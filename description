@@ -9,7 +9,7 @@ Institution: Nijmegen university
 Author: Randy Pollack 
 Author: Henk Barendregt 
 Institution: Nijmegen university
-Author: Luis Cruz-Filipe
+Author: Luís Cruz-Filipe
 Institution: Nijmegen university
 Description: 
  The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
@@ -18,5 +18,6 @@ Description:
  It includes in particular a constructive proof of the Fundamental
  Theorem of Algebra (every non-trivial polynomial equation P(z)=0
  always has a solution in the complex plane)
+Url: http://c-corn.cs.kun.nl
 Keywords: FTA, Fundamental, Theorem, Algebra, Constructive, Real, Complex,
           Polynomial
