@@ -1,0 +1,75 @@
+% $Id$
+
+\begin{proposition}\label{propfactpoly}
+Let $f(x)=a_n x^n+a_{n-1}x^{n-1}+\ldots + a_1 x+a_0$, with $a_i\in\CC$. 
+Suppose that $a_k\noto 0$, for some $0<k\leq n$.
+Then $f$ can be factorized as follows in linear factors.
+$$\overline{f}(x)=(\beta_1 x-\delta_1)\ldots(\beta_n x-\delta_n).$$
+\end{proposition}
+
+\begin{proof} Let $f$ be given.
+Take a $c\in\CC$ as in Lemma \ref{lempolnpts} such that $f(c)\noto 0$
+and let $g=(f_c)^{{\verb+~+}}$.
+Note that by Lemma \ref{lempolyop} we have
+$$\overline{g}(y)=y^n\overline{f}(c + \frac{1}{y}), \mbox{ for
+}y\noto 0.$$
+satisfying
+$$\overline{g}(y)=\overline{f}(c)y^n+\frac{\overline{f\ac}(c)}{1!}y^{n-1}+
+\ldots+ \frac{\overline{f^{(n)}}(c)}{n!}.$$
+It follows that $g$ is regular, with leading coefficient
+$\overline{f}(c)$, and hence 
+by the corollary $g$ is a product
+$$\overline{g}(y)=\overline{f}(c)(y-\alpha_1)\ldots(y-\alpha_n).\eqno{(1)}$$
+Now, for $x\noto c$, 
+\begin{eqnarray*}
+\overline{f}(x) &=& \overline{g}(\frac{1}{x-c})(x-c)^n\\
+	&=&\overline{f}(c)(\frac{1}{x-c}-\alpha_1)
+		\ldots(\frac{1}{x-c}-\alpha_n)(x-c)^n\\
+	&=& \overline{f}(c)(1-\alpha_1(x-c))
+		\ldots(1-\alpha_n(x-c))\\
+	&=& \overline{f}(c)(1+c -\alpha_1 x)\ldots(1+c-\alpha_n x).
+\end{eqnarray*}
+So, we are done by taking $\beta_i := -\overline{f}(c)\alpha_i$ and
+$\delta_i := -\overline{f}(c) (1+c)$.
+\qed
+\end{proof}
+
+
+\begin{theorem}\label{thmpolyzero}
+Let $f(x)=a_n x^n+a_{n-1}x^{n-1}+\ldots + a_1 x+a_0$, with $a_i\in\CC$. 
+Suppose that $a_k\noto 0$, for some $0<k\leq n$.
+Then $f$ can be factorized as
+follows in linear factors.
+$$\overline{f}(x)=(x-\alpha_1)\ldots(x-\alpha_k)(\beta_{k+1}x-\delta_{k+1})
+\ldots (\beta_n x-\delta_n).$$
+So, in particular, $f$ has $k$ zeros.
+\end{theorem}
+
+\begin{proof}
+From Proposition \ref{propfactpoly} we conclude that
+$$\overline{f}(x)=(\beta_1 x-\delta_1)\ldots(\beta_n x-\delta_n),$$
+for some $\beta_i$ and $\delta_i$ in $\CC$. We prove by induction on
+$n$ that at least $k$ of the $\beta_i$ can be chosen apart from $0$;
+hence, by dividing out these factors, we obtain the $\alpha_i$, $\beta_i$
+and $\delta_i$ of the statement.
+\begin{itemize}
+\item[$n=1$] Then $f(x) = a_1 x + a_0$ and $a_1\noto 0$, so we are
+	done.
+\item[$n+1$] Now $\overline{f}(x)=(\beta_1 x-\delta_1)
+	\ldots(\beta_{n+1} x-\delta_{n+1})$. Writing $h(x) =(\beta_2
+	x-\delta_2) \ldots(\beta_{n+1} x-\delta_{n+1})$, we find that
+	$h$ is a polynomial of length $n$, say $h(x) = h_n x^n +\ldots
+	+ h_0$. We find that 
+$$a_k = \beta_1 h_{k-1} - \delta_1 h_k.$$	
+	As $a_k \noto 0$, we conclude that $\beta_1 h_{k-1}\noto 0$
+	or $\delta_1 h_k\noto 0$. In the first case, $\beta_1\noto 0$
+	and from the induction hypothesis we derive that $k-1$ from
+	the $\beta_2 ,\ldots, \beta_n$ are $\noto 0$, so we are
+	done. In the second case, we conclude from the induction
+	hypothesis that $k$ from 
+	the $\beta_2 ,\ldots, \beta_n$ are $\noto 0$, so we are
+	done. 
+\end{itemize}
+\qed
+\end{proof}
+

@@ -1,0 +1,102 @@
+% $Id$
+
+\begin{definition}[Constructive Integral Domain]\label{defintdom}
+  A {\em constructive integral domain\/} is a constructive ring
+  \struct{S,0,1,+,-,*,=,\noto} such that
+\begin{enumerate}
+  \item $\forall x,y [x\noto 0 \wedge y\noto 0 \implies x y \noto 0]$.
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}\label{nonzsetoid}
+If \struct{S,0,1,+,-,*,=,\noto} is a constructive integral domain,
+then \struct{\{x\in S\,|\, x\noto 0\},1,*,=,\noto} forms a
+constructive monoid.
+\end{lemma}
+
+\begin{lemma}\label{intmulrespap}
+In a constructive integral domain, $*$ respects $\noto$, i.e.
+\[
+\forall x,y,z[x\noto y \wedge z\noto 0 \implies x z \noto y z].
+\]
+\end{lemma}
+\begin{proof}
+  Suppose $x\noto y$ and $z\noto 0$. By lemma \ref{lemgrstrext}, we
+  have that $x-y \noto 0$.  Hence $x z-y z=(x-y)z\noto 0$, and 
+  $z x\noto z y$ using lemma \ref{lemgrstrext} again. \qed
+\end{proof}
+
+
+\begin{lemma}\label{lempropid}
+\begin{eqnarray*}
+x\neq 0 \wedge y\neq 0 &\implies& x y \neq 0,\\
+x\neq y \wedge z\neq 0 &\implies& x z \neq y  z,\\
+x\neq0 \wedge x y = 0 &\implies & y=0.
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+For the first, suppose $\neg\neg(x\noto 0)$ and $\neg\neg(y\noto 0)$
+and suppose $\neg(x y\noto 0)$. If $x\not 0$, then if $y\noto 0$ we
+would have $x y \noto 0$, contradiction, so $\neg(y\noto 0$. But this
+is a contradiction, so $\neg(x\noto 0)$. Contradiction, so 
+$\neg\neg(x y\noto 0)$.
+
+For the second, suppose $x\neq y$ and $z\neq 0$. Then $x-y \neq 0$
+(using Lemma \ref{lemstrextneq}). Now, $z (x-y) \neq 0$ using the
+first and hence $z x \neq z y$ using distributivity and again Lemma
+\ref{lemstrextneq}.\\ For the third, suppose $x\neq 0$ and $x y=0$. If
+$y\neq 0$, then $x y \neq 0$ by the first. Contradiction, so
+$\neg(y\neq 0)$, which implies $y=0$. \qed
+\end{proof}
+
+\begin{remark}
+  It is in general not the case that in a constructive integral
+  domain,
+$$xy = 0 \implies x =0 \vee y =0.$$
+This is just because the $\vee$ has a strong interpretation. A weak
+counterexample is given by defining the real numbers $x$ and $y$
+respectively by the following Cauchy sequences of rationals
+$(x_i)_{i\in\NN}$, resp.\ $(y_i)_{i\in\NN}$.
+(In this definition we use  $k_{99}$ as abbreviation of `the number
+$k$ where we have just completed a sequence of 
+$99$ $9$s in the decimal series of $\pi$. Similarly $i<k_{99}$ if up
+to $i$ we have not yet encountered such a sequence of $99$ $9$s.)
+\begin{eqnarray*}
+  x_i &:=& 2^{-i} \mbox{ if } i<k_{99},\\
+  x_i &:=& 2^{_i} \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  even},\\
+  x_i &:=& 0 \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  odd},\\
+  y_i &:=& 2^{-i} \mbox{ if } i<k_99,\\
+  y_i &:=& 2^{_i} \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  odd},\\
+  y_i &:=& 0 \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  even}.
+\end{eqnarray*}
+Now, $xy = 0$, but to say that $x=0$ implies that we know that $k_99$
+exists and is odd. Similarly for $y=0$.
+\end{remark}
+
+
+\begin{lemma}\label{lemidsqu}
+  \begin{eqnarray*}
+    x^2 = a^2 &\implies& \neg(x\noto a \wedge x\noto -a),\\
+a\noto 0\wedge x^2 = a^2 &\implies& x= a \vee x= -a.\\
+  \end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+If $x^2 = a^2$, then 
+$$(x-a)(x+a) = 0.\:\:\: (*)$$ 
+Now, if $x\noto a \wedge x\noto
+-a$, then $x-a \noto 0 \wedge x+a\noto 0$, hence $(x-a)(x+a) \noto 0$,
+contradiction.\\
+If also $a\noto 0$, then $a\noto -a$ ($a\noto 0 \implies 2a\noto 0
+\implies a\noto -a$). Hence $x\noto a \vee x\noto -a$ by
+cotransitivity of $\noto$. Now, if $x\noto a$, then $x-a \noto 0$
+hence $x+a = 0$ by (*) and Lemma \ref{lempropid}, and hence
+$x=-a$. Similarly, if $x\noto -a$, then $x = a$.
+\qed
+\end{proof}
+

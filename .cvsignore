@@ -1,0 +1,6 @@
+.glob
+.depend
+.docdepend
+.doclist
+bin
+lib

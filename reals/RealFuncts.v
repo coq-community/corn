@@ -1,0 +1,227 @@
+(* $Id$ *)
+
+Require Export CReals1.
+
+(** * Continuity of Functions on Reals
+*)
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+
+Section Continuity.
+Variable f : CSetoid_un_op IR.
+Variable f2 : CSetoid_bin_op IR.
+
+(**
+Let [f] be a unary setoid operation on [IR] and
+let [f2] be a binary setoid operation on [IR].
+
+We use the following notations for intervals. [Intclr a b] for the
+closed interval [[a,b]], [Intolr a b] for the
+open interval ${<}a,b{>}$#&lt;a,b&gt;#, [Intcl a] for the
+left-closed interval $[a,\infty{>}$#[a,&infin;&gt;#, [Intol a] for the
+left-open interval ${<}a,\infty{>}$#&lt; a,&infin;&gt#, [Intcr b] for the
+right-closed interval ${<}-\infty,b]$#&lt;-&infin;,b]#.
+
+Intervals like [[a,b]] are defined for arbitrary reals [a,b] (being
+$\emptyset$#&empty;# for [a>b]).
+*)
+
+Definition Intclr (a b x : IR) : Prop := a[<=]x /\ x[<=]b.
+Definition Intolr (a b x : IR) : CProp := a[<]x and x[<]b.
+Definition Intol (a x : IR) : CProp := a[<]x.
+Definition Intcl (a x : IR) : Prop := a[<=]x.
+Definition Intcr (b x : IR) : Prop := x[<=]b.
+
+(** The limit of [f(x)] as [x] goes to [p = l], for both unary and binary
+functions:
+
+The limit of [f] in [p] is [l] if %\[\forall_{e>0}
+\exists_{d>0} \forall x\in\RR(-d<p-x < d) \rightarrow(-e <l-f(x) <e)\]%
+#&forall; e&gt;0&exists; d&gt;0 &forall; x in IR (-d &lt; p-x &lt; d)->(-e &lt; l-f(x) &lt; e)#
+*)
+
+Definition funLim (p l : IR) : CProp :=
+  forall e : IR,
+  Zero[<]e ->
+  {d : IR | Zero[<]d |
+  forall x : IR, AbsSmall d (p[-]x) -> AbsSmall e (l[-]f x)}.
+
+(** The definition of limit of [f] in [p] using Cauchy sequences. *)
+
+Definition funLim_Cauchy (p l : IR) : CProp :=
+  forall s : CauchySeqR,
+  Lim s[=]p ->
+  forall e : IR,
+  Zero[<]e -> {N : nat | forall m : nat, N <= m -> AbsSmall e (f (s m)[-]l)}.
+
+(** The first definition implies the second one. *)
+
+(*
+ Axiom funLim_prop1 :(p,l:IR)(funLim p l)->(funLim_Cauchy p l).
+*)
+(*
+Intros. Unfold funLim_Cauchy. Unfold funLim in H. Intros.
+Elim (H e H1). Intros.
+Elim s. Intros s_seq s_proof.
+Decompose [and] H2.
+Cut (Zero [<]  x[/]TwoNZ).
+Intro Hx2.
+Elim (s_proof (x[/]TwoNZ) Hx2).
+Intros N HN.
+Exists N.
+Intros.
+Apply AbsSmall_minus.
+Apply H5.
+Generalize (HN m H3).
+Intro HmN.
+*)
+
+(** The limit of [f] in [(p,p')] is [l] if %\[\forall_{e>0}\exists_{d>0}\forall x\in\RR(-d<p-x < d) \rightarrow
+(-d<p'-y < d<) \rightarrow(-e <l-f(x,y) <e).\]%
+#&forall; e&gt;0&exists; d&gt;0
+&forall; x in IR (-d <p-x <d)->(-d<p'-y < d<)->(-e <l-f(x,y) <e).#
+*)
+
+Definition funLim2 (p p' l : IR) : CProp :=
+  forall e : IR,
+  Zero[<]e ->
+  {d : IR | Zero[<]d |
+  forall x y : IR,
+  AbsSmall d (p[-]x) -> AbsSmall d (p'[-]y) -> AbsSmall e (l[-]f2 x y)}.
+
+(** The function [f] is continuous at [p] if the limit of [f(x)] as [x] goes to [p]
+is [f(p)].  This is the $\epsilon/\delta$#&epsilon;/&delta;# definition.
+We also give the defintion with limits of Cauchy sequences.
+*)
+
+Definition continAt (p : IR) : CProp := funLim p (f p).
+Definition continAtCauchy (p : IR) : CProp := funLim_Cauchy p (f p).
+Definition continAt2 (p q : IR) : CProp := funLim2 p q (f2 p q).
+
+(*
+Axiom continAt_prop1 :(p:IR)(continAt p)->(continAtCauchy p).
+*)
+
+Definition contin : CProp := forall x : IR, continAt x.
+Definition continCauchy : CProp := forall x : IR, continAtCauchy x.
+Definition contin2 : CProp := forall x y : IR, continAt2 x y.
+
+(**Continuous on a closed, resp. open, resp. left open, resp. left closed
+interval *)
+
+Definition continOnc (a b : IR) : CProp :=
+  forall x : IR, Intclr a b x -> continAt x.
+Definition continOno (a b : IR) : CProp :=
+  forall x : IR, Intolr a b x -> continAt x.
+Definition continOnol (a : IR) : CProp :=
+  forall x : IR, Intol a x -> continAt x.
+Definition continOncl (a : IR) : CProp :=
+  forall x : IR, Intcl a x -> continAt x.
+
+(*
+Section Sequence_and_function_limits.
+
+_* _Tex_Prose
+If $\lim_{x->p} (f x) = l$, then for every sequence $p_n$ whose
+limit is $p$, $\lim_{n->\infty} f (p_n) =l$.
+ *_
+_* _Begin_Tex_Verb *_
+Lemma funLim_SeqLimit:
+  (p,l:IR)(fl:(funLim p l))
+    (pn:nat->IR)(sl:(SeqLimit pn p)) (SeqLimit ([n:nat](f (pn n))) l).
+_* _End_Tex_Verb *_
+Proof.
+Intros; Unfold seqLimit.
+Intros eps epos.
+Elim (fl ? epos); Intros del dh; Elim dh; Intros H0 H1.
+Elim (sl ? H0); Intros N Nh.
+Exists N. Intros m leNm.
+Apply AbsSmall_minus.
+Apply H1.
+Apply AbsSmall_minus.
+Apply (Nh ? leNm).
+Qed.
+
+_**** Is the converse constructively provable? **
+Lemma SeqLimit_funLim:
+  (p,l:IR)((pn:nat->IR)(sl:(SeqLimit pn p)) (SeqLimit ([n:nat](f (pn n))) l))->
+    (funLim p l).
+****_
+
+_* _Tex_Prose
+Now the same Lemma in terms of Cauchy sequences: if $\lim_{x->p} (f x) = l$,
+then for every Cauchy sequence $s_n$ whose
+limit is $p$, $\lim_{n->\infty} f (s_n) =l$.
+ *_
+_* _Begin_Tex_Verb *_
+Ax_iom funLim_isCauchy:
+  (p,l:IR)(funLim p l)->(s:CauchySeqR)((Lim s) [=]  p)->
+	(e:IR)(Zero [<] e)->(Ex [N:nat](m:nat)(le N m)
+			 ->(AbsSmall e ((s m)[-](s N)))).
+_* _End_Tex_Verb *_
+
+End Sequence_and_function_limits.
+
+Section Monotonic_functions.
+_* _Begin_Tex_Verb *_
+Definition str_monot  := (x,y:IR)(x [<] y)->((f x) [<] (f y)).
+
+Definition str_monotOnc  := [a,b:IR]
+         (x,y:IR)(Intclr a b x)->(Intclr a b y)
+                ->(x [<] y)->((f x) [<] (f y)).
+
+Definition str_monotOncl  := [a:IR]
+         (x,y:IR)(Intcl a x)->(Intcl a y)
+                ->(x [<] y)->((f x) [<] (f y)).
+
+Definition str_monotOnol  := [a:IR]
+         (x,y:IR)(Intol a x)->(Intol a y)
+                ->(x [<] y)->((f x) [<] (f y)).
+_* _End_Tex_Verb *_
+
+_* Following probably not needed for the FTA proof;
+it stated that strong monotonicity on a closed interval implies that the
+intermediate value theorem holds on this interval. For FTA we need IVT on
+$[0,\infty>$.
+*_
+Ax_iom strmonc_imp_ivt :(a,b:IR)(str_monotOnc a b)
+           ->(x,y:IR)(x [<] y)->(Intclr a b x)->(Intclr a b y)
+               ->((f x) [<] Zero)->(Zero [<] (f y))
+                   ->(EX z:IR | (Intclr x y z)/\((f z) [=] Zero)).
+_* _Tex_Prose
+$\forall c\in\RR (f\mbox{ strongly monotonic on }[c,\infty>)
+\rightarrow \forall a,b\in\RR(c <a)\rightarrow( c< b)\rightarrow\ (f (a)<0)
+\rightarrow\ (0:<f(b))
+         \rightarrow \forall x,y\in\RR (a\leq x\leq b)\rightarrow
+	(a\leq y\leq b)\rightarrow (x<y)
+                \rightarrow \exists z\in\RR(x\leq z\leq y)\wedge(f(z)\noto 0))$
+*_
+_* _Begin_Tex_Verb *_
+Ax_iom strmon_ivt_prem : (c:IR)(str_monotOncl c)->
+  (a,b:IR)(Intcl c a)->(Intcl c b)->((f a) [<]  Zero)->(Zero  [<] (f b))
+       ->(x,y:IR)(Intclr a b x)->(Intclr a b y)->(x [<] y)
+              ->(EX z:IR | (Intclr x y z)/\((f z) [#] Zero)).
+_* _End_Tex_Verb *_
+
+_* The following is lemma 5.8 from the skeleton *_
+_* _Tex_Prose
+$\forall c\in\RR (f\mbox{ strongly monotonic on }[c,\infty>)
+\rightarrow \forall a,b\in\RR(a<b) \rightarrow(c <a)\rightarrow( c< b)
+\rightarrow(f (a)<0)\rightarrow (0:<f(b))
+         \rightarrow \exists z\in\RR(a\leq z\leq b)\wedge(f(z)= 0))$
+*_
+_* _Begin_Tex_Verb *_
+Ax_iom strmoncl_imp_ivt : (c:IR)(str_monotOncl c)
+           ->(a,b:IR)(a [<] b)->(Intcl c a)->(Intcl c b)
+               ->((f a) [<] Zero)->(Zero [<] (f b))
+                   ->(EX z:IR | (Intclr a b z)/\ ((f z) [=] Zero)).
+_* _End_Tex_Verb *_
+End Monotonic_functions.
+
+*)
+End Continuity.
+
+Set Strict Implicit.
+Unset Implicit Arguments.
+

@@ -1,0 +1,136 @@
+% $Id$
+
+\section{Real valued functions}
+In the proof of the Fundamental Theorem of Algebra, we use a
+strong version of the Intermediate Value Theorem (with a
+strong conclusion and a strong premise). This is Theorem 6.1.5 of
+\cite{TvD881}.
+
+\begin{definition} Intervals (closed and open) in $\RR$.
+\end{definition}
+
+\begin{definition} Continuity of functions $f:\RR^n\rightarrow \RR$
+($n\in\NN$).
+\end{definition}
+
+\begin{lemma}
+The identity and a constant function are continuous. 
+Continuity is preserved under $+$, $*$, composition and maximum
+(of finitely many functions).
+\end{lemma}
+
+\begin{corollary} If $f(X)$ is a polynomial over $\RR$, then the
+associated function $f$ is continuous.
+\end{corollary}
+
+\begin{theorem}[Intermediate Value Theorem]\label{thmIVT}
+Let $a,b\in \RR$, $a<b$, and let $f$ be continuous on $[a,b]$ with
+$f(a)<0<f(b)$.  Moreover assume that
+$$\forall x,y\in [a,b](x<y \rightarrow \exists z\in[x,y] (f(z)\noto
+0)).$$
+Then $\exists z\in[a,b](f(z)=0)$.
+\end{theorem}
+
+\begin{proof}
+See \cite{TvD881}, p.\ 294.
+\end{proof}
+
+\weg{
+\begin{lemma}\label{lemTvD2.6}
+Let $f$ be $n+1$ times uniformly differentiable on $[a,b]$, such that 
+$$ \inf_{x\in[a,b]} (\Sigma_{k=0}^n |f^{(k)} (x) |) > 0.$$
+then in each interval $[c,d] \subset [a,b]$ with $c<d$ there is an $x$
+such that $f(x)\noto 0$.
+\end{lemma}
+
+\begin{proof}
+See \cite{TvD881}, p.\ 298.
+\end{proof}
+
+\begin{lemma}If $f(X)$ is a polynomial over $\RR$, then the premises
+of Lemma \ref{lemTvD2.6} are satisfied for the associated function $f$
+, i.e.\ $f$ is $n+1$ times 
+uniformly differentiable on $[a,b]$, such that
+$$ \inf_{x\in[a,b]} (\Sigma_{k=0}^n |f^{(k)} (x) |) > 0.$$
+\end{lemma}
+
+\begin{proof}
+?? Or prove that the premises of the Intermediate Value Theorem
+\ref{thmIVT} hold for polynomials (and skip \ref{lemTvD2.6} and this Lemma).
+\end{proof}
+}
+
+\begin{corollary}[Intermediate Value Theorem for regular
+polynomials]\label{corimvpol} 
+Let $f$ be a regular polynomial over $\RR$ and let $a,b\in \RR$ such that
+$a<b$. 
+$$\mbox{If }f(a) < 0\mbox{ and }f(b)>0\mbox{ then }\exists z\in[a,b](f(z)=0).$$
+\end{corollary}
+
+\begin{proof}
+The premise in Theorem \ref{thmIVT} is satisfied: if $n$ is the
+degree of $f$, we choose $n+1$ distinct points in the interval
+$[x,y]$; due to Lemma \ref{lempolnpts} the value of $f$ is apart from
+$0$ for one of these points. \qed
+\end{proof}
+
+\begin{proposition}[Roots of polynomials over $\RR$ of odd degree]
+\label{proppolRodd}
+  Every polynomial of odd degree over $\RR$ has a root.
+\end{proposition}
+
+\begin{proof}
+Let $f$ be a polynomial of odd degree.
+We only have to show that for $x$ sufficiently small, $f(x) <0$ and
+for $x$ sufficiently large, $f(x) >0$. Then Corollary \ref{corimvpol}
+does the job. \qed. 
+\end{proof}
+
+\begin{lemma}[Intermediate Value Theorem for stricly monotonic
+functions]\label{lemivtstrmon} 
+If $f:\RR\arr\RR$ is strictly monotonic and continuous on some
+interval $I$, and $a,b\in I$ with $a<b$, $f(a)<0$, $f(b)>0$, then there
+is a $c\in (a,b)$ with $f(c)=0$.
+\end{lemma}
+
+\begin{proof}
+We show that the premise of Theorem \ref{thmIVT} is satisfied. Let
+$x, y \in [a,b]$ with $x<y$. Take $z_1,z_2 \in [x,y]$ such that
+$z_1<z_2$. Then $f(z_1)<f(z_2)$ due to the strict monotonicity of
+$f$. Hence $f(z_1)<0 \vee f(z_2) >0$.
+\qed
+\end{proof}
+
+\begin{definition} Let $n\in\NN$, $n\geq 1$, $a_1, \ldots , a_n \in \{
+x\in \RR| x\geq 0\}$ with $a_n = 1$.
+Define $m : [0, \infty) \rightarrow  [0, \infty)$ as follows.
+$$ m(s) := \maxx \{ a_i s^i \, |\, 1\leq i \leq n \}.$$
+\end{definition}
+
+\begin{lemma}\label{lemstrmonm}
+The function $m$ is strictly monotonic on $(0,\infty)$.
+\end{lemma}
+
+\begin{proof}
+We prove that for every $x,y\in(0,\infty)$, if $x<y$ then $\frac{m(y)}{m(x)}
+\geq \frac{y}{x}$. (Then $\frac{m(y)}{m(x)} >1$ and hence $m(y)>m(x)$.)
+Let $x,y\in(0,\infty)$, $x<y$, and suppose $\frac{m(y)}{m(x)}
+< \frac{y}{x}$. Then $\frac{x}{y}m(y) < m(x)$. We conclude that
+$\forall j\in\{1,\ldots,n\} (\frac{x}{y} a_j y^j < m(x))$ and hence
+$$\forall j\in\{1,\ldots,n\} ( a_j x^j \neq m(x)).$$ 
+(If $a_j x^j =
+m(x)$, then $\frac{x}{y} a_j y^j < a_j x^j$ and $y^{j-1}< x^{j-1}$,
+contradiction.) Also 
+$$\forall j\in\{1,\ldots,n\} ( a_j x^j \leq  m(x)).$$ 
+From these two, we conclude that
+$$\forall j\in\{1,\ldots,n\} ( \neg\neg (a_j x^j <  m(x))).$$
+From Lemma \ref{lemmaxngt} we conclude that
+$$\neg \forall j\in\{1,\ldots,n\} (a_j x^j < m(x)).$$ From these two
+statements we derive a contradiction. (Here we use that the universal
+quantifier ranges over a finite set.) Viz.\ Suppose $a_1 x <  m(x),
+a_2 x^2 <  m(x),\ldots, a_n x^n <  m(x)$. Then $\bot$ using the
+second. Hence $\neg(a_1 x <  m(x))$, which contradicts the first,
+hence $\neg(a_2 x^2 <  m(x))$, which contradicts the first, etcetera
+until we derive $\neg(a_n x^n <  m(x))$ and a contradiction.
+\qed
+\end{proof}

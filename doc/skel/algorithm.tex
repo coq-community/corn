@@ -1,0 +1,89 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\def\NN{\mathbb{N}}
+\def\RR{\mathbb{R}}
+\def\CC{\mathbb{C}}
+
+\begin{document}
+
+\title{Kneser}
+\author{}
+\date{}
+\maketitle
+
+\section{Classical}
+
+\subsection{Input}
+
+$$n\ge 2$$
+$$b_0,\ldots,b_n\in\CC$$
+$$b_0 \ne 0$$
+$$b_n = 1$$
+
+\subsection{Output}
+
+$$z\in\CC$$
+
+\subsection{Algorithm}
+
+\begin{enumerate}
+\item define $a_i = |b_i|$ for $i\in\{0,\ldots,n\}$
+\item\label{step:amb1} find $t$ and $k_0$ with $a_{k_0} t^{k_0} = a_0$ and
+$a_i t^i \le a_0$ for all $i\in\{1,\ldots,n\}$
+\item\label{step:amb2} for each $j$ take $r_j = t/3^j$ and
+find $k_j$ such that $a_i {r_j}^i \le a_{k_j} {r_j}^{k_j}$ for all $i\in\{1,\ldots,n\}$
+\item take the first $j$ for which $k_{j-1} = k_j = k_{j+1}$
+\item define $k = k_j$ and $r = t/3^j$
+\item\label{step:und} define $z$ such that $|z| = r$ and $b_k z^k$ points against $b_0$
+in the complex plane
+\end{enumerate}
+
+\subsection{Remark}
+
+Steps \ref{step:amb1} and \ref{step:amb2} are ambiguous, because there might
+be more than one $k_j$ that satisfies the conditions.  To disambiguate this
+algorithm some choices have to be made there.
+
+
+\section{Constructive}
+
+\subsection{Input}
+
+$$n\ge 2$$
+$$b_0,\ldots,b_n\in\CC$$
+$$b_n = 1$$
+$$c > |b_0|$$
+$$q = 1 - 3^{-2n^2-n}$$
+The number $c$ should be thought of as `the norm of the value of the polynomial in $0$'
+(it is a real number arbitrarily close to that.)
+
+\subsection{Output}
+
+$$z\in\CC$$
+such that:
+$$|z| < c^{1/n}$$
+(so if the value of the polynomial in 0 gets small, $z$ gets small) and:
+$$\sum_{i=0}^n b_i z^i < qc$$
+(so the value of the polynomial in $z$ is sufficiently smaller
+than the value in $0$.)
+
+\subsection{Algorithm}
+
+\begin{enumerate}
+\item choose some sufficiently small $\eta > 0$
+\item choose some $b_0' \mathrel{\#} 0$ sufficiently close to $b_0$
+\item choose some sufficiently small $\epsilon > 0$
+\item define $a_0 = |b_0'|$ and $a_i = |b_i|$ for $i\in\{1,\ldots,n\}$
+(this gives a real polynomial that `estimates' the complex polynomial)
+\item find $t$ with some properties
+\item find $j$ and $k$ with some more properties
+(basically:
+$j$ is not too big and $a_k r^k$ strongly dominates all other terms in the
+polynomial)
+\item define $r = t/3^j$
+\item define $z$ such that $|z| = r$ and $b_k z^k$ points against $b_0'$
+in the complex plane.
+\end{enumerate}
+
+\end{document}

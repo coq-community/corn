@@ -1,0 +1,116 @@
+% $Id$
+
+\subsection{Roots of complex numbers}
+We show that for $c \in\CC$, $c \noto 0$ and $n\in\NN^+$, $\sqrt[n]{c}$
+exists in $\CC$.
+To prove this we rely just on the following two facts: 1. Every
+positive number in $\RR$ has a square root, 2. Every
+polynomial of odd degree over $\RR$ has a root in $\RR$.
+The proof avoids the use of polar coordinates, exponentials and
+arctan. We have learned this proof from \cite{Litt41}; thanks to R.\
+Kortram who made us aware of this proof. 
+
+Let in the following $\CC$ be a structure for the complex numbers. 
+
+\begin{lemma}
+For each $c = a+ib \in\CC$ with $c \noto 0$, there exists a solution to
+$z^2 = c$. In particular, 
+%for the special case that $b \noto 0$, 
+a solution is given by:
+\begin{eqnarray*}
+  z = \sqrt{\frac{\sqrt{a^2 + b^2} +a}{2}} + i
+  \sqrt{\frac{\sqrt{a^2 + b^2} -a}{2}}&&\mbox{for}\quad b \geq 0\\
+  z = \sqrt{\frac{\sqrt{a^2 + b^2} +a}{2}} - i
+  \sqrt{\frac{\sqrt{a^2 + b^2} -a}{2}}&&\mbox{for}\quad b \leq 0
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+The second statement, including the fact that all square roots that
+occur take positive numbers, is a straightforward computation
+(using that $\sqrt{b^2} = b$ when $b\geq 0$, and that $\sqrt{b^2} = -b$ when
+$b\leq 0$.)
+For the first statement, because $c \noto 0$, we have either $a \noto 0$ or
+$b \noto 0$.  The second case we explicitly solved, and the first
+case reduces to the second by multiplying $c$ by $i$.
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemCrootequiv}
+Let $z, c\in\CC$, $c\noto 0$, $n\in\NN$. Then
+$$z^n = c \vee z^n = -c,$$
+if the conjunction of the following two equations holds.
+  \begin{eqnarray}
+    (|z|^2)^n &=& |c|^2,\\
+    z^n \bar{c} - \bar{z}^n c &=&0.
+  \end{eqnarray}
+(If $n>0$, the first determines a circle in the complex plane,
+while the second determines a number of lines through the origin.)
+\end{lemma}
+
+\begin{proof}
+Given these two equations, $z^n \bar{c} = \bar{z}^n c$, and so
+$$(z^n)^2 \bar{c} = z^n z^n \bar{c} = z^n \bar{z}^n c = (|z|^2)^n c =
+|c|^2 c = c^2 \bar{c}.$$
+Because $c\noto 0$ we can divide by $\bar{c}$ and hence
+$(z^n)^2 = c^2$.
+Again because $c\noto 0$ from this it follows that $z^n = c \vee z^n = -c$.
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemCrootoddpoly}
+For $a, b\in\RR$, $b\noto 0$, $n\in\NN$, 
+$$\frac{(r+i)^n(a-ib)-(r-i)^n(a+ib)}{2i}$$
+is a polynomial in $r$ of degree $n$ with real coefficients.
+\end{lemma}
+
+\begin{proof}
+This is equal to $\mbox{\it Im }(r+i)^n(a-ib)$, so it will be real.
+Now $(r+i)^n(a-ib)$ clearly has degree $n$, and because
+its head coefficient is
+$a-ib$ and $b\noto 0$, its imaginary part will have head coefficient
+$-b$, and so it also will have degree $n$.
+\qed
+\end{proof}
+
+
+\begin{proposition}
+For $c=a+ib\in\CC$, $c\noto 0$, and $n\in \NN$, $n$ odd, there exists a
+$z\in\CC$ such that $z^n = c$.
+\end{proposition}
+
+\begin{proof}
+We first treat the case that $b\noto 0$.
+Then by Lemma \ref{lemCrootoddpoly},
+$f(r)\equiv\big((r+i)^n(a-ib)-(r-i)^n(a+ib)\big)/2i$
+is a polynomial of odd degree
+with real coefficients. Hence it has a root in $\RR$. We now
+solve the following two equations in $x$ and $y$.
+\begin{eqnarray*}
+  r &=& x/y,\\
+  (x^2+y^2)^n &=& a^2+b^2.
+\end{eqnarray*}
+From the fact that $r$ is a root of $f$, by multiplying with $2iy^n$ we
+find that $(x+iy)^n(a-ib)-(x-iy)^n(a+ib)=0$, and
+from Lemma \ref{lemCrootequiv} then $(x+iy)^n = a + ib
+\vee(x+iy)^n = -a -ib$. In the first case $z=x+iy$, and
+in the second case $z=-x-iy$ will be a solution to $z^n=c$.
+
+The case that $a\noto 0$ reduces to the other one by multiplying $c$ by $i$.
+\qed
+\end{proof}
+
+\begin{theorem}
+For $c\in\CC$, $c\noto 0$ and $n\in\NN^+$ there exists an
+$z\in\CC$ such that $z^n = c$.
+\end{theorem}
+
+\begin{proof}
+This combines the ability to take square and odd roots.  Write $n$ as the
+product of a power of 2 and an odd factor and iterate taking roots.  (Note that
+this uses strong extensionality of taking powers: we need
+that the result of taking a root is again $\noto 0$.)
+\qed  
+\end{proof}
+
+

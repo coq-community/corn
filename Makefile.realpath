@@ -1,0 +1,18 @@
+# $Id$
+
+SRCDIR=$(shell pwd)/$(TOPDIR)
+BINDIR=$(SRCDIR)/bin
+
+.PHONY : realpath clean
+
+realpath: $(BINDIR)/realpath
+
+$(BINDIR):
+	mkdir --parents "$@"
+
+$(BINDIR)/realpath: $(BINDIR) $(SRCDIR)/tools/realpath
+	ln -f $(SRCDIR)/tools/realpath $(BINDIR)/realpath
+
+clean:
+	rm -f $(SRCDIR)/tools/realpath{,.o} "$(BINDIR)/realpath"
+	if [ -a "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi

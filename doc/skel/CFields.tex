@@ -1,0 +1,298 @@
+% $Id$
+
+\begin{definition}[Constructive Field]\label{deffield}
+A {\em constructive field\/} is a tuple
+\struct{S,0,1,+,-,*,^{-1},=,\noto} such that
+\struct{S,0,1,+,-,*,=,\noto} is a constructive ring and $^{-1}$ is an
+operation on the subsetoid $\{x\in S\mid x\noto 0\}$, such that
+\begin{enumerate}     
+\item $x^{-1}$ is inverse of $x$ with respect to $*$:\quad
+    $\forall x[x\noto 0 \implies x x^{-1}=1]$.
+\end{enumerate}
+\end{definition}
+
+We have not introduces Integral Domains as a seperate algebraic
+notion, but constructive fields are indeed constructive integral
+domains, as they satisfy the following property.
+
+\begin{lemma}[Integral Domain Property]\label{lemidfield}
+In a constructive field we have
+$$\forall x,y [x\noto 0 \wedge y\noto 0 \implies x y \noto 0],$$
+that is, a constructive field is a constructive integral domain.
+\end{lemma}
+
+\begin{proof}
+Suppose $x\noto 0, y\noto 0$. Then $(x y) y^{-1} =x \noto 0= 0 y^{-1}$, 
+so $x y \noto 0$, by strong extensionality of $*$. \qed.  
+\end{proof}
+
+\begin{lemma}\label{nonzsetoid}
+If \struct{S,0,1,+,-,*,^{-1},=,\noto} is a constructive field,
+then \struct{\{x\in S\,|\, x\noto 0\},1,*,=,\noto} forms a
+constructive monoid.
+\end{lemma}
+
+\begin{lemma}\label{intmulrespap}
+In a constructive field, $*$ respects $\noto$, i.e.
+\[
+\forall x,y,z[x\noto y \wedge z\noto 0 \implies x z \noto y z].
+\]
+\end{lemma}
+\begin{proof}
+  Suppose $x\noto y$ and $z\noto 0$. By lemma \ref{lemgrstrext}, we
+  have that $x-y \noto 0$.  Hence $x z-y z=(x-y)z\noto 0$, and 
+  $z x\noto z y$ using lemma \ref{lemgrstrext} again. \qed
+\end{proof}
+
+
+\begin{lemma}\label{lempropid}
+The following hold in a constructive field.
+\begin{eqnarray*}
+x\neq 0 \wedge y\neq 0 &\implies& x y \neq 0,\\
+x\neq y \wedge z\neq 0 &\implies& x z \neq y  z,\\
+x\neq0 \wedge x y = 0 &\implies & y=0.
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+For the first, suppose $\neg\neg(x\noto 0)$ and $\neg\neg(y\noto 0)$
+and suppose $\neg(x y\noto 0)$. If $x\not 0$, then if $y\noto 0$ we
+would have $x y \noto 0$, contradiction, so $\neg(y\noto 0$. But this
+is a contradiction, so $\neg(x\noto 0)$. Contradiction, so 
+$\neg\neg(x y\noto 0)$.
+
+For the second, suppose $x\neq y$ and $z\neq 0$. Then $x-y \neq 0$
+(using Lemma \ref{lemstrextneq}). Now, $z (x-y) \neq 0$ using the
+first and hence $z x \neq z y$ using distributivity and again Lemma
+\ref{lemstrextneq}.\\ For the third, suppose $x\neq 0$ and $x y=0$. If
+$y\neq 0$, then $x y \neq 0$ by the first. Contradiction, so
+$\neg(y\neq 0)$, which implies $y=0$. \qed
+\end{proof}
+
+\begin{remark}
+  It is in general not the case that in a constructive integral
+  domain,
+$$xy = 0 \implies x =0 \vee y =0.$$
+This is just because the $\vee$ has a strong interpretation. A weak
+counterexample is given by defining the real numbers $x$ and $y$
+respectively by the following Cauchy sequences of rationals
+$(x_i)_{i\in\NN}$, resp.\ $(y_i)_{i\in\NN}$.
+(In this definition we use  $k_{99}$ as abbreviation of `the number
+$k$ where we have just completed a sequence of 
+$99$ $9$s in the decimal series of $\pi$. Similarly $i<k_{99}$ if up
+to $i$ we have not yet encountered such a sequence of $99$ $9$s.)
+\begin{eqnarray*}
+  x_i &:=& 2^{-i} \mbox{ if } i<k_{99},\\
+  x_i &:=& 2^{_i} \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  even},\\
+  x_i &:=& 0 \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  odd},\\
+  y_i &:=& 2^{-i} \mbox{ if } i<k_99,\\
+  y_i &:=& 2^{_i} \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  odd},\\
+  y_i &:=& 0 \mbox{ if } i\geq k_{99} \mbox{ and } k_{99} \mbox{ is
+  even}.
+\end{eqnarray*}
+Now, $xy = 0$, but to say that $x=0$ implies that we know that $k_{99}$
+exists and that it is odd. Similarly for $y=0$.
+\end{remark}
+
+
+\begin{lemma}\label{lemidsqu}
+In a constructive field we have the following
+  \begin{eqnarray*}
+    x^2 = a^2 &\implies& \neg(x\noto a \wedge x\noto -a),\\
+2\noto 0\wedge a\noto 0\wedge x^2 = a^2 &\implies& x= a \vee x= -a.\\
+  \end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+If $x^2 = a^2$, then 
+$$(x-a)(x+a) = 0.\:\:\: (*)$$ 
+Now, if $x\noto a \wedge x\noto
+-a$, then $x-a \noto 0 \wedge x+a\noto 0$, hence $(x-a)(x+a) \noto 0$,
+contradiction.\\
+If also $a\noto 0$, then $a\noto -a$ ($a\noto 0 \implies 2a\noto 0
+\implies a\noto -a$). Hence $x\noto a \vee x\noto -a$ by
+cotransitivity of $\noto$. Now, if $x\noto a$, then $x-a \noto 0$
+hence $x+a = 0$ by (*) and Lemma \ref{lempropid}, and hence
+$x=-a$. Similarly, if $x\noto -a$, then $x = a$.
+\qed
+\end{proof}
+
+\begin{remark}
+In the previous Lemma we use the premise $2\noto 0$ to conclude $a\not
+-a$ from $a \not 0$. Note that if $2=0$, the result ($a\noto 0\wedge
+x^2 = a^2 \implies x= a \vee x= -a$) is also true. We would like to
+prove $2\noto 0 \vee 2 = 0$, so we can drop the assumption $2\noto 0$
+in the Lemma. We conjecture this to hold (the charachteristic of a
+field is discreet, also constructively (?)). Note that for the present
+development this doesn't really matter, as we will only be dealing
+with fields of charachteristic $0$ (hence $2\noto 0$): the reals and
+the complex numbers.
+\end{remark}
+
+\begin{lemma}\label{lemfdmulgrp}
+If \struct{S,0,1,+,-,*,^{-1},=,\noto} is a
+constructive field, then 
+\struct{\{x\in S \,|\, x\noto 0\},1,*,^{-1},=,\noto}
+is a constructive group.
+\end{lemma}
+
+\begin{definition}[Constructive Ordered Field]\label{defordfield}
+A {\em constructive ordered field\/} is a tuple
+\struct{S,0,1,+,-,*,^{-1},=,<,\noto} such that
+\struct{S,0,1,+,-,*,^{-1},=,\noto} is a constructive field and $<$ is a
+binary relation on $S$ such that
+\begin{enumerate}
+\item $<$ is transitive, irreflexive, anti-symmetric,
+\item $+$ respects $<$, i.e.\ $\forall x,y [x<y \rightarrow\forall
+z[x+z<y+z]]$,
+\item $*$ respects $0<$, i.e.\ $\forall x,y [0<x \wedge 0<y
+\rightarrow 0< x y]$,
+\item $\forall x,y[ x \noto y  \leftrightarrow  (x < y \vee y< x)]$,   
+\end{enumerate}
+\end{definition}
+
+
+\subsubsection{Properties of the ordering in a field}
+
+\begin{lemma}[$<$ is cotransitive]\label{lemlesscotr}
+The relation $<$ is cotransitive:
+$$\forall x,y [x<y \rightarrow\forall z[x<z \vee z< y]].$$
+\end{lemma}
+
+\begin{proof}
+Suppose $x < y$, then $x\noto y$, so for all $z$: $x\noto z \vee
+z\noto y$. Hence $x< z \vee z < x \vee z < y \vee y < z$. As $ z<x
+\implies z<y$ and $y<z \implies x<z$, we conclude that $x < z \vee z <
+y$. \qed
+\end{proof}
+
+\weg{
+\begin{lemma}[Cancellation fo $<$]]\label{lemcanclt}
+$$x+y <y+z \implies x<y.$$
+\end{lemma}
+
+\begin{proof} Immediate from Axiom 2. \qed
+\end{proof}
+}
+
+\begin{lemma}[$*$ respects $<$]\label{lempres1}
+$$a < b, c >0 \implies a   c < b   c.$$
+\end{lemma}
+
+\begin{proof} Using Axioms 3, 4 and distributivity. \qed
+\end{proof}
+ 
+\begin{lemma}\label{lemminless}
+$$a>b \eqqe -a < -b.$$
+\end{lemma}
+
+\begin{proof}
+Using Axiom 3. \qed 
+\end{proof}
+
+\begin{corollary}
+$$0 < 1.$$
+\end{corollary}
+
+\begin{proof}
+$0<1\vee 1<0$. If $1<0$, then $-1 > 0$ (by \ref{lemminless}), so $1 = (-1)
+ (-1) > 0$. \qed
+\end{proof}
+
+\begin{lemma}\label{leminvpos}
+$$a> 0 \eqqe a^{-1} > 0.$$
+\end{lemma}
+
+\begin{proof}
+ If $a> 0$, then $a\noto 0$, so $a^{-1} \noto 0$, i.e.\ $a^{-1}>0 \vee
+ a^{-1}< 0$. Now, if $a^{-1}< 0$, then $-a^{-1}>0$ (Lemma
+ \ref{lemminless}), so $-1 >0$ (Lemma \ref{lempres1}),
+ contradiction. Hence $a^{-1}>0$. \qed
+\end{proof}
+
+\begin{lemma}\label{leminvless}
+\begin{eqnarray*}
+a>b>0 &\eqqe& b^{-1} > a^{-1} > 0\\
+0>a>b &\eqqe& 0> b^{-1} > a^{-1}.
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+The first using Lemma \ref{lempres1} and Lemma \ref{leminvpos}. The
+second using Lemma \ref{lemminless} and the first. \qed
+\end{proof}
+
+
+\begin{definition}\label{defleq}
+We define the relation $\leq$ by
+$$x\leq y := \neg(y< x).$$
+\end{definition}
+
+\begin{lemma}\label{lemmulpresgeq}
+\begin{eqnarray*}
+x\leq y &\implies& x+z \leq y+z,\\
+x\leq y \wedge z>0 &\implies& x z \leq y z.
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof} If $x+z > y +z$, then $x>y$ by Axiom 3.
+If $x z > y  z$ and $z>0$, then $x>y$ by Lemma \ref{lempres1}, using Lemma
+\ref{leminvpos}. \qed 
+\end{proof}
+
+\begin{lemma}\label{lemgtgeq}
+$x\geq y \eqqe \forall z[y>z \implies x>z]$.
+\end{lemma}
+
+\begin{proof}
+From right to left: Suppose $x<y$, then $x< \frac{x+y}{2} < y$,
+contradiction.\\
+From left to right: Let $z\in\RR$ be such that $y>z$. Then $y>x\vee
+x>z$. As $y\leq x$, we conclude that $x>z$. 
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemgeqprop}
+\begin{eqnarray*}
+x\leq y \wedge y\leq x &\implies& x=y,\\
+x> y \vee y=x &\implies& x\geq y
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+Both trivial.
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemgeqtrans}
+\begin{eqnarray*}
+x< y \wedge y\leq z &\implies& x<z,\\
+x\leq y \wedge y<z &\implies& x<z,\\
+x\leq y \wedge y\leq z &\implies& x\leq z.
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+For the first, if $x<y$, then $x<z\vee z<y$. As $y\leq z$ we conclude
+that $x<z$. The second is similar. For the third, suppose $x>z$. The
+$x>z$ using the second, contradiction.
+\qed
+\end{proof}
+
+
+\begin{lemma}\label{lemsqpos}
+$x^2 \geq 0$.
+\end{lemma}
+
+\begin{proof}
+Suppose $x^2 < 0$. Then $x^2 \noto 0$, so $x\noto 0$ (using \ref{lemHeyt}), 
+so $x>0$ or $x<0$. In the first case $x^2 >0$. In the second case $-x >0$, so
+$(-x)^2 = x^2 >0$. Contradiction in both cases, so $\neg(x^2 < 0)$.
+\qed
+\end{proof}
+
+
+  

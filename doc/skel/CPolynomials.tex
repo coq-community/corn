@@ -1,0 +1,324 @@
+% $Id$
+
+\section{Polynomials}
+
+\subsection{Definition and general properties}
+\begin{definition}
+For $R$ a ring, we define the set of {\em polynomials over $R$},
+$R[X]$, as the finite lists of elements of $R$. We define the operations $+$,
+$*$ and $-$  on $R[X]$. Let $f= \langle f_0, \ldots,
+f_n\rangle $ and $g= \langle g_0, \ldots, g_m\rangle $ be two
+polynomials 
+%with $m\leq n$. 
+Then $f+g$ and $f-g$ are polynomials of length $\maxx\{ m+1,n+1\}$ and
+$f*g$ is a polynomial of length $m+n+1$ defined as follows.
+\begin{eqnarray*}
+  (f+g)_i &:=& f_i + g_i \mbox{ for } i \leq \maxx\{ m,n\},\\
+  (f-g)_i &:=& f_i - g_i \mbox{ for } i \leq \maxx\{ m,n\},\\
+  (f*g)_i &:=& \Sigma_{j=0}^i f_j * g(i-j) \mbox{ for } i \leq m+n,
+\end{eqnarray*}
+where it is understood that we take $f_j$ (resp.\ $g_j$) to be $0$ if
+$j>n$ (resp.\ $j>m$). The zero and unit are defined by
+\begin{eqnarray*}
+  0 &:=& \langle\; \rangle, (\mbox{the empty sequence}),\\
+  1&:=&\langle 1\rangle.
+\end{eqnarray*}
+The apartness relation on $R[X]$ is defined by
+$$ f \noto g \; := \; \exists i(f_i \noto g_i).$$
+\end{definition}
+
+Note that we use the terminology {\em length of a polynomial\/} when
+talking about the length of the list of coefficients. The length of a
+polynomial may not be the same as its {\em degree} (defined
+precisely in \ref{defdegpol})may be $0$.
+
+It is easy to see that
+$$ f =g \; \eqqe \; \forall i(f_i = g_i).$$
+
+\begin{definition}\label{defdegpol}
+Let $f(X)=f_n X^n+f_{n-1}X^{n-1}+\ldots + f_1 X+f_0$ be a polynomial.
+\begin{enumerate}
+\item $f(X)$ {\em has degree $k$}, notation $\deg(f) = k$, if
+$k\leq n$, $f_k \noto 0$ and $i=0$ for all $i$ with $k< i \leq n$,\\
+\item $f(X)$ {\em has degree at most $k$}, notation $\deg(f) \leq k$,
+if $k\leq n $, and $i=0$ for all $i$ with $k< i \leq n$,\\
+\item $f(X)$ {\em has degree at least $k$}, notation $\deg(f) \geq k$,
+if $k\leq n $, $f_k \noto 0$.
+\end{enumerate}
+So, not all polynomials have a degree: `degree' is not a function on
+polynomials but a relation between polynomials and natural
+numbers. However, it is always the case that 
+the degree of $f(X)=f_n X^n+f_{n-1}X^{n-1}+\ldots + f_1 X+f_0$ is {\em
+at most $n$}, and if we know that $f_k \noto 0$, it is {\em at least
+$k$}.
+\end{definition}
+
+\begin{definition}\label{defregpol}
+A polynomial $f(X)=f_n X^n+f_{n-1}X^{n-1}+\ldots + f_1 X+f_0$ is called
+{\em regular} if for its leading coefficient one has $f_n\noto
+0$. (That is: the polynomial has a degree, which is the same as its
+length, $n$.) 
+\end{definition}
+
+\begin{lemma}\label{lempolring} For $R$ a ring, $R[X]$ is a ring.
+\end{lemma}
+
+In the following, unless stated otherwise, $R$ is a ring.
+
+\begin{notation}
+A polynomial $f= \langle f_0, \ldots, f_n\rangle$ will often be denoted by
+$ f(X) = f_n X^n + f_{n-1} X^{n-1} + \ldots + f_0$ or by $f(X)=
+\Sigma_{j=0}^n f_j X^j$.\\
+The multiplication operation $*$ will usually be omitted.
+\end{notation}
+
+\begin{definition}\label{defpolyfun} For every polynomial $f(X)= f_n X^n
+  + f_{n-1} 
+  X^{n-1} + \ldots + f_0$  over $R$ we define a
+  function $\overline{f}:R\rightarrow R$ in the canonical way:
+$$f(a):=f_n a^n + f_{n-1}   a^{n-1} + \ldots + f_0.$$
+In the following, we will often just write $f$ for this function
+$\overline{f}$. 
+\end{definition}
+
+The following two Lemmas already hold for integral domains (rings with the
+additional property $x\noto 0 \wedge y\noto 0 \implies xy \noto 0$,
+see Lemma \ref{lemidfield}), but we have not introduced that notion here.
+
+\begin{lemma}\label{lempolid}
+  Let $F$ be a field and let $f = f_n X^n + \ldots + f_0$
+  and $g= g_m X^m  + \ldots + g_0$ be polynomials over $F$. Write
+  $h_{m+n} X^{m+n}  + \ldots + h_0$ for $fg$. Then
+$$f_i g_j \noto 0 \implies \exists k[ i+j \leq k \leq n+m \wedge h_k
+\noto 0].$$
+\end{lemma}
+
+\begin{proof}
+  See \cite{TvD882}, p.\ 417.
+\end{proof}
+
+\begin{theorem}\label{thmpolid}
+  If $F$ is a field, then $F[X]$ satisfies the integral domain
+  property, i.e.\ for all $f, g \in F[X]$, if $f\noto 0$ and $g\noto
+  0$, then $fg\noto 0$.
+\end{theorem}
+
+\begin{proof}
+  Suppose $f= f_n X^n + \ldots + f_0 \noto 0$ and $g= g_m X^m  +
+  \ldots + g_0\noto 0$ and let $h_{m+n} X^{m+n}  + \ldots + h_0$ be
+  $fg$. Then $f_i g_j \noto 0$ for some 
+  $i,j$, but then $h_k\noto 0$ for some $k$. \qed
+\end{proof}
+
+\subsection{Factorization and zeros}
+Let $R$ be a constructive ring.
+
+\begin{lemma}\label{lemremainder}
+  Let $f = f_n X^n + \ldots + f_0$
+  and $g= g_m X^m  + \ldots + g_0$ be polynomials over $R$. Then there
+  exist $k\in \NN, q,r \in R[X]$ such that
+$$(g_m)^k f(X) = q(X) g(X) + r(X)$$
+  and $r(X)$ has length less then $m$ or $0$.
+\end{lemma}
+
+\begin{proof}
+  See \cite{TvD882}, p.\ 418.
+\end{proof}
+
+\begin{theorem}\label{thmremainder}
+  Let $f(X)\in R[X]$ and $a\in R$. Then
+$$\exists ! q(X)\in R[X] ( f(X) = (X-a) q(X) + f(a)).$$
+\end{theorem}
+
+\begin{proof}
+By Lemma \ref{lemremainder}, $f(X) =q(X) (X-a) + c$, for some
+polynomial $q(X)$ and $c\in R$. By taking the value of the function
+$f$ in $a$, we find that $c= f(a)$. Furthermore, $q(X) = q_{n-1}
+X^{n-1} + \ldots + q_0$ and we can determine the coefficients of
+$q(X)$ uniquely from the equation $f(X) =q(X) (X-a) + f(a)$. \qed
+\end{proof}
+
+\begin{corollary}\label{corremainder}
+  For $f(X)\in R[X]$ and $a\in R$, 
+$$ (X-a) | f(X) \eqqe f(a) = 0.$$
+Moreover, if $f(X)$ has length $n$ and $f$ has $n+1$ zeros, then $f= 0$.
+\end{corollary}
+
+We now prove that if the polynomial $f$ has degree at least $k$
+($n\geq k>0$) and we are given
+$n+1$ distinct elements $(a_i)_{1\leq i \leq n+1}$, then $f(a_i)\noto
+0$ for one of the $i$. This will be used to prove the Intermediate
+Value Theorem for polynomials.
+
+\begin{lemma}\label{lempolagrnpts} Let $f(X), g(X)\in R[X]$, both of
+length $n$. Let $(a_i)_{0\leq i \leq n-1}$ be distinct elements of $R$ (I.e.\
+$a_i \noto a_j$ if $i\neq j$.). If $f(a_i)=g(a_i)$ for all $i$ ($0\leq
+i \leq n-1$), then $f=g$.
+\end{lemma}
+
+\begin{proof}
+The polynomial $h:= f-g$ has length $n$ and has $n$ zeros,
+so $h=0$ by Corollary \ref{corremainder}. Hence, $f=g$.\qed
+\end{proof}
+
+Let $F$ be a constructive field.
+
+\begin{lemma}\label{lempolnptsform}
+Let $f(X) \in R[X]$ of length $n$ and let $(a_i)_{1\leq i \leq
+n}$ be distinct elements of $R$. Then
+\begin{eqnarray*}
+f(X) &=& f(a_1) \frac{(X-a_2)(X-a_3) \cdots (X-a_{n})}{(a_1-a_2)(a_1
+-a_3) \cdots (a_1-a_{n})} +\\
+&& f(a_2) \frac{(X-a_1)(X-a_3) \cdots (X-a_{n})}{(a_2-a_1)(a_2
+-a_3) \cdots (a_2-a_{n})} +\\
+&&\cdots\\
+&& f(a_{n}) \frac{(X-a_1)(X-a_2) \cdots (X-a_{n-1})}{(a_{n}-a_1)(a_{n}
+-a_2) \cdots (a_{n}-a_{n-1})}.\\
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+The right hand side of the equation is a polynomial $h(X)$ of length
+$n$ (note that all the fractions are defined, because all $a_i$ are
+distinct). Furthermore $f$ and $h$ agree on all $a_i$, hence $f=h$ by
+Lemma \ref{lempolagrnpts}. \qed
+\end{proof}
+
+\begin{lemma}\label{lempolnpts}
+Let $f(X) \in R[X]$ of degree at least $k$ ($n\geq k > 0$) and let
+$(a_i)_{1\leq i \leq 
+n+1}$ be distinct elements of $R$. Then 
+$$f(a_i) \noto 0$$
+for some $i$.
+\end{lemma}
+
+\begin{proof}
+Write $f(X) = f_n X^n + \ldots + f_0$.  By Lemma \ref{lempolnptsform}
+we find that for the coefficient $f_k$ we
+have
+%$$f_k = \Sigma_{1\leq i \leq n+1} f(a_i)\frac{1}{\Pi_{1\leq j \leq
+%n+1, i\neq j} (a_i - a_j)}.$$
+$$f_k = \Sigma_{1\leq i \leq n+1} f(a_i) h_k^i,$$
+where $h_k^i$ is the $k$-th coefficient of the $i$-th polynomial as above:
+$$\frac{(X-a_1) \cdots
+  (X-a_{i-1})(X-a_{i+1})\cdots(X-a_{n})}{(a_{i}-a_1)\cdots (a_{i}
+  -a_{i-1})(a_{i} -a_{i+1}) \cdots (a_{i}-a_{n+1})}$$
+As $f_k \noto 0$, we find that $f(a_i) \noto 0$ for at least one
+$i$. \qed
+\end{proof}
+
+
+\subsection{Operations on polynomials}
+
+We need some formal operations on polynomials. Let $F$ be an ordered
+field (to make sure that always $n!\noto 0$; as ordered
+field are infinite this is the case).
+
+
+\begin{definition}
+  For $f(X) = a_n X^n+a_{n-1}X^{n-1}+\ldots +a_1 X +a_0$ a polynomial,
+  we define the {\em derivative of $f$}, $f\ac$ as follows.
+$$f\ac (X) := na_n X^{n-1}+(n-1)a_{n-1}X^{n-2}+\ldots +a_1.$$
+Taking $k$-times the deriavtive of $f$ is denoted as $f^{(k)}$.
+\end{definition}
+
+\begin{definition}\label{defpolyop} Let
+  $f(x)=a_nx^n+a_{n-1}x^{n-1}+\ldots +a_0$ be a polynomial over
+  $R$ and $c\in R$. Define the polynomials $f{{\verb+~+}}$ and $f_c$ as
+  follows.
+  \begin{eqnarray*}
+    f{{\verb+~+}}(X)&=&a_0 X^n+\ldots +a_{n-1}X+a_n,\\
+    f_c(X)&=&\frac{f^{(n)}(c)}{n!}X^n+\frac{f^{(n-1)}(c)}{(n-1)!}X^{n-1}+ 
+    \ldots +\frac{f\ac(c)}{1!}X + f(c)  
+  \end{eqnarray*}
+\end{definition}
+
+\begin{lemma}\label{lempolyop} Let $f(X)=a_n X^n+a_{n-1}X^{n-1}+\ldots
+    +a_0$ be a polynomial over $R$ and $c\in R$. For the function
+    $\overline{f}$ associated to this polynomial (\ref{defpolyfun}) we have
+\begin{eqnarray*}
+\overline{f{{\verb+~+}}}(x)= x^n \overline{f}(x^{-1}),\mbox{ if }x\noto
+0,\\
+\overline{f{{\verb+~+}}}(0)= a_n, \\
+\overline{f_c}(x)=\overline{f}(x+c).
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+We informally write $f$ where we refer to the function $\overline{f}$ etcetera.
+\beqn
+x^nf(\frac{1}{x})&=&x^n(a_nx^{-n}+\ldots+a_0)\\
+&=&a_n+a_{n-1}+\ldots+a_0x^n\\
+&=&f{{\verb+~+}}(x).
+\eeqn
+Clearly $f_c(x)$ is a polynomial of maximal degree $n$. Hence,
+$$f_c(x)=b_nx^n+\ldots+b_0.$$
+It follows that
+\beqn
+f(c)&=& f_c(0)\;=\;b_0,\hfill \mbox{ hence }b_0\;=\;f(c),\\
+f\ac(c)&=&f\ac_c(0)\;=\;b_1,\mbox{ hence }b_1\;=\;f\ac(c)\\
+f^{(2)}(c)&=&f^{(2)}_c(0)\;=\;2!b_2,\mbox{ hence }
+b_2\;=\;\frac{f^{(2)}(c)}{2!}\\
+\ldots&&\\
+f^{(n)}(c)&=&f^{(n)}_c(0)\;=\;n!b_n,\mbox{ hence }
+b_n\;=\;\frac{f^{(n)}(c)}{n!}. \qed
+\eeqn
+\end{proof}
+
+
+\weg{
+\begin{lemma}\label{1.6} Let $f(X) = a_n X^n+a_{n-1}X^{n-1}+\ldots +a_1
+  X +a_0,$ be  a polynomial over an infinite field $F$ in which $i\neq
+  0, a\noto 0 \implies ia\noto 0$.
+  Suppose that $a_k\unneq 0,$ for some $0<k\leq n.$ Then for some
+  $c\in F$ one has 
+$$f(c)\unneq 0,\;f'(c)\unneq 0,\ldots,f^{(k)}(c)\unneq 0.$$
+\end{lemma}
+
+? Is $i\neq 0, a\noto 0 \implies ia\noto 0$ needed?
+\begin{proof}
+
+We show, for $0\leq l\leq k,$ the existence of an infinite subset
+$A_l\subset F$ such that
+$$a\in A_l\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l)}(a)\unneq 0,$$
+by induction on $l.$\\[1ex]
+{\em Case }$l=0.$ Choose $u_0,\ldots,u_n\in F,\;\; u_i\noto u_j$ for
+$i\neq j.$ Consider the system of $n+1$ equations
+$$ (a_0\; a_1\;\ldots a_n)\;U =(f(u_0)\; f(u_1)\;\ldots f(u_n))$$
+where
+$$ U =
+\left(
+\begin{array}{llll}
+1 &1 &\ldots &1 \\
+u_0 &u_1 &\ldots &u_n \\
+&&& \\
+&&& \\
+u_0^n &u_1^n &\ldots &u_n^n
+\end{array}
+\right).$$
+We have
+$$det(U) = \prod\limits_{0\leq j < i\leq n}(u_i - u_j)\noto
+0\quad\quad\mbox{(Vandermonde \ref{lemVand})}.$$
+Hence (by \ref{lemLinInvDet}), $U$ has an inverse $C$ such that 
+$$ (a_0\; a_1\;\ldots a_n) = (f(u_0)\; f(u_1)\;\ldots f(u_n))\;C.$$
+Especially
+$$a_k = f(u_0)c_{0k}+\ldots +f(u_n)c_{nk}.$$
+
+From $a_k\unneq 0$ follows $f(u_i)\unneq 0$ for some $i.$ This shows
+the existence of the set $A_0.$\\[1ex]
+{\em Case }$l>0.$ By the induction hypothesis there exists an infinite
+subset $A_{l-1}\subset F$ such that
+$$a\in A_{l-1}\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l-1)}(a)\unneq 0.$$
+We only need to show the existence of an infinite subset $A_l\subset
+A_{l-1}$ such that
+$$a\in A_l\Rightarrow f^{(l)}(a)\unneq 0.$$
+The coefficient of degree $k-l$ in $f^{(l)}$ is
+$k(k-1)\ldots(k-l+1)a_k\unneq 0.$ Hence if we choose
+$u_0,\ldots,u_{n-l}\in A_{l-1},\;\; u_i\noto u_j \mbox{ if } i\neq j,$
+then it follows similarly to the {\em Case }$l=0$ that
+$f^{(l)}(u_i)\unneq 0$ for some $i,\;\; 0\leq i \leq n-l.$ This shows
+the existence of $A_l.\hfill\qed$
+\end{proof}
+}

@@ -1,0 +1,454 @@
+% $Id$
+
+\section{The Reals}
+We give a constructive axiomatization of the reals $\RR$. The
+intention is that the axioms can be instantiated by any specific
+construction of $\RR$. In our axiomatization, the reals form a
+constructive ordered field, for which Cauchy-completeness and the
+axiom of Archimedes hold.
+
+\begin{definition} A {\em structure for real numbers\/} is a
+constructive abelian ordered field 
+$\langle \RR, 0, 1, +, *, -, ^{-1}, =, <, \noto\rangle$ that
+\begin{enumerate}
+%\item $\langle \RR, 0, 1, +, *, -, ^{-1}, =, <, \noto\rangle$ is an abelian
+%constructive ordered field,
+%\item $<$ is transitive, irreflexive, anti-symmetric,
+%\item $+$ respects $<$, i.e.\ $\forall x,y [x<y \rightarrow\forall
+%z[x+z<y+z]]$,
+%\item $*$ respects $0<$, i.e.\ $\forall x,y [0<x \wedge 0<y
+%\rightarrow 0< x y]$,
+%\item $\forall x,y[ x \noto y  \leftrightarrow  (x < y \vee y< x)]$,     
+\item is Cauchy-complete:
+$$\forall x_1, x_2,\ldots 
+        (\forall \epsilon>0 \exists N\in\NN \forall m>N(-\epsilon <x_m - x_N <
+        \epsilon))
+        \rightarrow
+        \exists x [x = \lim_{n\rightarrow\infty} x_n].$$
+\item satisfies the Axiom of Archimedes:
+$$\forall x\exists n\in\NN[x<n].$$
+\end{enumerate}
+\end{definition}
+
+\begin{remark}[to the Definition]
+ In the definition we actually use $\NN$ to denote both $\NN$
+  itself (in 1) as the {\em image\/} of
+  $\NN$ in $\RR$ (in 2) via the function $f$ that maps $0\in\NN$ to $0\in\RR$
+  and $S(x) \in \NN$ to $f(x) +1$. So, in 1, we quantify over the set
+  of functions from $\NN$ to $\RR$. In 2, the axiom really reads
+  $\forall x\exists n\in\NN[x<f(n)]$, with $f$ the injection of $\NN$
+  into $\RR$.
+\end{remark}
+
+
+
+
+\weg{\subsection{$\NN$, $\ZZ$ and $\QQ$}
+
+\begin{definition} Similarly to $\NN$ we define
+$\ZZ$ and $\QQ$ as follows. 
+\begin{enumerate}
+\item $\ZZ$ is the smallest subset of $\RR$
+containing $0$, $1$ and closed under $+$ and $-$. 
+\item $\QQ$ is the
+smallest subset of $\RR$ containing $0$, $1$ and closed under $+$,
+$-$ and $^{-1}$ (the latter restricted to elements that are $\noto
+0$).
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}
+$\ZZ$ and $\QQ$ are closed under $*$.
+\end{lemma}
+
+\begin{proof}
+By induction, using distributivity and Lemma \ref{lemuninv}.
+\end{proof}
+
+\begin{lemma}[Standard forms of naturals, integers and
+rationals]\label{lemstand}
+\begin{enumerate}
+\item Every $x\in\NN$ can be written as
+$$(\ldots((0+1)+1)\ldots +1).$$
+\item Every $x\in\ZZ$ can be written as
+$$ p-q , \mbox{ with } p,q\in \NN.$$
+\item Every $x\in\QQ$ can be written as
+$$p   q^{-1}, \mbox{ with } p,q\in \ZZ, q \neq 0.$$
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+By induction. \qed
+\end{proof}
+
+\begin{lemma} Equality on $\NN$, $\ZZ$ and $\QQ$ are decidable, i.e.\
+\begin{eqnarray*}
+\forall x,y[x\in\NN\wedge y\in \NN &\implies& x =y \vee x\neq y],\\
+\forall x,y[x\in\ZZ\wedge y\in \ZZ &\implies& x =y \vee x\neq y],\\
+\forall x,y[x\in\QQ\wedge y\in \QQ &\implies& x =y \vee x\neq y],\\
+\end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+First use Lemma \ref{lemstand} to create a standard form. Then, for $\ZZ$,
+$p-q = r-s$ iff $p+s = r+q$ in $\NN$.
+For $\QQ$, $p   q^{-1} = r  s^{-1}$ iff $p   s = q   r$ in $\ZZ$. \qed
+\end{proof}
+
+\begin{definition}[Absolute value]\label{defabszq}
+For $x\in\ZZ$ we define the absolute value of $x$, $|x|$ by first
+considering the standardform of $x$, $p-q$, and then defining
+\begin{eqnarray*} 
+|x|&:=& p-q, \mbox{ if } p\geq q,\\
+|x| &:=& q-p, \mbox{ if } p< q.
+\end{eqnarray*}
+For $x\in\QQ$ we define the absolute value of $x$, $|x|$ by first
+considering the standardform of $x$, $p q^{-1}$, and then defining
+$$|x|:= |p| |q|^{-1}.$$
+\end{definition}
+
+\begin{lemma}\label{lemmulabsval}
+For $x, y \in \QQ$,
+$$ |x| |y| = |xy|.$$
+\end{lemma}
+
+\begin{proof}
+We first prove the Lemma for integers. There are four cases of which we treat one:
+suppose $x = p-q$ with $p\geq q$ and $y= r-s$ with $r<s$. Then $|x y| = |(p-q) (r-s)|
+= |(p-q) r -(p-q) s| = (p-q) s - (p-q) r = = (p-q) (s-r) = |x| |y|$. 
+(Use Lemma \ref{lemmulpresgeq}.) Now for the rationals suppose $x = p q^{-1}$ and 
+$y = r   s^{-1}$. Then $|x   y| = |p r| (|q s|)^{-1} = |p| |q|^{-1} 
+|r|   |s|^{-1} = |x| |y|$.
+\end{proof}
+
+\begin{lemma}\label{lemtriangle}
+For $x, y \in \QQ$,
+$$|x + y| \leq |x|+|y|.$$
+\end{lemma}
+
+\begin{proof}
+We first prove the Lemma for integers. There are four cases of which we treat one: 
+suppose $x = p-q$ with $p\geq q$ and $y= r-s$ with $r<s$. Then $|x+y| =|p-q+r-s| \leq 
+|p-q+s-r| = |x| +|y|$.
+For the rationals, suppose $x = p q^{-1}$ and $y = r   s^{-1}$. Then $|x+y| = |(ps + rq) (qs)^{-1}|
+=  |ps + rq| |qs|^{-1} \leq (|ps| + |rq|) |qs|^{-1} = |p   q^{-1}| + |r s^{-1}| = 
+|x|+|y|$. \qed
+\end{proof}
+
+\begin{corollary}\label{corabsq}
+For $x, y \in \QQ$,
+$$||x| - |y|| \leq |x-y|.$$
+\end{corollary}
+
+\begin{proof} Distinguish between $|x|\geq |y|$ and $|x|< |y|$. In the
+first case, $||x| - |y|| = |x|-|y|\leq |x-y|$, by $|x| \leq
+|y|+|x-y|$. In the second case, $||x| - |y|| = |y|-|x|\leq |y-x| =
+|x-y|$, by $|y| \leq |x|+|y-x|$. \qed
+\end{proof}
+}
+\subsection{Properties of the real numbers}
+\begin{lemma}\label{lemnonstand}
+There are no non-standard real numbers, i.e.
+$$\forall n\in \NN[ -\frac{1}{n} < x <\frac{1}{n}] \implies x = 0,$$
+for all $x$. 
+\end{lemma}
+
+\begin{proof}
+Suppose $x \noto 0$ towards a contradiction. (Then $\neg
+(x\noto 0)$ and hence $x = 0$.) Then $x^{-1}$ exists and by the Axiom
+of Archimedes we find a $n\in \NN$ such that $\frac{1}{x} < n$. But
+then either $\frac{1}{n} < x$ or $x <\frac{-1}{n}$ (distinguishing
+cases according to $x>0$ or $x<0$ and using Lemma
+\ref{leminvless}. \qed
+\end{proof}
+
+\begin{definition} A sequence of reals $x_1, x_2,\ldots$ is called a
+{\em Cauchy sequence\/} if 
+$$\forall \epsilon>0 \exists N\in\NN \forall
+m>N(-\epsilon < x_m - x_N <  \epsilon).$$ 
+\end{definition}
+
+\begin{lemma}\label{lemCauchy} A sequence of reals $x_1, x_2,\ldots$ is
+a Cauchy-sequence iff
+$$\forall k\in\NN \exists N\in\NN \forall m>N(-\frac{1}{k} <x_m - x_N <
+        \frac{1}{k}).$$
+\end{lemma}
+
+\begin{proof} The implication from left to right is immediate, as
+$\frac{1}{k} >0$. The reverse implication uses the axiom of
+Archimedes. Assume $\forall k\in\NN \exists N\in\NN \forall
+m>N(-\frac{1}{k} <x_m - x_N <
+        \frac{1}{k})$.
+Let $\epsilon > 0$. Then $ \epsilon^{-1} \in \RR$, so
+there is a $k\in\NN$ such that $\epsilon^{-1} < k$ and hence
+$\epsilon > \frac{1}{k}$. Now we find $N$ by our assumption. \qed
+\end{proof}
+
+\weg{
+\begin{lemma}\label{lemrealseqrat}
+For every $x\in \RR$ there exists a sequence of rational numbers $q_0,
+q_1, q_2, \ldots$ such that
+$$ x = \lim_{n\rightarrow\infty} q_n.$$
+\end{lemma}
+
+\begin{proof} Let $x\in \RR$. Then there are $m, n\in \NN$ such that
+$x<n$ and $-x <m$, hence $-m < x < n$. We construct two sequences of
+rational numbers  $p_0, p_1, p_2, \ldots$ and $q_0, q_1, q_2, \ldots$
+such that
+\begin{enumerate}
+\item $\forall i\in \NN [ p_i < x < q_i]$,      
+\item $\forall i\in \NN [ q_{i+1} - p_{i+1} = \frac{2}{3}(q_{i} - p_{i})]$.
+\end{enumerate}
+Then $q_0, q_1, q_2, \ldots$ is a Cauchy sequence and
+$\lim_{n\rightarrow \infty} q_n = x$. The construction of $p_0, p_1,
+p_2, \ldots$ and $q_0, q_1, q_2, \ldots$ is as follows. Define $p_0 := -m$,
+$q_0 := n$ and if $p_i$ and $q_i$ have already been defined such that
+$p_i < x < q_i$, consider  
+\begin{eqnarray*}
+l &:=& \frac{2p_i + q_i}{3},\\
+r &:=& \frac{p_i + 2 q_i}{3}.
+\end{eqnarray*}
+Now $l < r$, so we can define
+\begin{eqnarray*}
+q_{i+1} := r, && p_{i+1} := p_i, \mbox{ if }x<r,\\
+q_{i+1} := q_i, && p_{i+1} := l, \mbox{ if }l<x.
+\end{eqnarray*}
+Then $q_{i+1} - p_{i+1} = \frac{2}{3}(q_{i} - p_{i})$
+and $p_{i+1} < x < q_{i+1}$. \qed
+\end{proof}
+}
+
+\begin{lemma}\label{lemapy}
+Given $x,y\in\RR$ and $\epsilon>0$, there exists $x'\in\RR$ such that
+$$-\epsilon < x-x'< \epsilon \wedge x'\noto y.$$ 
+\end{lemma}
+
+\begin{proof}
+$y< x+\frac{\epsilon}{2} \vee y> x-\frac{\epsilon}{2}$. In the first
+case take $x' := x+\frac{\epsilon}{2}$, in the second case take $x' :=
+x-\frac{\epsilon}{2}$.
+\qed
+\end{proof}
+
+We now define the {\em maximum\/} of two real numbers. This is not
+straightfoward, because we have no trichotomy. (Classically, the
+maximum can be defined in an ordered field, but constructively that is
+in general not the case: one needs the Cauchy property.) In a
+situation where the reals are constructed out of the rationals, say,
+$x = (x_i)_{i\in \NN}$, one can use the maximum of two rationals
+($\max(x_i,y_i)$) to define a Cauchy sequence of
+the maximum of $x$ and $y$, namely $(\max(x_i,y_i)_{i\in \NN}$.
+Here we can not do that. Instead when defining the maximum of $x$ and
+$y$ we first have to define an auxiliary sequence of reals
+$(y_i)_{i\in\NN}$ that has $y$ as a limit and such that $x\noto y_i$
+for all $i$.
+
+\begin{definition}\label{defmax}
+We construct a sequence $(y_i)_{i\in\NN}$ such that
+$$\forall i\in \NN[-\frac{1}{i}< y-y_i <\frac{1}{i} \wedge y_i \noto
+x].$$ This is is possible, due to Lemma \ref{lemapy}. Note that
+$(y_i)_{i\in\NN}$ is a Cauchy sequence and $y=\lim_{i\rightarrow \infty}
+y_i$. Now define the sequence $(s_i)_{i\in\NN}$ by
+$$s_i :=
+\left\{ \begin{array}{rcl}
+        x &\mbox{if}& x>y_i,\\
+        y_i &\mbox{if}& x<y_i,\\
+       \end{array}\right.$$
+Now $(s_i)_{i\in\NN}$ is a Cauchy sequence and we define
+$$\maxx (x ,y) := \lim_{i\rightarrow \infty} s_i.$$
+\end{definition}
+
+\begin{lemma}\label{lemmaxngt}
+$\forall x,y\in\RR[\neg(\maxx(x,y)>x \wedge \maxx(x,y)>y)]$.
+\end{lemma}
+\begin{proof}
+From the Definition of \maxx.\qed
+\end{proof}
+
+\begin{lemma}\label{lemmaxcomm}
+\maxx\ is commutative, i.e.\ $\forall x,y\in\RR[\maxx(x,y)=\maxx(y,x)]$.
+\end{lemma}
+
+\begin{lemma}\label{lemmaxisupb}
+\maxx\ gives an upperbound, i.e.\ $\forall x,y\in\RR[\maxx(x,y)\geq x 
+\wedge \maxx(x,y)\geq y]$.
+\end{lemma}
+
+\begin{lemma}\label{lemmaxislub}
+\maxx\ give a least upperbound, i.e.\ $\forall x,y,z\in\RR[z\geq x 
+\wedge z\geq y \rightarrow z\geq\maxx(x,y)]$. 
+\end{lemma}
+
+\begin{proof}
+Suppose $z< \maxx(x,y)$. Then  $z<y \vee y<\maxx(x,y)$ and 
+$z<x \vee x<\maxx(x,y)$. If $y<\maxx(x,y)$, then $x<\maxx(x,y)$ 
+contradicts Lemma \ref{lemmaxngt}, so $z<y\vee z<x$, contradicting 
+$z\geq x \wedge z\geq y$. So $z\geq\maxx(x,y)$.
+\qed
+\end{proof}
+
+\begin{lemma} \label{lemmaxgeq}
+$\forall x,y\in\RR[ x\leq y \leftrightarrow \maxx(x,y) = y]$.
+\end{lemma}
+
+\begin{proof}
+  For $\rightarrow$: $\maxx(x,y)\geq y$ by Lemma \ref{lemmaxisupb} and
+  $\maxx(x,y) \leq y$ by Lemma \ref{lemmaxislub}.\\
+  For $\leftarrow$: suppose $x>y$. Then $x\geq y$ and hence
+  $\maxx(x,y) = x$ by the previous. Hence $x=y$, contradiction. So
+  $x\leq y$.  \qed
+\end{proof}
+
+\begin{definition}\label{defabs}
+For $x\in\RR$, we define
+$$|x| := \maxx(x, -x).$$
+\end{definition}
+
+\begin{lemma} \label{lemabsid}
+$\forall x\in \RR[x\geq 0 \rightarrow |x|=x].$
+\end{lemma}
+
+\begin{proof}
+If $x\geq 0$, then 
+$-x \leq 0$, hence $-x\leq x$. So $\maxx(x,-x)= x$ by Lemma 
+\ref{lemmaxgeq}. 
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemabseps}
+$\forall x,y,r\in\RR [|x-y| \leq r \leftrightarrow x-r \leq y\leq x+r]$.
+\end{lemma}
+
+\begin{proof}
+  Immediate using the intermediate equivalent statement $x-y\leq r
+  \wedge -x+y \leq r$.  \qed
+\end{proof}
+
+\begin{lemma}\label{lemtriangle}
+$\forall x,y\in\RR[ |x+y| \leq |x|+|y|]$.
+\end{lemma}
+
+\begin{proof}
+  $\maxx(x,-x)+\maxx(y,-y) \geq x+y$ and $\maxx(x,-x)+\maxx(y,-y) \geq
+  -x-y$.  Hence $|x|+|y| = \maxx(x,-x)+\maxx(y,-y) \geq \maxx(x+y,
+  -x-y) = |x+y|$.  \qed
+\end{proof}
+
+\begin{lemma}\label{lemabsmin}
+$\forall x,y,z,r,q\in\RR[ |x-y|\leq r \wedge |y-z|\leq q \rightarrow |x-z|\leq r+q$. 
+\end{lemma}
+
+\begin{proof}
+$|x-z| =|x-y+y-z| \leq |x-y|+|y-z| \leq r+q$.
+\qed
+\end{proof}
+
+\weg{
+\begin{remark}\label{remtris}
+The construction of the two sequences $p_0, p_1, p_2, \ldots$ and
+$q_0, q_1, q_2, \ldots$ in the proof above is a standard technique. We
+will refer to it as the {\em method of succesive trisection}. If we
+want to define a Cauchy sequence with limit $x$, this method works in
+general if we have a fixed $p_0$ and $q_0$ such that $p_0 < x < q_0$
+and we can decide whether $\frac{2p + q}{3} <x$ or $x< \frac{p+3q}{3}$
+for every $p,q$ with $p_0 <p <q<q_0$.
+\end{remark}
+
+
+\begin{lemma}
+If a sequence of rationals $q_1, q_2, \ldots$ is a Cauchy sequence,
+then so is $ |q_1|, |q_2|, \ldots$.
+\end{lemma}
+
+\begin{proof} Use Corollary \ref{corabsq}. \qed
+\end{proof}
+
+\begin{definition}[Absolute value]\label{defabsr}
+For $x\in\RR$ we define the absolute value of $x$, $|x|$ by first
+considering a Cauchy sequence $q_0, q_1, \ldots$ of rationals with
+limit $x$, and then defining
+$$|x|:= \lim_{n\rightarrow\infty}|q_n|.$$
+\end{definition}
+}
+
+\begin{lemma}\label{lemlimop}
+If  $x_0, x_1, \ldots$ and $y_0, y_1, \ldots$ are  Cauchy sequences
+with limits (respectively) $x$ and  $y$, then
+\begin{eqnarray*}
+\lim_{n\rightarrow\infty} x_n +\lim_{n\rightarrow\infty} y_n &=& 
+\lim_{n\rightarrow\infty} (x_n + y_n),\\ 
+(\lim_{n\rightarrow\infty} x_n)  (\lim_{n\rightarrow\infty} y_n) &=& 
+\lim_{n\rightarrow\infty} (x_n   y_n),\\ 
+|\lim_{n\rightarrow\infty} x_n| &=& 
+\lim_{n\rightarrow\infty} |x_n|,\\ 
+-\lim_{n\rightarrow\infty} x_n  &=& 
+\lim_{n\rightarrow\infty} (- x_n),\\ 
+(\lim_{n\rightarrow\infty} x_n)^{-1}  &=& 
+\lim_{n\rightarrow\infty} (x_n)^{-1}, 
+\end{eqnarray*}
+where the latter is only defined if $\forall i\in\NN[x_i\noto 0]$. 
+Furthermore, if $x_i \leq y_i$ 
+for all $i$, then $x\leq y$.
+\end{lemma}
+
+In the following, for $n\in\NN$, $y^n$ denotes the $n$-times
+multiplication of $y$. 
+
+\begin{definition}\label{defrootRR}
+For $x\geq 0$ and $n\in\NN^+$, we define $\sqrt[n]{x}$. First we
+notice that $(x+1)^n >x$ (proof by induction on $n$). Define the
+sequences $(p_i)_{i\in\NN}$ and $(q_i)_{i\in\NN}$ as follows.
+\begin{eqnarray*}
+p_0 &:=& 0,\\
+q_0 &:=& x+1,\\
+p_{i+1} &:=& \left\{\begin{array}{rcl}
+                p_i &\mbox{if}&(\frac{2p_i + q_i}{3})^n<x,\\
+                \frac{2p_i + q_i}{3} &\mbox{if}&(\frac{p_i + 2q_i}{3})^n>x
+                \end{array}\right.\\
+q_{i+1} &:=& \left\{\begin{array}{rcl}
+                q_i &\mbox{if}&(\frac{p_i + 2q_i}{3})^n>x,\\
+                \frac{p_i + 2q_i}{3} &\mbox{if}&(\frac{2p_i + q_i}{3})^n<x
+                \end{array}\right.
+\end{eqnarray*}
+Then we have the following.
+\begin{enumerate}
+\item $\forall i\in \NN [ p_i < x < q_i]$,      
+\item $\forall i\in \NN [ q_{i+1} - p_{i+1} = \frac{2}{3}(q_{i} - p_{i})]$.
+\end{enumerate}
+So, $(q_i)_{i\in\NN}$ is a Cauchy sequence and we define
+$$\sqrt[n]{x}:= \lim_{i\rightarrow \infty} q_i.$$ 
+\end{definition}
+
+\begin{lemma}\label{lemrtpos}
+$\forall x\in\RR\forall n\in\NN^+[x\geq 0 \implies \sqrt[n]{x} \geq 0].$
+\end{lemma}
+
+\begin{lemma}\label{lemrtmult}
+$\forall x,y\in\RR\forall n\in\NN^+[x,y\geq 0 \implies
+\sqrt[n]{x}\sqrt[n]{y} = \sqrt[n]{xy}].$
+\end{lemma}
+
+\begin{lemma}\label{lemroot}
+$$\forall x \forall n\in\NN^+ [x\geq 0 \implies (\sqrt[n]{x})^n = x].$$
+\end{lemma}
+
+\begin{lemma}
+ If $x\geq 0$, then there is a unique $y\geq 0$ such that $y^2 = x$.
+\end{lemma}
+
+\begin{proof}
+  Suppose we have $y$ and $z$ ($y,z\geq 0$) such that $y^2 = x = z^2$
+  and suppose $y\noto z$.  Using Lemma ?? we conclude that $y=z \vee
+  y= -z$, hence $y= -z$.  Also $y\noto 0 \vee z\noto 0$, so
+  $(y>0\wedge z<0)\vee(y<0 \wedge z>0)$. Contradiction. So $y=z$.
+  \qed
+\end{proof}
+
+\weg{
+\begin{lemma}\label{lemdecQroot}
+Equality on the set $\{ x\,|\, \exists y\in\QQ\exists k\in\NN[y =
+x^k]\}$ is decidable.
+\end{lemma}
+}
+
+

@@ -1,0 +1,99 @@
+% $Id$
+
+\section{Constructive Commutative Algebra}
+We define the notions of commutative monoid, group, ring, integral
+domain and field in a constructive way. In doing so, we follow
+\cite{Ruit82} and \cite{TvD882}, by requiring the basic operations to
+be strongly extensional. In the end this choice does not effect our
+work, because in a real number structure, it can be proved from the
+axioms that all basic operations and relations are strongly
+extensional.
+
+\begin{convention}\label{convstrext}
+Without stating it explicitly, we require all operations on setoids to respect
+the equality.
+%, that is, for $f$ an operation in the structure we require 
+%$\forall x, y [x = y \implies f(x) = f(y)].$ 
+We also require all basic operations and relations on setoids to be
+strongly extensional (Definition \ref{defstrext}).
+\end{convention}
+
+\subsection{Groups: One associative operation}
+\begin{definition}[Constructive Semi-Group]\label{defsemigrp}
+A {\em constructive semi-group\/} is a tuple \struct{S,+,=,\noto} with
+\struct{S,=,\noto} a constructive setoid, $+$ a binary operation on
+$S$ such that
+  \begin{enumerate}
+  \item $+$ is {\em associative}: $\forall x, y,z[(x+y)+z = x+(y+z)]$.
+   \end{enumerate}
+\end{definition}
+
+\begin{definition}[Constructive Monoid]\label{defmonoid}
+A {\em constructive monoid\/} is a tuple \struct{S,0,+,=,\noto} with
+\struct{S,+,=,\noto} a constructive semi-group and $0$ an element of
+$S$ such that
+  \begin{enumerate}
+  \item $0$ is the {\em identity\/} w.r.t.\ $+$: $\forall x[x+0=x]$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Constructive Group]\label{defgroup}
+  A {\em constructive group\/} is a tuple \struct{S,0,+,-,=,\noto}
+  with \struct{S,0,+,=,\noto} a constructive monoid, $-$ a unary
+  operation on $S$ such that 
+\begin{enumerate} 
+\item $-x$ is the inverse of $x$: $\forall x[x+(-x)=0]$.
+\end{enumerate}
+In practice we write ``$x-y$'' for ``$x+(-y)$''.
+\end{definition}
+
+
+\begin{lemma}[Inverses are unique]\label{lemuninv}
+The inverse of $+$ is unique, i.e.\ for all $x,y$,
+$$x + y = 0  \implies y = -x.$$
+As a consequence we find immediately that for all $x,y$,
+\begin{eqnarray*}
+  -(-x) &=& x,\\
+  -(x+y) &=& (-y)+(-x).
+\end{eqnarray*}
+\end{lemma}
+
+\begin{lemma}[Cancellation]\label{lemcanc} For all $x, y, z$,
+\[
+x+y=x+z \implies x=y.
+\]
+\end{lemma}
+
+\subsubsection{Apartness in Groups}
+
+\begin{lemma}\label{lemGrpHeyt}
+For all $x,y$,
+\[ x+y\noto 0 \implies x\noto 0 \vee y\noto 0. \]
+\end{lemma}
+\begin{proof}
+By strong extensionality of $+$,  
+$x+y\noto 0+0$ implies $x\noto 0\vee y\noto 0$.
+\qed
+\end{proof}
+
+\begin{lemma}\label{lemgrstrext}
+The operations of a group respect $\noto$, i.e.\ for all $x,y,z$,
+\begin{eqnarray*}
+x\noto y & \eqqe & x+z \noto y+z,\\
+x\noto y & \eqqe & x-y \noto 0,\\
+x\noto 0 & \eqqe & -x \noto 0.
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+For direction $\implies$, $(x+z)-z = x\noto y = (y+z)-z$
+(using that $\noto$ respects $=$, \ref{lemaprespeq}), so by strong
+extensionality of $+$, $x+z\noto y+z$. The converse uses the forward
+direction with $-z$. The second part follows from the first part
+noting that $0=y-y$. \qed
+\end{proof}
+
+\begin{remark}As has already been pointed out, we {\em always} require 
+functions to respect the equality and to be strongly extensional.
+In general, you'd want a function to respect the inequality or the
+apartness only if it has an inverse. See Lemma \ref{lemstrextinv}.
+\end{remark}

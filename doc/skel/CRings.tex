@@ -1,0 +1,46 @@
+% $Id$
+
+\subsection{Rings: Two associative operations}
+
+\begin{definition}[Constructive Ring]\label{defring}
+A non-trivial
+{\em constructive ring\/} is a tuple \struct{S,0,1,+,-,*,=,\noto}
+with \struct{S,0,+,-,=,\noto} a
+constructive group and \struct{S,1,*,=,\noto} a
+constructive monoid such that 
+\begin{enumerate}
+\item Non-triviality: $1\noto 0$.
+\item $+$ distributes over $*$:\quad $\forall x,y,z[x*(y+z) = (x*y)+(x*z)]$.
+\end{enumerate}
+\end{definition}
+
+\begin{notation}
+When dealing with rings we replace the operation $*$ by juxtaposition,
+writing $xy$ for $x*y$.
+\end{notation}
+
+
+\begin{lemma}\label{lemring}For all $x, y$:
+  \begin{eqnarray*}
+    x   0 &=& 0,\\
+    x   (- y) &=& -(x y).
+  \end{eqnarray*}
+\end{lemma}
+
+\begin{proof}
+The first by cancellation: $x0=x(0+0)=x0+x0$. The second (using the
+first) by uniqueness of inverses \ref{lemuninv}. \qed
+\end{proof}
+
+\begin{lemma}\label{lemHeyt}
+For all $x,y$,
+\begin{eqnarray*}
+x  y \noto 0 &\implies& x\noto 0 \wedge y\noto 0.
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+Suppose $x y \noto 0$. As $*$ is strongly extensional, we know 
+$x y \noto x 0\implies y\noto 0$ and $x y \noto 0 y \implies x\noto 0$.
+\qed
+\end{proof}
+

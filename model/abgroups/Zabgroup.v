@@ -1,0 +1,19 @@
+(* $Id$ *)
+
+
+Require Export Zgroup.
+Require Import CAbGroups.
+
+(** *Example of an abelian group: <Z,+>
+*)
+
+Lemma Z_is_CAbGroup : is_CAbGroup Z_as_CGroup. 
+Proof.
+red in |- *.
+simpl in |- *.
+exact Zplus_is_commut.
+Qed.
+
+Definition Z_as_CAbGroup := Build_CAbGroup Z_as_CGroup Z_is_CAbGroup.
+
+(** The term [Z_as_CAbGroup] is of type [CAbGroup]. Hence we have proven that [Z] is a constructive Abelian group. *)
