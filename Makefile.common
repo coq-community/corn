@@ -14,7 +14,7 @@ else
 endif
 
 # We are using many bashisms all around
-SHELL=bash -O nullglob
+SHELL:=bash -O nullglob
 
 # realpath utility to use
 REALPATH := $(shell if ! which realpath 2>/dev/null; then $(MAKE) -f "$(SRCDIR)/Makefile.realpath" -s TOPDIR="$(TOPDIR)" realpath; echo "$(SRCDIR)/bin/realpath"; fi)
@@ -28,39 +28,39 @@ SRCDIR:=$(shell "$(REALPATH)" "$(SRCDIR)")
 OCAMLC ?= ocamlc
 OCAMLOPT ?= ocamlopt
 #coqdoc to use
-COQDOC ?= coqdoc
+COQDOC ?= $(COQBIN)/coqdoc
 
 # Placement and names of executables we build
-BINDIR = $(SRCDIR)/bin
-LIBDIR = $(SRCDIR)/lib
-TOPLEVELNAME = CoRNtop
-COMPILERNAME = CoRNc
-IDENAME = CoRNide
+BINDIR := $(SRCDIR)/bin
+LIBDIR := $(SRCDIR)/lib
+TOPLEVELNAME := CoRNtop
+COMPILERNAME := CoRNc
+IDENAME := CoRNide
 
 # Library name used internally by coq
 LIBNAME ?= CoRN
 
 # Directories and files that should not be distributed (i.e. part of the 
 # publicly available version of C-CoRN)
-PRIVFILES = $(SRCDIR)/devel $(SRCDIR)/doc/www
+PRIVFILES := $(SRCDIR)/devel $(SRCDIR)/doc/www
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES = algebra complex fta ftc metrics model reals tactics transc
+COQ_HIERARCHIES := algebra complex fta ftc metrics model reals tactics transc
 
 # Directory that will contain the html version of the documentation
-HTMLDIR = $(SRCDIR)/doc/html
+HTMLDIR := $(SRCDIR)/doc/html
 # Directory that contains the postscript versionofthe doc:
-PSDIR = $(SRCDIR)/doc
+PSDIR := $(SRCDIR)/doc
 # Name of file containing postscript documentation
-PSFILE = doc.ps
+PSFILE := doc.ps
 
 # File that contains the dependencies
-DEPEND = $(SRCDIR)/.depend
+DEPEND := $(SRCDIR)/.depend
 # File containing the partial order given by coqdep for documentation
-DOCDEPEND = $(SRCDIR)/.docdepend
+DOCDEPEND := $(SRCDIR)/.docdepend
 # File containing a list of files that must be processed by coqdoc
-DOCLIST = $(SRCDIR)/.doclist
+DOCLIST := $(SRCDIR)/.doclist
 
 # File where coqc stores the references to global symbols
 GLOBFILE = $(SRCDIR)/.glob
@@ -69,22 +69,24 @@ GLOBFILE = $(SRCDIR)/.glob
 ## Please don't edit beyond this line, unless you really know what you are doing
 
 # Various executables we build
-TOPLEVEL = $(LIBDIR)/$(TOPLEVELNAME)
-BINARIES=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME)
-LIBEXECS=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
-IDELIB=$(LIBDIR)/$(IDENAME)
-IDEBIN=$(BINDIR)/$(IDENAME)
+TOPLEVEL := $(LIBDIR)/$(TOPLEVELNAME)
+BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME)
+LIBEXECS:=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
+IDELIB:=$(LIBDIR)/$(IDENAME)
+IDEBIN:=$(BINDIR)/$(IDENAME)
 
 # Coq directories
-COQ_PRIMITIVE_DEVEL_DIRS = $(shell if [ -n "$(devel)" ]; then for d in $(devel); do \
+COQ_PRIMITIVE_DEVEL_DIRS := $(shell if [ -n "$(devel)" ]; then for d in $(devel); do \
 	echo "`$(REALPATH) $${d}` "; done; fi)
-COQ_PRIMITIVE_DIRS = $(shell for d in $(COQ_HIERARCHIES:%=$(SRCDIR)/%); do if [ -d $${d} ]; then echo "`$(REALPATH) $${d}` "; fi; done)
-COQDIRS = $(shell find $(COQ_PRIMITIVE_DIRS) $(COQ_PRIMITIVE_DEVEL_DIRS) -type d -not -name CVS)
-COQSOURCES = $(shell find $(COQDIRS) -maxdepth 1 -name '*.v' -not -name 'Transparent_*' -not -name 'Opaque_*')
+COQ_PRIMITIVE_DIRS := $(shell for d in $(COQ_HIERARCHIES:%=$(SRCDIR)/%); do if [ -d $${d} ]; then echo "`$(REALPATH) $${d}` "; fi; done)
+COQDIRS := $(shell find $(COQ_PRIMITIVE_DIRS) $(COQ_PRIMITIVE_DEVEL_DIRS) -type d -not -name CVS)
+COQSOURCES := $(shell find $(COQDIRS) -maxdepth 1 -name '*.v' -not -name 'Transparent_*' -not -name 'Opaque_*')
 
 # tools
 COQBIN ?= $(COQTOP)/bin
-COQSRC=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
+CAMLP4LIB:=`camlp4 -where`
+CAMLP4EXTEND:=pa_extend.cmo pa_ifdef.cmo q_MLast.cmo
+COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
   -I $(COQTOP)/library -I $(COQTOP)/parsing \
   -I $(COQTOP)/pretyping -I $(COQTOP)/interp \
   -I $(COQTOP)/proofs -I $(COQTOP)/syntax -I $(COQTOP)/tactics \
@@ -95,13 +97,11 @@ COQSRC=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
   -I $(COQTOP)/contrib/omega -I $(COQTOP)/contrib/romega \
   -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
   -I $(CAMLP4LIB)
-COQC = $(COQBIN)/coqc
-COQDEP = $(COQBIN)/coqdep
-COQMKTOP = $(COQBIN)/coqmktop
-GRAMMARS=grammar.cma
-CAMLP4LIB=`camlp4 -where`
-CAMLP4EXTEND=pa_extend.cmo pa_ifdef.cmo q_MLast.cmo
-PP=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
+COQC := $(COQBIN)/coqc
+COQDEP := $(COQBIN)/coqdep
+COQMKTOP := $(COQBIN)/coqmktop
+GRAMMARS:=grammar.cma
+PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
 
 # COQMAP defines the mapping between physical and logical directories
 COQMAP = -R $(SRCDIR) $(LIBNAME)
@@ -110,29 +110,34 @@ COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = -image $(TOPLEVEL)
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
-COQDEPFLAGS = $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
-COQOBJECTS = $(COQSOURCES:.v=.vo)
-CAMLSOURCES = $(shell find $(SRCDIR)/tactics -name '*.ml')
-CAMLOBJECTS = $(CAMLSOURCES:.ml=.cmo)
-CMX = $(CAMLSOURCES:.ml=.cmx)
+COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
+COQOBJECTS := $(COQSOURCES:.v=.vo)
+CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
+CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
+CMX := $(CAMLSOURCES:.ml=.cmx)
 
 # Declaration of rules that have no target (i.e. .PHONY rules)
-.PHONY : dep clean depclean distclean doc-clean showcommands doc-pre binaries binaries-clean human ide makefiles
+.PHONY : dep clean depclean distclean doc-clean showcommands doc-pre binaries binaries-clean lib-clean human ide makefiles
 
+ifdef CoRN_MF_sub
 all : $(COQOBJECTS)
+else
+all :
+	$(MAKE) CoRN_MF_sub=1 all
+endif
 
 # Convenience utilities for humans
 ide : $(IDEBIN) human
 
 human : makefiles binaries
 
-AUTO_MAKEFILES = $(patsubst %,%/Makefile,$(COQDIRS))
+AUTO_MAKEFILES := $(patsubst %,%/Makefile,$(COQDIRS))
 
 makefiles : $(AUTO_MAKEFILES)
 
 $(AUTO_MAKEFILES) : 
 	@set -e; if ! [ -a $@ ]; then \
-	  depth="`echo -n "$(patsubst $(SRCDIR)/%,%,$@)" | sed 's|[^/]||g' | wc --bytes | sed 's|[[:space:]]||g'`"; \
+	  depth="`echo -n "$(patsubst $(SRCDIR)/%,%,$@)" | sed 's|[^/]||g' | wc -c | sed 's|[[:space:]]||g'`"; \
 	  model="$(SRCDIR)/Makefile.auto.$${depth}"; \
 	  if ! [ -a "$${model}" ]; then \
 	    ( echo -n 'TOPDIR=..'; i=1; \
@@ -158,36 +163,36 @@ lib-clean:
 	rm -f $(LIBEXECS) $(IDELIB)
 	if [ -a "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
 
-$(IDELIB): $(LIBDIR) $(CMX)
-	@echo Building coq-ide top-level $(subst $(SRCDIR)/, , $@)
+$(IDELIB): $(CMX) | $(LIBDIR)
+	@echo Building coq-ide top-level $(subst $(SRCDIR)/,, $@)
 	@$(COQMKTOP) -ide -srcdir $(COQTOP) -ide -opt -o $@ $(CMX)
 
-$(IDEBIN): $(IDELIB)
+$(IDEBIN): | $(BINDIR) $(IDELIB)
 	@echo Building coq-ide top-level startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec $(LIBDIR)/$(IDENAME) $(COQFLAGS) $$*' \
 	  ) > $@; chmod +x $@
 
-$(LIBDIR)/$(TOPLEVELNAME): $(LIBDIR) $(CMX)
+$(LIBDIR)/$(TOPLEVELNAME): $(CMX) | $(LIBDIR)
 	@echo Building top-level $(subst $(SRCDIR)/,,$@)
 	@$(COQMKTOP) -srcdir $(COQTOP) -opt -o $@ $(CMX)
 
-$(BINDIR)/$(TOPLEVELNAME): $(LIBDIR)/$(TOPLEVELNAME)
+$(BINDIR)/$(TOPLEVELNAME): | $(BINDIR) $(LIBDIR)/$(TOPLEVELNAME)
 	@echo Building top-level startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec $(TOPLEVEL) $(COQFLAGS) $$*' \
 	  ) > $@; chmod +x $@
 
-$(LIBDIR)/$(COMPILERNAME): $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
-	@echo Building compiler $(subst $(SRCDIR)/, , $@)
+$(LIBDIR)/$(COMPILERNAME): | $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
+	@echo Building compiler $(subst $(SRCDIR)/,, $@)
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec $(COQC) $(COQCFLAGS) $$*' \
 	  ) > $@; chmod +x $@
 
-$(BINDIR)/$(COMPILERNAME): $(LIBDIR)/$(COMPILERNAME)
+$(BINDIR)/$(COMPILERNAME): | $(BINDIR) $(LIBDIR)/$(COMPILERNAME)
 	@echo Building compiler startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
@@ -202,7 +207,15 @@ $(BINDIR)/$(COMPILERNAME): $(LIBDIR)/$(COMPILERNAME)
 	@echo Compiling $<
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
+ifdef CoRN_MF_sub
 %.vo : %.v $(TOPLEVEL)
+	@set -e; \
+	echo "Compiling $<"; \
+	$(COQC) $(COQFLAGS) $(COQCFLAGS) $<
+else
+.PHONY: always
+
+%.vo : always
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -213,12 +226,8 @@ $(BINDIR)/$(COMPILERNAME): $(LIBDIR)/$(COMPILERNAME)
 	  fi \
 	}; \
 	canon_name="$$(canonicalise "$@")" ; \
-	if [ "$@" != "$${canon_name}" ]; then \
-	  $(MAKE) "$${canon_name}"; \
-	else \
-	  echo "Compiling $<"; \
-	  $(COQC) $(COQFLAGS) $(COQCFLAGS) $<; \
-	fi
+	$(MAKE) CoRN_MF_sub=1 "$${canon_name}"
+endif
 
 dep : $(DEPEND) $(DOCDEPEND)
 
@@ -284,12 +293,12 @@ $(DOCDEPEND) : $(DEPEND)
 $(DOCLIST) : $(DOCDEPEND) $(SRCDIR)/doc/extradeps
 	( ( while read small big; do echo "$$( $(REALPATH) $(SRCDIR)/$${small} ) $$( $(REALPATH) $(SRCDIR)/$${big} )"; done ) < $(SRCDIR)/doc/extradeps ; cat $(DOCDEPEND) ) | tsort > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
-doc-pre : all $(DOCLIST)
+doc-pre : $(DOCLIST)
 
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre
+doc-html : doc-pre all
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
@@ -316,13 +325,13 @@ doc-clean :
 
 showcommands :
 	@echo Command used to compile FILE.v :
-	@echo $(COQC) $(COQFLAGS) $(COQCFLAGS) FILE.v
+	@echo "$(COQC) $(COQFLAGS) $(COQCFLAGS) FILE.v"
 	@echo
 	@echo Command used to compile FILE.ml :
-	@echo $(OCAMLOPT) -c $(COQSRC) $(PP) FILE.ml
+	@echo "$(OCAMLOPT) -c $(COQSRC) $(PP) FILE.ml"
 	@echo
 	@echo Command used to bytecode-compile FILE.ml :
-	@echo $(OCAMLC) -c $(COQSRC) $(PP) FILE.ml
+	@echo "$(OCAMLC) -c $(COQSRC) $(PP) FILE.ml"
 	@echo
 	@echo Realpath utility:
 	@echo "$(REALPATH)"

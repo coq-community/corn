@@ -2,12 +2,10 @@
 
 
 Require Export Zsec.
-Require Import CSetoidFun.
+Require Export CSetoidFun.
 
-(** *Example of a setoid: Z
-*)
-
-(** **Z
+(** **Example of a setoid: [Z]
+*** [Z]
 *)
 
 Lemma ap_Z_irreflexive : irreflexive (A:=Z) ap_Z.
@@ -34,40 +32,35 @@ red in |- *.
 apply ap_Z_tight0.
 Qed.
 
-Definition ap_Z_is_apartness :=
-  Build_is_CSetoid Z (eq (A:=Z)) ap_Z ap_Z_irreflexive ap_Z_symmetric
-    ap_Z_cotransitive ap_Z_tight.
+Definition ap_Z_is_apartness := Build_is_CSetoid Z (eq (A:=Z)) ap_Z
+ ap_Z_irreflexive ap_Z_symmetric ap_Z_cotransitive ap_Z_tight.
 
 
 Definition Z_as_CSetoid := Build_CSetoid _ _ _ ap_Z_is_apartness.
 
-(** The term [Z_as_CSetoid] is of type [CSetoid]. Hence we have proven that [Z] is a constructive setoid. *)
-
-(** **Addition
+(** The term [Z_as_CSetoid] is of type [CSetoid]. Hence we have proven that [Z] is a constructive setoid.
+***Addition
+We will prove now that the addition on the integers is a setoid function.
 *)
 
-(** We will prove now that the addition on the integers is a setoid function.
-*)
-
-Lemma Zplus_is_well_defined :
- bin_fun_well_def Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus.
+Lemma Zplus_wd :
+ bin_fun_wd Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus.
 Proof.
 red in |- *.
 simpl in |- *.
-apply Zplus_is_well_defined0.
+apply Zplus_wd0.
 Qed.
 
-Lemma Zplus_is_extensional :
- bin_fun_strong_ext Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus.
+Lemma Zplus_strext :
+ bin_fun_strext Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus.
 Proof.
 red in |- *.
 simpl in |- *.
-apply Zplus_is_extensional0.
+apply Zplus_strext0.
 Qed.
 
-Definition Zplus_is_bin_fun :=
-  Build_CSetoid_bin_fun Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus
-    Zplus_is_extensional.
+Definition Zplus_is_bin_fun := Build_CSetoid_bin_fun
+ Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus Zplus_strext.
 
 (** What's more: the addition is also associative and commutative.
 *) 
@@ -88,14 +81,11 @@ intros x y.
 apply Zplus_comm.
 Qed.
 
-(** **Opposite
+(** ***Opposite
+Taking the opposite of an integer is a setoid function.
 *)
 
-(** Taking the opposite of an integer is a setoid function.
-*)
-
-Lemma Zopp_is_well_defined :
- fun_well_def (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
+Lemma Zopp_wd : fun_wd (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -103,8 +93,8 @@ intros x y H.
 apply (f_equal Zopp H).
 Qed.
 
-Lemma Zopp_is_extensional :
- fun_strong_ext (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
+Lemma Zopp_strext :
+ fun_strext (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -116,16 +106,14 @@ exact (f_equal Zopp H0).
 Qed.
 
 Definition Zopp_is_fun :=
-  Build_CSetoid_fun Z_as_CSetoid Z_as_CSetoid Zopp Zopp_is_extensional.
+  Build_CSetoid_fun Z_as_CSetoid Z_as_CSetoid Zopp Zopp_strext.
 
-(** **Multiplication
+(** ***Multiplication
+Finally the multiplication is a setoid function and is associative and commutative.
 *)
 
-(** Finally the multiplication is a setoid function and is associative and commutative.
-*)
-
-Lemma Zmult_is_well_defined :
- bin_fun_well_def Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult.
+Lemma Zmult_wd :
+ bin_fun_wd Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -135,17 +123,16 @@ assumption.
 assumption.
 Qed.
 
-Lemma Zmult_is_extensional :
- bin_fun_strong_ext Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult.
+Lemma Zmult_strext :
+ bin_fun_strext Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult.
 Proof.
 red in |- *.
 simpl in |- *.
-apply Zmult_is_extensional0.
+apply Zmult_strext0.
 Qed.
 
-Definition Zmult_is_bin_fun :=
-  Build_CSetoid_bin_fun Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult
-    Zmult_is_extensional.
+Definition Zmult_is_bin_fun := Build_CSetoid_bin_fun
+ Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult Zmult_strext.
 
 Lemma Zmult_is_assoc : associative Zmult_is_bin_fun.
 Proof.
@@ -162,4 +149,12 @@ red in |- *.
 simpl in |- *.
 intros x y.
 apply Zmult_comm.
+Qed.
+
+(** ***Zero
+*)
+
+Lemma is_nullary_operation_Z_0 : (is_nullary_operation Z_as_CSetoid 0%Z).
+unfold is_nullary_operation.
+intuition.
 Qed.

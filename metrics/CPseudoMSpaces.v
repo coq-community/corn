@@ -128,7 +128,7 @@ exact H.
 
 apply cg_inv_inv.
  
-AStepr (c[-d]b).
+astepr (c[-d]b).
 apply shift_minus_leEq.
 apply shift_leEq_plus'.
 apply shift_minus_leEq.
@@ -166,7 +166,7 @@ intro H2.
 exact H2.
 
 apply (csbf_strext X X IR d).
-AStepl ZeroR.
+astepl ZeroR.
 apply less_imp_ap.
 exact H0.
 Qed.
@@ -232,9 +232,9 @@ a pseudo metric space.
 Definition zero_fun (X : CSetoid) (x y : X) : IR := ZeroR.
 
 Lemma zero_fun_strext :
- forall X : CSetoid, bin_fun_strong_ext X X IR (zero_fun X).
+ forall X : CSetoid, bin_fun_strext X X IR (zero_fun X).
 intro X.
-unfold bin_fun_strong_ext in |- *.
+unfold bin_fun_strext in |- *.
 unfold zero_fun in |- *.
 intros x1 x2 y1 y2 Z.
 set (H := ap_irreflexive_unfolded IR Zero Z) in *.

@@ -1,40 +1,21 @@
 (* $Id$ *)
 
-(**
-* On density of image of [Q] in an arbitrary real numbers structure
- In this file we introduce the image of the concrete rational numbers (as defined in [Fraction_Rat]) in an arbitrary
-   structure of type CReals. At the end of this file we assign to any real
-   number two rational numbers for which the real number lies betwen image
-   of them; in other words we will prove that the image of rational numbers in dense in any real numbers structure. *)
-
-
-(* begin hide *)
+(** * On density of the image of [Q] in an arbitrary real number structure
+In this file we introduce the image of the concrete rational numbers
+(as defined earlier) in an arbitrary structure of type
+[CReals]. At the end of this file we assign to any real number two
+rational numbers for which the real number lies betwen image of them;
+in other words we will prove that the image of rational numbers in
+dense in any real number structure. *)
 
 Require Export Cauchy_IR.
 Require Export Nmonoid.
 Require Export Zring.
-Import Q.
-
-Lemma ap_imp_not_eq : forall (S : CSetoid) (x y : S), (x[#]y) -> ~ (x[=]y).
-Proof.
- intros.
- intro.
- cut (~ (x[~=]y)).
- intro H1.
- apply H1.
- apply ap_imp_neq.
- assumption.
- apply eq_imp_not_neq.
- assumption.
-Qed.
-
-(* end hide *)
 
 Section Rational_sequence_prelogue.
 
 (**
-%\begin{convention}%
-Let [R1] be a real numbers structure.
+%\begin{convention}% Let [R1] be a real number structure.
 %\end{convention}%
 *)
 Variable R1 : CReals.
@@ -46,18 +27,20 @@ unfold Lim in |- *.
 elim R1; intros.
 exact crl_proof.
 Qed.
+
 Lemma Lim_Cauchy : forall s : CauchySeq R1, SeqLimit s (Lim s).
 elim CReals_is_CReals.
 intros.
 apply ax_Lim.  
 Qed.
-Lemma Archimedes : forall x : R1, {n : nat | x[<=]nring n}.
+
+Lemma Archimedes : forall x : R1, {n : nat | x [<=] nring n}.
 elim CReals_is_CReals.
 intros.
 apply ax_Arch.
 Qed.
    
-Lemma Archimedes' : forall x : R1, {n : nat | x[<]nring n}.
+Lemma Archimedes' : forall x : R1, {n : nat | x [<] nring n}.
 intro x.
 elim (Archimedes (x[+]One)); intros n Hn.
 exists n.
@@ -70,19 +53,18 @@ Coercion nat_of_P : positive >-> nat.
 (* end hide *)
 
 (**
-** Injection from [Q] to an arbitrary real numbers structure
- First we need to define the injection from [Q] to [R1]. Note that in [Cauchy_CReals] we defined [inject_Q] from an arbitray field [F] to [(R_COrdField F)] which was the set of Cauchy sequences of that field. But since [R1] is an %\emph{arbitrary}%#<i>arbitrary</i># real numbers structure we can not use [inject_Q].
+** Injection from [Q] to an arbitrary real number structure
+ First we need to define the injection from [Q] to [R1]. Note that in [Cauchy_CReals] we defined [inject_Q] from an arbitray field [F] to [(R_COrdField F)] which was the set of Cauchy sequences of that field. But since [R1] is an %\emph{arbitrary}%#<i>arbitrary</i># real number structure we can not use [inject_Q].
 
  To define the injection we need one elemntary lemma about the denominator:
 *)
 
-Lemma den_is_nonzero :
- forall x : Q_as_COrdField, nring (R:=R1) (Q.den x)[#]Zero.
+Lemma den_is_nonzero : forall x : Q_as_COrdField, nring (R:=R1) (den x) [#] Zero.
 Proof.
  intro.
  apply nring_ap_zero.
  intro.
- absurd (0 < Q.den x).
+ absurd (0 < den x).
  rewrite H.
  auto with arith.
  apply lt_O_nat_of_P.
@@ -95,13 +77,13 @@ Definition inj_Q : Q_as_COrdField -> R1.
  case x.
  intros num0 den0.
  exact 
- (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Q.Build_Q num0 den0)).
+ (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Build_Q num0 den0)).
 Defined.
 
 (** Next we need some properties of [nring], on the setoid of natural numbers: *)
 
-Lemma nring_strong_ext :
- forall m n : nat_as_CMonoid, (nring (R:=R1) m[#]nring (R:=R1) n) -> m[#]n.
+Lemma nring_strext : forall m n : nat_as_CMonoid,
+ (nring (R:=R1) m [#] nring (R:=R1) n) -> m [#] n.
 Proof.
  intros m n.
  case m.
@@ -111,7 +93,7 @@ Proof.
    simpl in |- *.
    red in |- *.
    simpl in H.
-   cut (Not (Zero[#](Zero:R1))).
+   cut (Not (Zero [#] (Zero:R1))).
    intro.
    intro.
    elim H0.
@@ -122,9 +104,6 @@ Proof.
    intros.
    simpl in |- *. 
    red in |- *.
-   apply Ccontrapos' with (0 = S n0).
-   intro.
-   assumption.
    discriminate.
 
   case n.
@@ -132,16 +111,13 @@ Proof.
    intros.
    simpl in |- *. 
    red in |- *.
-   apply Ccontrapos' with (S n0 = 0).
-   intro.
-   assumption.
    discriminate.
 
    intros.
    simpl in |- *.
    red in |- *.
    intro.
-   cut (Not (nring (R:=R1) (S n1)[#]nring (R:=R1) (S n0))).
+   cut (Not (nring (R:=R1) (S n1) [#] nring (R:=R1) (S n0))).
    intro H1.
    elim H1.
    assumption.
@@ -150,8 +126,8 @@ Proof.
    apply eq_reflexive_unfolded.
 Qed.
 
-Lemma nring_well_def :
- forall m n : nat_as_CMonoid, (m[=]n) -> nring (R:=R1) m[=]nring (R:=R1) n.
+Lemma nring_wd : forall m n : nat_as_CMonoid,
+ (m [=] n) -> nring (R:=R1) m [=] nring (R:=R1) n.
 Proof.
  intros.
  simpl in H. 
@@ -159,17 +135,15 @@ Proof.
  apply eq_reflexive_unfolded.
 Qed.
  
-Lemma nring_eq : forall m n : nat, m = n -> nring (R:=R1) m[=]nring (R:=R1) n. 
+Lemma nring_eq : forall m n : nat, m = n -> nring (R:=R1) m [=] nring (R:=R1) n. 
 Proof.
  intros.
  rewrite H.
  apply eq_reflexive_unfolded.
 Qed.
  
-
-Lemma nring_leEq :
- forall (OF : COrdField) (m n : nat),
- m <= n -> nring (R:=OF) m[<=]nring (R:=OF) n. 
+Lemma nring_leEq : forall (OF : COrdField) m n,
+ m <= n -> nring (R:=OF) m [<=] nring (R:=OF) n. 
 Proof.
  intros.
  induction  m as [| m Hrecm]. 
@@ -196,8 +170,8 @@ Unset Printing Coercions.
 
 (** Similarly we prove some properties of [zring] on the ring of integers: *)
 
-Lemma zring_strong_ext :
- forall m n : Z_as_CRing, (zring (R:=R1) m[#]zring n) -> m[#]n.
+Lemma zring_strext : forall m n : Z_as_CRing,
+ (zring (R:=R1) m [#] zring n) -> m [#] n.
 Proof.
  intros m n.
  case m.
@@ -205,9 +179,9 @@ Proof.
  
  intro H.
  elimtype False.
- cut (Zero[=](Zero:R1)).
- change (~ (Zero[=](Zero:R1))) in |- *.
- apply ap_imp_not_eq.
+ cut (Zero [=] (Zero:R1)).
+ change (~ (Zero [=] (Zero:R1))) in |- *.
+ apply ap_imp_neq.
  simpl in H.
  assumption.
  apply eq_reflexive_unfolded.
@@ -215,17 +189,11 @@ Proof.
  intros.
  simpl in |- *. 
  red in |- *.
- apply Ccontrapos' with (0%Z = BinInt.Zpos p).
- intro.
- assumption.
  discriminate.
 
  intros.
  simpl in |- *.
  red in |- *.
- apply Ccontrapos' with (0%Z = Zneg p).
- intro.
- assumption.
  discriminate.
 
  case n.
@@ -233,15 +201,12 @@ Proof.
  intros.
  simpl in |- *.
  red in |- *.
- apply Ccontrapos' with (BinInt.Zpos p = 0%Z).
- intro.
- assumption.
  discriminate.
 
  intros.
  simpl in |- *.
  intro.
- cut (Not (zring (R:=R1) (BinInt.Zpos p0)[#]zring (R:=R1) (BinInt.Zpos p))).
+ cut (Not (zring (R:=R1) (BinInt.Zpos p0) [#] zring (R:=R1) (BinInt.Zpos p))).
  intro H1.
  elim H1.
  assumption.
@@ -252,9 +217,6 @@ Proof.
  intros.
  simpl in |- *.
  red in |- *.
- apply Ccontrapos' with (BinInt.Zpos p0 = Zneg p).
- intro.
- assumption.
  discriminate.
 
  case n.
@@ -262,23 +224,17 @@ Proof.
  intros.
  simpl in |- *.
  red in |- *.
- apply Ccontrapos' with (Zneg p = 0%Z).
- intro.
- assumption.
  discriminate.
 
  intros.
  simpl in |- *.
  red in |- *. 
- apply Ccontrapos' with (Zneg p0 = BinInt.Zpos p).
- intro.
- assumption. 
  discriminate.
  
  intros.
  simpl in |- *.
  intro.
- cut (Not (zring (R:=R1) (Zneg p0)[#]zring (R:=R1) (Zneg p))).
+ cut (Not (zring (R:=R1) (Zneg p0) [#] zring (R:=R1) (Zneg p))).
  intro H1.
  elim H1.
  assumption.
@@ -287,8 +243,8 @@ Proof.
  apply eq_reflexive_unfolded.
 Qed.
  
-Lemma zring_well_def :
- forall m n : Z_as_CRing, (m[=]n) -> zring (R:=R1) m[=]zring (R:=R1) n.
+Lemma zring_wd : forall m n : Z_as_CRing,
+ (m [=] n) -> zring (R:=R1) m [=] zring (R:=R1) n.
 Proof.
  intros.
  simpl in H.
@@ -296,41 +252,8 @@ Proof.
  apply eq_reflexive_unfolded.
 Qed.
 
-(* begin hide *)
-
-Lemma inject_nat_convert :
- forall p : positive, Z_of_nat (nat_of_P p) = BinInt.Zpos p.
-intros.
-elim (ZL4 p); intros.
-rewrite H.
-simpl in |- *.
-apply (f_equal BinInt.Zpos).
-apply nat_of_P_inj.
-rewrite H.
-apply nat_of_P_o_P_of_succ_nat_eq_succ.
-Qed.
-(* end hide *)
-
-
-(* begin hide *)
-(*** this is the Set version of lemmaZL4 in Arith library ***)
-Lemma ZL4' : forall y : positive, {h : nat | nat_of_P y = S h}.
-Proof.
- simple induction y;
-  [ intros p H; elim H; intros x H1; exists (S x + S x);
-     unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
-     rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H1; 
-     rewrite H1; auto with arith
-  | intros p H1; elim H1; intros x H2; exists (x + S x);
-     unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
-     rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H2; 
-     rewrite H2; auto with arith
-  | exists 0; auto with arith ].
-Qed.
-(* end hide *)
-
-Lemma zring_less :
- forall m n : Z_as_CRing, (m < n)%Z -> zring (R:=R1) m[<]zring (R:=R1) n.
+Lemma zring_less : forall m n : Z_as_CRing,
+ (m < n)%Z -> zring (R:=R1) m [<] zring (R:=R1) n.
 Proof.
  intros m n.
  case m.
@@ -344,8 +267,8 @@ Proof.
 
  intros.
  simpl in |- *.
- AStepl (nring (R:=R1) 0).
- AStepr (nring (R:=R1) (nat_of_P p)).
+ astepl (nring (R:=R1) 0).
+ astepr (nring (R:=R1) (nat_of_P p)).
  apply nring_less.
  case (ZL4' p).
  intro a.
@@ -372,8 +295,8 @@ Proof.
  intros p1 p2.
  intro.
  simpl in |- *.
- AStepl (nring (R:=R1) (nat_of_P p2)). 
- AStepr (nring (R:=R1) (nat_of_P p1)).
+ astepl (nring (R:=R1) (nat_of_P p2)). 
+ astepr (nring (R:=R1) (nat_of_P p1)).
  apply nring_less.
  apply nat_of_P_lt_Lt_compare_morphism.
  red in H.
@@ -391,11 +314,11 @@ Proof.
  case n.
  intros.
  simpl in |- *.
- AStepl [--](nring (R:=R1) (nat_of_P p)).
- AStepr (Zero:R1).
+ astepl [--](nring (R:=R1) (nat_of_P p)).
+ astepr (Zero:R1).
  apply inv_cancel_less.
- AStepl (Zero:R1).
- AStepr (nring (R:=R1) (nat_of_P p)).
+ astepl (Zero:R1).
+ astepr (nring (R:=R1) (nat_of_P p)).
  case (ZL4' p).
  intro h.
  intros H0.
@@ -411,21 +334,21 @@ Proof.
  intro h2.
  intros.
  apply less_transitive_unfolded with (y := Zero:R1).
- AStepl [--](nring (R:=R1) (nat_of_P p2)).
+ astepl [--](nring (R:=R1) (nat_of_P p2)).
  apply inv_cancel_less.
- AStepl (Zero:R1).
- AStepr (nring (R:=R1) (nat_of_P p2)).
+ astepl (Zero:R1).
+ astepr (nring (R:=R1) (nat_of_P p2)).
  rewrite e.
  apply pos_nring_S.
- AStepr (nring (R:=R1) p1). 
+ astepr (nring (R:=R1) p1). 
  rewrite e0.
  apply pos_nring_S.
 
  intros p1 p2.
  intro. 
  simpl in |- *.
- AStepl [--](nring (R:=R1) (nat_of_P p2)).
- AStepr [--](nring (R:=R1) (nat_of_P p1)).
+ astepl [--](nring (R:=R1) (nat_of_P p2)).
+ astepr [--](nring (R:=R1) (nat_of_P p1)).
  apply inv_resp_less.
  apply nring_less.
  apply nat_of_P_lt_Lt_compare_morphism.
@@ -435,11 +358,9 @@ Proof.
  assumption.
 Qed.
 
+(** Using the above lemmata we prove the basic properties of [inj_Q], i.e.%\% it is a setoid function and preserves the ring operations and oreder operation. *)
 
-(** Using the above lemmata we prove the basic properties of [inj_Q], i.e. it is a setoid function and preserves the ring operations and oreder operation. *)
-
-Lemma inj_Q_strong_ext :
- forall q1 q2 : Q_as_COrdField, (inj_Q q1[#]inj_Q q2) -> q1[#]q2.
+Lemma inj_Q_strext : forall q1 q2, (inj_Q q1 [#] inj_Q q2) -> q1 [#] q2.
 Proof.
  intros q1 q2.
  generalize (den_is_nonzero q1).
@@ -452,14 +373,14 @@ Proof.
  simpl in |- *.
  simpl in H.
  simpl in H0.
- unfold Q.ap in |- *.
- unfold Q.eq in |- *.
- unfold Q.num in |- *.
- unfold Q.den in |- *.
+ unfold Qap in |- *.
+ unfold Qeq in |- *.
+ unfold num in |- *.
+ unfold den in |- *.
  
  intro.
 
- cut (~ (inj_Q (Q.Build_Q n1 d1)[=]inj_Q (Q.Build_Q n2 d2))).
+ cut (~ (inj_Q (Build_Q n1 d1) [=] inj_Q (Build_Q n2 d2))).
  intro.
  elim H3.
  simpl in |- *.
@@ -468,43 +389,41 @@ Proof.
  apply mult_resp_ap_zero.
  assumption. 
  assumption.
- RStepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
- RStepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
- AStepr (zring (R:=R1) (n1 * d2)).
- AStepr (zring (R:=R1) n1[*]zring (R:=R1) d2).
- apply mult_wd_rht.
- AStepl (zring (R:=R1) (Z_of_nat (nat_of_P d2))).
+ rstepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
+ rstepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
+ astepr (zring (R:=R1) (n1 * d2)).
+ astepr (zring (R:=R1) n1[*]zring (R:=R1) d2).
+ apply mult_wdr.
+ astepl (zring (R:=R1) (Z_of_nat (nat_of_P d2))).
  rewrite inject_nat_convert.
  Algebra.
  rewrite H2.
- AStepl (zring (R:=R1) n2[*]zring (R:=R1) d1).
- apply mult_wd_rht.
- AStepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
+ astepl (zring (R:=R1) n2[*]zring (R:=R1) d1).
+ apply mult_wdr.
+ astepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
  rewrite inject_nat_convert.
  Algebra.
- change (inj_Q (Q.Build_Q n1 d1)[~=]inj_Q (Q.Build_Q n2 d2)) in |- *. 
+ change (inj_Q (Build_Q n1 d1)[~=]inj_Q (Build_Q n2 d2)) in |- *. 
  apply ap_imp_neq.
  assumption.
 Qed.
 
-Lemma inj_Q_well_def :
- forall q1 q2 : Q_as_COrdField, (q1[=]q2) -> inj_Q q1[=]inj_Q q2.
+Lemma inj_Q_wd : forall q1 q2, (q1 [=] q2) -> inj_Q q1 [=] inj_Q q2.
 Proof.
  intros. 
  apply not_ap_imp_eq.
  intro.
- cut (~ (q1[=]q2)).
+ cut (~ (q1 [=] q2)).
  intro H1.
  apply H1.
  assumption.
  change (q1[~=]q2) in |- *.
  apply ap_imp_neq.
- apply inj_Q_strong_ext.
+ apply inj_Q_strext.
  assumption.
 Qed.
 
-Lemma inj_Q_plus :
- forall q1 q2 : Q_as_COrdField, inj_Q (q1[+]q2)[=]inj_Q q1[+]inj_Q q2.
+Lemma inj_Q_plus : forall q1 q2, inj_Q (q1[+]q2) [=] inj_Q q1[+]inj_Q q2.
 Proof.
  intros.
  generalize (den_is_nonzero q1).
@@ -521,30 +440,29 @@ Proof.
  assumption.
  assumption.
  
- AStepr (zring (R:=R1) (n1 * d2 + n2 * d1)).
- AStepr
+ astepr (zring (R:=R1) (n1 * d2 + n2 * d1)).
+ astepr
   (nring (R:=R1) (d1 * d2)%positive[*]
    (zring (R:=R1) (n1 * d2 + n2 * d1)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Q.Build_Q (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
- apply mult_wd_lft.
+    den_is_nonzero (Build_Q (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
+ apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
  Algebra.
  
- AStepr
+ astepr
   (zring (R:=R1) n1[*]nring (R:=R1) d2[+]zring (R:=R1) n2[*]nring (R:=R1) d1).
- AStepl (zring (R:=R1) (n1 * d2)[+]zring (R:=R1) (n2 * d1)).
+ astepl (zring (R:=R1) (n1 * d2)[+]zring (R:=R1) (n2 * d1)).
  apply bin_op_wd_unfolded.
- AStepr (zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat (nat_of_P d2))).
+ astepr (zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat (nat_of_P d2))).
  rewrite inject_nat_convert.
  Algebra.
- AStepr (zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat (nat_of_P d1))).
+ astepr (zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat (nat_of_P d1))).
  rewrite inject_nat_convert.
  Algebra.
  rational.
 Qed.
 
-Lemma inj_Q_mult :
- forall q1 q2 : Q_as_COrdField, inj_Q (q1[*]q2)[=]inj_Q q1[*]inj_Q q2.
+Lemma inj_Q_mult : forall q1 q2, inj_Q (q1[*]q2) [=] inj_Q q1[*]inj_Q q2.
 Proof.
  intros.
  generalize (den_is_nonzero q1).
@@ -561,24 +479,22 @@ Proof.
  assumption.
  trivial.
 
- AStepr (zring (R:=R1) (n1 * n2)).
- AStepr
+ astepr (zring (R:=R1) (n1 * n2)).
+ astepr
   (nring (R:=R1) (d1 * d2)%positive[*]
    (zring (R:=R1) (n1 * n2)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Q.Build_Q (n1 * n2)%Z (d1 * d2)%positive))).
+    den_is_nonzero (Build_Q (n1 * n2)%Z (d1 * d2)%positive))).
 
- apply mult_wd_lft.
+ apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
  Algebra.
 
- AStepr (zring (R:=R1) n1[*]zring (R:=R1) n2).
+ astepr (zring (R:=R1) n1[*]zring (R:=R1) n2).
  apply zring_mult.
  rational.
 Qed.
 
-
-Lemma inj_Q_less :
- forall q1 q2 : Q_as_COrdField, (q1[<]q2) -> inj_Q q1[<]inj_Q q2.
+Lemma inj_Q_less : forall q1 q2, (q1 [<] q2) -> inj_Q q1 [<] inj_Q q2.
 Proof.
  intros q1 q2.
  case q1.
@@ -587,7 +503,7 @@ Proof.
  intros n2 d2.
  intro H.
  simpl in H.
- unfold Q.lt in H.
+ unfold Qlt in H.
  simpl in H.
  simpl in |- *.
 
@@ -600,8 +516,8 @@ Proof.
  rewrite p.
  apply pos_nring_S. 
 
- RStepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
- RStepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
+ rstepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
+ rstepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
  apply less_wdl with (x := zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat d2)).
  apply less_wdr with (y := zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat d1)).
  apply less_wdl with (x := zring (R:=R1) (n1 * d2)).
@@ -617,30 +533,28 @@ Proof.
  Algebra.
 Qed.
 
-Lemma less_inj_Q :
- forall q1 q2 : Q_as_COrdField, (inj_Q q1[<]inj_Q q2) -> q1[<]q2.
+Lemma less_inj_Q : forall q1 q2, (inj_Q q1 [<] inj_Q q2) -> q1 [<] q2.
 Proof.
  intros.
- cut (q1[#]q2).
+ cut (q1 [#] q2).
  intro H0.
  case (ap_imp_less _ q1 q2 H0).
  intro.
  assumption.
  intro.
  elimtype False.
- cut (inj_Q q2[<]inj_Q q1).
- change (Not (inj_Q q2[<]inj_Q q1)) in |- *.
+ cut (inj_Q q2 [<] inj_Q q1).
+ change (Not (inj_Q q2 [<] inj_Q q1)) in |- *.
  apply less_antisymmetric_unfolded.
  assumption.
  apply inj_Q_less.
  assumption.
- apply inj_Q_strong_ext.
+ apply inj_Q_strext.
  apply less_imp_ap.
  assumption.
 Qed.
 
-Lemma leEq_inj_Q :
- forall q1 q2 : Q_as_COrdField, (inj_Q q1[<=]inj_Q q2) -> q1[<=]q2.
+Lemma leEq_inj_Q : forall q1 q2, (inj_Q q1 [<=] inj_Q q2) -> q1 [<=] q2.
 intros.
 intro.
 apply less_irreflexive_unfolded with (x := inj_Q q2).
@@ -650,8 +564,7 @@ apply inj_Q_less.
 auto.
 Qed.
 
-Lemma inj_Q_leEq :
- forall q1 q2 : Q_as_COrdField, (q1[<=]q2) -> inj_Q q1[<=]inj_Q q2.
+Lemma inj_Q_leEq : forall q1 q2, (q1 [<=] q2) -> inj_Q q1 [<=] inj_Q q2.
 Proof.
  intros.
  intro. 
@@ -660,37 +573,36 @@ Proof.
  assumption.
 Qed.
 
- 
-Lemma inj_Q_min : forall q1 : Q_as_COrdField, inj_Q [--]q1[=][--](inj_Q q1).
+Lemma inj_Q_min : forall q1, inj_Q [--]q1 [=] [--](inj_Q q1).
 Proof.
  intro.
  apply cg_cancel_lft with (x := inj_Q q1).
- AStepr (inj_Q (q1[+][--]q1)).
+ astepr (inj_Q (q1[+][--]q1)).
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
- AStepr (inj_Q Zero).
- apply inj_Q_well_def.
+ astepr (inj_Q Zero).
+ apply inj_Q_wd.
  Algebra.
  simpl in |- *.
- RStepl (Zero:R1).
+ rstepl (Zero:R1).
  Algebra.
 Qed.
 
-Lemma inj_Q_minus :
- forall q1 q2 : Q_as_COrdField, inj_Q (q1[-]q2)[=]inj_Q q1[-]inj_Q q2. 
+Lemma inj_Q_minus : forall q1 q2, inj_Q (q1[-]q2) [=] inj_Q q1[-]inj_Q q2. 
 Proof.
  intros.
- AStepl (inj_Q (q1[+][--]q2)).
- AStepr (inj_Q q1[+]inj_Q [--]q2).
+ astepl (inj_Q (q1[+][--]q2)).
+ astepr (inj_Q q1[+]inj_Q [--]q2).
  apply inj_Q_plus.
- AStepr (inj_Q q1[+][--](inj_Q q2)).
+ astepr (inj_Q q1[+][--](inj_Q q2)).
  apply plus_resp_eq.
  apply inj_Q_min.
 Qed.
 
-(** Moreover, and as expected, the [AbsSmall] perdiacte is also preserved under the [inj_Q] *) 
-Lemma inj_Q_AbsSmall :
- forall q1 q2 : Q_as_COrdField,
+(** Moreover, and as expected, the [AbsSmall] predicate is also
+preserved under the [inj_Q] *)
+
+Lemma inj_Q_AbsSmall : forall q1 q2,
  AbsSmall q1 q2 -> AbsSmall (inj_Q q1) (inj_Q q2).
 Proof.
  intros.
@@ -698,16 +610,16 @@ Proof.
  elim H.
  intros.
  split.
- AStepl (inj_Q [--]q1).
+ astepl (inj_Q [--]q1).
  apply inj_Q_leEq.
  assumption.
  apply cg_cancel_lft with (x := inj_Q q1).
- RStepr (Zero:R1).
- AStepr (inj_Q (q1[+][--]q1)).
+ rstepr (Zero:R1).
+ astepr (inj_Q (q1[+][--]q1)).
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
- AStepr (inj_Q Zero).
- apply inj_Q_well_def.
+ astepr (inj_Q Zero).
+ apply inj_Q_wd.
  Algebra.
  simpl in |- *.
  rational.
@@ -716,10 +628,8 @@ Proof.
  assumption.
 Qed.
  
- 
-
-Lemma AbsSmall_inj_Q :
- forall q e : Q_as_COrdField, AbsSmall (inj_Q e) (inj_Q q) -> AbsSmall e q.
+Lemma AbsSmall_inj_Q : forall q e,
+ AbsSmall (inj_Q e) (inj_Q q) -> AbsSmall e q.
 Proof.
  intros.
  elim H.
@@ -735,16 +645,13 @@ Proof.
 Qed.
 
 
-(** 
-** Injection preserves Cauchy property
-We apply the above lemmata to obtain following theorem, which says that a Cauchy sequnece of elemnts of [Q] will be Cauchy in [R1].
+(** ** Injection preserves Cauchy property
+We apply the above lemmata to obtain following theorem, which says
+that a Cauchy sequence of elemnts of [Q] will be Cauchy in [R1].
 *)
 
-
-
-Theorem inj_Q_Cauchy :
- forall g : CauchySeq Q_as_COrdField,
- Cauchy_prop (fun n : nat => inj_Q (g n)).
+Theorem inj_Q_Cauchy : forall g : CauchySeq Q_as_COrdField,
+ Cauchy_prop (fun n => inj_Q (g n)).
 Proof.
  intros.
  case g.
@@ -753,7 +660,7 @@ Proof.
  red in |- *.
  intros e H.
 
- cut {n : nat | (One[/]e[//]Greater_imp_ap _ e Zero H)[<]nring (R:=R1) n}.
+ cut {n : nat | (One[/]e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
  intro H0.
  case H0.
  intros N1 H1.
@@ -762,14 +669,14 @@ Proof.
   {N : nat |
   forall m : nat,
   N <= m ->
-  AbsSmall (R:=Q_as_COrdField) (Q.Build_Q 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
+  AbsSmall (R:=Q_as_COrdField) (Build_Q 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
  intro H2.
  case H2.
  intro N.
  intro.
  exists N.
  intros.
- apply AbsSmall_leEq_trans with (e1 := inj_Q (Q.Build_Q 1%Z (P_of_succ_nat N1))).
+ apply AbsSmall_leEq_trans with (e1 := inj_Q (Build_Q 1%Z (P_of_succ_nat N1))).
  apply less_leEq.
  apply
   mult_cancel_less
@@ -781,30 +688,30 @@ Proof.
  apply pos_one.
  unfold inj_Q in |- *.
  rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N1.
- RStepl (One[/]e[//]Greater_imp_ap _ e Zero H).
- RStepr (nring (R:=R1) (P_of_succ_nat N1)).
+ rstepl (One[/]e[//]Greater_imp_ap _ e Zero H).
+ rstepr (nring (R:=R1) (P_of_succ_nat N1)).
  apply less_transitive_unfolded with (y := nring (R:=R1) N1).
  assumption.
  apply nring_less.
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
  apply lt_n_Sn.
- AStepr (inj_Q (g_ m[-]g_ N)).
+ astepr (inj_Q (g_ m[-]g_ N)).
  apply inj_Q_AbsSmall.
  apply a.
  assumption.
 
- AStepl (inj_Q (g_ m[+][--](g_ N))).
- AStepr (inj_Q (g_ m)[+][--](inj_Q (g_ N))).
- AStepr (inj_Q (g_ m)[+]inj_Q [--](g_ N)).
+ astepl (inj_Q (g_ m[+][--](g_ N))).
+ astepr (inj_Q (g_ m)[+][--](inj_Q (g_ N))).
+ astepr (inj_Q (g_ m)[+]inj_Q [--](g_ N)).
  apply inj_Q_plus.
  apply plus_resp_eq. 
  apply cg_cancel_lft with (x := inj_Q (g_ N)).
- AStepr (Zero:R1).
- AStepr (inj_Q (g_ N[+][--](g_ N))).
+ astepr (Zero:R1).
+ astepr (inj_Q (g_ N[+][--](g_ N))).
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
- AStepr (inj_Q Zero).
- apply inj_Q_well_def.
+ astepr (inj_Q Zero).
+ apply inj_Q_wd.
  Algebra.
  simpl in |- *.
  rational.
@@ -818,17 +725,19 @@ Proof.
  apply Archimedes'.
 Qed.
 
-(** Furthermore we prove that applying [nring] (which is adding the ring unit [n] times) is the same whether we do it in [Q] or in [R1]: *)
-Lemma inj_Q_nring :
- forall n : nat, inj_Q (nring (R:=Q_as_COrdField) n)[=]nring (R:=R1) n.
+(** Furthermore we prove that applying [nring] (which is adding the
+ring unit [n] times) is the same whether we do it in [Q] or in [R1]:
+*)
+
+Lemma inj_Q_nring : forall n, inj_Q (nring n) [=] nring (R:=R1) n.
 Proof.
  intro.
  simpl in |- *.
  induction  n as [| n Hrecn].
  simpl in |- *.
  rational.
- change (inj_Q (nring n[+]One)[=]nring (R:=R1) n[+]One) in |- *.
- AStepr (inj_Q (nring n)[+]inj_Q One).
+ change (inj_Q (nring n[+]One) [=] nring (R:=R1) n[+]One) in |- *.
+ astepr (inj_Q (nring n)[+]inj_Q One).
  apply inj_Q_plus.
  apply bin_op_wd_unfolded.
  assumption.
@@ -837,22 +746,24 @@ Proof.
  rational.
 Qed.
  
-(**
-** Injcetion of [Q] is dense
+(** ** Injection of [Q] is dense
+Finally we are able to prove the density of image of [Q] in [R1]. We
+state this fact in two different ways. Both of them have their
+specific use.
 
- Finally we are able to prove the density of image of [Q] in [R1]. We state this fact in two different ways. Both of them have their specific use. 
-
- The first theorem states the fact that any real number can be bound by the image of two rational numbers. This is called [start_of_sequence] because it can be used as an starting point for the typical "interval trisection" argument, which is ubiquitous in constructive analysis.  
+The first theorem states the fact that any real number can be bound by
+the image of two rational numbers. This is called [start_of_sequence]
+because it can be used as an starting point for the typical "interval
+trisection" argument, which is ubiquitous in constructive analysis.
 *)
 
-Theorem start_of_sequence :
- forall x : R1,
- {q1 : Q_as_COrdField | {q2 : Q_as_COrdField | inj_Q q1[<]x | x[<]inj_Q q2}}.
+Theorem start_of_sequence : forall x : R1,
+ {q1 : Q_as_COrdField | {q2 : Q_as_COrdField | inj_Q q1 [<] x | x [<] inj_Q q2}}.
 Proof.
  intros.
- cut {n : nat | x[<]nring (R:=R1) n}.
+ cut {n : nat | x [<] nring (R:=R1) n}.
  intro H.
- cut {n : nat | [--]x[<]nring (R:=R1) n}.
+ cut {n : nat | [--]x [<] nring (R:=R1) n}.
  intro H0.
  case H.
  intro n2.
@@ -860,51 +771,53 @@ Proof.
  case H0.
  intro n1.
  intro.
- exists (Q.Build_Q (- n1) 1).
- exists (Q.Build_Q n2 1).
+ exists (Build_Q (- n1) 1).
+ exists (Build_Q n2 1).
   simpl in |- *.
-  RStepl (zring (R:=R1) (- Z_of_nat n1)).
-  AStepl [--](nring (R:=R1) n1).
+  rstepl (zring (R:=R1) (- Z_of_nat n1)).
+  astepl [--](nring (R:=R1) n1).
   apply inv_cancel_less.
-  AStepr (nring (R:=R1) n1).
+  astepr (nring (R:=R1) n1).
   assumption.
 
   simpl in |- *.
-  RStepr (zring (R:=R1) (Z_of_nat n2)).
-  AStepr (nring (R:=R1) n2).
+  rstepr (zring (R:=R1) (Z_of_nat n2)).
+  astepr (nring (R:=R1) n2).
   assumption.
 
  apply Archimedes'.
  apply Archimedes'.
 Qed.
 
-(** The second version of the density of [Q] in [R1] states that given any positive real number, there is a rational number between it and zero. This lemma can be used to prove the more general fact that there is a rational number between any two real numbers. *)
+(** The second version of the density of [Q] in [R1] states that given
+any positive real number, there is a rational number between it and
+zero. This lemma can be used to prove the more general fact that there
+is a rational number between any two real numbers. *)
 
-Lemma Q_dense_in_CReals :
- forall e : R1,
- Zero[<]e -> {q : Q_as_COrdField | Zero[<]inj_Q q | inj_Q q[<]e}.
+Lemma Q_dense_in_CReals : forall e : R1,
+ Zero [<] e -> {q : Q_as_COrdField | Zero [<] inj_Q q | inj_Q q [<] e}.
 Proof.
  intros e H.
- cut {n : nat | (One[/] e[//]Greater_imp_ap _ e Zero H)[<]nring (R:=R1) n}.
+ cut {n : nat | (One[/] e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
  intro H0.
  case H0.
  intro N.
  intros.
- exists (Q.Build_Q 1 (P_of_succ_nat N)).
+ exists (Build_Q 1 (P_of_succ_nat N)).
   simpl in |- *.
   unfold pring in |- *; simpl in |- *.
   apply mult_cancel_less with (z := nring (R:=R1) N[+]One).
-  change (Zero[<]nring (R:=R1) (S N)) in |- *.
+  change (Zero [<] nring (R:=R1) (S N)) in |- *.
   apply pos_nring_S.
-  AStepl (Zero:R1).
-  AStepr
+  astepl (Zero:R1).
+  astepr
    ((Zero[+]One[-]Zero[/] nring (P_of_succ_nat N)[//]
-     den_is_nonzero (Q.Build_Q 1%positive (P_of_succ_nat N)))[*]
+     den_is_nonzero (Build_Q 1%positive (P_of_succ_nat N)))[*]
     nring (S N)).
 
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N.
 
-  RStepr (One:R1).
+  rstepr (One:R1).
   apply pos_one.
   
   apply bin_op_wd_unfolded.
@@ -917,7 +830,7 @@ Proof.
   apply pos_nring_S.
   assumption.
   unfold pring in |- *; simpl in |- *.
-  RStepl (One[/] e[//]Greater_imp_ap _ e Zero H).
+  rstepl (One[/] e[//]Greater_imp_ap _ e Zero H).
   apply less_transitive_unfolded with (y := nring (R:=R1) N).
   assumption.
   rewrite nat_of_P_o_P_of_succ_nat_eq_succ.

@@ -16,13 +16,13 @@ proof that this number is the limit.
 (* Begin_SpecReals *)
 
 Record is_CReals (R : COrdField) (lim : CauchySeq R -> R) : CProp := 
-  {ax_Lim : forall s : CauchySeq R, SeqLimit s (lim s);
-   ax_Arch : forall x : R, {n : nat | x[<=]nring n}}.
+  {ax_Lim  : forall s : CauchySeq R, SeqLimit s (lim s);
+   ax_Arch : forall x : R, {n : nat | x [<=] nring n}}.
 
 Record CReals : Type := 
-  {crl_crr :> COrdField;
-   crl_lim : CauchySeq crl_crr -> crl_crr;
-   crl_proof : is_CReals crl_crr crl_lim}.
+  {crl_crr   :> COrdField;
+   crl_lim   :  CauchySeq crl_crr -> crl_crr;
+   crl_proof :  is_CReals crl_crr crl_lim}.
 
 (* End_SpecReals *)
 

@@ -10,10 +10,13 @@ Section Definitions.
 
 (** *Series of Functions
 
-We now turn our attention to series of functions.  Like it was already the case for sequences, we will mainly rewrite the results we proved for series of real numbers in a different way.
+We now turn our attention to series of functions.  Like it was already
+the case for sequences, we will mainly rewrite the results we proved
+for series of real numbers in a different way.
 
 %\begin{convention}% Throughout this section:
- - [a] and [b] will be real numbers and the interval $[a,b]$#[a,b]# will be denoted by [I];
+ - [a] and [b] will be real numbers and the interval [[a,b]] will be denoted
+by [I];
  - [f, g] and [h] will denote sequences of continuous functions;
  - [F, G] and [H] will denote continuous functions.
 
@@ -21,11 +24,13 @@ We now turn our attention to series of functions.  Like it was already the case 
 
 ** Definitions
 
-As before, we will consider only sequences of continuous functions defined in a compact interval.  For this, partial Sums are defined and convergence is simply the convergence of the sequence of partial Sums.
+As before, we will consider only sequences of continuous functions
+defined in a compact interval.  For this, partial sums are defined and
+convergence is simply the convergence of the sequence of partial sums.
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -34,24 +39,23 @@ Variable f : nat -> PartIR.
 
 Definition fun_seq_part_sum (n : nat) := FSum0 n f.
 
-Lemma fun_seq_part_sum_cont :
- (forall n : nat, Continuous_I Hab (f n)) ->
- forall n : nat, Continuous_I Hab (fun_seq_part_sum n).
+Lemma fun_seq_part_sum_cont : (forall n, Continuous_I Hab (f n)) -> forall n,
+ Continuous_I Hab (fun_seq_part_sum n).
 intros; unfold fun_seq_part_sum in |- *.
 Contin.
 Qed.
 
-Definition fun_series_convergent :=
-  {contf : _ |
+Definition fun_series_convergent := {contf : _ |
   Cauchy_fun_seq _ _ Hab fun_seq_part_sum (fun_seq_part_sum_cont contf)}.
 
 (**
-For what comes up next we need to know that the convergence of a series of functions implies pointwise convergence of the corresponding real number series.
+For what comes up next we need to know that the convergence of a
+series of functions implies pointwise convergence of the corresponding
+real number series.
 *)
 
-Lemma fun_series_conv_imp_conv :
- fun_series_convergent ->
- forall x : IR, I x -> forall Hx, convergent (fun n : nat => f n x (Hx n)).
+Lemma fun_series_conv_imp_conv : fun_series_convergent ->
+ forall x, I x -> forall Hx, convergent (fun n => f n x (Hx n)).
 intros H x H0 Hx e He.
 elim H; intros incF convF.
 elim (convF _ He).
@@ -66,8 +70,8 @@ apply cg_minus_wd; unfold seq_part_sum in |- *; apply Sum0_wd; intros;
  rational.
 Qed.
 
-(**
-We then define the sum of the series as being the pointwise sum of the corresponding series.
+(** We then define the sum of the series as being the pointwise sum of
+the corresponding series.
 *)
 
 (* begin show *)
@@ -79,11 +83,9 @@ Let contf := ProjT1 H.
 Let incf (n : nat) := contin_imp_inc _ _ _ _ (contf n).
 (* end hide *)
 
-Lemma Fun_Series_Sum_strext :
- forall (x y : IR) (Hx : I x) (Hy : I y),
- series_sum _ (fun_series_conv_imp_conv H x Hx (fun n : nat => incf n x Hx))[#]
- series_sum _ (fun_series_conv_imp_conv H y Hy (fun n : nat => incf n y Hy)) ->
- x[#]y.
+Lemma Fun_Series_Sum_strext : forall x y Hx Hy,
+ series_sum _ (fun_series_conv_imp_conv H x Hx (fun n => incf n x Hx)) [#] 
+  series_sum _ (fun_series_conv_imp_conv H y Hy (fun n => incf n y Hy)) -> x [#] y.
 intros x y Hx Hy H0.
 unfold series_sum in H0.
 elim (Lim_strext _ _ H0); intros m Hm.
@@ -113,15 +115,14 @@ Hint Resolve fun_seq_part_sum_cont: continuous.
 Section More_Definitions.
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 
 Variable f : nat -> PartIR.
-(**
-A series can also be absolutely convergent.
-*)
 
-Definition fun_series_abs_convergent :=
-  fun_series_convergent _ _ Hab (fun n : nat => FAbs (f n)).
+(** A series can also be absolutely convergent. *)
+
+Definition fun_series_abs_convergent := fun_series_convergent _ _ Hab
+ (fun n => FAbs (f n)).
 
 End More_Definitions.
 
@@ -133,17 +134,13 @@ All of these are analogous to the properties for series of real numbers, so we w
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
 
-Lemma fun_seq_part_sum_n :
- forall (f : nat -> PartIR) (H' : forall n : nat, Continuous_I Hab (f n))
-   (m n : nat),
- 0 < n ->
- m <= n ->
- Feq I (fun_seq_part_sum f n{-}fun_seq_part_sum f m) (FSum m (pred n) f).
+Lemma fun_seq_part_sum_n : forall f (H' : forall n, Continuous_I Hab (f n)) m n,
+ 0 < n -> m <= n -> Feq I (fun_seq_part_sum f n{-}fun_seq_part_sum f m) (FSum m (pred n) f).
 intros.
 unfold fun_seq_part_sum in |- *.
 apply eq_imp_Feq.
@@ -155,9 +152,8 @@ rewrite (S_pred n 0); auto.
 apply cg_minus_wd; apply Sum0_wd; intros; rational.
 Qed.
 
-Lemma conv_fun_const_series :
- forall x : nat -> IR,
- convergent x -> fun_series_convergent _ _ Hab (fun n : nat => [-C-](x n)).
+Lemma conv_fun_const_series : forall x, convergent x ->
+ fun_series_convergent _ _ Hab (fun n => [-C-] (x n)).
 intros x H.
 exists (fun n : nat => Continuous_I_const _ _ Hab (x n)).
 apply Cauchy_fun_seq2_seq.
@@ -166,31 +162,27 @@ elim (H e He); intros N HN.
 exists N; intros.
 simpl in |- *.
 apply AbsSmall_imp_AbsIR.
-apply AbsSmall_wd_rht_unfolded with (seq_part_sum x m[-]seq_part_sum x N).
+apply AbsSmall_wdr_unfolded with (seq_part_sum x m[-]seq_part_sum x N).
 apply HN; assumption.
 unfold seq_part_sum in |- *; simpl in |- *.
 apply cg_minus_wd; apply Sum0_wd; Algebra.
 Qed.
 
-Lemma fun_const_series_sum :
- forall (y : nat -> IR) (H : convergent y)
-   (H' : fun_series_convergent _ _ Hab (fun n : nat => [-C-](y n))) 
-   (x : IR) (Hx : I x), Fun_Series_Sum H' x Hx[=]series_sum _ H.
+Lemma fun_const_series_sum : forall y H
+ (H' : fun_series_convergent _ _ Hab (fun n => [-C-] (y n))) x Hx, Fun_Series_Sum H' x Hx [=] series_sum y H.
 intros.
 simpl in |- *.
 apply series_sum_wd.
 Algebra.
 Qed.
 
-Lemma conv_zero_fun_series :
- fun_series_convergent _ _ Hab (fun n : nat => [-C-]Zero).
+Lemma conv_zero_fun_series : fun_series_convergent _ _ Hab (fun n => [-C-]Zero).
 apply conv_fun_const_series with (x := fun n : nat => ZeroR).
 apply conv_zero_series.
 Qed.
 
-Lemma Fun_Series_Sum_zero :
- forall (H : fun_series_convergent _ _ Hab (fun n : nat => [-C-]Zero))
-   (x : IR) Hx, Fun_Series_Sum H x Hx[=]Zero.
+Lemma Fun_Series_Sum_zero : forall (H : fun_series_convergent _ _ Hab (fun n => [-C-]Zero))
+ x Hx, Fun_Series_Sum H x Hx [=] Zero.
 intros.
 simpl in |- *.
 apply series_sum_zero.
@@ -200,8 +192,7 @@ Qed.
 Variables f g : nat -> PartIR.
 (* end show *)
 
-Lemma fun_series_convergent_wd :
- (forall n : nat, Feq I (f n) (g n)) ->
+Lemma fun_series_convergent_wd : (forall n, Feq I (f n) (g n)) ->
  fun_series_convergent _ _ Hab f -> fun_series_convergent _ _ Hab g.
 intros H H0.
 elim H0; intros contF convF.
@@ -227,9 +218,7 @@ Hypothesis convF : fun_series_convergent _ _ Hab f.
 Hypothesis convG : fun_series_convergent _ _ Hab g.
 (* end show *)
 
-Lemma Fun_Series_Sum_wd' :
- (forall n : nat, Feq I (f n) (g n)) ->
- Feq I (Fun_Series_Sum convF) (Fun_Series_Sum convG).
+Lemma Fun_Series_Sum_wd' : (forall n, Feq I (f n) (g n)) -> Feq I (Fun_Series_Sum convF) (Fun_Series_Sum convG).
 intro H.
 apply eq_imp_Feq.
 Included.
@@ -240,8 +229,7 @@ intro; elim (H n); intros.
 inversion_clear b0; auto.
 Qed.
 
-Lemma conv_fun_series_plus :
- fun_series_convergent _ _ Hab (fun n : nat => f n{+}g n).
+Lemma conv_fun_series_plus : fun_series_convergent _ _ Hab (fun n => f n{+}g n).
 elim convF; intros contF convF'.
 elim convG; intros contG convG'.
 assert (H := fun n : nat => Continuous_I_plus _ _ _ _ _ (contF n) (contG n));
@@ -265,8 +253,7 @@ apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 apply Sum0_wd; intros; rational.
 Qed.
 
-Lemma Fun_Series_Sum_plus :
- forall H : fun_series_convergent _ _ Hab (fun n : nat => f n{+}g n),
+Lemma Fun_Series_Sum_plus : forall H : fun_series_convergent _ _ Hab (fun n => f n{+}g n),
  Feq I (Fun_Series_Sum H) (Fun_Series_Sum convF{+}Fun_Series_Sum convG).
 intros.
 apply eq_imp_Feq.
@@ -278,7 +265,7 @@ elim convG; intros contG convG'.
 cut
  (convergent
     (fun n : nat =>
-     Part _ _ (contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx'))[+]
+     Part _ _ (contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx')) [+]
      Part _ _ (contin_imp_inc _ _ _ _ (contG n) x (ProjIR2 Hx')))). intro H1.
 eapply eq_transitive_unfolded.
 2: apply
@@ -303,8 +290,7 @@ unfold seq_part_sum in |- *; apply cg_minus_wd; apply Sum0_wd; intros;
  rational.
 Qed.
 
-Lemma conv_fun_series_minus :
- fun_series_convergent _ _ Hab (fun n : nat => f n{-}g n).
+Lemma conv_fun_series_minus : fun_series_convergent _ _ Hab (fun n => f n{-}g n).
 elim convF; intros contF convF'.
 elim convG; intros contG convG'.
 assert (H := fun n : nat => Continuous_I_minus _ _ _ _ _ (contF n) (contG n));
@@ -327,8 +313,8 @@ apply eq_symmetric_unfolded.
 apply
  eq_transitive_unfolded
   with
-    (Sum0 n (fun i : nat => f i x (ProjIR1 Hx i))[+]
-     Sum0 n (fun i : nat => [--](g i x (ProjIR2 Hx i)))).
+    (Sum0 n (fun i : nat => f i x (ProjIR1 Hx i)) [+]
+     Sum0 n (fun i : nat => [--] (g i x (ProjIR2 Hx i)))).
 eapply eq_transitive_unfolded.
 2: apply Sum0_plus_Sum0.
 apply Sum0_wd; intros; rational.
@@ -340,8 +326,7 @@ eapply eq_transitive_unfolded.
 apply Sum0_wd; Algebra.
 Qed.
 
-Lemma Fun_Series_Sum_minus :
- forall H : fun_series_convergent _ _ Hab (fun n : nat => f n{-}g n),
+Lemma Fun_Series_Sum_min : forall H : fun_series_convergent _ _ Hab (fun n => f n{-}g n),
  Feq I (Fun_Series_Sum H) (Fun_Series_Sum convF{-}Fun_Series_Sum convG).
 intros.
 apply eq_imp_Feq.
@@ -353,14 +338,14 @@ elim convG; intros contG convG'.
 cut
  (convergent
     (fun n : nat =>
-     Part _ _ (contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx'))[-]
+     Part _ _ (contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx')) [-]
      Part _ _ (contin_imp_inc _ _ _ _ (contG n) x (ProjIR2 Hx')))). intro H1.
 apply
  eq_transitive_unfolded
   with
     (series_sum _
        (fun_series_conv_imp_conv _ _ _ _ convF x (ProjIR1 Hx')
-          (fun n : nat => contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx')))[-]
+          (fun n : nat => contin_imp_inc _ _ _ _ (contF n) x (ProjIR1 Hx'))) [-]
      series_sum _
        (fun_series_conv_imp_conv _ _ _ _ convG x (ProjIR2 Hx')
           (fun n : nat => contin_imp_inc _ _ _ _ (contG n) x (ProjIR2 Hx')))).
@@ -397,8 +382,7 @@ Variable c : IR.
 Variable H : PartIR.
 Hypothesis contH : Continuous_I Hab H.
 
-Lemma conv_fun_series_mult_scal :
- fun_series_convergent _ _ Hab (fun n : nat => H{*}f n).
+Lemma conv_fun_series_scal : fun_series_convergent _ _ Hab (fun n => H{*}f n).
 elim convF; intros contF convF'.
 set (H' := fun n : nat => Continuous_I_mult _ _ _ _ _ contH (contF n)) in *;
  exists H'.
@@ -421,7 +405,7 @@ simpl in |- *.
 unfold seq_part_sum in |- *.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
-2: apply Sum0_comm_scal' with (x := fun m : nat => f m x (ProjIR2 Hx m)).
+2: apply Sum0_comm_scal' with (s := fun m : nat => f m x (ProjIR2 Hx m)).
 apply Sum0_wd; intros; rational.
 apply fun_Cauchy_prop_const.
 apply
@@ -433,8 +417,7 @@ apply
 intro; apply Feq_reflexive; Included.
 Qed.
 
-Lemma Fun_Series_Sum_mult_scal :
- forall H' : fun_series_convergent _ _ Hab (fun n : nat => H{*}f n),
+Lemma Fun_Series_Sum_scal : forall H' : fun_series_convergent _ _ Hab (fun n => H{*}f n),
  Feq I (Fun_Series_Sum H') (H{*}Fun_Series_Sum convF).
 elim convF; intros contF convF'.
 intros.
@@ -442,14 +425,14 @@ unfold I in |- *; FEQ. rename X into H0.
 cut
  (convergent
     (fun n : nat =>
-     Part H x (ProjIR1 Hx')[*]
+     Part H x (ProjIR1 Hx') [*]
      f n x (contin_imp_inc _ _ _ _ (contF n) _ (ProjIR2 Hx')))). intro H1.
 apply
  eq_transitive_unfolded
   with
     (series_sum
        (fun n : nat =>
-        Part H x (ProjIR1 Hx')[*]
+        Part H x (ProjIR1 Hx') [*]
         f n x (contin_imp_inc _ _ _ _ (contF n) _ (ProjIR2 Hx'))) H1).
 2: simpl in |- *;
     apply
@@ -477,7 +460,7 @@ End Operations.
 Section More_Operations.
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -485,14 +468,13 @@ Let I := Compact Hab.
 Variable f : nat -> PartIR.
 Hypothesis convF : fun_series_convergent _ _ Hab f.
 
-Lemma conv_fun_series_inv :
- fun_series_convergent _ _ Hab (fun n : nat => {--}(f n)).
+Lemma conv_fun_series_inv : fun_series_convergent _ _ Hab (fun n => {--} (f n)).
 elim convF; intros contF convF'.
 exists (fun n : nat => Continuous_I_inv _ _ _ _ (contF n)).
-cut (forall n : nat, Continuous_I Hab {--}(fun_seq_part_sum f n)). intro H.
+cut (forall n : nat, Continuous_I Hab {--} (fun_seq_part_sum f n)). intro H.
 apply
  Cauchy_fun_seq_wd
-  with (f := fun n : nat => {--}(fun_seq_part_sum f n)) (contf := H).
+  with (f := fun n : nat => {--} (fun_seq_part_sum f n)) (contf := H).
 2: apply fun_Cauchy_prop_inv with (fun_seq_part_sum_cont _ _ _ _ contF).
 intro; FEQ.
 apply contin_imp_inc; Contin.
@@ -504,15 +486,14 @@ assumption.
 Contin.
 Qed.
 
-Lemma Fun_Series_Sum_inv :
- forall H : fun_series_convergent _ _ Hab (fun n : nat => {--}(f n)),
- Feq I (Fun_Series_Sum H) {--}(Fun_Series_Sum convF).
+Lemma Fun_Series_Sum_inv : forall H : fun_series_convergent _ _ Hab (fun n => {--} (f n)),
+ Feq I (Fun_Series_Sum H) {--} (Fun_Series_Sum convF).
 intros.
 FEQ. rename X into H0.
 cut
  (convergent
     (fun n : nat =>
-     [--](f n x (contin_imp_inc _ _ _ _ (ProjT1 convF n) x Hx')))). intro H1.
+     [--] (f n x (contin_imp_inc _ _ _ _ (ProjT1 convF n) x Hx')))). intro H1.
 simpl in |- *; apply eq_transitive_unfolded with (series_sum _ H1).
 2: apply
     series_sum_inv
@@ -540,20 +521,20 @@ End More_Operations.
 Section Other_Results.
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 
 Variable f : nat -> PartIR.
 
 Hypothesis convF : fun_series_convergent a b Hab f.
 
 (**
-The following relate the Sum series with the limit of the sequence of partial Sums; as a corollary we get the continuity of the Sum of the series.
+The following relate the sum series with the limit of the sequence of
+partial sums; as a corollary we get the continuity of the sum of the
+series.
 *)
 
-Lemma Fun_Series_Sum_char' :
- forall contf H,
- Feq (Compact Hab) (Fun_Series_Sum convF)
-   (Cauchy_fun_seq_Lim _ _ Hab (fun_seq_part_sum f) contf H).
+Lemma Fun_Series_Sum_char' : forall contf H,
+ Feq (Compact Hab) (Fun_Series_Sum convF) (Cauchy_fun_seq_Lim _ _ Hab (fun_seq_part_sum f) contf H).
 intros.
 FEQ.
 simpl in |- *; unfold series_sum in |- *.
@@ -561,8 +542,7 @@ apply Lim_wd'; simpl in |- *; intros.
 unfold seq_part_sum in |- *; apply Sum0_wd; intros; Algebra.
 Qed.
 
-Lemma fun_series_conv :
- forall H H',
+Lemma fun_series_conv : forall H H',
  conv_fun_seq' a b Hab (fun_seq_part_sum f) (Fun_Series_Sum convF) H H'.
 intros.
 inversion_clear convF. rename X into H0.
@@ -585,10 +565,8 @@ apply Feq_symmetric;
 Contin.
 Qed.
 
-Lemma Fun_Series_Sum_char :
- Feq (Compact Hab)
-   (Cauchy_fun_seq_Lim _ _ Hab (fun_seq_part_sum f) _ (ProjT2 convF))
-   (Fun_Series_Sum convF).
+Lemma Fun_Series_Sum_char : Feq (Compact Hab)
+ (Cauchy_fun_seq_Lim _ _ Hab (fun_seq_part_sum f) _ (ProjT2 convF)) (Fun_Series_Sum convF).
 intros.
 FEQ.
 simpl in |- *.
@@ -597,8 +575,7 @@ intro; simpl in |- *.
 unfold seq_part_sum in |- *; apply Sum0_wd; intros; Algebra.
 Qed.
 
-Lemma Fun_Series_Sum_as_Lim :
- forall Hf H',
+Lemma Fun_Series_Sum_as_Lim : forall Hf H',
  conv_fun_seq' _ _ Hab (fun_seq_part_sum f) (Fun_Series_Sum convF) Hf H'.
 intros.
 apply
@@ -623,7 +600,7 @@ Most of the convergence criteria for series of real numbers carry over to series
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -631,12 +608,8 @@ Let I := Compact Hab.
 Variable f : nat -> PartIR.
 Hypothesis contF : forall n : nat, Continuous_I Hab (f n).
 
-Lemma fun_str_comparison :
- forall g : nat -> PartIR,
- fun_series_convergent _ _ Hab g ->
- {k : nat |
- forall n : nat,
- k <= n -> forall x : IR, I x -> forall Hx Hx', AbsIR (f n x Hx)[<=]g n x Hx'} ->
+Lemma fun_str_comparison : forall g, fun_series_convergent _ _ Hab g ->
+ {k : nat | forall n, k <= n -> forall x, I x -> forall Hx Hx', AbsIR (f n x Hx) [<=] g n x Hx'} ->
  fun_series_convergent _ _ Hab f.
 set (H0 := contF) in *.
 intros g H H1.
@@ -665,7 +638,7 @@ assert
 apply
  leEq_transitive
   with
-    (Part (fun_seq_part_sum g m) x (H' m x Hx)[-]
+    (Part (fun_seq_part_sum g m) x (H' m x Hx) [-]
      Part (fun_seq_part_sum g N) x (H' N x Hx)).
 cut (forall n : nat, included (Compact Hab) (Dom (FAbs (f n)))). intro H4.
 cut (Dom (FSum N (pred m) (fun n : nat => FRestr (H4 n))) x). intro H5.
@@ -773,33 +746,24 @@ Qed.
 
 Transparent FAbs.
 
-Lemma fun_comparison :
- forall g : nat -> PartIR,
- fun_series_convergent _ _ Hab g ->
- (forall (n : nat) (x : IR),
-  I x -> forall Hx Hx', AbsIR (f n x Hx)[<=]g n x Hx') ->
+Lemma fun_comparison : forall g, fun_series_convergent _ _ Hab g ->
+ (forall n x,  I x -> forall Hx Hx', AbsIR (f n x Hx) [<=] g n x Hx') ->
  fun_series_convergent _ _ Hab f.
 intros g H H0.
 apply fun_str_comparison with g; auto.
 exists 0; intros; apply H0; auto.
 Qed.
 
-Lemma abs_imp_conv :
- fun_series_abs_convergent _ _ Hab f -> fun_series_convergent _ _ Hab f.
+Lemma abs_imp_conv : fun_series_abs_convergent _ _ Hab f ->
+ fun_series_convergent _ _ Hab f.
 intro H.
 apply fun_comparison with (fun n : nat => FAbs (f n)).
 apply H.
 intros; apply eq_imp_leEq; apply eq_symmetric_unfolded; apply FAbs_char.
 Qed.
 
-Lemma fun_ratio_test_conv :
- {N : nat |
- {c : IR | c[<]One |
- Zero[<=]c /\
- (forall x : IR,
-  I x ->
-  forall n : nat,
-  N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx')[<=]c[*]AbsIR (f n x Hx))}} ->
+Lemma fun_ratio_test_conv : {N : nat | {c : IR | c [<] One | Zero [<=] c /\
+ (forall x, I x -> forall n, N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx') [<=] c[*]AbsIR (f n x Hx))}} ->
  fun_series_convergent _ _ Hab f.
 intro H.
 elim H; clear H; intros N H.
@@ -810,18 +774,18 @@ cut
   I x ->
   forall n : nat,
   N <= n ->
-  forall Hx Hx', AbsIR (f n x Hx')[<=]AbsIR (f N x Hx)[*]c[^](n - N)).
+  forall Hx Hx', AbsIR (f n x Hx') [<=] AbsIR (f N x Hx) [*]c[^] (n - N)).
 intro H0.
 apply
- fun_str_comparison with (fun n : nat => FAbs (f N){*}[-C-](c[^](n - N))).
+ fun_str_comparison with (fun n : nat => FAbs (f N) {*} [-C-] (c[^] (n - N))).
 2: exists N; intros.
 2: eapply leEq_wdr.
 2: apply H0 with (Hx' := Hx) (Hx := ProjIR1 (ProjIR1 Hx')); auto with arith.
 Opaque FAbs.
 2: simpl in |- *; apply mult_wd;
     [ apply eq_symmetric_unfolded; apply FAbs_char | Algebra ].
-apply conv_fun_series_mult_scal with (f := fun n : nat => [-C-](c[^](n - N))).
-apply conv_fun_const_series with (x := fun n : nat => c[^](n - N)).
+apply conv_fun_series_scal with (f := fun n : nat => [-C-] (c[^] (n - N))).
+apply conv_fun_const_series with (x := fun n : nat => c[^] (n - N)).
 apply join_series with (power_series c).
 apply power_series_conv; auto.
 exists N.
@@ -837,7 +801,7 @@ rewrite H2.
 intros.
 apply eq_imp_leEq.
 simpl in |- *.
-AStepl (AbsIR (Part _ _ Hx')[*]One); apply mult_wd_lft; apply AbsIR_wd;
+astepl (AbsIR (Part _ _ Hx') [*]One); apply mult_wdl; apply AbsIR_wd;
  Algebra.
 intro.
 elim (le_lt_eq_dec _ _ H1); intro.
@@ -846,8 +810,8 @@ intros;
   leEq_transitive
    with (c[*]AbsIR (f n x (contin_imp_inc _ _ _ _ (contF n) x H0))).
 apply H; auto with arith.
-apply leEq_wdr with (AbsIR (f N x Hx)[*]c[^](n - N)[*]c).
-RStepr (c[*](AbsIR (Part _ _ Hx)[*]c[^](n - N))).
+apply leEq_wdr with (AbsIR (f N x Hx) [*]c[^] (n - N) [*]c).
+rstepr (c[*] (AbsIR (Part _ _ Hx) [*]c[^] (n - N))).
 apply mult_resp_leEq_lft.
 apply Hrecn; auto with arith.
 assumption.

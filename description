@@ -1,0 +1,18 @@
+Name: C-CoRN
+Title: Constructive Coq Repository at Nijmegen
+Author: Herman Geuvers 
+Author: Freek Wiedijk 
+Author: Jan Zwanenburg 
+Author: Randy Pollack 
+Author: Henk Barendregt 
+Author: Luis Cruz-Filipe
+Institution: Nijmegen university
+Description: 
+ The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
+ a computer based library of constructive mathematics, formalized in
+ the theorem prover Coq.
+ It includes in particular a constructive proof of the Fundamental
+ Theorem of Algebra (every non-trivial polynomial equation P(z)=0
+ always has a solution in the complex plane)
+Keywords: FTA, Fundamental, Theorem, Algebra, Constructive, Real, Complex,
+          Polynomial

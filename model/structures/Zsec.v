@@ -1,30 +1,25 @@
 (* $Id$ *)
 
+(** printing {#Z} %\ensuremath{\mathrel\#_{\mathbb Z}}% *)
 
 Require Export ZArith.
 Require Import CLogic.
 
-(** *About Z
+(** *[Z]
+** About [Z]
+We consider the implementation of integers as signed binary sequences (the 
+datatype [Z] as defined in [ZArith], in the standard library).
+
+***Apartness
+We define the apartness as the negation of the Leibniz equality:
 *)
 
-(** We consider the implementation of integers as signed binary sequences (the 
-datatype Z as defined in [ZArith], in the standard library).
-*)
-
-(** **Apartness
-*)
-
-(** We define the apartness as the negation of the Leibniz equality:
-*)
-
-Definition ap_Z (x y : Z) := CNot (x = y).
+Definition ap_Z (x y : Z) := ~ (x = y).
 
 Infix "{#Z}" := ap_Z (no associativity, at level 90).
 
 (** Some properties of apartness:
 *)
-
-
 
 Lemma ap_Z_irreflexive0 : forall x : Z, Not (x{#Z}x).
 intro x.
@@ -44,8 +39,8 @@ Lemma ap_Z_symmetric0 : forall x y : Z, (x{#Z}y) -> y{#Z}x.
  auto.
 Qed.
 
-Lemma ap_Z_cotransitive0 :
- forall x y : Z, (x{#Z}y) -> forall z : Z, (x{#Z}z) or (z{#Z}y).
+Lemma ap_Z_cotransitive0 : forall x y : Z,
+ (x{#Z}y) -> forall z : Z, (x{#Z}z) or (z{#Z}y).
 intros x y X z.
  unfold ap_Z in |- *.
  case (Z_eq_dec x z).
@@ -55,8 +50,6 @@ intros x y X z.
  assumption.
  intro n.
  left.
- apply Ccontrapos' with (x = z).
- auto.
  assumption.
 Qed.
 
@@ -69,47 +62,34 @@ intros x y.
  case (Z_eq_dec x y).
  intro e.
  assumption.
- intro n.
- elim H.
- apply Ccontrapos' with (x = y).
- auto.
- assumption.
- intro H.
- unfold ap_Z in |- *.
- red in |- *.
- intro H0.
- elim H0.
- assumption.
+ contradiction.
+ unfold ap_Z, Not. contradiction.
 Qed.
 
 Lemma ONE_neq_O : 1{#Z}0.
 Proof.
 apply ap_Z_symmetric0.
 red in |- *.
-apply Ccontrapos' with (0%Z = 1%Z).
-auto.
 apply Zorder.Zlt_not_eq.
 apply Zgt_lt.
 exact (Zorder.Zgt_pos_0 1).
 Qed.
 
-(** **Addition
-*)
-
-(** Some properties of the addition. [Zplus] is also defined in the standard 
+(** ***Addition
+Some properties of the addition. [Zplus] is also defined in the standard 
 library.
 *)
 
-Lemma Zplus_is_well_defined0 :
- forall x1 x2 y1 y2 : Z, x1 = x2 -> y1 = y2 -> (x1 + y1)%Z = (x2 + y2)%Z.
+Lemma Zplus_wd0 : forall x1 x2 y1 y2 : Z,
+ x1 = x2 -> y1 = y2 -> (x1 + y1)%Z = (x2 + y2)%Z.
 intros x1 x2 y1 y2 H H0.
 rewrite H.
 rewrite H0.
 auto.
 Qed.
 
-Lemma Zplus_is_extensional0 :
- forall x1 x2 y1 y2 : Z, (x1 + y1{#Z}x2 + y2) -> (x1{#Z}x2) or (y1{#Z}y2).
+Lemma Zplus_strext0 : forall x1 x2 y1 y2 : Z,
+ (x1 + y1{#Z}x2 + y2) -> (x1{#Z}x2) or (y1{#Z}y2).
 intros x1 x2 y1 y2 H. 
 unfold ap_Z in |- *.
 unfold ap_Z in H.
@@ -120,21 +100,15 @@ red in |- *.
 intro H0.
 apply H.
 exact (f_equal2 Zplus e H0).
-intro n.
-left.
-apply Ccontrapos' with (x1 = x2).
 auto.
-assumption.
 Qed.
 
-(** **Multiplication
+(** ***Multiplication
+The multiplication is extensional:
 *)
 
-(** The multiplication is extensional:
-*)
-
-Lemma Zmult_is_extensional0 :
- forall x1 x2 y1 y2 : Z, (x1 * y1{#Z}x2 * y2) -> (x1{#Z}x2) or (y1{#Z}y2).
+Lemma Zmult_strext0 : forall x1 x2 y1 y2 : Z,
+ (x1 * y1{#Z}x2 * y2) -> (x1{#Z}x2) or (y1{#Z}y2).
 unfold ap_Z in |- *.
 intros x1 x2 y1 y2 H.
 case (Z_eq_dec x1 x2). 
@@ -144,32 +118,25 @@ red in |- *.
 intro H0.
 apply H.
 exact (f_equal2 Zmult e H0).
-intro n.
-left.
-apply Ccontrapos' with (x1 = x2).
 auto.
-assumption.
 Qed.
 
-(** **Miscellaneous
+(** ***Miscellaneous
 *)
 
 
-Definition Zpos (x : Z) : positive :=
+Definition posZ (x : Z) : positive :=
   match x with
   | Z0 => 1%positive
   | Zpos p => p
   | Zneg p => p
   end.
 
+(* begin hide *)
+Coercion Zpos : positive >-> Z.
+(* end hide *)
 
-Coercion BinInt.Zpos : positive >-> Z.
-
-
-
-Lemma a_very_specific_lemma1 :
- forall a b c d e f : Z,
- c <> 0%Z ->
+Lemma a_very_specific_lemma1 : forall a b c d e f : Z, c <> 0%Z ->
  (a * b)%Z = (c * d)%Z -> (c * e)%Z = (f * b)%Z -> (a * e)%Z = (f * d)%Z.
 Proof.
  intros.
@@ -216,10 +183,8 @@ Proof.
 Qed.
 
 
-Lemma a_very_specific_lemma2 :
- forall a b c d s r t u : Z,
- (a * r)%Z = (b * s)%Z ->
- (c * u)%Z = (d * t)%Z ->
+Lemma a_very_specific_lemma2 : forall a b c d s r t u : Z,
+ (a * r)%Z = (b * s)%Z -> (c * u)%Z = (d * t)%Z ->
  ((a * t + c * s) * (r * u))%Z = ((b * u + d * r) * (s * t))%Z.
 Proof.
  intros.
@@ -257,12 +222,9 @@ Proof.
 Qed.
 
 
-Lemma a_very_specific_lemma3 :
- forall (a b c d : Z) (s r t u : positive),
- (a * r)%Z = (b * s)%Z ->
- (c * u)%Z = (d * t)%Z ->
- ((a * t + c * s) * (r * u)%positive)%Z =
- ((b * u + d * r) * (s * t)%positive)%Z.
+Lemma a_very_specific_lemma3 : forall (a b c d : Z) (s r t u : positive),
+ (a * r)%Z = (b * s)%Z -> (c * u)%Z = (d * t)%Z ->
+ ((a * t + c * s) * (r * u)%positive)%Z = ((b * u + d * r) * (s * t)%positive)%Z.
 Proof.
  intros a b c d s r t u.
  intros.
@@ -270,11 +232,8 @@ Proof.
   in |- *.
  apply a_very_specific_lemma2; trivial.
 Qed.
-(* end hide *)
 
-(* begin hide *)
-Lemma a_very_specific_lemma4 :
- forall a b c m n p : Z,
+Lemma a_very_specific_lemma4 : forall a b c m n p : Z,
  ((a * (n * p) + (b * p + c * n) * m) * (m * n * p))%Z =
  (((a * n + b * m) * p + c * (m * n)) * (m * (n * p)))%Z.
 Proof.
@@ -282,8 +241,7 @@ Proof.
  ring.
 Qed.
 
-Lemma a_very_specific_lemma5 :
- forall (a b c : Z) (m n p : positive),
+Lemma a_very_specific_lemma5 : forall (a b c : Z) (m n p : positive),
  ((a * (n * p)%positive + (b * p + c * n) * m) * (m * n * p)%positive)%Z =
  (((a * n + b * m) * p + c * (m * n)%positive) * (m * (n * p))%positive)%Z.
 Proof.
@@ -295,29 +253,28 @@ Proof.
  apply a_very_specific_lemma4.
 Qed.
 
-Lemma Zpos_pos : forall x : Z, (x > 0)%Z -> Zsec.Zpos x = x :>Z. 
+Lemma posZ_pos : forall x : Z, (x > 0)%Z -> posZ x = x :>Z. 
 Proof.
 simple induction x; intros; reflexivity || inversion H.
 Qed.
 
-Lemma Zpos_neg : forall x : Z, (x < 0)%Z -> Zsec.Zpos x = (- x)%Z :>Z. 
+Lemma posZ_neg : forall x : Z, (x < 0)%Z -> posZ x = (- x)%Z :>Z. 
 Proof.
 simple induction x; intros; reflexivity || inversion H.
 Qed.
 
-Lemma Zpos_Zsgn : forall x : Z, x <> 0%Z -> (Zsgn x * Zsec.Zpos x)%Z = x.
+Lemma posZ_Zsgn : forall x : Z, x <> 0%Z -> (Zsgn x * posZ x)%Z = x.
 Proof.
 simple induction x; intros; reflexivity.
 Qed.
 
-Lemma Zpos_Zsgn2 : forall x : Z, x <> 0%Z -> (Zsgn x * x)%Z = Zsec.Zpos x.
+Lemma posZ_Zsgn2 : forall x : Z, x <> 0%Z -> (Zsgn x * x)%Z = posZ x.
 Proof.
 simple induction x; intros; [ elim H | simpl in |- * | simpl in |- * ];
  reflexivity.
 Qed.
 
- Lemma a_very_specific_lemma5' :
-  forall (m n p : positive) (a b c : Z),
+Lemma a_very_specific_lemma5' : forall (m n p : positive) (a b c : Z),
   (a * n < b * m)%Z -> (b * p)%Z = (c * n)%Z -> (a * p < c * m)%Z.
 Proof.
 intros.
@@ -482,5 +439,3 @@ auto with zarith.
 rewrite Zmult_0_r.
 trivial.
 Qed.
-
-

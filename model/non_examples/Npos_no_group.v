@@ -1,17 +1,14 @@
 
 (* $Id$ *)
 
-Require Export Nposmonoid.
 Require Import CGroups.
+Require Export Nposmonoid.
 
-(** *Non-example of a group: <$\mathbb{N}^{+}$ #N<SUP>+</SUP>#,*>
+(** **Non-example of a group: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
+There is no inverse for multiplication on the positive natural numbers.
 *)
 
-(** There is no inverse for multiplication on the positive natural numbers.
-*)
-
-Lemma no_inverse_Nposmult :
- forall inv : CSetoid_fun Npossetoid.Npos Npossetoid.Npos,
+Lemma no_inverse_Nposmult : forall inv : CSetoid_un_op Npos,
  ~ is_inverse Npos_mult ONEpos TWOpos (inv TWOpos).
 intro inv.
 red in |- *.
@@ -29,8 +26,7 @@ Qed.
 (** Hence the natural numbers with multiplication do not form a group.
 *)
 
-Lemma no_group_Nposmult :
- forall inv : CSetoid_un_op Nposmult_as_CMonoid,
+Lemma no_group_Nposmult : forall inv : CSetoid_un_op Nposmult_as_CMonoid,
  ~ is_CGroup Nposmult_as_CMonoid inv.
 simpl in |- *.
 intro inv.

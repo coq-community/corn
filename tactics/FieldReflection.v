@@ -1,5 +1,6 @@
 (* $Id$ *)
 
+(* begin hide *)
 Require Export CFields.
 Require Export AlgReflection.
 
@@ -192,34 +193,34 @@ Step_final (zring z:F).
 intros x y H1 H2.
 inversion H1.
 inversion H2.
-AStepl (x0[+]y0).
+astepl (x0[+]y0).
 Step_final (x1[+]y1).
 
 intros x y H1 H2.
 inversion H1.
 inversion H2.
-AStepl (x0[*]y0).
+astepl (x0[*]y0).
 Step_final (x1[*]y1).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (x0[/]y0[//]nzy). Step_final (x1[/]y1[//]nzy0).
+astepl (x0[/]y0[//]nzy). Step_final (x1[/]y1[//]nzy0).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (unop u x0); Step_final (unop u x1).
+astepl (unop u x0); Step_final (unop u x1).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (binop b x0 y0); Step_final (binop b x1 y1).
+astepl (binop b x0 y0); Step_final (binop b x1 y1).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
+astepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
 Qed.
 
 Lemma interpF_wd :
@@ -299,8 +300,8 @@ Step_final (x0[*]y0[*]y).
 intros. inversion X. rewrite H in H0. rewrite H1 in H0.
 apply interpF_wd with (zring 0:F).
 apply interpF_int; Algebra.
-AStepl (Zero:F).
-AStepl (x[*]Zero).
+astepl (Zero:F).
+astepl (x[*]Zero).
 Step_final (x[*]zring 0).
 Qed.
 Transparent Zmult.
@@ -390,7 +391,7 @@ apply MI_mult_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[*]y[*]x0).
 apply MV_mult_corr_F; auto.
-AStepl (x0[*](y0[*]y)).
+astepl (x0[*](y0[*]y)).
 Step_final (x0[*]y0[*]y).
 Qed.
 Transparent MV_mult MI_mult.
@@ -420,8 +421,8 @@ intros. inversion X. rewrite H6 in X1. rewrite H8 in X2. rewrite H7 in H9.
 inversion X0. rewrite H10 in X3. rewrite H12 in X4. rewrite H11 in H13.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
-AStepl (x0[*](y0[+]y1)).
-AStepl (x0[*]y0[+]x0[*]y1).
+astepl (x0[*](y0[+]y1)).
+astepl (x0[*]y0[+]x0[*]y1).
 cut (x0[=]x1). intro.
 Step_final (x0[*]y0[+]x1[*]y1).
 apply refl_interpF with val unop binop pfun (expr_var n).
@@ -442,8 +443,8 @@ inversion X. rewrite <- H7. rewrite H9 in X2. rewrite H8 in H10.
 inversion X0. rewrite H11 in X3. rewrite H13 in X4. rewrite H12 in H14.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
-AStepr (x0[*]y0[+]x1[*]y1). AStepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. AStepr (y1[*]x1). apply mult_wd_rht.
+astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_unop u e0).
 rewrite <- H7; auto. rewrite H'. rewrite H''. auto. auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
@@ -466,8 +467,8 @@ inversion X. rewrite <- H9. rewrite H11 in X2. rewrite H10 in H12.
 inversion X0. rewrite H13 in X3. rewrite H15 in X4. rewrite H14 in H16.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
-AStepr (x0[*]y0[+]x1[*]y1). AStepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. AStepr (y1[*]x1). apply mult_wd_rht.
+astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_binop u e0 e3).
 rewrite <- H9; auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
 auto.
@@ -491,8 +492,8 @@ inversion X. rewrite <- H9. rewrite H11 in X2. rewrite H10 in H12.
 inversion X0. rewrite H13 in X3. rewrite H15 in X4. rewrite H14 in H16.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
-AStepr (x0[*]y0[+]x1[*]y1). AStepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. AStepr (y1[*]x1). apply mult_wd_rht.
+astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_part f e0).
 rewrite <- H9; auto. rewrite H7. rewrite H8; auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
@@ -552,7 +553,7 @@ intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[+](x0[+]y)).
 apply X; auto.
 apply MM_plus_corr_F; auto.
-AStepl (y0[+]x0[+]y).
+astepl (y0[+]x0[+]y).
 Step_final (x0[+]y0[+]y).
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (x0[+](y0[+]y)).
@@ -582,7 +583,7 @@ apply PM_plus_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[+]y[+]x0).
 apply PM_plus_corr_F; auto.
-AStepl (x0[+](y0[+]y)).
+astepl (x0[+](y0[+]y)).
 Step_final (x0[+]y0[+]y).
 Qed.
 Transparent PM_plus.
@@ -608,13 +609,13 @@ intros. apply interpF_wd with (zring 0[+]y[*]x).
 apply PM_plus_corr_F.
 apply interpF_int; Algebra.
 apply MI_mult_corr_F; auto.
-AStepl (Zero[+]y[*]x).
+astepl (Zero[+]y[*]x).
 Step_final (y[*]x).
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[*]y[+]x0[*]y).
 apply PM_plus_corr_F; auto.
 apply MM_mult_corr_F; auto.
-AStepl ((y0[+]x0)[*]y).
+astepl ((y0[+]x0)[*]y).
 Step_final ((x0[+]y0)[*]y).
 Qed.
 
@@ -640,7 +641,7 @@ intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y[*]x0[+]y0[*]y).
 apply PP_plus_corr_F; auto.
 apply PM_mult_corr_F; auto.
-AStepl (x0[*]y[+]y0[*]y).
+astepl (x0[*]y[+]y0[*]y).
 Step_final ((x0[+]y0)[*]y).
 Qed.
 
@@ -662,11 +663,11 @@ intros. inversion X. rewrite H in X1. rewrite H1 in X2. rewrite H0 in H2.
 inversion X0. rewrite H3 in X3. rewrite H5 in X4. rewrite H4 in H6.
 cut (y0[*]y1[#]Zero). intro H13.
 apply interpF_div with (x0[*]y1[+]y0[*]x1) (y0[*]y1) H13; auto.
-AStepl ((x0[*]y1[/] y0[*]y1[//]H13)[+](y0[*]x1[/] y0[*]y1[//]H13)).
-AStepl
+astepl ((x0[*]y1[/] y0[*]y1[//]H13)[+](y0[*]x1[/] y0[*]y1[//]H13)).
+astepl
  ((x0[/] y0[//]nzy)[*](y1[/] y1[//]nzy0)[+]
   (y0[/] y0[//]nzy)[*](x1[/] y1[//]nzy0)).
-AStepl ((x0[/] y0[//]nzy)[*]One[+]One[*](x1[/] y1[//]nzy0)).
+astepl ((x0[/] y0[//]nzy)[*]One[+]One[*](x1[/] y1[//]nzy0)).
 Step_final ((x0[/] y0[//]nzy)[+](x1[/] y1[//]nzy0)).
 apply PP_plus_corr_F; auto.
 apply PP_mult_corr_F; auto.
@@ -718,17 +719,17 @@ cut (x1[#]Zero). intro nzx1.
 cut (y0[*]x1[#]Zero). intro H13.
 cut ((x1[/]y1[//]nzy1)[#]Zero). intro H14.
 apply interpF_div with (x0[*]y1) (y0[*]x1) H13.
-AStepl ((y1[*]x0)[/]y0[*]x1[//]H13).
-AStepl (((y1[*]x0)[/]y0[//]nzy0)[/]x1[//]nzx1).
-AStepl ((y1[*](x0[/]y0[//]nzy0))[/]x1[//]nzx1).
-AStepl (((x0[/]y0[//]nzy0)[*]y1)[/]x1[//]nzx1).
+astepl ((y1[*]x0)[/]y0[*]x1[//]H13).
+astepl (((y1[*]x0)[/]y0[//]nzy0)[/]x1[//]nzx1).
+astepl ((y1[*](x0[/]y0[//]nzy0))[/]x1[//]nzx1).
+astepl (((x0[/]y0[//]nzy0)[*]y1)[/]x1[//]nzx1).
 Step_final ((x0[/]y0[//]nzy0)[/]x1[/]y1[//]nzy1[//]H14).
 apply PP_mult_corr_F; auto.
 apply PP_mult_corr_F; auto.
 apply div_resp_ap_zero_rev; auto.
 apply mult_resp_ap_zero; auto.
 apply div_resp_ap_zero with y1 nzy1.
-AStepl y. auto.
+astepl y. auto.
 Qed.
 
 Lemma NormF_corr : forall (e:expr) (x:F), II e x -> II (NormF e) x.
@@ -878,3 +879,4 @@ assumption.
 Qed.
 
 End Field_NormCorrect.
+(* end hide *)

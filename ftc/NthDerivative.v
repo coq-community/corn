@@ -9,9 +9,9 @@ Section Nth_Derivative.
 We now study higher order differentiability.
 
 %\begin{convention}% Throughout this section:
- - [a,b] will be real numbers with [a [<] b];
- - [I] will denote the compact interval $[a,b]$#[a,b]#;
- - [F,G,H] will denote partial functions.
+ - [a, b] will be real numbers with [a [<] b];
+ - [I] will denote the compact interval [[a,b]];
+ - [F, G, H] will denote partial functions.
 
 %\end{convention}%
 
@@ -30,19 +30,21 @@ Let I := Compact Hab.
 
 Fixpoint Derivative_I_n (n : nat) (F Fn : PartIR) {struct n} : CProp :=
   match n with
-  | O => Feq I F Fn
-  | S p =>
-      {f' : CSetoid_fun (subset (Compact Hab)) IR |
+  | O   => Feq I F Fn
+  | S p => {f' : CSetoid_fun (subset (Compact Hab)) IR |
       Derivative_I Hab' F (PartInt f') | Derivative_I_n p (PartInt f') Fn}
   end.
 
 (**
-Unlike first order differentiability, for our definition to be workable it is better to define directly what it means for a function to be [n] times differentiable instead of quantifying over the [Derivative_I_n] relation.
+Unlike first order differentiability, for our definition to be
+workable it is better to define directly what it means for a function
+to be [n] times differentiable instead of quantifying over the
+[Derivative_I_n] relation.
 *)
 
 Fixpoint Diffble_I_n (n : nat) (F : PartIR) {struct n} : CProp :=
   match n with
-  | O => included I (Dom F)
+  | O   => included I (Dom F)
   | S p => {H : Diffble_I Hab' F | Diffble_I_n p (PartInt (ProjT1 H))}
   end.
 
@@ -66,8 +68,7 @@ Let Hab := less_leEq _ _ _ Hab'.
 Let I := Compact Hab.
 (* end hide *)
 
-Lemma Diffble_I_n_wd :
- forall (n : nat) (F G : PartIR),
+Lemma Diffble_I_n_wd : forall n F G,
  Feq I F G -> Diffble_I_n Hab' n F -> Diffble_I_n Hab' n G.
 intro.
 induction  n as [| n Hrecn].
@@ -87,8 +88,7 @@ apply Feq_symmetric; assumption.
 apply projT2.
 Qed.
 
-Lemma Derivative_I_n_wdr :
- forall (n : nat) (F G H : PartIR),
+Lemma Derivative_I_n_wdr : forall n F G H,
  Feq I G H -> Derivative_I_n Hab' n F G -> Derivative_I_n Hab' n F H.
 intro.
 induction  n as [| n Hrecn]; intros F G H H0 H1.
@@ -99,8 +99,7 @@ exists f'; auto.
 apply Hrecn with G; assumption.
 Qed.
 
-Lemma Derivative_I_n_wdl :
- forall (n : nat) (F G H : PartIR),
+Lemma Derivative_I_n_wdl : forall n F G H,
  Feq I F G -> Derivative_I_n Hab' n F H -> Derivative_I_n Hab' n G H.
 intro.
 induction  n as [| n Hrecn]; intros F G H H0 H1.
@@ -113,8 +112,7 @@ exists f'; auto.
 apply Derivative_I_wdl with F; assumption.
 Qed.
 
-Lemma Derivative_I_n_unique :
- forall (n : nat) (F G H : PartIR),
+Lemma Derivative_I_n_unique : forall n F G H,
  Derivative_I_n Hab' n F G -> Derivative_I_n Hab' n F H -> Feq I G H.
 intro.
 induction  n as [| n Hrecn]; intros F G H H0 H1.
@@ -137,7 +135,10 @@ Section Basic_Results.
 
 (** **Basic Results
 
-We now explore the concept of [n] times differentiability.  Notice that, unlike the first order case, we do not pay so much attention to the relation of [n] times derivative, but focus rather on the definition of [Diffble_I_n].
+We now explore the concept of [n] times differentiability.  Notice
+that, unlike the first order case, we do not pay so much attention to
+the relation of [n] times derivative, but focus rather on the
+definition of [Diffble_I_n].
 *)
 
 Variables a b : IR.
@@ -152,8 +153,7 @@ Let I := Compact Hab.
 We begin by showing that having a higher order derivative implies being differentiable.
 *)
 
-Lemma Diffble_I_n_imp_diffble :
- forall n : nat,
+Lemma Diffble_I_n_imp_diffble : forall n : nat,
  0 < n -> forall F : PartIR, Diffble_I_n Hab' n F -> Diffble_I Hab' F.
 intros n H F H0.
 rewrite S_pred with n 0 in H0; auto.
@@ -161,9 +161,7 @@ simpl in H0.
 inversion_clear H0; assumption.
 Qed.
 
-Lemma deriv_n_imp_diffble :
- forall n : nat,
- 0 < n ->
+Lemma deriv_n_imp_diffble : forall n : nat, 0 < n ->
  forall F F' : PartIR, Derivative_I_n Hab' n F F' -> Diffble_I Hab' F.
 simple destruct n.
 intros; elimtype False; inversion H.
@@ -176,9 +174,8 @@ Qed.
 If a function is [n] times differentiable then it is also [m] times differentiable for every [m] less or equal than [n].
 *)
 
-Lemma le_imp_Diffble_I :
- forall m n : nat,
- m <= n -> forall F : PartIR, Diffble_I_n Hab' n F -> Diffble_I_n Hab' m F.
+Lemma le_imp_Diffble_I : forall m n : nat, m <= n ->
+ forall F, Diffble_I_n Hab' n F -> Diffble_I_n Hab' m F.
 intros m n H F H0.
 induction  n as [| n Hrecn].
 cut (m = 0); [ intro | auto with arith ].
@@ -202,15 +199,13 @@ assumption.
 Qed.
 
 (**
-The next result consolidates our intuition that a function is [n] times differentiable if we can build from it a chain of [n] derivatives.
+The next result consolidates our intuition that a function is [n]
+times differentiable if we can build from it a chain of [n]
+derivatives.
 *)
 
-Lemma Diffble_I_imp_le :
- forall n : nat,
- 0 < n ->
- forall F F' : PartIR,
- Diffble_I_n Hab' n F ->
- Derivative_I Hab' F F' -> Diffble_I_n Hab' (pred n) F'.
+Lemma Diffble_I_imp_le : forall n, 0 < n -> forall F F',
+ Diffble_I_n Hab' n F -> Derivative_I Hab' F F' -> Diffble_I_n Hab' (pred n) F'.
 simple destruct n.
 intros; elimtype False; inversion H.
 clear n; intros n H F F' H0 H1.
@@ -224,11 +219,11 @@ assumption.
 Qed.
 
 (**
-As expected, an [n] times differentiable in $[a,b]$#[a,b]# function must be defined in that interval.
+As expected, an [n] times differentiable in [[a,b]] function must be
+defined in that interval.
 *)
 
-Lemma Diffble_I_n_imp_inc :
- forall (n : nat) (F : PartIR),
+Lemma Diffble_I_n_imp_inc : forall n F,
  Diffble_I_n Hab' n F -> included (Compact Hab) (Dom F).
 intros n F H; induction  n as [| n Hrecn].
 simpl in H; Included.
@@ -240,11 +235,8 @@ Qed.
 Also, the notions of derivative and differentiability are related as expected.
 *)
 
-Lemma Diffble_I_n_imp_deriv_n :
- forall (n : nat) (F : PartIR),
- Diffble_I_n Hab' n F ->
- {f' : CSetoid_fun (subset (Compact Hab)) IR |
- Derivative_I_n Hab' n F (PartInt f')}.
+Lemma Diffble_I_n_imp_deriv_n : forall n F, Diffble_I_n Hab' n F ->
+ {f' : CSetoid_fun (subset (Compact Hab)) IR | Derivative_I_n Hab' n F (PartInt f')}.
 intro; induction  n as [| n Hrecn].
 intros F H.
 exists (IntPartIR (Diffble_I_n_imp_inc _ _ H)).
@@ -260,8 +252,7 @@ apply projT2.
 assumption.
 Qed.
 
-Lemma deriv_n_imp_Diffble_I_n :
- forall (n : nat) (F F' : PartIR),
+Lemma deriv_n_imp_Diffble_I_n : forall n F F',
  Derivative_I_n Hab' n F F' -> Diffble_I_n Hab' n F.
 intro; induction  n as [| n Hrecn]; intros F F' H.
 simpl in |- *; simpl in H.
@@ -280,18 +271,17 @@ apply projT2.
 Qed.
 
 (**
-From this we can prove that if [F] has an nth order derivative in $[a,b]$#[a,b]# then both [F] and its derivative are defined in that interval.
+From this we can prove that if [F] has an nth order derivative in
+[[a,b]] then both [F] and its derivative are defined in that interval.
 *)
 
-Lemma Derivative_I_n_imp_inc :
- forall (n : nat) (F F' : PartIR),
+Lemma Derivative_I_n_imp_inc : forall n F F',
  Derivative_I_n Hab' n F F' -> included I (Dom F).
 intros; apply Diffble_I_n_imp_inc with n.
 apply deriv_n_imp_Diffble_I_n with F'; assumption.
 Qed.
 
-Lemma Derivative_I_n_imp_inc' :
- forall (n : nat) (F F' : PartIR),
+Lemma Derivative_I_n_imp_inc' : forall n F F',
  Derivative_I_n Hab' n F F' -> included I (Dom F').
 intro; induction  n as [| n Hrecn]; intros F F' H.
 simpl in |- *; simpl in H.
@@ -301,14 +291,20 @@ apply Hrecn with (PartInt f').
 assumption.
 Qed.
 
+Section aux.
+
 (**
 First order differentiability is just a special case.
 *)
 
-Lemma deriv_1_deriv :
- forall F (diffF : Diffble_I Hab' F) (diffFn : Diffble_I_n Hab' 1 F),
- Feq I (PartInt (ProjT1 diffF))
-   (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ diffFn))).
+(* begin show *)
+Variable F : PartIR.
+Hypothesis diffF : Diffble_I Hab' F.
+Hypothesis diffFn : Diffble_I_n Hab' 1 F.
+(* end show *)
+
+Lemma deriv_1_deriv : Feq I
+ (PartInt (ProjT1 diffF)) (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ diffFn))).
 intros.
 simpl in |- *.
 unfold I, Hab in |- *; apply Derivative_I_unique with F.
@@ -322,12 +318,10 @@ elim H; intros f' H0 H1.
 apply Derivative_I_wdr with (PartInt f'); assumption.
 Qed.
 
-Lemma deriv_1_deriv' :
- forall F (diffF : Diffble_I Hab' F) (diffFn : Diffble_I_n Hab' 1 F)
-   (x : subset I),
- ProjT1 diffF x[=]ProjT1 (Diffble_I_n_imp_deriv_n _ _ diffFn) x.
+Lemma deriv_1_deriv' : forall (x : subset I),
+ ProjT1 diffF x [=] ProjT1 (Diffble_I_n_imp_deriv_n _ _ diffFn) x.
 intros.
-elim (deriv_1_deriv F diffF diffFn); intros H H1.
+elim deriv_1_deriv; intros H H1.
 elim H1; intros H0 H2.
 simpl in H2. clear H0 H1.
 generalize
@@ -336,42 +330,41 @@ intro H0.
 eapply eq_transitive_unfolded.
 eapply eq_transitive_unfolded.
 2: apply H0.
-apply csetoid_fun_wd_unfolded.
-cut (scs_elem _ _ x[=]scs_elem _ _ x).
+apply csf_wd_unfolded.
+cut (scs_elem _ _ x [=] scs_elem _ _ x).
 case x; simpl in |- *; auto.
 Algebra.
-apply csetoid_fun_wd_unfolded.
-cut (scs_elem _ _ x[=]scs_elem _ _ x).
+apply csf_wd_unfolded.
+cut (scs_elem _ _ x [=] scs_elem _ _ x).
 case x; simpl in |- *; auto.
 Algebra.
 Qed.
+
+End aux.
 
 (**
 As usual, nth order derivability is preserved by shrinking the interval.
 *)
 
-Lemma included_imp_deriv_n :
- forall n c d Hcd F F',
+Lemma included_imp_deriv_n : forall n c d Hcd F F',
  included (Compact (less_leEq _ c d Hcd)) (Compact (less_leEq _ a b Hab')) ->
  Derivative_I_n Hab' n F F' -> Derivative_I_n Hcd n F F'.
 intro; induction  n as [| n Hrecn]; simpl in |- *; intros c d Hcd F F' H H0.
 apply included_Feq with (Compact (less_leEq _ _ _ Hab')); auto.
 elim H0; intros f' H1 H2.
 exists
- (int_partIR (Frestr (F:=PartInt f') (compact_wd _ _ _) H) _ _ _
-    (included_refl _)).
+ (IntPartIR (F:=(Frestr (F:=PartInt f') (compact_wd _ _ _) H)) (included_refl _ _)).
 apply Derivative_I_wdr with (PartInt f').
 FEQ.
-simpl in |- *; apply csetoid_fun_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
 apply included_imp_deriv with (Hab := Hab'); auto.
 apply Derivative_I_n_wdl with (PartInt f').
 FEQ.
-simpl in |- *; apply csetoid_fun_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
 auto.
 Qed.
 
-Lemma included_imp_diffble_n :
- forall n c d Hcd F,
+Lemma included_imp_diffble_n : forall n c d Hcd F,
  included (Compact (less_leEq _ c d Hcd)) (Compact (less_leEq _ a b Hab')) ->
  Diffble_I_n Hab' n F -> Diffble_I_n Hcd n F.
 intro; induction  n as [| n Hrecn]; simpl in |- *; intros c d Hcd F H H0.
@@ -391,9 +384,7 @@ Qed.
 And finally we have an addition rule for the order of the derivative.
 *)
 
-Lemma Derivative_I_n_plus :
- forall n m k F G H,
- Derivative_I_n Hab' m F G ->
+Lemma Derivative_I_n_plus : forall n m k F G H, Derivative_I_n Hab' m F G ->
  Derivative_I_n Hab' n G H -> k = m + n -> Derivative_I_n Hab' k F H.
 do 2 intro.
 induction  m as [| m Hrecm]; intros k F G H H0 H1 H2; rewrite H2.
@@ -424,7 +415,10 @@ Let I := Compact Hab.
 
 (** **The Nth Derivative
 
-We now define an operator that returns an nth order derivative of an n-times differentiable function.  This is analogous to the quantifier elimination which we would get if we had defined nth differentiability as an existential quantification of the nth derivative relation.
+We now define an operator that returns an nth order derivative of an
+n-times differentiable function.  This is analogous to the quantifier
+elimination which we would get if we had defined nth differentiability
+as an existential quantification of the nth derivative relation.
 *)
 
 Definition n_deriv_I n F (H : Diffble_I_n Hab' n F) : PartIR.
@@ -453,10 +447,8 @@ Defined.
 This operator is well defined and works as expected.
 *)
 
-Lemma n_deriv_I_wd :
- forall (n : nat) (F G : PartIR) (Hf : Diffble_I_n Hab' n F)
-   (Hg : Diffble_I_n Hab' n G),
- Feq I F G -> Feq I (n_deriv_I _ _ Hf) (n_deriv_I _ _ Hg).
+Lemma n_deriv_I_wd : forall n F G Hf Hg,
+ Feq I F G -> Feq I (n_deriv_I n F Hf) (n_deriv_I n G Hg).
 intro; induction  n as [| n Hrecn]; intros F G Hf Hg H.
 elim H; clear H; intros H H0.
 elim H0; clear H0; intros H2 H1.
@@ -471,9 +463,7 @@ apply Feq_symmetric; assumption.
 apply projT2.
 Qed.
 
-Lemma n_deriv_lemma :
- forall (n : nat) (F : PartIR) (H : Diffble_I_n Hab' n F),
- Derivative_I_n Hab' n F (n_deriv_I _ _ H).
+Lemma n_deriv_lemma : forall n F H, Derivative_I_n Hab' n F (n_deriv_I n F H).
 intro; induction  n as [| n Hrecn]; intros.
 simpl in |- *; simpl in H; FEQ.
 elim H; intros Hf Hf'.
@@ -493,16 +483,13 @@ eapply Diffble_I_n_wd.
 apply Derivative_I_unique with F; apply projT2.
 Qed.
 
-Lemma n_deriv_inc :
- forall (n : nat) (F : PartIR) (H : Diffble_I_n Hab' n F),
- included (Compact Hab) (Dom (n_deriv_I _ _ H)).
+Lemma n_deriv_inc : forall n F H, included (Compact Hab) (Dom (n_deriv_I n F H)).
 intros; simpl in |- *.
 unfold I, Hab in |- *; apply Derivative_I_n_imp_inc' with n F.
 apply n_deriv_lemma.
 Qed.
 
-Lemma n_deriv_inc' :
- forall n Hab F H, included (Dom (n_deriv_I n F H)) (compact a b Hab).
+Lemma n_deriv_inc' : forall n Hab F H, included (Dom (n_deriv_I n F H)) (compact a b Hab).
 intro; induction  n as [| n Hrecn]; intros; simpl in |- *; Included.
 Qed.
 
@@ -510,21 +497,19 @@ Qed.
 Some basic properties of this operation.
 *)
 
-Lemma n_Sn_deriv :
- forall (n : nat) (F : PartIR) (H : Diffble_I_n Hab' n F)
-   (H' : Diffble_I_n Hab' (S n) F),
- Derivative_I Hab' (n_deriv_I _ _ H) (n_deriv_I _ _ H').
+Lemma n_Sn_deriv : forall n F H HS,
+ Derivative_I Hab' (n_deriv_I n F H) (n_deriv_I (S n) F HS).
 intro; induction  n as [| n Hrecn].
 intros.
 apply Derivative_I_wdl with F.
 FEQ.
 apply
  Derivative_I_wdr
-  with (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ _ (lt_O_Sn 0) _ H'))).
+  with (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ _ (lt_O_Sn 0) _ HS))).
 apply eq_imp_Feq.
 Included.
 Included.
-intros; simpl in |- *; apply csetoid_fun_wd_unfolded; simpl in |- *; Algebra.
+intros; simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
 apply projT2.
 intro.
 cut {p : nat | p = S n}.
@@ -532,7 +517,7 @@ intro H; elim H; intros p H0.
 pattern (S n) at 2 4 in |- *; rewrite <- H0.
 intros.
 elim H1; intros H0' H0''; clear H1.
-elim H'; intros H1' H1''; clear H'.
+elim HS; intros H1' H1''; clear HS.
 cut (Diffble_I_n Hab' n (PartInt (ProjT1 H1'))).
 intro H1'''.
 apply Derivative_I_wdl with (n_deriv_I _ _ H1''').
@@ -555,10 +540,8 @@ apply le_imp_Diffble_I with (S n); [ auto with arith | assumption ].
 exists (S n); auto.
 Qed.
 
-Lemma n_deriv_plus :
- forall (m n : nat) (F : PartIR) (H : Diffble_I_n Hab' n F)
-   (H' : Diffble_I_n Hab' (m + n) F),
- Derivative_I_n Hab' m (n_deriv_I _ _ H) (n_deriv_I _ _ H').
+Lemma n_deriv_plus : forall m n F H H',
+ Derivative_I_n Hab' m (n_deriv_I n F H) (n_deriv_I (m + n) F H').
 intro; induction  m as [| m Hrecm].
 simpl in |- *.
 intros.
@@ -571,7 +554,7 @@ cut (Diffble_I_n Hab' (S n) F).
 intro H0.
 exists (IntPartIR (n_deriv_inc _ _ H0)).
 eapply Derivative_I_wdr.
-2: apply n_Sn_deriv with (H' := H0).
+2: apply n_Sn_deriv with (HS := H0).
 FEQ.
 apply n_deriv_inc.
 cut
@@ -607,14 +590,10 @@ Section More_on_n_deriv.
 Some not so basic properties of this operation (needed in rather specific situations).
 *)
 
-Lemma n_deriv_I_wd' :
- forall (n : nat) a b Hab a' b' Hab' (F : PartIR) H H' (x y : IR),
- x[=]y ->
- Compact (less_leEq _ _ _ Hab) x ->
- Compact (less_leEq _ _ _ Hab') y ->
- Diffble_I_n (Min_less_Max _ _ a' b' Hab) n F ->
- forall Hx Hy,
- n_deriv_I a b Hab n F H x Hx[=]n_deriv_I a' b' Hab' n F H' y Hy.
+Lemma n_deriv_I_wd' : forall n a b Hab a' b' Hab' F H H' x y, x [=] y ->
+ Compact (less_leEq _ _ _ Hab) x -> Compact (less_leEq _ _ _ Hab') y ->
+ Diffble_I_n (Min_less_Max _ _ a' b' Hab) n F -> forall Hx Hy,
+ n_deriv_I a b Hab n F H x Hx [=] n_deriv_I a' b' Hab' n F H' y Hy.
 intros n a b Hab a' b' Hab' F H H' x y H0 H1 H2 H3 Hx Hy.
 cut (included (Compact (less_leEq _ _ _ Hab)) (Dom (n_deriv_I _ _ _ _ _ H3))).
 intro H4.
@@ -677,12 +656,9 @@ auto.
 apply lft_leEq_Max.
 Qed.
 
-Lemma n_deriv_I_wd'' :
- forall (n : nat) a b Hab Hab' (F : PartIR) H H' (x y : IR),
- x[=]y ->
- Compact (less_leEq _ _ _ Hab) x ->
- Compact (less_leEq _ _ _ Hab) y ->
- forall Hx Hy, n_deriv_I a b Hab n F H x Hx[=]n_deriv_I a b Hab' n F H' y Hy.
+Lemma n_deriv_I_wd'' : forall n a b Hab Hab' F H H' x y, x [=] y ->
+ Compact (less_leEq _ _ _ Hab) x -> Compact (less_leEq _ _ _ Hab) y ->
+ forall Hx Hy, n_deriv_I a b Hab n F H x Hx [=] n_deriv_I a b Hab' n F H' y Hy.
 intros n a b Hab Hab' F H H' x y H0 H1 H2 Hx Hy.
 apply n_deriv_I_wd'.
 Algebra.
@@ -700,14 +676,10 @@ apply H5.
 apply Max_id.
 Qed.
 
-Lemma n_deriv_I_strext' :
- forall (n : nat) a b Hab a' b' Hab' (F : PartIR) H H' (x y : IR),
- Compact (less_leEq _ _ _ Hab) x ->
- Compact (less_leEq _ _ _ Hab') y ->
- Diffble_I_n (Min_less_Max _ _ a' b' Hab) n F ->
- (forall Hx Hy,
-  n_deriv_I a b Hab n F H x Hx[#]n_deriv_I a' b' Hab' n F H' y Hy) -> 
- x[#]y.
+Lemma n_deriv_I_strext' : forall n a b Hab a' b' Hab' F H H' x y,
+ Compact (less_leEq _ _ _ Hab) x -> Compact (less_leEq _ _ _ Hab') y ->
+ Diffble_I_n (Min_less_Max _ _ a' b' Hab) n F -> (forall Hx Hy,
+ n_deriv_I a b Hab n F H x Hx [#] n_deriv_I a' b' Hab' n F H' y Hy) -> x [#] y.
 intros n a b Hab a' b' Hab' F H H' x y H0 H1 H2 H3.
 cut (Compact (less_leEq _ _ _ (Min_less_Max a b a' b' Hab)) x). intro H4.
 cut (Compact (less_leEq _ _ _ (Min_less_Max a b a' b' Hab)) y). intro H5.
@@ -718,10 +690,10 @@ apply
     (n_deriv_inc _ _ _ _ _ H2 _ H4)
     (n_deriv_inc _ _ _ _ _ H2 _ H5).
 apply
- ap_well_def_rht_unfolded
+ ap_wdr_unfolded
   with (Part (n_deriv_I _ _ _ _ _ H') y (n_deriv_inc _ _ _ _ _ H' y H1)).
 apply
- ap_well_def_lft_unfolded
+ ap_wdl_unfolded
   with (Part (n_deriv_I _ _ _ _ _ H) x (n_deriv_inc _ _ _ _ _ H x H0)).
 auto.
 apply Feq_imp_eq with (Compact (less_leEq _ _ _ Hab)).

@@ -5,11 +5,16 @@ Require Export Taylor.
 
 (** *Taylor Series
 
-We now generalize our work on Taylor's theorem to define the Taylor series of an infinitely many times differentiable function as a power series.  We prove convergence (always) of the Taylor series and give criteria for when the sum of this series is the original function.
+We now generalize our work on Taylor's theorem to define the Taylor
+series of an infinitely many times differentiable function as a power
+series.  We prove convergence (always) of the Taylor series and give
+criteria for when the sum of this series is the original function.
 
 **Definitions
 
-%\begin{convention}% Let [J] be a proper interval and [F] an infinitely many times differentiable function in [J].  Let [a] be a point of [J].
+%\begin{convention}% Let [J] be a proper interval and [F] an
+infinitely many times differentiable function in [J].  Let [a] be a
+point of [J].
 %\end{convention}%
 *)
 
@@ -28,54 +33,51 @@ Definition Taylor_Series' :=
   FPowerSeries' a (fun n : nat => N_Deriv _ _ _ _ (diffF n) a Ha).
 
 (**
-%\begin{convention}% Assume also that [f] is the sequence of derivatives of [F].
+%\begin{convention}% Assume also that [f] is the sequence of
+derivatives of [F].
 %\end{convention}%
 *)
 
 Variable f : nat -> PartIR.
-Hypothesis derF : forall n : nat, Derivative_n n J pJ F (f n).
+Hypothesis derF : forall n, Derivative_n n J pJ F (f n).
 
-Definition Taylor_Series :=
-  FPowerSeries' a
-    (fun n : nat => f n a (Derivative_n_imp_inc' _ _ _ _ _ (derF n) _ Ha)).
+Definition Taylor_Series := FPowerSeries' a
+ (fun n => f n a (Derivative_n_imp_inc' _ _ _ _ _ (derF n) _ Ha)).
 
 Opaque N_Deriv.
 
-(**
-Characterizations of the Taylor remainder.
-*)
+(** Characterizations of the Taylor remainder. *)
 
-Lemma Taylor_Rem_char :
- forall (n : nat) H (x : IR) Hx Hx' Hx'',
- F x Hx[-]FSum0 (S n) Taylor_Series x Hx'[=]Taylor_Rem J pJ F a x Ha Hx'' n H.
+Lemma Taylor_Rem_char : forall n H x Hx Hx' Hx'',
+ F x Hx[-]FSum0 (S n) Taylor_Series x Hx' [=] Taylor_Rem J pJ F a x Ha Hx'' n H.
 intros; unfold Taylor_Rem in |- *; repeat apply cg_minus_wd.
 Algebra.
 simpl in |- *.
 apply bin_op_wd_unfolded.
-2: apply mult_wd_lft.
+2: apply mult_wdl.
 apply eq_symmetric_unfolded.
 cut
- (good_fun_seq' _
+ (ext_fun_seq'
     (fun (i : nat) (l : i < n) =>
      [-C-]
      (N_Deriv _ _ _ _
         (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (lt_S _ _ l)) _ H) a Ha[/]
-      _[//]nring_fac_ap_zero _ i){*}(FId{-}[-C-]a){^}i)). intro H0.
+      _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i)). intro H0.
 apply
  eq_transitive_unfolded
   with
     (Sumx
        (fun (i : nat) (Hi : i < n) =>
         Part
-          ([-C-]
+          ( [-C-]
            (N_Deriv _ _ _ _
               (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (lt_S _ _ Hi)) _ H) a
-              Ha[/] _[//]nring_fac_ap_zero _ i){*}(FId{-}[-C-]a){^}i) x
+              Ha[/] _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i) x
           (FSumx_pred _ _ H0 _ (ProjIR1 (TaylorB _ _ _ a x Ha _ H)) i Hi))).
 exact (FSumx_char _ _ _ _ H0).
 apply Sumx_Sum0.
 intros; simpl in |- *.
-apply mult_wd_lft; apply div_wd.
+apply mult_wdl; apply div_wd.
 2: Algebra.
 apply Feq_imp_eq with J; auto.
 apply Derivative_n_unique with pJ i F; auto.
@@ -89,10 +91,9 @@ apply Derivative_n_unique with pJ n F; auto.
 Deriv.
 Qed.
 
-Lemma abs_Taylor_Rem_char :
- forall (n : nat) H (x : IR) Hx Hx' Hx'',
- AbsIR (F x Hx[-]FSum0 (S n) Taylor_Series x Hx')[=]
- AbsIR (Taylor_Rem J pJ F a x Ha Hx'' n H).
+Lemma abs_Taylor_Rem_char : forall n H x Hx Hx' Hx'',
+ AbsIR (F x Hx[-]FSum0 (S n) Taylor_Series x Hx') [=]
+   AbsIR (Taylor_Rem J pJ F a x Ha Hx'' n H).
 intros; apply AbsIR_wd; apply Taylor_Rem_char.
 Qed.
 
@@ -102,7 +103,10 @@ Section Convergence_in_IR.
 
 (** **Convergence
 
-Our interval is now the real line.  We begin by proving some helpful continuity properties, then define a boundedness condition for the derivatives of [F] that guarantees convergence of its Taylor series to [F].
+Our interval is now the real line.  We begin by proving some helpful
+continuity properties, then define a boundedness condition for the
+derivatives of [F] that guarantees convergence of its Taylor series to
+[F].
 *)
 
 Hypothesis H : proper realline.
@@ -113,15 +117,14 @@ Variable a : IR.
 Hypothesis Ha : realline a.
 
 Variable f : nat -> PartIR.
-Hypothesis derF : forall n : nat, Derivative_n n realline H F (f n).
+Hypothesis derF : forall n, Derivative_n n realline H F (f n).
 
 Lemma Taylor_Series_imp_cont : Continuous realline F.
 apply Derivative_n_imp_Continuous with H 1 (f 1); auto.
 Qed.
 
-Lemma Taylor_Series_lemma_cont :
- forall (r : IR) (n : nat),
- Continuous realline ((r[^]n[/] _[//]nring_fac_ap_zero _ n){**}f n).
+Lemma Taylor_Series_lemma_cont : forall r n,
+ Continuous realline ((r[^]n[/] _[//]nring_fac_ap_zero _ n) {**}f n).
 intros.
 apply Continuous_scal; case n.
 apply Continuous_wd with F.
@@ -133,11 +136,8 @@ clear n; intros.
 apply Derivative_n_imp_Continuous' with H (S n) F; auto with arith.
 Qed.
 
-Definition Taylor_bnd :=
-  forall (r : IR) H,
-  conv_fun_seq'_IR realline
-    (fun n : nat => (r[^]n[/] _[//]nring_fac_ap_zero _ n){**}f n) _ H
-    (Continuous_const _ Zero).
+Definition Taylor_bnd := forall r H, conv_fun_seq'_IR realline
+  (fun n => (r[^]n[/] _[//]nring_fac_ap_zero _ n) {**}f n) _ H (Continuous_const _ Zero).
 
 (* begin show *)
 Hypothesis bndf : Taylor_bnd.
@@ -146,12 +146,12 @@ Hypothesis bndf : Taylor_bnd.
 Opaque nexp_op fac.
 
 (* begin hide *)
-Let H1 : forall n : nat, Two[^]n[#]ZeroR.
+Let H1 : forall n, Two[^]n [#] ZeroR.
 intro; apply nexp_resp_ap_zero; apply two_ap_zero.
 Qed.
 
-Let Taylor_Series_conv_lemma1 :
-  forall t x y Hxy (e : IR) (He : Zero[<]e),
+Lemma Taylor_Series_conv_lemma1 :
+  forall t x y Hxy (e : IR) (He : Zero [<] e),
   {N : nat |
   forall n : nat,
   N <= n ->
@@ -160,16 +160,16 @@ Let Taylor_Series_conv_lemma1 :
   Compact (Min_leEq_Max' x y t) w ->
   forall Hw Hz,
   AbsIR
-    (((Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S n)) w Hw)[/] _[//]
-       nring_fac_ap_zero _ (S n)){**}((FId{-}[-C-]w){^}n{*}(FId{-}[-C-]a))) z
-       Hz)[<=](e[/] _[//]H1 (S n))}.
+    (((Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S n)) w Hw) [/] _[//]
+       nring_fac_ap_zero _ (S n)) {**} ((FId{-} [-C-]w) {^}n{*} (FId{-} [-C-]a))) z
+       Hz) [<=] (e[/] _[//]H1 (S n))}.
 intros.
-set (r := Max y (Max a t)[-]Min x (Min a t)) in *.
-cut (Min x (Min a t)[<=]Max y (Max a t)).
+set (r := Max y (Max a t) [-]Min x (Min a t)) in *.
+cut (Min x (Min a t) [<=] Max y (Max a t)).
 intro Hxy'; cut (included (Compact (Min_leEq_Max' x y t)) (Compact Hxy')).
 intro Hinc'.
 cut
- (forall w z : IR, Compact Hxy z -> Compact Hxy' w -> AbsIR (z[+][--]w)[<=]r). intro.
+ (forall w z : IR, Compact Hxy z -> Compact Hxy' w -> AbsIR (z[+][--]w) [<=] r). intro.
 2: intros w z H0 H2; fold (z[-]w) in |- *; unfold r in |- *.
 set (r' := Two[*]Max r One) in *.
 set (H' := Taylor_Series_lemma_cont r') in *.
@@ -179,14 +179,14 @@ elim
  intros N HN.
 exists N. intros n H2 w z H3 H4 Hw Hz.
 simpl in |- *; fold (Two:IR) in |- *.
-assert (H5 : forall n : nat, Zero[<]r'[^]n).
+assert (H5 : forall n : nat, Zero [<] r'[^]n).
 intro; unfold r' in |- *; apply nexp_resp_pos; unfold r' in |- *;
  apply mult_resp_pos; [ apply pos_two | apply pos_max_one ].
 apply
  leEq_transitive
   with
-    ((e[/] _[//]pos_ap_zero _ _ (H5 (S n)))[*]
-     AbsIR ((z[+][--]w)[^]n[*](z[+][--]a))).
+    ((e[/] _[//]pos_ap_zero _ _ (H5 (S n))) [*]
+     AbsIR ((z[+][--]w) [^]n[*] (z[+][--]a))).
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 apply mult_resp_leEq_rht.
@@ -197,29 +197,29 @@ clear Hz H3 z.
 eapply leEq_transitive.
 2: apply (HN (S n) (le_S _ _ H2) w H4).
 simpl in |- *.
-cut (forall z : IR, AbsIR z[=]AbsIR (z[-]Zero)); intros.
+cut (forall z : IR, AbsIR z [=] AbsIR (z[-]Zero)); intros.
 2: apply AbsIR_wd; Algebra.
 eapply leEq_wdr.
 2: apply H3.
 clear H3; eapply leEq_wdr.
-2: apply eq_symmetric_unfolded; apply AbsIR_product_positive'.
+2: apply eq_symmetric_unfolded; apply AbsIR_mult_pos'.
 eapply leEq_wdr.
 2: apply mult_commutes.
 cut
  (forall z : IR,
-  AbsIR (z[/] _[//]nring_fac_ap_zero _ (S n))[*]r'[^]S n[=]
-  AbsIR z[*](r'[^]S n[/] _[//]nring_fac_ap_zero _ (S n))); 
+  AbsIR (z[/] _[//]nring_fac_ap_zero _ (S n)) [*]r'[^]S n [=] 
+  AbsIR z[*] (r'[^]S n[/] _[//]nring_fac_ap_zero _ (S n))); 
  intros.
 eapply leEq_wdr.
 2: apply H3.
 clear H3; apply mult_resp_leEq_rht.
 apply eq_imp_leEq; apply AbsIR_wd; Algebra.
 apply less_leEq; auto.
-RStepr ((AbsIR z[/] _[//]nring_fac_ap_zero _ (S n))[*]r'[^]S n).
-apply mult_wd_lft.
+rstepr ((AbsIR z[/] _[//]nring_fac_ap_zero _ (S n)) [*]r'[^]S n).
+apply mult_wdl.
 eapply eq_transitive_unfolded.
 apply
- AbsIR_division with (Hy := AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ (S n))).
+ AbsIR_division with (y__ := AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ (S n))).
 apply div_wd.
 Algebra.
 apply AbsIR_eq_x.
@@ -233,17 +233,17 @@ apply
  leEq_wdl
   with
     (e[*]
-     (AbsIR ((z[+][--]w)[^]n[*](z[+][--]a))[/] _[//]
+     (AbsIR ((z[+][--]w) [^]n[*] (z[+][--]a)) [/] _[//]
       nexp_resp_ap_zero (S n) (max_one_ap_zero r))).
-AStepr (e[*]One).
+astepr (e[*]One).
 apply mult_resp_leEq_lft.
 2: apply less_leEq; auto.
 apply shift_div_leEq.
 apply nexp_resp_pos; apply pos_max_one.
-AStepr (Max r One[^]S n).
+astepr (Max r One[^]S n).
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
-AStepr (Max r One[^]n[*]Max r One).
+astepr (Max r One[^]n[*]Max r One).
 apply mult_resp_leEq_both; try apply AbsIR_nonneg.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_nexp_op.
@@ -261,23 +261,23 @@ eapply leEq_transitive.
 2: apply rht_leEq_Max.
 apply lft_leEq_Max.
 apply lft_leEq_Max.
-RStepl
+rstepl
  ((e[/] _[//]
    mult_resp_ap_zero _ _ _ (nexp_resp_ap_zero (S n) (max_one_ap_zero r))
-     (H1 (S n)))[*]AbsIR ((z[+][--]w)[^]n[*](z[+][--]a))[*]
+     (H1 (S n))) [*]AbsIR ((z[+][--]w) [^]n[*] (z[+][--]a)) [*]
   Two[^]S n).
-repeat apply mult_wd_lft.
+repeat apply mult_wdl.
 apply div_wd; Algebra.
 eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply mult_nexp.
 Algebra.
-apply leEq_wdr with (AbsIR (Max y (Max a t)[-]Min x (Min a t))).
+apply leEq_wdr with (AbsIR (Max y (Max a t) [-]Min x (Min a t))).
 apply compact_elements with Hxy'; auto.
 inversion_clear H0; split.
 apply leEq_transitive with x; auto; apply Min_leEq_lft.
 apply leEq_transitive with y; auto; apply lft_leEq_Max.
 apply AbsIR_eq_x.
-apply shift_leEq_minus; AStepl (Min x (Min a t)); auto.
+apply shift_leEq_minus; astepl (Min x (Min a t)); auto.
 red in |- *; intros z Hz.
 inversion_clear Hz; split.
 eapply leEq_transitive.
@@ -299,15 +299,15 @@ eapply leEq_transitive.
 apply rht_leEq_Max.
 Qed.
 
-Let Taylor_Series_conv_lemma2 :
-  forall x y Hxy (e : IR) (He : Zero[<]e),
+Lemma Taylor_Series_conv_lemma2 :
+  forall x y Hxy (e : IR) (He : Zero [<] e),
   {N : nat |
   forall n : nat,
   N <= n ->
   forall z : IR,
   compact x y Hxy z ->
   forall Hz,
-  AbsIR (Taylor_Series _ _ _ a Ha _ derF n z Hz)[<=](e[/] _[//]H1 n)}.
+  AbsIR (Taylor_Series _ _ _ a Ha _ derF n z Hz) [<=] (e[/] _[//]H1 n)}.
 intros.
 elim Taylor_Series_conv_lemma1 with (t := a) (Hxy := Hxy) (e := e); auto.
 intros N HN; exists (S N).
@@ -317,7 +317,7 @@ set (p := pred n) in *.
 assert (N <= p). unfold p in |- *; apply le_S_n; rewrite <- S_pred with n N; auto with arith.
 clearbody p; rewrite H3.
 assert
- (H5 : forall c d : IR, Dom (c{**}((FId{-}[-C-]d){^}p{*}(FId{-}[-C-]a))) z).
+ (H5 : forall c d : IR, Dom (c{**} ((FId{-} [-C-]d) {^}p{*} (FId{-} [-C-]a))) z).
  repeat split.
 assert (H6 : Compact (Min_leEq_Max' x y a) a).
  split; [ apply Min_leEq_rht | apply rht_leEq_Max ].
@@ -325,24 +325,22 @@ eapply leEq_wdl.
 apply
  (HN p H4 a z H2 H6 Ha
     (H5
-       (Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S p)) a Ha)[/] _[//]
+       (Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S p)) a Ha) [/] _[//]
         nring_fac_ap_zero _ (S p)) a)).
 apply AbsIR_wd; Algebra.
 Qed.
 (* end hide *)
 
-(**
-The Taylor series always converges on the realline.
-*)
+(** The Taylor series always converges on the realline. *)
 
 Lemma Taylor_Series_conv_IR :
  fun_series_convergent_IR realline (Taylor_Series _ _ _ a Ha _ derF).
 red in |- *; intros.
 unfold Taylor_Series, FPowerSeries' in |- *.
 apply
- fun_str_comparison with (fun n : nat => Fconst (S:=IR) ((One [/]TwoNZ)[^]n)).
+ fun_str_comparison with (fun n : nat => Fconst (S:=IR) ((One [/]TwoNZ) [^]n)).
 Contin.
-apply conv_fun_const_series with (x := fun n : nat => (OneR [/]TwoNZ)[^]n).
+apply conv_fun_const_series with (x := fun n : nat => (OneR [/]TwoNZ) [^]n).
 apply ratio_test_conv.
 exists 0; exists (OneR [/]TwoNZ); repeat split.
 apply pos_div_two'; apply pos_one.
@@ -351,7 +349,7 @@ intros; apply eq_imp_leEq.
 eapply eq_transitive_unfolded.
 2: apply mult_commutes.
 eapply eq_transitive_unfolded.
-2: apply AbsIR_product_positive; apply less_leEq; fold (Half (R:=IR)) in |- *;
+2: apply AbsIR_mult_pos; apply less_leEq; fold (Half (R:=IR)) in |- *;
     apply pos_half.
 Transparent nexp_op.
 apply AbsIR_wd; simpl in |- *; rational.
@@ -366,10 +364,10 @@ simpl in |- *; Algebra.
 Qed.
 
 (* begin hide *)
-Let majoration_lemma :
-  forall (n : nat) (e : IR), Zero[<]e -> e[*](nring n[/] _[//]H1 n)[<=]e.
+Lemma Taylor_majoration_lemma :
+  forall (n : nat) (e : IR), Zero [<] e -> e[*] (nring n[/] _[//]H1 n) [<=] e.
 intro; case n.
-intros; simpl in |- *; RStepl ZeroR; apply less_leEq; auto.
+intros; simpl in |- *; rstepl ZeroR; apply less_leEq; auto.
 clear n; intro; induction  n as [| n Hrecn].
 intros; simpl in |- *.
 eapply leEq_wdl.
@@ -382,7 +380,7 @@ apply mult_resp_leEq_lft.
 2: apply less_leEq; auto.
 apply shift_div_leEq.
 repeat apply mult_resp_pos; try apply nexp_resp_pos; apply pos_two.
-RStepr (nring (S n)[*]Two[^]S (S n)[/] _[//]H1 (S n)).
+rstepr (nring (S n) [*]Two[^]S (S n) [/] _[//]H1 (S n)).
 apply shift_leEq_div.
 apply nexp_resp_pos; apply pos_two.
 Transparent nexp_op.
@@ -390,61 +388,62 @@ set (p := S n) in *.
 cut (p = S n); [ intro | auto ].
 clear H0; clearbody p.
 simpl in |- *; fold (Two:IR) in |- *.
-RStepl (nring (R:=IR) p[*]nexp _ p Two[+]nring 1[*]nexp _ p Two).
-RStepr (nring (R:=IR) p[*]nexp _ p Two[+]nring p[*]nexp _ p Two).
+rstepl (nring (R:=IR) p[*]nexp _ p Two[+]nring 1[*]nexp _ p Two).
+rstepr (nring (R:=IR) p[*]nexp _ p Two[+]nring p[*]nexp _ p Two).
 apply plus_resp_leEq_lft.
 apply mult_resp_leEq_rht.
 apply nring_leEq; rewrite H2; auto with arith.
-AStepr ((Two:IR)[^]p); apply nexp_resp_nonneg.
+astepr ((Two:IR) [^]p); apply nexp_resp_nonneg.
 apply less_leEq; apply pos_two.
 Qed.
 
 Opaque N_Deriv fac.
 
-Let Taylor_Series_conv_lemma3 :
+Lemma Taylor_Series_conv_lemma3 :
   forall a' b d c e a'' x : IR,
-  a'[=]a'' ->
-  x[=]b[*]e ->
-  Zero[<=]e ->
+  a' [=] a'' ->
+  x [=] b[*]e ->
+  Zero [<=] e ->
   forall Hb He Hx,
-  (AbsIR (a'[*](One[/] b[//]Hb)[*]c[*]d)[/] e[//]He)[=]
-  AbsIR ((a''[/] x[//]Hx)[*](c[*]d)).
+  (AbsIR (a'[*] (One[/] b[//]Hb) [*]c[*]d) [/] e[//]He) [=] 
+  AbsIR ((a''[/] x[//]Hx) [*] (c[*]d)).
 intros.
-AStepr (AbsIR ((a''[/] x[//]Hx)[*]c[*]d)).
+astepr (AbsIR ((a''[/] x[//]Hx) [*]c[*]d)).
 apply
  eq_transitive_unfolded
   with
-    (AbsIR a'[*](One[/] _[//]AbsIR_resp_ap_zero _ Hb)[*]AbsIR c[*]AbsIR d[/]
+    (AbsIR a'[*] (One[/] _[//]AbsIR_resp_ap_zero _ Hb) [*]AbsIR c[*]AbsIR d[/]
      e[//]He).
 apply div_wd; Algebra.
 repeat
  (eapply eq_transitive_unfolded;
-   [ apply AbsIR_resp_mult | apply mult_wd_lft ]).
-eapply eq_transitive_unfolded; [ apply AbsIR_resp_mult | apply mult_wd_rht ].
+   [ apply AbsIR_resp_mult | apply mult_wdl ]).
+eapply eq_transitive_unfolded; [ apply AbsIR_resp_mult | apply mult_wdr ].
 apply AbsIR_recip.
-RStepl
- ((AbsIR a'[/] _[//]mult_resp_ap_zero _ _ _ (AbsIR_resp_ap_zero _ Hb) He)[*]
+rstepl
+ ((AbsIR a'[/] _[//]mult_resp_ap_zero _ _ _ (AbsIR_resp_ap_zero _ Hb) He) [*]
   AbsIR c[*]AbsIR d).
 apply eq_symmetric_unfolded.
 repeat
  (eapply eq_transitive_unfolded;
-   [ apply AbsIR_resp_mult | apply mult_wd_lft ]).
+   [ apply AbsIR_resp_mult | apply mult_wdl ]).
 eapply eq_transitive_unfolded;
- [ apply AbsIR_division with (Hy := AbsIR_resp_ap_zero _ Hx)
+ [ apply AbsIR_division with (y__ := AbsIR_resp_ap_zero _ Hx)
  | apply div_wd; Algebra ].
 eapply eq_transitive_unfolded.
-2: apply AbsIR_product_positive; auto.
+2: apply AbsIR_mult_pos; auto.
 Algebra.
 Qed.
 (* end hide *)
 
 (**
-We now prove that, under our assumptions, it actually converges to the original function.  For generality and also usability, however, we will separately assume convergence.
+We now prove that, under our assumptions, it actually converges to the
+original function.  For generality and also usability, however, we
+will separately assume convergence.
 *) 
 
 (* begin show *)
-Hypothesis
-  Hf : fun_series_convergent_IR realline (Taylor_Series _ _ _ a Ha _ derF).
+Hypothesis Hf : fun_series_convergent_IR realline (Taylor_Series _ _ _ a Ha _ derF).
 (* end show *)
 
 Lemma Taylor_Series_conv_to_fun : Feq realline F (FSeries_Sum Hf).
@@ -477,7 +476,7 @@ cut (p = S (pred p)); [ intro Hn | apply S_pred with N; auto ].
 set (n := pred p) in *; clearbody n.
 generalize Hp; clear Hp; rewrite Hn; clear Hn p.
 intros.
-cut (Zero[<]nring (S n)[*]e [/]TwoNZ); [ intro He | apply mult_resp_pos ].
+cut (Zero [<] nring (S n) [*]e [/]TwoNZ); [ intro He | apply mult_resp_pos ].
 2: apply pos_nring_S.
 2: apply pos_div_two; auto.
 elim
@@ -490,12 +489,12 @@ set
  (H7 :=
   CAnd_intro _ _ (CAnd_intro _ _ CI CI) (CAnd_intro _ _ CI CI)
   :Dom
-     (N_Deriv _ _ _ _ (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))){*}
-      [-C-](One[/] _[//]nring_fac_ap_zero _ n){*}([-C-]x{-}FId){^}n) y) 
+     (N_Deriv _ _ _ _ (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))) {*}
+      [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]x{-}FId) {^}n) y) 
  in *.
 eapply leEq_wdl.
 2: apply AbsIR_minus.
-cut (forall z w : IR, AbsIR z[<=]AbsIR (z[-]w)[+]AbsIR w); intros.
+cut (forall z w : IR, AbsIR z [<=] AbsIR (z[-]w) [+]AbsIR w); intros.
 2: eapply leEq_wdl.
 2: apply triangle_IR.
 2: apply AbsIR_wd; rational.
@@ -509,20 +508,20 @@ eapply leEq_wdl.
         (contin_imp_inc _ _ _ _
            (included_imp_Continuous _ _ (H2 (S n)) _ _ _ Hinc) _ Hx)
         (Hinc _ Hx)).
-RStepr (e [/]TwoNZ[+]e [/]TwoNZ).
+rstepr (e [/]TwoNZ[+]e [/]TwoNZ).
 eapply leEq_transitive.
 apply
  H8
   with
     (w := Part
             (N_Deriv _ _ _ _
-               (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))){*}
-             [-C-](One[/] _[//]nring_fac_ap_zero _ n){*}
-             ([-C-]x{-}FId){^}n) y H7[*](x[-]a)).
+               (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))) {*}
+             [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*}
+             ( [-C-]x{-}FId) {^}n) y H7[*] (x[-]a)).
 apply plus_resp_leEq_both; auto.
 eapply leEq_transitive.
-2: apply majoration_lemma with (n := S n); apply pos_div_two; auto.
-RStepr (nring (S n)[*](e [/]TwoNZ[/] _[//]H1 (S n))).
+2: apply Taylor_majoration_lemma with (n := S n); apply pos_div_two; auto.
+rstepr (nring (S n) [*] (e [/]TwoNZ[/] _[//]H1 (S n))).
 apply shift_leEq_mult' with (pos_ap_zero _ _ (pos_nring_S IR n)).
 apply pos_nring_S.
 set
@@ -552,9 +551,9 @@ set
  (Fy :=
   Part (N_Deriv _ _ _ _ (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))))
     y (ProjIR1 (ProjIR1 H7))) in *.
-AStepr
+astepr
  (AbsIR
-    (Fy[*](One[/] _[//]nring_fac_ap_zero _ n)[*](x[+][--]y)[^]n[*](x[-]a))[/]
+    (Fy[*] (One[/] _[//]nring_fac_ap_zero _ n) [*] (x[+][--]y) [^]n[*] (x[-]a)) [/]
   _[//]pos_ap_zero _ _ (pos_nring_S _ n)).
 unfold cg_minus in |- *.
 apply eq_symmetric_unfolded; apply Taylor_Series_conv_lemma3.
@@ -577,13 +576,13 @@ End Convergence_in_IR.
 Section Other_Results.
 
 (**
-The condition for the previous lemma is not very easy to prove.  We give some helpful lemmas.
+The condition for the previous lemma is not very easy to prove.  We
+give some helpful lemmas.
 *)
 
-Lemma Taylor_bnd_trans :
- forall f g : nat -> PartIR,
- (forall (n : nat) (x : IR) Hx Hx', AbsIR (f n x Hx)[<=]AbsIR (g n x Hx')) ->
- (forall n : nat, Continuous realline (g n)) -> Taylor_bnd g -> Taylor_bnd f.
+Lemma Taylor_bnd_trans : forall f g : nat -> PartIR,
+ (forall n x Hx Hx', AbsIR (f n x Hx) [<=] AbsIR (g n x Hx')) ->
+ (forall n, Continuous realline (g n)) -> Taylor_bnd g -> Taylor_bnd f.
 intros f g bndf contg Gbnd r H a b Hab Hinc e H0.
 elim
  (Gbnd r (fun n : nat => Continuous_scal _ _ (contg n) _) _ _ _ Hinc e H0);
@@ -591,7 +590,7 @@ elim
 exists N; intros.
 eapply leEq_transitive.
 2: apply HN with (n := n) (Hx := Hx); auto.
-cut (forall (z t : IR) Ht, AbsIR z[=]AbsIR (z[-][-C-]Zero t Ht)); intros.
+cut (forall (z t : IR) Ht, AbsIR z [=] AbsIR (z[-][-C-]Zero t Ht)); intros.
 2: simpl in |- *; apply AbsIR_wd; Algebra.
 eapply leEq_wdl.
 2: apply H2.
@@ -605,11 +604,12 @@ eapply leEq_wdr.
 apply mult_resp_leEq_lft; auto.
 apply AbsIR_nonneg.
 Qed.
+
 (* begin hide *)
-Let convergence_lemma :
+Lemma convergence_lemma :
   forall r : IR,
   conv_fun_seq'_IR realline
-    (fun n : nat => [-C-](r[^]n[/] _[//]nring_fac_ap_zero IR n)) 
+    (fun n : nat => [-C-] (r[^]n[/] _[//]nring_fac_ap_zero IR n)) 
     [-C-]Zero (fun n : nat => Continuous_const realline _)
     (Continuous_const realline _).
 red in |- *; intros.
@@ -622,7 +622,7 @@ assert (H : forall n : nat, Dom (Exp_ps n) r). repeat split.
 apply convergent_wd with (fun n : nat => Part (Exp_ps n) r (H n)).
 Opaque nexp_op.
 intros; simpl in |- *.
-RStepl ((r[-]Zero)[^]n[/] _[//]nring_fac_ap_zero _ n).
+rstepl ((r[-]Zero) [^]n[/] _[//]nring_fac_ap_zero _ n).
 Algebra.
 apply fun_series_conv_imp_conv_IR with realline.
 apply Exp_conv.
@@ -630,11 +630,9 @@ split.
 Qed.
 (* end hide *)
 
-Lemma bnd_imp_Taylor_bnd :
- forall (f : nat -> PartIR) (F : PartIR),
- (forall (n : nat) (x : IR) Hx Hx', AbsIR (f n x Hx)[<=]AbsIR (F x Hx')) ->
- Continuous realline F ->
- (forall n : nat, included (fun _ : IR => CTrue) (Dom (f n))) -> Taylor_bnd f.
+Lemma bnd_imp_Taylor_bnd : forall (f : nat -> PartIR) (F : PartIR),
+ (forall n x Hx Hx', AbsIR (f n x Hx) [<=] AbsIR (F x Hx')) -> Continuous realline F ->
+ (forall n, included (fun _ => CTrue) (Dom (f n))) -> Taylor_bnd f.
 intros f F H H0 H1.
 apply Taylor_bnd_trans with (fun n : nat => F); auto.
 red in |- *; intros.
@@ -646,7 +644,7 @@ FEQ.
 apply
  fun_Lim_seq_mult'_IR
   with
-    (f := fun n : nat => [-C-](r[^]n[/] _[//]nring_fac_ap_zero _ n))
+    (f := fun n : nat => [-C-] (r[^]n[/] _[//]nring_fac_ap_zero _ n))
     (contf := fun n : nat =>
               Continuous_const realline (r[^]n[/] _[//]nring_fac_ap_zero _ n))
     (g := fun n : nat => F)
@@ -658,7 +656,9 @@ apply fun_Lim_seq_const_IR.
 Qed.
 
 (**
-Finally, a uniqueness criterium: two functions [F] and [G] are equal, provided that their derivatives coincide at a given point and their Taylor series converge to themselves.
+Finally, a uniqueness criterium: two functions [F] and [G] are equal,
+provided that their derivatives coincide at a given point and their
+Taylor series converge to themselves.
 *)
 
 Variables F G : PartIR.
@@ -666,22 +666,21 @@ Variables F G : PartIR.
 Variable a : IR.
 
 Variables f g : nat -> PartIR.
-Hypothesis derF : forall n : nat, Derivative_n n realline CI F (f n).
-Hypothesis derG : forall n : nat, Derivative_n n realline CI G (g n).
+Hypothesis derF : forall n, Derivative_n n realline CI F (f n).
+Hypothesis derG : forall n, Derivative_n n realline CI G (g n).
 
 Hypothesis bndf : Taylor_bnd f.
 Hypothesis bndg : Taylor_bnd g.
 
 (* begin show *)
-Hypothesis Heq : forall (n : nat) HaF HaG, f n a HaF[=]g n a HaG.
+Hypothesis Heq : forall n HaF HaG, f n a HaF [=] g n a HaG.
 (* end show *)
 
 (* begin hide *)
 Let Hf := Taylor_Series_conv_IR CI F a CI f derF bndf.
 (* end hide *)
 
-Lemma Taylor_unique_crit :
- Feq realline F (FSeries_Sum Hf) -> Feq realline F G.
+Lemma Taylor_unique_crit : Feq realline F (FSeries_Sum Hf) -> Feq realline F G.
 intro H.
 cut
  (fun_series_convergent_IR realline (Taylor_Series realline CI G a CI g derG)).

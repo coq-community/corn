@@ -9,15 +9,21 @@
 
 (*i $Id$ i*)
 
-(* end hide *)
 (* THIS IS A OLD CONTRIB. IT IS NO LONGER MAINTAINED ***)
 (* Moved to Type for CoRN *)
+(* end hide *)
+
+(**
+%\cleardoublepage\setcounter{page}{1}%
+*Lists in Type
+
+This file contains a variant of the development of lists in the standard
+library of Coq but moved to the Type level.
+*)
 
 Require Import Le.
-Notation "x = y" := (x = y) (at level 70, no associativity).
 Section List.
-(*Parameter List_Dom:Type.
-Definition A := List_Dom.*)
+
 Variable A : Type.
 
 Inductive list : Type :=
@@ -114,13 +120,6 @@ Lemma lel_nil : forall l' : list, lel l' nil -> nil = l'.
 Proof. 
 	intro l'; elim l'; auto with list arith.
 	intros a' y H H0.
-	(*  <list>nil=(cons a' y)
-	    ============================
-	      H0 : (lel (cons a' y) nil)
-	      H : (lel y nil)->(<list>nil=y)
-	      y : list
-	      a' : A
-	      l' : list *)
 	absurd (S (length y) <= 0); auto with list arith.
 Qed.
 End length_order.
@@ -146,57 +145,26 @@ Proof.
 Qed.
 Hint Resolve in_cons: list v62.
 
-Lemma in_app_or :
- forall (l m : list) (a : A), In a (app l m) -> In a l \/ In a m.
+Lemma in_app_or : forall (l m : list) (a : A), In a (app l m) -> In a l \/ In a m.
 Proof. 
 	intros l m a.
 	elim l; simpl in |- *; auto with list.
 	intros a0 y H H0.
-	(*  ((<A>a0=a)\/(In a y))\/(In a m)
-	    ============================
-	      H0 : (<A>a0=a)\/(In a (app y m))
-	      H : (In a (app y m))->((In a y)\/(In a m))
-	      y : list
-	      a0 : A
-	      a : A
-	      m : list
-	      l : list *)
 	elim H0; auto with list.
 	intro H1.
-	(*  ((<A>a0=a)\/(In a y))\/(In a m)
-	    ============================
-	      H1 : (In a (app y m)) *)
 	elim (H H1); auto with list.
 Qed.
 Hint Immediate in_app_or: list v62.
 
-Lemma in_or_app :
- forall (l m : list) (a : A), In a l \/ In a m -> In a (app l m).
+Lemma in_or_app : forall (l m : list) (a : A), In a l \/ In a m -> In a (app l m).
 Proof. 
 	intros l m a.
 	elim l; simpl in |- *; intro H.
-	(* 1 (In a m)
-	    ============================
-	      H : False\/(In a m)
-	      a : A
-	      m : list
-	      l : list *)
 	elim H; auto with list; intro H0.
-	(*  (In a m)
-	    ============================
-	      H0 : False *)
 	elim H0. (* subProof completed *)
 	intros y H0 H1.
-	(*  2 (<A>H=a)\/(In a (app y m))
-	    ============================
-	      H1 : ((<A>H=a)\/(In a y))\/(In a m)
-	      H0 : ((In a y)\/(In a m))->(In a (app y m))
-	      y : list *)
 	elim H1; auto 4 with list.
 	intro H2.
-	(*  (<A>H=a)\/(In a (app y m))
-	    ============================
-	      H2 : (<A>H=a)\/(In a y) *)
 	elim H2; auto with list.
 Qed.
 Hint Resolve in_or_app: list v62.
@@ -234,44 +202,19 @@ Proof.
 Qed.
 Hint Immediate incl_appr: list v62.
 
-Lemma incl_cons :
- forall (a : A) (l m : list), In a m -> incl l m -> incl (cons a l) m.
+Lemma incl_cons : forall (a : A) (l m : list), In a m -> incl l m -> incl (cons a l) m.
 Proof. 
 	unfold incl in |- *; simpl in |- *; intros a l m H H0 a0 H1.
-	(*  (In a0 m)
-	    ============================
-	      H1 : (<A>a=a0)\/(In a0 l)
-	      a0 : A
-	      H0 : (a:A)(In a l)->(In a m)
-	      H : (In a m)
-	      m : list
-	      l : list
-	      a : A *)
 	elim H1.
-	(*  1 (<A>a=a0)->(In a0 m) *)
 	elim H1; auto with list; intro H2.
-	(*  (<A>a=a0)->(In a0 m)
-	    ============================
-	      H2 : <A>a=a0 *)
 	elim H2; auto with list. (* solves subgoal *)
-	(*  2 (In a0 l)->(In a0 m) *)
 	auto with list.
 Qed.
 Hint Resolve incl_cons: list v62.
 
-Lemma incl_app :
- forall l m n : list, incl l n -> incl m n -> incl (app l m) n.
+Lemma incl_app : forall l m n : list, incl l n -> incl m n -> incl (app l m) n.
 Proof. 
 	unfold incl in |- *; simpl in |- *; intros l m n H H0 a H1.
-	(*  (In a n)
-	    ============================
-	      H1 : (In a (app l m))
-	      a : A
-	      H0 : (a:A)(In a m)->(In a n)
-	      H : (a:A)(In a l)->(In a n)
-	      n : list
-	      m : list
-	      l : list *)
 	elim (in_app_or l m a); auto with list.
 Qed.
 End List.

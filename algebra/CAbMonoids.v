@@ -10,14 +10,14 @@ Now we introduce commutativity and add some results.
 Definition is_CAbMonoid (G : CMonoid) := commutes (csg_op (c:=G)).
 
 Record CAbMonoid : Type := 
-  {cam_crr :> CMonoid; cam_proof : is_CAbMonoid cam_crr}.
+ {cam_crr   :> CMonoid;
+  cam_proof :  is_CAbMonoid cam_crr}.
 
 Section AbMonoid_Axioms.
 
 Variable M : CAbMonoid.
 (**
-%\begin{convention}%
-Let [M] be an Abelian Monoid.
+%\begin{convention}% Let [M] be an abelian monoid.
 %\end{convention}%
 *)
 
@@ -29,7 +29,7 @@ Lemma cam_commutes : commutes (csg_op (c:=M)).
 exact CAbMonoid_is_CAbMonoid.
 Qed.
 
-Lemma cam_commutes_unfolded : forall x y : M, x[+]y[=]y[+]x.
+Lemma cam_commutes_unfolded : forall x y : M, x[+]y [=] y[+]x.
 Proof cam_commutes.
 
 End AbMonoid_Axioms.
@@ -58,7 +58,7 @@ red in |- *. intros x y. case x. case y. intros.
 simpl in |- *. apply cam_commutes_unfolded.
 Qed.
 
-Definition Build_SubCAbMonoid : CAbMonoid := Build_CAbMonoid subcrr isabgrp_scrr.
+Definition Build_SubCAbMonoid : CAbMonoid := Build_CAbMonoid _ isabgrp_scrr.
 
 End SubCAbMonoids.
 

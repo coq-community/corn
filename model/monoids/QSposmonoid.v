@@ -4,10 +4,8 @@
 Require Export QSpossemigroup.
 Require Import CMonoids.
 
-(** *Example of a monoid: <$\mathbb{Q}^{+}$ #Q<SUP>+</SUP>#,$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#>
-*)
-
-(** Two is the unit of the operation  $(x,y) \mapsto xy/2$ #(x,y) 
+(** **Example of a monoid: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
+Two is the unit of the operation  $(x,y) \mapsto xy/2$ #(x,y) 
   &#x21A6; xy/2# on the positive rationals. So we have another monoid structure on the positive rational numbers.
 *)                              
 
@@ -27,9 +25,8 @@ simpl in |- *.
 apply QTWOpos_is_left_unit0.
 Qed.
 
-Definition Qpos_multdiv2_is_CMonoid :=
-  Build_is_CMonoid Qpos_multdiv2_as_CSemiGroup QTWOpos QTWOpos_is_rht_unit
-    QTWOpos_is_lft_unit.
+Definition Qpos_multdiv2_is_CMonoid := Build_is_CMonoid
+ Qpos_multdiv2_as_CSemiGroup QTWOpos QTWOpos_is_rht_unit QTWOpos_is_lft_unit.
 
-Definition Qpos_multdiv2_as_CMonoid :=
-  Build_CMonoid Qpos_multdiv2_as_CSemiGroup QTWOpos Qpos_multdiv2_is_CMonoid.
+Definition Qpos_multdiv2_as_CMonoid := Build_CMonoid
+ Qpos_multdiv2_as_CSemiGroup QTWOpos Qpos_multdiv2_is_CMonoid.

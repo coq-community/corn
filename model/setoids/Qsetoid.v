@@ -4,42 +4,38 @@
 Require Export Qsec.
 Require Import CSetoidFun.
 
-(** *Example of a setoid: Q
+(** **Example of a setoid: [Q]
+***Setoid
 *)
-
-(** **Q
-*)
-Lemma ap_Q_irreflexive1 : irreflexive (A:=Q.Q) Q.ap.
+Lemma ap_Q_irreflexive1 : irreflexive (A:=Q) Qap.
 red in |- *.
 apply ap_Q_irreflexive0.
 Qed.
 
-Lemma ap_Q_symmetric1 : Csymmetric Q.ap.
+Lemma ap_Q_symmetric1 : Csymmetric Qap.
 red in |- *.
 apply ap_Q_symmetric0.
 Qed.
 
-Lemma ap_Q_cotransitive1 : cotransitive (A:=Q.Q) Q.ap.
+Lemma ap_Q_cotransitive1 : cotransitive (A:=Q) Qap.
 red in |- *.
 apply ap_Q_cotransitive0.
 Qed.
 
-Lemma ap_Q_tight1 : tight_apart (A:=Q.Q) Q.eq Q.ap.
+Lemma ap_Q_tight1 : tight_apart (A:=Q) Qeq Qap.
 red in |- *.
 apply ap_Q_tight0.
 Qed.
 
-Definition ap_Q_is_apartness :=
-  Build_is_CSetoid Q.Q Q.eq Q.ap ap_Q_irreflexive1 ap_Q_symmetric1
-    ap_Q_cotransitive1 ap_Q_tight1.
+Definition ap_Q_is_apartness := Build_is_CSetoid Q Qeq Qap
+ ap_Q_irreflexive1 ap_Q_symmetric1 ap_Q_cotransitive1 ap_Q_tight1.
 
-Definition Q_as_CSetoid := Build_CSetoid Q.Q Q.eq Q.ap ap_Q_is_apartness.
+Definition Q_as_CSetoid := Build_CSetoid _ _ _ ap_Q_is_apartness.
 
-(** **Addition
+(** ***Addition
 *)
 
-Lemma Qplus_is_well_defined :
- bin_fun_well_def Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.plus.
+Lemma Qplus_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplus.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -47,16 +43,13 @@ intros.
 exact (Qplus_simpl x1 x2 y1 y2 H H0).
 Qed.
 
-Lemma Qplus_is_extensional1 :
- bin_fun_strong_ext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.plus.
+Lemma Qplus_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplus.
 red in |- *.
 simpl in |- *.
-exact Qplus_is_extensional0.
+exact Qplus_strext0.
 Qed.
 
-Definition Qplus_is_bin_fun :=
-  Build_CSetoid_bin_fun Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.plus
-    Qplus_is_extensional1.
+Definition Qplus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qplus_strext1.
 
 (** It is associative and commutative.
 *)
@@ -72,11 +65,10 @@ simpl in |- *.
 exact Qplus_is_commut0.
 Qed.
 
-(** **Opposite
+(** ***Opposite
 *)
 
-Lemma Qopp_is_well_defined :
- fun_well_def (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Q.opp.
+Lemma Qopp_wd : fun_wd (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Qopp.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -84,27 +76,24 @@ intros.
 exact (Qopp_simpl x y H).
 Qed.
 
-Lemma Qopp_is_extensional :
- fun_strong_ext (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Q.opp.
+Lemma Qopp_strext : fun_strext (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Qopp.
 Proof.
 red in |- *.
 simpl in |- *.
-unfold Q.ap in |- *.
+unfold Qap in |- *.
 intros.
 red in |- *.
 intro H0.
-apply X.
+apply H.
 exact (Qopp_simpl x y H0).
 Qed.
 
-Definition Qopp_is_fun :=
-  Build_CSetoid_fun Q_as_CSetoid Q_as_CSetoid Q.opp Qopp_is_extensional.
+Definition Qopp_is_fun := Build_CSetoid_fun _ _ _ Qopp_strext.
 
-(** **Multiplication
+(** ***Multiplication
 *)
 
-Lemma Qmult_is_well_defined :
- bin_fun_well_def Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.mult.
+Lemma Qmult_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmult.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -114,17 +103,14 @@ assumption.
 assumption.
 Qed.
 
-Lemma Qmult_is_extensional1 :
- bin_fun_strong_ext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.mult.
+Lemma Qmult_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmult.
 Proof.
 red in |- *.
 simpl in |- *.
-apply Qmult_is_extensional0.
+apply Qmult_strext0.
 Qed.
 
-Definition Qmult_is_bin_fun :=
-  Build_CSetoid_bin_fun Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Q.mult
-    Qmult_is_extensional1.
+Definition Qmult_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qmult_strext1.
 
 (** It is associative and commutative.
 *)
@@ -144,14 +130,13 @@ simpl in |- *.
 exact Qmult_sym.
 Qed.
 
-(** **Less-than
+(** ***Less-than
 *)
 
-Lemma Qlt_is_extensional : Crel_strong_ext Q_as_CSetoid Q.lt.
+Lemma Qlt_strext : Crel_strext Q_as_CSetoid Qlt.
 Proof.
 red in |- *.
-apply Qlt_is_extensional_unfolded.
+apply Qlt_strext_unfolded.
 Qed.
 
-Definition Qlt_is_CSetoid_relation :=
-  Build_CCSetoid_relation Q_as_CSetoid Q.lt Qlt_is_extensional.
+Definition Qlt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qlt_strext.

@@ -9,8 +9,7 @@ Require Export RingReflection.
 In this chapter we will prove that whenever we start from an ordered
 field [F], we can define a new ordered field of Cauchy sequences over [F].
 
-%\begin{convention}%
-Let [F] be an ordered field.
+%\begin{convention}% Let [F] be an ordered field.
 %\end{convention}%
 *)
 
@@ -23,7 +22,7 @@ Variable F : COrdField.
 
 [R_Set] is the setoid of Cauchy sequences over [F]; given two sequences
 [x,y] over [F], we say that [x] is smaller than [y] if from some point
-onwards [(y n)[-](x n)] is greater than some fixed, positive
+onwards [(y n) [-] (x n)] is greater than some fixed, positive
 [e].  Apartness of two sequences means that one of them is smaller
 than the other, equality is the negation of the apartness.
 *)
@@ -32,12 +31,11 @@ Definition R_Set := CauchySeq F.
 
 Section CSetoid_Structure.
 
-Definition R_lt (x y : R_Set) :=
-  {N : nat |
-  {e : F | Zero[<]e |
-  forall n : nat, N <= n -> e[<=]CS_seq _ y n[-]CS_seq _ x n}}.
+Definition R_lt (x y : R_Set) := {N : nat |
+  {e : F | Zero [<] e | forall n, N <= n -> e [<=] CS_seq _ y n[-]CS_seq _ x n}}.
 
 Definition R_ap (x y : R_Set) := R_lt x y or R_lt y x.
+
 Definition R_eq (x y : R_Set) := Not (R_ap x y).
 
 Lemma R_lt_cotrans : cotransitive R_lt.
@@ -51,14 +49,14 @@ elim Hxy; intros N H.
 elim H; clear Hxy H; intros e He HN.
 simpl in HN.
 set (e3 := e [/]ThreeNZ) in *.
-cut (Zero[<]e3); [ intro He3 | unfold e3 in |- *; apply pos_div_three; auto ].
+cut (Zero [<] e3); [ intro He3 | unfold e3 in |- *; apply pos_div_three; auto ].
 set (e6 := e [/]SixNZ) in *.
-cut (Zero[<]e6); [ intro He6 | unfold e6 in |- *; apply pos_div_six; auto ].
+cut (Zero [<] e6); [ intro He6 | unfold e6 in |- *; apply pos_div_six; auto ].
 set (e12 := e [/]TwelveNZ) in *.
-cut (Zero[<]e12);
+cut (Zero [<] e12);
  [ intro He12 | unfold e12 in |- *; apply pos_div_twelve; auto ].
 set (e24 := e [/]TwentyFourNZ) in *.
-cut (Zero[<]e24);
+cut (Zero [<] e24);
  [ intro He24 | unfold e24 in |- *; apply pos_div_twentyfour; auto ].
 elim (px e24 He24); intros Nx HNx.
 elim (py e24 He24); intros Ny HNy.
@@ -67,17 +65,17 @@ set (NN := max N (max Nx (max Ny Nz))) in *.
 set (x0 := x_ NN) in *.
 set (y0 := y_ NN) in *.
 set (z0 := z_ NN) in *.
-elim (cotrans_less_unfolded _ (x0[+]e3) (y0[-]e3)) with z0.
+elim (less_cotransitive_unfolded _ (x0[+]e3) (y0[-]e3)) with z0.
 
 intro Hyz.
 left.
 exists NN; exists e6; auto.
 intros n Hn; simpl in |- *.
-apply leEq_wdl with (e3[-](e24[+]e24[+]e24[+]e24)).
+apply leEq_wdl with (e3[-] (e24[+]e24[+]e24[+]e24)).
 2: unfold e3, e6, e12, e24 in |- *; rational.
 apply
  leEq_transitive
-  with (e3[-](z0[-]z_ Nz[+](z_ Nz[-]z_ n)[+](x_ n[-]x_ Nx)[+](x_ Nx[-]x0))).
+  with (e3[-] (z0[-]z_ Nz[+] (z_ Nz[-]z_ n) [+] (x_ n[-]x_ Nx) [+] (x_ Nx[-]x0))).
 apply minus_resp_leEq_rht.
 repeat apply plus_resp_leEq_both.
 unfold z0 in |- *; elim (HNz NN); auto; unfold NN in |- *; eauto with arith.
@@ -91,18 +89,18 @@ apply shift_minus_leEq; apply shift_leEq_plus'.
 unfold cg_minus in |- *; apply shift_plus_leEq'.
 unfold x0 in |- *; elim (HNx NN); auto; unfold NN in |- *; eauto with arith.
 apply shift_minus_leEq.
-RStepr (z0[-]x0).
-apply shift_leEq_minus; AStepl (x0[+]e3); apply less_leEq; auto.
+rstepr (z0[-]x0).
+apply shift_leEq_minus; astepl (x0[+]e3); apply less_leEq; auto.
 
 intro Hzx.
 right.
 exists NN; exists e6; auto.
 intros n Hn; simpl in |- *.
-apply leEq_wdl with (e3[-](e24[+]e24[+]e24[+]e24)).
+apply leEq_wdl with (e3[-] (e24[+]e24[+]e24[+]e24)).
 2: unfold e3, e6, e12, e24 in |- *; rational.
 apply
  leEq_transitive
-  with (e3[-](z_ Nz[-]z0[+](z_ n[-]z_ Nz)[+](y_ Ny[-]y_ n)[+](y0[-]y_ Ny))).
+  with (e3[-] (z_ Nz[-]z0[+] (z_ n[-]z_ Nz) [+] (y_ Ny[-]y_ n) [+] (y0[-]y_ Ny))).
 apply minus_resp_leEq_rht.
 repeat apply plus_resp_leEq_both.
 apply shift_minus_leEq; apply shift_leEq_plus'.
@@ -116,17 +114,17 @@ elim (HNy n); auto; apply le_trans with NN; auto; unfold NN in |- *;
  eauto with arith.
 unfold y0 in |- *; elim (HNy NN); auto; unfold NN in |- *; eauto with arith.
 apply shift_minus_leEq.
-RStepr (y0[-]z0).
+rstepr (y0[-]z0).
 apply shift_leEq_minus; apply shift_plus_leEq'; apply less_leEq; auto.
 
 apply shift_less_minus.
-AStepl (x0[+](e3[+]e3)); apply shift_plus_less'.
+astepl (x0[+] (e3[+]e3)); apply shift_plus_less'.
 apply less_leEq_trans with e.
 apply shift_plus_less.
 apply less_wdl with ((e[-]e3) [/]TwoNZ).
 2: unfold e3 in |- *; rational.
 apply pos_div_two'.
-apply shift_less_minus; AStepl e3; unfold e3 in |- *; apply pos_div_three';
+apply shift_less_minus; astepl e3; unfold e3 in |- *; apply pos_div_three';
  auto.
 
 unfold x0, y0, NN in |- *; apply HN; eauto with arith.
@@ -149,7 +147,7 @@ elim HN; clear Hx HN; intros e He HN.
 apply (ap_irreflexive_unfolded _ (x N)).
 apply less_imp_ap.
 apply less_leEq_trans with (x N[+]e).
-AStepl (x N[+]Zero); apply plus_resp_less_lft; auto.
+astepl (x N[+]Zero); apply plus_resp_less_lft; auto.
 apply shift_plus_leEq'; auto with arith.
 Qed.
 
@@ -187,14 +185,13 @@ Definition R_plus (x y : R_CSetoid) : R_CSetoid :=
 
 Definition R_zero := Build_CauchySeq _ _ (CS_seq_const F Zero).
 
-Lemma R_plus_lft_ext :
- forall x y z : R_CSetoid, R_plus x z[#]R_plus y z -> x[#]y.
+Lemma R_plus_lft_ext : forall x y z, R_plus x z [#] R_plus y z -> x [#] y.
 intros x y z Hxy.
 elim Hxy; clear Hxy; intro H; [ left | right ]; elim H; intros N HN; elim HN;
  clear H HN; intros e He HN; exists N; exists e; auto; 
  intros n Hn; simpl in HN.
-RStepr (CS_seq _ y n[+]CS_seq _ z n[-](CS_seq _ x n[+]CS_seq _ z n)); auto.
-RStepr (CS_seq _ x n[+]CS_seq _ z n[-](CS_seq _ y n[+]CS_seq _ z n)); auto.
+rstepr (CS_seq _ y n[+]CS_seq _ z n[-] (CS_seq _ x n[+]CS_seq _ z n)); auto.
+rstepr (CS_seq _ x n[+]CS_seq _ z n[-] (CS_seq _ y n[+]CS_seq _ z n)); auto.
 Qed.
 
 Lemma R_plus_assoc : associative R_plus.
@@ -205,64 +202,64 @@ apply
  leEq_less_trans
   with
     (CS_seq _ x N[+]CS_seq _ y N[+]CS_seq _ z N[-]
-     (CS_seq _ x N[+](CS_seq _ y N[+]CS_seq _ z N))); 
+     (CS_seq _ x N[+] (CS_seq _ y N[+]CS_seq _ z N))); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 apply
  leEq_less_trans
   with
-    (CS_seq _ x N[+](CS_seq _ y N[+]CS_seq _ z N)[-]
+    (CS_seq _ x N[+] (CS_seq _ y N[+]CS_seq _ z N) [-]
      (CS_seq _ x N[+]CS_seq _ y N[+]CS_seq _ z N)); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
-Lemma R_zero_lft_unit : forall x : R_CSetoid, R_plus R_zero x[=]x.
+Lemma R_zero_lft_unit : forall x, R_plus R_zero x [=] x.
 intro x; intro x_ap.
 apply (R_lt_irreflexive x).
 elim x_ap; clear x_ap; intro x_lt; elim x_lt; intros N H; elim H;
  clear x_lt H; intros e He HN; exists N; exists e; 
  auto; simpl in HN; intros n Hn.
-AStepr (CS_seq _ x n[-](Zero[+]CS_seq _ x n)); auto.
-AStepr (Zero[+]CS_seq _ x n[-]CS_seq _ x n); auto.
+astepr (CS_seq _ x n[-] (Zero[+]CS_seq _ x n)); auto.
+astepr (Zero[+]CS_seq _ x n[-]CS_seq _ x n); auto.
 Qed.
 
-Lemma R_plus_comm : forall x y : R_CSetoid, R_plus x y[=]R_plus y x.
+Lemma R_plus_comm : forall x y, R_plus x y [=] R_plus y x.
 intros x y Hxy.
 elim Hxy; clear Hxy; intro H; elim H; intros N HN; elim HN; clear H HN;
  intros e He HN; simpl in HN; apply (less_irreflexive_unfolded _ e).
 apply
  leEq_less_trans
-  with (CS_seq _ y N[+]CS_seq _ x N[-](CS_seq _ x N[+]CS_seq _ y N)); 
+  with (CS_seq _ y N[+]CS_seq _ x N[-] (CS_seq _ x N[+]CS_seq _ y N)); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 apply
  leEq_less_trans
-  with (CS_seq _ x N[+]CS_seq _ y N[-](CS_seq _ y N[+]CS_seq _ x N)); 
+  with (CS_seq _ x N[+]CS_seq _ y N[-] (CS_seq _ y N[+]CS_seq _ x N)); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
 Definition R_inv (x : R_CSetoid) : R_CSetoid :=
   Build_CauchySeq _ _ (CS_seq_inv F _ (CS_proof _ x)).
 
-Lemma R_inv_is_inv : forall x : R_CSetoid, R_plus x (R_inv x)[=]R_zero.
+Lemma R_inv_is_inv : forall x, R_plus x (R_inv x) [=] R_zero.
 intro x; intro x_ap.
 apply (R_lt_irreflexive R_zero).
 elim x_ap; clear x_ap; intro x_lt; elim x_lt; intros N H; elim H;
  clear x_lt H; intros e He HN; exists N; exists e; 
  auto; simpl in HN; intros n Hn.
-simpl in |- *; AStepr (Zero[-](CS_seq _ x n[+][--](CS_seq _ x n))); auto.
-simpl in |- *; AStepr (CS_seq _ x n[+][--](CS_seq _ x n)[-]Zero); auto.
+simpl in |- *; astepr (Zero[-] (CS_seq _ x n[+][--] (CS_seq _ x n))); auto.
+simpl in |- *; astepr (CS_seq _ x n[+][--] (CS_seq _ x n) [-]Zero); auto.
 Qed.
 
-Lemma R_inv_ext : un_op_strong_ext _ R_inv.
+Lemma R_inv_ext : un_op_strext _ R_inv.
 intros x y Hxy.
 elim Hxy; clear Hxy; intro x_lt; [ right | left ]; elim x_lt; intros N H;
  elim H; clear x_lt H; intros e He HN; exists N; exists e; 
  auto; simpl in HN; intros n Hn.
-RStepr ([--](CS_seq _ y n)[-][--](CS_seq _ x n)); auto.
-RStepr ([--](CS_seq _ x n)[-][--](CS_seq _ y n)); auto.
+rstepr ([--] (CS_seq _ y n) [-][--] (CS_seq _ x n)); auto.
+rstepr ([--] (CS_seq _ x n) [-][--] (CS_seq _ y n)); auto.
 Qed.
 
 Definition Rinv : CSetoid_un_op R_CSetoid.
@@ -284,8 +281,7 @@ End Group_Structure.
 
 Section Ring_Structure.
 
-(**
-** Ring Structure
+(** ** Ring Structure
 Same comments as previously.
 *)
 
@@ -293,49 +289,47 @@ Definition R_mult (x y : R_CAbGroup) : R_CAbGroup :=
   Build_CauchySeq _ _ (CS_seq_mult F _ _ (CS_proof _ x) (CS_proof _ y)).
 Definition R_one : R_CAbGroup := Build_CauchySeq _ _ (CS_seq_const F One).
 
-Lemma R_one_ap_zero : R_one[#]Zero.
+Lemma R_one_ap_zero : R_one [#] Zero.
 right; exists 0; exists (One:F).
 apply pos_one.
-intros; simpl in |- *; AStepr (One:F); apply leEq_reflexive.
+intros; simpl in |- *; astepr (One:F); apply leEq_reflexive.
 Qed.
 
-Lemma R_mult_dist_plus :
- forall x y z : R_CAbGroup, R_mult x (y[+]z)[=]R_mult x y[+]R_mult x z.
+Lemma R_mult_dist_plus : forall x y z, R_mult x (y[+]z) [=] R_mult x y[+]R_mult x z.
 intros x y z H.
 elim H; intro Hlt; elim Hlt; intros N HN; elim HN; clear H Hlt HN;
  intros e He HN; simpl in HN; apply (less_irreflexive_unfolded _ e).
 eapply leEq_less_trans.
 apply (HN N (le_n _)).
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 eapply leEq_less_trans.
 apply (HN N (le_n _)).
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
-Lemma R_mult_dist_minus :
- forall x y z : R_CAbGroup, R_mult x (y[-]z)[=]R_mult x y[-]R_mult x z.
+Lemma R_mult_dist_minus : forall x y z, R_mult x (y[-]z) [=] R_mult x y[-]R_mult x z.
 intros x y z H.
 elim H; intro Hlt; elim Hlt; intros N HN; elim HN; clear H Hlt HN;
  intros e He HN; simpl in HN; apply (less_irreflexive_unfolded _ e).
 eapply leEq_less_trans.
 apply (HN N (le_n _)).
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 eapply leEq_less_trans.
 apply (HN N (le_n _)).
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
-Lemma R_one_rht_unit : forall x : R_CAbGroup, R_mult x R_one[=]x.
+Lemma R_one_rht_unit : forall x, R_mult x R_one [=] x.
 intro x; intro x_ap.
 apply (R_lt_irreflexive x).
 elim x_ap; clear x_ap; intro x_lt; elim x_lt; intros N H; elim H;
  clear x_lt H; intros e He HN; exists N; exists e; 
  auto; simpl in HN; intros n Hn.
-AStepr (CS_seq _ x n[-]CS_seq _ x n[*]One); auto.
-AStepr (CS_seq _ x n[*]One[-]CS_seq _ x n); auto.
+astepr (CS_seq _ x n[-]CS_seq _ x n[*]One); auto.
+astepr (CS_seq _ x n[*]One[-]CS_seq _ x n); auto.
 Qed.
 
-Lemma R_mult_comm : forall x y : R_CAbGroup, R_mult x y[=]R_mult y x.
+Lemma R_mult_comm : forall x y, R_mult x y [=] R_mult y x.
 intros x y Hxy.
 elim Hxy; clear Hxy; intro H; elim H; intros N HN; elim HN; clear H HN;
  intros e He HN; simpl in HN; apply (less_irreflexive_unfolded _ e).
@@ -343,16 +337,15 @@ apply
  leEq_less_trans
   with (CS_seq _ y N[*]CS_seq _ x N[-]CS_seq _ x N[*]CS_seq _ y N); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 apply
  leEq_less_trans
   with (CS_seq _ x N[*]CS_seq _ y N[-]CS_seq _ y N[*]CS_seq _ x N); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
-Lemma R_mult_ap_zero' :
- forall x y : R_CAbGroup, R_mult x y[#]Zero -> x[#]Zero.
+Lemma R_mult_ap_zero' : forall x y, R_mult x y [#] Zero -> x [#] Zero.
 intros x y Hxy.
 elim (CS_seq_bounded _ (CS_seq _ y) (CS_proof _ y)); intros K HK Hy; elim Hy;
  clear Hy; intros Ny HNY.
@@ -366,7 +359,7 @@ elim (ap_cotransitive_unfolded _ _ _ Hxy z); intro Hap; elim Hap; intro Hlt;
  intros e He HN.
 
 right.
-cut (forall n : nat, Ny <= n -> Zero[<]Two[*]K[-]CS_seq _ y n);
+cut (forall n : nat, Ny <= n -> Zero [<] Two[*]K[-]CS_seq _ y n);
  [ intro Hy' | intros n Hn ].
 set
  (KK :=
@@ -382,11 +375,11 @@ cut (Ny <= n);
 apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
 apply mult_cancel_leEq with (One[/] _[//]pos_ap_zero _ _ He).
 apply recip_resp_pos; auto.
-RStepl
+rstepl
  (One[/] _[//]mult_resp_ap_zero _ _ _ (three_ap_zero _) (pos_ap_zero _ _ HK)).
-RStepr (One[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
+rstepr (One[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
 apply recip_resp_leEq; auto.
-unfold cg_minus in |- *; apply shift_plus_leEq'; RStepr ([--][--]K).
+unfold cg_minus in |- *; apply shift_plus_leEq'; rstepr ([--][--]K).
 apply inv_resp_leEq; elim (HNY n); auto.
 apply shift_div_leEq; auto.
 eapply leEq_wdr.
@@ -394,10 +387,10 @@ apply (HN n); auto.
 simpl in |- *; rational.
 apply shift_zero_less_minus; apply leEq_less_trans with K.
 elim (HNY n); auto.
-AStepl (Zero[+]K); AStepr (K[+]K); apply plus_resp_less_rht; auto.
+astepl (Zero[+]K); astepr (K[+]K); apply plus_resp_less_rht; auto.
 
 left.
-cut (forall n : nat, Ny <= n -> Zero[<]Two[*]K[-]CS_seq _ y n);
+cut (forall n : nat, Ny <= n -> Zero [<] Two[*]K[-]CS_seq _ y n);
  [ intro Hy' | intros n Hn ].
 set
  (KK :=
@@ -413,11 +406,11 @@ cut (Ny <= n);
 apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
 apply mult_cancel_leEq with (One[/] _[//]pos_ap_zero _ _ He).
 apply recip_resp_pos; auto.
-RStepl
+rstepl
  (One[/] _[//]mult_resp_ap_zero _ _ _ (three_ap_zero _) (pos_ap_zero _ _ HK)).
-RStepr (One[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
+rstepr (One[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
 apply recip_resp_leEq; auto.
-unfold cg_minus in |- *; apply shift_plus_leEq'; RStepr ([--][--]K).
+unfold cg_minus in |- *; apply shift_plus_leEq'; rstepr ([--][--]K).
 apply inv_resp_leEq; elim (HNY n); auto.
 apply shift_div_leEq; auto.
 eapply leEq_wdr.
@@ -425,7 +418,7 @@ apply (HN n); auto.
 simpl in |- *; rational.
 apply shift_zero_less_minus; apply leEq_less_trans with K.
 elim (HNY n); auto.
-AStepl (Zero[+]K); AStepr (K[+]K); apply plus_resp_less_rht; auto.
+astepl (Zero[+]K); astepr (K[+]K); apply plus_resp_less_rht; auto.
 
 left.
 set
@@ -458,12 +451,11 @@ apply (HN n H).
 simpl in |- *; rational.
 Qed.
 
-Lemma R_mult_lft_ext :
- forall x y z : R_CAbGroup, R_mult x z[#]R_mult y z -> x[#]y.
+Lemma R_mult_lft_ext : forall x y z, R_mult x z [#] R_mult y z -> x [#] y.
 intros x y z Hxy.
 apply zero_minus_apart.
 apply R_mult_ap_zero' with z.
-apply ap_well_def_lft_unfolded with (R_mult x z[-]R_mult y z).
+apply ap_wdl_unfolded with (R_mult x z[-]R_mult y z).
 apply minus_ap_zero; auto.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
@@ -473,18 +465,17 @@ apply R_mult_dist_minus.
 apply cg_minus_wd; apply R_mult_comm.
 Qed.
 
-Lemma R_mult_rht_ext :
- forall x y z : R_CAbGroup, R_mult x y[#]R_mult x z -> y[#]z.
+Lemma R_mult_rht_ext : forall x y z, R_mult x y [#] R_mult x z -> y [#] z.
 intros x y z Hxy.
 apply R_mult_lft_ext with x.
-eapply ap_well_def_lft_unfolded.
-eapply ap_well_def_rht_unfolded.
+eapply ap_wdl_unfolded.
+eapply ap_wdr_unfolded.
 apply Hxy.
 apply R_mult_comm.
 apply R_mult_comm.
 Qed.
 
-Lemma R_mult_extensional : bin_op_strong_ext _ R_mult.
+Lemma R_mult_strext : bin_op_strext _ R_mult.
 red in |- *; red in |- *.
 intros x y a b Hap.
 elim (ap_cotransitive_unfolded _ _ _ Hap (R_mult x b)); intro H.
@@ -495,7 +486,7 @@ Qed.
 Definition Rmult : CSetoid_bin_op R_CAbGroup.
 red in |- *.
 apply Build_CSetoid_bin_fun with R_mult.
-apply R_mult_extensional.
+apply R_mult_strext.
 Defined.
 
 Lemma R_mult_assoc : associative Rmult.
@@ -506,18 +497,18 @@ apply
  leEq_less_trans
   with
     (CS_seq _ x N[*]CS_seq _ y N[*]CS_seq _ z N[-]
-     CS_seq _ x N[*](CS_seq _ y N[*]CS_seq _ z N)); 
+     CS_seq _ x N[*] (CS_seq _ y N[*]CS_seq _ z N)); 
  auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 apply
  leEq_less_trans
   with
-    (CS_seq _ x N[*](CS_seq _ y N[*]CS_seq _ z N)[-]
+    (CS_seq _ x N[*] (CS_seq _ y N[*]CS_seq _ z N) [-]
      CS_seq _ x N[*]CS_seq _ y N[*]CS_seq _ z N); auto.
-RStepl (Zero:F); auto.
+rstepl (Zero:F); auto.
 Qed.
 
-Lemma R_one_lft_unit : forall x : R_CAbGroup, R_mult R_one x[=]x.
+Lemma R_one_lft_unit : forall x, R_mult R_one x [=] x.
 intro.
 eapply eq_transitive_unfolded.
 apply R_mult_comm.
@@ -539,15 +530,14 @@ End Ring_Structure.
 
 Section Field_Structure.
 
-(**
-** Field Structure
+(** ** Field Structure
 For the field structure, it is technically easier to first prove
 that our ring is actually an integral domain.  The rest then follows
 quite straightforwardly.
 *)
 
 Lemma R_integral_domain :
- forall x y : R_CRing, x[#]Zero -> y[#]Zero -> x[*]y[#]Zero.
+ forall x y : R_CRing, x [#] Zero -> y [#] Zero -> x[*]y [#] Zero.
 intros x y Hx Hy.
 elim Hx; intro Hlt; elim Hlt; intros Nx HN; elim HN; clear Hx Hlt HN;
  intros ex Hex HNx; simpl in HNx; elim Hy; intro Hlt; 
@@ -557,53 +547,52 @@ elim Hx; intro Hlt; elim Hlt; intros Nx HN; elim HN; clear Hx Hlt HN;
 right.
 exists (max Nx Ny); exists (ex[*]ey).
 apply mult_resp_pos; auto.
-intros; simpl in |- *; RStepr ([--](CS_seq _ x n)[*][--](CS_seq _ y n)).
+intros; simpl in |- *; rstepr ([--] (CS_seq _ x n) [*][--] (CS_seq _ y n)).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-AStepr (Zero[-]CS_seq _ x n); eauto with arith.
-AStepr (Zero[-]CS_seq _ y n); eauto with arith.
+astepr (Zero[-]CS_seq _ x n); eauto with arith.
+astepr (Zero[-]CS_seq _ y n); eauto with arith.
 
 left.
 exists (max Nx Ny); exists (ex[*]ey).
 apply mult_resp_pos; auto.
-intros; simpl in |- *; RStepr ([--](CS_seq _ x n)[*]CS_seq _ y n).
+intros; simpl in |- *; rstepr ([--] (CS_seq _ x n) [*]CS_seq _ y n).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-AStepr (Zero[-]CS_seq _ x n); eauto with arith.
-AStepr (CS_seq _ y n[-]Zero); eauto with arith.
+astepr (Zero[-]CS_seq _ x n); eauto with arith.
+astepr (CS_seq _ y n[-]Zero); eauto with arith.
 
 left.
 exists (max Nx Ny); exists (ex[*]ey).
 apply mult_resp_pos; auto.
-intros; simpl in |- *; RStepr (CS_seq _ x n[*][--](CS_seq _ y n)).
+intros; simpl in |- *; rstepr (CS_seq _ x n[*][--] (CS_seq _ y n)).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-AStepr (CS_seq _ x n[-]Zero); eauto with arith.
-AStepr (Zero[-]CS_seq _ y n); eauto with arith.
+astepr (CS_seq _ x n[-]Zero); eauto with arith.
+astepr (Zero[-]CS_seq _ y n); eauto with arith.
 
 right.
 exists (max Nx Ny); exists (ex[*]ey).
 apply mult_resp_pos; auto.
-intros; simpl in |- *; AStepr (CS_seq _ x n[*]CS_seq _ y n).
+intros; simpl in |- *; astepr (CS_seq _ x n[*]CS_seq _ y n).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-AStepr (CS_seq _ x n[-]Zero); eauto with arith.
-AStepr (CS_seq _ y n[-]Zero); eauto with arith.
+astepr (CS_seq _ x n[-]Zero); eauto with arith.
+astepr (CS_seq _ y n[-]Zero); eauto with arith.
 Qed.
 
-Definition R_recip : forall x : R_CRing, x[#]Zero -> R_CRing.
+Definition R_recip : forall x : R_CRing, x [#] Zero -> R_CRing.
 intros x Hx; elim Hx; intro Hlt; elim Hlt; intros N HN; elim HN;
  clear Hx Hlt HN; intros e He HN.
-cut (forall n : nat, N <= n -> e[<=][--](CS_seq _ x n)); intros.
+cut (forall n : nat, N <= n -> e [<=] [--] (CS_seq _ x n)); intros.
 apply
  (Build_CauchySeq _ _
     (CS_seq_inv _ _
        (CS_seq_recip _ _ (CS_seq_inv _ _ (CS_proof _ x)) e He N H))).
-AStepr (Zero[-]CS_seq _ x n); simpl in HN; auto.
+astepr (Zero[-]CS_seq _ x n); simpl in HN; auto.
 
-cut (forall n : nat, N <= n -> e[<=]CS_seq _ x n); intros.
+cut (forall n : nat, N <= n -> e [<=] CS_seq _ x n); intros.
 apply (Build_CauchySeq _ _ (CS_seq_recip _ _ (CS_proof _ x) e He N H)).
-AStepr (CS_seq _ x n[-]Zero); simpl in HN; auto.
+astepr (CS_seq _ x n[-]Zero); simpl in HN; auto.
 Defined.
 
-Lemma R_recip_inverse :
- forall (x : R_CRing) (x_ : x[#]Zero), x[*]R_recip x x_[=]One.
+Lemma R_recip_inverse : forall x x_, x[*]R_recip x x_ [=] One.
 intros x Hx; elim Hx; intro Hlt; elim Hlt; intros N HN; elim HN;
  clear Hx Hlt HN; simpl in |- *; intros e He HN Hap; 
  elim Hap; intro Hlt; elim Hlt; intros K HK; elim HK; 
@@ -646,24 +635,21 @@ elimtype False; apply le_not_lt with N (max K N); auto with arith.
 simpl in |- *; rational.
 Qed.
 
-Lemma R_recip_extensional :
- forall (x y : R_CRing) (x_ : x[#]Zero) (y_ : y[#]Zero),
- R_recip x x_[#]R_recip y y_ -> x[#]y.
+Lemma R_recip_strext : forall x y x_ y_, R_recip x x_ [#] R_recip y y_ -> x [#] y.
 intros.
 apply zero_minus_apart.
-apply ap_well_def_lft with (x[*]y[*](R_recip y y_[-]R_recip x x_)).
+apply ap_wdl with (x[*]y[*] (R_recip y y_[-]R_recip x x_)).
 apply R_integral_domain.
 apply R_integral_domain; auto.
 apply minus_ap_zero; apply ap_symmetric_unfolded; auto.
-RStepl (y[*]R_recip y y_[*]x[-]x[*]R_recip x x_[*]y).
-RStepr (One[*]x[-]One[*]y).
-apply cg_minus_wd; apply mult_wd_lft; apply R_recip_inverse.
+rstepl (y[*]R_recip y y_[*]x[-]x[*]R_recip x x_[*]y).
+rstepr (One[*]x[-]One[*]y).
+apply cg_minus_wd; apply mult_wdl; apply R_recip_inverse.
 Qed.
 
-Lemma R_recip_inverse' :
- forall (x : R_CRing) (x_ : x[#]Zero), R_recip x x_[*]x[=]One.
+Lemma R_recip_inverse' : forall x x_, R_recip x x_[*]x [=] One.
 intros.
-AStepl (x[*]R_recip x x_).
+astepl (x[*]R_recip x x_).
 apply R_recip_inverse.
 Qed.
 
@@ -672,20 +658,19 @@ apply Build_CField with R_CRing R_recip.
 split.
 apply R_recip_inverse.
 apply R_recip_inverse'.
-exact R_recip_extensional.
+exact R_recip_strext.
 Defined.
 
 End Field_Structure.
 
 Section Order.
 
-(**
-** Order Structure
+(** ** Order Structure
 Finally, we extend the field structure with the ordering we
 defined at the beginning.
 *)
 
-Lemma R_lt_extensional : Crel_strong_ext R_CSetoid R_lt.
+Lemma R_lt_strext : Crel_strext R_CSetoid R_lt.
 intros x a y b Hxy.
 elim (R_lt_cotrans x y Hxy a); intro H.
 right; left; left; auto.
@@ -696,7 +681,7 @@ Qed.
 
 Definition Rlt : CCSetoid_relation R_CField.
 apply Build_CCSetoid_relation with R_lt.
-exact R_lt_extensional.
+exact R_lt_strext.
 Defined.
 
 Lemma Rlt_transitive : Ctransitive Rlt.
@@ -706,7 +691,7 @@ elim H; intros N1 HN1; elim HN1; clear H HN1; intros e1 He1 HN1.
 elim H'; intros N2 HN2; elim HN2; clear H' HN2; intros e2 He2 HN2.
 exists (max N1 N2); exists (e1[+]e2).
 apply plus_resp_pos; auto.
-intros; RStepr (CS_seq _ y n[-]CS_seq _ x n[+](CS_seq _ z n[-]CS_seq _ y n)).
+intros; rstepr (CS_seq _ y n[-]CS_seq _ x n[+] (CS_seq _ z n[-]CS_seq _ y n)).
 apply plus_resp_leEq_both; eauto with arith.
 Qed.
 
@@ -720,16 +705,14 @@ apply R_lt_irreflexive with x.
 apply Rlt_transitive with y; auto.
 Qed.
 
-Lemma R_plus_resp_lt :
- forall x y : R_CField, Rlt x y -> forall z : R_CField, Rlt (x[+]z) (y[+]z).
+Lemma R_plus_resp_lt : forall x y, Rlt x y -> forall z, Rlt (x[+]z) (y[+]z).
 intros x y Hxy z.
 elim Hxy; intros N HN; elim HN; clear Hxy HN; intros e He HN; exists N;
  exists e; auto; intros n Hn.
-simpl in |- *; RStepr (CS_seq _ y n[-]CS_seq _ x n); auto.
+simpl in |- *; rstepr (CS_seq _ y n[-]CS_seq _ x n); auto.
 Qed.
 
-Lemma R_mult_resp_lt :
- forall x y : R_CRing, Rlt Zero x -> Rlt Zero y -> Rlt Zero (x[*]y).
+Lemma R_mult_resp_lt : forall x y, Rlt Zero x -> Rlt Zero y -> Rlt Zero (x[*]y).
 intros x y Hx Hy.
 elim Hx; intros Nx HN; elim HN; clear Hx HN; intros ex Hex HNx; simpl in HNx;
  elim Hy; intros Ny HN; elim HN; clear Hy HN; intros ey Hey HNy; 
@@ -737,10 +720,10 @@ elim Hx; intros Nx HN; elim HN; clear Hx HN; intros ex Hex HNx; simpl in HNx;
 
 exists (max Nx Ny); exists (ex[*]ey).
 apply mult_resp_pos; auto.
-intros; simpl in |- *; AStepr (CS_seq _ x n[*]CS_seq _ y n).
+intros; simpl in |- *; astepr (CS_seq _ x n[*]CS_seq _ y n).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-AStepr (CS_seq _ x n[-]Zero); eauto with arith.
-AStepr (CS_seq _ y n[-]Zero); eauto with arith.
+astepr (CS_seq _ x n[-]Zero); eauto with arith.
+astepr (CS_seq _ y n[-]Zero); eauto with arith.
 Qed.
 
 Definition R_COrdField : COrdField.
@@ -761,11 +744,8 @@ Auxiliary characterizations of the main relations on [R_Set].
 
 Section Auxiliary.
 
-Lemma Rlt_alt_1 :
- forall x y : R_Set,
- {e : F | Zero[<]e |
- {N : nat | forall m : nat, N <= m -> e[<=]CS_seq F y m[-]CS_seq F x m}} ->
- Rlt x y.
+Lemma Rlt_alt_1 : forall x y : R_Set, {e : F | Zero [<] e |
+ {N : nat | forall m, N <= m -> e [<=] CS_seq F y m[-]CS_seq F x m}} -> Rlt x y.
 Proof.
 intros x y H.
 case H.
@@ -784,19 +764,16 @@ apply leEq_transitive with e1.
 apply mult_cancel_leEq with (Two:F).
 apply pos_two.
 
-RStepl (e1[+](Zero:F)).
-RStepr (e1[+]e1).
+rstepl (e1[+] (Zero:F)).
+rstepr (e1[+]e1).
 apply plus_resp_leEq_lft.
 apply less_leEq; assumption.
 apply H3.
 assumption.
 Qed.
 
-Lemma Rlt_alt_2 :
- forall x y : R_Set,
- Rlt x y ->
- {e : F | Zero[<]e |
- {N : nat | forall m : nat, N <= m -> e[<=]CS_seq F y m[-]CS_seq F x m}}.
+Lemma Rlt_alt_2 : forall x y : R_Set, Rlt x y -> {e : F | Zero [<] e |
+ {N : nat | forall m, N <= m -> e [<=] CS_seq F y m[-]CS_seq F x m}}.
 Proof.
  intros x y H.
 unfold Rlt in H.
@@ -810,11 +787,8 @@ exists N.
 auto.
 Qed.
 
-Lemma R_ap_alt_1 :
- forall x y : R_CSetoid,
- x[#]y ->
- {e : F | Zero[<]e |
- {N : nat | forall m : nat, N <= m -> AbsBig e (CS_seq F x m[-]CS_seq F y m)}}.
+Lemma R_ap_alt_1 : forall x y : R_CSetoid, x [#] y -> {e : F | Zero [<] e |
+ {N : nat | forall m, N <= m -> AbsBig e (CS_seq F x m[-]CS_seq F y m)}}.
 Proof.
  intros x y H.
  case H; intros H0.
@@ -828,8 +802,8 @@ Proof.
  assumption.
  right.
  apply inv_cancel_leEq.
- RStepl e1.
- RStepr (CS_seq F y m[-]CS_seq F x m).
+ rstepl e1.
+ rstepr (CS_seq F y m[-]CS_seq F x m).
  apply H31.
  assumption.
 
@@ -841,28 +815,22 @@ Proof.
  split; try left; auto.
 Qed.
 
-Lemma Eq_alt_1 :
- forall (x y : R_Set) (e : F),
- Zero[<]e ->
- Not
-   {N : nat |
-   forall m : nat,
-   N <= m -> AbsBig (e [/]FourNZ) (CS_seq F x m[-]CS_seq F y m)} ->
- {N : nat |
- forall m : nat, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}.
+Lemma Eq_alt_1 : forall (x y : R_Set) (e : F), Zero [<] e ->
+ Not {N : nat | forall m,   N <= m -> AbsBig (e [/]FourNZ) (CS_seq F x m[-]CS_seq F y m)} ->
+ {N : nat | forall m, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}.
 Proof.
  intros x y e H.
  set (e2 := e [/]TwoNZ) in *.
  set (e4 := e [/]FourNZ) in *.
  set (e8 := e [/]EightNZ) in *.
  set (e16 := e [/]SixteenNZ) in *.
- assert (He2 : Zero[<]e2).
+ assert (He2 : Zero [<] e2).
   unfold e2 in |- *; apply pos_div_two; assumption.
- assert (He4 : Zero[<]e4).
+ assert (He4 : Zero [<] e4).
   unfold e4 in |- *; apply pos_div_four; assumption.
- assert (He8 : Zero[<]e8).
+ assert (He8 : Zero [<] e8).
   unfold e8 in |- *; apply pos_div_eight; assumption.
- assert (He16 : Zero[<]e16).
+ assert (He16 : Zero [<] e16).
   unfold e16 in |- *; apply pos_div_sixteen; assumption.
  case x; intros x_ px.
  case y; intros y_ py.
@@ -883,9 +851,9 @@ Proof.
  unfold AbsSmall in |- *.
  assert (H3 : Not (AbsBig e2 (x_ m[-]y_ m))).
   intro; elim (H1 m); split; assumption.
- assert (H4 : ~ e2[<=]x_ m[-]y_ m).
+ assert (H4 : ~ e2 [<=] x_ m[-]y_ m).
   intro; apply H3; split; try left; assumption.
- assert (H5 : ~ x_ m[-]y_ m[<=][--]e2).
+ assert (H5 : ~ x_ m[-]y_ m [<=] [--]e2).
   intro; apply H3; split; try right; assumption.
  split; intro.
  apply H5.
@@ -906,30 +874,30 @@ Proof.
  exists NN.
  intros.
 
- apply AbsBig_wd_lft with (e2[-]e8[-]e8).
+ apply AbsBig_wdl with (e2[-]e8[-]e8).
  2: unfold e2, e4, e8 in |- *; rational.
 
- apply AbsBig_wd_rht with (x_ m[-]y_ m[-](x_ m[-]x_ m0)[-](y_ m0[-]y_ m)).
+ apply AbsBig_wdr with (x_ m[-]y_ m[-] (x_ m[-]x_ m0) [-] (y_ m0[-]y_ m)).
  2: rational.
 
- assert (e8[<]e2).
+ assert (e8 [<] e2).
   unfold e2, e8 in |- *.
-  RStepl ((e [/]TwoNZ) [/]FourNZ).
-  RStepr (e [/]TwoNZ).
+  rstepl ((e [/]TwoNZ) [/]FourNZ).
+  rstepr (e [/]TwoNZ).
   apply pos_div_four'.
   assumption.
 
- assert (Zero[<]e2[-]e8).
+ assert (Zero [<] e2[-]e8).
   apply plus_cancel_less with e8.
-  RStepl e8.
-  RStepr e2.
+  rstepl e8.
+  rstepr e2.
   assumption.
 
- assert (e8[<]e2[-]e8).
+ assert (e8 [<] e2[-]e8).
   apply plus_cancel_less with e8.
-  RStepr e2.
-  unfold e2, e8 in |- *; RStepl (e [/]FourNZ).
-  RStepl ((e [/]TwoNZ) [/]TwoNZ).
+  rstepr e2.
+  unfold e2, e8 in |- *; rstepl (e [/]FourNZ).
+  rstepl ((e [/]TwoNZ) [/]TwoNZ).
   apply pos_div_two'.
   assumption.
 
@@ -937,8 +905,8 @@ Proof.
  apply AbsBigSmall_minus; auto.
 
  unfold e8 in |- *.
- RStepl (e [/]SixteenNZ[+]e [/]SixteenNZ).
- RStepr (x_ m[-]x_ N1[+](x_ N1[-]x_ m0)).
+ rstepl (e [/]SixteenNZ[+]e [/]SixteenNZ).
+ rstepr (x_ m[-]x_ N1[+] (x_ N1[-]x_ m0)).
  apply AbsSmall_plus.
  apply px2.
  apply le_trans with NN; assumption.
@@ -948,8 +916,8 @@ Proof.
  apply le_trans with NN; assumption.
 
  unfold e8 in |- *.
- RStepl (e [/]SixteenNZ[+]e [/]SixteenNZ).
- RStepr (y_ m0[-]y_ N2[+](y_ N2[-]y_ m)).
+ rstepl (e [/]SixteenNZ[+]e [/]SixteenNZ).
+ rstepr (y_ m0[-]y_ N2[+] (y_ N2[-]y_ m)).
  apply AbsSmall_plus.
  apply py2.
  apply le_trans with NN; assumption.
@@ -959,11 +927,8 @@ Proof.
  apply le_trans with NN; assumption.
 Qed.
 
-Lemma R_ap_alt_2 :
- forall x y : R_CSetoid,
- {e : F | Zero[<]e |
- {N : nat | forall m : nat, N <= m -> AbsBig e (CS_seq F x m[-]CS_seq F y m)}} ->
- x[#]y.
+Lemma R_ap_alt_2 : forall x y : R_CSetoid, {e : F | Zero [<] e |
+ {N : nat | forall m, N <= m -> AbsBig e (CS_seq F x m[-]CS_seq F y m)}} -> x [#] y.
 Proof.
  intros x y H.
  case H.
@@ -972,13 +937,13 @@ Proof.
  set (e4 := e [/]FourNZ) in *.
  set (e8 := e [/]EightNZ) in *.
  set (e16 := e [/]SixteenNZ) in *.
- assert (He2 : Zero[<]e2).
+ assert (He2 : Zero [<] e2).
   unfold e2 in |- *; apply pos_div_two; assumption.
- assert (He4 : Zero[<]e4).
+ assert (He4 : Zero [<] e4).
   unfold e4 in |- *; apply pos_div_four; assumption.
- assert (He8 : Zero[<]e8).
+ assert (He8 : Zero [<] e8).
   unfold e8 in |- *; apply pos_div_eight; assumption.
- assert (He16 : Zero[<]e16).
+ assert (He16 : Zero [<] e16).
   unfold e16 in |- *; apply pos_div_sixteen; assumption.
  case x; intros x_ px.
  case y; intros y_ py.
@@ -1003,7 +968,7 @@ Proof.
  simpl in |- *.
 
  assert (H5 : AbsBig e2 (x0[-]y0)).
-  assert (e2[<=]e).
+  assert (e2 [<=] e).
    unfold e2 in |- *; apply less_leEq; apply pos_div_two'; auto.
   split; auto.
   elim (H21 NN).
@@ -1021,43 +986,43 @@ Proof.
  assumption.
 
  intro m; intros.
- AStepl ([--]e8[+]e2[+][--]e8).
+ astepl ([--]e8[+]e2[+][--]e8).
  2: unfold e2, e8, e4 in |- *; rational.
- RStepr (x_ m[-]x0[+](x0[-]y0)[+](y0[-]y_ m)).
+ rstepr (x_ m[-]x0[+] (x0[-]y0) [+] (y0[-]y_ m)).
  apply plus_resp_leEq_both.
  apply plus_resp_leEq_both.
 
- AStepl ([--]e16[+][--]e16).
+ astepl ([--]e16[+][--]e16).
  2: unfold e16, e8 in |- *; rational.
- RStepr (x_ m[-]x_ N1[+](x_ N1[-]x0)).
+ rstepr (x_ m[-]x_ N1[+] (x_ N1[-]x0)).
  apply plus_resp_leEq_both.
 
  assert (H7 : AbsSmall e16 (x_ m[-]x_ N1)).
   apply H31; apply le_trans with NN; auto.
  elim H7; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  assert (H7 : AbsSmall e16 (x_ N1[-]x0)).
   apply AbsSmall_minus.
   unfold x0 in |- *; auto.
  elim H7; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  (* e *)
  assumption.
  (* e *)
 
- AStepl ([--]e16[+][--]e16).
+ astepl ([--]e16[+][--]e16).
  2: unfold e16, e8 in |- *; rational.
- RStepr (y0[-]y_ N2[+](y_ N2[-]y_ m)).
+ rstepr (y0[-]y_ N2[+] (y_ N2[-]y_ m)).
  apply plus_resp_leEq_both.
 
  assert (H7 : AbsSmall e16 (y0[-]y_ N2)).
   unfold y0 in |- *; auto.
  elim H7; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  assert (H7 : AbsSmall e16 (y_ N2[-]y_ m)).
@@ -1065,7 +1030,7 @@ Proof.
   apply H41.
   apply le_trans with NN; auto.
  elim H7; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  left.
@@ -1076,46 +1041,46 @@ Proof.
  assumption.
 
  intro m; intros.
- AStepl ([--]e8[+]e2[+][--]e8).
+ astepl ([--]e8[+]e2[+][--]e8).
  2: unfold e8, e2, e4 in |- *; rational.
- RStepr (y_ m[-]y0[+](y0[-]x0)[+](x0[-]x_ m)).
+ rstepr (y_ m[-]y0[+] (y0[-]x0) [+] (x0[-]x_ m)).
  apply plus_resp_leEq_both.
  apply plus_resp_leEq_both.
 
- AStepl ([--]e16[+][--]e16).
+ astepl ([--]e16[+][--]e16).
  2: unfold e16, e8 in |- *; rational.
- RStepr (y_ m[-]y_ N2[+](y_ N2[-]y0)).
+ rstepr (y_ m[-]y_ N2[+] (y_ N2[-]y0)).
  apply plus_resp_leEq_both.
 
  assert (H8 : AbsSmall e16 (y_ m[-]y_ N2)).
   apply H41.
   apply le_trans with NN; auto.
  elim H8; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  assert (H8 : AbsSmall e16 (y_ N2[-]y0)).
   apply AbsSmall_minus.
   unfold y0 in |- *; auto.
  elim H8; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  (* e *)
  apply inv_cancel_leEq.
- RStepl (x0[-]y0).
+ rstepl (x0[-]y0).
  assumption.
  (* e *)
 
- AStepl ([--]e16[+][--]e16).
+ astepl ([--]e16[+][--]e16).
  2: unfold e16, e8 in |- *; rational.
- RStepr (x0[-]x_ N1[+](x_ N1[-]x_ m)).
+ rstepr (x0[-]x_ N1[+] (x_ N1[-]x_ m)).
  apply plus_resp_leEq_both.
 
  assert (H8 : AbsSmall e16 (x0[-]x_ N1)).
   unfold x0 in |- *; auto.
  elim H8; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 
  assert (H8 : AbsSmall e16 (x_ N1[-]x_ m)).
@@ -1123,17 +1088,12 @@ Proof.
   apply H31.
   apply le_trans with NN; auto.
  elim H8; intros.
- RStepl ([--]e16).
+ rstepl ([--]e16).
  assumption.
 Qed.
 
-Lemma Eq_alt_2_1 :
- forall x y : R_Set,
- Not (R_ap x y) ->
- forall e : F,
- Zero[<]e ->
- {N : nat |
- forall m : nat, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}.
+Lemma Eq_alt_2_1 : forall x y : R_Set, Not (R_ap x y) -> forall e : F, Zero [<] e ->
+ {N : nat | forall m, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}.
 Proof.
  intros.
  apply Eq_alt_1.
@@ -1147,13 +1107,8 @@ Proof.
  assumption.
 Qed.
 
-Lemma Eq_alt_2_2 :
- forall x y : R_Set,
- (forall e : F,
-  Zero[<]e ->
-  {N : nat |
-  forall m : nat, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}) ->
- Not (R_ap x y).
+Lemma Eq_alt_2_2 : forall x y : R_Set, (forall e : F, Zero [<] e ->
+ {N : nat | forall m, N <= m -> AbsSmall e (CS_seq F x m[-]CS_seq F y m)}) -> Not (R_ap x y).
 Proof.
  intros x y.
  case x; intros x_ px.
@@ -1163,7 +1118,7 @@ Proof.
 
  assert
   (H1 :
-   {e : F | Zero[<]e |
+   {e : F | Zero [<] e |
    {N : nat | forall m : nat, N <= m -> AbsBig (Two[*]e) (x_ m[-]y_ m)}}).
   elim (R_ap_alt_1 _ _ H0).
   intros e H1 H2.
@@ -1171,7 +1126,7 @@ Proof.
    apply pos_div_two; assumption.
   elim H2; intros N HN.
   exists N. intros.
-  apply AbsBig_wd_lft with e; [ auto | rational ].
+  apply AbsBig_wdl with e; [ auto | rational ].
 
  case H1.
  intros e H2 H3.
@@ -1197,15 +1152,15 @@ Proof.
 
  apply H7.
  apply less_leEq_trans with (Two[*]e).
- AStepl (Zero[+]e).  RStepr (e[+]e).
+ astepl (Zero[+]e).  rstepr (e[+]e).
  apply plus_resp_less_rht; auto.
  assumption.
 
  apply H6.
- apply leEq_less_trans with ([--](Two[*]e)).
+ apply leEq_less_trans with ([--] (Two[*]e)).
  auto.
  apply inv_resp_less.
- AStepl (Zero[+]e); RStepr (e[+]e).
+ astepl (Zero[+]e); rstepr (e[+]e).
  apply plus_resp_less_rht; auto.
 Qed.
 

@@ -12,18 +12,18 @@ Let Sumx_wd_weird :
   forall n m : nat,
   m = S n ->
   forall (f : forall i : nat, i < n -> IR) (g : forall i : nat, i < m -> IR),
-  (forall H, g 0 H[=]Zero) ->
-  (forall (i : nat) H H', f i H[=]g (S i) H') -> Sumx f[=]Sumx g.
+  (forall H, g 0 H [=] Zero) ->
+  (forall (i : nat) H H', f i H [=] g (S i) H') -> Sumx f [=] Sumx g.
 intro; induction  n as [| n Hrecn].
 do 2 intro.
 rewrite H.
 intros; simpl in |- *; apply eq_symmetric_unfolded.
-AStepr (g 0 (lt_n_Sn 0)); Algebra.
+astepr (g 0 (lt_n_Sn 0)); Algebra.
 do 2 intro; rewrite H; intros.
-AStepl
- (Sumx (fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi))[+]f n (lt_n_Sn n)).
+astepl
+ (Sumx (fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) [+]f n (lt_n_Sn n)).
 Step_final
- (Sumx (fun (i : nat) (Hi : i < S n) => g i (lt_S _ _ Hi))[+]
+ (Sumx (fun (i : nat) (Hi : i < S n) => g i (lt_S _ _ Hi)) [+]
   g (S n) (lt_n_Sn (S n))).
 Qed.
 
@@ -32,17 +32,17 @@ Lemma Sumx_weird_lemma :
  l = S (m + n) ->
  forall (f1 : forall i : nat, i < n -> IR) (f2 : forall i : nat, i < m -> IR)
    (f3 : forall i : nat, i < l -> IR),
- nat_less_n_fun _ _ f1 ->
- nat_less_n_fun _ _ f2 ->
- nat_less_n_fun _ _ f3 ->
- (forall (i : nat) Hi Hi', f1 i Hi[=]f3 i Hi') ->
- (forall (i : nat) Hi Hi', f2 i Hi[=]f3 (S (n + i)) Hi') ->
- (forall Hi, f3 n Hi[=]Zero) -> Sumx f1[+]Sumx f2[=]Sumx f3.
+ nat_less_n_fun f1 ->
+ nat_less_n_fun f2 ->
+ nat_less_n_fun f3 ->
+ (forall (i : nat) Hi Hi', f1 i Hi [=] f3 i Hi') ->
+ (forall (i : nat) Hi Hi', f2 i Hi [=] f3 (S (n + i)) Hi') ->
+ (forall Hi, f3 n Hi [=] Zero) -> Sumx f1[+]Sumx f2 [=] Sumx f3.
 intros n m.
 induction  m as [| m Hrecm].
 intros l Hl.
 simpl in Hl; rewrite Hl; intros f1 f2 f3 Hf1 Hf2 Hf3 Hf1_f3 Hf2_f3 Hf3_f3.
-AStepl (Sumx f1[+]Zero).
+astepl (Sumx f1[+]Zero).
 simpl in |- *; apply bin_op_wd_unfolded.
 apply Sumx_wd; intros; apply Hf1_f3.
 apply eq_symmetric_unfolded; apply Hf3_f3.
@@ -52,11 +52,11 @@ rewrite Hl; intros f1 f2 f3 Hf1 Hf2 Hf3 Hf1_f3 Hf2_f3 Hf3_f3.
 apply
  eq_transitive_unfolded
   with
-    (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (lt_S _ _ Hi))[+]
+    (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (lt_S _ _ Hi)) [+]
      f2 m (lt_n_Sn m)).
 simpl in |- *; Algebra.
-AStepr
- (Sumx (fun (i : nat) (Hi : i < l') => f3 i (lt_S _ _ Hi))[+]
+astepr
+ (Sumx (fun (i : nat) (Hi : i < l') => f3 i (lt_S _ _ Hi)) [+]
   f3 l' (lt_n_Sn l')).
 apply bin_op_wd_unfolded.
 apply Hrecm.
@@ -82,22 +82,25 @@ Section Integral.
 
 (** *Integral
 
-Having proved the main properties of partitions and refinements, we will define the integral of a continuous function [F] in the interval $[a,b]$#[a,b]# as the limit of the sequence of Sums of $F$ for even partitions of increasing number of points.
+Having proved the main properties of partitions and refinements, we
+will define the integral of a continuous function [F] in the interval
+[[a,b]] as the limit of the sequence of Sums of $F$ for even
+partitions of increasing number of points.
 
-%\begin{convention}% All throughout, [a,b] will be real numbers, the interval $[a,b]$#[a,b]# will be denoted by [I] and [F,G] will be continuous functions in [I].
+%\begin{convention}% All throughout, [a,b] will be real numbers, the
+interval [[a,b]] will be denoted by [I] and [F,G] will be
+continuous functions in [I].
 %\end{convention}%
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
-(* end hide *)
 
 Variable F : PartIR.
 Hypothesis contF : Continuous_I Hab F.
 
-(* begin hide *)
 Let contF' := contin_prop _ _ _ _ contF.
 (* end hide *)
 
@@ -116,7 +119,7 @@ set
  (e' :=
   e[/] _[//]mult_resp_ap_zero _ _ _ (two_ap_zero _) (max_one_ap_zero (b[-]a)))
  in *.
-cut (Zero[<]e').
+cut (Zero [<] e').
 intro He'.
 set (d := proj1_sig2T _ _ _ (contF' e' He')) in *.
 generalize (proj2b_sig2T _ _ _ (contF' e' He'));
@@ -125,8 +128,8 @@ generalize (proj2b_sig2T _ _ _ (contF' e' He'));
 set (N := ProjT1 (Archimedes (b[-]a[/] _[//]pos_ap_zero _ _ H0))) in *.
 exists N; intros.
 apply AbsIR_imp_AbsSmall.
-apply leEq_transitive with (Two[*]e'[*](b[-]a)).
-RStepr (e'[*](b[-]a)[+]e'[*](b[-]a)).
+apply leEq_transitive with (Two[*]e'[*] (b[-]a)).
+rstepr (e'[*] (b[-]a) [+]e'[*] (b[-]a)).
 unfold integral_seq in |- *.
 elim (even_partition_refinement _ _ Hab _ _ (O_S m) (O_S N)).
 intros w Hw.
@@ -164,7 +167,7 @@ apply leEq_transitive with (nring (R:=IR) N).
 exact (ProjT2 (Archimedes (b[-]a[/] d[//]pos_ap_zero _ _ H0))).
 apply nring_leEq; apply le_n_Sn.
 unfold e' in |- *.
-RStepl (e[*](b[-]a)[/] _[//]max_one_ap_zero (b[-]a)).
+rstepl (e[*] (b[-]a) [/] _[//]max_one_ap_zero (b[-]a)).
 apply shift_div_leEq.
 apply pos_max_one.
 apply mult_resp_leEq_lft.
@@ -185,9 +188,13 @@ End Darboux_Sum.
 Section Integral_Thm.
 
 (**
-The following shows that in fact the integral of [F] is the limit of any sequence of partitions of mesh converging to 0.
+The following shows that in fact the integral of [F] is the limit of
+any sequence of partitions of mesh converging to 0.
 
-%\begin{convention}% Let [e] be a positive real number and [P] be a partition of [I] with \verb!n! points and mesh smaller than the modulus of continuity of [F] for [e].  Let [fP] be a choice of points respecting [P].
+%\begin{convention}% Let [e] be a positive real number and [P] be a
+partition of [I] with [n] points and mesh smaller than the
+modulus of continuity of [F] for [e].  Let [fP] be a choice of points
+respecting [P].
 %\end{convention}%
 *)
 
@@ -196,33 +203,32 @@ Variable n : nat.
 Variable P : Partition Hab n.
 
 Variable e : IR.
-Hypothesis He : Zero[<]e.
+Hypothesis He : Zero [<] e.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
 (* end hide *)
 
-Hypothesis HmeshP : Mesh P[<]d.
+Hypothesis HmeshP : Mesh P [<] d.
 
 Variable fP : forall i : nat, i < n -> IR.
 Hypothesis HfP : Points_in_Partition P fP.
-Hypothesis HfP' : nat_less_n_fun _ _ fP.
+Hypothesis HfP' : nat_less_n_fun fP.
 
 Hypothesis incF : included (Compact Hab) (Dom F).
 
-Lemma partition_Sum_conv_integral :
- AbsIR (Partition_Sum HfP incF[-]integral)[<=]e[*](b[-]a).
+Lemma partition_Sum_conv_integral : AbsIR (Partition_Sum HfP incF[-]integral) [<=] e[*] (b[-]a).
 apply
  leEq_wdl
-  with (AbsIR (Partition_Sum HfP (contin_imp_inc _ _ _ _ contF)[-]integral)).
+  with (AbsIR (Partition_Sum HfP (contin_imp_inc _ _ _ _ contF) [-]integral)).
 apply
  leEq_wdl
   with
     (AbsIR
-       (Lim (Cauchy_const (Partition_Sum HfP (contin_imp_inc _ _ _ _ contF)))[-]
+       (Lim (Cauchy_const (Partition_Sum HfP (contin_imp_inc _ _ _ _ contF))) [-]
         integral)).
 2: apply AbsIR_wd; apply cg_minus_wd;
-    [ apply eq_symmetric_unfolded; apply Lim_const | Algebra ].
+   [ apply eq_symmetric_unfolded; apply Lim_const | Algebra ].
 unfold integral in |- *.
 apply
  leEq_wdl
@@ -237,12 +243,12 @@ apply
 2: apply AbsIR_wd; apply Lim_minus.
 eapply leEq_wdl.
 2: apply Lim_abs.
-AStepr (Zero[+]e[*](b[-]a)); apply shift_leEq_plus; red in |- *;
+astepr (Zero[+]e[*] (b[-]a)); apply shift_leEq_plus; red in |- *;
  apply approach_zero_weak.
 intros e' He'.
 set (ee := e'[/] _[//]max_one_ap_zero (b[-]a)) in *.
-apply leEq_transitive with (ee[*](b[-]a)).
-cut (Zero[<]ee).
+apply leEq_transitive with (ee[*] (b[-]a)).
+cut (Zero [<] ee).
 intro Hee.
 set (d' := proj1_sig2T _ _ _ (contF' _ Hee)) in *.
 generalize (proj2b_sig2T _ _ _ (contF' _ Hee));
@@ -274,12 +280,12 @@ unfold ee in |- *; apply div_resp_pos.
 apply pos_max_one.
 assumption.
 unfold ee in |- *.
-RStepl (e'[*](b[-]a[/] _[//]max_one_ap_zero (b[-]a))).
-RStepr (e'[*]One).
+rstepl (e'[*] (b[-]a[/] _[//]max_one_ap_zero (b[-]a))).
+rstepr (e'[*]One).
 apply mult_resp_leEq_lft.
 apply shift_div_leEq.
 apply pos_max_one.
-AStepr (Max (b[-]a) One); apply lft_leEq_Max.
+astepr (Max (b[-]a) One); apply lft_leEq_Max.
 apply less_leEq; assumption.
 apply AbsIR_wd; apply cg_minus_wd.
 unfold Partition_Sum in |- *.
@@ -299,12 +305,12 @@ The usual extensionality and strong extensionality results hold.
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
 
-Notation Integral := (integral _ _ Hab _).
+Notation Integral := (integral _ _ Hab).
 
 Section Well_Definedness.
 
@@ -312,9 +318,8 @@ Variables F G : PartIR.
 Hypothesis contF : Continuous_I Hab F.
 Hypothesis contG : Continuous_I Hab G.
 
-Lemma integral_strext :
- Integral contF[#]Integral contG ->
- {x : IR | I x | forall Hx Hx', F x Hx[#]G x Hx'}.
+Lemma integral_strext : Integral F contF [#] Integral G contG ->
+ {x : IR | I x | forall Hx Hx', F x Hx [#] G x Hx'}.
 intro H.
 unfold integral in H.
 elim (Lim_ap_imp_seq_ap' _ _ H); intros N HN; clear H.
@@ -325,7 +330,7 @@ set
   fun (i : nat) (H : i < S N) =>
   Part F _
     (contin_imp_inc _ _ _ _ contF _
-       (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H)))[*]
+       (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
   (Even_Partition Hab _ (O_S N) _ H[-]
    Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) 
  in *.
@@ -334,29 +339,29 @@ set
   fun (i : nat) (H : i < S N) =>
   Part G _
     (contin_imp_inc _ _ _ _ contG _
-       (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H)))[*]
+       (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
   (Even_Partition Hab _ (O_S N) _ H[-]
    Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) 
  in *.
-cut (nat_less_n_fun _ _ f'); intros.
-cut (nat_less_n_fun _ _ g'); intros.
-cut (Sumx f'[#]Sumx g'). intros H1.
+cut (nat_less_n_fun f'); intros.
+cut (nat_less_n_fun g'); intros.
+cut (Sumx f' [#] Sumx g'). intros H1.
 elim (Sumx_strext _ _ _ _ H H0 H1).
 intros n Hn.
 elim Hn; clear Hn; intros Hn H'.
-exists (a[+]nring n[*](b[-]a[/] nring _[//]nring_ap_zero' _ _ (O_S N))).
+exists (a[+]nring n[*] (b[-]a[/] nring _[//]nring_ap_zero' _ _ (O_S N))).
 unfold I in |- *; apply compact_partition_lemma; auto.
 apply lt_le_weak; assumption.
 intros.
 elim (bin_op_strext_unfolded _ _ _ _ _ _ H'); clear H'; intro.
-eapply ap_well_def_lft_unfolded.
-eapply ap_well_def_rht_unfolded.
+eapply ap_wdl_unfolded.
+eapply ap_wdr_unfolded.
 apply a0.
 Algebra.
 Algebra.
 elimtype False; generalize b0; exact (ap_irreflexive_unfolded _ _).
-eapply ap_well_def_lft_unfolded.
-eapply ap_well_def_rht_unfolded.
+eapply ap_wdl_unfolded.
+eapply ap_wdr_unfolded.
 apply HN.
 unfold g', Partition_imp_points in |- *; apply Sumx_wd; intros; simpl in |- *;
  rational.
@@ -368,9 +373,8 @@ do 3 intro.
 rewrite H; unfold f' in |- *; intros; Algebra.
 Qed.
 
-Lemma integral_strext' :
- forall c d Hcd HF1 HF2,
- integral a b Hab F HF1[#]integral c d Hcd F HF2 -> a[#]c or b[#]d.
+Lemma integral_strext' : forall c d Hcd HF1 HF2,
+ integral a b Hab F HF1 [#] integral c d Hcd F HF2 -> a [#] c or b [#] d.
 intros c d Hcd HF1 HF2 H.
 clear contF contG.
 unfold integral in H.
@@ -385,7 +389,7 @@ set
     (contin_imp_inc _ _ _ _ HF1 _
        (Pts_part_lemma _ _ _ _ _ _
           (Partition_imp_points_1 _ _ _ _ (Even_Partition Hab _ (O_S N))) i
-          Hi))[*]
+          Hi)) [*]
   (Even_Partition Hab _ (O_S N) _ Hi[-]
    Even_Partition Hab _ (O_S N) _ (lt_le_weak _ _ Hi))) 
  in *.
@@ -396,12 +400,12 @@ set
     (contin_imp_inc _ _ _ _ HF2 _
        (Pts_part_lemma _ _ _ _ _ _
           (Partition_imp_points_1 _ _ _ _ (Even_Partition Hcd _ (O_S N))) i
-          Hi))[*]
+          Hi)) [*]
   (Even_Partition Hcd _ (O_S N) _ Hi[-]
    Even_Partition Hcd _ (O_S N) _ (lt_le_weak _ _ Hi))) 
  in *.
-cut (nat_less_n_fun _ _ f1); intros.
-cut (nat_less_n_fun _ _ f2); intros.
+cut (nat_less_n_fun f1); intros.
+cut (nat_less_n_fun f2); intros.
 elim (Sumx_strext _ _ _ _ H H0 HN).
 clear H0 H HN; intros i Hi.
 elim Hi; clear Hi; intros Hi Hi'.
@@ -413,7 +417,7 @@ elim (bin_op_strext_unfolded _ _ _ _ _ _ H); clear H; intro.
 left; auto.
 elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
 elimtype False; generalize a0; apply ap_irreflexive_unfolded.
-elim (div_strong_ext _ _ _ _ _ _ _ b0); clear b0; intro.
+elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
 elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
 right; auto.
 left; auto.
@@ -424,7 +428,7 @@ elim (bin_op_strext_unfolded _ _ _ _ _ _ a0); clear a0; intro.
 left; auto.
 elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
 elimtype False; generalize a0; apply ap_irreflexive_unfolded.
-elim (div_strong_ext _ _ _ _ _ _ _ b0); clear b0; intro.
+elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
 elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
 right; auto.
 left; auto.
@@ -433,7 +437,7 @@ elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
 left; auto.
 elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
 elimtype False; generalize a0; apply ap_irreflexive_unfolded.
-elim (div_strong_ext _ _ _ _ _ _ _ b0); clear b0; intro.
+elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
 elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
 right; auto.
 left; auto.
@@ -452,7 +456,7 @@ unfold f1 in |- *.
 Algebra.
 Qed.
 
-Lemma integral_wd : Feq (Compact Hab) F G -> Integral contF[=]Integral contG.
+Lemma integral_wd : Feq (Compact Hab) F G -> Integral F contF [=] Integral G contG.
 intro H.
 apply not_ap_imp_eq.
 intro H0.
@@ -466,9 +470,8 @@ apply eq_imp_not_ap.
 auto.
 Qed.
 
-Lemma integral_wd' :
- forall a' b' Hab' contF',
- a[=]a' -> b[=]b' -> Integral contF[=]integral a' b' Hab' F contF'.
+Lemma integral_wd' : forall a' b' Hab' contF',
+ a [=] a' -> b [=] b' -> Integral F contF [=] integral a' b' Hab' F contF'.
 intros.
 unfold integral in |- *.
 apply Lim_wd'.
@@ -491,10 +494,10 @@ Section Linearity_and_Monotonicity.
 Opaque Even_Partition.
 
 (**
-The integral is a linear and monotonous function; in order to prove these facts we also need the important equalities $\int_a^bdx=b-a$#???# and $\int_a^af(x)dx=0$#???#.
+The integral is a linear and monotonous function; in order to prove these facts we also need the important equalities $\int_a^bdx=b-a$#&int;<sub>a</sub><sup>b</sup>dx=b-a# and $\int_a^af(x)dx=0$#&int;<sub>a</sub><sup>a</sup>=0#.
 *)
 
-Lemma integral_one : forall H : Continuous_I Hab [-C-]One, Integral H[=]b[-]a.
+Lemma integral_one : forall H, Integral ( [-C-] One) H [=] b[-]a.
 intro.
 unfold integral in |- *.
 eapply eq_transitive_unfolded.
@@ -513,11 +516,13 @@ intros; simpl in |- *; rational.
 apply cg_minus_wd; [ apply finish | apply start ].
 Qed.
 
-Lemma integral_comm_scal :
- forall (c : IR) (F : PartIR) (Hf : Continuous_I Hab F)
-   (Hf' : Continuous_I Hab (c{**}F)), Integral Hf'[=]c[*]Integral Hf.
+Variables F G : PartIR.
+Hypothesis contF : Continuous_I Hab F.
+Hypothesis contG : Continuous_I Hab G.
+
+Lemma integral_comm_scal : forall (c : IR) Hf', Integral (c{**}F) Hf' [=] c[*]Integral F contF.
 intros.
-apply eq_transitive_unfolded with (Lim (Cauchy_const c)[*]Integral Hf);
+apply eq_transitive_unfolded with (Lim (Cauchy_const c) [*]Integral F contF);
  unfold integral in |- *.
 eapply eq_transitive_unfolded.
 2: apply Lim_mult.
@@ -526,13 +531,11 @@ unfold integral_seq, Even_Partition_Sum, Partition_Sum in |- *.
 eapply eq_transitive_unfolded.
 2: apply Sumx_comm_scal'.
 apply Sumx_wd; intros; simpl in |- *; rational.
-apply mult_wd_lft.
+apply mult_wdl.
 apply eq_symmetric_unfolded; apply Lim_const.
 Qed.
 
-Lemma integral_plus :
- forall (F G : PartIR) (Hf : Continuous_I Hab F) (Hg : Continuous_I Hab G)
-   (Hfg : Continuous_I Hab (F{+}G)), Integral Hfg[=]Integral Hf[+]Integral Hg.
+Lemma integral_plus : forall Hfg, Integral (F{+}G) Hfg [=] Integral F contF[+]Integral G contG.
 intros.
 unfold integral in |- *.
 eapply eq_transitive_unfolded.
@@ -544,13 +547,9 @@ eapply eq_transitive_unfolded.
 apply Sumx_wd; intros; simpl in |- *; rational.
 Qed.
 
-Variables F G : PartIR.
-Hypothesis contF : Continuous_I Hab F.
-Hypothesis contG : Continuous_I Hab G.
-
 Transparent Even_Partition.
 
-Lemma integral_empty : a[=]b -> Integral contF[=]Zero.
+Lemma integral_empty : a [=] b -> Integral F contF [=] Zero.
 intros.
 unfold integral in |- *.
 eapply eq_transitive_unfolded.
@@ -564,19 +563,28 @@ apply Sumx_wd; intros; simpl in |- *.
 eapply eq_transitive_unfolded.
 apply dist_2a.
 apply x_minus_x.
-apply mult_wd_rht.
+apply mult_wdr.
 apply bin_op_wd_unfolded.
 Algebra.
-AStepl (nring (S i)[*](b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
-AStepr (nring i[*](b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
+astepl (nring (S i) [*] (b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
+astepr (nring i[*] (b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
 rational.
 eapply eq_transitive_unfolded.
 apply sumx_const.
 Algebra.
 Qed.
 
+End Linearity_and_Monotonicity.
+
+Section Linearity_and_Monotonicity'.
+
+Variables F G : PartIR.
+Hypothesis contF : Continuous_I Hab F.
+Hypothesis contG : Continuous_I Hab G.
+
 (**
-%\begin{convention}% Let [alpha,beta:IR] and assume that [h:=alpha{**}F{+}beta{**}G] is continuous.
+%\begin{convention}% Let [alpha, beta : IR] and assume that
+[h := alpha{**}F{+}beta{**}G] is continuous.
 %\end{convention}%
 *)
 
@@ -586,19 +594,17 @@ Let h := alpha{**}F{+}beta{**}G.
 (* end hide *)
 Hypothesis contH : Continuous_I Hab h.
 
-Lemma linear_integral :
- Integral contH[=]alpha[*]Integral contF[+]beta[*]Integral contG.
+Lemma linear_integral : Integral h contH [=] alpha[*]Integral F contF[+]beta[*]Integral G contG.
 assert (H : Continuous_I Hab (alpha{**}F)). Contin.
 assert (H0 : Continuous_I Hab (beta{**}G)). Contin.
-apply eq_transitive_unfolded with (Integral H[+]Integral H0).
+apply eq_transitive_unfolded with (Integral _ H[+]Integral _ H0).
 unfold h in |- *.
 apply integral_plus.
 apply bin_op_wd_unfolded; apply integral_comm_scal.
 Qed.
 
-Lemma monotonous_integral :
- (forall x : IR, I x -> forall Hx Hx', F x Hx[<=]G x Hx') ->
- Integral contF[<=]Integral contG.
+Lemma monotonous_integral : (forall x, I x -> forall Hx Hx', F x Hx [<=] G x Hx') ->
+ Integral F contF [<=] Integral G contG.
 intros.
 unfold integral in |- *.
 apply Lim_leEq_Lim.
@@ -617,7 +623,7 @@ Qed.
 
 Transparent nring.
 
-End Linearity_and_Monotonicity.
+End Linearity_and_Monotonicity'.
 
 Section Corollaries.
 
@@ -629,35 +635,31 @@ Hypothesis contG : Continuous_I Hab G.
 As corollaries we can calculate integrals of group operations applied to functions.
 *)
 
-Lemma integral_const :
- forall (c : IR) (H : Continuous_I Hab [-C-]c), Integral H[=]c[*](b[-]a).
+Lemma integral_const : forall c H, Integral ( [-C-]c)H [=] c[*] (b[-]a).
 intros.
 assert (H0 : Continuous_I Hab (c{**}[-C-]One)). Contin.
-apply eq_transitive_unfolded with (Integral H0).
+apply eq_transitive_unfolded with (Integral _ H0).
 apply integral_wd; FEQ.
 eapply eq_transitive_unfolded.
-apply integral_comm_scal with (Hf := Continuous_I_const a b Hab One).
-apply mult_wd_rht.
+apply integral_comm_scal with (contF := Continuous_I_const a b Hab One).
+apply mult_wdr.
 apply integral_one.
 Qed.
 
-Lemma integral_minus :
- forall H : Continuous_I Hab (F{-}G),
- Integral H[=]Integral contF[-]Integral contG.
+Lemma integral_minus : forall H, Integral (F{-}G) H [=] Integral F contF[-]Integral G contG.
 intro.
 assert (H0 : Continuous_I Hab (One{**}F{+}[--]One{**}G)). Contin.
-apply eq_transitive_unfolded with (Integral H0).
+apply eq_transitive_unfolded with (Integral _ H0).
 apply integral_wd; FEQ.
 eapply eq_transitive_unfolded.
 apply linear_integral with (contF := contF) (contG := contG).
 rational.
 Qed.
 
-Lemma integral_inv :
- forall H : Continuous_I Hab {--}F, Integral H[=][--](Integral contF).
+Lemma integral_inv : forall H, Integral ( {--}F) H [=] [--] (Integral F contF).
 intro.
 assert (H0 : Continuous_I Hab (Zero{**}F{+}[--]One{**}F)). Contin.
-apply eq_transitive_unfolded with (Integral H0).
+apply eq_transitive_unfolded with (Integral _ H0).
 apply integral_wd; FEQ.
 eapply eq_transitive_unfolded.
 apply linear_integral with (contF := contF) (contG := contF).
@@ -668,41 +670,34 @@ Qed.
 We can also bound integrals by bounding the integrated functions.
 *)
 
-Lemma lb_integral :
- forall c : IR,
- (forall x : IR, I x -> forall Hx, c[<=]F x Hx) ->
- c[*](b[-]a)[<=]Integral contF.
+Lemma lb_integral : forall c, (forall x, I x -> forall Hx, c [<=] F x Hx) -> c[*] (b[-]a) [<=] Integral F contF.
 intros.
-apply leEq_wdl with (Integral (Continuous_I_const a b Hab c)).
+apply leEq_wdl with (Integral _ (Continuous_I_const a b Hab c)).
 2: apply integral_const.
 apply monotonous_integral.
 simpl in |- *; auto.
 Qed.
 
-Lemma ub_integral :
- forall c : IR,
- (forall x : IR, I x -> forall Hx, F x Hx[<=]c) ->
- Integral contF[<=]c[*](b[-]a).
+Lemma ub_integral : forall c, (forall x, I x -> forall Hx, F x Hx [<=] c) -> Integral F contF [<=] c[*] (b[-]a).
 intros.
-apply leEq_wdr with (Integral (Continuous_I_const a b Hab c)).
+apply leEq_wdr with (Integral _ (Continuous_I_const a b Hab c)).
 2: apply integral_const.
 apply monotonous_integral.
 simpl in |- *; auto.
 Qed.
 
-Lemma integral_leEq_norm :
- AbsIR (Integral contF)[<=]Norm_Funct contF[*](b[-]a).
+Lemma integral_leEq_norm : AbsIR (Integral F contF) [<=] Norm_Funct contF[*] (b[-]a).
 simpl in |- *; unfold ABSIR in |- *.
 apply Max_leEq.
 apply ub_integral.
 intros; eapply leEq_transitive.
 apply leEq_AbsIR.
 unfold I in |- *; apply norm_bnd_AbsIR; assumption.
-AStepr ([--][--](Norm_Funct contF[*](b[-]a))).
-AStepr ([--]([--](Norm_Funct contF)[*](b[-]a))).
+astepr ( [--][--] (Norm_Funct contF[*] (b[-]a))).
+astepr ( [--] ( [--] (Norm_Funct contF) [*] (b[-]a))).
 apply inv_resp_leEq.
 apply lb_integral.
-intros; AStepr ([--][--](Part F x Hx)).
+intros; astepr ( [--][--] (Part F x Hx)).
 apply inv_resp_leEq.
 eapply leEq_transitive.
 apply inv_leEq_AbsIR.
@@ -714,9 +709,11 @@ End Corollaries.
 Section Integral_Sum.
 
 (**
-We now relate the sum of integrals in adjoining intervals to the integral over the union of those intervals.
+We now relate the sum of integrals in adjoining intervals to the
+integral over the union of those intervals.
 
-%\begin{convention}% Let [c] be a real number such that $c\in[a,b]$#c&in;[a,b]#.
+%\begin{convention}% Let [c] be a real number such that
+$c\in[a,b]$#c&isin;[a,b]#.
 %\end{convention}%
 *)
 
@@ -724,8 +721,8 @@ Variable F : PartIR.
 
 Variable c : IR.
 
-Hypothesis Hac : a[<=]c.
-Hypothesis Hcb : c[<=]b.
+Hypothesis Hac : a [<=] c.
+Hypothesis Hcb : c [<=] b.
 
 Hypothesis Hab' : Continuous_I Hab F.
 Hypothesis Hac' : Continuous_I Hac F.
@@ -734,9 +731,14 @@ Hypothesis Hcb' : Continuous_I Hcb F.
 Section Partition_Join.
 
 (**
-We first prove that every pair of partitions, one of $[a,c]$#[a,c]# and another of $[c,b]$#[c,b]# defines a partition of $[a,b]$#[a,b]# the mesh of which is less or equal to the maximum of the mesh of the original partitions (actually it is equal, but we don't need the other inequality).
+We first prove that every pair of partitions, one of [[a,c]]
+and another of [[c,b]] defines a partition of [[a,b]] the mesh
+of which is less or equal to the maximum of the mesh of the original
+partitions (actually it is equal, but we don't need the other
+inequality).
 
-%\begin{convention}% Let [P,Q] be partitions respectively of $[a,c]$#[a,c]# and $[c,b]$#[c,b]# with [n] and [m] points.
+%\begin{convention}% Let [P,Q] be partitions respectively of
+[[a,c]] and [[c,b]] with [n] and [m] points.
 %\end{convention}%
 *)
 
@@ -744,12 +746,13 @@ Variables n m : nat.
 Variable P : Partition Hac n.
 Variable Q : Partition Hcb m.
 
-Lemma partition_join_aux :
- forall i n m : nat, n < i -> i <= S (n + m) -> i - S n <= m.
+(* begin hide *)
+Lemma partition_join_aux : forall i n m, n < i -> i <= S (n + m) -> i - S n <= m.
 intros; omega.
 Qed.
+(* end hide *)
 
-Definition partition_join_fun : forall i : nat, i <= S (n + m) -> IR.
+Definition partition_join_fun : forall i, i <= S (n + m) -> IR.
 intros.
 elim (le_lt_dec i n); intros.
 apply (P i a0).
@@ -758,14 +761,14 @@ apply (Q _ H0).
 Defined.
 
 (* begin hide *)
-Lemma pjf_1 : forall (i : nat) Hi Hi', partition_join_fun i Hi[=]P i Hi'.
+Lemma pjf_1 : forall (i : nat) Hi Hi', partition_join_fun i Hi [=] P i Hi'.
 intros; unfold partition_join_fun in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 apply prf1; auto.
 elimtype False; apply le_not_lt with i n; auto.
 Qed.
 
-Lemma pjf_2 : forall (i : nat) Hi, i = n -> partition_join_fun i Hi[=]c.
+Lemma pjf_2 : forall (i : nat) Hi, i = n -> partition_join_fun i Hi [=] c.
 intros; unfold partition_join_fun in |- *.
 generalize Hi; clear Hi.
 rewrite H; clear H; intro.
@@ -774,20 +777,19 @@ apply finish.
 elimtype False; apply lt_irrefl with n; auto.
 Qed.
 
-Lemma pjf_2' : forall (i : nat) Hi, i = S n -> partition_join_fun i Hi[=]c.
+Lemma pjf_2' : forall (i : nat) Hi, i = S n -> partition_join_fun i Hi [=] c.
 intros; unfold partition_join_fun in |- *.
 generalize Hi; clear Hi.
 rewrite H; clear H; intro.
 elim le_lt_dec; intro; simpl in |- *.
 elimtype False; apply (le_Sn_n _ a0).
-cut (forall H, Q (n - n) H[=]c); auto.
+cut (forall H, Q (n - n) H [=] c); auto.
 cut (n - n = 0); [ intro | auto with arith ].
 rewrite H; intros; apply start.
 Qed.
 
-Lemma pjf_3 :
- forall (i j : nat) Hi Hj,
- n < i -> j = i - S n -> partition_join_fun i Hi[=]Q j Hj.
+Lemma pjf_3 : forall (i j : nat) Hi Hj,
+ n < i -> j = i - S n -> partition_join_fun i Hi [=] Q j Hj.
 intros; unfold partition_join_fun in |- *.
 generalize Hj; rewrite H0; clear Hj; intros.
 elim le_lt_dec; intro; simpl in |- *.
@@ -795,9 +797,8 @@ elimtype False; apply le_not_lt with i n; auto.
 apply prf1; auto.
 Qed.
 
-Lemma partition_join_prf1 :
- forall i j : nat,
- i = j -> forall Hi Hj, partition_join_fun i Hi[=]partition_join_fun j Hj.
+Lemma partition_join_prf1 : forall i j : nat,
+ i = j -> forall Hi Hj, partition_join_fun i Hi [=] partition_join_fun j Hj.
 intros.
 unfold partition_join_fun in |- *.
 elim (le_lt_dec i n); elim (le_lt_dec j n); intros; simpl in |- *.
@@ -811,14 +812,14 @@ rewrite <- H; assumption.
 apply prf1; auto.
 Qed.
 
-Lemma partition_join_prf2 :
- forall (i : nat) H H', partition_join_fun i H[<=]partition_join_fun (S i) H'.
+Lemma partition_join_prf2 : forall (i : nat) H H',
+ partition_join_fun i H [<=] partition_join_fun (S i) H'.
 intros.
 unfold partition_join_fun in |- *.
 elim (le_lt_dec i n); elim (le_lt_dec (S i) n); intros; simpl in |- *.
 apply prf2.
 cut (n = i); [ intro | apply le_antisym; auto with arith ].
-change (P i a0[<=]Q (S i - S n) (partition_join_aux _ _ _ b0 H')) in |- *.
+change (P i a0 [<=] Q (S i - S n) (partition_join_aux _ _ _ b0 H')) in |- *.
 generalize H' a0 b0; clear H' a0 b0.
 rewrite <- H0; intros.
 apply eq_imp_leEq.
@@ -835,7 +836,7 @@ apply prf2.
 apply prf1; auto.
 Qed.
 
-Lemma partition_join_start : forall H, partition_join_fun 0 H[=]a.
+Lemma partition_join_start : forall H, partition_join_fun 0 H [=] a.
 intro.
 unfold partition_join_fun in |- *.
 elim (le_lt_dec 0 n); intro; simpl in |- *.
@@ -843,7 +844,7 @@ apply start.
 elimtype False; apply (lt_n_O _ b0).
 Qed.
 
-Lemma partition_join_finish : forall H, partition_join_fun (S (n + m)) H[=]b.
+Lemma partition_join_finish : forall H, partition_join_fun (S (n + m)) H [=] b.
 intro.
 unfold partition_join_fun in |- *.
 elim le_lt_dec; intro; simpl in |- *.
@@ -865,26 +866,25 @@ Defined.
 (* end hide *)
 
 (**
-%\begin{convention}% [fP,fQ] are choices of points respecting [P] and [Q].
+%\begin{convention}% [fP, fQ] are choices of points respecting [P] and [Q].
 %\end{convention}%
 *)
 
 Variable fP : forall i : nat, i < n -> IR.
 Hypothesis HfP : Points_in_Partition P fP.
-Hypothesis HfP' : nat_less_n_fun _ _ fP.
+Hypothesis HfP' : nat_less_n_fun fP.
 
 Variable fQ : forall i : nat, i < m -> IR.
 Hypothesis HfQ : Points_in_Partition Q fQ.
-Hypothesis HfQ' : nat_less_n_fun _ _ fQ.
+Hypothesis HfQ' : nat_less_n_fun fQ.
 
 (* begin hide *)
-Lemma partition_join_aux' :
- forall i n m : nat, n < i -> i < S (n + m) -> i - S n < m.
+Lemma partition_join_aux' : forall i n m, n < i -> i < S (n + m) -> i - S n < m.
 intros; omega.
 Qed.
 (* end hide *)
 
-Definition partition_join_pts : forall i : nat, i < S (n + m) -> IR.
+Definition partition_join_pts : forall i, i < S (n + m) -> IR.
 intros.
 elim (le_lt_dec i n); intros.
 elim (le_lt_eq_dec _ _ a0); intro.
@@ -895,7 +895,7 @@ apply (fQ _ H0).
 Defined.
 
 (* begin hide *)
-Let pjp_1 : forall (i : nat) Hi Hi', partition_join_pts i Hi[=]fP i Hi'.
+Lemma pjp_1 : forall (i : nat) Hi Hi', partition_join_pts i Hi [=] fP i Hi'.
 intros; unfold partition_join_pts in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 elim le_lt_eq_dec; intro; simpl in |- *.
@@ -904,7 +904,7 @@ elimtype False; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
 elimtype False; apply le_not_lt with i n; auto with arith.
 Qed.
 
-Let pjp_2 : forall (i : nat) Hi, i = n -> partition_join_pts i Hi[=]c.
+Lemma pjp_2 : forall (i : nat) Hi, i = n -> partition_join_pts i Hi [=] c.
 intros; unfold partition_join_pts in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 elim le_lt_eq_dec; intro; simpl in |- *.
@@ -913,21 +913,20 @@ Algebra.
 elimtype False; rewrite H in b0; apply (lt_irrefl _ b0).
 Qed.
 
-Let pjp_3 :
-  forall (i : nat) Hi Hi',
-  n < i -> partition_join_pts i Hi[=]fQ (i - S n) Hi'.
+Lemma pjp_3 : forall (i : nat) Hi Hi',
+  n < i -> partition_join_pts i Hi [=] fQ (i - S n) Hi'.
 intros; unfold partition_join_pts in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 elimtype False; apply le_not_lt with i n; auto.
-cut (fQ _ (partition_join_aux' _ _ _ b0 Hi)[=]fQ _ Hi').
+cut (fQ _ (partition_join_aux' _ _ _ b0 Hi) [=] fQ _ Hi').
 2: apply HfQ'; auto.
 Algebra.
 Qed.
 (* end hide *)
 
-Lemma partition_join_Pts_in_partition :
- Points_in_Partition partition_join partition_join_pts.
+Lemma partition_join_Pts_in_partition : Points_in_Partition partition_join partition_join_pts.
 red in |- *; intros.
+rename Hi into H.
 cut
  (forall H',
   compact (partition_join i (lt_le_weak _ _ H)) (partition_join (S i) H) H'
@@ -954,7 +953,7 @@ apply compact_wd with c.
 split.
 apply eq_imp_leEq; apply finish.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
-cut (forall H, Q (n - n) H[=]c); auto.
+cut (forall H, Q (n - n) H [=] c); auto.
 cut (n - n = 0); [ intro | auto with arith ].
 rewrite H1; intros; apply start.
 elimtype False; apply le_not_lt with n i; auto with arith.
@@ -970,9 +969,8 @@ apply b2.
 apply prf1; rewrite minus_Sn_m; auto with arith.
 Qed.
 
-Lemma partition_join_Pts_wd :
- forall i j : nat,
- i = j -> forall Hi Hj, partition_join_pts i Hi[=]partition_join_pts j Hj.
+Lemma partition_join_Pts_wd : forall i j,
+ i = j -> forall Hi Hj, partition_join_pts i Hi [=] partition_join_pts j Hj.
 intros.
 elim (le_lt_dec i n); intro.
 elim (le_lt_eq_dec _ _ a0); intro.
@@ -999,8 +997,7 @@ apply HfQ'; auto.
 Qed.
 
 Lemma partition_join_Sum_lemma :
- Partition_Sum HfP (contin_imp_inc _ _ _ _ Hac')[+]
- Partition_Sum HfQ (contin_imp_inc _ _ _ _ Hcb')[=]
+ Partition_Sum HfP (contin_imp_inc _ _ _ _ Hac') [+] Partition_Sum HfQ (contin_imp_inc _ _ _ _ Hcb') [=] 
  Partition_Sum partition_join_Pts_in_partition (contin_imp_inc _ _ _ _ Hab').
 unfold Partition_Sum in |- *; apply Sumx_weird_lemma.
 auto with arith.
@@ -1047,7 +1044,7 @@ auto with arith.
 Transparent minus.
 apply prf1; transitivity (n + i - n); auto with arith.
 intro; apply x_mult_zero.
-AStepr (partition_join _ Hi[-]partition_join _ Hi).
+astepr (partition_join _ Hi[-]partition_join _ Hi).
 apply cg_minus_wd.
 Algebra.
 unfold partition_join in |- *; simpl in |- *.
@@ -1062,7 +1059,7 @@ apply prf1; auto with arith.
 apply start.
 Qed.
 
-Lemma partition_join_mesh : Mesh partition_join[<=]Max (Mesh P) (Mesh Q).
+Lemma partition_join_mesh : Mesh partition_join [<=] Max (Mesh P) (Mesh Q).
 unfold Mesh at 1 in |- *.
 apply maxlist_leEq.
 apply length_Part_Mesh_List.
@@ -1089,16 +1086,16 @@ apply leEq_wdl with ZeroR.
 eapply leEq_transitive.
 2: apply lft_leEq_Max.
 apply Mesh_nonneg.
-AStepl (c[-]c).
+astepl (c[-]c).
 apply eq_symmetric_unfolded; apply cg_minus_wd.
-cut (forall H, Q (n - n) H[=]c); auto.
+cut (forall H, Q (n - n) H [=] c); auto.
 cut (n - n = 0); [ intro | auto with arith ].
 rewrite H1; intros; apply start.
 apply finish.
 cut (i - n = S (i - S n)); [ intro | omega ].
 cut
  (forall H,
-  Q (i - n) H[-]Q _ (partition_join_aux _ _ _ b1 Hi)[<=]Max (Mesh P) (Mesh Q));
+  Q (i - n) H[-]Q _ (partition_join_aux _ _ _ b1 Hi) [<=] Max (Mesh P) (Mesh Q));
  auto.
 rewrite H0; intros; eapply leEq_transitive.
 apply Mesh_lemma.
@@ -1111,8 +1108,7 @@ End Partition_Join.
 With these results in mind, the following is a trivial consequence:
 *)
 
-Lemma integral_plus_integral :
- integral _ _ Hac _ Hac'[+]integral _ _ Hcb _ Hcb'[=]Integral Hab'.
+Lemma integral_plus_integral : integral _ _ Hac _ Hac'[+]integral _ _ Hcb _ Hcb' [=] Integral _ Hab'.
 unfold integral at 1 2 in |- *.
 eapply eq_transitive_unfolded.
 apply eq_symmetric_unfolded; apply Lim_plus.
@@ -1120,14 +1116,14 @@ apply cg_inv_unique_2.
 apply AbsIR_approach_zero.
 intros e' He'.
 set (e := e'[/] _[//]max_one_ap_zero (b[-]a)) in *.
-cut (Zero[<]e).
+cut (Zero [<] e).
 intro He.
 set (d := proj1_sig2T _ _ _ (contin_prop _ _ _ _ Hab' e He)) in *.
 generalize (proj2b_sig2T _ _ _ (contin_prop _ _ _ _ Hab' e He));
  generalize (proj2a_sig2T _ _ _ (contin_prop _ _ _ _ Hab' e He)).
 fold d in |- *; intros Hd Haux.
 clear Haux.
-apply leEq_transitive with (e[*](b[-]a)).
+apply leEq_transitive with (e[*] (b[-]a)).
 elim (Archimedes (b[-]c[/] _[//]pos_ap_zero _ _ Hd)); intros n1 Hn1.
 elim (Archimedes (c[-]a[/] _[//]pos_ap_zero _ _ Hd)); intros n2 Hn2.
 apply
@@ -1144,20 +1140,20 @@ apply
                             (Cauchy_Darboux_Seq _ _ Hac _ Hac'))
                          (Build_CauchySeq _ _
                             (Cauchy_Darboux_Seq _ _ Hcb _ Hcb'))))
-                   (Cauchy_const [--](Integral Hab'))))))).
+                   (Cauchy_const [--] (Integral _ Hab'))))))).
 apply str_seq_leEq_so_Lim_leEq.
 set (p := max n1 n2) in *; exists p; intros.
-AStepl
+astepl
  (AbsIR
     (integral_seq _ _ Hac _ Hac' i[+]integral_seq _ _ Hcb _ Hcb' i[-]
-     Integral Hab')).
+     Integral _ Hab')).
 unfold integral_seq, Even_Partition_Sum in |- *.
 set (EP1 := Even_Partition Hac (S i) (O_S i)) in *.
 set (EP2 := Even_Partition Hcb (S i) (O_S i)) in *.
 set (P := partition_join _ _ EP1 EP2) in *.
-cut (nat_less_n_fun _ _ (Partition_imp_points _ _ _ _ EP1));
+cut (nat_less_n_fun (Partition_imp_points _ _ _ _ EP1));
  [ intro | apply Partition_imp_points_2 ].
-cut (nat_less_n_fun _ _ (Partition_imp_points _ _ _ _ EP2));
+cut (nat_less_n_fun (Partition_imp_points _ _ _ _ EP2));
  [ intro | apply Partition_imp_points_2 ].
 apply
  leEq_wdl
@@ -1167,7 +1163,7 @@ apply
           (partition_join_Pts_in_partition _ _ _ _ _
              (Partition_imp_points_1 _ _ _ _ EP1) H0 _
              (Partition_imp_points_1 _ _ _ _ EP2) H1)
-          (contin_imp_inc _ _ _ _ Hab')[-]Integral Hab')).
+          (contin_imp_inc _ _ _ _ Hab') [-]Integral _ Hab')).
 apply partition_Sum_conv_integral with He; fold d in |- *.
 eapply leEq_less_trans.
 apply partition_join_mesh.
@@ -1236,7 +1232,7 @@ apply cg_minus_wd; simpl in |- *.
 apply eq_symmetric_unfolded; apply pjf_3; [ auto with arith | omega ].
 apply eq_symmetric_unfolded; apply pjf_3; auto with arith.
 intro; apply x_mult_zero.
-AStepr (c[-]c).
+astepr (c[-]c).
 apply cg_minus_wd.
 simpl in |- *; apply pjf_2'; auto.
 simpl in |- *; apply pjf_2; auto.
@@ -1250,7 +1246,7 @@ apply bin_op_wd_unfolded.
 Algebra.
 apply eq_symmetric_unfolded; apply Lim_const.
 unfold e in |- *.
-RStepl (e'[*](b[-]a)[/] _[//]max_one_ap_zero (b[-]a)).
+rstepl (e'[*] (b[-]a) [/] _[//]max_one_ap_zero (b[-]a)).
 apply shift_div_leEq.
 apply pos_max_one.
 apply mult_resp_leEq_lft.
@@ -1272,35 +1268,30 @@ End Basic_Properties.
 The following are simple consequences of this result and of previous ones.
 *)
 
-Lemma integral_less_norm :
- forall a b Hab F contF,
- let N := Norm_Funct (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF in
- a[<]b ->
- forall x : IR,
- Compact Hab x ->
- forall Hx,
- AbsIR (F x Hx)[<]N -> AbsIR (integral _ _ _ _ contF)[<]N[*](b[-]a).
+Lemma integral_less_norm : forall a b Hab (F : PartIR) contF,
+ let N := Norm_Funct contF in a [<] b -> forall x, Compact Hab x -> forall Hx,
+ AbsIR (F x Hx) [<] N -> AbsIR (integral a b Hab F contF) [<] N[*] (b[-]a).
 (* begin hide *)
 intros a b Hab F contF N Hless x H Hx H0.
 set (e := (N[-]AbsIR (F x Hx)) [/]TwoNZ) in *.
-cut (Zero[<]e); intros.
+cut (Zero [<] e); intros.
 2: unfold e in |- *; apply pos_div_two; apply shift_less_minus.
-2: AStepl (AbsIR (F x Hx)); auto.
+2: astepl (AbsIR (F x Hx)); auto.
 elim (contin_prop _ _ _ _ contF e); auto.
 intros d H2 H3.
 set (mid1 := Max a (x[-]d)) in *.
 set (mid2 := Min b (x[+]d)) in *.
-cut (a[<=]mid1); [ intro leEq1 | unfold mid1 in |- *; apply lft_leEq_Max ].
-cut (mid1[<=]mid2);
+cut (a [<=] mid1); [ intro leEq1 | unfold mid1 in |- *; apply lft_leEq_Max ].
+cut (mid1 [<=] mid2);
  [ intro leEq2
  | unfold mid1, mid2 in |- *; inversion_clear H; apply leEq_transitive with x ].
 2: apply Max_leEq; auto.
 2: apply less_leEq; apply shift_minus_less.
-2: apply shift_less_plus'; AStepl ZeroR; auto.
+2: apply shift_less_plus'; astepl ZeroR; auto.
 2: apply leEq_Min; auto.
 2: apply less_leEq; apply shift_less_plus'.
-2: AStepl ZeroR; auto.
-cut (mid2[<=]b); [ intro leEq3 | unfold mid2 in |- *; apply Min_leEq_lft ].
+2: astepl ZeroR; auto.
+cut (mid2 [<=] b); [ intro leEq3 | unfold mid2 in |- *; apply Min_leEq_lft ].
 cut (Continuous_I leEq1 F).
 cut (Continuous_I leEq2 F).
 cut (Continuous_I leEq3 F).
@@ -1320,7 +1311,7 @@ apply
 2: apply integral_plus_integral.
 2: Algebra.
 2: apply integral_plus_integral.
-RStepr (N[*](mid1[-]a)[+]N[*](mid2[-]mid1)[+]N[*](b[-]mid2)).
+rstepr (N[*] (mid1[-]a) [+]N[*] (mid2[-]mid1) [+]N[*] (b[-]mid2)).
 eapply leEq_less_trans.
 apply triangle_IR.
 apply plus_resp_less_leEq.
@@ -1330,7 +1321,7 @@ apply plus_resp_leEq_less.
 eapply leEq_transitive.
 apply integral_leEq_norm.
 unfold N in |- *; apply mult_resp_leEq_rht.
-2: apply shift_leEq_minus; AStepl a; auto.
+2: apply shift_leEq_minus; astepl a; auto.
 apply included_imp_norm_leEq.
 apply included_compact.
 apply compact_inc_lft.
@@ -1340,7 +1331,7 @@ apply leEq_transitive with mid2; auto.
 2: eapply leEq_transitive.
 2: apply integral_leEq_norm.
 2: unfold N in |- *; apply mult_resp_leEq_rht.
-3: apply shift_leEq_minus; AStepl mid2; auto.
+3: apply shift_leEq_minus; astepl mid2; auto.
 2: apply included_imp_norm_leEq.
 2: apply included_compact.
 2: split.
@@ -1352,9 +1343,9 @@ apply integral_leEq_norm.
 apply mult_resp_less.
 apply leEq_less_trans with (N[-]e).
 2: apply shift_minus_less; apply shift_less_plus'.
-2: AStepl ZeroR; auto.
+2: astepl ZeroR; auto.
 apply leEq_Norm_Funct; intros y Hy Hy'.
-apply leEq_wdr with (AbsIR (F x Hx)[+]e).
+apply leEq_wdr with (AbsIR (F x Hx) [+]e).
 2: unfold e in |- *; rational.
 apply AbsIR_bnd_AbsIR.
 apply H3; auto.
@@ -1364,7 +1355,7 @@ split; auto.
 apply leEq_transitive with mid2; auto.
 split; auto.
 apply leEq_transitive with mid1; auto.
-cut (x[-]d[<=]x[+]d). intro H5.
+cut (x[-]d [<=] x[+]d). intro H5.
 apply compact_bnd_AbsIR with H5.
 cut (included (Compact leEq2) (Compact H5)); auto.
 apply included_compact; unfold mid1, mid2 in |- *; split.
@@ -1376,26 +1367,26 @@ unfold mid1 in |- *; apply rht_leEq_Max.
 apply Min_leEq_rht.
 apply leEq_transitive with x.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 unfold mid2, mid1 in |- *.
-AStepl (x[-]x).
+astepl (x[-]x).
 unfold cg_minus at 1 2 in |- *.
 inversion_clear H.
-elim (cotrans_less_unfolded _ _ _ Hless x); intro.
+elim (less_cotransitive_unfolded _ _ _ Hless x); intro.
 apply plus_resp_leEq_less.
 apply leEq_Min; auto.
-apply shift_leEq_plus'; AStepl ZeroR; apply less_leEq; auto.
+apply shift_leEq_plus'; astepl ZeroR; apply less_leEq; auto.
 apply inv_resp_less; apply Max_less; auto.
 apply shift_minus_less; apply shift_less_plus'.
-AStepl ZeroR; auto.
+astepl ZeroR; auto.
 apply plus_resp_less_leEq.
 apply less_Min; auto.
-apply shift_less_plus'; AStepl ZeroR; auto.
+apply shift_less_plus'; astepl ZeroR; auto.
 apply inv_resp_leEq; apply Max_leEq; auto.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply included_imp_contin with a b Hab; auto.
 apply included_compact.
 apply compact_inc_lft.
@@ -1420,36 +1411,29 @@ apply leEq_transitive with mid2; auto.
 Qed.
 (* end hide *)
 
-Lemma integral_gt_zero :
- forall a b Hab F contF,
- let N := Norm_Funct (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF in
- a[<]b ->
- forall x : IR,
- Compact Hab x ->
- forall Hx,
- Zero[<]F x Hx ->
- (forall x : IR, Compact Hab x -> forall Hx, Zero[<=]F x Hx) ->
- Zero[<]integral _ _ _ _ contF.
+Lemma integral_gt_zero : forall a b Hab (F : PartIR) contF, let N := Norm_Funct contF in
+ a [<] b -> forall x, Compact Hab x -> forall Hx, Zero [<] F x Hx ->
+ (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) -> Zero [<] integral a b Hab F contF.
 (* begin hide *)
 intros a b Hab F contF N Hless x H Hx H0.
 set (e := F x Hx [/]TwoNZ) in *.
-cut (Zero[<]e). intros H1 H2.
+cut (Zero [<] e). intros H1 H2.
 2: unfold e in |- *; apply pos_div_two; auto.
 elim (contin_prop _ _ _ _ contF e); auto.
 intros d H3 H4.
 set (mid1 := Max a (x[-]d)) in *.
 set (mid2 := Min b (x[+]d)) in *.
-cut (a[<=]mid1); [ intro leEq1 | unfold mid1 in |- *; apply lft_leEq_Max ].
-cut (mid1[<=]mid2);
+cut (a [<=] mid1); [ intro leEq1 | unfold mid1 in |- *; apply lft_leEq_Max ].
+cut (mid1 [<=] mid2);
  [ intro leEq2
  | unfold mid1, mid2 in |- *; inversion_clear H; apply leEq_transitive with x ].
 2: apply Max_leEq; auto.
 2: apply less_leEq; apply shift_minus_less.
-2: apply shift_less_plus'; AStepl ZeroR; auto.
+2: apply shift_less_plus'; astepl ZeroR; auto.
 2: apply leEq_Min; auto.
 2: apply less_leEq; apply shift_less_plus'.
-2: AStepl ZeroR; auto.
-cut (mid2[<=]b); [ intro leEq3 | unfold mid2 in |- *; apply Min_leEq_lft ].
+2: astepl ZeroR; auto.
+cut (mid2 [<=] b); [ intro leEq3 | unfold mid2 in |- *; apply Min_leEq_lft ].
 cut (Continuous_I leEq1 F).
 cut (Continuous_I leEq2 F).
 cut (Continuous_I leEq3 F).
@@ -1466,7 +1450,7 @@ apply
 2: apply integral_plus_integral.
 2: Algebra.
 2: apply integral_plus_integral.
-RStepl (Zero[*](mid1[-]a)[+]Zero[*](mid2[-]mid1)[+]Zero[*](b[-]mid2)).
+rstepl (Zero[*] (mid1[-]a) [+]Zero[*] (mid2[-]mid1) [+]Zero[*] (b[-]mid2)).
 apply plus_resp_less_leEq.
 apply plus_resp_leEq_less.
 apply lb_integral.
@@ -1475,39 +1459,39 @@ apply H2.
 inversion_clear H6; split; auto.
 apply leEq_transitive with mid1; auto.
 apply leEq_transitive with mid2; auto.
-apply less_leEq_trans with (F x Hx [/]TwoNZ[*](mid2[-]mid1)).
+apply less_leEq_trans with (F x Hx [/]TwoNZ[*] (mid2[-]mid1)).
 apply mult_resp_less.
 apply pos_div_two; auto.
-apply shift_less_minus; AStepl mid1.
-elim (cotrans_less_unfolded _ _ _ Hless x); intro; unfold mid1, mid2 in |- *.
+apply shift_less_minus; astepl mid1.
+elim (less_cotransitive_unfolded _ _ _ Hless x); intro; unfold mid1, mid2 in |- *.
 apply less_leEq_trans with x.
 apply Max_less.
 auto.
 apply shift_minus_less; apply shift_less_plus'.
-AStepl ZeroR; auto.
+astepl ZeroR; auto.
 apply leEq_Min.
 inversion_clear H; auto.
 apply less_leEq; apply shift_less_plus'.
-AStepl ZeroR; auto.
+astepl ZeroR; auto.
 apply leEq_less_trans with x.
 apply Max_leEq.
 inversion_clear H; auto.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply less_Min.
 auto.
 apply shift_less_plus'.
-AStepl ZeroR; auto.
+astepl ZeroR; auto.
 apply lb_integral.
 intros x0 H6 Hx0.
-RStepl (F x Hx[-]F x Hx [/]TwoNZ).
+rstepl (F x Hx[-]F x Hx [/]TwoNZ).
 apply shift_minus_leEq; apply shift_leEq_plus'.
 fold e in |- *; eapply leEq_transitive; [ apply leEq_AbsIR | apply H4 ].
 auto.
 inversion_clear H6; split; auto.
 apply leEq_transitive with mid1; auto.
 apply leEq_transitive with mid2; auto.
-cut (x[-]d[<=]x[+]d); intros.
+cut (x[-]d [<=] x[+]d); intros.
 apply compact_bnd_AbsIR with H7.
 cut (included (Compact leEq2) (Compact H7)); auto.
 apply included_compact; unfold mid1, mid2 in |- *; split.
@@ -1519,9 +1503,9 @@ unfold mid1 in |- *; apply rht_leEq_Max.
 apply Min_leEq_rht.
 apply leEq_transitive with x.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply lb_integral.
 intros x0 H6 Hx0.
 apply H2.

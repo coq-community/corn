@@ -8,114 +8,19 @@
 
 Require Export FTC.
 
-Lemma series_aux_lemma :
- forall (F : PartIR) (x : IR) Hx,
- AbsIR (FAbs F x Hx)[=]AbsIR (F x (ProjIR1 Hx)).
-intros.
-eapply eq_transitive_unfolded.
- apply AbsIR_eq_x.
- 2: apply FAbs_char.
-eapply leEq_wdr.
- 2: apply eq_symmetric_unfolded; apply FAbs_char with (Hx' := ProjIR1 Hx).
-apply AbsIR_nonneg.
-Qed.
-
-Hint Resolve series_aux_lemma: algebra.
-
 (** *More on Power Series
 
-We will now formally define an operator that defines a function as the sum of some series given a number sequence.  Along with it, we will prove some important properties of these entities.
-*)
-
-(*
-Section NRoot_odd.
-
-Variable x : IR.
-Variable k : nat.
-Hypothesis Hk : (odd k).
-
-Local p := _X_[^]k[-](_C_ x).
-
-Lemma nrootIR_odd : {c:IR & (c[^]k [=] x)}.
-Intros.
-Elim (oddpoly_root p k); Intros; Auto.
-Exists x0.
-Unfold p in p0; Simpl in p0.
-Apply cg_inv_unique_2.
-AStepl (_X_!x0)[^]k[-](_C_ x)!x0.
-AStepl (_X_[^]k)!x0[-](_C_ x)!x0.
-Step_final (_X_[^]k[-](_C_ x))!x0.
-Split.
-Unfold p.
-AStepl (One::IR).
-Apply eq_symmetric_unfolded.
-AStepr (One::IR)[-]Zero.
-EApply eq_transitive_unfolded.
-Apply nth_coeff_minus.
-Apply cg_minus_wd.
-Apply nth_coeff_nexp_eq.
-Elim (not_O_imp_S k).
-Intros n Hn.
-Cut k=(S n); [Intro | Apply toCProp_e with k=(S n); Auto].
-Rewrite H; Simpl.
-Algebra.
-Inversion Hk; Apply lt_O.
-Unfold p.
-Apply Degree_le_invus.
-Cut k=(mult (1) k); [Intro | Auto with arith].
-Pattern 1 k; Rewrite H.
-Apply Degree_le_nexp.
-Apply Degree_le_x_.
-Apply degree_le_mon with O.
-Apply le_0.
-Apply Degree_le_c_.
-Qed.
-
-Definition Nroot_odd := (ProjS1 nrootIR_odd).
-
-Lemma NRoot_odd_power : Nroot_odd[^]k [=] x.
-Unfold Nroot_odd; Apply projS2.
-Qed.
-
-Lemma NRoot_odd_pos : (Zero [<] x)->(Zero [<] Nroot_odd).
-Intros.
-Apply odd_power_cancel_pos with k; Auto.
-Apply less_wdr with x; Auto.
-Apply eq_symmetric_unfolded; Apply NRoot_odd_power.
-Qed.
-
-End NRoot_odd.
-
-Syntactic Definition NRoot_odd := (Nroot_odd ?).
-
-Section Lemmas.
-
-Lemma NRoot_odd_nroot : (x,Hx,k,Hk,Hk':?)(Nroot_odd x k Hk) [=] (nroot_fun x k Hx Hk').
-Intros.
-Apply root_unique with k.
-Apply less_leEq; Apply NRoot_odd_pos; Auto.
-Apply less_leEq; Apply nroot_pos.
-Auto.
-AStepr x; Apply NRoot_odd_power.
-Qed.
-
-Lemma NRoot_odd_cancel : (x,y,k,Hk:?)((Nroot_odd x k Hk) [=] (Nroot_odd y k Hk))->(x [=] y).
-Intros.
-Apply eq_transitive_unfolded with (Nroot_odd x k Hk)[^]k.
-Apply eq_symmetric_unfolded; Apply NRoot_odd_power.
-Apply eq_transitive_unfolded with (Nroot_odd y k Hk)[^]k.
-2: Apply NRoot_odd_power.
-Apply nexp_wd; Algebra.
-Qed.
-
-End Lemmas.
+We will now formally define an operator that defines a function as the
+sum of some series given a number sequence.  Along with it, we will
+prove some important properties of these entities.
 *)
 
 Section Power_Series.
 
 (** **General results
 
-%\begin{convention}% Let [J:interval] and [x0:IR] be a point of [J].  Let [a:nat->IR].
+%\begin{convention}% Let [J : interval] and [x0 : IR] be a point of [J].
+Let [a : nat -> IR].
 %\end{convention}%
 *)
 
@@ -125,28 +30,22 @@ Hypothesis Hx0 : J x0.
 
 Variable a : nat -> IR.
 
-Definition FPowerSeries (n : nat) := a n{**}(FId{-}[-C-]x0){^}n.
+Definition FPowerSeries (n : nat) := a n{**} (FId{-} [-C-]x0) {^}n.
 
 (**
-The most important convergence criterium specifically for power series is the Dirichlet criterium.
+The most important convergence criterium specifically for power series
+is the Dirichlet criterium.
 *)
 
 (* begin show *)
-Hypothesis
-  Ha :
-    {r : IR |
-    {H : Zero[<]r |
-    {N : nat |
-    forall n : nat,
-    N <= n ->
-    AbsIR (a (S n))[<=](One[/] r[//]pos_ap_zero _ _ H)[*]AbsIR (a n)}}}.
+Hypothesis Ha : {r : IR | {H : Zero [<] r | {N : nat | forall n, N <= n ->
+  AbsIR (a (S n)) [<=] (One[/] r[//]pos_ap_zero _ _ H) [*]AbsIR (a n)}}}.
 
 Let r := ProjT1 Ha.
 Let Hr := ProjT1 (ProjT2 Ha).
 (* end show *)
 
-Lemma Dirichlet_crit :
- fun_series_abs_convergent_IR (olor (x0[-]r) (x0[+]r)) FPowerSeries.
+Lemma Dirichlet_crit : fun_series_abs_convergent_IR (olor (x0[-]r) (x0[+]r)) FPowerSeries.
 fold r in (value of Hr).
 red in |- *; intros.
 red in |- *; intros.
@@ -156,13 +55,13 @@ unfold FPowerSeries in |- *; Contin.
 elim (ProjT2 (ProjT2 Ha)); intros N HN.
 exists N.
 cut
- {z : IR | Zero[<]z and z[<]r |
- forall x : IR, Compact Hab x -> AbsIR (x[-]x0)[<=]z}.
+ {z : IR | Zero [<] z and z [<] r |
+ forall x : IR, Compact Hab x -> AbsIR (x[-]x0) [<=] z}.
 intro H.
 elim H; intros z Hz.
 elim Hz; clear Hz; intros H0z Hzr Hz.
 clear H.
-exists ((One[/] r[//]pos_ap_zero _ _ Hr)[*]z).
+exists ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z).
 apply shift_mult_less with (pos_ap_zero _ _ H0z).
 assumption.
 apply recip_resp_less; assumption.
@@ -171,36 +70,36 @@ apply less_leEq; apply mult_resp_pos.
 apply recip_resp_pos; assumption.
 assumption.
 intros.
-AStepl (AbsIR (FPowerSeries (S n) x (ProjIR1 Hx'))).
-apply leEq_wdl with (AbsIR (a (S n))[*]AbsIR (x[-]x0)[*]AbsIR ((x[-]x0)[^]n)).
+astepl (AbsIR (FPowerSeries (S n) x (ProjIR1 Hx'))).
+apply leEq_wdl with (AbsIR (a (S n)) [*]AbsIR (x[-]x0) [*]AbsIR ((x[-]x0) [^]n)).
 apply
  leEq_wdr
   with
-    ((One[/] r[//]pos_ap_zero _ _ Hr)[*]z[*]AbsIR (a n)[*]
-     AbsIR ((x[-]x0)[^]n)).
+    ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z[*]AbsIR (a n) [*]
+     AbsIR ((x[-]x0) [^]n)).
 apply mult_resp_leEq_rht.
 2: apply AbsIR_nonneg.
-RStepr ((One[/] r[//]pos_ap_zero _ _ Hr)[*]AbsIR (a n)[*]z).
+rstepr ((One[/] r[//]pos_ap_zero _ _ Hr) [*]AbsIR (a n) [*]z).
 apply mult_resp_leEq_both; try apply AbsIR_nonneg.
 apply HN; assumption.
 apply Hz; auto.
-RStepl
- ((One[/] r[//]pos_ap_zero _ _ Hr)[*]z[*](AbsIR (a n)[*]AbsIR ((x[-]x0)[^]n))).
-apply mult_wd_rht.
-AStepr (AbsIR (FPowerSeries n x (ProjIR1 Hx))).
+rstepl
+ ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z[*](AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n))).
+apply mult_wdr.
+astepr (AbsIR (FPowerSeries n x (ProjIR1 Hx))).
 simpl in |- *; apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 simpl in |- *.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 apply AbsIR_resp_mult.
 apply
  eq_transitive_unfolded
-  with (AbsIR (a (S n))[*](AbsIR ((x[-]x0)[^]n)[*]AbsIR (x[-]x0))).
-apply mult_wd_rht; apply AbsIR_resp_mult.
+  with (AbsIR (a (S n)) [*](AbsIR ((x[-]x0) [^]n) [*]AbsIR (x[-]x0))).
+apply mult_wdr; apply AbsIR_resp_mult.
 simpl in |- *; rational.
 clear HN.
 cut
- ((forall x : IR, Compact Hab x -> a0[<=]x) /\
-  (forall x : IR, Compact Hab x -> x[<=]b)); intros.
+ ((forall x : IR, Compact Hab x -> a0 [<=] x) /\
+  (forall x : IR, Compact Hab x -> x [<=] b)); intros.
 inversion_clear H.
 exists (Max (Max (b[-]x0) (x0[-]a0)) (r [/]TwoNZ)).
 repeat split.
@@ -221,7 +120,7 @@ eapply leEq_transitive.
 2: apply lft_leEq_Max.
 apply lft_leEq_Max.
 apply leEq_transitive with (x0[-]a0).
-RStepr ([--](a0[-]x0)); apply inv_resp_leEq.
+rstepr ([--](a0[-]x0)); apply inv_resp_leEq.
 apply minus_resp_leEq; apply H0; auto.
 eapply leEq_transitive.
 2: apply lft_leEq_Max.
@@ -233,15 +132,13 @@ Qed.
 When defining a function using its Taylor series as a motivation, the following operator can be of use.
 *)
 
-Definition FPowerSeries' (n : nat) :=
-  (a n[/] _[//]nring_fac_ap_zero _ n){**}(FId{-}[-C-]x0){^}n.
+Definition FPowerSeries' n := (a n[/] _[//]nring_fac_ap_zero _ n) {**} (FId{-} [-C-]x0) {^}n.
 
 (**
 This function is also continuous and has a good convergence ratio.
 *)
 
-Lemma FPowerSeries'_cont :
- forall n : nat, Continuous realline (FPowerSeries' n).
+Lemma FPowerSeries'_cont : forall n, Continuous realline (FPowerSeries' n).
 intros; unfold FPowerSeries' in |- *.
 Contin.
 Qed.
@@ -251,15 +148,11 @@ repeat split.
 Qed.
 
 (* begin show *)
-Hypothesis
-  Ha' :
-    {N : nat |
-    {c : IR | Zero[<]c |
-    forall n : nat, N <= n -> AbsIR (a (S n))[<=]c[*]AbsIR (a n)}}.
+Hypothesis Ha' : {N : nat | {c : IR | Zero [<] c |
+  forall n, N <= n -> AbsIR (a (S n)) [<=] c[*]AbsIR (a n)}}.
 (* end show *)
 
-Lemma FPowerSeries'_conv' :
- fun_series_abs_convergent_IR realline FPowerSeries'.
+Lemma FPowerSeries'_conv' : fun_series_abs_convergent_IR realline FPowerSeries'.
 clear Hr r Ha.
 red in |- *; intros.
 red in |- *; intros.
@@ -275,21 +168,21 @@ unfold Half in |- *.
 apply pos_div_two'; apply pos_one.
 apply less_leEq; apply pos_half.
 intros x H1; intros.
-AStepl (AbsIR (FPowerSeries' (S n) x (ProjIR1 Hx'))).
-AStepr (Half[*]AbsIR (FPowerSeries' n x (ProjIR1 Hx))).
+astepl (AbsIR (FPowerSeries' (S n) x (ProjIR1 Hx'))).
+astepr (Half[*]AbsIR (FPowerSeries' n x (ProjIR1 Hx))).
 simpl in |- *.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 apply
  leEq_wdl
   with
-    ((AbsIR (a (S n))[/] _[//]nring_fac_ap_zero _ (S n))[*]
-     (AbsIR ((x[-]x0)[^]n)[*]AbsIR (x[-]x0))).
+    ((AbsIR (a (S n)) [/] _[//]nring_fac_ap_zero _ (S n)) [*]
+     (AbsIR ((x[-]x0) [^]n) [*]AbsIR (x[-]x0))).
 2: apply mult_wd.
 2: apply
     eq_transitive_unfolded
      with
-       (AbsIR (a (S n))[/] _[//]
+       (AbsIR (a (S n)) [/] _[//]
         AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ (S n))).
 3: apply eq_symmetric_unfolded; apply AbsIR_division.
 2: apply div_wd; Algebra.
@@ -300,44 +193,44 @@ apply
 apply
  leEq_wdr
   with
-    (One [/]TwoNZ[*](AbsIR (a n)[/] _[//]nring_fac_ap_zero _ n)[*]
-     AbsIR ((x[-]x0)[^]n)).
+    (One [/]TwoNZ[*](AbsIR (a n) [/] _[//]nring_fac_ap_zero _ n) [*]
+     AbsIR ((x[-]x0) [^]n)).
 2: apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 3: apply mult_assoc_unfolded.
-2: apply mult_wd_rht.
+2: apply mult_wdr.
 2: eapply eq_transitive_unfolded.
 2: apply AbsIR_resp_mult.
-2: apply mult_wd_lft; simpl in |- *; Algebra.
+2: apply mult_wdl; simpl in |- *; Algebra.
 2: apply
     eq_transitive_unfolded
-     with (AbsIR (a n)[/] _[//]AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ n)).
+     with (AbsIR (a n) [/] _[//]AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ n)).
 2: apply AbsIR_division.
 2: apply div_wd; Algebra.
 2: apply AbsIR_eq_x; apply nring_nonneg.
-RStepl
- (AbsIR (a (S n))[*]AbsIR (x[-]x0)[*]AbsIR ((x[-]x0)[^]n)[/] _[//]
+rstepl
+ (AbsIR (a (S n)) [*]AbsIR (x[-]x0) [*]AbsIR ((x[-]x0) [^]n) [/] _[//]
   nring_fac_ap_zero _ (S n)).
 apply shift_div_leEq.
 apply pos_nring_fac.
-RStepr
+rstepr
  (One [/]TwoNZ[*]
-  (AbsIR (a n)[*]nring (fac (S n))[/] _[//]nring_fac_ap_zero _ n)[*]
-  AbsIR ((x[-]x0)[^]n)).
+  (AbsIR (a n) [*]nring (fac (S n)) [/] _[//]nring_fac_ap_zero _ n) [*]
+  AbsIR ((x[-]x0) [^]n)).
 apply
  leEq_wdr
-  with (One [/]TwoNZ[*](AbsIR (a n)[*]nring (S n))[*]AbsIR ((x[-]x0)[^]n)).
-2: apply mult_wd_lft; apply mult_wd_rht.
-2: RStepr (AbsIR (a n)[*](nring (fac (S n))[/] _[//]nring_fac_ap_zero _ n)).
-2: apply mult_wd_rht.
-2: AStepr (nring (S n * fac n)[/] _[//]nring_fac_ap_zero IR n).
-2: AStepr (nring (S n)[*]nring (fac n)[/] _[//]nring_fac_ap_zero IR n);
+  with (One [/]TwoNZ[*](AbsIR (a n) [*]nring (S n)) [*]AbsIR ((x[-]x0) [^]n)).
+2: apply mult_wdl; apply mult_wdr.
+2: rstepr (AbsIR (a n) [*](nring (fac (S n)) [/] _[//]nring_fac_ap_zero _ n)).
+2: apply mult_wdr.
+2: astepr (nring (S n * fac n) [/] _[//]nring_fac_ap_zero IR n).
+2: astepr (nring (S n) [*]nring (fac n) [/] _[//]nring_fac_ap_zero IR n);
     rational.
-RStepr (One [/]TwoNZ[*]nring (S n)[*]AbsIR (a n)[*]AbsIR ((x[-]x0)[^]n)).
+rstepr (One [/]TwoNZ[*]nring (S n) [*]AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n)).
 apply mult_resp_leEq_rht.
 2: apply AbsIR_nonneg.
-apply leEq_transitive with (AbsIR (a (S n))[*]AbsIR (Max b x0[-]Min a0 x0)).
+apply leEq_transitive with (AbsIR (a (S n)) [*]AbsIR (Max b x0[-]Min a0 x0)).
 apply mult_resp_leEq_lft.
-cut (Min a0 x0[<=]Max b x0). intro H3.
+cut (Min a0 x0 [<=] Max b x0). intro H3.
 apply compact_elements with H3.
 inversion_clear H1; split.
 apply leEq_transitive with a0; auto; apply Min_leEq_lft.
@@ -349,13 +242,13 @@ apply leEq_transitive with x0.
 apply Min_leEq_rht.
 apply rht_leEq_Max.
 apply AbsIR_nonneg.
-apply leEq_transitive with (AbsIR (a (S n))[*]Max (Max b x0[-]Min a0 x0) One).
+apply leEq_transitive with (AbsIR (a (S n)) [*]Max (Max b x0[-]Min a0 x0) One).
 apply mult_resp_leEq_lft.
 2: apply AbsIR_nonneg.
 eapply leEq_wdl.
 apply lft_leEq_Max.
 apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-apply shift_leEq_minus; AStepl (Min a0 x0).
+apply shift_leEq_minus; astepl (Min a0 x0).
 apply leEq_transitive with x0.
 apply Min_leEq_rht.
 apply rht_leEq_Max.
@@ -366,10 +259,10 @@ apply H0.
 apply le_trans with (max N y); auto; apply le_max_l.
 apply shift_leEq_div.
 apply pos_max_one.
-RStepl (c[*]Max (Max b x0[-]Min a0 x0) One[*]AbsIR (a n)).
+rstepl (c[*]Max (Max b x0[-]Min a0 x0) One[*]AbsIR (a n)).
 apply mult_resp_leEq_rht.
 2: apply AbsIR_nonneg.
-RStepr (nring (R:=IR) (S n) [/]TwoNZ); apply shift_leEq_div.
+rstepr (nring (R:=IR) (S n) [/]TwoNZ); apply shift_leEq_div.
 apply pos_two.
 apply less_leEq; apply leEq_less_trans with (nring (R:=IR) y).
 eapply leEq_wdl.
@@ -394,7 +287,8 @@ Hint Resolve FPowerSeries'_cont: continuous.
 Section More_on_PowerSeries.
 
 (**
-%\begin{convention}% Let [F] and [G] be the power series defined respectively by [a] and by [[n:nat](a (S n))].
+%\begin{convention}% Let [F] and [G] be the power series defined
+respectively by [a] and by [fun n => (a (S n))].
 %\end{convention}%
 *)
 
@@ -403,7 +297,7 @@ Variable a : nat -> IR.
 
 (* begin hide *)
 Let F := FPowerSeries' x0 a.
-Let G := FPowerSeries' x0 (fun n : nat => a (S n)).
+Let G := FPowerSeries' x0 (fun n => a (S n)).
 (* end hide *)
 
 (* begin show *)
@@ -412,13 +306,9 @@ Hypothesis Hf' : fun_series_abs_convergent_IR realline F.
 Hypothesis Hg : fun_series_convergent_IR realline G.
 (* end show *)
 
-(**
-We get a comparison test for power series.
-*)
+(** We get a comparison test for power series. *)
 
-Lemma FPowerSeries'_comp :
- forall b,
- (forall n : nat, AbsIR (b n)[<=]a n) ->
+Lemma FPowerSeries'_comp : forall b, (forall n, AbsIR (b n) [<=] a n) ->
  fun_series_convergent_IR realline (FPowerSeries' x0 b).
 intros.
 apply fun_comparison_IR with (fun n : nat => FAbs (FPowerSeries' x0 a n)).
@@ -438,12 +328,12 @@ eapply leEq_wdr.
 2: apply eq_symmetric_unfolded;
     apply
      AbsIR_division
-      with (Hy := AbsIR_resp_ap_zero _ (nring_fac_ap_zero IR n)).
+      with (y__ := AbsIR_resp_ap_zero _ (nring_fac_ap_zero IR n)).
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded;
     apply
      AbsIR_division
-      with (Hy := AbsIR_resp_ap_zero _ (nring_fac_ap_zero IR n)).
+      with (y__ := AbsIR_resp_ap_zero _ (nring_fac_ap_zero IR n)).
 apply div_resp_leEq.
 eapply less_leEq_trans.
 apply (pos_nring_fac IR n).
@@ -451,12 +341,9 @@ apply leEq_AbsIR.
 apply leEq_transitive with (a n); [ auto | apply leEq_AbsIR ].
 Qed.
 
-(**
-And a rule for differentiation.
-*)
+(** And a rule for differentiation. *)
 
-Lemma Derivative_FPowerSeries1' :
- forall H, Derivative realline H (FSeries_Sum Hf) (FSeries_Sum Hg).
+Lemma Derivative_FPowerSeries1' : forall H, Derivative realline H (FSeries_Sum Hf) (FSeries_Sum Hg).
 intro.
 eapply Derivative_wdr.
 apply Feq_symmetric; apply (insert_series_sum _ _ Hg).
@@ -476,56 +363,16 @@ apply included_FMult; Included.
 apply included_FScalMult; Included.
 intros; simpl in |- *.
 set (y := nexp _ n (x[-]x0)) in *.
-RStepl (a (S n)[*]y[*](nring (S n)[/] _[//]nring_fac_ap_zero _ (S n))).
-RStepr
- (a (S n)[*]y[*]
-  (nring (S n)[/] _[//]
+rstepl (a (S n) [*]y[*](nring (S n) [/] _[//]nring_fac_ap_zero _ (S n))).
+rstepr
+ (a (S n) [*]y[*]
+  (nring (S n) [/] _[//]
    mult_resp_ap_zero _ _ _ (pos_ap_zero _ _ (pos_nring_S _ n))
      (nring_fac_ap_zero _ n))).
-apply mult_wd_rht.
+apply mult_wdr.
 apply div_wd; Algebra.
 Step_final (nring (R:=IR) (S n * fac n)).
 Qed.
-
-(*
-Local FPowerSeries_conv_lemma1 : (x,h:IR)(Zero [<] h)->(n:nat){c:IR & (x[+]h)[^]n[-]x[^]n [=] h[*](nring n)[*]c[^](pred n)}.
-Intros; Case n.
-Exists x; Simpl; Rational.
-Clear n; Intro; Case n.
-Exists (One::IR); Simpl; Rational.
-Clear n; Intro.
-Elim (even_odd_dec (S n)); Intro Hn.
-LetTac c:=(((x[+]h)[^](S (S n)))[-]x[^](S (S n)))[/]?[//](mult_resp_ap_zero ??? (pos_ap_zero ?? H) (pos_ap_zero ?? (pos_nring_S IR (S n)))).
-Cut Zero [<=] c; [Intro | Unfold c].
-Exists (NRoot H0 (lt_O n)).
-Apply eq_transitive_unfolded with h[*](nring (S (S n)))[*]c.
-Unfold c; Simpl; Rational.
-Repeat Apply mult_wd_rht.
-Apply eq_symmetric_unfolded.
-Cut (pred (S (S n)))=(S n); [Intro; Rewrite H1 | Auto].
-Apply NRoot_power.
-Apply shift_leEq_div.
-Apply mult_resp_pos; [Auto | Apply pos_nring_S].
-Apply shift_leEq_minus; RStepl x[^](S (S n)).
-Apply nexp_resp_leEq_odd.
-Apply odd_S; Auto.
-Apply shift_leEq_plus'; AStepl (Zero::IR); Apply less_leEq; Auto.
-LetTac c:=(((x[+]h)[^](S (S n)))[-]x[^](S (S n)))[/]?[//](mult_resp_ap_zero ??? (pos_ap_zero ?? H) (pos_ap_zero ?? (pos_nring_S ? (S n)))).
-Exists (Nroot_odd c (S n) Hn).
-Apply eq_transitive_unfolded with h[*](nring (S (S n)))[*]c.
-Unfold c; Rational.
-Repeat Apply mult_wd_rht.
-Cut (pred (S (S n)))=(S n); [Intro | Auto].
-Rewrite H0.
-Apply eq_symmetric_unfolded; Apply NRoot_odd_power.
-Qed.
-
-Lemma FPowerSeries_conv_lemma : (fun_series_convergent_IR realline G).
-Unfold G.
-Unfold FPowerSeries'.
-
-Lemma Derivative_FPowerSeries' : (H:?)(Derivative realline H (FSeries_Sum Hf) (FSeries_Sum Hg)).
-*)
 
 End More_on_PowerSeries.
 
@@ -533,7 +380,9 @@ Section Definitions.
 
 (** **Function definitions through power series
 
-We now define the exponential, sinus and cosinus functions as power series, and prove their convergence.  Tangent is defined as the quotient of sinus over cosinus.
+We now define the exponential, sine and cosine functions as power
+series, and prove their convergence.  Tangent is defined as the
+quotient of sine over cosine.
 *)
 
 Definition Exp_ps := FPowerSeries' Zero (fun n : nat => One).
@@ -582,12 +431,12 @@ eapply leEq_wdl;
 apply eq_imp_leEq.
 elim (even_odd_dec k); intro.
 apply eq_transitive_unfolded with (AbsIR One).
-apply AbsIR_wd; AStepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
+apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
 apply AbsIR_eq_x; apply less_leEq; apply pos_one.
 apply eq_transitive_unfolded with (AbsIR [--]One).
-apply AbsIR_wd; AStepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
-AStepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
-AStepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
+apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
+astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
+astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
 Qed.
 
 Lemma cos_conv : fun_series_convergent_IR realline cos_ps.
@@ -599,20 +448,23 @@ elim Hk; simpl in |- *; intro.
 apply eq_imp_leEq.
 elim (even_odd_dec k); intro.
 apply eq_transitive_unfolded with (AbsIR One).
-apply AbsIR_wd; AStepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
+apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
 apply AbsIR_eq_x; apply less_leEq; apply pos_one.
 apply eq_transitive_unfolded with (AbsIR [--]One).
-apply AbsIR_wd; AStepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
-AStepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
-AStepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
+apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
+astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
+astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
 eapply leEq_wdl;
  [ apply less_leEq; apply pos_one
  | apply eq_symmetric_unfolded; apply AbsIRz_isz ].
 Qed.
 
 Definition Expon := FSeries_Sum Exp_conv.
+
 Definition Sine := FSeries_Sum sin_conv.
+
 Definition Cosine := FSeries_Sum cos_conv.
+
 Definition Tang := Sine{/}Cosine.
 
 (**
@@ -653,16 +505,16 @@ apply Continuous_id.
 intros a b Hab H.
 split.
 Included.
-assert (H0 : Zero[<]a). apply H; apply compact_inc_lft.
+assert (H0 : Zero [<] a). apply H; apply compact_inc_lft.
 exists a.
 auto.
-intros; inversion_clear Hy.
+intros; inversion_clear X.
 apply leEq_transitive with y.
 auto.
 apply leEq_AbsIR.
 Qed.
 
-Definition Logarithm := ({-S-}log_defn_lemma) One (pos_one IR).
+Definition Logarithm := ( [-S-]log_defn_lemma) One (pos_one IR).
 
 End Definitions.
 
@@ -693,5 +545,6 @@ intros x y H.
 exact (pfstrx _ _ _ _ _ _ H).
 Defined.
 
-Definition Log (x : IR) (Hx : Zero[<]x) := Logarithm x Hx.
-Definition Tan (x : IR) Hx := Tang x Hx.
+Definition Log x (Hx : Zero [<] x) := Logarithm x Hx.
+
+Definition Tan x Hx := Tang x Hx.

@@ -6,16 +6,18 @@ Section Lemmas.
 
 (** **Algebraic Operations
 
-We will now prove the main results about deriving functions built from the algebraic operators#. #%\footnote{%Composition presents some tricky questions, and is therefore discussed in a separated context.%}.%
+We will now prove the main results about deriving functions built from
+the algebraic operators#. #%\footnote{%Composition presents some
+tricky questions, and is therefore discussed in a separated
+context.%}.%
 
-%\begin{convention}% Let [a,b:IR] with [a [<] b] and denote by [I] the interval $[a,b]$#[a,b]#  Throughout this section, [F,F',G,G'] and [H] will be partial functions with domains respectively [P,P',Q,Q'] and [R].  As suggested by the notation, [F'] and [G'] will be the derivatives, respectively, of [F] and [G].
-%\end{convention}%
+[F'] and [G'] will be the derivatives, respectively, of [F] and [G].
 
 We begin with some technical stuff that will be necessary for division.
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -35,11 +37,11 @@ elim H0; clear H0; intros x H1 H2.
 split.
 Included.
 exists (x[*]x).
-AStepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
  assumption.
 intros.
 unfold I in H;
- apply leEq_wdr with (AbsIR (FRestr H y Hy)[*]AbsIR (FRestr H y Hy)).
+ apply leEq_wdr with (AbsIR (FRestr H y X)[*]AbsIR (FRestr H y X)).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption); simpl in |- *;
  apply H2; try assumption.
 eapply eq_transitive_unfolded.
@@ -59,7 +61,7 @@ We can now derive all the usual rules for deriving constant and identity functio
 *)
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 (* begin hide *)
 Let Hab := less_leEq _ _ _ Hab'.
@@ -77,7 +79,7 @@ apply pos_one.
 intros.
 simpl in |- *.
 apply leEq_wdl with ZeroR.
-AStepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
 apply less_leEq; assumption.
 apply AbsIR_nonneg.
 eapply eq_transitive_unfolded.
@@ -95,7 +97,7 @@ exists e.
 assumption.
 intros.
 apply leEq_wdl with ZeroR.
-AStepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
 apply less_leEq; assumption.
 apply AbsIR_nonneg.
 eapply eq_transitive_unfolded.
@@ -126,7 +128,7 @@ clear H2 H6.
 exists (Min df dg).
 apply less_Min; assumption.
 intros.
-RStepr (e [/]TwoNZ[*]AbsIR (y[-]x)[+]e [/]TwoNZ[*]AbsIR (y[-]x));
+rstepr (e [/]TwoNZ[*]AbsIR (y[-]x)[+]e [/]TwoNZ[*]AbsIR (y[-]x));
  simpl in |- *.
 set (fx := F x (ProjIR1 Hx)) in *.
 set (fy := F y (ProjIR1 Hy)) in *.
@@ -187,15 +189,15 @@ Contin.
 Contin.
 intros e He.
 set (M := Max (Max nF nG) nG'[+]One) in *.
-cut (Zero[<]M).
+cut (Zero [<] M).
 intro HM'.
-cut (M[#]Zero).
+cut (M [#] Zero).
 intro HM.
 2: apply Greater_imp_ap; assumption.
-cut (Three[*]M[#]Zero).
+cut (Three[*]M [#] Zero).
 intro H3M.
 2: apply mult_resp_ap_zero; [ apply three_ap_zero | assumption ].
-cut (Zero[<](e[/] _[//]H3M)).
+cut (Zero [<] (e[/] _[//]H3M)).
 intro HeM.
 elim (contin_prop _ _ _ _ contF _ HeM); intros dc H H0.
 elim (H2 _ HeM); intros df H1 H3.
@@ -221,8 +223,8 @@ apply
     (AbsIR
        (fy[*](gy[-]gx[-]g'x[*](y[-]x))[+](fy[-]fx)[*]g'x[*](y[-]x)[+]
         gx[*](fy[-]fx[-]f'x[*](y[-]x)))).
-AStepr (e[*]AbsIR (y[-]x)).
-RStepr
+astepr (e[*]AbsIR (y[-]x)).
+rstepr
  (e [/]ThreeNZ[*]AbsIR (y[-]x)[+]e [/]ThreeNZ[*]AbsIR (y[-]x)[+]
   e [/]ThreeNZ[*]AbsIR (y[-]x)).
 eapply leEq_transitive; [ apply triangle_IR | apply plus_resp_leEq_both ].
@@ -241,7 +243,7 @@ eapply leEq_transitive.
 apply lft_leEq_Max.
 apply shift_mult_leEq' with HM.
 assumption.
-RStepr ((e[/] _[//]H3M)[*]AbsIR (y[-]x)).
+rstepr ((e[/] _[//]H3M)[*]AbsIR (y[-]x)).
 unfold gx, gy, g'x in |- *; apply H5; try assumption.
 apply leEq_transitive with d.
 assumption.
@@ -263,7 +265,7 @@ unfold nG', I, g'x in |- *; apply norm_bnd_AbsIR; assumption.
 apply AbsIR_nonneg.
 apply shift_mult_leEq with HM.
 assumption.
-RStepr (e[/] _[//]H3M).
+rstepr (e[/] _[//]H3M).
 unfold fx, fy in |- *; apply H0; try assumption.
 apply leEq_transitive with d.
 2: unfold d in |- *; apply Min_leEq_rht.
@@ -283,7 +285,7 @@ eapply leEq_transitive.
 apply rht_leEq_Max.
 apply shift_mult_leEq' with HM.
 assumption.
-RStepr ((e[/] _[//]H3M)[*]AbsIR (y[-]x)).
+rstepr ((e[/] _[//]H3M)[*]AbsIR (y[-]x)).
 unfold fx, fy, f'x in |- *; apply H3; try assumption.
 apply leEq_transitive with d.
 assumption.
@@ -291,7 +293,7 @@ unfold d in |- *; eapply leEq_transitive;
  [ apply Min_leEq_lft | apply Min_leEq_lft ].
 apply AbsIR_wd; rational.
 apply div_resp_pos.
-AStepl (Three[*]ZeroR); apply mult_resp_less_lft.
+astepl (Three[*]ZeroR); apply mult_resp_less_lft.
 assumption.
 apply pos_three.
 assumption.
@@ -310,9 +312,9 @@ As was the case for continuity, the rule for the reciprocal function has a side 
 Hypothesis Fbnd : bnd_away_zero I F.
 (* end show *)
 
-Lemma Derivative_I_recip : Derivative_I Hab' {1/}F {--}(F'{/}F{*}F).
-cut (forall (x : IR) (Hx : I x) Hx', F x Hx'[#]Zero).
-cut (forall (x : IR) (Hx : I x) Hx', (F{*}F) x Hx'[#]Zero).
+Lemma Derivative_I_recip : Derivative_I Hab' {1/}F {--} (F'{/}F{*}F).
+cut (forall (x : IR) (Hx : I x) Hx', F x Hx' [#] Zero).
+cut (forall (x : IR) (Hx : I x) Hx', (F{*}F) x Hx' [#] Zero).
 intros Hff Hf.
 clear derG.
 elim derF; intros incF H1.
@@ -329,18 +331,18 @@ cut (Continuous_I Hab {1/}F); [ intro H | Contin ].
 set (nF1 := Norm_Funct H) in *.
 set (nF' := Norm_Funct contF') in *.
 set (M := Max nF1 nF'[+]One) in *.
-cut (Zero[<]M).
+cut (Zero [<] M).
 intro HM.
-cut (M[#]Zero).
+cut (M [#] Zero).
 intro H0.
 2: apply Greater_imp_ap; assumption.
-cut (Two[*]M[*]M[#]Zero).
+cut (Two[*]M[*]M [#] Zero).
 intro HM2.
-cut (Two[*]M[*]M[*]M[*]M[#]Zero).
+cut (Two[*]M[*]M[*]M[*]M [#] Zero).
 intro HM4.
-cut (Zero[<](e[/] _[//]HM2)).
+cut (Zero [<] (e[/] _[//]HM2)).
 intro HeM2.
-cut (Zero[<](e[/] _[//]HM4)).
+cut (Zero [<] (e[/] _[//]HM4)).
 intro HeM4.
 elim (contF_ _ HeM4).
 intros d1 H1 H3.
@@ -350,10 +352,10 @@ clear H2.
 exists (Min d1 d2).
 apply less_Min; assumption.
 intros x y H2 H6 Hx Hy Hx' H7.
-cut (forall (x : IR) (Hx : I x) Hx', AbsIR (One[/] _[//]Hf x Hx Hx')[<=]M).
+cut (forall (x : IR) (Hx : I x) Hx', AbsIR (One[/] _[//]Hf x Hx Hx') [<=] M).
 intro leEqM.
 2: intros z Hz Hz'.
-2: apply leEq_wdl with (AbsIR ({1/}F z (contin_imp_inc _ _ _ _ H z Hz))).
+2: apply leEq_wdl with (AbsIR ( {1/}F z (contin_imp_inc _ _ _ _ H z Hz))).
 2: unfold M in |- *; eapply leEq_transitive.
 3: apply less_leEq; apply less_plusOne.
 2: eapply leEq_transitive.
@@ -387,7 +389,7 @@ apply
 2: apply AbsIR_wd; rational.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
-RStepr (M[*]M[*]((e[/] _[//]mult_resp_ap_zero _ _ _ H0 H0)[*]AbsIR (y[-]x))).
+rstepr (M[*]M[*]((e[/] _[//]mult_resp_ap_zero _ _ _ H0 H0)[*]AbsIR (y[-]x))).
 apply mult_resp_leEq_both; try apply AbsIR_nonneg.
 eapply leEq_wdl.
 2: apply AbsIR_inv.
@@ -400,7 +402,7 @@ eapply leEq_wdl.
 apply mult_resp_leEq_both; try apply AbsIR_nonneg; apply leEqM.
 eapply leEq_transitive.
 apply triangle_IR.
-RStepr ((e[/] _[//]HM2)[*]AbsIR (y[-]x)[+](e[/] _[//]HM2)[*]AbsIR (y[-]x)).
+rstepr ((e[/] _[//]HM2)[*]AbsIR (y[-]x)[+](e[/] _[//]HM2)[*]AbsIR (y[-]x)).
 apply plus_resp_leEq_both.
 apply H5; try assumption.
 eapply leEq_transitive.
@@ -414,7 +416,7 @@ apply
  leEq_wdl
   with (AbsIR ((F x Hxx[-]F y Hyy)[*](F' x Hxx'[/] _[//]Hf x H2 Hxx))).
 2: apply AbsIR_wd; rational.
-RStepr ((e[/] _[//]HM4)[*](M[*]M)).
+rstepr ((e[/] _[//]HM4)[*](M[*]M)).
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 apply mult_resp_leEq_both; try apply AbsIR_nonneg.
@@ -436,12 +438,12 @@ apply leEqM.
 apply AbsIR_wd.
 simpl in |- *; rational.
 apply div_resp_pos.
-repeat (AStepl (ZeroR[*]Zero); apply mult_resp_less_both);
+repeat (astepl (ZeroR[*]Zero); apply mult_resp_less_both);
  try apply leEq_reflexive; try assumption.
 apply pos_two.
 assumption.
 apply div_resp_pos.
-repeat (AStepl (ZeroR[*]Zero); apply mult_resp_less_both);
+repeat (astepl (ZeroR[*]Zero); apply mult_resp_less_both);
  try apply leEq_reflexive; try assumption.
 apply pos_two.
 assumption.
@@ -471,7 +473,7 @@ Hint Resolve Derivative_I_const Derivative_I_id Derivative_I_plus
 Section Corolaries.
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 (* begin hide *)
 Let Hab := less_leEq _ _ _ Hab'.
@@ -503,8 +505,7 @@ FEQ.
 Deriv.
 Qed.
 
-Lemma Derivative_I_nth :
- forall n : nat, Derivative_I Hab' (F{^}S n) (nring (S n){**}(F'{*}F{^}n)).
+Lemma Derivative_I_nth : forall n, Derivative_I Hab' (F{^}S n) (nring (S n) {**} (F'{*}F{^}n)).
 unfold Fscalmult in |- *.
 intro; induction  n as [| n Hrecn].
 apply Derivative_I_wdl with F.
@@ -516,7 +517,7 @@ apply Derivative_I_wdl with (F{*}F{^}S n).
 apply FNth_mult'; Included.
 apply
  Derivative_I_wdr
-  with (F{*}([-C-](nring (S n)){*}(F'{*}F{^}n)){+}F'{*}F{^}S n).
+  with (F{*} ([-C-](nring (S n)) {*} (F'{*}F{^}n)) {+}F'{*}F{^}S n).
 apply eq_imp_Feq.
 Included.
 Included.
@@ -538,11 +539,11 @@ set (fx''' := F x (ProjIR2 (ProjIR2 Hx'))) in *; simpl in (value of fx''');
 apply
  eq_transitive_unfolded
   with (fx[*]((nring n[+]One)[*](f'x[*]fx[^]n))[+]f'x[*](fx[^]n[*]fx)).
-AStepl (fx[*]((nring n[+]One)[*](f'x[*]fx'[^]n))[+]f'x'[*](fx''[^]n[*]fx'')).
+astepl (fx[*]((nring n[+]One)[*](f'x[*]fx'[^]n))[+]f'x'[*](fx''[^]n[*]fx'')).
 repeat apply bin_op_wd_unfolded; try apply nexp_wd;
  unfold fx, f'x, fx', f'x', fx'' in |- *; rational.
-RStepl ((nring n[+]One[+]One)[*](f'x[*](fx[^]n[*]fx))).
-AStepr ((nring n[+]One[+]One)[*](f'x''[*](fx'''[^]n[*]fx'''))).
+rstepl ((nring n[+]One[+]One)[*](f'x[*](fx[^]n[*]fx))).
+astepr ((nring n[+]One[+]One)[*](f'x''[*](fx'''[^]n[*]fx'''))).
 repeat apply bin_op_wd_unfolded; try apply nexp_wd;
  unfold fx, f'x, f'x'', fx''' in |- *; rational.
 Deriv.
@@ -550,9 +551,8 @@ Qed.
 
 Hypothesis Gbnd : bnd_away_zero I G.
 
-Lemma Derivative_I_div :
- Derivative_I Hab' (F{/}G) ((F'{*}G{-}F{*}G'){/}G{*}G).
-cut (Derivative_I Hab' (F{/}G) (F{*}{--}(G'{/}G{*}G){+}F'{*}{1/}G)).
+Lemma Derivative_I_div : Derivative_I Hab' (F{/}G) ((F'{*}G{-}F{*}G') {/}G{*}G).
+cut (Derivative_I Hab' (F{/}G) (F{*}{--} (G'{/}G{*}G) {+}F'{*}{1/}G)).
 intro H.
 eapply Derivative_I_wdr.
 2: apply H.
@@ -572,3 +572,55 @@ End Corolaries.
 
 Hint Resolve Derivative_I_minus Derivative_I_nth Derivative_I_scal
   Derivative_I_div: derivate.
+
+Section Derivative_Sums.
+
+(** The derivation rules for families of functions are easily proved by
+induction using the constant and addition rules.
+*)
+
+Variables a b : IR.
+Hypothesis Hab : a [<=] b.
+Hypothesis Hab' : a [<] b.
+
+(* begin hide *)
+Let I := Compact Hab.
+(* end hide *)
+
+Lemma Derivative_I_Sum0 : forall f f' : nat -> PartIR,
+ (forall n, Derivative_I Hab' (f n) (f' n)) -> forall n, Derivative_I Hab' (FSum0 n f) (FSum0 n f').
+intros.
+induction  n as [| n Hrecn].
+eapply Derivative_I_wdl.
+apply FSum0_0; Included.
+eapply Derivative_I_wdr.
+apply FSum0_0; Included.
+apply Derivative_I_const.
+eapply Derivative_I_wdl.
+apply FSum0_S; Included.
+eapply Derivative_I_wdr.
+apply FSum0_S; Included.
+apply Derivative_I_plus; auto.
+Qed.
+
+Lemma Derivative_I_Sumx : forall n (f f' : forall i, i < n -> PartIR),
+ (forall i Hi Hi', Derivative_I Hab' (f i Hi) (f' i Hi')) ->
+ Derivative_I Hab' (FSumx n f) (FSumx n f').
+intro; induction  n as [| n Hrecn]; intros f f' derF.
+simpl in |- *; apply Derivative_I_const; auto.
+simpl in |- *; apply Derivative_I_plus; auto.
+Qed.
+
+Lemma Derivative_I_Sum : forall f f' : nat -> PartIR, (forall n, Derivative_I Hab' (f n) (f' n)) ->
+ forall m n, Derivative_I Hab' (FSum m n f) (FSum m n f').
+intros.
+eapply Derivative_I_wdl.
+apply Feq_symmetric; apply FSum_FSum0'; Included.
+eapply Derivative_I_wdr.
+apply Feq_symmetric; apply FSum_FSum0'; Included.
+apply Derivative_I_minus; apply Derivative_I_Sum0; auto.
+Qed.
+
+End Derivative_Sums.
+
+Hint Resolve Derivative_I_Sum0 Derivative_I_Sum Derivative_I_Sumx: derivate.

@@ -1,5 +1,7 @@
 (* $Id$ *)
 
+(** printing [-S-] %\ensuremath{\int}% #&int;# *)
+
 Require Export MoreIntegrals.
 Require Export CalculusTheorems.
 
@@ -9,13 +11,18 @@ Section Indefinite_Integral.
 
 (** *The Fundamental Theorem of Calculus
 
-Finally we can prove the fundamental theorem of calculus and its most important corollaries---which are the main tools to formalize most of real analysis.
+Finally we can prove the fundamental theorem of calculus and its most
+important corollaries, which are the main tools to formalize most of
+real analysis.
 
 **Indefinite Integrals
 
-We define the indefinite integral of a function in a proper interval in the obvious way; we just need to state a first lemma so that the continuity proofs become unnecessary.
+We define the indefinite integral of a function in a proper interval
+in the obvious way; we just need to state a first lemma so that the
+continuity proofs become unnecessary.
 
-%\begin{convention}% Let [I:interval], [F:PartIR] be continuous in [I] and [a] be a point in [I].
+%\begin{convention}% Let [I : interval], [F : PartIR] be continuous in [I]
+and [a] be a point in [I].
 %\end{convention}%
 *)
 
@@ -33,10 +40,8 @@ elim contF; intros incI contI.
 Included.
 Qed.
 
-Lemma Fprim_strext :
- forall x y Hx Hy,
- Integral (prim_lemma x Hx)[#]Integral (prim_lemma y Hy) -> x[#]y.
-(* End_Tex_Verb *)
+Lemma Fprim_strext : forall x y Hx Hy,
+ Integral (prim_lemma x Hx) [#] Integral (prim_lemma y Hy) -> x [#] y.
 intros x y Hx Hy H.
 elim (Integral_strext' _ _ _ _ _ _ _ _ _ H).
 intro; elimtype False.
@@ -56,15 +61,18 @@ End Indefinite_Integral.
 
 Implicit Arguments Fprim [I F].
 
-Notation "{-S-} F" := (Fprim F) (at level 20).
+Notation "[-S-] F" := (Fprim F) (at level 20).
 
 Section FTC.
 
 (** **The FTC
 
-We can now prove our main theorem.  We begin by remarking that the primitive function is always continuous.
+We can now prove our main theorem.  We begin by remarking that the
+primitive function is always continuous.
 
-%\begin{convention}% Assume that [J:interval], [F:PartIR] is continuous in [J] and [x0] is a point in [J].  Denote by [G] the indefinite integral of [F] from [x0].
+%\begin{convention}% Assume that [J : interval], [F : PartIR] is
+continuous in [J] and [x0] is a point in [J].  Denote by [G] the
+indefinite integral of [F] from [x0].
 %\end{convention}%
 *)
 
@@ -77,7 +85,7 @@ Variable x0 : IR.
 Hypothesis Hx0 : J x0.
 
 (* begin hide *)
-Let G := ({-S-}contF) x0 Hx0.
+Let G := ( [-S-]contF) x0 Hx0.
 (* end hide *)
 
 Lemma Continuous_prim : Continuous J G.
@@ -119,8 +127,8 @@ eapply shift_mult_leEq'.
 apply pos_max_one.
 apply H3.
 apply AbsIR_wd.
-RStepl
- (Integral (prim_lemma J F contF x0 Hx0 y Hy)[+]Integral H4[-]
+rstepl
+ (Integral (prim_lemma J F contF x0 Hx0 y Hy) [+]Integral H4[-]
   Integral (prim_lemma J F contF x0 Hx0 y Hy)).
 apply cg_minus_wd.
 apply eq_symmetric_unfolded;
@@ -129,7 +137,7 @@ apply included_imp_Continuous with J; auto.
 apply included3_interval; auto.
 apply Integral_wd.
 apply Feq_reflexive.
-apply included_trans with J; Included.
+apply (included_trans _ (Compact (Min_leEq_Max x0 y)) J); Included.
 apply included_imp_Continuous with J; auto.
 Included.
 Included.
@@ -183,7 +191,7 @@ apply mult_resp_leEq_rht.
 apply leEq_Norm_Funct.
 intros z Hz Hz1.
 simpl in |- *.
-apply leEq_wdl with (AbsIR (F z (X1 z (X z (Hinc z Hz)))[-]F x Hx')).
+apply leEq_wdl with (AbsIR (F z (X1 z (X z (Hinc z Hz))) [-]F x Hx')).
 2: apply AbsIR_wd; Algebra.
 apply H4; auto.
 eapply leEq_transitive.
@@ -192,21 +200,21 @@ eapply leEq_wdr.
 2: apply eq_symmetric_unfolded; apply Abs_Max.
 eapply leEq_wdr.
 2: apply AbsIR_eq_x; apply shift_leEq_minus.
-2: AStepl (Min x y); apply Min_leEq_Max.
+2: astepl (Min x y); apply Min_leEq_Max.
 apply compact_elements with (Min_leEq_Max x y); auto.
 apply compact_Min_lft.
 apply AbsIR_wd; apply Integral_minus.
 apply AbsIR_wd; apply cg_minus_wd.
-RStepl
- (Integral (prim_lemma _ _ contF x0 Hx0 _ Hx)[+]Integral H8[-]
+rstepl
+ (Integral (prim_lemma _ _ contF x0 Hx0 _ Hx) [+]Integral H8[-]
   Integral (prim_lemma _ _ contF x0 Hx0 _ Hx)).
 apply cg_minus_wd.
 apply eq_symmetric_unfolded;
  apply Integral_plus_Integral with (Min3_leEq_Max3 x0 y x).
 apply included_imp_Continuous with J; auto.
 apply included3_interval; auto.
-apply Integral_wd; apply Feq_reflexive; apply included_trans with J;
- try apply included_interval; auto.
+apply Integral_wd. apply Feq_reflexive.
+apply (included_trans _ (Compact (Min_leEq_Max x0 x)) J); try apply included_interval; auto.
 apply Integral_const.
 Included.
 Included.
@@ -235,10 +243,8 @@ The following is another statement of the Fundamental Theorem of Calculus, also 
 Let G0_inc := Derivative_imp_inc _ _ _ _ derG0.
 (* end hide *)
 
-Theorem Barrow :
- forall (a b : IR) (H : Continuous_I (Min_leEq_Max a b) F) Ha Hb,
- let Ha' := G0_inc a Ha in
- let Hb' := G0_inc b Hb in Integral H[=]G0 b Hb'[-]G0 a Ha'.
+Theorem Barrow : forall a b (H : Continuous_I (Min_leEq_Max a b) F) Ha Hb,
+ let Ha' := G0_inc a Ha in let Hb' := G0_inc b Hb in Integral H [=] G0 b Hb'[-]G0 a Ha'.
 (* begin hide *)
 intros a b H1 Ha Hb; intros.
 elim FTC2; intros c Hc.
@@ -248,24 +254,24 @@ elim H; clear H Hc; intros H3 H0.
 Allow G0b to be G0 of b. *)
 set (G0a := G0 a Ha') in *.
 set (G0b := G0 b Hb') in *.
-RStepr (G0b[+]c[-](G0a[+]c)).
+rstepr (G0b[+]c[-] (G0a[+]c)).
 (* Allow Ga to be G of a.
 Allow Gb to be G of b.*)
 set (Ga := G a Ha) in *.
 set (Gb := G b Hb) in *.
 apply eq_transitive_unfolded with (Gb[-]Ga).
 unfold Ga, Gb, G in |- *; simpl in |- *.
-cut (forall x y z : IR, z[=]x[+]y -> y[=]z[-]x). intro H5.
+cut (forall x y z : IR, z [=] x[+]y -> y [=] z[-]x). intro H5.
 apply H5.
 apply Integral_plus_Integral with (Min3_leEq_Max3 x0 b a).
 apply included_imp_Continuous with J.
 auto.
 apply included3_interval; auto.
 intros; apply eq_symmetric_unfolded.
-RStepr (x[+]y[-]x); Algebra.
-cut (forall x y z : IR, x[-]y[=]z -> x[=]y[+]z); intros.
+rstepr (x[+]y[-]x); Algebra.
+cut (forall x y z : IR, x[-]y [=] z -> x [=] y[+]z); intros.
 Opaque G.
-cut (forall x : IR, J x -> forall Hx Hx', G x Hx[-]G0 x Hx'[=]c); intros.
+cut (forall x : IR, J x -> forall Hx Hx', G x Hx[-]G0 x Hx' [=] c); intros.
 apply cg_minus_wd; unfold Ga, Gb, G0a, G0b in |- *; apply H; auto.
 simpl in H0.
 apply eq_transitive_unfolded with ((G{-}G0) x (CAnd_intro _ _ Hx Hx')).
@@ -273,7 +279,7 @@ apply eq_transitive_unfolded with ((G{-}G0) x (CAnd_intro _ _ Hx Hx')).
 simpl in |- *; Algebra.
 auto.
 auto.
-RStepl (y[+](x[-]y)).
+rstepl (y[+] (x[-]y)).
 Algebra.
 Qed.
 (* end hide *)
@@ -290,13 +296,15 @@ Section Limit_of_Integral_Seq.
 With these tools in our hand, we can prove several useful results.
 
 %\begin{convention}% From this point onwards:
- - [J:interval];
- - [f:nat->PartIR] is a sequence of continuous functions (in [J]);
- - [F:PartIR] is continuous in [J].
+ - [J : interval];
+ - [f : nat->PartIR] is a sequence of continuous functions (in [J]);
+ - [F : PartIR] is continuous in [J].
 
 %\end{convention}%
 
-In the first place, if a sequence of continuous functions converges then the sequence of their primitives also converges, and the limit commutes with the indefinite integral.
+In the first place, if a sequence of continuous functions converges
+then the sequence of their primitives also converges, and the limit
+commutes with the indefinite integral.
 *)
 
 Variable J : interval.
@@ -312,12 +320,15 @@ Section Compact.
 (**
 We need to prove this result first for compact intervals.
 
-%\begin{convention}% Assume that [a,b,x0:IR] with [(f n)] and [F] continuous in $[a,b]$#[a,b]#, $x0\in[a,b]$#x0&isin;[a,b]#; denote by [(g n)] and [G] the indefinite integrals respectively of [(f n)] and [F] with origin [x0].
+%\begin{convention}% Assume that [a, b, x0 : IR] with [(f n)] and [F]
+continuous in [[a,b]], $x0\in[a,b]$#x0&isin;[a,b]#; denote by
+[(g n)] and [G] the indefinite integrals respectively of [(f n)] and
+[F] with origin [x0].
 %\end{convention}%
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 Hypothesis contIf : forall n : nat, Continuous_I Hab (f n).
 Hypothesis contIF : Continuous_I Hab F.
 (* begin show *)
@@ -329,8 +340,8 @@ Hypothesis Hx0 : J x0.
 Hypothesis Hx0' : Compact Hab x0.
 
 (* begin hide *)
-Let g (n : nat) := ({-S-}contf n) x0 Hx0.
-Let G := ({-S-}contF) x0 Hx0.
+Let g (n : nat) := ( [-S-]contf n) x0 Hx0.
+Let G := ( [-S-]contF) x0 Hx0.
 (* end hide *)
 
 (* begin show *)
@@ -342,7 +353,7 @@ Lemma fun_lim_seq_integral : conv_fun_seq' a b Hab g G contg contG.
 assert (H : conv_norm_fun_seq _ _ _ _ _ contIf contIF).
 apply conv_fun_seq'_norm; assumption.
 intros e H0.
-elim (Archimedes (AbsIR (b[-]a)[/] _[//]pos_ap_zero _ _ H0)); intros k Hk.
+elim (Archimedes (AbsIR (b[-]a) [/] _[//]pos_ap_zero _ _ H0)); intros k Hk.
 elim (H k); intros N HN.
 exists N; intros.
 assert (H2 : included (Compact (Min_leEq_Max x0 x)) (Compact Hab)).
@@ -372,7 +383,7 @@ apply norm_bnd_AbsIR.
 apply H2; auto.
 apply compact_elements with Hab; auto.
 unfold one_div_succ, Snring in |- *.
-RStepl (AbsIR (b[-]a)[/] _[//]nring_ap_zero _ _ (sym_not_eq (O_S k))).
+rstepl (AbsIR (b[-]a) [/] _[//]nring_ap_zero _ _ (sym_not_eq (O_S k))).
 apply shift_div_leEq.
 apply pos_nring_S.
 eapply shift_leEq_mult'.
@@ -389,18 +400,14 @@ End Compact.
 And now we can generalize it step by step.
 *)
 
-Lemma limit_of_integral :
- conv_fun_seq'_IR J f F contf contF ->
- forall x y Hxy,
- included (Compact Hxy) J ->
- forall Hf HF,
- Cauchy_Lim_prop2 (fun n : nat => integral x y Hxy (f n) (Hf n))
-   (integral x y Hxy F HF).
+Lemma limit_of_integral : conv_fun_seq'_IR J f F contf contF -> forall x y Hxy,
+ included (Compact Hxy) J -> forall Hf HF,
+ Cauchy_Lim_prop2 (fun n => integral x y Hxy (f n) (Hf n)) (integral x y Hxy F HF).
 intros H x y Hxy H0 Hf HF.
 assert (Hx : J x). apply H0; apply compact_inc_lft.
 assert (Hy : J y). apply H0; apply compact_inc_rht.
-set (g := fun n : nat => ({-S-}contf n) x Hx) in *.
-set (G := ({-S-}contF) x Hx) in *.
+set (g := fun n : nat => ( [-S-]contf n) x Hx) in *.
+set (G := ( [-S-]contF) x Hx) in *.
 set (Hxg := fun n : nat => Hy) in *.
 apply Lim_wd with (Part G y Hy).
 simpl in |- *; apply Integral_integral.
@@ -422,14 +429,10 @@ unfold G in |- *; apply included_imp_Continuous with J; Contin.
 intro; unfold g in |- *; apply included_imp_Continuous with J; Contin.
 Qed.
 
-Lemma limit_of_Integral :
- conv_fun_seq'_IR J f F contf contF ->
- forall x y : IR,
- included (Compact (Min_leEq_Max x y)) J ->
- forall Hxy Hf HF,
- Cauchy_Lim_prop2
-   (fun n : nat => Integral (a:=x) (b:=y) (Hab:=Hxy) (F:=f n) (Hf n))
-   (Integral (a:=x) (b:=y) (Hab:=Hxy) (F:=F) HF).
+Lemma limit_of_Integral : conv_fun_seq'_IR J f F contf contF -> forall x y,
+ included (Compact (Min_leEq_Max x y)) J -> forall Hxy Hf HF,
+ Cauchy_Lim_prop2 (fun n => Integral (a:=x) (b:=y) (Hab:=Hxy) (F:=f n) (Hf n))
+   (Integral (Hab:=Hxy) (F:=F) HF).
 intros convF x y H.
 set (x0 := Min x y) in *.
 intros.
@@ -437,8 +440,8 @@ assert (Hx0 : J x0).
  apply H; apply compact_inc_lft.
 assert (Hx0' : Compact Hxy x0).
  apply compact_inc_lft.
-set (g := fun n : nat => ({-S-}contf n) x0 Hx0) in *.
-set (G := ({-S-}contF) x0 Hx0) in *.
+set (g := fun n : nat => ( [-S-]contf n) x0 Hx0) in *.
+set (G := ( [-S-]contF) x0 Hx0) in *.
 unfold Integral in |- *; fold x0 in |- *.
 apply
  (Cauchy_Lim_minus
@@ -464,7 +467,7 @@ Qed.
 Section General.
 
 (**
-Finally, with [x0,g,G] as before,
+Finally, with [x0, g, G] as before,
 *)
 
 (* begin show *)
@@ -475,8 +478,8 @@ Variable x0 : IR.
 Hypothesis Hx0 : J x0.
 
 (* begin hide *)
-Let g (n : nat) := ({-S-}contf n) x0 Hx0.
-Let G := ({-S-}contF) x0 Hx0.
+Let g (n : nat) := ( [-S-]contf n) x0 Hx0.
+Let G := ( [-S-]contF) x0 Hx0.
 (* end hide *)
 
 Hypothesis contg : forall n : nat, Continuous J (g n).
@@ -487,18 +490,18 @@ red in |- *; intros.
 unfold g, G in |- *.
 cut (J a). intro H.
 set
- (h := fun n : nat => [-C-](Integral (prim_lemma _ _ (contf n) x0 Hx0 a H)))
+ (h := fun n : nat => [-C-] (Integral (prim_lemma _ _ (contf n) x0 Hx0 a H)))
  in *.
-set (g' := fun n : nat => h n{+}({-S-}contf n) a H) in *.
+set (g' := fun n : nat => h n{+} ( [-S-]contf n) a H) in *.
 set
- (G' := [-C-](Integral (prim_lemma _ _ contF x0 Hx0 a H)){+}({-S-}contF) a H)
+ (G' := [-C-] (Integral (prim_lemma _ _ contF x0 Hx0 a H)) {+} ( [-S-]contF) a H)
  in *.
 assert (H0 : forall n : nat, Continuous_I Hab (h n)).
  intro; unfold h in |- *; Contin.
-cut (forall n : nat, Continuous_I Hab (({-S-}contf n) a H)). intro H1.
+cut (forall n : nat, Continuous_I Hab (( [-S-]contf n) a H)). intro H1.
 assert (H2 : forall n : nat, Continuous_I Hab (g' n)).
  intro; unfold g' in |- *; Contin.
-cut (Continuous_I Hab (({-S-}contF) a H)). intro H3.
+cut (Continuous_I Hab (( [-S-]contF) a H)). intro H3.
 assert (H4 : Continuous_I Hab G'). 
  unfold G' in |- *; Contin.
 apply
@@ -525,7 +528,7 @@ unfold g' in H2.
 intro; apply Feq_reflexive; Included.
 unfold g', G' in |- *.
 apply
- (fun_Lim_seq_plus' _ _ Hab h (fun n : nat => ({-S-}contf n) a H) H0 H1 _ _
+ (fun_Lim_seq_plus' _ _ Hab h (fun n : nat => ( [-S-]contf n) a H) H0 H1 _ _
     (Continuous_I_const _ _ _ (Integral (prim_lemma _ _ contF x0 Hx0 a H)))
     H3).
 unfold h in |- *.
@@ -580,8 +583,8 @@ Hypothesis derf : forall n : nat, Derivative J pJ (f n) (g n).
 
 Lemma fun_lim_seq_derivative : Derivative J pJ F G.
 elim (nonvoid_point _ (proper_nonvoid _ pJ)); intros a Ha.
-set (h := fun n : nat => ({-S-}contg n) a Ha) in *.
-set (H := ({-S-}contG) a Ha) in *.
+set (h := fun n : nat => ( [-S-]contg n) a Ha) in *.
+set (H := ( [-S-]contG) a Ha) in *.
 assert (H0 : Derivative J pJ H G). unfold H in |- *; apply FTC1.
 assert (H1 : forall n : nat, Derivative J pJ (h n) (g n)). intro; unfold h in |- *; apply FTC1.
 assert
@@ -593,14 +596,14 @@ assert
 cut {c : IR | Feq J (F{-}H) [-C-]c}.
 intro H3.
 elim H3; clear H3; intros c Hc.
-apply Derivative_wdl with (H{+}[-C-]c).
-apply Feq_transitive with (H{+}(F{-}H)).
+apply Derivative_wdl with (H{+} [-C-]c).
+apply Feq_transitive with (H{+} (F{-}H)).
 apply Feq_plus.
 apply Feq_reflexive; Included.
 apply Feq_symmetric; assumption.
 clear Hc H2 H1; clearbody H.
 FEQ.
-apply Derivative_wdr with (G{+}[-C-]Zero).
+apply Derivative_wdr with (G{+} [-C-]Zero).
 FEQ.
 apply Derivative_plus; auto.
 apply Derivative_const.
@@ -635,8 +638,7 @@ Hypothesis convG : fun_series_convergent_IR J g.
 (* end show *)
 Hypothesis derF : forall n : nat, Derivative J pJ (f n) (g n).
 
-Lemma Derivative_FSeries :
- Derivative J pJ (FSeries_Sum convF) (FSeries_Sum convG).
+Lemma Derivative_FSeries : Derivative J pJ (FSeries_Sum convF) (FSeries_Sum convG).
 apply
  fun_lim_seq_derivative
   with

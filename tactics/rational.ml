@@ -58,8 +58,6 @@ let sixth_arg c = (args_app c).(5)
 
 let xinterp g c = sixth_arg (pf_type_of g c)
 
-let mk_existential env = Evarutil.new_evar_in_sign env
-
 let mk_lambda n t c = mkLambda (n,t,c)
 let mk_cast c t = mkCast (c,t)
 let mk_case ci a b c = mkCase (ci,a,b,c)

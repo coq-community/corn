@@ -107,16 +107,16 @@ Lemma shrink23d :
 Proof.
  intros.
  apply plus_cancel_less with (z := (r2[-]r1) [/]ThreeNZ).
- RStepl (r2[-](r2[-]r1) [/]ThreeNZ).
- RStepr r2.
+ rstepl (r2[-](r2[-]r1) [/]ThreeNZ).
+ rstepr r2.
  apply plus_cancel_less with (z := [--]r2).
- RStepr ([--](Zero:R1)).
- RStepl ([--]((r2[-]r1) [/]ThreeNZ)).
+ rstepr ([--](Zero:R1)).
+ rstepl ([--]((r2[-]r1) [/]ThreeNZ)).
  apply inv_resp_less.
  apply mult_cancel_less with (z := Three:R1).
  apply pos_nring_S.
- RStepl (Zero:R1).
- RStepr (r2[-]r1).
+ rstepl (Zero:R1).
+ rstepr (r2[-]r1).
  apply shift_zero_less_minus.
  assumption.
 Qed.
@@ -127,7 +127,7 @@ Lemma shrink13d :
 Proof.
  intros.
  apply less_transitive_unfolded with (y := r1[+](r2[-]r1) [/]ThreeNZ).
- AStepl (r1[+]Zero).
+ astepl (r1[+]Zero).
  apply plus_resp_less_lft.
  apply div_resp_pos.
  apply pos_three.
@@ -144,12 +144,12 @@ Proof.
  apply less_transitive_unfolded with (y := r2[-](r2[-]r1) [/]ThreeNZ).
  apply shrink23d.
  assumption.
- AStepl (r2[+][--]((r2[-]r1) [/]ThreeNZ)).
- AStepr (r2[+]Zero).
+ astepl (r2[+][--]((r2[-]r1) [/]ThreeNZ)).
+ astepr (r2[+]Zero).
  apply plus_resp_less_lft.
  apply inv_cancel_less.
- RStepl (Zero:R1).
- RStepr ((r2[-]r1) [/]ThreeNZ).
+ rstepl (Zero:R1).
+ rstepr ((r2[-]r1) [/]ThreeNZ).
  apply div_resp_pos.
  apply pos_three.
  apply shift_zero_less_minus.
@@ -248,8 +248,8 @@ Proof.
 
  apply or_not_and.
  right.
- apply ap_imp_not_eq.
- AStepl (fstT i[+](sndT i[-]fstT i) [/]ThreeNZ).
+ apply ap_imp_neq.
+ astepl (fstT i[+](sndT i[-]fstT i) [/]ThreeNZ).
  apply less_imp_ap.
  apply shrink23d.
  assumption.
@@ -275,8 +275,8 @@ Proof.
 
  apply or_not_and.
  right.
- apply ap_imp_not_eq.
- AStepl (sndT i[-](sndT i[-]fstT i) [/]ThreeNZ).
+ apply ap_imp_neq.
+ astepl (sndT i[-](sndT i[-]fstT i) [/]ThreeNZ).
  apply Greater_imp_ap.
  apply shrink23d.
  assumption.
@@ -331,10 +331,10 @@ Proof.
  rational.
 
  (* n=(S n0) & induction hypothesis *)
- AStepr (Two [/]ThreeNZ[*]((Two [/]ThreeNZ)[^]n[*](dstart_r[-]dstart_l))).
- AStepr (Two [/]ThreeNZ[*]Length _ (dIntrvl n)).
+ astepr (Two [/]ThreeNZ[*]((Two [/]ThreeNZ)[^]n[*](dstart_r[-]dstart_l))).
+ astepr (Two [/]ThreeNZ[*]Length _ (dIntrvl n)).
  apply delta_dIntrvl.
- AStepr ((Two [/]ThreeNZ)[^]n[*]Two [/]ThreeNZ[*](dstart_r[-]dstart_l)).
+ astepr ((Two [/]ThreeNZ)[^]n[*]Two [/]ThreeNZ[*](dstart_r[-]dstart_l)).
  rational.
 Qed.
 
@@ -356,7 +356,7 @@ Proof.
  assumption.
 
  (* n=(S n0) *)
-  cut {m = S n} + {m <= n}.
+  cut ({m = S n} + {m <= n}).
   intro H0.
   case H0.
   intro H1.
@@ -373,7 +373,7 @@ Proof.
   change (fstT (dIntrvl n)[<=]fstT (dif_cotrans (dIntrvl n))) in |- *.
   rewrite H4.
   simpl in |- *.
-  AStepl (fstT (dIntrvl n)[+]Zero).  
+  astepl (fstT (dIntrvl n)[+]Zero).  
   apply
    plus_resp_leEq_both
     with (b := (sndT (dIntrvl n)[-]fstT (dIntrvl n)) [/]ThreeNZ).
@@ -418,7 +418,7 @@ Proof.
  assumption.
 
  (* n=(S n0) *)
-  cut {m = S n} + {m <= n}.
+  cut ({m = S n} + {m <= n}).
   intro H0.
   case H0.
   intro H1.
@@ -440,15 +440,15 @@ Proof.
   change (sndT (dif_cotrans (dIntrvl n))[<=]sndT (dIntrvl n)) in |- *.
   rewrite H4.
   simpl in |- *.
-  AStepr (sndT (dIntrvl n)[+]Zero).
-  AStepl
+  astepr (sndT (dIntrvl n)[+]Zero).
+  astepl
    (sndT (dIntrvl n)[+][--]((sndT (dIntrvl n)[-]fstT (dIntrvl n)) [/]ThreeNZ)).
   apply plus_resp_leEq_both. 
   apply leEq_reflexive. 
 
   apply inv_cancel_leEq.
-  AStepl (Zero:R1). 
-  AStepr ((sndT (dIntrvl n)[-]fstT (dIntrvl n)) [/]ThreeNZ).
+  astepl (Zero:R1). 
+  astepr ((sndT (dIntrvl n)[-]fstT (dIntrvl n)) [/]ThreeNZ).
   apply less_leEq.
   apply div_resp_pos.
   apply pos_three.
@@ -529,8 +529,8 @@ Proof.
    less_transitive_unfolded
     with
       (y := Two [/]ThreeNZ[*]((One:R1)[/] nring (S m)[//]nringS_ap_zero _ m)).
-  AStepl (((Two:R1) [/]ThreeNZ)[^]m[*]Two [/]ThreeNZ).
-  AStepl ((Two:R1) [/]ThreeNZ[*](Two [/]ThreeNZ)[^]m).
+  astepl (((Two:R1) [/]ThreeNZ)[^]m[*]Two [/]ThreeNZ).
+  astepl ((Two:R1) [/]ThreeNZ[*](Two [/]ThreeNZ)[^]m).
   apply mult_resp_less_lft.
   apply Hrecm.
   apply lt_n_Sm_le.
@@ -546,14 +546,14 @@ Proof.
   apply pos_three.
   apply pos_nring_S.
   apply pos_nring_S.
-  RStepl ((Two:R1)[*]nring (S (S m))).
-  RStepr ((Three:R1)[*]nring (S m)).
-  AStepl ((Two:R1)[*](nring m[+]Two)).
-  AStepr ((Three:R1)[*](nring m[+]One)). 
+  rstepl ((Two:R1)[*]nring (S (S m))).
+  rstepr ((Three:R1)[*]nring (S m)).
+  astepl ((Two:R1)[*](nring m[+]Two)).
+  astepr ((Three:R1)[*](nring m[+]One)). 
   apply plus_cancel_less with (z := [--]((Two:R1)[*]nring m[+]Three)).
-  RStepl (One:R1).
-  RStepr (nring (R:=R1) m).
-  AStepl (nring (R:=R1) 1). 
+  rstepl (One:R1).
+  rstepr (nring (R:=R1) m).
+  astepl (nring (R:=R1) 1). 
   apply nring_less.
   apply lt_trans with (m := 3).
   constructor.
@@ -573,16 +573,16 @@ Proof.
   apply mult_cancel_less with (z := nring (R:=R1) 5[*]Three[^]4).
   apply mult_resp_pos.
   apply pos_nring_S.
-  RStepr (Three[^]2[*](Three[^]2:R1)).
+  rstepr (Three[^]2[*](Three[^]2:R1)).
   apply mult_resp_pos.
   apply pos_square.
   apply nringS_ap_zero.
   apply pos_square.
   apply nringS_ap_zero. 
-  RStepl (Two[^]4[*]nring (R:=R1) 5).
-  RStepr (Three[^]4:R1).
-  RStepl (nring (R:=R1) 80).
-  RStepr (nring (R:=R1) 81).
+  rstepl (Two[^]4[*]nring (R:=R1) 5).
+  rstepr (Three[^]4:R1).
+  rstepl (nring (R:=R1) 80).
+  rstepr (nring (R:=R1) 81).
   apply nring_less.
   constructor.
 Qed.
@@ -597,8 +597,8 @@ Proof.
  intros.
  apply AbsSmall_leEq_trans with (e1 := Length _ (dIntrvl m)).
  apply less_leEq.
- AStepl ((Two [/]ThreeNZ)[^]m[*](dstart_r[-]dstart_l)). 
- RStepr ((One[/] nring (S m)[//]nringS_ap_zero _ m)[*](dstart_r[-]dstart_l)).
+ astepl ((Two [/]ThreeNZ)[^]m[*](dstart_r[-]dstart_l)). 
+ rstepr ((One[/] nring (S m)[//]nringS_ap_zero _ m)[*](dstart_r[-]dstart_l)).
  apply mult_resp_less.
  apply a_familiar_simple_inequality.
  assumption.
@@ -690,8 +690,8 @@ Proof.
  apply less_wdr with (y := Length _ (dIntrvl n)).
  apply less_wdl with (x := Length _ (dIntrvl n) [/]TwoNZ).
  apply plus_cancel_less with (z := [--](Length R1 (dIntrvl n) [/]TwoNZ)). 
- RStepl (Zero:R1).
- RStepr (Length R1 (dIntrvl n) [/]TwoNZ).
+ rstepl (Zero:R1).
+ rstepr (Length R1 (dIntrvl n) [/]TwoNZ).
  apply pos_div_two.
  unfold Length in |- *.
  apply shift_zero_less_minus.
@@ -708,8 +708,8 @@ Proof.
  apply less_wdr with (y := Length _ (dIntrvl n)).
  apply less_wdl with (x := Length _ (dIntrvl n) [/]TwoNZ).
  apply plus_cancel_less with (z := [--](Length R1 (dIntrvl n) [/]TwoNZ)). 
- RStepl (Zero:R1).
- RStepr (Length R1 (dIntrvl n) [/]TwoNZ).
+ rstepl (Zero:R1).
+ rstepr (Length R1 (dIntrvl n) [/]TwoNZ).
  apply pos_div_two.
  unfold Length in |- *.
  apply shift_zero_less_minus.
@@ -728,7 +728,7 @@ Proof.
  apply less_wdr with (y := Length R1 (dIntrvl n) [/]TwoNZ).
  apply less_wdl with (x := [--](Length R1 (dIntrvl n))).
  apply plus_cancel_less with (z := Length R1 (dIntrvl n)). 
- RStepl (Zero:R1).
+ rstepl (Zero:R1).
  apply plus_resp_pos.
  apply pos_div_two. 
  unfold Length in |- *.
@@ -753,7 +753,7 @@ Proof.
  apply less_wdr with (y := Length R1 (dIntrvl n) [/]TwoNZ).
  apply less_wdl with (x := [--](Length R1 (dIntrvl n))).
  apply plus_cancel_less with (z := Length R1 (dIntrvl n)). 
- RStepl (Zero:R1).
+ rstepl (Zero:R1).
  apply plus_resp_pos.
  apply pos_div_two. 
  unfold Length in |- *.
@@ -804,8 +804,8 @@ Proof.
   less_transitive_unfolded
    with (y := One[+]nring (S n)[*]x[+]nring n[*]x[^]2).
  apply plus_cancel_less with (z := [--](One[+]nring (S n)[*]x)).
- RStepl (Zero:OF).
- RStepr (nring n[*]x[^]2).
+ rstepl (Zero:OF).
+ rstepr (nring n[*]x[^]2).
  apply mult_resp_pos.
  change (nring (R:=OF) 0[<]nring n) in |- *.
  apply nring_less.
@@ -833,7 +833,7 @@ Proof.
  rewrite <- H1.
  apply less_wdr with (y := One[+]Two[*]x[+]x[^]2).
  apply plus_cancel_less with (z := [--](One[+]Two[*]x)).
- AStepl (Zero:OF).
+ astepl (Zero:OF).
  apply less_wdr with (y := x[^]2).
  apply pos_square. 
  apply Greater_imp_ap.
@@ -887,13 +887,13 @@ Proof.
  apply less_transitive_unfolded with (y := One:R1).
  apply pos_one.
  apply plus_cancel_less with (z := [--](One:R1)).
- AStepl (Zero:R1).
- RStepr ((One:R1)[/] nring (S N)[//]nringS_ap_zero R1 N).
+ astepl (Zero:R1).
+ rstepr ((One:R1)[/] nring (S N)[//]nringS_ap_zero R1 N).
  apply recip_resp_pos.
  apply pos_nring_S.
  apply plus_cancel_less with (z := [--](One:R1)).
- RStepl (One[/] nring (S N)[//]nringS_ap_zero R1 N).
- AStepr (x[-]One).
+ rstepl (One[/] nring (S N)[//]nringS_ap_zero R1 N).
+ astepr (x[-]One).
  apply swap_div with (z_ := H0).
  apply pos_nring_S.
  apply shift_zero_less_minus.
@@ -935,12 +935,12 @@ Proof.
  apply less_wdl with (x := One:R1).
  apply less_wdr with (y := x[^]M1[*](x[^]M2[-]One)).
  apply leEq_less_trans with (y := x[^]M1[*]One).
- AStepr (x[^]M1).
+ astepr (x[^]M1).
  apply nexp_resp_great_One.
  assumption.
  apply mult_resp_less_lft.
  apply shift_less_minus.
- RStepl (Two:R1).
+ rstepl (Two:R1).
  assumption.
  apply leEq_less_trans with (y := nring (R:=R1) n).
  change (nring (R:=R1) 0[<=]nring n) in |- *.
@@ -969,8 +969,8 @@ Proof.
  intro H3.
  exists (N1 + N2).
  intros.
- RStepr (V m[-]U m[+](U m[-]B)).
- RStepl (e [/]TwoNZ[+]e [/]TwoNZ).
+ rstepr (V m[-]U m[+](U m[-]B)).
+ rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
  apply H2.
  apply le_trans with (m := N1 + N2).
@@ -1001,8 +1001,8 @@ Proof.
  case (twisted_archimedean N (Three [/]TwoNZ)).
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- AStepl (Two:R1).
- RStepr (Three:R1).
+ astepl (Two:R1).
+ rstepr (Three:R1).
  apply two_less_three.
  intro M.
  intros.
@@ -1021,8 +1021,8 @@ Proof.
  apply less_leEq.
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- RStepl (Two:R1).
- RStepr (Three:R1).
+ rstepl (Two:R1).
+ rstepr (Three:R1).
  apply two_less_three.
  apply le_O_n.
  apply
@@ -1031,7 +1031,7 @@ Proof.
      (x := (Two[^]m[/] Three[^]m[//]nexp_resp_ap_zero m (three_ap_zero R1))[*]
            (dstart_r[-]dstart_l)[*]
            (Three[^]m[/] Two[^]m[//]nexp_resp_ap_zero m (two_ap_zero R1))).
- RStepl (dstart_r[-]dstart_l).
+ rstepl (dstart_r[-]dstart_l).
  apply mult_cancel_less with (z := Two[/] e[//]Greater_imp_ap _ e Zero H). 
  apply div_resp_pos.
  assumption.
@@ -1039,7 +1039,7 @@ Proof.
  apply
   less_wdl
    with (x := Two[*](dstart_r[-]dstart_l)[/] e[//]Greater_imp_ap _ e Zero H).
- RStepr (((Three:R1) [/]TwoNZ)[^]m).
+ rstepr (((Three:R1) [/]TwoNZ)[^]m).
  apply less_transitive_unfolded with (y := nring (R:=R1) N).
  assumption.
  apply less_leEq_trans with (y := ((Three:R1) [/]TwoNZ)[^]M).
@@ -1048,8 +1048,8 @@ Proof.
  apply less_leEq.
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- RStepl (Two:R1).
- AStepr (Three:R1).
+ rstepl (Two:R1).
+ astepr (Three:R1).
  apply two_less_three.
  assumption.
 
@@ -1087,8 +1087,8 @@ Proof.
  intros.
  exists (N1 + N2).
  intros.
- RStepr (W m[-]U m[+](U m[-]B)).
- RStepl (e [/]TwoNZ[+]e [/]TwoNZ).
+ rstepr (W m[-]U m[+](U m[-]B)).
+ rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
  apply a.
  apply le_trans with (m := N1 + N2).
@@ -1119,8 +1119,8 @@ Proof.
  case (twisted_archimedean N (Three [/]TwoNZ)).
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- AStepl (Two:R1).
- RStepr (Three:R1).
+ astepl (Two:R1).
+ rstepr (Three:R1).
  apply two_less_three.
  intro M.
  intros.
@@ -1139,8 +1139,8 @@ Proof.
  apply less_leEq.
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- RStepl (Two:R1).
- RStepr (Three:R1).
+ rstepl (Two:R1).
+ rstepr (Three:R1).
  apply two_less_three.
  apply le_O_n.
  apply
@@ -1149,7 +1149,7 @@ Proof.
      (x := (Two[^]m[/] Three[^]m[//]nexp_resp_ap_zero m (three_ap_zero R1))[*]
            (dstart_r[-]dstart_l)[*]
            (Three[^]m[/] Two[^]m[//]nexp_resp_ap_zero m (two_ap_zero R1))).
- RStepl (dstart_r[-]dstart_l).
+ rstepl (dstart_r[-]dstart_l).
  apply mult_cancel_less with (z := Two[/] e[//]Greater_imp_ap _ e Zero H). 
  apply div_resp_pos.
  assumption.
@@ -1157,7 +1157,7 @@ Proof.
  apply
   less_wdl
    with (x := Two[*](dstart_r[-]dstart_l)[/] e[//]Greater_imp_ap _ e Zero H).
- RStepr (((Three:R1) [/]TwoNZ)[^]m).
+ rstepr (((Three:R1) [/]TwoNZ)[^]m).
  apply less_transitive_unfolded with (y := nring (R:=R1) N).
  assumption.
  apply less_leEq_trans with (y := ((Three:R1) [/]TwoNZ)[^]M).
@@ -1166,8 +1166,8 @@ Proof.
  apply less_leEq.
  apply mult_cancel_less with (z := Two:R1).
  apply pos_two.
- RStepl (Two:R1).
- AStepr (Three:R1).
+ rstepl (Two:R1).
+ astepr (Three:R1).
  apply two_less_three.
  assumption.
 
@@ -1279,21 +1279,21 @@ Proof.
  intro H1.
  apply plus_cancel_less with (z := (t[-]z) [/]TwoNZ).
  apply less_leEq_trans with (y := W N).
- RStepl (t[-](t[-]z) [/]TwoNZ).
+ rstepl (t[-](t[-]z) [/]TwoNZ).
  cut (is_upper_bound R1 A (W N)).
  intro H2.
  red in H2.
  apply (H2 t At). 
  apply plus_cancel_less with (z := (t[-]z) [/]TwoNZ[-]t).
- RStepl (Zero:R1).
- RStepr ((t[-]z) [/]TwoNZ).
+ rstepl (Zero:R1).
+ rstepr ((t[-]z) [/]TwoNZ).
  apply pos_div_two.
  apply shift_zero_less_minus.
  assumption.
  apply W_n_is_upper.
  apply plus_cancel_leEq_rht with (z := [--]B).
- AStepl (W N[-]B).
- RStepr ((t[-]z) [/]TwoNZ).
+ astepl (W N[-]B).
+ rstepr ((t[-]z) [/]TwoNZ).
  elim H1.
  intros H2 H3.
  assumption.
@@ -1323,14 +1323,14 @@ Proof.
  apply less_transitive_unfolded with (y := V N).
  apply less_leEq_trans with (y := B[-](B[-]b') [/]TwoNZ).
  apply plus_cancel_less with (z := [--]b').
- AStepl (Zero:R1).
- RStepr ((B[-]b') [/]TwoNZ).
+ astepl (Zero:R1).
+ rstepr ((B[-]b') [/]TwoNZ).
  apply pos_div_two.
  apply shift_zero_less_minus.
  assumption.
  apply plus_cancel_leEq_rht with (z := [--]B).
- AStepr (V N[-]B).
- RStepl ([--]((B[-]b') [/]TwoNZ)).
+ astepr (V N[-]B).
+ rstepl ([--]((B[-]b') [/]TwoNZ)).
  elim H1.
  intros.
  assumption.

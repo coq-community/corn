@@ -49,17 +49,17 @@ Proof.
  intros H11 H12.
  apply leEq_transitive with ((Lim h[-]Lim g) [/]ThreeNZ).
  apply mult_cancel_leEq with (Twelve:IR).
- AStepl (nring (R:=IR) 0); apply nring_less; auto with arith.
- RStepl (Zero[+]Three[*](Lim h[-]Lim g)).
- RStepr (Lim h[-]Lim g[+]Three[*](Lim h[-]Lim g)).
+ astepl (nring (R:=IR) 0); apply nring_less; auto with arith.
+ rstepl (Zero[+]Three[*](Lim h[-]Lim g)).
+ rstepr (Lim h[-]Lim g[+]Three[*](Lim h[-]Lim g)).
  apply plus_resp_leEq.
  apply shift_zero_leEq_minus; apply less_leEq; auto.
  apply plus_cancel_leEq_rht with (z := Lim g[-]Lim h).
- RStepr (CS_seq IR h n[-]Lim h[+](Lim g[-]CS_seq IR g n)).
- RStepl ([--]((Lim h[-]Lim g) [/]ThreeNZ)[+][--]((Lim h[-]Lim g) [/]ThreeNZ)).
+ rstepr (CS_seq IR h n[-]Lim h[+](Lim g[-]CS_seq IR g n)).
+ rstepl ([--]((Lim h[-]Lim g) [/]ThreeNZ)[+][--]((Lim h[-]Lim g) [/]ThreeNZ)).
  apply plus_resp_leEq_both.
  assumption.
- RStepr ([--](CS_seq IR g n[-]Lim g)).
+ rstepr ([--](CS_seq IR g n[-]Lim g)).
  apply inv_resp_leEq.
  assumption.
 
@@ -90,8 +90,8 @@ Lemma Lim_pres_less :
 Proof.
  do 3 intro.  intro H.
  apply plus_cancel_less with (z := [--](Lim g)).
- AStepl (Zero:IR).
- AStepr (Lim h[-]Lim g).
+ astepl (Zero:IR).
+ astepr (Lim h[-]Lim g).
  simpl in H.
  red in H.
  case H.
@@ -131,14 +131,14 @@ Proof.
  apply less_leEq_trans with (y := e [/]ThreeNZ).
  apply pos_div_three.
  assumption.
- RStepr
+ rstepr
   (Lim h[-]CS_seq IR h (N + (N1 + N2))[+]
    (CS_seq IR h (N + (N1 + N2))[-]CS_seq IR g (N + (N1 + N2)))[+]
    (CS_seq IR g (N + (N1 + N2))[-]Lim g)).
- RStepl ([--](e [/]ThreeNZ)[+]e[+][--](e [/]ThreeNZ)).
+ rstepl ([--](e [/]ThreeNZ)[+]e[+][--](e [/]ThreeNZ)).
  apply plus_resp_leEq_both.
  apply plus_resp_leEq_both.
- RStepr ([--](CS_seq IR h (N + (N1 + N2))[-]Lim h)).
+ rstepr ([--](CS_seq IR h (N + (N1 + N2))[-]Lim h)).
  apply inv_resp_leEq.
  assumption.
  apply H3.
@@ -233,7 +233,7 @@ Proof.
 
  apply less_inj_Q with (R1 := IR).
  simpl in |- *.
- RStepl (Zero:IR).
+ rstepl (Zero:IR).
  assumption.
 
  intros.
@@ -281,20 +281,20 @@ Proof.
  intro H6.
  apply less_irreflexive_unfolded with (x := y[-]Lim g).
 
- RStepr (Zero[+](CS_seq _ g (N1 + N2)[-]Lim g)[+](y[-]CS_seq _ g (N1 + N2))).
- RStepl
+ rstepr (Zero[+](CS_seq _ g (N1 + N2)[-]Lim g)[+](y[-]CS_seq _ g (N1 + N2))).
+ rstepl
   ((y[-]Lim g) [/]ThreeNZ[+](y[-]Lim g) [/]ThreeNZ[+](y[-]Lim g) [/]ThreeNZ).
  apply plus_resp_less_leEq.
  apply plus_resp_less_leEq.
  apply shift_div_less.
  apply pos_three.
- apply shift_minus_less; RStepr (Lim g); auto.
+ apply shift_minus_less; rstepr (Lim g); auto.
  elim (H6 (N1 + N2)); intros.
- RStepl ([--]((Lim g[-]y) [/]ThreeNZ)); auto.
+ rstepl ([--]((Lim g[-]y) [/]ThreeNZ)); auto.
  apply le_plus_r.
  elim (H3 (N1 + N2)); intros.
  apply inv_cancel_leEq.
- RStepr ((Lim g[-]y) [/]ThreeNZ); RStepl (g (N1 + N2)[-]y); auto.
+ rstepr ((Lim g[-]y) [/]ThreeNZ); rstepl (g (N1 + N2)[-]y); auto.
  apply le_plus_l.
  apply H4.
  apply pos_div_three.
@@ -330,20 +330,20 @@ Proof.
  intros.
  apply less_irreflexive_unfolded with (x := Lim g[-]y).
 
- RStepr (Zero[+](Lim g[-]CS_seq _ g (N1 + N2))[+](CS_seq _ g (N1 + N2)[-]y)).
- RStepl
+ rstepr (Zero[+](Lim g[-]CS_seq _ g (N1 + N2))[+](CS_seq _ g (N1 + N2)[-]y)).
+ rstepl
   ((Lim g[-]y) [/]ThreeNZ[+](Lim g[-]y) [/]ThreeNZ[+](Lim g[-]y) [/]ThreeNZ).
  apply plus_resp_less_leEq.
  apply plus_resp_less_leEq.
  apply shift_div_less.
  apply pos_three.
- apply shift_minus_less; RStepr y; auto.
+ apply shift_minus_less; rstepr y; auto.
  elim (a (N1 + N2)); intros.
  apply inv_cancel_leEq.
- RStepr ((y[-]Lim g) [/]ThreeNZ); RStepl (g (N1 + N2)[-]Lim g); auto.
+ rstepr ((y[-]Lim g) [/]ThreeNZ); rstepl (g (N1 + N2)[-]Lim g); auto.
  apply le_plus_r.
  elim (H3 (N1 + N2)); intros.
- RStepl ([--]((y[-]Lim g) [/]ThreeNZ)); auto.
+ rstepl ([--]((y[-]Lim g) [/]ThreeNZ)); auto.
  apply le_plus_l.
  apply H4.
  apply pos_div_three.
@@ -393,8 +393,8 @@ Proof.
  intro H7.
  exists (N1 + N2).
  intros.
- RStepl (e [/]TwoNZ[+]e [/]TwoNZ).
- RStepr (CS_seq IR h m[-]CS_seq IR g m[+](CS_seq IR g m[-]Lim g)).
+ rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
+ rstepr (CS_seq IR h m[-]CS_seq IR g m[+](CS_seq IR g m[-]Lim g)).
  apply AbsSmall_plus.
  apply AbsSmall_minus.
 
@@ -455,8 +455,8 @@ Proof.
  intro H6.
  exists (N1 + N2).
  intros m H7.
- RStepl (e [/]TwoNZ[+]e [/]TwoNZ).
- AStepr (CS_seq IR g m[-]Lim g[+](Lim h[-]CS_seq IR h m)). 
+ rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
+ astepr (CS_seq IR g m[-]Lim g[+](Lim h[-]CS_seq IR h m)). 
  apply AbsSmall_plus.
  apply H5.
  apply le_trans with (m := N1 + N2).
@@ -471,14 +471,14 @@ Proof.
   eq_transitive_unfolded
    with (y := CS_seq IR g m[-]CS_seq IR h m[+](Lim h[-]Lim g)).
  rational.
- AStepr (CS_seq IR g m[-]CS_seq IR h m[+]Zero). 
+ astepr (CS_seq IR g m[-]CS_seq IR h m[+]Zero). 
  apply bin_op_wd_unfolded.
  apply eq_reflexive_unfolded.
  apply cg_cancel_rht with (x := Lim g).
  apply eq_transitive_unfolded with (y := Lim h).
  apply eq_symmetric_unfolded.
  apply cg_cancel_mixed.
- AStepr (Lim g).
+ astepr (Lim g).
  apply eq_symmetric_unfolded.
  assumption.
 
@@ -532,7 +532,7 @@ Proof.
  exists N.
  intros.
  apply
-  AbsSmall_wd_rht_unfolded
+  AbsSmall_wdr_unfolded
    with
      (y := inj_Q IR (CS_seq Q_as_COrdField g m[-]CS_seq Q_as_COrdField h m)).
  apply AbsSmall_leEq_trans with (inj_Q IR q).
@@ -606,7 +606,7 @@ Proof.
  auto.
 
  apply
-  AbsSmall_wd_rht_unfolded
+  AbsSmall_wdr_unfolded
    with
      (inj_Q IR (CS_seq Q_as_COrdField g m)[-]
       inj_Q IR (CS_seq Q_as_COrdField h m)).
@@ -661,8 +661,8 @@ Proof.
  intro H5.
  exists (N1 + N2).
  intros.
- RStepr (CS_seq IR g m[-]Lim g[+](CS_seq IR h m[-]Lim h)).
- RStepl (e [/]TwoNZ[+]e [/]TwoNZ).
+ rstepr (CS_seq IR g m[-]Lim g[+](CS_seq IR h m[-]Lim h)).
+ rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
  apply H3.
  apply le_trans with (m := N1 + N2).
@@ -749,15 +749,15 @@ Proof.
  intros.
  apply AbsSmall_inj_Q with (R1 := IR).
  apply
-  AbsSmall_wd_rht_unfolded
+  AbsSmall_wdr_unfolded
    with
      (y := inj_Q IR (G IR (x[+]y) m)[-]
            (inj_Q _ (G IR x m)[+]inj_Q _ (G IR y m))).
- RStepr
+ rstepr
   (inj_Q _ (G IR (x[+]y) m)[-](x[+]y)[+](x[-]inj_Q _ (G IR x m))[+]
    (y[-]inj_Q _ (G IR y m))). 
  apply
-  AbsSmall_wd_lft_unfolded
+  AbsSmall_wdl_unfolded
    with
      (x := inj_Q IR (e [/]ThreeNZ)[+]inj_Q IR (e [/]ThreeNZ)[+]
            inj_Q IR (e [/]ThreeNZ)).
@@ -808,7 +808,7 @@ Proof.
  apply eq_reflexive_unfolded.
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
- apply inj_Q_well_def.
+ apply inj_Q_wd.
  rational.
  apply
   eq_transitive_unfolded
@@ -882,7 +882,7 @@ Proof.
  apply pos_one.
  intro N.
  intros.
- RStepr (Lim g[-]CS_seq IR g (N + M)[+]CS_seq IR g (N + M)).
+ rstepr (Lim g[-]CS_seq IR g (N + M)[+]CS_seq IR g (N + M)).
  apply AbsSmall_plus.
  apply AbsSmall_minus.
  apply a.
@@ -941,9 +941,9 @@ Proof.
  intro H12.
  exists (N1 + (N2 + M1)).
  intros m H13.
- RStepr
+ rstepr
   (CS_seq IR g m[*](CS_seq IR h m[-]Lim h)[+]Lim h[*](CS_seq IR g m[-]Lim g)).
- RStepl
+ rstepl
   (Three[*](K[*](e[/] Six[*]K[//]H9))[+]Three[*](L[*](e[/] Six[*]L[//]H10))).
  apply AbsSmall_plus.
  apply AbsSmall_mult.
@@ -1080,14 +1080,14 @@ Proof.
  intros.
  apply (AbsSmall_inj_Q IR).
  apply
-  AbsSmall_wd_rht_unfolded
+  AbsSmall_wdr_unfolded
    with
      (y := inj_Q IR (G IR (x[*]y) m)[-]
            inj_Q IR (G IR x m)[*]inj_Q IR (G IR y m)). 
- RStepr
+ rstepr
   (inj_Q IR (G IR (x[*]y) m)[-]x[*]y[+]x[*](y[-]inj_Q IR (G IR y m))[+]
    inj_Q IR (G IR y m)[*](x[-]inj_Q IR (G IR x m))).
- RStepl
+ rstepl
   (inj_Q IR e [/]TwoNZ[+]Three[*](L[*](inj_Q IR e[/] Twelve[*]L[//]H11))[+]
    Three[*](inj_Q IR K[*](inj_Q IR e[/] Twelve[*]inj_Q IR K[//]H10))).
  apply AbsSmall_plus.
@@ -1102,7 +1102,7 @@ Proof.
  assumption.
 
  apply AbsSmall_mult.
- apply AbsSmall_wd_rht_unfolded with (y := Lim (inj_Q_G_as_CauchySeq IR x)).
+ apply AbsSmall_wdr_unfolded with (y := Lim (inj_Q_G_as_CauchySeq IR x)).
  assumption.
  apply eq_symmetric_unfolded.
  apply SeqLimit_unique.
@@ -1277,7 +1277,7 @@ Qed.
 
 
 
-Theorem f12_strong_ext : fun_strong_ext f12.
+Theorem f12_strong_ext : fun_strext f12.
 Proof.
  intros.
  red in |- *.
@@ -1453,16 +1453,16 @@ Proof.
  exists 0.
  intros.
  unfold CS_seq in |- *.
- apply AbsSmall_wd_rht_unfolded with (y := Zero:R2).
+ apply AbsSmall_wdr_unfolded with (y := Zero:R2).
  split.
- RStepr ([--](Zero:R2)).
+ rstepr ([--](Zero:R2)).
  apply inv_resp_leEq.
  apply less_leEq.
  assumption.
  apply less_leEq.
  assumption.
  apply cg_cancel_rht with (x := inj_Q R2 (G R1 x m)[+]inj_Q R2 (G R1 y m)).
- AStepl (inj_Q R2 (G R1 x m)[+]inj_Q R2 (G R1 y m)).
+ astepl (inj_Q R2 (G R1 x m)[+]inj_Q R2 (G R1 y m)).
  apply eq_transitive_unfolded with (y := inj_Q R2 (G R1 x m[+]G R1 y m)).
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
@@ -1552,16 +1552,16 @@ Proof.
  exists 0.
  intros.
  unfold CS_seq in |- *.
- apply AbsSmall_wd_rht_unfolded with (y := Zero:R2).
+ apply AbsSmall_wdr_unfolded with (y := Zero:R2).
  split.
- RStepr ([--](Zero:R2)).
+ rstepr ([--](Zero:R2)).
  apply inv_resp_leEq.
  apply less_leEq.
  assumption.
  apply less_leEq.
  assumption.
  apply cg_cancel_rht with (x := inj_Q R2 (G R1 x m)[*]inj_Q R2 (G R1 y m)).
- AStepl (inj_Q R2 (G R1 x m)[*]inj_Q R2 (G R1 y m)).
+ astepl (inj_Q R2 (G R1 x m)[*]inj_Q R2 (G R1 y m)).
  apply eq_transitive_unfolded with (y := inj_Q R2 (G R1 x m[*]G R1 y m)).
  apply eq_symmetric_unfolded.
  apply inj_Q_mult.
@@ -1635,7 +1635,7 @@ Qed.
 
 
 
-Theorem g21_strong_ext : fun_strong_ext g21.
+Theorem g21_strong_ext : fun_strext g21.
 Proof.
  intros.
  red in |- *.
@@ -1811,16 +1811,16 @@ Proof.
  exists 0.
  intros.
  unfold CS_seq in |- *.
- apply AbsSmall_wd_rht_unfolded with (y := Zero:R1).
+ apply AbsSmall_wdr_unfolded with (y := Zero:R1).
  split.
- RStepr ([--](Zero:R1)).
+ rstepr ([--](Zero:R1)).
  apply inv_resp_leEq.
  apply less_leEq.
  assumption.
  apply less_leEq.
  assumption.
  apply cg_cancel_rht with (x := inj_Q R1 (G R2 x m)[+]inj_Q R1 (G R2 y m)).
- AStepl (inj_Q R1 (G R2 x m)[+]inj_Q R1 (G R2 y m)).
+ astepl (inj_Q R1 (G R2 x m)[+]inj_Q R1 (G R2 y m)).
  apply eq_transitive_unfolded with (y := inj_Q R1 (G R2 x m[+]G R2 y m)).
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
@@ -1913,16 +1913,16 @@ Proof.
  exists 0.
  intros.
  unfold CS_seq in |- *.
- apply AbsSmall_wd_rht_unfolded with (y := Zero:R1).
+ apply AbsSmall_wdr_unfolded with (y := Zero:R1).
  split.
- RStepr ([--](Zero:R1)).
+ rstepr ([--](Zero:R1)).
  apply inv_resp_leEq.
  apply less_leEq.
  assumption.
  apply less_leEq.
  assumption.
  apply cg_cancel_rht with (x := inj_Q R1 (G R2 x m)[*]inj_Q R1 (G R2 y m)).
- AStepl (inj_Q R1 (G R2 x m)[*]inj_Q R1 (G R2 y m)).
+ astepl (inj_Q R1 (G R2 x m)[*]inj_Q R1 (G R2 y m)).
  apply eq_transitive_unfolded with (y := inj_Q R1 (G R2 x m[*]G R2 y m)).
  apply eq_symmetric_unfolded.
  apply inj_Q_mult.

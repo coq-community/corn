@@ -1,29 +1,33 @@
 (* $Id$ *)
 
-(** printing included %\ensuremath{\subseteq}% #&sube;# *)
-
+Require Export CSetoidInc.
 Require Export RealLists.
 
 Section Intervals.
+
 (** * Intervals
-In this section we define (compact) intervals of the real line and some useful functions to work with them.
+In this section we define (compact) intervals of the real line and
+some useful functions to work with them.
 
 ** Definitions
 
-We start by defining the compact interval [[a,b]] as being the set of points less or equal than [b] and greater or equal than [a].  We require [a] to be less or equal to [b], as we want to work only in nonempty intervals.
+We start by defining the compact interval [[a,b]] as being the set of
+points less or equal than [b] and greater or equal than [a].  We
+require [a [<=] b], as we want to work only in nonempty intervals.
 *)
 
-Definition compact (a b : IR) (Hab : a[<=]b) (x : IR) := a[<=]x and x[<=]b.
+Definition compact (a b : IR) (Hab : a [<=] b) (x : IR) := a [<=] x and x [<=] b.
 
 (**
-%\begin{convention}% Let [a,b:IR] and [Hab:a [<=] b].
+%\begin{convention}% Let [a,b : IR] and [Hab : a [<=] b].
 %\end{convention}%
 
-As expected, both [a] and [b] are members of [[a,b]].  Also they are members of the interval $[\min(a,b),\max(a,b)]$#[min(a,b), max(a,b)]#.
+As expected, both [a] and [b] are members of [[a,b]].  Also they are
+members of the interval [[Min(a,b),Max(a,b)]].
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 
 Lemma compact_inc_lft : compact a b Hab a.
 intros; split; [ apply leEq_reflexive | auto ].
@@ -44,10 +48,11 @@ split; [ apply Min_leEq_rht | apply rht_leEq_Max ].
 Qed.
 
 (**
-As we will be interested in taking functions with domain in a compact interval, we want this predicate to be well defined.
+As we will be interested in taking functions with domain in a compact
+interval, we want this predicate to be well defined.
 *)
 
-Lemma compact_wd : pred_well_def IR (compact a b Hab).
+Lemma compact_wd : pred_wd IR (compact a b Hab).
 intros; red in |- *; intros.
 inversion_clear X; split.
 apply leEq_wdr with x; assumption.
@@ -58,9 +63,8 @@ Qed.
 Also, it will sometimes be necessary to rewrite the endpoints of an interval.
 *)
 
-Lemma compact_wd' :
- forall (a' b' : IR) Hab' (x : IR),
- a[=]a' -> b[=]b' -> compact a b Hab x -> compact a' b' Hab' x.
+Lemma compact_wd' : forall (a' b' : IR) Hab' (x : IR),
+ a [=] a' -> b [=] b' -> compact a b Hab x -> compact a' b' Hab' x.
 intros. rename X into H1.
 inversion_clear H1; split.
 apply leEq_wdl with a; auto.
@@ -71,14 +75,13 @@ Qed.
 As we identify subsets with predicates, inclusion is simply implication.
 *)
 
-Definition included (P Q : IR -> CProp) : CProp := forall x : IR, P x -> Q x.
-
 (**
-Finally, we define a restriction operator that takes a function [F] and a well defined predicate [P] included in the domain of [F] and returns the restriction $F|_P$# of F to P#.
+Finally, we define a restriction operator that takes a function [F]
+and a well defined predicate [P] included in the domain of [F] and
+returns the restriction $F|_P$# of F to P#.
 *)
 
-Definition Frestr (F : PartIR) (P : IR -> CProp) (HP : pred_well_def IR P)
-  (H : included P (Dom F)) : PartIR.
+Definition Frestr F P (HP : pred_wd IR P) (H : included P (Dom F)) : PartIR.
 intros.
 apply Build_PartFunct with P (fun (x : IR) (Hx : P x) => Part F x (H x Hx)).
 assumption.
@@ -93,91 +96,15 @@ Notation FRestr := (Frestr (compact_wd _ _ _)).
 
 Section More_Intervals.
 
-(** ** Inclusion
-
-We now turn our attention to the properties of the inclusion relation.  We show it to be reflexive and transitive, and to work as expected with conjunction and extension.  The second property is a generalization of the reflexivity when the same compact interval is characterized in two different ways.
-*)
-
-Lemma included_refl : forall P : IR -> CProp, included P P.
-intro.
-red in |- *; intros.
-auto.
-Qed.
-
-Lemma included_refl' :
- forall a b Hab Hab', included (compact a b Hab) (compact a b Hab').
+Lemma included_refl' : forall a b Hab Hab', included (compact a b Hab) (compact a b Hab').
 intros.
 red in |- *; intros.
 inversion_clear X; split; auto.
 Qed.
 
-Lemma included_trans :
- forall P Q R, included P Q -> included Q R -> included P R.
-intros.
-red in |- *; intros.
-apply X0; apply X; auto.
-Qed.
+(** We prove some inclusions of compact intervals.  *)
 
-Lemma included_conj :
- forall P Q R : IR -> CProp,
- included P Q -> included P R -> included P (Conj Q R).
-intros.
-red in |- *; red in X, X0.
-intros; red in |- *.
-split.
-apply X; assumption.
-apply X0; assumption.
-Qed.
-
-Lemma included_conj' : forall P Q : IR -> CProp, included (Conj P Q) P.
-intros.
-exact (prj1 _ P Q).
-Qed.
-
-Lemma included_conj'' : forall P Q : IR -> CProp, included (Conj P Q) Q.
-intros.
-exact (prj2 _ P Q).
-Qed.
-
-Lemma included_conj_lft :
- forall P Q R : IR -> CProp, included R (Conj P Q) -> included R P.
-intros. rename X into H.
-red in |- *; red in H.
-unfold conjP in H.
-intros.
-elim (H x).
-intros; trivial.
-assumption.
-Qed.
-
-Lemma included_conj_rht :
- forall P Q R : IR -> CProp, included R (Conj P Q) -> included R Q.
-intros. rename X into H.
-red in |- *; red in H.
-unfold conjP in H.
-intros.
-elim (H x).
-intros; trivial.
-assumption.
-Qed.
-
-Lemma included_extend :
- forall (P R : IR -> CProp) (Q : forall x : IR, P x -> CProp),
- included R (extend P Q) -> included R P.
-intros. rename X into H.
-red in |- *; red in H.
-unfold extend in H.
-intros.
-elim (H x).
-2: assumption.
-intros.
-tauto.
-Qed.
-
-(** We also prove some inclusions of compact intervals.  *)
-
-Lemma compact_map1 :
- forall (a b : IR) Hab Hab',
+Definition compact_map1 : forall a b Hab Hab',
  included (compact (Min a b) (Max a b) Hab') (compact a b Hab).
 intros.
 red in |- *; intros x H.
@@ -188,8 +115,7 @@ eapply leEq_wdl; [ apply H0 | apply leEq_imp_Min_is_lft; auto ].
 eapply leEq_wdr; [ apply H1 | apply leEq_imp_Max_is_rht; auto ].
 Defined.
 
-Lemma compact_map2 :
- forall (a b : IR) Hab Hab',
+Definition compact_map2 : forall a b Hab Hab',
  included (compact a b Hab) (compact (Min a b) (Max a b) Hab').
 intros.
 red in |- *; intros x H.
@@ -200,9 +126,8 @@ eapply leEq_transitive; [ apply Min_leEq_lft | apply H0 ].
 eapply leEq_transitive; [ apply H1 | apply rht_leEq_Max ].
 Defined.
 
-Lemma compact_map3 :
- forall (a b e : IR) Hab Hab',
- Zero[<]e -> included (compact a (b[-]e) Hab') (compact a b Hab).
+Definition compact_map3 : forall a b e Hab Hab', Zero [<] e ->
+ included (compact a (b[-]e) Hab') (compact a b Hab).
 intros; red in |- *. rename X into H.
 intros.  rename X into H0. inversion_clear H0; split.
 auto.
@@ -210,44 +135,51 @@ eapply leEq_transitive.
 apply H2.
 apply shift_minus_leEq.
 apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; assumption.
+astepl ZeroR; apply less_leEq; assumption.
 Qed.
 
 End More_Intervals.
+
+Hint Resolve included_refl' compact_map1 compact_map2 compact_map3 : included.
 
 Section Totally_Bounded.
 
 (** ** Totally Bounded
 
-Sets that are totally bounded will play an important role in what is to come.  The definition (equivalent to the classical one) states that [P] is totally bounded iff %\[\forall_{\varepsilon>0}\exists_{x_1,\ldots,x_n}\forall_{y\in P}\exists_{1\leq i\leq n}|y-x_i|<\varepsilon\]%
-#for all e>0 there exists x1,...,xn such that for all y in P there exists 1 &le; i &le; n such that |y-xi|<e#
+Totally bounded sets will play an important role in what is
+to come.  The definition (equivalent to the classical one) states that
+[P] is totally bounded iff
+%\[\forall_{\varepsilon>0}\exists_{x_1,\ldots,x_n}\forall_{y\in P}
+\exists_{1\leq i\leq n}|y-x_i|<\varepsilon\]%#&forall;e&gt;0
+&exist;x<sub>1</sub>,...,x<sub>n</sub>&forall;y&isin;P&exist;
+1&le;i&le;n.|y-x<sub>i</sub>|&lt;e#.
 
 Notice the use of lists for quantification.
 *)
 
-Definition totally_bounded (P : IR -> CProp) : CProp :=
-  {x : IR | P x}
-  and (forall e : IR,
-       Zero[<]e ->
-       {l : list IR | forall x : IR, member x l -> P x |
-       forall x : IR, P x -> {y : IR | member y l | AbsSmall e (x[-]y)}}).
+Definition totally_bounded (P : IR -> CProp) : CProp := {x : IR | P x} and (forall e,
+ Zero [<] e -> {l : list IR | forall x, member x l -> P x |
+ forall x, P x -> {y : IR | member y l | AbsSmall e (x[-]y)}}).
 
 (**
-This definition is classically, but not constructively, equivalent to the definition of compact (if completeness is assumed); the next result, classically equivalent to the Heine-Borel theorem, justifies that we take the definition of totally bounded to be the relevant one and that we defined compacts as we did.
+This definition is classically, but not constructively, equivalent to
+the definition of compact (if completeness is assumed); the next
+result, classically equivalent to the Heine-Borel theorem, justifies
+that we take the definition of totally bounded to be the relevant one
+and that we defined compacts as we did.
 *)
 
-Lemma compact_is_totally_bounded :
- forall a b Hab, totally_bounded (compact a b Hab).
+Lemma compact_is_totally_bounded : forall a b Hab, totally_bounded (compact a b Hab).
 intros; split.
 exists a.
 apply compact_inc_lft.
 cut
- (forall (n : nat) (a b e : IR) (Hab : a[<=]b) (He : Zero[<]e),
-  (b[-]a[/] e[//]pos_ap_zero _ _ He)[<=]nring n ->
-  (2 <= n -> nring n[-]Two[<=](b[-]a[/] e[//]pos_ap_zero _ _ He)) ->
+ (forall (n : nat) (a b e : IR) (Hab : a [<=] b) (He : Zero [<] e),
+  (b[-]a[/] e[//]pos_ap_zero _ _ He) [<=] nring n ->
+  (2 <= n -> nring n[-]Two [<=] (b[-]a[/] e[//]pos_ap_zero _ _ He)) ->
   {l : list IR | forall x : IR, member x l -> compact a b Hab x |
   forall x : IR,
-  compact a b Hab x -> {y : IR | member y l | AbsIR (x[-]y)[<=]e}}).
+  compact a b Hab x -> {y : IR | member y l | AbsIR (x[-]y) [<=] e}}).
 intros H e He.
 elim (str_Archimedes (b[-]a[/] _[//]pos_ap_zero _ _ (pos_div_two _ _ He))).
 intros n Hn.
@@ -268,7 +200,7 @@ assumption.
 apply less_leEq; apply pos_div_two'; assumption.
 apply shift_leEq_div;
  [ apply pos_div_two; assumption | apply shift_leEq_minus ].
-RStepl a; assumption.
+rstepl a; assumption.
 clear Hab a b; intro n; induction  n as [| n Hrecn].
 intros.
 exists (cons a (nil _)).
@@ -282,18 +214,18 @@ exists a.
 right; Algebra.
 apply leEq_wdl with ZeroR.
 apply less_leEq; auto.
-AStepl (AbsIR Zero).
+astepl (AbsIR Zero).
 apply AbsIR_wd.
 apply leEq_imp_eq. rename X into H1.
-apply shift_leEq_minus; AStepl a; elim H1; auto.
+apply shift_leEq_minus; astepl a; elim H1; auto.
 apply shift_minus_leEq.
 apply leEq_transitive with b. rename X into H1.
 elim H1; auto.
 apply shift_leEq_plus.
 apply mult_cancel_leEq with (One[/] _[//]pos_ap_zero _ _ He).
 apply recip_resp_pos; auto.
-AStepr ZeroR.
-RStepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
+astepr ZeroR.
+rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
 exists (cons a (nil IR)).
@@ -308,8 +240,8 @@ eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
 apply leEq_transitive with (b[-]a).
 apply minus_resp_leEq; assumption.
-RStepr (e[*]nring 1); eapply shift_leEq_mult'; [ assumption | apply H ].
-apply shift_leEq_minus; AStepl a.
+rstepr (e[*]nring 1); eapply shift_leEq_mult'; [ assumption | apply H ].
+apply shift_leEq_minus; astepl a.
 assumption.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
@@ -319,18 +251,18 @@ intros x H1.
 inversion_clear H1. rename X into H2.
 inversion_clear H2.
 apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | Algebra ].
-AStepl (a[+]Zero); apply shift_plus_leEq'.
+astepl (a[+]Zero); apply shift_plus_leEq'.
 apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
-AStepl ZeroR.
-RStepr (b[-]a).
-apply shift_leEq_minus; AStepl a; auto.
-AStepr (b[+]Zero); apply shift_leEq_plus'.
+astepl ZeroR.
+rstepr (b[-]a).
+apply shift_leEq_minus; astepl a; auto.
+astepr (b[+]Zero); apply shift_leEq_plus'.
 apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
-AStepr ZeroR.
-RStepl (a[-]b).
-apply shift_minus_leEq; AStepr b; auto.
+astepr ZeroR.
+rstepl (a[-]b).
+apply shift_minus_leEq; astepr b; auto.
 intros.
 exists ((a[+]b) [/]TwoNZ).
 right; Algebra.
@@ -339,7 +271,7 @@ eapply leEq_wdl.
 apply shift_minus_leEq; apply Max_leEq; apply shift_leEq_plus';
  apply leEq_Min.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 apply shift_minus_leEq.
 apply leEq_transitive with b. rename X into H1.
 elim H1; auto.
@@ -348,7 +280,7 @@ apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
 apply shift_leEq_mult' with enz.
 auto.
-RStepl (b[-]a[/] e[//]enz); auto.
+rstepl (b[-]a[/] e[//]enz); auto.
 apply leEq_transitive with a.
 2: rename X into H1; elim H1; auto.
 apply shift_minus_leEq; apply shift_leEq_plus'.
@@ -356,12 +288,12 @@ apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
 apply shift_leEq_mult' with enz.
 auto.
-RStepl (b[-]a[/] e[//]enz); auto.
+rstepl (b[-]a[/] e[//]enz); auto.
 apply shift_minus_leEq; apply shift_leEq_plus'.
-AStepl ZeroR; apply less_leEq; auto.
+astepl ZeroR; apply less_leEq; auto.
 intros.
 set (b' := b[-]e) in *.
-cut (a[<=]b'); intros.
+cut (a [<=] b'); intros.
 elim (Hrecn a b' e H1 He).
 intros l Hl' Hl.
 exists (cons b' l).
@@ -372,7 +304,7 @@ simpl in H2; inversion_clear H2.
 apply Hl'; assumption.
 apply compact_wd with b'; [ apply compact_inc_rht | Algebra ].
 intros.
-cut (x[<]b' or b'[-]e[<]x). intros H3.
+cut (x [<] b' or b'[-]e [<] x). intros H3.
 inversion_clear H3.
 cut (compact a b' H1 x). intros H3.
 elim (Hl x H3).
@@ -388,64 +320,63 @@ right; Algebra.
 simpl in |- *; unfold ABSIR in |- *.
 apply Max_leEq.
 apply shift_minus_leEq; unfold b' in |- *.
-RStepr b. rename X into H2.
+rstepr b. rename X into H2.
 elim H2; auto.
-RStepl (b'[-]x); apply shift_minus_leEq; apply shift_leEq_plus';
+rstepl (b'[-]x); apply shift_minus_leEq; apply shift_leEq_plus';
  apply less_leEq; assumption.
-cut (b'[-]e[<]x or x[<]b'); [ tauto | apply cotrans_less_unfolded ].
-apply shift_minus_less; apply shift_less_plus'; AStepl ZeroR; assumption.
+cut (b'[-]e [<] x or x [<] b'); [ tauto | apply less_cotransitive_unfolded ].
+apply shift_minus_less; apply shift_less_plus'; astepl ZeroR; assumption.
 
 unfold b' in |- *.
-RStepl ((b[-]a[/] e[//]pos_ap_zero _ _ He)[-]One).
+rstepl ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-]One).
 apply shift_minus_leEq.
-AStepr (nring (R:=IR) (S (S (S n)))); auto.
+astepr (nring (R:=IR) (S (S (S n)))); auto.
 intro.
 unfold b' in |- *.
-RStepr ((b[-]a[/] e[//]pos_ap_zero _ _ He)[-]One).
+rstepr ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-]One).
 apply shift_leEq_minus.
-RStepl (nring (R:=IR) (S (S n))[+]One[-]Two).
+rstepl (nring (R:=IR) (S (S n)) [+]One[-]Two).
 auto with arith.
 
 unfold b' in |- *.
 apply shift_leEq_minus; apply shift_plus_leEq'.
-AStepl (One[*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
+astepl (One[*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
 auto.
-apply leEq_transitive with (nring (R:=IR) (S (S (S n)))[-]Two).
-apply shift_leEq_minus; RStepl (Three:IR); apply nring_leEq; auto with arith.
+apply leEq_transitive with (nring (R:=IR) (S (S (S n))) [-]Two).
+apply shift_leEq_minus; rstepl (Three:IR); apply nring_leEq; auto with arith.
 auto with arith.
 Qed.
 
 (**
-Suprema and infima will be needed throughout; we define them here both for arbitrary subsets of [IR] and for images of functions.
+Suprema and infima will be needed throughout; we define them here both
+for arbitrary subsets of [IR] and for images of functions.
 *)
 
-Definition set_glb_IR (P : IR -> CProp) (a : IR) : CProp :=
-  (forall x : IR, P x -> a[<=]x)
-  and (forall e : IR, Zero[<]e -> {x : IR | P x | x[-]a[<]e}).
+Definition set_glb_IR (P : IR -> CProp) a : CProp := (forall x, P x -> a [<=] x) and
+ (forall e, Zero [<] e -> {x : IR | P x | x[-]a [<] e}).
 
-Definition set_lub_IR (P : IR -> CProp) (a : IR) : CProp :=
-  (forall x : IR, P x -> x[<=]a)
-  and (forall e : IR, Zero[<]e -> {x : IR | P x | a[-]x[<]e}).
+Definition set_lub_IR (P : IR -> CProp) a : CProp := (forall x, P x -> x [<=] a) and
+ (forall e, Zero [<] e -> {x : IR | P x | a[-]x [<] e}).
 
-Definition fun_image (F : PartIR) (P : IR -> CProp) 
-  (x : IR) : CProp := {y : IR | P y and Dom F y and (forall Hy, F y Hy[=]x)}.
+Definition fun_image F (P : IR -> CProp) x : CProp := {y : IR |
+ P y and Dom F y and (forall Hy, F y Hy [=] x)}.
   
-Definition fun_glb_IR (F : PartIR) (P : IR -> CProp) 
-  (a : IR) : CProp := set_glb_IR (fun_image F P) a.
+Definition fun_glb_IR F (P : IR -> CProp) a : CProp :=
+ set_glb_IR (fun_image F P) a.
 
-Definition fun_lub_IR (F : PartIR) (P : IR -> CProp) 
-  (a : IR) : CProp := set_lub_IR (fun_image F P) a.
+Definition fun_lub_IR F (P : IR -> CProp) a : CProp :=
+ set_lub_IR (fun_image F P) a.
 
 (* begin hide *)
 Let aux_seq_lub (P : IR -> CProp) (H : totally_bounded P) :
   forall k : nat,
   Build_SubCSetoid IR
     (fun x : IR =>
-     P x and (forall y : IR, P y -> y[-]x[<=]Two[*]one_div_succ k)).
+     P x and (forall y : IR, P y -> y[-]x [<=] Two[*]one_div_succ k)).
 intros P H; elim H; clear H; intros non_empty H k.
 elim (H (one_div_succ k) (one_div_succ_pos IR k)).
 intros l Hl' Hl; clear H.
-cut {y : IR | member y l | maxlist l[-]one_div_succ k[<=]y}.
+cut {y : IR | member y l | maxlist l[-]one_div_succ k [<=] y}.
 intro H; inversion_clear H.
 2: apply maxlist_leEq_eps.
 2: inversion_clear non_empty.
@@ -460,8 +391,8 @@ apply Hl'; assumption.
 intros y Hy.
 elim (Hl y Hy).
 intros z Hz Hz'.
-RStepl (y[-]z[+](z[-]x)).
-RStepr (one_div_succ (R:=IR) k[+]one_div_succ k).
+rstepl (y[-]z[+] (z[-]x)).
+rstepr (one_div_succ (R:=IR) k[+]one_div_succ k).
 apply plus_resp_leEq_both.
 apply leEq_transitive with (AbsIR (y[-]z)).
 apply leEq_AbsIR.
@@ -477,13 +408,13 @@ Let aux_seq_lub_prop :
   forall (P : IR -> CProp) (H : totally_bounded P),
   (forall k : nat, P (scs_elem _ _ (aux_seq_lub P H k)))
   and (forall (k : nat) (y : IR),
-       P y -> y[-]scs_elem _ _ (aux_seq_lub P H k)[<=]Two[*]one_div_succ k).
+       P y -> y[-]scs_elem _ _ (aux_seq_lub P H k) [<=] Two[*]one_div_succ k).
 intros;
  cut
   (forall k : nat,
    P (scs_elem _ _ (aux_seq_lub P H k))
    and (forall y : IR,
-        P y -> y[-]scs_elem _ _ (aux_seq_lub P H k)[<=]Two[*]one_div_succ k)).
+        P y -> y[-]scs_elem _ _ (aux_seq_lub P H k) [<=] Two[*]one_div_succ k)).
 intro H0.
 split; intro; elim (H0 k); intros.
 assumption.
@@ -496,14 +427,14 @@ Qed.
 The following are probably the most important results in this section.
 *)
 
-Lemma totally_bounded_has_lub :
- forall P : IR -> CProp, totally_bounded P -> {z : IR | set_lub_IR P z}.
+Lemma totally_bounded_has_lub : forall P,
+ totally_bounded P -> {z : IR | set_lub_IR P z}.
 intros P tot_bnd.
 red in tot_bnd.
 elim tot_bnd; intros non_empty H.
 cut
  {sequence : nat -> IR | forall k : nat, P (sequence k) |
- forall (k : nat) (x : IR), P x -> x[-]sequence k[<=]Two[*]one_div_succ k}.
+ forall (k : nat) (x : IR), P x -> x[-]sequence k [<=] Two[*]one_div_succ k}.
 intros H0.
 elim H0.
 intros seq Hseq Hseq'.
@@ -513,7 +444,7 @@ set (seq1 := Build_CauchySeq IR seq H1) in *.
 exists (Lim seq1).
 split; intros.
 apply shift_leEq_rht.
-AStepl ([--]ZeroR); RStepr ([--](x[-]Lim seq1)).
+astepl ( [--]ZeroR); rstepr ( [--] (x[-]Lim seq1)).
 apply inv_resp_leEq.
 set (seq2 := Cauchy_const x) in *.
 apply leEq_wdl with (Lim seq2[-]Lim seq1).
@@ -554,7 +485,7 @@ intros eps Heps; elim (H3 eps Heps); clear H3; intros.
 exists x.
 intros m Hm; elim (p m Hm); clear p.
 intros.
-AStepr (seq1 m[-]Lim seq1).
+astepr (seq1 m[-]Lim seq1).
 apply AbsIR_eq_AbsSmall; assumption.
 red in |- *; fold (SeqLimit seq1 (Lim seq1)) in |- *.
 apply ax_Lim.
@@ -563,20 +494,20 @@ red in |- *; intros. rename X into H1.
 elim (Archimedes (One[/] e[//]pos_ap_zero _ _ H1)).
 intros n Hn.
 exists (S (2 * n)); intros.
-cut (Zero[<]nring (R:=IR) n); intros.
+cut (Zero [<] nring (R:=IR) n); intros.
 apply AbsIR_eq_AbsSmall. rename X into H3.
-apply leEq_transitive with ([--](One[/] nring n[//]pos_ap_zero _ _ H3)).
+apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H3)).
 apply inv_resp_leEq.
 apply shift_div_leEq.
 assumption.
 eapply shift_leEq_mult'; [ assumption | apply Hn ].
-RStepr ([--](seq (S (2 * n))[-]seq m)); apply inv_resp_leEq.
+rstepr ( [--] (seq (S (2 * n)) [-]seq m)); apply inv_resp_leEq.
 apply leEq_transitive with (Two[*]one_div_succ (R:=IR) m).
 auto.
 apply leEq_transitive with (one_div_succ (R:=IR) n).
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-RStepl
+rstepl
  (One[/] nring (S m) [/]TwoNZ[//]
   div_resp_ap_zero_rev _ _ _ _ (nring_ap_zero IR (S m) (sym_not_eq (O_S m)))).
 apply recip_resp_leEq.
@@ -584,11 +515,11 @@ apply pos_nring_S.
 apply shift_leEq_div.
 apply pos_two.
 simpl in |- *; fold (Two:IR) in |- *.
-RStepl (Two[*]nring (R:=IR) n[+]One[+]One).
+rstepl (Two[*]nring (R:=IR) n[+]One[+]One).
 apply plus_resp_leEq.
 apply leEq_wdl with (nring (R:=IR) (S (2 * n))).
 apply nring_leEq; assumption.
-Step_final (nring (R:=IR) (2 * n)[+]One).
+Step_final (nring (R:=IR) (2 * n) [+]One).
 unfold one_div_succ in |- *; unfold Snring in |- *; apply recip_resp_leEq.
 assumption.
 simpl in |- *; apply less_leEq; apply less_plusOne.
@@ -596,22 +527,22 @@ apply leEq_transitive with (Two[*]one_div_succ (R:=IR) (S (2 * n))).
 auto.
 apply less_leEq. rename X into H3.
 apply less_leEq_trans with (One[/] nring n[//]pos_ap_zero _ _ H3).
-AStepl (one_div_succ (R:=IR) (S (2 * n))[*]Two).
+astepl (one_div_succ (R:=IR) (S (2 * n)) [*]Two).
 unfold one_div_succ in |- *; unfold Snring in |- *.
 apply shift_mult_less with (two_ap_zero IR).
 apply pos_two.
-RStepr
+rstepr
  (One[/] Two[*]nring n[//]
   mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H3)).
 apply recip_resp_less.
-AStepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
  [ apply pos_two | assumption ].
 apply less_wdr with (Two[*]nring (R:=IR) n[+]One[+]One).
 apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+]One);
  apply less_plusOne.
-AStepr (nring (R:=IR) (S (2 * n))[+]One).
-Step_final (nring (R:=IR) (2 * n)[+]One[+]One).
-RStepr
+astepr (nring (R:=IR) (S (2 * n)) [+]One).
+Step_final (nring (R:=IR) (2 * n) [+]One[+]One).
+rstepr
  (One[/] One[/] e[//]pos_ap_zero _ _ H1[//]
   div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
 apply recip_resp_leEq; [ apply recip_resp_pos; assumption | assumption ].
@@ -627,11 +558,11 @@ Let aux_seq_glb (P : IR -> CProp) (H : totally_bounded P) :
   forall k : nat,
   Build_SubCSetoid IR
     (fun x : IR =>
-     P x and (forall y : IR, P y -> x[-]y[<=]Two[*]one_div_succ k)).
+     P x and (forall y : IR, P y -> x[-]y [<=] Two[*]one_div_succ k)).
 intros P H; elim H; clear H; intros non_empty H k.
 elim (H (one_div_succ k) (one_div_succ_pos IR k)).
 intros l Hl' Hl; clear H.
-cut {y : IR | member y l | y[<=]minlist l[+]one_div_succ k}.
+cut {y : IR | member y l | y [<=] minlist l[+]one_div_succ k}.
 intro H; inversion_clear H.
 2: apply minlist_leEq_eps.
 2: inversion_clear non_empty.
@@ -646,8 +577,8 @@ apply Hl'; assumption.
 intros y Hy.
 elim (Hl y Hy).
 intros z Hz Hz'.
-RStepl (x[-]z[+](z[-]y)).
-RStepr (one_div_succ (R:=IR) k[+]one_div_succ k).
+rstepl (x[-]z[+] (z[-]y)).
+rstepr (one_div_succ (R:=IR) k[+]one_div_succ k).
 apply plus_resp_leEq_both.
 apply shift_minus_leEq.
 apply shift_leEq_plus'.
@@ -656,7 +587,7 @@ apply shift_minus_leEq.
 assumption.
 apply minlist_smaller; assumption.
 apply leEq_transitive with (AbsIR (y[-]z)).
-RStepl ([--](y[-]z)); apply inv_leEq_AbsIR.
+rstepl ( [--] (y[-]z)); apply inv_leEq_AbsIR.
 apply AbsSmall_imp_AbsIR; assumption.
 Qed.
 
@@ -664,13 +595,13 @@ Let aux_seq_glb_prop :
   forall (P : IR -> CProp) (H : totally_bounded P),
   (forall k : nat, P (scs_elem _ _ (aux_seq_glb P H k)))
   and (forall (k : nat) (y : IR),
-       P y -> scs_elem _ _ (aux_seq_glb P H k)[-]y[<=]Two[*]one_div_succ k).
+       P y -> scs_elem _ _ (aux_seq_glb P H k) [-]y [<=] Two[*]one_div_succ k).
 intros;
  cut
   (forall k : nat,
    P (scs_elem _ _ (aux_seq_glb P H k))
    and (forall y : IR,
-        P y -> scs_elem _ _ (aux_seq_glb P H k)[-]y[<=]Two[*]one_div_succ k)).
+        P y -> scs_elem _ _ (aux_seq_glb P H k) [-]y [<=] Two[*]one_div_succ k)).
 intro H0.
 split; intro k; elim (H0 k); intros.
 assumption.
@@ -679,14 +610,14 @@ intro; apply scs_prf.
 Qed.
 (* end hide *)
 
-Lemma totally_bounded_has_glb :
- forall P : IR -> CProp, totally_bounded P -> {z : IR | set_glb_IR P z}.
+Lemma totally_bounded_has_glb : forall P : IR -> CProp,
+ totally_bounded P -> {z : IR | set_glb_IR P z}.
 intros P tot_bnd.
 red in tot_bnd.
 elim tot_bnd; intros non_empty H.
 cut
  {sequence : nat -> IR | forall k : nat, P (sequence k) |
- forall (k : nat) (x : IR), P x -> sequence k[-]x[<=]Two[*]one_div_succ k}.
+ forall (k : nat) (x : IR), P x -> sequence k[-]x [<=] Two[*]one_div_succ k}.
 intros H0.
 elim H0.
 clear H0; intros seq H0 H1.
@@ -696,7 +627,7 @@ set (seq1 := Build_CauchySeq IR seq H2) in *.
 exists (Lim seq1).
 split; intros.
 apply shift_leEq_rht.
-AStepl ([--]ZeroR); RStepr ([--](Lim seq1[-]x)).
+astepl ( [--]ZeroR); rstepr ( [--] (Lim seq1[-]x)).
 apply inv_resp_leEq.
 set (seq2 := Cauchy_const x) in *.
 apply leEq_wdl with (Lim seq1[-]Lim seq2).
@@ -725,7 +656,7 @@ intros n Hn.
 exists (seq n).
 apply H0.
 apply leEq_less_trans with (AbsIR (Lim seq1[-]seq n)).
-RStepl ([--](Lim seq1[-]seq n)).
+rstepl ( [--] (Lim seq1[-]seq n)).
 apply inv_leEq_AbsIR.
 apply leEq_less_trans with (e [/]TwoNZ).
 apply AbsSmall_imp_AbsIR.
@@ -739,7 +670,7 @@ intros eps Heps; elim (H4 eps Heps); clear H4; intros.
 exists x.
 intros m Hm; elim (p m Hm); clear p.
 intros.
-AStepr (seq1 m[-]Lim seq1).
+astepr (seq1 m[-]Lim seq1).
 apply AbsIR_eq_AbsSmall; assumption.
 red in |- *; fold (SeqLimit seq1 (Lim seq1)) in |- *.
 apply ax_Lim.
@@ -748,39 +679,39 @@ red in |- *; intros e H2.
 elim (Archimedes (One[/] e[//]pos_ap_zero _ _ H2)).
 intros n Hn.
 exists (S (2 * n)); intros.
-cut (Zero[<]nring (R:=IR) n); intros.
+cut (Zero [<] nring (R:=IR) n); intros.
 apply AbsIR_eq_AbsSmall.
 rename X into H4.
-apply leEq_transitive with ([--](One[/] nring n[//]pos_ap_zero _ _ H4)).
+apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H4)).
 apply inv_resp_leEq.
 apply shift_div_leEq.
 assumption.
 eapply shift_leEq_mult'; [ assumption | apply Hn ].
 apply less_leEq.
-RStepr ([--](seq (S (2 * n))[-]seq m)); apply inv_resp_less.
+rstepr ( [--] (seq (S (2 * n)) [-]seq m)); apply inv_resp_less.
 apply leEq_less_trans with (Two[*]one_div_succ (R:=IR) (S (2 * n))).
 apply H1; apply H0.
-AStepl (one_div_succ (R:=IR) (S (2 * n))[*]Two).
+astepl (one_div_succ (R:=IR) (S (2 * n)) [*]Two).
 unfold one_div_succ in |- *; unfold Snring in |- *.
 apply shift_mult_less with (two_ap_zero IR).
 apply pos_two.
-RStepr
+rstepr
  (One[/] Two[*]nring n[//]
   mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H4)).
 apply recip_resp_less.
-AStepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
  [ apply pos_two | assumption ].
 apply less_wdr with (Two[*]nring (R:=IR) n[+]One[+]One).
 apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+]One);
  apply less_plusOne.
-AStepr (nring (R:=IR) (S (2 * n))[+]One).
-Step_final (nring (R:=IR) (2 * n)[+]One[+]One).
+astepr (nring (R:=IR) (S (2 * n)) [+]One).
+Step_final (nring (R:=IR) (2 * n) [+]One[+]One).
 apply leEq_transitive with (Two[*]one_div_succ (R:=IR) m).
 apply H1; apply H0.
 apply leEq_transitive with (one_div_succ (R:=IR) n).
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-RStepl
+rstepl
  (One[/] nring (R:=IR) (S m) [/]TwoNZ[//]
   div_resp_ap_zero_rev _ _ _ _ (nring_ap_zero IR (S m) (sym_not_eq (O_S m)))).
 apply recip_resp_leEq.
@@ -788,13 +719,13 @@ apply pos_nring_S.
 apply shift_leEq_div.
 apply pos_two.
 simpl in |- *; fold (Two:IR) in |- *.
-RStepl (Two[*]nring (R:=IR) n[+]One[+]One).
+rstepl (Two[*]nring (R:=IR) n[+]One[+]One).
 apply plus_resp_leEq.
 apply leEq_wdl with (nring (R:=IR) (S (2 * n))).
 apply nring_leEq; assumption.
-Step_final (nring (R:=IR) (2 * n)[+]One).
+Step_final (nring (R:=IR) (2 * n) [+]One).
 unfold one_div_succ in |- *; unfold Snring in |- *.
-RStepr
+rstepr
  (One[/] One[/] e[//]pos_ap_zero _ _ H2[//]
   div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
 apply recip_resp_leEq.
@@ -812,16 +743,15 @@ End Totally_Bounded.
 
 Section Compact.
 
-(** ** Compact
+(** ** Compact sets
 
-In this section we dwell a bit farther into the definition of compact and explore some of its properties.
+In this section we dwell a bit farther into the definition of compactness
+and explore some of its properties.
 
 The following characterization of inclusion can be very useful:
 *)
 
-Lemma included_compact :
- forall (a b c d : IR) Hab Hcd,
- compact a b Hab c ->
+Lemma included_compact : forall (a b c d : IR) Hab Hcd, compact a b Hab c ->
  compact a b Hab d -> included (compact c d Hcd) (compact a b Hab).
 repeat intro. rename X into H. rename X0 into H0. rename X1 into H1.
 inversion_clear H.
@@ -833,96 +763,99 @@ apply leEq_transitive with d; auto.
 Qed.
 
 (**
-At several points in our future development of a theory we will need to partition a compact interval in subintervals of length smaller than some predefined value $\varepsilon$#e#. Although this seems a consequence of every compact interval being totally bounded, it is in fact a stronger property.  In this section we perform that construction (requiring the endpoints of the interval to be distinct) and prove some of its good properties.
+At several points in our future development of a theory we will need
+to partition a compact interval in subintervals of length smaller than
+some predefined value [eps]. Although this seems a
+consequence of every compact interval being totally bounded, it is in
+fact a stronger property.  In this section we perform that
+construction (requiring the endpoints of the interval to be distinct)
+and prove some of its good properties.
 
-%\begin{convention}% Let [a,b:IR], [Hab:(a [<=] b)] and denote by [I] the compact interval [[a,b]].  Also assume that [a<b], and let [e] be a positive real number.
+%\begin{convention}% Let [a,b : IR], [Hab : (a [<=] b)] and denote by [I]
+the compact interval [[a,b]].  Also assume that [a [<] b], and let [e] be
+a positive real number.
 %\end{convention}%
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := compact a b Hab.
 (* end hide *)
 
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 Variable e : IR.
-Hypothesis He : Zero[<]e.
+Hypothesis He : Zero [<] e.
 
 (**
-We start by finding a natural number [n] such that $\frac{b-a}n<\varepsilon$
-#(b-a) / n < e#
+We start by finding a natural number [n] such that [(b[-]a) [/] n [<] e].
 *)
 
-Definition compact_nat :=
-  ProjT1 (Archimedes (b[-]a[/] _[//]pos_ap_zero _ _ He)).
+Definition compact_nat := ProjT1 (Archimedes (b[-]a[/] e[//]pos_ap_zero _ _ He)).
 
-(** Obviously such an $n$ must be greater than zero.*)
+(** Obviously such an [n] must be greater than zero.*)
 
-Lemma pos_compact_nat : Zero[<]nring (R:=IR) compact_nat.
+Lemma pos_compact_nat : Zero [<] nring (R:=IR) compact_nat.
 
 apply less_leEq_trans with (b[-]a[/] e[//]pos_ap_zero _ _ He).
-RStepr ((b[-]a)[*](One[/] e[//]pos_ap_zero _ _ He)).
+rstepr ((b[-]a) [*] (One[/] e[//]pos_ap_zero _ _ He)).
 apply mult_resp_pos.
-apply shift_less_minus; AStepl a; assumption.
+apply shift_less_minus; astepl a; assumption.
 apply recip_resp_pos; assumption.
 unfold compact_nat in |- *; apply proj2_sigT.
 Qed.
 
 (**
-We now define a sequence on [n] points in [[a,b]] by $x_i=\min(a,b)+i\times\frac{b-a}n$#xi= min(a,b) + i* (b-a)/n# and prove that all of its points are really in that interval.
+We now define a sequence on [n] points in [[a,b]] by
+[x_i [=] Min(a,b) [+]i[*] (b[-]a) [/]n] and
+prove that all of its points are really in that interval.
 *)
 
 Definition compact_part (i : nat) : i <= compact_nat -> IR.
 intros.
-apply (a[+]nring i[*](b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat)).
+apply (a[+]nring i[*] (b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat)).
 Defined.
 
-Lemma compact_part_hyp :
- forall (i : nat) (Hi : i <= compact_nat),
- compact a b Hab (compact_part i Hi).
+Lemma compact_part_hyp : forall i Hi, compact a b Hab (compact_part i Hi).
 intros; unfold compact_part in |- *.
 split.
-AStepl (a[+]Zero); apply plus_resp_leEq_lft.
-AStepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+astepl (a[+]Zero); apply plus_resp_leEq_lft.
+astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
 apply nring_nonneg.
 apply shift_leEq_div.
 apply pos_compact_nat.
-apply shift_leEq_minus; RStepl a; apply less_leEq; assumption.
-RStepr
- (a[+]nring compact_nat[*](b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat)).
+apply shift_leEq_minus; rstepl a; apply less_leEq; assumption.
+rstepr
+ (a[+]nring compact_nat[*] (b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat)).
 apply plus_resp_leEq_lft.
 apply mult_resp_leEq_rht; try apply nring_nonneg.
 apply nring_leEq; assumption.
 apply shift_leEq_div.
 apply pos_compact_nat.
-apply shift_leEq_minus; RStepl a; apply less_leEq; assumption.
+apply shift_leEq_minus; rstepl a; apply less_leEq; assumption.
 Qed.
 
 (**
-This sequence is strictly increasing and each two consecutive points are apart by less than $\varepsilon$#e#.*)
+This sequence is strictly increasing and each two consecutive points
+are apart by less than [e].*)
 
-Lemma compact_less :
- forall (i : nat) (H1 : i <= compact_nat) (H2 : S i <= compact_nat),
- Zero[<]compact_part _ H2[-]compact_part _ H1.
-intros.
-apply shift_less_minus; AStepl (compact_part _ H1).
+Lemma compact_less : forall i Hi HSi, Zero [<] compact_part (S i) HSi[-]compact_part i Hi.
+intros i H1 H2.
+apply shift_less_minus; astepl (compact_part _ H1).
 unfold compact_part in |- *.
 apply plus_resp_less_lft.
 apply mult_resp_less.
 simpl in |- *; apply less_plusOne.
 apply div_resp_pos.
 apply pos_compact_nat.
-apply shift_less_minus; AStepl a; assumption.
+apply shift_less_minus; astepl a; assumption.
 Qed.
 
-Lemma compact_leEq :
- forall (i : nat) (H1 : i <= compact_nat) (H2 : S i <= compact_nat),
- compact_part _ H2[-]compact_part _ H1[<=]e.
-intros.
+Lemma compact_leEq : forall i Hi HSi, compact_part (S i) HSi[-]compact_part i Hi [<=] e.
+intros i H1 H2.
 unfold compact_part in |- *; simpl in |- *.
-RStepl (b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat).
+rstepl (b[-]a[/] _[//]pos_ap_zero _ _ pos_compact_nat).
 apply shift_div_leEq.
 apply pos_compact_nat.
 apply shift_leEq_mult' with (pos_ap_zero _ _ He).
@@ -932,43 +865,41 @@ Qed.
 
 (** When we proceed to integration, this lemma will also be useful: *)
 
-Lemma compact_partition_lemma :
- forall (n : nat) (Hn : 0 <> n) (i : nat) (H : i <= n),
- Compact Hab (a[+]nring i[*](b[-]a[/] _[//]nring_ap_zero' _ n Hn)).
-intros; split.
+Lemma compact_partition_lemma : forall n Hn i, i <= n ->
+ Compact Hab (a[+]nring i[*] (b[-]a[/] _[//]nring_ap_zero' _ n Hn)).
+intros n Hn i H; split.
 apply shift_leEq_plus'.
-AStepl ZeroR.
+astepl ZeroR.
 apply mult_resp_nonneg.
 apply nring_nonneg.
 apply shift_leEq_div.
 apply nring_pos; apply neq_O_lt; auto.
 apply shift_leEq_minus.
-RStepl a; assumption.
+rstepl a; assumption.
 apply shift_plus_leEq'.
-RStepr (nring n[*](b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
-AStepl (Zero[+]nring i[*](b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
+rstepr (nring n[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
+astepl (Zero[+]nring i[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
 apply shift_plus_leEq.
-RStepr ((nring n[-]nring i)[*](b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
+rstepr ((nring n[-]nring i) [*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
 apply mult_resp_nonneg.
 apply shift_leEq_minus.
-AStepl (nring (R:=IR) i).
+astepl (nring (R:=IR) i).
 apply nring_leEq; assumption.
 apply shift_leEq_div.
 apply nring_pos; apply neq_O_lt; auto.
 apply shift_leEq_minus.
-RStepl a; assumption.
+rstepl a; assumption.
 Qed.
 
 (** The next lemma provides an upper bound for the distance between two points in an interval: *)
 
-Lemma compact_elements :
- forall x y : IR,
- Compact Hab x -> Compact Hab y -> AbsIR (x[-]y)[<=]AbsIR (b[-]a).
+Lemma compact_elements : forall x y : IR,
+ Compact Hab x -> Compact Hab y -> AbsIR (x[-]y) [<=] AbsIR (b[-]a).
 clear Hab' He e.
 do 2 intro; intros Hx Hy.
 apply leEq_wdr with (b[-]a).
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl a; auto.
+2: apply shift_leEq_minus; astepl a; auto.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply Abs_Max.
 inversion_clear Hx.
@@ -983,10 +914,8 @@ Opaque Min Max.
 
 (** The following is a variation on the previous lemma: *)
 
-Lemma compact_elements' :
- forall c d Hcd (x y : IR),
- Compact Hab x ->
- compact c d Hcd y -> AbsIR (x[-]y)[<=]AbsIR (Max b d[-]Min a c).
+Lemma compact_elements' : forall c d Hcd x y, Compact Hab x ->
+ compact c d Hcd y -> AbsIR (x[-]y) [<=] AbsIR (Max b d[-]Min a c).
 do 5 intro; intros Hx Hy.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
@@ -996,32 +925,34 @@ simpl in |- *; unfold ABSIR in |- *; apply Max_leEq.
 unfold cg_minus in |- *; apply plus_resp_leEq_both.
 apply leEq_transitive with b; auto; apply lft_leEq_Max.
 apply inv_resp_leEq; apply leEq_transitive with c; auto; apply Min_leEq_rht.
-RStepl (y[-]x).
+rstepl (y[-]x).
 unfold cg_minus in |- *; apply plus_resp_leEq_both.
 apply leEq_transitive with d; auto; apply rht_leEq_Max.
 apply inv_resp_leEq; apply leEq_transitive with a; auto; apply Min_leEq_lft.
 Qed.
 
-(** The following lemma is a bit more specific: it shows that we can also estimate the distance from the center of a compact interval to any of its points. *)
+(** The following lemma is a bit more specific: it shows that we can
+also estimate the distance from the center of a compact interval to
+any of its points. *)
 
-Lemma compact_bnd_AbsIR :
- forall x y d H, compact (x[-]d) (x[+]d) H y -> AbsIR (x[-]y)[<=]d.
+Lemma compact_bnd_AbsIR : forall x y d H,
+ compact (x[-]d) (x[+]d) H y -> AbsIR (x[-]y) [<=] d.
 intros x y d H H0.
 inversion_clear H0.
 simpl in |- *; unfold ABSIR in |- *.
 apply Max_leEq.
 apply shift_minus_leEq; apply shift_leEq_plus'; auto.
-RStepl (y[-]x).
+rstepl (y[-]x).
 apply shift_minus_leEq.
-AStepr (x[+]d); auto.
+astepr (x[+]d); auto.
 Qed.
 
-(** Finally, two more useful lemmas to prove inclusion of compact intervals.  They will be necessary for the definition and proof of the elementary properties of the integral.  *)
+(** Finally, two more useful lemmas to prove inclusion of compact
+intervals.  They will be necessary for the definition and proof of the
+elementary properties of the integral.  *)
 
-Lemma included2_compact :
- forall (x y : IR) Hxy,
- Compact Hab x ->
- Compact Hab y -> included (compact (Min x y) (Max x y) Hxy) (Compact Hab).
+Lemma included2_compact : forall x y Hxy, Compact Hab x -> Compact Hab y ->
+ included (compact (Min x y) (Max x y) Hxy) (Compact Hab).
 do 3 intro. intros H H0.
 inversion_clear H.
 inversion_clear H0.
@@ -1036,11 +967,8 @@ apply rht_leEq_Max.
 apply Max_leEq; auto.
 Qed.
 
-Lemma included3_compact :
- forall (x y z : IR) Hxyz,
- Compact Hab x ->
- Compact Hab y ->
- Compact Hab z ->
+Lemma included3_compact : forall x y z Hxyz,
+ Compact Hab x -> Compact Hab y -> Compact Hab z ->
  included (compact (Min (Min x y) z) (Max (Max x y) z) Hxyz) (Compact Hab).
 do 4 intro. intros H H0 H1.
 inversion_clear H.
@@ -1058,3 +986,5 @@ repeat apply Max_leEq; auto.
 Qed.
 
 End Compact.
+
+Hint Resolve included_compact included2_compact included3_compact : included.

@@ -1,21 +1,31 @@
 (* $Id$ *)
 
 Require Export Zsetoid.
-Require Import CSemiGroups.
+Require Export CSemiGroups.
 
-(** *Examples of a semi-group: <Z,+> and <Z,*>
+(** **Examples of semi-groups: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
+***$\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 *)
 
-(** **<Z,+>
-*)
+Lemma Zplus_is_CSemiGroup: (is_CSemiGroup Z_as_CSetoid Zplus_is_bin_fun).
+unfold is_CSemiGroup.
+exact Zplus_is_assoc.
+Qed.
 
-Definition Z_as_CSemiGroup :=
-  Build_CSemiGroup Z_as_CSetoid Zplus_is_bin_fun Zplus_is_assoc.
+Definition Z_as_CSemiGroup := Build_CSemiGroup _ Zplus_is_bin_fun Zplus_is_assoc.
 
 (** The term [Z_as_CSemiGroup] is of type [CSemiGroup]. Hence we have proven that [Z] is a constructive semi-group. *)
 
-(** **<Z,*>
+(** ***$\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
 *)
 
-Definition Z_mul_as_CSemiGroup :=
-  Build_CSemiGroup Z_as_CSetoid Zmult_is_bin_fun Zmult_is_assoc.
+Lemma Zmult_is_CSemiGroup: (is_CSemiGroup Z_as_CSetoid Zmult_is_bin_fun).
+unfold is_CSemiGroup.
+exact Zmult_is_assoc.
+Qed.
+
+Definition Z_mul_as_CSemiGroup := Build_CSemiGroup _ Zmult_is_bin_fun Zmult_is_assoc.
+
+
+
+

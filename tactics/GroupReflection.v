@@ -1,5 +1,6 @@
 (* $Id$ *)
 
+(* begin hide *)
 Require Export CAbGroups.
 Require Export AlgReflection.
 
@@ -231,12 +232,12 @@ Step_final (Zero:G).
 intros x y H1 H2.
 inversion H1.
 inversion H2.
-AStepl (x0[+]y0).
+astepl (x0[+]y0).
 Step_final (x1[+]y1).
 
 intros x y Hx.
 inversion Hx; intro Hy; inversion Hy.
-AStepl (zmult x0 k). Step_final (zmult x1 k).
+astepl (zmult x0 k). Step_final (zmult x1 k).
 
 intros x y H0 H1.
 inversion H0.
@@ -244,17 +245,17 @@ inversion H0.
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (unop u x0); Step_final (unop u x1).
+astepl (unop u x0); Step_final (unop u x1).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (binop b x0 y0); Step_final (binop b x1 y1).
+astepl (binop b x0 y0); Step_final (binop b x1 y1).
 
 intros x y H0 H1.
 inversion H0.
 inversion H1.
-AStepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
+astepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
 Qed.
 
 Lemma interpG_wd :
@@ -322,11 +323,11 @@ intro z0; case z0; simpl in |- *; auto.
  intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
  inversion X0. rewrite <- H3. rewrite H5 in H4.
  rewrite Zmult_comm. rewrite <- Zmult_0_r_reverse. apply interpG_zero.
- AStepr (zmult (G:=G) Zero (Zpos p)). Step_final (zmult x0 (Zpos p)).
+ astepr (zmult (G:=G) Zero (Zpos p)). Step_final (zmult x0 (Zpos p)).
 intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
 inversion X0. rewrite <- H3. rewrite H5 in H4.
 rewrite Zmult_comm. rewrite <- Zmult_0_r_reverse. apply interpG_zero.
-AStepr (zmult (G:=G) Zero (Zneg p)). Step_final (zmult x0 (Zneg p)).
+astepr (zmult (G:=G) Zero (Zneg p)). Step_final (zmult x0 (Zneg p)).
 
 intros e0 e1 f; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
@@ -340,11 +341,11 @@ intro z; case z; simpl in |- *; auto.
  intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
  inversion X0. rewrite H3 in X1. rewrite H4 in H6. rewrite <- H5.
  simpl in |- *; apply interpG_mult_int with x1; auto.
- AStepr (zmult x0 (Zpos p)). Step_final (zmult (zmult x1 k0) (Zpos p)).
+ astepr (zmult x0 (Zpos p)). Step_final (zmult (zmult x1 k0) (Zpos p)).
 intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
 inversion X0. rewrite H3 in X1. rewrite H4 in H6. rewrite <- H5.
 simpl in |- *; apply interpG_mult_int with x1; auto.
-AStepr (zmult x0 (Zneg p)). Step_final (zmult (zmult x1 k0) (Zneg p)).
+astepr (zmult x0 (Zneg p)). Step_final (zmult (zmult x1 k0) (Zneg p)).
 
 intros e0 e1 f; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
@@ -398,7 +399,7 @@ apply MV_mult_corr_G.
 inversion X0. rewrite H3 in X1. rewrite <- H5. rewrite H4 in H6.
 replace (MM_mult (expr_int k0) (expr_int k)) with (expr_int (k0 * k)).
  apply interpG_mult_int with x1; auto.
- AStepr (zmult x0 k). Step_final (zmult (zmult x1 k0) k).
+ astepr (zmult x0 k). Step_final (zmult (zmult x1 k0) k).
 simpl in |- *. case k0; auto; intros; rewrite Zmult_comm; auto.
 inversion X0.
 
@@ -436,7 +437,7 @@ intros. inversion X. rewrite H6 in X1. rewrite <- H8. rewrite H7 in H9.
 inversion X0. rewrite H10 in X2. rewrite <- H12. rewrite H11 in H13.
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
-AStepr (zmult x0 k[+]zmult x1 k0).
+astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_var n).
@@ -457,7 +458,7 @@ inversion X. rewrite <- H7. rewrite <- H9. rewrite H8 in H10.
 inversion X0. rewrite H11 in X2. rewrite <- H13. rewrite H12 in H14.
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
-AStepr (zmult x0 k[+]zmult x1 k0).
+astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_unop u e0).
@@ -482,7 +483,7 @@ inversion X. rewrite <- H9. rewrite <- H11. rewrite H10 in H12.
 inversion X0. rewrite H13 in X2. rewrite <- H15. rewrite H14 in H16.
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
-AStepr (zmult x0 k[+]zmult x1 k0).
+astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_binop u e0 e3).
@@ -507,7 +508,7 @@ inversion X. rewrite <- H7. rewrite <- H9. rewrite H8 in H10.
 inversion X0. rewrite H11 in X2. rewrite <- H13. rewrite H12 in H14.
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
-AStepr (zmult x0 k[+]zmult x1 k0).
+astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_part u e0).
@@ -572,7 +573,7 @@ intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
 apply interpG_wd with (y0[+](x0[+]y)).
 apply X; auto.
 apply MM_plus_corr_G; auto.
-AStepl (y0[+]x0[+]y).
+astepl (y0[+]x0[+]y).
 Step_final (x0[+]y0[+]y).
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
 apply interpG_wd with (x0[+](y0[+]y)).
@@ -603,7 +604,7 @@ apply PM_plus_corr_G; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
 apply interpG_wd with (y0[+]y[+]x0).
 apply PM_plus_corr_G; auto.
-AStepl (x0[+](y0[+]y)).
+astepl (x0[+](y0[+]y)).
 Step_final (x0[+]y0[+]y).
 Qed.
 Transparent PM_plus.
@@ -659,7 +660,7 @@ intros f x H; elim H; clear H; intro H; inversion H.
 rewrite H0 in X. rewrite <- H2. rewrite H1 in H3.
 inversion X. rewrite H4 in X0. rewrite H6 in X1. rewrite H5 in H7.
 apply interpG_wd with (zmult y k[+]zmult x1 k).
- 2: AStepl (zmult (y[+]x1) k); AStepl (zmult (x1[+]y) k);
+ 2: astepl (zmult (y[+]x1) k); astepl (zmult (x1[+]y) k);
      Step_final (zmult x0 k).
 apply PM_plus_corr_G.
  apply Hrece0. left. apply interpG_mult_int with y; Algebra.
@@ -720,7 +721,7 @@ apply PM_mult_corr_G; auto.
 intros f x H. inversion H. rewrite H0 in X; rewrite <- H2; rewrite <- H1.
 inversion X. rewrite H4 in X0. rewrite H6 in X1. rewrite H5 in H7.
 apply interpG_wd with (zmult x1 k[+]zmult y k).
- 2: AStepl (zmult (x1[+]y) k); Step_final (zmult x0 k).
+ 2: astepl (zmult (x1[+]y) k); Step_final (zmult x0 k).
 apply PP_plus_corr_G.
  apply PM_mult_corr_G; right. apply interpG_mult_int with x1; Algebra.
 apply Hrece0. apply interpG_mult_int with y; Algebra.
@@ -792,3 +793,4 @@ apply NormG_corr_G; apply xexprG2interpG.
 Qed.
 
 End Group_NormCorrect.
+(* end hide *)

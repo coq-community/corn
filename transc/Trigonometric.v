@@ -2,13 +2,6 @@
 
 Require Export TaylorSeries.
 
-Lemma FAbs_nonneg : forall (F : PartIR) (x : IR) Hx, Zero[<=]FAbs F x Hx.
-intros.
-eapply leEq_wdr.
- 2: apply eq_symmetric_unfolded; apply FAbs_char with (Hx' := ProjIR1 Hx).
-apply AbsIR_nonneg.
-Qed.
-
 (** *The Trigonometric Functions
 
 In this section, we explore the properties of the trigonometric functions which we previously defined.
@@ -16,15 +9,12 @@ In this section, we explore the properties of the trigonometric functions which 
 
 Section Lemmas.
 
-(**
-First, we need a lemma on mappings.
-*)
+(** First, we need a lemma on mappings. *)
 
-Lemma maps_translation :
- forall y : IR, maps_compacts_into realline realline (FId{+}[-C-]y).
+Lemma maps_translation : forall y, maps_compacts_into realline realline (FId{+} [-C-]y).
 intros y a b Hab H.
 exists (a[+]y); exists (b[+]y[+]One).
-cut (a[+]y[<]b[+]y[+]One). intro H0.
+cut (a[+]y [<] b[+]y[+]One). intro H0.
 exists H0.
 split.
 split.
@@ -42,11 +32,9 @@ End Lemmas.
 
 Section Sine_and_Cosine.
 
-(**
-We prove that $\sin(0)=0$#sin(0)=0#, $\cos(0)=1$#cos(0)=1# and $\tan(0)=0$#tan(0)=0#.
-*)
+(** Sine, cosine and tangent at [Zero]. *)
 
-Lemma Sin_zero : Sin Zero[=]Zero.
+Lemma Sin_zero : Sin Zero [=] Zero.
 simpl in |- *.
 eapply eq_transitive_unfolded.
 2: apply (series_sum_zero conv_zero_series).
@@ -61,13 +49,13 @@ clear n; intro; simpl in |- *.
 rational.
 Qed.
 
-Lemma Cos_zero : Cos Zero[=]One.
+Lemma Cos_zero : Cos Zero [=] One.
 simpl in |- *.
 unfold series_sum in |- *.
 apply eq_symmetric_unfolded; apply Limits_unique.
 intros eps H.
 exists 1; intros.
-apply AbsSmall_wd_rht_unfolded with ZeroR.
+apply AbsSmall_wdr_unfolded with ZeroR.
 apply zero_AbsSmall; apply less_leEq; auto.
 simpl in |- *.
 unfold seq_part_sum in |- *.
@@ -89,11 +77,11 @@ simpl in |- *.
 set
  (h :=
   fun i : nat =>
-  (cos_seq i[/] _[//]nring_fac_ap_zero _ i)[*]nexp IR i (Zero[-]Zero)) 
+  (cos_seq i[/] _[//]nring_fac_ap_zero _ i) [*]nexp IR i (Zero[-]Zero)) 
  in *.
 fold (h n) in |- *.
-RStepr (h n[+](Sum0 n h[-]One)).
-AStepl (ZeroR[+]Zero).
+rstepr (h n[+] (Sum0 n h[-]One)).
+astepl (ZeroR[+]Zero).
 apply bin_op_wd_unfolded.
 2: auto.
 unfold h, cos_seq in |- *.
@@ -108,18 +96,18 @@ Hint Resolve Sin_zero Cos_zero: algebra.
 
 Opaque Sine Cosine.
 
-Lemma Tan_zero : forall H, Tan Zero H[=]Zero.
+Lemma Tan_zero : forall H, Tan Zero H [=] Zero.
 intros; unfold Tan, Tang in |- *.
 simpl in |- *.
-AStepr (ZeroR [/]OneNZ); apply div_wd.
-AStepr (Sin Zero); simpl in |- *; Algebra.
-AStepr (Cos Zero); simpl in |- *; Algebra.
+astepr (ZeroR [/]OneNZ); apply div_wd.
+astepr (Sin Zero); simpl in |- *; Algebra.
+astepr (Cos Zero); simpl in |- *; Algebra.
 Qed.
 
 Transparent Sine Cosine.
 
 (**
-Continuity of sinus and cosinus are trivial.
+Continuity of sine and cosine are trivial.
 *)
 
 Lemma Continuous_Sin : Continuous realline Sine.
@@ -131,10 +119,10 @@ unfold Cosine in |- *; Contin.
 Qed.
 
 (**
-The rules for the derivative of the sinus and cosinus function; we begin by proving that their defining sequences can be expressed in terms of one another.
+The rules for the derivative of the sine and cosine function; we begin by proving that their defining sequences can be expressed in terms of one another.
 *)
 
-Lemma cos_sin_seq : forall n : nat, cos_seq n[=]sin_seq (S n).
+Lemma cos_sin_seq : forall n : nat, cos_seq n [=] sin_seq (S n).
 intro.
 apply eq_symmetric_unfolded.
 unfold sin_seq, cos_seq in |- *.
@@ -151,7 +139,7 @@ rewrite H; Algebra.
 elimtype False; omega.
 Qed.
 
-Lemma sin_cos_seq : forall n : nat, sin_seq n[=][--](cos_seq (S n)).
+Lemma sin_cos_seq : forall n : nat, sin_seq n [=] [--] (cos_seq (S n)).
 intros.
 unfold sin_seq, cos_seq in |- *.
 elim even_or_odd_plus; intros; simpl in |- *.
@@ -178,7 +166,7 @@ eapply Derivative_wdr.
 FEQ.
 simpl in |- *.
 apply series_sum_wd; intros.
-apply mult_wd_lft.
+apply mult_wdl.
 apply div_wd.
 apply eq_symmetric_unfolded; apply cos_sin_seq.
 Algebra.
@@ -187,7 +175,7 @@ intros; FEQ.
 repeat split.
 repeat split.
 simpl in |- *.
-apply mult_wd_lft.
+apply mult_wdl.
 apply div_wd.
 apply cos_sin_seq.
 Algebra.
@@ -216,12 +204,12 @@ apply
              (fun_series_inc_IR realline _ sin_conv x Hx')))).
 apply series_sum_wd; intros.
 simpl in |- *.
-RStepr
- (([--](sin_seq n)[/] _[//]nring_fac_ap_zero _ n)[*]nexp IR n (x[-]Zero)).
-apply mult_wd_lft.
+rstepr
+ (( [--] (sin_seq n) [/] _[//]nring_fac_ap_zero _ n) [*]nexp IR n (x[-]Zero)).
+apply mult_wdl.
 apply div_wd.
 apply eq_symmetric_unfolded.
-AStepr ([--][--](cos_seq (S n))); apply un_op_wd_unfolded.
+astepr ( [--][--] (cos_seq (S n))); apply un_op_wd_unfolded.
 apply sin_cos_seq.
 Algebra.
 simpl in |- *.
@@ -229,19 +217,19 @@ apply
  series_sum_inv
   with
     (x := fun n : nat =>
-          (sin_seq n[/] _[//]nring_fac_ap_zero IR n)[*]nexp IR n (x[-]Zero)).
+          (sin_seq n[/] _[//]nring_fac_ap_zero IR n) [*]nexp IR n (x[-]Zero)).
 apply
  fun_series_convergent_wd_IR
-  with (fun n : nat => {--}(FPowerSeries' Zero sin_seq n)).
+  with (fun n : nat => {--} (FPowerSeries' Zero sin_seq n)).
 intros; FEQ.
 repeat split.
 repeat split.
 simpl in |- *.
-RStepl
- (([--](sin_seq n)[/] _[//]nring_fac_ap_zero _ n)[*]nexp IR n (x[-]Zero)).
-apply mult_wd_lft.
+rstepl
+ (( [--] (sin_seq n) [/] _[//]nring_fac_ap_zero _ n) [*]nexp IR n (x[-]Zero)).
+apply mult_wdl.
 apply div_wd.
-AStepr ([--][--](cos_seq (S n))); apply un_op_wd_unfolded.
+astepr ( [--][--] (cos_seq (S n))); apply un_op_wd_unfolded.
 apply sin_cos_seq.
 Algebra.
 apply FSeries_Sum_inv_conv.
@@ -254,34 +242,37 @@ Hint Resolve Continuous_Sin Continuous_Cos: continuous.
 Section Sine_of_Sum.
 
 (**
-We now prove the rule for the sinus and cosinus of the Sum.  These rules have to be proved first as functional equalities, which is why we also state the results in a function form (which we won't do in other situations).
+We now prove the rule for the sine and cosine of the sum.  These rules
+have to be proved first as functional equalities, which is why we also
+state the results in a function form (which we won't do in other
+situations).
 
 %\begin{convention}% Let:
- - [F:=[y:IR]Sine[o](FId{+}[-C-]y)];
- - [G:=[y:IR](Sine{*}[-C-](Cos y)){+}(Cosine{*}[-C-](Sin y))].
+ - [F := fun y => Sine[o] (FId{+} [-C-]y)];
+ - [G := fun y => (Sine{*} [-C-] (Cos y)) {+} (Cosine{*} [-C-] (Sin y))].
 
 %\end{convention}%
 *)
 
 (* begin hide *)
-Let F (y : IR) := Sine[o]FId{+}[-C-]y.
-Let G (y : IR) := Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y).
+Let F (y : IR) := Sine[o]FId{+} [-C-]y.
+Let G (y : IR) := Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y).
 Let F' (y : IR) :=
   (fix funct (n : nat) : PartIR :=
      match n with
-     | O => Sine[o]FId{+}[-C-]y
-     | S O => Cosine[o]FId{+}[-C-]y
-     | S (S O) => {--}(Sine[o]FId{+}[-C-]y)
-     | S (S (S O)) => {--}(Cosine[o]FId{+}[-C-]y)
+     | O => Sine[o]FId{+} [-C-]y
+     | S O => Cosine[o]FId{+} [-C-]y
+     | S (S O) => {--} (Sine[o]FId{+} [-C-]y)
+     | S (S (S O)) => {--} (Cosine[o]FId{+} [-C-]y)
      | S (S (S (S p))) => funct p
      end).
 Let G' (y : IR) :=
   (fix funct (n : nat) : PartIR :=
      match n with
-     | O => Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y)
-     | S O => Cosine{*}[-C-](Cos y){-}Sine{*}[-C-](Sin y)
-     | S (S O) => {--}(Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y))
-     | S (S (S O)) => Sine{*}[-C-](Sin y){-}Cosine{*}[-C-](Cos y)
+     | O => Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)
+     | S O => Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y)
+     | S (S O) => {--} (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y))
+     | S (S (S O)) => Sine{*} [-C-] (Sin y) {-}Cosine{*} [-C-] (Cos y)
      | S (S (S (S p))) => funct p
      end).
 (* end hide *)
@@ -291,16 +282,16 @@ Lemma Sin_plus_Taylor_bnd_lft : forall y : IR, Taylor_bnd (F' y).
 clear F G G'; intros.
 apply
  bnd_imp_Taylor_bnd
-  with (FAbs (Sine[o]FId{+}[-C-]y){+}FAbs (Cosine[o]FId{+}[-C-]y)).
+  with (FAbs (Sine[o]FId{+} [-C-]y) {+}FAbs (Cosine[o]FId{+} [-C-]y)).
 intro;
  apply
   four_ind
    with
      (P := fun n : nat =>
            forall (x : IR) Hx Hx',
-           AbsIR (F' y n x Hx)[<=]
+           AbsIR (F' y n x Hx) [<=] 
            AbsIR
-             ((FAbs (Sine[o]FId{+}[-C-]y){+}FAbs (Cosine[o]FId{+}[-C-]y)) x
+             ((FAbs (Sine[o]FId{+} [-C-]y) {+}FAbs (Cosine[o]FId{+} [-C-]y)) x
                 Hx')).
 
 intros.
@@ -309,7 +300,7 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl (AbsIR (Sine (x[+]y) (ProjT2 Hx))[+]Zero).
+astepl (AbsIR (Sine (x[+]y) (ProjT2 Hx)) [+]Zero).
 apply plus_resp_leEq_both.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
 Transparent FAbs.
@@ -324,7 +315,7 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl (Zero[+]AbsIR (Cosine (x[+]y) (ProjT2 Hx))).
+astepl (Zero[+]AbsIR (Cosine (x[+]y) (ProjT2 Hx))).
 apply plus_resp_leEq_both.
 apply FAbs_nonneg.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
@@ -339,8 +330,8 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl (AbsIR [--](Sine (x[+]y) (ProjT2 Hx))[+]Zero).
-apply leEq_wdl with (AbsIR (Sine (x[+]y) (ProjT2 Hx))[+]Zero).
+astepl (AbsIR [--] (Sine (x[+]y) (ProjT2 Hx)) [+]Zero).
+apply leEq_wdl with (AbsIR (Sine (x[+]y) (ProjT2 Hx)) [+]Zero).
 apply plus_resp_leEq_both.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
 Transparent FAbs.
@@ -358,7 +349,7 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl (Zero[+]AbsIR [--](Cosine (x[+]y) (ProjT2 Hx))).
+astepl (Zero[+]AbsIR [--] (Cosine (x[+]y) (ProjT2 Hx))).
 apply leEq_wdl with (Zero[+]AbsIR (Cosine (x[+]y) (ProjT2 Hx))).
 apply plus_resp_leEq_both.
 apply FAbs_nonneg.
@@ -373,12 +364,12 @@ apply AbsIR_inv.
 
 auto.
 
-cut (maps_compacts_into realline realline (Fid IR{+}[-C-]y)); intros.
+cut (maps_compacts_into realline realline (Fid IR{+} [-C-]y)); intros.
 apply Continuous_plus; apply Continuous_abs;
  apply Continuous_comp with realline; Contin.
 intros a b Hab H.
 exists (a[+]y); exists (b[+]y[+]One).
-cut (a[+]y[<]b[+]y[+]One). intro H0.
+cut (a[+]y [<] b[+]y[+]One). intro H0.
 exists H0.
 split.
 Included.
@@ -402,18 +393,18 @@ clear F G F'; intros.
 apply
  bnd_imp_Taylor_bnd
   with
-    (FAbs (Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y)){+}
-     FAbs (Cosine{*}[-C-](Cos y){-}Sine{*}[-C-](Sin y))).
+    (FAbs (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)) {+}
+     FAbs (Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y))).
 intro;
  apply
   four_ind
    with
      (P := fun n : nat =>
            forall (x : IR) Hx Hx',
-           AbsIR (G' y n x Hx)[<=]
+           AbsIR (G' y n x Hx) [<=] 
            AbsIR
-             ((FAbs (Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y)){+}
-               FAbs (Cosine{*}[-C-](Cos y){-}Sine{*}[-C-](Sin y))) x Hx')).
+             ((FAbs (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)) {+}
+               FAbs (Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y))) x Hx')).
 
 intros.
 unfold G' in |- *.
@@ -421,10 +412,10 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl
+astepl
  (AbsIR
-    (Sine x (ProjIR1 (ProjIR1 Hx))[*]Cos y[+]
-     Cosine x (ProjIR1 (ProjIR2 Hx))[*]Sin y)[+]Zero).
+    (Sine x (ProjIR1 (ProjIR1 Hx)) [*]Cos y[+]
+     Cosine x (ProjIR1 (ProjIR2 Hx)) [*]Sin y) [+]Zero).
 apply plus_resp_leEq_both.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
 Transparent FAbs.
@@ -439,11 +430,11 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl
+astepl
  (Zero[+]
   AbsIR
-    (Cosine x (ProjIR1 (ProjIR1 Hx))[*]Cos y[-]
-     Sine x (ProjIR1 (ProjIR2 Hx))[*]Sin y)).
+    (Cosine x (ProjIR1 (ProjIR1 Hx)) [*]Cos y[-]
+     Sine x (ProjIR1 (ProjIR2 Hx)) [*]Sin y)).
 apply plus_resp_leEq_both.
 apply FAbs_nonneg.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
@@ -458,17 +449,17 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl
+astepl
  (AbsIR
     [--]
-    (Sine x (ProjIR1 (ProjIR1 Hx))[*]Cos y[+]
-     Cosine x (ProjIR1 (ProjIR2 Hx))[*]Sin y)[+]Zero).
+    (Sine x (ProjIR1 (ProjIR1 Hx)) [*]Cos y[+]
+     Cosine x (ProjIR1 (ProjIR2 Hx)) [*]Sin y) [+]Zero).
 apply
  leEq_wdl
   with
     (AbsIR
-       (Sine x (ProjIR1 (ProjIR1 Hx))[*]Cos y[+]
-        Cosine x (ProjIR1 (ProjIR2 Hx))[*]Sin y)[+]Zero).
+       (Sine x (ProjIR1 (ProjIR1 Hx)) [*]Cos y[+]
+        Cosine x (ProjIR1 (ProjIR2 Hx)) [*]Sin y) [+]Zero).
 apply plus_resp_leEq_both.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
 Transparent FAbs.
@@ -486,18 +477,18 @@ Opaque FAbs.
 simpl in |- *.
 eapply leEq_transitive.
 2: apply leEq_AbsIR.
-AStepl
+astepl
  (Zero[+]
   AbsIR
-    (Sine x (ProjIR1 (ProjIR1 Hx))[*]Sin y[-]
-     Cosine x (ProjIR1 (ProjIR2 Hx))[*]Cos y)).
+    (Sine x (ProjIR1 (ProjIR1 Hx)) [*]Sin y[-]
+     Cosine x (ProjIR1 (ProjIR2 Hx)) [*]Cos y)).
 apply
  leEq_wdl
   with
     (Zero[+]
      AbsIR
-       (Cosine x (ProjIR1 (ProjIR2 Hx))[*]Cos y[-]
-        Sine x (ProjIR1 (ProjIR1 Hx))[*]Sin y)).
+       (Cosine x (ProjIR1 (ProjIR2 Hx)) [*]Cos y[-]
+        Sine x (ProjIR1 (ProjIR1 Hx)) [*]Sin y)).
 apply plus_resp_leEq_both.
 apply FAbs_nonneg.
 apply eq_imp_leEq; apply eq_symmetric_unfolded.
@@ -521,19 +512,18 @@ apply included_FInv; apply included_FPlus; Included.
 apply included_FMinus; Included.
 Qed.
 
-Lemma Sin_plus_eq :
- forall (y : IR) (n : nat) HaF HaG, F' y n Zero HaF[=]G' y n Zero HaG.
+Lemma Sin_plus_eq : forall y n HaF HaG, F' y n Zero HaF [=] G' y n Zero HaG.
 do 2 intro;
  apply
   four_ind
    with
-     (P := fun n : nat => forall HaF HaG, F' y n Zero HaF[=]G' y n Zero HaG).
+     (P := fun n : nat => forall HaF HaG, F' y n Zero HaF [=] G' y n Zero HaG).
 intros; simpl in |- *.
 apply eq_transitive_unfolded with (Sin y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Cos y[+]Cos Zero[*]Sin y).
 2: simpl in |- *; Algebra.
-RStepl (Zero[*]Cos y[+]One[*]Sin y).
+rstepl (Zero[*]Cos y[+]One[*]Sin y).
 Algebra.
 
 intros; simpl in |- *.
@@ -541,7 +531,7 @@ apply eq_transitive_unfolded with (Cos y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Cos Zero[*]Cos y[-]Sin Zero[*]Sin y).
 2: simpl in |- *; Algebra.
-RStepl (One[*]Cos y[-]Zero[*]Sin y).
+rstepl (One[*]Cos y[-]Zero[*]Sin y).
 Algebra.
 
 intros; simpl in |- *.
@@ -550,34 +540,33 @@ apply eq_transitive_unfolded with (Sin y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Cos y[+]Cos Zero[*]Sin y).
 2: simpl in |- *; Algebra.
-RStepl (Zero[*]Cos y[+]One[*]Sin y).
+rstepl (Zero[*]Cos y[+]One[*]Sin y).
 Algebra.
 
 intros; simpl in |- *.
-apply eq_transitive_unfolded with ([--](Cos y)).
+apply eq_transitive_unfolded with ( [--] (Cos y)).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Sin y[-]Cos Zero[*]Cos y).
 2: simpl in |- *; Algebra.
-RStepl (Zero[*]Sin y[-]One[*]Cos y).
+rstepl (Zero[*]Sin y[-]One[*]Cos y).
 Algebra.
 
 intros.
 simpl in |- *; auto.
 Qed.
 
-Lemma Sin_plus_der_lft :
- forall (y : IR) (n : nat), Derivative_n n realline CI (F y) (F' y n).
+Lemma Sin_plus_der_lft : forall y n, Derivative_n n realline CI (F y) (F' y n).
 intro; apply Derivative_n_chain.
 simpl in |- *; unfold F in |- *.
 apply Feq_reflexive.
 apply included_FComp; Included.
 intro.
 
-cut (maps_compacts_into realline realline (FId{+}[-C-]y));
+cut (maps_compacts_into realline realline (FId{+} [-C-]y));
  [ intro | apply maps_translation ].
 
-cut (Derivative realline CI (FId{+}[-C-]y) [-C-]One); intros.
-2: apply Derivative_wdr with ([-C-]One{+}[-C-]Zero:PartIR).
+cut (Derivative realline CI (FId{+} [-C-]y) [-C-]One); intros.
+2: apply Derivative_wdr with ( [-C-]One{+} [-C-]Zero:PartIR).
 2: FEQ.
 2: Deriv.
 
@@ -585,26 +574,26 @@ apply
  four_induction
   with (P := fun n : nat => Derivative realline CI (F' y n) (F' y (S n))).
 simpl in |- *.
-apply Derivative_wdr with ((Cosine[o]FId{+}[-C-]y){*}[-C-]One).
+apply Derivative_wdr with ((Cosine[o]FId{+} [-C-]y) {*} [-C-]One).
 FEQ.
 apply Derivative_comp with realline CI; auto.
 Deriv.
 
 simpl in |- *.
-apply Derivative_wdr with (({--}Sine[o]FId{+}[-C-]y){*}[-C-]One).
+apply Derivative_wdr with (( {--}Sine[o]FId{+} [-C-]y) {*} [-C-]One).
 FEQ.
 apply Derivative_comp with realline CI; auto.
 Deriv.
 
 simpl in |- *.
 apply Derivative_inv.
-apply Derivative_wdr with ((Cosine[o]FId{+}[-C-]y){*}[-C-]One).
+apply Derivative_wdr with ((Cosine[o]FId{+} [-C-]y) {*} [-C-]One).
 FEQ.
 apply Derivative_comp with realline CI; auto.
 Deriv.
 
 simpl in |- *.
-apply Derivative_wdr with ({--}(({--}Sine[o]FId{+}[-C-]y){*}[-C-]One)).
+apply Derivative_wdr with ( {--} (( {--}Sine[o]FId{+} [-C-]y) {*} [-C-]One)).
 FEQ.
 apply Derivative_inv.
 apply Derivative_comp with realline CI; auto.
@@ -614,8 +603,7 @@ intros.
 auto.
 Qed.
 
-Lemma Sin_plus_der_rht :
- forall (y : IR) (n : nat), Derivative_n n realline CI (G y) (G' y n).
+Lemma Sin_plus_der_rht : forall y n, Derivative_n n realline CI (G y) (G' y n).
 intro; apply Derivative_n_chain.
 simpl in |- *; unfold G in |- *.
 apply Feq_reflexive.
@@ -628,7 +616,7 @@ apply
  four_induction
   with (P := fun n : nat => Derivative realline CI (G' y n) (G' y (S n))).
 simpl in |- *.
-let r := PartIR_to_symbPF (Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y)) in
+let r := PartIR_to_symbPF (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)) in
 apply Derivative_wdr with (symbPF_deriv r).
 simpl in |- *.
 apply eq_imp_Feq.
@@ -638,7 +626,7 @@ intros; simpl in |- *; rational.
 simpl in |- *; Deriv.
 
 simpl in |- *.
-let r := PartIR_to_symbPF (Cosine{*}[-C-](Cos y){-}Sine{*}[-C-](Sin y)) in
+let r := PartIR_to_symbPF (Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y)) in
 apply Derivative_wdr with (symbPF_deriv r).
 simpl in |- *.
 apply eq_imp_Feq.
@@ -649,7 +637,7 @@ simpl in |- *; Deriv.
 
 simpl in |- *.
 let r :=
- PartIR_to_symbPF ({--}(Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y))) in
+ PartIR_to_symbPF ( {--} (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y))) in
 apply Derivative_wdr with (symbPF_deriv r).
 simpl in |- *.
 apply eq_imp_Feq.
@@ -659,7 +647,7 @@ intros; simpl in |- *; rational.
 simpl in |- *; Deriv.
 
 simpl in |- *.
-let r := PartIR_to_symbPF (Sine{*}[-C-](Sin y){-}Cosine{*}[-C-](Cos y)) in
+let r := PartIR_to_symbPF (Sine{*} [-C-] (Sin y) {-}Cosine{*} [-C-] (Cos y)) in
 apply Derivative_wdr with (symbPF_deriv r).
 simpl in |- *.
 apply eq_imp_Feq.
@@ -697,21 +685,18 @@ End Sine_of_Sum.
 
 Opaque Sine Cosine.
 
-Lemma Cos_plus_fun :
- forall y : IR,
- Feq realline (Cosine[o]FId{+}[-C-]y)
-   (Cosine{*}[-C-](Cos y){-}Sine{*}[-C-](Sin y)).
+Lemma Cos_plus_fun : forall y, Feq realline (Cosine[o]FId{+} [-C-]y) (Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y)).
 intro.
 assert (H : Derivative realline CI Sine Cosine). Deriv.
 assert (H0 : Derivative realline CI Cosine {--}Sine). Deriv.
-apply Derivative_unique with CI (Sine[o]FId{+}[-C-]y).
+apply Derivative_unique with CI (Sine[o]FId{+} [-C-]y).
 Derivative_Help.
 FEQ.
 apply Derivative_comp with realline CI.
 apply maps_translation.
 Deriv.
 Deriv.
-apply Derivative_wdl with (Sine{*}[-C-](Cos y){+}Cosine{*}[-C-](Sin y)).
+apply Derivative_wdl with (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)).
 apply Feq_symmetric; apply Sin_plus_fun.
 apply Derivative_wdl with (Cos y{**}Sine{+}Sin y{**}Cosine).
 apply eq_imp_Feq.

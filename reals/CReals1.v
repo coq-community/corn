@@ -6,47 +6,46 @@ Require Export CPoly_ApZero.
 
 Section More_Cauchy_Props.
 
-(** 
-** More properties of Cauchy sequences
+(** **Miscellaneous
+*** More properties of Cauchy sequences
 We will now define some special Cauchy sequences and prove some 
 more useful properties about them.
 
-The sequence defined by $x_n=\frac2{n+1}$#x(n)=2/(n+1)# (don't ask why!)
+The sequence defined by $x_n=\frac2{n+1}$#x(n)=2/(n+1)#.
 *)
 
-Lemma twice_inv_seq_Lim :
- SeqLimit (R:=IR) (fun n : nat => Two[*]one_div_succ n) Zero.
+Lemma twice_inv_seq_Lim : SeqLimit (R:=IR) (fun n => Two[*]one_div_succ n) Zero.
 red in |- *;
  fold (Cauchy_Lim_prop2 (fun n : nat => Two[*]one_div_succ n) Zero) in |- *.
 apply Cauchy_Lim_prop3_prop2.
 red in |- *; intro.
 exists (2 * S k); intros.
-AStepr ((Two:IR)[*]one_div_succ m).
+astepr ((Two:IR) [*]one_div_succ m).
 apply AbsIR_imp_AbsSmall.
-apply leEq_wdl with ((Two:IR)[*]one_div_succ m).
+apply leEq_wdl with ((Two:IR) [*]one_div_succ m).
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-AStepl (one_div_succ (R:=IR) m[*]Two).
+astepl (one_div_succ (R:=IR) m[*]Two).
 unfold one_div_succ in |- *; simpl in |- *; fold (Two:IR) in |- *.
 apply shift_mult_leEq with (two_ap_zero IR).
 apply pos_two.
 unfold Snring in |- *.
-RStepr
- (One[/] nring (S k)[*]Two[//]
+rstepr
+ (One[/] nring (S k) [*]Two[//]
   mult_resp_ap_zero _ _ _ (nring_ap_zero _ (S k) (sym_not_eq (O_S k)))
     (two_ap_zero IR)).
 apply recip_resp_leEq.
-AStepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
+astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
 apply pos_nring_S.
 apply pos_two.
-AStepl ((Two:IR)[*]nring (S k)).
+astepl ((Two:IR) [*]nring (S k)).
 apply leEq_transitive with (nring (R:=IR) m).
 apply leEq_wdl with (nring (R:=IR) (2 * S k)).
 apply nring_leEq.
 assumption.
 apply nring_comm_mult.
-simpl in |- *; AStepl (nring (R:=IR) m[+]Zero); apply plus_resp_leEq_lft;
+simpl in |- *; astepl (nring (R:=IR) m[+]Zero); apply plus_resp_leEq_lft;
  apply less_leEq; apply pos_one.
-AStepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
 apply less_leEq; apply pos_two.
 apply less_leEq; apply one_div_succ_pos.
 Qed.
@@ -65,10 +64,8 @@ Next, we prove that the sequence of absolute values of a Cauchy
 sequence is also Cauchy.
 *)
 
-Lemma Cauchy_Lim_abs :
- forall (seq : nat -> IR) (y : IR),
- Cauchy_Lim_prop2 seq y ->
- Cauchy_Lim_prop2 (fun n : nat => AbsIR (seq n)) (AbsIR y).
+Lemma Cauchy_Lim_abs : forall seq y, Cauchy_Lim_prop2 seq y ->
+ Cauchy_Lim_prop2 (fun n => AbsIR (seq n)) (AbsIR y).
 intros seq y H.
 red in |- *; red in H.
 intros eps He.
@@ -76,13 +73,13 @@ elim (H eps He); clear H.
 intros N HN.
 exists N; intros.
 apply AbsIR_imp_AbsSmall.
-cut (AbsIR (seq m[-]y)[<=]eps).
+cut (AbsIR (seq m[-]y) [<=] eps).
 intro.
 2: apply AbsSmall_imp_AbsIR; apply HN; assumption.
-cut (seq m[-]y[<=]eps).
+cut (seq m[-]y [<=] eps).
 2: eapply leEq_transitive; [ apply leEq_AbsIR | apply H0 ].
 intro.
-cut (y[-]seq m[<=]eps).
+cut (y[-]seq m [<=] eps).
 2: eapply leEq_transitive;
     [ apply leEq_AbsIR | eapply leEq_wdl; [ apply H0 | apply AbsIR_minus ] ].
 intro.
@@ -95,29 +92,28 @@ apply leEq_transitive with y.
 apply shift_minus_leEq; apply shift_leEq_plus'; assumption.
 apply lft_leEq_Max.
 apply shift_leEq_plus'.
-apply leEq_transitive with ([--]y).
+apply leEq_transitive with ( [--]y).
 apply shift_minus_leEq; apply shift_leEq_plus'.
-RStepl (y[-]seq m).
+rstepl (y[-]seq m).
 assumption.
 apply rht_leEq_Max.
-AStepr ([--][--]eps); apply inv_resp_leEq.
+astepr ( [--][--]eps); apply inv_resp_leEq.
 apply shift_leEq_minus; apply shift_plus_leEq'.
-apply leEq_wdr with (Max (seq m) [--](seq m)[+]eps).
+apply leEq_wdr with (Max (seq m) [--] (seq m) [+]eps).
 apply Max_leEq.
 apply leEq_transitive with (seq m[+]eps).
 apply shift_leEq_plus'; assumption.
 apply plus_resp_leEq.
 apply lft_leEq_Max.
-apply leEq_transitive with ([--](seq m)[+]eps).
-apply shift_leEq_plus'; RStepl (seq m[-]y); assumption.
+apply leEq_transitive with ( [--] (seq m) [+]eps).
+apply shift_leEq_plus'; rstepl (seq m[-]y); assumption.
 apply plus_resp_leEq.
 apply rht_leEq_Max.
 unfold cg_minus in |- *.
 Algebra.
 Qed.
 
-Lemma Cauchy_abs :
- forall seq : CauchySeq IR, Cauchy_prop (fun n : nat => AbsIR (seq n)).
+Lemma Cauchy_abs : forall seq : CauchySeq IR, Cauchy_prop (fun n => AbsIR (seq n)).
 intro.
 apply Cauchy_prop2_prop.
 exists (AbsIR (Lim seq)).
@@ -125,9 +121,8 @@ apply Cauchy_Lim_abs.
 apply Cauchy_complete.
 Qed.
 
-Lemma Lim_abs :
- forall seq : CauchySeq IR,
- Lim (Build_CauchySeq IR _ (Cauchy_abs seq))[=]AbsIR (Lim seq).
+Lemma Lim_abs : forall seq : CauchySeq IR,
+ Lim (Build_CauchySeq _ _ (Cauchy_abs seq)) [=] AbsIR (Lim seq).
 intros.
 apply eq_symmetric_unfolded; apply Limits_unique.
 simpl in |- *; apply Cauchy_Lim_abs.
@@ -138,17 +133,17 @@ End More_Cauchy_Props.
 
 Section Subsequences.
 
-(** 
-** Subsequences
+(** *** Subsequences
 We will now examine (although without formalizing it) the concept 
 of subsequence and some of its properties.
 
 %\begin{convention}% Let [seq1,seq2:nat->IR].
 %\end{convention}%
 
-In order for [seq1] to be a subsequence of [seq2], there must be an 
-increasing function [f] growing to infinity such that 
-[(n:nat)(seq1 n) [=] (seq2 (f n))].  We assume [f] to be such a function.
+In order for [seq1] to be a subsequence of [seq2], there must be an
+increasing function [f] growing to infinity such that
+[forall (n :nat), (seq1 n) [=] (seq2 (f n))].  We assume [f] to be such a
+function.
 
 Finally, for some of our results it is important to assume that 
 [seq2] is monotonous.
@@ -159,14 +154,12 @@ Variable f : nat -> nat.
 
 Hypothesis monF : forall m n : nat, m <= n -> f m <= f n.
 Hypothesis crescF : forall n : nat, {m : nat | n < m /\ f n < f m}.
-Hypothesis subseq : forall n : nat, seq1 n[=]seq2 (f n).
+Hypothesis subseq : forall n : nat, seq1 n [=] seq2 (f n).
 
-Hypothesis
-  mon_seq2 :
-    (forall m n : nat, m <= n -> seq2 m[<=]seq2 n) \/
-    (forall m n : nat, m <= n -> seq2 n[<=]seq2 m).
+Hypothesis mon_seq2 :
+ (forall m n, m <= n -> seq2 m [<=] seq2 n) \/ (forall m n, m <= n -> seq2 n [<=] seq2 m).
 
-Lemma unbnd_f : forall m : nat, {n : nat | m < f n}.
+Lemma unbnd_f : forall m, {n : nat | m < f n}.
 simple induction m.
 elim (crescF 0).
 intros n Hn.
@@ -203,23 +196,23 @@ exists (f N).
 intros.
 elim (unbnd_f m); intros i Hi.
 apply AbsIR_imp_AbsSmall.
-apply leEq_transitive with (AbsIR (seq2 (f i)[-]seq2 (f N))).
+apply leEq_transitive with (AbsIR (seq2 (f i) [-]seq2 (f N))).
 elim mon_seq2; intro.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (seq2 (f N)); apply H2; assumption.
+2: apply shift_leEq_minus; astepl (seq2 (f N)); apply H2; assumption.
 eapply leEq_wdr.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (seq2 (f N)); apply H2;
+2: apply shift_leEq_minus; astepl (seq2 (f N)); apply H2;
     apply le_trans with m; auto with arith.
 apply minus_resp_leEq.
 apply H2; auto with arith.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_inv_x.
-2: apply shift_minus_leEq; AStepr (seq2 (f N)); auto.
+2: apply shift_minus_leEq; astepr (seq2 (f N)); auto.
 eapply leEq_wdr.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_inv_x.
-2: apply shift_minus_leEq; AStepr (seq2 (f N)); apply H2;
+2: apply shift_minus_leEq; astepr (seq2 (f N)); apply H2;
     apply le_trans with m; auto with arith.
 apply inv_resp_leEq; apply minus_resp_leEq.
 apply H2; auto with arith.
@@ -230,8 +223,8 @@ apply mon_F'; apply le_lt_trans with m; auto.
 apply AbsIR_wd; Algebra.
 Qed.
 
-Lemma Cprop2_seq_imp_Cprop2_subseq :
- forall a : IR, Cauchy_Lim_prop2 seq2 a -> Cauchy_Lim_prop2 seq1 a.
+Lemma Cprop2_seq_imp_Cprop2_subseq : forall a,
+ Cauchy_Lim_prop2 seq2 a -> Cauchy_Lim_prop2 seq1 a.
 intros a H.
 red in |- *; red in H.
 intros eps H0.
@@ -240,7 +233,7 @@ intros N HN.
 elim (unbnd_f N); intros i Hi.
 exists i.
 intros.
-AStepr (seq2 (f m)[-]a).
+astepr (seq2 (f m) [-]a).
 apply HN.
 cut (f i <= f m).
 intros; apply le_trans with (f i); auto with arith.
@@ -259,8 +252,8 @@ exists (Lim (Build_CauchySeq _ _ H)).
 apply Lim_Cauchy.
 Qed.
 
-Lemma Cprop2_subseq_imp_Cprop2_seq :
- forall a : IR, Cauchy_Lim_prop2 seq1 a -> Cauchy_Lim_prop2 seq2 a.
+Lemma Cprop2_subseq_imp_Cprop2_seq : forall a,
+ Cauchy_Lim_prop2 seq1 a -> Cauchy_Lim_prop2 seq2 a.
 intros.
 cut (Cauchy_prop seq1); intros.
 2: apply Cauchy_prop2_prop.
@@ -273,7 +266,7 @@ cut
 2: apply Cauchy_complete.
 cut (Cauchy_Lim_prop2 seq1 (Lim (Build_CauchySeq _ _ H1))); intros.
 2: apply Cprop2_seq_imp_Cprop2_subseq; assumption.
-cut (Lim (Build_CauchySeq _ _ H1)[=]a).
+cut (Lim (Build_CauchySeq _ _ H1) [=] a).
 intro H4.
 eapply Lim_wd.
 apply H4.
@@ -290,14 +283,12 @@ Variable f : nat -> nat.
 
 Hypothesis monF : forall m n : nat, m <= n -> f m <= f n.
 Hypothesis crescF : forall n : nat, {m : nat | n < m /\ f n < f m}.
-Hypothesis subseq : forall n : nat, seq1 n[=]seq2 (f n).
+Hypothesis subseq : forall n : nat, seq1 n [=] seq2 (f n).
 
-Hypothesis
-  mon_seq2 :
-    (forall m n : nat, m <= n -> seq2 m[<=]seq2 n) \/
-    (forall m n : nat, m <= n -> seq2 n[<=]seq2 m).
+Hypothesis mon_seq2 :
+ (forall m n, m <= n -> seq2 m [<=] seq2 n) \/ (forall m n, m <= n -> seq2 n [<=] seq2 m).
 
-Lemma Lim_seq_eq_Lim_subseq : Lim seq1[=]Lim seq2.
+Lemma Lim_seq_eq_Lim_subseq : Lim seq1 [=] Lim seq2.
 cut (Cauchy_Lim_prop2 seq1 (Lim seq2)).
 2: apply Cprop2_seq_imp_Cprop2_subseq with (CS_seq _ seq2) f; auto;
     apply Cauchy_complete.
@@ -306,7 +297,7 @@ apply eq_symmetric_unfolded.
 apply Limits_unique; assumption.
 Qed.
 
-Lemma Lim_subseq_eq_Lim_seq : Lim seq1[=]Lim seq2.
+Lemma Lim_subseq_eq_Lim_seq : Lim seq1 [=] Lim seq2.
 cut (Cauchy_Lim_prop2 seq2 (Lim seq1)).
 2: exact
     (Cprop2_subseq_imp_Cprop2_seq seq1 seq2 f monF crescF subseq mon_seq2 _
@@ -319,134 +310,126 @@ End Cauchy_Subsequences.
 
 Section Properties_of_Exponentiation.
 
-(** 
-** More properties of Exponentiation
+(** *** More properties of Exponentiation
 
-Finally, we prove that $x^n$#x^n# grows to infinity if $x>1$ 
-#x larger than 1#.
+Finally, we prove that [x[^]n] grows to infinity if [x [>] One].
 *)
 
-Lemma power_big' :
- forall (R : COrdField) (x : R) (n : nat),
- Zero[<=]x -> One[+]nring n[*]x[<=](One[+]x)[^]n.
+Lemma power_big' : forall (R : COrdField) (x : R) n,
+ Zero [<=] x -> One[+]nring n[*]x [<=] (One[+]x) [^]n.
 intros.
 induction  n as [| n Hrecn]; intros.
-RStepl (One:R).
-AStepr (One:R).
+rstepl (One:R).
+astepr (One:R).
 apply leEq_reflexive.
 simpl in |- *.
-apply leEq_transitive with ((One[+]nring n[*]x)[*](One[+]x)).
-RStepr (One[+](nring n[+]One)[*]x[+]nring n[*]x[^]2).
-AStepl (One[+](nring n[+]One)[*]x[+]Zero).
+apply leEq_transitive with ((One[+]nring n[*]x) [*] (One[+]x)).
+rstepr (One[+] (nring n[+]One) [*]x[+]nring n[*]x[^]2).
+astepl (One[+] (nring n[+]One) [*]x[+]Zero).
 apply plus_resp_leEq_lft.
 apply mult_resp_nonneg.
-AStepl (nring 0:R). apply nring_leEq. auto with arith.
+astepl (nring 0:R). apply nring_leEq. auto with arith.
 apply sqr_nonneg.
 apply mult_resp_leEq_rht.
 auto.
-apply less_leEq. AStepl ((Zero:R)[+]Zero).
+apply less_leEq. astepl ((Zero:R) [+]Zero).
 apply plus_resp_less_leEq. apply pos_one. auto.
 Qed.
 
-Lemma power_big :
- forall x y : IR, Zero[<=]x -> One[<]y -> {N : nat | x[<=]y[^]N}.
+Lemma power_big : forall x y : IR, Zero [<=] x -> One [<] y -> {N : nat | x [<=] y[^]N}.
 intros.
-cut (Zero[<]y[-]One). intro.
-cut (y[-]One[#]Zero). intro H2.
+cut (Zero [<] y[-]One). intro.
+cut (y[-]One [#] Zero). intro H2.
 elim (Archimedes (x[-]One[/] y[-]One[//]H2)). intro N. intros. exists N.
-apply leEq_transitive with (One[+]nring N[*](y[-]One)).
+apply leEq_transitive with (One[+]nring N[*] (y[-]One)).
 apply shift_leEq_plus'.
-AStepr ((y[-]One)[*]nring N).
+astepr ((y[-]One) [*]nring N).
 apply shift_leEq_mult' with H2. auto.
 auto.
-apply leEq_wdr with ((One[+](y[-]One))[^]N).
+apply leEq_wdr with ((One[+] (y[-]One)) [^]N).
 apply power_big'. apply less_leEq. auto.
 apply un_op_wd_unfolded. rational.
 apply Greater_imp_ap. auto.
-apply shift_less_minus. AStepl OneR. auto.
+apply shift_less_minus. astepl OneR. auto.
 Qed.
 
-Lemma qi_yields_zero :
- forall q : IR,
- Zero[<=]q -> q[<]One -> forall e : IR, Zero[<]e -> {N : nat | q[^]N[<=]e}.
+Lemma qi_yields_zero : forall q : IR,
+ Zero [<=] q -> q [<] One -> forall e, Zero [<] e -> {N : nat | q[^]N [<=] e}.
 intros.
-cut (Zero[<](One[+]q) [/]TwoNZ). intro Haux.
-cut ((One[+]q) [/]TwoNZ[#]Zero). intro H2.
-cut (e[#]Zero). intro H3.
+cut (Zero [<] (One[+]q) [/]TwoNZ). intro Haux.
+cut ((One[+]q) [/]TwoNZ [#] Zero). intro H2.
+cut (e [#] Zero). intro H3.
 elim (power_big (One[/] e[//]H3) (One[/] _[//]H2)). intro N. intros H4. exists N.
-cut (Zero[<]((One[+]q) [/]TwoNZ)[^]N). intro H5.
-apply leEq_transitive with (((One[+]q) [/]TwoNZ)[^]N).
+cut (Zero [<] ((One[+]q) [/]TwoNZ) [^]N). intro H5.
+apply leEq_transitive with (((One[+]q) [/]TwoNZ) [^]N).
 apply nexp_resp_leEq.
 auto.
 apply shift_leEq_div.
 apply pos_two.
 apply shift_leEq_plus.
-RStepl q. apply less_leEq. auto.
-AStepl (One[*]((One[+]q) [/]TwoNZ)[^]N).
+rstepl q. apply less_leEq. auto.
+astepl (One[*] ((One[+]q) [/]TwoNZ) [^]N).
 set (H6 := pos_ap_zero _ _ H5) in *.
 apply shift_mult_leEq with H6. auto.
-RStepr (e[*](One[/] _[//]H6)).
+rstepr (e[*] (One[/] _[//]H6)).
 apply shift_leEq_mult' with H3. auto.
-AStepr (One[^]N[/] _[//]H6).
-AStepr ((One[/] _[//]H2)[^]N). auto.
+astepr (One[^]N[/] _[//]H6).
+astepr ((One[/] _[//]H2) [^]N). auto.
 apply nexp_resp_pos. apply pos_div_two.
-AStepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
 apply pos_one. auto.
 apply less_leEq. apply recip_resp_pos. auto. 
 apply shift_less_div. apply pos_div_two.
-AStepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
 apply pos_one. auto.
-AStepl ((One[+]q) [/]TwoNZ). apply shift_div_less.
-apply pos_two. RStepr (One[+]OneR).
+astepl ((One[+]q) [/]TwoNZ). apply shift_div_less.
+apply pos_two. rstepr (One[+]OneR).
 apply plus_resp_less_lft. auto.
 apply Greater_imp_ap. auto.
 apply Greater_imp_ap. auto.
 apply pos_div_two.
-AStepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
 apply pos_one. auto.
 Qed.
 
-Lemma qi_lim_zero :
- forall q : IR, Zero[<=]q -> q[<]One -> SeqLimit (fun i : nat => q[^]i) Zero.
+Lemma qi_lim_zero : forall q : IR, Zero [<=] q -> q [<] One -> SeqLimit (fun i => q[^]i) Zero.
 intros q H H0.
 unfold SeqLimit in |- *. unfold AbsSmall in |- *. intros.
 elim (qi_yields_zero q H H0 e); auto.
 intro N. intros. exists (S N). intros. split.
 apply less_leEq.
 apply less_leEq_trans with ZeroR.
-AStepr ([--]ZeroR). apply inv_resp_less. auto.
-AStepr (q[^]m).
+astepr ( [--]ZeroR). apply inv_resp_less. auto.
+astepr (q[^]m).
 apply nexp_resp_nonneg. auto.
-AStepl (q[^]m).
+astepl (q[^]m).
 replace m with (N + (m - N)).
-AStepl (q[^]N[*]q[^](m - N)). AStepr (e[*]One).
+astepl (q[^]N[*]q[^] (m - N)). astepr (e[*]One).
 apply mult_resp_leEq_both.
 apply nexp_resp_nonneg. auto. 
 apply nexp_resp_nonneg. auto.
 auto.
-AStepr (OneR[^](m - N)).
+astepr (OneR[^] (m - N)).
 apply nexp_resp_leEq. auto. apply less_leEq. auto.
 auto with arith.
 Qed.
 
 End Properties_of_Exponentiation.
 
-(** ** [IR] has characteristic zero *)
+(** *** [IR] has characteristic zero *)
 
 Lemma char0_IR : Char0 IR.
 apply char0_OrdField.
 Qed.
 
-Lemma poly_apzero_IR :
- forall f : cpoly_cring IR, f[#]Zero -> {c : IR | f ! c[#]Zero}.
+Lemma poly_apzero_IR : forall f : cpoly_cring IR, f [#] Zero -> {c : IR | f ! c [#] Zero}.
 intros.
 apply poly_apzero.
 exact char0_IR.
 auto.
 Qed.
 
-Lemma poly_IR_extensional :
- forall p q : cpoly_cring IR, (forall x : IR, p ! x[=]q ! x) -> p[=]q.
+Lemma poly_IR_extensional : forall p q : cpoly_cring IR, (forall x, p ! x [=] q ! x) -> p [=] q.
 intros.
 apply poly_extensional.
 exact char0_IR.

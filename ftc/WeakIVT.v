@@ -1,13 +1,19 @@
 (* $Id$ *)
 
+(** printing ** %\ensuremath\times% #&times;# *)
+
+(* begin hide *)
+Infix "**" := prodT (at level 20).
+(* end hide *)
+
 Require Export Continuity.
 
 (** *IVT for Partial Functions
 
-In general, we cannot prove the classically valid Intermediate Value Theorem
-for arbitrary partial functions, which states that in any interval $[a,b]$#[a,b]#,
-for any value [z] between [f(a)] and [f(b)] there exists $x\in[a,b]$#x&in [a,b]#
-such that [f(x) [=] z].
+In general, we cannot prove the classically valid Intermediate Value
+Theorem for arbitrary partial functions, which states that in any
+interval [[a,b]], for any value [z] between [f(a)] and [f(b)]
+there exists $x\in[a,b]$#x&isin;[a,b]# such that [f(x) [=] z].
 
 However, as is usually the case, there are some good aproximation results.  We
 will prove them here.
@@ -16,7 +22,7 @@ will prove them here.
 Section Lemma1.
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -26,23 +32,20 @@ Hypothesis contF : Continuous_I Hab F.
 
 (** **First Lemmas
 
-%\begin{convention}% Let [a,b:IR] and [Hab:a [<=] b] and denote by [I]the interval
-$[a,b]$#[a,b]#.  Let [F] be a continuous function on [I].
+%\begin{convention}% Let [a, b : IR] and [Hab : a [<=] b] and denote by [I]
+the interval [[a,b]].  Let [F] be a continuous function on [I].
 %\end{convention}%
 
 We begin by proving that, if [f(a) [<] f(b)], then for every [y] in 
-$[f(a),f(b)]$#[f(a),f(b)]# there is an $x\in[a,b]$#x&in [a,b]# such that [f(x)] is close
+[[f(a),f(b)]] there is an $x\in[a,b]$#x&isin;[a,b]# such that [f(x)] is close
 enough to [z].
 *)
 
-Lemma Weak_IVT_ap_lft :
- forall Ha Hb (HFab : F a Ha[<]F b Hb) (e : IR),
- Zero[<]e ->
- forall z : IR,
- Compact (less_leEq _ _ _ HFab) z ->
- {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z)[<=]e}.
+Lemma Weak_IVT_ap_lft : forall Ha Hb (HFab : F a Ha [<] F b Hb) e,
+ Zero [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
+ {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z) [<=] e}.
 intros Ha Hb HFab e H z H0.
-cut (a[<]b).
+cut (a [<] b).
 intro Hab'.
 set (G := FAbs (F{-}[-C-]z)) in *.
 assert (H1 : Continuous_I Hab G).
@@ -50,13 +53,13 @@ unfold G in |- *; Contin.
 set (m := glb_funct _ _ _ _ H1) in *.
 elim (glb_is_glb _ _ _ _ H1).
 fold m in |- *; intros.
-cut (forall x : IR, Compact Hab x -> forall Hx, m[<=]AbsIR (F x Hx[-]z));
+cut (forall x : IR, Compact Hab x -> forall Hx, m [<=] AbsIR (F x Hx[-]z));
  [ clear a0; intro a0 | intros ].
-elim (cotrans_less_unfolded _ _ _ H m); intros.
+elim (less_cotransitive_unfolded _ _ _ H m); intros.
 
 elim H0; clear H0; intros H0 H0'.
-cut (F a Ha[-]z[<=][--]m); intros.
-cut (m[<=]F b Hb[-]z); intros.
+cut (F a Ha[-]z [<=] [--]m); intros.
+cut (m [<=] F b Hb[-]z); intros.
 elimtype False.
 elim (contin_prop _ _ _ _ contF m a1); intros d H4 H5.
 set (incF := contin_imp_inc _ _ _ _ contF) in *.
@@ -64,10 +67,10 @@ set
  (f :=
   fun i Hi =>
   F (compact_part _ _ Hab' d H4 i Hi)
-    (incF _ (compact_part_hyp _ _ Hab Hab' d H4 i Hi))[-]z) 
+    (incF _ (compact_part_hyp _ _ Hab Hab' d H4 i Hi)) [-]z) 
  in *.
 set (n := compact_nat a b d H4) in *.
-cut (forall i Hi, f i Hi[<=]Zero).
+cut (forall i Hi, f i Hi [<=] Zero).
 intros.
 apply (less_irreflexive_unfolded _ (F b Hb[-]z)).
 eapply less_leEq_trans.
@@ -80,27 +83,27 @@ apply cg_minus_wd; [ apply pfwdef; rational | Algebra ].
 simple induction i.
 intros; unfold f, compact_part in |- *.
 apply leEq_wdl with (F a Ha[-]z).
-apply leEq_transitive with ([--]m); auto.
-AStepr ([--]ZeroR); apply less_leEq; apply inv_resp_less; auto.
+apply leEq_transitive with ( [--]m); auto.
+astepr ( [--]ZeroR); apply less_leEq; apply inv_resp_less; auto.
 apply cg_minus_wd; [apply pfwdef | idtac]; rational.
 intros i' Hrec HSi'.
-AStepr (m[-]m).
+astepr (m[-]m).
 apply shift_leEq_minus'.
 cut (i' <= n); [ intro Hi' | auto with arith ].
-apply leEq_transitive with ([--](f _ Hi')[+]f _ HSi').
+apply leEq_transitive with ( [--] (f _ Hi') [+]f _ HSi').
 apply plus_resp_leEq.
-cut ({m[<=]f _ Hi'} + {f _ Hi'[<=][--]m}).
+cut ({m [<=] f _ Hi'} + {f _ Hi' [<=] [--]m}).
 intro; inversion_clear H6.
 elimtype False.
 apply (less_irreflexive_unfolded _ m).
 apply leEq_less_trans with ZeroR.
 eapply leEq_transitive; [ apply H7 | apply (Hrec Hi') ].
 auto.
-AStepl ([--][--]m); apply inv_resp_leEq; auto.
+astepl ( [--][--]m); apply inv_resp_leEq; auto.
 apply leEq_distr_AbsIR.
 assumption.
 unfold f in |- *; apply a0; apply compact_part_hyp.
-RStepl (f _ HSi'[-]f _ Hi').
+rstepl (f _ HSi'[-]f _ Hi').
 eapply leEq_transitive.
 apply leEq_AbsIR.
 unfold f in |- *; simpl in |- *.
@@ -108,7 +111,7 @@ apply
  leEq_wdl
   with
     (AbsIR
-       (F _ (incF _ (compact_part_hyp _ _ Hab Hab' d H4 _ HSi'))[-]
+       (F _ (incF _ (compact_part_hyp _ _ Hab Hab' d H4 _ HSi')) [-]
         F _ (incF _ (compact_part_hyp _ _ Hab Hab' d H4 _ Hi')))).
 apply H5; try apply compact_part_hyp.
 eapply leEq_wdl.
@@ -119,12 +122,12 @@ apply AbsIR_wd; rational.
 eapply leEq_wdr.
 2: apply AbsIR_eq_x.
 apply a0; apply compact_inc_rht.
-apply shift_leEq_minus; AStepl z; auto.
-AStepl ([--][--](F a Ha[-]z)); apply inv_resp_leEq.
+apply shift_leEq_minus; astepl z; auto.
+astepl ( [--][--] (F a Ha[-]z)); apply inv_resp_leEq.
 eapply leEq_wdr.
 2: apply AbsIR_eq_inv_x.
 apply a0; apply compact_inc_lft.
-apply shift_minus_leEq; AStepr z; auto.
+apply shift_minus_leEq; astepr z; auto.
 
 elim (b0 (e[-]m)); intros.
 elim p; clear p b0; intros y Hy.
@@ -134,7 +137,7 @@ exists y; auto.
 intro.
 apply leEq_wdl with (G y H2).
 apply less_leEq.
-apply plus_cancel_less with ([--]m).
+apply plus_cancel_less with ( [--]m).
 eapply less_wdl.
 apply q.
 unfold cg_minus in |- *; Algebra.
@@ -142,7 +145,7 @@ unfold G in |- *.
 apply eq_transitive_unfolded with (AbsIR (Part _ _ (ProjIR1 H2))).
 apply FAbs_char.
 apply AbsIR_wd; simpl in |- *; Algebra.
-apply shift_less_minus; AStepl m; auto.
+apply shift_less_minus; astepl m; auto.
 apply a0.
 exists x.
 split.
@@ -166,7 +169,7 @@ End Lemma1.
 Section Lemma2.
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -178,17 +181,14 @@ Hypothesis contF : Continuous_I Hab F.
 If [f(b) [<] f(a)], a similar result holds:
 *)
 
-Lemma Weak_IVT_ap_rht :
- forall Ha Hb (HFab : F b Hb[<]F a Ha) (e : IR),
- Zero[<]e ->
- forall z : IR,
- Compact (less_leEq _ _ _ HFab) z ->
- {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z)[<=]e}.
+Lemma Weak_IVT_ap_rht : forall Ha Hb (HFab : F b Hb [<] F a Ha) e,
+ Zero [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
+ {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z) [<=] e}.
 intros Ha Hb HFab e H z H0.
 set (G := {--}F) in *.
 assert (contG : Continuous_I Hab G).
 unfold G in |- *; Contin.
-assert (HGab : G a Ha[<]G b Hb).
+assert (HGab : G a Ha [<] G b Hb).
 unfold G in |- *; simpl in |- *; apply inv_resp_less; auto.
 assert (H1 : Compact (less_leEq _ _ _ HGab) [--]z).
 inversion_clear H0; split; unfold G in |- *; simpl in |- *;
@@ -215,8 +215,8 @@ converge to [x0] such that [f(x0) [=] z].
 *)
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab' : a [<] b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := Compact Hab.
 (* end hide *)
@@ -228,9 +228,7 @@ Let incF := contin_imp_inc _ _ _ _ contF.
 (* end hide *)
 
 (* begin show *)
-Hypothesis
-  incrF :
-    forall x y : IR, I x -> I y -> x[<]y -> forall Hx Hy, F x Hx[<]F y Hy.
+Hypothesis incrF : forall x y, I x -> I y -> x [<] y -> forall Hx Hy, F x Hx [<] F y Hy.
 (* end show *)
 
 (* begin hide *)
@@ -242,40 +240,31 @@ Let HFab' := incrF _ _ Ha Hb Hab' (incF _ Ha) (incF _ Hb).
 
 (* begin show *)
 Variable z : IR.
-Hypothesis Haz : F a (incF _ Ha)[<=]z.
-Hypothesis Hzb : z[<=]F b (incF _ Hb).
+Hypothesis Haz : F a (incF _ Ha) [<=] z.
+Hypothesis Hzb : z [<=] F b (incF _ Hb).
 (* end show *)
 
-(**
-Given any two points [x [<] y] in $[a,b]$#[a,b]# such that [x [<=] z [<=] y], we
-can find [x' [<] y'] such that $|x'-y'|=\frac23|x-y|$#|x'-y'|=2/3|x-y|# and [x' [<=] z [<=] y'].
+(** Given any two points [x [<] y] in [[a,b]] such that [x [<=] z [<=] y],
+we can find [x' [<] y'] such that $|x'-y'|=\frac23|x-y|$#|x'-y'|=2/3|x-y|#
+and [x' [<=] z [<=] y'].
 *)
 
-Lemma IVT_seq_lemma :
- forall (xy : prodT IR IR) (x:=fstT xy) (y:=sndT xy)
-   (Hxy : prodT (I x) (I y)),
- let Hx := fstT Hxy in
- let Hy := sndT Hxy in
- x[<]y ->
- F x (incF _ Hx)[<=]z /\ z[<=]F y (incF _ Hy) ->
- {xy0 : prodT IR IR |
- let x0 := fstT xy0 in
- let y0 := sndT xy0 in
- {Hxy0 : prodT (I x0) (I y0) | x0[<]y0 |
- let Hx0 := fstT Hxy0 in
- let Hy0 := sndT Hxy0 in
- F x0 (incF _ Hx0)[<=]z /\
- z[<=]F y0 (incF _ Hy0) /\
- y0[-]x0[=]Two [/]ThreeNZ[*](y[-]x) /\ x[<=]x0 /\ y0[<=]y}}.
+Lemma IVT_seq_lemma : forall (xy : IR ** IR) (x:=fstT xy) (y:=sndT xy)
+   (Hxy : (I x) ** (I y)) (Hx := fstT Hxy) (Hy := sndT Hxy), x [<] y ->
+ F x (incF _ Hx) [<=] z /\ z [<=] F y (incF _ Hy) ->
+ {xy0 : IR ** IR | let x0 := fstT xy0 in let y0 := sndT xy0 in
+ {Hxy0 : (I x0) ** (I y0) | x0 [<] y0 | let Hx0 := fstT Hxy0 in let Hy0 := sndT Hxy0 in
+ F x0 (incF _ Hx0) [<=] z /\ z [<=] F y0 (incF _ Hy0) /\
+ y0[-]x0 [=] Two [/]ThreeNZ[*] (y[-]x) /\ x [<=] x0 /\ y0 [<=] y}}.
 (* begin hide *)
 intros xy x y Hxy Hx Hy H H0.
 set (x1 := (Two[*]x[+]y) [/]ThreeNZ) in *.
 set (y1 := (x[+]Two[*]y) [/]ThreeNZ) in *.
-assert (H1 : x1[<]y1).
+assert (H1 : x1 [<] y1).
  unfold x1, y1 in |- *; apply lft_rht; auto.
 cut (I x1). intro H2. cut (I y1). intro H3.
-cut (F x1 (incF _ H2)[<]F y1 (incF _ H3)); [ intro H4 | auto ].
-elim (cotrans_less_unfolded _ _ _ H4 z); intros.
+cut (F x1 (incF _ H2) [<] F y1 (incF _ H3)); [ intro H4 | auto ].
+elim (less_cotransitive_unfolded _ _ _ H4 z); intros.
 exists (pairT x1 y); exists (pairT H2 Hy); simpl in |- *; repeat split; auto.
 apply less_leEq_trans with y1.
  auto.
@@ -316,11 +305,11 @@ We now iterate this construction.
 Record IVT_aux_seq_type : Type := 
   {IVTseq1 : IR;
    IVTseq2 : IR;
-   IVTH1 : I IVTseq1;
-   IVTH2 : I IVTseq2;
-   IVTprf : IVTseq1[<]IVTseq2;
-   IVTz1 : F IVTseq1 (incF _ IVTH1)[<=]z;
-   IVTz2 : z[<=]F IVTseq2 (incF _ IVTH2)}.
+   IVTH1   : I IVTseq1;
+   IVTH2   : I IVTseq2;
+   IVTprf  : IVTseq1 [<] IVTseq2;
+   IVTz1   : F IVTseq1 (incF _ IVTH1) [<=] z;
+   IVTz2   : z [<=] F IVTseq2 (incF _ IVTH2)}.
 
 Definition IVT_iter : IVT_aux_seq_type -> IVT_aux_seq_type.
 intro Haux; elim Haux; intros.
@@ -353,19 +342,19 @@ Definition b_seq (n : nat) := IVTseq2 (IVT_seq n).
 Definition a_seq_I (n : nat) : I (a_seq n) := IVTH1 (IVT_seq n).
 Definition b_seq_I (n : nat) : I (b_seq n) := IVTH2 (IVT_seq n).
 
-Lemma a_seq_less_b_seq : forall n : nat, a_seq n[<]b_seq n.
+Lemma a_seq_less_b_seq : forall n : nat, a_seq n [<] b_seq n.
 exact (fun n : nat => IVTprf (IVT_seq n)).
 Qed.
 
-Lemma a_seq_leEq_z : forall n : nat, F _ (incF _ (a_seq_I n))[<=]z.
+Lemma a_seq_leEq_z : forall n : nat, F _ (incF _ (a_seq_I n)) [<=] z.
 exact (fun n : nat => IVTz1 (IVT_seq n)).
 Qed.
 
-Lemma z_leEq_b_seq : forall n : nat, z[<=]F _ (incF _ (b_seq_I n)).
+Lemma z_leEq_b_seq : forall n : nat, z [<=] F _ (incF _ (b_seq_I n)).
 exact (fun n : nat => IVTz2 (IVT_seq n)).
 Qed.
 
-Lemma a_seq_mon : forall i : nat, a_seq i[<=]a_seq (S i).
+Lemma a_seq_mon : forall i : nat, a_seq i [<=] a_seq (S i).
 intro.
 unfold a_seq in |- *.
 simpl in |- *.
@@ -380,7 +369,7 @@ case a2; clear a2; simpl in |- *; intros.
 case a2; auto.
 Qed.
 
-Lemma b_seq_mon : forall i : nat, b_seq (S i)[<=]b_seq i.
+Lemma b_seq_mon : forall i : nat, b_seq (S i) [<=] b_seq i.
 intro.
 unfold b_seq in |- *.
 simpl in |- *.
@@ -395,9 +384,7 @@ case a2; clear a2; simpl in |- *; intros.
 case a2; auto.
 Qed.
 
-Lemma a_seq_b_seq_dist_n :
- forall n : nat,
- b_seq (S n)[-]a_seq (S n)[=]Two [/]ThreeNZ[*](b_seq n[-]a_seq n).
+Lemma a_seq_b_seq_dist_n : forall n, b_seq (S n) [-]a_seq (S n) [=] Two [/]ThreeNZ[*] (b_seq n[-]a_seq n).
 intro.
 unfold a_seq, b_seq in |- *.
 simpl in |- *.
@@ -412,14 +399,13 @@ case a2; clear a2; simpl in |- *; intros.
 case a2; auto.
 Qed.
 
-Lemma a_seq_b_seq_dist :
- forall n : nat, b_seq n[-]a_seq n[=](Two [/]ThreeNZ)[^]n[*](b[-]a).
+Lemma a_seq_b_seq_dist : forall n, b_seq n[-]a_seq n [=] (Two [/]ThreeNZ) [^]n[*] (b[-]a).
 simple induction n.
 simpl in |- *; Algebra.
 clear n; intros.
-AStepr (Two [/]ThreeNZ[*](Two [/]ThreeNZ)[^]n[*](b[-]a)).
-AStepr (Two [/]ThreeNZ[*]((Two [/]ThreeNZ)[^]n[*](b[-]a))).
-AStepr (Two [/]ThreeNZ[*](b_seq n[-]a_seq n)).
+astepr (Two [/]ThreeNZ[*] (Two [/]ThreeNZ) [^]n[*] (b[-]a)).
+astepr (Two [/]ThreeNZ[*] ((Two [/]ThreeNZ) [^]n[*] (b[-]a))).
+astepr (Two [/]ThreeNZ[*] (b_seq n[-]a_seq n)).
 apply a_seq_b_seq_dist_n.
 Qed.
 
@@ -432,7 +418,7 @@ eapply leEq_transitive.
 2: apply Hi.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (a_seq i).
+2: apply shift_leEq_minus; astepl (a_seq i).
 2: apply local_mon'_imp_mon'; auto; exact a_seq_mon.
 eapply leEq_wdr.
 2: apply a_seq_b_seq_dist.
@@ -454,10 +440,10 @@ eapply leEq_wdl.
 2: apply AbsIR_minus.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (b_seq m).
-2: AStepl ([--][--](b_seq m)); AStepr ([--][--](b_seq i)).
+2: apply shift_leEq_minus; astepl (b_seq m).
+2: astepl ( [--][--] (b_seq m)); astepr ( [--][--] (b_seq i)).
 2: apply inv_resp_leEq;
-    apply local_mon'_imp_mon' with (f := fun n : nat => [--](b_seq n)); 
+    apply local_mon'_imp_mon' with (f := fun n : nat => [--] (b_seq n)); 
     auto.
 2: intro; apply inv_resp_leEq; apply b_seq_mon.
 eapply leEq_wdr.
@@ -473,7 +459,7 @@ Qed.
 Let xa := Lim (Build_CauchySeq _ _ a_seq_Cauchy).
 Let xb := Lim (Build_CauchySeq _ _ b_seq_Cauchy).
 
-Lemma a_seq_b_seq_lim : xa[=]xb.
+Lemma a_seq_b_seq_lim : xa [=] xb.
 unfold xa, xb in |- *; clear xa xb.
 apply cg_inv_unique_2.
 apply eq_symmetric_unfolded.
@@ -492,16 +478,16 @@ eapply leEq_wdl.
 2: apply AbsIR_minus.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (a_seq m[-]b_seq m).
-2: apply shift_minus_leEq; AStepr (b_seq m).
+2: apply shift_leEq_minus; astepl (a_seq m[-]b_seq m).
+2: apply shift_minus_leEq; astepr (b_seq m).
 2: apply less_leEq; apply a_seq_less_b_seq.
 eapply leEq_wdr.
 2: apply a_seq_b_seq_dist.
-RStepl (b_seq m[-]a_seq m).
+rstepl (b_seq m[-]a_seq m).
 unfold cg_minus in |- *; apply plus_resp_leEq_both.
-AStepl ([--][--](b_seq m)); AStepr ([--][--](b_seq i)).
+astepl ( [--][--] (b_seq m)); astepr ( [--][--] (b_seq i)).
 apply inv_resp_leEq;
- apply local_mon'_imp_mon' with (f := fun n : nat => [--](b_seq n)); 
+ apply local_mon'_imp_mon' with (f := fun n : nat => [--] (b_seq n)); 
  auto.
 intro; apply inv_resp_leEq; apply b_seq_mon.
 apply inv_resp_leEq; apply local_mon'_imp_mon'; auto; exact a_seq_mon.
@@ -519,7 +505,7 @@ simpl in |- *.
 intro; elim (a_seq_I i); auto.
 Qed.
 
-Lemma IVT_I : {x : IR | I x | forall Hx, F x Hx[=]z}.
+Lemma IVT_I : {x : IR | I x | forall Hx, F x Hx [=] z}.
 exists xa.
 apply xa_in_interval.
 intro.
@@ -542,7 +528,7 @@ apply a_seq_I.
 apply AbsSmall_imp_AbsIR.
 apply AbsSmall_minus.
 auto.
-apply shift_leEq_minus; AStepl (F _ (incF _ (a_seq_I N))).
+apply shift_leEq_minus; astepl (F _ (incF _ (a_seq_I N))).
 apply part_mon_imp_mon' with I; auto.
 apply a_seq_I.
 apply xa_in_interval.
@@ -550,7 +536,7 @@ unfold xa in |- *.
 apply str_leEq_seq_so_leEq_Lim.
 exists N; intros; simpl in |- *.
 apply local_mon'_imp_mon'; auto; exact a_seq_mon.
-AStepl ([--]ZeroR); RStepr ([--](z[-]F xa Hx)).
+astepl ( [--]ZeroR); rstepr ( [--] (z[-]F xa Hx)).
 apply inv_resp_leEq.
 red in |- *; apply approach_zero.
 intros e H.
@@ -559,7 +545,7 @@ apply leEq_less_trans with (e [/]TwoNZ).
 elim (contin_prop _ _ _ _ contF _ (pos_div_two _ _ H)); intros d H0 H1.
 elim (Cauchy_complete (Build_CauchySeq _ _ b_seq_Cauchy) _ H0);
  fold xb in |- *; simpl in |- *; intros N HN.
-apply leEq_transitive with (F (b_seq N) (incF _ (b_seq_I N))[-]F xa Hx).
+apply leEq_transitive with (F (b_seq N) (incF _ (b_seq_I N)) [-]F xa Hx).
 apply minus_resp_leEq; apply z_leEq_b_seq.
 eapply leEq_wdl.
 2: apply AbsIR_eq_x.
@@ -571,7 +557,7 @@ apply leEq_wdl with (AbsIR (b_seq N[-]xb)).
     [ Algebra | apply eq_symmetric_unfolded; apply a_seq_b_seq_lim ].
 apply AbsSmall_imp_AbsIR.
 auto.
-apply shift_leEq_minus; AStepl (F xa Hx).
+apply shift_leEq_minus; astepl (F xa Hx).
 apply part_mon_imp_mon' with I; auto.
 apply xa_in_interval.
 apply b_seq_I.
@@ -580,9 +566,9 @@ apply leEq_wdl with xb.
 unfold xb in |- *.
 apply str_seq_leEq_so_Lim_leEq.
 exists N; intros; simpl in |- *.
-AStepl ([--][--](b_seq i)); AStepr ([--][--](b_seq N)).
+astepl ( [--][--] (b_seq i)); astepr ( [--][--] (b_seq N)).
 apply inv_resp_leEq.
-apply local_mon'_imp_mon' with (f := fun n : nat => [--](b_seq n)); auto.
+apply local_mon'_imp_mon' with (f := fun n : nat => [--] (b_seq n)); auto.
 intro; apply inv_resp_leEq; apply b_seq_mon.
 Qed.
 

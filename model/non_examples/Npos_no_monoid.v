@@ -4,14 +4,11 @@
 Require Export Npossemigroup.
 Require Import CMonoids.
 
-(** *Non-example of a monoid: <$\mathbb{N}^{+}$ #N<SUP>+</SUP>#,+>
+(** **Non-example of a monoid: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
+There is no right unit for the addition on the positive natural numbers.
 *)
 
-(** There is no right unit for the addition on the positive natural numbers.
-*)
-
-Lemma no_rht_unit_Npos :
- forall y : Npossetoid.Npos, ~ is_rht_unit (S:=Npossetoid.Npos) Npos_plus y.
+Lemma no_rht_unit_Npos : forall y : Npos, ~ is_rht_unit (S:=Npos) Npos_plus y.
 unfold is_rht_unit in |- *.
 intro y.
 case y.
@@ -23,8 +20,7 @@ Qed.
 addition.
 *)
 
-Lemma no_monoid_Npos :
- forall y : Npossetoid.Npos, ~ is_CMonoid Npos_as_CSemiGroup y.
+Lemma no_monoid_Npos : forall y : Npos, ~ is_CMonoid Npos_as_CSemiGroup y.
 intro y.
 red in |- *.
 intro H.

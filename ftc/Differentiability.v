@@ -7,18 +7,36 @@ Section Definitions.
 
 (** *Differentiability
 
-We will now use our work on derivatives to define a notion of differentiable function and prove its main properties.
+We will now use our work on derivatives to define a notion of
+differentiable function and prove its main properties.
 
-%\begin{convention}% Throughout this section, [a,b] will be real numbers with [a [<] b], [I] will denote the interval $[a,b]$#[a,b]# and [F,G,H] will be differentiable functions.
+%\begin{convention}% Throughout this section, [a,b] will be real
+numbers with [a [<] b], [I] will denote the interval [[a,b]]
+and [F,G,H] will be differentiable functions.
 %\end{convention}%
 
-Usually a function [F] is said to be differentiable in a proper compact interval $[a,b]$#[a,b]# if there exists another function [F'] such that [F'] is a derivative of [F] in that interval.  There is a problem in formalizing this definition, as we pointed out earlier on, which is that if we simply write it down as is we are not able to get such a function [F'] from a hypothesis that [F] is differentiable.
+Usually a function [F] is said to be differentiable in a proper
+compact interval [[a,b]] if there exists another function [F']
+such that [F'] is a derivative of [F] in that interval.  There is a
+problem in formalizing this definition, as we pointed out earlier on,
+which is that if we simply write it down as is we are not able to get
+such a function [F'] from a hypothesis that [F] is differentiable.
 
-However, it turns out that this is not altogether the best definition for the following reason: if we say that [F] is differentiable in $[a,b]$#[a,b]#, we mean that there is a partial function [F'] which is defined in $[a,b]$#[a,b]# and satisfies a certain condition in that interval but nothing is required of the behaviour of the function outside $[a,b]$#[a,b]#.  Thus we can argue that, from a mathematical point of view, the [F'] that we get eliminating a hypothesis of differentiability should be defined exactly on that interval.  If we do this, we can quantify over the set of setoid functions in that interval and eliminate the existencial quantifier without any problems.
+However, it turns out that this is not altogether the best definition
+for the following reason: if we say that [F] is differentiable in
+[[a,b]], we mean that there is a partial function [F'] which is
+defined in [[a,b]] and satisfies a certain condition in that
+interval but nothing is required of the behaviour of the function
+outside [[a,b]].  Thus we can argue that, from a mathematical
+point of view, the [F'] that we get eliminating a hypothesis of
+differentiability should be defined exactly on that interval.  If we
+do this, we can quantify over the set of setoid functions in that
+interval and eliminate the existencial quantifier without any
+problems.
 *)
 
-Definition Diffble_I (a b : IR) (Hab : a[<]b) (F : PartIR) :=
-  {f' : CSetoid_fun (subset (Compact (less_leEq _ _ _ Hab))) IR |
+Definition Diffble_I (a b : IR) (Hab : a [<] b) (F : PartIR) :=
+ {f' : CSetoid_fun (subset (Compact (less_leEq _ _ _ Hab))) IR |
   Derivative_I Hab F (PartInt f')}.
 
 End Definitions.
@@ -30,21 +48,20 @@ Section Local_Properties.
 (**
 From this point on, we just prove results analogous to the ones for derivability.
 
-A function differentiable in $[a,b]$#[a,b]# is differentiable in every proper compact subinterval of $[a,b]$#[a,b]#.
+A function differentiable in [[a,b]] is differentiable in every proper compact subinterval of [[a,b]].
 *)
 
-Lemma included_imp_diffble :
- forall a b Hab c d Hcd F,
- included (compact c d (less_leEq _ _ _ Hcd))
-   (compact a b (less_leEq _ _ _ Hab)) -> Diffble_I Hab F -> Diffble_I Hcd F.
+Lemma included_imp_diffble : forall a b Hab c d Hcd F,
+ included (compact c d (less_leEq _ _ _ Hcd)) (compact a b (less_leEq _ _ _ Hab)) ->
+ Diffble_I Hab F -> Diffble_I Hcd F.
 intros a b Hab c d Hcd F H H0.
 elim H0; clear H0; intros f' derF.
 exists
- (int_partIR (Frestr (F:=PartInt f') (compact_wd _ _ _) H) _ _ _
-    (included_refl _)).
+ (IntPartIR (F:=(Frestr (F:=PartInt f') (compact_wd _ _ _) H))
+    (included_refl _ _)).
 apply Derivative_I_wdr with (PartInt f').
 FEQ.
-simpl in |- *; apply csetoid_fun_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
 exact (included_imp_deriv _ _ _ _ _ _ _ _ H derF).
 Qed.
 
@@ -53,15 +70,14 @@ A function differentiable in an interval is everywhere defined in that interval.
 *)
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 (* begin hide *)
 Let Hab := less_leEq _ _ _ Hab'.
 Let I := Compact Hab.
 (* end hide *)
 
-Lemma diffble_imp_inc :
- forall F : PartIR, Diffble_I Hab' F -> included I (Dom F).
+Lemma diffble_imp_inc : forall F, Diffble_I Hab' F -> included I (Dom F).
 intros F H.
 inversion_clear H.
 unfold I, Hab in |- *; Included.
@@ -71,8 +87,7 @@ Qed.
 If a function has a derivative in an interval then it is differentiable in that interval.
 *)
 
-Lemma deriv_imp_Diffble_I :
- forall F F' : PartIR, Derivative_I Hab' F F' -> Diffble_I Hab' F.
+Lemma deriv_imp_Diffble_I : forall F F', Derivative_I Hab' F F' -> Diffble_I Hab' F.
 intros F F' H.
 exists (IntPartIR (derivative_imp_inc' _ _ _ _ _ H)).
 apply Derivative_I_wdr with F'.
@@ -91,7 +106,7 @@ All the algebraic results carry on.
 *)
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 (* begin hide *)
 Let Hab := less_leEq _ _ _ Hab'.
@@ -102,15 +117,15 @@ Section Constants.
 
 Lemma Diffble_I_const : forall c : IR, Diffble_I Hab' [-C-]c.
 intros.
-exists (ifunct_const a b Hab Zero).
-apply Derivative_I_wdr with ([-C-]Zero:PartIR).
+exists (IConst (Hab:=Hab) Zero).
+apply Derivative_I_wdr with ( [-C-]Zero:PartIR).
 apply part_int_const.
 Deriv.
 Qed.
 
 Lemma Diffble_I_id : Diffble_I Hab' FId.
-exists (ifunct_const a b Hab One).
-apply Derivative_I_wdr with ([-C-]One:PartIR).
+exists (IConst (Hab:=Hab) One).
+apply Derivative_I_wdr with ( [-C-]One:PartIR).
 apply part_int_const.
 Deriv.
 Qed.
@@ -191,7 +206,7 @@ Lemma Diffble_I_recip : Diffble_I Hab' {1/}G.
 elim diffG; intros G' derG.
 cut (included I (Dom G)); [ intro Hg' | unfold I, Hab in |- *; Included ].
 unfold I in Hg';
- cut (forall x : subset I, IMult (IntPartIR Hg') (IntPartIR Hg') x[#]Zero). intro H.
+ cut (forall x : subset I, IMult (IntPartIR Hg') (IntPartIR Hg') x [#] Zero). intro H.
 exists (IInv (IDiv G' _ H)).
 eapply Derivative_I_wdr.
 apply part_int_inv with (F := PartInt (IDiv G' _ H)).
@@ -234,7 +249,7 @@ End Operations.
 Section Corollaries.
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
 (* begin hide *)
 Let Hab := less_leEq _ _ _ Hab'.
@@ -285,78 +300,19 @@ Qed.
 
 End Corollaries.
 
-Section Derivative_Sums.
-
-(** 
-We will now prove several corollaries of these lemmas and the ones we already had for derivation.
-
-The derivation rules for families of functions are easily proved by induction using the constant and addition rules.
-*)
-
-Variables a b : IR.
-Hypothesis Hab : a[<=]b.
-Hypothesis Hab' : a[<]b.
-
-(* begin hide *)
-Let I := Compact Hab.
-(* end hide *)
-
-Lemma Derivative_I_Sum0 :
- forall f f' : nat -> PartIR,
- (forall n : nat, Derivative_I Hab' (f n) (f' n)) ->
- forall n : nat, Derivative_I Hab' (FSum0 n f) (FSum0 n f').
-intros.
-induction  n as [| n Hrecn].
-eapply Derivative_I_wdl.
-apply FSum0_0; Included.
-eapply Derivative_I_wdr.
-apply FSum0_0; Included.
-apply Derivative_I_const.
-eapply Derivative_I_wdl.
-apply FSum0_S; Included.
-eapply Derivative_I_wdr.
-apply FSum0_S; Included.
-apply Derivative_I_plus; auto.
-Qed.
-
-Lemma Derivative_I_Sumx :
- forall (n : nat) (f f' : forall i : nat, i < n -> PartIR),
- (forall (i : nat) Hi Hi', Derivative_I Hab' (f i Hi) (f' i Hi')) ->
- Derivative_I Hab' (FSumx n f) (FSumx n f').
-intro; induction  n as [| n Hrecn]; intros f f' derF.
-simpl in |- *; apply Derivative_I_const; auto.
-simpl in |- *; apply Derivative_I_plus; auto.
-Qed.
-
-Lemma Derivative_I_Sum :
- forall f f' : nat -> PartIR,
- (forall n : nat, Derivative_I Hab' (f n) (f' n)) ->
- forall m n : nat, Derivative_I Hab' (FSum m n f) (FSum m n f').
-intros.
-eapply Derivative_I_wdl.
-apply Feq_symmetric; apply FSum_FSum0'; Included.
-eapply Derivative_I_wdr.
-apply Feq_symmetric; apply FSum_FSum0'; Included.
-apply Derivative_I_minus; apply Derivative_I_Sum0; auto.
-Qed.
-
-End Derivative_Sums.
-
-Hint Resolve Derivative_I_Sum0 Derivative_I_Sum Derivative_I_Sumx: derivate.
-
 Section Other_Properties.
 
 (**
-Analogous results hold for differentiability.
+Differentiability of families of functions is proved by
+induction using the constant and addition rules.
 *)
 
 Variables a b : IR.
-Hypothesis Hab' : a[<]b.
+Hypothesis Hab' : a [<] b.
 
-Lemma Diffble_I_Sum0 :
- forall (f : nat -> PartIR) (diffF : forall n : nat, Diffble_I Hab' (f n))
-   (n : nat), Diffble_I Hab' (FSum0 n f).
-intros.
+Lemma Diffble_I_Sum0 : forall (f : nat -> PartIR),
+ (forall n, Diffble_I Hab' (f n)) -> forall n, Diffble_I Hab' (FSum0 n f).
+intros f diffF.
 induction  n as [| n Hrecn].
 apply Diffble_I_wd with (Fconst (S:=IR) Zero).
 apply Diffble_I_const.
@@ -374,19 +330,16 @@ simpl in |- *.
 apply bin_op_wd_unfolded; try apply Sum0_wd; intros; rational.
 Qed.
 
-Lemma Diffble_I_Sumx :
- forall (n : nat) (f : forall i : nat, i < n -> PartIR)
-   (diffF : forall (i : nat) Hi, Diffble_I Hab' (f i Hi)),
- Diffble_I Hab' (FSumx n f).
+Lemma Diffble_I_Sumx : forall n (f : forall i, i < n -> PartIR),
+ (forall i Hi, Diffble_I Hab' (f i Hi)) -> Diffble_I Hab' (FSumx n f).
 intro; induction  n as [| n Hrecn]; intros.
 simpl in |- *; apply Diffble_I_const.
 simpl in |- *.
 apply Diffble_I_plus; auto.
 Qed.
 
-Lemma Diffble_I_Sum :
- forall (f : nat -> PartIR) (diffF : forall n : nat, Diffble_I Hab' (f n))
-   (m n : nat), Diffble_I Hab' (FSum m n f).
+Lemma Diffble_I_Sum : forall (f : nat -> PartIR),
+ (forall n, Diffble_I Hab' (f n)) -> forall m n, Diffble_I Hab' (FSum m n f).
 intros.
 eapply Diffble_I_wd.
 2: apply Feq_symmetric; apply FSum_FSum0'; Included.
@@ -402,8 +355,7 @@ Finally, a differentiable function is continuous.
 %\end{convention}%
 *)
 
-Lemma diffble_imp_contin_I :
- forall (a b : IR) (Hab' : a[<]b) (Hab : a[<=]b) (F : PartIR),
+Lemma diffble_imp_contin_I : forall a b (Hab' : a [<] b) (Hab : a [<=] b) F,
  Diffble_I Hab' F -> Continuous_I Hab F.
 intros a b Hab' Hab F H.
 apply deriv_imp_contin_I with Hab' (PartInt (ProjT1 H)).

@@ -2,7 +2,8 @@
 
 (* begin hide *)
 
-Require Export IntegralLemmas.
+Require Export COrdLemmas.
+Require Export Partitions.
 
 Section Separating_Partition.
 
@@ -26,14 +27,14 @@ Hypothesis Hcsi : Zero[<]csi.
 
 Let M := Norm_Funct contF.
 
-Let pos_n : 0 < n.
+Lemma RS'_pos_n : 0 < n.
 apply partition_less_imp_gt_zero with a b Hab; assumption.
 Qed.
 
 Lemma SPap_n : n <> 0.
 intro.
 apply (lt_O_neq n).
-exact pos_n.
+exact RS'_pos_n.
 auto.
 Qed.
 
@@ -42,17 +43,17 @@ Let delta :=
     (alpha[/] _[//]
      mult_resp_ap_zero _ _ _ (nring_ap_zero _ _ SPap_n) (max_one_ap_zero M)).
 
-Let pos_delta : Zero[<]delta.
+Lemma RS'_delta_pos : Zero[<]delta.
 unfold delta in |- *; apply less_Min.
 assumption.
 apply div_resp_pos.
 apply mult_resp_pos.
-AStepl (nring (R:=IR) 0); apply nring_less; apply pos_n.
+astepl (nring (R:=IR) 0); apply nring_less; apply RS'_pos_n.
 apply pos_max_one.
 assumption.
 Qed.
 
-Let delta_csi : delta[<=]csi.
+Lemma RS'_delta_csi : delta[<=]csi.
 unfold delta in |- *; apply Min_leEq_lft.
 Qed.
 
@@ -87,13 +88,13 @@ red in |- *; intros. rename X into H1.
 eapply less_wdl.
 apply H1.
 apply cg_minus_wd; apply prf1; auto.
-apply cotrans_less_unfolded.
+apply less_cotransitive_unfolded.
 apply shift_div_less.
 apply pos_four.
-RStepr (delta[+]delta).
-AStepl (Zero[+]delta).
+rstepr (delta[+]delta).
+astepl (Zero[+]delta).
 apply plus_resp_less_leEq.
-apply pos_delta.
+apply RS'_delta_pos.
 apply leEq_reflexive.
 Qed.
 
@@ -132,8 +133,8 @@ cut (sep__part_h i < j); intros.
 apply lt_le_weak; assumption.
 apply (Partition_Points_mon _ _ _ _ P) with a0 Hj.
 apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR.
-apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR.
+apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; assumption.
 assumption.
 apply sep__part_h_bnd.
@@ -149,8 +150,8 @@ elim (ProjT2 a1); intros Hj Hj'; fold j in Hj, Hj'.
 elim Hj'; clear Hj'; intros Hj0 Hj1.
 apply (Partition_Points_mon _ _ _ _ P) with a0 Hj.
 apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR.
-apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR.
+apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; assumption.
 assumption.
 assumption.
@@ -209,7 +210,7 @@ change (forall Hi' : m' <= n, P (sep__part_h i) Hi[<]P m' Hi') in |- *;
 elim (ProjT2 a1); fold m' in |- *; intros Hm' Hm''.
 elim Hm''; clear Hm''; intros H0 H1.
 apply less_transitive_unfolded with (P (sep__part_h i) Hi[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; eapply less_wdr.
 apply H0.
 apply cg_minus_wd; apply prf1; auto.
@@ -226,7 +227,7 @@ elim (ProjT2 a2); fold m' in |- *; intros Hm' Hm''.
 elim Hm''; clear Hm''; intros H1 H2.
 apply less_leEq_trans with (P _ Hm').
 apply less_transitive_unfolded with (P (sep__part_h i) Hi[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; eapply less_wdr.
 apply H1.
 apply cg_minus_wd; apply prf1; auto.
@@ -255,7 +256,7 @@ apply le_lt_trans with (sep__part_h i).
 apply le_O_n.
 apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).
 apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; assumption.
 intros; eapply leEq_transitive.
 2: apply less_leEq; apply b0.
@@ -283,38 +284,40 @@ apply sep__part_h_bnd.
 apply sep__part_h_bnd.
 Qed.
 
-Let delta2_delta4 :
+Lemma RS'_delta2_delta4 :
   forall m : nat,
   delta [/]FourNZ[<]P _ (sep__part_h_bnd (S m))[-]P _ (sep__part_h_bnd m)
   or P _ (sep__part_h_bnd (S m))[-]P _ (sep__part_h_bnd m)[<]delta [/]TwoNZ.
-intro; apply cotrans_less_unfolded.
-RStepl ((delta [/]TwoNZ) [/]TwoNZ).
-apply pos_div_two'; apply pos_div_two; exact pos_delta.
+intro; apply less_cotransitive_unfolded.
+rstepl ((delta [/]TwoNZ) [/]TwoNZ).
+apply pos_div_two'; apply pos_div_two; exact RS'_delta_pos.
 Qed.
 
-Let m1 := ProjT1 sep__part_app_n.
+Definition RS'_m1 := ProjT1 sep__part_app_n.
 
-Let m : nat.
-elim (delta2_delta4 m1); intro.
-apply (S m1).
-apply m1.
+Definition RS'_m : nat.
+elim (RS'_delta2_delta4 RS'_m1); intro.
+apply (S RS'_m1).
+apply RS'_m1.
 Defined.
+
+Notation m := RS'_m.
 
 Definition sep__part_length := m.
 
-Let m_m1 : {m = m1} + {m = S m1}.
-unfold m in |- *; clear m.
-elim (delta2_delta4 m1); intro; simpl in |- *.
+Lemma RS'_m_m1 : {m = RS'_m1} + {m = S RS'_m1}.
+unfold m in |- *.
+elim (RS'_delta2_delta4 RS'_m1); intro; simpl in |- *.
 right; auto.
 left; auto.
 Qed.
 
-Let pos_m : 0 < m.
+Lemma RS'_pos_m : 0 < m.
 unfold m in |- *.
-elim (delta2_delta4 m1); intro; simpl in |- *.
+elim (RS'_delta2_delta4 RS'_m1); intro; simpl in |- *.
 auto with arith.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
-cut (0 <> m1); intro.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
+cut (0 <> RS'_m1); intro.
 auto with arith.
 elimtype False.
 apply less_irreflexive_unfolded with (x := delta [/]TwoNZ).
@@ -357,7 +360,7 @@ elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
 reflexivity.
 elimtype False.
 generalize b0.
-apply lt_O_neq; apply pos_m.
+apply lt_O_neq; apply RS'_pos_m.
 Qed.
 
 Lemma sep__part_fun_i :
@@ -395,7 +398,7 @@ elim (ProjT2 sep__part_app_n).
 intros.
 apply H2.
 generalize a0; clear a0.
-unfold m in |- *; elim (delta2_delta4 m1); intro; simpl in |- *.
+unfold m in |- *; elim (RS'_delta2_delta4 RS'_m1); intro; simpl in |- *.
 auto with arith.
 auto with arith.
 rewrite b0 in H0; elim (lt_irrefl _ H0).
@@ -403,7 +406,7 @@ Qed.
 
 Lemma sep__part_fun_wd :
  forall (i j : nat) Hi Hj, i = j -> sep__part_fun i Hi = sep__part_fun j Hj.
-clearbody m; intros.
+intros.
 unfold sep__part_fun in |- *.
 elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
 rewrite H; auto.
@@ -414,7 +417,7 @@ Qed.
 
 Lemma sep__part_fun_mon :
  forall (i j : nat) Hi Hj, i < j -> sep__part_fun i Hi < sep__part_fun j Hj.
-clearbody m; intros.
+intros.
 apply less_nring with (IR:COrdField).
 apply
  local_mon_imp_mon_le
@@ -434,7 +437,7 @@ rewrite sep__part_fun_i.
 2: auto with arith.
 apply (Partition_Points_mon _ _ _ _ P) with a1 Hj.
 apply less_transitive_unfolded with (P _ a1[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; apply H0.
 apply sep__part_fun_bnd'; auto with arith.
 apply sep__part_fun_bnd'; auto with arith.
@@ -485,22 +488,22 @@ intro; rewrite sep__part_fun_m.
 intros.
 cut (m = m).
 2: auto.
-unfold m at 2 in |- *; elim (delta2_delta4 m1); intro; simpl in |- *; intro.
-cut (i = m1); [ clear b0; intro | rewrite <- b0 in H; auto with arith ].
+unfold m at 2 in |- *; elim (RS'_delta2_delta4 RS'_m1); intro; simpl in |- *; intro.
+cut (i = RS'_m1); [ clear b0; intro | rewrite <- b0 in H; auto with arith ].
 generalize Hi0; clear Hi0; rewrite H0.
 intro.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 apply
- less_transitive_unfolded with (P (sep__part_h m1) Hi0[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; apply pos_delta.
+ less_transitive_unfolded with (P (sep__part_h RS'_m1) Hi0[+]delta [/]FourNZ).
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; apply RS'_delta_pos.
 apply shift_plus_less'; eapply less_wdr.
 apply a0.
 apply cg_minus_wd; apply prf1.
 auto.
 auto.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 generalize Hi'0; clear Hi'0.
-cut (S i = m1); [ intro | transitivity m; auto ].
+cut (S i = RS'_m1); [ intro | transitivity m; auto ].
 pattern n at 1 5 in |- *; rewrite <- H0.
 rewrite <- H2.
 intro.
@@ -526,7 +529,7 @@ Lemma sep__part_mon_Mesh : Mesh sep__part[<=]Mesh P[+]csi.
 unfold Mesh at 1 in |- *.
 apply maxlist_leEq.
 apply length_Part_Mesh_List.
-apply pos_m.
+apply RS'_pos_m.
 intros x H.
 elim (Part_Mesh_List_lemma _ _ _ _ _ _ H).
 intros i Hi.
@@ -550,7 +553,7 @@ rewrite sep__part_fun_i.
 intros.
 cut (pred (sep__part_h (S i)) <= n);
  [ intro | eapply le_trans; [ apply le_pred_n | auto ] ].
-RStepl (P _ Ha[-]P _ H0[+](P _ H0[-]P _ Hb)).
+rstepl (P _ Ha[-]P _ H0[+](P _ H0[-]P _ Hb)).
 apply plus_resp_leEq_both.
 generalize Ha; pattern (sep__part_h (S i)) at 1 2 in |- *;
  replace (sep__part_h (S i)) with (S (pred (sep__part_h (S i)))); 
@@ -563,32 +566,32 @@ assumption.
 eapply leEq_transitive.
 apply sep__part_h_lemma2.
 apply less_leEq; apply less_leEq_trans with delta.
-apply pos_div_two'; exact pos_delta.
-apply delta_csi.
+apply pos_div_two'; exact RS'_delta_pos.
+apply RS'_delta_csi.
 generalize H; clear H; rewrite b0; intro H.
 rewrite sep__part_fun_m.
 cut (m = m); [ unfold m at 2 in |- * | auto ].
-elim delta2_delta4; intro; simpl in |- *; intro.
+elim RS'_delta2_delta4; intro; simpl in |- *; intro.
 intros.
-cut (sep__part_h (S m1) = n).
+cut (sep__part_h (S RS'_m1) = n).
 intro; generalize Ha Hb; pattern n at 1 5 in |- *.
 rewrite <- H1.
-cut (i = m1);
+cut (i = RS'_m1);
  [ intro
  | unfold sep__part_length in b0; rewrite <- b0 in H0; auto with arith ].
 rewrite H2.
 intros.
-cut (pred (sep__part_h (S m1)) <= n);
+cut (pred (sep__part_h (S RS'_m1)) <= n);
  [ intro | eapply le_trans; [ apply le_pred_n | auto ] ].
-RStepl (P _ Ha0[-]P _ H3[+](P _ H3[-]P _ Hb0)).
+rstepl (P _ Ha0[-]P _ H3[+](P _ H3[-]P _ Hb0)).
 apply plus_resp_leEq_both.
-generalize Ha0; pattern (sep__part_h (S m1)) at 1 2 in |- *;
- replace (sep__part_h (S m1)) with (S (pred (sep__part_h (S m1)))); 
+generalize Ha0; pattern (sep__part_h (S RS'_m1)) at 1 2 in |- *;
+ replace (sep__part_h (S RS'_m1)) with (S (pred (sep__part_h (S RS'_m1)))); 
  intros.
 apply Mesh_lemma.
-symmetry  in |- *; apply S_pred with (sep__part_h m1);
+symmetry  in |- *; apply S_pred with (sep__part_h RS'_m1);
  apply sep__part_h_mon_2.
-cut (m1 <= m).
+cut (RS'_m1 <= m).
 2: rewrite H0; apply le_n_Sn.
 intro.
 rewrite <- sep__part_fun_i with (H := H4).
@@ -598,16 +601,16 @@ rewrite H0; apply lt_n_Sn.
 eapply leEq_transitive.
 apply sep__part_h_lemma2.
 apply less_leEq; apply less_leEq_trans with delta.
-apply pos_div_two'; exact pos_delta.
-apply delta_csi.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+apply pos_div_two'; exact RS'_delta_pos.
+apply RS'_delta_csi.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 auto.
-cut (sep__part_h (S m1) = n).
+cut (sep__part_h (S RS'_m1) = n).
 intro; pattern n at 1 5 in |- *.
 rewrite <- H1.
 intros.
-cut (sep__part_h m1 <= n); [ intro | apply sep__part_h_bnd ].
-RStepl (P _ Ha[-]P _ H2[+](P _ H2[-]P _ Hb)).
+cut (sep__part_h RS'_m1 <= n); [ intro | apply sep__part_h_bnd ].
+rstepl (P _ Ha[-]P _ H2[+](P _ H2[-]P _ Hb)).
 apply leEq_transitive with (delta [/]TwoNZ[+](Mesh P[+]delta [/]TwoNZ)).
 apply plus_resp_leEq_both.
 apply less_leEq; eapply less_wdl.
@@ -625,7 +628,7 @@ elim (ProjT2 a1); fold j in |- *; intros Hj Hj'.
 elim Hj'; clear Hj'; intros H2 H3.
 intros.
 cut (pred j <= n); [ intro | apply le_trans with j; auto with arith ].
-RStepl (P j H4[-]P (pred j) H5[+](P (pred j) H5[-]P (sep__part_h i) Hb)).
+rstepl (P j H4[-]P (pred j) H5[+](P (pred j) H5[-]P (sep__part_h i) Hb)).
 cut (0 < j); intros.
 apply plus_resp_leEq_both.
 cut (j = S (pred j)); [ intro | apply S_pred with 0; auto ].
@@ -639,25 +642,25 @@ auto with arith.
 apply le_lt_trans with (sep__part_h i); auto with arith.
 apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).
 apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
-apply shift_less_plus'; AStepl ZeroR; apply pos_div_four; exact pos_delta.
+apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
 apply shift_plus_less'; assumption.
 intros.
 apply less_leEq; apply less_leEq_trans with (delta [/]TwoNZ).
 eapply less_wdl.
 apply b2.
 apply cg_minus_wd; apply prf1; auto.
-AStepl (Zero[+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
+astepl (Zero[+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
 elimtype False.
 exact (le_not_lt _ _ (sep__part_h_bnd _) b2).
-RStepl (Mesh P[+]delta).
-apply plus_resp_leEq_lft; apply delta_csi.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+rstepl (Mesh P[+]delta).
+apply plus_resp_leEq_lft; apply RS'_delta_csi.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 auto.
 Qed.
 
 Variable g : forall i : nat, i < n -> IR.
 Hypothesis gP : Points_in_Partition P g.
-Hypothesis gP' : nat_less_n_fun _ _ g.
+Hypothesis gP' : nat_less_n_fun g.
 
 Definition sep__part_pts (i : nat) (Hi : i < sep__part_length) : IR.
 intros.
@@ -713,7 +716,7 @@ rewrite <- H0.
 apply sep__part_fun_i'.
 Qed.
 
-Let Hsep_S :
+Lemma RS'_Hsep_S :
   forall (i j : nat) (Hi : S i <= m),
   j <= pred (sep__part_fun (S i) Hi) -> S j <= n.
 intros.
@@ -726,7 +729,7 @@ auto with arith.
 apply sep__part_fun_mon; apply lt_n_Sn.
 Qed.
 
-Let Hsep :
+Lemma RS'_Hsep :
   forall (i j : nat) (Hi : S i <= m),
   j <= pred (sep__part_fun (S i) Hi) -> j <= n.
 intros.
@@ -739,23 +742,24 @@ apply le_S; assumption.
 apply sep__part_fun_mon; apply lt_n_Sn.
 Qed.
 
-Let h : nat -> IR.
+Definition RS'_h : nat -> IR.
 intro i.
 elim (le_lt_dec i n); intro.
 apply (P i a0).
 apply ZeroR.
 Defined.
 
+Notation h := RS'_h.
 Notation just1 := (incF _ (Pts_part_lemma _ _ _ _ _ _ gP _ _)).
 Notation just2 :=
   (incF _ (Pts_part_lemma _ _ _ _ _ _ sep__part_pts_in_Partition _ _)).
 
-Let sep__part_sum1 :
+Lemma sep__part_suRS'_m1 :
   forall (i : nat) (Hi : i < m),
   Sum2
     (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
        (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-     P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj'))[=]
+     P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))[=]
   sep__part _ Hi[-]sep__part _ (lt_le_weak _ _ Hi).
 intros; simpl in |- *.
 unfold Sum2 in |- *.
@@ -782,10 +786,10 @@ elimtype False; apply le_not_lt with j n.
 apply le_trans with (S j); auto with arith.
 assumption.
 elimtype False; apply le_not_lt with (S j) n.
-exact (Hsep_S _ _ Hi a1).
+exact (RS'_Hsep_S _ _ Hi a1).
 assumption.
 elimtype False; apply le_not_lt with (S j) n.
-exact (Hsep_S _ _ Hi a1).
+exact (RS'_Hsep_S _ _ Hi a1).
 assumption.
 elimtype False; exact (le_not_lt _ _ H1 b0).
 elimtype False; exact (le_not_lt _ _ H2 b0).
@@ -803,15 +807,15 @@ apply sep__part_fun_bnd.
 assumption.
 Qed.
 
-Let sep__part_Sum2 :
+Lemma sep__part_Sum2 :
   Partition_Sum gP incF[=]
   Sumx
     (fun (i : nat) (Hi : i < m) =>
      Sum2
        (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
           (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-        F (g j (Hsep_S _ _ _ Hj')) just1[*]
-        (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj')))).
+        F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
+        (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
 unfold Partition_Sum in |- *.
 apply eq_symmetric_unfolded.
 unfold Sum2 in |- *.
@@ -837,10 +841,10 @@ apply
                   _ : {i0 <= pred (sep__part_fun (S i) Hi)} +
                       {pred (sep__part_fun (S i) Hi) < i0} => IR)
                (fun H0 : i0 <= pred (sep__part_fun (S i) Hi) =>
-                F (g i0 (Hsep_S i i0 Hi H0))
-                  (incF (g i0 (Hsep_S i i0 Hi H0))
-                     (Pts_part_lemma a b Hab n P g gP i0 (Hsep_S i i0 Hi H0)))[*]
-                (P (S i0) (Hsep_S i i0 Hi H0)[-]P i0 (Hsep i i0 Hi H0)))
+                F (g i0 (RS'_Hsep_S i i0 Hi H0))
+                  (incF (g i0 (RS'_Hsep_S i i0 Hi H0))
+                     (Pts_part_lemma a b Hab n P g gP i0 (RS'_Hsep_S i i0 Hi H0)))[*]
+                (P (S i0) (RS'_Hsep_S i i0 Hi H0)[-]P i0 (RS'_Hsep i i0 Hi H0)))
                (fun _ : pred (sep__part_fun (S i) Hi) < i0 => Zero)
                (le_lt_dec i0 (pred (sep__part_fun (S i) Hi))))
             (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => Zero)
@@ -889,7 +893,7 @@ apply mult_wd; Algebra.
 apply cg_minus_wd; apply prf1; auto.
 Qed.
 
-Let sep__part_Sum3 :
+Lemma sep__part_Sum3 :
   AbsIR
     (Partition_Sum gP incF[-]Partition_Sum sep__part_pts_in_Partition incF)[=]
   AbsIR
@@ -898,8 +902,8 @@ Let sep__part_Sum3 :
         Sum2
           (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
              (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-           (F (g j (Hsep_S _ _ _ Hj')) just1[-]F (sep__part_pts i Hi) just2)[*]
-           (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj'))))).
+           (F (g j (RS'_Hsep_S _ _ _ Hj')) just1[-]F (sep__part_pts i Hi) just2)[*]
+           (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))))).
 apply AbsIR_wd.
 apply
  eq_transitive_unfolded
@@ -909,13 +913,13 @@ apply
         Sum2
           (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
              (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-           F (g j (Hsep_S _ _ _ Hj')) just1[*]
-           (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj')))[-]
+           F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
+           (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))[-]
         F (sep__part_pts i Hi) just2[*]
         Sum2
           (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
              (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-           P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj')))).
+           P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
 eapply eq_transitive_unfolded.
 2: apply
     Sumx_minus_Sumx
@@ -924,19 +928,19 @@ eapply eq_transitive_unfolded.
              Sum2
                (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
                   (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-                F (g j (Hsep_S _ _ _ Hj')) just1[*]
-                (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj'))))
+                F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
+                (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))))
        (g := fun (i : nat) (Hi : i < m) =>
              F (sep__part_pts i Hi) just2[*]
              Sum2
                (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
                   (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-                P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj'))).
+                P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))).
 apply cg_minus_wd.
 apply sep__part_Sum2.
 unfold Partition_Sum in |- *; apply Sumx_wd; intros.
-apply mult_wd_rht.
-apply eq_symmetric_unfolded; apply sep__part_sum1.
+apply mult_wdr.
+apply eq_symmetric_unfolded; apply sep__part_suRS'_m1.
 apply Sumx_wd; intros i Hi.
 apply
  eq_transitive_unfolded
@@ -944,13 +948,13 @@ apply
     (Sum2
        (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
           (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
-        F (g j (Hsep_S _ _ _ Hj')) just1[*]
-        (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj')))[-]
+        F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
+        (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))[-]
      Sum2
        (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
           (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
         F (sep__part_pts i Hi) just2[*]
-        (P _ (Hsep_S _ _ _ Hj')[-]P _ (Hsep _ _ _ Hj')))).
+        (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
 apply cg_minus_wd.
 Algebra.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
@@ -974,7 +978,7 @@ apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
 Algebra.
 Qed.
 
-Let sep__part_Sum4 :
+Lemma sep__part_Sum4 :
   Sumx
     (fun (i : nat) (Hi : i < m) =>
      Sum2
@@ -1016,7 +1020,7 @@ apply
   with
     (Sumx
        (fun (i : nat) (_ : i < n) => alpha[/] _[//]nring_ap_zero _ _ SPap_n)).
-2: RStepr (nring n[*](alpha[/] _[//]nring_ap_zero _ _ SPap_n));
+2: rstepr (nring n[*](alpha[/] _[//]nring_ap_zero _ _ SPap_n));
     apply sumx_const.
 apply Sumx_resp_leEq; intros.
 unfold part_tot_nat_fun in |- *.
@@ -1034,20 +1038,20 @@ apply mult_resp_leEq_lft.
 apply div_resp_leEq.
 apply pos_two.
 apply Min_leEq_rht.
-AStepl (ZeroR[+]Zero); apply plus_resp_leEq_both; unfold M in |- *;
+astepl (ZeroR[+]Zero); apply plus_resp_leEq_both; unfold M in |- *;
  apply positive_norm.
-RStepl
+rstepl
  (alpha[*](M[/] _[//]max_one_ap_zero M)[*]
   (One[/] _[//]nring_ap_zero _ _ SPap_n)).
-RStepr (alpha[*]One[*](One[/] _[//]nring_ap_zero _ _ SPap_n)).
+rstepr (alpha[*]One[*](One[/] _[//]nring_ap_zero _ _ SPap_n)).
 apply mult_resp_leEq_rht.
 apply mult_resp_leEq_lft.
 apply shift_div_leEq.
 apply pos_max_one.
-AStepr (Max M One); apply lft_leEq_Max.
+astepr (Max M One); apply lft_leEq_Max.
 apply less_leEq; assumption.
 apply less_leEq; apply recip_resp_pos.
-AStepl (nring (R:=IR) 0); apply nring_less; apply pos_n.
+astepl (nring (R:=IR) 0); apply nring_less; apply RS'_pos_n.
 apply sep__part_fun_0.
 exact sep__part_fun_wd.
 exact sep__part_fun_mon.
@@ -1076,18 +1080,18 @@ rewrite sep__part_fun_i in b0; assumption.
 intros; symmetry  in |- *; apply sep__part_fun_m.
 Qed.
 
-Let sep__part_aux : forall i : nat, pred (sep__part_h (S i)) < n.
+Lemma sep__part_aux : forall i : nat, pred (sep__part_h (S i)) < n.
 intros.
 red in |- *.
 rewrite <- S_pred with (sep__part_h (S i)) (sep__part_h 0).
 apply sep__part_h_bnd.
 apply sep__part_h_mon_3.
 rewrite <- sep__part_fun_i with (H := le_O_n m).
-2: apply pos_m.
+2: apply RS'_pos_m.
 2: apply lt_O_Sn.
 rewrite <- sep__part_fun_m with (H := le_n m).
 apply sep__part_fun_mon.
-apply pos_m.
+apply RS'_pos_m.
 Qed.
 
 Lemma sep__part_Sum :
@@ -1116,43 +1120,43 @@ intros k Hk Hk'.
 elim (le_lt_dec m (S i)); intro.
 cut (S i = m); [ intro | clear Hk Hk'; omega ].
 generalize H0.
-unfold m at 1 in |- *; elim delta2_delta4; intro; simpl in |- *; intro.
+unfold m at 1 in |- *; elim RS'_delta2_delta4; intro; simpl in |- *; intro.
 cut (i < m); [ intro | assumption ].
 apply
  leEq_wdl
   with
     (AbsIR
-       ((F (g k (Hsep_S _ _ H Hk')) just1[-]F (g _ (sep__part_aux m1)) just1)[*]
-        (P (S k) (Hsep_S _ _ H Hk')[-]P k (Hsep _ _ H Hk')))).
-2: apply AbsIR_wd; apply mult_wd_lft.
+       ((F (g k (RS'_Hsep_S _ _ H Hk')) just1[-]F (g _ (sep__part_aux RS'_m1)) just1)[*]
+        (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk')))).
+2: apply AbsIR_wd; apply mult_wdl.
 2: apply cg_minus_wd; [ Algebra | idtac ].
-2: cut (i = m1); [ intro | auto ].
+2: cut (i = RS'_m1); [ intro | auto ].
 2: generalize H; rewrite H3; intro.
 2: unfold sep__part_pts in |- *; simpl in |- *; Algebra.
-elim (le_lt_dec (pred (sep__part_h (S m1))) k); intro.
-cut (pred (sep__part_h (S m1)) = k); intros.
+elim (le_lt_dec (pred (sep__part_h (S RS'_m1))) k); intro.
+cut (pred (sep__part_h (S RS'_m1)) = k); intros.
 apply leEq_wdl with ZeroR.
-AStepl ((Zero[+]Zero)[*]ZeroR).
+astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
 apply eq_imp_leEq; Algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
-apply less_leEq; AStepr (delta [/]TwoNZ); apply pos_div_two; exact pos_delta.
+apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply AbsIRz_isz.
 apply AbsIR_wd.
-RStepr
- ((F (g _ (sep__part_aux m1)) just1[-]F (g _ (sep__part_aux m1)) just1)[*]
-  (P (S k) (Hsep_S _ _ H Hk')[-]P k (Hsep _ _ H Hk'))).
+rstepr
+ ((F (g _ (sep__part_aux RS'_m1)) just1[-]F (g _ (sep__part_aux RS'_m1)) just1)[*]
+  (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk'))).
 Algebra.
 cut (forall H, sep__part_fun (S i) H = n).
 intro.
-cut (sep__part_h (S m1) = n); intros.
+cut (sep__part_h (S RS'_m1) = n); intros.
 rewrite H4 in a2.
 rewrite H3 in Hk'.
 rewrite H4.
 apply le_antisym; auto.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 auto.
 rewrite H0; exact sep__part_fun_m.
 eapply leEq_wdl.
@@ -1164,7 +1168,7 @@ apply plus_resp_leEq_both; unfold M, I in |- *; apply norm_bnd_AbsIR;
  apply Pts_part_lemma with n P; apply gP.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (P k (Hsep i k H Hk')); apply prf2.
+2: apply shift_leEq_minus; astepl (P k (RS'_Hsep i k H Hk')); apply prf2.
 apply sep__part_h_lemma3 with i.
 rewrite sep__part_fun_i in Hk; assumption.
 rewrite H1; assumption.
@@ -1172,14 +1176,14 @@ apply
  leEq_wdl
   with
     (AbsIR
-       ((F (g k (Hsep_S _ _ H Hk')) just1[-]F (g _ (sep__part_aux i)) just1)[*]
-        (P (S k) (Hsep_S _ _ H Hk')[-]P k (Hsep _ _ H Hk')))).
+       ((F (g k (RS'_Hsep_S _ _ H Hk')) just1[-]F (g _ (sep__part_aux i)) just1)[*]
+        (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk')))).
 2: apply AbsIR_wd; apply mult_wd.
 2: apply cg_minus_wd; apply pfwdef;
     [ Algebra | unfold sep__part_pts in |- *; apply gP' ]; 
     auto.
 2: apply cg_minus_wd; apply prf1; auto.
-elim (le_lt_dec (pred (sep__part_h m1)) k); intro.
+elim (le_lt_dec (pred (sep__part_h RS'_m1)) k); intro.
 elim (le_lt_eq_dec _ _ a1); intro.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -1190,20 +1194,20 @@ apply plus_resp_leEq_both; unfold M, I in |- *; apply norm_bnd_AbsIR;
  apply Pts_part_lemma with n P; assumption.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (P k (Hsep i k H Hk')); apply prf2.
+2: apply shift_leEq_minus; astepl (P k (RS'_Hsep i k H Hk')); apply prf2.
 apply less_leEq; eapply leEq_less_trans.
 2: apply b0.
 unfold cg_minus in |- *; apply plus_resp_leEq_both.
 apply Partition_mon.
-rewrite (S_pred (sep__part_h (S m1)) (sep__part_h m1)).
+rewrite (S_pred (sep__part_h (S RS'_m1)) (sep__part_h RS'_m1)).
 apply le_n_S.
-cut (forall H, sep__part_h (S m1) = sep__part_fun (S i) H); intros.
+cut (forall H, sep__part_h (S RS'_m1) = sep__part_fun (S i) H); intros.
 rewrite (H2 H); assumption.
 generalize H2; rewrite H0.
 intro; rewrite sep__part_fun_m.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; auto.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; auto.
 apply sep__part_h_mon_3.
-elim (ProjT2 sep__part_app_n); fold m1 in |- *; intros.
+elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
 apply H3; apply le_n.
 apply lt_n_Sn.
 apply inv_resp_leEq; apply Partition_mon.
@@ -1211,19 +1215,19 @@ eapply le_trans.
 2: apply a2.
 clear Hk Hk'; omega.
 apply leEq_wdl with ZeroR.
-AStepl ((Zero[+]Zero)[*]ZeroR).
+astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
 apply eq_imp_leEq; Algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
-apply less_leEq; AStepr (delta [/]TwoNZ); apply pos_div_two; exact pos_delta.
+apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply AbsIRz_isz.
 apply AbsIR_wd.
-RStepr
+rstepr
  ((F (g _ (sep__part_aux i)) just1[-]F (g _ (sep__part_aux i)) just1)[*]
-  (P (S k) (Hsep_S _ _ H Hk')[-]P k (Hsep _ _ H Hk'))).
-apply mult_wd_lft.
+  (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk'))).
+apply mult_wdl.
 apply cg_minus_wd; apply pfwdef; apply gP'; auto.
 rewrite H1; auto.
 eapply leEq_wdl.
@@ -1235,7 +1239,7 @@ apply plus_resp_leEq_both; unfold M, I in |- *; apply norm_bnd_AbsIR;
  apply Pts_part_lemma with n P; assumption.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (P k (Hsep i k H Hk')); apply prf2.
+2: apply shift_leEq_minus; astepl (P k (RS'_Hsep i k H Hk')); apply prf2.
 apply sep__part_h_lemma3 with i.
 rewrite sep__part_fun_i in Hk; assumption.
 rewrite H1; assumption.
@@ -1252,7 +1256,7 @@ apply Pts_part_lemma with sep__part_length sep__part;
 cut (pred (sep__part_fun (S i) H) <= n); intros.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply shift_leEq_minus; AStepl (P k (Hsep i k H Hk')); apply prf2.
+2: apply shift_leEq_minus; astepl (P k (RS'_Hsep i k H Hk')); apply prf2.
 apply sep__part_h_lemma3 with i.
 rewrite sep__part_fun_i in Hk; assumption.
 rewrite sep__part_fun_i in a0; assumption.
@@ -1260,24 +1264,23 @@ apply le_trans with (sep__part_fun (S i) H).
 auto with arith.
 apply sep__part_fun_bnd.
 apply leEq_wdl with ZeroR.
-AStepl ((Zero[+]Zero)[*]ZeroR).
+astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
 apply eq_imp_leEq; Algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
-apply less_leEq; AStepr (delta [/]TwoNZ); apply pos_div_two; exact pos_delta.
+apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply AbsIRz_isz.
 apply AbsIR_wd.
-RStepr
+rstepr
  ((F (g _ (sep__part_aux i)) just1[-]F (g _ (sep__part_aux i)) just1)[*]
-  (P (S k) (Hsep_S _ _ H Hk')[-]P k (Hsep _ _ H Hk'))).
-apply mult_wd_lft.
+  (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk'))).
+apply mult_wdl.
 apply cg_minus_wd; apply pfwdef; unfold sep__part_pts in |- *; apply gP';
  auto.
 rewrite sep__part_fun_i in b1; assumption.
 Qed.
 
 End Separating_Partition.
-
 (* end hide *)

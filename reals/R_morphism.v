@@ -50,7 +50,7 @@ End morphism_details.
 
 Record Homomorphism : Type := 
   {map :> R1 -> R2;
-   map_strong_ext : fun_strong_ext map;
+   map_strext : fun_strext map;
    map_pres_less :
     fun_pres_relation map (cof_less (c:=R1)) (cof_less (c:=R2));
    map_pres_plus : fun_pres_bin_fun map (csg_op (c:=R1)) (csg_op (c:=R2));
@@ -64,23 +64,23 @@ Record Homomorphism : Type :=
 Definition Homo_as_CSetoid_fun:=
     [f:Homomorphism]
          (Build_CSetoid_fun R1 R2 f 
-           (fun_strong_ext_imp_well_def R1 R2 f (!map_strong_ext f))
-           (!map_strong_ext f)
+           (fun_strext_imp_wd R1 R2 f (!map_strext f))
+           (!map_strext f)
           ).
 *****************)
 
 
-Lemma map_strong_ext_unfolded :
+Lemma map_strext_unfolded :
  forall (f : Homomorphism) (x y : R1), f x[#]f y -> x[#]y.
 Proof.
  intro f.
  case f.
  intros. rename X into H.
- apply map_strong_ext0.
+ apply map_strext0.
  exact H.
 Qed.
 
-Lemma map_well_def_unfolded :
+Lemma map_wd_unfolded :
  forall (f : Homomorphism) (x y : R1), x[=]y -> f x[=]f y.
 Proof.
  intros.
@@ -89,7 +89,7 @@ Proof.
  cut (Not (x[#]y)).
  intro H1.
  apply H1.
- apply map_strong_ext_unfolded with (f := f).
+ apply map_strext_unfolded with (f := f).
  exact H0.
  apply eq_imp_not_ap.
  exact H.
@@ -133,7 +133,7 @@ Proof.
  apply eq_transitive_unfolded with (f (Zero[+]Zero)).
  apply eq_symmetric_unfolded.
  apply map_pres_plus_unfolded.
- apply map_well_def_unfolded with (f := f).
+ apply map_wd_unfolded with (f := f).
  Algebra.
  Algebra.
 Qed.
@@ -151,13 +151,13 @@ Proof.
  red in |- *.
  intro.
  apply cg_cancel_lft with (x := f x).
- AStepr (Zero:R2).
+ astepr (Zero:R2).
  apply eq_transitive_unfolded with (f (x[+][--]x)).
  apply eq_symmetric_unfolded.
  apply map_pres_plus_unfolded.
- AStepl (f Zero).
+ astepl (f Zero).
  apply map_pres_zero_unfolded.
- apply map_well_def_unfolded.
+ apply map_wd_unfolded.
  Algebra.
 Qed.
   
@@ -191,7 +191,7 @@ Lemma map_pres_ap_zero :
  forall (f : Homomorphism) (x : R1), x[#]Zero -> f x[#]Zero.
 Proof.
  intros. rename X into H.
- apply ap_well_def_rht_unfolded with (y := f Zero).
+ apply ap_wdr_unfolded with (y := f Zero).
  apply map_pres_apartness with (y := Zero:R1).
  exact H.
  apply map_pres_zero_unfolded.
@@ -204,10 +204,10 @@ Proof.
  apply mult_cancel_lft with (z := f One).
  apply map_pres_ap_zero.
  apply ring_non_triv.
- AStepl (f One).
- AStepl (f (One[*]One)). 
+ astepl (f One).
+ astepl (f (One[*]One)). 
  apply map_pres_mult_unfolded.
- apply map_well_def_unfolded with (f := f).
+ apply map_wd_unfolded with (f := f).
  Algebra.
 Qed.
 
@@ -226,12 +226,12 @@ Proof.
  apply mult_cancel_lft with (z := f x).
  apply map_pres_ap_zero.
  assumption.
- RStepr (One:R2).
- AStepl (f One).
+ rstepr (One:R2).
+ astepl (f One).
  apply map_pres_one_unfolded.
- AStepl (f (x[*](One[/] x[//]H))).
+ astepl (f (x[*](One[/] x[//]H))).
  apply map_pres_mult_unfolded.
- apply map_well_def_unfolded.
+ apply map_wd_unfolded.
  rational.
 Qed.
 
@@ -245,7 +245,7 @@ Variable g : Homomorphism R2 R3.
 
 Definition compose (x : R1) := g (f x).
 
-Lemma compose_strong_ext : fun_strong_ext compose.
+Lemma compose_strext : fun_strext compose.
 Proof.
  red in |- *.
  unfold compose in |- *.
@@ -289,18 +289,18 @@ Proof.
  case f.
  intro f_.
  intros f_1 f_2 f_3 f_4.
- cut (fun_well_def g). 
+ cut (fun_wd g). 
  case g.
  intro g_.
  intros g_1 g_2 g_3 g_4.
  intros.
  simpl in H.
  simpl in |- *.
- AStepl (g_ (f_ x[+]f_ y)).
+ astepl (g_ (f_ x[+]f_ y)).
  apply g_3.
  red in |- *.
  intros.
- apply map_well_def_unfolded.  
+ apply map_wd_unfolded.  
  assumption.
 Qed.
 
@@ -312,18 +312,18 @@ Proof.
  case f.
  intro f_.
  intros f_1 f_2 f_3 f_4.
- cut (fun_well_def g). 
+ cut (fun_wd g). 
  case g.
  intro g_.
  intros g_1 g_2 g_3 g_4.
  intros.
  simpl in H.
  simpl in |- *.
- AStepl (g_ (f_ x[*]f_ y)).
+ astepl (g_ (f_ x[*]f_ y)).
  apply g_4.
  red in |- *.
  intros.
- apply map_well_def_unfolded.  
+ apply map_wd_unfolded.  
  assumption.
 Qed. 
 
@@ -349,7 +349,7 @@ Qed.
 
 
 Definition Compose :=
-  Build_Homomorphism R1 R3 compose compose_strong_ext compose_pres_less
+  Build_Homomorphism R1 R3 compose compose_strext compose_pres_less
     compose_pres_plus compose_pres_mult compose_pres_Lim.
 
  
@@ -392,7 +392,7 @@ Section simplification.
 Variables R1 R2 : CReals.
 Variable f : R1 -> R2.
 
-Hypothesis H1 : fun_strong_ext f.
+Hypothesis H1 : fun_strext f.
 
 
 Lemma f_well_def : forall x y : R1, x[=]y -> f x[=]f y.
@@ -479,8 +479,8 @@ Lemma f_pres_Zero : f Zero[=]Zero.
 Proof.
  intros.
  apply cg_cancel_lft with (x := f Zero).
- AStepr (f Zero).
- AStepl (f (Zero[+]Zero)).
+ astepr (f Zero).
+ astepl (f (Zero[+]Zero)).
  apply eq_symmetric_unfolded.
  red in H3.
  apply f_well_def.
@@ -491,9 +491,9 @@ Lemma f_pres_minus : forall x : R1, f [--]x[=][--](f x).
 Proof.
  intro. 
  apply cg_cancel_lft with (x := f x).
- AStepr (Zero:R2).
- AStepl (f (x[+][--]x)). 
- AStepr (f Zero).
+ astepr (Zero:R2).
+ astepl (f (x[+][--]x)). 
+ astepr (f Zero).
  apply f_well_def.
  Algebra.
  apply f_pres_Zero. 
@@ -503,12 +503,12 @@ Qed.
 Lemma f_pres_min : forall x y : R1, f (x[-]y)[=]f x[-]f y.
 Proof.
  intros.
- AStepr (f (x[+][--]y)).
+ astepr (f (x[+][--]y)).
  apply f_well_def.
  Algebra.
- AStepr (f x[+][--](f y)).
+ astepr (f x[+][--](f y)).
  red in H3.
- AStepr (f x[+]f [--]y).
+ astepr (f x[+]f [--]y).
  apply H3.
  apply bin_op_wd_unfolded.
  apply eq_reflexive_unfolded.
@@ -527,7 +527,7 @@ Hypothesis H3 : fun_pres_bin_fun R1 R2 f (csg_op (c:=R1)) (csg_op (c:=R2)).
 Lemma f_pres_ap_zero : forall x : R1, x[#]Zero -> f x[#]Zero.
 Proof.
  intros.
- apply ap_well_def_rht_unfolded with (y := f Zero).
+ apply ap_wdr_unfolded with (y := f Zero).
  apply f_pres_apartness with (y := Zero:R1).
  assumption.
  assumption.
@@ -561,10 +561,10 @@ Proof.
  intro.
  elim H8.
  intros.
- AStepl (f e1).
- AStepr (f (a m[-]l_a)).
+ astepl (f e1).
+ astepr (f (a m[-]l_a)).
  split.
- AStepl (f [--]e1).
+ astepl (f [--]e1).
  apply f_pres_leEq.
  assumption.
  assumption.
@@ -580,8 +580,8 @@ Proof.
  apply H.
  apply less_pres_f.
  assumption.
- AStepl (Zero:R2).
- AStepr e2.
+ astepl (Zero:R2).
+ astepr e2.
  assumption.
  apply eq_symmetric_unfolded.
  apply f_pres_Zero.
@@ -602,8 +602,8 @@ Proof.
  apply mult_cancel_lft with (z := f One).
  apply f_pres_ap_zero.
  apply ring_non_triv.
- AStepl (f One).
- AStepr (f (One[*]One)). 
+ astepl (f One).
+ astepr (f (One[*]One)). 
  apply f_well_def.
  Algebra.
 Qed.
@@ -616,9 +616,9 @@ Proof.
  apply mult_cancel_lft with (z := f x).
  apply f_pres_ap_zero.
  assumption.
- RStepr (One:R2).
- AStepr (f One).
- AStepl (f (x[*](One[/] x[//]H))).
+ rstepr (One:R2).
+ astepr (f One).
+ astepl (f (x[*](One[/] x[//]H))).
  apply eq_symmetric_unfolded.
  apply f_well_def.
  rational.
@@ -634,4 +634,4 @@ End with_plus_less.
 
 End simplification.
 
-(* end hide *) 
+(* end hide *)

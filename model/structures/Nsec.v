@@ -1,24 +1,17 @@
 (* $Id$ *)
 
+(** printing {#N} $\ensuremath{\mathrel\#_{\mathbb N}}$ *)
 
 Require Export Peano_dec.
 Require Export Relations.
 Require Import CLogic.
 
-(** *About N
-*)
+(** *[nat]
+**About [nat]
 
-Infix "{+N}" := plus (no associativity, at level 85).
-Infix "{*N}" := mult (no associativity, at level 80).
+We prove some basic lemmas of the natural numbers.
 
-(** printing {+N} $+_{\mathbb{N}}$ #+<SUB>N<\SUB># *)
-(** printing {*N} $*_{\mathbb{N}}$ #*<SUB>N<\SUB># *)
-
-
-(** We prove some basic lemmas of the natural numbers.
-*)
-
-(** A variant of [0_S] from the standard library
+A variant of [0_S] from the standard library
 *)
 
 Lemma S_O : forall n : nat, S n <> 0.
@@ -33,38 +26,32 @@ apply sym_eq.
 exact H.
 Qed.
 
-(** **Apartness
+(** ***Apartness
 *)
 
-Definition ap_nat (x y : nat) := CNot (x = y :>nat).
+Definition ap_nat (x y : nat) := ~ (x = y :>nat).
 
 Infix "{#N}" := ap_nat (no associativity, at level 90).
-
-(** printing {#N} $\#_{\mathbb{N}}$ *)
 
 Lemma ap_nat_irreflexive0 : forall x : nat, Not (x{#N}x).
 red in |- *.
 unfold ap_nat in |- *.
 intros x X.
-cut (x = x).
-intro.
-elim X.
-assumption.
-constructor 1.
+apply X.
+auto.
 Qed.
 
 Lemma ap_nat_symmetric0 : forall x y : nat, (x{#N}y) -> y{#N}x.
  intros x y.
  unfold ap_nat in |- *.
  intros X.
- red in |- *.
  intro Y.
  apply X.
  auto.
 Qed.
 
-Lemma ap_nat_cotransitive0 :
- forall x y : nat, (x{#N}y) -> forall z : nat, (x{#N}z) or (z{#N}y).
+Lemma ap_nat_cotransitive0 : forall x y : nat,
+ (x{#N}y) -> forall z : nat, (x{#N}z) or (z{#N}y).
  intros x y X z. 
  unfold ap_nat in |- *.
  case (eq_nat_dec x z).
@@ -100,11 +87,11 @@ intros x y.
  assumption.
 Qed.
 
-(** **Addition
+(** ***Addition
 *)
 
-Lemma plus_is_extensional0 :
- forall x1 x2 y1 y2 : nat, (x1{+N}y1{#N}x2{+N}y2) -> (x1{#N}x2) or (y1{#N}y2).
+Lemma plus_strext0 : forall x1 x2 y1 y2 : nat,
+ (x1+y1{#N}x2+y2) -> (x1{#N}x2) or (y1{#N}y2).
 intros x1 x2 y1 y2 H.
 unfold ap_nat in |- *.
 unfold ap_nat in H.
@@ -125,8 +112,7 @@ Qed.
 (** There is no inverse for addition, because every candidate will fail for 2
 *)
 
-Lemma no_inverse0 :
- forall f : nat -> nat, ~ ((2{+N}f 2) = 0 /\ (f 2{+N}2) = 0).
+Lemma no_inverse0 : forall f : nat -> nat, ~ ((2+f 2) = 0 /\ (f 2+2) = 0).
 intro f.
 simpl in |- *.
 red in |- *.
@@ -143,11 +129,11 @@ Qed.
 
 
 
-(** **Multiplication
+(** ***Multiplication
 *)
 
-Lemma mult_is_extensional0 :
- forall x1 x2 y1 y2 : nat, (x1{*N}y1{#N}x2{*N}y2) -> (x1{#N}x2) or (y1{#N}y2).
+Lemma mult_strext0 : forall x1 x2 y1 y2 : nat,
+ (x1*y1{#N}x2*y2) -> (x1{#N}x2) or (y1{#N}y2).
 unfold ap_nat in |- *.
 intros x1 x2 y1 y2 H.
 cut ({x1 = x2} + {x1 <> x2}).
@@ -160,9 +146,81 @@ intro H0.
 apply H.
 exact (f_equal2 mult e H0).
 intro X.
-left.
-apply Ccontrapos' with (x1 = x2).
 auto.
-exact X.
 apply eq_nat_dec.
 Qed.
+
+(** ***Decidability
+*)
+Lemma not_or:(forall (p q:nat), (p<>q)-> p<q or q<p):CProp.
+simpl.
+intros p q H.
+set (H0:=(lt_eq_lt_dec p q)).
+elim H0.
+clear H0.
+intros H0.
+elim H0.
+clear H0.
+intros H0.
+left.
+exact H0.
+clear H0.
+intros H0.
+intuition.
+clear H0.
+intros H0.
+right.
+exact H0.
+Qed.
+
+(* begin hide *)
+
+Lemma k_zero:forall (k i l:nat),
+Not (0<k or 0=k and i<l)-> k=0.
+intros k i l H.
+unfold Not in H.
+set (H1:=(lt_eq_lt_dec 0 k)).
+elim H1.
+clear H1.
+intro H1.
+elim H1.
+clear H1.
+intuition.
+intuition.
+intuition.
+Qed.
+
+Lemma lexi_dec:(forall (k i l:nat),
+Cdecidable (0<k or 0=k and i<l)):CProp.
+intros k i l.
+unfold Cdecidable.
+set (H:=(lt_eq_lt_dec 0 k)).
+elim H.
+clear H.
+intro H.
+elim H.
+clear H.
+intro H.
+left.
+left.
+exact H.
+
+clear H.
+intro H.
+elim (le_gt_dec l i).
+intro H1.
+right.
+unfold Not.
+intro H2.
+intuition.
+
+intro H1.
+left.
+right.
+intuition.
+
+intuition.
+Qed.
+
+
+(* end hide *)

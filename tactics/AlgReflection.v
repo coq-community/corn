@@ -1,5 +1,6 @@
 (* $Id$ *)
 
+(* begin hide *)
 Require Export CLogic.
 
 Section Syntactic_Expressions.
@@ -416,3 +417,4 @@ auto. apply eq_nat_corr. assumption.
 Qed.
 
 End Correctness_Results.
+(* end hide *)

@@ -16,8 +16,8 @@ The real numbers with the usual distance form a pseudo metric space.
 
 Definition dIR (x y : IR) : IR := ABSIR (x[-]y).
 
-Lemma bin_fun_strong_ext_dIR : bin_fun_strong_ext IR IR IR dIR.
-unfold bin_fun_strong_ext in |- *.
+Lemma bin_fun_strext_dIR : bin_fun_strext IR IR IR dIR.
+unfold bin_fun_strext in |- *.
 unfold dIR in |- *.
 intros.
 apply cg_minus_strext.
@@ -26,7 +26,7 @@ auto.
 Qed.
 
 Definition dIR_as_CSetoid_fun :=
-  Build_CSetoid_bin_fun IR IR IR dIR bin_fun_strong_ext_dIR.
+  Build_CSetoid_bin_fun IR IR IR dIR bin_fun_strext_dIR.
 
 Lemma dIR_nneg : forall x y : IR, Zero[<=]dIR_as_CSetoid_fun x y.
 unfold dIR_as_CSetoid_fun in |- *.
@@ -66,14 +66,14 @@ apply ap_irreflexive_unfolded.
 intro H1.
 exact H1.
 
-apply bin_fun_strong_ext_dIR.
-AStepr ZeroR.
+apply bin_fun_strext_dIR.
+astepr ZeroR.
 apply ap_symmetric_unfolded.
 apply less_imp_ap.
 exact H.
 
 unfold dIR in |- *.
-AStepr (ABSIR ZeroR).
+astepr (ABSIR ZeroR).
 apply eq_symmetric_unfolded.
 apply AbsIRz_isz.
 
@@ -85,14 +85,14 @@ Qed.
 (* begin hide *)
 Lemma IR_tri_ineq : forall a b : IR, AbsIR (a[+]b)[<=]AbsIR a[+]AbsIR b.
 intros a b.
-AStepr (AbsIR (AbsIR a[+]AbsIR b)).
+astepr (AbsIR (AbsIR a[+]AbsIR b)).
 apply AbsSmall_imp_AbsIR.
 unfold AbsSmall in |- *.
 split.
 apply inv_cancel_leEq.
-AStepr (AbsIR (AbsIR a[+]AbsIR b)).
-AStepl ([--]a[+][--]b).
-AStepr (AbsIR a[+]AbsIR b).
+astepr (AbsIR (AbsIR a[+]AbsIR b)).
+astepl ([--]a[+][--]b).
+astepr (AbsIR a[+]AbsIR b).
 apply plus_resp_leEq_both.
 apply inv_leEq_AbsIR.
 
@@ -100,13 +100,13 @@ apply inv_leEq_AbsIR.
 
 apply eq_symmetric_unfolded.
 apply AbsIR_eq_x.
-AStepl (ZeroR[+]ZeroR).
+astepl (ZeroR[+]ZeroR).
 apply plus_resp_leEq_both.
 apply AbsIR_nonneg.
 
 apply AbsIR_nonneg.
 
-AStepr (AbsIR a[+]AbsIR b).
+astepr (AbsIR a[+]AbsIR b).
 apply plus_resp_leEq_both.
 apply leEq_AbsIR.
 
@@ -114,14 +114,14 @@ apply leEq_AbsIR.
 
 apply eq_symmetric_unfolded.
 apply AbsIR_eq_x.
-AStepl (ZeroR[+]ZeroR).
+astepl (ZeroR[+]ZeroR).
 apply plus_resp_leEq_both.
 apply AbsIR_nonneg.
 
 apply AbsIR_nonneg.
 
 apply AbsIR_eq_x.
-AStepl (ZeroR[+]ZeroR).
+astepl (ZeroR[+]ZeroR).
 apply plus_resp_leEq_both.
 apply AbsIR_nonneg.
 
@@ -135,9 +135,9 @@ intros x y z.
 unfold dIR_as_CSetoid_fun in |- *.
 unfold dIR in |- *.
 simpl in |- *.
-AStepl (ABSIR (x[+]([--]y[+]y)[-]z)).
-AStepl (ABSIR (x[+][--]y[+](y[-]z))).
-AStepl (ABSIR (x[-]y[+](y[-]z))).
+astepl (ABSIR (x[+]([--]y[+]y)[-]z)).
+astepl (ABSIR (x[+][--]y[+](y[-]z))).
+astepl (ABSIR (x[-]y[+](y[-]z))).
 apply IR_tri_ineq.
 
 apply AbsIR_wd.
@@ -179,8 +179,8 @@ red in |- *.
 simpl in |- *.
 exists 0.
 intros x y.
-AStepr (OneR[*](x[-d]y)).
-AStepr (x[-d]y).
+astepr (OneR[*](x[-d]y)).
+astepr (x[-d]y).
 apply rev_tri_ineq'.
 Qed.
 
@@ -226,21 +226,21 @@ elim H1.
 intros x0 H3.
 exists (max x x0 + 1).
 intros x1 y.
-AStepl (dIR (f x1[+]g x1) (f y[+]g y)).
+astepl (dIR (f x1[+]g x1) (f y[+]g y)).
 unfold dIR in |- *.
 unfold dIR in |- *.
-AStepl (ABSIR (g x1[-]g y[+](f x1[-]f y))).
+astepl (ABSIR (g x1[-]g y[+](f x1[-]f y))).
 apply leEq_transitive with (ABSIR (g x1[-]g y)[+]ABSIR (f x1[-]f y)).
 apply IR_tri_ineq.
 apply leEq_transitive with ((Two:IR)[^]x0[*](x1[-d]y)[+]ABSIR (f x1[-]f y)).
 apply plus_resp_leEq.
-AStepl (g x1[-d]g y).
+astepl (g x1[-d]g y).
 apply H3.
 apply leEq_transitive with (Two[^]x0[*](x1[-d]y)[+]Two[^]x[*](x1[-d]y)).
 apply plus_resp_leEq_lft.
-AStepl (f x1[-d]f y).
+astepl (f x1[-d]f y).
 apply H2.
-AStepr ((Two:IR)[*]Two[^]max x x0[*](x1[-d]y)).
+astepr ((Two:IR)[*]Two[^]max x x0[*](x1[-d]y)).
 apply
  leEq_transitive
   with (Two[^]max x x0[*](x1[-d]y)[+]Two[^]max x x0[*](x1[-d]y)).
@@ -271,16 +271,16 @@ apply CPsMetricSpace_is_CPsMetricSpace.
 apply eq_imp_leEq.
 rational.
 
-AStepl (Two[^]1[*]Two[^]max x x0[*](x1[-d]y)).
+astepl (Two[^]1[*]Two[^]max x x0[*](x1[-d]y)).
 
 2: apply AbsIR_wd.
 
-apply mult_wd_lft.
-AStepl ((Two:IR)[^](max x x0 + 1)).
-2: AStepl ((Two:IR)[^]max x x0[*]Two[^]1).
+apply mult_wdl.
+astepl ((Two:IR)[^](max x x0 + 1)).
+2: astepl ((Two:IR)[^]max x x0[*]Two[^]1).
 2: apply mult_commutes.
 
-AStepr ((Two:IR)[^](max x x0 + 1)).
+astepr ((Two:IR)[^](max x x0 + 1)).
 rational.
 
 rational.
@@ -306,7 +306,7 @@ elim (H0 (S n) H1).
 intros x0 H3.
 exists (max x x0).
 intros x1 y H6.
-AStepl (ABSIR (f x1[-]f y[+](g x1[-]g y))).
+astepl (ABSIR (f x1[-]f y[+](g x1[-]g y))).
 apply leEq_less_trans with (ABSIR (f x1[-]f y)[+]ABSIR (g x1[-]g y)).
 apply IR_tri_ineq.
 
@@ -324,22 +324,22 @@ apply
 apply H8.
 
 3: simpl in |- *.
-AStepl (nexp IR (max x x0) (One[/] Two:IR[//]H1)).
-AStepr (nexp IR x (One[/] Two:IR[//]H1)).
-AStepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
-AStepr ((OneR[/] Two:IR[//]H1)[^]x).
+astepl (nexp IR (max x x0) (One[/] Two:IR[//]H1)).
+astepr (nexp IR x (One[/] Two:IR[//]H1)).
+astepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
+astepr ((OneR[/] Two:IR[//]H1)[^]x).
 apply small_nexp_resp_le.
 apply shift_leEq_div.
 apply pos_two.
 
-AStepl ZeroR.
+astepl ZeroR.
 apply less_leEq.
 apply pos_one.
 
 apply shift_div_leEq.
 apply pos_two.
 
-AStepr (Two:IR).
+astepr (Two:IR).
 apply less_leEq.
 apply one_less_two.
 
@@ -357,55 +357,55 @@ apply H7.
 apply less_leEq_trans with (nexp IR (max x x0) (One[/] Two:IR[//]H1)).
 exact H6.
 
-AStepr (nexp IR x0 (One[/] Two:IR[//]H1)).
-AStepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
-AStepr ((OneR[/] Two:IR[//]H1)[^]x0).
+astepr (nexp IR x0 (One[/] Two:IR[//]H1)).
+astepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
+astepr ((OneR[/] Two:IR[//]H1)[^]x0).
 apply small_nexp_resp_le.
 apply shift_leEq_div.
 apply pos_two.
 
-AStepl ZeroR.
+astepl ZeroR.
 apply less_leEq.
 apply pos_one.
 
 apply shift_div_leEq.
 apply pos_two.
 
-AStepr (Two:IR).
+astepr (Two:IR).
 apply less_leEq.
 apply one_less_two.
 
 intuition.
 apply eq_imp_leEq.
-AStepl ((Two:IR)[*](One[/] Two:IR[//]H1)[^]S n).
-AStepl
+astepl ((Two:IR)[*](One[/] Two:IR[//]H1)[^]S n).
+astepl
  ((Two:IR)[*](One[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1)).
-AStepl ((Two:IR)[*](One[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1)).
-AStepl
+astepl ((Two:IR)[*](One[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1)).
+astepl
  ((Two:IR)[*]
   ((One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1)[*](One[/] Two:IR[//]H1))).
-2: apply mult_wd_rht.
-2: AStepl ((One[/] Two:IR[//]H1)[^]S n).
-3: AStepl ((One[/] Two:IR[//]H1)[^]n[*](One[/] Two:IR[//]H1)).
+2: apply mult_wdr.
+2: astepl ((One[/] Two:IR[//]H1)[^]S n).
+3: astepl ((One[/] Two:IR[//]H1)[^]n[*](One[/] Two:IR[//]H1)).
 
-RStepl
+rstepl
  ((One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1)[*]Two[*]
   (One[/] Two:IR[//]H1)).
-AStepl
+astepl
  ((One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1)[*]
   (Two[*](One[/] Two:IR[//]H1))).
-RStepl ((One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1)[*]One).
-RStepl (One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1).
-AStepl ((OneR[/] Two:IR[//]H1)[^]n).
+rstepl ((One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1)[*]One).
+rstepl (One[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H1).
+astepl ((OneR[/] Two:IR[//]H1)[^]n).
 apply eq_reflexive.
 
 3: apply AbsIR_wd.
 3: rational.
 
-AStepr ((OneR[/] Two:IR[//]H1)[^]S n).
+astepr ((OneR[/] Two:IR[//]H1)[^]S n).
 apply eq_reflexive.
 
-AStepr ((One[/] Two:IR[//]H1)[^]n[*](One[/] Two:IR[//]H1)).
+astepr ((One[/] Two:IR[//]H1)[^]n[*](One[/] Two:IR[//]H1)).
 apply eq_reflexive.
 
 Qed.
@@ -428,7 +428,7 @@ elim (H0 x (S n) H1).
 intros x0 H3.
 exists (max xn x0).
 intros y H6.
-AStepl (ABSIR (f x[-]f y[+](g x[-]g y))).
+astepl (ABSIR (f x[-]f y[+](g x[-]g y))).
 apply leEq_less_trans with (ABSIR (f x[-]f y)[+]ABSIR (g x[-]g y)).
 apply IR_tri_ineq.
 
@@ -441,23 +441,23 @@ apply
  less_leEq_trans with (nexp IR (max xn x0) (One[/] Zero[+]One[+]One[//]H1)).
 exact H6.
 
-AStepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]max xn x0).
-AStepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]xn).
+astepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]max xn x0).
+astepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]xn).
 apply small_nexp_resp_le.
 apply shift_leEq_div.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply pos_two.
 
-AStepl ZeroR.
+astepl ZeroR.
 apply less_leEq.
 apply pos_one.
 
 apply shift_div_leEq.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply pos_two.
 
-AStepr (OneR[+]One).
-AStepr (Two:IR).
+astepr (OneR[+]One).
+astepr (Two:IR).
 apply less_leEq.
 apply one_less_two.
 
@@ -477,23 +477,23 @@ apply
  less_leEq_trans with (nexp IR (max xn x0) (One[/] Zero[+]One[+]One[//]H1)).
 exact H6.
 
-AStepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]max xn x0).
-AStepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]x0).
+astepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]max xn x0).
+astepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]x0).
 apply small_nexp_resp_le.
 apply shift_leEq_div.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply pos_two.
 
-AStepl ZeroR.
+astepl ZeroR.
 apply less_leEq.
 apply pos_one.
 
 apply shift_div_leEq.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply pos_two.
 
-AStepr (OneR[+]One).
-AStepr (Two:IR).
+astepr (OneR[+]One).
+astepr (Two:IR).
 apply less_leEq.
 apply one_less_two.
 
@@ -501,37 +501,37 @@ rational.
 
 intuition.
 apply eq_imp_leEq.
-AStepl ((Two:IR)[*](One[/] Zero[+]One[+]One[//]H1)[^]S n).
-AStepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]n).
-AStepl
+astepl ((Two:IR)[*](One[/] Zero[+]One[+]One[//]H1)[^]S n).
+astepr ((OneR[/] Zero[+]One[+]One[//]H1)[^]n).
+astepl
  ((Two:IR)[*]
   (One[^]S n[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H1)).
-AStepl
+astepl
  ((Two:IR)[*](One[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H1)).
-AStepl
+astepl
  ((Two:IR)[*]
   ((One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1)[*]
    (One[/] Zero[+]One[+]One[//]H1))).
-2: apply mult_wd_rht.
-2: AStepl ((One[/] Zero[+]One[+]One[//]H1)[^]S n).
-3: AStepl
+2: apply mult_wdr.
+2: astepl ((One[/] Zero[+]One[+]One[//]H1)[^]S n).
+3: astepl
     ((One[/] Zero[+]One[+]One[//]H1)[^]n[*](One[/] Zero[+]One[+]One[//]H1)).
-3: AStepr
+3: astepr
     ((One[/] Zero[+]One[+]One[//]H1)[^]n[*](One[/] Zero[+]One[+]One[//]H1)).
 3: apply eq_reflexive.
 
-RStepl
+rstepl
  ((One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1)[*]Two[*]
   (One[/] Zero[+]One[+]One[//]H1)).
-AStepl
+astepl
  ((One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1)[*]
   (Two[*](One[/] Zero[+]One[+]One[//]H1))).
-RStepl ((One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1)[*]One).
-RStepl (One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1).
-AStepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]n).
+rstepl ((One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1)[*]One).
+rstepl (One[/] (Zero[+]One[+]One)[^]n[//]nexp_resp_ap_zero n H1).
+astepl ((OneR[/] Zero[+]One[+]One[//]H1)[^]n).
 apply eq_reflexive.
 
-AStepr ((One[/] Zero[+]One[+]One[//]H1)[^]S n).
+astepr ((One[/] Zero[+]One[+]One[//]H1)[^]S n).
 apply eq_reflexive.
 
 apply AbsIR_wd.

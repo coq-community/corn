@@ -6,89 +6,92 @@ Section Conversion.
 
 (** *Correspondence
 
-In this file we prove that there are mappings going in both ways between the set of partial functions whose domain contains $[a,b]$#[a,b]# and the set of real-valued functions with domain on that interval.  These mappings form an adjunction, and thus they have all the good properties for preservation results.
+In this file we prove that there are mappings going in both ways
+between the set of partial functions whose domain contains
+[[a,b]] and the set of real-valued functions with domain on
+that interval.  These mappings form an adjunction, and thus they have
+all the good properties for preservation results.
 
 **Mappings
 
-We begin by defining the map from partial functions to setoid functions as simply being the restriction of the partial function to the interval $[a,b]$#[a,b]#.
+We begin by defining the map from partial functions to setoid
+functions as simply being the restriction of the partial function to
+the interval [[a,b]].
 
-%\begin{convention}% Let [F] be a partial function and \verb!a,b:IR! such that [I]$=[a,b]$ is included in the domain of [F].
+%\begin{convention}% Let [F] be a partial function and [a,b:IR] such
+that [I [=] [a,b]] is included in the domain of [F].
 %\end{convention}%
 *)
 
 Variable F : PartIR.
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := compact a b Hab.
 (* end hide *)
 
 Hypothesis Hf : included I (Dom F).
 
-Lemma int_partIR_strext :
- fun_strong_ext
-   (fun x : subset I =>
-    F (scs_elem _ _ x) (Hf (scs_elem _ _ x) (scs_prf _ _ x))).
+Lemma IntPartIR_strext : fun_strext
+ (fun x : subset I => F (scs_elem _ _ x) (Hf _ (scs_prf _ _ x))).
 red in |- *; intros x y H.
 generalize (pfstrx _ _ _ _ _ _ H).
 case x; case y; auto.
 Qed.
 
-Definition int_partIR : CSetoid_fun (subset I) IR.
+Definition IntPartIR : CSetoid_fun (subset I) IR.
 apply
  Build_CSetoid_fun
   with
     (fun x : subset I =>
      Part F (scs_elem _ _ x) (Hf (scs_elem _ _ x) (scs_prf _ _ x))).
-exact int_partIR_strext.
+exact IntPartIR_strext.
 Defined.
 
 End Conversion.
 
-Notation IntPartIR := (int_partIR _ _ _ _).
+Implicit Arguments IntPartIR [F a b Hab].
 
 Section AntiConversion.
 
 (**
-To go the other way around, we simply take a setoid function [f] with domain $[a,b]$#[a,b]# and build the corresponding partial function.
+To go the other way around, we simply take a setoid function [f] with
+domain [[a,b]] and build the corresponding partial function.
 *)
 
 Variables a b : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := compact a b Hab.
 (* end hide *)
 
 Variable f : CSetoid_fun (subset I) IR.
 
-Lemma partIR_int_strext :
- forall (x y : IR) Hx Hy,
- f (Build_subcsetoid_crr IR _ x Hx)[#]f (Build_subcsetoid_crr IR _ y Hy) ->
- x[#]y.
+Lemma PartInt_strext : forall x y Hx Hy,
+ f (Build_subcsetoid_crr IR _ x Hx) [#] f (Build_subcsetoid_crr IR _ y Hy) -> x [#] y.
 intros x y Hx Hy H.
-exact (csetoid_fun_strext_unfolded _ _ _ _ _ H).
+exact (csf_strext_unfolded _ _ _ _ _ H).
 Qed.
 
-Definition partIR_int : PartIR.
+Definition PartInt : PartIR.
 apply
  Build_PartFunct
   with (pfpfun := fun (x : IR) Hx => f (Build_subcsetoid_crr IR _ x Hx)).
 exact (compact_wd _ _ _).
-exact partIR_int_strext.
+exact PartInt_strext.
 Defined.
 
 End AntiConversion.
 
-Notation PartInt := (partIR_int _ _ _).
+Implicit Arguments PartInt [a b Hab].
 
 Section Inverses.
 
 (**
-In one way these operators are inverses#. #%\footnote{%Actually they form an adjunction, but that is completely irrelevant for our purpose, so we will ignore that in this formalization.%}.%
+In one direction these operators are inverses.
 *)
 
-Lemma int_part_int :
- forall (a b : IR) Hab (F : PartIR) (Hf : included (compact a b Hab) (Dom F)),
+Lemma int_part_int : forall a b Hab F (Hf : included (compact a b Hab) (Dom F)),
  Feq (compact a b Hab) F (PartInt (IntPartIR Hf)).
 intros; FEQ.
 Qed.
@@ -99,15 +102,18 @@ Section Equivalences.
 
 (** **Mappings Preserve Operations
 
-We now prove that all the operations we have defined on both sets are preserved by [PartInt].
+We now prove that all the operations we have defined on both sets are
+preserved by [PartInt].
 
-%\begin{convention}% Let [F,G] be partial functions and [a,b:IR] and denote by [I] the interval $[a,b]$#[a,b]#.  Let [f,g] be setoid functions of type [I->IR] equal respectively to [F] and [G] in [I].
+%\begin{convention}% Let [F,G] be partial functions and [a,b:IR] and
+denote by [I] the interval [[a,b]].  Let [f,g] be setoid functions of
+type [I->IR] equal respectively to [F] and [G] in [I].
 %\end{convention}%
 *)
 
 Variables F G : PartIR.
 Variables a b c : IR.
-Hypothesis Hab : a[<=]b.
+Hypothesis Hab : a [<=] b.
 (* begin hide *)
 Let I := compact a b Hab.
 (* end hide *)
@@ -117,14 +123,14 @@ Variables f g : CSetoid_fun (subset (compact a b Hab)) IR.
 Hypothesis Ff : Feq I F (PartInt f).
 Hypothesis Gg : Feq I G (PartInt g).
 
-Lemma part_int_const : Feq I [-C-]c (PartInt (ifunct_const a b Hab c)).
+Lemma part_int_const : Feq I [-C-]c (PartInt (IConst (Hab:=Hab) c)).
 apply eq_imp_Feq.
 red in |- *; simpl in |- *; intros; auto.
 unfold I in |- *; apply included_refl.
 intros; simpl in |- *; Algebra.
 Qed.
 
-Lemma part_int_id : Feq I FId (PartInt (ifunct_id a b Hab)).
+Lemma part_int_id : Feq I FId (PartInt (IId (Hab:=Hab))).
 apply eq_imp_Feq.
 red in |- *; simpl in |- *; intros; auto.
 unfold I in |- *; apply included_refl.
@@ -185,13 +191,13 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in |- *; simpl in Hf.
-AStepl (Part F x Hx[^]n); AStepr (f (Build_subcsetoid_crr IR _ x Hx')[^]n).
+astepl (Part F x Hx[^]n); astepr (f (Build_subcsetoid_crr IR _ x Hx')[^]n).
 apply nexp_wd; Algebra.
 Qed.
 
 (* begin show *)
 Hypothesis HG : bnd_away_zero I G.
-Hypothesis Hg : forall x : subset I, g x[#]Zero.
+Hypothesis Hg : forall x : subset I, g x [#] Zero.
 (* end show *)
 
 Lemma part_int_recip : Feq I {1/}G (PartInt (IRecip g Hg)).

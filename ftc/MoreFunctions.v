@@ -1,16 +1,18 @@
 (* $Id$ *)
 
+(** printing FNorm %\ensuremath{\|\cdot\|_{\infty}}% *)
+
 Require Export MoreIntervals.
 
 Opaque Min Max.
 
 Section Basic_Results.
 
-(** printing FNorm %\ensuremath{\|\cdot\|_{\infty}}% *)
-
 (** *More about Functions
 
-Here we state all the main results about properties of functions that we already proved for compact intervals in the more general setting of arbitrary intervals.
+Here we state all the main results about properties of functions that
+we already proved for compact intervals in the more general setting of
+arbitrary intervals.
 
 %\begin{convention}% Let [I:interval] and [F,F',G,G'] be partial functions.
 %\end{convention}%
@@ -24,8 +26,7 @@ Variable I : interval.
 Trivial stuff.
 *)
 
-Lemma Continuous_imp_inc :
- forall F : PartIR, Continuous I F -> included I (Dom F).
+Lemma Continuous_imp_inc : forall F, Continuous I F -> included I (Dom F).
 intros F H; elim H; intros; auto.
 Qed.
 
@@ -38,8 +39,7 @@ Hypothesis cI : compact_ I.
 Variable F : PartIR.
 Hypothesis contF : Continuous I F.
 
-Lemma continuous_compact :
- forall H, Continuous_I (a:=Lend cI) (b:=Rend cI) H F.
+Lemma continuous_compact : forall H, Continuous_I (a:=Lend cI) (b:=Rend cI) H F.
 intros.
 elim contF; intros incF contF'.
 Contin.
@@ -87,8 +87,7 @@ Qed.
 
 Definition FNorm := Norm_Funct (continuous_compact (Lend_leEq_Rend _ cI)).
 
-Lemma FNorm_bnd_AbsIR :
- forall x : IR, I x -> forall Hx, AbsIR (F x Hx)[<=]FNorm.
+Lemma FNorm_bnd_AbsIR : forall x, I x -> forall Hx, AbsIR (F x Hx) [<=] FNorm.
 intros; unfold FNorm in |- *.
 apply norm_bnd_AbsIR.
 apply interval_compact_inc; auto.
@@ -127,17 +126,16 @@ Hypothesis contF : Continuous I F.
 Hypothesis contG : Continuous I G.
 (* end show *)
 
-Lemma included_imp_Continuous :
- forall a b Hab, included (compact a b Hab) I -> Continuous_I Hab F.
+Lemma included_imp_Continuous : forall a b Hab,
+ included (compact a b Hab) I -> Continuous_I Hab F.
 intros.
 elim contF; auto.
 Qed.
 
-Lemma Included_imp_Continuous :
- forall J : interval, included J I -> Continuous J F.
+Lemma Included_imp_Continuous : forall J : interval, included J I -> Continuous J F.
 intros J H.
 split.
-exact (included_trans _ _ _ H (Continuous_imp_inc _ _ contF)).
+exact (included_trans _ _ _ _ H (Continuous_imp_inc _ _ contF)).
 intros.
 apply included_imp_Continuous; Included.
 Qed.
@@ -191,9 +189,9 @@ Qed.
 Lemma Continuous_recip : bnd_away_zero_in_P G I -> Continuous I {1/}G.
 intro H.
 elim contG; intros incG' contG'.
-cut (forall x : IR, I x -> forall Hx, G x Hx[#]Zero). intro H0.
+cut (forall x : IR, I x -> forall Hx, G x Hx [#] Zero). intro H0.
 split; Contin.
-intros x H0.
+intros x H0 Hx.
 apply bnd_imp_ap_zero with (Compact (leEq_reflexive _ x)); auto.
 apply H; auto.
 exact (compact_single_iprop I x H0).
@@ -225,7 +223,7 @@ FEQ.
 Contin.
 Qed.
 
-Lemma FNorm_wd : Feq I F G -> FNorm I cI F contF[=]FNorm I cI G contG.
+Lemma FNorm_wd : Feq I F G -> FNorm I cI F contF [=] FNorm I cI G contG.
 intro H; unfold FNorm in |- *; apply Norm_Funct_wd.
 eapply included_Feq.
 2: apply H.
@@ -240,9 +238,8 @@ Section Sums.
 
 Variable I : interval.
 
-Lemma Continuous_Sumx :
- forall (n : nat) (f : forall i : nat, i < n -> PartIR),
- (forall (i : nat) Hi, Continuous I (f i Hi)) -> Continuous I (FSumx n f).
+Lemma Continuous_Sumx : forall n (f : forall i, i < n -> PartIR),
+ (forall i Hi, Continuous I (f i Hi)) -> Continuous I (FSumx n f).
 intro; induction  n as [| n Hrecn]; intros f contF.
 simpl in |- *; Contin.
 simpl in |- *; Contin.
@@ -293,8 +290,7 @@ Hypothesis pI : proper I.
 
 Variables F G H : PartIR.
 
-Lemma Derivative_wdl :
- Feq I F G -> Derivative I pI F H -> Derivative I pI G H.
+Lemma Derivative_wdl : Feq I F G -> Derivative I pI F H -> Derivative I pI G H.
 intros H0 H1.
 elim H0; intros incF H0'.
 elim H0'; intros incG Heq.
@@ -308,8 +304,7 @@ intros; apply Derivative_I_wdl with F; auto.
 apply included_Feq with I; auto.
 Qed.
 
-Lemma Derivative_wdr :
- Feq I F G -> Derivative I pI H F -> Derivative I pI H G.
+Lemma Derivative_wdr : Feq I F G -> Derivative I pI H F -> Derivative I pI H G.
 intros H0 H1.
 elim H0; intros incF H0'.
 elim H0'; intros incG Heq.
@@ -323,8 +318,7 @@ intros; apply Derivative_I_wdr with F; auto.
 apply included_Feq with I; auto.
 Qed.
 
-Lemma Derivative_unique :
- Derivative I pI F G -> Derivative I pI F H -> Feq I G H.
+Lemma Derivative_unique : Derivative I pI F G -> Derivative I pI F H -> Feq I G H.
 intros H0 H1.
 elim H0; intros incF H0'.
 elim H0'; intros incG derFG.
@@ -332,7 +326,7 @@ elim H1; intros incF' H1'.
 elim H1'; intros incH derFH.
 apply included_Feq''; intros.
 auto.
-apply Derivative_I_unique with F; Deriv.
+unfold Hab'; apply Derivative_I_unique with F; Deriv.
 Qed.
 
 Lemma Derivative_imp_inc : Derivative I pI F G -> included I (Dom F).
@@ -399,21 +393,19 @@ Variables F F' G G' : PartIR.
 Hypothesis derF : Derivative I pI F F'.
 Hypothesis derG : Derivative I pI G G'.
 
-Lemma included_imp_Derivative :
- forall a b Hab,
- included (compact a b (less_leEq _ _ _ Hab)) I -> Derivative_I Hab F F'.
+Lemma included_imp_Derivative : forall a b Hab,
+ included (Compact (less_leEq _ a b Hab)) I -> Derivative_I Hab F F'.
 intros.
 elim derF; intros incF H'.
 elim H'; auto.
 Qed.
 
-Lemma Included_imp_Derivative :
- forall (J : interval) (pJ : proper J), included J I -> Derivative J pJ F F'.
+Lemma Included_imp_Derivative : forall J (pJ : proper J), included J I -> Derivative J pJ F F'.
 intros J pJ H.
 split.
-exact (included_trans _ _ _ H (Derivative_imp_inc _ _ _ _ derF)).
+exact (included_trans _ _ _ _ H (Derivative_imp_inc _ _ _ _ derF)).
 split.
-exact (included_trans _ _ _ H (Derivative_imp_inc' _ _ _ _ derF)).
+exact (included_trans _ _ _ _ H (Derivative_imp_inc' _ _ _ _ derF)).
 intros.
 apply included_imp_Derivative; Included.
 Qed.
@@ -479,8 +471,7 @@ Included.
 split; Deriv.
 Qed.
 
-Lemma Derivative_nth :
- forall n : nat, Derivative I pI (F{^}S n) (nring (S n){**}(F'{*}F{^}n)).
+Lemma Derivative_nth : forall n, Derivative I pI (F{^}S n) (nring (S n) {**} (F'{*}F{^}n)).
 elim derF; intros incF H.
 elim H; intros incF' derivF.
 split.
@@ -488,14 +479,13 @@ Included.
 split; Deriv.
 Qed.
 
-Lemma Derivative_recip :
- bnd_away_zero_in_P G I -> Derivative I pI {1/}G {--}(G'{/}G{*}G).
+Lemma Derivative_recip : bnd_away_zero_in_P G I -> Derivative I pI {1/}G {--} (G'{/}G{*}G).
 elim derG; intros incG H'.
 elim H'; intros incG' derivG.
 clear derF derG H'.
 intro.
-cut (forall x : IR, I x -> forall Hx, Part G x Hx[#]Zero); intros.
-cut (forall x : IR, I x -> forall Hx, (G{*}G) x Hx[#]Zero); intros.
+cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
+cut (forall x : IR, I x -> forall Hx, (G{*}G) x Hx [#] Zero); intros.
 split.
 Included.
 split; Deriv.
@@ -519,13 +509,13 @@ Hypothesis derG : Derivative I pI G G'.
 Hypothesis Gbnd : bnd_away_zero_in_P G I.
 (* end show *)
 
-Lemma Derivative_div : Derivative I pI (F{/}G) ((F'{*}G{-}F{*}G'){/}G{*}G).
+Lemma Derivative_div : Derivative I pI (F{/}G) ((F'{*}G{-}F{*}G') {/}G{*}G).
 elim derF; intros incF Hf.
 elim Hf; intros incF' Hf'.
 elim derG; intros incG derivG.
 elim derivG; intros incG' Hg'.
 clear Hf derivG.
-cut (forall x : IR, I x -> forall Hx, Part G x Hx[#]Zero); intros.
+cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
 split.
 Included.
 split.
@@ -544,10 +534,8 @@ Section More_Sums.
 Variable I : interval.
 Hypothesis pI : proper I.
 
-Lemma Derivative_Sumx :
- forall (n : nat) (f f' : forall i : nat, i < n -> PartIR),
- (forall (i : nat) Hi Hi', Derivative I pI (f i Hi) (f' i Hi')) ->
- Derivative I pI (FSumx n f) (FSumx n f').
+Lemma Derivative_Sumx : forall n (f f' : forall i, i < n -> PartIR),
+ (forall i Hi Hi', Derivative I pI (f i Hi) (f' i Hi')) -> Derivative I pI (FSumx n f) (FSumx n f').
 intro; induction  n as [| n Hrecn]; intros f f' derF.
 simpl in |- *; apply Derivative_const; auto.
 simpl in |- *; apply Derivative_plus; auto.
@@ -558,8 +546,7 @@ Variables f f' : nat -> PartIR.
 Hypothesis derF : forall n : nat, Derivative I pI (f n) (f' n).
 (* end show *)
 
-Lemma Derivative_Sum0 :
- forall n : nat, Derivative I pI (FSum0 n f) (FSum0 n f').
+Lemma Derivative_Sum0 : forall n, Derivative I pI (FSum0 n f) (FSum0 n f').
 intros.
 induction  n as [| n Hrecn].
 eapply Derivative_wdl.
@@ -574,8 +561,7 @@ apply FSum0_S; Included.
 apply Derivative_plus; auto.
 Qed.
 
-Lemma Derivative_Sum :
- forall m n : nat, Derivative I pI (FSum m n f) (FSum m n f').
+Lemma Derivative_Sum : forall m n, Derivative I pI (FSum m n f) (FSum m n f').
 intros.
 eapply Derivative_wdl.
 apply Feq_symmetric; apply FSum_FSum0'; Included.
@@ -596,15 +582,13 @@ Mutatis mutandis for differentiability.
 Variable I : interval.
 Hypothesis pI : proper I.
 
-Lemma Diffble_imp_inc :
- forall F : PartIR, Diffble I pI F -> included I (Dom F).
+Lemma Diffble_imp_inc : forall F, Diffble I pI F -> included I (Dom F).
 intros F H.
 inversion_clear H.
 auto.
 Qed.
 
-Lemma Derivative_imp_Diffble :
- forall F F' : PartIR, Derivative I pI F F' -> Diffble I pI F.
+Lemma Derivative_imp_Diffble : forall F F', Derivative I pI F F' -> Diffble I pI F.
 intros F F' H.
 elim H; intros incF H'.
 elim H'; intros incF' derivF.
@@ -612,8 +596,7 @@ split; auto.
 intros; apply deriv_imp_Diffble_I with F'; auto.
 Qed.
 
-Lemma Diffble_wd :
- forall F H : PartIR, Feq I F H -> Diffble I pI F -> Diffble I pI H.
+Lemma Diffble_wd : forall F H, Feq I F H -> Diffble I pI F -> Diffble I pI H.
 intros F H H0 H1.
 elim H0; intros incF H2.
 elim H2; intros incH eqFH.
@@ -633,18 +616,16 @@ Hypothesis diffG : Diffble I pI G.
 %\end{convention}%
 *)
 
-Lemma included_imp_Diffble :
- forall a b Hab,
- included (compact a b (less_leEq _ _ _ Hab)) I -> Diffble_I Hab F.
+Lemma included_imp_Diffble : forall a b Hab,
+ included (Compact (less_leEq _ a b Hab)) I -> Diffble_I Hab F.
 intros.
 elim diffF; auto.
 Qed.
 
-Lemma Included_imp_Diffble :
- forall (J : interval) (pJ : proper J), included J I -> Diffble J pJ F.
+Lemma Included_imp_Diffble : forall J (pJ : proper J), included J I -> Diffble J pJ F.
 intros J pJ H.
 split.
-exact (included_trans _ _ _ H (Diffble_imp_inc _ diffF)).
+exact (included_trans _ _ _ _ H (Diffble_imp_inc _ diffF)).
 intros; apply included_imp_Diffble; Included.
 Qed.
 
@@ -708,7 +689,7 @@ Qed.
 
 Lemma Diffble_recip : bnd_away_zero_in_P G I -> Diffble I pI {1/}G.
 elim diffG; intros incG diffbleG Gbnd.
-cut (forall x : IR, I x -> forall Hx, Part G x Hx[#]Zero); intros.
+cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
 split.
 Included.
 intros; apply Diffble_I_recip; auto.
@@ -747,10 +728,7 @@ apply Diffble_mult; auto.
 apply Diffble_recip; auto.
 Qed.
 
-Lemma Diffble_Sum0 :
- forall f,
- (forall n : nat, Diffble I pI (f n)) ->
- forall n : nat, Diffble I pI (FSum0 n f).
+Lemma Diffble_Sum0 : forall f, (forall n, Diffble I pI (f n)) -> forall n, Diffble I pI (FSum0 n f).
 intros f hypF n.
 split.
 intros x H n0.
@@ -760,10 +738,8 @@ intros; apply Diffble_I_Sum0; auto.
 intro; elim (hypF n0); auto.
 Qed.
 
-Lemma Diffble_Sumx :
- forall (n : nat) f,
- good_fun_seq' n f ->
- (forall (i : nat) Hi, Diffble I pI (f i Hi)) -> Diffble I pI (FSumx n f).
+Lemma Diffble_Sumx : forall n f, ext_fun_seq' f ->
+ (forall i Hi, Diffble I pI (f i Hi)) -> Diffble I pI (FSumx n f).
 intros n f Hgood hypF.
 split.
 red in |- *; intros.
@@ -774,10 +750,7 @@ intros; apply Diffble_I_Sumx.
 intros i Hi; elim (hypF i Hi); auto.
 Qed.
 
-Lemma Diffble_Sum :
- forall f,
- (forall n : nat, Diffble I pI (f n)) ->
- forall m n : nat, Diffble I pI (FSum m n f).
+Lemma Diffble_Sum : forall f, (forall n, Diffble I pI (f n)) -> forall m n, Diffble I pI (FSum m n f).
 intros f hypF m n.
 eapply Diffble_wd.
 apply Feq_symmetric; apply FSum_FSum0'.
@@ -815,14 +788,14 @@ elim diffF; intros incF diffbleF.
 set (a := Lend (compact_compact_in_interval I pI x H)) in *.
 set (b := Rend (compact_compact_in_interval I pI x H)) in *.
 fold J in (value of a), (value of b).
-cut (a[<]b). intro H0.
+cut (a [<] b). intro H0.
 cut (Diffble_I_n H0 n F). intro H1.
 apply (Part (n_deriv_I _ _ _ _ _ H1) x).
 apply n_deriv_inc.
 unfold a, b, J in |- *; apply iprop_compact_in_interval_inc2.
 apply iprop_compact_in_interval.
 apply diffbleF.
-apply included_trans with J; unfold a, b, J in |- *; Included.
+apply (included_trans _ (Compact (less_leEq IR a b H0)) J); unfold a, b, J in |- *; Included.
 unfold a, b, J in |- *; apply proper_compact_in_interval'.
 Defined.
 
@@ -830,7 +803,7 @@ Lemma N_Deriv_char
  (* begin hide *)
  :
  forall x Hx H,
- N_Deriv_fun x Hx[=]
+ N_Deriv_fun x Hx [=] 
  Part
    (n_deriv_I _ _
       (proper_compact_in_interval' _ _ _ _
@@ -874,8 +847,7 @@ apply compact_in_interval_wd2; Algebra.
 Qed.
 (* end hide *)
 
-Lemma N_Deriv_strext :
- forall (x y : IR) Hx Hy, N_Deriv_fun x Hx[#]N_Deriv_fun y Hy -> x[#]y.
+Lemma N_Deriv_strext : forall x y Hx Hy, N_Deriv_fun x Hx [#] N_Deriv_fun y Hy -> x [#] y.
 intros x y Hx Hy H.
 elim diffF; intros incF diffbleF.
 cut
@@ -893,8 +865,8 @@ cut
 cut (Dom (n_deriv_I _ _ _ _ _ H0) x). intro H3.
 cut (Dom (n_deriv_I _ _ _ _ _ H0) y). intro H4.
 apply pfstrx with (Hx := H3) (Hy := H4).
-eapply ap_well_def_lft_unfolded.
-eapply ap_well_def_rht_unfolded.
+eapply ap_wdl_unfolded.
+eapply ap_wdr_unfolded.
 apply H.
 eapply eq_transitive_unfolded.
 apply (N_Deriv_char y Hy H2).
@@ -956,11 +928,10 @@ apply diffbleF.
 simpl in |- *; Included.
 Qed.
 
-Lemma N_Deriv_wd :
- forall (x y : IR) Hx Hy, x[=]y -> N_Deriv_fun x Hx[=]N_Deriv_fun y Hy.
+Lemma N_Deriv_wd : forall x y Hx Hy, x [=] y -> N_Deriv_fun x Hx [=] N_Deriv_fun y Hy.
 intros.
 apply not_ap_imp_eq. intro H0.
-cut (x[#]y).
+cut (x [#] y).
 apply eq_imp_not_ap; auto.
 exact (N_Deriv_strext _ _ _ _ H0).
 Qed.
@@ -979,9 +950,7 @@ Section Basic_Results.
 All the usual results hold.
 *)
 
-Lemma Diffble_n_wd :
- forall (n : nat) (F G : PartIR),
- Feq I F G -> Diffble_n n I pI F -> Diffble_n n I pI G.
+Lemma Diffble_n_wd : forall n F G, Feq I F G -> Diffble_n n I pI F -> Diffble_n n I pI G.
 intros n F G H H0.
 elim H; intros incF H1.
 elim H1; intro incG.
@@ -992,8 +961,7 @@ apply included_Feq with I; auto.
 elim H0; auto.
 Qed.
 
-Lemma Derivative_n_wdr :
- forall n F G H,
+Lemma Derivative_n_wdr : forall n F G H,
  Feq I G H -> Derivative_n n I pI F G -> Derivative_n n I pI F H.
 intros n F G H H0 H1.
 elim H0; intros incG H2.
@@ -1008,8 +976,7 @@ apply included_Feq with I; auto.
 auto.
 Qed.
 
-Lemma Derivative_n_wdl :
- forall n F G H,
+Lemma Derivative_n_wdl : forall n F G H,
  Feq I F G -> Derivative_n n I pI F H -> Derivative_n n I pI G H.
 intros n F G H H0 H1.
 elim H0; intros incG H2.
@@ -1024,8 +991,7 @@ apply included_Feq with I; auto.
 auto.
 Qed.
 
-Lemma Derivative_n_unique :
- forall (n : nat) (F G H : PartIR),
+Lemma Derivative_n_unique : forall n F G H,
  Derivative_n n I pI F G -> Derivative_n n I pI F H -> Feq I G H.
 intros n F G H H0 H1.
 elim H0; intros incF H2.
@@ -1049,18 +1015,16 @@ apply interval_compact_inc.
 apply iprop_compact_in_interval.
 Qed.
 
-Lemma Diffble_n_imp_Diffble :
- forall n : nat,
- 0 < n -> forall F : PartIR, Diffble_n n I pI F -> Diffble I pI F.
+Lemma Diffble_n_imp_Diffble : forall n : nat, 0 < n -> forall F,
+ Diffble_n n I pI F -> Diffble I pI F.
 intros n H F H0.
 elim H0; intros incF diffF.
 split; auto.
 intros; apply Diffble_I_n_imp_diffble with n; auto.
 Qed.
 
-Lemma Derivative_n_imp_Diffble :
- forall n : nat,
- 0 < n -> forall F F' : PartIR, Derivative_n n I pI F F' -> Diffble I pI F.
+Lemma Derivative_n_imp_Diffble : forall n, 0 < n -> forall F F',
+ Derivative_n n I pI F F' -> Diffble I pI F.
 intros n H F F' H0.
 elim H0; intros incF H1.
 elim H1; intros incF' derivF.
@@ -1068,19 +1032,15 @@ split; auto.
 intros; apply deriv_n_imp_diffble with n F'; auto.
 Qed.
 
-Lemma le_imp_Diffble_n :
- forall m n : nat,
- m <= n -> forall F : PartIR, Diffble_n n I pI F -> Diffble_n m I pI F.
+Lemma le_imp_Diffble_n : forall m n, m <= n -> forall F,
+ Diffble_n n I pI F -> Diffble_n m I pI F.
 intros m n H F H0.
 elim H0; intros incF diffF.
 split; auto.
 intros; apply le_imp_Diffble_I with n; auto.
 Qed.
 
-Lemma Diffble_n_imp_le :
- forall n : nat,
- 0 < n ->
- forall F F' : PartIR,
+Lemma Diffble_n_imp_le : forall n, 0 < n -> forall F F',
  Diffble_n n I pI F -> Derivative I pI F F' -> Diffble_n (pred n) I pI F'.
 intros n H F F' H0 H1.
 elim H0; intros incF diffF.
@@ -1090,14 +1050,12 @@ split; auto.
 intros; apply Diffble_I_imp_le with F; auto.
 Qed.
 
-Lemma Diffble_n_imp_inc :
- forall (n : nat) (F : PartIR), Diffble_n n I pI F -> included I (Dom F).
+Lemma Diffble_n_imp_inc : forall n F, Diffble_n n I pI F -> included I (Dom F).
 intros n F H.
 inversion_clear H; auto.
 Qed.
 
-Lemma Derivative_n_imp_Diffble_n :
- forall (n : nat) (F F' : PartIR),
+Lemma Derivative_n_imp_Diffble_n : forall n F F',
  Derivative_n n I pI F F' -> Diffble_n n I pI F.
 intros n F F' H.
 elim H; intros incF H1.
@@ -1106,41 +1064,30 @@ split; auto.
 intros; apply deriv_n_imp_Diffble_I_n with F'; auto.
 Qed.
 
-Lemma Derivative_n_imp_inc :
- forall (n : nat) (F F' : PartIR),
- Derivative_n n I pI F F' -> included I (Dom F).
+Lemma Derivative_n_imp_inc : forall n F F', Derivative_n n I pI F F' -> included I (Dom F).
 intros n F F' H.
 inversion_clear H; auto.
 Qed.
 
-Lemma Derivative_n_imp_inc' :
- forall (n : nat) (F F' : PartIR),
- Derivative_n n I pI F F' -> included I (Dom F').
+Lemma Derivative_n_imp_inc' : forall n F F', Derivative_n n I pI F F' -> included I (Dom F').
 intros.
 inversion_clear X; inversion_clear X1; auto.
 Qed.
 
-Lemma included_imp_Derivative_n :
- forall n F F' a b Hab,
- Derivative_n n I pI F F' ->
- included (Compact (less_leEq _ _ _ Hab)) I ->
- Derivative_I_n (a:=a) (b:=b) Hab n F F'.
+Lemma included_imp_Derivative_n : forall n F F' a b Hab, Derivative_n n I pI F F' ->
+ included (Compact (less_leEq _ a b Hab)) I -> Derivative_I_n Hab n F F'.
 intros n F F' a b Hab H H0.
 elim H; intros incF H1.
 elim H1; auto.
 Qed.
 
-Lemma included_imp_Diffble_n :
- forall n F a b Hab,
- Diffble_n n I pI F ->
- included (Compact (less_leEq _ _ _ Hab)) I ->
- Diffble_I_n (a:=a) (b:=b) Hab n F.
+Lemma included_imp_Diffble_n : forall n F a b Hab, Diffble_n n I pI F ->
+ included (Compact (less_leEq _ a b Hab)) I -> Diffble_I_n Hab n F.
 intros.
 elim X; auto.
 Qed.
 
-Lemma Included_imp_Derivative_n :
- forall (n : nat) (J : interval) pJ (F F' : PartIR),
+Lemma Included_imp_Derivative_n : forall n (J : interval) pJ F F',
  included J I -> Derivative_n n I pI F F' -> Derivative_n n J pJ F F'.
 intros n J pJ F F' H H0.
 elim H0; clear H0; intros H1 H2.
@@ -1153,8 +1100,7 @@ intros; apply H3.
 Included.
 Qed.
 
-Lemma Included_imp_Diffble_n :
- forall (n : nat) (J : interval) pJ (F : PartIR),
+Lemma Included_imp_Diffble_n : forall n (J : interval) pJ F,
  included J I -> Diffble_n n I pI F -> Diffble_n n J pJ F.
 intros n J pJ F H H0.
 elim H0; clear H0; intros H1 H2.
@@ -1164,9 +1110,7 @@ intros; apply H2.
 Included.
 Qed.
 
-Lemma Derivative_n_plus :
- forall J pJ n m k F G H,
- Derivative_n m J pJ F G ->
+Lemma Derivative_n_plus : forall J pJ n m k F G H, Derivative_n m J pJ F G ->
  Derivative_n n J pJ G H -> k = m + n -> Derivative_n k J pJ F H.
 intros J pJ n m k F G H H0 H1 H2.
 elim H0; intros incF Hf.
@@ -1187,11 +1131,9 @@ Section More_Results.
 Some new results hold, too:
 *)
 
-Lemma N_Deriv_Feq :
- forall n F diffF a b Hab H
-   (incN : included (Compact (less_leEq _ _ _ Hab)) (Dom (N_Deriv n F diffF))),
- Feq (Compact (less_leEq _ _ _ Hab)) (N_Deriv n F diffF)
-   (n_deriv_I a b Hab n F H).
+Lemma N_Deriv_Feq : forall n F diffF a b Hab H
+ (incN : included (Compact (less_leEq _ _ _ Hab)) (Dom (N_Deriv n F diffF))),
+ Feq (Compact (less_leEq _ _ _ Hab)) (N_Deriv n F diffF) (n_deriv_I a b Hab n F H).
 intros.
 FEQ.
 apply n_deriv_inc.
@@ -1228,9 +1170,7 @@ apply iprop_compact_in_interval_inc1.
 Included.
 Qed.
 
-Lemma N_Deriv_lemma :
- forall (n : nat) (F : PartIR) (H : Diffble_n n I pI F),
- Derivative_n n I pI F (N_Deriv _ _ H).
+Lemma N_Deriv_lemma : forall n F H, Derivative_n n I pI F (N_Deriv n F H).
 intros.
 elim H; intros incF diffF.
 split; auto.
@@ -1243,11 +1183,9 @@ apply Feq_symmetric;
 apply n_deriv_lemma.
 Qed.
 
-Lemma N_Deriv_S :
- forall (n : nat) (F : PartIR) (H : Diffble_n n I pI F)
-   (H' : Diffble_n (S n) I pI F),
- Derivative I pI (N_Deriv _ _ H) (N_Deriv _ _ H').
-intros.
+Lemma N_Deriv_S : forall n F H HS,
+ Derivative I pI (N_Deriv n F H) (N_Deriv (S n) F HS).
+intros n F H H'.
 split; Included.
 split; Included.
 elim H; intros incF diffFn.
@@ -1264,10 +1202,8 @@ apply Feq_symmetric;
 apply n_Sn_deriv.
 Qed.
 
-Lemma N_Deriv_plus :
- forall (m n : nat) (F : PartIR) (H : Diffble_n n I pI F)
-   (H' : Diffble_n (m + n) I pI F),
- Derivative_n m I pI (N_Deriv _ _ H) (N_Deriv _ _ H').
+Lemma N_Deriv_plus : forall m n F H H',
+ Derivative_n m I pI (N_Deriv n F H) (N_Deriv (m + n) F H').
 intros.
 split; Included.
 split; Included.
@@ -1287,8 +1223,7 @@ Qed.
 Some useful characterization results.
 *)
 
-Lemma Derivative_n_O :
- forall F, included I (Dom F) -> Derivative_n 0 I pI F F.
+Lemma Derivative_n_O : forall F, included I (Dom F) -> Derivative_n 0 I pI F F.
 intros.
 split; Included.
 split; Included.
@@ -1296,9 +1231,7 @@ intros.
 red in |- *; apply Feq_reflexive; Included.
 Qed.
 
-Lemma Derivative_n_Sn :
- forall F n fn fSn,
- Derivative_n n I pI F fn ->
+Lemma Derivative_n_Sn : forall F n fn fSn, Derivative_n n I pI F fn ->
  Derivative_n (S n) I pI F fSn -> Derivative I pI fn fSn.
 intros F n fn fSn H H0.
 cut (Diffble_n n I pI F);
@@ -1347,8 +1280,7 @@ Section Corollaries.
 %\ldots%#...# for which the expected property also holds.
 *)
 
-Lemma Deriv_lemma :
- forall (F : PartIR) diffF, Derivative I pI F (Deriv F diffF).
+Lemma Deriv_lemma : forall F diffF, Derivative I pI F (Deriv F diffF).
 intros; unfold Deriv in |- *.
 apply
  Derivative_wdl
@@ -1365,8 +1297,7 @@ Qed.
 Some more interesting properties.
 *)
 
-Lemma Derivative_n_1 :
- forall F G, Derivative I pI F G -> Derivative_n 1 I pI F G.
+Lemma Derivative_n_1 : forall F G, Derivative I pI F G -> Derivative_n 1 I pI F G.
 intros F G H.
 cut (Diffble I pI F). intro H0.
 apply Derivative_n_wdr with (Deriv _ H0).
@@ -1377,11 +1308,8 @@ unfold Deriv in |- *; apply N_Deriv_lemma.
 apply Derivative_imp_Diffble with G; auto.
 Qed.
 
-Lemma Derivative_n_chain :
- forall F f,
- Feq I F (f 0) ->
- (forall n : nat, Derivative I pI (f n) (f (S n))) ->
- forall n : nat, Derivative_n n I pI F (f n).
+Lemma Derivative_n_chain : forall F f, Feq I F (f 0) ->
+ (forall n, Derivative I pI (f n) (f (S n))) -> forall n, Derivative_n n I pI F (f n).
 intros F f H H0 n.
 induction  n as [| n Hrecn].
 apply Derivative_n_wdr with F.
@@ -1393,8 +1321,8 @@ apply Derivative_n_1; auto.
 rewrite plus_comm; auto.
 Qed.
 
-Lemma Derivative_n_imp_Continuous :
- forall n F G, 0 < n -> Derivative_n n I pI F G -> Continuous I F.
+Lemma Derivative_n_imp_Continuous : forall n F G, 0 < n ->
+ Derivative_n n I pI F G -> Continuous I F.
 intros n F G H H0.
 cut (Diffble I pI F). intro H1.
 apply Derivative_imp_Continuous with pI (Deriv _ H1).
@@ -1403,8 +1331,8 @@ apply Diffble_n_imp_Diffble with n; auto.
 apply Derivative_n_imp_Diffble_n with G; auto.
 Qed.
 
-Lemma Derivative_n_imp_Continuous' :
- forall n F G, 0 < n -> Derivative_n n I pI F G -> Continuous I G.
+Lemma Derivative_n_imp_Continuous' : forall n F G, 0 < n ->
+ Derivative_n n I pI F G -> Continuous I G.
 intros n F G H H0.
 cut (Diffble_n (pred n) I pI F). intro H1.
 apply Derivative_imp_Continuous' with pI (N_Deriv _ _ H1).

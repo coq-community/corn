@@ -25,9 +25,9 @@ Defined.
 
 Lemma dprod0_strext :
  forall A B : CPsMetricSpace,
- bin_fun_strong_ext (ProdCSetoid A B) (ProdCSetoid A B) IR (dprod0 A B).
+ bin_fun_strext (ProdCSetoid A B) (ProdCSetoid A B) IR (dprod0 A B).
 intros A B.
-unfold bin_fun_strong_ext in |- *.
+unfold bin_fun_strext in |- *.
 intros x1 x2 y1 y2.
 unfold dprod0 in |- *.
 case x1.
@@ -36,7 +36,7 @@ case y1.
 case y2.
 do 8 intro. intro H.
 set
- (H1 := bin_op_strext IR csg_op (c5[-d]c1) (c3[-d]c) (c6[-d]c2) (c4[-d]c0) H)
+ (H1 := cs_bin_op_strext IR csg_op (c5[-d]c1) (c3[-d]c) (c6[-d]c2) (c4[-d]c0) H)
  in *.
 elim H1.
 intros.
@@ -88,7 +88,7 @@ unfold dprod0 in |- *.
 case x.
 case y.
 intros.
-apply (bin_op_wd IR csg_op).
+apply (cs_bin_op_wd IR csg_op).
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
 
@@ -103,7 +103,7 @@ unfold dprod0 in |- *.
 case x.
 case y.
 intros.
-AStepl (ZeroR[+]Zero).
+astepl (ZeroR[+]Zero).
 apply plus_resp_leEq_both.
 apply ax_d_nneg.
 apply CPsMetricSpace_is_CPsMetricSpace.
@@ -144,11 +144,11 @@ case x.
 case y.
 case z.
 intros.
-AStepr ((c3[-d]c1)[+]((c4[-d]c2)[+]((c1[-d]c)[+](c2[-d]c0)))).
-AStepr ((c3[-d]c1)[+]((c4[-d]c2)[+](c1[-d]c)[+](c2[-d]c0))).
-AStepr ((c3[-d]c1)[+]((c1[-d]c)[+](c4[-d]c2)[+](c2[-d]c0))).
-AStepr ((c3[-d]c1)[+]((c1[-d]c)[+]((c4[-d]c2)[+](c2[-d]c0)))).
-AStepr ((c3[-d]c1)[+](c1[-d]c)[+]((c4[-d]c2)[+](c2[-d]c0))).
+astepr ((c3[-d]c1)[+]((c4[-d]c2)[+]((c1[-d]c)[+](c2[-d]c0)))).
+astepr ((c3[-d]c1)[+]((c4[-d]c2)[+](c1[-d]c)[+](c2[-d]c0))).
+astepr ((c3[-d]c1)[+]((c1[-d]c)[+](c4[-d]c2)[+](c2[-d]c0))).
+astepr ((c3[-d]c1)[+]((c1[-d]c)[+]((c4[-d]c2)[+](c2[-d]c0)))).
+astepr ((c3[-d]c1)[+](c1[-d]c)[+]((c4[-d]c2)[+](c2[-d]c0))).
 apply plus_resp_leEq_both.
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
@@ -189,10 +189,10 @@ Definition restr_bin_fun' (X : CPsMetricSpace) (P : cms_crr X -> CProp)
 
 Implicit Arguments restr_bin_fun' [X].
 
-Lemma restr_bin_fun_strong_ext :
+Lemma restr_bin_fun_strext :
  forall (X : CPsMetricSpace) (P : cms_crr X -> CProp)
    (f : CSetoid_bin_fun X X IR),
- bin_fun_strong_ext (Build_SubCSetoid X P) (Build_SubCSetoid X P) IR
+ bin_fun_strext (Build_SubCSetoid X P) (Build_SubCSetoid X P) IR
    (restr_bin_fun P f).
 intros X P f.
 red in |- *.
@@ -209,7 +209,7 @@ Definition Build_SubCSetoid_bin_fun (X : CPsMetricSpace)
   (P : cms_crr X -> CProp) (f : CSetoid_bin_fun X X IR) :
   CSetoid_bin_fun (Build_SubCSetoid X P) (Build_SubCSetoid X P) IR :=
   Build_CSetoid_bin_fun (Build_SubCSetoid X P) (Build_SubCSetoid X P) IR
-    (restr_bin_fun P f) (restr_bin_fun_strong_ext X P f).
+    (restr_bin_fun P f) (restr_bin_fun_strext X P f).
 
 Definition dsub (X : CPsMetricSpace) (P : cms_crr X -> CProp) :=
   Build_SubCSetoid_bin_fun X P (cms_d (c:=X)).
@@ -311,9 +311,9 @@ Implicit Arguments dsub' [X].
 
 Lemma dsub'_strext :
  forall (X : CPsMetricSpace) (P : X -> CProp) (x : X),
- fun_strong_ext (dsub' P x).
+ fun_strext (dsub' P x).
 intros X P x.
-unfold fun_strong_ext in |- *.
+unfold fun_strext in |- *.
 intros x0 y.
 unfold dsub' in |- *.
 case y.
@@ -359,9 +359,9 @@ intro.
 apply leEq_transitive with (scs_elem0[-d]scs_elem).
 2: exact H0.
 unfold dIR in |- *.
-AStepl (AbsIR ((scs_elem0[-d]x)[-](scs_elem[-d]x))).
-AStepl (AbsIR ((x[-d]scs_elem0)[-](scs_elem[-d]x))).
-AStepl (AbsIR ((x[-d]scs_elem0)[-](x[-d]scs_elem))).
+astepl (AbsIR ((scs_elem0[-d]x)[-](scs_elem[-d]x))).
+astepl (AbsIR ((x[-d]scs_elem0)[-](scs_elem[-d]x))).
+astepl (AbsIR ((x[-d]scs_elem0)[-](x[-d]scs_elem))).
 apply AbsSmall_imp_AbsIR.
 apply rev_tri_ineq.
 

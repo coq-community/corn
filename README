@@ -13,10 +13,13 @@ available.
 Before installing C-CoRN, please check that you have:
  - Coq version 8.0 (a compiled source tree, not only a binary package)
  - the OCaml you used to compile Coq
- - Coqdoc (http://www.lri.fr/~filliatr/coqdoc/) version striclty higher
-   than 1.05 (if you want to generate the documentation)
  - at least 128MiB RAM memory available (and preferably more, especially if
    you plan to use the formalization of Real Analysis).
+ - GNU make version 3.80 or later
+ - a POSIX-compliant operating system. This means Unix, a clone
+   thereof or a good emulation layer on top of another OS. In
+   particular, *hard* links must be supported by the file system.
+ - the GNU Bourne Again SHell (we use some bashisms)
 
 In order for C-CoRN to work, you need to set some environment variables.
 We advise you to do this inside a .bash_profile or similar.
@@ -31,6 +34,7 @@ FILES
 Any distribution of C-CoRN should include the following files at root
 level:
  - Makefile
+ - Makefile.{realpath,common}
  - README
  - tree.ps.gz
 and the directories
@@ -49,7 +53,8 @@ of the following directories:
  - reals
  - transc
 
-If you obtained C-CoRN via CVS, you will also have a directory named devel/.
+If you obtained C-CoRN via CVS, you will also have a directory named
+devel/.
 
 Important note: if you plan to regularly update C-CoRN, you should
 keep any files you work on under devel/ or out of the CoRN tree
@@ -137,7 +142,7 @@ OTHERS
 ------
 
 More information can be found at the C-CoRN page,
-http://www.cs.kun.nl/fnds/ccorn.
+http://c-corn.cs.kun.nl/
 For any questions, comments, bug reports or other feel free to e-mail
 lcf@cs.kun.nl.
 

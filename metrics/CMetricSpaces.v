@@ -82,7 +82,7 @@ exact H1.
 apply ax_d_nneg.
 apply CPsMetricSpace_is_CPsMetricSpace.
 intro H1.
-AStepr ((c2[-d]c0)[+](c1[-d]c)).
+astepr ((c2[-d]c0)[+](c1[-d]c)).
 apply plus_resp_pos_nonneg.
 apply ax_d_apdiag_imp_grzero.
 exact H1.
@@ -191,7 +191,7 @@ unfold Csymmetric in |- *.
 intros x y.
 unfold metric_ap in |- *.
 intro H.
-AStepr (x[-d]y).
+astepr (x[-d]y).
 exact H.
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
@@ -260,9 +260,9 @@ Definition metric_d (X : CPsMetricSpace) (x y : Metric_CSetoid X) := x[-d]y.
 
 Lemma metric_d_strext :
  forall X : CPsMetricSpace,
- bin_fun_strong_ext (Metric_CSetoid X) (Metric_CSetoid X) IR (metric_d X).
+ bin_fun_strext (Metric_CSetoid X) (Metric_CSetoid X) IR (metric_d X).
 intro X.
-unfold bin_fun_strong_ext in |- *.
+unfold bin_fun_strext in |- *.
 intros x1 x2 y1 y2.
 simpl in |- *.
 unfold metric_d in |- *.
@@ -275,50 +275,50 @@ intros H1 H2.
 set (H4 := H1 H) in *.
 elim H4.
 intro H5.
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x1[-d]y1)[-](x1[-d]y1))).
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+](x1[-d]y1)[-](x1[-d]y1)).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x1[-d]y1)[-](x1[-d]y1))).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+](x1[-d]y1)[-](x1[-d]y1)).
 apply shift_less_minus.
-AStepl (x1[-d]y1).
+astepl (x1[-d]y1).
 apply less_leEq_trans with (x2[-d]y2).
 exact H5.
 apply leEq_transitive with ((x2[-d]x1)[+](x1[-d]y2)).
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
-AStepr ((x2[-d]x1)[+](y1[-d]y2)[+](x1[-d]y1)).
-AStepr ((x2[-d]x1)[+]((y1[-d]y2)[+](x1[-d]y1))).
+astepr ((x2[-d]x1)[+](y1[-d]y2)[+](x1[-d]y1)).
+astepr ((x2[-d]x1)[+]((y1[-d]y2)[+](x1[-d]y1))).
 apply plus_resp_leEq_lft.
-AStepr ((x1[-d]y1)[+](y1[-d]y2)).
+astepr ((x1[-d]y1)[+](y1[-d]y2)).
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
-AStepl ((y1[-d]y2)[+](x2[-d]x1)[+](x1[-d]y1)).
-AStepr ((y1[-d]y2)[+](x1[-d]x2)[+](x1[-d]y1)).
-AStepl ((y1[-d]y2)[+]((x2[-d]x1)[+](x1[-d]y1))).
-AStepr ((y1[-d]y2)[+]((x1[-d]x2)[+](x1[-d]y1))).
-AStepl ((y1[-d]y2)[+]((x1[-d]y1)[+](x2[-d]x1))).
-AStepr ((y1[-d]y2)[+]((x1[-d]y1)[+](x1[-d]x2))).
-AStepl ((y1[-d]y2)[+](x1[-d]y1)[+](x2[-d]x1)).
-AStepr ((y1[-d]y2)[+](x1[-d]y1)[+](x1[-d]x2)).
+astepl ((y1[-d]y2)[+](x2[-d]x1)[+](x1[-d]y1)).
+astepr ((y1[-d]y2)[+](x1[-d]x2)[+](x1[-d]y1)).
+astepl ((y1[-d]y2)[+]((x2[-d]x1)[+](x1[-d]y1))).
+astepr ((y1[-d]y2)[+]((x1[-d]x2)[+](x1[-d]y1))).
+astepl ((y1[-d]y2)[+]((x1[-d]y1)[+](x2[-d]x1))).
+astepr ((y1[-d]y2)[+]((x1[-d]y1)[+](x1[-d]x2))).
+astepl ((y1[-d]y2)[+](x1[-d]y1)[+](x2[-d]x1)).
+astepr ((y1[-d]y2)[+](x1[-d]y1)[+](x1[-d]x2)).
 apply plus_resp_eq.
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
 
 intro H5.
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x2[-d]y2)[-](x2[-d]y2))).
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+](x2[-d]y2)[-](x2[-d]y2)).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x2[-d]y2)[-](x2[-d]y2))).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+](x2[-d]y2)[-](x2[-d]y2)).
 apply shift_less_minus.
-AStepl (x2[-d]y2).
+astepl (x2[-d]y2).
 apply less_leEq_trans with (x1[-d]y1).
 exact H5.
 apply leEq_transitive with ((x1[-d]x2)[+](x2[-d]y1)).
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
-AStepr ((x1[-d]x2)[+](y1[-d]y2)[+](x2[-d]y2)).
-AStepr ((x1[-d]x2)[+]((y1[-d]y2)[+](x2[-d]y2))).
+astepr ((x1[-d]x2)[+](y1[-d]y2)[+](x2[-d]y2)).
+astepr ((x1[-d]x2)[+]((y1[-d]y2)[+](x2[-d]y2))).
 apply plus_resp_leEq_lft.
-AStepr ((x2[-d]y2)[+](y1[-d]y2)).
-AStepr ((x2[-d]y2)[+](y2[-d]y1)).
+astepr ((x2[-d]y2)[+](y1[-d]y2)).
+astepr ((x2[-d]y2)[+](y2[-d]y1)).
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
 apply plus_resp_eq.
@@ -435,9 +435,9 @@ simpl in |- *.
 exact x.
 Defined.
 
-Lemma emb_strext : forall X : CPsMetricSpace, fun_strong_ext (emb X).
+Lemma emb_strext : forall X : CPsMetricSpace, fun_strext (emb X).
 intro X.
-unfold fun_strong_ext in |- *.
+unfold fun_strext in |- *.
 unfold emb in |- *.
 simpl in |- *.
 unfold metric_ap in |- *.
@@ -635,12 +635,12 @@ intro H16.
 apply leEq_transitive with (a[-d]b).
 exact H16.
 
-AStepr ((seq (max x y)[-d]a)[+](seq (max x y)[-d]b)).
-AStepr ((a[-d]seq (max x y))[+](seq (max x y)[-d]b)).
+astepr ((seq (max x y)[-d]a)[+](seq (max x y)[-d]b)).
+astepr ((a[-d]seq (max x y))[+](seq (max x y)[-d]b)).
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
-AStepl ((seq (max x y)[-d]b)[+](a[-d]seq (max x y))).
-AStepr ((seq (max x y)[-d]b)[+](seq (max x y)[-d]a)).
+astepl ((seq (max x y)[-d]b)[+](a[-d]seq (max x y))).
+astepr ((seq (max x y)[-d]b)[+](seq (max x y)[-d]a)).
 apply plus_resp_eq.
 
 
@@ -659,10 +659,10 @@ intro H17.
 rewrite H17.
 apply eq_reflexive.
 
-AStepl ((Two:IR)[*]nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
-AStepl (nexp IR (S n) (One[/] Zero[+]One[+]One[//]H14)).
-AStepl ((One[/] Zero[+]One[+]One[//]H14)[^]S n).
-AStepl (One[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
+astepl ((Two:IR)[*]nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
+astepl (nexp IR (S n) (One[/] Zero[+]One[+]One[//]H14)).
+astepl ((One[/] Zero[+]One[+]One[//]H14)[^]S n).
+astepl (One[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
 apply
  leEq_transitive
   with
@@ -680,7 +680,7 @@ apply
 2: apply Hn'.
 apply recip_resp_leEq.
 apply nexp_resp_pos.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply pos_two.
 apply eq_imp_leEq.
 apply eq_reflexive_unfolded.
@@ -712,11 +712,11 @@ apply ap_imp_less.
 apply ap_symmetric_unfolded.
 exact H1.
 
-AStepl ((OneR[/] Zero[+]One[+]One[//]H14)[^]S n).
-AStepl
+astepl ((OneR[/] Zero[+]One[+]One[//]H14)[^]S n).
+astepl
  (OneR[^]S n[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
-AStepl (OneR[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
-AStepl
+astepl (OneR[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
+astepl
  ((OneR[+]One)[*]
   (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
 apply mult_cancel_lft with (OneR[/] Zero[+]One[+]One[//]H14).
@@ -725,51 +725,51 @@ apply ap_symmetric_unfolded.
 apply less_imp_ap.
 apply pos_one.
 
-AStepr
+astepr
  ((One[/] Zero[+]One[+]One[//]H14)[*](Zero[+]One[+]One)[*]
   (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
-AStepr
+astepr
  (OneR[*]
   (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
-AStepr
+astepr
  (OneR[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14).
-AStepr
+astepr
  (OneR[*]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
   mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
     (nexp_resp_ap_zero (S n) H14)).
-AStepr
+astepr
  (One[*]One[/] (Zero[+]One[+]One)[^]S (S n)[//]
   nexp_resp_ap_zero (S (S n)) H14).
 rational.
 
-AStepr
+astepr
  ((One[/] Zero[+]One[+]One[//]H14)[*]Two[*]
   nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
-AStepr
+astepr
  ((One[/] Zero[+]One[+]One[//]H14)[*](Zero[+]One[+]One)[*]
   nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
-apply mult_wd_rht.
+apply mult_wdr.
 
 3: apply plus_resp_less_both.
 3: exact H12.
 
 3: exact H13.
-AStepr ((One[/] Zero[+]One[+]One[//]H14)[^]S (S n)).
+astepr ((One[/] Zero[+]One[+]One[//]H14)[^]S (S n)).
 apply eq_symmetric_unfolded.
 apply nexp_distr_recip.
 
-AStepl
+astepl
  (One[+]One[/] (Zero[+]One[+]One)[^]S (S n)[//]
   nexp_resp_ap_zero (S (S n)) H14).
 2: rational.
-AStepl
+astepl
  (Zero[+]One[+]One[/] (Zero[+]One[+]One)[^]S (S n)[//]
   nexp_resp_ap_zero (S (S n)) H14).
-RStepr
+rstepr
  (Zero[+]One[+]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
   mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
     (nexp_resp_ap_zero (S n) H14)).
-AStepl
+astepl
  (Zero[+]One[+]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
   mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
     (nexp_resp_ap_zero (S n) H14)).

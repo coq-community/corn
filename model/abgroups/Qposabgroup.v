@@ -4,10 +4,8 @@
 Require Export Qposgroup.
 Require Import CAbGroups.
 
-(** *Example of an abelian group: <$\mathbb{Q}^{+}$ #Q<SUP>+</SUP>#,*>
-*)
-
-(** The positive rationals form with the multiplication a CAbgroup.
+(** **Example of an abelian group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
+The positive rationals form with the multiplication a CAbgroup.
 *)
 
 Definition Qpos_mult_is_CAbGroup : is_CAbGroup Qpos_as_CGroup.
@@ -21,5 +19,5 @@ intros x0 Hx y1 Hy.
 apply Qmult_sym.
 Qed.
 
-Definition Qpos_mult_as_CAbGroup :=
-  Build_CAbGroup Qpos_as_CGroup Qpos_mult_is_CAbGroup.
+Definition Qpos_mult_as_CAbGroup := Build_CAbGroup
+ Qpos_as_CGroup Qpos_mult_is_CAbGroup.

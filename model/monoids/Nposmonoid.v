@@ -3,10 +3,8 @@
 Require Export Npossemigroup.
 Require Import CMonoids.
 
-(** *Example of a monoid: <$\mathbb{N}^{+}$ #N<SUP>+</SUP>#,*>
-*)
-
-(** One is the right unit as well as the left unit of the multiplication on the
+(** **Example of a monoid: $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
+One is the right unit as well as the left unit of the multiplication on the
 positive natural numbers.
 *)
 
@@ -33,9 +31,8 @@ Qed.
 (** So, the positive natural numbers with multiplication form a CMonoid.
 *)
 
-Definition Nposmult_is_CMonoid :=
-  Build_is_CMonoid Nposmult_as_CSemiGroup ONEpos rhtunitNpos lftunitNpos.
+Definition Nposmult_is_CMonoid := Build_is_CMonoid
+ Nposmult_as_CSemiGroup ONEpos rhtunitNpos lftunitNpos.
 
-Definition Nposmult_as_CMonoid :=
-  Build_CMonoid Nposmult_as_CSemiGroup ONEpos Nposmult_is_CMonoid.
-
+Definition Nposmult_as_CMonoid := Build_CMonoid
+ Nposmult_as_CSemiGroup ONEpos Nposmult_is_CMonoid.

@@ -49,7 +49,7 @@ Defined.
 Lemma is_P :
  forall (P : IR -> CProp)
    (l : list (SubPsMetricSpace IR_as_CPsMetricSpace P)) 
-   (x : IR), pred_well_def IR P -> member x (list_IR P l) -> P x.
+   (x : IR), pred_wd IR P -> member x (list_IR P l) -> P x.
 intros P l x Q. 
 induction  l as [| a l Hrecl].
 simpl in |- *.
@@ -62,7 +62,7 @@ elim D.
 intro E.
 apply Hrecl.
 exact E.
-unfold pred_well_def in Q.
+unfold pred_wd in Q.
 intro H.
 apply Q with b.
 exact C.
@@ -145,9 +145,9 @@ Defined.
 
 Lemma Re_co_do_strext :
  forall (X Z : CSetoid) (f : CSetoid_fun X Z),
- fun_strong_ext (Re_co_do X Z f).
+ fun_strext (Re_co_do X Z f).
 intros X Z f.
-unfold fun_strong_ext in |- *.
+unfold fun_strext in |- *.
 intros x y.
 simpl in |- *.
 apply (csf_strext X Z f).
@@ -160,15 +160,15 @@ Definition re_co_do (X Z : CSetoid) (f : CSetoid_fun X Z) :
 
 Lemma re_co_do_well_def :
  forall (X Z : CSetoid) (f : CSetoid_fun X Z),
- pred_well_def Z (fun y : Z => {x : X | f x[=]y}).
+ pred_wd Z (fun y : Z => {x : X | f x[=]y}).
 intros X Z f.
-unfold pred_well_def in |- *.
+unfold pred_wd in |- *.
 intros x y.
 intros H0 H1.
 elim H0.
 intros x0 H3.
 exists x0.
-AStepr x.
+astepr x.
 exact H3.
 Qed.
 
@@ -242,7 +242,7 @@ intros m H7 H8.
 exists (re_co_do X Z f m).
 
 2: simpl in |- *.
-2: AStepl (f k[-d]f m).
+2: astepl (f k[-d]f m).
 2: apply H3.
 2: exact H8.
 
@@ -252,7 +252,7 @@ Qed.
 
 Lemma MStotallybounded_totallybounded :
  forall (P : IR -> CProp) (H0 : {x : IR | P x}),
- pred_well_def IR P ->
+ pred_wd IR P ->
  MStotally_bounded (SubPsMetricSpace (X:=IR_as_CPsMetricSpace) P) ->
  totally_bounded P.
 intros P H0 Q.
@@ -308,7 +308,7 @@ exact H1.
 exact H4.
 
 simpl in |- *.
-AStepl (nring (R:=IR) m[+]Zero).
+astepl (nring (R:=IR) m[+]Zero).
 apply plus_resp_less_lft.
 apply pos_one.
 
@@ -323,12 +323,12 @@ exact H4.
 unfold Snring in |- *.
 simpl in |- *.
 apply less_leEq.
-AStepl (nring (R:=IR) m[+]Zero).
+astepl (nring (R:=IR) m[+]Zero).
 apply plus_resp_less_lft.
 apply pos_one.
 
 apply inv_cancel_leEq.
-AStepr (one_div_succ (R:=IR) m).
+astepr (one_div_succ (R:=IR) m).
 apply leEq_transitive with (AbsIR (x[-]scs_elem)).
 apply inv_leEq_AbsIR.
 unfold AbsIR in |- *.
@@ -365,7 +365,7 @@ exact H1.
 exact H4.
 
 simpl in |- *.
-AStepl (nring (R:=IR) m[+]Zero).
+astepl (nring (R:=IR) m[+]Zero).
 apply plus_resp_less_lft.
 apply pos_one.
 
@@ -380,7 +380,7 @@ exact H4.
 unfold Snring in |- *.
 simpl in |- *.
 apply less_leEq.
-AStepl (nring (R:=IR) m[+]Zero).
+astepl (nring (R:=IR) m[+]Zero).
 apply plus_resp_less_lft.
 apply pos_one.
 Qed.
@@ -489,7 +489,7 @@ apply a.
 elim H3.
 intros.
 exists x2.
-AStepl (x[-d]from_SubPsMetricSpace X P x2).
+astepl (x[-d]from_SubPsMetricSpace X P x2).
 exact p.
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
@@ -505,7 +505,7 @@ exists x1.
 elim p.
 intros.
 exists x2.
-AStepl (from_SubPsMetricSpace X P x2[-d]x).
+astepl (from_SubPsMetricSpace X P x2[-d]x).
 exact p0.
 
 apply ax_d_com.
@@ -611,7 +611,7 @@ unfold set_glb_IR in |- *.
 apply H3.
 
 apply shift_leEq_plus'.
-AStepl (x1[-]x0).
+astepl (x1[-]x0).
 apply less_leEq.
 apply H7.
 
@@ -670,7 +670,7 @@ intros.
 simpl in |- *.
 apply ax_d_tri_ineq.
 apply CPsMetricSpace_is_CPsMetricSpace.
-AStepr
+astepr
  (one_div_succ (R:=IR) (n + (n + (n + 0)) + 2)[+]
   (one_div_succ (n + (n + (n + 0)) + 2)[+]
    one_div_succ (n + (n + (n + 0)) + 2))).
@@ -679,7 +679,7 @@ apply H4.
 apply leEq_transitive with (x2[+]one_div_succ (n + (n + (n + 0)) + 2)).
 apply leEq_transitive with (xj[-d]from_SubPsMetricSpace X P x0).
 apply eq_imp_leEq.
-apply csetoid_bin_fun_wd_unfolded.
+apply csbf_wd_unfolded.
 intuition.
 
 intuition.
@@ -699,52 +699,52 @@ apply CPsMetricSpace_is_CPsMetricSpace.
 
 apply H3.
 
-AStepr (One[*]one_div_succ (R:=IR) n).
-AStepr (((Three:IR)[/] Three:IR[//]three_ap_zero IR)[*]one_div_succ n).
-AStepl
+astepr (One[*]one_div_succ (R:=IR) n).
+astepr (((Three:IR)[/] Three:IR[//]three_ap_zero IR)[*]one_div_succ n).
+astepl
  (one_div_succ (n + (n + (n + 0)) + 2)[+]
   (Two:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
-AStepl
+astepl
  (OneR[*]one_div_succ (n + (n + (n + 0)) + 2)[+]
   (Two:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
-AStepl ((OneR[+]Two)[*]one_div_succ (n + (n + (n + 0)) + 2)).
-AStepl ((Three:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
-2: apply mult_wd_lft.
+astepl ((OneR[+]Two)[*]one_div_succ (n + (n + (n + 0)) + 2)).
+astepl ((Three:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
+2: apply mult_wdl.
 2: rational.
-AStepr ((Three:IR)[*](One[/] Three[//]three_ap_zero IR)[*]one_div_succ n).
-AStepr ((Three:IR)[*]((One[/] Three[//]three_ap_zero IR)[*]one_div_succ n)).
-apply mult_wd_rht.
+astepr ((Three:IR)[*](One[/] Three[//]three_ap_zero IR)[*]one_div_succ n).
+astepr ((Three:IR)[*]((One[/] Three[//]three_ap_zero IR)[*]one_div_succ n)).
+apply mult_wdr.
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
 simpl in |- *.
-AStepr
+astepr
  (OneR[/] (Three:IR)[*](nring n[+]One)[//]
   mult_resp_ap_zero IR Three (nring n[+]One) (three_ap_zero IR)
     (nringS_ap_zero IR n)).
 apply eq_div.
-apply mult_wd_rht.
-AStepl (Three[*]nring (R:=IR) n[+]Three[*]One).
+apply mult_wdr.
+astepl (Three[*]nring (R:=IR) n[+]Three[*]One).
 simpl in |- *.
-AStepr (nring (R:=IR) (n + (n + (n + 0)))[+]Two[+]One).
+astepr (nring (R:=IR) (n + (n + (n + 0)))[+]Two[+]One).
 
 
-AStepr (nring (R:=IR) n[+]nring (n + (n + 0))[+]Two[+]One).
-AStepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
+astepr (nring (R:=IR) n[+]nring (n + (n + 0))[+]Two[+]One).
+astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
 
-3: apply mult_wd_lft.
+3: apply mult_wdl.
 3: rational.
 
 2: simpl in |- *.
 2: rational.
 
-AStepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
-AStepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+](Two[+]One)).
-AStepl ((ZeroR[+]One[+]One[+]One)[*]nring n[+](Zero[+]One[+]One[+]One)).
+astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
+astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+](Two[+]One)).
+astepl ((ZeroR[+]One[+]One[+]One)[*]nring n[+](Zero[+]One[+]One[+]One)).
 simpl in |- *.
-AStepl (ZeroR[+]One[+]One[+]One[+](Zero[+]One[+]One[+]One)[*]nring n).
-AStepr (ZeroR[+]One[+]One[+]One[+](nring n[+](nring n[+]nring (n + 0)))).
+astepl (ZeroR[+]One[+]One[+]One[+](Zero[+]One[+]One[+]One)[*]nring n).
+astepr (ZeroR[+]One[+]One[+]One[+](nring n[+](nring n[+]nring (n + 0)))).
 apply plus_resp_eq.
-AStepr (nring (R:=IR) n[+](nring n[+](nring n[+]nring 0))).
+astepr (nring (R:=IR) n[+](nring n[+](nring n[+]nring 0))).
 simpl in |- *.
 rational.
 Qed.

@@ -9,20 +9,24 @@ Require Export CFields.
 
 Obsolete but maintained.
 *)
+
+(* begin hide *)
 Set Implicit Arguments.
 Unset Strict Implicit.
+(* end hide *)
+
 Record VSpace (F : CField) : Type := 
-  {vs_vs :> CGroup;
-   vs_op : CSetoid_outer_op F vs_vs;
-   vs_assoc :
-    forall (a b : F) (v : vs_vs), vs_op (a[*]b) v[=]vs_op a (vs_op b v);
-   vs_unit : forall v : vs_vs, vs_op One v[=]v;
-   vs_distl :
-    forall (a b : F) (v : vs_vs), vs_op (a[+]b) v[=]vs_op a v[+]vs_op b v;
-   vs_distr :
-    forall (a : F) (v u : vs_vs), vs_op a (v[+]u)[=]vs_op a v[+]vs_op a u}.
+  {vs_vs    :> CGroup;
+   vs_op    : CSetoid_outer_op F vs_vs;
+   vs_assoc : forall a b v, vs_op (a[*]b) v [=] vs_op a (vs_op b v);
+   vs_unit  : forall v, vs_op One v [=] v;
+   vs_distl : forall a b v, vs_op (a[+]b) v [=] vs_op a v[+]vs_op b v;
+   vs_distr : forall a v u, vs_op a (v[+]u) [=] vs_op a v[+]vs_op a u}.
+
+(* begin hide *)
 Set Strict Implicit.
 Unset Implicit Arguments.
+(* end hide *)
 
 Hint Resolve vs_assoc vs_unit vs_distl vs_distr: algebra.
 
@@ -39,88 +43,84 @@ Section VS_basics.
 Variable F : CField.
 Variable V : VSpace F.
 
-Lemma vs_op_zero : forall a : F, a['](Zero:V)[=]Zero.
+Lemma vs_op_zero : forall a : F, a['] (Zero:V) [=] Zero.
 intros.
-apply cg_cancel_lft with (a['](Zero:V)).
-AStepl (a[']((Zero:V)[+]Zero)).
-Step_final (a['](Zero:V)).
+apply cg_cancel_lft with (a['] (Zero:V)).
+astepl (a['] ((Zero:V) [+]Zero)).
+Step_final (a['] (Zero:V)).
 Qed.
 
-Lemma zero_vs_op : forall v : V, Zero[']v[=]Zero.
+Lemma zero_vs_op : forall v : V, Zero[']v [=] Zero.
 intros.
 apply cg_cancel_lft with (Zero[']v).
-AStepl ((Zero[+]Zero)[']v).
+astepl ((Zero[+]Zero) [']v).
 Step_final (Zero[']v).
 Qed.
 
 Hint Resolve vs_op_zero zero_vs_op: algebra.
 
-Lemma vs_op_inv_V : forall (x : F) (y : V), x['][--]y[=][--](x[']y).
+Lemma vs_op_inv_V : forall (x : F) (y : V), x['][--]y [=] [--] (x[']y).
 intros.
 apply cg_inv_unique.
-AStepl (x['](y[+][--]y)).
-Step_final (x['](Zero:V)).
+astepl (x['] (y[+][--]y)).
+Step_final (x['] (Zero:V)).
 Qed.
 
-Lemma vs_op_inv_S : forall (x : F) (y : V), [--]x[']y[=][--](x[']y).
+Lemma vs_op_inv_S : forall (x : F) (y : V), [--]x[']y [=] [--] (x[']y).
 intros.
 apply cg_inv_unique.
-AStepl ((x[+][--]x)[']y).
+astepl ((x[+][--]x) [']y).
 Step_final (Zero[']y).
 Qed.
 
 Hint Resolve vs_op_inv_V vs_op_inv_S: algebra.
 
-Lemma vs_inv_assoc :
- forall (a : F) (nz : a[#]Zero) (v : V), v[=]f_rcpcl a nz['](a[']v).
+Lemma vs_inv_assoc : forall (a : F) a_ (v : V), v [=] f_rcpcl a a_['] (a[']v).
 intros.
-AStepl (One[']v).
-Step_final ((f_rcpcl a nz[*]a)[']v).
+astepl (One[']v).
+Step_final ((f_rcpcl a a_[*]a) [']v).
 Qed.
 Hint Resolve vs_inv_assoc: algebra.
 
 
-Lemma ap_zero_vs_op_l : forall (a : F) (v : V), a[']v[#]Zero -> a[#]Zero.
+Lemma ap_zero_vs_op_l : forall (a : F) (v : V), a[']v [#] Zero -> a [#] Zero.
 intros.
 elim (csoo_strext _ _ (vs_op (F:=F) (v:=V)) a Zero v v).
 auto.
 intro contra; elim (ap_irreflexive _ _ contra).
-AStepr (Zero:V). auto.
+astepr (Zero:V). auto.
 Qed.
 
-Lemma ap_zero_vs_op_r : forall (a : F) (v : V), a[']v[#]Zero -> v[#]Zero.
+Lemma ap_zero_vs_op_r : forall (a : F) (v : V), a[']v [#] Zero -> v [#] Zero.
 intros.
 elim (csoo_strext _ _ (vs_op (F:=F) (v:=V)) a a v Zero).
 intro contra; elim (ap_irreflexive _ _ contra).
 auto.
-AStepr (Zero:V). auto.
+astepr (Zero:V). auto.
 Qed.
 
 (* note this is the same proof as mult_resp_ap_zero *)
-Lemma vs_op_resp_ap_rht :
- forall (a : F) (v u : V), a[#]Zero -> v[#]u -> a[']v[#]a[']u.
+Lemma vs_op_resp_ap_rht : forall (a : F) (v u : V), a [#] Zero -> v [#] u -> a[']v [#] a[']u.
 intros.
-cut (f_rcpcl a X['](a[']v)[#]f_rcpcl a X['](a[']u)).
+cut (f_rcpcl a X['] (a[']v) [#] f_rcpcl a X['] (a[']u)).
 intros H1.
 case (csoo_strext _ _ _ _ _ _ _ H1).
 intro contra; elim (ap_irreflexive _ _ contra).
 auto.
-AStepr u.
-AStepl v. auto.
+astepr u.
+astepl v. auto.
 Qed.
 
-Lemma vs_op_resp_ap_zero :
- forall (a : F) (v : V), a[#]Zero -> v[#]Zero -> a[']v[#]Zero.
+Lemma vs_op_resp_ap_zero : forall (a : F) (v : V), a [#] Zero -> v [#] Zero -> a[']v [#] Zero.
 intros.
-AStepr (a['](Zero:V)).
+astepr (a['] (Zero:V)).
 apply vs_op_resp_ap_rht; assumption.
 Qed.
 
-Lemma vs_op_resp_ap_lft :
- forall (a b : F) (v : V), a[#]b -> v[#]Zero -> a[']v[#]b[']v.
+Lemma vs_op_resp_ap_lft : forall (a b : F) (v : V), a [#] b -> v [#] Zero -> a[']v [#] b[']v.
 intros.
 apply zero_minus_apart.
-AStepl ((a[-]b)[']v).
+astepl ((a[-]b) [']v).
 apply vs_op_resp_ap_zero; [ idtac | assumption ].
 apply minus_ap_zero; assumption.
 unfold cg_minus in |- *. Step_final (a[']v[+][--]b[']v).

@@ -87,14 +87,14 @@ split.
 exists 0.
 intros x y.
 simpl in |- *.
-AStepr (OneR[*](x[-d]y)).
-AStepr (x[-d]y).
+astepr (OneR[*](x[-d]y)).
+astepr (x[-d]y).
 apply leEq_reflexive.
 exists 0.
 intros x y.
 simpl in |- *.
-AStepr (OneR[*](x[-d]y)).
-AStepr (x[-d]y).
+astepr (OneR[*](x[-d]y)).
+astepr (x[-d]y).
 apply leEq_reflexive.
 Qed.
 
@@ -155,7 +155,7 @@ simpl in |- *.
 intros H2 x y H3.
 set (H5 := csf_strext X Y f) in *.
 generalize H5.
-unfold fun_strong_ext in |- *.
+unfold fun_strext in |- *.
 intro H6.
 apply H6.
 auto.
@@ -195,21 +195,21 @@ apply H0110'.
 apply
  leEq_transitive
   with ((nring n[+]One)[*](nring m[+]One)[*](g (f x)[-d]g (f y))).
-AStepr ((nring n[+]One)[*]((nring m[+]One)[*](g (f x)[-d]g (f y)))).
+astepr ((nring n[+]One)[*]((nring m[+]One)[*](g (f x)[-d]g (f y)))).
 apply mult_resp_leEq_lft.
 apply H1110'.
 apply less_leEq.
-AStepr (nring (R:=IR) (S n)).
+astepr (nring (R:=IR) (S n)).
 apply pos_nring_S.
 apply mult_resp_leEq_rht.
 apply leEq_transitive with (nring (R:=IR) (S m * S n)).
 apply eq_imp_leEq.
-AStepl (nring (R:=IR) (S n)[*](nring m[+]One)).
-AStepl (nring (R:=IR) (S n)[*]nring (S m)).
-AStepl (nring (R:=IR) (S m)[*]nring (S n)).
-AStepl (nring (R:=IR) (S m * S n)).
+astepl (nring (R:=IR) (S n)[*](nring m[+]One)).
+astepl (nring (R:=IR) (S n)[*]nring (S m)).
+astepl (nring (R:=IR) (S m)[*]nring (S n)).
+astepl (nring (R:=IR) (S m * S n)).
 apply eq_reflexive.
-AStepr (nring (R:=IR) (S (S m * S n))).
+astepr (nring (R:=IR) (S (S m * S n))).
 apply less_leEq.
 apply nring_less_succ.
 
@@ -238,7 +238,7 @@ intros x y.
 apply leEq_transitive with (nring (R:=IR) (S m)[*](f x[-d]f y)).
 apply H1111'.
 apply leEq_transitive with (nring (S m)[*]nring (S n)[*](x[-d]y)).
-AStepr (nring (S m)[*](nring (S n)[*](x[-d]y))).
+astepr (nring (S m)[*](nring (S n)[*](x[-d]y))).
 apply mult_resp_leEq_lft.
 apply H0111'.
 apply less_leEq.
@@ -246,9 +246,9 @@ apply pos_nring_S.
 apply mult_resp_leEq_rht.
 apply leEq_transitive with (nring (R:=IR) (S m * S n)).
 apply eq_imp_leEq.
-AStepl (nring (R:=IR) (S m * S n)).
+astepl (nring (R:=IR) (S m * S n)).
 apply eq_reflexive.
-AStepr (nring (R:=IR) (S (S m * S n))).
+astepr (nring (R:=IR) (S (S m * S n))).
 apply less_leEq.
 apply nring_less_succ.
 
@@ -306,7 +306,7 @@ set
           (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 b2)))))
  in *.
 generalize H5.
-unfold fun_strong_ext in |- *.
+unfold fun_strext in |- *.
 intros H4.
 apply H4.
 set (H8 := ax_d_pos_imp_ap) in *.
@@ -341,18 +341,18 @@ elim (b3 y0).
 intros x0 b4.
 elim (b3 y1).
 intros x1 b5.
-AStepl (f x0[-d]y1).
-AStepl (f x0[-d]f x1).
+astepl (f x0[-d]y1).
+astepl (f x0[-d]f x1).
 apply leEq_transitive with (nring (S m)[*](x0[-d]x1)).
 simpl in |- *.
 apply P.
 simpl in |- *.
 apply eq_imp_leEq.
-apply mult_wd_rht.
+apply mult_wdr.
 set (H4 := csbf_wd) in *.
 set (H5 := H4 X X IR (cms_d (c:=X))) in *.
 generalize H5.
-unfold bin_fun_well_def in |- *.
+unfold bin_fun_wd in |- *.
 intro H6.
 apply H6.
 cut
@@ -375,7 +375,7 @@ cut
                     forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y))
                    m P))))) y0).
 intros.
-AStepr
+astepr
  (invfun f
     (isopsmetry_imp_bij X Y f
        (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
@@ -402,7 +402,7 @@ set
                        f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P)))))))
  in *.
 generalize H7.
-unfold fun_well_def in |- *.
+unfold fun_wd in |- *.
 unfold Inv in |- *.
 simpl in |- *.
 intro H8.
@@ -429,7 +429,7 @@ cut
                     forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y))
                    m P))))) y1).
 intros.
-AStepr
+astepr
  (invfun f
     (isopsmetry_imp_bij X Y f
        (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
@@ -456,7 +456,7 @@ set
                        f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P)))))))
  in *.
 generalize H7.
-unfold fun_well_def in |- *.
+unfold fun_wd in |- *.
 unfold Inv in |- *.
 simpl in |- *.
 intro H8.
@@ -475,14 +475,14 @@ elim (b3 y0).
 intros x0 b4.
 elim (b3 y1).
 intros x1 b5.
-AStepr ((nring m[+]One)[*](f x0[-d]f x1)).
+astepr ((nring m[+]One)[*](f x0[-d]f x1)).
 apply leEq_transitive with (x0[-d]x1).
 2: apply P.
 apply eq_imp_leEq.
 set (H4 := csbf_wd) in *.
 set (H5 := H4 X X IR (cms_d (c:=X))) in *.
 generalize H5.
-unfold bin_fun_well_def in |- *.
+unfold bin_fun_wd in |- *.
 intro H6.
 apply H6.
 cut
@@ -505,7 +505,7 @@ cut
                     forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y))
                    m P) b2)))) (f x0)).
 intros.
-AStepl
+astepl
  (invfun f
     (isopsmetry_imp_bij X Y f
        (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
@@ -531,7 +531,7 @@ set
                        x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2))))))
  in *.
 generalize H7.
-unfold fun_well_def in |- *.
+unfold fun_wd in |- *.
 unfold Inv in |- *.
 simpl in |- *.
 intro H8.
@@ -559,7 +559,7 @@ cut
                     forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y))
                    m P) b2)))) (f x1)).
 intros.
-AStepl
+astepl
  (invfun f
     (isopsmetry_imp_bij X Y f
        (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
@@ -585,7 +585,7 @@ set
                        x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2))))))
  in *.
 generalize H7.
-unfold fun_well_def in |- *.
+unfold fun_wd in |- *.
 unfold Inv in |- *.
 simpl in |- *.
 intro H8.
@@ -628,18 +628,18 @@ intro H8.
 set (H9 := H8 (pos_one IR)) in *.
 exact H9.
 
-AStepr ((nring (R:=IR) n[+]One)[*]Zero).
-AStepl (ABSIR (One[-]Zero)).
+astepr ((nring (R:=IR) n[+]One)[*]Zero).
+astepl (ABSIR (One[-]Zero)).
 apply H7.
 
 unfold ABSIR in |- *.
-AStepl (Max [--](One[-]Zero) (One[-]Zero)).
-AStepl (Max [--](One[-]Zero) One).
+astepl (Max [--](One[-]Zero) (One[-]Zero)).
+astepl (Max [--](One[-]Zero) One).
 apply leEq_imp_Max_is_rht.
-AStepl ([--]OneR).
-AStepl (ZeroR[-]One).
+astepl ([--]OneR).
+astepl (ZeroR[-]One).
 apply shift_minus_leEq.
-AStepr (Two:IR).
+astepr (Two:IR).
 apply less_leEq.
 apply pos_two.
 

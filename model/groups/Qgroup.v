@@ -3,10 +3,8 @@
 Require Export Qmonoid.
 Require Import CGroups.
 
-(** *Example of a group: <Q,+>
-*) 
-
-(** The rational numbers with addition form a group. The inverse function is taking the opposite.
+(** **Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
+The rational numbers with addition form a group. The inverse function is taking the opposite.
 *)
 
 Lemma Q_is_CGroup : is_CGroup Q_as_CMonoid Qopp_is_fun.

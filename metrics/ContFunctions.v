@@ -67,10 +67,10 @@ simpl in |- *.
 Algebra.
 
 intros n H.
-AStepr (nring (R:=IR) (power n 2 * 2)).
-AStepr (nring (R:=IR) (power n 2)[*]Two).
-AStepl (nexp IR n Two[*]Two).
-apply mult_wd_lft.
+astepr (nring (R:=IR) (power n 2 * 2)).
+astepr (nring (R:=IR) (power n 2)[*]Two).
+astepl (nexp IR n Two[*]Two).
+apply mult_wdl.
 exact H.
 
 Qed. 
@@ -97,8 +97,8 @@ apply leEq_less_trans with (one_div_succ (R:=IR) (power p 2)).
 exact H3.
 
 unfold one_div_succ in |- *.
-AStepr (OneR[^]p[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H1).
-AStepr (OneR[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H1).
+astepr (OneR[^]p[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H1).
+astepr (OneR[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H1).
 apply recip_resp_less.
 apply nexp_resp_pos.
 apply pos_two.
@@ -108,8 +108,8 @@ apply less_wdr with (nexp IR p Two[+]One).
 apply shift_less_plus.
 apply minusOne_less.
 
-AStepl (OneR[+]nexp IR p Two).
-AStepr (OneR[+]nring (power p 2)).
+astepl (OneR[+]nexp IR p Two).
+astepr (OneR[+]nring (power p 2)).
 apply plus_resp_eq.
 
 
@@ -118,8 +118,8 @@ apply nexp_power.
 simpl in |- *.
 Algebra.
 apply less_leEq.
-AStepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).
-AStepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).
+astepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).
+astepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
 apply bin_less_un.
@@ -144,8 +144,8 @@ apply less_transitive_unfolded with ((One[/] Two:IR[//]H0)[^]S p).
 exact H2.
 
 unfold one_div_succ in |- *.
-AStepl (OneR[^]S p[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
-AStepl (OneR[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
+astepl (OneR[^]S p[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
+astepl (OneR[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
 apply recip_resp_less.
 unfold Snring in |- *.
 apply nring_pos.
@@ -154,13 +154,13 @@ intuition.
 apply nat_less_bin_nexp.
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-AStepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
-AStepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
 apply recip_resp_less.
 apply nexp_resp_pos.
 apply pos_two.
-AStepr (nring (R:=IR) (power n 2)[+]One).
-AStepl (nexp IR n Two[+]Zero).
+astepr (nring (R:=IR) (power n 2)[+]One).
+astepl (nexp IR n Two[+]Zero).
 apply plus_resp_leEq_less.
 apply eq_imp_leEq.
 apply nexp_power.
@@ -189,13 +189,13 @@ exact H2.
 
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-AStepr (OneR[^]p[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H0).
-AStepr (OneR[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H0).
+astepr (OneR[^]p[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H0).
+astepr (OneR[/] (Two:IR)[^]p[//]nexp_resp_ap_zero p H0).
 apply recip_resp_less.
 apply nexp_resp_pos.
 apply pos_two.
-AStepr (nring (R:=IR) (power p 2)[+]One).
-AStepl (nexp IR p Two[+]Zero).
+astepr (nring (R:=IR) (power p 2)[+]One).
+astepl (nexp IR p Two[+]Zero).
 apply plus_resp_leEq_less.
 apply eq_imp_leEq.
 apply nexp_power.
@@ -204,8 +204,8 @@ apply pos_one.
 
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-AStepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H0).
-AStepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H0).
+astepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H0).
+astepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H0).
 apply bin_less_un.
 Qed.
 
@@ -229,20 +229,20 @@ exact H2.
 
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-AStepl (OneR[^]S p[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
-AStepl (OneR[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
+astepl (OneR[^]S p[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
+astepl (OneR[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
 apply bin_less_un.
 
 unfold one_div_succ in |- *.
-AStepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
-AStepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
 apply recip_resp_less.
 apply nexp_resp_pos.
 apply pos_two.
 
 unfold Snring in |- *.
-AStepr (nring (R:=IR) (power n 2)[+]One).
-AStepl (nexp IR n Two[+]Zero).
+astepr (nring (R:=IR) (power n 2)[+]One).
+astepl (nexp IR n Two[+]Zero).
 apply plus_resp_leEq_less.
 apply eq_imp_leEq.
 apply nexp_power.
@@ -308,7 +308,7 @@ apply less_leEq.
 apply pos_one.
 
 intro n.
-AStepl (Snring IR n).
+astepl (Snring IR n).
 apply less_leEq.
 apply nat_less_bin_nexp.
 
@@ -360,13 +360,13 @@ apply less_wdr with ((One[/] Two:IR[//]H0)[^](n + x)).
 apply less_wdl with (x0[-d]y).
 exact H1.
 
-AStepr (Two[^]x[*](x0[-d]y)[*](One[^]x[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
-AStepr (Two[^]x[*](x0[-d]y)[*](One[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
+astepr (Two[^]x[*](x0[-d]y)[*](One[^]x[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
+astepr (Two[^]x[*](x0[-d]y)[*](One[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
 
 rational.
 
 apply eq_symmetric_unfolded.
-AStepr ((One[/] Two:IR[//]H0)[^](n + x)).
+astepr ((One[/] Two:IR[//]H0)[^](n + x)).
 apply nexp_plus.
 
 Qed.
@@ -387,8 +387,8 @@ red in |- *.
 simpl in |- *.
 exists 0.
 intros x y.
-AStepr (OneR[*](x[-d]y)).
-AStepr (x[-d]y).
+astepr (OneR[*](x[-d]y)).
+astepr (x[-d]y).
 apply leEq_reflexive.
 Qed.
 
@@ -426,8 +426,8 @@ intro b.
 red in |- *.
 exists 1.
 intros.
-AStepr (Two[^]1[*](x[-d]y)).
-AStepr (Two[*](x[-d]y)).
+astepr (Two[^]1[*](x[-d]y)).
+astepr (Two[*](x[-d]y)).
 unfold Const_CSetoid_fun in |- *.
 unfold leEq in |- *.
 red in |- *.
@@ -436,11 +436,11 @@ intros H.
 apply (ap_irreflexive_unfolded B b).
 apply (ax_d_pos_imp_ap B (cms_d (c:=B)) (CPsMetricSpace_is_CPsMetricSpace B)).
 apply leEq_less_trans with ((Zero[+]One[+]One)[*](x[-d]y)).
-AStepr ((Two:IR)[*](x[-d]y)).
+astepr ((Two:IR)[*](x[-d]y)).
 apply shift_leEq_mult' with (two_ap_zero IR).
 apply pos_two.
 
-AStepl ZeroR.
+astepl ZeroR.
 apply ax_d_nneg.
 apply CPsMetricSpace_is_CPsMetricSpace.
 
@@ -495,11 +495,11 @@ intros x1 y.
 apply leEq_transitive with ((Two:IR)[^]x0[*](f x1[-d]f y)).
 apply H2.
 
-AStepr (Two[^](x + x0)[*](x1[-d]y)).
+astepr (Two[^](x + x0)[*](x1[-d]y)).
 
-AStepr (Two[^]x[*]Two[^]x0[*](x1[-d]y)).
-AStepr (Two[^]x0[*]Two[^]x[*](x1[-d]y)).
-RStepr (Two[^]x0[*](Two[^]x[*](x1[-d]y))).
+astepr (Two[^]x[*]Two[^]x0[*](x1[-d]y)).
+astepr (Two[^]x0[*]Two[^]x[*](x1[-d]y)).
+rstepr (Two[^]x0[*](Two[^]x[*](x1[-d]y))).
 apply mult_resp_leEq_lft.
 apply H1.
 
@@ -588,8 +588,8 @@ exact H4.
 
 unfold one_div_succ in |- *.
 unfold Snring in |- *.
-AStepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H2).
-AStepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H2).
+astepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H2).
+astepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H2).
 apply bin_less_un.
 Qed.
 
@@ -610,8 +610,8 @@ apply H1.
 exact H2.
 
 unfold one_div_succ in |- *.
-AStepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
-AStepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[^]n[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
+astepr (OneR[/] (Two:IR)[^]n[//]nexp_resp_ap_zero n H0).
 apply recip_resp_less.
 apply nexp_resp_pos.
 apply pos_two.
@@ -621,11 +621,11 @@ unfold Snring in |- *.
 simpl in |- *.
 apply less_wdr with (nexp IR n Two[+]One).
 apply shift_less_plus.
-AStepl (nexp IR n Two[-]One).
+astepl (nexp IR n Two[-]One).
 apply minusOne_less.
 
-AStepl (OneR[+]nexp IR n Two).
-AStepr (OneR[+]nring (power n 2)).
+astepl (OneR[+]nexp IR n Two).
+astepr (OneR[+]nring (power n 2)).
 apply plus_resp_eq.
 apply nexp_power.
 Qed.
@@ -656,9 +656,9 @@ intros q H2.
 exists q.
 intro m.
 intro H3.
-AStepl (f lim[-d]f (seq m)).
+astepl (f lim[-d]f (seq m)).
 apply H1.
-AStepl (seq m[-d]lim).
+astepl (seq m[-d]lim).
 apply H2.
 exact H3.
 

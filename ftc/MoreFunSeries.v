@@ -9,9 +9,13 @@ Section Definitions.
 
 (** *More on Sequences and Series
 
-We will now extend our convergence definitions and results for sequences and series of functions defined in compact intervals to arbitrary intervals.
+We will now extend our convergence definitions and results for
+sequences and series of functions defined in compact intervals to
+arbitrary intervals.
 
-%\begin{convention}% Throughout this file, [J] will be an interval, [f,g] will be sequences of continuous (in [J]) functions and [F,G] will be continuous (in [J]) functions.
+%\begin{convention}% Throughout this file, [J] will be an interval,
+[f, g] will be sequences of continuous (in [J]) functions and [F,G]
+will be continuous (in [J]) functions.
 %\end{convention}%
 
 **Sequences
@@ -20,7 +24,9 @@ First we will consider the case of sequences.
 
 ***Definitions
 
-Some of the definitions do not make sense in this more general setting (for instance, because the norm of a function is no longer defined), but the ones which do we simply adapt in the usual way.
+Some of the definitions do not make sense in this more general setting
+(for instance, because the norm of a function is no longer defined),
+but the ones which do we simply adapt in the usual way.
 *)
 
 Variable J : interval.
@@ -30,26 +36,19 @@ Variable F : PartIR.
 Hypothesis contf : forall n : nat, Continuous J (f n).
 Hypothesis contF : Continuous J F.
 
-Definition Cauchy_fun_seq_IR :=
-  forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
-  Cauchy_fun_seq a b Hab f
-    (fun n : nat => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
+Definition Cauchy_fun_seq_IR :=  forall a b Hab (Hinc : included (compact a b Hab) J),
+  Cauchy_fun_seq _ _ _ f (fun n => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
 
-Definition conv_fun_seq_IR :=
-  forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
-  conv_fun_seq a b Hab f
-    (fun n : nat => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
+Definition conv_fun_seq_IR := forall a b Hab (Hinc : included (Compact Hab) J),
+  conv_fun_seq a b Hab f (fun n => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
 
-Definition conv_fun_seq'_IR :=
-  forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
+Definition conv_fun_seq'_IR := forall a b Hab (Hinc : included (Compact Hab) J),
   conv_fun_seq' a b Hab f F
-    (fun n : nat => included_imp_Continuous _ _ (contf n) _ _ _ Hinc)
+    (fun n => included_imp_Continuous _ _ (contf n) _ _ _ Hinc)
     (included_imp_Continuous _ _ contF _ _ _ Hinc).
 
-Definition Cauchy_fun_seq2_IR :=
-  forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
-  Cauchy_fun_seq2 a b Hab f
-    (fun n : nat => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
+Definition Cauchy_fun_seq2_IR := forall a b Hab (Hinc : included (compact a b Hab) J),
+  Cauchy_fun_seq2 _ _ _ f (fun n => included_imp_Continuous _ _ (contf n) _ _ _ Hinc).
 
 (**
 The equivalences between these definitions still hold.
@@ -78,11 +77,8 @@ intros.
 apply Cauchy_fun_seq2_seq; auto.
 Qed.
 
-Lemma Cauchy_fun_real_IR :
- Cauchy_fun_seq_IR ->
- forall x Hx,
- Cauchy_prop
-   (fun n : nat => Part _ _ (Continuous_imp_inc _ _ (contf n) x Hx)).
+Lemma Cauchy_fun_real_IR : Cauchy_fun_seq_IR -> forall x Hx,
+ Cauchy_prop (fun n => Part _ _ (Continuous_imp_inc _ _ (contf n) x Hx)).
 intros H x Hx.
 red in H.
 cut (included (compact_single x) J). intro H0.
@@ -135,10 +131,9 @@ simpl in Hn.
 exact (pfstrx _ _ _ _ _ _ Hn).
 Defined.
 
-Lemma Cauchy_fun_seq_Lim_char :
- forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
+Lemma Cauchy_fun_seq_Lim_char : forall a b Hab (Hinc : included (Compact Hab) J),
  Feq (Compact Hab) Cauchy_fun_seq_Lim_IR
-   (Cauchy_fun_seq_Lim _ _ _ _ _ (conv a b Hab Hinc)).
+  (Cauchy_fun_seq_Lim _ _ _ _ _ (conv a b Hab Hinc)).
 intros.
 FEQ.
 simpl in |- *.
@@ -165,24 +160,24 @@ Variable F : PartIR.
 Hypotheses contF contF0 : Continuous J F.
 (* end show *)
 
-Lemma conv_fun_seq'_wd_IR :
- conv_fun_seq'_IR _ _ _ contf contF -> conv_fun_seq'_IR _ _ _ contf0 contF0.
+Lemma conv_fun_seq'_wd_IR : conv_fun_seq'_IR _ _ _ contf contF ->
+ conv_fun_seq'_IR _ _ _ contf0 contF0.
 intro H.
 red in |- *; intros.
 eapply conv_fun_seq'_wd.
 apply (H a b Hab Hinc).
 Qed.
 
-Lemma Cauchy_fun_seq2_wd_IR :
- Cauchy_fun_seq2_IR _ _ contf -> Cauchy_fun_seq2_IR _ _ contf0.
+Lemma Cauchy_fun_seq2_wd_IR : Cauchy_fun_seq2_IR _ _ contf ->
+ Cauchy_fun_seq2_IR _ _ contf0.
 intro H.
 red in |- *; intros.
 eapply Cauchy_fun_seq2_wd.
 apply (H a b Hab Hinc).
 Qed.
 
-Lemma conv_fun_seq_wd_IR :
- conv_fun_seq_IR _ _ contf -> conv_fun_seq_IR _ _ contf0.
+Lemma conv_fun_seq_wd_IR : conv_fun_seq_IR _ _ contf ->
+ conv_fun_seq_IR _ _ contf0.
 intro H.
 red in |- *; intros.
 eapply conv_fun_seq_wd.
@@ -203,10 +198,8 @@ Hypotheses contf contf0 : forall n : nat, Continuous J (f n).
 Hypotheses contg contg0 : forall n : nat, Continuous J (g n).
 (* end show *)
 
-Lemma Cauchy_conv_fun_seq'_IR :
- forall (H : Cauchy_fun_seq_IR _ _ contf)
-   (contf' : Continuous J (Cauchy_fun_seq_Lim_IR _ _ _ H)),
- conv_fun_seq'_IR _ _ _ contf contf'.
+Lemma Cauchy_conv_fun_seq'_IR : forall H contf',
+ conv_fun_seq'_IR _ _ (Cauchy_fun_seq_Lim_IR _ _ contf H) contf contf'.
 intros.
 red in |- *; intros.
 eapply conv_fun_seq'_wdr.
@@ -225,8 +218,7 @@ Hypotheses contF contF0 : Continuous J F.
 Hypotheses contG contG0 : Continuous J G.
 (* end show *)
 
-Lemma conv_fun_seq'_wdl_IR :
- (forall n : nat, Feq J (f n) (g n)) ->
+Lemma conv_fun_seq'_wdl_IR : (forall n, Feq J (f n) (g n)) ->
  conv_fun_seq'_IR _ _ _ contf contF -> conv_fun_seq'_IR _ _ _ contg contF0.
 intros H H0 a b Hab Hinc.
 eapply conv_fun_seq'_wdl with (f := f).
@@ -236,8 +228,7 @@ inversion_clear b0.
 apply eq_imp_Feq; Included.
 Qed.
 
-Lemma conv_fun_seq'_wdr_IR :
- Feq J F G ->
+Lemma conv_fun_seq'_wdr_IR : Feq J F G ->
  conv_fun_seq'_IR _ _ _ contf contF -> conv_fun_seq'_IR _ _ _ contf0 contG.
 intros H H0 a b Hab Hinc.
 eapply conv_fun_seq'_wdr with (F := F).
@@ -245,8 +236,7 @@ eapply conv_fun_seq'_wdr with (F := F).
 apply included_Feq with J; auto.
 Qed.
 
-Lemma conv_fun_seq'_wdl'_IR :
- (forall n : nat, Feq J (f n) (g n)) ->
+Lemma conv_fun_seq'_wdl'_IR : (forall n, Feq J (f n) (g n)) ->
  conv_fun_seq'_IR _ _ _ contf contF -> conv_fun_seq'_IR _ _ _ contg contF.
 intros H H0 a b Hab Hinc.
 eapply conv_fun_seq'_wdl' with (f := f); auto.
@@ -255,8 +245,7 @@ inversion_clear b0.
 apply eq_imp_Feq; Included.
 Qed.
 
-Lemma conv_fun_seq'_wdr'_IR :
- Feq J F G ->
+Lemma conv_fun_seq'_wdr'_IR : Feq J F G ->
  conv_fun_seq'_IR _ _ _ contf contF -> conv_fun_seq'_IR _ _ _ contf contG.
 intros H H0 a b Hab Hinc.
 eapply conv_fun_seq'_wdr' with (F := F).
@@ -264,9 +253,7 @@ eapply conv_fun_seq'_wdr' with (F := F).
 apply included_Feq with J; auto.
 Qed.
 
-Lemma Cauchy_cont_Lim_IR :
- forall H : Cauchy_fun_seq_IR _ _ contf,
- Continuous J (Cauchy_fun_seq_Lim_IR _ _ contf H).
+Lemma Cauchy_cont_Lim_IR : forall H, Continuous J (Cauchy_fun_seq_Lim_IR _ _ contf H).
 intros.
 split; Included.
 intros a b Hab H0; eapply Continuous_I_wd.
@@ -275,15 +262,15 @@ apply (Cauchy_fun_seq_Lim_char J f contf H a b Hab H0).
 Contin.
 Qed.
 
-Lemma Cauchy_conv_fun_seq_IR :
- Cauchy_fun_seq_IR _ _ contf -> conv_fun_seq_IR _ _ contf.
+Lemma Cauchy_conv_fun_seq_IR : Cauchy_fun_seq_IR _ _ contf ->
+ conv_fun_seq_IR _ _ contf.
 intros H a b Hab Hinc.
 eapply Cauchy_conv_fun_seq.
 apply (H a b Hab Hinc).
 Qed.
 
-Lemma conv_Cauchy_fun_seq_IR :
- conv_fun_seq_IR _ _ contf -> Cauchy_fun_seq_IR _ _ contf.
+Lemma conv_Cauchy_fun_seq_IR : conv_fun_seq_IR _ _ contf ->
+ Cauchy_fun_seq_IR _ _ contf.
 intros H a b Hab Hinc.
 eapply conv_Cauchy_fun_seq.
 apply (H a b Hab Hinc).
@@ -306,10 +293,8 @@ Variables f g : nat -> PartIR.
 Hypothesis contf : forall n : nat, Continuous J (f n).
 Hypothesis contg : forall n : nat, Continuous J (g n).
 
-Lemma FLim_unique_IR :
- forall F G HF HG,
- conv_fun_seq'_IR J f F contf HF ->
- conv_fun_seq'_IR J f G contf HG -> Feq J F G.
+Lemma FLim_unique_IR : forall F G HF HG,
+ conv_fun_seq'_IR J f F contf HF -> conv_fun_seq'_IR J f G contf HG -> Feq J F G.
 intros F G HF HG H H0.
 apply included_Feq'.
 intros a b Hab H1.
@@ -322,8 +307,7 @@ apply
     (included_imp_Continuous _ _ HG _ _ _ H1); auto.
 Qed.
 
-Lemma Cauchy_fun_seq_wd_IR :
- (forall n : nat, Feq J (f n) (g n)) ->
+Lemma Cauchy_fun_seq_wd_IR : (forall n, Feq J (f n) (g n)) ->
  Cauchy_fun_seq_IR _ _ contf -> Cauchy_fun_seq_IR _ _ contg.
 intros H H0 a b Hab Hinc.
 eapply Cauchy_fun_seq_wd with (f := f).
@@ -331,9 +315,8 @@ eapply Cauchy_fun_seq_wd with (f := f).
 intro; apply included_Feq with J; auto.
 Qed.
 
-Lemma fun_Lim_seq_const_IR :
- forall (H : PartIR) contH contH',
- conv_fun_seq'_IR J (fun n : nat => H) H contH contH'.
+Lemma fun_Lim_seq_const_IR : forall H contH contH',
+ conv_fun_seq'_IR J (fun n => H) H contH contH'.
 exists 0; intros.
 eapply leEq_wdl.
 2: eapply eq_transitive_unfolded.
@@ -342,8 +325,7 @@ apply less_leEq; assumption.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma fun_Cauchy_prop_const_IR :
- forall (H : PartIR) contH, Cauchy_fun_seq_IR J (fun n : nat => H) contH.
+Lemma fun_Cauchy_prop_const_IR : forall H contH, Cauchy_fun_seq_IR J (fun n => H) contH.
 intros.
 apply conv_Cauchy_fun_seq'_IR with H (contH 0).
 apply fun_Lim_seq_const_IR.
@@ -358,8 +340,8 @@ Hypothesis convF : conv_fun_seq'_IR _ _ _ contf contF.
 Hypothesis convG : conv_fun_seq'_IR _ _ _ contg contG.
 (* end show *)
 
-Lemma fun_Lim_seq_plus'_IR :
- forall H H', conv_fun_seq'_IR J (fun n : nat => f n{+}g n) (F{+}G) H H'.
+Lemma fun_Lim_seq_plus'_IR : forall H H',
+ conv_fun_seq'_IR J (fun n => f n{+}g n) (F{+}G) H H'.
 intros.
 red in |- *; intros.
 eapply fun_Lim_seq_plus'.
@@ -367,8 +349,8 @@ apply (convF a b Hab Hinc).
 apply (convG a b Hab Hinc).
 Qed.
 
-Lemma fun_Lim_seq_minus'_IR :
- forall H H', conv_fun_seq'_IR J (fun n : nat => f n{-}g n) (F{-}G) H H'.
+Lemma fun_Lim_seq_minus'_IR : forall H H',
+ conv_fun_seq'_IR J (fun n => f n{-}g n) (F{-}G) H H'.
 intros.
 red in |- *; intros.
 eapply fun_Lim_seq_minus'.
@@ -376,8 +358,8 @@ apply (convF a b Hab Hinc).
 apply (convG a b Hab Hinc).
 Qed.
 
-Lemma fun_Lim_seq_mult'_IR :
- forall H H', conv_fun_seq'_IR J (fun n : nat => f n{*}g n) (F{*}G) H H'.
+Lemma fun_Lim_seq_mult'_IR : forall H H',
+ conv_fun_seq'_IR J (fun n => f n{*}g n) (F{*}G) H H'.
 intros.
 red in |- *; intros.
 eapply fun_Lim_seq_mult'.
@@ -404,10 +386,8 @@ Hypothesis Hf : Cauchy_fun_seq_IR _ _ contf.
 Hypothesis Hg : Cauchy_fun_seq_IR _ _ contg.
 (* end show *)
 
-Lemma fun_Lim_seq_plus_IR :
- forall H H',
- conv_fun_seq'_IR J (fun n : nat => f n{+}g n)
-   (Cauchy_fun_seq_Lim_IR _ _ _ Hf{+}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
+Lemma fun_Lim_seq_plus_IR : forall H H', conv_fun_seq'_IR J (fun n => f n{+}g n)
+ (Cauchy_fun_seq_Lim_IR _ _ _ Hf{+}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
 intros.
 red in |- *; intros.
 cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (Hf a b Hab Hinc)));
@@ -424,8 +404,7 @@ apply
     (H := fun n : nat => included_imp_Continuous _ _ (H n) _ _ _ Hinc).
 Qed.
 
-Lemma fun_Cauchy_prop_plus :
- forall H, Cauchy_fun_seq_IR J (fun n : nat => f n{+}g n) H.
+Lemma fun_Cauchy_prop_plus : forall H, Cauchy_fun_seq_IR J (fun n => f n{+}g n) H.
 intro.
 cut
  (Continuous J
@@ -437,10 +416,8 @@ apply
 apply fun_Lim_seq_plus_IR.
 Qed.
 
-Lemma fun_Lim_seq_inv_IR :
- forall H H',
- conv_fun_seq'_IR J (fun n : nat => {--}(f n))
-   {--}(Cauchy_fun_seq_Lim_IR _ _ _ Hf) H H'.
+Lemma fun_Lim_seq_inv_IR : forall H H',
+ conv_fun_seq'_IR J (fun n => {--} (f n)) {--} (Cauchy_fun_seq_Lim_IR _ _ _ Hf) H H'.
 intros.
 red in |- *; intros.
 cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (Hf a b Hab Hinc)));
@@ -455,19 +432,16 @@ apply
     (H := fun n : nat => included_imp_Continuous _ _ (H n) _ _ _ Hinc).
 Qed.
 
-Lemma fun_Cauchy_prop_inv :
- forall H, Cauchy_fun_seq_IR J (fun n : nat => {--}(f n)) H.
+Lemma fun_Cauchy_prop_inv : forall H, Cauchy_fun_seq_IR J (fun n => {--} (f n)) H.
 intro.
-cut (Continuous J {--}(Cauchy_fun_seq_Lim_IR _ _ _ Hf));
+cut (Continuous J {--} (Cauchy_fun_seq_Lim_IR _ _ _ Hf));
  [ intro H0 | Contin ].
-apply conv_Cauchy_fun_seq'_IR with ({--}(Cauchy_fun_seq_Lim_IR _ _ _ Hf)) H0.
+apply conv_Cauchy_fun_seq'_IR with ( {--} (Cauchy_fun_seq_Lim_IR _ _ _ Hf)) H0.
 apply fun_Lim_seq_inv_IR.
 Qed.
 
-Lemma fun_Lim_seq_minus_IR :
- forall H H',
- conv_fun_seq'_IR J (fun n : nat => f n{-}g n)
-   (Cauchy_fun_seq_Lim_IR _ _ _ Hf{-}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
+Lemma fun_Lim_seq_minus_IR : forall H H', conv_fun_seq'_IR J (fun n => f n{-}g n)
+ (Cauchy_fun_seq_Lim_IR _ _ _ Hf{-}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
 intros.
 red in |- *; intros.
 cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (Hf a b Hab Hinc)));
@@ -485,8 +459,7 @@ apply
     (H := fun n : nat => included_imp_Continuous _ _ (H n) _ _ _ Hinc).
 Qed.
 
-Lemma fun_Cauchy_prop_minus :
- forall H, Cauchy_fun_seq_IR J (fun n : nat => f n{-}g n) H.
+Lemma fun_Cauchy_prop_minus : forall H, Cauchy_fun_seq_IR J (fun n => f n{-}g n) H.
 intro.
 cut
  (Continuous J
@@ -498,10 +471,8 @@ apply
 apply fun_Lim_seq_minus_IR.
 Qed.
 
-Lemma fun_Lim_seq_mult_IR :
- forall H H',
- conv_fun_seq'_IR J (fun n : nat => f n{*}g n)
-   (Cauchy_fun_seq_Lim_IR _ _ _ Hf{*}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
+Lemma fun_Lim_seq_mult_IR : forall H H', conv_fun_seq'_IR J (fun n => f n{*}g n)
+ (Cauchy_fun_seq_Lim_IR _ _ _ Hf{*}Cauchy_fun_seq_Lim_IR _ _ _ Hg) H H'.
 intros.
 red in |- *; intros.
 cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (Hf a b Hab Hinc)));
@@ -519,8 +490,7 @@ apply
     (H := fun n : nat => included_imp_Continuous _ _ (H n) _ _ _ Hinc).
 Qed.
 
-Lemma fun_Cauchy_prop_mult :
- forall H, Cauchy_fun_seq_IR J (fun n : nat => f n{*}g n) H.
+Lemma fun_Cauchy_prop_mult : forall H, Cauchy_fun_seq_IR J (fun n => f n{*}g n) H.
 intro.
 cut
  (Continuous J
@@ -541,13 +511,10 @@ Section Other.
 Finally, we define a mapping between sequences of real numbers and sequences of (constant) functions and prove that convergence is preserved.
 *)
 
-Definition seq_to_funseq (x : nat -> IR) (n : nat) : PartIR := [-C-](x n).
+Definition seq_to_funseq (x : nat -> IR) n : PartIR := [-C-] (x n).
 
-Lemma funseq_conv :
- forall J x y,
- nonvoid J ->
- conv_fun_seq'_IR J (seq_to_funseq x) [-C-]y
-   (fun n : nat => Continuous_const _ _) (Continuous_const _ _) ->
+Lemma funseq_conv : forall J x y, nonvoid J -> conv_fun_seq'_IR J
+ (seq_to_funseq x) [-C-]y (fun n => Continuous_const _ _) (Continuous_const _ _) ->
  Cauchy_Lim_prop2 x y.
 intros J x y H H0 eps H1.
 elim (nonvoid_point J H); intros x0 Hx0.
@@ -570,11 +537,9 @@ Qed.
 Another interesting fact: if a sequence of constant functions converges then it must converge to a constant function.
 *)
 
-Lemma fun_const_Lim :
- forall J f F contf contF,
- proper J ->
- conv_fun_seq'_IR J f F contf contF ->
- (forall n : nat, {c : IR | Feq J (f n) [-C-]c}) -> {c : IR | Feq J F [-C-]c}.
+Lemma fun_const_Lim : forall J f F contf contF, proper J ->
+ conv_fun_seq'_IR J f F contf contF -> (forall n, {c : IR | Feq J (f n) [-C-]c}) ->
+ {c : IR | Feq J F [-C-]c}.
 intros J f F contf contF pJ H H0.
 set (incF := Continuous_imp_inc _ _ contF) in *.
 set (incf := fun n : nat => Continuous_imp_inc _ _ (contf n)) in *.
@@ -592,9 +557,9 @@ set (Fx := Part _ _ Hx) in *.
 set (Fa := Part _ _ (incF x0 Hx0)) in *.
 set (fx := Part _ _ (incf N x H1)) in *.
 set (fa := Part _ _ (incf N x0 Hx0)) in *.
-apply leEq_wdl with (AbsIR (Fx[-]fx[+](fx[-]fa)[+](fa[-]Fa))).
+apply leEq_wdl with (AbsIR (Fx[-]fx[+] (fx[-]fa) [+] (fa[-]Fa))).
 2: apply AbsIR_wd; rational.
-RStepr (e [/]TwoNZ[+]Zero[+]e [/]TwoNZ).
+rstepr (e [/]TwoNZ[+]Zero[+]e [/]TwoNZ).
 eapply leEq_transitive.
 apply triangle_IR.
 apply plus_resp_leEq_both.
@@ -612,7 +577,7 @@ eapply eq_transitive_unfolded.
 2: apply AbsIRz_isz.
 elim Hc; clear Hc; intros H5 H3.
 elim H3; clear H3; intros H6 H4.
-apply AbsIR_wd; unfold fx, fa in |- *; AStepr (c[-]c).
+apply AbsIR_wd; unfold fx, fa in |- *; astepr (c[-]c).
 apply cg_minus_wd; simpl in H4; apply H4; auto.
 eapply leEq_wdl.
 apply (HN N (le_n N) x0 (compact_Min_rht _ _ _)).
@@ -633,13 +598,11 @@ Convergence is defined as expected---through convergence in every compact interv
 Variable J : interval.
 Variable f : nat -> PartIR.
 
-Definition fun_series_convergent_IR :=
-  forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
+Definition fun_series_convergent_IR := forall a b Hab (Hinc : included (Compact Hab) J),
   fun_series_convergent a b Hab f.
 
-Lemma fun_series_conv_imp_conv_IR :
- fun_series_convergent_IR ->
- forall x : IR, J x -> forall Hx, convergent (fun n : nat => f n x (Hx n)).
+Lemma fun_series_conv_imp_conv_IR : fun_series_convergent_IR ->
+ forall x, J x -> forall Hx, convergent (fun n : nat => f n x (Hx n)).
 intros H x H0 Hx.
 apply fun_series_conv_imp_conv with (Hab := leEq_reflexive _ x).
 apply H.
@@ -651,7 +614,7 @@ Qed.
 Hypothesis H : fun_series_convergent_IR.
 (* end show *)
 
-Lemma fun_series_inc_IR : forall x : IR, J x -> forall n : nat, Dom (f n) x.
+Lemma fun_series_inc_IR : forall x, J x -> forall n, Dom (f n) x.
 intros x H0 n.
 elim (H _ _ (leEq_reflexive _ x) (compact_single_iprop J x H0)).
 intros contF CauchyF.
@@ -659,13 +622,16 @@ apply (contin_imp_inc _ _ _ _ (contF n)).
 apply compact_single_prop.
 Qed.
 
-Let h (x : IR) (Hx : J x) :=
-  series_sum _
+(** Assume [h(x)] is the pointwise series of [f(x)] *)
+
+(* begin hide *)
+Let h (x : IR) (Hx : J x) := series_sum _
     (fun_series_conv_imp_conv _ _ _ _
        (H _ _ (leEq_reflexive _ x) (compact_single_iprop J x Hx)) x
        (compact_single_prop x) (fun_series_inc_IR x Hx)).
+(* end hide *)
 
-Lemma FSeries_Sum_strext_IR : forall x y Hx Hy, h x Hx[#]h y Hy -> x[#]y.
+Lemma FSeries_Sum_strext_IR : forall x y Hx Hy, h x Hx [#] h y Hy -> x [#] y.
 unfold h in |- *; clear h; intros x y Hx Hy H0.
 unfold series_sum in H0.
 elim (Lim_strext _ _ H0); intros N HN.
@@ -680,8 +646,7 @@ apply iprop_wd.
 exact FSeries_Sum_strext_IR.
 Defined.
 
-Lemma FSeries_Sum_char :
- forall (a b : IR) (Hab : a[<=]b) (Hinc : included (Compact Hab) J),
+Lemma FSeries_Sum_char : forall a b Hab (Hinc : included (Compact Hab) J),
  Feq (Compact Hab) FSeries_Sum (Fun_Series_Sum (H a b Hab Hinc)).
 intros; FEQ.
 simpl in |- *; Included.
@@ -703,23 +668,21 @@ Absolute convergence still exists.
 *)
 
 Definition fun_series_abs_convergent_IR :=
-  fun_series_convergent_IR J (fun n : nat => FAbs (f n)).
+ fun_series_convergent_IR J (fun n => FAbs (f n)).
 
 End More_Series_Definitions.
 
 Section Convergence_Results.
 
 (**
-As before, any series converges to its Sum.
+As before, any series converges to its sum.
 *)
 
 Variable J : interval.
 Variable f : nat -> PartIR.
 
-Lemma FSeries_conv :
- forall convF H H',
- conv_fun_seq'_IR J (fun n : nat => FSum0 n f)
-   (FSeries_Sum (J:=J) (f:=f) convF) H H'.
+Lemma FSeries_conv : forall (convF : fun_series_convergent_IR J f) H H',
+ conv_fun_seq'_IR J (fun n => FSum0 n f) (FSeries_Sum convF) H H'.
 intros.
 red in |- *; intros.
 elim (convF _ _ _ Hinc); intros Hcont Hconv.
@@ -743,8 +706,7 @@ apply (contin_imp_inc _ _ _ _ (Hcont n0)); auto.
 apply fun_series_conv.
 Qed.
 
-Lemma convergent_imp_inc :
- fun_series_convergent_IR J f -> forall n : nat, included J (Dom (f n)).
+Lemma convergent_imp_inc : fun_series_convergent_IR J f -> forall n, included J (Dom (f n)).
 intros H n.
 apply included_imp_inc.
 intros a b Hab H0.
@@ -753,8 +715,8 @@ elim (H _ _ _ H0); intros.
 apply contin_imp_inc; auto.
 Qed.
 
-Lemma convergent_imp_Continuous :
- fun_series_convergent_IR J f -> forall n : nat, Continuous J (f n).
+Lemma convergent_imp_Continuous : fun_series_convergent_IR J f -> forall n,
+ Continuous J (f n).
 intros H n.
 split.
 exact (convergent_imp_inc H n).
@@ -762,8 +724,7 @@ intros a b Hab H0; auto.
 elim (H a b Hab H0); auto.
 Qed.
 
-Lemma Continuous_FSeries_Sum :
- forall H, Continuous J (FSeries_Sum (J:=J) (f:=f) H).
+Lemma Continuous_FSeries_Sum : forall H, Continuous J (FSeries_Sum (J:=J) (f:=f) H).
 intros.
 split; Included.
 intros a b Hab H0.
@@ -788,33 +749,28 @@ Convergence is well defined and preserved by operations.
 
 Variable J : interval.
 
-Lemma conv_fun_const_series_IR :
- forall x : nat -> IR,
- convergent x -> fun_series_convergent_IR J (fun n : nat => [-C-](x n)).
+Lemma conv_fun_const_series_IR : forall x : nat -> IR, convergent x ->
+ fun_series_convergent_IR J (fun n => [-C-] (x n)).
 intros.
 red in |- *; intros.
 apply conv_fun_const_series; auto.
 Qed.
 
-Lemma fun_const_series_Sum_IR :
- forall (y : nat -> IR) (H : convergent y)
-   (H' : fun_series_convergent_IR J (fun n : nat => [-C-](y n))) x Hx,
- FSeries_Sum H' x Hx[=]series_sum _ H.
+Lemma fun_const_series_Sum_IR : forall y H
+ (H' : fun_series_convergent_IR J (fun n => [-C-] (y n))) x Hx, FSeries_Sum H' x Hx [=] series_sum y H.
 intros.
 simpl in |- *.
 apply series_sum_wd.
 Algebra.
 Qed.
 
-Lemma conv_zero_fun_series_IR :
- fun_series_convergent_IR J (fun n : nat => [-C-]Zero).
+Lemma conv_zero_fun_series_IR : fun_series_convergent_IR J (fun n => [-C-]Zero).
 apply conv_fun_const_series_IR with (x := fun n : nat => ZeroR).
 apply conv_zero_series.
 Qed.
 
-Lemma FSeries_Sum_zero_IR :
- forall (H : fun_series_convergent_IR J (fun n : nat => [-C-]Zero)) 
-   (x : IR) Hx, FSeries_Sum H x Hx[=]Zero.
+Lemma FSeries_Sum_zero_IR : forall (H : fun_series_convergent_IR J (fun n => [-C-]Zero)) 
+   x Hx, FSeries_Sum H x Hx [=] Zero.
 intros.
 simpl in |- *.
 apply series_sum_zero.
@@ -822,8 +778,7 @@ Qed.
 
 Variables f g : nat -> PartIR.
 
-Lemma fun_series_convergent_wd_IR :
- (forall n : nat, Feq J (f n) (g n)) ->
+Lemma fun_series_convergent_wd_IR : (forall n, Feq J (f n) (g n)) ->
  fun_series_convergent_IR J f -> fun_series_convergent_IR J g.
 intros.
 red in |- *; intros.
@@ -837,9 +792,7 @@ Hypothesis convF : fun_series_convergent_IR J f.
 Hypothesis convG : fun_series_convergent_IR J g.
 (* end show *)
 
-Lemma FSeries_Sum_wd' :
- (forall n : nat, Feq J (f n) (g n)) ->
- Feq J (FSeries_Sum convF) (FSeries_Sum convG).
+Lemma FSeries_Sum_wd' : (forall n, Feq J (f n) (g n)) -> Feq J (FSeries_Sum convF) (FSeries_Sum convG).
 intros H.
 apply included_Feq'; intros a b Hab H0.
 eapply Feq_transitive.
@@ -850,14 +803,12 @@ apply Fun_Series_Sum_wd'.
 intro; apply included_Feq with J; auto.
 Qed.
 
-Lemma FSeries_Sum_plus_conv :
- fun_series_convergent_IR J (fun n : nat => f n{+}g n).
+Lemma FSeries_Sum_plus_conv : fun_series_convergent_IR J (fun n => f n{+}g n).
 red in |- *; intros.
 apply conv_fun_series_plus; auto.
 Qed.
 
-Lemma FSeries_Sum_plus :
- forall H : fun_series_convergent_IR J (fun n : nat => f n{+}g n),
+Lemma FSeries_Sum_plus : forall H : fun_series_convergent_IR J (fun n => f n{+}g n),
  Feq J (FSeries_Sum H) (FSeries_Sum convF{+}FSeries_Sum convG).
 intros.
 apply included_Feq'; intros a b Hab H0.
@@ -870,15 +821,13 @@ apply
 apply Feq_symmetric; apply Feq_plus; apply FSeries_Sum_char.
 Qed.
 
-Lemma FSeries_Sum_inv_conv :
- fun_series_convergent_IR J (fun n : nat => {--}(f n)).
+Lemma FSeries_Sum_inv_conv : fun_series_convergent_IR J (fun n => {--} (f n)).
 red in |- *; intros.
 apply conv_fun_series_inv; auto.
 Qed.
 
-Lemma FSeries_Sum_inv :
- forall H : fun_series_convergent_IR J (fun n : nat => {--}(f n)),
- Feq J (FSeries_Sum H) {--}(FSeries_Sum convF).
+Lemma FSeries_Sum_inv : forall H : fun_series_convergent_IR J (fun n => {--} (f n)),
+ Feq J (FSeries_Sum H) {--} (FSeries_Sum convF).
 intros.
 apply included_Feq'; intros a b Hab H0.
 eapply Feq_transitive.
@@ -888,14 +837,12 @@ apply Fun_Series_Sum_inv with (convF := convF a b Hab H0).
 apply Feq_symmetric; apply Feq_inv; apply FSeries_Sum_char.
 Qed.
 
-Lemma FSeries_Sum_minus_conv :
- fun_series_convergent_IR J (fun n : nat => f n{-}g n).
+Lemma FSeries_Sum_minus_conv : fun_series_convergent_IR J (fun n => f n{-}g n).
 red in |- *; intros.
 apply conv_fun_series_minus; auto.
 Qed.
 
-Lemma FSeries_Sum_minus :
- forall H : fun_series_convergent_IR J (fun n : nat => f n{-}g n),
+Lemma FSeries_Sum_minus : forall H : fun_series_convergent_IR J (fun n => f n{-}g n),
  Feq J (FSeries_Sum H) (FSeries_Sum convF{-}FSeries_Sum convG).
 intros.
 apply included_Feq'; intros a b Hab H0.
@@ -903,7 +850,7 @@ eapply Feq_transitive.
 apply (FSeries_Sum_char _ _ H a b Hab H0).
 eapply Feq_transitive.
 apply
- Fun_Series_Sum_minus
+ Fun_Series_Sum_min
   with (convF := convF a b Hab H0) (convG := convG a b Hab H0).
 apply Feq_symmetric; apply Feq_minus; apply FSeries_Sum_char.
 Qed.
@@ -917,17 +864,15 @@ Variable c : IR.
 Variable H : PartIR.
 Hypothesis contH : Continuous J H.
 
-Lemma FSeries_Sum_scal_conv :
- fun_series_convergent_IR J (fun n : nat => H{*}f n).
+Lemma FSeries_Sum_scal_conv : fun_series_convergent_IR J (fun n => H{*}f n).
 red in |- *; intros.
-apply conv_fun_series_mult_scal; auto.
+apply conv_fun_series_scal; auto.
 eapply included_imp_Continuous.
 apply contH.
 auto.
 Qed.
 
-Lemma FSeries_Sum_scal :
- forall H' : fun_series_convergent_IR J (fun n : nat => H{*}f n),
+Lemma FSeries_Sum_scal : forall H' : fun_series_convergent_IR J (fun n => H{*}f n),
  Feq J (FSeries_Sum H') (H{*}FSeries_Sum convF).
 intros.
 apply included_Feq'; intros a b Hab H0.
@@ -935,7 +880,7 @@ cut (Continuous_I Hab H). intro H1.
 eapply Feq_transitive.
 apply (FSeries_Sum_char _ _ H' a b Hab H0).
 eapply Feq_transitive.
-apply Fun_Series_Sum_mult_scal with (convF := convF a b Hab H0).
+apply Fun_Series_Sum_scal with (convF := convF a b Hab H0).
 auto.
 apply Feq_symmetric; apply Feq_mult.
 apply Feq_reflexive; Included.
@@ -951,19 +896,16 @@ Section Convergence_Criteria.
 
 (** ***Convergence Criteria
 
-The most important tests for convergence of series still apply: the comparison test (in both versions) and the ratio test.
+The most important tests for convergence of series still apply: the
+comparison test (in both versions) and the ratio test.
 *)
 
 Variable J : interval.
 Variable f : nat -> PartIR.
-Hypothesis contF : forall n : nat, Continuous J (f n).
+Hypothesis contF : forall n, Continuous J (f n).
 
-Lemma fun_str_comparison_IR :
- forall g : nat -> PartIR,
- fun_series_convergent_IR J g ->
- {k : nat |
- forall n : nat,
- k <= n -> forall x : IR, J x -> forall Hx Hx', AbsIR (f n x Hx)[<=]g n x Hx'} ->
+Lemma fun_str_comparison_IR : forall g : nat -> PartIR, fun_series_convergent_IR J g ->
+ {k : nat | forall n, k <= n -> forall x, J x -> forall Hx Hx', AbsIR (f n x Hx) [<=] g n x Hx'} ->
  fun_series_convergent_IR J f.
 intros g H H0 a b Hab H1.
 apply fun_str_comparison with g.
@@ -974,33 +916,24 @@ exists k; intros.
 apply Hk; auto.
 Qed.
 
-Lemma fun_comparison_IR :
- forall g : nat -> PartIR,
- fun_series_convergent_IR J g ->
- (forall (n : nat) (x : IR),
-  J x -> forall Hx Hx', AbsIR (f n x Hx)[<=]g n x Hx') ->
+Lemma fun_comparison_IR : forall g : nat -> PartIR, fun_series_convergent_IR J g ->
+ (forall n x, J x -> forall Hx Hx', AbsIR (f n x Hx) [<=] g n x Hx') ->
  fun_series_convergent_IR J f.
 intros g H H0.
 apply fun_str_comparison_IR with g; auto.
 exists 0; intros; apply H0; auto.
 Qed.
 
-Lemma abs_imp_conv_IR :
- fun_series_abs_convergent_IR J f -> fun_series_convergent_IR J f.
+Lemma abs_imp_conv_IR : fun_series_abs_convergent_IR J f ->
+ fun_series_convergent_IR J f.
 intro H.
-apply fun_comparison_IR with (fun n : nat => FAbs (f n)).
+apply fun_comparison_IR with (fun n => FAbs (f n)).
 apply H.
 intros; apply eq_imp_leEq; apply eq_symmetric_unfolded; apply FAbs_char.
 Qed.
 
-Lemma fun_ratio_test_conv_IR :
- {N : nat |
- {c : IR | c[<]One |
- Zero[<=]c /\
- (forall x : IR,
-  J x ->
-  forall n : nat,
-  N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx')[<=]c[*]AbsIR (f n x Hx))}} ->
+Lemma fun_ratio_test_conv_IR : {N : nat | {c : IR | c [<] One | Zero [<=] c /\ (forall x,
+  J x -> forall n, N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx') [<=] c[*]AbsIR (f n x Hx))}} ->
  fun_series_convergent_IR J f.
 intro H.
 red in |- *; intros.
@@ -1022,28 +955,27 @@ When working in particular with power series and Taylor series, it is
 sometimes useful to ``shift'' all the terms in the series one position 
 forward, that is, replacing each $f_{i+1}$#f<sub>i+1</sub># with
 $f_i$#f<sub>i</sub># and inserting the null function in the first 
-position.  This does not affect convergence or the Sum of the series.
+position.  This does not affect convergence or the sum of the series.
 *)
 
 Variable J : interval.
 Variable f : nat -> PartIR.
 Hypothesis convF : fun_series_convergent_IR J f.
 
-Definition insert_series (n : nat) : PartIR :=
+Definition insert_series n : PartIR :=
   match n with
   | O => [-C-]Zero
   | S p => f p
   end.
 
-Lemma insert_series_cont : forall n : nat, Continuous J (insert_series n).
+Lemma insert_series_cont : forall n, Continuous J (insert_series n).
 intro; elim n; intros.
 simpl in |- *; apply Continuous_const.
 simpl in |- *; apply convergent_imp_Continuous; auto.
 Qed.
 
-Lemma insert_series_sum_char :
- forall (n : nat) x Hx Hx',
- fun_seq_part_sum f n x Hx[=]fun_seq_part_sum insert_series (S n) x Hx'.
+Lemma insert_series_sum_char : forall n x Hx Hx',
+ fun_seq_part_sum f n x Hx [=] fun_seq_part_sum insert_series (S n) x Hx'.
 intro; induction  n as [| n Hrecn].
 intros; simpl in |- *; Algebra.
 intros; simpl in |- *; simpl in Hrecn; Algebra.
@@ -1053,7 +985,7 @@ Lemma insert_series_conv : fun_series_convergent_IR J insert_series.
 intros a b Hab Hinc.
 elim (convF _ _ _ Hinc); intros Hcont HCauchy.
 exists
- (fun n : nat =>
+ (fun n =>
   included_imp_Continuous _ _ (insert_series_cont n) _ _ _ Hinc).
 intros e H.
 elim (HCauchy e H); intros N HN.
@@ -1075,14 +1007,13 @@ apply AbsIR_wd.
 apply cg_minus_wd; apply insert_series_sum_char.
 Qed.
 
-Lemma insert_series_sum :
- Feq J (FSeries_Sum convF) (FSeries_Sum insert_series_conv).
+Lemma insert_series_sum : Feq J (FSeries_Sum convF) (FSeries_Sum insert_series_conv).
 set (contF := convergent_imp_Continuous _ _ convF) in *.
 apply
  FLim_unique_IR
   with
-    (fun n : nat => FSum0 n f)
-    (fun n : nat => Continuous_Sum0 _ _ contF n)
+    (fun n => FSum0 n f)
+    (fun n => Continuous_Sum0 _ _ contF n)
     (Continuous_FSeries_Sum _ _ convF)
     (Continuous_FSeries_Sum _ _ insert_series_conv).
 apply FSeries_conv.
@@ -1115,3 +1046,4 @@ unfold fun_seq_part_sum in |- *; Algebra.
 Qed.
 
 End Insert_Series.
+
