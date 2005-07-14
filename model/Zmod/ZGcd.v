@@ -1211,8 +1211,7 @@ apply Zgcd_is_divisor_rht.
 generalize (Zgcd_lin_comb a b); intro Hlincomb;
  generalize (Zgcd_is_divisor_lft a b); intro Hdivb; 
  elim Hdivb; intros y Hy; generalize (Zgcd_is_divisor_rht a b); 
- intro Hdiva; elim Hdiva; intros x Hx; set (d := Zgcd a b); 
- fold d in Hx; fold d in Hy.
+ intro Hdiva; elim Hdiva; intros x Hx; set (d := Zgcd a b) in Hx, Hy |- *. 
 replace 1%Z with (Zgcd a b / d)%Z; auto with zarith.
 rewrite Hlincomb.
 set (u := Zgcd_coeff_a a b); set (v := Zgcd_coeff_b a b).
