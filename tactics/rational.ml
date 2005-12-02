@@ -59,7 +59,8 @@ let sixth_arg c = (args_app c).(5)
 let xinterp g c = sixth_arg (pf_type_of g c)
 
 let mk_lambda n t c = mkLambda (n,t,c)
-let mk_cast c t = mkCast (c,t)
+let mk_cast c k t = mkCast (c,k,t)
+let mk_default_cast c t = mk_cast c DEFAULTcast t
 let mk_case ci a b c = mkCase (ci,a,b,c)
 
 let pf_nf_betadeltaiota = pf_reduce nf_betadeltaiota
@@ -358,7 +359,7 @@ let xrational verbose g a =
   let rec valconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_cast (mkApp(csg_unit, [|the_cmonoid |])) ta)
+	    (mk_default_cast (mkApp(csg_unit, [|the_cmonoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; valconstr f ta |]) in
@@ -366,7 +367,7 @@ let xrational verbose g a =
   let rec unconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_cast (mkApp(id_un_op, [|the_csetoid |])) ta)
+	    (mk_default_cast (mkApp(id_un_op, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; unconstr f ta |]) in
@@ -374,7 +375,7 @@ let xrational verbose g a =
   let rec binconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_cast (mkApp(cs_binproj1, [|the_csetoid |])) ta)
+	    (mk_default_cast (mkApp(cs_binproj1, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; binconstr f ta |]) in
@@ -382,7 +383,7 @@ let xrational verbose g a =
   let rec funconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_cast (mkApp(fid, [|the_csetoid |])) ta)
+	    (mk_default_cast (mkApp(fid, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; funconstr f ta |]) in
