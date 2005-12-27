@@ -104,9 +104,7 @@ let xrational verbose g a =
   and pos_xH = coq_constant "xH"
   and int_ZERO = coq_constant "ZERO"
   and int_POS = coq_constant "POS"
-  and int_NEG = coq_constant "NEG"
-
-  and cs_eq = constant_algebra "CSetoids.cs_eq" in
+  and int_NEG = coq_constant "NEG" in
 
   let xexpr_constant s =
     try constant_tactics (the_file ^ ".xexpr" ^ the_suffix ^ "_" ^ s)
@@ -468,10 +466,10 @@ let hrational1 verbose g =
   if verbose then msgnl (str "begin Rational");
   hrational verbose g
       
-TACTIC EXTEND Rational
-| ["Rational"] -> [ hrational1 false ]
+TACTIC EXTEND rational
+| ["rational"] -> [ hrational1 false ]
 END
 
-TACTIC EXTEND RationalVerbose
-| ["Rational" "Verbose"] -> [ hrational1 true ]
+TACTIC EXTEND rational_verbose
+| ["rational" "verbose"] -> [ hrational1 true ]
 END
