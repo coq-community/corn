@@ -102,9 +102,9 @@ let xrational verbose g a =
   and pos_xI = coq_constant "xI"
   and pos_xO = coq_constant "xO"
   and pos_xH = coq_constant "xH"
-  and int_ZERO = coq_constant "ZERO"
-  and int_POS = coq_constant "POS"
-  and int_NEG = coq_constant "NEG" in
+  and int_Z0 = coq_constant "Z0"
+  and int_Zpos = coq_constant "Zpos"
+  and int_Zneg = coq_constant "Zneg" in
 
   let xexpr_constant s =
     try constant_tactics (the_file ^ ".xexpr" ^ the_suffix ^ "_" ^ s)
@@ -184,13 +184,13 @@ let xrational verbose g a =
     else raise (Failure "evalint") in
 
   let rec evalint n =
-    if eq_constr n int_ZERO then 0
+    if eq_constr n int_Z0 then 0
     else if isApp n then
       let f = hd_app n
       and a = args_app n in
 	if Array.length a > 0 then
-	  if eq_constr f int_POS then evalpos a.(0)
-	  else if eq_constr f int_NEG then -(evalpos a.(0))
+	  if eq_constr f int_Zpos then evalpos a.(0)
+	  else if eq_constr f int_Zneg then -(evalpos a.(0))
 	  else raise (Failure "evalint")
 	else raise (Failure "evalint")
     else raise (Failure "evalint") in
@@ -302,9 +302,9 @@ let xrational verbose g a =
 	mkApp((if l == 0 then pos_xO else pos_xI), [| posconstr (k / 2) |]) in
 
   let rec intconstr k =
-    if k == 0 then int_ZERO else
-    if k > 0 then mkApp(int_POS, [| posconstr k |]) else
-      mkApp(int_NEG, [| posconstr (- k) |]) in
+    if k == 0 then int_Z0 else
+    if k > 0 then mkApp(int_Zpos, [| posconstr k |]) else
+      mkApp(int_Zneg, [| posconstr (- k) |]) in
     
   let rec xexprconstr t rhoV rhoU rhoB rhoP =
     match t with
