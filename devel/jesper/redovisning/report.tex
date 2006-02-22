@@ -1,0 +1,716 @@
+%&LaTeX
+\documentclass[a4paper]{article}
+% \usepackage[active]{srcltx} % search in dvi
+% \usepackage[swedish]{babel}
+% \usepackage[T1]{fontenc} % ger dåliga pdf-er!
+\usepackage[latin1]{inputenc}
+
+% \usepackage{icomma} % ``a,b'' typeset without space, but ``a, b'' with
+
+% \usepackage{graphicx}
+% \newcommand{\thee}{\rotatebox[origin=c]{180}{$\iota$}}
+
+% \usepackage{amsmath}
+% \usepackage{amsthm}
+% \usepackage{amssymb}
+% \usepackage{latexsym}
+% \usepackage{hyperref}
+% \usepackage[PS]{diagrams}
+\usepackage{jespermacros}
+
+\author{Jesper Carlstr\"om}
+
+%\author{Jesper Carlstr\"om\thanks{\url{http://www.math.su.se/$\sim$jesper/}}}
+
+\title{Subsets in Coq\\Report to Erik Palmgren}
+
+% \parindent0pt%
+% \parskip2ex%
+
+\begin{document}
+\nonfrenchspacing
+\maketitle
+
+
+\noindent
+This is a report about the files {\sf subsets.v} and {\sf
+  subsetspacked.v}, which in short can be expressed thus:
+\begin{itemize}
+\item In {\sf subsets.v}, you find ideas from my article in the
+  proceedings of TYPES 2002
+  \cite{carlstromsubsets}. However, some things have been made
+  differently for technical reasons and this text describes mainly the
+  differences.
+\item In {\sf subsetspacked.v}, you find ''quotients'', packed in
+  records -- and a lot of records for other uses as well. The idea is
+  in part absurd because the mere reason for doing the stuff in the
+  previous file is the belief that packing and unpacking should be
+  avoided. I created this file to investigate how {\sf subsets.v} can
+  be used in a packing oriented environment. Some interesting
+  aspects were observed. I have tried to point these out later in this
+  report.
+\end{itemize}
+
+\tableofcontents
+
+\pagebreak
+\section{The file {\sf subsets.v}}
+\label{sec:filen-subsets.v}
+
+Let me emphasise that I use implicit arguments heavily, it became more
+or less necessary to get readable code.
+\begin{verbatim}
+Set Implicit Arguments.
+Unset Strict Implicit.
+\end{verbatim}
+This means that Coq figures out the typing in many cases, so that one
+can write in a polymorphic style. The line `Unset Strict Implicit'
+makes Coq more cleaver. To be precise, some syntactic information is
+used even if it is not invariant under definitional equality. For
+instance, if $P(x)=\bot$, Coq could still (sometimes) derive the type
+of $x$ from the expression $P(x)$.
+
+\subsection{Advantage of subsets-as-propositional-functions}
+\label{sec:delm-som-past}
+
+The paradigm of subsets-as-propositional-functions 
+\cite{toolboxsubsets,carlstromsubsets} is based on the observation
+that subsets are defined by saying
+\begin{equation}
+  \label{eq:1}
+  x\insubset U \defeq P(x)
+\end{equation}
+for a propositional function $P$, whence one can conceive 
+''$x\insubset U$'' as just another way of writing $P(x)$. In other
+words, there is no reason for distinguishing the subset $U$ from the
+propositional function $P$.
+
+This solution, however, makes it necessary to distinguish between sets
+and subsets. If this distinction is to be avoided, subsets has to be
+viewed as $\Sigma$-sets instead. A drawback of this approach is that
+$\Sigma$-sets are more complicated than propositional functions and
+requires more reductions. The counterpart to (\ref{eq:1}) becomes to let
+$U\defeq\Sigma(A,P)$ and conclude that
+\begin{equation}
+  \label{eq:2}
+  x\in U \iff \pi_r(x)\in P(\pi_\ell(x))
+\end{equation}
+with both sides being \emph{judgements} rather than
+\emph{propositions} and the $\iff$ is \emph{not} definitional
+equality. Rather, (\ref{eq:2}) should be thought of as expressing
+certain introduction and elimination rules for $\Sigma$.
+
+The solution with $\Sigma$ becomes particularly heavy when many
+subsets are considered at one on a given underlying set. This is often
+the case in formal topology, where an open set is a subset of the set
+of basic opens. This might explain why the
+subsets-as-propositional-functions approach is so popular among
+topologysts. In the expression $\Sigma(A,U)$, only $U$ is varied,
+hence it is easier to consider only $U$ itself.
+
+
+\subsection{The drawback}
+\label{sec:nackd-med-delm}
+
+In a big formalisation project, like the one in Nijmegen, where the
+goal is to produce a library for mathematics in type theory, it is not
+always self-evident that the logically most natural solution is the
+best one. It is also necessary to take into consideration:
+\begin{itemize}
+\item Communication with users -- the solution should be easy to
+  understand. A new solution is bad even if it is better from a
+  strictly logical/mathematical point of view.
+\item Readability -- working with a computer, you care that Coq can
+  present the material in a nice way. If Coq is better at presenting a
+  certain form of formalisation, then this is an argument for this form.
+\item Modularity -- one way of viewing the rationals is as a subset of
+  the set of formal fractions. But if $\Q$ is a subset or a set should
+  not be visible outside the module for rationals. This is complicated
+  because type difference is always visible. By sticking to sets
+  rather than subsets all the time, it is easier to use the modules.
+\item Technical details -- however silly, you will certainly take into
+  account things that have to do with the current Coq implementation.
+\end{itemize}
+
+
+\subsection{The content of {\sf subsets.v}}
+\label{sec:inneh-subsets.v}
+
+I first define binary relations on types
+\begin{verbatim}
+Definition bin (X:Type) := (X->X->CProp).
+\end{verbatim}
+and then what it is to be reflexive, symmetric and
+transitive. The concept of equivalence relation is avoided, because I
+want to try to work without conjuncted concepts.
+
+We then come to the section about subsets. Coq has a mechanism called
+''sections''. Within such a section one can make assumptions about
+variables, which are then abstracted when the section is closed.
+
+\subsubsection{Section subsets.}
+\label{sec:section-subsets}
+
+We thus write:
+\begin{verbatim}
+Section subsets.
+
+Variable (carrier:Type).
+
+Definition subset (X:Type) : Type := X->CProp.
+\end{verbatim}
+and get a family ''subset X'' of subsets of $X$. We can tell what it
+is to be an element in a subset and introduce infix notation for this:
+\begin{verbatim}
+Definition insubset (x:carrier) (U:subset carrier) := U x.
+Infix "in" := insubset (at level 60).
+\end{verbatim}
+Then we may write ''x in U'' to say that $x$ is in the subset
+$U$. 
+Then we introduce some algebraic operations on subsets:
+\begin{verbatim}
+Definition intersection (U V:subset carrier) x := x in U and x in V.
+Definition union (U V:subset carrier) x := x in U or x in V.
+Definition complement (U:subset carrier) x := Not (x in U).
+
+Definition intersection_family (I:Type) (U:I->(subset carrier)) x :=
+  forall i:I, x in U i.
+
+Definition union_family (I:Type) (U:I->(subset carrier)) x :=
+  {i:I | x in U i}.
+\end{verbatim}
+The notation \verb/{i:I | x in U i}/ is a bit unfortunate here: it is
+the standard notation for existence in Coq.
+
+Further, relations between subsets are defined, as inclusion and
+extensional equality:
+\begin{verbatim}
+Definition includedin (U V:subset carrier):= forall x:carrier, 
+    x in U -> x in V.
+
+Infix "<=" := includedin (at level 70).
+
+Definition extequal (U V:subset carrier) := (U <= V) and (V <= U).
+
+Infix "=_ext" := extequal (at level 70).
+\end{verbatim}
+and it is showed that this equality is an equivalence relation.
+\begin{verbatim}
+Lemma extequal_refl: refl (extequal).
+Proof.
+intros U.
+split; intro p; trivial.
+Qed.
+
+Lemma extequal_sym: sym extequal.
+Proof.
+intros U V [p q].
+split; auto.
+Qed.
+
+Lemma extequal_trans: trans extequal.
+Proof.
+intros U V W [p q] [r s].
+split; intros a t; auto.
+Qed.
+\end{verbatim}
+
+Finally some results about binary intersections being equal to
+intersections of a binary family. I omit this.
+
+After the section we must tell which notation should be available
+after it:
+\begin{verbatim}
+Infix "in" := insubset (at level 60).
+Infix "/\" := intersection.
+Infix "\/" := union.
+Notation "~ U" := (complement U).
+Notation "'for' x 'in' U , P" :=
+    (forall (x':_) (x:x' in U), P)
+    (at level 200, x ident).
+Notation "'exists' x 'in' U , P" :=
+    {x':_ |{ x:(x' in U) | P}}
+    (at level 200, x ident).
+Infix "<=" := includedin.
+Infix "=_ext" := extequal (at level 70).
+\end{verbatim}
+
+
+\subsubsection{Section subsetalgebra}
+\label{sec:sect-subsetalg}
+
+In this section it is assumed that we deal with four subsets and it
+should be proved that operations on them are extensional.
+\begin{verbatim}
+Section subsetalgebra.
+
+Variable carrier:Type.
+Variables U V U' V':subset carrier.
+\end{verbatim}
+
+Here are the results. I include them because they show rather good how
+one deals with subsets.
+\begin{verbatim}
+Lemma intersection_ext:
+   (U =_ext U') -> (V =_ext V') -> ((U /\ V) =_ext (U' /\ V')).
+Proof.
+intros [p q] [r s].
+split; intros a [u v]; split; auto.
+Qed.
+
+Lemma union_ext:
+   (U =_ext U') -> (V =_ext V') -> ((U \/ V) =_ext (U' \/ V')).
+Proof.
+intros [p q] [r s].
+split; (intros a [u | v]; [left | right]; auto).
+Qed.
+
+Lemma complement_ext: (U =_ext V) -> ((~ U) =_ext (~ V)).
+Proof.
+intros [p q].
+split; intros a r s; auto.
+Qed.
+
+Lemma deMorgan: (~ (U \/ V)) =_ext (~ U /\ ~V).
+Proof.
+split.
+intros a p.
+split; intro q; apply p; [left|right]; assumption.
+intros a [p q] [r|s]; auto.
+Qed.
+\end{verbatim}
+
+
+\subsubsection{Section quotients.}
+\label{sec:section-quotients}
+
+The purpose of this section is to introduce equivalence relations on
+subsets. We therefore assume that we deal with a certain subset, here
+called `domain', and define what is meant by a binary relation on
+it. Note the use of the previously defined notation
+`for x in domain, ...'.
+
+\begin{verbatim}
+Variables carrier:Type.
+Variable domain:subset carrier.
+
+Definition bin_on := (for x in domain, for y in domain, CProp).
+
+Variable R:bin_on.
+
+Infix "~" := R (at level 70). 
+\end{verbatim}
+In fact, $R$ takes four arguments $x p y q$, where $p$ and $q$ proves that
+$x$ and $y$ belongs to the domain. Because of the implicit arguments
+it is not necessary to spell out $x$ and $y$, as Coq can determine them
+from $p$ and
+$q$. Notice that this requires the option `unstrict' because $x$ is
+determined from `p:x in domain', but if `x in domain' is
+definitionally equal to `True', the judgement 
+`p:x in domain' could be converted to `p:True', which does not contain
+information about $x$. 
+
+Because  Coq can extract info about $x$ and $y$ from $p$ and $q$, I
+used the following trick:
+\begin{quote}
+  I use the notation \verb/x/ for $p$ and \verb/y/ for $q$, while $x$
+  and $y$ is denoted by \verb/x'/ and \verb/y'/, respectively.
+\end{quote}
+This leads to the nice illusion that one is working with the
+underlying objects, while Coq keeps track of the required proof
+objects. In reality it is the opposite, which is unintuitive to
+me. Therefore the trick gave more readable code.
+
+We may in this way define reflexivity, symmetry and transitivity thus:
+\begin{verbatim}
+Definition refl_part := for x in domain, x~x.
+
+Definition sym_part := for x in domain, for y in domain, x~y -> y~x.
+
+Definition trans_part := 
+   for x in domain,
+   for y in domain,
+   for z in domain,   x~y -> y~z -> x~z.
+\end{verbatim}
+
+We also define a property which is important to require in order for
+equivalence relations on subsets not to be too fine, namely a form of
+proof irrelevance. The arguments for this can be found in
+\cite{carlstromsubsets}.
+\begin{verbatim}
+Definition proofirr :=
+   for x in domain,
+   for y in domain,
+   forall z:(underlying x) in domain,
+   forall w:(underlying y) in domain,
+   z~w -> x~y.
+\end{verbatim}
+where \verb/underlying/ is defined thus:
+\begin{verbatim}
+Definition underlying (x':carrier) (_:x' in domain) := x'.
+\end{verbatim}
+
+The fines of all reflexive and proof irrelevant relations is called
+\verb/same/. It means that the underlying objects are Leibniz equal.
+\begin{verbatim}
+Definition same:bin_on := fun
+   (x':_) (x:x' in domain)
+   (y':_) (y:y' in domain) =>
+    x'=y'.
+
+Lemma strongrefl: proofirr ->
+                  refl_part -> 
+                  forall a:carrier,
+                  forall (x y:a in domain),
+                  x~y.
+Proof.
+intros Hpirr Hrefl a x y.
+apply Hpirr with x x.
+apply Hrefl.
+Qed.
+
+Lemma same_finest: proofirr ->
+                   refl_part ->
+                   for x in domain,
+                   for y in domain,
+                   same x y -> x ~ y.
+Proof.
+intros Hpirr Hrefl x' x y' y; compute.
+destruct 1; apply strongrefl; assumption.
+Qed.
+\end{verbatim}
+
+Every total equivalence relation can be cut down to a proof irrelevant
+equivalence relation on a subset and conversely every such relation
+can be extended to a total equivalence relation by the reflexive closure.
+
+\begin{verbatim}
+Definition reflexive_closure : bin carrier := 
+    fun x' y':carrier => 
+   (x'=y') or {x:(x' in domain) | {y:(y' in domain) | x~y}}.
+
+(** reflexive relations on subsets extend to reflexive relations *)
+
+Lemma reflexive_closure_refl: refl reflexive_closure.
+Proof.
+intros x'.
+left; auto.
+Qed.
+
+(** symmetric relations on subsets extend to symmetric relations *)
+
+Lemma reflexive_closure_of_sym_sym: sym_part -> sym reflexive_closure.
+Proof.
+intros s x' y' [eq|H].
+ left; symmetry; assumption.
+existse H x H.
+existse H y H.
+right; exists y; exists x; auto.
+Qed.
+
+
+(** Interestingly, we don't have the analogous lemma for transitivity,
+since it might happen that we have 
+
+   - [R x' x y' y]
+   - [R y' u z' z]
+
+and so the reflexive closure will identify x' with y' and y' with z',
+but not necessarily x' with z' (because y need not be the same as
+u). We need also proofirr to prove transitivity. *)
+
+Lemma reflexive_closure_of_pirr_trans_trans: 
+   proofirr -> trans_part -> trans reflexive_closure.
+Proof.
+intros Hpirr Htr x' y' z' [id| p].
+  destruct id.
+  intros [id| p].
+    destruct id.
+    left; reflexivity.
+  existse p x H.
+  existse H z e.
+  right; exists x; exists z; assumption.
+existse p x H.
+existse H y e.
+intros [id| p].
+  destruct id.
+  right; exists x; exists y; assumption.
+existse p y2 H.
+existse H z e2.
+right; exists x; exists z.
+apply Htr with y' y; auto.
+apply Hpirr with y2 z; auto.
+Qed.
+\end{verbatim}
+
+
+
+\subsubsection{Section partialfunctions.}
+\label{sec:sect-part}
+
+A nice notation for partial functions:
+\begin{verbatim}
+Notation "U ~> B" := (for x in U, B).
+\end{verbatim}
+Let's make some assumptions. We deal with two subsets with relations
+on and a partial function between, We define what it means that it
+maps into the codomain.
+\begin{verbatim}
+Variables carrier cocarrier:Type.
+Variable domain:subset carrier.
+Variable codomain:subset cocarrier.
+Variable R:bin_on domain.
+Variable R_co:bin_on codomain.
+Variable f:domain ~> cocarrier.
+
+Infix "~" := R (at level 70).
+Infix "~~" := R_co (at level 70).
+
+Definition into := for x in domain, f x in codomain.
+\end{verbatim}
+
+Notice that a partial function in itself does not carry a proof that
+it maps into the codomain. This is instead something we can say about
+it. This means that we may say things like `The partial function $f$
+maps into the subset $U$ but not into the subset $V$'.
+
+The definitions of extensionality look as follows:
+\begin{verbatim}
+Definition extensional :=
+   for x in domain, 
+   for x' in domain, 
+   forall y:f x in codomain,
+   forall y':f x' in codomain,
+   x~x' -> y~~y'.
+\end{verbatim}
+Dually we have the concept of injectivity:
+\begin{verbatim}
+Definition injective :=
+   for x in domain, 
+   for x' in domain,
+   forall y:f x in codomain,
+   forall y':f x' in codomain,
+   y ~~ y' -> x ~ x'.
+\end{verbatim}
+
+The definition of surjectivity follows Bishop: a function is
+surjective if it has a (not necessarily extensional) right inverse
+(this example shows that it is sometimes good not to require all
+functions to be extensional). That $g$ is right inverse of $f$ is
+expressed with \verb/isinv R_co f g/.
+\begin{verbatim}
+Definition isinv : CProp :=
+                 for y in codomain,
+                 forall x:(g y in domain),
+                 forall y':(f x in codomain), y' ~~ y.
+\end{verbatim}
+Notice that this concept depends on \verb/R_co/.
+
+
+\subsubsection{Section bijections.}
+\label{sec:section-bijections}
+
+This section contains some results about the right inverse of a
+surjective function $f$ is extensional if $f$ is injective, etc. I
+skip this, you may have a look in the file.
+
+
+\subsubsection{Section compositions.}
+\label{sec:sect-comp}
+
+Now a drawback of the `flat' approach is apparent: we must assume a
+lot in the beginning of this section:
+\begin{verbatim}
+Variables A B C:Type.
+Variable X:subset A.
+Variable Y:subset B.
+Variable Z:subset C.
+
+Variable RX:bin_on X.
+Variable RY:bin_on Y.
+Variable RZ:bin_on Z.
+
+Hypothesis Xpirr:proofirr RX.
+Hypothesis Ypirr:proofirr RY.
+Hypothesis Zpirr:proofirr RZ.
+
+Hypothesis Xrefl:refl_part RX.
+Hypothesis Yrefl:refl_part RY.
+Hypothesis Zrefl:refl_part RZ.
+
+Hypothesis Xsym:sym_part RX.
+Hypothesis Ysym:sym_part RY.
+Hypothesis Zsym:sym_part RZ.
+
+Hypothesis Xtr:trans_part RX.
+Hypothesis Ytr:trans_part RY.
+Hypothesis Ztr:trans_part RZ.
+
+Variable f:X ~> B.
+Variable g:Y ~> C.
+
+Hypothesis f_i:into Y f.
+\end{verbatim}
+
+The advantage is that we may use the assumptions freely within the
+section but when we close it each lemma will depend only on the ones
+which are actually used in the proof of the lemma. In this way some
+lemmas are very general without any extra effort.
+
+We define what compositions are and introduce nice notation for the
+equivalence relations.
+\begin{verbatim}
+Definition composition (a:A) (x:a in X) := g (f_i x).
+
+Infix "~X" := RX (at level 70).
+Infix "~Y" := RY (at level 70).
+Infix "~Z" := RZ (at level 70).
+\end{verbatim}
+
+Then we show things like `compositions are extensional if the parts
+are' (likewise for injectivity and surjectivity).
+
+
+\subsubsection{Section finiteness.}
+\label{sec:section-finiteness}
+
+We treat finite subsets. We want finiteness to be a predicate which we
+can use on subsets with equivalence relations. We define a
+standard family of finite subsets as initial segments of the natural
+numbers and say that a subset is finite iff it is in bijective
+correspondence with such a segment.
+\begin{verbatim}
+Definition fin n : subset nat := fun k => {l:nat | k + S l = n}.
+\end{verbatim}
+
+Then some results about finite subsets being discrete etc follows.
+
+Hofmann's theorem (with Hedberg's proof) about equality of natural
+numbers having at most one proof is used to show that proofs of k
+belonging to fin n are unique. This is in turn used to prove finite
+extensional choice: if we have a surjection to a finite subset there
+is an extensional right inverse. This is the last result of the file.
+
+\section{The file {\sf subsetspacked.v}}
+\label{sec:filen-packed}
+
+The question appeared if it is good or bad with a file which is as
+`flat' as {\sf subsets.v}. I therefore produced another file which
+uses {\sf subsets.v} but is more `packed'. The first step was of
+course to define the notion of equivalence relation
+\begin{verbatim}
+Record eq_rel (A:Type)(R:bin A):Type :=
+{  eq_rel_refl:refl R;
+   eq_rel_sym:sym R ;
+   eq_rel_trans:trans R }.
+\end{verbatim}
+and prove things like the extensional equality being an equivalence
+relation. Precisely as desired the lemmas from the previous file can
+be applied directly:
+\begin{verbatim}
+Lemma extequal_eq: forall (A:Type), eq_rel (extequal (carrier:=A)).
+Proof.
+split.
+    apply extequal_refl.
+  apply extequal_sym.
+apply extequal_trans.
+Qed.
+\end{verbatim}
+
+In the same spirit we define equivalence relations on subsets:
+\begin{verbatim}
+Record eq_part (A:Type)(U:subset A)(R:bin_on U): CProp :=
+{
+   eq_part_pirr:   proofirr R ;
+   eq_part_refl:   refl_part R;
+   eq_part_sym:    sym_part R;
+   eq_part_tr:     trans_part R
+}.
+\end{verbatim}
+This definition will later lead to problems, because several of my
+lemmas require that a relation is reflexive, but we don't have that,
+but only that it is an equivalence relation. For Coq it is not
+self-evident that equivalence relations are reflexive, so we have to
+teach this to Coq:
+\begin{verbatim}
+Hint Immediate eq_part_pirr : subsets.
+Hint Immediate eq_part_refl : subsets.
+Hint Immediate eq_part_sym : subsets.
+Hint Immediate eq_part_tr : subsets.
+\end{verbatim}
+The ending `:subsets' makes the hints put in a data base called
+`subsets'. We can then use these hints with a tactic
+''sauto'' which is defined in Ltac as follows:
+\begin{verbatim}
+Ltac sauto := auto with subsets.
+\end{verbatim}
+
+We now prove that the reflexive closure of an equivalence relation on
+a subset is a total equivalence relation. Again, we may use our lemmas:
+\begin{verbatim}
+Lemma reflexive_closure_of_eq_eq: forall (A:Type)(U:subset A)(R:bin_on U),
+   eq_part R -> eq_rel (reflexive_closure R).
+Proof.
+intros A U R [Href Hsym Htr Hext].
+split.
+    apply reflexive_closure_refl.
+  apply reflexive_closure_of_sym_sym; assumption.
+apply reflexive_closure_of_pirr_trans_trans; assumption.
+Qed.
+
+Thereafter you find a proof that ''same'' in an equivalence relation,
+I omit this.
+
+The definition of surjectivity follows Bishop:
+\begin{verbatim}
+Record surjective (A B:Type) (U:subset A) (V:subset B) (RV:bin_on V) (f:U~>B)
+: CProp := {
+   fun_i: into V f ;
+   inv : V ~> A ;
+   inv_i: into U inv ;
+   isinv_pf : isinv RV f inv }.
+\end{verbatim}
+
+Finally, we collect carrier, subset and equivalence relation in a
+record. Personally I think this idea is absurd, because it looks to me
+the result is very similar to setoids so it is unclear why one should
+do anything new at all. It is, however, instructive to see how it works.
+\begin{verbatim}
+Record quotient : Type :=
+{
+   q_carrier: Type ;
+   q_subset:  subset q_carrier ;
+   q_rel:     bin_on q_subset ;
+   q_eq:      eq_part q_rel
+}.
+\end{verbatim}
+
+The rest of this file is more or less a repetition of subsets.v, so I
+don't say more about it here but refer to the file itself.
+
+
+
+\section{Conclusion}
+\label{sec:sammanfattning}
+
+The file {\sf subsets.v} follows the paradigm of
+subsets-as-propositional-functions. Advantages are the ones one would
+expect. Unexpected (to me) disadvantages is that you often get many
+subgoals to prove. However simple, they have to be taken care of (by
+the tactic sauto, for instance). For example: instead of the goal that a relation
+is an equivalence relation one gets four goals to prove: reflexivity,
+symmetry, transitivity, proof irrelevance. 
+
+
+
+
+\bibliographystyle{jesper}
+\bibliography{all}
+
+\
+
+\
+
+See also the files {\sf subsets.v} and {\sf subsetspacked.v}.
+
+\end{document}

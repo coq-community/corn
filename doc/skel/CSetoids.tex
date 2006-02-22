@@ -1,0 +1,317 @@
+% $Id: CSetoids.tex,v 1.1 2004/02/11 09:39:58 lcf Exp $
+
+\section{Setoids}
+A basic ingredient of constructive real numbers is the {\em apartness\/}
+relation $\noto$. This is a constructive version of the (classical)
+inequality on reals: two real numbers are apart if it can positively
+be decided that they are distinct from each other. In constructive analysis, the apartness is more basic then equality. We therefore take
+the notion of apartness as a basic ingredient of our structures
+Usually this apartness is taken to be {\em tight}, saying that the
+negation of
+apartness is the equality. In \cite{Ruit82} and \cite{MRR88} also
+apartness relations occur that are not necessarily tight, but in the
+formalization
+of reals one can restrict to a tight apartness. This also implies that,
+in the formalization, we could have done without an equality
+alltogether (and replace it with the negation of $\noto$). For reasons
+of exposition and for relating to a more classical set-up we choose to
+take equality as a primitive.
+
+\begin{definition}
+A binary relation $\noto$ on a set $S$ is an {\em apartness\/}
+relation if
+\begin{enumerate}
+\item $\noto$ is {\em consistent}, i.e.\ $\neg a \noto a$ for all $a$.
+\item $\noto$ is {\em symmetric}, i.e.\ $ a \noto b \implies b \noto a$
+for
+all $a, b$.
+\item $\noto$ is cotransitive, i.e.\ $a\noto b \rightarrow\forall
+z[a\noto z \vee z\noto b]$ for all $a, b$.
+\end{enumerate}
+An apartness relation is {\em tight\/} if its negation is the
+equality, i.e.\ $\neg(a\noto b) \eqqe a = b$ for all $a, b$.
+\end{definition}
+
+\begin{fact} The negation of an apartness relation on $S$ is an
+equivalence relation on $S$ which is stable, i.e.\ $\neg\neg\neg(a\noto b) 
+\implies \neg(a\noto b)$.
+\end{fact}
+
+\begin{lemma}\label{lemaprespeq}
+  A tight apartness relation respects the equality, i.e.
+$$a\noto b \wedge b=b' \implies a\noto b' \mbox{ for all } a,b,b'.$$
+\end{lemma}
+
+\begin{proof}
+  If $a\noto b$, then $a\noto b' \vee b\noto b'$. The latter is false,
+  because $b=b'$. \qed
+\end{proof}
+
+\begin{definition}\label{defset} A {\em constructive setoid\/} is a triple 
+ $\langle  S, =, \noto \rangle$, with  $S$ a set, $=$ an equivalence relation
+ on $S$ and $\noto$ a tight apartness relation on $S$.
+\end{definition}
+
+In a structure, we want the operations and relations to respect
+the equality and the apartness. For the equality this means
+that we want to have the {\em replacement property\/} for all
+predicates:
+$$R(x_1,\ldots , x_n)\wedge x_1 = y_1 \wedge \ldots \wedge x_n = y_n
+\implies R(y_1,\ldots , y_n).$$ 
+
+\begin{fact}
+The replacement property is closed under $\vee, \wedge, \neg,
+\implies, \exists$ and $\forall$.
+\end{fact}
+
+So, we only have to require that the basic relations satisfy the
+replacement property and that all basic operations are {\em
+well-defined\/} with respect to the equality, i.e.\ for $f$ of arity
+$n$ we have the following.
+$$x_1 = y_1 \wedge \ldots \wedge x_n = y_n
+\implies f(x_1,\ldots , x_n) = f(y_1,\ldots , y_n).$$ 
+
+If we have a tight apartness relation, 
+this immediately implies
+$$\neg(x_1 \noto y_1) \wedge \ldots \wedge \neg(x_n \noto y_n)
+\implies \neg(f(x_1,\ldots , x_n) \noto f(y_1,\ldots , y_n)),$$
+but one would like to have a more positive
+formulation saying
+$$f(x_1,\ldots , x_n) \noto f(y_1,\ldots , y_n)\implies (x_1 \noto
+y_1) \vee \ldots \vee (x_n \noto y_n).$$  
+
+This property is called {\em strong extensionality\/} of $f$.
+
+\begin{definition}\label{defstrext}
+Let $S$ be a set with an apartness relation $\noto$ defined on it. For
+$f$ a $n$-ary function on $S$, we say that $f$ is {\em strongly
+extensional\/} if
+$$\forall x_1, \ldots, x_n, y_1, \ldots, y_n [f(\vec{x}) \noto
+f(\vec{y}) \implies (x_1\noto y_1 \vee \ldots \vee x_n \noto y_n)].$$
+For $R$ a $n$-ary relation on $S$, we say that $R$ is {\em strongly
+extensional\/} if
+$$\forall x_1, \ldots, x_n, y_1, \ldots, y_n [R(\vec{x}) \implies 
+(R(\vec{y})
+\vee x_1\noto y_1 \vee \ldots \vee x_n \noto y_n)].$$
+\end{definition}
+
+\begin{fact}
+Strong extensionality of functions is closed under composition. Strong
+extensionality of relations is closed under $\vee$, $\wedge$,
+$\exists$ and the substitution of strongly extensional terms.
+\end{fact}
+
+\begin{lemma}
+Strong extensionality implies well-definedness for functions.
+\end{lemma}
+
+\begin{proof}
+Suppose $f(\vec{x}) \noto f(\vec{y}) \implies (x_1\noto y_1 \vee
+\ldots \vee x_n \noto y_n)$ for all $x_1, \ldots, x_n, y_1, \ldots,
+y_n$. Suppose $x_1 = y_1\wedge \ldots \wedge x_n = y_n$ and
+$f(\vec{x}) \noto f(\vec{y})$. Then $x_1\noto y_1 \vee \ldots \vee x_n
+\noto y_n$ by strong extensionality of $f$. Contradiction, so
+$\neg(f(\vec{x}) \noto f(\vec{y}))$, i.e.\ $f(\vec{x}) = f(\vec{y})$.
+\qed
+\end{proof}
+
+ 
+\begin{remark}
+Strong extensionality (for functions) says that a function can only
+distinguish elements that can already be distinguished.  We will
+require all basic functions in constructive structures to be strongly
+extensional.  As a consequence, all composed functions will be
+strongly extensional.
+%
+%Strong extensionality for relations says -- roughly --
+%that a relation can only distinguish elements that can already be
+%distinguished. This intuition can be made more precise if we define
+%an apartness relation $\noto'$ on formulas by
+%$$ \phi \noto'\psi := (\phi\wedge \neg \psi)\vee(\neg \phi \vee
+%\psi),$$
+%and we define a relation to be {\em modified strongly extensional\/}
+%if
+%$$ \forall x_1, \ldots, x_n, y_1, \ldots, y_n [R(\vec{x}) \noto'
+%R(\vec{y}) \implies (x_1\noto y_1 \vee \ldots \vee x_n \noto y_n)].$$
+%Now, strong extensionality implies modified strong extensionality, but
+%not the other way around (QUESTION: Give CEX!). Obviously, both
+%notions are classically equivalent.
+
+We do not want all relations to be strongly extensional. For example,
+equality is not strongly extensional: if it were, then $x = y \implies
+p=q\vee x\noto p\vee y\noto q$ for all $x,y,p,q$, which implies the
+decidability of equality (take $x$ for $y$ and $p$).
+\end{remark}
+
+\begin{lemma}\label{lemstrextarg}
+If a binary function $f$ is strongly extensional in both arguments,
+i.e.\
+\begin{eqnarray*}
+\forall x_1, x_2, y [f(x_1,y) \noto f(x_2, y) \implies (x_1\noto
+x_2)],\\
+\forall x, y_1,y_2 [f(x,y_1) \noto f(x, y_2) \implies (y_1\noto y_2)],
+\end{eqnarray*}
+then it is strongly extensional. Similarly for functions of higher
+arity.
+\end{lemma}
+
+\begin{proof}
+Suppose the binary function $f$ is strongly extensional in both
+arguments and suppose $f(x_1,y_1) \noto f(x_2, y_2)$. Then $f(x_1,y_1)
+\noto f(x_1, y_2) \vee f(x_1,y_2) \noto f(x_2, y_2)$ by
+cotransitivity.  Hence $ y_1 \noto y_2 \vee x_1 \noto x_2$. \qed
+\end{proof}
+
+\begin{lemma}\label{lemstrextneq} If $f$ is strongly extensional, then
+$$ f(\vec{x}) \neq f(\vec{y}) \implies \neg(x_1 = y_1 \wedge \ldots
+\wedge x_n = y_n).$$ 
+\end{lemma}
+
+\begin{proof}
+Suppose $ f(\vec{x}) \neq f(\vec{y})$, i.e. $\neg\neg(f(\vec{x}) \neq
+f(\vec{y}))$. Suppose also that $x_1 = y_1 \wedge \ldots
+\wedge x_n = y_n$. Now, if $f(\vec{x}) \noto f(\vec{y})$, then $x_1
+\noto y_1 \vee \ldots \vee x_n \noto y_n$, contradicting $x_1 = y_1
+\wedge \ldots \wedge x_n = y_n$. So $\neg(f(\vec{x}) \noto
+f(\vec{y}))$, contradicting $ f(\vec{x}) \neq f(\vec{y})$. So we
+conclude that $\neg(x_1 = y_1 \wedge \ldots \wedge x_n = y_n)$. \qed
+\end{proof}
+
+If a function $f$ has an inverse, we want it to {\em respect\/} the
+apartness. Note that, if $f$ has no inverse we do not want that in
+general (e.g.\ consider multiplication in $\ZZ_4$).  That $f$ respects
+$\noto$ comes as a consequence of strong extensionality and the
+existence of an inverse.
+
+\begin{lemma}\label{lemstrextinv}
+Suppose that the unary function $f$ has an inverse $g$ which is
+strongly extensional. Then $f$ respects the apartness, i.e.\
+$$x\noto y \implies f(x) \noto f(y).$$
+\end{lemma}
+
+\begin{proof}
+We know that $g(x) \noto g(y) \implies x\noto y$
+and that $g(f(x))=x$. Now suppose $x\noto y$, i.e.\ $g(f(x))\noto
+g(f(y))$. Then $f(x) \noto f(y)$ by strong extensionality of $g$. \qed
+\end{proof}
+
+\begin{lemma}\label{respneq}
+If $f$ respects the apartness, then $f$ respects the inequality
+\end{lemma}
+
+\begin{proof}
+Let $f$ respect the apartness(i.e.\ $(x_1\noto y_1 \vee \ldots \vee
+x_n \noto y_n) \implies 
+f(\vec{x}) \noto f(\vec{y})$). Suppose  $x_1\neq y_1 \vee \ldots \vee
+x_n \neq y_n$ and suppose $f(\vec{x} = f(\vec{y})$. Now, if $x_i \noto
+y_i$ for some $i$, then $f(\vec{x} \noto f(\vec{y})$, contradiction,
+so $x_i = y_i$ for all $i$. This is again a contradiction, so
+$f(\vec{x}) \neq f(\vec{y})$. \qed
+\end{proof}
+
+\begin{lemma}
+If a relation $R$ is strongly extensional in each of its arguments, it
+is strongly extensional.
+\end{lemma}
+
+\begin{proof}
+We give the proof for a binary relation $R$. Suppose $R$ is strongly
+extensional in both arguments, i.e.
+\begin{eqnarray*}
+R(x,y) &\implies & R(x,q)\vee y\noto q,\\
+R(x,y) &\implies & R(p,y)\vee p\noto x.
+\end{eqnarray*}
+for all $x,y,p,q$.
+Now, if $R(x,y)$, then $R(x,q)\vee y\noto q$. If $R(x,q)$, then
+$R(p,q)\vee p\noto x$, so $R(p,q)\vee p\noto x\vee y\noto q$. \qed
+\end{proof}
+
+
+\begin{lemma}\label{tapstrext}
+Apartness is strongly extensional.
+\end{lemma}
+
+\begin{proof}
+Suppose $x\noto y$. Then $x\noto p \vee y\noto p$ by cotransitivity
+and hence $x\noto p \vee y\noto q \vee p\noto q$ by again
+cotransitivity.
+\qed
+\end{proof}
+
+\subsection{On the choice of the primitives}
+In view of the fact that we require an apartness relation in  a setoid
+to be tight, we could have chosen to define a setoid as a pair
+$\langle S, \noto\rangle$ with $\noto$ an apartness relation and then
+{\em define\/} equality by
+$$x=y \;\;\;\; := \;\;\;\; \neg(x\noto y).$$ 
+Then the following can be shown.
+\begin{enumerate}
+\item If an operation $f$ is strongly extensional, then it respects
+$=$.
+\item If a relation $R$ is strongly extensional, then it satisfies the
+replacement property.
+\item Hence all relations satisfy the replacement property.
+\end{enumerate}
+
+So, we could have done without an equality alltogether.  However, we
+have not chosen this option, because equality is a natural
+primitive. Furthermore one may at some point encounter structures in
+which apartness is not tight.
+
+\subsection{Subsetoids and Quotient Setoids}
+\begin{definition}\label{defsubset}
+Given a constructive setoid $\langle S, =, \noto \rangle$ and a
+predicate $P$ on $S$, we define the {\em subsetoid of the $x\in S$
+that satisfy $P$\/} as the setoid $\langle \{ x\in S \mid P (x) \},
+=', \noto' \rangle$, where $='$ and $\noto'$ are the equality and
+apartness inherited from $S$, i.e.\ for $q,t\in \{ x\in S \mid P (x) \}$,
+\begin{eqnarray*}
+ t='q &\iff & t =q,\\
+ t\noto'q &\iff & t \noto q,\\ 
+\end{eqnarray*}
+We denote this subsetoid just by $\{ x\in S \mid P (x) \}$.
+\end{definition}
+
+For this definition to be correct, it has to be shown that $='$ is
+indeed an equivalence relation and that $\noto'$ is a tight apartness
+relation (w.r.t.\ $=$) on $\{ x\in S \mid P (x) \}$. This is trivially
+the case. As the equivalence and apartness are directly inherited from
+$S$, we never write them explicitly, but use the ones from $S$.
+
+\begin{definition}\label{quotset}
+Given a constructive setoid $\langle S, =, \noto \rangle$ and a
+strongly extensional apartness relation $Q$ on $S$, we define the {\em
+co-quotient setoid $S/R$\/} as the setoid $\langle S,\overline{R} , R
+\rangle$, where $\overline{R}$ is the complement of $R$, i.e.\
+$\overline{R} (x,y)$ iff $\neg R(x,y)$.
+\end{definition}
+
+For this definition to be correct, it has to be shown that
+$\overline{R}$ is an equivalence relation and that $R$ is a tight
+apartness relation (w.r.t.\ $\overline{R}$) on $\{ x\in S \mid P (x)
+\}$. This follows trivially from the definition of $\overline{R}$ and
+the fact that $R$ is an apartness.
+
+If we do not require $R$ to be strongly extensional, $S/R$ as defined
+above is still a constructive setoid. However, we only want to
+consider the situation where the new apartness $R$ is a subset of the
+old one, i.e.\ $R(x,y) \implies x\noto y$. This is a consequence of
+strong extensionality of $R$: take $x$ for $p$ and for $q$ in $R(x,y)
+\implies (R(p,q) \vee x\noto p \vee y \noto q)$.  As a consequence we
+then find that $=$ is a subset of $\overline{R}$, so the new equality
+is a refinement of the old one. So, the definition of co-quotient
+setoid subsumes the ordinary definition of quotient set.
+
+For a strongly extensional function $f$ on a setoid $\langle S,
+=,\noto\rangle$ we find that, if $f$ is strongly extensional w.r.t.\
+$R$, with $R$ a strongly extensional apartness relation on $S$, then
+$f$ is also strongly extensional on the co-quotient setoid.
+
+The real numbers form a primary example of a co-quotient setoid. They
+can be seen as the setoid $(\NN \arr \QQ)/R$, where $\NN\arr \QQ$ is
+the set of infinite sequences of rational numbers and $R$ is the
+apartness relation between such sequences: for $r$ and $s$ two
+sequences, $R(r,s)$ iff $\exists k, N\in\NN\forall m>N (|r_m - s_m| 
+>\frac{1}{k})$.
+
+

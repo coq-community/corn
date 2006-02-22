@@ -1,0 +1,82 @@
+% $Id: CComplex.tex,v 1.1 2004/02/11 09:39:56 lcf Exp $
+
+\section{Complex numbers}
+\begin{definition}
+A structure for the complex numbers consists of
+
+$$\CC=\RR\times \RR,$$
+%
+where $\RR$ is a structure for the real numbers.
+On a structure of the complex numbers one defines
+\begin{eqnarray*}
+(r,s)+_\CC(r',s')&=&(r+r',s+s');\\
+(r,s)*_\CC(r',s')&=&(r*r'-s*s',r*s'+r'*s);\\
+0_\CC&=&(0,0);\\
+1_\CC&=&(1,0);\\
+i&=&(0,1),\\
+(r,s)=_\CC(r',s')&=&r= r' \wedge s= s',\\
+(r,s)\noto_\CC(r',s')&=&r\noto r' \vee s\noto s'.
+\end{eqnarray*}
+Here $+,*,0,1,=,\noto$ denote the usual operations and relations on
+the structure for the reals.
+\end{definition}
+
+\begin{notation}
+ As a corollary of the definition, an element $z=(r,s)\in \CC$ will
+ also be denoted by $r + is$.
+\end{notation}
+
+\begin{proposition}
+\begin{enumerate}
+\item With the definitions
+\begin{eqnarray*}
+-_\CC(r,s)&=&(-r,-s);\\
+(r,s)^{-1}&=&(\frac{r}{r^2+s^2},\frac{-s}{r^2+s^2}).
+\end{eqnarray*}
+a structure for the reals becomes a constructive field.
+\item
+Moreover $i^2=-1$.
+\end{enumerate}
+\end{proposition}
+
+Let in the following $\CC$ be a structure for the complex numbers.
+
+\begin{definition}
+For $z=(r,s)\in \CC$ define
+\begin{eqnarray*}
+|z|&=&\sqrt{(r^2+s^2)};\\
+\overline{z}&=&(r,-s).
+\end{eqnarray*}
+\end{definition}
+
+\begin{lemma}For $z\in\CC$ one has
+$$z\noto 0 \eqqe |z| \noto 0,$$
+where the second $\noto$ and $0$ are taken from the structure of reals.
+\end{lemma}
+
+
+\begin{proposition}
+For $z_1,z_2\in \CC$ one has
+\begin{eqnarray*}
+\overline{z_1*_\CC z_2}&=&\overline{z_1}*_\CC\overline{z_2}.\\
+|z_1*_\CC z_2|&=&|z_1|*|z_2|.\\
+|z_1+_\CC z_2|&\leq& |z_1|+|z_2|.
+\end{eqnarray*}
+\end{proposition}
+
+\begin{lemma} For $z_1, z_2\in\CC$ one has
+$$\frac{z_1}{z_2}< 0 \implies |z_1+z_2| = |z_1|-|z_2|,$$
+where the statement $ \frac{z_1}{z_2}< 0$ denotes that the complex
+number  $ \frac{z_1}{z_2}$ is of the form $(r,0)$ with $r<0$..
+\end{lemma}
+
+\begin{proof}
+$|a+b| = |a(1+\frac{b}{a})| = |a| |1+\frac{b}{a}| = |a|
+  (1-\frac{b}{a}) = |a|-|b|$.
+  \qed
+\end{proof}
+\begin{lemma}
+For $z\in \CC$ one has
+$$z*\overline{z} = |z|^2.$$
+\end{lemma}
+

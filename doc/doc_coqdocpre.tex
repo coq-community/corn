@@ -1,0 +1,32 @@
+\usepackage{a4wide,amstext,amssymb}
+\def\RR{\ensuremath{\mathbb{R}}}
+\def\QQ{\ensuremath{\mathbb{Q}}}
+\def\NN{\ensuremath{\mathbb{N}}}
+\def\ZZ{\ensuremath{\mathbb{Z}}}
+\def\noto{\mathrel{\#}}
+\newcommand{\ac}{^{\prime}}
+\def\eqqe{\leftrightarrow}
+\newcommand{\maxx}{\mbox{max}}
+
+\newcommand{\newenvs}[1]{\begin{list}{}{\setlength{\leftmargin}{0pt}
+                         \setlength{\rightmargin}{0pt}}\item {#1}}
+\newcommand{\newenve}[1]{{#1}\end{list}}
+\newcommand{\newenv}[3]{\newenvironment{#1}{\newenvs{#2}}{\newenve{#3}}}
+
+\newenv{convention}{\bf Convention:}{}
+\newenv{nameconvention}{\bf Name convention:}{}
+\newenv{shortcoming}{\bf Coq shortcoming:}{}
+\newenv{notation}{\bf Notation:}{}
+\newtheorem{numnotation}{Notation}
+\newtheorem{numconvention}[numnotation]{Convention}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{fact}[definition]{Fact}
+\newtheorem{example}[definition]{Example}
+\newtheorem{examples}[definition]{Examples}
+\newtheorem{claim}[definition]{Claim}

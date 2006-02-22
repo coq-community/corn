@@ -1,0 +1,56 @@
+% $Id: CVectorSpace.tex,v 1.1 2004/02/11 09:39:59 lcf Exp $
+
+\subsection{Vector Spaces: An external operation}
+
+\begin{definition}
+Let $F$ be a field.  An $F$-{\em vector space\/} is a 
+tuple \struct{G,\cdot}, with $G$ an abelian group and $\cdot$ 
+an operation from $F\times G$ to $G$ satisfying
+\begin{eqnarray*}
+(\alpha\beta) \cdot a &=& \alpha\cdot(\beta\cdot a),\\
+1\cdot a &=& a,\\
+(\alpha+\beta)\cdot a &=& (\alpha\cdot a) + (\beta\cdot a),\\
+\alpha\cdot(a+b) &=& (\alpha\cdot a) + (\beta\cdot a).
+%\alpha\cdot a \noto 0 &\implies& \alpha\noto 0 \wedge a\noto 0,
+\end{eqnarray*}
+where $\alpha,\beta$ range over $F$ (\emph{scalars}) and $a,b$ range
+over $G$ (\emph{vectors}).
+Where no confusion arises we will omit the operation $\cdot$,
+replacing it with juxtaposition. 
+\end{definition}
+Note that $\cdot$ is strongly extensional, due to our Convention
+\ref{convstrext}.
+
+\begin{lemma} For all $\alpha,a$,
+\begin{eqnarray*}
+& \alpha 0 = 0,\\
+& 0 a = 0,\\
+& \alpha a \noto 0 \implies \alpha\noto 0 \wedge a\noto 0,\\
+& (-\alpha)a =  -(\alpha a)  = \alpha(-a).
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+For the first, by cancellation in the group G, it suffices to note
+$(\alpha 0)+(\alpha 0)=\alpha (0+0)=\alpha 0$.
+The argument for the second is similar. For the third we use the first
+and the second. Suppose $\alpha a \noto 0=0 a$. By strong
+extensionality of $\cdot$, $\alpha\noto 0$ or $a\noto a$; the latter is absurd.
+Similarly, $a\noto 0$. \qed
+\end{proof}
+
+\begin{lemma} For all $\alpha,\beta,a,b$,
+\begin{eqnarray*}
+\alpha\noto 0\wedge a\noto b&\implies & \alpha\cdot a \noto \alpha\cdot b,\\
+\alpha\noto 0\wedge a\noto 0&\implies & \alpha\cdot a \noto 0,\\
+\alpha\noto \beta\wedge a\noto 0&\implies & \alpha\cdot a \noto \beta\cdot a.
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+For the first we have: $\alpha^{-1}(\alpha a)=a\noto
+b=\alpha^{-1}(\alpha b)$, so $\alpha a \noto\alpha b$ by strong
+extensionality of $\cdot$.  The second follows by taking $b=0$.  For
+the third, we have $\alpha-\beta\noto 0$ (from \ref{lemgrstrext}), and
+$a\noto 0$, so $\alpha a-\beta a=(\alpha-\beta)a\noto 0$, and $\alpha
+a\noto\beta a$ by \ref{lemgrstrext} again. \qed
+\end{proof}
+

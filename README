@@ -1,0 +1,159 @@
+C-CoRN, the Coq Constructive Repository at Nijmegen
+---------------------------------------------------
+
+This file contains some basic information about C-CoRN.
+
+PREREQUISITES
+-------------
+
+C-CoRN (notice the capitals) is designed to run with Coq version 8.0.
+A (no longer updated) version compatible with version 7.4 is also
+available.
+
+Before installing C-CoRN, please check that you have:
+ - Coq version 8.0
+   (CoRN used to require a compiled source tree, but a binary package will
+    do these days.)
+ - at least 128MiB RAM memory available (and preferably more, especially if
+   you plan to use the formalization of Real Analysis).
+ - GNU make version 3.80 or later
+ - a POSIX-compliant operating system. This means Unix, a clone
+   thereof or a good emulation layer on top of another OS. In
+   particular, *hard* links must be supported by the file system.
+ - the GNU Bourne Again SHell (we use some bashisms)
+ - At least one of:
+   * The "realpath" utility in your PATH (Debian package realpath).
+   * A C compiler.
+
+In order for C-CoRN to work, you need to set some environment variables.
+We advise you to do this inside a .bash_profile or similar.
+ - COQTOP should be set to the Coq installation prefix (e.g. /usr/ or
+   /usr/local/) or the location of a compiled Coq source tree (e.g.
+   /usr/local/src/coq-8.0/).
+ - COQBIN should be set to the directory where the Coq binaries can
+   be found, if different from ${COQTOP}/bin/.
+
+FILES
+-----
+
+Any distribution of C-CoRN should include the following files at root
+level:
+ - Makefile
+ - Makefile.{realpath,common}
+ - README
+ - tree.ps.gz
+and the directories
+ - doc
+ - tactics
+ - tools
+
+According to which version you downloaded you will also get some or all
+of the following directories:
+ - algebra
+ - complex
+ - fta
+ - ftc
+ - metrics
+ - model
+ - reals
+ - transc
+
+If you obtained C-CoRN via CVS, you will also have a directory named
+devel/.
+
+Important note: if you plan to regularly update C-CoRN, you should
+keep any files you work on under devel/ or out of the CoRN tree
+altogether.  This will ensure that subsequent updates will not
+overwrite your developments.
+
+COMPILING
+---------
+
+C-CoRN now comes with a general purpose Makefile.  This allows you to
+uniformly:
+ - (re)compile C-CoRN;
+ - automatically generate postscript or html documentation from C-CoRN;
+ - refresh the list of dependencies;
+ - see which commands are actually used for these tasks.
+
+The default behaviour of make (with no target specified) is to recompile
+all files that have been changed since the last compilation, as well as
+everything that depends on these files.  The following targets are also
+allowed:
+ dep          -> recalculates the dependencies of modified files
+                 Note that this is called automatically before
+                 compilation, you normally don't need to call it
+                 explicitly.
+ clean        -> removes all .vo, .cmx, .cmi, .cmo, .o, .vi, .g, emacs
+                 backup (*~) files, the CoRN toplevel and compiler and
+                 the globals file. Also does depclean.
+ depclean     -> forget all computed dependencies. Useful to force a
+                 full recomputation of the dependencies.
+ distclean    -> removes things that should not be distributed from a
+                 CVS checkout.
+ doc          -> produces both postscript and html documentation
+ doc-clean    -> removes all documentation files
+ doc-html     -> produces only html documentation
+ doc-ps       -> produces only postscript documentation
+ showcommands -> prints the actual command line that will be used to
+                 compile files
+ human        -> setup CoRN for human convenience (see `HUMAN CONVENIENCE' section)
+ ide          -> setup CoRN for human convenience using coqide
+
+Besides these, flags can also be given to make.  Currently, the following
+are recognized.
+ devel="space separated directories list"
+              -> compile the files in these directory trees, too. Between a
+                 command with some value of devel (e.g. unset) and a
+                 command with some other value (e.g. set to anything but
+                 empty), you _must_ force a complete recompilation of the
+                 dependencies (make depclean). For example, to compile all
+                 files in the devel/ sub-directory and all its
+                 subdirectories (like devel=yes did before) use
+                 devel=./devel . To compile files in devel/lcf and
+                 devel/foo, use devel="./devel/lcf ./devel/foo" . Yes, this
+                 means that directories containing a space in their name
+                 won't work.
+ OPT=[option] -> adds [option] to the Coq command line
+ OCAMLC=file
+ OCAMLOPT=file
+              -> Choose an ocamlc and ocamlopt to use
+                 (Obsolete, as CoRN does not use OCaml anymore.)
+ COQDOC=file  -> Choose a coqdoc to use
+
+HUMAN CONVENIENCE
+-----------------
+
+CoRN now has a few facilities for the convenience of the human beings
+using it. Enable with "make human".
+
+This will create Makefiles in every directory scanned for .v files
+(but will not overwrite the Makefile if any is present) so that all
+make commands work from anywhere in the CoRN hierarchy.
+
+It also populates the "bin" directory with CoRNc, CoRNtop and
+CoRNide. These are CoRN versions of coqc, coqtop and coqide,
+respectively. We suggest you add the "bin" directory of CoRN to your
+PATH.
+
+The old "ide" target is obsolete, as CoRN does not require a custom
+Coq image anymore.
+
+DEPENDENCIES
+------------
+
+The distribution includes a (gzip'ed) postscript file tree.ps.gz
+with the dependency tree of all the files in the standard, full,
+version of C-CoRN.
+
+OTHERS
+------
+
+More information can be found at the C-CoRN page,
+http://c-corn.cs.kun.nl/
+For any questions, comments, bug reports or other feel free to e-mail
+lcf@cs.kun.nl.
+
+$Id: README,v 1.12 2006/02/14 10:17:31 lionelm Exp $
+
+ LocalWords:  Nijmegen CoRN Coq CVS

@@ -1,0 +1,748 @@
+% $Id: FTAreg.tex,v 1.1 2004/02/11 09:39:59 lcf Exp $
+
+\section{Proof of the Fundamental Theorem of Algebra}
+
+\begin{proposition}[Kneser Lemma] \label{prop:kneser}
+For every $n\in\NN$, $n\geq 2$ there exists a $q\in\RR,\; 0<q<1$ such that for every
+polynomial over $\CC$ with leading coefficient $1$
+$$f(x)=x^n+b_{n-1}x^{n-1}+\ldots + b_1 x+b_0$$
+one has
+$$\forall c>|b_0|\exists z\in\CC[ |z| < c^{1/n} \wedge
+|f(z)|< qc].$$
+\end{proposition}
+
+Before proving the Kneser Lemma, we state the so called `Main Lemma'
+that gives the main ingredients for proving the Kneser Lemma. The
+advantage of the Main Lemma is that it is just about real numbers;
+the complex numbers only come in with the Kneser Lemma. There is a
+`Key Lemma' that proves the Main Lemma. We state the Key Lemma first.
+
+\begin{lemma}[Key Lemma]\label{lemma:seq}
+For every $n\geq 2$, $\epsilon >0$ and $a_0, \ldots , a_n
+\geq 0$ with $a_n = 1$, $a_0>\epsilon$, there
+exists
+\begin{enumerate}
+\item $t>0$ 
+\item $k_0\geq k_1,\geq k_2 \geq \ldots$,
+\end{enumerate}
+such that 
+$$ a_{k_0} t^{k_0} = a_0 +\epsilon $$
+and moreover for every $j$, if we let $k = k_j$ and $r = 3^{-j} t$:
+$$a_k r^k > a_i r^i - \epsilon \makebox[0pt][l]{\qquad\it for all $i\in\{1,\ldots,n\}$}$$
+\end{lemma}
+
+From the Key Lemma we obtain the Main Lemma
+
+\begin{lemma}[Main Lemma]\label{lemma:est1}
+For every $n\geq 2$, $\epsilon >0$ and $a_0, \ldots , a_n
+\geq 0$ with $a_n = 1$, $a_0> \epsilon$, there
+exists
+\begin{enumerate}
+\item $k\in \{1, \ldots, n\}$,
+\item $r>0$ 
+\end{enumerate}
+such that
+\begin{eqnarray}
+r^n			&< & a_0,	\label{ineq:est1}\\
+a_k r^k  		&<& a_0,	\label{ineq:est2}\\
+3^{-2n^2} a_0 - 2\epsilon &<& a_k r^k, 	\label{ineq:est3}\\
+\sum_{i=1\atop i\ne k}^n a_i r^i   &<& (1 - 3^{-n}) a_k r^k + 3^n\epsilon.
+					\label{ineq:est4}
+\end{eqnarray}
+\end{lemma}
+
+The Main Lemma is the crucial property about reals to prove the Kneser Lemma.
+
+\paragraph{Proof of the Key Lemma, \ref{lemma:seq}}
+We prove the Key Lemma in a sequence of smaller Lemmata, some
+specifically related to FTA, some of a more general nature.
+
+\begin{lemma}\label{lemma:max}
+For $n>0$, $a_1,\ldots,a_n\in\RR$ and $\epsilon > 0$ there always is a
+$k\in \{1, \ldots ,n\}$ such that for all $i\in\{1,\ldots,n\}$:
+$$a_k > a_i - \epsilon$$
+\end{lemma}
+\begin{proof}
+Induction with respect to $n$.
+\end{proof}
+
+\begin{lemma}\label{lemma:sel}
+For each sequence $k_0 \ge k_1 \ge k_2 \ge \ldots\in\{1,\ldots,n\}$ there is
+a $j\in\NN$ with $j < 2n$ such that $k_{j-1} = k_j = k_{j+1}$.
+\end{lemma}
+\begin{proof}
+Induction with respect to $n$.
+\end{proof}
+
+\begin{lemma}\label{lemma:ttt}
+Let $n>0$ and $\epsilon > 0$.
+Then for every $a_0,\ldots,a_n \ge 0$ with $a_0 > \epsilon$ and $a_n = 1$, there exist
+$t > 0$ and $k\in\{1,\ldots,n\}$ such that:
+$$a_k t^k = a_0 - \epsilon$$
+and such that for all $i\in\{1,\ldots,n\}$:
+$$a_i t^i < a_0$$
+\end{lemma}
+\begin{proof}
+Start with $k = n$ and $t = \root n\of{a_0 - \epsilon}$.  Then consider in turn
+for $i$ the values $n-1$ down to $1$.
+At each $i$ either $a_i t^i < a_0$
+or $a_i t^i > a_0 - \epsilon$ (for the value of $t$ that is current at that time.)
+In the first case do nothing, but in the second case
+set $k$ to $i$ and $t$ to $\root i\of{(a_0 - \epsilon)/a_i}$
+(in which case $t$ will decrease.)  This will give at the end a suitable $k$ and $t$.
+\end{proof}
+
+\begin{proof}[of the Key Lemma, \ref{lemma:seq}]
+Let $n\geq 2$, $\epsilon>0$ and $a_0, \ldots , a_n \geq 0$ with $a_n =
+1$, $a_0>0$ be given.
+Choose $t$ and $k_0$ according to Lemma \ref{lemma:ttt}.
+
+To get $k_{j+1}$ from $k_j$, let $k = k_j$, $r = 3^j t$
+and apply lemma \ref{lemma:max} with $\epsilon/2$ to the sequence
+$$a_1 (r/3),a_2 (r/3)^2,\ldots,a_k (r/3)^k$$
+to get $k' = k_{j+1}$.
+Then for $i\le k$ the inequality for $k_{j+1}$ directly follows,
+while for $i > k$ we have:
+$$a_k (r/3)^k = 3^{-k} a_k r^k > 3^{-k}\left(a_i r^i - \epsilon\right) = 3^{-k} a_i r^i - 3^{-k}\epsilon
+> a_i (r/3)^i - \epsilon/2$$
+and so:
+$$a_{k'} (r/3)^{k'} > a_k (r/3)^k - \epsilon/2 > a_i (r/3)^i - \epsilon$$
+\end{proof} 
+
+\paragraph{Proof of the Main Lemma, \ref{lemma:est1}}
+We also prove the Main Lemma in a sequence of smaller Lemmata.
+
+\begin{lemma}\label{lemma:bou}
+For every $n\geq 2$, $\epsilon >0$ and $a_0, \ldots , a_n
+\geq 0$ with $a_n = 1$, $a_0> \epsilon$, if there exist
+\begin{enumerate}
+\item $t>0$ 
+\item $k_0\geq k_1,\geq k_2 \geq \ldots$,
+\end{enumerate}
+such that 
+$$ a_{k_0} t^{k_0} = a_0 +\epsilon $$
+and moreover for every $j$, if we let $k = k_j$ and $r = 3^{-j} t$:
+$$a_k r^k > a_i r^i - \epsilon \makebox[0pt][l]{\qquad\it for all 
+$i\in\{1,\ldots,n\}$}$$
+then we have for all $j$, writing again $k = k_j$ and $r = 3^{-j} t$, 
+\begin{eqnarray*}
+r^n &<& a_0\\
+a_k r^k &<& a_0\\
+3^{-jn} a_0 - 2\epsilon &<& a_k r^k
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+We have $r \le t$ and so for all $i$ we have $a_i r^i \le a_i t^i < a_{k_0} t^{k_0} + \epsilon = a_0$.
+Of this statement $r^n < a_0$ and $a_k r^k < a_0$ are special cases.
+Finally, from $a_{k_0} r^{k_0} = 3^{-jk_0} a_{k_0} t^{k_0} \ge 3^{-jn} a_{k_0} t^{k_0} =
+3^{-jn} (a_0 - \epsilon) > 3^{-jn} a_0 - \epsilon$ it follows that
+$a_k r^k > a_{k_0} r^{k_0} - \epsilon > 3^{-jn} a_0 - 2\epsilon$.
+\end{proof}
+ 
+\begin{lemma}\label{lemma:strongmaj}
+For every $n\geq 2$, $\epsilon >0$ and $a_0, \ldots , a_n
+\geq 0$ with $a_n = 1$, $a_0> \epsilon$, if there exist
+\begin{enumerate}
+\item $t>0$ 
+\item $k_0\geq k_1,\geq k_2 \geq \ldots$,
+\end{enumerate}
+such that for every $j$, if we let $k = k_j$ and $r = 3^{-j} t$:
+$$a_k r^k > a_i r^i - \epsilon \makebox[0pt][l]{\qquad\it for all 
+$i\in\{1,\ldots,n\}$}$$
+then there is a $j_0<2n$ such that, writing $k = k_{j_0}$ and 
+$r = 3^{-j_0} t$,
+\begin{eqnarray*}
+a_k (r/3)^k &>& a_i (r/3)^i - \epsilon\makebox[0pt][l]{\qquad\it for all 
+$i\in\{1,\ldots,n\}$}\\
+a_k (3r)^k &>& a_i (3r)^i - \epsilon\makebox[0pt][l]{\qquad\it for all 
+$i\in\{1,\ldots,n\}$}
+\end{eqnarray*}
+\end{lemma}
+\begin{proof}
+From Lemma \ref{lemma:sel} it follows that there is a $j_0<2n$ such
+that $k_{j_0 -1} = k_{j_0} = k_{j_0+1}$. Writing $k$ for $k_{j_0}$, it
+immediately follows from $k_{j_0 -1} = k_{j_0}$ and the properties of
+the $k$-sequence that $a_k (3r)^k > a_i (3r)^i - \epsilon$. Similarly,
+it follows from $k_{j_0} = k_{j_0 +1}$ and the properties of the
+$k$-sequence that $a_k (r/3)^k > a_i (r/3)^i - \epsilon$.
+\end{proof}
+
+\begin{lemma}\label{lemma:est_a}
+For every $\epsilon > 0$, $a_1,\ldots,a_n \ge 0$, $k\in\{1,\ldots,n\}$ and $r > 0$ such that for all $i\in\{1,\ldots,n\}$:
+$$a_k (r/3)^k > a_i (r/3)^i - \epsilon$$
+holds:
+$$\sum_{i=1}^{k-1} a_i r^i < \frac{1}{2}(1 - 3^{-n}) a_k r^k 
+	+ \frac{1}{2} 3^n\epsilon$$
+\end{lemma}
+\begin{proof}
+From the assumption it follows that
+\begin{eqnarray*}
+a_i r^i &=& 3^i a_i (r/3)^i\\
+&<& 3^i (a_k (r/3)^k + \epsilon)\\
+&<& 3^{i-k} a_k r^k + 3^i\epsilon
+\end{eqnarray*}
+and therefore
+\begin{eqnarray*}
+\sum_{i=1}^{k-1} a_i r^i &<& \sum_{i=1}^{k-1} \left(3^{i-k} a_k r^k + 3^i\epsilon\right)\\
+&=& \big(\sum_{i=1}^{k-1} 3^{i-k}\big) a_k r^k + \big(\sum_{i=1}^{k-1} 3^i\big)\epsilon\\
+&=& {1\over 2}(1-3^{1-k}) a_k r^k + {1\over 2}(3^k-3^1)\epsilon\\
+&<& {1\over 2}(1 - 3^{-n}) a_k r^k + {1\over 2}3^n\epsilon
+\end{eqnarray*}
+\end{proof}
+
+\begin{lemma}\label{lemma:est_b}
+For every $\epsilon > 0$, $a_1,\ldots,a_n \ge 0$, $k\in\{1,\ldots,n\}$
+and $r > 0$ such that for all $i\in\{1,\ldots,n\}$:
+$$a_k (3r)^k > a_i (3r)^i - \epsilon$$
+holds:
+$$\sum_{i=k+1}^n a_i r^i < {1\over 2}(1 - 3^{-n}) a_k r^k + {1\over 2}3^n\epsilon$$
+\end{lemma}
+\begin{proof}
+From the assumption it follows that
+\begin{eqnarray*}
+a_i r^i &=& 3^{-i} a_i (3r)^i\\
+&<& 3^{-i} (a_k (3r)^k + \epsilon)\\
+&<& 3^{k-i} a_k r^k + 3^{-i}\epsilon
+\end{eqnarray*}
+and therefore
+\begin{eqnarray*}
+\sum_{i=k+1}^{n} a_i r^i &<& \sum_{i=k+1}^{n} \left(3^{k-i} a_k r^k 
+	+ 3^{-i}\epsilon\right)\\
+&=& \big(\sum_{i=k+1}^{n} 3^{k-i}\big) a_k r^k 
+	+ \big(\sum_{i=k+1}^{n} 3^{-i}\big)\epsilon\\
+&=& {3\over 2}(3^{-1}-3^{k-n-1}) a_k r^k 
+	+ {3\over 2}(3^{-k-1}-3^{-n-1})\epsilon\\
+&=& {1\over 2}(1 - 3^{k-n}) a_k r^k + {1\over 2}(3^{-k}-3^{-n})\epsilon\\
+&<& {1\over 2}(1 - 3^{-n}) a_k r^k + {1\over 2}3^n\epsilon
+\end{eqnarray*}
+\end{proof}
+
+\begin{lemma}\label{lemma:est}
+For every $\epsilon > 0$, $a_1,\ldots,a_n \ge 0$, $k\in\{1,\ldots,n\}$ 
+and $r > 0$ such that for all $i\in\{1,\ldots,n\}$:
+\begin{eqnarray*}
+a_k (r/3)^k &>& a_i (r/3)^i - \epsilon\\
+a_k (3r)^k &>& a_i (3r)^i - \epsilon
+\end{eqnarray*}
+holds:
+$$\sum_{i=1\atop i\ne k}^n a_i r^i < (1 - 3^{-n}) a_k r^k + 3^n\epsilon$$
+\end{lemma}
+\begin{proof}
+This follows immediately from Lemmata \ref{lemma:est_a}, \ref{lemma:est_b}.
+\end{proof}
+
+\begin{proof}[of the Main Lemma, \ref{lemma:est1}]
+Take $t$ and $k_0, k_1, \ldots$ according to the Key Lemma \ref{lemma:seq}.
+According to Lemma \ref{lemma:strongmaj} there is a $j_0 < 2n$ such
+that for $k= k_{j_0}$ and $r = 3^{-j_0} t$ the premises of Lemma
+\ref{lemma:est} hold. Hence inequality (\ref{ineq:est4}) of the Main Lemma 
+holds:
+$$\sum_{i=1\atop i\ne k}^n a_i r^i < (1 - 3^{-n}) a_k r^k + 3^n\epsilon$$
+Then inequalities (\ref{ineq:est1}), (\ref{ineq:est2}) and
+(\ref{ineq:est3}) are given by lemma \ref{lemma:bou}
+(the inequality $3^{-2n^2} a_0 < 3^{-j_0 n} a_0$ holds because $j_0 < 2n$).
+\end{proof}
+
+\paragraph{Proof of the Kneser Lemma, Proposition \ref{prop:kneser}} 
+We prove the Kneser Lemma in a sequence of steps.
+Let $n\geq 2$. We will show that 
+$$ q:= 1-\frac{1}{3^{2n^2 +n}}$$
+is a good choice for $q$. Let 
+$$f(x)=x^n+b_{n-1}x^{n-1}+\ldots + b_1 x+b_0$$ 
+be a polynomial over $\CC$ and let $c\in \RR^+$ be such that $c >
+|b_0|$.  We want to apply the Main Lemma taking $a_i := |b_i|$. 
+However, we don't know if $|b_0|\noto 0$. Hence we will approximate
+$b_0$ by a $b_0'\noto 0$ such that $|b_0 - b_0'|$ is sufficiently 
+small and $|b_0'|<c$.
+\weg{
+: choose a $b_0' \in\CC$ such that 
+\begin{eqnarray*}
+b_0' 		&\noto& 0,\\ 
+c		&>& |b_0'|,\\ 
+|b_0 - b_0'| 	&<& \frac{c}{3^{2n^2 +n}}
+\end{eqnarray*}
+}
+Then we will define the real numbers $a_0, \ldots, a_{n}$  by
+$a_0 := |b_0'|$, $a_i := |b_i|$ for $1\leq i < n$ and $a_n
+:= 1$. Now, for a specific choice of $z$ (with $|z|^n < a_0$)
+the Main Lemma will give an approximation of $|f(z)|$ in terms of 
+$a_0$ and hence in terms of $c$. In particular, it will be shown 
+that $|f(z)| < qc$, with $q$ as above. 
+
+\begin{lemma}\label{lemma:est2}
+Let $a_0,\ldots,a_n\ge 0$ and $b_0,\ldots,b_n\in\CC$ with $a_i = |b_i|$ for
+$i=1,\ldots,n$.
+Furthermore, let $k\in\{1,\ldots,n\}$\weg{, $r > 0$} and  $z\in\CC$ with 
+$r = |z|$.  Then:
+$$\big|\sum_{i=0}^n b_i z^i\big| < \left|b_0 + b_k z^k\right| + \sum_{i=1\atop i\ne k}^n a_i r^i$$
+\end{lemma}
+\begin{proof}
+Repeated application of the triangle inquality for the complex numbers.
+\end{proof}
+
+The Main Lemma will take care that the second term on the right hand
+side of the conclusion of Lemma \ref{lemma:est2} is sufficiently
+small. To assure that the first term is also small enough, a specific
+value of $z$ can be chosen in such a way that $b_0$ and $b_k z^k$
+cancel eachother out.
+
+\begin{lemma}\label{lemma:est3}
+Given $a_0,\,a_k > 0$, $b_0,\,b_0',\,b_k\in\CC$, $k\in\{1,\ldots,n\}$, $r > 0$ and $\eta > 0$
+such that:
+\begin{eqnarray*}
+|b_0'| &=& a_0 \\
+|b_k| &=& a_k \\
+|b_0 - b_0'| &<& \eta\\
+a_k r^k &<& a_0
+\end{eqnarray*}
+then there exists a $z\in\CC$ such that $|z| = r$ and:
+$$\left|b_0 + b_k z^k\right| < a_0 - a_k r^k + \eta$$
+\end{lemma}
+\begin{proof}
+Take
+$$z = r\,\root k\of{-{a_k\over a_0}{b_0'\over b_k}}$$
+Then we have:
+$$\Big|{-{a_k\over a_0}{b_0'\over b_k}}\Big| = {a_k\left|b_0'\right|\over a_0\left|b_k\right|}
+= {a_k a_0\over a_0 a_k} = 1$$
+so
+$$\Bigg|\root k\of{-{a_k\over a_0}{b_0'\over b_k}}\Bigg| = 1$$
+and so $|z| = r$.
+
+Because $a_k r^k < a_0$ we get $\big|a_0 - a_k r^k\big| = a_0 - a_k r^k$ and therefore
+\begin{eqnarray*}
+|b_0' + b_k z^k| &=& \Big|b_0' + b_k r^k \big(-{a_k\over a_0}{b_0'\over b_k}\big)\Big|\\
+&=& \big|{b_0'\over a_0}(a_0 - a_k r^k)\big|\\
+&=& {|b_0'|\over a_0}|a_0 - a_k r^k|\\
+&=& a_0 - a_k r^k
+\end{eqnarray*}
+From this it follows that
+$\left|b_0 + b_k z^k\right| \le \left|b_0 + b_k z^k\right| + |b_0 - b_0'| < a_0 - a_k r^k + \eta$.
+\end{proof}
+
+\begin{lemma}\label{lemma:nzc}
+For $\eta > 0$ and $z\in\CC$ there is a $z'\in\CC$ with $z' \mathrel{\#} 0$ and $|z' - z| < \eta$.
+\end{lemma}
+\begin{proof}
+Because $z + \eta/2 \mathrel{\#} z - \eta/2$, either $z + \eta/2 \mathrel{\#} 0$ or
+$z - \eta/2 \mathrel{\#} 0$.  For both choices $|z' - z| = \eta/2 < \eta$.
+\end{proof}
+\weg{
+\begin{lemma}\label{lemma:eps0}
+Given a finite list of inequalities
+\begin{eqnarray*}
+p_0\epsilon &<& q_0\\
+p_1\epsilon &<& q_1\\
+p_2\epsilon &<& q_2\\
+\ldots
+\end{eqnarray*}
+with $p_i,q_i > 0$, there is an $\epsilon > 0$ that satisfies it.
+\end{lemma}
+\begin{proof}
+Induction with respect to the length of the list.
+\end{proof}
+}
+\begin{lemma}\label{lemma:eps}
+Let be given $b_0\in\CC$ and $c\in\RR$ with $|b_0| < c$.
+Then there are $b_0'\in\CC$, $a_0$ and $\eta > 0$ such that:
+\begin{eqnarray}
+|b_0 - b_0'| &<& \eta\\
+|b_0'| &=& a_0\\
+a_0 &>& 0\\
+a_0 + 3\eta &<& c  \label{ineq:eta}
+\end{eqnarray}
+and an $\epsilon > 0$ such that:
+\begin{eqnarray}
+2(3^n + 1)\epsilon &<& \eta  \label{ineq:epsilon}\\
+2\epsilon &<& 3^{-2n^2} a_0\\
+\epsilon &<& a_0
+\end{eqnarray}
+\end{lemma}
+\begin{proof}
+Take
+$$\eta = {1\over 4}(c - |b_0|)$$
+so $|b_0| = c - 4\eta$.
+Then choose an arbitrary $b_0' \mathrel{\#} 0$ with $|b_0' - b_0| < \eta$ and take $a_0 = |b_0'|$.
+To see that (\ref{ineq:eta}) is satisfied, calculate:
+$$a_0 = |b_0'| \le |b_0' - b_0| + |b_0| < \eta + c - 4\eta = c - 3\eta$$
+%
+The existence of a suitable $\epsilon$ then follows easily: take
+$\epsilon>0$ smaller then $\minn(\frac{\eta}{2(3^{n}+1)},
+\frac{a_0}{2\;3^{2n^2}})$.
+\end{proof}
+
+\begin{lemma}\label{lemma:eps1}
+For:
+$$q = 1 - 3^{-2n^2-n}$$
+we have that $q > {1\over 2}$ and because of that
+inequalities (\ref{ineq:eta}) and (\ref{ineq:epsilon}) imply:
+$$q a_0 + 3^n \epsilon + \epsilon + \eta < qc$$
+\end{lemma}
+\begin{proof}
+We get
+$$a_0 + 2\cdot 3^n\epsilon + 2\epsilon + 2\eta = a_0 + 2(3^n + 1)\epsilon + 2\eta < a_0 + \eta + 2\eta < c$$
+Using that $1 < 2q$, this gives
+$$q a_0 + 3^n\epsilon + \epsilon + \eta < q a_0 + 2q 3^n\epsilon + 2q \epsilon + 2q \eta\
+= q (a_0 + 2\cdot 3^n\epsilon + 2\epsilon + 2\eta) < qc $$
+\end{proof}
+
+\weg{
+\begin{lemma}\label{lemma:key}
+Let be given $b_0,\ldots,b_n\in\CC$ with $b_n = 1$ and $c\in\RR$ with $|b_0| < c$.
+Let $q$ be as in the previous lemma.  Then there is a $z\in\CC$ with
+$$|z| < c^{1/n}$$
+and:
+$$\big|\sum_{i=0}^n b_i z^i\big| < qc$$
+\end{lemma}
+}
+\begin{proof}[of the Kneser Lemma, Proposition \ref{prop:kneser}]
+Take $b_0'$, $a_0$, $\eta$ and $\epsilon$ as in lemma \ref{lemma:eps}.  Take $a_i = |b_i|$
+for $i\in\{1,\ldots,n\}$.
+Take $r$ and $k$ as in lemma \ref{lemma:est1}.  Finally take $z$ as in lemma \ref{lemma:est3}.
+
+Then plugging all conditions and results of lemmas \ref{lemma:est1}, \ref{lemma:est2}, \ref{lemma:est3},
+\ref{lemma:eps} and \ref{lemma:eps1} together we get
+$$r^n < a_0 < c - 3\eta < c$$
+so
+$$|z| = r < c^{1/n}$$
+and
+\begin{eqnarray*}
+\big|\sum_{i=0}^n b_i z^i\big| &<& \left|b_0 + b_k z^k\right| + \sum_{i=1\atop i\ne k}^n a_i r^i\\
+&<& \left(a_0 - a_k r^k + \eta\right) + \left((1 - 3^{-n}) a_k r^k + 3^n\epsilon\right)\\
+&=& a_0 - 3^{-n} a_k r^k + 3^n\epsilon + \eta\\
+&<& a_0 - 3^{-n} (3^{-2n^2} a_0 - 2\epsilon) + 3^n\epsilon + \eta\\
+&=& (1 - 3^{-2n^2-n}) a_0 + 3^n\epsilon + 3^{-n} 2\epsilon +\eta\\
+&<& (1 - 3^{-2n^2-n}) a_0 + 3^n\epsilon + \epsilon + \eta\\
+&=& q a_0 + 3^n\epsilon + \epsilon + \eta\\
+&<& q c
+\end{eqnarray*}
+\end{proof}
+
+\weg{
+!!
+\begin{proof}
+to this $(a_i)_{i\in\{1,\ldots,n \} }$,
+taking
+$$\epsilon := \minn(\frac{c}{n 3^{2n^2 +2n+1}}, \frac{a_0}{3^{2n^2 +1}}).$$
+
+We obtain a $r\in\RR^+$ and a $k\in \{1, \ldots, n\}$, 
+such that 
+\begin{eqnarray*}
+r&\leq & a_0^{1/n}\\
+\frac{1}{3^{2n^2}} a_0 - \epsilon &\leq& a_k r^k \leq a_0,\\
+\Sigma_{1\leq i < k} a_i r^i &\leq&\frac{ 1}{2 }(1-3^{1-k}) a_k r^k
++n 3^n\epsilon \\
+\Sigma_{k < i \leq n} a_i r^i &\leq&\frac{ 1}{2 }(1-3^{k-n}) a_k
+r^k + n3^{-1}\epsilon.
+\end{eqnarray*}
+
+Note that $\frac{1}{3^{2n^2}} a_0 - \epsilon \geq \frac{1}{3^{2n^2}} a_0 -
+\frac{a_0}{3^{2n^2 +1}}>0$, and so $a_k > 0$.
+We determine $z\in\CC$ such that
+\begin{eqnarray*}
+|z| &=& r,\\
+(b_0')^{-1} b_k z^k &<& 0.
+\end{eqnarray*}
+That is: we want  the complex number $(b_0')^{-1} b_k z^k$ to be on the
+negative $x$-axis, which can be achieved by taking
+$z:=r(\frac{a_k}{a_0})^{1/k}(\frac{-b_0'}{b_k})^{1/k}$.
+
+As $r^n \leq a_0 = |b_0'| < c$, we
+conclude that $|z| < c^{1/n}$.
+
+We also have the following.
+\begin{eqnarray*}
+|f(z)| &\leq& |b_0 + b_k z^k| + \Sigma_{1\leq i\leq n, i\neq k} a_i
+|z^i|\\
+&\leq& |b_0 -b_0'| + |b_0'+ b_k z^k| + \Sigma_{1\leq i\leq n, i\neq k} a_i
+|z^i|\\
+&\stackrel{(i)}{<}&\frac{c}{3^{2n^2 +n}} + a_0 - a_k |z^k| + 
+	\Sigma_{1\leq i\leq n, i\neq k} a_i r^i\\
+&\leq& a_0 - a_k t^k +\frac{ 1}{2 }(1-3^{1-k}) a_k r^k 
+	+ \frac{  1}{2 }(1-3^{k-n}) a_k r^k +  n 3^n\epsilon 
+	+ n3^{-1}\epsilon + \frac{c}{3^{2n^2 +n}} \\
+&\stackrel{(ii)}{\leq}& a_0 -3^{1-n}a_k r^k +n (3^{n}+3^{-1})\epsilon 
+	+ \frac{c}{3^{2n^2 +n}}\\
+&\leq& a_0 -3^{1-n}(\frac{1}{3^{2n^2}} a_0 - \epsilon) 
+	+n (3^{n}+3^{-1})\epsilon+ \frac{c}{3^{2n^2 +n}}\\
+&=& a_0(1-\frac{1}{3^{2n^2 +n -1}})+3^{1-n}\epsilon 
+	+ n (3^{n}+3^{-1})\epsilon + \frac{c}{3^{2n^2 +n}}\\
+&<& c(1-\frac{1}{3^{2n^2 +n -1}})+ n 3^{n+1}\epsilon 
+	+ \frac{c}{3^{2n^2 +n}}\\
+&=& c(1-\frac{1}{3^{2n^2 +n -1}})+ n 3^{n+1}\frac{c}{n 3^{2n^2 +2n +1}}
+	+ \frac{c}{3^{2n^2 +n}}\\
+&=& c(1-\frac{1}{3^{2n^2 +n -1}})+ \frac{2c}{3^{2n^2 +n}}\\
+&=& c(1-\frac{1}{3^{2n^2 +n}})
+\end{eqnarray*}
+Inequality (i) is by $|b_0'+ b_k z^k| = |b_0'|\cdot |1 +\frac{b_k z^k}{b_0'}|
+\leq |b_0'|(1 +|\frac{b_k z^k}{b_0'}|) = |b_0'|(1 -\frac{a_k r^k}{|b_0'|})
+= |b_0'|- a_k r^k$.
+Inequality (ii) is by $3^{1-k} + 3^{k-n} \geq 2\cdot 3^{1-n}$, which follows from 
+$3^{n-k} + 3^{k-1} \geq 2$.
+
+So our choice for $q := (1-\frac{1}{3^{2n^2 +n}})$ works:
+$|f(z)| <  qc$. \qed
+\end{proof}
+}
+\weg{
+\begin{sublemma}\label{slem}
+Given $n\in\NN$, $b_0\in\CC$ and $c\in\RR$ with $c> |b_0|$, we can choose $\eta
+>0$ and $b_0' \in\CC$ such that
+\begin{eqnarray*}
+\eta &<& \frac{c}{3^{-n}\cdot 4 +2},\\
+\eta &<& |b_0'|,\\
+0&<& |b_0'| < c,\\
+|b_0 - b_0'| &<& 4\eta. 
+\end{eqnarray*}
+\end{sublemma}
+
+\begin{proof}
+Define $\eta : = \frac{c}{3^n\cdot 4 + 3}$. Then $|b_0| > c - 4\eta$
+or $|b_0| < c_3\eta$. In the first case define $b_0' := b_0 -(\eta,
+i\eta)$. In the second case define $b_0' := b_0 +(\eta,
+i\eta)$.
+\qed
+\end{proof}
+}
+
+\paragraph{Fundamental Theorem for regular polynomials}
+\begin{proposition}
+Let $f(x)=x^n+a_{n-1}x^{n-1}+\ldots + a_1x+a_0$, with $a_i\in\CC$. Then for
+some $z\in\CC$ one has $f(z)=0$.
+\end{proposition}
+\begin{proof} 
+Let $c\in\RR^+$ with $c> |a_0|$. We will construct a Cauchy sequence $z_i\in\CC$ such that for all $m$
+\benum
+\item $|f(z_m)|< q^m c$
+\item $|z_{m+1}-z_m|\leq (q^m c)^{1/n}$
+\eenum
+for some $q\in(0,1)$. Then $z=\lim_{i\arr\infty} z_i$ 
+exists and by continuity of $f$
+one has
+$$|f(z)|=\lim_{i\arr\infty} |f(z_i)|\leq \lim_{i\arr\infty} q^i c=0,$$
+so $f(z)=0$.
+
+Now, if 1 and 2 are satisfied, then indeed the $z_i$ form a Cauchy
+seqence:
+\beqn
+|z_{m+k}-z_m|&\leq&|z_{m+k}-z_{m+k-1}|+\ldots+|z_{m+1}-z_m|\\
+&\leq&(q^{\frac{m+k-1}{n}}+q^{\frac{m+k-2}{n}}+\ldots+q^{\frac{m}{n}})c^{1/n}\\
+&=&\frac{q^\frac{m}{n}-q^{\frac{m+k}{n}}}{1-q^{1/n}} c^{1/n}\\
+&=&q^{\frac{m}{n}}\frac{1-q^\frac{k}{n}}{1-q^{1/n}}c^{1/n}\\
+&\leq&q^{\frac{m}{n}}\frac{c^{1/n}}{1-q^{1/n}}.
+\eeqn
+By choosing $m$ sufficiently large ($n$ is fixed), this last
+expression can be made arbitrarily small.
+
+The construction of $z_i$ is as follows.
+Take $z_0=0$. Then indeed $|f(z_0)|=|f(0)| < q^0 c$.
+Now suppose $z_m$ is defined satisfying 1. Apply the Kneser Lemma to
+$f_{z_m}$ where
+$$f_{z_m}(x)=f(x+z_m)$$
+and taking $q^m c$ for $c$. (Note that $f_{z_m}$ has the same degree
+as $f$.)
+We obtain a $z$ such that
+$$|z| < (q^m c)^{1/n} \wedge |f_{z_m}(z)| < q^{m+1} c.$$
+Now take $z_{m+1}=z+z_m$. Then we have that 1 is valid:
+$|f(z_{m+1})|=|f(z+z_m)| = |f_{z_m}(z)|< q^{m+1}c.$
+
+Moreover, we also have 2:
+$|z_{m+1}-z_m|=|z| < (q^{m} c)^{1/n}$. \qed
+\end{proof}
+
+
+
+\begin{corollary}
+  \begin{enumerate}
+  \item 
+Every regular polynomial $f(x)=a_nx^n+a_{n-1}x^{n-1}+\ldots + a_1x+a_0$
+over $\CC$ has a root.
+\item Moreover, such $f$ can be factorized as follows
+$$\overline{f}(x)=a_n(x-\alpha_1)\ldots(x-\alpha_n).$$
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}\begin{enumerate}
+  \item 
+Divide $f$ by $a_n$ to obtain a polynomial $g$ with leading
+coefficient 1, satisfying $a_ng(x)=f(x)$. Then any root of $g$ is a
+root of $f$.
+\item If $\alpha_1$ is a root of $f$, then
+$$f(x)=(x-\alpha_1)f_{n-1}(x),$$ 
+by the Remainder Theorem (\ref{corremainder}) with $f_{n-1}$ being
+equal to $a_nx^{n-1}+\ldots$, hence also 
+regular. By (i) $f_{n-1}$ has a root $\alpha_2$ and hence
+$$f_{n-1}(x)=(x-\alpha_2)f_{n-2}(x).$$
+Continuing this way one obtains
+$$f(x)=(x-\alpha_1)\ldots(x-\alpha_n)a_n.\qed$$
+\end{enumerate}
+\end{proof}
+
+\weg{\begin{lemma}\label{apartness.prop}
+Let $a,b\in\CC$. Then
+\begin{enumerate}\item
+$a+b\noto 0\implies a\noto 0\vee b\noto 0.$
+\item $ab\noto 0\implies a\noto 0 \wedge b\noto 0.$
+\end{enumerate}\end{lemma}
+}
+%\begin{lemma}\label{1.6}
+%Let $f(x)=a_nx^n+a_{n-1}x^{n-1}+\ldots + a_1x+a_0$, with $a_i\in\CC$. 
+%Suppose that $a_k\noto 0$, for some $0<k\leq n$.
+%Then for some $c\in\CC$ one has
+%$$f(c)\noto 0, f\ac(c)\noto 0,\ldots,f^{(k)}(c)\noto 0.$$
+%\end{lemma}
+%\begin{proof}
+%Via vanderMonde determinant. Wil.\qed
+%\end{proof}
+
+%%>
+%Lemma 1.6 in proof of Fundamental Theorem
+
+\weg{
+\begin{lemma}\label{1.6} Let $f(x) = a_nx^n+a_{n-1}x^{n-1}+\ldots a_1x+a_0,$ with $a_i
+\in\CC.$  Suppose that $a_k\unneq 0,$ for some $0<k\leq n.$ Then for some $c\in\CC$ one has
+$$f(c)\unneq 0,\;f'(c)\unneq 0,\ldots,f^{(k)}(c)\unneq 0.$$
+\end{lemma}
+\begin{proof}
+We show, for $0\leq l\leq k,$ the existence of an infinite subset
+$A_l\subset\NN$ such that
+$$a\in A_l\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l)}(a)\unneq 0,$$
+by induction on $l.$\\[1ex]
+{\em Case }$l=0.$ Choose $u_0,\ldots,u_n\in\NN,\;\; u_i\neq u_j$ for
+$i\neq j.$ Consider the system of $n+1$ equations
+$$ (a_0\; a_1\;\ldots a_n)\;U =(f(u_0)\; f(u_1)\;\ldots f(u_n))$$
+where
+$$ U =
+\left(
+\begin{array}{llll}
+1 &1 &\ldots &1 \\
+u_0 &u_1 &\ldots &u_n \\
+&&& \\
+&&& \\
+u_0^n &u_1^n &\ldots &u_n^n
+\end{array}
+\right).$$
+We have
+$$det(U) = \prod\limits_{0\leq j < i\leq n}(u_i - u_j)\neq 0\quad\quad\mbox{(Vandermonde)}.$$
+Hence $U$ has an inverse $C$ such that 
+$$ (a_0\; a_1\;\ldots a_n) = (f(u_0)\; f(u_1)\;\ldots f(u_n))\;C.$$
+Especially
+$$a_k = f(u_0)c_{0k}+\ldots +f(u_n)c_{nk}.$$
+
+From $a_k\unneq 0$ follows $f(u_i)\unneq 0$ for some $i.$ This shows
+the existence of the set $A_0.$\\[1ex]
+{\em Case }$l>0.$ By the induction hypothesis there exists an infinite
+subset $A_{l-1}\subset\NN$ such that
+$$a\in A_{l-1}\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l-1)}(a)\unneq 0.$$
+We only need to show the existence of an infinite subset $A_l\subset
+A_{l-1}$ such that
+$$a\in A_l\Rightarrow f^{(l)}(a)\unneq 0.$$
+The coefficient of degree $k-l$ in $f^{(l)}$ is
+$k(k-1)\ldots(k-l+1)a_k\unneq 0.$ Hence if we choose
+$u_0,\ldots,u_{n-l}\in A_{l-1},\;\; u_i\neq u_j \mbox{ if } i\neq j,$
+then it follows similarly to the {\em Case }$l=0$ that
+$f^{(l)}(u_i)\unneq 0$ for some $i,\;\; 0\leq i \leq n-l.$ This shows
+the existence of $A_l.\hfill\qed$
+\end{proof}
+}
+
+
+\weg{
+\begin{lemma}[Vandermonde]
+Let for $n>0$ 
+$$D_n =
+\left|
+\begin{array}{llll}
+1 &1 &\ldots &1 \\
+u_0 &u_1 &\ldots &u_n \\
+&&& \\
+&&& \\
+u_0^n &u_1^n &\ldots &u_n^n
+\end{array}
+\right|.$$
+Then $\quad D_n = \prod\limits_{0\leq j < i\leq n}(u_i - u_j).$
+\end{lemma}
+\begin{proof}
+By induction on $n.$\\[1ex]
+{\em Case }$n=1.$\\
+$$D_1 = \left|\begin{array}{ll}
+1 &1 \\
+u_0 &u_1
+\end{array}\right|
+= u_1 - u_0.$$
+{\em Case }$n>1.$\\
+By subtracting $u_n$ times 
+row $n-(m+1)$ from row  $n-m$, successively for $m = 0,1,\ldots ,n-2$,
+we get 
+$$D_n =
+\left|
+\begin{array}{lllll}
+1 &1 &\ldots &1 &1\\
+u_0 - u_n &u_1 - u_n &\ldots &u_{n-1} - u_n &0\\
+&&& \\
+&&& \\
+u_0^{n-2}(u_0-u_n) &u_1^{n-2}(u_1-u_n) &\ldots
+&u_{n-1}^{n-2}(u_{n-1}-u_n) &0\\
+u_0^{n-1}(u_0-u_n) &u_1^{n-1}(u_1-u_n) &\ldots
+&u_{n-1}^{n-2}(u_{n-1}-u_n) &0
+\end{array}
+\right|.$$
+$ = (-1)^n(u_0-u_n)(u_1-u_n)\ldots(u_{n-1}-u_n)D_{n-1} =$ (by induction
+hypothesis)\\ 
+$(u_n-u_0)\ldots(u_n-u_{n-1})
+\prod\limits_{0\leq j < i\leq n-1}(u_i - u_j) =  
+\prod\limits_{0\leq j < i\leq n}(u_i - u_j).\hfill\qed$ 
+\end{proof}
+
+\begin{lemma}\label{1.6} Let $f(x) = a_nx^n+a_{n-1}x^{n-1}+\ldots
+a_1x+a_0,$ with $a_i 
+\in\CC.$  Suppose that $a_k\unneq 0,$ for some $0<k\leq n.$ Then for
+some $c\in\CC$ one has
+$$f(c)\unneq 0,\;f'(c)\unneq 0,\ldots,f^{(k)}(c)\unneq 0.$$
+\end{lemma}
+\begin{proof}
+We show, for $0\leq l\leq k,$ the existence of an infinite subset
+$A_l\subset\NN$ such that
+$$a\in A_l\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l)}(a)\unneq 0,$$
+by induction on $l.$\\[1ex]
+{\em Case }$l=0.$ Choose $u_0,\ldots,u_n\in\NN,\;\; u_i\neq u_j$ for
+$i\neq j.$ Consider the system of $n+1$ equations
+$$ (a_0\; a_1\;\ldots a_n)\;U =(f(u_0)\; f(u_1)\;\ldots f(u_n))$$
+where
+$$ U =
+\left(
+\begin{array}{llll}
+1 &1 &\ldots &1 \\
+u_0 &u_1 &\ldots &u_n \\
+&&& \\
+&&& \\
+u_0^n &u_1^n &\ldots &u_n^n
+\end{array}
+\right).$$
+We have
+$$det(U) = \prod\limits_{0\leq j < i\leq n}(u_i - u_j)\neq 0\quad\quad\mbox{(Vandermonde)}.$$
+Hence $U$ has an inverse $C$ such that 
+$$ (a_0\; a_1\;\ldots a_n) = C\;(f(u_0)\; f(u_1)\;\ldots f(u_n)).$$
+Especially
+$$a_k = c_{k0}f(u_0)+\ldots +c_{kn}f(u_n).$$
+>From $a_k\unneq 0$ follows $f(u_i)\unneq 0$ for some $i.$ This shows
+the existence of the set $A_0.$\\[1ex]
+{\em Case }$l>0.$ By the induction hypothesis there exists an infinite
+subset $A_{l-1}\subset\NN$ such that
+$$a\in A_{l-1}\Rightarrow f(a)\unneq 0,\;f'(a)\unneq
+0,\ldots,f^{(l-1)}(a)\unneq 0.$$
+We only need to show the existence of an infinite subset $A_l\subset
+A_{l-1}$ such that
+$$a\in A_l\Rightarrow f^{(l)}(a)\unneq 0.$$
+The coefficient of degree $k-l$ in $f^{(l)}$ is
+$k(k-1)\ldots(k-l+1)a_k\unneq 0.$ Hence if we choose
+$u_0,\ldots,u_{n-l}\in A_{l-1},\;\; u_i\neq u_j \mbox{ if } i\neq j,$
+then it follows similarly to the {\em Case }$l=0$ that
+$f^{(l)}(u_i)\unneq 0$ for some $i,\;\; 0\leq i \leq n-l.$ This shows
+the existence of $A_l.\hfill\qed$
+\end{proof}
+}
+%%<
+
