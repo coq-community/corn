@@ -19,6 +19,8 @@ Require Import ContFunctions.
 Require Import CMetricSpaces.
 Require Import CPMSTheory.
 
+Section LipschitzExtension.
+
 Variable M : CMetricSpace.
 Variable P : M -> CProp.
 Variable C : IR.
@@ -412,3 +414,4 @@ Qed.
 
 End ExtensionProperties.
 
+End LipschitzExtension.
