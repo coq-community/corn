@@ -336,6 +336,53 @@ apply mult_resp_leEq_rht;
  [ apply rht_leEq_Max | apply less_leEq; assumption ].
 Qed.
 
+Lemma max_plus : forall (a b c : IR),
+Max (a[+]c) (b[+]c) [=] Max a b [+] c.
+intros.
+apply equiv_imp_eq_max; intros.
+apply shift_plus_less.
+apply Max_less; apply shift_less_minus; auto.
+apply leEq_less_trans with (Max a b [+]c); auto.
+apply plus_resp_leEq.
+apply lft_leEq_Max.
+apply leEq_less_trans with (Max a b [+]c); auto.
+apply plus_resp_leEq.
+apply rht_leEq_Max.
+Qed.
+
+Lemma max_mult : forall (a b c : IR), Zero [<] c -> 
+(Max (c[*]a) (c[*]b)) [=] c[*](Max a b).
+intros a b c H.
+assert (H1 : c [#] Zero).
+apply pos_ap_zero; auto.
+assert (H2 : Zero [<=] c).
+apply less_leEq; auto.
+assert (forall y : IR, c[*]a[<]y -> c[*]b[<]y -> c[*]Max a b[<]y).
+intros.
+astepl (Max a b [*]c).
+apply shift_mult_less with H1; auto.
+apply Max_less;
+apply shift_less_div; auto.
+auto.
+astepl (c[*]a).
+auto.
+astepl (c[*]b).
+auto.
+assert (forall y : IR, c[*]Max a b[<]y -> c[*]a[<]y).
+intros.
+apply leEq_less_trans with (c[*]Max a b); auto.
+apply mult_resp_leEq_lft; auto.
+apply lft_leEq_MAX.
+auto.
+assert (forall y : IR, c[*]Max a b[<]y -> c[*]b[<]y).
+intros.
+apply leEq_less_trans with (c[*]Max a b); auto.
+apply mult_resp_leEq_lft; auto.
+apply rht_leEq_MAX.
+auto.
+apply equiv_imp_eq_max; auto.
+Qed.
+
 End properties_of_Max.
 
 End Maximum.
@@ -767,6 +814,18 @@ apply AbsIR_inv.
 apply AbsIR_wd; rational.
 Qed.
 
+Lemma AbsIR_mult : forall (x c: IR) (H : Zero [<]c),
+c[*] AbsIR (x) [=] AbsIR (c[*]x).
+intros.
+unfold AbsIR.
+simpl.
+unfold ABSIR.
+rstepr (Max (c[*]x) (c[*]([--]x))).
+apply eq_symmetric_unfolded.
+apply max_mult; auto.
+Qed.
+
+
 Lemma AbsIR_eq_x : forall x : IR, Zero [<=] x -> AbsIR x [=] x.
 intros.
 unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
@@ -913,6 +972,38 @@ intros e H0.
 eapply leEq_transitive; [ apply inv_leEq_AbsIR | exact (H e H0) ].
 Qed.
 
+Lemma AbsSmall_approach :
+forall (a b : IR),
+  (forall (e : IR), Zero[<]e -> AbsSmall (a[+]e) b) -> AbsSmall a b.
+unfold AbsSmall.
+intros a b H.
+split.
+assert (forall e : IR, Zero[<]e -> [--]a[-]b[<=]e).
+intros. 
+assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
+apply H; auto. destruct H0.
+apply shift_minus_leEq.
+apply shift_leEq_plus'.
+astepl ([--]a[+][--]e).
+astepl ([--](a[+]e)).
+auto.
+astepr (b[+]Zero).
+apply shift_leEq_plus'.
+unfold leEq.
+apply approach_zero_weak; auto.
+assert (forall e : IR, Zero[<]e -> b[-]a[<=]e).
+intros. 
+assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
+apply H; auto. destruct H0.
+apply shift_minus_leEq.
+astepr (a[+]e).
+auto.
+astepr (a[+]Zero).
+apply shift_leEq_plus'.
+unfold leEq.
+apply approach_zero_weak; auto.
+Qed.
+
 Lemma AbsIR_eq_zero : forall x : IR, AbsIR x [=] Zero -> x [=] Zero.
 intros.
 apply AbsIR_approach_zero; intros.
@@ -977,6 +1068,30 @@ Qed.
 End Absolute.
 
 Hint Resolve AbsIRz_isz: algebra.
+
+Section SeqMax.
+
+(** *** Bound of sequence *)
+
+Variable seq : nat -> IR.
+
+Fixpoint SeqBound0 (n : nat) : IR :=
+    match n with
+     | O => Zero
+     | S m => Max (AbsIR (seq m)) (SeqBound0 m)
+    end.
+
+Lemma SeqBound0_greater : forall (m n : nat), 
+m < n -> AbsIR (seq m) [<=] SeqBound0 n.
+intros.
+elim H.
+simpl. apply lft_leEq_MAX.
+intros. simpl.
+apply leEq_transitive with (SeqBound0 m0); auto.
+apply rht_leEq_MAX.
+Qed.
+ 
+End SeqMax.
 
 Section Part_Function_Max.
 

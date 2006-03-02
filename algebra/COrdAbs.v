@@ -89,6 +89,17 @@ assumption.
 assumption.
 Qed.
 
+Lemma AbsSmall_reflexive : forall (e : R), Zero [<=] e -> AbsSmall e e.
+intros.
+unfold AbsSmall.
+split.
+apply leEq_transitive with (Zero:R); auto.
+astepr ([--]Zero:R).
+apply inv_resp_leEq.
+auto.
+apply leEq_reflexive.
+Qed.
+
 Lemma AbsSmall_trans : forall e1 e2 d : R,
  e1 [<] e2 -> AbsSmall e1 d -> AbsSmall e2 d.
 intros.
@@ -119,6 +130,49 @@ astepr ([--][--]x).
 apply inv_resp_leEq.
 assumption.
 Qed.
+
+Lemma mult_resp_AbsSmall: forall (R: COrdField) (x y e : R) (H: Zero[<=]y),
+AbsSmall e x -> AbsSmall (y[*]e) (y[*]x).
+unfold AbsSmall.
+intros.
+destruct H0.
+split.
+rstepl (y[*]([--]e)).
+apply mult_resp_leEq_lft; auto.
+apply mult_resp_leEq_lft; auto.
+Qed.
+
+Lemma div_resp_AbsSmall: forall (R: COrdField) (x y e : R) (H: Zero[<]y),
+AbsSmall e x -> AbsSmall (e[/]y[//]pos_ap_zero _ _ H) (x[/]y[//]pos_ap_zero _ _ H).
+unfold AbsSmall.
+intros.
+destruct H0.
+split.
+rstepl (([--]e)[/]y[//]pos_ap_zero _ _ H).
+apply div_resp_leEq; auto.
+apply div_resp_leEq; auto.
+Qed.
+
+Lemma sum_resp_AbsSmall : forall 
+(x y : nat -> R) (n m: nat)
+(H1 : m <= n) (H2 : forall i : nat, m <= i -> i <= n ->  AbsSmall (y i) (x i)),
+AbsSmall (Sum m n y) (Sum m n x).
+unfold AbsSmall.
+intros.
+assert (H3 : forall i : nat, m <= i -> i <= n ->  [--](y i)[<=]x i).
+intros.
+elim (H2 i H H0). auto.
+assert (H4 : forall i : nat, m <= i -> i <= n ->  x i[<=]y i).
+intros.
+elim (H2 i H H0). auto.
+split.
+astepl (Sum m n (fun k: nat => [--](y k))).
+apply Sum_resp_leEq .
+auto with arith. intros. auto.
+apply Sum_resp_leEq .
+auto with arith. intros. auto.
+Qed.
+
 
 Lemma AbsSmall_minus : forall e x1 x2 : R, AbsSmall e (x1[-]x2) -> AbsSmall e (x2[-]x1).
 intros.

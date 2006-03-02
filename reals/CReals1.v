@@ -129,6 +129,34 @@ simpl in |- *; apply Cauchy_Lim_abs.
 apply Cauchy_complete.
 Qed.
 
+Lemma CS_seq_bounded' : forall seq : CauchySeqR,
+ {K : IR | Zero [<] K | forall m : nat, AbsSmall K (seq m)}.
+unfold CauchySeqR in |- *.
+intros.
+assert (X0 : {K : IR | Zero [<] K | {N : nat | forall m, N <= m -> AbsSmall K (seq m)}}).
+apply CS_seq_bounded; auto.
+apply (CS_proof _ seq). 
+destruct X0 as [K1 K1_pos H1].
+destruct H1 as [N H1].
+exists (Max K1 (SeqBound0 seq N)).
+apply less_leEq_trans with K1; auto.
+apply lft_leEq_MAX.
+intros.
+elim (le_or_lt N m).
+intros.
+assert (AbsSmall (R:=IR) K1 (seq m)). 
+apply H1. auto.
+apply AbsSmall_leEq_trans with K1; auto.
+apply lft_leEq_MAX.
+intros.
+apply AbsSmall_leEq_trans with (SeqBound0 seq N).
+apply rht_leEq_MAX.
+apply AbsSmall_leEq_trans with (AbsIR (seq m)).
+apply SeqBound0_greater; auto.
+apply AbsIR_imp_AbsSmall.
+apply leEq_reflexive.
+Qed.
+
 End More_Cauchy_Props.
 
 Section Subsequences.

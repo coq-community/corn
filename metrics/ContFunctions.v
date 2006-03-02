@@ -49,6 +49,9 @@ Definition lipschitz (f : CSetoid_fun A B) : CProp :=
 Definition lipschitz' (f : CSetoid_fun A B) : CProp :=
   {n : nat | forall x y : A, f x[-d]f y[<=]nring n[*](x[-d]y)}.
 
+Definition lipschitz_c (f : CSetoid_fun A B) (C : IR) : CProp :=
+    forall x1 x2 : A, f x1 [-d] f x2 [<=] C [*] (x1 [-d] x2).
+
 End Continuous_functions.
 Implicit Arguments continuous [A B].
 Implicit Arguments uni_continuous [A B].
@@ -57,6 +60,7 @@ Implicit Arguments continuous' [A B].
 Implicit Arguments uni_continuous' [A B].
 Implicit Arguments uni_continuous'' [A B].
 Implicit Arguments lipschitz' [A B].
+Implicit Arguments lipschitz_c [A B].
 
 Section Lemmas.
 
@@ -312,6 +316,24 @@ astepl (Snring IR n).
 apply less_leEq.
 apply nat_less_bin_nexp.
 
+apply ax_d_nneg.
+apply CPsMetricSpace_is_CPsMetricSpace.
+Qed.
+
+Lemma lip_c_imp_lip : forall (A B : CPsMetricSpace) (f : CSetoid_fun A B) (C : IR), 
+lipschitz_c f C -> lipschitz' f.
+unfold lipschitz_c.
+unfold lipschitz'.
+intros.
+assert ({n : nat| C [<=] nring n}).
+apply Archimedes.
+destruct X as [n H1]. 
+exists n.
+intros.
+assert (f x[-d]f y [<=] C[*](x[-d]y)).
+apply H.
+apply leEq_transitive with (C[*](x[-d]y)); auto.
+apply mult_resp_leEq_rht; auto.
 apply ax_d_nneg.
 apply CPsMetricSpace_is_CPsMetricSpace.
 Qed.
