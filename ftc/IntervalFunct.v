@@ -54,7 +54,7 @@ Definition IConst := Build_CSetoid_fun _ _ (fun x => c) IConst_strext.
 End Const.
 
 Lemma IId_strext : forall x y : subset I, scs_elem _ _ x [#] scs_elem _ _ y -> x [#] y.
-intros x y; case x; case y; intros; Algebra.
+intros x y; case x; case y; intros; algebra.
 Qed.
 
 Definition IId := Build_CSetoid_fun _ _ _ IId_strext.

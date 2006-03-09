@@ -155,7 +155,7 @@ rewrite nat_of_P_o_P_of_succ_nat_eq_succ; auto.
 astepl (pring IR (pos_fact (S n))).
 apply my_fact_pos_fact'.
 astepl (Two[*]pring IR (pos_fact n)).
-Algebra.
+algebra.
 apply less_leEq; apply mult_resp_pos; apply recip_resp_pos.
 astepr (pring IR (pos_fact n)). 
 apply pring_pos.

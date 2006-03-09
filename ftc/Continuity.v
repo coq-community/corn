@@ -79,7 +79,7 @@ exists x; split.
 auto.
 split.
 apply H0; auto.
-Algebra.
+algebra.
 intros e H2.
 elim (H1 _ H2).
 intros d H3 H4.
@@ -103,12 +103,12 @@ intros x0 H.
 apply Hl'; left; assumption.
 exists a0.
 split.
-apply Hl'; right; Algebra.
+apply Hl'; right; algebra.
 split.
-apply H0; apply Hl'; right; Algebra.
+apply H0; apply Hl'; right; algebra.
 intro; eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply H1.
-Algebra.
+algebra.
 intros x H; simpl in |- *.
 elim H; intros x0 H1.
 elim H1; clear H1; intros Hy' H1.
@@ -161,7 +161,7 @@ elim glb_is_glb.
 intros.
 apply a0.
 exists x.
-split; Algebra.
+split; algebra.
 Qed.
 
 Lemma lub_prop : forall x : IR, I x -> forall Hx, F x Hx [<=] lub_funct.
@@ -170,7 +170,7 @@ elim lub_is_lub.
 intros.
 apply a0.
 exists x.
-split; Algebra.
+split; algebra.
 Qed.
 
 (**
@@ -276,7 +276,7 @@ intros x Hx; elim Hx; clear Hx; intros y Hx'; elim Hx'; clear Hx';
 exists y; split.
 auto.
 intro; apply shift_minus_less; apply shift_less_plus'.
-eapply less_wdl; [ apply q | Algebra ].
+eapply less_wdl; [ apply q | algebra ].
 elim H0; clear H0; intros H2 H3.
 elim (H3 _ (pos_div_two _ _ H)).
 intros x Hx; elim Hx; clear Hx; intros y Hx'; elim Hx'; clear Hx';
@@ -284,7 +284,7 @@ intros x Hx; elim Hx; clear Hx; intros y Hx'; elim Hx'; clear Hx';
 exists y; split.
 auto.
 intro; apply shift_less_plus'.
-eapply less_wdl; [ apply q | Algebra ].
+eapply less_wdl; [ apply q | algebra ].
 Qed.
 
 Lemma leEq_Norm_Funct : forall e, (forall x, I x -> forall Hx, AbsIR (F x Hx) [<=] e) -> Norm_Funct [<=] e.
@@ -451,7 +451,7 @@ apply pos_one.
 intros.
 apply leEq_wdl with (AbsIR Zero).
 astepl ZeroR; apply less_leEq; assumption.
-Algebra.
+algebra.
 Qed.
 
 Lemma Continuous_I_id : Continuous_I Hab FId.
@@ -715,8 +715,8 @@ astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
 eapply leEq_wdr.
 2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 apply mult_resp_leEq_both; try (apply less_leEq; assumption).
-eapply leEq_wdr; [ apply (H0 x Hxx H4) | Algebra ].
-eapply leEq_wdr; [ apply (H0 y Hyy H5) | Algebra ].
+eapply leEq_wdr; [ apply (H0 x Hxx H4) | algebra ].
+eapply leEq_wdr; [ apply (H0 y Hyy H5) | algebra ].
 apply AbsIR_nonneg.
 apply shift_div_leEq'.
 astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;

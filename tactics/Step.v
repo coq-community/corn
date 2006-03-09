@@ -1,9 +1,9 @@
 (* begin hide *)
-Ltac Algebra := auto with algebra_r algebra algebra_c algebra_s.
+Ltac algebra := auto with algebra_r algebra algebra_c algebra_s.
 
-Ltac astepl x := stepl x; [idtac | Algebra].
+Ltac astepl x := stepl x; [idtac | algebra].
 
-Ltac astepr x := stepr x; [idtac | Algebra].
+Ltac astepr x := stepr x; [idtac | algebra].
 
 Tactic Notation "astepl" constr(c) :=  astepl c.
 

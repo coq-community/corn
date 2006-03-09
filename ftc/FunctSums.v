@@ -72,7 +72,7 @@ Lemma FSum_FSum0 : forall m n (f : nat -> PartIR) x Hx Hx' Hx'',
 intros.
 simpl in |- *; unfold Sum, Sum1 in |- *; simpl in |- *.
 apply cg_minus_wd; try apply bin_op_wd_unfolded; try apply Sum0_wd; intros;
- Algebra.
+ algebra.
 Qed.
 
 Lemma FSum0_wd : forall m (f g : nat -> PartIR),
@@ -81,7 +81,7 @@ Lemma FSum0_wd : forall m (f g : nat -> PartIR),
 intros.
 simpl in |- *.
 apply Sum0_wd.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 Qed.
 
 Lemma FSum_one : forall n (f : nat -> PartIR) x Hx Hx',
@@ -136,7 +136,7 @@ Lemma FSum_wd : forall m n (f g : nat -> PartIR),
 intros.
 simpl in |- *.
 apply Sum_wd.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSum_plus_FSum : forall (f g : nat -> PartIR) m n x Hx HxF HxG,
@@ -172,7 +172,7 @@ Lemma FSum_wd' : forall m n, m <= S n -> forall f g : nat -> PartIR,
 intros.
 simpl in |- *.
 apply Sum_wd'; try assumption.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSum_resp_less : forall (f g : nat -> PartIR) m n, m <= n ->
@@ -231,10 +231,10 @@ Lemma FSumx_wd : forall n (f g : forall i, i < n -> PartIR),
  (forall i Hi x HxF HxG, f i Hi x HxF [=] g i Hi x HxG) ->
  forall x HxF HxG, FSumx n f x HxF [=] FSumx n g x HxG.
 intro; case n.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 clear n.
 simple induction n.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 clear n; intro.
 cut {p : nat | S n = p}; [ intro H | exists (S n); auto ].
 elim H; intros p Hp.
@@ -282,7 +282,7 @@ cut (i < n); [ intro | auto with arith ].
 set (g := fun i Hi => f i (lt_S _ _ Hi)) in *.
 apply H with i (lt_S _ _ H1) x.
 auto.
-Algebra.
+algebra.
 change (Dom (g i H1) x) in |- *.
 apply Hrecn.
 unfold g in |- *; intros.
@@ -291,7 +291,7 @@ inversion_clear H0; assumption.
 elim H0; intros H1 H2; clear H0 H1.
 apply H with n (lt_n_Sn n) x; auto.
 symmetry  in |- *; auto.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSumx_pred' : forall n (f : forall i, i < n -> PartIR),
@@ -310,14 +310,14 @@ Qed.
 Lemma FSumx_char : forall n f x Hx Hf,
  FSumx n f x Hx [=] Sumx (fun i Hi => f i Hi x (FSumx_pred n f Hf x Hx i Hi)).
 intro; induction  n as [| n Hrecn].
-Algebra.
+algebra.
 intros; simpl in |- *.
-apply bin_op_wd_unfolded; Algebra.
+apply bin_op_wd_unfolded; algebra.
 cut (ext_fun_seq' (fun i Hi => f i (lt_S i n Hi))).
 intro H.
 eapply eq_transitive_unfolded.
 apply Hrecn with (Hf := H).
-apply Sumx_wd; intros; simpl in |- *; Algebra.
+apply Sumx_wd; intros; simpl in |- *; algebra.
 intros i j H H0 H' x0 y H1 H2.
 apply Hf with i (lt_S i n H0) x0; auto.
 Qed.
@@ -340,7 +340,7 @@ unfold FSumx_to_FSum in |- *.
 elim (le_lt_dec n i); intro; simpl in |- *.
 elimtype False; apply (le_not_lt n i); auto.
 intros; apply H; auto.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSumx_le : forall n (f : forall i, i < n -> PartIR), ext_fun_seq f ->
@@ -348,7 +348,7 @@ Lemma FSumx_le : forall n (f : forall i, i < n -> PartIR), ext_fun_seq f ->
 do 5 intro.
 unfold FSumx_to_FSum in |- *.
 elim (le_lt_dec n i); intro; simpl in |- *.
-intro; Algebra.
+intro; algebra.
 intros; elimtype False; apply (le_not_lt n i); auto.
 Qed.
 
@@ -393,7 +393,7 @@ cut (i < S n); [ intro | auto with arith ].
 apply eq_transitive_unfolded with (g i H8 x (FSumx_pred _ _ H3 x H4 i H8)).
 2: apply eq_symmetric_unfolded; apply FSumx_lt; assumption.
 unfold g in |- *; apply H0; auto.
-Algebra.
+algebra.
 intro.
 simpl in Hx.
 generalize (Hx m); clear H4 H3 H2 Hx.
@@ -433,8 +433,8 @@ simpl in |- *; red in |- *; intros.
 apply (H n0); auto.
 simpl in |- *.
 red in |- *; intros; apply (H n0); auto.
-simpl in |- *; apply bin_op_wd_unfolded; Algebra.
-apply Sum0_wd; Algebra.
+simpl in |- *; apply bin_op_wd_unfolded; algebra.
+apply Sum0_wd; algebra.
 Qed.
 
 Lemma FSum_0 : forall P f n, (forall i, included P (Dom (f i))) -> Feq P (f n) (FSum n n f).
@@ -446,7 +446,7 @@ simpl in |- *.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
 apply Sum_one.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSum_S : forall P f m n, (forall i, included P (Dom (f i))) ->
@@ -461,7 +461,7 @@ red in |- *; intros; apply (H n0); auto.
 intros; simpl in |- *; apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
 apply Sum_last.
-Algebra.
+algebra.
 Qed.
 
 Lemma FSum_FSum0' : forall P f m n, (forall i, included P (Dom (f i))) ->

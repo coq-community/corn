@@ -134,8 +134,8 @@ Proof.
  apply eq_symmetric_unfolded.
  apply map_pres_plus_unfolded.
  apply map_wd_unfolded with (f := f).
- Algebra.
- Algebra.
+ algebra.
+ algebra.
 Qed.
 
 Lemma map_pres_zero_unfolded : forall f : Homomorphism, f Zero[=]Zero.
@@ -158,7 +158,7 @@ Proof.
  astepl (f Zero).
  apply map_pres_zero_unfolded.
  apply map_wd_unfolded.
- Algebra.
+ algebra.
 Qed.
   
 Lemma map_pres_minus_unfolded :
@@ -208,7 +208,7 @@ Proof.
  astepl (f (One[*]One)). 
  apply map_pres_mult_unfolded.
  apply map_wd_unfolded with (f := f).
- Algebra.
+ algebra.
 Qed.
 
 Lemma map_pres_one_unfolded : forall f : Homomorphism, f One[=]One.
@@ -484,7 +484,7 @@ Proof.
  apply eq_symmetric_unfolded.
  red in H3.
  apply f_well_def.
- Algebra.
+ algebra.
 Qed.
 
 Lemma f_pres_minus : forall x : R1, f [--]x[=][--](f x).
@@ -495,7 +495,7 @@ Proof.
  astepl (f (x[+][--]x)). 
  astepr (f Zero).
  apply f_well_def.
- Algebra.
+ algebra.
  apply f_pres_Zero. 
 Qed.
 
@@ -505,7 +505,7 @@ Proof.
  intros.
  astepr (f (x[+][--]y)).
  apply f_well_def.
- Algebra.
+ algebra.
  astepr (f x[+][--](f y)).
  red in H3.
  astepr (f x[+]f [--]y).
@@ -605,7 +605,7 @@ Proof.
  astepl (f One).
  astepr (f (One[*]One)). 
  apply f_well_def.
- Algebra.
+ algebra.
 Qed.
  
 Lemma f_pres_inv :

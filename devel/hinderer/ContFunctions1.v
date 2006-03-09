@@ -64,7 +64,7 @@ Section Lemmas.
 Lemma nexp_power : forall p : nat, nexp IR p Two[=]nring (power p 2).
 simple induction p.
 simpl in |- *.
-Algebra.
+algebra.
 
 intros n H.
 astepr (nring (R:=IR) (power n 2 * 2)).
@@ -116,7 +116,7 @@ apply plus_resp_eq.
 
 apply nexp_power.
 simpl in |- *.
-Algebra.
+algebra.
 apply less_leEq.
 astepl (OneR[^]S n[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).
 astepl (OneR[/] (Two:IR)[^]S n[//]nexp_resp_ap_zero (S n) H1).

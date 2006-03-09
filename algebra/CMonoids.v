@@ -284,7 +284,7 @@ apply cm_lft_unit_unfolded.
 simpl.
 astepl (csbf_fun M M M (csg_op (c:=M)) a ((csbf_fun M M M (csg_op (c:=M)) (power_CMonoid a m)
           (power_CMonoid a n)))).
-Algebra.
+algebra.
 Qed.
 
 

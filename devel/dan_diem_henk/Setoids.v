@@ -700,7 +700,7 @@ End setoid_of_setoid_predicates.
 Notation "P '=e' Q" := (pred_eq _ P Q) (at level 70, no associativity).
 
 (* begin hide *)
-Ltac Step_final x := trans x; Algebra.
+Ltac Step_final x := trans x; algebra.
 (* end hide *)
 
 Tactic Notation "Step_final" constr(c) :=  Step_final c.

@@ -506,9 +506,9 @@ intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs.
 assumption.
 intros p1 c. intros.
 apply X with (cpoly_linear_cs c p1) (cpoly_linear_cs Zero cpoly_zero_cs).
-Algebra.
+algebra.
 apply _cpoly_lin_eq_zero.
-split; Algebra.
+split; algebra.
 apply X1.
 assumption.
 
@@ -517,8 +517,8 @@ assumption.
 intros.
 apply X with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs c p1).
 apply _cpoly_lin_eq_zero.
-split; Algebra.
-Algebra.
+split; algebra.
+algebra.
 apply X1.
 assumption.
 intros.
@@ -541,7 +541,7 @@ intros.
 apply X with p1 q1 r.
 assumption.
 assumption.
-Algebra.
+algebra.
 apply X2.
 
 intro r; pattern r in |- *; apply Ccpoly_ind_cs.
@@ -553,9 +553,9 @@ apply
     (cpoly_linear_cs Zero cpoly_zero_cs)
     (cpoly_linear_cs Zero cpoly_zero_cs)
     (cpoly_linear_cs c p0).
-apply _cpoly_lin_eq_zero; split; Algebra.
-apply _cpoly_lin_eq_zero; split; Algebra.
-Algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
+algebra.
 apply X1.
 assumption.
 
@@ -567,9 +567,9 @@ apply
     (cpoly_linear_cs c p0)
     (cpoly_linear_cs d q0)
     (cpoly_linear_cs Zero cpoly_zero_cs).
-Algebra.
-Algebra.
-apply _cpoly_lin_eq_zero; split; Algebra.
+algebra.
+algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
 apply X1.
 apply X2.
 intros.
@@ -587,9 +587,9 @@ intro p0; pattern p0 in |- *; apply cpoly_ind_cs.
 assumption.
 intros.
 apply H with (cpoly_linear_cs c p1) (cpoly_linear_cs Zero cpoly_zero_cs).
-Algebra.
+algebra.
 apply _cpoly_lin_eq_zero.
-split; Algebra.
+split; algebra.
 apply H1.
 assumption.
 
@@ -598,8 +598,8 @@ assumption.
 intros.
 apply H with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs c p1).
 apply _cpoly_lin_eq_zero.
-split; Algebra.
-Algebra.
+split; algebra.
+algebra.
 apply H1.
 assumption.
 intros.
@@ -622,7 +622,7 @@ intros.
 apply H with p1 q1 r.
 assumption.
 assumption.
-Algebra.
+algebra.
 apply H4.
 
 intro r; pattern r in |- *; apply cpoly_ind_cs.
@@ -634,9 +634,9 @@ apply
     (cpoly_linear_cs Zero cpoly_zero_cs)
     (cpoly_linear_cs Zero cpoly_zero_cs)
     (cpoly_linear_cs c p0).
-apply _cpoly_lin_eq_zero; split; Algebra.
-apply _cpoly_lin_eq_zero; split; Algebra.
-Algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
+algebra.
 apply H1.
 assumption.
 
@@ -648,9 +648,9 @@ apply
     (cpoly_linear_cs c p0)
     (cpoly_linear_cs d q0)
     (cpoly_linear_cs Zero cpoly_zero_cs).
-Algebra.
-Algebra.
-apply _cpoly_lin_eq_zero; split; Algebra.
+algebra.
+algebra.
+apply _cpoly_lin_eq_zero; split; algebra.
 apply H1.
 apply H2.
 intros.
@@ -696,16 +696,16 @@ pattern p, q in |- *.
 apply cpoly_double_sym_ind0_cs.
 unfold Tsymmetric in |- *.
 intros.
-Algebra.
+algebra.
 intro p0.
 rewrite cpoly_zero_plus.
 rewrite cpoly_plus_zero.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -962,7 +962,7 @@ intros.
 repeat rewrite cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -973,13 +973,13 @@ apply Build_is_CMonoid.
 unfold is_rht_unit in |- *.
 intro.
 rewrite cpoly_plus_zero.
-Algebra.
+algebra.
 unfold is_lft_unit in |- *.
 intros.
 eapply eq_transitive_unfolded.
 apply cpoly_plus_commutative.
 rewrite cpoly_plus_zero.
-Algebra.
+algebra.
 Qed.
 
 Definition cpoly_cmonoid := Build_CMonoid _ _ cpoly_cm_proof.
@@ -1029,7 +1029,7 @@ apply _cpoly_lin_ap_zero.
 auto.
 elim H0.
 left.
-astepl ( [--][--]c). Algebra.
+astepl ( [--][--]c). algebra.
 right.
 apply X.
 assumption.
@@ -1073,7 +1073,7 @@ rewrite cpoly_inv_lin.
 rewrite cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_zero.
 split.
-Algebra.
+algebra.
 assumption.
 split; auto.
 eapply eq_transitive_unfolded.
@@ -1124,12 +1124,12 @@ Qed.
 Lemma cpoly_mult_cr_zero : forall p, cpoly_mult_cr_cs p Zero [=] cpoly_zero_cs.
 intro; pattern p in |- *; apply cpoly_ind_cs.
 rewrite cpoly_zero_mult_cr.
-Algebra.
+algebra.
 intros.
 rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_zero.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1251,7 +1251,7 @@ apply cpoly_plus_op_wd.
 apply eq_symmetric_unfolded.
 apply cpoly_mult_cr_zero.
 apply _cpoly_zero_eq_lin.
-split; Algebra.
+split; algebra.
 
 intro; pattern p in |- *; apply Ccpoly_ind_cs.
 auto.
@@ -1287,7 +1287,7 @@ apply cpoly_plus_op_wd.
 apply eq_symmetric_unfolded.
 apply cpoly_mult_cr_zero.
 apply _cpoly_zero_eq_lin.
-split; Algebra.
+split; algebra.
 
 intros.
 cut ((c [#] d or p [#] q) or y1 [#] y2).
@@ -1321,20 +1321,20 @@ apply cpoly_mult_cr_wd.
 apply cpoly_plus_op_wd.
 assumption.
 assumption.
-Algebra.
+algebra.
 astepl (cpoly_plus_cs (cpoly_mult_cr_cs p1 c) (cpoly_mult_cr_cs q1 c)).
 apply cpoly_plus_op_wd.
-apply cpoly_mult_cr_wd; Algebra.
-apply cpoly_mult_cr_wd; Algebra.
+apply cpoly_mult_cr_wd; algebra.
+apply cpoly_mult_cr_wd; algebra.
 repeat rewrite cpoly_zero_plus.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_mult_cr.
 repeat rewrite cpoly_lin_plus_lin.
 rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1348,7 +1348,7 @@ change
 pattern p in |- *. apply cpoly_ind_cs.
 repeat rewrite cpoly_zero_mult.
 rewrite cpoly_zero_plus.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_mult.
 apply
@@ -1363,7 +1363,7 @@ apply cpoly_mult_cr_dist.
 rewrite cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 clear H.
 apply
@@ -1383,7 +1383,7 @@ apply
           (cpoly_plus_cs (cpoly_mult_cr_cs r c)
              (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))))).
 apply cpoly_plus_op_wd.
-Algebra.
+algebra.
 apply
  eq_transitive_unfolded
   with
@@ -1400,7 +1400,7 @@ apply
           (cpoly_mult_cr_cs r c)) (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))).
 apply cpoly_plus_op_wd.
 apply cpoly_plus_commutative.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded.
 apply cpoly_plus_associative.
 apply cpoly_plus_associative.
@@ -1411,12 +1411,12 @@ Lemma cpoly_mult_cr_assoc_mult_cr : forall p c d,
 intros.
 pattern p in |- *; apply cpoly_ind_cs.
 repeat rewrite cpoly_zero_mult_cr.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1427,7 +1427,7 @@ pattern p in |- *; apply cpoly_ind_cs.
 rewrite cpoly_zero_mult.
 repeat rewrite cpoly_zero_mult_cr.
 rewrite cpoly_zero_mult.
-Algebra.
+algebra.
 intros.
 rewrite cpoly_lin_mult.
 repeat rewrite cpoly_lin_mult_cr.
@@ -1443,21 +1443,21 @@ apply cpoly_mult_cr_assoc_mult_cr.
 rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
 Lemma cpoly_mult_zero : forall p, cpoly_mult_cs p cpoly_zero_cs [=] cpoly_zero_cs.
 intros.
 pattern p in |- *; apply cpoly_ind_cs.
-Algebra.
+algebra.
 intros.
 rewrite cpoly_lin_mult.
 rewrite cpoly_zero_mult_cr.
 rewrite cpoly_zero_plus.
 apply _cpoly_lin_eq_zero.
 split.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1470,13 +1470,13 @@ repeat rewrite cpoly_zero_mult.
 rewrite cpoly_zero_mult_cr.
 rewrite cpoly_zero_plus.
 apply _cpoly_zero_eq_lin.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_mult.
 repeat rewrite cpoly_lin_mult_cr.
 repeat rewrite cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_lin. split.
-Algebra.
+algebra.
 apply
  eq_transitive_unfolded
   with
@@ -1492,7 +1492,7 @@ apply
        (cpoly_plus_cs (cpoly_mult_cr_cs q c0) (cpoly_mult_cr_cs p0 c))
        (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))).
 2: apply cpoly_plus_op_wd.
-3: Algebra.
+3: algebra.
 2: apply cpoly_plus_commutative.
 apply
  eq_transitive_unfolded
@@ -1502,7 +1502,7 @@ apply
           (cpoly_linear_cs Zero (cpoly_mult_cs p0 q)))).
 2: apply cpoly_plus_associative.
 apply cpoly_plus_op_wd.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1523,9 +1523,9 @@ apply
        (cpoly_linear_cs Zero (cpoly_mult_cs q p0))).
 2: apply eq_symmetric_unfolded; apply cpoly_mult_lin.
 apply cpoly_plus_op_wd.
-Algebra.
+algebra.
 apply cpoly_linear_wd.
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -1556,7 +1556,7 @@ change
  in |- *.
 pattern p in |- *; apply cpoly_ind_cs.
 repeat rewrite cpoly_zero_mult.
-Algebra.
+algebra.
 intros.
 repeat rewrite cpoly_lin_mult.
 apply
@@ -1575,15 +1575,15 @@ apply
 rewrite cpoly_zero_plus.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
+algebra.
 assumption.
 apply cpoly_plus_op_wd.
 apply eq_symmetric_unfolded.
 apply cpoly_mult_cr_zero.
 apply _cpoly_lin_eq_lin.
 split.
-Algebra.
-Algebra.
+algebra.
+algebra.
 apply eq_symmetric_unfolded.
 apply cpoly_mult_dist_rht.
 Qed.
@@ -1591,11 +1591,11 @@ Qed.
 Lemma cpoly_mult_cr_one : forall p, cpoly_mult_cr_cs p One [=] p.
 intro.
 pattern p in |- *; apply cpoly_ind_cs.
-Algebra.
+algebra.
 intros.
 rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_lin.
-Algebra.
+algebra.
 Qed.
 
 Lemma cpoly_one_mult : forall p, cpoly_mult_cs cpoly_one p [=] p.
@@ -1609,8 +1609,8 @@ rewrite cpoly_zero_mult.
 apply eq_transitive_unfolded with (cpoly_plus_cs p cpoly_zero_cs).
 apply cpoly_plus_op_wd.
 apply cpoly_mult_cr_one.
-apply _cpoly_lin_eq_zero; Algebra.
-rewrite cpoly_plus_zero; Algebra.
+apply _cpoly_lin_eq_zero; algebra.
+rewrite cpoly_plus_zero; algebra.
 Qed.
 
 Lemma cpoly_mult_one : forall p, cpoly_mult_cs p cpoly_one [=] p.
@@ -1632,7 +1632,7 @@ change (cpoly_linear_cs One cpoly_zero_cs [#] cpoly_zero_cs) in |- *.
 cut ((One:CR) [#] Zero or cpoly_zero_cs [#] cpoly_zero_cs).
 auto.
 left.
-Algebra.
+algebra.
 Qed.
 
 Lemma cpoly_is_CRing : is_CRing cpoly_cabgroup cpoly_one cpoly_mult_op.
@@ -1920,31 +1920,31 @@ Notation RX := (cpoly_cring R).
 *)
 
 Lemma cpoly_X_ : _X_ [=] (Zero:RX) [+X*]One.
-Algebra.
+algebra.
 Qed.
 
 Lemma cpoly_C_ : forall c : RX, _C_ c [=] c[+X*]Zero.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve cpoly_X_ cpoly_C_: algebra.
 
 Lemma cpoly_const_eq : forall c d : R, c [=] d -> _C_ c [=] _C_ d.
 intros.
-Algebra.
+algebra.
 Qed.
 
 Lemma _c_zero : Zero [=] _C_ (Zero:R).
 simpl in |- *.
-split; Algebra.
+split; algebra.
 Qed.
 
 Lemma _c_one : One [=] _C_ (One:R).
-simpl in |- *; split; Algebra.
+simpl in |- *; split; algebra.
 Qed.
 
 Lemma _c_mult : forall a b : R, _C_ (a[*]b) [=] _C_ a[*]_C_ b.
-simpl in |- *; split; Algebra.
+simpl in |- *; split; algebra.
 Qed.
 
 Lemma cpoly_lin : forall (p : RX) (c : R), c[+X*]p [=] _C_ c[+]_X_[*]p.
@@ -1971,17 +1971,17 @@ apply
   with
     (c[+X*]Zero[+]((Zero:RX) [+]cpoly_linear _ (Zero:R) (p:cpoly_csetoid R))).
 2: apply bin_op_wd_unfolded.
-2: Algebra.
+2: algebra.
 2: apply bin_op_wd_unfolded.
-2: Algebra.
+2: algebra.
 2: apply (cpoly_linear_wd R).
-2: Algebra.
+2: algebra.
 2: apply eq_symmetric_unfolded.
 2: apply cpoly_one_mult.
 astepr (c[+X*]Zero[+]cpoly_linear _ (Zero:R) (p:cpoly_csetoid R)).
 astepr (c[+]Zero[+X*](Zero[+]p)).
 astepr (c[+X*]p).
-Algebra.
+algebra.
 apply cpoly_one_mult.
 Qed.
 
@@ -2008,11 +2008,11 @@ intros.
 pattern p in |- *.
 apply cpoly_induc.
 simpl in |- *.
-repeat split; Algebra.
+repeat split; algebra.
 intros. simpl in |- *.
-repeat split; Algebra.
+repeat split; algebra.
 change ((cpoly_mult_cr R p0 c:RX) [=] (cpoly_mult_cr R p0 c:RX)[+]Zero) in |- *.
-Algebra.
+algebra.
 Qed.
 
 
@@ -2021,7 +2021,7 @@ Lemma lin_mult : forall (p q : RX) c, (c[+X*]p) [*]q [=] _C_ c[*]q[+]_X_[*] (p[*
 intros.
 astepl ((_C_ c[+]_X_[*]p)[*]q).
 astepl (_C_ c[*]q[+]_X_[*]p[*]q).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve lin_mult: algebra.
@@ -2033,17 +2033,17 @@ Lemma poly_eq_zero : forall p : RX, p [=] cpoly_zero R -> forall x, p ! x [=] Ze
 intros.
 astepl (cpoly_zero R) ! x.
 change (Zero ! x [=] Zero) in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma apply_wd : forall (p p' : RX) x x', p [=] p' -> x [=] x' -> p ! x [=] p' ! x'.
 intros.
-Algebra.
+algebra.
 Qed.
 
 Lemma cpolyap_pres_eq : forall (f : RX) x y, x [=] y -> f ! x [=] f ! y.
 intros.
-Algebra.
+algebra.
 Qed.
 
 Lemma cpolyap_strext : forall (f : RX) x y, f ! x [#] f ! y -> x [#] y.
@@ -2060,7 +2060,7 @@ Lemma _c_apply : forall c x : R, (_C_ c) ! x [=] c.
 intros.
 simpl in |- *.
 astepl (c[+]Zero).
-Algebra.
+algebra.
 Qed.
 
 Lemma _x_apply : forall x : R, _X_ ! x [=] x.
@@ -2069,7 +2069,7 @@ simpl in |- *.
 astepl (x[*](One[+]x[*]Zero)).
 astepl (x[*](One[+]Zero)).
 astepl (x[*]One).
-Algebra.
+algebra.
 Qed.
 
 Lemma plus_apply : forall (p q : RX) x, (p[+]q) ! x [=] p ! x[+]q ! x.
@@ -2078,9 +2078,9 @@ pattern p, q in |- *; apply poly_double_comp_ind.
 intros.
 astepl (p1[+]q1) ! x.
 astepr (p1 ! x[+]q1 ! x).
-Algebra.
+algebra.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 astepl (c[+]d[+]x[*](p0[+]q0) ! x).
 astepr (c[+]x[*]p0 ! x[+](d[+]x[*]q0 ! x)).
@@ -2090,7 +2090,7 @@ astepl (c[+](d[+](x[*]p0 ! x[+]x[*]q0 ! x))).
 astepr (c[+](x[*]p0 ! x[+](d[+]x[*]q0 ! x))).
 astepl (c[+](d[+]x[*]p0 ! x[+]x[*]q0 ! x)).
 astepr (c[+](x[*]p0 ! x[+]d[+]x[*]q0 ! x)).
-Algebra.
+algebra.
 Qed.
 
 Lemma inv_apply : forall (p : RX) x, ( [--]p) ! x [=] [--]p ! x.
@@ -2098,13 +2098,13 @@ intros.
 pattern p in |- *.
 apply cpoly_induc.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 astepl ( [--]c[+]x[*]( [--]p0) ! x).
 astepr ( [--](c[+]x[*]p0 ! x)).
 astepr ( [--]c[+][--](x[*]p0 ! x)).
 astepr ( [--]c[+]x[*][--]p0 ! x).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve plus_apply inv_apply: algebra.
@@ -2114,7 +2114,7 @@ intros.
 astepl (p[+][--]q) ! x.
 astepr (p ! x[+][--]q ! x).
 astepl (p ! x[+]( [--]q) ! x).
-Algebra.
+algebra.
 Qed.
 
 Lemma _c_mult_apply : forall (q : RX) c x, (_C_ c[*]q) ! x [=] c[*]q ! x.
@@ -2128,7 +2128,7 @@ astepl (cpoly_mult_cr R q c) ! x.
 pattern q in |- *.
 apply cpoly_induc.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 astepl (c[*]c0[+X*]cpoly_mult_cr R p c) ! x.
 astepl (c[*]c0[+]x[*](cpoly_mult_cr R p c) ! x).
@@ -2136,10 +2136,10 @@ astepl (c[*]c0[+]x[*](c[*]p ! x)).
 astepr (c[*](c0[+]x[*]p ! x)).
 astepr (c[*]c0[+]c[*](x[*]p ! x)).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 astepl (x[*]c[*]p ! x).
 astepr (c[*]x[*]p ! x).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve _c_mult_apply: algebra.
@@ -2149,7 +2149,7 @@ intros.
 pattern p in |- *.
 apply cpoly_induc.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 astepl (_C_ c[*]q[+]_X_[*](p0[*]q)) ! x.
 astepl ((_C_ c[*]q) ! x[+](_X_[*](p0[*]q)) ! x).
@@ -2161,7 +2161,7 @@ astepl (c[*]q ! x[+]x[*](p0[*]q) ! x).
 astepl (c[*]q ! x[+]x[*](p0 ! x[*]q ! x)).
 astepr ((c[+]x[*]p0 ! x)[*]q ! x).
 astepr (c[*]q ! x[+]x[*]p0 ! x[*]q ! x).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve mult_apply: algebra.
@@ -2179,11 +2179,11 @@ intros.
 induction  n as [| n Hrecn].
 astepl (One:RX) ! x.
 astepl (One:R).
-Algebra.
+algebra.
 astepl (p[*]p[^]n) ! x.
 astepl (p ! x[*](p[^]n) ! x).
 astepl (p ! x[*]p ! x[^]n).
-Algebra.
+algebra.
 Qed.
 
 (* SUPERFLUOUS *)
@@ -2195,12 +2195,12 @@ Lemma Sum0_cpoly_ap : forall (f : nat -> RX) a k, (Sum0 k f) ! a [=] Sum0 k (fun
 intros.
 induction  k as [| k Hreck].
 simpl in |- *.
-Algebra.
+algebra.
 astepl (Sum0 k f[+]f k) ! a.
 astepl ((Sum0 k f) ! a[+](f k) ! a).
 astepl (Sum0 k (fun i : nat => (f i) ! a)[+](f k) ! a).
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma Sum_cpoly_ap : forall (f : nat -> RX) a k l,

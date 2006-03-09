@@ -110,7 +110,7 @@ apply shift_leEq_plus'; rstepl (seq m[-]y); assumption.
 apply plus_resp_leEq.
 apply rht_leEq_Max.
 unfold cg_minus in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma Cauchy_abs : forall seq : CauchySeq IR, Cauchy_prop (fun n => AbsIR (seq n)).
@@ -248,7 +248,7 @@ apply leEq_wdl with (AbsIR (seq1 i[-]seq1 N)).
 apply AbsSmall_imp_AbsIR; apply HN.
 apply lt_le_weak.
 apply mon_F'; apply le_lt_trans with m; auto.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 Lemma Cprop2_seq_imp_Cprop2_subseq : forall a,

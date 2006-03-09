@@ -235,12 +235,12 @@ Proof.
  left.
  split.
  assumption.
- Algebra.
+ algebra.
  intros.
  right.
  split.
  assumption.
- Algebra.
+ algebra.
 Qed.
 
 

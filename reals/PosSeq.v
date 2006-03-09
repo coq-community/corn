@@ -8,7 +8,7 @@ forall M : IR, {N : nat | forall m : nat, N <= m -> M [<] seq_part_sum x m}.
 
 Lemma One_part_sum : forall (m : nat),  seq_part_sum (fun n : nat => One) m [=] nring m.
 intros.
-induction m; simpl; Algebra.
+induction m; simpl; algebra.
 Qed.
 
 Lemma One_seq_is_pos : seq_pos (fun n : nat => One).

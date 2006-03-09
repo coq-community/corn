@@ -103,7 +103,7 @@ Fixpoint flip (p : RX) : RX :=
 
 Lemma flip_poly : forall (p : RX) x, (flip p) ! x [=] [--]p ! ( [--]x).
 intro p. elim p.
-intros. simpl in |- *. Algebra.
+intros. simpl in |- *. algebra.
 intros c q. intros.
 change
   ( [--]c[+]x[*] (cpoly_inv _ (flip q)) ! x [=] [--] (c[+][--]x[*]q ! ( [--]x)))
@@ -116,7 +116,7 @@ Qed.
 Lemma flip_coefficient : forall (p : RX) i,
  nth_coeff i (flip p) [=] [--] ( [--]One[^]i) [*]nth_coeff i p.
 intro p. elim p.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 intros c q. intros.
 elim i. simpl in |- *. rational.
 intros. simpl in |- *.

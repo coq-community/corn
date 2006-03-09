@@ -61,11 +61,11 @@ apply shift_less_div.
 apply less_wdr with (Cos x).
 apply Cos_pos; auto.
 apply less_transitive_unfolded with ZeroR; PiSolve.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 astepl ZeroR; apply less_wdr with (Sin x).
 apply Sin_pos; auto.
 apply less_transitive_unfolded with (Pi [/]TwoNZ); PiSolve.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Cos_nonneg : forall x, [--] (Pi [/]TwoNZ) [<=] x -> x [<=] Pi [/]TwoNZ -> Zero [<=] Cos x.
@@ -75,10 +75,10 @@ intros;
 PiSolve.
 intros x0 H1 Hx; inversion_clear H1.
 apply less_wdr with (Cos x0);
- [ apply Cos_pos; auto | simpl in |- *; Algebra ].
+ [ apply Cos_pos; auto | simpl in |- *; algebra ].
 astepr (Cos [--] (Pi [/]TwoNZ)); apply eq_imp_leEq;
  Step_final (Cos (Pi [/]TwoNZ)).
-fold (Cos (Pi [/]TwoNZ)) in |- *; apply eq_imp_leEq; Algebra.
+fold (Cos (Pi [/]TwoNZ)) in |- *; apply eq_imp_leEq; algebra.
 split; auto.
 Qed.
 
@@ -88,9 +88,9 @@ intros; apply olor_pos_clcr_nonneg with ZeroR Pi CI CI.
 PiSolve.
 intros x0 H1 Hx; inversion_clear H1.
 apply less_wdr with (Sin x0);
- [ apply Sin_pos; auto | simpl in |- *; Algebra ].
-fold (Sin Zero) in |- *; apply eq_imp_leEq; Algebra.
-fold (Sin Pi) in |- *; apply eq_imp_leEq; Algebra.
+ [ apply Sin_pos; auto | simpl in |- *; algebra ].
+fold (Sin Zero) in |- *; apply eq_imp_leEq; algebra.
+fold (Sin Pi) in |- *; apply eq_imp_leEq; algebra.
 split; auto.
 Qed.
 
@@ -147,7 +147,7 @@ apply leEq_transitive with (Min y x); try apply leEq_Min; auto;
  apply leEq_transitive with x; auto.
 apply leEq_transitive with (Max y x); try apply Max_leEq; auto;
  apply leEq_transitive with y; auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 PiSolve.
 Qed.
 
@@ -191,7 +191,7 @@ eapply leEq_wdr.
 apply lb_integral.
 intros z H6 Hx.
 apply leEq_wdr with (Sin z).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 cut ( [--] (Pi [/]TwoNZ) [<=] x); intros.
 inversion_clear H6; apply Sin_resp_leEq; auto.
 apply leEq_transitive with y; auto.
@@ -206,7 +206,7 @@ eapply eq_transitive_unfolded.
 apply
  Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI) (x0 := ZeroR);
  Contin; split.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Cos_resp_less_aux' :
@@ -244,11 +244,11 @@ apply strict_dec_glues with (Hab := Hab) (Hbc := Hbc) (Hac := Hac).
 Included.
 intros x0 y0 H2 H3 H4 Hx Hy.
 apply less_wdl with (Cos x0); [ apply less_wdr with (Cos y0) | idtac ];
- [ idtac | simpl in |- *; Algebra | simpl in |- *; Algebra ].
+ [ idtac | simpl in |- *; algebra | simpl in |- *; algebra ].
 inversion_clear H2; inversion_clear H3; apply Cos_resp_less_aux'; auto.
 intros x0 y0 H2 H3 H4 Hx Hy.
 apply less_wdl with (Cos x0); [ apply less_wdr with (Cos y0) | idtac ];
- [ idtac | simpl in |- *; Algebra | simpl in |- *; Algebra ].
+ [ idtac | simpl in |- *; algebra | simpl in |- *; algebra ].
 astepl (Cos [--]x0); astepl ( [--][--] (Cos [--]x0));
  astepl ( [--] (Cos ( [--]x0[+]Pi))).
 apply less_wdl with ( [--] (Cos (Pi[-]x0))).
@@ -310,7 +310,7 @@ apply leEq_wdr with (Cos y).
 2: apply eq_transitive_unfolded with (AbsIR (Cos y)).
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
 2: apply less_leEq; elim (H y X); intros; apply Cos_pos; auto.
-2: apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply AbsIR_wd; simpl in |- *; algebra.
 elim (less_cotransitive_unfolded _ _ _ pos_QuarterPi y); intros.
 eapply leEq_transitive.
 apply Min_leEq_lft.
@@ -417,12 +417,12 @@ apply included_FMinus; Included.
 Included.
 intros; simpl in |- *; apply ap_wdl with (Cos x[*]Cos x).
 apply mult_resp_ap_zero; auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply included_FRecip.
 Included.
 intros; simpl in |- *; apply ap_wdl with (Cos x[*]Cos x).
 apply mult_resp_ap_zero; auto.
-astepl (One[*]Cos x[*]Cos x); simpl in |- *; Algebra.
+astepl (One[*]Cos x[*]Cos x); simpl in |- *; algebra.
 intros x H3 Hx Hx'.
 apply
  eq_transitive_unfolded
@@ -439,20 +439,20 @@ simpl in |- *.
 astepl (Part _ _ (ProjIR1 H4) [-]Part _ _ (ProjIR2 H4)).
 elim H4; clear H4; intros H6 H7.
 astepl (Part _ _ H6[-]Part _ _ H7).
-apply cg_minus_wd; simpl in |- *; Algebra.
+apply cg_minus_wd; simpl in |- *; algebra.
 elim H5; clear H5; intros H6 H7.
 astepl (Part _ _ H6).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply
  eq_transitive_unfolded
   with (One[/] _[//]mult_resp_ap_zero _ _ _ (H2 x H3) (H2 x H3)).
 apply div_wd.
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 astepr (Cos x[^]2[+]Sin x[^]2); simpl in |- *; rational.
 simpl in Hx'; astepr (One[/] _[//]ext2 (S:=IR) Hx').
 apply div_wd.
-Algebra.
-astepl (One[*]Cos x[*]Cos x); simpl in |- *; Algebra.
+algebra.
+astepl (One[*]Cos x[*]Cos x); simpl in |- *; algebra.
 apply Derivative_div.
 Deriv.
 Deriv.
@@ -471,30 +471,30 @@ apply included_FRecip.
 Included.
 intros; simpl in |- *; apply ap_wdl with (Cos x[*]Cos x).
 apply mult_resp_ap_zero; auto.
-astepl (One[*]Cos x[*]Cos x); simpl in |- *; Algebra.
+astepl (One[*]Cos x[*]Cos x); simpl in |- *; algebra.
 apply included_FPlus.
 Included.
 apply included_FNth.
 unfold Tang in |- *; apply included_FDiv.
 Included.
 Included.
-intros; simpl in |- *; astepl (Cos x). Algebra.
-simpl in |- *; Algebra.
+intros; simpl in |- *; astepl (Cos x). algebra.
+simpl in |- *; algebra.
 intros x H1 Hx Hx'.
 apply
  eq_transitive_unfolded
   with (One[/] _[//]mult_resp_ap_zero _ _ _ (H0 x H1) (H0 x H1)).
 simpl in |- *; apply div_wd.
-Algebra.
-astepr (One[*]Cos x[*]Cos x); simpl in |- *; Algebra.
+algebra.
+astepr (One[*]Cos x[*]Cos x); simpl in |- *; algebra.
 astepl
  (Cos x[^]2[+]Sin x[^]2[/] _[//]mult_resp_ap_zero _ _ _ (H0 x H1) (H0 x H1)).
 apply
  eq_transitive_unfolded
   with (One[+]One[*] (Sin x[/] _[//]H0 x H1) [*] (Sin x[/] _[//]H0 x H1)).
 2: simpl in |- *; apply bin_op_wd_unfolded.
-2: Algebra.
-2: repeat apply mult_wd; try apply div_wd; Algebra.
+2: algebra.
+2: repeat apply mult_wd; try apply div_wd; algebra.
 simpl in |- *.
 rational.
 Qed.

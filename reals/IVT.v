@@ -386,7 +386,7 @@ astepr (Three[^]i:IR).
 apply leEq_wdl with (nring i[*]Two[^]i:IR).
 2: rstepr (nring i[*] (Small[^]i[*]Three[^]i)).
 2: astepr (nring i[*] (Small[*]Three) [^]i).
-2: cut (Small[*]Three [=] Two); Algebra.
+2: cut (Small[*]Three [=] Two); algebra.
 2: unfold Small in |- *; rational.
 induction  i as [| i Hreci].
 simpl in |- *. astepl ZeroR. apply less_leEq. apply pos_one.

@@ -26,7 +26,7 @@ change
   (sqrt (x1[^]2[+]x2[^]2) (cc_abs_aid _ x1 x2) [=] 
    sqrt (y1[^]2[+]y2[^]2) (cc_abs_aid _ y1 y2)) in |- *.
 elim H. clear H. intros.
-apply sqrt_wd. Algebra.
+apply sqrt_wd. algebra.
 Qed.
 
 Hint Resolve AbsCC_wd: algebra_c.
@@ -62,7 +62,7 @@ Hint Resolve cc_mult_abs: algebra.
 Lemma AbsCC_minzero : forall x : CC, AbsCC (x[-]Zero) [=] AbsCC x.
 intros.
 apply AbsCC_wd.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsCC_IR : forall x : IR, Zero [<=] x -> AbsCC (cc_IR x) [=] x.
@@ -78,7 +78,7 @@ Hint Resolve AbsCC_IR: algebra.
 Lemma cc_div_abs : forall (x y : CC) y_ y__, AbsCC (x[/] y[//]y_) [=] (AbsCC x[/] AbsCC y[//]y__).
 intros x y nz anz.
 rstepl (AbsCC y[*]AbsCC (x[/] y[//]nz) [/] AbsCC y[//]anz).
-apply div_wd. 2: Algebra.
+apply div_wd. 2: algebra.
 astepl (AbsCC (y[*] (x[/] y[//]nz))).
 apply AbsCC_wd. rational.
 Qed.
@@ -87,7 +87,7 @@ Lemma cc_div_abs' : forall (x : CC) (y : IR) y_ y__,
  Zero [<=] y -> AbsCC (x[/] cc_IR y[//]y__) [=] (AbsCC x[/] y[//]y_).
 intros x y nz cnz H.
 rstepl (y[*]AbsCC (x[/] cc_IR y[//]cnz) [/] y[//]nz).
-apply div_wd. 2: Algebra.
+apply div_wd. 2: algebra.
 astepl (AbsCC (cc_IR y) [*]AbsCC (x[/] cc_IR y[//]cnz)).
 astepl (AbsCC (cc_IR y[*] (x[/] cc_IR y[//]cnz))).
 apply AbsCC_wd.
@@ -188,7 +188,7 @@ apply
  eq_transitive_unfolded with (S := cc_csetoid) (y := cc_IR (x[^]2[+]y[^]2)).
 eapply l_1_1_2 with (x := x) (y := y).
 split; simpl in |- *.
-2: Algebra.
+2: algebra.
 eapply AbsCC_square_Re_Im with (x := x) (y := y).
 Qed.
 
@@ -208,7 +208,7 @@ Hint Resolve l_2_1_2: algebra.
 (* end hide *)
 
 Lemma AbsCC_mult_square : forall x y : CC, AbsCC (x[*]y) [^]2 [=] AbsCC x[^]2[*]AbsCC y[^]2.
-intros. rstepr ((AbsCC x[*]AbsCC y) [^]2). Algebra.
+intros. rstepr ((AbsCC x[*]AbsCC y) [^]2). algebra.
 Qed.
 
 Lemma AbsCC_square_ap_zero : forall z : CC, z [#] Zero -> AbsCC z[^]2 [#] Zero.
@@ -234,7 +234,7 @@ apply
     (y := cc_IR (Re z[^]2[+]Im z[^]2))
     (x' := CC_conj z)
     (y' := cc_IR (AbsCC z[^]2)).
-elim z. intros x y. simpl in |- *. split; simpl in |- *; Algebra.
+elim z. intros x y. simpl in |- *. split; simpl in |- *; algebra.
 apply cc_IR_wd.
 apply AbsCC_square_Re_Im with (x := Re z) (y := Im z).
 Qed.
@@ -345,7 +345,7 @@ astepl (cc_IR [--]Two[*]cc_IR eps).
 rstepr ( [--]Two[*]cc_IR eps).
 apply mult_wdl.
 simpl in |- *. unfold cc_eq in |- *. simpl in |- *.
-split; [ Algebra | rational ].
+split; [ algebra | rational ].
 Qed.
 
 (* The following lemmas are just auxiliary results *)
@@ -362,7 +362,7 @@ apply
     (S := cc_csetoid)
     (y := z[*]
           (CC_conj z[/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H))).
-2: Algebra.
+2: algebra.
 astepr (z[*] (CC_conj z[/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H))).
 apply
  bin_op_wd_unfolded
@@ -372,7 +372,7 @@ apply
     (x2 := z)
     (y1 := cc_recip z H)
     (y2 := CC_conj z[/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H)).
-Algebra.
+algebra.
 apply cc_recip_char.
 generalize H. clear H. elim z. intros x y H. simpl in |- *. split; simpl in |- *; rational.
 Qed.
@@ -391,7 +391,7 @@ apply
     (x' := cc_IR (AbsCC z[^]2))
     (y' := cc_IR (AbsCC z[^]2)).
 apply AbsCC_mult_conj.
-Algebra.
+algebra.
 Qed.
 
 Let l_4_3_4 :

@@ -217,7 +217,7 @@ apply Abs_Sin_less_One; auto.
 apply (half_lt1 IR).
 intros x Hx H1.
 apply compact_wd with (Sin x).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 unfold min, max in |- *; inversion_clear H1.
 split.
 eapply leEq_transitive; [ apply Min_leEq_lft | apply Sin_resp_leEq; auto ].
@@ -271,7 +271,7 @@ apply inv_resp_less.
 astepr (OneR[^]2); apply AbsIR_less_square.
 apply less_wdl with (AbsIR (Sin x)).
 inversion_clear X; apply Abs_Sin_less_One; auto.
-apply AbsIR_wd; simpl in |- *; Algebra.
+apply AbsIR_wd; simpl in |- *; algebra.
 split.
 split.
 intros x H3 Hx Hx'.
@@ -284,7 +284,7 @@ unfold power, FPower in |- *.
 unfold FPower in Hx.
 astepl (Part _ _ (ProjIR1 Hx) [*]Part _ _ (ProjIR2 Hx)).
 apply mult_wd.
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 elim Hx; clear Hx; intros Hx Hx1.
 astepl (Part _ _ Hx); clear Hx1.
 astepl (Part _ _ (ProjT2 Hx)).
@@ -307,8 +307,8 @@ astepl (Part _ _ (ProjIR1 Hx4) [-]Part _ _ (ProjIR2 Hx4)).
 elim Hx4; clear Hx5 Hx4 Hx3 Hx2; intros Hx2 Hx3.
 astepl (Part _ _ Hx2[-]Part _ _ Hx3).
 apply cg_minus_wd.
-Algebra.
-simpl in |- *; Algebra.
+algebra.
+simpl in |- *; algebra.
 unfold power in |- *.
 astepl (Exp [--] (One [/]TwoNZ[*]Log _ H4) [*]Cos x).
 astepl ((One[/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)) [*]Cos x).
@@ -316,7 +316,7 @@ astepr
  (Exp (One [/]TwoNZ[*]Log _ H4) [/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)).
 rstepl (Cos x[/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)).
 apply div_wd.
-2: Algebra.
+2: algebra.
 astepr (Exp (Log _ H4[*]One [/]TwoNZ)).
 assert (H5 : Zero [<] Cos x). inversion_clear H3; apply Cos_pos; auto.
 astepl (Exp (Log _ H5)).
@@ -324,7 +324,7 @@ apply Exp_wd.
 rstepl ((Log _ H5[+]Log _ H5) [/]TwoNZ).
 rstepr (Log _ H4 [/]TwoNZ).
 apply div_wd.
-2: Algebra.
+2: algebra.
 astepl (Log _ (mult_resp_pos _ _ _ H5 H5)).
 astepl (Log _ (pos_square _ _ (pos_ap_zero _ _ H5))).
 apply Log_wd.
@@ -337,7 +337,7 @@ inversion_clear H3; apply Abs_Sin_less_One; auto.
 Deriv.
 split; auto.
 intros; simpl in |- *; apply Integral_empty.
-astepl (Sin Zero); simpl in |- *; Algebra.
+astepl (Sin Zero); simpl in |- *; algebra.
 Qed.
 
 Opaque ArcSin.
@@ -348,7 +348,7 @@ unfold Sin in |- *.
 astepr (FId x CI).
 cut (Dom (ArcSin[o]Sine) x). intro H2.
 apply eq_transitive_unfolded with ((ArcSin[o]Sine) x H2).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply Feq_imp_eq with (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)).
 apply ArcSin_Sin_inv.
 split; auto.
@@ -363,8 +363,8 @@ cut
  forall Hy, Sine y Hy [=] x}.
 intros H; elim H; clear H; intros y H H0.
 elim H; clear H; intros H1 H2.
-assert (H : Sin y [=] x). simpl in |- *; Algebra.
-assert (H3 : Dom ArcSin (Sin y)). apply dom_wd with x; Algebra.
+assert (H : Sin y [=] x). simpl in |- *; algebra.
+assert (H3 : Dom ArcSin (Sin y)). apply dom_wd with x; algebra.
 split.
 astepr (ArcSin _ H3).
 apply less_wdr with y; auto.
@@ -385,9 +385,9 @@ intros x0 y H3 H4 H5 Hx0 Hy.
     auto.
 2: apply included_imp_Continuous with realline; Contin.
 apply less_wdl with (Sin x0).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply less_wdr with (Sin y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 inversion_clear H3; inversion_clear H4; apply Sin_resp_less; auto.
 Qed.
 
@@ -414,16 +414,16 @@ unfold FPower in |- *; intros.
 astepr (Part _ _ (ProjT2 Hx0)).
 apply less_wdr with (Exp (Part _ _ (ProjT1 Hx0))).
 apply Exp_pos.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 unfold FPower in |- *; intros.
 apply less_leEq; astepr (Part _ _ (ProjT2 Hx0)).
 apply less_wdr with (Exp (Part _ _ (ProjT1 Hx0))).
 apply Exp_pos.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 auto.
 apply eq_transitive_unfolded with (ArcSin y H[-]ArcSin x Hx).
 rstepl (ArcSin x Hx[+]Integral H1[-]ArcSin x Hx).
-apply cg_minus_wd; [ simpl in |- * | Algebra ].
+apply cg_minus_wd; [ simpl in |- * | algebra ].
 apply eq_symmetric_unfolded;
  apply Integral_plus_Integral with (Min3_leEq_Max3 Zero y x).
 apply included_imp_Continuous with (olor [--]One One).
@@ -432,7 +432,7 @@ apply included3_interval; auto.
 split.
 astepr ( [--]ZeroR); apply inv_resp_less; apply pos_one.
 apply pos_one.
-apply x_minus_x; simpl in |- *; Algebra.
+apply x_minus_x; simpl in |- *; algebra.
 apply included_imp_Continuous with (olor [--]One One).
 exact ArcSin_def_lemma.
 apply included_interval; auto.
@@ -459,9 +459,9 @@ intros x H Hx Hx'.
 elim Hx; intros x0 H0.
 astepr x; astepl (Part _ _ (ProjT2 Hx)); astepl (Part _ _ H0).
 apply eq_transitive_unfolded with (Sin (ArcSin x x0)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply eq_symmetric_unfolded; apply Sin_ArcSin.
-Algebra.
+algebra.
 Qed.
 
 Lemma ArcSin_resp_leEq : forall x y,
@@ -482,7 +482,7 @@ apply
   with
     (Exp (( [-C-] [--] (One [/]TwoNZ) {*} (Logarithm[o] [-C-]One{-}FId{^}2)) z x0)).
 apply less_leEq; apply Exp_pos.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 (** ***Cosine and Arcosine
@@ -491,13 +491,13 @@ Qed.
 Lemma ArcCos_Cos : forall x, Zero [<] x -> x [<] Pi -> forall H, ArcCos (Cos x) H [=] x.
 intros x H H0 H1.
 assert (H2 : Dom ArcCos (Sin (Pi [/]TwoNZ[-]x))).
- apply dom_wd with (Cos x); Algebra.
+ apply dom_wd with (Cos x); algebra.
 astepl (Part _ _ H2).
 unfold ArcCos in |- *.
 astepl (Pi [/]TwoNZ[-]Part _ _ (ProjIR2 H2)).
 rstepr (Pi [/]TwoNZ[-] (Pi [/]TwoNZ[-]x)).
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply ArcSin_Sin.
 apply shift_less_minus; apply shift_plus_less'.
 rstepr Pi; auto.
@@ -520,14 +520,14 @@ Included.
 intros.
 apply ArcCos_domain.
 apply less_wdr with (Cos x).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply inv_cancel_less.
 astepr OneR.
 eapply leEq_less_trans.
 apply inv_leEq_AbsIR.
 inversion_clear X; apply Abs_Cos_less_One; auto.
 apply less_wdl with (Cos x).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 eapply leEq_less_trans.
 apply leEq_AbsIR.
 inversion_clear X; apply Abs_Cos_less_One; auto.
@@ -536,11 +536,11 @@ intros.
 astepl (Part _ _ (ProjT2 Hx)); astepr x.
 cut (Dom ArcCos (Cos x)). intro H0.
 apply eq_transitive_unfolded with (ArcCos (Cos x) H0).
-apply pfwdef; simpl in |- *; Algebra.
+apply pfwdef; simpl in |- *; algebra.
 inversion_clear X; apply ArcCos_Cos; auto.
 inversion_clear Hx.
 apply dom_wd with (Cosine x x0); auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Cos_ArcCos_inv : Feq (olor [--]One One) (Cosine[o]ArcCos) FId.
@@ -553,7 +553,7 @@ intros.
 inversion_clear Hx.
 astepr x; astepl (Part _ _ (ProjT2 Hx)); astepl (Part _ _ X0).
 apply eq_transitive_unfolded with (Cos (ArcCos x x0)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply eq_symmetric_unfolded; apply Cos_ArcCos.
 Qed.
 
@@ -599,14 +599,14 @@ split.
 apply cos_domain.
 intros; apply ap_wdl with (Cos a).
 apply Greater_imp_ap; apply Cos_pos; auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 split.
 apply sin_domain.
 split.
 apply cos_domain.
 intros; apply ap_wdl with (Cos b).
 apply Greater_imp_ap; apply Cos_pos; auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma ArcTan_Tan_inv : Feq (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) (ArcTang[o]Tang) FId.
@@ -655,7 +655,7 @@ inversion_clear Hx.
 Opaque Tang.
 simpl in |- *.
 apply Integral_empty.
-Algebra.
+algebra.
 Qed.
 
 Transparent Tang.
@@ -667,7 +667,7 @@ unfold Tan, ArcTan in |- *.
 astepr (FId x CI).
 cut (Dom (ArcTang[o]Tang) x). intro H2.
 apply eq_transitive_unfolded with ((ArcTang[o]Tang) x H2).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply Feq_imp_eq with (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)).
 apply ArcTan_Tan_inv.
 split; auto.
@@ -754,14 +754,14 @@ unfold ArcCos in |- *; simpl in |- *.
 Transparent iprop.
 elim H4; intros H6' H7; elim H7; intros.
 apply iprop_wd with (Pi [/]TwoNZ[-]ArcSin _ H7).
-2: Algebra.
+2: algebra.
 elim (ArcSin_range _ H7); intros; split.
 apply shift_less_minus; apply shift_plus_less'.
 rstepr Pi; apply less_transitive_unfolded with (Pi [/]TwoNZ); PiSolve.
 apply shift_minus_less; apply shift_less_plus'.
 astepl ZeroR.
 assert (H6 : Dom ArcSin (Sin Zero)).
- apply dom_wd with ZeroR; [ split | Algebra ];
+ apply dom_wd with ZeroR; [ split | algebra ];
   [ astepr ( [--]ZeroR); apply inv_resp_less | idtac ]; 
   apply pos_one.
 apply less_wdl with (ArcSin _ H6).
@@ -779,16 +779,16 @@ apply ap_symmetric_unfolded; apply pos_ap_zero; apply recip_resp_pos.
 apply mult_resp_pos;
  [ apply pos_two | apply less_transitive_unfolded with aux_val; auto ].
 apply eq_transitive_unfolded with (Sin (ArcSin _ H7));
- [ apply Sin_ArcSin | simpl in |- *; Algebra ].
+ [ apply Sin_ArcSin | simpl in |- *; algebra ].
 apply eq_transitive_unfolded with (Sin (ArcSin _ H6));
- [ astepl (Sin Zero); apply Sin_ArcSin | simpl in |- *; Algebra ].
+ [ astepl (Sin Zero); apply Sin_ArcSin | simpl in |- *; algebra ].
 intros; unfold Tan, Tang in |- *.
 assert (H6 : Cos (ArcCos _ H4) [#] Zero).
  eapply ap_wdl_unfolded.
  2: apply Cos_ArcCos.
  apply recip_ap_zero; auto.
 apply leEq_wdr with (Sin (ArcCos _ H4) [/] _[//]H6).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply shift_leEq_div.
 Opaque Cos.
 unfold ArcCos in |- *; simpl in |- *.
@@ -812,7 +812,7 @@ PiSolve.
 astepl (Pi [/]TwoNZ[-]ArcSin _ (ProjIR2 H4)).
 apply shift_minus_leEq; apply shift_leEq_plus'; astepl ZeroR.
 assert (H7 : Dom ArcSin (Sin Zero)).
- apply dom_wd with ZeroR; [ split | Algebra ];
+ apply dom_wd with ZeroR; [ split | algebra ];
   [ astepr ( [--]ZeroR); apply inv_resp_less | idtac ]; 
   apply pos_one.
 apply leEq_wdl with (ArcSin _ H7).
@@ -859,7 +859,7 @@ apply sin_domain.
 split.
 apply cos_domain.
 intro; apply ap_wdl_unfolded with (Cos min).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply pos_ap_zero; apply Cos_pos.
 apply min1.
 apply min2.
@@ -881,7 +881,7 @@ apply sin_domain.
 split.
 apply cos_domain.
 intro; apply ap_wdl_unfolded with (Cos max).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply pos_ap_zero; apply Cos_pos.
 apply max1.
 apply max2.
@@ -895,7 +895,7 @@ apply sin_domain.
 split.
 apply cos_domain.
 intro; apply ap_wdl_unfolded with (Cos [--]min).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 astepl (Cos min).
 apply pos_ap_zero; apply Cos_pos.
 apply min1.
@@ -913,7 +913,7 @@ apply sin_domain.
 split.
 apply cos_domain.
 intro; apply ap_wdl_unfolded with (Cos [--]max).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 astepl (Cos max).
 apply pos_ap_zero; apply Cos_pos.
 apply max1.
@@ -1133,19 +1133,19 @@ Transparent ArcTang.
 elim ArcTan_range_lemma; intros y H H0.
 elim H; intros.
 cut (Dom Tang y). intro H1.
-assert (H2 : Tan y H1 [=] x). unfold Tan in |- *; Algebra.
+assert (H2 : Tan y H1 [=] x). unfold Tan in |- *; algebra.
 split.
 apply less_wdr with y; auto.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply ArcTan_Tan with (H := H1); auto.
-unfold ArcTan in |- *; Algebra.
+unfold ArcTan in |- *; algebra.
 apply less_wdl with y; auto.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply ArcTan_Tan with (H := H1); auto.
-unfold ArcTan in |- *; Algebra.
+unfold ArcTan in |- *; algebra.
 repeat split.
 intro; apply Greater_imp_ap.
-apply less_wdr with (Cos y); [ apply Cos_pos; auto | simpl in |- *; Algebra ].
+apply less_wdr with (Cos y); [ apply Cos_pos; auto | simpl in |- *; algebra ].
 Qed.
 
 End ArcTan_Range.
@@ -1175,13 +1175,13 @@ astepr (x0[^]2); apply sqr_nonneg.
 auto.
 apply eq_transitive_unfolded with (ArcTan y[-]ArcTan x).
 rstepl (ArcTan x[+]Integral H0[-]ArcTan x).
-apply cg_minus_wd; [ simpl in |- * | Algebra ].
+apply cg_minus_wd; [ simpl in |- * | algebra ].
 apply eq_symmetric_unfolded; unfold ArcTan in |- *; simpl in |- *.
 apply Integral_plus_Integral with (Min3_leEq_Max3 Zero y x).
 apply included_imp_Continuous with realline.
 exact ArcTan_def_lemma.
 apply included3_interval; split.
-apply x_minus_x; simpl in |- *; Algebra.
+apply x_minus_x; simpl in |- *; algebra.
 apply included_imp_Continuous with realline.
 exact ArcTan_def_lemma.
 apply included_interval; split.
@@ -1198,7 +1198,7 @@ auto.
 intros.
 apply ap_wdl with (Cos (ArcTan x)).
 Opaque ArcTang.
-2: unfold ArcTan in |- *; simpl in |- *; Algebra.
+2: unfold ArcTan in |- *; simpl in |- *; algebra.
 elim ArcTan_range with x; intros.
 apply pos_ap_zero; apply Cos_pos; auto.
 Included.
@@ -1206,10 +1206,10 @@ intros; inversion_clear Hx.
 astepr x; astepl (Part _ _ (ProjT2 Hx)); astepl (Part _ _ X0).
 cut (Dom Tang (ArcTan x)); intros.
 apply eq_transitive_unfolded with (Tan (ArcTan x) X1).
-unfold Tan, ArcTan in |- *; Algebra.
+unfold Tan, ArcTan in |- *; algebra.
 apply eq_symmetric_unfolded; apply Tan_ArcTan.
 apply dom_wd with (ArcTang x x0); auto.
-unfold ArcTan in |- *; Algebra.
+unfold ArcTan in |- *; algebra.
 Qed.
 
 End Inverses.

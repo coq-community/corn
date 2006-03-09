@@ -207,11 +207,11 @@ exists (cons a (nil _)).
 intros x H1.
 inversion H1. rename X into H2.
 elim H2.
-apply compact_wd with a; Algebra.
+apply compact_wd with a; algebra.
 apply compact_inc_lft.
 intros.
 exists a.
-right; Algebra.
+right; algebra.
 apply leEq_wdl with ZeroR.
 apply less_leEq; auto.
 astepl (AbsIR Zero).
@@ -232,10 +232,10 @@ exists (cons a (nil IR)).
 intros x H1.
 inversion_clear H1. rename X into H2.
 elim H2.
-apply compact_wd with a; [ apply compact_inc_lft | Algebra ].
+apply compact_wd with a; [ apply compact_inc_lft | algebra ].
 intros x Hx; inversion_clear Hx.
 exists a.
-simpl in |- *; right; Algebra.
+simpl in |- *; right; algebra.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
 apply leEq_transitive with (b[-]a).
@@ -250,7 +250,7 @@ exists (cons ((a[+]b) [/]TwoNZ) (nil IR)).
 intros x H1.
 inversion_clear H1. rename X into H2.
 inversion_clear H2.
-apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | Algebra ].
+apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | algebra ].
 astepl (a[+]Zero); apply shift_plus_leEq'.
 apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
@@ -265,7 +265,7 @@ rstepl (a[-]b).
 apply shift_minus_leEq; astepr b; auto.
 intros.
 exists ((a[+]b) [/]TwoNZ).
-right; Algebra.
+right; algebra.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply Abs_Max.
 apply shift_minus_leEq; apply Max_leEq; apply shift_leEq_plus';
@@ -302,7 +302,7 @@ unfold b' in H1; apply compact_map3 with (e := e) (Hab' := H1) (b := b).
 assumption. rename X into H2.
 simpl in H2; inversion_clear H2.
 apply Hl'; assumption.
-apply compact_wd with b'; [ apply compact_inc_rht | Algebra ].
+apply compact_wd with b'; [ apply compact_inc_rht | algebra ].
 intros.
 cut (x [<] b' or b'[-]e [<] x). intros H3.
 inversion_clear H3.
@@ -316,7 +316,7 @@ inversion_clear H2; split.
 assumption.
 apply less_leEq; auto.
 exists b'.
-right; Algebra.
+right; algebra.
 simpl in |- *; unfold ABSIR in |- *.
 apply Max_leEq.
 apply shift_minus_leEq; unfold b' in |- *.
@@ -450,7 +450,7 @@ set (seq2 := Cauchy_const x) in *.
 apply leEq_wdl with (Lim seq2[-]Lim seq1).
 2: apply cg_minus_wd;
     [ unfold seq2 in |- *; apply eq_symmetric_unfolded; apply Lim_const
-    | Algebra ].
+    | algebra ].
 apply
  leEq_wdl
   with
@@ -632,7 +632,7 @@ apply inv_resp_leEq.
 set (seq2 := Cauchy_const x) in *.
 apply leEq_wdl with (Lim seq1[-]Lim seq2).
 2: apply cg_minus_wd;
-    [ Algebra
+    [ algebra
     | unfold seq2 in |- *; apply eq_symmetric_unfolded; apply Lim_const ].
 apply
  leEq_wdl

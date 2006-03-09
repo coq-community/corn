@@ -169,21 +169,21 @@ do 3 intro.
 rewrite <- H; intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); elim (le_lt_dec i 0);
  intros; simpl in |- *.
-Algebra.
+algebra.
 apply RSR_h_nlnf; reflexivity.
 elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
 elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
 elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
 elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 Lemma Separated_Refinement_lemma3 :
  forall H : 0 <= pred (m + n), Separated_Refinement_fun 0 H[=]a.
 intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; inversion b0.
 apply eq_symmetric_unfolded; apply partition_length_zero with Hab.
 cut (m + n <= 1); [ intro | omega ].
@@ -198,11 +198,11 @@ Lemma Separated_Refinement_lemma4 :
  Separated_Refinement_fun (pred (m + n)) H[=]b.
 intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; apply (lt_irrefl _ a1).
 elimtype False; apply (lt_irrefl _ a0).
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 Lemma Separated_Refinement_lemma2 :

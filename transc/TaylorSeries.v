@@ -51,7 +51,7 @@ Opaque N_Deriv.
 Lemma Taylor_Rem_char : forall n H x Hx Hx' Hx'',
  F x Hx[-]FSum0 (S n) Taylor_Series x Hx' [=] Taylor_Rem J pJ F a x Ha Hx'' n H.
 intros; unfold Taylor_Rem in |- *; repeat apply cg_minus_wd.
-Algebra.
+algebra.
 simpl in |- *.
 apply bin_op_wd_unfolded.
 2: apply mult_wdl.
@@ -78,14 +78,14 @@ exact (FSumx_char _ _ _ _ H0).
 apply Sumx_Sum0.
 intros; simpl in |- *.
 apply mult_wdl; apply div_wd.
-2: Algebra.
+2: algebra.
 apply Feq_imp_eq with J; auto.
 apply Derivative_n_unique with pJ i F; auto.
 apply N_Deriv_lemma.
 red in |- *; do 3 intro.
 rewrite H0; intros; simpl in |- *; auto.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply Feq_imp_eq with J; auto.
 apply Derivative_n_unique with pJ n F; auto.
 Deriv.
@@ -198,7 +198,7 @@ eapply leEq_transitive.
 2: apply (HN (S n) (le_S _ _ H2) w H4).
 simpl in |- *.
 cut (forall z : IR, AbsIR z [=] AbsIR (z[-]Zero)); intros.
-2: apply AbsIR_wd; Algebra.
+2: apply AbsIR_wd; algebra.
 eapply leEq_wdr.
 2: apply H3.
 clear H3; eapply leEq_wdr.
@@ -213,7 +213,7 @@ cut
 eapply leEq_wdr.
 2: apply H3.
 clear H3; apply mult_resp_leEq_rht.
-apply eq_imp_leEq; apply AbsIR_wd; Algebra.
+apply eq_imp_leEq; apply AbsIR_wd; algebra.
 apply less_leEq; auto.
 rstepr ((AbsIR z[/] _[//]nring_fac_ap_zero _ (S n)) [*]r'[^]S n).
 apply mult_wdl.
@@ -221,7 +221,7 @@ eapply eq_transitive_unfolded.
 apply
  AbsIR_division with (y__ := AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ (S n))).
 apply div_wd.
-Algebra.
+algebra.
 apply AbsIR_eq_x.
 apply nring_nonneg.
 apply less_leEq; apply div_resp_pos; [ apply pos_nring_fac | auto ].
@@ -267,10 +267,10 @@ rstepl
      (H1 (S n))) [*]AbsIR ((z[+][--]w) [^]n[*] (z[+][--]a)) [*]
   Two[^]S n).
 repeat apply mult_wdl.
-apply div_wd; Algebra.
+apply div_wd; algebra.
 eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply mult_nexp.
-Algebra.
+algebra.
 apply leEq_wdr with (AbsIR (Max y (Max a t) [-]Min x (Min a t))).
 apply compact_elements with Hxy'; auto.
 inversion_clear H0; split.
@@ -327,7 +327,7 @@ apply
     (H5
        (Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S p)) a Ha) [/] _[//]
         nring_fac_ap_zero _ (S p)) a)).
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 (* end hide *)
 
@@ -359,8 +359,8 @@ elim (Taylor_Series_conv_lemma2 _ _ Hab One (pos_one _)); intros N HN;
 eapply leEq_wdr.
 eapply leEq_wdl.
 apply (HN _ H0 _ X Hx).
-apply AbsIR_wd; Algebra.
-simpl in |- *; Algebra.
+apply AbsIR_wd; algebra.
+simpl in |- *; algebra.
 Qed.
 
 (* begin hide *)
@@ -414,7 +414,7 @@ apply
   with
     (AbsIR a'[*] (One[/] _[//]AbsIR_resp_ap_zero _ Hb) [*]AbsIR c[*]AbsIR d[/]
      e[//]He).
-apply div_wd; Algebra.
+apply div_wd; algebra.
 repeat
  (eapply eq_transitive_unfolded;
    [ apply AbsIR_resp_mult | apply mult_wdl ]).
@@ -429,10 +429,10 @@ repeat
    [ apply AbsIR_resp_mult | apply mult_wdl ]).
 eapply eq_transitive_unfolded;
  [ apply AbsIR_division with (y__ := AbsIR_resp_ap_zero _ Hx)
- | apply div_wd; Algebra ].
+ | apply div_wd; algebra ].
 eapply eq_transitive_unfolded.
 2: apply AbsIR_mult_pos; auto.
-Algebra.
+algebra.
 Qed.
 (* end hide *)
 
@@ -564,7 +564,7 @@ eapply eq_transitive_unfolded.
 2: apply nring_comm_mult.
 Transparent fac.
 replace (fac (S n)) with (fac n * S n).
-Algebra.
+algebra.
 Opaque mult.
 unfold fac in |- *; fold (fac n) in |- *.
 auto with arith.
@@ -591,7 +591,7 @@ exists N; intros.
 eapply leEq_transitive.
 2: apply HN with (n := n) (Hx := Hx); auto.
 cut (forall (z t : IR) Ht, AbsIR z [=] AbsIR (z[-][-C-]Zero t Ht)); intros.
-2: simpl in |- *; apply AbsIR_wd; Algebra.
+2: simpl in |- *; apply AbsIR_wd; algebra.
 eapply leEq_wdl.
 2: apply H2.
 eapply leEq_wdr.
@@ -623,7 +623,7 @@ apply convergent_wd with (fun n : nat => Part (Exp_ps n) r (H n)).
 Opaque nexp_op.
 intros; simpl in |- *.
 rstepl ((r[-]Zero) [^]n[/] _[//]nring_fac_ap_zero _ n).
-Algebra.
+algebra.
 apply fun_series_conv_imp_conv_IR with realline.
 apply Exp_conv.
 split.
@@ -689,7 +689,7 @@ apply Feq_transitive with (FSeries_Sum Hf); auto.
 apply Feq_transitive with (FSeries_Sum Hg).
 apply eq_imp_Feq; simpl in |- *; Included.
 intros; apply series_sum_wd.
-intros; Algebra.
+intros; algebra.
 apply Feq_symmetric; apply Taylor_Series_conv_to_fun; auto.
 apply Taylor_Series_conv_IR; auto.
 Qed.

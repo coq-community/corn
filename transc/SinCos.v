@@ -41,8 +41,8 @@ simpl in |- *.
 eapply eq_transitive_unfolded.
 eapply eq_transitive_unfolded.
 2: apply H2.
-Algebra.
-Algebra.
+algebra.
+algebra.
 apply Feq_imp_eq with (fun x : IR => CTrue); auto.
 repeat split.
 exists (CAnd_intro _ _ CI CI); split.
@@ -60,8 +60,8 @@ simpl in |- *.
 eapply eq_transitive_unfolded.
 eapply eq_transitive_unfolded.
 2: apply (H0 x CI H1 H2).
-Algebra.
-Algebra.
+algebra.
+algebra.
 repeat split.
 exists (CAnd_intro _ _ CI CI); repeat split.
 Qed.
@@ -80,7 +80,7 @@ cut (Cos y [#] Zero).
 cut (Cos x [#] Zero).
 intros H0 H1 H2.
 apply eq_transitive_unfolded with (Sin (x[+]y) [/] _[//]H2).
-unfold Tan in |- *; simpl in |- *; Algebra.
+unfold Tan in |- *; simpl in |- *; algebra.
 rstepr
  ((Tan x Hx[+]Tan y Hy) [*]Cos x[*]Cos y[/] _[//]
   mult_resp_ap_zero _ _ _ H (mult_resp_ap_zero _ _ _ H0 H1)).
@@ -146,7 +146,7 @@ apply
   with ( [--]One[^]x0[*][--] ((x[-]Zero) [^]n) [/] _[//]nring_fac_ap_zero IR n).
 2: simpl in |- *; rational.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply mult_wdr.
 rewrite b.
 eapply eq_transitive_unfolded.
@@ -163,10 +163,10 @@ intros; unfold Tan, Tang in |- *.
 cut (Cos x [#] Zero).
 cut (Cos [--]x [#] Zero). intros H H0.
 apply eq_transitive_unfolded with (Sin [--]x[/] _[//]H).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 astepl ( [--] (Sin x) [/] _[//]H0).
 rstepl ( [--] (Sin x[/] _[//]H0)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 inversion_clear Hx'.
 inversion_clear X0.
 simpl in |- *; auto.
@@ -188,13 +188,13 @@ intros.
 astepl (Cos x[*]Cos x[+]Sin x[*]Sin x).
 astepr (Cos Zero).
 apply eq_transitive_unfolded with (Cos (x[+][--]x)).
-2: Algebra.
+2: algebra.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
 apply Cos_plus.
 unfold cg_minus in |- *.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 astepl (Sin x[*][--] (Sin [--]x)).
 Step_final (Sin x[*][--][--] (Sin x)).
 Qed.
@@ -246,15 +246,15 @@ unfold Tan in H; exact (pfstrx _ _ _ _ _ _ H).
 Qed.
 
 Lemma Sin_wd : forall x y : IR, x [=] y -> Sin x [=] Sin y.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 Lemma Cos_wd : forall x y : IR, x [=] y -> Cos x [=] Cos y.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 Lemma Tan_wd : forall x y Hx Hy, x [=] y -> Tan x Hx [=] Tan y Hy.
-intros; unfold Tan in |- *; Algebra.
+intros; unfold Tan in |- *; algebra.
 Qed.
 
 (**

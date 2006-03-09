@@ -165,7 +165,7 @@ apply AbsSmall_imp_AbsIR.
 apply AbsSmall_wdr_unfolded with (seq_part_sum x m[-]seq_part_sum x N).
 apply HN; assumption.
 unfold seq_part_sum in |- *; simpl in |- *.
-apply cg_minus_wd; apply Sum0_wd; Algebra.
+apply cg_minus_wd; apply Sum0_wd; algebra.
 Qed.
 
 Lemma fun_const_series_sum : forall y H
@@ -173,7 +173,7 @@ Lemma fun_const_series_sum : forall y H
 intros.
 simpl in |- *.
 apply series_sum_wd.
-Algebra.
+algebra.
 Qed.
 
 Lemma conv_zero_fun_series : fun_series_convergent _ _ Hab (fun n => [-C-]Zero).
@@ -320,10 +320,10 @@ eapply eq_transitive_unfolded.
 apply Sum0_wd; intros; rational.
 unfold cg_minus in |- *.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 eapply eq_transitive_unfolded.
 2: apply inv_Sum0.
-apply Sum0_wd; Algebra.
+apply Sum0_wd; algebra.
 Qed.
 
 Lemma Fun_Series_Sum_min : forall H : fun_series_convergent _ _ Hab (fun n => f n{-}g n),
@@ -539,7 +539,7 @@ intros.
 FEQ.
 simpl in |- *; unfold series_sum in |- *.
 apply Lim_wd'; simpl in |- *; intros.
-unfold seq_part_sum in |- *; apply Sum0_wd; intros; Algebra.
+unfold seq_part_sum in |- *; apply Sum0_wd; intros; algebra.
 Qed.
 
 Lemma fun_series_conv : forall H H',
@@ -572,7 +572,7 @@ FEQ.
 simpl in |- *.
 unfold series_sum in |- *; apply Lim_wd'.
 intro; simpl in |- *.
-unfold seq_part_sum in |- *; apply Sum0_wd; intros; Algebra.
+unfold seq_part_sum in |- *; apply Sum0_wd; intros; algebra.
 Qed.
 
 Lemma Fun_Series_Sum_as_Lim : forall Hf H',
@@ -783,7 +783,7 @@ apply
 2: apply H0 with (Hx' := Hx) (Hx := ProjIR1 (ProjIR1 Hx')); auto with arith.
 Opaque FAbs.
 2: simpl in |- *; apply mult_wd;
-    [ apply eq_symmetric_unfolded; apply FAbs_char | Algebra ].
+    [ apply eq_symmetric_unfolded; apply FAbs_char | algebra ].
 apply conv_fun_series_scal with (f := fun n : nat => [-C-] (c[^] (n - N))).
 apply conv_fun_const_series with (x := fun n : nat => c[^] (n - N)).
 apply join_series with (power_series c).
@@ -792,7 +792,7 @@ exists N.
 exists 0.
 intro.
 rewrite plus_comm; rewrite Minus.minus_plus.
-Algebra.
+algebra.
 Contin.
 intros x H0 n; induction  n as [| n Hrecn].
 intro.
@@ -802,7 +802,7 @@ intros.
 apply eq_imp_leEq.
 simpl in |- *.
 astepl (AbsIR (Part _ _ Hx') [*]One); apply mult_wdl; apply AbsIR_wd;
- Algebra.
+ algebra.
 intro.
 elim (le_lt_eq_dec _ _ H1); intro.
 intros;
@@ -823,7 +823,7 @@ rewrite <- minus_n_n.
 apply eq_imp_leEq.
 simpl in |- *; eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply mult_one.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 End Convergence_Criteria.

@@ -1015,7 +1015,7 @@ Implicit Arguments ss_elt [S P].
 Implicit Arguments ss_prf [S P].
 
 (* begin hide *)
-Ltac Step_final x := apply eq_transitive with x; Algebra.
+Ltac Step_final x := apply eq_transitive with x; algebra.
 (* end hide *)
 
 Tactic Notation "Step_final" constr(c) :=  Step_final c.

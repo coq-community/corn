@@ -20,7 +20,7 @@ Qed.
 
 Lemma Exp_wd : forall x y : IR, x [=] y -> Exp x [=] Exp y.
 intros x y H.
-unfold Exp in |- *; Algebra.
+unfold Exp in |- *; algebra.
 Qed.
 
 Hint Resolve Exp_wd: algebra.
@@ -39,7 +39,7 @@ intro H.
 cut (convergent h).
 intro H0.
 apply eq_transitive_unfolded with (series_sum h H0).
- apply series_sum_wd; Algebra.
+ apply series_sum_wd; algebra.
 unfold series_sum in |- *.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
@@ -49,14 +49,14 @@ apply Lim_seq_eq_Lim_subseq with (f := fun n : nat => S n).
  intro n; exists (S n); split; auto with arith.
 intro n; simpl in |- *.
 induction  n as [| n Hrecn]; simpl in |- *;
- [ Algebra | Step_final (OneR[+]Zero) ].
+ [ algebra | Step_final (OneR[+]Zero) ].
 
 apply
  convergent_wd
   with
     (fun n : nat =>
      (One[/] _[//]nring_fac_ap_zero IR n) [*]nexp _ n (Zero[-]Zero)).
- Algebra.
+ algebra.
 exact
  (fun_series_conv_imp_conv Zero Zero (leEq_reflexive IR Zero) Exp_ps
     (Exp_conv Zero Zero (leEq_reflexive IR Zero)
@@ -98,7 +98,7 @@ eapply Derivative_wdr.
      Derivative_FPowerSeries1' with (a := fun _ : nat => OneR) (Hg := H0).
 FEQ.
 simpl in |- *.
-apply series_sum_wd; Algebra.
+apply series_sum_wd; algebra.
 
 fold Exp_ps in |- *; apply Exp_conv.
 Qed.
@@ -151,7 +151,7 @@ Lemma One_leEq_Exp : forall x : IR, Zero [<=] x -> One [<=] Exp x.
 intros x H.
 astepl (Exp Zero).
 apply resp_leEq_char; auto.
- Algebra.
+ algebra.
 intro H0; astepl OneR.
 apply One_less_Exp; auto.
 Qed.
@@ -178,7 +178,7 @@ Qed.
 
 Lemma Exp_bnd : Taylor_bnd (fun n => Expon).
 apply bnd_imp_Taylor_bnd with Expon.
-  intros n x Hx Hx'; apply eq_imp_leEq; Algebra.
+  intros n x Hx Hx'; apply eq_imp_leEq; algebra.
  Contin.
 Included.
 Qed.
@@ -199,7 +199,7 @@ apply
     (bndf := bndf)
     (derF := derF); auto.
   apply bnd_imp_Taylor_bnd with F.
-    intros; apply eq_imp_leEq; Algebra.
+    intros; apply eq_imp_leEq; algebra.
    apply Derivative_n_imp_Continuous with CI 1 F; auto with arith.
   intro n.
   change (included realline (Dom F)) in |- *.
@@ -207,7 +207,7 @@ apply
  intros; astepr OneR.
  astepr (Exp Zero).
  Opaque Expon.
- unfold Exp in |- *; simpl in |- *; Algebra.
+ unfold Exp in |- *; simpl in |- *; algebra.
  Transparent Expon.
 apply Taylor_Series_conv_to_fun; auto.
 
@@ -302,7 +302,7 @@ Lemma Exp_inv_char : forall x : IR, Exp x[*]Exp [--]x [=] One.
 intro x.
 astepr (Exp Zero).
 apply eq_symmetric_unfolded; apply Exp_plus'.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve Exp_inv_char: algebra.
@@ -379,7 +379,7 @@ Lemma Exp_inv : forall x : IR, Exp [--]x [=] (One[/] _[//]Exp_ap_zero x).
 intro x.
 apply mult_cancel_lft with (Exp x).
  apply Exp_ap_zero.
-rstepr OneR; Algebra.
+rstepr OneR; algebra.
 Qed.
 
 Hint Resolve Exp_inv: algebra.
@@ -388,7 +388,7 @@ Lemma Exp_minus : forall x y : IR, Exp (x[-]y) [=] (Exp x[/] _[//]Exp_ap_zero y)
 intros x y.
 unfold cg_minus in |- *; astepl (Exp x[*]Exp [--]y).
 rstepr (Exp x[*] (One[/] _[//]Exp_ap_zero y)).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve Exp_minus: algebra.
@@ -437,7 +437,7 @@ Qed.
 
 Lemma Exp_resp_leEq : forall x y : IR, x [<=] y -> Exp x [<=] Exp y.
 intros x y; apply resp_leEq_char.
- Algebra.
+ algebra.
 intro H; apply Exp_resp_less; auto.
 Qed.
 
@@ -465,7 +465,7 @@ Hint Resolve Continuous_Log: continuous.
 
 Lemma Log_one : forall H, Log One H [=] Zero.
 intro H; unfold Log in |- *; simpl in |- *.
-apply Integral_empty; Algebra.
+apply Integral_empty; algebra.
 Qed.
 
 Hint Resolve Log_one: algebra.
@@ -480,7 +480,7 @@ Qed.
 
 Lemma Log_wd : forall (x y : IR) Hx Hy, x [=] y -> Log x Hx [=] Log y Hy.
 intros x y Hx Hy H.
-unfold Log in |- *; Algebra.
+unfold Log in |- *; algebra.
 Qed.
 
 Hint Resolve Log_wd: algebra.
@@ -510,7 +510,7 @@ cut (Dom (Logarithm{-}G) x); [ intro H2 | repeat split; simpl in |- *; auto ].
 eapply eq_transitive_unfolded.
  2: apply (H5 x Hx H2 CI).
 Opaque Logarithm.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 
 clear H5.
 exists (CAnd_intro _ _ CI CI); apply mult_resp_pos; auto.
@@ -518,7 +518,7 @@ exists (CAnd_intro _ _ CI CI); apply mult_resp_pos; auto.
 intros z w t H3.
 rstepl (z[-]t[+]t).
 apply bin_op_wd_unfolded.
- 2: Algebra.
+ 2: algebra.
 apply cg_inv_unique_2.
 astepr ( [--]ZeroR).
 rstepl ( [--] (w[-] (z[-]t))).
@@ -530,7 +530,7 @@ apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
  2: apply (H5 One (pos_one IR) H2 CI).
 simpl in |- *.
 rstepl (Zero[-] (Log y Hy[-]Log y Hy)).
-Algebra.
+algebra.
 
 Transparent Logarithm.
 simpl in |- *; apply pos_one.
@@ -607,7 +607,7 @@ apply Feq_criterium with CI (Fconst (S:=IR) One) ZeroR.
       exists CI.
       split; auto.
       intro; simpl in |- *; apply Greater_imp_ap.
-      apply less_wdr with (Exp x); [ apply Exp_pos | simpl in |- *; Algebra ].
+      apply less_wdr with (Exp x); [ apply Exp_pos | simpl in |- *; algebra ].
      Included.
     intros; simpl in |- *; rational.
    apply Derivative_comp with (openl Zero) CI; Deriv.
@@ -624,11 +624,11 @@ apply Feq_criterium with CI (Fconst (S:=IR) One) ZeroR.
    intros x Hx H2; elim H2; intros H3 H4; split.
     apply leEq_wdr with (Exp x).
      apply Exp_resp_leEq; auto.
-    simpl in |- *; Algebra.
+    simpl in |- *; algebra.
    apply less_leEq; apply leEq_less_trans with (Exp b).
     apply leEq_wdl with (Exp x).
      apply Exp_resp_leEq; auto.
-    simpl in |- *; Algebra.
+    simpl in |- *; algebra.
    apply less_plusOne.
   Deriv.
  split.
@@ -636,7 +636,7 @@ intros; simpl in |- *.
 astepr (Log One (pos_one _)).
 unfold Log in |- *; apply pfwdef.
 astepr (Exp Zero).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Log_Exp : forall x H, Log (Exp x) H [=] x.
@@ -645,7 +645,7 @@ cut (Dom (Logarithm[o]Expon) x).
 intro H0.
 unfold Log in |- *; simpl in |- *;
  apply eq_transitive_unfolded with (Part _ _ H0).
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 astepr (Part FId x CI).
 apply Feq_imp_eq with realline.
  apply Log_Exp_inv.
@@ -654,7 +654,7 @@ split.
 exists CI.
 apply Log_domain.
 apply less_wdr with (Exp x); auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Transparent Logarithm.
@@ -679,7 +679,7 @@ apply leEq_wdr with (Integral (prim_lemma _ _ log_defn_lemma x Hx y Hy)).
      (Integral (prim_lemma _ _ log_defn_lemma One (pos_one _) x Hx) [+]
       Integral (prim_lemma _ _ log_defn_lemma x Hx y Hy) [-]
       Integral (prim_lemma _ _ log_defn_lemma One (pos_one _) x Hx)).
- 2: apply cg_minus_wd; Algebra.
+ 2: apply cg_minus_wd; algebra.
  2: apply eq_symmetric_unfolded;
      apply Integral_plus_Integral with (Min3_leEq_Max3 One y x).
  2: apply included_imp_Continuous with (openl Zero);
@@ -707,13 +707,13 @@ Lemma Exp_Log : forall x H, Exp (Log x H) [=] x.
 intros x H.
 set (y := Exp (Log x H)) in *.
 cut (Zero [<] y); [ intro H0 | unfold y in |- *; apply Exp_pos ].
-cut (Log y H0 [=] Log x H); [ intro H1 | unfold y in |- *; Algebra ].
+cut (Log y H0 [=] Log x H); [ intro H1 | unfold y in |- *; algebra ].
 cut (Zero [=] Log y H0[-]Log x H);
  [ clear H1; intro H1 | apply eq_symmetric_unfolded; apply x_minus_x; auto ].
 apply leEq_imp_eq.
  apply Exp_Log_lemma with H H0; auto.
 apply Exp_Log_lemma with H0 H.
-astepl ( [--]ZeroR); rstepr ( [--] (Log y H0[-]Log x H)); Algebra.
+astepl ( [--]ZeroR); rstepr ( [--] (Log y H0[-]Log x H)); algebra.
 Qed.
 
 Hint Resolve Exp_Log: algebra.
@@ -741,7 +741,7 @@ apply eq_imp_Feq.
  Included.
 intros x H Hx Hx'; simpl in |- *.
 astepr (Exp (Log x H)).
-unfold Log in |- *; simpl in |- *; Algebra.
+unfold Log in |- *; simpl in |- *; algebra.
 Qed.
 
 Lemma Log_E : forall He, Log E He [=] One.
@@ -797,13 +797,13 @@ exists y.
   split; [ apply Min_leEq_rht | apply rht_leEq_Max ].
   repeat split.
   intro; simpl in |- *; apply pos_ap_zero; auto.
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 astepl ZeroR; auto.
 Qed.
 
 Lemma Log_resp_leEq : forall (x y : IR) Hx Hy, x [<=] y -> Log x Hx [<=] Log y Hy.
 intros x y Hx Hy; apply resp_leEq_char' with (P := fun x : IR => Zero [<] x).
- Algebra.
+ algebra.
 apply Log_resp_less.
 Qed.
 

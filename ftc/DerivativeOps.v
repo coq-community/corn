@@ -361,7 +361,7 @@ intro leEqM.
 2: eapply leEq_transitive.
 3: apply lft_leEq_Max.
 2: unfold nF1 in |- *; apply norm_bnd_AbsIR; assumption.
-2: apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply AbsIR_wd; simpl in |- *; algebra.
 cut (Dom F x);
  [ intro Hxx
  | simpl in Hx; unfold extend in Hx; inversion_clear Hx; assumption ].

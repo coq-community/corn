@@ -396,13 +396,13 @@ Proof.
  apply mult_wdr.
  astepl (zring (R:=R1) (Z_of_nat (nat_of_P d2))).
  rewrite inject_nat_convert.
- Algebra.
+ algebra.
  rewrite H2.
  astepl (zring (R:=R1) n2[*]zring (R:=R1) d1).
  apply mult_wdr.
  astepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
  rewrite inject_nat_convert.
- Algebra.
+ algebra.
  change (inj_Q (Build_Q n1 d1)[~=]inj_Q (Build_Q n2 d2)) in |- *. 
  apply ap_imp_neq.
  assumption.
@@ -447,7 +447,7 @@ Proof.
     den_is_nonzero (Build_Q (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
  apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
- Algebra.
+ algebra.
  
  astepr
   (zring (R:=R1) n1[*]nring (R:=R1) d2[+]zring (R:=R1) n2[*]nring (R:=R1) d1).
@@ -455,10 +455,10 @@ Proof.
  apply bin_op_wd_unfolded.
  astepr (zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat (nat_of_P d2))).
  rewrite inject_nat_convert.
- Algebra.
+ algebra.
  astepr (zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat (nat_of_P d1))).
  rewrite inject_nat_convert.
- Algebra.
+ algebra.
  rational.
 Qed.
 
@@ -487,7 +487,7 @@ Proof.
 
  apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
- Algebra.
+ algebra.
 
  astepr (zring (R:=R1) n1[*]zring (R:=R1) n2).
  apply zring_mult.
@@ -529,8 +529,8 @@ Proof.
  apply zring_mult.
  rewrite inject_nat_convert.
  apply zring_mult.
- Algebra.
- Algebra.
+ algebra.
+ algebra.
 Qed.
 
 Lemma less_inj_Q : forall q1 q2, (inj_Q q1 [<] inj_Q q2) -> q1 [<] q2.
@@ -582,10 +582,10 @@ Proof.
  apply inj_Q_plus.
  astepr (inj_Q Zero).
  apply inj_Q_wd.
- Algebra.
+ algebra.
  simpl in |- *.
  rstepl (Zero:R1).
- Algebra.
+ algebra.
 Qed.
 
 Lemma inj_Q_minus : forall q1 q2, inj_Q (q1[-]q2) [=] inj_Q q1[-]inj_Q q2. 
@@ -620,7 +620,7 @@ Proof.
  apply inj_Q_plus.
  astepr (inj_Q Zero).
  apply inj_Q_wd.
- Algebra.
+ algebra.
  simpl in |- *.
  rational.
 
@@ -712,7 +712,7 @@ Proof.
  apply inj_Q_plus.
  astepr (inj_Q Zero).
  apply inj_Q_wd.
- Algebra.
+ algebra.
  simpl in |- *.
  rational.
  
@@ -822,7 +822,7 @@ Proof.
   
   apply bin_op_wd_unfolded.
   rational.
-  Algebra.
+  algebra.
 
   simpl in |- *.
   apply swap_div with (z_ := Greater_imp_ap _ e Zero H).

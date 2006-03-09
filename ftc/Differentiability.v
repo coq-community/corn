@@ -61,7 +61,7 @@ exists
     (included_refl _ _)).
 apply Derivative_I_wdr with (PartInt f').
 FEQ.
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 exact (included_imp_deriv _ _ _ _ _ _ _ _ H derF).
 Qed.
 

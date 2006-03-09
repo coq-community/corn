@@ -79,7 +79,7 @@ apply leEq_less_trans with ZeroR.
 2: auto.
 apply leEq_wdl with (f _ (le_n n)); auto.
 unfold f, compact_part, n in |- *; simpl in |- *.
-apply cg_minus_wd; [ apply pfwdef; rational | Algebra ].
+apply cg_minus_wd; [ apply pfwdef; rational | algebra ].
 simple induction i.
 intros; unfold f, compact_part in |- *.
 apply leEq_wdl with (F a Ha[-]z).
@@ -140,11 +140,11 @@ apply less_leEq.
 apply plus_cancel_less with ( [--]m).
 eapply less_wdl.
 apply q.
-unfold cg_minus in |- *; Algebra.
+unfold cg_minus in |- *; algebra.
 unfold G in |- *.
 apply eq_transitive_unfolded with (AbsIR (Part _ _ (ProjIR1 H2))).
 apply FAbs_char.
-apply AbsIR_wd; simpl in |- *; Algebra.
+apply AbsIR_wd; simpl in |- *; algebra.
 apply shift_less_minus; astepl m; auto.
 apply a0.
 exists x.
@@ -154,7 +154,7 @@ repeat split; auto.
 intro; unfold G in |- *.
 apply eq_transitive_unfolded with (AbsIR (Part _ _ (ProjIR1 Hy))).
 apply FAbs_char.
-apply AbsIR_wd; simpl in |- *; Algebra.
+apply AbsIR_wd; simpl in |- *; algebra.
 set (H1 := less_imp_ap _ _ _ HFab) in *.
 set (H2 := pfstrx _ _ _ _ _ _ H1) in *.
 elim (ap_imp_less _ _ _ H2); intro.
@@ -401,7 +401,7 @@ Qed.
 
 Lemma a_seq_b_seq_dist : forall n, b_seq n[-]a_seq n [=] (Two [/]ThreeNZ) [^]n[*] (b[-]a).
 simple induction n.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 clear n; intros.
 astepr (Two [/]ThreeNZ[*] (Two [/]ThreeNZ) [^]n[*] (b[-]a)).
 astepr (Two [/]ThreeNZ[*] ((Two [/]ThreeNZ) [^]n[*] (b[-]a))).
@@ -554,7 +554,7 @@ apply b_seq_I.
 apply xa_in_interval.
 apply leEq_wdl with (AbsIR (b_seq N[-]xb)).
 2: apply AbsIR_wd; apply cg_minus_wd;
-    [ Algebra | apply eq_symmetric_unfolded; apply a_seq_b_seq_lim ].
+    [ algebra | apply eq_symmetric_unfolded; apply a_seq_b_seq_lim ].
 apply AbsSmall_imp_AbsIR.
 auto.
 apply shift_leEq_minus; astepl (F xa Hx).

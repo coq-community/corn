@@ -186,7 +186,7 @@ Qed.
 Lemma ing_nring' : forall m n : nat,
  CS_seq _ (nring (R:=R_COrdField') n) m [=] CS_seq _ (inject_Q (nring n)) m.
 intros.
-induction  n as [| n Hrecn]; simpl in |- *; Algebra.
+induction  n as [| n Hrecn]; simpl in |- *; algebra.
 Qed.
 
 Lemma ing_nring : forall n : nat, nring n [=] inject_Q (nring n).
@@ -246,7 +246,7 @@ Proof.
  apply eq_symmetric_unfolded.
  apply ing_mult.
  astepr (inject_Q x).
- apply ing_eq; Algebra.
+ apply ing_eq; algebra.
 Qed.
 
 Transparent R_COrdField.

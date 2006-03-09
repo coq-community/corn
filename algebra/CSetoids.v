@@ -1298,7 +1298,7 @@ End SubCSetoids.
 (* End_SpecReals *)
 
 (* begin hide *)
-Ltac Step_final x := apply eq_transitive_unfolded with x; Algebra.
+Ltac Step_final x := apply eq_transitive_unfolded with x; algebra.
 (* end hide *)
 
 Tactic Notation "Step_final" constr(c) :=  Step_final c.

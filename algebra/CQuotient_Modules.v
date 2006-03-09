@@ -32,8 +32,8 @@ Lemma ap_quotmod_irreflexive : irreflexive ap_quotmod.
 red in |-*.
 intro x.
 unfold ap_quotmod in |-*.
-assert (x[-]x[=]Zero); Algebra.
-assert (Not ((cmpred A cm) Zero)); Algebra.
+assert (x[-]x[=]Zero); algebra.
+assert (Not ((cmpred A cm) Zero)); algebra.
 intro. apply H0.
 apply (comod_wd A cm (x[-]x) Zero); auto.
 Qed.
@@ -44,12 +44,12 @@ intros x y.
 unfold ap_quotmod.
 intro X.
 apply (comod_mult A cm (y[-]x) ([--]One)).
-apply (comod_wd A cm (x[-]y) (rm_mu A [--]One (y[-]x))); Algebra.
+apply (comod_wd A cm (x[-]y) (rm_mu A [--]One (y[-]x))); algebra.
 astepr [--](y[-]x); try apply eq_symmetric; try apply muminus1.
 astepl [--](y[+][--]x).
 astepl ([--][--]x[+][--]y).
 astepl (x[+][--]y).
-Algebra.
+algebra.
 Qed.
 
 Lemma ap_quotmod_cotransitive : cotransitive ap_quotmod.
@@ -77,8 +77,8 @@ Definition eq_quotmod (x y:A) := Not (cm(x[-]y)).
 Lemma eq_quotmod_wd : forall (x y:A), x[=]y -> (eq_quotmod x y).
 intros x y X; auto.
 red in |-*; intro X0.
-assert ((cmpred A cm)(Zero)); Algebra.
-apply (comod_wd A cm (x[-]y) Zero); Algebra.
+assert ((cmpred A cm)(Zero)); algebra.
+apply (comod_wd A cm (x[-]y) Zero); algebra.
 apply x_minus_x; auto.
 apply (comod_nonzero A cm); assumption.
 Qed.
@@ -123,7 +123,7 @@ astepr (([--]y2[+][--]x2)[+]x1[+]y1).
 astepr (([--]y2[+][--]x2)[+](x1[+]y1)).
 astepr ((x1[+]y1)[+]([--]y2[+][--]x2)).
 astepr ((x1[+]y1)[+][--](x2[+]y2)).
-Algebra.
+algebra.
 Qed.
 
 Definition dmplus_is_bin_fun := 
@@ -133,7 +133,7 @@ quotmod_as_CSetoid (csg_op (c:=A)) dmplus_is_ext.
 Lemma dmplus_is_assoc : associative dmplus_is_bin_fun.
 red in |-*; auto.
 intros x y z; simpl in |-*.
-apply eq_quotmod_wd; Algebra.
+apply eq_quotmod_wd; algebra.
 Qed.
 
 Definition quotmod_as_CSemiGroup := Build_CSemiGroup quotmod_as_CSetoid
@@ -147,12 +147,12 @@ dmplus_is_bin_fun dmplus_is_assoc.
 Lemma zero_as_rht_unit : is_rht_unit dmplus_is_bin_fun Zero.
 red in |-*; intro x.
 simpl in |-*.
-apply eq_quotmod_wd; Algebra.
+apply eq_quotmod_wd; algebra.
 Qed.
 
 Lemma zero_as_lft_unit : is_lft_unit dmplus_is_bin_fun Zero.
 red in |-*; intro x; simpl in |-*.
-apply eq_quotmod_wd; Algebra.
+apply eq_quotmod_wd; algebra.
 Qed.
 
 Definition quotmod_is_CMonoid := Build_is_CMonoid quotmod_as_CSemiGroup
@@ -173,12 +173,12 @@ intros x y.
 simpl in |-*.
 unfold ap_quotmod in |-*.
 intro X.
-apply (comod_mult A cm (x[-]y) [--]One); Algebra.
-apply (comod_wd A cm ([--]x[-][--]y) ([--]One['](x[-]y))); Algebra.
+apply (comod_mult A cm (x[-]y) [--]One); algebra.
+apply (comod_wd A cm ([--]x[-][--]y) ([--]One['](x[-]y))); algebra.
 astepr ([--](x[-]y)).
 astepr ([--](x[+][--]y)).
 astepr ([--]x[+][--][--]y).
-Algebra.
+algebra.
 Qed.
 
 Definition dminv_is_un_op := 
@@ -190,7 +190,7 @@ intro x.
 simpl in |-*.
 unfold is_inverse in |-*.
 simpl in |-*.
-split; apply eq_quotmod_wd; Algebra.
+split; apply eq_quotmod_wd; algebra.
 Qed.
 
 Definition quotmod_as_CGroup := Build_CGroup quotmod_as_CMonoid
@@ -205,7 +205,7 @@ Lemma dmplus_is_commutative : commutes dmplus_is_bin_fun.
 red in |-*.
 intros x y.
 simpl in |-*.
-apply eq_quotmod_wd; Algebra.
+apply eq_quotmod_wd; algebra.
 Qed.
 
 Definition quotmod_as_CAbGroup := Build_CAbGroup quotmod_as_CGroup
@@ -226,13 +226,13 @@ intro X.
 cut (cm ( a1['](x1[-]x2) [+] (a1[-]a2)[']x2) ).
 intro.
 assert ( cm (a1['](x1[-]x2)) or cm ((a1[-]a2)[']x2) ).
-Algebra.
+algebra.
 elim X1;intros.
 right.
 apply (comod_mult A cm (x1[-]x2) a1); assumption.
 left.
 cut ( (a1[-]a2)[']x2 [#] Zero).
-intro X2; cut ((a1[-]a2)[#]Zero); Algebra.
+intro X2; cut ((a1[-]a2)[#]Zero); algebra.
 apply (mu_axap0_aap0 R A (a1[-]a2) x2); assumption.
 apply (comod_apzero A cm); assumption.
 apply (comod_wd A cm (a1[']x1 [-] a2[']x2) ); try assumption.
@@ -255,7 +255,7 @@ astepr (a1[']x1 [+] [--]a2[']x2).
 astepr (a1[']x1 [+] [--](a2[']x2)).
 Step_final (a1[']x1 [-] a2[']x2).
 astepl ((a1[']x2 [+] [--]a2[']x2) [+] (a1[']x1 [+] a1['][--]x2)).
-apply plus_resp_eq; Algebra.
+apply plus_resp_eq; algebra.
 Qed.
 
 Definition dmmu_is_bin_fun := 
@@ -264,7 +264,7 @@ quotmod_as_CAbGroup (rm_mu A) dmmu_is_ext.
 
 Lemma quotmod_is_RModule : is_RModule quotmod_as_CAbGroup 
 dmmu_is_bin_fun.
-apply Build_is_RModule; intuition; simpl in |-*; apply eq_quotmod_wd; Algebra.
+apply Build_is_RModule; intuition; simpl in |-*; apply eq_quotmod_wd; algebra.
 Qed.
 
 Definition quotmod_as_RModule := Build_RModule R quotmod_as_CAbGroup

@@ -119,7 +119,7 @@ Lemma om_fun_3a : forall n m f g Hfg, nat_less_n_fun f -> nat_less_n_fun g ->
 intro n. induction  n as [| n Hrecn].
  simpl in |- *; intros. elimtype False; inversion Hi.
 intro m; induction  m as [| m Hrecm].
- simpl in |- *; intros. exists i. exists Hi. Algebra.
+ simpl in |- *; intros. exists i. exists Hi. algebra.
 intros.
 simpl in |- *; elim ap_imp_less; simpl in |- *; intro.
  set (h := fun i Hi => g i (lt_S _ _ Hi)) in *.
@@ -156,7 +156,7 @@ Lemma om_fun_3b : forall n m f g Hfg, nat_less_n_fun f -> nat_less_n_fun g ->
 intro n. induction  n as [| n Hrecn].
  simpl in |- *; intros. exists i.
  assert (i < m + 0). rewrite <- plus_n_O. auto.
- exists H1. Algebra.
+ exists H1. algebra.
 intro m; induction  m as [| m Hrecm].
  simpl in |- *; intros. elimtype False; inversion Hi.
 intros.
@@ -271,7 +271,7 @@ Lemma Sumx_Sum_Sum
  Sumx (fun i (H : i < n) => Sum (f i) (pred (f (S i))) h) [=]
    Sumx (fun i (H : i < f n) => h i).
 simple induction n.
-rewrite f0; simpl in |- *; Algebra.
+rewrite f0; simpl in |- *; algebra.
 clear n; intros.
 elim (le_lt_dec n 0); intro.
 cut (n = 0); [ clear a; intro | auto with arith ].
@@ -285,7 +285,7 @@ eapply eq_transitive_unfolded.
 apply Sumx_to_Sum.
 pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
 red in |- *; intros.
-rewrite H1; Algebra.
+rewrite H1; algebra.
 clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *.
 auto with arith.
 intros.
@@ -293,7 +293,7 @@ elim (le_lt_dec (f 1) i); intro; simpl in |- *.
 cut (0 < f 1).
 intro; elimtype False; omega.
 pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
-Algebra.
+algebra.
 cut (0 < f n); [ intro | rewrite <- f0; apply f_mon; assumption ].
 simpl in |- *.
 eapply eq_transitive_unfolded.
@@ -310,8 +310,8 @@ apply H.
 apply Sumx_to_Sum.
 assumption.
 red in |- *; intros.
-rewrite H1; Algebra.
-Algebra.
+rewrite H1; algebra.
+algebra.
 cut (f n = S (pred (f n))); [ intro | apply S_pred with 0; auto ].
 pattern (f n) at 4 in |- *; rewrite H1.
 eapply eq_transitive_unfolded.
@@ -325,7 +325,7 @@ elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
 cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
 elimtype False; apply (le_not_lt (f n) i); auto.
 apply le_trans with (f (S n)); auto with arith.
-Algebra.
+algebra.
 rewrite <- H1.
 cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ].
 cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ].
@@ -335,10 +335,10 @@ intros.
 unfold part_tot_nat_fun in |- *.
 elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
 elimtype False; omega.
-Algebra.
+algebra.
 apply lt_trans with (f n); auto with arith.
 red in |- *; intros.
-rewrite H1; Algebra.
+rewrite H1; algebra.
 Qed.
 (* end hide *)
 
@@ -416,7 +416,7 @@ rewrite <-
  (S_pred (f (S i) H5) (f i (lt_le_weak _ _ H5)) (H1 _ _ _ _ (lt_n_Sn i)))
  .
 apply lt_le_weak; apply H1; apply lt_n_Sn.
-intros; Algebra.
+intros; algebra.
 apply str_Sumx_Sum_Sum.
 unfold f' in |- *; simpl in |- *.
 elim (le_lt_dec 0 m); intro; simpl in |- *.

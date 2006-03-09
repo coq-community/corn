@@ -114,7 +114,7 @@ Proof.
  apply (less_irreflexive_unfolded _ b).
  apply H3 with (x := [--]x) (z := b).
  apply (strong_extensionality_of_X x [--][--]x).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  astepl x.
@@ -141,7 +141,7 @@ Proof.
  intro.
  exists ([--]x).
  apply (strong_extensionality_of_X x [--][--]x).
- Algebra.
+ algebra.
  assumption.
 
  case H0.
@@ -186,7 +186,7 @@ Proof.
  intros.
  exists ([--]s).
  apply (strong_extensionality_of_X s [--][--]s).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  rstepl s.
@@ -770,7 +770,7 @@ Proof.
  elim (less_irreflexive_unfolded _ b).
  apply H0 with (x := [--]x) (z := b).
  apply (P_is_strongly_extensional x [--][--]x).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  astepl x.
@@ -799,7 +799,7 @@ Proof.
  intro.
  exists ([--]x).
  apply (P_is_strongly_extensional x [--][--]x).
- Algebra.
+ algebra.
  assumption.
 
  case is_finite_P. 
@@ -856,7 +856,7 @@ Proof.
    intros H2 H3.
    exists ([--](seq j)).
    apply (P_is_strongly_extensional (seq j) [--][--](seq j)).
-   Algebra.
+   algebra.
    assumption.
    assumption.
 

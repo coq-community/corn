@@ -829,12 +829,12 @@ Lemma power_plus:forall (M:CMonoid)(a:M)(m n:nat),
 intros M a m n.
 induction m.
 simpl.
-Algebra.
+algebra.
 
 simpl.
 astepl (csbf_fun M M M (csg_op (c:=M)) a ((csbf_fun M M M (csg_op (c:=M)) (power_CMonoid M a m)
           (power_CMonoid M a n)))).
-Algebra.
+algebra.
 Qed.
 
 Lemma power_k:forall (M:CMonoid)(u:M)(k l s:nat),(is_generator M u)->

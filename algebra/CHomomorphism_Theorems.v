@@ -65,7 +65,7 @@ intros x y X.
 cut ((sigma x)[+](sigma y)[#]Zero).
 intro X0.
 apply cg_add_ap_zero; auto.
-astepl (sigma (x[+]y)); Algebra.
+astepl (sigma (x[+]y)); algebra.
 (* cm_mult *)
 intros x a X.
 cut ((rm_mu B)a (sigma x)[#]Zero).
@@ -99,7 +99,7 @@ Definition tau (x:A) := (x:AdivCs).
 Lemma tau_strext : fun_strext tau.
 red in |-*; intros x y; unfold tau; simpl in |-*.
 unfold ap_quotmod; simpl in |-*; unfold cspred.
-intro X; cut ((x[-]y)[#]Zero); Algebra.
+intro X; cut ((x[-]y)[#]Zero); algebra.
 apply (mh_apzero A B sigma (x[-]y)); assumption.
 Qed.
 (* end hide *)
@@ -199,16 +199,16 @@ intros x y X.
 cut ((sigma x)[+](sigma y)[#]Zero).
 intro X0.
 apply cg_add_ap_zero; auto.
-astepl (sigma (x[+]y)); Algebra.
+astepl (sigma (x[+]y)); algebra.
 (* C_mult *)
 intros x y X.
 cut ((sigma x)[*](sigma y)[#]Zero).
-intro X0; split; Algebra.
+intro X0; split; algebra.
 apply (cring_mult_ap_zero S (sigma x) (sigma y)); auto.
 apply (cring_mult_ap_zero_op S (sigma x) (sigma y)); auto.
 astepl (sigma (x[*]y)); assumption.
 (* C_non_triv *)
-astepl (One:S); Algebra.
+astepl (One:S); algebra.
 Qed.
 
 Definition cs_as_coideal := Build_coideal R cswdpredR cs_is_coideal.
@@ -235,7 +235,7 @@ Definition Rtau (x:R) := (x:RdivCsR).
 Lemma Rtau_strext : fun_strext Rtau.
 red in |-*; intros x y; unfold Rtau; simpl in |-*.
 unfold ap_quotring; simpl in |-*; unfold cspred.
-intro X; cut ((x[-]y)[#]Zero); Algebra.
+intro X; cut ((x[-]y)[#]Zero); algebra.
 apply (rh_apzero R S sigma (x[-]y)); assumption.
 Qed.
 

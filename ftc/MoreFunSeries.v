@@ -97,7 +97,7 @@ apply
           (compact_single_prop x))).
 apply Cauchy_fun_real.
 unfold contf' in |- *; simpl in |- *; apply H.
-intro; simpl in |- *; Algebra.
+intro; simpl in |- *; algebra.
 apply compact_single_iprop; auto.
 Qed.
 
@@ -137,7 +137,7 @@ Lemma Cauchy_fun_seq_Lim_char : forall a b Hab (Hinc : included (Compact Hab) J)
 intros.
 FEQ.
 simpl in |- *.
-apply Lim_wd'; intros; simpl in |- *; Algebra.
+apply Lim_wd'; intros; simpl in |- *; algebra.
 Qed.
 
 End More_Definitions.
@@ -651,7 +651,7 @@ Lemma FSeries_Sum_char : forall a b Hab (Hinc : included (Compact Hab) J),
 intros; FEQ.
 simpl in |- *; Included.
 simpl in |- *; unfold h in |- *.
-apply series_sum_wd; intros; Algebra.
+apply series_sum_wd; intros; algebra.
 Qed.
 
 End Series_Definitions.
@@ -761,7 +761,7 @@ Lemma fun_const_series_Sum_IR : forall y H
 intros.
 simpl in |- *.
 apply series_sum_wd.
-Algebra.
+algebra.
 Qed.
 
 Lemma conv_zero_fun_series_IR : fun_series_convergent_IR J (fun n => [-C-]Zero).
@@ -977,8 +977,8 @@ Qed.
 Lemma insert_series_sum_char : forall n x Hx Hx',
  fun_seq_part_sum f n x Hx [=] fun_seq_part_sum insert_series (S n) x Hx'.
 intro; induction  n as [| n Hrecn].
-intros; simpl in |- *; Algebra.
-intros; simpl in |- *; simpl in Hrecn; Algebra.
+intros; simpl in |- *; algebra.
+intros; simpl in |- *; simpl in Hrecn; algebra.
 Qed.
 
 Lemma insert_series_conv : fun_series_convergent_IR J insert_series.
@@ -1029,7 +1029,7 @@ clear convS; exists N; intros.
 eapply leEq_wdl.
 apply (HN (S n) (le_S _ _ H0) _ Hx).
 apply AbsIR_wd; apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 apply eq_symmetric_unfolded.
 eapply eq_transitive_unfolded.
 eapply eq_transitive_unfolded.
@@ -1041,8 +1041,8 @@ eapply eq_transitive_unfolded.
        (contin_imp_inc _ _ _ _
           (included_imp_Continuous _ _
              (Continuous_Sum0 _ _ insert_series_cont (S n)) _ _ _ Hinc) _ Hx)).
-unfold fun_seq_part_sum in |- *; Algebra.
-unfold fun_seq_part_sum in |- *; Algebra.
+unfold fun_seq_part_sum in |- *; algebra.
+unfold fun_seq_part_sum in |- *; algebra.
 Qed.
 
 End Insert_Series.

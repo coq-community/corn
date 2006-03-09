@@ -71,7 +71,7 @@ astepr
 rstepr
  (x[-]z[-]Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [-]
   y' n (lt_n_Sn n)).
-Algebra.
+algebra.
 Qed.
 
 Lemma Taylor_lemma_ap : forall n Hf Hf' Ha',
@@ -111,7 +111,7 @@ cut
 2: eapply ap_wdr_unfolded.
 2: apply H.
 2: apply eq_symmetric_unfolded; eapply eq_transitive_unfolded;
-    [ apply sumx_const | Algebra ].
+    [ apply sumx_const | algebra ].
 2: exact (FSumx_char _ _ _ _ H1).
 simpl in H2.
 cut
@@ -125,12 +125,12 @@ elim HN; clear HN; intros HN H.
 cut (b[+][--]a [#] Zero). intro H3.
 2: eapply cring_mult_ap_zero_op; eapply cring_mult_ap_zero_op; apply H.
 apply ap_symmetric_unfolded; apply zero_minus_apart; auto.
-red in |- *; Algebra.
+red in |- *; algebra.
 red in |- *; do 3 intro.
 rewrite H3; intros; unfold fi in |- *.
 apply mult_wdl.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply Feq_imp_eq with I.
 apply Derivative_n_unique with pI (S j) F; apply N_Deriv_lemma.
 auto.
@@ -154,7 +154,7 @@ apply
        (fun i Hi =>
         Part _ _ (FSumx_pred _ _ H1 b (TaylorB n Hf') i Hi))).
 apply cg_minus_wd.
-Algebra.
+algebra.
 exact (FSumx_char _ _ _ _ H1).
 cut
  (ext_fun_seq'
@@ -169,7 +169,7 @@ apply
      Sumx
        (fun i (Hi : i < n) => Part _ _ (FSumx_pred _ _ H2 b H0 i Hi))).
 2: apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 2: apply eq_symmetric_unfolded; exact (FSumx_char _ _ _ _ H2).
 apply Taylor_Sumx_lemma.
 intros; simpl in |- *.
@@ -177,7 +177,7 @@ unfold fi in |- *.
 rstepr
  ((Part _ _ (Hpred a Ha) [/] Zero[+]One[//]nring_fac_ap_zero IR 0) [*]One).
 apply mult_wdl; apply div_wd.
-2: Algebra.
+2: algebra.
 apply Feq_imp_eq with I.
 apply Derivative_n_unique with pI 0 F.
 apply N_Deriv_lemma.
@@ -188,7 +188,7 @@ apply Feq_reflexive; Included.
 auto.
 intros; simpl in |- *.
 apply mult_wdl; apply div_wd.
-2: Algebra.
+2: algebra.
 unfold fi in |- *.
 apply Feq_imp_eq with I.
 apply Derivative_n_unique with pI (S i) F; apply N_Deriv_lemma; auto.
@@ -230,7 +230,7 @@ eapply leEq_wdl.
 apply (H4 H5).
 unfold Taylor_rem, Taylor_Rem in |- *.
 apply AbsIR_wd; repeat apply cg_minus_wd.
-Algebra.
+algebra.
 simpl in |- *.
 repeat first
  [ apply bin_op_wd_unfolded
@@ -240,7 +240,7 @@ repeat first
 apply FSumx_wd; intros; simpl in |- *.
 apply mult_wdl.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply
  eq_transitive_unfolded
   with
@@ -249,7 +249,7 @@ apply
           (Diffble_I_n_imp_deriv_n _ _ _ _ _
              (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (lt_S _ _ Hi)) _ H2)))
        a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply
  Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
 apply Derivative_I_n_unique with i F.
@@ -271,7 +271,7 @@ apply
           (Diffble_I_n_imp_deriv_n _ _ _ _ _
              (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (lt_n_Sn n)) _ H2)))
        a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply
  Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
 apply Derivative_I_n_unique with n F.
@@ -406,7 +406,7 @@ apply AbsIR_wd; simpl in |- *; repeat apply cg_minus_wd.
 2: repeat apply mult_wdl.
 unfold Taylor_Rem in |- *; simpl in |- *.
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply bin_op_wd_unfolded.
 apply Feq_imp_eq with (Compact (Min_leEq_Max a b)).
 apply FSumx_wd'.
@@ -420,12 +420,12 @@ apply Derivative_n_unique with pI i F.
 apply N_Deriv_lemma.
 apply derF.
 auto.
-Algebra.
+algebra.
 apply Feq_reflexive; repeat split.
 apply compact_Min_rht.
 apply mult_wdl.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply Feq_imp_eq with I.
 apply Derivative_n_unique with pI n F.
 apply N_Deriv_lemma.

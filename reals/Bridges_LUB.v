@@ -561,7 +561,7 @@ Proof.
   apply lt_S_n.
   assumption.
   simpl in |- *.
-  Algebra.
+  algebra.
   apply bin_op_wd_unfolded.
   apply eq_reflexive_unfolded.
   simpl in |- *.

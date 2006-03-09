@@ -37,7 +37,7 @@ elim (le_lt_eq_dec _ _ H0); intro.
 unfold seq_part_sum in |- *.
 unfold Sum, Sum1 in |- *.
 rewrite <- S_pred with n 0; auto.
-Algebra.
+algebra.
 rewrite b.
 astepl ZeroR.
 apply eq_symmetric_unfolded; apply Sum_empty.
@@ -230,7 +230,7 @@ apply less_leEq; auto.
 apply nexp_resp_nonneg; auto.
 astepl ( [--] (c[^]m[/] _[//]H) [+] (One[/] _[//]H) [-] (One[/] _[//]H)).
 apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 cut (c[-]One [#] Zero). intros H2.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 apply Sum0_c_exp with (H := H2).
@@ -285,7 +285,7 @@ eapply AbsSmall_wdr_unfolded.
 apply zero_AbsSmall; apply less_leEq; assumption.
 unfold seq_part_sum in |- *.
 induction  m as [| m Hrecm].
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 simpl in |- *.
 eapply eq_transitive_unfolded.
 apply Hrecm; auto with arith.
@@ -303,7 +303,7 @@ eapply AbsSmall_wdr_unfolded.
 apply zero_AbsSmall; apply less_leEq; assumption.
 unfold seq_part_sum in |- *.
 induction  m as [| m Hrecm].
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 simpl in |- *.
 eapply eq_transitive_unfolded.
 apply Hrecm; auto with arith.
@@ -385,7 +385,7 @@ apply eq_symmetric_unfolded; unfold cg_minus in |- *.
 eapply eq_transitive_unfolded.
 apply Sum0_plus_Sum0 with (g := fun n : nat => [--] (y n)).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply inv_Sum0.
 Qed.
 
@@ -402,7 +402,7 @@ unfold cg_minus in |- *.
 eapply eq_transitive_unfolded.
 apply Sum0_plus_Sum0 with (g := fun n : nat => [--] (y n)).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply inv_Sum0.
 Qed.
 
@@ -461,9 +461,9 @@ unfold seq_part_sum in |- *.
 intro.
 apply eq_symmetric_unfolded;
  apply eq_transitive_unfolded with (Zero[+]Sum0 n (fun n : nat => [--] (x n))).
-Algebra.
+algebra.
 unfold cg_minus in |- *; apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply inv_Sum0.
 Qed.
 
@@ -478,7 +478,7 @@ apply
   with
     (y := fun n : nat => y n[-]x n)
     (convY := conv_series_minus _ _ H0 convX).
-intro; unfold y in |- *; simpl in |- *; Algebra.
+intro; unfold y in |- *; simpl in |- *; algebra.
 cut (series_sum y H0 [=] Zero); intros.
 astepr (Zero[-]series_sum x convX).
 astepr (series_sum y H0[-]series_sum x convX).
@@ -535,7 +535,7 @@ exists (max n N).
 intros.
 apply AbsSmall_wdr_unfolded with (x m[-]c).
 apply HN; apply le_trans with (max n N); auto with arith.
-apply cg_minus_wd; [ apply Hn | Algebra ].
+apply cg_minus_wd; [ apply Hn | algebra ].
 apply le_trans with (max n N); auto with arith.
 Qed.
 
@@ -727,12 +727,12 @@ unfold seq_part_sum in |- *.
 apply eq_transitive_unfolded with (Sum (S (max N M) + k) (pred (m + k)) y).
 unfold Sum, Sum1 in |- *.
 rewrite <- S_pred with (m := 0).
-Algebra.
+algebra.
 apply lt_le_trans with (S (max N M)); auto with arith.
 astepr (Sum (S (max N M)) (pred m) x).
 2: unfold Sum, Sum1 in |- *.
 2: rewrite <- S_pred with (m := 0).
-2: Algebra.
+2: algebra.
 2: apply lt_le_trans with (S (max N M)); auto with arith.
 replace (pred (m + k)) with (pred m + k).
 apply eq_symmetric_unfolded; apply Sum_big_shift.
@@ -778,12 +778,12 @@ apply
  eq_transitive_unfolded with (Sum (S (max N M + k) - k) (pred (m - k)) x).
 unfold Sum, Sum1 in |- *.
 rewrite <- S_pred with (m := 0).
-Algebra.
+algebra.
 omega.
 astepr (Sum (S (max N M + k)) (pred m) y).
 2: unfold Sum, Sum1 in |- *.
 2: rewrite <- S_pred with (m := 0).
-2: Algebra.
+2: algebra.
 2: omega.
 replace (pred m) with (pred (m - k) + k).
 2: omega.
@@ -824,13 +824,13 @@ exists N.
 exists 0.
 intro.
 rewrite plus_comm; rewrite Minus.minus_plus.
-Algebra.
+algebra.
 simple induction n.
 intro.
 cut (N = 0); [ intro | auto with arith ].
 rewrite H1.
 apply eq_imp_leEq.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 clear n; intros.
 cut ({N < S n} + {N = S n}).
 2: apply le_lt_eq_dec; assumption.
@@ -847,7 +847,7 @@ auto with arith.
 rewrite H3.
 rewrite <- minus_n_n.
 apply eq_imp_leEq.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma ratio_test_div : {N : nat |
@@ -880,7 +880,7 @@ induction  n as [| n Hrecn].
 inversion H.
 clear Hrecn; induction  n as [| n Hrecn].
 inversion H.
-rewrite <- H1; apply eq_imp_leEq; Algebra.
+rewrite <- H1; apply eq_imp_leEq; algebra.
 inversion H1.
 elim (le_lt_eq_dec _ _ H); intro.
 apply leEq_transitive with (AbsIR (x (S n))).
@@ -890,7 +890,7 @@ astepl (One[*]AbsIR (x (S n))); apply mult_resp_leEq_rht.
 assumption.
 apply AbsIR_nonneg.
 apply Hn; auto with arith.
-rewrite b; apply eq_imp_leEq; Algebra.
+rewrite b; apply eq_imp_leEq; algebra.
 Qed.
 
 End More_CC.
@@ -1325,7 +1325,7 @@ apply eq_symmetric_unfolded.
 apply
  eq_transitive_unfolded
   with (AbsIR (One[/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (m + m)))).
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 apply AbsIR_eq_x; apply less_leEq.
 apply recip_resp_pos; apply pos_nring_S.
 intros.

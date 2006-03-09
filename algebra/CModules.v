@@ -105,15 +105,15 @@ Variable A : RModule R.
 (* begin hide *)
 
 Lemma mu0help : forall (a:R) (x:A), Zero[']x [=] a[']Zero[']x.
-intros a x; astepl ((a[*]Zero)[']x); Algebra.
+intros a x; astepl ((a[*]Zero)[']x); algebra.
 Qed.
 
 Hint Resolve mu0help : algebra.
 
 Lemma mu0help2 : forall x:A, Zero[']x [=] Zero[']x [+] Zero[']x.
-intro x; astepl ((One[+]One)[']Zero[']x); Algebra.
+intro x; astepl ((One[+]One)[']Zero[']x); algebra.
 astepl (One[']Zero[']x [+] One['](Zero[']x)).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve mu0help2 : algebra.
@@ -122,8 +122,8 @@ Hint Resolve mu0help2 : algebra.
 
 Lemma mu_zerox : forall x : A, Zero[']x [=] Zero.
 intro x; apply eq_symmetric.
-apply (cg_cancel_lft _ (Zero[']x)); Algebra.
-astepl (Zero[']x); Algebra.
+apply (cg_cancel_lft _ (Zero[']x)); algebra.
+astepl (Zero[']x); algebra.
 Qed.
 
 Hint Resolve mu_zerox : algebra.
@@ -133,7 +133,7 @@ intro x; apply (cg_cancel_rht A x ([--]One[']x) [--]x).
 astepr (Zero:A).
 astepl ([--]One[']x [+] One[']x).
 astepl (([--]One[+]One)['] x).
-astepl (Zero[']x); Algebra.
+astepl (Zero[']x); algebra.
 Qed.
 
 Hint Resolve mu_minusonex : algebra.

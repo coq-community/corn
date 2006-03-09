@@ -107,15 +107,15 @@ elim (cr_proof R); auto.
 Qed.
 
 Lemma mult_wd : forall x1 x2 y1 y2 : R, x1 [=] x2 -> y1 [=] y2 -> x1[*]y1 [=] x2[*]y2.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 Lemma mult_wdl : forall x1 x2 y : R, x1 [=] x2 -> x1[*]y [=] x2[*]y.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 Lemma mult_wdr : forall x y1 y2 : R, y1 [=] y2 -> x[*]y1 [=] x[*]y2.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 (* Begin_SpecReals *)
@@ -329,7 +329,7 @@ Fixpoint nexp (m : nat) : R -> R :=
 
 Lemma nexp_well_def : forall n, fun_wd (nexp n).
 intro n; induction  n as [| n Hrecn]; red in |- *; intros; simpl in |- *;
- Algebra.
+ algebra.
 Qed.
 
 Lemma nexp_strong_ext : forall n, fun_strext (nexp n).
@@ -378,7 +378,7 @@ Definition Char0 := forall n : nat, 0 < n -> nring n [#] Zero.
 
 Lemma nring_comm_plus : forall n m, nring (n + m) [=] nring n[+]nring m.
 intros n m; induction  n as [| n Hrecn]; simpl in |- *.
- Algebra.
+ algebra.
 astepr (nring n[+] (One[+]nring m)).
 astepr (nring n[+] (nring m[+]One)).
 Step_final (nring n[+]nring m[+]One).
@@ -386,7 +386,7 @@ Qed.
 
 Lemma nring_comm_mult : forall n m, nring (n * m) [=] nring n[*]nring m.
 intros n m; induction  n as [| n Hrecn]; simpl in |- *.
- Algebra.
+ algebra.
 apply eq_transitive_unfolded with (nring m[+]nring (n * m)). apply (nring_comm_plus m (n * m)).
 astepr (nring n[*]nring m[+]One[*]nring m).
 astepr (nring n[*]nring m[+]nring m).
@@ -422,14 +422,14 @@ Notation TwentyFour := (nring 24).
 Notation FortyEight := (nring 48).
 
 Lemma one_plus_one : forall R : CRing, One[+]One [=] (Two:R).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma x_plus_x : forall (R : CRing) (x : R), x[+]x [=] Two[*]x.
 intros R x.
 astepl (One[*]x[+]One[*]x).
 astepl ((One[+]One) [*]x).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Hint Resolve one_plus_one x_plus_x: algebra.
@@ -481,7 +481,7 @@ one. It is kept to avoid having to redo all the proofs.
 Definition zring_old k : R := caseZ_diff k (fun m n => nring m[-]nring n).
 
 Lemma zring_old_zero : zring_old 0 [=] Zero.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 Hint Resolve zring_old_zero: algebra.
 
@@ -507,7 +507,7 @@ astepr (nring (R:=R) n[+]nring p).
 astepr (nring (R:=R) (n + p)).
 astepl (nring (R:=R) (m + q)).
 rewrite H.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zring_old_diff.
@@ -516,7 +516,7 @@ Lemma zring_old_plus_nat : forall n : nat, zring_old n [=] nring n.
 intro n.
 replace (n:Z) with (n - 0%nat)%Z.
  astepl (nring (R:=R) n[-]nring 0).
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 simpl in |- *; auto with zarith.
 Qed.
 
@@ -526,7 +526,7 @@ Lemma zring_old_inv_nat : forall n : nat, zring_old (- n) [=] [--] (nring n).
 intro n.
 replace (- n)%Z with (0%nat - n)%Z.
  astepl (nring 0[-]nring (R:=R) n).
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 simpl in |- *; auto.
 Qed.
 
@@ -549,7 +549,7 @@ unfold cg_minus in |- *.
 astepl (nring m[+] (nring m0[+] [--] (nring n[+]nring n0)):R).
 astepr (nring m[+] ( [--] (nring n) [+] (nring m0[+] [--] (nring n0))):R).
 apply bin_op_wd_unfolded.
- Algebra.
+ algebra.
 astepl (nring m0[+] ( [--] (nring n) [+] [--] (nring n0)):R).
 astepl (nring m0[+] [--] (nring n) [+] [--] (nring n0):R).
 Step_final ( [--] (nring n) [+]nring m0[+] [--] (nring n0):R).
@@ -624,7 +624,7 @@ astepl
  (nring (R:=R) m[*]nring m0[+]
   (nring n[*]nring n0[+] [--] (nring n[*]nring m0[+]nring m[*]nring n0))).
 apply bin_op_wd_unfolded.
- Algebra.
+ algebra.
 astepl
  (nring (R:=R) n[*]nring n0[+]
   ( [--] (nring n[*]nring m0) [+] [--] (nring m[*]nring n0))).
@@ -687,7 +687,7 @@ Definition zring (z : Z) : R :=
   end.
 
 Lemma pring_aux_lemma : forall p r r', r [=] r' -> pring_aux p r [=] pring_aux p r'.
-simple induction p; simpl in |- *; Algebra.
+simple induction p; simpl in |- *; algebra.
 Qed.
 
 Lemma double_nring : forall n, Two[*]nring (R:=R) n [=] nring (R:=R) (n + n).
@@ -705,30 +705,30 @@ Step_final (nring (R:=R) n[+]nring (R:=R) (Pmult_nat p0 (n + n))).
 
 Step_final (pring_aux p0 (nring (n + n))).
 
-Algebra.
+algebra.
 Qed.
 Hint Resolve pring_aux_nring: algebra.
 
 Lemma pring_convert : forall p, pring p [=] nring (nat_of_P p).
 intros; unfold pring, nat_of_P in |- *; simpl in |- *.
 astepr (pring_aux p (nring 1)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 Hint Resolve pring_convert: algebra.
 
 Lemma zring_zring_old : forall z : Z, zring z [=] zring_old z.
 simple induction z; simpl in |- *; intros.
-Algebra.
+algebra.
 astepr (nring (R:=R) (nat_of_P p)).
-Algebra.
+algebra.
 astepr ( [--] (nring (R:=R) (nat_of_P p))).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zring_zring_old: algebra.
 
 Lemma zring_zero : zring 0 [=] Zero.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma zring_diff : forall m n : nat, zring (m - n) [=] nring m[-]nring n.
@@ -770,7 +770,7 @@ Qed.
 Lemma zring_one : zring 1 [=] One.
 simpl in |- *.
 unfold pring in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma zring_inv_one : forall x, zring (-1) [*]x [=] [--]x.
@@ -811,7 +811,7 @@ Fixpoint Sum_upto (f : nat -> R) (n : nat) {struct n} : R :=
   end.
 
 Lemma sum_upto_O : forall f : nat -> R, Sum_upto f 0 [=] Zero.
-Algebra.
+algebra.
 Qed.
 
 Definition Sum_from_upto f m n : R := Sum_upto f n[-]Sum_upto f m.
@@ -845,7 +845,7 @@ Fixpoint List_Sum_upto (l : list R) (n : nat) {struct n} : R :=
   end.
 
 Lemma list_sum_upto_O : forall l : list R, List_Sum_upto l 0 [=] Zero.
-Algebra.
+algebra.
 Qed.
 
 Definition List_Sum_from_upto l m n := List_Sum_upto l n[-]List_Sum_upto l m.
@@ -888,7 +888,7 @@ Lemma mult_distr_sum0_lft :  forall (f : nat -> R) x n,
  Sum0 n (fun i => x[*]f i) [=] x[*]Sum0 n f.
 intros f x n.
 induction  n as [| n Hrecn].
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 simpl in |- *.
 Step_final (x[*]Sum0 n f[+]x[*]f n).
 Qed.
@@ -912,7 +912,7 @@ Qed.
 
 Lemma sumx_const : forall n (x : R), Sumx (fun i (_ : i < n) => x) [=] nring n[*]x.
 intros n x; induction  n as [| n Hrecn].
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 simpl in |- *.
 astepr (nring n[*]x[+]One[*]x).
 Step_final (nring n[*]x[+]x).
@@ -934,7 +934,7 @@ Section NExp_properties.
 Variable R : CRing.
 
 Lemma nexp_wd : forall (x y : R) n, x [=] y -> x[^]n [=] y[^]n.
-Algebra.
+algebra.
 Qed.
 
 Lemma nexp_strext : forall (x y : R) n, x[^]n [#] y[^]n -> x [#] y.
@@ -965,7 +965,7 @@ Hint Resolve nexp_plus: algebra.
 Lemma one_nexp : forall n : nat, (One:R) [^]n [=] One.
 intro n.
 induction  n as [| n Hrecn].
- Algebra.
+ algebra.
 astepl ((One:R) [*]One[^]n).
 Step_final ((One:R) [*]One).
 Qed.
@@ -995,7 +995,7 @@ astepl ((x[*]x[^]m) [^]n).
 astepl (x[^]n[*] (x[^]m) [^]n).
 astepl (x[^]n[*]x[^] (m * n)).
 astepl (x[^] (n + m * n)).
-replace (n + m * n) with (S m * n); Algebra.
+replace (n + m * n) with (S m * n); algebra.
 Qed.
 Hint Resolve nexp_mult: algebra.
 
@@ -1080,7 +1080,7 @@ intros x y.
 unfold cg_minus in |- *.
 eapply eq_transitive_unfolded.
  apply square_plus.
-Algebra.
+algebra.
 Qed.
 
 Lemma nexp_funny : forall x y : R, (x[+]y) [*] (x[-]y) [=] x[^]2[-]y[^]2.

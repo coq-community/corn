@@ -129,14 +129,14 @@ apply eq_transitive_unfolded with (fcp _ (le_n n) [-]fcp 0 (le_O_n n)).
 apply Mengolli_Sum with (f := fun (i : nat) (H : i <= n) => fcp _ H).
 red in |- *; do 3 intro.
 rewrite H; intros.
-unfold fcp in |- *; simpl in |- *; Algebra.
-intros; Algebra.
+unfold fcp in |- *; simpl in |- *; algebra.
+intros; algebra.
 apply eq_transitive_unfolded with (F b Hb[-]F a Ha).
 unfold fcp, compact_part, n in |- *; simpl in |- *.
 apply cg_minus_wd; apply pfwdef; rational.
 astepr (F a Ha[-]F a Ha); apply cg_minus_wd.
 apply eq_symmetric_unfolded; apply Fab.
-Algebra.
+algebra.
 Qed.
 
 Let incF' : included (Compact Hab) (Dom F').
@@ -164,7 +164,7 @@ apply
           (cp _ H[-]cp _ (lt_le_weak _ _ H))).
 red in |- *; do 3 intro.
 rewrite H; intros.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 apply
  less_wdl
   with
@@ -193,7 +193,7 @@ apply plus_resp_leEq_lft.
 apply
  leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp (S i) H[-]cp i (lt_le_weak _ _ H))).
 2: apply mult_wd.
-2: Algebra.
+2: algebra.
 2: apply AbsIR_eq_x.
 2: apply less_leEq; apply compact_less.
 eapply leEq_transitive.
@@ -218,7 +218,7 @@ astepl (Zero[-]e); apply shift_minus_less.
 eapply mult_cancel_less.
 2: eapply less_wdl.
 2: apply Hi'.
-2: Algebra.
+2: algebra.
 apply compact_less.
 Qed.
 
@@ -235,7 +235,7 @@ apply
           (cp _ H[-]cp _ (lt_le_weak _ _ H))).
 red in |- *; do 3 intro.
 rewrite H; intros.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 apply
  less_wdr
   with
@@ -267,7 +267,7 @@ unfold cg_minus at 1 in |- *; apply plus_resp_leEq_lft.
 apply inv_resp_leEq;
  apply leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp _ H[-]cp _ (lt_le_weak _ _ H))).
 2: apply mult_wd.
-2: Algebra.
+2: algebra.
 2: apply AbsIR_eq_x.
 2: apply less_leEq; apply compact_less.
 eapply leEq_transitive.
@@ -292,7 +292,7 @@ astepr (e[+]Zero); apply shift_less_plus'.
 eapply mult_cancel_less.
 2: eapply less_wdr.
 2: apply Hi'.
-2: Algebra.
+2: algebra.
 apply shift_less_minus.
 astepl (cp _ (lt_le_weak _ _ Hi)).
 unfold compact_part in |- *.
@@ -341,13 +341,13 @@ intros i i' Hii'; rewrite Hii'; intros Hi Hi' HP.
 red in |- *; red in HP.
 eapply less_wdl.
 apply HP.
-apply AbsIR_wd; unfold fcp' in |- *; Algebra.
+apply AbsIR_wd; unfold fcp' in |- *; algebra.
 red in |- *.
 intros i i' Hii'; rewrite Hii'; intros Hi Hi' HQ.
 red in |- *; red in HQ.
 eapply less_wdr.
 apply HQ.
-apply AbsIR_wd; unfold fcp' in |- *; Algebra.
+apply AbsIR_wd; unfold fcp' in |- *; algebra.
 apply Rolle_lemma8.
 Qed.
 
@@ -360,7 +360,7 @@ exists (cp _ Hm).
 red in |- *; apply compact_part_hyp.
 intro; apply less_leEq; eapply less_wdl.
 apply Hm'.
-apply AbsIR_wd; unfold fcp' in |- *; Algebra.
+apply AbsIR_wd; unfold fcp' in |- *; algebra.
 Qed.
 
 Let Rolle_lemma11 :
@@ -475,19 +475,19 @@ intro; simpl in |- *; unfold ABSIR in |- *; apply Max_leEq.
 apply less_leEq; apply less_transitive_unfolded with ZeroR.
 eapply less_wdl.
 apply (H0 _ Hj).
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 assumption.
 astepr ( [--][--]e); apply inv_resp_leEq.
 apply less_leEq; eapply less_wdr.
 apply Hj'.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 exists (cp _ Hk).
 red in |- *; apply compact_part_hyp.
 intros.
 simpl in |- *; unfold ABSIR in |- *; apply Max_leEq.
 apply less_leEq; eapply less_wdl.
 apply Hk'.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 apply less_leEq; apply less_transitive_unfolded with ZeroR.
 astepr ( [--]ZeroR); apply inv_resp_less; eapply less_wdr.
 apply (H0 _ Hk).
@@ -518,13 +518,13 @@ assumption.
 intro.
 eapply less_wdl.
 apply a0.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 right; apply Rolle_lemma12.
 assumption.
 intro.
 eapply less_wdr.
 apply b1.
-unfold fcp' in |- *; Algebra.
+unfold fcp' in |- *; algebra.
 Qed.
 
 End Rolle.
@@ -690,7 +690,7 @@ apply compact_map2 with (Hab := less_leEq _ _ _ a1); auto.
 intros.
 eapply leEq_wdl.
 apply (H4 Hx).
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 cut (included (Compact (Min_leEq_Max b a)) (Compact (Min_leEq_Max a b))). intro H2.
 cut (included (Compact (less_leEq _ _ _ b0)) I). intro H3.
 2: apply included_trans with (Compact (Min_leEq_Max b a));
@@ -733,7 +733,7 @@ apply compact_Min_lft.
 intros; apply less_leEq.
 eapply less_wdl.
 apply b0.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 (**

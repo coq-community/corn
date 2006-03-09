@@ -93,7 +93,7 @@ apply less_imp_ap.
 apply pos_two.
 
 astepl OneR.
-Algebra.
+algebra.
 
 astepl (cmf_abs F [--]One[*]cmf_abs F [--]One).
 astepl (cmf_abs F ( [--]One[*][--]One)).
@@ -106,7 +106,7 @@ astepl (cmf_abs F One).
 2: astepl ( [--] ( [--] (One:F) [*]One)).
 2: astepl ( [--][--] ((One:F) [*]One)).
 2: astepl ((One:F) [*]One).
-2: Algebra.
+2: algebra.
 
 astepl (cmf_abs F (One[*]One)).
 astepl (cmf_abs F One[*]cmf_abs F One).

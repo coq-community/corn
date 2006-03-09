@@ -117,7 +117,7 @@ auto.
 intros.
 apply Continuous_I_wd with F.
 FEQ.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 auto.
 Qed.
 
@@ -819,7 +819,7 @@ intros.
 unfold N_Deriv_fun in |- *.
 elim diffF; intros; simpl in |- *.
 apply n_deriv_I_wd'.
-Algebra.
+algebra.
 apply iprop_compact_in_interval'.
 apply iprop_compact_in_interval'.
 apply b.
@@ -839,11 +839,11 @@ apply H1.
 eapply eq_transitive_unfolded.
 apply Min_comm.
 apply leEq_imp_Min_is_lft; apply eq_imp_leEq.
-apply compact_in_interval_wd1; Algebra.
+apply compact_in_interval_wd1; algebra.
 eapply leEq_wdr.
 apply H2.
 apply leEq_imp_Max_is_rht; apply eq_imp_leEq.
-apply compact_in_interval_wd2; Algebra.
+apply compact_in_interval_wd2; algebra.
 Qed.
 (* end hide *)
 
@@ -871,7 +871,7 @@ apply H.
 eapply eq_transitive_unfolded.
 apply (N_Deriv_char y Hy H2).
 apply n_deriv_I_wd'.
-Algebra.
+algebra.
 apply iprop_compact_in_interval_inc2; apply iprop_compact_in_interval.
 apply iprop_compact_in_interval2_inc2; apply iprop_compact_in_interval2y.
 apply
@@ -895,7 +895,7 @@ apply compact_in_interval_y_rht.
 eapply eq_transitive_unfolded.
 apply (N_Deriv_char x Hx H1).
 apply n_deriv_I_wd'.
-Algebra.
+algebra.
 apply iprop_compact_in_interval_inc2; apply iprop_compact_in_interval.
 apply iprop_compact_in_interval2_inc2; apply iprop_compact_in_interval2x.
 apply
@@ -1145,7 +1145,7 @@ cut
 eapply eq_transitive_unfolded.
 apply (N_Deriv_char n F diffF x Hx H1).
 apply n_deriv_I_wd'; auto.
-Algebra.
+algebra.
 apply iprop_compact_in_interval_inc2; apply iprop_compact_in_interval.
 apply included_imp_Diffble_n; auto.
 apply included_interval'.

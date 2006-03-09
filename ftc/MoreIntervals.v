@@ -657,14 +657,14 @@ Lemma compact_in_interval_wd1 : forall I pI x Hx y Hy
  (H : compact_ (compact_in_interval I pI x Hx))
  (H' : compact_ (compact_in_interval I pI y Hy)),
  x [=] y -> Lend H [=] Lend H'.
-intro I; elim I; simpl in |- *; intros; Algebra.
+intro I; elim I; simpl in |- *; intros; algebra.
 Qed.
 
 Lemma compact_in_interval_wd2 : forall I pI x Hx y Hy
  (H : compact_ (compact_in_interval I pI x Hx))
  (H' : compact_ (compact_in_interval I pI y Hy)),
  x [=] y -> Rend H [=] Rend H'.
-intro I; elim I; simpl in |- *; intros; Algebra.
+intro I; elim I; simpl in |- *; intros; algebra.
 Qed.
 
 (**

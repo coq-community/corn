@@ -175,7 +175,7 @@ intros.
 apply div_wd.
 unfold seq_part_sum. 
 apply Sum0_wd.
-intros. unfold y. Algebra.
+intros. unfold y. algebra.
 apply One_part_sum.
 Qed.
 

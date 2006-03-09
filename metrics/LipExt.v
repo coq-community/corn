@@ -76,7 +76,7 @@ apply CPsMetricSpace_is_CPsMetricSpace.
 assert ((y[-d]scs_elem)[=](scs_elem[-d]y)).
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
-Algebra.
+algebra.
 Qed.
 
 
@@ -210,9 +210,9 @@ destruct X. destruct s1.
 assert (z2[<=]f x1[+]C[*]dsub' M P x x1).
 apply (l0 (f x1[+]C[*]dsub' M P x x1)).
 exists x1.
-Algebra.
+algebra.
 assert (x0 [<] z2).
-apply plus_cancel_less with ([--]z1). Algebra.
+apply plus_cancel_less with ([--]z1). algebra.
 assert (f x1[+]C[*]dsub' M P y x1 [<] f x1[+]C[*]dsub' M P x x1).
 apply less_leEq_trans with z2; auto.
 astepl (x0). auto.
@@ -267,7 +267,7 @@ astepl (f x[-d]f x1).
 assert (lipschitz_c f C).
 apply f_lip.
 apply X.
-apply mult_wd; Algebra.
+apply mult_wd; algebra.
 case x. case x1. intros. simpl.
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
@@ -305,7 +305,7 @@ apply (CPsMetricSpace_is_CPsMetricSpace M).
 apply H.
 
 astepl (f x[+]C[*]Zero).
-astepl (f x[+]Zero). Algebra.
+astepl (f x[+]Zero). algebra.
 
 assert (forall e : IR, Zero [<]e -> f x [-] y [<] e).
 intros.
@@ -408,7 +408,7 @@ apply (extension_also_lipschitz_case y2 y1 fy1 Hfy1 fy2 Hfy2 e X).
 assert (y2[-d]y1[=]y1[-d]y2).
 apply ax_d_com.
 apply CPsMetricSpace_is_CPsMetricSpace.
-Algebra.
+algebra.
 apply AbsSmall_approach. auto.
 Qed.
 

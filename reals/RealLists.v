@@ -64,7 +64,7 @@ intros F l H.
 induction l as [| a l Hrecl].
 apply nil.
 apply cons.
-cut (member a (cons a l)); [ intro | right; Algebra ]; rename X into H0.
+cut (member a (cons a l)); [ intro | right; algebra ]; rename X into H0.
 apply (Part F a (H a H0)).
 cut (forall y : IR, member y l -> Dom F y); intros; rename X into H0.
 2: apply H; left; assumption.
@@ -86,7 +86,7 @@ assumption.
 right.
 eapply eq_transitive_unfolded.
 apply H1.
-simpl in |- *; apply pfwdef; Algebra.
+simpl in |- *; apply pfwdef; algebra.
 Qed.
 
 Lemma map2_pres_member : forall (F : PartIR) x Hx l H,
@@ -160,7 +160,7 @@ intro l; induction  l as [| a l Hrecl].
 clear Hrecl.
 intro H; induction  l as [| a0 l Hrecl]; intros e H0.
  simpl in |- *; exists a.
-  right; Algebra.
+  right; algebra.
  apply less_leEq; apply shift_minus_less; apply shift_less_plus'.
  astepl ZeroR; assumption.
 cut
@@ -170,7 +170,7 @@ cut
 intro H1.
 elim H1; intro H2.
  exists a0.
-  simpl in |- *; left; right; Algebra.
+  simpl in |- *; left; right; algebra.
  apply leEq_transitive with (Max a (maxlist (cons a0 l)) [-]e [/]TwoNZ).
   astepl (Max a (maxlist (cons a0 l)) [-]e).
   apply shift_leEq_minus; apply shift_plus_leEq'.
@@ -196,7 +196,7 @@ elim Hrecl with (e [/]TwoNZ).
   apply leEq_transitive with (maxlist (cons a l) [-]e [/]TwoNZ).
    apply minus_resp_leEq; assumption.
   assumption.
- exists a; right; Algebra.
+ exists a; right; algebra.
 apply pos_div_two; assumption.
 Qed.
 
@@ -208,14 +208,14 @@ clear l.
 do 2 intro. intro H.
 clear H; induction  l as [| a0 l Hrecl].
 simpl in |- *; intros H H0.
-apply H0; right; Algebra.
+apply H0; right; algebra.
 generalize l a0 Hrecl; clear Hrecl l a0.
 intros l b; intros. rename X into H0.
 eapply less_wdl.
 2: apply maxlist_aux.
 astepl (Max b (maxlist (cons a l))).
 apply Max_less.
-apply H0; left; right; Algebra.
+apply H0; left; right; algebra.
 apply Hrecl.
 simpl in |- *; apply lt_O_Sn.
 intros y H1.  apply H0.
@@ -232,14 +232,14 @@ clear l.
 do 3 intro.
 clear H; induction  l as [| a0 l Hrecl].
 simpl in |- *; intros.
-apply H0; right; Algebra.
+apply H0; right; algebra.
 generalize l a0 Hrecl; clear Hrecl l a0.
 intros l b; intros.
 eapply leEq_wdl.
 2: apply maxlist_aux.
 astepl (Max b (maxlist (cons a l))).
 apply Max_leEq.
-apply H0; left; right; Algebra.
+apply H0; left; right; algebra.
 apply Hrecl.
 simpl in |- *; auto with arith.
 intros x H1. apply H0.
@@ -308,7 +308,7 @@ intro l; induction  l as [| a l Hrecl].
 clear Hrecl.
 intro H; induction  l as [| a0 l Hrecl]; intros e He.
  simpl in |- *; exists a.
-  right; Algebra.
+  right; algebra.
  apply less_leEq; apply shift_less_plus'.
  astepl ZeroR; assumption.
 cut
@@ -318,7 +318,7 @@ cut
 intro H1.
 elim H1; intro H2.
  exists a0.
-  simpl in |- *; left; right; Algebra.
+  simpl in |- *; left; right; algebra.
  apply leEq_transitive with (Min a (minlist (cons a0 l)) [+]e [/]TwoNZ).
  apply shift_leEq_plus.
  astepr (minlist (cons a (cons a0 l))).
@@ -343,7 +343,7 @@ elim Hrecl with (e [/]TwoNZ).
   apply leEq_transitive with (minlist (cons a l) [+]e [/]TwoNZ).
    assumption.
   apply plus_resp_leEq; assumption.
- exists a; right; Algebra.
+ exists a; right; algebra.
 apply pos_div_two; assumption.
 Qed.
 
@@ -355,14 +355,14 @@ clear l.
 do 2 intro. intro H.
 clear H; induction  l as [| a0 l Hrecl].
 simpl in |- *; intros H H0.
-apply H0; right; Algebra.
+apply H0; right; algebra.
 generalize l a0 Hrecl; clear Hrecl l a0.
 intros l b; intros. rename X into H0.
 eapply less_wdr.
 2: apply minlist_aux.
 astepr (Min b (minlist (cons a l))).
 apply less_Min.
-apply H0; left; right; Algebra.
+apply H0; left; right; algebra.
 apply Hrecl.
 simpl in |- *; auto with arith.
 intros y H1; apply H0.
@@ -379,14 +379,14 @@ clear l.
 do 3 intro.
 clear H; induction  l as [| a0 l Hrecl].
 simpl in |- *; intros.
-apply H0; right; Algebra.
+apply H0; right; algebra.
 generalize l a0 Hrecl; clear Hrecl l a0.
 intros l b; intros.
 eapply leEq_wdr.
 2: apply minlist_aux.
 astepr (Min b (minlist (cons a l))).
 apply leEq_Min.
-apply H0; left; right; Algebra.
+apply H0; left; right; algebra.
 apply Hrecl.
 simpl in |- *; auto with arith.
 intros y H1; apply H0.

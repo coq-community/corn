@@ -166,7 +166,7 @@ astepr (cpoly_zero fp); intuition.
 induction g.
 astepl (cpoly_mult_op fp (zxfpx (c[+X*]f)) (cpoly_zero fp)).
 astepl (cpoly_zero fp).
-astepr (zxfpx (cpoly_zero Z_as_CRing));  try Algebra.
+astepr (zxfpx (cpoly_zero Z_as_CRing));  try algebra.
 apply fpxeq_wd.
 apply eq_symmetric.
 apply (mult_zero Z_as_CRing).

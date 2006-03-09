@@ -208,7 +208,7 @@ Qed.
 Lemma p3m_pow : forall i j : nat, p3m i[^]j [=] p3m (i * j).
 intros.
 unfold p3m in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve p3m_aux: algebra.
@@ -216,7 +216,7 @@ Hint Resolve p3m_aux: algebra.
 Lemma p3m_0 : p3m 0 [=] One.
 unfold p3m in |- *.
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve p3m_0: algebra.
@@ -238,13 +238,13 @@ Hint Resolve third_less_one: algebra.
 Lemma p3m_mon : forall i j : nat, i < j -> p3m j [<] p3m i.
 intros.
 unfold p3m in |- *.
-apply small_nexp_resp_lt; Algebra.
+apply small_nexp_resp_lt; algebra.
 Qed.
 
 Lemma p3m_mon' : forall i j : nat, i <= j -> p3m j [<=] p3m i.
 intros.
 unfold p3m in |- *.
-apply small_nexp_resp_le; try apply less_leEq; Algebra.
+apply small_nexp_resp_le; try apply less_leEq; algebra.
 Qed.
 
 Lemma p3m_small : forall i : nat, p3m i [<=] One.

@@ -89,7 +89,7 @@ astepl (nring (R:=F) (nat_of_P (p * q))).
 astepr (nring (R:=F) (nat_of_P p)[*]nring (nat_of_P q)).
 astepr (nring (R:=F) (nat_of_P p * nat_of_P q)).
 rewrite nat_of_P_mult_morphism.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve pring_mult: algebra.

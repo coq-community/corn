@@ -135,7 +135,7 @@ apply leEq_less_trans with (AbsCC (s M[-]l) [+]AbsCC (s M[-]l')).
 apply leEq_wdl with (AbsCC ( [--] (s M[-]l) [+] (s M[-]l'))).
 apply leEq_wdr with (AbsCC [--] (s M[-]l) [+]AbsCC (s M[-]l')).
 apply triangle.
-Algebra.
+algebra.
 apply AbsCC_wd. rational.
 rstepr (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ). astepl (Zero[+]AbsCC (s M[-]l) [+]AbsCC (s M[-]l')).
 apply plus_resp_less_leEq.

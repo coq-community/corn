@@ -89,50 +89,50 @@ Lemma xexprF2interpF : forall (x:F) (e:xexprF x), interpF (xforgetF _ e) x.
 intros x e.
 induction e.
 
-apply (interpF_var i); Algebra.
+apply (interpF_var i); algebra.
 
-apply (interpF_int k); Algebra.
+apply (interpF_int k); algebra.
 
-apply (interpF_plus (xforgetF _ e1) (xforgetF _ e2) x y (x[+]y)); Algebra.
+apply (interpF_plus (xforgetF _ e1) (xforgetF _ e2) x y (x[+]y)); algebra.
 
-apply (interpF_mult (xforgetF _ e1) (xforgetF _ e2) x y (x[*]y)); Algebra.
+apply (interpF_mult (xforgetF _ e1) (xforgetF _ e2) x y (x[*]y)); algebra.
 
-apply (interpF_unop (xforgetF _ e) f x (unop f x)); Algebra.
+apply (interpF_unop (xforgetF _ e) f x (unop f x)); algebra.
 
 apply (interpF_binop (xforgetF _ e1) (xforgetF _ e2) f x y (binop f x y));
- Algebra.
+ algebra.
 
 eapply (interpF_part (xforgetF _ e) f x (pfun f x Hx)).
  apply eq_reflexive_unfolded.
-Algebra.
+algebra.
 
 apply (interpF_div (xforgetF _ e1) (xforgetF _ e2) x y (x[/]y[//]nzy) nzy);
- Algebra.
+ algebra.
 
-apply (interpF_int 0); Algebra.
+apply (interpF_int 0); algebra.
 
 apply (interpF_int 1); Step_final (One:F).
 
-apply (interpF_int (Z_of_nat n)); Algebra.
+apply (interpF_int (Z_of_nat n)); algebra.
 
 apply (interpF_mult (xforgetF _ e) (expr_int (-1)) x (zring (-1)) [--]x);
  auto.
 Step_final (zring (-1)[*]x).
-apply (interpF_int (-1)); Algebra.
+apply (interpF_int (-1)); algebra.
 
 apply
  (interpF_plus (xforgetF _ e1) (xforgetF _ (xexprF_inv _ e2)) x [--]y (x[-]y));
- Algebra.
+ algebra.
 apply (interpF_mult (xforgetF _ e2) (expr_int (-1)) y (zring (-1)) [--]y);
  auto.
 Step_final (zring (-1)[*]y).
-apply (interpF_int (-1)); Algebra.
+apply (interpF_int (-1)); algebra.
 
 induction n.
  apply (interpF_int 1); Step_final (One:F).
 apply
  (interpF_mult (xforgetF _ e) (expr_power n (xforgetF _ e)) x (
-    x[^]n) (x[^]S n)); Algebra.
+    x[^]n) (x[^]S n)); algebra.
 Qed.
 
 Definition xexprF_diagram_commutes :
@@ -288,18 +288,18 @@ simple induction z0; simpl in |- *; auto.
 simple induction z; simpl in |- *; auto.
 simple induction z; simpl in |- *; auto.
 simple induction z; simpl in |- *; auto.
-intros; apply interpF_mult with x y; Algebra.
+intros; apply interpF_mult with x y; algebra.
 intros; apply interpF_wd with (zring (i * j):F).
-apply interpF_int; Algebra.
+apply interpF_int; algebra.
 inversion X. inversion X0.
 Step_final (zring i[*]zring j:F).
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
-apply interpF_wd with (x0[*](y0[*]y)); Algebra.
-apply interpF_mult with x0 (y0[*]y); Algebra.
+apply interpF_wd with (x0[*](y0[*]y)); algebra.
+apply interpF_mult with x0 (y0[*]y); algebra.
 Step_final (x0[*]y0[*]y).
 intros. inversion X. rewrite H in H0. rewrite H1 in H0.
 apply interpF_wd with (zring 0:F).
-apply interpF_int; Algebra.
+apply interpF_int; algebra.
 astepl (Zero:F).
 astepl (x[*]Zero).
 Step_final (x[*]zring 0).
@@ -355,17 +355,17 @@ intros n e0 H3 e1 H4 f.
 elim f; simpl in |- *; auto.
 intros n e0 H3 f.
 elim f; simpl in |- *; auto.
-intros; apply interpF_mult with x y; Algebra.
-intros; apply interpF_wd with (y[*]x); Algebra.
-apply interpF_mult with y x; Algebra.
+intros; apply interpF_mult with x y; algebra.
+intros; apply interpF_wd with (y[*]x); algebra.
+apply interpF_mult with y x; algebra.
 intros; apply interpF_wd with (y[*]One[*]x).
 apply MI_mult_corr_F; auto.
-apply interpF_mult with y (One:F); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
+apply interpF_mult with y (One:F); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
 Step_final (x[*](y[*]One)).
 intros. inversion X0. rewrite H0 in H2. rewrite H in X2. rewrite H1 in X3.
 apply interpF_wd with (x0[*](y0[*]y)).
-apply interpF_mult with x0 (y0[*]y); Algebra.
+apply interpF_mult with x0 (y0[*]y); algebra.
 Step_final (x0[*]y0[*]y).
 Qed.
 Transparent MI_mult.
@@ -385,8 +385,8 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
 intros H H0 H1 e.
 elim e; intros; simpl in |- *; auto.
-intros; apply interpF_mult with x y; Algebra.
-intros; apply interpF_wd with (y[*]x); Algebra.
+intros; apply interpF_mult with x y; algebra.
+intros; apply interpF_wd with (y[*]x); algebra.
 apply MI_mult_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[*]y[*]x0).
@@ -444,7 +444,7 @@ inversion X0. rewrite H11 in X3. rewrite H13 in X4. rewrite H12 in H14.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
 astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
+apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_unop u e0).
 rewrite <- H7; auto. rewrite H'. rewrite H''. auto. auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
@@ -468,7 +468,7 @@ inversion X0. rewrite H13 in X3. rewrite H15 in X4. rewrite H14 in H16.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
 astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
+apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_binop u e0 e3).
 rewrite <- H9; auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
 auto.
@@ -493,7 +493,7 @@ inversion X0. rewrite H13 in X3. rewrite H15 in X4. rewrite H14 in H16.
 apply interpF_wd with ((y0[+]y1)[*]x0).
 apply MV_mult_corr_F; auto.
 astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. Algebra. astepr (y1[*]x1). apply mult_wdr.
+apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
 apply refl_interpF with val unop binop pfun (expr_part f e0).
 rewrite <- H9; auto. rewrite H7. rewrite H8; auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
@@ -507,11 +507,11 @@ elim f; simpl in |- *; auto.
 intros u e0 H1 f.
 elim f; simpl in |- *; auto.
 
-intros; apply interpF_plus with x y; Algebra.
+intros; apply interpF_plus with x y; algebra.
 intros. inversion X.  rewrite H1 in H0. rewrite H in H0.
 inversion X0. rewrite H2 in H3. rewrite H4 in H3.
 apply interpF_wd with (zring (i + j):F).
-apply interpF_int; Algebra.
+apply interpF_int; algebra.
 Step_final (zring i[+]zring j:F).
 Qed.
 Transparent MV_mult.
@@ -545,9 +545,9 @@ simpl in |- *; auto.
 simpl in |- *; auto.
 simpl in |- *; auto.
 simpl in |- *; auto.
-intros; apply interpF_wd with (y[+]x); Algebra.
-apply interpF_plus with y x; Algebra.
-intros; apply interpF_plus with x y; Algebra.
+intros; apply interpF_wd with (y[+]x); algebra.
+apply interpF_plus with y x; algebra.
+intros; apply interpF_plus with x y; algebra.
 intros; apply MM_plus_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[+](x0[+]y)).
@@ -557,7 +557,7 @@ astepl (y0[+]x0[+]y).
 Step_final (x0[+]y0[+]y).
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (x0[+](y0[+]y)).
-apply interpF_plus with x0 (y0[+]y); Algebra.
+apply interpF_plus with x0 (y0[+]y); algebra.
 Step_final (x0[+]y0[+]y).
 Qed.
 Transparent MM_plus.
@@ -577,8 +577,8 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
 intros H H0 H1 e.
 elim e; intros; simpl in |- *; auto.
-intros. apply interpF_plus with x y; Algebra.
-intros. apply interpF_wd with (y[+]x); Algebra.
+intros. apply interpF_plus with x y; algebra.
+intros. apply interpF_wd with (y[+]x); algebra.
 apply PM_plus_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y0[+]y[+]x0).
@@ -604,10 +604,10 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
 intros H H0 H1 e.
 elim e; intros; simpl in |- *; auto.
-intros. apply interpF_mult with x y; Algebra.
+intros. apply interpF_mult with x y; algebra.
 intros. apply interpF_wd with (zring 0[+]y[*]x).
 apply PM_plus_corr_F.
-apply interpF_int; Algebra.
+apply interpF_int; algebra.
 apply MI_mult_corr_F; auto.
 astepl (Zero[+]y[*]x).
 Step_final (y[*]x).
@@ -634,8 +634,8 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
 intros H H0 H1 e.
 elim e; intros; simpl in |- *; auto.
-intros. apply interpF_mult with x y; Algebra.
-intros. apply interpF_wd with (y[*]x); Algebra.
+intros. apply interpF_mult with x y; algebra.
+intros. apply interpF_wd with (y[*]x); algebra.
 apply PM_mult_corr_F; auto.
 intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
 apply interpF_wd with (y[*]x0[+]y0[*]y).
@@ -658,7 +658,7 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
 intros H H0 e f.
 elim e; elim f; intros; simpl in |- *; auto.
-intros. apply interpF_plus with x y; Algebra.
+intros. apply interpF_plus with x y; algebra.
 intros. inversion X. rewrite H in X1. rewrite H1 in X2. rewrite H0 in H2.
 inversion X0. rewrite H3 in X3. rewrite H5 in X4. rewrite H4 in H6.
 cut (y0[*]y1[#]Zero). intro H13.
@@ -687,7 +687,7 @@ cut
  (forall (e f:expr) (x y:F), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
 intros H H0 e f.
 elim e; elim f; intros; simpl in |- *; auto.
-intros. apply interpF_mult with x y; Algebra.
+intros. apply interpF_mult with x y; algebra.
 intros. inversion X. rewrite H in X1. rewrite H1 in X2. rewrite H0 in H2.
 inversion X0. rewrite H3 in X3. rewrite H5 in X4. rewrite H4 in H6.
 cut (y0[*]y1[#]Zero). intro H13.
@@ -712,7 +712,7 @@ cut
     II e x -> II f y -> II (expr_div e f) (x[/]y[//]nzy)).
 intros H H0 e f.
 elim e; elim f; intros; simpl in |- *; auto.
-intros. apply interpF_div with x y nzy; Algebra.
+intros. apply interpF_div with x y nzy; algebra.
 intros. inversion X. rewrite H in X1. rewrite H1 in X2. rewrite H0 in H2.
 inversion X0. rewrite H3 in X3. rewrite H5 in X4. rewrite H4 in H6.
 cut (x1[#]Zero). intro nzx1.
@@ -738,20 +738,20 @@ apply
  (interpF_div F val unop binop pfun
     (expr_plus (expr_mult (expr_var v) expr_one) expr_zero) expr_one x
     (One:F) x (ring_non_triv F)).
-Algebra.
+algebra.
 apply
  (interpF_plus F val unop binop pfun (expr_mult (expr_var v) expr_one)
     expr_zero x (Zero:F) x).
-Algebra.
+algebra.
 apply (interpF_mult F val unop binop pfun (expr_var v) expr_one x (One:F) x);
- Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
-apply (interpF_int F val unop binop pfun 0); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
+ algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
+apply (interpF_int F val unop binop pfun 0); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
 apply
  (interpF_div F val unop binop pfun (expr_int z) expr_one x (
     One:F) x (ring_non_triv F)).
-Algebra. Algebra. apply (interpF_int F val unop binop pfun 1); Algebra.
+algebra. algebra. apply (interpF_int F val unop binop pfun 1); algebra.
 
 inversion X1. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
  apply interpF_wd with (x0[+]y). apply FF_plus_corr_F; auto. auto.
@@ -768,59 +768,59 @@ apply
  (interpF_div F val unop binop pfun
     (expr_plus (expr_mult (expr_unop u (NormF e0)) expr_one) expr_zero)
     expr_one x (One:F) x (ring_non_triv F)).
-Algebra.
+algebra.
 apply
  (interpF_plus F val unop binop pfun
     (expr_mult (expr_unop u (NormF e0)) expr_one) expr_zero x (
     Zero:F) x).
-Algebra.
+algebra.
 apply
  (interpF_mult F val unop binop pfun (expr_unop u (NormF e0)) expr_one x
-    (One:F) x); Algebra.
-apply (interpF_unop F val unop binop pfun (NormF e0) u x0); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
-apply (interpF_int F val unop binop pfun 0); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
+    (One:F) x); algebra.
+apply (interpF_unop F val unop binop pfun (NormF e0) u x0); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
+apply (interpF_int F val unop binop pfun 0); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
 
 inversion X1. rewrite H in H3. rewrite H1 in X2. rewrite H2 in X3. rewrite H0 in H3.
 apply
  (interpF_div F val unop binop pfun
     (expr_plus (expr_mult (expr_binop b (NormF e0) (NormF e1)) expr_one)
        expr_zero) expr_one x (One:F) x (ring_non_triv F)).
-Algebra.
+algebra.
 apply
  (interpF_plus F val unop binop pfun
     (expr_mult (expr_binop b (NormF e0) (NormF e1)) expr_one) expr_zero x
     (Zero:F) x).
-Algebra.
+algebra.
 apply
  (interpF_mult F val unop binop pfun (expr_binop b (NormF e0) (NormF e1))
-    expr_one x (One:F) x); Algebra.
+    expr_one x (One:F) x); algebra.
 apply (interpF_binop F val unop binop pfun (NormF e0) (NormF e1) b x0 y);
- Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
-apply (interpF_int F val unop binop pfun 0); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
+ algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
+apply (interpF_int F val unop binop pfun 0); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
 
 inversion X0. rewrite <- H. rewrite H1 in X1. rewrite H0 in H2.
 apply
  (interpF_div F val unop binop pfun
     (expr_plus (expr_mult (expr_part f (NormF e0)) expr_one) expr_zero)
     expr_one x (One:F) x (ring_non_triv F)).
-Algebra.
+algebra.
 apply
  (interpF_plus F val unop binop pfun
     (expr_mult (expr_part f (NormF e0)) expr_one) expr_zero x (
     Zero:F) x).
-Algebra.
+algebra.
 apply
  (interpF_mult F val unop binop pfun (expr_part f (NormF e0)) expr_one x
-    (One:F) x); Algebra.
+    (One:F) x); algebra.
 apply (interpF_part F val unop binop pfun (NormF e0) f x0) with (Hx := Hx);
- Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
-apply (interpF_int F val unop binop pfun 0); Algebra.
-apply (interpF_int F val unop binop pfun 1); Algebra.
+ algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
+apply (interpF_int F val unop binop pfun 0); algebra.
+apply (interpF_int F val unop binop pfun 1); algebra.
 Qed.
 
 Lemma Norm_wfF :
@@ -849,8 +849,8 @@ elim z; simpl in |- *; try (intros; elimtype False; inversion H2; fail);
  intros H2 H3.
 inversion H2. rewrite H4 in X. rewrite H6 in X0. rewrite H5 in H7.
 apply interpF_div with (Zero:F) y nzy; auto.
-Algebra.
-apply (interpF_int F val unop binop pfun 0); Algebra.
+algebra.
+apply (interpF_int F val unop binop pfun 0); algebra.
 Qed.
 
 Lemma Tactic_lemma_zero_F :

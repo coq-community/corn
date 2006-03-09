@@ -185,11 +185,11 @@ apply
        (AbsIR (a (S n)) [/] _[//]
         AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ (S n))).
 3: apply eq_symmetric_unfolded; apply AbsIR_division.
-2: apply div_wd; Algebra.
+2: apply div_wd; algebra.
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x; apply nring_nonneg.
 2: apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply AbsIR_resp_mult.
-2: apply mult_wd; apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply mult_wd; apply AbsIR_wd; simpl in |- *; algebra.
 apply
  leEq_wdr
   with
@@ -200,12 +200,12 @@ apply
 2: apply mult_wdr.
 2: eapply eq_transitive_unfolded.
 2: apply AbsIR_resp_mult.
-2: apply mult_wdl; simpl in |- *; Algebra.
+2: apply mult_wdl; simpl in |- *; algebra.
 2: apply
     eq_transitive_unfolded
      with (AbsIR (a n) [/] _[//]AbsIR_resp_ap_zero _ (nring_fac_ap_zero _ n)).
 2: apply AbsIR_division.
-2: apply div_wd; Algebra.
+2: apply div_wd; algebra.
 2: apply AbsIR_eq_x; apply nring_nonneg.
 rstepl
  (AbsIR (a (S n)) [*]AbsIR (x[-]x0) [*]AbsIR ((x[-]x0) [^]n) [/] _[//]
@@ -370,7 +370,7 @@ rstepr
    mult_resp_ap_zero _ _ _ (pos_ap_zero _ _ (pos_nring_S _ n))
      (nring_fac_ap_zero _ n))).
 apply mult_wdr.
-apply div_wd; Algebra.
+apply div_wd; algebra.
 Step_final (nring (R:=IR) (S n * fac n)).
 Qed.
 
@@ -408,7 +408,7 @@ unfold Exp_ps in |- *.
 apply FPowerSeries'_conv'.
 exists 0; exists OneR.
 apply pos_one.
-intros; apply eq_imp_leEq; Algebra.
+intros; apply eq_imp_leEq; algebra.
 Qed.
 
 Lemma Exp_conv : fun_series_convergent_IR realline Exp_ps.
@@ -416,7 +416,7 @@ unfold Exp_ps in |- *.
 apply FPowerSeries'_conv.
 exists 0; exists OneR.
 apply pos_one.
-intros; apply eq_imp_leEq; Algebra.
+intros; apply eq_imp_leEq; algebra.
 Qed.
 
 Lemma sin_conv : fun_series_convergent_IR realline sin_ps.
