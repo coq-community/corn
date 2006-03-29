@@ -666,7 +666,7 @@ Lemma Sum_resp_leEq : forall (f g : nat -> R) a b, a <= S b ->
 intros. induction  b as [| b Hrecb]; intros.
 unfold Sum in |- *. unfold Sum1 in |- *.
 generalize (toCle _ _ H); clear H; intro H.
-inversion H.
+inversion H as [|m X H2].
 astepl (Zero:R).
 astepr (Zero:R).
 apply leEq_reflexive.

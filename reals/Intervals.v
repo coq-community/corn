@@ -53,8 +53,8 @@ interval, we want this predicate to be well defined.
 *)
 
 Lemma compact_wd : pred_wd IR (compact a b Hab).
-intros; red in |- *; intros.
-inversion_clear X; split.
+intros; red in |- *; intros x y H H0.
+inversion_clear H; split.
 apply leEq_wdr with x; assumption.
 apply leEq_wdl with x; assumption.
 Qed.
@@ -65,7 +65,7 @@ Also, it will sometimes be necessary to rewrite the endpoints of an interval.
 
 Lemma compact_wd' : forall (a' b' : IR) Hab' (x : IR),
  a [=] a' -> b [=] b' -> compact a b Hab x -> compact a' b' Hab' x.
-intros. rename X into H1.
+intros a' b' Hab' x H H0 H1.
 inversion_clear H1; split.
 apply leEq_wdl with a; auto.
 apply leEq_wdr with b; auto.
@@ -98,8 +98,8 @@ Section More_Intervals.
 
 Lemma included_refl' : forall a b Hab Hab', included (compact a b Hab) (compact a b Hab').
 intros.
-red in |- *; intros.
-inversion_clear X; split; auto.
+red in |- *; intros x H.
+inversion_clear H; split; auto.
 Qed.
 
 (** We prove some inclusions of compact intervals.  *)
@@ -128,8 +128,8 @@ Defined.
 
 Definition compact_map3 : forall a b e Hab Hab', Zero [<] e ->
  included (compact a (b[-]e) Hab') (compact a b Hab).
-intros; red in |- *. rename X into H.
-intros.  rename X into H0. inversion_clear H0; split.
+intros; red in |- *. try rename X into H.
+intros x H0. inversion_clear H0; split.
 auto.
 eapply leEq_transitive.
 apply H2.
@@ -216,10 +216,10 @@ apply leEq_wdl with ZeroR.
 apply less_leEq; auto.
 astepl (AbsIR Zero).
 apply AbsIR_wd.
-apply leEq_imp_eq. rename X into H1.
+apply leEq_imp_eq. try rename X into H1.
 apply shift_leEq_minus; astepl a; elim H1; auto.
 apply shift_minus_leEq.
-apply leEq_transitive with b. rename X into H1.
+apply leEq_transitive with b. try rename X into H1.
 elim H1; auto.
 apply shift_leEq_plus.
 apply mult_cancel_leEq with (One[/] _[//]pos_ap_zero _ _ He).
@@ -230,7 +230,7 @@ clear Hrecn; induction  n as [| n Hrecn].
 intros.
 exists (cons a (nil IR)).
 intros x H1.
-inversion_clear H1. rename X into H2.
+inversion_clear H1 as [H2|].
 elim H2.
 apply compact_wd with a; [ apply compact_inc_lft | Algebra ].
 intros x Hx; inversion_clear Hx.
@@ -248,7 +248,7 @@ intros.
 set (enz := pos_ap_zero _ _ He) in *.
 exists (cons ((a[+]b) [/]TwoNZ) (nil IR)).
 intros x H1.
-inversion_clear H1. rename X into H2.
+inversion_clear H1 as [H2|].
 inversion_clear H2.
 apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | Algebra ].
 astepl (a[+]Zero); apply shift_plus_leEq'.
@@ -273,7 +273,7 @@ apply shift_minus_leEq; apply Max_leEq; apply shift_leEq_plus';
 apply shift_minus_leEq; apply shift_leEq_plus'.
 astepl ZeroR; apply less_leEq; auto.
 apply shift_minus_leEq.
-apply leEq_transitive with b. rename X into H1.
+apply leEq_transitive with b. try rename X into H1.
 elim H1; auto.
 apply shift_leEq_plus'.
 apply mult_cancel_leEq with (Two:IR).
@@ -282,7 +282,7 @@ apply shift_leEq_mult' with enz.
 auto.
 rstepl (b[-]a[/] e[//]enz); auto.
 apply leEq_transitive with a.
-2: rename X into H1; elim H1; auto.
+2: try rename X into H1; elim H1; auto.
 apply shift_minus_leEq; apply shift_leEq_plus'.
 apply mult_cancel_leEq with (Two:IR).
 apply pos_two.
@@ -299,7 +299,7 @@ intros l Hl' Hl.
 exists (cons b' l).
 intros.
 unfold b' in H1; apply compact_map3 with (e := e) (Hab' := H1) (b := b).
-assumption. rename X into H2.
+assumption. try rename X into H2.
 simpl in H2; inversion_clear H2.
 apply Hl'; assumption.
 apply compact_wd with b'; [ apply compact_inc_rht | Algebra ].
@@ -311,7 +311,7 @@ elim (Hl x H3).
 intros y Hy Hy'.
 exists y.
 left; assumption.
-auto. rename X into H2.
+auto. try rename X into H2.
 inversion_clear H2; split.
 assumption.
 apply less_leEq; auto.
@@ -320,7 +320,7 @@ right; Algebra.
 simpl in |- *; unfold ABSIR in |- *.
 apply Max_leEq.
 apply shift_minus_leEq; unfold b' in |- *.
-rstepr b. rename X into H2.
+rstepr b. try rename X into H2.
 elim H2; auto.
 rstepl (b'[-]x); apply shift_minus_leEq; apply shift_leEq_plus';
  apply less_leEq; assumption.
@@ -466,7 +466,7 @@ red in |- *; fold (SeqLimit twice_inv_seq Zero) in |- *.
 apply twice_inv_seq_Lim.
 apply Lim_minus.
 cut (Cauchy_Lim_prop2 seq (Lim seq1)).
-intro H4; red in H4. rename X into H2.
+intro H4; red in H4. try rename X into H2.
 elim (H4 (e [/]TwoNZ) (pos_div_two _ _ H2)); clear H4.
 intros n Hn.
 exists (seq n).
@@ -479,7 +479,7 @@ apply AbsSmall_minus; simpl in |- *; apply Hn.
 apply le_n.
 apply pos_div_two'; auto.
 cut (Cauchy_Lim_prop2 seq1 (Lim seq1)); intros.
-rename X0 into H3.
+try rename X0 into H3.
 red in |- *; red in H3.
 intros eps Heps; elim (H3 eps Heps); clear H3; intros.
 exists x.
@@ -490,12 +490,12 @@ apply AbsIR_eq_AbsSmall; assumption.
 red in |- *; fold (SeqLimit seq1 (Lim seq1)) in |- *.
 apply ax_Lim.
 apply crl_proof.
-red in |- *; intros. rename X into H1.
+red in |- *; intros. try rename X into H1.
 elim (Archimedes (One[/] e[//]pos_ap_zero _ _ H1)).
 intros n Hn.
 exists (S (2 * n)); intros.
 cut (Zero [<] nring (R:=IR) n); intros.
-apply AbsIR_eq_AbsSmall. rename X into H3.
+apply AbsIR_eq_AbsSmall. try rename X into H3.
 apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H3)).
 apply inv_resp_leEq.
 apply shift_div_leEq.
@@ -525,7 +525,7 @@ assumption.
 simpl in |- *; apply less_leEq; apply less_plusOne.
 apply leEq_transitive with (Two[*]one_div_succ (R:=IR) (S (2 * n))).
 auto.
-apply less_leEq. rename X into H3.
+apply less_leEq. try rename X into H3.
 apply less_leEq_trans with (One[/] nring n[//]pos_ap_zero _ _ H3).
 astepl (one_div_succ (R:=IR) (S (2 * n)) [*]Two).
 unfold one_div_succ in |- *; unfold Snring in |- *.
@@ -650,7 +650,7 @@ red in |- *; fold (SeqLimit twice_inv_seq Zero) in |- *.
 apply twice_inv_seq_Lim.
 apply Lim_minus.
 cut (Cauchy_Lim_prop2 seq (Lim seq1)).
-intro H4; red in H4. rename X into H3.
+intro H4; red in H4. try rename X into H3.
 elim (H4 (e [/]TwoNZ) (pos_div_two _ _ H3)); clear H4.
 intros n Hn.
 exists (seq n).
@@ -664,7 +664,7 @@ apply AbsSmall_minus; simpl in |- *; apply Hn.
 apply le_n.
 apply pos_div_two'; auto.
 cut (Cauchy_Lim_prop2 seq1 (Lim seq1)); intros.
-rename X0 into H4.
+try rename X0 into H4.
 red in |- *; red in H4.
 intros eps Heps; elim (H4 eps Heps); clear H4; intros.
 exists x.
@@ -681,7 +681,7 @@ intros n Hn.
 exists (S (2 * n)); intros.
 cut (Zero [<] nring (R:=IR) n); intros.
 apply AbsIR_eq_AbsSmall.
-rename X into H4.
+try rename X into H4.
 apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H4)).
 apply inv_resp_leEq.
 apply shift_div_leEq.
@@ -753,7 +753,7 @@ The following characterization of inclusion can be very useful:
 
 Lemma included_compact : forall (a b c d : IR) Hab Hcd, compact a b Hab c ->
  compact a b Hab d -> included (compact c d Hcd) (compact a b Hab).
-repeat intro. rename X into H. rename X0 into H0. rename X1 into H1.
+intros a b c d Hab Hcd H H0 x H1.
 inversion_clear H.
 inversion_clear H0.
 inversion_clear H1.

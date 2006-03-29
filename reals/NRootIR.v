@@ -506,12 +506,11 @@ Lemma triangle_SumIR : forall k l s,
  k <= S l -> AbsIR (Sum k l s) [<=] Sum k l (fun i => AbsIR (s i)).
 intros. induction  l as [| l Hrecl].
 generalize (toCle _ _ H); clear H; intro H.
-inversion H.
+inversion H as [|m H0 H1].
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 rstepr ZeroR.
 astepr (AbsIR Zero).
 apply eq_imp_leEq. apply AbsIR_wd. rational.
-rename X into H0.
 inversion H0.
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 rstepr (ABSIR (s 0)).

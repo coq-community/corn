@@ -453,12 +453,12 @@ Lemma triangle_Sum : forall m n (z : nat -> CC),
  m <= S n -> AbsCC (Sum m n z) [<=] Sum m n (fun i => AbsCC (z i)).
 intros. induction  n as [| n Hrecn]; intros.
 generalize (toCle _ _ H); clear H; intro H.
-inversion H.
+inversion H as [|m0 H1 H2].
 unfold Sum in |- *. unfold Sum1 in |- *.
 astepl (AbsCC Zero).
 astepr ZeroR.
 astepr (AbsCC Zero).
-apply leEq_reflexive. rename H1 into H2. rename X into H1.
+apply leEq_reflexive.
 inversion H1.
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 cut (AbsCC (Zero[+]z 0[-]Zero)[<=]Zero[+]AbsCC (z 0)[-]Zero).
