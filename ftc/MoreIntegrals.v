@@ -699,10 +699,10 @@ Qed.
 Lemma Integral_eq_zero : forall a b Hab (F : PartIR) contF x, Compact Hab x ->
  (forall Hx, Zero [<] F x Hx) -> (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) ->
  Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF [=] Zero -> a [=] b.
-intros.
+intros a b Hab F contF x H X H0 H1.
 apply not_ap_imp_eq; intro.
 apply less_irreflexive_unfolded with (x := ZeroR).
 apply less_wdr with (AbsIR (Integral contF)).
 2: Step_final (AbsIR Zero).
-apply Integral_ap_zero with x (contin_imp_inc _ _ _ _ contF x X); auto.
+apply Integral_ap_zero with x (contin_imp_inc _ _ _ _ contF x H); auto.
 Qed.

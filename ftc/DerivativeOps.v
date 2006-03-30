@@ -39,9 +39,9 @@ Included.
 exists (x[*]x).
 astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
  assumption.
-intros.
+intros y Hy H0.
 unfold I in H;
- apply leEq_wdr with (AbsIR (FRestr H y X)[*]AbsIR (FRestr H y X)).
+ apply leEq_wdr with (AbsIR (FRestr H y H0)[*]AbsIR (FRestr H y H0)).
 apply mult_resp_leEq_both; try (apply less_leEq; assumption); simpl in |- *;
  apply H2; try assumption.
 eapply eq_transitive_unfolded.

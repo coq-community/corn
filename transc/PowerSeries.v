@@ -508,7 +508,7 @@ Included.
 assert (H0 : Zero [<] a). apply H; apply compact_inc_lft.
 exists a.
 auto.
-intros; inversion_clear X.
+intros y Hy H1; inversion_clear H1.
 apply leEq_transitive with y.
 auto.
 apply leEq_AbsIR.
