@@ -248,7 +248,8 @@ apply Feq_imp_eq with realline.
   exists (a[+]z); exists (b[+]z[+]One).
   cut (a[+]z [<] b[+]z[+]One).
   intro H3.
-  exists H3; repeat split; simpl in |- *; elim X; try intros H5 H6.
+  exists H3; repeat split; simpl in |- *; try rename H4 into X; 
+    elim X; try intros H5 H6.
    apply plus_resp_leEq; auto.
   apply leEq_transitive with (b[+]z).
    apply plus_resp_leEq; auto.
@@ -697,7 +698,7 @@ elim H2; intros H3 H4; apply recip_resp_leEq; auto.
 apply less_leEq_trans with x; auto.
 
 apply included_imp_Continuous with (openl Zero);
- [ apply log_defn_lemma | red in |- *; intros ].
+ [ apply log_defn_lemma | red in |- *; intros x0 X ].
 inversion_clear X; simpl in |- *; apply less_leEq_trans with x; auto.
 Qed.
 

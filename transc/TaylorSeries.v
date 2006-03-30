@@ -355,7 +355,7 @@ Transparent nexp_op.
 apply AbsIR_wd; simpl in |- *; rational.
 Opaque nexp_op.
 elim (Taylor_Series_conv_lemma2 _ _ Hab One (pos_one _)); intros N HN;
- exists N; intros.
+ exists N; intros n H0 x X Hx Hx'.
 eapply leEq_wdr.
 eapply leEq_wdl.
 apply (HN _ H0 _ X Hx).
