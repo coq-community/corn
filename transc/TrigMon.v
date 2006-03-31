@@ -305,7 +305,7 @@ apply recip_resp_pos.
 apply power_cancel_less with 2.
 apply sqrt_nonneg.
 astepl ZeroR; astepr (Two:IR); apply pos_two.
-intros.
+intros y Hy X.
 apply leEq_wdr with (Cos y).
 2: apply eq_transitive_unfolded with (AbsIR (Cos y)).
 2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
