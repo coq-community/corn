@@ -428,7 +428,7 @@ Lemma IVT_dec : forall I F, Continuous I F -> forall a b Ha Hb, F a Ha [#] F b H
  I a -> I b -> (forall x y, I x -> I y -> x [<] y -> forall Hx Hy, F y Hy [<] F x Hx) ->
  forall y, Compact (Min_leEq_Max (F a Ha) (F b Hb)) y ->
  {x : IR | Compact (Min_leEq_Max a b) x | forall Hx, F x Hx [=] y}.
-intros.
+intros. try rename X4 into H.
 elim
  IVT_inc
   with
@@ -448,10 +448,10 @@ Contin.
 simpl in |- *; apply un_op_strext_unfolded with (cg_inv (c:=IR)).
 astepl (F a Ha); astepr (F b Hb); auto.
 intros; simpl in |- *; apply inv_resp_less; auto.
-inversion_clear X4; split; simpl in |- *; unfold MIN.
+inversion_clear H as (H0,H1); split; simpl in |- *; unfold MIN.
 apply inv_resp_leEq.
 eapply leEq_wdr.
-apply H0.
+apply H1.
 apply Max_wd_unfolded; Algebra.
 astepr ( [--][--] (Max [--] (F a Ha) [--] (F b Hb))).
 apply inv_resp_leEq; auto.
