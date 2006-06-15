@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Continuity.
@@ -152,7 +136,7 @@ apply
     (fun (i : nat) (Hi : i <= n) =>
      a[+]nring i[*] (b[-]a[/] _[//]nring_ap_zero' _ n Hn)).
 intros; simpl in |- *.
-rewrite H; Algebra.
+rewrite H; algebra.
 intros; simpl in |- *.
 apply plus_resp_leEq_lft.
 apply mult_resp_leEq_rht.
@@ -401,7 +385,7 @@ apply leEq_transitive with (P _ (le_n (S n)) [-]P _ (le_S _ _ (le_n n))).
 apply shift_leEq_minus; astepl (P _ (le_S _ _ (le_n n))).
 apply prf2.
 apply maxlist_greater.
-right; Algebra.
+right; algebra.
 Qed.
 
 Lemma AntiMesh_nonneg : forall n (a b : IR) (Hab : a [<=] b) (P : Partition Hab n),
@@ -546,7 +530,7 @@ Lemma Mesh_wd : forall n a b b' (Hab : a [<=] b) (Hab' : a [<=] b')
  (forall i Hi, P i Hi [=] Q i Hi) -> Mesh P [=] Mesh Q.
 simple induction n.
 intros.
-unfold Mesh in |- *; simpl in |- *; Algebra.
+unfold Mesh in |- *; simpl in |- *; algebra.
 clear n; intro.
 case n.
 intros.
@@ -559,23 +543,23 @@ apply
   with
     (Max (P _ (le_n (S (S n))) [-]P _ (le_S _ _ (le_n (S n))))
        (maxlist (Part_Mesh_List (Partition_Dom P)))).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply
  eq_transitive_unfolded
   with
     (Max (Q _ (le_n (S (S n))) [-]Q _ (le_S _ _ (le_n (S n))))
        (maxlist (Part_Mesh_List (Partition_Dom Q)))).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply Max_wd_unfolded.
 apply cg_minus_wd; apply H0.
 apply eq_transitive_unfolded with (Mesh (Partition_Dom P)).
-unfold Mesh in |- *; Algebra.
+unfold Mesh in |- *; algebra.
 apply eq_transitive_unfolded with (Mesh (Partition_Dom Q)).
 apply H.
 intros.
 unfold Partition_Dom in |- *; simpl in |- *.
 apply H0.
-unfold Mesh in |- *; Algebra.
+unfold Mesh in |- *; algebra.
 Qed.
 
 Lemma Mesh_wd' : forall n a b (Hab : a [<=] b) (P Q : Partition Hab n),
@@ -610,7 +594,7 @@ apply
        (maxlist (Part_Mesh_List (Partition_Dom (Even_Partition Hab _ Hm))))).
 cut (n = S (pred n)); [ intro | apply S_pred with 0; auto ].
 generalize Hm; rewrite H0; clear Hm; intro.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 eapply eq_transitive_unfolded.
 apply Max_comm.
 simpl in |- *.
@@ -621,7 +605,7 @@ apply eq_imp_leEq.
 rstepr (b[-]a[/] nring n[+]One[//]nring_ap_zero' _ _ Hm).
 apply
  eq_transitive_unfolded with (Mesh (Partition_Dom (Even_Partition Hab _ Hm))).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 cut (0 <> n); intro.
 eapply eq_transitive_unfolded.
 apply
@@ -686,7 +670,7 @@ intro.
 exists H1.
 simpl in |- *.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 generalize Hm; rewrite Hk.
 clear Hm; intro.
 rstepl
@@ -696,7 +680,7 @@ rstepl
 apply mult_wd.
 apply eq_symmetric_unfolded; apply nring_comm_mult.
 apply div_wd.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; apply nring_comm_mult.
 rewrite Hk.
 apply mult_le_compat_r; assumption.

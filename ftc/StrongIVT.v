@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export WeakIVT.
@@ -204,7 +188,7 @@ Qed.
 
 Lemma a'_seq_b'_seq_dist : forall n, b'_seq n[-]a'_seq n [=] (Two [/]ThreeNZ) [^]n[*] (b[-]a).
 simple induction n.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 clear n; intros.
 astepr (Two [/]ThreeNZ[*] (Two [/]ThreeNZ) [^]n[*] (b[-]a)).
 astepr (Two [/]ThreeNZ[*] ((Two [/]ThreeNZ) [^]n[*] (b[-]a))).
@@ -345,7 +329,7 @@ set (Ha' := incF _ (compact_inc_lft _ _ (Min_leEq_Max a b))) in *.
 set (Hb' := incF _ (compact_inc_rht _ _ (Min_leEq_Max a b))) in *.
 cut (F _ Ha' [<] F _ Hb'). intro H7.
 apply Weak_IVT_ap_lft with (HFab := H7); auto.
-apply compact_wd' with (Hab := less_leEq _ _ _ HFab); Algebra.
+apply compact_wd' with (Hab := less_leEq _ _ _ HFab); algebra.
 astepl (F a Ha); astepr (F b Hb); auto.
 cut (Continuous_I (Min_leEq_Max b a) F). intro H4.
 2: apply included_imp_Continuous with I; auto; apply included_interval; auto.
@@ -364,7 +348,7 @@ intro x; intros.
 exists x; auto.
 apply compact_wd' with (Hab := Min_leEq_Max b a);
  [ apply Min_comm | apply Max_comm | auto ].
-apply compact_wd' with (Hab := less_leEq _ _ _ HFab); Algebra.
+apply compact_wd' with (Hab := less_leEq _ _ _ HFab); algebra.
 apply pfwdef; astepl (Max a b); apply Max_comm.
 apply pfwdef; astepl (Min a b); apply Min_comm.
 apply less_wdl with (F a Ha).
@@ -389,8 +373,8 @@ cut (Max a b [=] b);
  [ intro | apply leEq_imp_Max_is_rht; apply less_leEq; auto ].
 cut (forall H H', F (Min a b) H [<] F (Max a b) H'); intros.
 2: apply H3; auto.
-2: apply iprop_wd with a; Algebra.
-2: apply iprop_wd with b; Algebra.
+2: apply iprop_wd with a; algebra.
+2: apply iprop_wd with b; algebra.
 2: astepl a; astepr b; auto.
 elim H4; intros.
 apply IVT_I with H5.
@@ -413,8 +397,8 @@ cut (Max b a [=] a);
  [ intro | apply leEq_imp_Max_is_rht; apply less_leEq; auto ].
 cut (forall H H', F (Min b a) H [<] F (Max b a) H'). intro H8.
 2: apply H3; auto.
-2: apply iprop_wd with b; Algebra.
-2: apply iprop_wd with a; Algebra.
+2: apply iprop_wd with b; algebra.
+2: apply iprop_wd with a; algebra.
 2: astepl b; astepr a; auto.
 elim H4; intros.
 elim IVT_I with (contF := H5) (z := y); intros; auto.
@@ -468,7 +452,7 @@ inversion_clear H as (H0,H1); split; simpl in |- *; unfold MIN.
 apply inv_resp_leEq.
 eapply leEq_wdr.
 apply H1.
-apply Max_wd_unfolded; Algebra.
+apply Max_wd_unfolded; algebra.
 astepr ( [--][--] (Max [--] (F a Ha) [--] (F b Hb))).
 apply inv_resp_leEq; auto.
 Qed.
@@ -488,8 +472,8 @@ cut (Max a b [=] b);
  [ intro | apply leEq_imp_Max_is_rht; apply less_leEq; auto ].
 cut (forall H H', F (Min a b) H [<] F (Max a b) H'). intro H8.
 2: apply H3; auto.
-2: apply iprop_wd with a; Algebra.
-2: apply iprop_wd with b; Algebra.
+2: apply iprop_wd with a; algebra.
+2: apply iprop_wd with b; algebra.
 2: astepl a; astepr b; auto.
 elim H4; intros.
 apply IVT'_I with (Min_leEq_Max a b) H5.
@@ -512,8 +496,8 @@ cut (Max b a [=] a);
  [ intro | apply leEq_imp_Max_is_rht; apply less_leEq; auto ].
 cut (forall H H', F (Min b a) H [<] F (Max b a) H'). intro H8.
 2: apply H3; auto.
-2: apply iprop_wd with b; Algebra.
-2: apply iprop_wd with a; Algebra.
+2: apply iprop_wd with b; algebra.
+2: apply iprop_wd with a; algebra.
 2: astepl b; astepr a; auto.
 elim H4; intros.
 elim IVT'_I with (contF := H5) (z := y); auto.
@@ -567,7 +551,7 @@ inversion_clear X4; split; simpl in |- *; unfold MIN.
 apply inv_resp_less.
 eapply less_wdr.
 apply X6.
-apply Max_wd_unfolded; Algebra.
+apply Max_wd_unfolded; algebra.
 astepr ( [--][--] (Max [--] (F a Ha) [--] (F b Hb))).
 apply inv_resp_less; auto.
 Qed.

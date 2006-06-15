@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [/] %\ensuremath{/}% #/# *)
@@ -176,7 +160,7 @@ auto.
 astepl (x[*]One).
 eapply eq_transitive_unfolded.
 2: apply CRings.mult_assoc.
-Algebra.
+algebra.
 Qed.
 
 Lemma mult_lft_resp_ap : forall x y z : F, x [#] y -> z [#] Zero -> z[*]x [#] z[*]y.
@@ -186,7 +170,7 @@ unfold cg_minus in |- *.
 astepl (z[*]x[+]z[*][--]y).
 astepl (z[*] (x[+][--]y)).
 astepl (z[*] (x[-]y)).
-apply mult_resp_ap_zero; Algebra.
+apply mult_resp_ap_zero; algebra.
 Qed.
 
 Lemma mult_rht_resp_ap : forall x y z : F, x [#] y -> z [#] Zero -> x[*]z [#] y[*]z.
@@ -380,7 +364,7 @@ Qed.
 
 Lemma f_rcpcl_wd : forall (x y : F) x_ y_, x [=] y -> f_rcpcl x x_ [=] f_rcpcl y y_.
 intros x y H.
-unfold f_rcpcl in |- *; Algebra.
+unfold f_rcpcl in |- *; algebra.
 Qed.
 
 Lemma f_rcpcl_mult : forall (y z : F) y_ z_ yz_,
@@ -453,7 +437,7 @@ Defined.
 
 Lemma plus_nonzeros_eq_mult_dom : forall x y : NonZeroMonoid,
  scs_elem _ _ (x[+]y) [=] scs_elem _ _ x[*]scs_elem _ _ y.
-simple destruct x; simple destruct y; Algebra.
+simple destruct x; simple destruct y; algebra.
 Qed.
 
 Lemma cfield_to_mult_cgroup : CGroup.
@@ -481,7 +465,7 @@ In the names of lemmas, we denote [[/]] by [div], and
 Variable F : CField.
 
 Lemma div_prop : forall (x : F) x_, (Zero[/] x[//]x_) [=] Zero.
-unfold cf_div in |- *; Algebra.
+unfold cf_div in |- *; algebra.
 Qed.
 
 Lemma div_1 : forall (x y : F) y_, (x[/] y[//]y_) [*]y [=] x.
@@ -530,7 +514,7 @@ The next lemma says $x\cdot\frac{y}{z} = \frac{x\cdot y}{z}$
 *)
 
 Lemma x_mult_y_div_z : forall (x y z : F) z_, x[*] (y[/] z[//]z_) [=] (x[*]y[/] z[//]z_).
-unfold cf_div in |- *; Algebra.
+unfold cf_div in |- *; algebra.
 Qed.
 
 Hint Resolve x_mult_y_div_z: algebra.
@@ -541,7 +525,7 @@ intros x x' y y' nzy nzy' H H0.
 unfold cf_div in |- *.
 cut (f_rcpcl y nzy [=] f_rcpcl y' nzy').
 intro H1.
-Algebra.
+algebra.
 
 apply f_rcpcl_wd.
 assumption.
@@ -575,7 +559,7 @@ Qed.
 
 Lemma div_resp_ap_zero : forall (x y : F) y_, (x[/] y[//]y_) [#] Zero -> x [#] Zero.
 intros x y nzy Hxy.
-astepl ((x[/] y[//]nzy) [*]y). Algebra.
+astepl ((x[/] y[//]nzy) [*]y). algebra.
 Qed.
 
 (**
@@ -620,11 +604,11 @@ apply f_rcpcl_mult.
 Qed.
 
 Lemma div_dist : forall (x y z : F) z_, (x[+]y[/] z[//]z_) [=] (x[/] z[//]z_) [+] (y[/] z[//]z_).
-unfold cf_div in |- *; Algebra.
+unfold cf_div in |- *; algebra.
 Qed.
 
 Lemma div_dist' : forall (x y z : F) z_, (x[-]y[/] z[//]z_) [=] (x[/] z[//]z_) [-] (y[/] z[//]z_).
-unfold cf_div in |- *; Algebra.
+unfold cf_div in |- *; algebra.
 Qed.
 
 Lemma div_semi_sym : forall (x y z : F) y_ z_, ((x[/] y[//]y_) [/] z[//]z_) [=] ((x[/] z[//]z_) [/] y[//]y_).
@@ -695,7 +679,7 @@ Qed.
 
 Lemma recip_ap_zero : forall (x : F) x_, (One[/] x[//]x_) [#] Zero.
 intros; apply cring_mult_ap_zero with x.
-astepl (One:F). Algebra.
+astepl (One:F). algebra.
 Qed.
 
 Lemma recip_resp_ap : forall (x y : F) x_ y_, x [#] y -> (One[/] x[//]x_) [#] (One[/] y[//]y_).

@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export TaylorSeries.
@@ -116,8 +100,8 @@ Lemma Tan_zero : forall H, Tan Zero H [=] Zero.
 intros; unfold Tan, Tang in |- *.
 simpl in |- *.
 astepr (ZeroR [/]OneNZ); apply div_wd.
-astepr (Sin Zero); simpl in |- *; Algebra.
-astepr (Cos Zero); simpl in |- *; Algebra.
+astepr (Sin Zero); simpl in |- *; algebra.
+astepr (Cos Zero); simpl in |- *; algebra.
 Qed.
 
 Transparent Sine Cosine.
@@ -147,11 +131,11 @@ elim p; intros; simpl in |- *.
 elim even_or_odd_plus; intros; simpl in |- *.
 elim p0; intros; simpl in |- *.
 elimtype False; omega.
-Algebra.
+algebra.
 elim even_or_odd_plus; intros; simpl in |- *.
 elim p0; intros; simpl in |- *.
 cut (x0 = x); [ intro | omega ].
-rewrite H; Algebra.
+rewrite H; algebra.
 elimtype False; omega.
 Qed.
 
@@ -163,7 +147,7 @@ elim p; intros; simpl in |- *.
 elim even_or_odd_plus; intros; simpl in |- *.
 elim p0; intros; simpl in |- *.
 elimtype False; omega.
-Algebra.
+algebra.
 elim even_or_odd_plus; intros; simpl in |- *.
 elim p0; intros; simpl in |- *.
 cut (S x = x0); [ intro | omega ].
@@ -185,7 +169,7 @@ apply series_sum_wd; intros.
 apply mult_wdl.
 apply div_wd.
 apply eq_symmetric_unfolded; apply cos_sin_seq.
-Algebra.
+algebra.
 apply fun_series_convergent_wd_IR with (FPowerSeries' Zero cos_seq).
 intros; FEQ.
 repeat split.
@@ -194,7 +178,7 @@ simpl in |- *.
 apply mult_wdl.
 apply div_wd.
 apply cos_sin_seq.
-Algebra.
+algebra.
 apply cos_conv.
 Qed.
 
@@ -227,7 +211,7 @@ apply div_wd.
 apply eq_symmetric_unfolded.
 astepr ( [--][--] (cos_seq (S n))); apply un_op_wd_unfolded.
 apply sin_cos_seq.
-Algebra.
+algebra.
 simpl in |- *.
 apply
  series_sum_inv
@@ -247,7 +231,7 @@ apply mult_wdl.
 apply div_wd.
 astepr ( [--][--] (cos_seq (S n))); apply un_op_wd_unfolded.
 apply sin_cos_seq.
-Algebra.
+algebra.
 apply FSeries_Sum_inv_conv.
 apply sin_conv.
 Qed.
@@ -357,7 +341,7 @@ apply AbsIR_wd; simpl in |- *; rational.
 apply FAbs_nonneg.
 apply bin_op_wd_unfolded.
 apply AbsIR_inv.
-Algebra.
+algebra.
 
 intros.
 unfold F' in |- *.
@@ -375,7 +359,7 @@ apply eq_transitive_unfolded with (AbsIR (Part _ _ (ProjIR1 (ProjIR2 Hx')))).
 apply FAbs_char.
 apply AbsIR_wd; simpl in |- *; rational.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply AbsIR_inv.
 
 auto.
@@ -485,7 +469,7 @@ apply AbsIR_wd; simpl in |- *; rational.
 apply FAbs_nonneg.
 apply bin_op_wd_unfolded.
 apply AbsIR_inv.
-Algebra.
+algebra.
 
 intros.
 unfold G' in |- *.
@@ -513,7 +497,7 @@ apply eq_transitive_unfolded with (AbsIR (Part _ _ (ProjIR1 (ProjIR2 Hx')))).
 apply FAbs_char.
 apply AbsIR_wd; simpl in |- *; rational.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply AbsIR_minus.
 
 auto.
@@ -538,34 +522,34 @@ intros; simpl in |- *.
 apply eq_transitive_unfolded with (Sin y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Cos y[+]Cos Zero[*]Sin y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 rstepl (Zero[*]Cos y[+]One[*]Sin y).
-Algebra.
+algebra.
 
 intros; simpl in |- *.
 apply eq_transitive_unfolded with (Cos y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Cos Zero[*]Cos y[-]Sin Zero[*]Sin y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 rstepl (One[*]Cos y[-]Zero[*]Sin y).
-Algebra.
+algebra.
 
 intros; simpl in |- *.
 apply un_op_wd_unfolded.
 apply eq_transitive_unfolded with (Sin y).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Cos y[+]Cos Zero[*]Sin y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 rstepl (Zero[*]Cos y[+]One[*]Sin y).
-Algebra.
+algebra.
 
 intros; simpl in |- *.
 apply eq_transitive_unfolded with ( [--] (Cos y)).
 simpl in |- *; rational.
 apply eq_transitive_unfolded with (Sin Zero[*]Sin y[-]Cos Zero[*]Cos y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 rstepl (Zero[*]Sin y[-]One[*]Cos y).
-Algebra.
+algebra.
 
 intros.
 simpl in |- *; auto.

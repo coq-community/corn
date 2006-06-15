@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [^^] %\ensuremath{\hat{\ }}% #^# *)
@@ -37,7 +21,7 @@ Lemma nexp_resp_ap_zero : forall (x : R) n, x [#] Zero -> x[^]n [#] Zero.
 intros.
 elim n.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 simpl in |- *.
 apply mult_resp_ap_zero.
@@ -51,7 +35,7 @@ Lemma nexp_distr_div : forall (x y : R) n y_ yn_, (x[/] y[//]y_) [^]n [=] (x[^]n
 simple induction n.
 intros.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 simpl in |- *.
 generalize (H y_ (nexp_resp_ap_zero y n0 y_)); intro.
@@ -163,7 +147,7 @@ Qed.
 Lemma nexp_resp_leEq_one : forall c : R, Zero [<=] c -> c [<=] One -> forall n, c[^]n [<=] One.
 simple induction n.
 red in |- *; apply eq_imp_leEq.
-Algebra.
+algebra.
 clear n; intros.
 astepl (c[^]n[*]c).
 astepr ((One:R)[*]One).
@@ -213,13 +197,13 @@ Qed.
 
 Lemma nexp_distr_recip : forall (x : R) n x_ xn_, (One[/] x[//]x_) [^]n [=] (One[/] x[^]n[//]xn_).
 intros. induction  n as [| n Hrecn]; intros.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 astepl ((One[/] x[//]x_)[^]n[*] (One[/] x[//]x_)).
 cut (x[^]n [#] Zero). intro H.
 astepl ((One[/] x[^]n[//]H)[*] (One[/] x[//]x_)).
 cut (x[^]n[*]x [#] Zero). intro H2.
 rstepl (One[/] x[^]n[*]x[//]H2).
-apply div_wd; Algebra.
+apply div_wd; algebra.
 apply mult_resp_ap_zero; auto.
 apply nexp_resp_ap_zero. auto.
 Qed.
@@ -250,11 +234,11 @@ apply shift_leEq_minus.
 astepl (c[^]N).
 apply nexp_resp_leEq_one; assumption.
 apply cg_minus_wd.
-Algebra.
+algebra.
 eapply eq_transitive_unfolded.
 apply nexp_plus.
 replace n with (m + (n - m)).
-Algebra.
+algebra.
 auto with arith.
 Qed.
 
@@ -363,7 +347,7 @@ Variable R : COrdField.
 Lemma zexp_zero : forall (x : R) x_, (x[//]x_) [^^] (0) [=] One.
 intros.
 unfold zexp in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_zero: algebra.
@@ -374,12 +358,12 @@ unfold zexp in |- *.
 simpl in |- *.
 elim n.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 simpl in |- *.
 rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_nexp: algebra.
@@ -390,12 +374,12 @@ unfold zexp in |- *.
 simpl in |- *.
 elim n.
 simpl in |- *.
-Algebra.
+algebra.
 intros.
 simpl in |- *.
 rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_inv_nexp: algebra.
@@ -452,13 +436,13 @@ intro.
 replace (Z_of_nat n + 1)%Z with (S n:Z).
 astepl (x[^]S n).
 astepr (x[^]n[*]x).
-Algebra.
+algebra.
 rewrite Znat.inj_S.
 reflexivity.
 intros.
 induction  n as [| n Hrecn].
 simpl in |- *.
-Algebra.
+algebra.
 replace (- Z_of_nat (S n) + 1)%Z with (- n)%Z.
 astepl ((One[/] x[//]Hx) [^]n).
 astepr ((One[/] x[//]Hx) [^]S n[*]x).
@@ -489,7 +473,7 @@ intro.
 astepl ((One[/] x[//]x_) [^]n).
 apply nexp_resp_ap_zero.
 apply div_resp_ap_zero_rev.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_resp_ap_zero: algebra.
@@ -504,8 +488,8 @@ intros.
 apply eq_transitive_unfolded with (One[/] x[^]n[//]nexp_resp_ap_zero n Hx).
 apply zexp_inv_nexp'.
 apply div_wd.
-Algebra.
-Algebra.
+algebra.
+algebra.
 
 intros.
 rewrite Zopp_involutive.
@@ -517,7 +501,7 @@ astepl ((x[*] (One[/] x[//]Hx)) [^]n).
 astepr (One:R).
 astepr ((One:R) [^]n).
 apply nexp_wd.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_inv: algebra.
@@ -546,21 +530,21 @@ pattern n in |- *.
 apply pred_succ_Z_ind.
 simpl in |- *.
 replace (m + 0)%Z with m.
-Algebra.
+algebra.
 auto with zarith.
 intros.
 replace (m + (n0 + 1))%Z with (m + n0 + 1)%Z.
 astepl ((x[//]Hx) [^^] (m + n0) [*]x).
 astepr ((x[//]Hx) [^^] (m) [*] ((x[//]Hx) [^^] (n0) [*]x)).
 astepr ((x[//]Hx) [^^] (m) [*] (x[//]Hx) [^^] (n0) [*]x).
-Algebra.
+algebra.
 auto with zarith.
 intros.
 replace (m + (n0 - 1))%Z with (m + n0 - 1)%Z.
 astepl ((x[//]Hx) [^^] (m + n0) [/] x[//]Hx).
 astepr ((x[//]Hx) [^^] (m) [*] ((x[//]Hx) [^^] (n0) [/] x[//]Hx)).
 astepr ((x[//]Hx) [^^] (m) [*] (x[//]Hx) [^^] (n0) [/] x[//]Hx).
-Algebra.
+algebra.
 unfold Zminus in |- *.
 auto with zarith.
 Qed.
@@ -574,7 +558,7 @@ replace (m - n)%Z with (m + - n)%Z.
 astepl ((x[//]Hx) [^^] (m) [*] (x[//]Hx) [^^] (- n)).
 astepl ((x[//]Hx) [^^] (m) [*] (One[/] (x[//]Hx) [^^] (n) [//]Hexp)).
 astepl ((x[//]Hx) [^^] (m) [*]One[/] (x[//]Hx) [^^] (n) [//]Hexp).
-Algebra.
+algebra.
 reflexivity.
 Qed.
 
@@ -596,7 +580,7 @@ astepr ((One:R) [/]OneNZ).
 apply eq_div.
 astepr ((One:R) [*]One[^]n).
 astepr ((One:R) [*]One).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve one_zexp: algebra.
@@ -623,7 +607,7 @@ rstepr
  (One[/] x[^]n[*]y[^]n[//]
   mult_resp_ap_zero _ _ _ (nexp_resp_ap_zero n Hx) (nexp_resp_ap_zero n Hy)).
 apply eq_div.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve mult_zexp: algebra.
@@ -634,20 +618,20 @@ intros x m n Hx He.
 pattern n in |- *.
 apply pred_succ_Z_ind.
 rewrite <- Zmult_0_r_reverse.
-Algebra.
+algebra.
 intros.
 rewrite Zmult_plus_distr_r.
 astepr (((x[//]Hx) [^^] (m) [//]He) [^^] (n0) [*] (x[//]Hx) [^^] (m)).
 rewrite Zmult_1_r.
 astepl ((x[//]Hx) [^^] (m * n0) [*] (x[//]Hx) [^^] (m)).
-Algebra.
+algebra.
 
 intros.
 rewrite Basics.Zmult_minus_distr_r.
 astepr (((x[//]Hx) [^^] (m) [//]He) [^^] (n0) [/] (x[//]Hx) [^^] (m) [//]He).
 rewrite Zmult_1_r.
 astepl ((x[//]Hx) [^^] (m * n0) [/] (x[//]Hx) [^^] (m) [//]He).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_mult: algebra.
@@ -655,7 +639,7 @@ Hint Resolve zexp_mult: algebra.
 Lemma zexp_two : forall (x : R) x_, (x[//]x_) [^^] (2) [=] x[*]x.
 intros.
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_two: algebra.
@@ -672,7 +656,7 @@ astepl
  ([--]x[*][--]x[//]mult_resp_ap_zero _ _ _ Hneg Hneg) [^^] (Zeven.Zdiv2 m).
 astepl (x[*]x[//]mult_resp_ap_zero _ _ _ Hx Hx) [^^] (Zeven.Zdiv2 m).
 astepl ((x[//]Hx) [^^] (2) [//]zexp_resp_ap_zero x 2 Hx) [^^] (Zeven.Zdiv2 m).
-Algebra.
+algebra.
 assumption.
 Qed.
 
@@ -700,7 +684,7 @@ apply Zodd_Zeven_min1.
 assumption.
 simpl in |- *.
 auto.
-Algebra.
+algebra.
 change ((m + -1 + 1)%Z = m) in |- *.
 rewrite <- Zplus_assoc.
 simpl in |- *.
@@ -711,7 +695,7 @@ Qed.
 Lemma zexp_one : forall (x : R) x_, (x[//]x_) [^^] (1) [=] x.
 intros.
 simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve zexp_one: algebra.

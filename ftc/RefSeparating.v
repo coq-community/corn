@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (* begin hide *)
@@ -882,7 +866,7 @@ assumption.
 apply lt_le_trans with (sep__part_fun (S i) Hi'').
 assumption.
 apply sep__part_fun_bnd.
-apply mult_wd; Algebra.
+apply mult_wd; algebra.
 apply cg_minus_wd; apply prf1; auto.
 elimtype False.
 apply le_not_lt with (sep__part_fun i Hi') j.
@@ -905,7 +889,7 @@ apply Sumx_wd; intros.
 unfold part_tot_nat_fun in |- *.
 elim (le_lt_dec n i); intro; simpl in |- *.
 elimtype False; apply le_not_lt with n i; auto.
-apply mult_wd; Algebra.
+apply mult_wd; algebra.
 apply cg_minus_wd; apply prf1; auto.
 Qed.
 
@@ -972,10 +956,10 @@ apply
         F (sep__part_pts i Hi) just2[*]
         (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 2: apply Sum2_comm_scal'.
-Algebra.
+algebra.
 rewrite <-
  (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
@@ -991,7 +975,7 @@ rewrite <-
  (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
 apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
-Algebra.
+algebra.
 Qed.
 
 Lemma sep__part_Sum4 :
@@ -1081,7 +1065,7 @@ assumption.
 eapply lt_le_trans.
 apply H0.
 apply sep__part_fun_bnd.
-Algebra.
+algebra.
 elimtype False; apply (le_not_lt _ _ H0).
 rewrite (S_pred (sep__part_fun (S i) Hi'') (sep__part_fun i Hi')).
 cut (sep__part_fun (S i) Hi'' = sep__part_fun (S i) Hi);
@@ -1145,16 +1129,16 @@ apply
        ((F (g k (RS'_Hsep_S _ _ H Hk')) just1[-]F (g _ (sep__part_aux RS'_m1)) just1)[*]
         (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk')))).
 2: apply AbsIR_wd; apply mult_wdl.
-2: apply cg_minus_wd; [ Algebra | idtac ].
+2: apply cg_minus_wd; [ algebra | idtac ].
 2: cut (i = RS'_m1); [ intro | auto ].
 2: generalize H; rewrite H3; intro.
-2: unfold sep__part_pts in |- *; simpl in |- *; Algebra.
+2: unfold sep__part_pts in |- *; simpl in |- *; algebra.
 elim (le_lt_dec (pred (sep__part_h (S RS'_m1))) k); intro.
 cut (pred (sep__part_h (S RS'_m1)) = k); intros.
 apply leEq_wdl with ZeroR.
 astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
-apply eq_imp_leEq; Algebra.
+apply eq_imp_leEq; algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
 apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.
@@ -1164,7 +1148,7 @@ apply AbsIR_wd.
 rstepr
  ((F (g _ (sep__part_aux RS'_m1)) just1[-]F (g _ (sep__part_aux RS'_m1)) just1)[*]
   (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk'))).
-Algebra.
+algebra.
 cut (forall H, sep__part_fun (S i) H = n).
 intro.
 cut (sep__part_h (S RS'_m1) = n); intros.
@@ -1196,7 +1180,7 @@ apply
         (P (S k) (RS'_Hsep_S _ _ H Hk')[-]P k (RS'_Hsep _ _ H Hk')))).
 2: apply AbsIR_wd; apply mult_wd.
 2: apply cg_minus_wd; apply pfwdef;
-    [ Algebra | unfold sep__part_pts in |- *; apply gP' ]; 
+    [ algebra | unfold sep__part_pts in |- *; apply gP' ]; 
     auto.
 2: apply cg_minus_wd; apply prf1; auto.
 elim (le_lt_dec (pred (sep__part_h RS'_m1)) k); intro.
@@ -1233,7 +1217,7 @@ clear Hk Hk'; omega.
 apply leEq_wdl with ZeroR.
 astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
-apply eq_imp_leEq; Algebra.
+apply eq_imp_leEq; algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
 apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.
@@ -1282,7 +1266,7 @@ apply sep__part_fun_bnd.
 apply leEq_wdl with ZeroR.
 astepl ((Zero[+]Zero)[*]ZeroR).
 apply mult_resp_leEq_both.
-apply eq_imp_leEq; Algebra.
+apply eq_imp_leEq; algebra.
 apply leEq_reflexive.
 apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
 apply less_leEq; astepr (delta [/]TwoNZ); apply pos_div_two; exact RS'_delta_pos.

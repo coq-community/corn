@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export RefLemma.
@@ -34,7 +18,7 @@ intro; induction  n as [| n Hrecn].
 do 2 intro.
 rewrite H.
 intros; simpl in |- *; apply eq_symmetric_unfolded.
-astepr (g 0 (lt_n_Sn 0)); Algebra.
+astepr (g 0 (lt_n_Sn 0)); algebra.
 do 2 intro; rewrite H; intros.
 astepl
  (Sumx (fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) [+]f n (lt_n_Sn n)).
@@ -70,7 +54,7 @@ apply
   with
     (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (lt_S _ _ Hi)) [+]
      f2 m (lt_n_Sn m)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 astepr
  (Sumx (fun (i : nat) (Hi : i < l') => f3 i (lt_S _ _ Hi)) [+]
   f3 l' (lt_n_Sn l')).
@@ -244,7 +228,7 @@ apply
        (Lim (Cauchy_const (Partition_Sum HfP (contin_imp_inc _ _ _ _ contF))) [-]
         integral)).
 2: apply AbsIR_wd; apply cg_minus_wd;
-   [ apply eq_symmetric_unfolded; apply Lim_const | Algebra ].
+   [ apply eq_symmetric_unfolded; apply Lim_const | algebra ].
 unfold integral in |- *.
 apply
  leEq_wdl
@@ -291,7 +275,7 @@ assumption.
 apply nring_less; auto with arith.
 assumption.
 red in |- *; do 3 intro.
-rewrite H0; intros; simpl in |- *; Algebra.
+rewrite H0; intros; simpl in |- *; algebra.
 unfold ee in |- *; apply div_resp_pos.
 apply pos_max_one.
 assumption.
@@ -306,8 +290,8 @@ apply less_leEq; assumption.
 apply AbsIR_wd; apply cg_minus_wd.
 unfold Partition_Sum in |- *.
 apply Sumx_wd; intros.
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 End Integral_Thm.
@@ -373,8 +357,8 @@ elim (bin_op_strext_unfolded _ _ _ _ _ _ H'); clear H'; intro.
 eapply ap_wdl_unfolded.
 eapply ap_wdr_unfolded.
 apply a0.
-Algebra.
-Algebra.
+algebra.
+algebra.
 elimtype False; generalize b0; exact (ap_irreflexive_unfolded _ _).
 eapply ap_wdl_unfolded.
 eapply ap_wdr_unfolded.
@@ -384,9 +368,9 @@ unfold g', Partition_imp_points in |- *; apply Sumx_wd; intros; simpl in |- *;
 unfold f', Partition_imp_points in |- *; apply Sumx_wd; intros; simpl in |- *;
  rational.
 do 3 intro.
-rewrite H0; unfold g' in |- *; intros; Algebra.
+rewrite H0; unfold g' in |- *; intros; algebra.
 do 3 intro.
-rewrite H; unfold f' in |- *; intros; Algebra.
+rewrite H; unfold f' in |- *; intros; algebra.
 Qed.
 
 Lemma integral_strext' : forall c d Hcd HF1 HF2,
@@ -464,12 +448,12 @@ red in |- *.
 do 3 intro.
 rewrite H0; clear H0; intros.
 unfold f2 in |- *.
-Algebra.
+algebra.
 red in |- *.
 do 3 intro.
 rewrite H; clear H; intros.
 unfold f1 in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma integral_wd : Feq (Compact Hab) F G -> Integral F contF [=] Integral G contG.
@@ -494,13 +478,13 @@ apply Lim_wd'.
 intro; simpl in |- *.
 unfold integral_seq, Even_Partition_Sum, Partition_Sum in |- *.
 apply Sumx_wd; intros; apply mult_wd.
-apply pfwdef; simpl in |- *; Algebra.
+apply pfwdef; simpl in |- *; algebra.
 simpl in |- *.
 repeat first
  [ apply cg_minus_wd
  | apply bin_op_wd_unfolded
  | apply mult_wd
- | apply div_wd ]; Algebra.
+ | apply div_wd ]; algebra.
 Qed.
 
 End Well_Definedness.
@@ -581,13 +565,13 @@ apply dist_2a.
 apply x_minus_x.
 apply mult_wdr.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 astepl (nring (S i) [*] (b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
 astepr (nring i[*] (b[-]b[/] _[//]nring_ap_zero' _ _ (O_S n))).
 rational.
 eapply eq_transitive_unfolded.
 apply sumx_const.
-Algebra.
+algebra.
 Qed.
 
 End Linearity_and_Monotonicity.
@@ -915,7 +899,7 @@ Lemma pjp_1 : forall (i : nat) Hi Hi', partition_join_pts i Hi [=] fP i Hi'.
 intros; unfold partition_join_pts in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 elim le_lt_eq_dec; intro; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
 elimtype False; apply le_not_lt with i n; auto with arith.
 Qed.
@@ -925,7 +909,7 @@ intros; unfold partition_join_pts in |- *.
 elim le_lt_dec; intro; simpl in |- *.
 elim le_lt_eq_dec; intro; simpl in |- *.
 elimtype False; rewrite H in a1; apply (lt_irrefl _ a1).
-Algebra.
+algebra.
 elimtype False; rewrite H in b0; apply (lt_irrefl _ b0).
 Qed.
 
@@ -936,7 +920,7 @@ elim le_lt_dec; intro; simpl in |- *.
 elimtype False; apply le_not_lt with i n; auto.
 cut (fQ _ (partition_join_aux' _ _ _ b0 Hi) [=] fQ _ Hi').
 2: apply HfQ'; auto.
-Algebra.
+algebra.
 Qed.
 (* end hide *)
 
@@ -1001,7 +985,7 @@ eapply eq_transitive_unfolded.
 apply pjp_2; auto.
 eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply pjp_2; auto.
-Algebra.
+algebra.
 cut (n < j); [ intro | rewrite <- H; assumption ].
 cut (i - S n < m); [ intro | omega ].
 cut (j - S n < m); [ intro | omega ].
@@ -1018,12 +1002,12 @@ Lemma partition_join_Sum_lemma :
 unfold Partition_Sum in |- *; apply Sumx_weird_lemma.
 auto with arith.
 Opaque partition_join.
-red in |- *; intros; apply mult_wd; Algebra; apply cg_minus_wd; apply prf1;
+red in |- *; intros; apply mult_wd; algebra; apply cg_minus_wd; apply prf1;
  auto.
-red in |- *; intros; apply mult_wd; Algebra; apply cg_minus_wd; apply prf1;
+red in |- *; intros; apply mult_wd; algebra; apply cg_minus_wd; apply prf1;
  auto.
 red in |- *; intros; apply mult_wd; try apply cg_minus_wd; try apply pfwdef;
- Algebra.
+ algebra.
 apply partition_join_Pts_wd; auto.
 apply prf1; auto.
 apply prf1; auto.
@@ -1062,7 +1046,7 @@ apply prf1; transitivity (n + i - n); auto with arith.
 intro; apply x_mult_zero.
 astepr (partition_join _ Hi[-]partition_join _ Hi).
 apply cg_minus_wd.
-Algebra.
+algebra.
 unfold partition_join in |- *; simpl in |- *.
 apply eq_transitive_unfolded with c; unfold partition_join_fun in |- *;
  elim le_lt_dec; simpl in |- *.
@@ -1211,16 +1195,16 @@ rewrite H2; clear H2; intros.
 apply partition_join_Pts_wd; auto.
 apply AbsIR_wd.
 apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 apply eq_symmetric_unfolded.
 unfold Partition_Sum in |- *; apply Sumx_weird_lemma.
 auto.
 red in |- *; do 3 intro.
-rewrite H2; clear H2; intros; Algebra.
+rewrite H2; clear H2; intros; algebra.
 red in |- *; do 3 intro.
-rewrite H2; clear H2; intros; Algebra.
+rewrite H2; clear H2; intros; algebra.
 red in |- *; do 3 intro.
-rewrite H2; clear H2; intros; Algebra.
+rewrite H2; clear H2; intros; algebra.
 Opaque Even_Partition.
 intros; apply mult_wd.
 apply pfwdef; unfold partition_join_pts in |- *.
@@ -1259,7 +1243,7 @@ unfold cg_minus in |- *.
 eapply eq_transitive_unfolded.
 apply Lim_plus.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; apply Lim_const.
 unfold e in |- *.
 rstepl (e'[*] (b[-]a) [/] _[//]max_one_ap_zero (b[-]a)).
@@ -1325,7 +1309,7 @@ apply
      with (integral _ _ _ _ H4[+]integral _ _ _ _ cont3).
 2: apply bin_op_wd_unfolded.
 2: apply integral_plus_integral.
-2: Algebra.
+2: algebra.
 2: apply integral_plus_integral.
 rstepr (N[*] (mid1[-]a) [+]N[*] (mid2[-]mid1) [+]N[*] (b[-]mid2)).
 eapply leEq_less_trans.
@@ -1464,7 +1448,7 @@ apply
      with (integral _ _ _ _ H5[+]integral _ _ _ _ cont3).
 2: apply bin_op_wd_unfolded.
 2: apply integral_plus_integral.
-2: Algebra.
+2: algebra.
 2: apply integral_plus_integral.
 rstepl (Zero[*] (mid1[-]a) [+]Zero[*] (mid2[-]mid1) [+]Zero[*] (b[-]mid2)).
 apply plus_resp_less_leEq.

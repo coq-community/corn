@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (* begin hide *)
@@ -202,7 +186,7 @@ apply RS_delta_deltaR.
 unfold deltaR in |- *; apply AntiMesh_lemma.
 apply shift_leEq_minus; eapply leEq_wdl.
 apply H3.
-Algebra.
+algebra.
 apply shift_leEq_minus; astepl (R j' Hj').
 eapply leEq_transitive.
 apply H3.
@@ -328,7 +312,7 @@ eapply less_wdl.
 apply H with (Hi' := Hi).
 apply AbsIR_wd.
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply prf1; auto.
 apply less_imp_ap; apply separation_conseq with j' Hj'.
 apply H.
@@ -364,8 +348,8 @@ rstepr (P i Hi'[+]delta [/]TwoNZ[-]P i Hi').
 apply cg_minus_wd.
 apply bin_op_wd_unfolded.
 apply prf1; auto.
-Algebra.
-Algebra.
+algebra.
+algebra.
 astepr (delta [/]TwoNZ); apply less_leEq; apply pos_div_two; exact RS_delta_pos.
 apply leEq_wdl with ZeroR.
 astepr (delta [/]TwoNZ); apply less_leEq; apply pos_div_two; exact RS_delta_pos.
@@ -390,7 +374,7 @@ eapply eq_transitive_unfolded.
 apply eq_symmetric_unfolded; apply AbsIRz_isz.
 apply AbsIR_wd.
 astepl (a[-]a).
-apply cg_minus_wd; [ Algebra | apply eq_symmetric_unfolded; apply start ].
+apply cg_minus_wd; [ algebra | apply eq_symmetric_unfolded; apply start ].
 elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
 apply sep__sep_fun_i_delta; assumption.
 generalize Hi'; rewrite b1; intros.
@@ -400,7 +384,7 @@ eapply eq_transitive_unfolded.
 apply eq_symmetric_unfolded; apply AbsIRz_isz.
 apply AbsIR_wd.
 astepl (b[-]b).
-apply cg_minus_wd; [ Algebra | apply eq_symmetric_unfolded; apply finish ].
+apply cg_minus_wd; [ algebra | apply eq_symmetric_unfolded; apply finish ].
 Qed.
 
 Lemma sep__sep_mon_i :
@@ -449,7 +433,7 @@ rewrite <- H.
 intros.
 unfold sep__sep_fun_i in |- *.
 elim (sep__sep_aux_lemma i); intros; simpl in |- *.
-apply bin_op_wd_unfolded; [ apply prf1; auto | Algebra ].
+apply bin_op_wd_unfolded; [ apply prf1; auto | algebra ].
 apply prf1; auto.
 Qed.
 
@@ -460,7 +444,7 @@ Lemma sep__sep_fun_wd :
 intros.
 unfold sep__sep_fun in |- *.
 elim (le_lt_dec i 0); elim (le_lt_dec j 0); intros; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; apply (lt_irrefl 0); apply lt_le_trans with j; auto;
  rewrite <- H; auto.
 elimtype False; apply (lt_irrefl 0); apply lt_le_trans with j; auto;
@@ -469,7 +453,7 @@ elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
 apply sep__sep_fun_i_wd; auto.
 elimtype False; rewrite H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
 elimtype False; rewrite <- H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
-Algebra.
+algebra.
 Qed.
 
 Definition sep__sep_part : Partition Hab n.
@@ -478,7 +462,7 @@ exact sep__sep_fun_wd.
 intros; apply less_leEq; apply sep__sep_mon.
 intros; unfold sep__sep_fun in |- *.
 elim (le_lt_dec 0 0); intro; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; inversion b0.
 intros; unfold sep__sep_fun in |- *.
 elim (le_lt_dec n 0); intro; simpl in |- *.
@@ -487,7 +471,7 @@ cut (n = 0); [ intro | auto with arith ].
 rewrite <- H0; apply P.
 elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
 elimtype False; apply (lt_irrefl _ a0).
-Algebra.
+algebra.
 Defined.
 
 Lemma sep__sep_lemma : Separated sep__sep_part R.
@@ -584,7 +568,7 @@ apply shift_leEq_plus; astepl ZeroR; apply less_leEq; exact RS_Hd.
 apply shift_leEq_minus.
 eapply leEq_wdl.
 apply rht_leEq_Max.
-Algebra.
+algebra.
 Qed.
 
 Notation just1 := (incF _ (Pts_part_lemma _ _ _ _ _ _ gP _ _)).
@@ -655,7 +639,7 @@ apply
      AbsIR (P _ H[-]P _ (lt_le_weak _ _ H))).
 eapply eq_transitive_unfolded.
 2: apply AbsIR_resp_mult.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 apply mult_wdr.
 apply AbsIR_eq_x.
 apply shift_leEq_minus; astepl (P i (lt_le_weak _ _ H)); apply prf2.
@@ -691,7 +675,7 @@ apply mult_wdr.
 eapply eq_transitive_unfolded.
 apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= n) => P i Hi).
 red in |- *; intros; apply prf1; auto.
-intros; Algebra.
+intros; algebra.
 apply cg_minus_wd.
 apply finish.
 apply start.
@@ -747,14 +731,14 @@ fold (Mesh P) in |- *; apply Mesh_lemma.
 apply leEq_transitive with delta.
 apply less_leEq; apply pos_div_two'; exact RS_delta_pos.
 apply RS_delta_csi.
-apply cg_minus_wd; [ Algebra | apply start ].
+apply cg_minus_wd; [ algebra | apply start ].
 generalize Hi'; rewrite H0; clear Hx Hi'; intro.
 apply leEq_wdl with (P 1 Hi'[-]P 0 (le_O_n _)).
 fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
 astepr (Mesh P); apply Mesh_lemma.
 apply plus_resp_leEq_lft.
 apply less_leEq; assumption.
-apply cg_minus_wd; [ Algebra | apply start ].
+apply cg_minus_wd; [ algebra | apply start ].
 elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
 unfold sep__sep_fun_i in |- *.
 elim (sep__sep_aux_lemma (S i)); elim (sep__sep_aux_lemma i); intros;
@@ -812,7 +796,7 @@ apply less_leEq; exact RS_delta_pos.
 apply RS_delta_csi.
 apply cg_minus_wd.
 generalize Hi'; rewrite b1; intro; apply finish.
-Algebra.
+algebra.
 apply leEq_wdl with (P (S i) Hi'[-]P i Hi).
 fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
 astepr (Mesh P); apply Mesh_lemma.
@@ -820,7 +804,7 @@ apply plus_resp_leEq_lft.
 apply less_leEq; assumption.
 apply cg_minus_wd.
 generalize Hi'; rewrite b1; intro; apply finish.
-Algebra.
+algebra.
 elimtype False; rewrite b3 in b1; apply n_Sn with n; auto.
 Qed.
 

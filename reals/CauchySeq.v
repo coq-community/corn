@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing IR %\ensuremath{\mathbb R}% *)
@@ -694,36 +678,73 @@ Qed.
 
 (** Well definedness. *)
 
-Lemma Cauchy_prop_wd : forall seq1 seq2 : nat -> IR,
- Cauchy_prop seq1 -> (forall n, seq1 n [=] seq2 n) -> Cauchy_prop seq2.
+Lemma Cauchy_prop_wd' : forall seq1 seq2 : nat -> IR,
+ Cauchy_prop seq1 -> {N : nat | forall n, N <= n ->  seq1 n [=] seq2 n} -> Cauchy_prop seq2.
 intros seq1 seq2 H H0.
 red in |- *.  intros e H1.
-elim (H e H1).
-intros N Hn; exists N; intros.
-astepr (seq1 m[-]seq1 N).
-apply Hn; assumption.
+elim (H (e[/]TwoNZ) (pos_div_two IR e H1)).
+intros N Hn.
+destruct H0 as [M H0].
+exists (max M N). intros.
+astepr (seq1 m[-]seq1 (max M N)).
+astepr ((seq1 m[-]seq1 N)[+](seq1 N [-]seq1 (max M N))).
+apply AbsSmall_eps_div_two.
+apply Hn. eauto with arith.
+apply AbsSmall_minus. apply Hn. eauto with arith.
+rational.
+apply cg_minus_wd; apply H0; eauto with arith.
+Qed.
+
+Lemma Cauchy_prop_wd : forall seq1 seq2 : nat -> IR,
+ Cauchy_prop seq1 -> (forall n, seq1 n [=] seq2 n) -> Cauchy_prop seq2.
+intros.
+apply Cauchy_prop_wd' with seq1; auto.
+exists 0.
+auto.
+Qed.
+
+Lemma Cauchy_Lim_prop2_wd' : forall seq1 seq2 c, Cauchy_Lim_prop2 seq1 c ->
+ { N : nat | forall n, N <= n -> seq1 n [=] seq2 n} -> Cauchy_Lim_prop2 seq2 c.
+intros seq1 seq2 c H1 H2.
+red in |- *. intros eps H3.
+elim (H1 eps H3).
+intros M H4.
+destruct H2 as [N H2].
+exists (max N M) .
+intros.
+assert (N <= m); eauto with arith.
+assert (M <= m); eauto with arith.
+astepr (seq1 m[-]c).
+apply H4; auto.
 Qed.
 
 Lemma Cauchy_Lim_prop2_wd : forall seq1 seq2 c, Cauchy_Lim_prop2 seq1 c ->
- (forall n, seq1 n [=] seq2 n) -> Cauchy_Lim_prop2 seq2 c.
-intros seq1 seq2 c H H0.
-red in |- *. intros eps H1.
-elim (H eps H1).
-intros N Hn; exists N; intros.
-astepr (seq1 m[-]c).
-apply Hn; assumption.
+ (forall n, seq1 n [=] seq2 n) -> Cauchy_Lim_prop2 seq2 c. 
+intros.
+apply Cauchy_Lim_prop2_wd' with seq1; auto.
+exists 0.
+auto.
 Qed.
 
-Lemma Lim_wd' : forall seq1 seq2 : CauchySeqR,
- (forall n, seq1 n [=] seq2 n) -> Lim seq1 [=] Lim seq2.
-intros.
+Lemma Lim_wd'' : forall seq1 seq2 : CauchySeqR,
+ {N : nat |  forall n : nat, N <= n  -> seq1 n [=] seq2 n} -> Lim seq1 [=] Lim seq2.
+intros seq1 seq2 H. destruct H as [N H]. 
 cut (Cauchy_Lim_prop2 seq1 (Lim seq2)).
 intro.
 apply eq_symmetric_unfolded.
 apply Limits_unique; assumption.
-apply Cauchy_Lim_prop2_wd with (seq2:nat -> IR).
+apply Cauchy_Lim_prop2_wd' with (seq2:nat -> IR).
 apply Cauchy_complete.
-intro; apply eq_symmetric_unfolded; Algebra.
+exists N.
+intros; apply eq_symmetric_unfolded. auto.
+Qed.
+
+Lemma Lim_wd' : forall seq1 seq2 : CauchySeqR,
+ (forall n : nat, seq1 n [=] seq2 n) -> Lim seq1 [=] Lim seq2.
+intros.
+apply Lim_wd''; auto.
+exists 0.
+auto.
 Qed.
 
 Lemma Lim_unique : forall seq x y,

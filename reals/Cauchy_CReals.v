@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Cauchy_COF.
@@ -202,7 +186,7 @@ Qed.
 Lemma ing_nring' : forall m n : nat,
  CS_seq _ (nring (R:=R_COrdField') n) m [=] CS_seq _ (inject_Q (nring n)) m.
 intros.
-induction  n as [| n Hrecn]; simpl in |- *; Algebra.
+induction  n as [| n Hrecn]; simpl in |- *; algebra.
 Qed.
 
 Lemma ing_nring : forall n : nat, nring n [=] inject_Q (nring n).
@@ -262,7 +246,7 @@ Proof.
  apply eq_symmetric_unfolded.
  apply ing_mult.
  astepr (inject_Q x).
- apply ing_eq; Algebra.
+ apply ing_eq; algebra.
 Qed.
 
 Transparent R_COrdField.

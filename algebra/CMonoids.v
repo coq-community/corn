@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing Zero %\ensuremath{\mathbf0}% #0# *)
@@ -300,7 +284,7 @@ apply cm_lft_unit_unfolded.
 simpl.
 astepl (csbf_fun M M M (csg_op (c:=M)) a ((csbf_fun M M M (csg_op (c:=M)) (power_CMonoid a m)
           (power_CMonoid a n)))).
-Algebra.
+algebra.
 Qed.
 
 
@@ -319,7 +303,7 @@ Section gen_cyc.
 Lemma power_k:forall (M:CMonoid)(u:M)(k l s:nat),(is_generator M u)->
   ((k<l and 
   (power_CMonoid u  k [=] power_CMonoid u l)
-  and ((forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+  and ((forall (k0 l0:nat), (k0<>l0 and (k0<k or (k0=k and l0<l)))-> 
   (power_CMonoid u k0 [#] power_CMonoid u l0)))):CProp)->
   (power_CMonoid u  k)[=](power_CMonoid u (k+(s*(l-k)))).
 intros M u k l s H.
@@ -365,7 +349,7 @@ Lemma power_k_n:forall (M:CMonoid)(u:M)(k l n :nat)
   (H2:((Z_of_nat (l-k)>0)%Z)),(is_generator M u)->(k<n)->
   ((k<l and 
   (power_CMonoid u k [=] power_CMonoid u l)
-  and ((forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+  and ((forall (k0 l0:nat), (k0<> l0 and (k0<k or (k0=k and l0<l)))-> 
   (power_CMonoid u k0 [#] power_CMonoid u l0)))):CProp)->
   (power_CMonoid u n)[=](power_CMonoid u (k+(mod_nat (n-k) (l-k) H2))).
 intros M u  k l n H2 H H15.
@@ -517,7 +501,7 @@ Qed.
 Lemma weakly_inj1:
   forall (M:CMonoid)(u:M)(k l a b:nat),(is_generator M u)->(a<l)->(b<l)->
   (k<l and (power_CMonoid u  k [=] power_CMonoid u l)
-  and (forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+  and (forall (k0 l0:nat),k0<>l0 and (k0<k or (k0=k and l0<l))-> 
   (power_CMonoid u  k0 [#] power_CMonoid u l0)))->
   (power_CMonoid u a)[=](power_CMonoid u b) ->
 a=b.
@@ -536,7 +520,11 @@ intuition.
 
 set (H6:= (eq_imp_not_ap M (power_CMonoid u a)(power_CMonoid u b) H4)).
 unfold Not in H6.
-apply H6.
+cut (k<>a+(l-b) or k=a+(l-b)).
+intro orex.
+elim orex.
+clear orex.
+intro orex.
 cut ((power_CMonoid u a[#]power_CMonoid u b) or 
    (power_CMonoid u (l-b)[#]power_CMonoid u (l-b))).
 intro H7.
@@ -560,7 +548,15 @@ replace (b+(l-b)) with l.
 csetoid_rewrite_rev H7.
 apply ap_symmetric_unfolded.
 apply H8.
+split.
+intuition.
 right.
+intuition.
+
+intuition.
+
+clear orex.
+intro orex.
 intuition.
 
 intuition.
@@ -570,9 +566,16 @@ intro H5.
 cut False.
 intuition.
 
+cut (power_CMonoid (M:=M) u b[=]power_CMonoid (M:=M) u a).
+intro H4'.
 set (H6:= (eq_imp_not_ap M (power_CMonoid u a)(power_CMonoid u b) H4)).
+set (H6':= (eq_imp_not_ap M (power_CMonoid u b)(power_CMonoid u a) H4')).
 unfold Not in H6.
-apply H6.
+cut (k<>b+(l-a) or k=b+(l-a)).
+intro orex.
+elim orex.
+clear orex.
+intro orex.
 cut ((power_CMonoid u a[#]power_CMonoid u b) or 
    (power_CMonoid u (l-a)[#]power_CMonoid u (l-a))).
 intro H7.
@@ -595,10 +598,21 @@ intros H7 H8.
 replace (a+(l-a)) with l.
 csetoid_rewrite_rev H7.
 apply H8.
+split.
+intuition.
 right.
 intuition.
 
 intuition.
+
+clear orex.
+intro orex.
+intuition.
+
+intuition.
+
+intuition.
+
 Qed.
 
 (**

@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export KneserLemma.
@@ -79,7 +63,7 @@ intro HH.
 apply
  (Build_Knes_tupp (Build_Knes_tup z c pzltc)
     (Build_Knes_tup (z'[+]z) (qK[*]c) HH)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 simpl in |- *; apply leEq_wdl with (AbsCC z'[^]n).
 assumption.
 apply (nexp_wd IR (AbsCC z') (AbsCC (z'[+]z[-]z)) n).
@@ -97,7 +81,7 @@ apply eq_symmetric_unfolded.
 apply AbsCC_wd.
 apply eq_transitive_unfolded with p ! (Zero[+]z).
 assumption.
-Algebra.
+algebra.
 Defined.
 
 Fixpoint Knes_fun_it (i : nat) : Knes_tup :=
@@ -315,8 +299,8 @@ astepr ((nrtq[^]n) [^]i[*]nrtc[^]n).
 unfold nrtq in |- *. unfold nrtc in |- *.
 apply bin_op_wd_unfolded.
 apply un_op_wd_unfolded.
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 Lemma abs_pow_ltRe : forall s, (forall i, AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*]c) ->
@@ -340,7 +324,7 @@ auto with arith.
 apply NRoot_nonneg.
 apply leEq_wdr with (q[^]i[*]c).
 exact (H i).
-Algebra.
+algebra.
 apply mult_resp_nonneg.
 apply nexp_resp_nonneg.
 assumption.
@@ -370,7 +354,7 @@ auto with arith.
 apply NRoot_nonneg.
 apply leEq_wdr with (q[^]i[*]c).
 exact (H i).
-Algebra.
+algebra.
 apply mult_resp_nonneg.
 apply nexp_resp_nonneg.
 assumption.

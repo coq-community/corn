@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [-S-] %\ensuremath{\int}% #&int;# *)
@@ -208,7 +192,7 @@ apply leEq_Norm_Funct.
 intros z Hz Hz1.
 simpl in |- *.
 apply leEq_wdl with (AbsIR (F z (X1 z (X z (Hinc z Hz))) [-]F x Hx')).
-2: apply AbsIR_wd; Algebra.
+2: apply AbsIR_wd; algebra.
 apply H4; auto.
 eapply leEq_transitive.
 2: apply H.
@@ -284,7 +268,7 @@ apply included_imp_Continuous with J.
 auto.
 apply included3_interval; auto.
 intros; apply eq_symmetric_unfolded.
-rstepr (x[+]y[-]x); Algebra.
+rstepr (x[+]y[-]x); algebra.
 cut (forall x y z : IR, x[-]y [=] z -> x [=] y[+]z); intros.
 Opaque G.
 cut (forall x : IR, J x -> forall Hx Hx', G x Hx[-]G0 x Hx' [=] c); intros.
@@ -292,11 +276,11 @@ apply cg_minus_wd; unfold Ga, Gb, G0a, G0b in |- *; apply H; auto.
 simpl in H0.
 apply eq_transitive_unfolded with ((G{-}G0) x (CAnd_intro _ _ Hx Hx')).
 2: apply H0 with (Hx := CAnd_intro _ _ Hx Hx').
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 auto.
 auto.
 rstepl (y[+] (x[-]y)).
-Algebra.
+algebra.
 Qed.
 (* end hide *)
 

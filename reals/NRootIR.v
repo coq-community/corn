@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing NRoot %\ensuremath{\sqrt[n]{\cdot}}% *)
@@ -159,7 +143,7 @@ apply eq_transitive_unfolded with (NRoot x k Hx Hk[^]k).
 apply eq_symmetric_unfolded; apply NRoot_power.
 apply eq_transitive_unfolded with (NRoot y k Hy Hk[^]k).
 2: apply NRoot_power.
-apply nexp_wd; Algebra.
+apply nexp_wd; algebra.
 Qed.
 
 (** %\begin{convention}% Let [x,y] be nonnegative real numbers.
@@ -210,8 +194,8 @@ apply leEq_imp_eq; auto.
 eapply leEq_wdl.
  eapply leEq_wdr.
   eexact H1.
- Algebra.
-Algebra.
+ algebra.
+algebra.
 
 clear H H1.
 generalize (NRoot_wd _ _ xpos ypos k kpos kpos H2).
@@ -378,7 +362,7 @@ intros.
 apply eq_transitive_unfolded with (AbsIR x[*]AbsIR y).
 apply AbsIR_resp_mult.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
 apply eq_transitive_unfolded with (Max [--]y y).
 apply Max_comm.
@@ -394,7 +378,7 @@ intros.
 astepl (AbsIR (y[*]x)).
 eapply eq_transitive_unfolded.
 apply AbsIR_mult_pos; auto.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIR_nexp : forall x n, AbsIR (nexp _ n x) [=] nexp _ n (AbsIR x).
@@ -404,7 +388,7 @@ simpl in |- *; apply AbsIR_eq_x; apply less_leEq; apply pos_one.
 simpl in |- *.
 eapply eq_transitive_unfolded.
 apply AbsIR_resp_mult.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIR_nexp_op : forall n x, AbsIR (x[^]n) [=] AbsIR x[^]n.
@@ -453,7 +437,7 @@ rstepl ( [--]OneR).
 astepr ( [--]ZeroR); apply inv_resp_leEq; apply less_leEq; apply pos_one.
 rstepl (One[/] [--]y[//]inv_resp_ap_zero _ _ H).
 apply div_wd.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; apply AbsIR_eq_inv_x.
 apply less_leEq; assumption.
 intros.
@@ -461,7 +445,7 @@ apply eq_transitive_unfolded with (One[/] y[//]H).
 apply AbsIR_eq_x.
 apply less_leEq; apply recip_resp_pos; assumption.
 apply div_wd;
- [ Algebra
+ [ algebra
  | apply eq_symmetric_unfolded; apply AbsIR_eq_x; apply less_leEq; assumption ].
 apply ap_imp_less.
 assumption.
@@ -474,7 +458,7 @@ intros x H Ha.
 apply eq_transitive_unfolded with (AbsIR One[/] AbsIR x[//]Ha).
 apply AbsIR_division.
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply AbsIR_eq_x; apply less_leEq; apply pos_one.
 Qed.
 
@@ -488,7 +472,7 @@ apply
        (ap_symmetric_unfolded _ _ _ (less_imp_ap _ _ _ (pos_two _)))).
 apply AbsIR_division.
 apply div_wd.
-Algebra.
+algebra.
 apply AbsIR_eq_x; apply less_leEq; apply pos_two.
 Qed.
 
@@ -555,10 +539,10 @@ unfold cg_minus in |- *.
 apply leEq_wdr with (AbsIR x[+]AbsIR [--]y).
 apply triangle_IR.
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
 apply eq_transitive_unfolded with (Max [--]y y).
-apply bin_op_wd_unfolded; Algebra.
+apply bin_op_wd_unfolded; algebra.
 apply Max_comm.
 Qed.
 
@@ -592,7 +576,7 @@ apply plus_resp_leEq.
 eapply leEq_wdr.
 apply H.
 apply Sumx_wd.
-intros; Algebra.
+intros; algebra.
 Qed.
 
 Lemma triangle_Sum2IR : forall m n (f : forall i, m <= i -> i <= n -> IR),
@@ -609,7 +593,7 @@ elim (le_lt_dec m i); intro;
  [ simpl in |- * | elimtype False; apply (le_not_lt m i); auto with arith ].
 elim (le_lt_dec i n); intro;
  [ simpl in |- * | elimtype False; apply (le_not_lt i n); auto with arith ].
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIR_str_bnd_AbsIR : forall a b e, AbsIR (a[-]b) [<] e -> AbsIR b [<] AbsIR a[+]e.

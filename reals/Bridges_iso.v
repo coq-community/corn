@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* begin hide *)
 (* file        : bridges_gives_our.v                               *)
 (* version     : 1.50 - 09/05/2001                                 *)
@@ -130,7 +114,7 @@ Proof.
  apply (less_irreflexive_unfolded _ b).
  apply H3 with (x := [--]x) (z := b).
  apply (strong_extensionality_of_X x [--][--]x).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  astepl x.
@@ -157,7 +141,7 @@ Proof.
  intro.
  exists ([--]x).
  apply (strong_extensionality_of_X x [--][--]x).
- Algebra.
+ algebra.
  assumption.
 
  case H0.
@@ -202,7 +186,7 @@ Proof.
  intros.
  exists ([--]s).
  apply (strong_extensionality_of_X s [--][--]s).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  rstepl s.
@@ -786,7 +770,7 @@ Proof.
  elim (less_irreflexive_unfolded _ b).
  apply H0 with (x := [--]x) (z := b).
  apply (P_is_strongly_extensional x [--][--]x).
- Algebra.
+ algebra.
  assumption.
  apply inv_cancel_less.
  astepl x.
@@ -815,7 +799,7 @@ Proof.
  intro.
  exists ([--]x).
  apply (P_is_strongly_extensional x [--][--]x).
- Algebra.
+ algebra.
  assumption.
 
  case is_finite_P. 
@@ -872,7 +856,7 @@ Proof.
    intros H2 H3.
    exists ([--](seq j)).
    apply (P_is_strongly_extensional (seq j) [--][--](seq j)).
-   Algebra.
+   algebra.
    assumption.
    assumption.
 

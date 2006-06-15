@@ -1,62 +1,143 @@
 /* This file is extracted unchanged from the dwww program.
- * dwww is free software.  You may copy it according to the
- * GNU General Public License, version 2.
+ * dwww is free software. You can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 /*
  * realpath.c -- output the real path of a filename.
  * Lars Wirzenius.
  */
- 
+
+#define _GNU_SOURCE
 #include <sys/param.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
 #include <errno.h>
+#include <getopt.h>
+#include <stdarg.h>
 
 static char *stripdir(char * dir, char *buf, int maxlen);
 
-int main(int argc, char **argv) {
-	char buf[10240];
-	int i;
-	int err;
-	int do_strip;
-	
-	err = 0;
-	do_strip = (argc < 2 || strcmp(argv[1], "-s")) ? 0 : 1;
-	
-	if (argc < 2 + do_strip) {
-		fprintf(stderr, "usage: %s [-s] filename ...\n", argv[0]);
-		return 1;
-	}
+int option_strip = 0; /* do stripdir */
+int option_zero  = 0; /* output zero terminated */
+char * myname    = "";
+extern int optind;
 
-	for (i = 1 + do_strip; i < argc; ++i) {
-		if (
-			(do_strip && stripdir(argv[i], buf, 10240) == NULL)
-	  	     || (!do_strip && realpath(argv[i], buf) == NULL)
-		   ) {
-			fprintf(stderr, "%s: %s\n", argv[i], strerror(errno));
-			fflush(stderr);
-			err = 1;
-		} else {
-		
-			printf("%s\n", buf);
-			fflush(stdout);
-			if (ferror(stdout)) {
-				perror("stdout");
-				return 1;
-			}
-		}
-	}
+static const struct option long_options []  = {
+    {"strip", 	no_argument, 	NULL, 's'},
+    {"zero", 	no_argument, 	NULL, 'z'},
+    {"help", 	no_argument, 	NULL, 'h'},
+    {"version",	no_argument, 	NULL, 'v'},
+    {0,		0, 		0,     0 }
+};
+static const char *short_options = "szhv?";
 
-	return err;
+static void error( char * fmt, ...  ) {
+	va_list list;
+
+	va_start(list, fmt);
+	vfprintf(stderr, fmt, list);
+	fflush(stderr);
+	va_end(list);
 }
 
 
-char *stripdir(char * dir, char *buf, int maxlen) {
+static void show_usage( int exit_code ) {
+	error( "Usage:\n"
+		" %s [-s|--strip] [-z|--zero] filename ...\n"
+		" %s -h|--help\n"
+		" %s -v|--version\n", myname, myname, myname);
+	exit( exit_code );
+}
+
+static void show_version( int exit_code ) {
+	error("%s version %s\n", myname, VERSION);
+	exit ( exit_code );
+}
+
+		
+
+static void parse_options(int argc, char ** argv ) {
+	int c, opt_idx;
+	
+	while ((c = getopt_long( argc, 
+				 argv, 
+				 short_options,
+				 long_options,
+				 &opt_idx )) != EOF ) {
+		switch (c) {
+			case 's':
+				option_strip = 1;
+				break;
+			case 'z':
+				option_zero = 1;
+				break;
+			case 'v':
+				show_version( 0 );
+				/* NOT REACHED */
+			case 'h':
+			case '?':
+				show_usage( 0 );
+				/* NOT REACHED */
+			default:
+				error("%s: Unknown option: %c\n", myname, c);
+				show_usage( 2 );
+				/* NOT REACHED */
+		}
+	}
+
+	if ( optind == argc ) {
+		error("%s: need at least one filename\n", myname);
+		show_usage(2);
+		/* NOT REACHED */
+	}
+}
+	
+
+	
+int main(int argc, char **argv) {
+	char buf[10240];
+	char * p;
+	int status = 0;
+	char * ok;
+
+	myname = ( p = strchr(argv[0], '/') ) ? p+1 : argv[0];
+
+	parse_options(argc, argv);
+
+	while (optind < argc) {
+		if (option_strip) {
+			ok = stripdir( argv[optind], buf, sizeof(buf));
+		} else {
+			ok = realpath(argv[optind], buf);
+		}
+		if (!ok) {
+			error( "%s: %s\n", argv[optind], strerror(errno));
+			status = 1;
+		} else {
+			fprintf(stdout, "%s", buf);
+			putc(option_zero ? '\0' : '\n', stdout);
+			fflush(stdout);
+			if (ferror(stdout)) {
+				error("error writing to stdout: %s\n", strerror(errno));
+				exit( 3 );
+			}
+		}
+		optind++;
+	}
+	return status;
+}
+
+
+static char *stripdir(char * dir, char *buf, int maxlen) {
 	char * in, * out;
 	char * last;
 	int ldots;
@@ -99,13 +180,13 @@ char *stripdir(char * dir, char *buf, int maxlen) {
 			}
 			ldots = 0;
 			
-		} else if (*in == '.') {
+		} else if (*in == '.' && ldots > -1) {
 			ldots++;
 		} else {
-			ldots = 0;
+			ldots = -1; 
 		}
 		
-		out++;	
+		out++;
 
 		if (!*in)
 			break;

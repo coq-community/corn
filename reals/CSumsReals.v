@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CReals1.
@@ -79,7 +63,7 @@ Lemma diff_is_Sum0 : forall (s : nat -> IR) n, s n[-]s 0 [=] Sum0 n (fun i => s 
 Proof.
 intros s.
 simple induction n.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 intros.
 simpl in |- *.
 apply eq_transitive_unfolded with (s (S n0) [-]s n0[+] (s n0[-]s 0)).
@@ -141,7 +125,7 @@ Qed.
 Lemma Sum0_comm_scal : forall (s : nat -> IR) a m,
  Sum0 m (fun i => s i[*]a) [=] Sum0 m s [*]a.
 intros. induction  m as [| m Hrecm]; intros.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 simpl in |- *. Step_final (Sum0 m s [*]a[+]s m[*]a).
 Qed.
 
@@ -158,10 +142,10 @@ Lemma Sum0_comm_scal' : forall (s : nat -> IR) a m,
 intros.
 apply eq_transitive_unfolded with (Sum0 m s[*]a).
 2: astepr (Sum0 m s[*]a); apply mult_wdl.
-2: apply Sum0_wd; Algebra.
+2: apply Sum0_wd; algebra.
 eapply eq_transitive_unfolded.
 2: apply Sum0_comm_scal.
-apply Sum0_wd; Algebra.
+apply Sum0_wd; algebra.
 Qed.
 
 Lemma Sum_comm_scal' : forall (s : nat -> IR) a m n,
@@ -176,13 +160,13 @@ Qed.
 Lemma Sumx_comm_scal' : forall n (a : IR) (f : forall i, i < n -> IR),
  Sumx (fun i H => a[*]f i H) [=] a[*]Sumx f.
 simple induction n.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 clear n; intros; simpl in |- *.
 eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply ring_dist_unfolded.
 apply bin_op_wd_unfolded.
 apply H with (f := fun i l => f i (lt_S _ _ l)).
-Algebra.
+algebra.
 Qed.
 
 Lemma Sum2_comm_scal' : forall a m n (f: forall i, m <= i -> i <= n -> IR),
@@ -194,6 +178,6 @@ apply Sum_wd'.
 assumption.
 intros.
 elim (le_lt_dec m i); intros; simpl in |- *.
-elim (le_lt_dec i n); intros; simpl in |- *; Algebra.
-Algebra.
+elim (le_lt_dec i n); intros; simpl in |- *; algebra.
+algebra.
 Qed.

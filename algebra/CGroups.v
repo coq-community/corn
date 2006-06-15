@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [-] %\ensuremath-% #&minus;# *)
@@ -100,12 +84,12 @@ Hint Resolve cg_rht_inv_unfolded cg_lft_inv_unfolded cg_minus_correct:
 
 Lemma cg_inverse' : forall x : G, is_inverse csg_op Zero [--] x x.
 intro x.
-split; Algebra.
+split; algebra.
 Qed.
 
 (* Hints for Auto *)
 Lemma cg_minus_unfolded : forall x y : G, x [-] y [=] x[+] [--] y.
-Algebra.
+algebra.
 Qed.
 Hint Resolve cg_minus_unfolded: algebra.
 
@@ -194,7 +178,7 @@ Step_final ([--] [--] y).
 Qed.
 
 Lemma cg_zero_inv : [--] (Zero:G) [=] Zero.
-apply eq_symmetric_unfolded; apply cg_inv_unique; Algebra.
+apply eq_symmetric_unfolded; apply cg_inv_unique; algebra.
 Qed.
 
 Hint Resolve cg_zero_inv: algebra.
@@ -239,7 +223,7 @@ Let subcrr : CMonoid := Build_SubCMonoid _ _ Punit op_pres_P.
 Let subinv : CSetoid_un_op subcrr := Build_SubCSetoid_un_op _ _ _ inv_pres_P.
 
 Lemma isgrp_scrr : is_CGroup subcrr subinv.
-red in |- *. intro x. case x. intros. split; simpl in |- *; Algebra.
+red in |- *. intro x. case x. intros. split; simpl in |- *; algebra.
 Qed.
 
 Definition Build_SubCGroup : CGroup := Build_CGroup subcrr _ isgrp_scrr.
@@ -262,13 +246,13 @@ Section Assoc_properties.
 Variable G : CGroup.
 
 Lemma assoc_2 : forall x y z : G, x[+] (y [-] z) [=] x[+]y [-] z.
-intros x y z; unfold cg_minus in |- *; Algebra.
+intros x y z; unfold cg_minus in |- *; algebra.
 Qed.
 
 Lemma zero_minus : forall x : G, Zero [-] x [=] [--] x.
 intro x.
 unfold cg_minus in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma cg_cancel_mixed : forall x y : G, x [=] x [-] y[+]y.
@@ -279,7 +263,7 @@ Lemma cg_cancel_mixed : forall x y : G, x [=] x [-] y[+]y.
 Qed.
 
 Lemma plus_resp_eq : forall x y z : G, y [=] z -> x[+]y [=] x[+]z.
-Algebra.
+algebra.
 Qed.
 
 End Assoc_properties.

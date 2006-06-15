@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CPoly_Degree.
@@ -55,7 +39,7 @@ induction  f0 as [| s f0 Hrecf0]; intros.
 exists (cpoly_zero R).
 exists (Zero:R).
 simpl in |- *.
-Algebra.
+algebra.
 elim Hrecf0. intro g'. intros H.
 elim H. intro g''. intros H0.
 exists (_X_[*]g'[+]_C_ g'').
@@ -169,7 +153,7 @@ Lemma poly_01_factor'_apzero :
 intros.
 unfold poly_01_factor' in |- *.
 astepl (_X_ ! (a_ i) [-] (_C_ (a_ n0)) ! (a_ i)).
-astepl (a_ i[-]a_ n0). Algebra.
+astepl (a_ i[-]a_ n0). algebra.
 Qed.
 
 Hint Resolve poly_01_factor'_zero.
@@ -241,14 +225,14 @@ apply degree_le_mon with 0.
 auto with arith.
 apply degree_le_c_.
 apply degree_le_wd with (poly_01_factor 0 i y).
-Algebra.
+algebra.
 apply poly_01_factor_degree.
 simpl in |- *.
 elim (eq_nat_dec i (S n0)); intro.
 apply degree_le_mon with (S n0).
 auto.
 apply degree_le_wd with (poly_01 i n0).
-Algebra.
+algebra.
 auto.
 replace (S (S n0)) with (1 + S n0).
 apply degree_le_mult.
@@ -271,7 +255,7 @@ auto with arith.
 simpl in |- *.
 elim (eq_nat_dec i (S n0)); intro.
 apply degree_le_wd with (poly_01 i n0).
-Algebra.
+algebra.
 apply poly_01_degree'.
 pattern (S n0) at 1 in |- *.
 replace (S n0) with (1 + n0).
@@ -347,7 +331,7 @@ intros.
 astepl (a 0[+]Sum 1 n a).
 astepr (a 0[+]Zero).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply Sum_zero.
 auto with arith.
 intros.
@@ -366,7 +350,7 @@ intro; rewrite H4 in H3; exact (le_Sn_n _ H3).
 astepl (a (S i') [+]Sum (S (S i')) n a).
 astepr (a (S i') [+]Zero).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 apply Sum_zero.
 auto with arith.
 intros.

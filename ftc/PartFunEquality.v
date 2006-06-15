@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing Feq %\ensuremath{\approx}% #&asymp;# *)
@@ -307,7 +291,7 @@ Lemma Feq_symmetric : Feq I F G -> Feq I G F.
 intro H0.
 elim H0; intros H' H1.
 elim H1; intros incF incG.
-FEQ; Algebra.
+FEQ; algebra.
 Qed.
 
 Lemma Feq_transitive : Feq I F G -> Feq I G H -> Feq I F H.
@@ -339,14 +323,14 @@ elim H0; intros incF H0'.
 elim H0'; clear H0 H0'; intros incG H2.
 elim H1; intros incF' H1'.
 elim H1'; clear H1 H1'; intros incG' H1.
-FEQ; simpl in |- *; Algebra.
+FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_inv : Feq I F F' -> Feq I {--}F {--}F'.
 intro H0.
 elim H0; intros incF H0'.
 elim H0'; clear H0 H0'; intros incF' H1.
-FEQ; simpl in |- *; Algebra.
+FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_minus : Feq I F F' -> Feq I G G' -> Feq I (F{-}G) (F'{-}G').
@@ -355,7 +339,7 @@ elim H0; intros incF H0'.
 elim H0'; clear H0 H0'; intros incG H2.
 elim H1; intros incF' H1'.
 elim H1'; clear H1 H1'; intros incG' H0.
-FEQ; simpl in |- *; Algebra.
+FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_mult : Feq I F F' -> Feq I G G' -> Feq I (F{*}G) (F'{*}G').
@@ -364,7 +348,7 @@ elim H0; intros incF H0'.
 elim H0'; clear H0 H0'; intros incG H2.
 elim H1; intros incF' H1'.
 elim H1'; clear H1 H1'; intros incG' H0.
-FEQ; simpl in |- *; Algebra.
+FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_nth : forall n : nat, Feq I F F' -> Feq I (F{^}n) (F'{^}n).
@@ -385,7 +369,7 @@ auto.
 intros x H Hx; apply ap_wdl_unfolded with (F x (incF x H)).
 apply bnd_imp_ap_zero with I; assumption.
 auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_recip' : bnd_away_zero I F -> Feq I F' F -> Feq I {1/}F' {1/}F.
@@ -407,7 +391,7 @@ apply included_FDiv; auto.
 intros x H Hx; apply ap_wdl_unfolded with (G x (incG x H)).
 apply bnd_imp_ap_zero with I; assumption.
 auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_div' : bnd_away_zero I G ->
@@ -476,7 +460,7 @@ Hypothesis Hf : included Q (Dom F).
 
 Lemma FNth_zero : forall x, Q x -> forall Hx Hx', [-C-]One x Hx [=] (F{^}0) x Hx'.
 intros.
-Algebra.
+algebra.
 Qed.
 
 Variable n : nat.

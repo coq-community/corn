@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing Smallest %\ensuremath{\frac13^{2n^2+n}}% *)
@@ -224,7 +208,7 @@ apply leEq_wdl with (AbsCC b_0'[-]a k[*]r[^]k[+]AbsCC (b_0[-]b_0')).
  apply leEq_wdl with (AbsCC (b_0'[-]b_0)); auto.
  apply AbsCC_wd; rational.
 apply bin_op_wd_unfolded.
- 2: Algebra.
+ 2: algebra.
 apply
  eq_transitive_unfolded
   with
@@ -243,10 +227,10 @@ apply
  apply
   eq_transitive_unfolded
    with (AbsCC (cc_IR (AbsCC b_0') [-]cc_IR (a k) [*]cc_IR (r[^]k))).
-  2: apply AbsCC_wd; Algebra.
+  2: apply AbsCC_wd; algebra.
  astepr (AbsCC (cc_IR (AbsCC b_0') [-]cc_IR (a k[*]r[^]k))).
  astepr (AbsCC (cc_IR (AbsCC b_0'[-]a k[*]r[^]k))).
- cut (Zero [<=] AbsCC b_0'[-]a k[*]r[^]k). Algebra.
+ cut (Zero [<=] AbsCC b_0'[-]a k[*]r[^]k). algebra.
  apply shift_leEq_lft; auto.
 apply AbsCC_wd.
 rstepl
@@ -254,8 +238,8 @@ rstepl
   b k[*]
   (cc_IR r[^]k[*]
    [--] ((cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] (b_0'[/] b k[//]H10)))).
-apply bin_op_wd_unfolded. Algebra.
-apply bin_op_wd_unfolded. Algebra.
+apply bin_op_wd_unfolded. algebra.
+apply bin_op_wd_unfolded. algebra.
 Step_final (cc_IR r[^]k[*]w[^]k).
 
 apply root_one with k; auto.
@@ -515,7 +499,7 @@ apply
   with (AbsCC (b_0[+]b k[*]z[^]k) [+] (Sum 1 (pred k) p_''[+]Sum (S k) n p_''));
  unfold p_'' in |- *.
  2: apply bin_op_wd_unfolded;
-     [ Algebra | apply bin_op_wd_unfolded; apply Sum_wd; Algebra ].
+     [ algebra | apply bin_op_wd_unfolded; apply Sum_wd; algebra ].
 apply
  leEq_transitive
   with

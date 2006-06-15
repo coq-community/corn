@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (* begin hide *)
@@ -433,4 +417,71 @@ auto. apply eq_nat_corr. assumption.
 Qed.
 
 End Correctness_Results.
+
+Ltac ClosedNat t :=
+match t with 
+| O => constr:true
+| (S ?n) => ClosedNat n
+| _ => constr:false
+end.
+
+Ltac ClosedPositive t := 
+match t with 
+| xH => constr:true
+| (xI ?n) => ClosedPositive n
+| (xO ?n) => ClosedPositive n
+| _ => constr:false
+end.
+
+Ltac ClosedZ t := 
+match t with 
+| Z0 => constr:true
+| (Zpos ?n) => ClosedPositive n
+| (Zneg ?n) => ClosedPositive n
+| _ => constr:false
+end.
+
+(*To prevent universe inconsitencies, we need lists at a higher
+type level than the one provided in algebra/ListType *)
+
+Section MetaList.
+
+Variable A : Type.
+
+Inductive metalist : Type :=
+  | Mnil : metalist
+  | Mcons : A -> metalist -> metalist.
+
+Fixpoint Mnth (n:nat) (l:metalist) (default:A) {struct l} : A :=
+  match n, l with
+  | O, Mcons x l' => x
+  | O, other => default
+  | S m, Mnil => default
+  | S m, Mcons x t => Mnth m t default
+  end.
+
+End MetaList.
+Implicit Arguments Mcons [A].
+Implicit Arguments Mnth [A].
+
+Ltac FindIndex t l :=
+match l with 
+| (Mcons ?x ?xs) =>
+  match x with
+  | t => constr:O
+  | _ => let n := FindIndex t xs in constr:(S n)
+  end
+end.
+
+(*To prevent universe inconsitencies, we define quadruple,
+rather than using the ProdT multiple times *)
+
+Section Quadruple.
+Variable A B C D: Type.
+
+Inductive quadruple : Type := 
+ Quad : A -> B -> C -> D -> quadruple.
+End Quadruple.
+Implicit Arguments Quad [A B C D].
+
 (* end hide *)

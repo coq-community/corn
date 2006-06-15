@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id.v,v 1.18 2002/11/25 14:43:42 lcf Exp $ *)
 
 (** printing [=] %\ensuremath{\equiv}% #&equiv;# *)
@@ -1314,7 +1298,7 @@ End SubCSetoids.
 (* End_SpecReals *)
 
 (* begin hide *)
-Ltac Step_final x := apply eq_transitive_unfolded with x; Algebra.
+Ltac Step_final x := apply eq_transitive_unfolded with x; algebra.
 (* end hide *)
 
 Tactic Notation "Step_final" constr(c) :=  Step_final c.

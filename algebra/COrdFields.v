@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [<] %\ensuremath<% #&lt;# *)
@@ -34,6 +18,7 @@
 
 Require Export FieldReflection.
 Require Export CSetoids.
+Require Export Rational.
 
 (* ORDERED FIELDS *)
 
@@ -425,7 +410,7 @@ Lemma pos_Snring : forall n : nat, (Zero:R) [<] Snring n.
 intro n.
 apply less_leEq_trans with (One:R).
 apply pos_one.
-stepl (nring (R:=R) 1). 2: simpl in |- *; Algebra.
+stepl (nring (R:=R) 1). 2: simpl in |- *; algebra.
 unfold Snring in |- *.
 apply nring_leEq.
 auto with arith.
@@ -1431,14 +1416,14 @@ apply inv_resp_less; assumption.
 generalize f H; clear X H f.
 induction  n as [| n Hrecn].
 simpl in |- *.
-intros; Algebra.
+intros; algebra.
 intros.
 simpl in |- *.
 rstepl
  ([--](Sumx (fun (i : nat) (l : i < n) => f i (lt_S i n l)))[+]
   [--](f n (lt_n_Sn n))).
 apply bin_op_wd_unfolded.
-2: Algebra.
+2: algebra.
 apply Hrecn with (f := fun (i : nat) (l : i < n) => f i (lt_S i n l)).
 red in |- *; intros; apply H; auto.
 Qed.

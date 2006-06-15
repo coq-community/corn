@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Max_AbsIR.
@@ -126,7 +110,7 @@ apply shift_leEq_plus'; rstepl (seq m[-]y); assumption.
 apply plus_resp_leEq.
 apply rht_leEq_Max.
 unfold cg_minus in |- *.
-Algebra.
+algebra.
 Qed.
 
 Lemma Cauchy_abs : forall seq : CauchySeq IR, Cauchy_prop (fun n => AbsIR (seq n)).
@@ -143,6 +127,34 @@ intros.
 apply eq_symmetric_unfolded; apply Limits_unique.
 simpl in |- *; apply Cauchy_Lim_abs.
 apply Cauchy_complete.
+Qed.
+
+Lemma CS_seq_bounded' : forall seq : CauchySeqR,
+ {K : IR | Zero [<] K | forall m : nat, AbsSmall K (seq m)}.
+unfold CauchySeqR in |- *.
+intros.
+assert (X0 : {K : IR | Zero [<] K | {N : nat | forall m, N <= m -> AbsSmall K (seq m)}}).
+apply CS_seq_bounded; auto.
+apply (CS_proof _ seq). 
+destruct X0 as [K1 K1_pos H1].
+destruct H1 as [N H1].
+exists (Max K1 (SeqBound0 seq N)).
+apply less_leEq_trans with K1; auto.
+apply lft_leEq_MAX.
+intros.
+elim (le_or_lt N m).
+intros.
+assert (AbsSmall (R:=IR) K1 (seq m)). 
+apply H1. auto.
+apply AbsSmall_leEq_trans with K1; auto.
+apply lft_leEq_MAX.
+intros.
+apply AbsSmall_leEq_trans with (SeqBound0 seq N).
+apply rht_leEq_MAX.
+apply AbsSmall_leEq_trans with (AbsIR (seq m)).
+apply SeqBound0_greater; auto.
+apply AbsIR_imp_AbsSmall.
+apply leEq_reflexive.
 Qed.
 
 End More_Cauchy_Props.
@@ -236,7 +248,7 @@ apply leEq_wdl with (AbsIR (seq1 i[-]seq1 N)).
 apply AbsSmall_imp_AbsIR; apply HN.
 apply lt_le_weak.
 apply mon_F'; apply le_lt_trans with m; auto.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 Lemma Cprop2_seq_imp_Cprop2_subseq : forall a,

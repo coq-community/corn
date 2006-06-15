@@ -17,7 +17,7 @@ endif
 SHELL:=bash -O nullglob
 
 # realpath utility to use
-REALPATH := $(shell if ! which realpath 2>/dev/null; then $(MAKE) -f "$(SRCDIR)/Makefile.realpath" -s TOPDIR="$(TOPDIR)" realpath; echo "$(SRCDIR)/bin/realpath"; fi)
+REALPATH := $(shell if ! type -p realpath 2>/dev/null; then $(MAKE) -f "$(SRCDIR)/Makefile.realpath" -s TOPDIR="$(TOPDIR)" realpath; echo "$(SRCDIR)/bin/realpath"; fi)
 
 SRCDIR:=$(shell "$(REALPATH)" "$(SRCDIR)")
 
@@ -68,9 +68,10 @@ GLOBFILE = $(SRCDIR)/.glob
 ## End of user-configurable variables
 ## Please don't edit beyond this line, unless you really know what you are doing
 
-# Various executables we build
+# Various executables we build when we need a custom Coq image.
+# (Thus currently not.)
 TOPLEVEL := $(LIBDIR)/$(TOPLEVELNAME)
-BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME)
+BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME)
 LIBEXECS:=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
 IDELIB:=$(LIBDIR)/$(IDENAME)
 IDEBIN:=$(BINDIR)/$(IDENAME)
@@ -98,6 +99,7 @@ COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
   -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
   -I $(CAMLP4LIB)
 COQC := $(COQBIN)/coqc
+COQIDE := $(COQBIN)/coqide
 COQDEP := $(COQBIN)/coqdep
 COQMKTOP := $(COQBIN)/coqmktop
 GRAMMARS:=grammar.cma
@@ -107,7 +109,7 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 COQMAP = -R $(SRCDIR) $(LIBNAME)
 OTHERFLAGS = -dump-glob $(GLOBFILE) -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
-COQCFLAGS = -image $(TOPLEVEL)
+COQCFLAGS = 
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
@@ -123,7 +125,7 @@ ifdef CoRN_MF_sub
 all : $(COQOBJECTS)
 else
 all :
-	$(MAKE) CoRN_MF_sub=1 all
+	exec $(MAKE) CoRN_MF_sub=1 all
 endif
 
 # Convenience utilities for humans
@@ -137,7 +139,7 @@ makefiles : $(AUTO_MAKEFILES)
 
 $(AUTO_MAKEFILES) : 
 	@set -e; if ! [ -a $@ ]; then \
-	  depth="`echo -n "$(patsubst $(SRCDIR)/%,%,$@)" | sed 's|[^/]||g' | wc -c | sed 's|[[:space:]]||g'`"; \
+	  depth=$$(echo '$(patsubst $(SRCDIR)/%,%,$@)' | awk '{ print gsub("/","/") }'); \
 	  model="$(SRCDIR)/Makefile.auto.$${depth}"; \
 	  if ! [ -a "$${model}" ]; then \
 	    ( echo -n 'TOPDIR=..'; i=1; \
@@ -167,36 +169,36 @@ $(IDELIB): $(CMX) | $(LIBDIR)
 	@echo Building coq-ide top-level $(subst $(SRCDIR)/,, $@)
 	@$(COQMKTOP) -ide -srcdir $(COQTOP) -ide -opt -o $@ $(CMX)
 
-$(IDEBIN): | $(BINDIR) $(IDELIB)
+$(IDEBIN): | $(BINDIR)
 	@echo Building coq-ide top-level startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
-	  echo 'exec $(LIBDIR)/$(IDENAME) $(COQFLAGS) $$*' \
+	  echo 'exec "$(COQIDE)" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 $(LIBDIR)/$(TOPLEVELNAME): $(CMX) | $(LIBDIR)
 	@echo Building top-level $(subst $(SRCDIR)/,,$@)
 	@$(COQMKTOP) -srcdir $(COQTOP) -opt -o $@ $(CMX)
 
-$(BINDIR)/$(TOPLEVELNAME): | $(BINDIR) $(LIBDIR)/$(TOPLEVELNAME)
+$(BINDIR)/$(TOPLEVELNAME): | $(BINDIR)
 	@echo Building top-level startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
-	  echo 'exec $(TOPLEVEL) $(COQFLAGS) $$*' \
+	  echo 'exec "$(COQBIN)/coqtop" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 $(LIBDIR)/$(COMPILERNAME): | $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
 	@echo Building compiler $(subst $(SRCDIR)/,, $@)
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
-	  echo 'exec $(COQC) $(COQCFLAGS) $$*' \
+	  echo 'exec $(COQC) $(COQCFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
-$(BINDIR)/$(COMPILERNAME): | $(BINDIR) $(LIBDIR)/$(COMPILERNAME)
+$(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@echo Building compiler startup script
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
-	  echo 'exec $(LIBDIR)/$(COMPILERNAME) $(COQFLAGS) $$*' \
+	  echo 'exec "$(COQC)" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 %.cmx : %.ml
@@ -208,10 +210,10 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR) $(LIBDIR)/$(COMPILERNAME)
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
 ifdef CoRN_MF_sub
-%.vo : %.v $(TOPLEVEL)
+%.vo : %.v
 	@set -e; \
 	echo "Compiling $<"; \
-	$(COQC) $(COQFLAGS) $(COQCFLAGS) $<
+	exec $(COQC) $(COQFLAGS) $(COQCFLAGS) $<
 else
 .PHONY: always
 
@@ -226,7 +228,7 @@ else
 	  fi \
 	}; \
 	canon_name="$$(canonicalise "$@")" ; \
-	$(MAKE) CoRN_MF_sub=1 "$${canon_name}"
+	exec $(MAKE) CoRN_MF_sub=1 "$${canon_name}"
 endif
 
 dep : $(DEPEND) $(DOCDEPEND)

@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* CModules.v, v1.0, 28april2004, Bart Kirkels *)
 
 (** printing [+] %\ensuremath+% #+# *)
@@ -121,15 +105,15 @@ Variable A : RModule R.
 (* begin hide *)
 
 Lemma mu0help : forall (a:R) (x:A), Zero[']x [=] a[']Zero[']x.
-intros a x; astepl ((a[*]Zero)[']x); Algebra.
+intros a x; astepl ((a[*]Zero)[']x); algebra.
 Qed.
 
 Hint Resolve mu0help : algebra.
 
 Lemma mu0help2 : forall x:A, Zero[']x [=] Zero[']x [+] Zero[']x.
-intro x; astepl ((One[+]One)[']Zero[']x); Algebra.
+intro x; astepl ((One[+]One)[']Zero[']x); algebra.
 astepl (One[']Zero[']x [+] One['](Zero[']x)).
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve mu0help2 : algebra.
@@ -138,8 +122,8 @@ Hint Resolve mu0help2 : algebra.
 
 Lemma mu_zerox : forall x : A, Zero[']x [=] Zero.
 intro x; apply eq_symmetric.
-apply (cg_cancel_lft _ (Zero[']x)); Algebra.
-astepl (Zero[']x); Algebra.
+apply (cg_cancel_lft _ (Zero[']x)); algebra.
+astepl (Zero[']x); algebra.
 Qed.
 
 Hint Resolve mu_zerox : algebra.
@@ -149,7 +133,7 @@ intro x; apply (cg_cancel_rht A x ([--]One[']x) [--]x).
 astepr (Zero:A).
 astepl ([--]One[']x [+] One[']x).
 astepl (([--]One[+]One)['] x).
-astepl (Zero[']x); Algebra.
+astepl (Zero[']x); algebra.
 Qed.
 
 Hint Resolve mu_minusonex : algebra.

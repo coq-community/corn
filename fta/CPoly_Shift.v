@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CComplex.
@@ -70,7 +54,7 @@ Lemma Shift_shift : forall a p, Shift [--]a (Shift a p) [=] p.
 intros. apply poly_CC_extensional. intros.
 astepl (Shift a p) ! (x[+][--]a).
 astepl p ! (x[+][--]a[+]a).
-apply apply_wd. Algebra. rational.
+apply apply_wd. algebra. rational.
 Qed.
 
 Lemma Shift_mult : forall a p1 p2, Shift a (p1[*]p2) [=] Shift a p1[*]Shift a p2.
@@ -90,7 +74,7 @@ apply degree_le_mult. apply degree_le_c_.
 apply degree_le_mon with (1 * i).
 omega.
 apply degree_le_nexp. apply degree_imp_degree_le.
-apply degree_wd with (_C_ a[+]_X_). Algebra.
+apply degree_wd with (_C_ a[+]_X_). algebra.
 apply degree_plus_rht with 0. apply degree_le_c_. apply degree_x_.
 auto. auto.
 unfold degree_le in H.
@@ -99,7 +83,7 @@ astepl (Zero:cpoly_cring CC).
 astepl (Zero[*] (_X_[+]_C_ a) [^]i).
 apply bin_op_wd_unfolded.
 Step_final (_C_ (Zero:CC)).
-Algebra.
+algebra.
 apply degree_le_mon with 0.
 auto with arith.
 apply degree_le_c_.
@@ -119,11 +103,11 @@ apply
     (Sum 0 n (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+]
      Sum (S n) (lth_of_poly p)
        (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i)).
-apply bin_op_wd_unfolded. Algebra.
+apply bin_op_wd_unfolded. algebra.
 apply eq_symmetric_unfolded.
 apply Sum_zero.
 cut (n < lth_of_poly p). intro. auto with arith.
-apply lt_i_lth_of_poly. astepl (One:CC). Algebra.
+apply lt_i_lth_of_poly. astepl (One:CC). algebra.
 intros. cut (n < i). intro.
 astepl (_C_ Zero[*] (_X_[+]_C_ a) [^]i).
 Step_final (Zero[*] (_X_[+]_C_ a) [^]i).
@@ -142,10 +126,10 @@ apply
   with
     (Sum 0 x (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+]
      _C_ (nth_coeff (S x) p) [*] (_X_[+]_C_ a) [^]S x).
-apply bin_op_wd_unfolded. Algebra.
+apply bin_op_wd_unfolded. algebra.
 astepl (One[*] (_X_[+]_C_ a) [^]S x).
 apply bin_op_wd_unfolded.
-Step_final (_C_ (One:CC)). Algebra.
+Step_final (_C_ (One:CC)). algebra.
 apply eq_symmetric_unfolded.
 apply
  Sum_last with (f := fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i).
@@ -156,12 +140,12 @@ apply degree_le_mult. apply degree_le_c_.
 apply degree_le_mon with (1 * i).
 omega.
 apply degree_le_nexp. apply degree_imp_degree_le.
-apply degree_wd with (_C_ a[+]_X_). Algebra.
+apply degree_wd with (_C_ a[+]_X_). algebra.
 apply degree_plus_rht with 0. apply degree_le_c_. apply degree_x_.
 auto. auto.
 pattern (S x) at 1 in |- *. replace (S x) with (1 * S x).
 apply monic_nexp.
-apply monic_wd with (_C_ a[+]_X_). Algebra.
+apply monic_wd with (_C_ a[+]_X_). algebra.
 apply monic_plus with 0. apply degree_le_c_.
 apply monic_x_.
 auto. auto with arith. auto.
@@ -170,7 +154,7 @@ apply monic_wd with (One:CCX).
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *. split.
 cut (One [=] nth_coeff 0 p[*]One[+]Zero). auto.
 astepl (nth_coeff 0 p). rational. auto.
-apply monic_wd with (_C_ (One:CC)). Algebra.
+apply monic_wd with (_C_ (One:CC)). algebra.
 apply monic_c_one.
 Qed.
 

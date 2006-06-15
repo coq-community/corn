@@ -2,6 +2,7 @@
 
 SRCDIR=$(shell pwd)/$(TOPDIR)
 BINDIR=$(SRCDIR)/bin
+CFLAGS:=-O3 -DVERSION='"1.9.25"' $(CFLAGS)
 
 .PHONY : realpath clean
 

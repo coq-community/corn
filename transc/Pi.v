@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 Require Export SinCos.
 
 Section Properties_of_Pi.
@@ -67,7 +51,7 @@ apply leEq_reflexive.
 apply included_imp_Continuous with realline; Contin.
 intros.
 apply less_wdr with (Cos t0).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 auto.
 
 clear H2 H1 t; intros t H1 H2 Ht.
@@ -84,11 +68,11 @@ set (B := Barrow _ _ Continuous_Sin Zero CI CI {--}Cosine) in *.
 set (B' := B H3 x t H4 CI CI) in *.
 apply less_wdr with (Cosine x CI[-]Integral H4).
 2: unfold cg_minus at 1 in |- *; apply bin_op_wd_unfolded.
-2: Algebra.
+2: algebra.
 2: rstepr ( [--] ( {--}Cosine t Ht[-] {--}Cosine x CI)).
 2: apply un_op_wd_unfolded; eapply eq_transitive_unfolded.
 2: apply B'.
-2: Algebra.
+2: algebra.
 clear B' B H3.
 apply less_wdl with (Cos (pi_seq n) [-] (pi_seq (S n) [-]pi_seq n)).
 2: simpl in |- *; rational.
@@ -104,11 +88,11 @@ apply (ub_Integral _ _ _ _ H4 (less_imp_ap _ _ _ H1) One) with x CI.
 intros.
 apply leEq_wdl with (AbsIR (Sin x0)).
 apply AbsIR_Sin_leEq_One.
-apply AbsIR_wd; simpl in |- *; Algebra.
+apply AbsIR_wd; simpl in |- *; algebra.
 apply compact_map2 with (Hab := less_leEq _ _ _ H1).
 apply compact_inc_lft.
 apply less_wdl with (AbsIR (Sin x)).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply AbsIR_Sin_less_One.
 apply H0; auto.
 apply leEq_reflexive.
@@ -156,7 +140,7 @@ apply leEq_glb.
 intros y0 H2 Hy.
 apply less_leEq.
 apply less_wdr with (Cos y0).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 inversion_clear H2.
 apply cos_pi_seq_pos with n.
 apply leEq_transitive with x; auto.
@@ -210,11 +194,11 @@ apply sin_pi_seq_mon with n; auto.
 astepl (Sin y[^]2[+]Cos y[^]2[-]Cos y[^]2).
 apply cg_minus_wd.
 Step_final (Cos y[^]2[+]Sin y[^]2).
-Algebra.
+algebra.
 astepl (Sin x[^]2[+]Cos x[^]2[-]Cos x[^]2).
 apply cg_minus_wd.
 Step_final (Cos x[^]2[+]Sin x[^]2).
-Algebra.
+algebra.
 Qed.
 
 (* begin hide *)
@@ -282,7 +266,7 @@ Lemma pi_seq_bnd' :
 intro; induction  n as [| n Hrecn].
 eapply leEq_wdr.
 apply pi_seq_bnd.
-Algebra.
+algebra.
 eapply leEq_transitive.
 apply pi_seq_bnd.
 apply
@@ -308,7 +292,7 @@ intro; case n; intros.
 elimtype False; inversion H; inversion H1.
 eapply leEq_wdr.
 apply pi_seq_bnd'.
-Algebra.
+algebra.
 Qed.
 (* end hide *)
 
@@ -333,7 +317,7 @@ apply less_leEq; apply pos_one.
 apply leEq_reflexive.
 apply leEq_glb.
 intros y H Hy; apply leEq_wdr with (Cos y).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 inversion_clear H.
 apply cos_pi_seq_mon with 1.
 eapply leEq_wdl.
@@ -372,9 +356,9 @@ apply
   with (Sum (S (S N)) (pred m) (fun i : nat => pi_seq (S i) [-]pi_seq i)).
 2: eapply eq_transitive_unfolded.
 2: apply Mengolli_Sum_gen with (f := pi_seq).
-2: Algebra.
+2: algebra.
 2: auto with arith.
-2: rewrite <- H3; Algebra.
+2: rewrite <- H3; algebra.
 set (z := One[-]Sin One) in *.
 apply
  leEq_transitive
@@ -396,7 +380,7 @@ apply leEq_wdl with (Sum (S N) (pred (pred m)) (fun i : nat => z[^]i)).
 2: cut (pred m = S (pred (pred m)));
     [ intro | apply S_pred with N; auto with arith ].
 2: pattern (pred m) at 2 in |- *; rewrite H4.
-2: apply Sum_shift; Algebra.
+2: apply Sum_shift; algebra.
 cut (z[-]One [#] Zero). intro H4.
 eapply leEq_wdl.
 2: apply eq_symmetric_unfolded; apply Sum_c_exp with (H := H4).
@@ -412,7 +396,7 @@ apply Sin_One_pos.
 astepr ZeroR; astepr ( [--]ZeroR).
 apply inv_resp_less.
 apply less_wdl with (ZeroR[^]S (pred (pred m))).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 apply nexp_resp_less.
 auto with arith.
 apply leEq_reflexive.
@@ -485,17 +469,17 @@ assert (H : Cauchy_prop (fun n : nat => pi_seq (S n))).
  apply conv_seq_imp_conv_subseq with pi_seq S; auto with arith.
  intro; exists (S n); split; apply lt_n_Sn.
  simpl in |- *; auto.
- Algebra.
+ algebra.
  apply pi_seq_Cauchy.
 apply
  eq_transitive_unfolded
   with
     (Lim (Build_CauchySeq _ _ H) [-]Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
-2: apply cg_minus_wd; Algebra.
+2: apply cg_minus_wd; algebra.
 2: apply Lim_subseq_eq_Lim_seq with S; auto with arith.
 2: intro; exists (S n); split; apply lt_n_Sn.
 2: simpl in |- *; auto.
-2: Algebra.
+2: algebra.
 2: left; intros; simpl in |- *.
 2: apply local_mon_imp_mon'; auto; apply pi_seq_incr.
 eapply eq_transitive_unfolded.
@@ -688,7 +672,7 @@ astepl (Cos (x[+]x)).
 astepl (Cos x[*]Cos x[-]Sin x[*]Sin x).
 astepl (Cos x[^]2[-]Sin x[^]2).
 rstepr (Cos x[^]2[-] (One[-]Cos x[^]2)).
-apply cg_minus_wd; Algebra.
+apply cg_minus_wd; algebra.
 astepr (Cos x[^]2[+]Sin x[^]2[-]Cos x[^]2); rational.
 Qed.
 
@@ -709,7 +693,7 @@ eapply eq_transitive_unfolded.
 apply Tan_plus with (Hx := Hx) (Hy := Hx) (H := H1).
 simpl in |- *; rational.
 astepl (One[-]Tan x Hx[^]2). auto.
-apply dom_wd with (Two[*]x); Algebra.
+apply dom_wd with (Two[*]x); algebra.
 Qed.
 
 (* begin hide *)
@@ -737,9 +721,9 @@ astepr ((ZeroR[+]One) [/]TwoNZ).
 astepr ((Cos (Pi [/]TwoNZ) [+]One) [/]TwoNZ).
 rstepl ((Two[*]Cos (Pi [/]FourNZ) [^]2[-]One[+]One) [/]TwoNZ).
 apply div_wd.
-2: Algebra.
+2: algebra.
 apply bin_op_wd_unfolded.
-2: Algebra.
+2: algebra.
 apply eq_transitive_unfolded with (Cos (Two[*]Pi [/]FourNZ)).
 apply eq_symmetric_unfolded; apply Cos_double.
 apply Cos_wd; rational.
@@ -767,8 +751,8 @@ rstepr
 repeat apply div_wd.
 astepl (Sin (Two[*]One [/]TwoNZ)).
 apply Sin_double.
-Algebra.
-Algebra.
+algebra.
+algebra.
 apply pos_cos; PiSolve.
 apply pos_div_two; apply pos_one.
 apply less_transitive_unfolded with (pi_seq 1).
@@ -797,7 +781,7 @@ apply cg_minus_wd.
 apply bin_op_wd_unfolded.
 apply nexp_wd.
 apply eq_symmetric_unfolded; apply Cos_QuarterPi.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; apply sqrt_lemma.
 Qed.
 
@@ -814,15 +798,15 @@ cut (sqrt Two pos2 [#] Zero).
 2: apply sqrt_nonneg.
 2: apply less_wdl with ZeroR.
 2: astepr (Two:IR); apply pos_two.
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 intro H0.
 unfold Tan in |- *; simpl in |- *.
 astepr ((One[/] _[//]H0) [/] _[//]recip_ap_zero _ _ H0).
 apply div_wd.
 astepr (Sin (Pi [/]FourNZ)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 astepr (Cos (Pi [/]FourNZ)).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 (** Shifting sine and cosine by [Pi[/]Two] and [Pi]. *)
@@ -868,7 +852,7 @@ unfold cg_minus in |- *.
 astepl (Sin ( [--]x[+]Pi [/]TwoNZ)).
 eapply eq_transitive_unfolded.
 apply Sin_plus_HalfPi.
-Algebra.
+algebra.
 Qed.
 
 Lemma Cos_plus_HalfPi : forall x : IR, Cos (x[+]Pi [/]TwoNZ) [=] [--] (Sin x).
@@ -893,7 +877,7 @@ apply eq_transitive_unfolded with (Sin (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
 apply Sin_wd; rational.
 eapply eq_transitive_unfolded.
 apply Sin_plus_HalfPi.
-Algebra.
+algebra.
 Qed.
 
 Lemma Cos_Pi : Cos Pi [=] [--]One.
@@ -901,7 +885,7 @@ apply eq_transitive_unfolded with (Cos (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
 apply Cos_wd; rational.
 eapply eq_transitive_unfolded.
 apply Cos_plus_HalfPi.
-Algebra.
+algebra.
 Qed.
 
 Lemma Sin_plus_Pi : forall x : IR, Sin (x[+]Pi) [=] [--] (Sin x).
@@ -947,11 +931,11 @@ intros.
 cut (Cos x [#] Zero). intro H.
 assert (H0 : [--] (Cos x) [#] Zero). apply inv_resp_ap_zero; auto.
 apply eq_transitive_unfolded with (Sin x[/] _[//]H).
-2: unfold Tan, Tang in |- *; simpl in |- *; Algebra.
+2: unfold Tan, Tang in |- *; simpl in |- *; algebra.
 rstepr ( [--] (Sin x) [/] _[//]H0).
 assert (H1 : Cos (x[+]Pi) [#] Zero). astepl ( [--] (Cos x)); auto.
 astepr (Sin (x[+]Pi) [/] _[//]H1).
-unfold Tan, Tang in |- *; simpl in |- *; Algebra.
+unfold Tan, Tang in |- *; simpl in |- *; algebra.
 inversion_clear Hx.
 inversion_clear X0.
 simpl in |- *; auto.

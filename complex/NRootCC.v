@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing sqrt_Half %\ensuremath{\sqrt{\frac12}}% *)
@@ -38,10 +22,10 @@ intro. intro. intro. intro.
 elim c. intros a b. intro H1.
 elim H1; intros H2.
 apply H.
-(* Algebra. *)
+(* algebra. *)
   exact H2.
 apply H0.
-(* Algebra. *)
+(* algebra. *)
   exact H2.
 Qed.
 
@@ -51,10 +35,10 @@ intro. intro H. intro H0. intro.
 elim c. intros a b. intro H1.
 elim H1; intros H2.
 apply H.
-(* Algebra. *)
+(* algebra. *)
   exact H2.
 apply H0.
-(* Algebra. *)
+(* algebra. *)
   exact H2.
 Qed.
 
@@ -118,7 +102,7 @@ cut (sqrt_Half[*]sqrt_Half [=] Half); intros.
   apply eq_transitive_unfolded with (sqrt_Half[^]2).
   apply eq_symmetric_unfolded. apply nexp_two.
 unfold sqrt_Half in |- *.
-(* Algebra. *)
+(* algebra. *)
   apply sqrt_sqr.
 Qed.
 
@@ -235,7 +219,7 @@ apply (Ccsr_wdl _ (cof_less (c:=IR)) (a[^]2[+]Zero) (a[^]2[+]b[^]2)).
 apply plus_resp_less_lft.
 change (Zero [<] b[^]2) in |- *.
 apply pos_square. assumption.
-(* Algebra. *)
+(* algebra. *)
   apply cm_rht_unit_unfolded.
 apply pos_half.
 Qed.
@@ -416,7 +400,7 @@ cut (a'[*]b'[*]Two [=] b); intros.
   apply eq_transitive_unfolded with (b[*]Half[*]Two).
   apply bin_op_wd_unfolded. apply nrCC1_a7_upper. rename X into H. exact H.
     apply eq_reflexive_unfolded.
-(* Algebra. *)
+(* algebra. *)
   apply half_1'.
 Qed.
 
@@ -435,7 +419,7 @@ rename H0 into H1. rename H into H0. rename X into H.  exact H1.
   apply bin_op_wd_unfolded. apply nrCC1_a7_lower. 
 rename H into H0. rename X into H.  exact H.
     apply eq_reflexive_unfolded.
-(* Algebra. *)
+(* algebra. *)
   apply half_1'.
 (* Step_final a'[^] (2) [-]b'[^] (2). *)
   apply eq_transitive_unfolded with (a'[^]2[-]b'[^]2).
@@ -727,7 +711,7 @@ cut (forall c x : CC, _X_ ! x[+] (_C_ c) ! x [=] x[+]c); intros.
   apply eq_reflexive_unfolded.
   apply un_op_wd_unfolded. apply I_wd. apply cm_rht_unit_unfolded.
     apply cm_lft_unit_unfolded.
-(* Algebra. *)
+(* algebra. *)
   apply bin_op_wd_unfolded. apply _x_apply. apply _c_apply.
 Qed.
 
@@ -735,9 +719,9 @@ Lemma nrCC3_a4 : degree_le 1 (_X_[+]_C_ II).
 apply degree_imp_degree_le.
 cut (degree 1 (_C_ II[+]_X_)); intros.
 apply (degree_wd _ (_C_ II[+]_X_)).
-(* Algebra. *)
+(* algebra. *)
   apply cag_commutes_unfolded.
-(* Algebra. *)
+(* algebra. *)
  rename X into H.  exact H.
 apply (degree_plus_rht _ (_C_ II) _X_ 0 1).
 apply degree_le_c_.
@@ -762,7 +746,7 @@ replace n with (1 * n).
 unfold nrCC3_poly'' in |- *.
 apply monic_nexp.
 unfold monic in |- *; split.
-(* Algebra. *)
+(* algebra. *)
   apply eq_reflexive_unfolded.
 exact nrCC3_a4.
 unfold mult in |- *.
@@ -1085,7 +1069,7 @@ Let x := nrCC4_x.
 
 Lemma nrCC4_a5 : x [=] y[*]r.
 unfold x in |- *. unfold nrCC4_x in |- *.
-(* Algebra. *)
+(* algebra. *)
   apply eq_reflexive_unfolded.
 Qed.
 
@@ -1260,9 +1244,9 @@ Let b' := Im c'.
 Lemma nrootCC_4_ap_real' : {z' : CC | z'[^]n [=] a'[+I*]b'}.
 apply nrootCC_4_ap_real; try assumption.
 apply (imag_to_real a b a' b').
-(* Algebra. *)
+(* algebra. *)
   apply eq_reflexive_unfolded.
-(* Algebra. *)
+(* algebra. *)
   exact a_.
 Qed.
 
@@ -1319,7 +1303,7 @@ intros.
   apply eq_transitive_unfolded with (z[^] (2 * n)).
   apply nexp_mult.
 rewrite <- nrCC_5a2.
-(* Algebra. *)
+(* algebra. *)
   apply eq_reflexive_unfolded.
 Qed.
 Hint Resolve nrCC_5a3: algebra.

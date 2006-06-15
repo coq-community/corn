@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Rolle.
@@ -122,7 +106,7 @@ red in |- *; intros n Hf i j H H0 H' x y H1 Hx Hy.
 simpl in |- *.
 apply mult_wd.
 apply div_wd.
-2: rewrite H; Algebra.
+2: rewrite H; algebra.
 generalize H' Hx Hy; clear Hy Hx H'.
 rewrite <- H; intros.
 cut
@@ -147,7 +131,7 @@ red in |- *; intros n Hf i j H H0 H' x y H1 Hx Hy.
 simpl in |- *.
 apply mult_wd.
 apply mult_wd.
-2: rewrite H; Algebra.
+2: rewrite H; algebra.
 generalize H' Hx Hy; clear Hy Hx H'.
 rewrite <- H; intros.
 cut
@@ -156,14 +140,14 @@ cut
 simpl in H2.
 apply H2.
 cut (Dom (PartInt (fi n Hf i H')) x);
- [ intro H2 | apply dom_wd with y; Algebra ].
+ [ intro H2 | apply dom_wd with y; algebra ].
 apply eq_transitive_unfolded with (Part _ _ H2).
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with i F; apply Taylor_lemma1.
 simpl in Hx.
 elim Hx; intros.
 inversion_clear a0; auto.
-Algebra.
+algebra.
 rewrite H.
 astepl ((b[+][--]x) [^]j); Step_final ((b[+][--]y) [^]j).
 Qed.
@@ -286,7 +270,7 @@ cut
  auto.
 unfold FSumx_to_FSum in |- *.
 elim le_lt_dec; intro; simpl in |- *.
-Algebra.
+algebra.
 intros.
 set
  (w :=
@@ -295,9 +279,9 @@ set
  in *.
 astepr (w[-]w); unfold w in |- *; simpl in |- *.
 repeat first [ apply cg_minus_wd | apply mult_wd ];
- try apply csf_wd_unfolded; Algebra.
+ try apply csf_wd_unfolded; algebra.
 rational.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 simpl in |- *; intro i.
 Opaque funct_i'.
 unfold FSumx_to_FSum in |- *.
@@ -340,13 +324,13 @@ apply
   with (F b Hb[-]FSumx (S n) (funct_i' n Hf) b (ProjIR2 H)).
 simpl in |- *; rational.
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply eq_symmetric_unfolded; apply FSum_FSumx_to_FSum.
 apply Taylor_lemma3.
 apply Taylor_lemma3'.
 simpl in |- *.
 astepr (Part _ _ Hb[-]Part _ _ Hb); apply cg_minus_wd.
-Algebra.
+algebra.
 eapply eq_transitive_unfolded.
 apply Sum_first.
 astepr (Part _ _ Hb[+]Zero); apply bin_op_wd_unfolded.
@@ -362,7 +346,7 @@ apply mult_wd.
 2: rational.
 apply eq_symmetric_unfolded.
 apply eq_transitive_unfolded with (PartInt (fi n Hf 0 b0) b TL_compact_b).
-2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 apply
  (ProjT2
@@ -375,7 +359,7 @@ intros.
 cut (forall H', FSumx_to_FSum (S n) (funct_i' n Hf) i b H' [=] Zero); auto.
 unfold FSumx_to_FSum in |- *.
 elim le_lt_dec; intro; simpl in |- *.
-Algebra.
+algebra.
 intro.
 astepr
  (fi n Hf i b0 (Build_subcsetoid_crr IR _ b (ProjIR1 (ProjIR1 H'))) [*]
@@ -453,7 +437,7 @@ Ltac Lazy_Eq :=
    | apply un_op_wd_unfolded
    | apply cg_minus_wd
    | apply div_wd
-   | apply csf_wd_unfolded ]; Algebra.
+   | apply csf_wd_unfolded ]; algebra.
 
 Lemma Taylor_lemma7 : forall n Hf Hf' i (Hi : 0 < i) Hi', Derivative_I Hab'
  (funct_i' n Hf i Hi') (funct_aux n Hf' i Hi'{-}funct_aux n Hf' (pred i) (lt_5 i (S n) Hi')).
@@ -507,8 +491,8 @@ set (a1 := fiSp1 x1) in *; set (a5 := fiSSp x5) in *;
 rstepl (a5[*]pp[*] (bxp[*] (b[-]x)) [-]a1[*] ((nring p[+]One) [*]pp) [*]bxp).
 unfold a1, a5 in |- *; clear a1 a5.
 Lazy_Eq.
-unfold x4, x5 in |- *; Algebra.
-simpl in |- *; Algebra.
+unfold x4, x5 in |- *; algebra.
+simpl in |- *; algebra.
 unfold pp in |- *.
 rstepr
  (nring (S p) [*]
@@ -516,13 +500,13 @@ rstepr
    mult_resp_ap_zero _ _ _ (nring_fac_ap_zero _ p)
      (pos_ap_zero _ _ (pos_nring_S IR p)))); simpl in |- *.
 apply mult_wdr; apply div_wd.
-Algebra.
+algebra.
 clear X H bxp pp x5 x4 x3 x2 x1 fiSSp fiSp1 fiSp2 Hx.
 cut (fac p + p * fac p = fac p * S p).
 intro; rewrite H.
 eapply eq_transitive_unfolded.
 apply nring_comm_mult.
-Algebra.
+algebra.
 transitivity (S p * fac p); auto with arith.
 unfold fiSp1, fiSp2 in |- *.
 apply
@@ -534,7 +518,7 @@ apply
        (PartInt (fi (S n) Hf' (S p) (lt_n_S _ _ (lt_5 _ _ Hi')))
           (scs_elem _ _ x0) (scs_prf _ _ x0)).
 simpl in |- *; apply csf_wd_unfolded.
-case x0; simpl in |- *; Algebra.
+case x0; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with (S p) F;
  apply Taylor_lemma1.
@@ -563,7 +547,7 @@ apply
        (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) [*]
      (One[/] _[//]nring_fac_ap_zero IR 0) [*]One).
 simpl in |- *; rational.
-Lazy_Eq; simpl in |- *; Algebra.
+Lazy_Eq; simpl in |- *; algebra.
 Qed.
 
 Lemma Taylor_lemma9 : forall n Hf Hf',
@@ -584,7 +568,7 @@ apply
        (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR1 Hx))) [*]
      (One[/] Zero[+]One[//]nring_fac_ap_zero IR 0) [*]One).
 simpl in |- *; rational.
-Lazy_Eq; simpl in |- *; Algebra.
+Lazy_Eq; simpl in |- *; algebra.
 apply Taylor_lemma8; assumption.
 cut {p : nat | S n = p}; [ intro H | exists (S n); auto ].
 elim H; intros p H0.
@@ -616,7 +600,7 @@ repeat first
  | apply bin_op_wd_unfolded
  | apply csf_wd_unfolded
  | apply eq_reflexive_unfolded ]; simpl in |- *.
-3: Algebra.
+3: algebra.
 apply Feq_imp_eq with (Compact Hab).
 2: assumption.
 apply FSumx_wd'.
@@ -626,11 +610,11 @@ repeat (split; auto).
 intros x0 H4; intros; simpl in |- *.
 repeat apply mult_wdl.
 apply eq_transitive_unfolded with (PartInt (fi n H1 i (lt_S _ _ H3)) x0 H4).
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply
  eq_transitive_unfolded
   with (PartInt (fi (S n) Hf i (lt_S _ _ (lt_S _ _ H'))) x0 H4).
-2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with i F; apply Taylor_lemma1.
 auto.
@@ -638,8 +622,8 @@ apply eq_transitive_unfolded with (PartInt (fi n H1 n (lt_n_Sn _)) x H2).
 2: apply
     eq_transitive_unfolded
      with (PartInt (fi (S n) Hf n (lt_S _ _ (lt_n_Sn _))) x H2).
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
-2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
+2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with n F; apply Taylor_lemma1.
 auto.
@@ -670,8 +654,8 @@ apply
        (PartInt
           (fi (S (S n)) Hf' (S n) (lt_n_S _ _ (lt_5 _ _ (lt_n_Sn (S n))))) x
           H2).
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
-2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
+2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with (S n) F;
  apply Taylor_lemma1.
@@ -839,7 +823,7 @@ eapply eq_transitive_unfolded.
 apply AbsIR_wd.
 rstepr (Taylor_rem n Hf[-]Part _ _ H0[*] (b[-]a)).
 apply cg_minus_wd.
-Algebra.
+algebra.
 apply mult_wdl.
 Transparent Taylor_rem funct_aux.
 unfold deriv_Sn', funct_aux in |- *.
@@ -850,12 +834,12 @@ simpl in |- *;
    with
      (n_deriv_I _ _ Hab' (S n) F Hf' c H1[*]
       (One[/] _[//]nring_fac_ap_zero _ n) [*] (b[-]c) [^]n).
-repeat apply mult_wdl; apply pfwdef; Algebra.
+repeat apply mult_wdl; apply pfwdef; algebra.
 repeat apply mult_wdl.
 apply
  eq_transitive_unfolded
   with (PartInt (fi (S n) Hf' (S n) (lt_n_S _ _ (lt_n_Sn _))) c Hc').
-2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply Feq_imp_eq with (Compact Hab).
 unfold Hab in |- *; apply Derivative_I_n_unique with (S n) F.
 apply n_deriv_lemma.

@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Integral.
@@ -101,7 +85,7 @@ astepr (integral a b Hab' F HF'[-]Zero).
 apply cg_minus_wd.
 apply integral_wd'.
 apply leEq_imp_Min_is_lft; assumption.
-Algebra.
+algebra.
 apply integral_empty.
 apply leEq_imp_Min_is_lft; assumption.
 Qed.
@@ -168,7 +152,7 @@ Lemma Integral_wd' : forall a' b' Ha'b' contF', a [=] a' -> b [=] b' ->
  Integral contF [=] Integral (a:=a') (b:=b') (Hab:=Ha'b') (F:=F) contF'.
 intros.
 unfold Integral in |- *.
-apply cg_minus_wd; apply integral_wd'; try apply bin_op_wd_unfolded; Algebra.
+apply cg_minus_wd; apply integral_wd'; try apply bin_op_wd_unfolded; algebra.
 Qed.
 
 (**
@@ -302,7 +286,7 @@ rstepl
  (integral a c Hac F Hac'[+]integral c b Hcb F Hcb'[-]integral a c Hac F Hac').
 apply cg_minus_wd.
 apply integral_plus_integral.
-Algebra.
+algebra.
 Qed.
 
 Lemma integral_plus_integral' : forall a b Hab F c Hac Hcb Hab' Hac' Hcb',
@@ -312,7 +296,7 @@ rstepl
  (integral a c Hac F Hac'[+]integral c b Hcb F Hcb'[-]integral c b Hcb F Hcb').
 apply cg_minus_wd.
 apply integral_plus_integral.
-Algebra.
+algebra.
 Qed.
 
 (**
@@ -534,7 +518,7 @@ apply rht_leEq_Max.
 apply leEq_transitive with b.
 apply Min_leEq_rht.
 apply rht_leEq_Max.
-apply Integral_empty; Algebra.
+apply Integral_empty; algebra.
 apply included_imp_contin with (Hab := Hab).
 2: apply contF.
 intros x H.

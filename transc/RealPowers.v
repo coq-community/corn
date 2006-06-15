@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing [!] %\ensuremath{\hat{\ }}% #^# *)
@@ -45,7 +29,7 @@ coincides with the exponential function.
 
 Lemma power_wd : forall x x' y y' Hx Hx', x [=] x' -> y [=] y' -> x[!]y[//]Hx [=] x'[!]y'[//]Hx'.
 intros.
-unfold power in |- *; Algebra.
+unfold power in |- *; algebra.
 Qed.
 
 Lemma power_strext : forall x x' y y' Hx Hx', x[!]y[//]Hx [#] x'[!]y'[//]Hx' -> x [#] x' or y [#] y'.
@@ -76,13 +60,13 @@ intros.
 unfold cg_minus in |- *.
 astepl (x[!]y[//]Hx[*]x[!][--]z[//]Hx).
 rstepr (x[!]y[//]Hx[*] (One[/] _[//]Hxz)).
-Algebra.
+algebra.
 Qed.
 
 Lemma power_nat : forall x n Hx, x[!]nring n[//]Hx [=] x[^]n.
 intros; unfold power in |- *.
 induction  n as [| n Hrecn].
-simpl in |- *; astepr (Exp Zero); simpl in |- *; Algebra.
+simpl in |- *; astepr (Exp Zero); simpl in |- *; algebra.
 simpl in |- *.
 astepr (Exp (nring n[*]Log x Hx) [*]Exp (Log x Hx)).
 astepr (Exp (nring n[*]Log x Hx[+]Log x Hx)).
@@ -101,7 +85,7 @@ Lemma power_one : forall (x : IR) Hx, x[!]One[//]Hx [=] x.
 intros.
 astepr (x[^]1).
 astepr (x[!]nring 1[//]Hx).
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Hint Resolve power_zero power_one: algebra.
@@ -167,7 +151,7 @@ intros; unfold power in |- *.
 apply Exp_wd.
 astepl (z[*]y[*]Log x Hx).
 astepl (z[*] (y[*]Log x Hx)).
-Algebra.
+algebra.
 Qed.
 
 Lemma power_pos : forall (x y : IR) Hx, Zero [<] x[!]y[//]Hx.
@@ -343,7 +327,7 @@ cut (Dom Expon (Part _ _ Hx4[*]Part _ _ Hx5)). intro H7.
     dom_wd
      with
        (x := Part _ _ (ProjIR1 (CAnd_intro _ _ Hx4 Hx5)) [*]
-             Part _ _ (ProjIR2 (CAnd_intro _ _ Hx4 Hx5))); Algebra.
+             Part _ _ (ProjIR2 (CAnd_intro _ _ Hx4 Hx5))); algebra.
 astepl (Part _ (Part _ _ Hx4[*]Part _ _ Hx5) H7[*]Part _ _ Hx2).
 clear Hx3; rename H7 into Hx3.
 astepl (Part _ (Part _ _ Hx4[*]Part _ _ (ProjT2 Hx5)) Hx3[*]Part _ _ Hx2).
@@ -374,7 +358,7 @@ apply
     (A[*]
      (Part _ _ Hx10[*] (Part _ _ Hx14[*]Part _ _ Hx15) [+]
       Part _ _ Hx12[*]Part _ _ Hx13)).
-apply mult_wd; Algebra.
+apply mult_wd; algebra.
 astepl
  (A[*]
   (Part _ _ Hx10[*] (Part _ _ Hx14[*]Part _ _ Hx15) [+]
@@ -433,7 +417,7 @@ astepr (Part _ _ Hx1[+]Part _ _ Hx2[*] (Part _ _ H12[*]Part _ _ Hx4)).
 apply
  eq_transitive_unfolded
   with (Part _ _ Hx1[+]Part _ _ Hx2[*] (Part _ _ H12[*]Log _ H9)).
-2: unfold Log in |- *; apply bin_op_wd_unfolded; Algebra.
+2: unfold Log in |- *; apply bin_op_wd_unfolded; algebra.
 clear Hx3 Hx4.
 astepr (Part _ _ Hx1[+]Part _ _ (ProjT2 Hx2) [*] (Part _ _ H12[*]Log _ H9)).
 elim Hx2; clear Hx2; intros Hx2 Hx3.
@@ -450,7 +434,7 @@ astepr
 apply
  eq_transitive_unfolded
   with (Part _ _ Hx1[+]Part _ _ H13[*] (Part _ _ H12[*]Log _ H9)).
-2: apply bin_op_wd_unfolded; Algebra.
+2: apply bin_op_wd_unfolded; algebra.
 generalize H13; clear H13 Hx3.
 elim Hx5; clear Hx5; intros Hx5 Hx6 Hx3.
 astepr
@@ -460,8 +444,8 @@ apply
  eq_transitive_unfolded
   with
     (Part _ _ Hx1[+]Exp (Part _ _ H7[*]Log _ H9) [*] (Part _ _ H12[*]Log _ H9)).
-2: apply bin_op_wd_unfolded; [ Algebra | unfold Log in |- *; simpl in |- * ].
-2: apply bin_op_wd_unfolded; Algebra.
+2: apply bin_op_wd_unfolded; [ algebra | unfold Log in |- *; simpl in |- * ].
+2: apply bin_op_wd_unfolded; algebra.
 eapply eq_transitive_unfolded.
 apply ring_dist_unfolded.
 apply bin_op_wd_unfolded.
@@ -479,24 +463,24 @@ astepr (Part _ _ H7[*] (Part _ _ Hx2[*]Part _ _ H11)).
 apply
  eq_transitive_unfolded
   with (Part _ _ H7[*] (Exp (Part _ _ Hx1) [*]Part _ _ H11)).
-2: simpl in |- *; Algebra.
+2: simpl in |- *; algebra.
 clear Hx2.
 apply
  eq_transitive_unfolded
   with
     (Part _ _ H7[*]
      (Exp (Part _ _ (ProjIR1 Hx1) [*]Part _ _ (ProjIR2 Hx1)) [*]Part _ _ H11)).
-2: apply mult_wdr; Algebra.
+2: apply mult_wdr; algebra.
 elim Hx1; clear Hx1; intros Hx1 Hx2.
 apply
  eq_transitive_unfolded
   with (Part _ _ H7[*] (Exp (Part _ _ Hx1[*]Part _ _ Hx2) [*]Part _ _ H11)).
-2: apply mult_wdr; Algebra.
+2: apply mult_wdr; algebra.
 apply
  eq_transitive_unfolded
   with (Part _ _ H7[*] (Exp ((Part _ _ H7[-]One) [*]Log _ H9) [*]Part _ _ H11)).
 2: unfold Log in |- *; simpl in |- *.
-2: apply mult_wdr; apply mult_wd; Algebra.
+2: apply mult_wdr; apply mult_wd; algebra.
 clear Hx1 Hx2.
 rstepl
  ((Exp (Part _ _ H7[*]Log _ H9) [/] _[//]H10) [*] (Part _ _ H7[*]Part _ _ H11)).
@@ -505,7 +489,7 @@ apply mult_wdl.
 apply eq_transitive_unfolded with (Exp (Part _ _ H7[*]Log _ H9[-]Log _ H9)).
 2: apply Exp_wd; rational.
 astepr (Exp (G x H7[*]Log _ H9) [/] _[//]Exp_ap_zero (Log _ H9)).
-Algebra.
+algebra.
 Transparent Logarithm.
 astepr (Part _ _ Hx16); auto.
 Opaque Logarithm.

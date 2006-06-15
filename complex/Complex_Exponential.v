@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing ExpCC %\ensuremath{\exp_{\mathbb C}}% *)
@@ -53,9 +37,9 @@ unfold ExpCC in |- *.
 apply bin_op_wd_unfolded.
 apply cc_IR_wd.
 apply Exp_wd.
-Algebra.
+algebra.
 
-split; Algebra.
+split; algebra.
 
 Qed.
 
@@ -67,9 +51,9 @@ Lemma ExpCC_equation_aid_2 :
    (Sin (Im z1) [*]Cos (Im z2) [+]Cos (Im z1) [*]Sin (Im z2))).
 intros z1 z2. apply bin_op_wd_unfolded.
 
-apply cc_IR_wd. Algebra.
+apply cc_IR_wd. algebra.
 
-split; Algebra.
+split; algebra.
 
 Qed.
 
@@ -88,7 +72,7 @@ set (c1 := Cos (Im z1)) in *.
 set (c2 := Cos (Im z2)) in *.
 set (s1 := Sin (Im z1)) in *.
 set (s2 := Sin (Im z2)) in *.
-split; simpl in |- *; Algebra.
+split; simpl in |- *; algebra.
 Qed.
 
 Lemma ExpCC_equation_aid_4 :
@@ -138,7 +122,7 @@ apply eq_transitive_unfolded with (S := cc_csetoid) (y := ExpCC Zero).
 astepl (ExpCC (z[+][--]z)).
 apply ExpCC_wd.
 rational.
-Algebra.
+algebra.
 Qed.
 
 Hint Resolve ExpCC_inv_aid: algebra.
@@ -174,8 +158,8 @@ astepl (ExpCC z[^]n0[*]ExpCC z).
 astepl (ExpCC (nring n0[*]z) [*]ExpCC z).
 astepl (ExpCC (nring n0[*]z[+]z)).
 apply ExpCC_wd.
-Algebra.
-rstepl ((nring n0[+]One) [*]z). Algebra.
+algebra.
+rstepl ((nring n0[+]One) [*]z). algebra.
 Qed.
 
 Hint Resolve ExpCC_pow: algebra.
@@ -248,7 +232,7 @@ intro x. unfold ExpCC in |- *.
 astepl (cc_IR (Exp x) [*] (Cos (Im (cc_IR x)) [+I*]Sin (Im (cc_IR x)))).
 astepr (cc_IR (Exp x) [*]One).
 apply bin_op_wd_unfolded.
-Algebra.
+algebra.
 astepl (Cos Zero[+I*]Sin Zero).
 Step_final (One[+I*]Zero).
 Qed.

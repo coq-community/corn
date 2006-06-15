@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CMonoids.
@@ -693,7 +677,7 @@ Definition to_C:
   (H3:((Z_of_nat k)>=0)%Z),(is_generator M u)->
   (k<l and 
   (power_CMonoid u  k [=] power_CMonoid u l)
-  and ((forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+  and ((forall (k0 l0:nat), (k0<>l0 and (k0<k or (k0=k and l0<l)))-> 
   (power_CMonoid u k0 [#] power_CMonoid u l0))))->
   M -> (C_as_CMonoid (Z_of_nat k)(Z_of_nat (l-k)) H2 H3).
 intros M u  k l  H2 H3 H H1 m1.
@@ -742,7 +726,7 @@ Lemma to_C_strext:
   forall (M:CMonoid)(u:M)(k l:nat)(H2:((Z_of_nat (l-k))>0)%Z)
   (H3:((Z_of_nat k)>=0)%Z)(H:(is_generator M u))(H1:(k<l and 
   (power_CMonoid u  k [=] power_CMonoid u l)
-  and ((forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+  and ((forall (k0 l0:nat), (k0<>l0 and (k0<k or (k0=k and l0<l)))-> 
   (power_CMonoid u  k0 [#] power_CMonoid u l0))))),
   (fun_strext (to_C M u  k l H2 H3 H H1)):CProp.
 intros M u k l H2 H3 H H1.
@@ -753,16 +737,8 @@ unfold ZFap.
 unfold to_C.
 unfold sigT_rec.
 unfold sigT_rect.
-(* generalize H1.*)
 set (H99:= (power_k_n M u)).
-(* generalize H99.
-clear H99.
-clear H1.*)
-(* case H.
-simpl.
-clear H.*)
 unfold is_generator in H.
-(* intros H99.*)
 case (H x).
 intros n0 prfn0.
 case (H y).
@@ -793,7 +769,7 @@ clear H8.
 intro H8.
 cut (p+(l-q)<l).
 intro H9.
-cut (k<k or (k=k and (p+(l-q))<l)). 
+cut (k<>p+(l-q) and (k<k or (k=k and (p+(l-q))<l))). 
 intro H10.
 set (H11:=( H1'' k (p+(l-q)) H10)).
 generalize H11.
@@ -851,18 +827,67 @@ intro H20.
 rewrite (inj_minus1 l k H20).
 intuition.
 
-intuition.
-apply lt_lt_minus.
+split.
 2:intuition.
-3:apply not_or.
-3:exact H7.
+2:apply lt_lt_minus.
+3:intuition.
+4:apply not_or.
+4:exact H7.
+set (H10:=(Z_mod_lt (n0-k)%nat (l-k)%nat H2)).
+elim H10.
+clear H10.
+intros H10 H10'.
+clear H10'.
+set (H11:=(Z_mod_lt (n1-k)%nat (l-k)%nat H2)).
+elim H11.
+clear H11.
+intros H11' H11.
+clear H11'.
+unfold q.
+set (H12:= (mod_nat_correct (n1-k)(l-k) H2)).
+Set Printing Coercions.
+apply surj_not.
+rewrite (inj_plus p (l-(k+ mod_nat (n1 - k) (l - k) H2))).
+rewrite (inj_minus1 l (k+mod_nat (n1-k)(l-k)H2)).
+rewrite (inj_plus k (mod_nat (n1-k)(l-k) H2)).
+rewrite<- H12.
+unfold p.
+rewrite (inj_plus k (mod_nat (n0-k)(l-k)H2)).
+set (H13:=(mod_nat_correct (n0-k)(l-k) H2)).
+rewrite<- H13.
+cut  (Z_of_nat k <
+   (Z_of_nat k + Z_of_nat (n0 - k) mod Z_of_nat (l - k) +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (n1 - k) mod Z_of_nat (l - k))))%Z)%Z.
+intuition.
+clear H12.
+clear H13.
+cut (Z_of_nat k <
+    Z_of_nat k + 0 +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (n1 - k) mod Z_of_nat (l - k))))%Z.
+intuition.
+cut (Z_of_nat k <=
+    Z_of_nat k + 0 +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (l - k))))%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+apply surj_le.
+rewrite (inj_plus k (mod_nat (n1-k)(l-k)H2)).
+cut (Z_of_nat k + Z_of_nat ((l - k)) <= Z_of_nat l)%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+cut ((l-k)>0)%Z.
+intro H11.
 unfold q.
 set (H9:= (mod_nat_correct (n1-k)(l-k) H2)).
 apply surj_lt.
 rewrite (inj_plus k ( mod_nat (n1 - k) (l - k) H2)).
 rewrite<- H9.
-cut ((l-k)>0)%Z.
-intro H11.
 set (H10:=(Z_mod_lt (n1-k) (l-k) H11)).
 2:intuition.
 cut (k<= n1).
@@ -879,7 +904,7 @@ clear H8.
 intro H8.
 cut (q+(l-p)<l).
 intro H9.
-cut (k<k or (k=k and (q+(l-p))<l)). 
+cut (k<>q+(l-p) and(k<k or (k=k and (q+(l-p))<l))). 
 intro H10.
 set (H11:=( H1'' k (q+(l-p)) H10)).
 generalize H11.
@@ -936,6 +961,56 @@ cut (k<=l).
 intro H20.
 rewrite (inj_minus1 l k H20).
 intuition.
+
+split.
+set (H10:=(Z_mod_lt (n0-k)%nat (l-k)%nat H2)).
+elim H10.
+clear H10.
+intros H10' H10.
+clear H10'.
+set (H11:=(Z_mod_lt (n1-k)%nat (l-k)%nat H2)).
+elim H11.
+clear H11.
+intros H11 H11'.
+clear H11'.
+unfold p.
+set (H12:= (mod_nat_correct (n0-k)(l-k) H2)).
+Set Printing Coercions.
+apply surj_not.
+rewrite (inj_plus q (l-(k+ mod_nat (n0 - k) (l - k) H2))).
+rewrite (inj_minus1 l (k+mod_nat (n0-k)(l-k)H2)).
+rewrite (inj_plus k (mod_nat (n0-k)(l-k) H2)).
+rewrite<- H12.
+unfold q.
+rewrite (inj_plus k (mod_nat (n1-k)(l-k)H2)).
+set (H13:=(mod_nat_correct (n1-k)(l-k) H2)).
+rewrite<- H13.
+cut  (Z_of_nat k <
+   (Z_of_nat k + Z_of_nat (n1 - k) mod Z_of_nat (l - k) +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (n0 - k) mod Z_of_nat (l - k))))%Z)%Z.
+intuition.
+clear H12.
+clear H13.
+cut (Z_of_nat k <
+    Z_of_nat k + 0 +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (n0 - k) mod Z_of_nat (l - k))))%Z.
+intuition.
+cut (Z_of_nat k <=
+    Z_of_nat k + 0 +
+    (Z_of_nat l - (Z_of_nat k + Z_of_nat (l - k))))%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+apply surj_le.
+rewrite (inj_plus k (mod_nat (n0-k)(l-k)H2)).
+cut (Z_of_nat k + Z_of_nat ((l - k)) <= Z_of_nat l)%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
 
 intuition.
 apply lt_lt_minus.
@@ -1002,7 +1077,12 @@ clear H8.
 intro H8.
 cut (p+(l-q)<l).
 intro H9.
-cut (k<k or (k=k and (p+(l-q))<l)). 
+cut ((p+(l-q))<>k or ((p+(l-q)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>p+(l-q) and (k<k or (k=k and (p+(l-q))<l))). 
 intro H10.
 set (H11:=( H1'' k (p+(l-q)) H10)).
 generalize H11.
@@ -1036,7 +1116,7 @@ set (H16:=(Z_mod_lt (n0-k) (l-k) H17)).
 unfold q.
 set (H18:= (mod_nat_correct (n0-k) (l-k) H2)).
 
-3:intuition.
+5:intuition.
 apply surj_eq.
 rewrite (inj_plus (k + mod_nat (n0 - k) (l - k) H2)  (l - (k + mod_nat (n0 - k) (l - k) H2))).
 cut ((k + mod_nat (n0 - k) (l - k) H2)<=l).
@@ -1061,6 +1141,60 @@ rewrite (inj_minus1 l k H20).
 intuition.
 
 intuition.
+
+clear H13.
+intro H13.
+cut (p<>q  and (p<k or (p=k and q<l))). 
+intro H10.
+set (H11:=( H1'' p q H10)).
+apply ap_symmetric_unfolded.
+exact H11.
+split.
+intuition.
+left.
+apply plus_lt_reg_l with (l-q).
+replace (l-q+p) with (p+(l-q)).
+2:intuition.
+rewrite H13.
+intuition.
+cut (0+k < l-q+k).
+intuition.
+apply plus_lt_compat_r.
+unfold q.
+
+apply surj_lt.
+set (H16:=(Z_mod_lt (n0-k)%nat (l-k)%nat  H2)).
+rewrite (inj_minus1 l (k + mod_nat (n0 - k) (l - k) H2)).
+rewrite (inj_plus k ( mod_nat (n0 - k) (l - k) H2)).
+elim H16.
+clear H16.
+intros H16 H16'.
+clear H16.
+rewrite<- (mod_nat_correct (n0-k) (l-k) H2).
+cut (Z_of_nat 0 <=
+    Z_of_nat l - (Z_of_nat k + Z_of_nat (l - k)))%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+
+apply surj_le.
+elim H16.
+clear H16.
+intros H16 H16'.
+rewrite (inj_plus k ( mod_nat (n0 - k) (l - k) H2)).
+rewrite<- (mod_nat_correct (n0-k)(l-k) H2). 
+cut (Z_of_nat k + Z_of_nat (l - k) <= Z_of_nat l)%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+
+set (H10:=(eq_nat_dec (p+(l-q)) k)).
+intuition.
+
 apply lt_lt_minus.
 unfold q.
 set (H9:= (mod_nat_correct (n0-k)(l-k) H2)).
@@ -1086,7 +1220,12 @@ clear H8.
 intro H8.
 cut (q+(l-p)<l).
 intro H9.
-cut (k<k or (k=k and (q+(l-p))<l)). 
+cut ((q+(l-p))<>k or ((q+(l-p)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>(q+(l-p)) and(k<k or (k=k and (q+(l-p))<l))). 
 intro H10.
 set (H11:=( H1'' k (q+(l-p)) H10)).
 generalize H11.
@@ -1123,6 +1262,34 @@ intro H16.
 rewrite (inj_minus1 l n1 H16).
 intuition.
 
+intuition.
+
+clear H13.
+intro H13.
+cut (q<>p  and (q<k or (q=k and p<l))). 
+intro H10.
+set (H11:=( H1'' q p H10)).
+exact H11.
+split.
+intuition.
+left.
+apply plus_lt_reg_l with (l-p).
+replace (l-p+q) with (q+(l-p)).
+2:intuition.
+rewrite H13.
+intuition.
+cut (0+k < l-p+k).
+intuition.
+apply plus_lt_compat_r.
+unfold p.
+
+apply surj_lt.
+rewrite (inj_minus1 l  n1).
+intuition.
+apply lt_le_weak.
+exact H4.
+
+set (H10:=(eq_nat_dec (q+(l-p)) k)).
 intuition.
 
 apply lt_lt_minus.
@@ -1166,7 +1333,12 @@ clear H8.
 intro H8.
 cut (p+(l-q)<l).
 intro H9.
-cut (k<k or (k=k and (p+(l-q))<l)). 
+cut ((p+(l-q))<>k or ((p+(l-q)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>p+(l-q) and (k<k or (k=k and (p+(l-q))<l))). 
 intro H10.
 set (H11:=( H1'' k (p+(l-q)) H10)).
 generalize H11.
@@ -1224,6 +1396,58 @@ rewrite (inj_minus1 l k H20).
 intuition.
 
 intuition.
+
+clear H13.
+intro H13.
+cut (p<>q  and (p<k or (p=k and q<l))). 
+intro H10.
+set (H11:=( H1'' p q H10)).
+exact H11.
+split.
+intuition.
+left.
+apply plus_lt_reg_l with (l-q).
+replace (l-q+p) with (p+(l-q)).
+2:intuition.
+rewrite H13.
+cut (0+k < l-q+k).
+intuition.
+apply plus_lt_compat_r.
+unfold q.
+
+apply surj_lt.
+set (H16:=(Z_mod_lt (n1-k)%nat (l-k)%nat  H2)).
+rewrite (inj_minus1 l (k + mod_nat (n1 - k) (l - k) H2)).
+rewrite (inj_plus k ( mod_nat (n1 - k) (l - k) H2)).
+elim H16.
+clear H16.
+intros H16 H16'.
+clear H16.
+rewrite<- (mod_nat_correct (n1-k) (l-k) H2).
+cut (Z_of_nat 0 <=
+    Z_of_nat l - (Z_of_nat k + Z_of_nat (l - k)))%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+
+apply surj_le.
+elim H16.
+clear H16.
+intros H16 H16'.
+rewrite (inj_plus k ( mod_nat (n1 - k) (l - k) H2)).
+rewrite<- (mod_nat_correct (n1-k)(l-k) H2). 
+cut (Z_of_nat k + Z_of_nat (l - k) <= Z_of_nat l)%Z.
+intuition.
+rewrite (inj_minus1 l k).
+intuition.
+apply lt_le_weak.
+exact H1'.
+
+set (H10:=(eq_nat_dec (p+(l-q)) k)).
+intuition.
+
 apply lt_lt_minus.
 unfold q.
 set (H9:= (mod_nat_correct (n1-k)(l-k) H2)).
@@ -1249,7 +1473,12 @@ clear H8.
 intro H8.
 cut (q+(l-p)<l).
 intro H9.
-cut (k<k or (k=k and (q+(l-p))<l)). 
+cut ((q+(l-p))<>k or ((q+(l-p)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>q+(l-p) and (k<k or (k=k and (q+(l-p))<l))). 
 intro H10.
 set (H11:=( H1'' k (q+(l-p)) H10)).
 generalize H11.
@@ -1286,6 +1515,30 @@ intro H16.
 rewrite (inj_minus1 l n0 H16).
 intuition.
 
+intuition.
+
+clear H13.
+intro H13.
+cut (q<>p  and (q<k or (q=k and p<l))). 
+intro H10.
+set (H11:=( H1'' q p H10)).
+apply ap_symmetric_unfolded.
+exact H11.
+split.
+intuition.
+left.
+apply plus_lt_reg_l with (l-p).
+replace (l-p+q) with (q+(l-p)).
+2:intuition.
+rewrite H13.
+cut (0+k < l-p+k).
+intuition.
+apply plus_lt_compat_r.
+unfold p.
+
+intuition.
+
+set (H10:=(eq_nat_dec (q+(l-p)) k)).
 intuition.
 
 apply lt_lt_minus.
@@ -1326,7 +1579,12 @@ clear H8.
 intro H8.
 cut (p+(l-q)<l).
 intro H9.
-cut (k<k or (k=k and (p+(l-q))<l)). 
+cut ((p+(l-q))<>k or ((p+(l-q)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>(p+(l-q)) and (k<k or (k=k and (p+(l-q))<l))). 
 intro H10.
 set (H11:=( H1'' k (p+(l-q)) H10)).
 generalize H11.
@@ -1364,6 +1622,31 @@ intuition.
 intuition.
 
 intuition.
+clear H13.
+intro H13.
+cut (p<>q  and (p<k or (p=k and q<l))). 
+intro H10.
+set (H11:=( H1'' p q H10)).
+apply ap_symmetric_unfolded.
+exact H11.
+split.
+
+intuition.
+left.
+apply plus_lt_reg_l with (l-q).
+replace (l-q+p) with (p+(l-q)).
+2:intuition.
+rewrite H13.
+intuition.
+cut (0+k < l-q+k).
+intuition.
+apply plus_lt_compat_r.
+unfold q.
+
+intuition.
+
+set (H10:=(eq_nat_dec (p+(l-q)) k)).
+intuition.
 
 apply lt_lt_minus.
 unfold q.
@@ -1375,7 +1658,12 @@ clear H8.
 intro H8.
 cut (q+(l-p)<l).
 intro H9.
-cut (k<k or (k=k and (q+(l-p))<l)). 
+cut ((q+(l-p))<>k or ((q+(l-p)=k))).
+intro H13.
+elim H13.
+clear H13.
+intro H13.
+cut (k<>q+(l-p) and (k<k or (k=k and (q+(l-p))<l))). 
 intro H10.
 set (H11:=( H1'' k (q+(l-p)) H10)).
 generalize H11.
@@ -1414,6 +1702,30 @@ intuition.
 
 intuition.
 
+clear H13.
+intro H13.
+cut (q<>p  and (q<k or (q=k and p<l))). 
+intro H10.
+set (H11:=( H1'' q p H10)).
+exact H11.
+split.
+intuition.
+left.
+apply plus_lt_reg_l with (l-p).
+replace (l-p+q) with (q+(l-p)).
+2:intuition.
+rewrite H13.
+intuition.
+cut (0+k < l-p+k).
+intuition.
+apply plus_lt_compat_r.
+unfold p.
+
+intuition.
+
+set (H10:=(eq_nat_dec (q+(l-p)) k)).
+intuition.
+
 apply lt_lt_minus.
 2:intuition.
 unfold p.
@@ -1430,7 +1742,7 @@ Definition to_C_as_csf (M:CMonoid)(u:M)(k l:nat)
 (H2: ((Z_of_nat (l-k))>0)%Z)(H3:((Z_of_nat k)>=0)%Z)(H:(is_generator M u))
 (H1:(k<l and 
 (power_CMonoid u  k [=] power_CMonoid u l)
-and ((forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+and ((forall (k0 l0:nat), k0<>l0 and (k0<k or (k0=k and l0<l))-> 
 (power_CMonoid u k0 [#] power_CMonoid u l0)))))
 :=
 (Build_CSetoid_fun M  (C_as_CMonoid k (l - k)%nat H2 H3)
@@ -1496,8 +1808,8 @@ Variable power_mod:forall (k l n : nat) (H2 : (Z_of_nat (l - k) > 0)%Z),
         k < n ->
         k < l
         and power_CMonoid c0 k[=]power_CMonoid c0 l
-            and (forall k0 l0 : nat,
-                 k0 < k or k0 = k and l0 < l ->
+            and (forall k0 l0 : nat, k0<>l0 and
+                 (k0 < k or k0 = k and l0 < l) ->
                  power_CMonoid c0 k0[#]power_CMonoid c0 l0) ->
         power_CMonoid c0 n[=]
         power_CMonoid c0 (k + mod_nat (n - k) (l - k) H2).
@@ -1506,14 +1818,14 @@ Variable w_inj:forall k l a b : nat,
         b < l ->
         k < l
         and power_CMonoid c0 k[=]power_CMonoid c0 l
-            and (forall k0 l0 : nat,
-                 k0 < k or k0 = k and l0 < l ->
+            and (forall k0 l0 : nat, k0<>l0 and
+                 (k0 < k or k0 = k and l0 < l) ->
                  power_CMonoid c0 k0[#]power_CMonoid c0 l0) ->
         power_CMonoid c0 a[=]power_CMonoid c0 b -> a = b.
 Variable smallest: k < l
         and power_CMonoid c0 k[=]power_CMonoid c0 l
-            and (forall k0 l0 : nat,
-                 k0 < k or k0 = k and l0 < l ->
+            and (forall k0 l0 : nat, k0<>l0 and
+                 (k0 < k or k0 = k and l0 < l) ->
                  power_CMonoid c0 k0[#]power_CMonoid c0 l0).
 Variable n0 n1 n2:nat.
 Variable a b:cs_crr (csg_crr (cm_crr M)).
@@ -1570,7 +1882,6 @@ intuition.
 
 2:intuition.
 
-
 apply surj_lt.
 rewrite (inj_plus k (mod_nat (n0 - k) (l - k) H13)).
 rewrite<- H14.
@@ -1584,7 +1895,6 @@ cut (k<=l).
 intro H18.
 rewrite<- (inj_minus1 l k H18).
 exact H17.
-
 intuition.
 
 cut (k<n0).
@@ -2414,8 +2724,8 @@ Variable k l:nat.
 Variable smallest: k < l
       and power_CMonoid u  k[=]
           power_CMonoid u l
-          and (forall k0 l0 : nat,
-               k0 < k or k0 = k and l0 < l ->
+          and (forall k0 l0 : nat, k0<>l0 and
+               (k0 < k or k0 = k and l0 < l) ->
                power_CMonoid u k0[#]
                power_CMonoid u l0).
 Variable a b:cs_crr (csg_crr (cm_crr M)).
@@ -2440,16 +2750,8 @@ unfold ZFeq.
 unfold to_C.
 unfold sigT_rec.
 unfold sigT_rect.
-(* generalize smallest_gen.*)
 set (power_mod :=(power_k_n M u)).
 set (w_inj:=(weakly_inj1 M u)).
-(* generalize w_inj_gen.
-generalize power_mod_gen.
-clear power_mod_gen.
-clear w_inj_gen.
-case cyc.
-simpl.
-intros c0 H power_mod w_inj smallest.*)
 case ( gen (csbf_fun M M M (csg_op (c:=M)) a b)).
 intros n0 Hn0.
 case (le_lt_dec l n0).
@@ -2932,13 +3234,18 @@ intros z l2 Hn2 l1 Hn1 l0.
 apply Char11 with M k l u a b.
 exact H5.
 intros.
+apply power_mod.
+exact gen.
+exact H.
+exact X.
+intros.
 apply w_inj with k0 l3.
 exact gen.
 exact H.
 exact H0.
 exact X.
 exact H1.
-exact smallest.
+apply smallest.
 exact Hn0.
 exact Hn1.
 exact Hn2.
@@ -2978,7 +3285,6 @@ exact l0.
 Qed.
 
 End MP.
-
 Section ZP.
 
 Variable M:CMonoid.
@@ -2988,8 +3294,8 @@ Variable l k: nat.
 Variable smallest:k < l
       and power_CMonoid u k[=]
           power_CMonoid u l
-          and (forall k0 l0 : nat,
-               k0 < k or k0 = k and l0 < l ->
+          and (forall k0 l0 : nat, k0<>l0 and 
+               (k0 < k or k0 = k and l0 < l) ->
                power_CMonoid u k0[#]
                power_CMonoid u l0).
 Variable H3:k >= 0.
@@ -3024,7 +3330,11 @@ unfold Cdecidable in H10.
 elim H10.
 clear H10.
 intro H10.
-set (H11:= (H8 H10)).
+cut (0<>i).
+intro H10'.
+cut (0<>i and (0 < k or 0 = k and i < l)).
+intro H10''.
+set (H11:= (H8 H10'')).
 simpl.
 csetoid_replace_cxt (@cm_unit M) (power_CMonoid u 0) H2.
 set (H12:=(eq_imp_not_ap M ( power_CMonoid u i)(power_CMonoid u 0)H2)).
@@ -3034,6 +3344,9 @@ unfold Not in H12.
 intuition.
 simpl.
 apply eq_reflexive.
+
+intuition.
+intuition.
 
 intro H11.
 cut (k=0).
@@ -3067,7 +3380,16 @@ unfold Not in H18.
 apply H18.
 apply H17.
 rewrite H12.
-right.
+split.
+
+apply surj_not.
+rewrite<- mod_nat_correct.
+replace i with (i-0).
+replace l with (l-0).
+intuition.
+intuition.
+intuition.
+
 intuition.
 
 rewrite<- (mod_nat_correct i l H14).
@@ -3130,7 +3452,6 @@ exact H2.
 Qed.
 
 End ZP.
-
 Section inj_surj.
 
 Variable M:CMonoid.
@@ -3140,13 +3461,12 @@ Variable k l:nat.
 Variable smallest:k < l
       and power_CMonoid u k[=]
           power_CMonoid u l
-          and (forall k0 l0 : nat,
-               k0 < k or k0 = k and l0 < l ->
+          and (forall k0 l0 : nat,k0<>l0 and
+               (k0 < k or k0 = k and l0 < l) ->
                power_CMonoid u k0[#]
                power_CMonoid u l0).
 Variable H7:((l - k)%nat > 0)%Z.
 Variable H4: (k >= 0)%Z.
-
 Section IL.
 
 Variable  a0 : M.
@@ -3157,7 +3477,7 @@ Variable  power_mod : forall (n : nat) (H2 : (Z_of_nat (l - k) > 0)%Z),
          k < n ->
          k < l
          and power_CMonoid u k[=]power_CMonoid u l
-             and ((forall k0 l0 : nat,
+             and ((forall k0 l0 : nat, k0<>l0 and
                   (k0 < k or k0 = k and l0 < l) ->
                   power_CMonoid u k0[#]power_CMonoid u l0):CProp) ->
          power_CMonoid u n[=]
@@ -3505,7 +3825,6 @@ exact H4.
 Qed.
 
 End CTN.
-
 Section Th17.
 
 Variable M:CMonoid.
@@ -3514,7 +3833,7 @@ Variable gen:(is_generator M u).
 
 Theorem Th17_partI:
 ({k:nat | {l:nat |k<l and (power_CMonoid u k [=] power_CMonoid u l)
-and (forall (k0 l0:nat), (k0<k or (k0=k and l0<l))-> 
+and (forall (k0 l0:nat), k0<>l0 and (k0<k or (k0=k and l0<l))-> 
 (power_CMonoid u k0 [#] power_CMonoid u l0) )}}
  ->
 {k:Z|{H0:(k>=0)%Z|{n:Z|{H:(n>0)%Z| (isomorphic M (C_as_CMonoid k n H H0))}}}}):

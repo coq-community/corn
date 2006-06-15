@@ -11,8 +11,9 @@ A (no longer updated) version compatible with version 7.4 is also
 available.
 
 Before installing C-CoRN, please check that you have:
- - Coq version 8.0 (a compiled source tree, not only a binary package)
- - the OCaml you used to compile Coq
+ - Coq version 8.0
+   (CoRN used to require a compiled source tree, but a binary package will
+    do these days.)
  - at least 128MiB RAM memory available (and preferably more, especially if
    you plan to use the formalization of Real Analysis).
  - GNU make version 3.80 or later
@@ -20,11 +21,15 @@ Before installing C-CoRN, please check that you have:
    thereof or a good emulation layer on top of another OS. In
    particular, *hard* links must be supported by the file system.
  - the GNU Bourne Again SHell (we use some bashisms)
+ - At least one of:
+   * The "realpath" utility in your PATH (Debian package realpath).
+   * A C compiler.
 
 In order for C-CoRN to work, you need to set some environment variables.
 We advise you to do this inside a .bash_profile or similar.
- - COQTOP should be set to the location of the Coq sources (e.g.
-   /usr/local/src/coq-8.0/)
+ - COQTOP should be set to the Coq installation prefix (e.g. /usr/ or
+   /usr/local/) or the location of a compiled Coq source tree (e.g.
+   /usr/local/src/coq-8.0/).
  - COQBIN should be set to the directory where the Coq binaries can
    be found, if different from ${COQTOP}/bin/.
 
@@ -113,23 +118,26 @@ are recognized.
  OCAMLC=file
  OCAMLOPT=file
               -> Choose an ocamlc and ocamlopt to use
+                 (Obsolete, as CoRN does not use OCaml anymore.)
  COQDOC=file  -> Choose a coqdoc to use
 
 HUMAN CONVENIENCE
 -----------------
 
 CoRN now has a few facilities for the convenience of the human beings
-using it. Enable with "make human", or "make ide" for coqide support
-(this needs a coqide-enabled Coq).
+using it. Enable with "make human".
 
 This will create Makefiles in every directory scanned for .v files
 (but will not overwrite the Makefile if any is present) so that all
 make commands work from anywhere in the CoRN hierarchy.
 
-It also populates the "bin" directory with CoRNc, CoRNtop and (with
-coqide support) CoRNide. These are CoRN versions of coqc, coqtop and
-coqide, respectively. We suggest you add the "bin" directory of CoRN
-to your PATH.
+It also populates the "bin" directory with CoRNc, CoRNtop and
+CoRNide. These are CoRN versions of coqc, coqtop and coqide,
+respectively. We suggest you add the "bin" directory of CoRN to your
+PATH.
+
+The old "ide" target is obsolete, as CoRN does not require a custom
+Coq image anymore.
 
 DEPENDENCIES
 ------------
@@ -147,5 +155,5 @@ For any questions, comments, bug reports or other feel free to e-mail
 lcf@cs.kun.nl.
 
 $Id$
-                 
+
  LocalWords:  Nijmegen CoRN Coq CVS

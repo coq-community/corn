@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* CQuotient_Rings.v, v1.0, 28april2004, Bart Kirkels *)
 
 (** printing [+] %\ensuremath+% #+# *)
@@ -47,8 +31,8 @@ Lemma ap_quotring_irreflexive : irreflexive ap_quotring.
 red in |-*.
 intro x.
 unfold ap_quotring in |-*.
-assert (x[-]x[=]Zero); Algebra.
-assert (Not ((cipred R C) Zero)); Algebra.
+assert (x[-]x[=]Zero); algebra.
+assert (Not ((cipred R C) Zero)); algebra.
 intro. apply H0.
 apply (coideal_wd R C (x[-]x) Zero); auto.
 Qed.
@@ -60,7 +44,7 @@ unfold ap_quotring.
 intro X.
 cut (C [--]One and C (y[-]x)). intuition.
 apply (coideal_mult R C [--]One (y[-]x)).
-apply (coideal_wd R C (x[-]y) ([--]One[*](y[-]x))); Algebra.
+apply (coideal_wd R C (x[-]y) ([--]One[*](y[-]x))); algebra.
 astepr [--](y[-]x). 
 astepr [--](y[+][--]x).
 astepr ([--][--]x[+][--]y).
@@ -92,8 +76,8 @@ Definition eq_quotring (x y:R) := Not (C(x[-]y)).
 Lemma eq_quotring_wd : forall (x y:R), x[=]y -> (eq_quotring x y).
 intros x y X; auto.
 red in |-*; intro X0.
-assert ((cipred R C)(Zero)); Algebra.
-apply (coideal_wd R C (x[-]y) Zero); Algebra.
+assert ((cipred R C)(Zero)); algebra.
+apply (coideal_wd R C (x[-]y) Zero); algebra.
 apply x_minus_x; auto.
 apply (coideal_nonzero R C); assumption.
 Qed.
@@ -138,7 +122,7 @@ astepr (([--]y2[+][--]x2)[+]x1[+]y1).
 astepr (([--]y2[+][--]x2)[+](x1[+]y1)).
 astepr ((x1[+]y1)[+]([--]y2[+][--]x2)).
 astepr ((x1[+]y1)[+][--](x2[+]y2)).
-Algebra.
+algebra.
 Qed.
 
 Definition drplus_is_bin_fun := 
@@ -148,7 +132,7 @@ quotring_as_CSetoid (csg_op (c:=R)) drplus_is_ext.
 Lemma drplus_is_assoc : associative drplus_is_bin_fun.
 red in |-*; auto.
 intros x y z; simpl in |-*.
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Definition quotring_as_CSemiGroup := Build_CSemiGroup quotring_as_CSetoid
@@ -162,12 +146,12 @@ drplus_is_bin_fun drplus_is_assoc.
 Lemma zero_as_rht_unit : is_rht_unit drplus_is_bin_fun Zero.
 red in |-*; intro x.
 simpl in |-*.
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Lemma zero_as_lft_unit : is_lft_unit drplus_is_bin_fun Zero.
 red in |-*; intro x; simpl in |-*.
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Definition quotring_is_CMonoid := Build_is_CMonoid quotring_as_CSemiGroup
@@ -189,9 +173,9 @@ simpl in |-*.
 unfold ap_quotring in |-*.
 intro X.
 cut (C (x[-]y) and C [--]One). intuition.
-apply (coideal_mult R C (x[-]y) [--]One); Algebra.
-apply (coideal_wd R C ([--]One[*](x[-]y)) ((x[-]y)[*][--]One)); Algebra.
-apply (coideal_wd R C ([--]x[-][--]y) ([--]One[*](x[-]y))); Algebra.
+apply (coideal_mult R C (x[-]y) [--]One); algebra.
+apply (coideal_wd R C ([--]One[*](x[-]y)) ((x[-]y)[*][--]One)); algebra.
+apply (coideal_wd R C ([--]x[-][--]y) ([--]One[*](x[-]y))); algebra.
 astepr ([--](x[-]y)).
 astepr ([--](x[+][--]y)).
 Step_final ([--]x[+][--][--]y).
@@ -206,7 +190,7 @@ intro x.
 simpl in |-*.
 unfold is_inverse in |-*.
 simpl in |-*.
-split; apply eq_quotring_wd; Algebra.
+split; apply eq_quotring_wd; algebra.
 Qed.
 
 Definition quotring_as_CGroup := Build_CGroup quotring_as_CMonoid
@@ -221,7 +205,7 @@ Lemma drplus_is_commutative : commutes drplus_is_bin_fun.
 red in |-*.
 intros x y.
 simpl in |-*.
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Definition quotring_as_CAbGroup := Build_CAbGroup quotring_as_CGroup
@@ -242,7 +226,7 @@ unfold ap_quotring.
 intro X.
 cut (C ((x1[*](y1[-]y2)) [+] ((x1[-]x2)[*]y2))).
 intro.
-assert (C (x1[*](y1[-]y2)) or C ((x1[-]x2)[*]y2)); Algebra.
+assert (C (x1[*](y1[-]y2)) or C ((x1[-]x2)[*]y2)); algebra.
 elim X1; intros.
 right. cut (C x1 and C (y1[-]y2)). intuition.
 apply coideal_mult; assumption.
@@ -271,28 +255,28 @@ Build_CSetoid_bin_op quotring_as_CAbGroup (cr_mult (c:=R)) drmult_is_ext.
 Lemma drmult_associative : associative drmult_is_bin_op.
 red in |-*; simpl in |-*.
 intros x y z; apply eq_quotring_wd.
-Algebra.
+algebra.
 Qed.
 
 Lemma drmult_monoid : is_CMonoid (Build_CSemiGroup quotring_as_CAbGroup
    drmult_is_bin_op drmult_associative) One.
 apply Build_is_CMonoid; red in |-*; intro x; simpl in |-*;
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Lemma drmult_commutes : commutes drmult_is_bin_op.
-red in |-*; simpl in |-*; intros x y; apply eq_quotring_wd; Algebra.
+red in |-*; simpl in |-*; intros x y; apply eq_quotring_wd; algebra.
 Qed.
 
 Lemma quotring_distr : distributive drmult_is_bin_op drplus_is_bin_fun.
 red in |-*; simpl in |-*; intros x y z.
-apply eq_quotring_wd; Algebra.
+apply eq_quotring_wd; algebra.
 Qed.
 
 Lemma quotring_nontriv : (One:quotring_as_CAbGroup) [#] (Zero:quotring_as_CAbGroup).
 simpl in |-*.
 unfold ap_quotring.
-apply (coideal_wd R C One (One[-]Zero)); Algebra.
+apply (coideal_wd R C One (One[-]Zero)); algebra.
 Qed.
 
 Definition quotring_is_CRing := Build_is_CRing quotring_as_CAbGroup One

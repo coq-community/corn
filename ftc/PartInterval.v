@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export IntervalFunct.
@@ -143,14 +127,14 @@ Lemma part_int_const : Feq I [-C-]c (PartInt (IConst (Hab:=Hab) c)).
 apply eq_imp_Feq.
 red in |- *; simpl in |- *; intros; auto.
 unfold I in |- *; apply included_refl.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_id : Feq I FId (PartInt (IId (Hab:=Hab))).
 apply eq_imp_Feq.
 red in |- *; simpl in |- *; intros; auto.
 unfold I in |- *; apply included_refl.
-intros; simpl in |- *; Algebra.
+intros; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_plus : Feq I (F{+}G) (PartInt (IPlus f g)).
@@ -162,7 +146,7 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_inv : Feq I {--}F (PartInt (IInv f)).
@@ -172,7 +156,7 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in |- *; simpl in Hf.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_minus : Feq I (F{-}G) (PartInt (IMinus f g)).
@@ -184,7 +168,7 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_mult : Feq I (F{*}G) (PartInt (IMult f g)).
@@ -196,7 +180,7 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_nth : forall n : nat, Feq I (F{^}n) (PartInt (INth f n)).
@@ -208,7 +192,7 @@ Included.
 Included.
 intros; simpl in |- *; simpl in Hf.
 astepl (Part F x Hx[^]n); astepr (f (Build_subcsetoid_crr IR _ x Hx')[^]n).
-apply nexp_wd; Algebra.
+apply nexp_wd; algebra.
 Qed.
 
 (* begin show *)
@@ -222,7 +206,7 @@ elim Hg'; clear Gg Hg'; intros incG' Hg'.
 apply eq_imp_Feq.
 Included.
 Included.
-intros; simpl in Hg'; simpl in |- *; Algebra.
+intros; simpl in Hg'; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_div : Feq I (F{/}G) (PartInt (IDiv f g Hg)).
@@ -234,7 +218,7 @@ apply eq_imp_Feq.
 Included.
 Included.
 intros; simpl in Hf, Hg'; simpl in |- *.
-Algebra.
+algebra.
 Qed.
 
 End Equivalences.

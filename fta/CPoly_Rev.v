@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CPoly_Degree.
@@ -42,33 +26,33 @@ Fixpoint monom (a : R) (n : nat) {struct n} : cpoly_cring R :=
 
 Lemma monom_coeff : forall (c : R) n, nth_coeff n (monom c n) [=] c.
 intros. induction  n as [| n Hrecn]; intros.
-simpl in |- *. Algebra.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
+simpl in |- *. algebra.
 Qed.
 
 Lemma monom_coeff' : forall (c : R) m n, m <> n -> nth_coeff n (monom c m) [=] Zero.
 intros c m.
 induction  m as [| m Hrecm]; intros.
 elim (O_or_S n); intro y. elim y. clear y. intros x y. rewrite <- y.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 elim (H y).
 elim (O_or_S n); intro y. elim y. clear y. intros x y. rewrite <- y.
 simpl in |- *. apply Hrecm. omega.
 rewrite <- y.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 Qed.
 
 Hint Resolve monom_coeff monom_coeff': algebra.
 
 Lemma monom_degree : forall (a : R) n, degree_le n (monom a n).
 unfold degree_le in |- *. intros.
-cut (n <> m). intro. Algebra. omega.
+cut (n <> m). intro. algebra. omega.
 Qed.
 
 Lemma monom_S : forall (a : R) n, monom a (S n) [=] _X_[*]monom a n.
 intros.
 apply eq_transitive_unfolded with (cpoly_linear _ Zero (monom a n)).
-simpl in |- *. split. Algebra. cut (monom a n [=] monom a n). auto. Algebra.
+simpl in |- *. split. algebra. cut (monom a n [=] monom a n). auto. algebra.
 astepl (_X_[*]monom a n[+]_C_ Zero).
 Step_final (_X_[*]monom a n[+]Zero).
 Qed.
@@ -88,7 +72,7 @@ Hint Resolve monom_wd_lft: algebra_c.
 Lemma monom_mult' : forall (a b : R) n, _C_ a[*]monom b n [=] monom (a[*]b) n.
 intros.
 induction  n as [| n Hrecn].
-simpl in |- *. split; Algebra.
+simpl in |- *. split; algebra.
 astepl (_C_ a[*] (_X_[*]monom b n)).
 astepl (_C_ a[*]_X_[*]monom b n).
 astepl (_X_[*]_C_ a[*]monom b n).
@@ -101,7 +85,7 @@ Hint Resolve monom_mult': algebra.
 Lemma monom_mult : forall (a b : R) m n,
  monom a m[*]monom b n [=] monom (a[*]b) (m + n).
 intros. induction  m as [| m Hrecm]; intros.
-replace (monom a 0) with (_C_ a). Algebra. Algebra.
+replace (monom a 0) with (_C_ a). algebra. algebra.
 astepl (_X_[*]monom a m[*]monom b n).
 astepl (_X_[*] (monom a m[*]monom b n)).
 replace (S m + n) with (S (m + n)).
@@ -126,12 +110,12 @@ apply
     (f := fun i0 : nat => nth_coeff i (monom (nth_coeff i0 p) i0))
     (i := i).
 auto with arith. auto.
-intros. Algebra.
-Algebra.
+intros. algebra.
+algebra.
 apply eq_transitive_unfolded with (Zero:R).
 apply Sum_zero. auto with arith.
-intros. cut (i0 <> i). intro. Algebra. omega.
-Algebra.
+intros. cut (i0 <> i). intro. algebra. omega.
+algebra.
 Qed.
 
 End Monomials.
@@ -169,8 +153,8 @@ apply
     (f := fun i0 : nat => nth_coeff i (monom (nth_coeff i0 p) (n - i0))).
 auto with arith. omega.
 intros.
-cut (n - j <> i). intro. Algebra. omega.
-replace (n - (n - i)) with i. Algebra. omega.
+cut (n - j <> i). intro. algebra. omega.
+replace (n - (n - i)) with i. algebra. omega.
 Qed.
 
 Lemma Rev_coeff' : forall n p i, n < i -> nth_coeff i (Rev n p) [=] Zero.
@@ -185,7 +169,7 @@ apply
   with (p_ := fun i0 : nat => monom (nth_coeff (R:=R) i0 p) (n - i0)).
 apply Sum_zero. auto with arith.
 intros.
-cut (n - i0 <> i). intro. Algebra. omega.
+cut (n - i0 <> i). intro. algebra. omega.
 Qed.
 
 Hint Resolve Rev_coeff Rev_coeff': algebra.
@@ -217,7 +201,7 @@ Qed.
 Hint Resolve Rev_rev: algebra.
 
 Lemma Rev_degree_le : forall n p, degree_le n (Rev n p).
-unfold degree_le in |- *. Algebra.
+unfold degree_le in |- *. algebra.
 Qed.
 
 Lemma Rev_degree : forall n p, p ! Zero [#] Zero -> degree n (Rev n p).
@@ -294,12 +278,12 @@ intros.
 induction  l as [| l Hrecl].
 replace (Sum0 0 a_) with (Zero:RX).
 replace (Sum0 0 (fun i : nat => Rev n (a_ i))) with (Zero:RX).
-Algebra. auto. auto.
+algebra. auto. auto.
 replace (Sum0 (S l) a_) with (Sum0 l a_[+]a_ l).
 replace (Sum0 (S l) (fun i : nat => Rev n (a_ i))) with
  (Sum0 l (fun i : nat => Rev n (a_ i)) [+]Rev n (a_ l)).
 astepl (Rev n (Sum0 l a_) [+]Rev n (a_ l)).
-apply bin_op_wd_unfolded. auto. Algebra.
+apply bin_op_wd_unfolded. auto. algebra.
 auto. auto.
 Qed.
 
@@ -379,10 +363,10 @@ astepl
  (monom (nth_coeff i1 p1) (n1 - i1) [*]monom (nth_coeff i2 p2) (n2 - i2)).
 astepl (monom (nth_coeff i1 p1[*]nth_coeff i2 p2) (n1 - i1 + (n2 - i2))).
 replace (n1 - i1 + (n2 - i2)) with (n1 + n2 - (i1 + i2)).
-Algebra.
+algebra.
 omega.
-unfold Rev in |- *. Algebra.
-unfold Rev in |- *. Algebra.
+unfold Rev in |- *. algebra.
+unfold Rev in |- *. algebra.
 astepl
  (Rev (n1 + n2)
     (Sum 0 n2

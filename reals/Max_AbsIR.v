@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing Max %\ensuremath{\max}% *)
@@ -47,8 +31,8 @@ Lemma Max_seq_char : forall n,
 intros.
 unfold Max_seq in |- *.
 elim less_cotransitive_unfolded; intro H; simpl in |- *.
- left; split; Algebra.
-right; split; Algebra.
+ left; split; algebra.
+right; split; algebra.
 Qed.
 
 Lemma Cauchy_Max_seq : Cauchy_prop Max_seq.
@@ -106,7 +90,7 @@ red in |- *; apply approach_zero_weak.
 intros e He.
 apply leEq_wdl with (Lim (Cauchy_const x) [-]MAX).
  2: apply cg_minus_wd;
-     [ apply eq_symmetric_unfolded; apply Lim_const | Algebra ].
+     [ apply eq_symmetric_unfolded; apply Lim_const | algebra ].
 unfold MAX in |- *.
 eapply leEq_wdl.
  2: apply Lim_minus.
@@ -352,6 +336,53 @@ apply mult_resp_leEq_rht;
  [ apply rht_leEq_Max | apply less_leEq; assumption ].
 Qed.
 
+Lemma max_plus : forall (a b c : IR),
+Max (a[+]c) (b[+]c) [=] Max a b [+] c.
+intros.
+apply equiv_imp_eq_max; intros.
+apply shift_plus_less.
+apply Max_less; apply shift_less_minus; auto.
+apply leEq_less_trans with (Max a b [+]c); auto.
+apply plus_resp_leEq.
+apply lft_leEq_Max.
+apply leEq_less_trans with (Max a b [+]c); auto.
+apply plus_resp_leEq.
+apply rht_leEq_Max.
+Qed.
+
+Lemma max_mult : forall (a b c : IR), Zero [<] c -> 
+(Max (c[*]a) (c[*]b)) [=] c[*](Max a b).
+intros a b c H.
+assert (H1 : c [#] Zero).
+apply pos_ap_zero; auto.
+assert (H2 : Zero [<=] c).
+apply less_leEq; auto.
+assert (forall y : IR, c[*]a[<]y -> c[*]b[<]y -> c[*]Max a b[<]y).
+intros.
+astepl (Max a b [*]c).
+apply shift_mult_less with H1; auto.
+apply Max_less;
+apply shift_less_div; auto.
+auto.
+astepl (c[*]a).
+auto.
+astepl (c[*]b).
+auto.
+assert (forall y : IR, c[*]Max a b[<]y -> c[*]a[<]y).
+intros.
+apply leEq_less_trans with (c[*]Max a b); auto.
+apply mult_resp_leEq_lft; auto.
+apply lft_leEq_MAX.
+auto.
+assert (forall y : IR, c[*]Max a b[<]y -> c[*]b[<]y).
+intros.
+apply leEq_less_trans with (c[*]Max a b); auto.
+apply mult_resp_leEq_lft; auto.
+apply rht_leEq_MAX.
+auto.
+apply equiv_imp_eq_max; auto.
+Qed.
+
 End properties_of_Max.
 
 End Maximum.
@@ -370,7 +401,7 @@ Definition MIN (x y : IR) : IR := [--] (Max [--]x [--]y).
 
 Lemma MIN_wd : bin_op_wd _ MIN.
 intros x1 x2 y1 y2.
-unfold MIN in |- *; Algebra.
+unfold MIN in |- *; algebra.
 Qed.
 
 Lemma MIN_strext : bin_op_strext _ MIN.
@@ -425,7 +456,7 @@ apply less_Max_imp.
 apply inv_cancel_less.
 apply less_wdr with z.
 assumption.
-Algebra.
+algebra.
 Qed.
 
 Lemma leEq_Min : forall x y z : IR, z [<=] x -> z [<=] y -> z [<=] Min x y.
@@ -617,7 +648,7 @@ Qed.
 Definition AbsIR : CSetoid_un_op IR := Build_CSetoid_un_op _ ABSIR ABSIR_strext.
 
 Lemma AbsIR_wd : forall x y : IR, x [=] y -> AbsIR x [=] AbsIR y.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIR_wdl : forall x y e, x [=] y -> AbsIR x [<] e -> AbsIR y [<] e.
@@ -625,7 +656,7 @@ Proof.
 intros.
 apply less_wdl with (AbsIR x).
 assumption.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIR_wdr : forall x y e, x [=] y -> e [<] AbsIR x -> e [<] AbsIR y.
@@ -633,7 +664,7 @@ Proof.
 intros.
 apply less_wdr with (AbsIR x).
 assumption.
-Algebra.
+algebra.
 Qed.
 
 Lemma AbsIRz_isz : AbsIR Zero [=] Zero.
@@ -772,7 +803,7 @@ Lemma AbsIR_inv : forall x : IR, AbsIR x [=] AbsIR [--]x.
 intros.
 unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
 apply eq_transitive_unfolded with (Max [--][--]x [--]x).
-apply bin_op_wd_unfolded; Algebra.
+apply bin_op_wd_unfolded; algebra.
 apply Max_comm.
 Qed.
 
@@ -782,6 +813,18 @@ eapply eq_transitive_unfolded.
 apply AbsIR_inv.
 apply AbsIR_wd; rational.
 Qed.
+
+Lemma AbsIR_mult : forall (x c: IR) (H : Zero [<]c),
+c[*] AbsIR (x) [=] AbsIR (c[*]x).
+intros.
+unfold AbsIR.
+simpl.
+unfold ABSIR.
+rstepr (Max (c[*]x) (c[*]([--]x))).
+apply eq_symmetric_unfolded.
+apply max_mult; auto.
+Qed.
+
 
 Lemma AbsIR_eq_x : forall x : IR, Zero [<=] x -> AbsIR x [=] x.
 intros.
@@ -866,7 +909,7 @@ rename X2 into H3. apply H3.
 apply less_leEq; apply pos_div_two'; auto.
 astepr (Zero[+][--]x); apply shift_leEq_plus.
 apply leEq_wdl with (y[+]x).
-2: unfold cg_minus in |- *; Algebra.
+2: unfold cg_minus in |- *; algebra.
 red in |- *; apply approach_zero.
 cut (forall e : IR, Zero [<] e -> e [<] x [/]TwoNZ -> y[+]x [<] e); intros.
 cut (x [/]FourNZ [<] x [/]TwoNZ); intros.
@@ -927,6 +970,38 @@ astepl ( [--]ZeroR); astepr ( [--][--]x); apply inv_resp_leEq.
 red in |- *; apply approach_zero_weak.
 intros e H0.
 eapply leEq_transitive; [ apply inv_leEq_AbsIR | exact (H e H0) ].
+Qed.
+
+Lemma AbsSmall_approach :
+forall (a b : IR),
+  (forall (e : IR), Zero[<]e -> AbsSmall (a[+]e) b) -> AbsSmall a b.
+unfold AbsSmall.
+intros a b H.
+split.
+assert (forall e : IR, Zero[<]e -> [--]a[-]b[<=]e).
+intros. 
+assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
+apply H; auto. destruct H0.
+apply shift_minus_leEq.
+apply shift_leEq_plus'.
+astepl ([--]a[+][--]e).
+astepl ([--](a[+]e)).
+auto.
+astepr (b[+]Zero).
+apply shift_leEq_plus'.
+unfold leEq.
+apply approach_zero_weak; auto.
+assert (forall e : IR, Zero[<]e -> b[-]a[<=]e).
+intros. 
+assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
+apply H; auto. destruct H0.
+apply shift_minus_leEq.
+astepr (a[+]e).
+auto.
+astepr (a[+]Zero).
+apply shift_leEq_plus'.
+unfold leEq.
+apply approach_zero_weak; auto.
 Qed.
 
 Lemma AbsIR_eq_zero : forall x : IR, AbsIR x [=] Zero -> x [=] Zero.
@@ -994,6 +1069,30 @@ End Absolute.
 
 Hint Resolve AbsIRz_isz: algebra.
 
+Section SeqMax.
+
+(** *** Bound of sequence *)
+
+Variable seq : nat -> IR.
+
+Fixpoint SeqBound0 (n : nat) : IR :=
+    match n with
+     | O => Zero
+     | S m => Max (AbsIR (seq m)) (SeqBound0 m)
+    end.
+
+Lemma SeqBound0_greater : forall (m n : nat), 
+m < n -> AbsIR (seq m) [<=] SeqBound0 n.
+intros.
+elim H.
+simpl. apply lft_leEq_MAX.
+intros. simpl.
+apply leEq_transitive with (SeqBound0 m0); auto.
+apply rht_leEq_MAX.
+Qed.
+ 
+End SeqMax.
+
 Section Part_Function_Max.
 
 (** *** Functional Operators
@@ -1041,14 +1140,14 @@ Definition FAbs := FMax F {--}F.
 Lemma FMin_char : forall x Hx Hx' Hx'', FMin x Hx [=] Min (F x Hx') (G x Hx'').
 intros.
 Opaque Max.
-simpl in |- *; unfold MIN; Algebra.
+simpl in |- *; unfold MIN; algebra.
 Qed.
 
 Transparent Max.
 
 Lemma FAbs_char : forall x Hx Hx', FAbs x Hx [=] AbsIR (F x Hx').
 intros.
-simpl in |- *; unfold ABSIR in |- *; apply MAX_wd; Algebra.
+simpl in |- *; unfold ABSIR in |- *; apply MAX_wd; algebra.
 Qed.
 
 End Part_Function_Abs.

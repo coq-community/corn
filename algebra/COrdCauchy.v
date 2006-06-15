@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 Require Export COrdAbs.
 
 (* Begin_SpecReals *)
@@ -114,7 +98,7 @@ Theorem CS_seq_bounded : forall g : nat -> R, Cauchy_prop g ->
  rstepr ((g N[-]One)[*](g N[-]One)).
  apply leEq_wdr with (y := (g N[-]One)[^]2).
  apply sqr_nonneg.
- Algebra.
+ algebra.
 Qed.
 
 Lemma CS_seq_const : forall c : R, Cauchy_prop (fun n => c).
@@ -634,7 +618,7 @@ Lemma local_mon_imp_mon' : forall f : nat -> R,
 intros f H i j H0.
 elim (le_lt_eq_dec _ _ H0); intro.
 apply less_leEq; apply local_mon_imp_mon with (f := f); assumption.
-apply eq_imp_leEq; rewrite b; Algebra.
+apply eq_imp_leEq; rewrite b; algebra.
 Qed.
 
 Lemma local_mon'_imp_mon' : forall f : nat -> R,

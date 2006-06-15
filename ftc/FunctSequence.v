@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Continuity.
@@ -453,7 +437,7 @@ apply
         Part (Cauchy_fun_seq_Lim _ _ _ _ _ H) x (incf' x Hx))).
 2: apply AbsIR_wd; apply cg_minus_wd.
 2: apply eq_symmetric_unfolded; apply Lim_const.
-2: Algebra.
+2: algebra.
 simpl in |- *.
 apply
  leEq_wdl
@@ -493,7 +477,7 @@ apply AbsIR_wd; apply cg_minus_wd.
 elim (H n); intros Haux inc.
 inversion_clear inc.
 auto.
-Algebra.
+algebra.
 Qed.
 
 Lemma conv_fun_seq'_wdr : Feq I F G ->
@@ -504,7 +488,7 @@ exists N; intros.
 eapply leEq_wdl.
 apply (HN n H2 x Hx).
 apply AbsIR_wd; apply cg_minus_wd.
-Algebra.
+algebra.
 elim H; intros Haux inc.
 inversion_clear inc.
 auto.
@@ -521,7 +505,7 @@ apply AbsIR_wd; apply cg_minus_wd.
 elim (H n); intros Haux inc.
 inversion_clear inc.
 auto.
-Algebra.
+algebra.
 Qed.
 
 Lemma conv_fun_seq'_wdr' : Feq I F G ->
@@ -532,7 +516,7 @@ exists N; intros.
 eapply leEq_wdl.
 apply (HN n H2 x Hx).
 apply AbsIR_wd; apply cg_minus_wd.
-Algebra.
+algebra.
 elim H; intros Haux inc.
 inversion_clear inc.
 auto.
@@ -549,7 +533,7 @@ elim (H n); intros.
 inversion_clear b0.
 elim (H m); intros.
 inversion_clear b0.
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 Lemma Cauchy_cont_Lim : forall H : Cauchy_fun_seq a b Hab f contf,
@@ -582,7 +566,7 @@ apply
  leEq_wdl
   with (AbsIR (Part _ _ Hx[-]Lim (Cauchy_const (Part _ _ (incf x H2))))).
 2: apply AbsIR_wd; apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 2: apply eq_symmetric_unfolded; apply Lim_const.
 simpl in |- *.
 apply
@@ -613,7 +597,7 @@ apply
         Part (Cauchy_fun_seq_Lim _ _ _ _ _ H) y Hy)).
 2: apply AbsIR_wd; apply cg_minus_wd.
 2: apply eq_symmetric_unfolded; apply Lim_const.
-2: Algebra.
+2: algebra.
 simpl in |- *.
 apply
  leEq_wdl
@@ -644,7 +628,7 @@ cut (Continuous_I Hab (PartInt (IntPartIR (contin_imp_inc _ _ _ _ H0)))).
 2: eapply Continuous_I_wd.
 3: apply Cauchy_cont_Lim with (H := H).
 2: FEQ.
-2: simpl in |- *; apply Lim_wd'; intros; Algebra.
+2: simpl in |- *; apply Lim_wd'; intros; algebra.
 intro H2; exists H2.
 intros e H1.
 elim (Cauchy_conv_fun_seq' H H0 e H1); intros N HN.
@@ -652,9 +636,9 @@ exists N; intros.
 eapply leEq_wdl.
 apply (HN n H3 x Hx).
 apply AbsIR_wd; apply cg_minus_wd.
-Algebra.
+algebra.
 simpl in |- *; apply Lim_wd'; intros; simpl in |- *; rational.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 simpl in |- *; apply Cauchy_cont_Lim.
 Qed.
 
@@ -681,7 +665,7 @@ exists N; intros.
 apply AbsIR_imp_AbsSmall.
 eapply leEq_wdl.
 apply (HN m H2 x H0).
-apply AbsIR_wd; Algebra.
+apply AbsIR_wd; algebra.
 Qed.
 
 (**
@@ -811,7 +795,7 @@ apply
     (AbsIR
        (Part _ _ (incf n x Hx) [+]Part _ _ (incg n x Hx) [-]
         (Part _ _ (incF x Hx) [+]Part _ _ (incG x Hx)))).
-2: apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply AbsIR_wd; simpl in |- *; algebra.
 apply
  leEq_wdl
   with
@@ -841,7 +825,7 @@ apply
     (AbsIR
        (Part _ _ (incf n x Hx) [-]Part _ _ (incg n x Hx) [-]
         (Part _ _ (incF x Hx) [-]Part _ _ (incG x Hx)))).
-2: apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply AbsIR_wd; simpl in |- *; algebra.
 apply
  leEq_wdl
   with
@@ -884,7 +868,7 @@ apply
     (AbsIR
        (Part _ _ (incf n x Hx) [*]Part _ _ (incg n x Hx) [-]
         Part _ _ (incF x Hx) [*]Part _ _ (incG x Hx))).
-2: apply AbsIR_wd; simpl in |- *; Algebra.
+2: apply AbsIR_wd; simpl in |- *; algebra.
 apply
  leEq_wdl
   with
@@ -1141,7 +1125,7 @@ astepr
 apply cg_minus_wd.
 eapply eq_transitive_unfolded.
 2: apply eq_symmetric_unfolded; apply Lim_const.
-apply Lim_wd'; intros; simpl in |- *; Algebra.
+apply Lim_wd'; intros; simpl in |- *; algebra.
 apply Lim_wd'; intros; simpl in |- *; rational.
 apply fun_Lim_seq_minus with (f := fun n : nat => [-C-]Zero:PartIR).
 Contin.

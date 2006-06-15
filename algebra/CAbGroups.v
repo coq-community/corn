@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 Require Export CGroups.
 
 Section Abelian_Groups.
@@ -253,24 +237,24 @@ Fixpoint nmult (a:G) (n:nat) {struct n} : G :=
 
 Lemma nmult_wd : forall (x y:G) (n m:nat), (x [=] y) -> n = m -> nmult x n [=] nmult y m.
 simple induction n; intros.
-rewrite <- H0; Algebra.
-rewrite <- H1; simpl in |- *; Algebra.
+rewrite <- H0; algebra.
+rewrite <- H1; simpl in |- *; algebra.
 Qed.
 
 Lemma nmult_one : forall x:G, nmult x 1 [=] x.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma nmult_Zero : forall n:nat, nmult Zero n [=] Zero.
 intro n.
 induction n.
- Algebra.
+ algebra.
 simpl in |- *; Step_final ((Zero:G)[+]Zero).
 Qed.
 
 Lemma nmult_plus : forall m n x, nmult x m[+]nmult x n [=] nmult x (m + n).
 simple induction m.
- simpl in |- *; Algebra.
+ simpl in |- *; algebra.
 clear m; intro m.
 intros.
 simpl in |- *. Step_final (x[+](nmult x m[+]nmult x n)).
@@ -278,25 +262,25 @@ Qed.
 
 Lemma nmult_mult : forall n m x, nmult (nmult x m) n [=] nmult x (m * n).
 simple induction n.
- intro. rewrite mult_0_r. Algebra.
+ intro. rewrite mult_0_r. algebra.
 clear n; intros.
 simpl in |- *.
 rewrite mult_comm. simpl in |- *.
 eapply eq_transitive_unfolded.
  2: apply nmult_plus.
-rewrite mult_comm. Algebra.
+rewrite mult_comm. algebra.
 Qed.
 
 Lemma nmult_inv : forall n x, nmult [--]x n [=] [--] (nmult x n).
 intro; induction n; simpl in |- *.
- Algebra.
+ algebra.
 intros.
 Step_final ([--]x[+] [--](nmult x n)).
 Qed.
 
 Lemma nmult_plus' : forall n x y, nmult x n[+]nmult y n [=] nmult (x[+]y) n.
 intro; induction n; simpl in |- *; intros.
- Algebra.
+ algebra.
 astepr (x[+]y[+](nmult x n[+]nmult y n)).
 astepr (x[+](y[+](nmult x n[+]nmult y n))).
 astepr (x[+](y[+]nmult x n[+]nmult y n)).
@@ -336,7 +320,7 @@ astepl (nmult x (nat_of_P p)).
 apply cg_cancel_rht with (nmult x n).
 astepr (nmult x m).
 astepl (nmult x (nat_of_P p + n)).
-apply nmult_wd; Algebra.
+apply nmult_wd; algebra.
 rewrite <- convert_is_POS in H.
 auto with zarith.
 
@@ -351,7 +335,7 @@ astepr (nmult x m[+] [--](nmult x m)[+]nmult x n).
 astepr (Zero[+]nmult x n).
 astepr (nmult x n).
 astepl (nmult x (m + nat_of_P p)).
-apply nmult_wd; Algebra.
+apply nmult_wd; algebra.
 rewrite <- min_convert_is_NEG in H.
 auto with zarith.
 Qed.
@@ -359,7 +343,7 @@ Qed.
 Lemma zmult_wd : forall (x y:G) (n m:Z), (x [=] y) -> n = m -> zmult x n [=] zmult y m.
 do 3 intro.
 case n; intros; inversion H0.
-Algebra.
+algebra.
 unfold zmult in |- *.
 simpl in |- *.
 astepl (nmult x (nat_of_P p)); Step_final (nmult y (nat_of_P p)).
@@ -369,7 +353,7 @@ Step_final [--](nmult y (nat_of_P p)).
 Qed.
 
 Lemma zmult_one : forall x:G, zmult x 1 [=] x.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma zmult_min_one : forall x:G, zmult x (-1) [=] [--]x.
@@ -377,12 +361,12 @@ intros; simpl in |- *; Step_final (Zero[-]x).
 Qed.
 
 Lemma zmult_zero : forall x:G, zmult x 0 [=] Zero.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 Qed.
 
 Lemma zmult_Zero : forall k:Z, zmult Zero k [=] Zero.
 intro; induction k; simpl in |- *.
-  Algebra.
+  algebra.
  Step_final ((Zero:G)[-]Zero).
 Step_final ((Zero:G)[-]Zero).
 Qed.
@@ -442,7 +426,7 @@ Step_final (nmult Zero (nat_of_P p)).
 astepr [--](Zero:G). astepl [--](nmult (Zero[-]Zero) (nat_of_P p)).
 Step_final [--](nmult Zero (nat_of_P p)).
 
-Algebra.
+algebra.
 
 astepr (nmult x (nat_of_P (p * p0))).
 astepl (nmult (nmult x (nat_of_P p)) (nat_of_P p0)[-]Zero).
@@ -454,7 +438,7 @@ astepl (Zero[-]nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
 astepl [--](nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
 rewrite nat_of_P_mult_morphism. apply un_op_wd_unfolded. apply nmult_mult.
 
-Algebra.
+algebra.
 
 astepr [--](nmult x (nat_of_P (p * p0))).
 astepl (nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)[-]Zero).

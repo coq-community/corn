@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Rolle.
@@ -446,7 +430,7 @@ intros a b F H Ha H0 x H1 Hx H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] a). intro H4.
 apply H0.
-eapply less_wdl; [ apply H2 | Algebra ].
+eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
 inversion_clear H1.
@@ -464,7 +448,7 @@ intros a b F H Ha H0 x H1 Hx H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] b). intro H4.
 apply H0.
-eapply less_wdl; [ apply H2 | Algebra ].
+eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
 inversion_clear H1.
@@ -483,7 +467,7 @@ cut (Not (olor a b x)); intro H4.
 elim (less_cotransitive_unfolded _ _ _ Hab x); intro H5.
 cut (x [=] b). intro H6.
 apply H1.
-eapply less_wdl; [ apply H3 | Algebra ].
+eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro H6.
 inversion_clear H2.
@@ -492,7 +476,7 @@ apply H4; split; auto.
 apply (less_irreflexive_unfolded _ b); apply less_leEq_trans with x; auto.
 cut (x [=] a); intros.
 apply H0.
-eapply less_wdl; [ apply H3 | Algebra ].
+eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro.
 inversion_clear H2.
@@ -645,7 +629,7 @@ apply mult_resp_nonneg.
 eapply leEq_transitive; [ apply H0 | apply Hglb1 ].
 exists x.
 split. auto.
-split; Algebra.
+split; algebra.
 apply (contin_imp_inc _ _ _ _ H); auto.
 apply shift_leEq_minus; astepl a; auto.
 Qed.

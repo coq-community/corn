@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* ZGcd.v, by Vince Barany *)
 
 Require Export ZDivides.
@@ -1227,7 +1211,9 @@ apply Zgcd_is_divisor_rht.
 generalize (Zgcd_lin_comb a b); intro Hlincomb;
  generalize (Zgcd_is_divisor_lft a b); intro Hdivb; 
  elim Hdivb; intros y Hy; generalize (Zgcd_is_divisor_rht a b); 
- intro Hdiva; elim Hdiva; intros x Hx; set (d := Zgcd a b) in Hx, Hy |- *. 
+ intro Hdiva; elim Hdiva; intros x Hx; set (d := Zgcd a b). 
+move d after Hy.
+fold d in Hx; fold d in Hy.
 replace 1%Z with (Zgcd a b / d)%Z; auto with zarith.
 rewrite Hlincomb.
 set (u := Zgcd_coeff_a a b); set (v := Zgcd_coeff_b a b).

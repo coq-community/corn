@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* begin hide *)
 (* In this file a notion of morphism between two arbitrary real number 
    structures, is introduced together with te proofs that this notion of 
@@ -150,8 +134,8 @@ Proof.
  apply eq_symmetric_unfolded.
  apply map_pres_plus_unfolded.
  apply map_wd_unfolded with (f := f).
- Algebra.
- Algebra.
+ algebra.
+ algebra.
 Qed.
 
 Lemma map_pres_zero_unfolded : forall f : Homomorphism, f Zero[=]Zero.
@@ -174,7 +158,7 @@ Proof.
  astepl (f Zero).
  apply map_pres_zero_unfolded.
  apply map_wd_unfolded.
- Algebra.
+ algebra.
 Qed.
   
 Lemma map_pres_minus_unfolded :
@@ -224,7 +208,7 @@ Proof.
  astepl (f (One[*]One)). 
  apply map_pres_mult_unfolded.
  apply map_wd_unfolded with (f := f).
- Algebra.
+ algebra.
 Qed.
 
 Lemma map_pres_one_unfolded : forall f : Homomorphism, f One[=]One.
@@ -500,7 +484,7 @@ Proof.
  apply eq_symmetric_unfolded.
  red in H3.
  apply f_well_def.
- Algebra.
+ algebra.
 Qed.
 
 Lemma f_pres_minus : forall x : R1, f [--]x[=][--](f x).
@@ -511,7 +495,7 @@ Proof.
  astepl (f (x[+][--]x)). 
  astepr (f Zero).
  apply f_well_def.
- Algebra.
+ algebra.
  apply f_pres_Zero. 
 Qed.
 
@@ -521,7 +505,7 @@ Proof.
  intros.
  astepr (f (x[+][--]y)).
  apply f_well_def.
- Algebra.
+ algebra.
  astepr (f x[+][--](f y)).
  red in H3.
  astepr (f x[+]f [--]y).
@@ -621,7 +605,7 @@ Proof.
  astepl (f One).
  astepr (f (One[*]One)). 
  apply f_well_def.
- Algebra.
+ algebra.
 Qed.
  
 Lemma f_pres_inv :

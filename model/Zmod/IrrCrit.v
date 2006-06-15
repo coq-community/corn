@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* IrrCrit.v, v1.1, 27aug2004, Bart Kirkels *)
 
 
@@ -182,7 +166,7 @@ astepr (cpoly_zero fp); intuition.
 induction g.
 astepl (cpoly_mult_op fp (zxfpx (c[+X*]f)) (cpoly_zero fp)).
 astepl (cpoly_zero fp).
-astepr (zxfpx (cpoly_zero Z_as_CRing));  try Algebra.
+astepr (zxfpx (cpoly_zero Z_as_CRing));  try algebra.
 apply fpxeq_wd.
 apply eq_symmetric.
 apply (mult_zero Z_as_CRing).

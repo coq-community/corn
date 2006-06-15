@@ -1,23 +1,8 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CPoly_NthCoeff.
 Require Export CFields.
+Require Export Rational.
 
 (** *Degrees of Polynomials
 ** Degrees of polynomials over a ring
@@ -118,7 +103,7 @@ Qed.
 Lemma degree_le_c_ : forall c : R, degree_le 0 (_C_ c).
 unfold degree_le in |- *. intros c m. elim m; intros.
 elim (lt_irrefl _ H).
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 Qed.
 
 Lemma degree_c_ : forall c : R, c [#] Zero -> degree 0 (_C_ c).
@@ -126,22 +111,22 @@ unfold degree in |- *. intros. split. simpl in |- *. auto. apply degree_le_c_.
 Qed.
 
 Lemma monic_c_one : monic 0 (_C_ (One:R)).
-unfold monic in |- *. intros. split. simpl in |- *. Algebra. apply degree_le_c_.
+unfold monic in |- *. intros. split. simpl in |- *. algebra. apply degree_le_c_.
 Qed.
 
 Lemma degree_le_x_ : degree_le 1 (_X_:RX).
 unfold degree_le in |- *.
 intro. elim m. intros. elim (lt_n_O _ H).
 intro. elim n. intros. elim (lt_irrefl _ H0).
-intros. simpl in |- *. Algebra.
+intros. simpl in |- *. algebra.
 Qed.
 
 Lemma degree_x_ : degree 1 (_X_:RX).
-unfold degree in |- *. split. simpl in |- *. Algebra. exact degree_le_x_.
+unfold degree in |- *. split. simpl in |- *. algebra. exact degree_le_x_.
 Qed.
 
 Lemma monic_x_ : monic 1 (_X_:RX).
-unfold monic in |- *. split. simpl in |- *. Algebra. exact degree_le_x_.
+unfold monic in |- *. split. simpl in |- *. algebra. exact degree_le_x_.
 Qed.
 
 Lemma degree_le_mon : forall (p : RX) m n,
@@ -177,14 +162,14 @@ generalize (toCle _ _ H); clear H; intro H.
 inversion H as [|m0 X].
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 apply eq_transitive_unfolded with (nth_coeff m (Zero:RX)).
-apply nth_coeff_wd. Algebra. Algebra.
+apply nth_coeff_wd. algebra. algebra.
 inversion X. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 apply eq_transitive_unfolded with (nth_coeff m (f 0)).
-apply nth_coeff_wd. cut (f 0[-]Zero [=] f 0). auto. Algebra.
+apply nth_coeff_wd. cut (f 0[-]Zero [=] f 0). auto. algebra.
 apply H0; try auto. rewrite H2. auto.
 elim (le_lt_eq_dec _ _ H); intro y.
 apply eq_transitive_unfolded with (nth_coeff m (Sum k l f[+]f (S l))).
-apply nth_coeff_wd. Algebra.
+apply nth_coeff_wd. algebra.
 astepl (nth_coeff m (Sum k l f) [+]nth_coeff m (f (S l))).
 astepr (Zero[+] (Zero:R)). apply bin_op_wd_unfolded.
 apply Hrecl. auto with arith. intros.
@@ -192,13 +177,13 @@ apply H0. auto. auto. auto.
 apply H0. auto with arith. auto. auto.
 rewrite y. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 apply eq_transitive_unfolded with (nth_coeff m (Zero:RX)).
-apply nth_coeff_wd. Algebra. Algebra.
+apply nth_coeff_wd. algebra. algebra.
 Qed.
 
 Lemma degree_inv : forall (p : RX) (n : nat), degree n p -> degree n [--]p.
 unfold degree in |- *. intros p n H.
 elim H. clear H. intros. split.
-astepl ( [--] (nth_coeff n p)). Algebra.
+astepl ( [--] (nth_coeff n p)). algebra.
 apply degree_le_inv; auto.
 Qed.
 
@@ -295,7 +280,7 @@ apply Sum_zero. auto with arith. intros.
 cut (n < S x + n - i). intro.
 Step_final (nth_coeff i p[*]Zero).
 omega.
-replace (S x + n - S x) with n. Algebra. auto with arith.
+replace (S x + n - S x) with n. algebra. auto with arith.
 rewrite <- y in H. rewrite <- y.
 pattern n at 2 in |- *. replace n with (0 + n - 0).
 apply
@@ -322,11 +307,11 @@ Lemma degree_le_nexp : forall (p : RX) m n,
  degree_le m p -> degree_le (m * n) (p[^]n).
 intros. induction  n as [| n Hrecn]; intros.
 replace (m * 0) with 0.
-apply degree_le_wd with (_C_ (One:R)). Algebra.
+apply degree_le_wd with (_C_ (One:R)). algebra.
 apply degree_le_c_.
 auto.
 replace (m * S n) with (m * n + m).
-apply degree_le_wd with (p[^]n[*]p). Algebra.
+apply degree_le_wd with (p[^]n[*]p). algebra.
 apply degree_le_mult; auto.
 auto.
 Qed.
@@ -334,11 +319,11 @@ Qed.
 Lemma monic_nexp : forall (p : RX) m n, monic m p -> monic (m * n) (p[^]n).
 intros. induction  n as [| n Hrecn]; intros.
 replace (m * 0) with 0.
-apply monic_wd with (_C_ (One:R)). Algebra.
+apply monic_wd with (_C_ (One:R)). algebra.
 apply monic_c_one.
 auto.
 replace (m * S n) with (m * n + m).
-apply monic_wd with (p[^]n[*]p). Algebra.
+apply monic_wd with (p[^]n[*]p). algebra.
 apply monic_mult; auto.
 auto.
 Qed.
@@ -376,7 +361,7 @@ apply nth_coeff_sum with (p_ := fun i : nat => _C_ (nth_coeff i p) [*]_X_[^]i).
 apply
  eq_transitive_unfolded
   with (Sum 0 n (fun i0 : nat => nth_coeff i0 p[*]nth_coeff i (_X_[^]i0))).
-apply Sum_wd. intros. Algebra.
+apply Sum_wd. intros. algebra.
 elim (le_lt_dec i n); intros.
 astepr (nth_coeff i p[*]One).
 astepr (nth_coeff i p[*]nth_coeff i (_X_[^]i)).
@@ -423,7 +408,7 @@ apply all_nth_coeff_eq_imp. intros.
 elim (O_or_S i); intro y.
 elim y. clear y. intros x y. rewrite <- y.
 cut (0 < S x). intro. Step_final (Zero:R). auto with arith.
-rewrite <- y. Algebra.
+rewrite <- y. algebra.
 Qed.
 
 Lemma degree_le_1_imp : forall p : RX,
@@ -434,7 +419,7 @@ apply all_nth_coeff_eq_imp. intros.
 elim i; intros.
 simpl in |- *. rational.
 elim n; intros.
-simpl in |- *. Algebra.
+simpl in |- *. algebra.
 simpl in |- *. apply H. auto with arith.
 Qed.
 
@@ -492,18 +477,18 @@ Lemma degree_mult : forall (p q : FX) m n,
 unfold degree in |- *. intros. rename X into H. rename X0 into H0.
 elim H. clear H. intros H1 H2. elim H0. clear H0. intros H3 H4.
 split.
-astepl (nth_coeff m p[*]nth_coeff n q). Algebra.
+astepl (nth_coeff m p[*]nth_coeff n q). algebra.
 apply degree_le_mult; auto.
 Qed.
 
 Lemma degree_nexp : forall (p : FX) m n, degree m p -> degree (m * n) (p[^]n).
 intros. induction  n as [| n Hrecn]; intros.
 replace (m * 0) with 0.
-apply degree_wd with (_C_ (One:F)). Algebra.
-apply degree_c_. Algebra.
+apply degree_wd with (_C_ (One:F)). algebra.
+apply degree_c_. algebra.
 auto.
 replace (m * S n) with (m * n + m).
-apply degree_wd with (p[^]n[*]p). Algebra.
+apply degree_wd with (p[^]n[*]p). algebra.
 apply degree_mult; auto.
 auto.
 Qed.

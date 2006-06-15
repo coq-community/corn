@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export CPoly_Rev.
@@ -99,7 +83,7 @@ astepl (Shift [--]c (Rev (1 + n) g)).
 astepl (Shift [--]c (Rev (1 + n) (g1[*]g2))).
 Step_final (Shift [--]c (Rev 1 g1[*]Rev n g2)).
 exact FTA_1a.
-apply degree_le_wd with (g1[*]g2); Algebra.
+apply degree_le_wd with (g1[*]g2); algebra.
 apply degree_le_mult; auto.
 apply degree_imp_degree_le; auto.
 apply degree_imp_degree_le; auto.
@@ -208,7 +192,7 @@ apply
        (fun i : nat => nth_coeff i f[*]x[^]i[-]nth_coeff i f[*]y[^]i)).
 2: apply Sum_wd.
 2: intro.
-2: Algebra.
+2: algebra.
 apply
  ap_wdl_unfolded
   with

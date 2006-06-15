@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (* begin hide *)
@@ -185,21 +169,21 @@ do 3 intro.
 rewrite <- H; intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); elim (le_lt_dec i 0);
  intros; simpl in |- *.
-Algebra.
+algebra.
 apply RSR_h_nlnf; reflexivity.
 elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
 elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
 elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
 elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 Lemma Separated_Refinement_lemma3 :
  forall H : 0 <= pred (m + n), Separated_Refinement_fun 0 H[=]a.
 intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; inversion b0.
 apply eq_symmetric_unfolded; apply partition_length_zero with Hab.
 cut (m + n <= 1); [ intro | omega ].
@@ -214,11 +198,11 @@ Lemma Separated_Refinement_lemma4 :
  Separated_Refinement_fun (pred (m + n)) H[=]b.
 intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
 elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
-Algebra.
+algebra.
 elimtype False; apply (lt_irrefl _ a1).
 elimtype False; apply (lt_irrefl _ a0).
-Algebra.
-Algebra.
+algebra.
+algebra.
 Qed.
 
 Lemma Separated_Refinement_lemma2 :

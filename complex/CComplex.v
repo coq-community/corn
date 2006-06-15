@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 (** printing Re %\ensuremath{\Re}% #&real;# *)
@@ -92,7 +76,7 @@ Unfold bin_op_wd. Unfold bin_fun_wd.
 Intros x1 x2 y1 y2. Elim x1. Elim x2. Elim y1. Elim y2.
 Simpl. Unfold cc_eq. Simpl. Intros.
 Elim H. Clear H. Intros. Elim H0. Clear H0. Intros.
-Split; Algebra.
+Split; algebra.
 Qed.
 
 Lemma cc_mult_op_proof : (bin_op_wd cc_csetoid cc_mult).
@@ -100,7 +84,7 @@ Unfold bin_op_wd. Unfold bin_fun_wd.
 Intros x1 x2 y1 y2. Elim x1. Elim x2. Elim y1. Elim y2.
 Simpl. Unfold cc_eq. Simpl. Intros.
 Elim H. Clear H. Intros. Elim H0. Clear H0. Intros.
-Split; Algebra.
+Split; algebra.
 Qed.
 
 Lemma cc_inv_op_proof : (un_op_wd cc_csetoid cc_inv).
@@ -108,7 +92,7 @@ Unfold un_op_wd. Unfold fun_wd.
 Intros x y. Elim x. Elim y.
 Simpl. Unfold cc_eq. Simpl. Intros.
 Elim H. Clear H. Intros.
-Split; Algebra.
+Split; algebra.
 Qed.
 *)
 
@@ -160,7 +144,7 @@ Definition cc_mult_op := Build_CSetoid_bin_op _ _ cc_mult_strext.
 
 Lemma cc_csg_associative : associative cc_plus_op.
 unfold associative in |- *. intros. elim x. elim y. elim z. intros.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma cc_cr_mult_associative : associative cc_mult_op.
@@ -173,9 +157,9 @@ Definition cc_csemi_grp := Build_CSemiGroup cc_csetoid _ cc_csg_associative.
 Lemma cc_cm_proof : is_CMonoid cc_csemi_grp cc_zero.
 apply Build_is_CMonoid.
 unfold is_rht_unit in |- *. intros. elim x. intros.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 unfold is_lft_unit in |- *. intros. elim x. intros.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Definition cc_cmonoid := Build_CMonoid _ _ cc_cm_proof.
@@ -183,8 +167,8 @@ Definition cc_cmonoid := Build_CMonoid _ _ cc_cm_proof.
 Lemma cc_cg_proof : is_CGroup cc_cmonoid cc_inv_op.
 unfold is_CGroup in |- *. intros. elim x. intros.
 split.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma cc_cr_dist : distributive cc_mult_op cc_plus_op.
@@ -202,7 +186,7 @@ Definition cc_cabgroup : CAbGroup.
 apply Build_CAbGroup with cc_cgroup.
 red in |- *; unfold commutes in |- *.
 intros.
-elim x; elim y; split; simpl in |- *; Algebra.
+elim x; elim y; split; simpl in |- *; algebra.
 Defined.
 
 Lemma cc_cr_mult_mon : is_CMonoid
@@ -379,7 +363,7 @@ simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; rational.
 Qed.
 
 Lemma I_wd : forall x x' y y' : IR, x [=] x' -> y [=] y' -> x[+I*]y [=] x'[+I*]y'.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. algebra.
 Qed.
 
 (** ** Properties of [Re] and [Im] *)
@@ -410,22 +394,22 @@ Qed.
 
 Lemma Re_resp_plus : forall x y : CC, Re (x[+]y) [=] Re x[+]Re y.
 intros. elim x. intros x1 x2. elim y. intros y1 y2.
-simpl in |- *. unfold cc_eq in |- *. Algebra.
+simpl in |- *. unfold cc_eq in |- *. algebra.
 Qed.
 
 Lemma Re_resp_inv : forall x y : CC, Re (x[-]y) [=] Re x[-]Re y.
 intros. elim x. intros x1 x2. elim y. intros y1 y2.
-simpl in |- *. unfold cc_eq in |- *. Algebra.
+simpl in |- *. unfold cc_eq in |- *. algebra.
 Qed.
 
 Lemma Im_resp_plus : forall x y : CC, Im (x[+]y) [=] Im x[+]Im y.
 intros. elim x. intros x1 x2. elim y. intros y1 y2.
-simpl in |- *. unfold cc_eq in |- *. Algebra.
+simpl in |- *. unfold cc_eq in |- *. algebra.
 Qed.
 
 Lemma Im_resp_inv : forall x y : CC, Im (x[-]y) [=] Im x[-]Im y.
 intros. elim x. intros x1 x2. elim y. intros y1 y2.
-simpl in |- *. unfold cc_eq in |- *. Algebra.
+simpl in |- *. unfold cc_eq in |- *. algebra.
 Qed.
 
 Lemma cc_calculate_square : forall x y, (x[+I*]y) [^]2 [=] (x[^]2[-]y[^]2) [+I*]x[*]y[*]Two.
@@ -444,7 +428,7 @@ Section Conj_properties.
 
 Lemma CC_conj_plus : forall c c' : CC, CC_conj (c[+]c') [=] CC_conj c[+]CC_conj c'.
 intros c c'. elim c. intros x y. elim c'. intros x' y'.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma CC_conj_mult : forall c c' : CC, CC_conj (c[*]c') [=] CC_conj c[*]CC_conj c'.
@@ -463,15 +447,15 @@ right. apply un_op_strext_unfolded with (cg_inv (c:=IR)). auto.
 Qed.
 
 Lemma CC_conj_conj : forall c : CC, CC_conj (CC_conj c) [=] c.
-intros. elim c. intros x y. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+intros. elim c. intros x y. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma CC_conj_zero : CC_conj Zero [=] Zero.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma CC_conj_one : CC_conj One [=] One.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve CC_conj_one: algebra.
@@ -503,7 +487,7 @@ intro x. simpl in |- *. apply eq_reflexive.
 Qed.
 
 Lemma cc_IR_wd : forall x y : IR, x [=] y -> cc_IR x [=] cc_IR y.
-intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve cc_IR_wd: algebra_c.
@@ -527,23 +511,23 @@ intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; rational.
 Qed.
 
 Lemma cc_IR_plus : forall x y : IR, cc_IR x[+]cc_IR y [=] cc_IR (x[+]y).
-intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve cc_IR_plus: algebra.
 
 Lemma cc_IR_minus : forall x y : IR, cc_IR x[-]cc_IR y [=] cc_IR (x[-]y).
-intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Lemma cc_IR_zero : cc_IR Zero [=] Zero.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve cc_IR_zero: algebra.
 
 Lemma cc_IR_one : cc_IR One [=] One.
-simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; Algebra.
+simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve cc_IR_one: algebra.

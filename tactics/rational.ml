@@ -58,9 +58,10 @@ let sixth_arg c = (args_app c).(5)
 
 let xinterp g c = sixth_arg (pf_type_of g c)
 
+let mk_existential env = Evarutil.new_evar_in_sign env
+
 let mk_lambda n t c = mkLambda (n,t,c)
-let mk_cast c k t = mkCast (c,k,t)
-let mk_default_cast c t = mk_cast c DEFAULTcast t
+let mk_cast c t = mkCast (c,t)
 let mk_case ci a b c = mkCase (ci,a,b,c)
 
 let pf_nf_betadeltaiota = pf_reduce nf_betadeltaiota
@@ -102,9 +103,11 @@ let xrational verbose g a =
   and pos_xI = coq_constant "xI"
   and pos_xO = coq_constant "xO"
   and pos_xH = coq_constant "xH"
-  and int_Z0 = coq_constant "Z0"
-  and int_Zpos = coq_constant "Zpos"
-  and int_Zneg = coq_constant "Zneg" in
+  and int_ZERO = coq_constant "ZERO"
+  and int_POS = coq_constant "POS"
+  and int_NEG = coq_constant "NEG"
+
+  and cs_eq = constant_algebra "CSetoids.cs_eq" in
 
   let xexpr_constant s =
     try constant_tactics (the_file ^ ".xexpr" ^ the_suffix ^ "_" ^ s)
@@ -184,13 +187,13 @@ let xrational verbose g a =
     else raise (Failure "evalint") in
 
   let rec evalint n =
-    if eq_constr n int_Z0 then 0
+    if eq_constr n int_ZERO then 0
     else if isApp n then
       let f = hd_app n
       and a = args_app n in
 	if Array.length a > 0 then
-	  if eq_constr f int_Zpos then evalpos a.(0)
-	  else if eq_constr f int_Zneg then -(evalpos a.(0))
+	  if eq_constr f int_POS then evalpos a.(0)
+	  else if eq_constr f int_NEG then -(evalpos a.(0))
 	  else raise (Failure "evalint")
 	else raise (Failure "evalint")
     else raise (Failure "evalint") in
@@ -302,9 +305,9 @@ let xrational verbose g a =
 	mkApp((if l == 0 then pos_xO else pos_xI), [| posconstr (k / 2) |]) in
 
   let rec intconstr k =
-    if k == 0 then int_Z0 else
-    if k > 0 then mkApp(int_Zpos, [| posconstr k |]) else
-      mkApp(int_Zneg, [| posconstr (- k) |]) in
+    if k == 0 then int_ZERO else
+    if k > 0 then mkApp(int_POS, [| posconstr k |]) else
+      mkApp(int_NEG, [| posconstr (- k) |]) in
     
   let rec xexprconstr t rhoV rhoU rhoB rhoP =
     match t with
@@ -357,7 +360,7 @@ let xrational verbose g a =
   let rec valconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_default_cast (mkApp(csg_unit, [|the_cmonoid |])) ta)
+	    (mk_cast (mkApp(csg_unit, [|the_cmonoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; valconstr f ta |]) in
@@ -365,7 +368,7 @@ let xrational verbose g a =
   let rec unconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_default_cast (mkApp(id_un_op, [|the_csetoid |])) ta)
+	    (mk_cast (mkApp(id_un_op, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; unconstr f ta |]) in
@@ -373,7 +376,7 @@ let xrational verbose g a =
   let rec binconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_default_cast (mkApp(cs_binproj1, [|the_csetoid |])) ta)
+	    (mk_cast (mkApp(cs_binproj1, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; binconstr f ta |]) in
@@ -381,7 +384,7 @@ let xrational verbose g a =
   let rec funconstr e ta =
     match e with
 	[] -> mk_lambda Anonymous nat_nat
-	    (mk_default_cast (mkApp(fid, [|the_csetoid |])) ta)
+	    (mk_cast (mkApp(fid, [|the_csetoid |])) ta)
       | [c] -> mk_lambda Anonymous nat_nat c
       | c::f -> mk_lambda (Name (id_of_string "n")) nat_nat
 	    (mk_case nat_info ta (mkRel 1) [| c; funconstr f ta |]) in
@@ -466,10 +469,10 @@ let hrational1 verbose g =
   if verbose then msgnl (str "begin Rational");
   hrational verbose g
       
-TACTIC EXTEND rational
-| ["rational"] -> [ hrational1 false ]
+TACTIC EXTEND Rational
+| ["Rational"] -> [ hrational1 false ]
 END
 
-TACTIC EXTEND rational_verbose
-| ["rational" "verbose"] -> [ hrational1 true ]
+TACTIC EXTEND RationalVerbose
+| ["Rational" "Verbose"] -> [ hrational1 true ]
 END

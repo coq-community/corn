@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export Differentiability.
@@ -349,11 +333,11 @@ eapply eq_transitive_unfolded.
 apply csf_wd_unfolded.
 cut (scs_elem _ _ x [=] scs_elem _ _ x).
 case x; simpl in |- *; auto.
-Algebra.
+algebra.
 apply csf_wd_unfolded.
 cut (scs_elem _ _ x [=] scs_elem _ _ x).
 case x; simpl in |- *; auto.
-Algebra.
+algebra.
 Qed.
 
 End aux.
@@ -372,11 +356,11 @@ exists
  (IntPartIR (F:=(Frestr (F:=PartInt f') (compact_wd _ _ _) H)) (included_refl _ _)).
 apply Derivative_I_wdr with (PartInt f').
 FEQ.
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply included_imp_deriv with (Hab := Hab'); auto.
 apply Derivative_I_n_wdl with (PartInt f').
 FEQ.
-simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 auto.
 Qed.
 
@@ -410,7 +394,7 @@ elim H0; clear H0; intros H3 H4.
 elim H4; clear H4; intros H0 H5.
 apply Derivative_I_n_unique with 0 G.
 simpl in |- *; apply Feq_reflexive; auto.
-simpl in |- *; FEQ; Algebra.
+simpl in |- *; FEQ; algebra.
 auto.
 elim H0; intros F' H3 H4.
 exists F'; auto.
@@ -525,7 +509,7 @@ apply
 apply eq_imp_Feq.
 Included.
 Included.
-intros; simpl in |- *; apply csf_wd_unfolded; simpl in |- *; Algebra.
+intros; simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
 apply projT2.
 intro.
 cut {p : nat | p = S n}.
@@ -586,7 +570,7 @@ apply projT2.
 apply projT2.
 FEQ.
 apply n_deriv_inc.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 elim H'; intros.
 eapply Diffble_I_n_wd.
 2: apply p.
@@ -634,7 +618,7 @@ auto.
 apply lft_leEq_Max.
 apply n_deriv_lemma.
 auto.
-simpl in |- *; Algebra.
+simpl in |- *; algebra.
 apply eq_symmetric_unfolded.
 apply Feq_imp_eq with (Compact (less_leEq _ _ _ Hab')).
 apply Derivative_I_n_unique with n F.
@@ -677,7 +661,7 @@ Lemma n_deriv_I_wd'' : forall n a b Hab Hab' F H H' x y, x [=] y ->
  forall Hx Hy, n_deriv_I a b Hab n F H x Hx [=] n_deriv_I a b Hab' n F H' y Hy.
 intros n a b Hab Hab' F H H' x y H0 H1 H2 Hx Hy.
 apply n_deriv_I_wd'.
-Algebra.
+algebra.
 auto.
 auto.
 apply included_imp_diffble_n with (Hab' := Hab).

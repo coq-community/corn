@@ -1,19 +1,3 @@
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
-
-
 (* $Id$ *)
 
 Require Export RefSeparating.
@@ -369,7 +353,7 @@ apply eq_symmetric_unfolded;
      (f := fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Q (S j) (H' _ _ H1 Hj') [-]Q j (lt_le_weak _ _ (H _ _ H1 Hj'))).
 apply RL_sub_SS.
-Algebra.
+algebra.
 Qed.
 
 Lemma ref_calc4 :
@@ -402,7 +386,7 @@ apply Sumx_wd; intros.
 eapply eq_transitive_unfolded.
 apply Sum2_minus_Sum2.
 apply RL_sub_SS.
-Algebra.
+algebra.
 Qed.
 
 Lemma ref_calc5 :
@@ -425,7 +409,7 @@ Lemma ref_calc5 :
 apply AbsIR_wd; apply Sumx_wd; intros.
 apply Sum2_wd; intros.
 apply RL_sub_SS.
-Algebra.
+algebra.
 Qed.
 
 Lemma ref_calc6 :
@@ -451,7 +435,7 @@ apply AbsIR_wd.
 apply Sum2_wd.
 apply RL_sub_SS.
 intros j Hj Hj'.
-Algebra.
+algebra.
 Qed.
 
 Lemma ref_calc7 :
@@ -473,7 +457,7 @@ apply Sumx_resp_leEq; intros.
 eapply leEq_wdr.
 apply triangle_Sum2IR.
 apply RL_sub_SS.
-Algebra.
+algebra.
 Qed.
 
 Lemma ref_calc8 :
@@ -580,7 +564,7 @@ apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 apply Sumx_wd; intros.
 eapply eq_transitive_unfolded.
 2: apply Sum2_comm_scal'.
-Algebra.
+algebra.
 apply RL_sub_SS.
 Qed.
 
@@ -779,9 +763,9 @@ apply
 apply sep__part_Sum.
 assumption.
 apply AbsIR_wd; apply cg_minus_wd.
-Algebra.
+algebra.
 unfold Partition_Sum in |- *; apply Sumx_wd; intros.
-Algebra.
+algebra.
 Qed.
 
 Let csi2 := Min (b[-]a) ((d'[-]Mesh R) [/]TwoNZ).
@@ -853,9 +837,9 @@ apply
 apply sep__part_Sum.
 assumption.
 apply AbsIR_wd; apply cg_minus_wd.
-Algebra.
+algebra.
 unfold Partition_Sum in |- *; apply Sumx_wd; intros.
-Algebra.
+algebra.
 Qed.
 
 Let csi3 := d[-]Mesh P'.
@@ -901,9 +885,9 @@ apply
 unfold Q, fQ in |- *; apply sep__sep_Sum.
 apply AbsIR_wd.
 unfold Partition_Sum in |- *; apply cg_minus_wd.
-Algebra.
+algebra.
 apply Sumx_wd; intros.
-Algebra.
+algebra.
 Qed.
 (* end hide *)
 
@@ -979,16 +963,16 @@ unfold Partition_Sum in |- *; apply Sumx_wd; intros.
 eapply eq_transitive_unfolded.
 2: apply ring_distl_minus.
 apply mult_wdl.
-rstepr (Part F (fP i H) (just HfP)); Algebra.
+rstepr (Part F (fP i H) (just HfP)); algebra.
 apply cg_minus_wd.
-2: Algebra.
+2: algebra.
 astepr (Fa[*]b[-]Fa[*]a).
 eapply eq_transitive_unfolded.
 apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= n) => Fa[*]P i Hi).
 red in |- *; intros.
 apply mult_wdr.
 apply prf1; auto.
-intros; Algebra.
+intros; algebra.
 apply cg_minus_wd; apply mult_wdr.
 apply finish.
 apply start.
@@ -1105,7 +1089,7 @@ eapply eq_transitive_unfolded.
 apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= m) => R i Hi).
 red in |- *; intros.
 apply prf1; auto.
-intros; Algebra.
+intros; algebra.
 apply cg_minus_wd; [ apply finish | apply start ].
 eapply leEq_transitive.
 apply triangle_SumxIR.
@@ -1142,7 +1126,7 @@ eapply eq_transitive_unfolded.
 apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= n) => P i Hi).
 red in |- *; intros.
 apply prf1; auto.
-intros; Algebra.
+intros; algebra.
 apply cg_minus_wd; [ apply finish | apply start ].
 Qed.
 
