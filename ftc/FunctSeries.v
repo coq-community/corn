@@ -421,7 +421,7 @@ Lemma Fun_Series_Sum_scal : forall H' : fun_series_convergent _ _ Hab (fun n => 
  Feq I (Fun_Series_Sum H') (H{*}Fun_Series_Sum convF).
 elim convF; intros contF convF'.
 intros.
-unfold I in |- *; FEQ. rename X into H0.
+unfold I in |- *; FEQ. try rename X into H0.
 cut
  (convergent
     (fun n : nat =>
@@ -489,7 +489,7 @@ Qed.
 Lemma Fun_Series_Sum_inv : forall H : fun_series_convergent _ _ Hab (fun n => {--} (f n)),
  Feq I (Fun_Series_Sum H) {--} (Fun_Series_Sum convF).
 intros.
-FEQ. rename X into H0.
+FEQ. try rename X into H0.
 cut
  (convergent
     (fun n : nat =>
@@ -545,7 +545,7 @@ Qed.
 Lemma fun_series_conv : forall H H',
  conv_fun_seq' a b Hab (fun_seq_part_sum f) (Fun_Series_Sum convF) H H'.
 intros.
-inversion_clear convF. rename X into H0.
+inversion_clear convF. try rename X into H0.
 apply
  conv_fun_seq'_wdr
   with
@@ -557,7 +557,7 @@ Qed.
 
 Lemma Fun_Series_Sum_cont : Continuous_I Hab (Fun_Series_Sum convF).
 intros.
-inversion_clear convF. rename X into H.
+inversion_clear convF. try rename X into H.
 eapply Continuous_I_wd.
 apply Feq_symmetric;
  apply

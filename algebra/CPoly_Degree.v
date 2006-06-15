@@ -159,7 +159,7 @@ Lemma Sum_degree_le : forall (f : nat -> RX) (n k l : nat), k <= S l ->
  (forall i, k <= i -> i <= l -> degree_le n (f i)) -> degree_le n (Sum k l f).
 unfold degree_le in |- *. intros. induction  l as [| l Hrecl]; intros.
 generalize (toCle _ _ H); clear H; intro H.
-inversion H.
+inversion H as [|m0 X].
 unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
 apply eq_transitive_unfolded with (nth_coeff m (Zero:RX)).
 apply nth_coeff_wd. algebra. algebra.

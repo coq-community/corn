@@ -162,7 +162,7 @@ inversion_clear contF.
 elim (contin_prop _ _ _ _ (X2 _ _ _ X) e X0); intros d H3 H4.
 exists d.
 assumption.
-intros.
+intros x y X3 X4 Hx Hy Hx' H.
 simpl in |- *.
 rename Hab into Hab'.
 set (Hab := less_leEq _ _ _ Hab') in *.
