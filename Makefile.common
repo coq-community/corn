@@ -80,7 +80,7 @@ IDEBIN:=$(BINDIR)/$(IDENAME)
 COQ_PRIMITIVE_DEVEL_DIRS := $(shell if [ -n "$(devel)" ]; then for d in $(devel); do \
 	echo "`$(REALPATH) $${d}` "; done; fi)
 COQ_PRIMITIVE_DIRS := $(shell for d in $(COQ_HIERARCHIES:%=$(SRCDIR)/%); do if [ -d $${d} ]; then echo "`$(REALPATH) $${d}` "; fi; done)
-COQDIRS := $(shell find $(COQ_PRIMITIVE_DIRS) $(COQ_PRIMITIVE_DEVEL_DIRS) -type d -not -name CVS)
+COQDIRS := $(shell find $(COQ_PRIMITIVE_DIRS) $(COQ_PRIMITIVE_DEVEL_DIRS) '(' -name CVS -or -name '{arch}' -or -name .arch-ids -or -name .svn -or -name _darcs ')' -prune -or -type d -print )
 COQSOURCES := $(shell find $(COQDIRS) -maxdepth 1 -name '*.v' -not -name 'Transparent_*' -not -name 'Opaque_*')
 
 # tools
