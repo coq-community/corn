@@ -261,7 +261,7 @@ Qed.
 Lemma interpG_wd :
  forall (e : expr) (x y : G), interpG e x -> (x[=]y) -> interpG e y.
 intros e x y H H0.
-inversion H; rewrite <- H2; rewrite H3 in H1.
+inversion H; try (rewrite <- H2; rewrite H3 in H1). (* compat 8.0 *)
 apply interpG_var. Step_final x.
 apply interpG_zero. Step_final x.
 apply interpG_plus with x0 y0; auto. Step_final x.
@@ -318,53 +318,53 @@ intros. apply interpG_zero. inversion X. Step_final (zmult x0 0).
 
 intros z f; case f; simpl in |- *; auto.
 intro z0; case z0; simpl in |- *; auto.
-  intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+  intros. inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
   apply interpG_zero. Step_final (zmult x0 0).
- intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
- inversion X0. rewrite <- H3. rewrite H5 in H4.
+ intros. inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
+ inversion X0. try (rewrite <- H3; rewrite H5 in H4). (* compat 8.0 *)
  rewrite Zmult_comm. rewrite <- Zmult_0_r_reverse. apply interpG_zero.
  astepr (zmult (G:=G) Zero (Zpos p)). Step_final (zmult x0 (Zpos p)).
-intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
-inversion X0. rewrite <- H3. rewrite H5 in H4.
+intros. inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
+inversion X0. try (rewrite <- H3; rewrite H5 in H4). (* compat 8.0 *)
 rewrite Zmult_comm. rewrite <- Zmult_0_r_reverse. apply interpG_zero.
 astepr (zmult (G:=G) Zero (Zneg p)). Step_final (zmult x0 (Zneg p)).
 
 intros e0 e1 f; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
-intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+intros. inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply interpG_zero. Step_final (zmult x0 0).
 
 intros e0 e1 f; case f; simpl in |- *; auto; try (intros; inversion X; fail).
 intro z; case z; simpl in |- *; auto.
-  intros. inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+  intros. inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
   apply interpG_zero. Step_final (zmult x0 0).
- intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
- inversion X0. rewrite H3 in X1. rewrite H4 in H6. rewrite <- H5.
+ intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
+ inversion X0. try (rewrite H3 in X1; rewrite H4 in H6; rewrite <- H5). (* compat 8.0 *)
  simpl in |- *; apply interpG_mult_int with x1; auto.
  astepr (zmult x0 (Zpos p)). Step_final (zmult (zmult x1 k0) (Zpos p)).
-intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
-inversion X0. rewrite H3 in X1. rewrite H4 in H6. rewrite <- H5.
+intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
+inversion X0. try (rewrite H3 in X1; rewrite H4 in H6; rewrite <- H5). (* compat 8.0 *)
 simpl in |- *; apply interpG_mult_int with x1; auto.
 astepr (zmult x0 (Zneg p)). Step_final (zmult (zmult x1 k0) (Zneg p)).
 
 intros e0 e1 f; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
-intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply interpG_zero. Step_final (zmult x0 0).
 
 intros n e0 f x; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
-intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply interpG_zero. Step_final (zmult x0 0).
 
 intros n e0 e1 f x; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
-intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply interpG_zero. Step_final (zmult x0 0).
 
 intros n e0 f x; case f; simpl in |- *; auto.
 intro z; case z; simpl in |- *; auto.
-intros; inversion X. rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+intros; inversion X. try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply interpG_zero. Step_final (zmult x0 0).
 Qed.
 Transparent Zmult.
@@ -373,7 +373,7 @@ Opaque MI_mult.
 Lemma MV_mult_corr_G :
  forall (e f : expr) (x : G), II (expr_mult f e) x -> II (MV_mult e f) x.
 intro e; case e; simpl in |- *; intros; inversion X.
-rewrite H in X0. rewrite H1 in H2. rewrite H0 in H2.
+try (rewrite H in X0; rewrite H1 in H2; rewrite H0 in H2). (* compat 8.0 *)
 apply MI_mult_corr_G.
 apply interpG_mult_int with x0; auto.
 unfold expr_one in |- *. apply interpG_mult_int with x0; algebra.
@@ -384,7 +384,7 @@ Lemma MM_mult_corr_G :
  forall (e f : expr) (x : G),
  II (expr_mult e f) x or II (expr_mult f e) x -> II (MM_mult e f) x.
 intro e; case e; simpl in |- *; intros; elim X; clear X; intro X; inversion X;
- rewrite H in X0; rewrite H0 in H2; rewrite <- H1.
+ try (rewrite H in X0; rewrite H0 in H2; rewrite <- H1). (* Compat 8.0 *)
 
 apply interpG_mult_int with x0; auto.
 
@@ -396,7 +396,7 @@ apply MI_mult_corr_G. apply interpG_mult_int with x0; auto.
 apply interpG_mult_int with x0; auto.
 
 apply MV_mult_corr_G.
-inversion X0. rewrite H3 in X1. rewrite <- H5. rewrite H4 in H6.
+inversion X0. try (rewrite H3 in X1; rewrite <- H5; rewrite H4 in H6). (* compat 8.0 *)
 replace (MM_mult (expr_int k0) (expr_int k)) with (expr_int (k0 * k)).
  apply interpG_mult_int with x1; auto.
  astepr (zmult x0 k). Step_final (zmult (zmult x1 k0) k).
@@ -433,8 +433,8 @@ elim f1; simpl in |- *; auto.
 intro m.
 cut (eq_nat n m = true -> n = m).
 elim (eq_nat n m); simpl in |- *; auto.
-intros. inversion X. rewrite H6 in X1. rewrite <- H8. rewrite H7 in H9.
-inversion X0. rewrite H10 in X2. rewrite <- H12. rewrite H11 in H13.
+intros. inversion X. try (rewrite H6 in X1; rewrite <- H8; rewrite H7 in H9). (* compat 8.0 *)
+inversion X0. try (rewrite H10 in X2; rewrite <- H12; rewrite H11 in H13). (* compat 8.0 *)
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
 astepr (zmult x0 k[+]zmult x1 k0).
@@ -454,15 +454,15 @@ cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> u = u0).
 cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> e0 = e5).
 elim andb; simpl in |- *; auto.
 intros H' H''. intros.
-inversion X. rewrite <- H7. rewrite <- H9. rewrite H8 in H10.
-inversion X0. rewrite H11 in X2. rewrite <- H13. rewrite H12 in H14.
+inversion X. try (rewrite H7 in X1; rewrite <- H9; rewrite H8 in H10).
+inversion X0. try (rewrite H11 in X2; rewrite <- H13; rewrite H12 in H14).
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
 astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_unop u e0).
-rewrite <- H7; auto. rewrite H'. rewrite H''. auto. auto. auto.
+auto. rewrite H'. rewrite H''. auto. auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
 intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
 
@@ -479,15 +479,15 @@ cut
  (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> e3 = e7).
 elim andb; simpl in |- *; auto.
 intros H' H'' H'''. intros.
-inversion X. rewrite <- H9. rewrite <- H11. rewrite H10 in H12.
-inversion X0. rewrite H13 in X2. rewrite <- H15. rewrite H14 in H16.
+inversion X. try (rewrite H9 in X1; rewrite <- H11; rewrite H10 in H12). (* compat 8.0 *)
+inversion X0. try (rewrite H13 in X2; rewrite <- H15; rewrite H14 in H16). (* compat 8.0 *)
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
 astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_binop u e0 e3).
-rewrite <- H9; auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
+auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
 auto.
 intro. elim (andb_prop _ _ H9); intros. elim (andb_prop _ _ H11); intros.
  apply eq_expr_corr; auto. 
@@ -504,15 +504,15 @@ cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> u = u0).
 cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> e0 = e5).
 elim andb; simpl in |- *; auto.
 intros H' H''. intros.
-inversion X. rewrite <- H7. rewrite <- H9. rewrite H8 in H10.
-inversion X0. rewrite H11 in X2. rewrite <- H13. rewrite H12 in H14.
+inversion X. try (rewrite H7 in X1; rewrite <- H9; rewrite H8 in H10). (* compat 8.0 *)
+inversion X0. try (rewrite H11 in X2; rewrite <- H13; rewrite H12 in H14). (* compat 8.0 *)
 apply MV_mult_corr_G.
 simpl in |- *. apply interpG_mult_int with x0; auto.
 astepr (zmult x0 k[+]zmult x1 k0).
 cut (x0[=]x1); intros.
 Step_final (zmult x0 k[+]zmult x0 k0).
 apply refl_interpG with val unop binop pfun (expr_part u e0).
-rewrite <- H7; auto. rewrite H'. rewrite H''. auto. auto. auto.
+auto. rewrite H'. rewrite H''. auto. auto. auto.
 intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
 intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
 
@@ -525,8 +525,8 @@ intros u e0 H1 f.
 elim f; simpl in |- *; auto.
 
 intros; apply interpG_plus with x y; algebra.
-intros. inversion X.  rewrite H1 in H0. rewrite <- H.
-inversion X0. rewrite <- H2. rewrite H4 in H3.
+intros. inversion X.  try (rewrite H1 in H0; rewrite <- H). (* compat 8.0 *)
+inversion X0. try (rewrite <- H2; rewrite H4 in H3). (* compat 8.0 *)
 simpl in |- *. apply interpG_zero.
 Step_final ((Zero:G)[+]Zero).
 Qed.
@@ -569,13 +569,13 @@ intros; apply interpG_wd with (y[+]x); algebra.
 apply interpG_plus with y x; algebra.
 intros; apply interpG_plus with x y; algebra.
 intros; apply MM_plus_corr_G; auto.
-intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
+intros. inversion X0. try (rewrite H in X2; rewrite H1 in X3; rewrite <- H0). (* compat 8.0 *)
 apply interpG_wd with (y0[+](x0[+]y)).
 apply X; auto.
 apply MM_plus_corr_G; auto.
 astepl (y0[+]x0[+]y).
 Step_final (x0[+]y0[+]y).
-intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
+intros. inversion X0. try (rewrite H in X2; rewrite H1 in X3; rewrite <- H0). (* compat 8.0 *)
 apply interpG_wd with (x0[+](y0[+]y)).
 apply interpG_plus with x0 (y0[+]y); algebra.
 Step_final (x0[+]y0[+]y).
@@ -601,7 +601,7 @@ elim e; intros; simpl in |- *; auto.
 intros. apply interpG_plus with x y; algebra.
 intros. apply interpG_wd with (y[+]x); algebra.
 apply PM_plus_corr_G; auto.
-intros. inversion X0. rewrite H in X2. rewrite H1 in X3. rewrite <- H0.
+intros. inversion X0. try (rewrite H in X2; rewrite H1 in X3; rewrite <- H0). (* compat 8.0 *)
 apply interpG_wd with (y0[+]y[+]x0).
 apply PM_plus_corr_G; auto.
 astepl (x0[+](y0[+]y)).
@@ -643,11 +643,11 @@ intro e;
     Hrece]; simpl in |- *; auto.
 
 intros f x H; elim H; clear H; intro H; inversion H.
- rewrite H0 in X. rewrite <- H2. rewrite H1 in H3.
+ try (rewrite H0 in X; rewrite <- H2; rewrite H1 in H3). (* compat 8.0 *)
  apply interpG_mult_int with x0; auto.
 
 intros f x H; elim H; clear H; intro H; inversion H.
- rewrite H0 in X. rewrite <- H2. rewrite H1 in H3.
+ try (rewrite H0 in X; rewrite <- H2; rewrite H1 in H3). (* compat 8.0 *)
  apply interpG_wd with (Zero[+]x); algebra.
  apply PM_plus_corr_G. apply interpG_zero; algebra.
  rewrite MI_mult_comm_int.
@@ -657,8 +657,8 @@ apply PM_plus_corr_G. apply interpG_zero; algebra.
 apply MI_mult_corr_G. auto.
 
 intros f x H; elim H; clear H; intro H; inversion H.
-rewrite H0 in X. rewrite <- H2. rewrite H1 in H3.
-inversion X. rewrite H4 in X0. rewrite H6 in X1. rewrite H5 in H7.
+try (rewrite H0 in X; rewrite <- H2; rewrite H1 in H3). (* compat 8.0 *)
+inversion X. try (rewrite H4 in X0; rewrite H6 in X1; rewrite H5 in H7). (* compat 8.0 *)
 apply interpG_wd with (zmult y k[+]zmult x1 k).
  2: astepl (zmult (y[+]x1) k); astepl (zmult (x1[+]y) k);
      Step_final (zmult x0 k).
@@ -718,8 +718,8 @@ intro e;
 intros f x H.
 apply PM_mult_corr_G; auto.
 
-intros f x H. inversion H. rewrite H0 in X; rewrite <- H2; rewrite <- H1.
-inversion X. rewrite H4 in X0. rewrite H6 in X1. rewrite H5 in H7.
+intros f x H. inversion H. try (rewrite H0 in X; rewrite <- H2; rewrite <- H1). (* compat 8.0 *)
+inversion X. try (rewrite H4 in X0; rewrite H6 in X1; rewrite H5 in H7). (* compat 8.0 *)
 apply interpG_wd with (zmult x1 k[+]zmult y k).
  2: astepl (zmult (x1[+]y) k); Step_final (zmult x0 k).
 apply PP_plus_corr_G.
@@ -736,14 +736,14 @@ algebra.
 apply (interpG_mult_int G val unop binop pfun (expr_var v) 1 x); algebra.
 apply interpG_zero; algebra.
 auto.
-inversion X1. rewrite H in X2. rewrite H1 in X3. rewrite H0 in H2.
+inversion X1. try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
  apply interpG_wd with (x0[+]y). apply PP_plus_corr_G; auto. auto.
-inversion X1. rewrite H in X2. rewrite <- H1. rewrite H0 in H2.
+inversion X1. try (rewrite H in X2; rewrite <- H1; rewrite H0 in H2). (* compat 8.0 *)
  simpl in |- *. apply interpG_wd with (zmult x0 k).
 apply PP_mult_corr_G. apply interpG_mult_int with x0; algebra. auto.
 auto.
 
-inversion X0. rewrite H in H2. rewrite H1 in X1. rewrite H0 in H2.
+inversion X0. try (rewrite H in H2; rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
 apply
  (interpG_plus G val unop binop pfun
     (expr_mult (expr_unop u (NormG e0)) expr_one) expr_zero x (
@@ -754,7 +754,7 @@ apply (interpG_mult_int G val unop binop pfun (expr_unop u (NormG e0)) 1 x);
 apply (interpG_unop G val unop binop pfun (NormG e0) u x0); algebra.
 apply interpG_zero; algebra.
 
-inversion X1. rewrite H in H3. rewrite H1 in X2. rewrite H2 in X3. rewrite H0 in H3.
+inversion X1. try (rewrite H in H3; rewrite H1 in X2; rewrite H2 in X3; rewrite H0 in H3). (* compat 8.0 *)
 apply
  (interpG_plus G val unop binop pfun
     (expr_mult (expr_binop b (NormG e0) (NormG e1)) expr_one) expr_zero x
@@ -767,15 +767,18 @@ apply (interpG_binop G val unop binop pfun (NormG e0) (NormG e1) b x0 y);
  algebra.
 apply interpG_zero; algebra.
 
-inversion X0. rewrite <- H. rewrite H1 in X1. rewrite H0 in H2.
+inversion X0.
+  (* circumvent inversion bug in Type in coq 8.0 *)
+  try ((generalize Hx H2; clear Hx H2; rewrite H; intros Hx H2);
+       rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
 apply
  (interpG_plus G val unop binop pfun
-    (expr_mult (expr_part f (NormG e0)) expr_one) expr_zero x (
+    (expr_mult (expr_part p (NormG e0)) expr_one) expr_zero x (
     Zero:G) x).
 algebra.
-apply (interpG_mult_int G val unop binop pfun (expr_part f (NormG e0)) 1 x);
+apply (interpG_mult_int G val unop binop pfun (expr_part p (NormG e0)) 1 x);
  algebra.
-apply (interpG_part G val unop binop pfun (NormG e0) f x0) with (Hx := Hx);
+apply (interpG_part G val unop binop pfun (NormG e0) p x0) with (Hx := Hx);
  algebra.
 apply interpG_zero; algebra.
 Qed.
