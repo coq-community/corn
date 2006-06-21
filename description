@@ -2,7 +2,7 @@ Name: C-CoRN
 Title: Constructive Coq Repository at Nijmegen
 Author: Herman Geuvers
 Institution: Radboud University Nijmegen
-Author: Lu�s Cruz-Filipe
+Author: Luís Cruz-Filipe
 Institution: Radboud University Nijmegen
 Author: Milad Niqui
 Institution: Radboud University Nijmegen
@@ -12,6 +12,23 @@ Author: Jan Zwanenburg
 Institution: Radboud University Nijmegen
 Author: Randy Pollack
 Author: Henk Barendregt
+Institution: Radboud University Nijmegen
+Author: Mariusz Giero
+Author: Rik van Ginneken
+Institution: Radboud University Nijmegen
+Author: Dimitri Hendriks
+Author: Sébastien Hinderer
+Author: Bart Kirkels
+Author: Pierre Letouzey
+Author: Iris Loeb
+Institution: Radboud University Nijmegen
+Author: Lionel Mamane
+Author: Russell O'Connor
+Institution: Radboud University Nijmegen
+Author: Nickolay V. Shmyrev
+Author: Bas Spitters
+Institution: Radboud University Nijmegen
+Author: Dan Synek
 Institution: Radboud University Nijmegen
 Description:
  The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
