@@ -1650,20 +1650,14 @@ Qed.
 Definition cpoly_cring_old : CRing := Build_CRing _ _ _ cpoly_is_CRing_old.
 
 (**
-cpoly_mult_fast produces smaller lengthed polynomials when multiplying by zero
-
-For example << Eval simpl in cpoly_mult_cs _ _X_ (Zero:cpoly_cring Q_as_CRing) >>
+[cpoly_mult_fast] produces smaller lengthed polynomials when multiplying by zero.
+For example [Eval simpl in cpoly_mult_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
 returns 
-<<
-   cpoly_linear Q_as_CRing QZERO
-         (cpoly_linear Q_as_CRing QZERO (cpoly_zero Q_as_CRing))
->>
-
-but << Eval simpl in cpoly_mult_fast_cs _ _X_ (Zero:cpoly_cring Q_as_CRing) >>
+[cpoly_linear Q_as_CRing QZERO (cpoly_linear Q_as_CRing QZERO (cpoly_zero Q_as_CRing))]
+while 
+[Eval simpl in cpoly_mult_fast_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
 returns
-<<
-   cpoly_zero Q_as_CRing
->>
+[cpoly_zero Q_as_CRing].
 
 Smaller lengthed polynomials means faster operations, and better estimates of the 
 degree of a polynomial.
