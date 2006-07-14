@@ -1635,11 +1635,133 @@ left.
 algebra.
 Qed.
 
-Lemma cpoly_is_CRing : is_CRing cpoly_cabgroup cpoly_one cpoly_mult_op.
+(**
+cring_old uses the original definition of polynomial multiplication 
+*)
+
+Lemma cpoly_is_CRing_old : is_CRing cpoly_cabgroup cpoly_one cpoly_mult_op.
 apply Build_is_CRing with cpoly_mult_assoc.
 exact cpoly_mult_monoid.
 exact cpoly_mult_commutative.
 exact cpoly_cr_dist.
+exact cpoly_cr_non_triv.
+Qed.
+
+Definition cpoly_cring_old : CRing := Build_CRing _ _ _ cpoly_is_CRing_old.
+
+(**
+[cpoly_mult_fast] produces smaller lengthed polynomials when multiplying by zero.
+For example [Eval simpl in cpoly_mult_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
+returns 
+[cpoly_linear Q_as_CRing QZERO (cpoly_linear Q_as_CRing QZERO (cpoly_zero Q_as_CRing))]
+while 
+[Eval simpl in cpoly_mult_fast_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
+returns
+[cpoly_zero Q_as_CRing].
+
+Smaller lengthed polynomials means faster operations, and better estimates of the 
+degree of a polynomial.
+*)
+
+Definition cpoly_mult_fast (p q : cpoly) : cpoly :=
+  match q with
+  | cpoly_zero        => cpoly_zero
+  | _ => cpoly_mult p q
+  end.
+
+Definition cpoly_mult_fast_cs (p q : cpoly_csetoid) : cpoly_csetoid := cpoly_mult_fast p q.
+
+(** cpoly_mult_fast is proven correct with respect the the original multiplication
+in cpoly_cring_old *)
+
+Lemma cpoly_mult_fast_ap_equiv : forall p1 p2 q1 q2, 
+(cpoly_mult_fast_cs p1 q1)[#](cpoly_mult_cs p2 q2) -> p1[#]p2 or q1[#]q2.
+destruct q1;
+destruct q2;
+intros X;
+simpl in X.
+rewrite cpoly_ap_p_zero in X.
+elim (ap_irreflexive cpoly_csetoid cpoly_zero).
+stepl (cpoly_mult_cs p2 cpoly_zero).
+assumption.
+apply cpoly_mult_zero.
+rewrite cpoly_ap_p_zero in X.
+right.
+apply ap_symmetric.
+eapply cring_mult_ap_zero_op with (R:=cpoly_cring_old).
+apply X.
+right.
+eapply cring_mult_ap_zero_op with (R:=cpoly_cring_old).
+change (cpoly_mult p1 (cpoly_linear c q1)) with (cpoly_mult_cs p1 (cpoly_linear c q1)) in X.
+stepr (cpoly_mult_cs p2 cpoly_zero).
+apply X.
+apply cpoly_mult_zero.
+apply cpoly_mult_op_strext.
+apply X.
+Qed.
+
+Lemma cpoly_mult_fast_equiv : forall p q, 
+(cpoly_mult_fast_cs p q)[=](cpoly_mult_cs p q).
+intros p q.
+apply not_ap_imp_eq.
+intro H.
+assert (p[#]p or q[#]q).
+apply cpoly_mult_fast_ap_equiv.
+assumption.
+destruct X as [X|X]; apply (ap_irreflexive _ _ X).
+Qed.
+
+Lemma cpoly_mult_fast_op_strext : bin_op_strext cpoly_csetoid cpoly_mult_fast_cs.
+intros x1 x2 y1 y2 H.
+apply cpoly_mult_op_strext.
+stepl (cpoly_mult_fast_cs x1 y1).
+stepr (cpoly_mult_fast_cs x2 y2).
+assumption.
+apply cpoly_mult_fast_equiv.
+apply cpoly_mult_fast_equiv.
+Qed.
+
+Definition cpoly_mult_fast_op := Build_CSetoid_bin_op _ _ cpoly_mult_fast_op_strext.
+
+Lemma cpoly_is_CRing : is_CRing cpoly_cabgroup cpoly_one cpoly_mult_fast_op.
+assert (mult_assoc:(associative cpoly_mult_fast_op)).
+intros p q r.
+stepl (cpoly_mult_op p (cpoly_mult_op q r)).
+stepr (cpoly_mult_op (cpoly_mult_op p q) r).
+apply cpoly_mult_assoc.
+stepl (cpoly_mult_op (cpoly_mult_fast_op p q) r).
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+apply bin_op_wd_unfolded.
+apply cpoly_mult_fast_equiv.
+apply eq_reflexive.
+stepl (cpoly_mult_op p (cpoly_mult_fast_op q r)).
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+apply bin_op_wd_unfolded.
+apply eq_reflexive.
+apply cpoly_mult_fast_equiv.
+eapply Build_is_CRing with mult_assoc.
+split.
+intro p.
+stepl (cpoly_mult_op p cpoly_one).
+apply cpoly_mult_one.
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+intro p.
+stepl (cpoly_mult_op cpoly_one p).
+apply cpoly_one_mult.
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+intros p q.
+stepl (cpoly_mult_op p q).
+stepr (cpoly_mult_op q p).
+apply cpoly_mult_commutative.
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+intros p q r.
+stepl (cpoly_mult_op p (q[+]r)).
+stepr (cpoly_plus_op (cpoly_mult_op p q) (cpoly_mult_op p r)).
+apply cpoly_cr_dist.
+apply bin_op_wd_unfolded;
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
+apply eq_symmetric; apply cpoly_mult_fast_equiv.
 exact cpoly_cr_non_triv.
 Qed.
 
@@ -1983,6 +2105,13 @@ astepr (c[+]Zero[+X*](Zero[+]p)).
 astepr (c[+X*]p).
 algebra.
 apply cpoly_one_mult.
+destruct p.
+simpl.
+algebra.
+simpl.
+split.
+auto with *.
+apply eq_reflexive with (S:=cpoly_cring R).
 Qed.
 
 Hint Resolve cpoly_lin: algebra.
@@ -2140,6 +2269,12 @@ algebra.
 astepl (x[*]c[*]p ! x).
 astepr (c[*]x[*]p ! x).
 algebra.
+stepr ((cpoly_mult _ (_C_ c) q)!x).
+apply eq_reflexive.
+apply apply_wd.
+apply eq_symmetric.
+apply (cpoly_mult_fast_equiv _ (_C_ c) q).
+apply eq_reflexive.
 Qed.
 
 Hint Resolve _c_mult_apply: algebra.
@@ -2148,6 +2283,7 @@ Lemma mult_apply : forall (p q : RX) x, (p[*]q) ! x [=] p ! x[*]q ! x.
 intros.
 pattern p in |- *.
 apply cpoly_induc.
+astepl (Zero ! x).
 simpl in |- *.
 algebra.
 intros.
