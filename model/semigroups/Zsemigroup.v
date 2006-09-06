@@ -1,4 +1,3 @@
-(* $Id: Zsemigroup.v,v 1.7 2004/09/22 11:06:13 loeb Exp $ *)
 
 Require Export Zsetoid.
 Require Export CSemiGroups.

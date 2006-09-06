@@ -1,4 +1,3 @@
-(* $Id: IVT.v,v 1.5 2004/04/23 10:01:04 lcf Exp $ *)
 
 Require Export CPoly_Contin.
 

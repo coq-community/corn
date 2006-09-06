@@ -1,4 +1,3 @@
-(* $Id: Equiv.v,v 1.4 2004/04/23 10:01:02 lcf Exp $ *)
 
 Require Export IR_CPMSpace.
 

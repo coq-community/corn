@@ -1,4 +1,3 @@
-(* $Id: Differentiability.v,v 1.5 2004/04/20 22:38:49 hinderer Exp $ *)
 
 Require Export PartInterval.
 Require Export DerivativeOps.

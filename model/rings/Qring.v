@@ -1,4 +1,3 @@
-(* $Id: Qring.v,v 1.8 2004/04/23 10:01:03 lcf Exp $ *)
 
 Require Export Qabgroup.
 Require Import CRings.

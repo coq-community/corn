@@ -1,4 +1,3 @@
-(* $Id: Zring.v,v 1.6 2004/04/08 08:20:34 lcf Exp $ *)
 
 Require Export Zabgroup.
 Require Import CRings.

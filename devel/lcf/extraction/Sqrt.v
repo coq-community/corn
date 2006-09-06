@@ -1,4 +1,3 @@
-(* $Id: Sqrt.v,v 1.4 2004/07/12 15:59:45 lcf Exp $ *)
 
 Require Export WeakIVT_Extr.
 Require Export Cauchy_IR.

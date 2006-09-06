@@ -1,4 +1,3 @@
-(* $Id: twoelemmonoid.v,v 1.1 2004/09/22 11:06:13 loeb Exp $ *)
 
 Require Export CMonoids.
 Require Export twoelemsemigroup.

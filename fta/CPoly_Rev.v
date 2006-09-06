@@ -1,4 +1,3 @@
-(* $Id: CPoly_Rev.v,v 1.3 2004/04/23 10:00:56 lcf Exp $ *)
 
 Require Export CPoly_Degree.
 

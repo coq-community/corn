@@ -1,4 +1,3 @@
-(* $Id: Trigonometric.v,v 1.5 2004/04/23 10:01:08 lcf Exp $ *)
 
 Require Export TaylorSeries.
 

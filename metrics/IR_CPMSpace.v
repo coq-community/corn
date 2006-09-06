@@ -1,4 +1,3 @@
-(* $Id: IR_CPMSpace.v,v 1.4 2004/04/23 10:01:02 lcf Exp $ *)
 
 Require Export ContFunctions.
 

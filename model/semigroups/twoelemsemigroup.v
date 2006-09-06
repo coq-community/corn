@@ -1,4 +1,3 @@
-(* $Id: twoelemsemigroup.v,v 1.1 2004/09/22 11:06:14 loeb Exp $ *)
 
 Require Export CSemiGroups.
 Require Export twoelemsetoid.

@@ -1,4 +1,3 @@
-(* $Id: Axioms.v,v 1.2 2004/04/13 12:39:18 lcf Exp $ *)
 
 Require Export CLogic.
 

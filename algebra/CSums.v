@@ -1,4 +1,3 @@
-(* $Id: CSums.v,v 1.8 2004/04/23 10:00:54 lcf Exp $ *)
 
 (** printing Sum0 %\ensuremath{\sum_0}% #&sum;<sub>0</sub># *)
 (** printing Sum1 %\ensuremath{\sum_1}% #&sum;<sub>1</sub># *)

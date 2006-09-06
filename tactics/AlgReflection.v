@@ -1,4 +1,3 @@
-(* $Id: AlgReflection.v,v 1.3 2005/08/05 17:10:23 roconnor Exp $ *)
 
 (* begin hide *)
 Require Export CLogic.

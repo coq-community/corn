@@ -1,4 +1,3 @@
-(* $Id: CFields.v,v 1.12 2004/04/23 10:00:52 lcf Exp $ *)
 
 (** printing [/] %\ensuremath{/}% #/# *)
 (** printing [//] %\ensuremath\ddagger% #&Dagger;# *)

@@ -1,4 +1,3 @@
-(* $Id: Q_in_CReals.v,v 1.11 2004/07/15 08:12:37 lcf Exp $ *)
 
 (** * On density of the image of [Q] in an arbitrary real number structure
 In this file we introduce the image of the concrete rational numbers

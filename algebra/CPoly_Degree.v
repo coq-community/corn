@@ -1,4 +1,3 @@
-(* $Id: CPoly_Degree.v,v 1.6 2005/08/05 17:10:24 roconnor Exp $ *)
 
 Require Export CPoly_NthCoeff.
 Require Export CFields.

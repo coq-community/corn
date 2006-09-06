@@ -1,4 +1,3 @@
-(* $Id: Prod_Sub1.v,v 1.4 2004/04/23 10:00:56 lcf Exp $ *)
 
 Require Export IR_CPMSpace.
 

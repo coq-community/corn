@@ -1,4 +1,3 @@
-(* $Id: CVectorSpace.v,v 1.4 2004/04/23 10:00:54 lcf Exp $ *)
 
 (** printing ['] %{'}% #'# *)
 

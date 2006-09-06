@@ -1,4 +1,3 @@
-(* $Id: CPMSTheory1.v,v 1.7 2004/04/23 10:00:55 lcf Exp $ *)
 
 Require Export Prod_Sub.
 

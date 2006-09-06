@@ -1,4 +1,3 @@
-(* $Id: CRings.v,v 1.13 2004/08/30 09:23:10 loeb Exp $ *)
 
 (** printing [*] %\ensuremath\times% #&times;# *)
 (** printing [^] %\ensuremath{\hat{\ }}% #^# *)

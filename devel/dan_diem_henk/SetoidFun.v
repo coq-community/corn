@@ -1,4 +1,3 @@
-(* $Id: SetoidFun.v,v 1.10 2004/12/20 10:03:37 hendriks Exp $ *)
 
 Require Export Setoids.
 Require Export build_setoid_fun.

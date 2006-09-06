@@ -1,4 +1,3 @@
-(* $Id: Extract.v,v 1.7 2004/07/13 15:25:36 lcf Exp $ *)
 
 Require Import Test.
 Require Import Qreduction.

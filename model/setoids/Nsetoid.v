@@ -1,4 +1,3 @@
-(* $Id: Nsetoid.v,v 1.5 2004/09/22 11:06:14 loeb Exp $ *)
 
 Require Export Nsec.
 Require Import CSetoidFun.

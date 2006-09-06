@@ -1,4 +1,3 @@
-(* $Id: Nsemigroup.v,v 1.7 2004/11/09 09:05:11 lionelm Exp $ *)
 
 Require Export Nsetoid.
 Require Import CSemiGroups.

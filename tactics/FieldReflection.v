@@ -1,4 +1,3 @@
-(* $Id: FieldReflection.v,v 1.5 2005/08/05 17:10:23 roconnor Exp $ *)
 
 (* begin hide *)
 Require Export CFields.

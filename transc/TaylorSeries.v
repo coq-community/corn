@@ -1,4 +1,3 @@
-(* $Id: TaylorSeries.v,v 1.7 2004/04/23 10:01:08 lcf Exp $ *)
 
 Require Export PowerSeries.
 Require Export Taylor.

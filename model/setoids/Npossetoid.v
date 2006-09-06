@@ -1,4 +1,3 @@
-(* $Id: Npossetoid.v,v 1.3 2004/04/06 15:46:04 lcf Exp $ *)
 
 Require Export Nsetoid.
 Require Export Npossec.

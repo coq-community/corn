@@ -1,4 +1,3 @@
-(* $Id: IntervalFunct.v,v 1.5 2004/04/08 15:28:06 lcf Exp $ *)
 
 Require Export PartFunEquality.
 

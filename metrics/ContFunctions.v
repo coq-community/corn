@@ -1,4 +1,3 @@
-(* $Id: ContFunctions.v,v 1.3 2004/04/23 10:01:02 lcf Exp $ *)
 
 Require Export CPseudoMSpaces.
 

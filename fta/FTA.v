@@ -1,4 +1,3 @@
-(* $Id: FTA.v,v 1.6 2004/04/23 10:00:57 lcf Exp $ *)
 
 Require Export CPoly_Rev.
 Require Export FTAreg.

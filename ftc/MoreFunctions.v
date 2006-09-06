@@ -1,4 +1,3 @@
-(* $Id: MoreFunctions.v,v 1.5 2004/04/20 22:38:50 hinderer Exp $ *)
 
 (** printing FNorm %\ensuremath{\|\cdot\|_{\infty}}% *)
 

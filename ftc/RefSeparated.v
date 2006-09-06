@@ -1,4 +1,3 @@
-(* $Id: RefSeparated.v,v 1.8 2004/04/23 10:01:00 lcf Exp $ *)
 
 (* begin hide *)
 

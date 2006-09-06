@@ -1,4 +1,3 @@
-(* $Id: CauchySeq.v,v 1.8 2004/04/23 10:01:04 lcf Exp $ *)
 
 (** printing IR %\ensuremath{\mathbb R}% *)
 (** printing PartIR %\ensuremath{\mathbb R\!\not\rightarrow\!\mathbb R}% *)

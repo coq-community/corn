@@ -1,4 +1,3 @@
-(* $Id: E.v,v 1.3 2004/04/23 11:44:05 lcf Exp $ *)
 
 Require Export Cauchy_IR.
 

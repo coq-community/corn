@@ -1,4 +1,3 @@
-(* $Id: Nmonoid.v,v 1.6 2004/11/09 09:05:10 lionelm Exp $ *)
 
 Require Export Nsemigroup.
 Require Import CMonoids.

@@ -1,4 +1,3 @@
-(* $Id: twoelemsetoid.v,v 1.1 2004/09/22 11:06:15 loeb Exp $ *)
 
 Require Export CSetoidFun.
 

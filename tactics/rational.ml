@@ -1,4 +1,3 @@
-(* $Id: rational.ml,v 1.3 2004/03/10 18:37:56 lionelm Exp $ *)
 
 open Util
 open Pp

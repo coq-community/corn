@@ -1,4 +1,3 @@
-(* $Id: Qpossemigroup.v,v 1.6 2004/04/08 08:20:35 lcf Exp $ *)
 
 Require Export Qpossetoid.
 Require Export CSemiGroups.

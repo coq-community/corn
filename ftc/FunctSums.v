@@ -1,4 +1,3 @@
-(* $Id: FunctSums.v,v 1.5 2004/04/23 10:00:59 lcf Exp $ *)
 
 (** printing FSum0 %\ensuremath{\sum_0}% #&sum;<sub>0</sub># *)
 (** printing FSum %\ensuremath{\sum}% #&sum;# *)

@@ -1,4 +1,3 @@
-(* $Id: CSetoidFun.v,v 1.12 2004/09/22 11:06:10 loeb Exp $ *)
 
 Require Export CSetoids.
 (** ** The Setoid of Setoid functions

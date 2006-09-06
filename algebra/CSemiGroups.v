@@ -1,4 +1,3 @@
-(* $Id: CSemiGroups.v,v 1.10 2004/09/24 15:30:34 loeb Exp $ *)
 
 (** printing [+] %\ensuremath+% #+# *)
 (** printing {+} %\ensuremath+% #+# *)

@@ -1,4 +1,3 @@
-(* $Id: CMonoidCyc.v,v 1.2 2004/12/21 08:04:14 loeb Exp $ *)
 
 Require Export CMonoids.
 Require Export csetoid_rewrite.

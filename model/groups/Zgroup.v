@@ -1,4 +1,3 @@
-(* $Id: Zgroup.v,v 1.5 2004/04/08 08:20:32 lcf Exp $ *)
 
 
 Require Export Zmonoid.

@@ -1,4 +1,3 @@
-(* $Id: Max_AbsIR.v,v 1.13 2004/04/23 10:01:04 lcf Exp $ *)
 
 (** printing Max %\ensuremath{\max}% *)
 (** printing Min %\ensuremath{\min}% *)

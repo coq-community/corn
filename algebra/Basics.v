@@ -1,4 +1,3 @@
-(* $Id: Basics.v,v 1.8 2004/09/22 11:06:09 loeb Exp $ *)
 
 (** printing alpha %\ensuremath{\alpha}% #&alpha;# *)
 (** printing beta %\ensuremath{\beta}% #&beta;# *)

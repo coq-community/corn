@@ -1,4 +1,3 @@
-(* $Id: KneserLemma.v,v 1.7 2004/04/23 10:00:57 lcf Exp $ *)
 
 (** printing Smallest %\ensuremath{\frac13^{2n^2+n}}% *)
 (** printing eta_0 %\ensuremath{\eta_0}% #&eta;<SUB>0</SUB># *)

@@ -1,4 +1,3 @@
-(* $Id: Rolle.v,v 1.6 2004/04/23 10:01:01 lcf Exp $ *)
 
 Require Export DiffTactics2.
 Require Export MoreFunctions.

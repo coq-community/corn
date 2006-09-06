@@ -1,4 +1,3 @@
-(* $Id: Qsetoid.v,v 1.7 2004/07/13 14:56:45 lcf Exp $ *)
 
 
 Require Export Qsec.

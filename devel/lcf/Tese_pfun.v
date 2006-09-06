@@ -1,4 +1,3 @@
-(* $Id: Tese_pfun.v,v 1.3 2004/03/31 09:13:40 lcf Exp $ *)
 
 (** Alternative definitions of partial functions *)
 

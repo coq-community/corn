@@ -1,4 +1,3 @@
-(* $Id: FunctSequence.v,v 1.5 2004/04/23 10:00:58 lcf Exp $ *)
 
 Require Export Continuity.
 Require Export PartInterval.

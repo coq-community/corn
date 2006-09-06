@@ -1,4 +1,3 @@
-(* $Id: Qabgroup.v,v 1.5 2004/04/08 08:20:31 lcf Exp $ *)
 
 Require Export Qgroup.
 Require Import CAbGroups.

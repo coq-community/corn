@@ -1,4 +1,3 @@
-(* $Id: CPoly_Shift.v,v 1.4 2004/04/23 10:00:56 lcf Exp $ *)
 
 Require Export CComplex.
 

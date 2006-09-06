@@ -1,4 +1,3 @@
-(* $Id: CGroups.v,v 1.10 2004/09/22 11:06:09 loeb Exp $ *)
 
 (** printing [-] %\ensuremath-% #&minus;# *)
 (** printing [--] %\ensuremath-% #&minus;# *)

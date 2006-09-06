@@ -1,4 +1,3 @@
-(* $Id: Zsetoid.v,v 1.6 2004/09/22 11:06:14 loeb Exp $ *)
 
 
 Require Export Zsec.

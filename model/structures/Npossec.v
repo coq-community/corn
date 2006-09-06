@@ -1,4 +1,3 @@
-(* $Id: Npossec.v,v 1.3 2004/04/06 15:46:05 lcf Exp $ *)
 
 (** printing Npos $\mathbb{N}^{+}$ #N<SUP>+</SUP># *)
 

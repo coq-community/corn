@@ -1,4 +1,3 @@
-(* $Id: MoreIntervals.v,v 1.6 2004/04/23 10:00:59 lcf Exp $ *)
 
 Require Export NthDerivative.
 

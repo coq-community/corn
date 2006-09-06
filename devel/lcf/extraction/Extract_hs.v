@@ -1,4 +1,3 @@
-(* $Id: Extract_hs.v,v 1.1 2004/07/15 08:21:37 letouzey Exp $ *)
 
 Require Import Test.
 Require Import Qreduction.

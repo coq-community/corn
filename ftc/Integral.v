@@ -1,4 +1,3 @@
-(* $Id: Integral.v,v 1.10 2004/04/23 10:00:59 lcf Exp $ *)
 
 Require Export RefLemma.
 

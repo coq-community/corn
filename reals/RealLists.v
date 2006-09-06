@@ -1,4 +1,3 @@
-(* $Id: RealLists.v,v 1.4 2004/04/23 10:01:05 lcf Exp $ *)
 
 Require Export CReals1.
 

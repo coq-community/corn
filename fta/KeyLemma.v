@@ -1,4 +1,3 @@
-(* $Id: KeyLemma.v,v 1.5 2004/04/23 10:00:57 lcf Exp $ *)
 
 Require Export ZArith.
 Require Export Compare.

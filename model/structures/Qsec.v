@@ -1,4 +1,3 @@
-(* $Id: Qsec.v,v 1.10 2004/07/13 14:56:45 lcf Exp $ *)
 
 (** printing Q %\ensuremath{\mathbb{Q}}% *)
 (** printing QZERO %\ensuremath{0_\mathbb{Q}}% #0<sub>Q</sub># *)

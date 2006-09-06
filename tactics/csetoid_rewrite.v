@@ -1,4 +1,3 @@
-(* $Id: csetoid_rewrite.v,v 1.1 2004/09/20 07:19:54 hendriks Exp $ *)
 
 (** 200904: first experimental version submitted to corn; 
 things need to be improved and cleaned up!; hendriks@cs.ru.nl *)

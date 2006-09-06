@@ -1,4 +1,3 @@
-(* $Id: Series_extr.v,v 1.4 2004/05/26 17:25:49 letouzey Exp $ *)
 (* begin hide *)
 (* Facts for extraction *)
 Require Export Series.

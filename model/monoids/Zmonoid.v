@@ -1,4 +1,3 @@
-(* $Id: Zmonoid.v,v 1.7 2004/09/22 11:06:12 loeb Exp $ *)
 
 
 Require Export Zsemigroup.

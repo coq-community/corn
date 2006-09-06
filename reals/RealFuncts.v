@@ -1,4 +1,3 @@
-(* $Id: RealFuncts.v,v 1.4 2004/04/07 15:08:10 lcf Exp $ *)
 
 Require Export CReals1.
 

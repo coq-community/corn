@@ -1,4 +1,3 @@
-(* $Id: NRootCC.v,v 1.9 2004/04/23 10:00:55 lcf Exp $ *)
 
 (** printing sqrt_Half %\ensuremath{\sqrt{\frac12}}% *)
 (** printing sqrt_I %\ensuremath{\sqrt{\imath}}% *)

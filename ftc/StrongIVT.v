@@ -1,4 +1,3 @@
-(* $Id: StrongIVT.v,v 1.5 2004/04/23 10:01:01 lcf Exp $ *)
 
 Require Export WeakIVT.
 Require Export CalculusTheorems.

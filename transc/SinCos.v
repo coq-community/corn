@@ -1,4 +1,3 @@
-(* $Id: SinCos.v,v 1.6 2004/04/23 10:01:08 lcf Exp $ *)
 
 Require Export Trigonometric.
 

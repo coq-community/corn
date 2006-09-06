@@ -1,4 +1,3 @@
-(* $Id: compositions.v,v 1.3 2004/03/31 11:11:17 lcf Exp $ *)
 
 Require Export CSetoids.
 

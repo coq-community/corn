@@ -1,4 +1,3 @@
-(* $Id: Cauchy_CReals.v,v 1.6 2004/05/26 15:58:32 letouzey Exp $ *)
 
 Require Export Cauchy_COF.
 Require Export CReals.

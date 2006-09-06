@@ -1,4 +1,3 @@
-(* $Id: Intervals.v,v 1.10 2004/04/23 10:01:04 lcf Exp $ *)
 
 Require Export CSetoidInc.
 Require Export RealLists.

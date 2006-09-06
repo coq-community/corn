@@ -1,4 +1,3 @@
-(* $Id: NthDerivative.v,v 1.5 2004/04/20 22:38:50 hinderer Exp $ *)
 
 Require Export Differentiability.
 

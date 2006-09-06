@@ -1,4 +1,3 @@
-(* $Id: Series.v,v 1.6 2004/04/23 10:01:05 lcf Exp $ *)
 
 (** printing seq_part_sum %\ensuremath{\sum^n}% #&sum;<sup>n</sup># *)
 (** printing series_sum %\ensuremath{\sum_0^{\infty}}% #&sum;<sub>0</sub><sup>&infin;</sup># *)

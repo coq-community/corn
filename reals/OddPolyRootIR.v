@@ -1,4 +1,3 @@
-(* $Id: OddPolyRootIR.v,v 1.5 2004/04/23 10:01:05 lcf Exp $ *)
 
 Require Export IVT.
 

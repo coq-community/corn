@@ -1,4 +1,3 @@
-(* $Id: PowerSeries.v,v 1.8 2004/04/23 10:01:08 lcf Exp $ *)
 
 (** printing Exp %\ensuremath{\exp}% *)
 (** printing Sin %\ensuremath{\sin}% *)

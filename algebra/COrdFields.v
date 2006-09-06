@@ -1,4 +1,3 @@
-(* $Id: COrdFields.v,v 1.8 2005/08/05 17:10:24 roconnor Exp $ *)
 
 (** printing [<] %\ensuremath<% #&lt;# *)
 (** printing [<=] %\ensuremath{\leq}% #&le;# *)

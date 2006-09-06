@@ -1,4 +1,3 @@
-(* $Id: Test.v,v 1.5 2004/07/13 15:25:36 lcf Exp $ *)
 
 Require Export E.
 Require Export FTA.

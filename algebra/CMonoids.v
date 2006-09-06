@@ -1,4 +1,3 @@
-(* $Id: CMonoids.v,v 1.6 2004/12/21 08:04:14 loeb Exp $ *)
 
 (** printing Zero %\ensuremath{\mathbf0}% #0# *)
 

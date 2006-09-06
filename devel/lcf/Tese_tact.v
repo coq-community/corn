@@ -1,4 +1,3 @@
-(* $Id: Tese_tact.v,v 1.2 2004/02/11 13:20:40 lcf Exp $ *)
 
 Require Export InvTrigonom.
 

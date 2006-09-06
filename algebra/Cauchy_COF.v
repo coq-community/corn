@@ -1,4 +1,3 @@
-(* $Id: Cauchy_COF.v,v 1.8 2004/04/23 10:00:54 lcf Exp $ *)
 
 Require Export COrdCauchy.
 Require Export RingReflection.

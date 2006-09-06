@@ -1,4 +1,3 @@
-(* $Id: RefLemma.v,v 1.7 2004/04/23 10:01:00 lcf Exp $ *)
 
 Require Export RefSeparating.
 Require Export RefSeparated.

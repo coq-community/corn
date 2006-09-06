@@ -1,4 +1,3 @@
-(* $Id: Exponential.v,v 1.7 2004/04/23 10:01:07 lcf Exp $ *)
 
 Require Export TaylorSeries.
 

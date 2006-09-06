@@ -1,4 +1,3 @@
-(* $Id: Cmod.v,v 1.1 2004/09/22 11:06:11 loeb Exp $ *)
 
 Require Export ZMod.
 Require Export CLogic.

@@ -1,4 +1,3 @@
-(* $Id: DiffTactics3.v,v 1.1.1.1 2004/02/05 16:25:44 lionelm Exp $ *)
 
 (* begin hide *)
 Require Export MoreFunSeries.

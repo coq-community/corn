@@ -1,4 +1,3 @@
-(* $Id: Qpossetoid.v,v 1.4 2004/04/06 15:46:05 lcf Exp $ *)
 
 Require Export Qsetoid.
 Require Import CSetoidFun.

@@ -1,4 +1,3 @@
-(* $Id: Continuity.v,v 1.6 2004/04/23 10:00:58 lcf Exp $ *)
 
 (** printing Norm_Funct %\ensuremath{\|\cdot\|}% *)
 

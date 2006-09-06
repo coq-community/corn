@@ -1,4 +1,3 @@
-(* $Id: Cauchy_IR.v,v 1.2 2004/04/06 15:46:03 lcf Exp $ *)
 
 Require Export Qordfield.
 Require Export Cauchy_CReals.

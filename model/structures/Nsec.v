@@ -1,4 +1,3 @@
-(* $Id: Nsec.v,v 1.8 2004/09/22 11:06:15 loeb Exp $ *)
 
 (** printing {#N} $\ensuremath{\mathrel\#_{\mathbb N}}$ *)
 

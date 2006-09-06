@@ -1,4 +1,3 @@
-(* $Id: CReals1.v,v 1.4 2004/04/23 10:01:04 lcf Exp $ *)
 
 Require Export Max_AbsIR.
 Require Export Expon.

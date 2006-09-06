@@ -1,4 +1,3 @@
-(* $Id: CMetricFields.v,v 1.6 2004/04/23 10:01:03 lcf Exp $ *)
 
 Require Export CReals1.
 

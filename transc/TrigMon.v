@@ -1,4 +1,3 @@
-(* $Id: TrigMon.v,v 1.9 2004/04/23 10:01:08 lcf Exp $ *)
 
 Require Export Pi.
 

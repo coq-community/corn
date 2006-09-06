@@ -1,4 +1,3 @@
-(* $Id: CalculusTheorems.v,v 1.6 2004/04/23 10:00:57 lcf Exp $ *)
 
 Require Export Rolle.
 Require Export DiffTactics3.

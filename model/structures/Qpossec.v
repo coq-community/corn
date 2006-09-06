@@ -1,4 +1,3 @@
-(* $Id: Qpossec.v,v 1.6 2004/07/13 14:56:45 lcf Exp $ *)
 
 (** printing Qpos $\mathbb{Q}^{+}$ #Q<SUP>+</SUP># *)
 

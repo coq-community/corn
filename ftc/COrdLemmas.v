@@ -1,4 +1,3 @@
-(* $Id: COrdLemmas.v,v 1.2 2004/04/23 10:00:57 lcf Exp $ *)
 
 Require Export COrdCauchy.
 

@@ -1,4 +1,3 @@
-(* $Id: InvTrigonom.v,v 1.9 2004/04/23 10:01:07 lcf Exp $ *)
 
 Require Export RealPowers.
 Require Export TrigMon.

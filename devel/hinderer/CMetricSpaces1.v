@@ -1,4 +1,3 @@
-(* $Id: CMetricSpaces1.v,v 1.5 2004/04/23 10:00:55 lcf Exp $ *)
 
 Require Export Prod_Sub.
 Require Export Equiv.

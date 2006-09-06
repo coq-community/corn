@@ -1,4 +1,3 @@
-(* $Id: WeakIVT_Extr.v,v 1.1 2004/07/13 12:21:59 lcf Exp $ *)
 
 (** printing ** %\ensuremath\times% #&times;# *)
 

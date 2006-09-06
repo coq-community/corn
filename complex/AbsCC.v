@@ -1,4 +1,3 @@
-(* $Id: AbsCC.v,v 1.2 2004/04/23 10:00:54 lcf Exp $ *)
 
 Require Export CComplex.
 

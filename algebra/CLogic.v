@@ -1,4 +1,3 @@
-(* $Id: CLogic.v,v 1.15 2004/11/16 13:58:00 hendriks Exp $ *)
 
 (** printing Not %\ensuremath\neg% #~# *)
 (** printing CNot %\ensuremath\neg% #~# *)

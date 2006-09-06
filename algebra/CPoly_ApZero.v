@@ -1,4 +1,3 @@
-(* $Id: CPoly_ApZero.v,v 1.3 2004/04/23 10:00:53 lcf Exp $ *)
 
 Require Export CPoly_Degree.
 Require Export COrdFields2.

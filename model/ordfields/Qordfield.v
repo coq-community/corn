@@ -1,4 +1,3 @@
-(* $Id: Qordfield.v,v 1.9 2004/04/23 10:01:03 lcf Exp $ *)
 
 Require Export Qfield.
 Require Import COrdFields.
