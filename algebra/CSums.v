@@ -370,11 +370,13 @@ apply
  astepl (Sf[+] (Sg[+]fn) [+]gn).
  Step_final (Sf[+]Sg[+]fn[+]gn).
 apply bin_op_wd_unfolded; algebra.
+(* useless since V8.1:
 apply
  Hrecn
   with
     (f := fun (i : nat) (l : i < n) => f i (lt_S i n l))
     (g := fun (i : nat) (l : i < n) => g i (lt_S i n l)).
+*)
 Qed.
 
 Lemma Sum2_plus_Sum2 : forall m n, m <= S n -> forall f g,
