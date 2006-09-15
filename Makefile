@@ -1,4 +1,3 @@
-
 TOPDIR=.
 
 include Makefile.common
