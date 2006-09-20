@@ -66,6 +66,8 @@ Definition ap_Q_is_apartness := Build_is_CSetoid Q Qeq Qap
 
 Definition Q_as_CSetoid := Build_CSetoid _ _ _ ap_Q_is_apartness.
 
+Canonical Structure Q_as_CSetoid.
+
 (** ***Addition
 *)
 
@@ -174,3 +176,5 @@ apply Qlt_strext_unfolded.
 Qed.
 
 Definition Qlt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qlt_strext.
+
+Canonical Structure Qlt_is_CSetoid_relation.

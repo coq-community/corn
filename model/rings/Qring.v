@@ -64,6 +64,8 @@ Defined.
 
 Definition Q_as_CRing := Build_CRing _ _ _ Q_is_CRing.
 
+Canonical Structure Q_as_CRing.
+
 (** The following lemmas are used in the proof that [Q] is Archimeadian.
 *)
 

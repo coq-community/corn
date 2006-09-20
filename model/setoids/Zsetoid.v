@@ -72,6 +72,8 @@ Definition ap_Z_is_apartness := Build_is_CSetoid Z (eq (A:=Z)) ap_Z
 
 Definition Z_as_CSetoid := Build_CSetoid _ _ _ ap_Z_is_apartness.
 
+Canonical Structure Z_as_CSetoid.
+
 (** The term [Z_as_CSetoid] is of type [CSetoid]. Hence we have proven that [Z] is a constructive setoid.
 ***Addition
 We will prove now that the addition on the integers is a setoid function.

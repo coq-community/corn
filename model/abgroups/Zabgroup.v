@@ -51,3 +51,5 @@ Qed.
 Definition Z_as_CAbGroup := Build_CAbGroup Z_as_CGroup Z_is_CAbGroup.
 
 (** The term [Z_as_CAbGroup] is of type [CAbGroup]. Hence we have proven that [Z] is a constructive Abelian group. *)
+
+Canonical Structure Z_as_CAbGroup.

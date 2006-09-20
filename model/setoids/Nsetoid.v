@@ -72,6 +72,8 @@ Definition ap_nat_is_apartness := Build_is_CSetoid nat (eq (A:=nat)) ap_nat
 
 Definition nat_as_CSetoid := Build_CSetoid _ _ _ ap_nat_is_apartness.
 
+Canonical Structure nat_as_CSetoid.
+
 (** ***Addition
 *)
 

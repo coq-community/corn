@@ -74,6 +74,8 @@ Definition Z_is_CMonoid := Build_is_CMonoid
 
 Definition Z_as_CMonoid := Build_CMonoid Z_as_CSemiGroup _ Z_is_CMonoid.
 
+Canonical Structure Z_as_CMonoid.
+
 (** The term [Z_as_CMonoid] is of type [CMonoid]. Hence we have proven that [Z] is a constructive monoid.
 
 ***$\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#

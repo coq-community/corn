@@ -50,6 +50,8 @@ Definition Q_is_COrdField := Build_is_COrdField Q_as_CField
 
 Definition Q_as_COrdField := Build_COrdField _ _ Q_is_COrdField.
 
+Canonical Structure Q_as_COrdField.
+
 Theorem Q_is_archemaedian : forall x : Q_as_COrdField, {n : nat | x [<] nring n}.
 Proof.
  intros.
