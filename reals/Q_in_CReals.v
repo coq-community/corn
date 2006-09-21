@@ -93,12 +93,12 @@ Coercion nat_of_P : positive >-> nat.
  To define the injection we need one elemntary lemma about the denominator:
 *)
 
-Lemma den_is_nonzero : forall x : Q_as_COrdField, nring (R:=R1) (den x) [#] Zero.
+Lemma den_is_nonzero : forall x : Q_as_COrdField, nring (R:=R1) (Qden x) [#] Zero.
 Proof.
  intro.
  apply nring_ap_zero.
  intro.
- absurd (0 < den x).
+ absurd (0 < Qden x).
  rewrite H.
  auto with arith.
  apply lt_O_nat_of_P.
@@ -111,7 +111,7 @@ Definition inj_Q : Q_as_COrdField -> R1.
  case x.
  intros num0 den0.
  exact 
- (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Build_Q num0 den0)).
+ (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Qmake num0 den0)).
 Defined.
 
 (** Next we need some properties of [nring], on the setoid of natural numbers: *)
@@ -409,12 +409,12 @@ Proof.
  simpl in H0.
  unfold Qap in |- *.
  unfold Qeq in |- *.
- unfold num in |- *.
- unfold den in |- *.
+ unfold Qnum in |- *.
+ unfold Qden in |- *.
  
  intro.
 
- cut (~ (inj_Q (Build_Q n1 d1) [=] inj_Q (Build_Q n2 d2))).
+ cut (~ (inj_Q (Qmake n1 d1) [=] inj_Q (Qmake n2 d2))).
  intro.
  elim H3.
  simpl in |- *.
@@ -437,7 +437,7 @@ Proof.
  astepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
  rewrite inject_nat_convert.
  algebra.
- change (inj_Q (Build_Q n1 d1)[~=]inj_Q (Build_Q n2 d2)) in |- *. 
+ change (inj_Q (Qmake n1 d1)[~=]inj_Q (Qmake n2 d2)) in |- *. 
  apply ap_imp_neq.
  assumption.
 Qed.
@@ -478,7 +478,7 @@ Proof.
  astepr
   (nring (R:=R1) (d1 * d2)%positive[*]
    (zring (R:=R1) (n1 * d2 + n2 * d1)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Build_Q (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
+    den_is_nonzero (Qmake (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
  apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
  algebra.
@@ -517,7 +517,7 @@ Proof.
  astepr
   (nring (R:=R1) (d1 * d2)%positive[*]
    (zring (R:=R1) (n1 * n2)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Build_Q (n1 * n2)%Z (d1 * d2)%positive))).
+    den_is_nonzero (Qmake (n1 * n2)%Z (d1 * d2)%positive))).
 
  apply mult_wdl.
  rewrite nat_of_P_mult_morphism.
@@ -703,14 +703,14 @@ Proof.
   {N : nat |
   forall m : nat,
   N <= m ->
-  AbsSmall (R:=Q_as_COrdField) (Build_Q 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
+  AbsSmall (R:=Q_as_COrdField) (Qmake 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
  intro H2.
  case H2.
  intro N.
  intro.
  exists N.
  intros.
- apply AbsSmall_leEq_trans with (e1 := inj_Q (Build_Q 1%Z (P_of_succ_nat N1))).
+ apply AbsSmall_leEq_trans with (e1 := inj_Q (Qmake 1%Z (P_of_succ_nat N1))).
  apply less_leEq.
  apply
   mult_cancel_less
@@ -805,8 +805,8 @@ Proof.
  case H0.
  intro n1.
  intro.
- exists (Build_Q (- n1) 1).
- exists (Build_Q n2 1).
+ exists (Qmake (- n1) 1).
+ exists (Qmake n2 1).
   simpl in |- *.
   rstepl (zring (R:=R1) (- Z_of_nat n1)).
   astepl [--](nring (R:=R1) n1).
@@ -837,7 +837,7 @@ Proof.
  case H0.
  intro N.
  intros.
- exists (Build_Q 1 (P_of_succ_nat N)).
+ exists (Qmake 1 (P_of_succ_nat N)).
   simpl in |- *.
   unfold pring in |- *; simpl in |- *.
   apply mult_cancel_less with (z := nring (R:=R1) N[+]One).
@@ -846,7 +846,7 @@ Proof.
   astepl (Zero:R1).
   astepr
    ((Zero[+]One[-]Zero[/] nring (P_of_succ_nat N)[//]
-     den_is_nonzero (Build_Q 1%positive (P_of_succ_nat N)))[*]
+     den_is_nonzero (Qmake 1%positive (P_of_succ_nat N)))[*]
     nring (S N)).
 
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N.

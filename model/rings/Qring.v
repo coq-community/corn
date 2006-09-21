@@ -102,7 +102,7 @@ Lemma nring_Q : forall n : nat, nring (R:=Q_as_CRing) n[=]inject_Z n.
 Proof.
  intro n.
  induction  n as [| n Hrecn].
- change (Build_Q 0%Z 1%positive{=Q}Build_Q 0%Z 1%positive) in |- *.
+ change (Qmake 0%Z 1%positive==Qmake 0%Z 1%positive) in |- *.
  change (Zero[=](Zero:Q_as_CRing)) in |- *.
  apply eq_reflexive_unfolded.
 

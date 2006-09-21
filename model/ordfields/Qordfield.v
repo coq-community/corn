@@ -65,8 +65,8 @@ Proof.
  unfold zring in |- *.
  simpl in |- *.
  red in |- *.
- unfold num at 1 in |- *. 
- unfold den in |- *.
+ unfold Qnum at 1 in |- *. 
+ unfold Qden in |- *.
  apply toCProp_Zlt. 
  simpl in |- *.
  rewrite Zmult_1_r.

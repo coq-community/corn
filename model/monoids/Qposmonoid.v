@@ -59,9 +59,9 @@ intro x.
 case x.
 simpl in |- *.
 intros e H.
-cut (QONE{*Q}e{=Q}e{*Q}QONE).
+cut (QONE*e==e*QONE).
 intro H0.
-apply trans_Qeq with (e{*Q}QONE).
+apply trans_Qeq with (e*QONE).
 exact H0.
 apply Qmult_n_1.
 apply Qmult_sym.

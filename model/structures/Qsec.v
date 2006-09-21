@@ -41,9 +41,10 @@
 (** printing QFOUR %\ensuremath{4_\mathbb{Q}}% #4<sub>Q</sub># *)
 
 Require Export CLogic.
-Require Export Arith.
-Require Export Peano_dec.
-Require Export Zsec.
+Require Import Arith.
+Require Import Peano_dec.
+Require Import Zsec.
+Require Export QArith.
 
 (** *[Q]
 **About [Q]
@@ -58,48 +59,30 @@ also define apartness, order, addition, multiplication, opposite,
 inverse an de constants 0 and 1.  *)
 
 Section Q.
-Record Q : Set :=  {num : Z; den : positive}.
-
-Definition Qeq (p q : Q) := (num p * den q)%Z = (num q * den p)%Z :>Z.
-
 Definition Qap (x y : Q) := ~(Qeq x y).
 
-Definition Qlt (x y : Q) := (num x * den y < num y * den x)%Z.
+Definition QZERO := Qmake 0 1. 
 
-Definition Qplus (x y : Q) :=
-  Build_Q (num x * den y + num y * den x) (den x * den y).
-
-Definition Qmult (x y : Q) := Build_Q (num x * num y) (den x * den y).
-
-Definition Qopp (x : Q) := Build_Q (- num x) (den x).
-
-Definition QZERO := Build_Q 0 1. 
-
-Definition QONE := Build_Q 1 1.
+Definition QONE := Qmake 1 1.
 
 Definition Qinv (x : Q) (x_ : ~(Qeq x QZERO)) :=
-  Build_Q (Zsgn (num x) * den x) (posZ (num x)).
+  Qmake (Zsgn (Qnum x) * Qden x) (posZ (Qnum x)).
 End Q.
 
-Infix "{=Q}" := Qeq (no associativity, at level 90).
-Infix "{#Q}" := Qap (no associativity, at level 90).
-Infix "{<Q}" := Qlt (no associativity, at level 90).
-Infix "{+Q}" := Qplus (no associativity, at level 85).
-Infix "{*Q}" := Qmult (no associativity, at level 80).
-Notation "{-Q}" := Qopp (at level 1, left associativity).
+Infix "/=" := Qap (no associativity, at level 70) : Q_scope.
 
 (** ***Constants
 *)
 
-Definition QTWO := Build_Q 2%positive 1%positive.
+Definition QTWO := Qmake 2%positive 1%positive.
 
-Definition QFOUR := Build_Q 4%positive 1%positive.
+Definition QFOUR := Qmake 4%positive 1%positive.
 
 (** ***Equality
 Here we prove that [QONE] is #<i>#%\emph{%not equal%}%#</i># to [QZERO]: 
 *)
 
-Theorem ONEQ_neq_ZEROQ : ~ (QONE{=Q}QZERO).
+Theorem ONEQ_neq_ZEROQ : ~ (QONE==QZERO).
 Proof.
  unfold Qeq in |- *.
  simpl in |- *.
@@ -107,14 +90,14 @@ Proof.
  exact (Zorder.Zgt_pos_0 1).
 Qed.
 
-Theorem refl_Qeq : forall x :Q, x{=Q}x.
+Theorem refl_Qeq : forall x :Q, x==x.
 Proof.
  intro x.
  unfold Qeq in |- *.
  apply refl_equal.
 Qed.
 
-Theorem sym_Qeq : forall x y : Q, (x{=Q}y) -> y{=Q}x. 
+Theorem sym_Qeq : forall x y : Q, (x==y) -> y==x. 
 Proof.
  intros x y H.
  unfold Qeq in |- *.
@@ -125,32 +108,32 @@ Qed.
 
 
 
-Theorem trans_Qeq : forall x y z : Q, (x{=Q}y) -> (y{=Q}z) -> x{=Q}z.
+Theorem trans_Qeq : forall x y z : Q, (x==y) -> (y==z) -> x==z.
 Proof.
  red in |- *.
  unfold Qeq in |- *.
  intros x y z e1 e2.
- case (dec_eq (num y) 0).
+ case (dec_eq (Qnum y) 0).
  intro H.
- cut (num x = 0%Z).
+ cut (Qnum x = 0%Z).
  intro H0.
  rewrite H0.
- cut (num z = 0%Z).
+ cut (Qnum z = 0%Z).
  intro H1.
  rewrite H1.
  simpl in |- *.
  trivial.
  rewrite H in e2.
- cut (Zpos (den y) <> 0%Z).
+ cut (Zpos (Qden y) <> 0%Z).
  intro H1.
  simpl in e2.
- exact (Zmult_integral_l (den y) (num z) H1 (sym_eq e2)).
+ exact (Zmult_integral_l (Qden y) (Qnum z) H1 (sym_eq e2)).
  apply Zgt_not_eq; auto with zarith. 
  rewrite H in e1.
  simpl in e1.
- cut (Zpos (den y) <> 0%Z).
+ cut (Zpos (Qden y) <> 0%Z).
  intro H0.
- exact (Zmult_integral_l (den y) (num x) H0 e1).
+ exact (Zmult_integral_l (Qden y) (Qnum x) H0 e1).
  apply Zgt_not_eq; auto with zarith.
  intro H.
  eapply a_very_specific_lemma1; eauto.
@@ -161,10 +144,10 @@ Qed.
  The equality is decidable: 
 *)
 
-Theorem dec_Qeq : forall x y : Q, {x{=Q}y} + {~ (x{=Q}y)}.
+Theorem dec_Qeq : forall x y : Q, {x==y} + {~ (x==y)}.
 Proof.
  intros x y.
- case (Z_eq_dec (num x * den y) (num y * den x)).
+ case (Z_eq_dec (Qnum x * Qden y) (Qnum y * Qden x)).
  intro e.
  auto.
  intro n.
@@ -178,7 +161,7 @@ Qed.
 *)
 
 
-Lemma Q_non_zero : forall x : Q, (x{#Q}QZERO) -> num x <> 0%Z.
+Lemma Q_non_zero : forall x : Q, (x/=QZERO) -> Qnum x <> 0%Z.
 Proof.
 intros x H.
 red in H.
@@ -186,13 +169,13 @@ intro H0.
 elim H.
 unfold Qeq in |- *.
 unfold QZERO in |- *.
-unfold num at 2 in |- *.
+unfold Qnum at 2 in |- *.
 rewrite H0.
 simpl in |- *.
 auto.
 Qed.
 
-Lemma ap_Q_irreflexive0 : forall x : Q, Not (x{#Q}x).
+Lemma ap_Q_irreflexive0 : forall x : Q, Not (x/=x).
 Proof. 
  intros x.
  unfold Qap in |- *.
@@ -203,7 +186,7 @@ Proof.
  auto.
 Qed.
 
-Lemma ap_Q_symmetric0 : forall x y : Q, (x{#Q}y) -> y{#Q}x.
+Lemma ap_Q_symmetric0 : forall x y : Q, (x/=y) -> y/=x.
 Proof.
  intros x y H.
  unfold Qap in |- *.
@@ -216,8 +199,8 @@ Proof.
 Qed.
 
 
-Lemma ap_Q_cotransitive0 : forall x y : Q, (x{#Q}y) ->
- forall z : Q, (x{#Q}z) or (z{#Q}y).
+Lemma ap_Q_cotransitive0 : forall x y : Q, (x/=y) ->
+ forall z : Q, (x/=z) or (z/=y).
 Proof.
  intros x y X z.
  unfold Qap in |- *.
@@ -235,7 +218,7 @@ Proof.
  auto.
 Qed.
 
-Lemma ap_Q_tight0 : forall x y : Q, Not (x{#Q}y) <-> x{=Q}y.
+Lemma ap_Q_tight0 : forall x y : Q, Not (x/=y) <-> x==y.
 Proof.
  intros x y.
  red in |- *.
@@ -262,7 +245,7 @@ Qed.
 *)
 
 Theorem Qplus_simpl : forall n m p q : Q,
- (n{=Q}m) -> (p{=Q}q) -> n{+Q}p{=Q}m{+Q}q. 
+ (n==m) -> (p==q) -> n+p==m+q. 
 Proof.
  red in |- *.
  simpl in |- *.
@@ -278,15 +261,15 @@ Qed.
  Addition is associative:
 *)
 
-Theorem Qplus_assoc : forall x y z : Q, x{+Q}(y{+Q}z){=Q}(x{+Q}y){+Q}z.
+Theorem Qplus_assoc : forall x y z : Q, x+(y+z)==(x+y)+z.
 Proof.
  intros x y z.
  red in |- *.
  unfold Qplus in |- *.
  simpl in |- *.
  exact
-  (a_very_specific_lemma5 (num x) (num y) (num z) (
-     den x) (den y) (den z)). 
+  (a_very_specific_lemma5 (Qnum x) (Qnum y) (Qnum z) (
+     Qden x) (Qden y) (Qden z)). 
 Qed.
 
 (**
@@ -294,15 +277,15 @@ Qed.
 *)
 
 
-Theorem QZERO_right : forall x : Q, x{+Q}QZERO{=Q}x.
+Theorem QZERO_right : forall x : Q, x+QZERO==x.
 Proof.
  intro x.
  red in |- *.
  unfold Qplus in |- *.
  simpl in |- *.
  rewrite Pmult_comm. 
- ring (num x * 1)%Z. (* FIXME *) simpl in |- *.
- ring (num x + 0)%Z. (* FIXME *) simpl in |- *.
+ ring (Qnum x * 1)%Z. (* FIXME *) simpl in |- *.
+ ring (Qnum x + 0)%Z. (* FIXME *) simpl in |- *.
  reflexivity.
 Qed. 
 
@@ -311,7 +294,7 @@ Qed.
 *)
 
 
-Theorem Qplus_sym : forall x y : Q, x{+Q}y{=Q}y{+Q}x.
+Theorem Qplus_sym : forall x y : Q, x+y==y+x.
 Proof.
  intros x y.
  red in |- *.
@@ -324,7 +307,7 @@ Qed.
 
 
 Lemma Qplus_strext0 : forall x1 x2 y1 y2 : Q,
- (x1{+Q}y1{#Q}x2{+Q}y2) -> (x1{#Q}x2) or (y1{#Q}y2).
+ (x1+y1/=x2+y2) -> (x1/=x2) or (y1/=y2).
 unfold Qap in |- *.
 intros x1 x2 y1 y2 X.
 case (dec_Qeq x1 x2).
@@ -341,19 +324,19 @@ elim n.
 auto.
 Qed.
 
-Lemma ZEROQ_as_rht_unit0 : forall x : Q, x{+Q}QZERO{=Q}x.
+Lemma ZEROQ_as_rht_unit0 : forall x : Q, x+QZERO==x.
 intro x.
 red in |- *.
 unfold Qplus in |- *.
 simpl in |- *.
 
-ring (num x * 1)%Z. ring (num x + 0)%Z. 
+ring (Qnum x * 1)%Z. ring (Qnum x + 0)%Z. 
 rewrite Pmult_comm.
 simpl in |- *.
 reflexivity.
 Qed.
 
-Lemma ZEROQ_as_lft_unit0 : forall x : Q, QZERO{+Q}x{=Q}x.
+Lemma ZEROQ_as_lft_unit0 : forall x : Q, QZERO+x==x.
 intro x.
 red in |- *.
 unfold Qplus in |- *.
@@ -362,38 +345,38 @@ ring.
 Qed.
 
 
-Lemma Qplus_is_commut0 : forall x y : Q, x{+Q}y{=Q}y{+Q}x. 
+Lemma Qplus_is_commut0 : forall x y : Q, x+y==y+x. 
 intros x y.
 unfold Qplus in |- *.
 red in |- *.
 simpl in |- *.
 change
-  (((num x * den y + num y * den x) * (den y * den x))%Z =
-   ((num y * den x + num x * den y) * (den x * den y))%Z) 
+  (((Qnum x * Qden y + Qnum y * Qden x) * (Qden y * Qden x))%Z =
+   ((Qnum y * Qden x + Qnum x * Qden y) * (Qden x * Qden y))%Z) 
  in |- *.
 ring.
 Qed.
 
 (** ***Opposite
- [{-Q}] is a well defined unary operation: 
+ [-] is a well defined unary operation: 
 *)
 
-Lemma Qopp_simpl : forall x y : Q, (x{=Q}y) -> {-Q} x{=Q}{-Q} y.
+Lemma Qopp_simpl : forall x y : Q, (x==y) -> - x==- y.
 Proof.
  red in |- *.
  simpl in |- *.
  unfold Qeq in |- *.
  intros x y e1.
- rewrite Zopp_mult_distr_l_reverse with (n := num x) (m := den y).
- rewrite Zopp_mult_distr_l_reverse with (n := num y) (m := den x).
+ rewrite Zopp_mult_distr_l_reverse with (n := Qnum x) (m := Qden y).
+ rewrite Zopp_mult_distr_l_reverse with (n := Qnum y) (m := Qden x).
  exact (f_equal Zopp e1).
 Qed.
 
 (**
- The group equation for [{-Q}]
+ The group equation for [-]
 *)
 
-Theorem Qplus_inverse_r : forall q : Q, q{+Q}{-Q} q{=Q}QZERO.
+Theorem Qplus_inverse_r : forall q : Q, q+-q==QZERO.
 Proof.
  red in |- *.
  simpl in |- *.
@@ -403,21 +386,21 @@ Qed.
 
 (** ***Multiplication
 Next we shall prove the properties of multiplication. First we prove
-that [{*Q}] is well-defined
+that [*] is well-defined
 *)
 
 Theorem Qmult_simpl : forall n m p q : Q,
- (n{=Q}m) -> (p{=Q}q) -> n{*Q}p{=Q}m{*Q}q. 
+ (n==m) -> (p==q) -> n*p==m*q. 
 Proof.
  red in |- *.
  simpl in |- *.
  unfold Qeq in |- *.
  intros n m p q e1 e2.
  change
-   ((num n * num p * (den m * den q))%Z =
-    (num m * num q * (den n * den p))%Z) in |- *.
+   ((Qnum n * Qnum p * (Qden m * Qden q))%Z =
+    (Qnum m * Qnum q * (Qden n * Qden p))%Z) in |- *.
  rewrite <- Zmult_assoc.
- rewrite Zmult_permute with (m := den m).
+ rewrite Zmult_permute with (m := Qden m).
  rewrite e2.
  rewrite Zmult_assoc.
  rewrite e1.
@@ -429,7 +412,7 @@ Qed.
  and it is associative:
 *)
 
-Theorem Qmult_assoc : forall n m p : Q, n{*Q}(m{*Q}p){=Q}(n{*Q}m){*Q}p.
+Theorem Qmult_assoc : forall n m p : Q, n*(m*p)==(n*m)*p.
 Proof.
  intros n m p.
  red in |- *.
@@ -442,22 +425,22 @@ Qed.
  [QONE] is the neutral element for multiplication:
 *)
 
-Theorem Qmult_n_1 : forall n : Q, n{*Q}QONE{=Q}n.
+Theorem Qmult_n_1 : forall n : Q, n*QONE==n.
 Proof.
  intro n.
  red in |- *.
  simpl in |- *.
- rewrite Zmult_1_r with (n := num n).
+ rewrite Zmult_1_r with (n := Qnum n).
  rewrite Pmult_comm.
  simpl in |- *; trivial. 
 Qed.
 
 
 (**
- The commutativity for [{*Q}]:
+ The commutativity for [*]:
 *)
 
-Theorem Qmult_sym : forall x y : Q, x{*Q}y{=Q}y{*Q}x.
+Theorem Qmult_sym : forall x y : Q, x*y==y*x.
 Proof.
  intros x y.
  red in |- *.
@@ -467,17 +450,17 @@ Proof.
 Qed.
 
 Theorem Qmult_plus_distr_r : forall x y z : Q,
- x{*Q}(y{+Q}z){=Q}x{*Q}y{+Q}x{*Q}z. 
+ x*(y+z)==x*y+x*z. 
 Proof.
 intros x y z.
 red in |- *.
 simpl in |- *.
 change
-  ((num x * (num y * den z + num z * den y) *
-    (den x * den y * (den x * den z)))%Z =
-   ((num x * num y * (den x * den z) +
-     num x * num z * (den x * den y)) *
-    (den x * (den y * den z)))%Z) in |- *.
+  ((Qnum x * (Qnum y * Qden z + Qnum z * Qden y) *
+    (Qden x * Qden y * (Qden x * Qden z)))%Z =
+   ((Qnum x * Qnum y * (Qden x * Qden z) +
+     Qnum x * Qnum z * (Qden x * Qden y)) *
+    (Qden x * (Qden y * Qden z)))%Z) in |- *.
 ring.
 Qed.
 
@@ -487,19 +470,19 @@ Qed.
 *)
 
 Theorem Qmult_eq : forall x y : Q,
- ~ (x{=Q}QZERO) -> (x{*Q}y{=Q}QZERO) -> y{=Q}QZERO.
+ ~ (x==QZERO) -> (x*y==QZERO) -> y==QZERO.
 Proof.
  intros x y.
  unfold Qeq in |- *.
  simpl in |- *.
- rewrite Zmult_1_r with (n := num x).
- rewrite Zmult_1_r with (n := (num x * num y)%Z).
- rewrite Zmult_1_r with (n := num y).
- rewrite Zmult_comm with (n := num x) (m := num y).
+ rewrite Zmult_1_r with (n := Qnum x).
+ rewrite Zmult_1_r with (n := (Qnum x * Qnum y)%Z).
+ rewrite Zmult_1_r with (n := Qnum y).
+ rewrite Zmult_comm with (n := Qnum x) (m := Qnum y).
  intro H.
- cut (num x <> 0%Z :>Z).
+ cut (Qnum x <> 0%Z :>Z).
  intros H0 H1.
- apply (Zmult_integral_l (num x) (num y)).
+ apply (Zmult_integral_l (Qnum x) (Qnum y)).
  assumption.
  assumption.
  intro H0.
@@ -513,7 +496,7 @@ Qed.
 
 
 Lemma Qmult_strext0 : forall x1 x2 y1 y2 : Q,
- (x1{*Q}y1{#Q}x2{*Q}y2) -> (x1{#Q}x2) or (y1{#Q}y2).
+ (x1*y1/=x2*y2) -> (x1/=x2) or (y1/=y2).
 unfold Qap in |- *.
 intros x1 x2 y1 y2 X.
 case (dec_Qeq x1 x2).
@@ -530,26 +513,26 @@ elim n.
 assumption.
 Qed.
 
-Lemma nonZero : forall x : Q, ~(x{=Q}QZERO) ->
-  ~(Build_Q (Zsgn (num x) * den x)%Z (posZ (num x)){=Q}QZERO).
+Lemma nonZero : forall x : Q, ~(x==QZERO) ->
+  ~(Qmake (Zsgn (Qnum x) * Qden x)%Z (posZ (Qnum x))==QZERO).
 Proof.
 intro x.
 unfold Qeq in |- *.
-unfold num at 2 6 in |- *.
+unfold Qnum at 2 6 in |- *.
 unfold QZERO in |- *.
 repeat rewrite Zmult_0_l. 
-unfold den at 1 3 in |- *.
+unfold Qden at 1 3 in |- *.
 repeat rewrite Zplus_0_l.
 repeat rewrite Zmult_1_r.
 simpl in |- *.
 intro H.
-cut (Zsgn (num x) <> 0%Z).
+cut (Zsgn (Qnum x) <> 0%Z).
 intro H0.
-cut (Zpos (den x) <> 0%Z).
+cut (Zpos (Qden x) <> 0%Z).
 intro H1.
 intro H2.
 elim H0.
-exact (Zmult_integral_l (den x) (Zsgn (num x)) H1 H2).
+exact (Zmult_integral_l (Qden x) (Zsgn (Qnum x)) H1 H2).
 apply Zgt_not_eq.
 auto with zarith.
 apply Zsgn_3.
@@ -561,7 +544,7 @@ Qed.
 
 
 Lemma Qinv_strext : forall (x y : Q) x_ y_,
- ~(Qinv x x_{=Q}Qinv y y_) -> ~(x{=Q}y).
+ ~(Qinv x x_==Qinv y y_) -> ~(x==y).
 Proof.
 red in |- *.
 intros x y.
@@ -598,14 +581,14 @@ assumption.
 assumption.
 Qed.
 
-Lemma Qinv_is_inv : forall (x : Q) (Hx : x{#Q}QZERO),
- (x{*Q}Qinv x Hx{=Q}QONE) /\ (Qinv x Hx{*Q}x{=Q}QONE).
+Lemma Qinv_is_inv : forall (x : Q) (Hx : x/=QZERO),
+ (x*Qinv x Hx==QONE) /\ (Qinv x Hx*x==QONE).
 intro x.
 case x.
 intros x1 p1.
 unfold Qap, Qeq in |- *.
 unfold Qinv in |- *.
-unfold Qmult, num, den, QONE, QZERO in |- *.
+unfold Qmult, Qnum, Qden, QONE, QZERO in |- *.
 repeat rewrite Zmult_1_l.
 simpl in |- *.
 repeat rewrite Zmult_1_r.
@@ -628,7 +611,7 @@ Qed.
 (** ***Less-than
 *)
 
-Lemma Qlt_wd_right : forall x y z : Q, (x{<Q}y) -> (y{=Q}z) -> x{<Q}z.
+Lemma Qlt_wd_right : forall x y z : Q, (x<y) -> (y==z) -> x<z.
 intros x y z X H.
 
 red in H.
@@ -638,41 +621,41 @@ apply toCProp_Zlt.
 apply
  a_very_specific_lemma5'
   with
-    (a := num x)
-    (b := num y)
-    (c := num z)
-    (m := den x)
-    (n := den y)
-    (p := den z).
+    (a := Qnum x)
+    (b := Qnum y)
+    (c := Qnum z)
+    (m := Qden x)
+    (n := Qden y)
+    (p := Qden z).
 generalize (CZlt_to _ _ X).
 trivial.
-change (y{=Q}z) in |- *.
+change (y==z) in |- *.
 simpl in H.
 assumption.
 Qed.
 
-Lemma Qlt_wd_left : forall x y z : Q, (x{<Q}y) -> (x{=Q}z) -> z{<Q}y.
+Lemma Qlt_wd_left : forall x y z : Q, (x<y) -> (x==z) -> z<y.
 intros x y z H H0.
 simpl in H0.
 red in H.
 red in H0.
 red in |- *.
 apply toCProp_Zlt.
-rewrite <- Zopp_involutive with (n := (num z * den y)%Z).
-rewrite <- Zopp_involutive with (n := (num y * den z)%Z).
+rewrite <- Zopp_involutive with (n := (Qnum z * Qden y)%Z).
+rewrite <- Zopp_involutive with (n := (Qnum y * Qden z)%Z).
 apply Zgt_lt.
 apply Zlt_opp.
-rewrite <- Zopp_mult_distr_l_reverse with (n := num y) (m := den z).
-rewrite <- Zopp_mult_distr_l_reverse with (n := num z) (m := den y).
+rewrite <- Zopp_mult_distr_l_reverse with (n := Qnum y) (m := Qden z).
+rewrite <- Zopp_mult_distr_l_reverse with (n := Qnum z) (m := Qden y).
 apply
  a_very_specific_lemma5'
   with
-    (a := (- num y)%Z)
-    (b := (- num x)%Z)
-    (c := (- num z)%Z)
-    (m := den y)
-    (n := den x)
-    (p := den z).
+    (a := (- Qnum y)%Z)
+    (b := (- Qnum x)%Z)
+    (c := (- Qnum z)%Z)
+    (m := Qden y)
+    (n := Qden x)
+    (p := Qden z).
 apply Zgt_lt.
 rewrite Zopp_mult_distr_l_reverse.
 rewrite Zopp_mult_distr_l_reverse.
@@ -681,11 +664,11 @@ generalize (CZlt_to _ _ H).
 trivial.
 rewrite Zopp_mult_distr_l_reverse.
 rewrite Zopp_mult_distr_l_reverse.
-apply (f_equal Zopp (x:=(num x * den z)%Z) (y:=(num z * den x)%Z)).
+apply (f_equal Zopp (x:=(Qnum x * Qden z)%Z) (y:=(Qnum z * Qden x)%Z)).
 assumption.
 Qed.
 
-Lemma Qlt_eq_gt_dec : forall q1 q2 : Q, ((q1{<Q}q2) or (q1{=Q}q2)) or (q2{<Q}q1).
+Lemma Qlt_eq_gt_dec : forall q1 q2 : Q, ((q1<q2) or (q1==q2)) or (q2<q1).
 intros q1 q2.
  case q1. 
  intros m1 n1.
@@ -717,7 +700,7 @@ intros q1 q2.
  assumption.
 Qed.
 
-Lemma Qlt_is_transitive_unfolded : forall x y z : Q, (x{<Q}y) -> (y{<Q}z) -> x{<Q}z.
+Lemma Qlt_is_transitive_unfolded : forall x y z : Q, (x<y) -> (y<z) -> x<z.
 intros x y z e e0.
 red in |- *.
 apply toCProp_Zlt.
@@ -727,7 +710,7 @@ intro H.
 red in e0.
 generalize (CZlt_to _ _ e0).
 intro H0.
-case (dec_eq (num x) 0). 
+case (dec_eq (Qnum x) 0). 
 
 
 (* x=0 *)
@@ -737,32 +720,32 @@ rewrite H1.
 simpl in |- *.
 rewrite H1 in H.
 simpl in H.
-rewrite <- Zmult_0_r with (n := den x).
-rewrite Zmult_comm with (n := num z).
+rewrite <- Zmult_0_r with (n := Qden x).
+rewrite Zmult_comm with (n := Qnum z).
 apply Zlt_reg_mult_l.
 auto with zarith.
 
 apply Zgt_lt.
-apply Zgt_mult_reg_absorb_l with (a := den y).
+apply Zgt_mult_reg_absorb_l with (a := Qden y).
 
 auto with zarith.
 
 rewrite Zmult_comm.
 rewrite Zmult_0_r.
-apply Zgt_trans with (m := (num y * den z)%Z).
+apply Zgt_trans with (m := (Qnum y * Qden z)%Z).
 
 apply Zlt_gt.
 assumption.
 
 rewrite Zmult_comm.
 apply Zlt_gt.
-rewrite <- Zmult_0_r with (n := den z).
+rewrite <- Zmult_0_r with (n := Qden z).
 apply Zlt_reg_mult_l.
 
 auto with zarith.
 
 apply Zgt_lt.
-apply Zgt_mult_reg_absorb_l with (a := den x).
+apply Zgt_mult_reg_absorb_l with (a := Qden x).
 
 auto with zarith.
 
@@ -772,17 +755,17 @@ rewrite Zmult_comm.
 assumption.
 
 intro H1.
-case (not_Zeq (num x) 0 H1).
+case (not_Zeq (Qnum x) 0 H1).
 
 (* x : 0 *)
 intro H2.
-case (dec_eq (num z) 0).
+case (dec_eq (Qnum z) 0).
 
  (* x : 0 , z = 0 *)
 intro H3.
 rewrite H3.
 simpl in |- *.
-rewrite <- Zmult_0_r with (n := num x).
+rewrite <- Zmult_0_r with (n := Qnum x).
 apply Zgt_lt.
 apply Zlt_conv_mult_l.
 
@@ -792,20 +775,20 @@ apply Zgt_lt.
 auto with zarith.
 
 intro H3.
-case (not_Zeq (num z) 0 H3).
+case (not_Zeq (Qnum z) 0 H3).
 
  (* x < 0 , z < 0 *)
 intro H4.
-apply Zgt_mult_conv_absorb_l with (a := num y). 
+apply Zgt_mult_conv_absorb_l with (a := Qnum y). 
 apply Zgt_lt.
-apply Zgt_mult_reg_absorb_l with (a := den z).
+apply Zgt_mult_reg_absorb_l with (a := Qden z).
 
 auto with zarith.
 
-apply Zgt_trans with (m := (num z * den y)%Z).
+apply Zgt_trans with (m := (Qnum z * Qden y)%Z).
 rewrite Zmult_0_r.
 apply Zlt_gt.
-rewrite <- Zmult_0_r with (n := den y).
+rewrite <- Zmult_0_r with (n := Qden y).
 rewrite Zmult_comm.
 apply Zlt_reg_mult_l.
 
@@ -817,9 +800,9 @@ apply Zlt_gt.
 rewrite Zmult_comm.
 assumption.
 
-apply Zgt_trans with (m := (num x * num z * den y)%Z).
+apply Zgt_trans with (m := (Qnum x * Qnum z * Qden y)%Z).
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (n := num y).
+rewrite Zmult_comm with (n := Qnum y).
 rewrite <- Zmult_assoc.
 rewrite <- Zmult_assoc.
 apply Zlt_conv_mult_l.
@@ -828,9 +811,9 @@ assumption.
 
 assumption.
 
-rewrite Zmult_comm with (n := num x).
+rewrite Zmult_comm with (n := Qnum x).
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (n := num y).
+rewrite Zmult_comm with (n := Qnum y).
 rewrite <- Zmult_assoc.
 rewrite <- Zmult_assoc.
 apply Zlt_conv_mult_l.
@@ -846,7 +829,7 @@ apply Zgt_lt.
 apply Zgt_trans with (m := 0%Z).
 apply Zlt_gt.
 rewrite Zmult_comm.
-rewrite <- Zmult_0_r with (n := den x).
+rewrite <- Zmult_0_r with (n := Qden x).
 apply Zlt_reg_mult_l.
 
 auto with zarith.
@@ -854,7 +837,7 @@ auto with zarith.
 assumption.
 
 rewrite Zmult_comm.
-rewrite <- Zmult_0_r with (n := den z).
+rewrite <- Zmult_0_r with (n := Qden z).
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
 
@@ -864,19 +847,19 @@ assumption.
 (* x > 0 *)
 intro H2.
 apply Zgt_lt.
-apply Zgt_mult_reg_absorb_l with (a := num y).
-apply Zgt_mult_reg_absorb_l with (a := den x).
+apply Zgt_mult_reg_absorb_l with (a := Qnum y).
+apply Zgt_mult_reg_absorb_l with (a := Qden x).
 
 auto with zarith.
 
-apply Zgt_trans with (m := (num x * den y)%Z).
+apply Zgt_trans with (m := (Qnum x * Qden y)%Z).
 
 rewrite Zmult_comm.
 apply Zlt_gt.
 assumption.
 
 rewrite Zmult_0_r.
-rewrite <- Zmult_0_r with (n := den y).
+rewrite <- Zmult_0_r with (n := Qden y).
 rewrite Zmult_comm.
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
@@ -885,27 +868,27 @@ auto with zarith.
 
 assumption.
 
-apply Zgt_trans with (m := (num x * num z * den y)%Z).
+apply Zgt_trans with (m := (Qnum x * Qnum z * Qden y)%Z).
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (n := num y).
-rewrite Zmult_comm with (n := num x).
+rewrite Zmult_comm with (n := Qnum y).
+rewrite Zmult_comm with (n := Qnum x).
 rewrite <- Zmult_assoc.
 rewrite <- Zmult_assoc.
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
 
-apply Zgt_mult_reg_absorb_l with (a := den y).
+apply Zgt_mult_reg_absorb_l with (a := Qden y).
 
 auto with zarith.
 
-apply Zgt_trans with (m := (num y * den z)%Z).
+apply Zgt_trans with (m := (Qnum y * Qden z)%Z).
 
 rewrite Zmult_comm.
 apply Zlt_gt.
 assumption.
 
 rewrite Zmult_0_r.
-rewrite <- Zmult_0_r with (n := den z).
+rewrite <- Zmult_0_r with (n := Qden z).
 rewrite Zmult_comm.
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
@@ -913,18 +896,18 @@ apply Zlt_reg_mult_l.
 auto with zarith.
 
 apply Zgt_lt.
-apply Zgt_mult_reg_absorb_l with (a := den x).
+apply Zgt_mult_reg_absorb_l with (a := Qden x).
 
 auto with zarith.
 
-apply Zgt_trans with (m := (num x * den y)%Z).
+apply Zgt_trans with (m := (Qnum x * Qden y)%Z).
 
 rewrite Zmult_comm.
 apply Zlt_gt.
 assumption.
 
 rewrite Zmult_0_r.
-rewrite <- Zmult_0_r with (n := den y).
+rewrite <- Zmult_0_r with (n := Qden y).
 rewrite Zmult_comm.
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
@@ -936,7 +919,7 @@ assumption.
 assumption.
 
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (n := num y).
+rewrite Zmult_comm with (n := Qnum y).
 rewrite <- Zmult_assoc.
 rewrite <- Zmult_assoc.
 apply Zlt_gt.
@@ -950,7 +933,7 @@ assumption.
 Qed.
 
 Lemma Qlt_strext_unfolded : forall x1 x2 y1 y2 : Q,
- (x1{<Q}y1) -> (x2{<Q}y2) or (x1{#Q}x2) or (y1{#Q}y2).
+ (x1<y1) -> (x2<y2) or (x1/=x2) or (y1/=y2).
 intros x1 x2 y1 y2.
 intro J.
 case (Qlt_eq_gt_dec x2 y2).
@@ -966,20 +949,20 @@ right.
 red in |- *.
 red in |- *.
 intro e1.
-cut (x1{=Q}y1).
+cut (x1==y1).
 intro e2.
 unfold Qlt in J.
 unfold Qeq in e2.
-set (J0 := CZlt_to (num x1 * den y1) (num y1 * den x1) J) in *.
-cut ((num y1 * den x1)%Z = (num x1 * den y1)%Z).
+set (J0 := CZlt_to (Qnum x1 * Qden y1) (Qnum y1 * Qden x1) J) in *.
+cut ((Qnum y1 * Qden x1)%Z = (Qnum x1 * Qden y1)%Z).
 intro e3.
-set (i := Zgt_irrefl (num x1 * den y1)) in *.
+set (i := Zgt_irrefl (Qnum x1 * Qden y1)) in *.
 generalize i.
 unfold not in |- *.
 intros i0.
 elim i0.
 apply Zlt_gt.
-apply Zlt_le_trans with (num y1 * den x1)%Z.
+apply Zlt_le_trans with (Qnum y1 * Qden x1)%Z.
 exact J0.
 apply Zeq_le.
 exact e3.
@@ -995,8 +978,8 @@ Intro.
 Unfold Qlt in J.
 Generalize (CZlt_to ? ? J).
 Intro J1.
-Elim (Zlt_not_eq `(num x1)*((den y1))` 
-                  `(num y1)*((den x1))` J1).
+Elim (Zlt_not_eq `(Qnum x1)*((Qden y1))` 
+                  `(Qnum y1)*((Qden x1))` J1).
 Symmetry.
 Assumption.
 Step_final x2.*)
@@ -1011,7 +994,7 @@ case (dec_Qeq x1 x2).
 intro e.
 right.
 right.
-cut (y2{<Q}y1).
+cut (y2<y1).
 intro H.
 red in H.
 generalize (CZlt_to _ _ H).
@@ -1019,7 +1002,7 @@ intro H0.
 simpl in |- *.
 unfold Qap in |- *.
 intro H1.
-elim (Zorder.Zlt_not_eq (num y2 * den y1) (num y1 * den y2) H0).
+elim (Zorder.Zlt_not_eq (Qnum y2 * Qden y1) (Qnum y1 * Qden y2) H0).
 symmetry  in |- *.
 assumption.
 apply Qlt_is_transitive_unfolded with x1.
@@ -1036,28 +1019,28 @@ elim n.
 assumption.
 Qed.
 
-Lemma Qlt_is_irreflexive_unfolded : forall x : Q, Not (x{<Q}x). 
+Lemma Qlt_is_irreflexive_unfolded : forall x : Q, Not (x<x). 
 intros x.
 unfold Qlt in |- *.
 intro X.
-cut (num x * den x > num x * den x)%Z.
-apply Zgt_irrefl with (n := (num x * den x)%Z).
+cut (Qnum x * Qden x > Qnum x * Qden x)%Z.
+apply Zgt_irrefl with (n := (Qnum x * Qden x)%Z).
 apply Zlt_gt.
 apply CZlt_to.
 assumption.
 Qed.
 
-Lemma Qlt_is_antisymmetric_unfolded : forall x y : Q, (x{<Q}y) -> Not (y{<Q}x).
+Lemma Qlt_is_antisymmetric_unfolded : forall x y : Q, (x<y) -> Not (y<x).
 intros x y X.
 intro X0.
-cut (x{<Q}x).
+cut (x<x).
 apply Qlt_is_irreflexive_unfolded with (x := x).
 apply Qlt_is_transitive_unfolded with (x := x) (y := y) (z := x).
 assumption.
 assumption.
 Qed.
 
-Lemma Qplus_resp_Qlt : forall x y : Q, (x{<Q}y) -> forall z : Q, x{+Q}z{<Q}y{+Q}z.
+Lemma Qplus_resp_Qlt : forall x y : Q, (x<y) -> forall z : Q, x+z<y+z.
 Proof.
 intros x y H z.
 red in H.
@@ -1065,22 +1048,22 @@ simpl in |- *.
 red in |- *.
 unfold Qplus in |- *.
 apply toCProp_Zlt.
-unfold num at 1 in |- *.
-unfold den at 3 in |- *.
-unfold num at 3 in |- *.
-unfold den at 7 in |- *.
+unfold Qnum at 1 in |- *.
+unfold Qden at 3 in |- *.
+unfold Qnum at 3 in |- *.
+unfold Qden at 7 in |- *.
 change
-  ((num x * den z + num z * den x) * (den y * den z) <
-   (num y * den z + num z * den y) * (den x * den z))%Z 
+  ((Qnum x * Qden z + Qnum z * Qden x) * (Qden y * Qden z) <
+   (Qnum y * Qden z + Qnum z * Qden y) * (Qden x * Qden z))%Z 
  in |- *.
 rewrite Zmult_assoc.
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (m := den z).
+rewrite Zmult_comm with (m := Qden z).
 rewrite
  Zmult_comm
             with
-            (m := den z)
-           (n := ((num y * den z + num z * den y) * den x)%Z).
+            (m := Qden z)
+           (n := ((Qnum y * Qden z + Qnum z * Qden y) * Qden x)%Z).
 apply Zlt_reg_mult_l.
 
 auto with zarith.
@@ -1089,33 +1072,33 @@ rewrite Zmult_comm.
 rewrite
  Zmult_comm
             with
-            (m := den x)
-           (n := (num y * den z + num z * den y)%Z).
-rewrite Zmult_plus_distr_r with (n := den y).
-rewrite Zmult_plus_distr_r with (n := den x).
-rewrite Zmult_permute with (m := num z).
-rewrite Zmult_permute with (m := num z).
-rewrite Zmult_comm with (n := den x) (m := den y).
+            (m := Qden x)
+           (n := (Qnum y * Qden z + Qnum z * Qden y)%Z).
+rewrite Zmult_plus_distr_r with (n := Qden y).
+rewrite Zmult_plus_distr_r with (n := Qden x).
+rewrite Zmult_permute with (m := Qnum z).
+rewrite Zmult_permute with (m := Qnum z).
+rewrite Zmult_comm with (n := Qden x) (m := Qden y).
 apply Zgt_lt.
-rewrite Zplus_comm with (m := (num z * (den y * den x))%Z).
-rewrite Zplus_comm with (m := (num z * (den y * den x))%Z).
+rewrite Zplus_comm with (m := (Qnum z * (Qden y * Qden x))%Z).
+rewrite Zplus_comm with (m := (Qnum z * (Qden y * Qden x))%Z).
 apply Zplus_gt_compat_l.
 rewrite Zmult_assoc.
 rewrite Zmult_assoc.
-rewrite Zmult_comm with (m := den z).
-rewrite Zmult_comm with (m := den z).
+rewrite Zmult_comm with (m := Qden z).
+rewrite Zmult_comm with (m := Qden z).
 apply Zlt_gt.
 apply Zlt_reg_mult_l.
 
 auto with zarith.
 
 rewrite Zmult_comm.
-rewrite Zmult_comm with (m := num y).
+rewrite Zmult_comm with (m := Qnum y).
 apply CZlt_to.
 assumption.
 Qed.
 
-Lemma Qmult_resp_pos_Qlt : forall x y : Q, (QZERO{<Q}x) -> (QZERO{<Q}y) -> QZERO{<Q}x{*Q}y.
+Lemma Qmult_resp_pos_Qlt : forall x y : Q, (QZERO<x) -> (QZERO<y) -> QZERO<x*y.
 intros x y.
 intro H.
 intro H0.
@@ -1130,12 +1113,12 @@ rewrite Zmult_1_r in H.
 
 unfold Qlt in H0.
 unfold QZERO in H0.
-unfold num at 1 in H0.
-unfold den at 2 in H0.
+unfold Qnum at 1 in H0.
+unfold Qden at 2 in H0.
 simpl in H0.
 rewrite Zmult_1_r in H0.
 
-rewrite <- Zmult_0_r with (n := num x).
+rewrite <- Zmult_0_r with (n := Qnum x).
 apply Zlt_reg_mult_l.
 apply Zlt_gt.
 apply CZlt_to.
@@ -1144,7 +1127,7 @@ apply CZlt_to.
 assumption.
 Qed.
 
-Lemma Qlt_gives_apartness : forall x y : Q, Iff (x{#Q}y) ((x{<Q}y) or (y{<Q}x)).
+Lemma Qlt_gives_apartness : forall x y : Q, Iff (x/=y) ((x<y) or (y<x)).
 Proof.
 intros x y.
 red in |- *.
@@ -1172,11 +1155,11 @@ intro l.
 
 simpl in |- *.
 intro H0.
-cut (x{<Q}x).
+cut (x<x).
 intro X.
 elim Qlt_is_irreflexive_unfolded with (x := x).
 assumption.
-cut (y{=Q}x).
+cut (y==x).
 intro H1.
 apply Qlt_wd_right with (x := x) (y := y) (z := x).
 assumption.
@@ -1187,7 +1170,7 @@ assumption.
 intro l.
 simpl in |- *.
 intro H0.
-cut (y{=Q}x).
+cut (y==x).
 intro.
 elim (Qlt_is_irreflexive_unfolded x).
 apply Qlt_wd_left with (x := y) (y := x) (z := x).
@@ -1201,22 +1184,22 @@ Qed.
 We consider the injection [inject_Z] from [Z] to [Q] as a coercion.
 *)
 
-Definition inject_Z (x : Z) := Build_Q x 1%positive. 
+Definition inject_Z (x : Z) := Qmake x 1%positive. 
 
 Coercion inject_Z : Z >-> Q.
 
 Lemma injz_plus : forall m n : Z,
- (inject_Z (m + n):Q){=Q}(inject_Z m:Q){+Q}inject_Z n.
+ (inject_Z (m + n):Q)==(inject_Z m:Q)+inject_Z n.
 Proof.
  intros m n.
  unfold inject_Z in |- *.
  simpl in |- *.
  unfold Qeq in |- *.
- unfold num at 1 in |- *.
- unfold den at 2 in |- *. 
+ unfold Qnum at 1 in |- *.
+ unfold Qden at 2 in |- *. 
  replace ((m + n) * 1)%Z with (m + n)%Z.
- replace (num (Build_Q m 1%positive{+Q}Build_Q n 1%positive) * 1)%Z
-  with (num (Build_Q m 1%positive{+Q}Build_Q n 1%positive)).
+ replace (Qnum (Qmake m 1+Qmake n 1)%Q * 1)%Z
+  with (Qnum (Qmake m 1+Qmake n 1)).
  unfold Qplus in |- *.
  simpl in |- *.
  ring.
@@ -1224,20 +1207,20 @@ Proof.
  ring.
 Qed.
 
-Lemma injZ_One : (inject_Z 1:Q){=Q}QONE.
+Lemma injZ_One : (inject_Z 1:Q)==QONE.
 Proof.
  unfold inject_Z in |- *.
- change ((Build_Q 1%Z 1%positive:Q){=Q}Build_Q 1%Z 1%positive) in |- *.
+ change ((Qmake 1%Z 1%positive:Q)==Qmake 1%Z 1%positive) in |- *.
  apply refl_Qeq.
 Qed.
 
 
-(** We can always find a natural number that is bigger than a given rational
-number.
+(** We can always find a natural Qnumber that is bigger than a given rational
+Qnumber.
 *)
 
 Theorem Q_is_archemaedian0 : forall x : Q,
- {n : positive | x{<Q}Build_Q n 1%positive}.
+ {n : positive | x<Qmake n 1%positive}.
 Proof.
  intro x.
  case x.
@@ -1246,8 +1229,8 @@ Proof.
  exists (P_of_succ_nat (Zabs_nat p)).
  
  red in |- *.
- unfold num at 1 in |- *. 
- unfold den in |- *.
+ unfold Qnum at 1 in |- *. 
+ unfold Qden in |- *.
  apply toCProp_Zlt. 
  simpl in |- *.
  rewrite Zmult_1_r.

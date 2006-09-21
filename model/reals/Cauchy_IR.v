@@ -46,3 +46,5 @@ of the real numbers as Cauchy sequences of rationals.
 Definition Cauchy_IR : CReals := R_as_CReals _ Q_is_archemaedian.
 
 (** The term [Cauchy_IR] is of type [CReals]. *)
+
+Close Scope Q_scope.
