@@ -434,16 +434,18 @@ Proof.
  apply not_ap_imp_eq.
  intro H0.
  elim (ap_imp_less _ _ _ H0).
- change (Zero [<=] x) in |- *.
+ change (Not (x [<] Zero)).
+ rewrite <- leEq_def.
  apply inv_cancel_leEq.
  astepr ZeroR.
- red in |- *; apply approach_zero_weak.
+ apply approach_zero_weak.
  intros.
  apply inv_cancel_leEq; astepr x.
  elim (H e); auto.
 
- change (x [<=] Zero) in |- *.
- red in |- *; apply approach_zero_weak.
+ change (Not (Zero [<] x)).
+ rewrite <- leEq_def.
+ apply approach_zero_weak.
  intros.
  elim (H e); auto.
 Qed.

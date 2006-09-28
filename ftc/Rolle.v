@@ -780,7 +780,7 @@ Theorem Law_of_the_Mean_ineq : forall a b, I a -> I b -> forall c,
 intros a b Ia Ib c Hc Ha Hb.
 astepr (c[*]AbsIR (b[-]a) [+]Zero).
 apply shift_leEq_plus'.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e H.
 elim Law_of_the_Mean with a b e; auto.
 intros x H0 H1.

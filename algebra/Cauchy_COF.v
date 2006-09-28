@@ -761,8 +761,8 @@ astepr (CS_seq _ y n[-]Zero); eauto with arith.
 Qed.
 
 Definition R_COrdField : COrdField.
-apply Build_COrdField with R_CField Rlt.
-apply Build_is_COrdField.
+apply Build_COrdField with R_CField Rlt (default_leEq _ Rlt) (default_greater _ Rlt) (default_grEq _ (default_leEq _ Rlt)).
+apply Build_is_COrdField; try solve [unfold Iff; tauto].
 exact Rlt_strict.
 exact R_plus_resp_lt.
 exact R_mult_resp_lt.
@@ -889,7 +889,7 @@ Proof.
   intro; apply H3; split; try left; assumption.
  assert (H5 : ~ x_ m[-]y_ m [<=] [--]e2).
   intro; apply H3; split; try right; assumption.
- split; intro.
+ split; rewrite leEq_def; intro.
  apply H5.
  apply leEq_transitive with ([--]e).
  apply less_leEq; assumption.
@@ -1178,13 +1178,13 @@ Proof.
  assert (H5 := B NN N2_NN).
 
  unfold AbsSmall in H5.
- unfold leEq in H5.
+ rewrite leEq_def in H5.
 
  elim H5; intros.
  elim H4; intros.
  elim b; intros.
 
- apply H7.
+ rewrite leEq_def in H7; apply H7.
  apply less_leEq_trans with (Two[*]e).
  astepl (Zero[+]e).  rstepr (e[+]e).
  apply plus_resp_less_rht; auto.

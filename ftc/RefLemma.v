@@ -1200,7 +1200,7 @@ cut (Zero [<] Min d d').
 intro H; elim (less_cotransitive_unfolded _ _ _ H (b[-]a)); intro.
 astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]Zero).
 apply shift_leEq_plus'.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros beta Hbeta.
 apply shift_minus_leEq.
 astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]beta).

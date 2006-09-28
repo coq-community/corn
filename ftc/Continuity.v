@@ -324,7 +324,7 @@ Qed.
 Lemma leEq_Norm_Funct : forall e, (forall x, I x -> forall Hx, AbsIR (F x Hx) [<=] e) -> Norm_Funct [<=] e.
 intros e H.
 astepr (Zero[+]e); apply shift_leEq_plus.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros d Hd.
 apply shift_minus_leEq.
 elim (norm_fun_lub d Hd); intros x Hx.
@@ -909,7 +909,7 @@ assert (H := lub_is_lub _ _ _ _ contF).
 set (y := lub_funct _ _ _ _ contF) in *.
 elim H; intros Hy Hy'; clear H.
 apply leEq_imp_eq; apply shift_zero_leEq_minus'; apply inv_cancel_leEq;
- astepr ZeroR; red in |- *; apply approach_zero; intros e He.
+ astepr ZeroR; apply approach_zero; intros e He.
 
 rstepl (z[-]y).
 apply shift_minus_less.
@@ -940,7 +940,7 @@ assert (H := glb_is_glb _ _ _ _ contF).
 set (y := glb_funct _ _ _ _ contF) in *.
 elim H; intros Hy Hy'; clear H.
 apply leEq_imp_eq; apply shift_zero_leEq_minus'; apply inv_cancel_leEq;
- astepr ZeroR; red in |- *; apply approach_zero; intros e He.
+ astepr ZeroR; apply approach_zero; intros e He.
 
 rstepl (z[-]y).
 apply shift_minus_less.
@@ -968,7 +968,7 @@ Lemma leEq_glb : forall a b Hab (F : PartIR) contF x,
 intros a b Hab F contF x H.
 elim (glb_is_glb _ _ _ _ contF); intros.
 astepr (glb_funct _ _ _ _ contF[+]Zero); apply shift_leEq_plus'.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e H0.
 elim (b0 _ H0); intro y; intros.
 apply less_leEq; eapply leEq_less_trans.

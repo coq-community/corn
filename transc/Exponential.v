@@ -697,7 +697,7 @@ Transparent Logarithm.
 Hint Resolve Log_Exp: algebra.
 
 Lemma Exp_Log_lemma : forall x y Hx Hy, Zero [=] Log y Hy[-]Log x Hx -> y [<=] x.
-intros x y Hx Hy H; intro H0.
+intros x y Hx Hy H; rewrite leEq_def; intro H0.
 cut ((y[-]x[/] _[//]pos_ap_zero _ _ Hy) [<=] Zero).
 intro H1.
 apply less_irreflexive_unfolded with (x := x).

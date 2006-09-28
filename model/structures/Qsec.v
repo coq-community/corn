@@ -1250,3 +1250,18 @@ Proof.
  auto with zarith.
  auto with zarith.
 Qed.
+
+Lemma Qle_is_not_lt : forall x y : Q, x <= y <-> ~ y < x.
+Proof.
+firstorder with Qle_not_lt Qnot_lt_le.
+Qed.
+
+Lemma Qge_is_not_gt : forall x y : Q, x >= y <-> y <= x.
+Proof.
+firstorder.
+Qed.
+
+Lemma Qgt_is_lt : forall x y : Q, x > y IFF  y < x.
+Proof.
+firstorder.
+Qed.

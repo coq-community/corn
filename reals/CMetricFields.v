@@ -105,9 +105,9 @@ Lemma Hulp :
 intros F G H.
 set (H0 := ax_abs_gt_zero) in *.
 generalize H0.
-unfold leEq in |- *.
 intro H1.
 set (H2 := H1 F (cmf_abs F) (cmf_proof F) [--] (One:F)) in *.
+rewrite leEq_def in H2.
 apply H2.
 astepl ( [--] (cmf_abs F One)).
 astepl ( [--]OneR).

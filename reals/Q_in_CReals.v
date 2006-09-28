@@ -590,7 +590,7 @@ Qed.
 
 Lemma leEq_inj_Q : forall q1 q2, (inj_Q q1 [<=] inj_Q q2) -> q1 [<=] q2.
 intros.
-intro.
+rewrite leEq_def; intro.
 apply less_irreflexive_unfolded with (x := inj_Q q2).
 eapply less_leEq_trans.
 2: apply H.
@@ -601,8 +601,8 @@ Qed.
 Lemma inj_Q_leEq : forall q1 q2, (q1 [<=] q2) -> inj_Q q1 [<=] inj_Q q2.
 Proof.
  intros.
- intro. 
- apply H.
+ rewrite leEq_def; intro. 
+ rewrite leEq_def in H; apply H.
  apply less_inj_Q.
  assumption.
 Qed.
