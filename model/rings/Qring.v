@@ -92,8 +92,7 @@ Proof.
  simpl in |- *. 
  red in |- *.
  simpl in |- *.
- ring.
- assumption.
+ rewrite H; trivial.
 Qed.
 
 Lemma nring_Q : forall n : nat, nring (R:=Q_as_CRing) n[=]inject_Z n.
@@ -111,11 +110,7 @@ Proof.
  red in |- *.
  unfold Qplus in |- *.
  simpl in |- *.
+ rewrite Zpos_mult_morphism in |- *.
+ rewrite succ_nat in |- *.
  ring.
- rewrite Pmult_comm.
- change ((1 + n)%Z = P_of_succ_nat n) in |- *.
- case n; simpl in |- *; auto with zarith. 
- Require Import ZArith.
- intros.
- rewrite BinPos.Pplus_one_succ_l; trivial.
 Qed.

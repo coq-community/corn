@@ -147,7 +147,6 @@ intros n' H.
 rewrite H.
 exists (n' * n' + n').
 unfold double in |- *.
-rewrite S_to_plus_one.
 ring.
 Qed.
 
