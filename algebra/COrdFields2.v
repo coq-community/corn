@@ -120,6 +120,12 @@ astepr (d[+]b).
 apply plus_resp_less_leEq; auto.
 Qed.
 
+Lemma plus_resp_nonneg : forall x y : R, Zero [<=] x -> Zero [<=] y -> Zero [<=] x[+]y.
+intros.
+astepl (Zero[+]Zero:R).
+apply plus_resp_leEq_both; auto.
+Qed.
+
 Lemma minus_resp_less_leEq : forall x y x' y' : R, x [<=] y -> y' [<] x' -> x[-]x' [<] y[-]y'.
 intros.
 astepl (x[+][--]x').
