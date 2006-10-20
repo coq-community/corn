@@ -294,6 +294,8 @@ astepl
   cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
 astepl (Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
 astepl ( [--] (cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10))).
+apply un_op_wd_unfolded.
+apply mult_wdl.
 unfold cc_IR in |- *; simpl in |- *; split; simpl in |- *; rational.
 Qed.
 (* end hide *)
