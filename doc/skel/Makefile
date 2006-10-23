@@ -1,5 +1,3 @@
-# $Id: Makefile,v 1.1 2004/02/11 09:40:00 lcf Exp $
-
 TEXFILES=\
 	CSetoids.tex \
 	CGroups.tex \

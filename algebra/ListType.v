@@ -42,8 +42,6 @@
 (*         *       GNU Lesser General Public License Version 2.1       *)
 (***********************************************************************)
 
-(*i $Id: ListType.v,v 1.2 2004/03/26 16:07:02 lcf Exp $ i*)
-
 (* THIS IS A OLD CONTRIB. IT IS NO LONGER MAINTAINED ***)
 (* Moved to Type for CoRN *)
 (* end hide *)

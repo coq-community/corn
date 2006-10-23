@@ -300,10 +300,8 @@ Proof.
  red in |- *.
  unfold Qplus in |- *.
  simpl in |- *.
- rewrite Pmult_comm. 
- ring (num x * 1)%Z. (* FIXME *) simpl in |- *.
- ring (num x + 0)%Z. (* FIXME *) simpl in |- *.
- reflexivity.
+ rewrite Zpos_mult_morphism in |- *.
+ ring.
 Qed. 
 
 (**
@@ -346,11 +344,8 @@ intro x.
 red in |- *.
 unfold Qplus in |- *.
 simpl in |- *.
-
-ring (num x * 1)%Z. ring (num x + 0)%Z. 
-rewrite Pmult_comm.
-simpl in |- *.
-reflexivity.
+rewrite Zpos_mult_morphism in |- *.
+ring.
 Qed.
 
 Lemma ZEROQ_as_lft_unit0 : forall x : Q, QZERO{+Q}x{=Q}x.
