@@ -42,7 +42,7 @@ LIBNAME ?= CoRN
 
 # Directories and files that should not be distributed (i.e. part of the 
 # publicly available version of C-CoRN)
-PRIVFILES := $(SRCDIR)/devel $(SRCDIR)/doc/www
+PRIVFILES := $(SRCDIR)/devel
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.

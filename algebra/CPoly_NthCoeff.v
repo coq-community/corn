@@ -371,8 +371,12 @@ Qed.
 Lemma nth_coeff_mult : forall (p q : RX) n,
  nth_coeff n (p[*]q) [=] Sum 0 n (fun i => nth_coeff i p[*]nth_coeff (n - i) q).
 intro; induction  p as [| s p Hrecp]. intros.
+stepl (nth_coeff n (Zero:RX)).
 simpl in |- *. apply eq_symmetric_unfolded.
 apply Sum_zero. auto with arith. intros. algebra.
+apply nth_coeff_wd.
+change (Zero[=]Zero[*]q).
+algebra.
 intros.
 apply
  eq_transitive_unfolded with (nth_coeff n (_C_ s[*]q[+]_X_[*] ((p:RX) [*]q))).
