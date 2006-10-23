@@ -33,7 +33,6 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
- (* $Id: Opaque_algebra.v,v 1.1 2004/02/11 10:56:57 lcf Exp $ *)
 
 (* Opaque cs_crr. *)
 Opaque csg_crr.

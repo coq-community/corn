@@ -1,0 +1,63 @@
+Name: C-CoRN
+Title: Constructive Coq Repository at Nijmegen
+Author: Herman Geuvers
+Institution: Radboud University Nijmegen
+Author: Luís Cruz-Filipe
+Institution: Radboud University Nijmegen
+Author: Milad Niqui
+Institution: Radboud University Nijmegen
+Author: Freek Wiedijk
+Institution: Radboud University Nijmegen
+Author: Jan Zwanenburg
+Institution: Radboud University Nijmegen
+Author: Randy Pollack
+Author: Henk Barendregt
+Institution: Radboud University Nijmegen
+Author: Mariusz Giero
+Author: Rik van Ginneken
+Institution: Radboud University Nijmegen
+Author: Dimitri Hendriks
+Author: Sébastien Hinderer
+Author: Bart Kirkels
+Author: Pierre Letouzey
+Author: Iris Loeb
+Institution: Radboud University Nijmegen
+Author: Lionel Mamane
+Author: Russell O'Connor
+Institution: Radboud University Nijmegen
+Author: Nickolay V. Shmyrev
+Author: Bas Spitters
+Institution: Radboud University Nijmegen
+Author: Dan Synek
+Institution: Radboud University Nijmegen
+Description:
+ The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
+ a computer based library of constructive mathematics, formalized in
+ the theorem prover Coq. It includes the following parts:
+
+*  Algebraic Hierarchy
+
+   o An axiomatic formalization of the most common algebraic
+     structures, including setoids, monoids, groups, rings,
+     fields, ordered fields, rings of polynomials, real and
+     complex numbers
+
+* Model of the Real Numbers
+
+   o Construction of a concrete real number structure
+     satisfying the previously defined axioms
+
+* Fundamental Theorem of Algebra
+
+   o A proof that every non-constant polynomial on the complex
+     plane has at least one root
+
+* Real Calculus
+
+   o A collection of elementary results on real analysis,
+     including continuity, differentiability, integration,
+     Taylor's theorem and the Fundamental Theorem of Calculus
+
+Url: http://c-corn.cs.ru.nl
+Keywords: Constructive, Algebra, Real Calculus, Real numbers,
+Fundamental Theorem of Algebra 
