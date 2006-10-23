@@ -42,8 +42,6 @@
 (*         *       GNU Lesser General Public License Version 2.1       *)
 (***********************************************************************)
 
-(*i $Id$ i*)
-
 (* THIS IS A OLD CONTRIB. IT IS NO LONGER MAINTAINED ***)
 (* Moved to Type for CoRN *)
 (* end hide *)

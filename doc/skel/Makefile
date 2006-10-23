@@ -1,5 +1,3 @@
-# $Id$
-
 TEXFILES=\
 	CSetoids.tex \
 	CGroups.tex \
