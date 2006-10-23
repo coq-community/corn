@@ -36,6 +36,7 @@
 
 (* begin hide *)
 Require Export CLogic.
+Require Export Bool.
 
 Section Syntactic_Expressions.
 
