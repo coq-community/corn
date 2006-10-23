@@ -1,0 +1,176 @@
+<html>
+<head>
+<title>C-CoRN -- History</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1 align="center">History</h1>
+<p>
+The C-CoRN repository grew out of the 
+<a href="http://www.cs.ru.nl/~freek/fta/">FTA project</a>, where
+a constructive proof of the Fundamental Theorem of Algebra was formalized in Coq.  This
+theorem states that every non-constant polynomial f over the complex
+numbers has a root, i.e. there is a complex number z such that f(z) = 0.
+The FTA project was performed by Herman Geuvers, Freek Wiedijk, Jan
+Zwanenburg, Randy Pollack, Milad Niqui, and Henk Barendregt. The
+motivations for starting this project were the following
+<UL>
+<LI> Formalize a large piece of real mathematics. See whether it can be done and which
+  problems arise. 
+<LI> Create a library for basic constructive algebra and analysis, to
+be used by others. Often, a formalization is only used by the person
+that created it (or is not used further at all!), whereas one of the
+goals of formalizing mathematics is to create a joint repository of
+mathematics.
+<LI> Investigate the current limitations of theorem provers, notably
+Coq, and the type theoretic approach towards theorem proving.
+<LI> Manage this project. Work with a group of people on one
+theory/proof-development. Initially, the following three sequential/parallel
+phases were distinguished:
+<UL>
+<LI> Mathematical proof: LaTeX document (the mathematical proof with
+lots of details filled in) 
+
+<LI> Theory development: Coq file (just definitions and statements of
+lemmas) 
+<LI> Proof development: Coq file (formal proofs filled in)
+</UL>
+
+The goal is to keep these phases consistent, so the theory/proof
+development process proceeds in a ``literate programming'' style: by
+working (in parallel) on three documents, one creates a complete
+formal development of FTA, together with a documentation, which
+consists of the LaTeX document (the high level specification) and the
+theory development (the low level specification, containing all the
+precise definitions and names of lemmas etc.) It is not trivial to
+keep these phases consistent (and in fact in FTA this consistency has
+not been maintained till the end): a lemma in the LaTeX version may
+be just wrong, a definition may be incomplete or the `basic
+properties' that one thinks one needs (say about fields) are just not
+the ones that one really needs.  
+
+<LI> Constructive proof. We view a
+real number as a (potentially) infinite object. So the equality on
+them is undecidable and one can not define functions by cases. A good
+thing is that we are actually proving the correctness of a
+root-finding algorithm. Details of the proof can be found in
+{GeuversWiedijkZwanenburg-TYPES-2001}.
+</UL>
+
+The proof did not proceed by constructing the reals in Coq, but by axiomatic
+reasoning. So the axioms of the real numbers were defined in
+Coq. As a matter of fact, we have proceeded even more generally by
+first defining an algebraic hierarchy (semi-groups, monoids, groups,
+rings, fields, ordered fields); see
+{GeuversPollackWiedijkZwanenburg-JSC-2002}. The advantages of this
+approach are: reuse of proven results and reuse of notation. (The
+reals and complex numbers are fields and the polynomials form a ring.)
+Then IR was defined to be an (arbitrary) Cauchy-complete
+Archimedean ordered field. Given such an IR, the complex numbers can be
+defined by CC := IR x IR.  To make sure that the axioms for IR make
+sense, a concrete instantiation for IR has been constructed by Niqui.
+<BR>
+Completely formalized in the theorem prover Coq, the proof and theory
+development amounts to the following. This is the size of the input files (definitions,
+lemmas, tactic scripts)
+<UL>
+<LI> Sets and Basics  41 kb
+<LI> Algebra (up to Ordered Fields)  165 kb
+<LI> Reals  52 kb
+<LI> Polynomials  113 kb
+<LI> Real-valued functions / Basic Analysis  30 kb
+<LI> Complex numbers  98 kb
+<LI> FTA proof  70 kb 
+<LI> Construction of IR 309 kb
+<LI> Rational Tactic  49 kb
+</UL>
+
+To modularize the proof and in order to create a real ``library'', we
+have first defined an algebraic hierarchy in the FTA project. In
+proving FTA, we have to deal with real numbers, complex numbers and
+polynomials and many of the properties we use are generic and
+algebraic. To be able to reuse results (also for future developments)
+we have defined a hierarchy of algebraic structures.  The basic level
+consists of constructive setoids, (A, #, =), with
+A: Set, # an apartness and = an equivalence
+relation. (Classically, apartness is just the negation of equality,
+but constructively, apartness is more `primitive' than equality and
+equality is usually defined as the negation of apartness. To
+understand this, think of two reals x and y as (infinite) Cauchy
+sequences: we may determine in a finite amount of time whether x # y,
+but we can in general never know in a finite amount of time that
+x=y.)
+On the next level we have semi-groups, (S, +), with S a
+setoid and + an associative binary operation on S.
+<P>
+Inside the algebraic hierarchy we have `inheritance via coercions'.
+We have the following coercions.
+<BR>   
+OrdField >-> Field >-> Ring >-> Group 
+              Group >-> Monoid >-> Semi_grp >-> Setoid
+<BR>
+This means that
+all properties of groups are inherited by rings,
+fields, etc.
+Also notation is inherited:
+x[+]y
+denotes the addition of x and y for x,y:G from any semi-group (or monoid, group, ring,...) G. 
+The coercions must form a tree, so there is no real 
+multiple inheritance,
+e.g. it is not
+possible to define rings in such a way that it inherits both from its
+additive group and its multiplicative monoid.
+<P>
+In the proof of FTA we needed
+proofs of equalities between rational expressions.
+These were automatized using so called `partial reflection'.
+<P>
+The axioms for real numbers are (apart from the fact that the reals
+form a constructive ordered field)
+<UL>
+<LI> All Cauchy sequences have a limit:<BR>
+SeqLim : {g: nat ->F | Cauchy(g)} -> F<BR>
+CauchyProp: forall g: nat->F. Cauchy(g) -> forall e: F{>0}. exists N: nat.forall m>= N.(|g_m - SeqLim(g)|<e)<BR>
+<LI> Axiom of Archimedes: (there are no non-standard elements)<BR>
+forall x: F. exists n: nat (n>x)
+</UL>
+
+The axiom of Archimedes proves that `epsilon-Cauchy sequences' and 
+`1/k-Cauchy sequences' coincide (and similar for limits).
+Viz: g:nat->F is a 1/k-Cauchy sequence if<BR>
+forall k: nat. \exists N:nat.forall m\geq N(|g_m - g_N|
+<1/k
+<P>
+
+To be sure that our axioms can be satisfied, we have also constructed
+a Real Number Structure via the standard technique of taking the Cauchy
+sequences of rational numbers and defining an appropriate apartness on
+them. It turns out (as was to be expected) that real number structures
+are categorical: Any two real number structures are isomorphic. This
+fact has been proved within Coq.
+<P>
+In conclusion we have found:
+<UL>
+<LI> Real mathematics, involving both a
+bit of algebra and a bit of analysis can be formalized completely
+within a theorem prover (Coq).  
+<LI> Setting up a basic library and some
+good proof automation procedures is a substantial part of the work.
+<LI> An important issue remains how to present the development (and the
+proof). In the formalization process, the connection with the LaTeX
+file has been abandoned. We believe that it is essential to provide a
+system in which one can write the formalization and the documentation
+in one file.  
+<LI> Work is in progress regarding the extraction of the algorithm implicit
+in the proof.  This has turned out to be far from trivial, and has provided
+important insight in issues such as how the sorts of Coq should be used.
+</UL>
+See the publications page for more information.
+</p>
+<div align="center"><a href="index.html">[Home]</a> [History] <a href="people.html">[People]</a> 
+  <a href="documentation/toc.html">[On-line Documentation]</a> <a href="pub.html">[Publications]</a> 
+  <a href="lib.html">[Library]</a> <a href="download.html">[Download]</a> <a href="info.html">[Contact 
+  Information]</a></div>
+</body>
+</html>

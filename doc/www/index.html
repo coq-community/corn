@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>C-CoRN</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1 align="center">Constructive Coq Repository at Nijmegen</h1>
+<h3 align="center"><a href="http://www.cs.ru.nl/fnds">Foundations Group</a>, 
+  <a href="http://www.ru.nl">Radboud University Nijmegen</a></h3>
+
+<p>
+
+The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
+a computer based library of constructive mathematics, formalized in
+the theorem prover Coq. 
+<P>
+
+<B>Background</B> There is a lot of mathematical knowledge. This
+knowledge is mainly stored in books and in the heads of mathematicians
+and other scientists. Putting this knowledge in the right form on a
+computer, the mathematics should be more readily available to be used
+by others (either humans or other computer applications). C-CoRN aims
+at being a starting point and a test-bed for this: we put mathematics
+on a computer in an active (formalized) way to see how one can
+interact with it (consult, use, extend) and how to manage it
+(document, update, keep consistent). The reason for working
+constructively is partly <a href="history.html">historical</a>,
+partly practical (because we wanted to use Coq, which is a
+constructive theorem prover), but mainly because constructive
+mathematics has the additional bonus of providing (actual, executable)
+algorithms for the functions that we prove to exist.  C-CoRN grew out
+of the FTA project, formalizing the Fundamental Theorem of
+Algebra. (See the <a href="history.html">history page</a>
+for an overview and links.) The repository is developed and maintained
+by the <a href="http://www.cs.ru.nl/fnds">Foundations Group</a> of
+the NIII (Computer Science Department) of the University of Nijmegen,
+but everybody is cordially invited to participate in its further
+development.
+<P>
+
+<B>Why</B> Computer formalized mathematics has a high potential: a
+good computer-representation of mathematics will enable the following.
+<UL>
+<LI> <I> Browsing </I> and <I> searching </I> libraries of
+mathematics in an easy way, (so it should both be readable, like a
+mathematics book and searchable like a database),
+<LI> <I>Using</I> the stored mathematics, e.g. by computing
+with it or proving with it (so it should be possible to actively use
+the mathematics in a computer algebra system or a theorem prover),
+<LI> <I>Extending</I> the corpus of mathematics. For example by
+extending the formalized theory or by adding an illuminating example. 
+Extending should be as easy as writing it up in, say, LaTeX.
+</UL>
+
+An important condition for opening up these potential advantages of
+formalized mathematics is having an extensive formalized library of
+(basic) results. C-CoRN aims at being such a library. In the context
+of our work, this library serves several purposes.
+<UL>
+<LI> A library for (basic) constructive results, say in algebra and
+analysis should be usable by others. Often, a formalization is only
+used by the person that created it (or is not used further at
+all!). We want C-CoRN explicitly to be used and extended by people
+from our group, but also by interested outsiders. This requires a
+certain way of working when doing a formalization, but it also
+requires a certain managerial structure (CVS etc.).  
+
+<LI> A library should be presented, both to its readers and to its
+users. The `readers' may just be interested in the mathematical line
+of thought, on a relatively high level, whereas the `users' will want
+to know the formalization details on a much lower level. So there is
+not just one good presentation, but presentation is vital for C-CoRN,
+given the huge amount of data. The <a
+href="http://helm.cs.unibo.it/">Helm project</a> provides interesting
+tools for presenting formalized mathematics on the web. To be able to
+present a theory/proof development, the files have to be
+documented. Therefore also <I>documenting</I> the repository is a
+focal point.
+
+<LI> Extending the library can be done with the existing tools for Coq
+(Proof General, PCoq). To attract mathematical users, a more
+mathematical input language (corresponding to a `mathematical
+vernacular') would be desirable. The repository can act as a test-bed
+for new interfaces.
+
+<LI> Building up a real library of real mathematics faces us with the
+current limitations of theorem provers, notably Coq. This concerns
+not only tactics for enhancing the proving process, but also more fundamental
+issues like the use of records, modules and coercions.
+
+<LI> Manage a big library of mathematics. At present, only <a
+href="http://www.mizar.org/">Mizar</a> has a really big library of
+formalized mathematics. Mizar is not distributed, and so isn't
+C-CoRN. Having a distributed library may be useful in the future.
+</UL>
+
+
+<P>
+
+<B>What</B> We formalize constructive mathematics in Coq. See the <a
+href="lib.html">library</a> for an overview.  Currently we have: a
+Constructive Algebraic Hierarchy (up to the reals), a Model of the
+Real Numbers, a proof of the Fundamental Theorem of Algebra, and a lot
+of Real Calculus.
+
+<P>
+
+<B>Who</B> See the <a href="people.html">people</a> page to see who
+has contributed to C-CoRN.
+
+</P>
+
+<div align="center"> Home <a href="history.html">[History]</a> <a href="people.html">[People]</a> 
+  <a href="documentation/toc.html">[On-line Documentation]</a> <a href="pub.html">[Publications]</a> 
+  <a href="lib.html">[Library]</a> <a href="download.html">[Download]</a> <a href="info.html">[Contact 
+  Information]</a> </div>
+</body>
+</html>
