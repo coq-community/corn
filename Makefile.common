@@ -107,13 +107,14 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 
 # COQMAP defines the mapping between physical and logical directories
 COQMAP = -R $(SRCDIR) $(LIBNAME)
-OTHERFLAGS = -dump-glob $(GLOBFILE) -I $(SRCDIR)/tactics $(COQMAP)
+OTHERFLAGS = -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = 
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
 COQOBJECTS := $(COQSOURCES:.v=.vo)
+COQGLOBS := $(COQSOURCES:.v=.glob)
 CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
@@ -209,11 +210,18 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@echo Compiling $<
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
+%.glob: %.vo
+
+$(GLOBFILE): $(COQGLOBS)
+	cat $(sed 's/\.v$/.glob/' < "$(DOCLIST)" ) > "$@"
+
 ifdef CoRN_MF_sub
 %.vo : %.v
 	@set -e; \
 	echo "Compiling $<"; \
-	exec $(COQC) $(COQFLAGS) $(COQCFLAGS) $<
+	GLOB="$(<:.v=.glob)"; \
+	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< && \
+	touch "$${GLOB}"
 else
 .PHONY: always
 
@@ -300,7 +308,7 @@ doc-pre : $(DOCLIST)
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre all
+doc-html : doc-pre $(GLOBFILE)
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
@@ -308,7 +316,7 @@ doc-html : doc-pre all
 doc : doc-ps doc-html
 
 clean : depclean binaries-clean lib-clean
-	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
+	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
         done
@@ -327,7 +335,7 @@ doc-clean :
 
 showcommands :
 	@echo Command used to compile FILE.v :
-	@echo "$(COQC) $(COQFLAGS) $(COQCFLAGS) FILE.v"
+	@echo "$(COQC) $(COQFLAGS) -dump-glob FILE.glob $(COQCFLAGS) FILE.v"
 	@echo
 	@echo Command used to compile FILE.ml :
 	@echo "$(OCAMLOPT) -c $(COQSRC) $(PP) FILE.ml"
