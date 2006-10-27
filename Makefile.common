@@ -55,8 +55,6 @@ PSDIR := $(SRCDIR)/doc
 # Name of file containing postscript documentation
 PSFILE := doc.ps
 
-# File that contains the dependencies
-DEPEND := $(SRCDIR)/.depend
 # File containing the partial order given by coqdep for documentation
 DOCDEPEND := $(SRCDIR)/.docdepend
 # File containing a list of files that must be processed by coqdoc
@@ -115,6 +113,7 @@ COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
 COQOBJECTS := $(COQSOURCES:.v=.vo)
 COQGLOBS := $(COQSOURCES:.v=.glob)
+DEPEND := $(COQSOURCES:.v=.d)
 CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
@@ -210,12 +209,13 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@echo Compiling $<
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
-%.glob: %.vo
-
-$(GLOBFILE): $(COQGLOBS)
-	cat $(sed 's/\.v$/.glob/' < "$(DOCLIST)" ) > "$@"
-
 ifdef CoRN_MF_sub
+%.glob: %.vo
+	true
+
+$(GLOBFILE): $(COQGLOBS) $(DOCLIST)
+	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+
 %.vo : %.v
 	@set -e; \
 	echo "Compiling $<"; \
@@ -225,7 +225,10 @@ ifdef CoRN_MF_sub
 else
 .PHONY: always
 
-%.vo : always
+$(GLOBFILE): always
+	exec $(MAKE) CoRN_MF_sub=1 "$@"
+
+%.vo %.glob: always
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -241,8 +244,7 @@ endif
 
 dep : $(DEPEND) $(DOCDEPEND)
 
-$(DEPEND) : $(COQSOURCES)
-	@echo Calculating dependencies
+%.d: %.v
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -252,50 +254,21 @@ $(DEPEND) : $(COQSOURCES)
 	    echo "$$($(REALPATH) $$(dirname "$$1"))/$$(basename "$$1")"; \
 	  fi \
 	}; \
-        if [ -f $@ ]; then ( IFS=$$' \t\n:'; \
-          for new_file in $?; do \
-              $(COQDEP) $(COQDEPFLAGS) "`canonicalise $$new_file`"; \
-          done; \
-	  while read binary source depends; do \
-            is_new_file=''; \
-            for new_file in $?; do \
-              if [ "$$source" == "`canonicalise $$new_file`" ]; then is_new_file='t'; break; fi ; \
-            done; \
-            if [ -z "$$is_new_file" ]; then \
-              is_current_source=''; \
-              for cur_source in $(COQSOURCES); do \
-                if [ "$$source" == "$$cur_source" ]; then is_current_source='t'; break; fi ; \
-              done; \
-              if [ -n "$$is_current_source" ]; then \
-                echo "$$binary: $$source $$depends"; \
-              fi; \
-            fi; \
-          done ) < $@ > $@.tmp && mv $@.tmp $@; \
-        else \
-	   $(COQDEP) $(COQDEPFLAGS) $(COQSOURCES) > "$@"; \
-        fi || ( RV=$$?; rm -f $@ $@.tmp; exit $${RV} )
-
-# TODO: This stuff must be updated to work with the new absolute paths.
-# Hair-pulling involved because of regexp meta-characters in paths
+	canon="`canonicalise $<`"; \
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$$(echo $${canon} | sed 's/\.v$$/.d/')"
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
-	@set -e; IFS=$$' \t\n:'; ( while read binary source depends; do \
-	  if [ -n "$${binary}" ] && ! echo "$${binary}" | egrep -q '^\./(devel|tactics)/'; then \
+	@set -e; IFS=$$' \t\n:'; cat $(DEPEND) | \
+	( while read binary source depends; do \
+	  if [ -n "$${binary}" ]; then \
 	    for depend in $${depends}; do \
-	      if ! echo "$${depend}" | egrep -q '^\./tactics/'; then \
-	        if echo "$${depend}" | egrep -q '^\./devel/'; then \
-	          ( echo 'ERROR: Things out of devel/ are not allowed to depend on devel/'; \
-		    echo "ERROR: but $${binary} depends on $${depend}" ) 1>&2 ; \
-		  exit 1; \
-	        else if echo "$${depend}" | egrep -q '\.vo$$'; then \
-	          echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
-	        fi; \
-		fi; \
+	      if echo "$${depend}" | egrep -q '\.vo$$'; then \
+	        echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
 	      fi; \
 	    done; \
 	  fi; \
-	done ) < $(DEPEND) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
+	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
 # Rules to create documentation depend on the whole compilation process
 # because they need the glob file to generate global references.
