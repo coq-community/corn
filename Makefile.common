@@ -315,7 +315,7 @@ doc-html : doc-pre $(GLOBFILE)
 
 doc : doc-ps doc-html
 
-clean : depclean binaries-clean lib-clean
+clean : depclean binaries-clean lib-clean doc-clean
 	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
@@ -327,7 +327,7 @@ clean : depclean binaries-clean lib-clean
 depclean : 
 	rm -f $(DEPEND) $(DOCDEPEND)
 
-distclean : clean doc-clean
+distclean : clean
 	for i in $(PRIVFILES); do rm -rf "$$i"; done
 
 doc-clean :
