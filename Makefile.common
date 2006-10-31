@@ -88,8 +88,6 @@ PSDIR := $(SRCDIR)/doc
 # Name of file containing postscript documentation
 PSFILE := doc.ps
 
-# File that contains the dependencies
-DEPEND := $(SRCDIR)/.depend
 # File containing the partial order given by coqdep for documentation
 DOCDEPEND := $(SRCDIR)/.docdepend
 # File containing a list of files that must be processed by coqdoc
@@ -140,13 +138,15 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 
 # COQMAP defines the mapping between physical and logical directories
 COQMAP = -R $(SRCDIR) $(LIBNAME)
-OTHERFLAGS = -dump-glob $(GLOBFILE) -I $(SRCDIR)/tactics $(COQMAP)
+OTHERFLAGS = -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = 
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
 COQOBJECTS := $(COQSOURCES:.v=.vo)
+COQGLOBS := $(COQSOURCES:.v=.glob)
+DEPEND := $(COQSOURCES:.v=.d)
 CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
@@ -243,14 +243,25 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
 ifdef CoRN_MF_sub
+%.glob: %.vo
+	true
+
+$(GLOBFILE): $(COQGLOBS) $(DOCLIST)
+	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+
 %.vo : %.v
 	@set -e; \
 	echo "Compiling $<"; \
-	exec $(COQC) $(COQFLAGS) $(COQCFLAGS) $<
+	GLOB="$(<:.v=.glob)"; \
+	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< && \
+	touch "$${GLOB}"
 else
 .PHONY: always
 
-%.vo : always
+$(GLOBFILE): always
+	exec $(MAKE) CoRN_MF_sub=1 "$@"
+
+%.vo %.glob: always
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -266,8 +277,7 @@ endif
 
 dep : $(DEPEND) $(DOCDEPEND)
 
-$(DEPEND) : $(COQSOURCES)
-	@echo Calculating dependencies
+%.d: %.v
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -277,50 +287,21 @@ $(DEPEND) : $(COQSOURCES)
 	    echo "$$($(REALPATH) $$(dirname "$$1"))/$$(basename "$$1")"; \
 	  fi \
 	}; \
-        if [ -f $@ ]; then ( IFS=$$' \t\n:'; \
-          for new_file in $?; do \
-              $(COQDEP) $(COQDEPFLAGS) "`canonicalise $$new_file`"; \
-          done; \
-	  while read binary source depends; do \
-            is_new_file=''; \
-            for new_file in $?; do \
-              if [ "$$source" == "`canonicalise $$new_file`" ]; then is_new_file='t'; break; fi ; \
-            done; \
-            if [ -z "$$is_new_file" ]; then \
-              is_current_source=''; \
-              for cur_source in $(COQSOURCES); do \
-                if [ "$$source" == "$$cur_source" ]; then is_current_source='t'; break; fi ; \
-              done; \
-              if [ -n "$$is_current_source" ]; then \
-                echo "$$binary: $$source $$depends"; \
-              fi; \
-            fi; \
-          done ) < $@ > $@.tmp && mv $@.tmp $@; \
-        else \
-	   $(COQDEP) $(COQDEPFLAGS) $(COQSOURCES) > "$@"; \
-        fi || ( RV=$$?; rm -f $@ $@.tmp; exit $${RV} )
-
-# TODO: This stuff must be updated to work with the new absolute paths.
-# Hair-pulling involved because of regexp meta-characters in paths
+	canon="`canonicalise $<`"; \
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$$(echo $${canon} | sed 's/\.v$$/.d/')"
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
-	@set -e; IFS=$$' \t\n:'; ( while read binary source depends; do \
-	  if [ -n "$${binary}" ] && ! echo "$${binary}" | egrep -q '^\./(devel|tactics)/'; then \
+	@set -e; IFS=$$' \t\n:'; cat $(DEPEND) | \
+	( while read binary source depends; do \
+	  if [ -n "$${binary}" ]; then \
 	    for depend in $${depends}; do \
-	      if ! echo "$${depend}" | egrep -q '^\./tactics/'; then \
-	        if echo "$${depend}" | egrep -q '^\./devel/'; then \
-	          ( echo 'ERROR: Things out of devel/ are not allowed to depend on devel/'; \
-		    echo "ERROR: but $${binary} depends on $${depend}" ) 1>&2 ; \
-		  exit 1; \
-	        else if echo "$${depend}" | egrep -q '\.vo$$'; then \
-	          echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
-	        fi; \
-		fi; \
+	      if echo "$${depend}" | egrep -q '\.vo$$'; then \
+	        echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
 	      fi; \
 	    done; \
 	  fi; \
-	done ) < $(DEPEND) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
+	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
 # Rules to create documentation depend on the whole compilation process
 # because they need the glob file to generate global references.
@@ -333,15 +314,15 @@ doc-pre : $(DOCLIST)
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre all
+doc-html : doc-pre $(GLOBFILE)
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
 
 doc : doc-ps doc-html
 
-clean : depclean binaries-clean lib-clean
-	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
+clean : depclean binaries-clean lib-clean doc-clean
+	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
         done
@@ -352,7 +333,7 @@ clean : depclean binaries-clean lib-clean
 depclean : 
 	rm -f $(DEPEND) $(DOCDEPEND)
 
-distclean : clean doc-clean
+distclean : clean
 	for i in $(PRIVFILES); do rm -rf "$$i"; done
 
 doc-clean :
@@ -360,7 +341,7 @@ doc-clean :
 
 showcommands :
 	@echo Command used to compile FILE.v :
-	@echo "$(COQC) $(COQFLAGS) $(COQCFLAGS) FILE.v"
+	@echo "$(COQC) $(COQFLAGS) -dump-glob FILE.glob $(COQCFLAGS) FILE.v"
 	@echo
 	@echo Command used to compile FILE.ml :
 	@echo "$(OCAMLOPT) -c $(COQSRC) $(PP) FILE.ml"
