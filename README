@@ -58,14 +58,6 @@ of the following directories:
  - reals
  - transc
 
-If you obtained C-CoRN via CVS, you will also have a directory named
-devel/.
-
-Important note: if you plan to regularly update C-CoRN, you should
-keep any files you work on under devel/ or out of the CoRN tree
-altogether.  This will ensure that subsequent updates will not
-overwrite your developments.
-
 COMPILING
 ---------
 
@@ -90,7 +82,7 @@ allowed:
  depclean     -> forget all computed dependencies. Useful to force a
                  full recomputation of the dependencies.
  distclean    -> removes things that should not be distributed from a
-                 CVS checkout.
+                 VCS checkout.
  doc          -> produces both postscript and html documentation
  doc-clean    -> removes all documentation files
  doc-html     -> produces only html documentation
@@ -109,11 +101,10 @@ are recognized.
                  empty), you _must_ force a complete recompilation of the
                  dependencies (make depclean). For example, to compile all
                  files in the devel/ sub-directory and all its
-                 subdirectories (like devel=yes did before) use
-                 devel=./devel . To compile files in devel/lcf and
-                 devel/foo, use devel="./devel/lcf ./devel/foo" . Yes, this
-                 means that directories containing a space in their name
-                 won't work.
+                 subdirectories use devel=./devel . To compile files
+                 in devel/lcf and devel/foo, use devel="./devel/lcf
+                 ./devel/foo" . Yes, this means that directories
+                 containing a space in their name won't work.
  OPT=[option] -> adds [option] to the Coq command line
  OCAMLC=file
  OCAMLOPT=file
@@ -150,8 +141,8 @@ OTHERS
 ------
 
 More information can be found at the C-CoRN page,
-http://c-corn.cs.kun.nl/
-For any questions, comments, bug reports or other feel free to e-mail
-lcf@cs.kun.nl.
+http://c-corn.cs.ru.nl/
+For any questions, comments, bug reports or other feel free to contact
+us; contact information is in the doc/www/info.html file.
 
- LocalWords:  Nijmegen CoRN Coq CVS
+ LocalWords:  Nijmegen CoRN Coq VCS
