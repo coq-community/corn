@@ -65,8 +65,8 @@ Definition QZERO := Qmake 0 1.
 
 Definition QONE := Qmake 1 1.
 
-Definition Qinv (x : Q) (x_ : ~(Qeq x QZERO)) :=
-  Qmake (Zsgn (Qnum x) * Qden x) (posZ (Qnum x)).
+Definition Qinv (x : Q) (x_ : ~(Qeq x QZERO)) := Qinv x.
+
 End Q.
 
 Infix "/=" := Qap (no associativity, at level 70) : Q_scope.
@@ -546,65 +546,18 @@ Qed.
 Lemma Qinv_strext : forall (x y : Q) x_ y_,
  ~(Qinv x x_==Qinv y y_) -> ~(x==y).
 Proof.
-red in |- *.
-intros x y.
-case x.
-intros x1 p1.
-case y.
-intros y1 q1.
-intros x_ y_ H.
-intro H0.
-apply H.
-
-unfold Qeq in H0.
-unfold Qeq in |- *.
-simpl in H0.
-simpl in |- *.
-generalize (Q_non_zero _ x_).
-generalize (Q_non_zero _ y_).
-simpl in |- *.
-intros H1 H2.
-repeat rewrite <- Zmult_assoc.
-apply Zsgn_5.
-
-apply Zgt_not_eq; auto with zarith.
-apply Zgt_not_eq; auto with zarith.
-
-rewrite Zmult_permute.
-rewrite posZ_Zsgn.
-rewrite Zmult_permute.
-rewrite posZ_Zsgn.
-rewrite Zmult_comm.
-rewrite H0.
-apply Zmult_comm.
-assumption.
-assumption.
+firstorder with Qinv_comp.
 Qed.
 
 Lemma Qinv_is_inv : forall (x : Q) (Hx : x/=QZERO),
  (x*Qinv x Hx==QONE) /\ (Qinv x Hx*x==QONE).
-intro x.
-case x.
-intros x1 p1.
-unfold Qap, Qeq in |- *.
-unfold Qinv in |- *.
-unfold Qmult, Qnum, Qden, QONE, QZERO in |- *.
-repeat rewrite Zmult_1_l.
-simpl in |- *.
-repeat rewrite Zmult_1_r.
-intros Hx.
-assert ((x1 * (Zsgn x1 * p1))%Z = (p1 * posZ x1)%positive).
-rewrite Pmult_comm.
-change ((x1 * (Zsgn x1 * p1))%Z = (posZ x1 * p1)%Z) in |- *.
-rewrite Zmult_permute.
-rewrite Zmult_assoc.
-rewrite posZ_Zsgn2.
-trivial.
-red in |- *; intros.
-elim Hx; assumption.
-split; auto.
-rewrite Zmult_comm.
-rewrite Pmult_comm. auto.
+intros x Hx.
+split.
+apply (Qmult_inv_r x).
+assumption.
+rewrite Qmult_comm.
+apply (Qmult_inv_r x).
+assumption.
 Qed.
 
 
