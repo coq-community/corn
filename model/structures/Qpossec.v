@@ -105,16 +105,7 @@ intro i.
 set (i0 := CZlt_to 0 (Qnum x * 1%positive) i) in *.
 rewrite Zmult_1_r in i0.
 generalize i0.
-case (Qnum x).
-intuition.
-
-unfold Zsgn in |- *.
-rewrite Zmult_1_l.
-intuition.
-
-unfold Zsgn in |- *.
-intros p H0.
-intuition.
+destruct x as [[num|x|num] den]; auto.
 Qed.
 
 (** ***Special multiplication
