@@ -255,7 +255,8 @@ dep : $(DEPEND) $(DOCDEPEND)
 	  fi \
 	}; \
 	canon="`canonicalise $<`"; \
-	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$$(echo $${canon} | sed 's/\.v$$/.d/')"
+	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
