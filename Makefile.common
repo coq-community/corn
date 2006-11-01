@@ -118,6 +118,11 @@ CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
 
+COQCDEP_EX:=$(shell [ -x "$(COQDEP)" ] && [ -x "$(COQC)" ]; echo "$$?")
+ifneq "$(COQCDEP_EX)" "0"
+$(error coqc or coqdep not found or not executable. Please set COQTOP to the appropriate value)
+endif
+
 # Declaration of rules that have no target (i.e. .PHONY rules)
 .PHONY : dep clean depclean distclean doc-clean showcommands doc-pre binaries binaries-clean lib-clean human ide makefiles
 
