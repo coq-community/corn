@@ -6,6 +6,9 @@
 ifndef TOPDIR
  $(error "You need to tell me what the top-level directory of CoRN is")
 endif
+ifndef COQTOP
+ $(error "You need to tell me where Coq is installed")
+endif
 
 ifeq ($(TOPDIR),.)
  SRCDIR := $(shell pwd)
