@@ -221,7 +221,7 @@ ifdef CoRN_MF_sub
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
-%.vo : %.v
+%.vo : %.v | %.d
 	@set -e; \
 	echo "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
