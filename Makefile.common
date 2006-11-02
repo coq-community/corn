@@ -39,6 +39,9 @@
 ifndef TOPDIR
  $(error "You need to tell me what the top-level directory of CoRN is")
 endif
+ifndef COQTOP
+ $(error "You need to tell me where Coq is installed")
+endif
 
 ifeq ($(TOPDIR),.)
  SRCDIR := $(shell pwd)
@@ -151,6 +154,11 @@ CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
 
+COQCDEP_EX:=$(shell [ -x "$(COQDEP)" ] && [ -x "$(COQC)" ]; echo "$$?")
+ifneq "$(COQCDEP_EX)" "0"
+$(error coqc or coqdep not found or not executable. Please set COQTOP to the appropriate value)
+endif
+
 # Declaration of rules that have no target (i.e. .PHONY rules)
 .PHONY : dep clean depclean distclean doc-clean showcommands doc-pre binaries binaries-clean lib-clean human ide makefiles
 
@@ -249,7 +257,7 @@ ifdef CoRN_MF_sub
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
-%.vo : %.v
+%.vo : %.v | %.d
 	@set -e; \
 	echo "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
@@ -288,7 +296,8 @@ dep : $(DEPEND) $(DOCDEPEND)
 	  fi \
 	}; \
 	canon="`canonicalise $<`"; \
-	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$$(echo $${canon} | sed 's/\.v$$/.d/')"
+	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
