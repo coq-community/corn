@@ -220,7 +220,7 @@ ifdef CoRN_MF_sub
 	true
 
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
-	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
 %.vo : %.v | %.d
 	@set -e; \
