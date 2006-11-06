@@ -1,5 +1,3 @@
-# $Id: Makefile.common,v 1.28 2006/02/14 10:17:46 lionelm Exp $
-
 ## Prologue. Don't touch unless you know what you are doing.
 ## User-changeable values after prologue
 
@@ -218,18 +216,14 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
 ifdef CoRN_MF_sub
-%.glob: %.vo
-	true
-
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
-	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
-%.vo : %.v | %.d
+%.vo %.glob : %.v | %.d
 	@set -e; \
 	echo "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
-	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< && \
-	touch "$${GLOB}"
+	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
 else
 .PHONY: always
 
