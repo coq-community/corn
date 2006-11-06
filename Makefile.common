@@ -251,18 +251,14 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
 ifdef CoRN_MF_sub
-%.glob: %.vo
-	true
-
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
-	cat $(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
-%.vo : %.v | %.d
+%.vo %.glob : %.v | %.d
 	@set -e; \
 	echo "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
-	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< && \
-	touch "$${GLOB}"
+	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
 else
 .PHONY: always
 
