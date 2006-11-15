@@ -37,6 +37,7 @@ LIBDIR := $(SRCDIR)/lib
 TOPLEVELNAME := CoRNtop
 COMPILERNAME := CoRNc
 IDENAME := CoRNide
+INTERFACENAME := CoRN-interface
 
 # Library name used internally by coq
 LIBNAME ?= CoRN
@@ -70,7 +71,7 @@ GLOBFILE = $(SRCDIR)/.glob
 # Various executables we build when we need a custom Coq image.
 # (Thus currently not.)
 TOPLEVEL := $(LIBDIR)/$(TOPLEVELNAME)
-BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME)
+BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME) $(BINDIR)/$(INTERFACENAME)
 LIBEXECS:=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
 IDELIB:=$(LIBDIR)/$(IDENAME)
 IDEBIN:=$(BINDIR)/$(IDENAME)
@@ -191,6 +192,13 @@ $(BINDIR)/$(TOPLEVELNAME): | $(BINDIR)
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec "$(COQBIN)/coqtop" $(COQFLAGS) "$$@"' \
+	  ) > $@; chmod +x $@
+
+$(BINDIR)/$(INTERFACENAME): | $(BINDIR)
+	@echo Building interface top-level startup script
+	@set -e; ( \
+	  echo '#!/bin/sh'; \
+	  echo 'exec "$(COQBIN)/coq-interface" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 $(LIBDIR)/$(COMPILERNAME): | $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
