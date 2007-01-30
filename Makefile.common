@@ -266,7 +266,9 @@ dep : $(DEPEND) $(DOCDEPEND)
 	}; \
 	canon="`canonicalise $<`"; \
 	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
-	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" \
+	| sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo \1.glob:/' \
+	> "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies

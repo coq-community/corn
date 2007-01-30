@@ -1,6 +1,6 @@
 (* A lexer for Coq files dependencies
  *
- * Copyright © 2004 Lionel Elie Mamane <lionel@mamane.lu>
+ * Copyright Â© 2004-2007 Lionel Elie Mamane <lionel@mamane.lu>
  *
  * To the maximum extent permitted by law, I abandon all my copyrights
  * on the interface (.mli) file generated from this file by the OCaml
@@ -37,6 +37,7 @@ let basename = [ ^ ' ' '\t' ':' '\n' ]+
 let eol = '\n'
 let coqSource = basename ".v"
 let coqBinary = basename ".vo"
+let coqGlob   = basename ".glob"
 let ocamlBinary =  basename ".cmo"
 
 rule token = parse
@@ -45,6 +46,7 @@ rule token = parse
   | separator+          { lex_debug_print "SEP"; Separator }
   | ocamlBinary as name { lex_debug_print "OBIN: "; lex_debug_print name; Binary (OCamlBinaryFile name) }
   | coqBinary as name   { lex_debug_print "CBIN: "; lex_debug_print name; Binary (CoqBinaryFile name) }
+  | coqGlob   as name   { lex_debug_print "CGLB: "; lex_debug_print name; Binary (CoqGlobalFile name) }
   | coqSource as name   { lex_debug_print "CSRC: "; lex_debug_print name; Source (CoqSourceFile name) }
   | eof                 { lex_debug_print "EOF"; if !seen_eof then raise Eof
                                                             else (seen_eof := true; EOL ) }
