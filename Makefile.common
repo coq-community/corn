@@ -166,11 +166,11 @@ binaries: $(BINARIES)
 
 binaries-clean:
 	rm -f $(BINARIES) $(IDEBIN)
-	if [ -a "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
+	if [ -d "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
 
 lib-clean:
 	rm -f $(LIBEXECS) $(IDELIB)
-	if [ -a "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
+	if [ -d "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
 
 $(IDELIB): $(CMX) | $(LIBDIR)
 	@echo Building coq-ide top-level $(subst $(SRCDIR)/,, $@)
