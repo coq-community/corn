@@ -287,12 +287,12 @@ $(DOCDEPEND) : $(DEPEND)
 $(DOCLIST) : $(DOCDEPEND) $(SRCDIR)/doc/extradeps
 	( ( while read small big; do echo "$$( $(REALPATH) $(SRCDIR)/$${small} ) $$( $(REALPATH) $(SRCDIR)/$${big} )"; done ) < $(SRCDIR)/doc/extradeps ; cat $(DOCDEPEND) ) | tsort > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
-doc-pre : $(DOCLIST)
+doc-pre : $(DOCLIST) $(GLOBFILE)
 
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre $(GLOBFILE)
+doc-html : doc-pre
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
