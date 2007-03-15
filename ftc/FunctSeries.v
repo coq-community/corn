@@ -1,4 +1,38 @@
-(* $Id: FunctSeries.v,v 1.6 2004/04/23 10:00:58 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export FunctSequence.
 Require Export Series.
@@ -421,7 +455,7 @@ Lemma Fun_Series_Sum_scal : forall H' : fun_series_convergent _ _ Hab (fun n => 
  Feq I (Fun_Series_Sum H') (H{*}Fun_Series_Sum convF).
 elim convF; intros contF convF'.
 intros.
-unfold I in |- *; FEQ. rename X into H0.
+unfold I in |- *; FEQ. try rename X into H0.
 cut
  (convergent
     (fun n : nat =>
@@ -489,7 +523,7 @@ Qed.
 Lemma Fun_Series_Sum_inv : forall H : fun_series_convergent _ _ Hab (fun n => {--} (f n)),
  Feq I (Fun_Series_Sum H) {--} (Fun_Series_Sum convF).
 intros.
-FEQ. rename X into H0.
+FEQ. try rename X into H0.
 cut
  (convergent
     (fun n : nat =>
@@ -545,7 +579,7 @@ Qed.
 Lemma fun_series_conv : forall H H',
  conv_fun_seq' a b Hab (fun_seq_part_sum f) (Fun_Series_Sum convF) H H'.
 intros.
-inversion_clear convF. rename X into H0.
+inversion_clear convF. try rename X into H0.
 apply
  conv_fun_seq'_wdr
   with
@@ -557,7 +591,7 @@ Qed.
 
 Lemma Fun_Series_Sum_cont : Continuous_I Hab (Fun_Series_Sum convF).
 intros.
-inversion_clear convF. rename X into H.
+inversion_clear convF. try rename X into H.
 eapply Continuous_I_wd.
 apply Feq_symmetric;
  apply

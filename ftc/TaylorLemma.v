@@ -1,4 +1,38 @@
-(* $Id: TaylorLemma.v,v 1.8 2004/04/23 10:01:01 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export Rolle.
 
@@ -156,7 +190,7 @@ Lemma Taylor_lemma3' : forall n Hf, ext_fun_seq' (funct_i' n Hf).
 intros n Hf i j H H0 H' x y H1 H2.
 elim H2; intros.
 simpl in a0, b0.
-clear b0; inversion_clear a0.
+clear b0; inversion_clear a0 as (X,X0).
 inversion_clear X; repeat split.
 astepr x; auto.
 astepl x; auto.
@@ -456,7 +490,7 @@ Lazy_Included.
 apply eq_imp_Feq.
 Lazy_Included.
 Lazy_Included.
-intros.
+intros x X0 Hx Hx'.
 simpl in Hx, Hx'; simpl in |- *.
 set (fiSp1 := fi n Hf (S p) Hi') in *.
 set (fiSp2 := fi (S n) Hf' (S p) (lt_n_S p (S n) (lt_5 (S p) (S n) Hi')))
@@ -584,14 +618,14 @@ apply
   with (Taylor_seq'_aux n H1{+}funct_i' _ Hf _ (lt_n_Sn (S n))).
 unfold Taylor_seq'_aux in |- *.
 apply eq_imp_Feq.
-repeat (split; auto). rename X into H2.
+repeat (split; auto). try rename X into H2.
 apply FSumx_pred'.
-red in |- *; intros. rename X into H6.
+red in |- *; intros. try rename X into H6.
 exact (Taylor_lemma3' _ _ _ _ H3 _ _ _ _ H4 H6).
 intros; simpl in |- *; repeat (split; auto).
-repeat (split; auto). rename X into H2.
+repeat (split; auto). try rename X into H2.
 apply FSumx_pred'.
-red in |- *; intros. rename X into H6.
+red in |- *; intros. try rename X into H6.
 exact (Taylor_lemma3' _ _ _ _ H3 _ _ _ _ H4 H6).
 intros; simpl in |- *; repeat (split; auto).
 intros x H2 Hx Hx'; simpl in |- *.
@@ -742,21 +776,21 @@ split; split; split; simpl in |- *; auto.
 2: split; split; auto; apply TL_compact_b.
 apply FSumx_pred'; intros.
 2: apply TL_b_i'.
-red in |- *; intros. rename X into H6.
+red in |- *; intros. try rename X into H6.
 exact (Taylor_lemma3' _ _ _ _ H3 _ _ _ _ H4 H6).
 split; split; split; simpl in |- *; auto.
 3: split; split.
 2: split; split; auto; apply TL_compact_a.
 apply FSumx_pred'; intros.
 2: apply TL_a_i'.
-red in |- *; intros. rename X into H5.
+red in |- *; intros. try rename X into H5.
 exact (Taylor_lemma3' _ _ _ _ H2 _ _ _ _ H3 H5).
 split; split; split; simpl in |- *; auto.
 3: split; split.
 2: split; split; auto; apply compact_inc_rht.
 apply FSumx_pred'; intros.
 2: apply TL_x_i'.
-red in |- *; intros. rename X into H4.
+red in |- *; intros. try rename X into H4.
 exact (Taylor_lemma3' _ _ _ _ H1 _ _ _ _ H2 H4).
 unfold I in |- *; apply compact_inc_rht.
 split; split; split; simpl in |- *; auto.
@@ -764,7 +798,7 @@ split; split; split; simpl in |- *; auto.
 2: split; split; auto; apply compact_inc_lft.
 apply FSumx_pred'; intros.
 2: apply TL_x_i'.
-red in |- *; intros. rename X into H3.
+red in |- *; intros. try rename X into H3.
 exact (Taylor_lemma3' _ _ _ _ H0 _ _ _ _ H1 H3).
 unfold I in |- *; apply compact_inc_lft.
 Qed.

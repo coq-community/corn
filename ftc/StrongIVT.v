@@ -1,4 +1,38 @@
-(* $Id: StrongIVT.v,v 1.5 2004/04/23 10:01:01 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export WeakIVT.
 Require Export CalculusTheorems.
@@ -428,7 +462,7 @@ Lemma IVT_dec : forall I F, Continuous I F -> forall a b Ha Hb, F a Ha [#] F b H
  I a -> I b -> (forall x y, I x -> I y -> x [<] y -> forall Hx Hy, F y Hy [<] F x Hx) ->
  forall y, Compact (Min_leEq_Max (F a Ha) (F b Hb)) y ->
  {x : IR | Compact (Min_leEq_Max a b) x | forall Hx, F x Hx [=] y}.
-intros.
+intros. try rename X4 into H.
 elim
  IVT_inc
   with
@@ -448,10 +482,10 @@ Contin.
 simpl in |- *; apply un_op_strext_unfolded with (cg_inv (c:=IR)).
 astepl (F a Ha); astepr (F b Hb); auto.
 intros; simpl in |- *; apply inv_resp_less; auto.
-inversion_clear X4; split; simpl in |- *; unfold MIN.
+inversion_clear H as (H0,H1); split; simpl in |- *; unfold MIN.
 apply inv_resp_leEq.
 eapply leEq_wdr.
-apply H0.
+apply H1.
 apply Max_wd_unfolded; algebra.
 astepr ( [--][--] (Max [--] (F a Ha) [--] (F b Hb))).
 apply inv_resp_leEq; auto.

@@ -1,4 +1,38 @@
-(* $Id: NRootCC.v,v 1.9 2004/04/23 10:00:55 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 (** printing sqrt_Half %\ensuremath{\sqrt{\frac12}}% *)
 (** printing sqrt_I %\ensuremath{\sqrt{\imath}}% *)
@@ -113,7 +147,6 @@ intros n' H.
 rewrite H.
 exists (n' * n' + n').
 unfold double in |- *.
-rewrite S_to_plus_one.
 ring.
 Qed.
 

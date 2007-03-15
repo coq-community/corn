@@ -1,4 +1,38 @@
-(* $Id: Exponential.v,v 1.7 2004/04/23 10:01:07 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export TaylorSeries.
 
@@ -248,7 +282,8 @@ apply Feq_imp_eq with realline.
   exists (a[+]z); exists (b[+]z[+]One).
   cut (a[+]z [<] b[+]z[+]One).
   intro H3.
-  exists H3; repeat split; simpl in |- *; elim X; try intros H5 H6.
+  exists H3; repeat split; simpl in |- *; try rename H4 into X; 
+    elim X; try intros H5 H6.
    apply plus_resp_leEq; auto.
   apply leEq_transitive with (b[+]z).
    apply plus_resp_leEq; auto.
@@ -697,7 +732,7 @@ elim H2; intros H3 H4; apply recip_resp_leEq; auto.
 apply less_leEq_trans with x; auto.
 
 apply included_imp_Continuous with (openl Zero);
- [ apply log_defn_lemma | red in |- *; intros ].
+ [ apply log_defn_lemma | red in |- *; intros x0 X ].
 inversion_clear X; simpl in |- *; apply less_leEq_trans with x; auto.
 Qed.
 

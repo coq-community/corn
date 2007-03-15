@@ -1,4 +1,38 @@
-(* $Id: MoreIntegrals.v,v 1.6 2004/04/23 10:00:59 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export Integral.
 Require Export MoreFunctions.
@@ -699,10 +733,10 @@ Qed.
 Lemma Integral_eq_zero : forall a b Hab (F : PartIR) contF x, Compact Hab x ->
  (forall Hx, Zero [<] F x Hx) -> (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) ->
  Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF [=] Zero -> a [=] b.
-intros.
+intros a b Hab F contF x H X H0 H1.
 apply not_ap_imp_eq; intro.
 apply less_irreflexive_unfolded with (x := ZeroR).
 apply less_wdr with (AbsIR (Integral contF)).
 2: Step_final (AbsIR Zero).
-apply Integral_ap_zero with x (contin_imp_inc _ _ _ _ contF x X); auto.
+apply Integral_ap_zero with x (contin_imp_inc _ _ _ _ contF x H); auto.
 Qed.

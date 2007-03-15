@@ -1,4 +1,38 @@
-(* $Id: Zsec.v,v 1.7 2004/07/13 14:56:45 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 (** printing {#Z} %\ensuremath{\mathrel\#_{\mathbb Z}}% *)
 
@@ -187,38 +221,10 @@ Lemma a_very_specific_lemma2 : forall a b c d s r t u : Z,
  (a * r)%Z = (b * s)%Z -> (c * u)%Z = (d * t)%Z ->
  ((a * t + c * s) * (r * u))%Z = ((b * u + d * r) * (s * t))%Z.
 Proof.
- intros.
- ring ((a * t + c * s) * (r * u))%Z.
- ring ((b * u + d * r) * (s * t))%Z.
- apply
-  (f_equal2 Zplus (x1:=(u * (r * (c * s)))%Z) (y1:=(
-     t * (s * (d * r)))%Z) (x2:=(u * (r * (t * a)))%Z)
-     (y2:=(t * (s * (u * b)))%Z)).   
- 
- rewrite Zmult_permute with (n := r) (m := c) (p := s).
- rewrite Zmult_assoc with (n := u) (m := c) (p := (r * s)%Z).
- rewrite Zmult_permute with (n := s) (m := d) (p := r).
- rewrite Zmult_assoc with (n := t) (m := d) (p := (s * r)%Z).              
- rewrite Zmult_comm with (n := u) (m := c).
- rewrite Zmult_comm with (n := t) (m := d).
- rewrite Zmult_comm with (n := s) (m := r).
- apply
-  (f_equal2 Zmult (x1:=(c * u)%Z) (y1:=(d * t)%Z) (x2:=(
-     r * s)%Z) (y2:=(r * s)%Z)).
- assumption.
- reflexivity.
- rewrite Zmult_permute with (n := r) (m := t) (p := a).
- rewrite Zmult_assoc with (n := u) (m := t) (p := (r * a)%Z).
- rewrite Zmult_permute with (n := s) (m := u) (p := b).
- rewrite Zmult_assoc with (n := t) (m := u) (p := (s * b)%Z).              
- rewrite Zmult_comm with (n := r) (m := a).
- rewrite Zmult_comm with (n := t) (m := u).
- rewrite Zmult_comm with (n := s) (m := b).
- apply
-  (f_equal2 Zmult (x1:=(u * t)%Z) (y1:=(u * t)%Z) (x2:=(
-     a * r)%Z) (y2:=(b * s)%Z)).
- reflexivity.
- assumption.
+intros.
+replace ((a * t + c * s) * (r * u))%Z with (a * r * t * u + c * u * s * r)%Z
+  by ring.
+rewrite H in |- *; rewrite H0 in |- *; ring.
 Qed.
 
 
@@ -336,45 +342,18 @@ apply Zlt_gt.
 apply Zgt_mult_conv_absorb_l with (a := b).
 assumption.
 
-rewrite Zmult_permute with (m := a).
-rewrite Zmult_comm with (n := n).
-rewrite Zmult_permute with (n := a).
-rewrite Zmult_assoc.
-rewrite Zmult_assoc with (p := m).
-rewrite Zmult_assoc with (p := m).
-rewrite Zmult_permute with (p := c).
-rewrite Zmult_comm with (m := c).
-rewrite Zmult_permute with (m := c).
-rewrite Zmult_assoc with (n := c).
-rewrite <- Zmult_assoc with (m := b).
-assumption.
+replace (b * (n * (a * p)))%Z with (b * p * (a * n))%Z by  ring.
+replace (b * (n * (c * m)))%Z with (c * n * (b * m))%Z by  ring; auto.
 
 rewrite <- H0.
-rewrite <- Zmult_assoc with (n := b).
-rewrite <- Zmult_assoc with (n := b).
-apply Zlt_conv_mult_l with (x := b).
-assumption.
+auto.
 
-apply Zlt_reg_mult_l with (x := p). 
-auto with zarith.
-assumption.
-
-rewrite <- Zmult_assoc with (n := b).
-rewrite <- Zmult_assoc with (n := b).
-apply Zlt_conv_mult_l with (x := b).
-assumption.
-
-apply Zlt_reg_mult_l with (x := p). 
-auto with zarith.
-assumption.
+apply Zlt_conv_mult_l;trivial.
 
 apply Zgt_lt.
-replace 0%Z with (b * 0)%Z.
-apply Zlt_conv_mult_l with (x := b).
-assumption.
-
+replace 0%Z with (b * 0)%Z by  ring.
+apply Zlt_conv_mult_l; trivial.
 apply Zgt_lt.
-auto with zarith.
 auto with zarith.
 
 (* y>0 *)
@@ -393,49 +372,13 @@ apply Zlt_gt.
 assumption.
 
 apply Zlt_gt.
-rewrite Zmult_permute with (m := a).
-rewrite Zmult_comm with (n := n).
-rewrite Zmult_permute with (n := a).
-rewrite Zmult_assoc.
-rewrite Zmult_assoc with (p := m).
-rewrite Zmult_assoc with (p := m).
-rewrite Zmult_permute with (p := c).
-rewrite Zmult_comm with (m := c).
-rewrite Zmult_permute with (m := c).
-rewrite Zmult_assoc with (n := c).
-rewrite <- Zmult_assoc with (m := b).
-assumption.
+replace (b * (n * (a * p)))%Z with (b * p * (a * n))%Z by  ring.
+replace (b * (n * (c * m)))%Z with (c * n * (b * m))%Z by  ring; auto.
 
 rewrite <- H0.
-rewrite <- Zmult_assoc with (n := b).
-rewrite <- Zmult_assoc with (n := b).
-apply Zlt_reg_mult_l with (x := b).
-apply Zlt_gt.
-assumption.
+auto.
 
-apply Zlt_reg_mult_l with (x := p). 
-auto with zarith.
-assumption.
+apply Zlt_reg_mult_l; auto.
 
-rewrite <- Zmult_assoc with (n := b).
-rewrite <- Zmult_assoc with (n := b).
-apply Zlt_reg_mult_l with (x := b).
-apply Zlt_gt.
-assumption.
-
-apply Zlt_reg_mult_l with (x := p). 
-auto with zarith.
-assumption.
-
-apply Zlt_gt.
-replace 0%Z with (b * 0)%Z.
-apply Zlt_reg_mult_l with (x := b).
-apply Zlt_gt.
-assumption.
-
-apply Zgt_lt.
-auto with zarith.
-
-rewrite Zmult_0_r.
-trivial.
+apply Zmult_gt_0_compat; auto with zarith.
 Qed.

@@ -1,4 +1,38 @@
-(* $Id: MoreIntervals.v,v 1.6 2004/04/23 10:00:59 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export NthDerivative.
 
@@ -229,7 +263,7 @@ exists c; split; [ apply leEq_reflexive | auto ].
 Qed.
 
 Lemma nonvoid_char : forall (I : interval) (x : IR), I x -> nonvoid I.
-intro; elim I; simpl in |- *; intros; auto; inversion_clear X.
+intro; induction I; simpl in |- *; intros x H; auto; inversion_clear H.
 apply less_transitive_unfolded with x; auto.
 apply less_leEq_trans with x; auto.
 apply leEq_less_trans with x; auto.
@@ -258,8 +292,8 @@ Some nice characterizations of inclusion:
 
 Lemma compact_included : forall a b Hab (I : interval),
  I a -> I b -> included (compact a b Hab) I.
-simple induction I; red in |- *; simpl in |- *; intros; try inversion_clear X;
- try inversion_clear X0; try inversion_clear X1.
+induction I; red in |- *; simpl in |- *; intros X X0 x X1; 
+ try inversion_clear X; try inversion_clear X0; try inversion_clear X1.
 auto.
 apply less_leEq_trans with a; auto.
 apply leEq_less_trans with b; auto.
@@ -273,7 +307,8 @@ Qed.
 
 Lemma included_interval' : forall (I : interval) x y z w, I x -> I y -> I z -> I w ->
  forall H, included (compact (Min x z) (Max y w) H) I.
-intro I; elim I; simpl in |- *; intros; red in |- *; intros t Ht;
+intros I x y z w; induction I; simpl in |- *; intros X X0 X1 X2 H; 
+ red in |- *; intros t Ht;
  inversion_clear Ht; simpl in |- *; try inversion_clear X;
  try inversion_clear X0; try inversion_clear X1; try inversion_clear X2;
  try split.
@@ -315,8 +350,8 @@ Finally, all intervals are characterized by well defined predicates.
 *)
 
 Lemma iprop_wd : forall I : interval, pred_wd _ I.
-intro; elim I; unfold iprop in |- *; red in |- *; intros;
- try inversion_clear X; try inversion X0; try inversion X1.
+induction I; unfold iprop in |- *; red in |- *; intros x y X X0;
+ try inversion_clear X; try inversion X0.
 auto.
 astepr x; auto.
 astepl x; auto.
@@ -586,11 +621,9 @@ Qed.
 
 Lemma included_compact_in_interval : forall I pI x Hx,
  included (compact_in_interval I pI x Hx) I.
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; red in |- *;
- simpl in |- *; intros; try inversion_clear X; try inversion_clear X0;
- try inversion_clear X1; try inversion X2; try inversion X3; 
- auto.
+induction I; simpl in |- *; intros X x X0; try inversion_clear Hx; red in |- *;
+ simpl in |- *; intros x0 X1; try inversion_clear X; try inversion_clear X0;
+ try inversion_clear X1; auto.
 apply less_leEq_trans with x; auto.
 apply leEq_less_trans with x; auto.
 apply leEq_transitive with x; auto.
@@ -758,10 +791,9 @@ Qed.
 
 Lemma included_compact_in_interval2 : forall I pI x y Hx Hy,
  included (compact_in_interval2 I pI x y Hx Hy) I.
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
- red in |- *; simpl in |- *; intros; try inversion_clear X;
- try inversion_clear X1; try inversion_clear X3; auto.
+induction I; simpl in |- *; intros; try inversion_clear Hx as (H,H0);
+ try inversion_clear Hy as (H1,H2); red in |- *; simpl in |- *;
+ intros x0 X; try inversion_clear X; auto.
 apply less_leEq_trans with (Min x y); try apply less_Min; auto.
 apply leEq_less_trans with (Max x y); try apply Max_less; auto.
 apply leEq_transitive with (Min x y); try apply leEq_Min; auto.

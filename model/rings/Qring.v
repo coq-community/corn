@@ -1,4 +1,38 @@
-(* $Id: Qring.v,v 1.8 2004/04/23 10:01:03 lcf Exp $ *)
+(* Copyright © 1998-2006
+ * Henk Barendregt
+ * Luís Cruz-Filipe
+ * Herman Geuvers
+ * Mariusz Giero
+ * Rik van Ginneken
+ * Dimitri Hendriks
+ * Sébastien Hinderer
+ * Bart Kirkels
+ * Pierre Letouzey
+ * Iris Loeb
+ * Lionel Mamane
+ * Milad Niqui
+ * Russell O’Connor
+ * Randy Pollack
+ * Nickolay V. Shmyrev
+ * Bas Spitters
+ * Dan Synek
+ * Freek Wiedijk
+ * Jan Zwanenburg
+ * 
+ * This work is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this work; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *) 
 
 Require Export Qabgroup.
 Require Import CRings.
@@ -58,8 +92,7 @@ Proof.
  simpl in |- *. 
  red in |- *.
  simpl in |- *.
- ring.
- assumption.
+ rewrite H; trivial.
 Qed.
 
 Lemma nring_Q : forall n : nat, nring (R:=Q_as_CRing) n[=]inject_Z n.
@@ -77,11 +110,7 @@ Proof.
  red in |- *.
  unfold Qplus in |- *.
  simpl in |- *.
+ rewrite Zpos_mult_morphism in |- *.
+ rewrite succ_nat in |- *.
  ring.
- rewrite Pmult_comm.
- change ((1 + n)%Z = P_of_succ_nat n) in |- *.
- case n; simpl in |- *; auto with zarith. 
- Require Import ZArith.
- intros.
- rewrite BinPos.Pplus_one_succ_l; trivial.
 Qed.
