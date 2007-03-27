@@ -852,8 +852,6 @@ split.
 apply eq_fm_reflexive.
 
 unfold empty_word.
-unfold app.
-unfold ListType.app.
 induction a.
 apply eq_fm_reflexive.
 
@@ -981,14 +979,14 @@ Definition Dbrack : M -> CProp :=
 
 Lemma Dbrack_unit: (Dbrack Zero).
 unfold Dbrack.
-exists (nil M).
+exists (@nil M).
 simpl.
 intuition.
 Qed.
 
 
 Lemma cm_Sum_app: 
-forall (k l : (list M)), (cm_Sum (app M k l))[=] (cm_Sum k)[+](cm_Sum l).
+forall (k l : (list M)), (cm_Sum (app k l))[=] (cm_Sum k)[+](cm_Sum l).
 intros k l.
 induction k.
 simpl.
@@ -1014,7 +1012,7 @@ intros lx Hx.
 elim Hy.
 clear Hy.
 intros ly Hy.
-exists (app M lx ly).
+exists (app lx ly).
 split.
 intro a.
 set (H:= (member_app M a ly lx)).

@@ -344,9 +344,9 @@ Variable A:CSetoid.
 
 Definition Astar := (list A).
 
-Definition empty_word := (nil A).
+Definition empty_word := (@nil A).
 
-Definition appA:= (app A).
+Definition appA:= (@app A).
 
 Fixpoint eq_fm (m:Astar)(k:Astar){struct m}:Prop:=
 match m with
@@ -556,7 +556,7 @@ elim H.
 intuition.
 
 clear H.
-generalize (IHx1 l y1 (nil A)).
+generalize (IHx1 l y1 (@nil A)).
 intuition.
 
 simpl.

@@ -76,7 +76,7 @@ Definition list_IR (P : IR -> CProp) :
 intro P.
 intro l.
 induction  l as [| a l Hrecl].
-apply nil.
+apply (@nil IR).
 apply (cons (to_IR P a) Hrecl).
 Defined.
 

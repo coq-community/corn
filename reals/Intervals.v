@@ -237,7 +237,7 @@ apply shift_leEq_div;
 rstepl a; assumption.
 clear Hab a b; intro n; induction  n as [| n Hrecn].
 intros.
-exists (cons a (nil _)).
+exists (a::nil).
 intros x H1.
 inversion H1. rename X into H2.
 elim H2.
@@ -262,7 +262,7 @@ astepr ZeroR.
 rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
-exists (cons a (nil IR)).
+exists (a::nil).
 intros x H1.
 inversion_clear H1 as [H2|].
 elim H2.
@@ -280,7 +280,7 @@ assumption.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
 set (enz := pos_ap_zero _ _ He) in *.
-exists (cons ((a[+]b) [/]TwoNZ) (nil IR)).
+exists (cons ((a[+]b) [/]TwoNZ) (@nil IR)).
 intros x H1.
 inversion_clear H1 as [H2|].
 inversion_clear H2.

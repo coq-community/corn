@@ -49,7 +49,7 @@ Require Export Omega.
 Require Export Even.
 Require Export Max.
 Require Export Min.
-Require Export ListType.
+Require Export List.
 
 (** *Basics
 This is random stuff that should be in the Coq basic library.

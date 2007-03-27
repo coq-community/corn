@@ -54,7 +54,7 @@ Qed.
 
 Fixpoint to_word (n:nat):(list (F 1)):=
 match n with
-|0 => (nil (F 1))
+|0 => (@nil (F 1))
 |(S m)=> (cons (Build_F 1 0 ZerolessOne)(to_word m))
 end.
 
