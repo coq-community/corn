@@ -4,7 +4,7 @@
  * copyright to hold on it. However, if you or your lawyer think
  * different, then:
  *
- * Copyright © 2004 Lionel Elie Mamane <lionel@mamane.lu>
+ * Copyright Â© 2004-2007 Lionel Elie Mamane <lionel@mamane.lu>
  *
  * To the maximum extent permitted by law, I abandon all my copyrights
  * on the interface (.mli) file generated from this file by the OCaml
@@ -28,6 +28,7 @@
 
 type file = | OCamlBinaryFile of string
 	    | CoqSourceFile of string
+	    | CoqGlobalFile of string
 	    | CoqBinaryFile of string;;
 
 exception Wrong_file_type of file;;
@@ -35,6 +36,7 @@ exception Wrong_file_type of file;;
 let fileName = function
   | OCamlBinaryFile n -> n
   | CoqSourceFile n -> n
+  | CoqGlobalFile n -> n
   | CoqBinaryFile n -> n;;
 
 let coqBinaryName = function

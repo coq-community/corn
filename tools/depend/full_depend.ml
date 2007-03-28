@@ -1,7 +1,7 @@
 (* full_depend: Computes the full (direct and indirect) dependencies
  *              of a binary from partial dependencies (direct only)
  *
- * Copyright © 2004 Lionel Elie Mamane <lionel@mamane.lu>
+ * Copyright Â© 2004-2007 Lionel Elie Mamane <lionel@mamane.lu>
  *
  * To the maximum extent permitted by law, I abandon all my copyrights
  * on the interface (.mli) file generated from this file by the OCaml
@@ -67,6 +67,7 @@ let rec full_depend filename =
     (fun l fname ->
        umerge l (match fname with
 		   | CoqSourceFile n -> [n]
+		   | CoqGlobalFile n -> failwith "full_depend: Unexpected globals"
 		   | CoqBinaryFile n -> full_depend n
 		   | OCamlBinaryFile n -> [(Filename.chop_extension n) ^ ".ml"]))
     []

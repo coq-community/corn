@@ -96,7 +96,7 @@ Definition map2 (F : PartIR) (l : list IR) :
  (forall y, member y l -> Dom F y) -> list IR.
 intros F l H.
 induction l as [| a l Hrecl].
-apply nil.
+apply (@nil IR).
 apply cons.
 cut (member a (cons a l)); [ intro | right; algebra ]; rename X into H0.
 apply (Part F a (H a H0)).

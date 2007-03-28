@@ -72,6 +72,7 @@ LIBDIR := $(SRCDIR)/lib
 TOPLEVELNAME := CoRNtop
 COMPILERNAME := CoRNc
 IDENAME := CoRNide
+INTERFACENAME := CoRN-interface
 
 # Library name used internally by coq
 LIBNAME ?= CoRN
@@ -105,7 +106,7 @@ GLOBFILE = $(SRCDIR)/.glob
 # Various executables we build when we need a custom Coq image.
 # (Thus currently not.)
 TOPLEVEL := $(LIBDIR)/$(TOPLEVELNAME)
-BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME)
+BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME) $(BINDIR)/$(INTERFACENAME)
 LIBEXECS:=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
 IDELIB:=$(LIBDIR)/$(IDENAME)
 IDEBIN:=$(BINDIR)/$(IDENAME)
@@ -200,11 +201,11 @@ binaries: $(BINARIES)
 
 binaries-clean:
 	rm -f $(BINARIES) $(IDEBIN)
-	if [ -a "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
+	if [ -d "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
 
 lib-clean:
 	rm -f $(LIBEXECS) $(IDELIB)
-	if [ -a "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
+	if [ -d "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
 
 $(IDELIB): $(CMX) | $(LIBDIR)
 	@echo Building coq-ide top-level $(subst $(SRCDIR)/,, $@)
@@ -226,6 +227,13 @@ $(BINDIR)/$(TOPLEVELNAME): | $(BINDIR)
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec "$(COQBIN)/coqtop" $(COQFLAGS) "$$@"' \
+	  ) > $@; chmod +x $@
+
+$(BINDIR)/$(INTERFACENAME): | $(BINDIR)
+	@echo Building interface top-level startup script
+	@set -e; ( \
+	  echo '#!/bin/sh'; \
+	  echo 'exec "$(COQBIN)/coq-interface" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 $(LIBDIR)/$(COMPILERNAME): | $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
@@ -293,12 +301,14 @@ dep : $(DEPEND) $(DOCDEPEND)
 	}; \
 	canon="`canonicalise $<`"; \
 	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
-	$(COQDEP) $(COQDEPFLAGS) "$${canon}" > "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" \
+	| sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo \1.glob:/' \
+	> "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
 	@set -e; IFS=$$' \t\n:'; cat $(DEPEND) | \
-	( while read binary source depends; do \
+	( while read binary glob source depends; do \
 	  if [ -n "$${binary}" ]; then \
 	    for depend in $${depends}; do \
 	      if echo "$${depend}" | egrep -q '\.vo$$'; then \
@@ -314,12 +324,12 @@ $(DOCDEPEND) : $(DEPEND)
 $(DOCLIST) : $(DOCDEPEND) $(SRCDIR)/doc/extradeps
 	( ( while read small big; do echo "$$( $(REALPATH) $(SRCDIR)/$${small} ) $$( $(REALPATH) $(SRCDIR)/$${big} )"; done ) < $(SRCDIR)/doc/extradeps ; cat $(DOCDEPEND) ) | tsort > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
-doc-pre : $(DOCLIST)
+doc-pre : $(DOCLIST) $(GLOBFILE)
 
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre $(GLOBFILE)
+doc-html : doc-pre
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
