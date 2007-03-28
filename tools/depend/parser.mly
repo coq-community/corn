@@ -35,9 +35,13 @@
   %type <Types.file> filename
 %%
   dep_spec:
-      Binary Separator FilenameSequence EOL             { Some (coqBinaryName $1, $3) }
+      BinarySequence Separator FilenameSequence EOL     { Some (coqBinaryName $1, $3) }
     | EOL                                               { None }
   ;
+
+  BinarySequence:
+      Binary                                            { $1 }
+    | Binary BinarySequence                             { $1 }
 
   FilenameSequence:
                                                         { [] }

@@ -136,7 +136,7 @@ helps us in this case.
 
 Definition Part_Mesh_List n a b Hab (P : Partition a b Hab n) : list IR.
 intro; induction  n as [| n Hrecn]; intros.
-apply nil.
+apply (@nil IR).
 apply cons.
 apply (P _ (le_n (S n)) [-]P _ (le_S _ _ (le_n n))).
 apply

@@ -700,7 +700,7 @@ Variable M : Type.
 
 Lemma member_app : 
   forall (x : M) (l k : (list M)), 
-  (Iff (member x (app M k l)) 
+  (Iff (member x (app k l)) 
        ((member x k) or (member x l))).
 Proof.
 intros x l.
