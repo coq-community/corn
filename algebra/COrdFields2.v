@@ -801,8 +801,8 @@ intros.
 rewrite leEq_def.
 red in |- *.
 apply CNot_Not_or with (a [<] b) (a [=] b).
- firstorder with leEq_def.
- firstorder with leEq_def.
+ firstorder using leEq_def.
+ firstorder using leEq_def.
 intro.
 cut (a [=] b); intros.
 2: apply leEq_imp_eq; auto.

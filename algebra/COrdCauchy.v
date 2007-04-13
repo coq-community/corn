@@ -408,10 +408,10 @@ apply less_leEq; apply pos_one.
 apply less_leEq; apply pos_one.
 apply shift_leEq_div.
 astepl ([--](Zero:R)); apply inv_resp_less; auto.
-astepl ([--]x); astepr ([--][--]X); apply inv_resp_leEq; firstorder with leEq_def.
+astepl ([--]x); astepr ([--][--]X); apply inv_resp_leEq; firstorder using leEq_def.
 apply shift_leEq_div.
 astepl ([--](Zero:R)); apply inv_resp_less; auto.
-astepl ([--]y); astepr ([--][--]Y); apply inv_resp_leEq; firstorder with leEq_def.
+astepl ([--]y); astepr ([--][--]Y); apply inv_resp_leEq; firstorder using leEq_def.
 apply shift_div_less; auto.
 astepr (x[*]y); auto.
 cut (Zero [<] y); intros.
@@ -424,11 +424,11 @@ apply mult_resp_leEq_both.
 apply less_leEq; apply pos_one.
 apply less_leEq; apply pos_one.
 apply shift_leEq_div; auto.
-astepl x; firstorder with leEq_def.
+astepl x; firstorder using leEq_def.
 apply shift_leEq_div; auto.
-astepl y; firstorder with leEq_def.
+astepl y; firstorder using leEq_def.
 apply shift_div_less; auto.
-astepr (x[*]y); firstorder with leEq_def.
+astepr (x[*]y); firstorder using leEq_def.
 Qed.
 
 Lemma mult_AbsSmall_lft : forall x y X Y : R, Zero [<=] X -> Zero [<=] Y ->
@@ -613,7 +613,7 @@ intro.
 cut (Not (x [<] y) /\ ~ x [=] y); intros.
 inversion_clear H1.
 apply H3.
-apply leEq_imp_eq; firstorder with leEq_def.
+apply leEq_imp_eq; firstorder using leEq_def.
 split; intro.
 apply less_irreflexive_unfolded with (x := f y Hy).
 apply less_transitive_unfolded with (f x Hx); auto.
@@ -850,11 +850,11 @@ cut (x [=] y); intros.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 astepl (F y Hy); auto.
 apply leEq_imp_eq.
-firstorder with leEq_def.
+firstorder using leEq_def.
 rewrite leEq_def in *.
 intro.
 apply (less_irreflexive_unfolded _ (F x Hx)).
-apply less_transitive_unfolded with (F y Hy); firstorder with leEq_def.
+apply less_transitive_unfolded with (F y Hy); firstorder using leEq_def.
 Qed.
 
 End Monotonous_functions.

@@ -362,7 +362,7 @@ intros x y z.
 repeat rewrite leEq_def in *.
 intros H H0 H1.
 apply H.
-apply leEq_less_trans with (y := z); firstorder with leEq_def.
+apply leEq_less_trans with (y := z); firstorder using leEq_def.
 Qed.
 
 Lemma less_leEq : forall x y : R, x [<] y -> x [<=] y.
