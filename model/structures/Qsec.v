@@ -541,7 +541,7 @@ Qed.
 Lemma Qinv_strext : forall (x y : Q) x_ y_,
  ~(Qinv x x_==Qinv y y_) -> ~(x==y).
 Proof.
-firstorder with Qinv_comp.
+firstorder using Qinv_comp.
 Qed.
 
 Lemma Qinv_is_inv : forall (x : Q) (Hx : x/=QZERO),
@@ -1201,7 +1201,7 @@ Qed.
 
 Lemma Qle_is_not_lt : forall x y : Q, x <= y <-> ~ y < x.
 Proof.
-firstorder with Qle_not_lt Qnot_lt_le.
+firstorder using Qle_not_lt Qnot_lt_le.
 Qed.
 
 Lemma Qge_is_not_gt : forall x y : Q, x >= y <-> y <= x.

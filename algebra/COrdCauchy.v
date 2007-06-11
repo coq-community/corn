@@ -508,7 +508,7 @@ intro.
 cut (Not (x [<] y) /\ ~ x [=] y); intros.
 inversion_clear H1.
 apply H3.
-apply leEq_imp_eq; firstorder with leEq_def.
+apply leEq_imp_eq; firstorder using leEq_def.
 split; intro.
 apply less_irreflexive_unfolded with (x := f y Hy).
 apply less_transitive_unfolded with (f x Hx); auto.
@@ -745,11 +745,11 @@ cut (x [=] y); intros.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 astepl (F y Hy); auto.
 apply leEq_imp_eq.
-firstorder with leEq_def.
+firstorder using leEq_def.
 rewrite leEq_def in *.
 intro.
 apply (less_irreflexive_unfolded _ (F x Hx)).
-apply less_transitive_unfolded with (F y Hy); firstorder with leEq_def.
+apply less_transitive_unfolded with (F y Hy); firstorder using leEq_def.
 Qed.
 
 End Monotonous_functions.
