@@ -470,9 +470,11 @@ Qed.
 Lemma mult_AbsSmall_rht : forall x y X Y : R, Zero [<=] X ->
  Zero [<=] Y -> [--]X [<=] x -> x [<=] X -> [--]Y [<=] y -> y [<=] Y -> x[*]y [<=] X[*]Y.
 intros.
+rewrite leEq_def.
 intro.
 cut (Zero [<] x[*]y); intros.
 2: apply leEq_less_trans with (X[*]Y); auto.
+rewrite leEq_def in *.
 cut (x[*]y [#] Zero); intros.
 2: apply pos_ap_zero; auto.
 cut (x [#] Zero); intros.
@@ -494,10 +496,10 @@ apply less_leEq; apply pos_one.
 apply less_leEq; apply pos_one.
 apply shift_leEq_div.
 astepl ([--](Zero:R)); apply inv_resp_less; auto.
-astepl ([--]x); astepr ([--][--]X); apply inv_resp_leEq; auto.
+astepl ([--]x); astepr ([--][--]X); apply inv_resp_leEq; firstorder using leEq_def.
 apply shift_leEq_div.
 astepl ([--](Zero:R)); apply inv_resp_less; auto.
-astepl ([--]y); astepr ([--][--]Y); apply inv_resp_leEq; auto.
+astepl ([--]y); astepr ([--][--]Y); apply inv_resp_leEq; firstorder using leEq_def.
 apply shift_div_less; auto.
 astepr (x[*]y); auto.
 cut (Zero [<] y); intros.
@@ -506,15 +508,15 @@ apply (less_irreflexive_unfolded R One).
 apply leEq_less_trans with (X[*]Y[/] _[//]X2).
 rstepr ((X[/] x[//]X3)[*](Y[/] y[//]pos_ap_zero _ _ X4)).
 astepl (One[*](One:R)).
-apply mult_resp_leEq_both. 
+apply mult_resp_leEq_both.
 apply less_leEq; apply pos_one.
 apply less_leEq; apply pos_one.
 apply shift_leEq_div; auto.
-astepl x; auto.
+astepl x; firstorder using leEq_def.
 apply shift_leEq_div; auto.
-astepl y; auto.
+astepl y; firstorder using leEq_def.
 apply shift_div_less; auto.
-astepr (x[*]y); auto.
+astepr (x[*]y); firstorder using leEq_def.
 Qed.
 
 Lemma mult_AbsSmall_lft : forall x y X Y : R, Zero [<=] X -> Zero [<=] Y ->
