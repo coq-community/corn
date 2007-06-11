@@ -52,3 +52,4 @@ Qed.
 
 Definition Q_as_CField := Build_CField _ _ Q_is_CField Qinv_strext.
 
+Canonical Structure Q_as_CField.

@@ -120,7 +120,7 @@ With strong extensionality, we can make the binary operation [Max].
 
 Lemma lft_leEq_MAX : x [<=] MAX.
 astepr (Zero[+]MAX); apply shift_leEq_plus.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e He.
 apply leEq_wdl with (Lim (Cauchy_const x) [-]MAX).
  2: apply cg_minus_wd;
@@ -246,13 +246,13 @@ Lemma Max_leEq : forall x y z : IR, x [<=] z -> y [<=] z -> Max x y [<=] z.
 unfold Max in |- *.
 simpl in |- *.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H1.
 generalize (less_MAX_imp _ _ _ H1); intro H2.
 elim H2; intros.
-elim H.
+rewrite leEq_def in H; elim H.
 assumption.
-elim H0.
+rewrite leEq_def in H0; elim H0.
 assumption.
 Qed.
 
@@ -319,7 +319,7 @@ Qed.
 
 Lemma Max_is_rht_imp_leEq : forall x y : IR, Max x y [=] y -> x [<=] y.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H0.
 generalize (less_leEq _ _ _ H0); intro H1.
 generalize (leEq_imp_Max_is_rht _ _ H1); intro.
@@ -707,7 +707,7 @@ Step_final (Max Zero Zero).
 Qed.
 
 Lemma AbsIR_nonneg : forall x : IR, Zero [<=] AbsIR x.
-intro x; intro H.
+intro x; rewrite leEq_def; intro H.
 cut (Zero [<] ZeroR).
 apply less_irreflexive.
 apply less_wdl with (AbsIR x); auto.
@@ -901,7 +901,7 @@ cut (x[*]Three [/]FourNZ [<] AbsIR y); intros.
 elim (less_AbsIR (x[*]Three [/]FourNZ) y); intros;
  [ left | right | idtac | auto ].
 astepr (Zero[+]y); apply shift_leEq_plus.
-red in |- *; apply approach_zero.
+apply approach_zero.
 cut (forall e : IR, Zero [<] e -> e [<] x [/]TwoNZ -> x[-]y [<] e); intros.
 cut (x [/]FourNZ [<] x [/]TwoNZ); intros.
 2: rstepl ((x [/]TwoNZ) [/]TwoNZ); apply pos_div_two'; apply pos_div_two;
@@ -944,7 +944,7 @@ apply less_leEq; apply pos_div_two'; auto.
 astepr (Zero[+][--]x); apply shift_leEq_plus.
 apply leEq_wdl with (y[+]x).
 2: unfold cg_minus in |- *; algebra.
-red in |- *; apply approach_zero.
+apply approach_zero.
 cut (forall e : IR, Zero [<] e -> e [<] x [/]TwoNZ -> y[+]x [<] e); intros.
 cut (x [/]FourNZ [<] x [/]TwoNZ); intros.
 2: rstepl ((x [/]TwoNZ) [/]TwoNZ); apply pos_div_two'; apply pos_div_two;
@@ -997,11 +997,11 @@ Qed.
 Lemma AbsIR_approach_zero : forall x, (forall e, Zero [<] e -> AbsIR x [<=] e) -> x [=] Zero.
 intros.
 apply leEq_imp_eq.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e H0.
 eapply leEq_transitive; [ apply leEq_AbsIR | exact (H e H0) ].
 astepl ( [--]ZeroR); astepr ( [--][--]x); apply inv_resp_leEq.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e H0.
 eapply leEq_transitive; [ apply inv_leEq_AbsIR | exact (H e H0) ].
 Qed.
@@ -1023,7 +1023,6 @@ astepl ([--](a[+]e)).
 auto.
 astepr (b[+]Zero).
 apply shift_leEq_plus'.
-unfold leEq.
 apply approach_zero_weak; auto.
 assert (forall e : IR, Zero[<]e -> b[-]a[<=]e).
 intros. 
@@ -1034,7 +1033,6 @@ astepr (a[+]e).
 auto.
 astepr (a[+]Zero).
 apply shift_leEq_plus'.
-unfold leEq.
 apply approach_zero_weak; auto.
 Qed.
 
@@ -1059,7 +1057,7 @@ apply rht_leEq_Max.
 apply inv_resp_leEq; apply Min_leEq_lft.
 astepr (Zero[+]AbsIR (a[-]b)).
 apply shift_leEq_plus.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros.
 do 2 apply shift_minus_leEq.
 eapply leEq_wdr.

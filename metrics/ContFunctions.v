@@ -485,7 +485,7 @@ intros.
 astepr (Two[^]1[*](x[-d]y)).
 astepr (Two[*](x[-d]y)).
 unfold Const_CSetoid_fun in |- *.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 red in |- *.
 simpl in |- *.
 intros H.

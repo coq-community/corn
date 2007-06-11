@@ -71,6 +71,7 @@ Definition ap_nat_is_apartness := Build_is_CSetoid nat (eq (A:=nat)) ap_nat
 
 
 Definition nat_as_CSetoid := Build_CSetoid _ _ _ ap_nat_is_apartness.
+Canonical Structure nat_as_CSetoid.
 
 (** ***Addition
 *)
@@ -90,6 +91,7 @@ apply plus_strext0.
 Qed.
 
 Definition plus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ plus_strext.
+Canonical Structure plus_is_bin_fun.
 
 (** It is associative and commutative.
 *)
@@ -121,6 +123,7 @@ apply mult_strext0.
 Qed.
 
 Definition mult_as_bin_fun := Build_CSetoid_bin_fun _ _ _ _ mult_strext. 
+Canonical Structure mult_as_bin_fun.
 
 (** ***Ternary addition
 *)

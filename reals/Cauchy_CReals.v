@@ -154,7 +154,7 @@ Lemma ing_le : forall x y : F, x [<=] y -> inject_Q x [<=] inject_Q y.
 Proof.
  intros.
  intro.
- apply H.
+ rewrite leEq_def in H; apply H.
  apply ing_cancel_less.
  auto.
 Qed.
@@ -162,7 +162,7 @@ Qed.
 Lemma ing_cancel_leEq : forall x y : F, inject_Q x [<=] inject_Q y -> x [<=] y.
 Proof.
  intros.
- intro.
+ rewrite leEq_def; intro.
  apply H.
  apply ing_lt.
  auto.

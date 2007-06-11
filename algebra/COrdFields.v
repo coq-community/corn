@@ -72,16 +72,24 @@ Implicit Arguments Build_strictorder [A R].
 Implicit Arguments so_trans [A R].
 Implicit Arguments so_asym [A R].
 
-Record is_COrdField (F : CField) (less : CCSetoid_relation F) : CProp := 
+Record is_COrdField (F : CField)
+  (less : CCSetoid_relation F) (leEq : Relation F)
+  (greater : CCSetoid_relation F) (grEq : Relation F) : CProp :=
   {ax_less_strorder  : strictorder less;
    ax_plus_resp_less : forall x y, less x y -> forall z, less (x[+]z) (y[+]z);
    ax_mult_resp_pos  : forall x y, less Zero x -> less Zero y -> less Zero (x[*]y);
-   ax_less_conf_ap   : forall x y, Iff (x [#] y) (less x y or less y x)}.
+   ax_less_conf_ap   : forall x y, Iff (x [#] y) (less x y or less y x);
+   def_leEq : forall x y, (leEq x y) <-> (Not (less y x));
+   def_greater : forall x y, Iff (greater x y) (less y x);
+   def_grEq : forall x y, (grEq x y) <-> (leEq y x)}.
 
 Record COrdField : Type := 
   {cof_crr   :> CField;
    cof_less  :  CCSetoid_relation cof_crr;
-   cof_proof :  is_COrdField cof_crr cof_less}.
+   cof_leEq :  Relation cof_crr;
+   cof_greater :  CCSetoid_relation cof_crr;
+   cof_grEq : Relation cof_crr;
+   cof_proof :  is_COrdField cof_crr cof_less cof_leEq cof_greater cof_grEq}.
 
 (**
 %\begin{nameconvention}%
@@ -93,18 +101,31 @@ is written as [pos].
 Implicit Arguments cof_less [c].
 Infix "[<]" := cof_less (at level 70, no associativity).
 
-Definition greater (F : COrdField) (x y : F) := y [<] x.
+Implicit Arguments cof_greater [c].
+Infix "[>]" := cof_greater (at level 70, no associativity).
 
-Implicit Arguments greater [F].
-Infix "[>]" := greater (at level 70, no associativity).
+Implicit Arguments cof_leEq [c].
+Infix "[<=]" := cof_leEq (at level 70, no associativity).
 
-(* End_SpecReals *)
+Implicit Arguments cof_grEq [c].
+Infix "[>=]" := cof_grEq (at level 70, no associativity).
 
-(**
-Less or equal is defined as ``not greater than''.
-*)
+Definition default_greater (X:CField) (lt:CCSetoid_relation X) : CCSetoid_relation X.
+intros.
+exists (fun x y => lt y x).
+destruct lt.
+unfold Crel_strext in *.
+simpl.
+intros.
+pose (Ccsr_strext _ y2 _ x2 X0).
+tauto.
+Defined.
 
-Definition leEq (F : COrdField) (x y : F) : Prop := Not (y [<] x).
+Definition default_leEq (X:CField) (lt:CCSetoid_relation X) : Relation X :=
+(fun x y => (Not (lt y x))).
+
+Definition default_grEq (X:CField) (le:Relation X) : Relation X :=
+(fun x y => (le y x)).
 
 (**
 %\begin{nameconvention}%
@@ -113,10 +134,8 @@ In the names of lemmas, [ [<=] ] is written as [leEq] and
 %\end{nameconvention}%
 *)
 
-Implicit Arguments leEq [F].
-Infix "[<=]" := leEq (at level 70, no associativity).
-
 Section COrdField_axioms.
+
 (**
 ** Ordered field axioms
 %\begin{convention}%
@@ -126,7 +145,7 @@ Let [F] be a field.
 
 Variable F : COrdField.
 
-Lemma COrdField_is_COrdField : is_COrdField F cof_less.
+Lemma COrdField_is_COrdField : is_COrdField F cof_less (@cof_leEq F) cof_greater (@cof_grEq F).
 elim F; auto.
 Qed.
 
@@ -164,6 +183,18 @@ elim COrdField_is_COrdField; auto.
 Qed.
 
 Lemma less_conf_ap : forall x y : F, Iff (x [#] y) (x [<] y or y [<] x).
+elim COrdField_is_COrdField; auto.
+Qed.
+
+Lemma leEq_def : forall x y : F, (x [<=] y) <-> (Not (y [<] x)).
+elim COrdField_is_COrdField; auto.
+Qed.
+
+Lemma greater_def : forall x y : F, Iff (x [>] y) (y [<] x).
+elim COrdField_is_COrdField; auto.
+Qed.
+
+Lemma grEq_def : forall x y : F, (x [>=] y) <-> (y [<=] x).
 elim COrdField_is_COrdField; auto.
 Qed.
 
@@ -245,6 +276,7 @@ Defined.
 Lemma leEq_not_eq : forall x y : R, x [<=] y -> x [#] y -> x [<] y.
 intros x y H H0.
 elim (ap_imp_less _ _ H0); intro H1; auto.
+rewrite leEq_def in H.
 elim (H H1).
 Qed.
 
@@ -260,8 +292,8 @@ Section Basic_Properties_of_leEq.
 Variable R : COrdField.
 
 Lemma leEq_wdr : forall x y z : R, x [<=] y -> y [=] z -> x [<=] z.
-unfold leEq in |- *.
 intros x y z H H0.
+rewrite leEq_def in *.
 intro H1.
 apply H.
 astepl z.
@@ -269,8 +301,8 @@ assumption.
 Qed.
 
 Lemma leEq_wdl : forall x y z : R, x [<=] y -> x [=] z -> z [<=] y.
-unfold leEq in |- *.
 intros x y z H H0.
+rewrite leEq_def in *.
 intro H1.
 apply H.
 astepr z.
@@ -279,7 +311,7 @@ Qed.
 
 Lemma leEq_reflexive : forall x : R, x [<=] x.
 intro x.
-unfold leEq in |- *.
+rewrite leEq_def.
 apply less_irreflexive_unfolded.
 Qed.
 
@@ -293,7 +325,7 @@ exact (leEq_reflexive _).
 Qed.
 
 Lemma leEq_imp_eq : forall x y : R, x [<=] y -> y [<=] x -> x [=] y.
-unfold leEq in |- *. intros x y H H0.
+intros x y H H0. rewrite leEq_def in *|-.
 apply not_ap_imp_eq. intro H1. apply H0.
 elim (ap_imp_less _ _ _ H1); intro H2. auto.
 elim (H H2).
@@ -302,38 +334,40 @@ Qed.
 Lemma lt_equiv_imp_eq : forall x x' : R,
  (forall y, x [<] y -> x' [<] y) -> (forall y, x' [<] y -> x [<] y) -> x [=] x'.
 intros x x' H H0.
-apply leEq_imp_eq; unfold leEq in |- *; intro H1.
+apply leEq_imp_eq; rewrite leEq_def in |- *; intro H1.
 apply (less_irreflexive_unfolded _ x); auto.
 apply (less_irreflexive_unfolded _ x'); auto.
 Qed.
 
 Lemma less_leEq_trans : forall x y z : R, x [<] y -> y [<=] z -> x [<] z.
 intros x y z.
-unfold leEq in |- *.
 intros H H0.
 elim (less_cotransitive_unfolded _ _ _ H z); intro H1.
 assumption.
+rewrite leEq_def in *|-.
 elim (H0 H1).
 Qed.
 
 Lemma leEq_less_trans : forall x y z : R, x [<=] y -> y [<] z -> x [<] z.
 intros x y z.
-unfold leEq in |- *.
 intros H H0.
 elim (less_cotransitive_unfolded _ _ _ H0 x); intro H1.
+rewrite leEq_def in *|-.
 elim (H H1).
 assumption.
 Qed.
 
 Lemma leEq_transitive : forall x y z : R, x [<=] y -> y [<=] z -> x [<=] z.
-intros x y z H H0 H1.
+intros x y z.
+repeat rewrite leEq_def in *.
+intros H H0 H1.
 apply H.
-apply leEq_less_trans with (y := z); auto.
+apply leEq_less_trans with (y := z); firstorder with leEq_def.
 Qed.
 
 Lemma less_leEq : forall x y : R, x [<] y -> x [<=] y.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def.
 apply less_antisymmetric_unfolded.
 assumption.
 Qed.
@@ -399,10 +433,10 @@ Qed.
 Lemma nring_leEq : forall m n : nat, m <= n -> (nring m:R) [<=] nring n.
 intros m n H.
 elim (le_lt_eq_dec _ _ H); intro H1.
- unfold leEq in |- *. apply less_antisymmetric_unfolded.
+ rewrite leEq_def in |- *. apply less_antisymmetric_unfolded.
  apply nring_less. auto.
 rewrite H1.
-unfold leEq in |- *. apply less_irreflexive_unfolded.
+rewrite leEq_def in |- *. apply less_irreflexive_unfolded.
 Qed.
 
 Lemma nring_apart : forall m n : nat, m <> n -> (nring m:R) [#] nring n.
@@ -971,8 +1005,9 @@ apply mult_resp_less_lft; auto.
 apply leEq_less_trans with x; auto.
 
 (* Cut *)
-unfold leEq in |- *.
-intros x y z H H0 H1.
+intros x y z.
+repeat rewrite leEq_def in |- *.
+intros H H0 H1.
 generalize (shift_zero_less_minus _ _ H1); intro H2.
 cut (Zero [<] (x[-]y)[*]z).
 intro H3.

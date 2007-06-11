@@ -48,6 +48,8 @@ Qed.
 
 Definition Z_as_CSemiGroup := Build_CSemiGroup _ Zplus_is_bin_fun Zplus_is_assoc.
 
+Canonical Structure Z_as_CSemiGroup.
+
 (** The term [Z_as_CSemiGroup] is of type [CSemiGroup]. Hence we have proven that [Z] is a constructive semi-group. *)
 
 (** ***$\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#

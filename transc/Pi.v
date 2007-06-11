@@ -256,7 +256,7 @@ set (F := FId{+}Cosine) in *.
 assert (H : Derivative realline CI F ( [-C-]One{+}{--}Sine)). unfold F in |- *; Deriv.
 astepr (Zero[+] (One[-]Sin One) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
 apply shift_leEq_plus.
-red in |- *; apply approach_zero_weak; intros e H0.
+apply approach_zero_weak; intros e H0.
 elim (Law_of_the_Mean _ _ _ _ H (pi_seq (S n)) (pi_seq (S (S n)))) with e.
 2: simpl in |- *; auto.
 2: simpl in |- *; auto.

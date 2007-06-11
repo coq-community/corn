@@ -174,8 +174,8 @@ rewrite b. apply leEq_reflexive.
 Qed.
 
 Lemma nexp_resp_leEq : forall (x y : R) k, Zero [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
-unfold leEq in |- *. intros. intro. apply H0.
-apply power_cancel_less with k; auto.
+intros. rewrite leEq_def in *. intro. apply H0.
+apply power_cancel_less with k; firstorder with leEq_def.
 Qed.
 
 Lemma nexp_resp_leEq_one : forall c : R, Zero [<=] c -> c [<=] One -> forall n, c[^]n [<=] One.

@@ -52,3 +52,5 @@ apply Qplus_inverse_r.
 Qed.
 
 Definition Q_as_CGroup := Build_CGroup Q_as_CMonoid Qopp_is_fun Q_is_CGroup.
+
+Canonical Structure Q_as_CGroup.

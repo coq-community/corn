@@ -43,14 +43,14 @@ Require Import CMonoids.
 The rational numbers form with addition a CMonoid. [QZERO] is the unit.
 *)
 
-Lemma ZEROQ_as_rht_unit3 : is_rht_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun QZERO.
+Lemma ZEROQ_as_rht_unit3 : is_rht_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun 0.
 Proof.
 red in |- *.
 simpl in |- *.
 apply ZEROQ_as_rht_unit0.
 Qed.
 
-Lemma ZEROQ_as_lft_unit3 : is_lft_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun QZERO.
+Lemma ZEROQ_as_lft_unit3 : is_lft_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun 0.
 Proof.
 red in |- *.
 simpl in |- *.
@@ -62,18 +62,20 @@ Definition Q_is_CMonoid := Build_is_CMonoid
 
 Definition Q_as_CMonoid := Build_CMonoid Q_as_CSemiGroup _ Q_is_CMonoid.
 
+Canonical Structure Q_as_CMonoid.
+
 (** ***$\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
 Also with multiplication Q forms a CMonoid. Here, the unit is [QONE].
 *)
 
-Lemma ONEQ_as_rht_unit : is_rht_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun QONE.
+Lemma ONEQ_as_rht_unit : is_rht_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun 1.
 Proof.
 red in |- *.
 simpl in |- *.
 exact Qmult_n_1.
 Qed.
 
-Lemma ONEQ_as_lft_unit : is_lft_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun QONE.
+Lemma ONEQ_as_lft_unit : is_lft_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun 1.
 Proof.
 red in |- *.
 intro.

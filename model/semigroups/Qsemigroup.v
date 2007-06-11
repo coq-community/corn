@@ -43,6 +43,8 @@ Require Import CSemiGroups.
 
 Definition Q_as_CSemiGroup := Build_CSemiGroup _ Qplus_is_bin_fun Qplus_is_assoc.
 
+Canonical Structure Q_as_CSemiGroup.
+
 (** ***$\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
 *)
 

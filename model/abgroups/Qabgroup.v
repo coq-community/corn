@@ -51,3 +51,5 @@ exact Qplus_is_commut1.
 Qed.
 
 Definition Q_as_CAbGroup := Build_CAbGroup Q_as_CGroup Q_is_CAbGroup.
+
+Canonical Structure Q_as_CAbGroup.

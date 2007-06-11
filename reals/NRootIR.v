@@ -134,7 +134,7 @@ intros. rename X into H.
 cut (Zero [<=] NRoot x k Hx Hk); intros.
 cut (NRoot x k Hx Hk [<] Zero or Zero [<] NRoot x k Hx Hk). intros H1.
 elim H1; clear H1; intro H1.
-elim (H0 H1).
+rewrite leEq_def in H0; elim (H0 H1).
 auto.
 apply ap_imp_less.
 apply un_op_strext_unfolded with (nexp_op (R:=IR) k).
@@ -217,7 +217,7 @@ Hint Resolve NRoot_power NRoot_power': algebra.
 Lemma NRoot_resp_leEq : forall x y xpos ypos k kpos,
  x [<=] y -> NRoot (x:=x) (n:=k) xpos kpos [<=] NRoot (x:=y) (n:=k) ypos kpos.
 intros.
-intro H0.
+rewrite leEq_def; intro H0.
 assert (NRoot ypos kpos[^]k [<=] NRoot xpos kpos[^]k).
 apply power_resp_leEq.
  apply NRoot_nonneg.

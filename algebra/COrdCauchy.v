@@ -503,11 +503,12 @@ Lemma resp_leEq_char' : forall (P : R -> CProp) (f : forall x : R, P x -> R) x y
  (x [=] y -> f x Hx [=] f y Hy) -> (x [<] y -> f x Hx [<] f y Hy) ->
  x [<=] y -> f x Hx [<=] f y Hy.
 intros.
+rewrite leEq_def in *.
 intro.
 cut (Not (x [<] y) /\ ~ x [=] y); intros.
 inversion_clear H1.
 apply H3.
-apply leEq_imp_eq; auto.
+apply leEq_imp_eq; firstorder with leEq_def.
 split; intro.
 apply less_irreflexive_unfolded with (x := f y Hy).
 apply less_transitive_unfolded with (f x Hx); auto.
@@ -738,14 +739,17 @@ Lemma part_mon_imp_mon' : forall F (I : R -> CProp), (forall x, I x -> Dom F x) 
  (forall x y Hx Hy, I x -> I y -> x [<] y -> F x Hx [<] F y Hy) ->
  forall x y Hx Hy, I x -> I y -> x [<=] y -> F x Hx [<=] F y Hy.
 intros.
+rewrite leEq_def in *.
 intro.
 cut (x [=] y); intros.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 astepl (F y Hy); auto.
-apply leEq_imp_eq; auto.
+apply leEq_imp_eq.
+firstorder with leEq_def.
+rewrite leEq_def in *.
 intro.
 apply (less_irreflexive_unfolded _ (F x Hx)).
-apply less_transitive_unfolded with (F y Hy); auto.
+apply less_transitive_unfolded with (F y Hy); firstorder with leEq_def.
 Qed.
 
 End Monotonous_functions.

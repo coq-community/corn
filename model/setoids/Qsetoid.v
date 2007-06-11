@@ -65,6 +65,7 @@ Definition ap_Q_is_apartness := Build_is_CSetoid Q Qeq Qap
  ap_Q_irreflexive1 ap_Q_symmetric1 ap_Q_cotransitive1 ap_Q_tight1.
 
 Definition Q_as_CSetoid := Build_CSetoid _ _ _ ap_Q_is_apartness.
+Canonical Structure Q_as_CSetoid.
 
 (** ***Addition
 *)
@@ -84,6 +85,7 @@ exact Qplus_strext0.
 Qed.
 
 Definition Qplus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qplus_strext1.
+Canonical Structure Qplus_is_bin_fun.
 
 (** It is associative and commutative.
 *)
@@ -123,6 +125,7 @@ exact (Qopp_simpl x y H0).
 Qed.
 
 Definition Qopp_is_fun := Build_CSetoid_fun _ _ _ Qopp_strext.
+Canonical Structure Qopp_is_fun.
 
 (** ***Multiplication
 *)
@@ -145,6 +148,7 @@ apply Qmult_strext0.
 Qed.
 
 Definition Qmult_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qmult_strext1.
+Canonical Structure Qmult_is_bin_fun.
 
 (** It is associative and commutative.
 *)
@@ -174,3 +178,18 @@ apply Qlt_strext_unfolded.
 Qed.
 
 Definition Qlt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qlt_strext.
+Canonical Structure Qlt_is_CSetoid_relation.
+
+(** ***Greater-than
+*)
+
+Lemma Qgt_strext : Crel_strext Q_as_CSetoid Qgt.
+Proof.
+red in |- *.
+intros.
+pose (Qlt_strext_unfolded y1 y2 x1 x2).
+tauto.
+Qed.
+
+Definition Qgt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qgt_strext.
+Canonical Structure Qgt_is_CSetoid_relation.

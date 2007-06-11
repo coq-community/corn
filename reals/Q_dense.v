@@ -487,7 +487,7 @@ Proof.
  cut (m = 0).
  intro.
  rewrite H0.
- simpl in |- *.
+
  apply leEq_reflexive.
  symmetry  in |- *.
  apply le_n_O_eq.
@@ -510,8 +510,8 @@ Proof.
   intros H3 H4.
   change (fstT (Intrvl x n)[<=]fstT (if_cotrans x (Intrvl x n))) in |- *.
   rewrite H4.
-  simpl in |- *.
-  astepl (fstT (Intrvl x n)[+]Zero).  
+  astepl (fstT (Intrvl x n)[+]Zero). 
+  simpl. 
   apply (plus_resp_leEq_both Q_as_COrdField).
   apply leEq_reflexive.
   apply less_leEq.
@@ -525,7 +525,6 @@ Proof.
   intros H3 H4.
   change (fstT (Intrvl x n)[<=]fstT (if_cotrans x (Intrvl x n))) in |- *.
   rewrite H4.
-  simpl in |- *.
   apply leEq_reflexive.
   case (le_lt_eq_dec m (S n) H).
   intro.
@@ -548,7 +547,6 @@ Proof.
  cut (m = 0).
  intro.
  rewrite H0.
- simpl in |- *.
  apply leEq_reflexive.
  symmetry  in |- *.
  apply le_n_O_eq.
@@ -569,14 +567,12 @@ Proof.
   intros H3 H4.
   change (sndT (if_cotrans x (Intrvl x n))[<=]sndT (Intrvl x n)) in |- *.
   rewrite H4.
-  simpl in |- *.
   apply leEq_reflexive.
   intro H2.
   elim H2.
   intros H3 H4.
   change (sndT (if_cotrans x (Intrvl x n))[<=]sndT (Intrvl x n)) in |- *.
   rewrite H4.
-  simpl in |- *.
   astepr (sndT (Intrvl x n)[+]Zero).
   astepl
    (sndT (Intrvl x n)[+]

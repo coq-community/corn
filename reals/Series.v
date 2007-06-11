@@ -107,7 +107,7 @@ elim (He' N); clear He'; intros m Hm.
 elim Hm; clear Hm; intros n Hm'.
 elim Hm'; clear Hm'; intros Hm Hn.
 elim Hn; clear Hn; intros Hn Hmn.
-apply Hmn.
+rewrite leEq_def in Hmn; apply Hmn.
 rstepr (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ).
 apply leEq_less_trans with (AbsIR (a m[-]a N) [+]AbsIR (a N[-]a n)).
 eapply leEq_wdl.

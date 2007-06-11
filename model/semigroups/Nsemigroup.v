@@ -45,6 +45,8 @@ Require Import CSemiGroups.
 
 Definition nat_as_CSemiGroup := Build_CSemiGroup _ plus_is_bin_fun plus_is_assoc.
 
+Canonical Structure nat_as_CSemiGroup.
+
 Lemma Nmult_is_CSemiGroup : is_CSemiGroup nat_as_CSetoid mult_as_bin_fun.
 unfold is_CSemiGroup in |- *.
 unfold associative in |- *.

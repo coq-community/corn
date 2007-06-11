@@ -226,9 +226,9 @@ intros H3 H4.
 set (H5 := H3 H0) in *.
 elim H5.
 generalize H6.
-unfold leEq in |- *.
 intros H7 H8.
 set (H9 := H7 x x) in *.
+rewrite leEq_def in H9.
 set (H10 := H9 H8) in *.
 exact H10.
 

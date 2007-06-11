@@ -44,9 +44,9 @@ We will examine the subsetoid of positive rationals of the setoid of
 rational numbers.
 *)
 
-Definition Qpos := Build_SubCSetoid Q_as_CSetoid (fun x : Q => QZERO{<Q}x).
+Definition Qpos := Build_SubCSetoid Q_as_CSetoid (fun x : Q => QZERO<x).
 
-Definition QposP := (fun x:Q_as_CSetoid => QZERO{<Q}x).
+Definition QposP := (fun x:Q_as_CSetoid => QZERO<x).
 
 (** One, two and four are elements of it.
 *)
@@ -97,7 +97,7 @@ Defined.
 (** The restricted inverse preserves positivity.
 *)
 
-Lemma inv_pres_pos1 : forall x : Qpos, QZERO{<Q}Qpos_inv x.
+Lemma inv_pres_pos1 : forall x : Qpos, QZERO<Qpos_inv x.
 intro x.
 unfold Qpos_inv in |- *.
 simpl in |- *.
@@ -171,8 +171,8 @@ set (i2 := Qmult_sym scs_elem1 (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)))
  in *.
 set
  (i3 :=
-  Qmult_simpl (scs_elem1{*Q}Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO))
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem1) scs_elem0
+  Qmult_simpl (scs_elem1*Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO))
+    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem1) scs_elem0
     scs_elem0 i2 (refl_Qeq scs_elem0)) in *.
 set
  (i4 := a0 (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)) scs_elem0 scs_elem)
@@ -182,31 +182,31 @@ apply refl_Qeq.
 set
  (i5 :=
   Qmult_simpl scs_elem1 scs_elem1
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}(scs_elem0{*Q}scs_elem))
-    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem0){*Q}scs_elem)
+    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(scs_elem0*scs_elem))
+    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem0)*scs_elem)
     (refl_Qeq scs_elem1) i4) in *.
 set
  (i6 :=
   sym_Qeq
-    (scs_elem1{*Q}
-     (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}(scs_elem0{*Q}scs_elem)))
-    (scs_elem1{*Q}
-     ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem0){*Q}scs_elem))
+    (scs_elem1*
+     (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(scs_elem0*scs_elem)))
+    (scs_elem1*
+     ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem0)*scs_elem))
     i5) in *.
 apply
  trans_Qeq
   with
-    (scs_elem1{*Q}
-     ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem0){*Q}scs_elem)).
+    (scs_elem1*
+     ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem0)*scs_elem)).
 exact i5.
 set
  (i7 :=
-  a0 scs_elem1 (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem0)
+  a0 scs_elem1 (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem0)
     scs_elem) in *.
 apply
  trans_Qeq
   with
-    ((scs_elem1{*Q}(Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem0)){*Q}
+    ((scs_elem1*(Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem0))*
      scs_elem).
 exact i7.
 apply Qmult_simpl.
@@ -217,18 +217,18 @@ set
 set
  (i9 :=
   sym_Qeq
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}(scs_elem1{*Q}scs_elem0))
-    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem1){*Q}scs_elem0)
+    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(scs_elem1*scs_elem0))
+    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem1)*scs_elem0)
     i8) in *.
 apply
  trans_Qeq
   with
-    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO){*Q}scs_elem1){*Q}scs_elem0).
+    ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*scs_elem1)*scs_elem0).
 2: apply i9.
 apply
  trans_Qeq
   with
-    ((scs_elem1{*Q}Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)){*Q}scs_elem0).
+    ((scs_elem1*Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO))*scs_elem0).
 apply i1.
 apply i3.
 Qed.

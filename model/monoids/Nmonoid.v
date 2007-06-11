@@ -67,6 +67,8 @@ Definition nat_is_CMonoid := Build_is_CMonoid
 
 Definition nat_as_CMonoid := Build_CMonoid nat_as_CSemiGroup _ nat_is_CMonoid. 
 
+Canonical Structure nat_as_CMonoid.
+
 Lemma SO_as_rht_unit : is_rht_unit (S:=nat_as_CSetoid) mult_as_bin_fun 1.
 Proof.
 red in |- *.

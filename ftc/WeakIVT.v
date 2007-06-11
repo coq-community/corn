@@ -544,7 +544,7 @@ exists xa.
 apply xa_in_interval.
 intro.
 apply cg_inv_unique_2; apply leEq_imp_eq.
-red in |- *; apply approach_zero.
+apply approach_zero.
 intros e H.
 apply leEq_less_trans with (e [/]TwoNZ).
 2: apply pos_div_two'; auto.
@@ -572,7 +572,7 @@ exists N; intros; simpl in |- *.
 apply local_mon'_imp_mon'; auto; exact a_seq_mon.
 astepl ( [--]ZeroR); rstepr ( [--] (z[-]F xa Hx)).
 apply inv_resp_leEq.
-red in |- *; apply approach_zero.
+apply approach_zero.
 intros e H.
 apply leEq_less_trans with (e [/]TwoNZ).
 2: apply pos_div_two'; auto.
