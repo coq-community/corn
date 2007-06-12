@@ -270,7 +270,7 @@ $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 else
 .PHONY: always
 
-$(GLOBFILE): always
+$(GLOBFILE): always $(DOCLIST)
 	exec $(MAKE) CoRN_MF_sub=1 "$@"
 
 %.vo %.glob: always
