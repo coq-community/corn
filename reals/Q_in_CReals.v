@@ -633,6 +633,28 @@ Proof.
  apply inj_Q_min.
 Qed.
 
+Lemma inj_Q_div : forall q1 q2 H, inj_Q (q1/q2)%Q [=] (inj_Q q1[/]inj_Q q2[//]H). 
+Proof.
+ intros.
+ apply mult_cancel_rht with (inj_Q q2);[apply H|].
+ apply eq_symmetric.
+ eapply eq_transitive;[|apply inj_Q_mult].
+ eapply eq_transitive;[apply div_1|].
+ apply inj_Q_wd.
+ simpl.
+ field.
+ apply inj_Q_strext.
+ stepr (Zero:R1).
+ apply H.
+ rstepl (inj_Q q1[-]inj_Q q1).
+ apply eq_symmetric.
+ eapply eq_transitive;[|apply inj_Q_minus].
+ apply inj_Q_wd.
+ unfold cg_minus.
+ simpl.
+ ring.
+Qed.
+
 (** Moreover, and as expected, the [AbsSmall] predicate is also
 preserved under the [inj_Q] *)
 
@@ -779,7 +801,7 @@ Proof.
  unfold pring in |- *; simpl in |- *.
  rational.
 Qed.
- 
+
 (** ** Injection of [Q] is dense
 Finally we are able to prove the density of image of [Q] in [R1]. We
 state this fact in two different ways. Both of them have their
