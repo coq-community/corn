@@ -42,34 +42,22 @@ Require Import CMonoids.
 One is the unit for multiplication on positive integers. Therefore the positive rational numbers together with the multiplication are a CMonoid.
 *)
 
-Lemma QONEpos_is_rht_unit : is_rht_unit Qpos_mult QONEpos.
-unfold is_rht_unit in |- *.
-simpl in |- *.
-intro x.
-case x.
-simpl in |- *.
-intros e H.
-apply Qmult_n_1.
+Lemma QONEpos_is_rht_unit : is_rht_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
+Proof.
+intros x.
+simpl.
+QposRing.
 Qed.
 
-Lemma QONEpos_is_lft_unit : is_lft_unit Qpos_mult QONEpos.
-unfold is_lft_unit in |- *.
-simpl in |- *.
-intro x.
-case x.
-simpl in |- *.
-intros e H.
-cut (QONE*e==e*QONE).
-intro H0.
-apply trans_Qeq with (e*QONE).
-exact H0.
-apply Qmult_n_1.
-apply Qmult_sym.
+Lemma QONEpos_is_lft_unit : is_lft_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
+Proof.
+intros x.
+simpl.
+QposRing.
 Qed.
-
 
 Definition Qpos_mult_is_CMonoid := Build_is_CMonoid
- Qpos_mult_as_CSemiGroup QONEpos QONEpos_is_rht_unit QONEpos_is_lft_unit.
+ Qpos_mult_as_CSemiGroup _ QONEpos_is_rht_unit QONEpos_is_lft_unit.
 
 Definition Qpos_mult_as_CMonoid := Build_CMonoid
- Qpos_mult_as_CSemiGroup QONEpos Qpos_mult_is_CMonoid.
+ Qpos_mult_as_CSemiGroup _ Qpos_mult_is_CMonoid.
