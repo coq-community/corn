@@ -774,9 +774,9 @@ Qed.
 We further generalize the mean law by writing as an explicit bound.
 *)
 
-Theorem Law_of_the_Mean_ineq : forall a b, I a -> I b -> forall c,
+Theorem Law_of_the_Mean_Abs_ineq : forall a b, I a -> I b -> forall c,
  (forall x,  Compact (Min_leEq_Max a b) x -> forall Hx, AbsIR (F' x Hx) [<=] c) ->
- forall Ha Hb, F b Hb[-]F a Ha [<=] c[*]AbsIR (b[-]a).
+ forall Ha Hb, AbsIR (F b Hb[-]F a Ha) [<=] c[*]AbsIR (b[-]a).
 intros a b Ia Ib c Hc Ha Hb.
 astepr (c[*]AbsIR (b[-]a) [+]Zero).
 apply shift_leEq_plus'.
@@ -788,18 +788,26 @@ cut (Dom F' x). intro H2.
 eapply leEq_transitive.
 2: apply (H1 Ha Hb H2).
 eapply leEq_transitive.
-2: apply leEq_AbsIR.
+2: apply triangle_IR_minus'.
 unfold cg_minus at 1 4 in |- *; apply plus_resp_leEq_lft.
 apply inv_resp_leEq.
-eapply leEq_transitive.
-apply leEq_AbsIR.
-eapply leEq_wdl.
-2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
+stepl (AbsIR (F' x H2)[*]AbsIR(b[-]a)).
+2:apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
 apply mult_resp_leEq_rht.
 auto.
 apply AbsIR_nonneg.
 apply (Derivative_imp_inc' _ _ _ _ derF).
 exact (included_interval I a b Ia Ib (Min_leEq_Max a b) x H0).
+Qed.
+
+Theorem Law_of_the_Mean_ineq : forall a b, I a -> I b -> forall c,
+ (forall x,  Compact (Min_leEq_Max a b) x -> forall Hx, AbsIR (F' x Hx) [<=] c) ->
+ forall Ha Hb, F b Hb[-]F a Ha [<=] c[*]AbsIR (b[-]a).
+Proof.
+intros.
+eapply leEq_transitive.
+apply leEq_AbsIR.
+apply Law_of_the_Mean_Abs_ineq; assumption.
 Qed.
 
 End Generalizations.

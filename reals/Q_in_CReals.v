@@ -894,4 +894,62 @@ Proof.
  apply Archimedes'.
 Qed.
 
+Lemma Q_dense_in_CReals' : forall a b : R1,
+ a [<] b -> {q : Q_as_COrdField | a [<] inj_Q q | inj_Q q [<] b}.
+Proof.
+cut (forall a b : R1, Zero[<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
+intros H a b Hab.
+destruct (less_cotransitive_unfolded _ _ _ Hab Zero);[|apply H;assumption].
+assert (X:Zero[<][--]a).
+ rstepl ([--]Zero:R1).
+ apply inv_resp_less.
+ assumption.
+assert (Y:=inv_resp_less _ _ _ Hab).
+ destruct (H _ _ X Y) as [q Hqa Hqb].
+exists (-q)%Q.
+ stepr ([--](inj_Q q)).
+ apply inv_cancel_less.
+  stepl (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+ apply eq_symmetric; apply inj_Q_min. 
+stepl ([--](inj_Q q)).
+apply inv_cancel_less.
+ stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+apply eq_symmetric; apply inj_Q_min.
+
+cut  (forall a b : R1,
+Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
+intros H a b Hb Hab.
+destruct (Q_dense_in_CReals _ (shift_zero_less_minus _ _ _ Hab)) as [q Haq Hbq].
+assert (X0 := pos_ap_zero _ _ Haq).
+assert (X1 : Zero[<](b[/]inj_Q q[//]X0)).
+ apply div_resp_pos; assumption.
+assert (X2 : (a[/]inj_Q q[//]X0)[+]One[<](b[/]inj_Q q[//]X0)).
+ apply shift_plus_less'.
+ rstepr ((b[-]a)[/]inj_Q q[//]X0).
+ apply shift_less_div.
+  assumption.
+ rstepl (inj_Q q).
+ assumption.
+destruct (H _ _ X1 X2) as [r Hra Hrb].
+exists ((nring r)[*]q)%Q; csetoid_rewrite (inj_Q_mult (nring r) q).
+ eapply shift_less_mult.
+  assumption.
+ stepr (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+ apply Hra.
+eapply shift_mult_less.
+ assumption.
+stepl (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+apply Hrb.
+
+intros a b Hb Hab.
+destruct (Archimedes' a) as [n Hn].
+induction n.
+ exists 0; try assumption.
+destruct (less_cotransitive_unfolded _ _ _ Hab (nring (R:=R1) (S n))).
+ apply IHn.
+ apply plus_cancel_less with One.
+ apply c.
+exists (S n); assumption.
+Qed.
+ 
 End Rational_sequence_prelogue.

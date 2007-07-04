@@ -268,6 +268,20 @@ pose ball_sym.
 auto.
 Qed.
 
+Lemma ball_ex_approx_r : forall (x:Complete) e, ball_ex e x (Cunit (approximate x e)).
+Proof.
+intros x [e|]; simpl.
+apply ball_approx_r.
+constructor.
+Qed.
+
+Lemma ball_ex_approx_l : forall (x:Complete) e, ball_ex e (Cunit (approximate x e)) x.
+Proof.
+intros x [e|]; simpl.
+apply ball_approx_l.
+constructor.
+Qed.
+
 Hypothesis Xpl : PrelengthSpace X.
 
 Lemma CompletePL : PrelengthSpace Complete.

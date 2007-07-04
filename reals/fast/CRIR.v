@@ -51,6 +51,25 @@ Proof.
 rapply map_wd_unfolded.
 Qed.
 
+Lemma IR_eq_as_CR : forall x y, x[=]y <-> (IRasCR x == IRasCR y)%CR.
+Proof.
+split.
+rapply map_wd_unfolded.
+intros H.
+stepl (CRasIR (IRasCR x)) by apply IRasCRasIR_id.
+stepr (CRasIR (IRasCR y)) by apply IRasCRasIR_id.
+rapply map_wd_unfolded.
+assumption.
+Qed.
+
+Lemma IR_leEq_as_CR : forall x y, x[<=]y <-> (IRasCR x <= IRasCR y)%CR.
+Proof.
+intros x y.
+split;[rapply f_pres_leEq|rapply leEq_pres_f];
+solve [ rapply map_strext
+      |rapply map_pres_less].
+Qed.
+
 Lemma IR_Zero_as_CR : (IRasCR Zero==Zero)%CR.
 Proof.
 rapply map_pres_zero_unfolded.
@@ -80,6 +99,16 @@ Lemma IR_opp_as_CR : forall x,
  (IRasCR ([--]x)== - IRasCR x)%CR.
 Proof.
 rapply map_pres_minus.
+Qed.
+
+Lemma IR_minus_as_CR : forall x y,
+ (IRasCR (x[-]y)== IRasCR x - IRasCR y)%CR.
+Proof.
+unfold cg_minus.
+intros x y.
+rewrite IR_plus_as_CR.
+rewrite IR_opp_as_CR.
+reflexivity.
 Qed.
 
 Lemma IR_One_as_CR : (IRasCR One==One)%CR.
@@ -276,4 +305,14 @@ Proof.
 intros x.
 rapply SeqLimit_unique.
 rapply (map_pres_Lim _ _ (iso_map_rht CRasCReals IR CRIR_iso) _ _ (Cauchy_complete x)).
+Qed.
+
+Lemma IR_AbsSmall_as_CR : forall (x y:IR),
+AbsSmall x y <-> AbsSmall (R:=CRasCOrdField) (IRasCR x) (IRasCR y).
+Proof.
+unfold AbsSmall.
+intros x y.
+do 2 rewrite IR_leEq_as_CR.
+rewrite IR_opp_as_CR.
+reflexivity.
 Qed.

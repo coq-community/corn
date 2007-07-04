@@ -728,7 +728,6 @@ auto with *.
 unfold m; auto with *.
 apply Qlt_le_trans with z;
 auto with *.
-apply Qmax_ub_l.
 stepr ((/(Qmax z (x b))*/(x m))*(x m - (Qmax z (x b))))%Q by
  (simpl; field; assumption).
 stepl ((/ Qmax z (x b) * / x m)*((Qmax z (x b))*(x m)*e))%Q by

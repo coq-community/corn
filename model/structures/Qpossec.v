@@ -37,6 +37,7 @@
 (** printing Qpos $\mathbb{Q}^{+}$ #Q<SUP>+</SUP># *)
 
 Require Export QArith.
+Require Import Qpower.
 Require Import Qordfield.
 Require Import COrdFields2.
 Require Import Eqdep_dec.
@@ -204,6 +205,49 @@ QposRing.
 Defined.
 
 Implicit Arguments Qpos_lt_plus [a b].
+
+Lemma Qpos_power_pos : forall (x:Qpos) z, 0 < x^z.
+Proof.
+intros x z.
+destruct (Qle_lt_or_eq _ _ (Qpower_pos x z (Qlt_le_weak _ _ (Qpos_prf x))));[assumption|].
+destruct z.
+discriminate H.
+elim (Qpower_not_0_positive x p).
+apply Qpos_nonzero.
+symmetry; assumption.
+elim (Qpower_not_0_positive (/x) p).
+change (~(Qpos_inv x) == 0).
+apply Qpos_nonzero.
+change ((/x)^p==0).
+rewrite Qinv_power.
+symmetry; assumption.
+Qed.
+
+Definition Qpos_power (x:Qpos) (z:Z) : Qpos.
+intros x z.
+apply mkQpos with (x^z).
+apply Qpos_power_pos.
+Defined.
+
+Infix "^" := Qpos_power : Qpos_scope.
+
+Add Morphism Qpos_power : Qpos_power_wd.
+intros x1 x2 Hx y.
+unfold QposEq in *.
+unfold Qpos_power.
+autorewrite with QposElim.
+rewrite Hx.
+reflexivity.
+Qed.
+
+Lemma Q_Qpos_power : forall (x:Qpos) z, ((x^z)%Qpos:Q)==(x:Q)^z.
+Proof.
+intros.
+unfold Qpos_power.
+autorewrite with QposElim.
+reflexivity.
+Qed.
+Hint Rewrite Q_Qpos_power : QposElim.
 
 Definition QposSum (l:list Qpos) : Q := fold_right
 (fun (x:Qpos) (y:Q) => x+y) (Zero:Q) l.

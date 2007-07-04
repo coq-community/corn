@@ -97,7 +97,7 @@ Definition Qmin_le_compat :
 
 Definition Qmax_ub_l : forall x y : Q, x <= Qmax x y := @join_ub_l Qto.
 Definition Qmax_ub_r : forall x y : Q, y <= Qmax x y := @join_ub_r Qto.
-Definition Qmax_glb : forall x y z : Q, x <= z -> y <= z -> (Qmax x y) <= z :=
+Definition Qmax_lub : forall x y z : Q, x <= z -> y <= z -> (Qmax x y) <= z :=
  @join_lub Qto.
 Definition Qmax_comm : forall x y : Q, Qmax x y == Qmax y x := @join_comm Qto.
 Definition Qmax_assoc : forall x y z : Q, Qmax x (Qmax y z) == Qmax (Qmax x y) z:= 
@@ -201,5 +201,12 @@ Definition Qminus_max_min_antidistr_r : forall x y z : Q, x - Qmax y z == Qmin (
  fun a => @antitone_join_meet_distr Qto _ (Qminus_antitone a).
 
 End QTotalOrder.
+
+Hint Resolve Qmin_lb_l: qarith.
+Hint Resolve Qmin_lb_r: qarith.
+Hint Resolve Qmin_glb: qarith.
+Hint Resolve Qmax_ub_l: qarith.
+Hint Resolve Qmax_ub_r: qarith.
+Hint Resolve Qmax_lub: qarith.
 
 Transparent Qlt_le_dec.

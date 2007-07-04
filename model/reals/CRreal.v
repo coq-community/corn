@@ -30,10 +30,13 @@ Opaque CR.
 
 Open Local Scope uc_scope.
 
-Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos), AbsSmall (R:=CRasCOrdField) (inject_Q e) ((x:CRasCOrdField)[-]y) ->
+Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos), AbsSmall (R:=CRasCOrdField) (inject_Q e) ((x:CRasCOrdField)[-]y) <->
  ball e x y.
 Proof.
-intros x y e [H1 H2].
+intros x y e.
+split.
+
+intros [H1 H2].
 rewrite <- (doubleSpeed_Eq x).
 rewrite <- (doubleSpeed_Eq (doubleSpeed x)).
 rewrite <- (doubleSpeed_Eq y).
@@ -55,12 +58,8 @@ replace RHS with (x' - y' + - - e + - - d) by ring.
 assumption.
 replace RHS with (e + - (x' - y') + - - d) by ring.
 assumption.
-Qed.
 
-Lemma CRball_AbsSmall : forall (x y:CR) (e:Qpos), ball e x y ->
-AbsSmall (R:=CRasCOrdField) (inject_Q e) ((x:CRasCOrdField)[-]y).
-Proof.
-intros x y e H.
+intros H.
 rewrite <- (doubleSpeed_Eq x) in H.
 rewrite <- (doubleSpeed_Eq y) in H.
 split; intros d;
@@ -110,7 +109,7 @@ abstract (
 intros e1 e2;
 destruct (Hf (inject_Q e1) (CRlt_Qlt _ _ (Qpos_prf e1))) as [n1 Hn1];
 destruct (Hf (inject_Q e2) (CRlt_Qlt _ _ (Qpos_prf e2))) as [n2 Hn2];
-rapply ball_triangle;[apply ball_sym|];apply CRAbsSmall_ball;
+rapply ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball;
 [apply Hn1;apply le_max_l|
  apply Hn2;apply le_max_r]) using Rlim_subproof0.
 Defined.
@@ -124,7 +123,7 @@ destruct (Hf _ (CRlt_Qlt _ _ (Qpos_prf ((1#2)*d)%Qpos))) as [n Hn].
 exists n.
 intros m Hm.
 apply AbsSmall_leEq_trans with (inject_Q d);[rstepr (e[-]Zero);assumption|].
-apply CRball_AbsSmall.
+rewrite CRAbsSmall_ball.
 change (nat -> Complete Q_as_MetricSpace) in f.
 change (ball d (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
 rewrite <- (MonadLaw5 (f m)).
@@ -138,7 +137,7 @@ destruct (Hf (' e2)%CR (CRlt_Qlt _ _ (Qpos_prf e2))) as [a Ha].
 change (ball (e1+d+e2) (f m) (f a)).
 destruct (le_ge_dec a m).
 
-apply CRAbsSmall_ball.
+rewrite <- CRAbsSmall_ball.
 rapply AbsSmall_leEq_trans;[|apply Ha;assumption].
 intros x.
 autorewrite with QposElim.
@@ -155,7 +154,7 @@ ring_simplify.
 change (0<=(e1+e2)%Qpos).
 apply Qpos_nonneg.
 apply ball_triangle with (f n);[|apply ball_sym];
-apply CRAbsSmall_ball; apply Hn.
+rewrite <- CRAbsSmall_ball; apply Hn.
 auto.
 apply le_trans with m; auto.
 
