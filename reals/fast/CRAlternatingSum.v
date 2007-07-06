@@ -158,6 +158,34 @@ match l with
 end.
 *)
 
+Fixpoint Qshrink_help (n:Z) (d:positive) {struct d} : Q :=
+match d with
+|xO d' => match n with
+          |Zpos (xO n') => Qshrink_help (Zpos n') d'
+          |Zneg (xO n') => Qshrink_help (Zneg n') d'
+          |_ => Qmake n d
+          end
+|_ => Qmake n d
+end.
+
+Definition Qshrink (q:Q) : Q := let (n,d):= q in Qshrink_help n d.
+
+Lemma Qshrink_correct : forall q, Qshrink q == q.
+Proof.
+intros [n d].
+simpl.
+generalize n; clear n.
+induction d; intros n; try reflexivity.
+destruct n as [|n|n]; try destruct n; try reflexivity; 
+ simpl; rewrite IHd; unfold Qeq; simpl;
+ rewrite Pmult_comm;
+ simpl;
+ rewrite Pmult_comm;
+ reflexivity.
+Qed.
+
+Definition Qminus' x y := Qshrink (x-y).
+
 Definition PartialAlternatingSumUntil (P:Stream Q -> bool)(seq:Stream Q)(ex:LazyExists P seq) : Q :=
 (takeUntil P ex Qminus' 0).
 
@@ -174,11 +202,11 @@ rename H0 into IH.
 destruct (IH tt dnn (ex tt)) as [H0 H1].
 destruct Z1 as [[_ Zd] _].
 split.
-     rewrite Qminus'_correct.
+     unfold Qminus' at 1; rewrite Qshrink_correct.
 rsapply shift_zero_leEq_minus.
 apply Qle_trans with (hd (tl x)); auto.
 rewrite Qle_minus_iff.
-     rewrite Qminus'_correct.
+     unfold Qminus' at 1; rewrite Qshrink_correct.
 ring_simplify.
 assumption.
 Qed.
@@ -288,7 +316,7 @@ set (b:=(takeUntil
          (fun s : Stream Q => if Qball_dec e2 (hd s) 0 then true else false)
          (ex4 tt)) Qminus' 0).
 stepr (b-a) by (simpl;
-     repeat rewrite Qminus'_correct;
+     unfold Qminus'; repeat rewrite Qshrink_correct;
  ring).
 rsapply AbsSmall_minus.
 rename H0 into IHExists.
@@ -358,7 +386,7 @@ destruct (takeUntil_step P (Limit_near zl e) Qminus' 0) as [ex' rw];
 rewrite rw; clear rw.
 simpl.
 rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
-     rewrite Qminus'_correct.
+     unfold Qminus' at 1; rewrite Qshrink_correct.
 rapply ball_refl.
 Qed.
 
@@ -393,6 +421,77 @@ ring.
 Qed.
 
 Section Series.
+
+CoFixpoint everyOther (A:Type) (s:Stream A) : Stream A :=
+Cons (hd s) (everyOther (tl (tl s))).
+
+Lemma everyOther_dnn : forall (a : Stream Q),
+ (DecreasingNonNegative a) ->  
+ (DecreasingNonNegative (everyOther a)).
+Proof.
+intros a Ha.
+rewrite <- dnn_alt_iff_dnn.
+generalize a Ha; clear a Ha.
+cofix.
+intros [a [b [c [d x]]]] [[_ [_ [H0 _]]] [_ Ha]].
+constructor;[assumption|].
+rapply everyOther_dnn.
+apply Ha.
+Qed.
+
+Lemma everyOther_nbz : forall (a : Stream Q) x, (NearBy 0 x a) ->
+ NearBy 0 x (everyOther a).
+cofix.
+intros [a [b r]] x [H [_ Ha]].
+constructor;[|rapply everyOther_nbz];assumption.
+Qed.
+
+Lemma everyOther_zl : forall (a : Stream Q), (Limit a 0) ->
+ Limit (everyOther a) 0.
+Proof.
+intros x Hx e.
+assert (H:=Hx e).
+generalize x H; clear x Hx H.
+fix 2.
+intros x [H|H].
+ left.
+ apply everyOther_nbz.
+ assumption.
+case (H tt);[intros [_ X]|intros X].
+ right; left.
+ clear - x X.
+ abstract (
+ destruct x as [a [b x]];
+ rapply everyOther_nbz;
+ assumption).
+right; intros _.
+assert (Y:= everyOther_zl _ (X tt)).
+clear - x Y.
+abstract (
+destruct x as [a [b x]];
+assumption).
+Defined.
+
+Lemma Str_nth_tl_everyOther : forall n A (a:Stream A), Str_nth_tl n (everyOther a) = everyOther (Str_nth_tl (2*n) a).
+Proof.
+induction n.
+ reflexivity.
+intros A [a0 [a1 a]].
+simpl.
+rewrite IHn.
+replace (n + S (n + 0))%nat with (S (2*n))%nat.
+ reflexivity.
+ring.
+Qed.
+
+Lemma Str_nth_everyOther : forall n A (a:Stream A), Str_nth n (everyOther a) = (Str_nth (2*n) a).
+Proof.
+intros n A a.
+unfold Str_nth.
+rewrite Str_nth_tl_everyOther.
+destruct (Str_nth_tl (2 * n) a).
+reflexivity.
+Qed.
 
 Definition mult_Streams := zipWith (Qmult).
 
