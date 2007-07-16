@@ -1132,8 +1132,6 @@ Qed.
 We consider the injection [inject_Z] from [Z] to [Q] as a coercion.
 *)
 
-Definition inject_Z (x : Z) := Qmake x 1%positive. 
-
 Coercion inject_Z : Z >-> Q.
 
 Lemma injz_plus : forall m n : Z,

@@ -98,6 +98,19 @@ intros s [_ H].
 assumption.
 Qed.
 
+Hint Resolve dnn_tl : dnn.
+
+Lemma dnn_Str_nth_tl : forall n s, DecreasingNonNegative s -> DecreasingNonNegative (Str_nth_tl n s).
+Proof.
+induction n.
+ tauto.
+intros s X.
+simpl.
+rapply IHn.
+apply dnn_tl.
+assumption.
+Qed.
+
 Coercion Local Is_true : bool >-> Sortclass.
 
 Fixpoint takeUntil (A B:Type) (P : Stream A -> bool)(s:Stream A) (ex:LazyExists P s) (cons: A -> B -> B) (nil : B) {struct ex} : B :=
@@ -150,6 +163,36 @@ elim H; constructor.
 reflexivity.
 Qed.
 
+Lemma takeUntil_elim : forall (A B:Type) (P:Stream A -> bool) (cons: A -> B -> B) (nil: B)
+ (Q: Stream A -> B -> Prop),
+ (forall seq, P seq -> Q seq nil) ->
+ (forall seq x, Q (tl seq) x -> ~P seq -> Q seq (cons (hd seq) x)) ->
+ forall seq (ex:LazyExists P seq), Q seq (takeUntil P ex cons nil).
+Proof.
+intros A B P cons nil Q c1 c2 seq ex.
+assert (ex':=ex).
+induction ex'.
+ rewrite takeUntil_end; try assumption.
+ eapply c1.
+ apply H.
+assert (Z0:=takeUntil_end P ex cons nil).
+assert (Z1:=takeUntil_step P ex cons nil).
+assert (Z0':=c1 x).
+assert (Z1':=c2 x).
+destruct (P x).
+ clear Z1.
+ rewrite Z0; try constructor.
+ apply Z0'.
+ constructor.
+clear Z0 Z0'.
+destruct (Z1 (fun x => x)) as [ex' Z].
+rewrite Z.
+clear Z Z1.
+eapply Z1'; auto.
+apply H0.
+constructor.
+Qed. 
+
 (* Deforested
 Fixpoint AlternatingSum (l:list Q) : Q :=
 match l with 
@@ -158,6 +201,7 @@ match l with
 end.
 *)
 
+(*
 Fixpoint Qshrink_help (n:Z) (d:positive) {struct d} : Q :=
 match d with
 |xO d' => match n with
@@ -183,8 +227,7 @@ destruct n as [|n|n]; try destruct n; try reflexivity;
  rewrite Pmult_comm;
  reflexivity.
 Qed.
-
-Definition Qminus' x y := Qshrink (x-y).
+*)
 
 Definition PartialAlternatingSumUntil (P:Stream Q -> bool)(seq:Stream Q)(ex:LazyExists P seq) : Q :=
 (takeUntil P ex Qminus' 0).
@@ -192,21 +235,20 @@ Definition PartialAlternatingSumUntil (P:Stream Q -> bool)(seq:Stream Q)(ex:Lazy
 Lemma PartialAlternatingSumUntil_small : forall (P:Stream Q -> bool)(seq:Stream Q)(dnn:DecreasingNonNegative seq)(ex:LazyExists P seq), 0 <= (PartialAlternatingSumUntil P ex) <= (hd seq).
 Proof.
 intros P seq dnn ex.
-assert (H:=ex).
 unfold PartialAlternatingSumUntil.
-induction H;
-destruct dnn as [[[Za Zb] Z1] dnn];
-case ex; clear ex; simpl; destruct (P x); try contradiction; pose Qle_refl; auto.
-intros ex.
-rename H0 into IH.
-destruct (IH tt dnn (ex tt)) as [H0 H1].
-destruct Z1 as [[_ Zd] _].
+generalize dnn; clear dnn.
+set (Q := (fun seq b => DecreasingNonNegative seq -> 0 <= b <= hd seq)).
+change (Q seq (takeUntil P ex Qminus' 0)).
+apply takeUntil_elim; unfold Q; clear seq ex Q.
+ intros seq _ [[[dnn _] _] _]; auto with *.
+intros seq b IH H [[[Za Zb] [[_ Zd] _]] dnn].
+destruct (IH dnn) as [H0 H1].
 split.
-     unfold Qminus' at 1; rewrite Qshrink_correct.
-rsapply shift_zero_leEq_minus.
-apply Qle_trans with (hd (tl x)); auto.
+     rewrite Qminus'_correct.
+ rsapply shift_zero_leEq_minus.
+ apply Qle_trans with (hd (tl seq)); auto.
 rewrite Qle_minus_iff.
-     unfold Qminus' at 1; rewrite Qshrink_correct.
+     rewrite Qminus'_correct.
 ring_simplify.
 assumption.
 Qed.
@@ -316,7 +358,7 @@ set (b:=(takeUntil
          (fun s : Stream Q => if Qball_dec e2 (hd s) 0 then true else false)
          (ex4 tt)) Qminus' 0).
 stepr (b-a) by (simpl;
-     unfold Qminus'; repeat rewrite Qshrink_correct;
+     repeat rewrite Qminus'_correct;
  ring).
 rsapply AbsSmall_minus.
 rename H0 into IHExists.
@@ -386,7 +428,7 @@ destruct (takeUntil_step P (Limit_near zl e) Qminus' 0) as [ex' rw];
 rewrite rw; clear rw.
 simpl.
 rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
-     unfold Qminus' at 1; rewrite Qshrink_correct.
+     rewrite Qminus'_correct.
 rapply ball_refl.
 Qed.
 
@@ -457,19 +499,18 @@ intros x [H|H].
  left.
  apply everyOther_nbz.
  assumption.
-case (H tt);[intros [_ X]|intros X].
+case (H tt);[intros X |intros X].
  right; left.
  clear - x X.
  abstract (
  destruct x as [a [b x]];
+ destruct X;
  rapply everyOther_nbz;
  assumption).
 right; intros _.
-assert (Y:= everyOther_zl _ (X tt)).
-clear - x Y.
-abstract (
-destruct x as [a [b x]];
-assumption).
+rapply everyOther_zl.
+apply X.
+constructor.
 Defined.
 
 Lemma Str_nth_tl_everyOther : forall n A (a:Stream A), Str_nth_tl n (everyOther a) = everyOther (Str_nth_tl (2*n) a).
@@ -621,12 +662,8 @@ Cons c (powers_help (c*a)).
 
 Definition powers := powers_help 1.
 
-Lemma Str_nth_powers : forall n, Str_nth n powers == a^n.
+Lemma Str_nth_powers_help : forall n x, Str_nth n (powers_help x) == x*a^n.
 Proof.
-unfold powers.
-intros n.
-setoid_replace (a^n) with (1*a^n) by ring.
-generalize 1.
 induction n.
 
 intros c.
@@ -650,15 +687,22 @@ rewrite Qpower_plus;[assumption|].
 ring.
 Qed.
 
+Lemma Str_nth_powers : forall n, Str_nth n powers == a^n.
+Proof.
+intros n.
+unfold powers.
+rewrite Str_nth_powers_help.
+ring.
+Qed.
+
 Hypothesis Ha : 0 <= a <= 1.
 
-Lemma powers_dnn : DecreasingNonNegative powers.
+Lemma powers_help_dnn : forall x, (0 <= x) -> DecreasingNonNegative (powers_help x).
 Proof.
+intros x Hx.
 destruct Ha as [Ha0 Ha1].
 apply dnn_alt_dnn.
-unfold powers.
-cut (0 <= 1);[|discriminate].
-generalize 1.
+generalize x Hx; clear x Hx.
 cofix.
 intros b Hb.
 constructor.
@@ -669,16 +713,18 @@ replace RHS with (b*1) by ring.
 rsapply mult_resp_leEq_lft; assumption.
 
 simpl.
-apply powers_dnn.
+apply powers_help_dnn.
 rsapply mult_resp_nonneg; assumption.
 Qed.
 
-Lemma powers_nbz : NearBy 0 (1#1)%Qpos powers.
+Lemma powers_dnn : DecreasingNonNegative powers.
 Proof.
-unfold powers.
-pose (one:=1).
-cut (0 <= 1 <=one);[|split;discriminate].
-generalize 1.
+rapply powers_help_dnn.
+discriminate.
+Qed.
+
+Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (1#1)%Qpos (powers_help x).
+Proof.
 cofix.
 intros b [Hb0 Hb1].
 destruct Ha as [Ha0 Ha1].
@@ -691,12 +737,17 @@ apply Qle_trans with 0;[discriminate|assumption].
 assumption.
 
 simpl.
-apply powers_nbz.
+apply powers_help_nbz.
 split.
 rsapply mult_resp_nonneg; assumption.
-unfold one in *; clear one.
 replace RHS with (1*1) by ring.
 rsapply mult_resp_leEq_both; assumption.
+Qed.
+
+Lemma powers_nbz : NearBy 0 (1#1)%Qpos powers.
+Proof.
+rapply powers_help_nbz.
+split; discriminate.
 Qed.
 
 End Powers.
@@ -941,6 +992,93 @@ Defined.
 
 End Series.
 
+Lemma dnn_zl_convergent : forall (seq:Stream Q),
+ forall (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
+ convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq)).
+Proof.
+intros seq dnn zl.
+cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
+ apply convergent_wd.
+ intros n.
+ stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq))) by
+  (apply eq_symmetric; apply inj_Q_mult).
+ apply mult_wdl.
+ stepr ((inj_Q IR (-(1)))[^]n) by
+  (apply eq_symmetric; apply inj_Q_power).
+ apply nexp_wd.
+ stepr ([--](inj_Q IR 1)) by
+   (apply eq_symmetric; apply inj_Q_min).
+ apply un_op_wd_unfolded.
+ rstepl ((nring 1):IR).
+ apply eq_symmetric; apply (inj_Q_nring IR 1).
+apply alternate_series_conv.
+  intros n.
+  unfold Str_nth.
+  change (Zero:IR) with (nring 0:IR).
+  stepl (inj_Q IR (nring 0)) by apply inj_Q_nring.
+  apply inj_Q_leEq.
+  simpl.
+  destruct (dnn_Str_nth_tl n dnn) as [[[H _] _] _].
+  assumption.
+ intros e He.
+ destruct (Q_dense_in_CReals IR e He) as [c Hc].
+ cut {N : nat & 
+ forall m : nat,
+ (N <= m)%nat -> AbsSmall c ((Str_nth m seq))}.
+  intros [N HN].
+  exists N.
+  intros m Hm.
+  eapply AbsSmall_trans with (inj_Q IR c).
+   assumption.
+  rstepr (inj_Q IR (Str_nth m seq)).
+  apply inj_Q_AbsSmall.
+  apply HN.
+  assumption.
+ clear e He c0.
+ assert (Hc':0<c).
+  apply less_inj_Q with IR.
+  change (0:Q) with (nring 0:Q).
+  stepl (nring 0:IR).
+   assumption.
+  apply eq_symmetric; apply inj_Q_nring.
+ assert (L:=(Limit_near zl (mkQpos Hc'))).
+ exists (takeUntil _ L (fun _ => S) O).
+ generalize dnn; clear dnn.
+ set (Q:= (fun seq b => DecreasingNonNegative seq -> forall m : nat, (b <= m)%nat ->
+           AbsSmall (R:=Q_as_COrdField) c (Str_nth m seq))).
+ change (Q seq (takeUntil
+   (fun s : Stream Q_as_MetricSpace =>
+    Qball_ex_bool (mkQpos (a:=c) Hc') (hd s) 0) L
+   (fun _ : Q_as_MetricSpace => S) 0%nat)).
+ apply takeUntil_elim; unfold Q; clear seq zl L Q.
+  intros x H dnn m _.
+  unfold Str_nth.
+  unfold Qball_ex_bool in H.
+  destruct (ball_ex_dec Q_as_MetricSpace Qball_dec (mkQpos (a:=c) Hc') (hd x) 0) as [b|b]; try contradiction.
+  simpl in b.
+  apply leEq_imp_AbsSmall.
+   destruct (dnn_Str_nth_tl m dnn) as [[[X _] _] _];assumption.
+  destruct dnn as [X _].
+  destruct (ForAll_Str_nth_tl m X) as [[_ Y] _].
+  simpl.
+  eapply Qle_trans.
+   apply Y.
+  destruct b as [_ b].
+  simpl in b.
+  autorewrite with QposElim in b.
+  ring_simplify in b.
+  assumption.
+ intros x b IH H dnn [|m] Hm.
+  elimtype False; auto with *.
+ rapply IH; auto with *.
+intros n.
+apply inj_Q_leEq.
+rewrite <- dnn_alt_iff_dnn in dnn.
+destruct (ForAll_Str_nth_tl n dnn) as [[_ X] _].
+rewrite tl_nth_tl in X.
+assumption.
+Qed.
+
 Lemma InfiniteAlternatingSum_correct : forall (seq:Stream Q) (x:nat -> IR),
  (forall n:nat, inj_Q IR (((-(1))^n)*Str_nth n seq)%Q[=]x n) ->
  forall (dnn:DecreasingNonNegative seq) zl H,
@@ -1048,3 +1186,13 @@ transitivity (IRasCR (inj_Q IR ((- (1)) ^ n * Str_nth n seq)%Q));
 apply IRasCR_wd.
 apply Hx.
 Qed.
+
+Lemma InfiniteAlternatingSum_correct' : forall (seq:Stream Q),
+ forall (dnn:DecreasingNonNegative seq) zl,
+ (InfiniteAlternatingSum dnn zl==IRasCR (series_sum _ (dnn_zl_convergent dnn zl)))%CR.
+Proof.
+intros seq dnn zl.
+apply InfiniteAlternatingSum_correct.
+intros; apply eq_reflexive.
+Qed.
+

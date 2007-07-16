@@ -625,6 +625,32 @@ Qed.
 
 End Monad_Laws.
 
+Lemma BindLaw1 : forall X Y Xpl (f:X--> Complete Y) a, (ms_eq (Cbind Xpl f (Cunit_fun _ a)) (f a)).
+Proof.
+intros X Y Xpl f a.
+change (ms_eq (Cjoin (Cmap_fun Xpl f (Cunit_fun X a))) (f a)).
+rewrite (MonadLaw3 Xpl f a).
+rapply MonadLaw5.
+Qed.
+
+Lemma BindLaw2 : forall X Xpl a, (ms_eq (Cbind Xpl (Cunit:X --> Complete X) a) a).
+Proof.
+rapply MonadLaw6.
+Qed.
+
+Lemma BindLaw3 : forall X Xpl Y Ypl Z (Zpl:PrelengthSpace Z) (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (ms_eq (Cbind Ypl g (Cbind Xpl f a)) (Cbind Xpl (uc_compose (Cbind Ypl g) f) a)).
+Proof.
+intros X Xpl Y Ypl Z Zpl a f g.
+change (ms_eq (Cjoin (Cmap_fun Ypl g (Cjoin_fun (Cmap Xpl f a))))
+  (Cjoin (Cmap_fun Xpl (uc_compose (Cbind Ypl g) f) a))).
+rewrite (MonadLaw2 Xpl (CompletePL Ypl) (Cbind Ypl g) f).
+unfold Cbind.
+rewrite (MonadLaw4 Ypl (CompletePL Ypl) g).
+rewrite (MonadLaw2 (CompletePL Ypl) (CompletePL (CompletePL Zpl)) (Cjoin (X:=Z)) (Cmap Ypl g)).
+symmetry.
+rapply MonadLaw7.
+Qed.
+
 Section Faster.
 
 Variable X : MetricSpace.

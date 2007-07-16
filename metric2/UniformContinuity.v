@@ -64,6 +64,20 @@ Definition is_UniformlyContinuousFunction
  (f: X -> Y) (mu: Qpos -> QposInf) :=
  forall e a b, ball_ex (mu e) a b -> ball e (f a) (f b).
 
+Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -> QposInf),
+ (forall x, ms_eq (f1 x) (f2 x)) ->
+ (forall x, QposInf_le (mu2 x) (mu1 x)) ->
+ (is_UniformlyContinuousFunction f1 mu1) ->
+ (is_UniformlyContinuousFunction f2 mu2).
+Proof.
+intros f1 f2 mu1 mu2 Hf Hmu H e a b Hab.
+do 2 rewrite <- Hf.
+apply H.
+eapply ball_ex_weak_le.
+apply Hmu.
+assumption.
+Qed.
+
 Record UniformlyContinuousFunction : Type :=
 {ucFun :> X -> Y
 ;mu : Qpos -> QposInf
@@ -74,11 +88,11 @@ Lemma uc_prf_smaller : forall (f:UniformlyContinuousFunction) (mu2 : Qpos -> Qpo
  (forall e, QposInf_le (mu2 e) (mu f e)) ->
  is_UniformlyContinuousFunction (ucFun f) mu2.
 Proof.
-intros [f mu1 p] mu2 H e a b Hab.
-apply p.
-eapply ball_ex_weak_le.
+intros f my2 H.
+eapply is_UniformlyContinuousFunction_wd.
+intros; reflexivity.
 apply H.
-assumption.
+apply uc_prf.
 Qed.
 
 Definition ucEq (f g : UniformlyContinuousFunction) :=

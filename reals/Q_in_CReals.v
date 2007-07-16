@@ -45,6 +45,7 @@ dense in any real number structure. *)
 Require Export Cauchy_IR.
 Require Export Nmonoid.
 Require Export Zring.
+Require Import Qpower.
 
 Section Rational_sequence_prelogue.
 
@@ -800,6 +801,38 @@ Proof.
  simpl in |- *.
  unfold pring in |- *; simpl in |- *.
  rational.
+Qed.
+
+Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
+Proof.
+intros q.
+induction n.
+ change ((inj_Q (nring 1))[=]One).
+ stepr ((nring 1):R1).
+  apply (inj_Q_nring 1).
+ rational.
+rewrite inj_S.
+unfold Zsucc.
+stepr (inj_Q (q^n*q)%Q).
+ apply inj_Q_wd.
+ simpl.
+ destruct (Qeq_dec q 0).
+  rewrite q0; rewrite Qpower_0.
+   intros H.
+   eapply S_O.
+   apply surj_eq.
+   rewrite inj_S.
+   unfold Zsucc.
+   apply H.
+  ring.
+ simpl; rewrite Qpower_plus.
+  assumption.
+ ring.
+stepr (inj_Q (q^n)%Q[*]inj_Q q).
+ apply inj_Q_mult.
+simpl.
+apply mult_wdl.
+assumption.
 Qed.
 
 (** ** Injection of [Q] is dense
