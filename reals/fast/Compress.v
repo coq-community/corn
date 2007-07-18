@@ -56,7 +56,7 @@ apply Z_div_mod_eq.
 auto with *.
 Qed.
 
-Definition compress_fun (x:CR) (e:QposInf) : Q :=
+Definition compress_raw (x:CR) (e:QposInf) : Q :=
 match e with
 | QposInfinity => approximate x e
 | Qpos2QposInf e =>
@@ -67,7 +67,7 @@ match e with
  end
 end.
 
-Lemma compress_fun_prop : forall x e, ball e x (Cunit (compress_fun x e)).
+Lemma compress_raw_prop : forall x e, ball e x (Cunit (compress_raw x e)).
 Proof.
 intros x [n d].
 simpl.
@@ -106,27 +106,43 @@ unfold Qdiv.
 ring.
 Qed.
 
-Lemma compress_fun_prf : forall x, is_RegularFunction (compress_fun x).
+Lemma compress_raw_prf : forall x, is_RegularFunction (compress_raw x).
 Proof.
 intros x e1 e2.
 rewrite <- ball_Cunit.
-eapply ball_triangle;[|apply compress_fun_prop].
+eapply ball_triangle;[|apply compress_raw_prop].
 apply ball_sym.
-apply compress_fun_prop.
+apply compress_raw_prop.
 Qed.
 
-Definition compress (x:CR) : CR :=
-Build_RegularFunction (compress_fun_prf x).
+Definition compress_fun (x:CR) : CR :=
+Build_RegularFunction (compress_raw_prf x).
 
-Lemma compress_correct : forall x, (compress x==x)%CR.
+Lemma compress_fun_correct : forall x, (compress_fun x==x)%CR.
 Proof.
 intros x.
 rapply regFunEq_e.
 intros e.
-unfold compress.
+unfold compress_fun.
 unfold approximate at 1.
 rewrite <- ball_Cunit.
 eapply ball_triangle;[|apply ball_approx_r].
 apply ball_sym.
-apply compress_fun_prop.
+apply compress_raw_prop.
+Qed.
+
+Lemma compress_uc : is_UniformlyContinuousFunction compress_fun Qpos2QposInf.
+Proof.
+intros e x y H.
+do 2 rewrite compress_fun_correct.
+assumption.
+Qed.
+
+Definition compress : CR --> CR :=
+Build_UniformlyContinuousFunction compress_uc.
+
+Lemma compress_correct : forall x, (compress x==x)%CR.
+Proof.
+intros x.
+rapply compress_fun_correct.
 Qed.
