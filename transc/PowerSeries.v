@@ -335,18 +335,21 @@ Let G := FPowerSeries' x0 (fun n => a (S n)).
 (* end hide *)
 
 (* begin show *)
-Hypothesis Hf : fun_series_convergent_IR realline F.
-Hypothesis Hf' : fun_series_abs_convergent_IR realline F.
-Hypothesis Hg : fun_series_convergent_IR realline G.
+Variable J : interval.
+
+Hypothesis Hf : fun_series_convergent_IR J F.
+Hypothesis Hf' : fun_series_abs_convergent_IR J F.
+Hypothesis Hg : fun_series_convergent_IR J G.
 (* end show *)
 
 (** We get a comparison test for power series. *)
 
 Lemma FPowerSeries'_comp : forall b, (forall n, AbsIR (b n) [<=] a n) ->
- fun_series_convergent_IR realline (FPowerSeries' x0 b).
+ fun_series_convergent_IR J (FPowerSeries' x0 b).
 intros.
 apply fun_comparison_IR with (fun n : nat => FAbs (FPowerSeries' x0 a n)).
-Contin.
+intros n.
+apply Included_imp_Continuous with realline;[Contin | auto with *].
 auto.
 intros.
 apply leEq_wdr with (AbsIR (FPowerSeries' x0 a n x (ProjIR1 Hx'))).
@@ -377,7 +380,7 @@ Qed.
 
 (** And a rule for differentiation. *)
 
-Lemma Derivative_FPowerSeries1' : forall H, Derivative realline H (FSeries_Sum Hf) (FSeries_Sum Hg).
+Lemma Derivative_FPowerSeries1' : forall H, Derivative J H (FSeries_Sum Hf) (FSeries_Sum Hg).
 intro.
 eapply Derivative_wdr.
 apply Feq_symmetric; apply (insert_series_sum _ _ Hg).
