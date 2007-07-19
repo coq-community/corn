@@ -30,6 +30,7 @@ Require Import Qmetric.
 Require Import PowerSeries.
 Require Import SinCos.
 Require Import Ndigits.
+Require Import Compress.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -57,13 +58,10 @@ rewrite plus_comm.
 rewrite Str_nth_recip_factorials.
 rewrite Str_nth_powers_help.
 rewrite <- Qpower_mult.
-destruct (Qeq_dec a 0).
- rewrite q.
- rewrite (Qpower_0 (1+2*n)%nat);[|ring].
- discriminate.
 rewrite inj_plus.
-rewrite Qpower_plus.
- assumption.
+rewrite Qpower_plus'.
+ rewrite <- inj_plus.
+ auto with *.
 rewrite inj_mult.
 reflexivity.
 Qed.
@@ -325,7 +323,7 @@ Qed.
 Definition sin_poly_uc : Q_as_MetricSpace --> Q_as_MetricSpace := 
 Build_UniformlyContinuousFunction sin_poly_prf.
 
-Definition sin_poly : CR --> CR := Cmap QPrelengthSpace sin_poly_uc.
+Definition sin_poly : CR --> CR := uc_compose compress (Cmap QPrelengthSpace sin_poly_uc).
 
 Lemma sin_poly_correct : forall x, AbsSmall (inj_Q IR (1)) x -> (IRasCR (Three[*]x[-]Four[*]x[^]3)==sin_poly (IRasCR x))%CR.
 Proof.
@@ -339,6 +337,7 @@ rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_
  transitivity (IRasCR (inj_Q IR (sin_poly_fun q)));[|apply IRasCR_wd; rapply sin_poly_fun_correct].
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
+ rewrite compress_fun_correct.
  rewrite MonadLaw3.
  rewrite IR_inj_Q_as_CR.
  rewrite CReq_Qeq.
