@@ -1097,6 +1097,26 @@ apply leEq_transitive with (AbsIR (a[-]b)); auto.
 eapply leEq_wdr; [ apply leEq_AbsIR | apply AbsIR_minus ].
 Qed.
 
+Lemma AbsIR_less : forall a b, a[<]b -> [--]b[<]a -> AbsIR a[<]b.
+intros a b H0 H1.
+destruct (smaller _ _ _ (shift_zero_less_minus _ _ _ H0) (shift_zero_less_minus _ _ _ H1)) as
+ [z Hz0 [Hz1 Hz2]].
+apply shift_zero_less_minus'.
+eapply less_leEq_trans.
+apply Hz0.
+apply shift_leEq_minus.
+apply shift_plus_leEq'.
+apply AbsSmall_imp_AbsIR.
+split.
+rstepl (z[-]b).
+apply shift_minus_leEq.
+rstepr (a[-][--]b).
+assumption.
+apply shift_leEq_minus.
+apply shift_plus_leEq'.
+assumption.
+Qed.
+
 End Absolute.
 
 Hint Resolve AbsIRz_isz: algebra.

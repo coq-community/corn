@@ -200,21 +200,20 @@ Power series are an important special case.
 Definition power_series (c : IR) n := c[^]n.
 
 (**
-Specially important is the case when [c] is a positive real number
-less than 1; in this case not only the power series is convergent, but
+Specially important is the case when [c] is a real number
+whose absolute value is less than 1; in this case not only the power series is convergent, but
 we can also compute its sum.
 
-%\begin{convention}% Let [c] be a real number between 0 and 1.
+%\begin{convention}% Let [c] be a real number between -1 and 1.
 %\end{convention}%
 *)
 
 Variable c : IR.
-Hypothesis H0c : Zero [<=] c.
-Hypothesis Hc1 : c [<] One.
+Hypothesis Hc : AbsIR c [<] One.
 
 Lemma c_exp_Lim : Cauchy_Lim_prop2 (power_series c) Zero.
 red in |- *; intros eps H.
-elim (qi_yields_zero c H0c Hc1 eps H).
+elim (qi_yields_zero (AbsIR c) (AbsIR_nonneg _) Hc eps H).
 intros N Hn.
 exists N; intros.
 unfold power_series in |- *.
@@ -223,16 +222,14 @@ apply AbsSmall_transitive with (c[^]N).
 apply AbsIR_imp_AbsSmall.
 eapply leEq_wdl.
 apply Hn.
-apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-apply nexp_resp_nonneg; assumption.
+apply eq_symmetric_unfolded; apply (AbsIR_nexp c N).
 eapply leEq_wdl.
-2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply nexp_resp_nonneg; assumption.
+2: apply eq_symmetric_unfolded; apply (AbsIR_nexp c m).
 eapply leEq_wdr.
-2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-2: apply nexp_resp_nonneg; assumption.
+2: apply eq_symmetric_unfolded; apply (AbsIR_nexp c N).
+change ((AbsIR c)[^]m[<=](AbsIR c)[^]N).
 apply nexp_resp_le'.
-assumption.
+apply AbsIR_nonneg.
 apply less_leEq; assumption.
 assumption.
 Qed.
@@ -243,7 +240,7 @@ intro.
 red in |- *.
 intros.
 unfold power_series in |- *; unfold seq_part_sum in |- *.
-cut ({N : nat | c[^]N [<=] eps[*]AbsIR (One[-]c)}).
+cut ({N : nat | (AbsIR c)[^]N [<=] eps[*]AbsIR (One[-]c)}).
 intro H1.
 elim H1; clear H1; intros N HN.
 exists N; intros.
@@ -256,12 +253,12 @@ eapply leEq_wdl.
 apply shift_div_leEq.
 apply AbsIR_pos; assumption.
 eapply leEq_wdl.
-2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
+2: apply eq_symmetric_unfolded; apply AbsIR_nexp_op.
 eapply leEq_transitive.
 2: apply HN.
 apply nexp_resp_le'; auto.
+apply AbsIR_nonneg.
 apply less_leEq; auto.
-apply nexp_resp_nonneg; auto.
 astepl ( [--] (c[^]m[/] _[//]H) [+] (One[/] _[//]H) [-] (One[/] _[//]H)).
 apply cg_minus_wd.
 2: algebra.
@@ -269,16 +266,18 @@ cut (c[-]One [#] Zero). intros H2.
 apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
 apply Sum0_c_exp with (H := H2).
 rational.
-apply less_imp_ap.
-apply shift_minus_less; astepr OneR; assumption.
-apply qi_yields_zero.
+apply minus_ap_zero.
+apply ap_symmetric.
+apply zero_minus_apart.
 assumption.
+apply qi_yields_zero.
+apply AbsIR_nonneg.
 assumption.
 apply less_wdl with (Zero[*]AbsIR (One[-]c)).
 apply mult_resp_less.
 assumption.
 apply AbsIR_pos.
-apply Greater_imp_ap; apply shift_less_minus; astepl c; assumption.
+assumption.
 apply cring_mult_zero_op.
 Qed.
 
@@ -290,7 +289,11 @@ cut (One[-]c [#] Zero).
 intro H.
 exists (One[/] _[//]H).
 apply power_series_Lim1.
-apply Greater_imp_ap; apply shift_less_minus; astepl c; assumption.
+apply minus_ap_zero.
+apply Greater_imp_ap.
+eapply leEq_less_trans.
+apply leEq_AbsIR.
+assumption.
 Qed.
 
 Lemma power_series_sum : forall H Hc,
@@ -853,7 +856,14 @@ apply str_comparison with (fun n : nat => AbsIR (x N) [*]c[^] (n - N)).
 2: exists N; assumption.
 apply conv_series_mult_scal with (x := fun n : nat => c[^] (n - N)).
 apply join_series with (power_series c).
-apply power_series_conv; assumption.
+apply power_series_conv.
+apply AbsIR_less.
+assumption.
+apply less_leEq_trans with Zero.
+rstepr ([--]Zero:IR).
+apply inv_resp_less.
+apply pos_one.
+assumption.
 exists N.
 exists 0.
 intro.

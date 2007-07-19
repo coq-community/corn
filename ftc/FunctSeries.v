@@ -821,7 +821,14 @@ Opaque FAbs.
 apply conv_fun_series_scal with (f := fun n : nat => [-C-] (c[^] (n - N))).
 apply conv_fun_const_series with (x := fun n : nat => c[^] (n - N)).
 apply join_series with (power_series c).
-apply power_series_conv; auto.
+apply power_series_conv.
+apply AbsIR_less.
+assumption.
+apply less_leEq_trans with Zero.
+rstepr ([--]Zero:IR).
+apply inv_resp_less.
+apply pos_one.
+assumption.
 exists N.
 exists 0.
 intro.
