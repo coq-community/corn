@@ -279,16 +279,27 @@ apply shift_less_minus. astepl x. auto.
 apply shift_less_minus. astepl y. auto.
 Qed.
 
-Lemma equiv_imp_eq_max : forall x x' m, (forall y, x [<] y -> x' [<] y -> m [<] y) ->
- (forall y, m [<] y -> x [<] y) -> (forall y, m [<] y -> x' [<] y) -> Max x x' [=] m.
+Lemma equiv_imp_eq_max : forall x x' m, (forall y, x [<=] y -> x' [<=] y -> m [<=] y) ->
+ (forall y, m [<=] y -> x [<=] y) -> (forall y, m [<=] y -> x' [<=] y) -> Max x x' [=] m.
 intros.
-apply lt_equiv_imp_eq; intros.
-apply X.
-apply leEq_less_trans with (Max x x').
-apply lft_leEq_Max. auto.
-apply leEq_less_trans with (Max x x').
-apply rht_leEq_Max. auto.
-apply Max_less; auto.
+apply not_ap_imp_eq.
+intros X.
+destruct (ap_imp_less _ _ _ X) as [X0|X0].
+apply (less_irreflexive_unfolded _ (Max x x')).
+apply less_leEq_trans with m.
+assumption.
+apply H.
+apply lft_leEq_Max.
+apply rht_leEq_Max.
+case (less_Max_imp _ _ _ X0).
+change (Not (m[<]x)).
+rewrite <- (leEq_def).
+apply H0.
+apply leEq_reflexive.
+change (Not (m[<]x')).
+rewrite <- (leEq_def).
+apply H1.
+apply leEq_reflexive.
 Qed.
 
 Lemma Max_id : forall x : IR, Max x x [=] x.
@@ -374,47 +385,55 @@ Lemma max_plus : forall (a b c : IR),
 Max (a[+]c) (b[+]c) [=] Max a b [+] c.
 intros.
 apply equiv_imp_eq_max; intros.
-apply shift_plus_less.
-apply Max_less; apply shift_less_minus; auto.
-apply leEq_less_trans with (Max a b [+]c); auto.
+apply shift_plus_leEq.
+apply Max_leEq; apply shift_leEq_minus; auto.
+apply leEq_transitive with (Max a b [+]c); auto.
 apply plus_resp_leEq.
 apply lft_leEq_Max.
-apply leEq_less_trans with (Max a b [+]c); auto.
+apply leEq_transitive with (Max a b [+]c); auto.
 apply plus_resp_leEq.
 apply rht_leEq_Max.
 Qed.
 
-Lemma max_mult : forall (a b c : IR), Zero [<] c -> 
+Lemma max_mult : forall (a b c : IR), Zero [<=] c -> 
 (Max (c[*]a) (c[*]b)) [=] c[*](Max a b).
 intros a b c H.
-assert (H1 : c [#] Zero).
-apply pos_ap_zero; auto.
-assert (H2 : Zero [<=] c).
-apply less_leEq; auto.
-assert (forall y : IR, c[*]a[<]y -> c[*]b[<]y -> c[*]Max a b[<]y).
-intros.
-astepl (Max a b [*]c).
-apply shift_mult_less with H1; auto.
-apply Max_less;
-apply shift_less_div; auto.
+apply leEq_imp_eq.
+apply Max_leEq;
+apply mult_resp_leEq_lft.
+apply lft_leEq_Max.
+assumption.
+apply rht_leEq_Max.
+assumption.
+rewrite leEq_def in *.
+intros Z.
+assert (Not (Not (Zero[<]c or Zero[=]c))).
+intros X.
+apply X.
+right.
+apply not_ap_imp_eq.
+intros Y.
+destruct (ap_imp_less _ _ _ Y) as [Y0|Y0].
 auto.
-astepl (c[*]a).
 auto.
-astepl (c[*]b).
-auto.
-assert (forall y : IR, c[*]Max a b[<]y -> c[*]a[<]y).
-intros.
-apply leEq_less_trans with (c[*]Max a b); auto.
-apply mult_resp_leEq_lft; auto.
-apply lft_leEq_MAX.
-auto.
-assert (forall y : IR, c[*]Max a b[<]y -> c[*]b[<]y).
-intros.
-apply leEq_less_trans with (c[*]Max a b); auto.
-apply mult_resp_leEq_lft; auto.
-apply rht_leEq_MAX.
-auto.
-apply equiv_imp_eq_max; auto.
+apply H0.
+intros X.
+generalize Z.
+clear H H0 Z.
+change (Not (Max (c[*]a) (c[*]b)[<]c[*]Max a b)).
+rewrite <- leEq_def.
+destruct X.
+assert (X:c[#]Zero).
+apply ap_symmetric; apply less_imp_ap; assumption.
+apply shift_mult_leEq' with X.
+ assumption.
+apply Max_leEq;(apply shift_leEq_div;[assumption|]).
+rstepl (c[*]a); apply lft_leEq_Max.
+rstepl (c[*]b); apply rht_leEq_Max.
+stepl (c[*]a).
+apply lft_leEq_Max.
+csetoid_rewrite_rev c0.
+rational.
 Qed.
 
 End properties_of_Max.
@@ -509,36 +528,36 @@ apply inv_resp_less.
 apply Max_less; apply inv_resp_less; assumption.
 Qed.
 
-Lemma equiv_imp_eq_min : forall x x' m, (forall y, y [<] x -> y [<] x' -> y [<] m) ->
- (forall y, y [<] m -> y [<] x) -> (forall y, y [<] m -> y [<] x') -> Min x x' [=] m.
-intros.
+Lemma equiv_imp_eq_min : forall x x' m, (forall y, y [<=] x -> y [<=] x' -> y [<=] m) ->
+ (forall y, y [<=] m -> y [<=] x) -> (forall y, y [<=] m -> y [<=] x') -> Min x x' [=] m.
+intros x x' m X X0 X1.
 simpl; unfold MIN.
 astepr ( [--][--]m).
 apply un_op_wd_unfolded.
 apply equiv_imp_eq_max.
 intros.
 rstepr ( [--][--]y).
-apply inv_resp_less.
+apply inv_resp_leEq.
 apply X.
 rstepr ( [--][--]x).
-apply inv_resp_less.
+apply inv_resp_leEq.
 assumption.
 rstepr ( [--][--]x').
-apply inv_resp_less.
+apply inv_resp_leEq.
 assumption.
 intros.
 rstepr ( [--][--]y).
-apply inv_resp_less.
+apply inv_resp_leEq.
 apply X0.
 rstepr ( [--][--]m).
-apply inv_resp_less.
+apply inv_resp_leEq.
 assumption.
 intros.
 rstepr ( [--][--]y).
-apply inv_resp_less.
+apply inv_resp_leEq.
 apply X1.
 rstepr ( [--][--]m).
-apply inv_resp_less.
+apply inv_resp_leEq.
 assumption.
 Qed.
 
@@ -848,7 +867,7 @@ apply AbsIR_inv.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma AbsIR_mult : forall (x c: IR) (H : Zero [<]c),
+Lemma AbsIR_mult : forall (x c: IR) (H : Zero [<=]c),
 c[*] AbsIR (x) [=] AbsIR (c[*]x).
 intros.
 unfold AbsIR.

@@ -352,26 +352,26 @@ values in [IR].
 Lemma AbsIR_sqrt_sqr : forall x x2pos, AbsIR x [=] sqrt (x[^]2) x2pos.
 intros x xxpos. unfold AbsIR in |- *. simpl in |- *. unfold ABSIR in |- *.
 apply equiv_imp_eq_max; intros.
-apply power_cancel_less with 2.
-apply less_leEq.
-apply mult_cancel_less with (Two:IR). apply pos_two.
+apply power_cancel_leEq with 2.
+auto.
+apply mult_cancel_leEq with (Two:IR). apply pos_two.
 rstepl (x[+][--]x).
 rstepr (y[+]y).
-apply plus_resp_less_both; auto.
+apply plus_resp_leEq_both; auto.
 astepl (One[*]x[*]x).
 rstepl (x[^]2[+]Zero).
-apply shift_plus_less'.
+apply shift_plus_leEq'.
 rstepr ((y[-]x) [*] (y[-][--]x)).
-apply mult_resp_pos.
-apply shift_zero_less_minus. auto.
-apply shift_zero_less_minus. auto.
-apply leEq_less_trans with (sqrt (x[^]2) xxpos).
+apply mult_resp_nonneg.
+apply shift_zero_leEq_minus. auto.
+apply shift_zero_leEq_minus. auto.
+apply leEq_transitive with (sqrt (x[^]2) xxpos).
 apply power_cancel_leEq with 2. auto.
 apply sqrt_nonneg.
 astepr (x[^]2).
 apply leEq_reflexive.
 auto.
-apply leEq_less_trans with (sqrt (x[^]2) xxpos).
+apply leEq_transitive with (sqrt (x[^]2) xxpos).
 apply power_cancel_leEq with 2. auto.
 apply sqrt_nonneg.
 astepr (x[^]2).
