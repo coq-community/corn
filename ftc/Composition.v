@@ -35,6 +35,7 @@
  *) 
 
 Require Export MoreFunctions.
+Require Export FunctSeries.
 
 Section Maps_into_Compacts.
 
@@ -77,7 +78,7 @@ Let I := Compact Hab.
 Hypothesis Hf : included (Compact Hab) (Dom F).
 (* end show *)
 
-Definition maps_into_compacts := c [<] d and included (Compact Hcd) (Dom G) and
+Definition maps_into_compacts := included (Compact Hcd) (Dom G) and
  (forall x Hx, I x -> Compact Hcd (F x Hx)).
 
 (* begin show *)
@@ -86,7 +87,6 @@ Hypothesis maps : maps_into_compacts.
 
 Lemma maps_lemma' : forall x Hx, I x -> Compact Hcd (F x Hx).
 inversion_clear maps.
-inversion_clear X0.
 assumption.
 Qed.
 
@@ -97,13 +97,8 @@ apply maps_lemma'.
 assumption.
 Qed.
 
-Lemma maps_lemma_less : c [<] d.
-inversion_clear maps; assumption.
-Qed.
-
 Lemma maps_lemma_inc : included (Compact Hcd) (Dom G).
 inversion_clear maps.
-inversion_clear X0.
 assumption.
 Qed.
 
@@ -233,9 +228,7 @@ apply maps_lemma' with G a b Hab; assumption.
 Qed.
 
 Lemma maps' : maps_into_compacts F G' a b Hab c d Hcd.
-inversion_clear Hmap; inversion_clear X0.
-split.
-assumption.
+inversion_clear Hmap.
 split.
 unfold Hcd in |- *; apply derivative_imp_inc' with G; assumption.
 assumption.
@@ -492,7 +485,6 @@ inversion_clear Hmap'.
 apply Continuous_I_comp with c d (less_leEq _ _ _ Hcd); auto.
 red in |- *; intros.
 split; auto.
-split; auto.
 Included.
 Qed.
 
@@ -522,7 +514,6 @@ elim Hd; clear Hd; intros Hcd Hmap2.
 inversion_clear Hmap2.
 apply Derivative_I_comp with c d Hcd; auto.
 red in |- *; intros.
-split; auto.
 split; auto.
 Included.
 Qed.
