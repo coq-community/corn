@@ -74,7 +74,7 @@ change (AbsIR ((nring (R:=IR) (S n))[*](One[*]nexp IR n x))[<=]
 inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
 stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))) by
 (apply eq_symmetric; rapply inj_Q_mult).
-stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n x))) by apply AbsIR_mult; apply nring_pos; auto with *.
+stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n x))) by apply AbsIR_mult;apply nring_nonneg; auto with *.
 rapply mult_resp_leEq_both.
    apply nring_nonneg; auto with *.
   apply AbsIR_nonneg.
@@ -85,7 +85,7 @@ rapply mult_resp_leEq_both.
  rewrite <- POS_anti_convert.
  stepl ((S n):Q) by apply eq_symmetric; rapply nring_Q.
  rapply leEq_reflexive.
-stepl (One[*](AbsIR (nexp IR n x))) by apply AbsIR_mult; apply pos_one.
+stepl (One[*](AbsIR (nexp IR n x))) by apply AbsIR_mult; apply less_leEq; apply pos_one.
 stepl (AbsIR (nexp IR n x)) by apply eq_symmetric; apply one_mult.
 stepl (nexp IR n (AbsIR x)) by apply eq_symmetric; apply AbsIR_nexp.
 stepr (inj_Q IR (c ^ Zpred p)) by apply inj_Q_wd; simpl; rewrite Q_Qpos_power; reflexivity.
