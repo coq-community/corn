@@ -425,6 +425,159 @@ Qed.
 
 End Differentiability.
 
+Section Sequences.
+
+(** **Sequences
+
+Here we show that the limit of sequences of compositions is the composition of the limits.
+*)
+
+Variables a b : IR.
+Hypothesis Hab : a [<=] b.
+(* begin hide *)
+Let I := Compact Hab.
+(* end hide *)
+
+Variables c d : IR.
+Hypothesis Hcd : c [<=] d.
+
+Variable f : nat -> PartIR.
+Variable g : nat -> PartIR.
+Hypothesis contf : forall n, Continuous_I Hab (f n).
+Hypothesis contg : forall n, Continuous_I Hcd (g n).
+Hypothesis rangef : forall n, forall (x : IR) (Hx : Dom (f n) x), I x -> Compact Hcd (f n x Hx).
+
+(* begin hide *)
+Let incf (n : nat) := contin_imp_inc _ _ _ _ (contf n).
+Let incg (n : nat) := contin_imp_inc _ _ _ _ (contg n).
+(* end hide *)
+
+Section ExplicitLimit.
+
+Variables F G : PartIR.
+
+Hypothesis contF : Continuous_I Hab F.
+Hypothesis contG : Continuous_I Hcd G.
+
+Hypothesis convF : conv_fun_seq' _ _ Hab f F contf contF.
+Hypothesis convG : conv_fun_seq' _ _ Hcd g G contg contG.
+
+(* end hide *)
+Let incF := contin_imp_inc _ _ _ _ contF.
+Let incG := contin_imp_inc _ _ _ _ contG.
+(* end hide *)
+
+(* begin show *)
+Hypothesis rangeF : forall (x : IR) (Hx : Dom F x), I x -> Compact Hcd (F x Hx).
+(* end show *)
+
+Lemma fun_Lim_seq_comp' : forall H H',
+ conv_fun_seq' a b Hab (fun n => g n[o]f n) (G[o]F) H H'.
+Proof.
+intros H H'.
+intros e He.
+destruct (convG _ (pos_div_two _ _ He)) as [N HN].
+destruct (CAnd_proj2 _ _ contG _ (pos_div_two _ _ He)) as [z Hz Hz0].
+destruct (convF _ Hz) as [M HM].
+exists (max N M).
+intros n Hn x Hx.
+assert (Hn0 : N <= n).
+ apply le_trans with (max N M); auto with *.
+assert (Hn1 : M <= n).
+ apply le_trans with (max N M); auto with *.
+apply AbsSmall_imp_AbsIR.
+assert (X:Continuous_I (a:=a) (b:=b) Hab (G[o]f n)).
+ eapply Continuous_I_comp.
+   apply contf.
+  apply contG.
+ (split; try assumption).
+ apply (rangef n).
+rstepr (((g n[o]f n) x (contin_imp_inc a b Hab (g n[o]f n) (H n) x Hx)[-]
+         ((G[o]f n) x (contin_imp_inc a b Hab _ X x Hx)))[+]
+        (((G[o]f n) x (contin_imp_inc a b Hab _ X x Hx))[-]
+         (G[o]F) x (contin_imp_inc a b Hab (G[o]F) H' x Hx))).
+apply AbsSmall_eps_div_two.
+ apply AbsIR_imp_AbsSmall.
+ simpl (AbsIR
+  ((g n[o]f n) x (contin_imp_inc a b Hab (g n[o]f n) (H n) x Hx)[-]
+   (G[o]f n) x (contin_imp_inc a b Hab (G[o]f n) X x Hx))).
+ generalize (ProjT1 (contin_imp_inc a b Hab (g n[o]f n) (H n) x Hx))
+            (ProjT1 (contin_imp_inc a b Hab (G[o]f n) X x Hx))
+            (ProjT2 (contin_imp_inc a b Hab (g n[o]f n) (H n) x Hx))
+            (ProjT2 (contin_imp_inc a b Hab (G[o]f n) X x Hx)).
+ intros Y0 Y1 Y2 Y3.
+ assert (fnx := pfwdef _ _ _ _ Y0 Y1 (eq_reflexive _ x)).
+ assert (Y4 : Dom (g n) (f n x Y1)).
+  apply (dom_wd _ (g n) (f n x Y0));assumption.
+ stepl (ABSIR (g n (f n x Y1) Y4[-]G (f n x Y1) Y3)) by
+  (apply AbsIR_wd; rational).
+ generalize (rangef n x Y1 Hx).
+ generalize (f n x Y1) Y4 Y3.
+ clear Y0 Y1 Y2 Y3 fnx Y4.
+ intros y Hy0 Hy1 Hy.
+ stepl (ABSIR (g n y (contin_imp_inc c d Hcd (g n) (contg n) y Hy)[-]
+               G y (contin_imp_inc c d Hcd G contG y Hy))) by
+  (apply AbsIR_wd; rational).
+ apply HN.
+ assumption.
+apply AbsIR_imp_AbsSmall.
+simpl.
+apply Hz0.
+  apply rangef; assumption.
+ apply rangeF; assumption.
+stepl (AbsIR
+       (f n x (contin_imp_inc a b Hab (f n) (contf n) x Hx)[-]
+        F x (contin_imp_inc a b Hab F contF x Hx))) by
+ (apply AbsIR_wd; rational).
+apply HM.
+assumption.
+Qed.
+
+End ExplicitLimit.
+
+(**
+The same is true if we don't make the limits explicit.
+*)
+
+(* begin hide *)
+Hypothesis Hf : Cauchy_fun_seq _ _ _ _ contf.
+Hypothesis Hg : Cauchy_fun_seq _ _ _ _ contg.
+(* end hide *)
+
+Lemma fun_Lim_seq_comp : forall H H', conv_fun_seq' a b Hab (fun n => g n[o]f n)
+ (Cauchy_fun_seq_Lim _ _ _ _ _ Hg[o]Cauchy_fun_seq_Lim _ _ _ _ _ Hf) H H'.
+Proof.
+intros H H' e H0.
+set (F := Cauchy_fun_seq_Lim _ _ _ _ _ Hf) in *.
+cut (Continuous_I Hab F). intro H1.
+2: unfold F in |- *; apply Cauchy_cont_Lim.
+cut (conv_fun_seq' _ _ _ _ _ contf H1).
+2: unfold F in |- *; apply Cauchy_conv_fun_seq'; assumption.
+intro Hf'.
+set (G := Cauchy_fun_seq_Lim _ _ _ _ _ Hg) in *.
+cut (Continuous_I Hcd G). intro H2.
+2: unfold G in |- *; apply Cauchy_cont_Lim.
+cut (conv_fun_seq' _ _ _ _ _ contg H2).
+2: unfold G in |- *; apply Cauchy_conv_fun_seq'; assumption.
+intro Hg'.
+assert (X: (forall (x : IR) (Hx : Dom F x), I x -> Compact Hcd (F x Hx)) ).
+ intros x Hx Hx'.
+ assert (X:=fun_conv_imp_seq_conv _ _ Hab _ contf _ H1 Hf' _ Hx' (fun n => incf n _ Hx') Hx).
+ assert (X0:Cauchy_prop2 (fun n : nat => Part (f n) x ((fun n0 : nat => incf n0 x Hx') n))).
+  exists (F x Hx).
+  assumption.
+ pose (cs:= (Build_CauchySeq _ _ (Cauchy_prop2_prop _ X0))).
+ assert (X1:=Limits_unique cs _ X).
+ apply compact_wd with (Lim cs);[|apply eq_symmetric; assumption].
+ split;[apply leEq_seq_so_leEq_Lim|apply seq_leEq_so_Lim_leEq];
+  intros i; simpl;
+  destruct (rangef i _ (incf i _ Hx') Hx');
+  assumption.
+apply (fun_Lim_seq_comp' _ _  H1 H2 Hf' Hg' X H); auto.
+Qed.
+
+End Sequences.
+
 Section Generalized_Intervals.
 
 (** **Generalizations
