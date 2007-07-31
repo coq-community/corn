@@ -681,16 +681,16 @@ Variables I J : interval.
 Hypothesis pI : proper I.
 Hypothesis pJ : proper J.
 
-Definition maps_compacts_into (F : PartIR) :=  forall a b Hab, included (compact a b Hab) I ->
- {c : IR | {d : IR | {Hcd : _ | included (Compact (less_leEq _ c d Hcd)) J and
- (forall x Hx, Compact Hab x -> Compact (less_leEq _ _ _ Hcd) (F x Hx))}}}.
+Definition maps_compacts_into_weak (F : PartIR) :=  forall a b Hab, included (compact a b Hab) I ->
+ {c : IR | {d : IR | {Hcd : _ | included (Compact Hcd) J and
+ (forall x Hx, Compact Hab x -> compact c d Hcd (F x Hx))}}}.
 
 (**
 Now everything comes naturally:
 *)
 
 Lemma comp_inc_lemma : forall F,
- maps_compacts_into F -> forall x Hx, I x -> J (F x Hx).
+ maps_compacts_into_weak F -> forall x Hx, I x -> J (F x Hx).
 intros F H x Hx H0.
 cut (included (Compact (leEq_reflexive _ x)) I). intro H1.
 elim (H _ _ _ H1); intros c Hc.
@@ -707,7 +707,7 @@ Qed.
 
 Variables F F' G G' : PartIR.
 (* begin show *)
-Hypothesis Hmap : maps_compacts_into F.
+Hypothesis Hmap : maps_compacts_into_weak F.
 (* end show *) 
 
 Lemma Continuous_comp : Continuous I F -> Continuous J G -> Continuous I (G[o]F).
@@ -724,18 +724,35 @@ elim (Hmap _ _ Hab H); clear Hmap; intros c Hc.
 elim Hc; clear Hc; intros d Hd.
 elim Hd; clear Hd; intros Hcd Hmap'.
 inversion_clear Hmap'.
-apply Continuous_I_comp with c d (less_leEq _ _ _ Hcd); auto.
+apply Continuous_I_comp with c d Hcd; auto.
 red in |- *; intros.
 split; auto.
 Included.
 Qed.
 
+Definition maps_compacts_into (F : PartIR) :=  forall a b Hab, included (compact a b Hab) I ->
+ {c : IR | {d : IR | {Hcd : _ | included (Compact (less_leEq _ _ _ Hcd)) J and
+ (forall x Hx, Compact Hab x -> compact c d (less_leEq _ _ _ Hcd) (F x Hx))}}}.
+
+Lemma maps_compacts_into_strict_imp_weak : forall F,
+maps_compacts_into F -> maps_compacts_into_weak F.
+Proof.
+intros X HX a b Hab Hinc.
+destruct (HX a b Hab Hinc) as [c [d [Hcd Hcd0]]].
+exists c.
+exists d.
+exists (less_leEq _ _ _ Hcd).
+assumption.
+Qed.
+
 (* begin show *)
-Hypothesis Hmap' : maps_compacts_into F'.
+Hypothesis Hmap' : maps_compacts_into F.
 (* end show *)
 
 Lemma Derivative_comp : Derivative I pI F F' -> Derivative J pJ G G' ->
  Derivative I pI (G[o]F) ((G'[o]F) {*}F').
+clear Hmap.
+assert (Hmap := maps_compacts_into_strict_imp_weak F Hmap').
 intros H H0.
 elim H; clear H; intros incF H'.
 elim H'; clear H'; intros incF' derF.
@@ -750,7 +767,7 @@ simpl in |- *; red in |- *; intros x H; exists (incF _ H).
 apply incG'; apply comp_inc_lemma; auto.
 Included.
 intros a b Hab H.
-elim (Hmap _ _ (less_leEq _ _ _ Hab) H); clear Hmap; intros c Hc.
+elim (Hmap' _ _ (less_leEq _ _ _ Hab) H); clear Hmap'; intros c Hc.
 elim Hc; clear Hc; intros d Hd.
 elim Hd; clear Hd; intros Hcd Hmap2.
 inversion_clear Hmap2.
@@ -770,7 +787,7 @@ Hypothesis convG : fun_series_convergent_IR J g.
 Lemma FSeries_Sum_comp_conv : fun_series_convergent_IR I (fun n => g n[o]F).
 red in |- *; intros.
 destruct (Hmap a b Hab Hinc) as [c [d [Hcd [H0 H1]]]].
-apply conv_fun_series_comp with c d (less_leEq _ _ _ Hcd); auto.
+apply conv_fun_series_comp with c d Hcd; auto.
 eapply included_imp_Continuous.
 apply contF.
 auto.
@@ -788,7 +805,7 @@ auto.
 eapply Feq_transitive.
 apply (FSeries_Sum_char _ _ H' a b Hab Hinc).
 apply Feq_transitive with 
- (Fun_Series_Sum (a:=c) (b:=d) (Hab:=less_leEq IR c d Hcd) (f:=g) (convG _ _ _ H0)[o]F).
+ (Fun_Series_Sum (a:=c) (b:=d) (Hab:=Hcd) (f:=g) (convG _ _ _ H0)[o]F).
 apply Fun_Series_Sum_comp.
 auto.
 apply H1.

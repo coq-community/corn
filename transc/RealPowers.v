@@ -254,12 +254,12 @@ apply Continuous_comp with realline.
 2: apply Continuous_mult;
    [ apply H1 | apply Continuous_comp with (openl Zero); auto ].
 3: apply Continuous_Log.
-apply Continuous_imp_maps_compacts_into.
+apply maps_compacts_into_strict_imp_weak; apply Continuous_imp_maps_compacts_into.
 apply Continuous_mult; auto.
 apply Continuous_comp with (openl Zero); auto.
 2: apply Continuous_Log.
-apply positive_imp_maps_compacts_into; auto.
-apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
 Qed.
 
 End Power_Function.
@@ -532,7 +532,7 @@ apply Continuous_imp_maps_compacts_into.
 apply Continuous_mult.
 apply Derivative_imp_Continuous with pJ G'; auto.
 apply Continuous_comp with (openl Zero).
-apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
 apply Derivative_imp_Continuous with pJ F'; auto.
 apply Derivative_imp_Continuous with pJ F'; auto.
 apply Continuous_Log.
