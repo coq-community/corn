@@ -359,9 +359,9 @@ apply less_leEq; assumption.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma fun_Cauchy_prop_const_IR : forall H contH, Cauchy_fun_seq_IR J (fun n => H) contH.
+Lemma fun_Cauchy_prop_const_IR : forall H (contH:Continuous J H), Cauchy_fun_seq_IR J (fun n => H) (fun n => contH).
 intros.
-apply conv_Cauchy_fun_seq'_IR with H (contH 0).
+apply conv_Cauchy_fun_seq'_IR with H (contH).
 apply fun_Lim_seq_const_IR.
 Qed.
 

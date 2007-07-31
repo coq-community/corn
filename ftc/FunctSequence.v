@@ -788,10 +788,10 @@ apply less_leEq; assumption.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma fun_Cauchy_prop_const : forall H contH,
- Cauchy_fun_seq a b Hab (fun n => H) contH.
+Lemma fun_Cauchy_prop_const : forall H (contH:Continuous_I Hab H),
+ Cauchy_fun_seq a b Hab (fun n => H) (fun n => contH).
 intros.
-apply conv_Cauchy_fun_seq' with H (contH 0).
+apply conv_Cauchy_fun_seq' with H contH.
 apply fun_Lim_seq_const.
 Qed.
 
@@ -1138,7 +1138,7 @@ cut
  (Continuous_I Hab
     (Cauchy_fun_seq_Lim _ _ _ _ _
        (fun_Cauchy_prop_const a b Hab [-C-]Zero
-          (fun n : nat => Continuous_I_const _ _ _ _)) {-}
+          (Continuous_I_const _ _ _ _)) {-}
      Cauchy_fun_seq_Lim _ _ _ _ _ Hf)).
 intros H1.
 apply
@@ -1147,7 +1147,7 @@ apply
     H0
     (Cauchy_fun_seq_Lim _ _ _ _ _
        (fun_Cauchy_prop_const a b Hab [-C-]Zero
-          (fun n : nat => Continuous_I_const _ _ _ _)) {-}
+          (Continuous_I_const _ _ _ _)) {-}
      Cauchy_fun_seq_Lim _ _ _ _ _ Hf)
     H1.
 apply eq_imp_Feq.

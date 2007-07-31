@@ -437,6 +437,28 @@ apply Feq_symmetric; assumption.
 apply Feq_symmetric; assumption.
 Qed.
 
+Lemma Feq_comp : forall (J : IR -> CProp),
+(forall x Hx, I x -> J (F x Hx)) -> (forall x Hx, I x -> J (F' x Hx)) ->
+Feq I F F' -> Feq J G G' -> Feq I (G[o]F) (G'[o]F').
+Proof.
+intros J Hmap Hmap' [HF0 [HF1 HF2]] [HG0 [HG1 HG2]].
+repeat split; try (apply included_FComp; Included).
+intros x Habx [Hx0 Hx1] [Hx'0 Hx'1].
+simpl.
+assert (F x Hx0[=]F' x Hx'0).
+apply HF2.
+Included.
+assert (X:Dom G' (F x Hx0)).
+eapply dom_wd.
+ apply Hx'1.
+ apply eq_symmetric; assumption.
+apply eq_transitive with (G' (F x Hx0) X).
+apply HG2.
+Included.
+apply pfwdef.
+assumption.
+Qed.
+
 (**
 Notice that in the case of division we only need to require boundedness away from zero for one of the functions (as they are equal); thus the two last lemmas are stated in two different ways, as according to the context one or the other condition may be easier to prove.
 
