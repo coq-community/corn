@@ -1033,8 +1033,8 @@ replace (n + m * n) with (S m * n); algebra.
 Qed.
 Hint Resolve nexp_mult: algebra.
 
-Lemma zero_nexp : forall (x : R) n, 0 < n -> (Zero:R) [^]n [=] Zero.
-intros x n H.
+Lemma zero_nexp : forall n, 0 < n -> (Zero:R) [^]n [=] Zero.
+intros n H.
 induction  n as [| n Hrecn].
  inversion H.
 Step_final ((Zero:R) [*]Zero[^]n).
