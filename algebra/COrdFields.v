@@ -372,6 +372,22 @@ apply less_antisymmetric_unfolded.
 assumption.
 Qed.
 
+Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
+Proof.
+intros x y Hxy H.
+rewrite leEq_def in Hxy.
+apply H.
+right.
+apply (not_ap_imp_eq).
+intros H0.
+destruct (ap_imp_less _ _ _ H0).
+ apply H.
+ left.
+ assumption.
+apply Hxy.
+assumption.
+Qed.
+
 End Basic_Properties_of_leEq.
 
 Declare Left Step leEq_wdl.
