@@ -981,6 +981,53 @@ Qed.
 
 End Convergence_Criteria.
 
+Section Power_Series.
+
+(** ***Power Series
+
+The geometric series converges on the open interval (-1, 1)
+*)
+
+Lemma fun_power_series_conv_IR : fun_series_convergent_IR (olor ([--]One) One) (fun (i:nat) => Fid IR{^}i).
+Proof.
+intros a b Hab H.
+apply fun_ratio_test_conv.
+ intros n.
+ Contin.
+exists 0%nat.
+exists (Max (AbsIR a) (AbsIR b)).
+ destruct (H a) as [Ha0 Ha1].
+  split; assumption || apply leEq_reflexive.
+ destruct (H b) as [Hb0 Hb1].
+  split; assumption || apply leEq_reflexive.
+ apply Max_less; apply AbsIR_less; assumption.
+split.
+ eapply leEq_transitive.
+  apply AbsIR_nonneg.
+ apply lft_leEq_Max.
+simpl.
+intros x Hx n Hn _ _.
+rstepr (ABSIR (nexp IR n x)[*]MAX (ABSIR a) (ABSIR b)).
+change (AbsIR (nexp IR n x[*]x)[<=]AbsIR (nexp IR n x)[*]Max (AbsIR a) (AbsIR b)).
+stepl (AbsIR (nexp IR n x)[*]AbsIR x) by apply eq_symmetric; apply AbsIR_resp_mult.
+apply mult_resp_leEq_lft;[|apply AbsIR_nonneg].
+apply AbsSmall_imp_AbsIR.
+destruct Hx.
+split.
+ apply leEq_transitive with a;[|assumption].
+ rstepr ([--][--]a).
+ apply inv_resp_leEq.
+ apply leEq_transitive with (AbsIR a).
+  apply inv_leEq_AbsIR.
+ apply lft_leEq_Max.
+apply leEq_transitive with b;[assumption|].
+apply leEq_transitive with (AbsIR b).
+ apply leEq_AbsIR.
+apply rht_leEq_Max.
+Qed.
+
+End Power_Series.
+
 Section Insert_Series.
 
 (** ***Translation

@@ -941,6 +941,33 @@ apply Cos_plus_HalfPi.
 apply un_op_wd_unfolded; apply Sin_plus_HalfPi.
 Qed.
 
+Lemma Tan_plus_HalfPi : forall x Hx Hx' H, Tan (x[+]Pi[/]TwoNZ) Hx[=]([--]One[/](Tan x Hx')[//]H).
+Proof.
+intros x Hy Hx H.
+set (y:=x[+]Pi [/]TwoNZ) in *.
+assert (H0:Cos y[#]Zero).
+ destruct Hy as [[] [[] Hy]].
+ apply (Hy CI).
+assert (H1:Cos x[#]Zero).
+ clear H.
+ destruct Hx as [[] [[] Hx]].
+ apply (Hx CI).
+csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
+unfold y.
+assert (H2:([--](Sin x))[#]Zero).
+ csetoid_rewrite_rev (Cos_plus_HalfPi x).
+ apply H0.
+stepr (Cos x[/]([--](Sin x))[//]H2).
+ apply div_wd.
+  apply Sin_plus_HalfPi.
+ apply Cos_plus_HalfPi.
+clear H0.
+rstepl (((Cos x[/][--](Sin x)[//]H2)[*](Tan x Hx))[/](Tan x Hx)[//]H).
+apply div_wd;[|apply eq_reflexive].
+csetoid_rewrite (Tan_Sin_over_Cos x Hx H1).
+rational.
+Qed.
+
 Hint Resolve Sin_plus_Pi Cos_plus_Pi: algebra.
 
 (** Sine and cosine have period [Two Pi], tangent has period [Pi]. *)

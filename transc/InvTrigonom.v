@@ -211,6 +211,14 @@ Lemma Derivative_ArcTan : forall H, Derivative realline H ArcTang {1/} ( [-C-]On
 intros; unfold ArcTang in |- *; apply FTC1.
 Qed.
 
+Lemma ArcTan_wd : forall x y, x[=]y -> ArcTan x [=] ArcTan y.
+Proof.
+intros.
+refine (pfwdef _ _ _ _ _ _ _).
+assumption.
+Qed.
+
+Hint Resolve ArcTan_wd: algebra.
 Hint Resolve Derivative_ArcCos Derivative_ArcTan: derivate.
 Hint Resolve Continuous_ArcCos Continuous_ArcTan: continuous.
 
