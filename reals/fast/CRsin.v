@@ -186,7 +186,7 @@ apply mult_wd.
   apply inj_Q_power.
  rapply nexp_wd.
  stepr ([--](inj_Q IR 1)).
-  apply inj_Q_min.
+  apply inj_Q_inv.
  apply un_op_wd_unfolded.
  rstepr (nring 1:IR).
  apply (inj_Q_nring IR 1).
@@ -306,7 +306,7 @@ split.
  stepl (inj_Q IR (-(1))).
   assumption.
  stepr ([--](inj_Q IR 1)).
-  apply inj_Q_min.
+  apply inj_Q_inv.
  rapply un_op_wd_unfolded.
  apply (inj_Q_nring IR 1).
  rstepr (Nine[-]Zero:IR).
@@ -352,7 +352,7 @@ rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_
  rewrite <- Qle_min_r.
  apply leEq_inj_Q with IR.
  destruct Hq0; assumption.
-destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_min|];assumption.
+destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_inv|];assumption.
 Qed.
 
 Lemma Sin_triple_angle : forall x, (Sin(Three[*]x)[=]Three[*]Sin x[-]Four[*]Sin x[^]3).
@@ -499,7 +499,7 @@ rewrite <- IR_opp_as_CR.
 apply IRasCR_wd.
 csetoid_rewrite_rev (Sin_inv (inj_Q IR (-a))).
 apply Sin_wd.
-csetoid_rewrite_rev (inj_Q_min IR (-a)).
+csetoid_rewrite_rev (inj_Q_inv IR (-a)).
 apply inj_Q_wd.
 simpl.
 ring.

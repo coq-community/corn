@@ -608,7 +608,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma inj_Q_min : forall q1, inj_Q [--]q1 [=] [--](inj_Q q1).
+Lemma inj_Q_inv : forall q1, inj_Q [--]q1 [=] [--](inj_Q q1).
 Proof.
  intro.
  apply cg_cancel_lft with (x := inj_Q q1).
@@ -631,7 +631,7 @@ Proof.
  apply inj_Q_plus.
  astepr (inj_Q q1[+][--](inj_Q q2)).
  apply plus_resp_eq.
- apply inj_Q_min.
+ apply inj_Q_inv.
 Qed.
 
 Lemma inj_Q_div : forall q1 q2 H, inj_Q (q1/q2)%Q [=] (inj_Q q1[/]inj_Q q2[//]H). 
@@ -696,7 +696,7 @@ Proof.
  apply leEq_wdl with (x := [--](inj_Q e)).
  assumption.
  apply eq_symmetric_unfolded.
- apply inj_Q_min.
+ apply inj_Q_inv.
  apply leEq_inj_Q. 
  assumption.
 Qed.
@@ -943,11 +943,11 @@ exists (-q)%Q.
  stepr ([--](inj_Q q)).
  apply inv_cancel_less.
   stepl (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
- apply eq_symmetric; apply inj_Q_min. 
+ apply eq_symmetric; apply inj_Q_inv. 
 stepl ([--](inj_Q q)).
 apply inv_cancel_less.
  stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
-apply eq_symmetric; apply inj_Q_min.
+apply eq_symmetric; apply inj_Q_inv.
 
 cut  (forall a b : R1,
 Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).

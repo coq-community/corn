@@ -127,7 +127,7 @@ rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_
  rewrite <- Qle_min_r.
  apply leEq_inj_Q with IR.
  destruct Hq0; assumption.
-destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_min|];assumption.
+destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_inv|];assumption.
 Qed.
 
 Lemma Cos_double_angle : forall x, (Cos(Two[*]x)[=]One[-]Two[*]Sin x[^]2).

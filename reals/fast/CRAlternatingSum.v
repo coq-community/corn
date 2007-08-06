@@ -1007,7 +1007,7 @@ cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
   (apply eq_symmetric; apply inj_Q_power).
  apply nexp_wd.
  stepr ([--](inj_Q IR 1)) by
-   (apply eq_symmetric; apply inj_Q_min).
+   (apply eq_symmetric; apply inj_Q_inv).
  apply un_op_wd_unfolded.
  rstepl ((nring 1):IR).
  apply eq_symmetric; apply (inj_Q_nring IR 1).

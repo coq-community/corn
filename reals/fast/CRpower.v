@@ -111,7 +111,7 @@ apply AbsSmall_imp_AbsIR.
 destruct Hx; split; try assumption.
 stepl (inj_Q IR (-c)).
  assumption.
-apply inj_Q_min.
+apply inj_Q_inv.
 Qed.
 
 Definition Qpower_positive_uc (c:Qpos) :  Q_as_MetricSpace --> Q_as_MetricSpace :=
@@ -150,7 +150,7 @@ transitivity (IRasCR (inj_Q IR (Qpower_positive q p))).
    reflexivity.
   rewrite <- Qle_max_r.
   apply leEq_inj_Q with IR.
-  stepl [--](inj_Q IR (c:Q)) by apply eq_symmetric; apply inj_Q_min.
+  stepl [--](inj_Q IR (c:Q)) by apply eq_symmetric; apply inj_Q_inv.
   destruct Hq; assumption.
  rewrite <- Qle_min_r.
  apply leEq_inj_Q with IR.
