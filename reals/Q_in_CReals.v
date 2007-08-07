@@ -589,6 +589,14 @@ Proof.
  assumption.
 Qed.
 
+Lemma inj_Q_ap : forall q1 q2, (q1 [#] q2) -> inj_Q q1 [#] inj_Q q2.
+Proof.
+intros q1 q2 H.
+destruct (ap_imp_less _ _ _ H);
+ [apply less_imp_ap|apply Greater_imp_ap];
+ apply inj_Q_less; assumption.
+Qed.
+
 Lemma leEq_inj_Q : forall q1 q2, (inj_Q q1 [<=] inj_Q q2) -> q1 [<=] q2.
 intros.
 rewrite leEq_def; intro.
