@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import QMinMax.
 Require Import CRAlternatingSum.
 Require Export CRArith.
 Require Import CRIR.
@@ -146,7 +147,7 @@ Defined.
 
 Definition rational_exp_small (a:Q) (p:-(1) <= a <= 1) : CR.
 intros a p.
-destruct (Qlt_le_dec 0 a).
+destruct (Qlt_le_dec_fast 0 a).
 refine (CRinv_pos (1#3) (@rational_exp_small_neg (-a) _)).
 abstract (destruct p;split;[apply Qopp_le_compat; assumption|apply (Qopp_le_compat 0); apply Qlt_le_weak; assumption]).
 apply (rational_exp_small_neg (conj (proj1 p) q)).

@@ -21,12 +21,11 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import Qpossec.
 Require Import QArith.
+Require Import QMinMax.
 Require Import TotalOrder.
 
-Opaque Qlt_le_dec.
-
 Definition Qpos_le_total (x y : Qpos) : {x <= y} + {y <= x} :=
-match Qlt_le_dec x y with
+match Qlt_le_dec_fast x y with
 | left p => left _ (Qlt_le_weak _ _ p)
 | right p => right _ p
 end.
@@ -188,5 +187,3 @@ Definition Qpos_max_plus_distr_l : forall x y z : Qpos, Qpos_plus (Qpos_max y z)
  fun a => @monotone_join_distr Qto _ (Qplus_monotone_l a).
 
 End QTotalOrder.
-
-Transparent Qlt_le_dec.

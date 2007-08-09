@@ -22,10 +22,18 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import QArith_base.
 Require Import TotalOrder.
 
-Opaque Qlt_le_dec.
+Definition Qlt_le_dec_fast x y : {x < y} + {y <= x}.
+intros x y.
+change ({x ?= y = Lt}+{y<=x}).
+cut (x ?= y <> Lt -> y <= x).
+destruct (x?=y); intros H;
+ (right; abstract(apply H; discriminate)) ||
+ (left; reflexivity).
+refine (Qnot_lt_le _ _).
+Defined.
 
 Definition Qle_total x y : {x <= y} + {y <= x} :=
-match Qlt_le_dec x y with
+match Qlt_le_dec_fast x y with
 | left p => left _ (Qlt_le_weak _ _ p)
 | right p => right _ p
 end.
@@ -208,5 +216,3 @@ Hint Resolve Qmin_glb: qarith.
 Hint Resolve Qmax_ub_l: qarith.
 Hint Resolve Qmax_ub_r: qarith.
 Hint Resolve Qmax_lub: qarith.
-
-Transparent Qlt_le_dec.

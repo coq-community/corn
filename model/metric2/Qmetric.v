@@ -1,4 +1,5 @@
 Require Export Metric.
+Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
 Require Import CornTac.
@@ -14,13 +15,13 @@ unfold Qball, AbsSmall.
 simpl.
 set (c:=-e).
 set (d:=(a-b)).
-destruct (Qlt_le_dec d c) as [Hdc|Hdc].
+destruct (Qlt_le_dec_fast d c) as [Hdc|Hdc].
 right.
 abstract(
 intros [H1 H2];
 apply (Qlt_not_le _ _ Hdc H1)
 ).
-destruct (Qlt_le_dec e d) as [Hed|Hed].
+destruct (Qlt_le_dec_fast e d) as [Hed|Hed].
 right.
 abstract(
 intros [H1 H2];

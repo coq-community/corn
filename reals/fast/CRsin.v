@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import QMinMax.
 Require Import CRAlternatingSum.
 Require Export CRArith.
 Require Import CRIR.
@@ -400,7 +401,7 @@ Fixpoint rational_sin_pos_bounded (n:nat) (a:Q) : 0 <= a <= (3^n)%Z -> CR :=
 match n return 0 <= a <= (3^n)%Z -> CR with 
 | O => @rational_sin_small_pos a
 | S n' => 
-  match (Qlt_le_dec 1 a) with
+  match (Qlt_le_dec_fast 1 a) with
   | left _ => fun H => sin_poly (rational_sin_pos_bounded n' (shrink_by_three n' H))
   | right H' => fun H => rational_sin_small_pos (conj (proj1 H) H')
   end
@@ -413,7 +414,7 @@ induction n.
  rapply rational_sin_small_pos_correct.
 intros a Ha.
 unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
-destruct (Qlt_le_dec 1 a);[|rapply rational_sin_small_pos_correct].
+destruct (Qlt_le_dec_fast 1 a);[|rapply rational_sin_small_pos_correct].
 rewrite IHn.
 rewrite <- sin_poly_correct.
  apply AbsIR_imp_AbsSmall.
