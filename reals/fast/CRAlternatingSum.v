@@ -286,10 +286,10 @@ apply Limit_tl.
 assumption.
 Defined.
 
-Definition InfiniteAlternatingSum_raw (seq:Stream Q)(dnn:DecreasingNonNegative seq)(zl:Limit seq 0)(e:QposInf) :=
+Definition InfiniteAlternatingSum_raw (seq:Stream Q)(zl:Limit seq 0)(e:QposInf) :=
 PartialAlternatingSumUntil _ (Limit_near zl e).
 
-Lemma InfiniteAlternatingSum_prf : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0), is_RegularFunction (InfiniteAlternatingSum_raw dnn zl).
+Lemma InfiniteAlternatingSum_prf : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0), is_RegularFunction (InfiniteAlternatingSum_raw zl).
 Proof.
 Opaque Qball_dec.
 intros seq dnn zl.
@@ -298,8 +298,8 @@ simpl.
 
 (*WLOG e2 <= e1*)
 cut (forall e1 e2 : Qpos, e2 <= e1 ->
-Qball (e1 + e2) (InfiniteAlternatingSum_raw dnn zl e1)
-  (InfiniteAlternatingSum_raw dnn zl e2)).
+Qball (e1 + e2) (InfiniteAlternatingSum_raw zl e1)
+  (InfiniteAlternatingSum_raw zl e2)).
 intros H e1 e2.
 destruct (Qpos_le_total e1 e2).
 setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
