@@ -24,9 +24,9 @@ Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
 Require Import Qordfield.
-Require Import ModulusDerivative.
-Require Import ContinuousCorrect.
+Require Import Q_in_CReals.
 Require Import Qmetric.
+Require Import QMinMax.
 Require Import MoreArcTan.
 Require Import CornTac.
 
@@ -94,8 +94,8 @@ unfold arcTanSequence.
 apply mult_Streams_zl with (1#1)%Qpos.
  apply everyOther_zl.
  apply recip_positives_zl.
-apply powers_help_nbz; try
- apply square_zero_one; assumption.
+abstract (apply powers_help_nbz; try
+ apply square_zero_one; assumption).
 Defined.
 
 End ArcTanSeries.
