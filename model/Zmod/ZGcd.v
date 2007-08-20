@@ -36,7 +36,7 @@
 (* ZGcd.v, by Vince Barany *)
 
 Require Export ZDivides.
-Require Export Wf.
+Require Export Coq.Init.Wf.
 
 (**
 * The GCD-function over Z
