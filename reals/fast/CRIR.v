@@ -62,6 +62,24 @@ rapply map_wd_unfolded.
 assumption.
 Qed.
 
+Lemma CR_less_as_IR : forall x y, (IRasCR x < IRasCR y -> x[<]y)%CR.
+Proof.
+intros x y H.
+stepl (CRasIR (IRasCR x)) by apply IRasCRasIR_id.
+stepr (CRasIR (IRasCR y)) by apply IRasCRasIR_id.
+rapply map_pres_less.
+assumption.
+Qed.
+
+Lemma CR_ap_as_IR : forall x y, (IRasCR x >< IRasCR y -> x[#]y)%CR.
+Proof.
+intros.
+stepl (CRasIR (IRasCR x)) by apply IRasCRasIR_id.
+stepr (CRasIR (IRasCR y)) by apply IRasCRasIR_id.
+rapply map_pres_apartness.
+assumption.
+Qed.
+
 Lemma IR_leEq_as_CR : forall x y, x[<=]y <-> (IRasCR x <= IRasCR y)%CR.
 Proof.
 intros x y.
@@ -70,9 +88,22 @@ solve [ rapply map_strext
       |rapply map_pres_less].
 Qed.
 
-Lemma IR_Zero_as_CR : (IRasCR Zero==Zero)%CR.
+Lemma IR_Zero_as_CR : (IRasCR Zero=='0)%CR.
 Proof.
 rapply map_pres_zero_unfolded.
+Qed.
+
+Hint Rewrite IR_Zero_as_CR : IRtoCR.
+
+Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< '0 -> x[#]Zero)%CR.
+Proof.
+intros.
+apply CR_ap_as_IR.
+generalize X.
+apply CRapart_wd.
+ reflexivity.
+symmetry.
+apply IR_Zero_as_CR.
 Qed.
 
 Lemma IR_plus_as_CR : forall x y,
@@ -80,6 +111,8 @@ Lemma IR_plus_as_CR : forall x y,
 Proof.
 rapply map_pres_plus.
 Qed.
+
+Hint Rewrite IR_plus_as_CR : IRtoCR.
 
 Lemma IR_Sum0_as_CR : forall m x, 
  (IRasCR (Sum0 m x)==Sum0 m (fun n => IRasCR (x n)))%CR.
@@ -101,6 +134,8 @@ Proof.
 rapply map_pres_minus.
 Qed.
 
+Hint Rewrite IR_opp_as_CR : IRtoCR.
+
 Lemma IR_minus_as_CR : forall x y,
  (IRasCR (x[-]y)== IRasCR x - IRasCR y)%CR.
 Proof.
@@ -111,16 +146,22 @@ rewrite IR_opp_as_CR.
 reflexivity.
 Qed.
 
-Lemma IR_One_as_CR : (IRasCR One==One)%CR.
+Hint Rewrite IR_minus_as_CR : IRtoCR.
+
+Lemma IR_One_as_CR : (IRasCR One=='1)%CR.
 Proof.
 rapply map_pres_one_unfolded.
 Qed.
+
+Hint Rewrite IR_One_as_CR : IRtoCR.
 
 Lemma IR_mult_as_CR : forall x y, 
  (IRasCR (x[*]y)==(IRasCR x * IRasCR y))%CR.
 Proof.
 rapply map_pres_mult.
 Qed.
+
+Hint Rewrite IR_mult_as_CR : IRtoCR.
 
 Lemma IR_div_as_CR : forall x y y_ y__, 
  (IRasCR (x[/]y[//]y_)==(IRasCR x[/]IRasCR y[//]y__))%CR.
@@ -144,6 +185,36 @@ Proof.
 intros; rapply IR_div_as_CR.
 Qed.
 
+Lemma IR_div_as_CR_2 :forall x y y_,
+ (IRasCR (x[/]y[//](CR_ap_zero_as_IR _ y_))==(IRasCR x[/]IRasCR y[//]y_))%CR.
+Proof.
+intros; rapply IR_div_as_CR.
+Qed.
+
+Lemma IR_recip_as_CR :forall y y_ y__,
+ (IRasCR (One[/]y[//]y_)==(CRinv (IRasCR y) y__))%CR.
+Proof.
+intros y y_ y__.
+assert (X:=(IR_div_as_CR One y y_ y__)).
+rewrite X.
+change ((IRasCR One * CRinv (IRasCR y) y__) == (CRinv (IRasCR y) y__))%CR.
+rewrite IR_One_as_CR.
+change (('1 * CRinv (IRasCR y) y__ == CRinv (IRasCR y) y__)%CR).
+ring.
+Qed.
+
+Lemma IR_recip_as_CR_1 :forall y y_,
+ (IRasCR (One[/]y[//]y_)==(CRinv (IRasCR y) (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_)))%CR.
+Proof.
+intros; rapply IR_recip_as_CR.
+Qed.
+
+Lemma IR_recip_as_CR_2 :forall y y_,
+ (IRasCR (One[/]y[//](CR_ap_zero_as_IR _ y_))==(CRinv (IRasCR y) y_))%CR.
+Proof.
+intros; rapply IR_recip_as_CR.
+Qed.
+
 Lemma IR_nring_as_CR : forall n, 
  (IRasCR (nring n)==nring n)%CR.
 Proof.
@@ -158,6 +229,8 @@ rewrite IHn.
 rewrite IR_One_as_CR.
 reflexivity.
 Qed.
+
+Hint Rewrite IR_nring_as_CR : IRtoCR.
 
 Lemma IR_pring_as_CR : forall p, 
  (IRasCR (pring _ p)==pring _ p)%CR.
@@ -219,6 +292,8 @@ apply CRopp_wd.
 apply IR_pring_as_CR.
 Qed.
 
+Hint Rewrite IR_zring_as_CR : IRtoCR.
+
 Lemma IR_inj_Q_as_CR : forall (a:Q), (IRasCR (inj_Q IR a)==('a))%CR.
 Proof.
 intros [n d].
@@ -277,6 +352,8 @@ rewrite X.
 rewrite CRopp_Qopp.
 reflexivity.
 Qed.
+
+Hint Rewrite IR_inj_Q_as_CR : IRtoCR.
 
 Lemma IR_Cauchy_prop_as_CR : forall (x:CauchySeq IR),
 (Cauchy_prop (fun n => (IRasCR (x n)))).

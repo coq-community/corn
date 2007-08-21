@@ -33,7 +33,7 @@ Set Implicit Arguments.
 Open Local Scope uc_scope.
 Opaque CR Qmin Qmax Qred.
 
-Definition CRpos (x:CR) := {e:Qpos | ' e <= x}%CR.
+Definition CRpos (x:CR) := sig (fun e:Qpos => ' e <= x)%CR.
 
 Lemma CRpos_wd : forall x y, (x==y)%CR -> (CRpos x) -> (CRpos y).
 Proof.
@@ -45,7 +45,31 @@ assumption
 ).
 Defined.
 
-Definition CRneg (x:CR) := {e:Qpos | x <= ' (-e)%Q}%CR.
+Lemma CRpos_char : forall (e:Qpos) (x:CR), 2*e <= (approximate x e) -> 
+ CRpos x.
+intros e x H.
+exists e.
+abstract (
+intros a;
+simpl;
+unfold Cap_raw;
+simpl;
+apply Qle_trans with (-(1#2)*a);
+ [rewrite Qle_minus_iff; ring_simplify; discriminate|];
+rewrite Qle_minus_iff;
+destruct (regFun_prf x e ((1#2)*a)%Qpos) as [_ X];
+(replace RHS with (approximate x ((1 # 2) * a)%Qpos + (1#2)*a + e + - (2*e)) by ring);
+rewrite <- Qle_minus_iff;
+apply Qle_trans with (approximate x e); try assumption;
+simpl in X;
+rewrite Qle_minus_iff in X;
+rewrite Qle_minus_iff;
+autorewrite with QposElim in X;
+(replace RHS with (e + (1 # 2) * a + - (approximate x e - approximate x ((1 # 2) * a)%Qpos)) by ring);
+assumption).
+Defined.
+
+Definition CRneg (x:CR) := sig (fun e:Qpos => x <= ' (-e)%Q)%CR.
 
 Lemma CRneg_wd : forall x y, (x==y)%CR -> (CRneg x) -> (CRneg y).
 Proof.
@@ -55,6 +79,31 @@ abstract (
 rewrite <- Hxy;
 assumption
 ).
+Defined.
+
+Lemma CRneg_char : forall (e:Qpos) (x:CR), (approximate x e) <= -(2)*e -> 
+ CRneg x.
+intros e x H.
+exists e.
+abstract (
+intros a;
+simpl;
+unfold Cap_raw;
+simpl;
+apply Qle_trans with (-(1#2)*a);
+ [rewrite Qle_minus_iff; ring_simplify; discriminate|];
+rewrite Qle_minus_iff;
+destruct (regFun_prf x e ((1#2)*a)%Qpos) as [X _];
+(replace RHS with ( - e + - approximate x ((1 # 2) * a)%Qpos + (1 # 2) * a + approximate x e + - approximate x e) by ring);
+rewrite <- Qle_minus_iff;
+apply Qle_trans with (-(2)*e); try assumption;
+simpl in X;
+rewrite Qle_minus_iff in X;
+rewrite Qle_minus_iff;
+autorewrite with QposElim in X;
+(replace RHS with (approximate x e - approximate x ((1 # 2) * a)%Qpos +
+    - - (e + (1 # 2) * a)) by ring);
+assumption).
 Defined.
 
 Definition CRlt (x y:CR) := CRpos (y-x)%CR.

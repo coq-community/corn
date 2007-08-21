@@ -85,6 +85,7 @@ Proof.
 intros x y e1 e2; rapply ball_refl.
 Qed.
 
+Hint Rewrite CRplus_Qplus : CRfast_compute.
 Hint Rewrite <- CRplus_Qplus : toCRring.
 
 Lemma CRopp_Qopp : forall (x:Q), - inject_Q x == inject_Q (- x)%Q.
@@ -92,6 +93,7 @@ Proof.
 intros x e1 e2; rapply ball_refl.
 Qed.
 
+Hint Rewrite CRopp_Qopp : CRfast_compute.
 Hint Rewrite <- CRopp_Qopp : toCRring.
 
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q x - inject_Q y == inject_Q (x - y)%Q.
@@ -186,3 +188,15 @@ rapply uc_wd.
 Qed.
 
 Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@msp_Xsetoid _ _ _ (@msp CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
+
+Lemma CRplus_translate' : forall x y, x + inject_Q y == translate y x.
+Proof.
+intros x y.
+transitivity (inject_Q y + x)%CR.
+ ring.
+apply CRplus_translate.
+Qed.
+
+Hint Rewrite CRplus_translate : CRfast_compute.
+Hint Rewrite CRplus_translate' : CRfast_compute.
+
