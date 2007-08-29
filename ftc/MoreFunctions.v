@@ -232,11 +232,19 @@ exact (compact_single_iprop I x H0).
 exact (compact_single_prop x).
 Qed.
 
+Lemma Continuous_NRoot : forall n H, (forall x : IR, I x -> forall Hx, Zero[<=]F x Hx)
+ -> Continuous I (FNRoot F n H).
+Proof.
+intros n H.
+elim contF; intros incF' contF'.
+split; Contin.
+Qed.
+
 End Other_Results.
 
 Hint Resolve continuous_compact Continuous_const Continuous_id
   Continuous_plus Continuous_inv Continuous_minus Continuous_mult
-  Continuous_scal Continuous_nth Continuous_recip Continuous_abs: continuous.
+  Continuous_scal Continuous_nth Continuous_recip Continuous_abs Continuous_NRoot: continuous.
 
 Hint Immediate included_imp_Continuous Included_imp_Continuous: continuous.
 

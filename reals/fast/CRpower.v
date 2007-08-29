@@ -215,3 +215,19 @@ apply CR_b_upperBound.
 Qed.
 
 End CRpower_positive.
+
+Add Morphism CRpower_positive with signature ms_eq ==> ms_eq as CRpower_positive_wd.
+Proof.
+intros p x1 x2 Hx.
+transitivity (CRpower_positive_bounded p (CR_b (1 # 1) x1) x2).
+ change (ucFun (CRpower_positive_bounded p (CR_b (1#1) x1)) x1==ucFun (CRpower_positive_bounded p (CR_b (1#1) x1)) x2)%CR.
+ apply uc_wd; assumption.
+apply CRpositive_power_bounded_positive_power.
+split; simpl; rewrite <- Hx.
+ rewrite CRopp_Qopp.
+ apply CR_b_lowerBound.
+apply CR_b_upperBound.
+Qed.
+
+
+

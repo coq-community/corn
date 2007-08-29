@@ -811,6 +811,33 @@ rewrite leEq_def.
 intro; auto.
 Qed.
 
+Lemma power_plus_leEq : forall n (x y:R), (0 < n) -> (Zero[<=]x) -> (Zero[<=]y) ->
+(x[^]n [+] y[^]n)[<=](x[+]y)[^]n.
+Proof.
+intros [|n] x y Hn Hx Hy.
+ elimtype False; auto with *.
+induction n.
+ simpl.
+ rstepl (One[*](x[+]y)).
+ apply leEq_reflexive.
+rename n into m.
+set (n:=(S m)) in *.
+apply leEq_transitive with ((x[^]n[+]y[^]n)[*](x[+]y)).
+ apply shift_zero_leEq_minus'.
+ change (x[^]S n) with (x[^]n[*]x).
+ change (y[^]S n) with (y[^]n[*]y).
+ rstepr (y[*]x[^]n[+]x[*]y[^]n).
+ apply plus_resp_nonneg; 
+  apply mult_resp_nonneg; 
+  try apply nexp_resp_nonneg; 
+  try assumption.
+change ((x[+]y)[^]S n) with ((x[+]y)[^]n[*](x[+]y)).
+apply mult_resp_leEq_rht.
+ apply IHn.
+ unfold n; auto with *.
+apply plus_resp_nonneg; assumption.
+Qed.
+
 End Properties_of_leEq.
 
 (***********************************)

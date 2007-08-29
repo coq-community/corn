@@ -660,6 +660,74 @@ apply Greater_imp_ap; auto.
 elimtype False; exact (less_irreflexive _ _ H0).
 Qed.
 
+Lemma Max_monotone : forall (f: PartIR), 
+ (forall (x y:IR) Hx Hy, (Min a b)[<=]x -> x[<=]y -> y[<=](Max a b) -> 
+   (f x Hx)[<=](f y Hy)) ->
+forall Ha Hb Hc, (Max (f a Ha) (f b Hb)) [=] f (Max a b) Hc.
+Proof.
+intros f H Ha Hb Hc.
+apply leEq_imp_eq.
+ apply Max_leEq; apply H;
+  (apply leEq_reflexive ||
+   apply Min_leEq_lft ||
+   apply Min_leEq_rht ||
+   apply lft_leEq_Max ||
+   apply rht_leEq_Max).
+rewrite leEq_def.
+intros X.
+apply (leEq_or_leEq IR a b).
+intros H0.
+generalize X; clear X.
+change (Not (Max (f a Ha) (f b Hb)[<]f (Max a b) Hc)).
+rewrite <- leEq_def.
+destruct H0.
+ stepl (f b Hb).
+  apply rht_leEq_Max.
+ apply pfwdef.
+ apply eq_symmetric; apply leEq_imp_Max_is_rht.
+ assumption.
+stepl (f a Ha).
+ apply lft_leEq_Max.
+apply pfwdef.
+stepr (Max b a) by apply Max_comm.
+apply eq_symmetric; apply leEq_imp_Max_is_rht.
+assumption.
+Qed.
+
+Lemma Min_monotone : forall (f: PartIR), 
+ (forall (x y:IR) Hx Hy, (Min a b)[<=]x -> x[<=]y -> y[<=](Max a b) -> 
+   (f x Hx)[<=](f y Hy)) ->
+forall Ha Hb Hc, (Min (f a Ha) (f b Hb)) [=] f (Min a b) Hc.
+Proof.
+intros f H Ha Hb Hc.
+apply leEq_imp_eq;[|
+  apply leEq_Min; apply H;
+  (apply leEq_reflexive ||
+   apply Min_leEq_lft ||
+   apply Min_leEq_rht ||
+   apply lft_leEq_Max ||
+   apply rht_leEq_Max)].
+rewrite leEq_def.
+intros X.
+apply (leEq_or_leEq IR a b).
+intros H0.
+generalize X; clear X.
+change (Not (f (Min a b) Hc[<]Min (f a Ha) (f b Hb))).
+rewrite <- leEq_def.
+destruct H0.
+ stepr (f a Ha).
+  apply Min_leEq_lft.
+ apply pfwdef.
+ apply eq_symmetric; apply leEq_imp_Min_is_lft.
+ assumption.
+stepr (f b Hb).
+ apply Min_leEq_rht.
+apply pfwdef.
+stepr (Min b a) by apply Min_comm.
+apply eq_symmetric; apply leEq_imp_Min_is_lft.
+assumption.
+Qed.
+
 End Minimum.
 
 (***********************************)

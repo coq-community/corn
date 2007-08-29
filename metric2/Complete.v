@@ -352,7 +352,7 @@ apply ball_approx_l.
 Qed.
 
 End RegularFunction.
-
+Implicit Arguments regFunEq_e_small [X].
 Implicit Arguments is_RegularFunction [X].
 
 Implicit Arguments Cunit [X].

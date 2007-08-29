@@ -32,6 +32,7 @@ Require Import PowerSeries.
 Require Import SinCos.
 Require Import Ndigits.
 Require Import Compress.
+Require Import PowerBound.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -439,39 +440,6 @@ apply Sin_triple_angle.
 Qed.
 
 End Sin_Poly.
-
-Lemma power3bound : forall q, (q <= (3^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z).
-intros [[|n|n] d]; try discriminate.
-unfold Qle.
-simpl.
-Open Scope Z_scope.
-rewrite Zpos_mult_morphism.
-apply Zmult_le_compat; auto with *.
-clear - n.
-apply Zle_trans with (two_p (Zsucc (log_inf n))-1)%Z.
- rewrite <- Zle_plus_swap.
- apply Zlt_succ_le.
- change (n+1) with (Zsucc n).
- apply Zsucc_lt_compat.
- destruct (log_inf_correct2 n).
- assumption.
-replace (Zsucc (log_inf n)) with (Z_of_nat (Psize n)).
- apply Zle_trans with (two_p (Psize n)).
-  auto with *.
- induction (Psize n); auto with *.
- rewrite inj_S.
- simpl.
- unfold Zsucc.
- rewrite two_p_is_exp; auto with *.
- change (two_p 1) with 2.
- rewrite Zpower_exp; auto with *.
- change (3^1) with 3.
- apply Zmult_le_compat; auto with *.
- induction (Z_of_nat n0); auto with *.
-induction n; auto with *; simpl; rewrite <- IHn;
- rewrite <- POS_anti_convert; rewrite inj_S; reflexivity.
-Close Scope Z_scope.
-Qed.
 
 Definition rational_sin_pos (a:Q) (Ha:0 <= a) : CR :=
  @rational_sin_pos_bounded _ a (conj Ha (power3bound a)).

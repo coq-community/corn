@@ -56,6 +56,30 @@ apply Z_div_mod_eq.
 auto with *.
 Qed.
 
+Lemma approximateQ_big : forall (z:Z) a p, (z <= a) -> z <= approximateQ a p.
+Proof.
+intros z [n d] p Ha.
+unfold approximateQ.
+unfold Qle in *.
+simpl in *.
+apply Zlt_succ_le.
+unfold Zsucc.
+apply Zmult_gt_0_lt_reg_r with d.
+ auto with *.
+replace RHS with (d* (n*p/d) + (Zmod (n*p) d) - (Zmod (n*p) d) + d)%Z by ring.
+rewrite <- (Z_div_mod_eq (n*p) d); try auto with *.
+apply Zle_lt_trans with (n*1*p)%Z.
+ replace LHS with (z*d*p)%Z by ring.
+ apply Zmult_lt_0_le_compat_r; auto with *.
+apply Zlt_0_minus_lt.
+replace RHS with (d - (Zmod (n*p) d))%Z by ring.
+rewrite <- Zlt_plus_swap.
+ring_simplify.
+assert (X:(d >0)%Z) by auto with *.
+destruct (Z_mod_lt (n*p) _ X).
+assumption.
+Qed.
+
 Definition compress_raw (x:CR) (e:QposInf) : Q :=
 match e with
 | QposInfinity => approximate x e

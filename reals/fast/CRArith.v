@@ -144,7 +144,7 @@ rewrite H in x_.
 apply (Qle_not_lt _ _ x_).
 rapply Qpos_prf.
 field.
-split;[assumption|intros X; apply H].
+intros X; apply H.
 replace LHS with (- - x)%Q by ring.
 rewrite X.
 reflexivity.

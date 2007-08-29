@@ -48,7 +48,6 @@ intros x.
 simpl.
 autorewrite with QposElim.
 field.
-discriminate.
 Qed.
 
 Lemma QTWOpos_is_lft_unit : is_lft_unit multdiv2 (2#1)%Qpos.
@@ -56,7 +55,6 @@ intros x.
 simpl.
 autorewrite with QposElim.
 field.
-discriminate.
 Qed.
 
 Definition Qpos_multdiv2_is_CMonoid := Build_is_CMonoid

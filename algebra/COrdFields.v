@@ -372,6 +372,19 @@ apply less_antisymmetric_unfolded.
 assumption.
 Qed.
 
+Lemma leEq_or_leEq : forall x y:R, Not (Not (x[<=]y or y[<=]x)).
+Proof.
+intros x y H.
+apply H.
+right.
+rewrite leEq_def.
+intros H0.
+apply H.
+left.
+apply less_leEq.
+assumption.
+Qed.
+
 Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
 Proof.
 intros x y Hxy H.
