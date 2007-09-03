@@ -269,6 +269,50 @@ Qed.
 Hint Resolve ArcTanH_wd: algebra.
 Hint Resolve Continuous_ArcTanH: continuous.
 Hint Resolve Derivative_ArcTanH: derivate.
+(** 
+
+Properties ofthe Inverse Hyperbolic Tangent Function
+
+*)
+
+Lemma ArcTanH_inv : forall x Hx Hx', ArcTanH [--]x Hx[=][--](ArcTanH x Hx').
+Proof.
+intros x Hx Hx'.
+unfold ArcTanH, ArcTangH.
+generalize (DomArcTanH_Dom_ArcTanH).
+intros X.
+simpl in X.
+set (A:=(ProjT2 (Prj2 (X [--]x Hx)))).
+set (B:=(ProjT2 (Prj2 (X x Hx')))).
+change (Half (R:=IR)[*]Log _ A[=][--](Half (R:=IR)[*]Log _ B)).
+generalize A B.
+clear A B.
+intros A B.
+rstepr (Half[*][--](Log _ B)).
+apply mult_wdr.
+apply cg_inv_unique.
+assert (C:=mult_resp_pos _ _ _ B A).
+astepl (Log _ C).
+astepr (Log _ (pos_one IR)).
+apply Log_wd.
+rational.
+Qed.
+
+Lemma ArcTanH_zero : forall H, ArcTanH Zero H[=]Zero.
+Proof.
+intros H.
+apply mult_cancel_lft with (Two:IR).
+ apply nringS_ap_zero.
+rstepr (Zero:IR).
+rstepl (ArcTanH Zero H[+]ArcTanH Zero H).
+assert (X:DomArcTanH [--]Zero).
+ eapply iprop_wd.
+  apply H.
+ rational.
+astepl (ArcTanH Zero H[+]ArcTanH _ X).
+csetoid_rewrite (ArcTanH_inv _ X H).
+rational.
+Qed.
 
 (** 
 
