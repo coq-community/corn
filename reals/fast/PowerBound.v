@@ -101,7 +101,7 @@ intros [[|n|n] d] H.
  assert (X:=power4bound (d#n)).
  simpl in X.
  rewrite Zpower_Qpower; try auto with *.
- apply Qle_shift_recip_r.
+ apply Qle_shift_inv_r.
   clear - d.
   induction (Psize d).
    constructor.

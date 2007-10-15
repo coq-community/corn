@@ -305,7 +305,7 @@ simpl.
 ring.
 Qed.
 
-Definition arcTan_uc_prf : is_UniformlyContinuousFunction rational_arcTan Qpos2QposInf.
+Lemma arcTan_uc_prf : is_UniformlyContinuousFunction rational_arcTan Qpos2QposInf.
 Proof.
 apply (is_UniformlyContinuousFunction_wd) with rational_arcTan (modulusD (1#1)).
   reflexivity.

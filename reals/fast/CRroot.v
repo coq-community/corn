@@ -34,32 +34,13 @@ Require Import Ndigits.
 Require Import PowerBound.
 Require Import RealPowers.
 Require Import ContinuousCorrect.
+Require Import Qauto.
 Require Import CornTac.
 
 Open Local Scope Q_scope.
 
 Opaque CR.
 Opaque Qmin Qmax.
-
-Ltac Qauto_pos :=
-  repeat (first [assumption
-               |constructor
-               |rsapply plus_resp_pos
-               |rsapply mult_resp_pos]);
-  auto with *.
-
-Ltac Qauto_nonneg :=
-  repeat (first [assumption
-               |discriminate
-               |rapply Qsqr_nonneg
-               |rsapply plus_resp_nonneg
-               |rsapply mult_resp_nonneg
-               |apply Qle_shift_div_l;[Qauto_pos|ring_simplify]
-               |apply Qle_shift_recip_l;[Qauto_pos|ring_simplify]]);
-  auto with *.
-
-Ltac Qauto_le :=
- rewrite Qle_minus_iff;ring_simplify;Qauto_nonneg.
 
 Section SquareRoot.
 
