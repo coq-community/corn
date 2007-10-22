@@ -22,6 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export Qordfield.
 Require Import COrdFields2.
 Require Import Qpower.
+Require Import Qabs.
 Require Import CornTac.
 
 Ltac Qauto_pos :=
@@ -34,6 +35,7 @@ Ltac Qauto_pos :=
 Ltac Qauto_nonneg :=
   repeat (first [assumption
                |discriminate
+               |rapply Qabs_nonneg
                |rapply Qsqr_nonneg
                |rsapply plus_resp_nonneg
                |rsapply mult_resp_nonneg

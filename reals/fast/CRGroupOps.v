@@ -288,7 +288,7 @@ eapply X.
 apply H.
 tauto.
 rapply ball_sym.
-eapply X.
+apply X with b1.
 rapply ball_sym.
 apply H.
 tauto.

@@ -37,6 +37,8 @@
 (** printing Max %\ensuremath{\max}% *)
 (** printing Min %\ensuremath{\min}% *)
 
+Require Export Q_in_CReals.
+Require Import Qabs.
 Require Export CauchySeq.
 
 Section Maximum.
@@ -1201,6 +1203,21 @@ rstepr (a[-][--]b).
 assumption.
 apply shift_leEq_minus.
 apply shift_plus_leEq'.
+assumption.
+Qed.
+
+Lemma AbsIR_Qabs : forall (a:Q), AbsIR (inj_Q IR a)[=]inj_Q IR (Qabs a).
+Proof.
+intros a.
+apply Qabs_case; intros H.
+ apply AbsIR_eq_x.
+ stepl (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
+ apply inj_Q_leEq.
+ assumption.
+stepr ([--](inj_Q IR a)) by apply eq_symmetric;apply inj_Q_inv.
+apply AbsIR_eq_inv_x.
+stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
+apply inj_Q_leEq.
 assumption.
 Qed.
 

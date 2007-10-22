@@ -52,7 +52,6 @@ Definition ZTotalOrder : TotalOrder.
 apply makeTotalOrder with 
   Z (@eq Z) Zle Zmonotone Zantitone Zmin Zmax; try solve 
  [auto with *].
-apply Zeq_le_def.
 apply Zle_total.
 firstorder using PartialOrder.Default.monotone_def.
 firstorder using PartialOrder.Default.antitone_def.

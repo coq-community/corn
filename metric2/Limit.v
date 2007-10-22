@@ -88,6 +88,17 @@ apply H'.
 constructor.
 Defined.
 
+Lemma Limit_Str_nth_tl : forall n s l, Limit s l -> Limit (Str_nth_tl n s) l.
+Proof.
+induction n.
+ tauto.
+intros.
+simpl.
+apply IHn.
+apply Limit_tl.
+assumption.
+Defined.
+
 End Limit.
 
 Implicit Arguments NearBy [X].
