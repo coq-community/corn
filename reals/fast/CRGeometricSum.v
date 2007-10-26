@@ -905,4 +905,47 @@ apply InfiniteGeometricSum_correct.
 intros; apply eq_reflexive.
 Qed.
 
+Lemma mult_Streams_Gs : forall (x y  : Stream Q),
+ (DecreasingNonNegative x) ->  
+ (GeometricSeries y) ->
+ (GeometricSeries (mult_Streams x y)).
+cofix.
+intros x y Hx Hy.
+constructor.
+ destruct Hy as [Hy _].
+ destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
+ simpl.
+ rewrite Qabs_Qmult.
+ apply Qle_trans with (Qabs (hd x) * Qabs (hd (tl y))).
+  apply Qmult_le_compat_r.
+   do 2 (rewrite Qabs_pos; try assumption).
+  apply Qabs_nonneg.
+ rewrite Qabs_Qmult.
+ replace LHS with (Qabs (hd (tl y))*Qabs (hd x)) by ring.
+ replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by ring.
+ apply Qmult_le_compat_r; try assumption.
+ apply Qabs_nonneg.
+rapply mult_Streams_Gs.
+ destruct Hx; assumption.
+destruct Hy; assumption.
+Qed.
+
+Lemma powers_help_Gs : forall c,
+ (GeometricSeries (powers_help a c)).
+cofix.
+intros c.
+constructor.
+ simpl.
+ rewrite Qmult_comm.
+ rewrite Qabs_Qmult.
+ rewrite Qabs_pos; try assumption.
+ apply Qle_refl.
+rapply powers_help_Gs.
+Qed.
+ 
+Lemma powers_Gs : (GeometricSeries (powers a)).
+Proof.
+rapply powers_help_Gs.
+Qed.
+
 End GeometricSeries.

@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CRAlternatingSum.
+Require Import CRarctanh.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -27,7 +27,9 @@ Require Import Qordfield.
 Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import Qmetric.
+Require Import Qauto.
 Require Import Exponential.
+Require Import ArcTanH.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -35,157 +37,354 @@ Set Implicit Arguments.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
-Opaque inj_Q CR.
+Opaque inj_Q CR Logarithm.
 
-Section LnPlusSeries.
-Variable a:Q.
-
-(* This is the series for ln (1+a) *)
-
-Definition lnPlusSequence := (mult_Streams (recip_positives) (tl (powers a))).
-
-Lemma Str_nth_lnPlusSequence : forall n, (Str_nth n lnPlusSequence == (1#P_of_succ_nat n)*a^(1+n)%nat)%Q.
+Lemma lnDomainAdaptor : forall a, (0 < a) -> 
+(let (n,d) := a in (n - d)/(n + d))^2 < 1.
 Proof.
-intros n.
-unfold lnPlusSequence.
-unfold mult_Streams.
-rewrite Str_nth_zipWith.
-rewrite Str_nth_recip_positives.
-change (Str_nth n (tl (powers a))) with  (Str_nth (S n) (powers a)).
-rewrite Str_nth_powers.
-reflexivity.
+intros [[|n|n] d] Ha;
+ try solve [elim (Qlt_not_le _ _ Ha); auto with *].
+simpl.
+replace LHS with ((n-d)*(n-d)/((n+d)*(n+d))) by
+ field; auto with *.
+apply Qlt_shift_div_r.
+ auto with *.
+rewrite Qlt_minus_iff.
+ring_simplify.
+Qauto_pos.
 Qed.
 
-Hypothesis Ha: 0 <= a <= 1.
+Definition rational_ln_slow (a:Q) (p: 0 < a) : CR := 
+ scale 2 (rational_arcTanh (lnDomainAdaptor p)).
 
-Lemma lnPlusSequence_dnn : DecreasingNonNegative lnPlusSequence.
+Lemma Qpos_adaptor : forall q, 0 < q -> Zero[<]inj_Q IR q.
 Proof.
-rapply mult_Streams_dnn.
- apply recip_positives_dnn.
-apply dnn_tl.
-apply powers_dnn.
-assumption.
+intros q H.
+stepl (inj_Q IR 0).
+ apply inj_Q_less.
+ assumption.
+apply (inj_Q_nring IR 0).
 Qed.
 
-Lemma lnPlusSequence_zl : Limit lnPlusSequence 0.
-Proof.
-unfold lnPlusSequence.
-apply mult_Streams_zl with (1#1)%Qpos.
- apply recip_positives_zl.
-abstract (
-destruct (powers_nbz Ha) as [_ H];
-apply H).
-Defined.
-
-End LnPlusSeries.
-
-Definition rational_lnPlus_small_pos (a:Q) (p: 0 <= a <= 1) : CR := 
- InfiniteAlternatingSum (lnPlusSequence_dnn p) (lnPlusSequence_zl p).
-
-(*
-Lemma rational_arcTan_small_pos_correct : forall (a:Q) Ha, a < 1 ->
- (@rational_arcTan_small_pos a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_ln_slow_correct : forall (a:Q) Ha Ha0,
+ (@rational_ln_slow a Ha == IRasCR (Log (inj_Q IR a) Ha0))%CR.
 Proof.
 intros a Ha Ha0.
-unfold rational_arcTan_small_pos.
-rewrite InfiniteAlternatingSum_correct'.
+unfold rational_ln_slow.
+assert (X:=arcTanh_DomArcTanH (lnDomainAdaptor Ha)).
+rewrite (fun x => rational_arcTanh_correct x X).
+rewrite <- CRmult_scale.
+rewrite <- IR_inj_Q_as_CR.
+rewrite <- IR_mult_as_CR.
 apply IRasCR_wd.
-assert (X:(olor ([--]One) One (inj_Q IR a))).
+csetoid_replace (inj_Q IR (2:Q)) (Two:IR);
+ [|apply (inj_Q_nring IR 2)].
+stepr (Two[*](Half[*]Log _ Ha0));
+ [|unfold Half; rational].
+do 2 rapply mult_wdr.
+unfold Log.
+simpl.
+rapply cspf_wd.
+set (b:=let (n, d) := a in (n - d) / (n + d)).
+assert (Y:inj_Q IR a[+]One[#]Zero).
+ apply Greater_imp_ap.
+ apply plus_resp_pos; try assumption.
+ apply pos_one.
+assert (Z:One[-](inj_Q IR a[-]One[/]_[//]Y)[#]Zero).
+ apply Greater_imp_ap.
+ rstepr (Two[/]_[//]Y).
+ apply div_resp_pos.
+  apply plus_resp_pos; try assumption.
+  apply pos_one.
+ apply pos_two.
+rstepr (One[+](inj_Q IR a[-]One[/]_[//]Y)[/]_[//]Z).
+cut (inj_Q IR b[=](inj_Q IR a[-]One[/]inj_Q IR a[+]One[//]Y)).
+ intros.
+ apply div_wd;
+  rapply bin_op_wd_unfolded; try apply eq_reflexive; try apply un_op_wd_unfolded; assumption.
+stepr (inj_Q IR ((a-1)/(a+1))).
+ apply inj_Q_wd.
+ clear - Ha.
+ destruct a as [n d].
+ simpl.
+ unfold b.
+ rewrite Qmake_Qdiv.
+ field.
  split.
-  apply less_leEq_trans with Zero.
-   apply shift_zero_less_minus'.
-   rstepr (One:IR).
-   apply pos_one.
-  stepl (inj_Q IR 0) by rapply (inj_Q_nring IR 0).
-  apply inj_Q_leEq.
-  destruct Ha; assumption.
- rstepr (nring 1:IR).
- stepr (inj_Q IR 1) by rapply (inj_Q_nring IR 1).
- apply inj_Q_less.
- assumption.  
-eapply eq_transitive_unfolded;
- [|apply (arctan_series (inj_Q IR a) (arctan_series_convergent_IR) X)].
-rapply series_sum_wd.
-intros n.
-change (inj_Q IR ((- (1)) ^ n * Str_nth n (arcTanSequence a))[=]
-(([--]One[^]n[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))[*]
- (inj_Q IR a)[^](2 * n + 1))).
-rstepr (([--]One[^]n)[*]((inj_Q IR a)[^](2*n+1)[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))).
-eapply eq_transitive_unfolded.
- apply inj_Q_mult.
-apply mult_wd.
- eapply eq_transitive_unfolded.
-  apply inj_Q_power.
- apply nexp_wd.
- eapply eq_transitive_unfolded.
-  apply inj_Q_inv.
+  unfold Qeq.
+  auto with *.
+ unfold Qeq, Qlt in *.
+ simpl in *.
+ intros H.
+ apply (Zlt_not_le _ _ Ha).
+ ring_simplify in H.
+ ring_simplify.
+ apply Zle_trans with (-(d*1))%Z; auto with *.
+ apply Zle_left_rev.
+ replace RHS with (-(n + (d*1)))%Z by ring.
+ simpl.
+ rewrite H.
+ apply Zle_refl.
+clear - Y.
+assert (X:inj_Q IR (a + 1)[#]Zero).
+ stepl (inj_Q IR a [+]inj_Q IR (nring 1)) by
+  apply eq_symmetric; apply inj_Q_plus.
+ csetoid_rewrite (inj_Q_nring IR 1).
+ rstepl (inj_Q IR a[+]One).
+ assumption. 
+stepl (inj_Q IR (a - 1)[/]_[//]X) by
+ apply eq_symmetric; apply inj_Q_div.
+apply div_wd.
+ stepl (inj_Q IR a[-]inj_Q IR 1) by 
+  apply eq_symmetric; apply inj_Q_minus.
+ rapply bin_op_wd_unfolded.
+  apply eq_reflexive.
  apply un_op_wd_unfolded.
  rstepr (nring 1:IR).
  apply (inj_Q_nring IR 1).
-apply mult_cancel_lft with (nring (R:=IR) (S (2 * n))).
- apply nringS_ap_zero.
-rstepr (inj_Q IR a[^](2 * n + 1)).
-stepr (inj_Q IR (a^(2*n+1)%nat)) by apply inj_Q_power.
-stepl ((inj_Q IR (nring (S (2*n))))[*]inj_Q IR (Str_nth n (arcTanSequence a))) by
- apply mult_wdl; apply inj_Q_nring.
-stepl (inj_Q IR (nring (S (2*n))[*]Str_nth n (arcTanSequence a)))
- by apply inj_Q_mult.
-apply inj_Q_wd.
-csetoid_rewrite (nring_Q (S (2*n))).
-change (S (2 * n)*Str_nth n (arcTanSequence a)==a ^ (2 * n + 1)%nat).
-rewrite Str_nth_arcTanSequence.
-rewrite (Qmake_Qdiv).
-rewrite plus_comm.
-generalize (a^(2*n+1)%nat).
-intros b.
-rewrite <- POS_anti_convert.
-field.
-unfold Qeq; simpl.
-rewrite Pmult_1_r.
-rewrite <- POS_anti_convert.
-auto with *.
+stepl (inj_Q IR a[+]inj_Q IR 1) by 
+ apply eq_symmetric; apply inj_Q_plus.
+rapply bin_op_wd_unfolded.
+ apply eq_reflexive.
+rstepr (nring 1:IR).
+apply (inj_Q_nring IR 1).
 Qed.
 
-Definition rational_arcTan_small (a:Q) (p: -(1) <= a <= 1) : CR.
-intros a.
-destruct (Qle_total a 0); intros Ha.
- refine (-(@rational_arcTan_small_pos (-a)%Q _))%CR.
- abstract (
- split;
- [(replace RHS with (0+-a) by ring);
-  rewrite <- Qle_minus_iff;
-  assumption
- |rewrite Qle_minus_iff;
-  (replace RHS with (a + - - (1)) by ring);
-  rewrite <- Qle_minus_iff;
-  destruct Ha; assumption]).
-apply (@rational_arcTan_small_pos a).
-abstract (
-split;[|destruct Ha; assumption];
- apply Qnot_lt_le; apply Qle_not_lt; assumption).
+Lemma rational_ln_slow_correct' : forall (a:Q) Ha,
+ (@rational_ln_slow a Ha == IRasCR (Log (inj_Q IR a) (Qpos_adaptor Ha)))%CR.
+Proof.
+intros.
+apply rational_ln_slow_correct.
+Qed.
+
+Definition ln2 : CR := rational_ln_slow (pos_two Q_as_COrdField).
+
+Lemma ln2_correct : (ln2 == IRasCR (Log Two (pos_two IR)))%CR.
+Proof.
+unfold ln2.
+rewrite rational_ln_slow_correct'.
+apply IRasCR_wd.
+apply Log_wd.
+apply (inj_Q_nring IR 2).
+Qed.
+
+Lemma ln_scale_by_two_power_adapt : forall (n:Z) q, 0 < q -> 0 < (2^n*q).
+Proof.
+intros n q H.
+rsapply mult_resp_pos; try assumption.
+assert (H2:0 < 2) by constructor.
+pose (twopos := mkQpos H2).
+setoid_replace (2%positive:Q) with (twopos:Q) by reflexivity.
+rsapply Qpos_power_pos.
+Qed.
+
+Lemma ln_scale_by_two_power : forall (n:Z) q (Hq:0 < q), (rational_ln_slow Hq + scale n ln2 == rational_ln_slow (ln_scale_by_two_power_adapt n Hq))%CR.
+Proof.
+intros n q Hq.
+rewrite ln2_correct.
+do 2 rewrite rational_ln_slow_correct'.
+rewrite <- CRmult_scale.
+rewrite <- IR_inj_Q_as_CR.
+rewrite <- IR_mult_as_CR.
+rewrite <- IR_plus_as_CR.
+apply IRasCR_wd.
+assert (X:Zero[<](Two[//](two_ap_zero IR))[^^]n).
+ apply zexp_pos.
+ apply pos_two.
+stepl (Log _ (Qpos_adaptor Hq)[+]Log _ X).
+ assert (Y:Zero[<](inj_Q IR q)[*](Two[//](two_ap_zero IR))[^^]n).
+  apply mult_resp_pos.
+   apply (Qpos_adaptor Hq).
+  assumption.
+ stepl (Log _ Y).
+  apply Log_wd.
+  assert (Z:(inj_Q IR (2:Q))[#]Zero).
+   stepr (inj_Q IR (0:Q)).
+    apply inj_Q_ap.
+    discriminate.
+   apply (inj_Q_nring IR 0).
+  csetoid_replace ((Two[//]two_ap_zero IR)[^^](n))
+   (((inj_Q IR (2:Q))[//]Z)[^^]n).
+   stepr (inj_Q IR q[*]inj_Q IR (2^n)).
+    apply mult_wdr.
+    apply eq_symmetric.
+    apply inj_Q_power_Z.
+   rstepl (inj_Q IR (2 ^ n)[*]inj_Q IR q).
+   apply eq_symmetric.
+   rapply (inj_Q_mult IR (2^n) q).
+  apply zexp_wd.
+  apply eq_symmetric.
+  apply (inj_Q_nring IR 2).
+ apply Log_mult.
+apply bin_op_wd_unfolded.
+ apply eq_reflexive.
+astepl ((zring n)[*]Log Two (pos_two IR)).
+apply mult_wdl.
+Transparent inj_Q.
+unfold inj_Q.
+simpl.
+rational.
+Qed.
+
+Definition ln_scale_power_factor q (Hq:0 < q) : Z.
+intros [[|n|n] d] Hq; try
+ abstract discriminate Hq.
+exact (Zpred (log_inf d - (log_sup n)))%Z.
 Defined.
 
-Lemma rational_arcTan_small_correct : forall (a:Q) Ha, -(1) < a -> a < 1 ->
- (@rational_arcTan_small a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Definition rational_ln (a:Q) (p: 0 < a) : CR := 
+ let n := ln_scale_power_factor p in
+ (rational_ln_slow (ln_scale_by_two_power_adapt n p) + scale (-n)%Z ln2)%CR.
+
+Lemma rational_ln_correct : forall (a:Q) Ha Ha0,
+ (@rational_ln a Ha == IRasCR (Log (inj_Q IR a) Ha0))%CR.
 Proof.
-intros a Ha Ha0 Ha1.
-unfold rational_arcTan_small.
-destruct (Qle_total a 0);
- rewrite rational_arcTan_small_pos_correct.
-   rewrite Qlt_minus_iff.
-   replace RHS with (a + - - (1)) by ring.
-   rewrite <- Qlt_minus_iff.
-   assumption.
-  rewrite <- IR_opp_as_CR.
-  apply IRasCR_wd.
-  csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
-  apply ArcTan_wd.
-  eapply eq_transitive.
-   apply eq_symmetric; apply (inj_Q_inv IR (-a)).
-  apply inj_Q_wd.
-  simpl.
-  ring.
- assumption.
-reflexivity.
+intros a Ha Ha0.
+unfold rational_ln.
+rewrite <- ln_scale_by_two_power.
+do 2 rewrite <- CRmult_scale.
+change (((- ln_scale_power_factor Ha)%Z):Q) with ((- ln_scale_power_factor Ha)%Q).
+rewrite <- CRopp_Qopp.
+ring_simplify.
+apply rational_ln_slow_correct.
 Qed.
-*)
+
+Lemma rational_ln_correct' : forall (a:Q) Ha,
+ (@rational_ln a Ha == IRasCR (Log (inj_Q IR a) (Qpos_adaptor Ha)))%CR.
+Proof.
+intros.
+apply rational_ln_correct.
+Qed.
+
+Lemma ln_uc_prf_pos : forall (c:Qpos) (x:Q), (0 < Qmax c x).
+Proof.
+intros c x.
+simpl.
+apply Qlt_le_trans with c; auto with *.
+Qed.
+
+Definition rational_ln_modulus (c:Qpos) (e:Qpos) : QposInf :=
+Qpos2QposInf (e*c).
+
+Lemma ln_pos_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
+Proof.
+intros c.
+set (lnf := fun x => match (Qlt_le_dec 0 x) with
+                     | left p => rational_ln p
+                     | right _ => ('0)%CR
+                     end).
+apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (modulusD (Qpos_inv c)).
+  intros x.
+  unfold lnf.
+   destruct (Qlt_le_dec 0 (QboundBelow_uc c x)).
+   do 2 rewrite rational_ln_correct'.
+   apply IRasCR_wd.
+   algebra.
+  elim (Qle_not_lt _ _ q).
+  rapply ln_uc_prf_pos.
+ intros x.
+ simpl.
+ autorewrite with QposElim.
+ replace RHS with (x*c).
+  apply Qle_refl.
+ field.
+ apply Qpos_nonzero.
+assert (Z:Derivative (closel (inj_Q IR (c:Q))) CI Logarithm {1/}FId).
+ apply (Included_imp_Derivative (openl Zero) CI).
+  Deriv.
+ intros x Hx.
+ simpl.
+ apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+ stepl (inj_Q IR 0).
+  apply inj_Q_less.
+  simpl; auto with *.
+ apply (inj_Q_nring IR 0).
+apply (is_UniformlyContinuousD (Some (c:Q)) None I _ _ Z lnf).
+ intros q Hq Hc.
+ unfold lnf.
+ destruct (Qlt_le_dec 0 q).
+  apply rational_ln_correct.
+ elim (Qle_not_lt _ _ q0).
+ apply Qlt_le_trans with c; auto with *.
+ apply leEq_inj_Q with IR.
+ assumption.
+intros x Hx Hc.
+apply AbsSmall_imp_AbsIR.
+apply leEq_imp_AbsSmall.
+ rapply shift_leEq_div.
+  apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+  stepl (inj_Q IR 0).
+   apply inj_Q_less.
+   simpl; auto with *.
+  apply (inj_Q_nring IR 0).
+ rstepl (Zero:IR).
+ apply less_leEq.
+ apply pos_one.
+stepr (One[/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_prf c)))).
+ rapply recip_resp_leEq; try assumption.
+ stepl (inj_Q IR 0).
+  apply inj_Q_less.
+  simpl; auto with *.
+ apply (inj_Q_nring IR 0).
+stepl (((inj_Q IR 1)[/]_[//]
+ Greater_imp_ap IR (inj_Q IR (c:Q)) Zero (Qpos_adaptor (Qpos_prf c)))).
+ change (inj_Q IR ((Qpos_inv c):Q)) with (inj_Q IR (1/c)).
+ apply eq_symmetric.
+ apply inj_Q_div.
+apply div_wd.
+ rstepr (nring 1:IR).
+ apply (inj_Q_nring IR 1).
+apply eq_reflexive.
+Qed.
+
+Definition ln_pos_uc (c:Qpos) :  Q_as_MetricSpace --> CR :=
+Build_UniformlyContinuousFunction (@ln_pos_uc_prf c).
+
+Definition CRln_pos (c:Qpos) : CR --> CR := (Cbind QPrelengthSpace (ln_pos_uc c)).
+
+Lemma CRln_pos_correct : forall (c:Qpos) x Hx, closel (inj_Q _ (c:Q)) x -> (IRasCR (Log x Hx)==CRln_pos c (IRasCR x))%CR.
+Proof.
+intros c x Hx Hx0.
+assert (Z:Continuous (closel (inj_Q IR (c:Q))) Logarithm).
+ apply (Included_imp_Continuous (openl Zero)).
+  Contin.
+ clear - c.
+ intros x Hx.
+ simpl.
+ apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+ stepl (inj_Q IR 0).
+  apply inj_Q_less.
+  simpl; auto with *.
+ apply (inj_Q_nring IR 0).
+apply (fun x => @ContinuousCorrect _ x Logarithm Z); auto with *.
+ constructor.
+intros q Hq H.
+change (CRln_pos c (' q) == IRasCR (Log (inj_Q IR q) Hq))%CR.
+transitivity (ln_pos_uc c q);[|].
+ unfold CRln_pos.
+ change (' q)%CR with (Cunit_fun _ q).
+ rapply BindLaw1.
+simpl.
+rewrite rational_ln_correct'.
+apply IRasCR_wd.
+apply Log_wd.
+apply inj_Q_wd.
+simpl.
+rewrite <- Qle_max_r.
+apply leEq_inj_Q with IR.
+assumption.
+Qed.
+
+Definition CRln (x:CR) (Hx:('0 < x)%CR) : CR :=
+let (c,_) := Hx in CRln_pos c x.
+
+Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==@CRln (IRasCR x) Hx0)%CR.
+Proof.
+intros x Hx [c Hc].
+rapply CRln_pos_correct.
+change ((inj_Q IR (c:Q))[<=]x).
+rewrite IR_leEq_as_CR.
+rewrite IR_inj_Q_as_CR.
+setoid_replace (IRasCR x) with (IRasCR x - '0)%CR using relation ms_eq by ring.
+assumption.
+Qed.

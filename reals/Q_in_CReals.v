@@ -45,7 +45,9 @@ dense in any real number structure. *)
 Require Export Cauchy_IR.
 Require Export Nmonoid.
 Require Export Zring.
+Require Import Expon.
 Require Import Qpower.
+Require Import CornTac.
 
 Section Rational_sequence_prelogue.
 
@@ -811,6 +813,36 @@ Proof.
  rational.
 Qed.
 
+Lemma inj_Q_pring : forall n, inj_Q (pring _ n) [=] pring R1 n.
+intros n.
+change (inj_Q (zring n)[=]zring n).
+stepr (inj_Q (nring n)).
+ apply inj_Q_wd.
+ rewrite <- inject_nat_convert.
+ apply zring_plus_nat.
+stepr (nring n:R1).
+ apply inj_Q_nring.
+apply eq_symmetric.
+rewrite <- inject_nat_convert.
+apply zring_plus_nat.
+Qed.
+
+Lemma inj_Q_zring : forall n, inj_Q (zring n) [=] zring (R:=R1) n.
+Proof.
+intros [|n|n].
+  simpl.
+  rational.
+ simpl.
+ apply inj_Q_pring.
+change (inj_Q ([--](pring _ n))[=][--](pring _ n)).
+stepl ([--](inj_Q (zring (R:=Q_as_COrdField) n))).
+ apply un_op_wd_unfolded.
+ simpl.
+ apply inj_Q_pring. 
+apply eq_symmetric.
+apply inj_Q_inv.
+Qed.
+
 Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
 Proof.
 intros q.
@@ -841,6 +873,38 @@ stepr (inj_Q (q^n)%Q[*]inj_Q q).
 simpl.
 apply mult_wdl.
 assumption.
+Qed.
+
+Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^]n. 
+Proof.
+intros q [|n|n] H.
+  change (inj_Q (q ^ 0)%Q[=]One).
+  rstepr (nring 1:R1).
+  stepr (inj_Q 1%Q) by apply (inj_Q_nring 1).
+  apply eq_reflexive.
+ simpl.
+ change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
+ csetoid_rewrite_rev (inj_Q_power q n).
+ rewrite inject_nat_convert.
+ apply eq_reflexive.
+change ((inj_Q (/q ^ n))%Q[=](One[/]inj_Q q[//]H)[^]n).
+stepl (inj_Q ((1/q)^n)%Q).
+ stepr ((inj_Q (1/q)%Q)[^]n).
+  csetoid_rewrite_rev (inj_Q_power (1/q)%Q n).
+  rewrite inject_nat_convert.
+  apply eq_reflexive.
+ apply nexp_wd.
+ stepr (inj_Q 1%Q[/]_[//]H).
+  apply inj_Q_div.
+ apply div_wd.
+  rstepr (nring 1:R1).
+  apply (inj_Q_nring 1).
+ apply eq_reflexive.
+apply inj_Q_wd.
+change (((1 * / q) ^ n)%Q==(/ q ^ n))%Q.
+rewrite <- Qinv_power.
+rewrite Qmult_1_l.
+reflexivity.
 Qed.
 
 (** ** Injection of [Q] is dense

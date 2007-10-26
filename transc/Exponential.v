@@ -624,6 +624,27 @@ intros.
 Step_final (Log (x[*]y) (mult_resp_pos _ _ _ Hx Hy)).
 Qed.
 
+Lemma Log_nexp : forall x n Hx Hxn, Log (x[^]n) Hxn [=] (nring n)[*]Log x Hx.
+Proof.
+induction n.
+ intros Hx Hn.
+ simpl.
+ rstepr (Zero:IR).
+ apply Log_one.
+intros Hx Hn.
+assert (X:Zero[<]x[^]n).
+ apply nexp_resp_pos.
+ assumption.
+stepl (Log _ X[+]Log x Hx) by
+ (apply eq_symmetric; apply (Log_mult _ _ X Hx)).
+astepr ((nring n [+] One)[*]Log x Hx).
+rstepr (nring n[*]Log x Hx[+]Log x Hx).
+apply bin_op_wd_unfolded; try apply eq_reflexive.
+apply IHn.
+Qed.
+
+Hint Resolve Log_nexp: algebra.
+
 (** A characterization of the domain of the logarithm. *)
 
 Lemma Log_domain : forall x : IR, Zero [<] x -> Dom Logarithm x.
@@ -928,6 +949,40 @@ Lemma Log_div' : forall x y z Hx Hy Hy' Hz,
 intros x y z Hx Hy Hy' Hz H.
 Step_final (Log _ (div_resp_pos _ _ _ Hy' Hy Hx)).
 Qed.
+
+Lemma Log_zexp : forall x n Hx Hx0 Hxn, Log ((x[//]Hx0)[^^]n) Hxn [=] (zring n)[*]Log x Hx.
+Proof.
+intros x [|n|n] Hx Hx0 Hxn.
+  simpl.
+  rstepr (Zero:IR).
+  algebra.
+ assert (X:Zero[<]x[^]n).
+  astepr ((x[//]Hx0)[^^]n).
+  assumption.
+ change (Log (x[^]n) Hxn[=]zring (R:=IR) n[*]Log x Hx).
+ astepl (nring n[*]Log x Hx).
+ apply mult_wdl.
+ apply eq_symmetric.
+ unfold pos2Z.
+ rewrite <- inject_nat_convert.
+ refine (zring_plus_nat IR n).
+simpl.
+change (Log ((One[/]x[//]Hx0)[^]n) Hxn[=][--](zring n)[*]Log x Hx).
+assert (X:Zero[<](One[/]x[//]Hx0)).
+ apply recip_resp_pos.
+ assumption.
+astepl ((nring n)[*](Log _ X)).
+astepl ((nring n)[*]([--](Log _ Hx))).
+rstepl ([--](nring n)[*](Log x Hx)).
+apply mult_wdl.
+apply un_op_wd_unfolded.
+unfold pos2Z.
+rewrite <- inject_nat_convert.
+apply eq_symmetric.
+refine (zring_plus_nat IR n).
+Qed.
+
+Hint Resolve Log_zexp: algebra.
 
 Section Log_Series.
 
