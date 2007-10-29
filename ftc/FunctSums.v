@@ -119,7 +119,7 @@ intros; simpl in |- *; algebra.
 Qed.
 
 Lemma FSum_one : forall n (f : nat -> PartIR) x Hx Hx',
- FSum n n f x Hx' [=] f n x (Hx n).
+ FSum n n f x Hx' [=] f n x Hx.
 intros.
 simpl in |- *.
 eapply eq_transitive_unfolded.
