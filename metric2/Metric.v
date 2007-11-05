@@ -55,6 +55,11 @@ Implicit Arguments ms_eq [m].
 
 Add Setoid ms ms_eq (fun X => @msp_Xsetoid _ _ _ (@msp X)) as ms_setoid.
 
+(*This is intended to be used as a ``type cast'' that Coq won't randomly make disappear.
+  It is useful when defining setoid rewrite lemmas for ms_eq.*)
+Definition ms_id (m:MetricSpace) (x:m) : m := x.
+Implicit Arguments ms_id [m].
+
 Add Morphism ball with signature QposEq ==> ms_eq ==> ms_eq ==> iff as ball_compat.
 intros m.
 exact (@ball_wd m).

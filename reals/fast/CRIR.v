@@ -220,12 +220,10 @@ Proof.
 intros; rapply IR_recip_as_CR.
 Qed.
 
-Definition IdCR := fun (x:CR) => x.
-
 Lemma IR_nring_as_CR : forall n, 
- (IRasCR (nring n)==IdCR (nring n))%CR.
+ (IRasCR (nring n)==ms_id (nring n))%CR.
 Proof.
-unfold IdCR.
+unfold ms_id.
 induction n.
 apply IR_Zero_as_CR.
 simpl in *.
@@ -241,9 +239,9 @@ Qed.
 Hint Rewrite IR_nring_as_CR : IRtoCR.
 
 Lemma IR_pring_as_CR : forall p, 
- (IRasCR (pring _ p)==pring _ p)%CR.
+ (IRasCR (pring _ p)==ms_id (pring _ p))%CR.
 Proof.
-unfold pring.
+unfold ms_id, pring.
 intros p.
 cut (IRasCR One == One)%CR;[|apply IR_One_as_CR].
 generalize (One:IR).
@@ -289,15 +287,16 @@ assumption.
 Qed.
 
 Lemma IR_zring_as_CR : forall z, 
- (IRasCR (zring z)==zring z)%CR.
+ (IRasCR (zring z)==ms_id (zring z))%CR.
 Proof.
+unfold ms_id.
 intros [|p|p].
 apply IR_Zero_as_CR.
 rapply IR_pring_as_CR.
 change ((IRasCR [--](pring IR p) == - ((pring CRasCRing p):CR))%CR).
 rewrite IR_opp_as_CR.
 apply CRopp_wd.
-apply IR_pring_as_CR.
+rapply IR_pring_as_CR.
 Qed.
 
 Hint Rewrite IR_zring_as_CR : IRtoCR.
