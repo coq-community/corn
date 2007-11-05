@@ -122,7 +122,16 @@ astepr (x[!]nring 1[//]Hx).
 simpl in |- *; algebra.
 Qed.
 
-Hint Resolve power_zero power_one: algebra.
+Lemma one_power : forall (x : IR) H, One[!]x[//]H [=] One.
+Proof.
+intros x H.
+unfold power.
+astepl  (Exp (x[*]Zero)).
+rstepl (Exp (Zero)).
+algebra.
+Qed.
+
+Hint Resolve power_zero power_one one_power: algebra.
 
 Opaque nexp_op.
 
