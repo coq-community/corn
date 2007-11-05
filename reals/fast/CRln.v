@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CRartanh.
+Require Import CRartanh_slow.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -55,7 +55,7 @@ Qauto_pos.
 Qed.
 
 Definition rational_ln_slow (a:Q) (p: 0 < a) : CR := 
- scale 2 (rational_artanh (lnDomainAdaptor p)).
+ scale 2 (rational_artanh_slow (lnDomainAdaptor p)).
 
 Lemma Qpos_adaptor : forall q, 0 < q -> Zero[<]inj_Q IR q.
 Proof.
@@ -72,7 +72,7 @@ Proof.
 intros a Ha Ha0.
 unfold rational_ln_slow.
 assert (X:=artanh_DomArTanH (lnDomainAdaptor Ha)).
-rewrite (fun x => rational_artanh_correct x X).
+rewrite (fun x => rational_artanh_slow_correct x X).
 rewrite <- CRmult_scale.
 rewrite <- IR_inj_Q_as_CR.
 rewrite <- IR_mult_as_CR.
