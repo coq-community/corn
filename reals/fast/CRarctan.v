@@ -37,9 +37,9 @@ Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
 
-Definition rational_arcTan_big_pos (a:Q) (Ha:1 <= a) : CR.
+Definition rational_arctan_big_pos (a:Q) (Ha:1 <= a) : CR.
 intros a Ha.
-refine ((r_pi (1#2)) -(@rational_arcTan_small_pos (/a) _))%CR.
+refine ((r_pi (1#2)) -(@rational_arctan_small_pos (/a) _))%CR.
 split.
  abstract (
  apply Qinv_le_0_compat;
@@ -56,14 +56,14 @@ rsapply (Greater_imp_ap _ a 0);
 assumption).
 Defined.
 
-Lemma rational_arcTan_big_pos_correct : forall a (Ha: 1 <= a), 1 < a ->
- (rational_arcTan_big_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_arctan_big_pos_correct : forall a (Ha: 1 <= a), 1 < a ->
+ (rational_arctan_big_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
 intros a Ha H.
-unfold rational_arcTan_big_pos.
+unfold rational_arctan_big_pos.
 assert (H0:0<a);
  [apply Qlt_trans with 1;[constructor|assumption]|].
-rewrite rational_arcTan_small_pos_correct.
+rewrite rational_arctan_small_pos_correct.
  rsapply (mult_cancel_less _ (/a) 1 a).
   assumption.
  ring_simplify.
@@ -112,10 +112,10 @@ unfold Qdiv.
 ring.
 Qed.
 
-Definition rational_arcTan_mid_pos (a:Q) (Ha:0 <= a) : CR.
+Definition rational_arctan_mid_pos (a:Q) (Ha:0 <= a) : CR.
 Proof.
 intros [n d] Ha.
-refine (r_pi (1#4) + (@rational_arcTan_small ((n-d)%Z/(n+d)%Z) _))%CR.
+refine (r_pi (1#4) + (@rational_arctan_small ((n-d)%Z/(n+d)%Z) _))%CR.
 abstract (
 unfold Qle in Ha;
 simpl in Ha;
@@ -141,12 +141,12 @@ split;
  auto with *).
 Defined.
 
-Lemma rational_arcTan_mid_pos_correct : forall a (Ha: 0 <= a), 0 < a ->
- (rational_arcTan_mid_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_arctan_mid_pos_correct : forall a (Ha: 0 <= a), 0 < a ->
+ (rational_arctan_mid_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
 intros [[|n|n] d] Ha H;
  try solve [elim (Qlt_not_le _ _ H); unfold Qle; auto with *].
-unfold rational_arcTan_mid_pos.
+unfold rational_arctan_mid_pos.
 assert (X:(n - d)%Z / (n + d)%Z < 1).
  assert ((n-d) < (n+d))%Z.
   apply Zlt_0_minus_lt.
@@ -170,7 +170,7 @@ assert (X0:- (1) < (n - d)%Z / (n + d)%Z).
  simpl.
  change (Zneg (n+d))%Z with (-(n+d))%Z.
  auto with *.
-rewrite rational_arcTan_small_correct;
+rewrite rational_arctan_small_correct;
  try assumption.
 rewrite r_pi_correct.
 rewrite <- IR_plus_as_CR.
@@ -243,57 +243,57 @@ apply mult_wdl.
 apply (inj_Q_nring IR 4).
 Qed.
  
-Definition rational_arcTan_pos (a:Q) (Ha:0 <= a) : CR.
+Definition rational_arctan_pos (a:Q) (Ha:0 <= a) : CR.
 intros a.
 destruct (Qle_total (2#5) a) as [A|A].
  destruct (Qle_total (5#2) a) as [B|_];  intros _.
-  apply (@rational_arcTan_big_pos a).
+  apply (@rational_arctan_big_pos a).
   abstract (eapply Qle_trans;[|apply B];discriminate).
- apply (@rational_arcTan_mid_pos a).
+ apply (@rational_arctan_mid_pos a).
  abstract (eapply Qle_trans;[|apply A];discriminate).
 intros H.
-apply (@rational_arcTan_small_pos a).
+apply (@rational_arctan_small_pos a).
 abstract (
 split;[assumption| 
  abstract (eapply Qle_trans;[apply A|discriminate])]).
 Defined.
 
-Lemma rational_arcTan_pos_correct : forall a (Ha: 0 <= a),
- (rational_arcTan_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_arctan_pos_correct : forall a (Ha: 0 <= a),
+ (rational_arctan_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
 intros a Ha.
-unfold rational_arcTan_pos.
+unfold rational_arctan_pos.
 destruct (Qle_total (2 # 5) a).
  destruct (Qle_total (5 # 2) a).
-  apply rational_arcTan_big_pos_correct.
+  apply rational_arctan_big_pos_correct.
   apply Qlt_le_trans with (5#2);
    [constructor|assumption].
- apply rational_arcTan_mid_pos_correct.
+ apply rational_arctan_mid_pos_correct.
  apply Qlt_le_trans with (2#5);
   [constructor|assumption].
-apply rational_arcTan_small_pos_correct.
+apply rational_arctan_small_pos_correct.
 apply Qle_lt_trans with (2#5);
  [assumption|constructor].
 Qed.
 
-Definition rational_arcTan (a:Q) : CR.
+Definition rational_arctan (a:Q) : CR.
 intros a.
 destruct (Qle_total a 0) as [H|H].
- refine (-(@rational_arcTan_pos (-a)%Q _))%CR.
+ refine (-(@rational_arctan_pos (-a)%Q _))%CR.
  abstract (
  change (-0 <= -a);
  rsapply (inv_resp_leEq);
  assumption).
-apply (rational_arcTan_pos H).
+apply (rational_arctan_pos H).
 Defined.
 
-Lemma rational_arcTan_correct : forall (a:Q),
- (rational_arcTan a == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_arctan_correct : forall (a:Q),
+ (rational_arctan a == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
 intros a.
-unfold rational_arcTan.
+unfold rational_arctan.
 destruct (Qle_total a 0);
- rewrite rational_arcTan_pos_correct; try reflexivity.
+ rewrite rational_arctan_pos_correct; try reflexivity.
 rewrite <- IR_opp_as_CR.
 apply IRasCR_wd.
 csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
@@ -305,9 +305,9 @@ simpl.
 ring.
 Qed.
 
-Lemma arcTan_uc_prf : is_UniformlyContinuousFunction rational_arcTan Qpos2QposInf.
+Lemma arctan_uc_prf : is_UniformlyContinuousFunction rational_arctan Qpos2QposInf.
 Proof.
-apply (is_UniformlyContinuousFunction_wd) with rational_arcTan (modulusD (1#1)).
+apply (is_UniformlyContinuousFunction_wd) with rational_arctan (modulusD (1#1)).
   reflexivity.
  intros x.
  simpl.
@@ -315,9 +315,9 @@ apply (is_UniformlyContinuousFunction_wd) with rational_arcTan (modulusD (1#1)).
  change (/1) with 1.
  replace RHS with (x:Q) by ring.
  apply Qle_refl.
-rapply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan CI) rational_arcTan).
+rapply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan CI) rational_arctan).
  intros q [] _.
- rapply rational_arcTan_correct.
+ rapply rational_arctan_correct.
 intros x Hx _.
 assert (X:Zero[<]One[+]One[*]x[*]x).
  apply plus_resp_pos_nonneg.
@@ -342,18 +342,18 @@ rstepl (nring 1:IR).
 apply eq_symmetric; apply (inj_Q_nring IR 1).
 Qed.
 
-Definition arcTan_uc : Q_as_MetricSpace --> CR := 
-Build_UniformlyContinuousFunction arcTan_uc_prf.
+Definition arctan_uc : Q_as_MetricSpace --> CR := 
+Build_UniformlyContinuousFunction arctan_uc_prf.
 
-Definition arcTan : CR --> CR := Cbind QPrelengthSpace arcTan_uc.
+Definition arctan : CR --> CR := Cbind QPrelengthSpace arctan_uc.
 
-Lemma arcTan_correct : forall x,
- (IRasCR (ArcTan x) == arcTan (IRasCR x))%CR.
+Lemma arctan_correct : forall x,
+ (IRasCR (ArcTan x) == arctan (IRasCR x))%CR.
 Proof.
 intros x.
 rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_ArcTan | | constructor].
 intros q [] _.
-transitivity (rational_arcTan q);[|rapply rational_arcTan_correct].
+transitivity (rational_arctan q);[|rapply rational_arctan_correct].
 rapply BindLaw1.
 Qed.
