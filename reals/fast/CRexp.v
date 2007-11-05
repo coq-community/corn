@@ -681,20 +681,13 @@ apply leEq_inj_Q with IR.
 assumption.
 Qed.
 
-Definition CRexp x := CRexp_bound (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
+Definition CRexp (x:CR) : CR := CRexp_bound (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
 
-Lemma CRexp_correct : forall x, (IRasCR (Exp x)==CRexp (IRasCR x))%CR.
+Implicit Arguments CRexp [].
+
+Lemma CRexp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
 Proof.
 intros x.
-unfold CRexp.
-apply CRexp_bound_correct.
-simpl.
-apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
- [|rsapply inj_Q_leEq; auto with *].
-rewrite IR_leEq_as_CR.
-rewrite IR_inj_Q_as_CR.
-generalize (IRasCR x).
-clear x; intros x.
 assert (X:=ball_approx_l x (1#1)).
 rewrite <- CRAbsSmall_ball in X.
 destruct X as [X _].
@@ -710,4 +703,56 @@ replace RHS with (approximate x (1 # 1)%Qpos +
     - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos)
  by QposRing.
 assumption.
+Qed.
+
+Lemma CRexp_correct : forall x, (IRasCR (Exp x)==CRexp (IRasCR x))%CR.
+Proof.
+intros x.
+unfold CRexp.
+apply CRexp_bound_correct.
+simpl.
+apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
+ [|rsapply inj_Q_leEq; auto with *].
+rewrite IR_leEq_as_CR.
+rewrite IR_inj_Q_as_CR.
+apply CRexp_bound_lemma.
+Qed.
+
+Lemma CRexp_bound_exp : forall (z:Z) (x:CR),
+ (x <= 'z ->
+  CRexp_bound z x == CRexp x)%CR.
+Proof.
+intros z x H.
+unfold CRexp.
+set (a:=(approximate x (1 # 1)%Qpos + 1)).
+rewrite <- (CRasIRasCR_id x).
+rewrite <- CRexp_bound_correct.
+ change (CRasIR x [<=] inj_Q IR (z:Q)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ assumption.
+rewrite <- CRexp_bound_correct.
+ change (CRasIR x [<=] inj_Q IR (Qceiling a:Q)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ apply CRle_trans with ('a)%CR.
+  rapply CRexp_bound_lemma.
+ rewrite CRle_Qle.
+ auto with *.
+reflexivity.
+Qed.
+
+Add Morphism CRexp with signature ms_eq ==> ms_eq as CRexp_wd.
+intros x y Hxy.
+unfold CRexp at 1.
+set (a :=  (approximate x (1 # 1)%Qpos + 1)).
+rewrite Hxy.
+apply CRexp_bound_exp.
+rewrite <- Hxy.
+apply CRle_trans with ('a)%CR.
+ rapply CRexp_bound_lemma.
+rewrite CRle_Qle.
+auto with *.
 Qed.
