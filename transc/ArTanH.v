@@ -23,12 +23,14 @@ Require Import CornTac.
 
 The definition of the inverse hyperbolic tangent function.
 
+area tangens hyperbolicus
+
 *)
-Definition ArcTangH : PartIR := Half{**}(Logarithm[o](([-C-]One{+}FId){/}([-C-]One{-}FId))).
+Definition ArTangH : PartIR := Half{**}(Logarithm[o](([-C-]One{+}FId){/}([-C-]One{-}FId))).
 
-Definition DomArcTanH := olor ([--]One) One.
+Definition DomArTanH := olor ([--]One) One.
 
-Lemma proper_DomArcTanH : proper DomArcTanH.
+Lemma proper_DomArTanH : proper DomArTanH.
 Proof.
 simpl.
 apply shift_zero_less_minus'.
@@ -36,7 +38,7 @@ rstepr (Two:IR).
 apply pos_two.
 Qed.
 
-Lemma DomArcTanH_Dom_ArcTanH : included DomArcTanH (Dom ArcTangH).
+Lemma DomArTanH_Dom_ArTanH : included DomArTanH (Dom ArTangH).
 Proof.
 intros x Hx.
 split.
@@ -61,7 +63,7 @@ apply shift_zero_less_minus.
 destruct Hx; assumption.
 Qed.
 
-Lemma Dom_ArcTanH_DomArcTanH : included (Dom ArcTangH) DomArcTanH.
+Lemma Dom_ArTanH_DomArTanH : included (Dom ArTangH) DomArTanH.
 Proof.
 intros x [_ [Hx0 Hx1]].
 simpl in Hx1.
@@ -98,15 +100,15 @@ apply shift_zero_less_minus'.
 assumption.
 Qed.
 
-Definition ArcTanH (x:IR) (Hx:DomArcTanH x) := ArcTangH x (DomArcTanH_Dom_ArcTanH x Hx).
+Definition ArTanH (x:IR) (Hx:DomArTanH x) := ArTangH x (DomArTanH_Dom_ArTanH x Hx).
 
-Lemma ArcTanH_wd : forall (x y : IR) Hx Hy, x[=]y -> ArcTanH x Hx[=]ArcTanH y Hy.
+Lemma ArTanH_wd : forall (x y : IR) Hx Hy, x[=]y -> ArTanH x Hx[=]ArTanH y Hy.
 intros x y Hx Hy H.
 rapply pfwdef.
 assumption.
 Qed.
 
-Lemma ArcTanH_maps_compact_lemma : maps_compacts_into DomArcTanH (openl Zero)
+Lemma ArTanH_maps_compact_lemma : maps_compacts_into DomArTanH (openl Zero)
   (([-C-]One{+}FId){/}([-C-]One{-}FId)).
 Proof.
 intros a b Hab H.
@@ -191,9 +193,9 @@ apply plus_resp_leEq.
 apply less_leEq; apply pos_one.
 Qed.
 
-Lemma Derivative_ArcTanH : forall H, Derivative DomArcTanH H ArcTangH (Frecip ([-C-]One{-}FId{^}2)).
+Lemma Derivative_ArTanH : forall H, Derivative DomArTanH H ArTangH (Frecip ([-C-]One{-}FId{^}2)).
 intros H.
-assert (bnd_away_zero_in_P ([-C-]One{-}FId) DomArcTanH).
+assert (bnd_away_zero_in_P ([-C-]One{-}FId) DomArTanH).
  clear H.
  intros a b Hab H.
  split.
@@ -208,11 +210,11 @@ assert (bnd_away_zero_in_P ([-C-]One{-}FId) DomArcTanH).
  rapply plus_resp_leEq_lft.
  apply inv_resp_leEq.
  destruct H0; assumption.
-unfold ArcTangH.
+unfold ArTangH.
 unfold Half.
 eapply Derivative_wdr;
  [|apply Derivative_scal;
-   eapply (Derivative_comp DomArcTanH (openl Zero) H CI);[apply ArcTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
+   eapply (Derivative_comp DomArTanH (openl Zero) H CI);[apply ArTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
  FEQ.
   apply included_FScalMult.
   apply included_FMult.
@@ -260,26 +262,26 @@ apply shift_zero_less_minus.
 destruct H0; assumption.
 Qed.
 
-Lemma Continuous_ArcTanH : Continuous DomArcTanH ArcTangH.
+Lemma Continuous_ArTanH : Continuous DomArTanH ArTangH.
 Proof.
-eapply Derivative_imp_Continuous with (pI:=proper_DomArcTanH).
-apply Derivative_ArcTanH.
+eapply Derivative_imp_Continuous with (pI:=proper_DomArTanH).
+apply Derivative_ArTanH.
 Qed.
 
-Hint Resolve ArcTanH_wd: algebra.
-Hint Resolve Continuous_ArcTanH: continuous.
-Hint Resolve Derivative_ArcTanH: derivate.
+Hint Resolve ArTanH_wd: algebra.
+Hint Resolve Continuous_ArTanH: continuous.
+Hint Resolve Derivative_ArTanH: derivate.
 (** 
 
 Properties ofthe Inverse Hyperbolic Tangent Function
 
 *)
 
-Lemma ArcTanH_inv : forall x Hx Hx', ArcTanH [--]x Hx[=][--](ArcTanH x Hx').
+Lemma ArTanH_inv : forall x Hx Hx', ArTanH [--]x Hx[=][--](ArTanH x Hx').
 Proof.
 intros x Hx Hx'.
-unfold ArcTanH, ArcTangH.
-generalize (DomArcTanH_Dom_ArcTanH).
+unfold ArTanH, ArTangH.
+generalize (DomArTanH_Dom_ArTanH).
 intros X.
 simpl in X.
 set (A:=(ProjT2 (Prj2 (X [--]x Hx)))).
@@ -298,19 +300,19 @@ apply Log_wd.
 rational.
 Qed.
 
-Lemma ArcTanH_zero : forall H, ArcTanH Zero H[=]Zero.
+Lemma ArTanH_zero : forall H, ArTanH Zero H[=]Zero.
 Proof.
 intros H.
 apply mult_cancel_lft with (Two:IR).
  apply nringS_ap_zero.
 rstepr (Zero:IR).
-rstepl (ArcTanH Zero H[+]ArcTanH Zero H).
-assert (X:DomArcTanH [--]Zero).
+rstepl (ArTanH Zero H[+]ArTanH Zero H).
+assert (X:DomArTanH [--]Zero).
  eapply iprop_wd.
   apply H.
  rational.
-astepl (ArcTanH Zero H[+]ArcTanH _ X).
-csetoid_rewrite (ArcTanH_inv _ X H).
+astepl (ArTanH Zero H[+]ArTanH _ X).
+csetoid_rewrite (ArTanH_inv _ X H).
 rational.
 Qed.
 
@@ -319,7 +321,7 @@ Qed.
 PowerSeries for the Inverse Hyperbolic Tangent Function
 
 *)
-Lemma ArcTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#]Zero.
+Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#]Zero.
 Proof.
 intros R [|n] H.
  elimtype False.
@@ -327,22 +329,22 @@ intros R [|n] H.
 apply nringS_ap_zero.
 Qed.
 
-Definition ArcTanH_series_coef (n:nat) :=
+Definition ArTanH_series_coef (n:nat) :=
 match (even_odd_dec n) with
 | left _ => Zero
-| right H => One[/](nring n)[//](ArcTanH_series_coef_lemma IR n H)
+| right H => One[/](nring n)[//](ArTanH_series_coef_lemma IR n H)
 end.
 
-Definition ArcTanH_ps := FPowerSeries Zero ArcTanH_series_coef.
+Definition ArTanH_ps := FPowerSeries Zero ArTanH_series_coef.
 
-Lemma ArcTanH_series_lemma :
+Lemma ArTanH_series_lemma :
 forall n : nat,
-Feq DomArcTanH
+Feq DomArTanH
   (Half (R:=IR){**}
    ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId)))
-  (ArcTanH_ps n).
+  (ArTanH_ps n).
 Proof.
-unfold Log_ps, ArcTanH_ps.
+unfold Log_ps, ArTanH_ps.
 unfold FPowerSeries.
 intros n.
 FEQ.
@@ -353,8 +355,8 @@ simpl.
 change (Half (R:=IR)[*]
  (Log_series_coef n[*](One[+]x[-]One)[^]n[-]
    Log_series_coef n[*](One[-]x[-]One)[^]n)[=]
-  ArcTanH_series_coef n[*]nexp IR n (x[-]Zero)).
-unfold ArcTanH_series_coef.
+  ArTanH_series_coef n[*]nexp IR n (x[-]Zero)).
+unfold ArTanH_series_coef.
 destruct n as [|n].
  destruct (even_odd_dec 0) as [A|A]; try inversion A.
  simpl; rational.
@@ -374,8 +376,8 @@ csetoid_rewrite (inv_nexp_even IR One _ (even_S _ A)).
 algebra.
 Qed.
 
-Lemma ArcTanH_series_lemma2 :
-fun_series_convergent_IR DomArcTanH
+Lemma ArTanH_series_lemma2 :
+fun_series_convergent_IR DomArTanH
   (fun n : nat =>
    Half (R:=IR){**}
    ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId))).
@@ -426,18 +428,18 @@ split; rapply plus_resp_leEq_lft;
  apply inv_resp_leEq; assumption.
 Qed.
 
-Lemma ArcTanH_series_convergent_IR : fun_series_convergent_IR DomArcTanH ArcTanH_ps.
+Lemma ArTanH_series_convergent_IR : fun_series_convergent_IR DomArTanH ArTanH_ps.
 Proof.
-eapply fun_series_convergent_wd_IR;[|apply ArcTanH_series_lemma2].
-apply ArcTanH_series_lemma.
+eapply fun_series_convergent_wd_IR;[|apply ArTanH_series_lemma2].
+apply ArTanH_series_lemma.
 Qed.
 
-Lemma ArcTanH_series : forall c : IR,
- forall (Hs:fun_series_convergent_IR DomArcTanH ArcTanH_ps) Hc0 Hc1,
- FSeries_Sum Hs c Hc0[=]ArcTanH c Hc1.
+Lemma ArTanH_series : forall c : IR,
+ forall (Hs:fun_series_convergent_IR DomArTanH ArTanH_ps) Hc0 Hc1,
+ FSeries_Sum Hs c Hc0[=]ArTanH c Hc1.
 Proof.
 intros c Hs Hc0 Hc1.
-unfold ArcTanH.
+unfold ArTanH.
 set (F:=([-C-](Half (R:=IR)){*}
    ((Logarithm[o][-C-]One{+}FId){-}(Logarithm[o][-C-]One{-}FId)))).
 assert (F0:Dom F c).
@@ -450,11 +452,11 @@ assert (F0:Dom F c).
  apply shift_zero_less_minus.
  assumption.
 apply eq_transitive with (F c F0).
- apply (Feq_imp_eq DomArcTanH); try assumption.
+ apply (Feq_imp_eq DomArTanH); try assumption.
  eapply Feq_transitive.
   apply Feq_symmetric.
-  apply (FSeries_Sum_wd' _ _ _ ArcTanH_series_lemma2 Hs ArcTanH_series_lemma).
- assert (B0:maps_compacts_into_weak DomArcTanH (olor Zero Two) ([-C-]One{+}FId)).
+  apply (FSeries_Sum_wd' _ _ _ ArTanH_series_lemma2 Hs ArTanH_series_lemma).
+ assert (B0:maps_compacts_into_weak DomArTanH (olor Zero Two) ([-C-]One{+}FId)).
   intros a b Hab H; simpl.
   exists (One[+]a); exists (One[+]b).
   assert (H0:One[+]a[<=]One[+]b).
@@ -476,10 +478,10 @@ apply eq_transitive with (F c F0).
    assumption.
   intros x _ [Hx0 Hx1].
   split; apply plus_resp_leEq_lft; assumption.
- assert (A0:fun_series_convergent_IR DomArcTanH (fun n : nat => Log_ps n[o]([-C-]One{+}FId))).
+ assert (A0:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-]One{+}FId))).
   apply FSeries_Sum_comp_conv with (olor Zero Two);
   try apply Log_series_convergent_IR; try Contin.
- assert (B1:maps_compacts_into_weak DomArcTanH (olor Zero Two) ([-C-]One{-}FId)).
+ assert (B1:maps_compacts_into_weak DomArTanH (olor Zero Two) ([-C-]One{-}FId)).
   intros a b Hab H; simpl.
   exists (One[-]b); exists (One[-]a).
   assert (H0:One[-]b[<=]One[-]a).
@@ -503,10 +505,10 @@ apply eq_transitive with (F c F0).
   intros x _ [Hx0 Hx1].
   split; rapply plus_resp_leEq_lft;
    apply inv_resp_leEq; assumption.
- assert (A1:fun_series_convergent_IR DomArcTanH (fun n : nat => Log_ps n[o]([-C-]One{-}FId))).
+ assert (A1:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-]One{-}FId))).
   apply FSeries_Sum_comp_conv with (olor Zero Two);
   try apply Log_series_convergent_IR; try Contin.
- assert (A2:fun_series_convergent_IR DomArcTanH (fun n : nat => ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId)))).
+ assert (A2:fun_series_convergent_IR DomArTanH (fun n : nat => ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId)))).
   apply FSeries_Sum_minus_conv; assumption.
  assert (A3:Feq (olor Zero Two) (FSeries_Sum (J:=olor Zero Two) (f:=Log_ps) Log_series_convergent_IR) Logarithm).
   split.
@@ -527,10 +529,10 @@ apply eq_transitive with (F c F0).
   apply (FSeries_Sum_minus _ _ _ A0 A1).
  apply Feq_minus.
   eapply Feq_transitive.
-   apply (FSeries_Sum_comp DomArcTanH (olor Zero Two)); try assumption.
+   apply (FSeries_Sum_comp DomArTanH (olor Zero Two)); try assumption.
    Contin.
   assert (X:forall (x : IR) (Hx : Dom ([-C-]One{+}FId) x),
-      DomArcTanH x -> olor Zero Two (([-C-]One{+}FId) x Hx)).
+      DomArTanH x -> olor Zero Two (([-C-]One{+}FId) x Hx)).
    intros x Hx [C0 C1].
    simpl; split.
     apply shift_less_plus'.
@@ -541,10 +543,10 @@ apply eq_transitive with (F c F0).
    assumption.
   eapply Feq_comp; try apply A3; try (apply Feq_reflexive; Included); assumption.
  eapply Feq_transitive.
-  apply (FSeries_Sum_comp DomArcTanH (olor Zero Two)); try assumption.
+  apply (FSeries_Sum_comp DomArTanH (olor Zero Two)); try assumption.
   Contin.
  assert (X:forall (x : IR) (Hx : Dom ([-C-]One{-}FId) x),
-    DomArcTanH x -> olor Zero Two (([-C-]One{-}FId) x Hx)).
+    DomArTanH x -> olor Zero Two (([-C-]One{-}FId) x Hx)).
   intros x Hx [C0 C1].
   simpl; split.
    apply shift_less_minus.
