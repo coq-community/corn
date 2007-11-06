@@ -34,7 +34,10 @@ Require Import RealPowers.
 Require Import Compress.
 Require Import Ndigits.
 Require Import ModulusDerivative.
+Require Import ContinuousCorrect.
 Require Import CRsign.
+Require Import Q_in_CReals.
+Require Import Qround.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -43,6 +46,7 @@ Opaque CR.
 Opaque Exp.
 
 Open Local Scope Q_scope.
+Open Local Scope uc_scope.
 
 Section ExpSeries.
 Variable a:Q.
@@ -335,51 +339,24 @@ intros a Ha.
 rapply rational_exp_neg_bounded_correct.
 Qed.
 
+Lemma minus_one_works_for_rational_exp_small_neg : -(1) <= -(1) <= 0.
+Proof.
+constructor; discriminate.
+Qed.
+
 Lemma rational_exp_small_neg_posH : forall (a:Q) (p:-(1) <= a <= 0),
  ('(1#3) <= rational_exp_small_neg p)%CR.
 Proof.
 intros a p.
-unfold rational_exp_small_neg.
-do 4 rewrite InfiniteAlternatingSum_step.
-generalize (dnn_tl
-                  (dnn_tl (dnn_tl (dnn_tl (expSequence_dnn (Qle_ZO_flip p)))))).
-generalize (@Limit_tl Q_as_MetricSpace
-                                (@tl Q (@tl Q (@tl Q (expSequence (Qopp a)))))
-                                (Qmake Z0 xH)
-                                (@Limit_tl Q_as_MetricSpace
-                                   (@tl Q (@tl Q (expSequence (Qopp a))))
-                                   (Qmake Z0 xH)
-                                   (@Limit_tl Q_as_MetricSpace
-                                      (@tl Q (expSequence (Qopp a)))
-                                      (Qmake Z0 xH)
-                                      (@Limit_tl Q_as_MetricSpace
-                                         (expSequence (Qopp a)) (Qmake Z0 xH)
-                                         (@expSequence_zl (Qopp a)
-                                            (@Qle_ZO_flip a p)))))).
-intros l d.
-change ('(1#3) <= '1%Q + - ('(1 * (1 * - a))%Q + - 
- ('((1 # 2) * (1 * - a * - a))%Q + - ('((1 # 6) * (1 * - a * - a * - a))%Q + 
- - InfiniteAlternatingSum d l))))%CR.
-cut ('0<=InfiniteAlternatingSum d l)%CR;[|apply InfiniteAlternatingSum_nonneg].
-generalize (InfiniteAlternatingSum d l).
-intros m Hm.
-rsapply shift_leEq_rht.
-unfold cg_minus;simpl.
-assert (X:((' 1 -
- (' (1 * (1 * - a)) -
-  (' ((1 # 2) * (1 * - a * - a)) - (' ((1 # 6) * (1 * - a * - a * - a)) - m))) -
- ' (1 # 3))==(('((1#6)*(a+1)*(1*(a+1)*(a+1)+(3#1)))%Q + m)))%CR) by (abstract ring).
-rewrite X.
-rsapply plus_resp_nonneg;[|assumption].
-rewrite CRle_Qle.
-repeat rsapply mult_resp_nonneg.
-discriminate.
-destruct p as [p _].
-rewrite Qle_minus_iff in p.
-(replace RHS with (a + - - (1)) by ring);assumption.
-rsapply plus_resp_nonneg.
-rsapply sqr_nonneg.
-discriminate.
+apply CRle_trans with (rational_exp_small_neg minus_one_works_for_rational_exp_small_neg).
+unfold CRle.
+apply CRpos_nonNeg.
+CR_solve_pos (1#1)%Qpos.
+do 2 rewrite (rational_exp_small_neg_correct).
+rewrite <- IR_leEq_as_CR.
+apply Exp_resp_leEq.
+rsapply inj_Q_leEq.
+destruct p; assumption.
 Qed.
 
 Lemma rational_exp_neg_posH : forall (n:nat) (a:Q) Ha, (-n <= a) ->
@@ -558,7 +535,6 @@ Definition exp_bound (z:Z) : Qpos :=
  |Zneg p => (1#2)^p
  end)%Qpos.
 
-(*
 Lemma exp_bound_bound : forall (z:Z) x, closer (inj_Q IR (z:Q)) x -> AbsIR (Exp x)[<=]inj_Q IR (exp_bound z:Q).
 Proof.
 intros [|z|z]; simpl; intros x Hx; 
@@ -571,82 +547,212 @@ intros [|z|z]; simpl; intros x Hx;
    apply (inj_Q_nring IR 0).
   rstepl (nring 1:IR).
   apply eq_symmetric; apply (inj_Q_nring IR 1).
+ apply leEq_transitive with (Exp (Max x Zero)).
+  apply Exp_resp_leEq.
+  apply lft_leEq_Max.
  stepr (Three[!](inj_Q IR (z:Q))[//](pos_three IR):IR).
-  astepl (E[!]x[//]pos_E).
-  apply real_power_resp_leEq_both.
+  astepl (E[!](Max x Zero)[//]pos_E).
+  apply real_power_resp_leEq_both;
+     try solve [IR_solve_ineq (1#1)%Qpos].
+   apply rht_leEq_Max.
+  apply Max_leEq; auto.
+  stepl (inj_Q IR 0).
+   apply inj_Q_leEq.
+   simpl; auto with *.
+  apply (inj_Q_nring IR 0).
+ stepl (Three[!]nring z[//]pos_three IR).
+  astepl (Three[^]z:IR).
+  stepl ((inj_Q IR (3:Q))[^]z).
+   stepl (inj_Q IR (3^z)).
+    apply inj_Q_wd.
+    apply eq_symmetric.
+    rapply Q_Qpos_power.
+   rewrite <- convert_is_POS.
+   apply inj_Q_power.
+  apply nexp_wd.
+  apply (inj_Q_nring IR 3).
+ apply power_wd.
+  apply eq_reflexive.
+ apply eq_symmetric.
+ rewrite <- convert_is_POS.
+ stepl (inj_Q IR (nring z)).
+  apply (inj_Q_nring).
+ apply inj_Q_wd; apply nring_Q.
 
-Focus 3.
+stepr (Half[!](inj_Q IR (z:Q))[//](pos_half IR):IR).
+ astepl (Exp [--][--]x).
+ astepl (One[/]_[//](Exp_ap_zero [--]x)).
+ unfold Half.
+ astepr ((One[!]inj_Q IR (z:Q)[//]pos_one _)[/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
+ astepr (One[/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
+ apply recip_resp_leEq.
+  apply power_pos.
+ astepr (E[!][--]x[//]pos_E).
+ apply real_power_resp_leEq_both;
+     try solve [IR_solve_ineq (1#1)%Qpos].
+  stepl (inj_Q IR 0).
+   apply inj_Q_leEq.
+   simpl; auto with *.
+  apply (inj_Q_nring IR 0).
+ rstepl ([--][--](inj_Q IR (z:Q))).
+ apply inv_resp_leEq.
+ stepr (inj_Q IR ((Zneg z):Q)).
+  assumption.
+ astepr (inj_Q IR ([--](z:Q))).
+ apply inj_Q_wd.
+ simpl; reflexivity.
+stepl (Half[!]nring z[//]pos_half IR).
+ astepl (Half[^]z:IR).
+ stepl ((inj_Q IR ((1#2):Q))[^]z).
+  stepl (inj_Q IR ((1#2)^z)).
+   apply inj_Q_wd.
+   apply eq_symmetric.
+   rapply Q_Qpos_power.
+  rewrite <- (convert_is_POS z).
+  apply inj_Q_power.
+ apply nexp_wd.
+ assert (X:(inj_Q IR (2:Q))[#]Zero).
+  stepr (inj_Q IR 0).
+   apply inj_Q_ap; discriminate.
+  apply (inj_Q_nring IR 0).
+ stepr ((inj_Q IR 1)[/]_[//]X).
+  stepl (inj_Q IR (1/2)).
+   apply inj_Q_div.
+  apply inj_Q_wd.
+  apply eq_symmetric; rapply Qmake_Qdiv.
+ rapply div_wd.
+  rstepr (nring 1:IR).
+  rapply (inj_Q_nring IR 1).
+ apply (inj_Q_nring IR 2).
+apply power_wd.
+ apply eq_reflexive.
+apply eq_symmetric.
+rewrite <- convert_is_POS.
+stepl (inj_Q IR (nring z)).
+ apply (inj_Q_nring).
+apply inj_Q_wd; apply nring_Q.
+Qed. 
 
- try apply less_leEq;
- apply CR_less_as_IR;
- unfold CRlt;
- match goal with 
- | |- CRpos ?X => let X0 := fresh "IR_dec" in
-                  set (X0:=X);
-                  let XH := fresh "IR_dec" in
-                  assert (XH:(X==X0)%CR) by reflexivity;
-                  autorewrite with IRtoCR in XH
- end.
-
-rewrite IR_nring_as_CR in IR_dec0.
-
-autorewrite with IRtoCR.
- in IR_dec0.
-
-IR_nring_as_CR.
-nring
-
-:IR_solve_ineq (1#1)%Qpos.
-4:IR_solve_ineq (1#1)%Qpos.
-IR_dec_precompute.
-repeat (match goal with 
- | H:_ |-_  => clear H
- end).
- match goal with 
- | H:_ |-_  => fail 2 "Context cannot be cleared"
- end.
-IR_solve_ineq (1#1)%Qpos.
-match goal with 
-| H:_ |-_  => clear H
-endNot satisfied with my last post, Robert 
-clear x.
-vm_compute.
-reflexivity.
-assert ((CRe - ' 1)==(CRe - ' 1))%CR.
-3:IR_dec_precompute.
-
-apply CR_epsilon_sign_dec_pos.
-exists (1#1)%Qpos.
-vm_compute.
-
-pose (X':=(CR_epsilon_sign_dec (1#1) (CRe - '1)%CR)).
-unfold CR_epsilon_sign_dec in X'.
-set (z':=(approximate (CRe - '1)%CR (1#1)%Qpos)) in X'.
-vm_compute in z'.
-unfold z' in *.
-simpl in X'.
-assert ((1#1)%Qpos < approximate (CRe - ' 1)%CR (1#1)%Qpos).
-
-
-rewrite IR_One_as_CR in XH.
-apply (CRpos_wd XH).
-
-     stepr
-  rstepl (x[*]One).
-  apply mult_resp_leEq_both.
- 
-  
- 
-Lemma exp_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmax z a)) (exp_modulus z).
+Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (modulusD (exp_bound z)).
 Proof.
-intros [|z|z].
-  apply (is_UniformlyContinuousFunction_wd) with (fun a => rational_exp (Qmax 0 a)) (modulusD (1#1)).
-    reflexivity.
-   intros x; simpl.
-   autorewrite with QposElim.
-   replace RHS with (x:Q) by (field; discriminate).
-   apply Qle_refl.
-  
-  
-; simpl; intros e a b Hab.
-*)
+intros z.
+assert (Z:Derivative (closer (inj_Q IR (z:Q))) CI Expon Expon).
+ apply (Included_imp_Derivative realline CI).
+  Deriv.
+ Included.
+apply (is_UniformlyContinuousFunction_wd) with (fun a => rational_exp (QboundAbove_uc z
+a)) (modulusD (exp_bound z)).
+  intros; simpl; reflexivity.
+ intros; simpl; apply Qle_refl.
+apply (is_UniformlyContinuousD None (Some (z:Q)) I _ _ Z).
+ intros q [] H.
+ rapply rational_exp_correct.
+intros x [] H.
+rapply exp_bound_bound.
+assumption.
+Qed.
+
+Definition exp_bound_uc (z:Z) :  Q_as_MetricSpace --> CR :=
+Build_UniformlyContinuousFunction (@exp_bound_uc_prf z).
+
+Definition CRexp_bound (z:Z) : CR --> CR := (Cbind QPrelengthSpace (exp_bound_uc z)).
+
+Lemma CRexp_bound_correct : forall (z:Z) x, closer (inj_Q _ (z:Q)) x -> (IRasCR (Exp x)==CRexp_bound z (IRasCR x))%CR.
+Proof.
+intros z x Hx.
+assert (Z:Continuous (closer (inj_Q IR (z:Q))) Expon).
+ apply (Included_imp_Continuous realline).
+  Contin.
+ Included.
+apply (fun a b c => @ContinuousCorrect _ a Expon Z b c x CI); auto with *.
+ constructor.
+intros q [] H.
+transitivity (exp_bound_uc z q);[|].
+ change (' q)%CR with (Cunit_fun _ q).
+ rapply BindLaw1.
+change (rational_exp (Qmin z q) == IRasCR (Exp (inj_Q IR q)))%CR.
+rewrite rational_exp_correct.
+apply IRasCR_wd.
+apply Exp_wd.
+apply inj_Q_wd.
+simpl.
+rewrite <- Qle_min_r.
+apply leEq_inj_Q with IR.
+assumption.
+Qed.
+
+Definition CRexp (x:CR) : CR := CRexp_bound (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
+
+Implicit Arguments CRexp [].
+
+Lemma CRexp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
+Proof.
+intros x.
+assert (X:=ball_approx_l x (1#1)).
+rewrite <- CRAbsSmall_ball in X.
+destruct X as [X _].
+simpl in X.
+rewrite <- CRplus_Qplus.
+apply CRle_trans with (doubleSpeed x).
+ rewrite (doubleSpeed_Eq x); apply CRle_refl.
+intros e.
+assert (Y:=X e).
+simpl in *.
+do 2 (unfold Cap_raw in *; simpl in *).
+replace RHS with (approximate x (1 # 1)%Qpos +
+    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos)
+ by QposRing.
+assumption.
+Qed.
+
+Lemma CRexp_correct : forall x, (IRasCR (Exp x)==CRexp (IRasCR x))%CR.
+Proof.
+intros x.
+unfold CRexp.
+apply CRexp_bound_correct.
+simpl.
+apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
+ [|rsapply inj_Q_leEq; auto with *].
+rewrite IR_leEq_as_CR.
+rewrite IR_inj_Q_as_CR.
+apply CRexp_bound_lemma.
+Qed.
+
+Lemma CRexp_bound_exp : forall (z:Z) (x:CR),
+ (x <= 'z ->
+  CRexp_bound z x == CRexp x)%CR.
+Proof.
+intros z x H.
+unfold CRexp.
+set (a:=(approximate x (1 # 1)%Qpos + 1)).
+rewrite <- (CRasIRasCR_id x).
+rewrite <- CRexp_bound_correct.
+ change (CRasIR x [<=] inj_Q IR (z:Q)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ assumption.
+rewrite <- CRexp_bound_correct.
+ change (CRasIR x [<=] inj_Q IR (Qceiling a:Q)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ apply CRle_trans with ('a)%CR.
+  rapply CRexp_bound_lemma.
+ rewrite CRle_Qle.
+ auto with *.
+reflexivity.
+Qed.
+
+Add Morphism CRexp with signature ms_eq ==> ms_eq as CRexp_wd.
+intros x y Hxy.
+unfold CRexp at 1.
+set (a :=  (approximate x (1 # 1)%Qpos + 1)).
+rewrite Hxy.
+apply CRexp_bound_exp.
+rewrite <- Hxy.
+apply CRle_trans with ('a)%CR.
+ rapply CRexp_bound_lemma.
+rewrite CRle_Qle.
+auto with *.
+Qed.

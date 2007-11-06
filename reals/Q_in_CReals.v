@@ -666,6 +666,8 @@ Proof.
  ring.
 Qed.
 
+Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.
+
 (** Moreover, and as expected, the [AbsSmall] predicate is also
 preserved under the [inj_Q] *)
 
@@ -680,17 +682,6 @@ Proof.
  astepl (inj_Q [--]q1).
  apply inj_Q_leEq.
  assumption.
- apply cg_cancel_lft with (x := inj_Q q1).
- rstepr (Zero:R1).
- astepr (inj_Q (q1[+][--]q1)).
- apply eq_symmetric_unfolded.
- apply inj_Q_plus.
- astepr (inj_Q Zero).
- apply inj_Q_wd.
- algebra.
- simpl in |- *.
- rational.
-
  apply inj_Q_leEq.
  assumption.
 Qed.
@@ -767,22 +758,6 @@ Proof.
  apply a.
  assumption.
 
- astepl (inj_Q (g_ m[+][--](g_ N))).
- astepr (inj_Q (g_ m)[+][--](inj_Q (g_ N))).
- astepr (inj_Q (g_ m)[+]inj_Q [--](g_ N)).
- apply inj_Q_plus.
- apply plus_resp_eq. 
- apply cg_cancel_lft with (x := inj_Q (g_ N)).
- astepr (Zero:R1).
- astepr (inj_Q (g_ N[+][--](g_ N))).
- apply eq_symmetric_unfolded.
- apply inj_Q_plus.
- astepr (inj_Q Zero).
- apply inj_Q_wd.
- algebra.
- simpl in |- *.
- rational.
- 
  apply pg.
  simpl in |- *.
  red in |- *. 
@@ -842,6 +817,8 @@ stepl ([--](inj_Q (zring (R:=Q_as_COrdField) n))).
 apply eq_symmetric.
 apply inj_Q_inv.
 Qed.
+
+Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
 
 Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
 Proof.
@@ -906,6 +883,8 @@ rewrite <- Qinv_power.
 rewrite Qmult_1_l.
 reflexivity.
 Qed.
+
+Hint Resolve inj_Q_power inj_Q_power_Z : algebra.
 
 (** ** Injection of [Q] is dense
 Finally we are able to prove the density of image of [Q] in [R1]. We
@@ -1058,3 +1037,7 @@ exists (S n); assumption.
 Qed.
  
 End Rational_sequence_prelogue.
+
+Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.
+Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
+Hint Resolve inj_Q_power inj_Q_power_Z : algebra.

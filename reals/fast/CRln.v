@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CRarctanh.
+Require Import CRartanh_slow.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -29,7 +29,7 @@ Require Import ContinuousCorrect.
 Require Import Qmetric.
 Require Import Qauto.
 Require Import Exponential.
-Require Import ArcTanH.
+Require Import ArTanH.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -55,7 +55,7 @@ Qauto_pos.
 Qed.
 
 Definition rational_ln_slow (a:Q) (p: 0 < a) : CR := 
- scale 2 (rational_arcTanh (lnDomainAdaptor p)).
+ scale 2 (rational_artanh_slow (lnDomainAdaptor p)).
 
 Lemma Qpos_adaptor : forall q, 0 < q -> Zero[<]inj_Q IR q.
 Proof.
@@ -71,8 +71,8 @@ Lemma rational_ln_slow_correct : forall (a:Q) Ha Ha0,
 Proof.
 intros a Ha Ha0.
 unfold rational_ln_slow.
-assert (X:=arcTanh_DomArcTanH (lnDomainAdaptor Ha)).
-rewrite (fun x => rational_arcTanh_correct x X).
+assert (X:=artanh_DomArTanH (lnDomainAdaptor Ha)).
+rewrite (fun x => rational_artanh_slow_correct x X).
 rewrite <- CRmult_scale.
 rewrite <- IR_inj_Q_as_CR.
 rewrite <- IR_mult_as_CR.
@@ -378,7 +378,9 @@ Qed.
 Definition CRln (x:CR) (Hx:('0 < x)%CR) : CR :=
 let (c,_) := Hx in CRln_pos c x.
 
-Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==@CRln (IRasCR x) Hx0)%CR.
+Implicit Arguments CRln [].
+
+Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==CRln (IRasCR x) Hx0)%CR.
 Proof.
 intros x Hx [c Hc].
 rapply CRln_pos_correct.
@@ -387,4 +389,56 @@ rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
 setoid_replace (IRasCR x) with (IRasCR x - '0)%CR using relation ms_eq by ring.
 assumption.
+Qed.
+
+Lemma CRln_pos_ln : forall (c:Qpos) (x:CR) Hx,
+ ('c <= x ->
+  CRln_pos c x == CRln x Hx)%CR.
+Proof.
+intros c x Hx Hc.
+assert (X:Zero[<](CRasIR x)).
+ apply CR_less_as_IR.
+ apply CRlt_wd with ('0)%CR x; try assumption.
+  rewrite IR_Zero_as_CR.
+  reflexivity.
+ rewrite CRasIRasCR_id.
+ reflexivity.
+destruct Hx as [d Hd].
+unfold CRln.
+rewrite <- (CRasIRasCR_id x).
+rewrite <- (CRln_pos_correct c _ X).
+ change (inj_Q IR (c:Q)[<=](CRasIR x)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ assumption.
+rewrite <- (CRln_pos_correct d _ X).
+ change (inj_Q IR (d:Q)[<=](CRasIR x)).
+ rewrite IR_leEq_as_CR.
+ autorewrite with IRtoCR.
+ rewrite CRasIRasCR_id.
+ ring_simplify in Hd.
+ assumption.
+apply IRasCR_wd.
+apply Log_wd.
+apply CRasIR_wd.
+reflexivity.
+Qed.
+
+Lemma CRln_wd : forall (x y:CR) Hx Hy, (x == y -> CRln x Hx == CRln y Hy)%CR.
+Proof.
+intros x y [c Hc] Hy Hxy.
+unfold CRln at 1.
+ rewrite Hxy.
+apply CRln_pos_ln.
+rewrite <- Hxy.
+ring_simplify in Hc.
+assumption.
+Qed.
+
+Lemma CRln_irrelvent : forall x Hx Hx0, (CRln x Hx == CRln x Hx0)%CR.
+Proof.
+intros.
+apply CRln_wd.
+reflexivity.
 Qed.

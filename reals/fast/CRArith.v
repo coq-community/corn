@@ -49,7 +49,6 @@ Qed.
 Lemma CReq_Qeq : forall (x y:Q), inject_Q x == inject_Q y <-> (x == y)%Q.
 Proof.
 unfold CR, inject_Q.
-Set Printing All.
 rapply Cunit_eq.
 Qed.
 
@@ -200,3 +199,28 @@ Qed.
 Hint Rewrite CRplus_translate : CRfast_compute.
 Hint Rewrite CRplus_translate' : CRfast_compute.
 
+Lemma CRpos_nonNeg : forall x, CRpos x -> CRnonNeg x.
+intros x [c Hx].
+cut ('0 <= x)%CR.
+ unfold CRle.
+ intros H.
+ setoid_replace (x - '0)%CR with x in H using relation ms_eq by ring.
+ assumption.
+apply CRle_trans with (' c)%CR; auto with *.
+rewrite CRle_Qle; auto with *.
+Qed.
+
+Lemma CRneg_nonPos : forall x, CRneg x -> CRnonPos x.
+intros x [c Hx].
+cut (x <= '0)%CR.
+ unfold CRle.
+ intros H.
+ setoid_replace ('0 - x)%CR with (-x)%CR in H using relation ms_eq by ring.
+ intros e.
+ rewrite <- (Qopp_involutive e).
+ rewrite <- (Qopp_involutive (approximate x e)).
+ apply Qopp_le_compat.
+ rapply H.
+apply CRle_trans with (' - c)%CR; auto with *.
+rewrite CRle_Qle; auto with *.
+Qed.

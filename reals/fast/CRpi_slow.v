@@ -57,10 +57,10 @@ split; discriminate.
 Qed.
 
 Definition r_pi (r:Q) : CR := 
-((scale (68*r) (rational_arcTan_small_pos small_per_23) +
-  scale (32*r) (rational_arcTan_small_pos small_per_182)) + 
- (scale (40*r) (rational_arcTan_small_pos small_per_5118) +
-  scale (20*r) (rational_arcTan_small_pos small_per_6072)))%CR.
+((scale (68*r) (rational_arctan_small_pos small_per_23) +
+  scale (32*r) (rational_arctan_small_pos small_per_182)) + 
+ (scale (40*r) (rational_arctan_small_pos small_per_5118) +
+  scale (20*r) (rational_arctan_small_pos small_per_6072)))%CR.
 
 Let f (a b:Q) : Q := 
  let (x,y) := a in 
@@ -276,12 +276,12 @@ setoid_replace (32*r) with (4*r*8) by ring.
 setoid_replace (40*r) with (4*r*10) by ring.
 setoid_replace (20*r) with (4*r*5) by ring.
 repeat rewrite <- CRmult_Qmult.
-transitivity ('4 * 'r *(' 17 * rational_arcTan_small_pos small_per_23 +
- ' 8 * rational_arcTan_small_pos small_per_182 +
- (' 10 * rational_arcTan_small_pos small_per_5118 +
-  ' 5 * rational_arcTan_small_pos small_per_6072)))%CR.
+transitivity ('4 * 'r *(' 17 * rational_arctan_small_pos small_per_23 +
+ ' 8 * rational_arctan_small_pos small_per_182 +
+ (' 10 * rational_arctan_small_pos small_per_5118 +
+  ' 5 * rational_arctan_small_pos small_per_6072)))%CR.
  ring.
-repeat (rewrite (rational_arcTan_small_pos_correct);
+repeat (rewrite (rational_arctan_small_pos_correct);
          [constructor|]).
 repeat rewrite <- IR_inj_Q_as_CR.
 repeat (rewrite <- IR_mult_as_CR || rewrite <- IR_plus_as_CR).

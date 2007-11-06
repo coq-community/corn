@@ -62,6 +62,11 @@ rapply map_wd_unfolded.
 assumption.
 Qed.
 
+Lemma CRasIR_wd : forall x y, (x==y)%CR -> CRasIR x [=] CRasIR y.
+Proof.
+rapply map_wd_unfolded.
+Qed.
+
 Lemma CR_less_as_IR : forall x y, (IRasCR x < IRasCR y -> x[<]y)%CR.
 Proof.
 intros x y H.
@@ -215,9 +220,12 @@ Proof.
 intros; rapply IR_recip_as_CR.
 Qed.
 
+Definition IdCR := fun (x:CR) => x.
+
 Lemma IR_nring_as_CR : forall n, 
- (IRasCR (nring n)==nring n)%CR.
+ (IRasCR (nring n)==IdCR (nring n))%CR.
 Proof.
+unfold IdCR.
 induction n.
 apply IR_Zero_as_CR.
 simpl in *.
