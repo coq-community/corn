@@ -120,7 +120,8 @@ Eval compute in (Split test2 (ou 1/4)).
 
 Implicit Arguments Split [X].
 
-Definition Map2 (X Y Z:Type):(X->Y->Z)->(StepF X)-> (StepF Y) -> (StepF Z).
+Definition Map2 (X Y Z:Type):
+  (X->Y->Z)->(StepF X)-> (StepF Y) -> (StepF Z).
 fix 5. 
 intros X Y Z f s t.
 destruct s as [x | b t1 t2].
@@ -331,62 +332,150 @@ Section Equivalence2.
 Variable X:Type.
 Variable Xeq:X->X->Prop.
 Hypothesis Xst:(Setoid_Theory X Xeq).
+Add Setoid X Xeq Xst as Xth1.
 
 Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst):foo.
 Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
 
 (* Add Setoid X Xeq Xst as Xth.*)
+Lemma StepFfoldPropglue:forall y o,
+ StepFfoldProp (glue o (fst (Split y o)) (snd (Split y o))) <->
+StepFfoldProp y.
+induction y.
+  unfold StepF_eq, StepFfoldProp.
+  simpl; tauto.
+simpl.
+intro o0.
+destruct (Q_dec o0 o) as [[H|H]|H].
+   generalize (IHy1 (OpenUnitDiv o0 o H)).
+   destruct (Split y1 (OpenUnitDiv o0 o H)) as [l r].
+   simpl.
+   change ((StepFfoldProp l /\StepFfoldProp r <-> StepFfoldProp y1) ->
+(StepFfoldProp l /\ StepFfoldProp r /\ StepFfoldProp y2 <->
+  StepFfoldProp y1 /\ StepFfoldProp y2)).
+   tauto.
+  generalize (IHy2 (OpenUnitAux o0 o H)).
+  destruct (Split y2 (OpenUnitAux o0 o H)) as [l r].
+  simpl.
+  change ((StepFfoldProp l /\StepFfoldProp r <-> StepFfoldProp y2) ->
+((StepFfoldProp y1 /\ StepFfoldProp l) /\ StepFfoldProp r <->
+  StepFfoldProp y1 /\ StepFfoldProp y2)).
+  tauto.
+simpl.
+reflexivity.
+Qed.
 
-Hint Resolve splitmap fstsplitmap sndsplitmap:foo.
-(* Look up in the library*)
-Axiom iffST:Setoid_Theory Prop iff.
-Hint Resolve iffST.
-Lemma StepFfoldProp_morphism:forall x y:(StepF Prop), 
- (StepF_eq iff x y) -> 
- ((StepFfoldProp x)<->(StepFfoldProp y)).
+Hint Resolve splitmap fstsplitmap sndsplitmap StepFfoldPropglue:foo.
+Lemma StepFfoldProp_morphism:forall x y:(StepF Prop),
+  (StepF_eq iff x y) ->
+  ((StepFfoldProp x)<->(StepFfoldProp y)).
 induction x. induction y.
-  auto with *.
- unfold StepF_eq. simpl. unfold StepFfoldProp;simpl;intuition.
+   auto with *.
+  unfold StepF_eq. simpl. unfold StepFfoldProp;simpl;intuition.
 intros y H0.
 unfold StepF_eq in H0. simpl in H0.
-cut ((StepFfoldProp ((glue o (fst (Split y o)) (snd (Split y o))))
-     <->(StepFfoldProp y))).
- intro H. rewrite <- H. clear H.
- destruct ( Split y o) as [L R]. destruct H0 as [H1 H2].
- unfold StepFfoldProp. simpl. fold StepFfoldProp. 
- rewrite <-(IHx1 L). auto with *.
- rewrite <-(IHx2 R). auto with *. auto with *.
-clear H0 IHx2 x2 IHx1 x1.
+transitivity (StepFfoldProp ((glue o (fst (Split y o)) (snd (Split y 
+o))))).
+  change ((StepFfoldProp x1 /\ StepFfoldProp x2) <->
+  ((StepFfoldProp (fst (Split y o)) /\ (StepFfoldProp (snd (Split y 
+o)))))).
+  destruct (Split y o) as [l r].
+  destruct H0 as [H0l H0r].
+  rewrite (IHx1 l); try assumption.
+  rewrite (IHx2 r); try assumption.
+  simpl.
+  tauto.
+auto with *.
+Qed.
+
+(*
+The next goal:
+
+Lemma Split_morphism1: forall o a b, a === b ->
+   (fst (Split a o)) === (fst (Split b o)).
+intros o a b H.
+ unfold Split. destruct  (Q_dec o o0) as [[H1 | H2]  | H3]; auto with *.
+
+  Not clear how to continue
+
+
+End Equivalence2.
+
+Section Equivalence3.
+Variable X:Type.
+Variable Xeq:X->X->Prop.
+Hypothesis Xst:(Setoid_Theory X Xeq).
+Variable Y:Type.
+Variable Yeq:Y->Y->Prop.
+Hypothesis Yst:(Setoid_Theory Y Yeq).
+Variable Z:Type.
+Variable Zeq:Z->Z->Prop.
+Hypothesis Zst:(Setoid_Theory Z Zeq).
+Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst):foo.
+Hint Resolve (Seq_trans Y Yeq Yst) (Seq_sym Y Yeq Yst) (Seq_refl Y Yeq Yst):foo.
+Lemma Map2_morphism2:forall f, (forall x x' y y',
+  (Xeq x x) -> (Yeq y y')-> (Zeq (f x y) (f x' y'))) ->
+  forall s t t', (StepF_eq Yeq t t') ->
+  (StepF_eq Zeq (Map2 f s t) (Map2 f s t')).
+intros f H.
+induction t. induction t'. 
+   unfold StepF_eq. simpl. unfold StepFfoldProp. simpl.
+   intro Hxx0. induction s.
+    simpl. auto with *.
+    simpl.  elim (Q_dec o o) using Qdec_eq_ind;simpl;auto with *.
+ intro. 
+ Does not seem like fun.
+
+simpl in H0.
+ split; auto with *.
+    apply IHs1.
+simpl.
+   unfold Map2; simpl. auto with *.
+  unfold StepF_eq. simpl. unfold StepFfoldProp;simpl;intuition.
+intros y H0.
+unfold StepF_eq in H0. simpl in H0.
+transitivity (StepFfoldProp ((glue o (fst (Split y o)) (snd (Split y 
+o))))).
+  change ((StepFfoldProp x1 /\ StepFfoldProp x2) <->
+  ((StepFfoldProp (fst (Split y o)) /\ (StepFfoldProp (snd (Split y 
+o)))))).
+  destruct (Split y o) as [l r].
+  destruct H0 as [H0l H0r].
+  rewrite (IHx1 l); try assumption.
+  rewrite (IHx2 r); try assumption.
+  simpl.
+  tauto.
+auto with *.
+Qed.
+*)
+
+Axiom PropST:(Setoid_Theory Prop iff).
 
 Lemma StepF_eq_trans:forall x y z : StepF X, (x === y) -> y === z -> x === z.
-induction x.
+induction x. intros.
+ unfold StepF_eq;simpl;auto with *.
+  cut (StepFfoldProp (Map (Xeq x) y)); try auto.
+ rewrite (StepFfoldProp_morphism (Map (Xeq x) y) (Map (Xeq x) z));try auto.
+ apply (map_resp_StepF_eq Xst PropST); auto with *.
+ intros x0 y0 Hx0y0. rewrite Hx0y0. intuition.
 intros.
+unfold StepF_eq. 
+rewrite <- (StepFfoldProp_morphism (Map2 Xeq (glue o x1 x2) y) (Map2 Xeq (glue o x1 x2) z)).
+2:auto with *.
 
-unfold StepF_eq;simpl;auto with *.
+fold StepFfoldProp.
 
+revert H.
+unfold StepF_eq. simpl. 
+(*rewrite (StepFfoldProp_morphism (Map2 iff (Map2 Xeq (glue o x1 x2) y) (Map2 Xeq (glue o x1 x2) z))
+                  ((Map2 Xeq (glue o x1 x2) z))).*)
 
-assert  (@StepF_eq Prop (Map (Xeq x) y) (Map (Xeq x) z)).
-
-Need that stepfold is a morphism, then rewrite
-replace with  (Map (Xeq x) y).
-
-
-
-fold StepF_eq.
-
-unfold Map2.
-
-simpl.
-
-
-
-rewrite H1.
-
-intros.
-intuition.
-
-
-
+destruct (Split y o). destruct (Split z o).
+assert (forall ss tt, (StepFfoldProp (glue o ss tt))<-> (StepFfoldProp ss/\ StepFfoldProp tt)).
+ unfold StepFfoldProp. simpl. intuition.
+rewrite H. intros [H1 H2].
+(* Should be a lemma?*)
+ unfold StepF_eq. simpl.
 
 Lemma StepF_eq_symm:forall x y : StepF X, StepF_eq x y -> StepF_eq y x.
 intro s. unfold StepF_eq. induction s. 
@@ -412,9 +501,6 @@ Lemma StepF_eq_trans:forall x y z : StepF X, StepF_eq x y -> StepF_eq y z -> Ste
 
 Lemma StepFst: Setoid_Theory (StepF X) StepF_eq.
 
-(*
-3. prove transitivity of (==).
-*)
 
 (* TODO:
 setoid eq 
