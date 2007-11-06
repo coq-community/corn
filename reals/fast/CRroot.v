@@ -908,3 +908,5 @@ intros q Hq Y.
 transitivity (rational_sqrt q);[|rapply rational_sqrt_correct].
 rapply BindLaw1.
 Qed.
+
+Hint Rewrite CRsqrt_correct : IRtoCR.

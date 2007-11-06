@@ -209,3 +209,5 @@ intros q [] _.
 transitivity (rational_cos q);[|rapply rational_cos_correct].
 rapply BindLaw1.
 Qed.
+
+Hint Rewrite cos_correct : IRtoCR.

@@ -510,3 +510,5 @@ intros q [] _.
 transitivity (rational_sin q);[|rapply rational_sin_correct].
 rapply BindLaw1.
 Qed.
+
+Hint Rewrite sin_correct : IRtoCR.

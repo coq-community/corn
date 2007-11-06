@@ -357,3 +357,5 @@ intros q [] _.
 transitivity (rational_arctan q);[|rapply rational_arctan_correct].
 rapply BindLaw1.
 Qed.
+
+Hint Rewrite arctan_correct : IRtoCR.

@@ -655,9 +655,9 @@ Qed.
 Definition exp_bound_uc (z:Z) :  Q_as_MetricSpace --> CR :=
 Build_UniformlyContinuousFunction (@exp_bound_uc_prf z).
 
-Definition CRexp_bound (z:Z) : CR --> CR := (Cbind QPrelengthSpace (exp_bound_uc z)).
+Definition exp_bounded (z:Z) : CR --> CR := (Cbind QPrelengthSpace (exp_bound_uc z)).
 
-Lemma CRexp_bound_correct : forall (z:Z) x, closer (inj_Q _ (z:Q)) x -> (IRasCR (Exp x)==CRexp_bound z (IRasCR x))%CR.
+Lemma exp_bounded_correct : forall (z:Z) x, closer (inj_Q _ (z:Q)) x -> (IRasCR (Exp x)==exp_bounded z (IRasCR x))%CR.
 Proof.
 intros z x Hx.
 assert (Z:Continuous (closer (inj_Q IR (z:Q))) Expon).
@@ -681,11 +681,11 @@ apply leEq_inj_Q with IR.
 assumption.
 Qed.
 
-Definition CRexp (x:CR) : CR := CRexp_bound (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
+Definition exp (x:CR) : CR := exp_bounded (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
 
-Implicit Arguments CRexp [].
+Implicit Arguments exp [].
 
-Lemma CRexp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
+Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
 Proof.
 intros x.
 assert (X:=ball_approx_l x (1#1)).
@@ -705,54 +705,56 @@ replace RHS with (approximate x (1 # 1)%Qpos +
 assumption.
 Qed.
 
-Lemma CRexp_correct : forall x, (IRasCR (Exp x)==CRexp (IRasCR x))%CR.
+Lemma exp_correct : forall x, (IRasCR (Exp x)==exp (IRasCR x))%CR.
 Proof.
 intros x.
-unfold CRexp.
-apply CRexp_bound_correct.
+unfold exp.
+apply exp_bounded_correct.
 simpl.
 apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
  [|rsapply inj_Q_leEq; auto with *].
 rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
-apply CRexp_bound_lemma.
+apply exp_bound_lemma.
 Qed.
 
-Lemma CRexp_bound_exp : forall (z:Z) (x:CR),
+Hint Rewrite exp_correct : IRtoCR.
+
+Lemma exp_bound_exp : forall (z:Z) (x:CR),
  (x <= 'z ->
-  CRexp_bound z x == CRexp x)%CR.
+  exp_bounded z x == exp x)%CR.
 Proof.
 intros z x H.
-unfold CRexp.
+unfold exp.
 set (a:=(approximate x (1 # 1)%Qpos + 1)).
 rewrite <- (CRasIRasCR_id x).
-rewrite <- CRexp_bound_correct.
+rewrite <- exp_bounded_correct.
  change (CRasIR x [<=] inj_Q IR (z:Q)).
  rewrite IR_leEq_as_CR.
  autorewrite with IRtoCR.
  rewrite CRasIRasCR_id.
  assumption.
-rewrite <- CRexp_bound_correct.
+rewrite <- exp_bounded_correct.
  change (CRasIR x [<=] inj_Q IR (Qceiling a:Q)).
  rewrite IR_leEq_as_CR.
  autorewrite with IRtoCR.
  rewrite CRasIRasCR_id.
  apply CRle_trans with ('a)%CR.
-  rapply CRexp_bound_lemma.
+  rapply exp_bound_lemma.
  rewrite CRle_Qle.
  auto with *.
 reflexivity.
 Qed.
 
-Add Morphism CRexp with signature ms_eq ==> ms_eq as CRexp_wd.
+Add Morphism exp with signature ms_eq ==> ms_eq as exp_wd.
 intros x y Hxy.
-unfold CRexp at 1.
+unfold exp at 1.
 set (a :=  (approximate x (1 # 1)%Qpos + 1)).
 rewrite Hxy.
-apply CRexp_bound_exp.
+apply exp_bound_exp.
 rewrite <- Hxy.
 apply CRle_trans with ('a)%CR.
- rapply CRexp_bound_lemma.
+ rapply exp_bound_lemma.
 rewrite CRle_Qle.
 auto with *.
 Qed.

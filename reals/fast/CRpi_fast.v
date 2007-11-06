@@ -310,14 +310,17 @@ Qed.
 
 Definition CRpi : CR := (r_pi 1).
 
-Lemma CRpi_correct : (CRpi == IRasCR Pi)%CR.
+Lemma CRpi_correct : (IRasCR Pi == CRpi)%CR.
 Proof.
 unfold CRpi.
 rewrite r_pi_correct.
 apply IRasCR_wd.
-rstepr ((nring 1)[*]Pi).
+rstepl ((nring 1)[*]Pi).
 apply mult_wdl.
+apply eq_symmetric.
 apply (inj_Q_nring IR 1).
 Qed.
 
 End Pi.
+
+Hint Rewrite CRpi_correct : IRtoCR.
