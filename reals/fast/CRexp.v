@@ -758,3 +758,14 @@ apply CRle_trans with ('a)%CR.
 rewrite CRle_Qle.
 auto with *.
 Qed.
+
+Lemma exp_Qexp : forall x : Q, (exp (' x) == rational_exp x)%CR.
+Proof.
+intros x.
+rewrite <- IR_inj_Q_as_CR.
+rewrite <- exp_correct.
+rewrite <- rational_exp_correct.
+reflexivity.
+Qed.
+
+Hint Rewrite exp_Qexp : CRfast_compute.

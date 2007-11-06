@@ -88,6 +88,16 @@ rewrite StrongMonadLaw1.
 reflexivity.
 Qed.
 
+Hint Rewrite CRplus_translate : CRfast_compute.
+
+Lemma translate_Qplus : forall a b:Q, (translate a ('b)=='(a+b)%Q)%CR.
+Proof.
+intros a b.
+rapply MonadLaw3.
+Qed.
+
+Hint Rewrite translate_Qplus : CRfast_compute.
+
 Lemma Qopp_uc_prf : is_UniformlyContinuousFunction Qopp Qpos2QposInf.
 Proof.
 intros e a b H.

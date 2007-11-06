@@ -359,3 +359,11 @@ rapply BindLaw1.
 Qed.
 
 Hint Rewrite arctan_correct : IRtoCR.
+
+Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
+Proof.
+intros x.
+rapply BindLaw1.
+Qed.
+
+Hint Rewrite arctan_Qarctan : CRfast_compute.

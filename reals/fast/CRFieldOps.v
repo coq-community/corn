@@ -526,6 +526,16 @@ apply CR_b_lowerBound.
 apply CR_b_upperBound.
 Qed.
 
+Hint Rewrite CRmult_scale : CRfast_compute.
+
+Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
+Proof.
+intros a b.
+rapply MonadLaw3.
+Qed.
+
+Hint Rewrite scale_Qmult : CRfast_compute.
+
 Definition Qinv_modulus (c:Qpos) (e:Qpos) : Qpos := (c*c*e)%Qpos.
 
 Lemma Qpos_Qmax : forall (a:Qpos) (b:Q), 0<Qmax a b.
