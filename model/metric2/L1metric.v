@@ -9,10 +9,6 @@ Set Implicit Arguments.
 Record OpenUnit:={OpenUnitasQ:> Q;
 OpenUnitprf:0<OpenUnitasQ/\OpenUnitasQ<1}.
 
-Inductive StepF(X:Type):Type:=
-|leaf:X->(StepF X)
-|glue:OpenUnit->(StepF X)->(StepF X)->(StepF X).
-
 Notation "'ou' x":=(@Build_OpenUnit x (conj (refl_equal Lt) (refl_equal Lt))) (at level 60, no associativity).
 Require Import Qordfield.
 Require Import COrdFields.
@@ -35,16 +31,6 @@ exact (OpenUnitMult x (Powern x n)).
 Defined.
 
 Definition half:=(ou 1/2).
-Definition test1:=(leaf 1). 
-Definition test2:=(glue (ou 1/2) (leaf 0) (leaf 1)).
-
-Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
-fix 4. intros X Y f [x| a t1 t2].
- exact (leaf (f x)).
-exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
-Defined.
-
-Implicit Arguments Map [X Y].
 
 Definition OpenUnitDiv (a b:OpenUnit):(a<b)->OpenUnit.
 intros a b p.
@@ -99,9 +85,20 @@ split; simpl;simpl in p;
 Defined.
 
 Eval compute in (OpenUnitAux (ou 1/2) (Powern (ou 1/2) (S O)) quarter_lt_half):Q.
-
-Print OpenUnitDiv.
  
+Inductive StepF(X:Type):Type:=
+|leaf:X->(StepF X)
+|glue:OpenUnit->(StepF X)->(StepF X)->(StepF X).
+
+Definition test1:=(leaf 1). 
+Definition test2:=(glue (ou 1/2) (leaf 0) (leaf 1)).
+
+Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
+fix 4. intros X Y f [x| a t1 t2].
+ exact (leaf (f x)).
+exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
+Defined.
+
 Definition Split (X:Type): (StepF X)-> OpenUnit -> ((StepF X)*(StepF X)).
 fix 2.
 intros X s a.
@@ -118,7 +115,11 @@ Defined.
 
 Eval compute in (Split test2 (ou 1/4)).
 
-Implicit Arguments Split [X].
+Definition SplitL (X:Type) (s:StepF X) (o:OpenUnit) : (StepF X) :=
+fst (Split s o).
+
+Definition SplitR (X:Type) (s:StepF X) (o:OpenUnit) : (StepF X) :=
+snd (Split s o).
 
 Definition Map2 (X Y Z:Type):
   (X->Y->Z)->(StepF X)-> (StepF Y) -> (StepF Z).
@@ -129,8 +130,6 @@ exact (Map (f x) t).
 destruct (Split t b) as [L R].
 exact (glue b (Map2 X Y Z f t1 L) (Map2 X Y Z f t2 R)).
 Defined.
-
-Implicit Arguments Map2 [X Y Z].
 
 Definition StepFfold:=
 (*
