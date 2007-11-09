@@ -290,6 +290,7 @@ rewrite splitmap. destruct ( Split t o) as [L R].
 destruct H0 as [H1 H2]. split. apply IHs1. apply H1.
 apply IHs2. apply H2.
 Qed.
+
 End Equivalence1.
 
 Hint Resolve StepF_eq_refl.
@@ -351,6 +352,11 @@ o)))))).
   tauto.
 auto with *.
 Qed.
+
+Lemma leaf_eq:forall x y, (leaf x)===(leaf y)->(Xeq x y).
+intros. auto with *.
+Qed.
+Hint Resolve leaf_eq:starith.
 
 Axiom PropST:(Setoid_Theory Prop iff).
 
@@ -417,6 +423,259 @@ split; intros; auto with *.
 eapply StepF_eq_trans;eauto.
 Qed.
 Add Setoid (StepF X) (StepF_eq Xeq) StepF_Sth as StepF_th.
+
+(*
+We seem to need even more conditions
+Variable Y:Type.
+Variable Yeq:Y->Y->Prop.
+Hypothesis Yst:(Setoid_Theory Y Yeq).
+Add Setoid Y Yeq Yst as Yth.
+
+Lemma StepFfold_morphism:forall f g, 
+  (forall x y, (Xeq x y)->((Yeq (f x) (f y)))) ->
+  (forall o o' y1 y2 y1' y2', 
+    (o==o'->(Yeq y1 y1')->(Yeq y2 y2')->
+      (Yeq (g o y1 y2) (g o y1 y2))))->
+  forall s t:(StepF X),
+  (StepF_eq Xeq s t) ->
+  (Yeq (StepFfold f g s) (StepFfold f g t)).
+induction s. induction t.
+  simpl;auto with *.
+ intro H1. assert (((leaf x)===t1)/\(leaf x)===t2); auto with *.
+ destruct H2 as [H2 H3]. simpl. 
+ transitivity (g o (StepFfold f (fun x : OpenUnit => g x) (leaf x)) (StepFfold f (fun x : OpenUnit => g x) (leaf x))) .
+ simpl.
+rewrite <- (IHt1 H2). auto with *.
+ unfold StepF_eq. simpl. rewrite StepFfoldPropglue2.
+ intros [H1  H2]. intuition auto with *.
+intros y H0.
+unfold StepF_eq in H0. simpl in H0.
+transitivity (StepFfoldProp ((glue o (fst (Split y o)) (snd (Split y 
+o))))).
+  change ((StepFfoldProp x1 /\ StepFfoldProp x2) <->
+  ((StepFfoldProp (fst (Split y o)) /\ (StepFfoldProp (snd (Split y 
+o)))))).
+  destruct (Split y o) as [l r].
+  destruct H0 as [H0l H0r].
+  rewrite (IHx1 l); try assumption.
+  rewrite (IHx2 r); try assumption.
+  simpl.
+  tauto.
+auto with *.
+Qed.*)
+
+End Equivalence2.
+
+Section L1metric.
+
+Notation "x === y" := (StepF_eq Qeq x y) (at level 60).
+Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
+intros e a b.
+unfold L1Ball.
+set (d:=Distance a b).
+destruct (Qlt_le_dec_fast e d) as [Hdc|Hdc].
+right. abstract auto with *.
+left. exact Hdc.
+Defined.
+Require Import QArith_base.
+
+Hint Resolve (StepF_eq_symm Q_Setoid) :starith.
+Add Setoid (StepF Q) (StepF_eq Qeq) (StepF_Sth Q_Setoid) as StepFQ_Setoid.
+Lemma leafglue:forall x o s t, (leaf x)===(glue o s t)->
+  ((leaf x)===s)/\((leaf x)===t).
+intros.
+assert ((leaf x)===(glue o (fst (Split (leaf x) o)) (snd (Split (leaf x) o)))).
+apply (StepF_eq_symm Q_Setoid).
+apply (glueSplit_eq Q_Setoid).
+simpl in H0.
+assert ((glue o s t)===(glue o (leaf x) (leaf x))).
+transitivity (leaf x); auto with *. 
+auto with *.
+Qed.
+
+Lemma glue_eq1:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (x===x1).
+intros.
+cut (fst (Split (glue o x y) o)===(fst (Split (glue o x1 y1) o) )).
+do 2 rewrite Splitglue.
+simpl. auto with *.
+apply pair_split_resp_eq_fst; auto with *.
+Qed.
+
+Lemma glue_eq2:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (y===y1).
+intros.
+cut (snd (Split (glue o x y) o)===(snd (Split (glue o x1 y1) o) )).
+do 2 rewrite Splitglue.
+simpl. auto with *.
+apply pair_split_resp_eq_snd; auto with *.
+Qed.
+
+(*
+Lemma glueSplit1:forall o x0 x1 y, (glue o x0 x1)===y ->
+ (x0 === fst (Split y o)) /\ (x1===snd (Split y o)).
+intros.
+assert ((glue o x0 x1)===(glue o (fst (Split y o)) (snd (Split y o)))).
+transitivity y; auto with *. 
+clear -y.
+Focus 2. split. apply (glue_eq1 o x0 x1 (fst (Split y o)) (snd (Split y o)) H0).
+ apply (glue_eq2 o x0 x1 (fst (Split y o)) (snd (Split y o)) H0).
+*)
+
+Notation "'SplitL' s o":= (fst (Split s o)) (at level 100, no associativity).
+Notation "'SplitR' s o":= (snd (Split s o)) (at level 100, no associativity).
+Axiom glue_eq_ind: forall s1 s2 s a (P:Prop),
+   (s1 === ( fst (Split  s a ))  -> 
+   s2 === (snd (Split s a)) -> P) ->
+  (glue a s1 s2 === s) -> P.
+
+Add Morphism IntegralQ 
+  with signature   (StepF_eq Qeq) ==>  Qeq
+ as L1Norm_mor.
+unfold IntegralQ.
+induction x1.
+intros x2 H. simpl. induction x2.
+  simpl.  auto with *.
+ set (a:=leafglue H); destruct a as [H0 H1].
+ simpl. rewrite <- (IHx2_1 H0). rewrite <- (IHx2_2 H1).
+ ring.
+intros x2 H. simpl. rewrite (IHx1_1 (fst (Split x2 o))).
+(* bug ?*)
+destruct  H as [H0 H1] using glue_eq_ind;auto with *.
+rewrite (IHx1_2 (snd (Split x2 o))).
+destruct  H as [H0 H1] using glue_eq_ind;auto with *.
+clear -o.
+fold IntegralQ.
+(*Should be a lemma?*)
+revert o. rename x2 into x. induction x.
+simpl. unfold IntegralQ. simpl. intros. ring.
+simpl. intro p. destruct (Q_dec p o) as [[H|H]| H].
+  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ. 
+  rewrite <-(IHx1 (OpenUnitDiv p o H)). destruct (Split x1 (OpenUnitDiv p o H)) as [L R]; simpl.
+  unfold IntegralQ; simpl; fold IntegralQ. ring. (*why does this not work*)
+ETC.
+
+
+Lemma L1_is_MetricSpace : (is_MetricSpace (StepF_eq Qeq)  L1Ball).
+split.
+     apply StepF_Sth. exact Q_Setoid.
+    intros e x. unfold L1Ball. unfold Distance. 
+    assert ((Map2 Qminus x x)===(leaf 0)).
+    induction x. unfold Map2. simpl. 
+    assert (H:forall x y, x==y-> leaf x===leaf y).
+    intros. unfold StepF_eq. simpl. auto with *.
+    apply H. change (x-x) with (x+-x). apply Qplus_opp_r. (* why is this not in the hints database*)
+    simpl.  elim (Q_dec o o) using Qdec_eq_ind; simpl; auto with *. intro H. clear H.
+    apply StepF_eq_aux; auto with *.
+    unfold L1Norm. rewrite H.
+
+
+
+(*
+simpl.
+apply AbsSmall_wdr with 0.
+apply (zero_AbsSmall _ (e:Q)).
+apply less_leEq.
+apply Qpos_prf.
+simpl; ring.
+intros e x y. 
+unfold Qball.
+rsapply AbsSmall_minus.
+intros [e1  He1] [e2 He2] a b c H1 H2.
+unfold Qball.
+apply AbsSmall_wdr with ((a-b)+(b-c)).
+autorewrite with QposElim.
+rsapply AbsSmall_plus; assumption.
+simpl; ring.
+intros e a b H.
+unfold Qball.
+assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e).
+intros.
+rsapply shift_zero_leEq_minus'.
+rsapply inv_cancel_leEq.
+rsapply approach_zero_weak.
+intros.
+replace LHS with (x[-](e:Q)).
+rsapply shift_minus_leEq.
+replace RHS with (e+e0) by ring.
+rewrite <- (QposAsmkQpos H1).
+apply (H0 (mkQpos H1)).
+unfold cg_minus; simpl; ring.
+split.
+rsapply inv_cancel_leEq.
+replace RHS with (e:Q) by ring.
+apply H0.
+intros.
+destruct (H d).
+rsapply inv_cancel_leEq.
+replace RHS with (a-b) by ring.
+destruct e; destruct d; apply H1.
+apply H0.
+intros d.
+destruct (H d).
+destruct e; destruct d; apply H2.
+intros.
+rsapply cg_inv_unique_2.
+rsapply AbsSmall_approach_zero.
+intros.
+rewrite <- (QposAsmkQpos H0).
+apply (H (mkQpos H0)).
+Qed.
+
+Add Morphism Qball with signature QposEq ==> Qeq ==> Qeq ==> iff as Qball_wd.
+intros [x1 Hx1] [x2 Hx2] H x3 x4 H0 x5 x6 H1.
+unfold Qball.
+unfold AbsSmall.
+simpl.
+rewrite H0.
+rewrite H1.
+unfold QposEq in H.
+simpl in H.
+rewrite H.
+tauto.
+Qed.
+
+Definition Q_as_MetricSpace : MetricSpace :=
+Build_MetricSpace Qball_wd Q_is_MetricSpace.
+
+Canonical Structure Q_as_MetricSpace.
+
+Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
+Proof.
+assert (forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c).
+intros e d1 d2 He a b c Hab Hc.
+simpl.
+unfold Qball.
+apply AbsSmall_wdr with ((d1/(d1+d2)%Qpos)*(a - b)).
+apply AbsSmall_wdl with ((d1/(d1+d2)%Qpos)*(d1+d2)%Qpos);
+ [|simpl; field; apply Qpos_nonzero].
+rsapply mult_resp_AbsSmall.
+rsapply less_leEq.
+rsapply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
+destruct d1; destruct d2; rsapply (AbsSmall_trans _ (e:Q)); assumption.
+simpl.
+rewrite Hc.
+pose (@Qpos_nonzero (d1 + d2)%Qpos).
+QposField.
+assumption.
+intros a b e d1 d2 He Hab.
+pose (c:= (a * d2 + b * d1) / (d1 + d2)%Qpos).
+exists c.
+apply (H e d1 d2 He a b c); try assumption.
+reflexivity.
+apply ball_sym.
+eapply H.
+rewrite Qplus_comm.
+apply He.
+apply ball_sym.
+apply Hab.
+unfold c.
+unfold Qdiv.
+apply Qmult_comp.
+ring.
+apply Qinv_comp.
+QposRing.
+Qed.
 
 
 (* TODO:
