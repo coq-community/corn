@@ -1,5 +1,5 @@
 Require Export Metric.
-Require Import QArith.
+Require Import OpenUnit.
 Require Import CornTac.
 Require Import Qauto.
 Require Import Qabs.
@@ -8,109 +8,6 @@ Require Import Qordfield.
 Require Import COrdFields.
 
 Set Implicit Arguments.
-Record OpenUnit:={OpenUnitasQ:> Q;
-OpenUnitprf:0<OpenUnitasQ/\OpenUnitasQ<1}.
-
-Notation "'ou' x":=(@Build_OpenUnit x (conj (refl_equal Lt) (refl_equal Lt))) (at level 60, no associativity).
-
-Lemma OpenUnit_0_lt : forall (a:OpenUnit), 0 < a.
-intros [a [H0 H1]]; assumption.
-Qed.
-
-Lemma OpenUnit_lt_1 : forall (a:OpenUnit), a < 1.
-intros [a [H0 H1]]; assumption.
-Qed.
-
-Lemma OpenUnit_0_lt_Dual : forall (a:OpenUnit), 0 < 1-a.
-intros [a [H0 H1]].
-simpl.
-rewrite Qlt_minus_iff in H1.
-assumption.
-Qed.
-
-Lemma OpenUnit_Dual_lt_1 : forall (a:OpenUnit), 1-a < 1.
-intros [a [H0 H1]].
-simpl.
-rewrite Qlt_minus_iff.
-replace RHS with a by ring.
-assumption.
-Qed.
-
-Hint Resolve OpenUnit_0_lt OpenUnit_lt_1 OpenUnit_0_lt_Dual OpenUnit_Dual_lt_1.
-
-Definition OpenUnitMult (a b:OpenUnit):OpenUnit.
-intros a b.
-exists (a * b).
-abstract(destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]];
-split; simpl;
- [rsapply mult_resp_pos; assumption
- |change (1:Q) with (1*1);
- rsapply mult_resp_less_both;auto with *]).
-Defined.
-
-(* x^(n+1) *)
-Definition Powern:OpenUnit->nat->OpenUnit.
-fix 2.
-intro x. destruct 1 as [| n].
- exact x.
-exact (OpenUnitMult x (Powern x n)).
-Defined.
-
-Definition half:=(ou 1/2).
-
-Definition OpenUnitDiv (a b:OpenUnit):(a<b)->OpenUnit.
-intros a b p.
-exists (a/b).
-abstract (destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]];
-split; simpl;[
- apply Qlt_shift_div_l; auto; ring_simplify;  auto|
- apply Qlt_shift_div_r; auto; ring_simplify;  auto]).
-Defined.
-
-Definition OpenUnitDual (a:OpenUnit):OpenUnit.
-intros a.
-exists (1-a).
-abstract (destruct a as [a [Ha0 Ha1]];
-simpl; split; rewrite  Qlt_minus_iff in *;[
-(replace RHS with (1+-a) by ring); auto|
-(replace RHS with (a+-0) by ring); auto]).
-Defined.
-
-Eval compute in (ou (1/2)).
-Eval compute in (OpenUnitDual (ou (1/2))):Q.
-
-Definition OpenUnitMinus (b a:OpenUnit):(a<b)->OpenUnit.
-intros b a p.
-exists (b-a).
-abstract (destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]];
-split; simpl;simpl in p;
-rewrite  Qlt_minus_iff in *;[
-(replace RHS with (b+-a) by ring); auto|
-(replace RHS with ((1+-b)+(a+-0)) by ring); Qauto_pos]).
-Defined.
-
-(*1/4<1/2*)
-Lemma quarter_lt_half:(Powern (ou 1/2) (S O))<(ou 1/2).
-compute; auto.
-Defined.
-
-Eval compute in (OpenUnitMinus (ou 1/2) (Powern (ou 1/2) (S O)) quarter_lt_half):Q.
-
-(* (b-a)/(1-a) *)
-Definition OpenUnitAux (b a:OpenUnit):(a<b)->OpenUnit.
-intros b a p.
-exists ((b-a)/(1-a)).
-abstract(destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]];
-split; simpl;simpl in p;
-[ apply Qlt_shift_div_l;
- [rewrite  Qlt_minus_iff in *; (replace RHS with (1+-a) by ring); auto
- |rewrite  Qlt_minus_iff in *; ring_simplify; auto]
-| apply Qlt_shift_div_r;
- [rewrite Qlt_minus_iff in *; (replace RHS with (1+-a) by ring); auto
- |rewrite Qlt_minus_iff in *; ring_simplify; (replace RHS with (1-b) by ring); auto]]).
-Defined.
-
-Eval compute in (OpenUnitAux (ou 1/2) (Powern (ou 1/2) (S O)) quarter_lt_half):Q.
  
 Inductive StepF(X:Type):Type:=
 |leaf:X->(StepF X)
@@ -139,8 +36,8 @@ destruct s as [x | b t1 t2].
 
 destruct (Q_dec a b) as [[H|H]|H].
    destruct (Split X t1 (OpenUnitDiv a b H)) as [L R].
-  exact (L, (glue (OpenUnitAux b a H) R t2)).
-  destruct (Split X t2 (OpenUnitAux a b H)) as [L R].
+  exact (L, (glue (OpenUnitDualDiv b a H) R t2)).
+  destruct (Split X t2 (OpenUnitDualDiv a b H)) as [L R].
   refine ((glue (OpenUnitDiv b a H) t1 L), R).
   exact (t1,t2).
 Defined.
@@ -202,8 +99,8 @@ auto with *.
 Qed.
 
 Lemma SplitLR_glue_ind : forall X s1 s2 (a b:OpenUnit) (P:(StepF X) -> (StepF X) -> Prop),
- (forall (H:a < b), P (SplitL s1 (OpenUnitDiv a b H)) (glue (OpenUnitAux b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
- (forall (H:b < a), P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitAux a b H))) (SplitR s2 (OpenUnitAux a b H))) ->
+ (forall (H:a < b), P (SplitL s1 (OpenUnitDiv a b H)) (glue (OpenUnitDualDiv b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
+ (forall (H:b < a), P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitDualDiv a b H))) (SplitR s2 (OpenUnitDualDiv a b H))) ->
  (a == b -> P s1 s2) ->
  P (SplitL (glue b s1 s2) a) (SplitR (glue b s1 s2) a).
 Proof.
@@ -216,7 +113,7 @@ Qed.
 
 Lemma SplitL_glue_ind : forall X s1 s2 (a b:OpenUnit) (P:(StepF X) -> Prop),
  (forall (H:a < b), P (SplitL s1 (OpenUnitDiv a b H))) ->
- (forall (H:b < a), P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitAux a b H)))) ->
+ (forall (H:b < a), P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitDualDiv a b H)))) ->
  (a == b -> P (s1)) ->
  P (SplitL (glue b s1 s2) a).
 Proof.
@@ -226,8 +123,8 @@ assumption.
 Qed.
 
 Lemma SplitR_glue_ind : forall X s1 s2 (a b:OpenUnit) (P:(StepF X) -> Prop),
- (forall (H:a < b), P (glue (OpenUnitAux b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
- (forall (H:b < a), P (SplitR s2 (OpenUnitAux a b H))) ->
+ (forall (H:a < b), P (glue (OpenUnitDualDiv b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
+ (forall (H:b < a), P (SplitR s2 (OpenUnitDualDiv a b H))) ->
  (a == b -> P (s2)) ->
  P (SplitR (glue b s1 s2) a).
 Proof.
@@ -753,7 +650,7 @@ intros Y s. induction s. simpl; auto.
 intros a f.
 rewrite Mapglue. simpl. destruct (Q_dec a o) as [[H0|H0]|H0].
 rewrite IHs1. destruct (Split s1 (OpenUnitDiv a o H0)). auto with *. 
-rewrite IHs2. destruct (Split s2 (OpenUnitAux a o H0)). auto with *. 
+rewrite IHs2. destruct (Split s2 (OpenUnitDualDiv a o H0)). auto with *. 
 auto.
 Qed.
 
@@ -859,8 +756,8 @@ destruct (Q_dec o0 o) as [[H|H]|H].
 (StepFfoldProp l /\ StepFfoldProp r /\ StepFfoldProp y2 <->
   StepFfoldProp y1 /\ StepFfoldProp y2)).
    tauto.
-  generalize (IHy2 (OpenUnitAux o0 o H)).
-  destruct (Split y2 (OpenUnitAux o0 o H)) as [l r].
+  generalize (IHy2 (OpenUnitDualDiv o0 o H)).
+  destruct (Split y2 (OpenUnitDualDiv o0 o H)) as [l r].
   simpl.
   change ((StepFfoldProp l /\StepFfoldProp r <-> StepFfoldProp y2) ->
 ((StepFfoldProp y1 /\ StepFfoldProp l) /\ StepFfoldProp r <->
