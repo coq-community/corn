@@ -547,6 +547,43 @@ apply Split_ind.
 reflexivity.
 Qed.
 
+Lemma Map2GlueGlue : forall X Y Z (f:X -> Y -> Z) o l1 r1 l2 r2, Map2 f (glue o l1 r1) (glue o l2 r2) = glue o (Map2 f l1 l2) (Map2 f r1 r2).
+Proof.
+intros.
+rewrite Map2Glue, SplitLGlue, SplitRGlue.
+reflexivity.
+Qed.
+
+Lemma MapMap2 (X Y Z:Type): forall (f:Z->Z) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
+  Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
+induction x. simpl. induction y.
+  simpl; auto with *.
+ simpl. rewrite IHy1. rewrite IHy2. auto with *.
+intros y.
+do 2 rewrite Map2Glue.
+simpl. rewrite IHx1. rewrite IHx2. auto with *.
+Qed.
+
+Lemma Map2Map2Map2 (X Y Z:Type): 
+  forall (f:Z->Z->Z) (g:X->Y->Z) (h:X->Y->Z) 
+          (x:StepF X) (y:StepF Y), 
+  (Map2 f (Map2 g x y) (Map2 h x y))
+  = (Map2 (fun x y => (f (g x y) (h x y))) x y).
+induction x. simpl. induction y.
+  simpl; auto with *.
+ Opaque Map2.
+ simpl.
+ Transparent Map2.
+ rewrite <-IHy1. rewrite <-IHy2.
+ rewrite Map2GlueGlue.
+ reflexivity.
+intro y. rewrite (Map2Glue (fun (x : X) (y0 : Y) => f (g x y0) (h x y0))).
+rewrite <- IHx1. rewrite <- IHx2.
+rewrite (Map2Glue g).
+rewrite (Map2Glue h).
+apply Map2GlueGlue.
+Qed.
+
 Lemma SplitMap (X Y:Type):forall x:(StepF X), forall a, forall f:X->Y, 
     (Split (Map f x) a) = let (l,r) := Split x a in (Map f l,Map f r).
 intros X Y s a f. revert a. induction s. simpl; auto.
@@ -880,13 +917,11 @@ Lemma glue_resp_StepF_eq:forall x x' y y' o,
   (glue o x y)===(glue o x' y').
 intros.
 unfold StepF_eq.
-rewrite Map2Glue.
-rewrite SplitLGlue.
-rewrite SplitRGlue. 
+rewrite Map2GlueGlue.
 split; assumption.
 Qed.
 
-Lemma StepF_eq_symm:forall y x: StepF X, StepF_eq Xeq x y -> StepF_eq Xeq y
+Lemma StepF_eq_sym :forall y x: StepF X, StepF_eq Xeq x y -> StepF_eq Xeq y
 x.
 intros y. induction y.
  unfold StepF_eq. simpl. intro x0. induction x0.
@@ -902,4 +937,28 @@ rewrite SplitGlue in H1; simpl in H1.
 apply glue_StepF_eq;auto with *.
 Qed.
 
+Hint Resolve StepF_eq_sym StepF_eq_trans.
+
+Lemma StepF_Sth : (Setoid_Theory (StepF X) (StepF_eq Xeq)).
+split; intros; eauto with sfarith.
+Qed.
+
+Lemma glue_injl:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (x===x1).
+intros.
+destruct H as [H _] using (glue_eq_ind Xeq).
+rewrite SplitLGlue in H.
+assumption.
+Qed.
+
+Lemma glue_injr:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (y===y1).
+intros.
+destruct H as [_ H] using (glue_eq_ind Xeq).
+rewrite SplitRGlue in H.
+assumption.
+Qed.
+
 End EquivalenceC.
+
+Hint Resolve StepF_eq_sym StepF_eq_trans :sfarith.
