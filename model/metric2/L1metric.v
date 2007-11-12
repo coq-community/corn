@@ -292,6 +292,10 @@ Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
 Require Import CornTac.
+
+Print StepFfold.
+Definition StepF_lt:=(fun x y=>(StepFfoldProp (Map2 Qlt x y))).
+
 Lemma L1_is_MetricSpace : (is_MetricSpace (StepF_eq Qeq)  L1Ball).
 split.
      apply (StepF_Sth Q_Setoid).
@@ -321,9 +325,31 @@ Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
   (* Trans*)
   do 5 intro. unfold L1Ball, Distance, L1Norm. intros.
   assert (IntegralQ (Map Qabs (Map2 Qminus a b))+
-         IntegralQ (Map Qabs (Map2 Qminus b c)) <=
+         IntegralQ (Map Qabs (Map2 Qminus b c)) >=
          IntegralQ (Map Qabs (Map2 Qminus a c))).
    clear -c. rewrite Integral_linear.  do 2 rewrite MapMap2.
+   cut (forall x y z o, x<=y->x<=z->x<=(o*y+(1-o)*z)).
+   intro HH.
+   assert (intpos:forall x y:(StepF Q), 
+         (StepF_lt x y)->(IntegralQ x <= IntegralQ y)).
+    induction x.
+     unfold StepF_lt, IntegralQ. simpl. 
+      induction y. simpl. auto with *.
+      simpl. unfold StepFfoldProp. simpl. fold StepFfoldProp. intros [H H1].
+      apply HH; auto with *.
+     intro y. unfold StepF_lt, IntegralQ. simpl.
+      destruct (Split y o) as [L R]. (*StepFfoldPropglue...*) fold IntegralQ.
+      elim (Q_dec o o) using Qdec_eq_ind; simpl; auto with *. intro H. clear H.  
+ rewrite StepFfoldPropglue2.
+(* Should follow from f>=0, then int f>=0*)
+(*     Focus 2. apply intpos. 
+ First show that 
+    Show that StepF_lt is a reflexive, transitive relation
+    Show that if f<=g, then (StepF_lt (Map2 f) (Map2 g))
+    (StepF_lt (Map2 | + |) (Map2 |  |+|  |))
+    Show that:
+    (a-b)+(b-c)= (a-c) This needs that Map2 is a morphism.
+*)
    Focus 3.
 (* Closed, this is copied from Qmetric*)
 unfold L1Ball. intros e a b H.
@@ -340,20 +366,12 @@ Focus 3. (* Equality, form Qmetric*)
 unfold L1Ball. Check Distance.
 assert (forall q:Q, 0<=q -> (forall e:Qpos, q<=e)->q==0).
 assert (forall a b, ((Distance a b==0) ->(a===b))).
-assert (forall a b : Q, (forall e : Qpos,  e a b) -> a == b).
-(*intros.
-rsapply cg_inv_unique_2.
-rsapply AbsSmall_approach_zero.
-intros.
-rewrite <- (QposAsmkQpos H0).
-apply (H (mkQpos H0)).*)
-Qed.
+Admitted.
 
-Add Morphism Qball with signature QposEq ==> Qeq ==> Qeq ==> iff as Qball_wd.
+(*
+Add Morphism L1Ball with signature QposEq ==> (StepF_eq Qeq) ==> (StepF_eq Qeq) ==> iff as Qball_wd.
 intros [x1 Hx1] [x2 Hx2] H x3 x4 H0 x5 x6 H1.
-unfold Qball.
-unfold AbsSmall.
-simpl.
+unfold L1Ball.
 rewrite H0.
 rewrite H1.
 unfold QposEq in H.
@@ -362,11 +380,13 @@ rewrite H.
 tauto.
 Qed.
 
-Definition Q_as_MetricSpace : MetricSpace :=
-Build_MetricSpace Qball_wd Q_is_MetricSpace.
 
-Canonical Structure Q_as_MetricSpace.
+Definition L1_as_MetricSpace : MetricSpace :=
+Build_MetricSpace L1ball_wd L1_is_MetricSpace.
 
+Canonical Structure L1_as_MetricSpace.
+
+ Do we need this?
 Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
 Proof.
 assert (forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c).
