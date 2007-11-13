@@ -134,13 +134,15 @@ Notation "'SplitR' s o":= (snd (Split s o)) (at level 100, no associativity).*)
 
 Hint Resolve Q_Setoid.
 
-Lemma IntegralSplit : forall x (o:OpenUnit), 
+Lemma IntegralSplit : forall (o:OpenUnit) x, 
  IntegralQ x ==
  o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o).
 Proof.
+intros o x.
+revert o.
 induction x.
 unfold IntegralQ. simpl. intros. ring.
-intro p.
+intros p.
 apply SplitLR_glue_ind; intros H.
   simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ.
   rewrite (IHx1 (OpenUnitDiv p o H)).
@@ -186,8 +188,26 @@ Axiom Map2switch: forall f s t,
  (Map2 (fun x y : Q => (f x y)) s t ===
 Map2 (fun y x : Q => (f x y)) t s).
 
-Axiom Integral_linear:forall s t,
+Lemma Integral_linear:forall s t,
   (IntegralQ s)+(IntegralQ t)==(IntegralQ (Map2 Qplus s t)).
+Proof.
+induction s.
+ induction t.
+  reflexivity.
+ unfold IntegralQ; simpl; fold IntegralQ.
+ rewrite <- IHt1.
+ rewrite <- IHt2.
+ change (IntegralQ (leaf x)) with x.
+ ring.
+intros t.
+rewrite Map2Glue.
+unfold IntegralQ; simpl; fold IntegralQ.
+rewrite <- IHs1.
+rewrite <- IHs2.
+rewrite (IntegralSplit o t).
+ring.
+Qed.
+
 Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
