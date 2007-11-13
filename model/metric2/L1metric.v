@@ -134,6 +134,26 @@ Notation "'SplitR' s o":= (snd (Split s o)) (at level 100, no associativity).*)
 
 Hint Resolve Q_Setoid.
 
+Lemma IntegralSplit : forall x (o:OpenUnit), 
+ IntegralQ x ==
+ o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o).
+Proof.
+induction x.
+unfold IntegralQ. simpl. intros. ring.
+intro p.
+apply SplitLR_glue_ind; intros H.
+  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ.
+  rewrite (IHx1 (OpenUnitDiv p o H)).
+  unfold IntegralQ; simpl; fold IntegralQ. field; auto with *. (*why does this not work*)
+ simpl. unfold IntegralQ; simpl; fold IntegralQ. 
+ rewrite (IHx2 (OpenUnitDualDiv p o H)).
+ unfold IntegralQ; simpl; fold IntegralQ. field; auto with *.
+rewrite H.
+reflexivity.
+Qed.
+
+Hint Resolve IntegralSplit.
+
 Add Morphism IntegralQ 
   with signature   (StepF_eq Qeq) ==>  Qeq
  as IntegralQ_mor.
@@ -142,8 +162,7 @@ induction x1.
 intros x2 H. simpl. induction x2.
   simpl.  auto with *.
  simpl.
- symmetry in H.
- destruct H as [H0 H1] using (glue_eq_ind Qeq).
+ destruct H as [H0 H1] using (eq_glue_ind Q_Setoid).
  rewrite <- IHx2_1; auto with *.
  rewrite <- IHx2_2; auto with *.
  ring.
@@ -152,21 +171,7 @@ destruct H as [H0 H1] using (glue_eq_ind Qeq).
 simpl.
 rewrite (IHx1_1 _ H0).
 rewrite (IHx1_2 _ H1).
-fold IntegralQ.
-clear -o.
-(*Should be a lemma?*)
-revert o. rename x2 into x. induction x.
-simpl. unfold IntegralQ. simpl. intros. ring.
-intro p.
-apply SplitLR_glue_ind; intros H.
-  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ. 
-  rewrite <-(IHx1 (OpenUnitDiv p o H)).
-  unfold IntegralQ; simpl; fold IntegralQ. field; auto with *. (*why does this not work*)
- simpl. unfold IntegralQ; simpl; fold IntegralQ. 
- rewrite <-(IHx2 (OpenUnitDualDiv p o H)).
- unfold IntegralQ; simpl; fold IntegralQ. field; auto with *.
-rewrite H.
-reflexivity.
+auto with *.
 Qed.
 
 (* 
