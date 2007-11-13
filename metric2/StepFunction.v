@@ -586,7 +586,7 @@ do 2 rewrite Map2Glue.
 repeat split; auto with *.
 Qed.
 
-Lemma MapMap2 (X Y Z:Type): forall (f:Z->Z) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
+Lemma MapMap2 (X Y Z W:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
   Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
 induction x. simpl. induction y.
   simpl; auto with *.
@@ -596,8 +596,8 @@ do 2 rewrite Map2Glue.
 simpl. rewrite IHx1. rewrite IHx2. auto with *.
 Qed.
 
-Lemma Map2Map2Map2 (X Y Z:Type): 
-  forall (f:Z->Z->Z) (g:X->Y->Z) (h:X->Y->Z) 
+Lemma Map2Map2Map2 (X Y Z W:Type): 
+  forall (f:Z->Z->W) (g:X->Y->Z) (h:X->Y->Z) 
           (x:StepF X) (y:StepF Y), 
   (Map2 f (Map2 g x y) (Map2 h x y))
   = (Map2 (fun x y => (f (g x y) (h x y))) x y).
