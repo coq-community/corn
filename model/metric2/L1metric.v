@@ -7,6 +7,12 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Lemma PropST:(Setoid_Theory Prop iff).
+split; intuition.
+Qed.
+
+Add Setoid (StepF Prop) (StepF_eq iff) (StepF_Sth PropST) as StepF_thProp.
+
 Definition test1:=(leaf 1).
 Definition test2:=(glue (ou 1/2) (leaf 0) (leaf 1)).
 
@@ -271,28 +277,16 @@ unfold SplitL, SplitR. simpl. destruct (Split y o) as [L R]. simpl.
 do 2 intro. rewrite StepFfoldPropglue_rew. intuition.
 Qed.
 
-(* This is the correct form. Should be moved*)
-Lemma MapMap2 (W X Y Z:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
-  Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
-induction x. simpl. induction y.
-  simpl; auto with *.
- simpl. rewrite IHy1. rewrite IHy2. auto with *.
-intros y.
-do 2 rewrite Map2Glue.
-simpl. rewrite IHx1. rewrite IHx2. auto with *.
-Qed.
-
 Lemma StepF_le_pos:forall x y, (StepF_le x y) <-> (StepFfoldProp (Map (fun q=>(0>=q)) (Map2 Qminus x y))).
 intros. unfold StepF_le. apply StepFfoldProp_morphism.
 rewrite MapMap2.
-apply (Map2_morphism Qeq Qeq); auto with *.
+apply (Map2_morphism Q_Setoid PropST Q_Setoid); auto with *.
 clear x y.
-do 4 intro. intros H HH. rewrite H. rewrite HH. clear H HH.
- rewrite Qle_minus_iff in *. assert (H:x'-y'==-(y'+-x')). ring. rewrite H. clear H.
-split. intro. rewrite Qle_minus_iff. 
-replace RHS with (y'+-x') by ring. assumption.
-intro H. rewrite Qle_minus_iff in H. 
-replace RHS with (0+ - -(y'+-x')) by ring. assumption.
+intros w w' x x' H HH. rewrite H. rewrite HH. clear H HH. auto with *.
+split. intro. rewrite Qle_minus_iff in *.
+replace RHS with (x0+-w) by ring. assumption.
+intro H. rewrite Qle_minus_iff in *. 
+replace RHS with (0+ - (w -x0)) by ring. assumption.
 Qed.
 
 Lemma StepF_le_ge:forall x y, (StepF_le x y) <-> (StepFfoldProp (Map2 Qge y x)).
@@ -300,9 +294,6 @@ intros. unfold StepF_le.
 apply StepFfoldProp_morphism.
 apply (@Map2switch Prop iff Qle).
 Qed.
-
-Axiom PropST:(Setoid_Theory Prop iff).
-Add Setoid (StepF Prop) (StepF_eq iff) (StepF_Sth PropST) as StepF_thProp.
 
 Definition Map3(X Y Z W:Type):=fun (f:X->Y->Z->W) (x:StepF X) (y:StepF Y) (z:StepF Z) =>
    (App (Map2 (fun x y=>(f x y)) x y) z).

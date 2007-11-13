@@ -571,6 +571,21 @@ rewrite Map2Glue, SplitLGlue, SplitRGlue.
 reflexivity.
 Qed.
 
+Lemma Map2_resp_Qeq : forall X Y Z (f:X -> Y -> Z) s1 s2 t1 t2,
+ (StepF_Qeq s1 s2) -> (StepF_Qeq t1 t2) ->
+ (StepF_Qeq (Map2 f s1 t1) (Map2 f s2 t2)).
+Proof.
+intros X Y Z f.
+induction s1; induction s2; try contradiction; intros t1 t2 Hs Ht.
+ simpl in *.
+ rewrite Hs.
+ apply Map_resp_Qeq.
+ assumption.
+destruct Hs as [Ho [Hl Hr]].
+do 2 rewrite Map2Glue.
+repeat split; auto with *.
+Qed.
+
 Lemma MapMap2 (W X Y Z:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
   Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
 induction x. simpl. induction y.
