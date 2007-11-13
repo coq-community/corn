@@ -295,11 +295,26 @@ apply StepFfoldProp_morphism.
 apply (@Map2switch Prop iff Qle).
 Qed.
 
-Definition Map3(X Y Z W:Type):=fun (f:X->Y->Z->W) (x:StepF X) (y:StepF Y) (z:StepF Z) =>
-   (App (Map2 (fun x y=>(f x y)) x y) z).
+Fixpoint nary_sig (l:list Type) : Type -> Type :=
+match l with
+|nil => fun x => x
+|cons b bs => fun x => b -> nary_sig bs x
+end.
 
-Definition Map4(X Y Z W V:Type):=fun (f:X->Y->Z->W->V) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)=>
-   (App (Map3 (fun x y z=>(f x y z)) x y z) w).
+Definition ApN_sig (l:list Type) (X:Type) := (StepF (nary_sig l X)) -> (nary_sig (map StepF l) (StepF X)).
+Fixpoint ApN (l:list Type) (X:Type) : ApN_sig l X :=
+match l return ApN_sig l X with 
+| nil => fun x => x
+| cons b bs => fun f a => (ApN bs X (App f a))
+end.
+
+Definition MapN_sig (l:list Type) (X:Type) := (nary_sig l X) -> (nary_sig (map StepF l) (StepF X)).
+Definition MapN (l:list Type) (X:Type) : MapN_sig l X
+:= fun f => ApN l X (leaf f).
+
+Definition Map3(X Y Z W:Type):= MapN (X::Y::Z::nil) W.
+
+Definition Map4(X Y Z W V:Type):= MapN (X::Y::Z::W::nil) V.
 
 Lemma Map4Map2Map2Map2(X Y Z W V U UU:Type):
 forall  (f:X->Y->U)(g:Z->W->V)(h:U->V->UU) 
@@ -308,6 +323,7 @@ forall  (f:X->Y->U)(g:Z->W->V)(h:U->V->UU)
 (Map4 (fun x y z w => (h (f x y) (g z w))) x y z w).
 intros.
 unfold Map4, Map3.
+simpl.
 Admitted.
 
 Lemma Map4Map32(X Y Z W:Type):forall (f:X->Y->Y->Z->W) 
