@@ -238,22 +238,30 @@ rewrite Hab.
 reflexivity.
 Qed.
 
+Lemma L1ball_sym : forall e x y, (L1Ball e x y) -> (L1Ball e y x).
+Proof.
+intros e x y Hxy.
+unfold L1Ball, Distance, L1Norm in *.
+rewrite MapMap2 in *.
+setoid_replace (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) y x:StepQ)
+ with (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) x y:StepQ).
+ apply Hxy.
+rewrite Map2switch. 
+rapply (Map2_morphism Q_Setoid Q_Setoid Q_Setoid); auto with *.
+  intros a b c d Hab Hcd.
+  rewrite Hab, Hcd.
+  reflexivity.
+intros a b.
+rewrite <- Qabs_opp.
+apply Qabs_wd.
+ring.
+Qed.
+
 Lemma L1_is_MetricSpace : (is_MetricSpace (StepF_eq Qeq)  L1Ball).
 split.
      apply (StepF_Sth Q_Setoid).
     rapply L1ball_refl.
-   (*Symm*)
-   (* define a new function |x-y|  ???*)
-   assert (((Map Qabs (Map2 Qminus x y))===(Map Qabs (Map2 Qminus y x)))).
-    do 2 rewrite MapMap2.
-    assert (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) x y ===
-Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
-    apply (Map2_morphism Q_Setoid Q_Setoid Q_Setoid); try apply (StepF_eq_refl Q_Setoid). 
-    intros. rewrite H0. rewrite H1. reflexivity.
-    intros.
-    assert (H2:forall x' y', x'-y' == -(y'-x')). intros; ring. rewrite H2.
-    apply Qabs_opp. rewrite H0. apply Map2switch.
-    rewrite <- H0. exact H.
+   rapply L1ball_sym.
   (* Trans*)
   do 5 intro. unfold L1Ball, Distance, L1Norm. intros.
   assert (IntegralQ (Map Qabs (Map2 Qminus a b))+
