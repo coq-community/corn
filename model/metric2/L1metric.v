@@ -59,12 +59,6 @@ Variable Z:Type.
 Variable Zeq:Z->Z->Prop.
 Hypothesis Zst:(Setoid_Theory Z Zeq).
 
-Lemma Map2_morphism: forall f g,
- (forall x x' y y', (Xeq x x')->(Yeq y y')->
-    (Zeq (f x y) (g x' y')))->
-  forall x x' y y', (StepF_eq Xeq x x')->(StepF_eq Yeq y y')->
- (StepF_eq Zeq (Map2 f x y) (Map2 g x' y')).
-Admitted.
 (* Seems awkward to prove. 
 intros. revert H1.
 induction x.
@@ -127,7 +121,10 @@ End Equivalence3.
 
 Section L1metric.
 
-Notation "x === y" := (StepF_eq Qeq x y) (at level 60).
+Definition StepQ := (StepF Q).
+Definition StepQ_eq : StepQ -> StepQ -> Prop := (StepF_eq Qeq).
+
+Notation "x === y" := (StepQ_eq x y) (at level 60).
 Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
 intros e a b.
 unfold L1Ball.
@@ -138,7 +135,7 @@ left. exact Hdc.
 Defined.
 Require Import QArith_base.
 
-Add Setoid (StepF Q) (StepF_eq Qeq) (StepF_Sth Q_Setoid) as StepFQ_Setoid.
+Add Setoid (StepQ) (StepQ_eq) (StepF_Sth Q_Setoid) as StepQ_Setoid.
 
 (*
 Lemma glueSplit1:forall o x0 x1 y, (glue o x0 x1)===y ->
@@ -156,16 +153,37 @@ Notation "'SplitR' s o":= (snd (Split s o)) (at level 100, no associativity).*)
 
 Hint Resolve Q_Setoid.
 
+Lemma IntegralSplit : forall (o:OpenUnit) x, 
+ IntegralQ x ==
+ o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o).
+Proof.
+intros o x.
+revert o.
+induction x.
+unfold IntegralQ. simpl. intros. ring.
+intros p.
+apply SplitLR_glue_ind; intros H.
+  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ.
+  rewrite (IHx1 (OpenUnitDiv p o H)).
+  unfold IntegralQ; simpl; fold IntegralQ. field; auto with *. (*why does this not work*)
+ simpl. unfold IntegralQ; simpl; fold IntegralQ. 
+ rewrite (IHx2 (OpenUnitDualDiv p o H)).
+ unfold IntegralQ; simpl; fold IntegralQ. field; auto with *.
+rewrite H.
+reflexivity.
+Qed.
+
+Hint Resolve IntegralSplit.
+
 Add Morphism IntegralQ 
-  with signature   (StepF_eq Qeq) ==>  Qeq
+  with signature  StepQ_eq ==>  Qeq
  as IntegralQ_mor.
 unfold IntegralQ.
 induction x1.
 intros x2 H. simpl. induction x2.
   simpl.  auto with *.
  simpl.
- symmetry in H.
- destruct H as [H0 H1] using (glue_eq_ind Qeq).
+ destruct H as [H0 H1] using (eq_glue_ind Q_Setoid).
  rewrite <- IHx2_1; auto with *.
  rewrite <- IHx2_2; auto with *.
  ring.
@@ -174,21 +192,7 @@ destruct H as [H0 H1] using (glue_eq_ind Qeq).
 simpl.
 rewrite (IHx1_1 _ H0).
 rewrite (IHx1_2 _ H1).
-fold IntegralQ.
-clear -o.
-(*Should be a lemma?*)
-revert o. rename x2 into x. induction x.
-simpl. unfold IntegralQ. simpl. intros. ring.
-intro p.
-apply SplitLR_glue_ind; intros H.
-  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ. 
-  rewrite <-(IHx1 (OpenUnitDiv p o H)).
-  unfold IntegralQ; simpl; fold IntegralQ. field; auto with *. (*why does this not work*)
- simpl. unfold IntegralQ; simpl; fold IntegralQ. 
- rewrite <-(IHx2 (OpenUnitDualDiv p o H)).
- unfold IntegralQ; simpl; fold IntegralQ. field; auto with *.
-rewrite H.
-reflexivity.
+auto with *.
 Qed.
 
 (* 
@@ -199,8 +203,26 @@ Need to define equality on functions for this.
 
 *)
 
-Axiom Integral_linear:forall s t,
+Lemma Integral_linear:forall s t,
   (IntegralQ s)+(IntegralQ t)==(IntegralQ (Map2 Qplus s t)).
+Proof.
+induction s.
+ induction t.
+  reflexivity.
+ unfold IntegralQ; simpl; fold IntegralQ.
+ rewrite <- IHt1.
+ rewrite <- IHt2.
+ change (IntegralQ (leaf x)) with x.
+ ring.
+intros t.
+rewrite Map2Glue.
+unfold IntegralQ; simpl; fold IntegralQ.
+rewrite <- IHs1.
+rewrite <- IHs2.
+rewrite (IntegralSplit o t).
+ring.
+Qed.
+
 Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
@@ -399,30 +421,39 @@ rewrite Map2Map2Map2.
   = (Map2 (fun x y => (f (g x y) (h x y))) x y).
  *)
 
+Lemma L1ball_refl : forall e x, (L1Ball e x x).
+Proof.
+intros e x.
+unfold L1Ball, Distance.
+assert ((Map2 Qminus x x)===(leaf 0)).
+ induction x.
+  change (x - x==0).
+  ring.
+ rewrite Map2GlueGlue.
+ rapply glue_StepF_eq; auto with *.
+unfold L1Norm.
+setoid_replace (Map Qabs (Map2 Qminus x x):StepQ) with (Map Qabs (leaf 0)).
+ auto with *.
+rapply (Map_morphism Q_Setoid); auto with *.
+intros a b Hab.
+rewrite Hab.
+reflexivity.
+Qed.
+
 Lemma L1_is_MetricSpace : (is_MetricSpace (StepF_eq Qeq)  L1Ball).
 split.
      apply (StepF_Sth Q_Setoid).
-    intros e x. unfold L1Ball. unfold Distance. 
-    assert ((Map2 Qminus x x)===(leaf 0)).
-    induction x. unfold Map2. simpl. 
-    assert (H:forall x y, x==y-> leaf x===leaf y).
-    intros. unfold StepF_eq. simpl. auto with *.
-    apply H. ring.
-    rewrite Map2GlueGlue.
-    apply glue_StepF_eq; auto with *.
-    unfold L1Norm. 
-    assert (H0:(Map Qabs (Map2 Qminus x x)) === (Map Qabs (leaf 0))). apply (Map_resp_StepF_eq Q_Setoid); auto with *.
-      exact Qabs_wd. rewrite  H0. simpl. unfold IntegralQ. simpl. auto with *.
-   intro. unfold symmetric, L1Ball, Distance, L1Norm. intros.
+    rapply L1ball_refl.
    (*Symm*)
    (* define a new function |x-y|  ???*)
    assert (((Map Qabs (Map2 Qminus x y))===(Map Qabs (Map2 Qminus y x)))).
     do 2 rewrite MapMap2.
     assert (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) x y ===
 Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
-    apply (Map2_morphism Qeq Qeq); try apply (StepF_eq_refl Q_Setoid). 
-    intros. rewrite H0. rewrite H1.
-    assert (H2:x'-y' == -(y'-x')). ring. rewrite H2.
+    apply (Map2_morphism Q_Setoid Q_Setoid Q_Setoid); try apply (StepF_eq_refl Q_Setoid). 
+    intros. rewrite H0. rewrite H1. reflexivity.
+    intros.
+    assert (H2:forall x' y', x'-y' == -(y'-x')). intros; ring. rewrite H2.
     apply Qabs_opp. rewrite H0. apply Map2switch.
     rewrite <- H0. exact H.
   (* Trans*)

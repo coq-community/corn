@@ -174,7 +174,7 @@ Qed.
 
 Hint Resolve SplitR_resp_Qeq.
 
-Lemma MirrorSplitL : forall (s:StepF) (a b:OpenUnit), b == (OpenUnitDual a) -> (StepF_Qeq (Mirror (SplitL s a)) (SplitR (Mirror s) b)).
+Lemma MirrorSplitL_Qeq : forall (s:StepF) (a b:OpenUnit), b == (OpenUnitDual a) -> (StepF_Qeq (Mirror (SplitL s a)) (SplitR (Mirror s) b)).
 Proof.
 induction s.
  auto with *.
@@ -220,7 +220,7 @@ rewrite Hao.
 auto with *.
 Qed.
 
-Lemma MirrorSplitR : forall (s:StepF) (a b:OpenUnit), b == (OpenUnitDual a) -> (StepF_Qeq (Mirror (SplitR s a)) (SplitL (Mirror s) b)).
+Lemma MirrorSplitR_Qeq: forall (s:StepF) (a b:OpenUnit), b == (OpenUnitDual a) -> (StepF_Qeq (Mirror (SplitR s a)) (SplitL (Mirror s) b)).
 Proof.
 intros s a b H.
 apply StepF_Qeq_trans with (Mirror (SplitR (Mirror (Mirror s)) a));
@@ -229,7 +229,7 @@ apply StepF_Qeq_trans with (Mirror (Mirror (SplitL (Mirror s) b)));
  auto with *.
 apply Mirror_resp_Qeq.
 apply StepF_Qeq_sym.
-apply MirrorSplitL.
+apply MirrorSplitL_Qeq.
 simpl in *.
 rewrite H.
 ring.
@@ -242,7 +242,7 @@ apply StepF_Qeq_trans with (Mirror (Mirror (SplitL s a)));
  auto with *.
 apply StepF_Qeq_trans with (Mirror (SplitR (Mirror s) (OpenUnitDual a))).
  apply Mirror_resp_Qeq.
- apply MirrorSplitL; auto with *.
+ apply MirrorSplitL_Qeq; auto with *.
 apply StepF_Qeq_trans with (Mirror (SplitR (Mirror t) (OpenUnitDual b))).
  apply Mirror_resp_Qeq.
  apply SplitR_resp_Qeq; auto with *.
@@ -251,7 +251,7 @@ apply StepF_Qeq_trans with (Mirror (Mirror (SplitL t b)));
  auto with *.
 apply Mirror_resp_Qeq.
 apply StepF_Qeq_sym.
-apply MirrorSplitL; auto with *.
+apply MirrorSplitL_Qeq; auto with *.
 Qed.
 
 Hint Resolve SplitL_resp_Qeq.
@@ -358,16 +358,16 @@ apply StepF_Qeq_trans with (Mirror (Mirror (SplitR s c)));
 apply Mirror_resp_Qeq.
 apply StepF_Qeq_trans with (SplitL (SplitL (Mirror s) (OpenUnitDual a)) (OpenUnitDual b)).
  apply StepF_Qeq_trans with (SplitL (Mirror (SplitR s a)) (OpenUnitDual b)).
-  apply MirrorSplitR; auto with *.
+  apply MirrorSplitR_Qeq; auto with *.
  apply SplitL_resp_Qeq; auto with *.
- apply MirrorSplitR; auto with *.
+ apply MirrorSplitR_Qeq; auto with *.
 apply StepF_Qeq_trans with (SplitL (Mirror s) (OpenUnitDual c)).
  apply SplitLSplitL.
  simpl.
  rewrite <- H.
  ring.
 apply StepF_Qeq_sym.
-apply MirrorSplitR; auto with *.
+apply MirrorSplitR_Qeq; auto with *.
 Qed.
 
 Lemma SplitLSplitR : forall (s:StepF) (a b c d:OpenUnit), (a+b-a*b==c) -> (d*c==a) -> 
@@ -523,6 +523,10 @@ Qed.
 
 End StepFunction.
 
+Section Map.
+
+Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
+
 Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
 fix 4. intros X Y f [x| a t1 t2].
  exact (leaf (f x)).
@@ -539,6 +543,19 @@ destruct (Split t b) as [L R].
 exact (glue b (Map2 X Y Z f t1 L) (Map2 X Y Z f t2 R)).
 Defined.
 
+Lemma Map_resp_Qeq : forall X Y (f:X -> Y) s1 s2,
+ (StepF_Qeq s1 s2) ->
+ (StepF_Qeq (Map f s1) (Map f s2)).
+Proof.
+intros X Y f.
+induction s1; induction s2; try contradiction; intros Hs.
+ simpl in *.
+ rewrite Hs.
+ reflexivity.
+destruct Hs as [Ho [Hl Hr]].
+repeat split; auto with *.
+Qed.
+
 Lemma Map2Glue : forall X Y Z (f:X -> Y -> Z) o l r b, Map2 f (glue o l r) b = glue o (Map2 f l (SplitL b o)) (Map2 f r (SplitR b o)).
 Proof.
 intros.
@@ -554,7 +571,7 @@ rewrite Map2Glue, SplitLGlue, SplitRGlue.
 reflexivity.
 Qed.
 
-Lemma MapMap2 (W X Y Z:Type): forall (f:W->Z) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
+Lemma MapMap2 (W X Y Z:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
   Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
 induction x. simpl. induction y.
   simpl; auto with *.
@@ -601,9 +618,11 @@ intros. unfold SplitL. rewrite SplitMap. destruct (Split x a). simpl. auto.
 Qed.
 
 Lemma SplitRMap(X Y:Type): forall x:(StepF X), forall a, forall f:X->Y, 
-    snd (Split (Map f x) a) = Map f (snd (Split x a)).
+    SplitR (Map f x) a = Map f (SplitR x a).
 intros. unfold SplitR. rewrite SplitMap. destruct (Split x a). simpl. auto.
 Qed.
+
+End Map.
 
 Section EquivalenceA.
 Variable X:Type.
@@ -744,7 +763,7 @@ Add Setoid X Xeq Xst as Xth1.
 
 Notation "x === y" := (StepF_eq Xeq x y) (at level 70).
 
-Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq.
+Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
 
 Lemma StepF_eq_resp_Qeq : forall s t u v, (StepF_Qeq s t) -> (StepF_Qeq u v) -> s === u -> t === v.
 Proof.
@@ -795,16 +814,16 @@ split; apply glue_eq_ind; intros H0 H1.
   rewrite <- IHs1.
   eapply StepF_eq_resp_Qeq;[| |apply H1]; auto with *.
   apply StepF_Qeq_sym.
-  apply MirrorSplitL; auto with *.
+  apply MirrorSplitL_Qeq; auto with *.
  rewrite <- IHs2.
  eapply StepF_eq_resp_Qeq;[| |apply H0]; auto with *.
  apply StepF_Qeq_sym.
- apply MirrorSplitR; auto with *.
+ apply MirrorSplitR_Qeq; auto with *.
 apply glue_StepF_eq.
- eapply StepF_eq_resp_Qeq;[apply StepF_Qeq_refl|apply MirrorSplitR; apply Qeq_refl|].
+ eapply StepF_eq_resp_Qeq;[apply StepF_Qeq_refl|apply MirrorSplitR_Qeq; apply Qeq_refl|].
  rewrite IHs2.
  assumption.
-eapply StepF_eq_resp_Qeq;[apply StepF_Qeq_refl|apply MirrorSplitL; apply Qeq_refl|].
+eapply StepF_eq_resp_Qeq;[apply StepF_Qeq_refl|apply MirrorSplitL_Qeq; apply Qeq_refl|].
 rewrite IHs1.
 assumption.
 Qed.
@@ -855,7 +874,7 @@ Qed.
 Lemma SplitR_resp_Xeq : forall s1 s2 a, s1 === s2 -> SplitR s1 a === SplitR s2 a.
 Proof.
 intros s1 s2 a H.
-eapply StepF_eq_resp_Qeq; try (eapply StepF_Qeq_trans;[apply Mirror_resp_Qeq; apply StepF_Qeq_sym; apply MirrorSplitR; reflexivity|apply MirrorMirror]).
+eapply StepF_eq_resp_Qeq; try (eapply StepF_Qeq_trans;[apply Mirror_resp_Qeq; apply StepF_Qeq_sym; apply MirrorSplitR_Qeq; reflexivity|apply MirrorMirror]).
 rewrite  Mirror_eq_Mirror.
 apply SplitL_resp_Xeq.
 rewrite Mirror_eq_Mirror.
@@ -943,6 +962,8 @@ Lemma StepF_Sth : (Setoid_Theory (StepF X) (StepF_eq Xeq)).
 split; intros; eauto with sfarith.
 Qed.
 
+Add Setoid (StepF X) (StepF_eq Xeq) StepF_Sth as StepF_Sth1.
+
 Lemma glue_injl:forall o x y x1 y1,
 (glue o x y)===(glue o x1 y1) -> (x===x1).
 intros.
@@ -959,6 +980,219 @@ rewrite SplitRGlue in H.
 assumption.
 Qed.
 
+Lemma eq_glue_ind : forall (s1 s2 s : StepF X) (a : OpenUnit) (P : Prop),
+       (StepF_eq Xeq (SplitL s a) s1 -> StepF_eq Xeq (SplitR s a) s2 -> P) ->
+       StepF_eq Xeq s (glue a s1 s2) -> P.
+Proof.
+intros s1 s2 s a P H H0.
+symmetry in H0.
+destruct H0 as [H0l H0r] using (glue_eq_ind Xeq).
+symmetry in H0l, H0r.
+auto.
+Qed.
+
+Lemma MirrorSplitR: forall (s : StepF X) (a b : OpenUnit),
+  b == OpenUnitDual a ->
+  (Mirror (SplitR s a)) === (SplitL (Mirror s) b).
+Proof.
+intros.
+apply StepF_Qeq_eq; auto with *.
+apply MirrorSplitR_Qeq; auto with *.
+Qed.
+
+Lemma MirrorSplitL: forall  (s : StepF X) (a b : OpenUnit),
+  b == OpenUnitDual a ->
+  (Mirror (SplitL s a)) === (SplitR (Mirror s) b).
+Proof.
+intros.
+apply StepF_Qeq_eq; auto with *.
+apply MirrorSplitL_Qeq; auto with *.
+Qed.
+
 End EquivalenceC.
 
 Hint Resolve StepF_eq_sym StepF_eq_trans :sfarith.
+Hint Resolve SplitL_resp_Xeq SplitR_resp_Xeq:sfarith.
+
+Section MapMorphism.
+Variable X:Type.
+Variable Xeq:X->X->Prop.
+Hypothesis Xst:(Setoid_Theory X Xeq).
+Add Setoid X Xeq Xst as Xth2.
+
+Variable Y:Type.
+Variable Yeq:Y->Y->Prop.
+Hypothesis Yst:(Setoid_Theory Y Yeq).
+Add Setoid Y Yeq Yst as Yth2.
+
+Lemma Map_morphism: forall (f g : X->Y),
+    (forall x y, (Xeq x y)-> (Yeq (f x) (f y))) ->
+    (forall x, (Yeq (f x) (g x))) ->
+    forall s t:(StepF X), (StepF_eq Xeq s t) -> (StepF_eq Yeq (Map f s) (Map g t)).
+Proof.
+intros f g Hf Hfg s t Hst.
+apply StepF_eq_trans with (Map f t); auto with *.
+ apply (Map_resp_StepF_eq Xst); auto with *.
+clear - Hfg.
+induction t.
+ rapply Hfg.
+rapply glue_resp_StepF_eq; assumption.
+Qed.
+
+Variable W:Type.
+Variable Weq:W->W->Prop.
+Hypothesis Wst:(Setoid_Theory W Weq).
+Add Setoid W Weq Wst as Wth2.
+
+Add Setoid (StepF Y) (StepF_eq Yeq) (StepF_Sth Yst) as StepF_Sth2.
+
+Lemma SplitLMap2 : forall (f: W -> X -> Y) s t o,
+ StepF_eq Yeq (SplitL (Map2 f s t) o) (Map2 f (SplitL s o) (SplitL t o)).
+Proof.
+induction s; intros.
+ simpl.
+ rewrite SplitLMap; auto with *.
+rewrite Map2Glue.
+unfold SplitL at 1 3.
+simpl.
+destruct (Q_dec o0 o) as [[Ho|Ho]|Ho].
+  do 2 apply Split_ind.
+  simpl.
+  eapply StepF_eq_trans; try assumption.
+   apply IHs1.
+  apply StepF_Qeq_eq; auto with *.
+  apply Map2_resp_Qeq; auto with *.
+   apply StepF_Qeq_refl.
+  apply SplitLSplitL.
+  simpl.
+  field; auto with *.
+ do 2 apply Split_ind.
+ simpl.
+ apply Split_ind.
+ apply glue_StepF_eq.
+  rewrite SplitLGlue.
+  apply StepF_Qeq_eq; auto with *.
+  apply Map2_resp_Qeq; auto with *.
+   apply StepF_Qeq_refl.
+  apply StepF_Qeq_sym.
+  apply SplitLSplitL.
+  simpl.
+  field; auto with *.
+ rewrite SplitRGlue.
+ eapply StepF_eq_trans; try assumption.
+  apply IHs2.
+ apply StepF_Qeq_eq; auto with *.
+ apply Map2_resp_Qeq; auto with *.
+  apply StepF_Qeq_refl.
+ apply SplitLSplitR; simpl; field; auto with *.
+simpl.
+apply StepF_Qeq_eq; auto with *.
+apply Map2_resp_Qeq; auto with *.
+ apply StepF_Qeq_refl.
+apply SplitL_resp_Qeq; auto with *.
+apply StepF_Qeq_refl.
+Qed.
+
+Lemma MirrorMap : forall (f: X -> Y) s,
+ (Mirror (Map f s)) = (Map f (Mirror s)).
+Proof.
+intros f.
+induction s.
+ reflexivity.
+change (Mirror (glue o (Map f s1) (Map f s2)) =
+glue (OpenUnitDual o) (Map f (Mirror s2)) (Map f (Mirror s1))).
+rewrite <- IHs1.
+rewrite <- IHs2.
+reflexivity.
+Qed.
+
+Lemma MirrorMap2 : forall (f: W -> X -> Y) s t,
+ StepF_eq Yeq (Mirror (Map2 f s t)) (Map2 f (Mirror s) (Mirror t)).
+Proof.
+intros f.
+induction s; intros t.
+ simpl.
+ rewrite MirrorMap.
+ apply StepF_eq_refl.
+ assumption.
+rewrite Map2Glue.
+change (StepF_eq Yeq (glue (OpenUnitDual o) (Mirror (Map2 f s2 (SplitR t o))) (Mirror (Map2 f s1 (SplitL t o))))
+(Map2 f (glue (OpenUnitDual o) (Mirror s2) (Mirror s1)) (Mirror t))).
+rewrite Map2Glue.
+apply glue_StepF_eq.
+ rewrite SplitLGlue.
+ eapply StepF_eq_trans.
+   assumption.
+  apply IHs2.
+ apply StepF_Qeq_eq; auto with *.
+ apply Map2_resp_Qeq; auto with *.
+  apply StepF_Qeq_refl.
+ apply MirrorSplitR_Qeq.
+ reflexivity.
+rewrite SplitRGlue.
+eapply StepF_eq_trans.
+  assumption.
+ apply IHs1.
+apply StepF_Qeq_eq; auto with *.
+apply Map2_resp_Qeq; auto with *.
+ apply StepF_Qeq_refl.
+apply MirrorSplitL_Qeq.
+reflexivity.
+Qed. 
+
+Lemma SplitRMap2 : forall (f: W -> X -> Y) s t o,
+ StepF_eq Yeq (SplitR (Map2 f s t) o) (Map2 f (SplitR s o) (SplitR t o)).
+Proof.
+intros f s t o.
+rewrite <- Mirror_eq_Mirror; auto with *.
+rewrite MirrorMap2.
+rewrite (fun a => MirrorSplitR Yst a _ (Qeq_refl (OpenUnitDual o))).
+eapply StepF_eq_trans.
+  assumption.
+ apply SplitL_resp_Xeq.
+  assumption.
+ apply MirrorMap2.
+eapply StepF_eq_trans.
+  assumption.
+ apply SplitLMap2.
+apply StepF_Qeq_eq.
+ assumption.
+apply StepF_Qeq_sym.
+apply Map2_resp_Qeq;
+ apply MirrorSplitR_Qeq; reflexivity.
+Qed.
+
+Lemma Map2_morphism:forall (f g:W -> X -> Y),
+  (forall w w' x x',
+   (Weq w w') -> (Xeq x x')-> (Yeq (f w x) (f w' x'))) ->
+  (forall w x, (Yeq (f w x) (g w x))) ->
+  forall s s' t t', (StepF_eq Weq s s') -> (StepF_eq Xeq t t') ->
+  (StepF_eq Yeq (Map2 f s t) (Map2 g s' t')).
+Proof.
+intros f g Hf Hfg s s' t t' Hs Ht.
+revert s Hs t t' Ht.
+induction s'; intros s Hs.
+ simpl.
+ induction s; intros.
+  simpl.
+  apply Map_morphism; auto with *.
+   intros; apply Hf; auto with *; reflexivity.
+  intros.
+  transitivity (f x x1); try apply Hf; auto with *; reflexivity.
+ rewrite Map2Glue.
+ destruct Hs as [Hs0 Hs1] using (glue_eq_ind Weq).
+ apply glue_StepF_eq.
+  rewrite SplitLMap; auto with *.
+ rewrite SplitRMap; auto with *.
+intros t t' Ht.
+destruct Hs as [Hs0 Hs1] using (eq_glue_ind Wst).
+apply StepF_eq_sym; auto with *.
+rewrite Map2Glue.
+apply glue_StepF_eq; apply StepF_eq_sym; auto with *.
+ rewrite SplitLMap2.
+ apply IHs'1; auto with *.
+rewrite SplitRMap2.
+apply IHs'2; auto with *.
+Qed.
+
+End MapMorphism.
