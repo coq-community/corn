@@ -301,19 +301,52 @@ Definition Map3(X Y Z W:Type):=fun (f:X->Y->Z->W) (x:StepF X) (y:StepF Y) (z:Ste
 Definition Map4(X Y Z W V:Type):=fun (f:X->Y->Z->W->V) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)=>
    (App (Map3 (fun x y z=>(f x y z)) x y z) w).
 
-Lemma Map4Map2Map2Map2(X Y Z W V U UU:Type):
+Definition Map5(X Y Z W V U:Type):=fun (f:X->Y->Z->W->V->U) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)(v:StepF V)=>
+   (App (Map4 (fun x y z w=>(f x y z w)) x y z w) v).
+
+Axiom Map4Map2Map2Map2:forall (X Y Z W V U UU:Type),
 forall  (f:X->Y->U)(g:Z->W->V)(h:U->V->UU) 
 (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W),
 (Map2 h (Map2 f x y) (Map2 g z w))=
 (Map4 (fun x y z w => (h (f x y) (g z w))) x y z w).
-intros.
-unfold Map4, Map3.
-Admitted.
+
+Axiom Map5Map3Map2Map2: forall (Xf Yf Zf Wf Xg Yg Zg Zh:Type),
+forall  (f:Xf->Yf->Zf->Wf)(g:Xg->Yg->Zg)(h:Wf->Zg->Zh) 
+(xf:StepF Xf) (yf:StepF Yf) (zf:StepF Zf) 
+(xg:StepF Xg) (yg:StepF Yg),
+(Map2 h (Map3 f xf yf zf) (Map2 g xg yg))=
+(Map5 (fun a b c d e => (h (f a b c) (g d e))) xf yf zf xg yg).
 
 Lemma Map4Map32(X Y Z W:Type):forall (f:X->Y->Y->Z->W) 
 (x:StepF X) (y:StepF Y) (z:StepF Z) ,
 (Map4 f x y y z)=(Map3 (fun x y z=> (f x y y z)) x y z).
 Admitted.
+
+Axiom Map5Map1435: forall (X Y Z W:Type),
+forall  (f:X->Y->Z->X->Z->W)
+(x:StepF X) (y:StepF Y) (z:StepF Z) ,
+((Map5 (fun a b c d e => (f a b c d e)) x y z x z)=
+(Map3 (fun a b c => (f a b c a c)) x y z)).
+
+Definition StepF_imp (f g:StepF Prop):Prop:=
+(StepFfoldProp (Map2 (fun A B:Prop=>(A->B)) f g)).
+
+Lemma StepF_imp_imp:forall x y:(StepF Prop),
+  (StepF_imp x y) ->
+  ((StepFfoldProp x)->(StepFfoldProp y)).
+induction x. induction y.
+   auto with *.
+  unfold StepF_imp. simpl. unfold StepFfoldProp;simpl;intuition.
+intros y H0.
+unfold StepF_imp in H0. simpl in H0.
+destruct (Split y o) using (Split_ind y o).
+destruct H0 as [H0l H0r].
+change ((StepFfoldProp x1 /\ StepFfoldProp x2) -> StepFfoldProp y).
+intros [HH HH0]. rewrite <- (StepFfoldPropglue y o).
+split. 
+apply (IHx1 (SplitL y o)); auto with *.
+apply (IHx2 (SplitR y o)); auto with *.
+Qed.
 
 Lemma StepF_le_trans:forall x y z, (StepF_le x y)-> (StepF_le y z) ->(StepF_le x z).
 intros x y z. unfold StepF_le.
@@ -324,93 +357,22 @@ rewrite <- StepFfoldPropMap2;intuition.
 clear H0 H.
 assert (H:StepFfoldProp
        (Map2 (fun a b : Prop => a /\ b) (Map2 Qle x y) (Map2 Qle y z))
-    <-> StepFfoldProp (Map2 Qle x z)). 
-apply (StepFfoldProp_morphism).
-Focus 2. rewrite <- H. auto with *.
+    -> StepFfoldProp (Map2 Qle x z)); auto.
 clear H1.
-assert (StepF_eq iff
-    (Map2 (fun a b : Prop => a /\ b) (Map2 Qle x y) (Map2 Qle y z))
-    (App (Map (fun a => (fun b=>a /\ b)) (Map2 Qle x y)) (Map2 Qle y z))).
-apply (Map2Map iff iff iff (fun a b : Prop => a /\ b) (fun a b : Prop => a /\ b)).
-intuition.
+apply StepF_imp_imp.
 rewrite Map4Map2Map2Map2.
+unfold StepF_imp.
 rewrite Map4Map32.
-assert (StepF_eq iff (Map3 (fun x0 z0 : Q => x0 <= y0 <= z0) x y z) (Map2 Qle x z)).
+rewrite Map5Map3Map2Map2.
+rewrite Map5Map1435.
+assert (StepF_eq iff 
+(Map3 (fun a b c : Q => a <= b <= c -> a <= c) x y z)
+(Map3 (fun a b c : Q => True) x y z)).
 unfold Map3.
-
-
-
-
-unfold Map3.
-
-(*
-rewrite H. rewrite MapMap2.
-transitivity ((Map4 (fun x y z w=>(x<=y)/\(z<=w))) x y y z).
-
-unfold Map4.
-
-
-Check Map2Map.
-Check (Map2Map Qeq Qeq iff Qle Qle).
-assert  (StepF_eq iff (Map2 Qle y z) (App (Map (fun x  => Qle x) y) z)).
-apply (Map2Map Qeq Qeq iff Qle Qle). 
-  do 4 intro. intros H0 H1. rewrite H0. rewrite H1. auto with *.
-transitivity (App (Map2 (fun (x0 y0 : Q) (b : Prop) => x0 <= y0 /\ b) x y)
-     (App (Map (fun x : Q => Qle x) y) z)).
-apply App_mor2. assumption.
-
-
-
-set (Map2Map (fun a b : Prop => a /\ b) (fun a b : Prop => a /\ b)).
-set (s Prop iff).
-Check (Map2 (fun (x0 y0 : Q) (b : Prop) => x0 <= y0 /\ b) x y).
-Check (Map (fun x0 : Q => Qle x0) y).
-
-
-
-
-apply (AppMapMap iff).
-
-
-
-
-
-
-
-intros x y z. do 3 rewrite StepF_le_pos.
-do 3 rewrite MapMap2.
-intros H H0.
-set (HH:=StepFfoldPropMap2 
-         (Map2 (fun x y : Q => x - y <= 0) x y)
-         (Map2 (fun x y : Q => x - y <= 0) y z)).
-assert  (H1:StepFfoldProp
-       (Map2 (fun a b : Prop => a /\ b)
-          (Map2 (fun x y : Q => x - y <= 0) x y)
-          (Map2 (fun x y : Q => x - y <= 0) y z))).
-rewrite <-HH; auto with *. clear HH H H0.
-cut ((StepFfoldProp
-       (Map2 (fun a b : Prop => a /\ b)
-          (Map2 (fun x y : Q => x - y <= 0) x y)
-          (Map2 (fun x y : Q => x - y <= 0) y z)))
-         <->
-          (StepFfoldProp (Map2 (fun x0 y0 : Q => x0 - y0 <= 0) x z))).
-intro H. rewrite <- H. auto with *.
-apply (StepFfoldProp_morphism).
-clear H1.
-assert (StepF_eq iff
-  (Map2 (fun a b : Prop => a /\ b) 
-     (Map2 (fun x0 y0 : Q => x0 - y0 <= 0) x y)
-     (Map2 (fun x0 y0 : Q => x0 - y0 <= 0) y z))
-  (Map2 (fun x0 y0 : Q => x0 - y0 <= 0) x z)).
-
-rewrite Map2Map2Map2.
-
- (Map2 (fun x0 y0 : Q => x0 - y0 <= 0) x y))). (Map2 Qle y z)) (Map2 Qle x z)); auto with *.
-
-
- (Map2 f (Map2 g x y) (Map2 h x y))
-  = (Map2 (fun x y => (f (g x y) (h x y))) x y).
- *)
+unfold App.
+eapply (Map2_morphism Q_Setoid PropST).
+Focus 6. (*Still seems difficult.*)
+Admitted.
 
 Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
@@ -437,6 +399,7 @@ split.
     rapply L1ball_refl.
    (*Symm*)
    (* define a new function |x-y|  ???*)
+   unfold symmetric. intros.
    assert (((Map Qabs (Map2 Qminus x y))===(Map Qabs (Map2 Qminus y x)))).
     do 2 rewrite MapMap2.
     assert (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) x y ===
@@ -445,8 +408,8 @@ Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
     intros. rewrite H0. rewrite H1. reflexivity.
     intros.
     assert (H2:forall x' y', x'-y' == -(y'-x')). intros; ring. rewrite H2.
-    apply Qabs_opp. rewrite H0. apply Map2switch.
-    rewrite <- H0. exact H.
+    apply Qabs_opp. rewrite H0. rapply Map2switch.
+    unfold L1Ball, Distance, L1Norm. rewrite <- H0. exact H.
   (* Trans*)
   do 5 intro. unfold L1Ball, Distance, L1Norm. intros.
   assert (IntegralQ (Map Qabs (Map2 Qminus a b))+
@@ -456,16 +419,18 @@ Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
    cut (forall x y z o, x<=y->x<=z->x<=(o*y+(1-o)*z)).
    intro HH.
    assert (intpos:forall x y:(StepF Q), 
-         (StepF_lt x y)->(IntegralQ x <= IntegralQ y)).
+         (StepF_le x y)->(IntegralQ x <= IntegralQ y)).
     induction x.
-     unfold StepF_lt, IntegralQ. simpl. 
+     unfold StepF_le, IntegralQ. simpl. 
       induction y. simpl. auto with *.
       simpl. intros [H H1]. apply HH; auto with *.
-     intro y. unfold StepF_lt, IntegralQ. simpl. fold IntegralQ.
+     intro y. unfold StepF_le, IntegralQ. simpl. fold IntegralQ.
       assert (rew:IntegralQ y==IntegralQ (glue o (fst (Split y o)) (snd (Split y o)))). apply IntegralQ_mor. 
       (* This is broken rewrite glueSplit should work*) 
       change (y === glue o (SplitL y o) (SplitR y o)).
-      rewrite (glueSplit Q_Setoid); auto with *.
+      (* something like unfold StepQ_eq.*)
+      rapply (StepF_eq_sym Q_Setoid).
+      apply (glueSplit Q_Setoid). 
       rewrite rew. clear rew.
       destruct (Split y o) as [L R]. intros [H1 H2].
       set (ineq1:=IHx1 L H1). set (ineq2:=IHx2 R H2). simpl.
@@ -484,7 +449,7 @@ Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
     Show that:
     (a-b)+(b-c)= (a-c) This needs that Map2 is a morphism.
 *)
-   Focus 3.
+   Focus 4.
 (* Closed, this is copied from Qmetric*)
 unfold L1Ball. intros e a b H.
 assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e).
