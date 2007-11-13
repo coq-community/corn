@@ -51,12 +51,6 @@ Variable Z:Type.
 Variable Zeq:Z->Z->Prop.
 Hypothesis Zst:(Setoid_Theory Z Zeq).
 
-Lemma Map2_morphism: forall f g,
- (forall x x' y y', (Xeq x x')->(Yeq y y')->
-    (Zeq (f x y) (g x' y')))->
-  forall x x' y y', (StepF_eq Xeq x x')->(StepF_eq Yeq y y')->
- (StepF_eq Zeq (Map2 f x y) (Map2 g x' y')).
-Admitted.
 (* Seems awkward to prove. 
 intros. revert H1.
 induction x.
@@ -218,9 +212,10 @@ split.
     do 2 rewrite MapMap2.
     assert (Map2 (fun x0 y0 : Q => Qabs (x0 - y0)) x y ===
 Map2 (fun y0 x0 : Q => Qabs (x0 - y0)) x y).
-    apply (Map2_morphism Qeq Qeq); try apply (StepF_eq_refl Q_Setoid). 
-    intros. rewrite H0. rewrite H1.
-    assert (H2:x'-y' == -(y'-x')). ring. rewrite H2.
+    apply (Map2_morphism Q_Setoid Q_Setoid Q_Setoid); try apply (StepF_eq_refl Q_Setoid). 
+    intros. rewrite H0. rewrite H1. reflexivity.
+    intros.
+    assert (H2:forall x' y', x'-y' == -(y'-x')). intros; ring. rewrite H2.
     apply Qabs_opp. rewrite H0. apply Map2switch.
     rewrite <- H0. exact H.
   (* Trans*)
