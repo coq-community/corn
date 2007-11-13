@@ -105,7 +105,10 @@ rewrite <- (glueSplit_eq Yst t).
 
 Section L1metric.
 
-Notation "x === y" := (StepF_eq Qeq x y) (at level 60).
+Definition StepQ := (StepF Q).
+Definition StepQ_eq : StepQ -> StepQ -> Prop := (StepF_eq Qeq).
+
+Notation "x === y" := (StepQ_eq x y) (at level 60).
 Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
 intros e a b.
 unfold L1Ball.
@@ -116,7 +119,7 @@ left. exact Hdc.
 Defined.
 Require Import QArith_base.
 
-Add Setoid (StepF Q) (StepF_eq Qeq) (StepF_Sth Q_Setoid) as StepFQ_Setoid.
+Add Setoid (StepQ) (StepQ_eq) (StepF_Sth Q_Setoid) as StepQ_Setoid.
 
 (*
 Lemma glueSplit1:forall o x0 x1 y, (glue o x0 x1)===y ->
@@ -157,7 +160,7 @@ Qed.
 Hint Resolve IntegralSplit.
 
 Add Morphism IntegralQ 
-  with signature   (StepF_eq Qeq) ==>  Qeq
+  with signature  StepQ_eq ==>  Qeq
  as IntegralQ_mor.
 unfold IntegralQ.
 induction x1.
@@ -216,21 +219,29 @@ Require Import CornTac.
 Print StepFfold.
 Definition StepF_lt:=(fun x y=>(StepFfoldProp (Map2 Qlt x y))).
 
+Lemma L1ball_refl : forall e x, (L1Ball e x x).
+Proof.
+intros e x.
+unfold L1Ball, Distance.
+assert ((Map2 Qminus x x)===(leaf 0)).
+ induction x.
+  change (x - x==0).
+  ring.
+ rewrite Map2GlueGlue.
+ rapply glue_StepF_eq; auto with *.
+unfold L1Norm.
+setoid_replace (Map Qabs (Map2 Qminus x x):StepQ) with (Map Qabs (leaf 0)).
+ auto with *.
+rapply (Map_morphism Q_Setoid); auto with *.
+intros a b Hab.
+rewrite Hab.
+reflexivity.
+Qed.
+
 Lemma L1_is_MetricSpace : (is_MetricSpace (StepF_eq Qeq)  L1Ball).
 split.
      apply (StepF_Sth Q_Setoid).
-    intros e x. unfold L1Ball. unfold Distance. 
-    assert ((Map2 Qminus x x)===(leaf 0)).
-    induction x. unfold Map2. simpl. 
-    assert (H:forall x y, x==y-> leaf x===leaf y).
-    intros. unfold StepF_eq. simpl. auto with *.
-    apply H. ring.
-    rewrite Map2GlueGlue.
-    apply glue_StepF_eq; auto with *.
-    unfold L1Norm. 
-    assert (H0:(Map Qabs (Map2 Qminus x x)) === (Map Qabs (leaf 0))). apply (Map_resp_StepF_eq Q_Setoid); auto with *.
-      exact Qabs_wd. rewrite  H0. simpl. unfold IntegralQ. simpl. auto with *.
-   intro. unfold symmetric, L1Ball, Distance, L1Norm. intros.
+    rapply L1ball_refl.
    (*Symm*)
    (* define a new function |x-y|  ???*)
    assert (((Map Qabs (Map2 Qminus x y))===(Map Qabs (Map2 Qminus y x)))).
