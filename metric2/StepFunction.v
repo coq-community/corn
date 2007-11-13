@@ -89,10 +89,26 @@ apply (SplitLR_glue_ind s1 s2 a b (fun a b => P b));
 assumption.
 Qed.
 
-Lemma Splitglue : forall x y:StepF, forall o,
+Lemma SplitGlue : forall x y:StepF, forall o,
   (Split (glue o x y) o)=(x,  y).
 intros. simpl.
  destruct (Q_dec o o) as [[H1|H1]|H1]; try (elim (Qlt_not_le _ _ H1); auto with *); simpl; auto with *.
+Qed.
+
+Lemma SplitLGlue : forall x y:StepF, forall o,
+  (SplitL (glue o x y) o)=x.
+unfold SplitL.
+intros.
+rewrite SplitGlue.
+reflexivity.
+Qed.
+
+Lemma SplitRGlue : forall x y:StepF, forall o,
+  (SplitR (glue o x y) o)=y.
+unfold SplitR.
+intros.
+rewrite SplitGlue.
+reflexivity.
 Qed.
 
 Fixpoint StepF_Qeq (s1 s2: StepF) : Prop :=
@@ -523,6 +539,51 @@ destruct (Split t b) as [L R].
 exact (glue b (Map2 X Y Z f t1 L) (Map2 X Y Z f t2 R)).
 Defined.
 
+Lemma Map2Glue : forall X Y Z (f:X -> Y -> Z) o l r b, Map2 f (glue o l r) b = glue o (Map2 f l (SplitL b o)) (Map2 f r (SplitR b o)).
+Proof.
+intros.
+simpl.
+apply Split_ind.
+reflexivity.
+Qed.
+
+Lemma Map2GlueGlue : forall X Y Z (f:X -> Y -> Z) o l1 r1 l2 r2, Map2 f (glue o l1 r1) (glue o l2 r2) = glue o (Map2 f l1 l2) (Map2 f r1 r2).
+Proof.
+intros.
+rewrite Map2Glue, SplitLGlue, SplitRGlue.
+reflexivity.
+Qed.
+
+Lemma MapMap2 (W X Y Z:Type): forall (f:W->Z) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
+  Map f (Map2 g x y)= (Map2 (fun x y => (f (g x y))) x y).
+induction x. simpl. induction y.
+  simpl; auto with *.
+ simpl. rewrite IHy1. rewrite IHy2. auto with *.
+intros y.
+do 2 rewrite Map2Glue.
+simpl. rewrite IHx1. rewrite IHx2. auto with *.
+Qed.
+
+Lemma Map2Map2Map2 (X Y Z:Type): 
+  forall (f:Z->Z->Z) (g:X->Y->Z) (h:X->Y->Z) 
+          (x:StepF X) (y:StepF Y), 
+  (Map2 f (Map2 g x y) (Map2 h x y))
+  = (Map2 (fun x y => (f (g x y) (h x y))) x y).
+induction x. simpl. induction y.
+  simpl; auto with *.
+ Opaque Map2.
+ simpl.
+ Transparent Map2.
+ rewrite <-IHy1. rewrite <-IHy2.
+ rewrite Map2GlueGlue.
+ reflexivity.
+intro y. rewrite (Map2Glue (fun (x : X) (y0 : Y) => f (g x y0) (h x y0))).
+rewrite <- IHx1. rewrite <- IHx2.
+rewrite (Map2Glue g).
+rewrite (Map2Glue h).
+apply Map2GlueGlue.
+Qed.
+
 Lemma SplitMap (X Y:Type):forall x:(StepF X), forall a, forall f:X->Y, 
     (Split (Map f x) a) = let (l,r) := Split x a in (Map f l,Map f r).
 intros X Y s a f. revert a. induction s. simpl; auto.
@@ -568,22 +629,32 @@ destruct (Split s a) as [s3 s4].
 split; assumption.
 Qed.
 
-Hint Resolve glue_StepF_eq.
+Lemma glue_eq_ind : forall s1 s2 s a (P:Prop), (s1 === (SplitL s a) -> s2 === (SplitR s a) -> P) -> (glue a s1 s2 === s) -> P.
+Proof.
+intros s1 s2 s a P H H0.
+unfold SplitL, SplitR, StepF_eq in *.
+simpl in *.
+destruct (Split s a).
+destruct H0.
+apply H; assumption.
+Qed.
 
 Lemma StepF_eq_refl:forall x : StepF X, x === x.
 intro s.
 induction s.
 compute. apply Seq_refl; auto.
-assert 
- (H:s1 === SplitL (glue o s1 s2) o/\
-    s2 === SplitR (glue o s1 s2) o).
- apply SplitLR_glue_ind; simpl; auto with *; 
- intros H; elim (Qlt_not_le _ _ H); auto with *.
-destruct H.
-auto with *.
+apply glue_StepF_eq.
+rewrite SplitLGlue; assumption.
+rewrite SplitRGlue; assumption.
 Qed.
 
 Hint Resolve StepF_eq_refl.
+
+Lemma glueSplit:forall s, forall a, (glue a (SplitL s a) (SplitR s a)) === s.
+intros s a. unfold SplitL, SplitR, StepF_eq. simpl. 
+destruct (Split s a) as [s3 s4].
+split; apply StepF_eq_refl.
+Qed.
 
 Lemma StepF_Qeq_eq : forall s t, (StepF_Qeq s t) -> s === t.
 Proof.
@@ -601,19 +672,10 @@ apply SplitR_glue_ind; intros H2;
  try (elim (Qlt_not_le _ _ H2); rewrite H); auto with *.
 Qed.
 
-Lemma glue_eq_ind : forall s1 s2 s a (P:Prop), (s1 === (SplitL s a) -> s2 === (SplitR s a) -> P) -> (glue a s1 s2 === s) -> P.
-Proof.
-intros s1 s2 s a P H H0.
-unfold SplitL, SplitR, StepF_eq in *.
-simpl in *.
-destruct (Split s a).
-destruct H0.
-apply H; assumption.
-Qed.
-
 End EquivalenceA.
 
-Hint Resolve StepF_eq_refl : sfarith.
+Hint Resolve StepF_eq_refl StepF_Qeq_eq : sfarith.
+Hint Unfold StepFfoldProp StepFfold StepF_eq : sfarith.
 
 Section EquivalenceB.
 Variable X:Type.
@@ -624,13 +686,9 @@ Variable Y:Type.
 Variable Yeq:Y->Y->Prop.
 Hypothesis Yst:(Setoid_Theory Y Yeq).
 
-Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst):foo.
-Hint Unfold StepFfoldProp StepFfold StepF_eq.
-Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
-
 Lemma Map_resp_StepF_eq: forall f:X->Y, 
     (forall x y, (Xeq x y)-> (Yeq (f x) (f y))) ->
-    forall s t:(StepF X), (s === t) -> (StepF_eq Yeq (Map f s) (Map f t)).
+    forall s t:(StepF X), (StepF_eq Xeq s t) -> (StepF_eq Yeq (Map f s) (Map f t)).
 intros f H.
 
 induction s. induction t.
@@ -647,33 +705,20 @@ Qed.
 End EquivalenceB.
 
 Lemma StepFfoldPropglue:forall y o,
- StepFfoldProp (glue o (fst (Split y o)) (snd (Split y o))) <->
-StepFfoldProp y.
+ StepFfoldProp (glue o (SplitL y o) (SplitR y o)) <-> StepFfoldProp y.
 induction y.
   unfold StepF_eq, StepFfoldProp.
   simpl; tauto.
 simpl.
 intro o0.
-destruct (Q_dec o0 o) as [[H|H]|H].
-   generalize (IHy1 (OpenUnitDiv o0 o H)).
-   destruct (Split y1 (OpenUnitDiv o0 o H)) as [l r].
-   simpl.
-   change ((StepFfoldProp l /\StepFfoldProp r <-> StepFfoldProp y1) ->
-(StepFfoldProp l /\ StepFfoldProp r /\ StepFfoldProp y2 <->
-  StepFfoldProp y1 /\ StepFfoldProp y2)).
-   tauto.
-  generalize (IHy2 (OpenUnitDualDiv o0 o H)).
-  destruct (Split y2 (OpenUnitDualDiv o0 o H)) as [l r].
-  simpl.
-  change ((StepFfoldProp l /\StepFfoldProp r <-> StepFfoldProp y2) ->
-((StepFfoldProp y1 /\ StepFfoldProp l) /\ StepFfoldProp r <->
-  StepFfoldProp y1 /\ StepFfoldProp y2)).
-  tauto.
+apply SplitLR_glue_ind; intros H.
+  generalize (IHy1 (OpenUnitDiv o0 o H)).
+  unfold StepFfoldProp; simpl; tauto.
+ generalize (IHy2 (OpenUnitDualDiv o0 o H)).
+ unfold StepFfoldProp; simpl; tauto.
 simpl.
 reflexivity.
 Qed.
-
-Hint Resolve StepFfoldPropglue : sfarith.
 
 Lemma StepFfoldProp_morphism:forall x y:(StepF Prop),
   (StepF_eq iff x y) ->
@@ -683,18 +728,12 @@ induction x. induction y.
   unfold StepF_eq. simpl. unfold StepFfoldProp;simpl;intuition.
 intros y H0.
 unfold StepF_eq in H0. simpl in H0.
-transitivity (StepFfoldProp ((glue o (fst (Split y o)) (snd (Split y 
-o))))).
-  change ((StepFfoldProp x1 /\ StepFfoldProp x2) <->
-  ((StepFfoldProp (fst (Split y o)) /\ (StepFfoldProp (snd (Split y 
-o)))))).
-  destruct (Split y o) as [l r].
-  destruct H0 as [H0l H0r].
-  rewrite (IHx1 l); try assumption.
-  rewrite (IHx2 r); try assumption.
-  simpl.
-  tauto.
-auto with *.
+destruct (Split y o) using (Split_ind y o).
+destruct H0 as [H0l H0r].
+change ((StepFfoldProp x1 /\ StepFfoldProp x2) <-> StepFfoldProp y).
+rewrite (IHx1 (SplitL y o)); auto with *.
+rewrite (IHx2 (SplitR y o)); auto with *.
+rapply StepFfoldPropglue.
 Qed.
 
 Section EquivalenceC.
@@ -703,9 +742,9 @@ Variable Xeq:X->X->Prop.
 Hypothesis Xst:(Setoid_Theory X Xeq).
 Add Setoid X Xeq Xst as Xth1.
 
-Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst):foo.
-Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
-Hint Resolve StepF_Qeq_refl StepF_Qeq_eq SplitL_resp_Qeq SplitR_resp_Qeq.
+Notation "x === y" := (StepF_eq Xeq x y) (at level 70).
+
+Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq.
 
 Lemma StepF_eq_resp_Qeq : forall s t u v, (StepF_Qeq s t) -> (StepF_Qeq u v) -> s === u -> t === v.
 Proof.
@@ -718,7 +757,9 @@ induction s; induction t; try contradiction.
  rewrite <- (StepFfoldProp_morphism (Map (Xeq x) u)); auto with *.
  apply (Map_resp_StepF_eq Xst); auto with *.
   split;[apply iff_refl|apply iff_sym|apply iff_trans].
- intros a b Hab; split; eauto with *.
+ intros a b Hab.
+ rewrite Hab.
+ reflexivity.
 intros u v [H [Hst0 Hst1]] Huv Hsu.
 destruct Hsu as [Hsu1 Hsu2] using (glue_eq_ind Xeq).
 apply glue_StepF_eq.
@@ -821,21 +862,7 @@ rewrite Mirror_eq_Mirror.
 assumption.
 Qed.
 
-End EquivalenceC.
-
-Section EquivalenceD.
-Variable X:Type.
-Variable Xeq:X->X->Prop.
-Hypothesis Xst:(Setoid_Theory X Xeq).
-Variable Y:Type.
-Variable Yeq:Y->Y->Prop.
-Hypothesis Yst:(Setoid_Theory Y Yeq).
-Variable Z:Type.
-Variable Zeq:Z->Z->Prop.
-Hypothesis Zst:(Setoid_Theory Z Zeq).
-Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst):foo.
-Hint Resolve (Seq_trans Y Yeq Yst) (Seq_sym Y Yeq Yst) (Seq_refl Y Yeq Yst):foo.
-
+(*
 Lemma Map2_morphism2:forall f, (forall x x' y y',
   (Xeq x x) -> (Yeq y y')-> (Zeq (f x y) (f x' y'))) ->
   forall s t t', (StepF_eq Yeq t t') ->
@@ -845,21 +872,21 @@ induction s.
  intros t t' H0.
  simpl.
  eapply Map_resp_StepF_eq;try apply Yst; auto with *.
+ intros a b Hab.
+ rewrite Hab.
 intros t t' H0.
 simpl.
 apply Split_ind.
 apply Split_ind.
 simpl.
 apply glue_StepF_eq.
- apply SplitL_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with *).
+ apply SplitL_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with * ).
  apply IHs1.
  apply SplitL_resp_Xeq; auto with *.
-apply SplitR_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with *).
+apply SplitR_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with * ).
 apply IHs2.
 apply SplitR_resp_Xeq; auto with *.
-Qed.
-
-Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
+Qed.*)
 
 Lemma StepF_eq_trans:forall x y z : StepF X, x === y -> y === z -> x === z.
 induction x. intros.
@@ -870,19 +897,18 @@ induction x. intros.
  eapply Map_resp_StepF_eq; try apply Xst; auto with *.
   split;[apply iff_refl|apply iff_sym|apply iff_trans].
  intros a b Hab.
- split; eauto with *.
+ rewrite Hab.
+ reflexivity.
 intros.
 destruct H using (glue_eq_ind Xeq).
 apply glue_StepF_eq.
  eapply IHx1.
   apply H.
  apply SplitL_resp_Xeq.
-  apply Xst.
  assumption.
 eapply IHx2.
  apply H1.
 apply SplitR_resp_Xeq.
- apply Xst.
 assumption.
 Qed.
 
@@ -891,30 +917,48 @@ Lemma glue_resp_StepF_eq:forall x x' y y' o,
   (glue o x y)===(glue o x' y').
 intros.
 unfold StepF_eq.
-simpl.
- destruct (Q_dec o o) as [[H1|H1]|H1]; try (elim (Qlt_not_le _ _ H1); auto with *); simpl; auto with *.
-unfold StepFfoldProp.
-simpl.
-intuition.
+rewrite Map2GlueGlue.
+split; assumption.
 Qed.
 
-Lemma StepF_eq_symm:forall y x: StepF X, StepF_eq Xeq x y -> StepF_eq Xeq y
+Lemma StepF_eq_sym :forall y x: StepF X, StepF_eq Xeq x y -> StepF_eq Xeq y
 x.
 intros y. induction y.
  unfold StepF_eq. simpl. intro x0. induction x0.
-  unfold StepFfoldProp. simpl. auto with *.
- simpl. unfold StepFfoldProp; simpl; intuition auto with *.
+  unfold StepFfoldProp. simpl. destruct Xst; auto with *.
+ simpl. unfold StepFfoldProp; simpl; intuition; auto with *.
 intros x H.
-assert (H0:=(SplitL_resp_Xeq Xst _ _ o H)).
+assert (H0:=(SplitL_resp_Xeq _ _ o H)).
 unfold SplitL in H0.
-rewrite Splitglue in H0; simpl in H0.
-assert (H1:=(SplitR_resp_Xeq Xst _ _ o H)).
+rewrite SplitGlue in H0; simpl in H0.
+assert (H1:=(SplitR_resp_Xeq _ _ o H)).
 unfold SplitR in H1.
-rewrite Splitglue in H1; simpl in H1.
-eapply StepF_eq_trans.
-apply (glue_resp_StepF_eq _ _ _ _ o (IHy1 _ H0) (IHy2 _ H1)).
-(* The following should be a lemma.*)
-clear -x Xst. apply glue_StepF_eq; auto with *.
+rewrite SplitGlue in H1; simpl in H1.
+apply glue_StepF_eq;auto with *.
 Qed.
 
-End EquivalenceD.
+Hint Resolve StepF_eq_sym StepF_eq_trans.
+
+Lemma StepF_Sth : (Setoid_Theory (StepF X) (StepF_eq Xeq)).
+split; intros; eauto with sfarith.
+Qed.
+
+Lemma glue_injl:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (x===x1).
+intros.
+destruct H as [H _] using (glue_eq_ind Xeq).
+rewrite SplitLGlue in H.
+assumption.
+Qed.
+
+Lemma glue_injr:forall o x y x1 y1,
+(glue o x y)===(glue o x1 y1) -> (y===y1).
+intros.
+destruct H as [_ H] using (glue_eq_ind Xeq).
+rewrite SplitRGlue in H.
+assumption.
+Qed.
+
+End EquivalenceC.
+
+Hint Resolve StepF_eq_sym StepF_eq_trans :sfarith.
