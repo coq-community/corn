@@ -533,6 +533,18 @@ fix 4. intros X Y f [x| a t1 t2].
 exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
 Defined.
 
+Notation "f ^@> x" := (Map f x) (at level 15, left associativity) : sfscope.
+
+Open Local Scope sfscope.
+
+Fixpoint Ap (X Y:Type) (f:StepF (X->Y)) (a:StepF X) : StepF Y :=
+match f with
+|leaf f0 => f0 ^@> a
+|glue o f0 f1 => let (l,r):=Split a o in (glue o (Ap f0 l) (Ap f1 r))
+end.
+
+Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfscope.
+
 Definition Map2 (X Y Z:Type):
   (X->Y->Z)->(StepF X)-> (StepF Y) -> (StepF Z).
 fix 5. 
@@ -542,6 +554,16 @@ exact (Map (f x) t).
 destruct (Split t b) as [L R].
 exact (glue b (Map2 X Y Z f t1 L) (Map2 X Y Z f t2 R)).
 Defined.
+
+Lemma Map2_def : forall X Y Z (f:X -> Y -> Z) a b, Map2 f a b = f ^@> a <@> b.
+Proof.
+induction a.
+ reflexivity.
+simpl.
+intros b.
+destruct (Split b o).
+congruence.
+Qed.
 
 Lemma Map_resp_Qeq : forall X Y (f:X -> Y) s1 s2,
  (StepF_Qeq s1 s2) ->
