@@ -1093,32 +1093,6 @@ rewrite Mirror_eq_Mirror.
 assumption.
 Qed.
 
-(*
-Lemma Map2_morphism2:forall f, (forall x x' y y',
-  (Xeq x x) -> (Yeq y y')-> (Zeq (f x y) (f x' y'))) ->
-  forall s t t', (StepF_eq Yeq t t') ->
-  (StepF_eq Zeq (Map2 f s t) (Map2 f s t')).
-intros f H.
-induction s.
- intros t t' H0.
- simpl.
- eapply Map_resp_StepF_eq;try apply Yst; auto with *.
- intros a b Hab.
- rewrite Hab.
-intros t t' H0.
-simpl.
-apply Split_ind.
-apply Split_ind.
-simpl.
-apply glue_StepF_eq.
- apply SplitL_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with * ).
- apply IHs1.
- apply SplitL_resp_Xeq; auto with *.
-apply SplitR_glue_ind; intros H1; try (elim (Qlt_not_le _ _ H1); auto with * ).
-apply IHs2.
-apply SplitR_resp_Xeq; auto with *.
-Qed.*)
-
 Lemma StepF_eq_trans:forall x y z : StepF X, x === y -> y === z -> x === z.
 induction x. intros.
  unfold StepF_eq, Map2;simpl;auto with *.
