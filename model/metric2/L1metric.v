@@ -18,13 +18,37 @@ Defined.
 Definition test1:=(leaf (1:QS)).
 Definition test2:=(glue (ou 1/2) (leaf (0:QS)) (leaf (1:QS))).
 
+Open Local Scope sfstscope.
+
 Definition Supnorm:(StepF QS)->Q:=(StepFfold (Qabs:QS->QS) (fun _=> Qmax)).
 Eval compute in (Supnorm test2):Q.
 Definition IntegralQ:(StepF QS)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (b*x+(1-b)*y:QS))).
 Eval compute in (IntegralQ test2):Q.
-Definition L1Norm(f:StepF QS):Q:=(IntegralQ (Map (Qabs:QS->QS) f)).
+Definition QabsS : QS-->QS.
+exists Qabs.
+abstract(
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition L1Norm(f:StepF QS):Q:=(IntegralQ (Map (QabsS) f)).
 Eval compute in (L1Norm test2):Q.
-Definition Distance(f g:StepF QS):Q:=(L1Norm (Map2 Qminus f g)).
+Definition Qminus0 : QS -> QS --> QS.
+intros q.
+exists (Qminus q).
+abstract (
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition QminusS : QS --> QS --> QS.
+exists (Qminus0).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
 Eval compute in (Distance test1 test2):Q.
 Eval compute in (Distance test2 test1):Q.
 Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(Distance f g)<=e.
@@ -32,15 +56,8 @@ Eval compute in (L1Ball (1#1)%Qpos test2 test1).
 Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
 Eval compute in (Mesh test2).
 
-Open Local Scope sfstscope.
-
 Section Equivalence1.
 Variable X Y:Setoid.
-
-Axiom ApMapMap:
-   forall (f g:Y-->Y-->Y) x y z, 
- (StepF_eq (Ap (Map f y) (Ap (Map g x) z)) 
-        (Ap (Map ((fun x y=> (f x) ((g x) y)):Y-->Y-->Y) x) z)).
 
 End Equivalence1.
 
@@ -112,21 +129,36 @@ Lemma Integral_glue : forall o s t, IntegralQ (glue o s t) = o*(IntegralQ s) + (
 Proof.
 reflexivity.
 Qed.
+Definition Qplus0 : QS -> QS --> QS.
+intros q.
+exists (Qplus q).
+abstract (
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition QplusS : QS --> QS --> QS.
+exists (Qplus0).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
 
 Lemma Integral_linear:forall s t,
-  (IntegralQ s)+(IntegralQ t)==(IntegralQ ((Qplus:QS-->QS-->QS) ^@> s <@> t)).
+  (IntegralQ s)+(IntegralQ t)==(IntegralQ ((QplusS:QS-->QS-->QS) ^@> s <@> t)).
 Proof.
 induction s using StepF_ind.
  induction t using StepF_ind.
   reflexivity.
  rewrite Integral_glue.
- change ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> glue o t1 t2)
-  with ((Qplus x:QS-->QS) ^@> glue o t1 t2).
+ change ((QplusS:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> glue o t1 t2)
+  with ((QplusS x:QS-->QS) ^@> glue o t1 t2).
  rewrite MapGlue.
- change ((Qplus x:QS-->QS) ^@> t1)
-  with ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t1).
- change ((Qplus x:QS-->QS) ^@> t2)
-  with ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t2).
+ change ((QplusS x:QS-->QS) ^@> t1)
+  with ((QplusS:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t1).
+ change ((QplusS x:QS-->QS) ^@> t2)
+  with ((QplusS:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t2).
  rewrite Integral_glue.
  rewrite <- IHt1.
  rewrite <- IHt2.
@@ -135,9 +167,6 @@ intros t.
 rewrite MapGlue.
 rewrite ApGlue.
 do 2 rewrite Integral_glue.
-(*Why can I no longer rewrite <- IHs1 ?*)
-set (A:=(Qplus:QS-->QS-->QS) ^@> s1) in *.
-set (B:=(Qplus:QS-->QS-->QS) ^@> s2) in *.
 rewrite <- IHs1.
 rewrite <- IHs2.
 rewrite (IntegralSplit o t).
@@ -149,10 +178,33 @@ Require Import COrdAbs.
 Require Import Qordfield.
 Require Import CornTac.
 Require Import Qauto.
-Definition StepF_le x y := (StepFfoldProp ((Qle:QS-->QS-->iffSetoid) ^@> x <@> y)).
+
+Definition Qle0 : QS -> QS --> iffSetoid.
+intros q.
+exists (Qle q).
+abstract (
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition QleS : QS --> QS --> iffSetoid.
+exists (Qle0).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+
+Definition StepF_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
 
 Lemma StepF_le_refl:forall x, (StepF_le x x).
-unfold StepF_le. induction x using StepF_ind.
+unfold StepF_le.
+pose (forall x, join QleS x).
+(*TODO using combinators*)
+
+
+
+ induction x using StepF_ind.
  change (Qle x x); auto with *.
 rewrite MapGlue.
 rewrite ApGlueGlue.split; auto with *.

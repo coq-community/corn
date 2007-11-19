@@ -798,6 +798,17 @@ Proof.
 exact Ap_interchange.
 Qed.
 
+Lemma Map_compose_Map : forall X Y Z (f:Y->Z) (g:X -> Y) a,
+StepF_Qeq ((fun a => f (g a)) ^@> a) (f ^@> (g ^@> a)).
+Proof.
+intros X Y Z f g a.
+change (StepF_Qeq (leaf (compose f g) <@> a) (leaf f <@> (leaf g <@> a))).
+rewrite <- (Map_homomorphism (compose f) g).
+change (compose f ^@> leaf g) with (leaf (compose f) <@> leaf g).
+rewrite <- (Map_homomorphism (@compose X Y Z) f).
+rapply Map_composition_Qeq.
+Qed.
+
 End ApplicativeFunctor.
 
 Lemma MapMap2 (X Y Z W:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
