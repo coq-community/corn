@@ -96,3 +96,25 @@ assert (X:OpenUnitDual b < OpenUnitDual a);
  |(replace LHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with *);
   auto with *]]).
 Defined.
+
+Definition ou_eq (x y:OpenUnit) := Qeq x y.
+Lemma ou_eq_refl : forall x, ou_eq x x.
+Proof.
+intros; rapply Qeq_refl.
+Qed.
+
+Lemma ou_eq_sym : forall x y, ou_eq x y -> ou_eq y x.
+Proof.
+intros; rapply Qeq_sym; auto.
+Qed.
+
+Lemma ou_eq_trans : forall x y z, ou_eq x y -> ou_eq y z -> ou_eq x z.
+Proof.
+intros; rapply (Qeq_trans x y); auto.
+Qed.
+
+Add Relation OpenUnit ou_eq
+ reflexivity proved by ou_eq_refl
+ symmetry proved by ou_eq_sym
+ transitivity proved by ou_eq_trans
+ as ou_st.

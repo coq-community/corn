@@ -1,4 +1,5 @@
-Require Import StepFunction.
+Require Export StepFunctionSetoid.
+Require Export Metric.
 Require Import OpenUnit.
 Require Import QArith.
 Require Import QMinMax.
@@ -7,130 +8,46 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
-Lemma PropST:(Setoid_Theory Prop iff).
-split; intuition.
-Qed.
+Open Local Scope sfscope.
 
-Add Setoid (StepF Prop) (StepF_eq iff) (StepF_Sth PropST) as StepF_thProp.
+Lemma QS:(Setoid).
+exists Q Qeq.
+split; eauto with qarith.
+Defined.
 
-Definition test1:=(leaf 1).
-Definition test2:=(glue (ou 1/2) (leaf 0) (leaf 1)).
+Definition test1:=(leaf (1:QS)).
+Definition test2:=(glue (ou 1/2) (leaf (0:QS)) (leaf (1:QS))).
 
-Definition Supnorm:(StepF Q)->Q:=(StepFfold Qabs (fun _=> Qmax)).
+Definition Supnorm:(StepF QS)->Q:=(StepFfold (Qabs:QS->QS) (fun _=> Qmax)).
 Eval compute in (Supnorm test2):Q.
-Definition IntegralQ:(StepF Q)->Q:=(StepFfold (fun x => x) (fun b x y => (b*x+(1-b)*y))).
+Definition IntegralQ:(StepF QS)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (b*x+(1-b)*y:QS))).
 Eval compute in (IntegralQ test2):Q.
-Definition L1Norm(f:StepF Q):Q:=(IntegralQ (Map Qabs f)).
+Definition L1Norm(f:StepF QS):Q:=(IntegralQ (Map (Qabs:QS->QS) f)).
 Eval compute in (L1Norm test2):Q.
-Definition Distance(f g:StepF Q):Q:=(L1Norm (Map2 Qminus f g)).
+Definition Distance(f g:StepF QS):Q:=(L1Norm (Map2 Qminus f g)).
 Eval compute in (Distance test1 test2):Q.
 Eval compute in (Distance test2 test1):Q.
-Definition L1Ball (e:Qpos)(f g:StepF Q):Prop:=(Distance f g)<=e.
+Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(Distance f g)<=e.
 Eval compute in (L1Ball (1#1)%Qpos test2 test1).
-Definition Mesh (X:Type):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
+Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
 Eval compute in (Mesh test2).
 
+Open Local Scope sfstscope.
+
 Section Equivalence1.
-Variable X:Type.
-Variable Xeq:X->X->Prop.
-Hypothesis Xst:(Setoid_Theory X Xeq).
-Variable Y:Type.
-Variable Yeq:Y->Y->Prop.
-Hypothesis Yst:(Setoid_Theory Y Yeq).
+Variable X Y:Setoid.
 
-Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
-
-Add Setoid X Xeq Xst as Xth.
-
-Hint Unfold StepFfoldProp StepFfold StepF_eq.
-
-Definition App(X Y:Type):(StepF (X->Y))->(StepF X)->(StepF Y):=
-fun f  s=> (Map2 (fun f => f) f s).
-
-Axiom App_mor2:forall f x y, (StepF_eq Yeq x y)-> 
- (StepF_eq Yeq (App f x) (App f y)).
-
-Axiom AppMapMap:
-   forall (f:Y->(Y->Y)) (g:Y->(Y->Y)) x y z, 
- (StepF_eq Yeq (App (Map f y) (App (Map g x) z)) 
-        (App (Map (fun x y=> (f x) ((g x) y)) x) z)).
-
-Lemma Appglue: forall o (f:StepF (X->Y)) g s t,
-(StepF_eq Yeq (App (glue o f g) (glue o s t))
-                                            (glue o (App f s) (App g t))).
-unfold App. intros. rewrite Map2GlueGlue. apply (StepF_eq_refl Yst).
-Qed.
-
-Variable Z:Type.
-Variable Zeq:Z->Z->Prop.
-Hypothesis Zst:(Setoid_Theory Z Zeq).
-
-(* Seems awkward to prove. 
-intros. revert H1.
-induction x.
-simpl. intro H1.
-*)
-
-
-Axiom Map2switch: forall f s t,
- (Map2 f s t ===
-Map2 (fun y x : Q => (f x y)) t s).
+Axiom ApMapMap:
+   forall (f g:Y-->Y-->Y) x y z, 
+ (StepF_eq (Ap (Map f y) (Ap (Map g x) z)) 
+        (Ap (Map ((fun x y=> (f x) ((g x) y)):Y-->Y-->Y) x) z)).
 
 End Equivalence1.
 
-Section Equivalence3.
-Variable X:Type.
-Variable Xeq:X->X->Prop.
-Hypothesis Xst:(Setoid_Theory X Xeq).
-Variable Y:Type.
-Variable Yeq:Y->Y->Prop.
-Hypothesis Yst:(Setoid_Theory Y Yeq).
-Variable Z:Type.
-Variable Zeq:Z->Z->Prop.
-Hypothesis Zst:(Setoid_Theory Z Zeq).
-
-Hint Resolve (Seq_trans X Xeq Xst) (Seq_sym X Xeq Xst) (Seq_refl X Xeq Xst) Xst:starith.
-Notation "x === y" := (StepF_eq Xeq x y) (at level 60).
-Add Setoid (StepF Z) (StepF_eq Zeq) (StepF_Sth  Zst) as StepF_thZ.
-Add Setoid (StepF Y) (StepF_eq Yeq) (StepF_Sth Yst) as StepF_thY.
-
-Lemma Map2Map: forall f:X->Y->Z, forall g,
-    (forall x x' y y', (Xeq x x') -> (Yeq y y'-> (Zeq (f x y) (g x' y'))))
-  -> forall s t, (StepF_eq Zeq (Map2 f s t) 
-   (App (Map (fun x =>(g x)) s) t)).
-Admitted.
-(*
-intros f g fisg. induction s; simpl.
- intro t. unfold App. simpl. apply (map_resp_StepF_eq Yst Zst); auto with *.
-intro t. 
- transitivity (App (glue o (Map (fun x : X => g x) s1) (Map (fun x : X => g x) s2)) ((glue o (fst (Split t o)) (snd (Split t o))))).
- destruct (Split t o) as [L R]. simpl. 
-  elim (Q_dec o o) using Qdec_eq_ind; simpl; auto with *.
- intro H. clear H. rewrite (Appglue Zst o (Map (fun x : X => g x) s1) (Map (fun x : X => g x) s2)).
- eapply (glue_resp_StepF_eq Zst Zst Zst);auto with *.
-unfold App. eapply Map2_morphism.
-3: eapply (glueSplit Yst Yst Yst).
-2:eapply StepF_eq_refl.
-
- setoid_replace t with ((glue o (fst (Split t o)) (snd (Split t o)))).
-
-
-auto with *.
-
-rewrite <-IHs1.
-
-rewrite (Map2_morphism Xeq Yeq t).
-rewrite <- (glueSplit_eq Yst t). 
-*)
-
-End Equivalence3.
-
 Section L1metric.
 
-Definition StepQ := (StepF Q).
-Definition StepQ_eq : StepQ -> StepQ -> Prop := (StepF_eq Qeq).
+Definition StepQ := (StepF QS).
 
-Notation "x === y" := (StepQ_eq x y) (at level 60).
 Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
 intros e a b.
 unfold L1Ball.
@@ -141,32 +58,14 @@ left. exact Hdc.
 Defined.
 Require Import QArith_base.
 
-Add Setoid (StepQ) (StepQ_eq) (StepF_Sth Q_Setoid) as StepQ_Setoid.
-
-(*
-Lemma glueSplit1:forall o x0 x1 y, (glue o x0 x1)===y ->
- (x0 === fst (Split y o)) /\ (x1===snd (Split y o)).
-intros.
-assert ((glue o x0 x1)===(glue o (fst (Split y o)) (snd (Split y o)))).
-transitivity y; auto with *. 
-clear -y.
-Focus 2. split. apply (glue_eq1 o x0 x1 (fst (Split y o)) (snd (Split y o)) H0).
- apply (glue_eq2 o x0 x1 (fst (Split y o)) (snd (Split y o)) H0).
-*)
-(*
-Notation "'SplitL' s o":= (fst (Split s o)) (at level 100, no associativity).
-Notation "'SplitR' s o":= (snd (Split s o)) (at level 100, no associativity).*)
-
-Hint Resolve Q_Setoid.
-
 Lemma IntegralSplit : forall (o:OpenUnit) x, 
  IntegralQ x ==
  o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o).
 Proof.
 intros o x.
 revert o.
-induction x.
-unfold IntegralQ. simpl. intros. ring.
+induction x using StepF_ind.
+unfold IntegralQ. simpl. intros. simpl in x; ring.
 intros p.
 apply SplitLR_glue_ind; intros H.
   simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ.
@@ -182,19 +81,19 @@ Qed.
 Hint Resolve IntegralSplit.
 
 Add Morphism IntegralQ 
-  with signature  StepQ_eq ==>  Qeq
+  with signature  StepF_eq ==>  Qeq
  as IntegralQ_mor.
 unfold IntegralQ.
-induction x1.
-intros x2 H. simpl. induction x2.
+induction x1 using StepF_ind.
+intros x2 H. simpl. induction x2 using StepF_ind.
   simpl.  auto with *.
  simpl.
- destruct H as [H0 H1] using (eq_glue_ind Q_Setoid).
+ destruct H as [H0 H1] using (eq_glue_ind x2_1).
  rewrite <- IHx2_1; auto with *.
  rewrite <- IHx2_2; auto with *.
- ring.
+ simpl in x; ring.
 intros x2 H.
-destruct H as [H0 H1] using (glue_eq_ind Qeq).
+destruct H as [H0 H1] using (glue_eq_ind x1_1).
 simpl.
 rewrite (IHx1_1 _ H0).
 rewrite (IHx1_2 _ H1).
@@ -209,20 +108,36 @@ Need to define equality on functions for this.
 
 *)
 
-Lemma Integral_linear:forall s t,
-  (IntegralQ s)+(IntegralQ t)==(IntegralQ (Map2 Qplus s t)).
+Lemma Integral_glue : forall o s t, IntegralQ (glue o s t) = o*(IntegralQ s) + (1-o)*(IntegralQ t).
 Proof.
-induction s.
- induction t.
+reflexivity.
+Qed.
+
+Lemma Integral_linear:forall s t,
+  (IntegralQ s)+(IntegralQ t)==(IntegralQ ((Qplus:QS-->QS-->QS) ^@> s <@> t)).
+Proof.
+induction s using StepF_ind.
+ induction t using StepF_ind.
   reflexivity.
- unfold IntegralQ; simpl; fold IntegralQ.
+ rewrite Integral_glue.
+ change ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> glue o t1 t2)
+  with ((Qplus x:QS-->QS) ^@> glue o t1 t2).
+ rewrite MapGlue.
+ change ((Qplus x:QS-->QS) ^@> t1)
+  with ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t1).
+ change ((Qplus x:QS-->QS) ^@> t2)
+  with ((Qplus:QS-->QS-->QS) ^@> leaf (X:=QS) x <@> t2).
+ rewrite Integral_glue.
  rewrite <- IHt1.
  rewrite <- IHt2.
- change (IntegralQ (leaf x)) with x.
  ring.
 intros t.
-rewrite Map2Glue.
-unfold IntegralQ; simpl; fold IntegralQ.
+rewrite MapGlue.
+rewrite ApGlue.
+do 2 rewrite Integral_glue.
+(*Why can I no longer rewrite <- IHs1 ?*)
+set (A:=(Qplus:QS-->QS-->QS) ^@> s1) in *.
+set (B:=(Qplus:QS-->QS-->QS) ^@> s2) in *.
 rewrite <- IHs1.
 rewrite <- IHs2.
 rewrite (IntegralSplit o t).
@@ -234,12 +149,13 @@ Require Import COrdAbs.
 Require Import Qordfield.
 Require Import CornTac.
 Require Import Qauto.
-Definition StepF_le:=(fun x y=>(StepFfoldProp (Map2 Qle x y))).
+Definition StepF_le x y := (StepFfoldProp ((Qle:QS-->QS-->iffSetoid) ^@> x <@> y)).
 
 Lemma StepF_le_refl:forall x, (StepF_le x x).
-unfold StepF_le. induction x.
- simpl. auto with *.
-rewrite Map2GlueGlue. auto with *.
+unfold StepF_le. induction x using StepF_ind.
+ change (Qle x x); auto with *.
+rewrite MapGlue.
+rewrite ApGlueGlue. split; auto with *.
 Qed.
 
 Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
@@ -248,40 +164,41 @@ Qed.
 
 Lemma StepFfoldPropMap: (forall b x, 
       (StepFfoldProp x /\ b)
-   <->(StepFfoldProp (Map (fun a  => a /\ b ) x))).
-induction x.
+   <->(StepFfoldProp (Map ((fun a  => a /\ b ):iffSetoid-->iffSetoid) x))).
+induction x using StepF_ind.
  split.
   intro H. simpl. auto with *.
  simpl. auto with *.
-simpl. do 2 rewrite StepFfoldPropglue_rew. intuition.
+rewrite MapGlue.
+do 2 rewrite StepFfoldPropglue_rew. intuition.
 Qed. 
 
 Lemma StepFfoldPropMap': (forall a x, 
       (a /\ StepFfoldProp x)
-   <->(StepFfoldProp (Map (fun b  => a /\ b ) x))).
-induction x.
+   <->(StepFfoldProp (Map ((fun b  => a /\ b):iffSetoid-->iffSetoid) x))).
+induction x using StepF_ind.
  split.
   intro H. simpl. auto with *.
  simpl. auto with *.
-simpl. do 2 rewrite StepFfoldPropglue_rew. intuition.
+rewrite MapGlue. do 2 rewrite StepFfoldPropglue_rew. intuition.
 Qed.
 
 Lemma StepFfoldPropMap2: (forall x y, 
       (StepFfoldProp x /\ StepFfoldProp y)
-   <->(StepFfoldProp (Map2 (fun a b => a /\ b ) x y))).
-induction x. simpl. apply StepFfoldPropMap'. 
+   <->(StepFfoldProp (((fun a b => a /\ b) : iffSetoid-->iffSetoid-->iffSetoid ) ^@> x <@> y))).
+unfold Map2.
+induction x using StepF_ind. rapply StepFfoldPropMap'. 
 intro y. set (H0:=IHx1 (SplitL y o)). set (H1:=IHx2 (SplitR y o)).
+rewrite MapGlue.
 rewrite <- (StepFfoldPropglue y o).
  do 2 rewrite StepFfoldPropglue_rew. revert H0 H1. 
-unfold SplitL, SplitR. simpl. destruct (Split y o) as [L R]. simpl.
-do 2 intro. rewrite StepFfoldPropglue_rew. intuition.
+do 2 intro. rewrite ApGlue. rewrite StepFfoldPropglue_rew. intuition.
 Qed.
 
-Lemma StepF_le_pos:forall x y, (StepF_le x y) <-> (StepFfoldProp (Map (fun q=>(0>=q)) (Map2 Qminus x y))).
+Lemma StepF_le_pos:forall x y, (StepF_le x y) <-> (StepFfoldProp (Map ((fun (q:QS)=>(0>=q)):QS-->iffSetoid) ((Qminus:QS-->QS-->QS) ^@> x <@> y))).
 intros. unfold StepF_le. apply StepFfoldProp_morphism.
-rewrite MapMap2.
-apply (Map2_morphism Q_Setoid PropST Q_Setoid); auto with *.
-clear x y.
+apply (Map_morphism); auto with *.
+clear A x y.
 intros w w' x x' H HH. rewrite H. rewrite HH. clear H HH. auto with *.
 split. intro. rewrite Qle_minus_iff in *.
 replace RHS with (x0+-w) by ring. assumption.
@@ -290,16 +207,14 @@ replace RHS with (0+ - (w -x0)) by ring. assumption.
 Qed.
 
 Lemma StepF_le_ge:forall x y, (StepF_le x y) <-> (StepFfoldProp (Map2 Qge y x)).
-intros. unfold StepF_le. 
+intros. unfold StepF_le, Map2. 
 apply StepFfoldProp_morphism.
 apply (@Map2switch Prop iff Qle).
 Qed.
 
-Definition Map3(X Y Z W:Type):=fun (f:X->Y->Z->W) (x:StepF X) (y:StepF Y) (z:StepF Z) =>
-   (App (Map2 (fun x y=>(f x y)) x y) z).
+Definition Map3 X Y Z W (f:X -> Y -> Z -> W) a b c := f ^@> a <@> b <@> c.
 
-Definition Map4(X Y Z W V:Type):=fun (f:X->Y->Z->W->V) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)=>
-   (App (Map3 (fun x y z=>(f x y z)) x y z) w).
+Definition Map4 X Y Z W V (f:X -> Y -> Z -> W -> V) a b c d := f ^@> a <@> b <@> c <@> d.
 
 Definition Map5(X Y Z W V U:Type):=fun (f:X->Y->Z->W->V->U) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)(v:StepF V)=>
    (App (Map4 (fun x y z w=>(f x y z w)) x y z w) v).
