@@ -642,6 +642,40 @@ rewrite SplitRAp.
 apply IHf2; try rewrite Hs; auto with *.
 Qed.
 
+Lemma Ap_homomorphism (X Y:Setoid) : forall (f:X-->Y) (a:X),
+ (leaf f <@> leaf a) = (leaf (f a)).
+Proof.
+reflexivity.
+Qed.
+
+Lemma Map_homomorphism (X Y:Setoid) : forall (f:X-->Y) (a:X),
+ (f ^@> leaf a) == (leaf (f a)).
+Proof.
+reflexivity.
+Qed.
+
+Definition id (X:Setoid) : X-->X.
+intros X.
+exists (fun x => x).
+abstract (auto).
+Defined.
+
+Implicit Arguments id [X].
+
+Lemma Map_identity X : forall (a:StepF X),
+ (@id X) ^@> a == a.
+Proof.
+intros X a.
+rewrite <- Map_identity.
+reflexivity.
+Qed.
+
+Lemma Ap_identity X : forall (a:StepF X),
+ (leaf (@id X)) <@> a == a.
+Proof.
+exact Map_identity.
+Qed.
+
 Definition compose0 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) -> X --> Z.
 intros X Y Z f0 f1.
 exists (compose f0 f1).
@@ -896,6 +930,24 @@ intros x.
 rewrite MapGlue.
 do 3 rewrite ApGlue.
 apply glue_resp_StepF_eq; auto.
+Qed.
+
+Lemma Ap_Map (X Y:Setoid) : forall (f:X --> Y) (a:StepF X),
+(leaf f) <@> a == f ^@> a.
+Proof.
+reflexivity.
+Qed.
+
+Lemma Ap_interchange (X Y:Setoid) : forall (f:StepF (X-->Y)) (a:X),
+ (f <@> leaf a) == (leaf (flip id a)) <@> f.
+Proof.
+intros X Y f a.
+do 2 rewrite <- Ap_homomorphism.
+repeat rewrite Ap_Map.
+rewrite Ap_commutative.
+rewrite Ap_Map.
+rewrite Map_identity.
+reflexivity.
 Qed.
 
 Hint Rewrite ApGlueGlue SplitRAp SplitLAp Map_composition

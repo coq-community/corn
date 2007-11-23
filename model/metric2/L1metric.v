@@ -9,10 +9,17 @@ Require Import CornTac.
 Set Implicit Arguments.
 Hint Rewrite ApGlueGlue SplitRAp SplitLAp Map_composition
 Ap_composition Ap_discardable Ap_commutative Ap_copyable
-ApGlue MapGlue SplitLMap SplitRMap Map_composition SplitLGlue SplitRGlue: StepF_rew.
+ApGlue MapGlue SplitLMap SplitRMap Map_composition SplitLGlue 
+SplitRGlue Ap_Map Map_homomorphism: StepF_rew.
 Open Local Scope sfscope.
 
-Ltac aw := autorewrite with  StepF_rew.
+Ltac arw := progress autorewrite with  StepF_rew.
+
+Add Morphism StepFfoldProp
+  with signature StepF_eq ==>  iff
+ as StepFfoldProp_mor.
+exact StepFfoldProp_morphism.
+Qed.
 
 Lemma QS:(Setoid).
 exists Q Qeq.
@@ -167,12 +174,12 @@ Proof.
 induction s using StepF_ind.
  induction t using StepF_ind.
   reflexivity.
- aw.
+ arw.
  rewrite <- IHt1.
  rewrite <- IHt2.
  ring.
 intros t.
-aw.
+arw.
 rewrite <- IHs1.
 rewrite <- IHs2.
 rewrite (IntegralSplit o t).
@@ -230,7 +237,7 @@ pose (forall x, join QleS x).
 
  induction x using StepF_ind.
  change (Qle x x); auto with *.
-aw. split;auto with *.
+arw. split;auto with *.
 Qed.
 
 Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
@@ -249,7 +256,7 @@ Lemma StepFfoldPropMap: (forall b x,
    <->(StepFfoldProp (Map (conjr b:iffSetoid-->iffSetoid) x))).
 induction x using StepF_ind.
  split;auto with *.
-rewrite MapGlue. aw. intuition.
+rewrite MapGlue. arw. intuition.
 Qed. 
 
 Definition conjl:iffSetoid -> iffSetoid-->iffSetoid.
@@ -262,7 +269,7 @@ Lemma StepFfoldPropMap': (forall a x,
    <->(StepFfoldProp (Map (conjl a) x))).
 induction x using StepF_ind.
  split; auto with *.
-aw. intuition.
+arw. intuition.
 Qed.
 
 (*Definition conj:(iffSetoid -> iffSetoid)-->iffSetoid.
@@ -370,9 +377,9 @@ induction x using StepF_ind. induction y  using StepF_ind.
    auto with *.
   unfold StepF_imp. unfold StepFfoldProp;simpl;intuition.
 intros y.
-unfold StepF_imp, Map2. aw.
+unfold StepF_imp, Map2. arw.
 intros.
-rewrite <- (StepFfoldPropglue y o). aw. intuition. 
+rewrite <- (StepFfoldPropglue y o). arw. intuition. 
 Qed.
 
 (* Should be moved*)
@@ -387,17 +394,62 @@ Lemma MapMap(X Y Z:Setoid)(f:Y-->Z)(g:X-->Y):forall a,
 intros.
 induction a using StepF_ind.
  auto with *.
-aw.
+arw.
 rewrite IHa1. rewrite IHa2.
 auto with *.
 Qed.
 
-(* Something like this*)
-Lemma ApMapApMap(X Y Z W:Setoid)(f:Y-->W-->Z)(g:X-->W):
-forall x y,
-(StepF_eq 
- ((f^@>x)<@>(g^@>y)) 
- ((comp f g)^@>x<@>y)).
+Lemma flipcompflip:(forall X Y Z W (g:X-->Y-->Z-->W)
+  (x:StepF X)(y:StepF Y)(z:StepF Z) , 
+  (StepF_eq
+  (g^@>x<@>y<@>z) 
+  ((flip (compose flip g))^@> z<@>x<@>y))).
+do 5 intro. induction x using StepF_ind. 
+ induction y using StepF_ind.
+  induction z using StepF_ind.
+   auto with *.
+  arw. apply glue_wd;auto with *;try apply ou_eq_refl.
+ intro z. arw. rewrite IHy1. rewrite IHy2.
+ set (f:=(flip (X:=X) (Y:=Z) (Z:=Y --> W)
+        (compose (X:=X) (Y:=Y --> Z --> W) (Z:=Z --> Y --> W)
+           (flip (X:=Y) (Y:=Z) (Z:=W)) g))).
+rewrite <- ApGlueGlue. apply Ap_wd.
+rewrite <- ApGlueGlue.
+assert (H:StepF_eq (leaf x) (glue o (leaf (X:=X) x) (leaf (X:=X) x))).
+unfold StepF_eq. arw. unfold StepFfoldProp. simpl. split;reflexivity.
+rewrite <-H. apply Ap_wd. rewrite <- MapGlue. apply Map_wd. 
+(*ext_Eq_refl*)
+     unfold extEq;intros. apply Seq_refl. apply st_isSetoid.
+  apply glueSplit. (* should be in Hints*)
+ auto with *.
+auto with *.
+intros. arw. rewrite IHx1. rewrite IHx2.
+clear.
+ set (f:=(flip (X:=X) (Y:=Z) (Z:=Y --> W)
+        (compose (X:=X) (Y:=Y --> Z --> W) (Z:=Z --> Y --> W)
+           (flip (X:=Y) (Y:=Z) (Z:=W)) g))).
+rewrite <- ApGlueGlue. apply Ap_wd.
+rewrite <- ApGlueGlue. apply Ap_wd.
+rewrite <- MapGlue. apply Map_wd.
+     unfold extEq;intros. apply Seq_refl. apply st_isSetoid.
+  apply glueSplit.
+ auto with *.
+apply glueSplit.
+Qed.
+
+Lemma MapMap2:forall X Y Z W U (f:U-->W-->X) (g:Y-->Z-->U)
+  (y:StepF Y)(z:StepF Z), 
+StepF_eq (f ^@> (g ^@> y <@> z)) 
+((compose (compose f) g) ^@> y <@> z).
+induction y using StepF_ind.
+  intros. arw.
+  induction z using StepF_ind.
+  arw.
+   apply leaf_wd. simpl. unfold extEq. unfold StepFunction.compose. intros; auto with *.
+  apply Seq_refl. apply st_isSetoid.
+  arw. apply glue_wd;auto with *. apply ou_eq_refl. (*should be in hints*)
+ intros z. arw. apply glue_wd;auto with *.  apply ou_eq_refl.
+Qed.
 
 Lemma StepF_le_trans:forall x y z, 
  (StepF_le x y)-> (StepF_le y z) ->(StepF_le x z).
@@ -405,14 +457,35 @@ intros x y z. unfold StepF_le.
 intros H.
 apply StepF_imp_imp.
  unfold StepF_imp.
-Unset Printing Notations.
-rewrite MapMap. 
-(* Do we need combinators also for setoid functions?*)
-change (StepFfoldProp (imp ^@> (QleS ^@> y <@> z) <@> (QleS ^@> x <@> z))).
- revert H. unfold StepF_imp. apply StepF_imp_imp.
-rewrite MapMap.
-unfold StepF_imp.
-
+rewrite (MapMap2 imp QleS y z).
+rewrite  flipcompflip.
+set (g:=(flip (X:=QS) (Y:=iffSetoid) (Z:=QS --> iffSetoid)
+     (compose (X:=QS) (Y:=QS --> iffSetoid --> iffSetoid)
+        (Z:=iffSetoid --> QS --> iffSetoid)
+        (flip (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid))
+        (compose (X:=QS) (Y:=QS --> iffSetoid)
+           (Z:=QS --> iffSetoid --> iffSetoid)
+           (compose (X:=QS) (Y:=iffSetoid) 
+   (Z:=iffSetoid --> iffSetoid) imp) QleS)))).
+rewrite MapMap2.
+set (h:=(
+(compose (X:=QS) (Y:=QS --> iffSetoid) (Z:=QS --> QS --> QS --> iffSetoid)
+     (compose (X:=QS) (Y:=iffSetoid) (Z:=QS --> QS --> iffSetoid) g) QleS))).
+revert H.
+apply StepF_imp_imp.
+ unfold StepF_imp.
+rewrite MapMap2.
+rewrite  flipcompflip.
+set (k:=(flip (X:=QS) (Y:=iffSetoid) (Z:=QS --> iffSetoid)
+     (compose (X:=QS) (Y:=QS --> iffSetoid --> iffSetoid)
+        (Z:=iffSetoid --> QS --> iffSetoid)
+        (flip (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid))
+        (compose (X:=QS) (Y:=QS --> iffSetoid)
+           (Z:=QS --> iffSetoid --> iffSetoid)
+           (compose (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid --> iffSetoid) imp)
+           QleS)))).
+assert (StepFfoldProp ((compose (compose (compose (compose k)  h)))^@> x <@> z <@> y <@> z) <@> x <@> y).
+rewrite MapMap2.
 Admitted.
 
 Lemma L1ball_refl : forall e x, (L1Ball e x x).
