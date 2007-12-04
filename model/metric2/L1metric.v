@@ -39,7 +39,7 @@ simpl; intros x1 x2 Hx;
 rewrite Hx;
 reflexivity).
 Defined.
-Definition L1Norm(f:StepF QS):Q:=(IntegralQ (Map (QabsS) f)).
+Definition L1Norm(f:StepF QS):Q:=(IntegralQ (QabsS ^@> f)).
 Eval compute in (L1Norm test2):Q.
 Definition Qminus0 : QS -> QS --> QS.
 intros q.
@@ -344,19 +344,61 @@ Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
 intros e x.
 unfold L1Ball, Distance.
-assert (StepF_eq (QminusS ^@> x <@> x) (leaf (0:QS))).
- induction x using StepF_ind.
-  change (x - x==0).
-  ring.
- aw. 
- rapply glue_StepF_eq; auto with *.
 unfold L1Norm.
-rewrite H. 
-compute. 
-intro C. inversion C.
+setoid_replace (QabsS ^@> (QminusS ^@> x <@> x)) with (leaf (0:QS)) using relation StepF_eq.
+ unfold IntegralQ.
+ simpl.
+ auto with *.
+symmetry.
+unfold StepF_eq.
+arw.
+set (g:=(st_eqS QS 0)).
+set (f:=(compose g (compose QabsS (join QminusS)))).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+change (0 == Qabs (a - a)).
+setoid_replace (a - a) with 0 using relation Qeq by ring.
+reflexivity.
 Qed.
 
+Lemma L1ball_sym : forall e x y, (L1Ball e x y) -> (L1Ball e y x).
+Proof.
+intros e x y.
+unfold L1Ball, Distance.
+unfold L1Norm.
+setoid_replace (QabsS ^@> (QminusS ^@> x <@> y)) with (QabsS ^@> (QminusS ^@> y <@> x)) using relation StepF_eq.
+ tauto.
+unfold StepF_eq.
+set (g:=(st_eqS QS)).
+set (f:=(ap
+(compose ap (compose (compose (compose g QabsS)) QminusS))
+(compose (compose QabsS) (flip QminusS)))).
+cut (StepFfoldProp (f ^@> x <@> y)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change (Qabs (a - b) == Qabs (b - a)).
+rewrite <- Qabs_opp.
+apply Qabs_wd.
+ring.
+Qed.
 
+Lemma L1ball_trans : forall e d x y z, (L1Ball e x y) -> (L1Ball d y z) -> (L1Ball (e+d) x z).
+Proof.
+intros e d x y z.
+unfold L1Ball, Distance.
+unfold L1Norm.
+intros He Hd.
+autorewrite with QposElim.
+apply Qle_trans with (IntegralQ (QabsS ^@> (QminusS ^@> x <@> y)) + IntegralQ (QabsS ^@> (QminusS ^@> y <@> z)));
+ [|rsapply plus_resp_leEq_both; assumption].
+Qed.
 
 Lemma L1_is_MetricSpace : 
  (is_MetricSpace (@StepF_eq QS) L1Ball).
