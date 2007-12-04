@@ -10,9 +10,7 @@ Set Implicit Arguments.
 
 Open Local Scope sfscope.
 
-Ltac arw := progress 
-((repeat rewrite <- Ap_Map, <- Map_homomorphism);
- autorewrite with  StepF_rew).
+Ltac arw := autorewrite with StepF_rew.
 
 Add Morphism StepFfoldProp
   with signature StepF_eq ==>  iff
@@ -59,10 +57,10 @@ rewrite Hx;
 reflexivity).
 Defined.
 Definition Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
-Eval compute in (Distance test1 test2):Q.
-Eval compute in (Distance test2 test1):Q.
+Eval lazy beta zeta delta iota in (Distance test1 test2):Q.
+Eval lazy beta zeta delta iota in (Distance test2 test1):Q.
 Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(Distance f g)<=e.
-Eval compute in (L1Ball (1#1)%Qpos test2 test1).
+Eval lazy beta zeta delta iota in (L1Ball (1#1)%Qpos test2 test1).
 Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
 Eval compute in (Mesh test2).
 
@@ -127,14 +125,6 @@ rewrite (IHx1_2 _ H1).
 auto with *.
 Qed.
 
-(* 
-Add Morphism Map
-  with signature   (StepF_eq Qeq) ==>  Qeq
- as Map_mor.
-Need to define equality on functions for this.
-
-*)
-
 Lemma Integral_glue : forall o s t, IntegralQ (glue o s t) = o*(IntegralQ s) + (1-o)*(IntegralQ t).
 Proof.
 reflexivity.
@@ -165,10 +155,7 @@ Proof.
 induction s using StepF_ind.
  induction t using StepF_ind.
   reflexivity.
- rewrite Map_homomorphism in *.
- rewrite Ap_Map in *.
- rewrite MapGlue.
- do 2 rewrite Integral_glue.
+ arw.
  rewrite <- IHt1.
  rewrite <- IHt2.
  ring.
@@ -254,7 +241,6 @@ Lemma StepFfoldPropForall_Map :
  forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
 Proof.
 intros X f x H.
-rewrite <- Ap_Map.
 apply StepFfoldPropForall_Ap.
 assumption.
 Qed.
@@ -265,9 +251,8 @@ Proof.
 intros X Y f x y H.
 apply StepFfoldPropForall_Ap.
 intros b.
-rewrite <- Ap_Map.
-rewrite <- (Ap_commutative (leaf f) (leaf b)).
-do 2 rewrite Ap_homomorphism.
+rewrite <- (Map_commutative (leaf f) (leaf b)).
+arw.
 rapply StepFfoldPropForall_Map.
 intros a.
 rapply H.
@@ -279,12 +264,11 @@ Proof.
 intros X Y Z f x y z H.
 apply StepFfoldPropForall_Ap.
 intros c.
-rewrite <- Ap_Map.
-rewrite <- (Ap_commutative ((leaf f) <@> x) (leaf c)).
-rewrite <- Ap_composition.
-do 2 rewrite Ap_homomorphism.
-rewrite <- (Ap_commutative (leaf (compose flip f)) (leaf c)).
-do 2 rewrite Ap_homomorphism.
+rewrite <- (Map_commutative ((leaf f) <@> x) (leaf c)).
+rewrite <- Map_composition.
+arw.
+rewrite <- (Map_commutative (leaf (compose flip f)) (leaf c)).
+arw.
 rapply StepFfoldPropForall_Map2.
 intros a b.
 rapply H.
@@ -294,7 +278,7 @@ Lemma StepF_le_refl:forall x, (StepF_le x x).
 intros x.
 unfold StepF_le.
 cut (StepFfoldProp (join QleS ^@> x)).
- arw.
+ evalStepF.
  tauto.
 apply StepFfoldPropForall_Map.
 intros.
@@ -307,116 +291,6 @@ auto with *.
 Qed.
 
 Hint Rewrite StepFfoldPropglue_rew:StepF_rew.
-
-Definition conjr:iffSetoid -> iffSetoid-->iffSetoid.
-intro b. apply (Build_Morphism iffSetoid iffSetoid (fun a  => a /\ b )).
-abstract (simpl; intuition).
-Defined.
-
-Lemma StepFfoldPropMap: (forall b x, 
-      (StepFfoldProp x /\ b)
-   <->(StepFfoldProp (Map (conjr b:iffSetoid-->iffSetoid) x))).
-induction x using StepF_ind.
- split;auto with *.
-rewrite MapGlue. arw. intuition.
-Qed. 
-
-Definition conjl:iffSetoid -> iffSetoid-->iffSetoid.
-intro b. apply (Build_Morphism iffSetoid iffSetoid (fun a  => b/\a )).
-abstract (simpl; intuition).
-Defined.
-
-Lemma StepFfoldPropMap': (forall a x, 
-      (a /\ StepFfoldProp x)
-   <->(StepFfoldProp (Map (conjl a) x))).
-induction x using StepF_ind.
- split; auto with *.
-arw. intuition.
-Qed.
-
-(*Definition conj:(iffSetoid -> iffSetoid)-->iffSetoid.
-intro b. apply (Build_Morphism iffSetoid iffSetoid (fun a  => b/\a )).
-abstract (simpl; intuition).
-Defined.*)
-
-
-(*Should be moved:
-Record Morphism (X Y:Setoid) :=
-{evalMorphism :> X -> Y
-;Morphism_prf : forall x1 x2, (st_eq X x1 x2) -> (st_eq Y (evalMorphism x1) (evalMorphism x2))
-}.
-
-Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq Y (f x) (g x).
-Definition extSetoid (X Y:Setoid) : Setoid.
-intros X Y.
-exists (Morphism X Y) (extEq Y).
-split.
-  intros x y; reflexivity.
- intros x y H a; symmetry; auto.
-intros x y z Hxy Hyz a; transitivity (y a); auto.
-Defined.
-
-Notation "x --> y" := (extSetoid x y) (at level 70, right associativity) : sfstscope.
-*)
-
-(*Lemma StepFfoldPropMap2: (forall x y, 
-      (StepFfoldProp x /\ StepFfoldProp y)
-   <->(StepFfoldProp (conjl^@> x))). <@> y))).
-unfold Map2.
-induction x using StepF_ind. rapply StepFfoldPropMap'. 
-intro y. set (H0:=IHx1 (SplitL y o)). set (H1:=IHx2 (SplitR y o)).
-rewrite MapGlue.
-rewrite <- (StepFfoldPropglue y o).
- do 2 rewrite StepFfoldPropglue_rew. revert H0 H1. 
-do 2 intro. rewrite ApGlue. rewrite StepFfoldPropglue_rew. intuition.
-Qed.
-*)
-(*
-Lemma StepF_le_pos:forall x y, 
- (StepF_le x y) 
-  <-> (StepFfoldProp 
-  (Map ((fun (q:QS)=>(0>=q)):QS-->iffSetoid) 
-  ((Qminus:QS-->QS-->QS) ^@> x <@> y))).
-intros. unfold StepF_le. apply StepFfoldProp_morphism.
-apply Map_morphism; auto with *.
-clear A x y.
-intros w w' x x' H HH. rewrite H. rewrite HH. clear H HH. auto with *.
-split. intro. rewrite Qle_minus_iff in *.
-replace RHS with (x0+-w) by ring. assumption.
-intro H. rewrite Qle_minus_iff in *. 
-replace RHS with (0+ - (w -x0)) by ring. assumption.
-Qed.
-*)
-
-Lemma flipQleQge:(extEq (QS-->iffSetoid) (flip QgeS) QleS).
-intros x y. simpl. auto with *.
-Qed.
-(*
-Lemma StepF_le_ge:forall x y, 
- (StepF_le x y) <-> (StepFfoldProp (QgeS ^@> y <@> x)).
-(* How to formulate this using flip*)
-intros. unfold StepF_le.
-apply StepFfoldProp_morphism.
-transitivity (((flip (Map (Ap QgeS))) ^@> x) <@> y).
-apply Ap_wd;auto with *. apply Map_wd;auto with *. apply flipQleQge. 
-rewrite Ap_commutative.
-2:apply (@Map2switch Prop iff Qle).
-Qed.
-*)
-Definition Map3 X Y Z W (f:X --> Y --> Z --> W) a b c := f ^@> a <@> b <@> c.
-
-Definition Map4 X Y Z W V (f:X --> Y --> Z --> W --> V) a b c d := f ^@> a <@> b <@> c <@> d.
-(*
-Definition Map5(X Y Z W V U:Type):=fun (f:X->Y->Z->W->V->U) (x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W)(v:StepF V)=>
-   (App (Map4 (fun x y z w=>(f x y z w)) x y z w) v).
-
-Axiom Map4Map2Map2Map2:forall (X Y Z W V U UU:Type),
-forall  (f:X->Y->U)(g:Z->W->V)(h:U->V->UU) 
-(x:StepF X) (y:StepF Y) (z:StepF Z) (w:StepF W),
-(Map2 h (Map2 f x y) (Map2 g z w))=
-(Map4 (fun x y z w => (h (f x y) (g z w))) x y z w).
-
-*)
 
 Definition imp0:Prop->iffSetoid-->iffSetoid.
 intro A.
@@ -457,8 +331,7 @@ pose (f:= ap
 (compose (flip (compose (@ap _ _ _) (compose (compose imp) QleS))) QleS)).
 cut (StepFfoldProp (f ^@> x <@> y <@> z)).
  unfold f.
- arw.
- repeat rewrite Ap_Map.
+ evalStepF.
  tauto.
 apply StepFfoldPropForall_Map3.
 intros a b c Hab Hbc.
