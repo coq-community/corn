@@ -781,7 +781,7 @@ Defined.
 
 Implicit Arguments const [X Y].
 
-Lemma Ap_discardable X Y : forall (a:StepF X) (b:StepF Y),
+Lemma Map_discardable X Y : forall (a:StepF X) (b:StepF Y),
  ((@const _ _) ^@> a <@> b == a).
 Proof.
 induction a using StepF_ind.
@@ -795,6 +795,12 @@ rewrite ApGlue.
 rewrite IHa1.
 rewrite IHa2.
 reflexivity.
+Qed.
+
+Lemma Ap_discardable X Y : forall (a:StepF X) (b:StepF Y),
+ ((leaf (@const _ _)) <@> a <@> b == a).
+Proof.
+exact Map_discardable.
 Qed.
 
 Definition flip0 (X Y Z:Setoid) : (X-->Y-->Z)->Y->X-->Z.
@@ -829,7 +835,7 @@ Defined.
 
 Implicit Arguments flip [X Y Z].
 
-Lemma Ap_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
+Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
  ((@flip _ _ _) ^@> f <@> x <@> w) == (f <@> w <@> x).
 Proof.
 induction f using StepF_ind.
@@ -887,6 +893,12 @@ do 4 rewrite ApGlue.
 apply glue_resp_StepF_eq; auto.
 Qed.
 
+Lemma Ap_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
+ ((leaf (@flip _ _ _)) <@> f <@> x <@> w) == (f <@> w <@> x).
+Proof.
+exact Map_commutative.
+Qed.
+
 Definition join0 (X Y:Setoid) : (X-->X-->Y)->X-->Y.
 intros X Y f.
 exists (fun y => f y y).
@@ -910,7 +922,7 @@ Defined.
 
 Implicit Arguments join [X Y].
 
-Lemma Ap_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
+Lemma Map_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
  ((@join _ _) ^@> f <@> x) == (f <@> x <@> x).
 Proof.
 induction f using StepF_ind.
@@ -932,6 +944,12 @@ do 3 rewrite ApGlue.
 apply glue_resp_StepF_eq; auto.
 Qed.
 
+Lemma Ap_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
+ ((leaf (@join _ _)) <@> f <@> x) == (f <@> x <@> x).
+Proof.
+exact Map_copyable.
+Qed.
+
 Lemma Ap_Map (X Y:Setoid) : forall (f:X --> Y) (a:StepF X),
 (leaf f) <@> a == f ^@> a.
 Proof.
@@ -944,12 +962,39 @@ Proof.
 intros X Y f a.
 do 2 rewrite <- Ap_homomorphism.
 repeat rewrite Ap_Map.
-rewrite Ap_commutative.
+rewrite Map_commutative.
 rewrite Ap_Map.
 rewrite Map_identity.
 reflexivity.
 Qed.
 
-Hint Rewrite ApGlueGlue SplitRAp SplitLAp Map_composition
-Ap_composition Ap_discardable Ap_commutative Ap_copyable
-ApGlue MapGlue SplitLMap SplitRMap Map_composition: StepF_rew.
+Definition ap (X Y Z:Setoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
+:= compose (compose (compose (@join _ _)) (flip (@compose _ _ _) (flip (@compose _ _ _)))) (flip (@compose _ _ _)).
+
+Implicit Arguments ap [X Y Z].
+
+Hint Rewrite ApGlueGlue SplitRAp SplitLAp 
+Map_composition Ap_composition 
+Map_discardable Ap_discardable 
+Map_commutative Ap_commutative
+Map_copyable Ap_copyable
+ApGlue MapGlue SplitLMap SplitRMap Map_composition : StepF_rew.
+
+Lemma Map_ap X Y Z : forall (f:StepF (X --> Y --> Z)) (x:StepF (X --> Y)) (a:StepF X),
+ ((@ap _ _ _) ^@> f <@> x <@> a) == (f <@> a <@> (x <@> a)).
+Proof.
+intros X Y Z f x a.
+unfold ap.
+repeat rewrite <- Ap_Map, <- Map_homomorphism.
+autorewrite with StepF_rew.
+reflexivity.
+Qed.
+
+Lemma Ap_ap X Y Z : forall (f:StepF (X --> Y --> Z)) (x:StepF (X --> Y)) (a:StepF X),
+ ((leaf (@ap _ _ _)) <@> f <@> x <@> a) == (f <@> a <@> (x <@> a)).
+Proof.
+exact Map_ap.
+Qed.
+
+Hint Rewrite Map_ap Ap_ap : StepF_rew.
+

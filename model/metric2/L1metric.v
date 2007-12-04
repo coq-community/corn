@@ -7,13 +7,12 @@ Require Import Qabs.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Hint Rewrite ApGlueGlue SplitRAp SplitLAp Map_composition
-Ap_composition Ap_discardable Ap_commutative Ap_copyable
-ApGlue MapGlue SplitLMap SplitRMap Map_composition SplitLGlue 
-SplitRGlue Ap_Map Map_homomorphism: StepF_rew.
+
 Open Local Scope sfscope.
 
-Ltac arw := progress autorewrite with  StepF_rew.
+Ltac arw := progress 
+((repeat rewrite <- Ap_Map, <- Map_homomorphism);
+ autorewrite with  StepF_rew).
 
 Add Morphism StepFfoldProp
   with signature StepF_eq ==>  iff
@@ -160,21 +159,16 @@ rewrite Hx;
 reflexivity).
 Defined.
 
-Lemma Mapleaf(X Y Z:Setoid):forall (f:X-->Y-->Z) (x:X) (y:StepF Y),
- (StepF_eq (f^@> leaf x<@>y) ((f x)^@>y)).
-intros.
-unfold Ap. simpl. auto with *.
-Qed.
-
-Hint Rewrite Mapleaf:StepF_rew.
-
 Lemma Integral_linear:forall s t,
   (IntegralQ s)+(IntegralQ t)==(IntegralQ ((QplusS:QS-->QS-->QS) ^@> s <@> t)).
 Proof.
 induction s using StepF_ind.
  induction t using StepF_ind.
   reflexivity.
- arw.
+ rewrite Map_homomorphism in *.
+ rewrite Ap_Map in *.
+ rewrite MapGlue.
+ do 2 rewrite Integral_glue.
  rewrite <- IHt1.
  rewrite <- IHt2.
  ring.
@@ -228,16 +222,84 @@ Defined.
 
 Definition StepF_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
 
+Lemma StepFfoldPropForall_Ap : 
+ forall X (f:StepF (X --> iffSetoid)) (x:StepF X), (forall y, StepFfoldProp (f <@> leaf y)) -> StepFfoldProp (f <@> x).
+Proof.
+intros X f x H.
+revert f H.
+induction x using StepF_ind.
+ intros f H.
+ rapply H.
+intros f H.
+rewrite <- (glueSplit f o).
+rewrite ApGlueGlue.
+split.
+ apply IHx1.
+ intros y.
+ assert (H0:=H y).
+ rewrite <- (glueSplit f o) in H0.
+ rewrite ApGlue in H0.
+ destruct H0 as [H0 _].
+ assumption.
+apply IHx2.
+intros y.
+assert (H0:=H y).
+rewrite <- (glueSplit f o) in H0.
+rewrite ApGlue in H0.
+destruct H0 as [_ H0].
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map : 
+ forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
+Proof.
+intros X f x H.
+rewrite <- Ap_Map.
+apply StepFfoldPropForall_Ap.
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map2 : 
+ forall X Y (f:X --> Y --> iffSetoid) x y, (forall a b, f a b) -> StepFfoldProp (f ^@> x <@> y).
+Proof.
+intros X Y f x y H.
+apply StepFfoldPropForall_Ap.
+intros b.
+rewrite <- Ap_Map.
+rewrite <- (Ap_commutative (leaf f) (leaf b)).
+do 2 rewrite Ap_homomorphism.
+rapply StepFfoldPropForall_Map.
+intros a.
+rapply H.
+Qed.
+
+Lemma StepFfoldPropForall_Map3 : 
+ forall X Y Z (f:X --> Y --> Z --> iffSetoid) x y z, (forall a b c, f a b c) -> StepFfoldProp (f ^@> x <@> y <@> z).
+Proof.
+intros X Y Z f x y z H.
+apply StepFfoldPropForall_Ap.
+intros c.
+rewrite <- Ap_Map.
+rewrite <- (Ap_commutative ((leaf f) <@> x) (leaf c)).
+rewrite <- Ap_composition.
+do 2 rewrite Ap_homomorphism.
+rewrite <- (Ap_commutative (leaf (compose flip f)) (leaf c)).
+do 2 rewrite Ap_homomorphism.
+rapply StepFfoldPropForall_Map2.
+intros a b.
+rapply H.
+Qed.
+
 Lemma StepF_le_refl:forall x, (StepF_le x x).
+intros x.
 unfold StepF_le.
-pose (forall x, join QleS x).
-(*TODO using combinators*)
-
-
-
- induction x using StepF_ind.
- change (Qle x x); auto with *.
-arw. split;auto with *.
+cut (StepFfoldProp (join QleS ^@> x)).
+ arw.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros.
+simpl.
+auto with *.
 Qed.
 
 Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
@@ -382,111 +444,36 @@ intros.
 rewrite <- (StepFfoldPropglue y o). arw. intuition. 
 Qed.
 
-(* Should be moved*)
-Definition comp(X Y Z:Setoid)(f:Y-->Z)(g:X-->Y):X-->Z.
-intros.
-exists (fun x=> (f (g x))).
-abstract (intros x y H; do 2 apply Morphism_prf; exact H).
-Defined.
-
-Lemma MapMap(X Y Z:Setoid)(f:Y-->Z)(g:X-->Y):forall a,
-(StepF_eq (f^@>(g^@>a)) ((comp f g)^@>a)).
-intros.
-induction a using StepF_ind.
- auto with *.
-arw.
-rewrite IHa1. rewrite IHa2.
-auto with *.
-Qed.
-
-Lemma flipcompflip:(forall X Y Z W (g:X-->Y-->Z-->W)
-  (x:StepF X)(y:StepF Y)(z:StepF Z) , 
-  (StepF_eq
-  (g^@>x<@>y<@>z) 
-  ((flip (compose flip g))^@> z<@>x<@>y))).
-do 5 intro. induction x using StepF_ind. 
- induction y using StepF_ind.
-  induction z using StepF_ind.
-   auto with *.
-  arw. apply glue_wd;auto with *;try apply ou_eq_refl.
- intro z. arw. rewrite IHy1. rewrite IHy2.
- set (f:=(flip (X:=X) (Y:=Z) (Z:=Y --> W)
-        (compose (X:=X) (Y:=Y --> Z --> W) (Z:=Z --> Y --> W)
-           (flip (X:=Y) (Y:=Z) (Z:=W)) g))).
-rewrite <- ApGlueGlue. apply Ap_wd.
-rewrite <- ApGlueGlue.
-assert (H:StepF_eq (leaf x) (glue o (leaf (X:=X) x) (leaf (X:=X) x))).
-unfold StepF_eq. arw. unfold StepFfoldProp. simpl. split;reflexivity.
-rewrite <-H. apply Ap_wd. rewrite <- MapGlue. apply Map_wd. 
-(*ext_Eq_refl*)
-     unfold extEq;intros. apply Seq_refl. apply st_isSetoid.
-  apply glueSplit. (* should be in Hints*)
- auto with *.
-auto with *.
-intros. arw. rewrite IHx1. rewrite IHx2.
-clear.
- set (f:=(flip (X:=X) (Y:=Z) (Z:=Y --> W)
-        (compose (X:=X) (Y:=Y --> Z --> W) (Z:=Z --> Y --> W)
-           (flip (X:=Y) (Y:=Z) (Z:=W)) g))).
-rewrite <- ApGlueGlue. apply Ap_wd.
-rewrite <- ApGlueGlue. apply Ap_wd.
-rewrite <- MapGlue. apply Map_wd.
-     unfold extEq;intros. apply Seq_refl. apply st_isSetoid.
-  apply glueSplit.
- auto with *.
-apply glueSplit.
-Qed.
-
-Lemma MapMap2:forall X Y Z W U (f:U-->W-->X) (g:Y-->Z-->U)
-  (y:StepF Y)(z:StepF Z), 
-StepF_eq (f ^@> (g ^@> y <@> z)) 
-((compose (compose f) g) ^@> y <@> z).
-induction y using StepF_ind.
-  intros. arw.
-  induction z using StepF_ind.
-  arw.
-   apply leaf_wd. simpl. unfold extEq. unfold StepFunction.compose. intros; auto with *.
-  apply Seq_refl. apply st_isSetoid.
-  arw. apply glue_wd;auto with *. apply ou_eq_refl. (*should be in hints*)
- intros z. arw. apply glue_wd;auto with *.  apply ou_eq_refl.
-Qed.
-
 Lemma StepF_le_trans:forall x y z, 
  (StepF_le x y)-> (StepF_le y z) ->(StepF_le x z).
 intros x y z. unfold StepF_le.
 intros H.
 apply StepF_imp_imp.
- unfold StepF_imp.
-rewrite (MapMap2 imp QleS y z).
-rewrite  flipcompflip.
-set (g:=(flip (X:=QS) (Y:=iffSetoid) (Z:=QS --> iffSetoid)
-     (compose (X:=QS) (Y:=QS --> iffSetoid --> iffSetoid)
-        (Z:=iffSetoid --> QS --> iffSetoid)
-        (flip (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid))
-        (compose (X:=QS) (Y:=QS --> iffSetoid)
-           (Z:=QS --> iffSetoid --> iffSetoid)
-           (compose (X:=QS) (Y:=iffSetoid) 
-   (Z:=iffSetoid --> iffSetoid) imp) QleS)))).
-rewrite MapMap2.
-set (h:=(
-(compose (X:=QS) (Y:=QS --> iffSetoid) (Z:=QS --> QS --> QS --> iffSetoid)
-     (compose (X:=QS) (Y:=iffSetoid) (Z:=QS --> QS --> iffSetoid) g) QleS))).
 revert H.
+rapply StepF_imp_imp.
+unfold StepF_imp.
+pose (f:= ap
+(compose (@ap _ _ _) (compose (compose (compose (@compose _ _ _) imp)) QleS))
+(compose (flip (compose (@ap _ _ _) (compose (compose imp) QleS))) QleS)).
+cut (StepFfoldProp (f ^@> x <@> y <@> z)).
+ unfold f.
+ arw.
+ repeat rewrite Ap_Map.
+ tauto.
+apply StepFfoldPropForall_Map3.
+intros a b c Hab Hbc.
+clear f.
+simpl in *.
+eauto with qarith.
+Qed.
+
+Lemma L1ball_refl : forall e x, (L1Ball e x x).
+Proof.
+Lemma StepF_le_trans:forall x y z, 
+ (StepF_le x y)-> (StepF_le y z) ->(StepF_le x z).
+intros x y z. unfold StepF_le.
+intros H.
 apply StepF_imp_imp.
- unfold StepF_imp.
-rewrite MapMap2.
-rewrite  flipcompflip.
-set (k:=(flip (X:=QS) (Y:=iffSetoid) (Z:=QS --> iffSetoid)
-     (compose (X:=QS) (Y:=QS --> iffSetoid --> iffSetoid)
-        (Z:=iffSetoid --> QS --> iffSetoid)
-        (flip (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid))
-        (compose (X:=QS) (Y:=QS --> iffSetoid)
-           (Z:=QS --> iffSetoid --> iffSetoid)
-           (compose (X:=QS) (Y:=iffSetoid) (Z:=iffSetoid --> iffSetoid) imp)
-           QleS)))).
-assert (StepFfoldProp ((compose (compose (compose (compose k)  h)))^@> x <@> z <@> y <@> z) <@> x <@> y).
-rewrite MapMap2.
-Admitted.
 
 Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
