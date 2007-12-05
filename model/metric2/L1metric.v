@@ -5,6 +5,7 @@ Require Import QArith.
 Require Import QMinMax.
 Require Import Qabs.
 Require Import Qordfield.
+Require Import Qmetric.
 Require Import COrdFields2.
 Require Import CornTac.
 
@@ -58,10 +59,18 @@ intros x1 x2 Hx y; simpl in *;
 rewrite Hx;
 reflexivity).
 Defined.
-Definition Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
-Eval lazy beta zeta delta iota in (Distance test1 test2):Q.
-Eval lazy beta zeta delta iota in (Distance test2 test1):Q.
-Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(Distance f g)<=e.
+Definition QscaleS : QS -> QS --> QS.
+intros q.
+exists (Qmult q).
+abstract (
+intros x1 x2 Hx; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+Definition L1Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
+Eval lazy beta zeta delta iota in (L1Distance test1 test2):Q.
+Eval lazy beta zeta delta iota in (L1Distance test2 test1):Q.
+Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(L1Distance f g)<=e.
 Eval lazy beta zeta delta iota in (L1Ball (1#1)%Qpos test2 test1).
 Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
 Eval compute in (Mesh test2).
@@ -78,7 +87,7 @@ Definition StepQ := (StepF QS).
 Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
 intros e a b.
 unfold L1Ball.
-set (d:=Distance a b).
+set (d:=L1Distance a b).
 destruct (Qlt_le_dec_fast e d) as [Hdc|Hdc].
 right. abstract auto with *.
 left. exact Hdc.
@@ -109,7 +118,7 @@ Hint Resolve IntegralSplit.
 
 Add Morphism IntegralQ 
   with signature  StepF_eq ==>  Qeq
- as IntegralQ_mor.
+ as IntegralQ_wd.
 unfold IntegralQ.
 induction x1 using StepF_ind.
 intros x2 H. simpl. induction x2 using StepF_ind.
@@ -125,6 +134,25 @@ simpl.
 rewrite (IHx1_1 _ H0).
 rewrite (IHx1_2 _ H1).
 auto with *.
+Qed.
+
+Add Morphism L1Norm 
+  with signature StepF_eq ==>  Qeq
+ as L1Norm_wd.
+unfold L1Norm.
+intros x y Hxy.
+rewrite Hxy.
+reflexivity.
+Qed.
+
+Add Morphism L1Distance 
+  with signature StepF_eq ==> StepF_eq ==>  Qeq
+ as L1Distance_wd.
+unfold L1Distance.
+intros x1 x2 Hx y1 y2 Hy.
+rewrite Hx.
+rewrite Hy.
+reflexivity.
 Qed.
 
 Lemma Integral_glue : forall o s t, IntegralQ (glue o s t) = o*(IntegralQ s) + (1-o)*(IntegralQ t).
@@ -185,6 +213,18 @@ induction s using StepF_ind.
 arw.
 rewrite <- IHs1.
 rewrite <- IHs2.
+ring.
+Qed.
+
+Lemma Integral_scale :forall q x, 
+ (q*(IntegralQ x) == (IntegralQ (QscaleS q^@>x))).
+Proof.
+intros q x.
+induction x using StepF_ind.
+ reflexivity.
+arw.
+rewrite <- IHx1.
+rewrite <- IHx2.
 ring.
 Qed.
 
@@ -367,7 +407,7 @@ arw.
 intros [Hxl Hxr].
 rsapply plus_resp_nonneg;
  rsapply mult_resp_nonneg; auto with *.
-Qed. 
+Qed.
 
 Lemma L1Norm_nonneg : forall x, 0 <= (L1Norm x).
 Proof.
@@ -460,10 +500,33 @@ rsapply mult_resp_nonneg; auto with *.
 rapply L1Norm_nonneg.
 Qed.
 
+Lemma L1Norm_scale : forall q s, 
+ L1Norm (QscaleS q ^@> s) == Qabs q * L1Norm s.
+Proof.
+intros q s.
+unfold L1Norm.
+rewrite Integral_scale.
+apply IntegralQ_wd.
+unfold StepF_eq.
+set (g:= st_eqS QS).
+set (q0 := (QscaleS q)).
+set (q1 := (QscaleS (Qabs q))).
+set (f:= ap
+ (compose g (compose QabsS q0))
+ (compose q1 QabsS)).
+cut (StepFfoldProp (f ^@> s)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+rapply Qabs_Qmult.
+Qed.
+
 Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
 intros e x.
-unfold L1Ball, Distance.
+unfold L1Ball, L1Distance.
 unfold L1Norm.
 setoid_replace (QabsS ^@> (QminusS ^@> x <@> x)) with (leaf (0:QS)) using relation StepF_eq.
  unfold IntegralQ.
@@ -488,7 +551,7 @@ Qed.
 Lemma L1ball_sym : forall e x y, (L1Ball e x y) -> (L1Ball e y x).
 Proof.
 intros e x y.
-unfold L1Ball, Distance.
+unfold L1Ball, L1Distance.
 unfold L1Norm.
 setoid_replace (QabsS ^@> (QminusS ^@> x <@> y)) with (QabsS ^@> (QminusS ^@> y <@> x)) using relation StepF_eq.
  tauto.
@@ -512,7 +575,7 @@ Qed.
 Lemma L1ball_triangle : forall e d x y z, (L1Ball e x y) -> (L1Ball d y z) -> (L1Ball (e+d) x z).
 Proof.
 intros e d x y z.
-unfold L1Ball, Distance.
+unfold L1Ball, L1Distance.
 unfold L1Norm.
 intros He Hd.
 autorewrite with QposElim.
@@ -583,7 +646,7 @@ assert (0<(1#2)*( L1Norm (QminusS ^@> x <@> y))).
 apply (Qle_not_lt _ _ (H (mkQpos H1))).
 autorewrite with QposElim.
 rewrite Qlt_minus_iff.
-unfold Distance.
+unfold L1Distance.
 ring_simplify.
 assumption.
 Qed.
@@ -599,62 +662,100 @@ split.
 rapply L1ball_eq.
 Qed.
 
-(*
-Add Morphism L1Ball with signature QposEq ==> (StepF_eq Qeq) ==> (StepF_eq Qeq) ==> iff as Qball_wd.
-intros [x1 Hx1] [x2 Hx2] H x3 x4 H0 x5 x6 H1.
+Add Morphism L1Ball with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
+intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold L1Ball.
-rewrite H0.
-rewrite H1.
-unfold QposEq in H.
-simpl in H.
-rewrite H.
-tauto.
+change (x1 == x2) in Hx.
+rewrite Hx.
+rewrite Hy.
+rewrite Hz.
+reflexivity.
 Qed.
 
-
 Definition L1_as_MetricSpace : MetricSpace :=
-Build_MetricSpace L1ball_wd L1_is_MetricSpace.
+Build_MetricSpace L1Ball_wd L1_is_MetricSpace.
 
 Canonical Structure L1_as_MetricSpace.
 
- Do we need this?
-Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
+Lemma L1PrelengthSpace : PrelengthSpace L1_as_MetricSpace.
 Proof.
-assert (forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c).
-intros e d1 d2 He a b c Hab Hc.
-simpl.
-unfold Qball.
-apply AbsSmall_wdr with ((d1/(d1+d2)%Qpos)*(a - b)).
-apply AbsSmall_wdl with ((d1/(d1+d2)%Qpos)*(d1+d2)%Qpos);
- [|simpl; field; apply Qpos_nonzero].
-rsapply mult_resp_AbsSmall.
-rsapply less_leEq.
-rsapply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
-destruct d1; destruct d2; rsapply (AbsSmall_trans _ (e:Q)); assumption.
-simpl.
-rewrite Hc.
-pose (@Qpos_nonzero (d1 + d2)%Qpos).
-QposField.
-assumption.
-intros a b e d1 d2 He Hab.
-pose (c:= (a * d2 + b * d1) / (d1 + d2)%Qpos).
-exists c.
-apply (H e d1 d2 He a b c); try assumption.
-reflexivity.
-apply ball_sym.
-eapply H.
-rewrite Qplus_comm.
-apply He.
-apply ball_sym.
-apply Hab.
-unfold c.
-unfold Qdiv.
-apply Qmult_comp.
-ring.
-apply Qinv_comp.
-QposRing.
+intros x y e d1 d2 He Hxy.
+change (e < (d1+d2)%Qpos) in He.
+set (d:=(d1+d2)%Qpos) in *.
+simpl in *.
+unfold L1Ball in *.
+unfold L1Distance in *.
+pose (f0:=(fun a b => (a*d2 + b*d1)/d)).
+simpl in *.
+assert (f1_p:forall a x1 x2 : QS, st_eq QS x1 x2 -> st_eq QS (f0 a x1) (f0 a x2)).
+ simpl.
+ intros a x1 x2 Hx.
+ unfold f0.
+ rewrite Hx.
+ reflexivity.
+pose (f1:=(fun a => Build_Morphism _ _ _ (f1_p a))).
+assert (f_p:forall x1 x2 : QS, st_eq QS x1 x2 -> st_eq (QS --> QS) (f1 x1) (f1 x2)).
+ unfold f1, f0.
+ simpl.
+ intros x1 x2 Hx z.
+ simpl.
+ rewrite Hx.
+ reflexivity.
+pose (f:=Build_Morphism _ _ _ f_p: QS --> QS --> QS).
+exists (f^@> x <@> y).
+ setoid_replace (QminusS ^@> x <@> (f ^@> x <@> y))
+  with (QscaleS ((d1/d)%Qpos) ^@> (QminusS ^@> x <@> y)) using relation StepF_eq.
+  rewrite L1Norm_scale.
+  rewrite Qabs_pos; auto with *.
+  autorewrite with QposElim.
+  replace LHS with ((d1*L1Norm (QminusS ^@> x <@> y))/d) by
+   (field; apply Qpos_nonzero).
+  apply Qle_shift_div_r; auto with *.
+  rsapply mult_resp_leEq_lft; auto with *.
+  apply Qle_trans with e; auto with *.
+ unfold StepF_eq.
+ set (g:= st_eqS QS).
+ set (q:= QscaleS (d1/d)%Qpos).
+ set (z:= ap
+  (compose (@ap _ _ _) (compose (compose g) ((compose (compose (@ap _ _ _)) (@compose _ _ _)) (@compose _ _ _) QminusS f)))
+  (compose (compose q) QminusS)).
+ cut (StepFfoldProp (z ^@> x <@> y)).
+  unfold z.
+  evalStepF.
+  tauto.
+ apply StepFfoldPropForall_Map2.
+ intros a b.
+ change (a - (a * d2 + b * d1) / (d1+d2) == (d1 / (d1 + d2)) * (a - b)).
+ field.
+ change (~d==0).
+ rapply Qpos_nonzero.
+setoid_replace (QminusS ^@> (f ^@> x <@> y) <@> y)
+  with (QscaleS ((d2/d)%Qpos) ^@> (QminusS ^@> x <@> y)) using relation StepF_eq.
+ rewrite L1Norm_scale.
+ rewrite Qabs_pos; auto with *.
+ autorewrite with QposElim.
+ replace LHS with ((d2*L1Norm (QminusS ^@> x <@> y))/d) by
+  (field; apply Qpos_nonzero).
+ apply Qle_shift_div_r; auto with *.
+ rsapply mult_resp_leEq_lft; auto with *.
+ apply Qle_trans with e; auto with *.
+unfold StepF_eq.
+set (g:= st_eqS QS).
+set (q:= QscaleS (d2/d)%Qpos).
+set (z:= ap
+  (compose (@ap _ _ _) (compose (compose g) (compose (@join _ _) (compose (compose QminusS) f))))
+  (compose (compose q) QminusS)).
+cut (StepFfoldProp (z ^@> x <@> y)).
+ unfold z.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change ((a * d2 + b * d1) / (d1+d2) - b == (d2 / (d1 + d2)) * (a - b)).
+field.
+change (~d==0).
+rapply Qpos_nonzero.
 Qed.
-*)
 
 (* TODO:
 Is a metric space
