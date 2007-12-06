@@ -26,12 +26,12 @@ Variable X:Setoid.
 
 Definition StepF := StepF X.
 
-Definition leaf : X -> StepF := (@leaf X).
+Definition constStepF : X -> StepF := (@constStepF X).
 
 Definition glue : OpenUnit -> StepF -> StepF -> StepF := (@glue X).
 
 Lemma StepF_ind : forall (P : StepF -> Prop),
-       (forall x : X, P (leaf x)) ->
+       (forall x : X, P (constStepF x)) ->
        (forall (o : OpenUnit) (s : StepF),
         P s -> forall s0 : StepF, P s0 -> P (glue o s s0)) ->
        forall s : StepF, P s.
@@ -48,7 +48,7 @@ Definition SplitL : StepF -> OpenUnit -> StepF := (@SplitL X).
 Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
 End StepF_Functions.
 
-Implicit Arguments leaf [X].
+Implicit Arguments constStepF [X].
 
 Record Morphism (X Y:Setoid) :=
 {evalMorphism :> X -> Y
@@ -71,8 +71,8 @@ Open Local Scope sfstscope.
 
 Definition Ap (X Y:Setoid) : (StepF (X --> Y))->(StepF X)->(StepF Y) := fun f x => (@Ap X Y (StepFunction.Map (@evalMorphism X Y) f) x).
 Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfstscope.
-Notation "f ^@> x" := (Ap (leaf f) x) (at level 15, left associativity) : sfstscope.
-Notation "f <@^ x" := (Ap f (leaf x)) (at level 15, left associativity) : sfstscope.
+Notation "f ^@> x" := (Ap (constStepF f) x) (at level 15, left associativity) : sfstscope.
+Notation "f <@^ x" := (Ap f (constStepF x)) (at level 15, left associativity) : sfstscope.
 
 Lemma MirrorGlue : forall (X : Setoid) (o : OpenUnit) (al ar : StepF X),
        Mirror (glue o al ar) = glue (OpenUnitDual o) (Mirror ar) (Mirror al).
@@ -335,7 +335,7 @@ induction s using StepF_ind; induction t using StepF_ind; try contradiction.
  simpl in Hst.
  unfold StepF_eq in *.
  rewrite <- Hst.
- rewrite <- (StepFfoldProp_morphism ((st_eqS X) ^@> leaf x <@> u)); auto.
+ rewrite <- (StepFfoldProp_morphism ((st_eqS X) ^@> constStepF x <@> u)); auto.
  rapply (Map_resp_StepF_eq); auto with *.
  intros a b Hab.
  simpl.
@@ -363,7 +363,7 @@ Proof.
 induction s using StepF_ind.
  induction t using StepF_ind; simpl.
   reflexivity.
- change (leaf x == (Mirror t2) /\ leaf x == (Mirror t1) <-> leaf x == t1 /\ leaf x == t2).
+ change (constStepF x == (Mirror t2) /\ constStepF x == (Mirror t1) <-> constStepF x == t1 /\ constStepF x == t2).
  tauto.
 intros t.
 rewrite MirrorGlue.
@@ -446,7 +446,7 @@ Qed.
 Lemma StepF_eq_trans:forall x y z : StepF X, x == y -> y == z -> x == z.
 induction x using StepF_ind. intros.
  unfold StepF_eq in *.
- set (A:=((st_eqS X:X-->X-->iffSetoid) ^@> leaf x)) in *.
+ set (A:=((st_eqS X:X-->X-->iffSetoid) ^@> constStepF x)) in *.
  rewrite <- (StepFfoldProp_morphism (A <@> y)); auto with *.
  rapply (Map_resp_StepF_eq); auto with *.
  intros a b Hab.
@@ -500,6 +500,12 @@ Add Relation StepF StepF_eq
  as StepF_SetoidTheory.
 
 Hint Resolve StepF_eq_sym StepF_eq_trans.
+
+Add Morphism StepFfoldProp
+  with signature StepF_eq ==>  iff
+ as StepFfoldProp_mor.
+exact StepFfoldProp_morphism.
+Qed.
 
 Lemma StepF_Sth (X:Setoid) : (Setoid_Theory (StepF X) (@StepF_eq X)).
 split; intros; eauto with sfarith.
@@ -570,7 +576,7 @@ rewrite <- StepFunction.SplitLMap.
 rapply SplitLAp_Qeq.
 Qed.
 
-Add Morphism leaf with signature st_eq ==> StepF_eq as leaf_wd.
+Add Morphism constStepF with signature st_eq ==> StepF_eq as constStepF_wd.
 auto.
 Qed.
 
@@ -610,7 +616,7 @@ induction f using StepF_ind; intros g Hfg.
   induction x1 using StepF_ind; intros x2.
    induction x2 using StepF_ind.
     intros H.
-    transitivity (x ^@> (leaf x2)).
+    transitivity (x ^@> (constStepF x2)).
      destruct x as [x Hx].
      rapply Hx; assumption.
     rapply Hfg.
@@ -666,7 +672,7 @@ reflexivity.
 Qed.
 
 Lemma Map_homomorphism (X Y:Setoid) : forall (f:X-->Y) (a:X),
- (f ^@> leaf a) == (leaf (f a)).
+ (f ^@> constStepF a) == (constStepF (f a)).
 Proof.
 reflexivity.
 Qed.
@@ -730,7 +736,7 @@ induction a using StepF_ind.
   intros c.
   induction c using StepF_ind.
    auto with *.
-  change (@compose X Y Z ^@> leaf (X:=Y --> Z) x <@> leaf (X:=X --> Y) x0 <@> glue o c1 c2)
+  change (@compose X Y Z ^@> constStepF (X:=Y --> Z) x <@> constStepF (X:=X --> Y) x0 <@> glue o c1 c2)
    with (@compose X Y Z x x0 ^@> glue o c1 c2).
   rewrite MapGlue.
   apply glue_StepF_eq.
@@ -845,23 +851,23 @@ induction f using StepF_ind.
   intros b.
   induction b using StepF_ind.
    auto with *.
-  change (flip x x0 ^@> glue o b1 b2== x^@> glue o b1 b2 <@> leaf x0).
+  change (flip x x0 ^@> glue o b1 b2== x^@> glue o b1 b2 <@> constStepF x0).
   rewrite MapGlue.
   apply glue_StepF_eq.
    (*Setoid rewrite bug*)
-   set (A:=(SplitL (x ^@> glue o b1 b2 <@> leaf x0) o)).
+   set (A:=(SplitL (x ^@> glue o b1 b2 <@> constStepF x0) o)).
    rewrite IHb1.
    unfold A; clear A.
-   set (A:=x ^@> b1 <@> leaf x0).
+   set (A:=x ^@> b1 <@> constStepF x0).
    rewrite (SplitLAp).
    rewrite SplitLMap.
    rewrite SplitLGlue.
    auto with *.
   (*Setoid rewrite bug*)
-  set (A:=(SplitR (x ^@> glue o b1 b2 <@> leaf x0) o)).
+  set (A:=(SplitR (x ^@> glue o b1 b2 <@> constStepF x0) o)).
   rewrite IHb2.
   unfold A; clear A.
-  set (A:=x ^@> b2 <@> leaf x0).
+  set (A:=x ^@> b2 <@> constStepF x0).
   rewrite (SplitRAp).
   rewrite SplitRMap.
   rewrite SplitRGlue.
@@ -920,7 +926,7 @@ Lemma Map_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
 Proof.
 induction f using StepF_ind.
  intros a.
- simpl ((@join _ _) ^@> leaf x).
+ simpl ((@join _ _) ^@> constStepF x).
  induction a using StepF_ind.
   auto with *.
  change (join x ^@> glue o a1 a2 == x ^@> glue o a1 a2 <@> glue o a1 a2).
@@ -974,3 +980,105 @@ reflexivity.
 Qed.
 
 Hint Rewrite Map_ap : StepF_eval.
+
+Ltac rewriteStepF := autorewrite with StepF_rew.
+
+Lemma StepFfoldPropForall_Ap : 
+ forall X (f:StepF (X --> iffSetoid)) (x:StepF X), (forall y, StepFfoldProp (f <@> constStepF y)) -> StepFfoldProp (f <@> x).
+Proof.
+intros X f x H.
+revert f H.
+induction x using StepF_ind.
+ intros f H.
+ rapply H.
+intros f H.
+rewrite <- (glueSplit f o).
+rewrite ApGlueGlue.
+split.
+ apply IHx1.
+ intros y.
+ assert (H0:=H y).
+ rewrite <- (glueSplit f o) in H0.
+ rewrite ApGlue in H0.
+ destruct H0 as [H0 _].
+ assumption.
+apply IHx2.
+intros y.
+assert (H0:=H y).
+rewrite <- (glueSplit f o) in H0.
+rewrite ApGlue in H0.
+destruct H0 as [_ H0].
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map : 
+ forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
+Proof.
+intros X f x H.
+apply StepFfoldPropForall_Ap.
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map2 : 
+ forall X Y (f:X --> Y --> iffSetoid) x y, (forall a b, f a b) -> StepFfoldProp (f ^@> x <@> y).
+Proof.
+intros X Y f x y H.
+apply StepFfoldPropForall_Ap.
+intros b.
+rewrite <- (Map_commutative (constStepF f) (constStepF b)).
+rewriteStepF.
+rapply StepFfoldPropForall_Map.
+intros a.
+rapply H.
+Qed.
+
+Lemma StepFfoldPropForall_Map3 : 
+ forall X Y Z (f:X --> Y --> Z --> iffSetoid) x y z, (forall a b c, f a b c) -> StepFfoldProp (f ^@> x <@> y <@> z).
+Proof.
+intros X Y Z f x y z H.
+apply StepFfoldPropForall_Ap.
+intros c.
+rewrite <- (Map_commutative ((constStepF f) <@> x) (constStepF c)).
+rewrite <- Map_composition.
+rewriteStepF.
+rewrite <- (Map_commutative (constStepF (compose flip f)) (constStepF c)).
+rewriteStepF.
+rapply StepFfoldPropForall_Map2.
+intros a b.
+rapply H.
+Qed.
+
+Definition imp0:Prop->iffSetoid-->iffSetoid.
+intro A.
+exists (fun B:Prop=>(A->B)).
+abstract (simpl; intuition).
+Defined.
+
+Definition imp:iffSetoid-->iffSetoid-->iffSetoid.
+exists imp0.
+abstract (simpl; unfold extEq; simpl; intuition).
+Defined.
+
+Definition StepF_imp (f g:StepF iffSetoid):Prop:=
+(StepFfoldProp (imp ^@> f <@> g)).
+
+Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
+auto with *.
+Qed.
+
+Hint Rewrite StepFfoldPropglue_rew:StepF_rew.
+
+Lemma StepF_imp_imp:forall x y:(StepF iffSetoid),
+  (StepF_imp x y) ->
+  ((StepFfoldProp x)->(StepFfoldProp y)).
+induction x using StepF_ind. induction y  using StepF_ind.
+   auto with *.
+  unfold StepF_imp. unfold StepFfoldProp;simpl;intuition.
+intros y.
+unfold StepF_imp, Map2. 
+rewriteStepF.
+intros.
+rewrite <- (StepFfoldPropglue y o). 
+rewriteStepF.
+intuition. 
+Qed.

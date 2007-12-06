@@ -11,30 +11,15 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope sfscope.
+Open Local Scope sfstscope.
 
-Ltac arw := autorewrite with StepF_rew.
-
-Add Morphism StepFfoldProp
-  with signature StepF_eq ==>  iff
- as StepFfoldProp_mor.
-exact StepFfoldProp_morphism.
-Qed.
+Section QS.
 
 Lemma QS:(Setoid).
 exists Q Qeq.
 split; eauto with qarith.
 Defined.
 
-Definition test1:=(leaf (1:QS)).
-Definition test2:=(glue (ou 1/2) (leaf (0:QS)) (leaf (1:QS))).
-
-Open Local Scope sfstscope.
-
-Definition Supnorm:(StepF QS)->Q:=(StepFfold (Qabs:QS->QS) (fun _=> Qmax)).
-Eval compute in (Supnorm test2):Q.
-Definition IntegralQ:(StepF QS)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (b*x+(1-b)*y:QS))).
-Eval compute in (IntegralQ test2):Q.
 Definition QabsS : QS-->QS.
 exists Qabs.
 abstract(
@@ -42,8 +27,32 @@ simpl; intros x1 x2 Hx;
 rewrite Hx;
 reflexivity).
 Defined.
-Definition L1Norm(f:StepF QS):Q:=(IntegralQ (QabsS ^@> f)).
-Eval compute in (L1Norm test2):Q.
+
+Definition Qplus0 : QS -> QS --> QS.
+intros q.
+exists (Qplus q).
+abstract (
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+
+Definition QplusS : QS --> QS --> QS.
+exists (Qplus0).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+
+Definition QoppS : QS --> QS.
+exists (Qopp).
+abstract (
+simpl; intros x1 x2 Hx; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+
 Definition Qminus0 : QS -> QS --> QS.
 intros q.
 exists (Qminus q).
@@ -52,6 +61,7 @@ simpl; intros x1 x2 Hx;
 rewrite Hx;
 reflexivity).
 Defined.
+
 Definition QminusS : QS --> QS --> QS.
 exists (Qminus0).
 abstract (
@@ -59,6 +69,7 @@ intros x1 x2 Hx y; simpl in *;
 rewrite Hx;
 reflexivity).
 Defined.
+
 Definition QscaleS : QS -> QS --> QS.
 intros q.
 exists (Qmult q).
@@ -67,17 +78,45 @@ intros x1 x2 Hx; simpl in *;
 rewrite Hx;
 reflexivity).
 Defined.
-Definition L1Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
-Eval lazy beta zeta delta iota in (L1Distance test1 test2):Q.
-Eval lazy beta zeta delta iota in (L1Distance test2 test1):Q.
-Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(L1Distance f g)<=e.
-Eval lazy beta zeta delta iota in (L1Ball (1#1)%Qpos test2 test1).
-Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
-Eval compute in (Mesh test2).
+
+Definition Qle0 : QS -> QS --> iffSetoid.
+intros q.
+exists (Qle q).
+abstract (
+simpl; intros x1 x2 Hx;
+rewrite Hx;
+reflexivity).
+Defined.
+
+Definition QleS : QS --> QS --> iffSetoid.
+exists (Qle0).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+
+End QS.
 
 Definition StepQ := (StepF QS).
 
-Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
+Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (b*x+(1-b)*y:QS))).
+Definition L1Norm(f:StepF QS):Q:=(IntegralQ (QabsS ^@> f)).
+Definition L1Distance(f g:StepF QS):Q:=(L1Norm (QminusS ^@> f <@> g)).
+Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(L1Distance f g)<=e.
+
+(*
+Definition test1:=(constStepF (1:QS)).
+Definition test2:=(glue (ou 1/2) (constStepF (0:QS)) (constStepF (1:QS))).
+Eval lazy beta zeta delta iota in (L1Distance test1 test2):Q.
+Why is compute so slow?
+Eval compute in (L1Distance test1 test2):Q.
+Eval lazy beta zeta delta iota in (L1Distance test2 test1):Q.
+Eval lazy beta zeta delta iota in (L1Ball (1#1)%Qpos test2 test1).
+Eval compute in (Mesh test2).
+*)
+
+Lemma L1ball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
 intros e a b.
 unfold L1Ball.
 set (d:=L1Distance a b).
@@ -85,76 +124,10 @@ destruct (Qlt_le_dec_fast e d) as [Hdc|Hdc].
 right. abstract auto with *.
 left. exact Hdc.
 Defined.
-Require Import QArith_base.
-
-Lemma StepFfoldPropForall_Ap : 
- forall X (f:StepF (X --> iffSetoid)) (x:StepF X), (forall y, StepFfoldProp (f <@> leaf y)) -> StepFfoldProp (f <@> x).
-Proof.
-intros X f x H.
-revert f H.
-induction x using StepF_ind.
- intros f H.
- rapply H.
-intros f H.
-rewrite <- (glueSplit f o).
-rewrite ApGlueGlue.
-split.
- apply IHx1.
- intros y.
- assert (H0:=H y).
- rewrite <- (glueSplit f o) in H0.
- rewrite ApGlue in H0.
- destruct H0 as [H0 _].
- assumption.
-apply IHx2.
-intros y.
-assert (H0:=H y).
-rewrite <- (glueSplit f o) in H0.
-rewrite ApGlue in H0.
-destruct H0 as [_ H0].
-assumption.
-Qed.
-
-Lemma StepFfoldPropForall_Map : 
- forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
-Proof.
-intros X f x H.
-apply StepFfoldPropForall_Ap.
-assumption.
-Qed.
-
-Lemma StepFfoldPropForall_Map2 : 
- forall X Y (f:X --> Y --> iffSetoid) x y, (forall a b, f a b) -> StepFfoldProp (f ^@> x <@> y).
-Proof.
-intros X Y f x y H.
-apply StepFfoldPropForall_Ap.
-intros b.
-rewrite <- (Map_commutative (leaf f) (leaf b)).
-arw.
-rapply StepFfoldPropForall_Map.
-intros a.
-rapply H.
-Qed.
-
-Lemma StepFfoldPropForall_Map3 : 
- forall X Y Z (f:X --> Y --> Z --> iffSetoid) x y z, (forall a b c, f a b c) -> StepFfoldProp (f ^@> x <@> y <@> z).
-Proof.
-intros X Y Z f x y z H.
-apply StepFfoldPropForall_Ap.
-intros c.
-rewrite <- (Map_commutative ((leaf f) <@> x) (leaf c)).
-rewrite <- Map_composition.
-arw.
-rewrite <- (Map_commutative (leaf (compose flip f)) (leaf c)).
-arw.
-rapply StepFfoldPropForall_Map2.
-intros a b.
-rapply H.
-Qed.
 
 Lemma IntegralSplit : forall (o:OpenUnit) x, 
- IntegralQ x ==
- o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o).
+ (IntegralQ x ==
+ o * IntegralQ (SplitL x o) + (1 - o) * IntegralQ (SplitR x o))%Q.
 Proof.
 intros o x.
 revert o.
@@ -172,7 +145,7 @@ rewrite H.
 reflexivity.
 Qed.
 
-Hint Resolve IntegralSplit.
+Hint Resolve IntegralSplit : StepQArith.
 
 Add Morphism IntegralQ 
   with signature  StepF_eq ==>  Qeq
@@ -220,62 +193,37 @@ Qed.
 
 Hint Rewrite Integral_glue: StepF_rew.
 
-Definition Qplus0 : QS -> QS --> QS.
-intros q.
-exists (Qplus q).
-abstract (
-simpl; intros x1 x2 Hx;
-rewrite Hx;
-reflexivity).
-Defined.
-
-Definition QplusS : QS --> QS --> QS.
-exists (Qplus0).
-abstract (
-intros x1 x2 Hx y; simpl in *;
-rewrite Hx;
-reflexivity).
-Defined.
-
 Lemma Integral_plus:forall s t,
-  (IntegralQ s)+(IntegralQ t)==(IntegralQ ((QplusS:QS-->QS-->QS) ^@> s <@> t)).
+  ((IntegralQ s)+(IntegralQ t)==(IntegralQ ((QplusS:QS-->QS-->QS) ^@> s <@> t)))%Q.
 Proof.
 induction s using StepF_ind.
  induction t using StepF_ind.
   reflexivity.
- arw.
+ rewriteStepF.
  rewrite <- IHt1.
  rewrite <- IHt2.
  ring.
 intros t.
-arw.
+rewriteStepF.
 rewrite <- IHs1.
 rewrite <- IHs2.
 rewrite (IntegralSplit o t).
 ring.
 Qed.
 
-Definition QoppS : QS --> QS.
-exists (Qopp).
-abstract (
-simpl; intros x1 x2 Hx; simpl in *;
-rewrite Hx;
-reflexivity).
-Defined.
-
 Lemma Integral_opp:forall s,
-  -(IntegralQ s)==(IntegralQ (QoppS^@> s)).
+  (-(IntegralQ s)==(IntegralQ (QoppS^@> s)))%Q.
 Proof.
 induction s using StepF_ind.
  reflexivity.
-arw.
+rewriteStepF.
 rewrite <- IHs1.
 rewrite <- IHs2.
 ring.
 Qed.
 
 Lemma Integral_minus:forall s t,
-  (IntegralQ s)-(IntegralQ t)==(IntegralQ (QminusS ^@> s <@> t)).
+  ((IntegralQ s)-(IntegralQ t)==(IntegralQ (QminusS ^@> s <@> t)))%Q.
 Proof.
 intros s t.
 unfold Qminus.
@@ -293,17 +241,17 @@ cut (StepFfoldProp (f ^@> s <@> t)).
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-change (a + - b == a - b).
+change (a + - b == a - b)%Q.
 ring.
 Qed.
 
 Lemma Integral_scale :forall q x, 
- (q*(IntegralQ x) == (IntegralQ (QscaleS q^@>x))).
+ (q*(IntegralQ x) == (IntegralQ (QscaleS q^@>x)))%Q.
 Proof.
 intros q x.
 induction x using StepF_ind.
  reflexivity.
-arw.
+rewriteStepF.
 rewrite <- IHx1.
 rewrite <- IHx2.
 ring.
@@ -315,7 +263,7 @@ Proof.
 intros x.
 induction x using StepF_ind.
  rapply Qle_refl.
-arw.
+rewriteStepF.
 eapply Qle_trans.
 apply Qabs_triangle.
 do 2 rewrite Qabs_Qmult.
@@ -331,45 +279,13 @@ Proof.
 exact Abs_Integral.
 Qed.
 
-Definition Qle0 : QS -> QS --> iffSetoid.
-intros q.
-exists (Qle q).
-abstract (
-simpl; intros x1 x2 Hx;
-rewrite Hx;
-reflexivity).
-Defined.
+Definition StepQ_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
 
-Definition QleS : QS --> QS --> iffSetoid.
-exists (Qle0).
-abstract (
-intros x1 x2 Hx y; simpl in *;
-rewrite Hx;
-reflexivity).
-Defined.
+Notation "x <= y" := (StepQ_le x y) (at level 70) : sfstscope.
 
-Definition Qge0 : QS -> QS --> iffSetoid.
-intros q.
-exists (Qge q).
-abstract (
-simpl; intros x1 x2 Hx;
-rewrite Hx;
-reflexivity).
-Defined.
-
-Definition QgeS : QS --> QS --> iffSetoid.
-exists (Qge0).
-abstract (
-intros x1 x2 Hx y; simpl in *;
-rewrite Hx;
-reflexivity).
-Defined.
-
-Definition StepF_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
-
-Lemma StepF_le_refl:forall x, (StepF_le x x).
+Lemma StepQ_le_refl:forall x, (x <= x).
 intros x.
-unfold StepF_le.
+unfold StepQ_le.
 cut (StepFfoldProp (join QleS ^@> x)).
  evalStepF.
  tauto.
@@ -379,41 +295,9 @@ simpl.
 auto with *.
 Qed.
 
-Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
-auto with *.
-Qed.
-
-Hint Rewrite StepFfoldPropglue_rew:StepF_rew.
-
-Definition imp0:Prop->iffSetoid-->iffSetoid.
-intro A.
-exists (fun B:Prop=>(A->B)).
-abstract (simpl; intuition).
-Defined.
-
-Definition imp:iffSetoid-->iffSetoid-->iffSetoid.
-exists imp0.
-abstract (simpl; unfold extEq; simpl; intuition).
-Defined.
-
-Definition StepF_imp (f g:StepF iffSetoid):Prop:=
-(StepFfoldProp (imp ^@> f <@> g)).
-
-Lemma StepF_imp_imp:forall x y:(StepF iffSetoid),
-  (StepF_imp x y) ->
-  ((StepFfoldProp x)->(StepFfoldProp y)).
-induction x using StepF_ind. induction y  using StepF_ind.
-   auto with *.
-  unfold StepF_imp. unfold StepFfoldProp;simpl;intuition.
-intros y.
-unfold StepF_imp, Map2. arw.
-intros.
-rewrite <- (StepFfoldPropglue y o). arw. intuition. 
-Qed.
-
-Lemma StepF_le_trans:forall x y z, 
- (StepF_le x y)-> (StepF_le y z) ->(StepF_le x z).
-intros x y z. unfold StepF_le.
+Lemma StepQ_le_trans:forall x y z, 
+ (x <= y)-> (y <= z) ->(x <= z).
+intros x y z. unfold StepQ_le.
 intros H.
 apply StepF_imp_imp.
 revert H.
@@ -434,25 +318,25 @@ eauto with qarith.
 Qed.
 
 Lemma Integral_resp_nonneg :forall x, 
- (StepF_le (leaf (0:QS)) x)-> 0 <= (IntegralQ x).
+ (constStepF (0:QS)) <= x -> (0 <= (IntegralQ x))%Q.
 Proof.
 intros x.
-unfold StepF_le.
-arw.
+unfold StepQ_le.
+rewriteStepF.
 induction x using StepF_ind.
  auto.
-arw.
+rewriteStepF.
 intros [Hxl Hxr].
 rsapply plus_resp_nonneg;
  rsapply mult_resp_nonneg; auto with *.
 Qed.
 
-Lemma L1Norm_nonneg : forall x, 0 <= (L1Norm x).
+Lemma L1Norm_nonneg : forall x, (0 <= (L1Norm x))%Q.
 Proof.
 intros x.
 rapply Integral_resp_nonneg.
-unfold StepF_le.
-arw.
+unfold StepQ_le.
+rewriteStepF.
 set (g:=QleS 0).
 cut (StepFfoldProp ((compose g QabsS) ^@> x)).
  evalStepF.
@@ -463,7 +347,7 @@ rapply Qabs_nonneg.
 Qed.
 
 Lemma Integral_resp_le :forall x y, 
- (StepF_le x y)-> (IntegralQ x) <= (IntegralQ y).
+ x <= y -> (IntegralQ x <= IntegralQ y)%Q.
 Proof.
 intros x y H.
 rewrite Qle_minus_iff.
@@ -472,7 +356,7 @@ apply Integral_resp_nonneg.
 revert H.
 rapply StepF_imp_imp.
 unfold StepF_imp.
-arw.
+rewriteStepF.
 set (g:= QleS 0).
 pose (f:=(ap
  (compose (@ap _ _ _) (compose (compose imp) QleS))
@@ -483,13 +367,13 @@ cut (StepFfoldProp (f ^@> x <@> y)).
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-change (a <= b -> 0 <= b + (- a)).
+change (a <= b -> 0 <= b + (- a))%Q.
 rewrite Qle_minus_iff.
 tauto.
 Qed.
 
 Lemma L1Norm_Zero : forall s, 
- L1Norm s <= 0 -> StepF_eq s (leaf (0:QS)).
+ (L1Norm s <= 0)%Q -> s == (constStepF (0:QS)).
 Proof.
 intros s.
 intros Hs.
@@ -539,7 +423,7 @@ rapply L1Norm_nonneg.
 Qed.
 
 Lemma L1Norm_scale : forall q s, 
- L1Norm (QscaleS q ^@> s) == Qabs q * L1Norm s.
+ (L1Norm (QscaleS q ^@> s) == Qabs q * L1Norm s)%Q.
 Proof.
 intros q s.
 unfold L1Norm.
@@ -566,13 +450,13 @@ Proof.
 intros e x.
 unfold L1Ball, L1Distance.
 unfold L1Norm.
-setoid_replace (QabsS ^@> (QminusS ^@> x <@> x)) with (leaf (0:QS)) using relation StepF_eq.
+setoid_replace (QabsS ^@> (QminusS ^@> x <@> x)) with (constStepF (0:QS)) using relation StepF_eq.
  unfold IntegralQ.
  simpl.
  auto with *.
 symmetry.
 unfold StepF_eq.
-arw.
+rewriteStepF.
 set (g:=(st_eqS QS 0)).
 set (f:=(compose g (compose QabsS (join QminusS)))).
 cut (StepFfoldProp (f ^@> x)).
@@ -581,7 +465,7 @@ cut (StepFfoldProp (f ^@> x)).
  tauto.
 apply StepFfoldPropForall_Map.
 intros a.
-change (0 == Qabs (a - a)).
+change (0 == Qabs (a - a))%Q.
 setoid_replace (a - a) with 0 using relation Qeq by ring.
 reflexivity.
 Qed.
@@ -604,7 +488,7 @@ cut (StepFfoldProp (f ^@> x <@> y)).
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-change (Qabs (a - b) == Qabs (b - a)).
+change (Qabs (a - b) == Qabs (b - a))%Q.
 rewrite <- Qabs_opp.
 apply Qabs_wd.
 ring.
@@ -621,7 +505,7 @@ apply Qle_trans with (IntegralQ (QabsS ^@> (QminusS ^@> x <@> y)) + IntegralQ (Q
  [|rsapply plus_resp_leEq_both; assumption].
 rewrite Integral_plus.
 apply Integral_resp_le.
-unfold StepF_le.
+unfold StepQ_le.
 set (f:=ap
  (compose (@compose _ _ _) (compose ap (compose (compose (compose QleS QabsS)) QminusS)))
  (compose (flip ap (compose (compose QabsS) QminusS)) (compose (compose (compose (@compose _ _ _) (compose QplusS QabsS))) QminusS))).
@@ -631,7 +515,7 @@ cut (StepFfoldProp (f ^@> x <@> y <@> z)).
  tauto.
 apply StepFfoldPropForall_Map3.
 intros a b c.
-change (Qabs (a - c) <= Qabs (a - b) + Qabs (b - c)).
+change (Qabs (a - c) <= Qabs (a - b) + Qabs (b - c))%Q.
 eapply Qle_trans;[|apply Qabs_triangle].
 setoid_replace (a - b + (b - c)) with (a - c) by ring.
 auto with *.
@@ -640,7 +524,7 @@ Qed.
 Lemma L1ball_closed : forall e x y, (forall d, (L1Ball (e+d) x y)) -> (L1Ball e x y).
 Proof.
 unfold L1Ball. intros e a b H.
-assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e).
+assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e)%Q.
  intros. rsapply shift_zero_leEq_minus'.
  rsapply inv_cancel_leEq. rsapply approach_zero_weak.
  intros. replace LHS with (x[-](e:Q)). 
@@ -654,10 +538,10 @@ Lemma L1ball_eq : forall x y, (forall e : Qpos, L1Ball e x y) -> StepF_eq x y.
 Proof.
 intros x y H.
 unfold L1Ball in H.
-cut (StepF_eq (leaf (0:QS)) (QminusS ^@>x <@> y)).
+cut (StepF_eq (constStepF (0:QS)) (QminusS ^@>x <@> y)).
  rapply StepF_imp_imp.
  unfold StepF_imp.
- arw.
+ rewriteStepF.
  set (g:=(st_eqS QS)).
  set (g0:= (g 0)).
  pose (f:=ap
@@ -669,7 +553,7 @@ cut (StepF_eq (leaf (0:QS)) (QminusS ^@>x <@> y)).
   tauto.
  apply StepFfoldPropForall_Map2.
  intros a b.
- change (0 == a - b -> a == b).
+ change (0 == a - b -> a == b)%Q.
  intros Hab.
  simpl in a, b.
  replace LHS with ((a - b) + b) by ring.
@@ -703,7 +587,7 @@ Qed.
 Add Morphism L1Ball with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
 intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold L1Ball.
-change (x1 == x2) in Hx.
+change (x1 == x2)%Q in Hx.
 rewrite Hx.
 rewrite Hy.
 rewrite Hz.
@@ -763,9 +647,9 @@ exists (f^@> x <@> y).
   tauto.
  apply StepFfoldPropForall_Map2.
  intros a b.
- change (a - (a * d2 + b * d1) / (d1+d2) == (d1 / (d1 + d2)) * (a - b)).
+ change (a - (a * d2 + b * d1) / (d1+d2) == (d1 / (d1 + d2)) * (a - b))%Q.
  field.
- change (~d==0).
+ change (~d==0)%Q.
  rapply Qpos_nonzero.
 setoid_replace (QminusS ^@> (f ^@> x <@> y) <@> y)
   with (QscaleS ((d2/d)%Qpos) ^@> (QminusS ^@> x <@> y)) using relation StepF_eq.
@@ -789,9 +673,9 @@ cut (StepFfoldProp (z ^@> x <@> y)).
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-change ((a * d2 + b * d1) / (d1+d2) - b == (d2 / (d1 + d2)) * (a - b)).
+change ((a * d2 + b * d1) / (d1+d2) - b == (d2 / (d1 + d2)) * (a - b))%Q.
 field.
-change (~d==0).
+change (~d==0)%Q.
 rapply Qpos_nonzero.
 Qed.
 
@@ -815,15 +699,3 @@ Open Local Scope uc_scope.
 
 Definition IntegralQ_uc : L1StepQ_as_MetricSpace --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction integral_uc_prf.
-
-End L1metric.
-
-(* TODO:
-Continuity of Map, Map2
-Continuous functions are in the completion, i.e. there is an injection 
-from continuous functions to integrable ones.
-Integration is correct. Needs mesh. 
-
-Write a tactic Done (auto with *, etc)
-Find out how simple works with fold.
-*)
