@@ -65,7 +65,7 @@ split.
 intros x y z Hxy Hyz a; transitivity (y a); auto.
 Defined.
 
-Notation "x --> y" := (extSetoid x y) (at level 70, right associativity) : sfstscope.
+Notation "x --> y" := (extSetoid x y) (at level 90, right associativity) : sfstscope.
 
 Open Local Scope sfstscope.
 

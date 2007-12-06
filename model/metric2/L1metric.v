@@ -1,5 +1,5 @@
 Require Export StepFunctionSetoid.
-Require Export Metric.
+Require Export UniformContinuity.
 Require Import OpenUnit.
 Require Import QArith.
 Require Import QMinMax.
@@ -75,13 +75,6 @@ Eval lazy beta zeta delta iota in (L1Ball (1#1)%Qpos test2 test1).
 Definition Mesh (X:Setoid):(StepF X)->Q:=(StepFfold (fun x => 1)(fun b x y => (Qmax (b*x) ((1-b)*y)))).
 Eval compute in (Mesh test2).
 
-Section Equivalence1.
-Variable X Y:Setoid.
-
-End Equivalence1.
-
-Section L1metric.
-
 Definition StepQ := (StepF QS).
 
 Lemma Qball_dec : forall e a b, {L1Ball e a b}+{~L1Ball e a b}.
@@ -93,6 +86,71 @@ right. abstract auto with *.
 left. exact Hdc.
 Defined.
 Require Import QArith_base.
+
+Lemma StepFfoldPropForall_Ap : 
+ forall X (f:StepF (X --> iffSetoid)) (x:StepF X), (forall y, StepFfoldProp (f <@> leaf y)) -> StepFfoldProp (f <@> x).
+Proof.
+intros X f x H.
+revert f H.
+induction x using StepF_ind.
+ intros f H.
+ rapply H.
+intros f H.
+rewrite <- (glueSplit f o).
+rewrite ApGlueGlue.
+split.
+ apply IHx1.
+ intros y.
+ assert (H0:=H y).
+ rewrite <- (glueSplit f o) in H0.
+ rewrite ApGlue in H0.
+ destruct H0 as [H0 _].
+ assumption.
+apply IHx2.
+intros y.
+assert (H0:=H y).
+rewrite <- (glueSplit f o) in H0.
+rewrite ApGlue in H0.
+destruct H0 as [_ H0].
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map : 
+ forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
+Proof.
+intros X f x H.
+apply StepFfoldPropForall_Ap.
+assumption.
+Qed.
+
+Lemma StepFfoldPropForall_Map2 : 
+ forall X Y (f:X --> Y --> iffSetoid) x y, (forall a b, f a b) -> StepFfoldProp (f ^@> x <@> y).
+Proof.
+intros X Y f x y H.
+apply StepFfoldPropForall_Ap.
+intros b.
+rewrite <- (Map_commutative (leaf f) (leaf b)).
+arw.
+rapply StepFfoldPropForall_Map.
+intros a.
+rapply H.
+Qed.
+
+Lemma StepFfoldPropForall_Map3 : 
+ forall X Y Z (f:X --> Y --> Z --> iffSetoid) x y z, (forall a b c, f a b c) -> StepFfoldProp (f ^@> x <@> y <@> z).
+Proof.
+intros X Y Z f x y z H.
+apply StepFfoldPropForall_Ap.
+intros c.
+rewrite <- (Map_commutative ((leaf f) <@> x) (leaf c)).
+rewrite <- Map_composition.
+arw.
+rewrite <- (Map_commutative (leaf (compose flip f)) (leaf c)).
+arw.
+rapply StepFfoldPropForall_Map2.
+intros a b.
+rapply H.
+Qed.
 
 Lemma IntegralSplit : forall (o:OpenUnit) x, 
  IntegralQ x ==
@@ -216,6 +274,29 @@ rewrite <- IHs2.
 ring.
 Qed.
 
+Lemma Integral_minus:forall s t,
+  (IntegralQ s)-(IntegralQ t)==(IntegralQ (QminusS ^@> s <@> t)).
+Proof.
+intros s t.
+unfold Qminus.
+rewrite Integral_opp.
+rewrite Integral_plus.
+apply IntegralQ_wd.
+unfold StepF_eq.
+set (g:=st_eqS QS).
+set (f:= ap
+ (compose (@ap _ _ _) (compose (compose g) (compose (flip (@compose _ _ _) QoppS) QplusS)))
+ QminusS).
+cut (StepFfoldProp (f ^@> s <@> t)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change (a + - b == a - b).
+ring.
+Qed.
+
 Lemma Integral_scale :forall q x, 
  (q*(IntegralQ x) == (IntegralQ (QscaleS q^@>x))).
 Proof.
@@ -226,6 +307,28 @@ arw.
 rewrite <- IHx1.
 rewrite <- IHx2.
 ring.
+Qed.
+
+Lemma Abs_Integral : forall x,
+ Qabs (IntegralQ x) <= IntegralQ (QabsS ^@> x).
+Proof.
+intros x.
+induction x using StepF_ind.
+ rapply Qle_refl.
+arw.
+eapply Qle_trans.
+apply Qabs_triangle.
+do 2 rewrite Qabs_Qmult.
+rewrite (Qabs_pos o); auto with *.
+rewrite (Qabs_pos (1-o)); auto with *.
+rsapply plus_resp_leEq_both;
+ rsapply mult_resp_leEq_lft; auto with *.
+Qed.
+
+Lemma Abs_Integral_Norm : forall x,
+ Qabs (IntegralQ x) <= L1Norm x.
+Proof.
+exact Abs_Integral.
 Qed.
 
 Definition Qle0 : QS -> QS --> iffSetoid.
@@ -263,71 +366,6 @@ reflexivity).
 Defined.
 
 Definition StepF_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
-
-Lemma StepFfoldPropForall_Ap : 
- forall X (f:StepF (X --> iffSetoid)) (x:StepF X), (forall y, StepFfoldProp (f <@> leaf y)) -> StepFfoldProp (f <@> x).
-Proof.
-intros X f x H.
-revert f H.
-induction x using StepF_ind.
- intros f H.
- rapply H.
-intros f H.
-rewrite <- (glueSplit f o).
-rewrite ApGlueGlue.
-split.
- apply IHx1.
- intros y.
- assert (H0:=H y).
- rewrite <- (glueSplit f o) in H0.
- rewrite ApGlue in H0.
- destruct H0 as [H0 _].
- assumption.
-apply IHx2.
-intros y.
-assert (H0:=H y).
-rewrite <- (glueSplit f o) in H0.
-rewrite ApGlue in H0.
-destruct H0 as [_ H0].
-assumption.
-Qed.
-
-Lemma StepFfoldPropForall_Map : 
- forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
-Proof.
-intros X f x H.
-apply StepFfoldPropForall_Ap.
-assumption.
-Qed.
-
-Lemma StepFfoldPropForall_Map2 : 
- forall X Y (f:X --> Y --> iffSetoid) x y, (forall a b, f a b) -> StepFfoldProp (f ^@> x <@> y).
-Proof.
-intros X Y f x y H.
-apply StepFfoldPropForall_Ap.
-intros b.
-rewrite <- (Map_commutative (leaf f) (leaf b)).
-arw.
-rapply StepFfoldPropForall_Map.
-intros a.
-rapply H.
-Qed.
-
-Lemma StepFfoldPropForall_Map3 : 
- forall X Y Z (f:X --> Y --> Z --> iffSetoid) x y z, (forall a b c, f a b c) -> StepFfoldProp (f ^@> x <@> y <@> z).
-Proof.
-intros X Y Z f x y z H.
-apply StepFfoldPropForall_Ap.
-intros c.
-rewrite <- (Map_commutative ((leaf f) <@> x) (leaf c)).
-rewrite <- Map_composition.
-arw.
-rewrite <- (Map_commutative (leaf (compose flip f)) (leaf c)).
-arw.
-rapply StepFfoldPropForall_Map2.
-intros a b.
-rapply H.
-Qed.
 
 Lemma StepF_le_refl:forall x, (StepF_le x x).
 intros x.
@@ -672,12 +710,12 @@ rewrite Hz.
 reflexivity.
 Qed.
 
-Definition L1_as_MetricSpace : MetricSpace :=
+Definition L1StepQ_as_MetricSpace : MetricSpace :=
 Build_MetricSpace L1Ball_wd L1_is_MetricSpace.
 
-Canonical Structure L1_as_MetricSpace.
+Canonical Structure L1StepQ_as_MetricSpace.
 
-Lemma L1PrelengthSpace : PrelengthSpace L1_as_MetricSpace.
+Lemma L1StepQPrelengthSpace : PrelengthSpace L1StepQ_as_MetricSpace.
 Proof.
 intros x y e d1 d2 He Hxy.
 change (e < (d1+d2)%Qpos) in He.
@@ -757,9 +795,30 @@ change (~d==0).
 rapply Qpos_nonzero.
 Qed.
 
+Lemma integral_uc_prf : is_UniformlyContinuousFunction IntegralQ Qpos2QposInf.
+Proof.
+intros e x y.
+simpl in *.
+rewrite Qball_Qabs.
+rewrite Integral_minus.
+unfold L1Ball, L1Distance.
+generalize (QminusS ^@> x <@> y).
+clear x y.
+intros x.
+intros Hx.
+eapply Qle_trans.
+ apply Abs_Integral_Norm.
+assumption.
+Qed.
+
+Open Local Scope uc_scope.
+
+Definition IntegralQ_uc : L1StepQ_as_MetricSpace --> Q_as_MetricSpace
+:= Build_UniformlyContinuousFunction integral_uc_prf.
+
+End L1metric.
+
 (* TODO:
-Is a metric space
-Continuity of integration
 Continuity of Map, Map2
 Continuous functions are in the completion, i.e. there is an injection 
 from continuous functions to integrable ones.
