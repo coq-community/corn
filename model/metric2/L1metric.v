@@ -79,6 +79,14 @@ rewrite Hx;
 reflexivity).
 Defined.
 
+Definition QmultS : QS --> QS --> QS.
+exists (QscaleS).
+abstract (
+intros x1 x2 Hx y; simpl in *;
+rewrite Hx;
+reflexivity).
+Defined.
+
 Definition Qle0 : QS -> QS --> iffSetoid.
 intros q.
 exists (Qle q).
@@ -99,6 +107,104 @@ Defined.
 End QS.
 
 Definition StepQ := (StepF QS).
+
+Definition StepQplus (s t:StepQ) : StepQ := QplusS ^@> s <@> t.
+Definition StepQopp (s:StepQ) : StepQ := QoppS ^@> s.
+Definition StepQminus (s t:StepQ) : StepQ := QminusS ^@> s <@> t.
+Definition StepQmult (s t:StepQ) : StepQ := QmultS ^@> s <@> t.
+
+Definition StepQsrt : ring_theory (constStepF (0:QS)) (constStepF (1:QS)) StepQplus StepQmult StepQminus StepQopp (@StepF_eq QS).
+constructor; 
+ intros; 
+ unfold StepF_eq, StepQplus, StepQminus, StepQopp, StepQmult; 
+ rewriteStepF;
+ set (g:=st_eqS QS).
+
+set (z:=QplusS 0).
+set (f:=(join (compose g z))).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+unfold f; simpl; ring.
+
+set (f:=ap
+ (compose (@ap _ _ _) (compose (compose g) QplusS))
+ (flip (QplusS))).
+cut (StepFfoldProp (f ^@> x <@> y)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change (a + b == b + a)%Q.
+ring.
+
+set (f:=ap
+ (compose (@ap _ _ _) (compose (compose (compose (compose (@ap _ _ _)) (@compose _ _ _) g)) (compose (flip (@compose _ _ _) QplusS) (compose (@compose _ _ _) QplusS))))
+ (compose (compose QplusS) QplusS)).
+cut (StepFfoldProp (f ^@> x <@> y <@> z)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map3.
+intros a b c.
+change (a + (b + c) == a + b + c)%Q.
+ring.
+
+set (z:=(QmultS 1)).
+set (f:=(join (compose g z))).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+unfold f; simpl; ring.
+
+set (f:=ap
+ (compose (@ap _ _ _) (compose (compose g) QmultS))
+ (flip (QmultS))).
+cut (StepFfoldProp (f ^@> x <@> y)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change (a * b == b * a)%Q.
+ring.
+
+set (f:=ap
+ (compose (@ap _ _ _) (compose (compose (compose (compose (@ap _ _ _)) (@compose _ _ _) g)) (compose (flip (@compose _ _ _) QmultS) (compose (@compose _ _ _) QmultS))))
+ (compose (compose QmultS) QmultS)).
+cut (StepFfoldProp (f ^@> x <@> y <@> z)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map3.
+intros a b c.
+change (a * (b * c) == a * b * c)%Q.
+ring.
+
+set (f:= ap
+ (compose (@ap _ _ _) (compose (compose (compose (@ap _ _ _) (compose (compose g) QmultS))) QplusS))
+ (compose (flip (@compose _ _ _) QmultS) (compose (@ap _ _ _) (compose (compose QplusS) QmultS)))).
+cut (StepFfoldProp (f ^@> x <@> y <@> z)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map3.
+intros a b c.
+change ((a + b) * c == a*c + b*c)%Q.
+ring.
+
+set (f:= ap
+ (compose (@ap _ _ _) (compose (compose g) QminusS))
+ (compose (flip (@compose _ _ _) QoppS) QplusS)).
+cut (StepFfoldProp (f ^@> x <@> y)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+change (a - b == a + - b)%Q.
+ring.
+
+set (z:=(0:QS)).
+set (f:= compose (flip g z) (ap QplusS QoppS)).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f; evalStepF; tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+change (a + - a == 0)%Q.
+ring.
+Qed.
 
 Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (b*x+(1-b)*y:QS))).
 Definition L1Norm(f:StepF QS):Q:=(IntegralQ (QabsS ^@> f)).
