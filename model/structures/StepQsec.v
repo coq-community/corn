@@ -101,7 +101,12 @@ Defined.
 
 End QS.
 
-Definition StepQ := (StepF QS).
+Notation "'StepQ'" := (StepF QS) : StepQ_scope.
+
+Delimit Scope StepQ_scope with SQ.
+Bind Scope StepQ_scope with StepF.
+
+Open Local Scope StepQ_scope.
 
 Definition StepQplus (s t:StepQ) : StepQ := QplusS ^@> s <@> t.
 Definition StepQopp (s:StepQ) : StepQ := QoppS ^@> s.
@@ -112,10 +117,6 @@ Notation "- x" := (StepQopp x) : StepQ_scope.
 Notation "x - y" := (StepQminus x y) : StepQ_scope.
 Notation "x * y" := (StepQmult x y) : StepQ_scope.
 
-Delimit Scope StepQ_scope with StepQ.
-Bind Scope StepQ_scope with StepQ.
-
-Open Local Scope StepQ_scope.
 
 Add Morphism StepQplus with signature StepF_eq ==> StepF_eq ==> StepF_eq as StepQplus_wd.
 Proof.
@@ -297,6 +298,7 @@ Ltac isStepQcst t :=
             end
    |false => false
    end
+  | _ => false
   end.
 
 Ltac StepQcst t :=
