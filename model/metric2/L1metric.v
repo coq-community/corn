@@ -544,3 +544,15 @@ Open Local Scope uc_scope.
 
 Definition IntegralQ_uc : L1StepQ_as_MetricSpace --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction integral_uc_prf.
+
+Lemma constStepF_uc_prf : is_UniformlyContinuousFunction (@constStepF QS) Qpos2QposInf.
+Proof.
+intros e x y H.
+simpl in *.
+rewrite Qball_Qabs in H.
+assumption.
+Qed.
+
+Definition constStepF_uc : Q_as_MetricSpace --> L1StepQ_as_MetricSpace
+:= Build_UniformlyContinuousFunction constStepF_uc_prf.
+
