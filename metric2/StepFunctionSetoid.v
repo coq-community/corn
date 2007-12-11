@@ -966,7 +966,7 @@ reflexivity.
 Qed.
 
 Definition ap (X Y Z:Setoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
-:= compose (compose (compose (@join _ _)) (flip (@compose _ _ _) (flip (@compose _ _ _)))) (flip (@compose _ _ _)).
+:= compose (compose (compose (@join _ _)) (@flip _ _ _)) (compose (@compose _ _ _)).
 
 Implicit Arguments ap [X Y Z].
 
