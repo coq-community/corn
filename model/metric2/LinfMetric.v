@@ -35,6 +35,8 @@ Set Implicit Arguments.
 Open Local Scope sfstscope.
 Open Local Scope StepQ_scope.
 
+Opaque Qmax Qabs.
+
 Definition StepQSup : (StepQ)->Q := StepFfold (fun x => x) (fun b (x y:QS) => Qmax x y)%Q.
 Definition LinfNorm (f:StepF QS):Q:=(StepQSup (StepQabs f)).
 Definition LinfDistance (f g:StepF QS):Q := (LinfNorm (f - g)).
@@ -81,4 +83,82 @@ unfold L1Ball.
 eapply Qle_trans.
  apply L1Distance_le_LinfDistance.
 assumption.
+Qed.
+
+Lemma StepQSupSplit : forall (o:OpenUnit) x, 
+ (StepQSup x == Qmax (StepQSup (SplitL x o)) (StepQSup (SplitR x o)))%Q.
+Proof.
+intros o x.
+revert o.
+induction x using StepF_ind.
+ intros o.
+ change (x == Qmax x x)%Q.
+ rewrite Qmax_idem.
+ reflexivity.
+intros s.
+apply SplitLR_glue_ind; intros H.
+  change (Qmax (StepQSup x1) (StepQSup x2) == Qmax (StepQSup (SplitL x1 (OpenUnitDiv s o H)))
+    (Qmax (StepQSup (SplitR x1 (OpenUnitDiv s o H))) (StepQSup x2)))%Q.
+  rewrite Qmax_assoc.
+  rewrite <- IHx1.
+  reflexivity.
+ change (Qmax (StepQSup x1) (StepQSup x2) == Qmax (Qmax (StepQSup x1) (StepQSup (SplitL x2 (OpenUnitDualDiv s o H))))
+   (StepQSup (SplitR x2 (OpenUnitDualDiv s o H))))%Q.
+ rewrite <- Qmax_assoc.
+ rewrite <- IHx2.
+ reflexivity.
+reflexivity.
+Qed. 
+
+Add Morphism StepQSup 
+  with signature  StepF_eq ==>  Qeq
+ as StepQSup_wd.
+unfold IntegralQ.
+induction x1 using StepF_ind.
+intros x2 H. simpl. induction x2 using StepF_ind.
+  simpl.  auto with *.
+ change (StepQSup (glue o x2_1 x2_2))%Q with
+  (Qmax (StepQSup x2_1) (StepQSup x2_2)).
+ destruct H as [H0 H1] using (eq_glue_ind x2_1).
+ rewrite <- IHx2_1; auto with *.
+ rewrite <- IHx2_2; auto with *.
+intros x2 H.
+destruct H as [H0 H1] using (glue_eq_ind x1_1).
+change (StepQSup (glue o x1_1 x1_2))%Q with
+ (Qmax (StepQSup x1_1) (StepQSup x1_2)).
+rewrite (IHx1_1 _ H0).
+rewrite (IHx1_2 _ H1).
+symmetry.
+apply StepQSupSplit.
+Qed.
+
+Add Morphism LinfNorm 
+  with signature StepF_eq ==>  Qeq
+ as LinfNorm_wd.
+unfold LinfNorm.
+intros x y Hxy.
+rewrite Hxy.
+reflexivity.
+Qed.
+
+Add Morphism LinfDistance 
+  with signature StepF_eq ==> StepF_eq ==>  Qeq
+ as LinfDistance_wd.
+unfold LinfDistance.
+intros x1 x2 Hx y1 y2 Hy.
+rewrite Hx.
+rewrite Hy.
+reflexivity.
+Qed.
+
+Add Morphism LinfBall 
+  with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff
+ as LinfBall_wd.
+unfold LinfBall.
+intros a1 a2 Ha x1 x2 Hx y1 y2 Hy.
+unfold QposEq in Ha.
+rewrite Ha.
+rewrite Hx.
+rewrite Hy.
+reflexivity.
 Qed.

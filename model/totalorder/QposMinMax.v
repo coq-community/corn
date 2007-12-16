@@ -187,3 +187,29 @@ Definition Qpos_max_plus_distr_l : forall x y z : Qpos, Qpos_plus (Qpos_max y z)
  fun a => @monotone_join_distr Qto _ (Qplus_monotone_l a).
 
 End QTotalOrder.
+
+Lemma Q_Qpos_min : forall (x y:Qpos), ((Qpos_min x y)%Qpos:Q)==Qmin (x:Q) (y:Q).
+Proof.
+intros x y.
+unfold Qpos_min.
+unfold Qmin.
+unfold Default.min.
+destruct (Qpos_le_total x y) as [H|H];
+destruct (Qle_total x y) as [H0|H0]; try reflexivity;
+ apply Qle_antisym; auto.
+Qed.
+
+Hint Rewrite Q_Qpos_min : QposElim.
+
+Lemma Q_Qpos_max : forall (x y:Qpos), ((Qpos_max x y)%Qpos:Q)==Qmax (x:Q) (y:Q).
+Proof.
+intros x y.
+unfold Qpos_max.
+unfold Qmax.
+unfold Default.max.
+destruct (Qpos_le_total y x) as [H|H];
+destruct (Qle_total y x) as [H0|H0]; try reflexivity;
+ apply Qle_antisym; auto.
+Qed.
+
+Hint Rewrite Q_Qpos_max : QposElim.

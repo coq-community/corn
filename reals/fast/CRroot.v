@@ -350,7 +350,7 @@ Proof.
 intros e1 e2.
 apply ball_weak_le with (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos.
  autorewrite with QposElim.
- rsapply plus_resp_leEq_both; apply Qpos_min_lb_r.
+ rsapply plus_resp_leEq_both; auto with *.
 apply ball_root_has_error;
  try first [rapply root_loop_one_le; apply initial_root_one_le
            |rapply root_loop_error; try first
