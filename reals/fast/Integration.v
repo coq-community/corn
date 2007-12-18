@@ -58,6 +58,39 @@ Definition positive_rect2
  (c3 : P 1%positive) (p : positive) : P p :=
 positive_rect2_helper P c1 c2 c3 false p.
 
+Lemma positive_rect2_helper_bool : forall P c1 c2 c3 p,
+positive_rect2_helper P c1 c2 c3 true p =
+positive_rect2_helper P c1 c2 c3 false (Psucc p).
+Proof.
+intros P c1 c2 c3.
+induction p; try reflexivity.
+simpl.
+rewrite IHp.
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red1 : forall P c1 c2 c3 p,
+positive_rect2 P c1 c2 c3 (xI p) =
+c1 p (positive_rect2 P c1 c2 c3 (Psucc p)) (positive_rect2 P c1 c2 c3 p).
+Proof.
+intros P c1 c2 c3 p.
+unfold positive_rect2.
+simpl.
+rewrite positive_rect2_helper_bool.
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red2 : forall P c1 c2 c3 p,
+positive_rect2 P c1 c2 c3 (xO p) =
+c2 p (positive_rect2 P c1 c2 c3 p).
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red3 : forall P c1 c2 c3,
+positive_rect2 P c1 c2 c3 (xH) = c3.
+reflexivity.
+Qed.
+
 Lemma oddGluePoint (p:positive) : 0 < Psucc p # xI p /\ Psucc p # xI p < 1.
 Proof.
 intros p.
@@ -270,7 +303,73 @@ rewrite (IHx1_2 _ _ _ (affineCombo_lt (OpenUnitDual o) H) H1).
 rewrite SupDistanceToLinear_split.
  reflexivity.
 apply SupDistanceToLinear_wd1; try reflexivity.
-Qed. 
+Qed.
+
+Lemma SupDistanceToLinear_translate :
+ forall x c a b (H:a < b) (H0:a+c < b + c),
+  (SupDistanceToLinear x H == SupDistanceToLinear (constStepF (c:QS) + x) H0)%Q.
+Proof.
+induction x using StepF_ind.
+ intros; unfold SupDistanceToLinear; simpl.
+ autorewrite with QposElim.
+ apply Qmax_compat; ring.
+intros c a b H H0.
+change (constStepF (X:=QS) c + glue o x1 x2)
+ with (glue o (constStepF (c:QS) + x1) (constStepF (c:QS) + x2)).
+do 2 rewrite SupDistanceToLinear_glue.
+set (A:=(affineCombo_gt (OpenUnitDual o) H)).
+apply Qmax_compat.
+ eapply Seq_trans.
+  apply Q_Setoid.
+ apply (IHx1 c _ _ A (Qplus_resp_Qlt _ _ A c)).
+ apply SupDistanceToLinear_wd1; try reflexivity.
+ unfold affineCombo; ring.
+set (B:=(affineCombo_lt (OpenUnitDual o) H)).
+eapply Seq_trans.
+ apply Q_Setoid.
+apply (IHx2 c _ _ B (Qplus_resp_Qlt _ _ B c)).
+apply SupDistanceToLinear_wd1; try reflexivity.
+unfold affineCombo; ring.
+Qed.
+
+Lemma SupDistanceToLinear_scale :
+ forall x c a b (H:a < b) (H0:c*a < c*b),
+  (c*SupDistanceToLinear x H == SupDistanceToLinear (constStepF (c:QS) * x) H0)%Q.
+Proof.
+intros x c a b H H0.
+assert (X:0 < c).
+ rewrite Qlt_minus_iff in *|-.
+ rsapply (mult_cancel_less _ 0 c (b + - a))%Q; auto with *.
+ replace LHS with 0 by ring.
+ replace RHS with (c* b + - (c*a))%Q by ring.
+ assumption.
+revert c a b H H0 X.
+induction x using StepF_ind.
+ intros; unfold SupDistanceToLinear; simpl.
+ autorewrite with QposElim.
+ rewrite Qmax_mult_pos_distr_r; auto with *.
+ apply Qmax_compat; ring.
+intros c a b H H0 X.
+change (constStepF (X:=QS) c * glue o x1 x2)
+ with (glue o (constStepF (c:QS) * x1) (constStepF (c:QS) * x2)).
+do 2 rewrite SupDistanceToLinear_glue.
+eapply Seq_trans.
+  apply Q_Setoid.
+ apply Qmax_mult_pos_distr_r; auto with *.
+set (A:=(affineCombo_gt (OpenUnitDual o) H)).
+apply Qmax_compat.
+ eapply Seq_trans.
+  apply Q_Setoid.
+ apply (IHx1 c _ _ A (mult_resp_less_lft _ _ _ _ A X)); auto with *.
+ apply SupDistanceToLinear_wd1; try reflexivity.
+ unfold affineCombo; ring.
+set (B:=(affineCombo_lt (OpenUnitDual o) H)).
+eapply Seq_trans.
+ apply Q_Setoid.
+apply (IHx2 c _ _ B (mult_resp_less_lft _ _ _ _ B X)); auto with *.
+apply SupDistanceToLinear_wd1; try reflexivity.
+unfold affineCombo; ring.
+Qed.
 
 Lemma SupDistanceToLinear_trans :
  forall x y a b (H:a < b), LinfBall (SupDistanceToLinear x H + SupDistanceToLinear y H) x y.
@@ -338,6 +437,86 @@ setoid_replace (SupDistanceToLinear y H:Q)
  eapply Qle_trans; [apply IHx2| apply Qmax_ub_r].
 apply SupDistanceToLinear_wd2.
 symmetry; apply glueSplit.
+Qed.
+
+Lemma stepSampleDistanceToId : (forall p, @SupDistanceToLinear (stepSample p) 0 1 (@pos_one _) == (1#(2*p)))%Q.
+Proof.
+induction p using positive_rect2.
+  replace (stepSample (xI p))
+   with (glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * (stepSample (Psucc p))) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*(stepSample p))))
+   by (symmetry;rapply positive_rect2_red1).
+  rewrite SupDistanceToLinear_glue.
+  generalize (@affineCombo_gt (OpenUnitDual (Build_OpenUnit (oddGluePoint p))) 0 1 (pos_one Q_as_COrdField))
+    (@affineCombo_lt (OpenUnitDual (Build_OpenUnit (oddGluePoint p))) 0 1 (pos_one Q_as_COrdField)).
+  intros A B.
+  set (C:=(pos_one Q_as_COrdField)) in *.
+  transitivity (Qmax (1#2*xI p) (1#2*xI p))%Q;[|apply Qmax_idem].
+  apply Qmax_compat.
+   set (LHS := (SupDistanceToLinear
+    (constStepF (X:=QS) (Psucc p # xI p) * stepSample (Psucc p)) A)).
+   transitivity ((Psucc p#xI p)*(SupDistanceToLinear (stepSample (Psucc p)) C))%Q;
+    [|rewrite IHp;
+      change ((Psucc p * 1 * (2 * (2* p + 1)) = 2* (Psucc p + p * (2* (Psucc p))))%Z);
+      repeat rewrite Zpos_succ_morphism; ring].
+   assert (X:(Psucc p # xI p) *0 < (Psucc p # xI p) *1).
+    constructor.
+   rewrite (fun a => SupDistanceToLinear_scale a C X).
+   rapply SupDistanceToLinear_wd1.
+    simpl; ring.
+   unfold affineCombo; simpl; unfold QONE; ring.
+  set (LHS := (SupDistanceToLinear
+  (constStepF (X:=QS) (1 # xI p) *
+   (constStepF (X:=QS) (Psucc p) + constStepF (X:=QS) p * stepSample p)) B)%Q).
+  transitivity ((1#xI p)*(p*(SupDistanceToLinear (stepSample (p)) C)))%Q;
+  [|rewrite IHp0;
+    change ((p * 1 * (2 * (2* p + 1)) = 2* (p + p * (2* p)))%Z); ring].
+  assert (X0:(p *0 < p *1)).
+   constructor.
+  rewrite (fun a => SupDistanceToLinear_scale a C X0).
+  assert (X1:(p*0 + Psucc p < p*1 + Psucc p)).
+   rsapply plus_resp_less_rht.
+   assumption.
+  rewrite (fun a => SupDistanceToLinear_translate a X0 X1).
+  assert (X2:((1# xI p)*(p*0 + Psucc p) < (1#xI p)*(p*1 + Psucc p))).
+   rsapply mult_resp_less_lft; auto with *.
+  rewrite (fun a => SupDistanceToLinear_scale a X1 X2).
+  rapply SupDistanceToLinear_wd1.
+   unfold affineCombo; simpl; unfold QONE.
+   repeat rewrite Zpos_succ_morphism;
+   repeat rewrite Qmake_Qdiv;
+   repeat rewrite Zpos_xI; 
+   field; auto with *.
+  change (2*(p*1) + 1 = ((p*1*1 + Psucc p*1)*1))%Z.
+  rewrite Zpos_succ_morphism; ring.
+ change (1#2*xO p)%Q with ((1#2)*(1#(2*p)))%Q.
+ replace (stepSample (xO p))
+   with (glue (ou (1#2))
+    (constStepF (1#2:QS) * (stepSample p)) 
+    (constStepF (1#2:QS) * (constStepF (1:QS) + (stepSample p))))
+   by (symmetry;rapply positive_rect2_red2).
+ rewrite SupDistanceToLinear_glue.
+ generalize (@affineCombo_gt (OpenUnitDual (ou (1#2))) 0 1 (pos_one Q_as_COrdField))
+    (@affineCombo_lt (OpenUnitDual (ou (1#2))) 0 1 (pos_one Q_as_COrdField)).
+ intros A B.
+ set (C:=(pos_one Q_as_COrdField)) in *.
+ transitivity (Qmax ((1#2)*(1#2 * p)) ((1#2)*(1#2 * p)))%Q;[|apply Qmax_idem].
+ set (D1:=(SupDistanceToLinear (constStepF (X:=QS) (1 # 2) * stepSample p) A)).
+ set (D2:=(SupDistanceToLinear
+      (constStepF (X:=QS) (1 # 2) * (constStepF (X:=QS) 1 + stepSample p)) B)).
+ rewrite <- IHp.
+ apply Qmax_compat.
+  assert (X:((1#2) *0 < (1#2) *1)).
+   constructor.
+  rewrite (fun a c => SupDistanceToLinear_scale a c X).
+  rapply SupDistanceToLinear_wd1; constructor.
+ assert (X0:0 + 1 < 1 +1).
+  constructor.
+ rewrite (fun a c => SupDistanceToLinear_translate a c X0).
+ assert (X1:(1#2)*(0 + 1) < (1#2)*(1 +1)).
+  constructor.
+ rewrite (fun a => SupDistanceToLinear_scale a X0 X1).
+ rapply SupDistanceToLinear_wd1; constructor.
+reflexivity.
 Qed.
 
 End id01.
