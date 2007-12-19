@@ -20,15 +20,20 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export IntegrableFunctions.
+Require Export CRmetric.
+Require Import CRArith.
 Require Import StepQsec.
 Require Import OpenUnit.
 Require Import QMinMax.
 Require Import QposMinMax.
 Require Import Qabs.
 Require Import Qauto.
+Require Import Qround.
+Require Import L1metric.
 Require Import LinfMetric.
 Require Import Qordfield.
 Require Import COrdFields2.
+Require Import Qmetric.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -109,7 +114,7 @@ Qed.
 Open Local Scope sfstscope.
 Open Local Scope StepQ_scope.
 
-Definition stepSample := positive_rect2 
+Definition stepSample : positive -> StepQ := positive_rect2 
  (fun _ => StepQ)
  (fun p rec1 rec2 => glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * rec1) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*rec2)))
  (fun p rec => glue (ou (1#2)) (constStepF (1#2:QS) * rec) (constStepF (1#2:QS) * (constStepF (1:QS) + rec)))
@@ -439,8 +444,9 @@ apply SupDistanceToLinear_wd2.
 symmetry; apply glueSplit.
 Qed.
 
-Lemma stepSampleDistanceToId : (forall p, @SupDistanceToLinear (stepSample p) 0 1 (@pos_one _) == (1#(2*p)))%Q.
+Lemma stepSampleDistanceToId : (forall p, QposEq (@SupDistanceToLinear (stepSample p) 0 1 (@pos_one _)) (1#(2*p))).
 Proof.
+unfold QposEq.
 induction p using positive_rect2.
   replace (stepSample (xI p))
    with (glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * (stepSample (Psucc p))) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*(stepSample p))))
@@ -519,4 +525,100 @@ induction p using positive_rect2.
 reflexivity.
 Qed.
 
+Definition id01_raw_help (q:QposInf) : positive := 
+match q with
+|QposInfinity => 1%positive
+|Qpos2QposInf q =>
+  match (Qceiling ((1#2)/q)%Qpos) with
+  | Zpos p => p
+  | _ => 1%positive
+  end
+end.
+
+Lemma id01_raw_help_le : forall (q:Qpos),
+ ((1#2*id01_raw_help q) <= q)%Q.
+Proof.
+intros q.
+simpl.
+assert (X:=Qle_ceiling ((1#2)/q)%Qpos).
+revert X.
+generalize (Qceiling ((1#2)/q)%Qpos).
+intros [|p|p] H; try solve [elim (Qle_not_lt _ _ H); auto with *].
+autorewrite with QposElim in *.
+rewrite Qmake_Qdiv in *.
+rewrite Zpos_xO.
+rewrite Qle_minus_iff in *.
+change ((2%positive * p)%Z:Q) with (2%positive * p)%Q.
+replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q by (field; split; discriminate).
+rsapply mult_resp_nonneg; auto with *.
+Qed.
+
+Definition id01_raw (q:QposInf) : StepQ := stepSample (id01_raw_help q).
+
+Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> L1StepQ_as_MetricSpace).
+Proof.
+intros a b.
+unfold id01_raw.
+apply ball_weak_le with ((1#2*(id01_raw_help a)) + (1#2*(id01_raw_help b)))%Qpos.
+ autorewrite with QposElim.
+ rapply plus_resp_leEq_both;
+  rapply id01_raw_help_le.
+apply LinfL1Ball.
+do 2 rewrite <- stepSampleDistanceToId.
+apply SupDistanceToLinear_trans.
+Qed.
+
+Definition id01 : IntegrableFunction :=
+Build_RegularFunction id01_prf.
+
 End id01.
+
+Definition CRSetoid : Setoid.
+exists CR (@ms_eq CR).
+eapply msp_Xsetoid.
+apply (@msp CR).
+Defined.
+
+(* approximate z e is not a morphism, so we revert to using the pre-setoid version of StepF's map *)
+Definition distribComplete_raw (x:StepF CRSetoid) (e:QposInf) : StepQ :=
+StepFunction.Map (fun z => approximate z e) x.
+
+Lemma distribComplete_prf : forall (x:StepF CRSetoid), is_RegularFunction (distribComplete_raw x).
+Proof.
+unfold distribComplete_raw.
+intros x a b.
+induction x using StepF_ind.
+ change (Qabs (approximate x a - approximate x b) <= (a + b)%Qpos)%Q.
+ rewrite <- Qball_Qabs.
+ rapply regFun_prf.
+simpl (ball (m:=L1StepQ_as_MetricSpace)).
+unfold L1Ball, L1Distance.
+set (f:=(fun z : RegularFunction Q_as_MetricSpace => approximate z a)) in *.
+set (g:=(fun z : RegularFunction Q_as_MetricSpace => approximate z b)) in *.
+change (Map f (glue o x1 x2))
+ with (glue o (Map f x1:StepQ) (Map f x2)).
+change (Map g (glue o x1 x2))
+ with (glue o (Map g x1:StepQ) (Map g
+ x2)).
+unfold StepQminus.
+rewrite MapGlue.
+rewrite ApGlueGlue.
+rewrite L1Norm_glue.
+apply Qle_trans with (o*(a+b)%Qpos + (1-o)*(a+b)%Qpos)%Q;
+ [|(replace LHS with ((a+b)%Qpos:Q) by ring); apply Qle_refl].
+rsapply plus_resp_leEq_both;
+ rsapply mult_resp_leEq_lft; auto with *.
+Qed.
+
+Definition distribComplete (x:StepF CRSetoid) : IntegrableFunction :=
+Build_RegularFunction (distribComplete_prf x).
+
+Definition ComposeContinuous_raw f (z:StepQ) := distribComplete (StepFunction.Map f z).
+
+Open Local Scope uc_scope.
+
+Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
+ is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
+Proof.
+intros f e a b H d1 d2.
+simpl.

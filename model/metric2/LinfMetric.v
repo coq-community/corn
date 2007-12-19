@@ -162,3 +162,83 @@ rewrite Hx.
 rewrite Hy.
 reflexivity.
 Qed.
+
+Lemma LinfBall_refl : forall e x, (LinfBall e x x).
+Proof.
+intros e x.
+unfold LinfBall, LinfDistance.
+setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
+change (0 <= e)%Q.
+auto with *.
+Qed.
+
+Lemma Linfball_sym : forall e x y, (LinfBall e x y) -> (LinfBall e y x).
+Proof.
+intros e x y.
+unfold LinfBall, LinfDistance.
+unfold LinfNorm.
+setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
+rewrite StepQabsOpp.
+auto.
+Qed.
+
+Lemma StepQSup_resp_le : forall x y, x <= y -> (StepQSup x <= StepQSup y)%Q.
+Proof.
+induction x using StepF_ind.
+ induction y using StepF_ind.
+  auto.
+ intros [Hl Hr].
+ rewrite StepQSup_glue.
+ eapply Qle_trans;[|apply Qmax_ub_l].
+ apply IHy1.
+ assumption.
+intros y.
+rewrite <- (glueSplit y o).
+do 2 rewrite StepQSup_glue.
+intros H.
+unfold StepQ_le in H.
+rewrite MapGlue in H.
+rewrite ApGlueGlue in H.
+destruct H as [Hl Hr].
+apply Qmax_le_compat; auto.
+Qed.
+
+Lemma StepQSup_plus : forall x y, (StepQSup (x + y) <= StepQSup x + StepQSup y )%Q.
+Proof.
+induction x using StepF_ind.
+ induction y using StepF_ind.
+  apply Qle_refl.
+ rewrite StepQSup_glue.
+ rewrite Qmax_plus_distr_r.
+ rapply Qmax_le_compat; assumption.
+intros y.
+rewrite <- (glueSplit y o).
+unfold StepQplus.
+rewrite MapGlue.
+rewrite ApGlueGlue.
+do 3 rewrite StepQSup_glue.
+change (Qmax (StepQSup (QplusS ^@> x1 <@> SplitL y o))
+   (StepQSup (QplusS ^@> x2 <@> SplitR y o)))
+ with (Qmax (StepQSup (x1 + SplitL y o)) (StepQSup (x2 + SplitR y o))).
+eapply Qle_trans;[apply Qmax_le_compat;[apply IHx1|apply IHx2]|].
+rewrite Qmax_plus_distr_l.
+apply Qmax_le_compat;
+ rsapply plus_resp_leEq_lft;
+ auto with *.
+Qed.
+
+Lemma Linfball_triangle : forall e d x y z, (LinfBall e x y) -> (LinfBall d y z) -> (LinfBall (e+d) x z).
+Proof.
+intros e d x y z.
+unfold LinfBall, LinfDistance.
+unfold LinfNorm.
+setoid_replace (x-z) with ((x-y)+(y-z)) using relation StepF_eq by ring.
+intros He Hd.
+autorewrite with QposElim.
+apply Qle_trans with (StepQSup (StepQabs (x-y) + StepQabs (y-z)))%Q.
+ apply StepQSup_resp_le.
+ apply StepQabs_triangle.
+eapply Qle_trans.
+ apply StepQSup_plus.
+rsapply plus_resp_leEq_both; assumption.
+Qed.

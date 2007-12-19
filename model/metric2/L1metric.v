@@ -188,6 +188,16 @@ Qed.
 
 Definition StepQ_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
 
+Add Morphism StepQ_le 
+  with signature StepF_eq ==> StepF_eq ==> iff
+ as StepQ_le_wd.
+unfold StepQ_le.
+intros x1 x2 Hx y1 y2 Hy.
+rewrite Hx.
+rewrite Hy.
+reflexivity.
+Qed.
+
 Notation "x <= y" := (StepQ_le x y) (at level 70) : sfstscope.
 
 Lemma StepQ_le_refl:forall x, (x <= x).
@@ -236,6 +246,14 @@ rewriteStepF.
 intros [Hxl Hxr].
 rsapply plus_resp_nonneg;
  rsapply mult_resp_nonneg; auto with *.
+Qed.
+
+Lemma L1Norm_glue : forall o s t, (L1Norm (glue o s t) == o*L1Norm s + (1-o)*L1Norm t)%Q.
+Proof.
+intros o s t.
+unfold L1Norm.
+rewrite <- Integral_glue.
+reflexivity.
 Qed.
 
 Lemma L1Norm_nonneg : forall x, (0 <= (L1Norm x))%Q.
@@ -361,28 +379,46 @@ change (0 <= e)%Q.
 auto with *.
 Qed.
 
+Lemma StepQabsOpp : forall x, StepQabs (-x) == StepQabs (x).
+Proof.
+intros x.
+unfold StepF_eq.
+set (g:=(st_eqS QS)).
+set (f:=(ap
+(compose g (compose QabsS QoppS))
+QabsS)).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+rapply Qabs_opp.
+Qed.
+
 Lemma L1ball_sym : forall e x y, (L1Ball e x y) -> (L1Ball e y x).
 Proof.
 intros e x y.
 unfold L1Ball, L1Distance.
 unfold L1Norm.
-setoid_replace (QabsS ^@> (QminusS ^@> x <@> y)) with (QabsS ^@> (QminusS ^@> y <@> x)) using relation StepF_eq.
- tauto.
-unfold StepF_eq.
-set (g:=(st_eqS QS)).
+setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
+rewrite StepQabsOpp.
+auto.
+Qed.
+
+Lemma StepQabs_triangle : forall x y, StepQabs (x+y) <= StepQabs x + StepQabs y.
+Proof.
+intros x y.
 set (f:=(ap
-(compose ap (compose (compose (compose g QabsS)) QminusS))
-(compose (compose QabsS) (flip QminusS)))).
+(compose ap (compose (compose (compose QleS QabsS)) QplusS))
+(compose (flip (@compose _ _ _) QabsS) (compose QplusS QabsS)))).
 cut (StepFfoldProp (f ^@> x <@> y)).
  unfold f.
  evalStepF.
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-change (Qabs (a - b) == Qabs (b - a))%Q.
-rewrite <- Qabs_opp.
-apply Qabs_wd.
-ring.
+rapply Qabs_triangle.
 Qed.
 
 Lemma L1ball_triangle : forall e d x y z, (L1Ball e x y) -> (L1Ball d y z) -> (L1Ball (e+d) x z).
@@ -390,26 +426,14 @@ Proof.
 intros e d x y z.
 unfold L1Ball, L1Distance.
 unfold L1Norm.
+setoid_replace (x-z) with ((x-y)+(y-z)) using relation StepF_eq by ring.
 intros He Hd.
 autorewrite with QposElim.
-apply Qle_trans with (IntegralQ (QabsS ^@> (QminusS ^@> x <@> y)) + IntegralQ (QabsS ^@> (QminusS ^@> y <@> z)))%Q;
- [|rsapply plus_resp_leEq_both; assumption].
-rewrite Integral_plus.
-apply Integral_resp_le.
-unfold StepQ_le.
-set (f:=ap
- (compose (@compose _ _ _) (compose ap (compose (compose (compose QleS QabsS)) QminusS)))
- (compose (flip ap (compose (compose QabsS) QminusS)) (compose (compose (compose (@compose _ _ _) (compose QplusS QabsS))) QminusS))).
-cut (StepFfoldProp (f ^@> x <@> y <@> z)).
- unfold f.
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map3.
-intros a b c.
-change (Qabs (a - c) <= Qabs (a - b) + Qabs (b - c))%Q.
-eapply Qle_trans;[|apply Qabs_triangle].
-setoid_replace (a - b + (b - c))%Q with (a - c)%Q by ring.
-auto with *.
+apply Qle_trans with (IntegralQ (StepQabs (x-y) + StepQabs (y-z)))%Q.
+ apply Integral_resp_le.
+ apply StepQabs_triangle.
+rewrite <- Integral_plus.
+rsapply plus_resp_leEq_both; assumption.
 Qed.
 
 Lemma L1ball_closed : forall e x y, (forall d, (L1Ball (e+d) x y)) -> (L1Ball e x y).
