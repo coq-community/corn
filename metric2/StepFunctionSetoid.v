@@ -511,6 +511,28 @@ Lemma StepF_Sth (X:Setoid) : (Setoid_Theory (StepF X) (@StepF_eq X)).
 split; intros; eauto with sfarith.
 Qed.
 
+Lemma StepF_ind2 : forall (X Y : Setoid) (P : StepF X -> StepF Y -> Prop),
+       (forall (s s0 : StepF X) (t t0 : StepF Y),
+        (s==s0) -> (t==t0) -> P s t -> P s0 t0) ->
+       (forall (x:X) (y:Y), P (constStepF x) (constStepF y)) ->
+       (forall (o : OpenUnit) (s s0 : StepF X) (t t0 : StepF Y),
+        P s t -> P s0 t0 -> P (glue o s s0) (glue o t t0)) ->
+       forall (s:StepF X) (t:StepF Y), P s t.
+Proof.
+intros X Y P wd c0 c1.
+induction s using StepF_ind.
+ induction t using StepF_ind.
+  apply c0.
+ apply wd with (s:=(glue o (constStepF x) (constStepF x))) (t:=glue o t1 t2); try reflexivity.
+  apply (glueSplit (constStepF x) o).
+ apply c1; assumption.
+intros t.
+eapply wd.
+  reflexivity.
+ apply glueSplit with (a:=o).
+apply c1; auto.
+Qed.
+
 Lemma glue_injl X :forall o (x y x1 y1:StepF X),
 (glue o x y)==(glue o x1 y1) -> (x==x1).
 intros.
@@ -608,8 +630,7 @@ Qed.
 
 Add Morphism Ap with signature StepF_eq ==> StepF_eq ==> StepF_eq as Ap_wd.
 Proof.
-intros X Y f g.
-revert g.
+intros X Y f.
 induction f using StepF_ind; intros g Hfg.
  induction g using StepF_ind; intros x1.
   simpl.
@@ -730,37 +751,17 @@ Lemma Map_composition X Y Z: forall (a:StepF (Y-->Z)) (b:StepF (X-->Y)) (c:StepF
 Proof.
 induction a using StepF_ind.
  simpl.
- intros b.
- induction b using StepF_ind.
-  simpl.
-  intros c.
-  induction c using StepF_ind.
-   auto with *.
-  change (@compose X Y Z ^@> constStepF (X:=Y --> Z) x <@> constStepF (X:=X --> Y) x0 <@> glue o c1 c2)
-   with (@compose X Y Z x x0 ^@> glue o c1 c2).
-  rewrite MapGlue.
-  apply glue_StepF_eq.
-   rewrite IHc1.
-   repeat rewrite (SplitLAp).
-   repeat rewrite SplitLGlue.
-   reflexivity.
-  rewrite IHc2.
-  repeat rewrite (SplitRAp).
-  repeat rewrite SplitRGlue.
-  reflexivity.
- intros c.
- change (compose x ^@> glue o b1 b2 <@> c == x ^@> (glue o b1 b2 <@> c)).
- rewrite MapGlue, ApGlue.
- apply glue_StepF_eq.
-  rewrite IHb1.
-  rewrite SplitLMap.
-  rewrite SplitLAp.
-  rewrite SplitLGlue.
-  reflexivity.
- rewrite IHb2.
- rewrite SplitRMap.
- rewrite (SplitRAp).
- rewrite SplitRGlue.
+ apply StepF_ind2; auto with *.
+  intros s s0 t t0 Hs Ht.
+  rewrite Hs, Ht.
+  auto.
+ intros o s s0 t t0 H H0.
+ rewrite Map_homomorphism.
+ rewrite ApGlueGlue.
+ do 2 rewrite MapGlue.
+ rewrite ApGlueGlue.
+ rewrite <- H.
+ rewrite <- H0.
  reflexivity.
 intros b c.
 rewrite MapGlue.
@@ -795,16 +796,15 @@ Implicit Arguments const [X Y].
 Lemma Map_discardable X Y : forall (a:StepF X) (b:StepF Y),
  ((@const _ _) ^@> a <@> b == a).
 Proof.
-induction a using StepF_ind.
- induction b using StepF_ind.
-  auto with *.
- simpl.
- rapply glue_StepF_eq; assumption.
-intros b.
+intros X Y.
+apply StepF_ind2; auto with *.
+ intros s s0 t t0 Hs Ht.
+ rewrite Hs, Ht.
+ auto.
+intros o s s0 t t0 H0 H1.
 rewrite MapGlue.
-rewrite ApGlue.
-rewrite IHa1.
-rewrite IHa2.
+rewrite ApGlueGlue.
+rewrite H0, H1.
 reflexivity.
 Qed.
 
@@ -845,53 +845,16 @@ Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:St
 Proof.
 induction f using StepF_ind.
  simpl.
- intros a.
- induction a using StepF_ind.
-  simpl.
-  intros b.
-  induction b using StepF_ind.
-   auto with *.
-  change (flip x x0 ^@> glue o b1 b2== x^@> glue o b1 b2 <@> constStepF x0).
-  rewrite MapGlue.
-  apply glue_StepF_eq.
-   (*Setoid rewrite bug*)
-   set (A:=(SplitL (x ^@> glue o b1 b2 <@> constStepF x0) o)).
-   rewrite IHb1.
-   unfold A; clear A.
-   set (A:=x ^@> b1 <@> constStepF x0).
-   rewrite (SplitLAp).
-   rewrite SplitLMap.
-   rewrite SplitLGlue.
-   auto with *.
-  (*Setoid rewrite bug*)
-  set (A:=(SplitR (x ^@> glue o b1 b2 <@> constStepF x0) o)).
-  rewrite IHb2.
-  unfold A; clear A.
-  set (A:=x ^@> b2 <@> constStepF x0).
-  rewrite (SplitRAp).
-  rewrite SplitRMap.
-  rewrite SplitRGlue.
-  auto with *.
- intros w.
- change (flip x ^@> glue o a1 a2 <@> w == x ^@> w <@> glue o a1 a2).
- rewrite MapGlue, ApGlue.
- apply glue_StepF_eq.
-  set (A:=(SplitL (x ^@> w <@> glue o a1 a2) o)).
-  rewrite IHa1.
-  unfold A; clear A.
-  set (A:=x ^@> SplitL w o <@> a1).
-  rewrite (SplitLAp).
-  rewrite SplitLMap.
-  rewrite SplitLGlue.
-  auto with *.
- set (A:=(SplitR (x ^@> w <@> glue o a1 a2) o)).
- rewrite IHa2.
- unfold A; clear A.
- set (A:=x ^@> SplitR w o <@> a2).
- rewrite (SplitRAp).
- rewrite SplitRMap.
- rewrite SplitRGlue.
- auto with *.
+ apply StepF_ind2; auto with *.
+  intros s s0 t t0 Hs Ht.
+  rewrite Hs, Ht.
+  auto.
+ intros o s s0 t t0 H0 H1.
+ rewrite Map_homomorphism.
+ do 2 rewrite MapGlue.
+ do 2 rewrite ApGlueGlue.
+ rewrite H0, H1.
+ reflexivity.
 intros x w.
 rewrite MapGlue.
 do 4 rewrite ApGlue.
@@ -924,27 +887,20 @@ Implicit Arguments join [X Y].
 Lemma Map_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
  ((@join _ _) ^@> f <@> x) == (f <@> x <@> x).
 Proof.
-induction f using StepF_ind.
- intros a.
- simpl ((@join _ _) ^@> constStepF x).
- induction a using StepF_ind.
-  auto with *.
- change (join x ^@> glue o a1 a2 == x ^@> glue o a1 a2 <@> glue o a1 a2).
- do 2 rewrite MapGlue.
- rewrite ApGlue.
- apply glue_resp_StepF_eq.
-  rewrite SplitLGlue.
-  auto.
- rewrite SplitRGlue.
+intros X Y.
+apply StepF_ind2; auto with *.
+ intros s s0 t t0 Hs Ht.
+ rewrite Hs, Ht.
  auto.
-intros x.
+intros o s s0 t t0 H0 H1.
 rewrite MapGlue.
-do 3 rewrite ApGlue.
-apply glue_resp_StepF_eq; auto.
+do 3 rewrite ApGlueGlue.
+rewrite H0, H1.
+reflexivity.
 Qed.
 
 Hint Rewrite 
- ApGlueGlue ApGlue GlueAp SplitRAp SplitLAp 
+ ApGlueGlue ApGlue GlueAp SplitRAp SplitLAp SplitLGlue SplitRGlue
  Map_homomorphism : StepF_rew.
 
 Hint Rewrite  

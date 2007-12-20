@@ -113,21 +113,17 @@ Hint Rewrite Integral_glue: StepF_rew.
 Lemma Integral_plus:forall s t,
   ((IntegralQ s)+(IntegralQ t)==(IntegralQ (s + t)))%Q.
 Proof.
-induction s using StepF_ind.
- induction t using StepF_ind.
-  reflexivity.
- unfold StepQplus.
- rewriteStepF.
- rewrite <- IHt1.
- rewrite <- IHt2.
- ring.
-intros t.
-unfold StepQplus in *.
+apply StepF_ind2; try reflexivity.
+ intros s s0 t t0 Hs Ht.
+ rewrite Hs, Ht; auto.
+intros o s s0 t t0 H0 H1.
+unfold StepQplus.
 rewriteStepF.
-rewrite <- IHs1.
-rewrite <- IHs2.
-rewrite (IntegralSplit o t).
-unfold affineCombo; ring.
+replace LHS
+ with (o*(IntegralQ s + IntegralQ t) + (1-o)*(IntegralQ s0 + IntegralQ t0))%Q
+ by ring.
+rewrite H0, H1.
+reflexivity.
 Qed.
 
 Lemma Integral_opp:forall s,

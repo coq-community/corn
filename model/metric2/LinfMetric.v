@@ -184,43 +184,25 @@ Qed.
 
 Lemma StepQSup_resp_le : forall x y, x <= y -> (StepQSup x <= StepQSup y)%Q.
 Proof.
-induction x using StepF_ind.
- induction y using StepF_ind.
-  auto.
- intros [Hl Hr].
- rewrite StepQSup_glue.
- eapply Qle_trans;[|apply Qmax_ub_l].
- apply IHy1.
- assumption.
-intros y.
-rewrite <- (glueSplit y o).
-do 2 rewrite StepQSup_glue.
-intros H.
-unfold StepQ_le in H.
-rewrite MapGlue in H.
-rewrite ApGlueGlue in H.
-destruct H as [Hl Hr].
+rapply StepF_ind2; auto.
+ intros s s0 t t0 Hs Ht.
+ rewrite Hs, Ht; auto.
+intros o s s0 t t0 H0 H1.
+unfold StepQ_le.
+rewriteStepF.
+intros [Hl Hr].
 apply Qmax_le_compat; auto.
 Qed.
 
 Lemma StepQSup_plus : forall x y, (StepQSup (x + y) <= StepQSup x + StepQSup y )%Q.
 Proof.
-induction x using StepF_ind.
- induction y using StepF_ind.
-  apply Qle_refl.
- rewrite StepQSup_glue.
- rewrite Qmax_plus_distr_r.
- rapply Qmax_le_compat; assumption.
-intros y.
-rewrite <- (glueSplit y o).
+rapply StepF_ind2; auto with *.
+ intros s s0 t t0 Hs Ht.
+ rewrite Hs, Ht; auto.
+intros o s s0 t t0 H0 H1.
 unfold StepQplus.
-rewrite MapGlue.
-rewrite ApGlueGlue.
-do 3 rewrite StepQSup_glue.
-change (Qmax (StepQSup (QplusS ^@> x1 <@> SplitL y o))
-   (StepQSup (QplusS ^@> x2 <@> SplitR y o)))
- with (Qmax (StepQSup (x1 + SplitL y o)) (StepQSup (x2 + SplitR y o))).
-eapply Qle_trans;[apply Qmax_le_compat;[apply IHx1|apply IHx2]|].
+rewriteStepF.
+eapply Qle_trans;[apply Qmax_le_compat;[apply H0|apply H1]|].
 rewrite Qmax_plus_distr_l.
 apply Qmax_le_compat;
  rsapply plus_resp_leEq_lft;

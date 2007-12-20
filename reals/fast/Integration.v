@@ -613,12 +613,142 @@ Qed.
 Definition distribComplete (x:StepF CRSetoid) : IntegrableFunction :=
 Build_RegularFunction (distribComplete_prf x).
 
-Definition ComposeContinuous_raw f (z:StepQ) := distribComplete (StepFunction.Map f z).
-
 Open Local Scope uc_scope.
+
+Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:StepQ) := distribComplete (StepFunction.Map f z).
+
+Add Morphism ComposeContinuous_raw with signature StepF_eq ==> ms_eq as ComposeContinuous_raw_wd.
+Proof.
+intros f x1 x2 Hx d1 d2.
+simpl.
+unfold distribComplete_raw.
+revert x1 x2 Hx.
+unfold L1Ball.
+induction x1 using StepF_ind.
+ induction x2 using StepF_ind.
+  change (x == x0 -> Qabs (approximate (f x) d1 - approximate (f x0) d2) <= (d1 + d2)%Qpos)%Q.
+  intros Hx.
+  rewrite <- Qball_Qabs.
+  revert d1 d2.
+  change (ms_eq (f x) (f x0)).
+  apply uc_wd.
+  assumption.
+ apply eq_glue_ind.
+ intros Hl Hr.
+ set (A:= (constStepF (approximate (f x) d1:QS))).
+ set (B:= (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f x2_1):StepQ)).
+ set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f x2_2):StepQ)).
+ change (o*(L1Distance A B) + (1-o)*(L1Distance A C) <= (d1 + d2)%Qpos)%Q.
+ replace RHS with (o*(d1 + d2)%Qpos + (1-o)*(d1 + d2)%Qpos)%Q by ring.
+ rsapply plus_resp_leEq_both;
+  rsapply mult_resp_leEq_lft;
+  auto with *.
+intros x2.
+apply glue_eq_ind.
+intros Hl Hr.
+ replace LHS with (L1Distance
+   (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+      (Map f (glue o x1_1 x1_2)))
+   (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+      (Map f (glue o (SplitL x2 o) (SplitR x2 o))))).
+ set (B:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+         (Map f x1_1):StepQ)).
+ set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+         (Map f x1_2):StepQ)).
+ set (A0:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f (SplitL x2 o)):StepQ)).
+ set (A1:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f (SplitR x2 o)):StepQ)).
+ change (L1Distance (glue o B C) (glue o A0 A1) <= (d1 + d2)%Qpos)%Q.
+ unfold L1Distance, L1Norm, StepQminus, StepQabs.
+ rewriteStepF.
+ replace RHS with (o*(d1 + d2)%Qpos + (1-o)*(d1 + d2)%Qpos)%Q by ring.
+ rsapply plus_resp_leEq_both;
+  rsapply mult_resp_leEq_lft;
+  auto with *.
+  rapply IHx1_1; auto with *.
+ rapply IHx1_2; auto with *.
+apply L1Distance_wd.
+ reflexivity.
+simpl.
+symmetry.
+rapply glue_StepF_eq.
+ unfold SplitL.
+ do 2 rewrite StepFunction.SplitLMap.
+ reflexivity.
+unfold SplitR.
+do 2 rewrite StepFunction.SplitRMap.
+reflexivity.
+Qed.
 
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
-intros f e a b H d1 d2.
+intros f e.
+rapply StepF_ind2.
+  intros s s0 t t0 Hs Ht H H0.
+  change (regFunBall e (ComposeContinuous_raw f s0)) with (ball e (ComposeContinuous_raw f s0)).
+  rewrite <- Hs.
+  rewrite <- Ht.
+  apply H.
+  destruct (mu f e); try constructor.
+  simpl.
+  rewrite Hs, Ht.
+  assumption.
+ intros x y H d1 d2.
+ simpl in *.
+ unfold L1Ball, L1Distance.
+ unfold L1Norm.
+ unfold StepQabs, StepQminus, QabsS, QminusS, IntegralQ.
+ simpl.
+ rewrite <- Qball_Qabs.
+ generalize d1 d2.
+ change (ball e (f x) (f y)).
+ rapply uc_prf.
+ destruct (mu f e); try solve [constructor].
+ simpl.
+ rewrite Qball_Qabs.
+ assumption.
 simpl.
+unfold regFunBall.
+simpl.
+unfold L1Ball, distribComplete_raw.
+simpl.
+intros o s s0 t t0 H0 H1 H d1 d2.
+set (A:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+         (Map f s):StepQ)).
+set (B:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+         (Map f s0):StepQ)).
+set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f t):StepQ)).
+set (D:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+         (Map f t0):StepQ)).
+change (L1Distance (glue o A B) (glue o C D) <= (d1 + e + d2)%Qpos)%Q.
+unfold L1Distance, StepQminus.
+rewriteStepF.
+change (o*(L1Distance A C) + (1-o)*(L1Distance B D) <= (d1 + e + d2)%Qpos)%Q.
+replace RHS with (o*(d1 + e + d2)%Qpos + (1-o)*(d1 + e + d2)%Qpos)%Q by ring.
+rsapply plus_resp_leEq_both;
+ rsapply mult_resp_leEq_lft;
+ auto with *.
+ rapply H0 || rapply H1;
+ destruct (mu f e); try constructor;
+ clear - H;
+ simpl in *;
+ unfold L1Ball in *;
+ (eapply Qle_trans;[|apply H]);
+ unfold L1Distance, StepQminus;
+ rewriteStepF.
+ change (L1Distance s t <= o*(L1Distance s t) + (1-o)*(L1Distance s0 t0))%Q.
+ replace LHS with (1*L1Distance s t + 0)%Q by ring.
+ rsapply plus_resp_leEq_both.
+  
+ 
+ simpl.
+ 
+re
+intros d1 d2.
+change (ComposeContinuous_raw f (glue o s s0))
+ with (glue o (ComposeContinuous_raw f s) (ComposeContinuous_raw f s0)).
