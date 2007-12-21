@@ -382,22 +382,20 @@ Proof.
 unfold LinfBall.
 intros x y a b H.
 autorewrite with QposElim.
-revert y a b H.
-induction x using StepF_ind.
- induction y using StepF_ind; intros a b H.
-  unfold LinfDistance, LinfNorm, StepQSup, SupDistanceToLinear.
-  simpl.
-  autorewrite with QposElim.
-  apply Qabs_case; intros  H0.
-   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q by ring.
-   rsapply plus_resp_leEq_both; auto with *.
-   replace RHS with (Qmax (x-a) (b-x) + 0)%Q by ring.
-   rsapply plus_resp_leEq_both; auto with *.
-   apply Qlt_le_weak.
-   rewrite Qlt_minus_iff in *.
-   replace RHS with (b + -a)%Q by ring.
-   assumption.
-  setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q by ring.
+revert x y a b H.
+rapply StepF_ind2.
+  intros s s0 t t0 Hs Ht H a b Hab.
+  replace RHS with  (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Q.
+   rewrite  <- Hs, <- Ht.
+   apply H.
+  rsapply Qplus_wd;
+   apply SupDistanceToLinear_wd2; auto.
+ unfold LinfDistance, LinfNorm, StepQSup, SupDistanceToLinear.
+ simpl.
+ intros x x0 a b H.
+ autorewrite with QposElim.
+ apply Qabs_case; intros  H0.
+  setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q by ring.
   rsapply plus_resp_leEq_both; auto with *.
   replace RHS with (Qmax (x-a) (b-x) + 0)%Q by ring.
   rsapply plus_resp_leEq_both; auto with *.
@@ -405,43 +403,28 @@ induction x using StepF_ind.
   rewrite Qlt_minus_iff in *.
   replace RHS with (b + -a)%Q by ring.
   assumption.
- rewrite SupDistanceToLinear_glue.
- change (LinfDistance (constStepF (x:QS)) (glue o y1 y2))
-  with (Qmax (LinfDistance (constStepF (x:QS)) y1)
-             (LinfDistance (constStepF (x:QS)) y2)).
- rewrite Qmax_plus_distr_r.
- eapply Qle_trans.
-  apply Qmax_le_compat;[apply (IHy1 _ _ (affineCombo_gt (OpenUnitDual o) H))|apply (IHy2 _ _ (affineCombo_lt (OpenUnitDual o) H))].
- apply Qmax_le_compat;
-  rsapply plus_resp_leEq;
-  unfold SupDistanceToLinear;
-  simpl;
-  autorewrite with QposElim; 
-  apply Qmax_le_compat; auto with *.
-  rsapply plus_resp_leEq.
-  auto with *.
- rsapply plus_resp_leEq_lft.
- apply Qopp_le_compat.
- auto with *.
-intros y a b H.
-unfold LinfDistance.
-unfold StepQminus.
-rewrite MapGlue.
-rewrite ApGlue.
+ setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q by ring.
+ rsapply plus_resp_leEq_both; auto with *.
+ replace RHS with (Qmax (x-a) (b-x) + 0)%Q by ring.
+ rsapply plus_resp_leEq_both; auto with *.
+ apply Qlt_le_weak.
+ rewrite Qlt_minus_iff in *.
+ replace RHS with (b + -a)%Q by ring.
+ assumption.
+intros o s s0 t t0 H0 H1 a b H.
+do 2 rewrite SupDistanceToLinear_glue.
+unfold LinfDistance, StepQminus.
+rewriteStepF.
+rewrite Qmax_plus_distr_r.
 change (LinfNorm
-  (glue o (QminusS ^@> x1 <@> SplitL y o) (QminusS ^@> x2 <@> SplitR y o)))
- with (Qmax (LinfDistance x1 (SplitL y o)) (LinfDistance x2 (SplitR y o))).
-rewrite SupDistanceToLinear_glue.
-rewrite Qmax_plus_distr_l.
-setoid_replace (SupDistanceToLinear y H:Q)
- with (SupDistanceToLinear (glue o (SplitL y o) (SplitR y  o)) H:Q).
- rewrite SupDistanceToLinear_glue.
- do 2 rewrite Qmax_plus_distr_r.
- apply Qmax_le_compat.
-  eapply Qle_trans; [apply IHx1| apply Qmax_ub_l].
- eapply Qle_trans; [apply IHx2| apply Qmax_ub_r].
-apply SupDistanceToLinear_wd2.
-symmetry; apply glueSplit.
+  (glue o (SplitL (constStepF (X:=QS --> QS --> QS) QminusS) o <@> s <@> t)
+      (SplitR (constStepF (X:=QS --> QS --> QS) QminusS) o <@> s0 <@> t0)))
+ with (Qmax (LinfDistance s t) (LinfDistance s0 t0)).
+rapply Qle_trans.
+ apply Qmax_le_compat;[apply (H0 _ _ (affineCombo_gt (OpenUnitDual o) H))|apply (H1 _ _ (affineCombo_lt (OpenUnitDual o) H))].
+apply Qmax_le_compat;
+ rsapply plus_resp_leEq;
+ auto with *.
 Qed.
 
 Lemma stepSampleDistanceToId : (forall p, QposEq (@SupDistanceToLinear (stepSample p) 0 1 (@pos_one _)) (1#(2*p))).
@@ -683,12 +666,24 @@ do 2 rewrite StepFunction.SplitRMap.
 reflexivity.
 Qed.
 
+Section Test.
+
+Hypothesis mu_scale:
+  forall X Y : MetricSpace,
+  PrelengthSpace X ->
+  forall (c e : Qpos) (f : UniformlyContinuousFunction X Y)
+    (a b : X),
+  ball_ex (X:=X) (c*(mu f e)) a b ->
+  ball (m:=Y) (c*e) (f a) (f b).
+
+
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
-intros f e.
+intros f e a b.
+revert a b e.
 rapply StepF_ind2.
-  intros s s0 t t0 Hs Ht H H0.
+  intros s s0 t t0 Hs Ht H e H0.
   change (regFunBall e (ComposeContinuous_raw f s0)) with (ball e (ComposeContinuous_raw f s0)).
   rewrite <- Hs.
   rewrite <- Ht.
@@ -697,7 +692,7 @@ rapply StepF_ind2.
   simpl.
   rewrite Hs, Ht.
   assumption.
- intros x y H d1 d2.
+ intros x y e H d1 d2.
  simpl in *.
  unfold L1Ball, L1Distance.
  unfold L1Norm.
@@ -716,7 +711,7 @@ unfold regFunBall.
 simpl.
 unfold L1Ball, distribComplete_raw.
 simpl.
-intros o s s0 t t0 H0 H1 H d1 d2.
+intros o s s0 t t0 H0 H1 e H d1 d2.
 set (A:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
          (Map f s):StepQ)).
 set (B:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
@@ -728,12 +723,14 @@ set (D:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
 change (L1Distance (glue o A B) (glue o C D) <= (d1 + e + d2)%Qpos)%Q.
 unfold L1Distance, StepQminus.
 rewriteStepF.
-change (o*(L1Distance A C) + (1-o)*(L1Distance B D) <= (d1 + e + d2)%Qpos)%Q.
+set (N1:=(L1Distance A C)).
+set (N2:=(L1Distance B D)).
+change (o*N1 + (1-o)*N2 <= (d1 + e + d2)%Qpos)%Q.
 replace RHS with (o*(d1 + e + d2)%Qpos + (1-o)*(d1 + e + d2)%Qpos)%Q by ring.
 rsapply plus_resp_leEq_both;
  rsapply mult_resp_leEq_lft;
  auto with *.
- rapply H0 || rapply H1;
+ rapply H0 || rapply H1.
  destruct (mu f e); try constructor;
  clear - H;
  simpl in *;
