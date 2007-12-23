@@ -29,10 +29,7 @@ Set Implicit Arguments.
 
 Open Local Scope uc_scope.
 
-Definition IntegrableFunction := Complete L1StepQ_as_MetricSpace.
+Definition IntegrableFunction := Complete L1StepQ.
 
 Definition Integral : IntegrableFunction --> CR :=
  Cmap L1StepQPrelengthSpace IntegralQ_uc.
-
-Definition ConstIF : CR --> IntegrableFunction :=
- Cmap QPrelengthSpace constStepF_uc.

@@ -538,7 +538,7 @@ Qed.
 
 Definition id01_raw (q:QposInf) : StepQ := stepSample (id01_raw_help q).
 
-Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> L1StepQ_as_MetricSpace).
+Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> L1StepQ).
 Proof.
 intros a b.
 unfold id01_raw.
@@ -574,7 +574,7 @@ induction x using StepF_ind.
  change (Qabs (approximate x a - approximate x b) <= (a + b)%Qpos)%Q.
  rewrite <- Qball_Qabs.
  rapply regFun_prf.
-simpl (ball (m:=L1StepQ_as_MetricSpace)).
+simpl (ball (m:=L1StepQ)).
 unfold L1Ball, L1Distance.
 set (f:=(fun z : RegularFunction Q_as_MetricSpace => approximate z a)) in *.
 set (g:=(fun z : RegularFunction Q_as_MetricSpace => approximate z b)) in *.
@@ -666,16 +666,7 @@ do 2 rewrite StepFunction.SplitRMap.
 reflexivity.
 Qed.
 
-Definition ouAsQpos (a:OpenUnit) : Qpos :=
-mkQpos (a:=a) (OpenUnit_0_lt a).
-
-Coercion ouAsQpos : OpenUnit >-> Qpos.
-
-Definition convex (f:Qpos -> QposInf) : Prop :=
- forall (o:OpenUnit) (a b:Qpos), (QposInf_le (f (o*a + (OpenUnitDual o)*b)) (o*(f a) + (OpenUnitDual o)*(f b)))%Qpos.
-
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
- convex (mu f) ->
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
 intros f Hf e a b.
