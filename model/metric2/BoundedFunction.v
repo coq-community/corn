@@ -21,20 +21,15 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export Complete.
 Require Import CRmetric.
-Require Import L1metric.
 Require Import LinfMetric.
 Require Import Qmetric.
 Require Import CornTac.
-Require Import BoundedFunction.
 
 Set Implicit Arguments.
 
 Open Local Scope uc_scope.
 
-Definition IntegrableFunction := Complete L1StepQ.
+Definition BoundedFunction := Complete LinfStepQ.
 
-Definition Integral : IntegrableFunction --> CR :=
- Cmap L1StepQPrelengthSpace IntegralQ_uc.
-
-Definition BounedAsIntegrable : BoundedFunction --> IntegrableFunction :=
- Cmap LinfStepQPrelengthSpace LinfAsL1.
+Definition sup : BoundedFunction --> CR :=
+ Cmap LinfStepQPrelengthSpace StepQSup_uc.
