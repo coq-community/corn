@@ -701,3 +701,14 @@ Qed.
 
 Definition ComposeContinuous (f:Q_as_MetricSpace --> CR) : LinfStepQ --> BoundedFunction :=
  Build_UniformlyContinuousFunction (ComposeContinuous_prf f).
+
+Definition IntegrateWithMeasure (f:Q_as_MetricSpace --> CR) : BoundedFunction --> CR :=
+(uc_compose Integral
+(uc_compose BounedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
+
+Definition Integrate01 f := IntegrateWithMeasure f id01.
+
+Definition ContinuousSup01 f :=
+(uc_compose sup (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f))) id01.
+
+  
