@@ -666,21 +666,19 @@ do 2 rewrite StepFunction.SplitRMap.
 reflexivity.
 Qed.
 
-Section Test.
+Definition ouAsQpos (a:OpenUnit) : Qpos :=
+mkQpos (a:=a) (OpenUnit_0_lt a).
 
-Hypothesis mu_scale:
-  forall X Y : MetricSpace,
-  PrelengthSpace X ->
-  forall (c e : Qpos) (f : UniformlyContinuousFunction X Y)
-    (a b : X),
-  ball_ex (X:=X) (c*(mu f e)) a b ->
-  ball (m:=Y) (c*e) (f a) (f b).
+Coercion ouAsQpos : OpenUnit >-> Qpos.
 
+Definition convex (f:Qpos -> QposInf) : Prop :=
+ forall (o:OpenUnit) (a b:Qpos), (QposInf_le (f (o*a + (OpenUnitDual o)*b)) (o*(f a) + (OpenUnitDual o)*(f b)))%Qpos.
 
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
+ convex (mu f) ->
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
-intros f e a b.
+intros f Hf e a b.
 revert a b e.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H e H0.

@@ -47,6 +47,17 @@ Proof.
 reflexivity.
 Qed.
 
+Lemma LinfDistance_glue : forall o s s0 t t0,
+ (LinfDistance (glue o s s0) (glue o t t0) == Qmax (LinfDistance s t) (LinfDistance s0 t0))%Q.
+Proof.
+intros o s s0 t t0.
+unfold LinfDistance at 1.
+unfold StepQminus.
+rewrite MapGlue.
+rewrite ApGlueGlue.
+reflexivity.
+Qed.
+
 Hint Rewrite StepQSup_glue: StepF_rew.
 
 Lemma StepQIntegral_le_Sup : forall x, (IntegralQ x <= StepQSup x)%Q.
@@ -163,7 +174,7 @@ rewrite Hy.
 reflexivity.
 Qed.
 
-Lemma LinfBall_refl : forall e x, (LinfBall e x x).
+Lemma Linfball_refl : forall e x, (LinfBall e x x).
 Proof.
 intros e x.
 unfold LinfBall, LinfDistance.
@@ -224,3 +235,236 @@ eapply Qle_trans.
  apply StepQSup_plus.
 rsapply plus_resp_leEq_both; assumption.
 Qed.
+
+Lemma Linfball_closed : forall e x y, (forall d, (LinfBall (e+d) x y)) -> (LinfBall e x y).
+Proof.
+unfold LinfBall. intros e a b H.
+assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e)%Q.
+ intros. rsapply shift_zero_leEq_minus'.
+ rsapply inv_cancel_leEq. rsapply approach_zero_weak.
+ intros. replace LHS with (x[-](e:Q)). 
+  rsapply shift_minus_leEq. replace RHS with (e+e0)%Q by ring. rewrite <- (QposAsmkQpos H1).
+  apply (H0 (mkQpos H1)).
+ unfold cg_minus; simpl; ring.
+apply H0. exact H.
+Qed.
+
+Lemma LinfNorm_Zero : forall s, 
+ (LinfNorm s <= 0)%Q -> s == (constStepF (0:QS)).
+Proof.
+intros s.
+intros Hs.
+induction s using StepF_ind.
+ rapply Qle_antisym.
+  eapply Qle_trans;[apply Qle_Qabs|assumption].
+ rewrite <- (Qopp_involutive x).
+ change 0 with (- (- 0))%Q.
+ apply Qopp_le_compat.
+ eapply Qle_trans;[apply Qle_Qabs|].
+ rewrite Qabs_opp.
+ assumption.
+apply glue_StepF_eq.
+ apply IHs1.
+ eapply Qle_trans;[|apply Hs].
+ rapply Qmax_ub_l.
+apply IHs2.
+eapply Qle_trans;[|apply Hs].
+rapply Qmax_ub_r.
+Qed.
+
+Lemma Linfball_eq : forall x y, (forall e : Qpos, LinfBall e x y) -> StepF_eq x y.
+Proof.
+intros x y H.
+unfold LinfBall in H.
+setoid_replace y with (constStepF (0:QS)+y) using relation StepF_eq by ring.
+set (z:=constStepF (0:QS)).
+setoid_replace x with (x - y + y) using relation StepF_eq by ring.
+apply StepQplus_wd; try reflexivity.
+unfold z; clear z.
+rapply LinfNorm_Zero.
+apply Qnot_lt_le.
+intros H0.
+assert (0<(1#2)*( LinfNorm (x - y))).
+ rsapply mult_resp_pos; auto with *.
+apply (Qle_not_lt _ _ (H (mkQpos H1))).
+autorewrite with QposElim.
+rewrite Qlt_minus_iff.
+unfold LinfDistance.
+ring_simplify.
+assumption.
+Qed.
+
+Lemma Linf_is_MetricSpace : 
+ (is_MetricSpace (@StepF_eq QS) LinfBall).
+split.
+     apply (StepF_Sth QS).
+    rapply Linfball_refl.
+   rapply Linfball_sym.
+  rapply Linfball_triangle.
+ rapply Linfball_closed.
+rapply Linfball_eq.
+Qed.
+
+Add Morphism LinfBall with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
+intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
+unfold LinfBall.
+change (x1 == x2)%Q in Hx.
+rewrite Hx.
+rewrite Hy.
+rewrite Hz.
+reflexivity.
+Qed.
+
+Definition LinfStepQ : MetricSpace :=
+Build_MetricSpace LinfBall_wd Linf_is_MetricSpace.
+
+Canonical Structure LinfStepQ.
+
+Lemma StepQSup_scale :forall q x, (0 <= q)%Q ->
+ (q*(StepQSup x) == (StepQSup (QscaleS q^@>x)))%Q.
+Proof.
+intros q x Hq.
+induction x using StepF_ind.
+ reflexivity.
+rewriteStepF.
+rewrite <- IHx1.
+rewrite <- IHx2.
+apply Qmax_mult_pos_distr_r; auto.
+Qed.
+
+Lemma LinfNorm_scale : forall q s, 
+ (LinfNorm (QscaleS q ^@> s) == Qabs q * LinfNorm s)%Q.
+Proof.
+intros q s.
+unfold LinfNorm.
+rewrite StepQSup_scale.
+ apply Qabs_nonneg.
+apply StepQSup_wd.
+unfold StepF_eq.
+set (g:= st_eqS QS).
+set (q0 := (QscaleS q)).
+set (q1 := (QscaleS (Qabs q))).
+set (f:= ap
+ (compose g (compose QabsS q0))
+ (compose q1 QabsS)).
+cut (StepFfoldProp (f ^@> s)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+rapply Qabs_Qmult.
+Qed.
+
+Lemma LinfStepQPrelengthSpace : PrelengthSpace LinfStepQ.
+Proof.
+intros x y e d1 d2 He Hxy.
+change (e < (d1+d2)%Qpos) in He.
+set (d:=(d1+d2)%Qpos) in *.
+simpl in *.
+unfold LinfBall in *.
+unfold LinfDistance in *.
+pose (d1':=constStepF (d1:QS)).
+pose (d2':=constStepF (d2:QS)).
+pose (d':=constStepF ((/d):QS)).
+set (f:=(d'*(x*d2' + y*d1'))%SQ).
+assert (X:(((d1' + d2')*d')==constStepF (1:QS))%SQ).
+ change (constStepF ((d1 + d2)%Qpos/(d1 + d2)%Qpos:QS)==constStepF (X:=QS) 1).
+ apply constStepF_wd.
+ simpl.
+ field.
+ apply Qpos_nonzero.
+exists (f).
+ setoid_replace (x - f)%SQ
+  with (d1' * d' * (x - y))%SQ using relation StepF_eq.
+  change ((d1' * d')%SQ * (x - y)%SQ) with
+    (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
+  rewrite LinfNorm_scale.
+  rewrite Qabs_pos; auto with *.
+  autorewrite with QposElim.
+  replace LHS with ((d1*LinfNorm (x - y))/d) by
+   (field; apply Qpos_nonzero).
+  apply Qle_shift_div_r; auto with *.
+  rsapply mult_resp_leEq_lft; auto with *.
+  apply Qle_trans with e; auto with *.
+ setoid_replace (x - f) with (constStepF (1:QS)*x - f) using relation StepF_eq by ring.
+ rewrite <- X.
+ unfold f.
+ ring.
+setoid_replace (f -y)
+  with (d2' * d' * (x - y))%SQ using relation StepF_eq.
+ change ((d2' * d')%SQ * (x - y)%SQ) with
+   (QscaleS (d2/d)%Qpos ^@> (x-y)%SQ).
+ rewrite LinfNorm_scale.
+ rewrite Qabs_pos; auto with *.
+ autorewrite with QposElim.
+ replace LHS with ((d2*LinfNorm (x - y))/d) by
+  (field; apply Qpos_nonzero).
+ apply Qle_shift_div_r; auto with *.
+ rsapply mult_resp_leEq_lft; auto with *.
+ apply Qle_trans with e; auto with *.
+setoid_replace (f- y) with (f - constStepF (1:QS)*y) using relation StepF_eq by ring.
+rewrite <- X.
+unfold f.
+ring.
+Qed.
+
+Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
+Proof.
+intros e x y H.
+simpl in *.
+rewrite Qball_Qabs.
+eapply Qle_trans;[|apply H].
+clear H.
+revert x y. 
+rapply StepF_ind2.
+  intros s s0 t t0 Hs Ht.
+  rewrite Hs, Ht.
+  auto.
+ intros x y.
+ apply Qle_refl.
+intros o s s0 t t0 H0 H1.
+rewrite LinfDistance_glue.
+do 2 rewrite StepQSup_glue.
+assert (X:forall a b, (-(a-b)==b-a)%Q).
+ intros; ring.
+apply Qabs_case; intros H;
+[|rewrite <- Qabs_opp in H0, H1; rewrite X in *];
+ rewrite Qmax_minus_distr_l;
+ apply Qmax_le_compat;
+  (eapply Qle_trans;[|apply H0 || apply H1]);
+  (eapply Qle_trans;[|apply Qle_Qabs]);
+  unfold Qminus;
+  rsapply plus_resp_leEq_lft;
+  auto with *.
+Qed.
+
+Open Local Scope uc_scope.
+
+Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
+:= Build_UniformlyContinuousFunction sup_uc_prf.
+
+Lemma constStepF_uc_prf : is_UniformlyContinuousFunction (@constStepF QS:Q -> LinfStepQ) Qpos2QposInf.
+Proof.
+intros e x y H.
+simpl in *.
+rewrite Qball_Qabs in H.
+assumption.
+Qed.
+
+Definition constStepF_uc : Q_as_MetricSpace --> LinfStepQ
+:= Build_UniformlyContinuousFunction constStepF_uc_prf.
+
+Lemma LinfAsL1_uc_prf : is_UniformlyContinuousFunction (fun (x:LinfStepQ) => (x:L1StepQ)) Qpos2QposInf.
+Proof.
+intros e x y H.
+simpl in *.
+unfold L1Ball.
+eapply Qle_trans.
+ unfold L1Distance.
+ apply L1Norm_le_LinfNorm.
+assumption.
+Qed.
+
+Definition LinfAsL1 : LinfStepQ --> L1StepQ
+:= Build_UniformlyContinuousFunction LinfAsL1_uc_prf.

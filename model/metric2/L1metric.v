@@ -489,12 +489,12 @@ rewrite Hz.
 reflexivity.
 Qed.
 
-Definition L1StepQ_as_MetricSpace : MetricSpace :=
+Definition L1StepQ : MetricSpace :=
 Build_MetricSpace L1Ball_wd L1_is_MetricSpace.
 
-Canonical Structure L1StepQ_as_MetricSpace.
+Canonical Structure L1StepQ.
 
-Lemma L1StepQPrelengthSpace : PrelengthSpace L1StepQ_as_MetricSpace.
+Lemma L1StepQPrelengthSpace : PrelengthSpace L1StepQ.
 Proof.
 intros x y e d1 d2 He Hxy.
 change (e < (d1+d2)%Qpos) in He.
@@ -565,17 +565,5 @@ Qed.
 
 Open Local Scope uc_scope.
 
-Definition IntegralQ_uc : L1StepQ_as_MetricSpace --> Q_as_MetricSpace
+Definition IntegralQ_uc : L1StepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction integral_uc_prf.
-
-Lemma constStepF_uc_prf : is_UniformlyContinuousFunction (@constStepF QS) Qpos2QposInf.
-Proof.
-intros e x y H.
-simpl in *.
-rewrite Qball_Qabs in H.
-assumption.
-Qed.
-
-Definition constStepF_uc : Q_as_MetricSpace --> L1StepQ_as_MetricSpace
-:= Build_UniformlyContinuousFunction constStepF_uc_prf.
-
