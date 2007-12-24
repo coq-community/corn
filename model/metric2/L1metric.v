@@ -14,7 +14,9 @@ Set Implicit Arguments.
 Open Local Scope sfstscope.
 Open Local Scope StepQ_scope.
 
-Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (affineCombo b x y:QS)))%Q.
+Opaque Qred.
+
+Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (Qred (affineCombo b x y:QS))))%Q.
 Definition L1Norm(f:StepF QS):Q:=(IntegralQ (StepQabs f)).
 Definition L1Distance(f g:StepF QS):Q:=(L1Norm (f - g)).
 Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(L1Distance f g)<=e.
@@ -39,6 +41,15 @@ right. abstract auto with *.
 left. exact Hdc.
 Defined.
 
+Lemma Integral_glue : forall o s t, (IntegralQ (glue o s t) == o*(IntegralQ s) + (1-o)*(IntegralQ t))%Q.
+Proof.
+intros o s t.
+unfold IntegralQ.
+simpl.
+rewrite Qred_correct.
+reflexivity.
+Qed.
+
 Lemma IntegralSplit : forall (o:OpenUnit) x, 
  (IntegralQ x ==
  affineCombo o (IntegralQ (SplitL x o)) (IntegralQ (SplitR x o)))%Q.
@@ -48,12 +59,15 @@ revert o.
 induction x using StepF_ind.
 unfold IntegralQ. simpl. intros. unfold affineCombo; simpl in x; ring.
 intros p.
+rewrite Integral_glue.
 apply SplitLR_glue_ind; intros H.
-  simpl.   (*This should be improved*) unfold IntegralQ; simpl; fold IntegralQ.
+  rewrite Integral_glue.
   unfold affineCombo in *.
   rewrite (IHx1 (OpenUnitDiv p o H)).
   unfold IntegralQ; simpl; fold IntegralQ. unfold affineCombo; field; auto with *. (*why does this not work*)
- simpl. unfold IntegralQ; simpl; fold IntegralQ. 
+ rewrite Integral_glue.
+ simpl. unfold IntegralQ; simpl; fold IntegralQ.
+ repeat rewrite Qred_correct. 
  unfold affineCombo in *.
  rewrite (IHx2 (OpenUnitDualDiv p o H)).
  unfold IntegralQ; simpl; fold IntegralQ. unfold affineCombo; field; auto with *.
@@ -67,10 +81,10 @@ Hint Resolve IntegralSplit : StepQArith.
 Add Morphism IntegralQ 
   with signature  StepF_eq ==>  Qeq
  as IntegralQ_wd.
-unfold IntegralQ.
 induction x1 using StepF_ind.
 intros x2 H. simpl. induction x2 using StepF_ind.
-  simpl.  auto with *.
+  auto with *.
+ rewrite Integral_glue.
  simpl.
  destruct H as [H0 H1] using (eq_glue_ind x2_1).
  rewrite <- IHx2_1; auto with *.
@@ -78,10 +92,11 @@ intros x2 H. simpl. induction x2 using StepF_ind.
  simpl in x; unfold affineCombo; ring.
 intros x2 H.
 destruct H as [H0 H1] using (glue_eq_ind x1_1).
-simpl.
+rewrite Integral_glue.
 rewrite (IHx1_1 _ H0).
 rewrite (IHx1_2 _ H1).
-auto with *.
+symmetry.
+rapply IntegralSplit.
 Qed.
 
 Add Morphism L1Norm 
@@ -100,11 +115,6 @@ unfold L1Distance.
 intros x1 x2 Hx y1 y2 Hy.
 rewrite Hx.
 rewrite Hy.
-reflexivity.
-Qed.
-
-Lemma Integral_glue : forall o s t, (IntegralQ (glue o s t) = o*(IntegralQ s) + (1-o)*(IntegralQ t))%Q.
-Proof.
 reflexivity.
 Qed.
 
