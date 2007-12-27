@@ -38,11 +38,13 @@ Require Import Qordfield.
 Require Import COrdFields2.
 Require Import Qmetric.
 Require Import ContinuousCorrect.
+Require Import IntegrationRules.
+Require Import MoreIntegrals.
 Require Import CornTac.
 
 Set Implicit Arguments.
 
-Opaque Qmax Qabs.
+Opaque Qmax Qabs inj_Q.
 
 Fixpoint positive_rect2_helper
  (P : positive -> Type)
@@ -708,7 +710,7 @@ Definition ComposeContinuous (f:Q_as_MetricSpace --> CR) : LinfStepQ --> Bounded
  Build_UniformlyContinuousFunction (ComposeContinuous_prf f).
 
 Definition IntegrateWithMeasure (f:Q_as_MetricSpace --> CR) : BoundedFunction --> CR :=
-(uc_compose Integral
+(uc_compose IntegrableFunctions.Integral
 (uc_compose BounedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
 
 Definition Integrate01 f := IntegrateWithMeasure f id01.
@@ -721,7 +723,28 @@ Lemma Integrate01_correct : forall F (H01:Zero[<=](One:IR)) (HF:Continuous_I H01
  (forall (o:Q) H, (0 <= o <= 1) -> (f o == IRasCR (F (inj_Q IR o) H)))%CR -> 
  (IRasCR (integral Zero One H01 F HF)==Integrate01 f)%CR.
 Proof.
-intros F H01 HF f Hf.
+intros F H01' HF' f Hf.
+assert (H01:(inj_Q IR 0)[<=](inj_Q IR 1)).
+ apply inj_Q_leEq.
+ discriminate.
+assert (HF:Continuous_I H01 F).
+ apply (included_imp_contin _ _ H01').
+  apply included_compact.
+   apply (compact_wd _ _ H01' Zero).
+    apply compact_inc_lft.
+   apply eq_symmetric; apply (inj_Q_nring IR 0).
+  apply (compact_wd _ _ H01' One).
+   apply compact_inc_rht.
+  rstepl (nring 1:IR).
+  apply eq_symmetric; apply (inj_Q_nring IR 1). 
+ assumption.
+transitivity (IRasCR (integral _ _ H01 F HF)).
+ apply IRasCR_wd.
+ apply integral_wd'.
+  apply eq_symmetric; apply (inj_Q_nring IR 0).
+ rstepl (nring 1:IR).
+ apply eq_symmetric; apply (inj_Q_nring IR 1).
+clear H01' HF'.
 apply ball_eq.
 intros e.
 setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
@@ -730,7 +753,16 @@ clear e.
 intros e.
 eapply ball_triangle;
  [|apply (@ball_approx_l Q_as_MetricSpace)].
+change (Cunit (approximate (Integrate01 f) e))
+ with ('(approximate (Integrate01 f) e))%CR.
+setoid_replace ('(approximate (Integrate01 f) e))%CR
+ with ('((1-0)*(approximate (Integrate01 f) e)))%CR
+ using relation ms_eq
+ by ring.
 rewrite <- CRAbsSmall_ball.
+stepl ('((1-0)*e))%CR
+ by (rapply inject_Q_wd; ring).
+set (z:=(integral (inj_Q IR 0) (inj_Q IR 1) H01 F HF)).
 simpl.  
 unfold Cjoin_raw.
 simpl.
@@ -748,13 +780,28 @@ assert (X:QposInf_le (SupDistanceToLinear s (pos_one Q_as_COrdField)) (mu f ((1 
  rapply id01_raw_help_le.
 clear Hs.
 rename X into Hs.
+revert s Hs.
+generalize (pos_one Q_as_COrdField).
+intros c s Hs.
+simpl in c, Hs.
+revert c s Hs.
+unfold z.
+clear z.
+revert H01 HF.
+revert Hf.
+unfold QONE.
+generalize 0 1.
+intros a b Hf Hab HF Hab0 s Hs.
+destruct (Qpos_lt_plus Hab0) as [ba Hba].
+stepl ('(ba*e)%Qpos)%CR
+ by (rapply inject_Q_wd; rewrite Hba; QposRing).
+revert a b Hab0 ba Hba F Hab HF Hf Hs.
 
-revert e F H01 HF f Hf Hs.
 induction s using StepF_ind;
- intros e F H01 HF f Hf Hs.
- change (AbsSmall (R:=CRasCOrdField) (' e)%CR
-  (IRasCR (integral Zero One H01 F HF)[-]
-   ('(approximate (f x) ((1 # 2) * e)%Qpos))%CR)).
+ intros a b Hab0 ba Hba F Hab HF Hf Hs.
+ change (AbsSmall (R:=CRasCOrdField) ('(ba*e)%Qpos)%CR
+  (IRasCR (integral _ _ Hab F HF)[-]
+   ('((b-a)*(approximate (f x) ((1 # 2) * e)%Qpos)))%CR)).
  rewrite CRAbsSmall_ball.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- CRAbsSmall_ball.
@@ -765,32 +812,29 @@ induction s using StepF_ind;
  rewrite <- IR_AbsSmall_as_CR.
  unfold SupDistanceToLinear in Hs.
  simpl in Hs.
- set (a:=inj_Q IR (approximate (f x) ((1 # 2) * e)%Qpos)).
+ set (a0:=inj_Q IR (approximate (f x) ((1 # 2) * e)%Qpos)).
  set (e':=(inj_Q IR (e:Q))).
- assert (X:forall y : IR, Compact H01 y -> forall Hy : Dom F y,
-  AbsSmall e' ((F y Hy)[-]a)).
+ assert (X:forall y : IR, Compact Hab y -> forall Hy : Dom F y,
+  AbsSmall e' ((F y Hy)[-]a0)).
   intros y Hy Hyf.
   rewrite IR_AbsSmall_as_CR.
   unfold e'.
-  apply AbsSmall_wdr with (IRasCR (F y Hyf)[-]IRasCR a)%CR;[|apply eq_symmetric; rapply IR_minus_as_CR].
+  apply AbsSmall_wdr with (IRasCR (F y Hyf)[-]IRasCR a0)%CR;[|apply eq_symmetric; rapply IR_minus_as_CR].
   eapply AbsSmall_wdl;[|apply eq_symmetric; apply IR_inj_Q_as_CR].
   rewrite CRAbsSmall_ball.
-  unfold a; rewrite IR_inj_Q_as_CR.
+  unfold a0; rewrite IR_inj_Q_as_CR.
   assert (X0:(forall (q : Q) (Hq : Dom F (inj_Q IR q)),
-     clcr Zero One (inj_Q IR q) ->
+     clcr (inj_Q IR a) (inj_Q IR b) (inj_Q IR q) ->
      (Cbind QPrelengthSpace f (' q) == IRasCR (F (inj_Q IR q) Hq))%CR)).
    intros q Hq [Hq0 H1].
    rewrite (BindLaw1 QPrelengthSpace f).
    apply Hf.
    split.
     apply (leEq_inj_Q IR).
-    stepl (Zero:IR); auto.
-    apply eq_symmetric; apply (inj_Q_nring IR 0).
+    auto.
    apply (leEq_inj_Q IR).
-   stepr (One:IR); auto.
-   rstepl (nring 1:IR).
-   apply eq_symmetric; apply (inj_Q_nring IR 1).
-  assert (X:=@ContinuousCorrect (clcr Zero One) (@pos_one IR) F (Continuous_Int (clcr Zero One) H01 H01 F HF)
+   auto.
+  assert (X:=@ContinuousCorrect (clcr (inj_Q IR a) (inj_Q IR b)) (inj_Q_less _ _ _ Hab0) F (Continuous_Int (clcr (inj_Q IR a) (inj_Q IR b)) Hab Hab F HF)
    (Cbind QPrelengthSpace f) X0 y Hyf Hy).
   set (z:=(' approximate (f x) ((1 # 2) * e)%Qpos)%CR).
   rewrite X.
@@ -823,90 +867,170 @@ induction s using StepF_ind;
   clear X.
   intros X.
   revert Y.
-  change (Not (inj_Q IR (Qmax (x - 0) (QONE - x))[<]AbsIR (y[-]inj_Q IR x))).
+  change (Not (inj_Q IR (Qmax (x - a) (b - x))[<]AbsIR (y[-]inj_Q IR x))).
   rewrite <- leEq_def.
   apply AbsSmall_imp_AbsIR.
   destruct X as [X|X].
    apply leEq_imp_AbsSmall.
     apply shift_leEq_lft; assumption.
-   apply leEq_transitive with (inj_Q IR (1 - x)%Q).
-    stepr ((inj_Q IR 1)[-](inj_Q IR x)) by (apply eq_symmetric; apply inj_Q_minus).
+   apply leEq_transitive with (inj_Q IR (b - x)%Q).
+    stepr ((inj_Q IR b)[-](inj_Q IR x)) by (apply eq_symmetric; apply inj_Q_minus).
     apply minus_resp_leEq.
-    stepr (One:IR).
-     destruct Hy; assumption.
-    rstepl (nring 1:IR).
-    apply eq_symmetric; apply (inj_Q_nring IR 1).
+    destruct Hy; assumption.
    apply inj_Q_leEq.
    apply Qmax_ub_r.
   apply AbsSmall_minus.
   apply leEq_imp_AbsSmall.
    apply shift_leEq_lft; assumption.
-  apply leEq_transitive with (inj_Q IR (x - 0)%Q).
-   stepr ((inj_Q IR x)[-](inj_Q IR 0)) by (apply eq_symmetric; apply inj_Q_minus).
+  apply leEq_transitive with (inj_Q IR (x - a)%Q).
+   stepr ((inj_Q IR x)[-](inj_Q IR a)) by (apply eq_symmetric; apply inj_Q_minus).
    apply minus_resp_leEq_rht.
-   stepl (Zero:IR).
-    destruct Hy; assumption.
-   apply eq_symmetric; apply (inj_Q_nring IR 0).
+   destruct Hy; assumption.
   apply inj_Q_leEq.
   apply Qmax_ub_l.
  split.
   rapply shift_leEq_minus.
-  rstepl (([--]e'[+]a)[*](One[-]Zero)).
-  apply lb_integral.
-  intros y Hy Hyf.
-  apply shift_plus_leEq.
-  destruct (X y Hy Hyf); assumption.
+  stepl (([--]e'[+]a0)[*](inj_Q IR b[-]inj_Q IR a)).
+   apply lb_integral.
+   intros y Hy Hyf.
+   apply shift_plus_leEq.
+   destruct (X y Hy Hyf); assumption.
+  rstepl ([--]((inj_Q IR b[-]inj_Q IR a)[*]e') [+] (inj_Q IR b[-]inj_Q IR a)[*]a0).
+  csetoid_replace (inj_Q IR b[-]inj_Q IR a) (inj_Q IR (b-a)%Q);
+   [|apply eq_symmetric; apply inj_Q_minus].
+  apply bin_op_wd_unfolded.
+   apply un_op_wd_unfolded.
+   unfold e'.
+   stepl (inj_Q IR ((b-a)*e)%Q) by apply inj_Q_mult.
+   rsapply inj_Q_wd.
+   autorewrite with QposElim.
+   rewrite Hba.
+   ring.
+  apply eq_symmetric; rapply inj_Q_mult.
  rapply shift_minus_leEq.
- rstepr ((e'[+]a)[*](One[-]Zero)).
- apply ub_integral.
- intros y Hy Hyf.
- apply shift_leEq_plus.
- destruct (X y Hy Hyf); assumption.
+ stepr ((e'[+]a0)[*](inj_Q IR b[-]inj_Q IR a)).
+  apply ub_integral.
+  intros y Hy Hyf.
+  apply shift_leEq_plus.
+  destruct (X y Hy Hyf); assumption.
+ rstepl (((inj_Q IR b[-]inj_Q IR a)[*]e') [+] (inj_Q IR b[-]inj_Q IR a)[*]a0).
+ csetoid_replace (inj_Q IR b[-]inj_Q IR a) (inj_Q IR (b-a)%Q);
+  [|apply eq_symmetric; apply inj_Q_minus].
+ apply bin_op_wd_unfolded.
+  unfold e'.
+  stepl (inj_Q IR ((b-a)*e)%Q) by apply inj_Q_mult.
+  rsapply inj_Q_wd.
+  autorewrite with QposElim.
+  rewrite Hba.
+  ring.
+ apply eq_symmetric; rapply inj_Q_mult.
 
-set (z:=(' IntegralQ
+set (z:=(IntegralQ
        (glue o
           (Map
              (fun z : RegularFunction Q_as_MetricSpace =>
               approximate z ((1 # 2) * e)%Qpos) (Map f s1):StepQ)
           (Map
              (fun z : RegularFunction Q_as_MetricSpace =>
-              approximate z ((1 # 2) * e)%Qpos) (Map f s2))))%CR).
-change (AbsSmall (R:=CRasCOrdField) (' e)%CR
-  (IRasCR (integral Zero One H01 F HF)[-]z)).
+              approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
+change (AbsSmall (R:=CRasCOrdField) ('(ba* e)%Qpos)%CR
+  (IRasCR (integral _ _ Hab F HF)[-]'((b-a)*z))%CR).
 rewrite CRAbsSmall_ball.
-set (a:=Zero:IR) in *.
-set (b:=One:IR) in *.
-set (c:=(inj_Q IR (o:Q))) in*.
-assert (Hac:a[<=]c).
- unfold a, c.
- stepl (inj_Q IR 0) by (apply (inj_Q_nring IR 0)).
+set (c:=(affineCombo (OpenUnitDual o) a b:Q)).
+assert (Hac:inj_Q IR a[<=]inj_Q IR c).
+ unfold c.
  apply inj_Q_leEq.
- apply less_leEq; simpl; auto with *.
-assert (Hcb:c[<=]b).
- unfold b, c.
- stepr (inj_Q IR 1).
-  apply inj_Q_leEq.
-  apply less_leEq; simpl; auto with *.
- rstepr (nring 1:IR).
- apply (inj_Q_nring IR 1).
+ simpl; auto with *.
+assert (Hcb:inj_Q IR c[<=]inj_Q IR b).
+ unfold  c.
+ apply inj_Q_leEq.
+ simpl; auto with *.
 assert (HFl :Continuous_I Hac F).
  revert HF. 
  apply included_imp_contin.
  intros x [Hxl Hxr].
  split; auto.
- apply leEq_transitive with c; auto.
+ apply leEq_transitive with (inj_Q IR c); auto.
 assert (HFr :Continuous_I Hcb F).
  revert HF. 
  apply included_imp_contin.
  intros x [Hxl Hxr].
  split; auto.
- apply leEq_transitive with c; auto.
-setoid_replace (IRasCR (integral a b H01 F HF))
- with (IRasCR (integral a c Hac F HFl)+IRasCR (integral c b Hcb F HFr))%CR
+ apply leEq_transitive with (inj_Q IR c); auto.
+setoid_replace (IRasCR (integral _ _ Hab F HF))
+ with (IRasCR (integral _ _ Hac F HFl)+IRasCR (integral _ _ Hcb F HFr))%CR
  using relation ms_eq
  by (rewrite <- IR_plus_as_CR;apply IRasCR_wd; apply eq_symmetric; apply integral_plus_integral).
 unfold z.
 rewrite Integral_glue.
-rewrite SupDistanceToLinear_glue in Hs.
-simpl in Hs.
+clear z.
+set (zl:=IntegralQ
+         (Map
+            (fun z : RegularFunction Q_as_MetricSpace =>
+             approximate z ((1 # 2) * e)%Qpos) (Map f s1))).
+set (zr:=IntegralQ
+         (Map
+            (fun z : RegularFunction Q_as_MetricSpace =>
+             approximate z ((1 # 2) * e)%Qpos) (Map f s2))).
+setoid_replace ((b - a) * (o * zl + (1 - o) * zr))%Q
+ with ((c - a)*zl + (b - c)*zr)%Q
+ by (unfold c, affineCombo, OpenUnitDual; simpl; ring).
+assert (Hac0: a < c).
+ unfold c; auto with*.
+assert (Hcb0: c < b).
+ unfold c; auto with*.
+destruct (Qpos_lt_plus Hac0) as [ca Hca].
+destruct (Qpos_lt_plus Hcb0) as [bc Hbc].
+assert (Z:(QposEq ba (ca + bc))%Qpos).
+ unfold QposEq.
+ autorewrite with QposElim.
+ rewrite Hba in Hbc.
+ rewrite Hca in Hbc.
+ replace LHS with (- a + (a + ba))%Q by ring.
+ rewrite Hbc.
+ ring.
+rewrite Z.
+clear Z.
+setoid_replace ((ca + bc)*e)%Qpos with (ca*e + bc*e)%Qpos by QposRing.
 rewrite <- CRAbsSmall_ball.
+stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl)))+
+    ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr)))))%CR.
+ stepl ('(ca * e)%Qpos + '(bc * e)%Qpos)%CR.
+  rapply AbsSmall_plus.
+   apply (IHs1 _ _ Hac0); auto.
+    intros o0 H [H0 H1].
+    apply Hf.
+    split; eauto with qarith.
+   destruct (mu f ((1#2)*e)) as [q|];[|constructor].
+   simpl in Hs|-*.
+   eapply Qle_trans;[|apply Hs].
+   rewrite SupDistanceToLinear_glue.
+   replace LHS with (SupDistanceToLinear s1 (affineCombo_gt (OpenUnitDual o) Hab0):Q).
+    apply Qmax_ub_l.
+   apply SupDistanceToLinear_wd1; reflexivity.
+  apply (IHs2 _ _ Hcb0); auto.
+   intros o0 H [H0 H1].
+   apply Hf.
+   clear - H0 H1 Hac0.
+   split; eauto with qarith.
+  destruct (mu f ((1#2)*e)) as [q|];[|constructor].
+  simpl in Hs|-*.
+  eapply Qle_trans;[|apply Hs].
+  rewrite SupDistanceToLinear_glue.
+  replace LHS with (SupDistanceToLinear s2 (affineCombo_lt (OpenUnitDual o) Hab0):Q).
+   apply Qmax_ub_r.
+  apply SupDistanceToLinear_wd1; reflexivity.
+ change (' (ca * e)%Qpos + ' (bc * e)%Qpos==(' (ca * e + bc * e)%Qpos))%CR.
+ autorewrite with QposElim.
+ ring.
+generalize (IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl))
+ (IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)).
+intros x y.
+clear - x y.
+change ((x-' ((c - a) * zl) + (y-' ((b - c) * zr)))==
+(x + y)-(' ((c - a) * zl + (b - c) * zr)))%CR.
+ring.
+Qed.
+   
+   
+ 
