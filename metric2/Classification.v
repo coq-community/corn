@@ -32,3 +32,5 @@ destruct (H e (e+d)%Qpos x y); try (assumption || contradiction).
 autorewrite with QposElim.
 rewrite Qlt_minus_iff; ring_simplify; auto with *.
 Qed.
+
+Hint Resolve decidable_located located_stable : classification.
