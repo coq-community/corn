@@ -57,10 +57,10 @@ split; discriminate.
 Qed.
 
 Definition r_pi (r:Q) : CR := 
-((scale (68*r) (rational_arctan_small_pos small_per_23) +
-  scale (32*r) (rational_arctan_small_pos small_per_182)) + 
- (scale (40*r) (rational_arctan_small_pos small_per_5118) +
-  scale (20*r) (rational_arctan_small_pos small_per_6072)))%CR.
+((scale (68%Z*r) (rational_arctan_small_pos small_per_23) +
+  scale (32%Z*r) (rational_arctan_small_pos small_per_182)) + 
+ (scale (40%Z*r) (rational_arctan_small_pos small_per_5118) +
+  scale (20%Z*r) (rational_arctan_small_pos small_per_6072)))%CR.
 
 Let f (a b:Q) : Q := 
  let (x,y) := a in 
