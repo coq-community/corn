@@ -1,4 +1,5 @@
 Require Import ZBasics.
+Require Import Classic.
 Require Export Metric.
 Require Import Classification.
 Require Import List.
@@ -9,121 +10,17 @@ Require Import Qauto.
 Require Import CornTac.
 
 (*
- The ordering of different notations of Finiteness are as follows:
-  SubFinite |- FinitelyEnumerable |- Finite   
- These entailments are strict.
-
- - I've stolen the name SubFinite.  SubFinite now means a subset of a finite set.
- - Finitely Enumerable means there is a list containing all elements
- - Finite means that there is are exactly n distinct elements
-*)
-
-Definition SubFinite X (p:X -> Prop) :=
-{l:list X | forall x:X, p x -> ~~In x l}.
-
 Definition FinitelyEnumerable X (p:X -> Prop) :=
 {l:list X | forall x:X, p x <-> ~~In x l}.
-
+(*
 Lemma FinitelyEnumerable_SubFinite : forall X p,
  FinitelyEnumerable X p -> SubFinite X p.
 intros X p [l Hl].
 exists l.
  abstract firstorder.
 Defined.
-
-Section ClassicExists.
-
-Variable A : Type.
-Variable P : A->Prop.
-
-Definition existsC : Prop :=
- ~forall x:A, ~P x.
-
-Lemma existsWeaken : (exists x:A, P x) -> existsC.
-Proof.
-intros [x Hx] H.
-apply (H x).
-assumption.
-Qed.
-
-Lemma existsC_ind : forall (Q:Prop),
- (~~Q -> Q) -> (forall x:A, P x -> Q) -> existsC -> Q.
-Proof.
-intros Q HQ H ex.
-apply HQ.
-intros Z.
-apply ex.
-intros x Hx.
-apply Z.
-apply H with x.
-assumption.
-Qed.
-
-Lemma existsC_stable : ~~existsC -> existsC.
-Proof.
-unfold existsC.
-auto.
-Qed.
-
-End ClassicExists.
-
-Lemma infinitePidgeonHolePrinicple : 
- forall (X:Type) (l:list X) (P:nat -> X -> Prop),
- (forall n, existsC X (fun x => ~~In x l /\ P n x)) ->
- existsC X (fun x => In x l /\ forall n, existsC nat (fun m => (n <= m)%nat /\ (P m x))).
-Proof.
-intros X l.
-induction l;
- intros P HP G.
- apply (HP O).
- intros x [Hx _].
- auto with *.
-apply (G a).
-split; auto with *.
-intros n Hn.
-set (P':= fun m => P (m+n)%nat).
-assert (HP' : forall m : nat, existsC X (fun x => ~~In x l /\ P' m x)).
- intros m.
- unfold P'.
- destruct (HP (m + n)%nat) as [HG | y [Hy0 Hy1]] using existsC_ind.
-  apply existsC_stable; auto.
- apply existsWeaken.
- exists y.
- split; auto.
- revert Hy0.
- cut (In y (a  :: l) -> In y l);[tauto|].
- intros Hy0.
- destruct Hy0; auto.
- elim (Hn (m + n)%nat).
- rewrite H.
- auto with *.
-destruct (IHl P' HP') as [HG | x [Hx0 Hx1]] using existsC_ind.
- tauto.
-apply (G x).
-split; auto with *.
-unfold P' in Hx1.
-intros n0.
-destruct (Hx1 n0) as [HG | m [Hm0 Hm1]] using existsC_ind.
- apply existsC_stable; auto.
-apply existsWeaken.
-exists (m + n)%nat.
-split; auto.
-auto with *.
-Qed.
-
-Lemma infinitePidgeonHolePrinicpleB : 
- forall (X:Type) (l:list X) (f:nat -> X),
- (forall n, In (f n) l) ->
- existsC X (fun x => In x l /\ forall n, existsC nat (fun m => (n <= m)%nat /\ (f m)=x)).
-Proof.
-intros X l f H.
-apply infinitePidgeonHolePrinicple.
-intros n.
-apply existsWeaken.
-exists (f n).
-auto with *.
-Qed.
-
+*)
+*)
 Section HausdorffMetric.
 
 Variable X : MetricSpace.
@@ -232,67 +129,6 @@ Qed.
 
 Hypothesis stableX : stableMetric X.
 
-Lemma hemiMetric_closed : forall e A B,
- SubFinite X B ->
- (forall d, hemiMetric (e+d) A B) ->
- hemiMetric e A B.
-Proof.
-intros e A B [l Hl] H x Hx.
-set (P:=fun n y => B y /\ ball (e+(1#(P_of_succ_nat n)))%Qpos x y).
-assert (HP:(forall n, existsC X (fun x => ~~In x l /\ P n x))).
- intros n.
- unfold P.
- destruct (H (1#(P_of_succ_nat n))%Qpos x Hx) as [HG | y Hy] using existsC_ind.
-  apply existsC_stable; auto.
- apply existsWeaken.
- exists y.
- split; auto.
- destruct Hy; (*destruct (Hl y);*) auto.
-destruct 
- (infinitePidgeonHolePrinicple _ _ P HP) as [HG | y [Hy0 Hy1]] using existsC_ind.
- apply existsC_stable; auto.
-destruct (Hy1 O) as [HG | m [_ [Hy _]]] using existsC_ind.
- apply existsC_stable; auto.
-clear m.
-apply existsWeaken.
-exists y.
-split; auto.
-apply ball_closed.
-intros [n d].
-destruct (Hy1 (nat_of_P d)) as [HG | m [Hmd [_ Hm]]] using existsC_ind.
- apply stableX; assumption.
-eapply ball_weak_le;[|apply Hm].
-autorewrite with QposElim.
-rewrite Qle_minus_iff.
-ring_simplify.
-rewrite <- Qle_minus_iff.
-unfold Qle.
-simpl.
-assert (Z:=inj_le _ _ Hmd).
-rewrite inject_nat_convert in Z.
-change (d <= n * P_of_succ_nat m)%Z.
-rewrite succ_nat.
-eapply Zle_trans;[apply Z|].
-ring_simplify.
-replace LHS with (m*1)%Z by ring.
-apply Zle_trans with (m*n + 0)%Z; auto with *.
-ring_simplify (m*n + 0)%Z; auto with *.
-Qed.
-
-Lemma hausdorffBall_closed : forall e A B,
- SubFinite X A -> SubFinite X B ->
- (forall d, hausdorffBall (e+d) A B) ->
- hausdorffBall e A B.
-Proof.
-intros e A B HA HB H.
-split; 
- apply hemiMetric_closed; 
- try assumption;
- intros d;
- destruct (H d);
- assumption.
-Qed.
-
 Lemma hemiMetric_stable :forall e A B, ~~(hemiMetric e A B) -> hemiMetric e A B.
 Proof.
 unfold hemiMetric.
@@ -303,6 +139,50 @@ Lemma hausdorffBall_stable :forall e A B, ~~(hausdorffBall e A B) -> hausdorffBa
 Proof.
 unfold hausdorffBall.
 firstorder using hemiMetric_stable.
+Qed.
+
+Lemma hemiMetric_wd :forall (e1 e2:Qpos), (e1==e2) -> 
+ forall A1 A2, (forall x, A1 x <-> A2 x) ->
+ forall B1 B2, (forall x, B1 x <-> B2 x) ->
+ (hemiMetric e1 A1 B1 <-> hemiMetric e2 A2 B2).
+Proof.
+cut (forall e1 e2 : Qpos,
+e1 == e2 ->
+forall A1 A2 : X -> Prop,
+(forall x : X, A1 x <-> A2 x) ->
+forall B1 B2 : X -> Prop,
+(forall x : X, B1 x <-> B2 x) ->
+(hemiMetric e1 A1 B1 -> hemiMetric e2 A2 B2)).
+ intros; split.
+  eauto.
+ symmetry in H0.
+ assert (H1':forall x : X, A2 x <-> A1 x) by firstorder.
+ assert (H2':forall x : X, B2 x <-> B1 x) by firstorder.
+ eauto.
+intros e1 e2 He A1 A2 HA B1 B2 HB H x Hx.
+rewrite <- HA in Hx.
+destruct (H x Hx) as [HG | y [Hy0 Hy1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists y.
+change (QposEq e1 e2) in He.
+rewrite <- HB.
+rewrite <- He.
+auto.
+Qed.
+
+Lemma hausdorffBall_wd :forall (e1 e2:Qpos), (e1==e2) -> 
+ forall A1 A2, (forall x, A1 x <-> A2 x) ->
+ forall B1 B2, (forall x, B1 x <-> B2 x) ->
+ (hausdorffBall e1 A1 B1 <-> hausdorffBall e2 A2 B2).
+Proof.
+intros.
+unfold hausdorffBall.
+setoid_replace (hemiMetric e1 A1 B1) with (hemiMetric e2 A2 B2).
+ setoid_replace (hemiMetric e1 B1 A1) with (hemiMetric e2 B2 A2).
+  reflexivity.
+ apply hemiMetric_wd; auto.
+apply hemiMetric_wd; auto.
 Qed.
 
 End HausdorffMetric.
@@ -379,6 +259,7 @@ apply hemiMetricStrong_wd1 with (e1 + e0)%Qpos.
 apply hemiMetricStrong_triangle with B; assumption.
 Qed.
 
+(*
 Lemma hemiMetricStrong_closed : forall e A B,
  FinitelyEnumerable X B ->
  (forall d, hemiMetricStrong (e+d) A B) ->
@@ -405,7 +286,8 @@ split;
  destruct (H d);
  assumption.
 Qed.
-
+*)
+(*
 Lemma HemiMetricStrongHemiMetric : stableMetric X -> 
  forall (e:Qpos) A B,
  SubFinite X B ->
@@ -429,9 +311,10 @@ Proof.
 intros HX e A B HA HB [H0 H1].
 split; auto using HemiMetricStrongHemiMetric.
 Qed.
-
+*)
 Hypothesis almostDecideX : locatedMetric X.
 
+(*
 Lemma HemiMetricHemiMetricStrong : forall (e:Qpos) A B,
  FinitelyEnumerable X B ->
  hemiMetric X e A B -> hemiMetricStrong e A B.
@@ -454,7 +337,7 @@ destruct (almostDecideX e (e+d)%Qpos x a).
   autorewrite with QposElim;
   rewrite Qlt_minus_iff;
   ring_simplify;
-  auto with *).
+  auto with * ).
  exists a.
  destruct (Hl a); auto with *.
 set (B':=fun x => ~~In x l).
@@ -478,7 +361,7 @@ exists y.
 abstract (
 split; auto;
 apply <- Hl;
-auto 7 with *).
+auto 7 with * ).
 Defined.
 
 Lemma HausdorffBallHausdorffBallStrong : forall (e:Qpos) A B,
@@ -637,9 +520,11 @@ destruct (HemiMetricStrongAlmostDecidable e d A B HA HB Hed).
 right.
 intros [H _]; auto.
 Defined.
+*)
 
 End HausdorffMetricStrong.
 
+(*
 Definition HausdorffBallAlmostDecidable : 
  forall X, locatedMetric X ->
  forall (e d:Qpos) A B,
@@ -658,4 +543,4 @@ intros H;
 apply Z;
 apply HausdorffBallHausdorffBallStrong; assumption).
 Defined.
-  
+*)

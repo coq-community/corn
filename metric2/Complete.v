@@ -623,6 +623,20 @@ setoid_replace (e1+e2)%Qpos with ((half (half e1)) + ((half (half e1)) + (half e
 rapply (regFun_prf x).
 Qed.
 
+Lemma CunitCjoin : forall a, (Cunit_fun _ (Cjoin_fun (X:=X) a)) =m a.
+Proof.
+intros x e1 e2 d1 d2.
+change (ball (d1 + (e1 + e2) + d2)
+  (approximate (approximate x ((1 # 2) * d1)%Qpos) ((1 # 2) * d1)%Qpos)
+  (approximate (approximate x e2) d2)).
+apply ball_weak_le with (((1 # 2) * d1 + ((1 # 2) * d1 + e2) + d2))%Qpos.
+ autorewrite with QposElim.
+ rewrite Qle_minus_iff.
+ ring_simplify.
+ auto with *.
+rapply (regFun_prf x).
+Qed.
+
 End Monad_Laws.
 
 Lemma BindLaw1 : forall X Y Xpl (f:X--> Complete Y) a, (ms_eq (Cbind Xpl f (Cunit_fun _ a)) (f a)).

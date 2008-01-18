@@ -83,7 +83,7 @@ PRIVFILES :=
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES := algebra complex fta ftc metrics model reals tactics transc order metric2
+COQ_HIERARCHIES := algebra complex fta ftc logic metrics model reals tactics transc order metric2
 
 # Directory that will contain the html version of the documentation
 HTMLDIR := $(SRCDIR)/doc/html
