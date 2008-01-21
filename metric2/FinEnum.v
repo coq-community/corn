@@ -2,6 +2,7 @@ Require Export Hausdorff.
 Require Import Classic.
 Require Export List.
 Require Export Classification.
+Require Import Complete.
 Require Import Basics.
 Require Import CornTac.
 
@@ -444,3 +445,88 @@ Defined.
 End Strong.
 
 End Finite.
+
+Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum X SX) e, ball e s1 s2 <-> ball e (map Cunit s1:FinEnum (Complete X) SCX) (map Cunit s2).
+Proof.
+intros X SX SCX.
+cut (forall (s1 s2 : FinEnum X SX) (e : Qpos),
+   hemiMetric X e (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2) <->
+   hemiMetric (Complete X) e (fun a => InFinEnumC _ a (map Cunit s1:FinEnum (Complete X) SCX))
+    (fun a => InFinEnumC _ a (map Cunit s2))).
+ intros Z s1 s2 e.
+ split;
+  intros [H0 H1].
+  split; rewrite <- Z; assumption.
+ split; rewrite Z; assumption.
+assert (L1:forall a l, InFinEnumC X a l <-> InFinEnumC (Complete X) (Cunit a) (map Cunit l)).
+ induction l.
+  reflexivity.
+ split;
+  intros Ha;
+  (destruct Ha as [G | Ha | Ha] using orC_ind;
+   [auto using InFinEnumC_stable
+   |rapply orWeaken;left
+   |rapply orWeaken;right]).
+    rewrite Ha; reflexivity.
+   rewrite IHl in Ha; assumption.
+  rewrite <- Cunit_eq; assumption.
+ rewrite <- IHl in Ha; assumption.
+intros s1 s2 e.
+split; intros H a Ha.
+ induction s1.
+  contradiction.
+ destruct Ha as [G | Ha | Ha] using orC_ind.
+   auto using existsC_stable.
+  assert (Ha0:InFinEnumC X a0 (a0::s1)).
+   rapply orWeaken.
+   left; reflexivity.
+  destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists (Cunit y).
+  split.
+   rewrite <- L1; assumption.
+  rewrite Ha.
+  rewrite ball_Cunit; assumption.
+ apply IHs1; auto.
+ intros b Hb.
+ apply H.
+ rapply orWeaken.
+ right; assumption.
+induction s1.
+ contradiction.
+destruct Ha as [G | Ha | Ha] using orC_ind.
+  auto using existsC_stable.
+ clear IHs1.
+ assert (Ha0:InFinEnumC _ (Cunit a0) (map Cunit (a0::s1))).
+  rapply orWeaken.
+  left; reflexivity.
+ destruct (H _ Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ clear - Ha Hy0 Hy1.
+ induction s2.
+  contradiction.
+ destruct Hy0 as [G | Hy0 | Hy0] using orC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists a1.
+  split.
+   rapply orWeaken.
+   left; reflexivity.
+  rewrite Ha.
+  rewrite <- ball_Cunit.
+  rewrite <- Hy0.
+  assumption.
+ destruct (IHs2 Hy0) as [G | z [Hz0 Hz1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists z.
+ split; auto.
+ rapply orWeaken.
+ right; assumption.
+apply IHs1; auto.
+intros b Hb.
+apply H.
+rapply orWeaken.
+right; assumption.
+Qed.

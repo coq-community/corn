@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export UniformContinuity.
 Require Export QposInf.
+Require Export Classification.
 Require Import QposMinMax.
 Require Import Qordfield.
 Require Import COrdFields2.
@@ -900,3 +901,43 @@ Qed.
 Transparent Complete.
 
 Definition Cmap2 (X Y Z:MetricSpace) (Xpl : PrelengthSpace X) (Ypl : PrelengthSpace Y) f := uc_compose (@Cap Y Z Ypl) (Cmap Xpl f).
+
+Lemma Complete_stable : forall X, stableMetric X -> stableMetric (Complete X).
+Proof.
+intros X HX e x y Hb e1 e2.
+apply HX.
+intros H.
+apply Hb.
+intros H0.
+apply H.
+apply H0.
+Qed.
+
+Lemma Complete_located : forall X, locatedMetric X -> locatedMetric (Complete X).
+Proof.
+intros X Hx e d x y Hed.
+destruct (Qpos_lt_plus Hed) as [c Hc].
+set (c':=((1#5)*c)%Qpos).
+assert (H:(c'+e+c')%Qpos < (e+(3#1)*c')%Qpos).
+ abstract (
+ rewrite Qlt_minus_iff;
+ autorewrite with QposElim;
+ ring_simplify;
+ auto with *).
+destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
+ left.
+ abstract (
+ change (QposEq d (e+c)) in Hc;
+ rewrite Hc;
+ rewrite <- ball_Cunit in H0;
+ setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by (unfold c';QposRing);
+ eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
+  [apply ball_approx_r|apply ball_approx_l]).
+right.
+abstract (
+intros H1;
+apply H0;
+rewrite <- ball_Cunit;
+eapply ball_triangle;[eapply ball_triangle;[|apply H1]|];
+ [apply ball_approx_l|apply ball_approx_r]).
+Defined.

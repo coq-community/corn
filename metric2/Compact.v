@@ -324,16 +324,17 @@ Lemma CompactCompleteSubset : forall x, CompleteSubset _ (fun z => inCompact z x
 Proof.
 intros x a H.
 exists (Cjoin a).
- intros e1 e2.
- unfold inCompact in H.
+ abstract (
+ intros e1 e2;
+ unfold inCompact in H;
  eapply almostIn_weak_le;
-  [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos].
- autorewrite with QposElim.
- rewrite Qle_minus_iff.
- ring_simplify.
- auto with *.
+  [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos];
+ autorewrite with QposElim;
+ rewrite Qle_minus_iff;
+ ring_simplify;
+ auto with *).
 rapply CunitCjoin.
-Qed.
+Defined.
 
 Section CompactTotallyBounded.
 
@@ -888,7 +889,7 @@ intros s e.
 exists (CompactTotalBound s e).
  apply CompactTotallyBoundedA.
 apply CompactTotallyBoundedB.
-Qed.
+Defined.
 
 Lemma CompactAsBishopCompact : forall s, CompactSubset _ (fun z => inCompact z s).
 Proof.
@@ -896,10 +897,11 @@ intros s.
 split.
   apply CompactCompleteSubset.
  apply CompactTotallyBounded.
-intros a b Hab.
-rewrite Hab.
-reflexivity.
-Qed.
+abstract(
+intros a b Hab;
+rewrite Hab;
+reflexivity).
+Defined.
 
 End CompactTotallyBounded.
 
@@ -985,5 +987,139 @@ Qed.
 Definition BishopCompactAsCompact 
  (P:Complete X->Prop) (HP:CompactSubset _ P) : Compact :=
 Build_RegularFunction (BishopCompactAsCompact_prf HP).
+
+Section Isomorphism.
+
+Hypothesis locatedX : locatedMetric X.
+
+Lemma BishopCompact_Compact_BishopCompact1 :
+ forall (P:Complete X->Prop) (HP:CompactSubset _ P) x,
+  P x -> inCompact x (BishopCompactAsCompact HP).
+Proof.
+intros P [HP1 HP2 HP3] x Hx e1 e2.
+simpl.
+destruct (HP2 ((1 # 2) * e2)%Qpos) as [l Hl0 Hl1].
+destruct (Hl1 x Hx) as [y [Hy0 Hy1]].
+clear - Hy0 Hy1.
+induction l.
+ contradiction.
+destruct Hy0 as [Hy0|Hy0].
+ rewrite Hy0.
+ rapply orWeaken.
+ left.
+ rewrite <- ball_Cunit.
+ setoid_replace (e1+e2)%Qpos with (e1 + ((1 # 2) * e2 + (1 # 2) * e2))%Qpos by QposRing.
+ apply ball_triangle with x.
+  apply ball_approx_l.
+ apply ball_triangle with y.
+  assumption.
+ apply ball_approx_r.
+rapply orWeaken.
+right.
+apply IHl.
+auto with *.
+Qed.
+
+Lemma BishopCompact_Compact_BishopCompact2 :
+ forall (P:Complete X->Prop) (HP:CompactSubset _ P) x,
+  inCompact x (BishopCompactAsCompact HP) -> P x.
+Proof.
+intros P [HP1 HP2 HP3] x Hx.
+assert (Y:forall e:Qpos, ((7#8)*e)%Qpos < e).
+ intros.
+ rewrite Qlt_minus_iff.
+ autorewrite with QposElim.
+ ring_simplify.
+ Qauto_pos.
+assert (A:forall e, {y | P y /\ ball (m:=Complete X) e x y}).
+ intros e.
+ assert (Hx':=Hx ((1#16)*e)%Qpos ((1#2)*e)%Qpos).
+ simpl in Hx'.
+ clear - Hx' locatedX Y.
+ destruct (HP2 ((1 # 2) * ((1 # 2) * e))%Qpos) as [l Hl0 Hl1].
+ clear Hl1.
+ induction l.
+  contradiction.
+ destruct (Complete_located locatedX x a (Y e)) as [A|A].
+  exists a.
+  split; auto.
+  apply Hl0; auto with *.
+ apply IHl.
+  intros y Hy.
+  apply Hl0; auto with *.
+ destruct Hx' as [G | Hx' | Hx'] using orC_ind.
+   auto using almostIn_stable.
+  elim A.
+  clear - Hx'.
+  rewrite <- ball_Cunit in Hx'.
+  setoid_replace ((7 # 8) * e)%Qpos with ((1#16)*e + ((1 # 16) * e + (1 # 2) * e) + (((1 # 2) * ((1 # 2) * e))))%Qpos 
+   by QposRing.
+  eapply ball_triangle.
+   eapply ball_triangle.
+    apply ball_approx_r.
+   apply Hx'.
+  apply ball_approx_l.
+ assumption.
+set (f:=fun e => (let (y,_):= (A e) in y)).
+assert (Hf0:forall e, ball (m:=Complete X) (e) (f e) x).
+ intros e.
+ unfold f.
+ destruct (A e) as [y [_ Hy]].
+ apply ball_sym.
+ assumption.
+assert (Hf:is_RegularFunction (fun e => match e with QposInfinity => f (1#1)%Qpos | Qpos2QposInf e' => f e' end)).
+ intros e1 e2.
+ apply ball_triangle with x.
+  apply Hf0.
+ apply ball_sym.
+ apply Hf0.
+set (f':=(Build_RegularFunction Hf)).
+assert (Hf1 : forall (e:Qpos), P (approximate f' e)).
+ intros e.
+ simpl; unfold f.
+ destruct (A e).
+ tauto.
+destruct (HP1 f') as [y Hy].
+ intros [e|]; rapply Hf1.
+unfold ExtSubset in HP3.
+rewrite (HP3 x y); auto.
+rewrite <- Cunit_eq.
+rewrite m.
+intros e1 e2.
+apply ball_sym.
+setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
+apply ball_weak.
+rapply Hf0.
+Qed.
+
+Lemma BishopCompact_Compact_BishopCompact :
+ forall (P:Complete X->Prop) (HP:CompactSubset _ P) x,
+  P x <-> inCompact x (BishopCompactAsCompact HP).
+Proof.
+intros P HP x.
+split.
+ apply BishopCompact_Compact_BishopCompact1.
+apply BishopCompact_Compact_BishopCompact2.
+Qed.
+
+Lemma Compact_BishopCompact_Compact : forall s,
+ ms_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
+Proof.
+intros s e1 e2.
+setoid_replace (e1 + e2)%Qpos with (e1 + (1#2)*e2 + (1#2)*e2)%Qpos by QposRing.
+rewrite (FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
+apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
+ simpl.
+ generalize (CompactTotallyBoundedNotFar locatedX s ((1 # 5) * e2) ((1 # 5) * e2)).
+ 
+ 
+simpl in l.
+simpl.
+split;
+ intros a Ha.
+ 
+
+
+End Isomorphism.
 
 End Compact.
