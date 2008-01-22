@@ -824,6 +824,71 @@ apply H with pt.
 rapply orWeaken;right;assumption.
 Defined.
 
+Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
+ ball ((3#5)*e) (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum (Complete X) SCX) (CompactTotalBound s e).
+Proof.
+intros SCX s e.
+unfold CompactTotalBound.
+generalize (CompactTotallyBoundedNotFar s ((1#5)*e) ((1#5)*e)).
+generalize (CompactTotallyBounded_fun s ((1 # 5) * e) ((1 # 5) * e)).
+induction (approximate s ((1 # 5) * e)%Qpos);
+ intros H L.
+ apply ball_refl.
+split;
+ intros x Hx.
+ destruct Hx as [G | Hx | Hx] using orC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists (H a (InFinEnumC_weaken X a (a :: m) (in_eq a m))).
+  split.
+   rapply orWeaken.
+   left.
+   reflexivity.
+  rewrite Hx.
+  setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
+  apply L.
+ set (H':=(fun pt (Hpt : InFinEnumC X pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
+ assert (L':forall (pt : X) (Hpt : InFinEnumC X pt m),
+    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
+      (Cunit pt) (H' pt Hpt)).
+  intros pt Hpt.
+  rapply L.
+ destruct (IHm H' L') as [A _].
+ destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists y.
+ split; auto.
+ rapply orWeaken.
+ right; assumption.
+destruct Hx as [G | Hx | Hx] using orC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists (Cunit a).
+ split.
+  rapply orWeaken.
+  left.
+  reflexivity.
+ rewrite Hx.
+ setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
+ apply ball_sym.
+ apply L.
+set (H':=(fun pt (Hpt : InFinEnumC X pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
+assert (L':forall (pt : X) (Hpt : InFinEnumC X pt m),
+   ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
+     (Cunit pt) (H' pt Hpt)).
+ intros pt Hpt.
+ rapply L.
+destruct (IHm H' L') as [_ A].
+destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists y.
+split; auto.
+rapply orWeaken.
+right; assumption.
+Qed.
+
 Lemma CompactTotallyBoundedA : forall s e y, In y (CompactTotalBound s e) -> inCompact y s.
 Proof.
 intros s e y.
@@ -1106,19 +1171,53 @@ Lemma Compact_BishopCompact_Compact : forall s,
  ms_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
 Proof.
 intros s e1 e2.
-setoid_replace (e1 + e2)%Qpos with (e1 + (1#2)*e2 + (1#2)*e2)%Qpos by QposRing.
+setoid_replace (e1 + e2)%Qpos with (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2)%Qpos by QposRing.
+apply ball_weak.
+apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
+ rapply regFun_prf.
+clear e1.
 rewrite (FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
 apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
- simpl.
- generalize (CompactTotallyBoundedNotFar locatedX s ((1 # 5) * e2) ((1 # 5) * e2)).
- 
- 
-simpl in l.
+ apply CompactTotalBoundNotFar.
 simpl.
-split;
- intros a Ha.
- 
-
+change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete X) (Complete_stable stableX))).
+induction (CompactTotalBound locatedX s ((1 # 2) * e2)).
+ rapply ball_refl.
+destruct IHl as [IHlA IHlB].
+split; intros x Hx;
+ (destruct Hx as [G | Hx | Hx] using orC_ind;
+  [auto using existsC_stable
+  |apply existsWeaken 
+  |]).
+   exists (Cunit (approximate a ((1 # 2) * e2)%Qpos)).
+   split.
+    rapply orWeaken.
+    left; reflexivity.
+   rewrite Hx.
+   apply ball_approx_r.
+  destruct (IHlA x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists y.
+  split; auto.
+  rapply orWeaken.
+  right.
+  assumption.
+ exists a.
+ split.
+  rapply orWeaken.
+  left; reflexivity.
+ rewrite Hx.
+ rapply ball_approx_l.
+destruct (IHlB x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists y.
+split; auto.
+rapply orWeaken.
+right.
+assumption.
+Qed.
 
 End Isomorphism.
 
