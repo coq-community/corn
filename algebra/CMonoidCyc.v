@@ -207,7 +207,7 @@ cut (Zmod (x_+y_ -k) n <n)%Z.
 intro H5.
 cut (0 <= x_+y_ -k < n)%Z.
 intro H6.
-rewrite (Zmod_small n ( x_+y_ -k) H H6).
+rewrite (ZMod.Zmod_small n ( x_+y_ -k) H H6).
 intuition.
 intuition.
 
@@ -246,7 +246,7 @@ cut (((x_ + y_ - k) mod n + z_)%Z =
 intuition.
 cut (0<= ((Zmod (x_ + y_ - k) n )+ z_)<n)%Z.
 intro H7.
-rewrite (Zmod_small n ((x_ + y_ - k) mod n + z_) H H7).
+rewrite (ZMod.Zmod_small n ((x_ + y_ - k) mod n + z_) H H7).
 reflexivity.
 split.
 2:intuition.
@@ -309,7 +309,7 @@ cut (0<= (x_ + (y_ + z_ - k) mod n)<n)%Z.
 7: case (Z_lt_le_dec (k + (x_ + y_ - k) mod n + z_) (k + n)).
 
 intro H6.
-set (H7:= (Zmod_small n  (x_ + (y_ + z_ - k) mod n) H H6)).
+set (H7:= (ZMod.Zmod_small n  (x_ + (y_ + z_ - k) mod n) H H6)).
 rewrite H7.
 intuition.
 set (H6:= (Z_mod_lt (y_+z_-k) n H)).
@@ -322,14 +322,14 @@ replace (y_ + z_ -k)%Z with (z_ +y_ -k)%Z.
 2:intuition.
 cut (0<= ((Zmod (x_+y_ -k)%Z n)+z_)<n)%Z.
 intro H5.
-set (H6:= (Zmod_small n ((Zmod (x_+y_ -k) n)%Z+ z_)%Z H H5)).
+set (H6:= (ZMod.Zmod_small n ((Zmod (x_+y_ -k) n)%Z+ z_)%Z H H5)).
 replace  (k + (x_ + y_ - k) mod n + z_)%Z with  
          (k + ((x_ + y_ - k) mod n + z_))%Z.
 2:intuition.
 rewrite<- H6.
 cut (0<= z_< n)%Z.
 intro H7.
-set (H8:=(Zmod_small n z_ H H7)).
+set (H8:=(ZMod.Zmod_small n z_ H H7)).
 replace (k + ((x_ + y_ - k) mod n + z_) mod n)%Z with 
          (k + ((x_ + y_ - k) mod n + z_ mod n ) mod n)%Z. 
 2:rewrite H8.
@@ -343,11 +343,11 @@ replace (x_ + (k + (z_ + y_ - k) mod n))%Z with
 2:intuition.
 cut (0<= ((Zmod (z_+y_ -k)%Z n)+x_)<n)%Z.
 intro H10.
-set (H11:= (Zmod_small n ((Zmod (z_+y_ -k) n)%Z+ x_)%Z H H10)).
+set (H11:= (ZMod.Zmod_small n ((Zmod (z_+y_ -k) n)%Z+ x_)%Z H H10)).
 rewrite<- H11.
 cut (0<= x_< n)%Z.
 intro H12.
-set (H13:=(Zmod_small n x_ H H12)).
+set (H13:=(ZMod.Zmod_small n x_ H H12)).
 replace (k + ((z_ + y_ - k) mod n + x_) mod n)%Z with 
          (k + ((z_ + y_ - k) mod n + x_ mod n ) mod n)%Z. 
 2:rewrite H13.
@@ -394,7 +394,7 @@ replace (k + (x_ + y_ - k) mod n + z_ - k)%Z with
 2:intuition.
 cut (0<=(x_+ (y_+z_-k)mod n)%Z<n)%Z.
 intro H5.
-set (H6:=(Zmod_small n (x_+(y_+z_-k)mod n)%Z H H5)).
+set (H6:=(ZMod.Zmod_small n (x_+(y_+z_-k)mod n)%Z H H5)).
 replace (x_ + (k + (y_ + z_ - k) mod n))%Z with
        (k + (x_ + (y_ + z_ - k) mod n))%Z.
 2:intuition.
@@ -428,13 +428,13 @@ replace (x_ + (k + (y_ + z_ - k) mod n) - k)%Z with
      (x_ + (y_ + z_ - k) mod n)%Z.                                             2:intuition.
 cut (0<= ((x_ + y_ - k) mod n + z_)%Z <n)%Z.
 intro H5.
-set (H6:=(Zmod_small n ((x_ + y_ - k) mod n + z_))%Z H H5).
+set (H6:=(ZMod.Zmod_small n ((x_ + y_ - k) mod n + z_))%Z H H5).
 replace (k + (x_ + y_ - k) mod n + z_)%Z with 
     (k + ((x_ + y_ - k) mod n + z_))%Z.                                        2: intuition.  
 rewrite<- H6.
 cut (0<=z_<n)%Z.
 intro H7.
-set (H8:=(Zmod_small n z_ H H7)).
+set (H8:=(ZMod.Zmod_small n z_ H H7)).
 replace ((x_ + y_ - k) mod n + z_)%Z with ((x_ + y_ - k) mod n +(z_ mod n))%Z.
 2:rewrite H8.
 2:reflexivity.
@@ -564,7 +564,7 @@ apply succ_nat.
 intros H1 H2 H3 H4 H5 H6.
 cut (0<= ((Z_of_nat m) + 1 - k)%Z <n)%Z.
 intro H7.
-set (H8:=(Zmod_small n (Z_of_nat m + 1 - k)%Z H2 H7)).
+set (H8:=(ZMod.Zmod_small n (Z_of_nat m + 1 - k)%Z H2 H7)).
 rewrite H8.
 replace (k + (Z_of_nat m + 1 - k))%Z with (Z_of_nat m + 1)%Z.
 2:intuition.
@@ -601,7 +601,7 @@ intuition.
 intros H2 H3.
 cut (0<= (a+1-k)%Z<n)%Z.
 intro H4.
-set (H5:= (Zmod_small n (a+1-k)%Z H H4)).
+set (H5:= (ZMod.Zmod_small n (a+1-k)%Z H H4)).
 rewrite H5.
 intuition.
 

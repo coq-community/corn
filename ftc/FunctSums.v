@@ -118,7 +118,8 @@ apply Sum0_wd.
 intros; simpl in |- *; algebra.
 Qed.
 
-Lemma FSum_one : forall n (f : nat -> PartIR) x Hx Hx',
+Lemma FSum_one : 
+ forall n (f : nat -> PartIR) x (Hx : nat -> pfdom IR (f n) x) Hx',
  FSum n n f x Hx' [=] f n x (Hx n).
 intros.
 simpl in |- *.
