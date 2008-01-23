@@ -1,4 +1,4 @@
-# Copyright © 1998-2006
+# Copyright © 1998-2008
 # Henk Barendregt
 # Luís Cruz-Filipe
 # Herman Geuvers
@@ -139,7 +139,7 @@ GRAMMARS:=grammar.cma
 PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
 
 # COQMAP defines the mapping between physical and logical directories
-COQMAP = -R $(SRCDIR) $(LIBNAME)
+COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN.devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
 OTHERFLAGS = -dump-glob $(GLOBFILE) -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = 
