@@ -8,15 +8,10 @@
 ./algebra/CPoly_ApZero.v ./reals/CauchySeq.v
 ./model/structures/Nsec.v ./model/Zmod/ZBasics.v
 ./model/Zmod/Cmod.v ./algebra/CSetoids.v
-./reals/Series.v ./model/structures/Npossec.v
-./reals/RealLists.v ./model/structures/Npossec.v
-./model/structures/Npossec.v ./model/setoids/Nsetoid.v
 ./model/non_examples/Npos_no_monoid.v ./model/structures/Zsec.v
 ./model/non_examples/Npos_no_group.v ./model/structures/Zsec.v
 ./model/non_examples/N_no_group.v ./model/structures/Zsec.v
 ./model/rings/Zring.v ./model/structures/Qsec.v
-./model/abgroups/QSposabgroup.v ./model/semigroups/Qsemigroup.v
-./model/abgroups/Qposabgroup.v ./model/semigroups/Qsemigroup.v
 ./algebra/CHomomorphism_Theorems.v ./algebra/CFields.v
 ./model/ordfields/Qordfield.v ./algebra/CMonoidCyc.v
 ./algebra/CMonoidCyc.v ./algebra/Cauchy_COF.v
@@ -32,7 +27,6 @@
 ./ftc/Composition.v ./ftc/Partitions.v
 ./ftc/Taylor.v ./ftc/Partitions.v
 ./ftc/Partitions.v ./ftc/COrdLemmas.v
-./ftc/MoreIntegrals.v ./ftc/FunctSequence.v
 ./ftc/CalculusTheorems.v ./ftc/WeakIVT.v
 ./ftc/StrongIVT.v ./ftc/FTC.v
 ./transc/RealPowers.v ./transc/Trigonometric.v
