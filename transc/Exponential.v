@@ -1337,7 +1337,7 @@ assert (X2:(olor Zero Two One)).
  apply one_less_two.
 eapply eq_transitive.
  2:apply eq_symmetric.
- 2:apply (fun A => Barrow (olor Zero Two) _ X1 _ Hc0 _ _ X0 _ _ A X2 Hc0).
+ 2:apply (fun A => Barrow (olor Zero Two) _ X1 _ _ X0 _ _ A X2 Hc0).
 simpl.
 rstepr (([--]One[/]nring (R:=IR) n[+]One[//]nringS_ap_zero IR n)[*]
 (nexp IR n (One[-]c)[*](One[-]c))).

@@ -3,6 +3,7 @@ Require Export Metric.
 Require Import Classification.
 Require Import List.
 Require Import ZArith.
+Require Import QMinMax.
 Require Import QposMinMax.
 Require Import Qauto.
 
@@ -428,18 +429,18 @@ e < d -> hemiMetricStrong d (fun x=>a=x) B + (hemiMetricStrong e (fun x=>a=x) B 
   autorewrite with QposElim.
   rewrite Hc.
   rewrite Qle_minus_iff.
-  replace RHS with ((1 # 2) * c + - (Qpos_min d0 ((1 # 2) * c))) by ring.
+  replace RHS with ((1 # 2) * c + - (Qmin d0 ((1 # 2) * c))) by ring.
   rewrite <- Qle_minus_iff.
-  rapply Qpos_min_lb_r.
+  rapply Qmin_lb_r.
  change (In y lB) in H1.
  split; auto with *.
  rewrite <- Hx.
  apply ball_weak_le with (e + Qpos_min d0 ((1 # 2) * c))%Qpos; auto.
  autorewrite with QposElim.
  rewrite Qle_minus_iff.
- replace RHS with (d0 + - (Qpos_min d0 ((1 # 2) * c))) by ring.
+ replace RHS with (d0 + - (Qmin d0 ((1 # 2) * c))) by ring.
  rewrite <- Qle_minus_iff.
- rapply Qpos_min_lb_l.
+ rapply Qmin_lb_l.
 
 intros e d A B [lA HA].
 revert A HA.

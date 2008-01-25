@@ -11,24 +11,24 @@ Section StepFunction.
 Variable X:Type.
 
 Inductive StepF :Type:=
-|leaf:X-> StepF
+|constStepF:X-> StepF
 |glue:OpenUnit-> StepF -> StepF -> StepF.
 
 Fixpoint StepFfold (Y : Type) (f : X -> Y) (g : OpenUnit -> Y -> Y -> Y)
               (s : StepF) {struct s} : Y :=
   match s with
-  | leaf x => f x
+  | constStepF x => f x
   | glue b t1 t2 => g b (StepFfold f g t1) (StepFfold f g t2)
   end.
 
 Definition Mirror :StepF -> StepF :=
-StepFfold leaf (fun a l r => glue (OpenUnitDual a) r l).
+StepFfold constStepF (fun a l r => glue (OpenUnitDual a) r l).
 
 Definition Split : StepF -> OpenUnit -> StepF*StepF.
 fix 1.
 intros s a.
 destruct s as [x | b t1 t2].
- exact (leaf x , leaf x).
+ exact (constStepF x , constStepF x).
 
 destruct (Q_dec a b) as [[H|H]|H].
    destruct (Split t1 (OpenUnitDiv a b H)) as [L R].
@@ -112,7 +112,7 @@ Qed.
 
 Fixpoint StepF_Qeq (s1 s2: StepF) : Prop :=
 match s1, s2 with
-|leaf x, leaf y => x = y
+|constStepF x, constStepF y => x = y
 |glue a x1 x2, glue b y1 y2 => a == b /\ (StepF_Qeq x1 y1) /\ (StepF_Qeq x2 y2)
 |_, _ => False
 end.
@@ -530,7 +530,7 @@ Add Relation StepF StepF_Qeq
 
 Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
 fix 4. intros X Y f [x| a t1 t2].
- exact (leaf (f x)).
+ exact (constStepF (f x)).
 exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
 Defined.
 
@@ -540,7 +540,7 @@ Open Local Scope sfscope.
 
 Fixpoint Ap (X Y:Type) (f:StepF (X->Y)) (a:StepF X) : StepF Y :=
 match f with
-|leaf f0 => f0 ^@> a
+|constStepF f0 => f0 ^@> a
 |glue o f0 f1 => let (l,r):=Split a o in (glue o (Ap f0 l) (Ap f1 r))
 end.
 
@@ -719,7 +719,7 @@ End Ap.
 
 Section ApplicativeFunctor.
 
-Lemma Ap_identity : forall X (a:StepF X), leaf (fun x => x) <@> a = a.
+Lemma Ap_identity : forall X (a:StepF X), constStepF (fun x => x) <@> a = a.
 Proof.
 induction a.
  reflexivity.
@@ -741,7 +741,7 @@ Hint Resolve StepF_Qeq_refl StepF_Qeq_sym StepF_Qeq_trans SplitL_resp_Qeq SplitR
 Definition compose X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
 
 Lemma Ap_composition_Qeq : forall X Y Z (a:StepF (Y->Z)) (b:StepF (X->Y)) (c:StepF X),
- StepF_Qeq (leaf (@compose X Y Z) <@> a <@> b <@> c) (a <@> (b <@> c)).
+ StepF_Qeq (constStepF (@compose X Y Z) <@> a <@> b <@> c) (a <@> (b <@> c)).
 Proof.
 induction a.
  simpl.
@@ -769,19 +769,19 @@ exact Ap_composition_Qeq.
 Qed.
 
 Lemma Ap_homomorphism : forall X Y (f:X->Y) (a:X),
- (leaf f <@> leaf a) = (leaf (f a)).
+ (constStepF f <@> constStepF a) = (constStepF (f a)).
 Proof.
 reflexivity.
 Qed.
 
 Lemma Map_homomorphism : forall X Y (f:X->Y) (a:X),
- (f ^@> leaf a) = (leaf (f a)).
+ (f ^@> constStepF a) = (constStepF (f a)).
 Proof.
 exact Ap_homomorphism.
 Qed.
 
 Lemma Ap_interchange : forall X Y (f:StepF (X->Y)) (a:X),
- (f <@> leaf a) = (leaf (fun g => g a)) <@> f.
+ (f <@> constStepF a) = (constStepF (fun g => g a)) <@> f.
 Proof.
 induction f.
  reflexivity.
@@ -793,7 +793,7 @@ reflexivity.
 Qed.
 
 Lemma Map_interchange : forall X Y (f:StepF (X->Y)) (a:X),
- (f <@> leaf a) = (fun g => g a) ^@> f.
+ (f <@> constStepF a) = (fun g => g a) ^@> f.
 Proof.
 exact Ap_interchange.
 Qed.
@@ -802,9 +802,9 @@ Lemma Map_compose_Map : forall X Y Z (f:Y->Z) (g:X -> Y) a,
 StepF_Qeq ((fun a => f (g a)) ^@> a) (f ^@> (g ^@> a)).
 Proof.
 intros X Y Z f g a.
-change (StepF_Qeq (leaf (compose f g) <@> a) (leaf f <@> (leaf g <@> a))).
+change (StepF_Qeq (constStepF (compose f g) <@> a) (constStepF f <@> (constStepF g <@> a))).
 rewrite <- (Map_homomorphism (compose f) g).
-change (compose f ^@> leaf g) with (leaf (compose f) <@> leaf g).
+change (compose f ^@> constStepF g) with (constStepF (compose f) <@> constStepF g).
 rewrite <- (Map_homomorphism (@compose X Y Z) f).
 rapply Map_composition_Qeq.
 Qed.
@@ -816,7 +816,7 @@ Lemma MapMap2 (X Y Z W:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y
 Proof.
 intros.
 change ((fun (x0 : X) (y0 : Y) => f (g x0 y0)) ^@> x)
- with (leaf (compose (compose f) g) <@> x).
+ with (constStepF (compose (compose f) g) <@> x).
 rewrite <- (Ap_homomorphism (compose (compose f)) g).
 rewrite <- (Ap_homomorphism (@compose X _ _) (@compose Y _ _ f)).
 (*Setoid rewrite bug *)

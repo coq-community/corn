@@ -118,3 +118,36 @@ Add Relation OpenUnit ou_eq
  symmetry proved by ou_eq_sym
  transitivity proved by ou_eq_trans
  as ou_st.
+
+Definition affineCombo (o:OpenUnit) (a b:Q) := o*a + (1-o)*b.
+
+Add Morphism affineCombo with signature ou_eq ==> Qeq ==> Qeq ==> Qeq as affineCombo_wd.
+Proof.
+intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
+unfold affineCombo.
+unfold ou_eq in Hx.
+rewrite Hx, Hy, Hz.
+reflexivity.
+Qed.
+
+Lemma affineCombo_gt : forall o a b (H:a < b), a < affineCombo o a b.
+Proof.
+intros o a b H.
+unfold affineCombo.
+rewrite Qlt_minus_iff in *.
+replace RHS with ((1-o)*(b-a)) by ring.
+rsapply mult_resp_pos;
+ auto with *.
+Qed.
+
+Lemma affineCombo_lt : forall o a b (H:a < b), affineCombo o a b < b.
+Proof.
+intros o a b H.
+unfold affineCombo.
+rewrite Qlt_minus_iff in *.
+replace RHS with (o*(b-a)) by ring.
+rsapply mult_resp_pos;
+ auto with *.
+Qed.
+
+Hint Resolve affineCombo_lt affineCombo_gt : ouarith.

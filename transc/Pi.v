@@ -99,7 +99,7 @@ Opaque Sine.
  FEQ. Deriv.
 assert (H4 : Continuous_I (Min_leEq_Max x t) Sine).
  apply included_imp_Continuous with realline; Contin.
-set (B := Barrow _ _ Continuous_Sin Zero CI CI {--}Cosine) in *.
+set (B := Barrow _ _ Continuous_Sin CI {--}Cosine) in *.
 set (B' := B H3 x t H4 CI CI) in *.
 apply less_wdr with (Cosine x CI[-]Integral H4).
 2: unfold cg_minus at 1 in |- *; apply bin_op_wd_unfolded.
