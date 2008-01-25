@@ -1,5 +1,6 @@
 Require Import Limit.
 Require Export FinEnum.
+Require Import Zpow_facts.
 Require Import Complete.
 Require Import Classic.
 Require Import COrdFields2.
