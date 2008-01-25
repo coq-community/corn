@@ -86,9 +86,9 @@ Record is_COrdField (F : CField)
 Record COrdField : Type := 
   {cof_crr   :> CField;
    cof_less  :  CCSetoid_relation cof_crr;
-   cof_leEq :  Relation cof_crr;
+   cof_leEq :  cof_crr -> cof_crr -> Prop;
    cof_greater :  CCSetoid_relation cof_crr;
-   cof_grEq : Relation cof_crr;
+   cof_grEq : cof_crr -> cof_crr -> Prop;
    cof_proof :  is_COrdField cof_crr cof_less cof_leEq cof_greater cof_grEq}.
 
 (**
