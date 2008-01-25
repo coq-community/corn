@@ -2,11 +2,41 @@ Require Export Metric.
 Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
+Require Import Qabs.
 Require Import CornTac.
 
 Set Implicit Arguments.
 
+Opaque Qabs.
+
 Definition Qball (e : Qpos) (a b : Q) := AbsSmall (e:Q) (a - b).
+
+Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= e.
+Proof.
+intros e a b.
+unfold Qball, AbsSmall.
+simpl.
+generalize (a-b).
+intros c.
+split.
+ apply Qabs_case.
+  tauto.
+ intros.
+ rewrite <- (Qopp_involutive e).
+ apply Qopp_le_compat.
+ tauto.
+intros.
+split.
+ apply Qle_trans with (-(Qabs (-c))).
+  rewrite Qabs_opp.
+  auto with *.
+ rewrite <- (Qopp_involutive c).
+ apply Qopp_le_compat.
+ rewrite Qopp_involutive.
+ apply Qle_Qabs.
+apply Qle_trans with (Qabs c); auto with *.
+apply Qle_Qabs.
+Qed.
 
 Lemma Qball_dec : forall e a b, {Qball e a b}+{~Qball e a b}.
 Proof.
@@ -104,9 +134,7 @@ Build_MetricSpace Qball_wd Q_is_MetricSpace.
 
 Canonical Structure Q_as_MetricSpace.
 
-Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
-Proof.
-assert (forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c).
+Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
 intros e d1 d2 He a b c Hab Hc.
 simpl.
 unfold Qball.
@@ -122,13 +150,17 @@ rewrite Hc.
 pose (@Qpos_nonzero (d1 + d2)%Qpos).
 QposField.
 assumption.
+Qed.
+
+Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
+Proof.
 intros a b e d1 d2 He Hab.
 pose (c:= (a * d2 + b * d1) / (d1 + d2)%Qpos).
 exists c.
-apply (H e d1 d2 He a b c); try assumption.
+apply (@QPrelengthSpace_help e d1 d2 He a b c); try assumption.
 reflexivity.
 apply ball_sym.
-eapply H.
+eapply QPrelengthSpace_help.
 rewrite Qplus_comm.
 apply He.
 apply ball_sym.
