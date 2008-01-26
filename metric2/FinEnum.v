@@ -6,6 +6,8 @@ Require Import Complete.
 Require Import Basics.
 Require Import CornTac.
 
+Set Implicit Arguments.
+
 Section Finite.
 
 Variable X:MetricSpace.
@@ -299,7 +301,7 @@ induction b; intros x Hx H d.
  apply existsC_ind;[tauto|];
  intros y [Hy0 Hy1];
  apply Hy0).
-destruct (almostDecideX e (e+d)%Qpos x a).
+destruct (@almostDecideX e (e+d)%Qpos x a).
   clear - e d.
   abstract (
   autorewrite with QposElim;
@@ -365,8 +367,7 @@ destruct (IHb Hed) as [H|H].
  split; try assumption;
  rapply orWeaken;
  auto).
-destruct (almostDecideX e d a a0).
-  assumption.
+destruct (almostDecideX a a0 Hed).
  left.
  abstract (
  intros x Hx;
@@ -405,7 +406,7 @@ induction a.
  apply Hx.
 intros b Hed.   
 destruct (IHa b Hed) as [I|I].
- destruct (HemiMetricStrongAlmostDecidableBody e d a b Hed) as [J|J].
+ destruct (HemiMetricStrongAlmostDecidableBody a b Hed) as [J|J].
   left.
   abstract (
   intros x Hx;
@@ -432,8 +433,8 @@ Defined.
 Lemma FinEnum_located : locatedMetric FinEnum.
 Proof.
 intros e d a b Hed.
-destruct (HemiMetricStrongAlmostDecidable e d a b Hed).
- destruct (HemiMetricStrongAlmostDecidable e d b a Hed).
+destruct (HemiMetricStrongAlmostDecidable a b Hed).
+ destruct (HemiMetricStrongAlmostDecidable b a Hed).
   left.
   split; assumption.
  right.
@@ -446,53 +447,94 @@ End Strong.
 
 End Finite.
 
-Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum X SX) e, ball e s1 s2 <-> ball e (map Cunit s1:FinEnum (Complete X) SCX) (map Cunit s2).
-Proof.
-intros X SX SCX.
-cut (forall (s1 s2 : FinEnum X SX) (e : Qpos),
-   hemiMetric X e (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2) <->
-   hemiMetric (Complete X) e (fun a => InFinEnumC _ a (map Cunit s1:FinEnum (Complete X) SCX))
-    (fun a => InFinEnumC _ a (map Cunit s2))).
- intros Z s1 s2 e.
- split;
-  intros [H0 H1].
-  split; rewrite <- Z; assumption.
- split; rewrite Z; assumption.
-assert (L1:forall a l, InFinEnumC X a l <-> InFinEnumC (Complete X) (Cunit a) (map Cunit l)).
- induction l.
-  reflexivity.
- split;
-  intros Ha;
-  (destruct Ha as [G | Ha | Ha] using orC_ind;
-   [auto using InFinEnumC_stable
-   |rapply orWeaken;left
-   |rapply orWeaken;right]).
-    rewrite Ha; reflexivity.
-   rewrite IHl in Ha; assumption.
-  rewrite <- Cunit_eq; assumption.
- rewrite <- IHl in Ha; assumption.
-intros s1 s2 e.
-split; intros H a Ha.
- induction s1.
-  contradiction.
- destruct Ha as [G | Ha | Ha] using orC_ind.
-   auto using existsC_stable.
-  assert (Ha0:InFinEnumC X a0 (a0::s1)).
-   rapply orWeaken.
-   left; reflexivity.
-  destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
-   auto using existsC_stable.
-  apply existsWeaken.
-  exists (Cunit y).
-  split.
-   rewrite <- L1; assumption.
-  rewrite Ha.
-  rewrite ball_Cunit; assumption.
- apply IHs1; auto.
- intros b Hb.
- apply H.
+Open Local Scope uc_scope.
+
+Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC X a l -> InFinEnumC Y (f a) (map f l).
+induction l.
+ auto.
+intros Ha.
+destruct Ha as [G | Ha | Ha] using orC_ind.
+  auto using InFinEnumC_stable.
  rapply orWeaken.
- right; assumption.
+ left.
+ rewrite Ha; reflexivity.
+rapply orWeaken.
+right.
+apply IHl.
+auto.
+Qed.
+
+Definition FinEnum_map_modulus (z:Qpos) (muf : Qpos -> QposInf) (e:Qpos) :=
+match (muf e) with
+| QposInfinity => z
+| Qpos2QposInf d => d
+end.
+
+(* if a is empty and b is not, then (map f a) and (map f b) are not equivalent,
+ even if f is the constant function *)
+Lemma FinEnum_map_uc : forall z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y), is_UniformlyContinuousFunction (map f:FinEnum SX -> FinEnum SY) (FinEnum_map_modulus z (mu f)).
+Proof.
+intros z X Y SX SY f e.
+cut (forall (a b : FinEnum SX) (d:Qpos), (QposInf_le d (mu f e)) ->
+ ball d a b -> ball (m:=FinEnum SY) e (map f a) (map f b)).
+ intros Z a b.
+ case_eq (mu f e).
+  intros d Hd H.
+  apply Z with d; auto.
+  rewrite Hd.
+  simpl; auto with *.
+ intros He H.
+ apply Z with z; auto.
+ rewrite He.
+ constructor.
+revert e.
+cut (forall (e d:Qpos), (QposInf_le d (mu f e)) -> forall (s1 s2 : FinEnum SX),
+  hemiMetric X d (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2) ->
+  hemiMetric Y e (fun a => InFinEnumC _ a (map f s1:FinEnum SY))
+   (fun a => InFinEnumC _ a (map f s2))).
+ intros Z e s1 s2 d Hd [H0 H1].
+ split; apply (Z e d Hd); assumption.
+intros e d Hd s1 s2.
+intros H a Ha.
+induction s1.
+ contradiction.
+destruct Ha as [G | Ha | Ha] using orC_ind.
+  auto using existsC_stable.
+ assert (Ha0:InFinEnumC X a0 (a0::s1)).
+  rapply orWeaken.
+  left; reflexivity.
+ destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists (f y).
+ split.
+  apply InFinEnumC_map; assumption.
+ rewrite Ha.
+ apply (uc_prf f).
+ apply ball_ex_weak_le with d; auto.
+apply IHs1; auto.
+intros b Hb.
+ apply H.
+rapply orWeaken.
+right; assumption.
+Qed.
+
+Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum SX) e, ball e s1 s2 <-> ball e (map Cunit s1:FinEnum SCX) (map Cunit s2).
+Proof.
+intros X SX SCX s1 s2 e.
+split.
+ intros H.
+ rapply (@FinEnum_map_uc (1#1) _ _ SX SCX).
+ assumption.
+revert s1 s2.
+cut (forall (s1 s2 : FinEnum SX) ,
+   hemiMetric (Complete X) e (fun a => InFinEnumC _ a (map Cunit s1:FinEnum SCX))
+    (fun a => InFinEnumC _ a (map Cunit s2)) ->
+   hemiMetric X e (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2)).
+ intros Z s1 s2.
+ intros [H0 H1].
+ split; apply Z; assumption.
+intros s1 s2 H a Ha.
 induction s1.
  contradiction.
 destruct Ha as [G | Ha | Ha] using orC_ind.

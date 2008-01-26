@@ -39,9 +39,9 @@ Section Compact.
 
 Variable X : MetricSpace.
 Hypothesis stableX : stableMetric X.
-Definition Compact := Complete (FinEnum X stableX).
+Definition Compact := Complete (FinEnum stableX).
 
-Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum X stableX) : Prop :=
+Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum stableX) : Prop :=
 match l with 
 | nil => False
 | y::ys => orC (ball e x y) (almostIn e x ys)
@@ -303,7 +303,7 @@ Add Morphism inCompact with signature ms_eq ==> ms_eq ==> iff as inCompact_wd.
 Proof.
 cut (forall x1 x2 : Complete X,
  ms_eq x1 x2 ->
- forall x3 x4 : Complete (FinEnum X stableX),
+ forall x3 x4 : Complete (FinEnum stableX),
  ms_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
  intros Z x1 x2 Hx y1 y2 Hy.
  split.
@@ -361,7 +361,7 @@ Defined.
 
 CoFixpoint CompactTotallyBoundedStream (s:Compact) (k d1 d2:Qpos) (pt:X) Hpt : Stream X :=
 Cons pt 
- (let (f,_) := HausdorffBallHausdorffBallStrong _ _ locatedX _ _ _
+ (let (f,_) := HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k*d1)%Qpos) in
   let (pt',HptX) := f pt Hpt d2 in
   let (Hpt',_) := HptX in
@@ -454,9 +454,7 @@ set (e0:=((d1 + k * d1 + d2) + mkQpos
  (CompactTotallyBoundedStreamCauchyLemma n (((1#1)+k)*(k*d1) + (k*d2)) Hk))%Qpos).
 setoid_replace e' with e0.
  simpl.
- destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-            (d1 + k * d1) (approximate s d1)
-            (approximate s (k * d1)%Qpos)
+ destruct (HausdorffBallHausdorffBallStrong locatedX
             (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
  unfold e0.
@@ -496,8 +494,7 @@ setoid_replace (k^S m*mkQpos Hd)%Qpos with (k^m*mkQpos e')%Qpos.
  replace (S m + n)%nat with (S (m + n))%nat by omega.
  unfold Str_nth.
  simpl.
- destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-               (d1 + k * d1) (approximate s d1) (approximate s (k * d1)%Qpos)
+ destruct (HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' _]].
  simpl.
@@ -531,8 +528,7 @@ induction n.
 intros.
 unfold Str_nth.
 simpl.
-destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-               (d1 + k * d1) (approximate s d1) (approximate s (k * d1)%Qpos)
+destruct (HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
 destruct (f pt Hpt d2) as [pt' [Hpt' _]].
 destruct (IHn s k (k*d1) (k*d2) pt' Hpt')%Qpos as [q Hq Hq0].
@@ -826,7 +822,7 @@ rapply orWeaken;right;assumption.
 Defined.
 
 Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
- ball ((3#5)*e) (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum (Complete X) SCX) (CompactTotalBound s e).
+ ball ((3#5)*e) (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum SCX) (CompactTotalBound s e).
 Proof.
 intros SCX s e.
 unfold CompactTotalBound.
@@ -972,7 +968,7 @@ Defined.
 End CompactTotallyBounded.
 
 Definition BishopCompactAsCompact_raw 
- (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum X stableX) :=
+ (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum stableX) :=
 match e with
 |QposInfinity => nil
 |Qpos2QposInf e' =>
@@ -1177,11 +1173,11 @@ apply ball_weak.
 apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
  rapply regFun_prf.
 clear e1.
-rewrite (FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
+rewrite (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
 apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
  apply CompactTotalBoundNotFar.
 simpl.
-change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete X) (Complete_stable stableX))).
+change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete_stable stableX))).
 induction (CompactTotalBound locatedX s ((1 # 2) * e2)).
  rapply ball_refl.
 destruct IHl as [IHlA IHlB].

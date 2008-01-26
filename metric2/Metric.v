@@ -111,7 +111,7 @@ apply B1.
 apply ball_refl.
 Qed.
 
-Hint Resolve ball_weak : metric.
+Hint Resolve ball_refl ball_triangle ball_weak : metric.
 
 Lemma ball_weak_le : forall (e d:Qpos) (a b:X), e<=d ->  ball e a b -> ball d a b.
 Proof.
@@ -211,3 +211,5 @@ Qed.
 End Prelength_Space.
 
 End Metric_Space.
+
+Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
