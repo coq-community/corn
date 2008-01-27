@@ -79,6 +79,14 @@ exists (X*Y)%type prod_ms_eq prod_ball.
 apply prod_is_MetricSpace.
 Defined.
 
+Lemma ProductMS_prelength : PrelengthSpace X -> PrelengthSpace Y -> PrelengthSpace ProductMS.
+Proof.
+intros HX HY a b e d1 d2 Hed Hab.
+destruct (HX (fst a) (fst b) e d1 d2 Hed (proj1 Hab)) as [c1 Hc1].
+destruct (HY (snd a) (snd b) e d1 d2 Hed (proj2 Hab)) as [c2 Hc2].
+exists (c1,c2); split; assumption.
+Defined.
+
 Lemma ProductMS_stable : stableMetric X -> stableMetric Y -> stableMetric ProductMS.
 Proof.
 unfold stableMetric.

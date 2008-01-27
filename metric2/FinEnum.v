@@ -519,6 +519,11 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+Implicit Arguments FinEnum_map_uc [X Y].
+
+Definition FinEnum_map z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y) :=
+ Build_UniformlyContinuousFunction (FinEnum_map_uc z SX SY f).
+
 Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum SX) e, ball e s1 s2 <-> ball e (map Cunit s1:FinEnum SCX) (map Cunit s2).
 Proof.
 intros X SX SCX s1 s2 e.

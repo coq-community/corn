@@ -1,7 +1,7 @@
 Require Import Limit.
 Require Export FinEnum.
 Require Import Zpow_facts.
-Require Import Complete.
+Require Export Complete.
 Require Import Classic.
 Require Import COrdFields2.
 Require Import Qordfield.
@@ -35,11 +35,10 @@ Record CompactSubset :=
 
 End BishopCompact.
 
-Section Compact.
+Section AlmostIn.
 
 Variable X : MetricSpace.
 Hypothesis stableX : stableMetric X.
-Definition Compact := Complete (FinEnum stableX).
 
 Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum stableX) : Prop :=
 match l with 
@@ -219,13 +218,16 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+End AlmostIn.
+
 Add Morphism almostIn with signature QposEq ==> ms_eq ==> ms_eq ==> iff as almostIn_wd.
 Proof.
+intros X stableX.
 unfold FinEnum_eq.
 assert (Y:forall x1 x2 : Qpos,
  QposEq x1 x2 ->
  forall y1 y2 : X,
- ms_eq (m:=X) y1 y2 ->forall z : list X,
+ ms_eq (m:=X) y1 y2 ->forall z : FinEnum stableX,
   (almostIn x1 y1 z -> almostIn x2 y2 z)).
  intros x1 x2 Hx y1 y2 Hy.
  induction z.
@@ -241,7 +243,7 @@ assert (Y:forall x1 x2 : Qpos,
  right.
  apply IHz; assumption.
 intros x1 x2 Hx y1 y2 Hy.
-cut (forall z1 x3 : list X,
+cut (forall z1 x3 : FinEnum stableX,
 (forall x : X, InFinEnumC X x z1 -> InFinEnumC X x x3) ->
 (almostIn x1 y1 z1 -> almostIn x2 y2 x3)).
  intros Z z1 z2 Hz.
@@ -296,6 +298,12 @@ apply IHz1.
 assumption.
 Qed.
 
+Section Compact.
+
+Variable X : MetricSpace.
+Hypothesis stableX : stableMetric X.
+Definition Compact := Complete (FinEnum stableX).
+
 Definition inCompact (x:Complete X) (s:Compact) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
 
@@ -321,6 +329,17 @@ apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
 apply H.
 Qed.
 
+Lemma inCompact_stable : forall x s, ~~inCompact x s -> inCompact x s.
+Proof.
+intros x s H e1 e2.
+apply almostIn_stable.
+intros H0.
+apply H.
+intros H1.
+apply H0.
+apply H1.
+Qed.
+
 Lemma CompactCompleteSubset : forall x, CompleteSubset _ (fun z => inCompact z x).
 Proof.
 intros x a H.
@@ -341,7 +360,7 @@ Section CompactTotallyBounded.
 
 Hypothesis locatedX : locatedMetric X.
 
-Lemma AlmostInExists: forall (e d:Qpos) x s, e < d -> almostIn e x s -> {y | In y s /\ ball d x y}.
+Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum stableX), e < d -> almostIn e x s -> {y | In y s /\ ball d x y}.
 Proof.
 intros e d x s Hed.
 induction s.
@@ -1219,3 +1238,103 @@ Qed.
 End Isomorphism.
 
 End Compact.
+
+Section CompactImage.
+
+Variable z : Qpos.
+Variable X Y : MetricSpace.
+Hypothesis stableX : stableMetric X.
+Hypothesis stableY : stableMetric Y.
+Hypothesis plX : PrelengthSpace X.
+Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
+
+Open Local Scope uc_scope.
+
+Variable f : X --> Y.
+
+Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum stableX), (QposInf_le d (mu f e)) -> almostIn d a b ->
+ almostIn e (f a) (FinEnum_map z stableX stableY f b).
+Proof.
+intros e d a b Hd Hab.
+induction b.
+ contradiction.
+destruct Hab as [G | Hab | Hab] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ apply uc_prf.
+ eapply ball_ex_weak_le.
+  apply Hd.
+ assumption.
+rapply orWeaken.
+right.
+apply IHb.
+auto.
+Qed.
+
+Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum stableX), (QposInf_le d ((mu f e1) + (mu f e2))) -> almostIn d a b ->
+ almostIn (e1 + e2) (f a) (FinEnum_map z stableX stableY f b).
+Proof.
+intros e1 e2 d a b Hd Hab.
+induction b.
+ contradiction.
+destruct Hab as [G | Hab | Hab] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ apply (mu_sum plX e2 (e1::nil) f).
+ eapply ball_ex_weak_le.
+  apply Hd.
+ assumption.
+rapply orWeaken.
+right.
+apply IHb.
+auto.
+Qed.
+
+Definition CompactImage : Compact stableX --> Compact stableY :=
+ Cmap plFEX (FinEnum_map z stableX stableY f).
+
+Lemma CompactImage_correct1 : forall x s, 
+ (inCompact x s) -> (inCompact (Cmap plX f x) (CompactImage s)).
+Proof.
+intros x s H e1 e2.
+apply almostIn_closed.
+intros d1.
+setoid_replace (e1 + e2 + d1)%Qpos
+ with ((e1 + (1#4)*d1) + ((1#4)*d1 + ((1#4)*d1)) + ((1#4)*d1 + e2))%Qpos
+ by QposRing.
+apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*d1)%Qpos);
+ [|apply regFun_prf].
+apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*d1)%Qpos);
+ [apply regFun_prf|].
+simpl.
+case_eq (mu f ((1#4)*d1)).
+ intros d Hd.
+ rapply almostIn_map2;[|apply H].
+ rewrite Hd.
+ rapply Qle_refl.
+intros H0.
+assert (Z:=H z z).
+destruct (approximate s z).
+ contradiction.
+rapply orWeaken.
+left.
+set (d:=((1 # 4) * d1)%Qpos).
+apply (mu_sum plX d (d::nil) f).
+simpl.
+unfold d.
+rewrite H0.
+constructor.
+Qed.
+
+(*
+Lemma CompactImage_correctC : forall y s, (inCompact y (CompactImage s)) ->
+existsC _ (fun x => ms_eq (Cmap plX f x) y /\ inCompact x s).
+Proof.
+Complicated.  Probably best to prove compact -> Sequnetially compact
+(where the sequnetially compact uses the classical existential)
+I don't seem to need this proof at the momment.
+*)
+
+End CompactImage.
