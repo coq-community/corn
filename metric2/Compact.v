@@ -298,17 +298,14 @@ apply IHz1.
 assumption.
 Qed.
 
-Section Compact.
+Definition Compact X (stableX : stableMetric X) := Complete (FinEnum stableX).
 
-Variable X : MetricSpace.
-Hypothesis stableX : stableMetric X.
-Definition Compact := Complete (FinEnum stableX).
-
-Definition inCompact (x:Complete X) (s:Compact) :=
+Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
 
 Add Morphism inCompact with signature ms_eq ==> ms_eq ==> iff as inCompact_wd.
 Proof.
+intros X stableX.
 cut (forall x1 x2 : Complete X,
  ms_eq x1 x2 ->
  forall x3 x4 : Complete (FinEnum stableX),
@@ -328,6 +325,14 @@ symmetry in Hx.
 apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
 apply H.
 Qed.
+
+Section Compact.
+
+Variable X : MetricSpace.
+Hypothesis stableX : stableMetric X.
+
+Let Compact := Compact stableX.
+Let inCompact := @inCompact X stableX.
 
 Lemma inCompact_stable : forall x s, ~~inCompact x s -> inCompact x s.
 Proof.
@@ -978,8 +983,9 @@ intros s.
 split.
   apply CompactCompleteSubset.
  apply CompactTotallyBounded.
-abstract(
+abstract (
 intros a b Hab;
+unfold inCompact;
 rewrite Hab;
 reflexivity).
 Defined.

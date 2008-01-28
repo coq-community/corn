@@ -1,1 +1,1 @@
-Require Export CRpi_slow.
+Require Export CRpi_fast.

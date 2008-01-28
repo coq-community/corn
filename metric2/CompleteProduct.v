@@ -133,3 +133,7 @@ apply (regFun_prf q e1 e2).
 Qed.
 
 End CompleteProduct.
+
+Implicit Arguments Strength [X Y].
+Implicit Arguments Cfst [X Y].
+Implicit Arguments Csnd [X Y].

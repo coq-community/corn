@@ -98,6 +98,38 @@ split.
 apply H1; tauto.
 Qed.
 
+Lemma ProductMS_stableX : Y -> stableMetric ProductMS -> stableMetric X.
+Proof.
+unfold stableMetric.
+intros a H0 e x y H.
+assert (Z:~ ~ ball (m:=ProductMS) e (x,a) (y,a)).
+ revert H.
+ cut (ball (m:=X) e x y ->
+ ball (m:=ProductMS) e (Basics.Pair x a) (Basics.Pair y a)).
+  tauto.
+ intros H.
+ split; auto.
+ apply ball_refl.
+destruct (H0 _ _ _ Z).
+assumption.
+Qed.
+
+Lemma ProductMS_stableY : X -> stableMetric ProductMS -> stableMetric Y.
+Proof.
+unfold stableMetric.
+intros a H0 e x y H.
+assert (Z:~ ~ ball (m:=ProductMS) e (a,x) (a,y)).
+ revert H.
+ cut (ball (m:=Y) e x y ->
+  ball (m:=ProductMS) e (Basics.Pair a x) (Basics.Pair a y)).
+  tauto.
+ intros H.
+ split; auto.
+ apply ball_refl.
+destruct (H0 _ _ _ Z).
+assumption.
+Qed.
+
 Lemma ProductMS_located : locatedMetric X -> locatedMetric Y -> locatedMetric ProductMS.
 Proof.
 unfold locatedMetric.

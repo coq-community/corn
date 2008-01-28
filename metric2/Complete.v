@@ -283,6 +283,14 @@ apply ball_approx_l.
 constructor.
 Qed.
 
+Lemma regFun_prf_ex : 
+ forall (r : Complete) (e1 e2 : QposInf),
+  ball_ex  (e1 + e2) (approximate r e1) (approximate r e2).
+Proof.
+intros r [e1|] [e2|]; try constructor.
+rapply regFun_prf.
+Qed.
+
 Hypothesis Xpl : PrelengthSpace X.
 
 Lemma CompletePL : PrelengthSpace Complete.
