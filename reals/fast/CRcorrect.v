@@ -890,6 +890,9 @@ change (-(CRinv_pos (mkQpos He) (- Cauchy_IRasCR (Build_CauchySeq Q_as_COrdField
 unfold y.
 rewrite <- Cauchy_IR_opp_as_CR_opp.
 apply CRopp_wd.
+set (X := (Cauchy_IRasCR
+   (f_rcpcl (F:=Cauchy_IR) [--](x':Cauchy_IR)
+      (Cinright (R_lt Q_as_COrdField [--](x':Cauchy_IR) (Zero:Cauchy_IR)) (Zero[<][--](x':Cauchy_IR)) H')))%CR).
 rewrite Cauchy_IR_opp_as_CR_opp.
 rapply Cauchy_IR_inv_as_CRinv_pos.
 intros i Hi.

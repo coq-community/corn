@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -33,6 +34,8 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
+
+Require Import CornTac.
 Require Export SinCos.
 
 Section Properties_of_Pi.
@@ -1001,6 +1004,52 @@ unfold Tan, Tang in |- *; simpl in |- *; algebra.
 inversion_clear Hx.
 inversion_clear X0.
 simpl in |- *; auto.
+Qed.
+
+Lemma Cos_one_gt_0 : Zero [<] Cos One.
+apply cos_pi_seq_pos with (1%nat).
+apply less_leEq.
+apply pos_one.
+unfold pi_seq.
+rewrite Cos_zero.
+apply eq_imp_leEq.
+rational.
+Qed.
+
+Lemma Pi_gt_2 : Two [<] Pi.
+unfold Pi.
+rstepl (Two [*] One:IR).
+rapply mult_resp_less_lft.
+apply less_leEq_trans with (One [+] (Cos One)).
+rstepl (One [+] Zero:IR).
+rapply plus_resp_leEq_less.
+rapply eq_imp_leEq.
+reflexivity.
+apply Cos_one_gt_0.
+rapply str_leEq_seq_so_leEq_Lim.
+exists (2%nat).
+intros i iH.
+change (One [+] Cos One[<=] pi_seq i).
+induction i.
+elimtype False.
+auto with *.
+clear IHi.
+induction i.
+elimtype False.
+auto with *.
+clear iH.
+clear IHi.
+induction i.
+unfold pi_seq.
+rewrite Cos_zero.
+setoid_replace (Zero [+] One:IR) with (One:IR) using relation cs_eq by rational.
+apply eq_imp_leEq.
+reflexivity.
+apply leEq_transitive with (pi_seq (S (S i))).
+assumption.
+apply less_leEq.
+apply pi_seq_incr.
+apply pos_two.
 Qed.
 
 End Sin_And_Cos.
