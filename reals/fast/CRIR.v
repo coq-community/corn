@@ -396,6 +396,7 @@ AbsSmall x y <-> AbsSmall (R:=CRasCOrdField) (IRasCR x) (IRasCR y).
 Proof.
 unfold AbsSmall.
 intros x y.
+simpl.
 do 2 rewrite IR_leEq_as_CR.
 rewrite IR_opp_as_CR.
 reflexivity.

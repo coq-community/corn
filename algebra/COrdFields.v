@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -1529,3 +1530,14 @@ Qed.
 End misc.
 
 End Properties_of_Ordering.
+
+Add Morphism cof_leEq with signature cs_eq ==> cs_eq ==> iff as cof_leEq_wd.
+intros c x1 x2 Hx y1 y2 Hy.
+split; intros.
+stepl x1 by assumption.
+stepr y1 by assumption.
+assumption.
+stepl x2 by symmetry;assumption.
+stepr y2 by symmetry;assumption.
+assumption.
+Qed.
