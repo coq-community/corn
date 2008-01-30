@@ -34,9 +34,6 @@ Require Import Pi.
 Require Import MoreArcTan.
 Require Import PropDecid.
 Require Import Exponential.
-Require Import QArith.
-Require Import Qreals.
-Require Import QArith_base.
 
 Lemma RIR_iso : Isomorphism RReals IR.
 exact (Canonic_Isomorphism_between_CReals RReals IR).
@@ -837,6 +834,10 @@ auto with *.
 Qed.
 
 Hint Rewrite R_IZR_as_IR : RtoIR.
+
+Require Import QArith.
+Require Import Qreals.
+Require Import QArith_base.
 
 Lemma R_Q2R_as_IR : forall q, RasIR (Q2R q) [=] inj_Q IR q.
 intro q.
