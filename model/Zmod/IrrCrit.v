@@ -275,6 +275,7 @@ unfold monic.
 split.
 astepl (zfp (nth_coeff m f)).
 assert (One[=]nth_coeff m f); intuition.
+simpl in H.
 rewrite <- H.  
 intuition.
 
@@ -282,6 +283,7 @@ red.
 intros.
 astepl (zfp (nth_coeff m0 f)).
 assert (Zero[=]nth_coeff m0 f); intuition.
+simpl in H0.
 rewrite <- H0.
 intuition.
 Qed.
