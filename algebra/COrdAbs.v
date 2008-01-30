@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -18,21 +19,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 Require Export COrdFields2.
 
 (**
@@ -188,7 +189,7 @@ apply div_resp_leEq; auto.
 apply div_resp_leEq; auto.
 Qed.
 
-Lemma sum_resp_AbsSmall : forall 
+Lemma sum_resp_AbsSmall : forall
 (x y : nat -> R) (n m: nat)
 (H1 : m <= n) (H2 : forall i : nat, m <= i -> i <= n ->  AbsSmall (y i) (x i)),
 AbsSmall (Sum m n y) (Sum m n x).
@@ -671,3 +672,17 @@ End absBig_wd_properties.
 
 Declare Left Step AbsBig_wdl_unfolded.
 Declare Right Step AbsBig_wdr_unfolded.
+
+Add Morphism AbsSmall with signature cs_eq ==> cs_eq ==> iff as AbsSmall_morph_wd.
+intros R x1 x2 xeq y1 y2 yeq.
+split;
+intro H.
+stepr y1 by assumption.
+stepl x1 by assumption.
+assumption.
+stepr y2 by symmetry;
+assumption.
+stepl x2 by symmetry;
+assumption.
+assumption.
+Qed.
