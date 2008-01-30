@@ -222,4 +222,26 @@ rapply CompactGraph_correct3.
 apply Hq2.
 Qed.
 
+Lemma CompactGraph_correct : forall plX plFEX x y s, 
+inCompact (Strength (x,y)) (CompactGraph plFEX s) <->
+(inCompact x s /\ ms_eq y (Cmap plX f x)).
+Proof.
+intros plX plFEX x y s.
+split; intros H.
+ split;
+  rewrite <- (StrengthCorrect2 x y).
+  apply (@CompactGraph_correct2 plFEX).
+  exact H.
+ symmetry.
+ transitivity (Csnd (Strength (x,y))).
+  rapply CompactGraph_correct3.
+  apply H.
+ apply StrengthCorrect3.
+destruct H as [H0 H1].
+change (Pair x y) with (PairMS x y).
+rewrite H1.
+rapply CompactGraph_correct1.
+auto.
+Qed.
+
 End Graph.

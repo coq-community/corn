@@ -157,4 +157,14 @@ right; intros [H _].
 apply A; assumption.
 Defined.
 
+Definition PairMS (x:X) (y:Y) : ProductMS := (x,y).
+
 End ProductMetric.
+
+Implicit Arguments PairMS [X Y].
+
+Add Morphism PairMS with signature ms_eq ==> ms_eq ==> ms_eq as PairMS_wd.
+Proof.
+intros.
+split; assumption.
+Qed.
