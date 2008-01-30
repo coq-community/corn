@@ -239,7 +239,7 @@ apply eq_symmetric_unfolded; apply Integral_inv.
 assert (H6 : Derivative realline CI Cosine {--}Sine). Deriv.
 eapply eq_transitive_unfolded.
 apply
- Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI) (x0 := ZeroR);
+ Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI);
  Contin; split.
 simpl in |- *; algebra.
 Qed.

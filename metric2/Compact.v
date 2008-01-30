@@ -1,6 +1,7 @@
 Require Import Limit.
 Require Export FinEnum.
-Require Import Complete.
+Require Import Zpow_facts.
+Require Export Complete.
 Require Import Classic.
 Require Import COrdFields2.
 Require Import Qordfield.
@@ -34,13 +35,12 @@ Record CompactSubset :=
 
 End BishopCompact.
 
-Section Compact.
+Section AlmostIn.
 
 Variable X : MetricSpace.
 Hypothesis stableX : stableMetric X.
-Definition Compact := Complete (FinEnum X stableX).
 
-Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum X stableX) : Prop :=
+Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum stableX) : Prop :=
 match l with 
 | nil => False
 | y::ys => orC (ball e x y) (almostIn e x ys)
@@ -218,13 +218,16 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+End AlmostIn.
+
 Add Morphism almostIn with signature QposEq ==> ms_eq ==> ms_eq ==> iff as almostIn_wd.
 Proof.
+intros X stableX.
 unfold FinEnum_eq.
 assert (Y:forall x1 x2 : Qpos,
  QposEq x1 x2 ->
  forall y1 y2 : X,
- ms_eq (m:=X) y1 y2 ->forall z : list X,
+ ms_eq (m:=X) y1 y2 ->forall z : FinEnum stableX,
   (almostIn x1 y1 z -> almostIn x2 y2 z)).
  intros x1 x2 Hx y1 y2 Hy.
  induction z.
@@ -240,7 +243,7 @@ assert (Y:forall x1 x2 : Qpos,
  right.
  apply IHz; assumption.
 intros x1 x2 Hx y1 y2 Hy.
-cut (forall z1 x3 : list X,
+cut (forall z1 x3 : FinEnum stableX,
 (forall x : X, InFinEnumC X x z1 -> InFinEnumC X x x3) ->
 (almostIn x1 y1 z1 -> almostIn x2 y2 x3)).
  intros Z z1 z2 Hz.
@@ -295,14 +298,17 @@ apply IHz1.
 assumption.
 Qed.
 
-Definition inCompact (x:Complete X) (s:Compact) :=
+Definition Compact X (stableX : stableMetric X) := Complete (FinEnum stableX).
+
+Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
 
 Add Morphism inCompact with signature ms_eq ==> ms_eq ==> iff as inCompact_wd.
 Proof.
+intros X stableX.
 cut (forall x1 x2 : Complete X,
  ms_eq x1 x2 ->
- forall x3 x4 : Complete (FinEnum X stableX),
+ forall x3 x4 : Complete (FinEnum stableX),
  ms_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
  intros Z x1 x2 Hx y1 y2 Hy.
  split.
@@ -318,6 +324,25 @@ apply almostIn_triangle_r with (approximate y1 d');[|apply Hy].
 symmetry in Hx.
 apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
 apply H.
+Qed.
+
+Section Compact.
+
+Variable X : MetricSpace.
+Hypothesis stableX : stableMetric X.
+
+Let Compact := Compact stableX.
+Let inCompact := @inCompact X stableX.
+
+Lemma inCompact_stable : forall x s, ~~inCompact x s -> inCompact x s.
+Proof.
+intros x s H e1 e2.
+apply almostIn_stable.
+intros H0.
+apply H.
+intros H1.
+apply H0.
+apply H1.
 Qed.
 
 Lemma CompactCompleteSubset : forall x, CompleteSubset _ (fun z => inCompact z x).
@@ -340,7 +365,7 @@ Section CompactTotallyBounded.
 
 Hypothesis locatedX : locatedMetric X.
 
-Lemma AlmostInExists: forall (e d:Qpos) x s, e < d -> almostIn e x s -> {y | In y s /\ ball d x y}.
+Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum stableX), e < d -> almostIn e x s -> {y | In y s /\ ball d x y}.
 Proof.
 intros e d x s Hed.
 induction s.
@@ -360,7 +385,7 @@ Defined.
 
 CoFixpoint CompactTotallyBoundedStream (s:Compact) (k d1 d2:Qpos) (pt:X) Hpt : Stream X :=
 Cons pt 
- (let (f,_) := HausdorffBallHausdorffBallStrong _ _ locatedX _ _ _
+ (let (f,_) := HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k*d1)%Qpos) in
   let (pt',HptX) := f pt Hpt d2 in
   let (Hpt',_) := HptX in
@@ -453,9 +478,7 @@ set (e0:=((d1 + k * d1 + d2) + mkQpos
  (CompactTotallyBoundedStreamCauchyLemma n (((1#1)+k)*(k*d1) + (k*d2)) Hk))%Qpos).
 setoid_replace e' with e0.
  simpl.
- destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-            (d1 + k * d1) (approximate s d1)
-            (approximate s (k * d1)%Qpos)
+ destruct (HausdorffBallHausdorffBallStrong locatedX
             (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
  unfold e0.
@@ -495,8 +518,7 @@ setoid_replace (k^S m*mkQpos Hd)%Qpos with (k^m*mkQpos e')%Qpos.
  replace (S m + n)%nat with (S (m + n))%nat by omega.
  unfold Str_nth.
  simpl.
- destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-               (d1 + k * d1) (approximate s d1) (approximate s (k * d1)%Qpos)
+ destruct (HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' _]].
  simpl.
@@ -530,8 +552,7 @@ induction n.
 intros.
 unfold Str_nth.
 simpl.
-destruct (HausdorffBallHausdorffBallStrong X stableX locatedX
-               (d1 + k * d1) (approximate s d1) (approximate s (k * d1)%Qpos)
+destruct (HausdorffBallHausdorffBallStrong locatedX
                (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
 destruct (f pt Hpt d2) as [pt' [Hpt' _]].
 destruct (IHn s k (k*d1) (k*d2) pt' Hpt')%Qpos as [q Hq Hq0].
@@ -825,7 +846,7 @@ rapply orWeaken;right;assumption.
 Defined.
 
 Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
- ball ((3#5)*e) (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum (Complete X) SCX) (CompactTotalBound s e).
+ ball ((3#5)*e) (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum SCX) (CompactTotalBound s e).
 Proof.
 intros SCX s e.
 unfold CompactTotalBound.
@@ -962,8 +983,9 @@ intros s.
 split.
   apply CompactCompleteSubset.
  apply CompactTotallyBounded.
-abstract(
+abstract (
 intros a b Hab;
+unfold inCompact;
 rewrite Hab;
 reflexivity).
 Defined.
@@ -971,7 +993,7 @@ Defined.
 End CompactTotallyBounded.
 
 Definition BishopCompactAsCompact_raw 
- (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum X stableX) :=
+ (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum stableX) :=
 match e with
 |QposInfinity => nil
 |Qpos2QposInf e' =>
@@ -1176,11 +1198,11 @@ apply ball_weak.
 apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
  rapply regFun_prf.
 clear e1.
-rewrite (FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
+rewrite (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
 apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
  apply CompactTotalBoundNotFar.
 simpl.
-change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete X) (Complete_stable stableX))).
+change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete_stable stableX))).
 induction (CompactTotalBound locatedX s ((1 # 2) * e2)).
  rapply ball_refl.
 destruct IHl as [IHlA IHlB].
@@ -1222,3 +1244,103 @@ Qed.
 End Isomorphism.
 
 End Compact.
+
+Section CompactImage.
+
+Variable z : Qpos.
+Variable X Y : MetricSpace.
+Hypothesis stableX : stableMetric X.
+Hypothesis stableY : stableMetric Y.
+Hypothesis plX : PrelengthSpace X.
+Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
+
+Open Local Scope uc_scope.
+
+Variable f : X --> Y.
+
+Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum stableX), (QposInf_le d (mu f e)) -> almostIn d a b ->
+ almostIn e (f a) (FinEnum_map z stableX stableY f b).
+Proof.
+intros e d a b Hd Hab.
+induction b.
+ contradiction.
+destruct Hab as [G | Hab | Hab] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ apply uc_prf.
+ eapply ball_ex_weak_le.
+  apply Hd.
+ assumption.
+rapply orWeaken.
+right.
+apply IHb.
+auto.
+Qed.
+
+Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum stableX), (QposInf_le d ((mu f e1) + (mu f e2))) -> almostIn d a b ->
+ almostIn (e1 + e2) (f a) (FinEnum_map z stableX stableY f b).
+Proof.
+intros e1 e2 d a b Hd Hab.
+induction b.
+ contradiction.
+destruct Hab as [G | Hab | Hab] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ apply (mu_sum plX e2 (e1::nil) f).
+ eapply ball_ex_weak_le.
+  apply Hd.
+ assumption.
+rapply orWeaken.
+right.
+apply IHb.
+auto.
+Qed.
+
+Definition CompactImage : Compact stableX --> Compact stableY :=
+ Cmap plFEX (FinEnum_map z stableX stableY f).
+
+Lemma CompactImage_correct1 : forall x s, 
+ (inCompact x s) -> (inCompact (Cmap plX f x) (CompactImage s)).
+Proof.
+intros x s H e1 e2.
+apply almostIn_closed.
+intros d1.
+setoid_replace (e1 + e2 + d1)%Qpos
+ with ((e1 + (1#4)*d1) + ((1#4)*d1 + ((1#4)*d1)) + ((1#4)*d1 + e2))%Qpos
+ by QposRing.
+apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*d1)%Qpos);
+ [|apply regFun_prf].
+apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*d1)%Qpos);
+ [apply regFun_prf|].
+simpl.
+case_eq (mu f ((1#4)*d1)).
+ intros d Hd.
+ rapply almostIn_map2;[|apply H].
+ rewrite Hd.
+ rapply Qle_refl.
+intros H0.
+assert (Z:=H z z).
+destruct (approximate s z).
+ contradiction.
+rapply orWeaken.
+left.
+set (d:=((1 # 4) * d1)%Qpos).
+apply (mu_sum plX d (d::nil) f).
+simpl.
+unfold d.
+rewrite H0.
+constructor.
+Qed.
+
+(*
+Lemma CompactImage_correctC : forall y s, (inCompact y (CompactImage s)) ->
+existsC _ (fun x => ms_eq (Cmap plX f x) y /\ inCompact x s).
+Proof.
+Complicated.  Probably best to prove compact -> Sequnetially compact
+(where the sequnetially compact uses the classical existential)
+I don't seem to need this proof at the momment.
+*)
+
+End CompactImage.

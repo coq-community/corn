@@ -208,6 +208,26 @@ Definition Qminus_min_max_antidistr_r : forall x y z : Q, x - Qmin y z == Qmax (
 Definition Qminus_max_min_antidistr_r : forall x y z : Q, x - Qmax y z == Qmin (x-y) (x-z) :=
  fun a => @antitone_join_meet_distr Qto _ (Qminus_antitone a).
 
+Lemma Qmult_pos_monotone_r : forall a, (0 <= a) -> Qmonotone (Qmult a).
+intros a Ha b c H.
+do 2 rewrite (Qmult_comm a).
+apply Qmult_le_compat_r; auto with *.
+Qed.
+
+Lemma Qmult_pos_monotone_l : forall a, (0 <= a) -> Qmonotone (fun x => x*a).
+intros a Ha b c H.
+apply Qmult_le_compat_r; auto with *.
+Qed.
+
+Definition Qmin_mult_pos_distr_r : forall x y z : Q, 0 <= x -> x * Qmin y z == Qmin (x*y) (x*z)  :=
+ fun x y z H => @monotone_meet_distr Qto _ (Qmult_pos_monotone_r _ H) y z.
+Definition Qmin_mult_pos_distr_l : forall x y z : Q, 0 <= x -> Qmin y z * x == Qmin (y*x) (z*x) :=
+ fun x y z H => @monotone_meet_distr Qto _ (Qmult_pos_monotone_l x H) y z.
+Definition Qmax_mult_pos_distr_r : forall x y z : Q, 0 <= x -> x * Qmax y z == Qmax (x*y) (x*z)  :=
+ fun x y z H => @monotone_join_distr Qto _ (Qmult_pos_monotone_r x H) y z.
+Definition Qmax_mult_pos_distr_l : forall x y z : Q, 0 <= x -> Qmax y z * x == Qmax (y*x) (z*x) :=
+ fun x y z H => @monotone_join_distr Qto _ (Qmult_pos_monotone_l x H) y z.
+
 End QTotalOrder.
 
 Hint Resolve Qmin_lb_l: qarith.
