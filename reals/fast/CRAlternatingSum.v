@@ -254,7 +254,7 @@ assumption.
 Qed.
 
 Definition Qball_ex_bool e a b : bool :=
- if ball_ex_dec _ Qball_dec e a b then true else false.
+ if ball_ex_dec _ Qmetric_dec e a b then true else false.
 
 Lemma sumbool_eq_true : forall P (dec:{P}+{~P}), (if dec then true else false) = true <-> P.
 Proof.
@@ -273,7 +273,7 @@ induction H'.
 left.
 destruct H0 as [H0 _].
 unfold Qball_ex_bool.
-destruct (ball_ex_dec Q_as_MetricSpace Qball_dec e (hd x) l).
+destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (hd x) l).
 constructor.
 apply n; clear n.
 apply H0.
@@ -291,7 +291,7 @@ PartialAlternatingSumUntil _ (Limit_near zl e).
 
 Lemma InfiniteAlternatingSum_prf : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0), is_RegularFunction (InfiniteAlternatingSum_raw zl).
 Proof.
-Opaque Qball_dec.
+Opaque Qmetric_dec.
 intros seq dnn zl.
 unfold is_RegularFunction, ball, Qball.
 simpl.
@@ -336,37 +336,39 @@ destruct dnn as [[[X _] _] _]; assumption.
 
 assert(H:=ex1).
 induction H;
-case (ex1); unfold Qball_ex_bool in *; simpl in *; destruct (Qball_dec e1 (hd x) 0); try contradiction; auto.
+case (ex1); unfold Qball_ex_bool in *; simpl in *; destruct (Qmetric_dec e1 (hd x) 0); try contradiction; auto.
 intros ex3.
 
 assert (case2:~(Qball e2 (hd x) 0)).
 intros q.
 apply n.
+simpl.
 unfold Qball.
 apply AbsSmall_leEq_trans with (e2:Q); assumption.
 
 Opaque Qred.
-case (ex2); unfold Qball_ex_bool in *; simpl; destruct (Qball_dec e2 (hd x) 0); try contradiction;
+case (ex2); unfold Qball_ex_bool in *; simpl; destruct (Qmetric_dec e2 (hd x) 0); try contradiction;
 try solve[intros; elim case2].
 intros ex4.
 simpl.
 set (a :=
      (takeUntil
-        (fun s : Stream Q => if Qball_dec e1 (hd s) 0 then true else false)
+        (fun s : Stream Q => if Qmetric_dec e1 (hd s) 0 then true else false)
         (ex3 tt)) Qminus' 0).
 set (b:=(takeUntil
-         (fun s : Stream Q => if Qball_dec e2 (hd s) 0 then true else false)
+         (fun s : Stream Q => if Qmetric_dec e2 (hd s) 0 then true else false)
          (ex4 tt)) Qminus' 0).
-stepr (b-a) by (simpl;
+stepr (b-a) by
+ (simpl;
      repeat rewrite Qminus'_correct;
- ring).
+  change (b - a == hd x - a - (hd x - b)); ring).
 rsapply AbsSmall_minus.
 rename H0 into IHExists.
 rapply (IHExists tt).
 clear - dnn.
 destruct dnn.
 assumption.
-Transparent Qball_dec.
+Transparent Qmetric_dec.
 Qed.
 
 Definition InfiniteAlternatingSum (seq:Stream Q)(dnn:DecreasingNonNegative seq)(zl:Limit seq 0) : CR :=
@@ -399,14 +401,14 @@ unfold P in H.
 rsapply ball_weak.
 rsapply ball_sym.
 unfold Qball_ex_bool in H.
-destruct (ball_ex_dec Q_as_MetricSpace Qball_dec e (Streams.hd (Cons hd seq))) as [X|X];
+destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd (Cons hd seq))) as [X|X];
  [apply X|discriminate H].
 
 unfold P in *.
 unfold Qball_ex_bool in *.
-destruct (ball_ex_dec Q_as_MetricSpace Qball_dec e (Streams.hd (Cons hd seq))) as [X|X];
+destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd (Cons hd seq))) as [X|X];
  [|discriminate H].
-destruct (ball_ex_dec Q_as_MetricSpace Qball_dec e (Streams.hd seq)) as [Y|Y];
+destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd seq)) as [Y|Y];
  [discriminate H0|].
 elim Y.
 simpl in dnn_hd.
@@ -1054,7 +1056,7 @@ apply alternate_series_conv.
   intros x H dnn m _.
   unfold Str_nth.
   unfold Qball_ex_bool in H.
-  destruct (ball_ex_dec Q_as_MetricSpace Qball_dec (mkQpos (a:=c) Hc') (hd x) 0) as [b|b]; try contradiction.
+  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (mkQpos (a:=c) Hc') (hd x) 0) as [b|b]; try contradiction.
   simpl in b.
   apply leEq_imp_AbsSmall.
    destruct (dnn_Str_nth_tl m dnn) as [[[X _] _] _];assumption.

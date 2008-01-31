@@ -1,4 +1,5 @@
 Require Export Metric.
+Require Import Classification.
 Require Import QMinMax.
 Require Import COrdAbs.
 Require Import Qordfield.
@@ -38,28 +39,20 @@ apply Qle_trans with (Qabs c); auto with *.
 apply Qle_Qabs.
 Qed.
 
-Lemma Qball_dec : forall e a b, {Qball e a b}+{~Qball e a b}.
+Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+d) -> x <= e).
 Proof.
-intros e a b.
-unfold Qball, AbsSmall.
-simpl.
-set (c:=-e).
-set (d:=(a-b)).
-destruct (Qlt_le_dec_fast d c) as [Hdc|Hdc].
-right.
-abstract(
-intros [H1 H2];
-apply (Qlt_not_le _ _ Hdc H1)
-).
-destruct (Qlt_le_dec_fast e d) as [Hed|Hed].
-right.
-abstract(
-intros [H1 H2];
-apply (Qlt_not_le _ _ Hed H2)
-).
-left.
-abstract auto.
-Defined.
+intros.
+rsapply shift_zero_leEq_minus'.
+rsapply inv_cancel_leEq.
+rsapply approach_zero_weak.
+intros.
+replace LHS with (x[-](e:Q)).
+rsapply shift_minus_leEq.
+replace RHS with (e+e0) by ring.
+rewrite <- (QposAsmkQpos H0).
+apply (H (mkQpos H0)).
+unfold cg_minus; simpl; ring.
+Qed.
 
 Lemma Q_is_MetricSpace : is_MetricSpace Qeq Qball.
 Proof.
@@ -83,31 +76,19 @@ rsapply AbsSmall_plus; assumption.
 simpl; ring.
 intros e a b H.
 unfold Qball.
-assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e).
-intros.
-rsapply shift_zero_leEq_minus'.
-rsapply inv_cancel_leEq.
-rsapply approach_zero_weak.
-intros.
-replace LHS with (x[-](e:Q)).
-rsapply shift_minus_leEq.
-replace RHS with (e+e0) by ring.
-rewrite <- (QposAsmkQpos H1).
-apply (H0 (mkQpos H1)).
-unfold cg_minus; simpl; ring.
 split.
 rsapply inv_cancel_leEq.
 replace RHS with (e:Q) by ring.
-apply H0.
+apply Qle_closed.
 intros.
 destruct (H d).
 rsapply inv_cancel_leEq.
 replace RHS with (a-b) by ring.
-destruct e; destruct d; apply H1.
-apply H0.
+destruct e; destruct d; apply H0.
+apply Qle_closed.
 intros d.
 destruct (H d).
-destruct e; destruct d; apply H2.
+destruct e; destruct d; apply H1.
 intros.
 rsapply cg_inv_unique_2.
 rsapply AbsSmall_approach_zero.
@@ -172,3 +153,45 @@ ring.
 apply Qinv_comp.
 QposRing.
 Qed.
+
+Lemma Qmetric_dec : decidableMetric Q_as_MetricSpace.
+Proof.
+intros e a b.
+simpl.
+unfold Qball, AbsSmall.
+simpl.
+set (c:=-e).
+set (d:=(a-b)).
+destruct (Qlt_le_dec_fast d c) as [Hdc|Hdc].
+right.
+abstract(
+intros [H1 H2];
+apply (Qlt_not_le _ _ Hdc H1)
+).
+destruct (Qlt_le_dec_fast e d) as [Hed|Hed].
+right.
+abstract(
+intros [H1 H2];
+apply (Qlt_not_le _ _ Hed H2)
+).
+left.
+abstract auto.
+Defined.
+
+Hint Resolve Qmetric_dec : metricQ.
+
+Lemma locatedQ : locatedMetric Q_as_MetricSpace.
+Proof.
+apply decidable_located.
+auto with *.
+Defined.
+
+Hint Resolve locatedQ : metricQ.
+
+Lemma stableQ : stableMetric Q_as_MetricSpace.
+Proof.
+apply located_stable.
+auto with *.
+Qed.
+
+Hint Resolve stableQ : metricQ.
