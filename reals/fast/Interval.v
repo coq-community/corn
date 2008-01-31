@@ -500,3 +500,5 @@ intros H.
 rewrite H in L0.
 discriminate L0.
 Qed.
+
+End Interval.
