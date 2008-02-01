@@ -616,9 +616,11 @@ End Strong.
 
 End Finite.
 
+Implicit Arguments InFinEnumC [X].
+
 Open Local Scope uc_scope.
 
-Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC X a l -> InFinEnumC Y (f a) (map f l).
+Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC a l -> InFinEnumC (f a) (map f l).
 induction l.
  auto.
 intros Ha.
@@ -658,9 +660,9 @@ cut (forall (a b : FinEnum SX) (d:Qpos), (QposInf_le d (mu f e)) ->
  constructor.
 revert e.
 cut (forall (e d:Qpos), (QposInf_le d (mu f e)) -> forall (s1 s2 : FinEnum SX),
-  hemiMetric X d (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2) ->
-  hemiMetric Y e (fun a => InFinEnumC _ a (map f s1:FinEnum SY))
-   (fun a => InFinEnumC _ a (map f s2))).
+  hemiMetric X d (fun a => InFinEnumC a s1) (fun a => InFinEnumC a s2) ->
+  hemiMetric Y e (fun a => InFinEnumC a (map f s1:FinEnum SY))
+   (fun a => InFinEnumC a (map f s2))).
  intros Z e s1 s2 d Hd [H0 H1].
  split; apply (Z e d Hd); assumption.
 intros e d Hd s1 s2.
@@ -669,7 +671,7 @@ induction s1.
  contradiction.
 destruct Ha as [G | Ha | Ha] using orC_ind.
   auto using existsC_stable.
- assert (Ha0:InFinEnumC X a0 (a0::s1)).
+ assert (Ha0:InFinEnumC a0 (a0::s1)).
   rapply orWeaken.
   left; reflexivity.
  destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
@@ -702,9 +704,9 @@ split.
  assumption.
 revert s1 s2.
 cut (forall (s1 s2 : FinEnum SX) ,
-   hemiMetric (Complete X) e (fun a => InFinEnumC _ a (map Cunit s1:FinEnum SCX))
-    (fun a => InFinEnumC _ a (map Cunit s2)) ->
-   hemiMetric X e (fun a => InFinEnumC X a s1) (fun a => InFinEnumC X a s2)).
+   hemiMetric (Complete X) e (fun a => InFinEnumC a (map Cunit s1:FinEnum SCX))
+    (fun a => InFinEnumC a (map Cunit s2)) ->
+   hemiMetric X e (fun a => InFinEnumC a s1) (fun a => InFinEnumC a s2)).
  intros Z s1 s2.
  intros [H0 H1].
  split; apply Z; assumption.
@@ -714,7 +716,7 @@ induction s1.
 destruct Ha as [G | Ha | Ha] using orC_ind.
   auto using existsC_stable.
  clear IHs1.
- assert (Ha0:InFinEnumC _ (Cunit a0) (map Cunit (a0::s1))).
+ assert (Ha0:InFinEnumC (Cunit a0) (map Cunit (a0::s1))).
   rapply orWeaken.
   left; reflexivity.
  destruct (H _ Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.

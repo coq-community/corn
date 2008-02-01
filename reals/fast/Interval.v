@@ -271,9 +271,9 @@ Proof.
 cut (forall e1 e2,
  hemiMetric Q_as_MetricSpace (e1 + e2)
   (fun a : Q_as_MetricSpace =>
-   InFinEnumC Q_as_MetricSpace a (CompactIntervalQ_raw e1))
+   InFinEnumC a (CompactIntervalQ_raw e1))
   (fun a : Q_as_MetricSpace =>
-   InFinEnumC Q_as_MetricSpace a (CompactIntervalQ_raw e2))).
+   InFinEnumC a (CompactIntervalQ_raw e2))).
  intros Z e1 e2.
  split.
   apply Z.

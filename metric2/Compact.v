@@ -73,7 +73,7 @@ right.
 apply IHl; assumption.
 Qed.
 
-Lemma InAlmostIn : forall x l, (forall e, almostIn e x l)<->(InFinEnumC X x l).
+Lemma InAlmostIn : forall x l, (forall e, almostIn e x l)<->(InFinEnumC x l).
 Proof.
 induction l.
  split.
@@ -198,7 +198,7 @@ induction l1; intros l2 H1 H2.
 unfold hemiMetric in *.
 destruct H1 as [G | H1 | H1] using orC_ind.
   auto using almostIn_stable.
- assert (Z:InFinEnumC X a (a :: l1)).
+ assert (Z:InFinEnumC a (a :: l1)).
   rapply orWeaken.
   left; reflexivity.
  destruct (H2 a Z) as [ G | z [Hz0 Hz1]] using existsC_ind.
@@ -244,7 +244,7 @@ assert (Y:forall x1 x2 : Qpos,
  apply IHz; assumption.
 intros x1 x2 Hx y1 y2 Hy.
 cut (forall z1 x3 : FinEnum stableX,
-(forall x : X, InFinEnumC X x z1 -> InFinEnumC X x x3) ->
+(forall x : X, InFinEnumC x z1 -> InFinEnumC x x3) ->
 (almostIn x1 y1 z1 -> almostIn x2 y2 x3)).
  intros Z z1 z2 Hz.
  split.
@@ -275,7 +275,7 @@ induction z1; intros z2 Hz.
 intros H.
 destruct H as [G | H | H] using orC_ind.
   auto using almostIn_stable.
- assert (Z:InFinEnumC X a z2).
+ assert (Z:InFinEnumC a z2).
   apply Hz.
   rapply orWeaken.
   left; reflexivity.
@@ -542,7 +542,7 @@ discriminate.
 Qed.
 
 Lemma StreamInCompactApprox : forall n s k d1 d2 pt Hpt,
-  {q:Qpos | InFinEnumC X (Str_nth n (CompactTotallyBoundedStream s k d1 d2 pt Hpt)) (approximate s q) & q==k^n*d1}.
+  {q:Qpos | InFinEnumC (Str_nth n (CompactTotallyBoundedStream s k d1 d2 pt Hpt)) (approximate s q) & q==k^n*d1}.
 Proof.
 induction n.
  intros.
@@ -726,7 +726,7 @@ Lemma CompactTotallyBounded_prf : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
 Proof.
 unfold CompactTotallyBounded_raw, is_RegularFunction.
 cut (forall (s : Compact) (d1 d2 : Qpos) (pt : X)
-  (Hpt : InFinEnumC X pt (approximate s d1)) (e1 e2 : Qpos),
+  (Hpt : InFinEnumC pt (approximate s d1)) (e1 e2 : Qpos),
   ((CompactTotallyBoundedIndex e1 d1 d2) <= (CompactTotallyBoundedIndex e2 d1 d2))%nat ->
  ball (m:=X) (e1 + e2)
   (Str_nth (CompactTotallyBoundedIndex e1 d1 d2)
@@ -868,8 +868,8 @@ split;
   rewrite Hx.
   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
   apply L.
- set (H':=(fun pt (Hpt : InFinEnumC X pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
- assert (L':forall (pt : X) (Hpt : InFinEnumC X pt m),
+ set (H':=(fun pt (Hpt : InFinEnumC pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
+ assert (L':forall (pt : X) (Hpt : InFinEnumC pt m),
     ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
       (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.
@@ -894,8 +894,8 @@ destruct Hx as [G | Hx | Hx] using orC_ind.
  setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
  apply ball_sym.
  apply L.
-set (H':=(fun pt (Hpt : InFinEnumC X pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
-assert (L':forall (pt : X) (Hpt : InFinEnumC X pt m),
+set (H':=(fun pt (Hpt : InFinEnumC pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
+assert (L':forall (pt : X) (Hpt : InFinEnumC pt m),
    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
      (Cunit pt) (H' pt Hpt)).
  intros pt Hpt.
@@ -1008,11 +1008,11 @@ cut (forall (P : RegularFunction X -> Prop) (HP : CompactSubset (Complete X) P)
   (e1 e2 : Qpos),
 hemiMetric X (e1 + e2)
   (fun a : X =>
-   InFinEnumC X a
+   InFinEnumC a
      (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e1)%Qpos in
       map (fun x : RegularFunction X => approximate x ((1 # 2) * e1)%Qpos) l))
   (fun a : X =>
-   InFinEnumC X a
+   InFinEnumC a
      (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e2)%Qpos in
       map (fun x : RegularFunction X => approximate x ((1 # 2) * e2)%Qpos) l))).
  intros Z P [HP0 HP HP1] e1 e2.
@@ -1244,6 +1244,225 @@ Qed.
 End Isomorphism.
 
 End Compact.
+
+Section CompactDistr.
+
+Variable X : MetricSpace.
+Hypothesis stableX : stableMetric X.
+Hypothesis stableCX : stableMetric (Complete X).
+
+Definition FinCompact_raw (x: FinEnum stableCX) (e:QposInf) : FinEnum stableX :=
+map (fun x => approximate x e) x.
+
+Lemma FinCompact_prf : forall x, is_RegularFunction (FinCompact_raw x).
+Proof.
+intros x.
+cut (forall e1 e2, hemiMetric X (e1 + e2)
+  (fun a : X => InFinEnumC a (FinCompact_raw x e1))
+  (fun a : X => InFinEnumC a (FinCompact_raw x e2))).
+ intros L e1 e2.
+ split; auto.
+ eapply hemiMetric_wd1;[|apply L].
+ QposRing.
+intros e1 e2.
+induction x.
+ apply hemiMetric_refl.
+intros b Hb.
+destruct Hb as [G | Hb | Hb] using orC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists (approximate a e2).
+ split.
+  rapply orWeaken.
+  left; reflexivity.
+ rewrite Hb.
+ apply regFun_prf.
+destruct (IHx b Hb) as [G | y [Hy0 Hy1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists y.
+split; auto.
+rapply orWeaken.
+right; auto.
+Qed.
+
+Definition FinCompact_fun (x: FinEnum stableCX) : Compact stableX :=
+ Build_RegularFunction (FinCompact_prf x).
+
+Lemma FinCompact_uc : is_UniformlyContinuousFunction FinCompact_fun Qpos2QposInf.
+Proof.
+cut (forall e d1 d2 (a b : FinEnum stableCX),
+ (hemiMetric (Complete X) e
+      (fun a0 : Complete X => InFinEnumC a0 a)
+      (fun a : Complete X => InFinEnumC a b)) ->
+ (hemiMetric X (d1 + e + d2)
+  (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun a) d1))
+  (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun b) d2)))).
+ intros L e a b [Hab0 Hab1] d1 d2.
+ split; auto.
+ eapply hemiMetric_wd1;[|apply L;apply Hab1].
+ QposRing.
+intros e d1 d2 a b Hab c Hc.
+simpl in Hc.
+unfold FinCompact_raw in Hc.
+assert (existsC (Complete X) (fun d => InFinEnumC d a /\ ms_eq c (approximate d d1))).
+ clear - Hc.
+ induction a.
+  contradiction.
+ destruct Hc as [ G | Hc | Hc] using orC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists a.
+  split; auto.
+  rapply orWeaken; left; reflexivity.
+ destruct (IHa Hc) as [G | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists y.
+ split; auto.
+ rapply orWeaken; right; auto.
+destruct H as [ G | d [Hd0 Hd1]] using existsC_ind.
+ auto using existsC_stable.
+destruct (Hab d Hd0) as [ G | z [Hz0 Hz1]] using existsC_ind.
+ auto using existsC_stable.
+clear - Hd1 Hz0 Hz1.
+induction b.
+ contradiction.
+destruct Hz0  as [ G | Hz0 | Hz0] using orC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists (approximate a d2).
+ split.
+  rapply orWeaken.
+  left; reflexivity.
+ rewrite Hz0 in Hz1.
+ rewrite Hd1.
+ apply Hz1.
+destruct (IHb Hz0) as [G | y [Hy0 Hy1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists y.
+split; auto.
+rapply orWeaken; right; auto.
+Qed.
+
+Open Local Scope uc_scope.
+
+Definition FinCompact : FinEnum stableCX --> Compact stableX :=
+ Build_UniformlyContinuousFunction FinCompact_uc.
+
+Lemma FinComplete_correct : forall x (s:FinEnum stableCX), 
+ InFinEnumC x s <-> inCompact x (FinCompact s).
+Proof.
+intros x s.
+split.
+ intros H e1 e2.
+ simpl.
+ induction s.
+  contradiction.
+ move H after IHs.
+ destruct H as [G | H | H] using orC_ind.
+   auto using almostIn_stable.
+  rapply orWeaken.
+  left; auto.
+ rapply orWeaken.
+ right.
+ apply IHs; auto.
+intros H.
+induction s.
+ apply (H (1#1) (1#1))%Qpos.
+unfold inCompact in H.
+simpl in H.
+set (P:= fun n (b:bool) => if b 
+ then (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (ball (m:=X) (e1 + e2) (approximate x e1) (approximate a e2)))
+ else (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (almostIn (e1 + e2) (approximate x e1) (FinCompact_raw s e2)))).
+assert (L:
+ (forall n : nat, existsC bool (fun x => ~ ~ In x (true :: false :: nil) /\ P n x))).
+ intros n.
+ destruct (H  (1#P_of_succ_nat n)%Qpos (1#P_of_succ_nat n)%Qpos)
+  as [ G | L | L] using orC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists true.
+  split; auto with *.
+ apply existsWeaken.
+ exists false.
+ split; auto with *.
+destruct (infinitePidgeonHolePrinicple _ _ _ L) as [G | c [_ Hc]] using existsC_ind.
+ auto using InFinEnumC_stable.
+destruct c.
+ rapply orWeaken.
+ left.
+ unfold P in Hc.
+ apply ball_eq.
+ intros e.
+ case_eq ((1#4)*e)%Qpos.
+ intros en ed He.
+ destruct (Hc (pred (nat_of_P ed))) as [G | m [Hm0 Hm1]] using existsC_ind.
+  auto using stableCX.
+ set (m' := (1#P_of_succ_nat m)%Qpos).
+ apply ball_weak_le with (m' + (m' + m') + m')%Qpos.
+  unfold m'.
+  autorewrite with QposElim.
+  replace LHS with ((1#P_of_succ_nat m)/(1#4)) by field.
+  apply Qle_shift_div_r.
+   constructor.
+  rewrite Qmult_comm.
+  change ((1#4)*e) with (((1#4)*e)%Qpos:Q).
+  rewrite He.
+  unfold Qle; simpl.
+  rewrite Zpos_mult_morphism.
+  apply Zle_trans with (en * ed)%Z; auto with *.
+  apply Zmult_le_compat_l; auto with *.
+  rewrite (anti_convert_pred_convert ed).
+  do 2 rewrite <- POS_anti_convert.
+  do 2 rewrite inj_S.
+  rewrite inj_le_iff in Hm0.
+  auto with *.
+ eapply ball_triangle;[|apply ball_approx_l].
+ eapply ball_triangle;[apply ball_approx_r|].
+ rewrite ball_Cunit.
+ apply Hm1.
+rapply orWeaken.
+right.
+apply IHs.
+unfold P in Hc.
+intros e1 e2.
+apply almostIn_closed.
+intros d.
+case_eq ((1#4)*d)%Qpos.
+intros dn dd Hd.
+destruct (Hc (pred (nat_of_P dd))) as [G | m [Hm0 Hm1]] using existsC_ind.
+ auto using almostIn_stable.
+set (m' := (1#P_of_succ_nat m)%Qpos).
+apply almostIn_weak_le with ((e1 + m') + (m' + m') + (m' + e2))%Qpos.
+ autorewrite with QposElim.
+ rewrite Qle_minus_iff.
+ replace RHS with (d + - (m' + (m' + m') + m')) by ring.
+ rewrite <- Qle_minus_iff.
+ unfold m'.
+ autorewrite with QposElim. 
+ replace LHS with ((1#P_of_succ_nat m)/(1#4)) by field.
+ apply Qle_shift_div_r.
+  constructor.
+ rewrite Qmult_comm.
+ change ((1#4)*d) with (((1#4)*d)%Qpos:Q).
+ rewrite Hd.
+ unfold Qle; simpl.
+ rewrite Zpos_mult_morphism.
+ apply Zle_trans with (dn * dd)%Z; auto with *.
+ apply Zmult_le_compat_l; auto with *.
+ rewrite (anti_convert_pred_convert dd).
+ do 2 rewrite <- POS_anti_convert.
+ do 2 rewrite inj_S.
+ rewrite inj_le_iff in Hm0.
+ auto with *.
+eapply almostIn_triangle_r;[|apply regFun_prf].
+eapply almostIn_triangle_l;[apply regFun_prf|].
+apply Hm1.
+Qed.
+
+End CompactDistr.
 
 Section CompactImage.
 
