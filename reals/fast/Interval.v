@@ -20,6 +20,18 @@ match n with
 |S m => z :: (iterateN f (f z) m)
 end.
 
+Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
+Proof.
+intros A f z n.
+revert f z.
+induction n.
+ reflexivity.
+simpl.
+intros f z.
+rewrite <- IHn.
+reflexivity.
+Qed.
+
 Section Interval.
 
 Variable (l r:Q).
