@@ -1,6 +1,7 @@
 Require Export Metric.
 Require Import Setoid.
 Require Import Classification.
+Require Import UniformContinuity.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -168,3 +169,22 @@ Proof.
 intros.
 split; assumption.
 Qed.
+
+Open Local Scope uc_scope.
+
+Lemma together_uc : forall A B C D (f:A --> C) (g:B --> D), 
+ is_UniformlyContinuousFunction (fun (p:ProductMS A B) => (f (fst p), g (snd p)):ProductMS C D) (fun x => QposInf_min (mu f x) (mu g x)).
+Proof.
+intros A B C D f g e a b H.
+split; simpl; apply uc_prf;
+ apply ball_ex_weak_le with (QposInf_min (mu f e) (mu g e)).
+   apply QposInf_min_lb_l.
+  destruct (QposInf_min (mu f e) (mu g e)) as [q|]; auto.
+  destruct H; auto.
+ apply QposInf_min_lb_r.
+destruct (QposInf_min (mu f e) (mu g e)) as [q|]; auto.
+destruct H; auto.
+Qed.
+
+Definition together A B C D (f:A --> C) (g:B --> D) : (ProductMS A B --> ProductMS C D) :=
+ Build_UniformlyContinuousFunction (together_uc f g).

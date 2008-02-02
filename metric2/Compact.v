@@ -218,6 +218,50 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+Lemma almostInExistsC : forall e x s, almostIn e x s <-> existsC X (fun y => ball e x y /\ InFinEnumC y s).
+Proof.
+intros e x s.
+induction s.
+ split; try contradiction.
+ intros H.
+ apply H.
+ intros y [_ Hy].
+ apply Hy.
+split.
+ intros H.
+ destruct H as [G | H | H] using orC_ind.
+   auto using existsC_stable.
+  apply existsWeaken.
+  exists a.
+  split; auto.
+  rapply orWeaken.
+  left; reflexivity.
+ rewrite IHs in H.
+ destruct H as [G | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists y.
+ split; auto.
+ rapply orWeaken.
+ right; auto.
+intros H.
+destruct H as [G | y [Hy0 Hy1]] using existsC_ind.
+ auto using almostIn_stable.
+destruct Hy1 as [G | Hy1 | Hy1] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ rewrite <- Hy1.
+ auto.
+rapply orWeaken.
+right.
+change (almostIn e x s).
+rewrite IHs.
+apply existsWeaken.
+exists y.
+auto.
+Qed. 
+
 End AlmostIn.
 
 Add Morphism almostIn with signature QposEq ==> ms_eq ==> ms_eq ==> iff as almostIn_wd.
@@ -1351,7 +1395,7 @@ Open Local Scope uc_scope.
 Definition FinCompact : FinEnum stableCX --> Compact stableX :=
  Build_UniformlyContinuousFunction FinCompact_uc.
 
-Lemma FinComplete_correct : forall x (s:FinEnum stableCX), 
+Lemma FinCompact_correct : forall x (s:FinEnum stableCX), 
  InFinEnumC x s <-> inCompact x (FinCompact s).
 Proof.
 intros x s.
@@ -1462,6 +1506,94 @@ eapply almostIn_triangle_l;[apply regFun_prf|].
 apply Hm1.
 Qed.
 
+Lemma CompactCompleteCompact_prf : forall x,
+ is_RegularFunction (Cmap_raw FinCompact x).
+Proof.
+intros x e1 e2.
+unfold Cmap_raw.
+simpl.
+apply FinCompact_uc.
+unfold ball_ex.
+apply regFun_prf.
+Qed.
+
+Definition CompactCompleteCompact_fun x : Complete (Compact stableX) :=
+ Build_RegularFunction (CompactCompleteCompact_prf x).
+
+Lemma CompactCompleteCompact_uc :
+ is_UniformlyContinuousFunction CompactCompleteCompact_fun Qpos2QposInf.
+Proof.
+intros e a b H d1 d2.
+simpl in *.
+apply FinCompact_uc.
+rapply H.
+Qed.
+
+Definition CompactCompleteCompact : Compact stableCX --> Compact stableX :=
+ uc_compose Cjoin (Build_UniformlyContinuousFunction CompactCompleteCompact_uc).
+
+Lemma CompactCompleteCompact_correct : forall x s,
+ inCompact x s <-> inCompact (Cjoin x) (CompactCompleteCompact s).
+Proof.
+intros x s.
+split.
+ intros H e1 e2.
+ simpl.
+ unfold Cjoin_raw.
+ simpl.
+ assert (Z:=(H ((1#2)*e1) ((1#2)*e2))%Qpos).
+ rewrite almostInExistsC in Z.
+ destruct Z as [G | z [Hz0 Hz1]] using existsC_ind.
+  auto using almostIn_stable.
+ rewrite FinCompact_correct in Hz1.
+ apply almostIn_closed.
+ intros d.
+ assert (Z0:=(Hz0  ((1#2)*e1) ((1#2)*d))%Qpos).
+ assert (Z1:=(Hz1 ((1#2)*d) ((1#2)*e2))%Qpos).
+ simpl in Z1.
+ set (w0:=((1 # 2) * e1 + ((1 # 2) * e1 + (1 # 2) * e2) + (1 # 2) * d)%Qpos) in *.
+ set (w1:= ((1 # 2) * d + (1 # 2) * e2)%Qpos) in *.
+ setoid_replace (e1 + e2 + d)%Qpos with (w0 + w1)%Qpos by (unfold w0, w1; QposRing).
+ eapply almostIn_triangle_l.
+  apply Z0.
+ apply Z1.
+intros H e1 e2.
+apply almostIn_closed.
+intros d.
+set (d':=((1#4)*d)%Qpos).
+setoid_replace (e1 + e2 + d)%Qpos with ((e1 + (1#2)*d' + (1#2)*d') + (((d' + d') + (1#2)*d') + ((1#2)*d' + e2)))%Qpos by (unfold d'; QposRing).
+eapply almostIn_triangle_l.
+ eapply ball_triangle.
+  apply regFun_prf.
+ apply ball_approx_r.
+eapply almostIn_triangle_r;[|apply regFun_prf].
+assert (Z:= (H d' d')).
+simpl in Z.
+unfold Cjoin_raw in Z.
+rewrite almostInExistsC in Z.
+simpl in Z.
+destruct Z as [G | z [Hz0 Hz1]] using existsC_ind.
+ auto using almostIn_stable.
+change (InFinEnumC (X:=X) z
+        (approximate (FinCompact (approximate s ((1 # 2) * d')%Qpos))
+           ((1 # 2) * d')%Qpos)) in Hz1.
+apply almostIn_triangle_l with (Cunit z).
+ rewrite ball_Cunit.
+ assumption.
+clear - Hz1.
+induction ((approximate s ((1 # 2) * d')%Qpos)).
+ auto.
+destruct Hz1 as [G | Hz1 | Hz1] using orC_ind.
+  auto using almostIn_stable.
+ rapply orWeaken.
+ left.
+ rewrite Hz1.
+ apply ball_approx_l.
+rapply orWeaken.
+right.
+apply IHm; auto.
+Qed.
+
 End CompactDistr.
 
 Section CompactImage.
@@ -1563,3 +1695,36 @@ I don't seem to need this proof at the momment.
 *)
 
 End CompactImage.
+
+Section CompactImageBind.
+
+Variable z : Qpos.
+Variable X Y : MetricSpace.
+Hypothesis stableX : stableMetric X.
+Hypothesis stableY : stableMetric Y.
+Hypothesis plX : PrelengthSpace X.
+Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
+
+Open Local Scope uc_scope.
+
+Variable f : X --> Complete Y.
+
+Definition CompactImage_b : Compact stableX --> Compact stableY :=
+ uc_compose (CompactCompleteCompact _ _) (CompactImage z (Complete_stable stableY) plFEX f).
+
+Lemma CompactImage_b_correct1 : forall x s, 
+ (inCompact x s) -> (inCompact (Cbind plX f x) (CompactImage_b s)).
+Proof.
+intros x s H.
+change (inCompact (Cjoin (Cmap_fun plX f x))
+     (CompactCompleteCompact stableY _ (CompactImage z (Complete_stable stableY) plFEX f s))).
+rewrite <- CompactCompleteCompact_correct.
+rapply CompactImage_correct1.
+assumption.
+Qed.
+
+(*
+Lemma CompactImage_b_correctC
+*)
+
+End CompactImageBind.
