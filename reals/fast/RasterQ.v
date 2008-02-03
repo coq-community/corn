@@ -2,12 +2,38 @@ Require Export Raster.
 Require Import Interval.
 Require Export FinEnum.
 Require Export ProductMetric.
+Require Import Classic.
 
 Set Implicit Arguments.
 
 Lemma stableQ2 : stableMetric (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 Proof.
 apply ProductMS_stable; apply stableQ.
+Qed.
+
+Lemma InStrengthen : forall x (l:FinEnum stableQ2),
+InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ ms_eq x y.
+Proof.
+induction l.
+ contradiction.
+intros H.
+assert (L:ms_eq x a \/ ~ms_eq x a).
+ destruct (Qeq_dec (fst x) (fst a)).
+  destruct (Qeq_dec (snd x) (snd a)).
+   left.
+   split; auto.
+  right; intros [_ B]; auto.
+ right; intros [B _]; auto.
+destruct L.
+ exists a.
+ split; auto with *.
+destruct (IHl) as [y [Hy0 Hy1]].
+ destruct H as [G | H | H] using orC_ind.
+   auto using InFinEnumC_stable.
+  elim H0; auto.
+ auto.
+exists y.
+split; auto with *.
 Qed.
 
 Definition InterpRow (up : list Q) n (v:Bvector n) : FinEnum stableQ:=
@@ -19,7 +45,7 @@ Definition InterpRaster (tl br:Q*Q) n m (bitmap : raster n m) : FinEnum stableQ2
  let up := (UniformPartition l r n) in
  flat_map (fun (p:Q*Bvector _) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r)) (combine (UniformPartition t b m) bitmap).
 
-Notation "a ⇱ b ⇲ c" := (InterpRaster a c _ _ b) (at level 1,
+Notation "a ⇱ b ⇲ c" := (InterpRaster a c b) (at level 1,
  format "a ⇱ '[v' '/' b ']' '[v' '/' ⇲ c ']'") : raster.
 
 (*
@@ -30,7 +56,7 @@ Example ex5 :=
 (0, 1)⇱
          ⎥█░█⎢
          ⎥░█░⎢
-         ⎥█░█⎢
+         ⎥░░█⎢
              ⇲(1, 0).
 
 Eval compute in (ex5).
@@ -51,7 +77,7 @@ generalize (f l r n) (f t b m).
 induction bitmap;
  intros f0 f1 i j H.
  unfold RasterIndex in H.
- destruct (nth_in_or_default i (map (@vectorAsList _ _) (Vnil (Bvector n))) nil) as [A | A].
+ destruct (nth_in_or_default i (map (@vectorAsList _ _) (Vnil (vector bool n))) nil) as [A | A].
   contradiction.
  rewrite A in H; clear A.
  destruct (nth_in_or_default j nil false) as [A | A].
@@ -160,3 +186,5 @@ simpl (fst (Pair (S (fst z)) (snd z))).
 rewrite inj_S.
 auto.
 Qed.
+
+End InterpRasterCorrect.

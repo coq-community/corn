@@ -618,6 +618,33 @@ End Finite.
 
 Implicit Arguments InFinEnumC [X].
 
+Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
+ ms_eq f (rev f).
+Proof.
+induction f.
+ reflexivity.
+intros x.
+destruct (IHf x) as [H0 H1].
+split; simpl; intros H.
+ destruct H as [G|H|H] using orC_ind.
+   auto using InFinEnumC_stable.
+  apply InFinEnumC_app_r.
+  rapply orWeaken.
+  left; auto.
+ apply InFinEnumC_app_l.
+ auto.
+destruct (InFinEnumC_app_orC _ _ _ _ H) as [G |A | A] using orC_ind.
+  auto using orC_stable.
+ apply orWeaken.
+ right.
+ auto.
+destruct A as [G | A| A] using orC_ind.
+  auto using orC_stable.
+ apply orWeaken.
+ left; auto.
+contradiction.
+Qed.
+
 Open Local Scope uc_scope.
 
 Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC a l -> InFinEnumC (f a) (map f l).
