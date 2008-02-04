@@ -11,13 +11,41 @@ Set Implicit Arguments.
 
 (** In this implemenation of Rasterization, I choose to push all points inside the raster *)
 
-Definition RasterizePoint (t l b r:Q) n m (bm:raster n m) (p:Q*Q) : raster n m :=
+Definition RasterizePoint n m (bm:raster n m) (t l b r:Q) (p:Q*Q) : raster n m :=
 let i := min (pred n) (Z_to_nat (Zle_max_l 0 (rasterize1 l r n (fst p)))) in
 let j := min (pred m) (Z_to_nat (Zle_max_l 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
 
+Add Morphism Qfloor with signature Qeq ==> eq as Qfloor_wd.
+Proof.
+intros x1 x2 Hx.
+apply Zle_antisym;
+ apply Qfloor_resp_le;
+ auto with *.
+symmetry in Hx.
+auto with *.
+Qed.
+
+Add Morphism RasterizePoint with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq ==> eq as RasterizePoint_wd.
+intros.
+unfold RasterizePoint.
+replace (rasterize1 x4 x1 m (snd x))
+ with (rasterize1 x5 x2 m (snd x)).
+ replace (rasterize1 x0 x6 n (fst x))
+  with (rasterize1 x3 x7 n (fst x)).
+  reflexivity.
+ unfold rasterize1.
+ rewrite H0.
+ rewrite H2.
+ reflexivity.
+unfold rasterize1.
+rewrite H.
+rewrite H1.
+reflexivity.
+Qed.
+
 Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
- Is_true (RasterIndex bm i j) -> Is_true (RasterIndex (RasterizePoint t l b r bm p) i j).
+ Is_true (RasterIndex bm i j) -> Is_true (RasterIndex (RasterizePoint bm t l b r p) i j).
 Proof.
 intros t l b r m n bm p i j H.
 unfold RasterizePoint.
@@ -40,8 +68,19 @@ rewrite setRaster_correct2; auto.
 Qed.
 
 (* This function could be a bit more efficent by sorting x *)
-Definition RasterizeQ2 (f:FinEnum stableQ2) (t l b r:Q) n m : raster n m :=
-fold_left (fun x y => @RasterizePoint t l b r n m x y) f (emptyRaster _ _).
+Definition RasterizeQ2 (f:FinEnum stableQ2) n m (t l b r:Q) : raster n m :=
+fold_left (fun x y => @RasterizePoint n m x t l b r y) f (emptyRaster _ _).
+
+Add Morphism RasterizeQ2 with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq as RasterizeQ2_wd.
+intros.
+unfold RasterizeQ2.
+do 2 rewrite <- fold_left_rev_right.
+induction (rev f).
+ reflexivity.
+simpl.
+rewrite IHl.
+apply RasterizePoint_wd; auto.
+Qed.
 
 Section RasterizeCorrect.
 
@@ -187,7 +226,7 @@ Hypothesis Hf:forall x y, InFinEnumC ((x,y):ProductMS _ _) f ->
 Lemma RasterizeQ2_correct1 : forall x y,
  InFinEnumC ((x,y):ProductMS _ _) f -> 
  existsC (ProductMS _ _) 
-  (fun p => InFinEnumC p (InterpRaster (l,t) (r,b) (RasterizeQ2 f t l b r (S n) (S m)))
+  (fun p => InFinEnumC p (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
             /\ ball err p (x,y)).
 Proof.
 intros x y.
@@ -199,7 +238,7 @@ clear Hf.
 destruct (FinEnum_eq_rev f (x,y)) as [L _].
 generalize (L H).
 clear L H.
-simpl ((ms (ProductMS Q_as_MetricSpace Q_as_MetricSpace))).
+simpl (ms Q2).
 generalize (emptyRaster (S n) (S m)).
 induction (@rev (prod Q Q) f).
  contradiction.
@@ -209,7 +248,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
  simpl in Hl, Hr.
  simpl (fold_right
            (fun (y0 : Q * Q) (x0 : raster (S n) (S m)) =>
-            RasterizePoint t l b r x0 y0) bm (a :: l0)).
+            RasterizePoint x0 t l b r y0) bm (a :: l0)).
  unfold RasterizePoint at 1.
  simpl (pred (S n)).
  simpl (pred (S m)).
@@ -250,7 +289,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
  auto.
 simpl ((fold_right
         (fun (y : Q * Q) (x : raster (S n) (S m)) =>
-         RasterizePoint t l b r x y) bm) (a :: l0)).
+         RasterizePoint x t l b r y) bm) (a :: l0)).
 destruct (IHl0 bm H) as [G | z [Hz0 Hz1]] using existsC_ind.
  auto using existsC_stable.
 apply existsWeaken.
@@ -270,7 +309,7 @@ auto.
 Qed.
 
 Lemma RasterizeQ2_correct2 : forall x y,
- InFinEnumC ((x,y):ProductMS _ _) (InterpRaster (l,t) (r,b) (RasterizeQ2 f t l b r (S n) (S m)))
+ InFinEnumC ((x,y):ProductMS _ _) (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
  -> (existsC (ProductMS _ _) 
   (fun p => InFinEnumC p f/\ ball err p (x,y))).
 Proof.
@@ -303,7 +342,7 @@ cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
  destruct (FinEnum_eq_rev f z); auto.
 unfold RasterizeQ2 in Hij.
 rewrite <- fold_left_rev_right in Hij.
-simpl ((ms (ProductMS Q_as_MetricSpace Q_as_MetricSpace))) in Hf'|-*.
+simpl (ms Q2) in Hf'|-*.
 induction (@rev (prod Q Q) f).
  clear - Hij.
  set (z:=emptyRaster (S n) (S m)) in Hij.
@@ -312,7 +351,7 @@ induction (@rev (prod Q Q) f).
  rewrite emptyRasterEmpty in Hij.
  contradiction.
 simpl (fold_right (fun (y : Q * Q) (x : raster (S n) (S m)) =>
-               RasterizePoint t l b r x y) (emptyRaster (S n) (S m))
+               RasterizePoint x t l b r y) (emptyRaster (S n) (S m))
               (a :: l0)) in Hij.
 unfold RasterizePoint at 1 in Hij.
 set (i0:=min (pred (S n))
@@ -382,7 +421,7 @@ Qed.
 
 Lemma RasterizeQ2_correct : 
  ball err
-  (InterpRaster (l,t) (r,b) (RasterizeQ2 f t l b r (S n) (S m)))
+  (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
   f.
 Proof.
 split; intros [x y] Hx.

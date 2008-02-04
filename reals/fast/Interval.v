@@ -513,4 +513,14 @@ rewrite H in L0.
 discriminate L0.
 Qed.
 
+Lemma CompactIntervalQ_bonus_correct : forall e x,
+ In x (approximate CompactIntervalQ e) -> (l <= x <= r).
+Proof.
+intros [e|] x H.
+ simpl in H.
+ rapply UniformPartition_inside.
+ apply H.
+elim H.
+Qed.
+
 End Interval.

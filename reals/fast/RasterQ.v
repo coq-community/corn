@@ -3,12 +3,14 @@ Require Import Interval.
 Require Export FinEnum.
 Require Export ProductMetric.
 Require Import Classic.
+Require Import CornTac.
 
 Set Implicit Arguments.
+Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
-Lemma stableQ2 : stableMetric (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
+Lemma stableQ2 : stableMetric Q2.
 Proof.
-apply ProductMS_stable; apply stableQ.
+rapply ProductMS_stable; apply stableQ.
 Qed.
 
 Lemma InStrengthen : forall x (l:FinEnum stableQ2),
@@ -39,13 +41,13 @@ Qed.
 Definition InterpRow (up : list Q) n (v:Bvector n) : FinEnum stableQ:=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
-Definition InterpRaster (tl br:Q*Q) n m (bitmap : raster n m) : FinEnum stableQ2 :=
+Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricSpace Q_as_MetricSpace)) : FinEnum stableQ2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in
  flat_map (fun (p:Q*Bvector _) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r)) (combine (UniformPartition t b m) bitmap).
 
-Notation "a ⇱ b ⇲ c" := (InterpRaster a c b) (at level 1,
+Notation "a ⇱ b ⇲ c" := (InterpRaster b a c) (at level 1,
  format "a ⇱ '[v' '/' b ']' '[v' '/' ⇲ c ']'") : raster.
 
 (*
@@ -67,7 +69,7 @@ Section InterpRasterCorrect.
 Let f := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
 
 Lemma InterpRaster_correct1 : forall n m (t l b r:Q) (bitmap: raster n m) i j,
-Is_true (RasterIndex bitmap i j) -> In (f l r n j,f t b m i) (InterpRaster (l,t) (r,b) bitmap).
+Is_true (RasterIndex bitmap i j) -> In (f l r n j,f t b m i) (InterpRaster bitmap (l,t) (r,b)).
 Proof.
 intros n m t l b r bitmap.
 unfold InterpRaster, InterpRow, UniformPartition.
@@ -128,7 +130,7 @@ apply H.
 Qed.
 
 Lemma InterpRaster_correct2 : forall n m (t l b r:Q) x y (bitmap: raster n m),
-In (x,y) (InterpRaster (l,t) (r,b) bitmap) -> 
+In (x,y) (InterpRaster bitmap (l,t) (r,b)) -> 
  exists p, Is_true (RasterIndex bitmap (fst p) (snd p)) /\ x=f l r n (snd p) /\ y=f t b m (fst p).
 Proof.
 intros n m t l b r x y bitmap.
@@ -188,3 +190,50 @@ auto.
 Qed.
 
 End InterpRasterCorrect.
+
+Add Morphism InterpRaster with signature ms_eq ==> ms_eq ==> ms_eq as InterpRaster_wd.
+cut (forall (n m : nat) (bitmap : raster n m) (x1 x2 : Q2),
+ prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
+ forall x3 x4 : Q2,
+ prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
+ InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
+  (InterpRaster bitmap x1 x3) ->
+ InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
+  (InterpRaster bitmap x2 x4)).
+ intros L.
+ split.
+  apply L; auto.
+ apply L.
+  change Q2 in x2.
+  change (ms_eq x2 x1).
+  symmetry; auto.
+ change Q2 in x3.
+ change (ms_eq x3 x0).
+ symmetry; auto.
+intros n m bm [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
+destruct (InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
+destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by] [Hb0 [Hb1 Hb2]]].
+rewrite Hb1 in Ha1.
+rewrite Hb2 in Ha1.
+unfold snd, fst in Ha1.
+destruct x2 as [x2l x2r].
+destruct y2 as [y2l y2r].
+assert (L0:ms_eq z (Pair (x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1))
+           (x2r + (y2r - x2r) * (2 * bx + 1 # 1) / (2 * m # 1)))).
+ transitivity (Pair (x1l + (y1l - x1l) * (2 * by + 1 # 1) / (2 * n # 1))
+           (x1r + (y1r - x1r) * (2 * bx + 1 # 1) / (2 * m # 1))).
+  auto.
+ clear - Hx Hy.
+ destruct Hx as [Hx1 Hx2].
+ destruct Hy as [Hy1 Hy2].
+ split;
+  simpl (ms_eq (m:=Q_as_MetricSpace)) in *;
+  unfold fst,snd in *.
+  rewrite Hx1, Hy1.
+  reflexivity.
+ rewrite Hx2, Hy2.
+ reflexivity.
+rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (Pair x2l x2r) (Pair y2l y2r)) L0).
+apply InFinEnumC_weaken.
+auto using InterpRaster_correct1.
+Qed.
