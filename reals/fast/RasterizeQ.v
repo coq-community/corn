@@ -141,6 +141,32 @@ setoid_replace x with (l+w).
 destruct H0; auto with *.
 Qed.
 
+Lemma switch_line_interp : forall t b m j, (j <= m)%nat -> C t b (S m) (m - j)%nat == C b t (S m) j.
+Proof.
+intros t b m j H.
+unfold C.
+rewrite inj_minus1;[|auto].
+change (2 * (m - j) + 1 # 1) with ((2 * (m - j) + 1)%Z:Q).
+change (2*S m#1) with (2*(S m)).
+change ((2*j +1)#1) with ((2*j+1)%Z:Q).
+do 2 rewrite injz_plus.
+change ((2%positive * (m - j))%Z:Q)
+ with (2 * (m - j)%Z).
+change ((2%positive * j)%Z:Q)
+ with (2 * j).
+change (1%Z:Q) with (1:Q).
+unfold Zminus.
+rewrite injz_plus.
+rewrite (inj_S m).
+unfold Zsucc.
+rewrite injz_plus.
+change ((-j)%Z:Q) with (-j).
+field.
+unfold Qeq.
+simpl.
+auto with *.
+Qed.
+
 Variable b l:Q.
 Variable w h:Qpos.
 
@@ -216,33 +242,12 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   unfold err.
   apply Qpos_max_ub_r.
  simpl (ball (m:=Q_as_MetricSpace)).
- setoid_replace (C t b (S m) (m - j)%nat) with
-  (C b t (S m) j).
-  rapply rasterization_error.
-  simpl in Hr.
-  rewrite Hr in Hfr.
-  auto.
- unfold C.
- rewrite inj_minus1;[|unfold j; auto with *].
- change (2 * (m - j) + 1 # 1) with ((2 * (m - j) + 1)%Z:Q).
- change (2*S m#1) with (2*(S m)).
- change ((2*j +1)#1) with ((2*j+1)%Z:Q).
- do 2 rewrite injz_plus.
- change ((2%positive * (m - j))%Z:Q)
-  with (2 * (m - j)%Z).
- change ((2%positive * j)%Z:Q)
-  with (2 * j).
- change (1%Z:Q) with (1:Q).
- unfold Zminus.
- rewrite injz_plus.
- rewrite (inj_S m).
- unfold Zsucc.
- rewrite injz_plus.
- change ((-j)%Z:Q) with (-j).
- field.
- unfold Qeq.
- simpl.
- auto with *.
+ rewrite switch_line_interp.
+  unfold j; auto with *.
+ rapply rasterization_error.
+ simpl in Hr.
+ rewrite Hr in Hfr.
+ auto.
 simpl ((fold_right
         (fun (y : Q * Q) (x : raster (S n) (S m)) =>
          RasterizePoint t l b r x y) bm) (a :: l0)).
@@ -264,71 +269,135 @@ apply RasterizePoint_carry.
 auto.
 Qed.
 
-Definition foo := Pair (-58 # 60) (-5 # 21)
-       :: Pair (-54 # 60) (-9 # 21)
-          :: Pair (-50 # 60) (-12 # 21)
-             :: Pair (-46 # 60) (-15 # 21)
-                :: Pair (-42 # 60) (-18 # 21)
-                   :: Pair (-38 # 60) (-19 # 21)
-                      :: Pair (-34 # 60) (-20 # 21)
-                         :: Pair (-30 # 60) (-20 # 21)
-                            :: Pair (-26 # 60) (-20 # 21)
-                               :: Pair (-22 # 60) (-18 # 21)
-                                  :: Pair (-18 # 60) (-1557 # 2000)
-                                     :: Pair (-14 # 60) (-7 # 10)
-                                        :: Pair (-10 # 60) (-1 # 2)
-                                           :: Pair (-6 # 60) (-3 # 10)
-                                              :: Pair (-2 # 60) 0
-                                                 :: Pair (2 # 60) 0
-                                                    :: Pair (6 # 60) (3 # 10)
-                                                       :: Pair (10 # 60)
-                                                            (1 # 2)
-                                                          :: Pair (14 # 60)
-                                                               (7 # 10)
-                                                             :: Pair
-                                                                  (18 # 60)
-                                                                  (1557
-                                                                   # 2000)
-                                                                :: Pair
-                                                                    (22 # 60)
-                                                                    (18 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (26 # 60)
-                                                                    (20 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (30 # 60)
-                                                                    (20 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (34 # 60)
-                                                                    (20 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (38 # 60)
-                                                                    (19 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (42 # 60)
-                                                                    (18 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (46 # 60)
-                                                                    (15 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (50 # 60)
-                                                                    (12 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (54 # 60)
-                                                                    (9 # 21)
-                                                                   :: 
-                                                                   Pair
-                                                                    (58 # 60)
-                                                                    (5 # 21)
-                                                                   :: nil.
+Lemma RasterizeQ2_correct2 : forall x y,
+ InFinEnumC ((x,y):ProductMS _ _) (InterpRaster (l,t) (r,b) (RasterizeQ2 f t l b r (S n) (S m)))
+ -> (existsC (ProductMS _ _) 
+  (fun p => InFinEnumC p f/\ ball err p (x,y))).
+Proof.
+intros x y H.
+destruct (InStrengthen _ _ H) as [[x' y'] [H' Hxy]].
+destruct (InterpRaster_correct2 _ _ _ _ _ _ _ H') as [[j i] [Hij [Hx' Hy']]].
+rewrite Hx' in Hxy.
+rewrite Hy' in Hxy.
+assert (Hf':forall x y : Q_as_MetricSpace,
+     InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace)
+       (Pair x y:ProductMS Q_as_MetricSpace Q_as_MetricSpace) (rev f) ->
+     l <= x <= r /\ b <= y <= t).
+ intros c d Hcd.
+ apply Hf.
+ destruct (FinEnum_eq_rev f (c,d)); auto.
+clear Hf.
+clear Hx' Hy' H' H.
+destruct Hxy as [Hx' Hy'].
+cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
+  (fun p : ProductMS Q_as_MetricSpace Q_as_MetricSpace =>
+   InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p (rev f) /\
+   ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p (Pair x y))).
+ intros L.
+ clear -L.
+ destruct L as [G | z [Hz0 Hz]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists z.
+ split; auto.
+ destruct (FinEnum_eq_rev f z); auto.
+unfold RasterizeQ2 in Hij.
+rewrite <- fold_left_rev_right in Hij.
+simpl ((ms (ProductMS Q_as_MetricSpace Q_as_MetricSpace))) in Hf'|-*.
+induction (@rev (prod Q Q) f).
+ clear - Hij.
+ set (z:=emptyRaster (S n) (S m)) in Hij.
+ simpl in Hij.
+ unfold z in Hij.
+ rewrite emptyRasterEmpty in Hij.
+ contradiction.
+simpl (fold_right (fun (y : Q * Q) (x : raster (S n) (S m)) =>
+               RasterizePoint t l b r x y) (emptyRaster (S n) (S m))
+              (a :: l0)) in Hij.
+unfold RasterizePoint at 1 in Hij.
+set (i0:=min (pred (S n))
+                (Z_to_nat (z:=Zmax 0 (rasterize1 l r (S n) (fst a)))
+                   (Zle_max_l 0 (rasterize1 l r (S n) (fst a))))) in *.
+set (j0:=min (pred (S m))
+                (Z_to_nat (z:=Zmax 0 (rasterize1 b t (S m) (snd a)))
+                   (Zle_max_l 0 (rasterize1 b t (S m) (snd a))))) in *.
+cbv zeta in Hij.
+assert (L:((i=i0)/\(j=m-j0) \/ ((j<>(m-j0)) \/ (i<>i0)))%nat)
+ by omega.
+destruct L as [[Hi Hj] | L].
+ clear IHl0.
+ rewrite Hi, Hj in Hx'.
+ rewrite Hi, Hj in Hy'.
+ unfold fst, snd in *.
+ apply existsWeaken.
+ exists a.
+ split.
+  rapply orWeaken.
+  left.
+  reflexivity.
+ destruct a as [ax ay].
+ destruct (Hf' ax ay) as [Hax Hay].
+  rapply orWeaken;left;reflexivity.
+ clear Hf'.
+ split.
+  unfold fst.
+  rewrite Hx'.
+  apply ball_sym.
+  eapply ball_weak_le.
+   unfold err.
+   apply Qpos_max_ub_l.
+  rapply rasterization_error.
+  auto.
+ unfold snd.
+ rewrite Hy'.
+ apply ball_sym.
+ eapply ball_weak_le.
+  unfold err.
+  apply Qpos_max_ub_r.
+ fold (C t b (S m) (m - j0)%nat).
+ simpl (ball (m:=Q_as_MetricSpace)).
+ rewrite switch_line_interp.
+  unfold j0; auto with *.
+ rapply rasterization_error.
+ auto.
+assert (L0:existsC (Q * Q)
+         (fun p : Q * Q =>
+          InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p l0 /\
+          ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p
+            (Pair x y))).
+ apply IHl0.
+  simpl in Hij.
+  rewrite setRaster_correct2 in Hij; auto.
+ intros c d Hcd.
+ apply Hf'.
+ rapply orWeaken; right; auto.
+destruct L0 as [G | z [Hz0 Hz1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists z.
+split; auto.
+rapply orWeaken.
+right; auto.
+Qed.
 
-Open Local Scope raster.
-Eval vm_compute in RasterizeQ2 foo 1 (-(1)) (-(1)) 1 10 10.
+Lemma RasterizeQ2_correct : 
+ ball err
+  (InterpRaster (l,t) (r,b) (RasterizeQ2 f t l b r (S n) (S m)))
+  f.
+Proof.
+split; intros [x y] Hx.
+ destruct (RasterizeQ2_correct2 Hx) as [ G | z [Hz0 Hz1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists z.
+ split; auto.
+ auto using ball_sym.
+destruct (RasterizeQ2_correct1 Hx) as [ G | z [Hz0 Hz1]] using existsC_ind.
+ auto using existsC_stable.
+apply existsWeaken.
+exists z.
+split; auto.
+auto using ball_sym.
+Qed.
+
+End RasterizeCorrect.
