@@ -16,16 +16,6 @@ let i := min (pred n) (Z_to_nat (Zle_max_l 0 (rasterize1 l r n (fst p)))) in
 let j := min (pred m) (Z_to_nat (Zle_max_l 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
 
-Add Morphism Qfloor with signature Qeq ==> eq as Qfloor_wd.
-Proof.
-intros x1 x2 Hx.
-apply Zle_antisym;
- apply Qfloor_resp_le;
- auto with *.
-symmetry in Hx.
-auto with *.
-Qed.
-
 Add Morphism RasterizePoint with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq ==> eq as RasterizePoint_wd.
 intros.
 unfold RasterizePoint.

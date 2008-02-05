@@ -26,10 +26,10 @@ apply FinEnum_prelength.
 apply QPrelengthSpace.
 Qed.
 
-Definition graphQ := CompactGraph_b (uc_compose clip f) stableQ2 plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
+Definition graphQ f := CompactGraph_b f stableQ2 plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
 
 Lemma graphQ_bonus : forall e x y, 
- In (x, y) (approximate graphQ e) -> l <= x <= r /\ b <= y <= t.
+ In (x, y) (approximate (graphQ (uc_compose clip f)) e) -> l <= x <= r /\ b <= y <= t.
 Proof.
 intros [e|] x y;[|intros; contradiction].
 simpl.
@@ -65,14 +65,14 @@ Variable err : Qpos.
 Let err := Qpos_max ((1 # 4 * P_of_succ_nat n) * w) 
  ((1 # 4 * P_of_succ_nat m) * h).
  
-Definition PlotQ := RasterizeQ2 (approximate graphQ err) n m t l b r.  
+Definition PlotQ := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.  
 
 Open Local Scope raster.
 
 Theorem Plot_correct : 
 ball (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
         ((1 # 2 * P_of_succ_nat (pred m)) * h))
- graphQ
+ (graphQ (uc_compose clip f))
  (Cunit (InterpRaster PlotQ (l,t) (r,b))).
 Proof.
 assert (Hw:=(ProjT2 (Qpos_lt_plus Hlr))).
@@ -80,7 +80,7 @@ assert (Hh:=(ProjT2 (Qpos_lt_plus Hbt))).
 fold w in Hw.
 fold h in Hh.
 simpl in Hw, Hh.
-apply ball_triangle with (Cunit (approximate graphQ err)).
+apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
  rapply ball_approx_r.
 unfold Compact.
 rewrite ball_Cunit.
@@ -112,16 +112,5 @@ Qed.
 
 End Plot.
 
-Require Import CRsin.
-
-Open Local Scope raster.
-
-Goal False.
-assert (X:=@Plot_correct (-(1)) 1 (refl_equal _) (-(1)) 1 (refl_equal _) (sin_uc) 25 25 (refl_equal _) (refl_equal _)).
-match goal with
- [X:ball ?e ?a (@ucFun _ _ _ (_⇱?b⇲_))|-_] => set (E:=e) in X; set (B:=b) in X
-end.
-compute in E.
-vm_compute in B.
-unfold E, B in X.
-clear E B.
+Notation "'graphCR' f [ l '..' r ]" := 
+ (graphQ l r (refl_equal _) f) : raster.
