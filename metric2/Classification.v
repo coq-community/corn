@@ -4,6 +4,21 @@ Require Import Qauto.
 Definition stableMetric (ms:MetricSpace) := 
  forall e (x y:ms), ~~(ball e x y) -> ball e x y.
 
+Lemma stableEq : forall (ms:MetricSpace) (stable:stableMetric ms) (x y:ms),
+ ~~(ms_eq x y) -> ms_eq x y.
+Proof.
+intros ms stable x y Hxy.
+apply ball_eq.
+intros e.
+apply stable.
+revert Hxy.
+cut (ms_eq x y -> ball (m:=ms) e x y).
+ tauto.
+intros H.
+rewrite H.
+apply ball_refl.
+Qed.
+
 Definition locatedMetric (ms:MetricSpace) := 
  forall (e d:Qpos) (x y:ms), e < d -> {ball d x y}+{~ball e x y}.
 
