@@ -508,7 +508,7 @@ cut (forall d1 d2 : Qpos,
        e < d1 + d2 -> 
       forall (a b:FinEnum), hemiMetricStrong X e (fun x : X => InFinEnumC x a)
        (fun x : X => InFinEnumC x b) ->
-{c : FinEnum | ball d1 a c &  hemiMetric X d2 (fun x : X => InFinEnumC x c) (fun x : X => InFinEnumC x b)}).
+exists2 c : FinEnum, ball d1 a c &  hemiMetric X d2 (fun x : X => InFinEnumC x c) (fun x : X => InFinEnumC x b)).
  intros Z a b d1 d2 He H.
  destruct (HausdorffBallHausdorffBallStrong H) as [Hl Hr].
  clear H.

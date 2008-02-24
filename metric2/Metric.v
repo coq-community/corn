@@ -131,7 +131,7 @@ Section Prelength_Space.
 
 Definition PrelengthSpace :=
 forall (a b:X) (e d1 d2:Qpos), e < d1+d2 -> ball e a b -> 
-{c:X | ball d1 a c & ball d2 c b}.
+exists2 c:X, ball d1 a c & ball d2 c b.
 
 Hypothesis prelength : PrelengthSpace.
 
@@ -139,8 +139,8 @@ Lemma trail : forall dl e (a b:X),
  ball e a b ->
  e < QposSum dl -> 
  let n := length dl in
- {f : nat -> X | f 0 = a /\ f n = b 
-               & forall i z, i < n -> ball (nth i dl z) (f i) (f (S i))}%nat.
+ (exists2 f : nat -> X, f 0 = a /\ f n = b 
+               & forall i z, i < n -> ball (nth i dl z) (f i) (f (S i)))%nat.
 Proof.
 induction dl.
 intros e a b H H1.
