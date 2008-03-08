@@ -114,8 +114,8 @@ Record CSetoid : Type :=
    cs_ap    :  Crelation cs_crr;
    cs_proof :  is_CSetoid cs_crr cs_eq cs_ap}.
 
-Implicit Arguments cs_eq [c].
-Implicit Arguments cs_ap [c].
+Implicit Arguments cs_eq [CSetoid].
+Implicit Arguments cs_ap [CSetoid].
 
 Infix "[=]" := cs_eq (at level 70, no associativity).
 Infix "[#]" := cs_ap (at level 70, no associativity).
@@ -146,22 +146,22 @@ Let [S] be a setoid.
 Section CSetoid_axioms.
 Variable S : CSetoid.
 
-Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (c:=S)) (cs_ap (c:=S)).
+Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (CSetoid:=S)) (cs_ap (CSetoid:=S)).
 Proof cs_proof S.
 
-Lemma ap_irreflexive : irreflexive (cs_ap (c:=S)).
+Lemma ap_irreflexive : irreflexive (cs_ap (CSetoid:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
-Lemma ap_symmetric : Csymmetric (cs_ap (c:=S)).
+Lemma ap_symmetric : Csymmetric (cs_ap (CSetoid:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
-Lemma ap_cotransitive : cotransitive (cs_ap (c:=S)).
+Lemma ap_cotransitive : cotransitive (cs_ap (CSetoid:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
-Lemma ap_tight : tight_apart (cs_eq (c:=S)) (cs_ap (c:=S)).
+Lemma ap_tight : tight_apart (cs_eq (CSetoid:=S)) (cs_ap (CSetoid:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
@@ -187,14 +187,14 @@ In `there exists a unique [a:S] such that %\ldots%#...#', we now mean unique wit
 
 Definition ex_unq (P : S -> CProp) := {x : S | forall y : S, P y -> x [=] y | P x}.
 
-Lemma eq_reflexive : Treflexive (cs_eq (c:=S)).
+Lemma eq_reflexive : Treflexive (cs_eq (CSetoid:=S)).
 intro x.
 generalize (ap_tight S x x); intro H.
 generalize (ap_irreflexive S x); intro H0.
 inversion_clear H; auto.
 Qed.
 
-Lemma eq_symmetric : Tsymmetric (cs_eq (c:=S)).
+Lemma eq_symmetric : Tsymmetric (cs_eq (CSetoid:=S)).
 intro x; intros y H.
 generalize (ap_tight S x y); intro H0.
 generalize (ap_tight S y x); intro H1.
@@ -205,7 +205,7 @@ apply H0; intro H6.
 apply H4; auto.
 Qed.
 
-Lemma eq_transitive : Ttransitive (cs_eq (c:=S)).
+Lemma eq_transitive : Ttransitive (cs_eq (CSetoid:=S)).
 intro x; intros y z H H0.
 generalize (ap_tight S x y); intro H1.
 generalize (ap_tight S y z); intro H2.
@@ -345,7 +345,7 @@ elim H0.
 intros.
 elim H1.
 intros.
-exact (cs_ap (c:=A) a a0 or cs_ap (c:=B) b b0).
+exact (cs_ap (CSetoid:=A) a a0 or cs_ap (CSetoid:=B) b b0).
 Defined.
 
 Definition prod_eq (A B : CSetoid) (c d : prodT A B) : Prop.
@@ -767,7 +767,7 @@ Qed.
 
 (* End_SpecReals *)
 
-Lemma ap_wdr : Crel_wdr (cs_ap (c:=S)).
+Lemma ap_wdr : Crel_wdr (cs_ap (CSetoid:=S)).
 red in |- *; intros x y z H H0.
 generalize (eq_imp_not_ap _ _ _ H0); intro H1.
 elim (ap_cotransitive_unfolded _ _ _ H z); intro H2.
@@ -779,7 +779,7 @@ apply ap_symmetric_unfolded.
 assumption.
 Qed.
 
-Lemma ap_wdl : Crel_wdl (cs_ap (c:=S)).
+Lemma ap_wdl : Crel_wdl (cs_ap (CSetoid:=S)).
 red in |- *; intros x y z H H0.
 generalize (ap_wdr y x z); intro H1.
 apply ap_symmetric_unfolded.
@@ -797,7 +797,7 @@ Proof ap_wdr.
 Lemma ap_wdl_unfolded : forall x y z : S, x [#] y -> x [=] z -> z [#] y.
 Proof ap_wdl.
 
-Lemma ap_strext : Crel_strext (cs_ap (c:=S)).
+Lemma ap_strext : Crel_strext (cs_ap (CSetoid:=S)).
 red in |- *; intros x1 x2 y1 y2 H.
 case (ap_cotransitive_unfolded _ _ _ H x2); intro H0.
 
@@ -1186,10 +1186,10 @@ Definition Crestrict_relation (R : Crelation S) : Crelation subcsetoid_crr :=
   end.
 
 Definition subcsetoid_eq : Relation subcsetoid_crr :=
-  restrict_relation (cs_eq (c:=S)).
+  restrict_relation (cs_eq (CSetoid:=S)).
 
 Definition subcsetoid_ap : Crelation subcsetoid_crr :=
-  Crestrict_relation (cs_ap (c:=S)).
+  Crestrict_relation (cs_ap (CSetoid:=S)).
 
 (* End_SpecReals *)
 
