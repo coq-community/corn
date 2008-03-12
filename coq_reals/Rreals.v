@@ -1,5 +1,6 @@
 (* Copyright © 2008-2008
  * Cezary Kaliszyk
+ * Russell O'Connor
  *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +32,21 @@ Require Import Rcomplete.
 Require Import Rlimit.
 Require Import Rbasic_fun.
 Require Import Fourier.
+Require Import ConstructiveEpsilon.
+Require Import Rlogic.
+
+(** * Coq Real Numbers
+
+ Warning: The Coq real numbers depend on classical logic.  Importing this
+ module will give you classical logic, the axioms of Coq's real number
+ structure, plus all the logical consquences of these axioms.  To avoid
+ these consequences, use CoRN's real number structure [IR] instead.
+ 
+ Here we show that the real numbers from the Coq standard library form
+ a real number structure.  This is done in the usual way by building up
+ the algebraic heirarchy. *)
+
+(** ** Coq real numbers form a setoid *)
 
 Lemma R_is_CSetoid: is_CSetoid R (@eq R) (fun x y : R => x <> y).
 constructor.
@@ -71,6 +87,10 @@ Qed.
 Definition RSetoid : CSetoid := Build_CSetoid R (@eq R) (fun x y => x <> y) R_is_CSetoid.
 Canonical Structure RSetoid.
 
+(** ** Coq real numbers form a semigroup *)
+
+(** *** addition *)
+
 Lemma RPlus_is_setoid_bin_fun: bin_fun_strext RSetoid RSetoid RSetoid Rplus.
 unfold bin_fun_strext.
 intros x1 x2 y1 y2 H.
@@ -101,6 +121,8 @@ Qed.
 Definition RSemiGroup : CSemiGroup := Build_CSemiGroup RSetoid RPlus_sbinfun R_is_CSemiGroup.
 Canonical Structure RSemiGroup.
 
+(** ** Coq real numbers form a monoid *)
+
 Lemma R_is_CMonoid : is_CMonoid RSemiGroup (0%R).
 constructor.
 unfold is_rht_unit.
@@ -112,6 +134,10 @@ Qed.
 
 Definition RMonoid : CMonoid := Build_CMonoid _ _ R_is_CMonoid.
 Canonical Structure RMonoid.
+
+(** ** Coq real numbers form a group *)
+
+(** *** negation *)
 
 Lemma RNeg_sunop : fun_strext (S1:=RSetoid) (S2:=RSetoid) Ropp.
 unfold fun_strext.
@@ -135,6 +161,8 @@ Qed.
 Definition RGroup := Build_CGroup _ _ R_is_Group.
 Canonical Structure RGroup.
 
+(** ** Coq real numbers form an abelian group *)
+
 Lemma R_is_AbGroup : is_CAbGroup RGroup.
 unfold is_CAbGroup.
 unfold commutes.
@@ -144,6 +172,10 @@ Qed.
 
 Definition RAbGroup := Build_CAbGroup _ R_is_AbGroup.
 Canonical Structure RAbGroup.
+
+(** ** Coq real numbers form a ring *)
+
+(** *** multiplication *)
 
 Lemma RMul_is_csbinop : bin_fun_strext RSetoid RSetoid RSetoid Rmult.
 unfold bin_fun_strext.
@@ -189,6 +221,10 @@ Qed.
 Definition RRing := Build_CRing _ _ _ R_is_Ring.
 Canonical Structure RRing.
 
+(** ** Coq real numbers form a field *)
+
+(** *** reciprocal *)
+
 Definition Rrecip : forall x : RRing, x [#] Zero -> RRing := fun x _ => Rinv x.
 
 Lemma R_is_Field : is_CField RRing Rrecip.
@@ -212,6 +248,10 @@ Qed.
 
 Definition RField : CField := Build_CField _ _ R_is_Field R_is_Field2.
 Canonical Structure RField.
+
+(** ** Coq real numbers form an ordered field *)
+
+(** *** less-than *)
 
 Lemma Rlt_strext : Crel_strext RField Rlt.
 unfold Crel_strext.
@@ -243,6 +283,8 @@ left; rapply Rgt_not_eq; assumption.
 Qed.
 
 Definition Rless_rel : CCSetoid_relation RField := Build_CCSetoid_relation RField Rlt Rlt_strext.
+
+(** *** greater-than *)
 
 Lemma Rgt_strext : Crel_strext RField Rgt.
 intros x1 x2 y1 y2.
@@ -289,6 +331,8 @@ Qed.
 Definition ROrdField : COrdField := Build_COrdField _ _ _ _ _ R_is_OrdField.
 Canonical Structure ROrdField.
 
+(** ** Coq real numbers form a real number structure *)
+
 Lemma cauchy_prop_cauchy_crit : (CauchySeq ROrdField) ->
   forall s : (nat -> ROrdField), (Cauchy_prop (R:=ROrdField) s) -> (Rseries.Cauchy_crit s).
 intros x seq cprop.
@@ -317,6 +361,8 @@ simpl in *.
 fourier.
 Qed.
 
+(** *** limit *)
+
 Definition RLim : CauchySeq ROrdField -> ROrdField.
 intro x.
 elim x.
@@ -330,6 +376,8 @@ rapply (cauchy_prop_cauchy_crit x).
 exact cprop.
 Defined.
 
+(** INR is isomorphic to nring *)
+
 Lemma R_INR_as_IR : forall n : nat, INR n = nring (R:=RRing) n.
 induction n.
 simpl; trivial.
@@ -341,9 +389,6 @@ trivial.
 Qed.
 
 Hint Rewrite R_INR_as_IR : RtoIR.
-
-Require Import ConstructiveEpsilon.
-Require Import Rlogic.
 
 Lemma RisReals : is_CReals ROrdField RLim.
 constructor.
