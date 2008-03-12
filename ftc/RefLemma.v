@@ -40,7 +40,8 @@ Require Export RefSepRef.
 
 Section Refinement_Lemma.
 
-(** *The Refinement Lemmas
+(**
+* The Refinement Lemmas
 
 Here we resume the results proved in four different files.  The aim is to prove the following result (last part of Theorem 2.9 of Bishop 1967):
 

@@ -37,7 +37,8 @@
 Require Export CPoly_Degree.
 Require Export COrdFields2.
 
-(** * Polynomials apart from zero *)
+(**
+* Polynomials apart from zero *)
 
 Definition distinct1 (A : CSetoid) (f : nat -> A) := forall i j, i <> j -> f i [#] f j.
 

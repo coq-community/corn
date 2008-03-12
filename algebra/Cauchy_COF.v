@@ -315,7 +315,8 @@ End Group_Structure.
 
 Section Ring_Structure.
 
-(** ** Ring Structure
+(**
+** Ring Structure
 Same comments as previously.
 *)
 
@@ -564,7 +565,8 @@ End Ring_Structure.
 
 Section Field_Structure.
 
-(** ** Field Structure
+(**
+** Field Structure
 For the field structure, it is technically easier to first prove
 that our ring is actually an integral domain.  The rest then follows
 quite straightforwardly.
@@ -699,7 +701,8 @@ End Field_Structure.
 
 Section Order.
 
-(** ** Order Structure
+(**
+** Order Structure
 Finally, we extend the field structure with the ordering we
 defined at the beginning.
 *)

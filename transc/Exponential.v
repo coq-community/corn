@@ -38,11 +38,12 @@ Require Export TaylorSeries.
 
 Opaque Min Max.
 
-(** *Exponential and Logarithmic Functions
+(**
+* Exponential and Logarithmic Functions
 
 The main properties of the exponential and logarithmic functions.
 
-**Properties of Exponential
+** Properties of Exponential
 
 Exponential is strongly extensional and well defined.
 *)
@@ -476,7 +477,8 @@ intros x y; apply resp_leEq_char.
 intro H; apply Exp_resp_less; auto.
 Qed.
 
-(** **Properties of Logarithm
+(**
+** Properties of Logarithm
 
 The logarithm is a continuous function with derivative [One[/]x].
 *)

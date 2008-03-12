@@ -37,7 +37,8 @@
 Require Export Qmonoid.
 Require Import CGroups.
 
-(** **Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
+(**
+** Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
 The rational numbers with addition form a group. The inverse function is taking the opposite.
 *)
 

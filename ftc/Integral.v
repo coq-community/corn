@@ -114,7 +114,8 @@ End Lemmas.
 
 Section Integral.
 
-(** *Integral
+(**
+* Integral
 
 Having proved the main properties of partitions and refinements, we
 will define the integral of a continuous function [F] in the interval

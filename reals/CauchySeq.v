@@ -42,7 +42,8 @@
 
 Require Export CReals.
 
-(** *Real Number Structures
+(**
+* Real Number Structures
 %\begin{convention}% Let [IR] be a structure for real numbers.
 %\end{convention}%
 *)
@@ -67,7 +68,8 @@ Notation OneR := (One:IR).
 (* end hide *)
 
 Section CReals_axioms.
-(** ** [CReals] axioms *)
+(**
+** [CReals] axioms *)
 
 Lemma CReals_is_CReals : is_CReals IR (Lim (IR:=IR)).
 unfold Lim in |- *.
@@ -132,7 +134,8 @@ End CReals_axioms.
 
 Section Cauchy_Defs.
 
-(** ** Cauchy sequences
+(**
+** Cauchy sequences
 *** Alternative definitions
 This section gives several definitions of Cauchy sequences. There
 are no lemmas in this section.
@@ -206,7 +209,8 @@ Definition Cauchy_prop4 (seq : nat -> IR) := {y : IR | Cauchy_Lim_prop4 seq y}.
 End Cauchy_Defs.
 
 Section Inequalities.
-(** *** Inequalities of Limits
+(**
+*** Inequalities of Limits
 
 The next lemma is equal to lemma [Lim_Cauchy].  *)
 
@@ -499,7 +503,8 @@ End Inequalities.
 
 Section Equiv_Cauchy.
 
-(** *** Equivalence of formulations of Cauchy *)
+(**
+*** Equivalence of formulations of Cauchy *)
 
 Lemma Cauchy_prop1_prop : forall seq, Cauchy_prop1 seq -> Cauchy_prop seq.
 intros seq H.
@@ -800,7 +805,8 @@ End Equiv_Cauchy.
 
 Section Cauchy_props.
 
-(** *** Properties of Cauchy sequences
+(**
+*** Properties of Cauchy sequences
 
 Some of these lemmas are now obsolete, because they were reproved for arbitrary ordered fields$\ldots$#...#
 

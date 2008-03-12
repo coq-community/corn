@@ -39,12 +39,13 @@
 Require Export ZArith.
 Require Import CLogic.
 
-(** *[Z]
+(**
+* [Z]
 ** About [Z]
 We consider the implementation of integers as signed binary sequences (the 
 datatype [Z] as defined in [ZArith], in the standard library).
 
-***Apartness
+*** Apartness
 We define the apartness as the negation of the Leibniz equality:
 *)
 
@@ -109,7 +110,8 @@ apply Zgt_lt.
 exact (Zorder.Zgt_pos_0 1).
 Qed.
 
-(** ***Addition
+(**
+*** Addition
 Some properties of the addition. [Zplus] is also defined in the standard 
 library.
 *)
@@ -137,7 +139,8 @@ exact (f_equal2 Zplus e H0).
 auto.
 Qed.
 
-(** ***Multiplication
+(**
+*** Multiplication
 The multiplication is extensional:
 *)
 
@@ -155,7 +158,8 @@ exact (f_equal2 Zmult e H0).
 auto.
 Qed.
 
-(** ***Miscellaneous
+(**
+*** Miscellaneous
 *)
 
 

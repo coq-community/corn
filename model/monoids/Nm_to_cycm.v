@@ -39,7 +39,8 @@ Require Export Nmonoid.
 
 Section p71E1.
 
-(** **A function from the natural numbers to a cyclic monoid
+(**
+** A function from the natural numbers to a cyclic monoid
 %\begin{convention}%
 Let [M:CMonoid], [c:M] and 
 [is_generated_by: forall(m:M),{n:nat | (power_CMonoid c n)[=]m}].

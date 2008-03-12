@@ -43,7 +43,8 @@
 
 (* Begin_SpecReals *)
 
-(** *Setoids
+(**
+* Setoids
 Definition of a constructive setoid with apartness,
 i.e.%\% a set with an equivalence relation and an apartness relation compatible with it.
 *)
@@ -70,7 +71,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 (* end hide *)
 
-(** **Relations necessary for Setoids
+(**
+** Relations necessary for Setoids
 %\begin{convention}% Let [A:Type].
 %\end{convention}%
 
@@ -97,7 +99,8 @@ Set Strict Implicit.
 Unset Implicit Arguments.
 (* end hide *)
 
-(** **Definition of Setoid
+(**
+** Definition of Setoid
 
 Apartness, being the main relation, needs to be [CProp]-valued.  Equality,
 as it is characterized by a negative statement, lives in [Prop]. *)
@@ -169,7 +172,8 @@ End CSetoid_axioms.
 
 (* End_SpecReals *)
 
-(** **Setoid basics%\label{section:setoid-basics}%
+(**
+** Setoid basics%\label{section:setoid-basics}%
 %\begin{convention}% Let [S] be a setoid.
 %\end{convention}%
 *)
@@ -337,7 +341,8 @@ End CSetoid_basics.
 
 
 Section product_csetoid.
-(** **The product of setoids *)
+(**
+** The product of setoids *)
 
 Definition prod_ap (A B : CSetoid) (c d : prodT A B) : CProp.
 intros A B H0 H1.
@@ -494,7 +499,8 @@ Declare Right Step eq_transitive_unfolded.
 
 (* Begin_SpecReals *)
 
-(** **Relations and predicates
+(**
+** Relations and predicates
 Here we define the notions of well-definedness and strong extensionality
 on predicates and relations.
 
@@ -513,7 +519,8 @@ Variable S : CSetoid.
 
 (* End_SpecReals *)
 
-(** ***Predicates
+(**
+*** Predicates
 
 At this stage, we consider [CProp]- and [Prop]-valued predicates on setoids.
 
@@ -562,7 +569,8 @@ Definition pred_wd' : Prop := forall x y : S, P x -> x [=] y -> P y.
 
 End CSetoidPPredicates.
 
-(** ***Definition of a setoid predicate *)
+(**
+*** Definition of a setoid predicate *)
 
 Record CSetoid_predicate' : Type := 
  {csp'_pred   :> S -> Prop;
@@ -583,7 +591,8 @@ Qed.
 
 (* Begin_SpecReals *)
 
-(** ***Relations
+(**
+*** Relations
 %\begin{convention}%
 Let [R] be a relation on (the carrier of) [S].
 %\end{convention}% *)
@@ -650,7 +659,8 @@ Qed.
 
 End CsetoidRelations.
 
-(** ***Definition of a setoid relation
+(**
+*** Definition of a setoid relation
 The type of relations over a setoid.  *)
 
 Record CSetoid_relation : Type := 
@@ -659,7 +669,8 @@ Record CSetoid_relation : Type :=
    csr_wdl    :  rel_wdl csr_rel;
    csr_strext :  rel_strext csr_rel}.
 
-(** ***[CProp] Relations
+(**
+*** [CProp] Relations
 %\begin{convention}%
 Let [R] be a relation on (the carrier of) [S].
 %\end{convention}%
@@ -725,7 +736,8 @@ Qed.
 
 End CCsetoidRelations.
 
-(** ***Definition of a [CProp] setoid relation
+(**
+*** Definition of a [CProp] setoid relation
 
 The type of relations over a setoid.  *)
 
@@ -824,7 +836,8 @@ Declare Right Step ap_wdr_unfolded.
 
 (* End_SpecReals *)
 
-(** **Functions between setoids
+(**
+** Functions between setoids
 Such functions must preserve the setoid equality
 and be strongly extensional w.r.t.%\% the apartness, i.e.%\%
 if [f(x,y) [#] f(x1,y1)], then  [x [#] x1 + y [#] y1].
@@ -968,7 +981,8 @@ Implicit Arguments fun_strext [S1 S2].
 
 (* Begin_SpecReals *)
 
-(** **The unary and binary (inner) operations on a csetoid
+(**
+** The unary and binary (inner) operations on a csetoid
 An operation is a function with domain(s) and co-domain equal.
 
 %\begin{nameconvention}%
@@ -1120,7 +1134,8 @@ Implicit Arguments associative [S].
 
 Hint Resolve bin_op_wd_unfolded un_op_wd_unfolded: algebra_c.
 
-(** **The binary outer operations on a csetoid
+(**
+** The binary outer operations on a csetoid
 %\begin{convention}%
 Let [S1] and [S2] be setoids.
 %\end{convention}%
@@ -1154,7 +1169,8 @@ Hint Resolve csoo_wd_unfolded: algebra_c.
 
 (* Begin_SpecReals *)
 
-(** **Subsetoids
+(**
+** Subsetoids
 %\begin{convention}%
 Let [S] be a setoid, and [P] a predicate on the carrier of [S].
 %\end{convention}%
@@ -1237,7 +1253,8 @@ Definition Build_SubCSetoid : CSetoid := Build_CSetoid
 
 (* End_SpecReals *)
 
-(** ***Subsetoid unary operations
+(**
+*** Subsetoid unary operations
 %\begin{convention}%
 Let [f] be a unary setoid operation on [S].
 %\end{convention}%
@@ -1275,7 +1292,8 @@ Definition Build_SubCSetoid_un_op : CSetoid_un_op Build_SubCSetoid :=
 End SubCSetoid_unary_operations.
 
 
-(** ***Subsetoid binary operations
+(**
+*** Subsetoid binary operations
 %\begin{convention}%
 Let [f] be a binary setoid operation on [S].
 %\end{convention}%
@@ -1337,7 +1355,8 @@ Ltac Step_final x := apply eq_transitive_unfolded with x; algebra.
 
 Tactic Notation "Step_final" constr(c) :=  Step_final c.
 
-(** **Miscellaneous
+(**
+** Miscellaneous
 *)
 
 Lemma proper_caseZ_diff_CS : forall (S : CSetoid) (f : nat -> nat -> S),

@@ -40,7 +40,8 @@ Require Export Zfinsetoid.
 Require Export Nmonoid.
 Require Export ZBasics.
 
-(** *Cyclic CMonoids
+(**
+* Cyclic CMonoids
 Some specific lemmas about cyclic monoids.
 *)
 

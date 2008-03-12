@@ -38,7 +38,8 @@ Require Export Qabgroup.
 Require Import CRings.
 Require Import Zring.
 
-(** **Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
+(**
+** Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
 Because [Q] forms an abelian group with addition, a monoid with 
 multiplication and it satisfies the distributive law, it is a ring.
 *)

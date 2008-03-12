@@ -37,7 +37,8 @@
 Require Export IR_CPMSpace.
 
 Section prodpsmetrics.
-(** **Product-Pseudo-Metric-Spaces
+(**
+** Product-Pseudo-Metric-Spaces
 *)
 
 (**
@@ -198,7 +199,8 @@ Definition Prod0CPsMetricSpace (A B : CPsMetricSpace) :=
 End prodpsmetrics.
 
 Section subpsmetrics.
-(** **Sub-Pseudo-Metric-Spaces
+(**
+** Sub-Pseudo-Metric-Spaces
 *)
 
 (**

@@ -37,7 +37,8 @@
 Require Export Qgroup.
 Require Import CAbGroups.
 
-(** **Example of an abelian group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
+(**
+** Example of an abelian group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
 *)
 
 (** Addition is commutative, so the rationals form with the addition a 

@@ -38,7 +38,8 @@ Require Export CPoly_NthCoeff.
 Require Export CFields.
 Require Export Rational.
 
-(** *Degrees of Polynomials
+(**
+* Degrees of Polynomials
 ** Degrees of polynomials over a ring
 %\begin{convention}%
 Let [R] be a ring and write [RX] for the ring of polynomials
@@ -494,7 +495,8 @@ Hint Resolve degree_mult_aux: algebra.
 
 
 Section degree_props_Field.
-(** ** Degrees of polynomials over a field
+(**
+** Degrees of polynomials over a field
 %\begin{convention}% Let [F] be a field and write [FX] for the ring of
 polynomials over [F].
 %\end{convention}%

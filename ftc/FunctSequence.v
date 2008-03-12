@@ -39,7 +39,8 @@ Require Export PartInterval.
 
 Section Definitions.
 
-(** *Sequences of Functions
+(**
+* Sequences of Functions
 
 In this file we define some more operators on functions, namely
 sequences and limits.  These concepts are defined only for continuous
@@ -343,7 +344,8 @@ End More_Definitions.
 
 Section Irrelevance_of_Proofs.
 
-(** **Irrelevance of Proofs
+(**
+** Irrelevance of Proofs
 
 This section contains a number of technical results stating mainly that being a Cauchy sequence or converging to some limit is a property of the sequence itself and independent of the proofs we supply of its continuity or the continuity of its limit.
 *)
@@ -435,7 +437,8 @@ End More_Proof_Irrelevance.
 
 Section More_Properties.
 
-(** **Other Properties
+(**
+** Other Properties
 
 Still more technical details---a convergent sequence converges to its
 limit; the limit is a continuous function; and convergence is well
@@ -721,7 +724,8 @@ Hint Resolve Cauchy_cont_Lim: continuous.
 
 Section Algebraic_Properties.
 
-(** **Algebraic Properties
+(**
+** Algebraic Properties
 
 We now study how convergence is affected by algebraic operations, and some algebraic properties of the limit function.
 *)

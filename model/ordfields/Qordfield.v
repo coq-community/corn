@@ -37,7 +37,8 @@
 Require Export Qfield.
 Require Import COrdFields.
 
-(** **Example of an ordered field: $\langle$#&lang;#[Q],[[+]],[[*]],[[<]]$\rangle$#&rang;#
+(**
+** Example of an ordered field: $\langle$#&lang;#[Q],[[+]],[[*]],[[<]]$\rangle$#&rang;#
  [Q] is an archemaedian ordered field.
 *)
 

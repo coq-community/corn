@@ -40,7 +40,8 @@ Opaque Min.
 
 Section Taylor_Defs.
 
-(** *Taylor's Theorem
+(**
+* Taylor's Theorem
 
 We now prove Taylor's theorem for the remainder of the Taylor
 series.  This proof is done in two steps: first, we prove the lemma

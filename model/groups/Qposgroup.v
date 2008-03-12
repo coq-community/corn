@@ -37,7 +37,8 @@
 Require Export Qposmonoid.
 Require Export CGroups.
 
-(** **Example of a group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
+(**
+** Example of a group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
 The positive rational numbers form a multiplicative group.
 *)
 

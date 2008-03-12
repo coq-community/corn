@@ -282,11 +282,12 @@ Qed.
 
 End OrdField_basics.
 
-(***********************************)
+(*---------------------------------*)
 Section Basic_Properties_of_leEq.
-(***********************************)
+(*---------------------------------*)
 
-(** ** Basic properties of [ [<=] ]
+(**
+** Basic properties of [ [<=] ]
 *)
 
 Variable R : COrdField.
@@ -603,7 +604,8 @@ End up_to_four.
 
 Section More_than_four.
 
-(** *** Properties of some other numbers *)
+(**
+*** Properties of some other numbers *)
 
 Lemma pos_six : (Zero:R) [<] Six.
 exact (pos_Snring 5).
@@ -716,9 +718,9 @@ Qed.
 
 End consequences_of_infinity.
 
-(***********************************)
+(*---------------------------------*)
 Section Properties_of_Ordering.
-(***********************************)
+(*---------------------------------*)
 
 (**
 ** Properties of [[<]]

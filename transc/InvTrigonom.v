@@ -42,9 +42,10 @@ Require Export StrongIVT.
 (** printing ArcCos %\ensuremath{\arccos}% *)
 (** printing ArcTan %\ensuremath{\arctan}% *)
 
-(** *Inverse Trigonometric Functions
+(**
+* Inverse Trigonometric Functions
 
-**Definitions
+** Definitions
 
 We will now define arcsine, arccosine and arctangent as indefinite
 integrals and prove their main properties.  We begin by proving that
@@ -54,7 +55,7 @@ main properties of the function.
 Arccosine is defined in terms of arcsine by the relation
 [ArcCos(x)=Pi[/]Two-ArcSin(x)].
 
-***Arcsine
+*** Arcsine
 *)
 
 Opaque Sine Cosine Expon Logarithm.
@@ -143,7 +144,8 @@ Qed.
 Hint Resolve Derivative_ArcSin: derivate.
 Hint Resolve Continuous_ArcSin: continuous.
 
-(** ***Arccosine
+(**
+*** Arccosine
 *)
 
 Definition ArcCos := [-C-] (Pi [/]TwoNZ) {-}ArcSin.
@@ -176,7 +178,8 @@ astepl ( [--] (Part _ _ (ProjIR2 Hx))).
 Step_final ( [--] ((( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)) x Hx')).
 Qed.
 
-(** ***Arctangent
+(**
+*** Arctangent
 *)
 
 Lemma ArcTan_def_lemma : Continuous realline {1/} ( [-C-]One{+}FId{^}2).
@@ -216,11 +219,12 @@ Hint Resolve Continuous_ArcCos Continuous_ArcTan: continuous.
 
 Section Inverses.
 
-(** **Composition properties
+(**
+** Composition properties
 
 We now prove that this functions are in fact inverses to the corresponding trigonometric functions.
 
-***Sine and Arcsine
+*** Sine and Arcsine
 *)
 
 Lemma maps_Sin : maps_compacts_into (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) (olor [--]One One) Sine.
@@ -519,7 +523,8 @@ apply less_leEq; apply Exp_pos.
 simpl in |- *; algebra.
 Qed.
 
-(** ***Cosine and Arcosine
+(**
+*** Cosine and Arcosine
 *)
 
 Lemma ArcCos_Cos : forall x, Zero [<] x -> x [<] Pi -> forall H, ArcCos (Cos x) H [=] x.
@@ -599,7 +604,8 @@ simpl in |- *; unfold cg_minus in |- *; apply plus_resp_leEq_lft.
 apply inv_resp_leEq; apply ArcSin_resp_leEq; auto.
 Qed.
 
-(** ***Tangent and Arctangent
+(**
+*** Tangent and Arctangent
 *)
 
 Lemma maps_Tan : maps_compacts_into (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) realline Tang.

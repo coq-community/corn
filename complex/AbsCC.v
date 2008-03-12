@@ -36,7 +36,8 @@
 
 Require Export CComplex.
 
-(** * Absolute value on [CC]
+(**
+* Absolute value on [CC]
 ** Properties of [AbsCC] *)
 
 Section AbsCC_properties.
@@ -444,7 +445,8 @@ Hint Resolve cc_inv_abs cc_mult_abs cc_div_abs cc_div_abs' cc_pow_abs
   AbsCC_zero AbsCC_one AbsCC_IR AbsCC_mult_conj AbsCC_mult_square
   cc_recip_char: algebra.
 
-(** ** The triangle inequality *)
+(**
+** The triangle inequality *)
 
 Lemma triangle : forall x y : CC, AbsCC (x[+]y) [<=] AbsCC x[+]AbsCC y.
 intros.

@@ -37,7 +37,8 @@
 Require Export CPoly_Rev.
 Require Export FTAreg.
 
-(** * Fundamental Theorem of Algebra
+(**
+* Fundamental Theorem of Algebra
 %\begin{convention}% Let [n:nat] and [f] be a complex polynomial of
 degree [(S n)].
 %\end{convention}%

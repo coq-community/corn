@@ -37,7 +37,8 @@
 Require Export QSposmonoid.
 Require Import CGroups.
 
-(** **Example of a group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
+(**
+** Example of a group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
 The positive rationals form with the operation  $(x,y) \mapsto xy/2$ 
 #(x,y) &#x21A6; xy/2# a CGroup.
 *)

@@ -39,10 +39,12 @@
 
 Require Export OddPolyRootIR.
 
-(** * Roots of Real Numbers *)
+(**
+* Roots of Real Numbers *)
 
 Section NRoot.
-(** ** Existence of roots
+(**
+** Existence of roots
 
 %\begin{convention}% Let [n] be a natural number and [c] a nonnegative real.
 [p] is the auxiliary polynomial [_X_[^]n[-] (_C_ c)].
@@ -239,11 +241,12 @@ astepr (NRoot xpos kpos).
 auto.
 Qed.
 
-(***********************************)
+(*---------------------------------*)
 Section Square_root.
-(***********************************)
+(*---------------------------------*)
 
-(** ** Square root *)
+(**
+** Square root *)
 
 Definition sqrt x xpos : IR := NRoot (x:=x) (n:=2) xpos (lt_O_Sn 1).
 
@@ -343,7 +346,8 @@ Hint Resolve sqrt_sqr sqrt_mult: algebra.
 
 Section Absolute_Props.
 
-(** ** More on absolute value
+(**
+** More on absolute value
 
 With the help of square roots, we can prove some more properties of absolute 
 values in [IR].
@@ -650,7 +654,8 @@ End Absolute_Props.
 
 Section Consequences.
 
-(** **Cauchy sequences
+(**
+** Cauchy sequences
 
 With these results, we can also prove that the sequence of reciprocals of a 
 Cauchy sequence that is never zero and whose Limit is not zero is also a 

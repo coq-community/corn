@@ -36,7 +36,8 @@
 
 Require Export TaylorSeries.
 
-(** *The Trigonometric Functions
+(**
+* The Trigonometric Functions
 
 In this section, we explore the properties of the trigonometric functions which we previously defined.
 *)

@@ -39,7 +39,8 @@ Require Export DerivativeOps.
 
 Section Definitions.
 
-(** *Differentiability
+(**
+* Differentiability
 
 We will now use our work on derivatives to define a notion of
 differentiable function and prove its main properties.

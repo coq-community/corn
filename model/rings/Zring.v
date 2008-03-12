@@ -37,7 +37,8 @@
 Require Export Zabgroup.
 Require Import CRings.
 
-(** **Example of a ring: $\langle$#&lang;#[Z],[[+]],[[*]]$\rangle$#&rang;#
+(**
+** Example of a ring: $\langle$#&lang;#[Z],[[+]],[[*]]$\rangle$#&rang;#
 
 The multiplication and the addition are distributive.
 *)

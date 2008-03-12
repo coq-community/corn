@@ -43,7 +43,8 @@ Require Export NRootIR.
 
 Section Definitions.
 
-(** *Series of Real Numbers
+(**
+* Series of Real Numbers
 In this file we develop a theory of series of real numbers.
 ** Definitions
 
@@ -192,7 +193,8 @@ End More_Definitions.
 
 Section Power_Series.
 
-(** **Power Series
+(**
+** Power Series
 
 Power series are an important special case.
 *)
@@ -305,7 +307,8 @@ End Power_Series.
 
 Section Operations.
 
-(** **Operations
+(**
+** Operations
 
 Some operations with series preserve convergence.  We start by defining 
 the series that is zero everywhere.
@@ -525,7 +528,8 @@ End More_Operations.
 
 Section Almost_Everywhere.
 
-(** ** Almost Everywhere
+(**
+** Almost Everywhere
 
 In this section we strengthen some of the convergence results for sequences 
 and derive an important corollary for series.
@@ -632,7 +636,8 @@ End Cauchy_Almost_Everywhere.
 
 Section Convergence_Criteria.
 
-(** **Convergence Criteria
+(**
+** Convergence Criteria
 
 %\begin{convention}% Let [x:nat->IR].
 %\end{convention}%
@@ -931,7 +936,8 @@ End More_CC.
 
 Section Alternate_Series.
 
-(** **Alternate Series
+(**
+** Alternate Series
 
 Alternate series are a special case.  Suppose that [x] is nonnegative and 
 decreasing convergent to 0.
@@ -1279,7 +1285,8 @@ End Alternate_Series.
 
 Section Important_Numbers.
 
-(** **Important Numbers
+(**
+** Important Numbers
 
 We end this chapter by defining two important numbers in mathematics: [pi]
 and $e$#e#, both as sums of convergent series.

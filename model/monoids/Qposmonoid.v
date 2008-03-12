@@ -38,7 +38,8 @@
 Require Export Qpossemigroup.
 Require Import CMonoids.
 
-(** **Example of a monoid: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
+(**
+** Example of a monoid: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
 One is the unit for multiplication on positive integers. Therefore the positive rational numbers together with the multiplication are a CMonoid.
 *)
 

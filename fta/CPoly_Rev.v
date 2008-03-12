@@ -36,7 +36,8 @@
 
 Require Export CPoly_Degree.
 
-(** * Reverse of polynomials
+(**
+* Reverse of polynomials
 *)
 
 Section Monomials.

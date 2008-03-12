@@ -34,7 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
 
-(** * Continuity of polynomials *)
+(**
+* Continuity of polynomials *)
 
 Require Export RealFuncts.
 

@@ -51,7 +51,8 @@ Require Export Max.
 Require Export Min.
 Require Export List.
 
-(** *Basics
+(**
+* Basics
 This is random stuff that should be in the Coq basic library.
 *)
 
@@ -205,7 +206,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 (* end hide *)
 
-(** **Some results about [Z]
+(**
+** Some results about [Z]
 
 We consider the injection [inject_nat] from [nat] to [Z] as a
 coercion. *)

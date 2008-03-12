@@ -43,7 +43,8 @@ Require Export CComplex.
 Require Export Wf_nat.
 Require Export ArithRing.
 
-(** * Roots of Complex Numbers
+(**
+* Roots of Complex Numbers
 
 Properties of non-zero complex numbers
 *)
@@ -103,7 +104,8 @@ Qed.
 
 End Imag_to_Real.
 
-(** ** Roots of the imaginary unit *)
+(**
+** Roots of the imaginary unit *)
 
 Section NRootI.
 
@@ -205,7 +207,8 @@ Qed.
 
 End NRootI.
 
-(** ** Roots of complex numbers *)
+(**
+** Roots of complex numbers *)
 
 Section NRootCC_1.
 

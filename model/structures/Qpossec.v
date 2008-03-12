@@ -39,10 +39,11 @@
 Require Export Qsec.
 Require Import CLogic.
 
-(** **About [Qpos]
+(**
+** About [Qpos]
 We will prove some lemmas concerning rationals bigger than 0.
 
-***Constants
+*** Constants
 One, two and four are all bigger than zero.
 *)
 
@@ -75,7 +76,8 @@ intros H7.
 exact (H7 QZERO q i2).
 Qed.
 
-(** ***Multiplication
+(**
+*** Multiplication
 The product of two positive rationals is again positive.
 *)
 
@@ -86,7 +88,8 @@ exact H.
 exact H0.
 Qed.
 
-(** ***Inverse
+(**
+*** Inverse
 The inverse of a positive rational is again positive.
 *)
 
@@ -108,7 +111,8 @@ generalize i0.
 destruct x as [[num|x|num] den]; auto.
 Qed.
 
-(** ***Special multiplication
+(**
+*** Special multiplication
 Now we will investigate the function $(x,y) \mapsto xy/2$#(x,y)
 &#x21A6; xy/2#. We will see that its unit is 2. Its inverse map is $x
 \mapsto 4/x$ #x &#x21A6; 4/x#.

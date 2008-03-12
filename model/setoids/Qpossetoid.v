@@ -38,8 +38,9 @@ Require Export Qsetoid.
 Require Import CSetoidFun.
 Require Export Qpossec.
 
-(** **Example of a setoid: [Qpos]
-***Setoid
+(**
+** Example of a setoid: [Qpos]
+*** Setoid
 We will examine the subsetoid of positive rationals of the setoid of 
 rational numbers.
 *)
@@ -57,7 +58,8 @@ Definition QTWOpos := Build_subcsetoid_crr _ QposP QTWO pos_QTWO.
 
 Definition QFOURpos := Build_subcsetoid_crr _ QposP QFOUR pos_QFOUR.
 
-(** ***Multiplication
+(**
+*** Multiplication
 As we have seen, multiplication preserves positivity, so we can restrict it
  to the positive rationals. We see that this restricted multiplication has some
  nice properties.
@@ -83,7 +85,8 @@ intros.
 apply Qmult_is_assoc.
 Qed.
 
-(** ***Inverse
+(**
+*** Inverse
 We restrict the domain of the inverse to the set of positive rationals.
 *)
 
@@ -140,7 +143,8 @@ Qed.
 
 Definition Qpos_Qpos_inv_op := Build_CSetoid_un_op _ _ Qpos_Qpos_inv_strong_ext.
 
-(** ***Special multiplication and inverse
+(**
+*** Special multiplication and inverse
 We define [multdiv2]: $(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#.
 *)
 

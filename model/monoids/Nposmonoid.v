@@ -37,7 +37,8 @@
 Require Export Npossemigroup.
 Require Import CMonoids.
 
-(** **Example of a monoid: $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
+(**
+** Example of a monoid: $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
 One is the right unit as well as the left unit of the multiplication on the
 positive natural numbers.
 *)

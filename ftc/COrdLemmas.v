@@ -38,7 +38,8 @@ Require Export COrdCauchy.
 
 Section Lemmas.
 
-(** *Lemmas for Integration
+(**
+* Lemmas for Integration
 
 Here we include several lemmas valid in any ordered field [F] which 
 are useful for integration.
@@ -291,7 +292,8 @@ Hypothesis f_mon : forall i j : nat, i < j -> f i < f j.
 Variable h : nat -> F.
 (* end hide *)
 
-(** ** Summations
+(**
+** Summations
 Also, some technical stuff on sums.  The first lemma relates two
 different kinds of sums; the other two ones are variations, where the
 structure of the arguments is analyzed in more detail.

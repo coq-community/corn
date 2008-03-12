@@ -315,7 +315,8 @@ Qed.
 
 Section Tangent.
 
-(** **Derivative of Tangent
+(**
+** Derivative of Tangent
 
 Finally, two formulas for the derivative of the tangent function and
 monotonicity properties.

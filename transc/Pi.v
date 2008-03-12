@@ -39,7 +39,8 @@ Section Properties_of_Pi.
 
 (** printing Pi %\ensuremath{\pi}% #&pi;# *)
 
-(** **Definition of Pi
+(**
+** Definition of Pi
 
 [Pi] is defined as twice the first positive zero of the cosine.  In order to do this, we follow the construction described in Bishop 1969, section 7.
 *)
@@ -566,7 +567,8 @@ Hint Resolve Cos_HalfPi: algebra.
 
 Section Pi_and_Order.
 
-(** **Properties of Pi
+(**
+** Properties of Pi
 
 The following are trivial ordering properties of multiples of [Pi]
 that will be used so often that it is convenient to state as lemmas;
@@ -695,7 +697,8 @@ Ltac PiSolve := try apply less_leEq; auto with piorder.
 
 Section Sin_And_Cos.
 
-(** **More formulas
+(**
+** More formulas
 
 We now move back to trigonometric identities: sine, cosine and tangent of
 the double.

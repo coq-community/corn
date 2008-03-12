@@ -37,7 +37,8 @@
 Require Export Nsetoid.
 Require Import CSemiGroups.
 
-(** **Example of a semi-group: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
+(**
+** Example of a semi-group: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
 *)
 
 (** Because addition is associative, the natural numbers form a CSemiGroup.

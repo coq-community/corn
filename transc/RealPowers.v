@@ -41,9 +41,10 @@ Require Export Exponential.
 
 Opaque Expon.
 
-(** *Arbitrary Real Powers
+(**
+* Arbitrary Real Powers
 
-**Powers of Real Numbers
+** Powers of Real Numbers
 
 We now define
 $x^y=e^{y\times\log(x)}$#x<sup>y</sup>=e<sup>y*log(x)</sup>#, whenever
@@ -221,7 +222,8 @@ Hint Resolve power_div: algebra.
 
 Section Power_Function.
 
-(** **Power Function
+(**
+** Power Function
 
 This operation on real numbers gives birth to an analogous operation
 on partial functions which preserves continuity.

@@ -38,7 +38,8 @@
 Require Export Qposgroup.
 Require Import CAbGroups.
 
-(** **Example of an abelian group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
+(**
+** Example of an abelian group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
 The positive rationals form with the multiplication a CAbgroup.
 *)
 

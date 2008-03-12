@@ -42,7 +42,8 @@ Require Export DiffTactics1.
 Section Definitions.
 
 
-(** *Equality of Partial Functions
+(**
+* Equality of Partial Functions
 
 ** Definitions
 
@@ -87,7 +88,8 @@ End Definitions.
 
 Section Equality_Results.
 
-(** **Properties of Inclusion
+(**
+** Properties of Inclusion
 
 We will now prove the main properties of the equality relation.
 
@@ -160,7 +162,8 @@ Section Away_from_Zero.
 
 Section Definitions.
 
-(** **Away from Zero
+(**
+** Away from Zero
 
 Before we prove our main results about the equality we have to do some
 work on division.  A function is said to be bounded away from zero in
@@ -289,7 +292,8 @@ End Away_from_Zero.
 Hint Resolve bnd_imp_inc_recip bnd_imp_inc_div: included.
 Hint Immediate bnd_in_P_imp_ap_zero: included.
 
-(** ** The [FEQ] tactic
+(**
+** The [FEQ] tactic
 This tactic splits a goal of the form [Feq I F G] into the three subgoals
 [included I (Dom F)], [included I (Dom G)] and [forall x, F x [=] G x]
 and applies [Included] to the first two and [rational] to the third.
@@ -302,7 +306,8 @@ Ltac FEQ := apply eq_imp_Feq;
 
 Section More_on_Equality.
 
-(** **Properties of Equality
+(**
+** Properties of Equality
 
 We are now finally able to prove the main properties of the equality relation.  We begin by showing it to be an equivalence relation.
 
@@ -471,7 +476,8 @@ End More_on_Equality.
 
 Section Nth_Power.
 
-(** **Nth Power
+(**
+** Nth Power
 
 We finish this group of lemmas with characterization results for the
 power function (similar to those already proved for arbitrary rings).

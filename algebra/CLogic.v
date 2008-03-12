@@ -51,7 +51,8 @@ Require Export ZArithRing.
 Require Export Div2.
 Require Export Wf_nat.
 
-(** *Extending the Coq Logic
+(**
+* Extending the Coq Logic
 Because notions of apartness and order have computational meaning, we
 will have to define logical connectives in [Type].  In order to
 keep a syntactic distinction between types of terms, we define [CProp]
@@ -92,7 +93,8 @@ version.
 Definition CProp := Type.
 
 Section Basics.
-(** ** Basics
+(**
+** Basics
 Here we treat conversion from [Prop] to [CProp] and vice versa,
 and some basic connectives in [CProp].
 *)

@@ -40,7 +40,8 @@ Require Export Nfinsetoid.
 
 Section p70text.
 
-(** **A morphism from the natural numbers to the free setoid with one element
+(**
+** A morphism from the natural numbers to the free setoid with one element
 *)
 
 Let A:= (CSetoid_of_less 1).

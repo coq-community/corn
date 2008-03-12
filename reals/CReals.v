@@ -38,7 +38,8 @@
 
 Require Export COrdCauchy.
 
-(** * Definition of the notion of reals
+(**
+* Definition of the notion of reals
 The reals are defined as a Cauchy-closed Archimedean constructive 
 ordered field in which we have a maximum function. The maximum
 function is definable, using countable choice, but in a rather tricky

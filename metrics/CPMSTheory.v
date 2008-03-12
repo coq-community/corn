@@ -37,7 +37,8 @@
 Require Export Prod_Sub.
 
 Section lists.
-(** **Lists
+(**
+** Lists
 *)
 
 (**
@@ -166,7 +167,8 @@ Qed.
 End lists.
 
 Section loc_and_bound.
-(** **Pseudo Metric Space theory
+(**
+** Pseudo Metric Space theory
 *)
 
 Definition Re_co_do (X Z : CSetoid) (f : CSetoid_fun X Z) :

@@ -42,7 +42,8 @@ Opaque Min Max.
 
 Section Basic_Results.
 
-(** *More about Functions
+(**
+* More about Functions
 
 Here we state all the main results about properties of functions that
 we already proved for compact intervals in the more general setting of
@@ -311,7 +312,8 @@ Hint Resolve Continuous_Sum0 Continuous_Sumx Continuous_Sum: continuous.
 
 Section Basic_Properties.
 
-(** **Derivative
+(**
+** Derivative
 
 Derivative is not that much different.
 
@@ -608,7 +610,8 @@ End More_Sums.
 
 Section Diffble_Basic_Properties.
 
-(** **Differentiability
+(**
+** Differentiability
 
 Mutatis mutandis for differentiability.
 *)
@@ -796,7 +799,8 @@ End Diffble_Corollaries.
 
 Section Nth_Derivative.
 
-(** **Nth Derivative
+(**
+** Nth Derivative
 
 Higher order derivatives pose more interesting problems.  It turns out that it really becomes necessary to generalize our [n_deriv] operator to any interval.
 *)

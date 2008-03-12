@@ -38,8 +38,9 @@ Require Export CSemiGroups.
 Require Import Nsemigroup.
 Require Export Npossetoid.
 
-(** **Examples of semi-groups:  $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
-***$\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
+(**
+** Examples of semi-groups:  $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
+*** $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
 The positive natural numbers form together with addition a subsemigroup 
  of the semigroup of the natural numbers with addition.
 *)
@@ -47,7 +48,8 @@ The positive natural numbers form together with addition a subsemigroup
 Definition Npos_as_CSemiGroup := Build_SubCSemiGroup
  nat_as_CSemiGroup NposP plus_resp_Npos.
 
-(** ***$\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
+(**
+*** $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#
 Also together with multiplication, the positive numbers form a semigroup.
 *)
 

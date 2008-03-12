@@ -41,7 +41,8 @@ Opaque Min Max.
 
 Section Various_Theorems.
 
-(** *Calculus Theorems
+(**
+* Calculus Theorems
 
 This file is intended to present a collection of miscellaneous, mostly
 technical results in differential calculus that are interesting or

@@ -38,7 +38,8 @@ Require Export CSetoidFun.
 
 Section p68E1b1.
 
-(** **Example of a setoid: setoids with two elements
+(**
+** Example of a setoid: setoids with two elements
 *)
 
 Inductive M1:Set :=

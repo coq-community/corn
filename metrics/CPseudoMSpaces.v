@@ -36,11 +36,13 @@
 
 Require Export Intervals.
 
-(** *Metric Spaces
+(**
+* Metric Spaces
 *)
 
 Section Relations.
-(** **Relations necessary for Pseudo Metric Spaces and Metric Spaces
+(**
+** Relations necessary for Pseudo Metric Spaces and Metric Spaces
 %\begin{convention}%
 Let [A : CSetoid], [d : (CSetoid_bin_fun A A IR)].
 %\end{convention}%
@@ -72,7 +74,8 @@ Definition apdiag_imp_grzero (X : CSetoid) (d : CSetoid_bin_fun X X IR) :
 End Relations.
 
 Section Definition_PsMS0.
-(** **Definition of Pseudo Metric Space
+(**
+** Definition of Pseudo Metric Space
 *)
 (**
 A pseudo metric space consists of a setoid and a %''pseudo metric''% #"pseudo metric"#, also called
@@ -98,7 +101,8 @@ Infix "[-d]" := cms_d (at level 68, left associativity).
 
 
 Section PsMS_axioms.
-(** **Pseudo Metric Space axioms
+(**
+** Pseudo Metric Space axioms
 %\begin{convention}%
 Let [A] be a pseudo metric space.
 %\end{convention}%
@@ -131,7 +135,8 @@ Qed.
 End PsMS_axioms.
 
 Section PsMS_basics.
-(** **Pseudo Metric Space basics
+(**
+** Pseudo Metric Space basics
 %\begin{convention}%
 Let [Y] be a pseudo metric space.
 %\end{convention}%
@@ -256,7 +261,8 @@ Qed.
 End PsMS_basics.
 
 Section Zerof.
-(** **Zero function
+(**
+** Zero function
 *)
 (**
 Every setoid forms with the binary function that always returns zero, 

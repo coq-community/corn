@@ -38,7 +38,8 @@
 Require Export QSpossemigroup.
 Require Import CMonoids.
 
-(** **Example of a monoid: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
+(**
+** Example of a monoid: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
 Two is the unit of the operation  $(x,y) \mapsto xy/2$ #(x,y) 
   &#x21A6; xy/2# on the positive rationals. So we have another monoid structure on the positive rational numbers.
 *)                              

@@ -37,7 +37,8 @@
 Require Export CPoly_Contin.
 
 Section Nested_Intervals.
-(** * Intermediate Value Theorem
+(**
+* Intermediate Value Theorem
 
 ** Nested intervals
 
@@ -231,7 +232,8 @@ End Nested_Intervals.
 
 Section Bisection.
 
-(** ** Bissections *)
+(**
+** Bissections *)
 
 Variable f : CSetoid_un_op IR.
 Hypothesis f_apzero_interval :
@@ -366,7 +368,8 @@ End Bisect_Interval.
 
 Section IVT_Op.
 
-(** ** IVT for operations
+(**
+** IVT for operations
 Same conventions as before.
 *)
 
@@ -509,7 +512,8 @@ End IVT_Op.
 
 Section IVT_Poly.
 
-(** ** IVT for polynomials *)
+(**
+** IVT for polynomials *)
 
 Lemma Civt_poly : forall f : cpoly_cring IR, f [#] Zero ->
  forall a b, a [<] b -> f ! a [<=] Zero -> Zero [<=] f ! b -> {x : IR | a [<=] x /\ x [<=] b /\ f ! x [=] Zero}.

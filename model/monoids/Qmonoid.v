@@ -38,8 +38,9 @@
 Require Export Qsemigroup.
 Require Import CMonoids.
 
-(** **Examples of a monoid: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
-***$\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
+(**
+** Examples of a monoid: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
+*** $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
 The rational numbers form with addition a CMonoid. [QZERO] is the unit.
 *)
 
@@ -64,7 +65,8 @@ Definition Q_as_CMonoid := Build_CMonoid Q_as_CSemiGroup _ Q_is_CMonoid.
 
 Canonical Structure Q_as_CMonoid.
 
-(** ***$\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
+(**
+*** $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
 Also with multiplication Q forms a CMonoid. Here, the unit is [QONE].
 *)
 

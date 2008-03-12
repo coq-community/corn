@@ -39,7 +39,8 @@ Require Export COrdAbs.
 
 Section OrdField_Cauchy.
 
-(** **Cauchy sequences
+(**
+** Cauchy sequences
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)

@@ -37,7 +37,8 @@
 Require Export Nsemigroup.
 Require Import CMonoids.
 
-(** **Example of a monoid: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
+(**
+** Example of a monoid: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
 Zero is an unit for the addition.
 *)
 

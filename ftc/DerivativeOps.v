@@ -38,7 +38,8 @@ Require Export Derivative.
 
 Section Lemmas.
 
-(** **Algebraic Operations
+(**
+** Algebraic Operations
 
 We will now prove the main results about deriving functions built from
 the algebraic operators#. #%\footnote{%Composition presents some
@@ -89,7 +90,8 @@ Hint Resolve bnd_away_zero_square: included.
 
 Section Local_Results.
 
-(** **Local Results
+(**
+** Local Results
 
 We can now derive all the usual rules for deriving constant and identity functions, sums, inverses and products of functions with a known derivative.
 *)

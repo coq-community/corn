@@ -38,7 +38,8 @@
 Require Export Zgroup.
 Require Import CAbGroups.
 
-(** **Example of an abelian group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
+(**
+** Example of an abelian group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 *)
 
 Lemma Z_is_CAbGroup : is_CAbGroup Z_as_CGroup. 

@@ -43,7 +43,8 @@ Opaque Min.
 
 Section Indefinite_Integral.
 
-(** *The Fundamental Theorem of Calculus
+(**
+* The Fundamental Theorem of Calculus
 
 Finally we can prove the fundamental theorem of calculus and its most
 important corollaries, which are the main tools to formalize most of
@@ -99,7 +100,8 @@ Notation "[-S-] F" := (Fprim F) (at level 20).
 
 Section FTC.
 
-(** **The FTC
+(**
+** The FTC
 
 We can now prove our main theorem.  We begin by remarking that the
 primitive function is always continuous.
@@ -325,7 +327,8 @@ Hint Resolve FTC1: derivate.
 
 Section Limit_of_Integral_Seq.
 
-(** **Corollaries
+(**
+** Corollaries
 
 With these tools in our hand, we can prove several useful results.
 

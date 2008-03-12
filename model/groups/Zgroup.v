@@ -38,7 +38,8 @@
 Require Export Zmonoid.
 Require Import CGroups.
 
-(** **Example of a group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
+(**
+** Example of a group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 *)
 
 Lemma Z_is_CGroup : is_CGroup Z_as_CMonoid Zopp_is_fun. 

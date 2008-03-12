@@ -41,7 +41,8 @@ Require Export NRootIR.
 (** printing p3m %\ensuremath{\frac13\hat{\ }}% *)
 (** printing Halfeps %\ensuremath{\frac\varepsilon2}% *)
 
-(** * Technical lemmas for the FTA
+(**
+* Technical lemmas for the FTA
 ** Key Lemma
 *)
 

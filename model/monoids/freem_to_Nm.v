@@ -39,7 +39,8 @@ Require Export Nmonoid.
 
 Section p71E2.
 
-(** **A morphism from a free monoid to the natural numbers
+(**
+** A morphism from a free monoid to the natural numbers
 %\begin{convention}%
 Let [A:CSetoid].
 %\end{convention}%

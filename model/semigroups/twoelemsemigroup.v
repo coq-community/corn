@@ -39,7 +39,8 @@ Require Export twoelemsetoid.
 
 Section p68E1b1.
 
-(** **Example of a semigroup: semigroups with two elements
+(**
+** Example of a semigroup: semigroups with two elements
 *)
 
 Lemma M1_is_CSemiGroup:(is_CSemiGroup M1_as_CSetoid M1_mult_as_bin_fun).

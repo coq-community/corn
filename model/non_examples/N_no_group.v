@@ -38,7 +38,8 @@
 Require Export Nmonoid.
 Require Import CGroups.
 
-(** **Non-example of a group: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
+(**
+** Non-example of a group: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#
 There is no inverse function for the natural numbers with addition.
 *)
 
