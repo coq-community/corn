@@ -46,8 +46,9 @@ Require Import Peano_dec.
 Require Import Zsec.
 Require Export QArith.
 
-(** *[Q]
-**About [Q]
+(**
+* [Q]
+** About [Q]
 We define the structure of rational numbers as follows. First of all,
 it consists of the set of rational numbers, defined as the set of
 pairs $\langle a,n\rangle$#&lang;a,n&rang;# with [a:Z] and
@@ -71,14 +72,16 @@ End Q.
 
 Infix "/=" := Qap (no associativity, at level 70) : Q_scope.
 
-(** ***Constants
+(**
+*** Constants
 *)
 
 Definition QTWO := Qmake 2%positive 1%positive.
 
 Definition QFOUR := Qmake 4%positive 1%positive.
 
-(** ***Equality
+(**
+*** Equality
 Here we prove that [QONE] is #<i>#%\emph{%not equal%}%#</i># to [QZERO]: 
 *)
 
@@ -157,7 +160,8 @@ Proof.
  assumption.
 Qed.
 
-(** ***Apartness
+(**
+*** Apartness
 *)
 
 
@@ -241,7 +245,8 @@ Proof.
  assumption.
 Qed.
 
-(** ***Addition
+(**
+*** Addition
 *)
 
 Theorem Qplus_simpl : forall n m p q : Q,
@@ -352,7 +357,8 @@ change
 ring.
 Qed.
 
-(** ***Opposite
+(**
+*** Opposite
  [-] is a well defined unary operation: 
 *)
 
@@ -379,7 +385,8 @@ Proof.
  ring.
 Qed.
 
-(** ***Multiplication
+(**
+*** Multiplication
 Next we shall prove the properties of multiplication. First we prove
 that [*] is well-defined
 *)
@@ -534,7 +541,8 @@ apply Zsgn_3.
 intro; elim H; auto.
 Qed.
 
-(** ***Inverse
+(**
+*** Inverse
 *)
 
 
@@ -556,7 +564,8 @@ assumption.
 Qed.
 
 
-(** ***Less-than
+(**
+*** Less-than
 *)
 
 Lemma Qlt_wd_right : forall x y z : Q, (x<y) -> (y==z) -> x<z.
@@ -1128,7 +1137,8 @@ apply sym_Qeq.
 assumption.
 Qed.
 
-(** ***Miscellaneous
+(**
+*** Miscellaneous
 We consider the injection [inject_Z] from [Z] to [Q] as a coercion.
 *)
 

@@ -41,7 +41,8 @@ Section Maps_into_Compacts.
 
 Section Part_Funct.
 
-(** *Composition
+(**
+* Composition
 
 Preservation results for functional composition are treated in this
 separate file.  We start by defining some auxiliary predicates, and
@@ -138,7 +139,8 @@ End Mapping.
 
 Section Interval_Continuity.
 
-(** **Continuity
+(**
+** Continuity
 
 We now prove that the composition of two continuous partial functions is continuous.
 *)
@@ -194,7 +196,8 @@ End Interval_Continuity.
 
 Section Derivative.
 
-(** **Derivative
+(**
+** Derivative
 
 We now work with the derivative relation and prove the chain rule for partial functions.
 *)
@@ -392,7 +395,8 @@ End Derivative.
 
 Section Differentiability.
 
-(** **Differentiability
+(**
+** Differentiability
 
 Finally, we move on to differentiability.
 *)
@@ -669,7 +673,8 @@ End Series.
 
 Section Generalized_Intervals.
 
-(** **Generalizations
+(**
+** Generalizations
 
 We now generalize this results to arbitrary intervals.  We begin by generalizing the notion of mapping compacts into compacts.
 

@@ -37,7 +37,8 @@
 Require Export Qring.
 Require Import CFields.
 
-(** **Example of a field: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
+(**
+** Example of a field: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
 As we have seen, there is a inverse for the multiplication for non-zeroes.
 So, [Q] not only forms a ring, but even a field.
 *)

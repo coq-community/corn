@@ -549,7 +549,8 @@ End AbsSmall_properties.
 Declare Left Step AbsSmall_wdl_unfolded.
 Declare Right Step AbsSmall_wdr_unfolded.
 
-(** ** Properties of [AbsBig] *)
+(**
+** Properties of [AbsBig] *)
 
 Definition absBig (R : COrdField) (e x : R) : CProp :=
  Zero [<] e and (e [<=] x or x [<=] [--]e).

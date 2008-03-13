@@ -41,7 +41,8 @@ Require Export MoreFunctions.
 
 Section Definitions.
 
-(** *More on Sequences and Series
+(**
+* More on Sequences and Series
 
 We will now extend our convergence definitions and results for
 sequences and series of functions defined in compact intervals to
@@ -52,11 +53,11 @@ arbitrary intervals.
 will be continuous (in [J]) functions.
 %\end{convention}%
 
-**Sequences
+** Sequences
 
 First we will consider the case of sequences.
 
-***Definitions
+*** Definitions
 
 Some of the definitions do not make sense in this more general setting
 (for instance, because the norm of a function is no longer defined),
@@ -178,7 +179,8 @@ End More_Definitions.
 
 Section Irrelevance_of_Proofs.
 
-(** ***Basic Properties
+(**
+*** Basic Properties
 
 Proofs are irrelevant as before---they just have to be present.
 *)
@@ -316,7 +318,8 @@ Hint Resolve Cauchy_cont_Lim_IR: continuous.
 
 Section Algebraic_Properties.
 
-(** ***Algebraic Properties
+(**
+*** Algebraic Properties
 
 Algebraic operations still work well.
 *)
@@ -540,7 +543,8 @@ End More_Algebraic_Properties.
 
 Section Other.
 
-(** ***Miscellaneous
+(**
+*** Miscellaneous
 
 Finally, we define a mapping between sequences of real numbers and sequences of (constant) functions and prove that convergence is preserved.
 *)
@@ -622,7 +626,8 @@ End Other.
 
 Section Series_Definitions.
 
-(** **Series
+(**
+** Series
 
 We now consider series of functions defined in arbitrary intervals.
 
@@ -776,7 +781,8 @@ Hint Resolve convergent_imp_Continuous Continuous_FSeries_Sum: continuous.
 
 Section Operations.
 
-(** **Algebraic Operations
+(**
+** Algebraic Operations
 
 Convergence is well defined and preserved by operations.
 *)
@@ -928,7 +934,8 @@ End Operations.
 
 Section Convergence_Criteria.
 
-(** ***Convergence Criteria
+(**
+*** Convergence Criteria
 
 The most important tests for convergence of series still apply: the
 comparison test (in both versions) and the ratio test.
@@ -1030,7 +1037,8 @@ End Power_Series.
 
 Section Insert_Series.
 
-(** ***Translation
+(**
+*** Translation
 
 When working in particular with power series and Taylor series, it is 
 sometimes useful to ``shift'' all the terms in the series one position 

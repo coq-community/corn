@@ -471,7 +471,8 @@ stepr (nring (Z_to_nat z0):IR) by auto with *.
 apply nring_nonneg.
 Qed.
 
-(** **Derivative of Tangent
+(**
+** Derivative of Tangent
 
 Finally, two formulas for the derivative of the tangent function and
 monotonicity properties.

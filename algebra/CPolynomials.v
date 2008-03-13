@@ -42,7 +42,8 @@
 
 Require Export RingReflection.
 
-(** * Polynomials
+(**
+* Polynomials
 The first section only proves the polynomials form a ring, and nothing more
 interesting.
 Section%~\ref{section:poly-equality}% gives some basic properties of
@@ -121,7 +122,8 @@ simple induction p; auto.
 simple induction q; auto.
 Qed.
 
-(** *** The polynomials form a setoid
+(**
+*** The polynomials form a setoid
 *)
 Fixpoint cpoly_eq_zero (p : cpoly) : Prop :=
   match p with
@@ -1018,7 +1020,8 @@ Qed.
 
 Definition cpoly_cmonoid := Build_CMonoid _ _ cpoly_cm_proof.
 
-(** *** The polynomials form a group
+(**
+*** The polynomials form a group
 *)
 
 Fixpoint cpoly_inv (p : cpoly) : cpoly :=
@@ -1125,7 +1128,8 @@ Qed.
 
 Definition cpoly_cabgroup := Build_CAbGroup _ cpoly_cag_proof.
 
-(** *** The polynomials form a ring
+(**
+*** The polynomials form a ring
 *)
 
 Fixpoint cpoly_mult_cr (q : cpoly) (c : CR) {struct q} : cpoly :=
@@ -1855,7 +1859,8 @@ Implicit Arguments cpoly_linear_fun' [CR].
 Infix "[+X*]" := cpoly_linear_fun' (at level 50, left associativity).
 
 
-(** ** Apartness, equality, and induction
+(**
+** Apartness, equality, and induction
 %\label{section:poly-equality}%
 *)
 
@@ -2189,7 +2194,8 @@ Qed.
 
 Hint Resolve lin_mult: algebra.
 
-(** *** Application of polynomials
+(**
+*** Application of polynomials
 *)
 
 Lemma poly_eq_zero : forall p : RX, p [=] cpoly_zero R -> forall x, p ! x [=] Zero.
@@ -2389,7 +2395,8 @@ Qed.
 
 End Poly_properties.
 
-(** ** Induction properties of polynomials for [Prop]
+(**
+** Induction properties of polynomials for [Prop]
 *)
 Section Poly_Prop_Induction.
 

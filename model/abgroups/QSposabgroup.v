@@ -38,7 +38,8 @@
 Require Export QSposgroup.
 Require Import CAbGroups.
 
-(** **Example of an abelian group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
+(**
+** Example of an abelian group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
 The positive rational numbers form with the operation  $(x,y) \mapsto xy/2$  #(x,y) &#x21A6; xy/2# an abelian group.
 *)
 

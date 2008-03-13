@@ -38,9 +38,9 @@ Require Export COrdFields.
 (** printing one_div_succ %\ensuremath{\frac1{\cdot+1}}% *)
 (** printing Half %\ensuremath{\frac12}% #&frac12;# *)
 
-(***********************************)
+(*---------------------------------*)
 Section Properties_of_leEq.
-(***********************************)
+(*---------------------------------*)
 
 (**
 ** Properties of [[<=]]
@@ -840,9 +840,9 @@ Qed.
 
 End Properties_of_leEq.
 
-(***********************************)
+(*---------------------------------*)
 Section PosP_properties.
-(***********************************)
+(*---------------------------------*)
 
 (**
 ** Properties of positive numbers

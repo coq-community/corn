@@ -44,7 +44,8 @@
 
 Require Export NRootIR.
 
-(** * Complex Numbers
+(**
+* Complex Numbers
 ** Algebraic structure
 *)
 
@@ -367,7 +368,8 @@ Definition II : CC := cc_i.
 
 Infix "[+I*]" := cc_set_CC (at level 48, no associativity).
 
-(** ** Properties of [II] *)
+(**
+** Properties of [II] *)
 
 Section I_properties.
 
@@ -400,7 +402,8 @@ Lemma I_wd : forall x x' y y' : IR, x [=] x' -> y [=] y' -> x[+I*]y [=] x'[+I*]y
 simpl in |- *. unfold cc_eq in |- *. simpl in |- *. algebra.
 Qed.
 
-(** ** Properties of [Re] and [Im] *)
+(**
+** Properties of [Re] and [Im] *)
 
 Lemma calculate_norm : forall x y : IR, (x[+I*]y) [*]CC_conj (x[+I*]y) [=] cc_IR (x[^]2[+]y[^]2).
 intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; rational.
@@ -456,7 +459,8 @@ Hint Resolve I_square I_square' I_recip_lft I_recip_rht mult_I calculate_norm
   cc_calculate_square: algebra.
 Hint Resolve I_wd Re_wd Im_wd: algebra_c.
 
-(** ** Properties of conjugation *)
+(**
+** Properties of conjugation *)
 
 Section Conj_properties.
 
@@ -508,7 +512,8 @@ End Conj_properties.
 Hint Resolve CC_conj_plus CC_conj_mult CC_conj_nexp CC_conj_conj
   CC_conj_zero: algebra.
 
-(** ** Properties of the real axis *)
+(**
+** Properties of the real axis *)
 
 Section cc_IR_properties.
 
@@ -592,7 +597,8 @@ Hint Resolve cc_IR_mult cc_IR_nexp cc_IR_mult_lft cc_IR_mult_rht cc_IR_plus
   cc_IR_minus: algebra.
 Hint Resolve cc_IR_nring cc_IR_zero: algebra.
 
-(** ** [CC] has characteristic zero *)
+(**
+** [CC] has characteristic zero *)
 
 Load "Transparent_algebra".
 Lemma char0_CC : Char0 CC.

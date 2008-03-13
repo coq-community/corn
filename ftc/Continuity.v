@@ -42,7 +42,8 @@ Require Import CornTac.
 
 Section Definitions_and_Basic_Results.
 
-(** *Continuity
+(**
+* Continuity
 
 Constructively, continuity is the most fundamental property of any
 function---so strongly that no example is known of a constructive
@@ -353,7 +354,8 @@ Implicit Arguments Norm_Funct [a b Hab F].
 
 Section Local_Results.
 
-(** **Algebraic Properties
+(**
+** Algebraic Properties
 
 We now state and prove some results about continuous functions.  Assume that [I] is included in the domain of both [F] and [G].
 *)

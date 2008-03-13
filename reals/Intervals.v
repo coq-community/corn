@@ -39,7 +39,8 @@ Require Export RealLists.
 
 Section Intervals.
 
-(** * Intervals
+(**
+* Intervals
 In this section we define (compact) intervals of the real line and
 some useful functions to work with them.
 
@@ -178,7 +179,8 @@ Hint Resolve included_refl' compact_map1 compact_map2 compact_map3 : included.
 
 Section Totally_Bounded.
 
-(** ** Totally Bounded
+(**
+** Totally Bounded
 
 Totally bounded sets will play an important role in what is
 to come.  The definition (equivalent to the classical one) states that
@@ -777,7 +779,8 @@ End Totally_Bounded.
 
 Section Compact.
 
-(** ** Compact sets
+(**
+** Compact sets
 
 In this section we dwell a bit farther into the definition of compactness
 and explore some of its properties.

@@ -40,7 +40,8 @@ Require Export Nm_to_cycm.
 
 Section p68E1b1.
 
-(** **Example of a monoid: monoids with two elements
+(**
+** Example of a monoid: monoids with two elements
 *)
 
 Definition M1_is_CMonoid:(is_CMonoid M1_as_CSemiGroup e1):=

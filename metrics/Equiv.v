@@ -37,7 +37,8 @@
 Require Export IR_CPMSpace.
 
 Section equivalent.
-(** **Equivalent Pseudo Metric Spaces
+(**
+** Equivalent Pseudo Metric Spaces
 *)
 (**
 We say that two pseudo metric spaces are equivalent, when there exists a 

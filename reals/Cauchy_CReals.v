@@ -39,7 +39,8 @@ Require Export CReals.
 
 Section R_CReals.
 
-(** * The Real Number Structure
+(**
+* The Real Number Structure
 
 We will now apply our Cauchy sequence construction to an archimedean ordered field in order to obtain a model of the real numbers.
 
@@ -710,7 +711,8 @@ Proof.
  assumption.
 Qed.
 
-(** ** Cauchy Completeness
+(**
+** Cauchy Completeness
 We can also define a limit operator.
 *)
 

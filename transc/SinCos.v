@@ -257,7 +257,8 @@ Opaque Min Sine Cosine.
 
 Section Basic_Properties.
 
-(** **Basic properties
+(**
+** Basic properties
 
 We now prove most of the usual trigonometric (in)equalities.
 

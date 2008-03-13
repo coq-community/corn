@@ -37,7 +37,7 @@
 Require Export Q_in_CReals.
 
 
-(****** Opaque_algebra.v will be loaded in line 151 ******)
+(*----- Opaque_algebra.v will be loaded in line 151 -----*)
 
 Lemma or_not_and :
  forall (A : CProp) (B : Prop), Not A \/ ~ B -> Not (A and B).
@@ -148,7 +148,7 @@ End COrdField_extra.
 
 
 Section Rational_sequence.
-Load "Opaque_algebra".  (**** WARNING: A file is being loaded *****)
+Load "Opaque_algebra".  (* WARNING: A file is being loaded *)
 Variable R1 : CReals.
 
 Definition start_l (x : R1) := let (N, _) := start_of_sequence _ x in N.

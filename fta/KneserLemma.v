@@ -41,7 +41,8 @@ Require Export NRootCC.
 Require Export AbsCC.
 Require Export MainLemma.
 
-(** ** Kneser Lemma *)
+(**
+** Kneser Lemma *)
 
 Section Kneser_Lemma.
 

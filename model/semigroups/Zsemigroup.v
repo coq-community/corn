@@ -37,8 +37,9 @@
 Require Export Zsetoid.
 Require Export CSemiGroups.
 
-(** **Examples of semi-groups: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
-***$\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
+(**
+** Examples of semi-groups: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
+*** $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 *)
 
 Lemma Zplus_is_CSemiGroup: (is_CSemiGroup Z_as_CSetoid Zplus_is_bin_fun).
@@ -52,7 +53,8 @@ Canonical Structure Z_as_CSemiGroup.
 
 (** The term [Z_as_CSemiGroup] is of type [CSemiGroup]. Hence we have proven that [Z] is a constructive semi-group. *)
 
-(** ***$\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
+(**
+*** $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
 *)
 
 Lemma Zmult_is_CSemiGroup: (is_CSemiGroup Z_as_CSetoid Zmult_is_bin_fun).

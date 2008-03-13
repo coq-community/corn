@@ -43,7 +43,8 @@
 Require Export CAbGroups.
 Require Export Peano_dec.
 
-(** * Sums
+(**
+* Sums
 
 %\begin{convention}% Let [G] be an abelian group.
 %\end{convention}%

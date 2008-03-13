@@ -1243,7 +1243,7 @@ Definition image_G_as_CauchySeq21 (y : R2) :=
 Definition f12 (x : R1) := Lim (image_G_as_CauchySeq12 x).
 Definition g21 (y : R2) := Lim (image_G_as_CauchySeq21 y).
 
-           (******* ISO FROM R1 TO R2 ********)
+           (*------- ISO FROM R1 TO R2 -------*)
 
 Theorem f12_is_inverse_g21 : forall y : R2, y[=]f12 (g21 y).
 Proof.
@@ -1465,7 +1465,7 @@ Proof.
  apply inj_seq_well_def. 
  unfold G_as_CauchySeq in |- *.
  apply G_pres_plus.
- (**** Cauchy inj_Q plus ****)
+ (* Cauchy inj_Q plus *)
  apply not_ap_imp_eq.
  apply
   Eq_alt_2_2
@@ -1502,7 +1502,7 @@ Proof.
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
  apply cg_cancel_mixed.
- (**** End of Cauchy inj_Q plus ****)
+ (* End of Cauchy inj_Q plus *)
 
  apply Lim_pres_plus. 
 Qed.
@@ -1567,7 +1567,7 @@ Proof.
          (CS_proof _ (G_as_CauchySeq R1 y)))) in |- *.
  apply G_pres_mult.
 
- (**** Cauchy inj_Q mult**)
+ (* Cauchy inj_Q mult *)
  apply not_ap_imp_eq.
  apply
   Eq_alt_2_2
@@ -1601,13 +1601,13 @@ Proof.
  apply eq_symmetric_unfolded.
  apply inj_Q_mult.
  apply cg_cancel_mixed.
- (**** End of Cauchy inj_Q mult ****)
+ (* End of Cauchy inj_Q mult *)
 
  apply Lim_pres_mult. 
 Qed.
 
 
-        (********** ISO FROM R2 TO R1 **********)
+        (*--------- ISO FROM R2 TO R1 ---------*)
 Theorem g21_is_inverse_f12 : forall y : R1, y[=]g21 (f12 y).
 Proof.
  intro.
@@ -1823,7 +1823,7 @@ Proof.
  apply inj_seq_well_def. 
  unfold G_as_CauchySeq in |- *.
  apply G_pres_plus.
- (**** Cauchy inj_Q plus ****)
+ (* Cauchy inj_Q plus *)
  apply not_ap_imp_eq.
  apply
   Eq_alt_2_2
@@ -1860,7 +1860,7 @@ Proof.
  apply eq_symmetric_unfolded.
  apply inj_Q_plus.
  apply cg_cancel_mixed.
- (**** End of Cauchy inj_Q plus ****)
+ (* End of Cauchy inj_Q plus *)
 
  apply Lim_pres_plus. 
 Qed.
@@ -1925,7 +1925,7 @@ Proof.
          (CS_proof _ (G_as_CauchySeq R2 y)))) in |- *.
  apply G_pres_mult.
 
- (**** Cauchy inj_Q mult**)
+ (* Cauchy inj_Q mult *)
  apply not_ap_imp_eq.
  apply
   Eq_alt_2_2
@@ -1962,12 +1962,12 @@ Proof.
  apply eq_symmetric_unfolded.
  apply inj_Q_mult.
  apply cg_cancel_mixed.
- (**** End of Cauchy inj_Q mult ****)
+ (* End of Cauchy inj_Q mult *)
 
  apply Lim_pres_mult. 
 Qed.
 
-(*** Building Homomorphisms out of f12 and g21 ***)
+(* Building Homomorphisms out of f12 and g21 *)
 
 
 Definition f12_as_Homomorphism :=

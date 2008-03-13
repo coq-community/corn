@@ -38,7 +38,8 @@ Require Export CReals1.
 
 Section Lists.
 
-(** * Lists of Real Numbers
+(**
+* Lists of Real Numbers
 
 In some contexts we will need to work with nested existential quantified formulas of the form $\exists_{n\in\NN}\exists_{x_1,\ldots,x_n}P(x_1,\ldots,x_n)$#exists n exists x1,...,xn P(x1,..,xn)#.  One way of formalizing this kind of statement is through quantifying over lists.  In this file we provide some tools for manipulating lists.
 

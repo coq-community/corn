@@ -38,8 +38,9 @@ Require Export Qsetoid.
 Require Import CSetoidFun.
 Require Export Qpossec.
 
-(** **Example of a setoid: [Qpos]
-***Setoid
+(**
+** Example of a setoid: [Qpos]
+*** Setoid
 We will examine the subsetoid of positive rationals of the setoid of 
 rational numbers.
 *)
@@ -96,7 +97,8 @@ autorewrite with QposElim.
 apply Qplus_is_assoc.
 Qed.
 
-(** ***Multiplication
+(**
+*** Multiplication
 *)
 
 Lemma Qpos_mult_strext :  bin_op_strext Qpos_as_CSetoid Qpos_mult.
@@ -124,7 +126,8 @@ autorewrite with QposElim.
 apply Qmult_is_assoc.
 Qed.
 
-(** ***Inverse
+(**
+*** Inverse
 *)
 
 Lemma Qpos_inv_strext : fun_strext Qpos_inv.
@@ -136,7 +139,8 @@ Qed.
 Definition Qpos_inv_op := Build_CSetoid_un_op _ _ Qpos_inv_strext.
 Canonical Structure Qpos_inv_op.
 
-(** ***Special multiplication and inverse
+(**
+*** Special multiplication and inverse
 We define [multdiv2]: $(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#.
 *)
 

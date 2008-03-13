@@ -38,7 +38,8 @@ Require Export CReals1.
 
 Section CMetric_Fields.
 
-(** *Metric Fields *)
+(**
+* Metric Fields *)
 
 Record is_CMetricField (F : CField) (abs : CSetoid_fun F IR) : Prop := 
   {ax_abs_gt_zero   : forall x : F, Zero [<=] abs x;

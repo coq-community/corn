@@ -42,7 +42,8 @@
 
 Require Export FTC.
 
-(** *More on Power Series
+(**
+* More on Power Series
 
 We will now formally define an operator that defines a function as the
 sum of some series given a number sequence.  Along with it, we will
@@ -51,7 +52,8 @@ prove some important properties of these entities.
 
 Section Power_Series.
 
-(** **General results
+(**
+** General results
 
 %\begin{convention}% Let [J : interval] and [x0 : IR] be a point of [J].
 Let [a : nat -> IR].
@@ -415,7 +417,8 @@ End More_on_PowerSeries.
 
 Section Definitions.
 
-(** **Function definitions through power series
+(**
+** Function definitions through power series
 
 We now define the exponential, sine and cosine functions as power
 series, and prove their convergence.  Tangent is defined as the

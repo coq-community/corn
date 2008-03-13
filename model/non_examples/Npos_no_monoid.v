@@ -38,7 +38,8 @@
 Require Export Npossemigroup.
 Require Import CMonoids.
 
-(** **Non-example of a monoid: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
+(**
+** Non-example of a monoid: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
 There is no right unit for the addition on the positive natural numbers.
 *)
 

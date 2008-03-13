@@ -40,7 +40,8 @@ Require Export CPoly_ApZero.
 
 Section More_Cauchy_Props.
 
-(** **Miscellaneous
+(**
+** Miscellaneous
 *** More properties of Cauchy sequences
 We will now define some special Cauchy sequences and prove some 
 more useful properties about them.
@@ -195,7 +196,8 @@ End More_Cauchy_Props.
 
 Section Subsequences.
 
-(** *** Subsequences
+(**
+*** Subsequences
 We will now examine (although without formalizing it) the concept 
 of subsequence and some of its properties.
 
@@ -372,7 +374,8 @@ End Cauchy_Subsequences.
 
 Section Properties_of_Exponentiation.
 
-(** *** More properties of Exponentiation
+(**
+*** More properties of Exponentiation
 
 Finally, we prove that [x[^]n] grows to infinity if [x [>] One].
 *)
@@ -478,7 +481,8 @@ Qed.
 
 End Properties_of_Exponentiation.
 
-(** *** [IR] has characteristic zero *)
+(**
+*** [IR] has characteristic zero *)
 
 Lemma char0_IR : Char0 IR.
 apply char0_OrdField.

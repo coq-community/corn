@@ -37,7 +37,8 @@
 Require Export ContFunctions.
 
 Section Reals.
-(** **Real numbers
+(**
+** Real numbers
 *)
 (** 
 %\begin{convention}%
@@ -237,7 +238,8 @@ Qed.
 End Reals.
 
 Section Addition.
-(** **Addition of continuous functions
+(**
+** Addition of continuous functions
 *)
 
 (**

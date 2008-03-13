@@ -38,8 +38,9 @@
 Require Export Qsec.
 Require Import CSetoidFun.
 
-(** **Example of a setoid: [Q]
-***Setoid
+(**
+** Example of a setoid: [Q]
+*** Setoid
 *)
 Lemma ap_Q_irreflexive1 : irreflexive (A:=Q) Qap.
 red in |- *.
@@ -67,7 +68,8 @@ Definition ap_Q_is_apartness := Build_is_CSetoid Q Qeq Qap
 Definition Q_as_CSetoid := Build_CSetoid _ _ _ ap_Q_is_apartness.
 Canonical Structure Q_as_CSetoid.
 
-(** ***Addition
+(**
+*** Addition
 *)
 
 Lemma Qplus_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplus.
@@ -101,7 +103,8 @@ simpl in |- *.
 exact Qplus_is_commut0.
 Qed.
 
-(** ***Opposite
+(**
+*** Opposite
 *)
 
 Lemma Qopp_wd : fun_wd (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Qopp.
@@ -127,7 +130,8 @@ Qed.
 Definition Qopp_is_fun := Build_CSetoid_fun _ _ _ Qopp_strext.
 Canonical Structure Qopp_is_fun.
 
-(** ***Multiplication
+(**
+*** Multiplication
 *)
 
 Lemma Qmult_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmult.
@@ -168,7 +172,8 @@ simpl in |- *.
 exact Qmult_sym.
 Qed.
 
-(** ***Less-than
+(**
+*** Less-than
 *)
 
 Lemma Qlt_strext : Crel_strext Q_as_CSetoid Qlt.
@@ -180,7 +185,8 @@ Qed.
 Definition Qlt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qlt_strext.
 Canonical Structure Qlt_is_CSetoid_relation.
 
-(** ***Greater-than
+(**
+*** Greater-than
 *)
 
 Lemma Qgt_strext : Crel_strext Q_as_CSetoid Qgt.

@@ -39,7 +39,8 @@ Require Export MoreFunctions.
 
 Section Rolle.
 
-(** *Rolle's Theorem
+(**
+* Rolle's Theorem
 
 We now begin to work with partial functions.  We begin by stating and proving Rolle's theorem in various forms and some of its corollaries.
 

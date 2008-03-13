@@ -41,7 +41,8 @@
 Require Export CSumsReals.
 Require Export PartFunEquality.
 
-(** *Sums of Functions
+(**
+* Sums of Functions
 
 In this file we define sums are defined of arbitrary families of
 partial functions.

@@ -38,7 +38,8 @@ Require Export Prod_Sub.
 Require Export Equiv.
 
 Section Definition_MS.
-(** **Definition of Metric Space
+(**
+** Definition of Metric Space
 *)
 
 
@@ -51,7 +52,8 @@ End Definition_MS.
 
 
 Section MS_basics.
-(** **Metric Space basics
+(**
+** Metric Space basics
 *)
 
 Lemma d_CMetricSpace_apdiag_imp_grzero :
@@ -90,7 +92,8 @@ Qed.
 
 End MS_basics.
 Section prodandsub.
-(** **Product-Metric-Spaces and Sub-Metric-Spaces
+(**
+** Product-Metric-Spaces and Sub-Metric-Spaces
 *)
 (**
 The product of two metric spaces is again a metric space.
@@ -155,7 +158,8 @@ Implicit Arguments SubMetricSpace [X].
 
 End prodandsub.
 Section Zeroff.
-(** **Pseudo Metric Spaces vs Metric Spaces
+(**
+** Pseudo Metric Spaces vs Metric Spaces
 *)
 (**
 Not all pseudo metric spaces are a metric space:
@@ -556,7 +560,8 @@ Qed.
 End Zeroff.
 
 Section Limitt.
-(** **Limit
+(**
+** Limit
 *)
 (**
 A sequence in a metric space has at most one limit.

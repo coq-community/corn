@@ -38,7 +38,8 @@ Require Export Continuity.
 
 Section Definitions.
 
-(** *Derivatives
+(**
+* Derivatives
 
 We will now proceed toward the development of differential calculus.
 To begin with, the main notion is that of derivative.
@@ -88,7 +89,8 @@ Implicit Arguments Derivative_I [a b].
 
 Section Basic_Properties.
 
-(** **Basic Properties
+(**
+** Basic Properties
 *)
 
 Variables a b : IR.

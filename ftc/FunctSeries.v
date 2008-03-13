@@ -42,7 +42,8 @@ Require Export Series.
 
 Section Definitions.
 
-(** *Series of Functions
+(**
+* Series of Functions
 
 We now turn our attention to series of functions.  Like it was already
 the case for sequences, we will mainly rewrite the results we proved
@@ -628,7 +629,8 @@ Hint Resolve Fun_Series_Sum_cont: continuous.
 
 Section Convergence_Criteria.
 
-(** **Convergence Criteria
+(**
+** Convergence Criteria
 
 Most of the convergence criteria for series of real numbers carry over to series of real-valued functions, so again we just present them without comments.
 *)

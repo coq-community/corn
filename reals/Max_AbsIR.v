@@ -44,7 +44,8 @@ Require Export CauchySeq.
 Section Maximum.
 
 Section Max_function.
-(** ** Maximum, Minimum and Absolute Value
+(**
+** Maximum, Minimum and Absolute Value
 
 %\begin{convention}%
 Let [x] and [y] be reals
@@ -214,7 +215,8 @@ Qed.
 
 Section properties_of_Max.
 
-(** *** Maximum *)
+(**
+*** Maximum *)
 
 Definition Max := Build_CSetoid_bin_op _ MAX MAX_strext.
 
@@ -446,7 +448,8 @@ Hint Resolve Max_id: algebra.
 
 Section Minimum.
 
-(** *** Mininum
+(**
+*** Mininum
 
 The minimum is defined by the formula 
 [Min(x,y) [=] [--]Max( [--]x,[--]y)].
@@ -732,11 +735,12 @@ Qed.
 
 End Minimum.
 
-(***********************************)
+(*---------------------------------*)
 Section Absolute.
-(***********************************)
+(*---------------------------------*)
 
-(** *** Absolute value *)
+(**
+*** Absolute value *)
 
 Definition ABSIR (x : IR) : IR := Max x [--]x.
 
@@ -1227,7 +1231,8 @@ Hint Resolve AbsIRz_isz: algebra.
 
 Section SeqMax.
 
-(** *** Bound of sequence *)
+(**
+*** Bound of sequence *)
 
 Variable seq : nat -> IR.
 
@@ -1251,7 +1256,8 @@ End SeqMax.
 
 Section Part_Function_Max.
 
-(** *** Functional Operators
+(**
+*** Functional Operators
 
 The existence of these operators allows us to lift them to functions.  We will define the maximum, minimum and absolute value of two partial functions.
 

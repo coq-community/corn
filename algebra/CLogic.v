@@ -51,7 +51,8 @@ Require Export ZArithRing.
 Require Export Div2.
 Require Export Wf_nat.
 
-(** *Extending the Coq Logic
+(**
+* Extending the Coq Logic
 Because notions of apartness and order have computational meaning, we
 will have to define logical connectives in [Type].  In order to
 keep a syntactic distinction between types of terms, we define [CProp]
@@ -92,7 +93,8 @@ version.
 Definition CProp := Type.
 
 Section Basics.
-(** ** Basics
+(**
+** Basics
 Here we treat conversion from [Prop] to [CProp] and vice versa,
 and some basic connectives in [CProp].
 *)
@@ -340,7 +342,8 @@ End Logical_Remarks.
 
 Section CRelation_Definition.
 
-(** ** [CProp]-valued Relations
+(**
+** [CProp]-valued Relations
 Similar to Relations.v in Coq's standard library.
 
 %\begin{convention}% Let [A:Type] and [R:Crelation].
@@ -380,7 +383,8 @@ Fixpoint member (A : Type) (n : A) (l : list A) {struct l} : CProp :=
 Implicit Arguments member [A].
 
 Section TRelation_Definition.
-(** ** [Prop]-valued Relations
+(**
+** [Prop]-valued Relations
 Analogous.
 
 %\begin{convention}% Let [A:Type] and [R:Trelation].
@@ -405,7 +409,8 @@ End TRelation_Definition.
 
 Section le_odd.
 
-(** ** The relation [le], [lt], [odd] and [even] in [CProp]
+(**
+** The relation [le], [lt], [odd] and [even] in [CProp]
 *)
 
 Inductive Cle (n : nat) : nat -> CProp :=
@@ -594,7 +599,8 @@ End le_odd.
 
 Section Misc.
 
-(** **Miscellaneous
+(**
+** Miscellaneous
 *)
 
 Lemma CZ_exh : forall z : Z, {n : nat | z = n} or {n : nat | z = (- n)%Z}.
@@ -741,7 +747,8 @@ Qed.
 
 End Misc.
 
-(** **Results about the natural numbers
+(**
+** Results about the natural numbers
 
 We now define a class of predicates on a finite subset of natural
 numbers that will be important throughout all our work.  Essentially,
@@ -805,7 +812,8 @@ Hint Resolve toCle: core.
 
 Section Natural_Numbers.
 
-(** **Algebraic Properties
+(**
+** Algebraic Properties
 
 We now present a series of trivial things proved with [Omega] that are
 stated as lemmas to make proofs shorter and to aid in auxiliary
@@ -1070,7 +1078,8 @@ Qed.
 
 Section Predicates_to_CProp.
 
-(** **Logical Properties
+(**
+** Logical Properties
 
 This section contains lemmas that aid in logical reasoning with
 natural numbers.  First, we present some principles of induction, both
@@ -1342,7 +1351,8 @@ Qed.
 
 End Predicates_to_Prop.
 
-(** **Integers
+(**
+** Integers
 
 Similar results for integers.
 *)

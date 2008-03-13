@@ -40,7 +40,8 @@ Require Export AbsCC.
 Require Export Exponential.
 Require Export Pi.
 
-(** ** The Complex Exponential *)
+(**
+** The Complex Exponential *)
 
 Definition ExpCC (z : CC) := cc_IR (Exp (Re z)) [*] (Cos (Im z) [+I*]Sin (Im z)).
 

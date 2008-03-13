@@ -34,7 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
 
-(** * On density of the image of [Q] in an arbitrary real number structure
+(**
+* On density of the image of [Q] in an arbitrary real number structure
 In this file we introduce the image of the concrete rational numbers
 (as defined earlier) in an arbitrary structure of type
 [CReals]. At the end of this file we assign to any real number two
@@ -84,7 +85,7 @@ exists n.
 apply less_leEq_trans with (x[+]One); auto.
 apply less_plusOne.
 Qed.
-(***************************************)
+(*--------------------------------------*)
 
 Coercion nat_of_P : positive >-> nat.
 (* end hide *)
@@ -703,7 +704,8 @@ Proof.
 Qed.
 
 
-(** ** Injection preserves Cauchy property
+(**
+** Injection preserves Cauchy property
 We apply the above lemmata to obtain following theorem, which says
 that a Cauchy sequence of elemnts of [Q] will be Cauchy in [R1].
 *)
@@ -886,7 +888,8 @@ Qed.
 
 Hint Resolve inj_Q_power inj_Q_power_Z : algebra.
 
-(** ** Injection of [Q] is dense
+(**
+** Injection of [Q] is dense
 Finally we are able to prove the density of image of [Q] in [R1]. We
 state this fact in two different ways. Both of them have their
 specific use.

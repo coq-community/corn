@@ -37,7 +37,8 @@
 Require Export Qpossetoid.
 Require Export CSemiGroups.
 
-(** **Example of a semi-group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
+(**
+** Example of a semi-group: $\langle$#&lang;#[Qpos],[[*]]$\rangle$#&rang;#
 The positive rationals form with the multiplication a CSemiGroup.
 *)
 

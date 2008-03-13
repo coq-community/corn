@@ -63,7 +63,8 @@ Transparent f_equal.
 
 (* Constructive RINGS *)
 
-(** * Rings
+(**
+* Rings
 We actually define commutative rings with identity.
 ** Definition of the notion of Ring
 *)
@@ -701,7 +702,7 @@ astepl ( [--]One[*]x).
 Step_final ( [--] (One[*]x)).
 Qed.
 
-(*************** new def of zring. ***********************)
+(*---------------- new def of zring. --------------------*)
 
 (** The [zring] function can be defined directly.  This is done here.
 *)
@@ -864,7 +865,8 @@ Definition Sum_from_upto_alt f m n : R := Sum_upto (seq_from f m) (n - m).
 End infinite_ring_sums.
 
 Section ring_sums_over_lists.
-(** *** Ring Sums over Lists
+(**
+*** Ring Sums over Lists
 *)
 
 Fixpoint RList_Mem (l : list R) (n : nat) {struct n} : R :=
