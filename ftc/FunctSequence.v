@@ -54,7 +54,7 @@ will be denoted by [I];
 
 %\end{convention}%
 
-**Definitions
+** Definitions
 
 A sequence of functions is simply an object of type [nat->PartIR].
 However, we will be interested mostly in convergent and Cauchy

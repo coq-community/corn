@@ -57,7 +57,7 @@ will be continuous (in [J]) functions.
 
 First we will consider the case of sequences.
 
-***Definitions
+*** Definitions
 
 Some of the definitions do not make sense in this more general setting
 (for instance, because the norm of a function is no longer defined),

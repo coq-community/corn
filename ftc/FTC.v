@@ -50,7 +50,7 @@ Finally we can prove the fundamental theorem of calculus and its most
 important corollaries, which are the main tools to formalize most of
 real analysis.
 
-**Indefinite Integrals
+** Indefinite Integrals
 
 We define the indefinite integral of a function in a proper interval
 in the obvious way; we just need to state a first lemma so that the

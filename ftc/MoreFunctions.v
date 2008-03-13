@@ -52,7 +52,7 @@ arbitrary intervals.
 %\begin{convention}% Let [I:interval] and [F,F',G,G'] be partial functions.
 %\end{convention}%
 
-**Continuity
+** Continuity
 *)
 
 Variable I : interval.
