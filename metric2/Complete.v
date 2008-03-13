@@ -23,6 +23,8 @@ Require Export UniformContinuity.
 Require Export QposInf.
 Require Export Classification.
 Require Import QposMinMax.
+Require Import QMinMax.
+Require Import Qauto.
 Require Import Qordfield.
 Require Import COrdFields2.
 Require Import CornTac.
@@ -419,7 +421,7 @@ End Cjoin.
 
 Implicit Arguments Cjoin [X].
 
-(* I never got Cmap_prf for this definition of map *)
+(* New way of doing map without requiring prelength spaces *)
 (*
 Section Cmap.
 
@@ -427,10 +429,10 @@ Variable X Y : MetricSpace.
 Variable f : X --> Y.
 
 Definition Cmap_raw (x:Complete X) (e:QposInf) :=
-f (x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e))).
+f (approximate x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e))).
 
 Lemma Cmap_raw_strong : forall (x:Complete X) (d e:Qpos), QposInf_le d (QposInf_mult (1#2)%Qpos (mu f e)) ->
-ball e (f (x d)) (Cmap_raw x e).
+ball e (f (approximate x d)) (Cmap_raw x e).
 Proof.
 intros x d e Hd.
 rapply uc_prf.
@@ -445,12 +447,12 @@ rsapply plus_resp_leEq.
 assumption.
 Qed.
 
-Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e)))).
+Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (approximate x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e)))).
 Proof.
 intros x e1 e2.
 cut (forall (e1 e2:Qpos), (QposInf_le (mu f e2) (mu f e1)) -> ball (m:=Y) (e1 + e2)
-  (f (x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e1))))
-  (f (x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e2))))).
+  (f (approximate x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e1))))
+  (f (approximate x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e2))))).
 intros H.
 (* move this out *)
 assert (forall a b, {QposInf_le a b}+{QposInf_le b a}).
@@ -472,6 +474,7 @@ simpl.
 rapply Cmap_raw_strong.
 destruct (mu f e1).
 simpl.
+autorewrite with QposElim.
 rsapply mult_resp_leEq_lft.
 assumption.
 discriminate.
@@ -487,26 +490,52 @@ Qed.
 Definition Cmap_fun (x:Complete X) : Complete Y :=
 Build_RegularFunction (Cmap_fun_prf x).
 
-Definition Cmap_prf : is_UniformlyContinuousFunction Cmap_fun (mu f).
+Definition Cmap_prf : is_UniformlyContinuousFunction Cmap_fun (fun e => (QposInf_mult (1#2)(mu f e))%Qpos).
 Proof.
 intros e0 x y Hxy.
 intros e1 e2.
-apply ball_closed.
-intros d.
-cut (QposInf_le (mu f e0) (mu f (e0+d))).
-intros mono.
-case_eq (mu f e0).
-intros e0' He0.
-rewrite He0 in Hxy.
-Focus 2.
-intros H.
-rewrite H in mono.
-simpl in mono.
-
-let g:=Qmin (mu f e0) (mu f e1)
 simpl.
-rapply (uc_prf f).
+set (d1:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e1))).
+set (d2:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))).
+set (d0:=(QposInf_bind (fun y' : Qpos => ((1 # 4) * y')%Qpos) (mu f e0))).
+apply ball_triangle with (f (approximate y (QposInf_min d0 d2 ))).
+ apply ball_triangle with (f (approximate x (QposInf_min d0 d1))).
+  apply uc_prf.
+  eapply ball_ex_weak_le;[|apply regFun_prf_ex].
+  unfold d1.
+  destruct (mu f e1); try constructor.
+  destruct d0;
+   simpl;
+   autorewrite with QposElim;
+   (replace RHS with (((1 # 2) * q + (1 # 2) * q)) by ring);
+   try rewrite Qmin_plus_distr_r;
+   auto with *.
+ apply uc_prf.
+ destruct (mu f e0); try constructor.
+ cut (forall z0 z1:Qpos, (z0 <= (1#4)*q) -> (z1 <= (1#4)*q) -> ball q (approximate x z0) (approximate y z1)).
+  intros H.
+  destruct d1; destruct d2; simpl; apply H; autorewrite with  QposElim; auto with *.
+ intros z0 z1 Hz0 Hz1.
+ eapply ball_weak_le.
+  2:apply Hxy.
+ autorewrite with QposElim.
+ rewrite Qle_minus_iff in *.
+ replace RHS with (((1 # 4) * q + - z0) + ((1 # 4) * q + - z1)) by ring.
+ Qauto_nonneg.
+apply uc_prf.
+eapply ball_ex_weak_le;[|apply regFun_prf_ex].
+unfold d2.
+destruct (mu f e2); try constructor.
+destruct d0;
+ simpl;
+ autorewrite with QposElim;
+ (replace RHS with (((1 # 2) * q + (1 # 2) * q)) by ring);
+ try rewrite Qmin_plus_distr_l;
+ auto with *.
+Qed.
 
+Definition Cmap : (Complete X) --> (Complete Y) :=
+Build_UniformlyContinuousFunction Cmap_prf.
 
 End Cmap.
 *)
