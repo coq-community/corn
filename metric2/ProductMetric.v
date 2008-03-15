@@ -2,6 +2,7 @@ Require Export Metric.
 Require Import Setoid.
 Require Import Classification.
 Require Import UniformContinuity.
+Require Import Prelength.
 Require Import CornTac.
 
 Set Implicit Arguments.

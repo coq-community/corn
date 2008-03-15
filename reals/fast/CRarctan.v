@@ -355,6 +355,8 @@ rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_ArcTan | | constructor].
 intros q [] _.
 transitivity (rational_arctan q);[|rapply rational_arctan_correct].
+unfold arctan.
+rewrite (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
 rapply BindLaw1.
 Qed.
 
@@ -363,6 +365,8 @@ Hint Rewrite arctan_correct : IRtoCR.
 Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
 Proof.
 intros x.
+unfold arctan.
+rewrite (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
 rapply BindLaw1.
 Qed.
 

@@ -1,4 +1,5 @@
 Require Export Metric.
+Require Import Prelength.
 Require Import Classification.
 Require Import QMinMax.
 Require Import COrdAbs.

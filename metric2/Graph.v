@@ -1,5 +1,6 @@
 Require Export UniformContinuity.
 Require Export Compact.
+Require Export Prelength.
 Require Export CompleteProduct.
 Require Import QposMinMax.
 Require Import QMinMax.

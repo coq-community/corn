@@ -363,6 +363,7 @@ change (CRln_pos c (' q) == IRasCR (Log (inj_Q IR q) Hq))%CR.
 transitivity (ln_pos_uc c q);[|].
  unfold CRln_pos.
  change (' q)%CR with (Cunit_fun _ q).
+ rewrite (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
  rapply BindLaw1.
 simpl.
 rewrite rational_ln_correct'.

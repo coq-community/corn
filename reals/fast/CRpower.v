@@ -142,6 +142,7 @@ transitivity (IRasCR (inj_Q IR (Qpower_positive q p))).
  rewrite IR_inj_Q_as_CR.
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
+ rewrite Cmap_fun_correct.
  rewrite MonadLaw3.
  rewrite CReq_Qeq.
  simpl.

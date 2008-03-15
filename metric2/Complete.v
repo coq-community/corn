@@ -293,76 +293,8 @@ intros r [e1|] [e2|]; try constructor.
 rapply regFun_prf.
 Qed.
 
-Hypothesis Xpl : PrelengthSpace X.
-
-Lemma CompletePL : PrelengthSpace Complete.
-Proof.
-intros x y e d1 d2 He Hxy.
-setoid_replace (d1+d2) with ((d1+d2)%Qpos:Q) in He by QposRing.
-destruct (Qpos_lt_plus He).
-pose (gA := ((1#5)*x0)%Qpos).
-pose (g := Qpos_min (Qpos_min ((1#2)*d1) ((1#2)*d2)) gA).
-unfold PrelengthSpace in Xpl.
-assert (Hd1:g < d1).
-unfold g.
-eapply Qle_lt_trans.
-apply Qpos_min_lb_l.
-eapply Qle_lt_trans.
-apply Qpos_min_lb_l.
-rapply (half_3 _ (d1:Q)).
-apply Qpos_prf. 
-assert (Hd2:g < d2).
-unfold g.
-eapply Qle_lt_trans.
-apply Qpos_min_lb_l.
-eapply Qle_lt_trans.
-apply Qpos_min_lb_r.
-rapply (half_3 _ (d2:Q)).
-apply Qpos_prf.
-destruct (Qpos_lt_plus Hd1) as [d1' Hd1'].
-destruct (Qpos_lt_plus Hd2) as [d2' Hd2'].
-assert (He':(g + e + g)%Qpos < d1' + d2').
-rsapply plus_cancel_less.
-instantiate (1:= (g+g)).
-replace RHS with ((g+d1')%Qpos+(g+d2')%Qpos) by QposRing.
-unfold QposEq in *.
-rewrite <- Hd1'.
-rewrite <- Hd2'.
-clear d1' Hd1' d2' Hd2'.
-apply Qle_lt_trans with (e + 4*gA).
-replace LHS with (e+4*g) by (unfold inject_Z;QposRing).
-rsapply plus_resp_leEq_lft.
-rsapply mult_resp_leEq_lft.
-rapply Qpos_min_lb_r.
-compute; discriminate.
-replace RHS with ((d1+d2)%Qpos:Q) by QposRing.
-rewrite q.
-replace RHS with (e+1*x0) by QposRing.
-rsapply plus_resp_less_lft.
-replace LHS with ((4#5)*x0) by (unfold inject_Z, gA;QposRing).
-rsapply mult_resp_less.
-constructor.
-apply Qpos_prf.
-destruct (Xpl _ _ He' (Hxy g g)) as [c Hc1 Hc2].
-exists (Cunit c).
-rewrite <- Q_Qpos_plus in Hd1'.
-change (QposEq d1 (g + d1')) in Hd1'.
-rewrite Hd1'.
-eapply ball_triangle.
-apply ball_approx_r.
-rewrite ball_Cunit.
-assumption.
-rewrite <- Q_Qpos_plus in Hd2'.
-change (QposEq d2 (g + d2')) in Hd2'.
-rewrite Hd2'.
-setoid_replace (g + d2')%Qpos with (d2' + g)%Qpos by QposRing.
-eapply ball_triangle with (Cunit (approximate y g)).
-rewrite ball_Cunit.
-assumption.
-apply ball_approx_l.
-Qed.
-
 End RegularFunction.
+
 Implicit Arguments regFunEq_e_small [X].
 Implicit Arguments is_RegularFunction [X].
 
@@ -422,79 +354,90 @@ End Cjoin.
 Implicit Arguments Cjoin [X].
 
 (* New way of doing map without requiring prelength spaces *)
-(*
 Section Cmap.
 
 Variable X Y : MetricSpace.
 Variable f : X --> Y.
 
-Definition Cmap_raw (x:Complete X) (e:QposInf) :=
+Definition Cmap_slow_raw (x:Complete X) (e:QposInf) :=
 f (approximate x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e))).
 
-Lemma Cmap_raw_strong : forall (x:Complete X) (d e:Qpos), QposInf_le d (QposInf_mult (1#2)%Qpos (mu f e)) ->
-ball e (f (approximate x d)) (Cmap_raw x e).
+Lemma Cmap_slow_raw_strongInf : forall (x:Complete X) (d:QposInf) (e:QposInf), QposInf_le d (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e)) ->
+ball_ex e (f (approximate x d)) (Cmap_slow_raw x e).
 Proof.
-intros x d e Hd.
-rapply uc_prf.
-simpl.
-case_eq (mu f e); simpl; trivial.
-intros q Hq.
-rewrite Hq in Hd.
-eapply ball_weak_le;[|apply regFun_prf].
-rewrite Q_Qpos_plus.
-replace RHS with (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos) by QposRing.
-rsapply plus_resp_leEq.
+intros x [d|] [e|] Hd; try constructor.
+ rapply uc_prf.
+ simpl.
+ case_eq (mu f e); simpl; trivial.
+ intros q Hq.
+ simpl in Hd.
+ rewrite Hq in Hd.
+ eapply ball_weak_le;[|apply regFun_prf].
+ rewrite Q_Qpos_plus.
+ replace RHS with (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos) by QposRing.
+ rsapply plus_resp_leEq.
+ assumption.
+unfold Cmap_slow_raw.
+simpl in *.
+apply uc_prf.
+destruct (mu f e) as [q|].
+ contradiction.
+constructor.
+Qed.
+
+Lemma Cmap_slow_raw_strong : forall (x:Complete X) (d:QposInf) (e:Qpos), QposInf_le d (QposInf_mult (1#2)%Qpos (mu f e)) ->
+ball e (f (approximate x d)) (Cmap_slow_raw x e).
+Proof.
+intros.
+rapply (Cmap_slow_raw_strongInf x d e).
 assumption.
 Qed.
 
-Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (approximate x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e)))).
+Lemma Cmap_slow_fun_prf (x:Complete X) : is_RegularFunction (Cmap_slow_raw x).
 Proof.
 intros x e1 e2.
+unfold Cmap_slow_raw.
 cut (forall (e1 e2:Qpos), (QposInf_le (mu f e2) (mu f e1)) -> ball (m:=Y) (e1 + e2)
   (f (approximate x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e1))))
   (f (approximate x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e2))))).
-intros H.
-(* move this out *)
-assert (forall a b, {QposInf_le a b}+{QposInf_le b a}).
-intros [a|] [b|]; simpl; try tauto.
-apply Qle_total.
-destruct (H0 (mu f e2) (mu f e1)).
-auto.
-apply ball_sym.
-setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
-auto.
+ intros H.
+ (* move this out *)
+ assert (forall a b, {QposInf_le a b}+{QposInf_le b a}).
+ intros [a|] [b|]; simpl; try tauto.
+ apply Qle_total.
+ destruct (H0 (mu f e2) (mu f e1)).
+ auto.
+ apply ball_sym.
+ setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
+ auto.
 clear e1 e2.
 intros e1 e2 H.
 apply ball_weak.
-case_eq (mu f e2); simpl.
-intros r Hr.
-rewrite Hr in *|-*.
 apply ball_sym.
 simpl.
-rapply Cmap_raw_strong.
+rapply Cmap_slow_raw_strong.
+simpl.
 destruct (mu f e1).
+simpl.
+destruct (mu f e2).
 simpl.
 autorewrite with QposElim.
 rsapply mult_resp_leEq_lft.
 assumption.
 discriminate.
-constructor.
-intros Hr.
-rewrite Hr in H.
-rapply uc_prf.
-destruct (mu f e1).
 elim H.
 constructor.
 Qed.
 
-Definition Cmap_fun (x:Complete X) : Complete Y :=
-Build_RegularFunction (Cmap_fun_prf x).
+Definition Cmap_slow_fun (x:Complete X) : Complete Y :=
+Build_RegularFunction (Cmap_slow_fun_prf x).
 
-Definition Cmap_prf : is_UniformlyContinuousFunction Cmap_fun (fun e => (QposInf_mult (1#2)(mu f e))%Qpos).
+Definition Cmap_slow_prf : is_UniformlyContinuousFunction Cmap_slow_fun (fun e => (QposInf_mult (1#2)(mu f e))%Qpos).
 Proof.
 intros e0 x y Hxy.
 intros e1 e2.
 simpl.
+unfold Cmap_slow_raw.
 set (d1:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e1))).
 set (d2:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))).
 set (d0:=(QposInf_bind (fun y' : Qpos => ((1 # 4) * y')%Qpos) (mu f e0))).
@@ -503,6 +446,7 @@ apply ball_triangle with (f (approximate y (QposInf_min d0 d2 ))).
   apply uc_prf.
   eapply ball_ex_weak_le;[|apply regFun_prf_ex].
   unfold d1.
+  simpl.
   destruct (mu f e1); try constructor.
   destruct d0;
    simpl;
@@ -525,6 +469,7 @@ apply ball_triangle with (f (approximate y (QposInf_min d0 d2 ))).
 apply uc_prf.
 eapply ball_ex_weak_le;[|apply regFun_prf_ex].
 unfold d2.
+simpl.
 destruct (mu f e2); try constructor.
 destruct d0;
  simpl;
@@ -534,110 +479,125 @@ destruct d0;
  auto with *.
 Qed.
 
-Definition Cmap : (Complete X) --> (Complete Y) :=
-Build_UniformlyContinuousFunction Cmap_prf.
-
-End Cmap.
-*)
-
-Section Cmap.
-
-Variable X Y : MetricSpace.
-Hypothesis Xpl : PrelengthSpace X.
-
-Variable f : X --> Y.
-
-Definition Cmap_raw (x:Complete X) (e:QposInf) :=
-f (approximate x (QposInf_bind (mu f) e)).
-
-Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (approximate x (QposInf_bind (mu f) e))).
-Proof.
-intros x e1 e2.
-simpl.
-apply (mu_sum (Y:=Y) Xpl e2 (e1::nil)).
-simpl.
-destruct (mu f e1) as [d1|].
-destruct (mu f e2) as [d2|].
-rapply regFun_prf.
-constructor.
-constructor.
-Qed.
-
-Definition Cmap_fun (x:Complete X) : Complete Y :=
-Build_RegularFunction (Cmap_fun_prf x).
-
-Lemma Cmap_prf : is_UniformlyContinuousFunction Cmap_fun (mu f).
-Proof.
-intros e0 x y Hxy e1 e2.
-simpl.
-setoid_replace (e1+e0+e2)%Qpos with (e1+(e0+e2))%Qpos by QposRing.
-apply (mu_sum (Y:=Y) Xpl e2 (e1::e0::nil)).
-simpl.
-destruct (mu f e1) as [d1|];[|constructor].
-destruct (mu f e0) as [d0|];[|constructor].
-destruct (mu f e2) as [d2|];[|constructor].
-simpl in *.
-setoid_replace (d1+(d0+d2))%Qpos with (d1+d0+d2)%Qpos by QposRing.
-apply Hxy.
-Qed.
-
-Definition Cmap : (Complete X) --> (Complete Y) :=
-Build_UniformlyContinuousFunction Cmap_prf.
+Definition Cmap_slow : (Complete X) --> (Complete Y) :=
+Build_UniformlyContinuousFunction Cmap_slow_prf.
 
 End Cmap.
 
-Definition Cbind (X Y:MetricSpace) (Xpl : PrelengthSpace X) f := uc_compose (Cjoin (X:=Y)) (Cmap Xpl f).
+Definition Cbind_slow (X Y:MetricSpace) (f:X-->Complete Y) := uc_compose Cjoin (Cmap_slow f).
 
 Section Monad_Laws.
 
 Variable X Y Z : MetricSpace.
-Hypothesis Xpl : PrelengthSpace X.
-Hypothesis CXpl : PrelengthSpace (Complete X).
-Hypothesis CCXpl : PrelengthSpace (Complete (Complete X)).
-Hypothesis Ypl : PrelengthSpace Y.
 
 Notation "a =m b" := (ms_eq a b)  (at level 70, no associativity).
 
-Lemma MonadLaw1 : forall a, Cmap_fun Xpl (uc_id X) a =m a.
+Lemma MonadLaw1 : forall a, Cmap_slow_fun (uc_id X) a =m a.
 Proof.
 intros x e1 e2.
 simpl.
-rapply regFun_prf.
+rapply ball_weak_le;[|apply regFun_prf].
+autorewrite with QposElim.
+Qauto_le.
 Qed.
 
-Lemma MonadLaw2 : forall (f:Y --> Z) (g:X --> Y) a, Cmap_fun Xpl (uc_compose f g) a =m (Cmap_fun Ypl f (Cmap_fun Xpl g a)).
+Lemma MonadLaw2 : forall (f:Y --> Z) (g:X --> Y) a, Cmap_slow_fun (uc_compose f g) a =m (Cmap_slow_fun f (Cmap_slow_fun g a)).
 Proof.
 simpl.
 intros f g x e1 e2.
-rapply regFun_prf.
+set (a := approximate (Cmap_slow_fun (uc_compose f g) x) e1).
+set (b:=(approximate (Cmap_slow_fun f (Cmap_slow_fun g x)) e2)).
+set (d0 := (QposInf_min (QposInf_mult (1#2)%Qpos (mu (uc_compose f g) e1)) ((1 # 2)%Qpos * QposInf_bind (mu g) (QposInf_mult (1 # 2)%Qpos (mu f e2))))).
+apply ball_triangle with ((uc_compose f g) (approximate x d0)).
+ apply ball_sym.
+ rapply Cmap_slow_raw_strong.
+ unfold d0.
+ apply QposInf_min_lb_l.
+unfold b; simpl.
+unfold Cmap_slow_raw.
+apply uc_prf.
+simpl.
+destruct (mu f e2) as [q|]; try constructor.
+simpl.
+apply ball_weak_le with ((1#2)*q)%Qpos.
+ autorewrite with QposElim.
+ Qauto_le.
+rapply (Cmap_slow_raw_strong g x d0).
+rapply QposInf_min_lb_r.
 Qed.
 
-Lemma MonadLaw3 : forall (f:X --> Y) a, (Cmap_fun Xpl f (Cunit_fun _ a)) =m (Cunit_fun _ (f a)).
+Lemma MonadLaw3 : forall (f:X --> Y) a, (Cmap_slow_fun f (Cunit_fun _ a)) =m (Cunit_fun _ (f a)).
 Proof.
 intros f x e1 e2.
 rapply regFun_prf.
 Qed.
 
-Lemma MonadLaw4 : forall (f:X --> Y) a, (Cmap_fun Xpl f (Cjoin_fun a)) =m (Cjoin_fun ((Cmap_fun CXpl (Cmap Xpl f)) a)).
+Lemma MonadLaw4 : forall (f:X --> Y) a, (Cmap_slow_fun f (Cjoin_fun a)) =m (Cjoin_fun ((Cmap_slow_fun (Cmap_slow f)) a)).
 Proof.
 intros f x e1 e2.
 set (e2' := ((1#2)*e2)%Qpos).
-set (d1 := mu f e1).
-set (d2 := mu f e2').
-set (a := approximate (approximate x ((1#2)%Qpos*d1)%QposInf) ((1#2)%Qpos*d1)%QposInf).
-set (b := approximate (approximate x d2) d2).
-change (ball (e1+e2) (f a) (f b)).
-setoid_replace (e2)%Qpos with (e2'+e2')%Qpos by (unfold e2'; QposRing).
-apply (mu_sum (Y:=Y) Xpl e2' (e1::e2'::nil)).
+set (d0 := (QposInf_min ((1#4)%Qpos*(mu f e1)) ((1#8)%Qpos*(mu f ((1#2)*e2))))%QposInf).
 simpl.
-fold d2.
-fold d1.
-destruct d1 as [d1|];[|constructor].
-destruct d2 as [d2|];[|constructor].
-simpl in *.
-set (d1' := ((1#2)*d1)%Qpos).
-setoid_replace (d1 + (d2 +d2))%Qpos with (d1' + (d1' + d2) + d2)%Qpos by (unfold d1';QposRing).
-rapply (regFun_prf x).
+unfold Cmap_slow_raw; simpl.
+unfold Cjoin_raw; simpl.
+unfold Cmap_slow_raw; simpl.
+apply ball_triangle with (f (approximate (approximate x d0) d0)).
+ apply uc_prf.
+ destruct (mu f e1) as [q|]; try constructor.
+ simpl.
+ do 2 rewrite <- ball_Cunit.
+ set (b:= (approximate (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)
+     ((1 # 2) * ((1 # 2) * q))%Qpos)).
+ setoid_replace q with (((1#4)*q + (1#4)*q)+ ((1#4)*q+ (1#4)*q))%Qpos by QposRing.
+ unfold b; clear b.
+ apply ball_triangle with x.
+  apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
+   rewrite ball_Cunit.
+   apply ball_approx_l.
+  apply ball_approx_l.
+ apply ball_triangle with (Cunit (approximate x d0)).
+  change (ball_ex ((1 # 4) * q)%Qpos x (Cunit (approximate x d0))).
+  apply ball_ex_weak_le with (d0)%QposInf.
+   rapply QposInf_min_lb_l.
+  destruct d0 as [d0|]; try constructor.
+  rapply ball_approx_r.
+ rewrite ball_Cunit.
+ change (ball_ex ((1 # 4) * q)%Qpos (approximate x d0)
+  (Cunit (approximate (approximate x d0) d0))).
+ apply ball_ex_weak_le with (d0)%QposInf.
+  rapply QposInf_min_lb_l.
+ destruct d0 as [d0|]; try constructor.
+ rapply ball_approx_r.
+apply ball_sym.
+apply ball_weak_le with ((1#2)*e2)%Qpos.
+ autorewrite with QposElim.
+ Qauto_le.
+apply uc_prf.
+destruct (mu f ((1#2)*e2)) as [q|]; try constructor.
+simpl.
+do 2 rewrite <- ball_Cunit.
+set (b:= (approximate (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)
+    ((1 # 2) * q)%Qpos)).
+setoid_replace q with (((1#2)*q + (1#4)*q)+ ((1#8)*q+ (1#8)*q))%Qpos by QposRing.
+unfold b; clear b.
+apply ball_triangle with x.
+ apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
+  rewrite ball_Cunit.
+  apply ball_approx_l.
+ apply ball_approx_l.
+apply ball_triangle with (Cunit (approximate x d0)).
+ change (ball_ex ((1 # 8) * q)%Qpos x (Cunit (approximate x d0))).
+ apply ball_ex_weak_le with (d0)%QposInf.
+  rapply QposInf_min_lb_r.
+ destruct d0 as [d0|]; try constructor.
+ rapply ball_approx_r.
+rewrite ball_Cunit.
+change (ball_ex ((1 # 8) * q)%Qpos (approximate x d0)
+ (Cunit (approximate (approximate x d0) d0))).
+apply ball_ex_weak_le with (d0)%QposInf.
+ rapply QposInf_min_lb_r.
+destruct d0 as [d0|]; try constructor.
+rapply ball_approx_r.
 Qed.
 
 Lemma MonadLaw5 : forall a, (Cjoin_fun (X:=X) (Cunit_fun _ a)) =m a.
@@ -648,16 +608,23 @@ apply ball_weak.
 rapply regFun_prf.
 Qed.
 
-Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_fun Xpl Cunit) a) =m a.
+Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=X) Cunit) a) =m a.
 Proof.
-apply MonadLaw5.
+intros a e1 e2.
+simpl.
+setoid_replace (e1+e2)%Qpos with ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos by QposRing.
+apply ball_weak.
+rapply regFun_prf.
 Qed.
 
-Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_fun CCXpl Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
+Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=Complete (Complete X)) Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
 Proof.
 intros x e1 e2.
 pose (half := fun e:Qpos => ((1#2)*e)%Qpos).
-setoid_replace (e1+e2)%Qpos with ((half (half e1)) + ((half (half e1)) + (half e1 + (half (half e2))) + (half (half e2))) + (half e2))%Qpos by (unfold half; QposRing).
+apply ball_weak_le with  ((half (half e1)) + ((half (half e1)) + (half (half e1) + (half (half e2))) + (half (half e2))) + (half e2))%Qpos.
+ unfold half.
+ autorewrite with QposElim.
+ Qauto_le.
 rapply (regFun_prf x).
 Qed.
 
@@ -677,28 +644,28 @@ Qed.
 
 End Monad_Laws.
 
-Lemma BindLaw1 : forall X Y Xpl (f:X--> Complete Y) a, (ms_eq (Cbind Xpl f (Cunit_fun _ a)) (f a)).
+Lemma BindLaw1 : forall X Y (f:X--> Complete Y) a, (ms_eq (Cbind_slow f (Cunit_fun _ a)) (f a)).
 Proof.
-intros X Y Xpl f a.
-change (ms_eq (Cjoin (Cmap_fun Xpl f (Cunit_fun X a))) (f a)).
-rewrite (MonadLaw3 Xpl f a).
+intros X Y f a.
+change (ms_eq (Cjoin (Cmap_slow_fun f (Cunit_fun X a))) (f a)).
+rewrite (MonadLaw3 f a).
 rapply MonadLaw5.
 Qed.
 
-Lemma BindLaw2 : forall X Xpl a, (ms_eq (Cbind Xpl (Cunit:X --> Complete X) a) a).
+Lemma BindLaw2 : forall X a, (ms_eq (Cbind_slow (Cunit:X --> Complete X) a) a).
 Proof.
 rapply MonadLaw6.
 Qed.
 
-Lemma BindLaw3 : forall X Xpl Y Ypl Z (Zpl:PrelengthSpace Z) (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (ms_eq (Cbind Ypl g (Cbind Xpl f a)) (Cbind Xpl (uc_compose (Cbind Ypl g) f) a)).
+Lemma BindLaw3 : forall X Y Z (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (ms_eq (Cbind_slow g (Cbind_slow f a)) (Cbind_slow (uc_compose (Cbind_slow g) f) a)).
 Proof.
-intros X Xpl Y Ypl Z Zpl a f g.
-change (ms_eq (Cjoin (Cmap_fun Ypl g (Cjoin_fun (Cmap Xpl f a))))
-  (Cjoin (Cmap_fun Xpl (uc_compose (Cbind Ypl g) f) a))).
-rewrite (MonadLaw2 Xpl (CompletePL Ypl) (Cbind Ypl g) f).
-unfold Cbind.
-rewrite (MonadLaw4 Ypl (CompletePL Ypl) g).
-rewrite (MonadLaw2 (CompletePL Ypl) (CompletePL (CompletePL Zpl)) (Cjoin (X:=Z)) (Cmap Ypl g)).
+intros X Y Z a f g.
+change (ms_eq (Cjoin (Cmap_slow_fun g (Cjoin_fun (Cmap_slow f a))))
+  (Cjoin (Cmap_slow_fun (uc_compose (Cbind_slow g) f) a))).
+rewrite (MonadLaw2 (Cbind_slow g) f).
+unfold Cbind_slow.
+rewrite (MonadLaw4 g).
+rewrite (MonadLaw2 (Cjoin (X:=Z)) (Cmap_slow g)).
 symmetry.
 rapply MonadLaw7.
 Qed.
@@ -772,22 +739,21 @@ End Faster.
 Section Strong_Monad.
 
 Variable X Y : MetricSpace.
-Hypothesis Xpl : PrelengthSpace X.
 Let X_Y := UniformlyContinuousSpace X Y.
 Let CX_CY := UniformlyContinuousSpace (Complete X) (Complete Y).
 
-Lemma Cmap_strong_prf : is_UniformlyContinuousFunction ((Cmap (Y:=Y) Xpl):(X_Y -> CX_CY)) Qpos2QposInf.
+Lemma Cmap_strong_slow_prf : is_UniformlyContinuousFunction ((Cmap_slow (Y:=Y)):(X_Y -> CX_CY)) Qpos2QposInf.
 Proof.
 intros e f g H x.
 apply ball_closed.
 intros e0.
 set (he0 := ((1#2)*e0)%Qpos).
-set (d0 := QposInf_min (mu f he0) (mu g he0)).
+set (d0 := QposInf_min ((1#2)%Qpos*(mu f he0)) ((1#2)%Qpos*(mu g he0))).
 set (a0 := approximate x d0).
 setoid_replace (e+e0)%Qpos with (he0 + e + he0)%Qpos by (unfold he0;QposRing).
 apply ball_triangle with (Cunit (g a0)).
 apply ball_triangle with (Cunit (f a0)).
-rewrite <- (MonadLaw3 Xpl f a0).
+rewrite <- (MonadLaw3 f a0).
 rapply uc_prf.
 simpl.
 destruct (mu f he0) as [d1|];[|constructor].
@@ -797,8 +763,8 @@ destruct d0 as [d0|];[|constructor].
 rapply ball_approx_r.
 rewrite ball_Cunit.
 apply H.
-rewrite <- (MonadLaw3 Xpl g a0).
-rapply (uc_prf (Cmap Xpl g)).
+rewrite <- (MonadLaw3 g a0).
+rapply (uc_prf (Cmap_slow g)).
 simpl.
 destruct (mu g he0) as [d2|];[|constructor].
 eapply ball_ex_weak_le with d0.
@@ -807,92 +773,92 @@ destruct d0 as [d0|];[|constructor].
 rapply ball_approx_l.
 Qed.
 
-Definition Cmap_strong : (X --> Y) --> (Complete X --> Complete Y) :=
-Build_UniformlyContinuousFunction Cmap_strong_prf.
+Definition Cmap_strong_slow : (X --> Y) --> (Complete X --> Complete Y) :=
+Build_UniformlyContinuousFunction Cmap_strong_slow_prf.
 
-Definition Cap_raw (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
- approximate (Cmap Xpl (approximate f ((1#2)%Qpos*e)%QposInf) x) ((1#2)%Qpos*e)%QposInf.
+Definition Cap_slow_raw (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
+ approximate (Cmap_slow (approximate f ((1#2)%Qpos*e)%QposInf) x) ((1#2)%Qpos*e)%QposInf.
 
-Lemma Cap_fun_prf (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_raw f x).
+Lemma Cap_slow_fun_prf (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_slow_raw f x).
 Proof.
 intros f x e1 e2.
-unfold Cap_raw.
+unfold Cap_slow_raw.
 unfold QposInf_mult, QposInf_bind.
 set (he1 := ((1 # 2) * e1)%Qpos).
 set (he2 := ((1 # 2) * e2)%Qpos).
 set (f1 := (approximate f he1)).
 set (f2 := (approximate f he2)).
-change (Cmap (Y:=Y) Xpl f1) with (Cmap_strong f1).
-change (Cmap (Y:=Y) Xpl f2) with (Cmap_strong f2).
-set (y1 :=(Cmap_strong f1 x)).
-set (y2 :=(Cmap_strong f2 x)).
+change (Cmap_slow (Y:=Y) f1) with (Cmap_strong_slow f1).
+change (Cmap_slow (Y:=Y) f2) with (Cmap_strong_slow f2).
+set (y1 :=(Cmap_strong_slow f1 x)).
+set (y2 :=(Cmap_strong_slow f2 x)).
 setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos by (unfold he1, he2; QposRing).
 rewrite <- ball_Cunit.
 apply ball_triangle with y2;[|apply ball_approx_r].
 apply ball_triangle with y1;[apply ball_approx_l|].
-rapply (uc_prf Cmap_strong).
+rapply (uc_prf Cmap_strong_slow).
 rapply regFun_prf.
 Qed.
 
-Definition Cap_fun (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
-Build_RegularFunction (Cap_fun_prf f x).
+Definition Cap_slow_fun (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
+Build_RegularFunction (Cap_slow_fun_prf f x).
 
-Lemma Cap_help (f:Complete (X --> Y)) (x:Complete X) (e:Qpos) : 
- ball e (Cap_fun f x) (Cmap Xpl (approximate f e) x).
+Lemma Cap_slow_help (f:Complete (X --> Y)) (x:Complete X) (e:Qpos) : 
+ ball e (Cap_slow_fun f x) (Cmap_slow (approximate f e) x).
 Proof.
 intros f x e d1 d2.
 set (d1' := ((1 # 2) * d1)%Qpos).
 set (f1 := (approximate f d1')).
 set (f2 := (approximate f e)).
-set (y1 := (Cmap Xpl f1 x)).
-set (y2 := (Cmap Xpl f2 x)).
+set (y1 := (Cmap_slow f1 x)).
+set (y2 := (Cmap_slow f2 x)).
 change (ball (d1 + e + d2) (approximate y1 d1') (approximate y2 d2)).
 setoid_replace (d1 + e + d2)%Qpos with (d1' + (d1' + e) + d2)%Qpos by (unfold d1'; QposRing).
 rewrite <- ball_Cunit.
 apply ball_triangle with y2;[|apply ball_approx_r].
 apply ball_triangle with y1;[apply ball_approx_l|].
-rapply (uc_prf Cmap_strong).
+rapply (uc_prf Cmap_strong_slow).
 rapply regFun_prf.
 Qed.
 
-Definition Cap_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := (mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)).
+Definition Cap_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := ((1#2)%Qpos*(mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)))%QposInf.
 
-Lemma Cap_weak_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_fun f) (Cap_modulus f).
+Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_slow_fun f) (Cap_modulus f).
 Proof.
 intros f e x y H.
 set (e' := ((1#3)*e)%Qpos).
 setoid_replace e with (e'+e'+e')%Qpos by (unfold e';QposRing).
-apply ball_triangle with (Cmap Xpl (approximate f e') y).
-apply ball_triangle with (Cmap Xpl (approximate f e') x).
-apply Cap_help.
+apply ball_triangle with (Cmap_slow (approximate f e') y).
+apply ball_triangle with (Cmap_slow (approximate f e') x).
+apply Cap_slow_help.
 rapply (uc_prf).
 apply H.
 apply ball_sym.
-apply Cap_help.
+apply Cap_slow_help.
 Qed.
 
-Definition Cap_weak (f:Complete (X --> Y)) : Complete X --> Complete Y :=
-Build_UniformlyContinuousFunction (Cap_weak_prf f).
+Definition Cap_weak_slow (f:Complete (X --> Y)) : Complete X --> Complete Y :=
+Build_UniformlyContinuousFunction (Cap_weak_slow_prf f).
 
-Lemma Cap_prf : is_UniformlyContinuousFunction Cap_weak Qpos2QposInf.
+Lemma Cap_slow_prf : is_UniformlyContinuousFunction Cap_weak_slow Qpos2QposInf.
 Proof.
 intros e f1 f2 H x.
 apply ball_closed.
 intros d.
 setoid_replace (e+d)%Qpos with ((1#4)*d + ((1#4)*d + e + (1#4)*d) + (1#4)*d)%Qpos by QposRing.
-apply ball_triangle with (Cmap_strong (approximate f2 ((1#4)*d)%Qpos) x).
-apply ball_triangle with (Cmap_strong (approximate f1 ((1#4)*d)%Qpos) x).
-rapply Cap_help.
-rapply (uc_prf Cmap_strong).
+apply ball_triangle with (Cmap_strong_slow (approximate f2 ((1#4)*d)%Qpos) x).
+apply ball_triangle with (Cmap_strong_slow (approximate f1 ((1#4)*d)%Qpos) x).
+rapply Cap_slow_help.
+rapply (uc_prf Cmap_strong_slow).
 rapply H.
 apply ball_sym.
-rapply Cap_help.
+rapply Cap_slow_help.
 Qed.
 
-Definition Cap : Complete (X --> Y) --> Complete X --> Complete Y :=
-Build_UniformlyContinuousFunction Cap_prf.
+Definition Cap_slow : Complete (X --> Y) --> Complete X --> Complete Y :=
+Build_UniformlyContinuousFunction Cap_slow_prf.
 
-Lemma StrongMonadLaw1 : forall a b, ms_eq (Cap_fun (Cunit_fun _ a) b) (Cmap_strong a b).
+Lemma StrongMonadLaw1 : forall a b, ms_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
 Proof.
 intros f x.
 rapply regFunEq_e.
@@ -909,35 +875,35 @@ Qed.
 End Strong_Monad.
 
 Opaque Complete.
-Add Morphism Cmap_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_wd.
-intros X Y H.
+Add Morphism Cmap_slow_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_slow_wd.
+intros X Y.
 intros x1 x2 Hx y1 y2 Hy.
-transitivity (Cmap_fun H x1 y2).
-apply (@uc_wd _ _ (Cmap H x1) _ _ Hy).
+transitivity (Cmap_slow_fun x1 y2).
+apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
 generalize y2.
-rapply (@uc_wd _ _ (Cmap_strong Y H)).
+rapply (@uc_wd _ _ (Cmap_strong_slow X Y)).
 assumption.
 Qed.
 
-Add Morphism Cap_weak with signature ms_eq ==> ms_eq as Cap_weak_wd.
-intros X Y H.
+Add Morphism Cap_weak_slow with signature ms_eq ==> ms_eq as Cap_weak_slow_wd.
+intros X Y.
 intros x1 x2 Hx.
-rapply (@uc_wd _ _ (Cap Y H)).
+rapply (@uc_wd _ _ (Cap_slow X Y)).
 assumption.
 Qed.
 
-Add Morphism Cap_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cap_wd.
-intros X Y H.
+Add Morphism Cap_slow_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cap_slow_wd.
+intros X Y.
 intros x1 x2 Hx y1 y2 Hy.
-transitivity (Cap_fun H x1 y2).
-apply (@uc_wd _ _ (Cap_weak H x1) _ _ Hy).
+transitivity (Cap_slow_fun x1 y2).
+apply (@uc_wd _ _ (Cap_weak_slow x1) _ _ Hy).
 generalize y2.
-rapply (@uc_wd _ _ (Cap Y H)).
+rapply (@uc_wd _ _ (Cap_slow X Y)).
 assumption.
 Qed.
 Transparent Complete.
 
-Definition Cmap2 (X Y Z:MetricSpace) (Xpl : PrelengthSpace X) (Ypl : PrelengthSpace Y) f := uc_compose (@Cap Y Z Ypl) (Cmap Xpl f).
+Definition Cmap2_slow (X Y Z:MetricSpace) (f:X --> Y --> Z) := uc_compose (@Cap_slow Y Z) (Cmap_slow f).
 
 Lemma Complete_stable : forall X, stableMetric X -> stableMetric (Complete X).
 Proof.

@@ -827,7 +827,8 @@ induction s using StepF_ind;
      clcr (inj_Q IR a) (inj_Q IR b) (inj_Q IR q) ->
      (Cbind QPrelengthSpace f (' q) == IRasCR (F (inj_Q IR q) Hq))%CR)).
    intros q Hq [Hq0 H1].
-   rewrite (BindLaw1 QPrelengthSpace f).
+   rewrite (Cbind_correct QPrelengthSpace f (' q))%CR.
+   rewrite (BindLaw1 f).
    apply Hf.
    split.
     apply (leEq_inj_Q IR).
@@ -841,11 +842,14 @@ induction s using StepF_ind;
   setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
   apply ball_triangle with (f x);
    [|rapply ball_approx_r].
-  rewrite <- (BindLaw1 QPrelengthSpace f).
-  apply uc_prf.
+  rewrite <- (BindLaw1 f).
+  rewrite <- (Cbind_correct QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x)).
+  set (z0:=(Cbind QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x))).
+  rapply uc_prf.
   clear z X X0 Hyf.
   set (z:=(mu f ((1#2)*e)%Qpos)) in *.
-  change (mu (Cbind QPrelengthSpace f) ((1 # 2) * e))
+  change (@mu CR CR (@Cbind Q_as_MetricSpace Q_as_MetricSpace QPrelengthSpace f)
+     (Qpos_mult (QposMake xH (xO xH)) e))
    with z.
   destruct z as [z|];[|constructor].
   unfold ball_ex.
@@ -1031,6 +1035,3 @@ change ((x-' ((c - a) * zl) + (y-' ((b - c) * zr)))==
 (x + y)-(' ((c - a) * zl + (b - c) * zr)))%CR.
 ring.
 Qed.
-   
-   
- 

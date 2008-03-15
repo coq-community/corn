@@ -113,6 +113,7 @@ rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_
  transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; rapply cos_poly_fun_correct].
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
+ rewrite Cmap_fun_correct.
  rewrite MonadLaw3.
  rewrite IR_inj_Q_as_CR.
  rewrite CReq_Qeq.
@@ -207,6 +208,8 @@ rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Cos | | constructor].
 intros q [] _.
 transitivity (rational_cos q);[|rapply rational_cos_correct].
+unfold cos.
+rewrite (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
 rapply BindLaw1.
 Qed.
 

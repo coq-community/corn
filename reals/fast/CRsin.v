@@ -340,6 +340,7 @@ rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
  rewrite compress_fun_correct.
+ rewrite Cmap_fun_correct.
  rewrite MonadLaw3.
  rewrite IR_inj_Q_as_CR.
  rewrite CReq_Qeq.
@@ -508,6 +509,8 @@ rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Sin | | constructor].
 intros q [] _.
 transitivity (rational_sin q);[|rapply rational_sin_correct].
+unfold sin.
+rewrite (Cbind_fun_correct QPrelengthSpace sin_uc).
 rapply BindLaw1.
 Qed.
 

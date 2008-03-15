@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export Complete.
+Require Export Prelength.
 Require Import Qmetric.
 Require Import CornTac.
 

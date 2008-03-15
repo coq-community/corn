@@ -906,6 +906,8 @@ rapply (ContinuousCorrect (CI:proper (closel Zero))); try assumption.
  intros; assumption.
 intros q Hq Y.
 transitivity (rational_sqrt q);[|rapply rational_sqrt_correct].
+unfold CRsqrt.
+rewrite (Cbind_correct QPrelengthSpace sqrt_uc ('q)%CR).
 rapply BindLaw1.
 Qed.
 

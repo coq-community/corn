@@ -669,6 +669,8 @@ apply (fun a b c => @ContinuousCorrect _ a Expon Z b c x CI); auto with *.
 intros q [] H.
 transitivity (exp_bound_uc z q);[|].
  change (' q)%CR with (Cunit_fun _ q).
+ unfold exp_bounded.
+ rewrite (Cbind_correct QPrelengthSpace (exp_bound_uc z) (Cunit_fun Q_as_MetricSpace q)).
  rapply BindLaw1.
 change (rational_exp (Qmin z q) == IRasCR (Exp (inj_Q IR q)))%CR.
 rewrite rational_exp_correct.

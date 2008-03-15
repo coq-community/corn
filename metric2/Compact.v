@@ -1506,6 +1506,8 @@ eapply almostIn_triangle_l;[apply regFun_prf|].
 apply Hm1.
 Qed.
 
+Require Import Prelength.
+
 Lemma CompactCompleteCompact_prf : forall x,
  is_RegularFunction (Cmap_raw FinCompact x).
 Proof.

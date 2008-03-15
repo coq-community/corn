@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export StepQsec.
+Require Import Prelength.
 Require Import L1metric.
 Require Import OpenUnit.
 Require Import QArith.

@@ -281,6 +281,8 @@ Proof.
 intros a x Ha Hb.
 unfold CRboundAbs.
 transitivity (uc_compose (Cmap QPrelengthSpace (QboundBelow_uc (-a))) (Cmap QPrelengthSpace (QboundAbove_uc a)) x).
+simpl.
+repeat rewrite Cmap_fun_correct.
 rapply MonadLaw2.
 simpl.
 change (boundBelow (-a)%Q (boundAbove a x) == x)%CR.
@@ -510,17 +512,23 @@ unfold ucFun2.
 unfold Cmap2.
 unfold inject_Q.
 simpl.
+rewrite Cap_fun_correct.
+repeat rewrite Cmap_fun_correct.
 rewrite MonadLaw3.
 rewrite StrongMonadLaw1.
 simpl.
 transitivity (uc_compose (Cmap QPrelengthSpace (Qscale_uc a))
                         (Cmap QPrelengthSpace (QboundAbs (CR_b (1#1) y))) y).
+simpl.
+repeat rewrite Cmap_fun_correct.
 rapply MonadLaw2.
 simpl.
-change (Cmap QPrelengthSpace (Qscale_uc a)
-   (Cmap_fun QPrelengthSpace (QboundAbs (CR_b (1 # 1) y)) y) ==
- Cmap QPrelengthSpace (Qscale_uc a) y)%CR.
+repeat rewrite Cmap_fun_correct.
+change (Cmap_slow (Qscale_uc a)
+   (Cmap_slow_fun (QboundAbs (CR_b (1 # 1) y)) y) ==
+ Cmap_slow (Qscale_uc a) y)%CR.
 rapply uc_wd.
+rewrite <- (Cmap_fun_correct (Y:=Q_as_MetricSpace) QPrelengthSpace).
 rapply CRboundAbs_Eq.
 apply CR_b_lowerBound.
 apply CR_b_upperBound.
@@ -531,6 +539,9 @@ Hint Rewrite CRmult_scale : CRfast_compute.
 Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
 Proof.
 intros a b.
+unfold scale.
+simpl.
+rewrite Cmap_fun_correct.
 rapply MonadLaw3.
 Qed.
 

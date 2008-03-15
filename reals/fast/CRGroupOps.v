@@ -57,6 +57,7 @@ ring.
 
 simpl.
 rewrite H.
+rewrite Cmap_fun_correct.
 rapply MonadLaw1.
 Qed.
 
@@ -83,6 +84,8 @@ unfold ucFun2, CRplus.
 unfold Cmap2.
 unfold inject_Q.
 simpl.
+do 2 rewrite Cmap_fun_correct.
+rewrite Cap_fun_correct.
 rewrite MonadLaw3.
 rewrite StrongMonadLaw1.
 reflexivity.
@@ -93,6 +96,9 @@ Hint Rewrite CRplus_translate : CRfast_compute.
 Lemma translate_Qplus : forall a b:Q, (translate a ('b)=='(a+b)%Q)%CR.
 Proof.
 intros a b.
+unfold translate, Cmap.
+simpl.
+rewrite Cmap_fun_correct.
 rapply MonadLaw3.
 Qed.
 
@@ -331,6 +337,8 @@ unfold ucFun2, CRmax.
 unfold Cmap2.
 unfold inject_Q.
 simpl.
+do 2 rewrite Cmap_fun_correct.
+rewrite Cap_fun_correct.
 rewrite MonadLaw3.
 rewrite StrongMonadLaw1.
 reflexivity.
@@ -457,6 +465,8 @@ unfold ucFun2, CRmin.
 unfold Cmap2.
 unfold inject_Q.
 simpl.
+do 2 rewrite Cmap_fun_correct.
+rewrite Cap_fun_correct.
 rewrite MonadLaw3.
 rewrite StrongMonadLaw1.
 reflexivity.
