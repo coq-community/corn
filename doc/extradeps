@@ -1,7 +1,8 @@
 ./model/structures/Nsec.v ./model/structures/Zsec.v
 ./model/structures/Zsec.v ./model/Zmod/ZBasics.v
 ./model/Zmod/Cmod.v ./model/structures/Qsec.v
-./model/structures/Qsec.v ./algebra/CSetoids.v
+./model/structures/Qsec.v ./order/PartialOrder.v
+./order/TotalOrder.v ./algebra/CSetoids.v
 ./algebra/CSetoidInc.v ./model/setoids/Nsetoid.v
 ./model/setoids/Npossetoid.v ./model/setoids/Zsetoid.v
 ./model/setoids/Zsetoid.v ./model/setoids/Qsetoid.v
@@ -52,3 +53,7 @@
 ./transc/InvTrigonom.v ./complex/Complex_Exponential.v
 ./complex/Complex_Exponential.v ./coq_reals/Rreals.v
 ./coq_reals/Rreals_iso.v ./metrics/CPseudoMSpaces.v
+./metrics/CPMSTheory.v ./metric2/Metric.v
+./reals/fast/CRFieldOps.v ./reals/fast/LazyNat.v
+./reals/fast/CRtrans.v ./model/structures/OpenUnit.v
+./reals/fast/Integration.v ./raster/Raster.v
