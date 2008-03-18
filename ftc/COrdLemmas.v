@@ -299,10 +299,7 @@ different kinds of sums; the other two ones are variations, where the
 structure of the arguments is analyzed in more detail.
 *)
 
-(* begin show *)
 Lemma Sumx_Sum_Sum
- (* end show *)
- (* begin hide *)
  : forall n,
  Sumx (fun i (H : i < n) => Sum (f i) (pred (f (S i))) h) [=]
    Sumx (fun i (H : i < f n) => h i).
@@ -376,13 +373,8 @@ apply lt_trans with (f n); auto with arith.
 red in |- *; intros.
 rewrite H1; algebra.
 Qed.
-(* end hide *)
 
-(* begin show *)
-Lemma str_Sumx_Sum_Sum
- (* end show *)
- (* begin hide *)
- :
+Lemma str_Sumx_Sum_Sum :
  forall n (g : (forall i Hi, nat -> F)),
  (forall i j Hi, f i <= j -> j < f (S i) -> g i Hi j [=] h j) ->
  forall m, m = f n ->
@@ -408,7 +400,7 @@ Qed.
 End Lemmas.
 
 Section More_Lemmas.
-
+(* begin hide *)
 Let f' (m : nat) (f : forall i, i <= m -> nat) : nat -> nat.
 intros m f i.
 elim (le_lt_dec i m); intro.
@@ -419,11 +411,7 @@ Defined.
 
 Variable F : COrdField.
 
-(* begin show *)
-Lemma str_Sumx_Sum_Sum'
- (* end show *)
- (* begin hide *)
- :
+Lemma str_Sumx_Sum_Sum' :
  forall (m : nat) (f : forall i, i <= m -> nat),
  f 0 (le_O_n _) = 0 ->
  (forall (i j : nat) Hi Hj, i = j -> f i Hi = f j Hj) ->
@@ -490,6 +478,5 @@ elim (le_lt_dec i m); intro; simpl in |- *.
 apply H0; auto.
 elim (le_not_lt i m); auto.
 Qed.
-(* end hide *)
 
 End More_Lemmas.
