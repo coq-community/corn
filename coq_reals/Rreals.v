@@ -89,7 +89,7 @@ Canonical Structure RSetoid.
 
 (** ** Coq real numbers form a semigroup *)
 
-(** *** addition *)
+(** addition *)
 
 Lemma RPlus_is_setoid_bin_fun: bin_fun_strext RSetoid RSetoid RSetoid Rplus.
 unfold bin_fun_strext.
@@ -137,7 +137,7 @@ Canonical Structure RMonoid.
 
 (** ** Coq real numbers form a group *)
 
-(** *** negation *)
+(** negation *)
 
 Lemma RNeg_sunop : fun_strext (S1:=RSetoid) (S2:=RSetoid) Ropp.
 unfold fun_strext.
@@ -175,7 +175,7 @@ Canonical Structure RAbGroup.
 
 (** ** Coq real numbers form a ring *)
 
-(** *** multiplication *)
+(** multiplication *)
 
 Lemma RMul_is_csbinop : bin_fun_strext RSetoid RSetoid RSetoid Rmult.
 unfold bin_fun_strext.
@@ -223,7 +223,7 @@ Canonical Structure RRing.
 
 (** ** Coq real numbers form a field *)
 
-(** *** reciprocal *)
+(** reciprocal *)
 
 Definition Rrecip : forall x : RRing, x [#] Zero -> RRing := fun x _ => Rinv x.
 
@@ -251,7 +251,7 @@ Canonical Structure RField.
 
 (** ** Coq real numbers form an ordered field *)
 
-(** *** less-than *)
+(** less-than *)
 
 Lemma Rlt_strext : Crel_strext RField Rlt.
 unfold Crel_strext.
@@ -284,7 +284,7 @@ Qed.
 
 Definition Rless_rel : CCSetoid_relation RField := Build_CCSetoid_relation RField Rlt Rlt_strext.
 
-(** *** greater-than *)
+(** greater-than *)
 
 Lemma Rgt_strext : Crel_strext RField Rgt.
 intros x1 x2 y1 y2.
@@ -361,7 +361,7 @@ simpl in *.
 fourier.
 Qed.
 
-(** *** limit *)
+(** limit *)
 
 Definition RLim : CauchySeq ROrdField -> ROrdField.
 intro x.

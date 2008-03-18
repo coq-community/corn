@@ -69,13 +69,13 @@ Lemma IRasRasIR_id : forall (x:IR), (RasIR (IRasR x)[=]x).
 rapply (inversity_lft _ _ RIR_iso).
 Qed.
 
-(** *** equality *)
+(** equality *)
 
 Lemma R_eq_as_IR : forall x y, (x = y -> RasIR x [=] RasIR y).
 rapply map_wd_unfolded.
 Qed.
 
-(** *** apartness *)
+(** apartness *)
 
 Lemma R_ap_as_IR : forall x y, (RasIR x [#] RasIR y -> x <> y).
 intros x y H.
@@ -96,7 +96,7 @@ intro.
 rapply map_pres_apartness.
 Qed.
 
-(** *** less-than *)
+(** less-than *)
 
 Lemma R_lt_as_IR : forall x y, (RasIR x [<] RasIR y -> x < y).
 intros x y H.
@@ -126,7 +126,7 @@ rapply map_pres_less.
 assumption.
 Qed.
 
-(** *** le *)
+(** le *)
 
 Lemma R_le_as_IR : forall x y, (RasIR x [<=] RasIR y -> x <= y).
 intros x y H.
@@ -150,7 +150,7 @@ apply R_lt_as_IR.
 assumption.
 Qed.
 
-(** *** zero *)
+(** zero *)
 
 Lemma R_Zero_as_IR : (RasIR R0 [=] Zero).
 rapply map_pres_zero_unfolded.
@@ -162,7 +162,7 @@ Qed.
 
 Hint Rewrite R_Zero_as_IR : RtoIR.
 
-(** *** one *)
+(** one *)
 
 Lemma R_One_as_IR : (RasIR R1 [=] One).
 rapply map_pres_one_unfolded.
@@ -170,7 +170,7 @@ Qed.
 
 Hint Rewrite R_One_as_IR : RtoIR.
 
-(** *** addition *)
+(** addition *)
 
 Lemma R_plus_as_IR : forall x y, (RasIR (x+y)  [=] RasIR x [+] RasIR y).
 rapply map_pres_plus.
@@ -178,7 +178,7 @@ Qed.
 
 Hint Rewrite R_plus_as_IR : RtoIR.
 
-(** *** negation *)
+(** negation *)
 
 Lemma R_opp_as_IR : forall x, (RasIR (- x) [=] ([--] (RasIR x))).
 rapply map_pres_minus.
@@ -186,7 +186,7 @@ Qed.
 
 Hint Rewrite R_opp_as_IR : RtoIR.
 
-(** *** subtraction *)
+(** subtraction *)
 
 Lemma R_minus_as_IR : forall x y, (RasIR (x-y) [=] RasIR x [-] RasIR y).
 intros x y.
@@ -198,14 +198,14 @@ Qed.
 
 Hint Rewrite R_minus_as_IR : RtoIR.
 
-(** *** multiplication *)
+(** multiplication *)
 
 Lemma R_mult_as_IR : forall x y, (RasIR (x*y) [=] RasIR x [*] RasIR y).
 rapply map_pres_mult.
 Qed.
 Hint Rewrite R_mult_as_IR : RtoIR.
 
-(** *** reciprocal *)
+(** reciprocal *)
 
 Lemma R_recip_as_IR : forall y Hy, (RasIR (1 / y) [=] (One [/] RasIR y [//] Hy)).
 intros y Hy.
@@ -224,7 +224,7 @@ Qed.
 
 Hint Rewrite R_recip_as_IR : RtoIR.
 
-(** *** division *)
+(** division *)
 
 Lemma R_div_as_IR : forall x y Hy, (RasIR (x/y) [=] (RasIR x [/] RasIR y [//] Hy)).
 intros x y Hy.
@@ -237,7 +237,7 @@ unfold Rdiv.
 ring.
 Qed.
 
-(** *** absolute value *)
+(** absolute value *)
 
 Lemma R_abs_as_IR : forall x, RasIR (Rabs x) [=] AbsIR (RasIR x).
 intro x.
@@ -261,7 +261,7 @@ fourier.
 Qed.
 Hint Rewrite R_abs_as_IR : RtoIR.
 
-(** *** parital sum *)
+(** parital sum *)
 
 Lemma R_sum_as_IR : forall a m,
     RasIR (sum_f_R0 a m) [=] (seq_part_sum (fun i : nat => RasIR (a i)) (S m)).
@@ -276,7 +276,7 @@ simpl.
 reflexivity.
 Qed.
 
-(** *** infinite sum *)
+(** infinite sum *)
 
 Lemma R_infsum_as_IR_convergent : forall (y: R) a,
   infinit_sum a y -> convergent (fun i : nat => RasIR (a i)).
@@ -395,7 +395,7 @@ apply R_infsum_as_IR.
 assumption.
 Qed.
 
-(** *** factorial *)
+(** factorial *)
 
 Lemma fac_fact : forall i, fac i = fact i.
 reflexivity.
@@ -412,7 +412,7 @@ reflexivity.
 Qed.
 Hint Rewrite R_nring_as_IR : RtoIR.
 
-(** *** exponents *)
+(** exponents *)
 
 Lemma R_pow_as_IR : forall x i,
   RasIR (Rpow_def.pow x i)[=] nexp _ i (RasIR x).
@@ -462,7 +462,7 @@ Qed.
 
 Hint Rewrite R_exp_as_IR : RtoIR.
 
-(** *** trigonometry *)
+(** trigonometry *)
 
 Lemma R_cos_as_IR : forall x, RasIR (cos x) [=] Cos (RasIR x).
 unfold cos.
@@ -685,7 +685,7 @@ rewrite H.
 reflexivity.
 Qed.
 
-(** *** logarithm *)
+(** logarithm *)
 
 Lemma R_ln_as_IR : forall x prf, RasIR (ln x) [=] Log (RasIR x) prf.
 intros x prf.
@@ -699,7 +699,7 @@ stepl (Zero:IR) by symmetry; apply R_Zero_as_IR.
 assumption.
 Qed.
 
-(** *** integers *)
+(** integers *)
 
 Lemma R_pring_as_IR : forall x, RasIR (pring _ x) [=] pring _ x.
 intro x.
@@ -758,7 +758,7 @@ Qed.
 
 Hint Rewrite R_IZR_as_IR : RtoIR.
 
-(** *** pi *)
+(** pi *)
 
 Lemma R_pi_as_IR : RasIR (PI) [=] Pi.
 assert (Sin (RasIR PI) [=] Zero).
@@ -894,7 +894,7 @@ Qed.
 
 Hint Rewrite R_pi_as_IR : RtoIR.
 
-(** *** rationals *)
+(** rationals *)
 
 Lemma R_Q2R_as_IR : forall q, RasIR (Q2R q) [=] inj_Q IR q.
 intro q.
