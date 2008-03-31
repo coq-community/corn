@@ -33,7 +33,17 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
+(**
+* Pi
+(Please import CRpi instead)
 
+This version is faster to compute than CRpi_slow; however it is slower to
+compile.
+
+Pi is defined as
+
+176*arctan(1/57) + 28*arctan(1/239) - 48*arctan(1/682) + 96*arctan(1/12943).
+*)
 Section Pi.
 
 Lemma small_per_57 : (0 <= (1#(57%positive)) <= 1)%Q.
@@ -61,6 +71,11 @@ Definition r_pi (r:Q) : CR :=
   scale (28%Z*r) (rational_arctan_small_pos small_per_239)) + 
  (scale (-(48%Z)*r) (rational_arctan_small_pos small_per_682) +
   scale (96%Z*r) (rational_arctan_small_pos small_per_12943)))%CR.
+
+(** To prove that pi is is correct we repeatedly use the arctan sum law.
+The problem is that the arctan sum law only works for input between -1
+and 1.  We use reflect to show that our use of arctan sum law always
+satifies this restriction. *)
 
 Let f (a b:Q) : Q := 
  let (x,y) := a in 
@@ -322,5 +337,6 @@ apply (inj_Q_nring IR 1).
 Qed.
 
 End Pi.
-
+(* begin hide *)
 Hint Rewrite CRpi_correct : IRtoCR.
+(* end hide *)

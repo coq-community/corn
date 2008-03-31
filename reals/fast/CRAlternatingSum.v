@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -42,10 +42,23 @@ Opaque CR.
 
 Open Local Scope Q_scope.
 
+(**
+** Computing Alternating Series.
+Alternating series are particularly nice to sum because each term is also
+a bound on the error of the partial sum.
+*** Decreasing and Nonnegative
+*)
+
+(** We characterize a decreasing nonnegative stream of rational numbers
+by saying at every point in the stream s, then every
+further point in the stream is in [[0,s]]. *)
 Definition DecreasingNonNegative := ForAll (fun (s:Stream Q) => ForAll (fun (t:Stream Q) => 0 <= (hd t) <= (hd s)) s).
 
+(** An alternative charactherization is that at every point in the stream
+the second element is in between 0 and the head element. *)
 Definition DecreasingNonNegative_alt := ForAll (fun (s:Stream Q) => 0 <= (hd (tl s)) <= (hd s)).
 
+(** These two characterizations are equivalent. *)
 Lemma dnn_alt_dnn : forall s, DecreasingNonNegative_alt s -> DecreasingNonNegative s.
 Proof.
 cofix r1.
@@ -92,14 +105,16 @@ Proof.
 firstorder using dnn_alt_dnn dnn_dnn_alt.
 Qed.
 
+(** Every tail of a decreasing nonnegative stream is also decreasing and
+nonnegative. *)
 Lemma dnn_tl : forall s, DecreasingNonNegative s -> DecreasingNonNegative (tl s).
 Proof.
 intros s [_ H].
 assumption.
 Qed.
-
+(* begin hide *)
 Hint Resolve dnn_tl : dnn.
-
+(* end hide *)
 Lemma dnn_Str_nth_tl : forall n s, DecreasingNonNegative s -> DecreasingNonNegative (Str_nth_tl n s).
 Proof.
 induction n.
@@ -111,127 +126,18 @@ apply dnn_tl.
 assumption.
 Qed.
 
+Section InfiniteAlternatingSum.
+(* begin hide *)
 Coercion Local Is_true : bool >-> Sortclass.
-
-Fixpoint takeUntil (A B:Type) (P : Stream A -> bool)(s:Stream A) (ex:LazyExists P s) (cons: A -> B -> B) (nil : B) {struct ex} : B :=
-(if P s as b return ((P s -> b) -> B)
-then fun _ => nil
-else fun (n : P s -> False) => cons (hd s)
-     (@takeUntil A B P (tl s)
-      match ex with
-      | LazyHere H => (False_ind _ (n H))
-      | LazyFurther ex0 => ex0 tt
-      end cons nil))
-(fun x => x).
-
-Lemma takeUntil_wd : forall (A B:Type) (P : Stream A -> bool)(s:Stream A)(ex1 ex2:LazyExists P s) (cons: A -> B -> B) (nil:B),
-  takeUntil P ex1 cons nil = takeUntil P ex2 cons nil.
-Proof.
-intros A B P s ex1 ex2 cons nil.
-assert (H:=ex1).
-induction H;
-case ex1; clear ex1; case ex2; clear ex2;
-simpl;
-destruct (P x); try contradiction; auto.
-intros ex2 ex1.
-rewrite (H0 tt (ex1 tt) (ex2 tt)).
-reflexivity.
-Qed.
-
-Lemma takeUntil_end : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons:A -> B -> B) (nil : B),
- P seq -> takeUntil P ex cons nil = nil.
-Proof.
-intros A B P seq ex cons nil H.
-rewrite <- (takeUntil_wd (B:=B) P (LazyHere P _ H)).
-unfold takeUntil.
-destruct (P seq);[|contradiction].
-reflexivity.
-Qed.
-
-Lemma takeUntil_step : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons: A -> B -> B) (nil: B),
- ~P seq -> exists ex':(LazyExists P (tl seq)), takeUntil P ex cons nil = cons (hd seq) (takeUntil P ex' cons nil).
-Proof.
-intros A B P seq ex cons nil H.
-assert (ex':=ex).
-destruct ex' as [H0|ex'].
-elim H; assumption.
-exists (ex' tt).
-rewrite <- (takeUntil_wd (B:=B) P (LazyFurther seq ex')).
-simpl.
-destruct (P seq).
-elim H; constructor.
-reflexivity.
-Qed.
-
-Lemma takeUntil_elim : forall (A B:Type) (P:Stream A -> bool) (cons: A -> B -> B) (nil: B)
- (Q: Stream A -> B -> Prop),
- (forall seq, P seq -> Q seq nil) ->
- (forall seq x, Q (tl seq) x -> ~P seq -> Q seq (cons (hd seq) x)) ->
- forall seq (ex:LazyExists P seq), Q seq (takeUntil P ex cons nil).
-Proof.
-intros A B P cons nil Q c1 c2 seq ex.
-assert (ex':=ex).
-induction ex'.
- rewrite takeUntil_end; try assumption.
- eapply c1.
- apply H.
-assert (Z0:=takeUntil_end P ex cons nil).
-assert (Z1:=takeUntil_step P ex cons nil).
-assert (Z0':=c1 x).
-assert (Z1':=c2 x).
-destruct (P x).
- clear Z1.
- rewrite Z0; try constructor.
- apply Z0'.
- constructor.
-clear Z0 Z0'.
-destruct (Z1 (fun x => x)) as [ex' Z].
-rewrite Z.
-clear Z Z1.
-eapply Z1'; auto.
-apply H0.
-constructor.
-Qed. 
-
-(* Deforested
-Fixpoint AlternatingSum (l:list Q) : Q :=
-match l with 
-| nil => 0
-| cons x xs => (x - (AlternatingSum xs))
-end.
-*)
-
-(*
-Fixpoint Qshrink_help (n:Z) (d:positive) {struct d} : Q :=
-match d with
-|xO d' => match n with
-          |Zpos (xO n') => Qshrink_help (Zpos n') d'
-          |Zneg (xO n') => Qshrink_help (Zneg n') d'
-          |_ => Qmake n d
-          end
-|_ => Qmake n d
-end.
-
-Definition Qshrink (q:Q) : Q := let (n,d):= q in Qshrink_help n d.
-
-Lemma Qshrink_correct : forall q, Qshrink q == q.
-Proof.
-intros [n d].
-simpl.
-generalize n; clear n.
-induction d; intros n; try reflexivity.
-destruct n as [|n|n]; try destruct n; try reflexivity; 
- simpl; rewrite IHd; unfold Qeq; simpl;
- rewrite Pmult_comm;
- simpl;
- rewrite Pmult_comm;
- reflexivity.
-Qed.
-*)
-
+(* end hide *)
+(** Given a stream, we can compute its alternating partial sum up to
+an point satifying a predicate, so long as that predicate eventually
+exists. *)
 Definition PartialAlternatingSumUntil (P:Stream Q -> bool)(seq:Stream Q)(ex:LazyExists P seq) : Q :=
 (takeUntil P ex Qminus' 0).
 
+(** The value of the partial sum is between 0 and the head of the
+sequence if the sequence is decreasing and nonnegative. *)
 Lemma PartialAlternatingSumUntil_small : forall (P:Stream Q -> bool)(seq:Stream Q)(dnn:DecreasingNonNegative seq)(ex:LazyExists P seq), 0 <= (PartialAlternatingSumUntil P ex) <= (hd seq).
 Proof.
 intros P seq dnn ex.
@@ -253,6 +159,7 @@ ring_simplify.
 assumption.
 Qed.
 
+(** A boolean version of Qball. *)
 Definition Qball_ex_bool e a b : bool :=
  if ball_ex_dec _ Qmetric_dec e a b then true else false.
 
@@ -264,6 +171,8 @@ simpl;split;auto.
 discriminate 1.
 Qed.
 
+(** If a sequence has a limit of l, then there is a point that gets
+arbitrarily close to l. *)
 Lemma Limit_near : forall (seq:Stream Q) (l:Q), Limit seq l -> forall e, LazyExists (fun s => Qball_ex_bool e (hd s) l) seq.
 Proof.
 intros seq l H e.
@@ -286,6 +195,8 @@ apply Limit_tl.
 assumption.
 Defined.
 
+(** The infinte sum of an alternating series is the limit of the
+partial sums. *)
 Definition InfiniteAlternatingSum_raw (seq:Stream Q)(zl:Limit seq 0)(e:QposInf) :=
 PartialAlternatingSumUntil _ (Limit_near zl e).
 
@@ -434,6 +345,7 @@ rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
 rapply ball_refl.
 Qed.
 
+(** The infinite alternating series is always nonnegative. *)
 Lemma InfiniteAlternatingSum_nonneg : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
  (inject_Q 0%Q <= InfiniteAlternatingSum dnn zl)%CR.
 Proof.
@@ -451,6 +363,8 @@ destruct (PartialAlternatingSumUntil_small _ dnn (Limit_near zl ((1 # 2) * e)%Qp
 assumption.
 Qed.
 
+(** The infinite alternating series is always bounded by the first term
+in the series. *)
 Lemma InfiniteAlternatingSum_bound : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
  (InfiniteAlternatingSum dnn zl <= inject_Q (hd seq))%CR.
 Proof.
@@ -464,536 +378,7 @@ simpl.
 ring.
 Qed.
 
-Section Series.
-
-CoFixpoint everyOther (A:Type) (s:Stream A) : Stream A :=
-Cons (hd s) (everyOther (tl (tl s))).
-
-Lemma everyOther_dnn : forall (a : Stream Q),
- (DecreasingNonNegative a) ->  
- (DecreasingNonNegative (everyOther a)).
-Proof.
-intros a Ha.
-rewrite <- dnn_alt_iff_dnn.
-generalize a Ha; clear a Ha.
-cofix.
-intros [a [b [c [d x]]]] [[_ [_ [H0 _]]] [_ Ha]].
-constructor;[assumption|].
-rapply everyOther_dnn.
-apply Ha.
-Qed.
-
-Lemma everyOther_nbz : forall (a : Stream Q) x, (NearBy 0 x a) ->
- NearBy 0 x (everyOther a).
-cofix.
-intros [a [b r]] x [H [_ Ha]].
-constructor;[|rapply everyOther_nbz];assumption.
-Qed.
-
-Lemma everyOther_zl : forall (a : Stream Q), (Limit a 0) ->
- Limit (everyOther a) 0.
-Proof.
-intros x Hx e.
-assert (H:=Hx e).
-generalize x H; clear x Hx H.
-fix 2.
-intros x [H|H].
- left.
- apply everyOther_nbz.
- assumption.
-case (H tt);[intros X |intros X].
- right; left.
- clear - x X.
- abstract (
- destruct x as [a [b x]];
- destruct X;
- rapply everyOther_nbz;
- assumption).
-right; intros _.
-rapply everyOther_zl.
-apply X.
-constructor.
-Defined.
-
-Lemma Str_nth_tl_everyOther : forall n A (a:Stream A), Str_nth_tl n (everyOther a) = everyOther (Str_nth_tl (2*n) a).
-Proof.
-induction n.
- reflexivity.
-intros A [a0 [a1 a]].
-simpl.
-rewrite IHn.
-replace (n + S (n + 0))%nat with (S (2*n))%nat.
- reflexivity.
-ring.
-Qed.
-
-Lemma Str_nth_everyOther : forall n A (a:Stream A), Str_nth n (everyOther a) = (Str_nth (2*n) a).
-Proof.
-intros n A a.
-unfold Str_nth.
-rewrite Str_nth_tl_everyOther.
-destruct (Str_nth_tl (2 * n) a).
-reflexivity.
-Qed.
-
-Definition mult_Streams := zipWith (Qmult).
-
-Lemma mult_Streams_nbz : forall (a b : Stream Q) x, (NearBy 0 x a) -> forall y, NearBy 0 y b ->
- NearBy 0 (x*y) (mult_Streams a b).
-Proof.
-unfold NearBy.
-cofix.
-intros a b x [Ha0 Ha] y [Hb0 Hb].
-constructor;[|apply (mult_Streams_nbz (tl a) (tl b)); assumption].
-destruct x as [x|];[|constructor].
-destruct y as [y|];[|constructor].
-simpl.
-unfold Qball.
-stepr ((hd a-0)*(hd b-0)) by (simpl;ring).
-autorewrite with QposElim.
-rapply mult_AbsSmall; assumption.
-Qed.
-
-Lemma ForAll_True : forall X (S:Stream X), ForAll (fun x => True) S.
-Proof.
-cofix.
-intros.
-constructor.
-constructor.
-auto.
-Qed.
-
-Lemma mult_Streams_zl : forall (a b : Stream Q), (Limit a 0) -> forall (x:Qpos), NearBy 0 x b ->
- Limit (mult_Streams a b) 0.
-Proof.
-intros a b Ha x Hb e.
-assert (H:=Ha (e * (Qpos_inv x))%QposInf).
-generalize b Hb.
-clear b Hb.
-induction H; intros b Hb.
-
-left.
-abstract (
-destruct e as [e|];[|rapply ForAll_True];
-assert (Heq:e==((e*Qpos_inv x)*x)%Qpos);[
- autorewrite with QposElim;
- field;
- apply Qpos_nonzero
-|rewrite (NearBy_comp _ 0 0 (Qeq_refl 0) Heq );
- apply (mult_Streams_nbz H Hb)]
-).
-
-right.
-simpl.
-rename H0 into IHExists.
-intros.
-apply (IHExists tt).
-apply Limit_tl; assumption.
-destruct Hb; assumption.
-Defined.
-
-Lemma mult_Streams_dnn : forall (a b : Stream Q),
- (DecreasingNonNegative a) ->  
- (DecreasingNonNegative b) ->
- (DecreasingNonNegative (mult_Streams a b)).
-Proof.
-intros a b.
-repeat rewrite <- dnn_alt_iff_dnn.
-generalize a b; clear a b.
-cofix.
-intros a b [[Ha1 Ha2] Ha'] [[Hb1 Hb2] Hb'].
-constructor.
-simpl.
-split.
-rsapply mult_resp_nonneg; assumption.
-rsapply mult_resp_leEq_both; assumption.
-simpl.
-apply mult_Streams_dnn; assumption.
-Qed.
-
-Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in AbsSmall a b) (zipWith Pair a b).
-
-Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.
-Proof.
-cofix.
-intros a b e Hb Ha.
-constructor.
-destruct Hb as [[Hb1 Hb2] _].
-destruct e as [e|];[|constructor].
-destruct Ha as [[Ha1 Ha2] _].
-simpl in *.
-split.
-apply Qle_trans with (-(hd a -0)).
-apply Qopp_le_compat.
-assumption.
-ring_simplify.
-assumption.
-apply Qle_trans with (hd a - 0).
-ring_simplify.
-assumption.
-assumption.
-rapply Stream_Bound_nbz.
-destruct Hb as [_ Hb].
-change (StreamBounds (tl a) (tl b)) in Hb.
-apply Hb.
-destruct Ha as [_ Ha].
-assumption.
-Qed.
-
-Lemma Stream_Bound_zl : forall a b, (StreamBounds a b) -> Limit a 0 -> Limit b 0.
-Proof.
-intros a b H Ha e.
-assert (Ha':=(Ha e)); clear Ha.
-generalize b H; clear b H.
-induction Ha'; intros b Hb.
-left.
-apply Stream_Bound_nbz with x; assumption.
-right.
-rename H0 into IHHa'.
-intros _.
-apply (IHHa' tt).
-destruct Hb; assumption.
-Defined.
-
-Section Powers.
-
-Variable a : Q.
-
-CoFixpoint powers_help (c:Q) : Stream Q :=
-Cons c (powers_help (c*a)).
-
-Definition powers := powers_help 1.
-
-Lemma Str_nth_powers_help : forall n x, Str_nth n (powers_help x) == x*a^n.
-Proof.
-induction n.
-
-intros c.
-unfold Str_nth.
-simpl.
-ring.
-
-intros c.
-unfold Str_nth in *.
-rewrite inj_S.
-simpl.
-
-rewrite IHn.
-unfold Zsucc.
-destruct (Qeq_dec a 0).
-rewrite q.
-rewrite (Qpower_0 (n+1)).
-auto with *.
-ring.
-rewrite Qpower_plus;[assumption|].
-ring.
-Qed.
-
-Lemma Str_nth_powers : forall n, Str_nth n powers == a^n.
-Proof.
-intros n.
-unfold powers.
-rewrite Str_nth_powers_help.
-ring.
-Qed.
-
-Hypothesis Ha : 0 <= a <= 1.
-
-Lemma powers_help_dnn : forall x, (0 <= x) -> DecreasingNonNegative (powers_help x).
-Proof.
-intros x Hx.
-destruct Ha as [Ha0 Ha1].
-apply dnn_alt_dnn.
-generalize x Hx; clear x Hx.
-cofix.
-intros b Hb.
-constructor.
-simpl.
-split.
-rsapply mult_resp_nonneg; assumption.
-replace RHS with (b*1) by ring.
-rsapply mult_resp_leEq_lft; assumption.
-
-simpl.
-apply powers_help_dnn.
-rsapply mult_resp_nonneg; assumption.
-Qed.
-
-Lemma powers_dnn : DecreasingNonNegative powers.
-Proof.
-rapply powers_help_dnn.
-discriminate.
-Qed.
-
-Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (1#1)%Qpos (powers_help x).
-Proof.
-cofix.
-intros b [Hb0 Hb1].
-destruct Ha as [Ha0 Ha1].
-constructor.
-simpl.
-unfold Qball.
-stepr b by (simpl;ring).
-split;simpl.
-apply Qle_trans with 0;[discriminate|assumption].
-assumption.
-
-simpl.
-apply powers_help_nbz.
-split.
-rsapply mult_resp_nonneg; assumption.
-replace RHS with (1*1) by ring.
-rsapply mult_resp_leEq_both; assumption.
-Qed.
-
-Lemma powers_nbz : NearBy 0 (1#1)%Qpos powers.
-Proof.
-rapply powers_help_nbz.
-split; discriminate.
-Qed.
-
-End Powers.
-
-CoFixpoint positives_help (n:positive) : Stream positive :=
-Cons n (positives_help (Psucc n)).
-
-Definition positives := positives_help 1.
-
-Lemma Str_nth_positives : forall n, Str_nth n positives = P_of_succ_nat n.
-Proof.
-intros n.
-unfold positives.
-apply nat_of_P_inj.
-rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
-change (S n) with ((nat_of_P 1) + n)%nat.
-generalize 1%positive.
-induction n.
-intros c.
-rewrite plus_comm.
-reflexivity.
-intros c.
-unfold Str_nth in *.
-simpl.
-rewrite IHn.
-rewrite nat_of_P_succ_morphism.
-rapply plus_n_Sm.
-Qed.
-
-Definition recip_positives := map (fun x => 1#x) positives.
-
-Lemma Str_nth_recip_positives : forall n, Str_nth n recip_positives = 1#(P_of_succ_nat n).
-Proof.
-intros n.
-unfold recip_positives.
-rewrite Str_nth_map.
-rewrite Str_nth_positives.
-reflexivity.
-Qed.
-
-Lemma recip_positives_help_nbz : forall (n d q:positive), (d <= q)%Z -> NearBy 0 (n#d)%Qpos (map (fun x => 1#x) (positives_help q)).
-cofix.
-intros n d q Hpq.
-constructor.
-simpl.
-unfold Qball.
-stepr (1#q) by (simpl;ring).
-rapply (AbsSmall_leEq_trans _ (1#q)).
-change (1*d <= n*q)%Z.
-apply Zmult_le_compat; auto with *.
-apply AbsSmall_reflexive.
-discriminate.
-rapply recip_positives_help_nbz.
-rewrite Zpos_succ_morphism.
-auto with *.
-Qed.
-
-Fixpoint Pplus_LazyNat (p:positive)(n:LazyNat) {struct n} : positive :=
-match n with
-| LazyO => p
-| (LazyS n') => (Pplus_LazyNat (Psucc p) (n' tt))
-end.
-
-Lemma recip_positives_help_Exists : forall P n p, LazyExists P (map (fun x => (1#x)) (positives_help (Pplus_LazyNat p n))) -> LazyExists P (map (fun x => (1#x)) (positives_help p)).
-Proof.
-induction n; intros p H0.
-exact H0.
-
-right.
-intros _.
-rapply (H tt).
-apply H0.
-Defined.
-
-Lemma recip_positives_zl : Limit recip_positives 0.
-Proof.
-intros [[n d]|];[|left;rapply ForAll_True].
-unfold recip_positives.
-unfold positives.
-apply recip_positives_help_Exists with (LazyPred (LazyNat_of_P d)).
-left.
-
-abstract (
-apply recip_positives_help_nbz;
-induction d using Pind;[simpl;auto with *|];
-autorewrite with UnLazyNat in *;
-rewrite nat_of_P_succ_morphism;
-assert (H:=lt_O_nat_of_P d);
-destruct (nat_of_P d);[elimtype False;auto with *|];
-simpl in *;
-replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Psucc (Pplus_LazyNat 1 (LazifyNat n0)));[
- repeat rewrite Zpos_succ_morphism;
- auto with *
-|];
-clear -n0;
-change 2%positive with (Psucc 1);
-generalize 1%positive;
-induction n0;intros p;[reflexivity|];
-simpl in *;
-rewrite IHn0;
-reflexivity
-).
-Defined.
-
-Lemma recip_positives_dnn : DecreasingNonNegative recip_positives.
-Proof.
-apply dnn_alt_dnn.
-unfold recip_positives.
-unfold positives.
-cut (forall p, DecreasingNonNegative_alt
-  (map (fun x : positive => 1 # x) (positives_help p))).
-auto.
-cofix.
-intros p.
-constructor.
-simpl.
-split.
-discriminate.
-change (p <= Psucc p)%Z.
-repeat rewrite Zpos_succ_morphism.
-auto with *.
-simpl.
-apply recip_positives_dnn.
-Qed.
-
-CoFixpoint factorials_help (n c:positive) : Stream positive :=
-Cons c (factorials_help (Psucc n) (n*c)).
-
-Definition factorials := factorials_help 1 1.
-
-Lemma Str_nth_factorials : forall n, nat_of_P (Str_nth n factorials) = fac n.
-Proof.
-unfold factorials.
-intros n.
-pose (ONE:=1%positive).
-replace (fac n) with ((nat_of_P 1)*fac (pred (nat_of_P ONE) + n))%nat by (simpl;auto).
-replace (nat_of_P (Str_nth n (factorials_help 1 1)))
- with ((fac (pred (nat_of_P ONE)))*(nat_of_P (Str_nth n (factorials_help ONE 1))))%nat by (simpl; auto with *).
-change (factorials_help 1 1) with (factorials_help ONE 1).
-generalize ONE.
-generalize 1%positive.
-unfold ONE; clear ONE.
-
-induction n.
-intros a b.
-unfold Str_nth.
-simpl.
-rewrite plus_comm.
-auto with *.
-
-intros a b.
-unfold Str_nth in *.
-simpl.
-assert (X:=IHn (b*a)%positive (Psucc b)).
-clear IHn.
-rewrite nat_of_P_succ_morphism in X.
-rewrite <- plus_n_Sm.
-apply surj_eq.
-apply Zmult_reg_l with (nat_of_P b:Z);
- [rewrite inject_nat_convert; auto with *|].
-do 2 rewrite <- (inj_mult (nat_of_P b)).
-apply inj_eq.
-rewrite (mult_assoc (nat_of_P b) (nat_of_P a)).
-rewrite  <- nat_of_P_mult_morphism.
-rewrite <- pred_Sn in X.
-change (S (pred (nat_of_P b) + n))%nat with (S (pred (nat_of_P b)) + n)%nat.
-assert (Z:S (pred (nat_of_P b)) = nat_of_P b).
-apply S_predn.
-intros H.
-symmetry in H.
-apply (lt_not_le _ _ (lt_O_nat_of_P b)).
-auto with *.
-rewrite Z.
-rewrite <- X.
-replace (fac (nat_of_P b)) with (fac (S (pred (nat_of_P b)))) by congruence.
-change (fac (S (pred (nat_of_P b)))) with ((S (pred (nat_of_P b)))*(fac (pred (nat_of_P b))))%nat.
-rewrite Z.
-ring.
-Qed.
-
-Definition recip_factorials := map (fun x => 1#x) factorials.
-
-Lemma Str_nth_recip_factorials : forall n, (Str_nth n recip_factorials) = 1#(P_of_succ_nat (pred (fac n))).
-Proof.
-intros n.
-unfold recip_factorials.
-rewrite Str_nth_map.
-rewrite <- Str_nth_factorials.
-rewrite <- anti_convert_pred_convert.
-reflexivity.
-Qed.
-
-Lemma recip_factorials_dnn : DecreasingNonNegative recip_factorials.
-Proof.
-unfold recip_factorials.
-unfold factorials.
-apply dnn_alt_dnn.
-cut (forall a b, DecreasingNonNegative_alt
-  (map (fun x : positive => 1 # x) (factorials_help a b))).
-auto.
-cofix.
-intros a b.
-constructor.
-simpl.
-split.
-discriminate.
-change (b <= a*b)%Z.
-auto with *.
-
-simpl.
-apply recip_factorials_dnn.
-Qed.
-
-Lemma recip_factorial_bounded : StreamBounds recip_positives (tl recip_factorials).
-Proof.
-unfold recip_positives, recip_factorials, positives, factorials.
-cut (forall (p q:positive), StreamBounds (map (fun x : positive => 1 # x) (positives_help p))
-  (tl (map (fun x : positive => 1 # x) (factorials_help p q)))).
-intros H.
-apply (H 1%positive 1%positive).
-auto with *.
-cofix.
-constructor.
-simpl.
-split.
-discriminate.
-change (p <= p * q)%Z.
-auto with *.
-simpl in *.
-apply recip_factorial_bounded.
-Qed.
-
-Lemma recip_factorials_zl : Limit recip_factorials 0.
-Proof.
-intros e.
-right.
-intros _.
-rapply Stream_Bound_zl.
-apply recip_factorial_bounded.
-apply recip_positives_zl.
-Defined.
-
-End Series.
-
+(** [InfiniteAlternatingSum] is correct. *)
 Lemma dnn_zl_convergent : forall (seq:Stream Q),
  forall (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
  convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq)).
@@ -1197,4 +582,4 @@ intros seq dnn zl.
 apply InfiniteAlternatingSum_correct.
 intros; apply eq_reflexive.
 Qed.
-
+End InfiniteAlternatingSum.

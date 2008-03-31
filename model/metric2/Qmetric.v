@@ -1,3 +1,23 @@
+(*
+Copyright © 2006-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Metric.
 Require Import Prelength.
 Require Import Classification.
@@ -10,6 +30,10 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Opaque Qabs.
+
+(**
+** Example of a Metric: <Q, Qball>
+*)
 
 Definition Qball (e : Qpos) (a b : Q) := AbsSmall (e:Q) (a - b).
 
@@ -97,7 +121,7 @@ intros.
 rewrite <- (QposAsmkQpos H0).
 apply (H (mkQpos H0)).
 Qed.
-
+(* begin hide *)
 Add Morphism Qball with signature QposEq ==> Qeq ==> Qeq ==> iff as Qball_wd.
 intros [x1 Hx1] [x2 Hx2] H x3 x4 H0 x5 x6 H1.
 unfold Qball.
@@ -110,12 +134,12 @@ simpl in H.
 rewrite H.
 tauto.
 Qed.
-
+(* end hide *)
 Definition Q_as_MetricSpace : MetricSpace :=
 Build_MetricSpace Qball_wd Q_is_MetricSpace.
-
+(* begin hide *)
 Canonical Structure Q_as_MetricSpace.
-
+(* end hide *)
 Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
 intros e d1 d2 He a b c Hab Hc.
 simpl.
@@ -134,6 +158,7 @@ QposField.
 assumption.
 Qed.
 
+(** Q is a prelength space *)
 Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
 Proof.
 intros a b e d1 d2 He Hab.
@@ -155,6 +180,7 @@ apply Qinv_comp.
 QposRing.
 Qed.
 
+(** Q is a decideable metric, and hence located and stable. *)
 Lemma Qmetric_dec : decidableMetric Q_as_MetricSpace.
 Proof.
 intros e a b.

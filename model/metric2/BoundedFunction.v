@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -28,7 +28,9 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Open Local Scope uc_scope.
-
+(**
+** Example of a Complete Metric Space: BoundedFunction
+*)
 Definition BoundedFunction := Complete LinfStepQ.
 
 Definition sup : BoundedFunction --> CR :=

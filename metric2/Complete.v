@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -32,19 +32,32 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Open Local Scope uc_scope.
-
+(**
+** Complete metric space
+*)
 Section RegularFunction.
 
 Variable X:MetricSpace.
 
+(**
+*** Regular functions
+A regular function is one way of representing elements in a complete
+metric space.  A regular function that take a given error e, and returns
+an approximation within e of the value it is representing.  These
+approximations must be coherent and the definition belows state this
+property.
+*)
+
 Definition is_RegularFunction (x:QposInf -> X) : Prop :=
  forall (e1 e2:Qpos), ball (m:=X) (e1+e2) (x e1) (x e2).
 
+(** A regular function consists of an approximation function, and
+a proof that the approximations are coherent. *)
 Record RegularFunction : Type :=
 {approximate : QposInf -> X
 ;regFun_prf : is_RegularFunction approximate
 }.
-
+(** Regular functions form a metric space *)
 Definition regFunEq (f g : RegularFunction) :=
  forall e1 e2, ball (m:=X) (e1+e2) (approximate f e1) (approximate g e2).
 
@@ -184,9 +197,13 @@ setoid_replace (e1+e2+d)%Qpos with (e1+d+e2)%Qpos by QposRing.
 auto.
 Qed.
 
+(** We define the completion of a metric space to be the space of
+regular functions *)
 Definition Complete : MetricSpace :=
 Build_MetricSpace regFunBall_wd regFun_is_MetricSpace.
 
+(** The ball of regular functions is related to the underlying ball
+in ways that you would expect. *)
 Lemma regFunBall_ball : forall (x y:Complete) (e0 e1 e2:Qpos), ball e0 (approximate x e1) (approximate y e2) -> ball (e1 + e0 + e2) x y.
 intros x y e0 e1 e2 H d1 d2.
 setoid_replace (d1+(e1+e0+e2)+d2)%Qpos with ((d1+e1)+e0+(e2+d2))%Qpos by QposRing.
@@ -206,6 +223,10 @@ apply regFunBall_ball.
 apply H.
 Qed.
 
+(**
+*** Cunit
+There is an injection from the original space to the complete space
+given by the constant regular function. *)
 Lemma Cunit_fun_prf (x:X) : is_RegularFunction (fun _ => x).
 Proof.
 intros x d1 d2.
@@ -227,6 +248,7 @@ Qed.
 Definition Cunit : X --> Complete :=
 Build_UniformlyContinuousFunction Cunit_prf.
 
+(** This injection preserves the metric *)
 Lemma ball_Cunit : forall e a b, ball e (Cunit a) (Cunit b) <-> ball e a b.
 Proof.
 intros e a b.
@@ -295,6 +317,7 @@ Qed.
 
 End RegularFunction.
 
+(* begin hide *)
 Implicit Arguments regFunEq_e_small [X].
 Implicit Arguments is_RegularFunction [X].
 
@@ -304,11 +327,90 @@ Add Morphism Cunit_fun with signature ms_eq ==> ms_eq as Cunit_wd.
 intros X.
 exact (@uc_wd _ _ Cunit).
 Qed.
+(* end hide *)
+
+Section Faster.
+
+Variable X : MetricSpace.
+Variable x : Complete X.
+
+(** A regular function is equivalent to the same function that returns
+a better approximation with a given error.  One would not generally want
+to do this when doing computation; however it is quite a useful
+substitution to be able to make during reasoning. *)
+
+Section FasterInGeneral.
+
+Variable f : Qpos -> Qpos.
+Hypothesis Hf : forall x, (f x) <= x.
+
+Lemma fasterIsRegular : is_RegularFunction (fun e => (approximate x (QposInf_bind f e))).
+Proof.
+intros e1 e2.
+simpl.
+apply ball_weak_le with (f e1 + f e2)%Qpos.
+autorewrite with QposElim.
+rsapply plus_resp_leEq_both; apply Hf.
+apply regFun_prf.
+Qed.
+
+Definition faster : Complete X := Build_RegularFunction fasterIsRegular.
+
+Lemma fasterIsEq : ms_eq faster x.
+Proof.
+rapply regFunEq_e.
+intros e.
+simpl.
+apply ball_weak_le with (f e + e)%Qpos.
+autorewrite with QposElim.
+rsapply plus_resp_leEq.
+apply Hf.
+apply regFun_prf.
+Qed.
+
+End FasterInGeneral.
+
+Lemma QreduceApprox_prf : forall (e:Qpos), QposRed e <= e.
+Proof.
+intros e.
+rewrite QposRed_correct.
+apply Qle_refl.
+Qed.
+
+Definition QreduceApprox := faster QposRed QreduceApprox_prf.
+
+Lemma QreduceApprox_Eq : ms_eq QreduceApprox x.
+Proof (fasterIsEq _ _).
+(** In particular, halving the error of the approximation is a common
+case. *)
+Lemma doubleSpeed_prf : forall (e:Qpos), ((1#2)*e)%Qpos <= e.
+Proof.
+intros e.
+autorewrite with QposElim.
+rewrite Qle_minus_iff.
+ring_simplify.
+rsapply mult_resp_nonneg.
+discriminate.
+apply Qpos_nonneg.
+Qed.
+
+Definition doubleSpeed := faster (Qpos_mult (1#2)) doubleSpeed_prf. 
+
+Lemma doubleSpeed_Eq : ms_eq doubleSpeed x.
+Proof (fasterIsEq _ _).
+
+End Faster.
 
 Section Cjoin.
 
 Variable X : MetricSpace.
 
+(**
+*** Cjoin
+There is an injection from a twice completed space into a once completed
+space.  This injection along with [Cunit] forms an isomorphism between
+a twice completed space and a once completed space.  This proves that
+a complete metric space is complete. *)
 Definition Cjoin_raw (x:Complete (Complete X)) (e:QposInf) :=
 (approximate (approximate x (QposInf_mult (1#2) e)) (QposInf_mult (1#2) e))%Qpos.
 
@@ -336,7 +438,6 @@ apply ball_triangle with y.
 apply ball_triangle with x.
 apply ball_triangle with (Cunit (approximate x ((1 # 2) * d1)%Qpos)).
 rewrite ball_Cunit.
-(* apply totally sucks *)
 rapply ball_approx_l.
 apply ball_approx_l.
 assumption.
@@ -353,11 +454,17 @@ End Cjoin.
 
 Implicit Arguments Cjoin [X].
 
-(* New way of doing map without requiring prelength spaces *)
 Section Cmap.
 
 Variable X Y : MetricSpace.
 Variable f : X --> Y.
+
+(**
+*** Cmap (slow)
+Uniformly continuous functions can be lifted to the completion of metric
+spaces.  A faster version that works under some mild assumptions will be
+given later.  But first the most generic version that we call
+[Cmap_slow]. *)
 
 Definition Cmap_slow_raw (x:Complete X) (e:QposInf) :=
 f (approximate x (QposInf_mult (1#2)%Qpos (QposInf_bind (mu f) e))).
@@ -484,8 +591,11 @@ Build_UniformlyContinuousFunction Cmap_slow_prf.
 
 End Cmap.
 
+(** Cbind can be defined in terms of map and join *)
 Definition Cbind_slow (X Y:MetricSpace) (f:X-->Complete Y) := uc_compose Cjoin (Cmap_slow f).
 
+(** The completion operation, along with the map functor from a monad
+in the catagory of metric spaces. *)
 Section Monad_Laws.
 
 Variable X Y Z : MetricSpace.
@@ -628,6 +738,8 @@ apply ball_weak_le with  ((half (half e1)) + ((half (half e1)) + (half (half e1)
 rapply (regFun_prf x).
 Qed.
 
+(** This final law isn't a monad law, rather it completes the isomorphism
+between a twice completed metric space and a one completed metric space. *)
 Lemma CunitCjoin : forall a, (Cunit_fun _ (Cjoin_fun (X:=X) a)) =m a.
 Proof.
 intros x e1 e2 d1 d2.
@@ -644,6 +756,7 @@ Qed.
 
 End Monad_Laws.
 
+(** The monad laws are sometimes expressed in terms of bind and unit. *)
 Lemma BindLaw1 : forall X Y (f:X--> Complete Y) a, (ms_eq (Cbind_slow f (Cunit_fun _ a)) (f a)).
 Proof.
 intros X Y f a.
@@ -670,72 +783,10 @@ symmetry.
 rapply MonadLaw7.
 Qed.
 
-Section Faster.
-
-Variable X : MetricSpace.
-Variable x : Complete X.
-
-Section FasterInGeneral.
-
-Variable f : Qpos -> Qpos.
-Hypothesis Hf : forall x, (f x) <= x.
-
-Lemma fasterIsRegular : is_RegularFunction (fun e => (approximate x (QposInf_bind f e))).
-Proof.
-intros e1 e2.
-simpl.
-apply ball_weak_le with (f e1 + f e2)%Qpos.
-autorewrite with QposElim.
-rsapply plus_resp_leEq_both; apply Hf.
-apply regFun_prf.
-Qed.
-
-Definition faster : Complete X := Build_RegularFunction fasterIsRegular.
-
-Lemma fasterIsEq : ms_eq faster x.
-Proof.
-rapply regFunEq_e.
-intros e.
-simpl.
-apply ball_weak_le with (f e + e)%Qpos.
-autorewrite with QposElim.
-rsapply plus_resp_leEq.
-apply Hf.
-apply regFun_prf.
-Qed.
-
-End FasterInGeneral.
-
-Lemma QreduceApprox_prf : forall (e:Qpos), QposRed e <= e.
-Proof.
-intros e.
-rewrite QposRed_correct.
-apply Qle_refl.
-Qed.
-
-Definition QreduceApprox := faster QposRed QreduceApprox_prf.
-
-Lemma QreduceApprox_Eq : ms_eq QreduceApprox x.
-Proof (fasterIsEq _ _).
-
-Lemma doubleSpeed_prf : forall (e:Qpos), ((1#2)*e)%Qpos <= e.
-Proof.
-intros e.
-autorewrite with QposElim.
-rewrite Qle_minus_iff.
-ring_simplify.
-rsapply mult_resp_nonneg.
-discriminate.
-apply Qpos_nonneg.
-Qed.
-
-Definition doubleSpeed := faster (Qpos_mult (1#2)) doubleSpeed_prf. 
-
-Lemma doubleSpeed_Eq : ms_eq doubleSpeed x.
-Proof (fasterIsEq _ _).
-
-End Faster.
-
+(**
+*** Strong Monad
+The monad is a strong monad because the map function itself is
+a uniformly continuous function. *)
 Section Strong_Monad.
 
 Variable X Y : MetricSpace.
@@ -776,6 +827,9 @@ Qed.
 Definition Cmap_strong_slow : (X --> Y) --> (Complete X --> Complete Y) :=
 Build_UniformlyContinuousFunction Cmap_strong_slow_prf.
 
+(** Using strength we can show that [Complete] forms an applicative
+functor. The [ap] function is useful for making multiple argument maps.
+*) 
 Definition Cap_slow_raw (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
  approximate (Cmap_slow (approximate f ((1#2)%Qpos*e)%QposInf) x) ((1#2)%Qpos*e)%QposInf.
 
@@ -874,6 +928,7 @@ Qed.
 
 End Strong_Monad.
 
+(* begin hide *)
 Opaque Complete.
 Add Morphism Cmap_slow_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_slow_wd.
 intros X Y.
@@ -902,9 +957,16 @@ rapply (@uc_wd _ _ (Cap_slow X Y)).
 assumption.
 Qed.
 Transparent Complete.
+(* end hide *)
 
+(** A binary version of map *)
 Definition Cmap2_slow (X Y Z:MetricSpace) (f:X --> Y --> Z) := uc_compose (@Cap_slow Y Z) (Cmap_slow f).
 
+(**
+*** Completion and Classification
+The completion operations preserve stability and locatedness, but
+it does not preserve the decidability.
+*)
 Lemma Complete_stable : forall X, stableMetric X -> stableMetric (Complete X).
 Proof.
 intros X HX e x y Hb e1 e2.

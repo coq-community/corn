@@ -1,3 +1,23 @@
+(*
+Copyright © 2006-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Q_in_CReals.
 Require Export MoreIntervals.
 Require Export CRIR.
@@ -10,7 +30,15 @@ Opaque CR inj_Q.
 Set Implicit Arguments.
 
 Open Local Scope uc_scope.
+(**
+** Correctness of continuous functions.
+We show that if two functions, one on IR and one on CR, agree on the
+rational values of some closed interval, and both functions are continuous,
+then the two functions agree on that entire closed interval.
 
+This is our main method of proving the corrections of functions defined
+on CR.
+*)
 Lemma Q_dense_in_compact : forall a b (Hab : a[<=]b) x, a[<]b -> Compact Hab x ->
  forall e, Zero[<]e -> {q:Q | Compact Hab (inj_Q IR q) | AbsSmall e (x[-]inj_Q IR q)}.
 Proof.

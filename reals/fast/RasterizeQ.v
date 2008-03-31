@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export RasterQ.
 Require Import Interval.
 Require Import Classic.
@@ -9,13 +29,25 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
-(** In this implemenation of Rasterization, I choose to push all points inside the raster *)
+(**
+** Rasterization
+Rasterization takes finite enumeration of points in [Q2] and moves them
+around a little so that they lie on a raster.  Thus rasterization produces
+a raster object that when interpreted as a finite enumeration of [Q2] is
+close to the original enumeration of points.  How close depends on how
+fine a raster is chosen.
 
+There is a choice as to how to treat points that lie outside of the bound
+of a chosen rectangle for rasterization.  In this implemenation I choose
+to push all points inside the raster.  In typical applications a rectangle
+is chosen that contains all the points, so that this doesn't matter.
+
+[Rasterize Point] adds a single point [p] into a raster. *)
 Definition RasterizePoint n m (bm:raster n m) (t l b r:Q) (p:Q*Q) : raster n m :=
 let i := min (pred n) (Z_to_nat (Zle_max_l 0 (rasterize1 l r n (fst p)))) in
 let j := min (pred m) (Z_to_nat (Zle_max_l 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
-
+(* begin hide *)
 Add Morphism RasterizePoint with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq ==> eq as RasterizePoint_wd.
 intros.
 unfold RasterizePoint.
@@ -33,7 +65,7 @@ rewrite H.
 rewrite H1.
 reflexivity.
 Qed.
-
+(* end hide *)
 Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
  Is_true (RasterIndex bm i j) -> Is_true (RasterIndex (RasterizePoint bm t l b r p) i j).
 Proof.
@@ -57,10 +89,13 @@ destruct (eq_nat_dec i i0).
 rewrite setRaster_correct2; auto.
 Qed.
 
+(** Rasterization is done by rasterizing each point, and composing
+the resulting raster transfomers.  A fold_left is done for efficency.
+(It is translated to a fold_right when we reason about it). *)
 (* This function could be a bit more efficent by sorting x *)
 Definition RasterizeQ2 (f:FinEnum stableQ2) n m (t l b r:Q) : raster n m :=
 fold_left (fun x y => @RasterizePoint n m x t l b r y) f (emptyRaster _ _).
-
+(* begin hide *)
 Add Morphism RasterizeQ2 with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq as RasterizeQ2_wd.
 intros.
 unfold RasterizeQ2.
@@ -71,7 +106,7 @@ simpl.
 rewrite IHl.
 apply RasterizePoint_wd; auto.
 Qed.
-
+(* end hide *)
 Section RasterizeCorrect.
 
 Let C := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
@@ -213,6 +248,7 @@ Let err : Qpos := Qpos_max errX errY.
 Hypothesis Hf:forall x y, InFinEnumC ((x,y):ProductMS _ _) f -> 
  (l<= x <= r) /\ (b <= y <= t).
 
+(** The Rasterization is close to the original enumeration. *)
 Lemma RasterizeQ2_correct1 : forall x y,
  InFinEnumC ((x,y):ProductMS _ _) f -> 
  existsC (ProductMS _ _) 

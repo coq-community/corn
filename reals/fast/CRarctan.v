@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -36,7 +36,11 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
-
+(**
+** Arctangent
+Using pi and properties of arctangent, we define arctangent from 1 to
+infinity.
+*)
 Definition rational_arctan_big_pos (a:Q) (Ha:1 <= a) : CR.
 intros a Ha.
 refine ((r_pi (1#2)) -(@rational_arctan_small_pos (/a) _))%CR.
@@ -112,6 +116,8 @@ unfold Qdiv.
 ring.
 Qed.
 
+(** Because we have slow convergence near 1, we have another compuation
+that works for nonnegative numbers, and is particularly fast near 1. *)
 Definition rational_arctan_mid_pos (a:Q) (Ha:0 <= a) : CR.
 Proof.
 intros [n d] Ha.
@@ -242,7 +248,9 @@ eapply eq_transitive.
 apply mult_wdl.
 apply (inj_Q_nring IR 4).
 Qed.
- 
+
+(** We glue all of are different methods of computing arctangent into
+a nice fast one that works for nonnegative numbers. *)
 Definition rational_arctan_pos (a:Q) (Ha:0 <= a) : CR.
 intros a.
 destruct (Qle_total (2#5) a) as [A|A].
@@ -276,6 +284,7 @@ apply Qle_lt_trans with (2#5);
  [assumption|constructor].
 Qed.
 
+(** By symmetry we get arctangent for all numbers. *)
 Definition rational_arctan (a:Q) : CR.
 intros a.
 destruct (Qle_total a 0) as [H|H].
@@ -305,6 +314,7 @@ simpl.
 ring.
 Qed.
 
+(** Lift arctangent on the rationals to the reals. *)
 Lemma arctan_uc_prf : is_UniformlyContinuousFunction rational_arctan Qpos2QposInf.
 Proof.
 apply (is_UniformlyContinuousFunction_wd) with rational_arctan (modulusD (1#1)).
@@ -359,9 +369,9 @@ unfold arctan.
 rewrite (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
 rapply BindLaw1.
 Qed.
-
+(* begin hide *)
 Hint Rewrite arctan_correct : IRtoCR.
-
+(* end hide *)
 Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
 Proof.
 intros x.
@@ -369,5 +379,6 @@ unfold arctan.
 rewrite (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
 rapply BindLaw1.
 Qed.
-
+(* begin hide *)
 Hint Rewrite arctan_Qarctan : CRfast_compute.
+(* end hide *)

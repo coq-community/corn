@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -26,14 +26,18 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+(** This extended notition of ball operates over QposInf, allowing
+one to say, ball Infinity a b, holds for all a and b.
+*)
+
 Definition ball_ex (X:MetricSpace) (e:QposInf) (a b:X) :=
  match e with
   | Qpos2QposInf e' => ball e' a b
   | QposInfinity => True
  end.
-
+(* begin hide *)
 Implicit Arguments ball_ex [X].
-
+(* end hide *)
 Lemma ball_ex_weak_le : forall (X:MetricSpace) (e d:QposInf) (a b:X), QposInf_le e d ->  ball_ex e a b -> ball_ex d a b.
 Proof.
 intros X e d a b Hed Hab.
@@ -58,12 +62,20 @@ Defined.
 
 Section UniformlyContinuousFunction.
 
+(**
+** Uniform Continuity
+*)
+
 Variable X Y : MetricSpace.
 
+(** This is the traditional definitition of uniform continuity with
+an explicitly given modulus of continuity
+*)
 Definition is_UniformlyContinuousFunction 
  (f: X -> Y) (mu: Qpos -> QposInf) :=
  forall e a b, ball_ex (mu e) a b -> ball e (f a) (f b).
 
+(** Every uniformly continuous function is automatically well defined *)
 Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -> QposInf),
  (forall x, ms_eq (f1 x) (f2 x)) ->
  (forall x, QposInf_le (mu2 x) (mu1 x)) ->
@@ -78,12 +90,17 @@ apply Hmu.
 assumption.
 Qed.
 
+(** A uniformly continuous function consists of a function, a modulus
+of continuity, and a proof that the function is uniformly continuous
+with that modulus *)
 Record UniformlyContinuousFunction : Type :=
 {ucFun :> X -> Y
 ;mu : Qpos -> QposInf
 ;uc_prf : is_UniformlyContinuousFunction ucFun mu
 }.
 
+(** Given a uniformly continuous function with a modulus mu, it is
+also uniformly continuous with any smaller modulus *)
 Lemma uc_prf_smaller : forall (f:UniformlyContinuousFunction) (mu2 : Qpos -> QposInf),
  (forall e, QposInf_le (mu2 e) (mu f e)) ->
  is_UniformlyContinuousFunction (ucFun f) mu2.
@@ -95,9 +112,10 @@ apply H.
 apply uc_prf.
 Qed.
 
+(** *** The metric space of uniformly continuous functions
+The space of uniformly continuous functions from a metric space *)
 Definition ucEq (f g : UniformlyContinuousFunction) :=
  forall x, ms_eq (f x) (g x).
-
 
 Lemma uc_setoid : Setoid_Theory UniformlyContinuousFunction ucEq.
 Proof.
@@ -154,11 +172,13 @@ Qed.
 
 End UniformlyContinuousFunction.
 
+(* begin hide *)
 Implicit Arguments is_UniformlyContinuousFunction [X Y].
 
 (*
 Add Setoid UniformlyContinuousFunction ucEq uc_setoid as uc_Setoid.
 *)
+(* end hide *)
 
 Definition UniformlyContinuousSpace (X Y:MetricSpace) : MetricSpace :=
 Build_MetricSpace (@ucBall_wd X Y) (@uc_is_MetricSpace X Y).
@@ -166,7 +186,7 @@ Build_MetricSpace (@ucBall_wd X Y) (@uc_is_MetricSpace X Y).
 Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 90, right associativity) : uc_scope.
 
 Open Local Scope uc_scope.
-
+(* begin hide *)
 Add Morphism ucFun with signature ms_eq ==> ms_eq as uc_wd.
 intros X Y f x0 x1 Hx.
 apply ball_eq.
@@ -190,7 +210,13 @@ change (ms_eq (f x1) (f x2)).
 rewrite H.
 reflexivity.
 Qed.
+(* end hide *)
+(**
+*** The category of metric spaces.
+Metric spaces with uniformly continuous functions form a category.
 
+The identity function is uniformly continuous.
+*)
 Lemma uc_id_prf (X:MetricSpace) : is_UniformlyContinuousFunction  (fun (x:X) => x) Qpos2QposInf.
 Proof.
 intros X e a b Hab.
@@ -200,6 +226,8 @@ Qed.
 Definition uc_id (X:MetricSpace) : UniformlyContinuousFunction X X :=
 Build_UniformlyContinuousFunction (uc_id_prf X).
 
+(** The composition of two uniformly continuous functions is uniformly
+continuous *)
 Lemma uc_compose_prf (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) :
 is_UniformlyContinuousFunction (fun x => g (f x)) (fun e => QposInf_bind (mu f) (mu g e)).
 Proof.
@@ -214,6 +242,7 @@ Qed.
 Definition uc_compose (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) : X --> Z :=
 Build_UniformlyContinuousFunction (uc_compose_prf g f).
 
+(* begin hide *)
 Add Morphism uc_compose with signature ms_eq ==> ms_eq ==> ms_eq as uc_compose_wd.
 Proof.
 intros X Y Z x1 x2 Hx y1 y2 Hy.
@@ -224,3 +253,4 @@ apply uc_wd.
 rewrite (Hy x).
 reflexivity.
 Qed.
+(* end hide *)

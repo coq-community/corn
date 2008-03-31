@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -25,7 +25,9 @@ Require Import ZArith.
 Require Import TotalOrder.
 
 Opaque Z_lt_le_dec.
-
+(**
+** Example of a Total Order: <Z, Zle, Zmin, Zmax>
+*)
 Section ZTotalOrder.
 
 Open Local Scope Z_scope.

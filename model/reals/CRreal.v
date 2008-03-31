@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -29,6 +29,10 @@ Require Import CornTac.
 Opaque CR.
 
 Open Local Scope uc_scope.
+
+(**
+** Example of a real number structure: $\langle$#&lang;#[CR]$\rangle$#&rang;#
+*)
 
 Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos), AbsSmall (R:=CRasCOrdField) (inject_Q e) ((x:CRasCOrdField)[-]y) <->
  ball e x y.

@@ -1,3 +1,23 @@
+(*
+Copyright © 2007-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export StepQsec.
 Require Export UniformContinuity.
 Require Import Prelength.
@@ -17,10 +37,17 @@ Open Local Scope StepQ_scope.
 
 Opaque Qred.
 
+(**
+** L1 metric for Step Functions
+The L1 metric is measured by the integral of the absolute value of the
+difference between step functions.
+
+*** Integeral for Step Functions.
+*)
 Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (Qred (affineCombo b x y:QS))))%Q.
 Definition L1Norm(f:StepF QS):Q:=(IntegralQ (StepQabs f)).
 Definition L1Distance(f g:StepF QS):Q:=(L1Norm (f - g)).
-Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=(L1Distance f g)<=e.
+Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=((L1Distance f g)<=e)%Q.
 
 (*
 Definition test1:=(constStepF (1:QS)).
@@ -42,6 +69,7 @@ right. abstract auto with *.
 left. exact Hdc.
 Defined.
 
+(** The integral of the glue of two step functions. *)
 Lemma Integral_glue : forall o s t, (IntegralQ (glue o s t) == o*(IntegralQ s) + (1-o)*(IntegralQ t))%Q.
 Proof.
 intros o s t.
@@ -51,6 +79,7 @@ rewrite Qred_correct.
 reflexivity.
 Qed.
 
+(** The integral of the split of a step function. *)
 Lemma IntegralSplit : forall (o:OpenUnit) x, 
  (IntegralQ x ==
  affineCombo o (IntegralQ (SplitL x o)) (IntegralQ (SplitR x o)))%Q.
@@ -76,7 +105,7 @@ unfold affineCombo in *.
 rewrite H.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Resolve IntegralSplit : StepQArith.
 
 Add Morphism IntegralQ 
@@ -120,7 +149,9 @@ reflexivity.
 Qed.
 
 Hint Rewrite Integral_glue: StepF_rew.
-
+(* end hide *)
+(** How the intergral intreacts with arithemetic functions on step
+functions. *)
 Lemma Integral_plus:forall s t,
   ((IntegralQ s)+(IntegralQ t)==(IntegralQ (s + t)))%Q.
 Proof.
@@ -172,7 +203,7 @@ ring.
 Qed.
 
 Lemma Abs_Integral : forall x,
- Qabs (IntegralQ x) <= IntegralQ (QabsS ^@> x).
+ (Qabs (IntegralQ x) <= IntegralQ (QabsS ^@> x))%Q.
 Proof.
 intros x.
 induction x using StepF_ind.
@@ -188,59 +219,12 @@ rsapply plus_resp_leEq_both;
 Qed.
 
 Lemma Abs_Integral_Norm : forall x,
- Qabs (IntegralQ x) <= L1Norm x.
+ (Qabs (IntegralQ x) <= L1Norm x)%Q.
 Proof.
 exact Abs_Integral.
 Qed.
 
-Definition StepQ_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
-
-Add Morphism StepQ_le 
-  with signature StepF_eq ==> StepF_eq ==> iff
- as StepQ_le_wd.
-unfold StepQ_le.
-intros x1 x2 Hx y1 y2 Hy.
-rewrite Hx.
-rewrite Hy.
-reflexivity.
-Qed.
-
-Notation "x <= y" := (StepQ_le x y) (at level 70) : sfstscope.
-
-Lemma StepQ_le_refl:forall x, (x <= x).
-intros x.
-unfold StepQ_le.
-cut (StepFfoldProp (join QleS ^@> x)).
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map.
-intros.
-simpl.
-auto with *.
-Qed.
-
-Lemma StepQ_le_trans:forall x y z, 
- (x <= y)-> (y <= z) ->(x <= z).
-intros x y z. unfold StepQ_le.
-intros H.
-apply StepF_imp_imp.
-revert H.
-rapply StepF_imp_imp.
-unfold StepF_imp.
-pose (f:= ap
-(compose (@ap _ _ _) (compose (compose (compose (@compose _ _ _) imp)) QleS))
-(compose (flip (compose (@ap _ _ _) (compose (compose imp) QleS))) QleS)).
-cut (StepFfoldProp (f ^@> x <@> y <@> z)).
- unfold f.
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map3.
-intros a b c Hab Hbc.
-clear f.
-simpl in *.
-eauto with qarith.
-Qed.
-
+(** The integral of a nonnegative function is nonnegative. *)
 Lemma Integral_resp_nonneg :forall x, 
  (constStepF (0:QS)) <= x -> (0 <= (IntegralQ x))%Q.
 Proof.
@@ -253,29 +237,6 @@ rewriteStepF.
 intros [Hxl Hxr].
 rsapply plus_resp_nonneg;
  rsapply mult_resp_nonneg; auto with *.
-Qed.
-
-Lemma L1Norm_glue : forall o s t, (L1Norm (glue o s t) == o*L1Norm s + (1-o)*L1Norm t)%Q.
-Proof.
-intros o s t.
-unfold L1Norm.
-rewrite <- Integral_glue.
-reflexivity.
-Qed.
-
-Lemma L1Norm_nonneg : forall x, (0 <= (L1Norm x))%Q.
-Proof.
-intros x.
-rapply Integral_resp_nonneg.
-unfold StepQ_le.
-rewriteStepF.
-set (g:=QleS 0).
-cut (StepFfoldProp ((compose g QabsS) ^@> x)).
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map.
-intros a.
-rapply Qabs_nonneg.
 Qed.
 
 Lemma Integral_resp_le :forall x y, 
@@ -302,6 +263,30 @@ intros a b.
 change (a <= b -> 0 <= b + (- a))%Q.
 rewrite Qle_minus_iff.
 tauto.
+Qed.
+
+(** Properties of the L1 norm. *)
+Lemma L1Norm_glue : forall o s t, (L1Norm (glue o s t) == o*L1Norm s + (1-o)*L1Norm t)%Q.
+Proof.
+intros o s t.
+unfold L1Norm.
+rewrite <- Integral_glue.
+reflexivity.
+Qed.
+
+Lemma L1Norm_nonneg : forall x, (0 <= (L1Norm x))%Q.
+Proof.
+intros x.
+rapply Integral_resp_nonneg.
+unfold StepQ_le.
+rewriteStepF.
+set (g:=QleS 0).
+cut (StepFfoldProp ((compose g QabsS) ^@> x)).
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+rapply Qabs_nonneg.
 Qed.
 
 Lemma L1Norm_Zero : forall s, 
@@ -377,6 +362,7 @@ intros a.
 rapply Qabs_Qmult.
 Qed.
 
+(** L1 ball has all the required properties. *)
 Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
 intros e x.
@@ -384,23 +370,6 @@ unfold L1Ball, L1Distance.
 setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
 change (0 <= e)%Q.
 auto with *.
-Qed.
-
-Lemma StepQabsOpp : forall x, StepQabs (-x) == StepQabs (x).
-Proof.
-intros x.
-unfold StepF_eq.
-set (g:=(st_eqS QS)).
-set (f:=(ap
-(compose g (compose QabsS QoppS))
-QabsS)).
-cut (StepFfoldProp (f ^@> x)).
- unfold f.
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map.
-intros a.
-rapply Qabs_opp.
 Qed.
 
 Lemma L1ball_sym : forall e x y, (L1Ball e x y) -> (L1Ball e y x).
@@ -411,21 +380,6 @@ unfold L1Norm.
 setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
 rewrite StepQabsOpp.
 auto.
-Qed.
-
-Lemma StepQabs_triangle : forall x y, StepQabs (x+y) <= StepQabs x + StepQabs y.
-Proof.
-intros x y.
-set (f:=(ap
-(compose ap (compose (compose (compose QleS QabsS)) QplusS))
-(compose (flip (@compose _ _ _) QabsS) (compose QplusS QabsS)))).
-cut (StepFfoldProp (f ^@> x <@> y)).
- unfold f.
- evalStepF.
- tauto.
-apply StepFfoldPropForall_Map2.
-intros a b.
-rapply Qabs_triangle.
 Qed.
 
 Lemma L1ball_triangle : forall e d x y z, (L1Ball e x y) -> (L1Ball d y z) -> (L1Ball (e+d) x z).
@@ -479,6 +433,9 @@ ring_simplify.
 assumption.
 Qed.
 
+(**
+*** Example of a Metric Space <StepQ, L1Ball>
+*)
 Lemma L1_is_MetricSpace : 
  (is_MetricSpace (@StepF_eq QS) L1Ball).
 split.
@@ -489,7 +446,7 @@ split.
  rapply L1ball_closed.
 rapply L1ball_eq.
 Qed.
-
+(* begin hide *)
 Add Morphism L1Ball with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
 intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold L1Ball.
@@ -499,12 +456,13 @@ rewrite Hy.
 rewrite Hz.
 reflexivity.
 Qed.
-
+(* end hide *)
 Definition L1StepQ : MetricSpace :=
 Build_MetricSpace L1Ball_wd L1_is_MetricSpace.
-
+(* begin hide *)
 Canonical Structure L1StepQ.
-
+(* end hide *)
+(** The L1 metric is a prelength space. *)
 Lemma L1StepQPrelengthSpace : PrelengthSpace L1StepQ.
 Proof.
 intros x y e d1 d2 He Hxy.
@@ -558,6 +516,7 @@ unfold f.
 ring.
 Qed.
 
+(** Integration is uniformly continuous. *)
 Lemma integral_uc_prf : is_UniformlyContinuousFunction IntegralQ Qpos2QposInf.
 Proof.
 intros e x y.

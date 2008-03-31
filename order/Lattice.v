@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -24,14 +24,19 @@ Require Export SemiLattice.
 
 Open Local Scope po_scope.
 
+(**
+* Lattice
+A lattice is a semilattice with a join operation such that it forms
+a semilattice with in the dual partial order.
+*)
 Record Lattice : Type :=
 { sl :> SemiLattice
 ; join : sl -> sl -> sl
 ; l_proof : is_SemiLattice (Dual sl) join
 }.
-
+(* begin hide *)
 Implicit Arguments join [l].
-
+(* end hide*)
 Section Join.
 
 Variable X : Lattice.
@@ -40,6 +45,7 @@ Definition makeLattice (po:PartialOrder) (meet join :  po -> po -> po) p1 p2 p3 
 @Build_Lattice (@makeSemiLattice po meet p1 p2 p3) join
 (@Build_is_SemiLattice (Dual po) join p4 p5 p6).
 
+(** The axioms of a join lattice. *)
 Lemma join_ub_l : forall x y : X, x <= join x y.
 Proof (sl_meet_lb_l _ _ (l_proof X)).
 
@@ -49,6 +55,9 @@ Proof (sl_meet_lb_r _ _ (l_proof X)).
 Lemma join_lub : forall x y z : X, x <= z -> y <= z -> join x y <= z.
 Proof (sl_meet_glb _ _ (l_proof X)).
 
+(**
+** Dual Latice
+The dual of a lattice is a lattice. *)
 Definition Dual : Lattice :=
 @makeLattice (Dual X) (@join X) (@meet X)
  join_ub_l
@@ -58,6 +67,7 @@ Definition Dual : Lattice :=
  (@meet_lb_r X)
  (@meet_glb X).
 
+(** All the lemmas about meet semilattices hold for join. *)
 Lemma join_comm :  forall x y:X, join x y == join y x.
 Proof meet_comm Dual.
 
@@ -83,14 +93,14 @@ Lemma join_le_compat : forall w x y z : X, w<=y -> x<=z -> join w x <= join y z.
 Proof fun w x y z => meet_le_compat Dual y z w x.
 
 End Join.
-
+(* begin hide *)
 Add Morphism join with signature po_eq ==> po_eq ==> po_eq  as join_compat.
 Proof fun X => meet_compat (Dual X).
-
+(* end hide *)
 Section MeetJoin.
 
 Variable X : Lattice.
-
+(** Lemma about how meet and join interact. *)
 Lemma meet_join_absorb_l_l : forall x y:X, meet x (join x y) == x.
 Proof.
 intros.
@@ -145,7 +155,7 @@ End MeetJoin.
 Section JoinMeet.
 
 Variable X : Lattice.
-
+(** The dual of the previous laws holds. *)
 Lemma join_meet_absorb_l_l : forall x y:X, join x (meet x y) == x.
 Proof meet_join_absorb_l_l (Dual X).
 

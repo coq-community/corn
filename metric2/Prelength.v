@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -33,15 +33,36 @@ Require Import Qauto.
 Set Implicit Arguments.
 
 Section Prelength_Space.
+(**
+** Prelength space
+In a length space the "internal" metric of a metric space corresponds
+to the given external metric.  The internal metric of a space measures
+the distance between two point by the length of curves connecting them.
 
+Because the notion of curves really only makes sense in a complete metric
+space, here we use a weaker notion of a prelength space.  In this case
+the internal metric says that two points are within e of each other if
+you can get between the two points making arbitarily short hops while
+covering a distance arbitrarily close to e.
+*)
 Variable X:MetricSpace.
 
+(** The notion of a prelength space is neatly characterized by the
+following simple definition. *)
 Definition PrelengthSpace :=
 forall (a b:X) (e d1 d2:Qpos), e < d1+d2 -> ball e a b -> 
 exists2 c:X, ball d1 a c & ball d2 c b.
 
+(** There is some evidence that we should be using the classical
+existential in the above definition.  For now we take the middle road
+and use the [Prop] based existential.  This show that the exists
+statement is not used in computations, but still every occurance is
+constructive. *)
+
 Hypothesis prelength : PrelengthSpace.
 
+(** This proves that you can construct a trail of points between a and b
+that is arbitarily close to e and with arbitrarily short hops. *)
 Lemma trail : forall dl e (a b:X),
  ball e a b ->
  e < QposSum dl -> 
@@ -117,7 +138,14 @@ Qed.
 
 Variable Y:MetricSpace.
 
-(*Lemma 15*)
+(** The major applicaiton of prelength spaces is that it allows one to
+reduce the problem of [ball (e1 + e2) (f a) (f b)] to 
+[ball (mu f e1 + mu f e2) a b] instead of reduceing it to
+[ball (mu f (e1 + e2)) a b].  This new reduction allows one to continue
+reasoning by making use of the triangle law.
+
+Below we show a more general lemma allowing for arbitarily many terms
+in the sum. *)
 Lemma mu_sum : forall e0 (es : list Qpos) (f:UniformlyContinuousFunction X Y) a b,
 ball_ex (fold_right QposInf_plus (mu f e0) (map (mu f) es)) a b ->
 ball (fold_right Qpos_plus e0 es) (f a) (f b).
@@ -261,6 +289,15 @@ Variable X Y : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
 Variable f : X --> Y.
 
+(**
+*** A more effictient [Cmap] and [Cbind]
+The main application of prelength spaces is to allow one to use a
+more natural and more efficent map function for complete metric spaces.
+Since this map function is more widely used in practice, it gets the
+name [Cmap] while the original map function is stuck with the name
+[Cmap_slow] as a reminder to try to use the function defined here if
+possible. *)
+
 Definition Cmap_raw (x:Complete X) (e:QposInf) :=
 f (approximate x (QposInf_bind (mu f) e)).
 
@@ -298,6 +335,7 @@ Qed.
 Definition Cmap : (Complete X) --> (Complete Y) :=
 Build_UniformlyContinuousFunction Cmap_prf.
 
+(** [Cmap] is equivalent to the original [Cmap_slow] *)
 Lemma Cmap_correct : ms_eq Cmap (Cmap_slow f).
 Proof.
 intros x e1 e2.
@@ -322,6 +360,7 @@ End Map.
 
 Open Local Scope uc_scope.
 
+(** Similarly we define a new Cbind *)
 Definition Cbind X Y plX (f:X-->Complete Y) := uc_compose Cjoin (Cmap plX f).
 
 Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), ms_eq (Cbind plX f) (Cbind_slow f).
@@ -337,6 +376,7 @@ Proof.
 apply Cbind_correct.
 Qed.
 
+(** Similarly we define a new Cmap_strong *)
 Lemma Cmap_strong_prf : forall (X Y:MetricSpace) (plX:PrelengthSpace X),
  is_UniformlyContinuousFunction (@Cmap X Y plX) Qpos2QposInf.
 Proof.
@@ -355,6 +395,7 @@ intros X Y plX.
 rapply Cmap_correct.
 Qed.
 
+(** Similarly we define a new Cap *)
 Definition Cap_raw X Y plX (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
  approximate (Cmap plX (approximate f ((1#2)%Qpos*e)%QposInf) x) ((1#2)%Qpos*e)%QposInf.
 
@@ -437,6 +478,7 @@ Proof.
 rapply Cap_fun_correct.
 Qed.
 
+(* begin hide *)
 Add Morphism Cmap_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_wd.
 Proof.
 intros X Y plX x1 x2 Hx y1 y2 Hy.
@@ -464,9 +506,14 @@ generalize y2.
 rapply (@uc_wd _ _ (Cap Y H)).
 assumption.
 Qed.
+(* end hide *)
 
+(** Similarly we define a new [Cmap2]. *)
 Definition Cmap2 (X Y Z:MetricSpace) (Xpl : PrelengthSpace X) (Ypl : PrelengthSpace Y) f := uc_compose (@Cap Y Z Ypl) (Cmap Xpl f).
 
+(** Completion of a metric space preserves the prelength property.
+In fact the completion of a prelenght space is a length space, but
+we have not formalized the notion of a length space yet. *)
 Lemma CompletePL : forall X, PrelengthSpace X -> PrelengthSpace (Complete X).
 Proof.
 intros X Xpl x y e d1 d2 He Hxy.

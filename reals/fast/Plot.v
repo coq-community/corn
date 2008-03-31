@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export RasterizeQ.
 Require Import Interval.
 Require Import Graph.
@@ -6,7 +26,16 @@ Require Export QposMinMax.
 Require Import CornTac.
 
 Section Plot.
+(**
+* Plotting
+Plotting a uniformly continuous function on a finite interval consists
+of producing the graph of a function as a compact set, approximating that
+graph, and finally rasterizing that approximation.
 
+A range for the plot must be provided.  We choose to clamp the plotted
+function so that it lies inside the specified range.  Thus we plot
+[compose (clip b t) f] rather than [f].
+*)
 Variable (l r:Q).
 Hypothesis Hlr : l < r.
 
@@ -64,11 +93,13 @@ Variable err : Qpos.
 *)
 Let err := Qpos_max ((1 # 4 * P_of_succ_nat n) * w) 
  ((1 # 4 * P_of_succ_nat m) * h).
- 
+
+(** [PlotQ] is the function that does all the work. *)
 Definition PlotQ := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.  
 
 Open Local Scope raster.
 
+(** The resulting plot is close to the graph of [f] *)
 Theorem Plot_correct : 
 ball (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
         ((1 # 2 * P_of_succ_nat (pred m)) * h))
@@ -112,5 +143,6 @@ Qed.
 
 End Plot.
 
+(** Some nice notation for the graph of f. *)
 Notation "'graphCR' f [ l '..' r ]" := 
  (graphQ l r (refl_equal _) f) : raster.

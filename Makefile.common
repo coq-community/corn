@@ -147,7 +147,8 @@ OTHERFLAGS = -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = 
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
-  --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
+  -g -l --multi-index --files-from $(DOCLIST)
+#  --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
 COQOBJECTS := $(COQSOURCES:.v=.vo)
 COQGLOBS := $(COQSOURCES:.v=.glob)

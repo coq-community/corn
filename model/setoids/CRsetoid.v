@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -23,6 +23,11 @@ Require Import CRcorrect.
 Require Export CRmetric.
 Require Export CSetoids.
 Require Import CornTac.
+
+(**
+** Example of a setoid: [CR]
+*** [CR]
+*)
 
 Lemma CRisCSetoid : is_CSetoid (@ms CR) (@ms_eq CR) CRapart.
 Proof.

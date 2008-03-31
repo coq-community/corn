@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -28,6 +28,10 @@ Set Implicit Arguments.
 
 Open Local Scope uc_scope.
 
+(**
+** Example of a Complete Metric Space: CR
+*)
+
 Definition CR := Complete Q_as_MetricSpace.
 
 Delimit Scope CR_scope with CR.
@@ -35,9 +39,11 @@ Bind Scope CR_scope with CR.
 
 Definition inject_Q : Q -> CR := (@Cunit Q_as_MetricSpace).
 
+(* begin hide *)
 Add Morphism (inject_Q) with signature Qeq ==> ms_eq as inject_Q_wd.
 exact (uc_wd (@Cunit Q_as_MetricSpace)).
 Qed.
+(* end hide *)
 
 Notation "' x" := (inject_Q x) : CR_scope.
 

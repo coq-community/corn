@@ -1,3 +1,23 @@
+(*
+Copyright © 2007-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Import OpenUnit.
 Require Import CornTac.
 Require Import Qauto.
@@ -10,6 +30,21 @@ Section StepFunction.
 
 Variable X:Type.
 
+(**
+* Step Functions
+We represent step functions from [[0,1]] to [X] inductively as a tree
+structure.  In the base case a costant function is a step function.
+Given two step functions f and g, then they can be scaled and glued
+together at a point o yeilding the step function which is f(x/o) for
+x in [[0,o]], and g((x-o)/(1-o)) for x in [[o,1]].
+
+Step functions are not functions.  They could be interpreted as
+functions; however, we don't give any particular interpretation to how
+the step functions ought to behave at the glue points in between step.
+Because our primary purpose for introducing step functions is to
+implement integration, this ambiguity is not a problem.
+*)
+
 Inductive StepF :Type:=
 |constStepF:X-> StepF
 |glue:OpenUnit-> StepF -> StepF -> StepF.
@@ -21,9 +56,14 @@ Fixpoint StepFfold (Y : Type) (f : X -> Y) (g : OpenUnit -> Y -> Y -> Y)
   | glue b t1 t2 => g b (StepFfold f g t1) (StepFfold f g t2)
   end.
 
+(** If f is a step function, so is f(1-x).  This symmetry operation
+is useful reasoning about step functions because of the symetric nature
+of the glue constructor. *)
 Definition Mirror :StepF -> StepF :=
 StepFfold constStepF (fun a l r => glue (OpenUnitDual a) r l).
 
+(** [Split] decomposes (and scales) a step function at a point o.
+It is essentially an inverse operation of glue *)
 Definition Split : StepF -> OpenUnit -> StepF*StepF.
 fix 1.
 intros s a.
@@ -44,6 +84,8 @@ fst (Split s o).
 Definition SplitR (s:StepF) (o:OpenUnit) : StepF :=
 snd (Split s o).
 
+(** Induction principles for reasoning about [Split], [SplitR],
+and [SplitL] *)
 Lemma Split_ind : forall s a (P:StepF*StepF -> Prop),
  (P (SplitL s a,SplitR s a)) -> P (Split s a).
 Proof.
@@ -110,6 +152,9 @@ rewrite SplitGlue.
 reflexivity.
 Qed.
 
+(** As stepping point to a proper setoid equality on step functions,
+[StepF_Qeq] specifies equality of step function upto [Qeq] on
+rational glue points *)
 Fixpoint StepF_Qeq (s1 s2: StepF) : Prop :=
 match s1, s2 with
 |constStepF x, constStepF y => x = y
@@ -136,9 +181,10 @@ induction s; induction t; induction u; try contradiction; simpl; auto with *.
 intros [H0 [H1 H2]] [H3 [H4 H5]].
 repeat split; eauto with *.
 Qed.
-
+(* begin hide *)
 Hint Resolve StepF_Qeq_refl StepF_Qeq_sym StepF_Qeq_trans.
-
+(* end hide *)
+(** [Mirror] behaves well with respect to this equality *)
 Lemma Mirror_resp_Qeq : forall (s t:StepF), StepF_Qeq s t -> StepF_Qeq (Mirror s) (Mirror t).
 Proof.
 induction s; induction t; intros Hst; simpl in *; try assumption; try contradiction.
@@ -148,9 +194,9 @@ repeat split.
  apply IHs2; assumption.
 apply IHs1; assumption.
 Qed.
-
+(* begin hide *)
 Hint Resolve Mirror_resp_Qeq.
-
+(* end hide *)
 Lemma MirrorMirror : forall (s:StepF), (StepF_Qeq (Mirror (Mirror s)) s).
 Proof.
 induction s.
@@ -158,9 +204,10 @@ induction s.
 repeat split; auto with *.
 simpl; ring.
 Qed.   
-
+(* begin hide *)
 Hint Resolve MirrorMirror.
-
+(* end hide *)
+(** Splits interacts with Mirror in the way you expect *)
 Lemma SplitR_resp_Qeq : forall (s t:StepF) (a b:OpenUnit), a == b -> StepF_Qeq s t -> StepF_Qeq (SplitR s a) (SplitR t b).
 Proof.
 induction s; induction t; intros a b Hab Hst; simpl in *; try assumption; try contradiction.
@@ -170,9 +217,9 @@ apply SplitR_glue_ind; intros Hao; apply SplitR_glue_ind; intros Hbo; repeat spl
            |elim (Qlt_not_le _ _ Hbo); rewrite <- Hab; rewrite <- Ho; try rewrite Hao; auto with *];
  try apply IHs1; try apply IHs2; auto with *; simpl; try (rewrite Hab; rewrite Ho; reflexivity).
 Qed.
-
+(* begin hide *)
 Hint Resolve SplitR_resp_Qeq.
-
+(* end hide *)
 Lemma MirrorSplitL_Qeq : forall (s:StepF) (a b:OpenUnit), b == (OpenUnitDual a) -> (StepF_Qeq (Mirror (SplitL s a)) (SplitR (Mirror s) b)).
 Proof.
 induction s.
@@ -252,9 +299,11 @@ apply Mirror_resp_Qeq.
 apply StepF_Qeq_sym.
 apply MirrorSplitL_Qeq; auto with *.
 Qed.
-
+(* begin hide *)
 Hint Resolve SplitL_resp_Qeq.
-
+(* end hide *)
+(** The following three lemmas are the key lemmas about Splits.  They
+characterise how Splits distribute across each other. *)
 Lemma SplitLSplitL : forall (s:StepF) (a b c:OpenUnit), (a*b==c) -> 
  (StepF_Qeq (SplitL (SplitL s a) b) (SplitL s c)).
 Proof.
@@ -521,13 +570,14 @@ auto with *.
 Qed.
 
 End StepFunction.
-
+(* begin hide *)
 Add Relation StepF StepF_Qeq 
  reflexivity proved by StepF_Qeq_refl
  symmetry proved by StepF_Qeq_sym
  transitivity proved by StepF_Qeq_trans
  as StepF_Qeq_Setoid.
-
+(* end hide *)
+(** Step functions are a functor *)
 Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
 fix 4. intros X Y f [x| a t1 t2].
  exact (constStepF (f x)).
@@ -537,7 +587,7 @@ Defined.
 Notation "f ^@> x" := (Map f x) (at level 15, left associativity) : sfscope.
 
 Open Local Scope sfscope.
-
+(** Step functions are an applicative functor *)
 Fixpoint Ap (X Y:Type) (f:StepF (X->Y)) (a:StepF X) : StepF Y :=
 match f with
 |constStepF f0 => f0 ^@> a
@@ -560,6 +610,7 @@ destruct Hs as [Ho [Hl Hr]].
 repeat split; auto with *.
 Qed.
 
+(** These lemmas show how ap distributes over glue *)
 Lemma ApGlue : forall X Y (fl fr:StepF (X -> Y)) o b, (glue o fl fr) <@> b = glue o (fl <@> (SplitL b o)) (fr <@> (SplitR b o)).
 Proof.
 intros.
@@ -574,7 +625,7 @@ intros.
 rewrite ApGlue, SplitLGlue, SplitRGlue.
 reflexivity.
 Qed.
-
+(* begn hide *)
 Add Morphism Ap with signature StepF_Qeq ==> StepF_Qeq ==> StepF_Qeq as Ap_resp_Qeq.
 Proof.
 intros X Y.
@@ -591,11 +642,12 @@ repeat split; auto.
 apply IHx1_2; auto with *.
 apply SplitR_resp_Qeq; auto with *.
 Qed.
-
+(* end hide *)
 Section Ap.
-
+(* begin hide *)
 Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
-
+(* end hide *)
+(** Splits commute with maps *)
 Lemma SplitMap (X Y:Type):forall x:(StepF X), forall a, forall f:X->Y, 
     (Split (Map f x) a) = let (l,r) := Split x a in (Map f l,Map f r).
 intros X Y s a f. revert a. induction s. simpl; auto.
@@ -617,6 +669,8 @@ Lemma SplitRMap(X Y:Type): forall x:(StepF X), forall a, forall f:X->Y,
 intros. unfold SplitR. rewrite SplitMap. destruct (Split x a). simpl. auto.
 Qed.
 
+(** These lemmas show how ap distributes over split and uses mirror
+properties to get the symetric cases *)
 Lemma SplitLAp_Qeq (X Y:Type) : forall (f: StepF (X -> Y)) s o,
  StepF_Qeq (SplitL (f <@> s) o) ((SplitL f o) <@> (SplitL s o)).
 Proof.
@@ -719,6 +773,7 @@ End Ap.
 
 Section ApplicativeFunctor.
 
+(** These are the laws of an applicative functor *)
 Lemma Ap_identity : forall X (a:StepF X), constStepF (fun x => x) <@> a = a.
 Proof.
 induction a.
@@ -733,12 +788,13 @@ Lemma Map_identity : forall X (a:StepF X), (fun x => x) ^@> a = a.
 Proof.
 exact Ap_identity.
 Qed.
-
+(* begin hide *)
 Hint Resolve Ap_resp_Qeq.
 Hint Resolve SplitLAp_Qeq SplitRAp_Qeq.
 Hint Resolve StepF_Qeq_refl StepF_Qeq_sym StepF_Qeq_trans SplitL_resp_Qeq SplitR_resp_Qeq.
+(* end hide *)
 
-Definition compose X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
+Let compose X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
 
 Lemma Ap_composition_Qeq : forall X Y Z (a:StepF (Y->Z)) (b:StepF (X->Y)) (c:StepF X),
  StepF_Qeq (constStepF (@compose X Y Z) <@> a <@> b <@> c) (a <@> (b <@> c)).
@@ -811,6 +867,7 @@ Qed.
 
 End ApplicativeFunctor.
 
+(*
 Lemma MapMap2 (X Y Z W:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
   StepF_Qeq (f ^@> (g ^@> x <@> y)) ((fun x y => (f (g x y))) ^@> x <@> y).
 Proof.
@@ -825,31 +882,5 @@ rewrite Ap_composition_Qeq.
 rewrite <- (Ap_homomorphism (@compose Y _ _) f).
 rewrite Ap_composition_Qeq.
 apply StepF_Qeq_refl.
-Qed.
-
-(*
-Lemma Map2Map2Map2 (X Y Z W:Type): 
-  forall (f:Z->Z->W) (g:X->Y->Z) (h:X->Y->Z) 
-          (x:StepF X) (y:StepF Y), 
-  (StepF_Qeq (f ^@> (g ^@> x <@> y) <@> (h ^@> x <@> y))
-   ((fun x y => (f (g x y) (h x y))) ^@> x <@> y)).
-Proof.
-intros.
-change ((fun (x0 : X) (y0 : Y) => f (g x0 y0) (h x0 y0)) ^@> x <@> y)
- with (
-
-induction x. simpl. induction y.
-  simpl; auto with *.
- Opaque Map2.
- simpl.
- Transparent Map2.
- rewrite <-IHy1. rewrite <-IHy2.
- rewrite Map2GlueGlue.
- reflexivity.
-intro y. rewrite (Map2Glue (fun (x : X) (y0 : Y) => f (g x y0) (h x y0))).
-rewrite <- IHx1. rewrite <- IHx2.
-rewrite (Map2Glue g).
-rewrite (Map2Glue h).
-apply Map2GlueGlue.
 Qed.
 *)

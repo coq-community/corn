@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -21,6 +21,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import QArith_base.
 Require Import TotalOrder.
+
+(**
+** Example of a Total Order: <Q, Qle, Qmin, Qmax>
+*)
 
 Definition Qlt_le_dec_fast x y : {x < y} + {y <= x}.
 intros x y.
@@ -73,13 +77,13 @@ apply (TotalOrder.Default.min_def2 Q Qeq Qle Qeq_le_def Qle_total).
 apply (TotalOrder.Default.max_def1 Q Qeq Qle Qeq_le_def Qle_total).
 apply (TotalOrder.Default.max_def2 Q Qeq Qle Qeq_le_def Qle_total).
 Defined.
-
+(* begin hide *)
 Add Morphism Qmin : Qmin_compat.
 Proof @meet_compat QTotalOrder.
 
 Add Morphism Qmax : Qmax_compat.
 Proof @join_compat QTotalOrder.
-
+(* end hide *)
 Section QTotalOrder.
 
 Let Qto := QTotalOrder.
@@ -229,10 +233,11 @@ Definition Qmax_mult_pos_distr_l : forall x y z : Q, 0 <= x -> Qmax y z * x == Q
  fun x y z H => @monotone_join_distr Qto _ (Qmult_pos_monotone_l x H) y z.
 
 End QTotalOrder.
-
+(* begin hide *)
 Hint Resolve Qmin_lb_l: qarith.
 Hint Resolve Qmin_lb_r: qarith.
 Hint Resolve Qmin_glb: qarith.
 Hint Resolve Qmax_ub_l: qarith.
 Hint Resolve Qmax_ub_r: qarith.
 Hint Resolve Qmax_lub: qarith.
+(* end hide *)

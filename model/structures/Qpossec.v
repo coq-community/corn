@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -43,6 +43,11 @@ Require Import COrdFields2.
 Require Import Eqdep_dec.
 Require Import CornTac.
 
+(**
+* [Qpos]
+We define [Qpos] as a pair of positives (n,d) which represents the
+fraction n/d.  *)
+
 Record Qpos : Set := QposMake 
 {QposNumerator : positive
 ;QposDenominator : positive
@@ -53,11 +58,14 @@ Notation "a # b" := (QposMake a b) (at level 55, no associativity) : Qpos_scope.
 Bind Scope Qpos_scope with Qpos.
 Delimit Scope Qpos_scope with Qpos.
 
+(** There is an injection from [Qpos] to [Q] that we make into a
+coersion. *)
 Definition QposAsQ (a:Qpos) : Q :=
 (Zpos (QposNumerator a))#(QposDenominator a).
 
 Coercion QposAsQ : Qpos >-> Q.
 
+(** Basic properties about [Qpos] *)
 Lemma Qpos_prf : forall a:Qpos, 0 < a.
 Proof.
 firstorder.
@@ -77,6 +85,7 @@ apply Qlt_le_weak.
 apply Qpos_prf.
 Qed.
 
+(** Any positive rational number can be transformed into a [Qpos]. *)
 Definition mkQpos (a:Q) (p:0 < a) : Qpos.
 intros [an ad] p.
 destruct an as [|an|an].
@@ -86,9 +95,9 @@ exact (QposMake an ad).
 compute in p.
 abstract discriminate p.
 Defined.
-
+(* begin hide *)
 Implicit Arguments mkQpos [a].
-
+(* end hide *)
 Lemma QposAsmkQpos : forall (a:Q) (p:0<a), (QposAsQ (mkQpos p))=a.
 Proof.
 intros [[|an|an] ad] p.
@@ -96,16 +105,20 @@ discriminate.
 reflexivity.
 discriminate.
 Qed.
-
+(* begin hide *)
 Implicit Arguments QposAsmkQpos [a].
-
+(* end hide *)
 Lemma QposAsQposMake : forall a b, (QposAsQ (QposMake a b)) = (Zpos a)#b.
 Proof.
 trivial.
 Qed.
-
+(* begin hide *)
 Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
+(* end hide *)
 
+(**
+*** Equality
+*)
 Definition QposEq (a b:Qpos) := Qeq a b.
 
 Add Relation Qpos QposEq
@@ -115,6 +128,9 @@ Add Relation Qpos QposEq
 
 Definition QposAp (a b:Qpos) := Qap a b.
 
+(**
+*** Addition
+*)
 Definition Qpos_plus (x y:Qpos) : Qpos. 
 intros x y.
 apply mkQpos with (x+y).
@@ -122,7 +138,7 @@ abstract (rsapply plus_resp_pos; apply Qpos_prf).
 Defined.
 
 Infix "+" := Qpos_plus : Qpos_scope.
-
+(* begin hide *)
 Add Morphism Qpos_plus : Qpos_plus_wd.
 intros x1 x2 Hx y1 y2 Hy.
 unfold QposEq in *.
@@ -130,13 +146,17 @@ unfold Qpos_plus.
 autorewrite with QposElim.
 apply Qplus_comp; assumption.
 Qed.
-
+(* end hide *)
 Lemma Q_Qpos_plus : forall (x y:Qpos), ((x + y)%Qpos:Q)=(x:Q)+(y:Q).
 Proof.
 trivial.
 Qed.
+(* begin hide *)
 Hint Rewrite Q_Qpos_plus : QposElim.
-
+(* end hide *)
+(**
+*** Multiplicaiton
+*)
 Definition Qpos_mult (x y:Qpos) : Qpos. 
 intros x y.
 apply mkQpos with (x*y).
@@ -144,7 +164,7 @@ abstract (rsapply mult_resp_pos; apply Qpos_prf).
 Defined.
 
 Infix "*" := Qpos_mult : Qpos_scope.
-
+(* begin hide *)
 Add Morphism Qpos_mult : Qpos_mult_wd.
 intros x1 x2 Hx y1 y2 Hy.
 unfold QposEq in *.
@@ -152,16 +172,20 @@ unfold Qpos_mult.
 autorewrite with QposElim.
 apply Qmult_comp; assumption.
 Qed.
-
+(* end hide *)
 Lemma Q_Qpos_mult : forall (x y:Qpos), ((x * y)%Qpos:Q)=(x:Q)*(y:Q).
 Proof.
 trivial.
 Qed.
+(* begin hide *)
 Hint Rewrite Q_Qpos_mult : QposElim.
-
+(* end hide *)
+(**
+*** Inverse
+*)
 Definition Qpos_inv (x:Qpos) : Qpos :=
 ((QposDenominator x)#(QposNumerator x))%Qpos.
-
+(* begin hide *)
 Add Morphism Qpos_inv : Qpos_inv_wd.
 intros [x1n x1d] [x2n x2d] Hx.
 unfold QposEq in *.
@@ -173,7 +197,7 @@ symmetry.
 rewrite Pmult_comm.
 apply Hx.
 Qed.
-
+(* end hide *)
 Lemma Q_Qpos_inv : forall (x:Qpos), Qpos_inv x = / x :> Q.
 Proof.
 trivial.
@@ -182,6 +206,11 @@ Hint Rewrite Q_Qpos_inv : QposElim.
 
 Notation "a / b" := (Qpos_mult a (Qpos_inv b)) : Qpos_scope.
 
+(**
+*** Tactics
+These tactics solve Ring and Field equations over [Qpos] by converting
+them to problems over [Q].
+*)
 Ltac QposRing :=
  unfold QposEq;
  autorewrite with QposElim;
@@ -192,6 +221,8 @@ Ltac QposField :=
  autorewrite with QposElim;
  field.
 
+(** This is a standard way of decomposing a rational b that is greater than
+a into a plus a positive value c. *)
 Lemma Qpos_lt_plus : forall (a b:Q), 
  a< b ->
  {c:Qpos | b==(a+c)}.
@@ -203,9 +234,12 @@ assumption.
 exists (mkQpos H0).
 QposRing.
 Defined.
-
+(* begin hide *)
 Implicit Arguments Qpos_lt_plus [a b].
-
+(* end hide *)
+(**
+*** Power
+*)
 Lemma Qpos_power_pos : forall (x:Qpos) z, 0 < x^z.
 Proof.
 intros x z.
@@ -230,7 +264,7 @@ apply Qpos_power_pos.
 Defined.
 
 Infix "^" := Qpos_power : Qpos_scope.
-
+(* begin hide *)
 Add Morphism Qpos_power : Qpos_power_wd.
 intros x1 x2 Hx y.
 unfold QposEq in *.
@@ -239,7 +273,7 @@ autorewrite with QposElim.
 rewrite Hx.
 reflexivity.
 Qed.
-
+(* end hide *)
 Lemma Q_Qpos_power : forall (x:Qpos) z, ((x^z)%Qpos:Q)==(x:Q)^z.
 Proof.
 intros.
@@ -249,6 +283,9 @@ reflexivity.
 Qed.
 Hint Rewrite Q_Qpos_power : QposElim.
 
+(**
+*** Summing lists
+*)
 Definition QposSum (l:list Qpos) : Q := fold_right
 (fun (x:Qpos) (y:Q) => x+y) (Zero:Q) l.
 
@@ -263,6 +300,7 @@ apply Qpos_prf.
 assumption.
 Qed.
 
+(** A version of [Qred] for [Qpos]. *)
 Lemma QposRed_prf : forall (a:Q), (0 < a) -> (0 < Qred a).
 Proof.
 intros a Ha.

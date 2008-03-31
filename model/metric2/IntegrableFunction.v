@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -19,38 +19,25 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Metric.
+Require Export Complete.
+Require Import CRmetric.
+Require Import L1metric.
+Require Import LinfMetric.
+Require Import Qmetric.
+Require Import CornTac.
+Require Import BoundedFunction.
 
 Set Implicit Arguments.
 
-Section Apartness.
+Open Local Scope uc_scope.
+(**
+** Example of a Complete Metric Space: IntegrableFunction
+*)
+Definition IntegrableFunction := Complete L1StepQ.
 
-Variable X : MetricSpace.
-Hypothesis stable : forall e (a b:X), ~~ball e a b -> ball e a b.
+Definition Integral : IntegrableFunction --> CR :=
+ Cmap L1StepQPrelengthSpace IntegralQ_uc.
 
-Definition ms_ap (a b:X) := {e:Qpos | ~ball e a b}.
-
-Lemma ms_ap_half_tight : forall a b, ms_ap a b -> ms_eq a b -> False.
-Proof.
-intros a b [e He] H.
-apply He.
-rewrite H.
-apply ball_refl.
-Qed.
-
-Lemma ms_ap_tight : forall a b, (ms_ap a b -> False) <-> ms_eq a b.
-intros a b.
-split.
-intros H.
-apply ball_eq.
-intros e.
-apply stable.
-intros H1.
-apply H.
-exists e.
-assumption.
-intros H H1.
-apply ms_ap_half_tight with a b; assumption.
-Qed.
-
-End Apartness.
+(** Every bounded function is integrable. *)
+Definition BounedAsIntegrable : BoundedFunction --> IntegrableFunction :=
+ Cmap LinfStepQPrelengthSpace LinfAsL1.

@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Metric.
 Require Import Setoid.
 Require Import Classification.
@@ -8,6 +28,9 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Section ProductMetric.
+(**
+** Product Metric
+The product of two metric spaces forms a metric space *)
 
 Variable X Y : MetricSpace.
 
@@ -81,6 +104,9 @@ exists (X*Y)%type prod_ms_eq prod_ball.
 apply prod_is_MetricSpace.
 Defined.
 
+(** Product metrics preserve properties of metric spaces such as
+being a prelenght space, being stable, being located, and being deciable
+*)
 Lemma ProductMS_prelength : PrelengthSpace X -> PrelengthSpace Y -> PrelengthSpace ProductMS.
 Proof.
 intros HX HY a b e d1 d2 Hed Hab.
@@ -100,6 +126,8 @@ split.
 apply H1; tauto.
 Qed.
 
+(** Furthermore, if a product space is stable, then the components are
+stable (assuming the components are non-zero). *)
 Lemma ProductMS_stableX : Y -> stableMetric ProductMS -> stableMetric X.
 Proof.
 unfold stableMetric.
@@ -159,10 +187,11 @@ right; intros [H _].
 apply A; assumption.
 Defined.
 
+(** This defines a pairing function with types of a metric space *)
 Definition PairMS (x:X) (y:Y) : ProductMS := (x,y).
 
 End ProductMetric.
-
+(* begin hide *)
 Implicit Arguments PairMS [X Y].
 
 Add Morphism PairMS with signature ms_eq ==> ms_eq ==> ms_eq as PairMS_wd.
@@ -170,9 +199,11 @@ Proof.
 intros.
 split; assumption.
 Qed.
-
+(* end hide *)
 Open Local Scope uc_scope.
 
+(** [together] forms the tensor of two functions operating between
+metric spaces *)
 Lemma together_uc : forall A B C D (f:A --> C) (g:B --> D), 
  is_UniformlyContinuousFunction (fun (p:ProductMS A B) => (f (fst p), g (snd p)):ProductMS C D) (fun x => QposInf_min (mu f x) (mu g x)).
 Proof.

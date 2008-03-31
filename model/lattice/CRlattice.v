@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -21,6 +21,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export CRpartialorder.
 Require Import Lattice.
+
+(**
+** Example of a Lattice: <CR, CRle, CRmin, CRmax>
+*)
 
 Definition CRLattice : Lattice :=
 makeLattice CRPartialOrder (ucFun2 CRmin) (ucFun2 CRmax)

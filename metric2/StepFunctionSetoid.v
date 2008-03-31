@@ -1,3 +1,24 @@
+(*
+Copyright © 2007-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
+Require Export RSetoid.
 Require Export StepFunction.
 Require Import OpenUnit.
 Require Import CornTac.
@@ -7,25 +28,20 @@ Require Import COrdFields.
 
 Set Implicit Arguments.
 
-Record Setoid: Type :=
-{ st_car:>Type;
-  st_eq:st_car-> st_car ->Prop;
-  st_isSetoid: Setoid_Theory _ st_eq
-}.
-
-Add Setoid st_car st_eq st_isSetoid as genericSetoid.
-
-Definition iffSetoid : Setoid.
-exists Prop iff.
-split; tauto.
-Defined.
-
 Section StepF_Functions.
 
 Variable X:Setoid.
 
+(**
+** Step Functions over setoids
+In this section we redevelop step functions over a setoid X.
+Here we shadow the old Step Function operations to operate over
+setoids.
+*)
+
 Definition StepF := StepF X.
 
+(** We lift the constructors and destructors to the setoid version *)
 Definition constStepF : X -> StepF := (@constStepF X).
 
 Definition glue : OpenUnit -> StepF -> StepF -> StepF := (@glue X).
@@ -47,33 +63,21 @@ Definition Mirror : StepF -> StepF := (@Mirror X).
 Definition SplitL : StepF -> OpenUnit -> StepF := (@SplitL X).
 Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
 End StepF_Functions.
-
+(* begn hide *)
 Implicit Arguments constStepF [X].
+(* end hide *)
+Open Local Scope setoid_scope.
 
-Record Morphism (X Y:Setoid) :=
-{evalMorphism :> X -> Y
-;Morphism_prf : forall x1 x2, (st_eq X x1 x2) -> (st_eq Y (evalMorphism x1) (evalMorphism x2))
-}.
-
-Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq Y (f x) (g x).
-Definition extSetoid (X Y:Setoid) : Setoid.
-intros X Y.
-exists (Morphism X Y) (extEq Y).
-split.
-  intros x y; reflexivity.
- intros x y H a; symmetry; auto.
-intros x y z Hxy Hyz a; transitivity (y a); auto.
-Defined.
-
-Notation "x --> y" := (extSetoid x y) (at level 90, right associativity) : sfstscope.
-
-Open Local Scope sfstscope.
-
+(** We lift ap to the setoid version.  Map is a notation calling ap so
+that all lemmas about ap automatically apply to ap *)
 Definition Ap (X Y:Setoid) : (StepF (X --> Y))->(StepF X)->(StepF Y) := fun f x => (@Ap X Y (StepFunction.Map (@evalMorphism X Y) f) x).
 Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfstscope.
 Notation "f ^@> x" := (Ap (constStepF f) x) (at level 15, left associativity) : sfstscope.
 Notation "f <@^ x" := (Ap f (constStepF x)) (at level 15, left associativity) : sfstscope.
 
+Open Local Scope sfstscope.
+
+(** We lift lemmas about map, ap, mirror, and glue *)
 Lemma MirrorGlue : forall (X : Setoid) (o : OpenUnit) (al ar : StepF X),
        Mirror (glue o al ar) = glue (OpenUnitDual o) (Mirror ar) (Mirror al).
 Proof.
@@ -177,7 +181,9 @@ Qed.
 
 Section EquivalenceA.
 Variable X:Setoid.
-
+(** A step function over [Prop], a characteristic function, can be
+folded into [Prop], which holds for the always true characteristic
+function *)
 Definition StepFfoldProp : StepF iffSetoid -> Prop := (StepFfold (X:=iffSetoid) (fun x => x ) (fun _ a b => a /\ b )).
 
 Definition st_eqS0 : X -> X --> iffSetoid.
@@ -198,12 +204,21 @@ simpl;
 rewrite Hx;
 reflexivity).
 Defined.
-
+(**
+** Equivalence
+An equivalence relation on step functions is implemented by lifiting
+the equivalence relation on the underlying setoid to step functions.
+The results is a characteristic function saying where two step functions
+are equivalent.  The step functions are considered equivalent if this
+characteristic function says they are equivalent everywhere.
+*)
 Definition StepF_eq (f g:StepF X):Prop:=
 (StepFfoldProp (st_eqS ^@> f <@> g)).
 
 Notation "x === y" := (StepF_eq x y) (at level 70).
 
+(** With equality defined we can complete the proof that split is the
+opposite of glue *)
 Lemma glue_StepF_eq:forall (s:StepF X) (s1 s2:StepF X), forall a, s1 === (SplitL s a) -> s2 === (SplitR s a) -> (glue a s1 s2) === s.
 intros s s1 s2 a H0 H1.
 unfold StepF_eq.
@@ -221,7 +236,7 @@ rewrite ApGlue in H0.
 destruct H0.
 auto.
 Qed.
-
+(** The equivalence relation is reflexive *)
 Lemma StepF_eq_refl:forall x : StepF X, x === x.
 induction x using StepF_ind.
  change (st_eq X x x).
@@ -230,9 +245,10 @@ apply glue_StepF_eq.
 simpl; rewrite SplitLGlue; assumption.
 simpl; rewrite SplitRGlue; assumption.
 Qed.
-
+(* begin hide *)
 Hint Resolve StepF_eq_refl.
-
+(* end hide *)
+(** StepF_Qeq is a refinement of any setoid equality *)
 Lemma StepF_Qeq_eq : forall (s t:StepF X), (StepF_Qeq s t) -> s === t.
 Proof.
 induction s using StepF_ind;
@@ -257,9 +273,9 @@ rapply glue_StepF_eq; auto with *.
 Qed.
 
 End EquivalenceA.
-
+(* begin hide *)
 Hint Resolve StepF_eq_refl : sfarith.
-
+(* end hide *)
 Notation "x == y" := (StepF_eq x y) (at level 70) : sfstscope.
 
 Section EquivalenceB.
@@ -325,9 +341,9 @@ Qed.
 Section EquivalenceC.
 
 Variable X:Setoid.
-
+(* begin hide *)
 Hint Resolve StepF_Qeq_eq StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
-
+(* end hide *)
 Lemma StepF_eq_resp_Qeq : forall (s t : StepF X) u v, (StepF_Qeq s t) -> (StepF_Qeq u v) -> s == u -> t == v.
 Proof.
 induction s using StepF_ind; induction t using StepF_ind; try contradiction.
@@ -443,6 +459,7 @@ rewrite Mirror_eq_Mirror.
 assumption.
 Qed.
 
+(** equalitiy is transitive *)
 Lemma StepF_eq_trans:forall x y z : StepF X, x == y -> y == z -> x == z.
 induction x using StepF_ind. intros.
  unfold StepF_eq in *.
@@ -476,6 +493,7 @@ rewrite ApGlueGlue.
 split; assumption.
 Qed.
 
+(** equality is symmetric *)
 Lemma StepF_eq_sym :forall x y: StepF X, x == y -> y == x.
 intros x y.
 revert x.
@@ -492,7 +510,7 @@ apply glue_StepF_eq;auto with *.
 Qed.
 
 End EquivalenceC.
-
+(* begin hide *)
 Add Relation StepF StepF_eq
  reflexivity proved by StepF_eq_refl
  symmetry proved by StepF_eq_sym
@@ -506,11 +524,15 @@ Add Morphism StepFfoldProp
  as StepFfoldProp_mor.
 exact StepFfoldProp_morphism.
 Qed.
-
+(* end hide *)
 Lemma StepF_Sth (X:Setoid) : (Setoid_Theory (StepF X) (@StepF_eq X)).
 split; intros; eauto with sfarith.
 Qed.
-
+(**
+** Common subdivision view
+This lemma allows to do induction over two step function as if the
+functions had the same subdivisions.
+*)
 Lemma StepF_ind2 : forall (X Y : Setoid) (P : StepF X -> StepF Y -> Prop),
        (forall (s s0 : StepF X) (t t0 : StepF Y),
         (s==s0) -> (t==t0) -> P s t -> P s0 t0) ->
@@ -549,6 +571,7 @@ rewrite SplitRGlue in H.
 assumption.
 Qed.
 
+(** Decompose an equality over glue into two parts *)
 Lemma eq_glue_ind X : forall (s1 s2 s : StepF X) (a : OpenUnit) (P : Prop),
        ((SplitL s a) == s1 -> (SplitR s a) == s2 -> P) ->
        s == (glue a s1 s2) -> P.
@@ -578,6 +601,8 @@ apply StepF_Qeq_eq; auto with *.
 rapply MirrorSplitL_Qeq; auto with *.
 Qed.
 
+(** Lift the distribution lemmas between ap and split to work over step
+functions *)
 Lemma SplitRAp :forall (X Y:Setoid) (f : StepF (Y --> X)) (s : StepF Y) (o : OpenUnit),
   (SplitR (f <@> s) o) == (SplitR f o <@> SplitR s o).
 Proof.
@@ -597,7 +622,7 @@ unfold Ap, SplitL.
 rewrite <- StepFunction.SplitLMap.
 rapply SplitLAp_Qeq.
 Qed.
-
+(* begin hide *)
 Add Morphism constStepF with signature st_eq ==> StepF_eq as constStepF_wd.
 auto.
 Qed.
@@ -680,7 +705,7 @@ apply glue_StepF_eq; auto with *.
 rewrite SplitRAp.
 apply IHf2; try rewrite Hs; auto with *.
 Qed.
-
+(* end hide *)
 Lemma GlueAp : forall (X Y : Setoid) (f : StepF (X --> Y)) (o : OpenUnit) (l r : StepF X),
        f <@> (glue o l r) == glue o ((SplitL f o) <@> l) ((SplitR f o) <@> r).
 Proof.
@@ -691,20 +716,15 @@ rewrite <- (glueSplit f o).
 rewrite ApGlueGlue.
 reflexivity.
 Qed.
-
+(**
+** Applicative Functor
+Here we prove the axioms of an applicative functor.
+*)
 Lemma Map_homomorphism (X Y:Setoid) : forall (f:X-->Y) (a:X),
  (f ^@> constStepF a) == (constStepF (f a)).
 Proof.
 reflexivity.
 Qed.
-
-Definition id (X:Setoid) : X-->X.
-intros X.
-exists (fun x => x).
-abstract (auto).
-Defined.
-
-Implicit Arguments id [X].
 
 Lemma Map_identity X : forall (a:StepF X),
  (@id X) ^@> a == a.
@@ -713,38 +733,6 @@ intros X a.
 rewrite <- Map_identity.
 reflexivity.
 Qed.
-
-Definition compose0 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) -> X --> Z.
-intros X Y Z f0 f1.
-exists (compose f0 f1).
-abstract (
-destruct f0 as [f0 Hf0];
-destruct f1 as [f1 Hf1];
-intros x1 x2 Hx;
-rapply Hf0;
-rapply Hf1;
-assumption).
-Defined.
-
-Definition compose1 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
-intros X Y Z f0.
-exists (compose0 f0).
-abstract (
-destruct f0 as [f0 Hf0];
-intros x1 x2 H y;
-rapply Hf0;
-rapply H).
-Defined.
-
-Definition compose (X Y Z:Setoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
-intros X Y Z.
-exists (@compose1 X Y Z).
-abstract (
-intros x1 x2 H y z;
-rapply H).
-Defined.
-
-Implicit Arguments compose [X Y Z].
 
 Lemma Map_composition X Y Z: forall (a:StepF (Y-->Z)) (b:StepF (X-->Y)) (c:StepF X),
  ((@compose X Y Z) ^@> a <@> b <@> c) == (a <@> (b <@> c)).
@@ -775,24 +763,10 @@ rewrite SplitRAp.
 reflexivity.
 Qed.
 
-Definition const0 (X Y:Setoid) : X->Y-->X.
-intros X Y x.
-exists (fun y => x).
-abstract (
-intros x1 x2 Hx;
-reflexivity).
-Defined.
-
-Definition const (X Y:Setoid) : X-->Y-->X.
-intros X Y.
-exists (@const0 X Y).
-abstract (
-intros x1 x2 Hx y;
-assumption).
-Defined.
-
-Implicit Arguments const [X Y].
-
+(** Here we show that the rest of the BCKW combinators lift to 
+step functions.  Hence all of the lambda calculus lifts to operate
+over step functions.  Step functions form about a nice of an
+applicative functor as is possible. *)
 Lemma Map_discardable X Y : forall (a:StepF X) (b:StepF Y),
  ((@const _ _) ^@> a <@> b == a).
 Proof.
@@ -807,38 +781,6 @@ rewrite ApGlueGlue.
 rewrite H0, H1.
 reflexivity.
 Qed.
-
-Definition flip0 (X Y Z:Setoid) : (X-->Y-->Z)->Y->X-->Z.
-intros X Y Z f y.
-exists (fun x => f x y).
-abstract (
-destruct f as [f Hf];
-intros x1 x2 H;
-apply Hf;
-auto).
-Defined.
-
-Definition flip1 (X Y Z:Setoid) : (X-->Y-->Z)->Y-->X-->Z.
-intros X Y Z f.
-exists (flip0 f).
-abstract (
-destruct f as [f Hf];
-intros x1 x2 H y;
-simpl;
-destruct (f y) as [g Hg];
-rapply Hg;
-auto).
-Defined.
-
-Definition flip (X Y Z:Setoid) : (X-->Y-->Z)-->Y-->X-->Z.
-intros X Y Z.
-exists (@flip1 X Y Z).
-abstract (
-intros x1 x2 H y z;
-rapply H).
-Defined.
-
-Implicit Arguments flip [X Y Z].
 
 Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
  ((@flip _ _ _) ^@> f <@> x <@> w) == (f <@> w <@> x).
@@ -861,29 +803,6 @@ do 4 rewrite ApGlue.
 apply glue_resp_StepF_eq; auto.
 Qed.
 
-Definition join0 (X Y:Setoid) : (X-->X-->Y)->X-->Y.
-intros X Y f.
-exists (fun y => f y y).
-abstract (
-destruct f as [f Hf];
-intros x1 x2 H;
-simpl;
-transitivity (f x1 x2);
-[destruct (f x1) as [g Hg];
- rapply Hg; auto
-|apply Hf; auto]).
-Defined.
-
-Definition join (X Y:Setoid) : (X-->X-->Y)-->X-->Y.
-intros X Y.
-exists (@join0 X Y).
-abstract (
-intros x1 x2 H y;
-rapply H).
-Defined.
-
-Implicit Arguments join [X Y].
-
 Lemma Map_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
  ((@join _ _) ^@> f <@> x) == (f <@> x <@> x).
 Proof.
@@ -898,7 +817,7 @@ do 3 rewrite ApGlueGlue.
 rewrite H0, H1.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Rewrite 
  ApGlueGlue ApGlue GlueAp SplitRAp SplitLAp SplitLGlue SplitRGlue
  Map_homomorphism : StepF_rew.
@@ -909,7 +828,9 @@ Hint Rewrite
  Map_commutative
  Map_identity
  Map_copyable : StepF_eval.
-
+(* end hide *)
+(** This tactic is usefully for symbolically evaluating functions written
+in (BCKWI) combinator form that are ap'ed to step functions *)
 Ltac evalStepF := progress 
 (repeat rewrite <- Map_homomorphism; autorewrite with StepF_eval).
 
@@ -921,11 +842,7 @@ evalStepF.
 reflexivity.
 Qed.
 
-Definition ap (X Y Z:Setoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
-:= compose (compose (compose (@join _ _)) (@flip _ _ _)) (compose (@compose _ _ _)).
-
-Implicit Arguments ap [X Y Z].
-
+(** Map'ing the S combinator (which is also called ap) *)
 Lemma Map_ap X Y Z : forall (f:StepF (X --> Y --> Z)) (x:StepF (X --> Y)) (a:StepF X),
  ((@ap _ _ _) ^@> f <@> x <@> a) == (f <@> a <@> (x <@> a)).
 Proof.
@@ -934,9 +851,9 @@ unfold ap.
 evalStepF.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Rewrite Map_ap : StepF_eval.
-
+(* end hide *)
 Ltac rewriteStepF := autorewrite with StepF_rew.
 
 Lemma StepFfoldPropForall_Ap : 
@@ -967,6 +884,9 @@ destruct H0 as [_ H0].
 assumption.
 Qed.
 
+(** A common case that we will encounter is that a predicate holds for
+all step functions when it is define via map (or map2 or map3) and the
+underlying function holds for all X. *)
 Lemma StepFfoldPropForall_Map : 
  forall X (f:X --> iffSetoid) (x:StepF X), (forall a, f a) -> StepFfoldProp (f ^@> x).
 Proof.
@@ -1004,6 +924,8 @@ intros a b.
 rapply H.
 Qed.
 
+(** The implication operation can be lifted to work on characteristic
+functions *)
 Definition imp0:Prop->iffSetoid-->iffSetoid.
 intro A.
 exists (fun B:Prop=>(A->B)).
@@ -1021,9 +943,9 @@ Definition StepF_imp (f g:StepF iffSetoid):Prop:=
 Lemma StepFfoldPropglue_rew:(forall o x y, (StepFfoldProp (glue o x y))<->((StepFfoldProp x)/\StepFfoldProp y)).
 auto with *.
 Qed.
-
+(* begin hide *)
 Hint Rewrite StepFfoldPropglue_rew:StepF_rew.
-
+(* end hide *)
 Lemma StepF_imp_imp:forall x y:(StepF iffSetoid),
   (StepF_imp x y) ->
   ((StepFfoldProp x)->(StepFfoldProp y)).

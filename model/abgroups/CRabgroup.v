@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -23,6 +23,10 @@ Require Export CRgroup.
 Require Import CRcorrect.
 Require Export CAbGroups.
 Require Import CornTac.
+
+(**
+** Example of a abelian group: $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
+*)
 
 Open Local Scope uc_scope.
 

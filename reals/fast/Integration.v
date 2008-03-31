@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export IntegrableFunctions.
+Require Export IntegrableFunction.
 Require Export BoundedFunction.
 Require Export CRmetric.
 Require Export CRArith.
@@ -46,63 +46,22 @@ Set Implicit Arguments.
 
 Opaque Qmax Qabs inj_Q.
 
-Fixpoint positive_rect2_helper
- (P : positive -> Type)
- (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
- (c2 : forall p : positive, P p -> P (xO p))
- (c3 : P 1%positive) 
- (b : bool) (p : positive) {struct p} : P (if b then Psucc p else p) :=
- match p return (P (if b then Psucc p else p)) with
- | xH    => if b return P (if b then (Psucc xH) else xH) then (c2 _ c3) else c3
- | xO p' => if b return P (if b then (Psucc (xO p')) else xO p') 
-             then (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
-             else (c2 _ (positive_rect2_helper P c1 c2 c3 false _))
- | xI p' => if b return P (if b then (Psucc (xI p')) else xI p') 
-             then (c2 _ (positive_rect2_helper P c1 c2 c3 true _))
-             else (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
- end.
-
-Definition positive_rect2
- (P : positive -> Type)
- (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
- (c2 : forall p : positive, P p -> P (xO p))
- (c3 : P 1%positive) (p : positive) : P p :=
-positive_rect2_helper P c1 c2 c3 false p.
-
-Lemma positive_rect2_helper_bool : forall P c1 c2 c3 p,
-positive_rect2_helper P c1 c2 c3 true p =
-positive_rect2_helper P c1 c2 c3 false (Psucc p).
-Proof.
-intros P c1 c2 c3.
-induction p; try reflexivity.
-simpl.
-rewrite IHp.
-reflexivity.
-Qed.
-
-Lemma positive_rect2_red1 : forall P c1 c2 c3 p,
-positive_rect2 P c1 c2 c3 (xI p) =
-c1 p (positive_rect2 P c1 c2 c3 (Psucc p)) (positive_rect2 P c1 c2 c3 p).
-Proof.
-intros P c1 c2 c3 p.
-unfold positive_rect2.
-simpl.
-rewrite positive_rect2_helper_bool.
-reflexivity.
-Qed.
-
-Lemma positive_rect2_red2 : forall P c1 c2 c3 p,
-positive_rect2 P c1 c2 c3 (xO p) =
-c2 p (positive_rect2 P c1 c2 c3 p).
-reflexivity.
-Qed.
-
-Lemma positive_rect2_red3 : forall P c1 c2 c3,
-positive_rect2 P c1 c2 c3 (xH) = c3.
-reflexivity.
-Qed.
-
 Open Local Scope Q_scope.
+
+(**
+* Effective Integration
+** stepSample
+The first step in defining integration is to define the unit function on
+[[0,1]] as a [Bounded Function].  This is defined to be the limit of
+step functions approximating the unit function.
+
+For efficenty reasons we want this approximation to be as good as we can muster because the number of steps this approximation returns will be
+the number of samples that we will take of the function we want to
+integrate.  Furthermore, we want the tree structure defining the step
+function to be as balanced as possible.
+
+First we create a step function with n steps that appoximates the
+identity function, [stepSample]. *)
 
 Lemma oddGluePoint (p:positive) : 0 < Psucc p # xI p /\ Psucc p # xI p < 1.
 Proof.
@@ -119,6 +78,7 @@ ring_simplify.
 auto with *.
 Qed.
 
+Open Local Scope setoid_scope.
 Open Local Scope sfstscope.
 Open Local Scope StepQ_scope.
 
@@ -128,6 +88,14 @@ Definition stepSample : positive -> StepQ := positive_rect2
  (fun p rec => glue (ou (1#2)) (constStepF (1#2:QS) * rec) (constStepF (1#2:QS) * (constStepF (1:QS) + rec)))
  (constStepF (1#2:QS)).
 
+(** We want to prove that [stepSample n] is within (1/(2*n)) of the
+identity function, but the identity function doesn't exist yet.
+Instead we define the [SupDistanceToLinear] which computes what would
+the distance to a linear function on [[0,1]].  This distance function
+is transitive in the sense that if a step function x is within e1 of
+a linear function, and a step function y is within e2 of the same
+linear function, then x and y are really within (e1+e2) of each other
+(in Linf).*)
 Section id01.
 
 Lemma SupDistanceToLinearBase_pos : forall (l r:Q) (H:l<r) (x:Q), 0 < Qmax (x-l) (r-x).
@@ -152,6 +120,7 @@ Definition SupDistanceToLinear := StepFfold
  (fun b f g l r H =>
   (Qpos_max (f _ _ (affineCombo_gt (OpenUnitDual b) H)) (g _ _ (affineCombo_lt (OpenUnitDual b) H)))).
 
+(** Various properties of [SupDistanceToLinear] *)
 Lemma SupDistanceToLinear_glue : forall o l r a b (H:a < b), 
  (SupDistanceToLinear (glue o l r) H ==
  Qmax (SupDistanceToLinear l (affineCombo_gt (OpenUnitDual o) H))
@@ -202,24 +171,6 @@ apply Qmax_compat.
 rewrite <- Qle_max_r.
 rsapply plus_resp_leEq.
 auto with *.
-Qed.
-
-Lemma affineAffine_l : forall a b o1 o2, 
-(affineCombo o1 a (affineCombo o2 a b)==affineCombo (OpenUnitDualMult o1 o2) a b)%Q.
-Proof.
-intros a b o1 o2.
-unfold affineCombo.
-simpl.
-ring.
-Qed.
-
-Lemma affineAffine_r : forall a b o1 o2, 
-(affineCombo o1 (affineCombo o2 a b) b==affineCombo (o1*o2) a b)%Q.
-Proof.
-intros a b o1 o2.
-unfold affineCombo.
-simpl.
-ring.
 Qed.
 
 Lemma SupDistanceToLinear_split :
@@ -384,6 +335,7 @@ apply SupDistanceToLinear_wd1; try reflexivity.
 unfold affineCombo; ring.
 Qed.
 
+(** This is the "transitivity" of the [SupDistanceToLinear] function. *)
 Lemma SupDistanceToLinear_trans :
  forall x y a b (H:a < b), LinfBall (SupDistanceToLinear x H + SupDistanceToLinear y H) x y.
 Proof.
@@ -435,6 +387,8 @@ apply Qmax_le_compat;
  auto with *.
 Qed.
 
+(** The [stepSample p] is as close to the virtual identity function as
+we excpet. *)
 Lemma stepSampleDistanceToId : (forall p, QposEq (@SupDistanceToLinear (stepSample p) 0 1 (@pos_one _)) (1#(2*p))).
 Proof.
 unfold QposEq.
@@ -516,6 +470,8 @@ induction p using positive_rect2.
 reflexivity.
 Qed.
 
+(** Given a requested error of q, what is smallest n for [stepFunction n]
+that will satifiy this error requirement. *)
 Definition id01_raw_help (q:QposInf) : positive := 
 match q with
 |QposInfinity => 1%positive
@@ -544,6 +500,8 @@ replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q by (field; spl
 rsapply mult_resp_nonneg; auto with *.
 Qed.
 
+(** Now define id01, the identity funciton on [[0,1]] as a bounded function,
+to be the limit of these [stepSample] functions. *)
 Definition id01_raw (q:QposInf) : StepQ := stepSample (id01_raw_help q).
 
 Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> LinfStepQ).
@@ -564,12 +522,17 @@ Build_RegularFunction id01_prf.
 
 End id01.
 
+(* This probably should be moved somewhere else, but where? *)
 Definition CRSetoid : Setoid.
 exists CR (@ms_eq CR).
 eapply msp_Xsetoid.
 apply (@msp CR).
 Defined.
 
+(**
+** StepFunctions distribute over Completion
+The distribution function maps StepF (Complete X) to Complete (StepF X).
+*)
 (* approximate z e is not a morphism, so we revert to using the pre-setoid version of StepF's map *)
 Definition distribComplete_raw (x:StepF CRSetoid) (e:QposInf) : LinfStepQ :=
 StepFunction.Map (fun z => approximate z e) x.
@@ -600,8 +563,18 @@ Build_RegularFunction (distribComplete_prf x).
 
 Open Local Scope uc_scope.
 
-Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
+(** Given a uniformly continuous function f, and a step function g,
+the composition f o g is a bounded function.  The map from g to f o g
+is uniformly continuous with modulus [mu f].
 
+The same thing does not work for integrable functions becuase 
+The map from g to f o g may not be uniformly continuous with modulus [mu f].
+However, I have not found a counter example where f o g is not uniformly
+continuous.  In fact, when f is lipschitz, then the map from g to
+f o g is Lipschitz.  However Lipschitz functions haven't been
+formalzied yet. *)
+Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
+(* begin hide *)
 Add Morphism ComposeContinuous_raw with signature ms_eq ==> ms_eq as ComposeContinuous_raw_wd.
 Proof.
 intros f x1 x2 Hx d1 d2.
@@ -660,7 +633,7 @@ unfold SplitR.
 do 2 rewrite StepFunction.SplitRMap.
 reflexivity.
 Qed.
-
+(* end hide *)
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
@@ -709,15 +682,24 @@ Qed.
 Definition ComposeContinuous (f:Q_as_MetricSpace --> CR) : LinfStepQ --> BoundedFunction :=
  Build_UniformlyContinuousFunction (ComposeContinuous_prf f).
 
+(**
+** Riemann-Stieltjes Integral
+A measure on the reals is represented by the inverse of it's cumlative
+distribution function as a bounded function.  So at the moment we
+can only integrate over bounded intervals.  This effectively the
+Stieltjes integral [Integral f d(g^-1)]. *)
 Definition IntegrateWithMeasure (f:Q_as_MetricSpace --> CR) : BoundedFunction --> CR :=
-(uc_compose IntegrableFunctions.Integral
+(uc_compose IntegrableFunction.Integral
 (uc_compose BounedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
 
+(** The Riemann Integral uses the uniform measure on [[0,1]].  The
+inverse of it's cumlative distribution function is [id01]. *)
 Definition Integrate01 f := IntegrateWithMeasure f id01.
 
 Definition ContinuousSup01 f :=
 (uc_compose sup (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f))) id01.
 
+(** Our integral on [[0,1]] is correct. *)
 Lemma Integrate01_correct : forall F (H01:Zero[<=](One:IR)) (HF:Continuous_I H01 F)
  (f:Q_as_MetricSpace --> CR),
  (forall (o:Q) H, (0 <= o <= 1) -> (f o == IRasCR (F (inj_Q IR o) H)))%CR -> 

@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export ProductMetric.
 Require Export Complete.
 Require Import Qauto.
@@ -5,10 +25,15 @@ Require Import Qauto.
 Set Implicit Arguments.
 
 Section CompleteProduct.
-
+(**
+*** Completion of product spaces.
+This section develops the strong monad properties of the Completion
+operation with respect to the product operation.
+*)
 Variable X Y:MetricSpace.
 Let XY := ProductMS X Y.
 
+(** The projection operations are uniformly continuous *)
 Lemma fst_uc : is_UniformlyContinuousFunction (fun p:XY => fst p) Qpos2QposInf.
 Proof.
 intros e a b [H _].
@@ -75,6 +100,7 @@ Build_UniformlyContinuousFunction Cfst_uc.
 Definition Csnd : Complete XY --> Complete Y :=
 Build_UniformlyContinuousFunction Csnd_uc.
 
+(** The pairing function is uniformly continuous *)
 Lemma pair_uc_l : forall y:Y, @is_UniformlyContinuousFunction X XY (fun x => (x,y)) Qpos2QposInf.
 Proof.
 intros y e a b H.
@@ -89,6 +115,7 @@ split; auto.
 apply ball_refl.
 Qed.
 
+(** C(X*Y) is isomorphic to (C X)*(C Y) *)
 Definition Strength_raw (p: ProductMS (Complete X) (Complete Y)) (e:QposInf): XY :=
 (approximate (fst p) e,approximate (snd p) e).
 
@@ -134,6 +161,8 @@ Qed.
 
 End CompleteProduct.
 
+(* begin hide *)
 Implicit Arguments Strength [X Y].
 Implicit Arguments Cfst [X Y].
 Implicit Arguments Csnd [X Y].
+(* end hide *)

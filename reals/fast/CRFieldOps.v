@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -33,6 +33,14 @@ Set Implicit Arguments.
 Open Local Scope uc_scope.
 Opaque CR Qmin Qmax Qred.
 
+(**
+** Strict Inequality
+First we defined positivity.  We define positivity to contain a 
+positive rational witness of a lower bound on x.  This seems the best
+way because this witness contains exactly the information needed
+for functions (such as inverse and logorithm) that have domains
+restricted to the positive reals.
+*)
 Definition CRpos (x:CR) := sig (fun e:Qpos => ' e <= x)%CR.
 
 Lemma CRpos_wd : forall x y, (x==y)%CR -> (CRpos x) -> (CRpos y).
@@ -45,6 +53,9 @@ assumption
 ).
 Defined.
 
+(** This is a characterization closer to Bishop's definiton.  If we
+replace [2*e] with [e], the theorem still holds, but it could be
+very expensive to call.  We prefer to avoid that. *)
 Lemma CRpos_char : forall (e:Qpos) (x:CR), 2*e <= (approximate x e) -> 
  CRpos x.
 intros e x H.
@@ -69,6 +80,7 @@ autorewrite with QposElim in X;
 assumption).
 Defined.
 
+(** Negative reals are defined similarly. *)
 Definition CRneg (x:CR) := sig (fun e:Qpos => x <= ' (-e)%Q)%CR.
 
 Lemma CRneg_wd : forall x y, (x==y)%CR -> (CRneg x) -> (CRneg y).
@@ -106,6 +118,7 @@ autorewrite with QposElim in X;
 assumption).
 Defined.
 
+(** Strict inequality is defined in terms of positivity. *)
 Definition CRlt (x y:CR) := CRpos (y-x)%CR.
 
 Infix "<" := CRlt : CR_scope.
@@ -121,6 +134,9 @@ reflexivity
 ).
 Defined.
 
+(**
+** Apartness
+*)
 Definition CRapart (x y:CR) := (x < y or y < x)%CR.
 
 Notation "x >< y" := (CRapart x y) (at level 70, no associativity) : CR_scope.
@@ -129,7 +145,10 @@ Lemma CRapart_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1><y1 -> x2
 Proof.
 intros x1 x2 Hx y1 y2 Hy [H|H];[left;apply (CRlt_wd Hx Hy)|right;apply (CRlt_wd Hy Hx)];assumption.
 Defined.
-
+(**
+** Multiplication
+The modulus of continuity for multiplication by a constant.
+*)
 Definition Qscale_modulus (a:Q) (e:Qpos) : QposInf :=
 match a with
 | 0 # _ => QposInfinity
@@ -244,11 +263,14 @@ rewrite Pmult_comm.
 reflexivity.
 Qed.
 
+(** Scaling by a constant is [Qmult] lifted on one parameter. *)
 Definition Qscale_uc (a:Q_as_MetricSpace) : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction (Qscale_uc_prf a).
 
 Definition scale (a:Q) : CR --> CR := Cmap QPrelengthSpace (Qscale_uc a).
 
+(** [CRboundAbs] clamps a real number between -c and c where c is
+rational. *)
 Definition QboundAbs (c:Qpos) := uc_compose (QboundBelow_uc (-c)) (QboundAbove_uc c).
 
 Definition CRboundAbs (c:Qpos) := Cmap QPrelengthSpace (QboundAbs c).
@@ -274,6 +296,7 @@ ring_simplify.
 auto with *.
 Qed.
 
+(** Properties of CRboundAbs. *)
 Lemma CRboundAbs_Eq : forall (a:Qpos) (x:CR),
  ('(-a)%Q <= x -> x <= ' a ->
  CRboundAbs a x == x)%CR.
@@ -316,6 +339,8 @@ apply H3.
 split;assumption.
 Qed.
 
+(** The modulus of continuity for multiplication depends on the
+bound, c, on the second argument. *)
 Definition Qmult_modulus (c:Qpos)(e:Qpos) : QposInf := (e / c)%Qpos.
 
 Lemma Qmult_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun a => uc_compose (Qscale_uc a) (QboundAbs c)) (Qmult_modulus c).
@@ -347,15 +372,18 @@ replace RHS with (- (- c)) by ring.
 rsapply inv_resp_leEq.
 apply H2.
 Qed.
-
+(* begin hide *)
 Implicit Arguments Qmult_uc_prf [].
-
+(* end hide *)
 Definition Qmult_uc (c:Qpos) :  Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace:=
 Build_UniformlyContinuousFunction (Qmult_uc_prf c).
 
+(** This multiply should be used when a bound on the absolute value of
+the second argument is known. *)
 Definition CRmult_bounded (c:Qpos) : CR --> CR --> CR :=
 Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc c).
 
+(** CR_b computes a rational bound on the absolute value of x *)
 Definition CR_b (e:Qpos) (x:CR) : Qpos.
 intros e x.
 refine (@mkQpos (Qabs (approximate x e) + e:Q) _).
@@ -424,6 +452,9 @@ assumption.
 (rsapply mult_resp_nonneg;[discriminate|apply Qpos_nonneg]).
 Qed.
 
+(** This version of multiply computes a bound on the second argument
+just in time.  It should be avoided in favour of the bounded version
+whenever possible. *)
 Definition CRmult x y := ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
 
 Infix "*" := CRmult : CR_scope.
@@ -487,7 +518,7 @@ rapply CRmult_bounded_weaken; try assumption.
 rapply CR_b_lowerBound.
 rapply CR_b_upperBound.
 Qed.
-
+(* begin hide *)
 Add Morphism CRmult with signature ms_eq ==> ms_eq ==> ms_eq as CRmult_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
@@ -502,7 +533,7 @@ rewrite <- Hy.
 rapply CR_b_lowerBound.
 rapply CR_b_upperBound.
 Qed.
-
+(* end hide *)
 Lemma CRmult_scale : forall (a:Q) (y:CR), ((' a)*y==scale a y)%CR.
 Proof.
 intros a y.
@@ -533,9 +564,9 @@ rapply CRboundAbs_Eq.
 apply CR_b_lowerBound.
 apply CR_b_upperBound.
 Qed.
-
+(* begin hide *)
 Hint Rewrite CRmult_scale : CRfast_compute.
-
+(* end hide *)
 Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
 Proof.
 intros a b.
@@ -544,9 +575,13 @@ simpl.
 rewrite Cmap_fun_correct.
 rapply MonadLaw3.
 Qed.
-
+(* begin hide *)
 Hint Rewrite scale_Qmult : CRfast_compute.
-
+(* end hide *)
+(**
+** Inverse
+The modulus of continuity for inverse depends on a rational bound
+away from 0 of x. *)
 Definition Qinv_modulus (c:Qpos) (e:Qpos) : Qpos := (c*c*e)%Qpos.
 
 Lemma Qpos_Qmax : forall (a:Qpos) (b:Q), 0<Qmax a b.
@@ -604,6 +639,7 @@ rewrite <- Qle_max_r.
 apply Qle_trans with c2; assumption.
 Qed.
 
+(** [CRinv_pos] works for inputs greater than c *)
 Definition CRinv_pos (c:Qpos) : CR --> CR := (Cmap QPrelengthSpace (Qinv_pos_uc c)).
 
 Lemma CRinv_pos_weaken : forall (c1 c2:Qpos), c1 <= c2 -> forall (x:CR), (' c2 <= x -> CRinv_pos c1 x == CRinv_pos c2 x)%CR.
@@ -656,6 +692,7 @@ rewrite <- Qle_max_r.
 assumption.
 Qed.
 
+(** [CRinv] works for inputs apart from 0 *)
 Definition CRinv (x:CR)(x_: (x >< ' 0)%CR) : CR.
 intros x [[c H]|[c H]].
 exact ((-(CRinv_pos c (-x)))%CR).

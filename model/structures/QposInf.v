@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -22,10 +22,19 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export Qpossec.
 Require Import QposMinMax.
 
+(** printing QposInf $\mathbb{Q}^{+}_{\infty}$ #Q<SUP>+</SUP><SUB>&infin;</SUB># *)
+(** printing QposInfinity $\infty$ #&infin;# *)
+
 Set Implicit Arguments.
 
 Open Local Scope Q_scope.
 Open Local Scope Qpos_scope.
+
+(**
+* [Qpos]
+We choose to define [QposInf] as the disjoint union of [Qpos] and an
+Infinity token.
+*)
 
 Inductive QposInf : Set :=
 | Qpos2QposInf : Qpos -> QposInf
@@ -34,8 +43,13 @@ Inductive QposInf : Set :=
 Bind Scope QposInf_scope with QposInf.
 Delimit Scope QposInf_scope with QposInf.
 
+(** Qpos2QposInf is an injection from [Qpos] to [QposInf] that we
+declare as a coercion.
+*)
 Coercion Qpos2QposInf : Qpos >-> QposInf.
 
+(** This bind operation is useful for lifting operations to work
+on [QposInf].  It will map [QposInfinity] to [QposInfinity]. *)
 Definition QposInf_bind (f : Qpos -> QposInf) (x:QposInf) :=
  match x with
  | Qpos2QposInf x' => f x'
@@ -46,12 +60,15 @@ Lemma QposInf_bind_id : forall x, QposInf_bind (fun e => e) x = x.
 intros [x|]; reflexivity.
 Qed.
 
+(** Addditon *)
 Definition QposInf_plus (x y : QposInf) : QposInf := 
 QposInf_bind (fun x' => QposInf_bind (fun y' => x'+y') y) x.
 
+(** Multiplication *)
 Definition QposInf_mult (x y : QposInf) : QposInf := 
 QposInf_bind (fun x' => QposInf_bind (fun y' => x'*y') y) x.
 
+(** Order *)
 Definition QposInf_le (x y: QposInf) : Prop :=
 match y with
 | QposInfinity => True
@@ -62,6 +79,7 @@ match y with
  end
 end.
 
+(** Minimum *)
 Definition QposInf_min (x y : QposInf) : QposInf :=
 match x with
 | QposInfinity => y

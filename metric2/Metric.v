@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -29,6 +29,13 @@ Require Import List.
 Require Import CornTac.
 
 Set Implicit Arguments.
+(**
+* Metric Space
+In this version, a metric space over a setoid X is characterized by a
+ball relation B where B e x y is intended to mean that the two points
+x and y are within e of each other ( d(x,y)<=e ).  This is characterized
+by the axioms given in the record structure below.
+*)
 
 Record is_MetricSpace (X:Type) (Xeq: relation X) (B: Qpos -> relation X) : Prop :=
 { msp_Xsetoid: Setoid_Theory X Xeq
@@ -50,6 +57,7 @@ Record MetricSpace : Type :=
 ; msp : is_MetricSpace ms_eq ball
 }.
 
+(* begin hide *)
 Implicit Arguments ball [m].
 Implicit Arguments ms_eq [m].
 
@@ -64,10 +72,18 @@ Add Morphism ball with signature QposEq ==> ms_eq ==> ms_eq ==> iff as ball_comp
 intros m.
 exact (@ball_wd m).
 Qed.
+(* end hide *)
 
 Section Metric_Space.
 
+(*
+** Ball lemmas
+*)
+
 Variable X : MetricSpace.
+
+(** These lemmas give direct access to the ball axioms of a metric space 
+*)
 
 Lemma ball_refl : forall e (a:X), ball e a a.
 Proof.
@@ -103,6 +119,10 @@ rewrite H.
 apply ball_refl.
 Qed.
 
+(** The ball constraint on a and b can always be weakened.  Here are
+two forms of the weakening lemma.
+*)
+
 Lemma ball_weak : forall e d (a b:X), ball e a b -> ball (e+d) a b.
 Proof.
 intros e d a b B1.
@@ -128,5 +148,6 @@ assumption.
 Qed.
 
 End Metric_Space.
-
+(* begin hide *)
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
+(* end hide *)

@@ -6,6 +6,7 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope setoid_scope.
 Open Local Scope sfstscope.
 
 Section QS.
@@ -320,4 +321,86 @@ intros.
 unfold StepQabs.
 rewrite H.
 reflexivity.
+Qed.
+
+(** 
+** A Partial Order on Step Functions. *)
+Definition StepQ_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
+(* begin hide *)
+Add Morphism StepQ_le 
+  with signature StepF_eq ==> StepF_eq ==> iff
+ as StepQ_le_wd.
+unfold StepQ_le.
+intros x1 x2 Hx y1 y2 Hy.
+rewrite Hx.
+rewrite Hy.
+reflexivity.
+Qed.
+(* end hide *)
+Notation "x <= y" := (StepQ_le x y) (at level 70) : sfstscope.
+
+Lemma StepQ_le_refl:forall x, (x <= x).
+intros x.
+unfold StepQ_le.
+cut (StepFfoldProp (join QleS ^@> x)).
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros.
+simpl.
+auto with *.
+Qed.
+
+Lemma StepQ_le_trans:forall x y z, 
+ (x <= y)-> (y <= z) ->(x <= z).
+intros x y z. unfold StepQ_le.
+intros H.
+apply StepF_imp_imp.
+revert H.
+rapply StepF_imp_imp.
+unfold StepF_imp.
+pose (f:= ap
+(compose (@ap _ _ _) (compose (compose (compose (@compose _ _ _) imp)) QleS))
+(compose (flip (compose (@ap _ _ _) (compose (compose imp) QleS))) QleS)).
+cut (StepFfoldProp (f ^@> x <@> y <@> z)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map3.
+intros a b c Hab Hbc.
+clear f.
+simpl in *.
+eauto with qarith.
+Qed.
+
+Lemma StepQabsOpp : forall x, StepQabs (-x) == StepQabs (x).
+Proof.
+intros x.
+unfold StepF_eq.
+set (g:=(st_eqS QS)).
+set (f:=(ap
+(compose g (compose QabsS QoppS))
+QabsS)).
+cut (StepFfoldProp (f ^@> x)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map.
+intros a.
+rapply Qabs_opp.
+Qed.
+
+Lemma StepQabs_triangle : forall x y, StepQabs (x+y) <= StepQabs x + StepQabs y.
+Proof.
+intros x y.
+set (f:=(ap
+(compose ap (compose (compose (compose QleS QabsS)) QplusS))
+(compose (flip (@compose _ _ _) QabsS) (compose QplusS QabsS)))).
+cut (StepFfoldProp (f ^@> x <@> y)).
+ unfold f.
+ evalStepF.
+ tauto.
+apply StepFfoldPropForall_Map2.
+intros a b.
+rapply Qabs_triangle.
 Qed.

@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -42,16 +42,22 @@ Open Local Scope Q_scope.
 Opaque CR.
 Opaque Qmin Qmax.
 
+(**
+** Square Root
+Square root is implement using Newton's method.
+*)
+
 Section SquareRoot.
 
 Variable a : Q.
 
 Hypothesis Ha : 1 <= a <= 4.
-
+(** Square root is first defined on [[1,4]].  Iterating this formula will
+converge to the square root of [a]. *)
 Definition root_step (b:Q) : Q := b/2 + a/(2*b).
 
 Definition root_has_error (e:Qpos) (b:Q) := a <= (b+e)^2 /\ (b-e)^2 <= a.
-
+(* begin hide *)
 Add Morphism root_has_error with signature QposEq ==> Qeq ==> iff as root_has_error_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
@@ -61,7 +67,7 @@ unfold QposEq in Hx.
 rewrite Hx.
 reflexivity.
 Qed.
-
+(* end hide *)
 Lemma root_has_error_le : forall (e1 e2:Qpos) (b:Q), e2 <= b -> e1 <= e2 -> root_has_error e1 b -> root_has_error e2 b.
 Proof.
 intros e1 e2 b Hb He [H0 H1].
@@ -179,7 +185,8 @@ replace RHS with ((a-(b-e)^2)*((b+e)^2-a)) by ring.
 rewrite Qle_minus_iff in *|-.
 rapply mult_resp_nonneg; assumption.
 Qed.
- 
+
+(** Our initial estimate is (a+1)/2 with an error of 1/2 *)
 Definition initial_root :Q := ((1#2)*(a+1)).
 
 Lemma initial_root_error : root_has_error (1#2) initial_root.
@@ -225,6 +232,7 @@ replace RHS with ((1#2)*(a + - (1))) by ring.
 Qauto_nonneg.
 Qed.
 
+(** Each step squares the error *)
 Fixpoint root_loop (e:Qpos) (n:nat) (b:Q) (err:positive) {struct n} : Q :=
 match n with 
 | O => b
@@ -308,6 +316,7 @@ rewrite <- Qpos_le_min_l.
 assumption.
 Qed.
 
+(** Find a bound on the number of iterations we need to take. *)
 Lemma root_max_steps : forall (n d:positive), (1#(iter_nat (S (Psize d)) _ (fun x => (x * x)%positive) 2%positive))<=(n#d)%Qpos.
 Proof.
 intros n d.
@@ -337,8 +346,8 @@ unfold Qle; simpl.
 change (1*d <= n*d)%Z.
 auto with *.
 Qed.
- 
 
+(** Square root on [[1,4]]. *)
 Definition sqrt_raw (e:QposInf) : Q :=
 match e with
 | QposInfinity => 1
@@ -512,6 +521,8 @@ Qed.
 
 End SquareRoot.
 
+(** By scaling the input the range of square root can be extened upto 4^n.
+*)
 Definition rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4^n)%Z) : CR.
 fix 1.
 intros n.
@@ -607,6 +618,8 @@ apply eq_symmetric.
 apply (inj_Q_mult IR (2:Q) (2:Q)).
 Qed.
 
+(** By scaling the other direction we can extend the range down to 4^(-n).
+*)
 Definition rational_sqrt_small_bounded (n:nat) a (Ha:/(4^n)%Z <= a <= 4) : CR.
 fix 1.
 intros n.
@@ -685,6 +698,7 @@ apply eq_symmetric.
 apply (inj_Q_mult IR).
 Qed.
 
+(** And hence it is defined for all postive numbers. *)
 Definition rational_sqrt_pos a (Ha:0<a) : CR.
 intros a Ha.
 destruct (Qle_total 1 a).
@@ -709,6 +723,7 @@ destruct (Qle_total 1 a).
 apply rational_sqrt_small_bounded_correct.
 Qed.
 
+(** We define the square root for all nonpositive numbers. *)
 Definition rational_sqrt a : CR := 
 match (Qlt_le_dec_fast 0 a) with
 |left H => rational_sqrt_pos a H
@@ -740,6 +755,7 @@ apply sqrt_to_nonneg.
 apply leEq_reflexive.
 Qed.
 
+(** Square root is uniformly continuous everywhere. *)
 Definition sqrt_modulus (e:Qpos) : QposInf := Qpos2QposInf (e*e).
 
 Lemma sqrt_uc_prf : is_UniformlyContinuousFunction rational_sqrt sqrt_modulus.
@@ -910,5 +926,6 @@ unfold CRsqrt.
 rewrite (Cbind_correct QPrelengthSpace sqrt_uc ('q)%CR).
 rapply BindLaw1.
 Qed.
-
+(* begin hide *)
 Hint Rewrite CRsqrt_correct : IRtoCR.
+(* end hide *)

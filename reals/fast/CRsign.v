@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -22,6 +22,14 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export CRIR.
 Require Import QMinMax.
 
+(**
+** Tactics for Inequalities
+This module defines tactics for automatically proving inequalities
+over real numbers.
+*)
+
+(** This returs GT if x is clearly greater than e, returns LT if x
+is clearly less than (-e), and returns Eq otherwise. *)
 Definition CR_epsilon_sign_dec (e:Qpos) (x:CR) : comparison :=
 let z := (approximate x e) in
  match (Qle_total z (2*e)) with
@@ -33,8 +41,10 @@ let z := (approximate x e) in
   end
  end.
 
+(** This helper lemma reduces a CRpos problem to a sigma type with
+a simple equality proposition. *)
 Lemma CR_epsilon_sign_dec_pos : forall x, 
-{e:Qpos | CR_epsilon_sign_dec e x = Gt } -> CRpos x.
+{e:Qpos | CR_epsilon_sign_dec e x = Gt} -> CRpos x.
 Proof.
 intros x [e H].
 apply (@CRpos_char e).
@@ -45,6 +55,35 @@ destruct (Qle_total (approximate x e) (2 * e)) as [A|A];
 assumption).
 Defined.
 
+(** Automatically solve the goal [{e:Qpos | CR_epsilon_sign_dec e x = Gt}]
+by starting with approximating by e, and halving the allowed error until
+the problem is solved.  (This tactic may not terminate.) *)
+Ltac CR_solve_pos_loop e :=
+ (exists e;
+  vm_compute;
+  match goal with 
+  | |- Gt = Gt => reflexivity
+  | |- Lt = Gt => fail 2 "CR number is negative"
+  end)
+ || CR_solve_pos_loop ((1#2)*e)%Qpos.
+
+(** This is the main tactic for solving goal of the from [CRpos e].
+It tries to clear the context to make sure that e is a closed term.
+Then it applies the helper lemma and runs [CR_solve_pos_loop]. *)
+Ltac CR_solve_pos e :=
+ repeat (match goal with 
+ | H:_ |-_  => clear H
+ end);
+ match goal with 
+ | H:_ |-_  => fail 1 "Context cannot be cleared"
+ | |-_ => idtac
+ end;
+ apply CR_epsilon_sign_dec_pos;
+ CR_solve_pos_loop e.
+
+(** This tactic is used to transform an inequality over IR into an
+problem bout CRpos over CR.  Some fancy work needs to be done because
+autorewrite will not in CRpos, because it is in Type and not Prop. *)
 Ltac IR_dec_precompute := 
  try apply less_leEq;
  apply CR_less_as_IR;
@@ -61,25 +100,7 @@ Ltac IR_dec_precompute :=
                   clear X0 XH
  end.
 
-Ltac CR_solve_pos_loop e :=
- (exists e;
-  vm_compute;
-  match goal with 
-  | |- Gt = Gt => reflexivity
-  | |- Lt = Gt => fail 2 "CR number is negative"
-  end)
- || CR_solve_pos_loop ((1#2)*e)%Qpos.
-
-Ltac CR_solve_pos e :=
- repeat (match goal with 
- | H:_ |-_  => clear H
- end);
- match goal with 
- | H:_ |-_  => fail 1 "Context cannot be cleared"
- | |-_ => idtac
- end;
- apply CR_epsilon_sign_dec_pos;
- CR_solve_pos_loop e.
-
+(** This tactic solves inequalites over IR.  It converts the problem
+into a question about positivity over CR, and then tries to solve it. *)
 Ltac IR_solve_ineq e :=
  IR_dec_precompute; CR_solve_pos e.

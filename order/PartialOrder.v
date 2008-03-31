@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -24,6 +24,12 @@ Require Import Setoid.
 
 Set Implicit Arguments.
 
+(**
+* Partial Order
+A partial order is a relfexive, transitive, antisymetric ordering relation.
+*)
+
+(* Perhaps adding monotone and antitone to the signature is going too far *)
 Record is_PartialOrder 
  (car : Type)
  (eq : car -> car -> Prop)
@@ -37,6 +43,7 @@ Record is_PartialOrder
 ; po_antitone_def : forall f, antitone f <-> (forall x y, le x y -> le (f y) (f x))
 }.
 
+(* This ought to decend from RSetoid *)
 Record PartialOrder : Type :=
 { po_car :> Type
 ; po_eq : po_car -> po_car -> Prop
@@ -63,7 +70,7 @@ intros.
 rewrite po_equiv_le_def0 in *.
 firstorder.
 Qed.
-
+(* begin hide *)
 Add Setoid po_car po_eq po_st as po_setoid.
 
 Add Morphism le with signature po_eq ==> po_eq ==> iff as le_compat.
@@ -81,7 +88,7 @@ assert (x3==x0).
 symmetry; assumption.
 firstorder.
 Qed.
-
+(* end hide *)
 Section PartialOrder.
 
 Variable X : PartialOrder.
@@ -90,6 +97,7 @@ Definition makePartialOrder car eq le monotone antitone p1 p2 p3 p4 p5 :=
 @Build_PartialOrder car eq le monotone antitone
 (@Build_is_PartialOrder car eq le monotone antitone p1 p2 p3 p4 p5).
 
+(** The axioms and basic properties of a partial order *)
 Lemma equiv_le_def : forall x y:X, x == y <-> (x <= y /\ y <= x).
 Proof (po_equiv_le_def (po_proof X)).
 
@@ -115,6 +123,10 @@ Proof.
 firstorder using equiv_le_def.
 Qed.
 
+(**
+** Dual Order
+The dual of a partial order is made by fliping the order relation.
+*)
 Definition Dual : PartialOrder.
 eapply makePartialOrder with
  (eq := @po_eq X)
@@ -131,7 +143,10 @@ Defined.
 End PartialOrder.
 
 Module Default.
-
+(**
+** Default Monotone and Antitone
+These provide default implemenations of Monotone and Antitone.
+*)
 Section MonotoneAntitone.
 
 Variable A : Type.

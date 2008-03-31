@@ -1,4 +1,40 @@
+(*
+Copyright © 2007-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
+
 Require Import List.
+
+(**
+* Classical Logic
+This section introduces the classical logic connectives, "classical or"
+and "classical exists" through their double negation translation.
+Induction principles are given that allow you to destruct these formulas
+as you would their constructive counter parts, so long as the conclusion
+is double negataion stable. 
+
+No classical axioms are assumed.
+*)
+
+(**
+** Classical or
+*)
 
 Section ClassicOr.
 
@@ -25,6 +61,9 @@ Qed.
 
 End ClassicOr.
 
+(**
+** Classical Existential
+*)
 Section ClassicExists.
 
 Variable A : Type.
@@ -60,6 +99,16 @@ auto.
 Qed.
 
 End ClassicExists.
+
+(**
+** Pidgeon Hole Principle
+Here we show the classical result of the pigenon hole principle using the
+classical quantifiers.
+
+Given a finite list of elements and a relation P(n,x) saying when items from
+the list are selected, there classically exists an item that is selected a
+classically infinite number of times.
+*)
 
 Lemma infinitePidgeonHolePrinicple : 
  forall (X:Type) (l:list X) (P:nat -> X -> Prop),
@@ -105,6 +154,11 @@ split; auto.
 auto with *.
 Qed.
 
+(**
+This weaker version of the pidgen hole principle uses a function to select
+elements from a list instead of a releation.  It may be more convienent to
+use at times.
+*)
 Lemma infinitePidgeonHolePrinicpleB : 
  forall (X:Type) (l:list X) (f:nat -> X),
  (forall n, In (f n) l) ->

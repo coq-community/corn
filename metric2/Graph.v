@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export UniformContinuity.
 Require Export Compact.
 Require Export Prelength.
@@ -11,10 +31,18 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Section Graph.
-
+(**
+* Graphing
+Uniformly continuous functions over compact sets can be graph.  A graph of a
+funciton f : X --> Y is the the subset of X*Y {(x,f x) | x in S} where S is
+the domain under consideration.  This graph is compact when S is a compact
+subset of X.
+*)
 Variable X Y:MetricSpace.
 Let XY := ProductMS X Y.
 
+(** [graphPoint] is the fundamental function of graphing.  It will be lifted in
+various ways to produce a graph *)
 Definition graphPoint_raw (f:X -> Y) (x:X) : XY := (x,f x).
 
 Open Local Scope uc_scope.
@@ -49,6 +77,8 @@ Build_UniformlyContinuousFunction graphPoint_uc.
 Hypothesis stableX : stableMetric X.
 Hypothesis stableXY : stableMetric XY.
 
+(** The compact image of graphFunction is the graph of [Cmap f] over any
+compact set S *)
 Definition CompactGraph (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
 CompactImage (1#1) _ plFEX graphPoint.
 
@@ -248,6 +278,14 @@ Qed.
 End Graph.
 
 Section GraphBind.
+
+(**
+** Graph and Bind
+The previous section used [graphPoint] to produce the graph of [Cmap f] over
+any compact set S.  In this section we use [graphPoint_b] to produce the
+graph of [Cbind f] over any compact set S.  It proceeds in largely the same
+way. *)
+
 
 (*This section ought to be defined in terms of Graph,
  but I'm too tired to figure out how to do it properly.

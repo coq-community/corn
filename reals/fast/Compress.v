@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -30,6 +30,17 @@ Opaque CR.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
+(**
+** Compression
+Compress improves the compuation by reducing the size of the numerator
+and denominator of rational numbers.  It works by increasing the
+requested precession, but then rounding the result to a value with a
+small numerator and denominator.
+
+The full euclidean algortihm would find the optimial rational approximation.
+But for speed we simply do division to quickly find a good rational
+approximation.
+*)
 Definition approximateQ (x:Q) (p:positive) :=
 let (n,d) := x in (Zdiv (n*p) d#p).
 
@@ -80,6 +91,8 @@ destruct (Z_mod_lt (n*p) _ X).
 assumption.
 Qed.
 
+(** Compress doubles the requried precision and uses the extra leway to
+round the rational number. *)
 Definition compress_raw (x:CR) (e:QposInf) : Q :=
 match e with
 | QposInfinity => approximate x e
@@ -142,6 +155,7 @@ Qed.
 Definition compress_fun (x:CR) : CR :=
 Build_RegularFunction (compress_raw_prf x).
 
+(** Compress is equivalent to the identity function. *)
 Lemma compress_fun_correct : forall x, (compress_fun x==x)%CR.
 Proof.
 intros x.

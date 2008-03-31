@@ -22,9 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export InvTrigonom.
 Require Import CornTac.
 
-(**
-Various properties of ArcTangent.
-*)
+(** Various properties of ArcTangent.*)
 
 Lemma Dom_Tang_ArcTan : forall x, (Dom Tang (ArcTan x)).
 Proof.
@@ -350,8 +348,8 @@ Qed.
 
 Section ArcTan_Series.
 
-(** **ArcTan Series
-
+(**
+** ArcTan Series
 In this section we show the convergence of ArcTan's power series.
 
 First we show the convergence of the series for 1/(1+x^2)
@@ -469,9 +467,9 @@ csetoid_rewrite_rev (mult_nexp _ ([--]One) (c[^]2) n).
 rational.
 Qed.
 
-(**
-Finally we show the convergence of the series for arctan.
-Althought the series converges on the closed interval [-1,1],
+(** Finally we show the convergence of the series for arctan.*)
+
+(* Although the series converges on the closed interval [-1,1],
 this proof only shows convergence on the open interval (-1,1).
 *)
 

@@ -1,3 +1,23 @@
+(*
+Copyright © 2006-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export CRIR.
 Require Import CRArith.
 Require Import Qpower.
@@ -11,6 +31,12 @@ Opaque CR inj_Q.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
+(**
+** Positive Integer Powers
+Positive integer powers is faster than repeated multiplication.
+
+It is uniformly continuous on an interval [[-c,c]].
+*)
 Section CRpower_positive.
 
 Variable p: positive.
@@ -117,6 +143,7 @@ Qed.
 Definition Qpower_positive_uc (c:Qpos) :  Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction (Qpower_positive_uc_prf c).
 
+(** CRpower_positive_bounded works on [[-c,c]]. *)
 Definition CRpower_positive_bounded (c:Qpos) : CR --> CR :=
 Cmap QPrelengthSpace (Qpower_positive_uc c).
 
@@ -184,6 +211,8 @@ stepr x by simpl; symmetry; apply CRasIRasCR_id.
 assumption.
 Qed.
 
+(** [CRpower_positive_bounded] is should be used when a known bound
+on the absolute value of x is available. *)
 Definition CRpower_positive (x:CR) : CR := ucFun (CRpower_positive_bounded (CR_b (1#1) x)) x.
 
 Lemma CRpositive_power_bounded_positive_power : forall (c:Qpos) (x:CR),
@@ -216,7 +245,7 @@ apply CR_b_upperBound.
 Qed.
 
 End CRpower_positive.
-
+(* begin hide *)
 Add Morphism CRpower_positive with signature ms_eq ==> ms_eq as CRpower_positive_wd.
 Proof.
 intros p x1 x2 Hx.
@@ -229,6 +258,4 @@ split; simpl; rewrite <- Hx.
  apply CR_b_lowerBound.
 apply CR_b_upperBound.
 Qed.
-
-
-
+(* end hide *)

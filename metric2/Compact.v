@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Import Limit.
 Require Export FinEnum.
 Require Import Zpow_facts.
@@ -11,7 +31,18 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+(**
+* Compact sets
+This module formalizes compact sets as the completion of a finitely
+enumerables sets.
+*)
 Section BishopCompact.
+
+(**
+** Bishop Compactness
+This section formalizes Bishops definition of compactness to serve as a
+reference specification for our definition of compactness.
+*)
 
 Variable X : MetricSpace.
 
@@ -27,6 +58,8 @@ Definition ExtSubset :=
 Definition TotallyBoundedSubset :=
  forall e, {l : list X | forall y, In y l -> P y & forall x, P x -> exists y, In y l /\ ball e x y }.
 
+(** A Bishop compact set is an (extensional) predicate that is complete
+ and totally bounded. *)
 Record CompactSubset :=
  {completeSubset : CompleteSubset
  ;totallyBoundedSubset : TotallyBoundedSubset
@@ -40,6 +73,9 @@ Section AlmostIn.
 Variable X : MetricSpace.
 Hypothesis stableX : stableMetric X.
 
+(** [almostIn] is a useful predicate that says when a point is within e
+of (classically) some member of a finite enumeration. We won't know which
+point it is close to. *)
 Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum stableX) : Prop :=
 match l with 
 | nil => False
@@ -73,6 +109,8 @@ right.
 apply IHl; assumption.
 Qed.
 
+(** If you are almost in for every e, then you are infact in the finite
+enumeration *)
 Lemma InAlmostIn : forall x l, (forall e, almostIn e x l)<->(InFinEnumC x l).
 Proof.
 induction l.
@@ -173,6 +211,7 @@ split.
 assumption.
 Qed.
 
+(** Left and right triangle laws for balls and [almostIn]. *)
 Lemma almostIn_triangle_l : forall e1 e2 x1 x2 l, (ball e1 x1 x2) -> almostIn e2 x2 l -> almostIn (e1 + e2) x1 l.
 Proof.
 induction l; intros H1 H2.
@@ -218,6 +257,8 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+(** If you are almost in a finite enumeration then you are close to 
+(classically) some point that is in the enumeration. *)
 Lemma almostInExistsC : forall e x s, almostIn e x s <-> existsC X (fun y => ball e x y /\ InFinEnumC y s).
 Proof.
 intros e x s.
@@ -263,7 +304,7 @@ auto.
 Qed. 
 
 End AlmostIn.
-
+(* begin hide *)
 Add Morphism almostIn with signature QposEq ==> ms_eq ==> ms_eq ==> iff as almostIn_wd.
 Proof.
 intros X stableX.
@@ -341,12 +382,18 @@ apply IHz1.
  right; assumption.
 assumption.
 Qed.
-
+(* end hide *)
+(**
+** Definition of Compact
+A compact set is defined as the completion of finite enumerations as
+a metric space *)
 Definition Compact X (stableX : stableMetric X) := Complete (FinEnum stableX).
 
+(** A point is in a compact set if all the approximations are almost in
+the approximations of the compact set. *)
 Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
-
+(* begin hide *)
 Add Morphism inCompact with signature ms_eq ==> ms_eq ==> iff as inCompact_wd.
 Proof.
 intros X stableX.
@@ -369,7 +416,7 @@ symmetry in Hx.
 apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
 apply H.
 Qed.
-
+(* end hide *)
 Section Compact.
 
 Variable X : MetricSpace.
@@ -389,6 +436,13 @@ apply H0.
 apply H1.
 Qed.
 
+(**
+** Compact is Bishop Compact.
+Here we show that our definiton of compactness satifies Bishop's compactness.
+
+First we show that our compact sets are complete.
+*)
+
 Lemma CompactCompleteSubset : forall x, CompleteSubset _ (fun z => inCompact z x).
 Proof.
 intros x a H.
@@ -407,8 +461,14 @@ Defined.
 
 Section CompactTotallyBounded.
 
+(** In order to show that compact sets are totally bounded we need to assume
+that the underlying metric space is located.  According to Bishop's
+definition, every metric space is located.  Therefore this is a fair
+assumption to make. *)
 Hypothesis locatedX : locatedMetric X.
 
+(** If a point is almost in an enumeration, then there it is close to
+a point in the enumeration in a constructive sense. *)
 Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum stableX), e < d -> almostIn e x s -> {y | In y s /\ ball d x y}.
 Proof.
 intros e d x s Hed.
@@ -427,6 +487,8 @@ exists y.
 abstract (destruct Hy; auto with *).
 Defined.
 
+(** The limit of this stream is going to be used to construct a point
+inside the compact set close to a suitable starting point. *)
 CoFixpoint CompactTotallyBoundedStream (s:Compact) (k d1 d2:Qpos) (pt:X) Hpt : Stream X :=
 Cons pt 
  (let (f,_) := HausdorffBallHausdorffBallStrong locatedX
@@ -483,6 +545,7 @@ rapply IHn.
 Qed.
 *)
 
+(** This stream is Cauchy *)
 Lemma CompactTotallyBoundedStreamCauchyLemma : forall n (k d:Qpos),
 k < 1 ->
 0 < (d*(1-k^(S n))/(1-k)).
@@ -765,6 +828,7 @@ apply CompactTotallyBoundedStream_PI.
 Qed.
 *)
 
+(** This stream forms a regular function *)
 Lemma CompactTotallyBounded_prf : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
  is_RegularFunction (CompactTotallyBounded_raw s d1 d2 pt Hpt).
 Proof.
@@ -817,6 +881,7 @@ Qed.
 Definition CompactTotallyBounded_fun  (s:Compact) (d1 d2:Qpos) (pt:X) Hpt : Complete X :=
  Build_RegularFunction (CompactTotallyBounded_prf s d1 d2 pt Hpt).
 
+(** The limit is inside the compact set *)
 Lemma CompactTotallyBoundedInCompact : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
  inCompact (CompactTotallyBounded_fun s d1 d2 pt Hpt) s.
 Proof.
@@ -848,6 +913,7 @@ apply <- InAlmostIn.
 assumption.
 Qed.
 
+(** The limit is close to the initial starting point *)
 Lemma CompactTotallyBoundedNotFar : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
  ball ((5#3)*d1 + (4#3)*d2) (Cunit pt) (CompactTotallyBounded_fun s d1 d2 pt Hpt).
 Proof.
@@ -873,6 +939,9 @@ ring_simplify.
 auto with *.
 Qed.
 
+(** Using CompactTotallyBounded_fun we can map the approximation of
+a compact set to a new enumeration that contains only points inside
+the compact sets, without moving the points too much *)
 Definition CompactTotalBound (s:Compact) (e:Qpos) : list (Complete X).
 intros s e.
 generalize (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e)).
@@ -954,6 +1023,7 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
+(** This means that our compact sets are totally bounded. *)
 Lemma CompactTotallyBoundedA : forall s e y, In y (CompactTotalBound s e) -> inCompact y s.
 Proof.
 intros s e y.
@@ -1021,6 +1091,9 @@ exists (CompactTotalBound s e).
 apply CompactTotallyBoundedB.
 Defined.
 
+
+
+(** And hence our compact sets are Bishop compact. *)
 Lemma CompactAsBishopCompact : forall s, CompactSubset _ (fun z => inCompact z s).
 Proof.
 intros s.
@@ -1036,6 +1109,13 @@ Defined.
 
 End CompactTotallyBounded.
 
+(**
+** Bishop Compact is Compact.
+Next we must show that Bishop compact sets are compact according to our
+definition.
+
+Given a Bishop compact set we construct finite enumerations that approximate
+that set. *)
 Definition BishopCompactAsCompact_raw 
  (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum stableX) :=
 match e with
@@ -1045,6 +1125,7 @@ match e with
    map (fun x => approximate x ((1#2)*e')) l)%Qpos
 end.
 
+(** These approximations are coherent *)
 Lemma BishopCompactAsCompact_prf : 
  forall P (HP:CompactSubset _ P), is_RegularFunction (BishopCompactAsCompact_raw HP).
 Proof.
@@ -1115,12 +1196,19 @@ repeat eapply ball_triangle.
 rapply ball_approx_r.
 Qed.
 
+(** Hence Bishop compact sets are compact in our sense. *)
 Definition BishopCompactAsCompact 
  (P:Complete X->Prop) (HP:CompactSubset _ P) : Compact :=
 Build_RegularFunction (BishopCompactAsCompact_prf HP).
 
 Section Isomorphism.
 
+(**
+** Isomorphism
+We claim that Bishop compact sets correspond to our compact sets, but
+to be sure we need to show that the definitions are isomoprhic.  We
+need to show that the conversions back and forth are equivalent to the
+identity. *)
 Hypothesis locatedX : locatedMetric X.
 
 Lemma BishopCompact_Compact_BishopCompact1 :
@@ -1289,12 +1377,20 @@ End Isomorphism.
 
 End Compact.
 
+Require Import Prelength.
+
 Section CompactDistr.
 
 Variable X : MetricSpace.
 Hypothesis stableX : stableMetric X.
 Hypothesis stableCX : stableMetric (Complete X).
 
+(** 
+** FinEnum distributes over Complete
+The FiniteEnumeration monad distributes over the Completion monad.
+This corresponds to a function from FinEnum (Complete X) to 
+Complete (FinEnum X).
+*)
 Definition FinCompact_raw (x: FinEnum stableCX) (e:QposInf) : FinEnum stableX :=
 map (fun x => approximate x e) x.
 
@@ -1506,8 +1602,6 @@ eapply almostIn_triangle_l;[apply regFun_prf|].
 apply Hm1.
 Qed.
 
-Require Import Prelength.
-
 Lemma CompactCompleteCompact_prf : forall x,
  is_RegularFunction (Cmap_raw FinCompact x).
 Proof.
@@ -1600,6 +1694,11 @@ End CompactDistr.
 
 Section CompactImage.
 
+(**
+** Compact Image
+If x is in a compact set S, then f x is in the compact image of S under f.
+(My definiton of compact image is really the closure of the image under f.)
+*)
 Variable z : Qpos.
 Variable X Y : MetricSpace.
 Hypothesis stableX : stableMetric X.

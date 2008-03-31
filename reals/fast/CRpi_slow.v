@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -36,6 +36,18 @@ Opaque inj_Q CR.
 
 Section Pi.
 
+(**
+* Pi (alternate)
+(Please import CRpi instead)
+
+This version is slower to compute than CRpi_fast; however it is faster to
+compile.
+
+Pi is defined as
+
+68*arctan(1/23) + 32*arctan(1/182) + 40*arctan(1/5118) + 20*arctan(1/6072).
+*)
+
 Lemma small_per_23 : (0 <= (1#(23%positive)) <= 1)%Q.
 Proof.
 split; discriminate.
@@ -62,6 +74,10 @@ Definition r_pi (r:Q) : CR :=
  (scale (40%Z*r) (rational_arctan_small_pos small_per_5118) +
   scale (20%Z*r) (rational_arctan_small_pos small_per_6072)))%CR.
 
+(** To prove that pi is is correct we repeatedly use the arctan sum law.
+The problem is that the arctan sum law only works for input between -1
+and 1.  We use reflect to show that our use of arctan sum law always
+satifies this restriction. *)
 Let f (a b:Q) : Q := 
  let (x,y) := a in 
  let (z,w) := b in
@@ -316,5 +332,6 @@ apply (inj_Q_nring IR 1).
 Qed.
 
 End Pi.
-
+(* begin hide *)
 Hint Rewrite CRpi_correct : IRtoCR.
+(* end hide *)

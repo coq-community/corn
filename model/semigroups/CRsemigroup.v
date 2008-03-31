@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -24,6 +24,11 @@ Require Export CRsetoid.
 Require Export CGroups.
 Require Import CRcorrect.
 Require Import CornTac.
+
+(**
+** Examples of semi-groups: $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
+*** $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
+*)
 
 Open Local Scope uc_scope.
 

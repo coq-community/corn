@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -21,6 +21,14 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import FTC.
 Require Export Composition.
+
+(**
+** Integration by substitution
+Here we prove integration by substition. Simply put, this lemma shows that
+int((F[o]G)*G', a .. b) = int(F, G(a) .. G(b)), assuming that
+G is differentiable on [[c, d]] and that
+F is continuous on [[c0, d0]] and that G maps compact intervals into [[c0, d0]].
+*)
 
 Lemma IntegrationBySubstition :
  forall a b
@@ -187,6 +195,11 @@ apply Integral_empty.
 algebra.
 Qed.
 
+(** This lemma is a special instance of substituion that ties
+ integration on [[0, 1]] with general integration on [[a, b]].
+ It says that int(F((b-a)*x+a), x=0 .. 1) = int(F, a .. b).
+*)
+
 Lemma IntegrationSubs01 : forall a b
  (Hab: Min a b[<=]Max a b)
  (H01: Zero[<=]One)
@@ -326,9 +339,3 @@ eapply (IntegrationBySubstition).
  assumption.
 assumption.
 Qed.
-  
-     
-   
-
-
- 

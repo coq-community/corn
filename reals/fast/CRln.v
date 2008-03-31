@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -39,6 +39,11 @@ Open Local Scope uc_scope.
 
 Opaque inj_Q CR Logarithm.
 
+(**
+** Logarithm
+Logarithm is defined in terms of artanh. [ln (n/d) = 2*artan((n-d)/(n+d))]
+*)
+
 Lemma lnDomainAdaptor : forall a, (0 < a) -> 
 (let (n,d) := a in (n - d)/(n + d))^2 < 1.
 Proof.
@@ -54,6 +59,8 @@ ring_simplify.
 Qauto_pos.
 Qed.
 
+(** Although [rational_ln_slow] works on the entire to domain, it is
+only efficent for values close 1. *)
 Definition rational_ln_slow (a:Q) (p: 0 < a) : CR := 
  scale 2 (rational_artanh_slow (lnDomainAdaptor p)).
 
@@ -157,6 +164,8 @@ intros.
 apply rational_ln_slow_correct.
 Qed.
 
+(** Efficeny of ln is imporved by scaling the input by a power of two
+and adding or subtracting a multiple of [ln 2]. *)
 Definition ln2 : CR := rational_ln_slow (pos_two Q_as_COrdField).
 
 Lemma ln2_correct : (ln2 == IRasCR (Log Two (pos_two IR)))%CR.
@@ -256,6 +265,7 @@ intros.
 apply rational_ln_correct.
 Qed.
 
+(** [ln] is uniformly continuous on any close strictly positive interval. *)
 Lemma ln_uc_prf_pos : forall (c:Qpos) (x:Q), (0 < Qmax c x).
 Proof.
 intros c x.
@@ -378,9 +388,9 @@ Qed.
 
 Definition CRln (x:CR) (Hx:('0 < x)%CR) : CR :=
 let (c,_) := Hx in CRln_pos c x.
-
+(* begin hide *)
 Implicit Arguments CRln [].
-
+(* end hide *)
 Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==CRln (IRasCR x) Hx0)%CR.
 Proof.
 intros x Hx [c Hc].

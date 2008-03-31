@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Hausdorff.
 Require Import Classic.
 Require Export List.
@@ -14,6 +34,11 @@ Section Finite.
 
 Variable X:MetricSpace.
 
+(**
+* Finite Enumerations
+Here we define a classical in predicate for lists.  Being classically
+in a list doesn't tell you which element in the list you are.
+*)
 Fixpoint InFinEnumC (x:X) (l:list X) : Prop :=
 match l with 
 | nil => False
@@ -81,9 +106,9 @@ rapply orWeaken.
 right.
 apply IHl1.
 Qed.
-
+(* begin hide *)
 Hint Resolve InFinEnumC_app_l InFinEnumC_app_r.
-
+(* end hide *)
 Lemma InFinEnumC_app_orC : forall x l1 l2, InFinEnumC x (l1 ++ l2) -> orC (InFinEnumC x l1)  (InFinEnumC x l2).
 Proof.
 intros x l1 l2 H.
@@ -110,6 +135,11 @@ right.
 assumption.
 Qed.
 
+(**
+** Equivalence
+Two finite enumerations, represented as lists, are equivalent
+if they (classically) have the same elements.
+*)
 Definition FinEnum_eq (a b:list X) : Prop :=
  forall x, InFinEnumC x a <-> InFinEnumC x b.
 
@@ -132,9 +162,14 @@ unfold FinEnum_eq.
 intros a b c H0 H1 x.
 transitivity (InFinEnumC x b); auto.
 Qed.
-
+(* begin hide *)
 Hint Resolve FinEnum_eq_refl FinEnum_eq_sym FinEnum_eq_trans : FinEnum.
-
+(* end hide *)
+(**
+** Metric Space
+Finite enumerations form a metric space under the Hausdorff metric for
+any stable metric space X.
+*)
 Definition FinEnum_ball (e:Qpos) (x y:list X) := 
  hausdorffBall X e (fun a => InFinEnumC a x) (fun a => InFinEnumC a y).
 
@@ -293,6 +328,7 @@ Qed.
 Definition FinEnum : MetricSpace :=
 Build_MetricSpace FinEnum_ball_wd FinEnum_is_MetricSpace.
 
+(** Our definition preserves stability *)
 Lemma FinEnum_stable : stableMetric FinEnum.
 Proof.
 intros e x y.
@@ -337,9 +373,12 @@ rapply orWeaken.
 right; assumption.
 Qed.
 
-
 Section Strong.
-
+(**
+** Strong Hausdroff Metric
+This section shows that the strong version of the Hausdroff metric
+is equivalen to the weak version when X is a located metric.
+*)
 Hypothesis almostDecideX : locatedMetric X.
 
 Lemma HemiMetricHemiMetricStrong : forall (e:Qpos) A b,
@@ -486,6 +525,7 @@ apply H;
 rapply orWeaken; right; assumption).
 Defined.
 
+(** Finite Enumerations preserve the locatedness property. *)
 Lemma FinEnum_located : locatedMetric FinEnum.
 Proof.
 intros e d a b Hed.
@@ -499,6 +539,13 @@ right.
 abstract (intros [H _]; contradiction).
 Defined.
 
+(** Finite Enumerations preserve the prelength property assuming X
+is a located metric space.
+
+If we change the definition of prelenght space to use a classical
+existential, then we could drop the located assumption of X.  I
+believe there would be no harm in changing the definition this way,
+but it has not been done yet. *)
 Hypothesis preLengthX : PrelengthSpace X.
 
 Lemma FinEnum_prelength : PrelengthSpace FinEnum.
@@ -616,9 +663,10 @@ Defined.
 End Strong.
 
 End Finite.
-
+(* begin hide *)
 Implicit Arguments InFinEnumC [X].
-
+(* end hide *)
+(** A list is equivalent to it's reverse as finite enumerations *)
 Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
  ms_eq f (rev f).
 Proof.
@@ -648,6 +696,7 @@ Qed.
 
 Open Local Scope uc_scope.
 
+(** [map] is compatable with classical in *)
 Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC a l -> InFinEnumC (f a) (map f l).
 induction l.
  auto.
@@ -663,6 +712,7 @@ apply IHl.
 auto.
 Qed.
 
+(** The map function for finite enumerations is uniformly continuous *)
 Definition FinEnum_map_modulus (z:Qpos) (muf : Qpos -> QposInf) (e:Qpos) :=
 match (muf e) with
 | QposInfinity => z
@@ -717,12 +767,14 @@ intros b Hb.
 rapply orWeaken.
 right; assumption.
 Qed.
-
+(* begin hide *)
 Implicit Arguments FinEnum_map_uc [X Y].
-
+(* end hide *)
 Definition FinEnum_map z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y) :=
  Build_UniformlyContinuousFunction (FinEnum_map_uc z SX SY f).
 
+(** maping [Cunit] is an injection from FinEnum X to FinEnum Complete X that
+preserves the metric *)
 Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum SX) e, ball e s1 s2 <-> ball e (map Cunit s1:FinEnum SCX) (map Cunit s2).
 Proof.
 intros X SX SCX s1 s2 e.

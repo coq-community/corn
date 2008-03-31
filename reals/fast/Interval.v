@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Compact.
 Require Export CRArith.
 Require Export Qmetric.
@@ -14,31 +34,20 @@ Opaque Qabs.
 
 Set Implicit Arguments.
 
-Fixpoint iterateN A (f:A -> A) (z:A) (n:nat) : list A :=
-match n with 
- O => nil
-|S m => z :: (iterateN f (f z) m)
-end.
-
-Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
-Proof.
-intros A f z n.
-revert f z.
-induction n.
- reflexivity.
-simpl.
-intros f z.
-rewrite <- IHn.
-reflexivity.
-Qed.
-
 Section Interval.
-
+(**
+* Intervals as a Compact Set.
+We want to make an efficent implementation of intervals as compact sets.
+We want to minimize the number of sample points in the approximations of
+a compact interval.
+*)
 Variable (l r:Q).
 Hypothesis Hlr : l <= r.
 
 Let f n (i:Z) := l + ((r-l)*(2*i+1#1))/(2*Z_of_nat n#1).
 
+(** [UniformPartition] produces a set of n points uniformly distributed
+inside the interval [[l, r]]. *)
 Definition UniformPartition (n:nat) := 
 map (f n) (iterateN Zsucc 0%Z n).
 
@@ -125,6 +134,8 @@ rewrite inj_S.
 auto with *.
 Qed.
 
+(** Given a point [x] in the interval [[l, r]], one can find a
+nearby point in our [UniformPartition]. *)
 Definition rasterize1 n (x:Q) := Qfloor ((Z_of_nat n)*(x-l)/(r-l)).
 
 Lemma rasterize1_close : l < r -> forall n (x:Q), Qabs (x - f (S n) (rasterize1 (S n) x)) <= ((r-l)/(2*(S n))).
@@ -260,6 +271,7 @@ rewrite Qle_minus_iff in Hlr;
 auto).
 Defined.
 
+(** Construct the compact set. *)
 Lemma CompactIntervalQ_nat : forall (e:Qpos), (0 <= Qceiling ((r-l)/(2*e)))%Z.
 Proof.
 intros e.
@@ -355,6 +367,7 @@ Open Local Scope CR_scope.
 
 Opaque max.
 
+(** The compact set indeed represents the interval [[l, r]]. *)
 Lemma CompactIntervalQ_correct1 : forall (x:CR),
  inCompact x CompactIntervalQ -> ('l <= x /\ x <= 'r).
 Proof.

@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -40,21 +40,35 @@ Opaque CR Qabs.
 
 Open Local Scope Q_scope.
 
+(**
+** Geometric Series
+A geometric series is simple to sum.  However we do something slightly
+more general.  We sum a series that satifies the ratio test. *)
+
 Section GeometricSeries.
 Variable a : Q.
 
 Hypothesis Ha0 : 0 <= a.
 Hypothesis Ha1 : a < 1.
 
+(** The definition of what we are calling a [GeometricSeries]: a series
+that satifies the ratio test. *)
 Definition GeometricSeries := ForAll (fun s => Qabs ((hd (tl s))) <= a*(Qabs(hd s))).
 
+(** [err_bound] is a bound on how the series could be in terms of its
+head elemement. *)
 Let err_bound (s:Stream Q) : Q := Qabs (hd s)/(1-a).
 
+(** [err_prop]: is err an bound on the series s? *)
 Let err_prop (err:Q) (s:Stream Q) : bool := 
 match ((err_bound s) ?= err) with
  Gt => false
 |_ => true
 end.
+
+(* begin hide *)
+Coercion Local Is_true : bool >-> Sortclass.
+(* end hide *)
 
 Lemma err_prop_prop : forall e s, err_prop e s <-> err_bound s <= e.
 Proof.
@@ -64,6 +78,7 @@ destruct (Qnum (Qabs (hd s) / (1 - a))%Q * Qden e ?= Qnum e * Qden (Qabs (hd s) 
  split; auto with *.
 Qed.
 
+(** The key lemma bout error bounds. *)
 Lemma err_prop_key : forall (e:Q) (s: Stream Q) (x:Q), 
  err_prop e s -> Qabs x <= a*e -> Qabs (Qplus' (hd s) x) <= e.
 Proof.
@@ -127,9 +142,16 @@ rewrite <- Qle_minus_iff.
 auto with *. 
 Qed.
 
+(** [InfiniteSum] is sums the series s.
+
+[InfiniteSum_raw_F] is the body of the fixpoint.  It tests the error of
+the partial sum and bails out early if the error becomes small enough.
+*)
 Definition InfiniteSum_raw_F rec (err_prop:Stream Q -> bool) (s:Stream Q) : Q :=
 if (err_prop s) then 0 else (Qplus' (hd s) (rec err_prop (tl s))).
 
+(** By carefully using continuations, we can efficently compute n
+iterations of [InfiniteSum_raw_F] with call-by-value. *)
 Fixpoint InfiniteSum_raw_N (n:positive) (cont: (Stream Q -> bool) -> Stream Q -> Q) {struct n} : (Stream Q -> bool) -> Stream Q -> Q :=
 match n with
 | xH => InfiniteSum_raw_F cont
@@ -142,6 +164,7 @@ Remark : the eta expension here is important, else the virtual machine will
 compute the value of (InfiniteGeometricSum_raw_N n') before
 reducing the call of InfiniteGeometricSum_raw_F.*)
 
+(** Lemmas for reasoning about InfiniteSum_raw_N. *)
 Lemma InfiniteSum_raw_N_F : forall p c,
  InfiniteSum_raw_N p (fun err s => InfiniteSum_raw_F c err s)= 
  InfiniteSum_raw_F (fun err s => InfiniteSum_raw_N p c err s).
@@ -230,6 +253,7 @@ intros C; apply H1; auto with *.
 destruct (err s); auto with *.
 Qed.
 
+(** The infinite sum is indeed bounded by an error bound. *)
 Lemma err_prop_correct : forall (e:Qpos) s, (GeometricSeries s) -> (err_prop e s) ->
  forall (p:positive) (e':Stream Q -> bool),
   (e' (Str_nth_tl p s)) -> Qabs (InfiniteSum_raw_N p (fun err s => 0) e' s) <= e.
@@ -254,6 +278,10 @@ destruct gs0.
 assumption.
 Qed. 
 
+(** This lemma tells us how to compute an upper bound on the number of
+terms we will need to compute.  It is okay for this error to be loose
+because the partial sums will bail out early when it sees that its
+estimate of the error is small enough. *)
 Lemma GeometricCovergenceLemma : forall (n:positive) (e:Qpos),
  /(e*(1 - a)) <= n -> a^n <= e.
 Proof.
@@ -442,6 +470,7 @@ rsapply mult_resp_leEq_rht; try assumption.
 apply IHp; assumption.
 Qed.
 
+(** The implemenation of [InfiniteGeometricSum]. *)
 Definition InfiniteGeometricSum_raw series (e:QposInf) : Q :=
 match e with
 | QposInfinity => 0
@@ -525,6 +554,7 @@ Qed.
 Definition InfiniteGeometricSum series (Gs:GeometricSeries series) : CR :=
 Build_RegularFunction (InfiniteGeometricSum_raw_prf Gs).
 
+(** The [InfiniteGeometricSum] is correct. *)
 Lemma InfiniteGeometricSum_step : forall series (Gs:GeometricSeries series),
  (InfiniteGeometricSum Gs ==
   ('(hd series))+(InfiniteGeometricSum (ForAll_Str_nth_tl 1%nat Gs)))%CR.
@@ -903,49 +933,6 @@ Proof.
 intros series Gs.
 apply InfiniteGeometricSum_correct.
 intros; apply eq_reflexive.
-Qed.
-
-Lemma mult_Streams_Gs : forall (x y  : Stream Q),
- (DecreasingNonNegative x) ->  
- (GeometricSeries y) ->
- (GeometricSeries (mult_Streams x y)).
-cofix.
-intros x y Hx Hy.
-constructor.
- destruct Hy as [Hy _].
- destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
- simpl.
- rewrite Qabs_Qmult.
- apply Qle_trans with (Qabs (hd x) * Qabs (hd (tl y))).
-  apply Qmult_le_compat_r.
-   do 2 (rewrite Qabs_pos; try assumption).
-  apply Qabs_nonneg.
- rewrite Qabs_Qmult.
- replace LHS with (Qabs (hd (tl y))*Qabs (hd x)) by ring.
- replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by ring.
- apply Qmult_le_compat_r; try assumption.
- apply Qabs_nonneg.
-rapply mult_Streams_Gs.
- destruct Hx; assumption.
-destruct Hy; assumption.
-Qed.
-
-Lemma powers_help_Gs : forall c,
- (GeometricSeries (powers_help a c)).
-cofix.
-intros c.
-constructor.
- simpl.
- rewrite Qmult_comm.
- rewrite Qabs_Qmult.
- rewrite Qabs_pos; try assumption.
- apply Qle_refl.
-rapply powers_help_Gs.
-Qed.
- 
-Lemma powers_Gs : (GeometricSeries (powers a)).
-Proof.
-rapply powers_help_Gs.
 Qed.
 
 End GeometricSeries.

@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Import ZBasics.
 Require Import Classic.
 Require Export Metric.
@@ -10,57 +30,26 @@ Require Import Qauto.
 
 Require Import CornTac.
 
-(*
-Definition FinitelyEnumerable X (p:X -> Prop) :=
-{l:list X | forall x:X, p x <-> ~~In x l}.
-(*
-Lemma FinitelyEnumerable_SubFinite : forall X p,
- FinitelyEnumerable X p -> SubFinite X p.
-intros X p [l Hl].
-exists l.
- abstract firstorder.
-Defined.
-*)
-*)
 Section HausdorffMetric.
+
+(**
+* Hausdorff Metric
+This module defines a Hausdorff metric for an arbitrary predicate over
+a metric space X.
+*)
 
 Variable X : MetricSpace.
 
-(*
-Variable XP_eq : (X -> Prop) -> (X -> Prop) -> Prop.
-Hypothesis XP_eq_ST : Setoid_Theory (X -> Prop) XP_eq.
-
-Add Setoid (X -> Prop) XP_eq XP_eq_ST as XP_Setoid.
+(** This is the (weak) hemiMetric, which makes an asymmetric metric.
+We make use of the classical quantifer in this definition.
 *)
-
 Definition hemiMetric (e:Qpos) (A B: X -> Prop) := 
  forall x:X, A x -> 
  existsC X (fun y => B y /\ ball e x y).
 
+(** This (weak) metric, makes the full symmetric metric. *)
 Definition hausdorffBall (e:Qpos) (A B: X -> Prop) :=
  hemiMetric e A B /\ hemiMetric e B A.
-
-(*
-Add Morphism hemiMetric with signature QposEq ==> XP_eq ==> XP_eq ==> iff as hemiMetric_wd.
-Proof.
-cut (forall x1 x2 : Qpos,
-QposEq x1 x2 ->
-forall x3 x4 : X -> Prop,
-XP_eq x3 x4 ->
-forall x5 x6 : X -> Prop,
-XP_eq x5 x6 -> (hemiMetric x1 x3 x5 -> hemiMetric x2 x4 x6)).
- intros Z e0 e1 He a0 a1 Ha b0 b1 Hb.
- split; apply Z; try assumption; try (unfold QposEq; symmetry; assumption).
-intros e0 e1 He a0 a1 Ha b0 b1 Hb H x Hx.
-apply (existC_destruct _ _ (H x Hx)).
- apply existC_stable.
-intros a Ha.
-apply existsWeaken.
-exists a.
-rewrite He in Ha.
-assumption.
-Qed.
-*)
 
 Lemma hemiMetric_wd1 : forall (e0 e1:Qpos) A B,
  (QposEq e0 e1) -> hemiMetric e0 A B -> hemiMetric e1 A B.
@@ -128,6 +117,10 @@ apply hemiMetric_wd1 with (e1 + e0)%Qpos.
 apply hemiMetric_triangle with B; assumption.
 Qed.
 
+(** Unfortunately this isn't a metric for an aribitrary predicate.  More
+assumptions are needed to show our definition of ball is closed.  See
+FinEnum for an example of an instance of the Hausdorff metric. *)
+
 Hypothesis stableX : stableMetric X.
 
 Lemma hemiMetric_stable :forall e A B, ~~(hemiMetric e A B) -> hemiMetric e A B.
@@ -191,6 +184,11 @@ End HausdorffMetric.
 Section HausdorffMetricStrong.
 
 Variable X : MetricSpace.
+(**
+** Strong Hausdorff Metric
+This section introduces an alternative stronger notition of Haudorff metric
+that uses a constructive existential.
+*)
 
 Definition hemiMetricStrong (e:Qpos) (A B: X -> Prop) := 
  forall x:X, A x -> 

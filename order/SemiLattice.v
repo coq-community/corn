@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -25,6 +25,12 @@ Require Export PartialOrder.
 
 Open Local Scope po_scope.
 
+(**
+* SemiLattice
+A (meet) semi lattice augments a partial order with a greatest lower bound
+operator.
+*)
+
 (*Should I take a PartialOrder parameter, or just a type and an inequality relation? *)
 Record is_SemiLattice (po : PartialOrder) (meet : po -> po -> po) : Prop :=
 { sl_meet_lb_l : forall x y, meet x y <= x (*left lower bound*)
@@ -38,6 +44,7 @@ Record SemiLattice : Type :=
 ; sl_proof : is_SemiLattice po meet
 }.
 
+(* begin hide *)
 Implicit Arguments meet [s].
 
 Add Morphism meet with signature po_eq ==> po_eq ==> po_eq  as meet_compat.
@@ -52,6 +59,7 @@ intros.
 pose (Seq_sym X _ (po_st X)).
 apply le_antisym; firstorder.
 Qed.
+(* end hide *)
 
 Section Meet.
 
@@ -61,6 +69,7 @@ Definition makeSemiLattice po meet p1 p2 p3 :=
 @Build_SemiLattice po meet
 (@Build_is_SemiLattice po meet p1 p2 p3).
 
+(** The axioms and basic properties of a semi lattice *)
 Lemma meet_lb_l : forall x y : X, meet x y <= x.
 Proof (sl_meet_lb_l _ _ (sl_proof X)).
 
@@ -70,6 +79,7 @@ Proof (sl_meet_lb_r _ _ (sl_proof X)).
 Lemma meet_glb : forall x y z : X, z <= x -> z <= y -> z <= meet x y.
 Proof (sl_meet_glb _ _ (sl_proof X)).
 
+(** commutativity of meet *)
 Lemma meet_comm : forall x y:X, meet x y == meet y x.
 Proof.
 assert (forall x y : X, meet x y <= meet y x).
@@ -80,6 +90,7 @@ firstorder.
 intros; apply le_antisym; firstorder.
 Qed.
 
+(** associativity of meet *)
 Lemma meet_assoc : forall x y z:X, meet x (meet y z) == meet (meet x y) z.
 Proof.
 assert (forall x y z : X, meet x (meet y z) <= meet (meet x y) z).
@@ -95,6 +106,7 @@ rewrite (meet_comm y z).
 apply H.
 Qed.
 
+(** idempotency of meet *)
 Lemma meet_idem : forall x:X, meet x x == x.
 intros.
 apply le_antisym; firstorder using meet_lb_l meet_glb le_refl.
@@ -120,6 +132,7 @@ rewrite meet_comm.
 apply le_meet_l.
 Qed.
 
+(** monotonicity of meet *)
 Lemma meet_monotone_r : forall a : X, monotone X (meet a).
 Proof.
 intros.

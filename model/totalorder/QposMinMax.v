@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -23,6 +23,10 @@ Require Import Qpossec.
 Require Import QArith.
 Require Import QMinMax.
 Require Import TotalOrder.
+
+(**
+** Example of a Total Order: <Qpos, Qpos_le, Qpos_min, Qpos_max>
+*)
 
 Definition Qpos_le_total (x y : Qpos) : {x <= y} + {y <= x} :=
 match Qlt_le_dec_fast x y with
@@ -65,13 +69,13 @@ apply (TotalOrder.Default.min_def2 _ _ _ Qpos_eq_le_def Qpos_le_total).
 apply (TotalOrder.Default.max_def1 _ _ _ Qpos_eq_le_def Qpos_le_total).
 apply (TotalOrder.Default.max_def2 _ _ _ Qpos_eq_le_def Qpos_le_total).
 Defined.
-
+(* begin hide *)
 Add Morphism Qpos_min : Qpos_min_compat.
 Proof @meet_compat QposTotalOrder.
 
 Add Morphism Qpos_max : Qpos_max_compat.
 Proof @join_compat QposTotalOrder.
-
+(* end hide *)
 Section QTotalOrder.
 
 Let Qto := QposTotalOrder.
@@ -198,9 +202,9 @@ destruct (Qpos_le_total x y) as [H|H];
 destruct (Qle_total x y) as [H0|H0]; try reflexivity;
  apply Qle_antisym; auto.
 Qed.
-
+(* begin hide *)
 Hint Rewrite Q_Qpos_min : QposElim.
-
+(* end hide *)
 Lemma Q_Qpos_max : forall (x y:Qpos), ((Qpos_max x y)%Qpos:Q)==Qmax (x:Q) (y:Q).
 Proof.
 intros x y.
@@ -211,5 +215,6 @@ destruct (Qpos_le_total y x) as [H|H];
 destruct (Qle_total y x) as [H0|H0]; try reflexivity;
  apply Qle_antisym; auto.
 Qed.
-
+(* begin hide *)
 Hint Rewrite Q_Qpos_max : QposElim.
+(* end hide *)

@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -24,7 +24,10 @@ Require Import Setoid.
 Require Export Lattice.
 
 Open Local Scope po_scope.
-
+(**
+* Total Order
+A total order is a lattice were x <= y or y <= x.
+*)
 Record TotalOrder : Type := 
 { L :> Lattice
 ; le_total : forall x y:L, {x <= y}+{y <= x}
@@ -33,7 +36,7 @@ Record TotalOrder : Type :=
 Section MinMax.
 
 Variable X : TotalOrder.
-
+(** meet x y is either x or y. *)
 Definition meet_irred : forall x y : X, {meet x y == x} + {meet x y == y}.
 intros.
 destruct (le_total _ x y) as [H|H].
@@ -55,6 +58,7 @@ rewrite equiv_le_def in *.
 firstorder.
 Qed.
 
+(** meet distributes over any monotone function. *)
 Lemma monotone_meet_distr : forall x y : X, f (meet x y) == meet (f x) (f y).
 Proof.
 rewrite monotone_def in Hf.
@@ -76,6 +80,7 @@ Qed.
 
 End Monotone.
 
+(** join distributes over meet *)
 Lemma join_meet_distr_r : forall x y z:X, (join x (meet y z))==(meet (join x y) (join x z)).
 Proof (fun a => monotone_meet_distr _ (join_monotone_r X a)).
 
@@ -87,13 +92,16 @@ Section Antitone.
 Variable f : X -> X.
 Hypothesis Hf : antitone X f.
 
+(* begin hide *)
 Add Morphism f with signature po_eq ==> po_eq as antitone_compat.
 rewrite antitone_def in Hf.
 intros.
 rewrite equiv_le_def in *.
 firstorder.
 Qed.
+(* end hide *)
 
+(* meet transforms into join for antitone functions *)
 Lemma antitone_meet_join_distr : forall x y : X, f (meet x y) == join (f x) (f y).
 Proof.
 rewrite antitone_def in Hf.
@@ -115,7 +123,7 @@ Qed.
 
 End Antitone.
 
-(* These are lemmas of distributive lattices *)
+(** Lemmas of distributive lattices *)
 Lemma join_meet_modular_r : forall x y z : X, join x (meet y (join x z)) == meet (join x y) (join x z).
 Proof.
 intros.
@@ -150,14 +158,17 @@ End MinMax.
 Section MaxMin.
 
 Variable X : TotalOrder.
-
+(**
+** Dual Total Order
+The dual of a total order is a total order.
+*)
 Definition Dual : TotalOrder.
 eapply Build_TotalOrder with 
  (L:= Dual X).
 intros.
 destruct (le_total _ x y); auto.
 Defined.
-
+(** The duals of the previous lemmas hold. *)
 Definition join_irred : forall x y : X, {join x y == x} + {join x y == y} :=
 meet_irred Dual.
 
@@ -184,7 +195,8 @@ End MaxMin.
 Section TotalOrderMinDef.
 
 Variable X : PartialOrder.
-
+(** Given a total order, meet and join can be characterized in terms of
+the order.*)
 Variable min : X -> X -> X.
 Hypothesis le_total : forall x y:X, {x <= y}+{y <= x}.
 Hypothesis min_def1 : forall x y:X, x <= y -> min x y == x.
@@ -220,6 +232,7 @@ Qed.
 
 End TotalOrderMinDef.
 
+(** With a total order has a new characterization. *)
 Definition makeTotalOrder :
  forall (A : Type) (equiv : A -> A -> Prop) (le : A -> A -> Prop) 
   (monotone antitone : (A -> A) -> Prop)
@@ -250,7 +263,9 @@ exact (Build_TotalOrder L0 total).
 Defined.
 
 Module Default.
-
+(**
+** Default meet and join.
+*)
 Section MinDefault.
 Variable A : Type.
 Variable equiv: A -> A -> Prop.
@@ -258,6 +273,7 @@ Variable le : A -> A -> Prop.
 Hypothesis equiv_le_def : forall x y : A, equiv x y <-> (le x y /\ le y x).
 Hypothesis le_total : forall x y:A, {le x y}+{le y x}.
 
+(** Given a total order, meet and join have a default implemenation. *)
 Definition min (x y:A) :=
  if (le_total x y) then x else y.
 

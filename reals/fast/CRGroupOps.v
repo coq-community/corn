@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -32,6 +32,10 @@ Opaque CR Qmin Qmax.
 
 Open Local Scope uc_scope.
 
+(**
+** Addition
+Lifting addition over [Q] by one parameter yields a rational translation
+function. *)
 Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (a[+]b):Q) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
@@ -61,6 +65,7 @@ rewrite Cmap_fun_correct.
 rapply MonadLaw1.
 Qed.
 
+(** Lifting translate yields binary addition over CR. *)
 Lemma Qplus_uc_prf :  is_UniformlyContinuousFunction Qtranslate_uc Qpos2QposInf.
 Proof.
 intros e a0 a1 H b.
@@ -103,7 +108,10 @@ rapply MonadLaw3.
 Qed.
 
 Hint Rewrite translate_Qplus : CRfast_compute.
-
+(**
+** Negation
+Lifting negation on [Q] yields negation on CR.
+*)
 Lemma Qopp_uc_prf : is_UniformlyContinuousFunction Qopp Qpos2QposInf.
 Proof.
 intros e a b H.
@@ -120,15 +128,25 @@ Build_UniformlyContinuousFunction Qopp_uc_prf.
 Definition CRopp : CR -> CR := Cmap QPrelengthSpace Qopp_uc.
 
 Notation "- x" := (CRopp x) : CR_scope.
-Notation "x - y" := (x + (- y))%CR : CR_scope.
 
+(**
+** Subtraction
+There is no subtraction on CR.  It is simply notation for adding a
+negated quantity.  This way all lemmas about addition automatically
+apply to subtraction.
+*)
+Notation "x - y" := (x + (- y))%CR : CR_scope.
+(* begin hide *)
 Add Morphism CRopp with signature ms_eq ==> ms_eq as CRopp_wd.
 Proof.
 rapply uc_wd.
 Qed.
-
+(* end hide *)
+(**
+** Inequality
+First a predicate for nonnegative numbers is defined. *)
 Definition CRnonNeg (x:CR) := forall e:Qpos, (-e) <= (approximate x e).
-
+(* begin hide *)
 Add Morphism CRnonNeg with signature ms_eq ==> iff as CRnonNeg_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
@@ -169,9 +187,10 @@ change (x2==x1)%CR.
 symmetry.
 assumption.
 Qed.
-
+(* end hide *)
+(** And similarly for nonpositive. *)
 Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= e.
-
+(* begin hide *)
 Add Morphism CRnonPos with signature ms_eq ==> iff as CRnonPos_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
@@ -212,11 +231,12 @@ change (x2==x1)%CR.
 symmetry.
 assumption.
 Qed.
-
+(* end hide *)
+(** Inequality is defined in terms of nonnegativity. *)
 Definition CRle (x y:CR) := (CRnonNeg (y - x))%CR.
 
 Infix "<=" := CRle : CR_scope.
-
+(* begin hide *)
 Add Morphism CRle with signature ms_eq ==> ms_eq ==> iff as CRle_wd.
 intros x1 x2 Hx y1 y2 Hy.
 change (x1==x2)%CR in Hx.
@@ -228,7 +248,8 @@ assumption.
 apply CRopp_wd.
 assumption.
 Qed.
-
+(* end hide *)
+(** Basic properties of inequality *)
 Lemma CRle_refl : forall x, (x <= x)%CR.
 Proof.
 intros x e.
@@ -276,6 +297,11 @@ replace LHS with (-(1#2)*e + - (1#2)*e) by ring.
 apply Qplus_le_compat;assumption.
 Qed.
 
+(**
+** Maximum
+[QboundBelow] ensures that a real number is at least some fixed
+rational number.  It is the lifting of the first parameter of [Qmax].
+*)
 Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmax a b):Q) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
@@ -316,6 +342,7 @@ Build_UniformlyContinuousFunction (QboundBelow_uc_prf a).
 
 Definition boundBelow (a:Q) : CR --> CR := Cmap QPrelengthSpace (QboundBelow_uc a).
 
+(** CRmax is the lifting of [QboundBelow]. *)
 Lemma Qmax_uc_prf :  is_UniformlyContinuousFunction QboundBelow_uc Qpos2QposInf.
 Proof.
 intros e a0 a1 H b.
@@ -343,7 +370,7 @@ rewrite MonadLaw3.
 rewrite StrongMonadLaw1.
 reflexivity.
 Qed.
-
+(** Basic properties of CRmax. *)
 Lemma CRmax_ub_l : forall x y, (x <= CRmax x y)%CR.
 Proof.
 intros x y e.
@@ -420,7 +447,11 @@ rapply mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
-
+(**
+** Minimum
+[QboundAbove] ensures that a real number is at most some fixed
+rational number.  It is the lifting of the first parameter of [Qmin].
+*)
 Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmin a b):Q) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
@@ -444,6 +475,7 @@ Build_UniformlyContinuousFunction (QboundAbove_uc_prf a).
 
 Definition boundAbove (a:Q) : CR --> CR := Cmap QPrelengthSpace (QboundAbove_uc a).
 
+(** CRmin is the lifting of [QboundAbove]. *)
 Lemma Qmin_uc_prf :  is_UniformlyContinuousFunction QboundAbove_uc Qpos2QposInf.
 Proof.
 intros e a0 a1 H b.
@@ -472,6 +504,7 @@ rewrite StrongMonadLaw1.
 reflexivity.
 Qed.
 
+(** Basic properties of CRmin. *)
 Lemma CRmin_lb_l : forall x y, (CRmin x y <= x)%CR.
 Proof.
 intros x y e.

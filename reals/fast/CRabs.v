@@ -29,7 +29,9 @@ Require Import CRIR.
 Require Import CornTac.
 
 Open Local Scope Q_scope.
-
+(**
+** Absolute Value
+*)
 Lemma Qabs_uc_prf : is_UniformlyContinuousFunction
  (Qabs:Q_as_MetricSpace -> Q_as_MetricSpace) Qpos2QposInf.
 Proof.

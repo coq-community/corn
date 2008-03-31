@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CRAlternatingSum.
+Require Import CRseries.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -37,6 +38,11 @@ Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
 
+(**
+** Arctangent (small)
+For values between in [[0,1]], arctangent is computed by it's alternating
+taylor series.
+*)
 Section ArcTanSeries.
 Variable a:Q.
 
@@ -166,6 +172,7 @@ rewrite <- POS_anti_convert.
 auto with *.
 Qed.
 
+(** Extend the range to [[-1,1]] by symmetry. *)
 Definition rational_arctan_small (a:Q) (p: -(1) <= a <= 1) : CR.
 intros a.
 destruct (Qle_total a 0); intros Ha.

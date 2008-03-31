@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2007-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -38,16 +38,25 @@ Open Local Scope StepQ_scope.
 
 Opaque Qmax Qabs.
 
+(**
+** Linf metric for Step Functions
+The Linf metric is measured by the sup of the absolute value of the
+difference between step functions.
+
+*** Sup for Step Functions.
+*)
 Definition StepQSup : (StepQ)->Q := StepFfold (fun x => x) (fun b (x y:QS) => Qmax x y)%Q.
 Definition LinfNorm (f:StepF QS):Q:=(StepQSup (StepQabs f)).
 Definition LinfDistance (f g:StepF QS):Q := (LinfNorm (f - g)).
 Definition LinfBall (e:Qpos)(f g:StepF QS):Prop:=((LinfDistance f g)<=e)%Q.
 
+(** The Sup of the glue of two step functions. *)
 Lemma StepQSup_glue : forall o s t, (StepQSup (glue o s t) = Qmax (StepQSup s) (StepQSup t))%Q.
 Proof.
 reflexivity.
 Qed.
 
+(** The Linf Distance between the glue of two step functions. *)
 Lemma LinfDistance_glue : forall o s s0 t t0,
  (LinfDistance (glue o s s0) (glue o t t0) == Qmax (LinfDistance s t) (LinfDistance s0 t0))%Q.
 Proof.
@@ -58,9 +67,10 @@ rewrite MapGlue.
 rewrite ApGlueGlue.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Rewrite StepQSup_glue: StepF_rew.
-
+(* end hide *)
+(** The integral (on [[0,1]]) is always at most the sup. *)
 Lemma StepQIntegral_le_Sup : forall x, (IntegralQ x <= StepQSup x)%Q.
 Proof.
 intros x.
@@ -76,6 +86,7 @@ replace RHS with (o*(Qmax a b) + (1-o)*(Qmax a b))%Q by ring.
 rsapply plus_resp_leEq_both; rsapply mult_resp_leEq_lft; auto with *.
 Qed.
 
+(** Hence, the L1 Norm is at most the Linf Norm. *)
 Lemma L1Norm_le_LinfNorm : forall x, (L1Norm x <= LinfNorm x)%Q.
 Proof.
 intros x.
@@ -97,6 +108,30 @@ eapply Qle_trans.
 assumption.
 Qed.
 
+Lemma LinfNorm_Zero : forall s, 
+ (LinfNorm s <= 0)%Q -> s == (constStepF (0:QS)).
+Proof.
+intros s.
+intros Hs.
+induction s using StepF_ind.
+ rapply Qle_antisym.
+  eapply Qle_trans;[apply Qle_Qabs|assumption].
+ rewrite <- (Qopp_involutive x).
+ change 0 with (- (- 0))%Q.
+ apply Qopp_le_compat.
+ eapply Qle_trans;[apply Qle_Qabs|].
+ rewrite Qabs_opp.
+ assumption.
+apply glue_StepF_eq.
+ apply IHs1.
+ eapply Qle_trans;[|apply Hs].
+ rapply Qmax_ub_l.
+apply IHs2.
+eapply Qle_trans;[|apply Hs].
+rapply Qmax_ub_r.
+Qed.
+
+(** The sup of the split of a step function. *)
 Lemma StepQSupSplit : forall (o:OpenUnit) x, 
  (StepQSup x == Qmax (StepQSup (SplitL x o)) (StepQSup (SplitR x o)))%Q.
 Proof.
@@ -121,7 +156,7 @@ apply SplitLR_glue_ind; intros H.
  reflexivity.
 reflexivity.
 Qed. 
-
+(* begin hide *)
 Add Morphism StepQSup 
   with signature  StepF_eq ==>  Qeq
  as StepQSup_wd.
@@ -174,26 +209,8 @@ rewrite Hx.
 rewrite Hy.
 reflexivity.
 Qed.
-
-Lemma Linfball_refl : forall e x, (LinfBall e x x).
-Proof.
-intros e x.
-unfold LinfBall, LinfDistance.
-setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
-change (0 <= e)%Q.
-auto with *.
-Qed.
-
-Lemma Linfball_sym : forall e x y, (LinfBall e x y) -> (LinfBall e y x).
-Proof.
-intros e x y.
-unfold LinfBall, LinfDistance.
-unfold LinfNorm.
-setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
-rewrite StepQabsOpp.
-auto.
-Qed.
-
+(* end hide *)
+(** How the sup interacts with various arithmetic operations on step functions. *)
 Lemma StepQSup_resp_le : forall x y, x <= y -> (StepQSup x <= StepQSup y)%Q.
 Proof.
 rapply StepF_ind2; auto.
@@ -219,6 +236,26 @@ rewrite Qmax_plus_distr_l.
 apply Qmax_le_compat;
  rsapply plus_resp_leEq_lft;
  auto with *.
+Qed.
+
+(** The Linf ball satifies the requirements of a metric. *)
+Lemma Linfball_refl : forall e x, (LinfBall e x x).
+Proof.
+intros e x.
+unfold LinfBall, LinfDistance.
+setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
+change (0 <= e)%Q.
+auto with *.
+Qed.
+
+Lemma Linfball_sym : forall e x y, (LinfBall e x y) -> (LinfBall e y x).
+Proof.
+intros e x y.
+unfold LinfBall, LinfDistance.
+unfold LinfNorm.
+setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
+rewrite StepQabsOpp.
+auto.
 Qed.
 
 Lemma Linfball_triangle : forall e d x y z, (LinfBall e x y) -> (LinfBall d y z) -> (LinfBall (e+d) x z).
@@ -250,29 +287,6 @@ assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e)%Q.
 apply H0. exact H.
 Qed.
 
-Lemma LinfNorm_Zero : forall s, 
- (LinfNorm s <= 0)%Q -> s == (constStepF (0:QS)).
-Proof.
-intros s.
-intros Hs.
-induction s using StepF_ind.
- rapply Qle_antisym.
-  eapply Qle_trans;[apply Qle_Qabs|assumption].
- rewrite <- (Qopp_involutive x).
- change 0 with (- (- 0))%Q.
- apply Qopp_le_compat.
- eapply Qle_trans;[apply Qle_Qabs|].
- rewrite Qabs_opp.
- assumption.
-apply glue_StepF_eq.
- apply IHs1.
- eapply Qle_trans;[|apply Hs].
- rapply Qmax_ub_l.
-apply IHs2.
-eapply Qle_trans;[|apply Hs].
-rapply Qmax_ub_r.
-Qed.
-
 Lemma Linfball_eq : forall x y, (forall e : Qpos, LinfBall e x y) -> StepF_eq x y.
 Proof.
 intros x y H.
@@ -295,6 +309,9 @@ ring_simplify.
 assumption.
 Qed.
 
+(**
+*** Example of a Metric Space <StepQ, LinfBall>
+*)
 Lemma Linf_is_MetricSpace : 
  (is_MetricSpace (@StepF_eq QS) LinfBall).
 split.
@@ -305,7 +322,7 @@ split.
  rapply Linfball_closed.
 rapply Linfball_eq.
 Qed.
-
+(* begin hide *)
 Add Morphism LinfBall with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
 intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold LinfBall.
@@ -315,12 +332,14 @@ rewrite Hy.
 rewrite Hz.
 reflexivity.
 Qed.
-
+(* end hide *)
 Definition LinfStepQ : MetricSpace :=
 Build_MetricSpace LinfBall_wd Linf_is_MetricSpace.
-
+(* begin hide *)
 Canonical Structure LinfStepQ.
+(* end hide *)
 
+(** The Linf space is a prelength space. *)
 Lemma StepQSup_scale :forall q x, (0 <= q)%Q ->
  (q*(StepQSup x) == (StepQSup (QscaleS q^@>x)))%Q.
 Proof.
@@ -410,6 +429,7 @@ unfold f.
 ring.
 Qed.
 
+(** Sup is uniformly continuous. *)
 Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
 Proof.
 intros e x y H.
@@ -445,6 +465,7 @@ Open Local Scope uc_scope.
 Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction sup_uc_prf.
 
+(** There is an injection from Q to Linf. *)
 Lemma constStepF_uc_prf : is_UniformlyContinuousFunction (@constStepF QS:Q -> LinfStepQ) Qpos2QposInf.
 Proof.
 intros e x y H.
@@ -456,6 +477,7 @@ Qed.
 Definition constStepF_uc : Q_as_MetricSpace --> LinfStepQ
 := Build_UniformlyContinuousFunction constStepF_uc_prf.
 
+(** And there is an injection from Linf to L1. *)
 Lemma LinfAsL1_uc_prf : is_UniformlyContinuousFunction (fun (x:LinfStepQ) => (x:L1StepQ)) Qpos2QposInf.
 Proof.
 intros e x y H.

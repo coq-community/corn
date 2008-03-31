@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -26,8 +26,11 @@ Require Import CRcorrect.
 Require Import Rational.
 Require Import CornTac.
 
-Open Local Scope uc_scope.
+(**
+** Example of a ring: $\langle$#&lang;#[CR],[+],[*]$\rangle$#&rang;#
+*)
 
+Open Local Scope uc_scope.
 
 Lemma CRmult_strext : bin_op_strext CRasCSetoid CRmult.
 Proof.

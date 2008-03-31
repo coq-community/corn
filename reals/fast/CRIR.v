@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -27,7 +27,13 @@ Require Export CRreal.
 Require Import CornTac.
 
 Opaque CR inject_Q.
-
+(**
+** Isomorphism between CR and IR
+Because CR and IR are both real number structures, they are isomorphic.
+This module develops lemmas for translating between expressions over CR
+and IR.  A rewrite database [IRtoCR] contains rewrite lemmas for
+converting expressions over IR to expressions over CR.
+*)
 Lemma CRIR_iso : Isomorphism CRasCReals IR.
 Proof.
 apply Canonic_Isomorphism_between_CReals.

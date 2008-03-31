@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -28,6 +28,9 @@ Require Import Qpower.
 Require Import CornTac.
 
 Open Local Scope Q_scope.
+
+(** These functions effiecently find bounds on rational numbers of the
+form 3^z or 4^z. *)
 
 Lemma power3bound : forall (q:Q), (q <= (3^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z).
 intros [[|n|n] d]; try discriminate.

@@ -1,5 +1,6 @@
 (* Copyright  2008-2008
  * Cezary Kaliszyk
+ * Russell O'Connor
  *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +17,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
+(**
+** Decidability of connectives
+Here we show the decidability of logical connectives.
+*)
+
 Lemma imp_dec : (forall A B, ({A} + {~A}) -> ({B} + {~B}) -> ({A -> B} + {~(A -> B)})).
-intros a b A B .
-destruct A as [A | A].
-destruct B as [B | B].
-left; tauto.
-right; tauto.
-left; tauto.
+tauto.
 Qed.
+
+(* TODO: other connectives *)

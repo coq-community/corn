@@ -19,13 +19,12 @@
 Require Export Exponential.
 Require Import CornTac.
 
-(** *Inverse Hyperbolic Tangent Function
-
+(**
+* Inverse Hyperbolic Tangent Function
 The definition of the inverse hyperbolic tangent function.
 
-area tangens hyperbolicus
+area tangens hyperbolicus *)
 
-*)
 Definition ArTangH : PartIR := Half{**}(Logarithm[o](([-C-]One{+}FId){/}([-C-]One{-}FId))).
 
 Definition DomArTanH := olor ([--]One) One.
@@ -267,15 +266,12 @@ Proof.
 eapply Derivative_imp_Continuous with (pI:=proper_DomArTanH).
 apply Derivative_ArTanH.
 Qed.
-
+(* begin hide *)
 Hint Resolve ArTanH_wd: algebra.
 Hint Resolve Continuous_ArTanH: continuous.
 Hint Resolve Derivative_ArTanH: derivate.
-(** 
-
-Properties ofthe Inverse Hyperbolic Tangent Function
-
-*)
+(* end hide *)
+(** Properties ofthe Inverse Hyperbolic Tangent Function. *)
 
 Lemma ArTanH_inv : forall x Hx Hx', ArTanH [--]x Hx[=][--](ArTanH x Hx').
 Proof.
@@ -316,11 +312,7 @@ csetoid_rewrite (ArTanH_inv _ X H).
 rational.
 Qed.
 
-(** 
-
-PowerSeries for the Inverse Hyperbolic Tangent Function
-
-*)
+(** PowerSeries for the Inverse Hyperbolic Tangent Function. *)
 Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#]Zero.
 Proof.
 intros R [|n] H.

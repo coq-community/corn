@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import CRAlternatingSum.
 Require Import CRGeometricSum.
+Require Import CRseries.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -39,6 +40,11 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
+
+(**
+** Area Tangens Hyperbolicus (artanh)
+[artanh] is implemented by as the [GeometricSum] of it's taylor series.
+*)
 
 Lemma arctanSequence_Gs : forall a, GeometricSeries (a^2) (arctanSequence a).
 Proof.
@@ -87,6 +93,8 @@ rstepr (nring 1:IR).
 apply (inj_Q_nring IR 1).
 Qed.
 
+(** Although this function works on the entire domain of [artanh], it is
+only reasonably fast for values close to 0, say [[-(2/3), 2/3]]. *)
 Definition rational_artanh_slow (a:Q) (p1: a^2 < 1) : CR := 
  InfiniteGeometricSum (Qsqr_nonneg a) p1 (arctanSequence_Gs a).
 
@@ -174,3 +182,6 @@ intros o.
 elim (fun x=> not_even_and_odd _ x o).
 rapply even_plus_n_n.
 Qed.
+
+(* This development is incomplete.  At the moment only what is need
+for logorithm has been developed. *)

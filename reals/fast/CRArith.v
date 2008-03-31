@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -30,22 +30,8 @@ Require Import CornTac.
 
 Open Local Scope CR_scope.
 
-Lemma CR_ring_theory : 
- @ring_theory (ms CR) (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
- (fun (x y:CR) => (x + - y)) CRopp (@ms_eq CR).
-Proof.
-split.
-rapply cm_lft_unit_unfolded.
-rapply cag_commutes_unfolded.
-rapply plus_assoc_unfolded.
-rapply one_mult.
-rapply mult_commut_unfolded.
-rapply mult_assoc_unfolded.
-intros x y z;generalize z x y;rapply ring_distl_unfolded.
-reflexivity.
-rapply cg_minus_correct.
-Qed.
-
+(** Operations on rational numbers over CR are the same as the operations
+on rational numbers. *)
 Lemma CReq_Qeq : forall (x y:Q), inject_Q x == inject_Q y <-> (x == y)%Q.
 Proof.
 unfold CR, inject_Q.
@@ -90,26 +76,26 @@ Lemma CRopp_Qopp : forall (x:Q), - inject_Q x == inject_Q (- x)%Q.
 Proof.
 intros x e1 e2; rapply ball_refl.
 Qed.
-
+(* begin hide *)
 Hint Rewrite CRopp_Qopp : CRfast_compute.
 Hint Rewrite <- CRopp_Qopp : toCRring.
-
+(* end hide *)
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q x - inject_Q y == inject_Q (x - y)%Q.
 Proof.
 intros x y e1 e2; rapply ball_refl.
 Qed.
-
+(* begin hide *)
 Hint Rewrite <- CRminus_Qminus : toCRring.
-
+(* end hide *)
 Lemma CRmult_Qmult : forall (x y:Q), inject_Q x * inject_Q y == inject_Q (x * y)%Q.
 Proof.
 intros x y.
 rewrite CRmult_scale.
 intros e1 e2; rapply ball_refl.
 Qed.
-
+(* begin hide *)
 Hint Rewrite <- CRmult_Qmult : toCRring.
-
+(* end hide *)
 Lemma Qap_CRap : forall (x y:Q), (~(x==y))%Q -> (' x)><(' y).
 Proof.
 intros x y Hxy.
@@ -150,8 +136,28 @@ replace RHS with (x + - 0)%Q by ring.
 assumption.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Rewrite <- CRinv_Qinv : toCRring.
+(* end hide *)
+(**
+** Ring
+CR forms a ring for the ring tactic.
+*)
+Lemma CR_ring_theory : 
+ @ring_theory (ms CR) (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
+ (fun (x y:CR) => (x + - y)) CRopp (@ms_eq CR).
+Proof.
+split.
+rapply cm_lft_unit_unfolded.
+rapply cag_commutes_unfolded.
+rapply plus_assoc_unfolded.
+rapply one_mult.
+rapply mult_commut_unfolded.
+rapply mult_assoc_unfolded.
+intros x y z;generalize z x y;rapply ring_distl_unfolded.
+reflexivity.
+rapply cg_minus_correct.
+Qed.
 
 Lemma CR_Q_ring_morphism : 
  ring_morph (inject_Q 0%Q) (inject_Q 1%Q) (ucFun2 CRplus) CRmult
@@ -187,6 +193,7 @@ Qed.
 
 Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@msp_Xsetoid _ _ _ (@msp CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
 
+(** Relationship between strict and nonstrict positivity *)
 Lemma CRpos_nonNeg : forall x, CRpos x -> CRnonNeg x.
 intros x [c Hx].
 cut ('0 <= x)%CR.

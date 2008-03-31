@@ -3,9 +3,15 @@ Require Export List.
 Require Import Arith.
 
 Set Implicit Arguments.
- 
+
+(**
+* Rasters
+A n by m raster is a vector of vector of booleans.
+*)
 Definition raster n m := vector (vector bool n) m.
 
+(** A series of notation allows rasters to be rendered (and to a certain
+extent parsed) in Coq *)
 Notation "'⎥' a b" := (Vcons (vector bool _) a _ b) 
   (format "'[v' '⎥' a '/' b ']'", at level 0, a, b at level 0) : raster.
 Notation "'⎥' a" := (Vcons (vector bool _) a _ (Vnil _)) 
@@ -18,6 +24,7 @@ Notation "⎢" := (@Vnil bool) (at level 0, right associativity) : raster.
 Notation "' ' a" := (Vcons bool false _ a) (at level 0, right associativity) : raster.
 Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
 
+(** Standard rasters. *)
 Definition emptyRaster n m : raster n m :=
 Vconst _ (Vconst _ false _) _.
 
@@ -38,9 +45,11 @@ simpl.
 auto with *.
 Qed.
 
+(** Indexing into a raster *)
 Definition RasterIndex n m (r:raster n m) i j :=
  nth j (nth i (map (@vectorAsList _ _) r) nil) false.
 
+(** Indexing into an empty raster is alway empty *)
 Lemma emptyRasterEmpty : forall n m i j,
 RasterIndex (emptyRaster n m) i j = false.
 Proof.
@@ -65,6 +74,8 @@ simpl.
 apply IHm.
 Qed. 
 
+(** [setRaster] transforms a raster by setting (or reseting) the (i,j)th 
+pixel. *)
 Definition updateVector A n (v:vector A n) (f:A->A) : nat -> vector A n :=
 vector_rect A (fun (n0 : nat) (_ : vector A n0) => nat -> vector A n0)
   (fun (_ : nat) => Vnil A)

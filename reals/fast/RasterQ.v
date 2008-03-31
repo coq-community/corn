@@ -1,3 +1,23 @@
+(*
+Copyright © 2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
 Require Export Raster.
 Require Import Interval.
 Require Export FinEnum.
@@ -6,6 +26,10 @@ Require Import Classic.
 Require Import CornTac.
 
 Set Implicit Arguments.
+(**
+** Rasters on Planes
+By attaching coordinates to the top-left and bottom-right corners of
+a raster, it can be interpreted as a finite set in [Q]^2. *)
 Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
 Lemma stableQ2 : stableMetric Q2.
@@ -13,6 +37,8 @@ Proof.
 rapply ProductMS_stable; apply stableQ.
 Qed.
 
+(** For [Q2], classical membership in a finite enumeration is the
+same as a constructive membership. *)
 Lemma InStrengthen : forall x (l:FinEnum stableQ2),
 InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ ms_eq x y.
 Proof.
@@ -47,6 +73,7 @@ Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricS
  let up := (UniformPartition l r n) in
  flat_map (fun (p:Q*Bvector _) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r)) (combine (UniformPartition t b m) bitmap).
 
+(** Notation for the interpretation of a raster. *)
 Notation "a ⇱ b ⇲ c" := (InterpRaster b a c) (at level 1,
  format "a ⇱ '[v' '/' b ']' '[v' '/' ⇲ c ']'") : raster.
 
@@ -64,6 +91,7 @@ Example ex5 :=
 Eval compute in (ex5).
 *)
 
+(** Correctness properties of our interpretation. *)
 Section InterpRasterCorrect.
 
 Let f := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
@@ -190,7 +218,7 @@ auto.
 Qed.
 
 End InterpRasterCorrect.
-
+(* begin hide *)
 Add Morphism InterpRaster with signature ms_eq ==> ms_eq ==> ms_eq as InterpRaster_wd.
 cut (forall (n m : nat) (bitmap : raster n m) (x1 x2 : Q2),
  prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
@@ -237,3 +265,4 @@ rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (Pair x2l x2r) (Pair y2l y2r)) L0
 apply InFinEnumC_weaken.
 auto using InterpRaster_correct1.
 Qed.
+(* end hide *)

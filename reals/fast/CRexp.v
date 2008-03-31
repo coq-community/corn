@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import QMinMax.
 Require Import CRAlternatingSum.
+Require Import CRseries.
 Require Export CRArith.
 Require Import CRIR.
 Require Import iso_CReals.
@@ -48,6 +49,11 @@ Opaque Exp.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
+(**
+** Exponential
+[exp] is implement by its alternating Taylor's series.
+*)
+
 Section ExpSeries.
 Variable a:Q.
 
@@ -64,6 +70,7 @@ rewrite Str_nth_recip_factorials.
 reflexivity.
 Qed.
 
+(** The exponential is first defined on [[-1,0]]. *)
 Hypothesis Ha: 0 <= a <= 1.
 
 Lemma expSequence_dnn : DecreasingNonNegative expSequence.
@@ -210,6 +217,7 @@ clear Ha.
 apply exp_ps_correct.
 Qed.
 
+(** exp is extended to work on [[-2^n, 0]] for all n. *)
 Lemma shrink_by_two : forall n a, (-(2^(S n)))%Z <= a <= 0 -> (-(2^n))%Z <= (a/2) <= 0.
 Proof.
 intros n a [H0 H1].
@@ -245,6 +253,7 @@ match n return (-(2^n))%Z <= a <= 0 -> CR with
   end
 end.
 
+(** [exp] works on all nonpositive numbers. *)
 Lemma rational_exp_neg_bounded_correct : forall n (a:Q) Ha,
  (@rational_exp_neg_bounded n a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
@@ -338,7 +347,8 @@ Proof.
 intros a Ha.
 rapply rational_exp_neg_bounded_correct.
 Qed.
-
+(** exp(x) is bounded below by (3^x) for x nonpositive, and hence
+exp(x) is positive. *)
 Lemma minus_one_works_for_rational_exp_small_neg : -(1) <= -(1) <= 0.
 Proof.
 constructor; discriminate.
@@ -475,6 +485,8 @@ exists ((3#1)^(Zdiv (Qnum a) (Qden a)))%Qpos.
 apply rational_exp_neg_posH'.
 Defined.
 
+(** exp is extended to all numbers by saying exp(x) = 1/exp(-x) when x
+is positive. *)
 Definition rational_exp (a:Q) : CR.
 intros a.
 destruct (Qle_total 0 a).
@@ -511,6 +523,9 @@ csetoid_rewrite_rev (inj_Q_inv IR a).
 apply eq_reflexive.
 Qed.
 
+(**
+*** e
+*)
 Definition CRe : CR := rational_exp 1.
 
 Lemma CRe_correct : (CRe == IRasCR E)%CR.
@@ -528,6 +543,7 @@ Hint Rewrite <- CRe_correct : IRtoCR.
 
 Opaque inj_Q.
 
+(** [exp] is uniformly continuous below any given integer. *)
 Definition exp_bound (z:Z) : Qpos :=
 (match z with
  |Z0 => 1#1
@@ -655,6 +671,7 @@ Qed.
 Definition exp_bound_uc (z:Z) :  Q_as_MetricSpace --> CR :=
 Build_UniformlyContinuousFunction (@exp_bound_uc_prf z).
 
+(** [exp] for any real number upto a given integer. *)
 Definition exp_bounded (z:Z) : CR --> CR := (Cbind QPrelengthSpace (exp_bound_uc z)).
 
 Lemma exp_bounded_correct : forall (z:Z) x, closer (inj_Q _ (z:Q)) x -> (IRasCR (Exp x)==exp_bounded z (IRasCR x))%CR.
@@ -683,10 +700,12 @@ apply leEq_inj_Q with IR.
 assumption.
 Qed.
 
+(** exp on all real numbers.  [exp_bounded] should be used instead when [x]
+is known to be bounded by some intenger. *)
 Definition exp (x:CR) : CR := exp_bounded (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
-
+(* begin hide *)
 Implicit Arguments exp [].
-
+(* end hide *)
 Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
 Proof.
 intros x.
@@ -719,9 +738,9 @@ rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
 apply exp_bound_lemma.
 Qed.
-
+(* begin hide *)
 Hint Rewrite exp_correct : IRtoCR.
-
+(* end hide *)
 Lemma exp_bound_exp : forall (z:Z) (x:CR),
  (x <= 'z ->
   exp_bounded z x == exp x)%CR.
@@ -747,7 +766,7 @@ rewrite <- exp_bounded_correct.
  auto with *.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Add Morphism exp with signature ms_eq ==> ms_eq as exp_wd.
 intros x y Hxy.
 unfold exp at 1.
@@ -760,7 +779,7 @@ apply CRle_trans with ('a)%CR.
 rewrite CRle_Qle.
 auto with *.
 Qed.
-
+(* end hide *)
 Lemma exp_Qexp : forall x : Q, (exp (' x) == rational_exp x)%CR.
 Proof.
 intros x.
@@ -769,5 +788,6 @@ rewrite <- exp_correct.
 rewrite <- rational_exp_correct.
 reflexivity.
 Qed.
-
+(* begin hide *)
 Hint Rewrite exp_Qexp : CRfast_compute.
+(* end hide *)

@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -25,6 +25,12 @@ Require Import CRcorrect.
 Require Import CornTac.
 
 Open Local Scope uc_scope.
+
+(**
+** Examples of monoids: $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
+*** $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
+We use the addition [' 0] as the unit of monoid:
+*)
 
 Lemma CRisCMonoid : is_CMonoid CRasCSemiGroup (' 0)%CR.
 Proof.

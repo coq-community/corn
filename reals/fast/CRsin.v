@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import QMinMax.
 Require Import CRAlternatingSum.
+Require Import CRseries.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
@@ -42,6 +43,10 @@ Open Local Scope uc_scope.
 
 Opaque inj_Q CR Qmin Qmax.
 
+(**
+** Sine
+Sine is defined in terms of its alternating Taylor's series.
+*)
 Section SinSeries.
 Variable a:Q.
 
@@ -68,6 +73,7 @@ rewrite inj_mult.
 reflexivity.
 Qed.
 
+(** Sine is first defined on [[0,1]]. *)
 Hypothesis Ha: 0 <= a <= 1.
 
 Lemma square_zero_one : 0 <= a^2 <= 1.
@@ -245,6 +251,8 @@ apply nexp_wd.
 rational.
 Qed.
 
+(** Sine's range can then be extended to [[0,3^n]] by [n] applications
+of the identity [sin(x) = 3*sin(x/3) - 4*(sin(x/3))^3]. *)
 Section Sin_Poly.
 
 Definition sin_poly_fun (x:Q) :Q := x*(3 - 4*x*x).
@@ -442,6 +450,7 @@ Qed.
 
 End Sin_Poly.
 
+(** Therefore sin works on all nonnegative numbers. *)
 Definition rational_sin_pos (a:Q) (Ha:0 <= a) : CR :=
  @rational_sin_pos_bounded _ a (conj Ha (power3bound a)).
 
@@ -451,6 +460,7 @@ Proof.
 intros; rapply rational_sin_pos_bounded_correct.
 Qed.
 
+(** By symmetry sin is extented to its entire range. *)
 Definition rational_sin (a:Q) : CR :=
 match (Qle_total 0 a) with
 | left H => rational_sin_pos H
@@ -475,6 +485,7 @@ simpl.
 ring.
 Qed.
 
+(** Sine is uniformly continuous everywhere. *)
 Definition sin_uc_prf : is_UniformlyContinuousFunction rational_sin Qpos2QposInf.
 Proof.
 apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_sin x) (modulusD (1#1)).
@@ -513,5 +524,6 @@ unfold sin.
 rewrite (Cbind_fun_correct QPrelengthSpace sin_uc).
 rapply BindLaw1.
 Qed.
-
+(* begin hide *)
 Hint Rewrite sin_correct : IRtoCR.
+(* end hide *)

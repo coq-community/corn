@@ -1,5 +1,5 @@
 (*
-Copyright © 2006 Russell O’Connor
+Copyright © 2006-2008 Russell O’Connor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -34,6 +34,12 @@ Opaque inj_Q CR Qmin Qmax.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
+
+(**
+** Cosine
+Cosine is defined in terms of Sine.  [cos x = 1 - 2*(sin(x/2))^2].
+But cosine is still first defined on the rational numbers, and lifted
+to the real numbers. *)
 
 Section Cos_Poly.
 
@@ -152,6 +158,7 @@ End Cos_Poly.
 
 Definition rational_cos (x:Q) := cos_poly (rational_sin (x/2)).
 
+(** Cosine is correct. *)
 Lemma rational_cos_correct : forall (a:Q),
  (rational_cos a == IRasCR (Cos (inj_Q IR a)))%CR.
 Proof.
