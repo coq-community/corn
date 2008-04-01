@@ -37,7 +37,7 @@
 Require Export Intervals.
 
 (**
-* Metric Spaces
+* Metric Spaces (traditional)
 *)
 
 Section Relations.

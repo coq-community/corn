@@ -29,7 +29,7 @@ Set Implicit Arguments.
 Open Local Scope uc_scope.
 
 (**
-** Example of a Complete Metric Space: CR
+* Complete Metric Space: Computable Reals (CR)
 *)
 
 Definition CR := Complete Q_as_MetricSpace.

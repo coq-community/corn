@@ -37,7 +37,7 @@ Opaque inj_Q CR.
 Section Pi.
 
 (**
-* Pi (alternate)
+** Pi (alternate)
 (Please import CRpi instead)
 
 This version is slower to compute than CRpi_fast; however it is faster to

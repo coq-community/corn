@@ -34,7 +34,7 @@ Open Local Scope uc_scope.
 
 Opaque inj_Q CR.
 (**
-* Pi
+** Pi
 (Please import CRpi instead)
 
 This version is faster to compute than CRpi_slow; however it is slower to
