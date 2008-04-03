@@ -436,8 +436,8 @@ cut
      ( [-C-]b{-}FId) {^}n) c). intro H0.
 eapply leEq_wdl.
 apply (Hc H0).
-apply AbsIR_wd; simpl in |- *; repeat apply cg_minus_wd.
-2: repeat apply mult_wdl.
+apply AbsIR_wd; simpl in |- *; repeat simple apply cg_minus_wd.
+2: repeat simple apply mult_wdl.
 unfold Taylor_Rem in |- *; simpl in |- *.
 apply cg_minus_wd.
 algebra.
