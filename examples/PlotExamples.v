@@ -42,9 +42,9 @@ Goal True.
 (* Plot_correct is a proof that the plot is correct.*)
 (* below we plot exp on [-6, 0] with range [0,1] *)
 (* (exp_bound_uc 0) is exp on ]-inf,0] which is one domain where it is uniformly continuous *)
-assert (X:=@Plot_correct (-(6)) 0 star 0 1 star
+assert (X:=@Plot_correct (-(3)) 0 star 0 1 star
  (exp_bound_uc 0)
- 69 23 (refl_equal _) (refl_equal _)).
+ 39 13 (refl_equal _) (refl_equal _)).
 (* No plot is seen.  It is hidden in the uncomputed
   PlotQ (- (6)) 0 ∗ 0 1 ∗ (exp_bound_uc 0) 69 23 *)
 (* We use patern matchin to extract the parts of the statement we
