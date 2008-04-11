@@ -135,7 +135,7 @@ intros a H0 e x y H.
 assert (Z:~ ~ ball (m:=ProductMS) e (x,a) (y,a)).
  revert H.
  cut (ball (m:=X) e x y ->
- ball (m:=ProductMS) e (Basics.Pair x a) (Basics.Pair y a)).
+ ball (m:=ProductMS) e (x, a) (y, a)).
   tauto.
  intros H.
  split; auto.
@@ -151,7 +151,7 @@ intros a H0 e x y H.
 assert (Z:~ ~ ball (m:=ProductMS) e (a,x) (a,y)).
  revert H.
  cut (ball (m:=Y) e x y ->
-  ball (m:=ProductMS) e (Basics.Pair a x) (Basics.Pair a y)).
+  ball (m:=ProductMS) e (a,x) (a, y)).
   tauto.
  intros H.
  split; auto.

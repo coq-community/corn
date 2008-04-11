@@ -133,8 +133,8 @@ destruct i as [|i].
   simpl.
   left; reflexivity.
  rewrite inj_S.
- cut (In (Pair (f0 (Zsucc j)) (f1 0%Z))
-  (map (fun x : Q => Pair x (f1 0%Z))
+ cut (In ((f0 (Zsucc j)), (f1 0%Z))
+  (map (fun x : Q => (x, (f1 0%Z)))
      (map (@fst _ _) (filter (@snd _ _) (combine (map f0 (iterateN Zsucc 1%Z n)) a0))))).
   intros L.
   destruct a; try right; auto.
@@ -212,7 +212,7 @@ rewrite (map_map) in H0.
 edestruct IHbitmap as [z Hz].
  apply H0.
 exists (S (fst z),snd z).
-simpl (fst (Pair (S (fst z)) (snd z))).
+simpl (fst ((S (fst z)), (snd z))).
 rewrite inj_S.
 auto.
 Qed.
@@ -246,9 +246,9 @@ rewrite Hb2 in Ha1.
 unfold snd, fst in Ha1.
 destruct x2 as [x2l x2r].
 destruct y2 as [y2l y2r].
-assert (L0:ms_eq z (Pair (x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1))
+assert (L0:ms_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
            (x2r + (y2r - x2r) * (2 * bx + 1 # 1) / (2 * m # 1)))).
- transitivity (Pair (x1l + (y1l - x1l) * (2 * by + 1 # 1) / (2 * n # 1))
+ transitivity ((x1l + (y1l - x1l) * (2 * by + 1 # 1) / (2 * n # 1)),
            (x1r + (y1r - x1r) * (2 * bx + 1 # 1) / (2 * m # 1))).
   auto.
  clear - Hx Hy.
@@ -261,7 +261,7 @@ assert (L0:ms_eq z (Pair (x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1))
   reflexivity.
  rewrite Hx2, Hy2.
  reflexivity.
-rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (Pair x2l x2r) (Pair y2l y2r)) L0).
+rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (x2l, x2r) (y2l, y2r)) L0).
 apply InFinEnumC_weaken.
 auto using InterpRaster_correct1.
 Qed.

@@ -346,7 +346,7 @@ rewrite Hx' in Hxy.
 rewrite Hy' in Hxy.
 assert (Hf':forall x y : Q_as_MetricSpace,
      InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace)
-       (Pair x y:ProductMS Q_as_MetricSpace Q_as_MetricSpace) (rev f) ->
+       ((x, y):ProductMS Q_as_MetricSpace Q_as_MetricSpace) (rev f) ->
      l <= x <= r /\ b <= y <= t).
  intros c d Hcd.
  apply Hf.
@@ -357,7 +357,7 @@ destruct Hxy as [Hx' Hy'].
 cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
   (fun p : ProductMS Q_as_MetricSpace Q_as_MetricSpace =>
    InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p (rev f) /\
-   ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p (Pair x y))).
+   ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p (x, y))).
  intros L.
  clear -L.
  destruct L as [G | z [Hz0 Hz]] using existsC_ind.
@@ -429,7 +429,7 @@ assert (L0:existsC (Q * Q)
          (fun p : Q * Q =>
           InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p l0 /\
           ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p
-            (Pair x y))).
+            (x, y))).
  apply IHl0.
   simpl in Hij.
   rewrite setRaster_correct2 in Hij; auto.

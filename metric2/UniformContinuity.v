@@ -254,3 +254,5 @@ rewrite (Hy x).
 reflexivity.
 Qed.
 (* end hide *)
+
+Notation "f ∘ g" := (uc_compose f g) (at level 25, left associativity) : uc_scope.

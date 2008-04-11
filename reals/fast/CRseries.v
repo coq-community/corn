@@ -198,7 +198,7 @@ Qed.
 *** [StreamBounds] 
 [StreamBounds] says that one stream pointwise bounds the absolute value
 of the other. *)
-Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in AbsSmall a b) (zipWith Pair a b).
+Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in AbsSmall a b) (zipWith (@pair _ _) a b).
 
 (** If the bounding stream goes to 0, so does the bounded stream. *)
 Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.

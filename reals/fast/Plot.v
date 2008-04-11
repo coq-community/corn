@@ -20,7 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Export RasterizeQ.
 Require Import Interval.
-Require Import Graph.
+Require Export Graph.
 Require Import QMinMax.
 Require Export QposMinMax.
 Require Import CornTac.
@@ -91,8 +91,8 @@ Let h := proj1_sigT _ _ (Qpos_lt_plus Hbt).
 (*
 Variable err : Qpos.
 *)
-Let err := Qpos_max ((1 # 4 * P_of_succ_nat n) * w) 
- ((1 # 4 * P_of_succ_nat m) * h).
+Let err := Qpos_max ((1 # 4 * P_of_succ_nat (pred n)) * w) 
+ ((1 # 4 * P_of_succ_nat (pred m)) * h).
 
 (** [PlotQ] is the function that does all the work. *)
 Definition PlotQ := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.  
@@ -120,9 +120,9 @@ assert (L:ms_eq ((l,t):Q2) (l,b + h)).
  split; simpl.
   reflexivity.
  auto.
-set (Z0:=(Pair l t):Q2) in *.
-set (Z1:=(Pair r b):Q2) in *.
-set (Z:=(Pair l (b + h)):Q2) in *.
+set (Z0:=(l, t):Q2) in *.
+set (Z1:=(r, b):Q2) in *.
+set (Z:=(l, (b + h)):Q2) in *.
 rewrite L.
 setoid_replace Z1 with (l+w,b) using relation ms_eq.
  unfold Z, PlotQ.

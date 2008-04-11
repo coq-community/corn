@@ -27,7 +27,7 @@ Definition star := refl_equal Lt.
 Notation "∗" := star.
 
 Open Local Scope Q_scope.
-
+Open Local Scope uc_scope.
 Open Local Scope raster.
 
 (* This file illustrates how to plot funcitons *)
@@ -35,18 +35,18 @@ Open Local Scope raster.
    Therefore we cannot plot (sin : CR -> CR), me must instead
    plot the UniformlyContinuousFunction (sin_uc : Q --> CR). *)
 (* Here we plot sin on [-3,3] with range [-1,1] on a 36x12 raster *)
-Time Eval vm_compute in PlotQ (- (3)) 3 ∗ (- (1)) 1 ∗ sin_uc 36 12.
+Time Eval vm_compute in PlotQ (- (3)) 3 star (- (1)) 1 star sin_uc 36 12.
 
 (* Here we explore the proof that plots are correct *)
 Goal True.
 (* Plot_correct is a proof that the plot is correct.*)
-(* below we plot exp on [-6, 0] with range [0,1] *)
+(* below we plot exp on [-3, 0] with range [0,1] *)
 (* (exp_bound_uc 0) is exp on ]-inf,0] which is one domain where it is uniformly continuous *)
 assert (X:=@Plot_correct (-(3)) 0 star 0 1 star
  (exp_bound_uc 0)
- 39 13 (refl_equal _) (refl_equal _)).
+ 45 15 (refl_equal _) (refl_equal _)).
 (* No plot is seen.  It is hidden in the uncomputed
-  PlotQ (- (6)) 0 ∗ 0 1 ∗ (exp_bound_uc 0) 69 23 *)
+  PlotQ (- (3)) 0 ∗ 0 1 ∗ (exp_bound_uc 0) 45 15 *)
 (* We use patern matchin to extract the parts of the statement we
    wish to normalize *)
 match goal with
@@ -54,10 +54,10 @@ match goal with
 end.
 (* E is the error; a bound on the distance between our plot and the actual function *)
 vm_compute in E.
-(* The error is 2508/38640 *)
+(* The error is 90/1800 *)
 (* B is the plot *)
 Time vm_compute in B.
-(* The plot is a 69 by 23 raster. *)
+(* The plot is a 45 by 15 raster. *)
 (* The plot and error can be reinserted into the statement if you wish *)
 unfold E, B in X.
 clear E B.

@@ -86,7 +86,7 @@ Lemma CompactGraph_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Strength (x,(Cmap plX f x))) (CompactGraph plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph.
-setoid_replace (Strength (X:=X) (Y:=Y) (Basics.Pair x (Cmap plX f x))) with (Cmap plX graphPoint x) using relation ms_eq.
+setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x) using relation ms_eq.
  auto using CompactImage_correct1.
 intros e1 e2.
 split;simpl.
@@ -188,7 +188,7 @@ apply ball_triangle with (approximate (Csnd p) d').
   assert (Z:=regFun_prf_ex p (mu f e2) d').
   destruct (mu f e2); try constructor.
   destruct Z; auto.
- assert (L:existsC X (fun x => ball (d' + d') (approximate p d') (Pair x (f x)))).
+ assert (L:existsC X (fun x => ball (d' + d') (approximate p d') (x, (f x)))).
   clear -H'.
   simpl in H'.
   induction (@approximate (@FinEnum X stableX) s
@@ -269,7 +269,7 @@ split; intros H.
   apply H.
  apply StrengthCorrect3.
 destruct H as [H0 H1].
-change (Pair x y) with (PairMS x y).
+change (x, y) with (PairMS x y).
 rewrite H1.
 rapply CompactGraph_correct1.
 auto.
@@ -339,7 +339,7 @@ Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Strength (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph_b.
-setoid_replace (Strength (X:=X) (Y:=Y) (Pair x (Cbind plX f x))) with (Cbind plX graphPoint_b x) using relation ms_eq.
+setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x) using relation ms_eq.
  auto using CompactImage_b_correct1.
 intros e1 e2.
 split;simpl.
@@ -577,7 +577,7 @@ split; intros H.
   apply H.
  apply StrengthCorrect3.
 destruct H as [H0 H1].
-change (Pair x y) with (PairMS x y).
+change (x, y) with (PairMS x y).
 rewrite H1.
 rapply CompactGraph_b_correct1.
 auto.
