@@ -529,7 +529,7 @@ apply
   with (One[+]One[*] (Sin x[/] _[//]H0 x H1) [*] (Sin x[/] _[//]H0 x H1)).
 2: simpl in |- *; apply bin_op_wd_unfolded.
 2: algebra.
-2: repeat apply mult_wd; try apply div_wd; algebra.
+2: repeat simple apply mult_wd; try apply div_wd; algebra.
 simpl in |- *.
 rational.
 Qed.
