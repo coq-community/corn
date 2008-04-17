@@ -145,4 +145,4 @@ End Plot.
 
 (** Some nice notation for the graph of f. *)
 Notation "'graphCR' f [ l '..' r ]" := 
- (graphQ l r (refl_equal _) f) : raster.
+ (graphQ l r (refl_equal _) f) (f at level 0) : raster.
