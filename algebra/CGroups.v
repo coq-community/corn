@@ -268,7 +268,7 @@ End SubCGroups.
 
 End CGroup_basics.
 
-Add Morphism cg_minus with signature cs_eq ==> cs_eq ==> cs_eq as cg_minus_wd_morph.
+Add Parametric Morphism c : (@cg_minus c) with signature (@cs_eq (cg_crr c)) ==> (@cs_eq c) ==> (@cs_eq c) as cg_minus_wd_morph.
 intros.
 rapply cg_minus_wd; assumption.
 Qed.

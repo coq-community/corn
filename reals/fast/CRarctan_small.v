@@ -59,7 +59,7 @@ rewrite Str_nth_recip_positives.
 rewrite Str_nth_powers_help.
 rewrite <- Qpower_mult.
 rewrite inj_plus.
-rewrite (Qpower_plus' a 1 (2*n)%nat).
+rewrite (Qpower_plus' a 1 (2*n)%nat);
  auto with *.
 rewrite inj_mult.
 reflexivity.
@@ -199,19 +199,19 @@ intros a Ha Ha0 Ha1.
 unfold rational_arctan_small.
 destruct (Qle_total a 0);
  rewrite rational_arctan_small_pos_correct.
-   rewrite Qlt_minus_iff.
-   replace RHS with (a + - - (1)) by ring.
-   rewrite <- Qlt_minus_iff.
-   assumption.
-  rewrite <- IR_opp_as_CR.
-  apply IRasCR_wd.
-  csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
-  apply ArcTan_wd.
-  eapply eq_transitive.
-   apply eq_symmetric; apply (inj_Q_inv IR (-a)).
-  apply inj_Q_wd.
-  simpl.
-  ring.
- assumption.
-reflexivity.
+   rewrite <- IR_opp_as_CR.
+   apply IRasCR_wd.
+   csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
+   apply ArcTan_wd.
+   eapply eq_transitive.
+    apply eq_symmetric; apply (inj_Q_inv IR (-a)).
+   apply inj_Q_wd.
+   simpl.
+   ring.
+  rewrite Qlt_minus_iff.
+  replace RHS with (a + - - (1)) by ring.
+  rewrite <- Qlt_minus_iff.
+  assumption.
+ reflexivity.
+assumption.
 Qed.

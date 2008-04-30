@@ -40,7 +40,7 @@ Bind Scope CR_scope with CR.
 Definition inject_Q : Q -> CR := (@Cunit Q_as_MetricSpace).
 
 (* begin hide *)
-Add Morphism (inject_Q) with signature Qeq ==> ms_eq as inject_Q_wd.
+Add Morphism (inject_Q) with signature Qeq ==> (@ms_eq _) as inject_Q_wd.
 exact (uc_wd (@Cunit Q_as_MetricSpace)).
 Qed.
 (* end hide *)

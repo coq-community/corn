@@ -66,25 +66,24 @@ destruct po_proof0.
 split.
 firstorder.
 firstorder.
-intros.
-rewrite po_equiv_le_def0 in *.
+intros x y z.
+repeat rewrite po_equiv_le_def0 in *.
 firstorder.
 Qed.
 (* begin hide *)
-Add Setoid po_car po_eq po_st as po_setoid.
+Add Parametric Setoid p : (po_car p) (po_eq p) (po_st p) as po_setoid.
 
-Add Morphism le with signature po_eq ==> po_eq ==> iff as le_compat.
-intros p.
+Add Parametric Morphism p : (le p) with signature (po_eq p) ==> (po_eq p) ==> iff as le_compat.
 assert (forall x1 x2 : p, x1 == x2 -> forall x3 x4 : p, x3 == x4 -> (x1 <= x3 -> x2 <= x4)).
 intros.
 rewrite (po_equiv_le_def (po_proof p)) in *|-.
 destruct (po_proof p).
 clear - H H0 H1 po_le_trans0.
 firstorder.
-intros.
-assert (x2==x1).
+intros x y Hxy x0 y0 Hx0y0.
+assert (y==x).
 symmetry; assumption.
-assert (x3==x0).
+assert (y0==x0).
 symmetry; assumption.
 firstorder.
 Qed.

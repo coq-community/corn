@@ -113,28 +113,26 @@ Proof.
 intros x [[c x_]|[c x_]];
 [change (' c <= ' 0%Q + - ' x)%CR in x_|change (' c <= ' x + - ' 0%Q)%CR in x_];
 unfold CRinv;
-rewrite CRopp_Qopp in x_;
-rewrite CRplus_Qplus in x_;
-rewrite CRle_Qle in x_;
+rewrite CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_;
 try rewrite CRopp_Qopp;
 rewrite (@CRinv_pos_Qinv c).
-replace RHS with (0 + - x)%Q by ring.
-assumption.
-rewrite CRopp_Qopp.
-rewrite CReq_Qeq.
-assert (~x==0)%Q.
-intros H.
-rewrite H in x_.
-apply (Qle_not_lt _ _ x_).
-rapply Qpos_prf.
-field.
-intros X; apply H.
-replace LHS with (- - x)%Q by ring.
-rewrite X.
-reflexivity.
+   rewrite CRopp_Qopp.
+   rewrite CReq_Qeq.
+   assert (~x==0)%Q.
+    intros H.
+    rewrite H in x_.
+    apply (Qle_not_lt _ _ x_).
+    rapply Qpos_prf.
+   field.
+   intros X; apply H.
+   replace LHS with (- - x)%Q by ring.
+   rewrite X.
+   reflexivity.
+  replace RHS with (0 + - x)%Q by ring.
+  assumption.
+ reflexivity.
 replace RHS with (x + - 0)%Q by ring.
 assumption.
-reflexivity.
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRinv_Qinv : toCRring.
@@ -199,7 +197,7 @@ intros x [c Hx].
 cut ('0 <= x)%CR.
  unfold CRle.
  intros H.
- setoid_replace (x - '0)%CR with x in H using relation ms_eq by ring.
+ setoid_replace (x - '0)%CR with x in H by ring.
  assumption.
 apply CRle_trans with (' c)%CR; auto with *.
 rewrite CRle_Qle; auto with *.
@@ -210,7 +208,7 @@ intros x [c Hx].
 cut (x <= '0)%CR.
  unfold CRle.
  intros H.
- setoid_replace ('0 - x)%CR with (-x)%CR in H using relation ms_eq by ring.
+ setoid_replace ('0 - x)%CR with (-x)%CR in H by ring.
  intros e.
  rewrite <- (Qopp_involutive e).
  rewrite <- (Qopp_involutive (approximate x e)).

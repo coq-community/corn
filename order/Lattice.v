@@ -94,8 +94,10 @@ Proof fun w x y z => meet_le_compat Dual y z w x.
 
 End Join.
 (* begin hide *)
-Add Morphism join with signature po_eq ==> po_eq ==> po_eq  as join_compat.
-Proof fun X => meet_compat (Dual X).
+Add Parametric Morphism X : (@join X) with signature (@po_eq (sl X)) ==> (@po_eq X) ==> (@po_eq X) as join_compat.
+Proof.
+exact (meet_compat (Dual X)).
+Qed.
 (* end hide *)
 Section MeetJoin.
 

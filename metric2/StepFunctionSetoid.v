@@ -63,6 +63,9 @@ Definition Mirror : StepF -> StepF := (@Mirror X).
 Definition SplitL : StepF -> OpenUnit -> StepF := (@SplitL X).
 Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
 End StepF_Functions.
+
+Typeclasses unfold StepF.
+
 (* begn hide *)
 Implicit Arguments constStepF [X].
 (* end hide *)
@@ -511,22 +514,24 @@ Qed.
 
 End EquivalenceC.
 (* begin hide *)
-Add Relation StepF StepF_eq
- reflexivity proved by StepF_eq_refl
- symmetry proved by StepF_eq_sym
- transitivity proved by StepF_eq_trans
+Add Parametric Relation X : (StepF X) (@StepF_eq X)
+ reflexivity proved by (@StepF_eq_refl X)
+ symmetry proved by (@StepF_eq_sym X)
+ transitivity proved by (@StepF_eq_trans X)
  as StepF_SetoidTheory.
 
 Hint Resolve StepF_eq_sym StepF_eq_trans.
 
-Add Morphism StepFfoldProp
-  with signature StepF_eq ==>  iff
+Add Morphism (StepFfoldProp)
+  with signature (@StepF_eq iffSetoid) ==>  iff
  as StepFfoldProp_mor.
 exact StepFfoldProp_morphism.
 Qed.
 (* end hide *)
 Lemma StepF_Sth (X:Setoid) : (Setoid_Theory (StepF X) (@StepF_eq X)).
-split; intros; eauto with sfarith.
+split;
+ unfold Reflexive, Symmetric, Transitive;
+ eauto with sfarith.
 Qed.
 (**
 ** Common subdivision view
@@ -623,39 +628,39 @@ rewrite <- StepFunction.SplitLMap.
 rapply SplitLAp_Qeq.
 Qed.
 (* begin hide *)
-Add Morphism constStepF with signature st_eq ==> StepF_eq as constStepF_wd.
+Add Parametric Morphism s : (@constStepF s) with signature (st_eq s) ==> (@StepF_eq s) as constStepF_wd.
 auto.
 Qed.
 
-Add Morphism glue with signature ou_eq ==> StepF_eq ==> StepF_eq ==> StepF_eq as glue_wd.
-intros X o1 o2 Ho x1 x2 Hx y1 y2 Hy.
+Add Parametric Morphism s : (@glue s) with signature ou_eq ==> (@StepF_eq s) ==> (@StepF_eq s) ==> (@StepF_eq s) as glue_wd.
+intros o1 o2 Ho x1 x2 Hx y1 y2 Hy.
 transitivity (glue o1 x2 y2).
 apply glue_resp_StepF_eq; auto.
 apply StepF_Qeq_eq.
 repeat split; auto; reflexivity.
 Qed.
 
-Add Morphism SplitL with signature StepF_eq ==> ou_eq ==> StepF_eq as SplitL_wd.
+Add Parametric Morphism X : (@SplitL X) with signature (@StepF_eq X) ==> ou_eq ==> (@StepF_eq X) as SplitL_wd.
 Proof.
-intros X x1 x2 Hx o1 o2 Ho.
+intros x1 x2 Hx o1 o2 Ho.
 transitivity (SplitL x2 o1).
  apply SplitL_resp_Xeq; auto.
 apply StepF_Qeq_eq.
 rapply SplitL_resp_Qeq; auto; reflexivity.
 Qed.
 
-Add Morphism SplitR with signature StepF_eq ==> ou_eq ==> StepF_eq as SplitR_wd.
+Add Parametric Morphism X : (@SplitR X) with signature (@StepF_eq X) ==> ou_eq ==> (@StepF_eq X) as SplitR_wd.
 Proof.
-intros X x1 x2 Hx o1 o2 Ho.
+intros x1 x2 Hx o1 o2 Ho.
 transitivity (SplitR x2 o1).
  apply SplitR_resp_Xeq; auto.
 apply StepF_Qeq_eq.
 rapply SplitR_resp_Qeq; auto; reflexivity.
 Qed.
 
-Add Morphism Ap with signature StepF_eq ==> StepF_eq ==> StepF_eq as Ap_wd.
+Add Parametric Morphism X Y : (@Ap X Y) with signature (@StepF_eq (extSetoid X Y)) ==> (@StepF_eq X) ==> (@StepF_eq Y) as Ap_wd.
 Proof.
-intros X Y f.
+intros f.
 induction f using StepF_ind; intros g Hfg.
  induction g using StepF_ind; intros x1.
   simpl.
@@ -693,9 +698,9 @@ induction f using StepF_ind; intros g Hfg.
  destruct Hfg as [Hfg0 Hfg1] using (eq_glue_ind g1).
  apply glue_StepF_eq; symmetry.
   rewrite SplitLMap.
-  apply IHg1; try rewrite H; auto with *.
+  apply IHg1; try rewrite H0; auto with *.
  rewrite SplitRMap.
- apply IHg2; try rewrite H; auto with *.
+ apply IHg2; try rewrite H0; auto with *.
 intros s s' Hs.
 destruct Hfg as [Hfg0 Hfg1] using (glue_eq_ind f1).
 rewrite ApGlue.

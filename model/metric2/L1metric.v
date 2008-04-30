@@ -109,9 +109,9 @@ Qed.
 Hint Resolve IntegralSplit : StepQArith.
 
 Add Morphism IntegralQ 
-  with signature  StepF_eq ==>  Qeq
+  with signature  (@StepF_eq _) ==>  Qeq
  as IntegralQ_wd.
-induction x1 using StepF_ind.
+induction x using StepF_ind.
 intros x2 H. simpl. induction x2 using StepF_ind.
   auto with *.
  rewrite Integral_glue.
@@ -120,17 +120,17 @@ intros x2 H. simpl. induction x2 using StepF_ind.
  rewrite <- IHx2_1; auto with *.
  rewrite <- IHx2_2; auto with *.
  simpl in x; unfold affineCombo; ring.
-intros x2 H.
-destruct H as [H0 H1] using (glue_eq_ind x1_1).
+intros y H.
+destruct H as [H0 H1] using (glue_eq_ind x1).
 rewrite Integral_glue.
-rewrite (IHx1_1 _ H0).
-rewrite (IHx1_2 _ H1).
+rewrite (IHx1 _ H0).
+rewrite (IHx2 _ H1).
 symmetry.
 rapply IntegralSplit.
 Qed.
 
 Add Morphism L1Norm 
-  with signature StepF_eq ==>  Qeq
+  with signature (@StepF_eq _) ==>  Qeq
  as L1Norm_wd.
 unfold L1Norm.
 intros x y Hxy.
@@ -139,7 +139,7 @@ reflexivity.
 Qed.
 
 Add Morphism L1Distance 
-  with signature StepF_eq ==> StepF_eq ==>  Qeq
+  with signature (@StepF_eq _) ==> (@StepF_eq _) ==>  Qeq
  as L1Distance_wd.
 unfold L1Distance.
 intros x1 x2 Hx y1 y2 Hy.
@@ -367,7 +367,7 @@ Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
 intros e x.
 unfold L1Ball, L1Distance.
-setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
+setoid_replace (x-x) with (constStepF (0:QS)) by ring.
 change (0 <= e)%Q.
 auto with *.
 Qed.
@@ -377,7 +377,7 @@ Proof.
 intros e x y.
 unfold L1Ball, L1Distance.
 unfold L1Norm.
-setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
+setoid_replace (x-y) with (-(y-x)) by ring.
 rewrite StepQabsOpp.
 auto.
 Qed.
@@ -387,7 +387,7 @@ Proof.
 intros e d x y z.
 unfold L1Ball, L1Distance.
 unfold L1Norm.
-setoid_replace (x-z) with ((x-y)+(y-z)) using relation StepF_eq by ring.
+setoid_replace (x-z) with ((x-y)+(y-z)) by ring.
 intros He Hd.
 autorewrite with QposElim.
 apply Qle_trans with (IntegralQ (StepQabs (x-y) + StepQabs (y-z)))%Q.
@@ -414,9 +414,9 @@ Lemma L1ball_eq : forall x y, (forall e : Qpos, L1Ball e x y) -> StepF_eq x y.
 Proof.
 intros x y H.
 unfold L1Ball in H.
-setoid_replace y with (constStepF (0:QS)+y) using relation StepF_eq by ring.
+setoid_replace y with (constStepF (0:QS)+y) by ring.
 set (z:=constStepF (0:QS)).
-setoid_replace x with (x - y + y) using relation StepF_eq by ring.
+setoid_replace x with (x - y + y) by ring.
 apply StepQplus_wd; try reflexivity.
 unfold z; clear z.
 rapply L1Norm_Zero.
@@ -447,7 +447,7 @@ split.
 rapply L1ball_eq.
 Qed.
 (* begin hide *)
-Add Morphism L1Ball with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
+Add Morphism L1Ball with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
 intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold L1Ball.
 change (x1 == x2)%Q in Hx.
@@ -483,7 +483,7 @@ assert (X:(((d1' + d2')*d')==constStepF (1:QS))%SQ).
  apply Qpos_nonzero.
 exists (f).
  setoid_replace (x - f)%SQ
-  with (d1' * d' * (x - y))%SQ using relation StepF_eq.
+  with (d1' * d' * (x - y))%SQ.
   change ((d1' * d')%SQ * (x - y)%SQ) with
     (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
   rewrite L1Norm_scale.
@@ -494,12 +494,12 @@ exists (f).
   apply Qle_shift_div_r; auto with *.
   rsapply mult_resp_leEq_lft; auto with *.
   apply Qle_trans with e; auto with *.
- setoid_replace (x - f) with (constStepF (1:QS)*x - f) using relation StepF_eq by ring.
+ setoid_replace (x - f) with (constStepF (1:QS)*x - f) by ring.
  rewrite <- X.
  unfold f.
  ring.
 setoid_replace (f -y)
-  with (d2' * d' * (x - y))%SQ using relation StepF_eq.
+  with (d2' * d' * (x - y))%SQ.
  change ((d2' * d')%SQ * (x - y)%SQ) with
    (QscaleS (d2/d)%Qpos ^@> (x-y)%SQ).
  rewrite L1Norm_scale.
@@ -510,7 +510,7 @@ setoid_replace (f -y)
  apply Qle_shift_div_r; auto with *.
  rsapply mult_resp_leEq_lft; auto with *.
  apply Qle_trans with e; auto with *.
-setoid_replace (f- y) with (f - constStepF (1:QS)*y) using relation StepF_eq by ring.
+setoid_replace (f- y) with (f - constStepF (1:QS)*y) by ring.
 rewrite <- X.
 unfold f.
 ring.

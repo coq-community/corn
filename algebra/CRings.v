@@ -1143,7 +1143,7 @@ Hint Resolve nexp_funny': algebra.
 
 End NExp_properties.
 
-Add Morphism nexp with signature cs_eq ==> cs_eq as nexp_morph_wd.
+Add Parametric Morphism c n : (nexp c n) with signature (@cs_eq (cr_crr c)) ==> (@cs_eq c) as nexp_morph_wd.
 intros.
 rapply nexp_wd.
 assumption.

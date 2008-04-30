@@ -71,10 +71,12 @@ apply (TotalOrder.Default.max_def2 _ _ _ Qpos_eq_le_def Qpos_le_total).
 Defined.
 (* begin hide *)
 Add Morphism Qpos_min : Qpos_min_compat.
-Proof @meet_compat QposTotalOrder.
+exact (@meet_compat QposTotalOrder).
+Qed.
 
 Add Morphism Qpos_max : Qpos_max_compat.
-Proof @join_compat QposTotalOrder.
+exact (@join_compat QposTotalOrder).
+Qed.
 (* end hide *)
 Section QTotalOrder.
 

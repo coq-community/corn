@@ -1410,19 +1410,18 @@ Definition nat_less_n_fun' (S : CSetoid) (n : nat) (f : forall i : nat, i <= n -
 Implicit Arguments nat_less_n_fun [S n].
 Implicit Arguments nat_less_n_fun' [S n].
 
-Add Relation cs_crr cs_eq
-  reflexivity proved by eq_reflexive
-  symmetry proved by eq_symmetric
-  transitivity proved by eq_transitive
+Add Parametric Relation c : (cs_crr c) (@cs_eq c)
+  reflexivity proved by (eq_reflexive c)
+  symmetry proved by (eq_symmetric c)
+  transitivity proved by (eq_transitive c)
   as CSetoid_eq_Setoid.
 
-
-Add Morphism csbf_fun with signature cs_eq ==> cs_eq ==> cs_eq as csbf_fun_wd.
-intros S1 S2 S3 c x1 x2 Hx y1 y2 Hy.
+Add Parametric Morphism c1 c2 c3 f: (csbf_fun c1 c2 c3 f) with signature (@cs_eq c1) ==> (@cs_eq c2) ==> (@cs_eq c3) as csbf_fun_wd.
+intros x1 x2 Hx y1 y2 Hy.
 rapply csbf_wd; assumption.
 Qed.
 
-Add Morphism csf_fun with signature cs_eq ==> cs_eq as csf_fun_wd.
-intros S1 S2 c x1 x2 Hx.
+Add Parametric Morphism c1 c2 f: (@csf_fun c1 c2 f) with signature (@cs_eq c1) ==> (@cs_eq c2) as csf_fun_wd.
+intros x1 x2 Hx.
 rapply csf_wd; assumption.
 Qed.

@@ -148,8 +148,8 @@ assert (A:~ r - l == 0 /\ ~ S n == 0)
 replace RHS with ((1#2)/((S n)/(r - l))) by (field;auto).
 apply Qle_shift_div_l.
  apply Qlt_shift_div_l; auto with *.
-rewrite <- (Qabs_pos (S n/(r-l))).
- apply Qle_shift_div_l; auto with *.
+rewrite <- (Qabs_pos (S n/(r-l)));
+ [|apply Qle_shift_div_l; auto with *].
 rewrite <- Qabs_Qmult.
 unfold f.
 change (2*S n # 1) with (2*S n).
@@ -249,20 +249,20 @@ split;
  rewrite inj_S;
  auto with *|];
 destruct Hx as [_ Hx];
-setoid_replace x with r
- by (apply Qle_antisym; auto with *);
+(setoid_replace x with r
+ by apply Qle_antisym; auto with *);
 unfold f;
 change (2*S n #1) with (2*S n);
 change (2*n + 1#1) with ((2*n + 1)%Z:Q);
 rewrite (inj_S n);
 unfold Zsucc;
 do 2 rewrite injz_plus;
-setoid_replace ((2%positive * n)%Z:Q) with (2*n)
- by (unfold Qeq; simpl; auto with *);
-setoid_replace (r - (l + (r - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
+(setoid_replace ((2%positive * n)%Z:Q) with (2*n)
+ by unfold Qeq; simpl; auto with *);
+(setoid_replace (r - (l + (r - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
  with (((r-l) / (2 * (n + 1%positive))))
- by (field; unfold Qeq; simpl; auto with *);
-rewrite Qabs_pos;[|apply Qle_refl];
+ by field; unfold Qeq; simpl; auto with *);
+rewrite Qabs_pos;[apply Qle_refl|];
 apply Qle_shift_div_l;
 [rsapply mult_resp_pos; auto with *;
  unfold Qlt; simpl; auto with *|];
@@ -374,7 +374,7 @@ Proof.
 intros x Hx.
 split.
  unfold CRle.
- setoid_replace (x - 'l)%CR with ('(-l) + x)%CR using relation ms_eq by ring.
+ setoid_replace (x - 'l)%CR with ('(-l) + x)%CR by ring.
  rewrite CRplus_translate.
  intros e.
  simpl.
@@ -445,7 +445,7 @@ apply (@almostIn_triangle_l _ stableQ e1 e2 (approximate x e1) y).
   intros H _.
   split; simpl.
    unfold CRle in Hlx.
-   setoid_replace (x - 'l) with ('(-l) + x) in Hlx using relation ms_eq by ring.
+   setoid_replace (x - 'l) with ('(-l) + x) in Hlx  by ring.
    rewrite CRplus_translate in Hlx.
    assert (H0:=Hlx e1).
    simpl in H0.

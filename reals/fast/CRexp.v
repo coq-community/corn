@@ -137,8 +137,7 @@ replace (P_of_succ_nat (pred (S n * fac n))%nat) with
 rewrite <- pred_Sn.
 rewrite inj_S.
 unfold Zsucc.
-rewrite Qpower_plus'.
-auto with *.
+rewrite Qpower_plus'; auto with *.
 change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fac n))%positive))%Q
  with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fac n))))%Q.
 ring.
@@ -225,12 +224,10 @@ split.
  apply Qmult_lt_0_le_reg_r with 2.
   constructor.
  change ((-(2 ^ n)%Z) * 2 <= a / 2 * 2).
- rewrite Zpower_Qpower.
-  auto with *.
+ rewrite Zpower_Qpower; auto with *.
  rewrite (inj_S n) in H0.
  replace LHS with (-(2%positive^n*2^1)) by ring.
- rewrite <- Qpower_plus.
-  discriminate.
+ rewrite <- Qpower_plus;[|discriminate].
  replace RHS with a by (field; discriminate).
  change (- (2 ^ Zsucc n)%Z <= a) in H0.
  rewrite Zpower_Qpower in H0.
@@ -266,33 +263,33 @@ destruct (Qlt_le_dec_fast a (- (1))).
  clear IHn.
  rewrite compress_correct.
  rewrite <- CRpower_positive_bounded_correct.
-  apply leEq_imp_AbsSmall.
-   apply less_leEq; apply Exp_pos.
-  stepr (One:IR).
-   apply Exp_leEq_One.
-   stepr (inj_Q IR 0) by apply (inj_Q_nring IR 0).
-   apply inj_Q_leEq.
-   apply mult_cancel_leEq with (2:Q).
-    constructor.
-   change (a/2*2<=0).
-   replace LHS with a by (field; discriminate).
-   apply Qle_trans with (-(1)); try discriminate.
-   apply Qlt_le_weak.
-   assumption. 
-  rstepl (nring 1:IR).
-  apply eq_symmetric; apply (inj_Q_nring IR 1).
- apply IRasCR_wd.
- set (a':=inj_Q IR (a/2)).
- simpl. 
- rstepl (Exp a'[*]Exp a').
- stepl (Exp (a'[+]a')) by apply Exp_plus.
- apply Exp_wd.
- unfold a'.
- eapply eq_transitive.
-  apply eq_symmetric; apply (inj_Q_plus IR).
- apply inj_Q_wd.
- simpl.
- field; discriminate.
+  apply IRasCR_wd.
+  set (a':=inj_Q IR (a/2)).
+  simpl. 
+  rstepl (Exp a'[*]Exp a').
+  stepl (Exp (a'[+]a')) by apply Exp_plus.
+  apply Exp_wd.
+  unfold a'.
+  eapply eq_transitive.
+   apply eq_symmetric; apply (inj_Q_plus IR).
+  apply inj_Q_wd.
+  simpl.
+  field; discriminate.
+ apply leEq_imp_AbsSmall.
+  apply less_leEq; apply Exp_pos.
+ stepr (One:IR).
+  apply Exp_leEq_One.
+  stepr (inj_Q IR 0) by apply (inj_Q_nring IR 0).
+  apply inj_Q_leEq.
+  apply mult_cancel_leEq with (2:Q).
+   constructor.
+  change (a/2*2<=0).
+  replace LHS with a by (field; discriminate).
+  apply Qle_trans with (-(1)); try discriminate.
+  apply Qlt_le_weak.
+  assumption. 
+ rstepl (nring 1:IR).
+ apply eq_symmetric; apply (inj_Q_nring IR 1).
 apply rational_exp_small_neg_correct.
 Qed.
 
@@ -510,9 +507,8 @@ assert (X:((IRasCR (Exp (inj_Q IR (- a)%Q)) >< '0)%CR)).
  exists ((3 # 1) ^ (Qnum (-a) / Qden (-a)))%Qpos. 
  ring_simplify.
  apply rational_exp_neg_posH'.
-rewrite (@CRinv_pos_inv ((3 # 1) ^ (Qnum (-a) / Qden (-a))) _ X).
- rewrite <- X0.
- apply rational_exp_neg_posH'.
+rewrite (@CRinv_pos_inv ((3 # 1) ^ (Qnum (-a) / Qden (-a))) _ X);
+ [|rewrite <- X0; apply rational_exp_neg_posH'].
 rewrite <- IR_recip_as_CR_2.
 apply IRasCR_wd.
 apply eq_symmetric.
@@ -750,12 +746,8 @@ unfold exp.
 set (a:=(approximate x (1 # 1)%Qpos + 1)).
 rewrite <- (CRasIRasCR_id x).
 rewrite <- exp_bounded_correct.
- change (CRasIR x [<=] inj_Q IR (z:Q)).
- rewrite IR_leEq_as_CR.
- autorewrite with IRtoCR.
- rewrite CRasIRasCR_id.
- assumption.
-rewrite <- exp_bounded_correct.
+ rewrite <- exp_bounded_correct.
+  reflexivity.
  change (CRasIR x [<=] inj_Q IR (Qceiling a:Q)).
  rewrite IR_leEq_as_CR.
  autorewrite with IRtoCR.
@@ -764,10 +756,14 @@ rewrite <- exp_bounded_correct.
   rapply exp_bound_lemma.
  rewrite CRle_Qle.
  auto with *.
-reflexivity.
+change (CRasIR x [<=] inj_Q IR (z:Q)).
+rewrite IR_leEq_as_CR.
+autorewrite with IRtoCR.
+rewrite CRasIRasCR_id.
+assumption.
 Qed.
 (* begin hide *)
-Add Morphism exp with signature ms_eq ==> ms_eq as exp_wd.
+Add Morphism exp with signature (@ms_eq _) ==> (@ms_eq _) as exp_wd.
 intros x y Hxy.
 unfold exp at 1.
 set (a :=  (approximate x (1 # 1)%Qpos + 1)).

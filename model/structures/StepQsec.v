@@ -13,7 +13,7 @@ Section QS.
 
 Lemma QS:(Setoid).
 exists Q Qeq.
-split; eauto with qarith.
+split; unfold reflexive, transitive, symmetric; eauto with qarith.
 Defined.
 
 Definition QabsS : QS-->QS.
@@ -119,7 +119,7 @@ Notation "x - y" := (StepQminus x y) : StepQ_scope.
 Notation "x * y" := (StepQmult x y) : StepQ_scope.
 
 
-Add Morphism StepQplus with signature StepF_eq ==> StepF_eq ==> StepF_eq as StepQplus_wd.
+Add Morphism StepQplus with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@StepF_eq QS) as StepQplus_wd.
 Proof.
 intros.
 unfold StepQplus.
@@ -128,7 +128,7 @@ rewrite H0.
 reflexivity.
 Qed.
 
-Add Morphism StepQopp with signature StepF_eq ==> StepF_eq as StepQopp_wd.
+Add Morphism StepQopp with signature (@StepF_eq QS) ==> (@StepF_eq QS) as StepQopp_wd.
 Proof.
 intros.
 unfold StepQopp.
@@ -136,7 +136,7 @@ rewrite H.
 reflexivity.
 Qed.
 
-Add Morphism StepQminus with signature StepF_eq ==> StepF_eq ==> StepF_eq as StepQminus_wd.
+Add Morphism StepQminus with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@StepF_eq QS) as StepQminus_wd.
 Proof.
 intros.
 unfold StepQminus.
@@ -145,7 +145,7 @@ rewrite H0.
 reflexivity.
 Qed.
 
-Add Morphism StepQmult with signature StepF_eq ==> StepF_eq ==> StepF_eq as StepQmult_wd.
+Add Morphism StepQmult with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@StepF_eq QS) as StepQmult_wd.
 Proof.
 intros.
 unfold StepQmult.
@@ -315,7 +315,7 @@ Add Ring StepQRing : StepQsrt
 
 Definition StepQabs (s:StepQ) : StepQ := QabsS ^@> s.
 
-Add Morphism StepQabs with signature StepF_eq ==> StepF_eq as StepQabs_wd.
+Add Morphism StepQabs with signature (@StepF_eq QS) ==> (@StepF_eq QS) as StepQabs_wd.
 Proof.
 intros.
 unfold StepQabs.
@@ -328,7 +328,7 @@ Qed.
 Definition StepQ_le x y := (StepFfoldProp (QleS ^@> x <@> y)).
 (* begin hide *)
 Add Morphism StepQ_le 
-  with signature StepF_eq ==> StepF_eq ==> iff
+  with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> iff
  as StepQ_le_wd.
 unfold StepQ_le.
 intros x1 x2 Hx y1 y2 Hy.

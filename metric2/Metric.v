@@ -61,15 +61,14 @@ Record MetricSpace : Type :=
 Implicit Arguments ball [m].
 Implicit Arguments ms_eq [m].
 
-Add Setoid ms ms_eq (fun X => @msp_Xsetoid _ _ _ (@msp X)) as ms_setoid.
+Add Parametric Setoid X : (ms X) (@ms_eq X) (@msp_Xsetoid _ _ _ (@msp X)) as ms_setoid.
 
 (*This is intended to be used as a ``type cast'' that Coq won't randomly make disappear.
   It is useful when defining setoid rewrite lemmas for ms_eq.*)
 Definition ms_id (m:MetricSpace) (x:m) : m := x.
 Implicit Arguments ms_id [m].
 
-Add Morphism ball with signature QposEq ==> ms_eq ==> ms_eq ==> iff as ball_compat.
-intros m.
+Add Parametric Morphism m : (@ball m) with signature QposEq ==> (@ms_eq m) ==> (@ms_eq m) ==> iff as ball_compat.
 exact (@ball_wd m).
 Qed.
 (* end hide *)

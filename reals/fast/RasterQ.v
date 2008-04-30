@@ -219,26 +219,22 @@ Qed.
 
 End InterpRasterCorrect.
 (* begin hide *)
-Add Morphism InterpRaster with signature ms_eq ==> ms_eq ==> ms_eq as InterpRaster_wd.
-cut (forall (n m : nat) (bitmap : raster n m) (x1 x2 : Q2),
+Add Parametric Morphism n m bm : (@InterpRaster n m bm) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as InterpRaster_wd.
+cut (forall (x1 x2 : Q2),
  prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
  forall x3 x4 : Q2,
  prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
-  (InterpRaster bitmap x1 x3) ->
+  (InterpRaster bm x1 x3) ->
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
-  (InterpRaster bitmap x2 x4)).
+  (InterpRaster bm x2 x4)).
  intros L.
  split.
   apply L; auto.
  apply L.
-  change Q2 in x2.
-  change (ms_eq x2 x1).
   symmetry; auto.
- change Q2 in x3.
- change (ms_eq x3 x0).
  symmetry; auto.
-intros n m bm [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
+intros [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
 destruct (InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
 destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by] [Hb0 [Hb1 Hb2]]].
 rewrite Hb1 in Ha1.

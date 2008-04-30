@@ -443,8 +443,7 @@ split; simpl.
   auto with *.
  rewrite <- Qle_minus_iff.
  apply rational_sqrt_mid_le_3.
-rewrite <- (CRpositive_power_bounded_positive_power 2 (3#1)).
- assumption.
+rewrite <- (CRpositive_power_bounded_positive_power 2 (3#1));[|assumption].
 apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_positive_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
 intros e He.
 set (d:=(e / (6#1))%Qpos).

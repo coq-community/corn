@@ -48,12 +48,12 @@ let i := min (pred n) (Z_to_nat (Zle_max_l 0 (rasterize1 l r n (fst p)))) in
 let j := min (pred m) (Z_to_nat (Zle_max_l 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
 (* begin hide *)
-Add Morphism RasterizePoint with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq ==> eq as RasterizePoint_wd.
-intros.
+Add Parametric Morphism n m bm : (@RasterizePoint n m bm) with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> (@eq _) ==> (@eq _) as RasterizePoint_wd.
+intros x0 x1 H x2 x3 H0 x4 x5 H1 x6 x7 H2 x.
 unfold RasterizePoint.
-replace (rasterize1 x4 x1 m (snd x))
- with (rasterize1 x5 x2 m (snd x)).
- replace (rasterize1 x0 x6 n (fst x))
+replace (rasterize1 x4 x0 m (snd x))
+ with (rasterize1 x5 x1 m (snd x)).
+ replace (rasterize1 x2 x6 n (fst x))
   with (rasterize1 x3 x7 n (fst x)).
   reflexivity.
  unfold rasterize1.
@@ -96,11 +96,11 @@ the resulting raster transfomers.  A fold_left is done for efficency.
 Definition RasterizeQ2 (f:FinEnum stableQ2) n m (t l b r:Q) : raster n m :=
 fold_left (fun x y => @RasterizePoint n m x t l b r y) f (emptyRaster _ _).
 (* begin hide *)
-Add Morphism RasterizeQ2 with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> eq as RasterizeQ2_wd.
+Add Parametric Morphism f n m : (@RasterizeQ2 f n m) with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> (@eq _) as RasterizeQ2_wd.
 intros.
 unfold RasterizeQ2.
 do 2 rewrite <- fold_left_rev_right.
-induction (rev f).
+induction (@rev (prod Q Q) f).
  reflexivity.
 simpl.
 rewrite IHl.
@@ -177,7 +177,7 @@ replace (min n
   setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
    with ((w / (2 * (n + 1%positive))))
    by (field; unfold Qeq; simpl; auto with *).
-  rewrite Qabs_pos;[|apply Qle_refl].
+  rewrite Qabs_pos;[apply Qle_refl|].
   apply Qle_shift_div_l;
    [rsapply mult_resp_pos; auto with *;
     unfold Qlt; simpl; auto with *|].
@@ -307,8 +307,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   unfold err.
   apply Qpos_max_ub_r.
  simpl (ball (m:=Q_as_MetricSpace)).
- rewrite switch_line_interp.
-  unfold j; auto with *.
+ rewrite switch_line_interp;[|unfold j; auto with *].
  rapply rasterization_error.
  simpl in Hr.
  rewrite Hr in Hfr.
@@ -396,13 +395,14 @@ destruct L as [[Hi Hj] | L].
  unfold fst, snd in *.
  apply existsWeaken.
  exists a.
+ change (ms Q2) in a.
  split.
   rapply orWeaken.
   left.
   reflexivity.
  destruct a as [ax ay].
  destruct (Hf' ax ay) as [Hax Hay].
-  rapply orWeaken;left;reflexivity.
+  rapply orWeaken;left;change (ax, ay) with ((ax,ay):Q2);reflexivity.
  clear Hf'.
  split.
   unfold fst.
@@ -421,8 +421,7 @@ destruct L as [[Hi Hj] | L].
   apply Qpos_max_ub_r.
  fold (C t b (S m) (m - j0)%nat).
  simpl (ball (m:=Q_as_MetricSpace)).
- rewrite switch_line_interp.
-  unfold j0; auto with *.
+ rewrite switch_line_interp;[|unfold j0; auto with *].
  rapply rasterization_error.
  auto.
 assert (L0:existsC (Q * Q)

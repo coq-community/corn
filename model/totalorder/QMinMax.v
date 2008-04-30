@@ -79,10 +79,12 @@ apply (TotalOrder.Default.max_def2 Q Qeq Qle Qeq_le_def Qle_total).
 Defined.
 (* begin hide *)
 Add Morphism Qmin : Qmin_compat.
-Proof @meet_compat QTotalOrder.
+exact (@meet_compat QTotalOrder).
+Qed.
 
 Add Morphism Qmax : Qmax_compat.
-Proof @join_compat QTotalOrder.
+exact (@join_compat QTotalOrder).
+Qed.
 (* end hide *)
 Section QTotalOrder.
 

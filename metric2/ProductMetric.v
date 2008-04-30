@@ -194,7 +194,7 @@ End ProductMetric.
 (* begin hide *)
 Implicit Arguments PairMS [X Y].
 
-Add Morphism PairMS with signature ms_eq ==> ms_eq ==> ms_eq as PairMS_wd.
+Add Parametric Morphism X Y : (@PairMS X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as PairMS_wd.
 Proof.
 intros.
 split; assumption.

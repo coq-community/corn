@@ -667,7 +667,7 @@ ring_simplify.
 apply H.
 
 intros x y H.
-rewrite Qabs_pos;[assumption|].
+rewrite Qabs_pos;[|assumption].
 split.
 intros H0.
 rapply leEq_imp_AbsSmall; assumption.
@@ -805,6 +805,7 @@ intros [x Hx] [a [d d_ x_]] z n Hn.
 rapply regFunEq_e.
 intros e.
 simpl.
+unfold Qinv_modulus.
 destruct (Hx ((z * z * e)%Qpos:Q) (Qpos_prf (z * z * e)%Qpos)) as [b Hb].
 destruct (CS_seq_recip Q_as_COrdField x Hx d d_ a (fun (n0 : nat) (H : le a n0) =>
        leEq_wdr Q_as_COrdField d (@cg_minus Q_as_CGroup (x n0) (Qmake Z0 xH)) (x n0) (x_ n0 H) (cg_inv_zero Q_as_CGroup (x n0))) (e:Q) (Qpos_prf e)) as [c Hc].

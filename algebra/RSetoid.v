@@ -30,15 +30,22 @@ Require Import CornTac.
 Record Setoid: Type :=
 { st_car:>Type;
   st_eq:st_car-> st_car ->Prop;
-  st_isSetoid: Setoid_Theory _ st_eq
+  st_isSetoid: equivalence _ st_eq
 }.
 
-Add Setoid st_car st_eq st_isSetoid as genericSetoid.
+Add Parametric Relation s : (st_car s) (st_eq s)
+ reflexivity proved by (equiv_refl (st_car s) (st_eq s) (st_isSetoid s))
+ symmetry proved by (equiv_sym _ _ (st_isSetoid s))
+ transitivity proved by (equiv_trans _ _ (st_isSetoid s))
+ as genericSetoid.
 
 (** Propositions form a setoid under iff *)
 Definition iffSetoid : Setoid.
 exists Prop iff.
-split; tauto.
+split.
+  unfold reflexive; tauto.
+ unfold transitive; tauto.
+unfold symmetric; tauto.
 Defined.
 
 (**
@@ -55,11 +62,11 @@ intros X Y.
 exists (Morphism X Y) (extEq Y).
 split.
   intros x y; reflexivity.
- intros x y H a; symmetry; auto.
-intros x y z Hxy Hyz a; transitivity (y a); auto.
+ intros x y z Hxy Hyz a; transitivity (y a); auto.
+intros x y H a; symmetry; auto.
 Defined.
 
-Notation "x --> y" := (extSetoid x y) (at level 90, right associativity) : setoid_scope.
+Notation "x --> y" := (extSetoid x y) (at level 55, right associativity) : setoid_scope.
 
 Open Local Scope setoid_scope.
 (**

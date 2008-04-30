@@ -398,7 +398,7 @@ rapply CRln_pos_correct.
 change ((inj_Q IR (c:Q))[<=]x).
 rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
-setoid_replace (IRasCR x) with (IRasCR x - '0)%CR using relation ms_eq by ring.
+setoid_replace (IRasCR x) with (IRasCR x - '0)%CR by ring.
 assumption.
 Qed.
 
@@ -418,22 +418,19 @@ destruct Hx as [d Hd].
 unfold CRln.
 rewrite <- (CRasIRasCR_id x).
 rewrite <- (CRln_pos_correct c _ X).
- change (inj_Q IR (c:Q)[<=](CRasIR x)).
- rewrite IR_leEq_as_CR.
- autorewrite with IRtoCR.
- rewrite CRasIRasCR_id.
- assumption.
-rewrite <- (CRln_pos_correct d _ X).
+ rewrite <- (CRln_pos_correct d _ X).
+  reflexivity.
  change (inj_Q IR (d:Q)[<=](CRasIR x)).
  rewrite IR_leEq_as_CR.
  autorewrite with IRtoCR.
  rewrite CRasIRasCR_id.
  ring_simplify in Hd.
  assumption.
-apply IRasCR_wd.
-apply Log_wd.
-apply CRasIR_wd.
-reflexivity.
+change (inj_Q IR (c:Q)[<=](CRasIR x)).
+rewrite IR_leEq_as_CR.
+autorewrite with IRtoCR.
+rewrite CRasIRasCR_id.
+assumption.
 Qed.
 
 Lemma CRln_wd : forall (x y:CR) Hx Hy, (x == y -> CRln x Hx == CRln y Hy)%CR.

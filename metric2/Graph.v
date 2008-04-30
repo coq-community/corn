@@ -58,6 +58,7 @@ end.
 Lemma graphPoint_uc : is_UniformlyContinuousFunction (graphPoint_raw f) graphPoint_modulus.
 Proof.
 intros e a b H.
+unfold graphPoint_modulus in *.
 split.
  change (ball_ex e a b).
  eapply ball_ex_weak_le;[|apply H].
@@ -86,10 +87,11 @@ Lemma CompactGraph_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Strength (x,(Cmap plX f x))) (CompactGraph plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph.
-setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x) using relation ms_eq.
+setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x).
  auto using CompactImage_correct1.
 intros e1 e2.
 split;simpl.
+ unfold graphPoint_modulus.
  eapply ball_weak_le;[|apply regFun_prf].
  destruct (mu f e2);
   autorewrite with QposElim.
@@ -99,7 +101,8 @@ split;simpl.
  apply Qle_refl.
 apply (mu_sum plX e2 (e1::nil) f).
 simpl.
- eapply ball_ex_weak_le;[|apply regFun_prf_ex].
+unfold graphPoint_modulus.
+eapply ball_ex_weak_le;[|apply regFun_prf_ex].
 destruct (mu f e1) as [d0|]; try constructor.
 destruct (mu f e2) as [d|]; try constructor.
 simpl.
@@ -124,6 +127,7 @@ clear H.
 unfold XY in *.
 destruct (approximate p e1) as [a b].
 simpl in *.
+unfold FinEnum_map_modulus, graphPoint_modulus in H'.
 set (d2:=match mu f d' with
              | Qpos2QposInf d => Qpos_min d' d
              | QposInfinity => d'
@@ -191,6 +195,7 @@ apply ball_triangle with (approximate (Csnd p) d').
  assert (L:existsC X (fun x => ball (d' + d') (approximate p d') (x, (f x)))).
   clear -H'.
   simpl in H'.
+  unfold FinEnum_map_modulus, graphPoint_modulus in H'.
   induction (@approximate (@FinEnum X stableX) s
              (Qpos2QposInf
                 match @mu X Y f d' return Qpos with
@@ -307,6 +312,7 @@ intros e a b H d1 d2.
 split.
  change (ball_ex (d1 + e + d2) a b).
  eapply ball_ex_weak_le;[|apply H].
+ unfold graphPoint_modulus.
  destruct (mu f e) as [d|].
   simpl.
   apply Qle_trans with e.
@@ -321,6 +327,7 @@ revert d1 d2.
 change (ball e (f a) (f b)).
 rapply uc_prf.
 eapply ball_ex_weak_le;[|apply H].
+unfold graphPoint_modulus.
 destruct (mu f e) as [d|].
  rapply Qpos_min_lb_r.
 constructor.
@@ -339,11 +346,12 @@ Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Strength (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph_b.
-setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x) using relation ms_eq.
+setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x).
  auto using CompactImage_b_correct1.
 intros e1 e2.
 split;simpl.
  eapply ball_weak_le;[|apply regFun_prf].
+ unfold graphPoint_modulus.
  destruct (mu f ((1#2)*e2));
   autorewrite with QposElim.
   assert (Qmin ((1#2)*e2) q <= ((1#2)*e2)) by auto with *.
@@ -365,6 +373,7 @@ apply (mu_sum plX e2' (e1'::nil) f).
 simpl.
  eapply ball_ex_weak_le;[|apply regFun_prf_ex].
 unfold e1'.
+unfold graphPoint_modulus.
 destruct (mu f ((1#2)*e1)) as [d0|]; try constructor.
 destruct (mu f e2') as [d|]; try constructor.
 simpl.
@@ -391,6 +400,7 @@ destruct (approximate p e1) as [a b].
 simpl in *.
 unfold Cjoin_raw in H'.
 simpl in *.
+unfold FinEnum_map_modulus, graphPoint_modulus in H'.
 set (d2:=match mu f ((1#2)*d') with
              | Qpos2QposInf d => Qpos_min ((1#2)*d') d
              | QposInfinity => ((1#2)*d')%Qpos
@@ -486,6 +496,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
   simpl in H'.
   unfold Cjoin_raw in H'.
   simpl in H'.
+  unfold FinEnum_map_modulus, graphPoint_modulus in H'.
   induction (@approximate (@FinEnum X stableX) s
              (Qpos2QposInf
                 match @mu X _ f ((1#2)*d') return Qpos with

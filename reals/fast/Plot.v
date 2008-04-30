@@ -124,7 +124,7 @@ set (Z0:=(l, t):Q2) in *.
 set (Z1:=(r, b):Q2) in *.
 set (Z:=(l, (b + h)):Q2) in *.
 rewrite L.
-setoid_replace Z1 with (l+w,b) using relation ms_eq.
+setoid_replace Z1 with (l+w,b).
  unfold Z, PlotQ.
  rewrite Hw, Hh.
  destruct n; try discriminate.

@@ -68,52 +68,52 @@ unfold rational_arctan_big_pos.
 assert (H0:0<a);
  [apply Qlt_trans with 1;[constructor|assumption]|].
 rewrite rational_arctan_small_pos_correct.
- rsapply (mult_cancel_less _ (/a) 1 a).
-  assumption.
- ring_simplify.
- replace LHS with 1.
-  assumption.
- field.
- rsapply (Greater_imp_ap _ a 0); assumption.
-rewrite r_pi_correct.
-assert (H1:(inj_Q IR a)[#]Zero).
- stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
- apply inj_Q_ap.
- rsapply (Greater_imp_ap _ a 0); assumption.
-rewrite <- IR_minus_as_CR.
-apply IRasCR_wd.
-stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
- assert (H2:Zero[<]inj_Q IR a).
-  stepl (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
-  apply inj_Q_less; assumption.
- unfold cg_minus.
- csetoid_rewrite (ArcTan_recip _ H1 H2).
- rational.
-rapply bin_op_wd_unfolded.
- rstepl (((nring 1)[/]TwoNZ)[*]Pi).
- apply mult_wdl.
- change (1#2) with (1/2).
- assert (H2:(inj_Q IR (2#1))[#]Zero).
+ rewrite r_pi_correct.
+ assert (H1:(inj_Q IR a)[#]Zero).
   stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
-  apply inj_Q_ap; discriminate.
- apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
+  apply inj_Q_ap.
+  rsapply (Greater_imp_ap _ a 0); assumption.
+ rewrite <- IR_minus_as_CR.
+ apply IRasCR_wd.
+ stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
+  assert (H2:Zero[<]inj_Q IR a).
+   stepl (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
+   apply inj_Q_less; assumption.
+  unfold cg_minus.
+  csetoid_rewrite (ArcTan_recip _ H1 H2).
+  rational.
+ rapply bin_op_wd_unfolded.
+  rstepl (((nring 1)[/]TwoNZ)[*]Pi).
+  apply mult_wdl.
+  change (1#2) with (1/2).
+  assert (H2:(inj_Q IR (2#1))[#]Zero).
+   stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
+   apply inj_Q_ap; discriminate.
+  apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
+   apply div_wd.
+    apply eq_symmetric; apply (inj_Q_nring IR 1).
+   apply eq_symmetric; apply (inj_Q_nring IR 2).
+  apply eq_symmetric; apply inj_Q_div.
+ apply un_op_wd_unfolded.
+ apply ArcTan_wd.
+ apply eq_transitive with ((inj_Q IR 1)[/]_[//]H1).
   apply div_wd.
+   rstepl (nring 1:IR).
    apply eq_symmetric; apply (inj_Q_nring IR 1).
-  apply eq_symmetric; apply (inj_Q_nring IR 2).
+  apply eq_reflexive.
+ eapply eq_transitive.
  apply eq_symmetric; apply inj_Q_div.
-apply un_op_wd_unfolded.
-apply ArcTan_wd.
-apply eq_transitive with ((inj_Q IR 1)[/]_[//]H1).
- apply div_wd.
-  rstepl (nring 1:IR).
-  apply eq_symmetric; apply (inj_Q_nring IR 1).
- apply eq_reflexive.
-eapply eq_transitive.
-apply eq_symmetric; apply inj_Q_div.
-apply inj_Q_wd.
-simpl.
-unfold Qdiv.
-ring.
+ apply inj_Q_wd.
+ simpl.
+ unfold Qdiv.
+ ring.
+rsapply (mult_cancel_less _ (/a) 1 a).
+ assumption.
+ring_simplify.
+replace LHS with 1.
+ assumption.
+field.
+rsapply (Greater_imp_ap _ a 0); assumption.
 Qed.
 
 (** Because we have slow convergence near 1, we have another compuation

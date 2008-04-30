@@ -136,7 +136,7 @@ csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[
   rapply even_plus_n_n.
  intros _.
  eapply eq_transitive;
-  [|apply inj_Q_wd; simpl; rewrite Str_nth_arctanSequence; rewrite Qmake_Qdiv; reflexivity].
+  [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_arctanSequence].
  eapply eq_transitive;
   [|apply eq_symmetric; apply inj_Q_mult].
  apply mult_wd.
@@ -157,6 +157,8 @@ csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[
     apply inj_Q_ap.
     discriminate.
    apply (inj_Q_nring IR 0).
+  eapply eq_transitive;
+   [|apply inj_Q_wd; symmetry; apply Qmake_Qdiv]. 
   eapply eq_transitive;
    [|apply eq_symmetric; apply (fun b => inj_Q_div _ b _ X0)].
   apply div_wd.

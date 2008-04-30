@@ -47,8 +47,7 @@ Record SemiLattice : Type :=
 (* begin hide *)
 Implicit Arguments meet [s].
 
-Add Morphism meet with signature po_eq ==> po_eq ==> po_eq  as meet_compat.
-intros X.
+Add Parametric Morphism X : (@meet X) with signature (po_eq (po X)) ==> (po_eq (po X)) ==> (po_eq (po X))  as meet_compat.
 assert (forall x1 x2 : X, x1 == x2 -> forall x3 x4 : X, x3 == x4 -> meet x1 x3 <= meet x2 x4).
 intros.
 rewrite equiv_le_def in *|-.

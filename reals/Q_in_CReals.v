@@ -835,18 +835,8 @@ unfold Zsucc.
 stepr (inj_Q (q^n*q)%Q).
  apply inj_Q_wd.
  simpl.
- destruct (Qeq_dec q 0).
-  rewrite q0; rewrite Qpower_0.
-   intros H.
-   eapply S_O.
-   apply surj_eq.
-   rewrite inj_S.
-   unfold Zsucc.
-   apply H.
-  ring.
- simpl; rewrite Qpower_plus.
-  assumption.
- ring.
+ rapply Qpower_plus'.
+ auto with *.
 stepr (inj_Q (q^n)%Q[*]inj_Q q).
  apply inj_Q_mult.
 simpl.

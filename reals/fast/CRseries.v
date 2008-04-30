@@ -300,10 +300,9 @@ rewrite IHn.
 unfold Zsucc.
 destruct (Qeq_dec a 0).
 rewrite q.
-rewrite (Qpower_0 (n+1)).
-auto with *.
+rewrite (Qpower_0 (n+1)); auto with *.
 ring.
-rewrite Qpower_plus;[assumption|].
+rewrite Qpower_plus;[|assumption].
 ring.
 Qed.
 

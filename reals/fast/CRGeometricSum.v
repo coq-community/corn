@@ -317,7 +317,7 @@ destruct (Qle_lt_or_eq _ _ Ha0) as [Ha0'|Ha0'].
   apply Qle_refl.
  rewrite Zpos_succ_morphism.
  unfold Zsucc.
- rewrite Qpower_plus;[auto with *|].
+ rewrite Qpower_plus;[|auto with *].
  rewrite Qinv_mult_distr.
  rewrite injz_plus.
  apply Qle_trans with ((1 + n * (/ a - 1))*/a).
@@ -448,8 +448,7 @@ induction p using Pind; intros series H.
 rewrite nat_of_P_succ_morphism.
 rewrite Zpos_succ_morphism.
 unfold Zsucc.
-rewrite Qpower_plus'.
- discriminate.
+rewrite Qpower_plus';[|discriminate].
 replace RHS with ((Qabs (hd series) * a ^ p)*a) by ring.
 apply Qle_trans with (Qabs (hd (Str_nth_tl p series))*a).
  change (S p) with (1+p)%nat.
@@ -600,8 +599,8 @@ case_eq (err_prop e series); intros He.
  apply err_prop_correct.
    destruct Gs; assumption.
   apply err_prop_monotone'; assumption.
- change (err_prop e
-  (Str_nth_tl (S (InfiniteGeometricSum_maxIter (tl series) e)) series)).
+ change (Is_true (err_prop e
+  (Str_nth_tl (S (InfiniteGeometricSum_maxIter (tl series) e)) series))).
  induction (S (InfiniteGeometricSum_maxIter (tl series) e)).
   assumption.
  simpl.
@@ -633,7 +632,7 @@ destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
  stepr ('0)%CR.
   split; simpl;
   rewrite Hq; try apply CRle_refl.
-  setoid_replace (-'0)%CR with ('0)%CR using relation ms_eq by ring.
+  setoid_replace (-'0)%CR with ('0)%CR by ring.
   apply CRle_refl.
  rapply regFunEq_e.
  intros e.
@@ -844,7 +843,7 @@ induction n.
  symmetry.
  rewrite InfiniteGeometricSum_step.
  setoid_replace (IRasCR (Sum0 (G:=IR) (S m) x))
-  with (IRasCR (inj_Q _ (hd seq) [+](Sum0 (G:=IR) m (fun n0 : nat => (x (S n0)))%Q))) using relation ms_eq.
+  with (IRasCR (inj_Q _ (hd seq) [+](Sum0 (G:=IR) m (fun n0 : nat => (x (S n0)))%Q))).
   rewrite (IR_plus_as_CR).
   rewrite IR_inj_Q_as_CR.
   ring.

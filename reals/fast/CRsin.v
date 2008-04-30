@@ -66,9 +66,7 @@ rewrite Str_nth_recip_factorials.
 rewrite Str_nth_powers_help.
 rewrite <- Qpower_mult.
 rewrite inj_plus.
-rewrite Qpower_plus'.
- rewrite <- inj_plus.
- auto with *.
+rewrite Qpower_plus';[|rewrite <- inj_plus; auto with *].
 rewrite inj_mult.
 reflexivity.
 Qed.
@@ -395,16 +393,12 @@ split.
  discriminate.
 apply Qmult_lt_0_le_reg_r with 3.
  constructor.
-rewrite Zpower_Qpower.
- auto with *.
+rewrite Zpower_Qpower; auto with *.
 rewrite (inj_S n) in H1.
 replace RHS with (3%positive^n*3^1) by ring.
-rewrite <- Qpower_plus.
- discriminate.
+rewrite <- Qpower_plus;[|discriminate].
 replace LHS with a by (field; discriminate).
-rewrite Zpower_Qpower in H1.
- assumption.
-auto with *.
+rewrite Zpower_Qpower in H1; auto with *.
 Qed.
 
 Fixpoint rational_sin_pos_bounded (n:nat) (a:Q) : 0 <= a <= (3^n)%Z -> CR :=
@@ -426,11 +420,11 @@ intros a Ha.
 unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
 destruct (Qlt_le_dec_fast 1 a);[|rapply rational_sin_small_pos_correct].
 rewrite IHn.
-rewrite <- sin_poly_correct.
- apply AbsIR_imp_AbsSmall.
- stepr (nring 1:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 1)).
- rstepr (One:IR).
- apply AbsIR_Sin_leEq_One.
+rewrite <- sin_poly_correct;
+ [|apply AbsIR_imp_AbsSmall;
+   (stepr (nring 1:IR) by apply eq_symmetric; apply (inj_Q_nring IR 1));
+   rstepr (One:IR);
+   apply AbsIR_Sin_leEq_One].
 apply IRasCR_wd.
 stepl (Sin (inj_Q IR (a/3*3))).
  apply Sin_wd.

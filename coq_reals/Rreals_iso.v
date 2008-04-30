@@ -283,7 +283,7 @@ Lemma R_infsum_as_IR_convergent : forall (y: R) a,
 unfold infinit_sum.
 unfold convergent.
 intros y a conv.
-assert (cauchy := CV_Cauchy _ (existT _ y conv)).
+assert (cauchy := CV_Cauchy _ (exist _ y conv)).
 clear conv.
 unfold Cauchy_crit in cauchy.
 unfold Cauchy_prop.
@@ -546,8 +546,7 @@ setoid_replace
  ((Zero[/]nring (R:=IR) (fac (n + n) + (n + n) * fac (n + n))[//]
   nring_fac_ap_zero IR (S (n + n)))[*]
  (nexp IR (n + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero)))
- with (Zero:IR) using relation cs_eq
-.
+ with (Zero:IR).
 rational.
 rational.
 Qed.
@@ -608,12 +607,12 @@ nexp IR (n + n) (RasIR x[-]Zero)[+]
 ).
 apply bin_op_wd_unfolded.
 reflexivity.
-setoid_replace (RasIR x [-] Zero) with (RasIR x) using relation cs_eq by rational.
+setoid_replace (RasIR x [-] Zero) with (RasIR x);[|rational].
 replace x1 with n by omega.
 clear.
 
 setoid_replace ((Zero[/]nring (R:=IR) (fac (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
-nexp IR (n + n) (RasIR x)) with (Zero:IR) using relation cs_eq by rational.
+nexp IR (n + n) (RasIR x)) with (Zero:IR);[|rational].
 rstepr (
 RasIR x [*] (
 (nexp IR n [--]One[/]nring (R:=IR) (fac (n + n) + (n + n) * fac (n + n))[//]
@@ -679,7 +678,7 @@ stepl (Cos (RasIR x)) by symmetry; apply R_cos_as_IR.
 rapply c.
 Qed.
 
-Add Morphism RasIR with signature cs_eq ==> cs_eq as R_as_IR_wd.
+Add Morphism RasIR with signature (@cs_eq _) ==> (@cs_eq _) as R_as_IR_wd.
 intros.
 rewrite H.
 reflexivity.
@@ -868,7 +867,7 @@ simpl; reflexivity.
 stepr (RasIR (1 / nring (R:=RRing) (2 * n + 1))).
 apply R_as_IR_wd.
 unfold Rdiv.
-auto with *.
+simpl; auto with *.
 cut (n + (n + 0) + 1 = S (n + n))%nat.
 intro DF.
 cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RReals) (2 * n + 1)))).
@@ -910,7 +909,7 @@ apply R_as_IR_wd.
 unfold Rdiv.
 replace (nring (R:=RRing) Qden) with (INR Qden).
 replace (zring (R:=RRing) Qnum) with (IZR Qnum).
-reflexivity.
+simpl; reflexivity.
 apply IZR_as_zring.
 apply INR_as_nring.
 apply div_wd.

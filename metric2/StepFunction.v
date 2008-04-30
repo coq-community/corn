@@ -571,10 +571,10 @@ Qed.
 
 End StepFunction.
 (* begin hide *)
-Add Relation StepF StepF_Qeq 
- reflexivity proved by StepF_Qeq_refl
- symmetry proved by StepF_Qeq_sym
- transitivity proved by StepF_Qeq_trans
+Add Parametric Relation X : (StepF X) (@StepF_Qeq X)
+ reflexivity proved by (@StepF_Qeq_refl X)
+ symmetry proved by (@StepF_Qeq_sym X)
+ transitivity proved by (@StepF_Qeq_trans X)
  as StepF_Qeq_Setoid.
 (* end hide *)
 (** Step functions are a functor *)
@@ -599,10 +599,9 @@ Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfscope.
 Definition Map2 (X Y Z:Type) (f:(X->Y->Z)) a b :=
  f ^@> a <@> b.
 
-Add Morphism Map with signature StepF_Qeq ==> StepF_Qeq as Map_resp_Qeq.
+Add Parametric Morphism X Y f : (@Map X Y f) with signature (@StepF_Qeq X) ==> (@StepF_Qeq Y) as Map_resp_Qeq.
 Proof. 
-intros X Y f.
-induction x1; induction x2; try contradiction; intros Hs.
+induction x; induction y; try contradiction; intros Hs.
  simpl in *.
  rewrite Hs.
  reflexivity.
@@ -626,10 +625,9 @@ rewrite ApGlue, SplitLGlue, SplitRGlue.
 reflexivity.
 Qed.
 (* begn hide *)
-Add Morphism Ap with signature StepF_Qeq ==> StepF_Qeq ==> StepF_Qeq as Ap_resp_Qeq.
+Add Parametric Morphism X Y : (@Ap X Y) with signature (@StepF_Qeq (X->Y)) ==> (@StepF_Qeq X) ==> (@StepF_Qeq Y) as Ap_resp_Qeq.
 Proof.
-intros X Y.
-induction x1; induction x2; try contradiction; intros Hf s1 s2 Hs.
+induction x; induction y; try contradiction; intros Hf s1 s2 Hs.
  simpl in *.
  rewrite Hf.
  apply Map_resp_Qeq.
@@ -637,9 +635,9 @@ induction x1; induction x2; try contradiction; intros Hf s1 s2 Hs.
 destruct Hf as [Ho [Hl Hr]].
 do 2 rewrite ApGlue.
 repeat split; auto.
- apply IHx1_1; auto with *.
+ apply IHx1; auto with *.
  apply SplitL_resp_Qeq; auto with *.
-apply IHx1_2; auto with *.
+apply IHx2; auto with *.
 apply SplitR_resp_Qeq; auto with *.
 Qed.
 (* end hide *)

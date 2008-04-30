@@ -99,13 +99,14 @@ Qed.
 Lemma regFun_setoid : Setoid_Theory RegularFunction regFunEq.
 Proof.
 split.
+unfold Reflexive.
 intros; apply regFunEq_e; intros; apply ball_refl.
-unfold regFunEq.
+unfold Symmetric, regFunEq.
 intros.
 apply ball_sym.
 setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
 auto.
-unfold regFunEq.
+unfold Transitive, regFunEq.
 intros.
 apply ball_closed.
 intros.
@@ -158,8 +159,10 @@ intros; eapply H.
 unfold QposEq. symmetry.
 apply H0.
 apply Seq_sym.
+apply regFun_setoid.
 apply H1.
 apply Seq_sym.
+apply regFun_setoid.
 apply H2.
 auto.
 Qed.
@@ -323,8 +326,7 @@ Implicit Arguments is_RegularFunction [X].
 
 Implicit Arguments Cunit [X].
 
-Add Morphism Cunit_fun with signature ms_eq ==> ms_eq as Cunit_wd.
-intros X.
+Add Parametric Morphism X : (@Cunit_fun X) with signature (@ms_eq _) ==> (@ms_eq _) as Cunit_wd.
 exact (@uc_wd _ _ Cunit).
 Qed.
 (* end hide *)
@@ -930,8 +932,8 @@ End Strong_Monad.
 
 (* begin hide *)
 Opaque Complete.
-Add Morphism Cmap_slow_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_slow_wd.
-intros X Y.
+
+Add Parametric Morphism X Y : (@Cmap_slow_fun X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cmap_slow_wd.
 intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cmap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
@@ -940,15 +942,13 @@ rapply (@uc_wd _ _ (Cmap_strong_slow X Y)).
 assumption.
 Qed.
 
-Add Morphism Cap_weak_slow with signature ms_eq ==> ms_eq as Cap_weak_slow_wd.
-intros X Y.
+Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@ms_eq _) ==> (@ms_eq _) as Cap_weak_slow_wd.
 intros x1 x2 Hx.
 rapply (@uc_wd _ _ (Cap_slow X Y)).
 assumption.
 Qed.
 
-Add Morphism Cap_slow_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cap_slow_wd.
-intros X Y.
+Add Parametric Morphism X Y : (@Cap_slow_fun X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cap_slow_wd.
 intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cap_weak_slow x1) _ _ Hy).
@@ -995,7 +995,7 @@ destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
  change (QposEq d (e+c)) in Hc;
  rewrite Hc;
  rewrite <- ball_Cunit in H0;
- setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by (unfold c';QposRing);
+ (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by unfold c';QposRing);
  eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
   [apply ball_approx_r|apply ball_approx_l]).
 right.

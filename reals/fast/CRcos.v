@@ -166,17 +166,17 @@ intros a.
 unfold rational_cos.
 rewrite rational_sin_correct.
 rewrite <- cos_poly_correct.
- apply AbsIR_imp_AbsSmall.
- stepr (nring 1:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 1)).
- rstepr (One:IR).
- apply AbsIR_Sin_leEq_One.
-apply IRasCR_wd.
-csetoid_rewrite_rev (Cos_double_angle (inj_Q IR (a/2))).
-apply Cos_wd.
-csetoid_replace (Two:IR) (inj_Q IR (2:Q));[|apply eq_symmetric; apply (inj_Q_nring IR 2)].
-stepl (inj_Q IR (2*(a/2))) by apply inj_Q_mult.
-apply inj_Q_wd.
-simpl; field; discriminate.
+ apply IRasCR_wd.
+ csetoid_rewrite_rev (Cos_double_angle (inj_Q IR (a/2))).
+ apply Cos_wd.
+ csetoid_replace (Two:IR) (inj_Q IR (2:Q));[|apply eq_symmetric; apply (inj_Q_nring IR 2)].
+ stepl (inj_Q IR (2*(a/2))) by apply inj_Q_mult.
+ apply inj_Q_wd.
+ simpl; field; discriminate.
+apply AbsIR_imp_AbsSmall.
+stepr (nring 1:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 1)).
+rstepr (One:IR).
+apply AbsIR_Sin_leEq_One.
 Qed.
 
 Definition cos_uc_prf : is_UniformlyContinuousFunction rational_cos Qpos2QposInf.

@@ -674,8 +674,8 @@ End absBig_wd_properties.
 Declare Left Step AbsBig_wdl_unfolded.
 Declare Right Step AbsBig_wdr_unfolded.
 
-Add Morphism AbsSmall with signature cs_eq ==> cs_eq ==> iff as AbsSmall_morph_wd.
-intros R x1 x2 xeq y1 y2 yeq.
+Add Parametric Morphism c : (@AbsSmall c) with signature (@cs_eq (cof_crr c)) ==> (@cs_eq c) ==> iff as AbsSmall_morph_wd.
+intros x1 x2 xeq y1 y2 yeq.
 split;
 intro H.
 stepr y1 by assumption.

@@ -19,6 +19,8 @@
 (** Generic Tacticals used by the CoRN project *)
 (* begin hide *)
 
+Require Import SetoidTactics.
+
 (* Implements an apply-like tactic that uses refine's strong unifcation algorithm *)
 Ltac rapply T := 
  (refine T ||

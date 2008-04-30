@@ -51,7 +51,7 @@ Section Monotone.
 Variable f : X -> X.
 Hypothesis Hf : monotone X f.
 
-Add Morphism f with signature po_eq ==> po_eq  as monotone_compat.
+Add Morphism f with signature (@po_eq X) ==> (@po_eq X)  as monotone_compat.
 rewrite monotone_def in Hf.
 intros.
 rewrite equiv_le_def in *.
@@ -93,7 +93,7 @@ Variable f : X -> X.
 Hypothesis Hf : antitone X f.
 
 (* begin hide *)
-Add Morphism f with signature po_eq ==> po_eq as antitone_compat.
+Add Morphism f with signature (@po_eq X) ==> (@po_eq X) as antitone_compat. 
 rewrite antitone_def in Hf.
 intros.
 rewrite equiv_le_def in *.
@@ -206,8 +206,7 @@ Lemma min_lb_l : forall x y:X, min x y <= x.
 Proof.
 intros.
 destruct (le_total x y).
-rewrite min_def1.
-auto.
+rewrite min_def1; auto.
 apply le_refl.
 rewrite min_def2; auto.
 Qed.
@@ -217,8 +216,7 @@ Proof.
 intros.
 destruct (le_total x y).
 rewrite min_def1; auto.
-rewrite min_def2.
-auto.
+rewrite min_def2; auto.
 apply le_refl.
 Qed.
 

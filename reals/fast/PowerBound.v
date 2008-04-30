@@ -110,8 +110,7 @@ intros [[|n|n] d] H.
    constructor.
   rewrite inj_S.
   unfold Zsucc.
-  rewrite Qpower_plus.
-   discriminate.
+  rewrite Qpower_plus;[|discriminate].
   rsapply mult_resp_pos;[assumption|constructor].
  rewrite <- Zpower_Qpower; try auto with *.
  destruct (inject_Z (4%positive ^ Psize d)%Z).

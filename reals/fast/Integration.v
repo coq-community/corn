@@ -193,29 +193,29 @@ apply SplitLR_glue_ind; intros H.
   do 2 rewrite SupDistanceToLinear_glue.
   rewrite Qmax_assoc.
   rewrite IHx1.
-   rewrite Hc.
-   unfold affineCombo.
-   simpl.
-   field; auto with *.
+   apply Qmax_compat;
+    apply SupDistanceToLinear_wd1; try reflexivity;
+    rewrite Hc;
+    unfold affineCombo;
+    simpl;
+    field; auto with *.
+  rewrite Hc.
+  unfold affineCombo.
+  simpl.
+  field; auto with *.
+ do 2 rewrite SupDistanceToLinear_glue.
+ rewrite <- Qmax_assoc.
+ rewrite IHx2.
   apply Qmax_compat;
    apply SupDistanceToLinear_wd1; try reflexivity;
    rewrite Hc;
    unfold affineCombo;
    simpl;
    field; auto with *.
- do 2 rewrite SupDistanceToLinear_glue.
- rewrite <- Qmax_assoc.
- rewrite IHx2.
-  rewrite Hc.
-  unfold affineCombo.
-  simpl.
-  field; auto with *.
- apply Qmax_compat;
-  apply SupDistanceToLinear_wd1; try reflexivity;
-  rewrite Hc;
-  unfold affineCombo;
-  simpl;
-  field; auto with *.
+ rewrite Hc.
+ unfold affineCombo.
+ simpl.
+ field; auto with *.
 rewrite SupDistanceToLinear_glue.
 apply Qmax_compat;
  apply SupDistanceToLinear_wd1; try reflexivity;
@@ -264,8 +264,7 @@ destruct Hx as [H0 H1] using (glue_eq_ind x1_1).
 rewrite SupDistanceToLinear_glue.
 rewrite (IHx1_1 _ _ _ (affineCombo_gt (OpenUnitDual o) H) H0).
 rewrite (IHx1_2 _ _ _ (affineCombo_lt (OpenUnitDual o) H) H1).
-rewrite SupDistanceToLinear_split.
- reflexivity.
+rewrite SupDistanceToLinear_split; [|reflexivity].
 apply SupDistanceToLinear_wd1; try reflexivity.
 Qed.
 
@@ -525,8 +524,9 @@ End id01.
 (* This probably should be moved somewhere else, but where? *)
 Definition CRSetoid : Setoid.
 exists CR (@ms_eq CR).
-eapply msp_Xsetoid.
-apply (@msp CR).
+destruct (@msp CR).
+destruct msp_Xsetoid.
+split; assumption.
 Defined.
 
 (**
@@ -575,9 +575,9 @@ f o g is Lipschitz.  However Lipschitz functions haven't been
 formalzied yet. *)
 Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
 (* begin hide *)
-Add Morphism ComposeContinuous_raw with signature ms_eq ==> ms_eq as ComposeContinuous_raw_wd.
+Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@ms_eq _) ==> (@ms_eq _) as ComposeContinuous_raw_wd.
 Proof.
-intros f x1 x2 Hx d1 d2.
+intros x1 x2 Hx d1 d2.
 simpl.
 unfold distribComplete_raw.
 revert x1 x2 Hx.
@@ -591,7 +591,7 @@ induction x1 using StepF_ind.
   change (ms_eq (f x) (f x0)).
   apply uc_wd.
   assumption.
- apply eq_glue_ind.
+ rapply eq_glue_ind.
  intros Hl Hr.
  set (A:= (constStepF (approximate (f x) d1:QS))).
  set (B:= (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
@@ -601,7 +601,7 @@ induction x1 using StepF_ind.
  change (Qmax (LinfDistance A B) (LinfDistance A C) <= (d1 + d2)%Qpos)%Q.
  apply Qmax_lub; auto.
 intros x2.
-apply glue_eq_ind.
+rapply glue_eq_ind.
 intros Hl Hr.
  replace LHS with (LinfDistance
    (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
@@ -622,15 +622,33 @@ intros Hl Hr.
   rapply IHx1_1; auto with *.
  rapply IHx1_2; auto with *.
 apply LinfDistance_wd.
+ change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+  (Map f (glue o x1_1 x1_2)):StepQ) ==
+  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
+   (Map f (glue o x1_1 x1_2)):StepQ)).
  reflexivity.
 simpl.
+change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2) (Map f x2):StepQ) ==
+StepFunction.glue o
+  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+     (Map f (SplitL x2 o)))
+  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+     (Map f (SplitR x2 o)))).
 symmetry.
 rapply glue_StepF_eq.
  unfold SplitL.
  do 2 rewrite StepFunction.SplitLMap.
+ change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+  (Map f (StepFunction.SplitL x2 o)):StepQ) ==
+Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+  (Map f (StepFunction.SplitL x2 o))).
  reflexivity.
 unfold SplitR.
 do 2 rewrite StepFunction.SplitRMap.
+change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+  (Map f (StepFunction.SplitR x2 o)):StepQ) ==
+Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
+  (Map f (StepFunction.SplitR x2 o))).
 reflexivity.
 Qed.
 (* end hide *)
@@ -641,7 +659,7 @@ intros f e a b.
 revert a b e.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H e H0.
-  change (LinfStepQ) in s, s0, t, t0.
+  change (ms LinfStepQ) in s, s0, t, t0.
   change (ms_eq s s0) in Hs.
   change (ms_eq t t0) in Ht.
   rewrite <- Hs.
@@ -739,7 +757,6 @@ change (Cunit (approximate (Integrate01 f) e))
  with ('(approximate (Integrate01 f) e))%CR.
 setoid_replace ('(approximate (Integrate01 f) e))%CR
  with ('((1-0)*(approximate (Integrate01 f) e)))%CR
- using relation ms_eq
  by ring.
 rewrite <- CRAbsSmall_ball.
 stepl ('((1-0)*e))%CR
@@ -945,7 +962,6 @@ assert (HFr :Continuous_I Hcb F).
  apply leEq_transitive with (inj_Q IR c); auto.
 setoid_replace (IRasCR (integral _ _ Hab F HF))
  with (IRasCR (integral _ _ Hac F HFl)+IRasCR (integral _ _ Hcb F HFr))%CR
- using relation ms_eq
  by (rewrite <- IR_plus_as_CR;apply IRasCR_wd; apply eq_symmetric; apply integral_plus_integral).
 unfold z.
 rewrite Integral_glue.

@@ -183,12 +183,12 @@ Add Setoid UniformlyContinuousFunction ucEq uc_setoid as uc_Setoid.
 Definition UniformlyContinuousSpace (X Y:MetricSpace) : MetricSpace :=
 Build_MetricSpace (@ucBall_wd X Y) (@uc_is_MetricSpace X Y).
 
-Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 90, right associativity) : uc_scope.
+Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 55, right associativity) : uc_scope.
 
 Open Local Scope uc_scope.
 (* begin hide *)
-Add Morphism ucFun with signature ms_eq ==> ms_eq as uc_wd.
-intros X Y f x0 x1 Hx.
+Add Parametric Morphism X Y f : (@ucFun X Y f) with signature (@ms_eq X) ==> (@ms_eq Y) as uc_wd.
+intros x0 x1 Hx.
 apply ball_eq.
 intros e.
 apply uc_prf.
@@ -200,14 +200,14 @@ Qed.
 
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 
-Add Morphism ucFun2 with signature ms_eq ==> ms_eq ==> ms_eq as ucFun2_wd.
+Add Parametric Morphism X Y Z f : (@ucFun2 X Y Z f) with signature (@ms_eq X) ==> (@ms_eq Y) ==> (@ms_eq Z) as ucFun2_wd.
 Proof.
-intros.
+intros x y Hxy x0 y0 Hxy0.
 unfold ucFun2.
-rewrite H0.
-generalize x3.
-change (ms_eq (f x1) (f x2)).
-rewrite H.
+rewrite Hxy0.
+generalize y0.
+change (ms_eq (f x) (f y)).
+rewrite Hxy.
 reflexivity.
 Qed.
 (* end hide *)
@@ -243,9 +243,9 @@ Definition uc_compose (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) : X --> Z :=
 Build_UniformlyContinuousFunction (uc_compose_prf g f).
 
 (* begin hide *)
-Add Morphism uc_compose with signature ms_eq ==> ms_eq ==> ms_eq as uc_compose_wd.
+Add Parametric Morphism X Y Z : (@uc_compose X Y Z) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as uc_compose_wd.
 Proof.
-intros X Y Z x1 x2 Hx y1 y2 Hy.
+intros x1 x2 Hx y1 y2 Hy.
 intros x.
 simpl.
 rewrite (Hx (y1 x)).
@@ -255,4 +255,4 @@ reflexivity.
 Qed.
 (* end hide *)
 
-Notation "f ∘ g" := (uc_compose f g) (at level 25, left associativity) : uc_scope.
+Notation "f ∘ g" := (uc_compose f g) (at level 40, left associativity) : uc_scope.

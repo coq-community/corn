@@ -23,7 +23,7 @@ Require Import Plot.
 Require Import CRtrans.
 
 (* `∗' is used for trival proofs that a some concrete number is less than another *)
-Notation star := refl_equal Lt.
+Notation star := (refl_equal Lt).
 Notation "∗" := star.
 
 Open Local Scope Q_scope.

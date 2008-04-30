@@ -137,7 +137,7 @@ apply to subtraction.
 *)
 Notation "x - y" := (x + (- y))%CR : CR_scope.
 (* begin hide *)
-Add Morphism CRopp with signature ms_eq ==> ms_eq as CRopp_wd.
+Add Morphism CRopp with signature (@ms_eq _) ==> (@ms_eq _) as CRopp_wd.
 Proof.
 rapply uc_wd.
 Qed.
@@ -147,7 +147,7 @@ Qed.
 First a predicate for nonnegative numbers is defined. *)
 Definition CRnonNeg (x:CR) := forall e:Qpos, (-e) <= (approximate x e).
 (* begin hide *)
-Add Morphism CRnonNeg with signature ms_eq ==> iff as CRnonNeg_wd.
+Add Morphism CRnonNeg with signature (@ms_eq _) ==> iff as CRnonNeg_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
 intros x y Hxy Hx e.
@@ -183,7 +183,7 @@ intros.
 split.
 apply H; assumption.
 apply H.
-change (x2==x1)%CR.
+change (y==x)%CR.
 symmetry.
 assumption.
 Qed.
@@ -191,7 +191,7 @@ Qed.
 (** And similarly for nonpositive. *)
 Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= e.
 (* begin hide *)
-Add Morphism CRnonPos with signature ms_eq ==> iff as CRnonPos_wd.
+Add Morphism CRnonPos with signature (@ms_eq _) ==> iff as CRnonPos_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
 intros x y Hxy Hx e.
@@ -227,7 +227,7 @@ intros.
 split.
 apply H; assumption.
 apply H.
-change (x2==x1)%CR.
+change (y==x)%CR.
 symmetry.
 assumption.
 Qed.
@@ -237,7 +237,7 @@ Definition CRle (x y:CR) := (CRnonNeg (y - x))%CR.
 
 Infix "<=" := CRle : CR_scope.
 (* begin hide *)
-Add Morphism CRle with signature ms_eq ==> ms_eq ==> iff as CRle_wd.
+Add Morphism CRle with signature (@ms_eq _) ==> (@ms_eq _) ==> iff as CRle_wd.
 intros x1 x2 Hx y1 y2 Hy.
 change (x1==x2)%CR in Hx.
 change (y1==y2)%CR in Hy.

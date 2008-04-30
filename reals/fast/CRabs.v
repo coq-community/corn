@@ -81,14 +81,13 @@ intros [H|H].
  intros m Hm.
  rewrite CRle_min_r in Hm.
  rewrite CRmin_boundAbove in Hm.
- setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR using relation ms_eq by ring.
+ setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
  apply CRopp_wd.
  rewrite <- Hm.
  rapply regFunEq_e.
  intros e.
  simpl. 
- rewrite Qabs_neg.
-  auto with *.
+ rewrite Qabs_neg; auto with *.
  rewrite Qopp_involutive.
  rapply ball_refl.
 transitivity (IRasCR x).
@@ -105,7 +104,6 @@ rewrite <- Hm.
 rapply regFunEq_e.
 intros e.
 simpl. 
-rewrite Qabs_pos.
- auto with *.
+rewrite Qabs_pos; auto with *.
 rapply ball_refl.
 Qed.

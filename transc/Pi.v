@@ -1045,7 +1045,7 @@ clear IHi.
 induction i.
 unfold pi_seq.
 rewrite Cos_zero.
-setoid_replace (Zero [+] One:IR) with (One:IR) using relation cs_eq by rational.
+setoid_replace (Zero [+] One:IR) with (One:IR);[|rational].
 apply eq_imp_leEq.
 reflexivity.
 apply leEq_transitive with (pi_seq (S (S i))).

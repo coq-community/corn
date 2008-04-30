@@ -305,9 +305,8 @@ Qed.
 
 End AlmostIn.
 (* begin hide *)
-Add Morphism almostIn with signature QposEq ==> ms_eq ==> ms_eq ==> iff as almostIn_wd.
+Add Parametric Morphism X stableX : (@almostIn X stableX) with signature QposEq ==> (@ms_eq _) ==> (@ms_eq _) ==> iff as almostIn_wd.
 Proof.
-intros X stableX.
 unfold FinEnum_eq.
 assert (Y:forall x1 x2 : Qpos,
  QposEq x1 x2 ->
@@ -335,6 +334,8 @@ cut (forall z1 x3 : FinEnum stableX,
  split.
   apply Z.
   intros x H.
+  simpl in Hz.
+  unfold FinEnum_eq in Hz.
   apply -> Hz.
   assumption.
  intros H.
@@ -346,6 +347,7 @@ cut (forall z1 x3 : FinEnum stableX,
   apply Hy.
  eapply Z.
   intros a Ha.
+  simpl in Hz; unfold FinEnum_eq in Hz.
   apply <- Hz.
   apply Ha.
  eapply Y.
@@ -394,9 +396,8 @@ the approximations of the compact set. *)
 Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
-Add Morphism inCompact with signature ms_eq ==> ms_eq ==> iff as inCompact_wd.
+Add Parametric Morphism X stableX : (@inCompact X stableX) with signature (@ms_eq _) ==> (@ms_eq _) ==> iff as inCompact_wd.
 Proof.
-intros X stableX.
 cut (forall x1 x2 : Complete X,
  ms_eq x1 x2 ->
  forall x3 x4 : Complete (FinEnum stableX),
@@ -668,8 +669,7 @@ exists q.
 change (q==k^(P_of_succ_nat n)*d1).
 rewrite Zpos_P_of_succ_nat.
 unfold Zsucc.
-rewrite Qpower_plus.
- apply Qpos_nonzero.
+rewrite Qpower_plus;[|apply Qpos_nonzero].
 autorewrite with QposElim in Hq0.
 ring [Hq0].
 Qed.
@@ -707,8 +707,7 @@ rapply Qle_shift_div_r.
   constructor.
  change (S n) with (1+n)%nat.
  rewrite inj_plus.
- rewrite Qpower_plus.
-  discriminate.
+ rewrite Qpower_plus;[|discriminate].
  change 0 with (4*0).
  rsapply mult_resp_less_lft; auto.
  constructor.
@@ -734,8 +733,8 @@ destruct z as [[|n|n] d].
   rewrite Zpos_mult_morphism.
   ring_simplify.
   rewrite Zmult_comm.
-  replace LHS with (d * (n / d) + n mod d)%Z by
-   (symmetry; rapply Z_div_mod_eq; auto with *).
+  replace LHS with (d * (n / d) + n mod d)%Z
+   by (rapply Z_div_mod_eq; auto with *).
   apply Zplus_le_compat_l.
   destruct (Z_mod_lt n d); auto with *.
  generalize (Zsucc (n/d)).
@@ -744,7 +743,7 @@ destruct z as [[|n|n] d].
  destruct z.
    discriminate.
   change (4%positive:Z) with (2^2)%Z.
-  rewrite Zpower_Qpower;[discriminate|].
+  rewrite Zpower_Qpower;[|discriminate].
   rewrite <- Qpower_mult.
   apply Qle_trans with (two_p (log_sup p)).
    unfold Qle; simpl.
@@ -758,7 +757,7 @@ destruct z as [[|n|n] d].
   cut (z <=  (2 * div2 (S (Z_to_nat (z:=z) Hz))))%Z.
    generalize ((2 * div2 (S (Z_to_nat (z:=z) Hz))))%Z.
    intros y Hy.
-   rewrite <- Zpower_Qpower.
+   rewrite <- Zpower_Qpower;
     auto with *.
    unfold Qle.
    simpl.
@@ -794,7 +793,7 @@ destruct z as [[|n|n] d].
     reflexivity.
    elim Hz; constructor.
   replace LHS with (Z_to_nat Hz:Z)
-   by (symmetry; apply Z_to_nat_correct).
+   by (apply Z_to_nat_correct).
   generalize (Z_to_nat (z:=z) Hz).
   intros n.
   clear - n.
@@ -1160,7 +1159,6 @@ assert (Z0:existsC (Complete X) (fun x' => In x' l /\ ball ((1#2)*e1) (Cunit x) 
   apply existsWeaken.
   exists a.
   split; auto with *.
-  change (Complete X) in a.
   rewrite Hx.
   apply ball_approx_l.
  destruct (IHl Hx) as [G | z [Hz0 Hz1]] using existsC_ind.
@@ -1767,6 +1765,7 @@ apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*d1)%Qpos);
 apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*d1)%Qpos);
  [apply regFun_prf|].
 simpl.
+unfold FinEnum_map_modulus.
 case_eq (mu f ((1#4)*d1)).
  intros d Hd.
  rapply almostIn_map2;[|apply H].

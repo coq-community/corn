@@ -313,7 +313,7 @@ set
   (One[/] _[//]nring_fac_ap_zero IR i) [*] (b[+][--]a) [^]i) 
  in *.
 astepr (w[-]w); unfold w in |- *; simpl in |- *.
-repeat first [ apply cg_minus_wd | apply mult_wd ];
+repeat first [ apply cg_minus_wd | simple apply mult_wd ];
  try apply csf_wd_unfolded; algebra.
 rational.
 simpl in |- *; algebra.
@@ -458,21 +458,21 @@ Qed.
 
 Ltac Lazy_Included :=
   repeat first
-   [ apply included_IR
-   | apply included_FPlus
-   | apply included_FInv
-   | apply included_FMinus
-   | apply included_FMult
-   | apply included_FNth
-   | apply included_refl ].
+   [ simple apply included_IR
+   | simple apply included_FPlus
+   | simple apply included_FInv
+   | simple apply included_FMinus
+   | simple apply included_FMult
+   | simple apply included_FNth
+   | simple apply included_refl ].
 
 Ltac Lazy_Eq :=
   repeat first
-   [ apply bin_op_wd_unfolded
-   | apply un_op_wd_unfolded
-   | apply cg_minus_wd
-   | apply div_wd
-   | apply csf_wd_unfolded ]; algebra.
+   [ simple apply bin_op_wd_unfolded
+   | simple apply un_op_wd_unfolded
+   | simple apply cg_minus_wd
+   | simple apply div_wd
+   | simple apply csf_wd_unfolded ]; algebra.
 
 Lemma Taylor_lemma7 : forall n Hf Hf' i (Hi : 0 < i) Hi', Derivative_I Hab'
  (funct_i' n Hf i Hi') (funct_aux n Hf' i Hi'{-}funct_aux n Hf' (pred i) (lt_5 i (S n) Hi')).
@@ -631,10 +631,10 @@ exact (Taylor_lemma3' _ _ _ _ H3 _ _ _ _ H4 H6).
 intros; simpl in |- *; repeat (split; auto).
 intros x H2 Hx Hx'; simpl in |- *.
 repeat first
- [ apply mult_wd
- | apply bin_op_wd_unfolded
- | apply csf_wd_unfolded
- | apply eq_reflexive_unfolded ]; simpl in |- *.
+ [ simple apply mult_wd
+ | simple apply bin_op_wd_unfolded
+ | simple apply csf_wd_unfolded
+ | simple apply eq_reflexive_unfolded ]; simpl in |- *.
 3: algebra.
 apply Feq_imp_eq with (Compact Hab).
 2: assumption.

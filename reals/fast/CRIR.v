@@ -134,7 +134,6 @@ rapply IR_Zero_as_CR.
 simpl in *.
 set (a:=Sum0 (G:=CRasCAbGroup) m (fun n : nat => IRasCR (x n))) in *.
 clearbody a.
-change CR in a.
 rewrite <- IHm.
 rapply IR_plus_as_CR.
 Qed.
@@ -235,7 +234,6 @@ apply IR_Zero_as_CR.
 simpl in *.
 set (a:= (nring (R:=CRasCRing) n)) in *.
 clearbody a.
-change CR in a.
 rewrite IR_plus_as_CR.
 rewrite IHn.
 rewrite IR_One_as_CR.
@@ -269,7 +267,6 @@ assert (X:= (IHp _ _ H)).
 simpl in X.
 set (c:=pring_aux CRasCRing p ((' 0 + ' 1 + ' 1) * a)%CR) in *.
 clearbody c.
-change CR in c.
 rewrite <- X.
 rewrite IR_plus_as_CR.
 rewrite Hab.

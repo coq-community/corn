@@ -158,10 +158,10 @@ reflexivity.
 Qed. 
 (* begin hide *)
 Add Morphism StepQSup 
-  with signature  StepF_eq ==>  Qeq
+  with signature  (@StepF_eq _) ==>  Qeq
  as StepQSup_wd.
 unfold IntegralQ.
-induction x1 using StepF_ind.
+induction x using StepF_ind.
 intros x2 H. simpl. induction x2 using StepF_ind.
   simpl.  auto with *.
  change (StepQSup (glue o x2_1 x2_2))%Q with
@@ -169,18 +169,18 @@ intros x2 H. simpl. induction x2 using StepF_ind.
  destruct H as [H0 H1] using (eq_glue_ind x2_1).
  rewrite <- IHx2_1; auto with *.
  rewrite <- IHx2_2; auto with *.
-intros x2 H.
-destruct H as [H0 H1] using (glue_eq_ind x1_1).
-change (StepQSup (glue o x1_1 x1_2))%Q with
- (Qmax (StepQSup x1_1) (StepQSup x1_2)).
-rewrite (IHx1_1 _ H0).
-rewrite (IHx1_2 _ H1).
+intros y H.
+destruct H as [H0 H1] using (glue_eq_ind x1).
+change (StepQSup (glue o x1 x2))%Q with
+ (Qmax (StepQSup x1) (StepQSup x2)).
+rewrite (IHx1 _ H0).
+rewrite (IHx2 _ H1).
 symmetry.
 apply StepQSupSplit.
 Qed.
 
 Add Morphism LinfNorm 
-  with signature StepF_eq ==>  Qeq
+  with signature (@StepF_eq _) ==>  Qeq
  as LinfNorm_wd.
 unfold LinfNorm.
 intros x y Hxy.
@@ -189,7 +189,7 @@ reflexivity.
 Qed.
 
 Add Morphism LinfDistance 
-  with signature StepF_eq ==> StepF_eq ==>  Qeq
+  with signature (@StepF_eq _) ==> (@StepF_eq _) ==>  Qeq
  as LinfDistance_wd.
 unfold LinfDistance.
 intros x1 x2 Hx y1 y2 Hy.
@@ -199,7 +199,7 @@ reflexivity.
 Qed.
 
 Add Morphism LinfBall 
-  with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff
+  with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
  as LinfBall_wd.
 unfold LinfBall.
 intros a1 a2 Ha x1 x2 Hx y1 y2 Hy.
@@ -243,7 +243,7 @@ Lemma Linfball_refl : forall e x, (LinfBall e x x).
 Proof.
 intros e x.
 unfold LinfBall, LinfDistance.
-setoid_replace (x-x) with (constStepF (0:QS)) using relation StepF_eq by ring.
+setoid_replace (x-x) with (constStepF (0:QS)) by ring.
 change (0 <= e)%Q.
 auto with *.
 Qed.
@@ -253,7 +253,7 @@ Proof.
 intros e x y.
 unfold LinfBall, LinfDistance.
 unfold LinfNorm.
-setoid_replace (x-y) with (-(y-x)) using relation StepF_eq by ring.
+setoid_replace (x-y) with (-(y-x)) by ring.
 rewrite StepQabsOpp.
 auto.
 Qed.
@@ -263,7 +263,7 @@ Proof.
 intros e d x y z.
 unfold LinfBall, LinfDistance.
 unfold LinfNorm.
-setoid_replace (x-z) with ((x-y)+(y-z)) using relation StepF_eq by ring.
+setoid_replace (x-z) with ((x-y)+(y-z)) by ring.
 intros He Hd.
 autorewrite with QposElim.
 apply Qle_trans with (StepQSup (StepQabs (x-y) + StepQabs (y-z)))%Q.
@@ -291,9 +291,9 @@ Lemma Linfball_eq : forall x y, (forall e : Qpos, LinfBall e x y) -> StepF_eq x 
 Proof.
 intros x y H.
 unfold LinfBall in H.
-setoid_replace y with (constStepF (0:QS)+y) using relation StepF_eq by ring.
+setoid_replace y with (constStepF (0:QS)+y) by ring.
 set (z:=constStepF (0:QS)).
-setoid_replace x with (x - y + y) using relation StepF_eq by ring.
+setoid_replace x with (x - y + y) by ring.
 apply StepQplus_wd; try reflexivity.
 unfold z; clear z.
 rapply LinfNorm_Zero.
@@ -323,7 +323,7 @@ split.
 rapply Linfball_eq.
 Qed.
 (* begin hide *)
-Add Morphism LinfBall with signature QposEq ==> StepF_eq ==> StepF_eq ==> iff as L1Ball_wd.
+Add Morphism LinfBall with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
 intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
 unfold LinfBall.
 change (x1 == x2)%Q in Hx.
@@ -357,8 +357,7 @@ Lemma LinfNorm_scale : forall q s,
 Proof.
 intros q s.
 unfold LinfNorm.
-rewrite StepQSup_scale.
- apply Qabs_nonneg.
+rewrite StepQSup_scale;[|apply Qabs_nonneg].
 apply StepQSup_wd.
 unfold StepF_eq.
 set (g:= st_eqS QS).
@@ -396,7 +395,7 @@ assert (X:(((d1' + d2')*d')==constStepF (1:QS))%SQ).
  apply Qpos_nonzero.
 exists (f).
  setoid_replace (x - f)%SQ
-  with (d1' * d' * (x - y))%SQ using relation StepF_eq.
+  with (d1' * d' * (x - y))%SQ.
   change ((d1' * d')%SQ * (x - y)%SQ) with
     (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
   rewrite LinfNorm_scale.
@@ -407,12 +406,12 @@ exists (f).
   apply Qle_shift_div_r; auto with *.
   rsapply mult_resp_leEq_lft; auto with *.
   apply Qle_trans with e; auto with *.
- setoid_replace (x - f) with (constStepF (1:QS)*x - f) using relation StepF_eq by ring.
+ setoid_replace (x - f) with (constStepF (1:QS)*x - f) by ring.
  rewrite <- X.
  unfold f.
  ring.
 setoid_replace (f -y)
-  with (d2' * d' * (x - y))%SQ using relation StepF_eq.
+  with (d2' * d' * (x - y))%SQ.
  change ((d2' * d')%SQ * (x - y)%SQ) with
    (QscaleS (d2/d)%Qpos ^@> (x-y)%SQ).
  rewrite LinfNorm_scale.
@@ -423,7 +422,7 @@ setoid_replace (f -y)
  apply Qle_shift_div_r; auto with *.
  rsapply mult_resp_leEq_lft; auto with *.
  apply Qle_trans with e; auto with *.
-setoid_replace (f- y) with (f - constStepF (1:QS)*y) using relation StepF_eq by ring.
+setoid_replace (f- y) with (f - constStepF (1:QS)*y) by ring.
 rewrite <- X.
 unfold f.
 ring.

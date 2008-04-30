@@ -59,8 +59,9 @@ split; simpl; unfold Qle; simpl.
  apply Zmult_le_compat_r; auto with *.
 replace LHS with ((n*p) mod d)%Z.
  destruct (Z_mod_lt (n*p) d); auto with *.
-transitivity (n * p - (d*(n * p / d)))%Z;[|ring].
-rewrite <- Zeq_plus_swap.
+transitivity (n * p - (d*(n * p / d)))%Z;[ring|].
+symmetry.
+apply -> Zeq_plus_swap.
 rewrite Zplus_comm.
 symmetry.
 apply Z_div_mod_eq.
@@ -122,8 +123,8 @@ apply ball_weak_le with (2#p)%Qpos.
  apply Zle_minus_le_0.
  replace LHS with ((xO d) mod n)%Z.
   destruct (Z_mod_lt (xO d) n); auto with *.
- transitivity (xO d - (n*(xO d / n)))%Z;[|ring].
- rewrite <- Zeq_plus_swap.
+ transitivity (xO d - (n*(xO d / n)))%Z;[ring|].
+ symmetry; apply -> Zeq_plus_swap.
  rewrite Zplus_comm.
  symmetry.
  apply Z_div_mod_eq.

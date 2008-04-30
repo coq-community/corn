@@ -289,18 +289,18 @@ destruct Hx as [HG | Hx | Hx] using orC_ind.
  destruct (infinitePidgeonHolePrinicple _ _ _ H'') as [HG | y [Hy0 Hy1]] using existsC_ind.
   auto using InFinEnumC_stable.
  rewrite (InFinEnumC_wd1 x y).
-  apply ball_eq.
-  intros [n d].
-  rewrite (anti_convert_pred_convert d).
-  destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
-   auto using Xstable. 
-  apply ball_weak_le with (1 # P_of_succ_nat z)%Qpos; auto.
-  rapply Zmult_le_compat; auto with *.
-  simpl.
-  repeat rewrite <- POS_anti_convert.
-  apply inj_le.
-  auto with *.
- auto using InFinEnumC_weaken.
+  auto using InFinEnumC_weaken.
+ apply ball_eq.
+ intros [n d].
+ rewrite (anti_convert_pred_convert d).
+ destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
+  auto using Xstable. 
+ apply ball_weak_le with (1 # P_of_succ_nat z)%Qpos; auto.
+ rapply Zmult_le_compat; auto with *.
+ simpl.
+ repeat rewrite <- POS_anti_convert.
+ apply inj_le.
+ auto with *.
 apply IHa; auto.
 intros e y Hy.
 apply H.
@@ -311,7 +311,7 @@ Qed.
 
 Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnum_eq FinEnum_ball.
 split.
-     split; auto with *.
+     split; unfold Reflexive, Symmetric, Transitive; auto with *.
      apply FinEnum_eq_trans.
     intros e x.
     rapply hausdorffBall_refl.
@@ -671,6 +671,7 @@ Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
  ms_eq f (rev f).
 Proof.
 induction f.
+ change (ms_eq (nil:FinEnum stable) (nil:FinEnum stable)). 
  reflexivity.
 intros x.
 destruct (IHf x) as [H0 H1].
@@ -727,6 +728,7 @@ intros z X Y SX SY f e.
 cut (forall (a b : FinEnum SX) (d:Qpos), (QposInf_le d (mu f e)) ->
  ball d a b -> ball (m:=FinEnum SY) e (map f a) (map f b)).
  intros Z a b.
+ unfold FinEnum_map_modulus.
  case_eq (mu f e).
   intros d Hd H.
   apply Z with d; auto.

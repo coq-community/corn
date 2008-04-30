@@ -467,7 +467,7 @@ intros c1 c2 x y Hc1a Hc1b Hc2.
 assert (Hy:=CRboundAbs_Eq Hc1a Hc1b).
 set (y':= (CRboundAbs c1 y)) in *.
 transitivity (ucFun2 (CRmult_bounded c2) x y');
-[|unfold y';rewrite Hy;try assumption;reflexivity].
+ [|rewrite Hy;reflexivity].
 assert (H:forall x:Qpos, (x*c1/c2)%Qpos <= x).
 intros a.
 autorewrite with QposElim.
@@ -519,7 +519,7 @@ rapply CR_b_lowerBound.
 rapply CR_b_upperBound.
 Qed.
 (* begin hide *)
-Add Morphism CRmult with signature ms_eq ==> ms_eq ==> ms_eq as CRmult_wd.
+Add Morphism CRmult with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as CRmult_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 unfold CRmult.
@@ -667,7 +667,8 @@ intros e.
 assert (Z:=Qinv_pos_uc_wd Hc).
 simpl in Z.
 simpl.
-rewrite Z;[apply Qmax_ub_l|].
+rewrite Z;[|apply Qmax_ub_l].
+unfold Qinv_modulus.
 replace (QposRed (c1 * c1 * e))
  with (QposRed (f (c2 * c2 * e)%Qpos));
  [rapply ball_refl|].

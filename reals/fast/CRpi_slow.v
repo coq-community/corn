@@ -298,7 +298,7 @@ transitivity ('4 * 'r *(' 17 * rational_arctan_small_pos small_per_23 +
   ' 5 * rational_arctan_small_pos small_per_6072)))%CR.
  ring.
 repeat (rewrite (rational_arctan_small_pos_correct);
-         [constructor|]).
+         [|constructor]).
 repeat rewrite <- IR_inj_Q_as_CR.
 repeat (rewrite <- IR_mult_as_CR || rewrite <- IR_plus_as_CR).
 apply IRasCR_wd.

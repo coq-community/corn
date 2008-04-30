@@ -529,7 +529,7 @@ stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq))%CR;[assumption|].
 simpl.
 change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq)) ==
  - ' ((- (1)) ^ n * Str_nth n (tl seq)))%CR).
-rewrite Qpower_plus;[discriminate|].
+rewrite Qpower_plus;[|discriminate].
 simpl.
 ring.
 
@@ -555,7 +555,7 @@ intros i; simpl.
 change (Qpower_positive (- (1)) (P_of_succ_nat i)) with ((-(1))^ S i).
 rewrite inj_S.
 unfold Zsucc.
-rewrite Qpower_plus;[discriminate|].
+rewrite Qpower_plus;[|discriminate].
 ring.
 
 rsapply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].

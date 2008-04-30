@@ -479,9 +479,9 @@ rapply Cap_fun_correct.
 Qed.
 
 (* begin hide *)
-Add Morphism Cmap_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cmap_wd.
+Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cmap_wd.
 Proof.
-intros X Y plX x1 x2 Hx y1 y2 Hy.
+intros x1 x2 Hx y1 y2 Hy.
 change (ms_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
 rewrite Cmap_fun_correct.
 set (a:=(Cmap_slow_fun x1 y1)).
@@ -489,15 +489,13 @@ rewrite Cmap_fun_correct.
 rapply Cmap_slow_wd; auto.
 Qed.
 
-Add Morphism Cap_weak with signature ms_eq ==> ms_eq as Cap_weak_wd.
-intros X Y H.
+Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@ms_eq _) ==> (@ms_eq _) as Cap_weak_wd.
 intros x1 x2 Hx.
 rapply (@uc_wd _ _ (Cap Y H)).
 assumption.
 Qed.
 
-Add Morphism Cap_fun with signature ms_eq ==> ms_eq ==> ms_eq as Cap_wd.
-intros X Y H.
+Add Parametric Morphism X Y H : (@Cap_fun X Y H) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cap_wd.
 intros x1 x2 Hx y1 y2 Hy.
 change (ms_eq (Cap_fun H x1 y1) (Cap_fun H x2 y2)).
 transitivity (Cap_fun H x1 y2).

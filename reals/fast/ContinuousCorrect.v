@@ -158,9 +158,7 @@ apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
  destruct d1.
   rapply Min_leEq_rht.
  rapply leEq_reflexive.
-rewrite <- Hg.
- apply HJ'.
- assumption.
+rewrite <- Hg;[|apply HJ';assumption].
 apply uc_prf.
 fold d1.
 destruct d1; try constructor.
