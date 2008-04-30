@@ -116,44 +116,44 @@ apply ball_refl.
 Qed.
 
 (** C(X*Y) is isomorphic to (C X)*(C Y) *)
-Definition Strength_raw (p: ProductMS (Complete X) (Complete Y)) (e:QposInf): XY :=
+Definition Couple_raw (p: ProductMS (Complete X) (Complete Y)) (e:QposInf): XY :=
 (approximate (fst p) e,approximate (snd p) e).
 
-Lemma Strength_prf : forall p, is_RegularFunction (Strength_raw p).
+Lemma Couple_prf : forall p, is_RegularFunction (Couple_raw p).
 Proof.
 intros [p1 p2] e1 e2.
 split; simpl; apply regFun_prf.
 Qed.
 
-Definition Strength_fun (p: ProductMS (Complete X) (Complete Y)) : Complete XY :=
-Build_RegularFunction (Strength_prf p).
+Definition Couple_fun (p: ProductMS (Complete X) (Complete Y)) : Complete XY :=
+Build_RegularFunction (Couple_prf p).
 
-Lemma Strength_uc : is_UniformlyContinuousFunction Strength_fun Qpos2QposInf.
+Lemma Couple_uc : is_UniformlyContinuousFunction Couple_fun Qpos2QposInf.
 Proof.
 intros e a b [Hl Hr] e1 e2.
 split; simpl; auto.
 Qed.
 
-Definition Strength : (ProductMS (Complete X) (Complete Y)) --> (Complete (ProductMS X Y)) :=
-Build_UniformlyContinuousFunction Strength_uc.
+Definition Couple : (ProductMS (Complete X) (Complete Y)) --> (Complete (ProductMS X Y)) :=
+Build_UniformlyContinuousFunction Couple_uc.
 
-Lemma StrengthCorrect1 : forall p,
-ms_eq (Strength ((Cfst p), (Csnd p))) p.
+Lemma CoupleCorrect1 : forall p,
+ms_eq (Couple ((Cfst p), (Csnd p))) p.
 Proof.
 intros p e1 e2.
 destruct (regFun_prf p e1 e2).
 split; simpl; auto.
 Qed.
 
-Lemma StrengthCorrect2 : forall p q,
-ms_eq (Cfst (Strength (p,q))) p.
+Lemma CoupleCorrect2 : forall p q,
+ms_eq (Cfst (Couple (p,q))) p.
 Proof.
 intros p q e1 e2.
 apply (regFun_prf p e1 e2).
 Qed.
 
-Lemma StrengthCorrect3 : forall p q,
-ms_eq (Csnd (Strength (p,q))) q.
+Lemma CoupleCorrect3 : forall p q,
+ms_eq (Csnd (Couple (p,q))) q.
 Proof.
 intros p q e1 e2.
 apply (regFun_prf q e1 e2).
@@ -162,7 +162,7 @@ Qed.
 End CompleteProduct.
 
 (* begin hide *)
-Implicit Arguments Strength [X Y].
+Implicit Arguments Couple [X Y].
 Implicit Arguments Cfst [X Y].
 Implicit Arguments Csnd [X Y].
 (* end hide *)

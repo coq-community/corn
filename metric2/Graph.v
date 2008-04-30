@@ -84,10 +84,10 @@ Definition CompactGraph (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stabl
 CompactImage (1#1) _ plFEX graphPoint.
 
 Lemma CompactGraph_correct1 : forall plX plFEX x s, (inCompact x s) ->
-inCompact (Strength (x,(Cmap plX f x))) (CompactGraph plFEX s).
+inCompact (Couple (x,(Cmap plX f x))) (CompactGraph plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph.
-setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x).
+setoid_replace (Couple (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x).
  auto using CompactImage_correct1.
 intros e1 e2.
 split;simpl.
@@ -243,36 +243,36 @@ Qauto_le.
 Qed.
 
 Lemma CompactGraph_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s, 
- inCompact (Strength (p,q1)) (CompactGraph plFEX s) ->
- inCompact (Strength (p,q2)) (CompactGraph plFEX s) ->
+ inCompact (Couple (p,q1)) (CompactGraph plFEX s) ->
+ inCompact (Couple (p,q2)) (CompactGraph plFEX s) ->
  ms_eq q1 q2.
 Proof.
 intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cmap plX f p).
  symmetry.
- rewrite <- (StrengthCorrect2 p q1).
+ rewrite <- (CoupleCorrect2 p q1).
  rapply CompactGraph_correct3.
  apply Hq1.
-rewrite <- (StrengthCorrect2 p q2).
+rewrite <- (CoupleCorrect2 p q2).
 rapply CompactGraph_correct3.
 apply Hq2.
 Qed.
 
 Lemma CompactGraph_correct : forall plX plFEX x y s, 
-inCompact (Strength (x,y)) (CompactGraph plFEX s) <->
+inCompact (Couple (x,y)) (CompactGraph plFEX s) <->
 (inCompact x s /\ ms_eq y (Cmap plX f x)).
 Proof.
 intros plX plFEX x y s.
 split; intros H.
  split;
-  rewrite <- (StrengthCorrect2 x y).
+  rewrite <- (CoupleCorrect2 x y).
   apply (@CompactGraph_correct2 plFEX).
   exact H.
  symmetry.
- transitivity (Csnd (Strength (x,y))).
+ transitivity (Csnd (Couple (x,y))).
   rapply CompactGraph_correct3.
   apply H.
- apply StrengthCorrect3.
+ apply CoupleCorrect3.
 destruct H as [H0 H1].
 change (x, y) with (PairMS x y).
 rewrite H1.
@@ -300,7 +300,7 @@ way. *)
 Variable X Y:MetricSpace.
 Let XY := ProductMS X Y.
 
-Definition graphPoint_b_raw (f:X -> Complete Y) (x:X) : Complete XY := Strength (Cunit x,f x).
+Definition graphPoint_b_raw (f:X -> Complete Y) (x:X) : Complete XY := Couple (Cunit x,f x).
 
 Open Local Scope uc_scope.
 
@@ -343,10 +343,10 @@ Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact sta
 CompactImage_b (1#1) _ plFEX graphPoint_b.
 
 Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
-inCompact (Strength (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
+inCompact (Couple (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 intros plX plFEX x s Hs.
 unfold CompactGraph_b.
-setoid_replace (Strength (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x).
+setoid_replace (Couple (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x).
  auto using CompactImage_b_correct1.
 intros e1 e2.
 split;simpl.
@@ -491,7 +491,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
   assert (Z:=regFun_prf_ex p (mu f ((1#2)*e2)) ((1#2)%Qpos*d')).
   destruct (mu f ((1#2)*e2)); try constructor.
   destruct Z; auto.
- assert (L:existsC X (fun x => ball (((1#2)*d') + d') (approximate p ((1#2)%Qpos*d')) (Strength_raw ((Cunit x), (f x)) ((1#2)*d')%Qpos))).
+ assert (L:existsC X (fun x => ball (((1#2)*d') + d') (approximate p ((1#2)%Qpos*d')) (Couple_raw ((Cunit x), (f x)) ((1#2)*d')%Qpos))).
   clear -H'.
   simpl in H'.
   unfold Cjoin_raw in H'.
@@ -557,36 +557,36 @@ Qauto_nonneg.
 Qed.
 
 Lemma CompactGraph_b_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s, 
- inCompact (Strength (p,q1)) (CompactGraph_b plFEX s) ->
- inCompact (Strength (p,q2)) (CompactGraph_b plFEX s) ->
+ inCompact (Couple (p,q1)) (CompactGraph_b plFEX s) ->
+ inCompact (Couple (p,q2)) (CompactGraph_b plFEX s) ->
  ms_eq q1 q2.
 Proof.
 intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cbind plX f p).
  symmetry.
- rewrite <- (StrengthCorrect2 p q1).
+ rewrite <- (CoupleCorrect2 p q1).
  rapply CompactGraph_b_correct3.
  apply Hq1.
-rewrite <- (StrengthCorrect2 p q2).
+rewrite <- (CoupleCorrect2 p q2).
 rapply CompactGraph_b_correct3.
 apply Hq2.
 Qed.
 
 Lemma CompactGraph_b_correct : forall plX plFEX x y s, 
-inCompact (Strength (x,y)) (CompactGraph_b plFEX s) <->
+inCompact (Couple (x,y)) (CompactGraph_b plFEX s) <->
 (inCompact x s /\ ms_eq y (Cbind plX f x)).
 Proof.
 intros plX plFEX x y s.
 split; intros H.
  split;
-  rewrite <- (StrengthCorrect2 x y).
+  rewrite <- (CoupleCorrect2 x y).
   apply (@CompactGraph_b_correct2 plFEX).
   exact H.
  symmetry.
- transitivity (Csnd (Strength (x,y))).
+ transitivity (Csnd (Couple (x,y))).
   rapply CompactGraph_b_correct3.
   apply H.
- apply StrengthCorrect3.
+ apply CoupleCorrect3.
 destruct H as [H0 H1].
 change (x, y) with (PairMS x y).
 rewrite H1.

@@ -70,7 +70,7 @@ rewrite map_map.
 rewrite in_map_iff.
 unfold graphPoint_b_raw.
 simpl.
-unfold Strength_raw.
+unfold Couple_raw.
 simpl.
 intros [z [Hz0 Hz1]].
 inversion Hz0.
