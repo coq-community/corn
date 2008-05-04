@@ -31,3 +31,4 @@ Require Export CRsin.
 Require Export CRcos.
 Require Export CRpi.
 Require Export CRarctan.
+Require Export CRabs.
