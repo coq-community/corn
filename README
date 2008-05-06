@@ -6,16 +6,11 @@ This file contains some basic information about C-CoRN.
 PREREQUISITES
 -------------
 
-C-CoRN (notice the capitals) is designed to run with Coq version 8.0.
-A (no longer updated) version compatible with version 7.4 is also
-available.
+C-CoRN (notice the capitals) is designed to run with Coq version 8.2.
 
 Before installing C-CoRN, please check that you have:
- - Coq version 8.0
-   (CoRN used to require a compiled source tree, but a binary package will
-    do these days.)
- - at least 128MiB RAM memory available (and preferably more, especially if
-   you plan to use the formalization of Real Analysis).
+ - Coq version 8.2
+ - at least 128MiB RAM memory available (and preferably more) 
  - GNU make version 3.80 or later
  - a POSIX-compliant operating system. This means Unix, a clone
    thereof or a good emulation layer on top of another OS. In
@@ -51,17 +46,23 @@ According to which version you downloaded you will also get some or all
 of the following directories:
  - algebra
  - complex
+ - coq_reals
+ - examples
  - fta
  - ftc
+ - logic
+ - metric2
  - metrics
  - model
+ - order
+ - raster
  - reals
  - transc
 
 COMPILING
 ---------
 
-C-CoRN now comes with a general purpose Makefile.  This allows you to
+C-CoRN comes with a general purpose Makefile.  This allows you to
 uniformly:
  - (re)compile C-CoRN;
  - automatically generate postscript or html documentation from C-CoRN;
@@ -126,9 +127,6 @@ It also populates the "bin" directory with CoRNc, CoRNtop and
 CoRNide. These are CoRN versions of coqc, coqtop and coqide,
 respectively. We suggest you add the "bin" directory of CoRN to your
 PATH.
-
-The old "ide" target is obsolete, as CoRN does not require a custom
-Coq image anymore.
 
 DEPENDENCIES
 ------------
