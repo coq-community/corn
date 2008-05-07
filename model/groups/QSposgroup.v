@@ -44,7 +44,10 @@ The positive rationals form with the operation  $(x,y) \mapsto xy/2$
 *)
 
 Lemma Qpos_multdiv2_is_CGroup : is_CGroup Qpos_multdiv2_as_CMonoid divmult4.
-intro x; case x; simpl; apply multdiv2_is_inv.
+Proof.
+intro x.
+unfold is_inverse.
+split; simpl; autorewrite with QposElim; field; discriminate.
 Qed.
 
 Definition Qpos_multdiv2_as_CGroup := Build_CGroup

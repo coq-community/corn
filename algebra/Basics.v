@@ -149,10 +149,6 @@ Qed.
 Transparent sym_eq.
 Transparent f_equal.
 
-Notation Pair := (pair (B:=_)).
-Notation Proj1 := (proj1 (B:=_)).
-Notation Proj2 := (proj2 (B:=_)).
-
 (* Following only needed in finite, but tha's now obsolete
 
 Lemma deMorgan_or_and: (A,B,X:Prop)((A\/B)->X)->(A->X)/\(B->X).
@@ -908,3 +904,84 @@ exact
   induction_ltof2T nat (fun m : nat => m) P F p).
 Defined.
 End InductionTT.
+
+(** This new version of postive recursion gives access to
+both n and n+1 for the 2n+1 case, while still maintaining efficency.
+*)
+Fixpoint positive_rect2_helper
+ (P : positive -> Type)
+ (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
+ (c2 : forall p : positive, P p -> P (xO p))
+ (c3 : P 1%positive) 
+ (b : bool) (p : positive) {struct p} : P (if b then Psucc p else p) :=
+ match p return (P (if b then Psucc p else p)) with
+ | xH    => if b return P (if b then (Psucc xH) else xH) then (c2 _ c3) else c3
+ | xO p' => if b return P (if b then (Psucc (xO p')) else xO p') 
+             then (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
+             else (c2 _ (positive_rect2_helper P c1 c2 c3 false _))
+ | xI p' => if b return P (if b then (Psucc (xI p')) else xI p') 
+             then (c2 _ (positive_rect2_helper P c1 c2 c3 true _))
+             else (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
+ end.
+
+Definition positive_rect2
+ (P : positive -> Type)
+ (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
+ (c2 : forall p : positive, P p -> P (xO p))
+ (c3 : P 1%positive) (p : positive) : P p :=
+positive_rect2_helper P c1 c2 c3 false p.
+
+Lemma positive_rect2_helper_bool : forall P c1 c2 c3 p,
+positive_rect2_helper P c1 c2 c3 true p =
+positive_rect2_helper P c1 c2 c3 false (Psucc p).
+Proof.
+intros P c1 c2 c3.
+induction p; try reflexivity.
+simpl.
+rewrite IHp.
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red1 : forall P c1 c2 c3 p,
+positive_rect2 P c1 c2 c3 (xI p) =
+c1 p (positive_rect2 P c1 c2 c3 (Psucc p)) (positive_rect2 P c1 c2 c3 p).
+Proof.
+intros P c1 c2 c3 p.
+unfold positive_rect2.
+simpl.
+rewrite positive_rect2_helper_bool.
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red2 : forall P c1 c2 c3 p,
+positive_rect2 P c1 c2 c3 (xO p) =
+c2 p (positive_rect2 P c1 c2 c3 p).
+reflexivity.
+Qed.
+
+Lemma positive_rect2_red3 : forall P c1 c2 c3,
+positive_rect2 P c1 c2 c3 (xH) = c3.
+reflexivity.
+Qed.
+
+(** Iteration for natural numbers. *)
+
+Fixpoint iterateN A (f:A -> A) (z:A) (n:nat) : list A :=
+match n with 
+ O => nil
+|S m => z :: (iterateN A f (f z) m)
+end.
+(* begin hide *)
+Implicit Arguments iterateN [A].
+(* end hide *)
+Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
+Proof.
+intros A f z n.
+revert f z.
+induction n.
+ reflexivity.
+simpl.
+intros f z.
+rewrite <- IHn.
+reflexivity.
+Qed.

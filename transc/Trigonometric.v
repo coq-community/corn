@@ -399,24 +399,20 @@ apply AbsIR_inv.
 
 auto.
 
-cut (maps_compacts_into realline realline (Fid IR{+} [-C-]y)); intros.
+cut (maps_compacts_into_weak realline realline (Fid IR{+} [-C-]y)); intros.
 apply Continuous_plus; apply Continuous_abs;
  apply Continuous_comp with realline; Contin.
 intros a b Hab H.
-exists (a[+]y); exists (b[+]y[+]One).
-cut (a[+]y [<] b[+]y[+]One). intro H0.
+exists (a[+]y); exists (b[+]y).
+cut (a[+]y [<=] b[+]y). intro H0.
 exists H0.
 split.
 Included.
 intros x Hx H1; inversion_clear H1.
 split.
 simpl in |- *; apply plus_resp_leEq; auto.
-simpl in |- *; apply leEq_transitive with (b[+]y).
+simpl in |- *; apply plus_resp_leEq; auto.
 apply plus_resp_leEq; auto.
-apply less_leEq; apply less_plusOne.
-apply leEq_less_trans with (b[+]y).
-apply plus_resp_leEq; auto.
-apply less_plusOne.
 apply
  four_induction
   with (P := fun n : nat => included (fun _ : IR => CTrue) (Dom (F' y n)));

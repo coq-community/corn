@@ -46,6 +46,9 @@ dense in any real number structure. *)
 Require Export Cauchy_IR.
 Require Export Nmonoid.
 Require Export Zring.
+Require Import Expon.
+Require Import Qpower.
+Require Import CornTac.
 
 Section Rational_sequence_prelogue.
 
@@ -589,6 +592,14 @@ Proof.
  assumption.
 Qed.
 
+Lemma inj_Q_ap : forall q1 q2, (q1 [#] q2) -> inj_Q q1 [#] inj_Q q2.
+Proof.
+intros q1 q2 H.
+destruct (ap_imp_less _ _ _ H);
+ [apply less_imp_ap|apply Greater_imp_ap];
+ apply inj_Q_less; assumption.
+Qed.
+
 Lemma leEq_inj_Q : forall q1 q2, (inj_Q q1 [<=] inj_Q q2) -> q1 [<=] q2.
 intros.
 rewrite leEq_def; intro.
@@ -608,7 +619,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma inj_Q_min : forall q1, inj_Q [--]q1 [=] [--](inj_Q q1).
+Lemma inj_Q_inv : forall q1, inj_Q [--]q1 [=] [--](inj_Q q1).
 Proof.
  intro.
  apply cg_cancel_lft with (x := inj_Q q1).
@@ -631,8 +642,32 @@ Proof.
  apply inj_Q_plus.
  astepr (inj_Q q1[+][--](inj_Q q2)).
  apply plus_resp_eq.
- apply inj_Q_min.
+ apply inj_Q_inv.
 Qed.
+
+Lemma inj_Q_div : forall q1 q2 H, inj_Q (q1/q2)%Q [=] (inj_Q q1[/]inj_Q q2[//]H). 
+Proof.
+ intros.
+ apply mult_cancel_rht with (inj_Q q2);[apply H|].
+ apply eq_symmetric.
+ eapply eq_transitive;[|apply inj_Q_mult].
+ eapply eq_transitive;[apply div_1|].
+ apply inj_Q_wd.
+ simpl.
+ field.
+ apply inj_Q_strext.
+ stepr (Zero:R1).
+ apply H.
+ rstepl (inj_Q q1[-]inj_Q q1).
+ apply eq_symmetric.
+ eapply eq_transitive;[|apply inj_Q_minus].
+ apply inj_Q_wd.
+ unfold cg_minus.
+ simpl.
+ ring.
+Qed.
+
+Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.
 
 (** Moreover, and as expected, the [AbsSmall] predicate is also
 preserved under the [inj_Q] *)
@@ -648,17 +683,6 @@ Proof.
  astepl (inj_Q [--]q1).
  apply inj_Q_leEq.
  assumption.
- apply cg_cancel_lft with (x := inj_Q q1).
- rstepr (Zero:R1).
- astepr (inj_Q (q1[+][--]q1)).
- apply eq_symmetric_unfolded.
- apply inj_Q_plus.
- astepr (inj_Q Zero).
- apply inj_Q_wd.
- algebra.
- simpl in |- *.
- rational.
-
  apply inj_Q_leEq.
  assumption.
 Qed.
@@ -674,7 +698,7 @@ Proof.
  apply leEq_wdl with (x := [--](inj_Q e)).
  assumption.
  apply eq_symmetric_unfolded.
- apply inj_Q_min.
+ apply inj_Q_inv.
  apply leEq_inj_Q. 
  assumption.
 Qed.
@@ -736,22 +760,6 @@ Proof.
  apply a.
  assumption.
 
- astepl (inj_Q (g_ m[+][--](g_ N))).
- astepr (inj_Q (g_ m)[+][--](inj_Q (g_ N))).
- astepr (inj_Q (g_ m)[+]inj_Q [--](g_ N)).
- apply inj_Q_plus.
- apply plus_resp_eq. 
- apply cg_cancel_lft with (x := inj_Q (g_ N)).
- astepr (Zero:R1).
- astepr (inj_Q (g_ N[+][--](g_ N))).
- apply eq_symmetric_unfolded.
- apply inj_Q_plus.
- astepr (inj_Q Zero).
- apply inj_Q_wd.
- algebra.
- simpl in |- *.
- rational.
- 
  apply pg.
  simpl in |- *.
  red in |- *. 
@@ -781,7 +789,95 @@ Proof.
  unfold pring in |- *; simpl in |- *.
  rational.
 Qed.
- 
+
+Lemma inj_Q_pring : forall n, inj_Q (pring _ n) [=] pring R1 n.
+intros n.
+change (inj_Q (zring n)[=]zring n).
+stepr (inj_Q (nring n)).
+ apply inj_Q_wd.
+ rewrite <- inject_nat_convert.
+ apply zring_plus_nat.
+stepr (nring n:R1).
+ apply inj_Q_nring.
+apply eq_symmetric.
+rewrite <- inject_nat_convert.
+apply zring_plus_nat.
+Qed.
+
+Lemma inj_Q_zring : forall n, inj_Q (zring n) [=] zring (R:=R1) n.
+Proof.
+intros [|n|n].
+  simpl.
+  rational.
+ simpl.
+ apply inj_Q_pring.
+change (inj_Q ([--](pring _ n))[=][--](pring _ n)).
+stepl ([--](inj_Q (zring (R:=Q_as_COrdField) n))).
+ apply un_op_wd_unfolded.
+ simpl.
+ apply inj_Q_pring. 
+apply eq_symmetric.
+apply inj_Q_inv.
+Qed.
+
+Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
+
+Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
+Proof.
+intros q.
+induction n.
+ change ((inj_Q (nring 1))[=]One).
+ stepr ((nring 1):R1).
+  apply (inj_Q_nring 1).
+ rational.
+rewrite inj_S.
+unfold Zsucc.
+stepr (inj_Q (q^n*q)%Q).
+ apply inj_Q_wd.
+ simpl.
+ rapply Qpower_plus'.
+ auto with *.
+stepr (inj_Q (q^n)%Q[*]inj_Q q).
+ apply inj_Q_mult.
+simpl.
+apply mult_wdl.
+assumption.
+Qed.
+
+Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^]n. 
+Proof.
+intros q [|n|n] H.
+  change (inj_Q (q ^ 0)%Q[=]One).
+  rstepr (nring 1:R1).
+  stepr (inj_Q 1%Q) by apply (inj_Q_nring 1).
+  apply eq_reflexive.
+ simpl.
+ change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
+ csetoid_rewrite_rev (inj_Q_power q n).
+ rewrite inject_nat_convert.
+ apply eq_reflexive.
+change ((inj_Q (/q ^ n))%Q[=](One[/]inj_Q q[//]H)[^]n).
+stepl (inj_Q ((1/q)^n)%Q).
+ stepr ((inj_Q (1/q)%Q)[^]n).
+  csetoid_rewrite_rev (inj_Q_power (1/q)%Q n).
+  rewrite inject_nat_convert.
+  apply eq_reflexive.
+ apply nexp_wd.
+ stepr (inj_Q 1%Q[/]_[//]H).
+  apply inj_Q_div.
+ apply div_wd.
+  rstepr (nring 1:R1).
+  apply (inj_Q_nring 1).
+ apply eq_reflexive.
+apply inj_Q_wd.
+change (((1 * / q) ^ n)%Q==(/ q ^ n))%Q.
+rewrite <- Qinv_power.
+rewrite Qmult_1_l.
+reflexivity.
+Qed.
+
+Hint Resolve inj_Q_power inj_Q_power_Z : algebra.
+
 (**
 ** Injection of [Q] is dense
 Finally we are able to prove the density of image of [Q] in [R1]. We
@@ -875,4 +971,66 @@ Proof.
  apply Archimedes'.
 Qed.
 
+Lemma Q_dense_in_CReals' : forall a b : R1,
+ a [<] b -> {q : Q_as_COrdField | a [<] inj_Q q | inj_Q q [<] b}.
+Proof.
+cut (forall a b : R1, Zero[<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
+intros H a b Hab.
+destruct (less_cotransitive_unfolded _ _ _ Hab Zero);[|apply H;assumption].
+assert (X:Zero[<][--]a).
+ rstepl ([--]Zero:R1).
+ apply inv_resp_less.
+ assumption.
+assert (Y:=inv_resp_less _ _ _ Hab).
+ destruct (H _ _ X Y) as [q Hqa Hqb].
+exists (-q)%Q.
+ stepr ([--](inj_Q q)).
+ apply inv_cancel_less.
+  stepl (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+ apply eq_symmetric; apply inj_Q_inv. 
+stepl ([--](inj_Q q)).
+apply inv_cancel_less.
+ stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+apply eq_symmetric; apply inj_Q_inv.
+
+cut  (forall a b : R1,
+Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
+intros H a b Hb Hab.
+destruct (Q_dense_in_CReals _ (shift_zero_less_minus _ _ _ Hab)) as [q Haq Hbq].
+assert (X0 := pos_ap_zero _ _ Haq).
+assert (X1 : Zero[<](b[/]inj_Q q[//]X0)).
+ apply div_resp_pos; assumption.
+assert (X2 : (a[/]inj_Q q[//]X0)[+]One[<](b[/]inj_Q q[//]X0)).
+ apply shift_plus_less'.
+ rstepr ((b[-]a)[/]inj_Q q[//]X0).
+ apply shift_less_div.
+  assumption.
+ rstepl (inj_Q q).
+ assumption.
+destruct (H _ _ X1 X2) as [r Hra Hrb].
+exists ((nring r)[*]q)%Q; csetoid_rewrite (inj_Q_mult (nring r) q).
+ eapply shift_less_mult.
+  assumption.
+ stepr (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+ apply Hra.
+eapply shift_mult_less.
+ assumption.
+stepl (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+apply Hrb.
+
+intros a b Hb Hab.
+destruct (Archimedes' a) as [n Hn].
+induction n.
+ exists 0; try assumption.
+destruct (less_cotransitive_unfolded _ _ _ Hab (nring (R:=R1) (S n))).
+ apply IHn.
+ apply plus_cancel_less with One.
+ apply c.
+exists (S n); assumption.
+Qed.
+ 
 End Rational_sequence_prelogue.
+
+Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.
+Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
+Hint Resolve inj_Q_power inj_Q_power_Z : algebra.

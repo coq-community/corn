@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -86,9 +87,9 @@ Record is_COrdField (F : CField)
 Record COrdField : Type := 
   {cof_crr   :> CField;
    cof_less  :  CCSetoid_relation cof_crr;
-   cof_leEq :  Relation cof_crr;
+   cof_leEq :  cof_crr -> cof_crr -> Prop;
    cof_greater :  CCSetoid_relation cof_crr;
-   cof_grEq : Relation cof_crr;
+   cof_grEq : cof_crr -> cof_crr -> Prop;
    cof_proof :  is_COrdField cof_crr cof_less cof_leEq cof_greater cof_grEq}.
 
 (**
@@ -370,6 +371,35 @@ Lemma less_leEq : forall x y : R, x [<] y -> x [<=] y.
 intros.
 rewrite leEq_def.
 apply less_antisymmetric_unfolded.
+assumption.
+Qed.
+
+Lemma leEq_or_leEq : forall x y:R, Not (Not (x[<=]y or y[<=]x)).
+Proof.
+intros x y H.
+apply H.
+right.
+rewrite leEq_def.
+intros H0.
+apply H.
+left.
+apply less_leEq.
+assumption.
+Qed.
+
+Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
+Proof.
+intros x y Hxy H.
+rewrite leEq_def in Hxy.
+apply H.
+right.
+apply (not_ap_imp_eq).
+intros H0.
+destruct (ap_imp_less _ _ _ H0).
+ apply H.
+ left.
+ assumption.
+apply Hxy.
 assumption.
 Qed.
 
@@ -1502,3 +1532,14 @@ Qed.
 End misc.
 
 End Properties_of_Ordering.
+
+Add Parametric Morphism c : (@cof_leEq c) with signature (@cs_eq (cof_crr c)) ==> (@cs_eq c) ==> iff as cof_leEq_wd.
+intros x1 x2 Hx y1 y2 Hy.
+split; intros.
+stepl x1 by assumption.
+stepr y1 by assumption.
+assumption.
+stepl x2 by symmetry;assumption.
+stepr y2 by symmetry;assumption.
+assumption.
+Qed.

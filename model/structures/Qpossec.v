@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -36,204 +36,299 @@
 
 (** printing Qpos $\mathbb{Q}^{+}$ #Q<SUP>+</SUP># *)
 
-Require Export Qsec.
-Require Import CLogic.
+Require Export QArith.
+Require Import Qpower.
+Require Import Qordfield.
+Require Import COrdFields2.
+Require Import Eqdep_dec.
+Require Import CornTac.
 
 (**
-** About [Qpos]
-We will prove some lemmas concerning rationals bigger than 0.
+* [Qpos]
+We define [Qpos] as a pair of positives (n,d) which represents the
+fraction n/d.  *)
 
-*** Constants
-One, two and four are all bigger than zero.
-*)
+Record Qpos : Set := QposMake 
+{QposNumerator : positive
+;QposDenominator : positive
+}.
 
-Lemma pos_QONE : QZERO<QONE.
-constructor.
+Notation "a # b" := (QposMake a b) (at level 55, no associativity) : Qpos_scope.
+
+Bind Scope Qpos_scope with Qpos.
+Delimit Scope Qpos_scope with Qpos.
+
+(** There is an injection from [Qpos] to [Q] that we make into a
+coersion. *)
+Definition QposAsQ (a:Qpos) : Q :=
+(Zpos (QposNumerator a))#(QposDenominator a).
+
+Coercion QposAsQ : Qpos >-> Q.
+
+(** Basic properties about [Qpos] *)
+Lemma Qpos_prf : forall a:Qpos, 0 < a.
+Proof.
+firstorder.
 Qed.
 
-Lemma pos_QTWO : QZERO<QTWO.
-constructor.
+Lemma Qpos_nonzero : forall x:Qpos, (x:Q)[#]0.
+Proof.
+intros x.
+rsapply pos_ap_zero.
+apply Qpos_prf.
 Qed.
 
-Lemma pos_QFOUR : QZERO<QFOUR.
-constructor.
+Lemma Qpos_nonneg : forall a:Qpos, 0 <= a.
+Proof.
+intros a.
+apply Qlt_le_weak.
+apply Qpos_prf.
 Qed.
 
-(** A positive rational is not zero.
-*)
-
-Definition pos_imp_nonzero : forall q : Q, (QZERO<q) -> ~(q==QZERO).
-intros q X.
-elim (Qlt_gives_apartness QZERO q).
-intros H0 H1 H2.
-set (i1 := Cinleft (QZERO<q) (q<QZERO) X) in *.
-set (i2 := H1 i1) in *.
-elim (ap_Q_tight0 q QZERO).
-intros H3 H4.
-elim (H4 H2).
-generalize ap_Q_symmetric0.
-intros H7.
-exact (H7 QZERO q i2).
+(** Any positive rational number can be transformed into a [Qpos]. *)
+Definition mkQpos (a:Q) (p:0 < a) : Qpos.
+intros [an ad] p.
+destruct an as [|an|an].
+compute in p.
+abstract discriminate p.
+exact (QposMake an ad).
+compute in p.
+abstract discriminate p.
+Defined.
+(* begin hide *)
+Implicit Arguments mkQpos [a].
+(* end hide *)
+Lemma QposAsmkQpos : forall (a:Q) (p:0<a), (QposAsQ (mkQpos p))=a.
+Proof.
+intros [[|an|an] ad] p.
+discriminate.
+reflexivity.
+discriminate.
 Qed.
+(* begin hide *)
+Implicit Arguments QposAsmkQpos [a].
+(* end hide *)
+Lemma QposAsQposMake : forall a b, (QposAsQ (QposMake a b)) = (Zpos a)#b.
+Proof.
+trivial.
+Qed.
+(* begin hide *)
+Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
+(* end hide *)
 
 (**
-*** Multiplication
-The product of two positive rationals is again positive.
+*** Equality
 *)
+Definition QposEq (a b:Qpos) := Qeq a b.
 
-Lemma Qmult_pres_pos0 : forall x y : Q, (QZERO<x) -> (QZERO<y) -> QZERO<x*y.
-intros x y H H0.
-apply Qmult_resp_pos_Qlt.
-exact H.
-exact H0.
+Add Relation Qpos QposEq
+ reflexivity proved by (fun (x:Qpos) => refl_Qeq x)
+ symmetry proved by (fun (x y:Qpos) => sym_Qeq x y)
+ transitivity proved by (fun (x y z:Qpos) => trans_Qeq x y z) as QposSetoid.
+
+Definition QposAp (a b:Qpos) := Qap a b.
+
+(**
+*** Addition
+*)
+Definition Qpos_plus (x y:Qpos) : Qpos. 
+intros x y.
+apply mkQpos with (x+y).
+abstract (rsapply plus_resp_pos; apply Qpos_prf).
+Defined.
+
+Infix "+" := Qpos_plus : Qpos_scope.
+(* begin hide *)
+Add Morphism Qpos_plus : Qpos_plus_wd.
+intros x1 x2 Hx y1 y2 Hy.
+unfold QposEq in *.
+unfold Qpos_plus.
+autorewrite with QposElim.
+apply Qplus_comp; assumption.
 Qed.
+(* end hide *)
+Lemma Q_Qpos_plus : forall (x y:Qpos), ((x + y)%Qpos:Q)=(x:Q)+(y:Q).
+Proof.
+trivial.
+Qed.
+(* begin hide *)
+Hint Rewrite Q_Qpos_plus : QposElim.
+(* end hide *)
+(**
+*** Multiplicaiton
+*)
+Definition Qpos_mult (x y:Qpos) : Qpos. 
+intros x y.
+apply mkQpos with (x*y).
+abstract (rsapply mult_resp_pos; apply Qpos_prf).
+Defined.
 
+Infix "*" := Qpos_mult : Qpos_scope.
+(* begin hide *)
+Add Morphism Qpos_mult : Qpos_mult_wd.
+intros x1 x2 Hx y1 y2 Hy.
+unfold QposEq in *.
+unfold Qpos_mult.
+autorewrite with QposElim.
+apply Qmult_comp; assumption.
+Qed.
+(* end hide *)
+Lemma Q_Qpos_mult : forall (x y:Qpos), ((x * y)%Qpos:Q)=(x:Q)*(y:Q).
+Proof.
+trivial.
+Qed.
+(* begin hide *)
+Hint Rewrite Q_Qpos_mult : QposElim.
+(* end hide *)
 (**
 *** Inverse
-The inverse of a positive rational is again positive.
 *)
-
-Lemma inv_pres_pos0 : forall x (H:QZERO<x), QZERO<Qinv x (pos_imp_nonzero x H).
-intros x H.
-unfold QZERO in |- *.
-unfold Qlt in |- *.
-simpl in |- *.
-apply toCProp_Zlt.
-rewrite Zmult_1_r.
-unfold Qlt in H.
-unfold QZERO in H.
-generalize H.
-simpl in |- *.
-intro i.
-set (i0 := CZlt_to 0 (Qnum x * 1%positive) i) in *.
-rewrite Zmult_1_r in i0.
-generalize i0.
-destruct x as [[num|x|num] den]; auto.
+Definition Qpos_inv (x:Qpos) : Qpos :=
+((QposDenominator x)#(QposNumerator x))%Qpos.
+(* begin hide *)
+Add Morphism Qpos_inv : Qpos_inv_wd.
+intros [x1n x1d] [x2n x2d] Hx.
+unfold QposEq in *.
+unfold Qpos_inv.
+unfold Qeq in *.
+simpl in *.
+rewrite Pmult_comm.
+symmetry.
+rewrite Pmult_comm.
+apply Hx.
 Qed.
+(* end hide *)
+Lemma Q_Qpos_inv : forall (x:Qpos), Qpos_inv x = / x :> Q.
+Proof.
+trivial.
+Qed.
+Hint Rewrite Q_Qpos_inv : QposElim.
+
+Notation "a / b" := (Qpos_mult a (Qpos_inv b)) : Qpos_scope.
 
 (**
-*** Special multiplication
-Now we will investigate the function $(x,y) \mapsto xy/2$#(x,y)
-&#x21A6; xy/2#. We will see that its unit is 2. Its inverse map is $x
-\mapsto 4/x$ #x &#x21A6; 4/x#.
+*** Tactics
+These tactics solve Ring and Field equations over [Qpos] by converting
+them to problems over [Q].
 *)
+Ltac QposRing :=
+ unfold QposEq;
+ autorewrite with QposElim;
+ ring.
 
-Lemma QTWOpos_is_rht_unit0 : forall x : Q, (QZERO<x) ->
- Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(x*QTWO)==x.
-intros x h.
-apply
- trans_Qeq with ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*QTWO)*x).
-apply
- trans_Qeq with (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(QTWO*x)).
-apply Qmult_simpl.
-apply refl_Qeq.
-set (i := Qmult_sym) in *.
-generalize i.
-intuition.
-apply Qmult_assoc.
-set (i1 := Qinv_is_inv) in *.
-set (i2 := i1 QTWO (pos_imp_nonzero QTWO pos_QTWO)) in *.
-elim i2.
-intros H1 H2.
-apply trans_Qeq with (QONE*x).
-apply Qmult_simpl.
-exact H1.
-apply refl_Qeq.
-cut (QONE*x==x*QONE).
-intro H3.
-apply trans_Qeq with (x*QONE).
-exact H3.
-apply Qmult_n_1.
-apply Qmult_sym.
+Ltac QposField :=
+ unfold QposEq;
+ autorewrite with QposElim;
+ field.
+
+(** This is a standard way of decomposing a rational b that is greater than
+a into a plus a positive value c. *)
+Lemma Qpos_lt_plus : forall (a b:Q), 
+ a< b ->
+ {c:Qpos | b==(a+c)}.
+Proof.
+intros.
+assert (0<b-a).
+rsapply shift_zero_less_minus.
+assumption.
+exists (mkQpos H0).
+QposRing.
+Defined.
+(* begin hide *)
+Implicit Arguments Qpos_lt_plus [a b].
+(* end hide *)
+(**
+*** Power
+*)
+Lemma Qpos_power_pos : forall (x:Qpos) z, 0 < x^z.
+Proof.
+intros x z.
+destruct (Qle_lt_or_eq _ _ (Qpower_pos x z (Qlt_le_weak _ _ (Qpos_prf x))));[assumption|].
+destruct z.
+discriminate H.
+elim (Qpower_not_0_positive x p).
+apply Qpos_nonzero.
+symmetry; assumption.
+elim (Qpower_not_0_positive (/x) p).
+change (~(Qpos_inv x) == 0).
+apply Qpos_nonzero.
+change ((/x)^p==0).
+rewrite Qinv_power.
+symmetry; assumption.
 Qed.
 
-Lemma QTWOpos_is_left_unit0 : forall x : Q, (QZERO<x) ->
- Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(QTWO*x)==x.
-intro x.
-intro h.
-apply
- trans_Qeq with ((Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*QTWO)*x). 
-apply Qmult_assoc.
-set (i1 := Qinv_is_inv) in *.
-set (i2 := i1 QTWO (pos_imp_nonzero QTWO pos_QTWO)) in *.
-elim i2.
-intros H1 H2.
-apply trans_Qeq with (QONE*x).
-apply Qmult_simpl.
-exact H1.
-apply refl_Qeq.
-apply trans_Qeq with (x*QONE).
-apply Qmult_sym.
-apply Qmult_n_1.
+Definition Qpos_power (x:Qpos) (z:Z) : Qpos.
+intros x z.
+apply mkQpos with (x^z).
+apply Qpos_power_pos.
+Defined.
+
+Infix "^" := Qpos_power : Qpos_scope.
+(* begin hide *)
+Add Morphism Qpos_power : Qpos_power_wd.
+intros x1 x2 Hx y.
+unfold QposEq in *.
+unfold Qpos_power.
+autorewrite with QposElim.
+rewrite Hx.
+reflexivity.
+Qed.
+(* end hide *)
+Lemma Q_Qpos_power : forall (x:Qpos) z, ((x^z)%Qpos:Q)==(x:Q)^z.
+Proof.
+intros.
+unfold Qpos_power.
+autorewrite with QposElim.
+reflexivity.
+Qed.
+Hint Rewrite Q_Qpos_power : QposElim.
+
+(**
+*** Summing lists
+*)
+Definition QposSum (l:list Qpos) : Q := fold_right
+(fun (x:Qpos) (y:Q) => x+y) (Zero:Q) l.
+
+Lemma QposSumNonNeg : forall l, 0 <= QposSum l.
+Proof.
+induction l.
+rsapply leEq_reflexive.
+simpl.
+rsapply plus_resp_nonneg.
+rsapply less_leEq.
+apply Qpos_prf.
+assumption.
 Qed.
 
-Lemma multdiv2_is_inv : forall x (H : QZERO<x),
- (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*
-  (x*(QFOUR*Qinv x (pos_imp_nonzero x H)))==QTWO) /\
- (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*
-  ((QFOUR*Qinv x (pos_imp_nonzero x H))*x)==QTWO).
-intros x scs_prf.
-split.
-apply
- trans_Qeq
-  with
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*
-     (x*(Qinv x (pos_imp_nonzero x scs_prf)*QFOUR))).
-apply Qmult_simpl.
-apply refl_Qeq.
-apply Qmult_simpl.
-apply refl_Qeq.
-apply Qmult_sym.
-apply
- trans_Qeq
-  with
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*
-     ((x*Qinv x (pos_imp_nonzero x scs_prf))*QFOUR)).
-apply Qmult_simpl.
-apply refl_Qeq.
-apply Qmult_assoc.
-apply
- trans_Qeq
-  with (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(QONE*QFOUR)).
-apply Qmult_simpl.
-apply refl_Qeq.
-apply Qmult_simpl.
-set (i0 := Qinv_is_inv) in *.
-elim (i0 x (pos_imp_nonzero x scs_prf)).
-intuition.
-apply refl_Qeq.
-unfold Qmult in |- *.
-unfold QTWO in |- *. 
-unfold QONE in |- *.
-unfold QFOUR in |- *.
-unfold Qeq in |- *.
-simpl in |- *.
-intuition.
-apply
- trans_Qeq
-  with
-    (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*
-     (QFOUR*(Qinv x (pos_imp_nonzero x scs_prf)*x))).
-apply Qmult_simpl.
-apply refl_Qeq.
-apply sym_Qeq.
-apply Qmult_assoc.
-apply
- trans_Qeq
-  with (Qinv QTWO (pos_imp_nonzero QTWO pos_QTWO)*(QFOUR*QONE)). 
-apply Qmult_simpl.
-apply refl_Qeq.
-apply Qmult_simpl.
-apply refl_Qeq.
-set (i0 := Qinv_is_inv) in *. 
-elim (i0 x (pos_imp_nonzero x scs_prf)).
-intuition.
-unfold Qmult in |- *.
-unfold QTWO in |- *. 
-unfold QONE in |- *.
-unfold QFOUR in |- *.
-unfold Qeq in |- *.
-simpl in |- *.
-intuition.
+(** A version of [Qred] for [Qpos]. *)
+Lemma QposRed_prf : forall (a:Q), (0 < a) -> (0 < Qred a).
+Proof.
+intros a Ha.
+rewrite Qred_correct.
+assumption.
 Qed.
 
+Definition QposRed (a:Qpos) : Qpos := mkQpos (QposRed_prf a (Qpos_prf a)).
+
+Lemma QposRed_complete : forall p q : Qpos, p == q -> QposRed p = QposRed q.
+Proof.
+intros p q H.
+unfold QposRed.
+generalize (QposRed_prf p (Qpos_prf p)).
+generalize (QposRed_prf q (Qpos_prf q)).
+rewrite (Qred_complete p q H).
+unfold Qlt, Zlt.
+intros A B.
+assert (X:forall x y : comparison, x = y \/ x <> y).
+decide equality.
+rewrite (eq_proofs_unicity X A B).
+reflexivity.
+Qed.
+
+Lemma QposRed_correct : forall p, QposRed p == p.
+Proof.
+unfold QposRed.
+intros p.
+autorewrite with QposElim.
+apply Qred_correct.
+Qed.

@@ -891,8 +891,6 @@ Proof.
  apply G_m_n_upper.
  constructor.
  apply x_in_Intrvl_r.
- apply eq_symmetric_unfolded.
- apply inj_Q_minus.
 Qed.
 
 Lemma x_is_SeqLimit_G : forall x : R1, SeqLimit (inj_Q_G_as_CauchySeq x) x. 
@@ -966,10 +964,6 @@ Proof.
        nringS_ap_zero Q_as_COrdField N))).
  apply inj_Q_wd.
  rational.
- apply inj_Q_mult.
- apply mult_wd.
- apply inj_Q_nring.
- apply eq_reflexive_unfolded.
 
  apply
   AbsSmall_leEq_trans

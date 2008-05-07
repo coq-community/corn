@@ -388,7 +388,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
-      constr:(fun p:A1 /\ A2 => conj (d1 (Proj1 p)) (d2 (Proj2 p)))
+      constr:(fun p:A1 /\ A2 => conj (d1 (fst p)) (d2 (snd p)))
   | (?X1 and ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
@@ -415,8 +415,8 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with ba2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun p:A1 <-> A2 =>
-                conj (fun b1 => ab2 (Proj1 p (ba1 b1)))
-                  (fun b2 => ab1 (Proj2 p (ba2 b2))))
+                conj (fun b1 => ab2 (fst p (ba1 b1)))
+                  (fun b2 => ab1 (snd p (ba2 b2))))
   | (Iff ?X1 ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
@@ -505,7 +505,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
-      constr:(fun q:_ /\ _ => conj (d1 (Proj1 q)) (d2 (Proj2 q)))
+      constr:(fun q:_ /\ _ => conj (d1 (fst q)) (d2 (snd q)))
   | (?X1 and ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
@@ -532,8 +532,8 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with ba2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q:_ <-> _ =>
-                conj (fun a1:A1 => ba2 (Proj1 q (ab1 a1)))
-                  (fun a2:A2 => ba1 (Proj2 q (ab2 a2))))
+                conj (fun a1:A1 => ba2 (fst q (ab1 a1)))
+                  (fun a2:A2 => ba1 (snd q (ab2 a2))))
   | (Iff ?X1 ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
@@ -1048,7 +1048,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
-      constr:(fun p:A1 /\ A2 => conj (d1 (Proj1 p)) (d2 (Proj2 p)))
+      constr:(fun p:A1 /\ A2 => conj (d1 (fst p)) (d2 (snd p)))
   | (?X1 and ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
@@ -1075,8 +1075,8 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with ba2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun p:A1 <-> A2 =>
-                conj (fun b1 => ab2 (Proj1 p (ba1 b1)))
-                  (fun b2 => ab1 (Proj2 p (ba2 b2))))
+                conj (fun b1 => ab2 (fst p (ba1 b1)))
+                  (fun b2 => ab1 (snd p (ba2 b2))))
   | (Iff ?X1 ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
@@ -1174,7 +1174,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
-      constr:(fun q:_ /\ _ => conj (d1 (Proj1 q)) (d2 (Proj2 q)))
+      constr:(fun q:_ /\ _ => conj (d1 (fst q)) (d2 (snd q)))
   | (?X1 and ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
@@ -1201,8 +1201,8 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with ba2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q:_ <-> _ =>
-                conj (fun a1:A1 => ba2 (Proj1 q (ab1 a1)))
-                  (fun a2:A2 => ba1 (Proj2 q (ab2 a2))))
+                conj (fun a1:A1 => ba2 (fst q (ab1 a1)))
+                  (fun a2:A2 => ba1 (snd q (ab2 a2))))
   | (Iff ?X1 ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1

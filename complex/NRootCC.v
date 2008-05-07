@@ -1370,7 +1370,7 @@ apply (cs_un_op_strext _ (nexp_op (R:=CC) n)).
 (* astepr (Zero::CC). *)
   apply ap_wdr_unfolded with (Zero:CC).
   exact c_.
-  apply eq_symmetric_unfolded. apply zero_nexp. exact x. exact H.
+  apply eq_symmetric_unfolded. apply zero_nexp. exact H.
 Qed.
 
 Lemma nrootCC_5 : forall n : nat, 0 < n -> {z : CC | z[^]n [=] c}.

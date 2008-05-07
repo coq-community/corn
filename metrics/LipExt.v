@@ -175,6 +175,7 @@ apply dsub'_is_lipschitz.
 unfold dIR.
 astepr (ABSIR (C[*](dsub' M P y x[-]dsub' M P y y0))).
 apply AbsIR_mult.
+apply less_leEq.
 apply constant_positive.
 apply ABSIR_wd; auto with algebra.
 Qed.

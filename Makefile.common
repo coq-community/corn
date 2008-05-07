@@ -6,6 +6,7 @@
 # Rik van Ginneken
 # Dimitri Hendriks
 # Sébastien Hinderer
+# Cezary Kaliszyk
 # Bart Kirkels
 # Pierre Letouzey
 # Iris Loeb
@@ -83,7 +84,11 @@ PRIVFILES :=
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES := algebra complex fta ftc metrics model reals tactics transc
+COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2
+
+# Files to filter out of the tree.pdf diagra
+#TREE_FILTER := coq_reals/ model/
+TREE_FILTER := 
 
 # Directory that will contain the html version of the documentation
 HTMLDIR := $(SRCDIR)/doc/html
@@ -318,6 +323,18 @@ $(DOCDEPEND) : $(DEPEND)
 	  fi; \
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
+tree.dot : PreDot.hs $(DEPEND)
+	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
+
+tree.svg : tree.dot
+	dot -Tsvg < $< > $@
+
+tree.ps : tree.dot
+	dot -Tps < $< > $@
+
+tree.pdf : tree.ps
+	epstopdf $<
+
 # Rules to create documentation depend on the whole compilation process
 # because they need the glob file to generate global references.
 
@@ -334,7 +351,7 @@ doc-html : doc-pre
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
 
-doc : doc-ps doc-html
+doc : doc-ps doc-html tree.svg
 
 clean : depclean binaries-clean lib-clean doc-clean
 	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f

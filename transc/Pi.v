@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -33,6 +34,8 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
+
+Require Import CornTac.
 Require Export SinCos.
 
 Section Properties_of_Pi.
@@ -100,7 +103,7 @@ Opaque Sine.
  FEQ. Deriv.
 assert (H4 : Continuous_I (Min_leEq_Max x t) Sine).
  apply included_imp_Continuous with realline; Contin.
-set (B := Barrow _ _ Continuous_Sin Zero CI CI {--}Cosine) in *.
+set (B := Barrow _ _ Continuous_Sin CI {--}Cosine) in *.
 set (B' := B H3 x t H4 CI CI) in *.
 apply less_wdr with (Cosine x CI[-]Integral H4).
 2: unfold cg_minus at 1 in |- *; apply bin_op_wd_unfolded.
@@ -944,6 +947,33 @@ apply Cos_plus_HalfPi.
 apply un_op_wd_unfolded; apply Sin_plus_HalfPi.
 Qed.
 
+Lemma Tan_plus_HalfPi : forall x Hx Hx' H, Tan (x[+]Pi[/]TwoNZ) Hx[=]([--]One[/](Tan x Hx')[//]H).
+Proof.
+intros x Hy Hx H.
+set (y:=x[+]Pi [/]TwoNZ) in *.
+assert (H0:Cos y[#]Zero).
+ destruct Hy as [[] [[] Hy]].
+ apply (Hy CI).
+assert (H1:Cos x[#]Zero).
+ clear H.
+ destruct Hx as [[] [[] Hx]].
+ apply (Hx CI).
+csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
+unfold y.
+assert (H2:([--](Sin x))[#]Zero).
+ csetoid_rewrite_rev (Cos_plus_HalfPi x).
+ apply H0.
+stepr (Cos x[/]([--](Sin x))[//]H2).
+ apply div_wd.
+  apply Sin_plus_HalfPi.
+ apply Cos_plus_HalfPi.
+clear H0.
+rstepl (((Cos x[/][--](Sin x)[//]H2)[*](Tan x Hx))[/](Tan x Hx)[//]H).
+apply div_wd;[|apply eq_reflexive].
+csetoid_rewrite (Tan_Sin_over_Cos x Hx H1).
+rational.
+Qed.
+
 Hint Resolve Sin_plus_Pi Cos_plus_Pi: algebra.
 
 (** Sine and cosine have period [Two Pi], tangent has period [Pi]. *)
@@ -977,6 +1007,52 @@ unfold Tan, Tang in |- *; simpl in |- *; algebra.
 inversion_clear Hx.
 inversion_clear X0.
 simpl in |- *; auto.
+Qed.
+
+Lemma Cos_one_gt_0 : Zero [<] Cos One.
+apply cos_pi_seq_pos with (1%nat).
+apply less_leEq.
+apply pos_one.
+unfold pi_seq.
+rewrite Cos_zero.
+apply eq_imp_leEq.
+rational.
+Qed.
+
+Lemma Pi_gt_2 : Two [<] Pi.
+unfold Pi.
+rstepl (Two [*] One:IR).
+rapply mult_resp_less_lft.
+apply less_leEq_trans with (One [+] (Cos One)).
+rstepl (One [+] Zero:IR).
+rapply plus_resp_leEq_less.
+rapply eq_imp_leEq.
+reflexivity.
+apply Cos_one_gt_0.
+rapply str_leEq_seq_so_leEq_Lim.
+exists (2%nat).
+intros i iH.
+change (One [+] Cos One[<=] pi_seq i).
+induction i.
+elimtype False.
+auto with *.
+clear IHi.
+induction i.
+elimtype False.
+auto with *.
+clear iH.
+clear IHi.
+induction i.
+unfold pi_seq.
+rewrite Cos_zero.
+setoid_replace (Zero [+] One:IR) with (One:IR);[|rational].
+apply eq_imp_leEq.
+reflexivity.
+apply leEq_transitive with (pi_seq (S (S i))).
+assumption.
+apply less_leEq.
+apply pi_seq_incr.
+apply pos_two.
 Qed.
 
 End Sin_And_Cos.

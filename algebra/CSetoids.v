@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -49,6 +50,7 @@ Definition of a constructive setoid with apartness,
 i.e.%\% a set with an equivalence relation and an apartness relation compatible with it.
 *)
 
+Require Import CornTac.
 Require Export CLogic.
 Require Export Step.
 
@@ -1407,3 +1409,19 @@ Definition nat_less_n_fun' (S : CSetoid) (n : nat) (f : forall i : nat, i <= n -
 
 Implicit Arguments nat_less_n_fun [S n].
 Implicit Arguments nat_less_n_fun' [S n].
+
+Add Parametric Relation c : (cs_crr c) (@cs_eq c)
+  reflexivity proved by (eq_reflexive c)
+  symmetry proved by (eq_symmetric c)
+  transitivity proved by (eq_transitive c)
+  as CSetoid_eq_Setoid.
+
+Add Parametric Morphism c1 c2 c3 f: (csbf_fun c1 c2 c3 f) with signature (@cs_eq c1) ==> (@cs_eq c2) ==> (@cs_eq c3) as csbf_fun_wd.
+intros x1 x2 Hx y1 y2 Hy.
+rapply csbf_wd; assumption.
+Qed.
+
+Add Parametric Morphism c1 c2 f: (@csf_fun c1 c2 f) with signature (@cs_eq c1) ==> (@cs_eq c2) as csf_fun_wd.
+intros x1 x2 Hx.
+rapply csf_wd; assumption.
+Qed.

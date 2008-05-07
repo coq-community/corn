@@ -123,7 +123,16 @@ astepr (x[!]nring 1[//]Hx).
 simpl in |- *; algebra.
 Qed.
 
-Hint Resolve power_zero power_one: algebra.
+Lemma one_power : forall (x : IR) H, One[!]x[//]H [=] One.
+Proof.
+intros x H.
+unfold power.
+astepl  (Exp (x[*]Zero)).
+rstepl (Exp (Zero)).
+algebra.
+Qed.
+
+Hint Resolve power_zero power_one one_power: algebra.
 
 Opaque nexp_op.
 
@@ -220,6 +229,76 @@ Qed.
 
 Hint Resolve power_div: algebra.
 
+Lemma real_power_resp_leEq_rht : forall x y p Hx Hy,
+ Zero[<=] p -> x[<=]y -> x[!]p[//]Hx [<=] y[!]p[//]Hy.
+Proof.
+intros x y p Hp Hx Hy H.
+unfold power.
+apply Exp_resp_leEq.
+apply mult_resp_leEq_lft; try assumption.
+apply Log_resp_leEq.
+assumption.
+Qed.
+
+Lemma real_power_resp_less_rht : forall x y p Hx Hy,
+ Zero[<] p -> x[<]y -> x[!]p[//]Hx [<] y[!]p[//]Hy.
+Proof.
+intros x y p Hp Hx Hy H.
+unfold power.
+apply Exp_resp_less.
+apply mult_resp_less_lft; try assumption.
+apply Log_resp_less.
+assumption.
+Qed.
+
+Lemma real_power_resp_leEq_lft : forall x p q Hx Hx',
+ One[<=]x -> p[<=]q -> x[!]p[//]Hx [<=] x[!]q[//]Hx'.
+Proof.
+intros x p q Hx Hx' Hx0 H.
+unfold power.
+apply Exp_resp_leEq.
+stepr (q[*]Log x Hx) by
+ csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive.
+apply mult_resp_leEq_rht; try assumption.
+apply Zero_leEq_Log.
+assumption.
+Qed.
+
+Lemma real_power_resp_less_lft : forall x p q Hx Hx',
+ One[<]x -> p[<]q -> x[!]p[//]Hx [<] x[!]q[//]Hx'.
+Proof.
+intros x p q Hx Hx' Hx0 H.
+unfold power.
+apply Exp_resp_less.
+stepr (q[*]Log x Hx) by
+ csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive.
+apply mult_resp_less; try assumption.
+apply Zero_less_Log.
+assumption.
+Qed.
+
+Lemma real_power_resp_leEq_both : forall x y p q Hx Hy',
+ One[<=]x -> Zero [<=] p -> x[<=]y -> p[<=]q -> 
+ x[!]p[//]Hx [<=] y[!]q[//]Hy'.
+Proof.
+intros x y p q Hx Hy Hx0 Hp H0 H1.
+apply leEq_transitive with (y[!]p[//]Hy).
+ apply real_power_resp_leEq_rht; assumption.
+apply real_power_resp_leEq_lft; try assumption.
+apply leEq_transitive with x; assumption.
+Qed.
+
+Lemma real_power_resp_less_both : forall x y p q Hx Hy',
+ One[<]x -> Zero [<] p -> x[<]y -> p[<]q -> 
+ x[!]p[//]Hx [<] y[!]q[//]Hy'.
+Proof.
+intros x y p q Hx Hy Hx0 Hp H0 H1.
+apply less_transitive_unfolded with (y[!]p[//]Hy).
+ apply real_power_resp_less_rht; assumption.
+apply real_power_resp_less_lft; try assumption.
+apply less_transitive_unfolded with x; assumption.
+Qed.
+
 Section Power_Function.
 
 (**
@@ -256,12 +335,12 @@ apply Continuous_comp with realline.
 2: apply Continuous_mult;
    [ apply H1 | apply Continuous_comp with (openl Zero); auto ].
 3: apply Continuous_Log.
-apply Continuous_imp_maps_compacts_into.
+apply maps_compacts_into_strict_imp_weak; apply Continuous_imp_maps_compacts_into.
 apply Continuous_mult; auto.
 apply Continuous_comp with (openl Zero); auto.
 2: apply Continuous_Log.
-apply positive_imp_maps_compacts_into; auto.
-apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
 Qed.
 
 End Power_Function.
@@ -534,7 +613,7 @@ apply Continuous_imp_maps_compacts_into.
 apply Continuous_mult.
 apply Derivative_imp_Continuous with pJ G'; auto.
 apply Continuous_comp with (openl Zero).
-apply positive_imp_maps_compacts_into; auto.
+apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
 apply Derivative_imp_Continuous with pJ F'; auto.
 apply Derivative_imp_Continuous with pJ F'; auto.
 apply Continuous_Log.
