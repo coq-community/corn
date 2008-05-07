@@ -323,6 +323,9 @@ $(DOCDEPEND) : $(DEPEND)
 	  fi; \
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
+tree.svg : PreDot.hs $(DEPEND)
+	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) | dot -Tsvg > $@
+
 tree.ps : PreDot.hs $(DEPEND)
 	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) | dot -Tps > $@
 
@@ -345,7 +348,7 @@ doc-html : doc-pre
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
 
-doc : doc-ps doc-html
+doc : doc-ps doc-html tree.svg
 
 clean : depclean binaries-clean lib-clean doc-clean
 	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
