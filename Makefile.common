@@ -86,6 +86,10 @@ PRIVFILES :=
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
 COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2
 
+# Files to filter out of the tree.pdf diagra
+#TREE_FILTER := coq_reals/ model/
+TREE_FILTER := 
+
 # Directory that will contain the html version of the documentation
 HTMLDIR := $(SRCDIR)/doc/html
 # Directory that contains the postscript versionofthe doc:
@@ -318,6 +322,12 @@ $(DOCDEPEND) : $(DEPEND)
 	    done; \
 	  fi; \
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
+
+tree.ps : PreDot.hs $(DEPEND)
+	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) | dot -Tps > $@
+
+tree.pdf : tree.ps
+	epstopdf $<
 
 # Rules to create documentation depend on the whole compilation process
 # because they need the glob file to generate global references.
