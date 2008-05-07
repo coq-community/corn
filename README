@@ -36,7 +36,6 @@ level:
  - Makefile
  - Makefile.{realpath,common}
  - README
- - tree.ps.gz
 and the directories
  - doc
  - tactics
@@ -84,7 +83,8 @@ allowed:
                  full recomputation of the dependencies.
  distclean    -> removes things that should not be distributed from a
                  VCS checkout.
- doc          -> produces both postscript and html documentation
+ doc          -> produces both postscript and html documentation and
+                 and SVG dependency graph.
  doc-clean    -> removes all documentation files
  doc-html     -> produces only html documentation
  doc-ps       -> produces only postscript documentation
@@ -131,9 +131,16 @@ PATH.
 DEPENDENCIES
 ------------
 
-The distribution includes a (gzip'ed) postscript file tree.ps.gz
-with the dependency tree of all the files in the standard, full,
-version of C-CoRN.
+The distribution can build a dependency graph.  run
+
+ make tree.pdf
+
+or 
+
+ make tree.svg
+
+to build it.
+This requires graphviz and a haskell interpreter.
 
 OTHERS
 ------

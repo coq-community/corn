@@ -323,11 +323,14 @@ $(DOCDEPEND) : $(DEPEND)
 	  fi; \
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
-tree.svg : PreDot.hs $(DEPEND)
-	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) | dot -Tsvg > $@
+tree.dot : PreDot.hs $(DEPEND)
+	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
 
-tree.ps : PreDot.hs $(DEPEND)
-	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) | dot -Tps > $@
+tree.svg : tree.dot
+	dot -Tsvg < $< > $@
+
+tree.ps : tree.dot
+	dot -Tps < $< > $@
 
 tree.pdf : tree.ps
 	epstopdf $<
