@@ -995,7 +995,7 @@ destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
  change (QposEq d (e+c)) in Hc;
  rewrite Hc;
  rewrite <- ball_Cunit in H0;
- (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by unfold c';QposRing);
+ (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by (unfold c';QposRing));
  eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
   [apply ball_approx_r|apply ball_approx_l]).
 right.
