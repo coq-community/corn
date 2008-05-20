@@ -41,7 +41,8 @@ Require Export MoreFunctions.
 
 Section Definitions.
 
-(** *More on Sequences and Series
+(**
+* More on Sequences and Series
 
 We will now extend our convergence definitions and results for
 sequences and series of functions defined in compact intervals to
@@ -52,11 +53,11 @@ arbitrary intervals.
 will be continuous (in [J]) functions.
 %\end{convention}%
 
-**Sequences
+** Sequences
 
 First we will consider the case of sequences.
 
-***Definitions
+*** Definitions
 
 Some of the definitions do not make sense in this more general setting
 (for instance, because the norm of a function is no longer defined),
@@ -178,7 +179,8 @@ End More_Definitions.
 
 Section Irrelevance_of_Proofs.
 
-(** ***Basic Properties
+(**
+*** Basic Properties
 
 Proofs are irrelevant as before---they just have to be present.
 *)
@@ -316,7 +318,8 @@ Hint Resolve Cauchy_cont_Lim_IR: continuous.
 
 Section Algebraic_Properties.
 
-(** ***Algebraic Properties
+(**
+*** Algebraic Properties
 
 Algebraic operations still work well.
 *)
@@ -359,9 +362,9 @@ apply less_leEq; assumption.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma fun_Cauchy_prop_const_IR : forall H contH, Cauchy_fun_seq_IR J (fun n => H) contH.
+Lemma fun_Cauchy_prop_const_IR : forall H (contH:Continuous J H), Cauchy_fun_seq_IR J (fun n => H) (fun n => contH).
 intros.
-apply conv_Cauchy_fun_seq'_IR with H (contH 0).
+apply conv_Cauchy_fun_seq'_IR with H (contH).
 apply fun_Lim_seq_const_IR.
 Qed.
 
@@ -540,7 +543,8 @@ End More_Algebraic_Properties.
 
 Section Other.
 
-(** ***Miscellaneous
+(**
+*** Miscellaneous
 
 Finally, we define a mapping between sequences of real numbers and sequences of (constant) functions and prove that convergence is preserved.
 *)
@@ -622,7 +626,8 @@ End Other.
 
 Section Series_Definitions.
 
-(** **Series
+(**
+** Series
 
 We now consider series of functions defined in arbitrary intervals.
 
@@ -776,7 +781,8 @@ Hint Resolve convergent_imp_Continuous Continuous_FSeries_Sum: continuous.
 
 Section Operations.
 
-(** **Algebraic Operations
+(**
+** Algebraic Operations
 
 Convergence is well defined and preserved by operations.
 *)
@@ -928,7 +934,8 @@ End Operations.
 
 Section Convergence_Criteria.
 
-(** ***Convergence Criteria
+(**
+*** Convergence Criteria
 
 The most important tests for convergence of series still apply: the
 comparison test (in both versions) and the ratio test.
@@ -981,9 +988,57 @@ Qed.
 
 End Convergence_Criteria.
 
+Section Power_Series.
+
+(** ***Power Series
+
+The geometric series converges on the open interval (-1, 1)
+*)
+
+Lemma fun_power_series_conv_IR : fun_series_convergent_IR (olor ([--]One) One) (fun (i:nat) => Fid IR{^}i).
+Proof.
+intros a b Hab H.
+apply fun_ratio_test_conv.
+ intros n.
+ Contin.
+exists 0%nat.
+exists (Max (AbsIR a) (AbsIR b)).
+ destruct (H a) as [Ha0 Ha1].
+  split; assumption || apply leEq_reflexive.
+ destruct (H b) as [Hb0 Hb1].
+  split; assumption || apply leEq_reflexive.
+ apply Max_less; apply AbsIR_less; assumption.
+split.
+ eapply leEq_transitive.
+  apply AbsIR_nonneg.
+ apply lft_leEq_Max.
+simpl.
+intros x Hx n Hn _ _.
+rstepr (ABSIR (nexp IR n x)[*]MAX (ABSIR a) (ABSIR b)).
+change (AbsIR (nexp IR n x[*]x)[<=]AbsIR (nexp IR n x)[*]Max (AbsIR a) (AbsIR b)).
+stepl (AbsIR (nexp IR n x)[*]AbsIR x) by apply eq_symmetric; apply AbsIR_resp_mult.
+apply mult_resp_leEq_lft;[|apply AbsIR_nonneg].
+apply AbsSmall_imp_AbsIR.
+destruct Hx.
+split.
+ apply leEq_transitive with a;[|assumption].
+ rstepr ([--][--]a).
+ apply inv_resp_leEq.
+ apply leEq_transitive with (AbsIR a).
+  apply inv_leEq_AbsIR.
+ apply lft_leEq_Max.
+apply leEq_transitive with b;[assumption|].
+apply leEq_transitive with (AbsIR b).
+ apply leEq_AbsIR.
+apply rht_leEq_Max.
+Qed.
+
+End Power_Series.
+
 Section Insert_Series.
 
-(** ***Translation
+(**
+*** Translation
 
 When working in particular with power series and Taylor series, it is 
 sometimes useful to ``shift'' all the terms in the series one position 

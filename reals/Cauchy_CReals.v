@@ -39,7 +39,8 @@ Require Export CReals.
 
 Section R_CReals.
 
-(** * The Real Number Structure
+(**
+* The Real Number Structure
 
 We will now apply our Cauchy sequence construction to an archimedean ordered field in order to obtain a model of the real numbers.
 
@@ -154,7 +155,7 @@ Lemma ing_le : forall x y : F, x [<=] y -> inject_Q x [<=] inject_Q y.
 Proof.
  intros.
  intro.
- apply H.
+ rewrite leEq_def in H; apply H.
  apply ing_cancel_less.
  auto.
 Qed.
@@ -162,7 +163,7 @@ Qed.
 Lemma ing_cancel_leEq : forall x y : F, inject_Q x [<=] inject_Q y -> x [<=] y.
 Proof.
  intros.
- intro.
+ rewrite leEq_def; intro.
  apply H.
  apply ing_lt.
  auto.
@@ -710,7 +711,8 @@ Proof.
  assumption.
 Qed.
 
-(** ** Cauchy Completeness
+(**
+** Cauchy Completeness
 We can also define a limit operator.
 *)
 

@@ -40,7 +40,8 @@ Require Export Nfinsetoid.
 
 Section p70text.
 
-(** **A morphism from the natural numbers to the free setoid with one element
+(**
+** A morphism from the natural numbers to the free setoid with one element
 *)
 
 Let A:= (CSetoid_of_less 1).
@@ -54,7 +55,7 @@ Qed.
 
 Fixpoint to_word (n:nat):(list (F 1)):=
 match n with
-|0 => (nil (F 1))
+|0 => (@nil (F 1))
 |(S m)=> (cons (Build_F 1 0 ZerolessOne)(to_word m))
 end.
 

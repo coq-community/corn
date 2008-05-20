@@ -38,7 +38,8 @@ Ltac Contin := auto with continuous included.
 Ltac Deriv := eauto with derivate continuous included.
 (* end hide *)
 
-(** *Search tactics for reasoning in Real Analysis
+(**
+* Search tactics for reasoning in Real Analysis
 
 The following tactics are defined:
  - [Contin] will solve [(Continuous_I H F)]

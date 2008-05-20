@@ -40,7 +40,8 @@ Require Export CSetoidFun.
 
 Section inclusion.
 
-(** ** Inclusion
+(**
+** Inclusion
 
 Let [S] be a setoid, and [P], [Q], [R] be predicates on [S]. *)
 

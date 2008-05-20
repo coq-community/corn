@@ -114,7 +114,8 @@ End Lemmas.
 
 Section Integral.
 
-(** *Integral
+(**
+* Integral
 
 Having proved the main properties of partitions and refinements, we
 will define the integral of a continuous function [F] in the interval
@@ -277,8 +278,7 @@ apply
 2: apply AbsIR_wd; apply Lim_minus.
 eapply leEq_wdl.
 2: apply Lim_abs.
-astepr (Zero[+]e[*] (b[-]a)); apply shift_leEq_plus; red in |- *;
- apply approach_zero_weak.
+astepr (Zero[+]e[*] (b[-]a)); apply shift_leEq_plus; apply approach_zero_weak.
 intros e' He'.
 set (ee := e'[/] _[//]max_one_ap_zero (b[-]a)) in *.
 apply leEq_transitive with (ee[*] (b[-]a)).

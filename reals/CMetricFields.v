@@ -38,7 +38,8 @@ Require Export CReals1.
 
 Section CMetric_Fields.
 
-(** *Metric Fields *)
+(**
+* Metric Fields *)
 
 Record is_CMetricField (F : CField) (abs : CSetoid_fun F IR) : Prop := 
   {ax_abs_gt_zero   : forall x : F, Zero [<=] abs x;
@@ -105,9 +106,9 @@ Lemma Hulp :
 intros F G H.
 set (H0 := ax_abs_gt_zero) in *.
 generalize H0.
-unfold leEq in |- *.
 intro H1.
 set (H2 := H1 F (cmf_abs F) (cmf_proof F) [--] (One:F)) in *.
+rewrite leEq_def in H2.
 apply H2.
 astepl ( [--] (cmf_abs F One)).
 astepl ( [--]OneR).

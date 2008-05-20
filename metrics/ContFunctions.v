@@ -37,7 +37,8 @@
 Require Export CPseudoMSpaces.
 
 Section Continuous_functions.
-(** **Continuous functions, uniformly continuous functions and Lipschitz functions
+(**
+** Continuous functions, uniformly continuous functions and Lipschitz functions
 %\begin{convention}%
 Let [A] and [B] be pseudo metric spaces.
 %\end{convention}%
@@ -430,7 +431,8 @@ Qed.
 End Lemmas.
 
 Section Identity.
-(** **Identity 
+(**
+** Identity 
 *)
 (**
 The identity function is Lipschitz. 
@@ -464,7 +466,8 @@ Qed.
 End Identity.
 
 Section Constant.
-(** **Constant functions
+(**
+** Constant functions
 %\begin{convention}%
 Let [B] and [X] be pseudo metric spaces.
 %\end{convention}%
@@ -485,7 +488,7 @@ intros.
 astepr (Two[^]1[*](x[-d]y)).
 astepr (Two[*](x[-d]y)).
 unfold Const_CSetoid_fun in |- *.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 red in |- *.
 simpl in |- *.
 intros H.
@@ -520,7 +523,8 @@ Qed.
 End Constant.
 
 Section Composition.
-(** **Composition
+(**
+** Composition
 %\begin{convention}%
 Let [B],[C] and [X] be pseudo metric spaces.
 Let [f : (CSetoid_fun X B)] and
@@ -606,7 +610,8 @@ Qed.
 End Composition.
 
 Section Limit.
-(** **Limit
+(**
+** Limit
 *)
 
 Definition MSseqLimit (X : CPsMetricSpace) (seq : nat -> X) 

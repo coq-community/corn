@@ -36,7 +36,8 @@
 
 Require Export CReals1.
 
-(** * Continuity of Functions on Reals
+(**
+* Continuity of Functions on Reals
 *)
 
 (* begin hide *)

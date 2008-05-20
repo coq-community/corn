@@ -38,7 +38,8 @@ Require Export IntervalFunct.
 
 Section Conversion.
 
-(** *Correspondence
+(**
+* Correspondence
 
 In this file we prove that there are mappings going in both ways
 between the set of partial functions whose domain contains
@@ -46,7 +47,7 @@ between the set of partial functions whose domain contains
 that interval.  These mappings form an adjunction, and thus they have
 all the good properties for preservation results.
 
-**Mappings
+** Mappings
 
 We begin by defining the map from partial functions to setoid
 functions as simply being the restriction of the partial function to
@@ -134,7 +135,8 @@ End Inverses.
 
 Section Equivalences.
 
-(** **Mappings Preserve Operations
+(**
+** Mappings Preserve Operations
 
 We now prove that all the operations we have defined on both sets are
 preserved by [PartInt].

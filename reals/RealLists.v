@@ -38,7 +38,8 @@ Require Export CReals1.
 
 Section Lists.
 
-(** * Lists of Real Numbers
+(**
+* Lists of Real Numbers
 
 In some contexts we will need to work with nested existential quantified formulas of the form $\exists_{n\in\NN}\exists_{x_1,\ldots,x_n}P(x_1,\ldots,x_n)$#exists n exists x1,...,xn P(x1,..,xn)#.  One way of formalizing this kind of statement is through quantifying over lists.  In this file we provide some tools for manipulating lists.
 
@@ -96,7 +97,7 @@ Definition map2 (F : PartIR) (l : list IR) :
  (forall y, member y l -> Dom F y) -> list IR.
 intros F l H.
 induction l as [| a l Hrecl].
-apply nil.
+apply (@nil IR).
 apply cons.
 cut (member a (cons a l)); [ intro | right; algebra ]; rename X into H0.
 apply (Part F a (H a H0)).

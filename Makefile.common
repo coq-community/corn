@@ -6,6 +6,7 @@
 # Rik van Ginneken
 # Dimitri Hendriks
 # Sébastien Hinderer
+# Cezary Kaliszyk
 # Bart Kirkels
 # Pierre Letouzey
 # Iris Loeb
@@ -39,6 +40,9 @@
 ifndef TOPDIR
  $(error "You need to tell me what the top-level directory of CoRN is")
 endif
+ifndef COQTOP
+ $(error "You need to tell me where Coq is installed")
+endif
 
 ifeq ($(TOPDIR),.)
  SRCDIR := $(shell pwd)
@@ -69,6 +73,7 @@ LIBDIR := $(SRCDIR)/lib
 TOPLEVELNAME := CoRNtop
 COMPILERNAME := CoRNc
 IDENAME := CoRNide
+INTERFACENAME := CoRN-interface
 
 # Library name used internally by coq
 LIBNAME ?= CoRN
@@ -79,7 +84,11 @@ PRIVFILES :=
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES := algebra complex fta ftc metrics model reals tactics transc
+COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2
+
+# Files to filter out of the tree.pdf diagra
+#TREE_FILTER := coq_reals/ model/
+TREE_FILTER := 
 
 # Directory that will contain the html version of the documentation
 HTMLDIR := $(SRCDIR)/doc/html
@@ -88,8 +97,6 @@ PSDIR := $(SRCDIR)/doc
 # Name of file containing postscript documentation
 PSFILE := doc.ps
 
-# File that contains the dependencies
-DEPEND := $(SRCDIR)/.depend
 # File containing the partial order given by coqdep for documentation
 DOCDEPEND := $(SRCDIR)/.docdepend
 # File containing a list of files that must be processed by coqdoc
@@ -104,7 +111,7 @@ GLOBFILE = $(SRCDIR)/.glob
 # Various executables we build when we need a custom Coq image.
 # (Thus currently not.)
 TOPLEVEL := $(LIBDIR)/$(TOPLEVELNAME)
-BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME)
+BINARIES:=$(BINDIR)/$(TOPLEVELNAME) $(BINDIR)/$(COMPILERNAME) $(BINDIR)/$(IDENAME) $(BINDIR)/$(INTERFACENAME)
 LIBEXECS:=$(LIBDIR)/$(TOPLEVELNAME) $(LIBDIR)/$(COMPILERNAME)
 IDELIB:=$(LIBDIR)/$(IDENAME)
 IDEBIN:=$(BINDIR)/$(IDENAME)
@@ -139,17 +146,24 @@ GRAMMARS:=grammar.cma
 PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
 
 # COQMAP defines the mapping between physical and logical directories
-COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN.devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
-OTHERFLAGS = -dump-glob $(GLOBFILE) -I $(SRCDIR)/tactics $(COQMAP)
+COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN .devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
+OTHERFLAGS = -I $(SRCDIR)/tactics $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = 
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
 COQOBJECTS := $(COQSOURCES:.v=.vo)
+COQGLOBS := $(COQSOURCES:.v=.glob)
+DEPEND := $(COQSOURCES:.v=.d)
 CAMLSOURCES := $(shell find $(SRCDIR)/tactics -name '*.ml')
 CAMLOBJECTS := $(CAMLSOURCES:.ml=.cmo)
 CMX := $(CAMLSOURCES:.ml=.cmx)
+
+COQCDEP_EX:=$(shell [ -x "$(COQDEP)" ] && [ -x "$(COQC)" ]; echo "$$?")
+ifneq "$(COQCDEP_EX)" "0"
+$(error coqc or coqdep not found or not executable. Please set COQTOP to the appropriate value)
+endif
 
 # Declaration of rules that have no target (i.e. .PHONY rules)
 .PHONY : dep clean depclean distclean doc-clean showcommands doc-pre binaries binaries-clean lib-clean human ide makefiles
@@ -192,11 +206,11 @@ binaries: $(BINARIES)
 
 binaries-clean:
 	rm -f $(BINARIES) $(IDEBIN)
-	if [ -a "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
+	if [ -d "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
 
 lib-clean:
 	rm -f $(LIBEXECS) $(IDELIB)
-	if [ -a "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
+	if [ -d "$(LIBDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(LIBDIR)"; fi
 
 $(IDELIB): $(CMX) | $(LIBDIR)
 	@echo Building coq-ide top-level $(subst $(SRCDIR)/,, $@)
@@ -218,6 +232,13 @@ $(BINDIR)/$(TOPLEVELNAME): | $(BINDIR)
 	@set -e; ( \
 	  echo '#!/bin/sh'; \
 	  echo 'exec "$(COQBIN)/coqtop" $(COQFLAGS) "$$@"' \
+	  ) > $@; chmod +x $@
+
+$(BINDIR)/$(INTERFACENAME): | $(BINDIR)
+	@echo Building interface top-level startup script
+	@set -e; ( \
+	  echo '#!/bin/sh'; \
+	  echo 'exec "$(COQBIN)/coq-interface" $(COQFLAGS) "$$@"' \
 	  ) > $@; chmod +x $@
 
 $(LIBDIR)/$(COMPILERNAME): | $(LIBDIR) $(LIBDIR)/$(TOPLEVELNAME)
@@ -243,14 +264,21 @@ $(BINDIR)/$(COMPILERNAME): | $(BINDIR)
 	@$(OCAMLC) -c $(COQSRC) $(PP) $<
 
 ifdef CoRN_MF_sub
-%.vo : %.v
+$(GLOBFILE): $(COQGLOBS) $(DOCLIST)
+	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
+
+%.vo %.glob : %.v | %.d
 	@set -e; \
 	echo "Compiling $<"; \
-	exec $(COQC) $(COQFLAGS) $(COQCFLAGS) $<
+	GLOB="$(<:.v=.glob)"; \
+	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
 else
 .PHONY: always
 
-%.vo : always
+$(GLOBFILE): always $(DOCLIST)
+	exec $(MAKE) CoRN_MF_sub=1 "$@"
+
+%.vo %.glob: always
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -266,8 +294,7 @@ endif
 
 dep : $(DEPEND) $(DOCDEPEND)
 
-$(DEPEND) : $(COQSOURCES)
-	@echo Calculating dependencies
+%.d: %.v
 	@set -e; \
 	canonicalise () \
 	{ \
@@ -277,50 +304,36 @@ $(DEPEND) : $(COQSOURCES)
 	    echo "$$($(REALPATH) $$(dirname "$$1"))/$$(basename "$$1")"; \
 	  fi \
 	}; \
-        if [ -f $@ ]; then ( IFS=$$' \t\n:'; \
-          for new_file in $?; do \
-              $(COQDEP) $(COQDEPFLAGS) "`canonicalise $$new_file`"; \
-          done; \
-	  while read binary source depends; do \
-            is_new_file=''; \
-            for new_file in $?; do \
-              if [ "$$source" == "`canonicalise $$new_file`" ]; then is_new_file='t'; break; fi ; \
-            done; \
-            if [ -z "$$is_new_file" ]; then \
-              is_current_source=''; \
-              for cur_source in $(COQSOURCES); do \
-                if [ "$$source" == "$$cur_source" ]; then is_current_source='t'; break; fi ; \
-              done; \
-              if [ -n "$$is_current_source" ]; then \
-                echo "$$binary: $$source $$depends"; \
-              fi; \
-            fi; \
-          done ) < $@ > $@.tmp && mv $@.tmp $@; \
-        else \
-	   $(COQDEP) $(COQDEPFLAGS) $(COQSOURCES) > "$@"; \
-        fi || ( RV=$$?; rm -f $@ $@.tmp; exit $${RV} )
-
-# TODO: This stuff must be updated to work with the new absolute paths.
-# Hair-pulling involved because of regexp meta-characters in paths
+	canon="`canonicalise $<`"; \
+	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
+	$(COQDEP) $(COQDEPFLAGS) "$${canon}" \
+	| sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo \1.glob:/' \
+	> "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
 	@echo Calculating documentation dependencies
-	@set -e; IFS=$$' \t\n:'; ( while read binary source depends; do \
-	  if [ -n "$${binary}" ] && ! echo "$${binary}" | egrep -q '^\./(devel|tactics)/'; then \
+	@set -e; IFS=$$' \t\n:'; cat $(DEPEND) | \
+	( while read binary glob source depends; do \
+	  if [ -n "$${binary}" ]; then \
 	    for depend in $${depends}; do \
-	      if ! echo "$${depend}" | egrep -q '^\./tactics/'; then \
-	        if echo "$${depend}" | egrep -q '^\./devel/'; then \
-	          ( echo 'ERROR: Things out of devel/ are not allowed to depend on devel/'; \
-		    echo "ERROR: but $${binary} depends on $${depend}" ) 1>&2 ; \
-		  exit 1; \
-	        else if echo "$${depend}" | egrep -q '\.vo$$'; then \
-	          echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
-	        fi; \
-		fi; \
+	      if echo "$${depend}" | egrep -q '\.vo$$'; then \
+	        echo "`echo $${depend} | sed 's/\.vo$$/.v/'` $${source}"; \
 	      fi; \
 	    done; \
 	  fi; \
-	done ) < $(DEPEND) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
+	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
+
+tree.dot : PreDot.hs $(DEPEND)
+	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
+
+tree.svg : tree.dot
+	dot -Tsvg < $< > $@
+
+tree.ps : tree.dot
+	dot -Tps < $< > $@
+
+tree.pdf : tree.ps
+	epstopdf $<
 
 # Rules to create documentation depend on the whole compilation process
 # because they need the glob file to generate global references.
@@ -328,20 +341,20 @@ $(DOCDEPEND) : $(DEPEND)
 $(DOCLIST) : $(DOCDEPEND) $(SRCDIR)/doc/extradeps
 	( ( while read small big; do echo "$$( $(REALPATH) $(SRCDIR)/$${small} ) $$( $(REALPATH) $(SRCDIR)/$${big} )"; done ) < $(SRCDIR)/doc/extradeps ; cat $(DOCDEPEND) ) | tsort > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
-doc-pre : $(DOCLIST)
+doc-pre : $(DOCLIST) $(GLOBFILE)
 
 doc-ps : doc-pre
 	$(COQDOC) $(COQDOCFLAGS) --ps -o $(PSDIR)/$(PSFILE) -p '\input{$(SRCDIR)/doc/doc_coqdocpre}'
 
-doc-html : doc-pre all
+doc-html : doc-pre
 	mkdir -p $(HTMLDIR)
 	cp $(SRCDIR)/doc/style.css $(HTMLDIR)
 	$(COQDOC) $(COQDOCFLAGS) -d $(HTMLDIR)
 
-doc : doc-ps doc-html
+doc : doc-ps doc-html tree.svg
 
-clean : depclean binaries-clean lib-clean
-	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
+clean : depclean binaries-clean lib-clean doc-clean
+	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
         done
@@ -352,7 +365,7 @@ clean : depclean binaries-clean lib-clean
 depclean : 
 	rm -f $(DEPEND) $(DOCDEPEND)
 
-distclean : clean doc-clean
+distclean : clean
 	for i in $(PRIVFILES); do rm -rf "$$i"; done
 
 doc-clean :
@@ -360,7 +373,7 @@ doc-clean :
 
 showcommands :
 	@echo Command used to compile FILE.v :
-	@echo "$(COQC) $(COQFLAGS) $(COQCFLAGS) FILE.v"
+	@echo "$(COQC) $(COQFLAGS) -dump-glob FILE.glob $(COQCFLAGS) FILE.v"
 	@echo
 	@echo Command used to compile FILE.ml :
 	@echo "$(OCAMLOPT) -c $(COQSRC) $(PP) FILE.ml"

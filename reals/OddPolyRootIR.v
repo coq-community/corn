@@ -36,11 +36,13 @@
 
 Require Export IVT.
 
-(** * Roots of polynomials of odd degree *)
+(**
+* Roots of polynomials of odd degree *)
 
 Section CPoly_Big.
 
-(** ** Monic polynomials are positive near infinity
+(**
+** Monic polynomials are positive near infinity
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)
@@ -118,7 +120,8 @@ End CPoly_Big.
 
 Section Flip_Poly.
 
-(** **Flipping a polynomial
+(**
+** Flipping a polynomial
 %\begin{convention}% Let [R] be a ring.
 %\end{convention}%
 *)
@@ -183,7 +186,8 @@ Hint Resolve flip_poly: algebra.
 
 Section OddPoly_Signs.
 
-(** ** Sign of a polynomial of odd degree
+(**
+** Sign of a polynomial of odd degree
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)
@@ -223,7 +227,8 @@ End OddPoly_Signs.
 
 Section Poly_Norm.
 
-(** ** The norm of a polynomial
+(**
+** The norm of a polynomial
 %\begin{convention}% Let [R] be a field, and [RX] the polynomials over
 this field.
 %\end{convention}%
@@ -269,7 +274,8 @@ End Poly_Norm.
 
 Section OddPoly_Root.
 
-(** ** Roots of polynomials of odd degree
+(**
+** Roots of polynomials of odd degree
 Polynomials of odd degree over the reals always have a root. *)
 
 Lemma oddpoly_root' : forall f n, odd n -> monic n f -> {x : IR | f ! x [=] Zero}.

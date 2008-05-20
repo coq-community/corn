@@ -38,7 +38,8 @@ Require Export PartFunEquality.
 
 Section Operations.
 
-(** * Functions with compact domain
+(**
+* Functions with compact domain
 
 In this section we concern ourselves with defining operations on the
 set of functions from an arbitrary interval [[a,b]] to [IR].

@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -52,6 +53,7 @@
 (** printing TwentyFour %\ensuremath{\mathbf{24}}% #24# *)
 (** printing FortyEight %\ensuremath{\mathbf{48}}% #48# *)
 
+Require Import CornTac.
 Require Export CSums.
 
 Transparent sym_eq.
@@ -61,7 +63,8 @@ Transparent f_equal.
 
 (* Constructive RINGS *)
 
-(** * Rings
+(**
+* Rings
 We actually define commutative rings with identity.
 ** Definition of the notion of Ring
 *)
@@ -699,7 +702,7 @@ astepl ( [--]One[*]x).
 Step_final ( [--] (One[*]x)).
 Qed.
 
-(*************** new def of zring. ***********************)
+(*---------------- new def of zring. --------------------*)
 
 (** The [zring] function can be defined directly.  This is done here.
 *)
@@ -862,7 +865,8 @@ Definition Sum_from_upto_alt f m n : R := Sum_upto (seq_from f m) (n - m).
 End infinite_ring_sums.
 
 Section ring_sums_over_lists.
-(** *** Ring Sums over Lists
+(**
+*** Ring Sums over Lists
 *)
 
 Fixpoint RList_Mem (l : list R) (n : nat) {struct n} : R :=
@@ -1033,8 +1037,8 @@ replace (n + m * n) with (S m * n); algebra.
 Qed.
 Hint Resolve nexp_mult: algebra.
 
-Lemma zero_nexp : forall (x : R) n, 0 < n -> (Zero:R) [^]n [=] Zero.
-intros x n H.
+Lemma zero_nexp : forall n, 0 < n -> (Zero:R) [^]n [=] Zero.
+intros n H.
 induction  n as [| n Hrecn].
  inversion H.
 Step_final ((Zero:R) [*]Zero[^]n).
@@ -1138,6 +1142,12 @@ Qed.
 Hint Resolve nexp_funny': algebra.
 
 End NExp_properties.
+
+Add Parametric Morphism c n : (nexp c n) with signature (@cs_eq (cr_crr c)) ==> (@cs_eq c) as nexp_morph_wd.
+intros.
+rapply nexp_wd.
+assumption.
+Qed.
 
 Hint Resolve nexp_wd nexp_Sn nexp_plus one_nexp mult_nexp nexp_mult zero_nexp
   inv_nexp_even inv_nexp_two inv_nexp_odd nexp_one nexp_two nexp_funny

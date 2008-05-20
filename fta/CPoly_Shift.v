@@ -36,7 +36,8 @@
 
 Require Export CComplex.
 
-(** * Shifting polynomials
+(**
+* Shifting polynomials
 This can be done for [CRings] in general, but we do it here
 only for [CC] because extensionality makes everything much easier,
 and we only need it for [CC].

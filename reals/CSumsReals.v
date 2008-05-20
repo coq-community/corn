@@ -36,7 +36,8 @@
 
 Require Export CReals1.
 
-(** * Sums over Reals
+(**
+* Sums over Reals
 
 %\begin{convention}% Let [c] be a real.
 %\end{convention}%

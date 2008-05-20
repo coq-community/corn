@@ -38,11 +38,12 @@ Require Export TaylorSeries.
 
 Opaque Min Max.
 
-(** *Exponential and Logarithmic Functions
+(**
+* Exponential and Logarithmic Functions
 
 The main properties of the exponential and logarithmic functions.
 
-**Properties of Exponential
+** Properties of Exponential
 
 Exponential is strongly extensional and well defined.
 *)
@@ -406,6 +407,12 @@ Lemma Exp_ap_zero : forall x : IR, Exp x [#] Zero.
 intro; apply Greater_imp_ap; apply Exp_pos.
 Qed.
 
+Lemma pos_E : Zero [<] E.
+Proof.
+astepr (Exp One).
+apply Exp_pos.
+Qed.
+
 (**
 And the rules for the exponential of differences.
 *)
@@ -476,7 +483,8 @@ intros x y; apply resp_leEq_char.
 intro H; apply Exp_resp_less; auto.
 Qed.
 
-(** **Properties of Logarithm
+(**
+** Properties of Logarithm
 
 The logarithm is a continuous function with derivative [One[/]x].
 *)
@@ -618,6 +626,27 @@ intros.
 Step_final (Log (x[*]y) (mult_resp_pos _ _ _ Hx Hy)).
 Qed.
 
+Lemma Log_nexp : forall x n Hx Hxn, Log (x[^]n) Hxn [=] (nring n)[*]Log x Hx.
+Proof.
+induction n.
+ intros Hx Hn.
+ simpl.
+ rstepr (Zero:IR).
+ apply Log_one.
+intros Hx Hn.
+assert (X:Zero[<]x[^]n).
+ apply nexp_resp_pos.
+ assumption.
+stepl (Log _ X[+]Log x Hx) by
+ (apply eq_symmetric; apply (Log_mult _ _ X Hx)).
+astepr ((nring n [+] One)[*]Log x Hx).
+rstepr (nring n[*]Log x Hx[+]Log x Hx).
+apply bin_op_wd_unfolded; try apply eq_reflexive.
+apply IHn.
+Qed.
+
+Hint Resolve Log_nexp: algebra.
+
 (** A characterization of the domain of the logarithm. *)
 
 Lemma Log_domain : forall x : IR, Zero [<] x -> Dom Logarithm x.
@@ -697,7 +726,7 @@ Transparent Logarithm.
 Hint Resolve Log_Exp: algebra.
 
 Lemma Exp_Log_lemma : forall x y Hx Hy, Zero [=] Log y Hy[-]Log x Hx -> y [<=] x.
-intros x y Hx Hy H; intro H0.
+intros x y Hx Hy H; rewrite leEq_def; intro H0.
 cut ((y[-]x[/] _[//]pos_ap_zero _ _ Hy) [<=] Zero).
 intro H1.
 apply less_irreflexive_unfolded with (x := x).
@@ -922,3 +951,407 @@ Lemma Log_div' : forall x y z Hx Hy Hy' Hz,
 intros x y z Hx Hy Hy' Hz H.
 Step_final (Log _ (div_resp_pos _ _ _ Hy' Hy Hx)).
 Qed.
+
+Lemma Log_zexp : forall x n Hx Hx0 Hxn, Log ((x[//]Hx0)[^^]n) Hxn [=] (zring n)[*]Log x Hx.
+Proof.
+intros x [|n|n] Hx Hx0 Hxn.
+  simpl.
+  rstepr (Zero:IR).
+  algebra.
+ assert (X:Zero[<]x[^]n).
+  astepr ((x[//]Hx0)[^^]n).
+  assumption.
+ change (Log (x[^]n) Hxn[=]zring (R:=IR) n[*]Log x Hx).
+ astepl (nring n[*]Log x Hx).
+ apply mult_wdl.
+ apply eq_symmetric.
+ unfold pos2Z.
+ rewrite <- inject_nat_convert.
+ refine (zring_plus_nat IR n).
+simpl.
+change (Log ((One[/]x[//]Hx0)[^]n) Hxn[=][--](zring n)[*]Log x Hx).
+assert (X:Zero[<](One[/]x[//]Hx0)).
+ apply recip_resp_pos.
+ assumption.
+astepl ((nring n)[*](Log _ X)).
+astepl ((nring n)[*]([--](Log _ Hx))).
+rstepl ([--](nring n)[*](Log x Hx)).
+apply mult_wdl.
+apply un_op_wd_unfolded.
+unfold pos2Z.
+rewrite <- inject_nat_convert.
+apply eq_symmetric.
+refine (zring_plus_nat IR n).
+Qed.
+
+Hint Resolve Log_zexp: algebra.
+
+Section Log_Series.
+
+Definition Log_series_coef (n:nat) :=
+match n with
+| O => Zero
+| (S n') => ([--]One)[^](S (S n'))[/](nring (S n'))[//]nringS_ap_zero IR n'
+end.
+
+Definition Log_ps := FPowerSeries One Log_series_coef.
+
+Lemma Log_series_convergent_IR : fun_series_convergent_IR (olor Zero Two) Log_ps.
+Proof.
+intros a b Hab Hinc.
+apply fun_ratio_test_conv.
+ unfold Log_ps; unfold FPowerSeries; Contin.
+exists 1.
+pose (c:=Max (AbsIR (a[-]One)) (AbsIR (b[-]One))).
+assert (Z0:c[<]One).
+ unfold c.
+ destruct (Hinc _ (compact_inc_lft _ _ Hab)).
+ destruct (Hinc _ (compact_inc_rht _ _ Hab)).
+ apply Max_less; apply AbsIR_less;
+  first [apply shift_minus_less; rstepr (Two:IR)
+        |apply shift_less_minus; rstepl (Zero:IR)];
+  assumption.
+assert (Z1:Zero[<=]c).
+ unfold c.
+ eapply leEq_transitive.
+ apply AbsIR_nonneg.
+ apply lft_leEq_Max.
+exists c.
+ assumption.
+split.
+ assumption.
+intros x [Hx0 Hx1] n Hn Hx Hx'.
+destruct n.
+ elimtype False; auto with *.
+unfold Log_ps, FPowerSeries, Log_series_coef.
+generalize (nringS_ap_zero IR (S n)).
+generalize (nringS_ap_zero IR (n)).
+intros Y0 Y1.
+stepl (
+   (nexp IR (S (S n)) (AbsIR (x[-]One)))[/]nring (R:=IR) (S (S n))[//]Y1).
+ apply shift_div_leEq.
+  apply nring_pos; auto with *.
+ stepr ((((nexp IR (S n) (AbsIR (x[-]One))[*]c)[*](nring (R:=IR) (S (S n))))[/]nring (R:=IR) (S n)[//]Y0)).
+  apply shift_leEq_div.
+   apply nring_pos; auto with *.
+  apply mult_resp_leEq_both.
+     apply (nexp_resp_nonneg _ (AbsIR (x[-]One)) (S (S n))).
+     apply AbsIR_nonneg.
+    apply nring_nonneg; auto with *.
+   change (nexp IR (S (S n)) (AbsIR (x[-]One)))
+    with ((nexp IR (S n) (AbsIR (x[-]One)))[*](AbsIR (x[-]One))).
+   apply mult_resp_leEq_lft.
+    apply AbsSmall_imp_AbsIR.
+    split.
+     apply shift_zero_leEq_minus'.
+     rstepr (c[-]([--](x[-]One))).
+     apply shift_zero_leEq_minus.
+     unfold c.
+     eapply leEq_transitive;[|apply lft_leEq_Max].
+     eapply leEq_transitive;[|apply inv_leEq_AbsIR].
+     apply inv_resp_leEq.
+     apply minus_resp_leEq.
+     assumption.
+    unfold c.
+    eapply leEq_transitive;[|apply rht_leEq_Max].
+    eapply leEq_transitive;[|apply leEq_AbsIR].
+    apply minus_resp_leEq.
+    assumption.
+   apply (nexp_resp_nonneg _ (AbsIR (x[-]One)) (S n)).
+   apply AbsIR_nonneg.
+  apply nring_leEq; auto with *.
+ rstepl (c[*](nexp IR (S n) (AbsIR (x[-]One))[/]
+  nring (R:=IR) (S n)[//]Y0)[*]nring (R:=IR) (S (S n))).
+ apply mult_wdl.
+ apply mult_wdr.
+ stepl (AbsIR ((x[-]One)[^](S n))[/]_[//](AbsIR_resp_ap_zero _ Y0)).
+  eapply eq_transitive.
+   apply eq_symmetric.
+   apply (AbsIR_division ((x[-]One)[^]S n) _ Y0).
+  stepr (AbsIR (([--]One)[^](S (S n)))[*]AbsIR ((x[-]One)[^]S n[/]nring (R:=IR) (S n)[//]Y0)).
+   rstepl (One[*]AbsIR ((x[-]One)[^]S n[/]nring (R:=IR) (S n)[//]Y0)).
+   apply mult_wdl.
+   csetoid_rewrite (AbsIR_nexp_op (S (S n)) ([--]One)).
+   csetoid_replace (AbsIR ([--]One)) (One:IR).
+    apply eq_symmetric.
+    apply (one_nexp IR (S (S n))).
+   rstepr ([--][--]One:IR).
+   apply AbsIR_eq_inv_x.
+   apply shift_zero_leEq_minus'.
+   rstepr (One:IR).
+   apply less_leEq; apply pos_one.
+  eapply eq_transitive.
+   apply eq_symmetric; apply AbsIR_resp_mult.
+  apply AbsIR_wd.
+  change ((([--]One[^]S (S n)[/]nring (R:=IR) (S n)[//]Y0){**}(FId{-}[-C-]One){^}S n) x Hx)
+   with ((([--]One[^]S (S n)[/]nring (R:=IR) (S n)[//]Y0)[*](x[-]One)[^]S n)).
+  rational.
+ apply div_wd.
+  apply (AbsIR_nexp (x[-]One) (S n)).
+ apply AbsIR_eq_x.
+ apply nring_nonneg.
+stepl (AbsIR ((x[-]One)[^](S (S n)))[/]_[//](AbsIR_resp_ap_zero _ Y1)).
+ eapply eq_transitive.
+  apply eq_symmetric.
+  apply (AbsIR_division ((x[-]One)[^]S (S n)) _ Y1).
+ stepr (AbsIR (([--]One[^]S (S (S n))[*]((x[-]One)[^]S (S n)[/]_[//]Y1)))).
+  eapply eq_transitive;[|apply eq_symmetric; apply AbsIR_resp_mult].
+  rstepl (One[*]AbsIR ((x[-]One)[^]S (S n)[/]nring (R:=IR) (S (S n))[//]Y1)).
+  apply mult_wdl.
+  csetoid_rewrite (AbsIR_nexp_op (S (S (S n))) [--]One).
+  csetoid_replace (AbsIR ([--]One)) (One:IR).
+   apply eq_symmetric.
+   apply (one_nexp IR).
+  rstepr ([--][--]One:IR).
+  apply AbsIR_eq_inv_x.
+  apply shift_zero_leEq_minus'.
+  rstepr (One:IR).
+  apply less_leEq; apply pos_one.
+ apply AbsIR_wd.
+ change ((([--]One[^]S (S (S n))[/]nring (R:=IR) (S (S n))[//]Y1){**}(FId{-}[-C-]One){^}S (S n)) x Hx')
+  with ((([--]One[^]S (S (S n))[/]nring (R:=IR) (S (S n))[//]Y1)[*](x[-]One)[^]S (S n))).
+ rational.
+apply div_wd.
+ apply (AbsIR_nexp (x[-]One) (S (S n))).
+apply AbsIR_eq_x.
+apply nring_nonneg.
+Qed.
+
+Lemma Log_series : forall c : IR,
+ forall (Hs:fun_series_convergent_IR (olor Zero Two) Log_ps) Hc0 Hc1,
+ FSeries_Sum Hs c Hc0[=]Log c Hc1.
+Proof.
+intros c Hs Hc0 Hc1.
+Transparent Logarithm.
+assert (Z:fun_series_convergent_IR (olor Zero Two)
+                (fun n : nat => Log_ps (S n))).
+ generalize Log_ps Hs.
+ intros p Hp; clear - Hp.
+ intros a b Hab Hinc.
+ destruct (Hp a b Hab Hinc) as [A B].
+ exists (fun n => (A (S n))).
+ intros e He.
+ destruct (B e He) as [C D].
+ exists (C).
+ intros m n Hm Hn x Hx.
+ assert (D' := (D (S m) (S n))).
+ stepl (AbsIR
+       (fun_seq_part_sum p (S m) x
+          (contin_imp_inc a b Hab (fun_seq_part_sum p (S m))
+             (fun_seq_part_sum_cont a b Hab p A (S m)) x Hx)[-]
+        fun_seq_part_sum p (S n) x
+          (contin_imp_inc a b Hab (fun_seq_part_sum p (S n))
+             (fun_seq_part_sum_cont a b Hab p A (S n)) x Hx))).
+  apply D'; auto with *.
+ apply AbsIR_wd.
+ set (g:=(fun (y n0 : nat) =>
+   Part (p n0) x
+     (contin_imp_inc a b Hab (fun_seq_part_sum p y)
+        (fun_seq_part_sum_cont a b Hab p A y) x Hx n0))).
+ set (g':=(fun y n0 : nat =>
+   Part (p (S n0)) x
+     (contin_imp_inc a b Hab (fun_seq_part_sum (fun n1 : nat => p (S n1)) y)
+        (fun_seq_part_sum_cont a b Hab (fun n1 : nat => p (S n1))
+           (fun n1 : nat => A (S n1)) y) x Hx n0))).
+ change (Sum0 (G:=IR) (S m) (g (S m))[-](Sum0 (G:=IR) (S n) (g (S n)))[=]
+         Sum0 (G:=IR) m (g' m)[-]Sum0 (G:=IR) n (g' n)).
+ stepr ((g (S m) 0[+]Sum0 (G:=IR) m (g' m))[-](g (S n) 0[+]Sum0 (G:=IR) n (g' n))).
+  unfold cg_minus.
+  apply eq_symmetric;
+  apply bin_op_wd_unfolded; try apply un_op_wd_unfolded;
+   apply Sum0_shift;
+   intros i; unfold g', g;
+   apply pfwdef;
+   apply eq_reflexive.
+ apply cg_cancel_lft with (g (S n) 0[-](Sum0 (G:=IR) m (g' m)[-]Sum0 (G:=IR) n (g' n))).
+ rstepr (g (S n) 0).
+ rstepl (g (S m) 0).
+ unfold g; apply pfwdef; apply eq_reflexive.
+assert (Z0:=insert_series_sum _ _ Z).
+set (Hs':=(insert_series_conv (olor Zero Two) (fun n : nat => Log_ps (S n)) Z)) in *.
+apply eq_transitive with (FSeries_Sum (J:=olor Zero Two)
+          (f:=insert_series (fun n : nat => Log_ps (S n))) Hs' c Hc0).
+ simpl.
+ apply series_sum_wd.
+ intros [|n].
+  simpl; rational.
+ simpl; rational.
+apply eq_transitive with (FSeries_Sum Z c Hc0).
+ apply Feq_imp_eq with (olor Zero Two).
+ apply Feq_symmetric.
+ apply (insert_series_sum _ _ Z).
+ assumption.
+simpl.
+unfold series_sum.
+apply eq_symmetric.
+apply Limits_unique.
+simpl.
+unfold Log, Logarithm.
+simpl.
+assert (X:forall n, Continuous_I (Min_leEq_Max One c) (([-C-]One{-}FId){^}n)).
+ Contin.
+apply Cauchy_Lim_prop2_wd with (fun n => Integral (fun_seq_part_sum_cont _ _ _ _ X n)).
+ assert (A0:Continuous (olor Zero Two) ({1/}FId)).
+  apply Continuous_recip.
+   Contin.
+  intros a b Hab Hinc.
+  split.
+   Included.
+  exists a.
+   destruct (Hinc _ (compact_inc_lft _ _ Hab)); assumption.
+  simpl.
+  intros y _ Hy.
+  stepr y.
+   destruct Hy; assumption.
+  apply eq_symmetric.
+  apply AbsIR_eq_x.
+  apply less_leEq; destruct (Hinc _ Hy); assumption.
+ assert (A1:forall n : nat, Continuous (olor Zero Two) (fun_seq_part_sum (Fnth (R:=IR) ([-C-]One{-}FId)) n)).
+  intros n.
+  split.
+   repeat constructor.
+  intros a b Hab Hinc.
+  Contin.
+ eapply (limit_of_Integral (olor Zero Two) _ _ A1 A0).
+  unfold fun_seq_part_sum.
+  assert (A2:fun_series_convergent_IR (olor Zero Two)
+   (Fnth (R:=IR) ([-C-]One{-}FId))).
+   cut (fun_series_convergent_IR (olor Zero Two) (fun n => FId{^}n[o]([-C-]One{-}FId))).
+    apply fun_series_convergent_wd_IR.
+    intros n.
+    FEQ.
+    intros x Hx.
+    assert (W:Dom ([-C-]One{-}FId) x).
+     repeat constructor.
+    exists W.
+    repeat constructor.
+   apply FSeries_Sum_comp_conv with (olor [--]One One).
+     intros a b Hab Hinc.
+     exists (One[-]b).
+     exists (One[-]a).
+     assert (W:One[-]b[<=]One[-]a).
+      unfold cg_minus.
+      apply plus_resp_leEq_lft.
+      apply inv_resp_leEq.
+      assumption.
+     exists W.
+     split.
+      intros x [Hx0 Hx1].
+      split.
+       eapply less_leEq_trans;[|apply Hx0].
+       apply shift_less_minus.
+       apply shift_plus_less'.
+       rstepr (Two:IR).
+       destruct (Hinc _ (compact_inc_rht _ _ Hab)); assumption.
+      eapply leEq_less_trans;[apply Hx1|].
+      apply shift_minus_less.
+      apply shift_less_plus'.
+      rstepl (Zero:IR).
+      destruct (Hinc _ (compact_inc_lft _ _ Hab)); assumption.
+     intros x Hx [Hx0 Hx1].
+     split; simpl.
+      apply shift_leEq_minus'.
+      apply shift_plus_leEq.
+      rstepr b.
+      assumption.
+     apply shift_leEq_minus'.
+     apply shift_plus_leEq.
+     rstepr x.
+     assumption.
+    Contin.
+   apply fun_power_series_conv_IR.
+  assert (A3:Continuous (olor Zero Two)
+    (FSeries_Sum (J:=olor Zero Two) (f:=Fnth (R:=IR) ([-C-]One{-}FId)) A2)).
+   Contin.
+  eapply (conv_fun_seq'_wdr_IR);[|apply (FSeries_conv _ _ A2 A1 A3)].
+  FEQ.
+  assert (Y:AbsIR (One[-]x)[<]One).
+   destruct X0.
+   apply AbsIR_less.
+    apply shift_minus_less.
+    apply shift_less_plus'.
+    rstepl (Zero:IR); assumption.
+   apply shift_less_minus'.
+   apply shift_plus_less.
+   rstepr (Two:IR); assumption.
+  assert (Y0:One[-](One[-]x)[#]Zero).
+   rstepl (x).
+   apply Greater_imp_ap.
+   destruct X0; assumption.
+  apply eq_transitive with (One[/]_[//]Y0).
+   eapply eq_transitive;[|apply (power_series_sum _ Y Y0 (power_series_conv _ Y))].
+   simpl.
+   apply series_sum_wd.
+   intros n; apply eq_reflexive.
+  simpl.
+  rational.
+ intros x [Hx0 Hx1].
+ split.
+  apply less_leEq_trans with (Min One c); try assumption.
+  apply less_Min; try assumption.
+  apply pos_one.
+ apply leEq_less_trans with (Max One c); try assumption.
+ destruct Hc0.
+ apply Max_less; try assumption.
+ apply one_less_two.
+intros n.
+induction n.
+ simpl.
+ rstepr (Zero[*](c[-]One)).
+ eapply eq_transitive;[|apply (Integral_const _ _ (Min_leEq_Max One c) Zero (Continuous_I_const _ _ _ _))].
+ apply Integral_wd.
+ FEQ.
+ auto with *.
+simpl.
+csetoid_rewrite_rev IHn.
+assert (Y:Continuous_I (Min_leEq_Max One c) (([-C-]One{-}FId){^}n)).
+ Contin.
+csetoid_replace ((nexp IR n [--]One[*][--]One[*][--]One[/]nring (R:=IR) n[+]One[//]
+ nringS_ap_zero IR n)[*](nexp IR n (c[-]One)[*](c[-]One)))
+ (Integral Y).
+ assert (Y0:=Continuous_I_plus _ _ _ _ _ (fun_seq_part_sum_cont (Min One c) (Max One c) (Min_leEq_Max One c)
+      (Fnth (R:=IR) ([-C-]One{-}FId)) X n) Y).
+ stepl (Integral Y0).
+  apply Integral_plus.
+ apply Integral_wd.
+ apply eq_imp_Feq; try Included.
+  intros x Hx; split; constructor.
+ intros x H Hx Hx'.
+ simpl.
+ apply eq_reflexive.
+rstepl ((nexp IR n [--]One[/]nring (R:=IR) n[+]One[//]
+ nringS_ap_zero IR n)[*](nexp IR n (c[-]One)[*](c[-]One))).
+change ((nexp IR n [--]One[/]nring (R:=IR) n[+]One[//]nringS_ap_zero IR n)[*]
+(nexp IR n (c[-]One)[*](c[-]One)))
+ with (([--]One[^]n[/]_[//]nringS_ap_zero IR n)[*](c[-]One)[^](S n)).
+pose (G:=(([--]One[/]_[//]nringS_ap_zero IR n){**}([-C-]One{-}FId){^}(S n))).
+assert (X0:Derivative (olor Zero Two) (pos_two IR) G (([-C-]One{-}FId){^}n)).
+ unfold G.
+ Derivative_Help;
+  [|apply Derivative_scal;refine (Derivative_nth _ _ _ _ _ _);Deriv].
+ FEQ.
+ repeat constructor.
+assert (X1:Continuous (olor Zero Two) (([-C-]One{-}FId){^}n)).
+ Contin.
+assert (X2:(olor Zero Two One)).
+ split.
+  apply pos_one.
+ apply one_less_two.
+eapply eq_transitive.
+ 2:apply eq_symmetric.
+ 2:apply (fun A => Barrow (olor Zero Two) _ X1 _ _ X0 _ _ A X2 Hc0).
+simpl.
+rstepr (([--]One[/]nring (R:=IR) n[+]One[//]nringS_ap_zero IR n)[*]
+(nexp IR n (One[-]c)[*](One[-]c))).
+change (([--]One[^]n[/]_[//]nringS_ap_zero IR n)[*]
+ ((c[-]One)[^](S n))[=]
+ ([--]One[/]_[//]nringS_ap_zero IR n)[*]
+ ((One[-]c)[^](S n))).
+rstepr (([--]One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]
+ ([--]One[*](c[-]One))[^]S n).
+csetoid_rewrite (mult_nexp IR ([--]One) (c[-]One) (S n)).
+simpl.
+rational.
+Qed.
+
+End Log_Series.

@@ -42,7 +42,8 @@ Opaque Min Max.
 
 Section Basic_Results.
 
-(** *More about Functions
+(**
+* More about Functions
 
 Here we state all the main results about properties of functions that
 we already proved for compact intervals in the more general setting of
@@ -51,7 +52,7 @@ arbitrary intervals.
 %\begin{convention}% Let [I:interval] and [F,F',G,G'] be partial functions.
 %\end{convention}%
 
-**Continuity
+** Continuity
 *)
 
 Variable I : interval.
@@ -232,11 +233,19 @@ exact (compact_single_iprop I x H0).
 exact (compact_single_prop x).
 Qed.
 
+Lemma Continuous_NRoot : forall n H, (forall x : IR, I x -> forall Hx, Zero[<=]F x Hx)
+ -> Continuous I (FNRoot F n H).
+Proof.
+intros n H.
+elim contF; intros incF' contF'.
+split; Contin.
+Qed.
+
 End Other_Results.
 
 Hint Resolve continuous_compact Continuous_const Continuous_id
   Continuous_plus Continuous_inv Continuous_minus Continuous_mult
-  Continuous_scal Continuous_nth Continuous_recip Continuous_abs: continuous.
+  Continuous_scal Continuous_nth Continuous_recip Continuous_abs Continuous_NRoot: continuous.
 
 Hint Immediate included_imp_Continuous Included_imp_Continuous: continuous.
 
@@ -311,7 +320,8 @@ Hint Resolve Continuous_Sum0 Continuous_Sumx Continuous_Sum: continuous.
 
 Section Basic_Properties.
 
-(** **Derivative
+(**
+** Derivative
 
 Derivative is not that much different.
 
@@ -608,7 +618,8 @@ End More_Sums.
 
 Section Diffble_Basic_Properties.
 
-(** **Differentiability
+(**
+** Differentiability
 
 Mutatis mutandis for differentiability.
 *)
@@ -796,7 +807,8 @@ End Diffble_Corollaries.
 
 Section Nth_Derivative.
 
-(** **Nth Derivative
+(**
+** Nth Derivative
 
 Higher order derivatives pose more interesting problems.  It turns out that it really becomes necessary to generalize our [n_deriv] operator to any interval.
 *)

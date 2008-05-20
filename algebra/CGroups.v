@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -39,6 +40,7 @@
 (** printing {-} %\ensuremath-% #&minus;# *)
 (** printing {--} %\ensuremath-% #&minus;# *)
 
+Require Import CornTac.
 Require Export CMonoids.
 
 (* Begin_SpecReals *)
@@ -265,6 +267,11 @@ Definition Build_SubCGroup : CGroup := Build_CGroup subcrr _ isgrp_scrr.
 End SubCGroups.
 
 End CGroup_basics.
+
+Add Parametric Morphism c : (@cg_minus c) with signature (@cs_eq (cg_crr c)) ==> (@cs_eq c) ==> (@cs_eq c) as cg_minus_wd_morph.
+intros.
+rapply cg_minus_wd; assumption.
+Qed.
 
 Hint Resolve cg_rht_inv_unfolded cg_lft_inv_unfolded: algebra.
 Hint Resolve cg_inv_inv cg_minus_correct cg_zero_inv cg_inv_zero: algebra.

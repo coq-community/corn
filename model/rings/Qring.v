@@ -38,7 +38,8 @@ Require Export Qabgroup.
 Require Import CRings.
 Require Import Zring.
 
-(** **Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
+(**
+** Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
 Because [Q] forms an abelian group with addition, a monoid with 
 multiplication and it satisfies the distributive law, it is a ring.
 *)
@@ -63,6 +64,8 @@ auto.
 Defined.
 
 Definition Q_as_CRing := Build_CRing _ _ _ Q_is_CRing.
+
+Canonical Structure Q_as_CRing.
 
 (** The following lemmas are used in the proof that [Q] is Archimeadian.
 *)
@@ -99,7 +102,7 @@ Lemma nring_Q : forall n : nat, nring (R:=Q_as_CRing) n[=]inject_Z n.
 Proof.
  intro n.
  induction  n as [| n Hrecn].
- change (Build_Q 0%Z 1%positive{=Q}Build_Q 0%Z 1%positive) in |- *.
+ change (Qmake 0%Z 1%positive==Qmake 0%Z 1%positive) in |- *.
  change (Zero[=](Zero:Q_as_CRing)) in |- *.
  apply eq_reflexive_unfolded.
 

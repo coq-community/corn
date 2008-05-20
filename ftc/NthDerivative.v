@@ -38,7 +38,8 @@ Require Export Differentiability.
 
 Section Nth_Derivative.
 
-(** *Nth Derivative
+(**
+* Nth Derivative
 
 We now study higher order differentiability.
 
@@ -49,7 +50,7 @@ We now study higher order differentiability.
 
 %\end{convention}%
 
-**Definitions
+** Definitions
 
 We first define what we mean by the derivative of order [n] of a function.
 *)
@@ -89,7 +90,8 @@ Implicit Arguments Diffble_I_n [a b].
 
 Section Trivia.
 
-(** **Trivia
+(**
+** Trivia
 
 These are the expected extensionality and uniqueness results.
 *)
@@ -167,7 +169,8 @@ End Trivia.
 
 Section Basic_Results.
 
-(** **Basic Results
+(**
+** Basic Results
 
 We now explore the concept of [n] times differentiability.  Notice
 that, unlike the first order case, we do not pay so much attention to
@@ -447,7 +450,8 @@ Let Hab := less_leEq _ _ _ Hab'.
 Let I := Compact Hab.
 (* end hide *)
 
-(** **The Nth Derivative
+(**
+** The Nth Derivative
 
 We now define an operator that returns an nth order derivative of an
 n-times differentiable function.  This is analogous to the quantifier

@@ -932,10 +932,10 @@ Qed.
 
 End supremum.
 
-(***********************************)
-(***********************************)
-(***********************************)
-(***********************************)
+(*---------------------------------*)
+(*---------------------------------*)
+(*---------------------------------*)
+(*---------------------------------*)
 Section Every_Cauchy_Sequence_is_bounded.
 
 Definition seq2set (g : CauchySeq OF) (x : OF) : CProp :=
@@ -1413,7 +1413,7 @@ Qed.
 Lemma sup_leEq : forall n : nat, g_ n[<=]sup.
 Proof.
  intros.
- intro.
+ rewrite leEq_def; intro.
  apply (less_irreflexive_unfolded _ sup).
  apply (Psup_unfolded1 (g_ n)).
  red in |- *.
@@ -1425,7 +1425,7 @@ Qed.
 Lemma inf_geEq : forall n : nat, inf[<=]g_ n.
 Proof.
  intros.
- intro. 
+ rewrite leEq_def; intro. 
  apply (less_irreflexive_unfolded _ (g_ n)).
  apply (Pinf_unfolded1 (g_ n)).
  red in |- *.
@@ -1509,7 +1509,7 @@ Proof.
  apply inv_cancel_leEq.
  rstepl (sup_tail N[-]sup_tail m).
  rstepr e.
- intro.
+ rewrite leEq_def; intro.
  apply (less_irreflexive_unfolded _ e).
  case (Psup_unfolded2 (tail_seq g N) (sup_tail m[+]e)). 
  change (sup_tail m[+]e[<]sup_tail N) in |- *.
@@ -1547,7 +1547,7 @@ Proof.
  (* II *)
  apply less_leEq.
  apply leEq_less_trans with (y := e [/]TwoNZ).
- red in |- *.
+ rewrite leEq_def.
  intro.
  apply (less_irreflexive_unfolded _ (e [/]TwoNZ)).
  case (Psup_unfolded2 (tail_seq g m) (sup_tail N[+]e [/]TwoNZ)). 
@@ -1596,7 +1596,7 @@ Lemma sup_tail_decrease :
  forall m n : nat, m <= n -> sup_tail n[<=]sup_tail m.
 Proof.
  intros.
- intro. 
+ rewrite leEq_def; intro. 
  case (Psup_unfolded2 (tail_seq g n) (sup_tail m)).
  assumption.
  intro xj.

@@ -42,7 +42,8 @@
 
 Require Export CReals.
 
-(** *Real Number Structures
+(**
+* Real Number Structures
 %\begin{convention}% Let [IR] be a structure for real numbers.
 %\end{convention}%
 *)
@@ -67,7 +68,8 @@ Notation OneR := (One:IR).
 (* end hide *)
 
 Section CReals_axioms.
-(** ** [CReals] axioms *)
+(**
+** [CReals] axioms *)
 
 Lemma CReals_is_CReals : is_CReals IR (Lim (IR:=IR)).
 unfold Lim in |- *.
@@ -132,7 +134,8 @@ End CReals_axioms.
 
 Section Cauchy_Defs.
 
-(** ** Cauchy sequences
+(**
+** Cauchy sequences
 *** Alternative definitions
 This section gives several definitions of Cauchy sequences. There
 are no lemmas in this section.
@@ -206,7 +209,8 @@ Definition Cauchy_prop4 (seq : nat -> IR) := {y : IR | Cauchy_Lim_prop4 seq y}.
 End Cauchy_Defs.
 
 Section Inequalities.
-(** *** Inequalities of Limits
+(**
+*** Inequalities of Limits
 
 The next lemma is equal to lemma [Lim_Cauchy].  *)
 
@@ -332,11 +336,13 @@ Qed.
 
 Lemma leEq_seq_so_leEq_Lim : forall (seq : CauchySeqR) y, (forall i, y [<=] seq i) -> y [<=] Lim seq.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H0.
 generalize (Lim_less_so_seq_less _ _ H0); intro H1.
 elim H1; intros N H2.
-apply (H N).
+pose (c:=H N).
+rewrite leEq_def in c.
+apply c.
 apply H2.
 auto with arith.
 Qed.
@@ -344,7 +350,7 @@ Qed.
 Lemma str_leEq_seq_so_leEq_Lim : forall (seq : CauchySeq IR) y,
  (exists N : nat, (forall i, N <= i -> y [<=] seq i)) -> y [<=] Lim seq.
 intros.
-red in |- *; intro H0.
+rewrite leEq_def; intro H0.
 generalize (Lim_less_so_seq_less _ _ H0).
 elim H; intros N HN.
 intro H1.
@@ -359,22 +365,26 @@ Qed.
 Lemma Lim_leEq_Lim : forall seq1 seq2 : CauchySeqR,
  (forall i, seq1 i [<=] seq2 i) -> Lim seq1 [<=] Lim seq2.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H0.
 generalize (Lim_less_Lim_so_seq_less_seq _ _ H0); intro H1.
 elim H1; intros N H2.
-apply (H N).
+pose (c:=H N).
+rewrite leEq_def in c.
+apply c.
 apply H2.
 auto with arith.
 Qed.
 
 Lemma seq_leEq_so_Lim_leEq : forall (seq : CauchySeqR) y, (forall i, seq i [<=] y) -> Lim seq [<=] y.
 intros.
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H0.
 generalize (less_Lim_so_less_seq _ _ H0); intro H1.
 elim H1; intros N H2.
-apply (H N).
+pose (c:=H N).
+rewrite leEq_def in c.
+apply c.
 apply H2.
 auto with arith.
 Qed.
@@ -382,7 +392,7 @@ Qed.
 Lemma str_seq_leEq_so_Lim_leEq : forall (seq : CauchySeq IR) y,
  (exists N : nat, (forall i, N <= i -> seq i [<=] y)) -> Lim seq [<=] y.
 intros.
-red in |- *; intro H0.
+rewrite leEq_def; intro H0.
 generalize (less_Lim_so_less_seq _ _ H0).
 elim H; intros N HN.
 intro H1.
@@ -493,7 +503,8 @@ End Inequalities.
 
 Section Equiv_Cauchy.
 
-(** *** Equivalence of formulations of Cauchy *)
+(**
+*** Equivalence of formulations of Cauchy *)
 
 Lemma Cauchy_prop1_prop : forall seq, Cauchy_prop1 seq -> Cauchy_prop seq.
 intros seq H.
@@ -794,7 +805,8 @@ End Equiv_Cauchy.
 
 Section Cauchy_props.
 
-(** *** Properties of Cauchy sequences
+(**
+*** Properties of Cauchy sequences
 
 Some of these lemmas are now obsolete, because they were reproved for arbitrary ordered fields$\ldots$#...#
 

@@ -43,13 +43,14 @@ Opaque Min.
 
 Section Indefinite_Integral.
 
-(** *The Fundamental Theorem of Calculus
+(**
+* The Fundamental Theorem of Calculus
 
 Finally we can prove the fundamental theorem of calculus and its most
 important corollaries, which are the main tools to formalize most of
 real analysis.
 
-**Indefinite Integrals
+** Indefinite Integrals
 
 We define the indefinite integral of a function in a proper interval
 in the obvious way; we just need to state a first lemma so that the
@@ -99,7 +100,8 @@ Notation "[-S-] F" := (Fprim F) (at level 20).
 
 Section FTC.
 
-(** **The FTC
+(**
+** The FTC
 
 We can now prove our main theorem.  We begin by remarking that the
 primitive function is always continuous.
@@ -277,11 +279,18 @@ The following is another statement of the Fundamental Theorem of Calculus, also 
 Let G0_inc := Derivative_imp_inc _ _ _ _ derG0.
 (* end hide *)
 
-Theorem Barrow : forall a b (H : Continuous_I (Min_leEq_Max a b) F) Ha Hb,
- let Ha' := G0_inc a Ha in let Hb' := G0_inc b Hb in Integral H [=] G0 b Hb'[-]G0 a Ha'.
+End FTC.
+
+Theorem Barrow : forall J F (contF : Continuous J F)
+ (pJ:proper J) G0 (derG0 : Derivative J pJ G0 F)
+ a b (H : Continuous_I (Min_leEq_Max a b) F) Ha Hb,
+ let Ha' := Derivative_imp_inc _ _ _ _ derG0 a Ha in let Hb' := Derivative_imp_inc _ _ _ _ derG0 b Hb in Integral H [=] G0 b Hb'[-]G0 a Ha'.
 (* begin hide *)
-intros a b H1 Ha Hb; intros.
-elim FTC2; intros c Hc.
+intros J F contF pJ G0 derG0 a b H1 Ha Hb; intros.
+pose (x0:=a).
+pose (Hx0:=Ha).
+set (G := ( [-S-]contF) x0 Hx0).
+elim (@FTC2 J F contF x0 Hx0 pJ G0 derG0); intros c Hc.
 elim Hc; intros H2 H.
 elim H; clear H Hc; intros H3 H0.
 (* Allow G0a to be G0 of a.
@@ -304,28 +313,53 @@ apply included3_interval; auto.
 intros; apply eq_symmetric_unfolded.
 rstepr (x[+]y[-]x); algebra.
 cut (forall x y z : IR, x[-]y [=] z -> x [=] y[+]z); intros.
-Opaque G.
-cut (forall x : IR, J x -> forall Hx Hx', G x Hx[-]G0 x Hx' [=] c); intros.
+fold G in H0.
 apply cg_minus_wd; unfold Ga, Gb, G0a, G0b in |- *; apply H; auto.
 simpl in H0.
-apply eq_transitive_unfolded with ((G{-}G0) x (CAnd_intro _ _ Hx Hx')).
-2: apply H0 with (Hx := CAnd_intro _ _ Hx Hx').
-simpl in |- *; algebra.
+apply eq_transitive_unfolded with ((G{-}G0) b (CAnd_intro _ _ Hb Hb')).
+2: apply H0 with (Hx := CAnd_intro _ _ Hb Hb').
+simpl.
+apply cg_minus_wd.
+apply Integral_wd.
+apply Feq_reflexive.
+destruct H1 as [H1 _].
+apply H1.
+algebra.
 auto.
+auto.
+change c with ([-C-]c a CI).
+apply eq_transitive_unfolded with ((G{-}G0) a (CAnd_intro _ _ Ha Ha')).
+2: apply H0 with (Hx := CAnd_intro _ _ Ha Ha').
+simpl.
+apply cg_minus_wd.
+apply Integral_wd.
+apply Feq_reflexive.
+destruct H1 as [H1 _].
+intros y Hy.
+apply H1.
+apply (compact_wd _ _ (Min_leEq_Max a b) a).
+apply compact_Min_lft.
+unfold compact, x0 in Hy.
+destruct Hy.
+apply leEq_imp_eq.
+astepl (Min a a). assumption.
+apply Min_id.
+stepr(Max a a). assumption.
+apply Max_id.
+algebra.
 auto.
 rstepl (y[+] (x[-]y)).
 algebra.
 Qed.
 (* end hide *)
 
-End FTC.
-
 Hint Resolve Continuous_prim: continuous.
 Hint Resolve FTC1: derivate.
 
 Section Limit_of_Integral_Seq.
 
-(** **Corollaries
+(**
+** Corollaries
 
 With these tools in our hand, we can prove several useful results.
 

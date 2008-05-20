@@ -41,7 +41,8 @@
 Require Export CSumsReals.
 Require Export KeyLemma.
 
-(** ** Main Lemma
+(**
+** Main Lemma
 *)
 
 Section Main_Lemma.

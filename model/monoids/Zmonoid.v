@@ -38,8 +38,9 @@
 Require Export Zsemigroup.
 Require Export CMonoids.
 
-(** **Examples of monoids: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
-***$\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
+(**
+** Examples of monoids: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
+*** $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 We use the addition [ZERO] (defined in the standard library) as the
 unit of monoid:
 *)
@@ -74,9 +75,11 @@ Definition Z_is_CMonoid := Build_is_CMonoid
 
 Definition Z_as_CMonoid := Build_CMonoid Z_as_CSemiGroup _ Z_is_CMonoid.
 
+Canonical Structure Z_as_CMonoid.
+
 (** The term [Z_as_CMonoid] is of type [CMonoid]. Hence we have proven that [Z] is a constructive monoid.
 
-***$\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
+*** $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#
 As the multiplicative unit we should use [`1`], which is [(POS xH)] in
 the representation we have for integers.
 *)

@@ -38,7 +38,8 @@ Require Export Prod_Sub.
 Require Export Equiv.
 
 Section Definition_MS.
-(** **Definition of Metric Space
+(**
+** Definition of Metric Space
 *)
 
 
@@ -51,7 +52,8 @@ End Definition_MS.
 
 
 Section MS_basics.
-(** **Metric Space basics
+(**
+** Metric Space basics
 *)
 
 Lemma d_CMetricSpace_apdiag_imp_grzero :
@@ -90,7 +92,8 @@ Qed.
 
 End MS_basics.
 Section prodandsub.
-(** **Product-Metric-Spaces and Sub-Metric-Spaces
+(**
+** Product-Metric-Spaces and Sub-Metric-Spaces
 *)
 (**
 The product of two metric spaces is again a metric space.
@@ -155,7 +158,8 @@ Implicit Arguments SubMetricSpace [X].
 
 End prodandsub.
 Section Zeroff.
-(** **Pseudo Metric Spaces vs Metric Spaces
+(**
+** Pseudo Metric Spaces vs Metric Spaces
 *)
 (**
 Not all pseudo metric spaces are a metric space:
@@ -257,7 +261,7 @@ intros x y.
 split.
 intro H.
 cut (ZeroR[<=]x[-d]y).
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H1.
 cut (Not (x[-d]y[#]Zero)).
 intro H2.
@@ -556,7 +560,8 @@ Qed.
 End Zeroff.
 
 Section Limitt.
-(** **Limit
+(**
+** Limit
 *)
 (**
 A sequence in a metric space has at most one limit.
@@ -657,7 +662,7 @@ cut
  (nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
   nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[<=]
   (seq (max x y)[-d]a)[+](seq (max y x)[-d]b)).
-unfold leEq in |- *.         
+rewrite leEq_def in |- *.         
 intro H16.
 auto.
 
@@ -736,9 +741,9 @@ intro H17.
 set (H18 := ax_d_nneg X (cms_d (c:=X))) in *.
 generalize H18.
 unfold nneg in |- *.
-unfold leEq in |- *.
 intro H19.
 set (H20 := H19 (CPsMetricSpace_is_CPsMetricSpace X) a b) in *.
+rewrite leEq_def in H20.
 set (H21 := H20 H17) in *.
 intuition.
 

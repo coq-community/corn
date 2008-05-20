@@ -38,7 +38,8 @@ Require Export Nsetoid.
 Require Export Npossec.
 Require Import CSetoidFun.
 
-(** **Example of a setoid: [Npos]
+(**
+** Example of a setoid: [Npos]
 
 *** Setoid
 The positive natural numbers [Npos] will be defined as a subsetoid of the
@@ -58,7 +59,8 @@ Definition ONEpos := Build_subcsetoid_crr _ NposP 1 (S_O 0).
 Definition TWOpos := Build_subcsetoid_crr _ NposP 2 (S_O 1).
 
 
-(** ***Addition and multiplication
+(**
+*** Addition and multiplication
 Because addition and multiplication preserve positivity, we can define 
 them on this subsetoid.
 *)

@@ -39,7 +39,8 @@ Require Export PartInterval.
 
 Section Definitions.
 
-(** *Sequences of Functions
+(**
+* Sequences of Functions
 
 In this file we define some more operators on functions, namely
 sequences and limits.  These concepts are defined only for continuous
@@ -53,7 +54,7 @@ will be denoted by [I];
 
 %\end{convention}%
 
-**Definitions
+** Definitions
 
 A sequence of functions is simply an object of type [nat->PartIR].
 However, we will be interested mostly in convergent and Cauchy
@@ -343,7 +344,8 @@ End More_Definitions.
 
 Section Irrelevance_of_Proofs.
 
-(** **Irrelevance of Proofs
+(**
+** Irrelevance of Proofs
 
 This section contains a number of technical results stating mainly that being a Cauchy sequence or converging to some limit is a property of the sequence itself and independent of the proofs we supply of its continuity or the continuity of its limit.
 *)
@@ -435,7 +437,8 @@ End More_Proof_Irrelevance.
 
 Section More_Properties.
 
-(** **Other Properties
+(**
+** Other Properties
 
 Still more technical details---a convergent sequence converges to its
 limit; the limit is a continuous function; and convergence is well
@@ -721,7 +724,8 @@ Hint Resolve Cauchy_cont_Lim: continuous.
 
 Section Algebraic_Properties.
 
-(** **Algebraic Properties
+(**
+** Algebraic Properties
 
 We now study how convergence is affected by algebraic operations, and some algebraic properties of the limit function.
 *)
@@ -788,10 +792,10 @@ apply less_leEq; assumption.
 apply AbsIR_wd; rational.
 Qed.
 
-Lemma fun_Cauchy_prop_const : forall H contH,
- Cauchy_fun_seq a b Hab (fun n => H) contH.
+Lemma fun_Cauchy_prop_const : forall H (contH:Continuous_I Hab H),
+ Cauchy_fun_seq a b Hab (fun n => H) (fun n => contH).
 intros.
-apply conv_Cauchy_fun_seq' with H (contH 0).
+apply conv_Cauchy_fun_seq' with H contH.
 apply fun_Lim_seq_const.
 Qed.
 
@@ -1138,7 +1142,7 @@ cut
  (Continuous_I Hab
     (Cauchy_fun_seq_Lim _ _ _ _ _
        (fun_Cauchy_prop_const a b Hab [-C-]Zero
-          (fun n : nat => Continuous_I_const _ _ _ _)) {-}
+          (Continuous_I_const _ _ _ _)) {-}
      Cauchy_fun_seq_Lim _ _ _ _ _ Hf)).
 intros H1.
 apply
@@ -1147,7 +1151,7 @@ apply
     H0
     (Cauchy_fun_seq_Lim _ _ _ _ _
        (fun_Cauchy_prop_const a b Hab [-C-]Zero
-          (fun n : nat => Continuous_I_const _ _ _ _)) {-}
+          (Continuous_I_const _ _ _ _)) {-}
      Cauchy_fun_seq_Lim _ _ _ _ _ Hf)
     H1.
 apply eq_imp_Feq.
