@@ -40,14 +40,15 @@ Require Export Continuity.
 
 Section Definitions.
 
-(** *Partitions
+(**
+* Partitions
 
 We now begin to lay the way for the definition of Riemann integral.  This will
 be done through the definition of a sequence of
 sums that is proved to be convergent; in order to do that, we first
 need to do a bit of work on partitions.
 
-**Definitions
+** Definitions
 
 A partition is defined as a record type.  For each compact interval [[a,b]]
 and each natural number [n], a partition of [[a,b]] with [n+1] points is a
@@ -136,7 +137,7 @@ helps us in this case.
 
 Definition Part_Mesh_List n a b Hab (P : Partition a b Hab n) : list IR.
 intro; induction  n as [| n Hrecn]; intros.
-apply nil.
+apply (@nil IR).
 apply cons.
 apply (P _ (le_n (S n)) [-]P _ (le_S _ _ (le_n n))).
 apply
@@ -283,7 +284,8 @@ End Refinements.
 Implicit Arguments Points_in_Partition [a b Hab n].
 Implicit Arguments Partition_Sum [a b Hab n P g F].
 
-(** **Constructions
+(**
+** Constructions
 
 We now formalize some trivial and helpful constructions.
 
@@ -364,7 +366,8 @@ Hint Resolve start finish: algebra.
 
 Section Lemmas.
 
-(** ** Properties of the mesh
+(**
+** Properties of the mesh
 
 If a partition has more than one point then its mesh list is nonempty.
 *)
@@ -655,7 +658,8 @@ simpl in |- *; rational.
 apply (lt_O_neq n); auto.
 Qed.
 
-(** ** Miscellaneous
+(**
+** Miscellaneous
 %\begin{convention}% Throughout this section, let [a,b:IR] and [I] be [[a,b]].
 %\end{convention}%
 *)
@@ -765,7 +769,8 @@ End Even_Partitions.
 
 Section More_Definitions.
 
-(** ** Separation
+(**
+** Separation
 
 Some auxiliary definitions.  A partition is said to be separated if all its points are distinct.
 *)

@@ -36,7 +36,8 @@
 
 Require Import CSetoids.
 
-(** **Setoids of the first [n] natural numbers
+(**
+** Setoids of the first [n] natural numbers
 *)
 
 Record F (n:nat):Set:=

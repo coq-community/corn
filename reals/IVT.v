@@ -37,7 +37,8 @@
 Require Export CPoly_Contin.
 
 Section Nested_Intervals.
-(** * Intermediate Value Theorem
+(**
+* Intermediate Value Theorem
 
 ** Nested intervals
 
@@ -110,20 +111,22 @@ Let a' := Build_CauchySeq _ a intervals_cauchy.
 Lemma Cnested_intervals_limit : {z : IR | forall i, a i [<=] z | forall i, z [<=] b i}.
 exists (Lim a').
 intros.
-unfold leEq in |- *. unfold Not in |- *. intros.
+rewrite leEq_def in |- *. unfold Not in |- *. intros.
 elim (Lim_less_so_seq_less a' (a i)). intro n. intros H0.
 elim (le_lt_dec n i); intro H1.
 cut (Not (a i [<] a i)). intro H2.
 unfold Not in H1. elim H2. apply H0. auto.
 apply less_irreflexive_unfolded.
 cut (forall i j : nat, i <= j -> a i [<=] a j). intro a_mon''.
-unfold leEq in a_mon''. unfold Not in a_mon''.
-elim a_mon'' with i n. auto with arith.
+pose (c:=a_mon'' i n).
+rewrite leEq_def in c.
+apply c.
+auto with arith.
 apply H0.
 auto.
 intros. apply a_mon'; auto.
 auto.
-unfold leEq in |- *. unfold Not in |- *. intros i H.
+intros i. rewrite leEq_def. unfold Not. intros H.
 elim (less_Lim_so_less_seq a' (b i) H). intro n. intros H0.
 elim (le_lt_dec n i); intro H1.
 cut (Not (a i [<] b i)). unfold Not in |- *. intro.
@@ -209,8 +212,7 @@ elim (f_contin_neg z H3). intro eps. intros H5 H6.
 elim (b_a eps). intro i. intros H7.
 cut (b i [<=] z[+]eps). intro.
 cut (z [<=] b i[+]eps). intro.
-unfold leEq in f_b. unfold Not in f_b.
-apply f_b with i. apply H6. auto. auto.
+pose (c:= f_b i). rewrite leEq_def in c. apply c. apply H6. auto. auto.
 apply leEq_transitive with (b i). auto.
 astepl (b i[+]Zero). apply plus_resp_leEq_lft. apply less_leEq. auto.
 apply leEq_transitive with (a i[+]eps). auto.
@@ -219,8 +221,7 @@ elim (f_contin_pos z H3). intro eps. intros H5 H6.
 elim (b_a eps). intro i. intros H7.
 cut (a i [<=] z[+]eps). intro.
 cut (z [<=] a i[+]eps). intro.
-unfold leEq in f_a. unfold Not in f_a.
-apply f_a with i. apply H6. auto. auto.
+pose (c:= f_a i). rewrite leEq_def in c; apply c. apply H6. auto. auto.
 apply leEq_transitive with (b i). auto.
 auto. apply leEq_transitive with z. auto.
 astepl (z[+]Zero). apply less_leEq. apply plus_resp_less_lft. auto.
@@ -231,7 +232,8 @@ End Nested_Intervals.
 
 Section Bisection.
 
-(** ** Bissections *)
+(**
+** Bissections *)
 
 Variable f : CSetoid_un_op IR.
 Hypothesis f_apzero_interval :
@@ -366,7 +368,8 @@ End Bisect_Interval.
 
 Section IVT_Op.
 
-(** ** IVT for operations
+(**
+** IVT for operations
 Same conventions as before.
 *)
 
@@ -509,7 +512,8 @@ End IVT_Op.
 
 Section IVT_Poly.
 
-(** ** IVT for polynomials *)
+(**
+** IVT for polynomials *)
 
 Lemma Civt_poly : forall f : cpoly_cring IR, f [#] Zero ->
  forall a b, a [<] b -> f ! a [<=] Zero -> Zero [<=] f ! b -> {x : IR | a [<=] x /\ x [<=] b /\ f ! x [=] Zero}.

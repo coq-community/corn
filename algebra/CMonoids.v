@@ -182,7 +182,8 @@ End SubCMonoids.
 End CMonoid_basics.
 
 Section Th13.
-(** **Morphism, isomorphism and automorphism of Monoids
+(**
+** Morphism, isomorphism and automorphism of Monoids
 %\begin{convention}%
 Let [M1 M2 M M':CMonoid].
 %\end{convention}%
@@ -287,7 +288,8 @@ Definition automorphism:= (isomorphism M M).
 End p71R2.
 
 Section p71E1.
-(** **Power in a monoid
+(**
+** Power in a monoid
 %\begin{convention}%
 Let [M:CMonoid] and [c:M].
 %\end{convention}%
@@ -322,7 +324,8 @@ algebra.
 Qed.
 
 
-(** **Cyclicity
+(**
+** Cyclicity
 *)
 
 Definition is_generator (M:CMonoid)(u:M):CProp:=
@@ -667,7 +670,8 @@ Qed.
 
 End gen_cyc.
 
-(** **Invertability
+(**
+** Invertability
 *)
 
 Definition is_inverse S (op : CSetoid_bin_op S) Zero x x_inv : Prop :=
@@ -679,7 +683,8 @@ Definition invertible (M:CMonoid): M -> CProp :=
 fun m =>{inv: (CSetoid_un_op M) | (is_inverse csg_op (@cm_unit M) m (inv m))}.
 
 Section D9M.
-(** **Direct Product
+(**
+** Direct Product
 %\begin{convention}%
 Let [M1 M2:CMonoid]
 %\end{convention}%
@@ -793,7 +798,8 @@ Qed.
 End p71E2b2.
 
 
-(** **The Monoids of Setoid functions and bijective Setoid functions.
+(**
+** The Monoids of Setoid functions and bijective Setoid functions.
 *)
 
 Definition FS_id (A : CSetoid) : FS_as_CSetoid A A.
@@ -839,7 +845,8 @@ Definition PS_as_CMonoid (A : CSetoid) :=
   Build_SubCMonoid (FS_as_CMonoid A) (bijective (A:=A) (B:=A)) (
     id_is_bij A) (comp_resp_bij A A A).  
 
-(** **The free Monoid
+(**
+** The free Monoid
 *)
 
 Lemma is_unit_Astar_empty_word: forall (A:CSetoid),
@@ -852,8 +859,6 @@ split.
 apply eq_fm_reflexive.
 
 unfold empty_word.
-unfold app.
-unfold ListType.app.
 induction a.
 apply eq_fm_reflexive.
 
@@ -905,7 +910,8 @@ Definition free_monoid_as_CMonoid:CMonoid:=
 
 End Th12.
 
-(** **The unit in the setoid of Setoid functions
+(**
+** The unit in the setoid of Setoid functions
 %\begin{convention}%
 Let [X:CSetoid].
 %\end{convention}%
@@ -927,7 +933,8 @@ End p67R2.
 
 Section Th11.
 
-(** **Intersection
+(**
+** Intersection
 The intersection of a collection of monoids is again a monoid.
 %\begin{convention}%
 Let [M:CMonoid], [I:type], [C:I->(M->CProp)], [Cunit: (C i Zero)] and
@@ -981,14 +988,14 @@ Definition Dbrack : M -> CProp :=
 
 Lemma Dbrack_unit: (Dbrack Zero).
 unfold Dbrack.
-exists (nil M).
+exists (@nil M).
 simpl.
 intuition.
 Qed.
 
 
 Lemma cm_Sum_app: 
-forall (k l : (list M)), (cm_Sum (app M k l))[=] (cm_Sum k)[+](cm_Sum l).
+forall (k l : (list M)), (cm_Sum (app k l))[=] (cm_Sum k)[+](cm_Sum l).
 intros k l.
 induction k.
 simpl.
@@ -1014,7 +1021,7 @@ intros lx Hx.
 elim Hy.
 clear Hy.
 intros ly Hy.
-exists (app M lx ly).
+exists (app lx ly).
 split.
 intro a.
 set (H:= (member_app M a ly lx)).

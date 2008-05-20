@@ -36,7 +36,8 @@
 
 Require Export AbsCC.
 
-(** * More properties of complex numbers
+(**
+* More properties of complex numbers
 ** Sequences and limits *)
 
 Hint Resolve AbsIR_sqrt_sqr: algebra.
@@ -188,7 +189,8 @@ apply CC_SeqLimit_uniq with (CC_seq s). auto.
 apply LimCC_is_lim.
 Qed.
 
-(** ** Continuity for [CC]
+(**
+** Continuity for [CC]
 *)
 
 Section Continuity_for_CC.

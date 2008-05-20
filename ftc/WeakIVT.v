@@ -42,7 +42,8 @@ Infix "**" := prodT (at level 20).
 
 Require Export Continuity.
 
-(** *IVT for Partial Functions
+(**
+* IVT for Partial Functions
 
 In general, we cannot prove the classically valid Intermediate Value
 Theorem for arbitrary partial functions, which states that in any
@@ -64,7 +65,8 @@ Let I := Compact Hab.
 Variable F : PartIR.
 Hypothesis contF : Continuous_I Hab F.
 
-(** **First Lemmas
+(**
+** First Lemmas
 
 %\begin{convention}% Let [a, b : IR] and [Hab : a [<=] b] and denote by [I]
 the interval [[a,b]].  Let [F] be a continuous function on [I].
@@ -240,7 +242,8 @@ End Lemma2.
 
 Section IVT.
 
-(** **The IVT
+(**
+** The IVT
 
 We will now assume that [a [<] b] and that [F] is not only
 continuous, but also strictly increasing in [I].  Under
@@ -544,7 +547,7 @@ exists xa.
 apply xa_in_interval.
 intro.
 apply cg_inv_unique_2; apply leEq_imp_eq.
-red in |- *; apply approach_zero.
+apply approach_zero.
 intros e H.
 apply leEq_less_trans with (e [/]TwoNZ).
 2: apply pos_div_two'; auto.
@@ -572,7 +575,7 @@ exists N; intros; simpl in |- *.
 apply local_mon'_imp_mon'; auto; exact a_seq_mon.
 astepl ( [--]ZeroR); rstepr ( [--] (z[-]F xa Hx)).
 apply inv_resp_leEq.
-red in |- *; apply approach_zero.
+apply approach_zero.
 intros e H.
 apply leEq_less_trans with (e [/]TwoNZ).
 2: apply pos_div_two'; auto.

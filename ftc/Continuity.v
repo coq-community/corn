@@ -38,10 +38,12 @@
 
 Require Export NRootIR.
 Require Export FunctSums.
+Require Import CornTac.
 
 Section Definitions_and_Basic_Results.
 
-(** *Continuity
+(**
+* Continuity
 
 Constructively, continuity is the most fundamental property of any
 function---so strongly that no example is known of a constructive
@@ -324,7 +326,7 @@ Qed.
 Lemma leEq_Norm_Funct : forall e, (forall x, I x -> forall Hx, AbsIR (F x Hx) [<=] e) -> Norm_Funct [<=] e.
 intros e H.
 astepr (Zero[+]e); apply shift_leEq_plus.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros d Hd.
 apply shift_minus_leEq.
 elim (norm_fun_lub d Hd); intros x Hx.
@@ -352,7 +354,8 @@ Implicit Arguments Norm_Funct [a b Hab F].
 
 Section Local_Results.
 
-(** **Algebraic Properties
+(**
+** Algebraic Properties
 
 We now state and prove some results about continuous functions.  Assume that [I] is included in the domain of both [F] and [G].
 *)
@@ -767,6 +770,61 @@ astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
 assumption.
 Qed.
 
+Lemma Continuous_I_NRoot : forall n Hn, (forall x Hx, I x -> Zero[<=]F x Hx) ->
+ Continuous_I Hab (FNRoot F n Hn).
+Proof.
+intros n Hn H.
+split.
+ Included.
+intros e He.
+destruct contF as [contF'' contF'].
+destruct (contF' (e[^]n)) as [d Hd H0]; clear contF contF'.
+ apply nexp_resp_pos; assumption.
+exists d.
+ assumption.
+intros x y Hx0 Hy0 Hx Hy Hxy.
+set (x':=FNRoot F n Hn x Hx).
+set (y':=FNRoot F n Hn y Hy).
+stepl (Max x' y'[-]Min x' y');
+ [|apply eq_symmetric;apply Abs_Max].
+apply shift_minus_leEq.
+apply power_cancel_leEq with n; try assumption.
+ apply plus_resp_nonneg.
+  apply less_leEq; assumption.
+ apply leEq_Min; rapply NRoot_nonneg.
+apply leEq_transitive with (e[^]n[+]Min x' y'[^]n).
+ apply shift_leEq_plus.
+ set (Hx':=(ProjT1
+                 (ext2_a IR (Dom F)
+                    (fun (x0 : IR) (Hx1 : Dom F x0) => Zero[<=]F x0 Hx1) x Hx))).           
+ set (Hy':=(ProjT1
+                 (ext2_a IR (Dom F)
+                    (fun (x0 : IR) (Hx1 : Dom F x0) => Zero[<=]F x0 Hx1) y Hy))).
+ stepl (AbsIR (F x Hx'[-]F y Hy')).
+  apply H0; try assumption.
+ stepr (AbsIR (x'[^]n[-]y'[^]n)).
+  apply AbsIR_wd.
+  rapply bin_op_wd_unfolded;
+   apply eq_symmetric; try apply un_op_wd_unfolded; rapply NRoot_power.
+ csetoid_rewrite (Abs_Max (x'[^]n) (y'[^]n)).
+ rapply bin_op_wd_unfolded; try apply un_op_wd_unfolded.
+  change (Max ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Max x' y') CI)).
+  apply Max_monotone.
+  simpl; intros r s _ _ X0 X1 X2.
+  rapply nexp_resp_leEq; try assumption.
+  eapply leEq_transitive;[|apply X0].
+  apply leEq_Min; rapply NRoot_nonneg.
+ change (Min ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Min x' y') CI)).
+ apply Min_monotone.
+ simpl; intros r s _ _ X0 X1 X2.
+ rapply nexp_resp_leEq; try assumption.
+ eapply leEq_transitive;[|apply X0].
+ apply leEq_Min; rapply NRoot_nonneg.
+apply power_plus_leEq; try assumption.
+ apply less_leEq; assumption.
+apply leEq_Min; rapply NRoot_nonneg.
+Qed.
+
 End Local_Results.
 
 Hint Resolve contin_imp_inc: included.
@@ -909,7 +967,7 @@ assert (H := lub_is_lub _ _ _ _ contF).
 set (y := lub_funct _ _ _ _ contF) in *.
 elim H; intros Hy Hy'; clear H.
 apply leEq_imp_eq; apply shift_zero_leEq_minus'; apply inv_cancel_leEq;
- astepr ZeroR; red in |- *; apply approach_zero; intros e He.
+ astepr ZeroR; apply approach_zero; intros e He.
 
 rstepl (z[-]y).
 apply shift_minus_less.
@@ -940,7 +998,7 @@ assert (H := glb_is_glb _ _ _ _ contF).
 set (y := glb_funct _ _ _ _ contF) in *.
 elim H; intros Hy Hy'; clear H.
 apply leEq_imp_eq; apply shift_zero_leEq_minus'; apply inv_cancel_leEq;
- astepr ZeroR; red in |- *; apply approach_zero; intros e He.
+ astepr ZeroR; apply approach_zero; intros e He.
 
 rstepl (z[-]y).
 apply shift_minus_less.
@@ -968,7 +1026,7 @@ Lemma leEq_glb : forall a b Hab (F : PartIR) contF x,
 intros a b Hab F contF x H.
 elim (glb_is_glb _ _ _ _ contF); intros.
 astepr (glb_funct _ _ _ _ contF[+]Zero); apply shift_leEq_plus'.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros e H0.
 elim (b0 _ H0); intro y; intros.
 apply less_leEq; eapply leEq_less_trans.
@@ -1039,4 +1097,4 @@ End Other.
 Hint Resolve Continuous_I_const Continuous_I_id Continuous_I_plus
   Continuous_I_inv Continuous_I_minus Continuous_I_mult Continuous_I_scal
   Continuous_I_recip Continuous_I_max Continuous_I_min Continuous_I_div
-  Continuous_I_nth Continuous_I_abs: continuous.
+  Continuous_I_nth Continuous_I_abs Continuous_I_NRoot: continuous.

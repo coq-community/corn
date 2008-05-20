@@ -39,10 +39,12 @@
 
 Require Export OddPolyRootIR.
 
-(** * Roots of Real Numbers *)
+(**
+* Roots of Real Numbers *)
 
 Section NRoot.
-(** ** Existence of roots
+(**
+** Existence of roots
 
 %\begin{convention}% Let [n] be a natural number and [c] a nonnegative real.
 [p] is the auxiliary polynomial [_X_[^]n[-] (_C_ c)].
@@ -134,7 +136,7 @@ intros. rename X into H.
 cut (Zero [<=] NRoot x k Hx Hk); intros.
 cut (NRoot x k Hx Hk [<] Zero or Zero [<] NRoot x k Hx Hk). intros H1.
 elim H1; clear H1; intro H1.
-elim (H0 H1).
+rewrite leEq_def in H0; elim (H0 H1).
 auto.
 apply ap_imp_less.
 apply un_op_strext_unfolded with (nexp_op (R:=IR) k).
@@ -217,7 +219,7 @@ Hint Resolve NRoot_power NRoot_power': algebra.
 Lemma NRoot_resp_leEq : forall x y xpos ypos k kpos,
  x [<=] y -> NRoot (x:=x) (n:=k) xpos kpos [<=] NRoot (x:=y) (n:=k) ypos kpos.
 intros.
-intro H0.
+rewrite leEq_def; intro H0.
 assert (NRoot ypos kpos[^]k [<=] NRoot xpos kpos[^]k).
 apply power_resp_leEq.
  apply NRoot_nonneg.
@@ -239,11 +241,31 @@ astepr (NRoot xpos kpos).
 auto.
 Qed.
 
-(***********************************)
-Section Square_root.
-(***********************************)
+Lemma NRoot_cancel_less : forall x (Hx:Zero[<=]x) y (Hy:Zero[<=]y) k (Hk Hk':0<k), NRoot Hx Hk [<] NRoot Hy Hk' -> x [<] y.
+intros x Hx y Hy k Hk Hk' H.
+astepl (NRoot Hx Hk[^]k).
+astepr (NRoot Hy Hk'[^]k).
+apply nexp_resp_less.
+  auto with *.
+ apply NRoot_nonneg.
+assumption.
+Qed.
 
-(** ** Square root *)
+Lemma NRoot_str_ext : forall k (Hk Hk':0 < k) x y (Hx:Zero[<=]x) (Hy:Zero[<=]y), NRoot Hx Hk [#] NRoot Hy Hk' -> x[#]y.
+intros k Hk Hk' x y Hx Hy H0.
+destruct (ap_imp_less _ _ _ H0) as [H1|H1].
+ apply less_imp_ap.
+ refine (NRoot_cancel_less _ _ _ _ _ _ _ H1).
+apply Greater_imp_ap.
+refine (NRoot_cancel_less _ _ _ _ _ _ _ H1).
+Qed.
+
+(*---------------------------------*)
+Section Square_root.
+(*---------------------------------*)
+
+(**
+** Square root *)
 
 Definition sqrt x xpos : IR := NRoot (x:=x) (n:=2) xpos (lt_O_Sn 1).
 
@@ -343,7 +365,8 @@ Hint Resolve sqrt_sqr sqrt_mult: algebra.
 
 Section Absolute_Props.
 
-(** ** More on absolute value
+(**
+** More on absolute value
 
 With the help of square roots, we can prove some more properties of absolute 
 values in [IR].
@@ -352,26 +375,26 @@ values in [IR].
 Lemma AbsIR_sqrt_sqr : forall x x2pos, AbsIR x [=] sqrt (x[^]2) x2pos.
 intros x xxpos. unfold AbsIR in |- *. simpl in |- *. unfold ABSIR in |- *.
 apply equiv_imp_eq_max; intros.
-apply power_cancel_less with 2.
-apply less_leEq.
-apply mult_cancel_less with (Two:IR). apply pos_two.
+apply power_cancel_leEq with 2.
+auto.
+apply mult_cancel_leEq with (Two:IR). apply pos_two.
 rstepl (x[+][--]x).
 rstepr (y[+]y).
-apply plus_resp_less_both; auto.
+apply plus_resp_leEq_both; auto.
 astepl (One[*]x[*]x).
 rstepl (x[^]2[+]Zero).
-apply shift_plus_less'.
+apply shift_plus_leEq'.
 rstepr ((y[-]x) [*] (y[-][--]x)).
-apply mult_resp_pos.
-apply shift_zero_less_minus. auto.
-apply shift_zero_less_minus. auto.
-apply leEq_less_trans with (sqrt (x[^]2) xxpos).
+apply mult_resp_nonneg.
+apply shift_zero_leEq_minus. auto.
+apply shift_zero_leEq_minus. auto.
+apply leEq_transitive with (sqrt (x[^]2) xxpos).
 apply power_cancel_leEq with 2. auto.
 apply sqrt_nonneg.
 astepr (x[^]2).
 apply leEq_reflexive.
 auto.
-apply leEq_less_trans with (sqrt (x[^]2) xxpos).
+apply leEq_transitive with (sqrt (x[^]2) xxpos).
 apply power_cancel_leEq with 2. auto.
 apply sqrt_nonneg.
 astepr (x[^]2).
@@ -650,7 +673,8 @@ End Absolute_Props.
 
 Section Consequences.
 
-(** **Cauchy sequences
+(**
+** Cauchy sequences
 
 With these results, we can also prove that the sequence of reciprocals of a 
 Cauchy sequence that is never zero and whose Limit is not zero is also a 
@@ -755,3 +779,70 @@ apply Cauchy_complete.
 Qed.
 
 End Consequences.
+
+Section Part_Function_NRoot.
+
+(** *** Functional Operators
+
+%\begin{convention}%
+Let [F:PartIR] and denote by [P] its domain, which must be entirely nonnegative.
+%\end{convention}%
+*)
+
+Variables F : PartIR.
+
+Let P := Dom F.
+
+Let R := extend P (fun x Hx => Zero[<=]F x Hx).
+
+Let Ext2R := ext2 (P:=P) (R:=fun x Hx => Zero[<=]F x Hx).
+
+Variable n : nat.
+
+Hypothesis Hn : 0 < n.
+
+Lemma part_function_NRoot_strext : forall x y Hx Hy,
+ NRoot (Ext2R x Hx) Hn [#] NRoot (Ext2R y Hy) Hn -> x [#] y.
+Proof.
+intros x y Hx Hy H.
+refine (pfstrx _ _ _ _ _ _ (NRoot_str_ext _ _ _ _ _ _ _ H)).
+Qed.
+
+Lemma part_function_NRoot_pred_wd : pred_wd _ R.
+Proof.
+intros x y H H0.
+elim H.
+intros H1 H2.
+split.
+ apply (dom_wd _ F x y H1 H0).
+intros H3.
+astepr (F x H1).
+auto.
+Qed.
+
+Definition FNRoot := Build_PartFunct IR _ part_function_NRoot_pred_wd
+ (fun x Hx => NRoot (Ext2R x Hx) Hn) part_function_NRoot_strext.
+
+Section Included.
+
+Variable S:IR -> CProp.
+
+Lemma included_FNRoot : included S P ->
+ (forall x, S x -> forall Hx, Zero[<=]F x Hx) -> included S (Dom FNRoot).
+intros H H0.
+simpl in |- *.
+unfold extend in |- *.
+split.
+apply H; assumption.
+intros; apply H0; assumption.
+Qed.
+
+Lemma included_FNRoot' : included S (Dom FNRoot) -> included S P.
+intro H; simpl in H; eapply included_extend; unfold R in *; apply H.
+Qed.
+
+End Included.
+
+End Part_Function_NRoot.
+
+Hint Resolve included_FNRoot included_FNRoot' : included.

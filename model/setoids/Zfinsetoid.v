@@ -36,7 +36,8 @@
 Require Export ZArith.
 Require Import CSetoids.
 
-(** ** Setoids of the integers between 0 and [z]
+(**
+** Setoids of the integers between 0 and [z]
 *)
 
 Record ZF (n:Z):Set:=

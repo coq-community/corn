@@ -49,4 +49,4 @@ $(BINDIR)/realpath: $(BINDIR) $(SRCDIR)/tools/realpath
 
 clean:
 	rm -f $(SRCDIR)/tools/realpath{,.o} "$(BINDIR)/realpath"
-	if [ -a "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
+	if [ -d "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi

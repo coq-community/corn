@@ -152,7 +152,8 @@ Qed.
 End Field_axioms.
 
 Section Field_basics.
-(** ** Field basics
+(**
+** Field basics
 %\begin{convention}% Let [F] be a field.
 %\end{convention}%
 *)

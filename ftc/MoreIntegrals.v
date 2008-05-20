@@ -42,7 +42,8 @@ Section Lemmas.
 (** printing Integral %\ensuremath{\int}% #&int;# *)
 (** printing integral' %\ensuremath{\int}% #&int;# *)
 
-(** *The generalized integral
+(**
+* The generalized integral
 
 In this file we extend the definition of integral to allow for
 arbitrary integration domains (that is, not requiring that the lower
@@ -130,7 +131,8 @@ Implicit Arguments Integral [a b Hab F].
 
 Section Properties_of_Integral.
 
-(** **Properties of the Integral
+(**
+** Properties of the Integral
 
 All our old properties carry over to this new definition---and some
 new ones, too.  We begin with (strong) extensionality.

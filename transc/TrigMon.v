@@ -35,6 +35,7 @@
  *) 
 
 Require Export Pi.
+Require Import CornTac.
 
 Opaque Sine Cosine.
 
@@ -238,7 +239,7 @@ apply eq_symmetric_unfolded; apply Integral_inv.
 assert (H6 : Derivative realline CI Cosine {--}Sine). Deriv.
 eapply eq_transitive_unfolded.
 apply
- Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI) (x0 := ZeroR);
+ Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI);
  Contin; split.
 simpl in |- *; algebra.
 Qed.
@@ -313,9 +314,165 @@ apply shift_minus_leEq; apply shift_leEq_plus'; rstepl ( [--] (Pi [/]TwoNZ));
  auto.
 Qed.
 
+Lemma Sin_ap_Zero : forall x:IR, (forall z, x[#](zring z)[*]Pi) -> Sin x [#] Zero.
+Proof.
+cut (forall x : IR, Zero[<]x -> (forall n : nat, x[#]nring (R:=IR) n[*]Pi) -> Sin x[#]Zero).
+ intros X x Hx.
+ destruct (ap_imp_less _ _ _ (Hx 0)).
+  rstepl ([--][--](Sin x)).
+  rstepr ([--]Zero:IR).
+  apply inv_resp_ap.
+  csetoid_rewrite_rev (Sin_inv x).
+  apply X.
+   rstepl ([--](Zero[*]Pi):IR).
+   apply inv_resp_less.
+   assumption.
+  intros n.
+  csetoid_rewrite_rev (zring_plus_nat IR n).
+  replace (n:Z) with (- - n)%Z by ring.
+  csetoid_rewrite (zring_inv IR (- n)%Z).
+  rstepr ([--](zring (-n)[*]Pi)).
+  apply inv_resp_ap.
+  apply Hx.
+ apply X.
+  rstepl (Zero[*]Pi).
+  assumption.
+ intros n.
+ csetoid_rewrite_rev (zring_plus_nat IR n).
+ apply Hx.
+
+cut (forall x : IR,
+Zero[<]x -> x[<]Two[*]Pi -> (x[#]Pi) -> Sin x[#]Zero).
+ intros X x Hx0 Hx1.
+ assert (Hpi : (Zero[<]Two[*]Pi)).
+  apply mult_resp_pos.
+   apply (nring_pos); auto with *.
+  auto with *. 
+ destruct (Archimedes' (x[/](Two[*]Pi)[//](Greater_imp_ap _ _ _ Hpi))) as [n Hn].
+ generalize x Hx0 Hx1 Hn.
+ clear x Hx0 Hx1 Hn.
+ induction n; intros x Hx0 Hx1 Hn.
+  elim (less_antisymmetric_unfolded _ _ _ Hn).
+  rapply div_resp_pos; assumption.
+ destruct (ap_imp_less _ _ _ (Hx1 (2*n))).
+  apply IHn; try assumption.
+  apply shift_div_less'.
+   assumption.
+  rstepr ((nring 2[*]nring n)[*]Pi).
+  stepr (nring (R:=IR) (2 * n)[*]Pi).
+   assumption.
+  apply mult_wdl.
+  apply nring_comm_mult.
+ destruct n as [|n].
+  apply X; try assumption.
+   rstepr ((Two[*]Pi)[*]One).
+   eapply shift_less_mult'.
+    assumption.
+   rstepr (nring 1:IR).
+   apply Hn.
+  rstepr ((nring 1:IR)[*]Pi).
+  apply Hx1.
+ rstepl (Sin (x[-]Two[*]Pi[+]Two[*]Pi)).
+ csetoid_rewrite (Sin_periodic (x[-]Two[*]Pi)).
+ apply IHn.
+   apply shift_zero_less_minus.
+   eapply leEq_less_trans;[|apply c].
+   stepr ((Two:IR)[*]nring (S n)[*]Pi);
+    [|csetoid_rewrite (nring_comm_mult IR (2%nat) (S n)); apply eq_reflexive].
+   rstepl (Two[*]Pi[*]nring 1).
+   rstepr (Two[*]Pi[*]nring (S n)).
+   apply mult_resp_leEq_lft.
+    apply nring_leEq; auto with *.
+   apply less_leEq; assumption.
+  intros i.
+  apply zero_minus_apart.
+  rstepl (x[-]((nring 2[+]nring i)[*]Pi)).
+  apply minus_ap_zero.
+  csetoid_rewrite_rev (nring_comm_plus IR 2 i).
+  apply Hx1.
+ rstepl ((x[/](Two[*]Pi)[//]Greater_imp_ap IR (Two[*]Pi) Zero Hpi)[-](nring 1)).
+ apply shift_minus_less.
+ csetoid_rewrite_rev (nring_comm_plus IR (S n) 1).
+ rewrite plus_comm.
+ assumption.
+
+intros x Hx0 Hx1 Hx2.
+destruct (ap_imp_less _ _ _ Hx2).
+ apply Greater_imp_ap.
+ apply Sin_pos; assumption.
+rstepl (Sin (x[-]Pi[+]Pi)).
+csetoid_rewrite (Sin_plus_Pi (x[-]Pi)).
+rstepr ([--]Zero:IR).
+apply inv_resp_ap.
+apply Greater_imp_ap.
+apply Sin_pos.
+ apply shift_zero_less_minus.
+ assumption.
+apply shift_minus_less.
+rstepr (Two[*]Pi).
+assumption.
+Qed.
+
+Lemma Cos_ap_Zero : forall x:IR, (forall z, x[#]Pi[/]TwoNZ[+](zring z)[*]Pi) -> Cos x [#] Zero.
+Proof.
+intros x Hx.
+stepl (Cos (x[-](Pi[/]TwoNZ)[+](Pi[/]TwoNZ))) by
+ apply Cos_wd; rational.
+csetoid_rewrite (Cos_plus_HalfPi (x[-](Pi[/]TwoNZ))).
+rstepr ([--]Zero:IR).
+apply inv_resp_ap.
+apply Sin_ap_Zero.
+intros i.
+apply zero_minus_apart.
+rstepl (x[-](Pi[/]TwoNZ[+]zring i[*]Pi)).
+apply minus_ap_zero.
+apply Hx.
+Qed.
+
 Section Tangent.
 
-(** **Derivative of Tangent
+Lemma Tang_Domain : forall x:IR, (forall z, x[#]Pi[/]TwoNZ[+](zring z)[*]Pi) -> Dom Tang x.
+Proof.
+intros.
+repeat split; try constructor.
+intros [].
+rapply Cos_ap_Zero.
+assumption.
+Qed.
+
+Lemma Tang_Domain' : included (olor ([--](Pi[/]TwoNZ)) (Pi[/]TwoNZ)) (Dom Tang).
+Proof.
+intros x [Hx0 Hx1].
+apply Tang_Domain.
+intros z.
+destruct (Z_lt_le_dec z 0).
+ apply Greater_imp_ap.
+ eapply leEq_less_trans;[|apply Hx0].
+ rstepr ([--]Zero[*]Pi[-]Pi[/]TwoNZ).
+ apply shift_leEq_minus.
+ rstepl (((zring z)[+](zring 1))[*]Pi).
+ apply mult_resp_leEq_rht;[|apply less_leEq; auto with *].
+ stepl (zring (z+1):IR) by apply zring_plus.
+ replace (z+1)%Z with (-(-z-1))%Z by ring.
+ assert (0<=-z-1)%Z.
+  auto with *.
+ rewrite (Z_to_nat_correct H).
+ stepl ([--](nring (Z_to_nat H)):IR) by apply eq_symmetric; apply zring_inv_nat.
+ apply inv_resp_leEq.
+ apply nring_nonneg.
+apply less_imp_ap.
+eapply less_leEq_trans.
+ apply Hx1.
+rstepl (Pi[/]TwoNZ[+]Zero).
+apply plus_resp_leEq_lft.
+apply mult_resp_nonneg;[|apply less_leEq; auto with *].
+rewrite (Z_to_nat_correct z0).
+stepr (nring (Z_to_nat z0):IR) by auto with *.
+apply nring_nonneg.
+Qed.
+
+(**
+** Derivative of Tangent
 
 Finally, two formulas for the derivative of the tangent function and
 monotonicity properties.

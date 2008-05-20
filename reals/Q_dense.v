@@ -37,7 +37,7 @@
 Require Export Q_in_CReals.
 
 
-(****** Opaque_algebra.v will be loaded in line 151 ******)
+(*----- Opaque_algebra.v will be loaded in line 151 -----*)
 
 Lemma or_not_and :
  forall (A : CProp) (B : Prop), Not A \/ ~ B -> Not (A and B).
@@ -148,7 +148,7 @@ End COrdField_extra.
 
 
 Section Rational_sequence.
-Load "Opaque_algebra".  (**** WARNING: A file is being loaded *****)
+Load "Opaque_algebra".  (* WARNING: A file is being loaded *)
 Variable R1 : CReals.
 
 Definition start_l (x : R1) := let (N, _) := start_of_sequence _ x in N.
@@ -487,7 +487,7 @@ Proof.
  cut (m = 0).
  intro.
  rewrite H0.
- simpl in |- *.
+
  apply leEq_reflexive.
  symmetry  in |- *.
  apply le_n_O_eq.
@@ -510,8 +510,8 @@ Proof.
   intros H3 H4.
   change (fstT (Intrvl x n)[<=]fstT (if_cotrans x (Intrvl x n))) in |- *.
   rewrite H4.
-  simpl in |- *.
-  astepl (fstT (Intrvl x n)[+]Zero).  
+  astepl (fstT (Intrvl x n)[+]Zero). 
+  simpl. 
   apply (plus_resp_leEq_both Q_as_COrdField).
   apply leEq_reflexive.
   apply less_leEq.
@@ -525,7 +525,6 @@ Proof.
   intros H3 H4.
   change (fstT (Intrvl x n)[<=]fstT (if_cotrans x (Intrvl x n))) in |- *.
   rewrite H4.
-  simpl in |- *.
   apply leEq_reflexive.
   case (le_lt_eq_dec m (S n) H).
   intro.
@@ -548,7 +547,6 @@ Proof.
  cut (m = 0).
  intro.
  rewrite H0.
- simpl in |- *.
  apply leEq_reflexive.
  symmetry  in |- *.
  apply le_n_O_eq.
@@ -569,14 +567,12 @@ Proof.
   intros H3 H4.
   change (sndT (if_cotrans x (Intrvl x n))[<=]sndT (Intrvl x n)) in |- *.
   rewrite H4.
-  simpl in |- *.
   apply leEq_reflexive.
   intro H2.
   elim H2.
   intros H3 H4.
   change (sndT (if_cotrans x (Intrvl x n))[<=]sndT (Intrvl x n)) in |- *.
   rewrite H4.
-  simpl in |- *.
   astepr (sndT (Intrvl x n)[+]Zero).
   astepl
    (sndT (Intrvl x n)[+]
@@ -895,8 +891,6 @@ Proof.
  apply G_m_n_upper.
  constructor.
  apply x_in_Intrvl_r.
- apply eq_symmetric_unfolded.
- apply inj_Q_minus.
 Qed.
 
 Lemma x_is_SeqLimit_G : forall x : R1, SeqLimit (inj_Q_G_as_CauchySeq x) x. 
@@ -970,10 +964,6 @@ Proof.
        nringS_ap_zero Q_as_COrdField N))).
  apply inj_Q_wd.
  rational.
- apply inj_Q_mult.
- apply mult_wd.
- apply inj_Q_nring.
- apply eq_reflexive_unfolded.
 
  apply
   AbsSmall_leEq_trans

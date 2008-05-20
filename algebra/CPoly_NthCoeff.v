@@ -180,7 +180,8 @@ Hint Resolve nth_coeff_wd: algebra_c.
 
 Section NthCoeff_props.
 
-(** ** Properties of [nth_coeff] *)
+(**
+** Properties of [nth_coeff] *)
 
 Variable R : CRing.
 

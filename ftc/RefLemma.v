@@ -40,7 +40,8 @@ Require Export RefSepRef.
 
 Section Refinement_Lemma.
 
-(** *The Refinement Lemmas
+(**
+* The Refinement Lemmas
 
 Here we resume the results proved in four different files.  The aim is to prove the following result (last part of Theorem 2.9 of Bishop 1967):
 
@@ -1200,7 +1201,7 @@ cut (Zero [<] Min d d').
 intro H; elim (less_cotransitive_unfolded _ _ _ H (b[-]a)); intro.
 astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]Zero).
 apply shift_leEq_plus'.
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros beta Hbeta.
 apply shift_minus_leEq.
 astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]beta).

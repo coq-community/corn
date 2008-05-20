@@ -40,7 +40,8 @@ Opaque Min Max N_Deriv.
 
 Section More_Taylor_Defs.
 
-(** **General case
+(**
+** General case
 
 The generalization to arbitrary intervals just needs a few more definitions.
 

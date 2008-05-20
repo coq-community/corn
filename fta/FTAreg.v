@@ -38,7 +38,8 @@ Require Export KneserLemma.
 Require Export CPoly_Shift.
 Require Export CPoly_Contin1.
 
-(** * FTA for regular polynomials
+(**
+* FTA for regular polynomials
 ** The Kneser sequence
 %\begin{convention}% Let [n] be a positive natural number.
 %\end{convention}%
@@ -195,7 +196,8 @@ End Kneser_Sequence.
 
 Section Seq_Exists_Main.
 
-(** **Main results
+(**
+** Main results
 *)
 
 Lemma seq_exists : {q : IR | Zero [<=] q | q [<] One and (forall p : cpoly CC,
@@ -282,7 +284,8 @@ End N_Exists.
 
 Section Seq_is_CC_CAuchy.
 
-(** ** The Kneser sequence is Cauchy in [CC] *)
+(**
+** The Kneser sequence is Cauchy in [CC] *)
 
 Variable n : nat.
 Hypothesis lt0n : 0 < n.

@@ -35,7 +35,8 @@
  *) 
 
 Require Export CSetoids.
-(** ** The Setoid of Setoid functions
+(**
+** The Setoid of Setoid functions
 
 The setoid functions form again a setoid. *)
 
@@ -126,7 +127,8 @@ Definition FS_as_CSetoid (A B : CSetoid) :=
   Build_CSetoid (CSetoid_fun A B) (eq_fun A B) (ap_fun A B)
     (FS_is_CSetoid A B).
 
-(** **Nullary and n-ary operations
+(**
+** Nullary and n-ary operations
 *)
 
 Definition is_nullary_operation (S:CSetoid) (s:S):Prop := True.
@@ -139,7 +141,8 @@ end.
 
 Section unary_function_composition.
 
-(** ** Composition of Setoid functions
+(**
+** Composition of Setoid functions
 
 Let [S1],  [S2] and [S3] be setoids, [f] a
 setoid function from [S1] to [S2], and [g] from [S2]
@@ -158,7 +161,8 @@ Defined.
 
 End unary_function_composition.
 
-(** ***Composition as operation
+(**
+*** Composition as operation
 *)
 Definition comp (A B C : CSetoid) :
   FS_as_CSetoid A B -> FS_as_CSetoid B C -> FS_as_CSetoid A C.
@@ -266,7 +270,8 @@ Defined.
 
 End unary_and_binary_function_composition.
 
-(** ***Projections
+(**
+*** Projections
 *)
 
 Section function_projection.
@@ -305,7 +310,8 @@ Defined.
 
 End BinProj.
 
-(** **Combining operations
+(**
+** Combining operations
 %\begin{convention}% Let [S1], [S2] and [S3] be setoids.
 %\end{convention}%
 *)
@@ -336,7 +342,8 @@ End CombiningOperations.
 
 Section p66E2b4.
 
-(** **The Free Setoid
+(**
+** The Free Setoid
 %\begin{convention}% Let [A:CSetoid].
 %\end{convention}%
 *)
@@ -344,9 +351,9 @@ Variable A:CSetoid.
 
 Definition Astar := (list A).
 
-Definition empty_word := (nil A).
+Definition empty_word := (@nil A).
 
-Definition appA:= (app A).
+Definition appA:= (@app A).
 
 Fixpoint eq_fm (m:Astar)(k:Astar){struct m}:Prop:=
 match m with
@@ -556,7 +563,7 @@ elim H.
 intuition.
 
 clear H.
-generalize (IHx1 l y1 (nil A)).
+generalize (IHx1 l y1 (@nil A)).
 intuition.
 
 simpl.
@@ -587,7 +594,8 @@ Qed.
 
 End p66E2b4.
 
-(** **Partial Functions
+(**
+** Partial Functions
 
 In this section we define a concept of partial function for an
 arbitrary setoid.  Essentially, a partial function is what would be
@@ -611,7 +619,8 @@ Before we state our definitions we need to do some work on domains.
 
 Section SubSets_of_G.
 
-(** ***Subsets of Setoids
+(**
+*** Subsets of Setoids
 
 Subsets of a setoid will be identified with predicates from the
 carrier set of the setoid into [CProp].  At this stage, we do not make
@@ -730,7 +739,8 @@ Implicit Arguments extend [S].
 Implicit Arguments ext1 [S P R x].
 Implicit Arguments ext2 [S P R x].
 
-(** ***Operations
+(**
+*** Operations
 
 We are now ready to define the concept of partial function between arbitrary setoids.
 *)
@@ -958,7 +968,8 @@ Infix "[o]" := Fcomp (at level 65, no associativity).
 Hint Resolve pfwdef bpfwdef: algebra.
 
 Section bijections.
-(** **Bijections *)
+(**
+** Bijections *)
 
 Definition injective A B (f : CSetoid_fun A B) := (forall a0 a1 : A,
  a0 [#] a1 -> f a0 [#] f a1):CProp.

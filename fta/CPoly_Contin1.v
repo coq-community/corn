@@ -36,7 +36,8 @@
 
 Require Export CC_Props.
 
-(** * Continuity of complex polynomials
+(**
+* Continuity of complex polynomials
 *)
 
 Section Mult_CC_Continuous.

@@ -37,7 +37,8 @@
 Require Export Zabgroup.
 Require Import CRings.
 
-(** **Example of a ring: $\langle$#&lang;#[Z],[[+]],[[*]]$\rangle$#&rang;#
+(**
+** Example of a ring: $\langle$#&lang;#[Z],[[+]],[[*]]$\rangle$#&rang;#
 
 The multiplication and the addition are distributive.
 *)
@@ -56,3 +57,5 @@ Definition Z_is_CRing := Build_is_CRing Z_as_CAbGroup _ _ Zmult_is_assoc
 Definition Z_as_CRing := Build_CRing _ _ _ Z_is_CRing.
 
 (** The term [Z_as_CRing] is of type [CRing]. Hence we have proven that [Z] is a constructive ring. *)
+
+Canonical Structure Z_as_CRing.

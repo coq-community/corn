@@ -50,7 +50,8 @@ Section Intervals.
 (** printing olcr %\ensuremath{(\cdot,\cdot]}% #(&sdot;,&sdot;]# *)
 (** printing clcr %\ensuremath{[\cdot,\cdot]}% #[&sdot;,&sdot;]# *)
 
-(** *Generalized Intervals
+(**
+* Generalized Intervals
 
 At this stage we have enough material to begin generalizing our
 concepts in preparation for the fundamental theorem of calculus and
@@ -80,7 +81,7 @@ compact interval [[a,b]] is included in [I].  Furthermore, all
 intervals are characterized by simple, well defined predicates, and
 the nonempty and proper concepts become very easy to define.
 
-**Definitions and Basic Results
+** Definitions and Basic Results
 
 We define an inductive type of intervals with nine constructors,
 corresponding to the nine basic types of intervals.  The reason why so
@@ -380,7 +381,8 @@ Section Compact_Constructions.
 
 Section Single_Compact_Interval.
 
-(** **Constructions with Compact Intervals
+(**
+** Constructions with Compact Intervals
 
 Several important constructions are now discussed.
 
@@ -1017,7 +1019,8 @@ End Compact_Constructions.
 
 Section Functions.
 
-(** **Properties of Functions in Intervals
+(**
+** Properties of Functions in Intervals
 
 We now define notions of continuity, differentiability and so on on
 arbitrary intervals.  As expected, a function [F] has property [P] in

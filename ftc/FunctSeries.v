@@ -42,7 +42,8 @@ Require Export Series.
 
 Section Definitions.
 
-(** *Series of Functions
+(**
+* Series of Functions
 
 We now turn our attention to series of functions.  Like it was already
 the case for sequences, we will mainly rewrite the results we proved
@@ -628,7 +629,8 @@ Hint Resolve Fun_Series_Sum_cont: continuous.
 
 Section Convergence_Criteria.
 
-(** **Convergence Criteria
+(**
+** Convergence Criteria
 
 Most of the convergence criteria for series of real numbers carry over to series of real-valued functions, so again we just present them without comments.
 *)
@@ -821,7 +823,14 @@ Opaque FAbs.
 apply conv_fun_series_scal with (f := fun n : nat => [-C-] (c[^] (n - N))).
 apply conv_fun_const_series with (x := fun n : nat => c[^] (n - N)).
 apply join_series with (power_series c).
-apply power_series_conv; auto.
+apply power_series_conv.
+apply AbsIR_less.
+assumption.
+apply less_leEq_trans with Zero.
+rstepr ([--]Zero:IR).
+apply inv_resp_less.
+apply pos_one.
+assumption.
 exists N.
 exists 0.
 intro.

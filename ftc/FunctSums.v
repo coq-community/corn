@@ -41,7 +41,8 @@
 Require Export CSumsReals.
 Require Export PartFunEquality.
 
-(** *Sums of Functions
+(**
+* Sums of Functions
 
 In this file we define sums are defined of arbitrary families of
 partial functions.
@@ -118,9 +119,8 @@ apply Sum0_wd.
 intros; simpl in |- *; algebra.
 Qed.
 
-Lemma FSum_one : 
- forall n (f : nat -> PartIR) x (Hx : nat -> pfdom IR (f n) x) Hx',
- FSum n n f x Hx' [=] f n x (Hx n).
+Lemma FSum_one : forall n (f : nat -> PartIR) x Hx Hx',
+ FSum n n f x Hx' [=] f n x Hx.
 intros.
 simpl in |- *.
 eapply eq_transitive_unfolded.

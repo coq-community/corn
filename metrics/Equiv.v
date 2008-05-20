@@ -37,7 +37,8 @@
 Require Export IR_CPMSpace.
 
 Section equivalent.
-(** **Equivalent Pseudo Metric Spaces
+(**
+** Equivalent Pseudo Metric Spaces
 *)
 (**
 We say that two pseudo metric spaces are equivalent, when there exists a 
@@ -657,7 +658,7 @@ unfold zero_fun in |- *.
 unfold dIR in |- *.
 intro H7.
 cut (OneR[<=]Zero).
-unfold leEq in |- *.
+rewrite leEq_def in |- *.
 intro H8.
 set (H9 := H8 (pos_one IR)) in *.
 exact H9.

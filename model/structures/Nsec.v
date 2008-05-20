@@ -40,8 +40,9 @@ Require Export Peano_dec.
 Require Export Relations.
 Require Import CLogic.
 
-(** *[nat]
-**About [nat]
+(**
+* [nat]
+** About [nat]
 
 We prove some basic lemmas of the natural numbers.
 
@@ -60,7 +61,8 @@ apply sym_eq.
 exact H.
 Qed.
 
-(** ***Apartness
+(**
+*** Apartness
 *)
 
 Definition ap_nat (x y : nat) := ~ (x = y :>nat).
@@ -121,7 +123,8 @@ intros x y.
  assumption.
 Qed.
 
-(** ***Addition
+(**
+*** Addition
 *)
 
 Lemma plus_strext0 : forall x1 x2 y1 y2 : nat,
@@ -163,7 +166,8 @@ Qed.
 
 
 
-(** ***Multiplication
+(**
+*** Multiplication
 *)
 
 Lemma mult_strext0 : forall x1 x2 y1 y2 : nat,
@@ -184,7 +188,8 @@ auto.
 apply eq_nat_dec.
 Qed.
 
-(** ***Decidability
+(**
+*** Decidability
 *)
 Lemma not_or:(forall (p q:nat), (p<>q)-> p<q or q<p):CProp.
 simpl.

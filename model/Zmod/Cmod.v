@@ -37,7 +37,8 @@
 Require Export ZMod.
 Require Export CLogic.
 
-(** *CProp-valued lemmas about 'mod'
+(**
+* CProp-valued lemmas about 'mod'
 *)
 
 Lemma Zmod_pos:(forall (k l:nat)(H:(l>0)%Z),

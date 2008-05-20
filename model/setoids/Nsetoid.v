@@ -37,7 +37,8 @@
 Require Export Nsec.
 Require Import CSetoidFun.
 
-(** **Example of a setoid: [nat]
+(**
+** Example of a setoid: [nat]
 
 We will show that the natural numbers form a CSetoid. 
 *)
@@ -71,8 +72,10 @@ Definition ap_nat_is_apartness := Build_is_CSetoid nat (eq (A:=nat)) ap_nat
 
 
 Definition nat_as_CSetoid := Build_CSetoid _ _ _ ap_nat_is_apartness.
+Canonical Structure nat_as_CSetoid.
 
-(** ***Addition
+(**
+*** Addition
 *)
 
 Lemma plus_wd : bin_fun_wd nat_as_CSetoid nat_as_CSetoid nat_as_CSetoid plus.
@@ -90,6 +93,7 @@ apply plus_strext0.
 Qed.
 
 Definition plus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ plus_strext.
+Canonical Structure plus_is_bin_fun.
 
 (** It is associative and commutative.
 *)
@@ -110,7 +114,8 @@ intros x y.
 exact (plus_comm x y). 
 Qed.
 
-(** ***Multiplication
+(**
+*** Multiplication
 *)
 
 Lemma mult_strext : bin_fun_strext
@@ -121,8 +126,10 @@ apply mult_strext0.
 Qed.
 
 Definition mult_as_bin_fun := Build_CSetoid_bin_fun _ _ _ _ mult_strext. 
+Canonical Structure mult_as_bin_fun.
 
-(** ***Ternary addition
+(**
+*** Ternary addition
 *)
 
 Definition plus1 (n:nat)(m:nat): (n_ary_operation 1 nat_as_CSetoid).

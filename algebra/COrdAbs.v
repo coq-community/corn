@@ -1,4 +1,4 @@
-(* Copyright © 1998-2006
+(* Copyright © 1998-2008
  * Henk Barendregt
  * Luís Cruz-Filipe
  * Herman Geuvers
@@ -6,6 +6,7 @@
  * Rik van Ginneken
  * Dimitri Hendriks
  * Sébastien Hinderer
+ * Cezary Kaliszyk
  * Bart Kirkels
  * Pierre Letouzey
  * Iris Loeb
@@ -18,21 +19,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 Require Export COrdFields2.
 
 (**
@@ -188,7 +189,7 @@ apply div_resp_leEq; auto.
 apply div_resp_leEq; auto.
 Qed.
 
-Lemma sum_resp_AbsSmall : forall 
+Lemma sum_resp_AbsSmall : forall
 (x y : nat -> R) (n m: nat)
 (H1 : m <= n) (H2 : forall i : nat, m <= i -> i <= n ->  AbsSmall (y i) (x i)),
 AbsSmall (Sum m n y) (Sum m n x).
@@ -434,18 +435,113 @@ Proof.
  apply not_ap_imp_eq.
  intro H0.
  elim (ap_imp_less _ _ _ H0).
- change (Zero [<=] x) in |- *.
+ change (Not (x [<] Zero)).
+ rewrite <- leEq_def.
  apply inv_cancel_leEq.
  astepr ZeroR.
- red in |- *; apply approach_zero_weak.
+ apply approach_zero_weak.
  intros.
  apply inv_cancel_leEq; astepr x.
  elim (H e); auto.
 
- change (x [<=] Zero) in |- *.
- red in |- *; apply approach_zero_weak.
+ change (Not (Zero [<] x)).
+ rewrite <- leEq_def.
+ apply approach_zero_weak.
  intros.
  elim (H e); auto.
+Qed.
+
+Lemma mult_AbsSmall'_rht : forall x y C : R, Zero [<=] C ->
+ [--]C [<=] x -> x [<=] C -> [--]C [<=] y -> y [<=] C -> x[*]y [<=] Three[*]C[^]2.
+intros.
+astepl (Zero[+]x[*]y). apply shift_plus_leEq.
+apply leEq_transitive with ((C[+]x)[*](C[-]y)).
+apply mult_resp_nonneg.
+apply shift_leEq_plus. astepl ([--]x). astepr ([--][--]C).
+apply inv_resp_leEq. auto.
+apply shift_leEq_minus. astepl y. auto.
+rstepl (C[^]2[-]x[*]y[+]C[*](x[-]y)).
+rstepr (C[^]2[-]x[*]y[+]C[*](C[-][--]C)).
+apply plus_resp_leEq_lft.
+apply mult_resp_leEq_lft.
+apply minus_resp_leEq_both.
+auto. auto. auto.
+Qed.
+
+Lemma mult_AbsSmall_rht : forall x y X Y : R, Zero [<=] X ->
+ Zero [<=] Y -> [--]X [<=] x -> x [<=] X -> [--]Y [<=] y -> y [<=] Y -> x[*]y [<=] X[*]Y.
+intros.
+rewrite leEq_def.
+intro.
+cut (Zero [<] x[*]y); intros.
+2: apply leEq_less_trans with (X[*]Y); auto.
+rewrite leEq_def in *.
+cut (x[*]y [#] Zero); intros.
+2: apply pos_ap_zero; auto.
+cut (x [#] Zero); intros.
+2: apply mult_cancel_ap_zero_lft with y; auto.
+elim (ap_imp_less _ _ _ X3); intro.
+cut (y [<] Zero); intros.
+2: astepl ([--][--]y); astepr ([--](Zero:R)); apply inv_resp_less.
+2: apply mult_cancel_pos_rht with ([--]x).
+2: astepr (x[*]y); auto.
+2: astepl ([--](Zero:R)); apply less_leEq; apply inv_resp_less; auto.
+apply (less_irreflexive_unfolded R One).
+apply leEq_less_trans with (X[*]Y[/] _[//]X2).
+rstepr
+ ((X[/] [--]x[//]inv_resp_ap_zero _ _ X3)[*]
+  (Y[/] [--]y[//]inv_resp_ap_zero _ _ (less_imp_ap _ _ _ X4))).
+astepl (One[*](One:R)).
+apply mult_resp_leEq_both.
+apply less_leEq; apply pos_one.
+apply less_leEq; apply pos_one.
+apply shift_leEq_div.
+astepl ([--](Zero:R)); apply inv_resp_less; auto.
+astepl ([--]x); astepr ([--][--]X); apply inv_resp_leEq; firstorder using leEq_def.
+apply shift_leEq_div.
+astepl ([--](Zero:R)); apply inv_resp_less; auto.
+astepl ([--]y); astepr ([--][--]Y); apply inv_resp_leEq; firstorder using leEq_def.
+apply shift_div_less; auto.
+astepr (x[*]y); auto.
+cut (Zero [<] y); intros.
+2: apply mult_cancel_pos_rht with x; try apply less_leEq; auto.
+apply (less_irreflexive_unfolded R One).
+apply leEq_less_trans with (X[*]Y[/] _[//]X2).
+rstepr ((X[/] x[//]X3)[*](Y[/] y[//]pos_ap_zero _ _ X4)).
+astepl (One[*](One:R)).
+apply mult_resp_leEq_both.
+apply less_leEq; apply pos_one.
+apply less_leEq; apply pos_one.
+apply shift_leEq_div; auto.
+astepl x; firstorder using leEq_def.
+apply shift_leEq_div; auto.
+astepl y; firstorder using leEq_def.
+apply shift_div_less; auto.
+astepr (x[*]y); firstorder using leEq_def.
+Qed.
+
+Lemma mult_AbsSmall_lft : forall x y X Y : R, Zero [<=] X -> Zero [<=] Y ->
+ [--]X [<=] x -> x [<=] X -> [--]Y [<=] y -> y [<=] Y -> [--](X[*]Y) [<=] x[*]y.
+intros.
+rstepr ([--]([--]x[*]y)).
+apply inv_resp_leEq.
+apply mult_AbsSmall_rht; auto.
+apply inv_resp_leEq. auto.
+rstepr ([--][--]X).
+apply inv_resp_leEq. auto.
+Qed.
+
+Lemma mult_AbsSmall : forall x y X Y : R,
+ AbsSmall X x -> AbsSmall Y y -> AbsSmall (X[*]Y) (x[*]y).
+unfold AbsSmall in |- *.
+intros.
+elim H. intros. elim H0. intros.
+cut (Zero [<=] X). intro. cut (Zero [<=] Y). intro.
+split.
+apply mult_AbsSmall_lft; auto.
+apply mult_AbsSmall_rht; auto.
+apply AbsSmall_nonneg with y; auto.
+apply AbsSmall_nonneg with x; auto.
 Qed.
 
 End AbsSmall_properties.
@@ -453,7 +549,8 @@ End AbsSmall_properties.
 Declare Left Step AbsSmall_wdl_unfolded.
 Declare Right Step AbsSmall_wdr_unfolded.
 
-(** ** Properties of [AbsBig] *)
+(**
+** Properties of [AbsBig] *)
 
 Definition absBig (R : COrdField) (e x : R) : CProp :=
  Zero [<] e and (e [<=] x or x [<=] [--]e).
@@ -576,3 +673,17 @@ End absBig_wd_properties.
 
 Declare Left Step AbsBig_wdl_unfolded.
 Declare Right Step AbsBig_wdr_unfolded.
+
+Add Parametric Morphism c : (@AbsSmall c) with signature (@cs_eq (cof_crr c)) ==> (@cs_eq c) ==> iff as AbsSmall_morph_wd.
+intros x1 x2 xeq y1 y2 yeq.
+split;
+intro H.
+stepr y1 by assumption.
+stepl x1 by assumption.
+assumption.
+stepr y2 by symmetry;
+assumption.
+stepl x2 by symmetry;
+assumption.
+assumption.
+Qed.

@@ -39,7 +39,8 @@ Require Export CalculusTheorems.
 
 Section IVT'.
 
-(** ** Strong IVT for partial functions
+(**
+** Strong IVT for partial functions
 
 The IVT can be generalized to arbitrary partial functions; in the first
 part, we will simply do that, repeating the previous construction.
@@ -339,7 +340,8 @@ Qed.
 
 End IVT'.
 
-(** **Other formulations
+(**
+** Other formulations
 
 We now generalize the various statements of the intermediate value
 theorem to more widely applicable forms.

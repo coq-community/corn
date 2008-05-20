@@ -39,7 +39,8 @@ Require Export RealLists.
 
 Section Intervals.
 
-(** * Intervals
+(**
+* Intervals
 In this section we define (compact) intervals of the real line and
 some useful functions to work with them.
 
@@ -178,7 +179,8 @@ Hint Resolve included_refl' compact_map1 compact_map2 compact_map3 : included.
 
 Section Totally_Bounded.
 
-(** ** Totally Bounded
+(**
+** Totally Bounded
 
 Totally bounded sets will play an important role in what is
 to come.  The definition (equivalent to the classical one) states that
@@ -237,7 +239,7 @@ apply shift_leEq_div;
 rstepl a; assumption.
 clear Hab a b; intro n; induction  n as [| n Hrecn].
 intros.
-exists (cons a (nil _)).
+exists (a::nil).
 intros x H1.
 inversion H1. rename X into H2.
 elim H2.
@@ -262,7 +264,7 @@ astepr ZeroR.
 rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
-exists (cons a (nil IR)).
+exists (a::nil).
 intros x H1.
 inversion_clear H1 as [H2|].
 elim H2.
@@ -280,7 +282,7 @@ assumption.
 clear Hrecn; induction  n as [| n Hrecn].
 intros.
 set (enz := pos_ap_zero _ _ He) in *.
-exists (cons ((a[+]b) [/]TwoNZ) (nil IR)).
+exists (cons ((a[+]b) [/]TwoNZ) (@nil IR)).
 intros x H1.
 inversion_clear H1 as [H2|].
 inversion_clear H2.
@@ -777,7 +779,8 @@ End Totally_Bounded.
 
 Section Compact.
 
-(** ** Compact sets
+(**
+** Compact sets
 
 In this section we dwell a bit farther into the definition of compactness
 and explore some of its properties.

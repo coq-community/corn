@@ -37,7 +37,8 @@
 Require Export Qmonoid.
 Require Import CGroups.
 
-(** **Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
+(**
+** Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#
 The rational numbers with addition form a group. The inverse function is taking the opposite.
 *)
 
@@ -52,3 +53,5 @@ apply Qplus_inverse_r.
 Qed.
 
 Definition Q_as_CGroup := Build_CGroup Q_as_CMonoid Qopp_is_fun Q_is_CGroup.
+
+Canonical Structure Q_as_CGroup.

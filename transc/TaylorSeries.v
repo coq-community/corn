@@ -37,14 +37,15 @@
 Require Export PowerSeries.
 Require Export Taylor.
 
-(** *Taylor Series
+(**
+* Taylor Series
 
 We now generalize our work on Taylor's theorem to define the Taylor
 series of an infinitely many times differentiable function as a power
 series.  We prove convergence (always) of the Taylor series and give
 criteria for when the sum of this series is the original function.
 
-**Definitions
+** Definitions
 
 %\begin{convention}% Let [J] be a proper interval and [F] an
 infinitely many times differentiable function in [J].  Let [a] be a
@@ -135,7 +136,8 @@ End Definitions.
 
 Section Convergence_in_IR.
 
-(** **Convergence
+(**
+** Convergence
 
 Our interval is now the real line.  We begin by proving some helpful
 continuity properties, then define a boundedness condition for the

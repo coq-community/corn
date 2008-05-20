@@ -38,7 +38,8 @@
 Require Export Zgroup.
 Require Import CAbGroups.
 
-(** **Example of an abelian group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
+(**
+** Example of an abelian group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#
 *)
 
 Lemma Z_is_CAbGroup : is_CAbGroup Z_as_CGroup. 
@@ -51,3 +52,5 @@ Qed.
 Definition Z_as_CAbGroup := Build_CAbGroup Z_as_CGroup Z_is_CAbGroup.
 
 (** The term [Z_as_CAbGroup] is of type [CAbGroup]. Hence we have proven that [Z] is a constructive Abelian group. *)
+
+Canonical Structure Z_as_CAbGroup.

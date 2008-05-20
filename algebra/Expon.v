@@ -41,8 +41,9 @@ Require Export COrdCauchy.
 
 Load "Transparent_algebra".
 
-(** *Exponentiation
-**More properties about [nexp]
+(**
+* Exponentiation
+** More properties about [nexp]
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)
@@ -174,8 +175,8 @@ rewrite b. apply leEq_reflexive.
 Qed.
 
 Lemma nexp_resp_leEq : forall (x y : R) k, Zero [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
-unfold leEq in |- *. intros. intro. apply H0.
-apply power_cancel_less with k; auto.
+intros. rewrite leEq_def in *. intro. apply H0.
+apply power_cancel_less with k; firstorder using leEq_def.
 Qed.
 
 Lemma nexp_resp_leEq_one : forall c : R, Zero [<=] c -> c [<=] One -> forall n, c[^]n [<=] One.
@@ -343,7 +344,8 @@ Hint Resolve nexp_distr_div nexp_distr_recip: algebra.
 
 Implicit Arguments nexp_resp_ap_zero [R x].
 
-(** **Definition of [zexp]: integer exponentiation
+(**
+** Definition of [zexp]: integer exponentiation
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)
@@ -369,7 +371,8 @@ End Zexp_def.
 Implicit Arguments zexp [R].
 Notation "( x [//] Hx ) [^^] n" := (zexp x Hx n) (at level 0).
 
-(** **Properties of [zexp]
+(**
+** Properties of [zexp]
 %\begin{convention}% Let [R] be an ordered field.
 %\end{convention}%
 *)

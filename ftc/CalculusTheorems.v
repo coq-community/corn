@@ -41,7 +41,8 @@ Opaque Min Max.
 
 Section Various_Theorems.
 
-(** *Calculus Theorems
+(**
+* Calculus Theorems
 
 This file is intended to present a collection of miscellaneous, mostly
 technical results in differential calculus that are interesting or
@@ -212,7 +213,7 @@ apply Min_leEq_lft.
 apply shift_div_leEq; [ apply pos_two | rstepr (b[+]b) ].
 apply plus_resp_leEq; apply less_leEq; auto.
 apply Min_leEq_rht.
-intro H6.
+rewrite leEq_def; intro H6.
 cut (y [<=] b). intro H7.
 apply (less_irreflexive_unfolded _ (F y Hy)).
 eapply less_wdr.
@@ -220,7 +221,7 @@ apply H6.
 apply pfwdef; eapply eq_transitive_unfolded.
 apply Min_comm.
 apply leEq_imp_Min_is_lft; auto.
-intro H7.
+rewrite leEq_def; intro H7.
 apply (less_irreflexive_unfolded _ (F y Hy)).
 eapply less_transitive_unfolded.
 apply H6.
@@ -277,12 +278,12 @@ apply leEq_less_trans with (F _ H5).
 2: apply shift_leEq_div; [ apply pos_two | rstepl (b[+]b) ].
 2: apply plus_resp_leEq; apply less_leEq; auto.
 2: apply rht_leEq_Max.
-intro H6.
-cut (b [<=] x); intro H7.
+rewrite leEq_def; intro H6.
+cut (b [<=] x); rewrite leEq_def; intro H7.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 eapply less_wdl.
 apply H6.
-apply pfwdef; apply leEq_imp_Max_is_rht; auto.
+apply pfwdef; apply leEq_imp_Max_is_rht; rewrite leEq_def; auto.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 eapply less_transitive_unfolded.
 2: apply H6.
@@ -348,14 +349,14 @@ apply Min_leEq_lft.
 apply shift_div_leEq; [ apply pos_two | rstepr (b[+]b) ].
 apply plus_resp_leEq; apply less_leEq; auto.
 apply Min_leEq_rht.
-intro H6.
-cut (y [<=] b); intro H7.
+rewrite leEq_def; intro H6.
+cut (y [<=] b); rewrite leEq_def; intro H7.
 apply (less_irreflexive_unfolded _ (F y Hy)).
 eapply less_wdr.
 apply H6.
 apply pfwdef; eapply eq_transitive_unfolded.
 apply Min_comm.
-apply leEq_imp_Min_is_lft; auto.
+apply leEq_imp_Min_is_lft; rewrite leEq_def; auto.
 apply (less_irreflexive_unfolded _ (F y Hy)).
 eapply less_transitive_unfolded.
 apply H6.
@@ -412,12 +413,12 @@ apply leEq_less_trans with (F _ H5).
 2: apply shift_leEq_div; [ apply pos_two | rstepl (b[+]b) ].
 2: apply plus_resp_leEq; apply less_leEq; auto.
 2: apply rht_leEq_Max.
-intro H6.
-cut (b [<=] x); intro H7.
+rewrite leEq_def; intro H6.
+cut (b [<=] x); rewrite leEq_def; intro H7.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 eapply less_wdl.
 apply H6.
-apply pfwdef; apply leEq_imp_Max_is_rht; auto.
+apply pfwdef; apply leEq_imp_Max_is_rht; rewrite leEq_def; auto.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 eapply less_transitive_unfolded.
 2: apply H6.
@@ -432,9 +433,9 @@ Qed.
 
 Lemma strict_dec_glues : forall a b c F (Hab : a [<=] b) (Hbc : b [<=] c) (Hac : a [<=] c),
  included (Compact Hac) (Dom F) ->
- (forall x y, Compact Hab x -> Compact Hab y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy) ->
- (forall x y, Compact Hbc x -> Compact Hbc y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy) ->
- forall x y, Compact Hac x -> Compact Hac y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy.
+ (forall x y, Compact Hab x -> Compact Hab y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy) ->
+ (forall x y, Compact Hbc x -> Compact Hbc y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy) ->
+ forall x y, Compact Hac x -> Compact Hac y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy.
 intros.
 apply inv_cancel_less.
 astepl ( {--}F y Hy); astepr ( {--}F x Hx).
@@ -444,9 +445,9 @@ intros; simpl in |- *; apply inv_resp_less; auto.
 Qed.
 
 Lemma strict_dec_glues' : forall a b c F, a [<] b -> b [<] c -> included (olor a c) (Dom F) ->
- (forall x y, olcr a b x -> olcr a b y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy) ->
- (forall x y, clor b c x -> clor b c y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy) ->
- forall x y, olor a c x -> olor a c y -> x[>]y -> forall Hx Hy, F x Hx [<] F y Hy.
+ (forall x y, olcr a b x -> olcr a b y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy) ->
+ (forall x y, clor b c x -> clor b c y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy) ->
+ forall x y, olor a c x -> olor a c y -> y[<]x -> forall Hx Hy, F x Hx [<] F y Hy.
 intros.
 apply inv_cancel_less.
 astepl ( {--}F y Hy); astepr ( {--}F x Hx).
@@ -460,10 +461,11 @@ Qed.
 Lemma olor_pos_clor_nonneg : forall a b (F : PartIR),
  (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Ha,
  Zero [<=] F a Ha -> forall x, clor a b x -> forall Hx, Zero [<=] F x Hx.
-intros a b F H Ha H0 x H1 Hx H2.
+intros a b F H Ha H0 x H1 Hx.
+rewrite leEq_def; intros H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] a). intro H4.
-apply H0.
+rewrite leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
@@ -478,10 +480,11 @@ Qed.
 Lemma olor_pos_olcr_nonneg : forall a b (F : PartIR),
  (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Hb,
  Zero [<=] F b Hb -> forall x, olcr a b x -> forall Hx, Zero [<=] F x Hx.
-intros a b F H Ha H0 x H1 Hx H2.
+intros a b F H Ha H0 x H1 Hx.
+rewrite leEq_def; intros H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] b). intro H4.
-apply H0.
+rewrite leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
@@ -496,11 +499,12 @@ Qed.
 Lemma olor_pos_clcr_nonneg : forall a b (F : PartIR), a [<] b ->
  (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Ha, Zero [<=] F a Ha -> forall Hb, Zero [<=] F b Hb ->
  forall x, clcr a b x -> forall Hx, Zero [<=] F x Hx.
-intros a b F Hab H Ha H0 Hb H1 x H2 Hx H3.
+intros a b F Hab H Ha H0 Hb H1 x H2 Hx.
+rewrite leEq_def; intros H3.
 cut (Not (olor a b x)); intro H4.
 elim (less_cotransitive_unfolded _ _ _ Hab x); intro H5.
 cut (x [=] b). intro H6.
-apply H1.
+rewrite leEq_def in H1; apply H1.
 eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro H6.
@@ -509,7 +513,7 @@ elim (ap_imp_less _ _ _ H6); intros.
 apply H4; split; auto.
 apply (less_irreflexive_unfolded _ b); apply less_leEq_trans with x; auto.
 cut (x [=] a); intros.
-apply H0.
+rewrite leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro.
@@ -646,7 +650,7 @@ cut (Continuous_I (Min_leEq_Max b a) F'). intro H.
 elim (glb_is_glb _ _ _ _ H).
 simpl in |- *; intros Hglb1 Hglb2.
 cut (Zero [<=] glb_funct _ _ _ _ H); [ intro H0 | auto ].
-red in |- *; apply approach_zero_weak.
+apply approach_zero_weak.
 intros.
 elim (Law_of_the_Mean _ _ _ _ derF b a) with (e := e); auto.
 intros x H2 H3.

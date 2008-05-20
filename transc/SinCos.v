@@ -257,7 +257,8 @@ Opaque Min Sine Cosine.
 
 Section Basic_Properties.
 
-(** **Basic properties
+(**
+** Basic properties
 
 We now prove most of the usual trigonometric (in)equalities.
 
@@ -289,6 +290,21 @@ Qed.
 
 Lemma Tan_wd : forall x y Hx Hy, x [=] y -> Tan x Hx [=] Tan y Hy.
 intros; unfold Tan in |- *; algebra.
+Qed.
+
+Lemma Tan_Sin_over_Cos : forall x Hx H, Tan x Hx[=](Sin x[/]Cos x[//]H).
+Proof.
+intros x Hx H.
+change ((Sine x (prj1 IR _ _ _ Hx)[/]
+ Cosine x
+   (ProjT1
+      (ext2_a IR (Dom Cosine)
+         (fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) x
+         (prj2 IR _ _ _ Hx)))[//]
+ ext2 (S:=IR) (P:=Dom Cosine)
+   (R:=fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) (x:=x)
+   (prj2 _ _ _ _ Hx))[=](Sine x CI[/]Cosine x CI[//]H)).
+algebra.
 Qed.
 
 (**

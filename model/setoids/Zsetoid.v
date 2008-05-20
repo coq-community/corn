@@ -38,7 +38,8 @@
 Require Export Zsec.
 Require Export CSetoidFun.
 
-(** **Example of a setoid: [Z]
+(**
+** Example of a setoid: [Z]
 *** [Z]
 *)
 
@@ -71,9 +72,10 @@ Definition ap_Z_is_apartness := Build_is_CSetoid Z (eq (A:=Z)) ap_Z
 
 
 Definition Z_as_CSetoid := Build_CSetoid _ _ _ ap_Z_is_apartness.
+Canonical Structure Z_as_CSetoid.
 
 (** The term [Z_as_CSetoid] is of type [CSetoid]. Hence we have proven that [Z] is a constructive setoid.
-***Addition
+*** Addition
 We will prove now that the addition on the integers is a setoid function.
 *)
 
@@ -95,6 +97,7 @@ Qed.
 
 Definition Zplus_is_bin_fun := Build_CSetoid_bin_fun
  Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zplus Zplus_strext.
+Canonical Structure Zplus_is_bin_fun.
 
 (** What's more: the addition is also associative and commutative.
 *) 
@@ -115,7 +118,8 @@ intros x y.
 apply Zplus_comm.
 Qed.
 
-(** ***Opposite
+(**
+*** Opposite
 Taking the opposite of an integer is a setoid function.
 *)
 
@@ -141,8 +145,10 @@ Qed.
 
 Definition Zopp_is_fun :=
   Build_CSetoid_fun Z_as_CSetoid Z_as_CSetoid Zopp Zopp_strext.
+Canonical Structure Zopp_is_fun.
 
-(** ***Multiplication
+(**
+*** Multiplication
 Finally the multiplication is a setoid function and is associative and commutative.
 *)
 
@@ -167,6 +173,7 @@ Qed.
 
 Definition Zmult_is_bin_fun := Build_CSetoid_bin_fun
  Z_as_CSetoid Z_as_CSetoid Z_as_CSetoid Zmult Zmult_strext.
+Canonical Structure Zmult_is_bin_fun.
 
 Lemma Zmult_is_assoc : associative Zmult_is_bin_fun.
 Proof.
@@ -185,7 +192,8 @@ intros x y.
 apply Zmult_comm.
 Qed.
 
-(** ***Zero
+(**
+*** Zero
 *)
 
 Lemma is_nullary_operation_Z_0 : (is_nullary_operation Z_as_CSetoid 0%Z).

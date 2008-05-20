@@ -38,7 +38,8 @@
 Require Import CGroups.
 Require Export Nposmonoid.
 
-(** **Non-example of a group: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
+(**
+** Non-example of a group: $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;#
 There is no inverse for multiplication on the positive natural numbers.
 *)
 

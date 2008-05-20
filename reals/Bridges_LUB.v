@@ -962,8 +962,7 @@ Proof.
  simpl in |- *. 
  apply plus_resp_less_leEq.
  assumption.
- red in |- *.
- apply less_irreflexive_unfolded.
+ apply leEq_reflexive.
 
  apply less_wdr with (y := x[^]M1[*]x[^]M2).
  apply plus_cancel_less with (z := [--](x[^]M1)).

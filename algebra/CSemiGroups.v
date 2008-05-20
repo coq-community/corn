@@ -41,9 +41,9 @@ Require Export CSetoidInc.
 
 (* Begin_SpecReals *)
 
-(** *Semigroups
-
-**Definition of the notion of semigroup
+(**
+* Semigroups
+** Definition of the notion of semigroup
 *)
 
 Definition is_CSemiGroup A (op : CSetoid_bin_op A) := associative op.
@@ -63,7 +63,8 @@ Implicit Arguments csg_op [c].
 Infix "[+]" := csg_op (at level 50, left associativity).
 (* End_SpecReals *)
 
-(** **Semigroup axioms
+(**
+** Semigroup axioms
 The axiomatic properties of a semi group.
 
 %\begin{convention}% Let [G] be a semi-group.
@@ -84,7 +85,8 @@ End CSemiGroup_axioms.
 
 (* Begin_SpecReals *)
 
-(** **Semigroup basics
+(**
+** Semigroup basics
 
 %\begin{convention}%
 Let [G] be a semi-group.
@@ -103,7 +105,8 @@ End CSemiGroup_basics.
 
 Section p71R1.
 
-(** **Morphism
+(**
+** Morphism
 %\begin{convention}%
 Let [S1 S2:CSemiGroup].
 %\end{convention}%
@@ -117,7 +120,8 @@ forall (a b:S1), (f (a[+]b))[=] (f a)[+](f b).
 
 End p71R1.
 
-(** **About the unit
+(**
+** About the unit
 *)
 
 Definition is_rht_unit S (op : CSetoid_bin_op S) Zero : Prop := forall x, op x Zero [=] x.
@@ -162,7 +166,8 @@ Qed.
 
 Hint Resolve plus_assoc_unfolded: algebra.
 
-(** **Functional operations
+(**
+** Functional operations
 We can also define a similar addition operator, which will be denoted by [{+}], on partial functions.
 
 %\begin{convention}% Whenever possible, we will denote the functional construction corresponding to an algebraic operation by the same symbol enclosed in curly braces.
@@ -222,7 +227,8 @@ Hint Resolve included_FPlus : included.
 
 Hint Immediate included_FPlus' included_FPlus'' : included.
 
-(** **Subsemigroups
+(**
+** Subsemigroups
 %\begin{convention}%
 Let [csg] a semi-group and [P] a non-empty
 predicate on the semi-group which is preserved by [[+]].
@@ -242,7 +248,8 @@ End SubCSemiGroups.
 
 Section D9S.
 
-(** **Direct Product
+(**
+** Direct Product
 %\begin{convention}%
 Let [M1 M2:CSemiGroup]
 %\end{convention}%
@@ -326,7 +333,8 @@ Definition direct_product_as_CSemiGroup:=
 End D9S.
 
 
-(** **The SemiGroup of Setoid functions
+(**
+** The SemiGroup of Setoid functions
 *)
 
 Lemma FS_is_CSemiGroup: 
@@ -340,7 +348,8 @@ Definition FS_as_CSemiGroup (A : CSetoid) :=
 
 Section p66E2b4.
 
-(** **The Free SemiGroup
+(**
+** The Free SemiGroup
 %\begin{convention}% Let [A:CSetoid].
 %\end{convention}%
 *)

@@ -39,7 +39,8 @@
 Require Export Nsec.
 Require Import Arith.
 
-(** **[Npos]
+(**
+** [Npos]
 The positive natural numbers have some nice properties. Addition as well 
 as multiplication preserve the feature of being positive.
 *)

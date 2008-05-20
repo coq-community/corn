@@ -37,7 +37,8 @@
 Require Export Prod_Sub.
 
 Section lists.
-(** **Lists
+(**
+** Lists
 *)
 
 (**
@@ -76,7 +77,7 @@ Definition list_IR (P : IR -> CProp) :
 intro P.
 intro l.
 induction  l as [| a l Hrecl].
-apply nil.
+apply (@nil IR).
 apply (cons (to_IR P a) Hrecl).
 Defined.
 
@@ -166,7 +167,8 @@ Qed.
 End lists.
 
 Section loc_and_bound.
-(** **Pseudo Metric Space theory
+(**
+** Pseudo Metric Space theory
 *)
 
 Definition Re_co_do (X Z : CSetoid) (f : CSetoid_fun X Z) :

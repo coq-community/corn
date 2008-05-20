@@ -175,6 +175,7 @@ apply dsub'_is_lipschitz.
 unfold dIR.
 astepr (ABSIR (C[*](dsub' M P y x[-]dsub' M P y y0))).
 apply AbsIR_mult.
+apply less_leEq.
 apply constant_positive.
 apply ABSIR_wd; auto with algebra.
 Qed.
@@ -235,7 +236,7 @@ Lemma lip_extension_strext_case: forall (x : M) (y : M)
          z2), x [#] y.
 unfold set_glb_IR.
 intros.
-destruct H1. destruct H2.
+destruct H1 as [l s]. destruct H2 as [l0 s0].
 assert {x0 : IR |
     sigT (fun x1 : subcsetoid_crr M P => f x1[+]C[*]dsub' M P y x1[=]x0) |
     x0[-]z1[<](z2 [-] z1)}.
@@ -322,7 +323,7 @@ unfold lip_extension_f.
 elim inf_f_multi_ext_exists.
 unfold set_glb_IR.
 simpl. intros y H.
-destruct H.
+destruct H as [l s].
 
 apply leEq_imp_eq.
 
@@ -361,7 +362,6 @@ astepl (x0 [-] y); auto.
 astepl (f x [-] y [+] y).
 astepr (Zero [+] y).
 apply plus_resp_leEq.
-unfold leEq.
 apply approach_zero; auto.
 Qed.
 
@@ -376,7 +376,7 @@ forall (y1 : M) (y2 : M) (fy2 : IR)
 (X : Zero[<]e),
 fy2[-]fy1[<=]C[*](y1[-d]y2)[+]e.
 intros.
-destruct Hfy1. destruct Hfy2.
+destruct Hfy1. destruct Hfy2  as [l0 s0].
 assert ({x : IR | sigT (fun x0 : SubMetricSpace M P => f x0[+]C[*]dsub' M P y1 x0[=]x) |
       x[-]fy1[<]e}).
 apply s. auto. destruct X0 as [fx1 Ht Hl1].  destruct Ht as [x1 He1].

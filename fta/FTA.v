@@ -37,7 +37,8 @@
 Require Export CPoly_Rev.
 Require Export FTAreg.
 
-(** * Fundamental Theorem of Algebra
+(**
+* Fundamental Theorem of Algebra
 %\begin{convention}% Let [n:nat] and [f] be a complex polynomial of
 degree [(S n)].
 %\end{convention}%
@@ -193,7 +194,10 @@ elim H.
 intros x H0.
 elim H0.
 intros y H1.
-unfold greater in H1.
+pose (H1':=(CAnd_proj1 _ _ (greater_def _ _ _) H1)).
+clearbody H1'.
+clear H1.
+rename H1' into H1.
 generalize (less_imp_ap _ _ _ H1); intro H2.
 generalize (AbsCC_ap_zero _ H2); intro H3.
 
