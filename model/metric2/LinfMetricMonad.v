@@ -1,5 +1,7 @@
 (*
-Copyright © 2007-2008 Russell O’Connor
+Copyright © 2007-2008 
+ Russell O’Connor
+ Bas Spitters
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -19,9 +21,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export LinfMetric.
-Require Import Prelength.
-Require Import L1metric.
+Require Export StepFunctionSetoid.
+Require Import UniformContinuity.
 Require Import OpenUnit.
 Require Import QArith.
 Require Import QMinMax.
