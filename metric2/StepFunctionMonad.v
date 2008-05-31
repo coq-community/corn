@@ -61,7 +61,7 @@ Definition StFJoin0 (X:Setoid):(StepFS (StepFS X)) -> (StepFS X).
 intros X m.
 apply (@StepFfold (StepFS X)).
 exact (@id (StepFS X)).
-exact (@glue X).
+exact (fun o l r => @glue X o (SplitL l o) (SplitR r o)).
 exact m.
 Defined.
 
