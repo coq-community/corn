@@ -1,5 +1,7 @@
 (*
-Copyright © 2007-2008 Russell O’Connor
+Copyright © 2007-2008 
+ Russell O’Connor
+ Bas Spitters
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -19,9 +21,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export LinfMetric.
-Require Import Prelength.
-Require Import L1metric.
+Require Export StepFunctionSetoid.
+Require Import UniformContinuity.
 Require Import OpenUnit.
 Require Import QArith.
 Require Import QMinMax.
@@ -146,41 +147,47 @@ rapply (ball_triangle X e d a b c); assumption.
 Qed.
 
 Lemma StepFSupBall_closed : forall e x y, (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
-Admitted.
-(*
-Proof.
-unfold StepFSupBall. intros e a b.
-
-apply StepF_imp_imp.
-
+intros e x y.
+apply (StepF_ind2 (fun x y => 
+(forall d : Qpos, StepFSupBall (e + d) x y) -> 
+ StepFSupBall e x y)).
+  intros. rewrite H in H1. rewrite H0 in H1. apply H1.
+  intro. rewrite H. rewrite H0. apply H2.
+ do 2 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
+ apply (@msp_closed X (@ms_eq X)). apply msp.
+do 5 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
+do 3 intro.  rewrite MapGlue. rewrite ApGlue. simpl.
+split. rewrite SplitLGlue. apply H. clear H.
+ intro d. pose (H2:=H1 d).
+  rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+ simpl in H2.  intuition. 
+rewrite SplitRGlue. apply H0. clear H0.
+intro d. pose (H2:=H1 d).
+rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+simpl in H2.  intuition.
 Qed.
-*)
 
 Lemma StepFSupBall_eq : forall x y, 
 (forall e : Qpos, StepFSupBall e x y) -> StepF_eq x y.
-Admitted.
-(*
-Proof.
-intros x y H.
-unfold LinfBall in H.
-setoid_replace y with (constStepF (0:QS)+y) by ring.
-set (z:=constStepF (0:QS)).
-setoid_replace x with (x - y + y) by ring.
-apply StepQplus_wd; try reflexivity.
-unfold z; clear z.
-rapply LinfNorm_Zero.
-apply Qnot_lt_le.
-intros H0.
-assert (0<(1#2)*( LinfNorm (x - y))).
- rsapply mult_resp_pos; auto with *.
-apply (Qle_not_lt _ _ (H (mkQpos H1))).
-autorewrite with QposElim.
-rewrite Qlt_minus_iff.
-unfold LinfDistance.
-ring_simplify.
-assumption.
+intros x y.
+apply (StepF_ind2 (fun x y => 
+(forall e : Qpos, StepFSupBall e x y) -> x == y
+)).
+  intros. rewrite H in H1. rewrite H0 in H1. apply H1.
+  intro. rewrite H. rewrite H0. apply H2.
+ do 2 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
+ apply (@msp_eq X (@ms_eq X)). apply msp.
+do 5 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
+do 3 intro. apply glue_resp_StepF_eq.
+  apply H. clear H.
+ intro e. pose (H2:=H1 e). 
+  rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+ simpl in H2.  intuition. 
+apply H0. clear H0.
+intro e. pose (H2:=H1 e).
+rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+simpl in H2.  intuition.
 Qed.
-*)
 (**
 *** Example of a Metric Space <Step, StepFSupBall>
 *)
