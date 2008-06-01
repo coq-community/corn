@@ -75,14 +75,16 @@ Add Morphism StepFSupBall
  as StepFSupBall_wd.
 unfold StepFSupBall.
 intros a1 a2 Ha x1 x2 Hx y1 y2 Hy.
-unfold QposEq in Ha.
 apply StepFfoldProp_morphism.
 rewrite Hx.
 rewrite Hy.
-(* Cheat here 
+setoid_replace (ballS X a1) with (ballS X a2).
+reflexivity.
+intros x y.
+simpl.
 rewrite Ha.
-reflexivity.*)
-Admitted.
+reflexivity.
+Qed.
 
 Lemma StepFSupBall_refl : forall e x, (StepFSupBall e x x).
 Proof.
@@ -94,11 +96,7 @@ cut (StepFfoldProp (f <@> x )).
  unfold f.
  evalStepF.
  auto.
-apply StepFfoldPropForall_Ap.
-intro y.
-unfold f.
- evalStepF.
-unfold StepFfoldProp.
+rapply StepFfoldPropForall_Map.
 simpl.
 auto with *.
 Qed.
@@ -140,10 +138,7 @@ cut (StepFfoldProp (f ^@> x <@> y <@> z)).
  evalStepF.
  tauto.
 apply StepFfoldPropForall_Map3.
-intros a b c Hab Hbc.
-clear f.
-simpl in *.
-rapply (ball_triangle X e d a b c); assumption.
+rapply (ball_triangle X e d).
 Qed.
 
 Lemma StepFSupBall_closed : forall e x y, (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
