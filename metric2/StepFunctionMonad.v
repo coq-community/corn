@@ -56,7 +56,7 @@ induction x1 using StepF_ind.
  set (SF:=(@StepFfold X Y f (fun o y=>g o y))).
 How to continue??*)
 
-
+(* Problem: what is the right encoding*)
 Definition StFJoin0 (X:Setoid):(StepFS (StepFS X)) -> (StepFS X).
 intros X m.
 apply (@StepFfold (StepFS X)).
@@ -78,6 +78,18 @@ Defined.
 
 Definition StFBind (X Y:Setoid)(m:StepFS X)(f:X-->StepFS Y):(StepFS Y):=
 StFJoin0 (f^@>m).
+(* Map should have type --> *)
+
+(* 
+Definition Map' (X Y : Setoid):
+       (X --> Y) -> StepFS X --> StepFS Y.
+intros X Y f.
+pose (Map (compose (@StFReturn Y) f  )).
+assert (mapcompose:(StepFS X)--> (StepFS (StepFS Y))).
+exists s.
+intros.
+unfold s.
+Problem: Map has the wrong type *)
 
 (** Monad laws *)
 Variable X Y:Setoid.
@@ -110,13 +122,87 @@ auto with *.
 Qed.
 *)
 
+Definition SSplitL(S:StepFS X):(StepFS (StepFS X)).
+intro f.
+apply (@StepFfold X (StepFS (StepFS X))).
+3:exact f. clear f.
+intro x.
+exact (StFReturn (StepFS X) (StFReturn X x)).
+intros o g h.
+exact (Map (fun x=> SplitL x o) g).
+Defined.
+
+Definition SSplitR(S:StepFS X):(StepFS (StepFS X)).
+intro f.
+apply (@StepFfold X (StepFS (StepFS X))).
+3:exact f. clear f.
+intro x.
+exact (StFReturn (StepFS X) (StFReturn X x)).
+intros o g h.
+exact (Map (fun x=> SplitR x o) h).
+Defined.
+
+Definition Diag(S:StepFS (StepFS X)):(StepFS (StepFS X)).
+fix 1.
+intro m.
+case m.
+exact (StFReturn (StepFS X)).
+intros o f g.
+pose (Map (fun x=> SplitL x o) f).
+pose (Map (fun x=> SplitR x o) g).
+apply (Map2 (glue o) s s0).
+Defined.
+
+Print Diag.
+
+Lemma JoinDiag:forall m, (StFJoin X m)==(StFJoin X (Diag m)).
+intros.
+induction m.
+reflexivity.
+pose (s := Map (fun x : StepF X => SplitL x o) m1).
+pose (s0 := Map (fun x : StepF X => SplitR x o) m2). 
+change ((@glue X o (SplitL (StFJoin X m1) o) (SplitR (StFJoin X m2) o))
+== StFJoin X (Diag (StepFunction.glue o m1 m2))).
+change (glue o (SplitL (StFJoin X m1) o) (SplitR (StFJoin X m2) o) 
+== StFJoin X (Map2 (glue o) s s0)).
+simpl.
+rewrite IHm1. rewrite IHm2.
+clear IHm1 IHm2.
+
+
+
+
+
+StFJoin0
+  (Map2 (glue o) (Map (fun x : StepF X => SplitL x o) m1)
+     (Map (fun x : StepF X => SplitR x o) m2))).
+
+
+unfold StFJoin0.
+simpl.
+
+
+
+
+
+
 Lemma BindReturn(m:StepF X): (StFBind m (StFReturn X)) == m.
 intro m.
 unfold StFBind.
-induction m using StepF_ind. simpl; auto with *.
-unfold StFJoin0.
-???
+assert ((StFReturn X ^@> m) == (SSplitL m)).
+induction m using StepF_ind.
+unfold SSplitL. simpl. auto with *.
 rewrite MapGlue.
+unfold SSplitL. simpl.
+rewrite IHm1. rewrite IHm2.
+
+
+
+induction m using StepF_ind. simpl;auto with *.
+
+rewrite MapGlue.
+assert ((StFReturn X ^@> m) == 
+unfold StFJoin0.
 simpl.
 apply glue_resp_StepF_eq. 
  clear IHm2 m2. rewrite  IHm1.
