@@ -61,7 +61,7 @@ Definition StFJoin0 (X:Setoid):(StepFS (StepFS X)) -> (StepFS X).
 intros X m.
 apply (@StepFfold (StepFS X)).
 exact (@id (StepFS X)).
-exact (@glue X).
+exact (fun o l r => @glue X o (SplitL l o) (SplitR r o)).
 exact m.
 Defined.
 
@@ -96,6 +96,7 @@ intros; apply g; assumption|
 apply f; assumption]).
 Defined.
 
+(*
 Lemma BindBind(Z:Setoid)(f:X-->StepFS Y)(g:Y-->StepFS Z)(m:StepF X): 
 (StFBind (StFBind m f) g) == (StFBind m (Bind_compose f g)).
 intros.
@@ -107,17 +108,19 @@ simpl.
 rewrite IHm1. rewrite IHm2.
 auto with *.
 Qed.
+*)
 
 Lemma BindReturn(m:StepF X): (StFBind m (StFReturn X)) == m.
 intro m.
 unfold StFBind.
-induction m. simpl; auto with *.
-simpl.
-change (StFJoin0 (StFReturn X ^@> glue o m1 m2) ==
-glue o m1 m2).
-rewrite MapGlue.
+induction m using StepF_ind. simpl; auto with *.
 unfold StFJoin0.
+???
+rewrite MapGlue.
 simpl.
-apply glue_resp_StepF_eq.
+apply glue_resp_StepF_eq. 
+ clear IHm2 m2. rewrite  IHm1.
+(* SplitL m1 o == m1 ??*)
+rewrite GlueSplit.
 apply IHm1. apply IHm2.
 Qed.
