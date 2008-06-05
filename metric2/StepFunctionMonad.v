@@ -33,6 +33,44 @@ Defined.
 Open Scope setoid_scope.
 Open Local Scope sfstscope.
 
+(* Use:    destruct H as [Hl Hr] using (glue_eq_ind x2_1). *)
+Lemma ConstGlue(X:Setoid):forall m n x o, ((constStepF x)==(@glue X o m n)) ->
+((constStepF x)==m)/\((constStepF x)==n).
+intros. split.  
+ pose (s:=SplitL_resp_Xeq _ _ o H). rewrite SplitLGlue in s. auto with *.
+ pose (s:=SplitR_resp_Xeq _ _ o H). rewrite SplitRGlue in s. auto with *.
+Qed.
+
+(*
+Lemma Ext(X Y:Setoid):forall f:(StepFS X)->Y, 
+ (forall x y:X, (st_eq X x y)-> (st_eq _ (f (constStepF x)) (f (constStepF y))))->
+(*  (forall m n o, (st_eq _ (f (glue o m n))
+                 (glue o (f m)) (f n))) -> *)
+ (forall m o, (st_eq _ (f (glue o (SplitL m o) (SplitR m o) )) (f m)))
+ -> (forall m n, m==n -> (st_eq _ (f m)(f n))).
+Admitted.*)
+(*
+intros X Y f H H0 H1.
+induction m using StepF_ind.
+ induction n using StepF_ind. intro. assert (st_eq _ x x0); auto with *.
+ intro H2. destruct (ConstGlue H2) as [left right].
+ rewrite H1. 
+ pose (L:=(IHn1 left)). pose (R:=(IHn2 right)).
+ rewrite <- L. rewrite <- R. apply H0.
+intros n H2. clear H H0.
+rewrite H1. 
+assert (H3:(SplitL (glue o m1 m2) o) == (SplitL n o)). apply (SplitL_wd _ _ H2); auto with *.
+  rewrite SplitLGlue in H3.
+assert ((SplitR (glue o m1 m2) o) == (SplitR n o)). apply (SplitR_wd _ _ H2); auto with *.
+  rewrite SplitRGlue in H4.
+ pose (L:=(IHm1 _ H3)). pose (R:=(IHm2 _ H4)).
+change (f (glue o m1 m2) == f n).
+clear H H0.
+rewrite  H1.
+*)
+
+
+
 Definition StFReturn (X:Setoid) : X-->(StepFS X).
 intros.
 exists (@constStepF X).
@@ -86,29 +124,16 @@ Definition StFBind(X Y:Setoid) :
   (StepFS X) --> (X --> (StepFS Y)) --> (StepFS Y).
 intros X Y.
 exists (fun m => (@StFBind1 X Y m)).
-intros x1.
-induction x1.  
- induction x2. simpl. intro; auto with *.
+induction x1 using StepF_ind. intro y. 
+ induction y using StepF_ind. simpl. intro H.
   intro f. apply f. auto with *. 
- simpl. intro H.
- (* Should be a Lemma *)
- change (StepF_eq (StepFunction.constStepF x) (glue o x2_1 x2_2)) in H.
- pose (s:=SplitL_resp_Xeq _ _ o H). rewrite SplitLGlue in s.
- change (StepF_eq (constStepF x)  x2_1) in s.
- pose (s1:=IHx2_1 s). 
+ simpl. intro H. symmetry in H. destruct H as [Hl Hr] using (glue_eq_ind y1).
+ symmetry in Hl. pose (s1:=IHy1 Hl). 
+ symmetry in Hr. pose (s2:=IHy2 Hr).
  intro f. 
- pose (s1 (compose1 (SplitLS Y o) f)). rewrite <- s0.
- simpl. unfold compose0. clear s1 s0 s IHx2_1. 
- pose (s:=SplitR_resp_Xeq _ _ o H). rewrite SplitRGlue in s.
- clear H. change (StepF_eq (constStepF x)  x2_2) in s.
- pose (s1:=IHx2_2 s).  
- pose (s1 (compose1 (SplitRS Y o) f)). rewrite <- s0.
- simpl. unfold compose0. unfold SplitLS0, SplitRS0. symmetry. apply glueSplit.
-
-intro x2.
-change (st_eq (StepFS X) (glue o x1_1 x1_2) x2 ->
-st_eq ((X --> StepFS Y) --> StepFS Y)
-  (StFBind1 Y (glue o x1_1 x1_2)) (StFBind1 Y x2)).
+ rewrite <- (s1 (compose1 (SplitLS Y o) f)). simpl. unfold compose0. clear s1 IHy1. 
+ rewrite <- (s2 (compose1 (SplitRS Y o) f)). simpl. unfold compose0. unfold SplitLS0, SplitRS0. symmetry. apply glueSplit.
+intro y.
 intro H.
 pose (s:=SplitL_resp_Xeq _ _ o H). rewrite SplitLGlue in s.
 pose (t:=SplitR_resp_Xeq _ _ o H). rewrite SplitRGlue in t.
@@ -117,20 +142,64 @@ pose (IHx1_1 _ s (compose1 (SplitLS Y o) f)).
 rewrite s0. clear s0.
 pose (IHx1_2 _ t (compose1 (SplitRS Y o) f)).
 rewrite s0. clear s0 IHx1_1 IHx1_2. 
-change ((StFBind1 _ (glue o (SplitL x2 o) (SplitR x2 o)) f)  == StFBind00 x2 f).
+change ((StFBind1 _ (glue o (SplitL y o) (SplitR y o)) f)  == StFBind00 y f).
 clear H s t x1_1 x1_2.
+simpl.
+(* *)
+rewrite <- (glueSplit (StFBind00 y f) o).
+apply glue_wd; auto with *. revert f o.
+ induction y using StepF_ind. reflexivity.
+ intros f p. apply SplitL_glue_ind. intro. simpl.
+ assert ((SplitL
+  (glue o (StFBind00 y1 (compose1 (SplitLS Y o) f))
+     (StFBind00 y2 (compose1 (SplitRS Y o) f))) p)
+ ==
+(SplitL (StFBind00 y1 (compose1 (SplitLS Y o) f)) p)).
+elim cheat.
+rewrite H0. clear H0. clear IHy2 y2.
+rewrite <- IHy1.
+assert (StFBind00 (SplitL y1 (OpenUnitDiv p o H)) (compose1 (SplitLS Y p) f) ==
+StFBind00 (SplitL y1 p) ((compose1 (SplitLS Y (OpenUnitDualDiv o p H)) f))).
+clear IHy1.
 
-rename x2 into y. revert o.
-induction y. simpl; auto with *. unfold compose0, SplitLS0, SplitRS0. apply glueSplit.
-intro p.
-change (StFBind1 Y
-  (glue p (SplitL (glue o y1 y2) p)
-     (SplitR (glue o y1 y2) p)) f ==
-StFBind00 (glue o y1 y2) f).
 
-
-
+elim (cheat).
+elim (cheat).
 Defined.
+
+Definition StFJoin0 (X:Setoid):(StepFS (StepFS X))->(StepFS X):=
+(fun m => (StFBind1 _ m id)).
+
+(* Check laws for Join return
+What about join glue.
+*)
+
+Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X).
+intros.
+exists (@StFJoin0 X).
+intros m. induction m using StepF_ind.
+intro n.
+induction n using StepF_ind.
+Focus 3.
+intros n H.
+assert (st_eq (StepFS X) (StFJoin0 (glue o (SplitL n o) (SplitR n o))) (StFJoin0 n)).
+simpl.
+unfold StFJoin0.
+simpl.
+assert  ((glue o (StFBind00 (SplitL n o) (SplitLS X o) )
+  (StFBind00 (SplitR n o) (SplitRS X o)) == StFBind00 n id)).
+
+
+
+
+
+
+
+
+abstract (elim cheat).
+Defined.
+
+
 
 (*
 Lemma StFJoin_wd: forall X:Setoid, forall m m1:(StepFS (StepFS X)), m==m1 -> 
