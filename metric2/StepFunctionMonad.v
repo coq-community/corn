@@ -33,48 +33,10 @@ Defined.
 Open Scope setoid_scope.
 Open Local Scope sfstscope.
 
-(* Use:    destruct H as [Hl Hr] using (glue_eq_ind x2_1). *)
-Lemma ConstGlue(X:Setoid):forall m n x o, ((constStepF x)==(@glue X o m n)) ->
-((constStepF x)==m)/\((constStepF x)==n).
-intros. split.  
- pose (s:=SplitL_resp_Xeq _ _ o H). rewrite SplitLGlue in s. auto with *.
- pose (s:=SplitR_resp_Xeq _ _ o H). rewrite SplitRGlue in s. auto with *.
-Qed.
-
-(*
-Lemma Ext(X Y:Setoid):forall f:(StepFS X)->Y, 
- (forall x y:X, (st_eq X x y)-> (st_eq _ (f (constStepF x)) (f (constStepF y))))->
-(*  (forall m n o, (st_eq _ (f (glue o m n))
-                 (glue o (f m)) (f n))) -> *)
- (forall m o, (st_eq _ (f (glue o (SplitL m o) (SplitR m o) )) (f m)))
- -> (forall m n, m==n -> (st_eq _ (f m)(f n))).
-Admitted.*)
-(*
-intros X Y f H H0 H1.
-induction m using StepF_ind.
- induction n using StepF_ind. intro. assert (st_eq _ x x0); auto with *.
- intro H2. destruct (ConstGlue H2) as [left right].
- rewrite H1. 
- pose (L:=(IHn1 left)). pose (R:=(IHn2 right)).
- rewrite <- L. rewrite <- R. apply H0.
-intros n H2. clear H H0.
-rewrite H1. 
-assert (H3:(SplitL (glue o m1 m2) o) == (SplitL n o)). apply (SplitL_wd _ _ H2); auto with *.
-  rewrite SplitLGlue in H3.
-assert ((SplitR (glue o m1 m2) o) == (SplitR n o)). apply (SplitR_wd _ _ H2); auto with *.
-  rewrite SplitRGlue in H4.
- pose (L:=(IHm1 _ H3)). pose (R:=(IHm2 _ H4)).
-change (f (glue o m1 m2) == f n).
-clear H H0.
-rewrite  H1.
-*)
-
-
-
 Definition StFReturn (X:Setoid) : X-->(StepFS X).
 intros.
 exists (@constStepF X).
-auto with *.
+abstract (auto with *).
 Defined.
 
 Definition SplitLS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
@@ -83,7 +45,7 @@ Definition SplitLS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
 Definition SplitLS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
 intros X o.
 exists (fun x => (SplitLS0 o x)).
-intros. rapply SplitL_wd;auto with *.
+abstract (intros; rapply SplitL_wd;auto with *).
 Defined.
 
 Definition SplitRS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
@@ -92,7 +54,7 @@ Definition SplitRS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
 Definition SplitRS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
 intros X o.
 exists (fun x => (SplitRS0 o x)).
-intros. rapply SplitR_wd;auto with *.
+abstract (intros; rapply SplitR_wd;auto with *).
 Defined.
 
 Definition StFBind00(X Y:Setoid) : 
@@ -106,11 +68,9 @@ exact (glue o (StFBind00 m1 (compose (SplitLS Y o) f))
                      (StFBind00 m2 (compose (SplitRS Y o) f))).
 Defined.
 
-Axiom cheat:False.
-Definition StFBind1(X Y:Setoid) : 
-  (StepFS X) -> (X --> (StepFS Y)) --> (StepFS Y).
-intros X Y m.
-exists (fun f=> (@StFBind00 X Y m f)).
+Lemma StFBind_wd1(X Y:Setoid):forall m, forall x1 x2 : X --> StepFS Y,
+st_eq (X --> StepFS Y) x1 x2 ->
+st_eq (StepFS Y) (StFBind00 m x1) (StFBind00 m x2).
 induction m.
  intros. simpl; auto with *. apply H.
 intros. simpl. apply glue_resp_StepF_eq.
@@ -118,12 +78,71 @@ intros. simpl. apply glue_resp_StepF_eq.
  apply SplitL_wd; auto with *. apply H.
 apply IHm2. intro. simpl. unfold compose0. 
 apply SplitR_wd; auto with *. apply H.
+Qed.
+
+Definition StFBind1(X Y:Setoid) : 
+  (StepFS X) -> (X --> (StepFS Y)) --> (StepFS Y).
+intros X Y m.
+exists (fun f=> (@StFBind00 X Y m f)).
+abstract (apply StFBind_wd1).
 Defined.
 
-Definition StFBind(X Y:Setoid) : 
-  (StepFS X) --> (X --> (StepFS Y)) --> (StepFS Y).
+Definition MirrorS(X:Setoid):(StepFS X)-->(StepFS X).
+intro X.
+exists (@Mirror X).
+abstract (intros; change (Mirror x1 == Mirror x2); rewrite Mirror_eq_Mirror; assumption).
+Defined.
+
+Lemma MirrorBind(X Y:Setoid):forall (x:StepF X) (f:X --> (StepFS Y)), 
+Mirror (StFBind00 x f)==(StFBind00 (Mirror x) (compose (MirrorS Y) f)).
+induction x using StepF_ind.
+ reflexivity.
+intros. simpl. rewrite MirrorGlue. apply glue_wd; auto with *.
+rewrite IHx2. simpl. change 
+(StFBind00 (Mirror x2) (compose1 (MirrorS Y) (compose1 (SplitRS Y o) f)) ==
+StFBind00 (Mirror x2) (compose1 (SplitLS Y (OpenUnitDual o)) (compose1 (MirrorS Y) f))).
+apply StFBind_wd1. intro. simpl. unfold compose0. unfold SplitRS0, SplitLS0.
+apply MirrorSplitR; auto with *.
+
+rewrite IHx1. simpl. change (StFBind00 (Mirror x1) (compose1 (MirrorS Y) (compose1 (SplitLS Y o) f)) ==
+StFBind00 (Mirror x1) (compose1 (SplitRS Y (OpenUnitDual o)) (compose1 (MirrorS Y) f))).
+apply StFBind_wd1. intro. simpl. unfold compose0. unfold SplitRS0, SplitLS0.
+apply MirrorSplitL; auto with *.
+Qed.
+
+Lemma StFBind_wd(X Y:Setoid): forall x1 x2 : StepFS X,
+st_eq (StepFS X) x1 x2 ->
+st_eq ((X --> StepFS Y) --> StepFS Y) (StFBind1 Y x1) (StFBind1 Y x2).
 intros X Y.
-exists (fun m => (@StFBind1 X Y m)).
+assert (Bind_resp_Q:forall x1 x2 : StepFS X,
+(StepF_Qeq  x1 x2) ->
+st_eq ((X --> StepFS Y) --> StepFS Y) (StFBind1 Y x1) (StFBind1 Y x2)).
+induction x1 using StepF_ind; induction x2 using StepF_ind;try contradiction.
+ intro. intro. simpl. rewrite H. reflexivity.
+ intro H. simpl in H. destruct H as [eq [L R]].
+ intro f. simpl. apply glue_wd; try assumption.
+clear IHx2_1 IHx2_2.
+pose (IHx1_1 _ L).
+assert (extEq _ (compose1 (SplitLS Y o) f) (compose1 (SplitLS Y o0) f)). 
+intro. simpl. unfold compose0. unfold SplitLS0. 
+apply SplitL_wd; auto with *. 
+transitivity (StFBind00 x1_1 (compose1 (SplitLS Y o0) f)).
+change (StFBind1 _ x1_1 (compose1 (SplitLS Y o) f) ==
+StFBind1 _ x1_1 (compose1 (SplitLS Y o0) f)).
+rapply (@StFBind_wd1 X Y x1_1). intro. apply H. clear H.
+rapply s.
+clear IHx2_1 IHx2_2.
+pose (IHx1_2 _ R).
+assert (extEq _
+(compose1 (SplitRS Y o) f)
+(compose1 (SplitRS Y o0) f)). intro. simpl. unfold compose0. unfold SplitRS0. 
+apply SplitR_wd; auto with *. 
+transitivity (StFBind00 x1_2 (compose1 (SplitRS Y o0) f)).
+change (StFBind1 _ x1_2 (compose1 (SplitRS Y o) f) ==
+StFBind1 _ x1_2 (compose1 (SplitRS Y o0) f)).
+rapply (@StFBind_wd1 X Y x1_2). intro. apply H. clear H.
+rapply s.
+(* Bind_resp_Q*)
 induction x1 using StepF_ind. intro y. 
  induction y using StepF_ind. simpl. intro H.
   intro f. apply f. auto with *. 
@@ -147,88 +166,95 @@ clear H s t x1_1 x1_2.
 simpl.
 (* *)
 rewrite <- (glueSplit (StFBind00 y f) o).
-apply glue_wd; auto with *. revert f o.
+revert f o y.
+assert (BindSplitL: forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
+StFBind00 (SplitL y o) (compose1 (SplitLS Y o) f) == SplitL (StFBind00 y f) o).
  induction y using StepF_ind. reflexivity.
- intros f p. apply SplitL_glue_ind. intro. simpl.
- assert ((SplitL
-  (glue o (StFBind00 y1 (compose1 (SplitLS Y o) f))
-     (StFBind00 y2 (compose1 (SplitRS Y o) f))) p)
- ==
-(SplitL (StFBind00 y1 (compose1 (SplitLS Y o) f)) p)).
-elim cheat.
-rewrite H0. clear H0. clear IHy2 y2.
+ intros p f. simpl.  apply SplitL_glue_ind; apply SplitL_glue_ind. intro. intro.
 rewrite <- IHy1.
-assert (StFBind00 (SplitL y1 (OpenUnitDiv p o H)) (compose1 (SplitLS Y p) f) ==
-StFBind00 (SplitL y1 p) ((compose1 (SplitLS Y (OpenUnitDualDiv o p H)) f))).
-clear IHy1.
-
-
-elim (cheat).
-elim (cheat).
-Defined.
-
-Definition StFJoin0 (X:Setoid):(StepFS (StepFS X))->(StepFS X):=
-(fun m => (StFBind1 _ m id)).
-
-(* Check laws for Join return
-What about join glue.
-*)
-
-Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X).
+assert (rew:ou_eq (OpenUnitDiv p o H0) (OpenUnitDiv p o H)). unfold ou_eq; reflexivity.
+pose (@Bind_resp_Q (SplitL y1 (OpenUnitDiv p o H0))  (SplitL y1 (OpenUnitDiv p o H))).
+unfold StFBind1 in s. assert ((StepF_Qeq (SplitL y1 (OpenUnitDiv p o H0))
+      (SplitL y1 (OpenUnitDiv p o H)))). apply SplitL_resp_Qeq; auto with *. reflexivity.
+pose (s H1).
+simpl in s0. 
+transitivity (StFBind00 (SplitL y1 (OpenUnitDiv p o H)) (compose1 (SplitLS Y p) f)).
+apply s0.
+assert (extEq _ (compose1 (SplitLS Y p) f)  
+ (compose1 (SplitLS Y (OpenUnitDiv p o H)) (compose1 (SplitLS Y o) f))).
+intro. simpl. unfold compose0. symmetry. apply StepF_Qeq_eq.
+rapply (SplitLSplitL (f x) o (OpenUnitDiv p o H) p). simpl. field. auto with *.
+apply StFBind_wd1. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+intros. elim (Qlt_not_le p o H0).  rewrite H. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+(* o<p*)
+intros. simpl. apply glue_wd. unfold ou_eq; reflexivity. apply StFBind_wd1.
+intro. simpl. unfold compose0, SplitLS0. apply StepF_Qeq_eq. rapply (SplitLSplitL (f x)).
+simpl. field. auto with *. rewrite <- IHy2.
+transitivity (StFBind00 (SplitL y2 (OpenUnitDualDiv p o H))
+  (compose1 (SplitRS Y (OpenUnitDiv o p H0)) (compose1 (SplitLS Y p) f))). rapply Bind_resp_Q.
+apply SplitL_resp_Qeq; [unfold ou_eq|]; reflexivity. clear IHy1.
+apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply StepF_Qeq_eq. symmetry. rapply ((SplitLSplitR (f x) o) (OpenUnitDualDiv p o H)).
+simpl. field. auto with *. simpl. field. auto with *.
+(* *)
+intros. elim (Qlt_not_le o p); auto with *.
+intros. elim (Qlt_not_le p o H).  rewrite H0. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+(* p==o *)
+intros. apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply SplitL_wd;auto with *.
 intros.
-exists (@StFJoin0 X).
-intros m. induction m using StepF_ind.
-intro n.
-induction n using StepF_ind.
-Focus 3.
-intros n H.
-assert (st_eq (StepFS X) (StFJoin0 (glue o (SplitL n o) (SplitR n o))) (StFJoin0 n)).
-simpl.
-unfold StFJoin0.
-simpl.
-assert  ((glue o (StFBind00 (SplitL n o) (SplitLS X o) )
-  (StFBind00 (SplitR n o) (SplitRS X o)) == StFBind00 n id)).
+apply glue_wd; auto with *.
+(*
+rewrite <- Mirror_eq_Mirror.
+rewrite MirrorBind. rewrite (@MirrorSplitR _ (StFBind00 y f) o (OpenUnitDual o)); auto with *.
+rewrite MirrorBind. rewrite <- BindSplitL. simpl.
+*)
+(*RIGHT*)
+revert y f o.
+ induction y using StepF_ind. reflexivity. intros f p. 
+ simpl.  apply SplitR_glue_ind; apply SplitR_glue_ind. intro. intro.
+simpl. apply glue_wd; auto with *. unfold ou_eq; reflexivity. rewrite <- IHy1.
+transitivity (StFBind00 (SplitR y1 (OpenUnitDiv p o H))
+  (compose1 (SplitLS Y (OpenUnitDualDiv o p H0)) (compose1 (SplitRS Y p) f))).
+rapply Bind_resp_Q.
+apply SplitR_resp_Qeq; [unfold ou_eq|]; reflexivity. clear IHy1.
+apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply StepF_Qeq_eq. rapply ((SplitLSplitR (f x) p) (OpenUnitDualDiv o p H0)).
+simpl. field. auto with *. simpl. field. auto with *.
+apply StFBind_wd1. intro x. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply StepF_Qeq_eq. rapply (SplitRSplitR (f x) p (OpenUnitDualDiv o p H0) o).
+simpl. field. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+intros. elim (Qlt_not_le p o H0).  rewrite H. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+(* o<p*)
+intros. simpl. rewrite <- IHy2.
+transitivity (StFBind00 (SplitR y2 (OpenUnitDualDiv p o H)) (compose1 (SplitRS Y p) f)).
+rapply Bind_resp_Q. apply SplitR_resp_Qeq; [unfold ou_eq|]; reflexivity. clear IHy1.
+apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply StepF_Qeq_eq. symmetry. rapply ((SplitRSplitR (f x) o (OpenUnitDualDiv p o H) p)).
+simpl. field. auto with *. simpl. 
+(* *)
+intros. elim (Qlt_not_le o p); auto with *.
+intros. elim (Qlt_not_le p o H).  rewrite H0. auto with *.
+intros. elim (Qlt_not_le o p); auto with *.
+(* p==o *)
+intros. apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
+apply SplitR_wd;auto with *.
+Qed.
 
-
-
-
-
-
-
-
-abstract (elim cheat).
+Definition StFBind(X Y:Setoid) : 
+  (StepFS X) --> (X --> (StepFS Y)) --> (StepFS Y).
+intros X Y.
+exists (fun m => (@StFBind1 X Y m)).
+exact (@StFBind_wd X Y).
 Defined.
 
-
-
-(*
-Lemma StFJoin_wd: forall X:Setoid, forall m m1:(StepFS (StepFS X)), m==m1 -> 
-  (StFJoin0 m)==(StFJoin0 m1).
-
-(*
-Definition StFJoin (X:Setoid):(StepFS (StepFS X)) --> (StepFS X).
-intros X.
-exists (@StFJoin0 X).
-intros. apply (StFJoin_wd x1 x2). assumption.
-Defined.
-*)
-
-(*
-Definition StFBind (X Y:Setoid)(m:StepFS X)(f:X-->StepFS Y):(StepFS Y):=
-StFJoin0 (f^@>m).
-(* Map should have type --> *)
-*)
-
-(* 
-Definition Map' (X Y : Setoid):
-       (X --> Y) -> StepFS X --> StepFS Y.
-intros X Y f.
-pose (Map (compose (@StFReturn Y) f  )).
-assert (mapcompose:(StepFS X)--> (StepFS (StepFS Y))).
-exists s.
-intros.
-unfold s.
-Problem: Map has the wrong type *)
+Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X):=
+ (flip (@StFBind (StepFS X) X) (@id (StepFS X))).
 
 (** Monad laws *)
 Variable X Y:Setoid.
