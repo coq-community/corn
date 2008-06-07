@@ -30,22 +30,19 @@ Require Import CornTac.
 Record Setoid: Type :=
 { st_car:>Type;
   st_eq:st_car-> st_car ->Prop;
-  st_isSetoid: equivalence _ st_eq
+  st_isSetoid: Setoid_Theory _ st_eq
 }.
 
 Add Parametric Relation s : (st_car s) (st_eq s)
- reflexivity proved by (equiv_refl (st_car s) (st_eq s) (st_isSetoid s))
- symmetry proved by (equiv_sym _ _ (st_isSetoid s))
- transitivity proved by (equiv_trans _ _ (st_isSetoid s))
+ reflexivity proved by (@Equivalence_Reflexive _ _ (st_isSetoid s))
+ symmetry proved by (@Equivalence_Symmetric _ _ (st_isSetoid s))
+ transitivity proved by (@Equivalence_Transitive _ _ (st_isSetoid s))
  as genericSetoid.
 
 (** Propositions form a setoid under iff *)
 Definition iffSetoid : Setoid.
 exists Prop iff.
-split.
-  unfold reflexive; tauto.
- unfold transitive; tauto.
-unfold symmetric; tauto.
+firstorder.
 Defined.
 
 (**
@@ -62,8 +59,8 @@ intros X Y.
 exists (Morphism X Y) (extEq Y).
 split.
   intros x y; reflexivity.
- intros x y z Hxy Hyz a; transitivity (y a); auto.
-intros x y H a; symmetry; auto.
+ intros x y H a; symmetry; auto.
+intros x y z Hxy Hyz a; transitivity (y a); auto.
 Defined.
 
 Notation "x --> y" := (extSetoid x y) (at level 55, right associativity) : setoid_scope.
