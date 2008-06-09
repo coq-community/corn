@@ -43,9 +43,8 @@ Variable X:MetricSpace.
 
 Definition msp_is_setoid:MetricSpace->Setoid.
 intro m.
-apply (@Build_Setoid (ms m) (@ms_eq m)). 
-pose (s:=msp_Xsetoid (msp m)).
-apply (@Build_equivalence); destruct s; auto.
+apply (@Build_Setoid (ms m) (@ms_eq m)).
+apply (msp_Xsetoid (msp m)).
 Defined.
 
 Coercion msp_is_setoid:MetricSpace>->Setoid.

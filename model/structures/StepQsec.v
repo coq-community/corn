@@ -13,7 +13,7 @@ Section QS.
 
 Lemma QS:(Setoid).
 exists Q Qeq.
-split; unfold reflexive, transitive, symmetric; eauto with qarith.
+split; unfold Reflexive, Transitive, Symmetric; eauto with qarith.
 Defined.
 
 Definition QabsS : QS-->QS.
