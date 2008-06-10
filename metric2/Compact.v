@@ -334,6 +334,7 @@ cut (forall z1 x3 : FinEnum stableX,
  split.
   apply Z.
   intros x H.
+  unfold ms_eq, st_eq in Hz.
   simpl in Hz.
   unfold FinEnum_eq in Hz.
   apply -> Hz.
@@ -347,6 +348,7 @@ cut (forall z1 x3 : FinEnum stableX,
   apply Hy.
  eapply Z.
   intros a Ha.
+  unfold ms_eq, st_eq in Hz.
   simpl in Hz; unfold FinEnum_eq in Hz.
   apply <- Hz.
   apply Ha.
@@ -951,7 +953,7 @@ intros H.
 rapply cons.
  apply H with a.
  apply InFinEnumC_weaken; auto with *.
-apply IHm.
+apply IHs0.
 intros pt Hpt.
 apply H with pt.
 rapply orWeaken;right;assumption.
@@ -972,7 +974,7 @@ split;
  destruct Hx as [G | Hx | Hx] using orC_ind.
    auto using existsC_stable.
   apply existsWeaken.
-  exists (H a (InFinEnumC_weaken X a (a :: m) (in_eq a m))).
+  exists (H a (InFinEnumC_weaken X a (a :: s0) (in_eq a s0))).
   split.
    rapply orWeaken.
    left.
@@ -980,13 +982,13 @@ split;
   rewrite Hx.
   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
   apply L.
- set (H':=(fun pt (Hpt : InFinEnumC pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
- assert (L':forall (pt : X) (Hpt : InFinEnumC pt m),
+ set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
+ assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
     ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
       (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.
   rapply L.
- destruct (IHm H' L') as [A _].
+ destruct (IHs0 H' L') as [A _].
  destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
@@ -1006,13 +1008,13 @@ destruct Hx as [G | Hx | Hx] using orC_ind.
  setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
  apply ball_sym.
  apply L.
-set (H':=(fun pt (Hpt : InFinEnumC pt m) => H pt (orWeaken _ _ (right _ Hpt)))).
-assert (L':forall (pt : X) (Hpt : InFinEnumC pt m),
+set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
+assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
      (Cunit pt) (H' pt Hpt)).
  intros pt Hpt.
  rapply L.
-destruct (IHm H' L') as [_ A].
+destruct (IHs0 H' L') as [_ A].
 destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
  auto using existsC_stable.
 apply existsWeaken.
@@ -1685,7 +1687,7 @@ destruct Hz1 as [G | Hz1 | Hz1] using orC_ind.
  apply ball_approx_l.
 rapply orWeaken.
 right.
-apply IHm; auto.
+apply IHs0; auto.
 Qed.
 
 End CompactDistr.

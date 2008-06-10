@@ -143,7 +143,7 @@ eapply almostIn_triangle_r with (approximate s d2).
   assumption.
  rapply orWeaken.
  right.
- apply IHm.
+ apply IHs0.
  assumption.
 eapply ball_weak_le;[|apply regFun_prf].
 unfold d2.
@@ -416,7 +416,7 @@ eapply almostIn_triangle_r with (approximate s d2).
   assumption.
  rapply orWeaken.
  right.
- apply IHm.
+ apply IHs0.
  assumption.
 eapply ball_weak_le;[|apply regFun_prf].
 unfold d2.

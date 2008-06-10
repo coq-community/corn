@@ -22,6 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export StepFunctionSetoid.
+Require Import StepFunctionMonad.
 Require Import UniformContinuity.
 Require Import OpenUnit.
 Require Import QArith.
@@ -40,14 +41,6 @@ Section StepFSupBall.
 Set Implicit Arguments.
 
 Variable X:MetricSpace.
-
-Definition msp_is_setoid:MetricSpace->Setoid.
-intro m.
-apply (@Build_Setoid (ms m) (@ms_eq m)).
-apply (msp_Xsetoid (msp m)).
-Defined.
-
-Coercion msp_is_setoid:MetricSpace>->Setoid.
 
 Open Local Scope setoid_scope.
 Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
@@ -70,6 +63,8 @@ Definition StepFSupBall(e:Qpos)(f:StepF X)(g:StepF X):=
 StepFfoldProp ((@ballS X e)^@> f <@> g).
 
 End StepFSupBall.
+
+Implicit Arguments StepFSupBall [X].
 
 Add Parametric Morphism X : (@StepFSupBall X)
   with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
@@ -189,9 +184,8 @@ Qed.
 *** Example of a Metric Space <Step, StepFSupBall>
 *)
 Lemma StepFSupBall_is_MetricSpace : 
- (is_MetricSpace (@StepF_eq X) (@StepFSupBall X)).
+ (is_MetricSpace (@StepFS X) (@StepFSupBall X)).
 split.
-     apply (StepF_Sth X).
     rapply StepFSupBall_refl.
    rapply StepFSupBall_sym.
   rapply StepFSupBall_triangle.
@@ -210,7 +204,7 @@ reflexivity.
 Qed.
 end hide *)
 Definition StepFSup : MetricSpace :=
-Build_MetricSpace (@StepFSupBall_wd X) StepFSupBall_is_MetricSpace.
+@Build_MetricSpace (StepFS X) _ (@StepFSupBall_wd X) StepFSupBall_is_MetricSpace.
 
 End SupMetric.
 

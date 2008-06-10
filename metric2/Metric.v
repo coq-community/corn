@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Setoid.
+Require Export RSetoid.
 Require Import Relation_Definitions.
 Require Export Qpossec.
 Require Import COrdFields2.
@@ -37,31 +37,29 @@ x and y are within e of each other ( d(x,y)<=e ).  This is characterized
 by the axioms given in the record structure below.
 *)
 
-Record is_MetricSpace (X:Type) (Xeq: relation X) (B: Qpos -> relation X) : Prop :=
-{ msp_Xsetoid: Setoid_Theory X Xeq
-; msp_refl: forall e, reflexive _ (B e)
+Record is_MetricSpace (X:Setoid) (B: Qpos -> relation X) : Prop :=
+{ msp_refl: forall e, reflexive _ (B e)
 ; msp_sym: forall e, symmetric _ (B e)
 ; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2)%Qpos a c
 ; msp_closed: forall e a b, (forall d, B (e+d)%Qpos a b) -> B e a b
-; msp_eq: forall a b, (forall e, B e a b) -> Xeq a b
+; msp_eq: forall a b, (forall e, B e a b) -> st_eq _ a b
 }.
 
 Record MetricSpace : Type :=
-{ ms :> Type
-; ms_eq : ms -> ms -> Prop
-; ball : Qpos -> ms -> ms -> Prop
-; ball_wd : forall (e1 e2:Qpos), (e1==e2) -> 
-            forall x1 x2, (ms_eq x1 x2) -> 
-            forall y1 y2, (ms_eq y1 y2) -> 
+{ msp_is_setoid :> Setoid
+; ball : Qpos -> msp_is_setoid -> msp_is_setoid -> Prop
+; ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
+            forall x1 x2, (st_eq _ x1 x2) -> 
+            forall y1 y2, (st_eq _ y1 y2) -> 
             (ball e1 x1 y1 <-> ball e2 x2 y2)
-; msp : is_MetricSpace ms_eq ball
+; msp : is_MetricSpace msp_is_setoid ball
 }.
+
+Definition ms_eq (m:MetricSpace) := st_eq m.
 
 (* begin hide *)
 Implicit Arguments ball [m].
 Implicit Arguments ms_eq [m].
-
-Add Parametric Setoid X : (ms X) (@ms_eq X) (@msp_Xsetoid _ _ _ (@msp X)) as ms_setoid.
 
 (*This is intended to be used as a ``type cast'' that Coq won't randomly make disappear.
   It is useful when defining setoid rewrite lemmas for ms_eq.*)

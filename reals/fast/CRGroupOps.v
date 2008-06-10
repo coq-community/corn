@@ -36,7 +36,7 @@ Open Local Scope uc_scope.
 ** Addition
 Lifting addition over [Q] by one parameter yields a rational translation
 function. *)
-Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (a[+]b):Q) Qpos2QposInf.
+Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (a[+]b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.
@@ -56,6 +56,7 @@ intros x.
 unfold translate.
 assert (H:ms_eq (Qtranslate_uc 0) (uc_id _)).
 intros a.
+unfold ms_eq.
 simpl.
 ring.
 
@@ -112,7 +113,7 @@ Hint Rewrite translate_Qplus : CRfast_compute.
 ** Negation
 Lifting negation on [Q] yields negation on CR.
 *)
-Lemma Qopp_uc_prf : is_UniformlyContinuousFunction Qopp Qpos2QposInf.
+Lemma Qopp_uc_prf : @is_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace Qopp Qpos2QposInf.
 Proof.
 intros e a b H.
 simpl in *.
@@ -302,7 +303,7 @@ Qed.
 [QboundBelow] ensures that a real number is at least some fixed
 rational number.  It is the lifting of the first parameter of [Qmax].
 *)
-Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmax a b):Q) Qpos2QposInf.
+Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.
@@ -452,7 +453,7 @@ Qed.
 [QboundAbove] ensures that a real number is at most some fixed
 rational number.  It is the lifting of the first parameter of [Qmin].
 *)
-Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmin a b):Q) Qpos2QposInf.
+Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.

@@ -96,7 +96,7 @@ rapply Qpos_min_lb_r.
 apply regFun_prf.
 Qed.
 
-Lemma regFun_setoid : Setoid_Theory RegularFunction regFunEq.
+Lemma regFun_is_setoid : Setoid_Theory RegularFunction regFunEq.
 Proof.
 split.
 unfold Reflexive.
@@ -116,16 +116,14 @@ apply H.
 apply H0.
 Qed.
 
-(*
-Add Setoid RegularFunction regFunEq regFun_setoid as regFun_Setoid.
-*)
+Definition regFun_Setoid := Build_Setoid regFun_is_setoid.
 
 Definition regFunBall e (f g : RegularFunction) :=
 forall d1 d2, ball (m:=X) (d1+e+d2)%Qpos (approximate f d1) (approximate g d2).
 
 Lemma regFunBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
-            forall x1 x2, (regFunEq x1 x2) -> 
-            forall y1 y2, (regFunEq y1 y2) -> 
+            forall (x1 x2 : regFun_Setoid), (st_eq _ x1 x2) -> 
+            forall (y1 y2 : regFun_Setoid), (st_eq _ y1 y2) -> 
             (regFunBall e1 x1 y1 <-> regFunBall e2 x2 y2).
 Proof.
 assert (forall x1 x2 : Qpos,
@@ -154,24 +152,23 @@ apply H0.
 apply H1.
 apply H2.
 auto.
-destruct (regFun_setoid).
+destruct (regFun_is_setoid).
 intros; eapply H.
 unfold QposEq. symmetry.
 apply H0.
 apply Seq_sym.
-apply regFun_setoid.
+apply regFun_is_setoid.
 apply H1.
 apply Seq_sym.
-apply regFun_setoid.
+apply regFun_is_setoid.
 apply H2.
 auto.
 Qed.
 
-Lemma regFun_is_MetricSpace : is_MetricSpace regFunEq regFunBall.
+Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid regFunBall.
 Proof.
 unfold regFunBall.
 split.
-apply regFun_setoid.
 intros e f d1 d2.
 setoid_replace (d1 + e + d2)%Qpos with (d1+d2+e)%Qpos by QposRing.
 apply ball_weak.
