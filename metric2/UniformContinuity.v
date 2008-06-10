@@ -131,12 +131,13 @@ apply H1.
 apply H2.
 Qed.
 
+Definition uc_Setoid : Setoid := (Build_Setoid uc_setoid).
+
 Definition ucBall e (f g : UniformlyContinuousFunction) := forall a, ball e (f a) (g a).
 
-Lemma uc_is_MetricSpace : is_MetricSpace ucEq ucBall.
+Lemma uc_is_MetricSpace : is_MetricSpace uc_Setoid ucBall.
 Proof.
 constructor.
-apply uc_setoid.
 firstorder using ball_refl.
 firstorder using ball_sym.
 intros e1 e2 f g h H1 H2 a.
@@ -150,13 +151,15 @@ firstorder.
 Qed.
 
 Lemma ucBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
-            forall x1 x2, (ucEq x1 x2) -> 
-            forall y1 y2, (ucEq y1 y2) -> 
+            forall (x1 x2 : uc_Setoid), (st_eq _ x1 x2) -> 
+            forall (y1 y2 : uc_Setoid), (st_eq _ y1 y2) -> 
             (ucBall e1 x1 y1 <-> ucBall e2 x2 y2).
 Proof.
 intros.
 unfold ucEq in *.
 unfold ucBall in *.
+simpl in H0, H1.
+unfold ucEq in H0, H1.
 split.
 intros.
 rewrite <- H.

@@ -221,9 +221,9 @@ End InterpRasterCorrect.
 (* begin hide *)
 Add Parametric Morphism n m bm : (@InterpRaster n m bm) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as InterpRaster_wd.
 cut (forall (x1 x2 : Q2),
- prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
+ prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
  forall x3 x4 : Q2,
- prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
+ prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
   (InterpRaster bm x1 x3) ->
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y

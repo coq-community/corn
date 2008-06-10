@@ -201,10 +201,17 @@ exists (fun m => (@StFBind1 X Y m)).
 exact (@StFBind_wd X Y).
 Defined.
 
+Add Parametric Morphism X Y : (@StFBind00 X Y) with signature (@StepF_eq X ==> (st_eq _) ==> @StepF_eq Y) as StFBind00_wd.
+intros x y Hxy f g Hfg.
+transitivity (StFBind00 x g).
+ apply StFBind_wd1; assumption.
+rapply StFBind_wd; assumption.
+Qed.
+
 Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X):=
  (flip (@StFBind (StepFS X) X) (@id (StepFS X))).
 
-(** Monad laws *)
+Section Monad_Laws.
 Variable X Y:Setoid.
 
 Lemma ReturnBind(x:X)(f:X-->StepFS Y): (StFBind X Y (StFReturn X x) f)== (f x).
@@ -261,6 +268,8 @@ rewrite s in IHm2. clear s H.
 assumption.
 Qed.
 
+End Monad_Laws.
+
 (* (\f x -> f >>= (\g -> x >>= \a -> return (g a)))
 f: S (X -->Y)
 x: S X
@@ -282,27 +291,33 @@ x >>= : (X --> S Y) --> SY     = (bind x)
 
 Lemma ApBind(X Y:Setoid): forall (x:(StepFS X)) (f:StepFS (X-->Y)) ,
 (f<@>x==
-(@StFBind00 _ _ f (compose (StFBind _ _ x) 
+(@StFBind _ _ f (compose (StFBind _ _ x) 
 (compose (StFReturn _))))).
-simpl. induction x using StepF_ind.
- induction f using StepF_ind.
-reflexivity. simpl. rewrite ApGlue. apply glue_wd; auto with *.
-  rewrite IHf1. rapply StFBind_wd1.  intro f. reflexivity. 
- rewrite IHf2. rapply StFBind_wd1.  intro f. reflexivity.
-intro f. rewrite GlueAp. rewrite IHx1. rewrite IHx2.
-transitivity (StFBind00 (glue o (SplitL f o) (SplitR f o))
-  (compose1 (StFBind1 Y0 (glue o x1 x2)) (compose2 X0 (StFReturn Y0)))).
-simpl. apply glue_wd; try reflexivity.
-  apply StFBind_wd1. intro x. unfold StFBind1.  simpl. 
-  unfold compose1. simpl. unfold compose0. simpl.
-  unfold SplitLS0. rewrite SplitLGlue. apply StFBind_wd1.
-  simpl. intro y. reflexivity.
- apply StFBind_wd1. intro x. unfold StFBind1.  simpl. 
- unfold compose1. simpl. unfold compose0. simpl.
- unfold SplitRS0. rewrite SplitRGlue. apply StFBind_wd1.
- simpl. intro y. reflexivity.
-set (G:=(compose1 (StFBind1 Y0 (glue o x1 x2)) (compose2 X0 (StFReturn Y0)))).
-change ((@StFBind1 _ _ (glue o (SplitL f o) (SplitR f o)) G) == 
-(@StFBind1 _ _ f G)).
-apply StFBind_wd. rapply glueSplit.
+Proof.
+intros X Y.
+rapply StepF_ind2.
+  intros s s0 t t0 Hs Ht H.
+  rewrite <- Hs, <- Ht at 1.
+  rewrite H.
+  unfold StFBind.
+  simpl.
+  match goal with [|- ?a == ?b] => change (st_eq _ a b) end.
+  transitivity (StFBind00 t0 (compose1 (StFBind1 Y s) (compose2 X (StFReturn Y)))).
+   rapply StFBind_wd; auto.
+  apply StFBind_wd1.
+  intros a.
+  rapply StFBind_wd; auto.
+ reflexivity.
+intros o s s0 t t0 IHf1 IHf2.
+rewrite ApGlueGlue.
+rewrite IHf1, IHf2.
+simpl. apply glue_wd; try reflexivity;
+ apply StFBind_wd1; intro x;
+ unfold StFBind1, compose1, compose0; simpl.
+ unfold SplitLS0. rewrite SplitLGlue.
+ apply StFBind_wd1.
+ intro y. reflexivity.
+unfold SplitRS0. rewrite SplitRGlue.
+apply StFBind_wd1.
+intro y. reflexivity.
 Qed. 

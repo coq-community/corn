@@ -165,6 +165,14 @@ Qed.
 (* begin hide *)
 Hint Resolve FinEnum_eq_refl FinEnum_eq_sym FinEnum_eq_trans : FinEnum.
 (* end hide *)
+
+Lemma FinEnum_is_Setoid : Setoid_Theory _ FinEnum_eq.
+split; unfold Reflexive, Symmetric, Transitive; auto with *.
+apply FinEnum_eq_trans.
+Qed.
+
+Definition FinEnumS : Setoid := Build_Setoid FinEnum_is_Setoid.
+
 (**
 ** Metric Space
 Finite enumerations form a metric space under the Hausdorff metric for
@@ -174,8 +182,8 @@ Definition FinEnum_ball (e:Qpos) (x y:list X) :=
  hausdorffBall X e (fun a => InFinEnumC a x) (fun a => InFinEnumC a y).
 
 Lemma FinEnum_ball_wd : forall (e1 e2:Qpos), (e1==e2) -> 
- forall a1 a2, FinEnum_eq a1 a2 ->
- forall b1 b2, FinEnum_eq b1 b2 ->
+ forall (a1 a2 : FinEnumS), st_eq _ a1 a2 ->
+ forall (b1 b2 : FinEnumS), st_eq _ b1 b2 ->
  (FinEnum_ball e1 a1 b1 <-> FinEnum_ball e2 a2 b2).
 Proof.
 intros e1 e2 He a1 a2 Ha b1 b2 Hb.
@@ -309,10 +317,8 @@ right.
 assumption.
 Qed.
 
-Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnum_eq FinEnum_ball.
+Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnumS FinEnum_ball.
 split.
-     split; unfold Reflexive, Symmetric, Transitive; auto with *.
-     apply FinEnum_eq_trans.
     intros e x.
     rapply hausdorffBall_refl.
    intros e x y.

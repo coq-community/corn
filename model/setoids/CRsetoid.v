@@ -29,7 +29,7 @@ Require Import CornTac.
 *** [CR]
 *)
 
-Lemma CRisCSetoid : is_CSetoid (@ms CR) (@ms_eq CR) CRapart.
+Lemma CRisCSetoid : is_CSetoid CR (@ms_eq CR) CRapart.
 Proof.
 split;simpl.
 

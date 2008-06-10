@@ -1,8 +1,10 @@
+Require Import Qmetric.
 Require Export QArith.
 Require Export StepFunctionSetoid.
 Require Import Qabs.
 Require Import Bool.
 Require Import CornTac.
+Require Import RSetoid.
 
 Set Implicit Arguments.
 
@@ -13,7 +15,7 @@ Section QS.
 
 Lemma QS:(Setoid).
 exists Q Qeq.
-split; unfold reflexive, transitive, symmetric; eauto with qarith.
+split; unfold Reflexive, Transitive, Symmetric; eauto with qarith.
 Defined.
 
 Definition QabsS : QS-->QS.

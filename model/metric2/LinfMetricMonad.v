@@ -22,6 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export StepFunctionSetoid.
+Require Import StepFunctionMonad.
 Require Import UniformContinuity.
 Require Import OpenUnit.
 Require Import QArith.
@@ -36,19 +37,10 @@ Set Implicit Arguments.
 
 Open Local Scope sfstscope.
 
-Section StepFSup_sec.
+Section StepFSupBall.
 Set Implicit Arguments.
 
 Variable X:MetricSpace.
-
-Definition msp_is_setoid:MetricSpace->Setoid.
-intro m.
-apply (@Build_Setoid (ms m) (@ms_eq m)). 
-pose (s:=msp_Xsetoid (msp m)).
-apply (@Build_equivalence); destruct s; auto.
-Defined.
-
-Coercion msp_is_setoid:MetricSpace>->Setoid.
 
 Open Local Scope setoid_scope.
 Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
@@ -70,7 +62,11 @@ Defined.
 Definition StepFSupBall(e:Qpos)(f:StepF X)(g:StepF X):=
 StepFfoldProp ((@ballS X e)^@> f <@> g).
 
-Add Morphism StepFSupBall 
+End StepFSupBall.
+
+Implicit Arguments StepFSupBall [X].
+
+Add Parametric Morphism X : (@StepFSupBall X)
   with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
  as StepFSupBall_wd.
 unfold StepFSupBall.
@@ -86,7 +82,11 @@ rewrite Ha.
 reflexivity.
 Qed.
 
-Lemma StepFSupBall_refl : forall e x, (StepFSupBall e x x).
+Section SupMetric.
+
+Variable X : MetricSpace.
+
+Lemma StepFSupBall_refl : forall e (x:StepF X), (StepFSupBall e x x).
 Proof.
 intros e x.
 unfold StepFSupBall.
@@ -101,7 +101,7 @@ simpl.
 auto with *.
 Qed.
 
-Lemma StepFSupBall_sym : forall e x y, (StepFSupBall e x y) -> (StepFSupBall e y x).
+Lemma StepFSupBall_sym : forall e (x y:StepF X), (StepFSupBall e x y) -> (StepFSupBall e y x).
 Proof.
 intros e x y.
 unfold StepFSupBall.
@@ -119,7 +119,7 @@ simpl. unfold compose0.
 auto with *.
 Qed.
 
-Lemma StepFSupBall_triangle : forall e d x y z, 
+Lemma StepFSupBall_triangle : forall e d (x y z:StepF X), 
  (StepFSupBall e x y) -> (StepFSupBall d y z) -> (StepFSupBall (e+d) x z).
 Proof.
 intros e d x y z.
@@ -141,55 +141,51 @@ apply StepFfoldPropForall_Map3.
 rapply (ball_triangle X e d).
 Qed.
 
-Lemma StepFSupBall_closed : forall e x y, (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
-intros e x y.
-apply (StepF_ind2 (fun x y => 
-(forall d : Qpos, StepFSupBall (e + d) x y) -> 
- StepFSupBall e x y)).
-  intros. rewrite H in H1. rewrite H0 in H1. apply H1.
-  intro. rewrite H. rewrite H0. apply H2.
- do 2 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
- apply (@msp_closed X (@ms_eq X)). apply msp.
-do 5 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
-do 3 intro.  rewrite MapGlue. rewrite ApGlue. simpl.
-split. rewrite SplitLGlue. apply H. clear H.
- intro d. pose (H2:=H1 d).
+Lemma StepFSupBall_closed : forall e (x y:StepF X), (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
+Proof.
+intros e.
+rapply (StepF_ind2).
+  intros. rewrite H, H0 in H1. apply H1.
+  intro. rewrite H, H0. apply H2.
+ rapply ball_closed.
+intros o s s0 t t0 IH0 IH1 H.
+unfold StepFSupBall in *.
+rewrite MapGlue. rewrite ApGlue. simpl.
+split.
+ rewrite SplitLGlue. apply IH0. clear IH0.
+ intro d. pose (H2:=H d).
   rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
- simpl in H2.  intuition. 
-rewrite SplitRGlue. apply H0. clear H0.
-intro d. pose (H2:=H1 d).
+ destruct H2. auto. 
+rewrite SplitRGlue. apply IH1. clear IH1.
+intro d. pose (H2:=H d).
 rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
-simpl in H2.  intuition.
+destruct H2. auto.
 Qed.
 
-Lemma StepFSupBall_eq : forall x y, 
+Lemma StepFSupBall_eq : forall (x y : StepF X),
 (forall e : Qpos, StepFSupBall e x y) -> StepF_eq x y.
-intros x y.
-apply (StepF_ind2 (fun x y => 
-(forall e : Qpos, StepFSupBall e x y) -> x == y
-)).
-  intros. rewrite H in H1. rewrite H0 in H1. apply H1.
-  intro. rewrite H. rewrite H0. apply H2.
- do 2 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
- apply (@msp_eq X (@ms_eq X)). apply msp.
-do 5 intro. unfold StepFSupBall. unfold StepFfoldProp. simpl.
-do 3 intro. apply glue_resp_StepF_eq.
-  apply H. clear H.
+Proof.
+rapply (StepF_ind2).
+  intros s s0 t t0 H H0 H1 H2. rewrite H, H0 in H1. apply H1.
+  intro. rewrite H, H0. apply H2.
+ rapply ball_eq.
+intros o s s0 t t0 H H0 H1.
+unfold StepFSupBall in *. apply glue_resp_StepF_eq.
+apply H. clear H.
  intro e. pose (H2:=H1 e). 
-  rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
- simpl in H2.  intuition. 
+ rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
+ destruct H2; auto.
 apply H0. clear H0.
 intro e. pose (H2:=H1 e).
-rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
-simpl in H2.  intuition.
+rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
+destruct H2; auto.
 Qed.
 (**
 *** Example of a Metric Space <Step, StepFSupBall>
 *)
 Lemma StepFSupBall_is_MetricSpace : 
- (is_MetricSpace (@StepF_eq X) StepFSupBall).
+ (is_MetricSpace (@StepFS X) (@StepFSupBall X)).
 split.
-     apply (StepF_Sth X).
     rapply StepFSupBall_refl.
    rapply StepFSupBall_sym.
   rapply StepFSupBall_triangle.
@@ -208,7 +204,10 @@ reflexivity.
 Qed.
 end hide *)
 Definition StepFSup : MetricSpace :=
-Build_MetricSpace StepFSupBall_wd StepFSupBall_is_MetricSpace.
+@Build_MetricSpace (StepFS X) _ (@StepFSupBall_wd X) StepFSupBall_is_MetricSpace.
+
+End SupMetric.
+
 (* begin hide *)
 Canonical Structure StepFSup.
 (* end hide *)
@@ -220,13 +219,13 @@ Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 *)
 
 (** There is an injection from Q to Linf. *)
-Lemma constStepF_uc_prf : is_UniformlyContinuousFunction
- (@constStepF X:X -> StepFSup) Qpos2QposInf.
+Lemma constStepF_uc_prf (X:MetricSpace) : is_UniformlyContinuousFunction
+ (@constStepF X:X -> StepFSup X) Qpos2QposInf.
 Proof.
-intros e x y H.
+intros X e x y H.
 simpl in *.
 assumption.
 Qed.
-Definition constStepF_uc : X --> StepFSup
-:= Build_UniformlyContinuousFunction constStepF_uc_prf.
-End StepFSup_sec.
+
+Definition constStepF_uc (X:MetricSpace) : X --> StepFSup X
+:= Build_UniformlyContinuousFunction (constStepF_uc_prf X).
