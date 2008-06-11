@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export StepQsec.
 Require Import Prelength.
 Require Import L1metric.
-Require Import LinfMetricMonad.
+Require Export LinfMetricMonad.
 Require Import OpenUnit.
 Require Import QArith.
 Require Import QMinMax.
@@ -134,6 +134,8 @@ Qed.
 
 Definition LinfStepQ : MetricSpace := StepFSup Q_as_MetricSpace.
 
+Definition LinfStepQPrelengthSpace := StepFSupPrelengthSpace QPrelengthSpace.
+
 Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
 Proof.
 intros e x y.
@@ -173,9 +175,6 @@ Open Local Scope uc_scope.
 
 Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction sup_uc_prf.
-
-Definition constStepF_uc : Q_as_MetricSpace --> LinfStepQ
-:= constStepF_uc _.
 
 (** And there is an injection from Linf to L1. *)
 Lemma LinfAsL1_uc_prf : is_UniformlyContinuousFunction (fun (x:LinfStepQ) => (x:L1StepQ)) Qpos2QposInf.

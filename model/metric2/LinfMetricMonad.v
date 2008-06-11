@@ -30,6 +30,7 @@ Require Import QMinMax.
 Require Import Qabs.
 Require Import Qordfield.
 Require Import Qmetric.
+Require Import Prelength.
 Require Import COrdFields2.
 Require Import CornTac.
 
@@ -61,6 +62,17 @@ Defined.
 
 Definition StepFSupBall(e:Qpos)(f:StepF X)(g:StepF X):=
 StepFfoldProp ((@ballS X e)^@> f <@> g).
+
+Lemma StepFSupBallGlueGlue : forall e o fl fr gl gr, 
+StepFSupBall e (glue o fl fr) (glue o gl gr) <->
+StepFSupBall e fl gl /\ StepFSupBall e fr gr.
+Proof.
+intros e o fl fr gl gr.
+unfold StepFSupBall at 1.
+rewrite MapGlue.
+rewrite ApGlueGlue.
+reflexivity.
+Qed.
 
 End StepFSupBall.
 
@@ -206,6 +218,31 @@ end hide *)
 Definition StepFSup : MetricSpace :=
 @Build_MetricSpace (StepFS X) _ (@StepFSupBall_wd X) StepFSupBall_is_MetricSpace.
 
+Lemma StepFSupPrelengthSpace : PrelengthSpace X -> PrelengthSpace StepFSup.
+Proof.
+intros pl.
+rapply StepF_ind2.
+  intros s s0 t t0 Hs Ht H e d1 d2 He H0.
+  rewrite <- Hs, <- Ht in H0.
+  destruct (H _ _ _ He H0) as [c Hc0 Hc1].
+  exists c.
+   rewrite <- Hs; auto.
+  rewrite <- Ht; auto.
+ intros a b e d1 d2 He Hab.
+ destruct (pl a b e d1 d2 He Hab) as [c Hc0 Hc1].
+ exists (constStepF c); auto.
+intros o s s0 t t0 IHl IHr e d1 d2 He H.
+simpl in H.
+rewrite StepFSupBallGlueGlue in H.
+destruct H as [Hl Hr].
+destruct (IHl _ _ _ He Hl) as [c Hc0 Hc1].
+destruct (IHr _ _ _ He Hr) as [d Hd0 Hd1].
+exists (glue o c d);
+ simpl;
+ rewrite StepFSupBallGlueGlue;
+ auto.
+Qed.
+
 End SupMetric.
 
 (* begin hide *)
@@ -229,3 +266,5 @@ Qed.
 
 Definition constStepF_uc (X:MetricSpace) : X --> StepFSup X
 := Build_UniformlyContinuousFunction (constStepF_uc_prf X).
+
+Implicit Arguments constStepF_uc [X].
