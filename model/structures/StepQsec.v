@@ -13,11 +13,6 @@ Open Local Scope sfstscope.
 
 Section QS.
 
-Lemma QS:(Setoid).
-exists Q Qeq.
-split; unfold Reflexive, Transitive, Symmetric; eauto with qarith.
-Defined.
-
 Definition QabsS : QS-->QS.
 exists Qabs.
 abstract(
