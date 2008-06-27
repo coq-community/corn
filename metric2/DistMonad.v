@@ -127,7 +127,7 @@ Defined.
 
 (* RegularFunction should have been extensional *)
 Definition swap_raw (x:StepFSup (Complete X)) (e:QposInf): (StepFSup X):=
-((typefun2extSetoid (fun z=> approximate z e)) ^@> x).
+((StepFunction.Map (fun z=> approximate z e)) x).
 
 Lemma swap_prf : forall (x:StepFSup (Complete X)),
  is_RegularFunction (swap_raw x).
@@ -139,10 +139,9 @@ rapply regFun_prf.
 simpl (ball (m:=StepFSup X)).
 set (f:=(fun z : RegularFunction X => approximate z a)) in *.
 set (g:=(fun z : RegularFunction X => approximate z b)) in *.
-change (Map f (glue o x1 x2))
- with (glue o (Map f x1) (Map f x2)).
-change (Map g (glue o x1 x2))
- with (glue o (Map g x1) (Map g x2)).
+simpl.
+fold (glue o (Map f x1) (Map f x2)).
+fold (glue o (Map g x1) (Map g x2)).
 rewrite StepFSupBallGlueGlue.
 auto.
 Qed.
@@ -151,6 +150,60 @@ Definition swap1 (x:StepFSup (Complete X)): (Complete (StepFSup X)).
 intro x. exists (swap_raw x).
 abstract (apply (swap_prf x)).
 Defined.
+
+
+Add Morphism swap1 with signature (@ms_eq _)
+ ==> (@ms_eq _) as swap1_wd.
+induction x.
+ induction y.
+  intros H d1 d2.
+  rapply H.
+ intros H d1 d2.
+ destruct H.
+ split.
+  apply IHy1; assumption.
+ apply IHy2; assumption.
+intros y H d1 d2.
+simpl.
+unfold swap_raw.
+simpl.
+destruct H as [Hl Hr] using (glue_eq_ind x1 x2 y o).
+rewrite <- (glueSplit (Map (fun z : RegularFunction X => approximate z d2) y) o).
+unfold SplitL, SplitR.
+ rewrite StepFunction.SplitLMap, StepFunction.SplitRMap.
+fold (glue o (Map (fun z : RegularFunction X => approximate z d1) x1)
+     (Map (fun z : RegularFunction X => approximate z d1) x2)).
+rewrite StepFSupBallGlueGlue.
+split; revert d1 d2.
+ rapply IHx1.
+ assumption.
+rapply IHx2.
+assumption.
+Qed.
+
+Lemma swap1_uc : is_UniformlyContinuousFunction swap1 Qpos2QposInf.
+Proof.
+intros e.
+rapply StepF_ind2.
+  simpl (ball_ex).
+  intros s s0 t t0 Hs Ht H.
+  rewrite <- Hs, <- Ht.
+  assumption.
+ intros.
+ assumption.
+intros o s s0 t t0 Hl Hr H d1 d2.
+simpl.
+unfold swap_raw.
+simpl.
+fold (glue o (Map (fun z : RegularFunction X => approximate z d1) s)
+     (Map (fun z : RegularFunction X => approximate z d1) s0)).
+fold (glue o
+     (Map (fun z : RegularFunction X => approximate z d2) t)
+     (Map (fun z : RegularFunction X => approximate z d2) t0)).
+simpl in *.
+rewrite StepFSupBallGlueGlue in H |- *.
+split; revert d1 d2; tauto.
+Qed.
 
 Require Export StepFunctionSetoid.
 Lemma uc_stdFun(X Y:MetricSpace):
