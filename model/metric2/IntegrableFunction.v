@@ -39,5 +39,5 @@ Definition Integral : IntegrableFunction --> CR :=
  Cmap L1StepQPrelengthSpace IntegralQ_uc.
 
 (** Every bounded function is integrable. *)
-Definition BounedAsIntegrable : BoundedFunction --> IntegrableFunction :=
+Definition BoundedAsIntegrable : BoundedFunction --> IntegrableFunction :=
  Cmap LinfStepQPrelengthSpace LinfAsL1.
