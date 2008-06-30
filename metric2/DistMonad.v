@@ -437,92 +437,99 @@ unfold Cjoin_raw. simpl. unfold swap_raw.
 set (f1:=(fun z : RegularFunction X =>
       approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)).
 set (f2:=(fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)).
-
-(* FIXME *)
-Admitted.
-
-
-
-====
-
-(*
-unfold is_UniformlyContinuousFunction.
-intros. simpl in H. simpl. unfold swap1, regFunBall. simpl. unfold swap_raw.
-intros.
-(* We first need to compare the distances in Complete X*) 
-assert (StepFSupBall (Qpos_plus (Qpos_plus d1 e) d2)
-  (Map (uc_stdFun (@Cunit X)) (Map (fun z : RegularFunction X => approximate z d1) a))
-  ((uc_stdFun (@Cunit X)) ^@>  (Map (fun z : RegularFunction X => approximate z d2) b))).
-
-setoid_replace (Map (uc_stdFun Cunit)
-     (Map (fun z : RegularFunction X => approximate z d1) a))
-with
-(Map (fun z : RegularFunction X => ((uc_stdFun Cunit) (approximate z d1))) a).
-2: symmetry; rapply Map_compose_Map_eq.
-set (f:=  (fun z : RegularFunction X => uc_stdFun Cunit (approximate z d1))).
-simpl. 
-setoid_replace 
-(Cunit_fun X ^@> 
-((fun z : RegularFunction X => approximate z d2) ^@> b))
-with
-( ((fun z : RegularFunction X => Cunit (approximate z d2)) ^@> b))
-by (symmetry; rapply Map_compose_Map_eq).
-simpl.
-set (g:=  (fun z : RegularFunction X => Cunit_fun X (approximate z d2))).
-simpl in f.
-revert H.
-set (bb:=(fun x =>((@ballS (Complete X) (d1+e+d2)) (f x) (g x)))).
-rapply StepF_imp_imp.
-unfold StepF_imp.
-Open Scope sfstscope.
-(*
-set (F:=(((flip (compose (flip (compose bb (uc_stdFun f))) (uc_stdFun f)))))).
-*)
-(*
-set (IMP:=(ap
- (compose (@ap _ _ _) 
-  (compose (compose imp) (ballS (Complete X) e)))
- bb)).
-cut (StepFfoldProp (IMP ^@> a <@> b)).
- unfold IMP, F; evalStepF. tauto.
-apply StepFfoldPropForall_Map2.
-intros a0 b0. simpl. unfold compose0.
-intro. apply uc_prf. rewrite eq. rapply H.
-
-set (F:=(((flip (compose (flip (compose bb f)) g))))).
-
-rapply ball_ex_approx_l.
-*)
-(* FIX ME *)
-abstract (elim cheat).
-abstract (elim cheat).
-Defined.
-
-===
-
-(* Should have a variant of  Map_compose_Map *)
-setoid_replace (
-Map (fun z : RegularFunction X => approximate z e)
-         (Map (Cmap_slow f) x))
-with (Map (fun z  => (approximate ((Cmap_slow f) z) e)) x).
-2: (apply StepF_Qeq_eq; rewrite <- Map_compose_Map; reflexivity).
-set (qbind:= (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e1))).
-setoid_replace (Map f
+unfold StepFSupBall.
+assert (forall y, StepFSupBall (X:=Complete X) (((1 # 2) * ((1 # 2) * e))%Qpos)
+  (Map (fun z=>Cunit (f1 z)) y)
+  (Map (@id (Complete X)) y)).
+ unfold f1. induction y. 
+   rapply ball_approx_l.
+  simpl. repeat rewrite StepFunction.Map_identity.
+ change (StepFSupBall (X:=Complete X) ((1 # 2) * ((1 # 2) * e))
+  (glue o
      (Map
         (fun z : RegularFunction X =>
-         approximate z
-           qbind) x))
-with (Map
+         Cunit_fun X (approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)) y1)
+     (Map
         (fun z : RegularFunction X =>
-         ((ucFun f) (approximate z
-           qbind))) x).
-2: (apply StepF_Qeq_eq; rewrite <- Map_compose_Map; reflexivity).
-set (bal:=(ballS X (e+e1))).
-set (f1:=(fun z : Complete X => approximate (Cmap_slow f z) e)).
-set (f2:=(fun z : RegularFunction X => f (approximate z qbind))).
-simpl in f1.
+         Cunit_fun X (approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)) y2))
+  (@glue (Complete X) o y1
+     y2)).
+ rewrite StepFSupBallGlueGlue. split. 
+ simpl in IHy1. rewrite StepFunction.Map_identity in IHy1. rapply IHy1.
+ simpl in IHy2. rewrite StepFunction.Map_identity in IHy2. rapply IHy2.
+(* We should be able to complete this case, let's first see if it helps *)
 
-setoid_rewrite <- (@Map_compose_Map_eq _ _ _ bal f1 x).
+Focus 2.
+simpl. intros e e1. simpl.
+unfold Cjoin_raw. simpl. unfold swap_raw.
+simpl.
+change (StepFSupBall (X:=X) (e + e1)
+  (glue o
+     (StFBind00
+        (Map
+           (fun z : RegularFunction (StepFSup X) =>
+            approximate z ((1 # 2) * e)%Qpos)
+           (Map
+              (fun x : RegularFunction (StepFSup (Complete X)) =>
+               Cjoin_fun (Cmap_slow_fun (swap X) x)) x1))
+        (compose1 (SplitLS X o) id))
+     (StFBind00
+        (Map
+           (fun z : RegularFunction (StepFSup X) =>
+            approximate z ((1 # 2) * e)%Qpos)
+           (Map
+              (fun x : RegularFunction (StepFSup (Complete X)) =>
+               Cjoin_fun (Cmap_slow_fun (swap X) x)) x2))
+        (compose1 (SplitRS X o) id)))
+  (glue o
+     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
+        (StFBind00
+           (Map
+              (fun z : RegularFunction (StepFSup (Complete X)) =>
+               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x1)
+           (compose1 (SplitLS (regFun_Setoid X) o) id)))
+     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
+        (StFBind00
+           (Map
+              (fun z : RegularFunction (StepFSup (Complete X)) =>
+               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x2)
+           (compose1 (SplitRS (regFun_Setoid X) o) id))))).
+assert (StepFSupBall (X:=X) (e + e1)
+  (glue o
+     (StFBind00
+        (Map
+           (fun z : RegularFunction (StepFSup X) =>
+            approximate z ((1 # 2) * e)%Qpos)
+           (Map
+              (fun x : RegularFunction (StepFSup (Complete X)) =>
+               Cjoin_fun (Cmap_slow_fun (swap X) x)) x1))
+        (SplitLS X o))
+     (StFBind00
+        (Map
+           (fun z : RegularFunction (StepFSup X) =>
+            approximate z ((1 # 2) * e)%Qpos)
+           (Map
+              (fun x : RegularFunction (StepFSup (Complete X)) =>
+               Cjoin_fun (Cmap_slow_fun (swap X) x)) x2))
+        (SplitRS X o) ))
+  (glue o
+     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
+        (StFBind00
+           (Map
+              (fun z : RegularFunction (StepFSup (Complete X)) =>
+               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x1)
+           (SplitLS (regFun_Setoid X) o)))
+     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
+        (StFBind00
+           (Map
+              (fun z : RegularFunction (StepFSup (Complete X)) =>
+               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x2)
+           (SplitRS (regFun_Setoid X) o))))).
+(*removing compose id *)
+rewrite StepFSupBallGlueGlue.
+split.
+simpl in IHx1. pose (H:=IHx1 e e1). simpl in H.
+unfold Cjoin_raw, swap_raw in H. 
 
-(* approximate, Cmap_slow_raw should be a setoid function on RegularFunction *)
-(* set (F:=(((flip (compose (flip (compose bal f1))) f2)))).*)
+Check prod.
+Check dorp.
