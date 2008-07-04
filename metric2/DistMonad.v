@@ -26,7 +26,8 @@ Require Import CornTac.
 Require Export Integration.
 Require Export LinfMetricMonad.
 
-(** We prove the that StepF distributes over Complete.
+(** We prove the that StepF distributes over Complete using the function 
+swap as in Jones, Duponcheel - composing monads
 *)
 Set Implicit Arguments.
 Open Local Scope sfstscope.
@@ -111,21 +112,7 @@ abstract (unfold is_UniformlyContinuousFunction; simpl; intros; apply
 StepFSupBallBind; [auto with * | assumption]).
 Defined.
 
-Axiom cheat:False.
 Open Scope uc_scope.
-(*
-Definition LeibnizSetoid(A:Type):Setoid.
-intro A. exists A (@eq A).
-split; auto with *.
-Defined.
-
-Definition typefun2extSetoid(A B:Type)(f:A->B):(extSetoid (LeibnizSetoid A)
-(LeibnizSetoid B)).
-intros A B f. exists f. simpl. intros.  rewrite H.
-reflexivity.
-Defined.
-*)
-(* RegularFunction should have been extensional *)
 Definition swap_raw (x:StepFSup (Complete X)) (e:QposInf): (StepFSup X):=
 (Map (fun z=> approximate z e) x).
 
@@ -150,7 +137,6 @@ Definition swap1 (x:StepFSup (Complete X)): (Complete (StepFSup X)).
 intro x. exists (swap_raw x).
 abstract (apply (swap_prf x)).
 Defined.
-
 
 Add Morphism swap1 with signature (@ms_eq _)
  ==> (@ms_eq _) as swap1_wd.
@@ -423,113 +409,83 @@ intros. intros e1 e2. simpl. unfold swap_raw. simpl.
 unfold StepFSupBall, StepFfoldProp;simpl; apply x.
 Qed.
 
+Definition glue_uc0(X:MetricSpace)(o:OpenUnit): 
+ StepFSup X -> StepFSup X --> StepFSup X.
+intros X0 o x.
+exists (fun y=>(glue o x y)) (fun x:Qpos=> x).
+abstract(
+intros e a b;  simpl; rewrite StepFSupBallGlueGlue; intuition;
+apply StepFSupBall_refl).
+Defined.
+
+Definition glue_uc(X:MetricSpace)(o:OpenUnit): 
+ Complete (StepFSup X) --> Complete (StepFSup X) --> Complete (StepFSup X).
+intros X0 o.
+apply Cmap2_slow.
+exists (fun y=>(glue_uc0 o y)) (fun x:Qpos=> x).
+abstract (intros e a b; simpl; unfold ucBall; simpl; intros; 
+rewrite StepFSupBallGlueGlue; intuition;
+apply StepFSupBall_refl).
+Defined.
+
+Lemma swap_glue(X:MetricSpace)(o:OpenUnit): forall x y,
+(ms_eq (swap X (glue o x y))  (glue_uc _ o (swap _ x) (swap _ y))).
+intros. simpl. intros e e1. simpl.
+unfold swap_raw. simpl.
+unfold Cmap_slow_fun. simpl.
+unfold Cap_slow_raw. simpl.
+unfold swap_raw.
+fold
+  (glue o
+     (Map (fun z : RegularFunction X0 => approximate z e) x)
+     (Map (fun z : RegularFunction X0 => approximate z e) y)).
+rewrite StepFSupBallGlueGlue.
+assert (forall w:StepF (Complete X0), StepFSupBall (X:=X0) (e + e1)
+  (Map (fun z : RegularFunction X0 => approximate z e) w)
+  (Map
+     (fun z : RegularFunction X0 =>
+      approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w)).
+induction w using StepF_ind.
+ unfold StepFSupBall. unfold StepFfoldProp. simpl.
+rewrite <- ball_Cunit.
+apply ball_triangle with x0.
+apply ball_approx_l.
+apply ball_weak_le  with  ((1 # 2) * ((1 # 2) * e1))%Qpos.
+rewrite Qle_minus_iff.
+replace RHS with (e1 - (1#2)*(1#2)*e1).
+replace RHS with ((3#4)*e1) by ring.
+Qauto_nonneg. auto with *.
+ rapply ball_approx_r.
+simpl.
+change (StepFSupBall (X:=X0) (e + e1)
+  (glue o0
+     (Map (fun z : RegularFunction X0 => approximate z e) w1)
+     (Map (fun z : RegularFunction X0 => approximate z e) w2))
+  (glue o0
+     (Map
+        (fun z : RegularFunction X0 =>
+         approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w1)
+     (Map
+        (fun z : RegularFunction X0 =>
+         approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w2))).
+rewrite StepFSupBallGlueGlue.
+intuition.
+
+split;auto. 
+Qed.
+
+
+
+(* We skip the proof of the following lemma since the obvious induction
+proof does not work since glue does not work well with join 
+In our current setting it would be more natural to check the distributive laws
+ using a (unit, bind) presentation. Unfortunately, we have been unable to find one
+in the literature.
+*)
+
 (* prod . mapN dorp≍dorp . prod*)
 Lemma prodmadorp:(ucEq
 (uc_compose (prod _)
 (@Map_uc _ _ (dorp _)))
 (uc_compose (dorp _) (@prod (Complete X)))
 ).
-intro x. 
-induction x using StepF_ind.
-simpl. intros e e1.
-simpl.
-unfold Cjoin_raw. simpl. unfold swap_raw.
-set (f1:=(fun z : RegularFunction X =>
-      approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)).
-set (f2:=(fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)).
-unfold StepFSupBall.
-assert (forall y, StepFSupBall (X:=Complete X) (((1 # 2) * ((1 # 2) * e))%Qpos)
-  (Map (fun z=>Cunit (f1 z)) y)
-  (Map (@id (Complete X)) y)).
- unfold f1. induction y. 
-   rapply ball_approx_l.
-  simpl. repeat rewrite StepFunction.Map_identity.
- change (StepFSupBall (X:=Complete X) ((1 # 2) * ((1 # 2) * e))
-  (glue o
-     (Map
-        (fun z : RegularFunction X =>
-         Cunit_fun X (approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)) y1)
-     (Map
-        (fun z : RegularFunction X =>
-         Cunit_fun X (approximate z ((1 # 2) * ((1 # 2) * e))%Qpos)) y2))
-  (@glue (Complete X) o y1
-     y2)).
- rewrite StepFSupBallGlueGlue. split. 
- simpl in IHy1. rewrite StepFunction.Map_identity in IHy1. rapply IHy1.
- simpl in IHy2. rewrite StepFunction.Map_identity in IHy2. rapply IHy2.
-(* We should be able to complete this case, let's first see if it helps *)
-
-Focus 2.
-simpl. intros e e1. simpl.
-unfold Cjoin_raw. simpl. unfold swap_raw.
-simpl.
-change (StepFSupBall (X:=X) (e + e1)
-  (glue o
-     (StFBind00
-        (Map
-           (fun z : RegularFunction (StepFSup X) =>
-            approximate z ((1 # 2) * e)%Qpos)
-           (Map
-              (fun x : RegularFunction (StepFSup (Complete X)) =>
-               Cjoin_fun (Cmap_slow_fun (swap X) x)) x1))
-        (compose1 (SplitLS X o) id))
-     (StFBind00
-        (Map
-           (fun z : RegularFunction (StepFSup X) =>
-            approximate z ((1 # 2) * e)%Qpos)
-           (Map
-              (fun x : RegularFunction (StepFSup (Complete X)) =>
-               Cjoin_fun (Cmap_slow_fun (swap X) x)) x2))
-        (compose1 (SplitRS X o) id)))
-  (glue o
-     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
-        (StFBind00
-           (Map
-              (fun z : RegularFunction (StepFSup (Complete X)) =>
-               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x1)
-           (compose1 (SplitLS (regFun_Setoid X) o) id)))
-     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
-        (StFBind00
-           (Map
-              (fun z : RegularFunction (StepFSup (Complete X)) =>
-               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x2)
-           (compose1 (SplitRS (regFun_Setoid X) o) id))))).
-assert (StepFSupBall (X:=X) (e + e1)
-  (glue o
-     (StFBind00
-        (Map
-           (fun z : RegularFunction (StepFSup X) =>
-            approximate z ((1 # 2) * e)%Qpos)
-           (Map
-              (fun x : RegularFunction (StepFSup (Complete X)) =>
-               Cjoin_fun (Cmap_slow_fun (swap X) x)) x1))
-        (SplitLS X o))
-     (StFBind00
-        (Map
-           (fun z : RegularFunction (StepFSup X) =>
-            approximate z ((1 # 2) * e)%Qpos)
-           (Map
-              (fun x : RegularFunction (StepFSup (Complete X)) =>
-               Cjoin_fun (Cmap_slow_fun (swap X) x)) x2))
-        (SplitRS X o) ))
-  (glue o
-     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
-        (StFBind00
-           (Map
-              (fun z : RegularFunction (StepFSup (Complete X)) =>
-               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x1)
-           (SplitLS (regFun_Setoid X) o)))
-     (Map (fun z : RegularFunction X => approximate z ((1 # 2) * e1)%Qpos)
-        (StFBind00
-           (Map
-              (fun z : RegularFunction (StepFSup (Complete X)) =>
-               approximate z ((1 # 2) * ((1 # 2) * ((1 # 2) * e1)))%Qpos) x2)
-           (SplitRS (regFun_Setoid X) o))))).
-(*removing compose id *)
-rewrite StepFSupBallGlueGlue.
-split.
-simpl in IHx1. pose (H:=IHx1 e e1). simpl in H.
-unfold Cjoin_raw, swap_raw in H. 
-
-Check prod.
-Check dorp.
