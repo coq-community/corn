@@ -46,7 +46,8 @@ Definition Qlt_is_strict_order := Build_strictorder
  Qlt_is_transitive_unfolded Qlt_is_antisymmetric_unfolded.
 
 Definition Q_is_COrdField := Build_is_COrdField Q_as_CField
- Qlt_is_CSetoid_relation Qle Qgt_is_CSetoid_relation Qge Qlt_is_strict_order Qplus_resp_Qlt
+ Qlt_is_CSetoid_relation Qle (default_greater Q_as_CField Qlt_is_CSetoid_relation) 
+ (default_grEq Q_as_CField Qle) Qlt_is_strict_order Qplus_resp_Qlt
  Qmult_resp_pos_Qlt Qlt_gives_apartness Qle_is_not_lt Qgt_is_lt Qge_is_not_gt.
 
 Definition Q_as_COrdField := Build_COrdField _ _ _ _ _ Q_is_COrdField.
