@@ -77,6 +77,13 @@ Qed.
 
 (** apartness *)
 
+Lemma R_eq_as_IR_back : forall x y, (RasIR x [=] RasIR y -> x = y).
+intros x y H.
+replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
+replace y with (IRasR (RasIR y)) by apply RasIRasR_id.
+rapply map_wd_unfolded; assumption.
+Qed.
+
 Lemma R_ap_as_IR : forall x y, (RasIR x [#] RasIR y -> x <> y).
 intros x y H.
 replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
