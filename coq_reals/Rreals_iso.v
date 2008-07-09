@@ -77,6 +77,13 @@ Qed.
 
 (** apartness *)
 
+Lemma R_eq_as_IR_back : forall x y, (RasIR x [=] RasIR y -> x = y).
+intros x y H.
+replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
+replace y with (IRasR (RasIR y)) by apply RasIRasR_id.
+rapply map_wd_unfolded; assumption.
+Qed.
+
 Lemma R_ap_as_IR : forall x y, (RasIR x [#] RasIR y -> x <> y).
 intros x y H.
 replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
@@ -150,6 +157,21 @@ apply R_lt_as_IR.
 assumption.
 Qed.
 
+Lemma IR_le_as_R_back : forall x y, (IRasR x <= IRasR y -> x [<=] y).
+intros.
+rewrite leEq_def.
+intro xy.
+cut (~ (IRasR y < IRasR x)); intro.
+apply H0.
+apply R_lt_as_IR.
+stepl y by rewrite IRasRasIR_id; reflexivity.
+stepr x by rewrite IRasRasIR_id; reflexivity.
+assumption .
+apply (RIneq.Rle_not_lt (IRasR y) (IRasR x)).
+assumption.
+assumption.
+Qed.
+
 (** zero *)
 
 Lemma R_Zero_as_IR : (RasIR R0 [=] Zero).
@@ -170,13 +192,21 @@ Qed.
 
 Hint Rewrite R_One_as_IR : RtoIR.
 
+Lemma IR_One_as_R : (IRasR One = R1).
+rapply map_pres_one_unfolded.
+Qed.
+
 (** addition *)
 
-Lemma R_plus_as_IR : forall x y, (RasIR (x+y)  [=] RasIR x [+] RasIR y).
+Lemma R_plus_as_IR : forall x y, (RasIR (x+y) [=] RasIR x [+] RasIR y).
 rapply map_pres_plus.
 Qed.
 
 Hint Rewrite R_plus_as_IR : RtoIR.
+
+Lemma IR_plus_as_R : forall x y, (IRasR (x[+]y) [=] IRasR x + IRasR y).
+rapply map_pres_plus_unfolded.
+Qed.
 
 (** negation *)
 
@@ -808,7 +838,7 @@ rstepl (Two [*] Two:IR).
 apply mult_resp_less_lft.
 apply Pi_gt_2.
 rstepr ((Zero [+] One) [+] One : IR).
-rapply  plus_one_ext_less.
+rapply plus_one_ext_less.
 rapply zero_lt_posplus1.
 rapply eq_imp_leEq.
 reflexivity.
