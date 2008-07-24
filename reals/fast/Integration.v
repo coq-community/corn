@@ -708,7 +708,7 @@ can only integrate over bounded intervals.  This effectively the
 Stieltjes integral [Integral f d(g^-1)]. *)
 Definition IntegrateWithMeasure (f:Q_as_MetricSpace --> CR) : BoundedFunction --> CR :=
 (uc_compose IntegrableFunction.Integral
-(uc_compose BounedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
+(uc_compose BoundedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
 
 (** The Riemann Integral uses the uniform measure on [[0,1]].  The
 inverse of it's cumlative distribution function is [id01]. *)
