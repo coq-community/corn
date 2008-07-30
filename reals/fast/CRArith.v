@@ -169,7 +169,7 @@ intros x y; rewrite CRmult_Qmult; reflexivity.
 apply CRopp_Qopp.
 intros x y H.
 rewrite CReq_Qeq.
-apply Qeq_bool_correct.
+apply Qeq_bool_eq.
 assumption.
 Qed.
 
