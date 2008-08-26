@@ -721,14 +721,15 @@ Proof.
 intros x y [n [e He Hn]].
 exists (mkQpos He).
 
-autorewrite with CRtoCauchy_IR.
+abstract (
+autorewrite with CRtoCauchy_IR;
 intros [m [d Hd Hm]];
 refine (Qle_not_lt _ _ (Hn (max n m) _) _);[auto with *|];
 rewrite Qlt_minus_iff;
 apply Qlt_le_trans with d;[assumption|];
 autorewrite with QposElim in Hm;
 rapply Hm; auto with *
-.
+).
 Defined.
 
 Lemma CR_lt_as_Cauchy_IR_lt_1 : forall (x y:CR),

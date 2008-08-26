@@ -32,8 +32,6 @@ Require Import Rcomplete.
 Require Import Rlimit.
 Require Import Rbasic_fun.
 Require Import Fourier.
-Require Import ConstructiveEpsilon.
-Require Import Rlogic.
 
 (** * Coq Real Numbers
 
@@ -400,48 +398,34 @@ simpl.
 destruct (R_complete s ((cauchy_prop_cauchy_crit (Build_CauchySeq ROrdField s hs) s hs))).
 unfold Rseries.Un_cv in u.
 simpl in *.
-cut (@sig nat
-  (fun N : nat =>
-   forall m : nat, le N m -> @AbsSmall ROrdField e (@cg_minus RGroup (s m) x))).
-intros [N HN].
+destruct (hs (e/4)) as [N HN].
+ simpl.
+ fourier.
 exists N.
-assumption.
-apply constructive_indefinite_description_nat.
-intros x0.
-apply forall_dec.
-intro n.
-destruct (le_gt_dec x0 n).
-unfold AbsSmall.
-simpl.
-destruct (Rle_dec (- e) (s n[-]x)).
-destruct (Rle_dec (s n[-]x) e).
-left; intro.
-split; assumption.
-
-right; intro.
-destruct (H l).
-apply n0.
-apply H1.
-right; intro.
-destruct (H l).
-apply n0.
-apply H0.
-left.
-intro.
-elimtype False.
-omega.
-
-destruct (u e e0).
-exists x0.
 intros m Hm.
-unfold AbsSmall.
-assert (x0H := Rabs_def2 _ _ (H m Hm)).
-unfold Rfunctions.R_dist in x0H.
-clear - x0H e0.
-destruct x0H.
-simpl; split.
-apply Rlt_le; assumption.
-apply Rlt_le; assumption.
+destruct (u (e/2)).
+ fourier.
+set (z:=max x0 m).
+rstepr (((s m[-]s N)[+](s N[-]s z))[+](s z[-]x)).
+ apply AbsSmall_eps_div_two.
+  apply AbsSmall_eps_div_two.
+  stepl (e/4).
+   apply HN; auto.
+  change (e / 4 = e * / (0 + 1 + 1) * / (0 + 1 + 1)).
+  field.
+ apply AbsSmall_minus.
+ stepl (e/4).
+  unfold z.
+  apply HN; eauto with *.
+ change (e / 4 = e * / (0 + 1 + 1) * / (0 + 1 + 1)).
+ field.
+ assert (Hz:(z >= x0)%nat).
+  unfold z; eauto with *.
+ destruct (Rabs_def2 _ _ (H _ Hz)) as [A0 A1].
+ stepl (e/2).
+  split; unfold cg_minus; simpl; auto with *.
+ change (e / 2 = e * / (0 + 1 + 1)).
+ field.
 
 intro x.
 exists (Zabs_nat (up x)).
