@@ -267,7 +267,7 @@ transitivity (y + (constStepF (0:QS))).
  generalize (x-y).
  intros s H.
  induction s.
-  rapply Qeq_bool_correct.
+  rapply Qeq_bool_eq.
   assumption.
  symmetry in H.
  destruct (andb_true_eq _ _ H) as [H1 H2].

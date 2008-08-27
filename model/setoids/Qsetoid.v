@@ -184,18 +184,3 @@ Qed.
 
 Definition Qlt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qlt_strext.
 Canonical Structure Qlt_is_CSetoid_relation.
-
-(**
-*** Greater-than
-*)
-
-Lemma Qgt_strext : Crel_strext Q_as_CSetoid Qgt.
-Proof.
-red in |- *.
-intros.
-pose (Qlt_strext_unfolded y1 y2 x1 x2).
-tauto.
-Qed.
-
-Definition Qgt_is_CSetoid_relation := Build_CCSetoid_relation _ _ Qgt_strext.
-Canonical Structure Qgt_is_CSetoid_relation.

@@ -245,6 +245,17 @@ apply CR_b_upperBound.
 Qed.
 
 End CRpower_positive.
+
+Lemma CRpower_positive_correct' : forall n x, 
+(IRasCR (x[^]S n)==CRpower_positive (P_of_succ_nat n) (IRasCR x))%CR.
+Proof.
+intros n x.
+rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ.
+apply CRpower_positive_correct.
+Qed.
+
+Hint Rewrite CRpower_positive_correct' : IRtoCR.
+
 (* begin hide *)
 Add Parametric Morphism p : (@CRpower_positive p) with signature (@ms_eq _) ==> (@ms_eq _) as CRpower_positive_wd.
 Proof.
