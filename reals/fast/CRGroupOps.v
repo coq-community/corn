@@ -113,7 +113,7 @@ Hint Rewrite translate_Qplus : CRfast_compute.
 ** Negation
 Lifting negation on [Q] yields negation on CR.
 *)
-Lemma Qopp_uc_prf : @is_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace Qopp Qpos2QposInf.
+Lemma Qopp_uc_prf : is_UniformlyContinuousFunction Qopp Qpos2QposInf.
 Proof.
 intros e a b H.
 simpl in *.

@@ -341,6 +341,24 @@ rewrite (IHx2 (SplitR y o)); auto with *.
 rapply StepFfoldPropglue.
 Qed.
 
+Lemma StepFfoldPropSplitR
+     : forall (s : StepF iffSetoid) (a : OpenUnit),
+       StepFfoldProp s -> StepFfoldProp (SplitR s a).
+Proof.
+intros s a H.
+rewrite <- (StepFfoldPropglue s a) in H.
+destruct H; auto.
+Qed.
+
+Lemma StepFfoldPropSplitL
+     : forall (s : StepF iffSetoid) (a : OpenUnit),
+       StepFfoldProp s -> StepFfoldProp (SplitL s a).
+Proof.
+intros s a H.
+rewrite <- (StepFfoldPropglue s a) in H.
+destruct H; auto.
+Qed.
+
 Section EquivalenceC.
 
 Variable X:Setoid.
@@ -404,21 +422,6 @@ apply glue_StepF_eq.
 apply StepF_eq_resp_Qeq with (Mirror s1) (Mirror (SplitL t o)); auto.
  rapply MirrorSplitL_Qeq; apply Qeq_refl.
 rewrite IHs1.
-assumption.
-Qed.
-
-Lemma StepFfoldPropSplitL : 
- forall (s : StepF iffSetoid) a, StepFfoldProp s -> StepFfoldProp (SplitL s a).
-Proof.
-induction s; intros a H.
- assumption.
-destruct H.
-rapply SplitL_glue_ind; intros Hao.
-  apply IHs1; assumption.
- split.
-  assumption.
- apply IHs2.
- assumption.
 assumption.
 Qed.
 

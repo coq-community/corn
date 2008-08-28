@@ -374,7 +374,7 @@ Proof.
 intros x Hx.
 split.
  unfold CRle.
- setoid_replace (x - 'l)%CR with ('(-l) + x)%CR using relation (@ms_eq CR) by ring.
+ setoid_replace (x - 'l)%CR with ('(-l) + x)%CR by ring.
  rewrite CRplus_translate.
  intros e.
  simpl.
@@ -445,7 +445,7 @@ apply (@almostIn_triangle_l _ stableQ e1 e2 (approximate x e1) y).
   intros H _.
   split; simpl.
    unfold CRle in Hlx.
-   setoid_replace (x - 'l) with ('(-l) + x) using relation (@ms_eq CR) in Hlx  by ring.
+   setoid_replace (x - 'l) with ('(-l) + x) in Hlx  by ring.
    rewrite CRplus_translate in Hlx.
    assert (H0:=Hlx e1).
    simpl in H0.

@@ -43,11 +43,6 @@ apply glue_wd; auto with *. apply StFBind00_wd; try reflexivity. rewrite SplitLG
  rewrite <- SplitRBind. simpl. rewrite SplitRGlue. apply StFBind_wd1. intro x. reflexivity.
 Qed.
 
-(* Should be moved*)
-Axiom StepFfoldPropSplitR
-     : forall (s : StepF iffSetoid) (a : OpenUnit),
-       StepFfoldProp s -> StepFfoldProp (SplitR s a).
-
 Section Swap.
 (* M= Complete, N= StepF 
 swap = distribComplete*)
@@ -210,7 +205,6 @@ intros. apply StepF_Qeq_eq. apply Map_compose_Map.
 Qed.
 
 Open Scope sfstscope.
-Print Scopes.
 Open Scope sfscope.
 Definition swap: (StepFSup (Complete X))-->(Complete (StepFSup X)).
 rapply (@Build_UniformlyContinuousFunction _ _ swap1 (fun e => e)).
@@ -359,11 +353,6 @@ Implicit Arguments bind_compose [X Y Z W].
 (* <-- Should be moved to RSetoid*)
 
 Open Scope sfstscope.
-(* Do we need this???*)
-Lemma Map_functor(X Y Z:Setoid)(f:X-->Y)(g:Y-->Z):forall x, 
-g^@>(f^@>x)==(compose g f)^@>x.
-Admitted.
-
 Open Scope uc_scope.
 
 (*swap . mapN returnM≍returnM*)
@@ -484,8 +473,10 @@ in the literature.
 *)
 
 (* prod . mapN dorp≍dorp . prod*)
+(*
 Lemma prodmadorp:(ucEq
 (uc_compose (prod _)
 (@Map_uc _ _ (dorp _)))
 (uc_compose (dorp _) (@prod (Complete X)))
 ).
+*)

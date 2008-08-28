@@ -81,7 +81,7 @@ intros [H|H].
  intros m Hm.
  rewrite CRle_min_r in Hm.
  rewrite CRmin_boundAbove in Hm.
- setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR using relation (@ms_eq CR) by ring.
+ setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
  apply CRopp_wd.
  rewrite <- Hm.
  rapply regFunEq_e.

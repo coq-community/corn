@@ -143,7 +143,7 @@ CR forms a ring for the ring tactic.
 *)
 Lemma CR_ring_theory : 
  @ring_theory CR (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
- (fun (x y:CR) => (x + - y)) CRopp (@ms_eq CR).
+ (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
 Proof.
 split.
 rapply cm_lft_unit_unfolded.
@@ -179,7 +179,7 @@ Ltac CRcst t :=
   | _ => NotConstant
   end.
 
-Ltac CRring_pre := autorewrite with toCRring.
+Ltac CRring_pre := try unfold ms_eq; autorewrite with toCRring.
 
 Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@ms_eq CR).
 Proof.
@@ -197,7 +197,7 @@ intros x [c Hx].
 cut ('0 <= x)%CR.
  unfold CRle.
  intros H.
- setoid_replace (x - '0)%CR with x using relation (@ms_eq CR) in H by ring.
+ setoid_replace (x - '0)%CR with x in H by ring.
  assumption.
 apply CRle_trans with (' c)%CR; auto with *.
 rewrite CRle_Qle; auto with *.
@@ -208,7 +208,7 @@ intros x [c Hx].
 cut (x <= '0)%CR.
  unfold CRle.
  intros H.
- setoid_replace ('0 - x)%CR with (-x)%CR using relation (@ms_eq CR) in H by ring.
+ setoid_replace ('0 - x)%CR with (-x)%CR in H by ring.
  intros e.
  rewrite <- (Qopp_involutive e).
  rewrite <- (Qopp_involutive (approximate x e)).

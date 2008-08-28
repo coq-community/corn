@@ -632,7 +632,7 @@ destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
  stepr ('0)%CR.
   split; simpl;
   rewrite Hq; try apply CRle_refl.
-  setoid_replace (-'0)%CR with ('0)%CR  using relation (@ms_eq CR) by ring.
+  setoid_replace (-'0)%CR with ('0)%CR by ring.
   apply CRle_refl.
  rapply regFunEq_e.
  intros e.

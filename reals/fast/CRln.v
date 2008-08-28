@@ -398,7 +398,7 @@ rapply CRln_pos_correct.
 change ((inj_Q IR (c:Q))[<=]x).
 rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
-setoid_replace (IRasCR x) with (IRasCR x - '0)%CR using relation (@ms_eq CR) by ring.
+setoid_replace (IRasCR x) with (IRasCR x - '0)%CR by ring.
 assumption.
 Qed.
 

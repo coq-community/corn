@@ -732,7 +732,7 @@ change (Cunit (approximate (Integrate01 f) e))
  with ('(approximate (Integrate01 f) e))%CR.
 setoid_replace ('(approximate (Integrate01 f) e))%CR
  with ('((1-0)*(approximate (Integrate01 f) e)))%CR
- using relation (@ms_eq CR) by ring.
+ by ring.
 rewrite <- CRAbsSmall_ball.
 stepl ('((1-0)*e))%CR
  by (rapply inject_Q_wd; ring).
