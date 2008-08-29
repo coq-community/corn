@@ -23,6 +23,7 @@ Require Export IntegrableFunction.
 Require Export BoundedFunction.
 Require Export CRmetric.
 Require Export CRArith.
+Require Import DistMonad.
 Require Import CRIR.
 Require Import Integral.
 Require Import StepQsec.
@@ -570,66 +571,14 @@ However, I have not found a counter example where f o g is not uniformly
 continuous.  In fact, when f is lipschitz, then the map from g to
 f o g is Lipschitz.  However Lipschitz functions haven't been
 formalzied yet. *)
-Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
+
+Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := swap _ (uc_stdFun f ^@> z).
 (* begin hide *)
 Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _) ==> (@st_eq _) as ComposeContinuous_raw_wd.
 Proof.
-intros x1 x2 Hx d1 d2.
-simpl.
-unfold distribComplete_raw.
-revert x1 x2 Hx.
-induction x1 using StepF_ind.
- induction x2 using StepF_ind.
-  intros Hx.
-  revert d1 d2.
-  change (st_eq (f x) (f x0)).
-  apply uc_wd.
-  assumption.
- rapply eq_glue_ind.
- intros Hl Hr.
- split.
-  apply IHx2_1; auto.
- apply IHx2_2; auto.
-intros x2.
-rapply glue_eq_ind.
-intros Hl Hr.
-set (B:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-        (Map f x1_1):StepQ)).
-set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-        (Map f x1_2):StepQ)).
-set (A0:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-        (Map f (SplitL x2 o)):StepQ)).
-set (A1:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-        (Map f (SplitR x2 o)):StepQ)).
-setoid_replace (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-     (Map f x2)) with (glue o A0 A1).
- change (StepFSupBall (X:=Q_as_MetricSpace) (d1 + d2)%Qpos (glue o B C) (glue o A0 A1)).
- rewrite StepFSupBallGlueGlue.
- split.
-  rapply IHx1_1; auto with *.
- rapply IHx1_2; auto with *.
-simpl.
-change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2) (Map f x2):StepQ) ==
-StepFunction.glue o
-  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-     (Map f (SplitL x2 o)))
-  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-     (Map f (SplitR x2 o)))).
-symmetry.
-rapply glue_StepF_eq.
- unfold SplitL.
- do 2 rewrite StepFunction.SplitLMap.
- change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitL x2 o)):StepQ) ==
-Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitL x2 o))).
- reflexivity.
-unfold SplitR.
-do 2 rewrite StepFunction.SplitRMap.
-change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitR x2 o)):StepQ) ==
-Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitR x2 o))).
+intros x1 x2 Hx.
+unfold ComposeContinuous_raw.
+rewrite Hx.
 reflexivity.
 Qed.
 (* end hide *)
@@ -641,10 +590,7 @@ revert a b e.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H e H0.
   change (st_car LinfStepQ) in s, s0, t, t0.
-  change (st_eq s s0) in Hs.
-  change (st_eq t t0) in Ht.
-  rewrite <- Hs.
-  rewrite <- Ht.
+  rewrite <- Hs, <- Ht.
   apply H.
   destruct (mu f e); try constructor.
   change (ball q s t).
@@ -656,16 +602,19 @@ rapply StepF_ind2.
  destruct (mu f e); try solve [constructor].
  simpl.
  assumption.
+intros o s s0 t t0 H0 H1 e H.
+unfold ComposeContinuous_raw in *.
+repeat rewrite MapGlue, swap_glue.
+intros d1 d2.
+apply ball_weak_le with (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos.
+ autorewrite with QposElim.
+ Qauto_le.
 simpl.
-unfold regFunBall.
+unfold Cap_slow_raw.
 simpl.
-unfold distribComplete_raw.
-simpl.
-intros o s s0 t t0 H0 H1 e H d1 d2.
-change (@StepFunction.glue Q o) with (@glue QS o).
 rewrite StepFSupBallGlueGlue.
 split;
- (apply H0 || apply H1);
+ [apply H0 | apply H1];
  destruct (mu f e); try constructor;
  simpl in *;
  rewrite StepFSupBallGlueGlue in H;
