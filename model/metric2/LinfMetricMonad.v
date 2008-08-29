@@ -38,11 +38,16 @@ Set Implicit Arguments.
 
 Open Local Scope sfstscope.
 
+(**
+** Linf metric for Step Functions
+The Linf metric for [StepF X] is obtained by lifting the ball predicate on X *)
+
 Section StepFSupBall.
 Set Implicit Arguments.
 
 Variable X:MetricSpace.
 
+(** A setoid verion of the ball predicate *)
 Open Local Scope setoid_scope.
 Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
 intros m e x.
@@ -58,8 +63,7 @@ exists (ballS0  m e).
 intros. simpl. split; rewrite H; auto with *.
 Defined.
 
-(** We define the sup-metric on step functions *)
-
+(** The definition of the usp metric *)
 Definition StepFSupBall(e:Qpos)(f:StepF X)(g:StepF X):=
 StepFfoldProp ((@ballS X e)^@> f <@> g).
 
@@ -95,7 +99,7 @@ reflexivity.
 Qed.
 
 Section SupMetric.
-
+(** The StepFSupBall satifies the requirements of a metric. *)
 Variable X : MetricSpace.
 
 Lemma StepFSupBall_refl : forall e (x:StepF X), (StepFSupBall e x x).
@@ -204,20 +208,11 @@ split.
  rapply StepFSupBall_closed.
 rapply StepFSupBall_eq.
 Qed.
-(* begin hide 
-Add Morphism StepFSupBall with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as StepFSupBall_wd.
-intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
-unfold LinfBall.
-change (x1 == x2)%Q in Hx.
-rewrite Hx.
-rewrite Hy.
-rewrite Hz.
-reflexivity.
-Qed.
-end hide *)
+
 Definition StepFSup : MetricSpace :=
 @Build_MetricSpace (StepFS X) _ (@StepFSupBall_wd X) StepFSupBall_is_MetricSpace.
 
+(** The StepFSup is is a prelength space. *)
 Lemma StepFSupPrelengthSpace : PrelengthSpace X -> PrelengthSpace StepFSup.
 Proof.
 intros pl.
@@ -250,12 +245,8 @@ Canonical Structure StepFSup.
 (* end hide *)
 
 Open Local Scope uc_scope.
-(*
-Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
-:= Build_UniformlyContinuousFunction sup_uc_prf.
-*)
 
-(** There is an injection from Q to Linf. *)
+(** There is an injection from X to StepFSup X. *)
 Lemma constStepF_uc_prf (X:MetricSpace) : is_UniformlyContinuousFunction
  (@constStepF X:X -> StepFSup X) Qpos2QposInf.
 Proof.

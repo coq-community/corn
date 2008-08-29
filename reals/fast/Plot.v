@@ -116,7 +116,7 @@ apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
 unfold Compact.
 rewrite ball_Cunit.
 apply ball_sym.
-assert (L:ms_eq ((l,t):Q2) (l,b + h)).
+assert (L:st_eq ((l,t):Q2) (l,b + h)).
  split; simpl.
   reflexivity.
  auto.

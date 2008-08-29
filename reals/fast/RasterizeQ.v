@@ -291,7 +291,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   rewrite setRaster_correct1; unfold i, j; auto with *.
  split.
   change (ball err (C l r (S n) i) x).
-  change (ms_eq x (fst a)) in Hl.
+  change (st_eq x (fst a)) in Hl.
   rewrite Hl.
   eapply ball_weak_le.
    unfold err.
@@ -301,7 +301,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   rewrite Hl in Hfl.
   auto.
  change (ball err (C t b (S m) (m-j)%nat) y).
- change (ms_eq y (snd a)) in Hr.
+ change (st_eq y (snd a)) in Hr.
  rewrite Hr.
  eapply ball_weak_le.
   unfold err.

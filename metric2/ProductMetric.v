@@ -26,12 +26,15 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+(**
+** Product Metric
+The product of two metric spaces forms a metric space *)
 Section ProductSetoid.
 
 Variable X Y : Setoid.
 
 Definition prod_st_eq (a b:X*Y) :=
-st_eq _ (fst a) (fst b) /\ st_eq _ (snd a) (snd b).
+st_eq (fst a) (fst b) /\ st_eq (snd a) (snd b).
 
 Lemma prodST : Setoid_Theory _ prod_st_eq.
 Proof.
@@ -47,9 +50,6 @@ Definition prodS : Setoid := Build_Setoid prodST.
 End ProductSetoid.
 
 Section ProductMetric.
-(**
-** Product Metric
-The product of two metric spaces forms a metric space *)
 Variable X Y : MetricSpace.
 
 Definition prod_ball e (a b:X*Y) :=
@@ -198,7 +198,7 @@ End ProductMetric.
 (* begin hide *)
 Implicit Arguments PairMS [X Y].
 
-Add Parametric Morphism X Y : (@PairMS X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as PairMS_wd.
+Add Parametric Morphism X Y : (@PairMS X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as PairMS_wd.
 Proof.
 intros.
 split; assumption.

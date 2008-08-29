@@ -77,7 +77,7 @@ Definition is_UniformlyContinuousFunction
 
 (** Every uniformly continuous function is automatically well defined *)
 Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -> QposInf),
- (forall x, ms_eq (f1 x) (f2 x)) ->
+ (forall x, st_eq (f1 x) (f2 x)) ->
  (forall x, QposInf_le (mu2 x) (mu1 x)) ->
  (is_UniformlyContinuousFunction f1 mu1) ->
  (is_UniformlyContinuousFunction f2 mu2).
@@ -115,7 +115,7 @@ Qed.
 (** *** The metric space of uniformly continuous functions
 The space of uniformly continuous functions from a metric space *)
 Definition ucEq (f g : UniformlyContinuousFunction) :=
- forall x, ms_eq (f x) (g x).
+ forall x, st_eq (f x) (g x).
 
 Lemma uc_setoid : Setoid_Theory UniformlyContinuousFunction ucEq.
 Proof.
@@ -151,8 +151,8 @@ firstorder.
 Qed.
 
 Lemma ucBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
-            forall (x1 x2 : uc_Setoid), (st_eq _ x1 x2) -> 
-            forall (y1 y2 : uc_Setoid), (st_eq _ y1 y2) -> 
+            forall (x1 x2 : uc_Setoid), (st_eq x1 x2) -> 
+            forall (y1 y2 : uc_Setoid), (st_eq y1 y2) -> 
             (ucBall e1 x1 y1 <-> ucBall e2 x2 y2).
 Proof.
 intros.
@@ -190,7 +190,7 @@ Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 55, right associa
 
 Open Local Scope uc_scope.
 (* begin hide *)
-Add Parametric Morphism X Y f : (@ucFun X Y f) with signature (@ms_eq X) ==> (@ms_eq Y) as uc_wd.
+Add Parametric Morphism (X Y:MetricSpace) f : (@ucFun X Y f) with signature (@st_eq X) ==> (@st_eq Y) as uc_wd.
 intros x0 x1 Hx.
 apply ball_eq.
 intros e.
@@ -203,13 +203,13 @@ Qed.
 
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 
-Add Parametric Morphism X Y Z f : (@ucFun2 X Y Z f) with signature (@ms_eq X) ==> (@ms_eq Y) ==> (@ms_eq Z) as ucFun2_wd.
+Add Parametric Morphism (X Y Z:MetricSpace) f : (@ucFun2 X Y Z f) with signature (@st_eq X) ==> (@st_eq Y) ==> (@st_eq Z) as ucFun2_wd.
 Proof.
 intros x y Hxy x0 y0 Hxy0.
 unfold ucFun2.
 rewrite Hxy0.
 generalize y0.
-change (ms_eq (f x) (f y)).
+change (st_eq (f x) (f y)).
 rewrite Hxy.
 reflexivity.
 Qed.
@@ -246,7 +246,7 @@ Definition uc_compose (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) : X --> Z :=
 Build_UniformlyContinuousFunction (uc_compose_prf g f).
 
 (* begin hide *)
-Add Parametric Morphism X Y Z : (@uc_compose X Y Z) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as uc_compose_wd.
+Add Parametric Morphism X Y Z : (@uc_compose X Y Z) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as uc_compose_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 intros x.

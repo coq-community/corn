@@ -572,7 +572,7 @@ f o g is Lipschitz.  However Lipschitz functions haven't been
 formalzied yet. *)
 Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
 (* begin hide *)
-Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@ms_eq _) ==> (@ms_eq _) as ComposeContinuous_raw_wd.
+Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _) ==> (@st_eq _) as ComposeContinuous_raw_wd.
 Proof.
 intros x1 x2 Hx d1 d2.
 simpl.
@@ -582,7 +582,7 @@ induction x1 using StepF_ind.
  induction x2 using StepF_ind.
   intros Hx.
   revert d1 d2.
-  change (ms_eq (f x) (f x0)).
+  change (st_eq (f x) (f x0)).
   apply uc_wd.
   assumption.
  rapply eq_glue_ind.
@@ -641,8 +641,8 @@ revert a b e.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H e H0.
   change (st_car LinfStepQ) in s, s0, t, t0.
-  change (ms_eq s s0) in Hs.
-  change (ms_eq t t0) in Ht.
+  change (st_eq s s0) in Hs.
+  change (st_eq t t0) in Ht.
   rewrite <- Hs.
   rewrite <- Ht.
   apply H.

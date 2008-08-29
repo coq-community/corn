@@ -191,7 +191,7 @@ Definition StepFfoldProp : StepF iffSetoid -> Prop := (StepFfold (X:=iffSetoid) 
 
 Definition st_eqS0 : X -> X --> iffSetoid.
 intros x.
-exists (st_eq X x).
+exists (st_eq x).
 abstract (
 intros x1 x2 Hx;
 simpl;
@@ -242,7 +242,7 @@ Qed.
 (** The equivalence relation is reflexive *)
 Lemma StepF_eq_refl:forall x : StepF X, x === x.
 induction x using StepF_ind.
- change (st_eq X x x).
+ change (st_eq x x).
  reflexivity.
 apply glue_StepF_eq.
 simpl; rewrite SplitLGlue; assumption.
@@ -285,7 +285,7 @@ Section EquivalenceB.
 Variable X Y:Setoid.
 
 Lemma Map_resp_StepF_eq: forall f:X-->Y,
-    (forall x y, (st_eq X x y)-> (st_eq Y (f x) (f y))) ->
+    (forall x y, (st_eq x y)-> (st_eq (f x) (f y))) ->
     forall s t:(StepF X), s == t -> (f ^@> s) == (f ^@> t).
 intros f H.
 induction s using StepF_ind. induction t using StepF_ind.
@@ -631,7 +631,7 @@ rewrite <- StepFunction.SplitLMap.
 rapply SplitLAp_Qeq.
 Qed.
 (* begin hide *)
-Add Parametric Morphism s : (@constStepF s) with signature (st_eq s) ==> (@StepF_eq s) as constStepF_wd.
+Add Parametric Morphism s : (@constStepF s) with signature (@st_eq s) ==> (@StepF_eq s) as constStepF_wd.
 auto.
 Qed.
 

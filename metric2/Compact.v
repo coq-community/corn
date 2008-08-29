@@ -50,10 +50,10 @@ Variable P : X -> Prop.
 
 Definition CompleteSubset :=
  forall (f:Complete X), (forall e, P (approximate f e)) ->
- {y:X | P y & ms_eq (Cunit y) f}.
+ {y:X | P y & st_eq (Cunit y) f}.
 
 Definition ExtSubset :=
- forall x y, (ms_eq x y) -> (P x <-> P y).
+ forall x y, (st_eq x y) -> (P x <-> P y).
 
 Definition TotallyBoundedSubset :=
  forall e, {l : list X | forall y, In y l -> P y & forall x, P x -> exists y, In y l /\ ball e x y }.
@@ -305,13 +305,13 @@ Qed.
 
 End AlmostIn.
 (* begin hide *)
-Add Parametric Morphism X stableX : (@almostIn X stableX) with signature QposEq ==> (@ms_eq _) ==> (@ms_eq _) ==> iff as almostIn_wd.
+Add Parametric Morphism X stableX : (@almostIn X stableX) with signature QposEq ==> (@st_eq _) ==> (@st_eq _) ==> iff as almostIn_wd.
 Proof.
 unfold FinEnum_eq.
 assert (Y:forall x1 x2 : Qpos,
  QposEq x1 x2 ->
  forall y1 y2 : X,
- ms_eq (m:=X) y1 y2 ->forall z : FinEnum stableX,
+ st_eq y1 y2 ->forall z : FinEnum stableX,
   (almostIn x1 y1 z -> almostIn x2 y2 z)).
  intros x1 x2 Hx y1 y2 Hy.
  induction z.
@@ -334,7 +334,6 @@ cut (forall z1 x3 : FinEnum stableX,
  split.
   apply Z.
   intros x H.
-  unfold ms_eq, st_eq in Hz.
   simpl in Hz.
   unfold FinEnum_eq in Hz.
   apply -> Hz.
@@ -348,7 +347,6 @@ cut (forall z1 x3 : FinEnum stableX,
   apply Hy.
  eapply Z.
   intros a Ha.
-  unfold ms_eq, st_eq in Hz.
   simpl in Hz; unfold FinEnum_eq in Hz.
   apply <- Hz.
   apply Ha.
@@ -398,12 +396,12 @@ the approximations of the compact set. *)
 Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
  forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
-Add Parametric Morphism X stableX : (@inCompact X stableX) with signature (@ms_eq _) ==> (@ms_eq _) ==> iff as inCompact_wd.
+Add Parametric Morphism X stableX : (@inCompact X stableX) with signature (@st_eq _) ==> (@st_eq _) ==> iff as inCompact_wd.
 Proof.
 cut (forall x1 x2 : Complete X,
- ms_eq x1 x2 ->
+ st_eq x1 x2 ->
  forall x3 x4 : Complete (FinEnum stableX),
- ms_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
+ st_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
  intros Z x1 x2 Hx y1 y2 Hy.
  split.
   apply Z; assumption.
@@ -1303,7 +1301,7 @@ destruct (HP1 f') as [y Hy].
 unfold ExtSubset in HP3.
 rewrite (HP3 x y); auto.
 rewrite <- Cunit_eq.
-rewrite m.
+rewrite s.
 intros e1 e2.
 apply ball_sym.
 setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
@@ -1322,7 +1320,7 @@ apply BishopCompact_Compact_BishopCompact2.
 Qed.
 
 Lemma Compact_BishopCompact_Compact : forall s,
- ms_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
+ st_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
 Proof.
 intros s e1 e2.
 setoid_replace (e1 + e2)%Qpos with (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2)%Qpos by QposRing.
@@ -1445,7 +1443,7 @@ cut (forall e d1 d2 (a b : FinEnum stableCX),
 intros e d1 d2 a b Hab c Hc.
 simpl in Hc.
 unfold FinCompact_raw in Hc.
-assert (existsC (Complete X) (fun d => InFinEnumC d a /\ ms_eq c (approximate d d1))).
+assert (existsC (Complete X) (fun d => InFinEnumC d a /\ st_eq c (approximate d d1))).
  clear - Hc.
  induction a.
   contradiction.

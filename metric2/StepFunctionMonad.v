@@ -24,7 +24,15 @@ Require Export StepFunctionSetoid.
 Require Import OpenUnit.
 Require Import CornTac.
 
+(** ** Monad
+Here we define bind and join for the step function monad, and prove that they
+satify the monad laws.
+*)
+
 Set Implicit Arguments.
+
+(** This version of [StepF] has type [Setoid] that carries its equivalence
+relation with it. *)
 Definition StepFS (X:Setoid):Setoid.
 intro X. exists (StepF X) (@StepF_eq X).
 apply StepF_Sth.
@@ -32,6 +40,8 @@ Defined.
 
 Open Scope setoid_scope.
 Open Local Scope sfstscope.
+
+(** We redefine several functions to return a setoid type. *)
 
 Definition StFReturn (X:Setoid) : X-->(StepFS X).
 intros.
@@ -57,6 +67,14 @@ exists (fun x => (SplitRS0 o x)).
 abstract (intros; rapply SplitR_wd;auto with *).
 Defined.
 
+Definition MirrorS(X:Setoid):(StepFS X)-->(StepFS X).
+intro X.
+exists (@Mirror X).
+abstract (intros; change (Mirror x1 == Mirror x2); rewrite Mirror_eq_Mirror; assumption).
+Defined.
+
+(** Definition of bind. *)
+
 Definition StFBind00(X Y:Setoid) : 
   (StepFS X) -> (X --> (StepFS Y)) -> (StepFS Y).
 intros X Y .
@@ -69,8 +87,8 @@ exact (glue o (StFBind00 m1 (compose (SplitLS Y o) f))
 Defined.
 
 Lemma StFBind_wd1(X Y:Setoid):forall m, forall x1 x2 : X --> StepFS Y,
-st_eq (X --> StepFS Y) x1 x2 ->
-st_eq (StepFS Y) (StFBind00 m x1) (StFBind00 m x2).
+st_eq x1 x2 ->
+st_eq (StFBind00 m x1) (StFBind00 m x2).
 induction m.
  intros x1 x2 H.
  simpl; auto with *. apply H.
@@ -86,13 +104,6 @@ Definition StFBind1(X Y:Setoid) :
 intros X Y m.
 exists (fun f=> (@StFBind00 X Y m f)).
 apply StFBind_wd1.
-Defined.
-
-
-Definition MirrorS(X:Setoid):(StepFS X)-->(StepFS X).
-intro X.
-exists (@Mirror X).
-abstract (intros; change (Mirror x1 == Mirror x2); rewrite Mirror_eq_Mirror; assumption).
 Defined.
 
 Lemma MirrorBind(X Y:Setoid):forall (x:StepF X) (f:X --> (StepFS Y)), 
@@ -167,8 +178,8 @@ apply SplitR_wd;auto with *.
 Qed.
 
 Lemma StFBind_wd(X Y:Setoid): forall x1 x2 : StepFS X,
-st_eq (StepFS X) x1 x2 ->
-st_eq ((X --> StepFS Y) --> StepFS Y) (StFBind1 Y x1) (StFBind1 Y x2).
+st_eq  x1 x2 ->
+st_eq (StFBind1 Y x1) (StFBind1 Y x2).
 intros X Y.
 induction x1 using StepF_ind. intro y. 
  induction y using StepF_ind. simpl. intro H.
@@ -201,24 +212,27 @@ exists (fun m => (@StFBind1 X Y m)).
 exact (@StFBind_wd X Y).
 Defined.
 
-Add Parametric Morphism X Y : (@StFBind00 X Y) with signature (@StepF_eq X ==> (st_eq _) ==> @StepF_eq Y) as StFBind00_wd.
+Add Parametric Morphism X Y : (@StFBind00 X Y) with signature (@StepF_eq X ==> (@st_eq _) ==> @StepF_eq Y) as StFBind00_wd.
 intros x y Hxy f g Hfg.
 transitivity (StFBind00 x g).
  apply StFBind_wd1; assumption.
 rapply StFBind_wd; assumption.
 Qed.
 
+(** Join is defined in terms of bind. *)
+
 Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X):=
  (flip (@StFBind (StepFS X) X) (@id (StepFS X))).
 
 Section Monad_Laws.
+(** Here we prove the monad laws. *)
 Variable X Y:Setoid.
 
-Lemma ReturnBind(x:X)(f:X-->StepFS Y): (StFBind X Y (StFReturn X x) f)== (f x).
+Lemma ReturnBind(x:X)(f:X-->StepFS Y): (StFBind X Y (StFReturn X x) f)==(f x).
 simpl; auto with *.
 Qed.
 
-Definition Bind_compose(Z:Setoid)(f:X-->StepFS Y)(g:Y-->StepFS Z):=
+Let Bind_compose(Z:Setoid)(f:X-->StepFS Y)(g:Y-->StepFS Z):=
 (compose ((flip (StFBind Y Z)) g) f).
 
 Lemma BindBind(Z:Setoid)(m:StepF X)(f:X-->StepFS Y)(g:Y-->StepFS Z):
@@ -287,7 +301,8 @@ x >>= : (X --> S Y) --> SY     = (bind x)
 
 *)
 
-
+(** Lastly, we prove that the applicative functor is the canonical one
+ for this monad. *)
 
 Lemma ApBind(X Y:Setoid): forall (x:(StepFS X)) (f:StepFS (X-->Y)) ,
 (f<@>x==
@@ -301,7 +316,6 @@ rapply StepF_ind2.
   rewrite H.
   unfold StFBind.
   simpl.
-  match goal with [|- ?a == ?b] => change (st_eq _ a b) end.
   transitivity (StFBind00 t0 (compose1 (StFBind1 Y s) (compose2 X (StFReturn Y)))).
    rapply StFBind_wd; auto.
   apply StFBind_wd1.
@@ -320,4 +334,4 @@ simpl. apply glue_wd; try reflexivity;
 unfold SplitRS0. rewrite SplitRGlue.
 apply StFBind_wd1.
 intro y. reflexivity.
-Qed. 
+Qed.

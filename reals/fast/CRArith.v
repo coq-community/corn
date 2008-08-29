@@ -159,7 +159,7 @@ Qed.
 
 Lemma CR_Q_ring_morphism : 
  ring_morph (inject_Q 0%Q) (inject_Q 1%Q) (ucFun2 CRplus) CRmult
- (fun x y => (x + - y)) CRopp (@ms_eq CR)
+ (fun x y => (x + - y)) CRopp (@st_eq CR)
   (0%Q) (1%Q) Qplus Qmult Qminus Qopp Qeq_bool (inject_Q).
 Proof.
 split; try reflexivity.
@@ -179,9 +179,9 @@ Ltac CRcst t :=
   | _ => NotConstant
   end.
 
-Ltac CRring_pre := try unfold ms_eq; autorewrite with toCRring.
+Ltac CRring_pre := autorewrite with toCRring.
 
-Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@ms_eq CR).
+Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@st_eq CR).
 Proof.
 split.
 rapply ucFun2_wd.

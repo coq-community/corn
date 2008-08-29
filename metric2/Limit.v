@@ -134,10 +134,10 @@ Variable X : MetricSpace.
 (** This proposition says that the entire stream is within e of l *)
 Definition NearBy (l:X)(e:QposInf) := ForAll (fun (s:Stream X) => ball_ex e (hd s) l).
 
-Lemma NearBy_comp: forall l1 l2, ms_eq l1 l2 -> forall (e1 e2:Qpos), QposEq e1 e2 -> forall s, (NearBy l1 e1 s <-> NearBy l2 e2 s).
+Lemma NearBy_comp: forall l1 l2, st_eq l1 l2 -> forall (e1 e2:Qpos), QposEq e1 e2 -> forall s, (NearBy l1 e1 s <-> NearBy l2 e2 s).
 Proof.
 cut (forall l1 l2 : X,
-ms_eq (m:=X) l1 l2 ->
+st_eq l1 l2 ->
 forall e1 e2 : Qpos,
 QposEq e1 e2 -> forall s : Stream X, NearBy l1 e1 s -> NearBy l2 e2 s).
 intros.

@@ -763,7 +763,7 @@ rewrite CRasIRasCR_id.
 assumption.
 Qed.
 (* begin hide *)
-Add Morphism exp with signature (@ms_eq _) ==> (@ms_eq _) as exp_wd.
+Add Morphism exp with signature (@st_eq _) ==> (@st_eq _) as exp_wd.
 intros x y Hxy.
 unfold exp at 1.
 set (a :=  (approximate x (1 # 1)%Qpos + 1)).

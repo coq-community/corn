@@ -32,5 +32,5 @@ Definition CRmonotone := Default.monotone CRle.
 Definition CRantitone := Default.antitone CRle.
 
 Definition CRPartialOrder : PartialOrder :=
-makePartialOrder (@ms_eq CR) CRle CRmonotone CRantitone
+makePartialOrder (@st_eq CR) CRle CRmonotone CRantitone
  CRle_def CRle_refl CRle_trans (Default.monotone_def _) (Default.antitone_def _).

@@ -40,11 +40,7 @@ Open Local Scope StepQ_scope.
 Opaque Qmax Qabs.
 
 (**
-** Linf metric for Step Functions
-The Linf metric is measured by the sup of the absolute value of the
-difference between step functions.
-
-*** Sup for Step Functions.
+*** Sup for Step Functions on Q.
 *)
 Definition StepQSup : (StepQ)->Q := StepFfold (fun x => x) (fun b (x y:QS) => Qmax x y)%Q.
 
@@ -132,10 +128,12 @@ apply Qmax_le_compat;
  auto with *.
 Qed.
 
+(** The Linf metric on step function over Q. *)
 Definition LinfStepQ : MetricSpace := StepFSup Q_as_MetricSpace.
 
 Definition LinfStepQPrelengthSpace := StepFSupPrelengthSpace QPrelengthSpace.
 
+(** Sup is uniformly continuous. *)
 Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
 Proof.
 intros e x y.
@@ -176,7 +174,7 @@ Open Local Scope uc_scope.
 Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction sup_uc_prf.
 
-(** And there is an injection from Linf to L1. *)
+(** There is an injection from Linf to L1. *)
 Lemma LinfAsL1_uc_prf : is_UniformlyContinuousFunction (fun (x:LinfStepQ) => (x:L1StepQ)) Qpos2QposInf.
 Proof.
 intros e.

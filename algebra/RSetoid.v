@@ -33,7 +33,9 @@ Record Setoid: Type :=
   st_isSetoid: Setoid_Theory _ st_eq
 }.
 
-Add Parametric Relation s : (st_car s) (st_eq s)
+Implicit Arguments st_eq [s].
+
+Add Parametric Relation s : (st_car s) (@st_eq s)
  reflexivity proved by (@Equivalence_Reflexive _ _ (st_isSetoid s))
  symmetry proved by (@Equivalence_Symmetric _ _ (st_isSetoid s))
  transitivity proved by (@Equivalence_Transitive _ _ (st_isSetoid s))
@@ -50,10 +52,10 @@ Defined.
 *)
 Record Morphism (X Y:Setoid) :=
 {evalMorphism :> X -> Y
-;Morphism_prf : forall x1 x2, (st_eq X x1 x2) -> (st_eq Y (evalMorphism x1) (evalMorphism x2))
+;Morphism_prf : forall x1 x2, (st_eq x1 x2) -> (st_eq (evalMorphism x1) (evalMorphism x2))
 }.
 
-Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq Y (f x) (g x).
+Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq (f x) (g x).
 Definition extSetoid (X Y:Setoid) : Setoid.
 intros X Y.
 exists (Morphism X Y) (extEq Y).
@@ -189,4 +191,15 @@ Definition ap (X Y Z:Setoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
 := compose (compose (compose (@join _ _)) (@flip _ _ _)) (compose (@compose _ _ _)).
 (* begin hide *)
 Implicit Arguments ap [X Y Z].
+(* end hide *)
+
+Definition bind (X Y Z:Setoid) : (X--> Y) --> (Y --> X--> Z) --> (X--> Z):=
+(compose (compose (@join _ _)) (flip (@compose X Y (X-->Z)))).
+
+Definition bind_compose (X Y Z W:Setoid) : 
+ (W--> X--> Y) --> (Y --> X--> Z) --> (W--> X--> Z):=
+ (flip (compose (@compose W _ _) ((flip (@bind X Y Z))))).
+(* begin hide *)
+Implicit Arguments bind [X Y Z].
+Implicit Arguments bind_compose [X Y Z W].
 (* end hide *)
