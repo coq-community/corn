@@ -52,9 +52,9 @@ $\RR^{2}$ #IR<SUP>2</SUP># out of the metric of $\RR$ #IR#.
 Definition dprod0 (A B : CPsMetricSpace) (c d : prodT A B) : IR.
 intros A B c d.
 case c.
-intros.
+intros c0 c1.
 case d.
-intros.
+intros c2 c3.
 exact ((c0[-d]c2)[+](c1[-d]c3)).
 Defined.
 
@@ -69,7 +69,7 @@ case x1.
 case x2.
 case y1.
 case y2.
-do 8 intro. intro H.
+intros c c0 c1 c2 c3 c4 c5 c6 H.
 set
  (H1 := cs_bin_op_strext IR csg_op (c5[-d]c1) (c3[-d]c) (c6[-d]c2) (c4[-d]c0) H)
  in *.
@@ -153,7 +153,7 @@ simpl in |- *.
 unfold dprod0 in |- *.
 case x.
 case y.
-do 4 intro. intro H.
+intros c c0 c1 c2 H.
 unfold prod_ap in |- *.
 unfold prod_rect in |- *.
 set (H0 := positive_Sum_two IR (c1[-d]c) (c2[-d]c0) H) in *.
@@ -178,7 +178,7 @@ unfold dprod0 in |- *.
 case x.
 case y.
 case z.
-intros.
+intros c c0 c1 c2 c3 c4.
 astepr ((c3[-d]c1)[+]((c4[-d]c2)[+]((c1[-d]c)[+](c2[-d]c0)))).
 astepr ((c3[-d]c1)[+]((c4[-d]c2)[+](c1[-d]c)[+](c2[-d]c0))).
 astepr ((c3[-d]c1)[+]((c1[-d]c)[+](c4[-d]c2)[+](c2[-d]c0))).

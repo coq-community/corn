@@ -94,7 +94,7 @@ Proof fun w x y z => meet_le_compat Dual y z w x.
 
 End Join.
 (* begin hide *)
-Add Parametric Morphism X : (@join X) with signature (@po_eq (sl X)) ==> (@po_eq X) ==> (@po_eq X) as join_compat.
+Add Parametric Morphism X : (@join X) with signature (@st_eq (sl X)) ==> (@st_eq X) ==> (@st_eq X) as join_compat.
 Proof.
 exact (meet_compat (Dual X)).
 Qed.

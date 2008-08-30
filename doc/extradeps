@@ -2,9 +2,8 @@
 ./reals/fast/LazyNat.v ./model/structures/Zsec.v
 ./model/structures/Zsec.v ./model/Zmod/ZBasics.v
 ./model/Zmod/Cmod.v ./model/structures/Qsec.v
-./model/structures/Qsec.v ./order/PartialOrder.v
-./order/TotalOrder.v ./algebra/RSetoid.v
-./algebra/RSetoid.v ./algebra/CSetoids.v
+./model/structures/Qsec.v ./algebra/RSetoid.v
+./order/TotalOrder.v ./algebra/CSetoids.v
 ./algebra/CSetoidInc.v ./model/setoids/Nsetoid.v
 ./model/setoids/Npossetoid.v ./model/setoids/Zsetoid.v
 ./model/setoids/Zsetoid.v ./model/setoids/Qsetoid.v

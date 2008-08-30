@@ -66,7 +66,6 @@ apply CR_ap_as_Cauchy_IR_ap_1.
 apply X.
 Qed.
 
-Definition CRasCSetoid : CSetoid := Build_CSetoid
- _ _ _ CRisCSetoid.
+Definition CRasCSetoid : CSetoid := makeCSetoid CR _ CRisCSetoid.
 
 Canonical Structure CRasCSetoid.

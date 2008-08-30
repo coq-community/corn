@@ -880,7 +880,6 @@ intros H11' H11.
 clear H11'.
 unfold q.
 set (H12:= (mod_nat_correct (n1-k)(l-k) H2)).
-Set Printing Coercions.
 apply surj_not.
 rewrite (inj_plus p (l-(k+ mod_nat (n1 - k) (l - k) H2))).
 rewrite (inj_minus1 l (k+mod_nat (n1-k)(l-k)H2)).
@@ -1010,7 +1009,6 @@ intros H11 H11'.
 clear H11'.
 unfold p.
 set (H12:= (mod_nat_correct (n0-k)(l-k) H2)).
-Set Printing Coercions.
 apply surj_not.
 rewrite (inj_plus q (l-(k+ mod_nat (n0 - k) (l - k) H2))).
 rewrite (inj_minus1 l (k+mod_nat (n0-k)(l-k)H2)).
@@ -3619,7 +3617,7 @@ case (le_lt_dec l n1).
 
 (* 1 *)
 
-intros.
+intros l0 c0 l1 a b.
 apply to_C_inj1 with a0 a1.
 exact ap.
 intuition.
@@ -3635,7 +3633,7 @@ exact l1.
 
 (* 2 *)
 
-intros.
+intros l0 c0 l1 a b.
 apply to_C_inj2 with a0 a1.
 exact ap.
 intuition.
@@ -3655,7 +3653,7 @@ case (le_lt_dec l n1).
 
 (* 3 *)
 
-intros.
+intros l0 c0 l1 a b.
 cut (Z_of_nat n0 <> (Z_of_nat k + Z_of_nat (n1 - k) mod Z_of_nat (l - k))%Z).
 intuition.
 apply to_C_inj2 with a1 a0.
@@ -3674,7 +3672,7 @@ exact l0.
 
 (* 4 *)
 
-intros.
+intros l0 c0 l1 a b.
 apply inj_neq.
 unfold neq.
 apply power_inj.

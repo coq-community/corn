@@ -79,10 +79,7 @@ apply (H (mkQpos H0)).
 unfold cg_minus; simpl; ring.
 Qed.
 
-Definition QS:(Setoid) := Build_Setoid Q_Setoid.
-(* begin hide *)
-Canonical Structure QS.
-(* end hide *)
+Notation QS  := Q_is_Setoid (only parsing).
 
 Lemma Q_is_MetricSpace : is_MetricSpace QS Qball.
 Proof.

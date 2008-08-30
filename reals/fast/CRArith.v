@@ -34,8 +34,8 @@ Open Local Scope CR_scope.
 on rational numbers. *)
 Lemma CReq_Qeq : forall (x y:Q), inject_Q x == inject_Q y <-> (x == y)%Q.
 Proof.
-unfold CR, inject_Q.
-rapply Cunit_eq.
+intros x y.
+apply Cunit_eq.
 Qed.
 
 Lemma CRle_Qle : forall (x y:Q), inject_Q x <= inject_Q y <-> (x <= y)%Q.

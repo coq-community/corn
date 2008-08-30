@@ -244,7 +244,7 @@ cut (forall x y Hxy,
  apply G; try assumption.
   stepl (One:IR) by apply eq_symmetric; assumption.
   apply leEq_reflexive.
- destruct Hx1'; try assumption.
+ destruct Hx1' as [c|c]; try assumption.
  elimtype False.
  refine (eq_imp_not_ap _ _ _ _ Hxy').
  unfold cg_minus.
