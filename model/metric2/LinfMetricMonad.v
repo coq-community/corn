@@ -244,18 +244,144 @@ End SupMetric.
 Canonical Structure StepFSup.
 (* end hide *)
 
+Lemma StepFSupBallBind(X:MetricSpace): ((forall (e : Qpos) (a b : StepF (StepFS X)) ,
+forall f:(StepFS X) -->(StepFS X), 
+(forall c d, (StepFSupBall e c d) -> (StepFSupBall e (f c) (f d)))->
+StepFSupBall (X:=StepFSup X) e a b ->
+StepFSupBall (X:=X) e (StFBind00 a f) (StFBind00 b f))).
+intros X e a. unfold ball_ex.
+induction a using StepF_ind. simpl. induction b using StepF_ind.
+  intros. simpl. apply H. assumption.
+ intros f Hf H. simpl in H. unfold StepFSupBall in H. rewrite GlueAp in H. 
+ rewrite StepFfoldPropglue_rew in H. destruct H as [H H1].
+ simpl.
+ unfold StepFSupBall. rewrite GlueAp.
+ rewrite StepFfoldPropglue_rew. split.
+ pose (HH:=IHb1  (compose1 (SplitLS X o) f)). simpl in HH.
+ simpl in HH. unfold StepFSupBall in HH. unfold compose0 in HH.
+  assert (rew:(ballS X e ^@> SplitLS0 o (f x)) ==
+   (SplitL (ballS X e ^@> f x) o)). unfold SplitLS0. rewrite SplitLMap;reflexivity.
+  rewrite <-rew. clear rew. apply HH; auto with *.
+   intros. unfold SplitLS0. rewrite <- SplitLMap. rewrite <- SplitLAp.
+   apply StepFfoldPropSplitL. apply (Hf c d H0).
+ (* right *)
+ pose (HH:=IHb2  (compose1 (SplitRS X o) f)). simpl in HH.
+ unfold StepFSupBall in HH. unfold compose0 in HH.
+  assert (rew:(ballS X e ^@> SplitRS0 o (f x)) ==
+   (SplitR (ballS X e ^@> f x) o)). unfold SplitRS0. rewrite SplitRMap;reflexivity.
+  rewrite <-rew. clear rew. apply HH; auto with *.
+   intros. unfold SplitRS0. rewrite <- SplitRMap. rewrite <- SplitRAp.
+   apply StepFfoldPropSplitR. apply (Hf c d H0).
+intros b f Hf H.
+simpl. 
+unfold StepFSupBall. simpl. rewrite MapGlue. 
+rewrite ApGlue. rewrite StepFfoldPropglue_rew. split.
+ clear IHa2. pose (HH:=IHa1 (SplitL b o) (compose1 (SplitLS X o) f)). simpl in HH.
+ unfold compose0 in HH. unfold StepFSupBall in HH. 
+ rewrite SplitLBind. apply HH; clear HH.
+  intros. unfold SplitLS0. rewrite <- SplitLMap. rewrite <- SplitLAp.
+  apply StepFfoldPropSplitL. apply (Hf c d H0).
+ pose (HH:=StepFfoldPropSplitL _ o H). rewrite SplitLAp in HH. rewrite SplitLMap in HH.
+ setoid_replace a1 with (SplitL (glue o a1 a2) o ).
+ assumption. rewrite SplitLGlue;reflexivity.
+
+ clear IHa1. pose (HH:=IHa2 (SplitR b o) (compose1 (SplitRS X o) f)). simpl in HH.
+ unfold compose0 in HH. unfold StepFSupBall in HH. 
+ rewrite SplitRBind. apply HH; clear HH.
+  intros. unfold SplitRS0. rewrite <- SplitRMap. rewrite <- SplitRAp.
+  apply StepFfoldPropSplitR. apply (Hf c d H0).
+ pose (HH:=StepFfoldPropSplitR _ o H). rewrite SplitRAp in HH. rewrite SplitRMap in HH.
+ setoid_replace a2 with (SplitR (glue o a1 a2) o ).
+ assumption. rewrite SplitRGlue;reflexivity.
+Qed.
+
 Open Local Scope uc_scope.
 
+Section UniformlyContinuousFunctions.
+
+Variable X Y : MetricSpace.
+
+(** Various functions with step functions are uniformly continuous with this metric. *)
+Definition StFJoinSup :(StepFSup (StepFSup X)) --> (StepFSup X).
+simpl. rapply (@Build_UniformlyContinuousFunction
+_ _ (@StFJoin X) (fun e:Qpos=>e)).
+abstract (unfold is_UniformlyContinuousFunction; simpl; intros; apply
+StepFSupBallBind; [auto with * | assumption]).
+Defined.
+
+Definition StFReturn_uc : X --> (StepFSup X).
+simpl. exists (StFReturn X) (fun x:Qpos=> x:QposInf).
+abstract (intros e a b H ; rapply H).
+Defined.
+
+Lemma uc_stdFun(X Y:MetricSpace):
+(UniformlyContinuousFunction X Y) ->(extSetoid X Y).
+intros X0 Y0 f. exists (ucFun f). abstract (intros; apply uc_wd; assumption).
+Defined.
+
+(* Why doesn't this work?
+Coercion uc_stdFun: (UniformlyContinuousFunction X Y)>-> (extSetoid X Y).
+*)
+
+Definition Map_uc (f:X-->Y):(StepFSup X)-->(StepFSup Y).
+intros.
+exists (Map f) (mu f).
+intros e a b.
+simpl. unfold StepFSupBall.
+case_eq (mu f e).
+Focus 2. intros.
+set (bal:=(ballS Y e)).
+unfold ball_ex in H.
+cut (StepFfoldProp 
+((flip (compose (flip (compose bal (uc_stdFun f))) (uc_stdFun f))) ^@> a <@> b)).
+evalStepF. auto with *.
+apply StepFfoldPropForall_Map2. intros. simpl.
+apply uc_prf.
+rewrite H. simpl. auto.
+intros q eq. rapply StepF_imp_imp.
+unfold StepF_imp.
+set (bal:=(ballS Y e)).
+set (F:=(((flip (compose (flip (compose bal (uc_stdFun f))) (uc_stdFun f)))))).
+set (IMP:=(ap
+ (compose (@ap _ _ _) (compose (compose imp) (ballS X q)))
+ F)).
+cut (StepFfoldProp (IMP ^@> a <@> b)).
+ unfold IMP, F; evalStepF. tauto.
+apply StepFfoldPropForall_Map2.
+intros a0 b0. simpl. unfold compose0.
+intro. apply uc_prf. rewrite eq. rapply H.
+Defined.
+
+Definition glue_uc0 (o:OpenUnit): 
+ StepFSup X -> StepFSup X --> StepFSup X.
+intros o x.
+exists (fun y=>(glue o x y)) (fun x:Qpos=> x).
+abstract(
+intros e a b;  simpl; rewrite StepFSupBallGlueGlue; intuition;
+apply StepFSupBall_refl).
+Defined.
+
+Definition glue_uc (o:OpenUnit): 
+ StepFSup X --> StepFSup X --> StepFSup X.
+intros o.
+exists (fun y=>(glue_uc0 o y)) (fun x:Qpos=> x).
+abstract (intros e a b; simpl; unfold ucBall; simpl; intros; 
+rewrite StepFSupBallGlueGlue; intuition;
+apply StepFSupBall_refl).
+Defined.
+
 (** There is an injection from X to StepFSup X. *)
-Lemma constStepF_uc_prf (X:MetricSpace) : is_UniformlyContinuousFunction
+Lemma constStepF_uc_prf : is_UniformlyContinuousFunction
  (@constStepF X:X -> StepFSup X) Qpos2QposInf.
 Proof.
-intros X e x y H.
+intros e x y H.
 simpl in *.
 assumption.
 Qed.
 
-Definition constStepF_uc (X:MetricSpace) : X --> StepFSup X
-:= Build_UniformlyContinuousFunction (constStepF_uc_prf X).
+Definition constStepF_uc : X --> StepFSup X
+:= Build_UniformlyContinuousFunction (constStepF_uc_prf).
+
+End UniformlyContinuousFunctions.
 
 Implicit Arguments constStepF_uc [X].

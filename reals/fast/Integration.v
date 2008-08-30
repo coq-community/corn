@@ -572,7 +572,7 @@ continuous.  In fact, when f is lipschitz, then the map from g to
 f o g is Lipschitz.  However Lipschitz functions haven't been
 formalzied yet. *)
 
-Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := swap _ (uc_stdFun f ^@> z).
+Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := dist (uc_stdFun f ^@> z).
 (* begin hide *)
 Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _) ==> (@st_eq _) as ComposeContinuous_raw_wd.
 Proof.
@@ -604,7 +604,7 @@ rapply StepF_ind2.
  assumption.
 intros o s s0 t t0 H0 H1 e H.
 unfold ComposeContinuous_raw in *.
-repeat rewrite MapGlue, swap_glue.
+repeat rewrite MapGlue, dist_glue.
 intros d1 d2.
 apply ball_weak_le with (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos.
  autorewrite with QposElim.

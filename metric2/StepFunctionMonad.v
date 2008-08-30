@@ -224,6 +224,18 @@ Qed.
 Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X):=
  (flip (@StFBind (StepFS X) X) (@id (StepFS X))).
 
+Lemma JoinGlue(X:Setoid): forall o a b, 
+(StFJoin X (glue o a b))==(glue o (StFBind (StepFS X) _ a (SplitLS X o)) (StFBind (StepFS X) _ b (SplitRS X o))).
+intros. simpl. 
+transitivity (glue o (StFBind00 (SplitL (glue o a b) o) (compose1 (SplitLS X o) id))
+  (StFBind00 (SplitR (glue o a b) o) (compose1 (SplitRS X o) id))).
+apply glue_wd; auto with *. apply StFBind00_wd; try reflexivity. rewrite SplitLGlue. reflexivity.
+ apply StFBind00_wd; try reflexivity. rewrite SplitRGlue. reflexivity.
+ apply glue_wd; auto with *.
+ rewrite <- SplitLBind. simpl. rewrite SplitLGlue. apply StFBind_wd1. intro x. reflexivity.
+ rewrite <- SplitRBind. simpl. rewrite SplitRGlue. apply StFBind_wd1. intro x. reflexivity.
+Qed.
+
 Section Monad_Laws.
 (** Here we prove the monad laws. *)
 Variable X Y:Setoid.
