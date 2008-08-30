@@ -23,7 +23,7 @@ Require Export IntegrableFunction.
 Require Export BoundedFunction.
 Require Export CRmetric.
 Require Export CRArith.
-Require Import DistMonad.
+Require Import LinfDistMonad.
 Require Import CRIR.
 Require Import Integral.
 Require Import StepQsec.

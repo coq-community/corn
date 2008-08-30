@@ -72,7 +72,7 @@
 ./reals/fast/CRarctan.v ./reals/fast/CRartanh_slow.v
 ./reals/fast/CRtrans.v ./model/structures/OpenUnit.v
 ./model/metric2/L1metric.v ./model/metric2/LinfMetricMonad.v
-./model/metric2/IntegrableFunction.v ./metric2/DistMonad.v
-./metric2/DistMonad.v ./reals/fast/Integration.v
+./model/metric2/IntegrableFunction.v ./model/metric2/LinfDistMonad.v
+./model/metric2/LinfDistMonad.v ./reals/fast/Integration.v
 ./reals/fast/Integration.v ./reals/fast/Interval.v
 ./reals/fast/Interval.v ./raster/Raster.v
