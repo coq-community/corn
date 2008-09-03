@@ -1,0 +1,12 @@
+*.vo
+*.d
+*.glob
+tree.dot
+tree.ps
+tree.pdf
+tree.svg
+doc.ps
+doc/html/*
+coqdoc.css
+.docdepend
+.doclist
