@@ -1183,12 +1183,8 @@ Section SubCSetoids.
 Variable S : CSetoid.
 Variable P : S -> CProp.
 
-(** We use this hack to prevent the target class of the [scs_elem] coercion
-from interferring with other coercions. *)
-Definition targetClassHack1 := st_car.
-
 Record subcsetoid_crr : Type := 
- {scs_elem :> targetClassHack1 S;
+ {scs_elem :> S;
   scs_prf  :  P scs_elem}.
 
 (** Though [scs_elem] is declared as a coercion, it does not satisfy the
