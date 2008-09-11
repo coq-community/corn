@@ -257,7 +257,7 @@ Qed.
 Hint Rewrite CRpower_positive_correct' : IRtoCR.
 
 (* begin hide *)
-Add Parametric Morphism p : (@CRpower_positive p) with signature (@ms_eq _) ==> (@ms_eq _) as CRpower_positive_wd.
+Add Parametric Morphism p : (@CRpower_positive p) with signature (@st_eq _) ==> (@st_eq _) as CRpower_positive_wd.
 Proof.
 intros x1 x2 Hx.
 transitivity (CRpower_positive_bounded p (CR_b (1 # 1) x1) x2).

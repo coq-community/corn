@@ -1010,7 +1010,7 @@ Proof.
  red in H0.
  case H0.
  intro n.
- intro.
+ intro c.
  apply less_transitive_unfolded with (y := x).
  assumption.
  apply less_wdl with (x := g_ n).
@@ -1204,7 +1204,7 @@ Proof.
  intros x H0 z H1.
  case H0.
  intro n.
- intros.
+ intros c.
  apply less_wdr with (y := g_ n).
  case (le_ge_dec N n).
  intro.
@@ -1661,7 +1661,7 @@ Proof.
  red in s.
  case s.
  intro N.
- intros.
+ intros c0.
  case (Psup_unfolded2_informative (tail_seq g (k + N)) (L[-]one_div_succ k)).
  apply less_leEq_trans with (y := L).
  apply shift_minus_less.

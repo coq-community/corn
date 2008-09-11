@@ -90,7 +90,7 @@ Definition P (f g:zx):= f[=]g -> (zxfpx f)[=](zxfpx g).
 Lemma fpxeq_wd : forall f g:zx, f[=]g -> (zxfpx f)[=](zxfpx g).
 apply (cpoly_double_ind Z_as_CRing P); unfold P.
 
-induction p0.
+induction p0 as [|c p0].
 trivial.
 intro H.
 astepl ((zfp c)[+X*](zxfpx p0)).
@@ -104,7 +104,7 @@ apply IHp0.
 elim H.
 auto with *.
 
-induction p0.
+induction p0 as [|c p0].
 trivial.
 intro H.
 astepr ((zfp c)[+X*](zxfpx p0)).
@@ -158,7 +158,7 @@ Qed.
 Lemma fpx_resp_mult_cr : forall (c:Z_as_CRing)(f:zx),
   (cpoly_mult_cr_cs fp (zxfpx f) (zfp c)) [=]
   (zxfpx (cpoly_mult_cr_cs _ f c)).
-induction f.
+induction f as [|c0 f].
 intuition.
 astepr (zxfpx ((c[*]c0)[+X*](cpoly_mult_cr_cs _ f c))).
 astepr ((zfp (c[*]c0))[+X*](zxfpx (cpoly_mult_cr_cs _ f c))).
@@ -173,9 +173,9 @@ Hint Resolve fpx_resp_mult_cr : algebra.
 Lemma fpx_resp_plus :  forall f g:zx,
   (cpoly_plus_op fp (zxfpx f) (zxfpx g))[=]
   (zxfpx (cpoly_plus_op _ f g)).
-induction f.
+induction f as [|c f].
 intuition.
-induction g.
+induction g as [|c0 g].
 intuition.
 astepl (cpoly_plus fp (zxfpx (c[+X*]f)) (zxfpx (c0[+X*]g))).
 astepr (zxfpx (cpoly_plus_op _ (c[+X*]f) (c0[+X*]g))).
@@ -191,14 +191,14 @@ Hint Resolve fpx_resp_plus : algebra.
 Lemma fpx_resp_mult : forall f g:zx,
   (cpoly_mult_op fp (zxfpx f) (zxfpx g)) [=] 
   (zxfpx (cpoly_mult_op _ f g)).
-induction f.
+induction f as [|c f].
 intro g.
 astepl (cpoly_mult_op fp (cpoly_zero fp)(zxfpx g)).
 astepl (cpoly_zero fp).
 astepr (zxfpx (cpoly_zero Z_as_CRing)).
 astepr (cpoly_zero fp); intuition.
 
-induction g.
+induction g as [|c0 g].
 astepl (cpoly_mult_op fp (zxfpx (c[+X*]f)) (cpoly_zero fp)).
 astepl (cpoly_zero fp).
 astepr (zxfpx (cpoly_zero Z_as_CRing));  try algebra.

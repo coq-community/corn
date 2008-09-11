@@ -53,6 +53,7 @@ i.e.%\% a set with an equivalence relation and an apartness relation compatible 
 Require Import CornTac.
 Require Export CLogic.
 Require Export Step.
+Require Export RSetoid.
 
 Definition Relation := Trelation.
 
@@ -113,13 +114,12 @@ Record is_CSetoid (A : Type) (eq : Relation A) (ap : Crelation A) : CProp :=
    ax_ap_cotransitive : cotransitive ap;
    ax_ap_tight        : tight_apart eq ap}.
 
-Record CSetoid : Type := 
-  {cs_crr   :> Type;
-   cs_eq    :  Relation cs_crr;
+Record CSetoid : Type := makeCSetoid
+  {cs_crr   :> Setoid;
    cs_ap    :  Crelation cs_crr;
-   cs_proof :  is_CSetoid cs_crr cs_eq cs_ap}.
+   cs_proof :  is_CSetoid cs_crr (@st_eq cs_crr) cs_ap}.
 
-Implicit Arguments cs_eq [c].
+Notation cs_eq := st_eq (only parsing).
 Implicit Arguments cs_ap [c].
 
 Infix "[=]" := cs_eq (at level 70, no associativity).
@@ -151,7 +151,7 @@ Let [S] be a setoid.
 Section CSetoid_axioms.
 Variable S : CSetoid.
 
-Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (c:=S)) (cs_ap (c:=S)).
+Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (s:=S)) (cs_ap (c:=S)).
 Proof cs_proof S.
 
 Lemma ap_irreflexive : irreflexive (cs_ap (c:=S)).
@@ -166,7 +166,7 @@ Lemma ap_cotransitive : cotransitive (cs_ap (c:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
-Lemma ap_tight : tight_apart (cs_eq (c:=S)) (cs_ap (c:=S)).
+Lemma ap_tight : tight_apart (cs_eq (s:=S)) (cs_ap (c:=S)).
 elim CSetoid_is_CSetoid; auto.
 Qed.
 
@@ -182,6 +182,28 @@ End CSetoid_axioms.
 
 (* Begin_SpecReals *)
 
+Lemma is_CSetoid_Setoid : forall S eq ap, is_CSetoid S eq ap -> Setoid_Theory S eq.
+Proof.
+intros S eq ap p.
+destruct p.
+unfold tight_apart in *.
+split.
+  firstorder.
+ intros a b.
+ repeat rewrite <- ax_ap_tight0.
+ firstorder.
+intros a b c.
+repeat rewrite <- ax_ap_tight0.
+intros H H0 H1.
+destruct (ax_ap_cotransitive0 _ _ H1 b); auto.
+Qed.
+
+Definition Build_CSetoid (X:Type) (eq:Relation X) (ap:Crelation X) (p:is_CSetoid X eq ap) : CSetoid.
+intros X eq ap H.
+exists (Build_Setoid (is_CSetoid_Setoid _ _ _ H)) ap.
+assumption.
+Defined.
+
 Section CSetoid_basics.
 Variable S : CSetoid.
 
@@ -193,39 +215,19 @@ In `there exists a unique [a:S] such that %\ldots%#...#', we now mean unique wit
 
 Definition ex_unq (P : S -> CProp) := {x : S | forall y : S, P y -> x [=] y | P x}.
 
-Lemma eq_reflexive : Treflexive (cs_eq (c:=S)).
+Lemma eq_reflexive : Treflexive (cs_eq (s:=S)).
 intro x.
-generalize (ap_tight S x x); intro H.
-generalize (ap_irreflexive S x); intro H0.
-inversion_clear H; auto.
+reflexivity.
 Qed.
 
-Lemma eq_symmetric : Tsymmetric (cs_eq (c:=S)).
+Lemma eq_symmetric : Tsymmetric (cs_eq (s:=S)).
 intro x; intros y H.
-generalize (ap_tight S x y); intro H0.
-generalize (ap_tight S y x); intro H1.
-generalize (ap_symmetric S y x); intro H2.
-elim H0; clear H0; intros H3 H4.
-elim H1; clear H1; intros H0 H5.
-apply H0; intro H6.
-apply H4; auto.
+symmetry; assumption.
 Qed.
 
-Lemma eq_transitive : Ttransitive (cs_eq (c:=S)).
+Lemma eq_transitive : Ttransitive (cs_eq (s:=S)).
 intro x; intros y z H H0.
-generalize (ap_tight S x y); intro H1.
-generalize (ap_tight S y z); intro H2.
-generalize (ap_tight S x z); intro H3.
-elim H3; intros H4 H5.
-apply H4.
-intro H6.
-generalize (ap_cotransitive _ _ _ H6 y); intro H7.
-elim H1; clear H1; intros H1' H1''.
-elim H2; clear H2; intros H2' H2''.
-elim H3; clear H3; intros H3' H3''.
-elim H7; clear H7; intro H1.
-generalize H1; apply H1''; auto.
-generalize H1; apply H2''; auto.
+transitivity y; assumption.
 Qed.
 
 (**
@@ -341,7 +343,6 @@ End CSetoid_basics.
 
 (* End_SpecReals *)
 
-
 Section product_csetoid.
 (**
 ** The product of setoids *)
@@ -407,7 +408,7 @@ case x.
 case y.
 intros c c0 c1 c2 H z.
 case z.
-intros.
+intros c3 c4.
 generalize H.
 unfold prod_ap in |- *.
 unfold prodT_rect in |- *.
@@ -452,7 +453,7 @@ case x.
 case y.
 unfold prod_ap in |- *.
 unfold prod_rect in |- *.
-intros.
+intros c c0 c1 c2.
 unfold prod_eq in |- *.
 simpl in |- *.
 split.
@@ -1204,7 +1205,7 @@ Definition Crestrict_relation (R : Crelation S) : Crelation subcsetoid_crr :=
   end.
 
 Definition subcsetoid_eq : Relation subcsetoid_crr :=
-  restrict_relation (cs_eq (c:=S)).
+  restrict_relation (cs_eq (s:=S)).
 
 Definition subcsetoid_ap : Crelation subcsetoid_crr :=
   Crestrict_relation (cs_ap (c:=S)).
@@ -1416,12 +1417,12 @@ Add Parametric Relation c : (cs_crr c) (@cs_eq c)
   transitivity proved by (eq_transitive c)
   as CSetoid_eq_Setoid.
 
-Add Parametric Morphism c1 c2 c3 f: (csbf_fun c1 c2 c3 f) with signature (@cs_eq c1) ==> (@cs_eq c2) ==> (@cs_eq c3) as csbf_fun_wd.
+Add Parametric Morphism (c1 c2 c3 : CSetoid) f: (csbf_fun c1 c2 c3 f) with signature (@cs_eq c1) ==> (@cs_eq c2) ==> (@cs_eq c3) as csbf_fun_wd.
 intros x1 x2 Hx y1 y2 Hy.
 rapply csbf_wd; assumption.
 Qed.
 
-Add Parametric Morphism c1 c2 f: (@csf_fun c1 c2 f) with signature (@cs_eq c1) ==> (@cs_eq c2) as csf_fun_wd.
+Add Parametric Morphism (c1 c2 : CSetoid) f: (@csf_fun c1 c2 f) with signature (@cs_eq c1) ==> (@cs_eq c2) as csf_fun_wd.
 intros x1 x2 Hx.
 rapply csf_wd; assumption.
 Qed.

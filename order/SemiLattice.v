@@ -20,7 +20,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Set Firstorder Depth 5.
 
-Require Import Setoid.
 Require Export PartialOrder.
 
 Open Local Scope po_scope.
@@ -47,7 +46,7 @@ Record SemiLattice : Type :=
 (* begin hide *)
 Implicit Arguments meet [s].
 
-Add Parametric Morphism X : (@meet X) with signature (po_eq (po X)) ==> (po_eq (po X)) ==> (po_eq (po X))  as meet_compat.
+Add Parametric Morphism (X:SemiLattice) : (@meet X) with signature (@st_eq X) ==> (@st_eq X) ==> (@st_eq X)  as meet_compat.
 assert (forall x1 x2 : X, x1 == x2 -> forall x3 x4 : X, x3 == x4 -> meet x1 x3 <= meet x2 x4).
 intros.
 rewrite equiv_le_def in *|-.
@@ -55,7 +54,7 @@ pose (le_trans X).
 destruct (sl_proof X).
 apply sl_meet_glb0; firstorder.
 intros.
-pose (Seq_sym X _ (po_st X)).
+pose (Seq_sym X _ (po_st (po_proof X))).
 apply le_antisym; firstorder.
 Qed.
 (* end hide *)

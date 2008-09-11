@@ -33,7 +33,7 @@ Require Import Rtrigo_def.
 Require Import PowerSeries.
 Require Import ConstructiveEpsilon.
 Require Import Rlogic.
-Require Import Reals.
+Require Export Reals.
 Require Import Pi.
 Require Import MoreArcTan.
 Require Import PropDecid.

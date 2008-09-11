@@ -253,12 +253,12 @@ Ltac tot_repl_in_form S r1 r2 A :=
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
       constr:(R r1 r2)
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
-      constr:(cs_eq (c:=T) r1 r2)
+      constr:(cs_eq (s:=T) r1 r2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
@@ -359,7 +359,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d1 := constr:(tse_int_wd S T r1 r2 h e1)
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
       constr:(fun a:R s1 s2 => Ccsr_wd T R s1 s2 r1 r2 a d1 d2)
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
@@ -368,7 +368,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with r2 := constr:(tse_int S T r2 e2)
       with d1 := constr:(tse_int_wd S T r1 r2 h e1)
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
-      constr:(fun a:cs_eq (c:=T) s1 s2 => eq_wd T s1 s2 r1 r2 a d1 d2)
+      constr:(fun a:cs_eq (s:=T) s1 s2 => eq_wd T s1 s2 r1 r2 a d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
@@ -476,7 +476,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d1 := constr:(tse_int_wd S T r2 r1 h0 e1)
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
       constr:(fun b:R r1 r2 => Ccsr_wd T R r1 r2 s1 s2 b d1 d2)
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
@@ -485,7 +485,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with r2 := constr:(tse_int S T r2 e2)
       with d1 := constr:(tse_int_wd S T r2 r1 h0 e1)
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
-      constr:(fun b:cs_eq (c:=T) r1 r2 => eq_wd T r1 r2 s1 s2 b d1 d2)
+      constr:(fun b:cs_eq (s:=T) r1 r2 => eq_wd T r1 r2 s1 s2 b d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
@@ -563,7 +563,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
 Ltac total_csetoid_rewrite h :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
       let h0 := constr:(eq_symmetric S r1 r2 h) in
       match goal with
@@ -579,7 +579,7 @@ Ltac total_csetoid_rewrite h :=
 Ltac total_csetoid_rewrite_rev h :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
       let h0 := constr:(eq_symmetric S r2 r1 h) in
       match goal with
@@ -595,7 +595,7 @@ Ltac total_csetoid_rewrite_rev h :=
 Ltac total_csetoid_rewrite_cxt h h0 :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
       let h1 := constr:(eq_symmetric S r1 r2 h) with A := type of h0 in
       let B := tot_repl_in_form S r1 r2 A
@@ -608,7 +608,7 @@ Ltac total_csetoid_rewrite_cxt h h0 :=
 Ltac total_csetoid_rewrite_cxt_rev h h0 :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
       let h1 := constr:(eq_symmetric S r2 r1 h) with A := type of h0 in
       let B := tot_repl_in_form S r1 r2 A
@@ -881,7 +881,7 @@ replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 Ltac part_repl_in_form H A :=
   let type_of_H := type of H in
   match constr:type_of_H with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let r1 := constr:X2 with r2 := constr:X3 in
       match constr:A with
       | (csp_pred ?X1 ?X2 ?X3) =>
@@ -906,14 +906,14 @@ Ltac part_repl_in_form H A :=
           let s1 := constr:(replace_in_term H Ht1)
           with s2 := constr:(replace_in_term H Ht2) in
           constr:(R s1 s2)
-      | (cs_eq (c:=?X1) ?X2 ?X3) =>
+      | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
           let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
           let Ht1 := constr:(extract_correct e1)
           with Ht2 := constr:(extract_correct e2) in
           let s1 := constr:(replace_in_term H Ht1)
           with s2 := constr:(replace_in_term H Ht2) in
-          constr:(cs_eq (c:=T) s1 s2)
+          constr:(cs_eq (s:=T) s1 s2)
       | (cs_ap (c:=?X1) ?X2 ?X3) =>
           let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
@@ -1015,7 +1015,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d1 := constr:(pse_int_wd H Ht1 Hs1)
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
       constr:(fun a:R t1 t2 => Ccsr_wd T R t1 t2 s1 s2 a d1 d2)
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
@@ -1026,7 +1026,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with Hs2 := constr:(replace_in_term_proof H Ht2) in
       let d1 := constr:(pse_int_wd H Ht1 Hs1)
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
-      constr:(fun a:cs_eq (c:=T) t1 t2 => eq_wd T t1 t2 s1 s2 a d1 d2)
+      constr:(fun a:cs_eq (s:=T) t1 t2 => eq_wd T t1 t2 s1 s2 a d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
@@ -1141,7 +1141,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d1 := constr:(pse_int_wd H0 Hs1 Ht1)
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
       constr:(fun b:R s1 s2 => Ccsr_wd T R s1 s2 t1 t2 b d1 d2)
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
@@ -1152,7 +1152,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with Hs2 := constr:(replace_in_term_proof H Ht2) in
       let d1 := constr:(pse_int_wd H0 Hs1 Ht1)
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
-      constr:(fun b:cs_eq (c:=T) s1 s2 => eq_wd T s1 s2 t1 t2 b d1 d2)
+      constr:(fun b:cs_eq (s:=T) s1 s2 => eq_wd T s1 s2 t1 t2 b d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
       let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
@@ -1236,7 +1236,7 @@ Ltac Unfold_partial_csetoid_rewrite_stuff :=
 Ltac partial_csetoid_rewrite h :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
       let h0 := constr:(eq_symmetric T r1 r2 h) in
       match goal with
@@ -1252,7 +1252,7 @@ Ltac partial_csetoid_rewrite h :=
 Ltac partial_csetoid_rewrite_rev h :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
       let h0 := constr:(eq_symmetric T r2 r1 h) in
       match goal with
@@ -1268,7 +1268,7 @@ Ltac partial_csetoid_rewrite_rev h :=
 Ltac partial_csetoid_rewrite_cxt h h0 :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
       let h1 := constr:(eq_symmetric T r1 r2 h) with A := type of h0 in
       let B := part_repl_in_form h A
@@ -1282,7 +1282,7 @@ Ltac partial_csetoid_rewrite_cxt h h0 :=
 Ltac partial_csetoid_rewrite_cxt_rev h h0 :=
   let type_of_h := type of h in
   match constr:type_of_h with
-  | (cs_eq (c:=?X1) ?X2 ?X3) =>
+  | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
       let h1 := constr:(eq_symmetric T r2 r1 h) with A := type of h0 in
       let B := part_repl_in_form h A

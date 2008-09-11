@@ -32,8 +32,6 @@ Require Import Rcomplete.
 Require Import Rlimit.
 Require Import Rbasic_fun.
 Require Import Fourier.
-Require Import ConstructiveEpsilon.
-Require Import Rlogic.
 
 (** * Coq Real Numbers
 
@@ -84,14 +82,15 @@ intros H H0.
 apply H0; assumption.
 Qed.
 
-Definition RSetoid : CSetoid := Build_CSetoid R (@eq R) (fun x y => x <> y) R_is_CSetoid.
-Canonical Structure RSetoid.
+Definition RCSetoid : CSetoid := Build_CSetoid R (@eq R) (fun x y => x <> y) R_is_CSetoid.
+Canonical Structure RCSetoid.
+Canonical Structure RSetoid := cs_crr RCSetoid.
 
 (** ** Coq real numbers form a semigroup *)
 
 (** addition *)
 
-Lemma RPlus_is_setoid_bin_fun: bin_fun_strext RSetoid RSetoid RSetoid Rplus.
+Lemma RPlus_is_setoid_bin_fun: bin_fun_strext RCSetoid RCSetoid RCSetoid Rplus.
 unfold bin_fun_strext.
 intros x1 x2 y1 y2 H.
 elim (total_order_T x1 x2); intro H1.
@@ -108,9 +107,9 @@ left.
 rapply Rgt_not_eq; assumption.
 Qed.
 
-Definition RPlus_sbinfun : CSetoid_bin_op RSetoid := Build_CSetoid_bin_op RSetoid Rplus RPlus_is_setoid_bin_fun.
+Definition RPlus_sbinfun : CSetoid_bin_op RCSetoid := Build_CSetoid_bin_op RCSetoid Rplus RPlus_is_setoid_bin_fun.
 
-Lemma R_is_CSemiGroup : is_CSemiGroup RSetoid RPlus_sbinfun.
+Lemma R_is_CSemiGroup : is_CSemiGroup RCSetoid RPlus_sbinfun.
 unfold is_CSemiGroup.
 unfold associative.
 intros x y z.
@@ -118,7 +117,7 @@ apply eq_symmetric.
 rapply Rplus_assoc.
 Qed.
 
-Definition RSemiGroup : CSemiGroup := Build_CSemiGroup RSetoid RPlus_sbinfun R_is_CSemiGroup.
+Definition RSemiGroup : CSemiGroup := Build_CSemiGroup RCSetoid RPlus_sbinfun R_is_CSemiGroup.
 Canonical Structure RSemiGroup.
 
 (** ** Coq real numbers form a monoid *)
@@ -139,7 +138,7 @@ Canonical Structure RMonoid.
 
 (** negation *)
 
-Lemma RNeg_sunop : fun_strext (S1:=RSetoid) (S2:=RSetoid) Ropp.
+Lemma RNeg_sunop : fun_strext (S1:=RCSetoid) (S2:=RCSetoid) Ropp.
 unfold fun_strext.
 intros x y H H0.
 apply H.
@@ -147,7 +146,7 @@ rewrite H0.
 reflexivity.
 Qed.
 
-Definition RNeg_op : CSetoid_un_op RMonoid := Build_CSetoid_un_op RSetoid Ropp RNeg_sunop.
+Definition RNeg_op : CSetoid_un_op RMonoid := Build_CSetoid_un_op RCSetoid Ropp RNeg_sunop.
 
 Lemma R_is_Group : is_CGroup RMonoid RNeg_op.
 unfold is_CGroup.
@@ -177,7 +176,7 @@ Canonical Structure RAbGroup.
 
 (** multiplication *)
 
-Lemma RMul_is_csbinop : bin_fun_strext RSetoid RSetoid RSetoid Rmult.
+Lemma RMul_is_csbinop : bin_fun_strext RCSetoid RCSetoid RCSetoid Rmult.
 unfold bin_fun_strext.
 intros x1 x2 y1 y2 H.
 elim (total_order_T x1 x2); intro H1.
@@ -195,7 +194,7 @@ rewrite H2.
 reflexivity.
 Qed.
 
-Definition RMul_op : CSetoid_bin_op RMonoid := Build_CSetoid_bin_op RSetoid Rmult RMul_is_csbinop.
+Definition RMul_op : CSetoid_bin_op RMonoid := Build_CSetoid_bin_op RCSetoid Rmult RMul_is_csbinop.
 
 Lemma RMul_assoc : associative (S:=RAbGroup) RMul_op.
 unfold associative.
@@ -400,48 +399,34 @@ simpl.
 destruct (R_complete s ((cauchy_prop_cauchy_crit (Build_CauchySeq ROrdField s hs) s hs))).
 unfold Rseries.Un_cv in u.
 simpl in *.
-cut (@sig nat
-  (fun N : nat =>
-   forall m : nat, le N m -> @AbsSmall ROrdField e (@cg_minus RGroup (s m) x))).
-intros [N HN].
+destruct (hs (e/4)) as [N HN].
+ simpl.
+ fourier.
 exists N.
-assumption.
-apply constructive_indefinite_description_nat.
-intros x0.
-apply forall_dec.
-intro n.
-destruct (le_gt_dec x0 n).
-unfold AbsSmall.
-simpl.
-destruct (Rle_dec (- e) (s n[-]x)).
-destruct (Rle_dec (s n[-]x) e).
-left; intro.
-split; assumption.
-
-right; intro.
-destruct (H l).
-apply n0.
-apply H1.
-right; intro.
-destruct (H l).
-apply n0.
-apply H0.
-left.
-intro.
-elimtype False.
-omega.
-
-destruct (u e e0).
-exists x0.
 intros m Hm.
-unfold AbsSmall.
-assert (x0H := Rabs_def2 _ _ (H m Hm)).
-unfold Rfunctions.R_dist in x0H.
-clear - x0H e0.
-destruct x0H.
-simpl; split.
-apply Rlt_le; assumption.
-apply Rlt_le; assumption.
+destruct (u (e/2)).
+ fourier.
+set (z:=max x0 m).
+rstepr (((s m[-]s N)[+](s N[-]s z))[+](s z[-]x)).
+ apply AbsSmall_eps_div_two.
+  apply AbsSmall_eps_div_two.
+  stepl (e/4).
+   apply HN; auto.
+  change (e / 4 = e * / (0 + 1 + 1) * / (0 + 1 + 1)).
+  field.
+ apply AbsSmall_minus.
+ stepl (e/4).
+  unfold z.
+  apply HN; eauto with *.
+ change (e / 4 = e * / (0 + 1 + 1) * / (0 + 1 + 1)).
+ field.
+ assert (Hz:(z >= x0)%nat).
+  unfold z; eauto with *.
+ destruct (Rabs_def2 _ _ (H _ Hz)) as [A0 A1].
+ stepl (e/2).
+  split; unfold cg_minus; simpl; auto with *.
+ change (e / 2 = e * / (0 + 1 + 1)).
+ field.
 
 intro x.
 exists (Zabs_nat (up x)).

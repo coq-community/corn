@@ -57,7 +57,7 @@ end.
 
 Ltac rational := 
 match goal with
-[|-@cs_eq ?T ?x ?y] => 
+[|-@cs_eq (cs_crr ?T) ?x ?y] => 
  match GetStructureName T with 
  |(cfield ?F) => rationalF F x y
  |(cring ?R) => rationalR R x y

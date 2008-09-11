@@ -2,9 +2,8 @@
 ./reals/fast/LazyNat.v ./model/structures/Zsec.v
 ./model/structures/Zsec.v ./model/Zmod/ZBasics.v
 ./model/Zmod/Cmod.v ./model/structures/Qsec.v
-./model/structures/Qsec.v ./order/PartialOrder.v
-./order/TotalOrder.v ./algebra/RSetoid.v
-./algebra/RSetoid.v ./algebra/CSetoids.v
+./model/structures/Qsec.v ./algebra/RSetoid.v
+./order/TotalOrder.v ./algebra/CSetoids.v
 ./algebra/CSetoidInc.v ./model/setoids/Nsetoid.v
 ./model/setoids/Npossetoid.v ./model/setoids/Zsetoid.v
 ./model/setoids/Zsetoid.v ./model/setoids/Qsetoid.v
@@ -72,5 +71,8 @@
 ./reals/fast/CRcos.v ./reals/fast/CRarctan_small.v
 ./reals/fast/CRarctan.v ./reals/fast/CRartanh_slow.v
 ./reals/fast/CRtrans.v ./model/structures/OpenUnit.v
+./model/metric2/L1metric.v ./model/metric2/LinfMetricMonad.v
+./model/metric2/IntegrableFunction.v ./model/metric2/LinfDistMonad.v
+./model/metric2/LinfDistMonad.v ./reals/fast/Integration.v
 ./reals/fast/Integration.v ./reals/fast/Interval.v
 ./reals/fast/Interval.v ./raster/Raster.v

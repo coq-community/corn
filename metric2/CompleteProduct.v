@@ -138,7 +138,7 @@ Definition Couple : (ProductMS (Complete X) (Complete Y)) --> (Complete (Product
 Build_UniformlyContinuousFunction Couple_uc.
 
 Lemma CoupleCorrect1 : forall p,
-ms_eq (Couple ((Cfst p), (Csnd p))) p.
+st_eq (Couple ((Cfst p), (Csnd p))) p.
 Proof.
 intros p e1 e2.
 destruct (regFun_prf p e1 e2).
@@ -146,14 +146,14 @@ split; simpl; auto.
 Qed.
 
 Lemma CoupleCorrect2 : forall p q,
-ms_eq (Cfst (Couple (p,q))) p.
+st_eq (Cfst (Couple (p,q))) p.
 Proof.
 intros p q e1 e2.
 apply (regFun_prf p e1 e2).
 Qed.
 
 Lemma CoupleCorrect3 : forall p q,
-ms_eq (Csnd (Couple (p,q))) q.
+st_eq (Csnd (Couple (p,q))) q.
 Proof.
 intros p q e1 e2.
 apply (regFun_prf q e1 e2).

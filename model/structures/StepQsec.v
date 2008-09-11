@@ -1,8 +1,10 @@
+Require Import Qmetric.
 Require Export QArith.
 Require Export StepFunctionSetoid.
 Require Import Qabs.
 Require Import Bool.
 Require Import CornTac.
+Require Import RSetoid.
 
 Set Implicit Arguments.
 
@@ -10,11 +12,6 @@ Open Local Scope setoid_scope.
 Open Local Scope sfstscope.
 
 Section QS.
-
-Lemma QS:(Setoid).
-exists Q Qeq.
-split; unfold reflexive, transitive, symmetric; eauto with qarith.
-Defined.
 
 Definition QabsS : QS-->QS.
 exists Qabs.

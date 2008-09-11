@@ -336,7 +336,7 @@ Definition Cmap : (Complete X) --> (Complete Y) :=
 Build_UniformlyContinuousFunction Cmap_prf.
 
 (** [Cmap] is equivalent to the original [Cmap_slow] *)
-Lemma Cmap_correct : ms_eq Cmap (Cmap_slow f).
+Lemma Cmap_correct : st_eq Cmap (Cmap_slow f).
 Proof.
 intros x e1 e2.
 simpl.
@@ -351,7 +351,7 @@ autorewrite with QposElim.
 Qauto_le.
 Qed.
 
-Lemma Cmap_fun_correct : forall x, ms_eq (Cmap_fun x) (Cmap_slow_fun f x).
+Lemma Cmap_fun_correct : forall x, st_eq (Cmap_fun x) (Cmap_slow_fun f x).
 Proof.
 apply Cmap_correct.
 Qed.
@@ -363,7 +363,7 @@ Open Local Scope uc_scope.
 (** Similarly we define a new Cbind *)
 Definition Cbind X Y plX (f:X-->Complete Y) := uc_compose Cjoin (Cmap plX f).
 
-Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), ms_eq (Cbind plX f) (Cbind_slow f).
+Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), st_eq (Cbind plX f) (Cbind_slow f).
 Proof.
 unfold Cbind, Cbind_slow.
 intros X Y plX f.
@@ -371,7 +371,7 @@ rewrite (Cmap_correct).
 reflexivity.
 Qed.
 
-Lemma Cbind_fun_correct : forall X Y plX (f:X-->Complete Y) x, ms_eq (Cbind plX f x) (Cbind_slow f x).
+Lemma Cbind_fun_correct : forall X Y plX (f:X-->Complete Y) x, st_eq (Cbind plX f x) (Cbind_slow f x).
 Proof.
 apply Cbind_correct.
 Qed.
@@ -389,7 +389,7 @@ Qed.
 Definition Cmap_strong X Y plX : (X --> Y) --> (Complete X --> Complete Y) :=
 Build_UniformlyContinuousFunction (@Cmap_strong_prf X Y plX).
 
-Lemma Cmap_strong_correct : forall X Y plX, ms_eq (@Cmap_strong X Y plX) (@Cmap_strong_slow X Y).
+Lemma Cmap_strong_correct : forall X Y plX, st_eq (@Cmap_strong X Y plX) (@Cmap_strong_slow X Y).
 Proof.
 intros X Y plX.
 rapply Cmap_correct.
@@ -424,7 +424,7 @@ Qed.
 Definition Cap_fun X Y plX (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
 Build_RegularFunction (Cap_fun_prf plX f x).
 
-Lemma Cap_fun_correct : forall X Y plX (f:Complete (X --> Y)) x, ms_eq (Cap_fun plX f x) (Cap_slow_fun f x).
+Lemma Cap_fun_correct : forall X Y plX (f:Complete (X --> Y)) x, st_eq (Cap_fun plX f x) (Cap_slow_fun f x).
 Proof.
 intros X Y plX f x e1 e2.
 simpl.
@@ -457,7 +457,7 @@ Qed.
 Definition Cap_weak X Y plX (f:Complete (X --> Y)) : Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction (Cap_weak_prf plX f).
 
-Lemma Cap_weak_correct : forall X Y plX (f:Complete (X --> Y)), ms_eq (Cap_weak plX f) (Cap_weak_slow f).
+Lemma Cap_weak_correct : forall X Y plX (f:Complete (X --> Y)), st_eq (Cap_weak plX f) (Cap_weak_slow f).
 Proof.
 rapply Cap_fun_correct.
 Qed.
@@ -473,31 +473,31 @@ Qed.
 Definition Cap X Y plX : Complete (X --> Y) --> Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction (Cap_prf plX).
 
-Lemma Cap_correct : forall X Y plX, ms_eq (Cap Y plX) (Cap_slow X Y).
+Lemma Cap_correct : forall X Y plX, st_eq (Cap Y plX) (Cap_slow X Y).
 Proof.
 rapply Cap_fun_correct.
 Qed.
 
 (* begin hide *)
-Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cmap_wd.
+Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cmap_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
-change (ms_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
+change (st_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
 rewrite Cmap_fun_correct.
 set (a:=(Cmap_slow_fun x1 y1)).
 rewrite Cmap_fun_correct.
 rapply Cmap_slow_wd; auto.
 Qed.
 
-Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@ms_eq _) ==> (@ms_eq _) as Cap_weak_wd.
+Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_wd.
 intros x1 x2 Hx.
 rapply (@uc_wd _ _ (Cap Y H)).
 assumption.
 Qed.
 
-Add Parametric Morphism X Y H : (@Cap_fun X Y H) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cap_wd.
+Add Parametric Morphism X Y H : (@Cap_fun X Y H) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cap_wd.
 intros x1 x2 Hx y1 y2 Hy.
-change (ms_eq (Cap_fun H x1 y1) (Cap_fun H x2 y2)).
+change (st_eq (Cap_fun H x1 y1) (Cap_fun H x2 y2)).
 transitivity (Cap_fun H x1 y2).
 apply (@uc_wd _ _ (Cap_weak H x1) _ _ Hy).
 generalize y2.

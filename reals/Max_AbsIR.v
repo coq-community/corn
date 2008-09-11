@@ -426,7 +426,7 @@ generalize Z.
 clear H H0 Z.
 change (Not (Max (c[*]a) (c[*]b)[<]c[*]Max a b)).
 rewrite <- leEq_def.
-destruct X.
+destruct X as [c0|c0].
 assert (X:c[#]Zero).
 apply ap_symmetric; apply less_imp_ap; assumption.
 apply shift_mult_leEq' with X.

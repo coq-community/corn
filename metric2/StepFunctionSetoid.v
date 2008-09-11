@@ -191,7 +191,7 @@ Definition StepFfoldProp : StepF iffSetoid -> Prop := (StepFfold (X:=iffSetoid) 
 
 Definition st_eqS0 : X -> X --> iffSetoid.
 intros x.
-exists (st_eq X x).
+exists (st_eq x).
 abstract (
 intros x1 x2 Hx;
 simpl;
@@ -242,7 +242,7 @@ Qed.
 (** The equivalence relation is reflexive *)
 Lemma StepF_eq_refl:forall x : StepF X, x === x.
 induction x using StepF_ind.
- change (st_eq X x x).
+ change (st_eq x x).
  reflexivity.
 apply glue_StepF_eq.
 simpl; rewrite SplitLGlue; assumption.
@@ -285,7 +285,7 @@ Section EquivalenceB.
 Variable X Y:Setoid.
 
 Lemma Map_resp_StepF_eq: forall f:X-->Y,
-    (forall x y, (st_eq X x y)-> (st_eq Y (f x) (f y))) ->
+    (forall x y, (st_eq x y)-> (st_eq (f x) (f y))) ->
     forall s t:(StepF X), s == t -> (f ^@> s) == (f ^@> t).
 intros f H.
 induction s using StepF_ind. induction t using StepF_ind.
@@ -339,6 +339,24 @@ change ((StepFfoldProp x1 /\ StepFfoldProp x2) <-> StepFfoldProp y).
 rewrite (IHx1 (SplitL y o)); auto with *.
 rewrite (IHx2 (SplitR y o)); auto with *.
 rapply StepFfoldPropglue.
+Qed.
+
+Lemma StepFfoldPropSplitR
+     : forall (s : StepF iffSetoid) (a : OpenUnit),
+       StepFfoldProp s -> StepFfoldProp (SplitR s a).
+Proof.
+intros s a H.
+rewrite <- (StepFfoldPropglue s a) in H.
+destruct H; auto.
+Qed.
+
+Lemma StepFfoldPropSplitL
+     : forall (s : StepF iffSetoid) (a : OpenUnit),
+       StepFfoldProp s -> StepFfoldProp (SplitL s a).
+Proof.
+intros s a H.
+rewrite <- (StepFfoldPropglue s a) in H.
+destruct H; auto.
 Qed.
 
 Section EquivalenceC.
@@ -404,21 +422,6 @@ apply glue_StepF_eq.
 apply StepF_eq_resp_Qeq with (Mirror s1) (Mirror (SplitL t o)); auto.
  rapply MirrorSplitL_Qeq; apply Qeq_refl.
 rewrite IHs1.
-assumption.
-Qed.
-
-Lemma StepFfoldPropSplitL : 
- forall (s : StepF iffSetoid) a, StepFfoldProp s -> StepFfoldProp (SplitL s a).
-Proof.
-induction s; intros a H.
- assumption.
-destruct H.
-rapply SplitL_glue_ind; intros Hao.
-  apply IHs1; assumption.
- split.
-  assumption.
- apply IHs2.
- assumption.
 assumption.
 Qed.
 
@@ -628,7 +631,7 @@ rewrite <- StepFunction.SplitLMap.
 rapply SplitLAp_Qeq.
 Qed.
 (* begin hide *)
-Add Parametric Morphism s : (@constStepF s) with signature (st_eq s) ==> (@StepF_eq s) as constStepF_wd.
+Add Parametric Morphism s : (@constStepF s) with signature (@st_eq s) ==> (@StepF_eq s) as constStepF_wd.
 auto.
 Qed.
 

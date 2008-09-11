@@ -1714,8 +1714,8 @@ in cpoly_cring_old *)
 
 Lemma cpoly_mult_fast_ap_equiv : forall p1 p2 q1 q2, 
 (cpoly_mult_fast_cs p1 q1)[#](cpoly_mult_cs p2 q2) -> p1[#]p2 or q1[#]q2.
-destruct q1;
-destruct q2;
+destruct q1 as [|c q1];
+destruct q2 as [|c0 q2];
 intros X;
 simpl in X.
 rewrite cpoly_ap_p_zero in X.

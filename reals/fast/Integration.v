@@ -23,6 +23,7 @@ Require Export IntegrableFunction.
 Require Export BoundedFunction.
 Require Export CRmetric.
 Require Export CRArith.
+Require Import LinfDistMonad.
 Require Import CRIR.
 Require Import Integral.
 Require Import StepQsec.
@@ -336,22 +337,24 @@ Qed.
 
 (** This is the "transitivity" of the [SupDistanceToLinear] function. *)
 Lemma SupDistanceToLinear_trans :
- forall x y a b (H:a < b), LinfBall (SupDistanceToLinear x H + SupDistanceToLinear y H) x y.
+ forall x y a b (H:a < b), StepFSupBall (SupDistanceToLinear x H + SupDistanceToLinear y H) x y.
 Proof.
-unfold LinfBall.
-intros x y a b H.
-autorewrite with QposElim.
-revert x y a b H.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H a b Hab.
-  replace RHS with  (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Q.
-   rewrite  <- Hs, <- Ht.
+  rewrite  <- Hs, <- Ht at 2.
+  setoid_replace (SupDistanceToLinear s0 Hab + SupDistanceToLinear t0 Hab)%Qpos
+   with (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Qpos.
    apply H.
+  unfold QposEq.
+  autorewrite with QposElim.
   rsapply Qplus_wd;
    apply SupDistanceToLinear_wd2; auto.
- unfold LinfDistance, LinfNorm, StepQSup, SupDistanceToLinear.
- simpl.
  intros x x0 a b H.
+ unfold StepFSupBall, StepFfoldProp.
+ simpl.
+ rewrite Qball_Qabs.
+ unfold SupDistanceToLinear.
+ simpl.
  autorewrite with QposElim.
  apply Qabs_case; intros  H0.
   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q by ring.
@@ -371,19 +374,25 @@ rapply StepF_ind2.
  replace RHS with (b + -a)%Q by ring.
  assumption.
 intros o s s0 t t0 H0 H1 a b H.
-do 2 rewrite SupDistanceToLinear_glue.
-unfold LinfDistance, StepQminus.
-rewriteStepF.
-rewrite Qmax_plus_distr_r.
-change (LinfNorm
-  (glue o (SplitL (constStepF (X:=QS --> QS --> QS) QminusS) o <@> s <@> t)
-      (SplitR (constStepF (X:=QS --> QS --> QS) QminusS) o <@> s0 <@> t0)))
- with (Qmax (LinfDistance s t) (LinfDistance s0 t0)).
-rapply Qle_trans.
- apply Qmax_le_compat;[apply (H0 _ _ (affineCombo_gt (OpenUnitDual o) H))|apply (H1 _ _ (affineCombo_lt (OpenUnitDual o) H))].
-apply Qmax_le_compat;
- rsapply plus_resp_leEq;
- auto with *.
+assert (X:forall (o : OpenUnit) (l r : StepQ) (a b : Q) (H : a < b),
+    QposEq (SupDistanceToLinear (glue o l r) H)
+     (Qpos_max (SupDistanceToLinear l (affineCombo_gt (OpenUnitDual o) H))
+       (SupDistanceToLinear r (affineCombo_lt (OpenUnitDual o) H)))%Q).
+ intros.
+ unfold QposEq.
+ autorewrite with QposElim.
+ reflexivity.
+do 2 rewrite X.
+rewrite StepFSupBallGlueGlue.
+split.
+ rapply ball_weak_le;[|simpl; apply H0].
+ autorewrite with QposElim.
+ apply Qplus_le_compat;
+  apply Qpos_max_ub_l.
+rapply ball_weak_le;[|simpl; apply H1].
+autorewrite with QposElim.
+apply Qplus_le_compat;
+ apply Qpos_max_ub_r.
 Qed.
 
 (** The [stepSample p] is as close to the virtual identity function as
@@ -521,32 +530,21 @@ Build_RegularFunction id01_prf.
 
 End id01.
 
-(* This probably should be moved somewhere else, but where? *)
-Definition CRSetoid : Setoid.
-exists CR (@ms_eq CR).
-destruct (@msp CR).
-destruct msp_Xsetoid.
-split; assumption.
-Defined.
-
 (**
 ** StepFunctions distribute over Completion
 The distribution function maps StepF (Complete X) to Complete (StepF X).
 *)
 (* approximate z e is not a morphism, so we revert to using the pre-setoid version of StepF's map *)
-Definition distribComplete_raw (x:StepF CRSetoid) (e:QposInf) : LinfStepQ :=
+Definition distribComplete_raw (x:StepF CR) (e:QposInf) : LinfStepQ :=
 StepFunction.Map (fun z => approximate z e) x.
 
-Lemma distribComplete_prf : forall (x:StepF CRSetoid), is_RegularFunction (distribComplete_raw x).
+Lemma distribComplete_prf : forall (x:StepF CR), is_RegularFunction (distribComplete_raw x).
 Proof.
 unfold distribComplete_raw.
 intros x a b.
 induction x using StepF_ind.
- change (Qabs (approximate x a - approximate x b) <= (a + b)%Qpos)%Q.
- rewrite <- Qball_Qabs.
  rapply regFun_prf.
 simpl (ball (m:=LinfStepQ)).
-unfold LinfBall.
 set (f:=(fun z : RegularFunction Q_as_MetricSpace => approximate z a)) in *.
 set (g:=(fun z : RegularFunction Q_as_MetricSpace => approximate z b)) in *.
 change (Map f (glue o x1 x2))
@@ -554,11 +552,11 @@ change (Map f (glue o x1 x2))
 change (Map g (glue o x1 x2))
  with (glue o (Map g x1:StepQ) (Map g
  x2)).
-rewrite LinfDistance_glue.
-apply Qmax_lub; auto.
+rewrite StepFSupBallGlueGlue.
+auto.
 Qed.
 
-Definition distribComplete (x:StepF CRSetoid) : BoundedFunction :=
+Definition distribComplete (x:StepF CR) : BoundedFunction :=
 Build_RegularFunction (distribComplete_prf x).
 
 Open Local Scope uc_scope.
@@ -573,82 +571,14 @@ However, I have not found a counter example where f o g is not uniformly
 continuous.  In fact, when f is lipschitz, then the map from g to
 f o g is Lipschitz.  However Lipschitz functions haven't been
 formalzied yet. *)
-Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := distribComplete (StepFunction.Map f z).
+
+Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := dist (uc_stdFun f ^@> z).
 (* begin hide *)
-Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@ms_eq _) ==> (@ms_eq _) as ComposeContinuous_raw_wd.
+Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _) ==> (@st_eq _) as ComposeContinuous_raw_wd.
 Proof.
-intros x1 x2 Hx d1 d2.
-simpl.
-unfold distribComplete_raw.
-revert x1 x2 Hx.
-unfold LinfBall.
-induction x1 using StepF_ind.
- induction x2 using StepF_ind.
-  change (x == x0 -> Qabs (approximate (f x) d1 - approximate (f x0) d2) <= (d1 + d2)%Qpos)%Q.
-  intros Hx.
-  rewrite <- Qball_Qabs.
-  revert d1 d2.
-  change (ms_eq (f x) (f x0)).
-  apply uc_wd.
-  assumption.
- rapply eq_glue_ind.
- intros Hl Hr.
- set (A:= (constStepF (approximate (f x) d1:QS))).
- set (B:= (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-         (Map f x2_1):StepQ)).
- set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-         (Map f x2_2):StepQ)).
- change (Qmax (LinfDistance A B) (LinfDistance A C) <= (d1 + d2)%Qpos)%Q.
- apply Qmax_lub; auto.
-intros x2.
-rapply glue_eq_ind.
-intros Hl Hr.
- replace LHS with (LinfDistance
-   (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-      (Map f (glue o x1_1 x1_2)))
-   (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-      (Map f (glue o (SplitL x2 o) (SplitR x2 o))))).
- set (B:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-         (Map f x1_1):StepQ)).
- set (C:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-         (Map f x1_2):StepQ)).
- set (A0:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-         (Map f (SplitL x2 o)):StepQ)).
- set (A1:=(Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-         (Map f (SplitR x2 o)):StepQ)).
- change (LinfDistance (glue o B C) (glue o A0 A1) <= (d1 + d2)%Qpos)%Q.
- rewrite LinfDistance_glue.
- apply Qmax_lub.
-  rapply IHx1_1; auto with *.
- rapply IHx1_2; auto with *.
-apply LinfDistance_wd.
- change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-  (Map f (glue o x1_1 x1_2)):StepQ) ==
-  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d1)
-   (Map f (glue o x1_1 x1_2)):StepQ)).
- reflexivity.
-simpl.
-change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2) (Map f x2):StepQ) ==
-StepFunction.glue o
-  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-     (Map f (SplitL x2 o)))
-  (Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-     (Map f (SplitR x2 o)))).
-symmetry.
-rapply glue_StepF_eq.
- unfold SplitL.
- do 2 rewrite StepFunction.SplitLMap.
- change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitL x2 o)):StepQ) ==
-Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitL x2 o))).
- reflexivity.
-unfold SplitR.
-do 2 rewrite StepFunction.SplitRMap.
-change ((Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitR x2 o)):StepQ) ==
-Map (fun z : RegularFunction Q_as_MetricSpace => approximate z d2)
-  (Map f (StepFunction.SplitR x2 o))).
+intros x1 x2 Hx.
+unfold ComposeContinuous_raw.
+rewrite Hx.
 reflexivity.
 Qed.
 (* end hide *)
@@ -659,42 +589,36 @@ intros f e a b.
 revert a b e.
 rapply StepF_ind2.
   intros s s0 t t0 Hs Ht H e H0.
-  change (ms LinfStepQ) in s, s0, t, t0.
-  change (ms_eq s s0) in Hs.
-  change (ms_eq t t0) in Ht.
-  rewrite <- Hs.
-  rewrite <- Ht.
+  change (st_car LinfStepQ) in s, s0, t, t0.
+  rewrite <- Hs, <- Ht.
   apply H.
   destruct (mu f e); try constructor.
   change (ball q s t).
   rewrite Hs, Ht.
   assumption.
- intros x y e H d1 d2.
- change ((Qabs (approximate (f x) d1 - approximate (f y) d2) <= (d1 + e + d2)%Qpos)%Q).
- rewrite <- Qball_Qabs.
- revert d1 d2.
+ intros x y e H.
  change (ball e (f x) (f y)).
  rapply uc_prf.
  destruct (mu f e); try solve [constructor].
  simpl.
- rewrite Qball_Qabs.
  assumption.
+intros o s s0 t t0 H0 H1 e H.
+unfold ComposeContinuous_raw in *.
+repeat rewrite MapGlue, dist_glue.
+intros d1 d2.
+apply ball_weak_le with (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos.
+ autorewrite with QposElim.
+ Qauto_le.
 simpl.
-unfold regFunBall.
+unfold Cap_slow_raw.
 simpl.
-unfold LinfBall, distribComplete_raw.
-simpl.
-intros o s s0 t t0 H0 H1 e H d1 d2.
-change (@StepFunction.glue Q o) with (@glue QS o).
-rewrite LinfDistance_glue.
-apply Qmax_lub;
- (apply H0 || apply H1);
+rewrite StepFSupBallGlueGlue.
+split;
+ [apply H0 | apply H1];
  destruct (mu f e); try constructor;
- simpl;
- unfold LinfBall;
- (eapply Qle_trans;[|apply H]);
- rewrite LinfDistance_glue;
- auto with *.
+ simpl in *;
+ rewrite StepFSupBallGlueGlue in H;
+ tauto.
 Qed.
 
 Definition ComposeContinuous (f:Q_as_MetricSpace --> CR) : LinfStepQ --> BoundedFunction :=

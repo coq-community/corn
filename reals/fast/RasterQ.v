@@ -40,12 +40,12 @@ Qed.
 (** For [Q2], classical membership in a finite enumeration is the
 same as a constructive membership. *)
 Lemma InStrengthen : forall x (l:FinEnum stableQ2),
-InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ ms_eq x y.
+InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ st_eq x y.
 Proof.
 induction l.
  contradiction.
 intros H.
-assert (L:ms_eq x a \/ ~ms_eq x a).
+assert (L:st_eq x a \/ ~st_eq x a).
  destruct (Qeq_dec (fst x) (fst a)).
   destruct (Qeq_dec (snd x) (snd a)).
    left.
@@ -219,11 +219,11 @@ Qed.
 
 End InterpRasterCorrect.
 (* begin hide *)
-Add Parametric Morphism n m bm : (@InterpRaster n m bm) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as InterpRaster_wd.
+Add Parametric Morphism n m bm : (@InterpRaster n m bm) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as InterpRaster_wd.
 cut (forall (x1 x2 : Q2),
- prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
+ prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 ->
  forall x3 x4 : Q2,
- prod_ms_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
+ prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
   (InterpRaster bm x1 x3) ->
  InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y
@@ -242,7 +242,7 @@ rewrite Hb2 in Ha1.
 unfold snd, fst in Ha1.
 destruct x2 as [x2l x2r].
 destruct y2 as [y2l y2r].
-assert (L0:ms_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
+assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
            (x2r + (y2r - x2r) * (2 * bx + 1 # 1) / (2 * m # 1)))).
  transitivity ((x1l + (y1l - x1l) * (2 * by + 1 # 1) / (2 * n # 1)),
            (x1r + (y1r - x1r) * (2 * bx + 1 # 1) / (2 * m # 1))).
@@ -251,7 +251,6 @@ assert (L0:ms_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
  destruct Hx as [Hx1 Hx2].
  destruct Hy as [Hy1 Hy2].
  split;
-  simpl (ms_eq (m:=Q_as_MetricSpace)) in *;
   unfold fst,snd in *.
   rewrite Hx1, Hy1.
   reflexivity.

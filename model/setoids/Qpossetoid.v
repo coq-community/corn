@@ -71,6 +71,7 @@ Definition ap_Qpos_is_apartness := Build_is_CSetoid _ _ _
 
 Definition Qpos_as_CSetoid := Build_CSetoid _ _ _ ap_Qpos_is_apartness.
 Canonical Structure Qpos_as_CSetoid.
+Canonical Structure Qpos_as_Setoid := (cs_crr Qpos_as_CSetoid).
 
 Lemma Qpos_plus_strext :  bin_fun_strext Qpos_as_CSetoid Qpos_as_CSetoid Qpos_as_CSetoid Qpos_plus.
 red in |- *.

@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Export Metric.
-Require Import Setoid.
 Require Import Classification.
 Require Import UniformContinuity.
 Require Import Prelength.
@@ -27,25 +26,31 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
-Section ProductMetric.
 (**
 ** Product Metric
 The product of two metric spaces forms a metric space *)
+Section ProductSetoid.
 
-Variable X Y : MetricSpace.
+Variable X Y : Setoid.
 
-Definition prod_ms_eq (a b:X*Y) :=
-ms_eq (fst a) (fst b) /\ ms_eq (snd a) (snd b).
+Definition prod_st_eq (a b:X*Y) :=
+st_eq (fst a) (fst b) /\ st_eq (snd a) (snd b).
 
-Lemma prodST : Setoid_Theory _ prod_ms_eq.
+Lemma prodST : Setoid_Theory _ prod_st_eq.
 Proof.
-split; unfold prod_ms_eq.
+split; unfold prod_st_eq.
   intros; split; reflexivity.
  intros x y [H1 H2]; split; symmetry; assumption.
 intros x y z [H1 H2] [H3 H4]; split.
  transitivity (fst y); assumption.
 transitivity (snd y); assumption.
 Qed.
+
+Definition prodS : Setoid := Build_Setoid prodST.
+End ProductSetoid.
+
+Section ProductMetric.
+Variable X Y : MetricSpace.
 
 Definition prod_ball e (a b:X*Y) :=
 ball e (fst a) (fst b) /\ ball e (snd a) (snd b).
@@ -75,17 +80,16 @@ unfold prod_ball in *.
 split; apply ball_closed; firstorder.
 Qed.
 
-Lemma prod_ball_eq : forall a b, (forall e, prod_ball e a b) -> prod_ms_eq a b.
+Lemma prod_ball_eq : forall a b, (forall e, prod_ball e a b) -> prod_st_eq _ _ a b.
 Proof.
 intros a b H.
 unfold prod_ball in *.
 split; apply ball_eq; firstorder.
 Qed.
 
-Lemma prod_is_MetricSpace : is_MetricSpace prod_ms_eq prod_ball.
+Lemma prod_is_MetricSpace : is_MetricSpace (prodS X Y) prod_ball.
 Proof.
 split.
-     apply prodST.
     rapply prod_ball_refl.
    rapply prod_ball_sym.
   rapply prod_ball_triangle.
@@ -94,7 +98,7 @@ rapply prod_ball_eq.
 Qed.
 
 Definition ProductMS : MetricSpace.
-exists (X*Y)%type prod_ms_eq prod_ball.
+exists (prodS X Y) prod_ball.
  abstract (
  intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1];
  unfold prod_ball;
@@ -194,7 +198,7 @@ End ProductMetric.
 (* begin hide *)
 Implicit Arguments PairMS [X Y].
 
-Add Parametric Morphism X Y : (@PairMS X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as PairMS_wd.
+Add Parametric Morphism X Y : (@PairMS X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as PairMS_wd.
 Proof.
 intros.
 split; assumption.

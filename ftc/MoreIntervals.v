@@ -200,7 +200,7 @@ Definition compact_ (I : interval) : CProp :=
 
 Definition left_end (I : interval) : finite I -> IR.
 intro.
-elim I; intros; rename X into H.
+destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
 inversion H.
 inversion H.
 inversion H.
@@ -214,7 +214,7 @@ Defined.
 
 Definition right_end (I : interval) : finite I -> IR.
 intro.
-elim I; intros; rename X into H.
+destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
 inversion H.
 inversion H.
 inversion H.
@@ -243,7 +243,7 @@ Qed.
 
 Lemma nonvoid_point : forall I : interval, nonvoid I -> {x : IR | I x}.
 intro.
-elim I; simpl in |- *; intros; try rename X into H.
+destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try rename X into H.
 exists ZeroR; auto.
 exists (c[+]One); apply less_plusOne.
 exists (c[-]One); apply shift_minus_less; apply less_plusOne.
@@ -569,7 +569,7 @@ Qed.
 (* end hide *)
 
 Definition compact_in_interval I (pI : proper I) x (Hx : I x) : interval.
-intros; elim I; intros.
+intros; destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
 apply (clcr x (x[+]One)).
 apply (clcr x (x[+]One)).
 apply (clcr (x[-]One) x).
@@ -710,7 +710,7 @@ Definition compact_in_interval2 I (pI : proper I) x y : I x -> I y -> interval.
 intros.
 set (z1 := Min x y) in *.
 set (z2 := Max x y) in *.
-elim I; intros.
+destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
 apply (clcr z1 (z2[+]One)).
 apply (clcr z1 (z2[+]One)).
 apply (clcr (z1[-]One) z2).
@@ -916,7 +916,7 @@ Qed.
 Lemma compact_in_interval_x_lft : forall I pI x y Hx Hy H H',
  Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=] 
    Lend (I:=compact_in_interval I pI x Hx) H'.
-intro I; elim I; simpl in |- *; intros; try apply minus_resp_leEq;
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
  try apply Min_leEq_lft; try apply leEq_reflexive;
  (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (x[-]c) [/]TwoNZ);
    apply plus_resp_leEq_lft; apply div_resp_leEq;
@@ -926,7 +926,7 @@ Qed.
 Lemma compact_in_interval_y_lft : forall I pI x y Hx Hy H H',
  Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=] 
    Lend (I:=compact_in_interval I pI y Hy) H'.
-intro I; elim I; simpl in |- *; intros; try apply minus_resp_leEq;
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
  try apply Min_leEq_rht; try apply leEq_reflexive;
  (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (y[-]c) [/]TwoNZ);
    apply plus_resp_leEq_lft; apply div_resp_leEq;
@@ -936,7 +936,7 @@ Qed.
 Lemma compact_in_interval_x_rht : forall I pI x y Hx Hy H H',
  Rend (I:=compact_in_interval I pI x Hx) H [<=] 
    Rend (I:=compact_in_interval2 I pI x y Hx Hy) H'.
-intro I; elim I; simpl in |- *; intros; try apply plus_resp_leEq;
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
  try apply lft_leEq_Max; try apply leEq_reflexive;
  (rstepl (c0[-] (c0[-]x) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
    unfold cg_minus in |- *; apply plus_resp_leEq_lft; 
@@ -948,7 +948,7 @@ Qed.
 Lemma compact_in_interval_y_rht : forall I pI x y Hx Hy H H',
  Rend (I:=compact_in_interval I pI y Hy) H [<=] 
    Rend (I:=compact_in_interval2 I pI x y Hx Hy) H'.
-intro I; elim I; simpl in |- *; intros; try apply plus_resp_leEq;
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
  try apply rht_leEq_Max; try apply leEq_reflexive;
  (rstepl (c0[-] (c0[-]y) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
    unfold cg_minus in |- *; apply plus_resp_leEq_lft; 
@@ -965,8 +965,7 @@ Compact intervals are exactly compact intervals(!).
 
 Lemma interval_compact_inc : forall I (cI : compact_ I) H,
  included I (compact (Lend cI) (Rend cI) H).
-intro.
-elim I; intros; try inversion cI.
+intros [| c| c| c| c| c c0| c c0| c c0| c c0];intros; try inversion cI.
 generalize c c0 cI H; clear H cI c0 c.
 simpl in |- *; intros a b Hab Hab'.
 intros x H.
@@ -976,8 +975,7 @@ Qed.
 
 Lemma compact_interval_inc : forall I (cI : compact_ I) H,
  included (compact (Lend cI) (Rend cI) H) I.
-intro.
-elim I; intros; try inversion cI.
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI H; clear H cI c0 c.
 simpl in |- *; intros a b Hab.
 intros H x H0.
@@ -1067,7 +1065,7 @@ cut (included I (compact (Lend cI) (Rend cI) H)).
 cut (included (compact (Lend cI) (Rend cI) H) I).
 2: apply compact_interval_inc; auto.
 generalize cI H H0; clear H0 H cI.
-elim I; intros; try inversion cI.
+destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI H H0 X X0; clear X0 X H0 H cI c0 c.
 simpl in |- *; intros a b Hab Hab' contF inc1 inc2.
 split.
@@ -1079,8 +1077,7 @@ Qed.
 Lemma Int_Continuous :
  forall (I : interval) (cI : compact_ I) H (F : PartIR),
  Continuous I F -> Continuous_I (a:=Lend cI) (b:=Rend cI) H F.
-intro.
-elim I; intros; try inversion cI.
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI H F X; clear X F H cI c0 c.
 simpl in |- *; intros a b Hab Hab' F contF.
 inversion_clear contF.
@@ -1096,7 +1093,7 @@ cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
 cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
 2: apply compact_interval_inc; auto.
 generalize cI pI H; clear H cI pI.
-elim I; intros; try inversion cI.
+destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI pI H X X0 F F' X1; clear X1 F' F X0 X H pI cI c0 c.
 simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F F' derF.
 split.
@@ -1110,8 +1107,7 @@ Qed.
 Lemma Int_Derivative :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F F' : PartIR),
  Derivative I pI F F' -> Derivative_I (a:=Lend cI) (b:=Rend cI) H F F'.
-intro.
-elim I; intros; try inversion cI.
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI pI H F F' X; clear X F' F H pI cI c0 c.
 simpl in |- *; intros a b Hab Hnonv Hab' F F' derF.
 elim derF; intros H H0.
@@ -1128,7 +1124,7 @@ cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
 cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
 2: apply compact_interval_inc; auto.
 generalize cI pI H; clear H pI cI.
-elim I; intros; try inversion cI.
+destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI pI H X X0 F X1; clear X1 F X0 X H pI cI c0 c.
 simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F diffF.
 red in |- *; simpl in |- *.
@@ -1141,8 +1137,7 @@ Qed.
 Lemma Int_Diffble :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F : PartIR),
  Diffble I pI F -> Diffble_I (a:=Lend cI) (b:=Rend cI) H F.
-intro.
-elim I; intros; try inversion cI.
+intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
 generalize c c0 cI pI H F X; clear X F H pI cI c0 c.
 simpl in |- *; intros a b Hab Hnonv Hab' F diffF.
 inversion_clear diffF.

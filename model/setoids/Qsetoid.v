@@ -67,6 +67,7 @@ Definition ap_Q_is_apartness := Build_is_CSetoid Q Qeq Qap
 
 Definition Q_as_CSetoid := Build_CSetoid _ _ _ ap_Q_is_apartness.
 Canonical Structure Q_as_CSetoid.
+Canonical Structure Q_is_Setoid := (cs_crr Q_as_CSetoid).
 
 (**
 *** Addition

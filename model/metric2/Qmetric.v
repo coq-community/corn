@@ -79,10 +79,11 @@ apply (H (mkQpos H0)).
 unfold cg_minus; simpl; ring.
 Qed.
 
-Lemma Q_is_MetricSpace : is_MetricSpace Qeq Qball.
+Notation QS  := Q_is_Setoid (only parsing).
+
+Lemma Q_is_MetricSpace : is_MetricSpace QS Qball.
 Proof.
 split.
-exact Q_Setoid.
 intros e x.
 unfold Qball.
 apply AbsSmall_wdr with 0.
@@ -136,11 +137,11 @@ tauto.
 Qed.
 (* end hide *)
 Definition Q_as_MetricSpace : MetricSpace :=
-Build_MetricSpace Qball_wd Q_is_MetricSpace.
+@Build_MetricSpace QS _ Qball_wd Q_is_MetricSpace.
 (* begin hide *)
 Canonical Structure Q_as_MetricSpace.
 (* end hide *)
-Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:Q), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
+Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:QS), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
 intros e d1 d2 He a b c Hab Hc.
 simpl.
 unfold Qball.

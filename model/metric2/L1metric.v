@@ -433,13 +433,16 @@ ring_simplify.
 assumption.
 Qed.
 
+Definition L1S : Setoid := Build_Setoid (StepF_Sth QS).
+(* begin hide *)
+Canonical Structure L1S.
+(* end hide *)
 (**
 *** Example of a Metric Space <StepQ, L1Ball>
 *)
 Lemma L1_is_MetricSpace : 
- (is_MetricSpace (@StepF_eq QS) L1Ball).
+ (is_MetricSpace L1S L1Ball).
 split.
-     apply (StepF_Sth QS).
     rapply L1ball_refl.
    rapply L1ball_sym.
   rapply L1ball_triangle.
@@ -458,7 +461,7 @@ reflexivity.
 Qed.
 (* end hide *)
 Definition L1StepQ : MetricSpace :=
-Build_MetricSpace L1Ball_wd L1_is_MetricSpace.
+@Build_MetricSpace L1S _ L1Ball_wd L1_is_MetricSpace.
 (* begin hide *)
 Canonical Structure L1StepQ.
 (* end hide *)

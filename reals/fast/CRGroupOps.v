@@ -36,7 +36,7 @@ Open Local Scope uc_scope.
 ** Addition
 Lifting addition over [Q] by one parameter yields a rational translation
 function. *)
-Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (a[+]b):Q) Qpos2QposInf.
+Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (a[+]b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.
@@ -54,7 +54,7 @@ Lemma translate_ident : forall x:CR, (translate 0 x==x)%CR.
 Proof.
 intros x.
 unfold translate.
-assert (H:ms_eq (Qtranslate_uc 0) (uc_id _)).
+assert (H:st_eq (Qtranslate_uc 0) (uc_id _)).
 intros a.
 simpl.
 ring.
@@ -137,7 +137,7 @@ apply to subtraction.
 *)
 Notation "x - y" := (x + (- y))%CR : CR_scope.
 (* begin hide *)
-Add Morphism CRopp with signature (@ms_eq _) ==> (@ms_eq _) as CRopp_wd.
+Add Morphism CRopp with signature (@st_eq _) ==> (@st_eq _) as CRopp_wd.
 Proof.
 rapply uc_wd.
 Qed.
@@ -147,7 +147,7 @@ Qed.
 First a predicate for nonnegative numbers is defined. *)
 Definition CRnonNeg (x:CR) := forall e:Qpos, (-e) <= (approximate x e).
 (* begin hide *)
-Add Morphism CRnonNeg with signature (@ms_eq _) ==> iff as CRnonNeg_wd.
+Add Morphism CRnonNeg with signature (@st_eq _) ==> iff as CRnonNeg_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
 intros x y Hxy Hx e.
@@ -191,7 +191,7 @@ Qed.
 (** And similarly for nonpositive. *)
 Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= e.
 (* begin hide *)
-Add Morphism CRnonPos with signature (@ms_eq _) ==> iff as CRnonPos_wd.
+Add Morphism CRnonPos with signature (@st_eq _) ==> iff as CRnonPos_wd.
 assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
 regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
 intros x y Hxy Hx e.
@@ -237,7 +237,7 @@ Definition CRle (x y:CR) := (CRnonNeg (y - x))%CR.
 
 Infix "<=" := CRle : CR_scope.
 (* begin hide *)
-Add Morphism CRle with signature (@ms_eq _) ==> (@ms_eq _) ==> iff as CRle_wd.
+Add Morphism CRle with signature (@st_eq _) ==> (@st_eq _) ==> iff as CRle_wd.
 intros x1 x2 Hx y1 y2 Hy.
 change (x1==x2)%CR in Hx.
 change (y1==y2)%CR in Hy.
@@ -302,7 +302,7 @@ Qed.
 [QboundBelow] ensures that a real number is at least some fixed
 rational number.  It is the lifting of the first parameter of [Qmax].
 *)
-Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmax a b):Q) Qpos2QposInf.
+Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.
@@ -452,7 +452,7 @@ Qed.
 [QboundAbove] ensures that a real number is at most some fixed
 rational number.  It is the lifting of the first parameter of [Qmin].
 *)
-Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:Q => (Qmin a b):Q) Qpos2QposInf.
+Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
 Proof.
 intros a e b0 b1 H.
 simpl in *.

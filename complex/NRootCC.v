@@ -653,7 +653,6 @@ unfold Im_poly in |- *.
   apply eq_transitive_unfolded with (Im (Zero:CC));
    apply eq_reflexive_unfolded.
 (* astepl (cpoly_linear ? (Im s) (Im_poly c))!r. *)
-   rename c into s; rename c0 into c.
   apply eq_transitive_unfolded with (cpoly_linear _ (Im s) (Im_poly c)) ! r.
   apply eq_reflexive_unfolded.
 (* astepl (Im s) [+]r[*] ((Im_poly c)!r). *)
@@ -700,12 +699,10 @@ unfold Im_poly in |- *.
   apply eq_reflexive_unfolded.
 elim n; intros.
 (* Step_final (Im s). *)
-  rename c into s; rename c0 into c.
   apply eq_transitive_unfolded with (Im s).
   apply eq_reflexive_unfolded.
   apply eq_reflexive_unfolded.
 (* astepl (nth_coeff ? n0 (Im_poly c)). *)
-  rename c into s; rename c0 into c.
   apply eq_transitive_unfolded with (nth_coeff n0 (Im_poly c)).
   apply eq_reflexive_unfolded.
 (* Step_final (Im (nth_coeff CC n0 c)). *)

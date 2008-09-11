@@ -519,7 +519,7 @@ rapply CR_b_lowerBound.
 rapply CR_b_upperBound.
 Qed.
 (* begin hide *)
-Add Morphism CRmult with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as CRmult_wd.
+Add Morphism CRmult with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as CRmult_wd.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 unfold CRmult.
@@ -627,7 +627,7 @@ Implicit Arguments Qinv_pos_uc_prf [].
 Definition Qinv_pos_uc (c:Qpos) : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction (Qinv_pos_uc_prf c).
 
-Lemma Qinv_pos_uc_wd : forall (c1 c2:Qpos), (c1 <= c2) -> forall x, (c2 <= x) -> ms_eq (Qinv_pos_uc c1 x) (Qinv_pos_uc c2 x).
+Lemma Qinv_pos_uc_wd : forall (c1 c2:Qpos), (c1 <= c2) -> forall x, (c2 <= x) -> st_eq (Qinv_pos_uc c1 x) (Qinv_pos_uc c2 x).
 Proof.
 intros c1 c2 Hc x Hx.
 simpl.

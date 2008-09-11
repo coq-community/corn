@@ -20,7 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Set Firstorder Depth 5.
 
-Require Import Setoid.
+Require Export RSetoid.
 
 Set Implicit Arguments.
 
@@ -45,24 +45,22 @@ Record is_PartialOrder
 
 (* This ought to decend from RSetoid *)
 Record PartialOrder : Type :=
-{ po_car :> Type
-; po_eq : po_car -> po_car -> Prop
+{ po_car :> Setoid
 ; le : po_car -> po_car -> Prop
 ; monotone : (po_car -> po_car) -> Prop
 ; antitone : (po_car -> po_car) -> Prop
-; po_proof : is_PartialOrder po_eq le monotone antitone
+; po_proof : is_PartialOrder (@st_eq po_car) le monotone antitone
 }.
 
-Notation "x == y" := (po_eq _ x y) (at level 70, no associativity) : po_scope.
+Notation "x == y" := (st_eq x y) (at level 70, no associativity) : po_scope.
 Notation "x <= y" := (le _ x y) : po_scope.
 
 Open Local Scope po_scope.
 
-Lemma po_st : forall X:PartialOrder, Setoid_Theory X (po_eq X).
+Lemma po_st : forall X eq le mnt ant, @is_PartialOrder X eq le mnt ant -> Setoid_Theory X eq.
 Proof.
-destruct X.
-simpl.
-destruct po_proof0.
+intros X eq le0 mnt ant H.
+destruct H.
 split.
 firstorder.
 firstorder.
@@ -70,10 +68,9 @@ intros x y z.
 repeat rewrite po_equiv_le_def0 in *.
 firstorder.
 Qed.
-(* begin hide *)
-Add Parametric Setoid p : (po_car p) (po_eq p) (po_st p) as po_setoid.
 
-Add Parametric Morphism p : (le p) with signature (po_eq p) ==> (po_eq p) ==> iff as le_compat.
+(* begin hide *)
+Add Parametric Morphism (p:PartialOrder) : (le p) with signature (@st_eq p) ==> (@st_eq p) ==> iff as le_compat.
 assert (forall x1 x2 : p, x1 == x2 -> forall x3 x4 : p, x3 == x4 -> (x1 <= x3 -> x2 <= x4)).
 intros.
 rewrite (po_equiv_le_def (po_proof p)) in *|-.
@@ -93,8 +90,8 @@ Section PartialOrder.
 Variable X : PartialOrder.
 
 Definition makePartialOrder car eq le monotone antitone p1 p2 p3 p4 p5 :=
-@Build_PartialOrder car eq le monotone antitone
-(@Build_is_PartialOrder car eq le monotone antitone p1 p2 p3 p4 p5).
+let p := (@Build_is_PartialOrder car eq le monotone antitone p1 p2 p3 p4 p5) in
+ @Build_PartialOrder (Build_Setoid (po_st p)) le monotone antitone p.
 
 (** The axioms and basic properties of a partial order *)
 Lemma equiv_le_def : forall x y:X, x == y <-> (x <= y /\ y <= x).
@@ -128,7 +125,7 @@ The dual of a partial order is made by fliping the order relation.
 *)
 Definition Dual : PartialOrder.
 eapply makePartialOrder with
- (eq := @po_eq X)
+ (eq := @st_eq X)
  (le:= (fun x y => le X y x))
  (monotone := @monotone X)
  (antitone := @antitone X).

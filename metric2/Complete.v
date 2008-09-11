@@ -96,7 +96,7 @@ rapply Qpos_min_lb_r.
 apply regFun_prf.
 Qed.
 
-Lemma regFun_setoid : Setoid_Theory RegularFunction regFunEq.
+Lemma regFun_is_setoid : Setoid_Theory RegularFunction regFunEq.
 Proof.
 split.
 unfold Reflexive.
@@ -116,16 +116,14 @@ apply H.
 apply H0.
 Qed.
 
-(*
-Add Setoid RegularFunction regFunEq regFun_setoid as regFun_Setoid.
-*)
+Definition regFun_Setoid := Build_Setoid regFun_is_setoid.
 
 Definition regFunBall e (f g : RegularFunction) :=
 forall d1 d2, ball (m:=X) (d1+e+d2)%Qpos (approximate f d1) (approximate g d2).
 
 Lemma regFunBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
-            forall x1 x2, (regFunEq x1 x2) -> 
-            forall y1 y2, (regFunEq y1 y2) -> 
+            forall (x1 x2 : regFun_Setoid), (st_eq x1 x2) -> 
+            forall (y1 y2 : regFun_Setoid), (st_eq y1 y2) -> 
             (regFunBall e1 x1 y1 <-> regFunBall e2 x2 y2).
 Proof.
 assert (forall x1 x2 : Qpos,
@@ -154,24 +152,23 @@ apply H0.
 apply H1.
 apply H2.
 auto.
-destruct (regFun_setoid).
+destruct (regFun_is_setoid).
 intros; eapply H.
 unfold QposEq. symmetry.
 apply H0.
 apply Seq_sym.
-apply regFun_setoid.
+apply regFun_is_setoid.
 apply H1.
 apply Seq_sym.
-apply regFun_setoid.
+apply regFun_is_setoid.
 apply H2.
 auto.
 Qed.
 
-Lemma regFun_is_MetricSpace : is_MetricSpace regFunEq regFunBall.
+Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid regFunBall.
 Proof.
 unfold regFunBall.
 split.
-apply regFun_setoid.
 intros e f d1 d2.
 setoid_replace (d1 + e + d2)%Qpos with (d1+d2+e)%Qpos by QposRing.
 apply ball_weak.
@@ -268,7 +265,7 @@ rapply Cunit_prf.
 assumption.
 Qed.
 
-Lemma Cunit_eq : forall a b, ms_eq (Cunit a) (Cunit b) <-> ms_eq a b.
+Lemma Cunit_eq : forall a b, st_eq (Cunit a) (Cunit b) <-> st_eq a b.
 Proof.
 intros a b.
 do 2 rewrite <- ball_eq_iff.
@@ -326,7 +323,7 @@ Implicit Arguments is_RegularFunction [X].
 
 Implicit Arguments Cunit [X].
 
-Add Parametric Morphism X : (@Cunit_fun X) with signature (@ms_eq _) ==> (@ms_eq _) as Cunit_wd.
+Add Parametric Morphism X : (@Cunit_fun X) with signature (@st_eq _) ==> (@st_eq _) as Cunit_wd.
 exact (@uc_wd _ _ Cunit).
 Qed.
 (* end hide *)
@@ -358,7 +355,7 @@ Qed.
 
 Definition faster : Complete X := Build_RegularFunction fasterIsRegular.
 
-Lemma fasterIsEq : ms_eq faster x.
+Lemma fasterIsEq : st_eq faster x.
 Proof.
 rapply regFunEq_e.
 intros e.
@@ -381,7 +378,7 @@ Qed.
 
 Definition QreduceApprox := faster QposRed QreduceApprox_prf.
 
-Lemma QreduceApprox_Eq : ms_eq QreduceApprox x.
+Lemma QreduceApprox_Eq : st_eq QreduceApprox x.
 Proof (fasterIsEq _ _).
 (** In particular, halving the error of the approximation is a common
 case. *)
@@ -398,7 +395,7 @@ Qed.
 
 Definition doubleSpeed := faster (Qpos_mult (1#2)) doubleSpeed_prf. 
 
-Lemma doubleSpeed_Eq : ms_eq doubleSpeed x.
+Lemma doubleSpeed_Eq : st_eq doubleSpeed x.
 Proof (fasterIsEq _ _).
 
 End Faster.
@@ -602,7 +599,7 @@ Section Monad_Laws.
 
 Variable X Y Z : MetricSpace.
 
-Notation "a =m b" := (ms_eq a b)  (at level 70, no associativity).
+Notation "a =m b" := (st_eq a b)  (at level 70, no associativity).
 
 Lemma MonadLaw1 : forall a, Cmap_slow_fun (uc_id X) a =m a.
 Proof.
@@ -759,23 +756,23 @@ Qed.
 End Monad_Laws.
 
 (** The monad laws are sometimes expressed in terms of bind and unit. *)
-Lemma BindLaw1 : forall X Y (f:X--> Complete Y) a, (ms_eq (Cbind_slow f (Cunit_fun _ a)) (f a)).
+Lemma BindLaw1 : forall X Y (f:X--> Complete Y) a, (st_eq (Cbind_slow f (Cunit_fun _ a)) (f a)).
 Proof.
 intros X Y f a.
-change (ms_eq (Cjoin (Cmap_slow_fun f (Cunit_fun X a))) (f a)).
+change (st_eq (Cjoin (Cmap_slow_fun f (Cunit_fun X a))) (f a)).
 rewrite (MonadLaw3 f a).
 rapply MonadLaw5.
 Qed.
 
-Lemma BindLaw2 : forall X a, (ms_eq (Cbind_slow (Cunit:X --> Complete X) a) a).
+Lemma BindLaw2 : forall X a, (st_eq (Cbind_slow (Cunit:X --> Complete X) a) a).
 Proof.
 rapply MonadLaw6.
 Qed.
 
-Lemma BindLaw3 : forall X Y Z (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (ms_eq (Cbind_slow g (Cbind_slow f a)) (Cbind_slow (uc_compose (Cbind_slow g) f) a)).
+Lemma BindLaw3 : forall X Y Z (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (st_eq (Cbind_slow g (Cbind_slow f a)) (Cbind_slow (uc_compose (Cbind_slow g) f) a)).
 Proof.
 intros X Y Z a f g.
-change (ms_eq (Cjoin (Cmap_slow_fun g (Cjoin_fun (Cmap_slow f a))))
+change (st_eq (Cjoin (Cmap_slow_fun g (Cjoin_fun (Cmap_slow f a))))
   (Cjoin (Cmap_slow_fun (uc_compose (Cbind_slow g) f) a))).
 rewrite (MonadLaw2 (Cbind_slow g) f).
 unfold Cbind_slow.
@@ -914,7 +911,7 @@ Qed.
 Definition Cap_slow : Complete (X --> Y) --> Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction Cap_slow_prf.
 
-Lemma StrongMonadLaw1 : forall a b, ms_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
+Lemma StrongMonadLaw1 : forall a b, st_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
 Proof.
 intros f x.
 rapply regFunEq_e.
@@ -933,7 +930,7 @@ End Strong_Monad.
 (* begin hide *)
 Opaque Complete.
 
-Add Parametric Morphism X Y : (@Cmap_slow_fun X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cmap_slow_wd.
+Add Parametric Morphism X Y : (@Cmap_slow_fun X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cmap_slow_wd.
 intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cmap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
@@ -942,13 +939,13 @@ rapply (@uc_wd _ _ (Cmap_strong_slow X Y)).
 assumption.
 Qed.
 
-Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@ms_eq _) ==> (@ms_eq _) as Cap_weak_slow_wd.
+Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_slow_wd.
 intros x1 x2 Hx.
 rapply (@uc_wd _ _ (Cap_slow X Y)).
 assumption.
 Qed.
 
-Add Parametric Morphism X Y : (@Cap_slow_fun X Y) with signature (@ms_eq _) ==> (@ms_eq _) ==> (@ms_eq _) as Cap_slow_wd.
+Add Parametric Morphism X Y : (@Cap_slow_fun X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cap_slow_wd.
 intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cap_weak_slow x1) _ _ Hy).

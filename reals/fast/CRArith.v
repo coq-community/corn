@@ -34,8 +34,8 @@ Open Local Scope CR_scope.
 on rational numbers. *)
 Lemma CReq_Qeq : forall (x y:Q), inject_Q x == inject_Q y <-> (x == y)%Q.
 Proof.
-unfold CR, inject_Q.
-rapply Cunit_eq.
+intros x y.
+apply Cunit_eq.
 Qed.
 
 Lemma CRle_Qle : forall (x y:Q), inject_Q x <= inject_Q y <-> (x <= y)%Q.
@@ -142,8 +142,8 @@ Hint Rewrite <- CRinv_Qinv : toCRring.
 CR forms a ring for the ring tactic.
 *)
 Lemma CR_ring_theory : 
- @ring_theory (ms CR) (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
- (fun (x y:CR) => (x + - y)) CRopp (@ms_eq CR).
+ @ring_theory CR (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
+ (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
 Proof.
 split.
 rapply cm_lft_unit_unfolded.
@@ -159,7 +159,7 @@ Qed.
 
 Lemma CR_Q_ring_morphism : 
  ring_morph (inject_Q 0%Q) (inject_Q 1%Q) (ucFun2 CRplus) CRmult
- (fun x y => (x + - y)) CRopp (@ms_eq CR)
+ (fun x y => (x + - y)) CRopp (@st_eq CR)
   (0%Q) (1%Q) Qplus Qmult Qminus Qopp Qeq_bool (inject_Q).
 Proof.
 split; try reflexivity.
@@ -181,7 +181,7 @@ Ltac CRcst t :=
 
 Ltac CRring_pre := autorewrite with toCRring.
 
-Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@ms_eq CR).
+Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@st_eq CR).
 Proof.
 split.
 rapply ucFun2_wd.
@@ -189,7 +189,7 @@ rapply CRmult_wd.
 rapply uc_wd.
 Qed.
 
-Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@msp_Xsetoid _ _ _ (@msp CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
+Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@st_isSetoid (@msp_is_setoid CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
 
 (** Relationship between strict and nonstrict positivity *)
 Lemma CRpos_nonNeg : forall x, CRpos x -> CRnonNeg x.

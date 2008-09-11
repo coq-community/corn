@@ -143,7 +143,7 @@ eapply almostIn_triangle_r with (approximate s d2).
   assumption.
  rapply orWeaken.
  right.
- apply IHm.
+ apply IHs0.
  assumption.
 eapply ball_weak_le;[|apply regFun_prf].
 unfold d2.
@@ -155,7 +155,7 @@ Qauto_le.
 Qed.
 
 Lemma CompactGraph_correct3 : forall plX plFEX p s, inCompact p (CompactGraph plFEX s) ->
-ms_eq (Cmap plX f (Cfst p)) (Csnd p).
+st_eq (Cmap plX f (Cfst p)) (Csnd p).
 Proof.
 intros plX plFEX p s H.
 apply ball_eq.
@@ -245,7 +245,7 @@ Qed.
 Lemma CompactGraph_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s, 
  inCompact (Couple (p,q1)) (CompactGraph plFEX s) ->
  inCompact (Couple (p,q2)) (CompactGraph plFEX s) ->
- ms_eq q1 q2.
+ st_eq q1 q2.
 Proof.
 intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cmap plX f p).
@@ -260,7 +260,7 @@ Qed.
 
 Lemma CompactGraph_correct : forall plX plFEX x y s, 
 inCompact (Couple (x,y)) (CompactGraph plFEX s) <->
-(inCompact x s /\ ms_eq y (Cmap plX f x)).
+(inCompact x s /\ st_eq y (Cmap plX f x)).
 Proof.
 intros plX plFEX x y s.
 split; intros H.
@@ -416,7 +416,7 @@ eapply almostIn_triangle_r with (approximate s d2).
   assumption.
  rapply orWeaken.
  right.
- apply IHm.
+ apply IHs0.
  assumption.
 eapply ball_weak_le;[|apply regFun_prf].
 unfold d2.
@@ -432,7 +432,7 @@ Qauto_le.
 Qed.
 
 Lemma CompactGraph_b_correct3 : forall plX plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
-ms_eq (Cbind plX f (Cfst p)) (Csnd p).
+st_eq (Cbind plX f (Cfst p)) (Csnd p).
 Proof.
 intros plX plFEX p s H.
 apply ball_eq.
@@ -559,7 +559,7 @@ Qed.
 Lemma CompactGraph_b_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s, 
  inCompact (Couple (p,q1)) (CompactGraph_b plFEX s) ->
  inCompact (Couple (p,q2)) (CompactGraph_b plFEX s) ->
- ms_eq q1 q2.
+ st_eq q1 q2.
 Proof.
 intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cbind plX f p).
@@ -574,7 +574,7 @@ Qed.
 
 Lemma CompactGraph_b_correct : forall plX plFEX x y s, 
 inCompact (Couple (x,y)) (CompactGraph_b plFEX s) <->
-(inCompact x s /\ ms_eq y (Cbind plX f x)).
+(inCompact x s /\ st_eq y (Cbind plX f x)).
 Proof.
 intros plX plFEX x y s.
 split; intros H.

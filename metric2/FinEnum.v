@@ -42,7 +42,7 @@ in a list doesn't tell you which element in the list you are.
 Fixpoint InFinEnumC (x:X) (l:list X) : Prop :=
 match l with 
 | nil => False
-| y::ys => orC (ms_eq x y) (InFinEnumC x ys)
+| y::ys => orC (st_eq x y) (InFinEnumC x ys)
 end.
 
 Lemma InFinEnumC_weaken : forall x l, (In x l) -> InFinEnumC x l.
@@ -58,13 +58,13 @@ apply IHl.
 assumption.
 Qed.
 
-Lemma InFinEnumC_wd1 : forall x y l, (ms_eq x y) -> (InFinEnumC x l <-> InFinEnumC y l).
+Lemma InFinEnumC_wd1 : forall x y l, (st_eq x y) -> (InFinEnumC x l <-> InFinEnumC y l).
 Proof.
 induction l.
  simpl; tauto.
 intros H.
 simpl.
-cut ((ms_eq (m:=X) x a)<->(ms_eq (m:=X) y a)).
+cut ((st_eq x a)<->(st_eq y a)).
  unfold orC; tauto.
 rewrite H.
 reflexivity.
@@ -165,6 +165,14 @@ Qed.
 (* begin hide *)
 Hint Resolve FinEnum_eq_refl FinEnum_eq_sym FinEnum_eq_trans : FinEnum.
 (* end hide *)
+
+Lemma FinEnum_is_Setoid : Setoid_Theory _ FinEnum_eq.
+split; unfold Reflexive, Symmetric, Transitive; auto with *.
+apply FinEnum_eq_trans.
+Qed.
+
+Definition FinEnumS : Setoid := Build_Setoid FinEnum_is_Setoid.
+
 (**
 ** Metric Space
 Finite enumerations form a metric space under the Hausdorff metric for
@@ -174,8 +182,8 @@ Definition FinEnum_ball (e:Qpos) (x y:list X) :=
  hausdorffBall X e (fun a => InFinEnumC a x) (fun a => InFinEnumC a y).
 
 Lemma FinEnum_ball_wd : forall (e1 e2:Qpos), (e1==e2) -> 
- forall a1 a2, FinEnum_eq a1 a2 ->
- forall b1 b2, FinEnum_eq b1 b2 ->
+ forall (a1 a2 : FinEnumS), st_eq a1 a2 ->
+ forall (b1 b2 : FinEnumS), st_eq b1 b2 ->
  (FinEnum_ball e1 a1 b1 <-> FinEnum_ball e2 a2 b2).
 Proof.
 intros e1 e2 He a1 a2 Ha b1 b2 Hb.
@@ -309,10 +317,8 @@ right.
 assumption.
 Qed.
 
-Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnum_eq FinEnum_ball.
+Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnumS FinEnum_ball.
 split.
-     split; unfold Reflexive, Symmetric, Transitive; auto with *.
-     apply FinEnum_eq_trans.
     intros e x.
     rapply hausdorffBall_refl.
    intros e x y.
@@ -438,8 +444,8 @@ Defined.
 Lemma HemiMetricStrongAlmostDecidableBody : 
  forall (e d:Qpos) a (b : FinEnum),
  e < d -> 
- {hemiMetric X d (fun x => ms_eq x a) (fun x => InFinEnumC x b)} + 
- {~hemiMetric X e (fun x => ms_eq x a) (fun x => InFinEnumC x b)}.
+ {hemiMetric X d (fun x => st_eq x a) (fun x => InFinEnumC x b)} + 
+ {~hemiMetric X e (fun x => st_eq x a) (fun x => InFinEnumC x b)}.
 Proof.
 intros e d a b.
 induction b.
@@ -473,7 +479,7 @@ destruct (almostDecideX a a0 Hed).
 right.
 abstract (
 intros H0;
-assert (Haa:ms_eq a a) by reflexivity;
+assert (Haa:st_eq a a) by reflexivity;
 destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind;
  [tauto|];
 destruct (Hz0) as [HG | Hz0 | Hz0] using orC_ind;
@@ -668,10 +674,10 @@ Implicit Arguments InFinEnumC [X].
 (* end hide *)
 (** A list is equivalent to it's reverse as finite enumerations *)
 Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
- ms_eq f (rev f).
+ st_eq f (rev f).
 Proof.
 induction f.
- change (ms_eq (nil:FinEnum stable) (nil:FinEnum stable)). 
+ change (st_eq (nil:FinEnum stable) (nil:FinEnum stable)). 
  reflexivity.
 intros x.
 destruct (IHf x) as [H0 H1].

@@ -264,7 +264,7 @@ clear Hf.
 destruct (FinEnum_eq_rev f (x,y)) as [L _].
 generalize (L H).
 clear L H.
-simpl (ms Q2).
+simpl (st_car (msp_is_setoid Q2)).
 generalize (emptyRaster (S n) (S m)).
 induction (@rev (prod Q Q) f).
  contradiction.
@@ -291,7 +291,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   rewrite setRaster_correct1; unfold i, j; auto with *.
  split.
   change (ball err (C l r (S n) i) x).
-  change (ms_eq x (fst a)) in Hl.
+  change (st_eq x (fst a)) in Hl.
   rewrite Hl.
   eapply ball_weak_le.
    unfold err.
@@ -301,7 +301,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   rewrite Hl in Hfl.
   auto.
  change (ball err (C t b (S m) (m-j)%nat) y).
- change (ms_eq y (snd a)) in Hr.
+ change (st_eq y (snd a)) in Hr.
  rewrite Hr.
  eapply ball_weak_le.
   unfold err.
@@ -367,7 +367,7 @@ cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
  destruct (FinEnum_eq_rev f z); auto.
 unfold RasterizeQ2 in Hij.
 rewrite <- fold_left_rev_right in Hij.
-simpl (ms Q2) in Hf'|-*.
+simpl (st_car (msp_is_setoid Q2)) in Hf'|-*.
 induction (@rev (prod Q Q) f).
  clear - Hij.
  set (z:=emptyRaster (S n) (S m)) in Hij.
@@ -395,7 +395,7 @@ destruct L as [[Hi Hj] | L].
  unfold fst, snd in *.
  apply existsWeaken.
  exists a.
- change (ms Q2) in a.
+ change (st_car (msp_is_setoid Q2)) in a.
  split.
   rapply orWeaken.
   left.
