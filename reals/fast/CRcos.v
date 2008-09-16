@@ -21,9 +21,13 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export CRArith.
 Require Import CRsin.
+Require Import CRpi.
 Require Import CRIR.
+Require Import Compress.
 Require Import Qpower.
 Require Import Qordfield.
+Require Import Qround.
+Require Import Pi.
 Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import Qmetric.
@@ -205,19 +209,49 @@ Qed.
 Definition cos_uc : Q_as_MetricSpace --> CR := 
 Build_UniformlyContinuousFunction cos_uc_prf.
 
-Definition cos : CR --> CR := Cbind QPrelengthSpace cos_uc.
+Definition cos_slow : CR --> CR := Cbind QPrelengthSpace cos_uc.
 
-Lemma cos_correct : forall x,
- (IRasCR (Cos x) == cos (IRasCR x))%CR.
+Lemma cos_slow_correct : forall x,
+ (IRasCR (Cos x) == cos_slow (IRasCR x))%CR.
 Proof.
 intros x.
 rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Cos | | constructor].
 intros q [] _.
 transitivity (rational_cos q);[|rapply rational_cos_correct].
-unfold cos.
+unfold cos_slow.
 rewrite (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
 rapply BindLaw1.
 Qed.
 
+Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.
+
+Lemma cos_correct : forall x,
+  (IRasCR (Cos x) == cos (IRasCR x))%CR.
+Proof.
+intros x.
+unfold cos.
+generalize (Qceiling
+        (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
+           (1 # 2)%Qpos - (1 # 2)))%CR.
+intros z.
+rewrite compress_correct.
+rewrite <- CRpi_correct, <- CRmult_scale,
+        <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
+        <- IR_minus_as_CR, <- cos_slow_correct.
+apply IRasCR_wd.
+rewrite inj_Q_mult.
+change (2:Q) with (Two:Q).
+rewrite inj_Q_nring.
+rstepr (Cos (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
+setoid_replace (inj_Q IR z) with (zring z:IR).
+ rewrite <- zring_inv.
+ symmetry; apply Cos_periodic_Z.
+rewrite <- inj_Q_zring.
+apply inj_Q_wd.
+symmetry; apply zring_Q.
+Qed.
+
+(* begin hide *)
 Hint Rewrite cos_correct : IRtoCR.
+(* end hide *)

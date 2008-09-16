@@ -117,3 +117,21 @@ Proof.
  rewrite succ_nat in |- *.
  ring.
 Qed.
+
+Lemma zring_Q : forall z, zring (R:=Q_as_CRing) z[=]inject_Z z.
+Proof.
+destruct z; simpl.
+  reflexivity.
+ rewrite pring_convert.
+ rewrite nring_Q.
+ rewrite convert_is_POS.
+ reflexivity.
+rewrite pring_convert.
+rewrite nring_Q.
+unfold Qeq.
+simpl.
+ring_simplify.
+rewrite min_convert_is_NEG.
+rewrite Pmult_comm.
+reflexivity.
+Qed.

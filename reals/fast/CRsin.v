@@ -22,10 +22,13 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import QMinMax.
 Require Import CRAlternatingSum.
 Require Import CRseries.
+Require Import CRpi.
 Require Export CRArith.
 Require Import CRIR.
 Require Import Qpower.
 Require Import Qordfield.
+Require Import Qround.
+Require Import Pi.
 Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import Qmetric.
@@ -504,20 +507,49 @@ Qed.
 Definition sin_uc : Q_as_MetricSpace --> CR := 
 Build_UniformlyContinuousFunction sin_uc_prf.
 
-Definition sin : CR --> CR := Cbind QPrelengthSpace sin_uc.
+Definition sin_slow : CR --> CR := Cbind QPrelengthSpace sin_uc.
 
-Lemma sin_correct : forall x,
- (IRasCR (Sin x) == sin (IRasCR x))%CR.
+Lemma sin_slow_correct : forall x,
+ (IRasCR (Sin x) == sin_slow (IRasCR x))%CR.
 Proof.
 intros x.
 rapply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Sin | | constructor].
 intros q [] _.
 transitivity (rational_sin q);[|rapply rational_sin_correct].
-unfold sin.
+unfold sin_slow.
 rewrite (Cbind_fun_correct QPrelengthSpace sin_uc).
 rapply BindLaw1.
 Qed.
+
+Definition sin (x:CR) := sin_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.
+
+Lemma sin_correct : forall x,
+  (IRasCR (Sin x) == sin (IRasCR x))%CR.
+Proof.
+intros x.
+unfold sin.
+generalize (Qceiling
+        (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
+           (1 # 2)%Qpos - (1 # 2)))%CR.
+intros z.
+rewrite compress_correct.
+rewrite <- CRpi_correct, <- CRmult_scale,
+        <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
+        <- IR_minus_as_CR, <- sin_slow_correct.
+apply IRasCR_wd.
+rewrite inj_Q_mult.
+change (2:Q) with (Two:Q).
+rewrite inj_Q_nring.
+rstepr (Sin (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
+setoid_replace (inj_Q IR z) with (zring z:IR).
+ rewrite <- zring_inv.
+ symmetry; apply Sin_periodic_Z.
+rewrite <- inj_Q_zring.
+apply inj_Q_wd.
+symmetry; apply zring_Q.
+Qed.
+
 (* begin hide *)
 Hint Rewrite sin_correct : IRtoCR.
 (* end hide *)

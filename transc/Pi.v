@@ -994,6 +994,44 @@ astepl ( [--] (Cos (x[+]Pi))).
 Step_final ( [--][--] (Cos x)).
 Qed.
 
+Lemma Sin_periodic_Z : forall (x : IR) z, Sin (x[+]zring z[*](Two[*]Pi)) [=] Sin x.
+Proof.
+intros x z; revert x; induction z using Zind; intros x.
+  rational.
+ rewrite <- Zsucc_succ'.
+ unfold Zsucc.
+ rewrite zring_plus.
+ rstepl (Sin (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
+ rewrite Sin_periodic.
+ auto.
+rewrite <- Zpred_pred'.
+unfold Zpred.
+rewrite zring_plus.
+rstepl (Sin (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).
+rstepr (Sin (x[-]Two[*]Pi[+]Two[*]Pi)).
+rewrite Sin_periodic.
+auto.
+Qed.
+
+Lemma Cos_periodic_Z : forall (x : IR) z, Cos (x[+]zring z[*](Two[*]Pi)) [=] Cos x.
+Proof.
+intros x z; revert x; induction z using Zind; intros x.
+  rational.
+ rewrite <- Zsucc_succ'.
+ unfold Zsucc.
+ rewrite zring_plus.
+ rstepl (Cos (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
+ rewrite Cos_periodic.
+ auto.
+rewrite <- Zpred_pred'.
+unfold Zpred.
+rewrite zring_plus.
+rstepl (Cos (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).
+rstepr (Cos (x[-]Two[*]Pi[+]Two[*]Pi)).
+rewrite Cos_periodic.
+auto.
+Qed.
+
 Lemma Tan_periodic : forall (x : IR) Hx Hx', Tan (x[+]Pi) Hx' [=] Tan x Hx.
 intros.
 cut (Cos x [#] Zero). intro H.
