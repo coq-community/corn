@@ -66,6 +66,48 @@ split; simpl; auto.
 reflexivity.
 Qed.
 
+Require Export CRing_Homomorphisms.
+
+Lemma rh_pres_nring : forall (R S:CRing) (f:RingHom R S) n, (f (nring n:R)) [=] (nring n:S).
+Proof.
+induction n.
+ apply rh_pres_zero.
+simpl.
+rewrite rh_pres_plus.
+auto with *.
+Qed.
+
+Section PolynomialRingHomomorphism.
+Variable F R:CRing.
+Variable eta : RingHom F R.
+
+Definition poly_rhmap := compose_CSetoid_fun _ _ _ eta _C_.
+
+Lemma poly_rh1 : fun_pres_plus _ _ poly_rhmap.
+Proof.
+intros x y.
+simpl; split; auto with *.
+Qed.
+
+Lemma poly_rh2 : fun_pres_mult _ _ poly_rhmap.
+Proof.
+intros x y.
+simpl; split; auto.
+rstepr (eta x[*]eta y).
+auto with *.
+Qed.
+
+Lemma poly_rh3 : fun_pres_unit _ _ poly_rhmap.
+Proof.
+split; simpl; auto with *.
+Qed.
+
+Definition CPoly_RingHom : RingHom _ _ := Build_RingHom _ _ _ poly_rh1 poly_rh2 poly_rh3.
+Canonical Structure CPoly_RingHom.
+
+End PolynomialRingHomomorphism.
+
+(*
 Require Import CModules.
 
 Section PolynomialModule.
@@ -172,7 +214,7 @@ Qed.
 
 Canonical Structure CPoly_as_Module := Build_RModule _ _ _ CPolyModule.
 
-(* This ought to belong to a general theory about alegbras *)
+( * This ought to belong to a general theory about alegbras * )
 Lemma CPoly_mu_mult_assoc : 
 forall (a : F) (x y: cpoly_cring R),
 (forall (b c:R), mu a (b[*]c)[=]mu a b[*]c) ->
@@ -215,18 +257,22 @@ setoid_replace (cpoly_mult_cs R (cpoly_constant R s) y) with
  setoid_replace (Zero:cpoly_cring R) with (cpoly_linear R Zero Zero).
   apply IHy.
  split;simpl; auto with *.
-change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).
+change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).
+change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).
 setoid_replace (cpoly_linear R Zero Zero:cpoly_cring R) with (Zero:cpoly_cring R).
  rational.
 split; simpl; auto with *.
 Qed.
 
 End PolynomialModule.
-
+*)
 Require Import Qordfield.
 Close Scope Q_scope.
 
 Section Bernstein.
+
+Opaque cpoly_cring.
+Opaque _C_.
 
 Variable R : CRing.
 
@@ -243,9 +289,6 @@ match n return (i <= n) -> cpoly R  with
     end
   end
 end.
-
-Opaque cpoly_cring.
-Opaque _C_.
 
 Lemma Bernstein_inv1 : forall n i (H:i < n) (H0:S i <= S n),
  Bernstein H0[=](One[-]_X_)[*](Bernstein (lt_n_Sm_le _ _ (lt_n_S _ _ H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
@@ -486,22 +529,26 @@ Opaque Bernstein.
 
 Require Import Bvector.
 
-Fixpoint evalBernsteinBasisH (n i:nat) (v:vector R i) : i <= S n -> cpoly_cring R :=
-match v in vector _ i return i <= S n -> cpoly_cring R with
+Fixpoint evalBernsteinBasisH (n i:nat) (v:vector R i) : i <= n -> cpoly_cring R :=
+match v in vector _ i return i <= n -> cpoly_cring R with
 |Vnil => fun _ => Zero
-|Vcons a i' v' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (le_Sn_le _ _ p)
+|Vcons a i' v' => 
+  match n as n return (S i' <= n) -> cpoly_cring R with
+  | O => fun p => False_rect _ (le_Sn_O _ p)
+  | S n' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (le_Sn_le _ _ p)
+  end
 end.
 
-Definition evalBernsteinBasis (n:nat) (v:vector R (S n)) : cpoly_cring R :=
-evalBernsteinBasisH v (le_refl (S n)).
+Definition evalBernsteinBasis (n:nat) (v:vector R n) : cpoly_cring R :=
+evalBernsteinBasisH v (le_refl n).
 
-Lemma evalBernsteinBasisPlus : forall n (v1 v2: vector R (S n)),
+Lemma evalBernsteinBasisPlus : forall n (v1 v2: vector R n),
 evalBernsteinBasis (Vbinary _ (fun (x y:R)=>x[+]y) _ v1 v2)[=]evalBernsteinBasis v1[+]evalBernsteinBasis v2.
 Proof.
 unfold evalBernsteinBasis.
 intros n.
-generalize (le_refl (S n)).
-generalize (S n) at 1 3 4 5 6 7 8.
+generalize (le_refl n).
+generalize n at 1 3 4  6 7  9 11.
 intros i.
 induction i.
  intros l v1 v2.
@@ -509,6 +556,8 @@ induction i.
  simpl.
  rational.
 intros l v1 v2.
+destruct n as [|n].
+ elimtype False; auto with *.
 rewrite (VSn_eq R _ v1), (VSn_eq R _ v2).
 simpl.
 rewrite IHi.
@@ -526,7 +575,7 @@ stepr (evalBernsteinBasis (Vconst R c (S n))[+]_C_ c[*]Sum (S n) n (part_tot_nat
  rational.
 unfold evalBernsteinBasis.
 generalize (le_refl (S n)).
-generalize (S n) at 1 3 4 5.
+generalize (S n) at 1 4 5 6.
 intros i l.
 induction i.
  rstepr (_C_ c[*]One).
@@ -556,32 +605,47 @@ replace (lt_n_Sm_le _ _ l0) with (le_S_n _ _ l) by apply le_irrelevent.
 reflexivity.
 Qed.
 
-Variable mu : CSetoid_bin_fun Q_as_CSetoid R R.
-Hypothesis Hmodule : is_RModule R mu.
-Let RM := Build_RModule _ _ _ Hmodule.
-(* I hope canonical structures don't survive past section boundarys *)
-Canonical Structure CPoly_as_Module := Build_RModule _ _ _ (CPolyModule _ Hmodule).
-Opaque RM.
+Variable eta : RingHom Q_as_CRing R.
+
 Opaque Qred.
+Opaque Q_as_CRing.
+Opaque Vbinary.
+Opaque Vconst.
 
-Lemma 
-
-Fixpoint BernsteinBasisTimesXH (n i:nat) (v:vector R i) : i <= S n -> vector R (S i) :=
-match v in vector _ i return i <= S n -> vector R (S i) with
+Fixpoint BernsteinBasisTimesXH (n i:nat) (v:vector R i) : i <= n -> vector R (S i) :=
+match v in vector _ i return i <= n -> vector R (S i) with
 | Vnil => fun _ => Vcons _ Zero _ (Vnil _)
-| Vcons a i' v' => fun p => Vcons _ ((Qred (S i#P_of_succ_nat n))['](a:RM)) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
+| Vcons a i' v' => match n as n return S i' <= n -> vector R (S (S i')) with
+  | O => fun p => False_rect _ (le_Sn_O _ p)
+  | S n' => fun p => Vcons _ (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
+  end
 end.
 
-Definition BernsteinBasisTimesX (n:nat) (v:vector R (S n)) : vector R (S (S n)) :=
-BernsteinBasisTimesXH v (le_refl (S n)).
+Definition BernsteinBasisTimesX (n:nat) (v:vector R n) : vector R (S n) :=
+BernsteinBasisTimesXH v (le_refl n).
 
-Lemma evalBernsteinBasisTimesXH : forall n (v:vector R (S n)),
+(****************************************************)
+(*MOVE ME*)
+Lemma Q_nring : forall n, (nring n:Q)[=]n.
+induction n.
+ reflexivity.
+rewrite inj_S.
+change ((nring (S n):Q)==((n+1)%Z:Q))%Q.
+rewrite injz_plus.
+simpl.
+rewrite IHn.
+reflexivity.
+Qed.
+
+(****************************************************)
+
+Lemma evalBernsteinBasisTimesX : forall n (v:vector R n),
  evalBernsteinBasis (BernsteinBasisTimesX v)[=]_X_[*]evalBernsteinBasis v.
 Proof.
 intros n.
 unfold evalBernsteinBasis, BernsteinBasisTimesX.
-generalize (le_refl (S (S n))) (le_refl (S n)).
-generalize (S n) at 1 3 5 7 8 9.
+generalize (le_refl (S n)) (le_refl n).
+generalize n at 1 3 5 7 9 11.
 intros i.
 induction i.
  intros l l0 v.
@@ -590,14 +654,109 @@ induction i.
  rewrite <- _c_zero.
  rational.
 intros l l0 v.
+destruct n as [|n].
+ elimtype False; auto with *.
 rewrite (VSn_eq R _ v).
 simpl.
 rewrite IHi.
-setoid_replace (Vhead R i v) with (One[*]Vhead R i v) at 1;[|rational].
+rewrite _c_mult.
+rewrite ring_dist_unfolded.
+apply csbf_wd; try reflexivity.
+set (A:= (_C_ (eta (Qred
+                 (Qmake (Zpos (P_of_succ_nat i)) (P_of_succ_nat n)))))).
+rstepl (_C_ (Vhead R i v)[*](A[*]Bernstein (le_S_n (S i) (S n) l))).
+rstepr (_C_ (Vhead R i v)[*](_X_[*]Bernstein (le_S_n i n l0))).
+apply mult_wdr.
+unfold A; clear A.
+assert (Hn : (nring (S n):Q)[#]Zero).
+ stepl (S n:Q).
+  simpl.
+  unfold Qap, Qeq.
+  auto with *.
+ symmetry; apply Q_nring.
+setoid_replace (Qred (P_of_succ_nat i # P_of_succ_nat n))
+ with ((One[/](nring (S n))[//]Hn)[*](nring (S i))).
+ set (eta':=CPoly_RingHom eta).
+ change (_C_ (eta ((One[/]nring (S n)[//]Hn)[*]nring (S i))))
+  with ((eta' ((One[/]nring (S n)[//]Hn)[*]nring (S i))):cpoly_cring R).
+ rewrite rh_pres_mult.
+ rewrite rh_pres_nring.
+ rewrite <- mult_assoc_unfolded.
+ replace (le_S_n (S i) (S n) l) with (le_n_S _ _ (le_S_n i n l0)) by apply le_irrelevent.
+ rewrite <- RaiseDegreeA.
+ rewrite <- (@rh_pres_nring _ _ eta').
+ rewrite <- mult_assoc_unfolded.
+ rewrite mult_assoc_unfolded.
+ rewrite <- rh_pres_mult.
+ setoid_replace (eta' ((One[/]nring (S n)[//]Hn)[*]nring (S n))) with (One:cpoly_cring R).
+  rational.
+ rewrite <- (@rh_pres_unit _ _ eta').
+ apply csf_wd.
+ apply (@div_1 Q_as_CField).
+rewrite Qred_correct.
+rewrite Qmake_Qdiv.
+change (Zpos (P_of_succ_nat n)) with ((S n):Z).
+rewrite <- (Q_nring (S n)).
+change (Zpos (P_of_succ_nat i)) with ((S i):Z).
+rewrite <- (Q_nring (S i)).
+change (nring (S i)/nring (S n) == (1/(nring (S n)))*nring (S i))%Q.
+field.
+apply Hn.
+Qed.
+
+Fixpoint BernsteinCoefficents (p:cpoly_cring R) : sigT (vector R) :=
+match p with
+| cpoly_zero => existT _ _ (Vnil R)
+| cpoly_linear c p' => 
+  let (n', b') := (BernsteinCoefficents p') in
+  existT _ _  (Vbinary _ (fun (x y:R)=>x[+]y) _ (Vconst R c _) (BernsteinBasisTimesX b'))
+end.
+
+Lemma evalBernsteinCoefficents : forall p, (let (n,b) := BernsteinCoefficents p in evalBernsteinBasis b)[=]p.
+Proof.
+induction p.
+ reflexivity.
+simpl.
+destruct (BernsteinCoefficents p).
+rewrite evalBernsteinBasisPlus.
+rewrite evalBernsteinBasisConst.
+rewrite evalBernsteinBasisTimesX.
+rewrite IHp.
+rewrite poly_linear.
+rational.
+Qed.
+
+End Bernstein.
+
+Require Import COrdFields2.
+
+Section BernsteinOrdField.
+
+Variable F : COrdField.
+
+Opaque cpoly_cring.
+
+Hint Resolve pos_one less_leEq shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: algebra.
+
+Hint Rewrite one_apply _c_apply _x_apply mult_apply plus_apply minus_apply : apply.
 
 
-destruct (le_lt_eq_dec (S i) (S n) (le_S_n (S i) (S n) l)).
- simpl.
- elimtype False; auto with *.
+Lemma BersteinNonNeg : forall x:F, Zero [<=] x -> x [<=] One ->
+forall n i (p:le i n), Zero[<=](Bernstein F p)!x.
+Proof.
+intros x Hx0 Hx1.
+induction n.
+ intros i p.
+ simpl (Bernstein F p).
+ autorewrite with apply.
+ auto with *.
+intros [|i] p;
+ simpl (Bernstein F p).
+ autorewrite with apply.
+ auto with *.
+destruct (le_lt_eq_dec (S i) (S n) p);
+ autorewrite with apply;
+ auto with *.
+Qed.
 
- simpl.
+End BernsteinOrdField.
