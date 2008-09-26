@@ -50,6 +50,7 @@ Require Export Even.
 Require Export Max.
 Require Export Min.
 Require Export List.
+Require Import Eqdep_dec.
 
 (**
 * Basics
@@ -84,6 +85,51 @@ Lemma le_mult_right : forall x y z : nat, x <= y -> x * z <= y * z.
 intros x y z H.
 rewrite mult_comm. rewrite (mult_comm y).
 auto with arith.
+Qed.
+
+Lemma le_irrelevent : forall n m (H1 H2:le n m), H1=H2.
+Proof.
+assert (forall n (H1: le n n), H1 = le_n n).
+ intros n H1.
+ change H1 with (eq_rec n (fun a => a <= n) H1 _ (refl_equal n)).
+ generalize (refl_equal n).
+ revert H1.
+ generalize n at 1 3 7.
+ dependent inversion H1.
+  apply K_dec_set.
+   decide equality.
+  reflexivity.
+ intros; elimtype False; omega.
+induction m.
+ dependent inversion H1.
+ symmetry.
+ apply H.
+dependent inversion H1.
+ symmetry.
+ apply H.
+intros H3.
+change H3 with (eq_rec (S m) (le n) (eq_rec n (fun n => n <= S m) H3 _ (refl_equal n)) _ (refl_equal (S m))).
+generalize (refl_equal n) (refl_equal (S m)).
+revert H3.
+generalize n at 1 2 7.
+generalize (S m) at 1 2 5 6.
+dependent inversion H3.
+ intros; elimtype False; omega.
+intros e e0.
+assert (e':=e).
+assert (e0':=e0).
+revert e e0 l0.
+rewrite e', (eq_add_S _ _ e0'). 
+intros e.
+elim e using K_dec_set.
+ decide equality.
+intros e0.
+elim e0 using K_dec_set.
+ decide equality.
+simpl.
+intros l0.
+rewrite (IHm l l0).
+reflexivity.
 Qed.
 
 Lemma minus3:forall (a b c:nat),(c<=b<=a)-> a+(b-c)=b+(a-c).

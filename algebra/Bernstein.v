@@ -4,79 +4,9 @@ Require Import Rational.
 
 Set Implicit Arguments.
 
-Require Import Eqdep_dec.
+Require Import CRing_Homomorphisms.
 
-Lemma le_irrelevent : forall n m (H1 H2:le n m), H1=H2.
-Proof.
-assert (forall n (H1: le n n), H1 = le_n n).
- intros n H1.
- change H1 with (eq_rec n (fun a => a <= n) H1 _ (refl_equal n)).
- generalize (refl_equal n).
- revert H1.
- generalize n at 1 3 7.
- dependent inversion H1.
-  apply K_dec_set.
-   decide equality.
-  reflexivity.
- intros; elimtype False; omega.
-induction m.
- dependent inversion H1.
- symmetry.
- apply H.
-dependent inversion H1.
- symmetry.
- apply H.
-intros H3.
-change H3 with (eq_rec (S m) (le n) (eq_rec n (fun n => n <= S m) H3 _ (refl_equal n)) _ (refl_equal (S m))).
-generalize (refl_equal n) (refl_equal (S m)).
-revert H3.
-generalize n at 1 2 7.
-generalize (S m) at 1 2 5 6.
-dependent inversion H3.
- intros; elimtype False; omega.
-intros e e0.
-assert (e':=e).
-assert (e0':=e0).
-revert e e0 l0.
-rewrite e', (eq_add_S _ _ e0'). 
-intros e.
-elim e using K_dec_set.
- decide equality.
-intros e0.
-elim e0 using K_dec_set.
- decide equality.
-simpl.
-intros l0.
-rewrite (IHm l l0).
-reflexivity.
-Qed.
-
-Canonical Structure cpoly_cring.
-Canonical Structure cpoly_cabgroup.
-Canonical Structure cpoly_cgroup.
-Canonical Structure cpoly_cmonoid.
-Canonical Structure cpoly_csemi_grp.
-Canonical Structure cpoly_csetoid.
-Canonical Structure cpoly_setoid := fun R => cs_crr (cpoly_csetoid R).
-
-(* cpoly_C_ is wrong. c should have type R *)
-Lemma _c_plus : forall (R:CRing) (a b : R), _C_ (a[+]b) [=] _C_ a[+]_C_ b.
-Proof.
-split; simpl; auto.
-reflexivity.
-Qed.
-
-Require Export CRing_Homomorphisms.
-
-Lemma rh_pres_nring : forall (R S:CRing) (f:RingHom R S) n, (f (nring n:R)) [=] (nring n:S).
-Proof.
-induction n.
- apply rh_pres_zero.
-simpl.
-rewrite rh_pres_plus.
-auto with *.
-Qed.
-
+(*
 Section PolynomialRingHomomorphism.
 Variable F R:CRing.
 Variable eta : RingHom F R.
@@ -106,7 +36,7 @@ Definition CPoly_RingHom : RingHom _ _ := Build_RingHom _ _ _ poly_rh1 poly_rh2 
 Canonical Structure CPoly_RingHom.
 
 End PolynomialRingHomomorphism.
-
+*)
 (*
 Require Import CModules.
 
@@ -277,10 +207,10 @@ Opaque _C_.
 Variable R : CRing.
 
 Fixpoint Bernstein (n i:nat) {struct n}: (i <= n) -> cpoly_cring R :=
-match n return (i <= n) -> cpoly R  with
+match n return (i <= n) -> cpoly_cring R  with
  O => fun _ => One
 |S n' => 
-  match i return (i <= S n') -> cpoly R  with
+  match i return (i <= S n') -> cpoly_cring R  with
    O => fun _ => (One[-]_X_)[*](Bernstein (le_O_n n'))
   |S i' => fun p =>
     match (le_lt_eq_dec _ _ p) with
@@ -527,7 +457,7 @@ Qed.
 
 Opaque Bernstein.
 
-Require Import Bvector.
+Require Export Bvector.
 
 Fixpoint evalBernsteinBasisH (n i:nat) (v:vector R i) : i <= n -> cpoly_cring R :=
 match v in vector _ i return i <= n -> cpoly_cring R with
@@ -676,7 +606,7 @@ assert (Hn : (nring (S n):Q)[#]Zero).
  symmetry; apply Q_nring.
 setoid_replace (Qred (P_of_succ_nat i # P_of_succ_nat n))
  with ((One[/](nring (S n))[//]Hn)[*](nring (S i))).
- set (eta':=CPoly_RingHom eta).
+ set (eta':=RHcompose _ _ _ _C_ eta).
  change (_C_ (eta ((One[/]nring (S n)[//]Hn)[*]nring (S i))))
   with ((eta' ((One[/]nring (S n)[//]Hn)[*]nring (S i))):cpoly_cring R).
  rewrite rh_pres_mult.
@@ -736,12 +666,9 @@ Variable F : COrdField.
 
 Opaque cpoly_cring.
 
-Hint Resolve pos_one less_leEq shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: algebra.
+Hint Resolve pos_one less_leEq shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: inequality.
 
-Hint Rewrite one_apply _c_apply _x_apply mult_apply plus_apply minus_apply : apply.
-
-
-Lemma BersteinNonNeg : forall x:F, Zero [<=] x -> x [<=] One ->
+Lemma BernsteinNonNeg : forall x:F, Zero [<=] x -> x [<=] One ->
 forall n i (p:le i n), Zero[<=](Bernstein F p)!x.
 Proof.
 intros x Hx0 Hx1.

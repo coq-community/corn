@@ -313,7 +313,8 @@ astepl ((sigma x)[+](sigma [--]y)); simpl.
 astepl (sigma (x[+][--]y)); simpl.
 assumption.
 apply rh_pres_plus.
-apply plus_resp_eq; apply rh_pres_minus.
+autorewrite with ringHomPush.
+reflexivity.
 Qed.
 
 (**
