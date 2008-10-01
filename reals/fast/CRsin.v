@@ -280,7 +280,7 @@ apply mult_wd.
 apply (inj_Q_power IR q 3).
 Qed.
 
-Definition sin_poly_modulus (e:Qpos) := Qpos2QposInf (e/(9#1)).
+Definition sin_poly_modulus (e:Qpos) := Qpos2QposInf ((1#9)*e).
 
 Let X:((-(1))<1)%Q.
 constructor.
@@ -298,10 +298,11 @@ Qed.
 
 Lemma sin_poly_prf : is_UniformlyContinuousFunction (fun x => sin_poly_fun (QboundAbs (1#1) x)) sin_poly_modulus.
 Proof.
-rapply (is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D sin_poly_fun).
+rapply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D sin_poly_fun a (9#1)).
  simpl; intros q _ _.
  rapply sin_poly_fun_correct.
-simpl; intros x _ [Hx0 Hx1].
+simpl; intros x' _ [Hx0 Hx1].
+set (x:=(inj_Q IR x')) in *.
 stepr (Nine:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 9)).
 stepl (ABSIR (Three[-]Twelve[*]x[*]x)) by (apply AbsIR_wd; rational).
 apply AbsSmall_imp_AbsIR.
@@ -485,7 +486,7 @@ Qed.
 (** Sine is uniformly continuous everywhere. *)
 Definition sin_uc_prf : is_UniformlyContinuousFunction rational_sin Qpos2QposInf.
 Proof.
-apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_sin x) (modulusD (1#1)).
+apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_sin x) (Qscale_modulus (1#1)).
   reflexivity.
  intros x.
  simpl.

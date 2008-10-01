@@ -645,17 +645,13 @@ stepl (inj_Q IR (nring z)).
 apply inj_Q_wd; apply nring_Q.
 Qed. 
 
-Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (modulusD (exp_bound z)).
+Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (Qscale_modulus (exp_bound z)).
 Proof.
 intros z.
 assert (Z:Derivative (closer (inj_Q IR (z:Q))) CI Expon Expon).
  apply (Included_imp_Derivative realline CI).
   Deriv.
  Included.
-apply (is_UniformlyContinuousFunction_wd) with (fun a => rational_exp (QboundAbove_uc z
-a)) (modulusD (exp_bound z)).
-  intros; simpl; reflexivity.
- intros; simpl; apply Qle_refl.
 apply (is_UniformlyContinuousD None (Some (z:Q)) I _ _ Z).
  intros q [] H.
  rapply rational_exp_correct.

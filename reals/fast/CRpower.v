@@ -85,6 +85,16 @@ rewrite Qlt_minus_iff.
 ring_simplify.
 change (0 < ((2#1)*c)%Qpos).
 rapply Qpos_prf.
+apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Zpred p))%Qpos)).
+  reflexivity.
+ intros x.
+ unfold Qpower_positive_modulus.
+ generalize ((p # 1) * c ^ Zpred p)%Qpos.
+ intros [qn qd].
+ simpl.
+ autorewrite with QposElim.
+ rewrite Qmult_sym.
+ apply Qle_refl.
 rapply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
  simpl.
  intros q _ Hq.
