@@ -585,6 +585,34 @@ repeat apply bin_op_wd_unfolded; try apply nexp_wd;
 Deriv.
 Qed.
 
+Lemma Derivative_I_poly : forall p, Derivative_I Hab' (FPoly _ p) (FPoly _ (_D_ p)).
+Proof.
+induction p.
+ apply Derivative_I_wdl with ([-C-] Zero).
+  FEQ.
+ apply Derivative_I_wdr with ([-C-] Zero).
+  FEQ.
+ Deriv.
+simpl.
+change (FPoly IR (cpoly_linear IR s p))
+ with (FPoly IR (s[+X*]p)).
+change (FPoly IR (cpoly_plus_cs IR p (cpoly_linear IR Zero (cpoly_diff IR p))))
+ with (FPoly IR (p[+](Zero[+X*](_D_ p)))).
+apply Derivative_I_wdl with ([-C-] s{+}FId{*}(FPoly IR p)).
+ repeat constructor.
+ reflexivity.
+apply Derivative_I_wdr with ([-C-]Zero{+}(FId{*}(FPoly IR (_D_ p)){+}[-C-]One{*}(FPoly IR p))).
+ repeat constructor.
+ simpl.
+ intros x _ _ _.
+ change (Zero[+](x[*](_D_ p)!x[+]One[*]p!x)[=]
+   (p[+](Zero[+X*](_D_ p)))!x).
+ rewrite cpoly_lin.
+ autorewrite with apply.
+ rational.
+Deriv.
+Qed.
+
 Hypothesis Gbnd : bnd_away_zero I G.
 
 Lemma Derivative_I_div : Derivative_I Hab' (F{/}G) ((F'{*}G{-}F{*}G') {/}G{*}G).
@@ -607,7 +635,7 @@ Qed.
 End Corolaries.
 
 Hint Resolve Derivative_I_minus Derivative_I_nth Derivative_I_scal
-  Derivative_I_div: derivate.
+  Derivative_I_div Derivative_I_poly: derivate.
 
 Section Derivative_Sums.
 
