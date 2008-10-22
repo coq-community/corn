@@ -202,10 +202,6 @@ Proof.
  apply leEq_reflexive.
 Qed.
 
-(* begin hide *)
-Unset Printing Coercions.
-(* end hide *)
-
 (** Similarly we prove some properties of [zring] on the ring of integers: *)
 
 Lemma zring_strext : forall m n : Z_as_CRing,
