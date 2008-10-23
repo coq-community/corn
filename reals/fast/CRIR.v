@@ -309,23 +309,23 @@ Proof.
 intros [n d].
 unfold inj_Q.
 rewrite IR_div_as_CR_1.
-generalize (map_pres_ap_zero IR CRasCReals (iso_map_rht CRasCReals IR CRIR_iso) (nring (R:=IR) d)
+generalize (map_pres_ap_zero IR CRasCReals (iso_map_rht CRasCReals IR CRIR_iso) (nring (R:=IR) (nat_of_P d))
     (den_is_nonzero IR (n # d)%Q)).
 intros d_.
-change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) d)[//]d_):CR) == ' (n # d))%CR).
+change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) == ' (n # d))%CR).
 rewrite Qmake_Qdiv.
-change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) d)[//]d_):CR) ==
+change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) ==
  ' ((n # 1) * / (d # 1)))%CR).
 rewrite <- CRmult_Qmult.
 assert (d__:('d><'0%Q)%CR).
 apply Qap_CRap.
 discriminate.
-change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) d)[//]d_):CR) ==
+change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) ==
  ' (n # 1) * ' (/ (d # 1)))%CR).
 rewrite <- (CRinv_Qinv d d__).
 unfold cf_div.
 
-assert (X:(forall (n:positive), IRasCR (nring (R:=IR) n) == ' ('n)%Z)%CR).
+assert (X:(forall (n:positive), IRasCR (nring (R:=IR) (nat_of_P n)) == ' ('n)%Z)%CR).
 intros x.
 clear -x.
 rewrite <- convert_is_POS.
@@ -349,11 +349,11 @@ apply (inj_plus 1 n).
 
 rsapply mult_wd;[|rsapply f_rcpcl_wd;apply (X d)].
 destruct n as [|p|p];[apply IR_Zero_as_CR| |];simpl.
-transitivity (IRasCR (nring p)).
+transitivity (IRasCR (nring (nat_of_P p))).
 apply IRasCR_wd.
 apply pring_convert.
 apply (X p).
-transitivity (IRasCR [--](nring p)).
+transitivity (IRasCR [--](nring (nat_of_P p))).
 apply IRasCR_wd.
 rapply csf_wd_unfolded.
 apply pring_convert.

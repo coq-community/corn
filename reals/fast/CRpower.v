@@ -44,7 +44,7 @@ Variable p: positive.
 Definition Qpower_positive_modulus (c:Qpos) (e:Qpos) : QposInf :=
 Qpos2QposInf (e/((p#1)*c^(Zpred p))).
 
-Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}p) (inj_Q IR q) CI)).
+Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}(nat_of_P p)) (inj_Q IR q) CI)).
 Proof.
 clear p.
 intros p.
@@ -59,7 +59,6 @@ algebra.
 rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
 rewrite nat_of_P_o_P_of_succ_nat_eq_succ in IHn.
 change (P_of_succ_nat (S n)) with (Psucc (P_of_succ_nat n)).
-unfold pos2Z.
 simpl in *.
 rewrite Pplus_one_succ_r.
 stepl (inj_Q IR (Qpower_positive q (P_of_succ_nat n))[*](inj_Q IR q)).
@@ -106,27 +105,25 @@ rapply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x 
  apply eq_reflexive.
 simpl.
 intros x _ Hx.
-change (AbsIR ((nring (R:=IR) (S n))[*](One[*]nexp IR n x))[<=]
+change (AbsIR ((nring (R:=IR) (S n))[*](One[*]nexp IR n (inj_Q IR x)))[<=]
 inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
 stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))) by
 (apply eq_symmetric; rapply inj_Q_mult).
-stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n x))) by apply AbsIR_mult;apply nring_nonneg; auto with *.
+stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n (inj_Q IR x)))) by apply AbsIR_mult;apply nring_nonneg; auto with *.
 rapply mult_resp_leEq_both.
    apply nring_nonneg; auto with *.
   apply AbsIR_nonneg.
  stepl (inj_Q IR (nring (S n))) by apply inj_Q_nring.
  apply inj_Q_leEq.
  rewrite Hn.
- unfold pos2Z.
  rewrite <- POS_anti_convert.
  stepl ((S n):Q) by apply eq_symmetric; rapply nring_Q.
  rapply leEq_reflexive.
-stepl (One[*](AbsIR (nexp IR n x))) by apply AbsIR_mult; apply less_leEq; apply pos_one.
-stepl (AbsIR (nexp IR n x)) by apply eq_symmetric; apply one_mult.
-stepl (nexp IR n (AbsIR x)) by apply eq_symmetric; apply AbsIR_nexp.
+stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))) by apply AbsIR_mult; apply less_leEq; apply pos_one.
+stepl (AbsIR (nexp IR n (inj_Q _ x))) by apply eq_symmetric; apply one_mult.
+stepl (nexp IR n (AbsIR (inj_Q _ x))) by apply eq_symmetric; apply AbsIR_nexp.
 stepr (inj_Q IR (c ^ Zpred p)) by apply inj_Q_wd; simpl; rewrite Q_Qpos_power; reflexivity.
 rewrite Hn.
-unfold pos2Z.
 rewrite <- POS_anti_convert.
 rewrite inj_S.
 rewrite <- Zpred_succ.
@@ -139,7 +136,7 @@ destruct n.
 rewrite  <- (nat_of_P_o_P_of_succ_nat_eq_succ n).
 rewrite convert_is_POS.
 simpl.
-stepr ((FId{^}(P_of_succ_nat n)) (inj_Q IR (c:Q)) CI) by apply eq_symmetric; apply Qpower_positive_correct.
+stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) CI) by apply eq_symmetric; apply Qpower_positive_correct.
 simpl.
 rapply power_resp_leEq.
  apply AbsIR_nonneg.
@@ -171,7 +168,7 @@ assert (HI:proper I).
  apply shift_zero_less_minus'.
  rstepr (inj_Q IR (c:Q)[+]inj_Q IR (c:Q)).
  apply plus_resp_pos; assumption.
-change (x[^]p) with ((FId{^}p) x CI).
+change (x[^](nat_of_P p)) with ((FId{^}(nat_of_P p)) x CI).
 destruct Hx as [Hx0 Hx1].
 apply (ContinuousCorrect HI (Continuous_nth I FId (Continuous_id I)  (nat_of_P p)));[|split;assumption].
 intros q [] Hq.

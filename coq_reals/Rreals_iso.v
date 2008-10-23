@@ -733,8 +733,8 @@ Qed.
 Lemma R_pring_as_IR : forall x, RasIR (pring _ x) [=] pring _ x.
 intro x.
 (*rewrite pring_convert.*)
-stepr (nring (R := IR) x).
-stepl (RasIR (nring (R := RReals) x)).
+stepr (nring (R := IR) (nat_of_P x)).
+stepl (RasIR (nring (R := RReals) (nat_of_P x))).
 apply R_nring_as_IR.
 apply R_as_IR_wd.
 symmetry.
@@ -811,7 +811,7 @@ apply R_ap_as_IR_back.
 apply PI_neq0.
 intro p.
 rewrite <- convert_is_POS.
-stepr (nring (R := IR) p [*] Pi) by
+stepr (nring (R := IR) (nat_of_P p) [*] Pi) by
     apply mult_wdl; symmetry; rapply (zring_plus_nat IR).
 case (nat_of_P p).
 simpl.
@@ -858,7 +858,7 @@ rewrite pring_convert.
 rapply less_leEq.
 rapply inv_cancel_less.
 rstepl (Zero[*]Zero:IR).
-rstepr ((nring (R:=IR) p)[*]Pi).
+rstepr ((nring (R:=IR) (nat_of_P p))[*]Pi).
 apply mult_resp_less_both.
 rapply eq_imp_leEq.
 reflexivity.
@@ -930,14 +930,14 @@ intro q.
 destruct q.
 unfold Q2R.
 simpl.
-cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) Qden))).
+cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (nat_of_P Qden)))).
 intro Hy.
-stepr (RasIR (zring (R:=RRing) Qnum)[/]RasIR (nring (R:=RRing) Qden)[//]Hy).
-stepl (RasIR (zring (R:=RRing) Qnum / nring (R:=RRing) Qden)).
-apply (R_div_as_IR (zring Qnum) (nring Qden)).
+stepr (RasIR (zring (R:=RRing) Qnum)[/]RasIR (nring (R:=RRing) (nat_of_P Qden))[//]Hy).
+stepl (RasIR (zring (R:=RRing) Qnum / nring (R:=RRing) (nat_of_P Qden))).
+apply (R_div_as_IR (zring Qnum) (nring (nat_of_P Qden))).
 apply R_as_IR_wd.
 unfold Rdiv.
-replace (nring (R:=RRing) Qden) with (INR Qden).
+replace (nring (R:=RRing) (nat_of_P Qden)) with (INR (nat_of_P Qden)).
 replace (zring (R:=RRing) Qnum) with (IZR Qnum).
 simpl; reflexivity.
 apply IZR_as_zring.
@@ -951,7 +951,7 @@ apply IR_ap_as_R.
 apply Rgt_not_eq.
 unfold Rgt.
 replace 0%R with (nring (R:=RRing) 0).
-change ((nring (R:=RRing) 0 [<] nring (R:=RRing) Qden)).
+change ((nring (R:=RRing) 0 [<] nring (R:=RRing) (nat_of_P Qden))).
 rapply nring_less.
 auto with *.
 auto with *.

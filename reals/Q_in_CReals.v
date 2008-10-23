@@ -87,7 +87,7 @@ apply less_plusOne.
 Qed.
 (*--------------------------------------*)
 
-Coercion nat_of_P : positive >-> nat.
+Coercion Local nat_of_P : positive >-> nat.
 (* end hide *)
 
 (**

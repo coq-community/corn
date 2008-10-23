@@ -254,6 +254,7 @@ Unset Strict Implicit.
 We consider the injection [inject_nat] from [nat] to [Z] as a
 coercion. *)
 (* begin hide *)
+Coercion Zpos : positive >-> Z.
 Coercion Z_of_nat : nat >-> Z.
 (* end hide *)
 

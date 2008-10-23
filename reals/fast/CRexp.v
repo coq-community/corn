@@ -572,9 +572,9 @@ intros [|z|z]; simpl; intros x Hx;
    apply inj_Q_leEq.
    simpl; auto with *.
   apply (inj_Q_nring IR 0).
- stepl (Three[!]nring z[//]pos_three IR).
-  astepl (Three[^]z:IR).
-  stepl ((inj_Q IR (3:Q))[^]z).
+ stepl (Three[!]nring (nat_of_P z)[//]pos_three IR).
+  astepl (Three[^](nat_of_P z):IR).
+  stepl ((inj_Q IR (3:Q))[^](nat_of_P z)).
    stepl (inj_Q IR (3^z)).
     apply inj_Q_wd.
     apply eq_symmetric.
@@ -587,7 +587,7 @@ intros [|z|z]; simpl; intros x Hx;
   apply eq_reflexive.
  apply eq_symmetric.
  rewrite <- convert_is_POS.
- stepl (inj_Q IR (nring z)).
+ stepl (inj_Q IR (nring (nat_of_P z))).
   apply (inj_Q_nring).
  apply inj_Q_wd; apply nring_Q.
 
@@ -613,9 +613,9 @@ stepr (Half[!](inj_Q IR (z:Q))[//](pos_half IR):IR).
  astepr (inj_Q IR ([--](z:Q))).
  apply inj_Q_wd.
  simpl; reflexivity.
-stepl (Half[!]nring z[//]pos_half IR).
- astepl (Half[^]z:IR).
- stepl ((inj_Q IR ((1#2):Q))[^]z).
+stepl (Half[!]nring (nat_of_P z)[//]pos_half IR).
+ astepl (Half[^](nat_of_P z):IR).
+ stepl ((inj_Q IR ((1#2):Q))[^](nat_of_P z)).
   stepl (inj_Q IR ((1#2)^z)).
    apply inj_Q_wd.
    apply eq_symmetric.
@@ -640,7 +640,7 @@ apply power_wd.
  apply eq_reflexive.
 apply eq_symmetric.
 rewrite <- convert_is_POS.
-stepl (inj_Q IR (nring z)).
+stepl (inj_Q IR (nring (nat_of_P z))).
  apply (inj_Q_nring).
 apply inj_Q_wd; apply nring_Q.
 Qed. 
