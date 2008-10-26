@@ -46,6 +46,7 @@ dense in any real number structure. *)
 Require Export Cauchy_IR.
 Require Export Nmonoid.
 Require Export Zring.
+Require Import CRing_Homomorphisms.
 Require Import Expon.
 Require Import Qpower.
 Require Import CornTac.
@@ -816,16 +817,32 @@ apply eq_symmetric.
 apply inj_Q_inv.
 Qed.
 
-Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
+Lemma inj_Q_One : inj_Q One [=] One.
+Proof.
+rstepr ((nring 1):R1).
+apply (inj_Q_nring 1).
+Qed.
+
+Lemma inj_Q_Zero : inj_Q Zero [=] Zero.
+Proof.
+rstepr ((nring 0):R1).
+apply (inj_Q_nring 0).
+Qed.
+
+Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring inj_Q_One inj_Q_Zero : algebra.
+
+Definition inj_Q_hom : RingHom Q_as_CRing R1.
+exists (Build_CSetoid_fun _ _ _ inj_Q_strext).
+  refine inj_Q_plus.
+ refine inj_Q_mult.
+refine inj_Q_One.
+Defined.
 
 Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
 Proof.
 intros q.
 induction n.
- change ((inj_Q (nring 1))[=]One).
- stepr ((nring 1):R1).
-  apply (inj_Q_nring 1).
- rational.
+ apply inj_Q_One.
 rewrite inj_S.
 unfold Zsucc.
 stepr (inj_Q (q^n*q)%Q).
@@ -844,9 +861,7 @@ Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^
 Proof.
 intros q [|n|n] H.
   change (inj_Q (q ^ 0)%Q[=]One).
-  rstepr (nring 1:R1).
-  stepr (inj_Q 1%Q) by apply (inj_Q_nring 1).
-  apply eq_reflexive.
+  apply inj_Q_One.
  simpl.
  change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
  csetoid_rewrite_rev (inj_Q_power q n).

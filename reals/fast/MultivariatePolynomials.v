@@ -4,6 +4,10 @@ Require Import COrdFields2.
 Require Export Qordfield.
 Require Import QMinMax.
 Require Import CornTac.
+Require Import Qauto.
+Require Import Qmetric.
+Require Import Qabs.
+Require Import ModulusDerivative.
 
 Set Implicit Arguments.
 
@@ -33,7 +37,9 @@ match n return MultivariatePolynomial n -> vector F n -> F with
 | (S n') => fun p v => (MVP_apply (p ! (MVP_C_ _ (Vhead _ _ v))) (Vtail _ _ v))
 end.
 
-Add Parametric Morphism n : (@MVP_apply n) with signature (@st_eq (MultivariatePolynomial n)) ==> (@eq _) ==> (@st_eq _) as MVP_apply_wd.
+End MultivariatePolynomial.
+
+Add Parametric Morphism F n : (@MVP_apply F n) with signature (@st_eq (MultivariatePolynomial F n)) ==> (@eq _) ==> (@st_eq _) as MVP_apply_wd.
 Proof.
 induction n;
  intros x y Hxy z.
@@ -44,7 +50,7 @@ rewrite Hxy.
 reflexivity.
 Qed.
 
-Lemma zero_MVP_apply : forall n v, MVP_apply (Zero:MultivariatePolynomial n) v[=]Zero.
+Lemma zero_MVP_apply : forall F n v, MVP_apply F (Zero:MultivariatePolynomial F n) v[=]Zero.
 Proof.
 induction v.
  reflexivity.
@@ -53,7 +59,7 @@ rewrite <- IHv.
 reflexivity.
 Qed.
 
-Lemma one_MVP_apply : forall n v, MVP_apply (One:MultivariatePolynomial n) v[=]One.
+Lemma one_MVP_apply : forall F n v, MVP_apply F (One:MultivariatePolynomial F n) v[=]One.
 Proof.
 induction v.
  reflexivity.
@@ -63,8 +69,17 @@ rewrite one_apply.
 reflexivity.
 Qed.
 
-Lemma MVP_plus_apply: forall n (p q : MultivariatePolynomial n) v,
-  MVP_apply (p[+]q) v [=] MVP_apply p v[+]MVP_apply q v.
+Lemma C_MVP_apply : forall F n q v, MVP_apply F (MVP_C_ F n q) v[=]q.
+Proof.
+induction v.
+ reflexivity.
+simpl.
+rewrite _c_apply.
+assumption.
+Qed.
+
+Lemma MVP_plus_apply: forall F n (p q : MultivariatePolynomial F n) v,
+  MVP_apply F (p[+]q) v [=] MVP_apply F p v[+]MVP_apply F q v.
 Proof.
 induction v.
  reflexivity.
@@ -73,8 +88,8 @@ rewrite plus_apply.
 apply IHv.
 Qed.
 
-Lemma MVP_mult_apply: forall n (p q : MultivariatePolynomial n) v,
-  MVP_apply (p[*]q) v [=] MVP_apply p v[*]MVP_apply q v.
+Lemma MVP_mult_apply: forall F n (p q : MultivariatePolynomial F n) v,
+  MVP_apply F (p[*]q) v [=] MVP_apply F p v[*]MVP_apply F q v.
 Proof.
 induction v.
  reflexivity.
@@ -83,8 +98,8 @@ rewrite mult_apply.
 apply IHv.
 Qed.
 
-Lemma MVP_c_mult_apply: forall n (p : MultivariatePolynomial n) c v,
-  MVP_apply (MVP_C_ _ c[*]p) v[=]c[*]MVP_apply p v.
+Lemma MVP_c_mult_apply: forall F n (p : MultivariatePolynomial F n) c v,
+  MVP_apply F (MVP_C_ _ _ c[*]p) v[=]c[*]MVP_apply F p v.
 Proof.
 induction v.
  reflexivity.
@@ -94,7 +109,29 @@ rewrite _c_mult_apply.
 reflexivity.
 Qed.
 
-End MultivariatePolynomial.
+Lemma MVP_apply_hom_strext : forall (F:CRing) n (v:vector F n), fun_strext (fun (p:MultivariatePolynomial F n) => MVP_apply _ p v).
+Proof.
+induction n.
+ intros v x y.
+ simpl.
+ auto with *.
+intros v x y H.
+simpl in H.
+destruct (csbf_strext _ _ _ _ _ _ _ _ (IHn _ _ _ H)) as [H0 | H0].
+ assumption.
+elim (ap_irreflexive _ _ H0).
+Defined.
+
+Definition MVP_apply_hom_csf (F:CRing) n (v:vector F n) := 
+Build_CSetoid_fun _ _ _ (MVP_apply_hom_strext F v).
+
+Definition MVP_apply_hom (F:CRing) n (v:vector F n) : RingHom (MultivariatePolynomial F n) F.
+intros F n v.
+exists (MVP_apply_hom_csf F v).
+  intros x y; rapply MVP_plus_apply.
+ intros x y; rapply MVP_mult_apply.
+rapply one_MVP_apply.
+Defined.
 
 (* Some upper bound on the polynomial on [0,1] *)
 Fixpoint MVP_upperBound (n:nat) : MultivariatePolynomial Q_as_CRing n -> Q :=
@@ -449,3 +486,256 @@ replace (lt_n_Sm_le i m (lt_le_trans i (S m) (S m) H (le_refl (S m))))
  with (lt_n_Sm_le i m H) by apply le_irrelevent.
 reflexivity.
 Qed.
+Open Local Scope Q_scope.
+
+Definition MVP_apply_modulus n (p:MultivariatePolynomial Q_as_CRing (S n)) :=
+let p' := (_D_ p) in
+Qscale_modulus (Qmax (MVP_upperBound (S n) p') (-(MVP_lowerBound (S n) p'))).
+
+Lemma MVP_apply_modulus_correct : forall n (p:MultivariatePolynomial Q_as_CRing (S n)) x y e, 
+ (0 <= x) -> (x <= 1) -> (0 <= y) -> (y <= 1) ->
+ ball_ex (MVP_apply_modulus p e) x y -> 
+ forall (v:vector Q n), UnitHyperInterval v -> ball e (MVP_apply _ p (Vcons _ x _ v):Q) (MVP_apply _ p (Vcons _ y _ v)).
+intros n p x y e Hx0 Hx1 Hy0 Hy1 Hxy v Hv.
+assert (Hx : (Qmax 0 (Qmin 1 x))==x).
+ rewrite Qle_min_r in Hx1.
+ rewrite Hx1.
+ rewrite Qle_max_r in Hx0.
+ rewrite Hx0.
+ reflexivity.
+assert (Hy : (Qmax 0 (Qmin 1 y))==y).
+ rewrite Qle_min_r in Hy1.
+ rewrite Hy1.
+ rewrite Qle_max_r in Hy0.
+ rewrite Hy0.
+ reflexivity.
+simpl.
+rewrite <- Hx.
+rewrite <- Hy.
+unfold MVP_apply_modulus in Hxy.
+set (c:=(Qmax (MVP_upperBound (S n) (_D_ p))
+              (- MVP_lowerBound (S n) (_D_ p)))) in *.
+set (fp:=cpoly_map (RHcompose _ _ _ (inj_Q_hom IR) (MVP_apply_hom _ v)) p).
+apply (fun A B e => is_UniformlyContinuousD_Q (Some 0) (Some 1) (refl_equal _) (FPoly _ fp) (FPoly _ (_D_ fp)) (Derivative_poly _ _ _)
+ (fun x => (MVP_apply _ p (Vcons _ x _ v))) A c B e x y);
+ try assumption.
+ unfold fp.
+ simpl.
+ intros q _ _.
+ clear - p.
+ change (inj_Q_hom IR (MVP_apply_hom Q_as_CRing v p ! (MVP_C_ Q_as_CRing n q))[=]
+   (cpoly_map (RHcompose (MultivariatePolynomial Q_as_CRing n) Q_as_CRing IR
+      (inj_Q_hom IR) (MVP_apply_hom Q_as_CRing v)) p) ! (inj_Q_hom IR q)).
+ rewrite cpoly_map_compose.
+ rewrite <- cpoly_map_apply.
+ rapply inj_Q_wd.
+ rewrite cpoly_map_apply.
+ apply csbf_wd; try reflexivity.
+ rapply C_MVP_apply.
+simpl.
+clear - c Hv.
+intros x _ [H0x Hx1].
+change (AbsIR
+  (_D_
+     (cpoly_map
+        (RHcompose (MultivariatePolynomial Q_as_CRing n) Q_as_CRing IR
+           (inj_Q_hom IR) (MVP_apply_hom Q_as_CRing v)) p)) ! (inj_Q_hom IR x)[<=]
+   inj_Q IR c).
+rewrite <- cpoly_map_diff.
+rewrite cpoly_map_compose.
+rewrite <- cpoly_map_apply.
+change (AbsIR (inj_Q IR (cpoly_map (MVP_apply_hom Q_as_CRing v) (_D_ p)) ! x)[<=]inj_Q IR c).
+rewrite AbsIR_Qabs.
+apply inj_Q_leEq.
+assert (Hx: 0 <= x <= 1).
+ split;
+  apply (leEq_inj_Q IR).
+  rewrite inj_Q_Zero.
+  rstepl (Zero[/]Zero[+]One[//]den_is_nonzero IR 0); auto.
+ rewrite inj_Q_One.
+ rstepr (One[/]Zero[+]One[//]den_is_nonzero IR 1); auto.
+setoid_replace ((cpoly_map (MVP_apply_hom Q_as_CRing v) (_D_ p)) ! x)
+ with (@MVP_apply Q_as_CRing (S n) (_D_ p) (Vcons _ x _ v)).
+ apply Qabs_case; intros H.
+  eapply Qle_trans;[|apply Qmax_ub_l].
+  apply MVP_upperBound_correct.
+  split; auto.
+ eapply Qle_trans;[|apply Qmax_ub_r].
+ apply Qopp_le_compat.
+ apply MVP_lowerBound_correct.
+ split; auto.
+generalize (_D_ p).
+intros s; clear -s.
+simpl.
+change ((cpoly_map_fun (MultivariatePolynomial Q_as_CRing n) Q_as_CRing
+   (MVP_apply_hom Q_as_CRing v) s) ! x == MVP_apply_hom Q_as_CRing v (s ! (MVP_C_ Q_as_CRing n x))).
+rewrite cpoly_map_apply.
+simpl.
+rewrite C_MVP_apply.
+reflexivity.
+Qed.
+
+Open Scope uc_scope.
+
+Definition Qclamp01 := QboundBelow_uc (0) ∘ QboundAbove_uc 1.
+
+Lemma Qclamp01_clamped : forall x, 0 <= Qclamp01 x <= 1.
+Proof.
+intros x.
+unfold Qclamp01.
+split; simpl.
+ apply Qmax_ub_l.
+rewrite Qmax_min_distr_r.
+apply Qmin_lb_l.
+Qed. 
+
+Lemma Qclamp01_le : forall x y, x <= y -> Qclamp01 x <= Qclamp01 y.
+Proof.
+intros x y H.
+simpl.
+apply Qmax_le_compat; auto with *.
+apply Qmin_le_compat; auto with *.
+Qed.
+
+Lemma Qclamp01_close : forall e x y, Qabs (x-y) <= e -> Qabs (Qclamp01 x - Qclamp01 y) <= e.
+Proof.
+intros e.
+cut (forall x y : Q, y <= x -> x - y <= e -> Qclamp01 x - Qclamp01 y <= e).
+ intros H x y.
+ destruct (Qle_total x y).
+  rewrite Qabs_neg.
+   intros He.
+   rewrite Qabs_neg.
+    replace LHS with (Qclamp01 y - Qclamp01 x) by ring.
+    apply H; auto.
+    replace LHS with (- (x-y)) by ring.
+    auto.
+   apply (shift_minus_leEq Q_as_COrdField).
+   stepr (Qclamp01 y) by (simpl; ring).
+   apply Qclamp01_le.
+   auto.
+  apply (shift_minus_leEq Q_as_COrdField).
+  stepr y by (simpl; ring).
+  auto. 
+ rewrite Qabs_pos.
+  intros He.
+  rewrite Qabs_pos.
+   apply H; auto.
+  rapply shift_zero_leEq_minus.
+  apply Qclamp01_le.
+  auto.
+ rapply shift_zero_leEq_minus.
+ auto.
+intros x y Hxy He.
+simpl.
+apply (Qmin_case 1 y).
+ intros Hy.
+ assert (Hx:=Qle_trans _ _ _ Hy Hxy).
+ rewrite Qle_min_l in Hx.
+ rewrite Hx.
+ replace LHS with  0 by ring.
+ eapply Qle_trans;[|apply He].
+ rapply shift_zero_leEq_minus; auto.
+apply (Qmin_case 1 x).
+ intros Hx Hy.
+ eapply Qle_trans;[|apply He].
+ apply Qplus_le_compat; auto.
+ apply Qopp_le_compat.
+ apply Qmax_ub_r.
+intros _ _.
+apply (Qmax_case 0 x); intros Hx.
+ assert (Hy:=Qle_trans _ _ _ Hxy Hx).
+ rewrite Qle_max_l in Hy.
+ rewrite Hy.
+ eapply Qle_trans;[|apply He].
+ rapply shift_zero_leEq_minus; auto.
+apply (Qmax_case 0 y); intros Hy.
+ eapply Qle_trans;[|apply He].
+ apply Qplus_le_compat; auto with *.
+auto.
+Qed.
+
+Fixpoint n_UniformlyContinuousFunction (X Y:MetricSpace) (n:nat) :=
+match n with
+|O => Y
+|S n' => X --> (n_UniformlyContinuousFunction X Y n')
+end.
+
+Fixpoint MVP_uc_sig (n:nat) :MultivariatePolynomial Q_as_CRing n -> n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n -> Type :=
+match n return MultivariatePolynomial Q_as_CRing n -> n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n -> Type with
+| O => fun p x => p==x
+| (S n') => fun p f => forall v, MVP_uc_sig n' (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 v))) (f v)
+end.
+
+Definition MVP_uc : forall n (p:MultivariatePolynomial Q_as_CRing n),
+ {f:n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n
+ |MVP_uc_sig _ p f}.
+induction n.
+ intros x.
+ exists x.
+ simpl.
+ reflexivity.
+intros p.
+assert (is_UniformlyContinuousFunction (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 x))))) (MVP_apply_modulus p)).
+ intros e x y Hxy.
+ assert (Hxy' : ball_ex (MVP_apply_modulus p e) (Qclamp01 x) (Qclamp01 y)).
+  destruct (MVP_apply_modulus p e); auto.
+  simpl.
+  rewrite Qball_Qabs.
+  rapply Qclamp01_close.
+  rewrite <- Qball_Qabs.
+  auto.
+ destruct (Qclamp01_clamped x) as [Hx0 Hx1].
+ destruct (Qclamp01_clamped y) as [Hy0 Hy1].
+ assert (X:=@MVP_apply_modulus_correct _ p (Qclamp01 x) (Qclamp01 y) e Hx0 Hx1 Hy0 Hy1 Hxy').
+ clear Hxy Hxy'.
+ generalize
+        (proj2_sigT _  _ (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 x))))
+        (proj2_sigT _  _ (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 y)))).
+ set (x':=Qclamp01 x) in *.
+ set (y':=Qclamp01 y) in *.
+ simpl in X.
+ revert X.
+ generalize (ProjT1 (IHn p ! (MVP_C_ Q_as_CRing n x')))
+            (ProjT1 (IHn p ! (MVP_C_ Q_as_CRing n y'))).
+ change (Q_as_CSetoid) with (csg_crr Q_as_CRing).
+ generalize (p ! (MVP_C_ Q_as_CRing n x'))
+            (p ! (MVP_C_ Q_as_CRing n y')).
+ clear - e.
+ induction n.
+  simpl.
+  intros p q s t H Hs Ht.
+  rewrite <- Hs, <- Ht.
+  apply (H (Vnil _)).
+  constructor.
+ simpl.
+ intros p q s t H Hs Ht v.
+ apply (fun H => IHn _ _ _ _ H (Hs v) (Ht v)).
+ intros v0 Hv0.
+ apply (H (Vcons _ (Qclamp01 v) _ v0)).
+ split; auto.
+ apply Qclamp01_clamped.
+exists (Build_UniformlyContinuousFunction H).
+simpl.
+intros v.
+exact (ProjT2 (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 v)))).
+Defined.
+
+Definition MVP_uc_Q := (fun n p => ProjT1 (MVP_uc n p)).
+
+Fixpoint n_Cap X Y (plX : PrelengthSpace X) n : Complete (n_UniformlyContinuousFunction X Y n) -->
+ n_UniformlyContinuousFunction (Complete X) (Complete Y) n :=
+match n return Complete (n_UniformlyContinuousFunction X Y n) -->
+ n_UniformlyContinuousFunction (Complete X) (Complete Y) n with
+| O => uc_id _
+| (S n') => (uc_compose_uc _ _ _ (@n_Cap X Y plX n')) ∘ (@Cap X _ plX)
+end.
+
+Definition n_Cmap X Y (plX : PrelengthSpace X) n : n_UniformlyContinuousFunction X Y n -->
+ n_UniformlyContinuousFunction (Complete X) (Complete Y) n :=
+(@n_Cap X Y plX n) ∘ (@Cunit _).
+
+Definition MVP_uc_fun n (p:MultivariatePolynomial _ n) :
+ n_UniformlyContinuousFunction CR CR n := 
+n_Cmap _ QPrelengthSpace n (MVP_uc_Q n p).
+
