@@ -107,3 +107,43 @@ simpl.
 rewrite Qabs_pos; auto with *.
 rapply ball_refl.
 Qed.
+
+Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.
+Proof.
+intros a b.
+rewrite <- (CRasIRasCR_id a).
+rewrite <- (CRasIRasCR_id b).
+rewrite <- CRabs_correct.
+rewrite <- IR_AbsSmall_as_CR.
+rewrite <- IR_leEq_as_CR.
+split.
+ apply AbsIR_imp_AbsSmall.
+apply AbsSmall_imp_AbsIR.
+Qed.
+
+Lemma CRabs_pos : forall x:CR, ('0 <= x -> CRabs x == x)%CR.
+Proof.
+intros x.
+rewrite <- (CRasIRasCR_id x).
+rewrite <- CRabs_correct.
+intros H.
+apply IRasCR_wd.
+apply AbsIR_eq_x.
+rewrite IR_leEq_as_CR.
+rewrite IR_Zero_as_CR.
+auto.
+Qed.
+
+Lemma CRabs_neg: forall x, (x <= '0 -> CRabs x == - x)%CR.
+Proof.
+intros x.
+rewrite <- (CRasIRasCR_id x).
+rewrite <- CRabs_correct.
+intros H.
+rewrite <- IR_opp_as_CR.
+apply IRasCR_wd.
+apply AbsIR_eq_inv_x.
+rewrite IR_leEq_as_CR.
+rewrite IR_Zero_as_CR.
+auto.
+Qed.

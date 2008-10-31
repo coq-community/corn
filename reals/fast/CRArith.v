@@ -25,6 +25,8 @@ Require Import QArith.
 Require Export CRreal.
 Require Import Complete.
 Require Export CRFieldOps.
+Require Import Qring.
+Require Import CRing_Homomorphisms.
 Require Import Qmetric.
 Require Import CornTac.
 
@@ -156,6 +158,40 @@ intros x y z;generalize z x y;rapply ring_distl_unfolded.
 reflexivity.
 rapply cg_minus_correct.
 Qed.
+
+Lemma inject_Q_strext : fun_strext inject_Q.
+Proof.
+intros x y [Hxy|Hxy].
+ rapply Qlt_not_eq.
+ apply Qnot_le_lt.
+ intros H.
+ absurd ('y[<=]'x).
+  rewrite leEq_def.
+  auto with *.
+ rewrite CRle_Qle.
+ auto.
+apply ap_symmetric.
+rapply Qlt_not_eq.
+apply Qnot_le_lt.
+intros H.
+absurd ('x[<=]'y).
+ rewrite leEq_def.
+ auto with *.
+rewrite CRle_Qle.
+auto.
+Qed.
+
+Definition inject_Q_csf := Build_CSetoid_fun _ _ _ inject_Q_strext.
+
+Lemma inject_Q_hom : RingHom Q_as_CRing CRasCRing.
+Proof.
+exists (inject_Q_csf).
+  rapply CRplus_Qplus.
+ intros x y.
+ apply eq_symmetric.
+ apply CRmult_Qmult.
+apply eq_reflexive.
+Defined.
 
 Lemma CR_Q_ring_morphism : 
  ring_morph (inject_Q 0%Q) (inject_Q 1%Q) (ucFun2 CRplus) CRmult

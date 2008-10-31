@@ -7,7 +7,9 @@ Require Import CornTac.
 Require Import Qauto.
 Require Import Qmetric.
 Require Import Qabs.
+Require Import CRabs.
 Require Import ModulusDerivative.
+Require Import CRArith.
 
 Set Implicit Arguments.
 
@@ -132,6 +134,25 @@ exists (MVP_apply_hom_csf F v).
  intros x y; rapply MVP_mult_apply.
 rapply one_MVP_apply.
 Defined.
+
+Fixpoint MVP_map R S (f:RingHom R S) (n:nat) : RingHom (MultivariatePolynomial R n) (MultivariatePolynomial S n) :=
+match n return RingHom (MultivariatePolynomial R n) (MultivariatePolynomial S n) with
+| O => f
+| (S n') => cpoly_map (MVP_map f n')
+end.
+
+Lemma MVP_map_C_ : forall R S (f:RingHom R S) n c,
+ MVP_map f n (MVP_C_ _ _ c)[=]MVP_C_ _ _ (f c).
+Proof.
+induction n.
+ intros c; reflexivity.
+intros c.
+simpl.
+change (cpoly_map (MVP_map f n) (_C_ (MVP_C_ R n c))[=]_C_ (MVP_C_ S n (f c))).
+rewrite cpoly_map_C.
+rewrite IHn.
+reflexivity.
+Qed.
 
 (* Some upper bound on the polynomial on [0,1] *)
 Fixpoint MVP_upperBound (n:nat) : MultivariatePolynomial Q_as_CRing n -> Q :=
@@ -655,6 +676,14 @@ apply (Qmax_case 0 y); intros Hy.
 auto.
 Qed.
 
+Require Import RSetoid.
+
+Fixpoint n_Function X Y (n:nat) :=
+match n with
+|O => Y
+|S n' => extSetoid X (n_Function X Y n')
+end.
+
 Fixpoint n_UniformlyContinuousFunction (X Y:MetricSpace) (n:nat) :=
 match n with
 |O => Y
@@ -676,45 +705,45 @@ induction n.
  simpl.
  reflexivity.
 intros p.
-assert (is_UniformlyContinuousFunction (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 x))))) (MVP_apply_modulus p)).
- intros e x y Hxy.
- assert (Hxy' : ball_ex (MVP_apply_modulus p e) (Qclamp01 x) (Qclamp01 y)).
-  destruct (MVP_apply_modulus p e); auto.
-  simpl.
-  rewrite Qball_Qabs.
-  rapply Qclamp01_close.
-  rewrite <- Qball_Qabs.
-  auto.
- destruct (Qclamp01_clamped x) as [Hx0 Hx1].
- destruct (Qclamp01_clamped y) as [Hy0 Hy1].
- assert (X:=@MVP_apply_modulus_correct _ p (Qclamp01 x) (Qclamp01 y) e Hx0 Hx1 Hy0 Hy1 Hxy').
- clear Hxy Hxy'.
+assert (is_UniformlyContinuousFunction (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 x))))) (MVP_apply_modulus p)) by abstract
+ (intros e x y Hxy;
+ assert (Hxy' : ball_ex (MVP_apply_modulus p e) (Qclamp01 x) (Qclamp01 y)) by 
+  (destruct (MVP_apply_modulus p e); auto;
+  simpl;
+  rewrite Qball_Qabs;
+  rapply Qclamp01_close;
+  rewrite <- Qball_Qabs;
+  auto);
+ destruct (Qclamp01_clamped x) as [Hx0 Hx1];
+ destruct (Qclamp01_clamped y) as [Hy0 Hy1];
+ assert (X:=@MVP_apply_modulus_correct _ p (Qclamp01 x) (Qclamp01 y) e Hx0 Hx1 Hy0 Hy1 Hxy');
+ clear Hxy Hxy';
  generalize
         (proj2_sigT _  _ (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 x))))
-        (proj2_sigT _  _ (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 y)))).
- set (x':=Qclamp01 x) in *.
- set (y':=Qclamp01 y) in *.
- simpl in X.
- revert X.
+        (proj2_sigT _  _ (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 y))));
+ set (x':=Qclamp01 x) in *;
+ set (y':=Qclamp01 y) in *;
+ simpl in X;
+ revert X;
  generalize (ProjT1 (IHn p ! (MVP_C_ Q_as_CRing n x')))
-            (ProjT1 (IHn p ! (MVP_C_ Q_as_CRing n y'))).
- change (Q_as_CSetoid) with (csg_crr Q_as_CRing).
+            (ProjT1 (IHn p ! (MVP_C_ Q_as_CRing n y')));
+ change (Q_as_CSetoid) with (csg_crr Q_as_CRing);
  generalize (p ! (MVP_C_ Q_as_CRing n x'))
-            (p ! (MVP_C_ Q_as_CRing n y')).
- clear - e.
- induction n.
-  simpl.
-  intros p q s t H Hs Ht.
-  rewrite <- Hs, <- Ht.
-  apply (H (Vnil _)).
-  constructor.
- simpl.
- intros p q s t H Hs Ht v.
- apply (fun H => IHn _ _ _ _ H (Hs v) (Ht v)).
- intros v0 Hv0.
- apply (H (Vcons _ (Qclamp01 v) _ v0)).
- split; auto.
- apply Qclamp01_clamped.
+            (p ! (MVP_C_ Q_as_CRing n y'));
+ clear - e;
+ induction n;[
+  simpl;
+  intros p q s t H Hs Ht;
+  rewrite <- Hs, <- Ht;
+  apply (H (Vnil _));
+  constructor|];
+ simpl;
+ intros p q s t H Hs Ht v;
+ apply (fun H => IHn _ _ _ _ H (Hs v) (Ht v));
+ intros v0 Hv0;
+ apply (H (Vcons _ (Qclamp01 v) _ v0));
+ split; auto;
+ apply Qclamp01_clamped).
 exists (Build_UniformlyContinuousFunction H).
 simpl.
 intros v.
@@ -722,6 +751,19 @@ exact (ProjT2 (IHn p ! (MVP_C_ Q_as_CRing n (Qclamp01 v)))).
 Defined.
 
 Definition MVP_uc_Q := (fun n p => ProjT1 (MVP_uc n p)).
+
+Add Parametric Morphism n : (@MVP_uc_Q n) with signature (@st_eq _) ==> (@st_eq _) as MVP_uc_Q_wd.
+Proof.
+induction n.
+ simpl.
+ unfold MVP_uc_Q.
+ simpl.
+ auto.
+intros x y Hxy a.
+rapply IHn.
+rewrite Hxy.
+reflexivity.
+Qed.
 
 Fixpoint n_Cap X Y (plX : PrelengthSpace X) n : Complete (n_UniformlyContinuousFunction X Y n) -->
  n_UniformlyContinuousFunction (Complete X) (Complete Y) n :=
@@ -735,7 +777,786 @@ Definition n_Cmap X Y (plX : PrelengthSpace X) n : n_UniformlyContinuousFunction
  n_UniformlyContinuousFunction (Complete X) (Complete Y) n :=
 (@n_Cap X Y plX n) ∘ (@Cunit _).
 
+Add Parametric Morphism X Y plX n : (@n_Cap X Y plX n)
+ with signature (@st_eq _) ==> (@st_eq _) as n_Cap_wd.
+Proof.
+induction n.
+ simpl.
+ auto.
+intros x y Hxy z.
+rapply IHn.
+rapply Cap_wd; auto.
+reflexivity.
+Qed.
+
+Add Parametric Morphism X Y plX n : (@n_Cmap X Y plX n)
+ with signature (@st_eq _) ==> (@st_eq _) as n_Cmap_wd.
+intros x y Hxy.
+unfold n_Cmap.
+simpl.
+rewrite Hxy.
+reflexivity.
+Qed.
+
 Definition MVP_uc_fun n (p:MultivariatePolynomial _ n) :
  n_UniformlyContinuousFunction CR CR n := 
 n_Cmap _ QPrelengthSpace n (MVP_uc_Q n p).
 
+Add Parametric Morphism n : (@MVP_uc_fun n)
+ with signature (@st_eq _) ==> (@st_eq _) as MVP_uc_fun_wd.
+intros x y Hxy.
+unfold MVP_uc_fun.
+rewrite Hxy.
+reflexivity.
+Qed.
+
+Section MVP_correct.
+
+Lemma MVP_uc_fun_sub_Q : forall n (p:MultivariatePolynomial _ (S n)) x,
+ 0 <= x -> x <= 1 ->
+ (MVP_uc_fun (S n) p ('x)%CR)[=](MVP_uc_fun n (p!(MVP_C_ _ _ x))).
+Proof.
+intros n p x Hx0 Hx1.
+unfold MVP_uc_fun.
+rapply n_Cap_wd.
+intros e1 e2.
+simpl.
+unfold Cap_raw.
+simpl.
+change (ball (e1 + e2)
+  (MVP_uc_Q n p ! (MVP_C_ Q_as_CRing n (Qmax 0 (Qmin 1 x))))
+  (MVP_uc_Q n p ! (MVP_C_ Q_as_CRing n x))).
+rewrite Qle_min_r in Hx1.
+rewrite Hx1.
+rewrite Qle_max_r in Hx0.
+rewrite Hx0.
+apply ball_refl.
+Qed.
+
+Fixpoint MVP_CR_apply n : extSetoid (MultivariatePolynomial CRasCRing n) (n_Function CR CR n) :=
+match n return extSetoid (MultivariatePolynomial CRasCRing n) (n_Function CR CR n) with
+| O => id
+| S n' => Build_Morphism _ (n_Function CR CR (S n')) (fun p => Build_Morphism _ _ (fun x => MVP_CR_apply n' (p!(MVP_C_ _ n' x))) 
+ (fun (x y : RegularFunction Q_as_MetricSpace) (Hxy : regFunEq x y) =>
+       Morphism_prf (MVP_CR_apply n') p ! (MVP_C_ CRasCRing n' x)
+         p ! (MVP_C_ CRasCRing n' y)
+         (cpoly_apply_wd (MultivariatePolynomial CRasCRing n') p p
+            (MVP_C_ CRasCRing n' x) (MVP_C_ CRasCRing n' y) (reflexivity p)
+            (csf_wd CRasCSetoid (MultivariatePolynomial CRasCRing n')
+               (MVP_C_ CRasCRing n') x y Hxy)))) 
+ (fun (x1 x2 : cpoly_cring (MultivariatePolynomial CRasCRing n'))
+         (H : x1[=]x2) (x : RegularFunction Q_as_MetricSpace) =>
+       Morphism_prf (MVP_CR_apply n') x1 ! (MVP_C_ CRasCRing n' x)
+         x2 ! (MVP_C_ CRasCRing n' x)
+         (cpoly_apply_wd (MultivariatePolynomial CRasCRing n') x1 x2
+            (MVP_C_ CRasCRing n' x) (MVP_C_ CRasCRing n' x) H
+            (reflexivity (MVP_C_ CRasCRing n' x))))
+end.
+
+Fixpoint MVP_uc_fun_correct_sig_Q n : n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop :=
+match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop with
+| O => fun a b => st_eq a b
+| S n' => fun f g => forall x, (0 <= x)%Q -> (x <= 1)%Q -> MVP_uc_fun_correct_sig_Q n' (f ('x)%CR) (g ('x)%CR)
+end.
+
+Add Parametric Morphism n : 
+ (@MVP_uc_fun_correct_sig_Q n) with signature (@st_eq _) ==> (@st_eq _) ==> iff as MVP_uc_fun_correct_sig_Q_wd.
+induction n;
+ intros x y Hxy a b Hab.
+ change (x==a <-> y==b)%CR.
+ rewrite Hxy, Hab.
+ reflexivity.
+simpl.
+split;
+ intros H c.
+ rewrite <- (IHn _ _ (Hxy (' c)%CR) _ _ (Hab ('c)%CR)).
+ auto.
+rewrite (IHn _ _ (Hxy ('c)%CR) _ _ (Hab ('c)%CR)).
+auto.
+Qed.
+
+Lemma MVP_uc_fun_correct_Q : forall n (p:MultivariatePolynomial Q_as_CRing n),
+ MVP_uc_fun_correct_sig_Q n (MVP_uc_fun n p) (MVP_CR_apply n (MVP_map inject_Q_hom n p)).
+Proof.
+induction n; intros p.
+ change ('p=='p)%CR.
+ reflexivity.
+intros x Hx0 Hx1.
+change (MVP_uc_fun_correct_sig_Q n (MVP_uc_fun (S n) p ('x)%CR)
+ (MVP_CR_apply n ((MVP_map inject_Q_hom (S n) p)!(MVP_C_ _ _ ('x)%CR)))).
+eapply MVP_uc_fun_correct_sig_Q_wd;[apply MVP_uc_fun_sub_Q; auto| |apply IHn].
+apply Morphism_prf.
+simpl.
+setoid_replace (MVP_C_ CRasCRing n (' x)%CR)
+ with ((MVP_map inject_Q_hom n) (MVP_C_ Q_as_CRing n x)).
+ symmetry.
+ apply cpoly_map_apply.
+clear - n.
+induction n.
+ change ('x[=]'x)%CR.
+ reflexivity.
+simpl.
+rapply csf_wd.
+apply IHn.
+Qed.
+
+Fixpoint MVP_uc_fun_close_sig n e : n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop :=
+match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop with
+| O => fun a b => ball e a b
+| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> MVP_uc_fun_close_sig n' e (f x) (g x)
+end.
+
+Add Parametric Morphism n : 
+ (@MVP_uc_fun_close_sig n) with signature QposEq ==> (@st_eq _) ==> (@st_eq _) ==> iff as MVP_uc_fun_close_sig_wd.
+induction n;
+ intros e1 e2 He x y Hxy a b Hab.
+ change (ball e1 x a <-> ball e2 y b).
+ rewrite He, Hxy, Hab.
+ reflexivity.
+simpl.
+split;
+ intros H c.
+ rewrite <- (IHn _ _ He _ _ (Hxy c) _ _ (Hab c)).
+ auto.
+rewrite (IHn _ _ He _ _ (Hxy c) _ _ (Hab c)).
+auto.
+Qed.
+
+Lemma MVP_uc_fun_close_weaken : forall n (e1 e2:Qpos) f g, (e1 <= e2) ->
+ MVP_uc_fun_close_sig n e1 f g ->
+ MVP_uc_fun_close_sig n e2 f g.
+Proof.
+induction n;
+ intros e1 e2 f g He H.
+ rapply ball_weak_le.
+  apply He.
+ apply H.
+intros x Hx0 Hx1.
+rapply IHn.
+ apply He.
+apply H; auto.
+Qed.
+
+Fixpoint n_Function_ball01 n e : n_Function CR CR n -> n_Function CR CR n -> Prop :=
+match n return n_Function CR CR n -> n_Function CR CR n -> Prop with
+| O => ball e
+| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> n_Function_ball01 n' e (f x) (g x)
+end.
+
+Add Parametric Morphism n : 
+ (@n_Function_ball01 n) with signature QposEq ==> (@st_eq _) ==> (@st_eq _) ==> iff as n_Function_ball01_wd.
+induction n;
+ intros e1 e2 He x y Hxy a b Hab.
+ change (ball e1 x a <-> ball e2 y b).
+ rewrite He, Hxy, Hab.
+ reflexivity.
+simpl.
+split;
+ intros H c.
+ rewrite <- (IHn _ _ He _ _ (Hxy c) _ _ (Hab c)).
+ auto.
+rewrite (IHn _ _ He _ _ (Hxy c) _ _ (Hab c)).
+auto.
+Qed.
+
+
+Lemma MVP_uc_fun_close_left : forall n (e1 e2:Qpos) f1 f2 g,
+ ball e1 f1 f2 ->
+ MVP_uc_fun_close_sig n e2 f2 g ->
+ MVP_uc_fun_close_sig n (e1+e2) f1 g.
+Proof.
+induction n;
+ intros e1 e2 f g1 g2 H0 H1.
+ eapply ball_triangle.
+  apply H0.
+ apply H1.
+intros x Hx0 Hx1.
+rapply IHn.
+ apply H0; auto.
+apply H1; auto.
+Qed.
+
+Lemma MVP_uc_fun_close_right : forall n (e1 e2:Qpos) f g1 g2,
+ MVP_uc_fun_close_sig n e1 f g1 ->
+ n_Function_ball01 n e2 g1 g2 ->
+ MVP_uc_fun_close_sig n (e1+e2) f g2.
+Proof.
+induction n;
+ intros e1 e2 f g1 g2 H0 H1.
+ eapply ball_triangle.
+  apply H0.
+ apply H1.
+intros x Hx0 Hx1.
+rapply IHn.
+ apply H0; auto.
+apply H1; auto.
+Qed.
+
+Lemma n_Function_ball01_sym : forall n e f g,
+(n_Function_ball01 n e f g) ->
+(n_Function_ball01 n e g f).
+Proof.
+induction n.
+ apply ball_sym.
+intros e f g H x Hx0 Hx1.
+rapply IHn.
+apply H; auto.
+Qed.
+
+Lemma n_Function_ball01_triangle : forall n e1 e2 f g h,
+(n_Function_ball01 n e1 f g) ->
+(n_Function_ball01 n e2 g h) ->
+(n_Function_ball01 n (e1+e2)%Qpos f h).
+Proof.
+induction n.
+ apply ball_triangle.
+intros e1 e2 f g h H0 H1 x Hx0 Hx1.
+rapply IHn.
+ apply H0; auto.
+apply H1; auto.
+Qed.
+
+Lemma n_Function_ball01_plus : forall n e p1 p2 p3,
+(n_Function_ball01 n e (MVP_CR_apply n p2) (MVP_CR_apply n p3)) ->
+(n_Function_ball01 n e (MVP_CR_apply n (p1[+]p2)) (MVP_CR_apply n (p1[+]p3))).
+Proof.
+induction n;
+ intros e p1 p2 p3 H.
+ intros d1 d2.
+ simpl.
+ unfold Qball.
+ unfold Cap_raw.
+ simpl.
+ replace RHS with ((approximate p1 ((1 # 2) * d1)%Qpos - approximate p1 ((1 # 2) * d2)%Qpos)
+                  +(approximate p2 ((1 # 2) * d1)%Qpos - approximate p3 ((1 # 2) * d2)%Qpos)) by ring.
+ replace LHS with (((1 # 2) * d1 + (1 # 2) * d2)%Qpos+((1 # 2) * d1 + e + (1 # 2) * d2)%Qpos) by QposRing.
+ rapply AbsSmall_plus.
+  change (ball ((1 # 2) * d1 + (1 # 2) * d2) (approximate p1 ((1 # 2) * d1)%Qpos) (approximate p1 ((1 # 2) * d2)%Qpos)).
+  generalize ((1#2)*d1)%Qpos ((1#2)*d2)%Qpos.
+  change (p1[=]p1).
+  reflexivity.
+ generalize ((1#2)*d1)%Qpos ((1#2)*d2)%Qpos.
+ apply H.
+intros x Hx0 Hx1.
+change (n_Function_ball01 n e (MVP_CR_apply _ (p1[+]p2) ! (MVP_C_ _ _ x))
+                              (MVP_CR_apply _ (p1[+]p3) ! (MVP_C_ _ _ x))).
+eapply n_Function_ball01_wd;[| | |apply IHn].
+   reflexivity.
+  apply Morphism_prf.
+  apply plus_apply.
+ apply Morphism_prf.
+ apply plus_apply.
+rapply H; auto.
+Qed.
+
+Lemma n_Function_ball01_mult_C : forall n e c q1 q2,
+('0 <= c)%CR -> (c <= '1)%CR ->
+(n_Function_ball01 n e (MVP_CR_apply n q1) (MVP_CR_apply n q2)) ->
+(n_Function_ball01 n e (MVP_CR_apply n ((MVP_C_ _ _ c)[*]q1))
+                       (MVP_CR_apply n ((MVP_C_ _ _ c)[*]q2))).
+Proof.
+induction n;
+ intros e c q1 q2 Hc0 Hc1 H.
+ change (ball e (c * q1)%CR (c * q2)%CR).
+ rewrite <- CRAbsSmall_ball.
+ change (AbsSmall (' e)%CR (c[*]q1[-]c[*]q2)).
+ rstepr (c[*](q1[-]q2)).
+ apply AbsSmall_leEq_trans with (c[*]'e)%CR.
+  rstepr (One[*]('e))%CR.
+  rapply mult_resp_leEq_rht; auto.
+  change ('0<='e)%CR.
+  rewrite CRle_Qle.
+  auto with *.
+ apply mult_resp_AbsSmall; auto.
+ rewrite CRAbsSmall_ball.
+ auto.
+intros x Hx0 Hx1.
+change (n_Function_ball01 n e (MVP_CR_apply _ (MVP_C_ _ _ c[*]q1) ! (MVP_C_ _ _ x))
+                              (MVP_CR_apply _ (MVP_C_ _ _ c[*]q2) ! (MVP_C_ _ _ x))).
+eapply n_Function_ball01_wd.
+   reflexivity.
+  apply Morphism_prf.
+  eapply eq_transitive.
+   apply mult_apply.
+  apply mult_wdl.
+  simpl.
+  apply _c_apply.
+ apply Morphism_prf.
+ eapply eq_transitive.
+  apply mult_apply.
+ apply mult_wdl.
+ simpl.
+ apply _c_apply.
+rapply IHn; auto.
+rapply H; auto.
+Qed.
+
+Fixpoint MVP_is_Bound01 n (M:CR) : MultivariatePolynomial CRasCRing n -> Prop :=
+match n return MultivariatePolynomial CRasCRing n -> Prop with
+| O => fun a => AbsSmall M a
+| S n' => fun p => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> 
+  MVP_is_Bound01 n' M (p ! (MVP_C_ _ _ x))
+end.
+
+Add Parametric Morphism n : 
+ (@MVP_is_Bound01 n) with signature (@st_eq _) ==> (@st_eq _) ==> iff as MVP_is_Bound01_wd.
+Proof.
+induction n;
+ intros x y Hxy a b Hab.
+ simpl.
+ rewrite Hxy.
+ rewrite Hab.
+ reflexivity.
+split;
+ intros H c Hc0 Hc1.
+ change (MVP_is_Bound01 n y b ! (MVP_C_ CRasCRing n c)).
+ rewrite <- (IHn _ _ Hxy (a!(MVP_C_ CRasCRing n c)) (b!(MVP_C_ CRasCRing n c))).
+  apply H; auto.
+ rewrite Hab.
+ reflexivity.  
+change (MVP_is_Bound01 n x a ! (MVP_C_ CRasCRing n c)).
+rewrite <- (fun A => IHn y x A (b!(MVP_C_ CRasCRing n c)) (a!(MVP_C_ CRasCRing n c))).
+  apply H; auto.
+ symmetry; auto.
+rewrite Hab.
+reflexivity.
+Qed.  
+
+Lemma MVP_is_Bound01_plus : forall n M N p q,
+ MVP_is_Bound01 n M p -> MVP_is_Bound01 n N q ->
+ MVP_is_Bound01 n (M+N)%CR (p[+]q).
+Proof.
+induction n; intros M N p q Hp Hq.
+ apply AbsSmall_plus; auto.
+simpl.
+intros x Hx0 Hx1.
+rewrite plus_apply.
+auto.
+Qed.
+
+Lemma MVP_is_Bound01_mult01 : forall n M p x,
+ ('0 <= x)%CR -> (x <= '1)%CR ->
+ MVP_is_Bound01 n M p -> 
+ MVP_is_Bound01 n M (MVP_C_ _ n x[*]p).
+Proof.
+induction n;
+ intros M p x Hx0 Hx1 H.
+ simpl.
+ change (st_car CR) in p. 
+ eapply AbsSmall_leEq_trans;[|apply mult_resp_AbsSmall;[|apply H]]; auto.
+ rstepr ((One:CR)[*]M).
+ apply mult_resp_leEq_rht; auto.
+ simpl in H.
+ rewrite <- CRabs_AbsSmall in H.
+ eapply leEq_transitive;[|apply H].
+ rewrite <- (CRasIRasCR_id p).
+ rewrite <- CRabs_correct.
+ simpl.
+ rewrite <- IR_Zero_as_CR.
+ rewrite <- IR_leEq_as_CR.
+ apply AbsIR_nonneg.
+simpl.
+intros y Hy0 Hy1.
+rewrite mult_apply.
+rewrite _c_apply.
+apply IHn; auto.
+Qed.
+
+Lemma n_Function_ball01_mult : forall n e x y p M,
+MVP_is_Bound01 n ('M)%CR p ->
+ball_ex (Qscale_modulus M e) x y ->
+n_Function_ball01 n e
+  (MVP_CR_apply n (MVP_C_ CRasCRing n x[*]p))
+  (MVP_CR_apply n (MVP_C_ CRasCRing n y[*]p)).
+Proof.
+induction n; intros e x y p b Hb Hxy.
+ change (ball e (x*p) (y*p))%CR.
+ rewrite <- CRAbsSmall_ball.
+ change (AbsSmall (' e)%CR (x[*]p[-]y[*]p)).
+ rstepr (p[*](x[-]y)).
+ simpl in Hb.
+ case_eq (Qscale_modulus b e).
+  intros q Hq.
+  apply AbsSmall_leEq_trans with (CRabs p[*]'q)%CR.
+   destruct b as [[|nb|nb] db].
+    discriminate Hq.
+    simpl in Hq.
+    injection Hq; clear Hq; intros Hq; rewrite <- Hq.
+    assert (Z: (' ((db # nb) * e)%Qpos)%CR[#]Zero).
+     rapply Qap_CRap.
+     apply Qpos_nonzero.
+    apply shift_mult_leEq with Z.
+     rapply CRlt_Qlt; auto with *.
+    rewrite <- CRabs_AbsSmall in Hb.
+    stepr ('(nb#db))%CR; auto.
+    change ((' (nb # db))%CR[=](' e)%CR[*]CRinv (' ((db # nb) * e)%Qpos)%CR Z).
+    rewrite CRinv_Qinv.
+    rewrite CRmult_Qmult.
+    rewrite CReq_Qeq.
+    autorewrite with QposElim.
+    rewrite Qinv_mult_distr.
+    replace RHS with ((/(db#nb) * e) * /e) by ring.
+    change (nb#db == ((nb#db)*e/e)).
+    rewrite Qdiv_mult_l.
+     reflexivity.
+    apply Qpos_nonzero.
+   elim (Qle_not_lt 0 (Zneg nb # db)); auto with *.
+   rewrite <- CRle_Qle.
+   rapply AbsSmall_nonneg.
+   apply Hb.
+  cut (Not (Not (AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))))).
+   unfold Not, AbsSmall.
+   repeat rewrite leEq_def.
+   unfold Not; tauto.
+  generalize (leEq_or_leEq CRasCOrdField Zero p).
+  cut (((Zero:CR)[<=]p or (p:CR)[<=]Zero) -> AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))).
+   unfold Not; tauto.
+  intros [Hp|Hp].
+   rewrite CRabs_pos; auto.
+   apply mult_resp_AbsSmall;auto.
+   rewrite Hq in Hxy.
+   rewrite CRAbsSmall_ball.
+   auto.
+  rewrite CRabs_neg; auto.
+  rstepr (([--]p)[*](y[-]x)).
+  apply mult_resp_AbsSmall.
+   rstepl ([--]Zero:CR).
+   apply inv_resp_leEq.
+   auto.
+  rewrite Hq in Hxy.
+  rewrite CRAbsSmall_ball.
+  apply ball_sym.
+  apply Hxy.
+ intros Hq.
+ destruct b as [[|nb|nb] db]; try discriminate Hq.
+ stepr (Zero:CR).
+  apply zero_AbsSmall.
+  simpl.
+  rewrite CRle_Qle; auto with *.
+ rstepl (Zero[*](x[-]y))%CR.
+ apply mult_wdl.
+ destruct Hb as [Hb0 Hb1].
+ rapply leEq_imp_eq.
+  stepl (-(' (0 # db)))%CR; auto.
+  rewrite CRopp_Qopp.
+  change ('(0#db)=='0)%CR.
+  rewrite CReq_Qeq.
+  unfold Qeq; reflexivity.
+ stepr ((' (0 # db)))%CR; auto.
+ change ('(0#db)=='0)%CR.
+ rewrite CReq_Qeq.
+ unfold Qeq; reflexivity.
+simpl.
+intros a Ha0 Ha1.
+eapply n_Function_ball01_wd.
+   reflexivity.
+  apply Morphism_prf.
+  eapply eq_transitive.
+   apply mult_apply.
+  apply csbf_wd.
+   apply _c_apply.
+  reflexivity.
+ apply Morphism_prf.
+ eapply eq_transitive.
+  apply mult_apply.
+ apply csbf_wd.
+  apply _c_apply.
+ reflexivity.
+rapply IHn; auto.
+Qed.
+
+Fixpoint MVP_poor_Bound01 n : MultivariatePolynomial Q_as_CRing n -> Q :=
+match n return MultivariatePolynomial Q_as_CRing n -> Q with
+| O => Qabs
+| S n' => fix MVP_poor_Bound01_H p : Q :=
+          match p with
+          | cpoly_zero => 0
+          | cpoly_linear s p' => MVP_poor_Bound01 n' s + MVP_poor_Bound01_H p'
+          end
+end.
+
+Lemma MVP_poor_Bound01_zero : forall n, MVP_poor_Bound01 n (Zero)==0.
+Proof.
+induction n.
+ reflexivity.
+reflexivity.
+Qed.
+
+Add Parametric Morphism n : 
+ (@MVP_poor_Bound01 n) with signature (@st_eq _) ==> Qeq as MVP_poor_Bound01_wd.
+induction n.
+ intros x y Hxy.
+ simpl in *.
+ rewrite Hxy.
+ reflexivity.
+induction x.
+ induction y.
+  reflexivity.
+ intros [H0 H1].
+ simpl in *.
+ change 0 with (0+0).
+ apply Qplus_comp.
+  rewrite <- (MVP_poor_Bound01_zero n).
+  apply IHn.
+  symmetry; auto.
+ apply IHy.
+ apply H1.
+intros [|t y] [H0 H1].
+ simpl.
+ change 0 with (0+0).
+  apply Qplus_comp.
+  rewrite <- (MVP_poor_Bound01_zero n).
+  apply IHn.
+  auto.
+ change (MVP_poor_Bound01 (S n) x==0).
+ rewrite <- (MVP_poor_Bound01_zero (S n)).
+ apply IHx.
+ apply eq_symmetric.
+ apply H1.
+simpl.
+apply Qplus_comp.
+ apply IHn.
+ auto.
+apply IHx.
+auto.
+Qed.
+
+Lemma MVP_poor_is_Bound01 : forall n p,
+MVP_is_Bound01 n ('(MVP_poor_Bound01 n p))%CR (MVP_map inject_Q_hom n p).
+Proof.
+induction n.
+ split.
+  change (-('Qabs p)<='p)%CR.
+  rewrite CRopp_Qopp.
+  rewrite CRle_Qle.
+  simpl in p.
+  replace RHS with (- (- p)) by ring.
+  apply Qopp_le_compat.
+  rewrite <- Qabs_opp.
+  apply Qle_Qabs.
+ change ('p<=('Qabs p))%CR.
+ rewrite CRle_Qle.
+ apply Qle_Qabs.
+simpl.
+induction p; intros x Hx0 Hx1.
+ change (MVP_is_Bound01 n ('0)%CR (Zero)).
+ clear - n.
+ induction n.
+  apply AbsSmall_reflexive.
+  apply leEq_reflexive.
+ intros y _ _.
+ rapply IHn.
+change (MVP_is_Bound01 n
+  (' (MVP_poor_Bound01 n s +
+      (fix MVP_poor_Bound01_H (p0 : cpoly
+                                      (MultivariatePolynomial Q_as_CRing n)) :
+         Q :=
+         match p0 with
+         | cpoly_zero => 0
+         | cpoly_linear s0 p' =>
+             (MVP_poor_Bound01 n s0 + MVP_poor_Bound01_H p')%Q
+         end) p))%CR
+  (MVP_map inject_Q_hom n s[+]MVP_C_ CRasCRing n x[*](cpoly_map (MVP_map inject_Q_hom n) p) ! (MVP_C_ CRasCRing n x))).
+rewrite <- CRplus_Qplus.
+apply MVP_is_Bound01_plus.
+ apply IHn.
+apply MVP_is_Bound01_mult01; auto.
+Qed.
+
+Lemma MVP_CR_apply_cont : forall n e (p:MultivariatePolynomial Q_as_CRing (S n)),
+ {d | forall x y,
+ ('0 <= x)%CR -> (x <= '1)%CR ->
+ ('0 <= 'y)%CR -> ('y <= '1)%CR ->
+ ball_ex d x ('y)%CR ->
+ n_Function_ball01 n e (MVP_CR_apply _ (MVP_map inject_Q_hom _ p) x)
+                       (MVP_CR_apply _ (MVP_map inject_Q_hom _ p) ('y)%CR)}.
+Proof.
+intros n e p.
+revert e.
+induction p; intros e.
+ exists QposInfinity.
+ intros x y _ _ _ _ _.
+ change (n_Function_ball01 n e
+  (MVP_CR_apply n Zero)
+  (MVP_CR_apply n Zero)).
+ generalize (MVP_CR_apply n Zero).
+ induction n.
+  apply ball_refl.
+ intros s a _ _.
+ rapply IHn.
+simpl.
+destruct (IHp ((1#2)*e)%Qpos) as [d0 Hd0].
+set (b:=MVP_poor_Bound01 (S n) p).
+set (d1:=(Qscale_modulus b ((1 # 2) * e))).
+exists (QposInf_min d0 d1).
+intros x y Hx0 Hx1 Hy0 Hy1 Hxy.
+change (n_Function_ball01 n e
+      (MVP_CR_apply n
+         ((MVP_map inject_Q_hom n s)[+](MVP_C_ CRasCRing n x)[*]((cpoly_map (MVP_map inject_Q_hom n) p))
+         ! (MVP_C_ CRasCRing n x)))
+      (MVP_CR_apply n
+         ((MVP_map inject_Q_hom n s)[+](MVP_C_ CRasCRing n ('y)%CR)[*]((cpoly_map (MVP_map inject_Q_hom n) p))
+         ! (MVP_C_ CRasCRing n (inject_Q_hom y)%CR)))).
+apply n_Function_ball01_plus.
+setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
+apply n_Function_ball01_triangle with (MVP_CR_apply n
+ (MVP_C_ CRasCRing n x[*]
+      (cpoly_map (MVP_map inject_Q_hom n) p) ! (MVP_C_ CRasCRing n (inject_Q_hom y)%CR))).
+ apply n_Function_ball01_mult_C; auto.
+ change (n_Function_ball01 n ((1 # 2) * e)
+  (MVP_CR_apply (S n) (MVP_map inject_Q_hom (S n) p) x)
+  (MVP_CR_apply (S n) (MVP_map inject_Q_hom (S n) p) ('y)%CR)).
+ apply Hd0; auto with *.
+ eapply ball_ex_weak_le;[|apply Hxy].
+ apply QposInf_min_lb_l.
+eapply n_Function_ball01_wd.
+   reflexivity.
+  apply Morphism_prf.
+  apply mult_wdr.
+  eapply eq_transitive.
+   apply csbf_wd;[apply eq_reflexive|].
+   symmetry. 
+   apply MVP_map_C_.
+  symmetry.
+  apply cpoly_map_apply.
+ apply Morphism_prf.
+ apply mult_wdr.
+ eapply eq_transitive.
+  apply csbf_wd;[apply eq_reflexive|].
+  symmetry. 
+  apply MVP_map_C_.
+ symmetry.
+ apply cpoly_map_apply.
+apply n_Function_ball01_mult with b.
+ assert (Z:=MVP_poor_is_Bound01 (S n) p _ Hy0 Hy1).
+ unfold b.
+ change (MVP_is_Bound01 n (' MVP_poor_Bound01 (S n) p)%CR 
+       (MVP_map inject_Q_hom (S n) p) ! (MVP_C_ CRasCRing n (' y)%CR)) in Z.
+ eapply MVP_is_Bound01_wd;[| |apply Z].
+  reflexivity.
+ simpl.
+ change (MVP_map inject_Q_hom n p ! (MVP_C_ Q_as_CRing n y)[=]
+(cpoly_map (MVP_map inject_Q_hom n) p)
+! (MVP_C_ CRasCRing n (inject_Q_hom y)%CR)).
+ rewrite <- MVP_map_C_.
+ apply cpoly_map_apply.
+eapply ball_ex_weak_le;[|apply Hxy].
+apply QposInf_min_lb_r.
+Qed.
+
+Lemma MVP_uc_fun_close : forall n e (p:MultivariatePolynomial Q_as_CRing n),
+ MVP_uc_fun_close_sig n e (MVP_uc_fun n p) (MVP_CR_apply n (MVP_map inject_Q_hom n p)).
+Proof.
+induction n; intros e p.
+ change (ball e ('p) ('p))%CR.
+ apply ball_refl.
+intros x Hx0 Hx1.
+change (MVP_uc_fun_close_sig n e (MVP_uc_fun (S n) p x)
+  (MVP_CR_apply (S n) (MVP_map inject_Q_hom (S n) p) x)).
+setoid_replace e with ((((1#3)*e)+(1#3)*e)+(1#3)*e)%Qpos by QposRing.
+set (e3:=((1#3)*e)%Qpos).
+destruct (MVP_CR_apply_cont e3 p) as [d0 Hd].
+set (d1:=mu (MVP_uc_fun (S n) p) e3).
+set (d:=QposInf_min d0 d1).
+set (y:=Qclamp01 (approximate x d)).
+destruct (Qclamp01_clamped (approximate x d)) as [Hy0 Hy1].
+rewrite <- CRle_Qle in Hy0.
+rewrite <- CRle_Qle in Hy1.
+assert (Hd0:=Hd _ _ Hx0 Hx1 Hy0 Hy1).
+assert (Z:ball_ex d x (' Qclamp01 (approximate x d))%CR).
+ clear - Hx0 Hx1.
+ destruct d as [d|];[|constructor].
+ change (ball d x (' Qclamp01 (approximate x d))%CR).
+ rewrite <- CRAbsSmall_ball.
+ assert (Z:=ball_approx_r x d).
+ rewrite <- CRAbsSmall_ball in Z.
+ change (AbsSmall (' d)%CR (x[-]'(approximate x d)))%CR in Z.
+ revert Z.
+ generalize (approximate x d).
+ clear - Hx0 Hx1.
+ intros s [Z0 Z1].
+ simpl.
+ split.
+  apply Qmax_case.
+   intros _.
+   apply leEq_transitive with (Zero:CR).
+    rstepr ([--](Zero:CR)).
+    apply inv_resp_leEq.
+    change ('0<='d)%CR.
+    rewrite CRle_Qle.
+    auto with *.
+   change (Zero[<=]x[-]Zero)%CR.
+   rstepr x.
+   auto.
+  intros H.
+  eapply leEq_transitive;[apply Z0|].
+  apply minus_resp_leEq_rht.
+  rewrite CRle_Qle.
+  apply Qmin_lb_r.
+ rewrite Qmax_min_distr_r.
+ apply Qmin_case.
+  intros _.
+  eapply leEq_transitive with ('1[-]'1)%CR.
+   apply minus_resp_leEq.
+   auto.
+  rstepl (Zero:CR).
+  change ('0<='d)%CR.
+  rewrite CRle_Qle.
+  auto with *.
+ intros H.
+ eapply leEq_transitive;[|apply Z1].
+ apply minus_resp_leEq_rht.
+ rewrite CRle_Qle.
+ apply Qmax_ub_r.
+eapply MVP_uc_fun_close_right;
+ [|apply n_Function_ball01_sym;apply Hd0].
+ eapply MVP_uc_fun_close_left.
+  apply uc_prf.
+  eapply ball_ex_weak_le;[|apply Z].
+  apply QposInf_min_lb_r.
+ rewrite CRle_Qle in Hy0.
+ rewrite CRle_Qle in Hy1.
+ rewrite MVP_uc_fun_sub_Q;auto.
+ eapply MVP_uc_fun_close_sig_wd.
+    reflexivity.
+   reflexivity.
+  simpl.
+  apply Morphism_prf.
+  eapply eq_transitive.
+   apply csbf_wd.
+    reflexivity.
+   symmetry.
+   apply (MVP_map_C_ inject_Q_hom).
+  symmetry.
+  change (cpoly_map_fun (MultivariatePolynomial Q_as_CRing n)
+   (MultivariatePolynomial CRasCRing n) (MVP_map inject_Q_hom n) p)
+   with (cpoly_map (MVP_map inject_Q_hom n) p).
+  apply cpoly_map_apply.
+ apply IHn.
+eapply ball_ex_weak_le;[|apply Z].
+apply QposInf_min_lb_l.
+Qed.
+
+Fixpoint MVP_uc_fun_correct_sig n : n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop :=
+match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop with
+| O => fun a b => a[=]b
+| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> MVP_uc_fun_correct_sig n' (f x) (g x)
+end.
+
+Lemma MVP_uc_fun_correct : forall n (p:MultivariatePolynomial Q_as_CRing n),
+ MVP_uc_fun_correct_sig n (MVP_uc_fun n p) (MVP_CR_apply n (MVP_map inject_Q_hom n p)).
+Proof.
+intros n p.
+generalize (fun e => MVP_uc_fun_close n e p).
+generalize (MVP_uc_fun n p) (MVP_CR_apply n (MVP_map inject_Q_hom n p)).
+clear p.
+induction n; intros a b H.
+ apply ball_eq.
+ auto.
+intros x Hx0 Hx1.
+rapply IHn.
+intros e.
+apply H; auto.
+Qed.
+
+End MVP_correct.
