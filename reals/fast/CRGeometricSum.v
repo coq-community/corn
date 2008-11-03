@@ -189,7 +189,7 @@ Qed.
 
 
 Lemma InfiniteSum_raw_N_extend' : forall (p q:positive) s (err : Stream Q -> bool),
- (err (Str_nth_tl p s)) -> (p <= q)%Z ->
+ (err (Str_nth_tl (nat_of_P p) s)) -> (p <= q)%Z ->
  InfiniteSum_raw_N p (fun _ _ => 0) err s = InfiniteSum_raw_N q (fun _ _ => 0) err s.
 Proof.
 induction p using Pind.
@@ -224,7 +224,7 @@ assumption.
 Qed.
 
 Lemma InfiniteSum_raw_N_extend : forall (p:positive) s (err : Stream Q -> bool),
- (err (Str_nth_tl p s)) ->
+ (err (Str_nth_tl (nat_of_P p) s)) ->
  InfiniteSum_raw_N p (fun _ _ => 0) err s = InfiniteSum_raw_N (Psucc p) (fun _ _ => 0) err s.
 Proof.
 intros.
@@ -236,7 +236,7 @@ Qed.
 Lemma InfiniteSum_raw_N_ind : forall (err:Stream Q -> bool) (P:Stream Q -> Q -> Prop),
  (forall s, (err s) -> P s 0) ->
  (forall s rec, ~(err s) -> P (tl s) rec -> P s (Qplus' (hd s) rec)) ->
- forall (p:positive) s, (err (Str_nth_tl p s)) -> P s (InfiniteSum_raw_N p (fun err s => 0) err s).
+ forall (p:positive) s, (err (Str_nth_tl (nat_of_P p) s)) -> P s (InfiniteSum_raw_N p (fun err s => 0) err s).
 Proof.
 intros err P H0 H1 p.
 induction p using Pind; intros s X.
@@ -256,7 +256,7 @@ Qed.
 (** The infinite sum is indeed bounded by an error bound. *)
 Lemma err_prop_correct : forall (e:Qpos) s, (GeometricSeries s) -> (err_prop e s) ->
  forall (p:positive) (e':Stream Q -> bool),
-  (e' (Str_nth_tl p s)) -> Qabs (InfiniteSum_raw_N p (fun err s => 0) e' s) <= e.
+  (e' (Str_nth_tl (nat_of_P p) s)) -> Qabs (InfiniteSum_raw_N p (fun err s => 0) e' s) <= e.
 Proof.
 intros e s gs H p e' Z.
 assert (X:0<=e) by apply Qpos_nonneg.
@@ -450,11 +450,11 @@ rewrite Zpos_succ_morphism.
 unfold Zsucc.
 rewrite Qpower_plus';[|discriminate].
 replace RHS with ((Qabs (hd series) * a ^ p)*a) by ring.
-apply Qle_trans with (Qabs (hd (Str_nth_tl p series))*a).
- change (S p) with (1+p)%nat.
+apply Qle_trans with (Qabs (hd (Str_nth_tl (nat_of_P p) series))*a).
+ change (S (nat_of_P p)) with (1+(nat_of_P p))%nat.
  rewrite <- Str_nth_tl_plus.
- cut (GeometricSeries (Str_nth_tl p series)).
-  generalize (Str_nth_tl p series).
+ cut (GeometricSeries (Str_nth_tl (nat_of_P p) series)).
+  generalize (Str_nth_tl (nat_of_P p) series).
   intros s [H0 _].
   rewrite Qmult_comm.
   assumption.
@@ -488,8 +488,8 @@ simpl.
 generalize (InfiniteGeometricSum_maxIter series e0) (InfiniteGeometricSum_maxIter series e1).
 revert e0 e1.
 cut (forall (e0 e1:Qpos), (e1 <= e0) -> forall (p p0 : positive),
-err_prop e0 (Str_nth_tl p series) ->
-err_prop e1 (Str_nth_tl p0 series) ->
+err_prop e0 (Str_nth_tl (nat_of_P p) series) ->
+err_prop e1 (Str_nth_tl (nat_of_P p0) series) ->
 Qball (e0)
   (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
      (err_prop e0) series)
@@ -508,7 +508,7 @@ Qball (e0)
 intros e0 e1 He p0 p1 H0.
 revert H.
 set (P0:=fun s q => GeometricSeries s ->
-  err_prop e1 (Str_nth_tl p1 s) -> Qball e0 q (InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
+  err_prop e1 (Str_nth_tl (nat_of_P p1) s) -> Qball e0 q (InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
      (err_prop e1) s)).
 change (P0 series (InfiniteSum_raw_N p0 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
      (err_prop e0) series)).
@@ -600,8 +600,8 @@ case_eq (err_prop e series); intros He.
    destruct Gs; assumption.
   apply err_prop_monotone'; assumption.
  change (Is_true (err_prop e
-  (Str_nth_tl (S (InfiniteGeometricSum_maxIter (tl series) e)) series))).
- induction (S (InfiniteGeometricSum_maxIter (tl series) e)).
+  (Str_nth_tl (S (nat_of_P (InfiniteGeometricSum_maxIter (tl series) e))) series))).
+ induction (S (nat_of_P (InfiniteGeometricSum_maxIter (tl series) e))).
   assumption.
  simpl.
  rewrite <- tl_nth_tl.

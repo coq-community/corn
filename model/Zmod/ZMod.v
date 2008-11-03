@@ -399,10 +399,6 @@ Hint Resolve Zmod_one_rht: zarith.
 Hint Resolve Zmod_lin_comb: zarith.
 Hint Resolve Zmod_relprime_inv: zarith.
 
-Definition pos2Z (p : positive) := Zpos p.
-
-Coercion pos2Z : positive >-> Z.
-
 (*
 ** Equality modulo m
 Let m be a positive number.
@@ -594,24 +590,18 @@ intros a b H.
 apply Zmodeq_eqmod.
 rewrite Zmod_Zmod; auto with zarith.
 rewrite Zmod_Zmod; auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 Lemma Zmodeq_mod_elim_lft : forall a b : Z, Zmodeq a b -> Zmodeq (a mod m) b.
 intros a b H.
 apply Zmodeq_eqmod.
 rewrite Zmod_Zmod; auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 Lemma Zmodeq_mod_elim_rht : forall a b : Z, Zmodeq a b -> Zmodeq a (b mod m).
 intros a b H.
 apply Zmodeq_eqmod.
 rewrite Zmod_Zmod; auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 Lemma Zmodeq_mod_intro :
@@ -620,24 +610,18 @@ intros a b H.
 apply Zmodeq_eqmod.
 rewrite <- (Zmod_Zmod m a); auto with zarith.
 rewrite <- (Zmod_Zmod m b); auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 Lemma Zmodeq_mod_intro_lft : forall a b : Z, Zmodeq (a mod m) b -> Zmodeq a b.
 intros a b H.
 apply Zmodeq_eqmod.
 rewrite <- (Zmod_Zmod m a); auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 Lemma Zmodeq_mod_intro_rht : forall a b : Z, Zmodeq a (b mod m) -> Zmodeq a b.
 intros a b H.
 apply Zmodeq_eqmod.
 rewrite <- (Zmod_Zmod m b); auto with zarith.
-apply Zmodeq_modeq.
-exact H.
 Qed.
 
 

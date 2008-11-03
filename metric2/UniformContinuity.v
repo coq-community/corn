@@ -259,3 +259,28 @@ Qed.
 (* end hide *)
 
 Notation "f ∘ g" := (uc_compose f g) (at level 40, left associativity) : uc_scope.
+
+Lemma is_uc_uc_compose0 : forall X Y Z (f:Y-->Z), 
+ is_UniformlyContinuousFunction (@uc_compose X Y Z f) (mu f).
+Proof.
+intros X Y Z f e x y Hxy z.
+simpl.
+simpl in Hxy.
+apply uc_prf.
+destruct (mu f e); auto.
+apply Hxy.
+Qed.
+
+Definition uc_compose_uc0 X Y Z (f:Y-->Z) : (X-->Y) --> X --> Z := 
+ Build_UniformlyContinuousFunction (is_uc_uc_compose0 f).
+
+Lemma is_uc_uc_compose : forall X Y Z,
+ is_UniformlyContinuousFunction (@uc_compose_uc0 X Y Z) Qpos2QposInf.
+Proof.
+intros X Y Z e x y Hxy z z0.
+simpl.
+apply Hxy.
+Qed.
+
+Definition uc_compose_uc X Y Z : (Y-->Z)-->(X-->Y)-->X-->Z := 
+ Build_UniformlyContinuousFunction (@is_uc_uc_compose X Y Z).

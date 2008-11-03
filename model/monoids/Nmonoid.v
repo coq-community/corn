@@ -84,9 +84,6 @@ simpl.
 auto with arith.
 Qed.
 
-Print plus_is_bin_fun.
-Print mult_as_bin_fun.
-
 Definition Nmult_is_CMonoid := Build_is_CMonoid
  Nmult_as_CSemiGroup _ SO_as_rht_unit SO_as_lft_unit.
 

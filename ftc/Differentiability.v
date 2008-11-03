@@ -165,6 +165,15 @@ apply part_int_const.
 Deriv.
 Qed.
 
+Lemma Diffble_I_poly : forall p, Diffble_I Hab' (FPoly _ p).
+Proof.
+intros p.
+exists (@IntPartIR (FPoly _ (_D_ p)) _ _ Hab (included_IR _)).
+apply Derivative_I_wdr with (FPoly _ (_D_ p)).
+apply int_part_int.
+Deriv.
+Qed.
+
 End Constants.
 
 Section Well_Definedness.

@@ -317,7 +317,7 @@ Qed.
 (** Lift arctangent on the rationals to the reals. *)
 Lemma arctan_uc_prf : is_UniformlyContinuousFunction rational_arctan Qpos2QposInf.
 Proof.
-apply (is_UniformlyContinuousFunction_wd) with rational_arctan (modulusD (1#1)).
+apply (is_UniformlyContinuousFunction_wd) with rational_arctan (Qscale_modulus (1#1)).
   reflexivity.
  intros x.
  simpl.

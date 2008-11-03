@@ -274,7 +274,7 @@ apply Qlt_le_trans with c; auto with *.
 Qed.
 
 Definition rational_ln_modulus (c:Qpos) (e:Qpos) : QposInf :=
-Qpos2QposInf (e*c).
+Qpos2QposInf (c*e).
 
 Lemma ln_pos_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
 Proof.
@@ -283,7 +283,7 @@ set (lnf := fun x => match (Qlt_le_dec 0 x) with
                      | left p => rational_ln p
                      | right _ => ('0)%CR
                      end).
-apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (modulusD (Qpos_inv c)).
+apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (Qscale_modulus (Qpos_inv c)).
   intros x.
   unfold lnf.
    destruct (Qlt_le_dec 0 (QboundBelow_uc c x)).
@@ -292,13 +292,7 @@ apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf 
    algebra.
   elim (Qle_not_lt _ _ q).
   rapply ln_uc_prf_pos.
- intros x.
- simpl.
- autorewrite with QposElim.
- replace RHS with (x*c).
-  apply Qle_refl.
- field.
- apply Qpos_nonzero.
+ intros [xn xd]; rapply Qle_refl.
 assert (Z:Derivative (closel (inj_Q IR (c:Q))) CI Logarithm {1/}FId).
  apply (Included_imp_Derivative (openl Zero) CI).
   Deriv.

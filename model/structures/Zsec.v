@@ -170,10 +170,6 @@ Definition posZ (x : Z) : positive :=
   | Zneg p => p
   end.
 
-(* begin hide *)
-Coercion Zpos : positive >-> Z.
-(* end hide *)
-
 Lemma a_very_specific_lemma1 : forall a b c d e f : Z, c <> 0%Z ->
  (a * b)%Z = (c * d)%Z -> (c * e)%Z = (f * b)%Z -> (a * e)%Z = (f * d)%Z.
 Proof.

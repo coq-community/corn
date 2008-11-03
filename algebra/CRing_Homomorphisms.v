@@ -127,11 +127,19 @@ astepr ((f (Zero[+]Zero))[-](f Zero)).
 Step_final ((f Zero[+]f Zero)[-]f Zero).
 Qed.
 
-Lemma rh_pres_minus : forall x:R, (f [--]x) [=] [--] (f x).
+Lemma rh_pres_inv : forall x:R, (f [--]x) [=] [--] (f x).
 intro x; apply (cg_cancel_lft S (f x)).
 astepr (Zero:S).
 astepl (f (x[+][--]x)).
 Step_final (f (Zero:R)); try apply rh_pres_zero.
+Qed.
+
+Lemma rh_pres_minus : forall x y:R, f (x[-]y) [=] (f x) [-] (f y).
+unfold cg_minus.
+intros x y.
+rewrite rh_pres_plus.
+rewrite rh_pres_inv.
+reflexivity.
 Qed.
 
 Lemma rh_apzero : forall x:R, (f x) [#] Zero -> x [#] Zero.
@@ -144,10 +152,62 @@ apply (op_rht_resp_ap S (f x) (Zero:S) (f x)).
 assumption.
 Qed.
 
+
+Lemma rh_pres_nring : forall n, (f (nring n:R)) [=] (nring n:S).
+Proof.
+induction n.
+ apply rh_pres_zero.
+simpl.
+rewrite rh_pres_plus.
+auto with *.
+Qed.
+
 End RingHom_Basics.
 
 End RingHom_Lemmas.
 
-
 Hint Resolve rh_strext rh_pres_plus rh_pres_mult rh_pres_unit : algebra.
-Hint Resolve rh_pres_zero rh_pres_minus rh_apzero : algebra.
+Hint Resolve rh_pres_zero rh_pres_minus rh_pres_inv rh_apzero : algebra.
+Hint Rewrite rh_pres_zero rh_pres_plus rh_pres_minus rh_pres_inv rh_pres_mult rh_pres_unit : ringHomPush.
+
+Definition RHid R : RingHom R R.
+intros R.
+exists (id_un_op R).
+  intros x y; apply eq_reflexive.
+ intros x y; apply eq_reflexive.
+apply eq_reflexive.
+Defined.
+
+Section Compose.
+
+Variable R S T : CRing.
+Variable phi : RingHom S T.
+Variable psi : RingHom R S.
+
+Lemma RHcompose1 : fun_pres_plus _ _ (compose_CSetoid_fun _ _ _ psi phi).
+Proof.
+intros x y.
+simpl.
+repeat rewrite rh_pres_plus.
+reflexivity.
+Qed.
+
+Lemma RHcompose2 : fun_pres_mult _ _ (compose_CSetoid_fun _ _ _ psi phi).
+Proof.
+intros x y.
+simpl.
+repeat rewrite rh_pres_mult.
+reflexivity.
+Qed.
+
+Lemma RHcompose3 : fun_pres_unit _ _ (compose_CSetoid_fun _ _ _ psi phi).
+Proof.
+unfold fun_pres_unit.
+simpl.
+repeat rewrite rh_pres_unit.
+reflexivity.
+Qed.
+
+Definition RHcompose : RingHom R T := Build_RingHom _ _ _ RHcompose1 RHcompose2 RHcompose3.
+
+End Compose.

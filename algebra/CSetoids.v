@@ -975,6 +975,41 @@ Qed.
 
 End CSetoid_functions.
 
+Lemma bin_fun_is_wd_fun_lft : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S2),
+ fun_wd _ _ (fun x : S1 => f x c).
+Proof.
+intros S1 S2 S3 f c x y H.
+apply csbf_wd_unfolded. trivial. apply eq_reflexive_unfolded.
+Qed.
+
+Lemma bin_fun_is_wd_fun_rht : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S1),
+ fun_wd _ _ (fun x : S2 => f c x).
+Proof.
+intros S1 S2 S3 f c x y H. apply csbf_wd_unfolded. apply eq_reflexive_unfolded. trivial.
+Qed.
+
+Lemma bin_fun_is_strext_fun_lft : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S2),
+ fun_strext _ _ (fun x : S1 => f x c).
+Proof.
+intros S1 S2 S3 f c x y H. cut (x [#] y or c [#] c). intro Hv. elim Hv. trivial. intro Hf.
+generalize (ap_irreflexive_unfolded _ c Hf). intro. elim H0.
+eapply csbf_strext. apply H.
+Defined.
+
+Lemma bin_fun_is_strext_fun_rht : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S1),
+ fun_strext _ _ (fun x : S2 => f c x).
+Proof.
+intros S1 S2 S3 op c x y H. cut (c [#] c or x [#] y). intro Hv. elim Hv. intro Hf.
+generalize (ap_irreflexive_unfolded _ c Hf). tauto. auto.
+eapply csbf_strext. apply H.
+Defined.
+
+Definition bin_fun2fun_rht (S1 S2 S3:CSetoid) (f : CSetoid_bin_fun S1 S2 S3) (c : S1) : CSetoid_fun S2 S3 :=
+  Build_CSetoid_fun _ _ (fun x : S2 => f c x) (bin_fun_is_strext_fun_rht _ _ _ f c).
+
+Definition bin_fun2fun_lft (S1 S2 S3:CSetoid) (f : CSetoid_bin_fun S1 S2 S3) (c : S2) : CSetoid_fun S1 S3 :=
+  Build_CSetoid_fun _ _ (fun x : S1 => f x c) (bin_fun_is_strext_fun_lft _ _ _ f c).
+
 (* End_SpecReals *)
 
 Hint Resolve csf_wd_unfolded csbf_wd_unfolded: algebra_c.
@@ -1086,40 +1121,32 @@ Qed.
 Lemma bin_op_is_wd_un_op_lft : forall (op : CSetoid_bin_op) (c : S),
  un_op_wd (fun x : S => op x c).
 Proof.
-intros op c. unfold un_op_wd in |- *. unfold fun_wd in |- *.
-intros x y H. apply bin_op_wd_unfolded. trivial. apply eq_reflexive_unfolded.
+intros; apply bin_fun_is_wd_fun_lft.
 Qed.
 
 Lemma bin_op_is_wd_un_op_rht : forall (op : CSetoid_bin_op) (c : S),
  un_op_wd (fun x : S => op c x).
 Proof.
-intros op c. unfold un_op_wd in |- *. unfold fun_wd in |- *.
-intros x y H. apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. trivial.
+intros; apply bin_fun_is_wd_fun_rht.
 Qed.
 
 Lemma bin_op_is_strext_un_op_lft : forall (op : CSetoid_bin_op) (c : S),
  un_op_strext (fun x : S => op x c).
 Proof.
-intros op c. unfold un_op_strext in |- *. unfold fun_strext in |- *.
-intros x y H. cut (x [#] y or c [#] c). intro Hv. elim Hv. trivial. intro Hf.
-generalize (ap_irreflexive_unfolded _ c Hf). intro. elim H0.
-apply bin_op_strext_unfolded with op. trivial.
-Qed.
+intros; apply bin_fun_is_strext_fun_lft.
+Defined.
 
 Lemma bin_op_is_strext_un_op_rht : forall (op : CSetoid_bin_op) (c : S),
  un_op_strext (fun x : S => op c x).
 Proof.
-intros op c. unfold un_op_strext in |- *. unfold fun_strext in |- *.
-intros x y H. cut (c [#] c or x [#] y). intro Hv. elim Hv. intro Hf.
-generalize (ap_irreflexive_unfolded _ c Hf). tauto. auto.
-apply bin_op_strext_unfolded with op. trivial.
-Qed.
+intros; apply bin_fun_is_strext_fun_rht.
+Defined.
 
 Definition bin_op2un_op_rht (op : CSetoid_bin_op) (c : S) : CSetoid_un_op :=
-  Build_CSetoid_un_op (fun x : S => op c x) (bin_op_is_strext_un_op_rht op c).
+  bin_fun2fun_rht _ _ _ op c.
 
 Definition bin_op2un_op_lft (op : CSetoid_bin_op) (c : S) : CSetoid_un_op :=
-  Build_CSetoid_un_op (fun x : S => op x c) (bin_op_is_strext_un_op_lft op c).
+  bin_fun2fun_lft _ _ _ op c.
 
 (* Begin_SpecReals *)
 

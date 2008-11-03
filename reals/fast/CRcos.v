@@ -69,7 +69,7 @@ apply mult_wd.
 apply (inj_Q_power IR q 2).
 Qed.
 
-Definition cos_poly_modulus (e:Qpos) := Qpos2QposInf (e/(4#1)).
+Definition cos_poly_modulus (e:Qpos) := Qpos2QposInf ((1#4)*e).
 
 Let X:((-(1))<1)%Q.
 constructor.
@@ -86,10 +86,11 @@ Qed.
 
 Lemma cos_poly_prf : is_UniformlyContinuousFunction (fun x => cos_poly_fun (QboundAbs (1#1) x)) cos_poly_modulus.
 Proof.
-rapply (is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun).
+rapply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun a (4#1)).
  simpl; intros q _ _.
  rapply cos_poly_fun_correct.
-simpl; intros x _ [Hx0 Hx1].
+simpl; intros x' _ [Hx0 Hx1].
+set (x:=(inj_Q IR x')) in *.
 stepr (Four:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 4)).
 stepl (ABSIR ([--](Four[*]x))) by (apply AbsIR_wd; rational).
 stepl (ABSIR (Four[*]x)) by apply AbsIR_inv.
@@ -185,7 +186,7 @@ Qed.
 
 Definition cos_uc_prf : is_UniformlyContinuousFunction rational_cos Qpos2QposInf.
 Proof.
-apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_cos x) (modulusD (1#1)).
+apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_cos x) (Qscale_modulus (1#1)).
   reflexivity.
  intros x.
  simpl.

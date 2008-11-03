@@ -515,6 +515,13 @@ Included.
 split; Deriv.
 Qed.
 
+Lemma Derivative_poly : forall p, Derivative I pI (FPoly _ p) (FPoly _ (_D_ p)).
+intro.
+split.
+Included.
+split; Deriv.
+Qed.
+
 Lemma Derivative_nth : forall n, Derivative I pI (F{^}S n) (nring (S n) {**} (F'{*}F{^}n)).
 elim derF; intros incF H.
 elim H; intros incF' derivF.
@@ -730,6 +737,12 @@ elim diffF; intros incF diffbleF.
 split.
 Included.
 intros; apply Diffble_I_scal; auto.
+Qed.
+
+Lemma Diffble_poly : forall p, Diffble I pI (FPoly _ p).
+split.
+Included.
+intros; apply Diffble_I_poly; auto.
 Qed.
 
 Lemma Diffble_recip : bnd_away_zero_in_P G I -> Diffble I pI {1/}G.

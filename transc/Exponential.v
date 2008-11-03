@@ -958,30 +958,28 @@ intros x [|n|n] Hx Hx0 Hxn.
   simpl.
   rstepr (Zero:IR).
   algebra.
- assert (X:Zero[<]x[^]n).
+ assert (X:Zero[<]x[^](nat_of_P n)).
   astepr ((x[//]Hx0)[^^]n).
   assumption.
- change (Log (x[^]n) Hxn[=]zring (R:=IR) n[*]Log x Hx).
- astepl (nring n[*]Log x Hx).
+ change (Log (x[^](nat_of_P n)) Hxn[=]zring (R:=IR) n[*]Log x Hx).
+ astepl (nring (nat_of_P n)[*]Log x Hx).
  apply mult_wdl.
  apply eq_symmetric.
- unfold pos2Z.
  rewrite <- inject_nat_convert.
- refine (zring_plus_nat IR n).
+ refine (zring_plus_nat IR (nat_of_P n)).
 simpl.
-change (Log ((One[/]x[//]Hx0)[^]n) Hxn[=][--](zring n)[*]Log x Hx).
+change (Log ((One[/]x[//]Hx0)[^](nat_of_P n)) Hxn[=][--](zring n)[*]Log x Hx).
 assert (X:Zero[<](One[/]x[//]Hx0)).
  apply recip_resp_pos.
  assumption.
-astepl ((nring n)[*](Log _ X)).
-astepl ((nring n)[*]([--](Log _ Hx))).
-rstepl ([--](nring n)[*](Log x Hx)).
+astepl ((nring (nat_of_P n))[*](Log _ X)).
+astepl ((nring (nat_of_P n))[*]([--](Log _ Hx))).
+rstepl ([--](nring (nat_of_P n))[*](Log x Hx)).
 apply mult_wdl.
 apply un_op_wd_unfolded.
-unfold pos2Z.
 rewrite <- inject_nat_convert.
 apply eq_symmetric.
-refine (zring_plus_nat IR n).
+refine (zring_plus_nat IR (nat_of_P n)).
 Qed.
 
 Hint Resolve Log_zexp: algebra.

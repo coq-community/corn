@@ -41,6 +41,8 @@
 (** printing FX %\ensuremath{F[x]}% #F[x]# *)
 
 Require Export RingReflection.
+Require Import CRing_Homomorphisms.
+Require Import Rational.
 
 (**
 * Polynomials
@@ -333,6 +335,8 @@ exact tight_apart_cpoly_ap.
 Qed.
 
 Definition cpoly_csetoid := Build_CSetoid _ _ _ cpoly_is_CSetoid.
+Canonical Structure cpoly_csetoid.
+Canonical Structure cpoly_setoid := cs_crr cpoly_csetoid.
 
 (**
 Now that we know that the polynomials form a setoid, we can use the
@@ -1003,6 +1007,7 @@ assumption.
 Qed.
 
 Definition cpoly_csemi_grp := Build_CSemiGroup _ _ cpoly_plus_associative.
+Canonical Structure cpoly_csemi_grp.
 
 Lemma cpoly_cm_proof : is_CMonoid cpoly_csemi_grp cpoly_zero.
 apply Build_is_CMonoid.
@@ -1019,6 +1024,7 @@ algebra.
 Qed.
 
 Definition cpoly_cmonoid := Build_CMonoid _ _ cpoly_cm_proof.
+Canonical Structure cpoly_cmonoid.
 
 (**
 *** The polynomials form a group
@@ -1119,6 +1125,7 @@ auto.
 Qed.
 
 Definition cpoly_cgroup := Build_CGroup _ _ cpoly_cg_proof.
+Canonical Structure cpoly_cgroup.
 
 Lemma cpoly_cag_proof : is_CAbGroup cpoly_cgroup.
 unfold is_CAbGroup in |- *.
@@ -1127,6 +1134,7 @@ apply cpoly_plus_commutative.
 Qed.
 
 Definition cpoly_cabgroup := Build_CAbGroup _ cpoly_cag_proof.
+Canonical Structure cpoly_cgroup.
 
 (**
 *** The polynomials form a ring
@@ -1804,6 +1812,7 @@ exact cpoly_cr_non_triv.
 Qed.
 
 Definition cpoly_cring : CRing := Build_CRing _ _ _ cpoly_is_CRing.
+Canonical Structure cpoly_cring.
 
 Lemma cpoly_constant_strext :
  fun_strext (S1:=CR) (S2:=cpoly_cring) cpoly_constant.
@@ -1822,7 +1831,7 @@ apply fun_strext_imp_wd.
 exact cpoly_constant_strext.
 Qed.
 
-Definition _C_ := Build_CSetoid_fun _ _ _ cpoly_constant_strext.
+Definition cpoly_constant_fun := Build_CSetoid_fun _ _ _ cpoly_constant_strext.
 
 Definition _X_ : cpoly_cring := cpoly_linear_cs Zero (One:cpoly_cring).
 
@@ -1849,7 +1858,6 @@ Qed.
 
 End CPoly_CRing.
 
-Implicit Arguments _C_ [CR].
 Implicit Arguments _X_ [CR].
 
 Definition cpoly_linear_fun' (CR : CRing) :
@@ -2076,6 +2084,37 @@ Variable R : CRing.
 
 Notation RX := (cpoly_cring R).
 
+Lemma cpoly_const_one : One [=] cpoly_constant_fun _ (One:R).
+simpl in |- *; split; algebra.
+Qed.
+
+Lemma cpoly_const_plus : forall a b : R, cpoly_constant_fun _ (a[+]b) [=] cpoly_constant_fun _ a[+]cpoly_constant_fun _ b.
+simpl in |- *; split; algebra.
+Qed.
+
+Lemma cpoly_const_mult : forall a b : R, cpoly_constant_fun _ (a[*]b) [=] cpoly_constant_fun _ a[*] cpoly_constant_fun _ b.
+simpl in |- *; split; algebra.
+Qed.
+
+Definition _C_ : RingHom R RX := Build_RingHom _ _ _ cpoly_const_plus cpoly_const_mult cpoly_const_one.
+
+Lemma _c_one : One [=] _C_ (One:R).
+simpl in |- *; split; algebra.
+Qed.
+
+Lemma _c_plus : forall a b : R, _C_ (a[+]b) [=] _C_ a[+] _C_ b.
+simpl in |- *; split; algebra.
+Qed.
+
+Lemma _c_mult : forall a b : R, _C_ (a[*]b) [=] _C_ a[*] _C_ b.
+simpl in |- *; split; algebra.
+Qed.
+
+Lemma _c_zero : Zero [=] _C_ (Zero:R).
+simpl in |- *.
+split; algebra.
+Qed.
+
 (**
 *** Constant and identity
 *)
@@ -2084,7 +2123,7 @@ Lemma cpoly_X_ : _X_ [=] (Zero:RX) [+X*]One.
 algebra.
 Qed.
 
-Lemma cpoly_C_ : forall c : RX, _C_ c [=] c[+X*]Zero.
+Lemma cpoly_C_ : forall c : R, _C_ c [=] c[+X*]Zero.
 algebra.
 Qed.
 
@@ -2093,19 +2132,6 @@ Hint Resolve cpoly_X_ cpoly_C_: algebra.
 Lemma cpoly_const_eq : forall c d : R, c [=] d -> _C_ c [=] _C_ d.
 intros.
 algebra.
-Qed.
-
-Lemma _c_zero : Zero [=] _C_ (Zero:R).
-simpl in |- *.
-split; algebra.
-Qed.
-
-Lemma _c_one : One [=] _C_ (One:R).
-simpl in |- *; split; algebra.
-Qed.
-
-Lemma _c_mult : forall a b : R, _C_ (a[*]b) [=] _C_ a[*]_C_ b.
-simpl in |- *; split; algebra.
 Qed.
 
 Lemma cpoly_lin : forall (p : RX) (c : R), c[+X*]p [=] _C_ c[+]_X_[*]p.
@@ -2224,6 +2250,8 @@ Qed.
 
 Definition cpoly_csetoid_op (f : RX) : CSetoid_un_op R :=
  Build_CSetoid_fun _ _ (fun x => f ! x) (cpolyap_strext f).
+
+Definition FPoly p := total_eq_part _ (cpoly_csetoid_op p).
 
 Lemma _c_apply : forall c x : R, (_C_ c) ! x [=] c.
 intros.
@@ -2395,6 +2423,8 @@ Qed.
 
 End Poly_properties.
 
+Implicit Arguments _C_ [R].
+
 (**
 ** Induction properties of polynomials for [Prop]
 *)
@@ -2425,3 +2455,330 @@ Hint Resolve _c_apply _x_apply inv_apply plus_apply minus_apply mult_apply
 Hint Resolve one_apply _c_zero _c_one _c_mult: algebra.
 Hint Resolve poly_inv_apply: algebra.
 Hint Resolve _c_mult_lin: algebra.
+
+Hint Rewrite one_apply _c_apply _x_apply mult_apply plus_apply minus_apply : apply.
+
+Section Derivative.
+
+Variable R:CRing.
+Let RX := cpoly_cring R.
+
+Fixpoint cpoly_diff (p : RX) : RX :=
+match p with
+| cpoly_zero => Zero
+| cpoly_linear c p1 => p1[+](Zero[+X*](cpoly_diff p1))
+end.
+
+Lemma cpoly_diff_strext : un_op_strext _ cpoly_diff.
+Proof.
+intros x.
+induction x.
+ induction y.
+  auto with *.
+ intros Hxy.
+ right.
+ abstract (
+  destruct (cpoly_ap_zero_plus _ _ _ (ap_symmetric _ _ _ Hxy)) as [c|[c|c]];
+   [apply (ap_symmetric _ _ _ c)
+   |elim (ap_irreflexive _ _ c)
+   |apply IHy;apply c]).
+intros [|a y] Hxy.
+ simpl in Hxy.
+ right.
+ abstract (
+  destruct (cpoly_ap_zero_plus _ _ _ Hxy) as [c|[c|c]];
+   [apply (ap_symmetric _ _ _ c)
+   |elim (ap_irreflexive _ _ c)
+   |change (Zero[#]x); apply ap_symmetric; apply IHx; apply ap_symmetric; apply c]).
+right.
+destruct (cpoly_plus_op_strext _ _ _ _ _ Hxy) as [c|[c|c]].
+  assumption.
+ elim (ap_irreflexive _ _ c).
+apply IHx; apply c.
+Defined.
+
+Lemma cpoly_diff_wd : un_op_wd _ cpoly_diff.
+Proof.
+apply fun_strext_imp_wd.
+apply cpoly_diff_strext.
+Qed.
+
+Definition _D_ := Build_CSetoid_un_op _ _ cpoly_diff_strext.
+
+Lemma diff_zero : _D_ Zero[=]Zero.
+Proof.
+reflexivity.
+Qed.
+
+Lemma diff_one : _D_ One[=]Zero.
+Proof.
+simpl; split; auto with *; reflexivity.
+Qed.
+
+Lemma diff_const : forall c, _D_ (_C_ c)[=]Zero.
+Proof.
+simpl; split; auto with *.
+Qed.
+
+Lemma diff_x : _D_ _X_[=]One.
+Proof.
+simpl; split; auto with *.
+Qed.
+
+Lemma diff_linear : forall a (p:RX), _D_ (a[+X*]p)[=]p[+]_X_[*]_D_ p.
+Proof.
+intros a p.
+change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
+rewrite cpoly_lin.
+rewrite <- _c_zero.
+rational.
+Qed.
+
+Lemma diff_plus : forall (p q:RX), _D_ (p[+]q)[=]_D_ p[+]_D_ q.
+Proof.
+induction p.
+ intros q.
+ reflexivity.
+intros [|a q].
+ rewrite cm_rht_unit_unfolded.
+ change (cpoly_zero R) with (Zero:cpoly_cring R).
+ apply csf_wd.
+ algebra.
+change ((p[+]q)[+]cpoly_linear _ Zero (_D_ (p[+]q))[=]
+ (p[+]cpoly_linear _ Zero (_D_ p))[+](q[+]cpoly_linear _ Zero (_D_ q))).
+do 3 rewrite poly_linear.
+change (st_car RX) in p, q.
+change (p[+]q[+](_X_[*]_D_ (p[+]q)[+]_C_ Zero)[=]
+p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
+rewrite (IHp q).
+rewrite <- _c_zero.
+rational.
+Qed.
+
+Lemma diff_c_mult : forall c (p:RX), _D_ (_C_ c[*]p)[=]_C_ c[*]_D_ p.
+Proof.
+intros c p.
+induction p.
+ auto with *.
+change (_D_ (cpoly_linear R s p)) with (p[+](Zero[+X*](_D_ p))).
+change (cpoly_linear R s p) with (s[+X*]p).
+rewrite _c_mult_lin.
+change (_D_ (c[*]s[+X*]_C_ c[*]p))
+ with (_C_ c[*]p [+] (Zero[+X*](_D_ (_C_ c[*]p)))).
+rewrite IHp.
+do 2 rewrite cpoly_lin.
+rewrite <- _c_zero.
+rational.
+Qed.
+
+Lemma diff_mult : forall (p q:RX), _D_ (p[*]q)[=]_D_ p[*]q [+] p[*]_D_ q.
+Proof.
+induction p.
+ intros q.
+ change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
+ rstepl (_D_(Zero:RX)).
+ rewrite diff_zero.
+ rational.
+intros q.
+change (st_car RX) in p.
+change (_D_((s[+X*]p)[*]q)[=]_D_(s[+X*]p)[*]q[+](s[+X*]p)[*]_D_ q).
+do 2 rewrite lin_mult.
+rewrite diff_linear.
+fold RX.
+rewrite diff_plus.
+setoid_replace (_D_ ((_C_ s:RX)[*]q)) with (_C_ s[*]_D_ q) by apply diff_c_mult.
+setoid_replace (((_X_:RX)[*](p[*]q)):RX)
+ with ((((_X_:RX)[*](p[*]q)))[+]Zero) by (symmetry;apply cm_rht_unit_unfolded).
+setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply _c_zero.
+unfold RX.
+rewrite <- poly_linear.
+fold RX.
+change (_D_ (cpoly_linear R Zero (p[*]q)))
+ with (p[*]q [+] (Zero[+X*]_D_ (p[*]q))).
+rewrite cpoly_lin.
+rewrite <- _c_zero.
+rewrite IHp.
+rational.
+Qed.
+
+End Derivative.
+Implicit Arguments _D_ [R].
+
+Hint Rewrite diff_zero diff_one diff_const diff_x diff_plus diff_c_mult diff_mult diff_linear : poly_diff.
+Section Map.
+
+Variable R S : CRing.
+Variable f : RingHom R S.
+Let RX := cpoly_cring R.
+Let SX := cpoly_cring S.
+
+Fixpoint cpoly_map_fun (p:RX) : SX :=
+match p with
+| cpoly_zero => cpoly_zero _
+| cpoly_linear c p1 => cpoly_linear _ (f c) (cpoly_map_fun p1)
+end.
+
+Lemma cpoly_map_strext : fun_strext cpoly_map_fun.
+Proof.
+intros x.
+induction x; intros y H.
+ induction y.
+  elim H.
+ destruct H as [H|H].
+  left.
+  eapply rh_apzero; apply H.
+ right.
+ apply IHy.
+ apply H.
+destruct y as [|c y].
+ destruct H as [H|H].
+  left.
+  eapply rh_apzero; apply H.
+ right.
+ change (Zero[#]x).
+ apply ap_symmetric.
+ apply IHx.
+ apply ap_symmetric.
+ apply H.
+destruct H as [H|H].
+ left.
+ eapply rh_strext; apply H.
+right.
+apply IHx.
+apply H.
+Defined.
+
+Definition cpoly_map_csf : CSetoid_fun RX SX := Build_CSetoid_fun _ _ _ cpoly_map_strext.
+
+Lemma cpoly_map_pres_plus : fun_pres_plus _ _ cpoly_map_csf.
+Proof.
+unfold fun_pres_plus.
+apply (cpoly_double_ind0 R).
+  intros p.
+  change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
+  rstepr (cpoly_map_csf p).
+  apply csf_wd.
+  rational.
+ intros p.
+ apply eq_reflexive.
+intros p q c d H.
+split.
+ apply rh_pres_plus.
+apply H.
+Qed.
+
+Lemma cpoly_map_pres_mult : fun_pres_mult _ _ cpoly_map_csf.
+Proof.
+unfold fun_pres_mult.
+assert (X:forall x y, cpoly_map_csf (cpoly_mult_cr _ x y)[=]cpoly_mult_cr _ (cpoly_map_csf x) (f y)).
+ induction x; intros y.
+  apply eq_reflexive.
+ split.
+  apply rh_pres_mult.
+ apply IHx.
+apply (cpoly_double_ind0 R).
+  intros p.
+  apply eq_reflexive.
+ intros p.
+ change (st_car RX) in p.
+ change (cpoly_zero R) with (Zero:RX).
+ stepl (cpoly_map_csf (Zero:RX)) by (apply csf_wd; rational).
+ change (cpoly_map_csf Zero) with (Zero:SX).
+ rational.
+intros p q c d H.
+split.
+ autorewrite with ringHomPush.
+ reflexivity.
+change (st_car RX) in p,q.
+change (cpoly_map_csf ((cpoly_mult_cr _ q c)[+](p[*](cpoly_linear _ d q)))
+        [=](cpoly_mult_cr _ (cpoly_map_csf q) (f c))[+](cpoly_map_csf p)[*](cpoly_map_csf (cpoly_linear _ d q))).
+stepl ((cpoly_map_csf (cpoly_mult_cr R q c))[+](cpoly_map_csf (p[*]cpoly_linear R d q))) by
+ apply eq_symmetric; apply cpoly_map_pres_plus.
+apply csbf_wd.
+ apply X.
+stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)) by
+ apply csf_wd;rational.
+stepr (cpoly_map_csf (cpoly_linear R d q)[*]cpoly_map_csf p).
+ 2:apply (mult_commut_unfolded SX).
+change ((cpoly_linear R d q:RX)[*]p)
+ with (cpoly_mult_fast_cs _ (cpoly_linear R d q) p).
+rewrite cpoly_mult_fast_equiv.
+rewrite cpoly_lin_mult.
+change (cpoly_map_csf (cpoly_linear R d q:RX)[*]cpoly_map_csf p)
+ with (cpoly_mult_fast_cs _ (cpoly_linear S (f d) (cpoly_map_csf q)) (cpoly_map_csf p)).
+rewrite cpoly_mult_fast_equiv.
+rewrite cpoly_lin_mult.
+stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p))) by
+ apply eq_symmetric; apply cpoly_map_pres_plus.
+apply csbf_wd.
+ apply X.
+split.
+ auto with *.
+change ((cpoly_map_csf (cpoly_mult_cs R q p))[=](cpoly_mult_cs S (cpoly_map_csf q) (cpoly_map_csf p))).
+repeat setoid_rewrite <- cpoly_mult_fast_equiv.
+change (cpoly_map_csf (q[*]p)[=]cpoly_map_csf q[*]cpoly_map_csf p).
+rstepr (cpoly_map_csf p[*]cpoly_map_csf q).
+rewrite <- H.
+apply csf_wd.
+rational.
+Qed.
+
+Lemma cpoly_map_pres_unit : fun_pres_unit _ _ cpoly_map_csf.
+Proof.
+split.
+ apply rh_pres_unit.
+constructor.
+Qed.
+
+Definition cpoly_map := Build_RingHom _ _ _ cpoly_map_pres_plus cpoly_map_pres_mult cpoly_map_pres_unit.
+
+Lemma cpoly_map_X : cpoly_map _X_[=]_X_.
+Proof.
+repeat split.
+ apply rh_pres_zero.
+apply rh_pres_unit.
+Qed.
+
+Lemma cpoly_map_C : forall c, cpoly_map (_C_ c)[=]_C_ (f c).
+Proof.
+reflexivity.
+Qed.
+
+Lemma cpoly_map_diff : forall p, cpoly_map (_D_ p) [=] _D_ (cpoly_map p).
+Proof.
+induction p.
+ apply eq_reflexive.
+change (cpoly_map (_D_ (s[+X*]p))[=]_D_ (f s[+X*](cpoly_map p))).
+do 2 rewrite diff_linear.
+unfold RX.
+autorewrite with ringHomPush.
+rewrite IHp.
+rewrite cpoly_map_X.
+apply eq_reflexive.
+Qed.
+
+Lemma cpoly_map_apply : forall p x, f (p ! x)[=] (cpoly_map p) ! (f x).
+Proof.
+induction p.
+ intros x.
+ apply rh_pres_zero.
+intros x.
+simpl in *.
+rewrite rh_pres_plus.
+rewrite rh_pres_mult.
+rewrite IHp.
+reflexivity.
+Qed.
+
+End Map.
+Implicit Arguments cpoly_map [R S].
+
+Lemma cpoly_map_compose : forall R S T (g:RingHom S T) (f:RingHom R S) p,
+ (cpoly_map (RHcompose _ _ _ g f) p)[=]cpoly_map g (cpoly_map f p).
+Proof.
+induction p.
+ constructor.
+split.
+ reflexivity.
+apply IHp.
+Qed.
