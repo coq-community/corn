@@ -264,6 +264,9 @@ apply Qpos_power_pos.
 Defined.
 
 Infix "^" := Qpos_power : Qpos_scope.
+
+(** The default relation on Z is [eqm] otherwise. *)
+Instance Z_default : @DefaultRelation Z (@eq Z).
 (* begin hide *)
 Add Morphism Qpos_power : Qpos_power_wd.
 intros x1 x2 Hx y.
