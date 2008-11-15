@@ -64,9 +64,7 @@ Definition SplitL : StepF -> OpenUnit -> StepF := (@SplitL X).
 Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
 End StepF_Functions.
 
-Typeclasses unfold StepF.
-
-(* begn hide *)
+(* begin hide *)
 Implicit Arguments constStepF [X].
 (* end hide *)
 Open Local Scope setoid_scope.

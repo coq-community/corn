@@ -146,7 +146,8 @@ intros p f. simpl.  apply SplitL_glue_ind; apply SplitL_glue_ind; intros H H0;
   simpl; field; auto with *.
 (* p==o *)
 apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
-apply SplitL_wd;auto with *.
+apply SplitL_wd. auto with *.
+symmetry; auto with *.
 Qed.
 
 Lemma SplitRBind (X Y:Setoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
@@ -164,7 +165,7 @@ intros p f. simpl.  apply SplitR_glue_ind; apply SplitR_glue_ind; intros H H0;
    symmetry. apply StepF_Qeq_eq. rapply ((SplitLSplitR (f x) p) (OpenUnitDualDiv _ _ H));
     simpl; field; auto with *.
   apply StFBind_wd1.
-  intro x. simpl. unfold compose0, SplitLS0. symmetry. apply StepF_Qeq_eq. rapply (SplitRSplitR (f x)).
+  intro x. simpl. unfold compose0, SplitLS0. symmetry. rapply StepF_Qeq_eq. rapply (SplitRSplitR (f x)).
   simpl. field. auto with *.
  (* o<p*)
  setoid_replace (OpenUnitDualDiv p o H0) with (OpenUnitDualDiv p o H) by (unfold ou_eq; reflexivity).
@@ -175,6 +176,7 @@ intros p f. simpl.  apply SplitR_glue_ind; apply SplitR_glue_ind; intros H H0;
 (* p==o *)
 apply StFBind_wd1. intro. simpl. unfold compose0, SplitLS0, SplitRS0.
 apply SplitR_wd;auto with *.
+symmetry. auto with *.
 Qed.
 
 Lemma StFBind_wd(X Y:Setoid): forall x1 x2 : StepFS X,
@@ -188,7 +190,7 @@ induction x1 using StepF_ind. intro y.
  intro f.
  rewrite <- (IHy1 Hl (compose1 (SplitLS Y o) f)). simpl. unfold compose0. clear IHy1. 
  rewrite <- (IHy2 Hr (compose1 (SplitRS Y o) f)). simpl. unfold compose0. 
- unfold SplitLS0, SplitRS0. symmetry. apply glueSplit.
+ unfold SplitLS0, SplitRS0. symmetry. rapply glueSplit.
 intros y H f.
 simpl in H.
 destruct H as [Hl Hr] using (glue_eq_ind x1_1).
