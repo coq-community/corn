@@ -67,9 +67,9 @@
 ./reals/fast/CRsign.v ./reals/fast/CRAlternatingSum.v
 ./reals/fast/CRseries.v ./reals/fast/ContinuousCorrect.v
 ./reals/fast/ContinuousCorrect.v ./reals/fast/ModulusDerivative.v
- /reals/fast/CRexp.v ./reals/fast/CRsin.v
-./reals/fast/CRcos.v ./reals/fast/CRarctan_small.v
-./reals/fast/CRarctan.v ./reals/fast/CRartanh_slow.v
+./reals/fast/CRexp.v ./reals/fast/CRarctan_small.v
+./reals/fast/CRarctan.v ./reals/fast/CRsin.v
+./reals/fast/CRcos.v ./reals/fast/CRartanh_slow.v
 ./reals/fast/CRtrans.v ./model/structures/OpenUnit.v
 ./model/metric2/L1metric.v ./model/metric2/LinfMetricMonad.v
 ./model/metric2/IntegrableFunction.v ./model/metric2/LinfDistMonad.v
