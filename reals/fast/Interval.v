@@ -30,6 +30,8 @@ Require Import QMinMax.
 Require Import Classic.
 Require Import CornTac.
 
+Open Local Scope Q_scope.
+
 Opaque Qabs.
 
 Set Implicit Arguments.

@@ -33,6 +33,8 @@ We prove the that StepF distributes over Complete using the function
 swap (which we call dist) as in Jones, Duponcheel - composing monads
 *)
 Set Implicit Arguments.
+
+Open Local Scope Q_scope.
 Open Local Scope sfstscope.
 
 Section Dist.
@@ -120,9 +122,9 @@ rewrite StepFSupBallGlueGlue in H |- *.
 split; revert d1 d2; tauto.
 Qed.
 
-Open Scope uc_scope.
-Open Scope sfstscope.
-Open Scope sfscope.
+Open Local Scope uc_scope.
+Open Local Scope sfstscope.
+Open Local Scope sfscope.
 
 Definition dist: (StepFSup (Complete X))-->(Complete (StepFSup X)).
 rapply (@Build_UniformlyContinuousFunction _ _ dist1 (fun e => e)).

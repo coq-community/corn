@@ -30,6 +30,7 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Opaque CR Qmin Qmax Qred.
 

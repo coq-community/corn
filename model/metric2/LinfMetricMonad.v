@@ -37,6 +37,7 @@ Require Import CornTac.
 Set Implicit Arguments.
 
 Open Local Scope sfstscope.
+Open Local Scope setoid_scope.
 
 (**
 ** Linf metric for Step Functions
@@ -48,7 +49,6 @@ Set Implicit Arguments.
 Variable X:MetricSpace.
 
 (** A setoid verion of the ball predicate *)
-Open Local Scope setoid_scope.
 Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
 intros m e x.
 exists (ball e x).

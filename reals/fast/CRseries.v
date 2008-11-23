@@ -31,6 +31,8 @@ Require Import LazyNat.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 Opaque Qabs.
 
 (**

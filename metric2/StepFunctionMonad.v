@@ -38,7 +38,7 @@ intro X. exists (StepF X) (@StepF_eq X).
 apply StepF_Sth.
 Defined.
 
-Open Scope setoid_scope.
+Open Local Scope setoid_scope.
 Open Local Scope sfstscope.
 
 (** We redefine several functions to return a setoid type. *)

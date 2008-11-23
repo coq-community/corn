@@ -27,8 +27,9 @@ Require Import ZArith.
 Require Import QMinMax.
 Require Import QposMinMax.
 Require Import Qauto.
-
 Require Import CornTac.
+
+Open Local Scope Q_scope.
 
 Section HausdorffMetric.
 

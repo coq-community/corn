@@ -25,6 +25,9 @@ Require Import Qauto.
 Require Import CornTac.
 
 Set Implicit Arguments.
+
+Open Local Scope Q_scope.
+
 (**
 * [OpenUnit]
 Open unit represents rational number in (0,1).

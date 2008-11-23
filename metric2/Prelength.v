@@ -32,6 +32,8 @@ Require Import Qauto.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 Section Prelength_Space.
 (**
 ** Prelength space

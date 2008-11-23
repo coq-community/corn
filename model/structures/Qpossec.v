@@ -43,6 +43,8 @@ Require Import COrdFields2.
 Require Import Eqdep_dec.
 Require Import CornTac.
 
+Open Local Scope Q_scope.
+
 (**
 * [Qpos]
 We define [Qpos] as a pair of positives (n,d) which represents the

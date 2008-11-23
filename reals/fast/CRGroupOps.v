@@ -30,6 +30,7 @@ Set Implicit Arguments.
 
 Opaque CR Qmin Qmax.
 
+Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
 (**

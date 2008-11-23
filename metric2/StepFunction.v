@@ -26,6 +26,8 @@ Require Import COrdFields.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 Section StepFunction.
 
 Variable X:Type.

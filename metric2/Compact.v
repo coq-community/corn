@@ -31,6 +31,8 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 (**
 * Compact sets
 This module formalizes compact sets as the completion of a finitely

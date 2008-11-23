@@ -27,6 +27,8 @@ Require Import Qauto.
 Require Import Qround.
 Require Import CornTac.
 
+Open Local Scope Q_scope.
+
 Set Implicit Arguments.
 
 (**

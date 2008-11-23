@@ -29,6 +29,8 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 Opaque Qabs.
 
 (**

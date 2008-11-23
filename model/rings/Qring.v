@@ -38,6 +38,8 @@ Require Export Qabgroup.
 Require Import CRings.
 Require Import Zring.
 
+Open Local Scope Q_scope.
+
 (**
 ** Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#
 Because [Q] forms an abelian group with addition, a monoid with 

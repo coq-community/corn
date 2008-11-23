@@ -46,6 +46,9 @@ Require Import Peano_dec.
 Require Import Zsec.
 Require Export QArith.
 
+Close Scope Q_scope.
+Open Local Scope Q_scope.
+
 (**
 * [Q]
 ** About [Q]

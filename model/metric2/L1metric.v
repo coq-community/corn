@@ -32,6 +32,7 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
 Open Local Scope sfstscope.
 Open Local Scope StepQ_scope.
 

@@ -21,6 +21,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export Metric.
 Require Import Qauto.
 
+Open Local Scope Q_scope.
+
 (**
 ** Classification of metric spaces
 There is a heirarchy of properties that a metric space can possess.

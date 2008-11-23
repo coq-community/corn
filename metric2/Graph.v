@@ -30,6 +30,8 @@ Require Import CornTac.
 
 Set Implicit Arguments.
 
+Open Local Scope Q_scope.
+
 Section Graph.
 (**
 * Graphing

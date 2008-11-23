@@ -25,6 +25,8 @@ Require Import Qring.
 Require Import Qauto.
 Require Import CornTac.
 
+Open Local Scope Q_scope.
+
 Definition CRsum_list_raw (l:list CR) (e:QposInf) : Q :=
 fold_left Qplus
 match l with

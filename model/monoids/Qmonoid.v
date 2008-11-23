@@ -38,6 +38,8 @@
 Require Export Qsemigroup.
 Require Import CMonoids.
 
+Open Local Scope Q_scope.
+
 (**
 ** Examples of a monoid: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#
 *** $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#

@@ -28,6 +28,8 @@ Require Import QMinMax.
 Require Import List.
 Require Import CornTac.
 
+Open Local Scope Q_scope.
+
 Set Implicit Arguments.
 (**
 * Metric Space

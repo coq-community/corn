@@ -172,7 +172,7 @@ match n return MultivariatePolynomial Q_as_CRing n -> Q with
                          (fun c _ _ rec => Qmin (MVP_lowerBound n' c) rec) m b
 end.
 
-Open Scope Q_scope.
+Open Local Scope Q_scope.
 
 Fixpoint UnitHyperInterval (n:nat) (v:vector Q n) : Prop :=
 match v with
@@ -507,6 +507,7 @@ replace (lt_n_Sm_le i m (lt_le_trans i (S m) (S m) H (le_refl (S m))))
  with (lt_n_Sm_le i m H) by apply le_irrelevent.
 reflexivity.
 Qed.
+
 Open Local Scope Q_scope.
 
 Definition MVP_apply_modulus n (p:MultivariatePolynomial Q_as_CRing (S n)) :=
@@ -596,7 +597,7 @@ rewrite C_MVP_apply.
 reflexivity.
 Qed.
 
-Open Scope uc_scope.
+Open Local Scope uc_scope.
 
 Definition Qclamp01 := QboundBelow_uc (0) ∘ QboundAbove_uc 1.
 
