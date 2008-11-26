@@ -875,9 +875,9 @@ rapply (uc_prf Cmap_strong_slow).
 rapply regFun_prf.
 Qed.
 
-Definition Cap_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := ((1#2)%Qpos*(mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)))%QposInf.
+Definition Cap_slow_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := ((1#2)%Qpos*(mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)))%QposInf.
 
-Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_slow_fun f) (Cap_modulus f).
+Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_slow_fun f) (Cap_slow_modulus f).
 Proof.
 intros f e x y H.
 set (e' := ((1#3)*e)%Qpos).

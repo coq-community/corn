@@ -448,12 +448,26 @@ apply Cmap_strong_slow_prf.
 rapply regFun_prf.
 Qed.
 
+Definition Cap_modulus X Y (f:Complete (X --> Y)) (e:Qpos) : QposInf := (mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)).
+
 Lemma Cap_weak_prf X Y plX (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_fun plX f) (Cap_modulus f).
 Proof.
-intros X Y plX f e a b Hab.
-do 2 rewrite Cap_fun_correct.
-apply Cap_weak_slow_prf.
-auto.
+intros X Y plX f e x y H.
+set (e' := ((1#3)*e)%Qpos).
+setoid_replace e with (e'+e'+e')%Qpos by (unfold e';QposRing).
+apply ball_triangle with (Cmap plX (approximate f e') y).
+apply ball_triangle with (Cmap plX (approximate f e') x).
+rewrite Cap_fun_correct.
+simpl (Cmap plX (approximate f e') x).
+rewrite Cmap_fun_correct.
+apply Cap_slow_help.
+rapply (uc_prf).
+apply H.
+apply ball_sym.
+rewrite Cap_fun_correct.
+simpl (Cmap plX (approximate f e') y).
+rewrite Cmap_fun_correct.
+apply Cap_slow_help.
 Qed.
 
 Definition Cap_weak X Y plX (f:Complete (X --> Y)) : Complete X --> Complete Y :=
