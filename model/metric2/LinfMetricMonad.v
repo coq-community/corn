@@ -53,8 +53,6 @@ Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
 intros m e x.
 exists (ball e x).
 intros. apply ball_wd;auto with *.
-(* should be a lemma*)
-apply ball_eq. intro. auto with *.
 Defined.
 
 Definition ballS (m : MetricSpace): Qpos ->  m --> m --> iffSetoid.
