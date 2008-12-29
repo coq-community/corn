@@ -93,6 +93,12 @@ Example xkcd217B : (Exp Pi [-] Pi [<] (nring 20)).
 Time IR_solve_ineq (1#1000)%Qpos.
 Qed.
 
+Require Import MultivariatePolynomials.
 
+(* approximate 4*(1/e)*(1-(1/e)) while sharing the expression (1/e)
+   using multivariable polynomial library (which only uses one variable
+   in this case). *)
+Time Eval vm_compute in 
+ answer 20 (MVP_uc_fun 1 ((_C_ (4#1))[*]_X_[*](One[-]_X_)) (rational_exp (-1#1))%CR).
 
 
