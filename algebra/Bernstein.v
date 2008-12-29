@@ -1,203 +1,37 @@
+(*
+Copyright © 2006-2008 Russell O’Connor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this proof and associated documentation files (the "Proof"), to deal in
+the Proof without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Proof, and to permit persons to whom the Proof is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Proof.
+
+THE PROOF IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
+*)
+
 Require Export CPolynomials.
 Require Import CSums.
 Require Import Rational.
+Require Import Qordfield.
+Require Import COrdFields2.
+Require Import CRing_Homomorphisms.
+Require Export Bvector.
 
 Set Implicit Arguments.
 
-Require Import CRing_Homomorphisms.
-
-(*
-Section PolynomialRingHomomorphism.
-Variable F R:CRing.
-Variable eta : RingHom F R.
-
-Definition poly_rhmap := compose_CSetoid_fun _ _ _ eta _C_.
-
-Lemma poly_rh1 : fun_pres_plus _ _ poly_rhmap.
-Proof.
-intros x y.
-simpl; split; auto with *.
-Qed.
-
-Lemma poly_rh2 : fun_pres_mult _ _ poly_rhmap.
-Proof.
-intros x y.
-simpl; split; auto.
-rstepr (eta x[*]eta y).
-auto with *.
-Qed.
-
-Lemma poly_rh3 : fun_pres_unit _ _ poly_rhmap.
-Proof.
-split; simpl; auto with *.
-Qed.
-
-Definition CPoly_RingHom : RingHom _ _ := Build_RingHom _ _ _ poly_rh1 poly_rh2 poly_rh3.
-Canonical Structure CPoly_RingHom.
-
-End PolynomialRingHomomorphism.
+(**
+** Bernstein Polynomials
 *)
-(*
-Require Import CModules.
-
-Section PolynomialModule.
-
-Variable F R:CRing.
-Variable mu : CSetoid_bin_fun F R R.
-Hypothesis Hmodule : is_RModule R mu.
-
-Let RM := Build_RModule _ _ _ Hmodule.
-
-Fixpoint cpoly_mu_cr (a:F) (x:cpoly_cring R) : cpoly_cring R :=
-match x with 
-| cpoly_zero => cpoly_zero R
-| cpoly_linear d q1 => cpoly_linear R (mu a d) (cpoly_mu_cr a q1)
-end.
-
-Lemma cpoly_mu_cr_strext : bin_fun_strext _ _ _ cpoly_mu_cr.
-Proof.
-intros a b x.
-induction x; intros y.
- induction y.
-  intros; contradiction.
- intros H.
- simpl in H.
- destruct H as [H|H].
-  right.
-  left.
-  apply (mu_axap0_xap0 _ RM b s H).
- simpl in IHy.
- simpl.
- tauto.
-destruct y; simpl.
- intros [H|H].
-  right; left.
-  apply (mu_axap0_xap0 _ RM a s H).
- destruct (IHx Zero); try tauto.
-  apply ap_symmetric; apply H.
- right; right.
- change (Zero[#]x).
- apply ap_symmetric; auto with *.
-intros [H|H].
- destruct (csbf_strext _ _ _ _ _ _ _ _ H); tauto.
-destruct (IHx _ H); tauto.
-Defined.
-
-Lemma cpoly_mu_cr_wd : bin_fun_wd _ _ _ cpoly_mu_cr.
-Proof.
-apply bin_fun_strext_imp_wd.
-exact cpoly_mu_cr_strext.
-Qed.
-
-Definition cpoly_mu : CSetoid_bin_fun F (cpoly_cring R) (cpoly_cring R) :=
- Build_CSetoid_bin_fun _ _ _ _ cpoly_mu_cr_strext.
-
-Lemma cpoly_mu_distr_plus  : 
- forall (a : F) (x y : cpoly_cring R),
- cpoly_mu a (x[+]y)[=]cpoly_mu a x[+]cpoly_mu a y.
-Proof.
-induction x; destruct y.
-   simpl; auto.
-  split; reflexivity.
- split; reflexivity.
-split.
- apply rm_pl1; auto.
-apply IHx.
-Qed.
-
-Lemma plus_distr_cpoly_mu : 
- forall (a b : F) (x : cpoly_cring R),
- cpoly_mu (a[+]b) x[=]cpoly_mu a x[+]cpoly_mu b x.
-Proof.
-induction x.
- reflexivity.
-split; auto.
-apply rm_pl2; auto.
-Qed.
-
-Lemma cpoly_mu_assoc : 
-forall (a b : F) (x : cpoly_cring R),
-cpoly_mu (a[*]b) x[=]cpoly_mu a (cpoly_mu b x).
-Proof.
-induction x.
- reflexivity.
-split; auto.
-apply rm_mult; auto.
-Qed.
-
-Lemma cpoly_mu_one : 
- forall x : cpoly_cring R, cpoly_mu One x[=]x.
-induction x.
- reflexivity.
-split; auto.
-apply rm_one; auto.
-Qed.
-
-Lemma CPolyModule : is_RModule (cpoly_cring R) cpoly_mu.
-Proof.
-split.
-   apply cpoly_mu_distr_plus.
-  apply plus_distr_cpoly_mu.
- apply cpoly_mu_assoc.
-apply cpoly_mu_one.
-Qed.
-
-Canonical Structure CPoly_as_Module := Build_RModule _ _ _ CPolyModule.
-
-( * This ought to belong to a general theory about alegbras * )
-Lemma CPoly_mu_mult_assoc : 
-forall (a : F) (x y: cpoly_cring R),
-(forall (b c:R), mu a (b[*]c)[=]mu a b[*]c) ->
-cpoly_mu a (x[*]y)[=](cpoly_mu a x)[*]y.
-Proof.
-intros a x y H.
-change (a['](x[*]y)[=](a[']x)[*]y).
-revert y.
-induction x; intros y.
- rewrite mu_azero.
- setoid_replace (Zero[*]y) with (Zero:cpoly_cring R);[|rational].
- auto with *.
-simpl (a['](cpoly_linear R s x:CPoly_as_Module)).
-rewrite (poly_linear _ (mu a s)).
-rewrite (mult_commut_unfolded (cpoly_cring R) _X_).
-rewrite ring_distl_unfolded.
-rewrite <- mult_assoc_unfolded.
-rewrite <- IHx.
-rewrite mult_assoc_unfolded.
-change (_C_ (mu a s)) with (a['](_C_ s)).
-setoid_replace (a[']_C_ s[*]y) with (a['](_C_ s[*]y)).
- rewrite <- (mu_plus1 F CPoly_as_Module).
- rewrite poly_linear.
- apply csbf_wd; [reflexivity|].
- change ((_X_[*]x[+]_C_ s)[*]y[=]x[*]_X_[*]y[+]_C_ s[*]y).
- rational.
-clear - H.
-simpl (_C_ s[*]y).
-simpl (a[']_C_ s[*]y).
-do 2 rewrite cpoly_mult_fast_equiv.
-setoid_replace (cpoly_mult_cs R (cpoly_constant R s) y) with
- (cpoly_mult_cr R y s).
- induction y.
-  simpl; split; auto with *.
- split; simpl.
-  rstepl (mu a s[*]s0).
-  symmetry.
-  apply H.
- change (cpoly_mult_cr R y (mu a s)[+]Zero[=](@rm_mu F CPoly_as_Module) a (cpoly_mult_cr R y s)).
- setoid_replace (Zero:cpoly_cring R) with (cpoly_linear R Zero Zero).
-  apply IHy.
- split;simpl; auto with *.
-change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).
-change (((cpoly_mult_cr R y s)[+](cpoly_linear R Zero Zero):cpoly_cring R)[=]cpoly_mult_cr R y s).
-setoid_replace (cpoly_linear R Zero Zero:cpoly_cring R) with (Zero:cpoly_cring R).
- rational.
-split; simpl; auto with *.
-Qed.
-
-End PolynomialModule.
-*)
-Require Import Qordfield.
-Close Scope Q_scope.
 
 Section Bernstein.
 
@@ -205,6 +39,8 @@ Opaque cpoly_cring.
 Opaque _C_.
 
 Variable R : CRing.
+
+(** [Bernstein n i] is the ith element of the n dimensional Bernstein basis *)
 
 Fixpoint Bernstein (n i:nat) {struct n}: (i <= n) -> cpoly_cring R :=
 match n return (i <= n) -> cpoly_cring R  with
@@ -220,6 +56,7 @@ match n return (i <= n) -> cpoly_cring R  with
   end
 end.
 
+(** These lemmas provide an induction principle for polynomials using the Bernstien basis *)
 Lemma Bernstein_inv1 : forall n i (H:i < n) (H0:S i <= S n),
  Bernstein H0[=](One[-]_X_)[*](Bernstein (lt_n_Sm_le _ _ (lt_n_S _ _ H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
 Proof.
@@ -242,7 +79,6 @@ replace (lt_n_Sm_le n n H) with (le_S_n n n H) by apply le_irrelevent.
 reflexivity.
 Qed. 
 
-(*
 Lemma Bernstein_ind : forall n i (H:i<=n) (P : nat -> nat -> cpoly_cring R -> Prop),
 P 0 0 One ->
 (forall n p, P n 0 p -> P (S n) 0 ((One[-]_X_)[*]p)) ->
@@ -268,7 +104,9 @@ intros H.
 apply H2.
 auto with *.
 Qed.
-*)
+
+(** One important property of the Bernstein basis is that its elements form a partition of unity *)
+
 Lemma partitionOfUnity : forall n, @Sumx (cpoly_cring R) _ (fun i H => Bernstein (lt_n_Sm_le i n H)) [=]One.
 Proof.
 induction n.
@@ -457,8 +295,8 @@ Qed.
 
 Opaque Bernstein.
 
-Require Export Bvector.
-
+(** Given a vector of coefficents for a polynomial in the Bernstein basis, return the polynomial *)
+ 
 Fixpoint evalBernsteinBasisH (n i:nat) (v:vector R i) : i <= n -> cpoly_cring R :=
 match v in vector _ i return i <= n -> cpoly_cring R with
 |Vnil => fun _ => Zero
@@ -471,6 +309,8 @@ end.
 
 Definition evalBernsteinBasis (n:nat) (v:vector R n) : cpoly_cring R :=
 evalBernsteinBasisH v (le_refl n).
+
+(** The coefficents are linear *)
 
 Lemma evalBernsteinBasisPlus : forall n (v1 v2: vector R n),
 evalBernsteinBasis (Vbinary _ (fun (x y:R)=>x[+]y) _ v1 v2)[=]evalBernsteinBasis v1[+]evalBernsteinBasis v2.
@@ -542,6 +382,11 @@ Opaque Q_as_CRing.
 Opaque Vbinary.
 Opaque Vconst.
 
+(** To convert a polynomial to the Bernstein basis, we need to know how to
+multiply a bernstein basis element by [_X_] can convert it to the Bernstein basis.
+At this point we must work with rational coeffients.  So we assume there is a
+ring homomorphism from [Q] to R *)
+
 Fixpoint BernsteinBasisTimesXH (n i:nat) (v:vector R i) : i <= n -> vector R (S i) :=
 match v in vector _ i return i <= n -> vector R (S i) with
 | Vnil => fun _ => Vcons _ Zero _ (Vnil _)
@@ -553,21 +398,6 @@ end.
 
 Definition BernsteinBasisTimesX (n:nat) (v:vector R n) : vector R (S n) :=
 BernsteinBasisTimesXH v (le_refl n).
-
-(****************************************************)
-(*MOVE ME*)
-Lemma Q_nring : forall n, (nring n:Q)[=]n.
-induction n.
- reflexivity.
-rewrite inj_S.
-change ((nring (S n):Q)==((n+1)%Z:Q))%Q.
-rewrite injz_plus.
-simpl.
-rewrite IHn.
-reflexivity.
-Qed.
-
-(****************************************************)
 
 Lemma evalBernsteinBasisTimesX : forall n (v:vector R n),
  evalBernsteinBasis (BernsteinBasisTimesX v)[=]_X_[*]evalBernsteinBasis v.
@@ -603,7 +433,7 @@ assert (Hn : (nring (S n):Q)[#]Zero).
   simpl.
   unfold Qap, Qeq.
   auto with *.
- symmetry; apply Q_nring.
+ symmetry; apply nring_Q.
 setoid_replace (Qred (P_of_succ_nat i # P_of_succ_nat n))
  with ((One[/](nring (S n))[//]Hn)[*](nring (S i))).
  set (eta':=RHcompose _ _ _ _C_ eta).
@@ -626,14 +456,15 @@ setoid_replace (Qred (P_of_succ_nat i # P_of_succ_nat n))
 rewrite Qred_correct.
 rewrite Qmake_Qdiv.
 change (Zpos (P_of_succ_nat n)) with ((S n):Z).
-rewrite <- (Q_nring (S n)).
+rewrite <- (nring_Q (S n)).
 change (Zpos (P_of_succ_nat i)) with ((S i):Z).
-rewrite <- (Q_nring (S i)).
+rewrite <- (nring_Q (S i)).
 change (nring (S i)/nring (S n) == (1/(nring (S n)))*nring (S i))%Q.
 field.
 apply Hn.
 Qed.
 
+(** Convert a polynomial to the Bernstein basis *)
 Fixpoint BernsteinCoefficents (p:cpoly_cring R) : sigT (vector R) :=
 match p with
 | cpoly_zero => existT _ _ (Vnil R)
@@ -658,15 +489,14 @@ Qed.
 
 End Bernstein.
 
-Require Import COrdFields2.
-
 Section BernsteinOrdField.
 
 Variable F : COrdField.
 
 Opaque cpoly_cring.
 
-Hint Resolve pos_one less_leEq shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: inequality.
+(** A second important property of the Bernstein polynomials is that they
+are all non-negative on the unit interval. *)
 
 Lemma BernsteinNonNeg : forall x:F, Zero [<=] x -> x [<=] One ->
 forall n i (p:le i n), Zero[<=](Bernstein F p)!x.

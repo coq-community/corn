@@ -19,20 +19,32 @@ Opaque _C_.
 
 Section MultivariatePolynomial.
 
+(**
+** Multivariable polynomails
+
+Here we prove that multivariable polynomials over the rationals are uniformly continuous
+on the unit hyperinterval.  Hence they can be lifted to apply to real numbers.
+This allows real numbers to be used in polynomial expressions so that each variable
+is only approximated once.
+*)
+
 Variable F : CRing.
 
+(** Define the type of multivariable polynomials with [n] variables *)
 Fixpoint MultivariatePolynomial (n:nat) : CRing :=
 match n with
 | O => F
 | S n' => cpoly_cring (MultivariatePolynomial n')
 end.
 
+(** The constant multivariable polynomial *)
 Fixpoint MVP_C_ (n:nat) : RingHom F (MultivariatePolynomial n) :=
 match n return RingHom F (MultivariatePolynomial n) with
 | O => RHid _
 | S n' =>  RHcompose _ _ _ _C_ (MVP_C_ n')
 end.
 
+(** Apply a multivariable polynomial to a vector of input values *)
 Fixpoint MVP_apply (n:nat) : MultivariatePolynomial n -> (vector F n) -> F :=
 match n return MultivariatePolynomial n -> vector F n -> F with
 | O => fun x _ => x
@@ -41,6 +53,7 @@ end.
 
 End MultivariatePolynomial.
 
+(* begin hide *)
 Add Parametric Morphism F n : (@MVP_apply F n) with signature (@st_eq (MultivariatePolynomial F n)) ==> (@eq _) ==> (@st_eq _) as MVP_apply_wd.
 Proof.
 induction n;
@@ -51,6 +64,9 @@ apply IHn.
 rewrite Hxy.
 reflexivity.
 Qed.
+(* end hide *)
+
+(* Multivariable polynomial application by a constant set of inputs is a ring homomorphism. *)
 
 Lemma zero_MVP_apply : forall F n v, MVP_apply F (Zero:MultivariatePolynomial F n) v[=]Zero.
 Proof.
@@ -135,6 +151,7 @@ exists (MVP_apply_hom_csf F v).
 rapply one_MVP_apply.
 Defined.
 
+(** [MVP_map] applies a ring homomorphism to the coefficents of a multivariable polynomial *)
 Fixpoint MVP_map R S (f:RingHom R S) (n:nat) : RingHom (MultivariatePolynomial R n) (MultivariatePolynomial S n) :=
 match n return RingHom (MultivariatePolynomial R n) (MultivariatePolynomial S n) with
 | O => f
@@ -154,7 +171,8 @@ rewrite IHn.
 reflexivity.
 Qed.
 
-(* Some upper bound on the polynomial on [0,1] *)
+(* In practice we use the Bernstein coeffecients to bound the polynomials *)
+(** Some upper bound on the polynomial on [0,1] *)
 Fixpoint MVP_upperBound (n:nat) : MultivariatePolynomial Q_as_CRing n -> Q :=
 match n return MultivariatePolynomial Q_as_CRing n -> Q with
 | O => fun x => x
@@ -163,7 +181,7 @@ match n return MultivariatePolynomial Q_as_CRing n -> Q with
                          (fun c _ _ rec => Qmax (MVP_upperBound n' c) rec) m b
 end.
 
-(* Some lower bound on the polynomial on [0,1] *)
+(** Some lower bound on the polynomial on [0,1] *)
 Fixpoint MVP_lowerBound (n:nat) : MultivariatePolynomial Q_as_CRing n -> Q :=
 match n return MultivariatePolynomial Q_as_CRing n -> Q with
 | O => fun x => x
@@ -174,12 +192,14 @@ end.
 
 Open Local Scope Q_scope.
 
+(** Definition of the unit hyperinterval of n dimensions *)
 Fixpoint UnitHyperInterval (n:nat) (v:vector Q n) : Prop :=
 match v with
 | Vnil => True
 | Vcons a _ v' => 0 <= a <= 1 /\ UnitHyperInterval v'
 end.
 
+(* begin hide *)
 Lemma BernsteinApplyRingHom : forall R F (eta: RingHom R F) n i (H:(i <= n)%nat) a,
  (Bernstein F H) ! (eta a)[=](eta (Bernstein R H) ! a).
 Proof.
@@ -208,7 +228,9 @@ rapply MVP_apply_wd;try reflexivity.
 rewrite BernsteinApplyRingHom.
 auto with *.
 Qed.
+(* end hide *)
 
+(** Return the ith entry of a vector *)
 Fixpoint Vector_ix A (n i:nat) (H:(i < n)%nat) (v:vector A n) : A :=
 match v in vector _ m return (i < m)%nat -> A with
 | Vnil => fun p => False_rect _ (lt_n_O _ p)
@@ -218,6 +240,7 @@ match v in vector _ m return (i < m)%nat -> A with
                             end
 end H.
 
+(** The upper and lower bounds are correct. *)
 Lemma MVP_upperBound_correct : forall n p v, UnitHyperInterval v -> MVP_apply _ p v[<=]MVP_upperBound n p.
 Proof.
 induction n;
@@ -510,6 +533,8 @@ Qed.
 
 Open Local Scope Q_scope.
 
+(** Use the upper and lower bounds of the derivative of a polynomial to
+define its modulus of continuity. *)
 Definition MVP_apply_modulus n (p:MultivariatePolynomial Q_as_CRing (S n)) :=
 let p' := (_D_ p) in
 Qscale_modulus (Qmax (MVP_upperBound (S n) p') (-(MVP_lowerBound (S n) p'))).
@@ -599,6 +624,7 @@ Qed.
 
 Open Local Scope uc_scope.
 
+(** Clamp a value to the unit interval *)
 Definition Qclamp01 := QboundBelow_uc (0) ∘ QboundAbove_uc 1.
 
 Lemma Qclamp01_clamped : forall x, 0 <= Qclamp01 x <= 1.
@@ -679,24 +705,29 @@ Qed.
 
 Require Import RSetoid.
 
+(** Definition of a setoid function type of n parameters *)
 Fixpoint n_Function X Y (n:nat) :=
 match n with
 |O => Y
 |S n' => extSetoid X (n_Function X Y n')
 end.
 
+(** Definition of a uniformly continuous function type of n parameters *)
 Fixpoint n_UniformlyContinuousFunction (X Y:MetricSpace) (n:nat) :=
 match n with
 |O => Y
 |S n' => X --> (n_UniformlyContinuousFunction X Y n')
 end.
 
+(** [MVP_uc_sig] is a recursive type definition that is needed for part of the definition of
+ of a multivariable polynomial as a uniformly continuous function. *)
 Fixpoint MVP_uc_sig (n:nat) :MultivariatePolynomial Q_as_CRing n -> n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n -> Type :=
 match n return MultivariatePolynomial Q_as_CRing n -> n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n -> Type with
 | O => fun p x => p==x
 | (S n') => fun p f => forall v, MVP_uc_sig n' (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 v))) (f v)
 end.
 
+(** Multivariable polynomials are uniformly continuous on the unit hyper interval *)
 Definition MVP_uc : forall n (p:MultivariatePolynomial Q_as_CRing n),
  {f:n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n
  |MVP_uc_sig _ p f}.
@@ -774,6 +805,7 @@ match n return Complete (n_UniformlyContinuousFunction X Y n) -->
 | (S n') => (uc_compose_uc _ _ _ (@n_Cap X Y plX n')) ∘ (@Cap X _ plX)
 end.
 
+(** A [Cmap] for an n parameter function. *)
 Definition n_Cmap X Y (plX : PrelengthSpace X) n : n_UniformlyContinuousFunction X Y n -->
  n_UniformlyContinuousFunction (Complete X) (Complete Y) n :=
 (@n_Cap X Y plX n) ∘ (@Cunit _).
@@ -799,6 +831,7 @@ rewrite Hxy.
 reflexivity.
 Qed.
 
+(** Multivariable polynomials on the unit hyper interval can be applied to real numbers *)
 Definition MVP_uc_fun n (p:MultivariatePolynomial _ n) :
  n_UniformlyContinuousFunction CR CR n := 
 n_Cmap _ QPrelengthSpace n (MVP_uc_Q n p).
@@ -813,6 +846,7 @@ Qed.
 
 Section MVP_correct.
 
+(** Correctness lemmas for [MVP_uc_fun]. *)
 Lemma MVP_uc_fun_sub_Q : forall n (p:MultivariatePolynomial _ (S n)) x,
  0 <= x -> x <= 1 ->
  (MVP_uc_fun (S n) p ('x)%CR)[=](MVP_uc_fun n (p!(MVP_C_ _ _ x))).
@@ -1544,6 +1578,7 @@ match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Pr
 | S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> MVP_uc_fun_correct_sig n' (f x) (g x)
 end.
 
+(** Finally, the correctness lemma. *)
 Lemma MVP_uc_fun_correct : forall n (p:MultivariatePolynomial Q_as_CRing n),
  MVP_uc_fun_correct_sig n (MVP_uc_fun n p) (MVP_CR_apply n (MVP_map inject_Q_hom n p)).
 Proof.

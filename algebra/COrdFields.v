@@ -405,6 +405,8 @@ Qed.
 
 End Basic_Properties_of_leEq.
 
+Hint Resolve less_leEq : algebra.
+
 Declare Left Step leEq_wdl.
 Declare Right Step leEq_wdr.
 
@@ -704,6 +706,8 @@ Qed.
 End More_than_four.
 
 End infinity_of_cordfields.
+
+Hint Resolve pos_one : algebra.
 
 Declare Left Step leEq_wdl.
 Declare Right Step leEq_wdr.

@@ -840,6 +840,8 @@ Qed.
 
 End Properties_of_leEq.
 
+Hint Resolve shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: algebra.
+
 (*---------------------------------*)
 Section PosP_properties.
 (*---------------------------------*)
