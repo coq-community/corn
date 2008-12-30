@@ -1162,7 +1162,7 @@ Lemma MVP_is_Bound01_plus : forall n M N p q,
  MVP_is_Bound01 n (M+N)%CR (p[+]q).
 Proof.
 induction n; intros M N p q Hp Hq.
- apply AbsSmall_plus; auto.
+ rapply AbsSmall_plus; auto.
 simpl.
 intros x Hx0 Hx1.
 rewrite plus_apply.

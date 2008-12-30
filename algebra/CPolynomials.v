@@ -2710,6 +2710,10 @@ rewrite cpoly_mult_fast_equiv.
 rewrite cpoly_lin_mult.
 stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p))) by
  apply eq_symmetric; apply cpoly_map_pres_plus.
+change (cpoly_map_fun (cpoly_mult_cr_cs R p d)[+]
+cpoly_map_fun (Zero[+X*] (cpoly_mult_cs R q p))[=]
+(cpoly_mult_cr_cs S (cpoly_map_fun p) (f d))[+]
+  (Zero[+X*](cpoly_mult_cs S (cpoly_map_fun q) (cpoly_map_fun p)))).
 apply csbf_wd.
  apply X.
 split.
