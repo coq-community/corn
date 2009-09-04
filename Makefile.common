@@ -1,4 +1,4 @@
-# Copyright © 1998-2008
+# Copyright © 1998-2009
 # Henk Barendregt
 # Luís Cruz-Filipe
 # Herman Geuvers
@@ -43,6 +43,9 @@ endif
 ifndef COQTOP
  $(error "You need to tell me where Coq is installed")
 endif
+ifndef SSRDIR
+ $(error "You need to tell me what the top-level directory of Ssreflect is")
+endif
 
 ifeq ($(TOPDIR),.)
  SRCDIR := $(shell pwd)
@@ -84,7 +87,7 @@ PRIVFILES :=
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2
+COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2 Liouville CayleyHamilton
 
 # Files to filter out of the tree.pdf diagra
 #TREE_FILTER := coq_reals/ model/
@@ -139,7 +142,7 @@ COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
   -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
   -I $(CAMLP4LIB)
 COQC := $(COQBIN)/coqc
-COQIDE := $(COQBIN)/coqide
+COQIDE := $(SSRDIR)/bin/ssrcoqide
 COQDEP := $(COQBIN)/coqdep
 COQMKTOP := $(COQBIN)/coqmktop
 GRAMMARS:=grammar.cma
@@ -147,9 +150,9 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 
 # COQMAP defines the mapping between physical and logical directories
 COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN .devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
-OTHERFLAGS = -I $(SRCDIR)/tactics $(COQMAP)
+OTHERFLAGS = -I $(SRCDIR)/tactics -I $(SSRDIR)/theories $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
-COQCFLAGS = 
+COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')

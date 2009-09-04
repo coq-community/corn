@@ -64,7 +64,7 @@ Record CGroup : Type :=
 
 
 Implicit Arguments cg_inv [c].
-Notation "[--] x" := (cg_inv x) (at level 2, right associativity).
+Notation "[--] x" := (cg_inv x) (at level 4, right associativity).
 
 Definition cg_minus (G : CGroup) (x y : G) := x[+] [--]y.
 
@@ -576,7 +576,7 @@ Qed.
 End CGroup_Ops.
 
 Implicit Arguments Finv [G].
-Notation "{--} x" := (Finv x) (at level 2, right associativity).
+Notation "{--} x" := (Finv x) (at level 4, right associativity).
 
 Implicit Arguments Fminus [G].
 Infix "{-}" := Fminus (at level 50, left associativity).

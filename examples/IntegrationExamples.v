@@ -36,10 +36,14 @@ Definition answer (n:positive) (r:CR) : Z :=
 (* Please review RealFast.v for examples on how to compute with CR *)
 
 (* Integrate01 requires that we integrate uniformly continuous functions.
-   Therefore we cannot integerate (sin : CR -> CR), me must instead
+   Therefore we cannot integerate (sin : CR -> CR), we must instead
    integrate the UniformlyContinuousFunction (sin_uc : Q --> CR). *)
 Time Eval vm_compute in answer 3 (Integrate01 sin_uc).
 
+(* Integrate01 the x^2 function 
+Time Eval vm_compute in answer 3 (Integrate01 (uc_compose (CRpower_positive_bounded 2 (1#1)) Cunit)).
+Time Eval vm_compute in answer 4 (Integrate01 (uc_compose (CRpower_positive_bounded 2 (1#1)) Cunit)).
+*)
 (* find the supremum of cos on [0,1] *)
 Time Eval vm_compute in answer 3 (ContinuousSup01 cos_uc).
 

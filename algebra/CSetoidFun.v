@@ -958,7 +958,7 @@ End BinPart_Function_Composition.
 (* Different tokens for compatibility with coqdoc *)
 
 Implicit Arguments Fconst [S].
-Notation "[-C-] x" := (Fconst x) (at level 2, right associativity).
+Notation "[-C-] x" := (Fconst x) (at level 4, right associativity).
 
 Notation FId := (Fid _).
 

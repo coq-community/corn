@@ -876,7 +876,7 @@ Qed.
 End CField_Ops.
 
 Implicit Arguments Frecip [X].
-Notation "{1/} x" := (Frecip x) (at level 2, right associativity).
+Notation "{1/} x" := (Frecip x) (at level 4, right associativity).
 
 Implicit Arguments Fdiv [X].
 Infix "{/}" := Fdiv (at level 41, no associativity).

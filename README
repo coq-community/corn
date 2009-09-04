@@ -19,6 +19,26 @@ Before installing C-CoRN, please check that you have:
  - At least one of:
    * The "realpath" utility in your PATH (Debian package realpath).
    * A C compiler.
+ - camlp4
+ - A compiled ssreflect library in which you applied the patch:
+   You first need to apply the patch. In the directory src, run :
+
+   patch < ssreflect.ml.patch
+
+   Then you can compile Ssreflect in the root directory of its sources:
+
+   <your path to coq sources directory>/bin/coq_makefile -f Make > Makefile
+   Add a custom target to the Makefile:
+   ----
+   bin/ssrcoqide: src/ssreflect.cmx
+        $(COQBIN)coqmktop -ide -opt -o "$@" src/ssreflect.cmx
+   ----
+   COQBIN=<your path to coq sources directory>/bin/ make
+
+   If you have ocaml version > 3.11 then  you can directly use standard coq tools if you use
+   ssreflect as a plugin Declare ML Module "ssreflect".
+   at the beginning of ssreflect.v, and installing ssreflect.cmxs next to ssreflect.vo
+   Or put the Declare line in either a .coqrc file, or in a Coq compile option, rather than modifying ssreflect.v.
 
 In order for C-CoRN to work, you need to set some environment variables.
 We advise you to do this inside a .bash_profile or similar.
@@ -27,6 +47,8 @@ We advise you to do this inside a .bash_profile or similar.
    /usr/local/src/coq-8.0/).
  - COQBIN should be set to the directory where the Coq binaries can
    be found, if different from ${COQTOP}/bin/.
+ - SSRDIR should be set to the directory where Ssreflect can
+   be found.
 
 FILES
 -----
