@@ -20,12 +20,7 @@ Before installing C-CoRN, please check that you have:
    * The "realpath" utility in your PATH (Debian package realpath).
    * A C compiler.
  - camlp4
- - A compiled ssreflect library in which you applied the patch:
-   You first need to apply the patch. In the directory src, run :
-
-   patch < ssreflect.ml.patch
-
-   Then you can compile Ssreflect in the root directory of its sources:
+ - Compile Ssreflect in the root directory of its sources:
 
    <your path to coq sources directory>/bin/coq_makefile -f Make > Makefile
    Add a custom target to the Makefile:

@@ -1833,7 +1833,8 @@ Qed.
 
 Definition cpoly_constant_fun := Build_CSetoid_fun _ _ _ cpoly_constant_strext.
 
-Definition _X_ : cpoly_cring := cpoly_linear_cs Zero (One:cpoly_cring).
+Definition cpoly_var : cpoly_cring := cpoly_linear_cs Zero (One:cpoly_cring).
+Notation "'_X_'" := cpoly_var.
 
 Definition cpoly_x_minus_c c : cpoly_cring :=
  cpoly_linear_cs [--]c (One:cpoly_cring).
@@ -1858,7 +1859,7 @@ Qed.
 
 End CPoly_CRing.
 
-Implicit Arguments _X_ [CR].
+Notation "'_X_'" := (@cpoly_var _).
 
 Definition cpoly_linear_fun' (CR : CRing) :
  CSetoid_bin_fun CR (cpoly_cring CR) (cpoly_cring CR) := cpoly_linear_fun CR.
@@ -2096,21 +2097,22 @@ Lemma cpoly_const_mult : forall a b : R, cpoly_constant_fun _ (a[*]b) [=] cpoly_
 simpl in |- *; split; algebra.
 Qed.
 
-Definition _C_ : RingHom R RX := Build_RingHom _ _ _ cpoly_const_plus cpoly_const_mult cpoly_const_one.
+Definition polyconst : RingHom R RX := Build_RingHom _ _ _ cpoly_const_plus cpoly_const_mult cpoly_const_one.
+Notation "'_C_'" := polyconst.
 
-Lemma _c_one : One [=] _C_ (One:R).
+Lemma c_one : One [=] _C_ (One:R).
 simpl in |- *; split; algebra.
 Qed.
 
-Lemma _c_plus : forall a b : R, _C_ (a[+]b) [=] _C_ a[+] _C_ b.
+Lemma c_plus : forall a b : R, _C_ (a[+]b) [=] _C_ a[+] _C_ b.
 simpl in |- *; split; algebra.
 Qed.
 
-Lemma _c_mult : forall a b : R, _C_ (a[*]b) [=] _C_ a[*] _C_ b.
+Lemma c_mult : forall a b : R, _C_ (a[*]b) [=] _C_ a[*] _C_ b.
 simpl in |- *; split; algebra.
 Qed.
 
-Lemma _c_zero : Zero [=] _C_ (Zero:R).
+Lemma c_zero : Zero [=] _C_ (Zero:R).
 simpl in |- *.
 split; algebra.
 Qed.
@@ -2193,11 +2195,11 @@ intros.
 cut (_C_ a [#] _C_ Zero).
 intro H0.
 generalize (csf_strext _ _ _ _ _ H0); auto.
-Hint Resolve _c_zero: algebra.
+Hint Resolve c_zero: algebra.
 astepr (Zero:RX). auto.
 Qed.
 
-Lemma _c_mult_lin : forall (p : RX) c d, _C_ c[*] (d[+X*]p) [=] c[*]d[+X*]_C_ c[*]p.
+Lemma c_mult_lin : forall (p : RX) c d, _C_ c[*] (d[+X*]p) [=] c[*]d[+X*]_C_ c[*]p.
 intros.
 pattern p in |- *.
 apply cpoly_induc.
@@ -2253,14 +2255,14 @@ Definition cpoly_csetoid_op (f : RX) : CSetoid_un_op R :=
 
 Definition FPoly p := total_eq_part _ (cpoly_csetoid_op p).
 
-Lemma _c_apply : forall c x : R, (_C_ c) ! x [=] c.
+Lemma c_apply : forall c x : R, (_C_ c) ! x [=] c.
 intros.
 simpl in |- *.
 astepl (c[+]Zero).
 algebra.
 Qed.
 
-Lemma _x_apply : forall x : R, _X_ ! x [=] x.
+Lemma x_apply : forall x : R, _X_ ! x [=] x.
 intros.
 simpl in |- *.
 astepl (x[*](One[+]x[*]Zero)).
@@ -2314,7 +2316,7 @@ astepl (p ! x[+]( [--]q) ! x).
 algebra.
 Qed.
 
-Lemma _c_mult_apply : forall (q : RX) c x, (_C_ c[*]q) ! x [=] c[*]q ! x.
+Lemma c_mult_apply : forall (q : RX) c x, (_C_ c[*]q) ! x [=] c[*]q ! x.
 intros.
 astepl ((cpoly_mult_cr R q c:RX)[+](Zero[+X*]Zero)) ! x.
 astepl ((cpoly_mult_cr R q c) ! x[+](Zero[+X*]Zero) ! x).
@@ -2345,7 +2347,7 @@ apply (cpoly_mult_fast_equiv _ (_C_ c) q).
 apply eq_reflexive.
 Qed.
 
-Hint Resolve _c_mult_apply: algebra.
+Hint Resolve c_mult_apply: algebra.
 
 Lemma mult_apply : forall (p q : RX) x, (p[*]q) ! x [=] p ! x[*]q ! x.
 intros.
@@ -2373,7 +2375,7 @@ Hint Resolve mult_apply: algebra.
 Lemma one_apply : forall x : R, One ! x [=] One.
 intro.
 astepl (_C_ One) ! x.
-apply _c_apply.
+apply c_apply.
 Qed.
 
 Hint Resolve one_apply: algebra.
@@ -2423,7 +2425,9 @@ Qed.
 
 End Poly_properties.
 
-Implicit Arguments _C_ [R].
+(* Implicit Arguments _C_ [R].*)
+Check polyconst.
+Notation "'_C_'" := (@polyconst _).
 
 (**
 ** Induction properties of polynomials for [Prop]
@@ -2450,13 +2454,13 @@ End Poly_Prop_Induction.
 
 Hint Resolve poly_linear cpoly_lin: algebra.
 Hint Resolve apply_wd cpoly_const_eq: algebra_c.
-Hint Resolve _c_apply _x_apply inv_apply plus_apply minus_apply mult_apply
+Hint Resolve c_apply x_apply inv_apply plus_apply minus_apply mult_apply
   nexp_apply: algebra.
-Hint Resolve one_apply _c_zero _c_one _c_mult: algebra.
+Hint Resolve one_apply c_zero c_one c_mult: algebra.
 Hint Resolve poly_inv_apply: algebra.
-Hint Resolve _c_mult_lin: algebra.
+Hint Resolve c_mult_lin: algebra.
 
-Hint Rewrite one_apply _c_apply _x_apply mult_apply plus_apply minus_apply : apply.
+Hint Rewrite one_apply c_apply x_apply mult_apply plus_apply minus_apply : apply.
 
 Section Derivative.
 
@@ -2503,7 +2507,8 @@ apply fun_strext_imp_wd.
 apply cpoly_diff_strext.
 Qed.
 
-Definition _D_ := Build_CSetoid_un_op _ _ cpoly_diff_strext.
+Definition cpolyder := Build_CSetoid_un_op _ _ cpoly_diff_strext.
+Notation "'_D_'" := cpolyder.
 
 Lemma diff_zero : _D_ Zero[=]Zero.
 Proof.
@@ -2530,7 +2535,7 @@ Proof.
 intros a p.
 change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
 rewrite cpoly_lin.
-rewrite <- _c_zero.
+rewrite <- c_zero.
 rational.
 Qed.
 
@@ -2551,7 +2556,7 @@ change (st_car RX) in p, q.
 change (p[+]q[+](_X_[*]_D_ (p[+]q)[+]_C_ Zero)[=]
 p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
 rewrite (IHp q).
-rewrite <- _c_zero.
+rewrite <- c_zero.
 rational.
 Qed.
 
@@ -2562,12 +2567,12 @@ induction p.
  auto with *.
 change (_D_ (cpoly_linear R s p)) with (p[+](Zero[+X*](_D_ p))).
 change (cpoly_linear R s p) with (s[+X*]p).
-rewrite _c_mult_lin.
+rewrite c_mult_lin.
 change (_D_ (c[*]s[+X*]_C_ c[*]p))
  with (_C_ c[*]p [+] (Zero[+X*](_D_ (_C_ c[*]p)))).
 rewrite IHp.
 do 2 rewrite cpoly_lin.
-rewrite <- _c_zero.
+rewrite <- c_zero.
 rational.
 Qed.
 
@@ -2589,20 +2594,20 @@ rewrite diff_plus.
 setoid_replace (_D_ ((_C_ s:RX)[*]q)) with (_C_ s[*]_D_ q) by apply diff_c_mult.
 setoid_replace (((_X_:RX)[*](p[*]q)):RX)
  with ((((_X_:RX)[*](p[*]q)))[+]Zero) by (symmetry;apply cm_rht_unit_unfolded).
-setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply _c_zero.
+setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply c_zero.
 unfold RX.
 rewrite <- poly_linear.
 fold RX.
 change (_D_ (cpoly_linear R Zero (p[*]q)))
  with (p[*]q [+] (Zero[+X*]_D_ (p[*]q))).
 rewrite cpoly_lin.
-rewrite <- _c_zero.
+rewrite <- c_zero.
 rewrite IHp.
 rational.
 Qed.
 
 End Derivative.
-Implicit Arguments _D_ [R].
+Notation "'_D_'" := (@cpolyder _).
 
 Hint Rewrite diff_zero diff_one diff_const diff_x diff_plus diff_c_mult diff_mult diff_linear : poly_diff.
 Section Map.

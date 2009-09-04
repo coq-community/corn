@@ -36,7 +36,6 @@ Set Implicit Arguments.
 Section Bernstein.
 
 Opaque cpoly_cring.
-Opaque _C_.
 
 Variable R : CRing.
 
@@ -230,7 +229,7 @@ induction n.
  repeat split; rational.
 intros i H.
 change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
-set (X0:=(One[-]@_X_ R)) in *.
+set (X0:=(One[-](@cpoly_var R))) in *.
 rstepl (nring (S n)[*]X0[*]Bernstein H[+]X0[*]Bernstein H).
 destruct i as [|i].
  simpl (Bernstein H) at 1.
@@ -311,6 +310,7 @@ Definition evalBernsteinBasis (n:nat) (v:vector R n) : cpoly_cring R :=
 evalBernsteinBasisH v (le_refl n).
 
 (** The coefficents are linear *)
+Opaque polyconst.
 
 Lemma evalBernsteinBasisPlus : forall n (v1 v2: vector R n),
 evalBernsteinBasis (Vbinary _ (fun (x y:R)=>x[+]y) _ v1 v2)[=]evalBernsteinBasis v1[+]evalBernsteinBasis v2.
@@ -331,7 +331,7 @@ destruct n as [|n].
 rewrite (VSn_eq R _ v1), (VSn_eq R _ v2).
 simpl.
 rewrite IHi.
-rewrite _c_plus.
+rewrite c_plus.
 unfold cpoly_constant.
 rational.
 Qed.
@@ -411,7 +411,7 @@ induction i.
  intros l l0 v.
  rewrite (V0_eq R v).
  simpl.
- rewrite <- _c_zero.
+ rewrite <- c_zero.
  rational.
 intros l l0 v.
 destruct n as [|n].
@@ -419,7 +419,7 @@ destruct n as [|n].
 rewrite (VSn_eq R _ v).
 simpl.
 rewrite IHi.
-rewrite _c_mult.
+rewrite c_mult.
 rewrite ring_dist_unfolded.
 apply csbf_wd; try reflexivity.
 set (A:= (_C_ (eta (Qred
