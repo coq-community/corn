@@ -195,6 +195,10 @@ Qed.
 Transparent sym_eq.
 Transparent f_equal.
 
+Notation Pair := (pair (B:=_)) (only parsing).
+Notation Proj1 := (proj1 (B:=_)) (only parsing).
+Notation Proj2 := (proj2 (B:=_)) (only parsing ).
+
 (* Following only needed in finite, but tha's now obsolete
 
 Lemma deMorgan_or_and: (A,B,X:Prop)((A\/B)->X)->(A->X)/\(B->X).

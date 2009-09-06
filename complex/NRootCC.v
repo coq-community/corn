@@ -745,7 +745,7 @@ cut (forall c x : CC, _X_ ! x[+] (_C_ c) ! x [=] x[+]c); intros.
   apply un_op_wd_unfolded. apply I_wd. apply cm_rht_unit_unfolded.
     apply cm_lft_unit_unfolded.
 (* algebra. *)
-  apply bin_op_wd_unfolded. apply _x_apply. apply _c_apply.
+  apply bin_op_wd_unfolded. apply x_apply. apply c_apply.
 Qed.
 
 Lemma nrCC3_a4 : degree_le 1 (_X_[+]_C_ II).
@@ -800,7 +800,7 @@ Hint Resolve nrCC3_a3: algebra.
 (* Step_final (nrCC3_poly''!(cc_IR r)) [*] (a[+I*][--]b). *)
   apply
    eq_transitive_unfolded with (nrCC3_poly'' ! (cc_IR r) [*] (a[+I*][--]b)).
-  apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. apply _c_apply.
+  apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. apply c_apply.
   apply bin_op_wd_unfolded. apply nrCC3_a3. apply eq_reflexive_unfolded.
 Qed.
 
@@ -935,11 +935,11 @@ cut ((_X_[^]n) ! x [=] x[^]n). intros.
 (* Step_final (_X_[^]n)!x[-] (_C_ c)!x. *)
   apply eq_transitive_unfolded with ((_X_[^]n) ! x[-] (_C_ c) ! x).
   apply minus_apply.
-  apply cg_minus_wd. exact H. apply _c_apply.
+  apply cg_minus_wd. exact H. apply c_apply.
 (* Step_final (_X_!x) [^]n. *)
   apply eq_transitive_unfolded with (_X_ ! x[^]n).
   apply nexp_apply.
-  apply un_op_wd_unfolded. apply _x_apply.
+  apply un_op_wd_unfolded. apply x_apply.
 Qed.
 
 Lemma nrootCC_3'_degree : degree n nrootCC_3'_poly.

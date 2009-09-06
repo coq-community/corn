@@ -35,14 +35,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *) 
 
+(** printing != %\ensuremath{\mathrel\#}% *)
+(** printing == %\ensuremath{\equiv}% #&equiv;# *)
 (** printing [=] %\ensuremath{\equiv}% #&equiv;# *)
 (** printing [~=] %\ensuremath{\mathrel{\not\equiv}}% #&ne;# *)
 (** printing [#] %\ensuremath{\mathrel\#}% *)
 (** printing ex_unq %\ensuremath{\exists^1}% #&exist;<sup>1</sup># *)
 (** printing [o] %\ensuremath\circ% #&sdot;# *)
 (** printing [-C-] %\ensuremath\diamond% *)
-
-(* Begin_SpecReals *)
 
 (**
 * Setoids
@@ -55,14 +55,13 @@ Require Export CLogic.
 Require Export Step.
 Require Export RSetoid.
 
-Definition Relation := Trelation.
+Delimit Scope corn_scope with corn.
+Open Scope corn_scope.
 
-(* End_SpecReals *)
+Definition Relation := Trelation.
 
 Implicit Arguments Treflexive [A].
 Implicit Arguments Creflexive [A].
-
-(* Begin_SpecReals *)
 
 Implicit Arguments Tsymmetric [A].
 Implicit Arguments Csymmetric [A].

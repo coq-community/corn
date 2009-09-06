@@ -2426,7 +2426,6 @@ Qed.
 End Poly_properties.
 
 (* Implicit Arguments _C_ [R].*)
-Check polyconst.
 Notation "'_C_'" := (@polyconst _).
 
 (**

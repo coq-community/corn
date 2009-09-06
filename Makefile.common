@@ -73,9 +73,9 @@ COQDOC ?= $(COQBIN)/coqdoc
 # Placement and names of executables we build
 BINDIR := $(SRCDIR)/bin
 LIBDIR := $(SRCDIR)/lib
-TOPLEVELNAME := CoRNtop
-COMPILERNAME := CoRNc
-IDENAME := CoRNide
+TOPLEVELNAME := corntop
+COMPILERNAME := cornc
+IDENAME := cornide
 INTERFACENAME := CoRN-interface
 
 # Library name used internally by coq
