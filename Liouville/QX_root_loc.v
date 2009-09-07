@@ -208,7 +208,7 @@ Proof.
 intros P a Hval.
 set (P0 := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
 assert (H : P0 ! a [=] Zero).
-  unfold P0; rewrite mult_apply, _c_apply, Hval; ring.
+  unfold P0; rewrite mult_apply, c_apply, Hval; ring.
 clear Hval; revert H.
 rewrite (zx2qx_spec P0); [|apply Zlcm_den_poly_spec].
 unfold P0; clear P0.
@@ -311,7 +311,7 @@ Proof.
 intros P a Hval.
 set (Q := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
 assert (H : Q ! a [=] Zero).
-  unfold Q; rewrite mult_apply, _c_apply, Hval; ring.
+  unfold Q; rewrite mult_apply, c_apply, Hval; ring.
 clear Hval; revert H.
 rewrite (zx2qx_spec Q); [|apply Zlcm_den_poly_spec].
 unfold Q; clear Q.
@@ -362,7 +362,7 @@ apply list_Q_spec.
       intro; apply Hap; clear Hap.
       unfold P0 in H.
       cut ((_C_ (Zlcm_den_poly P:Q_as_CRing) [*] P) ! Zero [=] Zero).
-        rewrite mult_apply, _c_apply.
+        rewrite mult_apply, c_apply.
         intro H0; apply (Qmult_eq (Zlcm_den_poly P)); [|assumption].
         intro H1; destruct (Zlcm_den_poly_nz P).
         unfold Qeq in H1; simpl in H1.

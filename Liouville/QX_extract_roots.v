@@ -215,7 +215,7 @@ induction n.
   destruct (degree_le_zero _ _ d).
   case (Q_dec P ! a Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); clear Hap; revert Heq.
-  rewrite s, _c_apply; intro H; rewrite H; split; [reflexivity|apply I].
+  rewrite s, c_apply; intro H; rewrite H; split; [reflexivity|apply I].
 unfold QX_extract_roots_rec.
 intros P Hdeg Hap.
 case_eq (QX_find_root P).
@@ -265,9 +265,9 @@ rewrite (cpoly_map_C _ _ inj_Q_rh).
 rewrite plus_apply.
 rewrite mult_apply.
 rewrite minus_apply.
-rewrite _x_apply.
-rewrite _c_apply.
-rewrite _c_apply.
+rewrite x_apply.
+rewrite c_apply.
+rewrite c_apply.
 rewrite (QX_find_root_spec_some _ _ Hsome).
 rewrite rh_pres_zero.
 rewrite cm_rht_unit.

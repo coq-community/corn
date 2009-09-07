@@ -31,7 +31,7 @@ Unset Strict Implicit.
 Opaque csg_op.
 Opaque cm_unit.
 Opaque cr_mult.
-Opaque _C_.
+Opaque polyconst.
 Opaque cr_one.
 Opaque cpoly_apply_fun.
 Opaque cg_inv.
@@ -262,9 +262,9 @@ apply eq_bigr=> i _.
 rewrite /scalar_mx /addmx /oppmx /matrixC.
 rewrite -> plus_apply.
 rewrite -> inv_apply.
-rewrite ->  _c_apply.
+rewrite ->  c_apply.
 apply csbf_wd; last by reflexivity.
-case: (i == s i); first by apply _x_apply.
+case: (i == s i); first by apply x_apply.
 by apply poly_eq_zero; reflexivity.
 Qed.
 

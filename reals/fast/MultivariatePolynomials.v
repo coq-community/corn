@@ -15,7 +15,7 @@ Set Implicit Arguments.
 
 Opaque cpoly_cring.
 Opaque cpoly_apply_fun.
-Opaque _C_.
+Opaque polyconst.
 
 Section MultivariatePolynomial.
 
@@ -92,7 +92,7 @@ Proof.
 induction v.
  reflexivity.
 simpl.
-rewrite _c_apply.
+rewrite c_apply.
 assumption.
 Qed.
 
@@ -123,7 +123,7 @@ induction v.
  reflexivity.
 simpl.
 rewrite <- IHv.
-rewrite _c_mult_apply.
+rewrite c_mult_apply.
 reflexivity.
 Qed.
 
@@ -320,7 +320,7 @@ apply Qle_trans with
      rapply MVP_apply_wd; try reflexivity.
      replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
       with (le_S_n n1 m l) by apply le_irrelevent.
-     apply _c_mult_apply.
+     apply c_mult_apply.
     apply MVP_BernsteinNonNeg; auto.
    eapply Qle_trans;[|apply Qmax_ub_r].
    set (R:=vector_rec (MultivariatePolynomial Q_as_CRing n)
@@ -471,7 +471,7 @@ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Ber
     rapply MVP_apply_wd; try reflexivity.
     replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
      with (le_S_n n1 m l) by apply le_irrelevent.
-    apply _c_mult_apply.
+    apply c_mult_apply.
    apply MVP_BernsteinNonNeg; auto.
   eapply Qle_trans;[apply Qmin_lb_r|].
   set (R:=vector_rec (MultivariatePolynomial Q_as_CRing n)
@@ -1115,13 +1115,13 @@ eapply n_Function_ball01_wd.
    apply mult_apply.
   apply mult_wdl.
   simpl.
-  apply _c_apply.
+  apply c_apply.
  apply Morphism_prf.
  eapply eq_transitive.
   apply mult_apply.
  apply mult_wdl.
  simpl.
- apply _c_apply.
+ apply c_apply.
 rapply IHn; auto.
 rapply H; auto.
 Qed.
@@ -1193,7 +1193,7 @@ induction n;
 simpl.
 intros y Hy0 Hy1.
 rewrite mult_apply.
-rewrite _c_apply.
+rewrite c_apply.
 apply IHn; auto.
 Qed.
 
@@ -1289,13 +1289,13 @@ eapply n_Function_ball01_wd.
   eapply eq_transitive.
    apply mult_apply.
   apply csbf_wd.
-   apply _c_apply.
+   apply c_apply.
   reflexivity.
  apply Morphism_prf.
  eapply eq_transitive.
   apply mult_apply.
  apply csbf_wd.
-  apply _c_apply.
+  apply c_apply.
  reflexivity.
 rapply IHn; auto.
 Qed.

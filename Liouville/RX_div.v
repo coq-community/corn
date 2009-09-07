@@ -60,7 +60,7 @@ destruct (degree_le_zero _ _ (d _ H0)).
 rewrite s2.
 apply csf_wd.
 rewrite plus_apply, mult_apply, minus_apply.
-rewrite _x_apply, _c_apply, _c_apply; unfold cg_minus; ring.
+rewrite x_apply, c_apply, c_apply; unfold cg_minus; ring.
 Qed.
 
 End RX_div.

@@ -303,7 +303,7 @@ assert ((zx2qx (qx2zx P)) ! (p#q)%Q[#]Zero).
   case (Q_dec ((zx2qx (qx2zx P)) ! (p#q)%Q) Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); revert Heq.
   rewrite qx2zx_spec.
-  rewrite mult_apply, _c_apply.
+  rewrite mult_apply, c_apply.
   intro Heq.
   apply (mult_eq_zero _ (Zlcm_den_poly P:Q_as_CField)).
     intro Heq2; injection Heq2.
@@ -316,7 +316,7 @@ apply mult_wdr.
 apply AbsIR_wd.
 apply csf_wd.
 rewrite qx2zx_spec.
-rewrite mult_apply, _c_apply; reflexivity.
+rewrite mult_apply, c_apply; reflexivity.
 Qed.
 
 Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] Zero ->
