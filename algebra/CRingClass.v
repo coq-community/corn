@@ -1,5 +1,5 @@
 (*
-Copyright © 2009 Valentin Blot
+Copyright © 2009 Valentin Blot and Bas Spitters
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -18,28 +18,13 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CRings RingClass.
+Require Export CRings RingClass.
+Require Import CornTac. (* For rapply*)
 
 Section cring_is_ring.
 Global Instance CRing_is_Ring (CR : CRing) : Ring (@cm_unit CR) (@cr_one CR) (@csg_op CR) (@cr_mult CR) (fun x y => x [-] y) (@cg_inv CR).
-Proof.
-intro.
-constructor.
-constructor.
-apply lunit.
-apply cm_proof.
-apply cag_proof.
-apply csg_proof.
-apply one_mult.
-apply mult_commutes.
-apply mult_assoc.
-intros; apply ring_distl_unfolded.
-reflexivity.
-apply cg_rht_inv_unfolded.
-constructor.
-intros; apply bin_op_wd_unfolded; auto.
-intros; apply bin_op_wd_unfolded; auto.
-intros; apply un_op_wd_unfolded; auto.
+Proof with auto.
+intro CR. split;split;algebra.
 Qed.
 End cring_is_ring.
 
@@ -61,9 +46,7 @@ Proof.
 assert (associative submult).
 intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply mult_assoc.
 apply (Build_is_CRing _ _ _ H).
-constructor.
-intro x; destruct x as [x xpf]; simpl; apply mult_one.
-intro x; destruct x as [x xpf]; simpl; apply one_mult.
+split; intro x; destruct x as [x xpf]; simpl; algebra. 
 intros x y; destruct x as [x xpf]; destruct y as [y ypf]; simpl; apply mult_commutes.
 intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply dist.
 simpl; apply ring_non_triv.

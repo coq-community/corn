@@ -408,7 +408,6 @@ Fixpoint nring (m : nat) : R :=
   | O   => Zero
   | S n => nring n[+]One
   end.
-
 Definition Char0 := forall n : nat, 0 < n -> nring n [#] Zero.
 
 (* End_SpecReals *)
@@ -430,19 +429,11 @@ astepr (nring n[*]nring m[+]nring m).
 Step_final (nring m[+]nring n[*]nring m).
 Qed.
 
-(* Begin_SpecReals *)
-
 End nat_injection.
-
-(* End_SpecReals *)
 
 Hint Resolve nring_comm_plus nring_comm_mult: algebra.
 
-(* Begin_SpecReals *)
-
 Implicit Arguments nring [R].
-
-(* End_SpecReals *)
 
 Notation Two := (nring 2).
 Notation Three := (nring 3).

@@ -87,7 +87,8 @@ PRIVFILES :=
 
 # Directories containing Coq files. These _must_ be relative to the top-level directory
 # of CoRN. Use the "devel" variable for things outside of the CoRN hierarchy.
-COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2 Liouville CayleyHamilton
+#COQ_HIERARCHIES := algebra complex coq_reals fta ftc logic metrics model raster reals tactics transc order metric2 Liouville CayleyHamilton
+COQ_HIERARCHIES := algebra complex coq_reals logic metrics model reals tactics order metric2 Liouville CayleyHamilton
 
 # Files to filter out of the tree.pdf diagra
 #TREE_FILTER := coq_reals/ model/

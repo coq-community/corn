@@ -40,14 +40,14 @@
 (** printing RX %\ensuremath{R[x]}% #R[x]# *)
 (** printing FX %\ensuremath{F[x]}% #F[x]# *)
 
-Require Export RingReflection.
+Require Export CRingClass.
+(* Require Export RingReflection.*)
 Require Import CRing_Homomorphisms.
 Require Import Rational.
 
 (**
 * Polynomials
-The first section only proves the polynomials form a ring, and nothing more
-interesting.
+The first section only proves the polynomials form a ring.
 Section%~\ref{section:poly-equality}% gives some basic properties of
 equality and induction of polynomials.
 ** Definition of polynomials; they form a ring
@@ -2790,3 +2790,5 @@ split.
  reflexivity.
 apply IHp.
 Qed.
+
+(* TODO: proof that the polynomials form a module over the ring*)
