@@ -611,7 +611,7 @@ Lemma inj_Q_leEq : forall q1 q2, (q1 [<=] q2) -> inj_Q q1 [<=] inj_Q q2.
 Proof.
  intros.
  rewrite leEq_def; intro. 
- rewrite leEq_def in H; apply H.
+ rewrite -> leEq_def in H; apply H.
  apply less_inj_Q.
  assumption.
 Qed.
@@ -848,7 +848,7 @@ unfold Zsucc.
 stepr (inj_Q (q^n*q)%Q).
  apply inj_Q_wd.
  simpl.
- rapply Qpower_plus'.
+ apply Qpower_plus'.
  auto with *.
 stepr (inj_Q (q^n)%Q[*]inj_Q q).
  apply inj_Q_mult.

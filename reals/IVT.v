@@ -119,7 +119,7 @@ unfold Not in H1. elim H2. apply H0. auto.
 apply less_irreflexive_unfolded.
 cut (forall i j : nat, i <= j -> a i [<=] a j). intro a_mon''.
 pose (c:=a_mon'' i n).
-rewrite leEq_def in c.
+rewrite -> leEq_def in c.
 apply c.
 auto with arith.
 apply H0.
@@ -212,7 +212,7 @@ elim (f_contin_neg z H3). intro eps. intros H5 H6.
 elim (b_a eps). intro i. intros H7.
 cut (b i [<=] z[+]eps). intro.
 cut (z [<=] b i[+]eps). intro.
-pose (c:= f_b i). rewrite leEq_def in c. apply c. apply H6. auto. auto.
+pose (c:= f_b i). rewrite -> leEq_def in c. apply c. apply H6. auto. auto.
 apply leEq_transitive with (b i). auto.
 astepl (b i[+]Zero). apply plus_resp_leEq_lft. apply less_leEq. auto.
 apply leEq_transitive with (a i[+]eps). auto.
@@ -221,7 +221,7 @@ elim (f_contin_pos z H3). intro eps. intros H5 H6.
 elim (b_a eps). intro i. intros H7.
 cut (a i [<=] z[+]eps). intro.
 cut (z [<=] a i[+]eps). intro.
-pose (c:= f_a i). rewrite leEq_def in c; apply c. apply H6. auto. auto.
+pose (c:= f_a i). rewrite -> leEq_def in c; apply c. apply H6. auto. auto.
 apply leEq_transitive with (b i). auto.
 auto. apply leEq_transitive with z. auto.
 astepl (z[+]Zero). apply less_leEq. apply plus_resp_less_lft. auto.

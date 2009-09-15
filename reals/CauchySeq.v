@@ -341,7 +341,7 @@ intro H0.
 generalize (Lim_less_so_seq_less _ _ H0); intro H1.
 elim H1; intros N H2.
 pose (c:=H N).
-rewrite leEq_def in c.
+rewrite -> leEq_def in c.
 apply c.
 apply H2.
 auto with arith.
@@ -370,7 +370,7 @@ intro H0.
 generalize (Lim_less_Lim_so_seq_less_seq _ _ H0); intro H1.
 elim H1; intros N H2.
 pose (c:=H N).
-rewrite leEq_def in c.
+rewrite -> leEq_def in c.
 apply c.
 apply H2.
 auto with arith.
@@ -383,7 +383,7 @@ intro H0.
 generalize (less_Lim_so_less_seq _ _ H0); intro H1.
 elim H1; intros N H2.
 pose (c:=H N).
-rewrite leEq_def in c.
+rewrite -> leEq_def in c.
 apply c.
 apply H2.
 auto with arith.

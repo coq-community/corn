@@ -791,7 +791,7 @@ apply shift_minus_leEq.
 apply power_cancel_leEq with n; try assumption.
  apply plus_resp_nonneg.
   apply less_leEq; assumption.
- apply leEq_Min; rapply NRoot_nonneg.
+ apply leEq_Min; apply: NRoot_nonneg.
 apply leEq_transitive with (e[^]n[+]Min x' y'[^]n).
  apply shift_leEq_plus.
  set (Hx':=(ProjT1
@@ -804,25 +804,25 @@ apply leEq_transitive with (e[^]n[+]Min x' y'[^]n).
   apply H0; try assumption.
  stepr (AbsIR (x'[^]n[-]y'[^]n)).
   apply AbsIR_wd.
-  rapply bin_op_wd_unfolded;
-   apply eq_symmetric; try apply un_op_wd_unfolded; rapply NRoot_power.
+  apply: bin_op_wd_unfolded;
+   apply eq_symmetric; try apply un_op_wd_unfolded; apply: NRoot_power.
  csetoid_rewrite (Abs_Max (x'[^]n) (y'[^]n)).
- rapply bin_op_wd_unfolded; try apply un_op_wd_unfolded.
+ apply: bin_op_wd_unfolded; try apply un_op_wd_unfolded.
   change (Max ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Max x' y') CI)).
   apply Max_monotone.
   simpl; intros r s _ _ X0 X1 X2.
-  rapply nexp_resp_leEq; try assumption.
+  apply: nexp_resp_leEq; try assumption.
   eapply leEq_transitive;[|apply X0].
-  apply leEq_Min; rapply NRoot_nonneg.
+  apply leEq_Min; apply: NRoot_nonneg.
  change (Min ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Min x' y') CI)).
  apply Min_monotone.
  simpl; intros r s _ _ X0 X1 X2.
- rapply nexp_resp_leEq; try assumption.
+ apply: nexp_resp_leEq; try assumption.
  eapply leEq_transitive;[|apply X0].
- apply leEq_Min; rapply NRoot_nonneg.
+ apply leEq_Min; apply: NRoot_nonneg.
 apply power_plus_leEq; try assumption.
  apply less_leEq; assumption.
-apply leEq_Min; rapply NRoot_nonneg.
+apply leEq_Min; apply: NRoot_nonneg.
 Qed.
 
 End Local_Results.

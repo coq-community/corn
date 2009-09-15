@@ -90,11 +90,11 @@ Qed.
 Lemma prod_is_MetricSpace : is_MetricSpace (prodS X Y) prod_ball.
 Proof.
 split.
-    rapply prod_ball_refl.
-   rapply prod_ball_sym.
-  rapply prod_ball_triangle.
- rapply prod_ball_closed.
-rapply prod_ball_eq.
+    apply: prod_ball_refl.
+   apply: prod_ball_sym.
+  apply: prod_ball_triangle.
+ apply: prod_ball_closed.
+apply: prod_ball_eq.
 Qed.
 
 Definition ProductMS : MetricSpace.
@@ -103,7 +103,7 @@ exists (prodS X Y) prod_ball.
  intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1];
  unfold prod_ball;
  change (QposEq e1 e2) in He;
- rewrite He, Ha0, Ha1, Hb0, Hb1;
+ rewrite He Ha0 Ha1 Hb0 Hb1;
  reflexivity) using prod_ball_wd.
 apply prod_is_MetricSpace.
 Defined.

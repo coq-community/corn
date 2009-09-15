@@ -38,22 +38,22 @@ split.
 change (x*(CRinv x x_)==(' 1%Q))%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (CRinv x x_))) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl ((CRasCauchy_IR x)[*](f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))) by
- apply bin_op_is_wd_un_op_rht; rapply CR_inv_as_Cauchy_IR_inv.
-rapply eq_transitive.
+ apply bin_op_is_wd_un_op_rht; apply CR_inv_as_Cauchy_IR_inv.
+apply: eq_transitive.
 apply field_mult_inv.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 
 change ((CRinv x x_)*x==(' 1%Q))%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR (CRinv x x_))[*](CRasCauchy_IR x)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl ((f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))[*](CRasCauchy_IR x)) by
- apply bin_op_is_wd_un_op_lft; rapply CR_inv_as_Cauchy_IR_inv.
-rapply eq_transitive.
+ apply bin_op_is_wd_un_op_lft; apply CR_inv_as_Cauchy_IR_inv.
+apply: eq_transitive.
 apply field_mult_inv_op.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Qed.
 
 Lemma CRinv_strext : forall x y x_ y_, CRapart (CRinv x x_) (CRinv y y_) -> CRapart x y.

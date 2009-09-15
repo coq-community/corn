@@ -49,7 +49,7 @@ Opaque inj_Q CR.
 Lemma arctanSequence_Gs : forall a, GeometricSeries (a^2) (arctanSequence a).
 Proof.
 intros a.
-rapply mult_Streams_Gs.
+apply mult_Streams_Gs.
  apply everyOther_dnn.
  apply recip_positives_dnn.
 apply powers_help_Gs.
@@ -59,7 +59,7 @@ Qed.
 Lemma Qsqr_lt_one : forall (a:Q), (-(1) < a) -> a < 1 -> (a^2 < 1).
 Proof.
 intros a H0 H1.
-rewrite Qlt_minus_iff in *.
+rewrite -> Qlt_minus_iff in *.
 replace RHS with ((1 + - a)*(a + - -(1))) by ring.
 Qauto_pos.
 Qed.
@@ -73,7 +73,7 @@ split.
   apply Qnot_le_lt.
   intros H.
   apply (Qlt_not_le _ _ Ha).
-  rewrite Qle_minus_iff in *.
+  rewrite ->  Qle_minus_iff in *.
   replace RHS with ((- (1) + - a + 2)*(-(1) +- a)) by ring.
   Qauto_nonneg.
  stepr ([--](inj_Q IR 1)).
@@ -86,7 +86,7 @@ stepr (inj_Q IR (1)).
  apply Qnot_le_lt.
  intros H.
  apply (Qlt_not_le _ _ Ha).
- rewrite Qle_minus_iff in *.
+ rewrite -> Qle_minus_iff in *.
  replace RHS with ((a + - (1) + 2)*(a +- (1))) by ring.
  Qauto_nonneg.
 rstepr (nring 1:IR).
@@ -133,7 +133,7 @@ csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[
  case_eq (even_odd_dec (S (double n))); intros H.
   elim (not_even_and_odd _ H).
   constructor.
-  rapply even_plus_n_n.
+  apply even_plus_n_n.
  intros _.
  eapply eq_transitive;
   [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_arctanSequence].
@@ -182,7 +182,7 @@ case_eq (even_odd_dec (double n)).
  rational.
 intros o.
 elim (fun x=> not_even_and_odd _ x o).
-rapply even_plus_n_n.
+apply even_plus_n_n.
 Qed.
 
 (* This development is incomplete.  At the moment only what is need

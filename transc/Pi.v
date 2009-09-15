@@ -1060,14 +1060,14 @@ Qed.
 Lemma Pi_gt_2 : Two [<] Pi.
 unfold Pi.
 rstepl (Two [*] One:IR).
-rapply mult_resp_less_lft.
+apply mult_resp_less_lft.
 apply less_leEq_trans with (One [+] (Cos One)).
 rstepl (One [+] Zero:IR).
-rapply plus_resp_leEq_less.
-rapply eq_imp_leEq.
+apply plus_resp_leEq_less.
+apply eq_imp_leEq.
 reflexivity.
 apply Cos_one_gt_0.
-rapply str_leEq_seq_so_leEq_Lim.
+apply str_leEq_seq_so_leEq_Lim.
 exists (2%nat).
 intros i iH.
 change (One [+] Cos One[<=] pi_seq i).

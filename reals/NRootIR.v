@@ -136,7 +136,7 @@ intros. rename X into H.
 cut (Zero [<=] NRoot x k Hx Hk); intros.
 cut (NRoot x k Hx Hk [<] Zero or Zero [<] NRoot x k Hx Hk). intros H1.
 elim H1; clear H1; intro H1.
-rewrite leEq_def in H0; elim (H0 H1).
+rewrite -> leEq_def in H0; elim (H0 H1).
 auto.
 apply ap_imp_less.
 apply un_op_strext_unfolded with (nexp_op (R:=IR) k).

@@ -83,7 +83,7 @@ assert (-c < c)%Q.
 rewrite Qlt_minus_iff.
 ring_simplify.
 change (0 < ((2#1)*c)%Qpos).
-rapply Qpos_prf.
+apply Qpos_prf.
 apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Zpred p))%Qpos)).
   reflexivity.
  intros x.
@@ -94,7 +94,7 @@ apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace
  autorewrite with QposElim.
  rewrite Qmult_sym.
  apply Qle_refl.
-rapply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
+apply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
  simpl.
  intros q _ Hq.
  csetoid_rewrite (Qpower_positive_correct p q).
@@ -108,17 +108,17 @@ intros x _ Hx.
 change (AbsIR ((nring (R:=IR) (S n))[*](One[*]nexp IR n (inj_Q IR x)))[<=]
 inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
 stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))) by
-(apply eq_symmetric; rapply inj_Q_mult).
+(apply eq_symmetric; apply inj_Q_mult).
 stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n (inj_Q IR x)))) by apply AbsIR_mult;apply nring_nonneg; auto with *.
-rapply mult_resp_leEq_both.
+apply mult_resp_leEq_both.
    apply nring_nonneg; auto with *.
   apply AbsIR_nonneg.
  stepl (inj_Q IR (nring (S n))) by apply inj_Q_nring.
  apply inj_Q_leEq.
  rewrite Hn.
  rewrite <- POS_anti_convert.
- stepl ((S n):Q) by apply eq_symmetric; rapply nring_Q.
- rapply leEq_reflexive.
+ stepl ((S n):Q) by apply eq_symmetric; apply nring_Q.
+ apply leEq_reflexive.
 stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))) by apply AbsIR_mult; apply less_leEq; apply pos_one.
 stepl (AbsIR (nexp IR n (inj_Q _ x))) by apply eq_symmetric; apply one_mult.
 stepl (nexp IR n (AbsIR (inj_Q _ x))) by apply eq_symmetric; apply AbsIR_nexp.
@@ -138,7 +138,7 @@ rewrite convert_is_POS.
 simpl.
 stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) CI) by apply eq_symmetric; apply Qpower_positive_correct.
 simpl.
-rapply power_resp_leEq.
+apply: power_resp_leEq.
  apply AbsIR_nonneg.
 apply AbsSmall_imp_AbsIR.
 destruct Hx; split; try assumption.
@@ -162,7 +162,7 @@ assert (Hc: Zero[<]inj_Q IR (c:Q)).
  stepl (inj_Q IR Zero).
   apply inj_Q_less.
   apply Qpos_prf.
- rapply (inj_Q_nring IR 0).
+ apply (inj_Q_nring IR 0).
 assert (HI:proper I).
  simpl.
  apply shift_zero_less_minus'.
@@ -242,7 +242,7 @@ Qed.
 Lemma CRpower_positive_correct : forall x, (IRasCR (x[^](nat_of_P p))==CRpower_positive (IRasCR x))%CR.
 Proof.
 intros x.
-rapply CRpower_positive_bounded_correct.
+apply CRpower_positive_bounded_correct.
 rewrite IR_AbsSmall_as_CR.
 stepl ('(CR_b (1#1) (IRasCR x)))%CR by simpl; symmetry; apply IR_inj_Q_as_CR.
 split; simpl.

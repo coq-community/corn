@@ -80,7 +80,7 @@ intro H0; destruct (Hrec H0) as [Hcoeff Hdeg].
 split.
   case (R_dec (nth_coeff (S (RX_deg p)) (c[+X*]p)) Zero).
     intro H1; destruct (ap_imp_neq _ _ _ Hcoeff).
-    rewrite coeff_Sm_lin in H1; assumption.
+    rewrite -> coeff_Sm_lin in H1; assumption.
   tauto.
 intro m; case m.
 intro H1; inversion H1.
@@ -150,7 +150,7 @@ Lemma RX_deg_inv : forall p, RX_deg p = RX_deg ([--]p).
 Proof.
 intro p.
 case (RX_dec p Zero).
-  intro H; rewrite (RX_deg_wd _ _ H), RX_deg_zero.
+  intro H; rewrite (RX_deg_wd _ _ H) RX_deg_zero.
   rewrite <- RX_deg_zero; apply RX_deg_wd; rewrite H; unfold RX; ring.
 intro Hp.
 apply (degree_inj p).

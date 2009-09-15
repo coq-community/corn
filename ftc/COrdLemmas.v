@@ -304,74 +304,60 @@ Lemma Sumx_Sum_Sum
  Sumx (fun i (H : i < n) => Sum (f i) (pred (f (S i))) h) [=]
    Sumx (fun i (H : i < f n) => h i).
 simple induction n.
-rewrite f0; simpl in |- *; algebra.
+ rewrite f0; simpl in |- *; algebra.
 clear n; intros.
 elim (le_lt_dec n 0); intro.
-cut (n = 0); [ clear a; intro | auto with arith ].
-rewrite H0 in H.
-rewrite H0.
-simpl in |- *.
-astepl (Sum (f 0) (pred (f 1)) h).
-rewrite f0.
-apply eq_symmetric_unfolded.
-eapply eq_transitive_unfolded.
-apply Sumx_to_Sum.
-pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
-red in |- *; intros.
-rewrite H1; algebra.
-clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *.
-auto with arith.
-intros.
-elim (le_lt_dec (f 1) i); intro; simpl in |- *.
-cut (0 < f 1).
-intro; elimtype False; omega.
-pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
-algebra.
+ cut (n = 0); [ clear a; intro | auto with arith ].
+ rewrite H0 in H. rewrite H0. clear H0.
+ simpl in |- *. astepl (Sum (f 0) (pred (f 1)) h). rewrite f0.
+ apply eq_symmetric. eapply eq_transitive. 
+  apply Sumx_to_Sum. 
+   pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
+  intros i j H0 H1 H'; rewrite H0; algebra.
+ clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *; auto with arith.
+ intros. elim (le_lt_dec (f 1) i); intro; simpl in |- *.
+  cut (0 < f 1).
+   intro; elimtype False; omega.
+  pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
+ algebra.
 cut (0 < f n); [ intro | rewrite <- f0; apply f_mon; assumption ].
 simpl in |- *.
 eapply eq_transitive_unfolded.
-2: apply eq_symmetric_unfolded; apply Sumx_to_Sum.
-apply
+ 2: apply eq_symmetric_unfolded; apply Sumx_to_Sum.
+  apply
  eq_transitive_unfolded
   with
     (Sum 0 (pred (f n))
        (part_tot_nat_fun _ _ (fun (i : nat) (H : i < f n) => h i)) [+]
      Sum (f n) (pred (f (S n))) h).
-apply bin_op_wd_unfolded.
-eapply eq_transitive_unfolded.
-apply H.
-apply Sumx_to_Sum.
-assumption.
-red in |- *; intros.
-rewrite H1; algebra.
-algebra.
-cut (f n = S (pred (f n))); [ intro | apply S_pred with 0; auto ].
-pattern (f n) at 4 in |- *; rewrite H1.
-eapply eq_transitive_unfolded.
+   apply bin_op_wd_unfolded.
+    eapply eq_transitive_unfolded.
+     apply H.
+    apply Sumx_to_Sum; try assumption.
+    red in |- *; intros; rewrite H1; algebra.
+   algebra.
+  cut (f n = S (pred (f n))); [ intro | apply S_pred with 0; auto ].
+  rewrite  {4} H1.
+  eapply eq_transitive_unfolded.
 2: apply Sum_Sum with (m := pred (f n)).
-apply bin_op_wd_unfolded; apply Sum_wd'.
-rewrite <- H1; apply lt_le_weak; assumption.
-intros; unfold part_tot_nat_fun in |- *.
-elim (le_lt_dec (f n) i); intro; simpl in |- *.
-elimtype False; omega.
-elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
-cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
-elimtype False; apply (le_not_lt (f n) i); auto.
-apply le_trans with (f (S n)); auto with arith.
-algebra.
-rewrite <- H1.
-cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ].
-cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ].
-rewrite <- H3.
-apply lt_le_weak; auto with arith.
-intros.
-unfold part_tot_nat_fun in |- *.
-elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
-elimtype False; omega.
-algebra.
-apply lt_trans with (f n); auto with arith.
-red in |- *; intros.
-rewrite H1; algebra.
+  apply bin_op_wd_unfolded; apply Sum_wd'.
+     rewrite <- H1; apply lt_le_weak; assumption.
+    intros. 
+    elim (le_lt_dec (f n) i); intro; simpl in |- *.
+     elimtype False; omega.
+    elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
+     cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
+     elimtype False; apply (le_not_lt (f n) i); auto.
+     apply le_trans with (f (S n)); auto with arith.
+    intros; unfold part_tot_nat_fun in |- *;
+   elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try elimtype False; try omega.
+   rewrite -H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
+   cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
+   rewrite <- H3; apply lt_le_weak; auto with arith.
+  intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i); 
+  [intro; simpl in |- *; elimtype False; omega| reflexivity].
+ apply lt_trans with (f n); auto with arith.
+red in |- *; intros; rewrite -> H1; reflexivity.
 Qed.
 
 Lemma str_Sumx_Sum_Sum :

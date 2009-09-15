@@ -81,8 +81,8 @@ induction t; intros e1'' e2'' e1' e2' x y Hxy H1 H2.
 simpl in *.
 change ('P_of_succ_nat (length t))%Z with (Z_of_nat (1+(length t))) in H1.
 change ('P_of_succ_nat (length t))%Z with (Z_of_nat (1+(length t))) in H2.
-rewrite inj_plus in *.
-rewrite injz_plus in *.
+rewrite ->  inj_plus in *.
+rewrite ->  injz_plus in *.
 ring_simplify in H1.
 ring_simplify in H2.
 apply (IHt e1'' e2'' (e1'' + e1')%Qpos (e2'' + e2')%Qpos);
@@ -93,7 +93,7 @@ replace RHS with ((x - y) + (approximate a e1'' - approximate a e2'')) by ring.
 replace LHS with ((e1' + e2') + (e1'' + e2'')) by ring.
 apply AbsSmall_plus.
  auto.
-rapply (regFun_prf a).
+apply: (regFun_prf a).
 Qed.
 
 Definition CRsum_list (l:list CR) : CR := Build_RegularFunction (CRsum_list_prf l).
@@ -101,12 +101,12 @@ Definition CRsum_list (l:list CR) : CR := Build_RegularFunction (CRsum_list_prf 
 Lemma CRsum_correct : forall l, (CRsum_list l == fold_right (fun x y => x + y) ('0) l)%CR.
 Proof.
 induction l.
- rapply regFunEq_e; intros e.
+ apply: regFunEq_e; intros e.
  apply ball_refl.
 simpl (fold_right (fun x y : CR => (x + y)%CR) (' 0)%CR (a :: l)).
 rewrite <- IHl.
 clear -l.
-rapply regFunEq_e; intros e.
+apply: regFunEq_e; intros e.
 simpl.
 unfold Cap_raw.
 simpl.
@@ -116,7 +116,7 @@ destruct l;
  simpl.
  ring_simplify.
  setoid_replace (e+e)%Qpos with ((1 # 1) *e + (1 # 2) * e + (1 # 2) * e)%Qpos by QposRing.
- rapply ball_weak.
+ apply: ball_weak.
  apply regFun_prf.
 set (n:=  (@length (RegularFunction Q_as_MetricSpace) l)).
 cut (forall (z1:Q) (e3 e5 e1 e2 e4 e6:Qpos) (z2 z3:Q), 
@@ -143,7 +143,7 @@ cut (forall (z1:Q) (e3 e5 e1 e2 e4 e6:Qpos) (z2 z3:Q),
            (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos).
     simpl.
     rewrite Qplus_0_l.
-    rapply regFun_prf.
+    apply: regFun_prf.
   ring.
  autorewrite with QposElim.
  replace LHS with ((1 # Psucc (P_of_succ_nat n)) * (2+n) *e +
@@ -176,7 +176,7 @@ induction l;
  replace RHS with ((approximate a e3 - approximate a e4) + (z1 - z2)) by ring.
  apply AbsSmall_leEq_trans with (e3 + e4 + e5); auto.
  apply AbsSmall_plus; auto.
- rapply (regFun_prf a).
+ apply: (regFun_prf a).
 simpl.
 apply (IHl (z1 + approximate a0 e1) e3 (e5 + (e1 + e2))%Qpos).
   simpl.
@@ -193,7 +193,7 @@ simpl in H.
 set (n:=  (@length (RegularFunction Q_as_MetricSpace) l)) in *.
 change (Zpos (P_of_succ_nat n)) with (Z_of_nat (1+n)) in H.
 rewrite inj_plus in H.
-rewrite injz_plus in H.
+rewrite -> injz_plus in H.
 replace LHS with (e1 * (1 + n) + e2 * (1 + n) + e3 + e4 + e5) by ring.
 auto.
 Qed.

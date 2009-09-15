@@ -85,7 +85,7 @@ destruct (le_lt_dec m j0).
  rewrite setRaster_overflow; auto.
 destruct (eq_nat_dec i i0).
  destruct (eq_nat_dec j j0).
-  rewrite e, e0.
+  rewrite e e0.
   rewrite setRaster_correct1; try constructor; congruence.
  rewrite setRaster_correct2; auto.
 rewrite setRaster_correct2; auto.
@@ -163,8 +163,8 @@ replace (min n
            (Zle_max_l 0 (rasterize1 l (l + w) (S n) x))))
  with n.
  setoid_replace x with (l + w).
-  rapply ball_sym.
-  rewrite Qball_Qabs.
+  apply: ball_sym.
+  rewrite ->  Qball_Qabs.
   unfold C.
   autorewrite with QposElim.
   replace RHS with (w*(1#xO (P_of_succ_nat n))) by ring.
@@ -181,7 +181,7 @@ replace (min n
    by (field; unfold Qeq; simpl; auto with *).
   rewrite Qabs_pos;[apply Qle_refl|].
   apply Qle_shift_div_l;
-   [rsapply mult_resp_pos; auto with *;
+   [apply: mult_resp_pos; simpl; auto with *;
     unfold Qlt; simpl; auto with *|].
   replace LHS with 0 by ring.
   auto with *.
@@ -289,7 +289,7 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
  exists (C l r (S n) i,C t b (S m) (m -j)%nat).
  split.
   apply InFinEnumC_weaken.
-  rapply InterpRaster_correct1.
+  apply InterpRaster_correct1.
   rewrite setRaster_correct1; unfold i, j; auto with *.
  split.
   change (ball err (C l r (S n) i) x).
@@ -298,9 +298,9 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   eapply ball_weak_le.
    unfold err.
    apply Qpos_max_ub_l.
-  rapply rasterization_error.
+  apply rasterization_error.
   simpl in Hl.
-  rewrite Hl in Hfl.
+  rewrite ->  Hl in Hfl.
   auto.
  change (ball err (C t b (S m) (m-j)%nat) y).
  change (st_eq y (snd a)) in Hr.
@@ -310,9 +310,9 @@ destruct H as [G | [Hl Hr] | H] using orC_ind.
   apply Qpos_max_ub_r.
  simpl (ball (m:=Q_as_MetricSpace)).
  rewrite switch_line_interp;[|unfold j; auto with *].
- rapply rasterization_error.
+ apply rasterization_error.
  simpl in Hr.
- rewrite Hr in Hfr.
+ rewrite -> Hr in Hfr.
  auto.
 simpl ((fold_right
         (fun (y : Q * Q) (x : raster (S n) (S m)) =>
@@ -392,19 +392,19 @@ assert (L:((i=i0)/\(j=m-j0) \/ ((j<>(m-j0)) \/ (i<>i0)))%nat)
  by omega.
 destruct L as [[Hi Hj] | L].
  clear IHl0.
- rewrite Hi, Hj in Hx'.
- rewrite Hi, Hj in Hy'.
+ rewrite Hi Hj in Hx'.
+ rewrite Hi Hj in Hy'.
  unfold fst, snd in *.
  apply existsWeaken.
  exists a.
  change (st_car (msp_is_setoid Q2)) in a.
  split.
-  rapply orWeaken.
+  apply orWeaken.
   left.
   reflexivity.
  destruct a as [ax ay].
  destruct (Hf' ax ay) as [Hax Hay].
-  rapply orWeaken;left;change (ax, ay) with ((ax,ay):Q2);reflexivity.
+  apply orWeaken;left;change (ax, ay) with ((ax,ay):Q2);reflexivity.
  clear Hf'.
  split.
   unfold fst.
@@ -413,7 +413,7 @@ destruct L as [[Hi Hj] | L].
   eapply ball_weak_le.
    unfold err.
    apply Qpos_max_ub_l.
-  rapply rasterization_error.
+  apply rasterization_error.
   auto.
  unfold snd.
  rewrite Hy'.
@@ -424,7 +424,7 @@ destruct L as [[Hi Hj] | L].
  fold (C t b (S m) (m - j0)%nat).
  simpl (ball (m:=Q_as_MetricSpace)).
  rewrite switch_line_interp;[|unfold j0; auto with *].
- rapply rasterization_error.
+ apply rasterization_error.
  auto.
 assert (L0:existsC (Q * Q)
          (fun p : Q * Q =>
@@ -436,13 +436,13 @@ assert (L0:existsC (Q * Q)
   rewrite setRaster_correct2 in Hij; auto.
  intros c d Hcd.
  apply Hf'.
- rapply orWeaken; right; auto.
+ apply orWeaken; right; auto.
 destruct L0 as [G | z [Hz0 Hz1]] using existsC_ind.
  auto using existsC_stable.
 apply existsWeaken.
 exists z.
 split; auto.
-rapply orWeaken.
+apply orWeaken.
 right; auto.
 Qed.
 

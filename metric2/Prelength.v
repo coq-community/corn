@@ -97,35 +97,35 @@ pose (g := ((Qmax 0 (e-x))+Sigma)/2).
 assert ((Qmax 0 (e-x))<Sigma).
 apply Qmax_case.
 intros.
-rsapply less_leEq_trans.
+apply: less_leEq_trans.
 instantiate (1:=(q:Q)).
 apply Qpos_prf.
 unfold Sigma.
 simpl.
 replace LHS with (q+0) by ring.
-rsapply plus_resp_leEq_lft.
+apply: plus_resp_leEq_lft.
 apply QposSumNonNeg.
 intros.
-rsapply shift_minus_less.
+apply: shift_minus_less;simpl.
 replace RHS with (x+Sigma) by ring.
 assumption.
 assert (Hg1:=Smallest_less_Average _ _ _ H).
 assert (0<g).
-rsapply leEq_less_trans.
+apply: leEq_less_trans.
 apply Qmax_ub_l.
 apply Hg1.
 set (g' := (mkQpos H0):Qpos).
 assert (Hg:g'=g:>Q).
-rapply QposAsmkQpos.
+apply QposAsmkQpos.
 assert (e<x+g').
-rsapply shift_less_plus'.
-rsapply leEq_less_trans.
+apply: shift_less_plus'.
+apply: leEq_less_trans.
 apply Qmax_ub_r.
 rewrite Hg.
 apply Hg1.
 assert (g'<Sigma).
 rewrite Hg.
-rsapply Average_less_Greatest.
+apply: Average_less_Greatest.
 assumption.
 destruct (prelength _ _ H1 B) as [c Hc1 Hc2].
 destruct (IHdl _ _ _ Hc2 H2) as [f' [Hf'1 Hf'2] Hf'3].
@@ -134,7 +134,7 @@ auto.
 intros [|i] z Hi.
 simpl.
 congruence.
-rapply Hf'3.
+apply Hf'3.
 auto with *.
 Qed.
 
@@ -311,7 +311,7 @@ apply (@mu_sum X plX Y e2 (e1::nil)).
 simpl.
 destruct (mu f e1) as [d1|].
 destruct (mu f e2) as [d2|].
-rapply regFun_prf.
+apply: regFun_prf.
 constructor.
 constructor.
 Qed.
@@ -394,7 +394,7 @@ Build_UniformlyContinuousFunction (@Cmap_strong_prf X Y plX).
 Lemma Cmap_strong_correct : forall X Y plX, st_eq (@Cmap_strong X Y plX) (@Cmap_strong_slow X Y).
 Proof.
 intros X Y plX.
-rapply Cmap_correct.
+apply: Cmap_correct.
 Qed.
 
 (** Similarly we define a new Cap *)
@@ -419,8 +419,8 @@ setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos by (unfold he1
 rewrite <- ball_Cunit.
 apply ball_triangle with y2;[|apply ball_approx_r].
 apply ball_triangle with y1;[apply ball_approx_l|].
-rapply (uc_prf (Cmap_strong Y plX)).
-rapply regFun_prf.
+apply (uc_prf (Cmap_strong Y plX)).
+apply: regFun_prf.
 Qed.
 
 Definition Cap_fun X Y plX (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
@@ -445,7 +445,7 @@ rewrite Cmap_correct.
 set (f1:=(approximate f ((1 # 2) * e1)%Qpos)).
 set (f2:=(approximate f ((1 # 2) * e2)%Qpos)).
 apply Cmap_strong_slow_prf.
-rapply regFun_prf.
+apply regFun_prf.
 Qed.
 
 Definition Cap_modulus X Y (f:Complete (X --> Y)) (e:Qpos) : QposInf := (mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)).
@@ -461,7 +461,7 @@ rewrite Cap_fun_correct.
 simpl (Cmap plX (approximate f e') x).
 rewrite Cmap_fun_correct.
 apply Cap_slow_help.
-rapply (uc_prf).
+apply (uc_prf).
 apply H.
 apply ball_sym.
 rewrite Cap_fun_correct.
@@ -475,7 +475,7 @@ Build_UniformlyContinuousFunction (Cap_weak_prf plX f).
 
 Lemma Cap_weak_correct : forall X Y plX (f:Complete (X --> Y)), st_eq (Cap_weak plX f) (Cap_weak_slow f).
 Proof.
-rapply Cap_fun_correct.
+apply: Cap_fun_correct.
 Qed.
 
 Lemma Cap_prf X Y plX : is_UniformlyContinuousFunction (@Cap_weak X Y plX) Qpos2QposInf.
@@ -491,7 +491,7 @@ Build_UniformlyContinuousFunction (Cap_prf plX).
 
 Lemma Cap_correct : forall X Y plX, st_eq (Cap Y plX) (Cap_slow X Y).
 Proof.
-rapply Cap_fun_correct.
+apply: Cap_fun_correct.
 Qed.
 
 (* begin hide *)
@@ -502,13 +502,12 @@ change (st_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
 rewrite Cmap_fun_correct.
 set (a:=(Cmap_slow_fun x1 y1)).
 rewrite Cmap_fun_correct.
-rapply Cmap_slow_wd; auto.
+apply Cmap_slow_wd; auto.
 Qed.
 
 Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_wd.
 intros x1 x2 Hx.
-rapply (@uc_wd _ _ (Cap Y H)).
-assumption.
+apply: (@uc_wd _ _ (Cap Y H));assumption.
 Qed.
 
 Add Parametric Morphism X Y H : (@Cap_fun X Y H) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cap_wd.
@@ -517,8 +516,7 @@ change (st_eq (Cap_fun H x1 y1) (Cap_fun H x2 y2)).
 transitivity (Cap_fun H x1 y2).
 apply (@uc_wd _ _ (Cap_weak H x1) _ _ Hy).
 generalize y2.
-rapply (@uc_wd _ _ (Cap Y H)).
-assumption.
+apply: (@uc_wd _ _ (Cap Y H));assumption.
 Qed.
 (* end hide *)
 
@@ -542,7 +540,7 @@ eapply Qle_lt_trans.
 apply Qpos_min_lb_l.
 eapply Qle_lt_trans.
 apply Qpos_min_lb_l.
-rapply (half_3 _ (d1:Q)).
+apply (half_3 _ (d1:Q)).
 apply Qpos_prf. 
 assert (Hd2:g < d2).
 unfold g.
@@ -550,12 +548,12 @@ eapply Qle_lt_trans.
 apply Qpos_min_lb_l.
 eapply Qle_lt_trans.
 apply Qpos_min_lb_r.
-rapply (half_3 _ (d2:Q)).
+apply (half_3 _ (d2:Q)).
 apply Qpos_prf.
 destruct (Qpos_lt_plus Hd1) as [d1' Hd1'].
 destruct (Qpos_lt_plus Hd2) as [d2' Hd2'].
 assert (He':(g + e + g)%Qpos < d1' + d2').
-rsapply plus_cancel_less.
+apply: plus_cancel_less;simpl.
 instantiate (1:= (g+g)).
 replace RHS with ((g+d1')%Qpos+(g+d2')%Qpos) by QposRing.
 unfold QposEq in *.
@@ -564,16 +562,16 @@ rewrite <- Hd2'.
 clear d1' Hd1' d2' Hd2'.
 apply Qle_lt_trans with (e + 4*gA).
 replace LHS with (e+4*g) by (unfold inject_Z;QposRing).
-rsapply plus_resp_leEq_lft.
-rsapply mult_resp_leEq_lft.
-rapply Qpos_min_lb_r.
+apply: plus_resp_leEq_lft.
+apply: mult_resp_leEq_lft.
+apply Qpos_min_lb_r.
 compute; discriminate.
 replace RHS with ((d1+d2)%Qpos:Q) by QposRing.
 rewrite q.
 replace RHS with (e+1*x0) by QposRing.
-rsapply plus_resp_less_lft.
+apply: plus_resp_less_lft;simpl.
 replace LHS with ((4#5)*x0) by (unfold inject_Z, gA;QposRing).
-rsapply mult_resp_less.
+apply: mult_resp_less.
 constructor.
 apply Qpos_prf.
 destruct (Xpl _ _ _ _ _ He' (Hxy g g)) as [c Hc1 Hc2].

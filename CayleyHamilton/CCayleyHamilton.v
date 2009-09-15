@@ -44,7 +44,7 @@ Add Ring cpoly_r : (RingClass.r_rt (Ring:=CRing_is_Ring (cpoly_cring CR))).
 
 Section degree_le.
 
-Global Instance degree_le_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@degree_le CR).
+Global Instance degree_le_morph : Morphisms.Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@degree_le CR).
 Proof. by move=> p q -> x y eqxy; split;[|symmetry in eqxy]; apply degree_le_wd. Qed.
 
 Lemma bigsum_degree_le : forall n (I : finType) (F : I -> cpoly_cring CR),
@@ -69,7 +69,7 @@ case: (P i)=> Hi; last by apply Hrec.
 by apply degree_le_mult; [apply Hi|apply Hrec].
 Qed.
 
-Global Instance nth_coeff_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@nth_coeff CR).
+Global Instance nth_coeff_morph : Morphisms.Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@nth_coeff CR).
 Proof. by move=> p q -> x y eqxy; apply nth_coeff_wd. Qed.
 
 Lemma nth_coeff_bigsum : forall n (I : finType) (F : I -> cpoly_cring CR),
@@ -82,7 +82,7 @@ have Hplus : forall p q : cpoly_cring CR, nth_coeff n (p[+]q) [=] nth_coeff n p 
 by apply (big_morph Hplus Hz _ predT).
 Qed.
 
-Global Instance monic_morphism : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@monic CR).
+Global Instance monic_morphism : Morphisms.Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (@monic CR).
 Proof. by move=> p q -> x y eqxy; split; [|symmetry in eqxy]; apply monic_wd. Qed.
 
 Lemma monic_bigsum : forall n (I : finType) (F : I -> cpoly_cring CR) (i : I),
@@ -117,7 +117,7 @@ simpl.
 by apply monic_mult.
 Qed.
 
-Global Instance cpoly_apply_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (cpoly_apply CR).
+Global Instance cpoly_apply_morph : Morphisms.Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) (cpoly_apply CR).
 Proof. by move=> a b eqab x y eqxy; apply cpoly_apply_wd. Qed.
 
 Lemma apply_bigsum : forall (I : finType) (F : I -> cpoly_cring CR) (x : CR),

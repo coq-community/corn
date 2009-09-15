@@ -743,7 +743,7 @@ generalize H18.
 unfold nneg in |- *.
 intro H19.
 set (H20 := H19 (CPsMetricSpace_is_CPsMetricSpace X) a b) in *.
-rewrite leEq_def in H20.
+rewrite -> leEq_def in H20.
 set (H21 := H20 H17) in *.
 intuition.
 

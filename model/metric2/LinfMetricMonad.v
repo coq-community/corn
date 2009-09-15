@@ -110,7 +110,7 @@ cut (StepFfoldProp (f <@> x )).
  unfold f.
  evalStepF.
  auto.
-rapply StepFfoldPropForall_Map.
+apply: StepFfoldPropForall_Map.
 simpl.
 auto with *.
 Qed.
@@ -152,46 +152,46 @@ cut (StepFfoldProp (f ^@> x <@> y <@> z)).
  evalStepF.
  tauto.
 apply StepFfoldPropForall_Map3.
-rapply (ball_triangle X e d).
+apply: (ball_triangle X e d).
 Qed.
 
 Lemma StepFSupBall_closed : forall e (x y:StepF X), (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
 Proof.
 intros e.
-rapply (StepF_ind2).
-  intros. rewrite H, H0 in H1. apply H1.
-  intro. rewrite H, H0. apply H2.
- rapply ball_closed.
+apply: (StepF_ind2).
+  intros. rewrite -> H, H0 in H1. apply H1.
+  intro. rewrite H H0. apply H2.
+ apply: ball_closed.
 intros o s s0 t t0 IH0 IH1 H.
 unfold StepFSupBall in *.
 rewrite MapGlue. rewrite ApGlue. simpl.
 split.
  rewrite SplitLGlue. apply IH0. clear IH0.
  intro d. pose (H2:=H d).
-  rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+  rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
  destruct H2. auto. 
 rewrite SplitRGlue. apply IH1. clear IH1.
 intro d. pose (H2:=H d).
-rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
+rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2. 
 destruct H2. auto.
 Qed.
 
 Lemma StepFSupBall_eq : forall (x y : StepF X),
 (forall e : Qpos, StepFSupBall e x y) -> StepF_eq x y.
 Proof.
-rapply (StepF_ind2).
-  intros s s0 t t0 H H0 H1 H2. rewrite H, H0 in H1. apply H1.
-  intro. rewrite H, H0. apply H2.
- rapply ball_eq.
+apply: (StepF_ind2).
+  intros s s0 t t0 H H0 H1 H2. rewrite -> H, H0 in H1. apply H1.
+  intro. rewrite H H0. apply H2.
+ apply ball_eq.
 intros o s s0 t t0 H H0 H1.
 unfold StepFSupBall in *. apply glue_resp_StepF_eq.
 apply H. clear H.
  intro e. pose (H2:=H1 e). 
- rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
+ rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
  destruct H2; auto.
 apply H0. clear H0.
 intro e. pose (H2:=H1 e).
-rewrite MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
+rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
 destruct H2; auto.
 Qed.
 (**
@@ -200,11 +200,11 @@ Qed.
 Lemma StepFSupBall_is_MetricSpace : 
  (is_MetricSpace (@StepFS X) (@StepFSupBall X)).
 split.
-    rapply StepFSupBall_refl.
-   rapply StepFSupBall_sym.
-  rapply StepFSupBall_triangle.
- rapply StepFSupBall_closed.
-rapply StepFSupBall_eq.
+    apply: StepFSupBall_refl.
+   apply: StepFSupBall_sym.
+  apply: StepFSupBall_triangle.
+ apply: StepFSupBall_closed.
+apply: StepFSupBall_eq.
 Qed.
 
 Definition StepFSup : MetricSpace :=
@@ -214,7 +214,7 @@ Definition StepFSup : MetricSpace :=
 Lemma StepFSupPrelengthSpace : PrelengthSpace X -> PrelengthSpace StepFSup.
 Proof.
 intros pl.
-rapply StepF_ind2.
+apply: StepF_ind2.
   intros s s0 t t0 Hs Ht H e d1 d2 He H0.
   rewrite <- Hs, <- Ht in H0.
   destruct (H _ _ _ He H0) as [c Hc0 Hc1].
@@ -226,7 +226,7 @@ rapply StepF_ind2.
  exists (constStepF c); auto.
 intros o s s0 t t0 IHl IHr e d1 d2 He H.
 simpl in H.
-rewrite StepFSupBallGlueGlue in H.
+rewrite -> StepFSupBallGlueGlue in H.
 destruct H as [Hl Hr].
 destruct (IHl _ _ _ He Hl) as [c Hc0 Hc1].
 destruct (IHr _ _ _ He Hr) as [d Hd0 Hd1].
@@ -250,8 +250,8 @@ StepFSupBall (X:=X) e (StFBind00 a f) (StFBind00 b f))).
 intros X e a. unfold ball_ex.
 induction a using StepF_ind. simpl. induction b using StepF_ind.
   intros. simpl. apply H. assumption.
- intros f Hf H. simpl in H. unfold StepFSupBall in H. rewrite GlueAp in H. 
- rewrite StepFfoldPropglue_rew in H. destruct H as [H H1].
+ intros f Hf H. simpl in H. unfold StepFSupBall in H. rewrite -> GlueAp in H. 
+ rewrite -> StepFfoldPropglue_rew in H. destruct H as [H H1].
  simpl.
  unfold StepFSupBall. rewrite GlueAp.
  rewrite StepFfoldPropglue_rew. split.
@@ -279,7 +279,7 @@ rewrite ApGlue. rewrite StepFfoldPropglue_rew. split.
  rewrite SplitLBind. apply HH; clear HH.
   intros. unfold SplitLS0. rewrite <- SplitLMap. rewrite <- SplitLAp.
   apply StepFfoldPropSplitL. apply (Hf c d H0).
- pose (HH:=StepFfoldPropSplitL _ o H). rewrite SplitLAp in HH. rewrite SplitLMap in HH.
+ pose (HH:=StepFfoldPropSplitL _ o H). rewrite -> SplitLAp in HH. rewrite SplitLMap in HH.
  setoid_replace a1 with (SplitL (glue o a1 a2) o ).
  assumption. rewrite SplitLGlue;reflexivity.
 
@@ -288,7 +288,7 @@ rewrite ApGlue. rewrite StepFfoldPropglue_rew. split.
  rewrite SplitRBind. apply HH; clear HH.
   intros. unfold SplitRS0. rewrite <- SplitRMap. rewrite <- SplitRAp.
   apply StepFfoldPropSplitR. apply (Hf c d H0).
- pose (HH:=StepFfoldPropSplitR _ o H). rewrite SplitRAp in HH. rewrite SplitRMap in HH.
+ pose (HH:=StepFfoldPropSplitR _ o H). rewrite -> SplitRAp in HH. rewrite SplitRMap in HH.
  setoid_replace a2 with (SplitR (glue o a1 a2) o ).
  assumption. rewrite SplitRGlue;reflexivity.
 Qed.
@@ -301,7 +301,7 @@ Variable X Y : MetricSpace.
 
 (** Various functions with step functions are uniformly continuous with this metric. *)
 Definition StFJoinSup :(StepFSup (StepFSup X)) --> (StepFSup X).
-simpl. rapply (@Build_UniformlyContinuousFunction
+simpl. apply (@Build_UniformlyContinuousFunction
 _ _ (@StFJoin X) (fun e:Qpos=>e)).
 abstract (unfold is_UniformlyContinuousFunction; simpl; intros; apply
 StepFSupBallBind; [auto with * | assumption]).
@@ -309,7 +309,7 @@ Defined.
 
 Definition StFReturn_uc : X --> (StepFSup X).
 simpl. exists (StFReturn X) (fun x:Qpos=> x:QposInf).
-abstract (intros e a b H ; rapply H).
+abstract (intros e a b H ; apply H).
 Defined.
 
 Lemma uc_stdFun(X Y:MetricSpace):
@@ -336,7 +336,7 @@ evalStepF. auto with *.
 apply StepFfoldPropForall_Map2. intros. simpl.
 apply uc_prf.
 rewrite H. simpl. auto.
-intros q eq. rapply StepF_imp_imp.
+intros q eq. apply: StepF_imp_imp.
 unfold StepF_imp.
 set (bal:=(ballS Y e)).
 set (F:=(((flip (compose (flip (compose bal (uc_stdFun f))) (uc_stdFun f)))))).
@@ -347,7 +347,7 @@ cut (StepFfoldProp (IMP ^@> a <@> b)).
  unfold IMP, F; evalStepF. tauto.
 apply StepFfoldPropForall_Map2.
 intros a0 b0. simpl. unfold compose0.
-intro. apply uc_prf. rewrite eq. rapply H.
+intro. apply uc_prf. rewrite eq. apply H.
 Defined.
 
 Definition glue_uc0 (o:OpenUnit): 

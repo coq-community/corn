@@ -45,7 +45,7 @@ Lemma Abs_poly_nth_coeff : forall P i, nth_coeff i (AbsPoly P) [=] AbsIR (nth_co
 Proof.
 intro P.
 pattern P; apply Ccpoly_induc; clear P.
-  intro; rewrite AbsPoly_zero, nth_coeff_zero.
+  intro; rewrite AbsPoly_zero nth_coeff_zero.
   symmetry; apply AbsIRz_isz.
 intros P c Hrec n.
 rewrite AbsPoly_linear.
@@ -188,7 +188,7 @@ split.
   apply minus_resp_leEq.
   apply (leEq_wdl _ (x[+](a[-]x))); [|rational].
   apply plus_resp_leEq_lft.
-  rewrite AbsIR_minus in Hle.
+  rewrite -> AbsIR_minus in Hle.
   apply (leEq_transitive _ _ (AbsIR (a[-]x))); [|assumption].
   apply leEq_AbsIR.
 apply (leEq_wdl _ (x[-]Two[+]Two)); [|rational].
@@ -283,7 +283,7 @@ assert ((inject_Z (Zpos q))[^]n [#] Zero).
   intro; destruct IHn.
   rewrite <- nexp_Sn in H.
   destruct (Qmult_integral _ _ H); [discriminate|assumption].
-rewrite H0 in H.
+rewrite -> H0 in H.
 apply (mult_eq_zero _ _ _ X); assumption.
 Qed.
 
@@ -303,20 +303,20 @@ assert ((zx2qx (qx2zx P)) ! (p#q)%Q[#]Zero).
   case (Q_dec ((zx2qx (qx2zx P)) ! (p#q)%Q) Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); revert Heq.
   rewrite qx2zx_spec.
-  rewrite mult_apply, c_apply.
+  rewrite mult_apply c_apply.
   intro Heq.
   apply (mult_eq_zero _ (Zlcm_den_poly P:Q_as_CField)).
     intro Heq2; injection Heq2.
     rewrite Zmult_1_r.
     apply Zlcm_den_poly_nz.
   assumption.
-rewrite qx2zx_deg; fold ZX_deg.
+rewrite -> qx2zx_deg; fold ZX_deg.
 apply (leEq_wdr _ _ _ _ (Liouville_lemma5 _ _ _ X)); fold ZX_deg.
 apply mult_wdr.
 apply AbsIR_wd.
 apply csf_wd.
 rewrite qx2zx_spec.
-rewrite mult_apply, c_apply; reflexivity.
+rewrite mult_apply c_apply; reflexivity.
 Qed.
 
 Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] Zero ->

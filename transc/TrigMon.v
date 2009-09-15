@@ -353,7 +353,7 @@ Zero[<]x -> x[<]Two[*]Pi -> (x[#]Pi) -> Sin x[#]Zero).
  clear x Hx0 Hx1 Hn.
  induction n; intros x Hx0 Hx1 Hn.
   elim (less_antisymmetric_unfolded _ _ _ Hn).
-  rapply div_resp_pos; assumption.
+  apply div_resp_pos; assumption.
  destruct (ap_imp_less _ _ _ (Hx1 (2*n))).
   apply IHn; try assumption.
   apply shift_div_less'.
@@ -436,7 +436,7 @@ Proof.
 intros.
 repeat split; try constructor.
 intros [].
-rapply Cos_ap_Zero.
+apply: Cos_ap_Zero.
 assumption.
 Qed.
 

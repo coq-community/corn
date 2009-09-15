@@ -267,8 +267,7 @@ transitivity (y + (constStepF (0:QS))).
  generalize (x-y).
  intros s H.
  induction s.
-  rapply Qeq_bool_eq.
-  assumption.
+  apply: Qeq_bool_eq;assumption.
  symmetry in H.
  destruct (andb_true_eq _ _ H) as [H1 H2].
  split.
@@ -354,7 +353,7 @@ intros x y z. unfold StepQ_le.
 intros H.
 apply StepF_imp_imp.
 revert H.
-rapply StepF_imp_imp.
+apply StepF_imp_imp.
 unfold StepF_imp.
 pose (f:= ap
 (compose (@ap _ _ _) (compose (compose (compose (@compose _ _ _) imp)) QleS))
@@ -384,7 +383,7 @@ cut (StepFfoldProp (f ^@> x)).
  tauto.
 apply StepFfoldPropForall_Map.
 intros a.
-rapply Qabs_opp.
+apply: Qabs_opp.
 Qed.
 
 Lemma StepQabs_triangle : forall x y, StepQabs (x+y) <= StepQabs x + StepQabs y.
@@ -399,5 +398,5 @@ cut (StepFfoldProp (f ^@> x <@> y)).
  tauto.
 apply StepFfoldPropForall_Map2.
 intros a b.
-rapply Qabs_triangle.
+apply: Qabs_triangle.
 Qed.

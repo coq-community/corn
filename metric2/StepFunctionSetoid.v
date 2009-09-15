@@ -56,8 +56,8 @@ Lemma StepF_ind : forall (P : StepF -> Prop),
 Proof.
 intros P H0 H1 s.
 induction s.
- rapply H0.
-rapply H1; auto.
+ apply H0.
+apply H1; auto.
 Qed.
 
 Definition StepFfold  : forall Y, (X -> Y) -> (OpenUnit -> Y -> Y -> Y) -> StepF -> Y := (@StepFfold X).
@@ -234,7 +234,7 @@ Lemma glue_eq_ind : forall (s1 s2 s:StepF X) a (P:Prop), (s1 === SplitL s a -> s
 Proof.
 intros s1 s2 s a P H H0.
 unfold StepF_eq in *.
-rewrite MapGlue in *.
+rewrite -> MapGlue in *.
 rewrite ApGlue in H0.
 destruct H0.
 auto.
@@ -263,16 +263,16 @@ induction s using StepF_ind;
 intros [H [H0 H1]].
 apply glue_StepF_eq.
  apply IHs1.
- rapply SplitL_glue_ind; intros H2;
+ apply SplitL_glue_ind; intros H2;
   try (elim (Qlt_not_le _ _ H2); rewrite H); auto with *.
 apply IHs2.
-rapply SplitR_glue_ind; intros H2;
+apply SplitR_glue_ind; intros H2;
  try (elim (Qlt_not_le _ _ H2); rewrite H); auto with *.
 Qed.
 
 Lemma glueSplit:forall (s : StepF X), forall a, (glue a (SplitL s a) (SplitR s a)) === s.
 intros s a.
-rapply glue_StepF_eq; auto with *.
+apply glue_StepF_eq; auto with *.
 Qed.
 
 End EquivalenceA.
@@ -338,7 +338,7 @@ destruct H0 as [H0l H0r].
 change ((StepFfoldProp x1 /\ StepFfoldProp x2) <-> StepFfoldProp y).
 rewrite (IHx1 (SplitL y o)); auto with *.
 rewrite (IHx2 (SplitR y o)); auto with *.
-rapply StepFfoldPropglue.
+apply: StepFfoldPropglue.
 Qed.
 
 Lemma StepFfoldPropSplitR
@@ -373,7 +373,7 @@ induction s using StepF_ind; induction t using StepF_ind; try contradiction.
  unfold StepF_eq in *.
  rewrite <- Hst.
  rewrite <- (StepFfoldProp_morphism ((st_eqS X) ^@> constStepF x <@> u)); auto.
- rapply (Map_resp_StepF_eq); auto with *.
+ apply: (Map_resp_StepF_eq); auto with *.
  intros a b Hab.
  simpl.
  rewrite Hab.
@@ -409,18 +409,18 @@ split; apply (@glue_eq_ind X); intros H0 H1.
   rewrite <- IHs1.
   eapply StepF_eq_resp_Qeq;[| |apply H1]; auto with *.
   apply StepF_Qeq_sym.
-  rapply MirrorSplitL_Qeq; auto with *.
+  apply MirrorSplitL_Qeq; auto with *.
  rewrite <- IHs2.
  eapply StepF_eq_resp_Qeq;[| |apply H0]; auto with *.
  apply StepF_Qeq_sym.
- rapply MirrorSplitR_Qeq; auto with *.
+ apply MirrorSplitR_Qeq; auto with *.
 apply glue_StepF_eq.
  apply StepF_eq_resp_Qeq with (Mirror s2) (Mirror (SplitR t o)); auto.
-  rapply MirrorSplitR_Qeq; apply Qeq_refl.
+  apply MirrorSplitR_Qeq; apply Qeq_refl.
  rewrite IHs2.
  assumption.
 apply StepF_eq_resp_Qeq with (Mirror s1) (Mirror (SplitL t o)); auto.
- rapply MirrorSplitL_Qeq; apply Qeq_refl.
+ apply MirrorSplitL_Qeq; apply Qeq_refl.
 rewrite IHs1.
 assumption.
 Qed.
@@ -438,17 +438,17 @@ intros s2 a H.
 destruct H using (glue_eq_ind s1_1).
 apply SplitL_glue_ind; intros Hao.
   apply StepF_eq_resp_Qeq with (SplitL s1_1 (OpenUnitDiv a o Hao)) (SplitL (SplitL s2 o) (OpenUnitDiv a o Hao)); auto.
-  rapply SplitLSplitL.
+  apply SplitLSplitL.
   simpl; field; auto with *.
  apply glue_StepF_eq.
   apply StepF_eq_resp_Qeq with s1_1 (SplitL s2 o); auto.
   apply StepF_Qeq_sym.
-  rapply SplitLSplitL.
+  apply SplitLSplitL.
   simpl; field; auto with *.
  apply StepF_eq_resp_Qeq with (SplitL s1_2 (OpenUnitDualDiv a o Hao)) (SplitL (SplitR s2 o) (OpenUnitDualDiv a o Hao)); auto.
- rapply SplitLSplitR; simpl; field; auto with *.
+ apply SplitLSplitR; simpl; field; auto with *.
 apply StepF_eq_resp_Qeq with s1_1 (SplitL s2 o); auto with *.
-rapply SplitL_resp_Qeq; auto.
+apply SplitL_resp_Qeq; auto.
 symmetry.
 assumption.
 Qed.
@@ -471,7 +471,7 @@ induction x using StepF_ind. intros.
  unfold StepF_eq in *.
  set (A:=((st_eqS X:X-->X-->iffSetoid) ^@> constStepF x)) in *.
  rewrite <- (StepFfoldProp_morphism (A <@> y)); auto with *.
- rapply (Map_resp_StepF_eq); auto with *.
+ apply: (Map_resp_StepF_eq); auto with *.
  intros a b Hab.
  simpl.
  rewrite Hab.
@@ -597,7 +597,7 @@ Lemma MirrorSplitR X : forall (s : StepF X) (a b : OpenUnit),
 Proof.
 intros.
 apply StepF_Qeq_eq; auto with *.
-rapply MirrorSplitR_Qeq; auto with *.
+apply MirrorSplitR_Qeq; auto with *.
 Qed.
 
 Lemma MirrorSplitL X : forall (s : StepF X) (a b : OpenUnit),
@@ -606,7 +606,7 @@ Lemma MirrorSplitL X : forall (s : StepF X) (a b : OpenUnit),
 Proof.
 intros.
 apply StepF_Qeq_eq; auto with *.
-rapply MirrorSplitL_Qeq; auto with *.
+apply MirrorSplitL_Qeq; auto with *.
 Qed.
 
 (** Lift the distribution lemmas between ap and split to work over step
@@ -618,7 +618,7 @@ intros X Y f s o.
 apply StepF_Qeq_eq; auto with *.
 unfold Ap, SplitR.
 rewrite <- StepFunction.SplitRMap.
-rapply SplitRAp_Qeq.
+apply SplitRAp_Qeq.
 Qed.
 
 Lemma SplitLAp :forall (X Y:Setoid) (f : StepF (Y --> X)) (s : StepF Y) (o : OpenUnit),
@@ -628,7 +628,7 @@ intros X Y f s o.
 apply StepF_Qeq_eq; auto with *.
 unfold Ap, SplitL.
 rewrite <- StepFunction.SplitLMap.
-rapply SplitLAp_Qeq.
+apply SplitLAp_Qeq.
 Qed.
 (* begin hide *)
 Add Parametric Morphism s : (@constStepF s) with signature (@st_eq s) ==> (@StepF_eq s) as constStepF_wd.
@@ -649,7 +649,7 @@ intros x1 x2 Hx o1 o2 Ho.
 transitivity (SplitL x2 o1).
  apply SplitL_resp_Xeq; auto.
 apply StepF_Qeq_eq.
-rapply SplitL_resp_Qeq; auto; reflexivity.
+apply SplitL_resp_Qeq; auto; reflexivity.
 Qed.
 
 Add Parametric Morphism X : (@SplitR X) with signature (@StepF_eq X) ==> ou_eq ==> (@StepF_eq X) as SplitR_wd.
@@ -658,7 +658,7 @@ intros x1 x2 Hx o1 o2 Ho.
 transitivity (SplitR x2 o1).
  apply SplitR_resp_Xeq; auto.
 apply StepF_Qeq_eq.
-rapply SplitR_resp_Qeq; auto; reflexivity.
+apply SplitR_resp_Qeq; auto; reflexivity.
 Qed.
 
 Add Parametric Morphism X Y : (@Ap X Y) with signature (@StepF_eq (extSetoid X Y)) ==> (@StepF_eq X) ==> (@StepF_eq Y) as Ap_wd.
@@ -672,8 +672,8 @@ induction f using StepF_ind; intros g Hfg.
     intros H.
     transitivity (x ^@> (constStepF x2)).
      destruct x as [x Hx].
-     rapply Hx; assumption.
-    rapply Hfg.
+     clear Hfg. apply: Hx ; assumption.
+    apply: Hfg.
    intros H.
    rewrite MapGlue.
    symmetry.
@@ -749,7 +749,7 @@ induction a using StepF_ind.
  simpl.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs, Ht.
+  rewrite Hs Ht.
   auto.
  intros o s s0 t t0 H H0.
  rewrite Map_homomorphism.
@@ -781,13 +781,11 @@ Proof.
 intros X Y.
 apply StepF_ind2; auto with *.
  intros s s0 t t0 Hs Ht.
- rewrite Hs, Ht.
- auto.
+ rewrite Hs Ht; auto.
 intros o s s0 t t0 H0 H1.
 rewrite MapGlue.
 rewrite ApGlueGlue.
-rewrite H0, H1.
-reflexivity.
+rewrite H0 H1;reflexivity.
 Qed.
 
 Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
@@ -797,14 +795,12 @@ induction f using StepF_ind.
  simpl.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs, Ht.
-  auto.
+  rewrite Hs Ht;auto.
  intros o s s0 t t0 H0 H1.
  rewrite Map_homomorphism.
  do 2 rewrite MapGlue.
  do 2 rewrite ApGlueGlue.
- rewrite H0, H1.
- reflexivity.
+ rewrite H0 H1; reflexivity.
 intros x w.
 rewrite MapGlue.
 do 4 rewrite ApGlue.
@@ -817,13 +813,11 @@ Proof.
 intros X Y.
 apply StepF_ind2; auto with *.
  intros s s0 t t0 Hs Ht.
- rewrite Hs, Ht.
- auto.
+ rewrite Hs Ht; auto.
 intros o s s0 t t0 H0 H1.
 rewrite MapGlue.
 do 3 rewrite ApGlueGlue.
-rewrite H0, H1.
-reflexivity.
+rewrite H0 H1;reflexivity.
 Qed.
 (* begin hide *)
 Hint Rewrite 
@@ -871,7 +865,7 @@ intros X f x H.
 revert f H.
 induction x using StepF_ind.
  intros f H.
- rapply H.
+ apply H.
 intros f H.
 rewrite <- (glueSplit f o).
 rewrite ApGlueGlue.
@@ -911,9 +905,9 @@ apply StepFfoldPropForall_Ap.
 intros b.
 rewrite <- (Map_commutative (constStepF f) (constStepF b)).
 rewriteStepF.
-rapply StepFfoldPropForall_Map.
+apply StepFfoldPropForall_Map.
 intros a.
-rapply H.
+apply: H.
 Qed.
 
 Lemma StepFfoldPropForall_Map3 : 
@@ -927,9 +921,9 @@ rewrite <- Map_composition.
 rewriteStepF.
 rewrite <- (Map_commutative (constStepF (compose flip f)) (constStepF c)).
 rewriteStepF.
-rapply StepFfoldPropForall_Map2.
+apply StepFfoldPropForall_Map2.
 intros a b.
-rapply H.
+apply: H.
 Qed.
 
 (** The implication operation can be lifted to work on characteristic

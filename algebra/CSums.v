@@ -42,7 +42,7 @@
 
 Require Export CAbGroups.
 Require Export Peano_dec.
-
+Require Import ssreflect.
 (**
 * Sums
 
@@ -602,10 +602,10 @@ Lemma Sum_big_shift : forall f g k m n, (forall j, m <= j -> f j [=] g (j + k)) 
  m <= S n -> Sum m n f [=] Sum (m + k) (n + k) g.
 do 3 intro; generalize f g; clear f g.
 induction  k as [| k Hreck].
-intros; repeat rewrite <- plus_n_O.
-apply Sum_wd'; intros.
-auto.
-pattern i at 2 in |- *; rewrite (plus_n_O i); apply H; auto.
+intros f g n m. repeat rewrite <- plus_n_O.
+intros H H0.
+apply: Sum_wd'. auto.
+intros. set (Hi:= H i). rewrite <- (plus_n_O i) in Hi. apply: Hi. auto.
 intros; repeat rewrite <- plus_n_Sm.
 apply
  eq_transitive_unfolded with (Sum (m + k) (n + k) (fun n : nat => g (S n))).
@@ -719,7 +719,7 @@ elimtype False; inversion H.
 cut (0 <= n); [ intro H0 | auto with arith ].
 elim (le_lt_eq_dec _ _ H0); clear H H0; intro H.
  simpl in |- *.
- pattern n at 6 in |- *; rewrite (S_pred _ _ H).
+ pattern n at 6 in |- *; rewrite -> (S_pred _ _ H).
  eapply eq_transitive_unfolded.
   2: apply eq_symmetric_unfolded; apply Sum_last.
  apply bin_op_wd_unfolded.

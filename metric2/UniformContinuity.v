@@ -43,7 +43,7 @@ Proof.
 intros X e d a b Hed Hab.
 destruct d as [d|];
 destruct e as [e|].
-rapply (ball_weak_le X).
+apply: (ball_weak_le X).
 apply Hed.
 assumption.
 elim Hed.

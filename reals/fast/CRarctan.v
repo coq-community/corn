@@ -52,11 +52,11 @@ split.
 abstract (
 assert (H:0<a);
  [apply Qlt_le_trans with 1;[constructor|assumption]|];
-rsapply (mult_cancel_leEq _ (/a) 1 a);[assumption|];
+apply: (mult_cancel_leEq _ (/a) 1 a);simpl;[assumption|];
 (replace RHS with a by ring);
 replace LHS with (1);[assumption|];
 field;
-rsapply (Greater_imp_ap _ a 0);
+apply (Greater_imp_ap _ a 0);
 assumption).
 Defined.
 
@@ -72,7 +72,7 @@ rewrite rational_arctan_small_pos_correct.
  assert (H1:(inj_Q IR a)[#]Zero).
   stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
   apply inj_Q_ap.
-  rsapply (Greater_imp_ap _ a 0); assumption.
+  apply (Greater_imp_ap _ a 0); assumption.
  rewrite <- IR_minus_as_CR.
  apply IRasCR_wd.
  stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
@@ -82,7 +82,7 @@ rewrite rational_arctan_small_pos_correct.
   unfold cg_minus.
   csetoid_rewrite (ArcTan_recip _ H1 H2).
   rational.
- rapply bin_op_wd_unfolded.
+ apply bin_op_wd_unfolded.
   rstepl (((nring 1)[/]TwoNZ)[*]Pi).
   apply mult_wdl.
   change (1#2) with (1/2).
@@ -107,13 +107,12 @@ rewrite rational_arctan_small_pos_correct.
  simpl.
  unfold Qdiv.
  ring.
-rsapply (mult_cancel_less _ (/a) 1 a).
- assumption.
+apply: (mult_cancel_less _ (/a) 1 a);simpl. assumption.
 ring_simplify.
 replace LHS with 1.
  assumption.
 field.
-rsapply (Greater_imp_ap _ a 0); assumption.
+apply: (Greater_imp_ap _ a 0); assumption.
 Qed.
 
 (** Because we have slow convergence near 1, we have another compuation
@@ -122,10 +121,9 @@ Definition rational_arctan_mid_pos (a:Q) (Ha:0 <= a) : CR.
 Proof.
 intros [n d] Ha.
 refine (r_pi (1#4) + (@rational_arctan_small ((n-d)%Z/(n+d)%Z) _))%CR.
-abstract (
 unfold Qle in Ha;
 simpl in Ha;
-rewrite Zmult_1_r in Ha;
+rewrite -> Zmult_1_r in Ha;
 assert (H:~(n+d)%Z==0);[
  intros H0;
  apply (Zle_not_lt _ _ Ha);
@@ -136,15 +134,14 @@ assert (H:~(n+d)%Z==0);[
  ring_simplify;
  auto with *|];
 change (-(1) <= ((inject_Z (n-d)%Z)[/]_[//]H) <= 1);
-split;
- ((rsapply shift_leEq_div || rsapply shift_div_leEq');
-  [unfold Qlt; simpl; auto with *|]);
+split; [apply: shift_leEq_div;simpl | apply: shift_div_leEq';simpl];try 
+ (unfold Qlt; simpl; auto with *);
  rewrite Qle_minus_iff;
  try change (0 <= (n + d)%Z * 1  + (- (n - d))%Z);
  ring_simplify;
  unfold Qle; simpl;
  ring_simplify;
- auto with *).
+ auto with *.
 Defined.
 
 Lemma rational_arctan_mid_pos_correct : forall a (Ha: 0 <= a), 0 < a ->
@@ -189,7 +186,7 @@ stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((n - d)%Z / (n + d)%Z))).
   rstepl y.
   rstepr (nring 1:IR).
   stepr (inj_Q IR 1) by apply (inj_Q_nring IR 1).
-  rapply inj_Q_less.
+  apply inj_Q_less.
   assumption.
  apply eq_transitive with (ArcTan (One[+]y[/]_[//](Greater_imp_ap _ _ _ Y))).
   apply ArcTan_plus_ArcTan.
@@ -199,13 +196,13 @@ stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((n - d)%Z / (n + d)%Z))).
     apply leEq_reflexive.
    rstepl ([--](nring 1:IR)).
    stepl (inj_Q IR ([--](1))).
-    rapply inj_Q_leEq.
+    apply inj_Q_leEq.
     apply less_leEq; assumption.
    csetoid_rewrite_rev (inj_Q_nring IR 1).
    apply inj_Q_inv.
   rstepr (nring 1:IR).
   stepr (inj_Q IR 1) by apply (inj_Q_nring IR 1).
-  rapply inj_Q_leEq.
+  apply inj_Q_leEq.
   apply less_leEq; assumption.
  apply ArcTan_wd.
  apply mult_cancel_lft with (One[-]One[*]y).
@@ -220,7 +217,7 @@ stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((n - d)%Z / (n + d)%Z))).
   eapply eq_transitive.
    apply eq_symmetric; apply inj_Q_plus.
   apply eq_transitive with (inj_Q IR ((n # d)[+][--](y'[*](n # d))));[|
-   rapply inj_Q_minus].
+   apply inj_Q_minus].
   apply inj_Q_wd.
   simpl. 
   rewrite (Qmake_Qdiv n d).
@@ -291,7 +288,7 @@ destruct (Qle_total a 0) as [H|H].
  refine (-(@rational_arctan_pos (-a)%Q _))%CR.
  abstract (
  change (-0 <= -a);
- rsapply (inv_resp_leEq);
+ apply: (inv_resp_leEq);
  assumption).
 apply (rational_arctan_pos H).
 Defined.
@@ -325,9 +322,9 @@ apply (is_UniformlyContinuousFunction_wd) with rational_arctan (Qscale_modulus (
  change (/1) with 1.
  replace RHS with (x:Q) by ring.
  apply Qle_refl.
-rapply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan CI) rational_arctan).
+apply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan CI) rational_arctan).
  intros q [] _.
- rapply rational_arctan_correct.
+ apply rational_arctan_correct.
 intros x Hx _.
 assert (X:Zero[<]One[+]One[*]x[*]x).
  apply plus_resp_pos_nonneg.
@@ -361,13 +358,13 @@ Lemma arctan_correct : forall x,
  (IRasCR (ArcTan x) == arctan (IRasCR x))%CR.
 Proof.
 intros x.
-rapply (ContinuousCorrect (CI:proper realline));
+apply (ContinuousCorrect (CI:proper realline));
  [apply Continuous_ArcTan | | constructor].
 intros q [] _.
-transitivity (rational_arctan q);[|rapply rational_arctan_correct].
+transitivity (rational_arctan q);[|apply rational_arctan_correct].
 unfold arctan.
 rewrite (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
-rapply BindLaw1.
+apply: BindLaw1.
 Qed.
 (* begin hide *)
 Hint Rewrite arctan_correct : IRtoCR.
@@ -377,7 +374,7 @@ Proof.
 intros x.
 unfold arctan.
 rewrite (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
-rapply BindLaw1.
+apply: BindLaw1.
 Qed.
 (* begin hide *)
 Hint Rewrite arctan_Qarctan : CRfast_compute.

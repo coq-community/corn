@@ -465,7 +465,7 @@ intros a b F H Ha H0 x H1 Hx.
 rewrite leEq_def; intros H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] a). intro H4.
-rewrite leEq_def in H0; apply H0.
+rewrite -> leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
@@ -484,7 +484,7 @@ intros a b F H Ha H0 x H1 Hx.
 rewrite leEq_def; intros H2.
 cut (Not (olor a b x)); intro H3.
 cut (x [=] b). intro H4.
-rewrite leEq_def in H0; apply H0.
+rewrite -> leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H2 | algebra ].
 red in H3.
 apply not_ap_imp_eq; intro H4.
@@ -504,7 +504,7 @@ rewrite leEq_def; intros H3.
 cut (Not (olor a b x)); intro H4.
 elim (less_cotransitive_unfolded _ _ _ Hab x); intro H5.
 cut (x [=] b). intro H6.
-rewrite leEq_def in H1; apply H1.
+rewrite -> leEq_def in H1; apply H1.
 eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro H6.
@@ -513,7 +513,7 @@ elim (ap_imp_less _ _ _ H6); intros.
 apply H4; split; auto.
 apply (less_irreflexive_unfolded _ b); apply less_leEq_trans with x; auto.
 cut (x [=] a); intros.
-rewrite leEq_def in H0; apply H0.
+rewrite -> leEq_def in H0; apply H0.
 eapply less_wdl; [ apply H3 | algebra ].
 red in H4.
 apply not_ap_imp_eq; intro.

@@ -223,7 +223,7 @@ auto with arith.
 apply sep__part_h_bnd.
 assumption.
 intros; apply Hm'.
-unfold m' in H0; rewrite S_pred with m 0; auto with arith.
+unfold m' in H0; rewrite (S_pred m 0); auto with arith.
 apply neq_O_lt; auto.
 apply SPap_n.
 rewrite H in Hm.
@@ -460,7 +460,7 @@ apply
 clear H Hj Hi j i; intros; apply nring_less.
 2: assumption.
 elim (le_lt_eq_dec _ _ H'); intro.
-rewrite sep__part_fun_i with (i := S i).
+rewrite (sep__part_fun_i (S i)).
 2: assumption.
 simpl in |- *; elim (le_lt_dec (sep__part_h i) n); intro; simpl in |- *.
 elim (sep__part_lemma (sep__part_h i) a1); intro; simpl in |- *.
@@ -510,7 +510,7 @@ do 3 intro.
 rewrite sep__part_fun_i.
 2: auto with arith.
 elim (le_lt_eq_dec _ _ Hi'); intro.
-rewrite sep__part_fun_i with (i := S i).
+rewrite (sep__part_fun_i (S i)).
 2: assumption.
 intros.
 apply sep__part_h_lemma.
@@ -579,7 +579,7 @@ cut
 intro.
 apply H.
 rename Hi' into H.
-rewrite sep__part_fun_i with (i := i).
+rewrite (sep__part_fun_i i).
 2: assumption.
 elim (le_lt_eq_dec _ _ H); intro.
 rewrite sep__part_fun_i.
@@ -666,7 +666,7 @@ rstepl (P j H4[-]P (pred j) H5[+](P (pred j) H5[-]P (sep__part_h i) Hb)).
 cut (0 < j); intros.
 apply plus_resp_leEq_both.
 cut (j = S (pred j)); [ intro | apply S_pred with 0; auto ].
-generalize H4; pattern j at 1 2 in |- *; rewrite H7; intro.
+generalize H4; rewrite {1 2}H7; intro.
 apply Mesh_lemma.
 apply less_leEq.
 apply less_wdl with (P (pred j) H5[-]P _ a0).

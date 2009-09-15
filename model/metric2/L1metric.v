@@ -100,7 +100,7 @@ apply SplitLR_glue_ind; intros H.
  simpl. unfold IntegralQ; simpl; fold IntegralQ.
  repeat rewrite Qred_correct. 
  unfold affineCombo in *.
- rewrite (IHx2 (OpenUnitDualDiv p o H)).
+ rewrite -> (IHx2 (OpenUnitDualDiv p o H)).
  unfold IntegralQ; simpl; fold IntegralQ. unfold affineCombo; field; auto with *.
 unfold affineCombo in *.
 rewrite H.
@@ -127,7 +127,7 @@ rewrite Integral_glue.
 rewrite (IHx1 _ H0).
 rewrite (IHx2 _ H1).
 symmetry.
-rapply IntegralSplit.
+apply IntegralSplit.
 Qed.
 
 Add Morphism L1Norm 
@@ -158,14 +158,14 @@ Lemma Integral_plus:forall s t,
 Proof.
 apply StepF_ind2; try reflexivity.
  intros s s0 t t0 Hs Ht.
- rewrite Hs, Ht; auto.
+ rewrite Hs Ht; auto.
 intros o s s0 t t0 H0 H1.
 unfold StepQplus.
 rewriteStepF.
 replace LHS
  with (o*(IntegralQ s + IntegralQ t) + (1-o)*(IntegralQ s0 + IntegralQ t0))%Q
  by ring.
-rewrite H0, H1.
+rewrite H0 H1.
 reflexivity.
 Qed.
 
@@ -186,7 +186,7 @@ Lemma Integral_minus:forall s t,
 Proof.
 intros s t.
 unfold Qminus.
-rewrite Integral_opp, Integral_plus.
+rewrite Integral_opp Integral_plus.
 apply IntegralQ_wd.
 ring.
 Qed.
@@ -208,15 +208,15 @@ Lemma Abs_Integral : forall x,
 Proof.
 intros x.
 induction x using StepF_ind.
- rapply Qle_refl.
+ apply Qle_refl.
 rewriteStepF.
 eapply Qle_trans.
 apply Qabs_triangle.
 do 2 rewrite Qabs_Qmult.
 rewrite (Qabs_pos o); auto with *.
 rewrite (Qabs_pos (1-o)); auto with *.
-rsapply plus_resp_leEq_both;
- rsapply mult_resp_leEq_lft; auto with *.
+apply: plus_resp_leEq_both;simpl;
+ apply: mult_resp_leEq_lft; simpl; auto with *.
 Qed.
 
 Lemma Abs_Integral_Norm : forall x,
@@ -236,8 +236,8 @@ induction x using StepF_ind.
  auto.
 rewriteStepF.
 intros [Hxl Hxr].
-rsapply plus_resp_nonneg;
- rsapply mult_resp_nonneg; auto with *.
+apply: plus_resp_nonneg;
+ apply: mult_resp_nonneg; simpl; auto with *.
 Qed.
 
 Lemma Integral_resp_le :forall x y, 
@@ -245,10 +245,10 @@ Lemma Integral_resp_le :forall x y,
 Proof.
 intros x y H.
 rewrite Qle_minus_iff.
-rewrite Integral_opp, Integral_plus.
+rewrite Integral_opp Integral_plus.
 apply Integral_resp_nonneg.
 revert H.
-rapply StepF_imp_imp.
+apply StepF_imp_imp.
 unfold StepF_imp.
 rewriteStepF.
 set (g:= QleS 0).
@@ -278,7 +278,7 @@ Qed.
 Lemma L1Norm_nonneg : forall x, (0 <= (L1Norm x))%Q.
 Proof.
 intros x.
-rapply Integral_resp_nonneg.
+apply Integral_resp_nonneg.
 unfold StepQ_le.
 rewriteStepF.
 set (g:=QleS 0).
@@ -287,7 +287,7 @@ cut (StepFfoldProp ((compose g QabsS) ^@> x)).
  tauto.
 apply StepFfoldPropForall_Map.
 intros a.
-rapply Qabs_nonneg.
+apply: Qabs_nonneg.
 Qed.
 
 Lemma L1Norm_Zero : forall s, 
@@ -296,7 +296,7 @@ Proof.
 intros s.
 intros Hs.
 induction s using StepF_ind.
- rapply Qle_antisym.
+ apply: Qle_antisym.
   eapply Qle_trans;[apply Qle_Qabs|assumption].
  rewrite <- (Qopp_involutive x).
  change 0 with (- (- 0))%Q.
@@ -306,7 +306,7 @@ induction s using StepF_ind.
  assumption.
 unfold L1Norm, StepQabs in *.
 rewrite MapGlue in Hs.
-rewrite Integral_glue in Hs.
+rewrite -> Integral_glue in Hs.
 apply glue_StepF_eq.
  apply IHs1.
  unfold L1Norm.
@@ -315,14 +315,14 @@ apply glue_StepF_eq.
  rewrite Qmult_comm.
  apply Qle_trans with (-((1 - o) * IntegralQ (QabsS ^@> s2)))%Q.
   rewrite Qle_minus_iff.
-  rewrite Qle_minus_iff in Hs.
+  rewrite -> Qle_minus_iff in Hs.
   replace RHS with (0 +
       - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by ring.
   assumption.
  change 0 with (-0)%Q.
  apply Qopp_le_compat.
- rsapply mult_resp_nonneg; auto with *.
- rapply L1Norm_nonneg.
+ apply: mult_resp_nonneg; simpl; auto with *.
+ apply: L1Norm_nonneg.
 apply IHs2.
 unfold L1Norm.
 setoid_replace 0 with (0/(1-o)) by (field; auto with *).
@@ -330,14 +330,14 @@ apply Qle_shift_div_l; auto with *.
 rewrite Qmult_comm.
 apply Qle_trans with (-(o * IntegralQ (QabsS ^@> s1)))%Q.
  rewrite Qle_minus_iff.
- rewrite Qle_minus_iff in Hs.
+ rewrite -> Qle_minus_iff in Hs.
  replace RHS with (0 +
      - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by ring.
  assumption.
 change 0 with (-0)%Q.
 apply Qopp_le_compat.
-rsapply mult_resp_nonneg; auto with *.
-rapply L1Norm_nonneg.
+apply: mult_resp_nonneg; simpl; auto with *.
+apply L1Norm_nonneg.
 Qed.
 
 Lemma L1Norm_scale : forall q s, 
@@ -360,7 +360,7 @@ cut (StepFfoldProp (f ^@> s)).
  tauto.
 apply StepFfoldPropForall_Map.
 intros a.
-rapply Qabs_Qmult.
+apply: Qabs_Qmult.
 Qed.
 
 (** L1 ball has all the required properties. *)
@@ -395,18 +395,18 @@ apply Qle_trans with (IntegralQ (StepQabs (x-y) + StepQabs (y-z)))%Q.
  apply Integral_resp_le.
  apply StepQabs_triangle.
 rewrite <- Integral_plus.
-rsapply plus_resp_leEq_both; assumption.
+apply: plus_resp_leEq_both; assumption.
 Qed.
 
 Lemma L1ball_closed : forall e x y, (forall d, (L1Ball (e+d) x y)) -> (L1Ball e x y).
 Proof.
 unfold L1Ball. intros e a b H.
 assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e)%Q.
- intros. rsapply shift_zero_leEq_minus'.
- rsapply inv_cancel_leEq. rsapply approach_zero_weak.
+ intros. apply: shift_zero_leEq_minus'.
+ apply inv_cancel_leEq. apply approach_zero_weak.
  intros. replace LHS with (x[-](e:Q)). 
-  rsapply shift_minus_leEq. replace RHS with (e+e0)%Q by ring. rewrite <- (QposAsmkQpos H1).
-  apply (H0 (mkQpos H1)).
+  apply: shift_minus_leEq;simpl. replace RHS with (e+e0)%Q by ring. rewrite <- (QposAsmkQpos X).
+  apply (H0 (mkQpos X)).
  unfold cg_minus; simpl; ring.
 apply H0. exact H.
 Qed.
@@ -420,14 +420,14 @@ set (z:=constStepF (0:QS)).
 setoid_replace x with (x - y + y) by ring.
 apply StepQplus_wd; try reflexivity.
 unfold z; clear z.
-rapply L1Norm_Zero.
+apply L1Norm_Zero.
 apply Qnot_lt_le.
-intros H0.
-assert (0<(1#2)*( L1Norm (QminusS ^@> x <@> y))).
- rsapply mult_resp_pos; auto with *.
-apply (Qle_not_lt _ _ (H (mkQpos H1))).
+intro H0.
+assert (H1:0<(1#2)*( L1Norm (QminusS ^@> x <@> y))).
+ apply: mult_resp_pos; simpl; auto with *.
+apply: (Qle_not_lt _ _ (H (mkQpos H1))).
 autorewrite with QposElim.
-rewrite Qlt_minus_iff.
+rewrite -> Qlt_minus_iff.
 unfold L1Distance.
 unfold StepQminus.
 ring_simplify.
@@ -444,11 +444,11 @@ Canonical Structure L1S.
 Lemma L1_is_MetricSpace : 
  (is_MetricSpace L1S L1Ball).
 split.
-    rapply L1ball_refl.
-   rapply L1ball_sym.
-  rapply L1ball_triangle.
- rapply L1ball_closed.
-rapply L1ball_eq.
+    apply: L1ball_refl.
+   apply: L1ball_sym.
+  apply: L1ball_triangle.
+ apply: L1ball_closed.
+apply: L1ball_eq.
 Qed.
 (* begin hide *)
 Add Morphism L1Ball with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
@@ -496,7 +496,7 @@ exists (f).
   replace LHS with ((d1*L1Norm (x - y))/d) by
    (field; apply Qpos_nonzero).
   apply Qle_shift_div_r; auto with *.
-  rsapply mult_resp_leEq_lft; auto with *.
+  apply: mult_resp_leEq_lft; simpl; auto with *.
   apply Qle_trans with e; auto with *.
  setoid_replace (x - f) with (constStepF (1:QS)*x - f) by ring.
  rewrite <- X.
@@ -512,7 +512,7 @@ setoid_replace (f -y)
  replace LHS with ((d2*L1Norm (x - y))/d) by
   (field; apply Qpos_nonzero).
  apply Qle_shift_div_r; auto with *.
- rsapply mult_resp_leEq_lft; auto with *.
+ apply: mult_resp_leEq_lft; simpl;auto with *.
  apply Qle_trans with e; auto with *.
 setoid_replace (f- y) with (f - constStepF (1:QS)*y) by ring.
 rewrite <- X.

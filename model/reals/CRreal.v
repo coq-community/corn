@@ -45,7 +45,7 @@ rewrite <- (doubleSpeed_Eq x).
 rewrite <- (doubleSpeed_Eq (doubleSpeed x)).
 rewrite <- (doubleSpeed_Eq y).
 rewrite <- (doubleSpeed_Eq (doubleSpeed y)).
-rapply regFunBall_e.
+apply: regFunBall_e.
 intros d.
 assert (H1':=H1 d).
 assert (H2':=H2 d).
@@ -55,8 +55,8 @@ set (x':=approximate x ((1#2)*((1#2)*d))%Qpos).
 set (y':=approximate y ((1#2)*((1#2)*d))%Qpos).
 change (-d <= x' - y' + - - e) in H1'.
 change (-d <= e + - (x' - y')) in H2'.
-rewrite Qle_minus_iff in *.
-rapply ball_weak.
+rewrite -> Qle_minus_iff in *.
+apply: ball_weak.
 split; simpl; autorewrite with QposElim; rewrite Qle_minus_iff.
 replace RHS with (x' - y' + - - e + - - d) by ring.
 assumption.
@@ -76,7 +76,7 @@ autorewrite with QposElim in H1.
 change (- ((1 # 2) * d + e + (1 # 2) * d)<=x' - y') in H1.
 change (-d <= x' - y' + - - e).
 rewrite Qle_minus_iff.
-rewrite Qle_minus_iff in H1.
+rewrite -> Qle_minus_iff in H1.
 replace RHS with (x' - y' + - - ((1 # 2) * d + e + (1 # 2) * d)) by ring.
 assumption.
 
@@ -84,7 +84,7 @@ autorewrite with QposElim in H2.
 change (x' - y'<=((1 # 2) * d + e + (1 # 2) * d)) in H2.
 change (-d <= e + - (x' - y')).
 rewrite Qle_minus_iff.
-rewrite Qle_minus_iff in H2.
+rewrite -> Qle_minus_iff in H2.
 replace RHS with ((1 # 2) * d + e + (1 # 2) * d + - (x' - y')) by ring.
 assumption.
 Qed.
@@ -113,7 +113,7 @@ abstract (
 intros e1 e2;
 destruct (Hf (inject_Q e1) (CRlt_Qlt _ _ (Qpos_prf e1))) as [n1 Hn1];
 destruct (Hf (inject_Q e2) (CRlt_Qlt _ _ (Qpos_prf e2))) as [n2 Hn2];
-rapply ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball;
+apply: ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball;
 [apply Hn1;apply le_max_l|
  apply Hn2;apply le_max_r]) using Rlim_subproof0.
 Defined.
@@ -142,7 +142,7 @@ change (ball (e1+d+e2) (f m) (f a)).
 destruct (le_ge_dec a m).
 
 rewrite <- CRAbsSmall_ball.
-rapply AbsSmall_leEq_trans;[|apply Ha;assumption].
+apply: AbsSmall_leEq_trans;[|apply Ha;assumption].
 intros x.
 autorewrite with QposElim.
 change (-x <= e1 + d + e2 - e2).
@@ -169,7 +169,7 @@ assert (X:=(CR_b_upperBound (1#1) x)).
 destruct (CR_b (1 # 1) x) as [n d].
 rewrite (anti_convert_pred_convert n) in X.
 exists (nat_of_P n)%nat.
-rapply leEq_transitive.
+apply: leEq_transitive.
 apply X.
 clear X.
 intros z.
@@ -203,7 +203,7 @@ rewrite Qle_minus_iff.
 replace RHS with
  ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by ring.
 rewrite<- Qle_minus_iff.
-rapply Qle_trans;[|apply IHa].
+apply: Qle_trans;[|apply IHa].
 generalize (P_of_succ_nat a).
 intros p.
 rewrite Qle_minus_iff.

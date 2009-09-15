@@ -60,8 +60,7 @@ destruct (H x Hx) as [HG | y [Hy Hxy]] using existsC_ind.
  apply existsC_stable; assumption.
 apply existsWeaken.
 exists y.
-rewrite He in Hxy.
-auto.
+rewrite -> He in Hxy; auto.
 Qed.
 
 Lemma hausdorffBall_wd1 : forall (e0 e1:Qpos) A B,
@@ -204,8 +203,7 @@ Proof.
 intros e0 e1 A B He H x Hx d.
 destruct (H x Hx d) as [y [Hy Hxy]].
 exists y.
-rewrite He in Hxy.
-auto.
+rewrite -> He in Hxy; auto.
 Qed.
 
 Lemma hausdorffBallStrong_wd1 : forall (e0 e1:Qpos) A B,

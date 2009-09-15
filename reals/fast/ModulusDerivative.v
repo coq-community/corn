@@ -94,7 +94,7 @@ clear -I Hlr.
 intros x.
 destruct l as [|l];destruct r as [|r]; try split;
  unfold clamp;
- rapply inj_Q_leEq; simpl;
+ apply: inj_Q_leEq; simpl;
  auto with *.
 assert (Y:=(fun a=> (Hg _ (Derivative_imp_inc _ _ _ _ Hf _ (X a)) (X a)))).
 do 2 rewrite Y.
@@ -142,8 +142,8 @@ apply mult_resp_leEq_both.
  apply ball_clamp.
  auto.
 assert (Z:Zero[<]inj_Q IR (y:Q)).
- (stepl (inj_Q IR (Zero:Q)) by rapply (inj_Q_nring IR 0)); apply inj_Q_less; apply Qpos_prf.
-rapply eq_transitive.
+ (stepl (inj_Q IR (Zero:Q)) by apply (inj_Q_nring IR 0)); apply inj_Q_less; apply Qpos_prf.
+apply: eq_transitive.
  apply mult_wdl.
  apply (inj_Q_div IR e _ (pos_ap_zero _ _ Z)).
 apply div_1.
@@ -207,7 +207,7 @@ assert (Z:~((LI'[<]x or x[<]RI')->False)).
            (compact_compact_in_interval I properI x HI)).
  change (Not (LI'[<]RI')).
  rewrite <- leEq_def.
- rewrite H0, <- H1.
+ rewrite -> H0, <- H1.
  apply leEq_reflexive.
 rewrite leEq_def.
 intros Z0.

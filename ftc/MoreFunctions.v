@@ -1399,7 +1399,7 @@ apply Derivative_wdr with (N_Deriv _ _ (Derivative_n_imp_Diffble_n _ _ _ H0)).
 apply Derivative_n_unique with n F; auto; apply N_Deriv_lemma.
 cut (n = S (pred n)); [ intro | apply S_pred with 0; auto ].
 generalize H0.
-pattern n at 1 3 4 in |- *; rewrite H2.
+rewrite {1 3 4} H2.
 intro; apply N_Deriv_S.
 apply le_imp_Diffble_n with n.
 auto with arith.

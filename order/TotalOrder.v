@@ -52,22 +52,21 @@ Variable f : X -> X.
 Hypothesis Hf : monotone X f.
 
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X)  as monotone_compat.
-rewrite monotone_def in Hf.
-intros.
-rewrite equiv_le_def in *.
+move:Hf;rewrite monotone_def;intros.
+move: H0; do 2 rewrite equiv_le_def.
 firstorder.
 Qed.
 
 (** meet distributes over any monotone function. *)
 Lemma monotone_meet_distr : forall x y : X, f (meet x y) == meet (f x) (f y).
 Proof.
-rewrite monotone_def in Hf.
+move: Hf; rewrite monotone_def. clear Hf. intro Hf.
 assert (forall x y : X, x <= y -> f (meet x y) == meet (f x) (f y)).
 intros x y Hxy.
 assert (Hfxfy:=Hf _ _ Hxy).
-rewrite le_meet_l in Hxy.
+rewrite -> le_meet_l in Hxy.
 rewrite Hxy.
-rewrite le_meet_l in Hfxfy.
+rewrite -> le_meet_l in Hfxfy.
 rewrite Hfxfy.
 reflexivity.
 intros.
@@ -94,9 +93,8 @@ Hypothesis Hf : antitone X f.
 
 (* begin hide *)
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat. 
-rewrite antitone_def in Hf.
-intros.
-rewrite equiv_le_def in *.
+move: Hf; rewrite antitone_def; clear Hf;intros.
+rewrite -> equiv_le_def in *.
 firstorder.
 Qed.
 (* end hide *)
@@ -104,13 +102,13 @@ Qed.
 (* meet transforms into join for antitone functions *)
 Lemma antitone_meet_join_distr : forall x y : X, f (meet x y) == join (f x) (f y).
 Proof.
-rewrite antitone_def in Hf.
+move: Hf;rewrite antitone_def; clear Hf; intro Hf.
 assert (forall x y : X, x <= y -> f (meet x y) == join (f x) (f y)).
 intros x y Hxy.
 assert (Hfxfy:=Hf _ _ Hxy).
-rewrite le_meet_l in Hxy.
+rewrite -> le_meet_l in Hxy.
 rewrite Hxy.
-rewrite le_join_l in Hfxfy.
+rewrite -> le_join_l in Hfxfy.
 rewrite Hfxfy.
 reflexivity.
 intros.

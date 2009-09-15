@@ -192,9 +192,8 @@ We begin by showing that having a higher order derivative implies being differen
 
 Lemma Diffble_I_n_imp_diffble : forall n : nat,
  0 < n -> forall F : PartIR, Diffble_I_n Hab' n F -> Diffble_I Hab' F.
-intros n H F H0.
-rewrite S_pred with n 0 in H0; auto.
-simpl in H0.
+intros n H F.
+rewrite (S_pred n 0);auto. simpl. intro H0. simpl in H0.
 inversion_clear H0; assumption.
 Qed.
 

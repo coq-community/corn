@@ -504,7 +504,7 @@ Lemma resp_leEq_char' : forall (P : R -> CProp) (f : forall x : R, P x -> R) x y
  (x [=] y -> f x Hx [=] f y Hy) -> (x [<] y -> f x Hx [<] f y Hy) ->
  x [<=] y -> f x Hx [<=] f y Hy.
 intros.
-rewrite leEq_def in *.
+rewrite leEq_def.
 intro.
 cut (Not (x [<] y) /\ ~ x [=] y); intros.
 inversion_clear H1.
@@ -740,14 +740,14 @@ Lemma part_mon_imp_mon' : forall F (I : R -> CProp), (forall x, I x -> Dom F x) 
  (forall x y Hx Hy, I x -> I y -> x [<] y -> F x Hx [<] F y Hy) ->
  forall x y Hx Hy, I x -> I y -> x [<=] y -> F x Hx [<=] F y Hy.
 intros.
-rewrite leEq_def in *.
+rewrite leEq_def.
 intro.
 cut (x [=] y); intros.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 astepl (F y Hy); auto.
 apply leEq_imp_eq.
 firstorder using leEq_def.
-rewrite leEq_def in *.
+rewrite leEq_def.
 intro.
 apply (less_irreflexive_unfolded _ (F x Hx)).
 apply less_transitive_unfolded with (F y Hy); firstorder using leEq_def.

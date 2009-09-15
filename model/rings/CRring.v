@@ -39,9 +39,9 @@ simpl in *.
 autorewrite with CRtoCauchy_IR in H.
 assert (X:(CRasCauchy_IR x1[*]CRasCauchy_IR y1)[#](CRasCauchy_IR x2[*]CRasCauchy_IR y2)).
 stepl (CRasCauchy_IR (x1*y1)%CR) by
- apply eq_symmetric; rapply CR_mult_as_Cauchy_IR_mult.
+ apply eq_symmetric; apply CR_mult_as_Cauchy_IR_mult.
 stepr (CRasCauchy_IR (x2*y2)%CR) by
- apply eq_symmetric; rapply CR_mult_as_Cauchy_IR_mult.
+ apply eq_symmetric; apply CR_mult_as_Cauchy_IR_mult.
 apply CR_ap_as_Cauchy_IR_ap_1.
 assumption.
 destruct (bin_op_strext_unfolded _ _ _ _ _ _ X);[left|right];
@@ -57,13 +57,13 @@ intros x y z.
 change (x*(y*z)==(x*y)*z)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (y*z)%CR)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl ((CRasCauchy_IR x)[*]((CRasCauchy_IR y)[*](CRasCauchy_IR z))) by
- apply  bin_op_is_wd_un_op_rht; rapply CR_mult_as_Cauchy_IR_mult.
+ apply  bin_op_is_wd_un_op_rht; apply CR_mult_as_Cauchy_IR_mult.
 stepr ((CRasCauchy_IR (x*y)%CR)[*](CRasCauchy_IR z)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepr (((CRasCauchy_IR x)[*](CRasCauchy_IR y))[*](CRasCauchy_IR z)) by
- rapply bin_op_is_wd_un_op_lft; rapply CR_mult_as_Cauchy_IR_mult.
+ apply bin_op_is_wd_un_op_lft; apply CR_mult_as_Cauchy_IR_mult.
 apply mult_assoc_unfolded.
 Qed.
 
@@ -76,47 +76,47 @@ intros x.
 change (x*(' 1%Q)==x)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (inject_Q 1))) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl ((CRasCauchy_IR x)[*]One) by
- apply bin_op_is_wd_un_op_rht; rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+ apply bin_op_is_wd_un_op_rht; apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 rational.
 intros x.
 change ((inject_Q 1%Q)*x==x)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR (inject_Q 1))[*](CRasCauchy_IR x)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl (One[*](CRasCauchy_IR x)) by
- apply bin_op_is_wd_un_op_lft; rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+ apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 rational.
 
 intros x y.
 change (x*y==y*x)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR y)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepr ((CRasCauchy_IR y)[*](CRasCauchy_IR x)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 rational.
 
 intros x y z.
 change (x*(y+z)==x*y+x*z)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (y+z)%CR)) by
- rapply CR_mult_as_Cauchy_IR_mult.
+ apply CR_mult_as_Cauchy_IR_mult.
 stepl ((CRasCauchy_IR x)[*]((CRasCauchy_IR y)[+](CRasCauchy_IR z))) by
-  apply bin_op_is_wd_un_op_rht; rapply CR_plus_as_Cauchy_IR_plus.
+  apply bin_op_is_wd_un_op_rht; apply CR_plus_as_Cauchy_IR_plus.
 stepr ((CRasCauchy_IR (x*y)%CR)[+](CRasCauchy_IR (x*z)%CR)) by
-  rapply CR_plus_as_Cauchy_IR_plus.
+  apply CR_plus_as_Cauchy_IR_plus.
 stepr (((CRasCauchy_IR x)[*](CRasCauchy_IR y))[+]((CRasCauchy_IR x)[*](CRasCauchy_IR z))).
 apply dist.
-apply cs_bin_op_wd; rapply CR_mult_as_Cauchy_IR_mult.
+apply cs_bin_op_wd; apply CR_mult_as_Cauchy_IR_mult.
 
 change (CRapart (inject_Q 1) (inject_Q 0)).
 apply CR_ap_as_Cauchy_IR_ap_2.
-rapply ap_wd.
+apply: ap_wd.
 apply one_ap_zero.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Qed.
 
 Definition CRasCRing : CRing :=

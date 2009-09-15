@@ -49,19 +49,19 @@ destruct (Qpos_lt_plus X) as [c Hc].
 assert (Y:=(H ((1#2)*c)%Qpos)).
 simpl in Y.
 unfold Cap_raw in Y; simpl in Y.
-rewrite Qle_minus_iff in Y.
-rewrite Hc in Y.
+rewrite -> Qle_minus_iff in Y.
+rewrite -> Hc in Y.
 autorewrite with QposElim in Y.
 ring_simplify in Y.
 elim (Qle_not_lt _ _ Y).
 rewrite Qlt_minus_iff.
 ring_simplify.
-rapply Qpos_prf.
+apply: Qpos_prf.
 
 intros H e.
 simpl.
 unfold Cap_raw; simpl.
-rewrite Qle_minus_iff in H.
+rewrite -> Qle_minus_iff in H.
 apply Qle_trans with (0%Q);[|assumption].
 rewrite Qle_minus_iff; ring_simplify.
 apply Qpos_nonneg.
@@ -69,14 +69,14 @@ Qed.
 
 Lemma CRplus_Qplus : forall (x y:Q), inject_Q x + inject_Q y == inject_Q (x + y)%Q.
 Proof.
-intros x y e1 e2; rapply ball_refl.
+intros x y e1 e2; apply ball_refl.
 Qed.
 
 Hint Rewrite <- CRplus_Qplus : toCRring.
 
 Lemma CRopp_Qopp : forall (x:Q), - inject_Q x == inject_Q (- x)%Q.
 Proof.
-intros x e1 e2; rapply ball_refl.
+intros x e1 e2; apply ball_refl.
 Qed.
 (* begin hide *)
 Hint Rewrite CRopp_Qopp : CRfast_compute.
@@ -84,7 +84,7 @@ Hint Rewrite <- CRopp_Qopp : toCRring.
 (* end hide *)
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q x - inject_Q y == inject_Q (x - y)%Q.
 Proof.
-intros x y e1 e2; rapply ball_refl.
+intros x y e1 e2; apply ball_refl.
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRminus_Qminus : toCRring.
@@ -93,7 +93,7 @@ Lemma CRmult_Qmult : forall (x y:Q), inject_Q x * inject_Q y == inject_Q (x * y)
 Proof.
 intros x y.
 rewrite CRmult_scale.
-intros e1 e2; rapply ball_refl.
+intros e1 e2; apply ball_refl.
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRmult_Qmult : toCRring.
@@ -115,16 +115,16 @@ Proof.
 intros x [[c x_]|[c x_]];
 [change (' c <= ' 0%Q + - ' x)%CR in x_|change (' c <= ' x + - ' 0%Q)%CR in x_];
 unfold CRinv;
-rewrite CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_;
+rewrite -> CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_;
 try rewrite CRopp_Qopp;
 rewrite (@CRinv_pos_Qinv c).
    rewrite CRopp_Qopp.
    rewrite CReq_Qeq.
    assert (~x==0)%Q.
     intros H.
-    rewrite H in x_.
+    rewrite -> H in x_.
     apply (Qle_not_lt _ _ x_).
-    rapply Qpos_prf.
+    apply Qpos_prf.
    field.
    intros X; apply H.
    replace LHS with (- - x)%Q by ring.
@@ -148,36 +148,36 @@ Lemma CR_ring_theory :
  (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
 Proof.
 split.
-rapply cm_lft_unit_unfolded.
-rapply cag_commutes_unfolded.
-rapply plus_assoc_unfolded.
-rapply one_mult.
-rapply mult_commut_unfolded.
-rapply mult_assoc_unfolded.
-intros x y z;generalize z x y;rapply ring_distl_unfolded.
+apply: cm_lft_unit_unfolded.
+apply: cag_commutes_unfolded.
+apply: plus_assoc_unfolded.
+apply: one_mult.
+apply: mult_commut_unfolded.
+apply: mult_assoc_unfolded.
+intros x y z;generalize z x y;apply: ring_distl_unfolded.
 reflexivity.
-rapply cg_minus_correct.
+apply: cg_minus_correct.
 Qed.
 
 Lemma inject_Q_strext : fun_strext inject_Q.
 Proof.
 intros x y [Hxy|Hxy].
- rapply Qlt_not_eq.
+ apply: Qlt_not_eq.
  apply Qnot_le_lt.
  intros H.
  absurd ('y[<=]'x).
   rewrite leEq_def.
   auto with *.
- rewrite CRle_Qle.
+ rewrite -> CRle_Qle.
  auto.
 apply ap_symmetric.
-rapply Qlt_not_eq.
+apply: Qlt_not_eq.
 apply Qnot_le_lt.
 intros H.
 absurd ('x[<=]'y).
  rewrite leEq_def.
  auto with *.
-rewrite CRle_Qle.
+rewrite -> CRle_Qle.
 auto.
 Qed.
 
@@ -186,7 +186,7 @@ Definition inject_Q_csf := Build_CSetoid_fun _ _ _ inject_Q_strext.
 Lemma inject_Q_hom : RingHom Q_as_CRing CRasCRing.
 Proof.
 exists (inject_Q_csf).
-  rapply CRplus_Qplus.
+  apply: CRplus_Qplus.
  intros x y.
  apply eq_symmetric.
  apply CRmult_Qmult.
@@ -220,9 +220,9 @@ Ltac CRring_pre := autorewrite with toCRring.
 Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@st_eq CR).
 Proof.
 split.
-rapply ucFun2_wd.
-rapply CRmult_wd.
-rapply uc_wd.
+apply ucFun2_wd.
+apply CRmult_wd.
+apply uc_wd.
 Qed.
 
 Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@st_isSetoid (@msp_is_setoid CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
@@ -249,7 +249,7 @@ cut (x <= '0)%CR.
  rewrite <- (Qopp_involutive e).
  rewrite <- (Qopp_involutive (approximate x e)).
  apply Qopp_le_compat.
- rapply H.
+ apply H.
 apply CRle_trans with (' - c)%CR; auto with *.
 rewrite CRle_Qle; auto with *.
 Qed.

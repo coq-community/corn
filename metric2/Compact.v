@@ -101,12 +101,12 @@ induction l; intros He H.
  apply H.
 destruct H as [G | H | H] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
  eapply ball_weak_le.
   apply He.
  assumption.
-rapply orWeaken.
+apply orWeaken.
 right.
 apply IHl; assumption.
 Qed.
@@ -156,14 +156,14 @@ intros H e.
 move H after e.
 destruct H as [ G | H | H] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
  rewrite H.
  apply ball_refl.
 rewrite <- IHl in H.
-rapply orWeaken.
+apply orWeaken.
 right.
-rapply H.
+apply H.
 Qed.
 
 Lemma almostIn_closed : forall e x l, (forall d, almostIn (e+d) x l) -> almostIn e x l.
@@ -193,7 +193,7 @@ destruct (Qlt_le_dec d0 d).
  apply (@almostIn_weak_le (e + d0)%Qpos).
   autorewrite with QposElim.
   apply Qlt_le_weak.
-  rewrite Qlt_minus_iff in *.
+  rewrite -> Qlt_minus_iff in *.
   replace RHS with (d + - d0) by ring.
   assumption.
  apply almostIn_stable.
@@ -206,7 +206,7 @@ split.
  apply Hd0.
  apply (@ball_weak_le X (e + d)%Qpos).
   autorewrite with QposElim.
-  rewrite Qle_minus_iff in *.
+  rewrite -> Qle_minus_iff in *.
   replace RHS with (d0 + - d) by ring.
   assumption.
  assumption.
@@ -220,14 +220,14 @@ induction l; intros H1 H2.
  apply H2.
 destruct H2 as [G | H2 | H2] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
  eapply ball_triangle.
   apply H1.
  apply H2.
-rapply orWeaken.
+apply orWeaken.
 right.
-rapply IHl; assumption.
+apply IHl; assumption.
 Qed.
 
 Lemma almostIn_triangle_r : forall e1 e2 x l1 l2, almostIn e1 x l1 -> (ball e2 l1 l2) -> almostIn (e1 + e2) x l2.
@@ -240,7 +240,7 @@ unfold hemiMetric in *.
 destruct H1 as [G | H1 | H1] using orC_ind.
   auto using almostIn_stable.
  assert (Z:InFinEnumC a (a :: l1)).
-  rapply orWeaken.
+  apply orWeaken.
   left; reflexivity.
  destruct (H2 a Z) as [ G | z [Hz0 Hz1]] using existsC_ind.
   auto using almostIn_stable.
@@ -255,7 +255,7 @@ apply IHl1.
  assumption.
 intros y Hy.
 apply H2.
-rapply orWeaken.
+apply orWeaken.
 right; assumption.
 Qed.
 
@@ -277,26 +277,26 @@ split.
   apply existsWeaken.
   exists a.
   split; auto.
-  rapply orWeaken.
+  apply orWeaken.
   left; reflexivity.
- rewrite IHs in H.
+ rewrite -> IHs in H.
  destruct H as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists y.
  split; auto.
- rapply orWeaken.
+ apply orWeaken.
  right; auto.
 intros H.
 destruct H as [G | y [Hy0 Hy1]] using existsC_ind.
  auto using almostIn_stable.
 destruct Hy1 as [G | Hy1 | Hy1] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
  rewrite <- Hy1.
  auto.
-rapply orWeaken.
+apply orWeaken.
 right.
 change (almostIn e x s).
 rewrite IHs.
@@ -321,11 +321,11 @@ assert (Y:forall x1 x2 : Qpos,
  intros H.
  destruct H as [G | H | H] using orC_ind.
    auto using almostIn_stable.
-  rapply orWeaken.
+  apply orWeaken.
   left.
   rewrite <- Hx, <- Hy.
   assumption.
- rapply orWeaken.
+ apply orWeaken.
  right.
  apply IHz; assumption.
 intros x1 x2 Hx y1 y2 Hy.
@@ -366,23 +366,23 @@ destruct H as [G | H | H] using orC_ind.
   auto using almostIn_stable.
  assert (Z:InFinEnumC a z2).
   apply Hz.
-  rapply orWeaken.
+  apply orWeaken.
   left; reflexivity.
- rewrite Hx, Hy in H.
+ rewrite -> Hx, Hy in H.
  clear - H Z. 
  induction z2.
   apply Z.
  destruct Z as [G | Z | Z] using orC_ind.
    auto using almostIn_stable.
-  rewrite Z in H.
-  rapply orWeaken.
+  rewrite -> Z in H.
+  apply orWeaken.
   left; assumption.
- rapply orWeaken.
+ apply orWeaken.
  right; apply IHz2; auto.
 apply IHz1.
  intros b Hb.
  apply Hz.
- rapply orWeaken.
+ apply orWeaken.
  right; assumption.
 assumption.
 Qed.
@@ -459,7 +459,7 @@ exists (Cjoin a).
  rewrite Qle_minus_iff;
  ring_simplify;
  auto with *).
-rapply CunitCjoin.
+apply CunitCjoin.
 Defined.
 
 Section CompactTotallyBounded.
@@ -554,7 +554,7 @@ k < 1 ->
 0 < (d*(1-k^(S n))/(1-k)).
 Proof.
 intros n k d Hk.
-repeat rsapply mult_resp_pos; auto with *.
+repeat (apply: mult_resp_pos; simpl); auto with *.
  unfold Qminus.
  rewrite <- Qlt_minus_iff.
  induction n.
@@ -563,7 +563,7 @@ repeat rsapply mult_resp_pos; auto with *.
  rewrite Pplus_one_succ_l.
  rewrite Qpower_plus_positive.
  apply Qlt_trans with (k*1).
-  rsapply mult_resp_less_lft; auto with *.
+  apply: mult_resp_less_lft;simpl; auto with *.
  ring_simplify.
  assumption.
 apply Qlt_shift_inv_l.
@@ -580,7 +580,7 @@ Lemma CompactTotallyBoundedStreamCauchy1 : forall n s (k d1 d2:Qpos) pt Hpt
 Proof.
 induction n;
  intros s k d1 d2 pt Hpt Hd Hk.
- rapply ball_refl.
+ apply ball_refl.
 unfold Str_nth.
 set (e:=(((1#1) + k) * d1 + d2)%Qpos * (1 - k ^ S (S n)) / (1 - k)) in *.
 set (e':=(mkQpos Hd)).
@@ -594,7 +594,7 @@ setoid_replace e' with e0.
  unfold e0.
  apply ball_triangle with pt'.
   assumption.
- rapply IHn; assumption.
+ apply IHn; assumption.
 unfold e', e0, e.
 unfold QposEq.
 autorewrite with QposElim.
@@ -699,7 +699,7 @@ rewrite <- Qmult_assoc.
 rewrite Qmult_comm.
 rewrite <- Qmult_assoc.
 rewrite Qmult_comm.
-rapply Qle_shift_div_r.
+apply Qle_shift_div_r.
  induction (let (n, d) := a * / e * / b in
    match Zsucc (n / d) with
    | Z0 => 0%nat
@@ -711,14 +711,14 @@ rapply Qle_shift_div_r.
  rewrite inj_plus.
  rewrite Qpower_plus;[|discriminate].
  change 0 with (4*0).
- rsapply mult_resp_less_lft; auto.
+ apply: mult_resp_less_lft; auto.
  constructor.
 assert (He:~e==0).
  apply Qpos_nonzero.
 set (z:=a * / e * / b).
 rewrite <- (Qinv_involutive e).
 rewrite (Qmult_comm (/ /e)).
-rapply Qle_shift_div_l.
+apply Qle_shift_div_l.
  auto with *.
 replace LHS with z by (unfold z;ring).
 assert (Hz:0 < z).
@@ -736,7 +736,7 @@ destruct z as [[|n|n] d].
   ring_simplify.
   rewrite Zmult_comm.
   replace LHS with (d * (n / d) + n mod d)%Z
-   by (rapply Z_div_mod_eq; auto with *).
+   by (apply Z_div_mod_eq; auto with *).
   apply Zplus_le_compat_l.
   destruct (Z_mod_lt n d); auto with *.
  generalize (Zsucc (n/d)).
@@ -863,7 +863,7 @@ unfold Qdiv.
 set (C:=(((1 + (1 # 4)) * d1 + d2) * (1 # 4) ^ A * / (1 - (1 # 4)))).
 replace LHS with ((1 - (1 # 4) ^ S (B - A)) * C) by (unfold C; ring).
 apply Qle_trans with (1*C).
- rsapply mult_resp_leEq_rht.
+ apply: mult_resp_leEq_rht;simpl.
   rewrite Qle_minus_iff.
   ring_simplify.
   apply Qpower_pos_positive.
@@ -875,7 +875,7 @@ apply Qle_trans with (1*C).
  discriminate.
 ring_simplify.
 apply Qle_trans with e1.
- rapply CompactTotallyBoundedIndexLemma.
+ apply CompactTotallyBoundedIndexLemma.
 Qauto_le.
 Qed.  
 
@@ -926,12 +926,12 @@ eapply ball_weak_le;
  [|apply (CompactTotallyBoundedStreamCauchy1 (CompactTotallyBoundedIndex e2 d1 d2) s pt Hpt Z0);constructor].
 autorewrite with QposElim.
 apply Qle_trans with (((1 + (1 # 4)) * d1 + d2) / (1 - (1 # 4))).
- rsapply mult_resp_leEq_rht; try discriminate.
+ apply: mult_resp_leEq_rht; try discriminate.
  replace RHS with (((1 + (1 # 4)) * d1 + d2)*1) by ring.
- rsapply mult_resp_leEq_lft;[|Qauto_pos].
+ apply mult_resp_leEq_lft;simpl;[|Qauto_pos].
  rewrite Qle_minus_iff.
  ring_simplify.
- rapply (Qpower_pos (1#4) (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2))).
+ apply (Qpower_pos (1#4) (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2))).
  discriminate.
 rewrite Qle_minus_iff.
 unfold Qdiv.
@@ -950,13 +950,13 @@ induction (approximate s ((1 # 5) * e)%Qpos).
  intros _.
  exact nil.
 intros H.
-rapply cons.
+apply cons.
  apply H with a.
  apply InFinEnumC_weaken; auto with *.
 apply IHs0.
 intros pt Hpt.
 apply H with pt.
-rapply orWeaken;right;assumption.
+apply orWeaken;right;assumption.
 Defined.
 
 Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
@@ -976,7 +976,7 @@ split;
   apply existsWeaken.
   exists (H a (InFinEnumC_weaken X a (a :: s0) (in_eq a s0))).
   split.
-   rapply orWeaken.
+   apply: orWeaken.
    left.
    reflexivity.
   rewrite Hx.
@@ -987,21 +987,21 @@ split;
     ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
       (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.
-  rapply L.
+  apply L.
  destruct (IHs0 H' L') as [A _].
  destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists y.
  split; auto.
- rapply orWeaken.
+ apply: orWeaken.
  right; assumption.
 destruct Hx as [G | Hx | Hx] using orC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists (Cunit a).
  split.
-  rapply orWeaken.
+  apply: orWeaken.
   left.
   reflexivity.
  rewrite Hx.
@@ -1013,14 +1013,14 @@ assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))
      (Cunit pt) (H' pt Hpt)).
  intros pt Hpt.
- rapply L.
+ apply L.
 destruct (IHs0 H' L') as [_ A].
 destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
  auto using existsC_stable.
 apply existsWeaken.
 exists y.
 split; auto.
-rapply orWeaken.
+apply: orWeaken.
 right; assumption.
 Qed.
 
@@ -1040,7 +1040,7 @@ intros F L [H|H].
  apply L.
 eapply (IHl);[|apply H].
 intros pt Hpt.
-rapply L.
+apply L.
 Qed.
 
 Lemma CompactTotallyBoundedB : forall s e x, (inCompact x s) -> exists y, In y (CompactTotalBound s e) /\ ball e x y.
@@ -1078,7 +1078,7 @@ cut (forall pt Hpt, ball ((3#5)*e) (Cunit pt) (CompactTotallyBounded_fun s ((1#5
  edestruct (fun F HF => IHl F HF H) as [y' [Hy'0 Hy'1]];
   [|exists y';split;[right;apply Hy'0|assumption]].
  intros pt Hpt.
- rapply HF.
+ apply: HF.
 intros pt Hpt.
 setoid_replace ((3#5)*e)%Qpos with ((5#3)*((1#5)*e) + (4#3)*((1#5)*e))%Qpos by QposRing.
 apply CompactTotallyBoundedNotFar.
@@ -1143,10 +1143,10 @@ hemiMetric X (e1 + e2)
       map (fun x : RegularFunction X => approximate x ((1 # 2) * e2)%Qpos) l))).
  intros Z P [HP0 HP HP1] e1 e2.
  split.
-  rapply Z.
+  apply Z.
  apply (hemiMetric_wd1 X (e2+e1)%Qpos).
   QposRing.
- rapply Z.
+ apply Z.
 intros P [HP0 HP HP1] e1 e2 x Hx.
 simpl in *.
 destruct (HP ((1 # 2) * e1)%Qpos) as [l Hl0 Hl1].
@@ -1179,10 +1179,10 @@ split.
   elim Hy0.
  destruct Hy0 as [Hy0 | Hy0].
   rewrite Hy0.
-  rapply orWeaken.
+  apply: orWeaken.
   left.
   reflexivity.
- rapply orWeaken.
+ apply: orWeaken.
  right.
  apply IHr; auto.
 setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + (1#2)*e2 + (1#2)*e2 + (1#2)*e1)%Qpos
@@ -1193,7 +1193,7 @@ repeat eapply ball_triangle.
   apply Hz1.
  change (ball ((1 # 2) * e2) z y) in Hy1.
  apply Hy1.
-rapply ball_approx_r.
+apply ball_approx_r.
 Qed.
 
 (** Hence Bishop compact sets are compact in our sense. *)
@@ -1224,7 +1224,7 @@ induction l.
  contradiction.
 destruct Hy0 as [Hy0|Hy0].
  rewrite Hy0.
- rapply orWeaken.
+ apply: orWeaken.
  left.
  rewrite <- ball_Cunit.
  setoid_replace (e1+e2)%Qpos with (e1 + ((1 # 2) * e2 + (1 # 2) * e2))%Qpos by QposRing.
@@ -1233,7 +1233,7 @@ destruct Hy0 as [Hy0|Hy0].
  apply ball_triangle with y.
   assumption.
  apply ball_approx_r.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHl.
 auto with *.
@@ -1299,16 +1299,16 @@ assert (Hf1 : forall (e:Qpos), P (approximate f' e)).
  destruct (A e).
  tauto.
 destruct (HP1 f') as [y Hy].
- intros [e|]; rapply Hf1.
+ intros [e|]; apply: Hf1.
 unfold ExtSubset in HP3.
 rewrite (HP3 x y); auto.
 rewrite <- Cunit_eq.
-rewrite s.
+rewrite -> s.
 intros e1 e2.
 apply ball_sym.
 setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
 apply ball_weak.
-rapply Hf0.
+apply Hf0.
 Qed.
 
 Lemma BishopCompact_Compact_BishopCompact :
@@ -1328,7 +1328,7 @@ intros s e1 e2.
 setoid_replace (e1 + e2)%Qpos with (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2)%Qpos by QposRing.
 apply ball_weak.
 apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
- rapply regFun_prf.
+ apply regFun_prf.
 clear e1.
 rewrite (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
 apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
@@ -1336,7 +1336,7 @@ apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
 simpl.
 change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete_stable stableX))).
 induction (CompactTotalBound locatedX s ((1 # 2) * e2)).
- rapply ball_refl.
+ apply ball_refl.
 destruct IHl as [IHlA IHlB].
 split; intros x Hx;
  (destruct Hx as [G | Hx | Hx] using orC_ind;
@@ -1345,7 +1345,7 @@ split; intros x Hx;
   |]).
    exists (Cunit (approximate a ((1 # 2) * e2)%Qpos)).
    split.
-    rapply orWeaken.
+    apply: orWeaken.
     left; reflexivity.
    rewrite Hx.
    apply ball_approx_r.
@@ -1354,21 +1354,21 @@ split; intros x Hx;
   apply existsWeaken.
   exists y.
   split; auto.
-  rapply orWeaken.
+  apply: orWeaken.
   right.
   assumption.
  exists a.
  split.
-  rapply orWeaken.
+  apply orWeaken.
   left; reflexivity.
  rewrite Hx.
- rapply ball_approx_l.
+ apply: ball_approx_l.
 destruct (IHlB x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
  auto using existsC_stable.
 apply existsWeaken.
 exists y.
 split; auto.
-rapply orWeaken.
+apply orWeaken.
 right.
 assumption.
 Qed.
@@ -1413,7 +1413,7 @@ destruct Hb as [G | Hb | Hb] using orC_ind.
  apply existsWeaken.
  exists (approximate a e2).
  split.
-  rapply orWeaken.
+  apply: orWeaken.
   left; reflexivity.
  rewrite Hb.
  apply regFun_prf.
@@ -1422,7 +1422,7 @@ destruct (IHx b Hb) as [G | y [Hy0 Hy1]] using existsC_ind.
 apply existsWeaken.
 exists y.
 split; auto.
-rapply orWeaken.
+apply: orWeaken.
 right; auto.
 Qed.
 
@@ -1454,13 +1454,13 @@ assert (existsC (Complete X) (fun d => InFinEnumC d a /\ st_eq c (approximate d 
   apply existsWeaken.
   exists a.
   split; auto.
-  rapply orWeaken; left; reflexivity.
+  apply orWeaken; left; reflexivity.
  destruct (IHa Hc) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists y.
  split; auto.
- rapply orWeaken; right; auto.
+ apply orWeaken; right; auto.
 destruct H as [ G | d [Hd0 Hd1]] using existsC_ind.
  auto using existsC_stable.
 destruct (Hab d Hd0) as [ G | z [Hz0 Hz1]] using existsC_ind.
@@ -1473,9 +1473,9 @@ destruct Hz0  as [ G | Hz0 | Hz0] using orC_ind.
  apply existsWeaken.
  exists (approximate a d2).
  split.
-  rapply orWeaken.
+  apply: orWeaken.
   left; reflexivity.
- rewrite Hz0 in Hz1.
+ rewrite -> Hz0 in Hz1.
  rewrite Hd1.
  apply Hz1.
 destruct (IHb Hz0) as [G | y [Hy0 Hy1]] using existsC_ind.
@@ -1483,7 +1483,7 @@ destruct (IHb Hz0) as [G | y [Hy0 Hy1]] using existsC_ind.
 apply existsWeaken.
 exists y.
 split; auto.
-rapply orWeaken; right; auto.
+apply: orWeaken; right; auto.
 Qed.
 
 Open Local Scope uc_scope.
@@ -1503,9 +1503,9 @@ split.
  move H after IHs.
  destruct H as [G | H | H] using orC_ind.
    auto using almostIn_stable.
-  rapply orWeaken.
+  apply: orWeaken.
   left; auto.
- rapply orWeaken.
+ apply: orWeaken.
  right.
  apply IHs; auto.
 intros H.
@@ -1531,7 +1531,7 @@ assert (L:
 destruct (infinitePidgeonHolePrinicple _ _ _ L) as [G | c [_ Hc]] using existsC_ind.
  auto using InFinEnumC_stable.
 destruct c.
- rapply orWeaken.
+ apply orWeaken.
  left.
  unfold P in Hc.
  apply ball_eq.
@@ -1557,13 +1557,13 @@ destruct c.
   rewrite (anti_convert_pred_convert ed).
   do 2 rewrite <- POS_anti_convert.
   do 2 rewrite inj_S.
-  rewrite inj_le_iff in Hm0.
+  rewrite -> inj_le_iff in Hm0.
   auto with *.
  eapply ball_triangle;[|apply ball_approx_l].
  eapply ball_triangle;[apply ball_approx_r|].
  rewrite ball_Cunit.
  apply Hm1.
-rapply orWeaken.
+apply orWeaken.
 right.
 apply IHs.
 unfold P in Hc.
@@ -1595,7 +1595,7 @@ apply almostIn_weak_le with ((e1 + m') + (m' + m') + (m' + e2))%Qpos.
  rewrite (anti_convert_pred_convert dd).
  do 2 rewrite <- POS_anti_convert.
  do 2 rewrite inj_S.
- rewrite inj_le_iff in Hm0.
+ rewrite -> inj_le_iff in Hm0.
  auto with *.
 eapply almostIn_triangle_r;[|apply regFun_prf].
 eapply almostIn_triangle_l;[apply regFun_prf|].
@@ -1622,7 +1622,7 @@ Proof.
 intros e a b H d1 d2.
 simpl in *.
 apply FinCompact_uc.
-rapply H.
+apply H.
 Qed.
 
 Definition CompactCompleteCompact : Compact stableCX --> Compact stableX :=
@@ -1638,10 +1638,10 @@ split.
  unfold Cjoin_raw.
  simpl.
  assert (Z:=(H ((1#2)*e1) ((1#2)*e2))%Qpos).
- rewrite almostInExistsC in Z.
+ rewrite -> almostInExistsC in Z.
  destruct Z as [G | z [Hz0 Hz1]] using existsC_ind.
   auto using almostIn_stable.
- rewrite FinCompact_correct in Hz1.
+ rewrite -> FinCompact_correct in Hz1.
  apply almostIn_closed.
  intros d.
  assert (Z0:=(Hz0  ((1#2)*e1) ((1#2)*d))%Qpos).
@@ -1666,7 +1666,7 @@ eapply almostIn_triangle_r;[|apply regFun_prf].
 assert (Z:= (H d' d')).
 simpl in Z.
 unfold Cjoin_raw in Z.
-rewrite almostInExistsC in Z.
+rewrite -> almostInExistsC in Z.
 simpl in Z.
 destruct Z as [G | z [Hz0 Hz1]] using existsC_ind.
  auto using almostIn_stable.
@@ -1681,11 +1681,11 @@ induction ((approximate s ((1 # 2) * d')%Qpos)).
  auto.
 destruct Hz1 as [G | Hz1 | Hz1] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
  rewrite Hz1.
  apply ball_approx_l.
-rapply orWeaken.
+apply orWeaken.
 right.
 apply IHs0; auto.
 Qed.
@@ -1718,13 +1718,13 @@ induction b.
  contradiction.
 destruct Hab as [G | Hab | Hab] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply: orWeaken.
  left.
  apply uc_prf.
  eapply ball_ex_weak_le.
   apply Hd.
  assumption.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHb.
 auto.
@@ -1738,13 +1738,13 @@ induction b.
  contradiction.
 destruct Hab as [G | Hab | Hab] using orC_ind.
   auto using almostIn_stable.
- rapply orWeaken.
+ apply: orWeaken.
  left.
  apply (mu_sum plX e2 (e1::nil) f).
  eapply ball_ex_weak_le.
   apply Hd.
  assumption.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHb.
 auto.
@@ -1770,14 +1770,14 @@ simpl.
 unfold FinEnum_map_modulus.
 case_eq (mu f ((1#4)*d1)).
  intros d Hd.
- rapply almostIn_map2;[|apply H].
+ apply: almostIn_map2;[|apply H].
  rewrite Hd.
- rapply Qle_refl.
+ apply: Qle_refl.
 intros H0.
 assert (Z:=H z z).
 destruct (approximate s z).
  contradiction.
-rapply orWeaken.
+apply: orWeaken.
 left.
 set (d:=((1 # 4) * d1)%Qpos).
 apply (mu_sum plX d (d::nil) f).
@@ -1821,8 +1821,7 @@ intros x s H.
 change (inCompact (Cjoin (Cmap_fun plX f x))
      (CompactCompleteCompact stableY _ (CompactImage z (Complete_stable stableY) plFEX f s))).
 rewrite <- CompactCompleteCompact_correct.
-rapply CompactImage_correct1.
-assumption.
+apply: CompactImage_correct1;assumption.
 Qed.
 
 (*

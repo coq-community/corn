@@ -192,7 +192,7 @@ Let Q := Dom F'.
 Lemma part_function_plus_strext : forall x y (Hx : Conj P Q x) (Hy : Conj P Q y),
  F x (Prj1 Hx) [+]F' x (Prj2 Hx) [#] F y (Prj1 Hy) [+]F' y (Prj2 Hy) -> x [#] y.
 intros x y Hx Hy H.
-elim (bin_op_strext_unfolded _ _ _ _ _ _ H); intro H1;
+elim: (cs_bin_op_strext  _ _ _ _ _ _  H); intro H1;
  exact (pfstrx _ _ _ _ _ _ H1).
 Qed.
 

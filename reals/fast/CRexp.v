@@ -75,7 +75,7 @@ Hypothesis Ha: 0 <= a <= 1.
 
 Lemma expSequence_dnn : DecreasingNonNegative expSequence.
 Proof.
-rapply mult_Streams_dnn.
+apply mult_Streams_dnn.
 apply recip_factorials_dnn.
 apply powers_dnn.
 assumption.
@@ -83,7 +83,7 @@ Qed.
 
 Lemma expSequence_zl : Limit expSequence 0.
 Proof.
-rapply mult_Streams_zl.
+apply: mult_Streams_zl.
 apply recip_factorials_zl.
 apply powers_nbz.
 assumption.
@@ -96,7 +96,7 @@ Lemma exp_ps_correct : forall a (n:nat) H,
 Proof.
 intros a n H.
 stepr (inj_Q IR ((1 # P_of_succ_nat (pred (fac n))) * a ^ n)%Q).
-rsapply inj_Q_wd.
+apply inj_Q_wd;simpl.
 rewrite Str_nth_expSequence.
 setoid_replace (a^n)%Q with ((-(1))^n*(-a)^n)%Q.
 ring.
@@ -154,7 +154,7 @@ cut (0 < fac n)%nat;[auto with *|apply (nat_fac_gtzero n)].
 
 stepl ((One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]inj_Q IR a[*]
  inj_Q IR ((1 # P_of_succ_nat (pred (fac n))) * a ^ n)%Q);
- [rapply mult_wdr; apply IHn|].
+ [apply mult_wdr; apply IHn|].
 apply eq_symmetric.
 eapply eq_transitive;[apply inj_Q_mult|].
 eapply eq_transitive;[apply mult_wdl;apply inj_Q_mult|].
@@ -185,7 +185,7 @@ eapply eq_transitive;[apply inj_Q_div|].
 instantiate (1:=B).
 apply div_wd.
 rstepr (Zero[+]One:IR).
-rapply (inj_Q_nring IR 1).
+apply (inj_Q_nring IR 1).
 assumption.
 Qed.
 
@@ -210,7 +210,7 @@ Lemma rational_exp_small_neg_correct : forall (a:Q) Ha,
 Proof.
 intros a Ha.
 unfold rational_exp_small_neg.
-rapply InfiniteAlternatingSum_correct.
+apply: InfiniteAlternatingSum_correct.
 intros n.
 clear Ha.
 apply exp_ps_correct.
@@ -230,10 +230,10 @@ split.
  rewrite <- Qpower_plus;[|discriminate].
  replace RHS with a by (field; discriminate).
  change (- (2 ^ Zsucc n)%Z <= a) in H0.
- rewrite Zpower_Qpower in H0.
+ rewrite ->  Zpower_Qpower in H0.
   assumption.
  auto with *.
-rsapply (fun a b => mult_cancel_leEq _ a b (2:Q)).
+apply: (fun a b => mult_cancel_leEq _ a b (2:Q));simpl.
  constructor.
 replace LHS with a by (field; discriminate).
 replace RHS with 0 by ring.
@@ -342,7 +342,7 @@ Lemma rational_exp_neg_correct : forall (a:Q) Ha,
  (@rational_exp_neg a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
 intros a Ha.
-rapply rational_exp_neg_bounded_correct.
+apply rational_exp_neg_bounded_correct.
 Qed.
 (** exp(x) is bounded below by (3^x) for x nonpositive, and hence
 exp(x) is positive. *)
@@ -362,7 +362,7 @@ CR_solve_pos (1#1)%Qpos.
 do 2 rewrite (rational_exp_small_neg_correct).
 rewrite <- IR_leEq_as_CR.
 apply Exp_resp_leEq.
-rsapply inj_Q_leEq.
+apply inj_Q_leEq.
 destruct p; assumption.
 Qed.
 
@@ -398,14 +398,14 @@ stepr (inj_Q IR (a/(S n))).
    rewrite Qle_minus_iff.
    replace RHS with ((a + S n)*(1/(S n))) by (field;discriminate).
    replace LHS with (0*(1/(S n))) by ring.
-   rsapply mult_resp_leEq_rht.
+   apply: mult_resp_leEq_rht;simpl.
     replace RHS with (a + - (- (P_of_succ_nat n))) by ring.
     rewrite <- Qle_minus_iff.
     assumption.
    rewrite <- (Qmake_Qdiv 1 (P_of_succ_nat n)).
    discriminate.
   replace RHS with (0*(1/(S n))) by ring.
-  rsapply mult_resp_leEq_rht.
+  apply: mult_resp_leEq_rht;simpl.
    assumption.
   rewrite <- (Qmake_Qdiv 1 (P_of_succ_nat n)).
   discriminate.
@@ -578,7 +578,7 @@ intros [|z|z]; simpl; intros x Hx;
    stepl (inj_Q IR (3^z)).
     apply inj_Q_wd.
     apply eq_symmetric.
-    rapply Q_Qpos_power.
+    apply Q_Qpos_power.
    rewrite <- convert_is_POS.
    apply inj_Q_power.
   apply nexp_wd.
@@ -619,7 +619,7 @@ stepl (Half[!]nring (nat_of_P z)[//]pos_half IR).
   stepl (inj_Q IR ((1#2)^z)).
    apply inj_Q_wd.
    apply eq_symmetric.
-   rapply Q_Qpos_power.
+   apply Q_Qpos_power.
   rewrite <- (convert_is_POS z).
   apply inj_Q_power.
  apply nexp_wd.
@@ -631,10 +631,10 @@ stepl (Half[!]nring (nat_of_P z)[//]pos_half IR).
   stepl (inj_Q IR (1/2)).
    apply inj_Q_div.
   apply inj_Q_wd.
-  apply eq_symmetric; rapply Qmake_Qdiv.
- rapply div_wd.
+  apply eq_symmetric; apply Qmake_Qdiv.
+ apply div_wd.
   rstepr (nring 1:IR).
-  rapply (inj_Q_nring IR 1).
+  apply (inj_Q_nring IR 1).
  apply (inj_Q_nring IR 2).
 apply power_wd.
  apply eq_reflexive.
@@ -654,9 +654,9 @@ assert (Z:Derivative (closer (inj_Q IR (z:Q))) CI Expon Expon).
  Included.
 apply (is_UniformlyContinuousD None (Some (z:Q)) I _ _ Z).
  intros q [] H.
- rapply rational_exp_correct.
+ apply rational_exp_correct.
 intros x [] H.
-rapply exp_bound_bound.
+apply: exp_bound_bound.
 assumption.
 Qed.
 
@@ -680,7 +680,7 @@ transitivity (exp_bound_uc z q);[|].
  change (' q)%CR with (Cunit_fun _ q).
  unfold exp_bounded.
  rewrite (Cbind_correct QPrelengthSpace (exp_bound_uc z) (Cunit_fun Q_as_MetricSpace q)).
- rapply BindLaw1.
+ apply: BindLaw1.
 change (rational_exp (Qmin z q) == IRasCR (Exp (inj_Q IR q)))%CR.
 rewrite rational_exp_correct.
 apply IRasCR_wd.
@@ -725,7 +725,7 @@ unfold exp.
 apply exp_bounded_correct.
 simpl.
 apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
- [|rsapply inj_Q_leEq; auto with *].
+ [|apply inj_Q_leEq; simpl;auto with *].
 rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.
 apply exp_bound_lemma.
@@ -749,7 +749,7 @@ rewrite <- exp_bounded_correct.
  autorewrite with IRtoCR.
  rewrite CRasIRasCR_id.
  apply CRle_trans with ('a)%CR.
-  rapply exp_bound_lemma.
+  apply exp_bound_lemma.
  rewrite CRle_Qle.
  auto with *.
 change (CRasIR x [<=] inj_Q IR (z:Q)).
@@ -767,7 +767,7 @@ rewrite Hxy.
 apply exp_bound_exp.
 rewrite <- Hxy.
 apply CRle_trans with ('a)%CR.
- rapply exp_bound_lemma.
+ apply exp_bound_lemma.
 rewrite CRle_Qle.
 auto with *.
 Qed.

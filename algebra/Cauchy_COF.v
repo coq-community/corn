@@ -1181,13 +1181,13 @@ Proof.
  assert (H5 := B NN N2_NN).
 
  unfold AbsSmall in H5.
- rewrite leEq_def in H5.
+ rewrite -> leEq_def in H5.
 
  elim H5; intros.
  elim H4; intros.
  elim b; intros.
 
- rewrite leEq_def in H7; apply H7.
+ rewrite ->  leEq_def in H7; apply H7.
  apply less_leEq_trans with (Two[*]e).
  astepl (Zero[+]e).  rstepr (e[+]e).
  apply plus_resp_less_rht; auto.

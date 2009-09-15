@@ -147,7 +147,7 @@ assert (One[-](inj_Q IR x)[*](inj_Q IR y)[#]Zero).
   apply inj_Q_ap; assumption.
  eapply eq_transitive.
   apply inj_Q_minus.
- rapply bin_op_wd_unfolded.
+ apply bin_op_wd_unfolded.
   rstepr (nring 1:IR); apply (inj_Q_nring IR 1).
  apply un_op_wd_unfolded.
  apply inj_Q_mult.
@@ -172,9 +172,9 @@ apply div_wd.
  apply inj_Q_plus.
 eapply eq_transitive.
  apply inj_Q_minus.
-rapply bin_op_wd_unfolded.
+apply bin_op_wd_unfolded.
  rstepr (nring 1:IR).
- rapply (inj_Q_nring IR 1).
+ apply (inj_Q_nring IR 1).
 apply un_op_wd_unfolded.
 apply inj_Q_mult.
 Qed.

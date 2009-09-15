@@ -56,9 +56,9 @@ Section addition.
 *)
 
 Lemma plus_resp_leEq : forall x y z : R, x [<=] y -> x[+]z [<=] y[+]z.
-intros.
-rewrite leEq_def in *.
-intro.
+intros x y z.
+do 2 rewrite leEq_def.
+intros. intro.
 apply H.
 apply (plus_cancel_less _ _ _ _ X).
 Qed.
@@ -78,9 +78,9 @@ apply plus_resp_leEq; auto.
 Qed.
 
 Lemma inv_resp_leEq : forall x y : R, x [<=] y -> [--]y [<=] [--]x.
-intros.
-rewrite leEq_def in *.
-intro.
+intros x y.
+repeat rewrite leEq_def.
+do 2 intro.
 apply H.
 apply inv_cancel_less.
 assumption.
@@ -250,9 +250,9 @@ Multiplication and division respect [[<=]]
 *)
 
 Lemma mult_resp_leEq_rht : forall x y z : R, x [<=] y -> Zero [<=] z -> x[*]z [<=] y[*]z.
-intros.
-rewrite leEq_def in *.
-intro H1.
+intros x y z .
+repeat rewrite leEq_def.
+intros H H0 H1.
 generalize (shift_zero_less_minus _ _ _ H1); intro H2.
 cut (Zero [<] (x[-]y) [*]z).
 intro H3.
@@ -336,9 +336,9 @@ apply leEq_transitive with y; assumption.
 Qed.
 
 Lemma recip_resp_leEq : forall (x y : R) x_ y_, Zero [<] y -> y [<=] x -> (One[/] x[//]x_) [<=] (One[/] y[//]y_).
-intros x y x_ y_ H H0.
-rewrite leEq_def in *.
-intro H1. apply H0.
+intros x y x_ y_ H.
+do 2 rewrite leEq_def.
+intros H0 H1. apply H0.
 cut ((One[/] x[//]x_) [#] Zero). intro x'_.
 cut ((One[/] y[//]y_) [#] Zero). intro y'_.
 rstepl (One[/] One[/] x[//]x_[//]x'_).
@@ -367,10 +367,10 @@ Hint Resolve recip_resp_leEq: algebra.
 *)
 
 Lemma mult_cancel_leEq : forall x y z : R, Zero [<] z -> x[*]z [<=] y[*]z -> x [<=] y.
-intros.
-rewrite leEq_def in *.
-intro.
-apply H.
+intros x y z H.
+do 2 rewrite leEq_def.
+intros H0 H1.
+apply H0.
 apply mult_resp_less.
 assumption.
 assumption.
@@ -392,7 +392,7 @@ apply mult_resp_leEq_lft; [ assumption | apply less_leEq; assumption ].
 Qed.
 
 Lemma shift_leEq_mult' : forall (x y z : R) y_, Zero [<] y -> (x[/] y[//]y_) [<=] z -> x [<=] y[*]z.
-intros x y z H. intros. rewrite leEq_def in *. intro. apply H0.
+intros x y z H H0. repeat rewrite leEq_def. intros H1 H2. apply H1.
 apply shift_less_div. auto.
 astepl (y[*]z). auto.
 Qed.
@@ -414,7 +414,7 @@ assumption.
 Qed.
 
 Lemma shift_leEq_div : forall (x y z : R) y_, Zero [<] y -> x[*]y [<=] z -> x [<=] (z[/] y[//]y_).
-intros x y z H. intros. rewrite leEq_def in *. intro. apply H0.
+intros x y z H X. repeat rewrite leEq_def. intros H0 H1. apply H0.
 astepr (y[*]x).
 apply shift_less_mult' with H; auto.
 Qed.
@@ -565,7 +565,7 @@ change (nring n [<] nring (R:=R) 0) in |- *.
 apply nring_less.
 apply lt_le_trans with (S n).
 auto with arith.
-elimtype False; rewrite leEq_def in *|-; apply H.
+elimtype False. move: H; rewrite leEq_def; apply.
 apply nring_less; auto with arith.
 cut (n <= m).
 auto with arith.
@@ -598,7 +598,7 @@ Qed.
 Load "Opaque_algebra".
 
 Lemma mult_resp_nonneg : forall x y : R, Zero [<=] x -> Zero [<=] y -> Zero [<=] x[*]y.
-intros x y H H0. rewrite leEq_def in *. intro H1. apply H0.
+intros x y. repeat rewrite leEq_def. intros  H H0 H1. apply H0.
 cut (x[*]y [#] Zero). intro H2.
 cut (x [#] Zero). intro H3.
 cut (y [#] Zero). intro H4.
@@ -654,7 +654,7 @@ assumption.
 Qed.
 
 Lemma power_cancel_leEq : forall (x y : R) k, 0 < k -> Zero [<=] y -> x[^]k [<=] y[^]k -> x [<=] y.
-intros. rewrite leEq_def in *. intro. apply H1.
+intros x y k H. repeat rewrite leEq_def. intros H0 H1 H2. apply H1.
 apply nexp_resp_less; try rewrite leEq_def; auto.
 Qed.
 
@@ -667,7 +667,7 @@ elim (less_irreflexive_unfolded _ _ H1).
 astepl (x[^]0). astepr (y[^]0). auto.
 cut (x [<] y or y [<] x). intro H1.
 elim H1; clear H1; intros H1. auto.
-cut (x [<=] y). intro. rewrite leEq_def in *|-. elim (H2 H1).
+cut (x [<=] y). intro. destruct (leEq_def _ x y) as [H3 _]. elim ((H3 H2) H1).
 apply power_cancel_leEq with k; auto.
 apply less_leEq. auto.
 apply ap_imp_less. apply un_op_strext_unfolded with (nexp_op (R:=R) k).
@@ -933,12 +933,13 @@ apply mult_resp_pos; auto.
 Qed.
 
 Lemma mult_cancel_pos_rht : forall x y : R, Zero [<] x[*]y -> Zero [<=] x -> Zero [<] y.
-intros x y H H0.
-rewrite leEq_def in *|-.
+intros x y H.
+destruct (leEq_def _ Zero x) as [H0 _].
+intro H2. pose (H3:=(H0 H2)).
 elim (mult_pos_imp _ _ H); intro H1.
 elim H1; auto.
 elim H1; intros.
-elim (H0 a).
+contradiction.
 Qed.
 
 Lemma mult_cancel_pos_lft : forall x y : R, Zero [<] x[*]y -> Zero [<=] y -> Zero [<] x.

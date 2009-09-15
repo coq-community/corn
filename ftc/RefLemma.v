@@ -239,8 +239,7 @@ apply eq_transitive_unfolded with (Q _ P1[-]Q _ P2).
 cut (sub (S i) = S (pred (sub (S i)))).
 2: apply S_pred with 0; apply RL_sub_S.
 intro.
-generalize P1 HP1; clear HP1 P1. pattern (sub (S i)) at 1 2 11 in |- *.
-rewrite H1; intros.
+generalize P1 HP1; clear HP1 P1. rewrite {1 2 11} H1; intros.
 eapply eq_transitive_unfolded.
 apply str_Mengolli_Sum_gen with (f := h).
 apply RL_sub_SS.

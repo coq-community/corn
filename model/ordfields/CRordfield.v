@@ -61,9 +61,9 @@ intros x y H z.
 change (x+z < y + z)%CR.
 apply CR_lt_as_Cauchy_IR_lt_2.
 stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR z)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepr ((CRasCauchy_IR y)[+](CRasCauchy_IR z)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 apply plus_resp_less_rht.
 apply CR_lt_as_Cauchy_IR_lt_1.
 assumption.
@@ -72,17 +72,17 @@ intros x y Hx Hy.
 change ((' 0%Q) < x*y)%CR.
 apply CR_lt_as_Cauchy_IR_lt_2.
 stepr ((CRasCauchy_IR x)[*](CRasCauchy_IR y)) by
- rapply CR_mult_as_Cauchy_IR_mult.
-rapply less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
-rapply mult_resp_pos;(
- rapply less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
+ apply CR_mult_as_Cauchy_IR_mult.
+apply: less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
+apply mult_resp_pos;(
+ apply: less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
  apply CR_lt_as_Cauchy_IR_lt_1;assumption).
 
 intros x y.
 split.
 intros H.
 destruct (ap_imp_less _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H));[left|right];
- rapply CR_lt_as_Cauchy_IR_lt_2; assumption.
+ apply CR_lt_as_Cauchy_IR_lt_2; assumption.
 intros [H|H];
  apply CR_ap_as_Cauchy_IR_ap_2;
  [apply less_imp_ap|apply Greater_imp_ap];
@@ -93,11 +93,11 @@ rewrite <- CR_le_as_Cauchy_IR_le.
 split.
 intros H0 H1.
 apply H0.
-rapply CR_lt_as_Cauchy_IR_lt_1.
+apply CR_lt_as_Cauchy_IR_lt_1.
 assumption.
 intros H0 H1.
 apply H0.
-rapply CR_lt_as_Cauchy_IR_lt_2.
+apply CR_lt_as_Cauchy_IR_lt_2.
 assumption.
 
 intros x y.

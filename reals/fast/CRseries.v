@@ -56,7 +56,7 @@ generalize a Ha; clear a Ha.
 cofix.
 intros [a [b [c [d x]]]] [[_ [_ [H0 _]]] [_ Ha]].
 constructor;[assumption|].
-rapply everyOther_dnn.
+apply: everyOther_dnn.
 apply Ha.
 Qed.
 
@@ -65,7 +65,7 @@ Lemma everyOther_nbz : forall (a : Stream Q) x, (NearBy 0 x a) ->
  NearBy 0 x (everyOther a).
 cofix.
 intros [a [b r]] x [H [_ Ha]].
-constructor;[|rapply everyOther_nbz];assumption.
+constructor;[|apply: everyOther_nbz];assumption.
 Qed.
 
 Lemma everyOther_zl : forall (a : Stream Q), (Limit a 0) ->
@@ -85,10 +85,10 @@ case (H tt);[intros X |intros X].
  abstract (
  destruct x as [a [b x]];
  destruct X;
- rapply everyOther_nbz;
+ apply: everyOther_nbz;
  assumption).
 right; intros _.
-rapply everyOther_zl.
+apply: everyOther_zl.
 apply X.
 constructor.
 Defined.
@@ -135,7 +135,7 @@ simpl.
 unfold Qball.
 stepr ((hd a-0)*(hd b-0)) by (simpl;ring).
 autorewrite with QposElim.
-rapply mult_AbsSmall; assumption.
+apply mult_AbsSmall; assumption.
 Qed.
 
 Lemma ForAll_True : forall X (S:Stream X), ForAll (fun x => True) S.
@@ -158,7 +158,7 @@ induction H; intros b Hb.
 
 left.
 abstract (
-destruct e as [e|];[|rapply ForAll_True];
+destruct e as [e|];[|apply ForAll_True];
 assert (Heq:e==((e*Qpos_inv x)*x)%Qpos);[
  autorewrite with QposElim;
  field;
@@ -190,8 +190,8 @@ intros a b [[Ha1 Ha2] Ha'] [[Hb1 Hb2] Hb'].
 constructor.
 simpl.
 split.
-rsapply mult_resp_nonneg; assumption.
-rsapply mult_resp_leEq_both; assumption.
+apply: mult_resp_nonneg; assumption.
+apply: mult_resp_leEq_both; assumption.
 simpl.
 apply mult_Streams_dnn; assumption.
 Qed.
@@ -222,7 +222,7 @@ apply Qle_trans with (hd a - 0).
 ring_simplify.
 assumption.
 assumption.
-rapply Stream_Bound_nbz.
+apply: Stream_Bound_nbz.
 destruct Hb as [_ Hb].
 change (StreamBounds (tl a) (tl b)) in Hb.
 apply Hb.
@@ -267,7 +267,7 @@ constructor.
  replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by ring.
  apply Qmult_le_compat_r; try assumption.
  apply Qabs_nonneg.
-rapply mult_Streams_Gs.
+apply: mult_Streams_Gs.
  destruct Hx; assumption.
 destruct Hy; assumption.
 Qed.
@@ -328,13 +328,13 @@ constructor.
  rewrite Qabs_Qmult.
  rewrite Qabs_pos; try assumption.
  apply Qle_refl.
-rapply powers_help_Gs.
+apply: powers_help_Gs.
 Qed.
  
 Lemma powers_Gs : (0 <= a) -> (GeometricSeries a powers).
 Proof.
 intros Ha.
-rapply (powers_help_Gs Ha).
+apply (powers_help_Gs Ha).
 Qed.
 
 Hypothesis Ha : 0 <= a <= 1.
@@ -351,18 +351,18 @@ intros b Hb.
 constructor.
 simpl.
 split.
-rsapply mult_resp_nonneg; assumption.
+apply: mult_resp_nonneg; assumption.
 replace RHS with (b*1) by ring.
-rsapply mult_resp_leEq_lft; assumption.
+apply: mult_resp_leEq_lft; assumption.
 
 simpl.
 apply powers_help_dnn.
-rsapply mult_resp_nonneg; assumption.
+apply: mult_resp_nonneg; assumption.
 Qed.
 
 Lemma powers_dnn : DecreasingNonNegative powers.
 Proof.
-rapply powers_help_dnn.
+apply powers_help_dnn.
 discriminate.
 Qed.
 
@@ -382,14 +382,14 @@ assumption.
 simpl.
 apply powers_help_nbz.
 split.
-rsapply mult_resp_nonneg; assumption.
+apply: mult_resp_nonneg; assumption.
 replace RHS with (1*1) by ring.
-rsapply mult_resp_leEq_both; assumption.
+apply: mult_resp_leEq_both; assumption.
 Qed.
 
 Lemma powers_nbz : NearBy 0 (1#1)%Qpos powers.
 Proof.
-rapply powers_help_nbz.
+apply powers_help_nbz.
 split; discriminate.
 Qed.
 
@@ -421,7 +421,7 @@ unfold Str_nth in *.
 simpl.
 rewrite IHn.
 rewrite nat_of_P_succ_morphism.
-rapply plus_n_Sm.
+apply plus_n_Sm.
 Qed.
 
 (**
@@ -447,12 +447,12 @@ constructor.
 simpl.
 unfold Qball.
 stepr (1#q) by (simpl;ring).
-rapply (AbsSmall_leEq_trans _ (1#q)).
+apply (AbsSmall_leEq_trans _ (1#q)).
 change (1*d <= n*q)%Z.
 apply Zmult_le_compat; auto with *.
 apply AbsSmall_reflexive.
 discriminate.
-rapply recip_positives_help_nbz.
+apply: recip_positives_help_nbz.
 rewrite Zpos_succ_morphism.
 auto with *.
 Qed.
@@ -464,13 +464,13 @@ exact H0.
 
 right.
 intros _.
-rapply (H tt).
+apply: (H tt).
 apply H0.
 Defined.
 
 Lemma recip_positives_zl : Limit recip_positives 0.
 Proof.
-intros [[n d]|];[|left;rapply ForAll_True].
+intros [[n d]|];[|left;apply ForAll_True].
 unfold recip_positives.
 unfold positives.
 apply recip_positives_help_Exists with (LazyPred (LazyNat_of_P d)).
@@ -641,7 +641,7 @@ Proof.
 intros e.
 right.
 intros _.
-rapply Stream_Bound_zl.
+apply: Stream_Bound_zl.
 apply recip_factorial_bounded.
 apply recip_positives_zl.
 Defined.

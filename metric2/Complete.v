@@ -87,13 +87,13 @@ set (e':=Qpos_min ((1#4)*d) E).
 apply ball_weak_le with ((e+e')+(e'+e')+(e'+e))%Qpos.
 autorewrite with QposElim.
 setoid_replace (e+e+d) with ((e+(1#4)*d)+((1#4)*d+(1#4)*d)+((1#4)*d+e)) by QposRing.
-repeat rsapply plus_resp_leEq_both;
-try rapply Qpos_min_lb_l; auto with *.
+repeat apply: plus_resp_leEq_both;simpl;
+try apply: Qpos_min_lb_l; auto with *.
 apply ball_triangle with (approximate g e').
 apply ball_triangle with (approximate f e').
 apply regFun_prf.
 apply H.
-rapply Qpos_min_lb_r.
+apply Qpos_min_lb_r.
 apply regFun_prf.
 Qed.
 
@@ -262,7 +262,7 @@ do 2 (apply ball_closed; intro).
 setoid_replace (e+d+d0)%Qpos with (d+e+d0)%Qpos by QposRing.
 apply H.
 intros H d1 d2.
-rapply Cunit_prf.
+apply: Cunit_prf.
 assumption.
 Qed.
 
@@ -313,7 +313,7 @@ Lemma regFun_prf_ex :
   ball_ex  (e1 + e2) (approximate r e1) (approximate r e2).
 Proof.
 intros r [e1|] [e2|]; try constructor.
-rapply regFun_prf.
+apply: regFun_prf.
 Qed.
 
 End RegularFunction.
@@ -350,7 +350,7 @@ intros e1 e2.
 simpl.
 apply ball_weak_le with (f e1 + f e2)%Qpos.
 autorewrite with QposElim.
-rsapply plus_resp_leEq_both; apply Hf.
+apply: plus_resp_leEq_both; apply Hf.
 apply regFun_prf.
 Qed.
 
@@ -358,12 +358,12 @@ Definition faster : Complete X := Build_RegularFunction fasterIsRegular.
 
 Lemma fasterIsEq : st_eq faster x.
 Proof.
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 simpl.
 apply ball_weak_le with (f e + e)%Qpos.
 autorewrite with QposElim.
-rsapply plus_resp_leEq.
+apply: plus_resp_leEq.
 apply Hf.
 apply regFun_prf.
 Qed.
@@ -389,7 +389,7 @@ intros e.
 autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
-rsapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -421,9 +421,9 @@ rewrite <- ball_Cunit.
 setoid_replace (d1 + d2)%Qpos with ((1#2)*d1 + ((1#2)*d1+(1#2)*d2) + (1#2)*d2)%Qpos by QposRing.
 apply ball_triangle with (approximate x ((1#2)*d2))%Qpos.
 apply ball_triangle with (approximate x ((1#2)*d1))%Qpos.
-rapply ball_approx_l.
-rapply regFun_prf.
-rapply ball_approx_r.
+apply ball_approx_l.
+apply regFun_prf.
+apply ball_approx_r.
 Qed.
 
 Definition Cjoin_fun (x:Complete (Complete X)) : Complete X :=
@@ -438,13 +438,13 @@ apply ball_triangle with y.
 apply ball_triangle with x.
 apply ball_triangle with (Cunit (approximate x ((1 # 2) * d1)%Qpos)).
 rewrite ball_Cunit.
-rapply ball_approx_l.
+apply: ball_approx_l.
 apply ball_approx_l.
 assumption.
 eapply ball_triangle.
 apply ball_approx_r.
 rewrite ball_Cunit.
-rapply ball_approx_r.
+apply: ball_approx_r.
 Qed.
 
 Definition Cjoin : (Complete (Complete X)) --> (Complete X) :=
@@ -473,7 +473,7 @@ Lemma Cmap_slow_raw_strongInf : forall (x:Complete X) (d:QposInf) (e:QposInf), Q
 ball_ex e (f (approximate x d)) (Cmap_slow_raw x e).
 Proof.
 intros x [d|] [e|] Hd; try constructor.
- rapply uc_prf.
+ apply uc_prf.
  simpl.
  case_eq (mu f e); simpl; trivial.
  intros q Hq.
@@ -482,7 +482,7 @@ intros x [d|] [e|] Hd; try constructor.
  eapply ball_weak_le;[|apply regFun_prf].
  rewrite Q_Qpos_plus.
  replace RHS with (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos) by QposRing.
- rsapply plus_resp_leEq.
+ apply: plus_resp_leEq.
  assumption.
 unfold Cmap_slow_raw.
 simpl in *.
@@ -496,7 +496,7 @@ Lemma Cmap_slow_raw_strong : forall (x:Complete X) (d:QposInf) (e:Qpos), QposInf
 ball e (f (approximate x d)) (Cmap_slow_raw x e).
 Proof.
 intros.
-rapply (Cmap_slow_raw_strongInf x d e).
+apply (Cmap_slow_raw_strongInf x d e).
 assumption.
 Qed.
 
@@ -522,14 +522,14 @@ intros e1 e2 H.
 apply ball_weak.
 apply ball_sym.
 simpl.
-rapply Cmap_slow_raw_strong.
+apply Cmap_slow_raw_strong.
 simpl.
 destruct (mu f e1).
 simpl.
 destruct (mu f e2).
 simpl.
 autorewrite with QposElim.
-rsapply mult_resp_leEq_lft.
+apply: mult_resp_leEq_lft.
 assumption.
 discriminate.
 elim H.
@@ -570,10 +570,10 @@ apply ball_triangle with (f (approximate y (QposInf_min d0 d2 ))).
  eapply ball_weak_le.
   2:apply Hxy.
  autorewrite with QposElim.
- rewrite Qle_minus_iff in *.
+ rewrite -> Qle_minus_iff in *.
  replace RHS with (((1 # 4) * q + - z0) + ((1 # 4) * q + - z1)) by ring.
  Qauto_nonneg.
-apply uc_prf.
+apply: uc_prf.
 eapply ball_ex_weak_le;[|apply regFun_prf_ex].
 unfold d2.
 simpl.
@@ -606,7 +606,7 @@ Lemma MonadLaw1 : forall a, Cmap_slow_fun (uc_id X) a =m a.
 Proof.
 intros x e1 e2.
 simpl.
-rapply ball_weak_le;[|apply regFun_prf].
+apply: ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
 Qauto_le.
 Qed.
@@ -620,7 +620,7 @@ set (b:=(approximate (Cmap_slow_fun f (Cmap_slow_fun g x)) e2)).
 set (d0 := (QposInf_min (QposInf_mult (1#2)%Qpos (mu (uc_compose f g) e1)) ((1 # 2)%Qpos * QposInf_bind (mu g) (QposInf_mult (1 # 2)%Qpos (mu f e2))))).
 apply ball_triangle with ((uc_compose f g) (approximate x d0)).
  apply ball_sym.
- rapply Cmap_slow_raw_strong.
+ apply Cmap_slow_raw_strong.
  unfold d0.
  apply QposInf_min_lb_l.
 unfold b; simpl.
@@ -632,14 +632,14 @@ simpl.
 apply ball_weak_le with ((1#2)*q)%Qpos.
  autorewrite with QposElim.
  Qauto_le.
-rapply (Cmap_slow_raw_strong g x d0).
-rapply QposInf_min_lb_r.
+apply (Cmap_slow_raw_strong g x d0).
+apply QposInf_min_lb_r.
 Qed.
 
 Lemma MonadLaw3 : forall (f:X --> Y) a, (Cmap_slow_fun f (Cunit_fun _ a)) =m (Cunit_fun _ (f a)).
 Proof.
 intros f x e1 e2.
-rapply regFun_prf.
+apply: regFun_prf.
 Qed.
 
 Lemma MonadLaw4 : forall (f:X --> Y) a, (Cmap_slow_fun f (Cjoin_fun a)) =m (Cjoin_fun ((Cmap_slow_fun (Cmap_slow f)) a)).
@@ -668,16 +668,16 @@ apply ball_triangle with (f (approximate (approximate x d0) d0)).
  apply ball_triangle with (Cunit (approximate x d0)).
   change (ball_ex ((1 # 4) * q)%Qpos x (Cunit (approximate x d0))).
   apply ball_ex_weak_le with (d0)%QposInf.
-   rapply QposInf_min_lb_l.
+   apply QposInf_min_lb_l.
   destruct d0 as [d0|]; try constructor.
-  rapply ball_approx_r.
+  apply ball_approx_r.
  rewrite ball_Cunit.
  change (ball_ex ((1 # 4) * q)%Qpos (approximate x d0)
   (Cunit (approximate (approximate x d0) d0))).
  apply ball_ex_weak_le with (d0)%QposInf.
-  rapply QposInf_min_lb_l.
+  apply QposInf_min_lb_l.
  destruct d0 as [d0|]; try constructor.
- rapply ball_approx_r.
+ apply ball_approx_r.
 apply ball_sym.
 apply ball_weak_le with ((1#2)*e2)%Qpos.
  autorewrite with QposElim.
@@ -698,16 +698,16 @@ apply ball_triangle with x.
 apply ball_triangle with (Cunit (approximate x d0)).
  change (ball_ex ((1 # 8) * q)%Qpos x (Cunit (approximate x d0))).
  apply ball_ex_weak_le with (d0)%QposInf.
-  rapply QposInf_min_lb_r.
+  apply QposInf_min_lb_r.
  destruct d0 as [d0|]; try constructor.
- rapply ball_approx_r.
+ apply ball_approx_r.
 rewrite ball_Cunit.
 change (ball_ex ((1 # 8) * q)%Qpos (approximate x d0)
  (Cunit (approximate (approximate x d0) d0))).
 apply ball_ex_weak_le with (d0)%QposInf.
- rapply QposInf_min_lb_r.
+ apply QposInf_min_lb_r.
 destruct d0 as [d0|]; try constructor.
-rapply ball_approx_r.
+apply ball_approx_r.
 Qed.
 
 Lemma MonadLaw5 : forall a, (Cjoin_fun (X:=X) (Cunit_fun _ a)) =m a.
@@ -715,7 +715,7 @@ intros x e1 e2.
 simpl.
 setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + e2 + (1#2)*e1)%Qpos by QposRing.
 apply ball_weak.
-rapply regFun_prf.
+apply regFun_prf.
 Qed.
 
 Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=X) Cunit) a) =m a.
@@ -724,7 +724,7 @@ intros a e1 e2.
 simpl.
 setoid_replace (e1+e2)%Qpos with ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos by QposRing.
 apply ball_weak.
-rapply regFun_prf.
+apply: regFun_prf.
 Qed.
 
 Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=Complete (Complete X)) Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
@@ -735,7 +735,7 @@ apply ball_weak_le with  ((half (half e1)) + ((half (half e1)) + (half (half e1)
  unfold half.
  autorewrite with QposElim.
  Qauto_le.
-rapply (regFun_prf x).
+apply (regFun_prf x).
 Qed.
 
 (** This final law isn't a monad law, rather it completes the isomorphism
@@ -751,7 +751,7 @@ apply ball_weak_le with (((1 # 2) * d1 + ((1 # 2) * d1 + e2) + d2))%Qpos.
  rewrite Qle_minus_iff.
  ring_simplify.
  auto with *.
-rapply (regFun_prf x).
+apply (regFun_prf x).
 Qed.
 
 End Monad_Laws.
@@ -762,12 +762,12 @@ Proof.
 intros X Y f a.
 change (st_eq (Cjoin (Cmap_slow_fun f (Cunit_fun X a))) (f a)).
 rewrite (MonadLaw3 f a).
-rapply MonadLaw5.
+apply MonadLaw5.
 Qed.
 
 Lemma BindLaw2 : forall X a, (st_eq (Cbind_slow (Cunit:X --> Complete X) a) a).
 Proof.
-rapply MonadLaw6.
+apply MonadLaw6.
 Qed.
 
 Lemma BindLaw3 : forall X Y Z (a:Complete X) (f:X --> Complete Y) (g:Y-->Complete Z), (st_eq (Cbind_slow g (Cbind_slow f a)) (Cbind_slow (uc_compose (Cbind_slow g) f) a)).
@@ -780,7 +780,7 @@ unfold Cbind_slow.
 rewrite (MonadLaw4 g).
 rewrite (MonadLaw2 (Cjoin (X:=Z)) (Cmap_slow g)).
 symmetry.
-rapply MonadLaw7.
+apply MonadLaw7.
 Qed.
 
 (**
@@ -805,23 +805,23 @@ setoid_replace (e+e0)%Qpos with (he0 + e + he0)%Qpos by (unfold he0;QposRing).
 apply ball_triangle with (Cunit (g a0)).
 apply ball_triangle with (Cunit (f a0)).
 rewrite <- (MonadLaw3 f a0).
-rapply uc_prf.
+apply: uc_prf.
 simpl.
 destruct (mu f he0) as [d1|];[|constructor].
 eapply ball_ex_weak_le with d0.
-rapply QposInf_min_lb_l.
+apply QposInf_min_lb_l.
 destruct d0 as [d0|];[|constructor].
-rapply ball_approx_r.
+apply ball_approx_r.
 rewrite ball_Cunit.
 apply H.
 rewrite <- (MonadLaw3 g a0).
-rapply (uc_prf (Cmap_slow g)).
+apply: (uc_prf (Cmap_slow g)).
 simpl.
 destruct (mu g he0) as [d2|];[|constructor].
 eapply ball_ex_weak_le with d0.
-rapply QposInf_min_lb_r.
+apply QposInf_min_lb_r.
 destruct d0 as [d0|];[|constructor].
-rapply ball_approx_l.
+apply: ball_approx_l.
 Qed.
 
 Definition Cmap_strong_slow : (X --> Y) --> (Complete X --> Complete Y) :=
@@ -850,8 +850,8 @@ setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos by (unfold he1
 rewrite <- ball_Cunit.
 apply ball_triangle with y2;[|apply ball_approx_r].
 apply ball_triangle with y1;[apply ball_approx_l|].
-rapply (uc_prf Cmap_strong_slow).
-rapply regFun_prf.
+apply (uc_prf Cmap_strong_slow).
+apply: regFun_prf.
 Qed.
 
 Definition Cap_slow_fun (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
@@ -871,8 +871,8 @@ setoid_replace (d1 + e + d2)%Qpos with (d1' + (d1' + e) + d2)%Qpos by (unfold d1
 rewrite <- ball_Cunit.
 apply ball_triangle with y2;[|apply ball_approx_r].
 apply ball_triangle with y1;[apply ball_approx_l|].
-rapply (uc_prf Cmap_strong_slow).
-rapply regFun_prf.
+apply: (uc_prf Cmap_strong_slow).
+apply: regFun_prf.
 Qed.
 
 Definition Cap_slow_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := ((1#2)%Qpos*(mu (approximate f ((1#3)*e)%Qpos) ((1#3)*e)))%QposInf.
@@ -885,7 +885,7 @@ setoid_replace e with (e'+e'+e')%Qpos by (unfold e';QposRing).
 apply ball_triangle with (Cmap_slow (approximate f e') y).
 apply ball_triangle with (Cmap_slow (approximate f e') x).
 apply Cap_slow_help.
-rapply (uc_prf).
+apply (uc_prf).
 apply H.
 apply ball_sym.
 apply Cap_slow_help.
@@ -902,11 +902,11 @@ intros d.
 setoid_replace (e+d)%Qpos with ((1#4)*d + ((1#4)*d + e + (1#4)*d) + (1#4)*d)%Qpos by QposRing.
 apply ball_triangle with (Cmap_strong_slow (approximate f2 ((1#4)*d)%Qpos) x).
 apply ball_triangle with (Cmap_strong_slow (approximate f1 ((1#4)*d)%Qpos) x).
-rapply Cap_slow_help.
-rapply (uc_prf Cmap_strong_slow).
-rapply H.
+apply: Cap_slow_help.
+apply (uc_prf Cmap_strong_slow).
+apply: H.
 apply ball_sym.
-rapply Cap_slow_help.
+apply: Cap_slow_help.
 Qed.
 
 Definition Cap_slow : Complete (X --> Y) --> Complete X --> Complete Y :=
@@ -915,15 +915,15 @@ Build_UniformlyContinuousFunction Cap_slow_prf.
 Lemma StrongMonadLaw1 : forall a b, st_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
 Proof.
 intros f x.
-rapply regFunEq_e.
+apply:regFunEq_e.
 intros e.
 apply ball_weak_le with ((1#2)*e+e)%Qpos.
 autorewrite with QposElim.
 rewrite Qle_minus_iff; ring_simplify.
-rsapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
-rapply regFun_prf.
+apply:regFun_prf.
 Qed.
 
 End Strong_Monad.
@@ -936,14 +936,13 @@ intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cmap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
 generalize y2.
-rapply (@uc_wd _ _ (Cmap_strong_slow X Y)).
+apply:(@uc_wd _ _ (Cmap_strong_slow X Y)).
 assumption.
 Qed.
 
 Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_slow_wd.
 intros x1 x2 Hx.
-rapply (@uc_wd _ _ (Cap_slow X Y)).
-assumption.
+apply:(@uc_wd _ _ (Cap_slow X Y));assumption.
 Qed.
 
 Add Parametric Morphism X Y : (@Cap_slow_fun X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cap_slow_wd.
@@ -951,8 +950,7 @@ intros x1 x2 Hx y1 y2 Hy.
 transitivity (Cap_slow_fun x1 y2).
 apply (@uc_wd _ _ (Cap_weak_slow x1) _ _ Hy).
 generalize y2.
-rapply (@uc_wd _ _ (Cap_slow X Y)).
-assumption.
+apply:(@uc_wd _ _ (Cap_slow X Y));assumption.
 Qed.
 Transparent Complete.
 (* end hide *)

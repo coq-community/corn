@@ -277,7 +277,7 @@ Defined.
 Lemma leEq_not_eq : forall x y : R, x [<=] y -> x [#] y -> x [<] y.
 intros x y H H0.
 elim (ap_imp_less _ _ H0); intro H1; auto.
-rewrite leEq_def in H.
+rewrite -> leEq_def in H.
 elim (H H1).
 Qed.
 
@@ -295,20 +295,18 @@ Variable R : COrdField.
 
 Lemma leEq_wdr : forall x y z : R, x [<=] y -> y [=] z -> x [<=] z.
 intros x y z H H0.
-rewrite leEq_def in *.
+rewrite -> leEq_def in *.
 intro H1.
 apply H.
-astepl z.
-assumption.
+astepl z; assumption.
 Qed.
 
 Lemma leEq_wdl : forall x y z : R, x [<=] y -> x [=] z -> z [<=] y.
 intros x y z H H0.
-rewrite leEq_def in *.
+rewrite -> leEq_def in *.
 intro H1.
 apply H.
-astepr z.
-auto.
+astepr z;auto.
 Qed.
 
 Lemma leEq_reflexive : forall x : R, x [<=] x.
@@ -327,7 +325,7 @@ exact (leEq_reflexive _).
 Qed.
 
 Lemma leEq_imp_eq : forall x y : R, x [<=] y -> y [<=] x -> x [=] y.
-intros x y H H0. rewrite leEq_def in *|-.
+intros x y H H0. rewrite -> leEq_def in *|-.
 apply not_ap_imp_eq. intro H1. apply H0.
 elim (ap_imp_less _ _ _ H1); intro H2. auto.
 elim (H H2).
@@ -346,22 +344,21 @@ intros x y z.
 intros H H0.
 elim (less_cotransitive_unfolded _ _ _ H z); intro H1.
 assumption.
-rewrite leEq_def in *|-.
-elim (H0 H1).
+destruct (leEq_def _ y z).
+elim ((H2 H0) H1).
 Qed.
 
 Lemma leEq_less_trans : forall x y z : R, x [<=] y -> y [<] z -> x [<] z.
 intros x y z.
 intros H H0.
-elim (less_cotransitive_unfolded _ _ _ H0 x); intro H1.
-rewrite leEq_def in *|-.
-elim (H H1).
-assumption.
+elim (less_cotransitive_unfolded _ _ _ H0 x); intro H1; try assumption.
+destruct (leEq_def _ x y) as [H2 H3].
+elim ((H2 H) H1).
 Qed.
 
 Lemma leEq_transitive : forall x y z : R, x [<=] y -> y [<=] z -> x [<=] z.
 intros x y z.
-repeat rewrite leEq_def in *.
+repeat rewrite leEq_def.
 intros H H0 H1.
 apply H.
 apply leEq_less_trans with (y := z); firstorder using leEq_def.
@@ -389,9 +386,8 @@ Qed.
 
 Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
 Proof.
-intros x y Hxy H.
-rewrite leEq_def in Hxy.
-apply H.
+intros x y Hxy H. move: Hxy.
+rewrite leEq_def. intro Hxy. apply H.
 right.
 apply (not_ap_imp_eq).
 intros H0.

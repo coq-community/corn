@@ -99,7 +99,7 @@ assert (forall x y : Q_as_CRing, {x = y} + {x <> y}).
     right; intro H3; injection H3; intros; destruct H2; assumption.
   right; intro H3; injection H3; intros; destruct H2; assumption.
 destruct (In_dec X (Q_can q) (list_Q (P0 P) (Pn P))).
-  intro H; rewrite (Q_can_spec q) in H; revert H.
+  intro H; rewrite -> (Q_can_spec q) in H; revert H.
   apply (QX_test_list_spec_none _ _ Hnone _ i).
 intro Hval; apply n.
 apply QX_root_loc; assumption.
@@ -152,7 +152,7 @@ clear s.
 destruct c.
 destruct d.
 intro Hq.
-rewrite Hq in s.
+rewrite -> Hq in s.
 assert (H : p [=] r); [rewrite s; unfold cg_minus; unfold QX; ring|].
 unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ H); fold QX_deg.
 destruct (_X_monic _ a).
@@ -174,19 +174,19 @@ unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ (RX_div_spec _ p a)).
 rewrite RX_deg_sum.
   rewrite RX_deg_c_.
   rewrite max_comm; unfold max.
-  rewrite QX_deg_mult.
+  rewrite -> QX_deg_mult.
       unfold QX_deg; rewrite RX_deg_minus.
-        rewrite RX_deg_c_, RX_deg_x_; fold QX_deg.
+        rewrite RX_deg_c_ RX_deg_x_; fold QX_deg.
         simpl; rewrite plus_comm; simpl.
         intro H; injection H; symmetry; assumption.
-      rewrite RX_deg_x_, RX_deg_c_; discriminate.
+      rewrite RX_deg_x_ RX_deg_c_; discriminate.
     apply QX_div_deg0; assumption.
   right; left; discriminate.
-rewrite QX_deg_mult.
+rewrite -> QX_deg_mult.
     unfold QX_deg; rewrite RX_deg_minus.
-      rewrite RX_deg_x_, RX_deg_c_, RX_deg_c_.
+      rewrite RX_deg_x_ RX_deg_c_ RX_deg_c_.
       rewrite plus_comm; discriminate.
-    rewrite RX_deg_x_, RX_deg_c_; discriminate.
+    rewrite RX_deg_x_ RX_deg_c_; discriminate.
   apply QX_div_deg0; assumption.
 right; left; discriminate.
 Qed.
@@ -215,7 +215,7 @@ induction n.
   destruct (degree_le_zero _ _ d).
   case (Q_dec P ! a Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); clear Hap; revert Heq.
-  rewrite s, c_apply; intro H; rewrite H; split; [reflexivity|apply I].
+  rewrite s c_apply; intro H; rewrite H; split; [reflexivity|apply I].
 unfold QX_extract_roots_rec.
 intros P Hdeg Hap.
 case_eq (QX_find_root P).
@@ -255,7 +255,7 @@ apply IHn.
   rewrite Hdeg; apply QX_div_deg.
   rewrite <- Hdeg; discriminate.
 clear IHn; revert Hval.
-rewrite (RX_div_spec _ P y) at 1.
+rewrite {1} (RX_div_spec _ P y).
 rewrite rh_pres_plus.
 rewrite rh_pres_mult.
 rewrite rh_pres_minus.

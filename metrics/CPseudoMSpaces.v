@@ -233,7 +233,7 @@ elim H5.
 generalize H6.
 intros H7 H8.
 set (H9 := H7 x x) in *.
-rewrite leEq_def in H9.
+rewrite -> leEq_def in H9.
 set (H10 := H9 H8) in *.
 exact H10.
 

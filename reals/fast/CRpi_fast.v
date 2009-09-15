@@ -146,7 +146,7 @@ assert (One[-](inj_Q IR x)[*](inj_Q IR y)[#]Zero).
   apply inj_Q_ap; assumption.
  eapply eq_transitive.
   apply inj_Q_minus.
- rapply bin_op_wd_unfolded.
+ apply bin_op_wd_unfolded.
   rstepr (nring 1:IR); apply (inj_Q_nring IR 1).
  apply un_op_wd_unfolded.
  apply inj_Q_mult.
@@ -171,9 +171,9 @@ apply div_wd.
  apply inj_Q_plus.
 eapply eq_transitive.
  apply inj_Q_minus.
-rapply bin_op_wd_unfolded.
+apply bin_op_wd_unfolded.
  rstepr (nring 1:IR).
- rapply (inj_Q_nring IR 1).
+ apply (inj_Q_nring IR 1).
 apply un_op_wd_unfolded.
 apply inj_Q_mult.
 Qed.
@@ -238,19 +238,19 @@ rstepl (nring 44[*]ArcTan (inj_Q IR (1 / 57%positive))[+]
 nring 24[*]ArcTan (inj_Q IR (1 / 12943%positive)))).
 csetoid_replace ((nring 44)[*]ArcTan (inj_Q IR (1 / 57%positive)))
                 (ArcTan (inj_Q IR y0));
- [|apply (reflect_right (ArcTan_multiple H0 44));
+ [|apply: (reflect_right (ArcTan_multiple H0 44));
    lazy beta delta iota zeta; constructor].
 csetoid_replace ((nring 7)[*]ArcTan (inj_Q IR (1 / 239%positive)))
                 (ArcTan (inj_Q IR y1));
- [|apply (reflect_right (ArcTan_multiple H1 7));
+ [|apply: (reflect_right (ArcTan_multiple H1 7));
    lazy beta delta iota zeta; constructor].
 csetoid_replace ((nring 12)[*]ArcTan (inj_Q IR (1 / 682%positive)))
                 (ArcTan (inj_Q IR y2));
- [|apply (reflect_right (ArcTan_multiple H2 12));
+ [|apply: (reflect_right (ArcTan_multiple H2 12));
    lazy beta delta iota zeta; constructor].
 csetoid_replace ((nring 24)[*]ArcTan (inj_Q IR (1 / 12943%positive)))
                 (ArcTan (inj_Q IR y3));
- [|apply (reflect_right (ArcTan_multiple H3 24));
+ [|apply: (reflect_right (ArcTan_multiple H3 24));
    lazy beta delta iota zeta; constructor].
 compute in y0.
 compute in y1.

@@ -121,7 +121,7 @@ induction n.
  tauto.
 intros s X.
 simpl.
-rapply IHn.
+apply IHn.
 apply dnn_tl.
 assumption.
 Qed.
@@ -151,7 +151,7 @@ intros seq b IH H [[[Za Zb] [[_ Zd] _]] dnn].
 destruct (IH dnn) as [H0 H1].
 split.
      rewrite Qminus'_correct.
- rsapply shift_zero_leEq_minus.
+ apply: shift_zero_leEq_minus.
  apply Qle_trans with (hd (tl seq)); auto.
 rewrite Qle_minus_iff.
      rewrite Qminus'_correct.
@@ -214,12 +214,12 @@ Qball (e1 + e2) (InfiniteAlternatingSum_raw zl e1)
 intros H e1 e2.
 destruct (Qpos_le_total e1 e2).
 setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
-rsapply ball_sym.
+apply: ball_sym;simpl.
 auto.
 auto.
 
 intros e1 e2 He.
-rsapply ball_weak.
+apply: ball_weak;simpl.
 unfold Qball.
 unfold InfiniteAlternatingSum_raw.
 unfold PartialAlternatingSumUntil.
@@ -233,7 +233,7 @@ assert(case1: forall seq (dnn:DecreasingNonNegative seq) (ex2: LazyExists _ seq)
        AbsSmall (R:=Q_as_COrdField) (e1:Q) (0 - (takeUntil (F e2) ex2 Qminus' 0))).
 clear seq dnn ex1 ex2.
 intros seq dnn ex2 [Hseq1 Hseq2].
-rsapply AbsSmall_minus.
+apply: AbsSmall_minus;simpl.
 change (AbsSmall (e1:Q) ((PartialAlternatingSumUntil _ (ex2))-0)).
 stepr (PartialAlternatingSumUntil _ (ex2)) by (simpl; ring).
 destruct (PartialAlternatingSumUntil_small _ dnn (ex2)) as [Hl1 Hl2].
@@ -273,9 +273,9 @@ stepr (b-a) by
  (simpl;
      repeat rewrite Qminus'_correct;
   change (b - a == hd x - a - (hd x - b)); ring).
-rsapply AbsSmall_minus.
+apply AbsSmall_minus.
 rename H0 into IHExists.
-rapply (IHExists tt).
+apply (IHExists tt).
 clear - dnn.
 destruct dnn.
 assumption.
@@ -291,7 +291,7 @@ Lemma InfiniteAlternatingSum_step : forall seq (dnn:DecreasingNonNegative seq) (
 Proof.
 intros [hd seq] [dnn_hd dnn] zl.
 rewrite CRplus_translate.
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 simpl.
 unfold Cap_raw; simpl.
@@ -309,8 +309,8 @@ rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
 simpl.
 ring_simplify.
 unfold P in H.
-rsapply ball_weak.
-rsapply ball_sym.
+apply: ball_weak;simpl.
+apply: ball_sym;simpl.
 unfold Qball_ex_bool in H.
 destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd (Cons hd seq))) as [X|X];
  [apply X|discriminate H].
@@ -342,7 +342,7 @@ rewrite rw; clear rw.
 simpl.
 rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
      rewrite Qminus'_correct.
-rapply ball_refl.
+apply: ball_refl.
 Qed.
 
 (** The infinite alternating series is always nonnegative. *)
@@ -372,7 +372,7 @@ intros seq dnn zl.
 rewrite InfiniteAlternatingSum_step.
 change (inject_Q (hd seq) - InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)[<=]inject_Q (hd seq))%CR.
 stepr (inject_Q (hd seq) - inject_Q 0%Q)%CR.
-rsapply minus_resp_leEq_rht.
+apply: minus_resp_leEq_rht.
 apply InfiniteAlternatingSum_nonneg.
 simpl.
 ring.
@@ -457,7 +457,7 @@ apply alternate_series_conv.
   assumption.
  intros x b IH H dnn [|m] Hm.
   elimtype False; auto with *.
- rapply IH; auto with *.
+ apply IH; auto with *.
 intros n.
 apply inj_Q_leEq.
 rewrite <- dnn_alt_iff_dnn in dnn.
@@ -474,7 +474,7 @@ Proof.
 intros seq x Hx dnn zl H.
 unfold series_sum.
 rewrite IR_Lim_as_CR.
-rapply SeqLimit_unique.
+apply: SeqLimit_unique.
 intros e He.
 generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
 intros C.
@@ -486,14 +486,14 @@ clear C.
 unfold seq_part_sum in *.
 rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
        ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum dnn zl)))).
-rapply AbsSmall_eps_div_two;[apply Hn; assumption|].
+apply AbsSmall_eps_div_two;[apply Hn; assumption|].
 
 assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq)))%CR)).
 stepr (IRasCR (x n)).
-stepr (Sum n n (fun n => IRasCR (x n))) by rapply Sum_one.
+stepr (Sum n n (fun n => IRasCR (x n))) by apply: Sum_one.
 unfold Sum, Sum1.
 stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )) by
- (rapply cg_minus_wd; apply IR_Sum0_as_CR).
+ (apply cg_minus_wd; apply IR_Sum0_as_CR).
 apply Hn.
 auto.
 simpl.
@@ -510,21 +510,21 @@ generalize (e[/]TwoNZ).
 clear e.
 induction n; intros e seq dnn zl X.
 simpl in *.
-rapply AbsSmall_minus.
+apply AbsSmall_minus.
 stepr (InfiniteAlternatingSum dnn zl) by (unfold cg_minus;simpl;ring).
-rsapply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
-rsapply leEq_transitive.
+apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
+apply: leEq_transitive;simpl.
 apply InfiniteAlternatingSum_bound.
 setoid_replace (hd seq) with (1*hd seq)%Q by ring.
 destruct X; assumption.
 
-rapply AbsSmall_minus.
+apply AbsSmall_minus.
 stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  ((- (1)) ^ n0 * Str_nth n0 (tl seq))%Q)))%CR)[-]
    InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)))%CR;
  [apply IHn|].
 rewrite inj_S in X.
 rstepr ([--][--]('(((- (1)) ^ n * Str_nth n (tl seq))%Q))%CR).
-rapply inv_resp_AbsSmall.
+apply inv_resp_AbsSmall.
 stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq))%CR;[assumption|].
 simpl.
 change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq)) ==
@@ -536,9 +536,9 @@ ring.
 stepl (InfiniteAlternatingSum dnn zl[-](('(((- (1)) ^ 0 * Str_nth 0 seq)%Q[+]
 ((Sum0 (G:=Q_as_CAbGroup) n
   (fun n0 : nat => ((- (1)) ^ (S n0) * Str_nth n0 (tl seq))%Q))):Q))%CR));[
-rsapply cg_minus_wd;[reflexivity|
+apply cg_minus_wd;[reflexivity|
  rewrite CReq_Qeq;
- rapply Sum0_shift;
+ apply: Sum0_shift;
  intros i; simpl; reflexivity]|].
 unfold cg_minus; simpl.
 rewrite InfiniteAlternatingSum_step.
@@ -549,8 +549,8 @@ setoid_replace ((Sum0 (G:=Q_as_CAbGroup) n
     (fun n0 : nat => Qpower_positive (- (1)) (P_of_succ_nat n0)  * Str_nth n0 (tl seq)))%Q:Q)
  with (-(Sum0 (G:=Q_as_CAbGroup) n
    (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 (tl seq)))))%Q;[ring|].
-rapply eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
-rapply Sum0_wd.
+apply: eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
+apply: Sum0_wd.
 intros i; simpl.
 change (Qpower_positive (- (1)) (P_of_succ_nat i)) with ((-(1))^ S i).
 rewrite inj_S.
@@ -558,7 +558,7 @@ unfold Zsucc.
 rewrite Qpower_plus;[|discriminate].
 ring.
 
-rsapply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
+apply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
 clear - Hx.
 induction n.
 reflexivity.

@@ -229,8 +229,8 @@ apply H1.
 unfold M1_eq in H, H2, H5 |- *.
 set (H6:=(H2 u u)).
 simpl in H6.
-rewrite H in H6.
-rewrite H5 in H6.
+rewrite -> H in H6.
+rewrite -> H5 in H6.
 simpl in H6.
 exact H6.
 

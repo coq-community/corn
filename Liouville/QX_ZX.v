@@ -145,7 +145,7 @@ split; intro H.
   cut (Zpos Qden = Zgcd Qnum Qden).
     intro H0; rewrite H0.
     apply Zgcd_is_divisor_lft.
-  rewrite (Zgcd_div_mult_rht Qnum Qden) at 1.
+  rewrite {1} (Zgcd_div_mult_rht Qnum Qden).
     rewrite H.
     apply Zmult_1_l.
   intro.
@@ -158,13 +158,13 @@ split; intro H.
 unfold Q_can_den.
 destruct q; simpl in *.
 case (Z_dec Qnum 0).
-  intro H0; rewrite H0 in *.
+  intro H0; rewrite H0.
   rewrite Zgcd_zero_lft.
   apply Z_div_same_full.
   discriminate.
 intro Hap.
 cut (Zpos Qden = Zgcd Qnum Qden).
-  intro H0; rewrite H0 at 1.
+  intro H0; rewrite {1} H0.
   apply Z_div_same_full.
   intro H1; destruct (Zgcd_zero _ _ H1).
   discriminate.
@@ -202,7 +202,7 @@ intros P Q; pattern P, Q; apply Ccpoly_double_sym_ind; clear P Q.
   symmetry; apply Hrec; symmetry; assumption.
 intros P Q c d Hrec Heq.
 destruct (linear_eq_linear_ _ _ _ _ _ Heq).
-rewrite Q_can_num_poly_linear, Q_can_num_poly_linear.
+rewrite Q_can_num_poly_linear Q_can_num_poly_linear.
 apply _linear_eq_linear.
 split.
   apply Q_can_num_spec; assumption.
@@ -268,7 +268,7 @@ Lemma injZ_strext : fun_strext (inject_Z : Z_as_CRing -> Q_as_CRing).
 Proof.
 intros x y.
 unfold inject_Z; simpl; unfold Qap, Qeq, ap_Z; simpl.
-rewrite Zmult_1_r, Zmult_1_r; tauto.
+rewrite Zmult_1_r Zmult_1_r; tauto.
 Qed.
 Lemma injZ_spec : forall q : Q_as_CRing, in_Z q -> q [=] (Q_can_num q).
 Proof.
@@ -282,11 +282,11 @@ unfold Q_can_num; simpl.
 unfold Q_can_den in Hin.
 simpl in Hin.
 cut (Zpos qd = Zgcd qn qd).
-  intro H; rewrite H at 2.
+  intro H; rewrite {2} H.
   rewrite Zmult_comm.
   symmetry; apply Zdivides_spec.
   apply Zgcd_is_divisor_lft.
-rewrite (Zgcd_div_mult_rht qn qd) at 1.
+rewrite {1} (Zgcd_div_mult_rht qn qd).
   rewrite Hin; rewrite Zmult_1_l; reflexivity.
 intro H; destruct (Zgcd_zero _ _ H); discriminate.
 Qed.
@@ -294,7 +294,7 @@ Lemma injZ_spec2 : forall p : Z_as_CRing, p = Q_can_num p.
 Proof.
 intro p.
 unfold Q_can_num, inject_Z; simpl.
-rewrite Zgcd_one_rht, Zdiv_1_r; reflexivity.
+rewrite Zgcd_one_rht Zdiv_1_r; reflexivity.
 Qed.
 Definition injZ_fun := Build_CSetoid_fun _ _ _ injZ_strext.
 
@@ -331,7 +331,7 @@ intros P c Hrec n.
 rewrite zx2qx_linear.
 induction n.
   reflexivity.
-rewrite coeff_Sm_lin, coeff_Sm_lin.
+rewrite coeff_Sm_lin coeff_Sm_lin.
 apply Hrec.
 Qed.
 
@@ -344,7 +344,7 @@ set (Hin n).
 rewrite nth_coeff_zx2qx.
 rewrite (injZ_spec _ i).
 unfold inject_Z; simpl; unfold Qeq; simpl.
-rewrite Zmult_1_r, Zmult_1_r.
+rewrite Zmult_1_r Zmult_1_r.
 symmetry; apply nth_coeff_Q_can_num_poly_spec.
 Qed.
 
@@ -388,7 +388,7 @@ case (RX_dec _ Q_dec P Zero).
 intro H.
 transitivity (nth_coeff n (Zero:QX)).
 apply nth_coeff_wd.
-rewrite H at 2.
+rewrite {2} H.
 apply I.
 reflexivity.
 intro Hap.

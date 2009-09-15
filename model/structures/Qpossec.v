@@ -76,7 +76,7 @@ Qed.
 Lemma Qpos_nonzero : forall x:Qpos, (x:Q)[#]0.
 Proof.
 intros x.
-rsapply pos_ap_zero.
+apply: pos_ap_zero.
 apply Qpos_prf.
 Qed.
 
@@ -136,7 +136,7 @@ Definition QposAp (a b:Qpos) := Qap a b.
 Definition Qpos_plus (x y:Qpos) : Qpos. 
 intros x y.
 apply mkQpos with (x+y).
-abstract (rsapply plus_resp_pos; apply Qpos_prf).
+abstract (apply: plus_resp_pos; apply Qpos_prf).
 Defined.
 
 Infix "+" := Qpos_plus : Qpos_scope.
@@ -162,7 +162,7 @@ Hint Rewrite Q_Qpos_plus : QposElim.
 Definition Qpos_mult (x y:Qpos) : Qpos. 
 intros x y.
 apply mkQpos with (x*y).
-abstract (rsapply mult_resp_pos; apply Qpos_prf).
+abstract (apply: mult_resp_pos; apply Qpos_prf).
 Defined.
 
 Infix "*" := Qpos_mult : Qpos_scope.
@@ -231,7 +231,7 @@ Lemma Qpos_lt_plus : forall (a b:Q),
 Proof.
 intros.
 assert (0<b-a).
-rsapply shift_zero_less_minus.
+apply: shift_zero_less_minus.
 assumption.
 exists (mkQpos H0).
 QposRing.
@@ -297,10 +297,10 @@ Definition QposSum (l:list Qpos) : Q := fold_right
 Lemma QposSumNonNeg : forall l, 0 <= QposSum l.
 Proof.
 induction l.
-rsapply leEq_reflexive.
+apply: leEq_reflexive.
 simpl.
-rsapply plus_resp_nonneg.
-rsapply less_leEq.
+apply: plus_resp_nonneg.
+apply: less_leEq.
 apply Qpos_prf.
 assumption.
 Qed.

@@ -39,17 +39,17 @@ intros x.
 change (x+(' 0%Q)==x)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (inject_Q 0))) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply: CR_plus_as_Cauchy_IR_plus.
 stepl ((CRasCauchy_IR x)[+]Zero) by
- apply plus_resp_eq; rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
-rapply cm_rht_unit.
+ apply: plus_resp_eq; apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply cm_rht_unit.
 change ((inject_Q 0%Q)+x==x)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR (inject_Q 0))[+](CRasCauchy_IR x)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepl (Zero[+](CRasCauchy_IR x)) by
- apply bin_op_is_wd_un_op_lft; rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
-rapply cm_lft_unit.
+ apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply cm_lft_unit.
 Qed.
 
 Definition CRasCMonoid : CMonoid :=

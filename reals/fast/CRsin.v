@@ -81,11 +81,11 @@ Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
 split.
  replace RHS with ((1*a)*a) by ring.
- rapply (sqr_nonneg _ a).
+ apply (sqr_nonneg _ a).
 rewrite Qle_minus_iff.
 replace RHS with ((1-a)*(1+a)) by ring.
 destruct Ha as [Ha0 Ha1].
-rsapply mult_resp_nonneg;
+apply: mult_resp_nonneg;
  [unfold Qminus|replace RHS with (a + - (-(1))) by ring];
  rewrite <- Qle_minus_iff;
  try assumption.
@@ -96,7 +96,7 @@ Qed.
 
 Lemma sinSequence_dnn : DecreasingNonNegative sinSequence.
 Proof.
-rapply mult_Streams_dnn.
+apply mult_Streams_dnn.
  apply everyOther_dnn.
  apply dnn_tl.
  apply recip_factorials_dnn.
@@ -110,7 +110,7 @@ Proof.
 unfold sinSequence.
 apply mult_Streams_zl with (1#1)%Qpos.
  apply everyOther_zl.
- rapply Limit_tl.
+ apply Limit_tl.
  apply recip_factorials_zl.
 apply powers_help_nbz; try
  apply square_zero_one; assumption.
@@ -163,7 +163,7 @@ apply bin_op_wd_unfolded.
  destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
    rational.
  elim (not_even_and_odd n').
-  rapply (even_mult_l 2 n).
+  apply (even_mult_l 2 n).
   repeat constructor.
  rewrite Hm.
  constructor.
@@ -174,7 +174,7 @@ destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
  elim (not_even_and_odd (S n')).
   rewrite Hm.
   replace (m + m)%nat with (2*m)%nat by omega.
-  rapply (even_mult_l 2 m).
+  apply (even_mult_l 2 m).
   repeat constructor.
  constructor.
  apply (even_mult_l 2 n).
@@ -193,7 +193,7 @@ rstepr ((nexp IR n [--]One[*](nexp IR (S n') (inj_Q IR a[-]Zero)[/]nring (R:=IR)
 apply mult_wd.
  stepr ((inj_Q IR (-(1)))[^]n).
   apply inj_Q_power.
- rapply nexp_wd.
+ apply nexp_wd.
  stepr ([--](inj_Q IR 1)).
   apply inj_Q_inv.
  apply un_op_wd_unfolded.
@@ -298,9 +298,9 @@ Qed.
 
 Lemma sin_poly_prf : is_UniformlyContinuousFunction (fun x => sin_poly_fun (QboundAbs (1#1) x)) sin_poly_modulus.
 Proof.
-rapply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D sin_poly_fun a (9#1)).
+apply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D sin_poly_fun a (9#1)).
  simpl; intros q _ _.
- rapply sin_poly_fun_correct.
+ apply sin_poly_fun_correct.
 simpl; intros x' _ [Hx0 Hx1].
 set (x:=(inj_Q IR x')) in *.
 stepr (Nine:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 9)).
@@ -319,7 +319,7 @@ split.
   assumption.
  stepr ([--](inj_Q IR 1)).
   apply inj_Q_inv.
- rapply un_op_wd_unfolded.
+ apply un_op_wd_unfolded.
  apply (inj_Q_nring IR 1).
  rstepr (Nine[-]Zero:IR).
 apply minus_resp_leEq_both.
@@ -343,10 +343,10 @@ intros x Hx.
 assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)).
  eapply Derivative_imp_Continuous.
  apply D.
-rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
+apply: (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
  [|repeat constructor|].
  intros q Hq Hq0.
- transitivity (IRasCR (inj_Q IR (sin_poly_fun q)));[|apply IRasCR_wd; rapply sin_poly_fun_correct].
+ transitivity (IRasCR (inj_Q IR (sin_poly_fun q)));[|apply IRasCR_wd; apply sin_poly_fun_correct].
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
  rewrite compress_fun_correct.
@@ -385,14 +385,14 @@ csetoid_replace (cx[^]2) (One[-]sx[^]2).
 apply cg_inv_unique_2.
 rstepl ((cx[^]2[+]sx[^]2)[-]One).
 apply x_minus_x.
-rapply FFT.
+apply FFT.
 Qed.
 
 Lemma shrink_by_three : forall n a, 0 <= a <= (3^(S n))%Z -> 0 <= a/3 <= (3^n)%Z.
 Proof.
 intros n a [H0 H1].
 split.
- rapply mult_resp_nonneg.
+ apply: mult_resp_nonneg.
   assumption.
  discriminate.
 apply Qmult_lt_0_le_reg_r with 3.
@@ -402,7 +402,7 @@ rewrite (inj_S n) in H1.
 replace RHS with (3%positive^n*3^1) by ring.
 rewrite <- Qpower_plus;[|discriminate].
 replace LHS with a by (field; discriminate).
-rewrite Zpower_Qpower in H1; auto with *.
+rewrite -> Zpower_Qpower in H1; auto with *.
 Qed.
 
 Fixpoint rational_sin_pos_bounded (n:nat) (a:Q) : 0 <= a <= (3^n)%Z -> CR :=
@@ -419,10 +419,10 @@ Lemma rational_sin_pos_bounded_correct :  forall n (a:Q) Ha,
  (@rational_sin_pos_bounded n a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
 induction n.
- rapply rational_sin_small_pos_correct.
+ apply rational_sin_small_pos_correct.
 intros a Ha.
 unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
-destruct (Qlt_le_dec_fast 1 a);[|rapply rational_sin_small_pos_correct].
+destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
 rewrite IHn.
 rewrite <- sin_poly_correct;
  [|apply AbsIR_imp_AbsSmall;
@@ -455,7 +455,7 @@ Definition rational_sin_pos (a:Q) (Ha:0 <= a) : CR :=
 Lemma rational_sin_pos_correct : forall (a:Q) Ha,
  (@rational_sin_pos a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
-intros; rapply rational_sin_pos_bounded_correct.
+intros; apply rational_sin_pos_bounded_correct.
 Qed.
 
 (** By symmetry sin is extented to its entire range. *)
@@ -494,15 +494,15 @@ apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_sin x) (Qscale
  change (/1) with 1.
  replace RHS with (x:Q) by ring.
  apply Qle_refl.
-rapply (is_UniformlyContinuousD None None I Sine Cosine (Derivative_Sin CI) rational_sin).
+apply (is_UniformlyContinuousD None None I Sine Cosine (Derivative_Sin CI) rational_sin).
  intros q [] _.
- rapply rational_sin_correct.
+ apply rational_sin_correct.
 intros x [] _.
 stepr (One:IR).
- rapply AbsIR_Cos_leEq_One.
+ apply: AbsIR_Cos_leEq_One.
 rstepl (nring 1:IR).
 apply eq_symmetric.
-rapply (inj_Q_nring IR 1).
+apply (inj_Q_nring IR 1).
 Qed.
 
 Definition sin_uc : Q_as_MetricSpace --> CR := 
@@ -514,13 +514,13 @@ Lemma sin_slow_correct : forall x,
  (IRasCR (Sin x) == sin_slow (IRasCR x))%CR.
 Proof.
 intros x.
-rapply (ContinuousCorrect (CI:proper realline));
+apply: (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Sin | | constructor].
 intros q [] _.
-transitivity (rational_sin q);[|rapply rational_sin_correct].
+transitivity (rational_sin q);[|apply rational_sin_correct].
 unfold sin_slow.
 rewrite (Cbind_fun_correct QPrelengthSpace sin_uc).
-rapply BindLaw1.
+apply: BindLaw1.
 Qed.
 
 Definition sin (x:CR) := sin_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.

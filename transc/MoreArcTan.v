@@ -28,7 +28,7 @@ Lemma Dom_Tang_ArcTan : forall x, (Dom Tang (ArcTan x)).
 Proof.
 intros x.
 apply Tang_Domain'.
-rapply ArcTan_range.
+apply ArcTan_range.
 Qed.
 
 Lemma ArcTan_zero : ArcTan Zero[=]Zero.
@@ -38,7 +38,7 @@ assert (Z:Dom Tang Zero).
  split; auto with *.
 stepl (ArcTan (Tan _ Z)).
  apply ArcTan_Tan; auto with *.
-rapply pfwdef.
+apply pfwdef.
 apply Tan_zero.
 Qed.
 
@@ -49,7 +49,7 @@ assert (Z:Dom Tang (Pi[/]FourNZ)).
  split; auto with *.
 stepl (ArcTan (Tan _ Z)).
  apply ArcTan_Tan; auto with *.
-rapply pfwdef.
+apply pfwdef.
 apply Tan_QuarterPi.
 Qed.
 
@@ -441,7 +441,7 @@ assert (X:AbsIR ([--](c[^]2))[<]One).
  csetoid_rewrite_rev (AbsIR_inv (c[^]2)).
  csetoid_rewrite (AbsIR_nexp_op 2 c).
  rstepr (One[^]2:IR).
- rapply nexp_resp_less.
+ apply nexp_resp_less.
    auto with *.
   apply AbsIR_nonneg.
  apply AbsIR_less; assumption.
@@ -457,7 +457,7 @@ assert (Y:One[-]([--](c[^]2))[#]Zero).
 rstepr (One[/](One[-]([--](c[^]2)))[//]Y).
 stepr (series_sum (power_series [--](c[^]2)) (power_series_conv [--](c[^]2) X)) by
  apply (power_series_sum ([--](c[^]2)) X Y (power_series_conv _ X)).
-rapply series_sum_wd.
+apply series_sum_wd.
 intros n.
 simpl.
 change ((([--]One)[^]n)[*]c[^](2*n)[=][--](One[*]c[*]c)[^]n).
@@ -589,7 +589,7 @@ assert (Y1 : J Zero).
 stepl (([-S-]
         Included_imp_Continuous realline {1/}([-C-]One{+}FId{^}2)
           ArcTan_def_lemma J Y0) Zero Y1 c Hc).
- rapply Integral_wd.
+ apply: Integral_wd.
  apply Feq_reflexive.
  intros d Hd.
  eapply Continuous_imp_inc.
@@ -603,12 +603,12 @@ cut (Derivative J HJ (FSeries_Sum Hs) {1/}([-C-]One{+}FId{^}2)).
  apply eq_transitive with z.
   eapply eq_transitive;
    [|apply (Feq_imp_eq _ _ _ Hz _ Hc (CAnd_intro _ _ Hc Hc) CI)].
-  rapply bin_op_wd_unfolded;[|apply un_op_wd_unfolded]; apply pfwdef; apply eq_reflexive.
+  apply: bin_op_wd_unfolded;[|apply un_op_wd_unfolded]; apply pfwdef; apply eq_reflexive.
  apply eq_symmetric.
  eapply eq_transitive;
   [|apply (Feq_imp_eq _ _ _ Hz _ Y1 (CAnd_intro _ _ Y1 Y1) CI)].
  rstepl (Zero[-]Zero:IR).
- rapply cg_minus_wd.
+ apply: cg_minus_wd.
   stepr (ArcTan Zero).
    assert (Z:Dom Tang Zero).
     repeat split; try constructor.
@@ -618,13 +618,13 @@ cut (Derivative J HJ (FSeries_Sum Hs) {1/}([-C-]One{+}FId{^}2)).
     apply eq_symmetric.
     apply Cos_zero.
    stepl (ArcTan (Tan _ Z)).
-    rapply pfwdef.
+    apply pfwdef.
     apply Tan_zero.
    apply ArcTan_Tan;
     [rstepr ([--]Zero:IR); apply inv_resp_less|];
     apply pos_HalfPi.
   unfold ArcTan, ArcTang.
-  rapply Integral_wd.
+  apply: Integral_wd.
   apply Feq_reflexive.
   intros d Hd.
   eapply Continuous_imp_inc.
@@ -650,7 +650,7 @@ intros n.
 rewrite plus_comm.
 simpl.
 Derivative_Help;
- [|apply Derivative_scal;rapply Derivative_nth;Deriv].
+ [|apply Derivative_scal;apply Derivative_nth;Deriv].
 FEQ.
 Qed.
 

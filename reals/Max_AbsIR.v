@@ -254,9 +254,9 @@ rewrite leEq_def in |- *.
 intro H1.
 generalize (less_MAX_imp _ _ _ H1); intro H2.
 elim H2; intros.
-rewrite leEq_def in H; elim H.
+rewrite -> leEq_def in H; elim H.
 assumption.
-rewrite leEq_def in H0; elim H0.
+rewrite -> leEq_def in H0; elim H0.
 assumption.
 Qed.
 
@@ -409,7 +409,7 @@ apply lft_leEq_Max.
 assumption.
 apply rht_leEq_Max.
 assumption.
-rewrite leEq_def in *.
+rewrite -> leEq_def in *.
 intros Z.
 assert (Not (Not (Zero[<]c or Zero[=]c))).
 intros X.

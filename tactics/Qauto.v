@@ -28,21 +28,20 @@ Require Import CornTac.
 Ltac Qauto_pos :=
   repeat (first [assumption
                |constructor
-               |rsapply plus_resp_pos
-               |rsapply mult_resp_pos]);
+               |apply: plus_resp_pos;simpl
+               |apply: mult_resp_pos;simpl]);
   auto with *.
 
 Ltac Qauto_nonneg :=
   repeat (first [assumption
                |discriminate
-               |rapply Qabs_nonneg
-               |rapply Qsqr_nonneg
-               |rsapply plus_resp_nonneg
-               |rsapply mult_resp_nonneg
-               |apply Qle_shift_div_l;[Qauto_pos|ring_simplify]
-               |apply Qle_shift_inv_l;[Qauto_pos|ring_simplify]]);
+               |apply: Qabs_nonneg
+               |apply: Qsqr_nonneg
+               |apply: plus_resp_nonneg;simpl
+               |apply: mult_resp_nonneg;simpl
+               |apply: Qle_shift_div_l;[Qauto_pos|ring_simplify]
+               |apply: Qle_shift_inv_l;[Qauto_pos|ring_simplify]]);
   auto with *.
 
 Ltac Qauto_le :=
- rewrite Qle_minus_iff;ring_simplify;Qauto_nonneg.
-
+ rewrite -> Qle_minus_iff;ring_simplify;Qauto_nonneg.

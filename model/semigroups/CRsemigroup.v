@@ -38,9 +38,9 @@ intros x1 x2 y1 y2 H.
 simpl in *.
 assert (X:(CRasCauchy_IR x1[+]CRasCauchy_IR y1)[#](CRasCauchy_IR x2[+]CRasCauchy_IR y2)).
 stepl (CRasCauchy_IR (x1+y1)%CR) by
- apply eq_symmetric; rapply CR_plus_as_Cauchy_IR_plus.
+ apply eq_symmetric; apply CR_plus_as_Cauchy_IR_plus.
 stepr (CRasCauchy_IR (x2+y2)%CR) by
- apply eq_symmetric; rapply CR_plus_as_Cauchy_IR_plus.
+ apply eq_symmetric; apply CR_plus_as_Cauchy_IR_plus.
 apply CR_ap_as_Cauchy_IR_ap_1.
 assumption.
 destruct (bin_op_strext_unfolded _ _ _ _ _ _ X);[left|right];
@@ -56,13 +56,13 @@ intros x y z.
 change (x + (y+z)==(x+y)+z)%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (y+z)%CR)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepl ((CRasCauchy_IR x)[+]((CRasCauchy_IR y)[+](CRasCauchy_IR z))) by
- apply plus_resp_eq; rapply CR_plus_as_Cauchy_IR_plus.
+ apply plus_resp_eq; apply CR_plus_as_Cauchy_IR_plus.
 stepr ((CRasCauchy_IR (x+y)%CR)[+](CRasCauchy_IR z)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepr (((CRasCauchy_IR x)[+](CRasCauchy_IR y))[+](CRasCauchy_IR z)) by
- rapply bin_op_is_wd_un_op_lft; rapply CR_plus_as_Cauchy_IR_plus.
+ apply bin_op_is_wd_un_op_lft; apply CR_plus_as_Cauchy_IR_plus.
 apply plus_assoc_unfolded.
 Qed.
 

@@ -91,8 +91,8 @@ assert (X:0 < 1 - a).
  change (0 < 1 + - a).
  rewrite <- Qlt_minus_iff.
  assumption.
-rsapply plus_resp_leEq_both; try assumption.
-rewrite err_prop_prop in Hs.
+apply: plus_resp_leEq_both; try assumption.
+rewrite -> err_prop_prop in Hs.
 unfold err_bound in Hs.
 apply Qmult_lt_0_le_reg_r with (/(1-a)).
  apply Qinv_lt_0_compat; assumption.
@@ -106,10 +106,10 @@ Lemma err_prop_key' : forall (e:Q) (s: Stream Q),
  GeometricSeries s -> err_prop e s -> err_prop (a*e) (tl s).
 Proof.
 intros e s [H _] Hs.
-rewrite err_prop_prop in *.
+rewrite -> err_prop_prop in *.
 unfold err_bound in *.
-rewrite Qle_minus_iff in H, Hs |- *.
-rewrite Qlt_minus_iff in Ha1.
+rewrite -> Qle_minus_iff in H, Hs |- *.
+rewrite -> Qlt_minus_iff in Ha1.
 replace RHS with (a * (e + - (Qabs (hd s)/(1-a)))+
  (a * Qabs (hd s) + - Qabs (hd (tl s)))/(1+-a)).
  Qauto_nonneg.
@@ -120,21 +120,21 @@ Qed.
 Lemma err_prop_monotone : forall (e0 e1:Q) (s: Stream Q), (e0 <= e1) -> err_prop e0 s -> err_prop e1 s.
 Proof.
 intros e0 e1 s He H.
-rewrite err_prop_prop in *.
+rewrite ->  err_prop_prop in *.
 apply Qle_trans with e0; assumption.
 Qed.
 
 Lemma err_prop_monotone' : forall (e:Q) (s: Stream Q), GeometricSeries s -> err_prop e s -> err_prop e (tl s).
 Proof.
 intros e s Hs H.
-rewrite err_prop_prop in *.
+rewrite -> err_prop_prop in *.
 eapply Qle_trans;[|apply H].
 unfold err_bound.
-rsapply mult_resp_leEq_rht.
+apply: mult_resp_leEq_rht.
  destruct Hs as [H0 _].
  eapply Qle_trans;[apply H0|].
  replace RHS with (1*Qabs(hd s)) by ring.
- rsapply mult_resp_leEq_rht; auto with *.
+ apply: mult_resp_leEq_rht; auto with *.
  apply Qabs_nonneg.
 apply Qinv_le_0_compat.
 unfold Qminus.
@@ -272,7 +272,7 @@ intros s0 rec _ Hrec e He H0 gs0.
 apply err_prop_key.
  assumption.
 apply Hrec.
-  rsapply mult_resp_nonneg; assumption.
+  apply: mult_resp_nonneg; assumption.
  apply err_prop_key'; assumption.
 destruct gs0.
 assumption.
@@ -292,22 +292,22 @@ destruct (Qle_lt_or_eq _ _ Ha0) as [Ha0'|Ha0'].
   autorewrite with QposElim in X.
   assumption.
  apply Qmult_lt_0_le_reg_r with ((/e)*/(a^n)).
-  rsapply mult_resp_pos.
+  apply: mult_resp_pos.
    apply Qinv_lt_0_compat; auto with *.
   apply Qinv_lt_0_compat.
   assumption.
  assert (0 <e) by auto with *.
  replace RHS with (/a^n) by (field; split; auto with *).
  replace LHS with (/e) by (field; split; auto with *).
- rewrite Qlt_minus_iff in Ha1.
+ rewrite -> Qlt_minus_iff in Ha1.
  change (0<1-a) in Ha1.
- rewrite Qle_minus_iff in H.
+ rewrite -> Qle_minus_iff in H.
  apply Qle_trans with (1 + n*(/a -1)).
   rewrite Qle_minus_iff.
   replace RHS with (1+(1 - a)*((n*(1-a)*/a + (n +-(/(e*(1 - a))))))) by
    field; split; auto with *.
-   rsapply plus_resp_nonneg; try discriminate.
-   repeat rsapply mult_resp_nonneg; auto with *.
+   apply: plus_resp_nonneg; try discriminate.
+   repeat apply: mult_resp_nonneg; simpl; auto with *.
    assert (0 <= 1-a) by auto with *.
    Qauto_nonneg.
  clear -n Ha0'.
@@ -324,7 +324,7 @@ destruct (Qle_lt_or_eq _ _ Ha0) as [Ha0'|Ha0'].
   rewrite Qle_minus_iff.
   replace RHS with (n*(/a -1)^2) by ring.
   Qauto_nonneg.
- rsapply mult_resp_leEq_rht.
+ apply: mult_resp_leEq_rht.
   assumption.
  apply Qinv_le_0_compat; auto with *.
 intros n e _.
@@ -377,7 +377,7 @@ destruct Gs as [H _].
 eapply Qle_trans.
  apply H.
 replace RHS with (1*Qabs (hd series)) by ring.
-rsapply mult_resp_leEq_rht;
+apply: mult_resp_leEq_rht;simpl;
  auto with *.
 apply Qabs_nonneg.
 Qed.
@@ -465,7 +465,7 @@ apply Qle_trans with (Qabs (hd (Str_nth_tl (nat_of_P p) series))*a).
  rewrite <- Str_nth_tl_plus.
  simpl.
  destruct IHn; assumption.
-rsapply mult_resp_leEq_rht; try assumption.
+apply: mult_resp_leEq_rht; try assumption.
 apply IHp; assumption.
 Qed.
 
@@ -498,12 +498,11 @@ Qball (e0)
  intros X e0 e1 p0 p1.
  destruct (Qle_total e1 e0).
   intros H0 H1.
-  rsapply ball_weak.
-  auto.
+  apply: ball_weak;simpl;auto.
  intros H0 H1.
  setoid_replace (e0 + e1)%Qpos with (e1+e0)%Qpos by QposRing.
- rsapply ball_weak.
- rapply ball_sym.
+ apply: ball_weak.
+ apply ball_sym.
  apply X; auto with *.
 intros e0 e1 He p0 p1 H0.
 revert H.
@@ -514,7 +513,7 @@ change (P0 series (InfiniteSum_raw_N p0 (fun (_ : Stream Q -> bool) (_ : Stream 
      (err_prop e0) series)).
 apply InfiniteSum_raw_N_ind; try assumption; unfold P0.
  intros s Hs Gs H1.
- rsapply ball_sym.
+ apply: ball_sym;simpl.
  unfold Qball.
  rewrite <- AbsSmall_Qabs.
  unfold Qminus.
@@ -537,7 +536,7 @@ repeat rewrite Qplus'_correct.
 set (x:=InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) (err_prop e1) (tl s)) in *.
 setoid_replace (hd s + rec - (hd s + x)) with (rec - x) by ring.
 rewrite AbsSmall_Qabs.
-rapply Ind.
+apply Ind.
  destruct Gs; assumption.
 rewrite <- tl_nth_tl.
 apply err_prop_monotone'; try assumption.
@@ -560,7 +559,7 @@ Lemma InfiniteGeometricSum_step : forall series (Gs:GeometricSeries series),
 Proof.
 intros series Gs.
 rewrite CRplus_translate.
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 simpl.
 rewrite InfiniteSum_raw_N_extend;
@@ -571,7 +570,7 @@ case_eq (err_prop e series); intros He.
  assert (He':err_prop e series).
   destruct (err_prop e series);try discriminate He; constructor.
  clear He.
- rapply ball_sym.
+ apply: ball_sym.
  simpl.
  unfold Qball.
  rewrite <- AbsSmall_Qabs.
@@ -582,8 +581,8 @@ case_eq (err_prop e series); intros He.
  eapply Qle_trans.
   apply Qabs_triangle.
  autorewrite with QposElim.
- rsapply plus_resp_leEq_both.
-  rewrite err_prop_prop in He'.
+ apply: plus_resp_leEq_both;simpl.
+  rewrite ->  err_prop_prop in He'.
   unfold err_bound in He'.
   assert (X:0 < 1 - a).
    change (0 < 1 + - a).
@@ -592,7 +591,7 @@ case_eq (err_prop e series); intros He.
   clear - He' Ha0 X.
   replace LHS with ((Qabs (hd series)/(1-a))*(1-a)) by (field; auto with *).
   replace RHS with (e*1) by ring.
-  rsapply mult_resp_leEq_both; try solve[Qauto_nonneg]; auto with *.
+  apply: mult_resp_leEq_both; simpl; try solve[Qauto_nonneg]; auto with *.
   rewrite Qle_minus_iff.
   ring_simplify.
   assumption.
@@ -606,13 +605,13 @@ case_eq (err_prop e series); intros He.
  simpl.
  rewrite <- tl_nth_tl.
  apply err_prop_monotone'; try assumption.
- rapply ForAll_Str_nth_tl.
+ apply ForAll_Str_nth_tl.
  assumption.
 rewrite Qplus'_correct.
 rewrite (@InfiniteSum_raw_N_extend'
  (InfiniteGeometricSum_maxIter (tl series) e)
  (InfiniteGeometricSum_maxIter series e)).
-  rapply ball_refl.
+  apply: ball_refl.
  apply InfiniteGeometricSum_maxIter_correct.
  destruct Gs; assumption.
 apply (@InfiniteGeometricSum_maxIter_monotone series e).
@@ -634,13 +633,13 @@ destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
   rewrite Hq; try apply CRle_refl.
   setoid_replace (-'0)%CR with ('0)%CR by ring.
   apply CRle_refl.
- rapply regFunEq_e.
+ apply: regFunEq_e.
  intros e.
- rapply ball_sym.
+ apply ball_sym.
  simpl.
  unfold Qball. 
  stepr 0.
-  rapply zero_AbsSmall.
+  apply zero_AbsSmall.
   apply Qpos_nonneg.
  simpl.
  ring_simplify.
@@ -675,7 +674,7 @@ cut (AbsSmall (R:=CRasCOrdField) (' e)%CR (InfiniteGeometricSum Gs)).
  split; assumption.
 stepr (InfiniteGeometricSum Gs[-]'0)%CR by (unfold cg_minus; simpl; ring).
 rewrite CRAbsSmall_ball.
-rapply regFunBall_e.
+apply: regFunBall_e.
 intros d.
 simpl.
 set (p:=(InfiniteGeometricSum_maxIter series d)).
@@ -694,7 +693,7 @@ apply err_prop_correct; try assumption.
  autorewrite with QposElim.
  apply Qle_refl.
 unfold e'.
-rapply InfiniteGeometricSum_maxIter_correct.
+apply InfiniteGeometricSum_maxIter_correct.
 assumption.
 Qed.
 
@@ -708,9 +707,9 @@ exists (nat_of_P (InfiniteGeometricSum_maxIter series e)).
 intros Gs.
 eapply AbsSmall_leEq_trans;
  [|apply InfiniteGeometricSum_bound].
-rewrite CRle_Qle.
+rewrite ->  CRle_Qle.
 rewrite <- err_prop_prop.
-rapply InfiniteGeometricSum_maxIter_correct.
+apply InfiniteGeometricSum_maxIter_correct.
 assumption.
 Qed.
 
@@ -757,7 +756,7 @@ Proof.
 intros seq x Hx Gs H.
 unfold series_sum.
 rewrite IR_Lim_as_CR.
-rapply SeqLimit_unique.
+apply: SeqLimit_unique.
 intros e He.
 generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
 intros C.
@@ -769,7 +768,7 @@ clear C.
 unfold seq_part_sum in *.
 rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
        ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteGeometricSum Gs)))).
-rapply AbsSmall_eps_div_two;[apply Hn; assumption|].
+apply AbsSmall_eps_div_two;[apply Hn; assumption|].
 
 clear m Hm.
 stepr (('(Sum0 n (fun n => (Str_nth n seq))%Q))%CR[-]InfiniteGeometricSum Gs).
@@ -778,8 +777,8 @@ revert seq x H Hx Gs Hn.
 induction n.
  intros seq x H Hx Gs Hn. 
  stepr (Zero[-]InfiniteGeometricSum Gs);
-  [|rapply csbf_wd_unfolded; try apply eq_reflexive; apply eq_symmetric; rapply IR_Zero_as_CR].
- rapply AbsSmall_minus.
+  [|apply csbf_wd_unfolded; try apply eq_reflexive; apply eq_symmetric; apply IR_Zero_as_CR].
+ apply AbsSmall_minus.
  rstepr (InfiniteGeometricSum Gs).
  assert (Hn' : forall m : nat,
      (0 <= m)%nat ->
@@ -802,14 +801,14 @@ induction n.
  destruct (Q_dense_in_CReals IR d) as [q Hq0 Hq].
   assumption. 
  assert (Hq0': 0 < q).
-  rapply (less_inj_Q IR).
+  apply (less_inj_Q IR).
   stepl (Zero:IR).
    assumption.
-  apply eq_symmetric; rapply (inj_Q_nring IR 0).
+  apply eq_symmetric; apply (inj_Q_nring IR 0).
  destruct (InfiniteGeometricSum_small_tail (mkQpos Hq0') Gs) as [m Hm].
  rstepr ((IRasCR (Sum0 (G:=IR) m x))[+]((InfiniteGeometricSum Gs)[-](IRasCR (Sum0 (G:=IR) m x)))).
- stepl (IRasCR (CRasIR (e [/]TwoNZ))[+](IRasCR d)) by apply eq_symmetric; rapply IR_plus_as_CR.
- rapply AbsSmall_plus.
+ stepl (IRasCR (CRasIR (e [/]TwoNZ))[+](IRasCR d)) by apply eq_symmetric; apply IR_plus_as_CR.
+ apply AbsSmall_plus.
   stepl (e [/]TwoNZ) by apply eq_symmetric; apply CRasIRasCR_id.
   apply Hn'; auto with *.
  apply AbsSmall_leEq_trans with ('q)%CR.
@@ -883,9 +882,9 @@ stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  Str_nth n0 (tl seq))%Q))
  do 2 rewrite <- IR_minus_as_CR.
  apply IRasCR_wd.
  stepr ((x O[+]Sum0 (G:=IR) m y[-](x O[+]Sum0 (G:=IR) n y))).
- rapply bin_op_wd_unfolded;[|apply un_op_wd_unfolded];
+ apply bin_op_wd_unfolded;[|apply un_op_wd_unfolded];
   apply eq_symmetric;
-  rapply Sum0_shift;
+  apply Sum0_shift;
   intros; unfold y;rewrite plus_comm; apply eq_reflexive.
  rational.
 change ((' Sum0 (G:=Q_as_CAbGroup) n
@@ -905,11 +904,11 @@ setoid_replace ((Sum0 (G:=Q_as_CAbGroup) (S n) z):Q)
  simpl.
  ring.
 symmetry.
-rsapply Sum0_shift.
+apply Sum0_shift.
 intros i.
 reflexivity.
 
-rsapply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
+apply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
 clear - Hx.
 induction n.
 reflexivity.

@@ -47,7 +47,7 @@ set (l:=Max a (x[-]e)).
 set (r:=Min b (x[+]e)).
 assert (Hlr:l[<]r).
 destruct Hx as [Hx0 Hx1].
-rapply less_Min; rapply Max_less.
+apply less_Min; apply Max_less.
     assumption.
    apply shift_minus_less.
    rstepl (x[+]Zero).
@@ -64,14 +64,14 @@ exists q; split.
    apply less_leEq; unfold l in Hlq; apply Hlq.
   eapply leEq_transitive.
    apply less_leEq;apply Hqr.
-  rapply Min_leEq_lft.
+  apply Min_leEq_lft.
  apply shift_zero_leEq_minus'.
  rstepr ((x[+]e)[-]inj_Q IR q).
  apply shift_zero_leEq_minus.
  eapply leEq_transitive.
   apply less_leEq.
   apply Hqr.
- rapply Min_leEq_rht.
+ apply Min_leEq_rht.
 apply shift_zero_leEq_minus'.
 rstepr (inj_Q IR q[-](x[-]e)).
 apply shift_zero_leEq_minus.
@@ -96,10 +96,10 @@ Lemma ContinuousCorrect : forall (x:IR) Hx, I x -> (IRasCR (f x Hx) == g (IRasCR
 Proof.
 intros x Hx H.
 set (J:=compact_in_interval I HI x H).
-rapply ball_eq.
+apply ball_eq.
 intros e.
 assert (HJ:compact_ J) by
- rapply compact_compact_in_interval.
+ apply compact_compact_in_interval.
 destruct Hf as [Hf1 Hf0].
 clear Hf.
 assert (X:Continuous_I (Lend_leEq_Rend J HJ) f).
@@ -123,9 +123,9 @@ assert (HJ':included (Compact Hab) I).
   unfold Hab, a, b, J; apply iprop_compact_in_interval_inc1.
  apply included_compact_in_interval.
 assert (Hab0: a[<]b).
- rapply proper_compact_in_interval'.
+ apply proper_compact_in_interval'.
 assert (HJx:(Compact Hab) x).
- rapply iprop_compact_in_interval'.
+ apply iprop_compact_in_interval'.
 clearbody Hab a b.
 clear J HJ.
 pose (d:=match d1 with 
@@ -134,10 +134,10 @@ pose (d:=match d1 with
  end).
 assert (H0d : Zero[<]d).
  destruct d1; try assumption.
- rapply less_Min; try assumption.
+ apply less_Min; try assumption.
  stepl (inj_Q IR Zero).
   apply inj_Q_less.
-  rapply Qpos_prf.
+  apply Qpos_prf.
  apply (inj_Q_nring IR 0).
 destruct (Q_dense_in_compact Hab0 HJx _ H0d) as [q Hq0 Hq1].
 setoid_replace e with ((1#2)*e+(1#2)*e)%Qpos by QposRing.
@@ -147,7 +147,7 @@ assert (Hfq : Dom f (inj_Q IR q)).
  assumption.
 apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
  rewrite <- CRAbsSmall_ball.
- stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)) by (simpl; rapply IR_minus_as_CR).
+ stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)) by (simpl; apply IR_minus_as_CR).
  stepl (IRasCR (inj_Q IR (((1 # 2) * e)%Qpos:Q))) by (simpl; apply IR_inj_Q_as_CR).
  rewrite <- IR_AbsSmall_as_CR.
  apply AbsIR_imp_AbsSmall.
@@ -156,8 +156,8 @@ apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
  apply AbsSmall_imp_AbsIR.
  apply Hq1.
  destruct d1.
-  rapply Min_leEq_rht.
- rapply leEq_reflexive.
+  apply Min_leEq_rht.
+ apply leEq_reflexive.
 rewrite <- Hg;[|apply HJ';assumption].
 apply uc_prf.
 fold d1.
@@ -165,12 +165,12 @@ destruct d1; try constructor.
 simpl.
 rewrite <- IR_inj_Q_as_CR.
 rewrite <- CRAbsSmall_ball.
- stepr (IRasCR (inj_Q IR q[-]x)) by (simpl; rapply IR_minus_as_CR).
+ stepr (IRasCR (inj_Q IR q[-]x)) by (simpl; apply IR_minus_as_CR).
 stepl (IRasCR (inj_Q IR (q0:Q))) by (simpl; apply IR_inj_Q_as_CR).
 rewrite <- IR_AbsSmall_as_CR.
 apply AbsSmall_minus.
 eapply AbsSmall_leEq_trans;[|apply Hq1].
-rapply Min_leEq_lft.
+apply Min_leEq_lft.
 Qed.
 
 End ContinuousCorrect.

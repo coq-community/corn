@@ -228,10 +228,10 @@ induction s.
  auto with *.
 intros a b Hab; simpl in Hab.
 simpl.
-apply SplitL_glue_ind; intros Hao; rapply SplitR_glue_ind; intros Hoa; simpl in Hoa;
+apply SplitL_glue_ind; intros Hao; apply: SplitR_glue_ind; intros Hoa; simpl in Hoa;
  try (repeat split; auto with *; try apply IHs1; try apply IHs2; simpl; rewrite Hab; field; auto with *).
       elim (Qlt_not_le _ _ Hao).
-      rewrite Qlt_minus_iff in Hoa.
+      rewrite -> Qlt_minus_iff in Hoa.
       rewrite Qle_minus_iff.
       replace RHS with (1 - o + - (1 - a)) by ring.
       rewrite <- Hab.
@@ -247,7 +247,7 @@ apply SplitL_glue_ind; intros Hao; rapply SplitR_glue_ind; intros Hoa; simpl in 
     revert H; change (~(a==0)); auto with *.
    elim (Qlt_not_le _ _ Hao).
    rewrite Qle_minus_iff.
-   rewrite Qlt_minus_iff in Hoa.
+   rewrite -> Qlt_minus_iff in Hoa.
    replace RHS with (1 - a + - (1 - o)) by ring.
    rewrite <- Hab.
    auto with *.
@@ -359,7 +359,7 @@ apply SplitL_glue_ind; intros Hao.
    simpl.
    rewrite <- H.
    field; repeat split; auto with *.
-   clear - Hao; rewrite Qlt_minus_iff in Hao.
+   clear - Hao; rewrite -> Qlt_minus_iff in Hao.
    auto with *.
   elim (Qlt_not_le _ _ Hbd).
   simpl.
@@ -389,7 +389,7 @@ apply SplitL_glue_ind; intros Hco.
 elim (Qlt_not_le b 1).
  auto with *.
 rewrite <- Hao in Hco.
-rewrite Hco in H.
+rewrite -> Hco in H.
 apply Qmult_lt_0_le_reg_r with a.
  auto with *.
 ring_simplify.
@@ -439,7 +439,7 @@ apply SplitR_glue_ind; intros Hao.
     apply SplitL_glue_ind; intros Hco.
       apply IHs1; simpl; [rewrite <- H0|rewrite <- H1]; field; auto with *.
      elim (Qlt_not_le _ _ Hbz).
-     rewrite Qlt_minus_iff in Hco.
+     rewrite -> Qlt_minus_iff in Hco.
      rewrite Qle_minus_iff.
      replace RHS with ((a + b - a*b + -o)/(1 -a)) by (field; auto with *).
      rewrite H0.
@@ -455,7 +455,7 @@ apply SplitR_glue_ind; intros Hao.
     auto with *.
    apply SplitL_glue_ind; intros Hco.
      elim (Qlt_not_le _ _ Hbz).
-     rewrite Qlt_minus_iff in Hco.
+     rewrite -> Qlt_minus_iff in Hco.
      rewrite Qle_minus_iff.
      replace RHS with ((o + -(a + b - a*b))/(1 -a)) by (field; auto with *).
      rewrite H0.
@@ -465,7 +465,7 @@ apply SplitR_glue_ind; intros Hao.
     apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
       repeat split; simpl.
         field_simplify; auto with *.
-        rapply Qmult_simpl.
+        apply Qmult_simpl.
          rewrite <- H1; ring.
         apply Qinv_comp.
         replace LHS with (a + b - a*b - a) by ring.
@@ -509,25 +509,24 @@ apply SplitR_glue_ind; intros Hao.
    elim (Qlt_not_le _ _ Hco).
    rewrite <- H0.
    apply Qlt_le_weak.
-   rewrite Qlt_minus_iff in *.
+   rewrite -> Qlt_minus_iff in *.
    replace RHS with (a + - o + b*(1-a)) by ring.
    assert (Z:0 < (1-a)) by auto with *.
    Qauto_pos.
   assert (Hco':~ c - o == 0).
    intros H.
    elim (Qlt_not_le _ _ Hco).
-   rewrite Qle_minus_iff.
-   replace RHS with (- (c- o)) by ring.
-   rewrite H.
-   auto with *.
-  apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
+   rewrite -> Qle_minus_iff.
+   replace RHS with (c-o). rewrite H. auto with *.
+   replace LHS with (-(c-o)) by ring. rewrite H. ring.
+ apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
     elim (Qlt_not_le _ _ Hdz).
     apply Qle_shift_div_r; auto with *.
     rewrite H1; auto with *.
    apply IHs2; simpl; [rewrite <- H0|rewrite <- H1]; field; auto with *.
   elim (Qlt_not_le _ _ Hao).
   rewrite <- H1.
-  rewrite Hdz.
+rewrite Hdz.
   replace LHS with (o:Q) by (field; auto with *).
   auto with *.
  elim (Qlt_not_le _ _ Hao).
@@ -623,7 +622,7 @@ Qed.
 Lemma ApGlueGlue : forall X Y (fl fr:StepF (X -> Y)) o l r, (glue o fl fr) <@> (glue o l r) = glue o (fl <@> l) (fr <@> r).
 Proof.
 intros.
-rewrite ApGlue, SplitLGlue, SplitRGlue.
+rewrite ApGlue SplitLGlue SplitRGlue.
 reflexivity.
 Qed.
 (* begn hide *)
@@ -862,25 +861,7 @@ change (StepF_Qeq (constStepF (compose f g) <@> a) (constStepF f <@> (constStepF
 rewrite <- (Map_homomorphism (compose f) g).
 change (compose f ^@> constStepF g) with (constStepF (compose f) <@> constStepF g).
 rewrite <- (Map_homomorphism (@compose X Y Z) f).
-rapply Map_composition_Qeq.
+apply Map_composition_Qeq.
 Qed.
 
 End ApplicativeFunctor.
-
-(*
-Lemma MapMap2 (X Y Z W:Type): forall (f:Z->W) (g:X->Y->Z) (x:StepF X) (y:StepF Y), 
-  StepF_Qeq (f ^@> (g ^@> x <@> y)) ((fun x y => (f (g x y))) ^@> x <@> y).
-Proof.
-intros.
-change ((fun (x0 : X) (y0 : Y) => f (g x0 y0)) ^@> x)
- with (constStepF (compose (compose f) g) <@> x).
-rewrite <- (Ap_homomorphism (compose (compose f)) g).
-rewrite <- (Ap_homomorphism (@compose X _ _) (@compose Y _ _ f)).
-(*Setoid rewrite bug *)
-set (A:= (Map g)).
-rewrite Ap_composition_Qeq.
-rewrite <- (Ap_homomorphism (@compose Y _ _) f).
-rewrite Ap_composition_Qeq.
-apply StepF_Qeq_refl.
-Qed.
-*)

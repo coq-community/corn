@@ -88,10 +88,10 @@ csetoid_replace (inj_Q IR (2:Q)) (Two:IR);
  [|apply (inj_Q_nring IR 2)].
 stepr (Two[*](Half[*]Log _ Ha0));
  [|unfold Half; rational].
-do 2 rapply mult_wdr.
+do 2 apply: mult_wdr.
 unfold Log.
 simpl.
-rapply cspf_wd.
+apply cspf_wd.
 set (b:=let (n, d) := a in (n - d) / (n + d)).
 assert (Y:inj_Q IR a[+]One[#]Zero).
  apply Greater_imp_ap.
@@ -108,7 +108,7 @@ rstepr (One[+](inj_Q IR a[-]One[/]_[//]Y)[/]_[//]Z).
 cut (inj_Q IR b[=](inj_Q IR a[-]One[/]inj_Q IR a[+]One[//]Y)).
  intros.
  apply div_wd;
-  rapply bin_op_wd_unfolded; try apply eq_reflexive; try apply un_op_wd_unfolded; assumption.
+  apply bin_op_wd_unfolded; try apply eq_reflexive; try apply un_op_wd_unfolded; assumption.
 stepr (inj_Q IR ((a-1)/(a+1))).
  apply inj_Q_wd.
  clear - Ha.
@@ -144,14 +144,14 @@ stepl (inj_Q IR (a - 1)[/]_[//]X) by
 apply div_wd.
  stepl (inj_Q IR a[-]inj_Q IR 1) by 
   apply eq_symmetric; apply inj_Q_minus.
- rapply bin_op_wd_unfolded.
+ apply bin_op_wd_unfolded.
   apply eq_reflexive.
  apply un_op_wd_unfolded.
  rstepr (nring 1:IR).
  apply (inj_Q_nring IR 1).
 stepl (inj_Q IR a[+]inj_Q IR 1) by 
  apply eq_symmetric; apply inj_Q_plus.
-rapply bin_op_wd_unfolded.
+apply bin_op_wd_unfolded.
  apply eq_reflexive.
 rstepr (nring 1:IR).
 apply (inj_Q_nring IR 1).
@@ -180,11 +180,11 @@ Qed.
 Lemma ln_scale_by_two_power_adapt : forall (n:Z) q, 0 < q -> 0 < (2^n*q).
 Proof.
 intros n q H.
-rsapply mult_resp_pos; try assumption.
+apply: mult_resp_pos; simpl; try assumption.
 assert (H2:0 < 2) by constructor.
 pose (twopos := mkQpos H2).
 setoid_replace (2%positive:Q) with (twopos:Q) by reflexivity.
-rsapply Qpos_power_pos.
+apply Qpos_power_pos.
 Qed.
 
 Lemma ln_scale_by_two_power : forall (n:Z) q (Hq:0 < q), (rational_ln_slow Hq + scale n ln2 == rational_ln_slow (ln_scale_by_two_power_adapt n Hq))%CR.
@@ -220,7 +220,7 @@ stepl (Log _ (Qpos_adaptor Hq)[+]Log _ X).
     apply inj_Q_power_Z.
    rstepl (inj_Q IR (2 ^ n)[*]inj_Q IR q).
    apply eq_symmetric.
-   rapply (inj_Q_mult IR (2^n) q).
+   apply (inj_Q_mult IR (2^n) q).
   apply zexp_wd.
   apply eq_symmetric.
   apply (inj_Q_nring IR 2).
@@ -291,8 +291,8 @@ apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf 
    apply IRasCR_wd.
    algebra.
   elim (Qle_not_lt _ _ q).
-  rapply ln_uc_prf_pos.
- intros [xn xd]; rapply Qle_refl.
+  apply: ln_uc_prf_pos.
+ intros [xn xd]; apply: Qle_refl.
 assert (Z:Derivative (closel (inj_Q IR (c:Q))) CI Logarithm {1/}FId).
  apply (Included_imp_Derivative (openl Zero) CI).
   Deriv.
@@ -315,7 +315,7 @@ apply (is_UniformlyContinuousD (Some (c:Q)) None I _ _ Z lnf).
 intros x Hx Hc.
 apply AbsSmall_imp_AbsIR.
 apply leEq_imp_AbsSmall.
- rapply shift_leEq_div.
+ apply: shift_leEq_div.
   apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
   stepl (inj_Q IR 0).
    apply inj_Q_less.
@@ -325,7 +325,7 @@ apply leEq_imp_AbsSmall.
  apply less_leEq.
  apply pos_one.
 stepr (One[/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_prf c)))).
- rapply recip_resp_leEq; try assumption.
+ apply: recip_resp_leEq; try assumption.
  stepl (inj_Q IR 0).
   apply inj_Q_less.
   simpl; auto with *.
@@ -368,7 +368,7 @@ transitivity (ln_pos_uc c q);[|].
  unfold CRln_pos.
  change (' q)%CR with (Cunit_fun _ q).
  rewrite (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
- rapply BindLaw1.
+ apply: BindLaw1.
 simpl.
 rewrite rational_ln_correct'.
 apply IRasCR_wd.
@@ -388,7 +388,7 @@ Implicit Arguments CRln [].
 Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==CRln (IRasCR x) Hx0)%CR.
 Proof.
 intros x Hx [c Hc].
-rapply CRln_pos_correct.
+apply CRln_pos_correct.
 change ((inj_Q IR (c:Q))[<=]x).
 rewrite IR_leEq_as_CR.
 rewrite IR_inj_Q_as_CR.

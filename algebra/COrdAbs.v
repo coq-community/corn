@@ -475,7 +475,7 @@ rewrite leEq_def.
 intro.
 cut (Zero [<] x[*]y); intros.
 2: apply leEq_less_trans with (X[*]Y); auto.
-rewrite leEq_def in *.
+rewrite -> leEq_def in *.
 cut (x[*]y [#] Zero); intros.
 2: apply pos_ap_zero; auto.
 cut (x [#] Zero); intros.

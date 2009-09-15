@@ -35,7 +35,7 @@ Proof.
 intros x y H.
 change (CRapart x y)%CR.
 apply CR_ap_as_Cauchy_IR_ap_2.
-rapply un_op_strext_unfolded.
+apply: un_op_strext_unfolded.
 stepl (CRasCauchy_IR (-x)%CR) by
  apply eq_symmetric; apply CR_opp_as_Cauchy_IR_opp.
 stepr (CRasCauchy_IR (-y)%CR) by
@@ -53,22 +53,22 @@ split.
 change (x-x==(inject_Q 0%Q))%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (- x)%CR)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepl ((CRasCauchy_IR x)[+][--](CRasCauchy_IR x)) by
- apply plus_resp_eq; rapply CR_opp_as_Cauchy_IR_opp.
-rapply eq_transitive.
+ apply plus_resp_eq; apply CR_opp_as_Cauchy_IR_opp.
+apply: eq_transitive.
 apply cg_rht_inv_unfolded.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 
 change (-x + x==(inject_Q 0%Q))%CR.
 rewrite <- CR_eq_as_Cauchy_IR_eq.
 stepl ((CRasCauchy_IR (-x)%CR)[+](CRasCauchy_IR x)) by
- rapply CR_plus_as_Cauchy_IR_plus.
+ apply CR_plus_as_Cauchy_IR_plus.
 stepl ([--](CRasCauchy_IR x)[+](CRasCauchy_IR x)) by
- apply bin_op_is_wd_un_op_lft; rapply CR_opp_as_Cauchy_IR_opp.
-rapply eq_transitive.
+ apply bin_op_is_wd_un_op_lft; apply CR_opp_as_Cauchy_IR_opp.
+apply: eq_transitive.
 apply cg_lft_inv_unfolded.
-rapply CR_inject_Q_as_Cauchy_IR_inject_Q.
+apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Qed.
 
 Definition CRasCGroup : CGroup :=

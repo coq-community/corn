@@ -175,7 +175,7 @@ rewrite b. apply leEq_reflexive.
 Qed.
 
 Lemma nexp_resp_leEq : forall (x y : R) k, Zero [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
-intros. rewrite leEq_def in *. intro. apply H0.
+intros. rewrite -> leEq_def in *. intro. apply H0.
 apply power_cancel_less with k; firstorder using leEq_def.
 Qed.
 
@@ -685,7 +685,7 @@ Lemma inv_zexp_even : forall (x : R) m, Zeven m -> forall x_ x__,
  ([--]x[//]x__) [^^] (m) [=] (x[//]x_) [^^] (m).
 intros x m H Hx Hneg.
 pattern m in |- *.
-rewrite Zeven.Zeven_div2.
+rewrite ->  Zeven.Zeven_div2.
 astepl
  (([--]x[//]Hneg) [^^] (2) [//]zexp_resp_ap_zero [--]x 2 Hneg) [^^]
  (Zeven.Zdiv2 m).

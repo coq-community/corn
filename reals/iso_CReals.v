@@ -181,11 +181,11 @@ Proof.
  assumption.
  
  apply H9.
- rewrite plus_comm with (m := N2).
- rewrite plus_permute with (m := N2).
+ rewrite -> plus_comm with (m := N2).
+ rewrite -> plus_permute with (m := N2).
  apply le_plus_l.
  apply H8.
- rewrite plus_permute with (m := N1).
+ rewrite -> plus_permute with (m := N1).
  apply le_plus_l. 
  
  apply H5.
@@ -814,7 +814,7 @@ Proof.
   in |- *.
  apply a.
  apply le_trans with (m := K + (N1 + N2)).
- rewrite plus_permute with (m := N1).
+ rewrite -> plus_permute with (m := N1).
  apply le_plus_l.
  assumption.
  
@@ -825,8 +825,8 @@ Proof.
   in |- *.
  apply H5.
  apply le_trans with (m := K + (N1 + N2)).
- rewrite plus_comm with (m := N2).
- rewrite plus_permute with (m := N2).
+ rewrite -> plus_comm with (m := N2).
+ rewrite -> plus_permute with (m := N2).
  apply le_plus_l.
  assumption.
  
@@ -985,15 +985,15 @@ Proof.
  apply H5.
  
   apply le_trans with (m := N1 + (N2 + M1)).
-  rewrite plus_comm with (m := M1).
-  rewrite plus_permute with (m := M1).
+  rewrite -> plus_comm with (m := M1).
+  rewrite -> plus_permute with (m := M1).
   apply le_plus_l.
  assumption.
 
  apply H12.
  
   apply le_trans with (m := N1 + (N2 + M1)).
-  rewrite plus_permute with (m := N2).
+  rewrite -> plus_permute with (m := N2).
   apply le_plus_l.
   assumption.
   
@@ -1131,8 +1131,8 @@ Proof.
  unfold CS_seq at 1 in H14.
  apply H14.
  apply le_trans with (m := N1 + (N2 + (N3 + M1))).
- rewrite plus_permute with (m := N3).
- rewrite plus_permute with (m := N3).
+ rewrite -> plus_permute with (m := N3).
+ rewrite -> plus_permute with (m := N3).
  apply le_plus_l.
  assumption.
 
@@ -1147,7 +1147,7 @@ Proof.
  unfold CS_seq at 1 in H13.
  apply H13.
  apply le_trans with (m := N1 + (N2 + (N3 + M1))).
- rewrite plus_permute with (m := N2).
+ rewrite ->  plus_permute with (m := N2).
  apply le_plus_l.
  assumption.
  
@@ -1155,9 +1155,9 @@ Proof.
  apply inj_Q_AbsSmall.
  apply H6.
  apply le_trans with (m := N1 + (N2 + (N3 + M1))).
- rewrite plus_comm with (m := M1).
- rewrite plus_permute with (m := M1).
- rewrite plus_permute with (m := M1).
+ rewrite -> plus_comm with (m := M1).
+ rewrite -> plus_permute with (m := M1).
+ rewrite -> plus_permute with (m := M1).
  apply le_plus_l.
  assumption.
  apply AbsSmall_minus.

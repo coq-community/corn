@@ -40,6 +40,7 @@
 
 Require Export CSumsReals.
 Require Export KeyLemma.
+Require Import CRing_as_Ring.
 
 (**
 ** Main Lemma
@@ -198,8 +199,8 @@ apply
    pattern k at 1 in |- *.
    rewrite (S_pred _ _ H0).
    astepl (One[*] (Three[*]Three[^]pred k):IR).
-   rational.
-
+      clear H3 H4 H5.
+      astepl ((Three[*]Three[^]pred k):IR). reflexivity.
    apply nexp_resp_ap_zero.
    apply three_ap_zero.
   apply mult_resp_nonneg.

@@ -96,7 +96,7 @@ intros x1 x2 y1 y2 H.
 elim (total_order_T x1 x2); intro H1.
 elim H1; clear H1; intro H2.
 left.
-rapply Rlt_not_eq; assumption.
+apply: Rlt_not_eq; assumption.
 right.
 intro H0.
 apply H.
@@ -104,7 +104,7 @@ rewrite H2.
 rewrite H0.
 reflexivity.
 left.
-rapply Rgt_not_eq; assumption.
+apply: Rgt_not_eq; assumption.
 Qed.
 
 Definition RPlus_sbinfun : CSetoid_bin_op RCSetoid := Build_CSetoid_bin_op RCSetoid Rplus RPlus_is_setoid_bin_fun.
@@ -114,7 +114,7 @@ unfold is_CSemiGroup.
 unfold associative.
 intros x y z.
 apply eq_symmetric.
-rapply Rplus_assoc.
+apply Rplus_assoc.
 Qed.
 
 Definition RSemiGroup : CSemiGroup := Build_CSemiGroup RCSetoid RPlus_sbinfun R_is_CSemiGroup.
@@ -126,7 +126,7 @@ Lemma R_is_CMonoid : is_CMonoid RSemiGroup (0%R).
 constructor.
 unfold is_rht_unit.
 intro x.
-rapply Rplus_0_r.
+apply Rplus_0_r.
 unfold is_lft_unit.
 apply Rplus_0_l.
 Qed.
@@ -153,8 +153,8 @@ unfold is_CGroup.
 intro x.
 unfold is_inverse.
 split.
-rapply Rplus_opp_r.
-rapply Rplus_opp_l.
+apply Rplus_opp_r.
+apply Rplus_opp_l.
 Qed.
 
 Definition RGroup := Build_CGroup _ _ R_is_Group.
@@ -166,7 +166,7 @@ Lemma R_is_AbGroup : is_CAbGroup RGroup.
 unfold is_CAbGroup.
 unfold commutes.
 intros x y.
-rapply Rplus_comm.
+apply Rplus_comm.
 Qed.
 
 Definition RAbGroup := Build_CAbGroup _ R_is_AbGroup.
@@ -182,11 +182,11 @@ intros x1 x2 y1 y2 H.
 elim (total_order_T x1 x2); intro H1.
 elim H1; clear H1; intro H2.
 left.
-rapply Rlt_not_eq; assumption.
+apply: Rlt_not_eq; assumption.
 right.
 Focus 2.
 left.
-rapply Rgt_not_eq; assumption.
+apply: Rgt_not_eq; assumption.
 intro H0.
 apply H.
 rewrite H0.
@@ -200,21 +200,21 @@ Lemma RMul_assoc : associative (S:=RAbGroup) RMul_op.
 unfold associative.
 intros x y z.
 apply eq_symmetric.
-rapply Rmult_assoc.
+apply Rmult_assoc.
 Qed.
 
 Lemma R_is_Ring : is_CRing RAbGroup (1%R) RMul_op.
 exists RMul_assoc.
 constructor.
 unfold is_rht_unit; intro x.
-rapply Rmult_1_r.
+apply Rmult_1_r.
 unfold is_lft_unit; intro x.
-rapply Rmult_1_l.
+apply Rmult_1_l.
 unfold commutes.
-rapply Rmult_comm.
+apply Rmult_comm.
 unfold distributive; intros x y z.
-rapply Rmult_plus_distr_l.
-rapply R1_neq_R0.
+apply Rmult_plus_distr_l.
+apply R1_neq_R0.
 Qed.
 
 Definition RRing := Build_CRing _ _ _ R_is_Ring.
@@ -228,9 +228,9 @@ Definition Rrecip : forall x : RRing, x [#] Zero -> RRing := fun x _ => Rinv x.
 
 Lemma R_is_Field : is_CField RRing Rrecip.
 constructor.
-rapply Rinv_r.
+apply Rinv_r.
 assumption.
-rapply Rinv_l.
+apply Rinv_l.
 assumption.
 Qed.
 
@@ -262,23 +262,23 @@ right.
 elim (total_order_T x1 x2); intro H1.
 elim H1; clear H1; intro H3.
 left.
-rapply Rlt_not_eq; assumption.
+apply: Rlt_not_eq; assumption.
 right.
 rewrite <- H2.
 rewrite <- H3.
-rapply Rgt_not_eq; assumption.
+apply: Rgt_not_eq; assumption.
 left.
-rapply Rgt_not_eq; assumption.
+apply: Rgt_not_eq; assumption.
 right.
 elim (total_order_T x1 x2); intro H2.
 elim H2; clear H2; intro H3.
-left; rapply Rlt_not_eq; assumption.
+left; apply: Rlt_not_eq; assumption.
 right.
-rapply Rgt_not_eq.
+apply: Rgt_not_eq.
 apply Rgt_trans with x1.
 assumption.
 rewrite H3; assumption.
-left; rapply Rgt_not_eq; assumption.
+left; apply: Rgt_not_eq; assumption.
 Qed.
 
 Definition Rless_rel : CCSetoid_relation RField := Build_CCSetoid_relation RField Rlt Rlt_strext.
@@ -301,10 +301,10 @@ apply Rlt_trans.
 unfold CSetoids.antisymmetric.
 apply Rlt_asym.
 intros x y xy z.
-rapply Rplus_lt_compat_r.
+apply Rplus_lt_compat_r.
 assumption.
 intros x y x0 y0.
-rapply Rmult_gt_0_compat; assumption.
+apply Rmult_gt_0_compat; assumption.
 intros x y.
 constructor.
 intro xy.
@@ -314,8 +314,8 @@ left; assumption.
 elimtype False; apply xy; assumption.
 right; assumption.
 intro H; destruct H.
-rapply Rlt_not_eq; assumption.
-rapply Rgt_not_eq; assumption.
+apply: Rlt_not_eq; assumption.
+apply: Rgt_not_eq; assumption.
 intros x y.
 simpl in *.
 unfold Not; split.
@@ -345,10 +345,10 @@ intros n m ngt mgt.
 assert (AbsSmall (eps / 2) ((seq n) - (seq m)) )%R.
 stepr ((seq n - seq N) + (seq N - seq m))%R by (simpl; ring).
 stepl (eps / 2 / 2 + eps / 2 / 2)%R by (simpl; field).
-rapply AbsSmall_plus.
-rapply NProp; assumption.
-rapply (AbsSmall_minus).
-rapply NProp; assumption.
+apply AbsSmall_plus.
+apply NProp; assumption.
+apply (AbsSmall_minus).
+apply NProp; assumption.
 destruct H.
 unfold Rfunctions.R_dist.
 apply Rabs_def1.
@@ -371,7 +371,7 @@ intro crit.
 elim (R_complete seq crit).
 intros lim uncv.
 exact lim.
-rapply (cauchy_prop_cauchy_crit x).
+apply (cauchy_prop_cauchy_crit x).
 exact cprop.
 Defined.
 

@@ -21,7 +21,8 @@
 
 Require Import SetoidTactics.
 
-(* Implements an apply-like tactic that uses refine's strong unifcation algorithm *)
+(* Implements an apply-like tactic that uses refine's strong unifcation algorithm 
+REPLACED by ssr apply 
 Ltac rapply T := 
  (refine T ||
  refine (T _) ||
@@ -37,7 +38,7 @@ Ltac rapply T :=
  refine (T _ _ _ _ _ _ _ _ _ _ _)).
 
 Ltac rsapply T := rapply T; simpl.
-
+*)
 (* Replace the LHS or RHS of an expression with another expression
   This tactic along with the setiod functionality, basically replaces the step
   tactic *)

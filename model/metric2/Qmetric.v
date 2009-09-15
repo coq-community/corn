@@ -69,12 +69,12 @@ Qed.
 Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+d) -> x <= e).
 Proof.
 intros.
-rsapply shift_zero_leEq_minus'.
-rsapply inv_cancel_leEq.
-rsapply approach_zero_weak.
+apply: shift_zero_leEq_minus'.
+apply: inv_cancel_leEq.
+apply: approach_zero_weak;simpl.
 intros.
 replace LHS with (x[-](e:Q)).
-rsapply shift_minus_leEq.
+apply: shift_minus_leEq;simpl.
 replace RHS with (e+e0) by ring.
 rewrite <- (QposAsmkQpos H0).
 apply (H (mkQpos H0)).
@@ -95,22 +95,22 @@ apply Qpos_prf.
 simpl; ring.
 intros e x y.
 unfold Qball.
-rsapply AbsSmall_minus.
+apply AbsSmall_minus.
 intros [e1  He1] [e2 He2] a b c H1 H2.
 unfold Qball.
 apply AbsSmall_wdr with ((a-b)+(b-c)).
 autorewrite with QposElim.
-rsapply AbsSmall_plus; assumption.
+apply AbsSmall_plus; assumption.
 simpl; ring.
 intros e a b H.
 unfold Qball.
 split.
-rsapply inv_cancel_leEq.
+apply inv_cancel_leEq;simpl.
 replace RHS with (e:Q) by ring.
 apply Qle_closed.
 intros.
 destruct (H d).
-rsapply inv_cancel_leEq.
+apply: inv_cancel_leEq;simpl.
 replace RHS with (a-b) by ring.
 destruct e; destruct d; apply H0.
 apply Qle_closed.
@@ -118,9 +118,9 @@ intros d.
 destruct (H d).
 destruct e; destruct d; apply H1.
 intros.
-rsapply cg_inv_unique_2.
-rsapply AbsSmall_approach_zero.
-intros.
+apply: cg_inv_unique_2.
+apply: AbsSmall_approach_zero;simpl.
+intros e H0.
 rewrite <- (QposAsmkQpos H0).
 apply (H (mkQpos H0)).
 Qed.
@@ -150,10 +150,10 @@ unfold Qball.
 apply AbsSmall_wdr with ((d1/(d1+d2)%Qpos)*(a - b)).
 apply AbsSmall_wdl with ((d1/(d1+d2)%Qpos)*(d1+d2)%Qpos);
  [|simpl; field; apply Qpos_nonzero].
-rsapply mult_resp_AbsSmall.
-rsapply less_leEq.
-rsapply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
-destruct d1; destruct d2; rsapply (AbsSmall_trans _ (e:Q)); assumption.
+apply mult_resp_AbsSmall.
+apply less_leEq.
+apply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
+destruct d1; destruct d2; apply (AbsSmall_trans _ (e:Q)); assumption.
 simpl.
 rewrite Hc.
 pose (@Qpos_nonzero (d1 + d2)%Qpos).

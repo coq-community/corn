@@ -46,7 +46,7 @@ apply Qabs_case.
 intros _.
 replace LHS with (Qabs b - Qabs a) by ring.
 setoid_replace (a - b) with (- (b - a)) in Hab by ring.
-rewrite Qabs_opp in Hab.
+rewrite -> Qabs_opp in Hab.
 eapply Qle_trans;[|apply Hab].
 apply Qabs_triangle_reverse.
 Qed.
@@ -63,7 +63,7 @@ Lemma CRabs_correct : forall x,
 Proof.
 intros x.
 apply stableEq.
- rapply Complete_stable.
+ apply Complete_stable.
  apply stableQ.
 generalize (leEq_or_leEq _ Zero x).
 cut ((x[<=]Zero or Zero[<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
@@ -74,38 +74,38 @@ intros [H|H].
   apply IRasCR_wd.
   apply AbsIR_eq_inv_x; auto.
  rewrite IR_opp_as_CR.
- rewrite IR_leEq_as_CR in H.
- rewrite IR_Zero_as_CR in H.
+ rewrite -> IR_leEq_as_CR in H.
+ rewrite -> IR_Zero_as_CR in H.
  revert H.
  generalize (IRasCR x).
  intros m Hm.
- rewrite CRle_min_r in Hm.
- rewrite CRmin_boundAbove in Hm.
+ rewrite -> CRle_min_r in Hm.
+ rewrite -> CRmin_boundAbove in Hm.
  setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
  apply CRopp_wd.
  rewrite <- Hm.
- rapply regFunEq_e.
+ apply: regFunEq_e.
  intros e.
  simpl. 
  rewrite Qabs_neg; auto with *.
  rewrite Qopp_involutive.
- rapply ball_refl.
+ apply: ball_refl.
 transitivity (IRasCR x).
  apply IRasCR_wd.
  apply AbsIR_eq_x; auto.
-rewrite IR_leEq_as_CR in H.
-rewrite IR_Zero_as_CR in H.
+rewrite -> IR_leEq_as_CR in H.
+rewrite -> IR_Zero_as_CR in H.
 revert H.
 generalize (IRasCR x).
 intros m Hm.
-rewrite CRle_max_r in Hm.
-rewrite CRmax_boundBelow in Hm.
+rewrite -> CRle_max_r in Hm.
+rewrite -> CRmax_boundBelow in Hm.
 rewrite <- Hm.
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 simpl. 
 rewrite Qabs_pos; auto with *.
-rapply ball_refl.
+apply: ball_refl.
 Qed.
 
 Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.

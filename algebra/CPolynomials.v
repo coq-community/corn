@@ -1011,16 +1011,11 @@ Canonical Structure cpoly_csemi_grp.
 
 Lemma cpoly_cm_proof : is_CMonoid cpoly_csemi_grp cpoly_zero.
 apply Build_is_CMonoid.
-unfold is_rht_unit in |- *.
-intro.
-rewrite cpoly_plus_zero.
-algebra.
-unfold is_lft_unit in |- *.
-intros.
+- intro; rewrite -> cpoly_plus_zero;algebra.
+intro x.
 eapply eq_transitive_unfolded.
 apply cpoly_plus_commutative.
-rewrite cpoly_plus_zero.
-algebra.
+rewrite cpoly_plus_zero;algebra.
 Qed.
 
 Definition cpoly_cmonoid := Build_CMonoid _ _ cpoly_cm_proof.
@@ -1108,12 +1103,11 @@ unfold is_inverse in |- *.
 assert (x[+]cpoly_inv_cs x [=] Zero).
 pattern x in |- *; apply cpoly_ind_cs.
 rewrite cpoly_inv_zero.
-rewrite cpoly_plus_zero.
-simpl in |- *.
-auto.
+rewrite -> cpoly_plus_zero.
+simpl; auto.
 intros.
 rewrite cpoly_inv_lin.
-rewrite cpoly_lin_plus_lin.
+rewrite ->  cpoly_lin_plus_lin.
 apply _cpoly_lin_eq_zero.
 split.
 algebra.
@@ -1377,11 +1371,9 @@ algebra.
 intros.
 repeat rewrite cpoly_lin_mult_cr.
 repeat rewrite cpoly_lin_plus_lin.
-rewrite cpoly_lin_mult_cr.
-apply _cpoly_lin_eq_lin.
-split.
-algebra.
-assumption.
+rewrite <- cpoly_lin_mult_cr.
+apply: _cpoly_lin_eq_lin.
+split; algebra.
 Qed.
 
 Lemma cpoly_cr_dist : distributive cpoly_mult_op cpoly_plus_op.
@@ -1471,9 +1463,7 @@ Lemma cpoly_mult_cr_assoc_mult : forall p q c,
 intros.
 pattern p in |- *; apply cpoly_ind_cs.
 rewrite cpoly_zero_mult.
-repeat rewrite cpoly_zero_mult_cr.
-rewrite cpoly_zero_mult.
-algebra.
+rewrite -> cpoly_zero_mult_cr; reflexivity.
 intros.
 rewrite cpoly_lin_mult.
 repeat rewrite cpoly_lin_mult_cr.
@@ -1488,9 +1478,7 @@ apply cpoly_plus_op_wd.
 apply cpoly_mult_cr_assoc_mult_cr.
 rewrite cpoly_lin_mult_cr.
 apply _cpoly_lin_eq_lin.
-split.
-algebra.
-assumption.
+split;algebra.
 Qed.
 
 Lemma cpoly_mult_zero : forall p, cpoly_mult_cs p cpoly_zero_cs [=] cpoly_zero_cs.
@@ -1502,9 +1490,7 @@ rewrite cpoly_lin_mult.
 rewrite cpoly_zero_mult_cr.
 rewrite cpoly_zero_plus.
 apply _cpoly_lin_eq_zero.
-split.
-algebra.
-assumption.
+split;algebra.
 Qed.
 
 Lemma cpoly_mult_lin : forall c p q,
@@ -2541,13 +2527,11 @@ Qed.
 Lemma diff_plus : forall (p q:RX), _D_ (p[+]q)[=]_D_ p[+]_D_ q.
 Proof.
 induction p.
- intros q.
  reflexivity.
 intros [|a q].
  rewrite cm_rht_unit_unfolded.
  change (cpoly_zero R) with (Zero:cpoly_cring R).
- apply csf_wd.
- algebra.
+ rewrite diff_zero; algebra.
 change ((p[+]q)[+]cpoly_linear _ Zero (_D_ (p[+]q))[=]
  (p[+]cpoly_linear _ Zero (_D_ p))[+](q[+]cpoly_linear _ Zero (_D_ q))).
 do 3 rewrite poly_linear.

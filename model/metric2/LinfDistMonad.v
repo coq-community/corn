@@ -53,7 +53,7 @@ Proof.
 unfold dist_raw.
 intros x a b.
 induction x using StepF_ind.
-rapply regFun_prf.
+apply: regFun_prf.
 simpl (ball (m:=StepFSup X)).
 set (f:=(fun z : RegularFunction X => approximate z a)) in *.
 set (g:=(fun z : RegularFunction X => approximate z b)) in *.
@@ -74,7 +74,7 @@ Add Morphism dist1 with signature (@st_eq _)
 induction x.
  induction y.
   intros H d1 d2.
-  rapply H.
+  apply: H.
  intros H d1 d2.
  destruct H.
  split.
@@ -87,21 +87,19 @@ simpl.
 destruct H as [Hl Hr] using (glue_eq_ind x1 x2 y o).
 rewrite <- (glueSplit (Map (fun z : RegularFunction X => approximate z d2) y) o).
 unfold SplitL, SplitR.
- rewrite StepFunction.SplitLMap, StepFunction.SplitRMap.
+ rewrite StepFunction.SplitLMap StepFunction.SplitRMap.
 fold (glue o (Map (fun z : RegularFunction X => approximate z d1) x1)
      (Map (fun z : RegularFunction X => approximate z d1) x2)).
 rewrite StepFSupBallGlueGlue.
 split; revert d1 d2.
- rapply IHx1.
- assumption.
-rapply IHx2.
-assumption.
+ apply: IHx1; assumption.
+apply: IHx2; assumption.
 Qed.
 
 Lemma dist1_uc : is_UniformlyContinuousFunction dist1 Qpos2QposInf.
 Proof.
 intros e.
-rapply StepF_ind2.
+apply: StepF_ind2.
   simpl (ball_ex).
   intros s s0 t t0 Hs Ht H.
   rewrite <- Hs, <- Ht.
@@ -118,7 +116,7 @@ fold (glue o
      (Map (fun z : RegularFunction X => approximate z d2) t)
      (Map (fun z : RegularFunction X => approximate z d2) t0)).
 simpl in *.
-rewrite StepFSupBallGlueGlue in H |- *.
+rewrite -> StepFSupBallGlueGlue in H |- *.
 split; revert d1 d2; tauto.
 Qed.
 
@@ -127,7 +125,7 @@ Open Local Scope sfstscope.
 Open Local Scope sfscope.
 
 Definition dist: (StepFSup (Complete X))-->(Complete (StepFSup X)).
-rapply (@Build_UniformlyContinuousFunction _ _ dist1 (fun e => e)).
+apply (@Build_UniformlyContinuousFunction _ _ dist1 (fun e => e)).
 abstract (exact dist1_uc).
 Defined.
 End Dist.
@@ -173,7 +171,7 @@ rewrite Qle_minus_iff.
 replace RHS with (e1 - (1#2)*(1#2)*e1).
 replace RHS with ((3#4)*e1) by ring.
 Qauto_nonneg. auto with *.
- rapply ball_approx_r.
+ apply ball_approx_r.
 simpl.
 change (StepFSupBall (X:=X) (e + e1)
   (glue o0
@@ -232,7 +230,7 @@ induction x using StepF_ind.
  rewrite <-  ball_Cunit.
  assert (H:ball (m:=(Complete Y)) (e + e1) 
   ((Cmap_slow f) (Cunit (approximate x ee))) ((Cmap_slow f) (Cunit (approximate x ee1)))).
-   apply ball_triangle with (Cmap_slow f x);rapply (uc_prf (Cmap_slow f));[rapply ball_ex_approx_l|rapply ball_ex_approx_r].
+   apply ball_triangle with (Cmap_slow f x);apply: (uc_prf (Cmap_slow f));[apply: ball_ex_approx_l|apply: ball_ex_approx_r].
  apply H.
 intros e1 e2. simpl. unfold dist_raw. simpl.
 (* Why do we need to fold glue??*)
@@ -257,7 +255,7 @@ change
               (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2)))
            x2)))).
 rewrite (@StepFSupBallGlueGlue Y (e1+e2) o).
-split; [rapply IHx1|rapply IHx2].
+split; [apply IHx1|apply IHx2].
 Qed.
 
 (* dist . returnM≍mapM returnN*)
@@ -275,7 +273,7 @@ change (ballS X (e + e1) (approximate x e)
 (approximate x ((1 # 2) * e1)%Qpos)).
 simpl.
 apply ball_weak_le with (Qpos_plus e ((1 # 2) * e1)%Qpos).
-2: rapply (regFun_prf_ex x e ((1 # 2) * e1)%Qpos).
+2: apply (regFun_prf_ex x e ((1 # 2) * e1)%Qpos).
 rewrite Qle_minus_iff.
 replace RHS with (e1 - (1#2)*e1).
 replace RHS with ((1#2)*e1) by ring.
@@ -300,10 +298,10 @@ set (b:=(@ballS X (e1+e2))).
 set (f:=(@join _ _) ^@> (constStepF b)).
 cut (StepFfoldProp (f <@> x )).
  unfold f;  evalStepF; tauto.
-rapply StepFfoldPropForall_Map.
+apply: StepFfoldPropForall_Map.
 simpl.
 auto with *.
-rapply Map_identity.
+apply: Map_identity.
 (* Is there a general solution to avoid StepF_Qeq_eq??*)
 apply StepF_Qeq_eq; rewrite <- Map_compose_Map; reflexivity.
 Qed.

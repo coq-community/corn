@@ -109,7 +109,7 @@ Lemma compress_raw_prop : forall x e, ball e x (Cunit (compress_raw x e)).
 Proof.
 intros x [n d].
 simpl.
-case_eq (Zsucc (xO d / n));try (intros; rapply ball_approx_r).
+case_eq (Zsucc (xO d / n));try (intros; apply: ball_approx_r).
 intros p Hp.
 apply ball_weak_le with (2#p)%Qpos.
  unfold Qle.
@@ -131,7 +131,7 @@ apply ball_weak_le with (2#p)%Qpos.
  auto with *.
 setoid_replace (2#p)%Qpos with ((1#p)+(1#p))%Qpos.
  eapply ball_triangle with (Cunit (approximate x (1#p)%Qpos)).
-  rapply ball_approx_r.
+  apply: ball_approx_r.
  Transparent CR.
  change (ball (m:=Complete Q_as_MetricSpace) (1 # p) (Cunit (approximate x (1 # p)%Qpos))
   (Cunit (approximateQ (approximate x (1 # p)%Qpos) p))).
@@ -160,7 +160,7 @@ Build_RegularFunction (compress_raw_prf x).
 Lemma compress_fun_correct : forall x, (compress_fun x==x)%CR.
 Proof.
 intros x.
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 unfold compress_fun.
 unfold approximate at 1.
@@ -183,5 +183,5 @@ Build_UniformlyContinuousFunction compress_uc.
 Lemma compress_correct : forall x, (compress x==x)%CR.
 Proof.
 intros x.
-rapply compress_fun_correct.
+apply compress_fun_correct.
 Qed.

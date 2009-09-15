@@ -65,12 +65,12 @@ split.
  change (ball_ex e a b).
  eapply ball_ex_weak_le;[|apply H].
  destruct (mu f e) as [d|].
-  rapply Qpos_min_lb_l.
- rapply Qle_refl.
-rapply uc_prf.
+  apply Qpos_min_lb_l.
+ apply Qle_refl.
+apply: uc_prf.
 eapply ball_ex_weak_le;[|apply H].
 destruct (mu f e) as [d|].
- rapply Qpos_min_lb_r.
+ apply Qpos_min_lb_r.
 constructor.
 Qed.
 
@@ -98,7 +98,7 @@ split;simpl.
  destruct (mu f e2);
   autorewrite with QposElim.
   assert (Qmin e2 q <= e2) by auto with *.
-  rewrite Qle_minus_iff in *.
+  rewrite -> Qle_minus_iff in *.
   Qauto_le.
  apply Qle_refl.
 apply (mu_sum plX e2 (e1::nil) f).
@@ -110,7 +110,7 @@ destruct (mu f e2) as [d|]; try constructor.
 simpl.
 autorewrite with QposElim.
 assert (Qmin e2 d <= d) by auto with *.
-rewrite Qle_minus_iff in *.
+rewrite -> Qle_minus_iff in *.
 Qauto_le.
 Qed.
 
@@ -140,10 +140,10 @@ eapply almostIn_triangle_r with (approximate s d2).
   contradiction.
  destruct H' as [G | [H' _] | H'] using orC_ind.
    auto using almostIn_stable.
-  rapply orWeaken.
+  apply orWeaken.
   left.
   assumption.
- rapply orWeaken.
+ apply orWeaken.
  right.
  apply IHs0.
  assumption.
@@ -152,7 +152,7 @@ unfold d2.
 destruct (mu f d') as [d0|]; auto with *.
 autorewrite with QposElim.
 assert (Qmin d' d0 <= d') by auto with *.
-rewrite Qle_minus_iff in *.
+rewrite -> Qle_minus_iff in *.
 Qauto_le.
 Qed.
 
@@ -174,12 +174,12 @@ assert (Hd'1 : d' <= e').
 assert (Hd'2 : QposInf_le d' (mu f e')).
  unfold d', graphPoint_modulus.
  destruct (mu f e').
-  rapply Qpos_min_lb_r.
+  apply Qpos_min_lb_r.
  constructor.
 assert (H':= H d' d').
 apply ball_triangle with (approximate (Csnd p) d').
  apply ball_triangle with (f (Cfst_raw p d')).
-  rapply (mu_sum plX e' (e2::nil) f).
+  apply: (mu_sum plX e' (e2::nil) f).
   simpl.
   apply ball_ex_weak_le with (mu f e2 + d')%QposInf.
    destruct (mu f e2); try constructor.
@@ -187,7 +187,7 @@ apply ball_triangle with (approximate (Csnd p) d').
    clear - Hd'2.
    simpl in *.
    autorewrite with QposElim.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    Qauto_le.
   unfold Cfst_raw.
   simpl.
@@ -213,7 +213,7 @@ apply ball_triangle with (approximate (Csnd p) d').
   auto.
  clear - L Hd'1 Hd'2 plX stableXY.
  destruct L as [G | a [Hl Hr]] using existsC_ind.
-  rapply (@ProductMS_stableY X).
+  apply (@ProductMS_stableY X).
     apply (approximate (Cfst p) (1#1)%Qpos).
    apply stableXY.
   auto.
@@ -227,7 +227,7 @@ apply ball_triangle with (approximate (Csnd p) d').
    destruct (mu f e'); try constructor.
    simpl in *.
    autorewrite with QposElim.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    replace RHS with ((q + - d') + (q + - d')) by ring.
    Qauto_nonneg.
   apply Hl.
@@ -235,12 +235,12 @@ apply ball_triangle with (approximate (Csnd p) d').
  eapply ball_weak_le;[|apply Hr].
  autorewrite with QposElim.
  clear - Hd'1.
- rewrite Qle_minus_iff in *.
+ rewrite -> Qle_minus_iff in *.
  replace RHS with ((e' + - d') + (e' + - d')) by ring.
  Qauto_nonneg.
 eapply ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
-rewrite Qle_minus_iff in *.
+rewrite -> Qle_minus_iff in *.
 Qauto_le.
 Qed.
 
@@ -253,10 +253,10 @@ intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cmap plX f p).
  symmetry.
  rewrite <- (CoupleCorrect2 p q1).
- rapply CompactGraph_correct3.
+ apply: CompactGraph_correct3.
  apply Hq1.
 rewrite <- (CoupleCorrect2 p q2).
-rapply CompactGraph_correct3.
+apply: CompactGraph_correct3.
 apply Hq2.
 Qed.
 
@@ -272,13 +272,13 @@ split; intros H.
   exact H.
  symmetry.
  transitivity (Csnd (Couple (x,y))).
-  rapply CompactGraph_correct3.
+  apply: CompactGraph_correct3.
   apply H.
  apply CoupleCorrect3.
 destruct H as [H0 H1].
 change (x, y) with (PairMS x y).
 rewrite H1.
-rapply CompactGraph_correct1.
+apply: CompactGraph_correct1.
 auto.
 Qed.
 
@@ -318,7 +318,7 @@ split.
  destruct (mu f e) as [d|].
   simpl.
   apply Qle_trans with e.
-   rapply Qpos_min_lb_l.
+   apply: Qpos_min_lb_l.
   autorewrite with QposElim.
   Qauto_le.
  simpl.
@@ -327,11 +327,11 @@ split.
 simpl.
 revert d1 d2.
 change (ball e (f a) (f b)).
-rapply uc_prf.
+apply: uc_prf.
 eapply ball_ex_weak_le;[|apply H].
 unfold graphPoint_modulus.
 destruct (mu f e) as [d|].
- rapply Qpos_min_lb_r.
+ apply: Qpos_min_lb_r.
 constructor.
 Qed.
 
@@ -344,6 +344,7 @@ Hypothesis stableXY : stableMetric XY.
 Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
 CompactImage_b (1#1) _ plFEX graphPoint_b.
 
+Require Import Qordfield.
 Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Couple (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 intros plX plFEX x s Hs.
@@ -357,10 +358,9 @@ split;simpl.
  destruct (mu f ((1#2)*e2));
   autorewrite with QposElim.
   assert (Qmin ((1#2)*e2) q <= ((1#2)*e2)) by auto with *.
-  rewrite Qle_minus_iff in *.
+  rewrite -> Qle_minus_iff in *.
   replace RHS with ((1 # 2) * e2 + ((1 # 2) * e2 + - Qmin ((1 # 2) * e2) q)) by ring.
   Qauto_nonneg.
- replace RHS with (e1 + (1 # 2) * e2 + (1 # 2) * e2) by ring.
  Qauto_le.
 unfold Cjoin_raw.
 rewrite <- ball_Cunit.
@@ -381,8 +381,7 @@ destruct (mu f e2') as [d|]; try constructor.
 simpl.
 autorewrite with QposElim.
 assert (Qmin e2' d <= d) by auto with *.
-rewrite Qle_minus_iff in *.
-Qauto_le.
+rewrite -> Qle_minus_iff in *. Qauto_le.
 Qed.
 
 Lemma CompactGraph_b_correct2 : forall plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
@@ -413,10 +412,10 @@ eapply almostIn_triangle_r with (approximate s d2).
   contradiction.
  destruct H' as [G | [H' _] | H'] using orC_ind.
    auto using almostIn_stable.
-  rapply orWeaken.
+  apply orWeaken.
   left.
   assumption.
- rapply orWeaken.
+ apply orWeaken.
  right.
  apply IHs0.
  assumption.
@@ -425,7 +424,7 @@ unfold d2.
 destruct (mu f ((1#2)*d')) as [d0|].
  autorewrite with QposElim.
  assert (Qmin ((1#2)*d') d0 <= ((1#2)*d')) by auto with *.
- rewrite Qle_minus_iff in *.
+ rewrite -> Qle_minus_iff in *.
  replace RHS with ((1 # 2) * d' + - Qmin ((1 # 2) * d') d0 + (1#2)*d') by ring.
  Qauto_nonneg.
 autorewrite with QposElim.
@@ -458,7 +457,7 @@ assert (Hd'1 : d' <= e').
 assert (Hd'2 : QposInf_le (d') (mu f ((1#2)*e'))).
  unfold d', graphPoint_modulus.
  destruct (mu f ((1#2)*e')).
-  rapply Qpos_min_lb_r.
+  apply Qpos_min_lb_r.
  constructor.
 assert (H':= H ((1#2)*d')%Qpos d').
 apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
@@ -469,7 +468,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
   apply ball_weak_le with ((1#2)*e2 + ((1#2)*e2 + (1#2)*e') + (1#2)*d')%Qpos.
    autorewrite with QposElim.
    clear - Hd'1.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    replace RHS with ((1 # 2) * (e' + - d')) by ring.
    Qauto_nonneg.
   cut (ball ((1 # 2) * e2 + (1 # 2) * e')
@@ -477,7 +476,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
     (f (Cfst_raw p ((1 # 2) * d')%Qpos))).
    intros L.
    apply L.
-  rapply (mu_sum plX ((1#2)*e') (((1#2)*e2)::nil) f)%Qpos.
+  apply (mu_sum plX ((1#2)*e') (((1#2)*e2)::nil) f)%Qpos.
   simpl.
   apply ball_ex_weak_le with (QposInf_plus (mu f ((1#2)*e2)) ((1#2)*d'))%Qpos.
    destruct (mu f ((1#2)*e2)); try constructor.
@@ -485,7 +484,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
    clear - Hd'2.
    simpl in *.
    autorewrite with QposElim.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    replace RHS with (q0 + - d' + (1#2)*d') by ring.
    Qauto_nonneg.
   unfold Cfst_raw.
@@ -514,7 +513,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
   auto.
  clear - L Hd'1 Hd'2 plX stableXY.
  destruct L as [G | a [Hl Hr]] using existsC_ind.
-  rapply (@ProductMS_stableY X).
+  apply (@ProductMS_stableY X).
     apply (approximate (Cfst p) (1#1)%Qpos).
    apply stableXY.
   auto.
@@ -522,7 +521,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
   apply ball_weak_le with ((1#2)*d' + ((1#2)*e' + (1#2)*e') + (1#2)*d')%Qpos.
    clear - Hd'1.
    autorewrite with QposElim.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    replace RHS with (e' + - d') by ring.
    auto.   
   simpl.
@@ -537,7 +536,7 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
    destruct (mu f ((1#2)*e')); try constructor.
    simpl in *.
    autorewrite with QposElim.
-   rewrite Qle_minus_iff in *.
+   rewrite -> Qle_minus_iff in *.
    replace RHS with ((q + - d') + (q + - d')) by ring.
    Qauto_nonneg.
   simpl.
@@ -548,12 +547,12 @@ apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
  eapply ball_weak_le;[|apply Hr].
  autorewrite with QposElim.
  clear - Hd'1.
- rewrite Qle_minus_iff in *.
+ rewrite -> Qle_minus_iff in *.
  replace RHS with ((e' + - d') + (e' + - d') + (1#2)*d') by ring.
  Qauto_nonneg.
 eapply ball_weak_le;[|apply (regFun_prf (Csnd p) ((1#2)*d')%Qpos)].
 autorewrite with QposElim.
-rewrite Qle_minus_iff in *.
+rewrite -> Qle_minus_iff in *.
 replace RHS with ((e' + - d') + (1#2)*d') by ring.
 Qauto_nonneg.
 Qed.
@@ -567,10 +566,10 @@ intros plX plFEX p q1 q2 s Hq1 Hq2.
 transitivity (Cbind plX f p).
  symmetry.
  rewrite <- (CoupleCorrect2 p q1).
- rapply CompactGraph_b_correct3.
+ apply: CompactGraph_b_correct3.
  apply Hq1.
 rewrite <- (CoupleCorrect2 p q2).
-rapply CompactGraph_b_correct3.
+apply: CompactGraph_b_correct3.
 apply Hq2.
 Qed.
 
@@ -586,13 +585,13 @@ split; intros H.
   exact H.
  symmetry.
  transitivity (Csnd (Couple (x,y))).
-  rapply CompactGraph_b_correct3.
+  apply: CompactGraph_b_correct3.
   apply H.
  apply CoupleCorrect3.
 destruct H as [H0 H1].
 change (x, y) with (PairMS x y).
 rewrite H1.
-rapply CompactGraph_b_correct1.
+apply CompactGraph_b_correct1.
 auto.
 Qed.
 

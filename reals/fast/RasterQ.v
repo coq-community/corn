@@ -34,7 +34,7 @@ Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
 Lemma stableQ2 : stableMetric Q2.
 Proof.
-rapply ProductMS_stable; apply stableQ.
+apply ProductMS_stable; apply stableQ.
 Qed.
 
 (** For [Q2], classical membership in a finite enumeration is the
@@ -252,9 +252,9 @@ assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
  destruct Hy as [Hy1 Hy2].
  split;
   unfold fst,snd in *.
-  rewrite Hx1, Hy1.
+  rewrite Hx1 Hy1.
   reflexivity.
- rewrite Hx2, Hy2.
+ rewrite Hx2 Hy2.
  reflexivity.
 rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (x2l, x2r) (y2l, y2r)) L0).
 apply InFinEnumC_weaken.

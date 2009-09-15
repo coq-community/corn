@@ -385,7 +385,7 @@ replace (pred m + n) with (pred (m + n)).
 auto with arith.
 cut (S (pred (m + n)) = S (pred m + n)); auto.
 rewrite <- plus_Sn_m.
-rewrite S_pred with m 0; auto with arith.
+rewrite (S_pred m 0); auto with arith.
 apply neq_O_lt.
 intro.
 apply lt_irrefl with 0.

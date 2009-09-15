@@ -35,6 +35,7 @@
  *) 
 
 Require Export CSetoids.
+Require Import ssreflect.
 (**
 ** The Setoid of Setoid functions
 
@@ -56,7 +57,7 @@ red in |- *.
 intro H.
 elim H.
 intros a H0.
-set (H1 := ap_irreflexive_unfolded B (f a)) in *.
+set (H1 := ap_irreflexive B (f a)) in *.
 intuition.
 Qed.
 
@@ -115,7 +116,7 @@ elim H.
 clear H.
 intros a H.
 exists a.
-apply ap_symmetric_unfolded.
+apply ap_symmetric.
 exact H.
 Qed.
 
@@ -284,7 +285,7 @@ intro fo.
 simpl.
 intros csbf_strext0 x y H.
 elim (csbf_strext0 _ _ _ _ H); intro H0.
- elim (ap_irreflexive_unfolded _ _ H0).
+ elim (ap_irreflexive _ _ H0).
 exact H0.
 Qed.
 
@@ -850,7 +851,7 @@ apply
  Build_PartFunct with (fun x : S => CTrue) (fun (x : S) (H : CTrue) => f x).
 red in |- *; intros; auto.
 intros x y Hx Hy H.
-exact (csf_strext_unfolded _ _ f _ _ H).
+exact (csf_strext _ _ f _ _ H).
 Defined.
 
 Section Part_Function_Const.
@@ -1055,42 +1056,30 @@ Lemma inv2 : forall A B (f : CSetoid_fun A B) (H : bijective f) (a : A),
  invfun f H (f a) [=] a.
 intros.
 unfold invfun in |- *; case inv; simpl.
-elim H; clear H; intros H0 H1.
-intro x.
-apply injective_imp_injective_weak.
-auto.
+move:H => [H0 H1] x.
+by apply injective_imp_injective_weak.
 Qed.
 
 Lemma inv_strext : forall A B (f : CSetoid_fun A B) (H : bijective f),
  fun_strext (invfun f H).
-intros A B f H x y.
-intro H1.
-elim H; intros H00 H01.
-elim (H01 x); intros a0 H2.
-elim (H01 y); intros a1 H3.
+intros A B f H x y H1.
+elim H => [H00 H01].
+elim (H01 x) => a0 H2.
+elim (H01 y) => a1 H3.
 astepl (f a0).
 astepr (f a1).
 apply H00.
 astepl (invfun f H x).
-astepr (invfun f H y).
-exact H1.
-astepl (invfun f H (f a1)).
-apply inv2.
+astepr (invfun f H y); first exact H1.
+astepl (invfun f H (f a1)); first apply inv2.
 apply injective_imp_injective_weak with (f := f); auto.
 astepl (f a1).
 astepl y.
-apply eq_symmetric.
-apply inv1.
-apply eq_symmetric.
-apply inv1.
-astepl (invfun f H (f a0)).
-apply inv2.
+apply eq_symmetric; apply inv1.
+ apply eq_symmetric; apply inv1.
 
 apply injective_imp_injective_weak with (f := f); auto.
-astepl (f a0).
-astepl x.
-apply eq_symmetric; apply inv1.
-apply eq_symmetric; apply inv1.
+rewrite inv1. algebra.
 Qed.
 
 Definition Inv A B f (H : bijective f) :=
@@ -1101,45 +1090,33 @@ Implicit Arguments Inv [A B].
 Definition Inv_bij : forall A B (f : CSetoid_fun A B) (H : bijective f),
   bijective (Inv f H).
 intros A B f H.
-unfold bijective in |- *.
 split.
 unfold injective in |- *.
 unfold bijective in H.
 unfold surjective in H.
-elim H.
-intros H0 H1.
+elim H => H0 H1.
 intros b0 b1 H2.
-elim (H1 b0).
-intros a0 H3.
-elim (H1 b1).
-intros a1 H4.
+elim (H1 b0) => a0 H3.
+elim (H1 b1) => a1 H4.
 astepl (Inv f (CAnd_intro _ _ H0 H1) (f a0)).
 astepr (Inv f (CAnd_intro _ _ H0 H1) (f a1)).
 cut (fun_strext f).
-unfold fun_strext in |- *.
 intros H5.
 apply H5.
 astepl (f a0).
 astepr (f a1).
 astepl b0.
-astepr b1.
-exact H2.
+by astepr b1.
 apply eq_symmetric.
 unfold Inv in |- *.
-simpl in |- *.
 apply inv1.
 apply eq_symmetric.
-unfold Inv in |- *.
-simpl in |- *.
-apply inv1.
-elim f.
-intuition.
+simpl in |- *; apply inv1.
+elim f; intuition.
 
-unfold surjective in |- *.
 intro a.
-exists (f a).
+exists (f a). 
 unfold Inv in |- *.
-simpl in |- *.
 apply inv2.
 Qed.
 

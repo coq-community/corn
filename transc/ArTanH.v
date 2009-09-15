@@ -103,7 +103,7 @@ Definition ArTanH (x:IR) (Hx:DomArTanH x) := ArTangH x (DomArTanH_Dom_ArTanH x H
 
 Lemma ArTanH_wd : forall (x y : IR) Hx Hy, x[=]y -> ArTanH x Hx[=]ArTanH y Hy.
 intros x y Hx Hy H.
-rapply pfwdef.
+apply pfwdef.
 assumption.
 Qed.
 
@@ -145,7 +145,7 @@ assert (Hcd : (One[+]a[/]_[//]Ha')[<](One[+](One[+]b[/]_[//]Hb'))).
 exists Hcd.
 split.
  intros y [Hy _].
- rapply less_leEq_trans;[|apply Hy].
+ apply: less_leEq_trans;[|apply Hy].
  apply div_resp_pos.
   assumption.
   destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
@@ -206,7 +206,7 @@ assert (bnd_away_zero_in_P ([-C-]One{-}FId) DomArTanH).
  intros y Hy H0.
  simpl.
  eapply leEq_transitive;[|apply leEq_AbsIR].
- rapply plus_resp_leEq_lft.
+ apply plus_resp_leEq_lft.
  apply inv_resp_leEq.
  destruct H0; assumption.
 unfold ArTangH.
@@ -373,8 +373,8 @@ fun_series_convergent_IR DomArTanH
   (fun n : nat =>
    Half (R:=IR){**}
    ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId))).
-rapply FSeries_Sum_scal_conv;[|Contin].
-rapply FSeries_Sum_minus_conv;
+apply FSeries_Sum_scal_conv;[|Contin].
+apply FSeries_Sum_minus_conv;
  apply FSeries_Sum_comp_conv with (olor Zero Two);
  try apply Log_series_convergent_IR; try Contin;
  intros a b Hab H; simpl.
@@ -399,7 +399,7 @@ rapply FSeries_Sum_minus_conv;
  split; apply plus_resp_leEq_lft; assumption.
 exists (One[-]b); exists (One[-]a).
 assert (H0:One[-]b[<=]One[-]a).
- rapply plus_resp_leEq_lft.
+ apply plus_resp_leEq_lft.
  apply inv_resp_leEq; assumption.
 exists H0.
 split.
@@ -411,12 +411,12 @@ split.
   assumption.
  eapply leEq_less_trans;[apply Hc1|].
  rstepr (One[+][--][--]One:IR).
- rapply plus_resp_less_lft.
+ apply plus_resp_less_lft.
  apply inv_resp_less.
  destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
  assumption.
 intros x _ [Hx0 Hx1].
-split; rapply plus_resp_leEq_lft;
+split; apply plus_resp_leEq_lft;
  apply inv_resp_leEq; assumption.
 Qed.
 
@@ -477,7 +477,7 @@ apply eq_transitive with (F c F0).
   intros a b Hab H; simpl.
   exists (One[-]b); exists (One[-]a).
   assert (H0:One[-]b[<=]One[-]a).
-   rapply plus_resp_leEq_lft.
+   apply plus_resp_leEq_lft.
    apply inv_resp_leEq; assumption.
   exists H0.
   split.
@@ -490,12 +490,12 @@ apply eq_transitive with (F c F0).
     assumption.
    eapply leEq_less_trans;[apply Hc1|].
    rstepr (One[+][--][--]One:IR).
-   rapply plus_resp_less_lft.
+   apply plus_resp_less_lft.
    apply inv_resp_less.
    destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
    assumption.
   intros x _ [Hx0 Hx1].
-  split; rapply plus_resp_leEq_lft;
+  split; apply plus_resp_leEq_lft;
    apply inv_resp_leEq; assumption.
  assert (A1:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-]One{-}FId))).
   apply FSeries_Sum_comp_conv with (olor Zero Two);
@@ -545,11 +545,11 @@ apply eq_transitive with (F c F0).
    rstepl (x:IR).
    assumption.
   rstepr (One[-][--]One:IR).
-  rapply plus_resp_less_lft.
+  apply plus_resp_less_lft.
   apply inv_resp_less.
   assumption.
  eapply Feq_comp; try apply A3; try (apply Feq_reflexive; Included); assumption.
-rapply mult_wdr.
+apply: mult_wdr.
 apply eq_symmetric.
-rapply Log_div.
+apply: Log_div.
 Qed.

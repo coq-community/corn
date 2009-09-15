@@ -112,7 +112,7 @@ fold w in Hw.
 fold h in Hh.
 simpl in Hw, Hh.
 apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
- rapply ball_approx_r.
+ apply ball_approx_r.
 unfold Compact.
 rewrite ball_Cunit.
 apply ball_sym.
@@ -126,7 +126,7 @@ set (Z:=(l, (b + h)):Q2) in *.
 rewrite L.
 setoid_replace Z1 with (l+w,b).
  unfold Z, PlotQ.
- rewrite Hw, Hh.
+ rewrite Hw Hh.
  destruct n; try discriminate.
  destruct m; try discriminate.
  apply (RasterizeQ2_correct).
@@ -135,7 +135,7 @@ setoid_replace Z1 with (l+w,b).
  rewrite <- Hh.
  destruct (InStrengthen _ _ H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
  simpl in Hz1, Hz2.
- rewrite Hz1, Hz2.
+ rewrite Hz1 Hz2.
  eapply graphQ_bonus.
  apply Hz0.
 split; simpl; auto with *.

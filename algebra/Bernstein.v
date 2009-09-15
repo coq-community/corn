@@ -116,7 +116,7 @@ rewrite (fun a b => Sumx_Sum0 _ a b B).
  unfold B.
  rewrite Sum0_plus_Sum0.
  do 2 rewrite mult_distr_sum0_lft.
- rewrite Sumx_to_Sum in IHn; auto with *.
+ rewrite -> Sumx_to_Sum in IHn; auto with *.
   setoid_replace (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A))
    with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero);[|rational].
   change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero)
@@ -288,7 +288,7 @@ Lemma RaiseDegree : forall n i (H: i<=n),
 Proof.
 intros n i H.
 stepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H) by rational.
-rewrite RaiseDegreeA, RaiseDegreeB.
+rewrite RaiseDegreeA RaiseDegreeB.
 reflexivity.
 Qed.
 
@@ -322,13 +322,13 @@ generalize n at 1 3 4  6 7  9 11.
 intros i.
 induction i.
  intros l v1 v2.
- rewrite (V0_eq R v1), (V0_eq R v2).
+ rewrite (V0_eq R v1) (V0_eq R v2).
  simpl.
  rational.
 intros l v1 v2.
 destruct n as [|n].
  elimtype False; auto with *.
-rewrite (VSn_eq R _ v1), (VSn_eq R _ v2).
+rewrite (VSn_eq R _ v1) (VSn_eq R _ v2).
 simpl.
 rewrite IHi.
 rewrite c_plus.
@@ -482,7 +482,7 @@ destruct (BernsteinCoefficents p).
 rewrite evalBernsteinBasisPlus.
 rewrite evalBernsteinBasisConst.
 rewrite evalBernsteinBasisTimesX.
-rewrite IHp.
+rewrite -> IHp.
 rewrite poly_linear.
 rational.
 Qed.

@@ -101,9 +101,9 @@ Qed.
 (** How the sup interacts with various arithmetic operations on step functions. *)
 Lemma StepQSup_resp_le : forall x y, x <= y -> (StepQSup x <= StepQSup y)%Q.
 Proof.
-rapply StepF_ind2; auto.
+apply: StepF_ind2; auto.
  intros s s0 t t0 Hs Ht.
- rewrite Hs, Ht; auto.
+ rewrite Hs Ht; auto.
 intros o s s0 t t0 H0 H1.
 unfold StepQ_le.
 rewriteStepF.
@@ -114,9 +114,9 @@ Qed.
 
 Lemma StepQSup_plus : forall x y, (StepQSup (x + y) <= StepQSup x + StepQSup y )%Q.
 Proof.
-rapply StepF_ind2; auto with *.
+apply StepF_ind2; auto with *.
  intros s s0 t t0 Hs Ht.
- rewrite Hs, Ht; auto.
+ rewrite Hs Ht; auto.
 intros o s s0 t t0 H0 H1.
 unfold StepQplus.
 rewriteStepF.
@@ -124,8 +124,7 @@ repeat rewrite StepQSup_glue.
 eapply Qle_trans;[apply Qmax_le_compat;[apply H0|apply H1]|].
 rewrite Qmax_plus_distr_l.
 apply Qmax_le_compat;
- rsapply plus_resp_leEq_lft;
- auto with *.
+ apply: plus_resp_leEq_lft; simpl; auto with *.
 Qed.
 
 (** The Linf metric on step function over Q. *)
@@ -140,10 +139,10 @@ intros e x y.
 simpl.
 rewrite Qball_Qabs.
 revert x y.
-rapply StepF_ind2.
+apply: StepF_ind2.
   intros s s0 t t0 Hs Ht.
   simpl.
-  rewrite Hs, Ht.
+  rewrite Hs Ht.
   auto.
  intros x y.
  rewrite <- Qball_Qabs.
@@ -158,15 +157,14 @@ revert H2.
 rewriteStepF.
 intros [H2a H2b].
 apply Qabs_case; intros H;
-[|rewrite <- Qabs_opp in H0, H1; rewrite X in *];
+[|rewrite <- Qabs_opp in H0, H1; rewrite -> X in *];
  (rewrite Qmax_minus_distr_l;
  unfold Qminus;
  apply Qmax_lub;[|clear H0; rename H1 into H0];
   (eapply Qle_trans;[|apply H0; auto]);
   (eapply Qle_trans;[|apply Qle_Qabs]);
   unfold Qminus;
-  rsapply plus_resp_leEq_lft;
-  auto with *).
+  apply: plus_resp_leEq_lft; simpl; auto with *).
 Qed.
 
 Open Local Scope uc_scope.
@@ -178,14 +176,14 @@ Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 Lemma LinfAsL1_uc_prf : is_UniformlyContinuousFunction (fun (x:LinfStepQ) => (x:L1StepQ)) Qpos2QposInf.
 Proof.
 intros e.
-rapply StepF_ind2.
+apply: StepF_ind2.
   simpl.
   intros s s0 t t0 Hs Ht H.
   rewrite <- Hs , <- Ht.
   assumption.
  intros x y Hxy.
  change (Qball e x y) in Hxy.
- rewrite Qball_Qabs in Hxy.
+ rewrite ->  Qball_Qabs in Hxy.
  apply Hxy.
 intros o s s0 t t0 Hst Hst0 H.
 simpl.

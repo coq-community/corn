@@ -111,7 +111,7 @@ intros [[|n|n] d] H.
   rewrite inj_S.
   unfold Zsucc.
   rewrite Qpower_plus;[|discriminate].
-  rsapply mult_resp_pos;[assumption|constructor].
+  apply: mult_resp_pos;[assumption|constructor].
  rewrite <- Zpower_Qpower; try auto with *.
  destruct (inject_Z (4%positive ^ Psize d)%Z).
  change ((1 * (d * Qden)%positive <= n * Qnum * 1)%Z).

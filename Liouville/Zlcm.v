@@ -33,11 +33,11 @@ Lemma Zgcd_lin : forall a b c, (Zabs c * Zgcd a b = Zgcd (c * a) (c * b))%Z.
 Proof.
 intros a b c.
 case (Z_eq_dec a 0).
-  intro H; rewrite H; rewrite Zmult_0_r, Zgcd_zero_lft, Zgcd_zero_lft; apply Zabs_mult_compat.
+  intro H; rewrite H; rewrite Zmult_0_r Zgcd_zero_lft Zgcd_zero_lft; apply Zabs_mult_compat.
 intro Ha; case (Z_eq_dec b 0).
-  intro H; rewrite H; rewrite Zmult_0_r, Zgcd_zero_rht, Zgcd_zero_rht; apply Zabs_mult_compat.
+  intro H; rewrite H; rewrite Zmult_0_r Zgcd_zero_rht Zgcd_zero_rht; apply Zabs_mult_compat.
 intro Hb; case (Z_eq_dec c 0).
-  intro H; rewrite H; rewrite Zmult_0_l, Zmult_0_l, Zmult_0_l, Zgcd_zero_lft; reflexivity.
+  intro H; rewrite H; rewrite Zmult_0_l Zmult_0_l Zmult_0_l Zgcd_zero_lft; reflexivity.
 intro Hc; apply Zdivides_antisymm.
       rewrite <- (Zmult_0_r (Zabs c)).
       apply Zmult_pos_mon_lt_lft.
@@ -70,14 +70,14 @@ cut (forall c : positive, Zdivides (Zgcd (c * a) (c * b)) (Zabs c * Zgcd a b)).
   assert ((p:Z) = Zabs p).
     reflexivity.
   rewrite H0; clear H0.
-  rewrite Zabs_mult_compat, Zabs_mult_compat.
+  rewrite Zabs_mult_compat Zabs_mult_compat.
   rewrite <- Zgcd_abs.
   apply H.
 clear c Hc; intro c.
 rewrite (Zgcd_lin_comb a b).
 rewrite Zmult_plus_distr_r.
 simpl (Zabs c).
-rewrite Zmult_assoc, Zmult_assoc.
+rewrite Zmult_assoc Zmult_assoc.
 rewrite (Zmult_comm c (Zgcd_coeff_a a b)).
 rewrite (Zmult_comm c (Zgcd_coeff_b a b)).
 rewrite <- Zmult_assoc, <- Zmult_assoc.
@@ -100,7 +100,7 @@ case (Z_eq_dec (Zgcd a b) (Zero:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
-intro H; rewrite (Zgcd_div_mult_rht a b) at 1; [|assumption].
+intro H; rewrite -> (Zgcd_div_mult_rht a b) at 1; [|assumption].
 simpl.
 rewrite Zmult_assoc.
 rewrite Z_div_mult_full; [|assumption].
@@ -115,7 +115,7 @@ case (Z_eq_dec (Zgcd a b) (Zero:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
-intro H; rewrite (Zgcd_div_mult_lft a b) at 1; [|assumption].
+intro H; rewrite -> (Zgcd_div_mult_lft a b) at 1; [|assumption].
 simpl.
 rewrite Zmult_comm.
 rewrite Zmult_assoc.
@@ -184,14 +184,14 @@ rewrite Zmult_comm.
 revert Heq.
 assert (Zgcd p q <> 0%Z).
   intro H; destruct Happ; apply (Zgcd_zero _ _ H).
-rewrite (Zgcd_div_mult_lft p q) at 1; [|assumption].
+rewrite -> (Zgcd_div_mult_lft p q) at 1; [|assumption].
 rewrite (Zmult_comm (p / Zgcd p q)).
 rewrite <- Zmult_assoc.
 rewrite Zdiv_mult_cancel_lft; [|assumption].
 intro Heq.
 rewrite (Zgcd_div_mult_lft p q); [|assumption].
 rewrite <- Zmult_assoc, (Zmult_comm _ q), Zmult_assoc.
-rewrite Heq, Zmult_0_l; reflexivity.
+rewrite Heq Zmult_0_l; reflexivity.
 Qed.
 
 Fixpoint Zlcm_gen (l : list Z_as_CRing) : Z_as_CRing :=

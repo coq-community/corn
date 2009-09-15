@@ -51,7 +51,7 @@ Lemma InFinEnumC_weaken : forall x l, (In x l) -> InFinEnumC x l.
 Proof.
 induction l.
  contradiction.
-intros [H0|H0]; rapply orWeaken.
+intros [H0|H0]; apply orWeaken.
  left.
  rewrite H0.
  reflexivity.
@@ -90,10 +90,10 @@ induction l1.
  contradiction.
 destruct H as [ G | H | H] using orC_ind.
   auto using InFinEnumC_stable.
- rapply orWeaken.
+ apply: orWeaken.
  left.
  auto.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHl1.
 assumption.
@@ -104,7 +104,7 @@ Proof.
 intros x l1 l2 H.
 induction l1.
  assumption.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHl1.
 Qed.
@@ -120,19 +120,19 @@ induction l1.
  assumption.
 destruct H as [ G | H | H] using orC_ind.
   auto using orC_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
- rapply orWeaken.
+ apply orWeaken.
  left.
  assumption.
 destruct (IHl1 H) as [ G | IH | IH] using orC_ind.
   auto using orC_stable.
- rapply orWeaken.
+ apply orWeaken.
  left.
- rapply orWeaken.
+ apply orWeaken.
  right.
  assumption.
-rapply orWeaken.
+apply orWeaken.
 right.
 assumption.
 Qed.
@@ -189,7 +189,7 @@ Lemma FinEnum_ball_wd : forall (e1 e2:Qpos), (e1==e2) ->
  (FinEnum_ball e1 a1 b1 <-> FinEnum_ball e2 a2 b2).
 Proof.
 intros e1 e2 He a1 a2 Ha b1 b2 Hb.
-rapply hausdorffBall_wd; auto with *.
+apply hausdorffBall_wd; auto with *.
 Qed.
 
 Hypothesis Xstable : stableMetric X.
@@ -235,7 +235,7 @@ autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
 rewrite <- Qle_minus_iff.
-rapply Zmult_le_compat; auto with *.
+apply Zmult_le_compat; auto with *.
 simpl.
 repeat rewrite <- inject_nat_convert.
 apply inj_le.
@@ -274,7 +274,7 @@ destruct Hx as [HG | Hx | Hx] using orC_ind.
      existsC X (fun y : X => InFinEnumC y b /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
   intros e.
   apply H.
-  rapply orWeaken.
+  apply: orWeaken.
   left;  assumption.
  assert (H'':forall n :nat ,
      existsC X (fun y : X => ~~In y b /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
@@ -306,7 +306,7 @@ destruct Hx as [HG | Hx | Hx] using orC_ind.
  destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
   auto using Xstable. 
  apply ball_weak_le with (1 # P_of_succ_nat z)%Qpos; auto.
- rapply Zmult_le_compat; auto with *.
+ apply Zmult_le_compat; auto with *.
  simpl.
  repeat rewrite <- POS_anti_convert.
  apply inj_le.
@@ -314,7 +314,7 @@ destruct Hx as [HG | Hx | Hx] using orC_ind.
 apply IHa; auto.
 intros e y Hy.
 apply H.
-rapply orWeaken.
+apply orWeaken.
 right.
 assumption.
 Qed.
@@ -322,14 +322,14 @@ Qed.
 Lemma FinEnum_is_MetricSpace : is_MetricSpace FinEnumS FinEnum_ball.
 split.
     intros e x.
-    rapply hausdorffBall_refl.
+    apply hausdorffBall_refl.
    intros e x y.
-   rapply hausdorffBall_sym.
+   apply hausdorffBall_sym.
   intros e d x y z.
-  rapply hausdorffBall_triangle.
+  apply hausdorffBall_triangle.
  intros e x y.
  unfold FinEnum_ball.
- rapply FinEnum_ball_closed.
+ apply FinEnum_ball_closed.
 apply FinEnum_ball_eq.
 Qed.
 
@@ -340,7 +340,7 @@ Build_MetricSpace FinEnum_ball_wd FinEnum_is_MetricSpace.
 Lemma FinEnum_stable : stableMetric FinEnum.
 Proof.
 intros e x y.
-rapply hausdorffBall_stable.
+apply: hausdorffBall_stable.
 Qed.
 
 Lemma FinEum_map_ball : forall (f:X -> X) e (s:FinEnum), 
@@ -357,18 +357,18 @@ split;
     |apply existsWeaken
     |]).
    exists (f a);split.
-    rapply orWeaken; left; reflexivity.
+    apply: orWeaken; left; reflexivity.
    rewrite y; apply H.
   destruct (IHs0 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.
   apply existsWeaken.
   exists z.
   split; auto.
-  rapply orWeaken.
+  apply: orWeaken.
   right; assumption.
  exists a.
  split.
-  rapply orWeaken; left; reflexivity.
+  apply orWeaken; left; reflexivity.
  apply ball_sym.
  rewrite y.
  apply H.
@@ -377,7 +377,7 @@ destruct (IHs1 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
 apply existsWeaken.
 exists z.
 split; auto.
-rapply orWeaken.
+apply orWeaken.
 right; assumption.
 Qed.
 
@@ -424,14 +424,14 @@ assert (Z:existsC X (fun y : X => InFinEnumC y b /\ ball (m:=X) e x y)).
  split; auto;
  destruct Hy0 as [HG | Hy | Hy] using orC_ind;
   [auto using InFinEnumC_stable
-  |rewrite Hy in Hy1; contradiction
+  |rewrite -> Hy in Hy1; contradiction
   |assumption]).
 exists (let (y,_) := (IHb x Hx Z d) in y).
 clear - IHb.
 abstract (
 destruct (IHb x Hx Z d) as [y [Hy0 Hy1]];
 split; auto;
-rapply orWeaken;
+apply orWeaken;
 auto).
 Defined.
 
@@ -468,7 +468,7 @@ destruct (IHb Hed) as [H|H].
  apply existsWeaken;
  exists z;
  split; try assumption;
- rapply orWeaken;
+ apply orWeaken;
  auto).
 destruct (almostDecideX a a0 Hed).
  left.
@@ -486,7 +486,7 @@ destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind;
  [tauto|];
 destruct (Hz0) as [HG | Hz0 | Hz0] using orC_ind;
  [tauto
- |rewrite Hz0 in Hz1; contradiction
+ |rewrite -> Hz0 in Hz1; contradiction
  |];
 apply H;
 intros x Hx;
@@ -523,14 +523,14 @@ destruct (IHa b Hed) as [I|I].
  apply J;
  intros x Hx;
  apply H;
- rapply orWeaken; left; assumption).
+ apply orWeaken; left; assumption).
 right.
 abstract (
 intros H;
 apply I;
 intros x Hx;
 apply H;
-rapply orWeaken; right; assumption).
+apply orWeaken; right; assumption).
 Defined.
 
 (** Finite Enumerations preserve the locatedness property. *)
@@ -608,11 +608,11 @@ destruct IHa as [c1 Hc1a Hc1b].
  abstract (
  intros x Hx d;
  apply (H x);
- rapply orWeaken;
+ apply orWeaken;
  right; auto).
 destruct (Qpos_lt_plus He) as [g Hg].
 destruct (fun z => H a z ((1#2)*g)%Qpos) as [b0 Hb0].
- abstract (rapply orWeaken; left; reflexivity).
+ abstract (apply orWeaken; left; reflexivity).
 clear H.
 destruct (@preLengthX a b0 (e + (1 # 2) * g)%Qpos d1 d2) as [c Hc0 Hc1].
   abstract ( clear - Hg;
@@ -630,7 +630,7 @@ exists (c :: c1).
    |apply existsWeaken;
     exists c;
     split;
-     [rapply orWeaken;left; reflexivity
+     [apply orWeaken;left; reflexivity
      |rewrite Hx; auto]
    |destruct Hc1a as [Hc1a _];
     destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
@@ -638,14 +638,14 @@ exists (c :: c1).
     apply existsWeaken;
     exists y;
     split; auto;
-    rapply orWeaken;
+    apply orWeaken;
     right; auto]
  |destruct Hx as [ G | Hx | Hx ] using orC_ind;
    [auto using existsC_stable
    |apply existsWeaken;
    exists a;
     split;
-     [rapply orWeaken;left; reflexivity
+     [apply orWeaken;left; reflexivity
      |rewrite Hx; auto with *]
    |destruct Hc1a as [_ Hc1a];
     destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
@@ -653,7 +653,7 @@ exists (c :: c1).
     apply existsWeaken;
     exists y;
     split; auto;
-    rapply orWeaken;
+    apply orWeaken;
     right; auto]]).
 abstract (
 destruct Hb0 as [Hb0a Hb0b];
@@ -687,7 +687,7 @@ split; simpl; intros H.
  destruct H as [G|H|H] using orC_ind.
    auto using InFinEnumC_stable.
   apply InFinEnumC_app_r.
-  rapply orWeaken.
+  apply orWeaken.
   left; auto.
  apply InFinEnumC_app_l.
  auto.
@@ -712,10 +712,10 @@ induction l.
 intros Ha.
 destruct Ha as [G | Ha | Ha] using orC_ind.
   auto using InFinEnumC_stable.
- rapply orWeaken.
+ apply: orWeaken.
  left.
  rewrite Ha; reflexivity.
-rapply orWeaken.
+apply: orWeaken.
 right.
 apply IHl.
 auto.
@@ -760,7 +760,7 @@ induction s1.
 destruct Ha as [G | Ha | Ha] using orC_ind.
   auto using existsC_stable.
  assert (Ha0:InFinEnumC a0 (a0::s1)).
-  rapply orWeaken.
+  apply orWeaken.
   left; reflexivity.
  destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -774,7 +774,7 @@ destruct Ha as [G | Ha | Ha] using orC_ind.
 apply IHs1; auto.
 intros b Hb.
  apply H.
-rapply orWeaken.
+apply orWeaken.
 right; assumption.
 Qed.
 (* begin hide *)
@@ -790,7 +790,7 @@ Proof.
 intros X SX SCX s1 s2 e.
 split.
  intros H.
- rapply (@FinEnum_map_uc (1#1) _ _ SX SCX).
+ apply (@FinEnum_map_uc (1#1) _ _ SX SCX).
  assumption.
 revert s1 s2.
 cut (forall (s1 s2 : FinEnum SX) ,
@@ -807,7 +807,7 @@ destruct Ha as [G | Ha | Ha] using orC_ind.
   auto using existsC_stable.
  clear IHs1.
  assert (Ha0:InFinEnumC (Cunit a0) (map Cunit (a0::s1))).
-  rapply orWeaken.
+  apply: orWeaken.
   left; reflexivity.
  destruct (H _ Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -819,7 +819,7 @@ destruct Ha as [G | Ha | Ha] using orC_ind.
   apply existsWeaken.
   exists a1.
   split.
-   rapply orWeaken.
+   apply orWeaken.
    left; reflexivity.
   rewrite Ha.
   rewrite <- ball_Cunit.
@@ -830,11 +830,11 @@ destruct Ha as [G | Ha | Ha] using orC_ind.
  apply existsWeaken.
  exists z.
  split; auto.
- rapply orWeaken.
+ apply orWeaken.
  right; assumption.
 apply IHs1; auto.
 intros b Hb.
 apply H.
-rapply orWeaken.
+apply: orWeaken.
 right; assumption.
 Qed.

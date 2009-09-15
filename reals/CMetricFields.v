@@ -108,7 +108,7 @@ set (H0 := ax_abs_gt_zero) in *.
 generalize H0.
 intro H1.
 set (H2 := H1 F (cmf_abs F) (cmf_proof F) [--] (One:F)) in *.
-rewrite leEq_def in H2.
+rewrite -> leEq_def in H2.
 apply H2.
 astepl ( [--] (cmf_abs F One)).
 astepl ( [--]OneR).

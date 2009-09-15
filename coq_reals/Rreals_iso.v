@@ -62,17 +62,17 @@ Definition RasIR : R -> IR := iso_map_lft _ _ RIR_iso.
 Definition IRasR : IR -> R := iso_map_rht _ _ RIR_iso.
 
 Lemma RasIRasR_id : forall (x:R), (IRasR (RasIR x)=x).
-rapply (inversity_rht _ _ RIR_iso).
+apply (inversity_rht _ _ RIR_iso).
 Qed.
 
 Lemma IRasRasIR_id : forall (x:IR), (RasIR (IRasR x)[=]x).
-rapply (inversity_lft _ _ RIR_iso).
+apply (inversity_lft _ _ RIR_iso).
 Qed.
 
 (** equality *)
 
 Lemma R_eq_as_IR : forall x y, (x = y -> RasIR x [=] RasIR y).
-rapply map_wd_unfolded.
+apply: map_wd_unfolded.
 Qed.
 
 (** apartness *)
@@ -81,7 +81,7 @@ Lemma R_eq_as_IR_back : forall x y, (RasIR x [=] RasIR y -> x = y).
 intros x y H.
 replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
 replace y with (IRasR (RasIR y)) by apply RasIRasR_id.
-rapply map_wd_unfolded; assumption.
+apply: map_wd_unfolded; assumption.
 Qed.
 
 Lemma R_ap_as_IR : forall x y, (RasIR x [#] RasIR y -> x <> y).
@@ -89,18 +89,18 @@ intros x y H.
 replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
 replace y with (IRasR (RasIR y)) by apply RasIRasR_id.
 change (IRasR (RasIR x) [#] IRasR (RasIR y)).
-rapply map_pres_apartness; assumption.
+apply: map_pres_apartness; assumption.
 Qed.
 
 Lemma R_ap_as_IR_back : forall x y, (x <> y -> RasIR x [#] RasIR y).
 intros x y H.
-rapply map_pres_apartness.
+apply map_pres_apartness.
 assumption.
 Qed.
 
 Lemma IR_ap_as_R : forall x y, (x <> y -> RasIR x [#] RasIR y).
 intro.
-rapply map_pres_apartness.
+apply: map_pres_apartness.
 Qed.
 
 (** less-than *)
@@ -110,26 +110,26 @@ intros x y H.
 replace x with (IRasR (RasIR x)) by apply RasIRasR_id.
 replace y with (IRasR (RasIR y)) by apply RasIRasR_id.
 change (IRasR (RasIR x) [<] IRasR (RasIR y)).
-rapply map_pres_less; assumption.
+apply: map_pres_less; assumption.
 Qed.
 
 Lemma R_lt_as_IR_back : forall x y, (x [<] y -> IRasR x < IRasR y).
 intros x y H.
 change (IRasR x [<] IRasR y).
-rapply map_pres_less.
+apply: map_pres_less.
 assumption.
 Qed.
 
 Lemma IR_lt_as_R : forall x y, (x < y -> RasIR x [<] RasIR y).
 intro.
-rapply map_pres_less.
+apply: map_pres_less.
 Qed.
 
 Lemma IR_lt_as_R_back : forall x y, (IRasR x < IRasR y -> x [<] y).
 intros.
 stepl (RasIR (IRasR x)) by apply IRasRasIR_id.
 stepr (RasIR (IRasR y)) by apply IRasRasIR_id.
-rapply map_pres_less.
+apply map_pres_less.
 assumption.
 Qed.
 
@@ -140,8 +140,7 @@ intros x y H.
 cut (~ (y < x)).
 apply Rnot_lt_le.
 intro xy.
-rewrite leEq_def in H.
-apply H.
+move:H. rewrite leEq_def. apply.
 apply IR_lt_as_R.
 assumption.
 Qed.
@@ -175,11 +174,11 @@ Qed.
 (** zero *)
 
 Lemma R_Zero_as_IR : (RasIR R0 [=] Zero).
-rapply map_pres_zero_unfolded.
+apply map_pres_zero_unfolded.
 Qed.
 
 Lemma IR_Zero_as_R : (IRasR Zero = 0).
-rapply map_pres_zero_unfolded.
+apply: map_pres_zero_unfolded.
 Qed.
 
 Hint Rewrite R_Zero_as_IR : RtoIR.
@@ -187,31 +186,31 @@ Hint Rewrite R_Zero_as_IR : RtoIR.
 (** one *)
 
 Lemma R_One_as_IR : (RasIR R1 [=] One).
-rapply map_pres_one_unfolded.
+apply map_pres_one_unfolded.
 Qed.
 
 Hint Rewrite R_One_as_IR : RtoIR.
 
 Lemma IR_One_as_R : (IRasR One = R1).
-rapply map_pres_one_unfolded.
+apply: map_pres_one_unfolded.
 Qed.
 
 (** addition *)
 
 Lemma R_plus_as_IR : forall x y, (RasIR (x+y) [=] RasIR x [+] RasIR y).
-rapply map_pres_plus.
+apply: map_pres_plus.
 Qed.
 
 Hint Rewrite R_plus_as_IR : RtoIR.
 
 Lemma IR_plus_as_R : forall x y, (IRasR (x[+]y) [=] IRasR x + IRasR y).
-rapply map_pres_plus_unfolded.
+apply: map_pres_plus_unfolded.
 Qed.
 
 (** negation *)
 
 Lemma R_opp_as_IR : forall x, (RasIR (- x) [=] ([--] (RasIR x))).
-rapply map_pres_minus.
+apply: map_pres_minus.
 Qed.
 
 Hint Rewrite R_opp_as_IR : RtoIR.
@@ -231,7 +230,7 @@ Hint Rewrite R_minus_as_IR : RtoIR.
 (** multiplication *)
 
 Lemma R_mult_as_IR : forall x y, (RasIR (x*y) [=] RasIR x [*] RasIR y).
-rapply map_pres_mult.
+apply: map_pres_mult.
 Qed.
 Hint Rewrite R_mult_as_IR : RtoIR.
 
@@ -241,10 +240,10 @@ Lemma R_recip_as_IR : forall y Hy, (RasIR (1 / y) [=] (One [/] RasIR y [//] Hy))
 intros y Hy.
 simpl in Hy.
 assert (y [#] 0)%R.
-rapply R_ap_as_IR.
+apply: R_ap_as_IR.
 stepr (Zero:IR). assumption.
 symmetry.
-rapply R_Zero_as_IR.
+apply R_Zero_as_IR.
 change (1/y) with (One [/] y [//] X).
 eapply eq_transitive.
 unfold RasIR.
@@ -278,15 +277,15 @@ intro Hxn.
 rewrite (AbsIR_eq_inv_x (RasIR x) Hxn).
 autorewrite with RtoIR; reflexivity.
 stepr (RasIR 0) by apply R_Zero_as_IR.
-rapply less_leEq.
-rapply IR_lt_as_R.
+apply less_leEq.
+apply IR_lt_as_R.
 assumption.
 cut (Zero [<=] RasIR x).
 intro Hxn.
 rewrite (AbsIR_eq_x _ Hxn).
 reflexivity.
 stepl (RasIR 0) by apply R_Zero_as_IR.
-rapply IR_le_as_R.
+apply IR_le_as_R.
 fourier.
 Qed.
 Hint Rewrite R_abs_as_IR : RtoIR.
@@ -319,7 +318,7 @@ unfold Cauchy_crit in cauchy.
 unfold Cauchy_prop.
 intros e e0.
 pose (new_e0 := R_lt_as_IR_back _ _ e0).
-rewrite IR_Zero_as_R in new_e0.
+rewrite -> IR_Zero_as_R in new_e0.
 assert (sig (fun N =>
    forall n m : nat,
     (n >= N)%nat ->
@@ -327,21 +326,21 @@ assert (sig (fun N =>
 )).
 apply constructive_indefinite_description_nat.
 intros N.
-rapply forall_dec.
+apply forall_dec.
 intros n0.
-rapply forall_dec.
+apply forall_dec.
 intros n1.
-rapply imp_dec.
+apply imp_dec.
 unfold ge.
 destruct (le_gt_dec N n0).
 left; auto with *.
 right; auto with *.
-rapply imp_dec.
+apply imp_dec.
 destruct (le_gt_dec N n1).
 left; auto with *.
 right; auto with *.
 apply Rlt_dec.
-rapply cauchy.
+apply cauchy.
 auto with *.
 destruct H as [N HN].
 exists (S N).
@@ -360,8 +359,8 @@ apply AbsIR_imp_AbsSmall.
 stepl (RasIR (Rabs(sum_f_R0 a m - sum_f_R0 a N))) by apply R_abs_as_IR.
 apply less_leEq.
 unfold R_dist in HH.
-stepr (RasIR (IRasR e)) by rapply IRasRasIR_id.
-rapply IR_lt_as_R.
+stepr (RasIR (IRasR e)) by apply IRasRasIR_id.
+apply IR_lt_as_R.
 assumption.
 Qed.
 
@@ -371,7 +370,7 @@ Lemma R_infsum_as_IR : forall (y: R) a,
 intros y a Hay prf.
 unfold series_sum.
 unfold infinit_sum in *.
-rapply Limits_unique.
+apply Limits_unique.
 unfold Cauchy_Lim_prop2.
 simpl.
 clear prf.
@@ -381,19 +380,19 @@ assert (sig (fun N =>
 )).
 apply constructive_indefinite_description_nat.
 intros N.
-rapply forall_dec.
+apply forall_dec.
 intros n0.
-rapply imp_dec.
+apply imp_dec.
 unfold ge.
 destruct (le_gt_dec N n0).
 left; auto with *.
 right; auto with *.
 apply Rlt_dec.
-rapply (Hay).
+apply (Hay).
 unfold Rgt.
-rapply R_lt_as_IR.
-stepl (Zero:IR)  by symmetry;rapply R_Zero_as_IR.
-stepr (e) by symmetry; rapply IRasRasIR_id.
+apply R_lt_as_IR.
+stepl (Zero:IR)  by symmetry;apply R_Zero_as_IR.
+stepr (e) by symmetry; apply IRasRasIR_id.
 assumption.
 destruct H as [N HN].
 exists (S N).
@@ -412,8 +411,8 @@ unfold R_dist in HH.
 simpl in HH.
 apply less_leEq.
 stepl (RasIR (Rabs(sum_f_R0 a m - y))) by apply R_abs_as_IR.
-stepr (RasIR (IRasR e)) by rapply IRasRasIR_id.
-rapply IR_lt_as_R.
+stepr (RasIR (IRasR e)) by apply IRasRasIR_id.
+apply IR_lt_as_R.
 assumption.
 Qed.
 
@@ -479,15 +478,15 @@ intro Hy.
 rewrite (R_recip_as_IR (nring (fac i)) Hy).
 clear.
 rewrite (cg_inv_zero IR (RasIR x)).
-rapply mult_wdl.
-rapply div_wd.
+apply mult_wdl.
+apply div_wd.
 reflexivity.
-rapply (R_nring_as_IR (fac i)).
+apply (R_nring_as_IR (fac i)).
 simpl.
 stepl (nring (R:=IR) (fac i)).
-rapply (nring_fac_ap_zero IR i).
+apply (nring_fac_ap_zero IR i).
 symmetry.
-rapply (R_nring_as_IR).
+apply (R_nring_as_IR).
 Qed.
 
 Hint Rewrite R_exp_as_IR : RtoIR.
@@ -596,8 +595,8 @@ rewrite (R_infsum_f_as_IR x y (fun x i => sin_n i * Rsqr x ^ i) rsums
 assert (convergent
                (fun n : nat =>
                 RasIR x[*](fun i : nat => RasIR (sin_n i * Rsqr x ^ i)) n)).
-rapply conv_series_mult_scal.
-rapply (R_infsum_as_IR_convergent _ _ rsums).
+apply conv_series_mult_scal.
+apply (R_infsum_as_IR_convergent _ _ rsums).
 rewrite <- (series_sum_mult_scal (fun i : nat => RasIR (sin_n i * Rsqr x ^ i))
  (R_infsum_as_IR_convergent _ _ rsums) (RasIR x) X).
 simpl.
@@ -656,7 +655,7 @@ apply bin_op_wd_unfolded.
 cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fact (n + n + 1))))).
 intro X.
 rewrite (R_div_as_IR ((-1)^n) (nring (R:=RRing) (fact (n + n + 1))) X).
-rapply div_wd.
+apply div_wd.
 autorewrite with RtoIR; reflexivity.
 autorewrite with RtoIR.
 apply nring_wd.
@@ -690,10 +689,10 @@ intro ndom.
 stepl (Sin(RasIR x) [/] Cos(RasIR x) [//] ndom).
 unfold Tan.
 unfold Tang.
-rapply div_wd.
-rapply pfwdef.
+apply: div_wd.
+apply: pfwdef.
 reflexivity.
-rapply pfwdef.
+apply: pfwdef.
 reflexivity.
 apply div_wd.
 symmetry; apply R_sin_as_IR.
@@ -705,7 +704,7 @@ unfold pfdom,f_rcpcl', Tang,Fdiv in *.
 destruct dom.
 destruct e.
 stepl (Cos (RasIR x)) by symmetry; apply R_cos_as_IR.
-rapply c.
+apply: c.
 Qed.
 
 Add Morphism RasIR with signature (@cs_eq _) ==> (@cs_eq _) as R_as_IR_wd.
@@ -718,7 +717,7 @@ Qed.
 
 Lemma R_ln_as_IR : forall x prf, RasIR (ln x) [=] Log (RasIR x) prf.
 intros x prf.
-rapply Exp_cancel.
+apply Exp_cancel.
 rewrite Exp_Log.
 rewrite <- R_exp_as_IR.
 apply R_as_IR_wd.
@@ -799,7 +798,7 @@ unfold Not.
 intro X.
 apply ((eq_imp_not_ap _ _ _ H) (Sin_ap_Zero (RasIR (PI)) X)).
 clear H.
-rapply (not_ap_imp_eq).
+apply (not_ap_imp_eq).
 intro PiNot.
 elim H0.
 intro z.
@@ -812,7 +811,7 @@ apply PI_neq0.
 intro p.
 rewrite <- convert_is_POS.
 stepr (nring (R := IR) (nat_of_P p) [*] Pi) by
-    apply mult_wdl; symmetry; rapply (zring_plus_nat IR).
+    apply mult_wdl; symmetry; apply (zring_plus_nat IR).
 case (nat_of_P p).
 simpl.
 rstepr (Zero:IR).
@@ -825,47 +824,47 @@ simpl.
 rstepr (Pi).
 assumption.
 intro n0.
-rapply less_imp_ap.
+apply less_imp_ap.
 apply leEq_less_trans with Four.
 rstepr ((One [+] One) [*] (One [+] One):IR).
 rewrite <- R_One_as_IR.
 rewrite <- R_plus_as_IR.
 rewrite <- R_mult_as_IR.
-rapply IR_le_as_R.
+apply IR_le_as_R.
 apply PI_4.
 apply less_leEq_trans with (Two [*] Pi).
 rstepl (Two [*] Two:IR).
 apply mult_resp_less_lft.
 apply Pi_gt_2.
 rstepr ((Zero [+] One) [+] One : IR).
-rapply plus_one_ext_less.
-rapply zero_lt_posplus1.
-rapply eq_imp_leEq.
+apply plus_one_ext_less.
+apply zero_lt_posplus1.
+apply eq_imp_leEq.
 reflexivity.
-rapply mult_resp_leEq_rht.
+apply mult_resp_leEq_rht.
 simpl.
-rapply (plus_resp_leEq).
-rapply (plus_resp_leEq).
+apply (plus_resp_leEq).
+apply (plus_resp_leEq).
 stepl (nring (R := IR) 0) by auto with *.
 apply nring_leEq; auto with *.
 apply less_leEq.
 apply pos_Pi.
 intro p.
-rapply Greater_imp_ap.
+apply Greater_imp_ap.
 simpl.
 apply leEq_less_trans with (Zero:IR).
 rewrite pring_convert.
-rapply less_leEq.
-rapply inv_cancel_less.
+apply less_leEq.
+apply inv_cancel_less.
 rstepl (Zero[*]Zero:IR).
 rstepr ((nring (R:=IR) (nat_of_P p))[*]Pi).
 apply mult_resp_less_both.
-rapply eq_imp_leEq.
+apply eq_imp_leEq.
 reflexivity.
 rstepl (nring (R := IR) 0) .
-rapply nring_less.
+apply nring_less.
 auto with *.
-rapply eq_imp_leEq.
+apply eq_imp_leEq.
 reflexivity.
 auto with *.
 stepl (RasIR 0) by apply R_Zero_as_IR.
@@ -917,7 +916,7 @@ apply Rgt_not_eq.
 rewrite DF.
 unfold Rgt.
 change (Zero [<] nring (R:=RRing) (S (n + n))).
-rapply pos_nring_S.
+apply pos_nring_S.
 auto with *.
 Qed.
 
@@ -943,8 +942,8 @@ simpl; reflexivity.
 apply IZR_as_zring.
 apply INR_as_nring.
 apply div_wd.
-rapply R_zring_as_IR.
-rapply R_nring_as_IR.
+apply R_zring_as_IR.
+apply R_nring_as_IR.
 simpl.
 stepr (RasIR 0) by apply R_Zero_as_IR.
 apply IR_ap_as_R.
@@ -952,7 +951,7 @@ apply Rgt_not_eq.
 unfold Rgt.
 replace 0%R with (nring (R:=RRing) 0).
 change ((nring (R:=RRing) 0 [<] nring (R:=RRing) (nat_of_P Qden))).
-rapply nring_less.
+apply nring_less.
 auto with *.
 auto with *.
 Qed.

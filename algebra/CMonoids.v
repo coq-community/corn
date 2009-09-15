@@ -240,40 +240,19 @@ unfold Inv.
 simpl.
 apply inv2.
 
-intros a b.
-unfold isomorphism in isof.
-elim isof.
-intros H0 H1.
-unfold bijective in H1.
-elim H1.
-clear H1.
-intros H1 H2.
-unfold surjective in H2.
-set (Ha:= (H2 a)).
-set (Hb:= (H2 b)).
-elim Ha.
-intros a' fa'a.
-elim Hb.
-intros b' fb'b.
-unfold morphism in H0.
-astepl ((Inv f iso_imp_bij) ((csg_op (c:=M2)) (f a') (f b'))).
-astepl ((Inv f iso_imp_bij) ( f ( a'[+] b'))).
-set (H3:= (inv2 M1 M2 f iso_imp_bij (a'[+]b'))).
-astepl (a'[+]b').
-astepr (a'[+] b').
-intuition.
-
-set (H4:=(inv2 M1 M2 f iso_imp_bij a')).
-apply csbf_wd_unfolded.
-astepr (Inv f iso_imp_bij (f a')).
-intuition.
-
-set (H5:= (inv2 M1 M2 f iso_imp_bij b')).
-astepr (Inv f iso_imp_bij (f b')).
-intuition.
-
-intuition.
-
+ intros a b.  elim isof. intros H0 H1. move: H1 => [H1 H2].
+(* set (Ha:= (H2 a)). set (Hb:= (H2 b)).*)
+ move: (H2 a) => [a' fa'a]. move: (H2 b) => [b' fb'b].
+ unfold morphism in H0.
+  astepl ((Inv f iso_imp_bij) (f a' [+] f b')).
+   astepl ((Inv f iso_imp_bij) ( f ( a'[+] b'))).
+   set (H3:= (inv2 M1 M2 f iso_imp_bij (a'[+]b'))).
+   astepl (a'[+]b'). astepr (a'[+] b'). intuition.
+   set (H4:=(inv2 M1 M2 f iso_imp_bij a')).
+   apply csbf_wd. 
+    astepr (Inv f iso_imp_bij (f a')); intuition.
+   astepr (Inv f iso_imp_bij (f b')).  set (H5:= (inv2 M1 M2 f iso_imp_bij b')); intuition.
+  intuition.
 apply Inv_bij.
 Qed.
 
@@ -315,7 +294,7 @@ intros M a m n.
 induction m.
 simpl.
 apply eq_symmetric.
-apply cm_lft_unit_unfolded.
+apply cm_lft_unit.
 
 simpl.
 astepl (csbf_fun M M M (csg_op (c:=M)) a ((csbf_fun M M M (csg_op (c:=M)) (power_CMonoid a m)

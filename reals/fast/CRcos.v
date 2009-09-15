@@ -86,9 +86,9 @@ Qed.
 
 Lemma cos_poly_prf : is_UniformlyContinuousFunction (fun x => cos_poly_fun (QboundAbs (1#1) x)) cos_poly_modulus.
 Proof.
-rapply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun a (4#1)).
+apply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun a (4#1)).
  simpl; intros q _ _.
- rapply cos_poly_fun_correct.
+ apply cos_poly_fun_correct.
 simpl; intros x' _ [Hx0 Hx1].
 set (x:=(inj_Q IR x')) in *.
 stepr (Four:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 4)).
@@ -118,10 +118,10 @@ intros x Hx.
 assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ([-C-](One:IR){-}(Two:IR){**}FId{^}2)).
  eapply Derivative_imp_Continuous.
  apply D.
-rapply (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
+apply: (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
  [|repeat constructor|].
  intros q Hq Hq0.
- transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; rapply cos_poly_fun_correct].
+ transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; apply cos_poly_fun_correct].
  simpl.
  change (' q)%CR with (Cunit_fun _ q).
  rewrite Cmap_fun_correct.
@@ -156,7 +156,7 @@ csetoid_replace (cx[^]2) (One[-]sx[^]2).
 apply cg_inv_unique_2.
 rstepl ((cx[^]2[+]sx[^]2)[-]One).
 apply x_minus_x.
-rapply FFT.
+apply FFT.
 Qed.
 
 End Cos_Poly.
@@ -194,17 +194,17 @@ apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_cos x) (Qscale
  change (/1) with 1.
  replace RHS with (x:Q) by ring.
  apply Qle_refl.
-rapply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos CI) rational_cos).
+apply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos CI) rational_cos).
  intros q [] _.
- rapply rational_cos_correct.
+ apply rational_cos_correct.
 intros x [] _.
 stepr (One:IR).
  change (AbsIR ([--](Sin x))[<=]One).
  stepl (AbsIR (Sin x)) by apply AbsIR_inv.
- rapply AbsIR_Sin_leEq_One.
+ apply AbsIR_Sin_leEq_One.
 rstepl (nring 1:IR).
 apply eq_symmetric.
-rapply (inj_Q_nring IR 1).
+apply (inj_Q_nring IR 1).
 Qed.
 
 Definition cos_uc : Q_as_MetricSpace --> CR := 
@@ -216,13 +216,13 @@ Lemma cos_slow_correct : forall x,
  (IRasCR (Cos x) == cos_slow (IRasCR x))%CR.
 Proof.
 intros x.
-rapply (ContinuousCorrect (CI:proper realline));
+apply: (ContinuousCorrect (CI:proper realline));
  [apply Continuous_Cos | | constructor].
 intros q [] _.
-transitivity (rational_cos q);[|rapply rational_cos_correct].
+transitivity (rational_cos q);[|apply rational_cos_correct].
 unfold cos_slow.
 rewrite (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
-rapply BindLaw1.
+apply: BindLaw1.
 Qed.
 
 Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.

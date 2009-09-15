@@ -270,7 +270,7 @@ End CGroup_basics.
 
 Add Parametric Morphism c : (@cg_minus c) with signature (@cs_eq (cg_crr c)) ==> (@cs_eq c) ==> (@cs_eq c) as cg_minus_wd_morph.
 intros.
-rapply cg_minus_wd; assumption.
+apply cg_minus_wd; assumption.
 Qed.
 
 Hint Resolve cg_rht_inv_unfolded cg_lft_inv_unfolded: algebra.

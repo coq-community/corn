@@ -32,7 +32,7 @@ Lemma degree_poly_div : forall (m n : nat) (f g : cpoly CR),
     S m >= n -> degree_le (S m) f -> degree_le n g -> degree_le m f1.
 Proof.
 intros m n f g f1 ge_m_n df dg p Hp; unfold f1; clear f1.
-rewrite nth_coeff_minus, nth_coeff_c_mult_p, nth_coeff_c_mult_p, nth_coeff_mult.
+rewrite nth_coeff_minus nth_coeff_c_mult_p nth_coeff_c_mult_p nth_coeff_mult.
 rewrite (Sum_term _ _ _ (S m - n)); [ | omega | omega | intros ].
   rewrite nth_coeff_nexp_eq.
   destruct Hp.
@@ -62,12 +62,12 @@ destruct (IHp (m - 1) n) with (f := f1) (g := g); [ omega | | assumption | omega
 destruct x as [q1 r1].
 exists (q1 [+] _C_ ((nth_coeff (S n) g)[^](m - S n) [*] (nth_coeff m f)) [*] _X_ [^] (m - S n), r1); [ | assumption].
 unfold f1 in y.
-rewrite ring_distl_unfolded, <- plus_assoc_unfolded, (cag_commutes _ _ r1), plus_assoc_unfolded, <- y.
+rewrite ring_distl_unfolded. rewrite <- plus_assoc_unfolded. rewrite (cag_commutes _ _ r1). rewrite plus_assoc_unfolded. rewrite  <- y.
 replace (m - n) with (S (m - S n)) by omega.
 replace (m - 1 - n) with (m - S n) by omega.
 rewrite <- nexp_Sn.
 generalize (nth_coeff (S n) g) (nth_coeff m f) (m - S n).
-intros; rewrite c_mult, c_mult; rational.
+intros; rewrite c_mult c_mult; rational.
 Qed.
 
 Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] Zero).
@@ -77,20 +77,19 @@ Lemma cpoly_div2 : forall (n m : nat) (a b c : cpoly_cring CR),
 Proof.
 induction n.
   intros; destruct (degree_le_zero _ _ H).
-  rewrite s; rewrite s in H1; destruct X; rewrite c_zero; apply cpoly_const_eq.
+  move: H1. repeat rewrite s; destruct X; rewrite c_zero. intro. apply cpoly_const_eq.
   destruct m.
     set (tmp := nth_coeff_wd _ 0 _ _ H1); destruct H0.
-    rewrite nth_coeff_c_mult_p, H0, mult_one, (nth_coeff_wd _ _ _ _ (s0 H2)) in tmp; apply tmp.
+    move: tmp. rewrite nth_coeff_c_mult_p H0 mult_one (nth_coeff_wd _ _ _ _ (s0 H2)). intro tmp; apply tmp.
   set (tmp := nth_coeff_wd _ (S m) _ _ H1); destruct H0.
-  rewrite nth_coeff_c_mult_p, H0, mult_one, (d m H2 (S m)) in tmp; [ apply tmp | apply le_n ].
+  move: tmp. rewrite nth_coeff_c_mult_p H0 mult_one (d m H2 (S m)).  apply. apply le_n.
 intros.
 induction a as [ | a s ] using cpoly_induc; [ reflexivity | ].
 apply _linear_eq_zero.
-rewrite cpoly_lin in H1.
-rewrite ring_distl_unfolded in H1.
+move: H1. rewrite cpoly_lin ring_distl_unfolded. intro H1.
 cut (a [=] Zero); [ intro aeqz; split; [ | apply aeqz ] | ].
   assert (s [=] nth_coeff m (_C_ s[*]b[+]_X_[*]a[*]b)).
-    destruct H0; rewrite nth_coeff_plus, nth_coeff_c_mult_p, H0.
+    destruct H0; rewrite nth_coeff_plus nth_coeff_c_mult_p H0.
     rewrite (nth_coeff_wd _ _ _ Zero); [ simpl; rational | ].
     rewrite aeqz; rational.
   rewrite H2.
@@ -107,12 +106,12 @@ apply (IHn (S m) _ (Zero [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H1, c
 unfold degree_lt_pair.
 split; intros.
   unfold degree_le; intros.
-  rewrite nth_coeff_minus, nth_coeff_c_mult_p, (degree_le_cpoly_linear _ _ _ _ H2); [ | apply H3 ].
-  rewrite cring_mult_zero, cg_inv_zero; destruct X.
+  rewrite nth_coeff_minus nth_coeff_c_mult_p (degree_le_cpoly_linear _ _ _ _ H2); [ | apply H3 ].
+  rewrite cring_mult_zero cg_inv_zero; destruct X.
   destruct m; [ destruct H0; apply (nth_coeff_wd _ _ _ _ (s0 H4)) | ].
   apply (d n0); [ | apply H3 ].
   apply (degree_le_mon _ _ n0); [ apply le_S; apply le_n | apply (degree_le_cpoly_linear _ _ _ _ H2) ].
-destruct (degree_le_zero _ _ H2); rewrite cpoly_C_ in s0.
+destruct (degree_le_zero _ _ H2) as [x s0]. move: s0. rewrite cpoly_C_. intro s0.
 destruct (linear_eq_linear_ _ _ _ _ _ s0); rewrite <- H1, H4; rational.
 Qed.
 
@@ -121,40 +120,40 @@ Lemma cpoly_div : forall (f g : cpoly_cring CR) (n : nat), monic n g ->
 Proof.
 intros; destruct n.
   destruct H; destruct (degree_le_zero _ _ H0).
-  rewrite (nth_coeff_wd _ _ _ _ s) in H; simpl in H; rewrite H in s.
+  rewrite -> (nth_coeff_wd _ _ _ _ s) in H. simpl in H; rewrite -> H in s.
   exists (f,Zero).
     intros; destruct y; simpl (snd (s0, s1)) in *; simpl (fst (s0, s1)) in *.
     destruct X; destruct d; split; [ | symmetry; apply (s3 H0) ].
-    rewrite s2, (s3 H0), s, <- c_one; rational.
+    rewrite s2 (s3 H0) s -c_one; rational.
   simpl (fst (f, Zero : cpoly_cring CR)); simpl (snd (f, Zero : cpoly_cring CR)).
   replace (cpoly_zero CR) with (Zero : cpoly_cring CR) by (simpl;reflexivity).
-  split; [ rewrite s, <- c_one; rational | ].
+  split; [ rewrite s -c_one; rational | ].
   split; [ | reflexivity ].
   unfold degree_le; intros; apply nth_coeff_zero.
 destruct (@cpoly_div1 (max (lth_of_poly f) n) n f g); [ | destruct H; assumption | apply le_max_r | ].
   apply (@degree_le_mon _ _ (lth_of_poly f)); [ apply le_max_l | apply poly_degree_lth ].
 destruct H; destruct x as [q r].
-rewrite H, one_nexp, mult_one in y.
+rewrite -> H, one_nexp, mult_one in y.
 assert (f[=]q[*]g[+]r and degree_lt_pair r g).
   split; [ assumption | ].
   split.
     intros; unfold degree_le; intros; apply y0; apply le_lt_trans with n0; [ | assumption ].
     unfold degree_le in H1; apply not_gt; intro; unfold gt in H3.
-    set (tmp := (H1 (S n) (lt_n_S _ _ H3))); rewrite H in tmp.
+    set (tmp := (H1 (S n) (lt_n_S _ _ H3))); rewrite -> H in tmp.
     apply (eq_imp_not_ap _ _ _ tmp); apply ring_non_triv.
-  intro; unfold degree_le in H1; rewrite H1 in H; [ | apply lt_O_Sn ].
+  intro; unfold degree_le in H1; rewrite -> H1 in H; [ | apply lt_O_Sn ].
   destruct (eq_imp_not_ap _ _ _ H); apply ap_symmetric; apply ring_non_triv.
 exists (q,r); [ | assumption ].
 intros; destruct y1 as [q1 r1]; simpl (fst (q1, r1)); simpl (snd (q1, r1)) in X0.
-destruct X; destruct X0; rewrite s in s0; assert (q [=] q1).
+destruct X; destruct X0; rewrite -> s in s0; assert (q [=] q1).
   apply cg_inv_unique_2.
   apply (@cpoly_div2 (lth_of_poly (q [-] q1)) (S n) (q [-] q1) g (r1 [-] r)); [ apply poly_degree_lth | split; assumption | | ].
     destruct d; destruct d0; split.
       intros; apply degree_le_minus; [ apply d0 | apply d ]; assumption.
-    intro; rewrite (s1 H1), (s2 H1); rational.
+    intro; rewrite (s1 H1) (s2 H1); rational.
   assert (r1[=]q1[*]g[+]r1[-]q1[*]g); [ rational | ].
-  rewrite H1, <- s0; rational.
+  rewrite H1 -s0; rational.
 split; [ assumption | ].
-rewrite H1 in s0; apply (cg_cancel_lft _ _ _ _ s0).
+rewrite -> H1 in s0; apply (cg_cancel_lft _ _ _ _ s0).
 Qed.
 End poly_eucl.

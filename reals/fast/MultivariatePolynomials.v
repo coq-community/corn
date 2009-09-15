@@ -146,9 +146,9 @@ Build_CSetoid_fun _ _ _ (MVP_apply_hom_strext F v).
 Definition MVP_apply_hom (F:CRing) n (v:vector F n) : RingHom (MultivariatePolynomial F n) F.
 intros F n v.
 exists (MVP_apply_hom_csf F v).
-  intros x y; rapply MVP_plus_apply.
- intros x y; rapply MVP_mult_apply.
-rapply one_MVP_apply.
+  intros x y; apply: MVP_plus_apply.
+ intros x y; apply: MVP_mult_apply.
+apply: one_MVP_apply.
 Defined.
 
 (** [MVP_map] applies a ring homomorphism to the coefficents of a multivariable polynomial *)
@@ -219,12 +219,12 @@ Lemma MVP_BernsteinNonNeg : forall m n i (H:(i <= n)%nat) v (a:Q), 0 <= a -> a <
 Proof.
 intros m n i H v a Ha0 Ha1.
 induction v.
- rapply BernsteinNonNeg; auto.
+ apply: BernsteinNonNeg; auto.
 simpl.
 replace RHS with (MVP_apply Q_as_CRing
   (Bernstein _ H) ! (MVP_C_ Q_as_CRing n0 a) v).
  apply IHv.
-rapply MVP_apply_wd;try reflexivity.
+apply MVP_apply_wd;try reflexivity.
 rewrite BernsteinApplyRingHom.
 auto with *.
 Qed.
@@ -300,13 +300,13 @@ apply Qle_trans with
        Bernstein (MultivariatePolynomial Q_as_CRing n)
          (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) H l)))).
   do 2 rewrite MVP_plus_apply.
-  rewrite (Qplus_comm (@MVP_apply Q_as_CRing (S n)
+  rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n)
    (Sumx
       (fun (i : nat) (l0 : (i < n1)%nat) =>
        Bernstein (MultivariatePolynomial Q_as_CRing n)
          (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l))))
    (Vcons Q a n v0))).
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   rewrite Qmult_plus_distr_l.
   apply Qplus_le_compat; rewrite Qmult_comm; rewrite Qmax_mult_pos_distr_l.
      replace LHS with (MVP_apply Q_as_CRing a0 v0 *
@@ -317,7 +317,7 @@ apply Qle_trans with
       apply Qmax_ub_l.
      simpl.
      rewrite <- (MVP_mult_apply Q_as_CRing).
-     rapply MVP_apply_wd; try reflexivity.
+     apply: MVP_apply_wd; try reflexivity.
      replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
       with (le_S_n n1 m l) by apply le_irrelevent.
      apply c_mult_apply.
@@ -336,7 +336,7 @@ apply Qle_trans with
           (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l)))))
       (Vcons Q a n v0)).
     apply IHb.
-   rapply mult_wdr.
+   apply: mult_wdr.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
    intros i H.
@@ -352,7 +352,7 @@ apply Qle_trans with
       Bernstein (MultivariatePolynomial Q_as_CRing n)
         (lt_n_Sm_le i m (lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) l0) l)))).
   rewrite MVP_plus_apply.
-  rapply plus_resp_nonneg.
+  apply: plus_resp_nonneg.
    stepr (@MVP_apply Q_as_CRing (S n)
          (Sumx
             (fun (i : nat) (l0 : (i < n1)%nat) =>
@@ -451,13 +451,13 @@ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Ber
       Bernstein (MultivariatePolynomial Q_as_CRing n)
         (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) H l)))).
  do 2 rewrite MVP_plus_apply.
- rewrite (Qplus_comm (@MVP_apply Q_as_CRing (S n)
+ rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n)
   (Sumx
      (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
         (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l))))
   (Vcons Q a n v0))).
- rewrite Qmult_comm.
+ rewrite ->  Qmult_comm.
  rewrite Qmult_plus_distr_l.
  apply Qplus_le_compat; rewrite Qmult_comm; rewrite Qmin_mult_pos_distr_l.
     replace RHS with (MVP_apply Q_as_CRing a0 v0 *
@@ -468,7 +468,7 @@ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Ber
      apply Qmin_lb_l.
     simpl.
     rewrite <- (MVP_mult_apply Q_as_CRing).
-    rapply MVP_apply_wd; try reflexivity.
+    apply: MVP_apply_wd; try reflexivity.
     replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
      with (le_S_n n1 m l) by apply le_irrelevent.
     apply c_mult_apply.
@@ -487,7 +487,7 @@ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Ber
          (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l)))))
      (Vcons Q a n v0)).
    apply IHb.
-  rapply mult_wdr.
+  apply: mult_wdr.
   apply MVP_apply_wd; try reflexivity.
   apply Sumx_wd.
   intros i H.
@@ -503,7 +503,7 @@ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Ber
      Bernstein (MultivariatePolynomial Q_as_CRing n)
        (lt_n_Sm_le i m (lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) l0) l)))).
  rewrite MVP_plus_apply.
- rapply plus_resp_nonneg.
+ apply: plus_resp_nonneg.
   stepr (@MVP_apply Q_as_CRing (S n)
         (Sumx
            (fun (i : nat) (l0 : (i < n1)%nat) =>
@@ -545,15 +545,15 @@ Lemma MVP_apply_modulus_correct : forall n (p:MultivariatePolynomial Q_as_CRing 
  forall (v:vector Q n), UnitHyperInterval v -> ball e (MVP_apply _ p (Vcons _ x _ v):Q) (MVP_apply _ p (Vcons _ y _ v)).
 intros n p x y e Hx0 Hx1 Hy0 Hy1 Hxy v Hv.
 assert (Hx : (Qmax 0 (Qmin 1 x))==x).
- rewrite Qle_min_r in Hx1.
+ rewrite ->  Qle_min_r in Hx1.
  rewrite Hx1.
- rewrite Qle_max_r in Hx0.
+ rewrite ->  Qle_max_r in Hx0.
  rewrite Hx0.
  reflexivity.
 assert (Hy : (Qmax 0 (Qmin 1 y))==y).
- rewrite Qle_min_r in Hy1.
+ rewrite -> Qle_min_r in Hy1.
  rewrite Hy1.
- rewrite Qle_max_r in Hy0.
+ rewrite ->  Qle_max_r in Hy0.
  rewrite Hy0.
  reflexivity.
 simpl.
@@ -575,10 +575,10 @@ apply (fun A B e => is_UniformlyContinuousD_Q (Some 0) (Some 1) (refl_equal _) (
       (inj_Q_hom IR) (MVP_apply_hom Q_as_CRing v)) p) ! (inj_Q_hom IR q)).
  rewrite cpoly_map_compose.
  rewrite <- cpoly_map_apply.
- rapply inj_Q_wd.
+ apply inj_Q_wd.
  rewrite cpoly_map_apply.
  apply csbf_wd; try reflexivity.
- rapply C_MVP_apply.
+ apply: C_MVP_apply.
 simpl.
 clear - c Hv.
 intros x _ [H0x Hx1].
@@ -669,21 +669,21 @@ cut (forall x y : Q, y <= x -> x - y <= e -> Qclamp01 x - Qclamp01 y <= e).
   intros He.
   rewrite Qabs_pos.
    apply H; auto.
-  rapply shift_zero_leEq_minus.
+  apply: shift_zero_leEq_minus.
   apply Qclamp01_le.
   auto.
- rapply shift_zero_leEq_minus.
+ apply: shift_zero_leEq_minus.
  auto.
 intros x y Hxy He.
 simpl.
 apply (Qmin_case 1 y).
  intros Hy.
  assert (Hx:=Qle_trans _ _ _ Hy Hxy).
- rewrite Qle_min_l in Hx.
+ rewrite ->  Qle_min_l in Hx.
  rewrite Hx.
  replace LHS with  0 by ring.
  eapply Qle_trans;[|apply He].
- rapply shift_zero_leEq_minus; auto.
+ apply: shift_zero_leEq_minus; auto.
 apply (Qmin_case 1 x).
  intros Hx Hy.
  eapply Qle_trans;[|apply He].
@@ -693,10 +693,10 @@ apply (Qmin_case 1 x).
 intros _ _.
 apply (Qmax_case 0 x); intros Hx.
  assert (Hy:=Qle_trans _ _ _ Hxy Hx).
- rewrite Qle_max_l in Hy.
+ rewrite ->  Qle_max_l in Hy.
  rewrite Hy.
  eapply Qle_trans;[|apply He].
- rapply shift_zero_leEq_minus; auto.
+ apply: shift_zero_leEq_minus; auto.
 apply (Qmax_case 0 y); intros Hy.
  eapply Qle_trans;[|apply He].
  apply Qplus_le_compat; auto with *.
@@ -743,7 +743,7 @@ assert (is_UniformlyContinuousFunction (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (
   (destruct (MVP_apply_modulus p e); auto;
   simpl;
   rewrite Qball_Qabs;
-  rapply Qclamp01_close;
+  apply: Qclamp01_close;
   rewrite <- Qball_Qabs;
   auto);
  destruct (Qclamp01_clamped x) as [Hx0 Hx1];
@@ -792,7 +792,7 @@ induction n.
  simpl.
  auto.
 intros x y Hxy a.
-rapply IHn.
+apply: IHn.
 rewrite Hxy.
 reflexivity.
 Qed.
@@ -817,8 +817,8 @@ induction n.
  simpl.
  auto.
 intros x y Hxy z.
-rapply IHn.
-rapply Cap_wd; auto.
+apply: IHn.
+apply: Cap_wd; auto.
 reflexivity.
 Qed.
 
@@ -853,7 +853,7 @@ Lemma MVP_uc_fun_sub_Q : forall n (p:MultivariatePolynomial _ (S n)) x,
 Proof.
 intros n p x Hx0 Hx1.
 unfold MVP_uc_fun.
-rapply n_Cap_wd.
+apply: n_Cap_wd.
 intros e1 e2.
 simpl.
 unfold Cap_raw.
@@ -861,9 +861,9 @@ simpl.
 change (ball (e1 + e2)
   (MVP_uc_Q n p ! (MVP_C_ Q_as_CRing n (Qmax 0 (Qmin 1 x))))
   (MVP_uc_Q n p ! (MVP_C_ Q_as_CRing n x))).
-rewrite Qle_min_r in Hx1.
+rewrite ->  Qle_min_r in Hx1.
 rewrite Hx1.
-rewrite Qle_max_r in Hx0.
+rewrite ->  Qle_max_r in Hx0.
 rewrite Hx0.
 apply ball_refl.
 Qed.
@@ -899,7 +899,7 @@ Add Parametric Morphism n :
 induction n;
  intros x y Hxy a b Hab.
  change (x==a <-> y==b)%CR.
- rewrite Hxy, Hab.
+ rewrite Hxy Hab.
  reflexivity.
 simpl.
 split;
@@ -931,7 +931,7 @@ induction n.
  change ('x[=]'x)%CR.
  reflexivity.
 simpl.
-rapply csf_wd.
+apply: csf_wd.
 apply IHn.
 Qed.
 
@@ -946,7 +946,7 @@ Add Parametric Morphism n :
 induction n;
  intros e1 e2 He x y Hxy a b Hab.
  change (ball e1 x a <-> ball e2 y b).
- rewrite He, Hxy, Hab.
+ rewrite He Hxy Hab.
  reflexivity.
 simpl.
 split;
@@ -963,11 +963,11 @@ Lemma MVP_uc_fun_close_weaken : forall n (e1 e2:Qpos) f g, (e1 <= e2) ->
 Proof.
 induction n;
  intros e1 e2 f g He H.
- rapply ball_weak_le.
+ apply: ball_weak_le.
   apply He.
  apply H.
 intros x Hx0 Hx1.
-rapply IHn.
+apply: IHn.
  apply He.
 apply H; auto.
 Qed.
@@ -983,7 +983,7 @@ Add Parametric Morphism n :
 induction n;
  intros e1 e2 He x y Hxy a b Hab.
  change (ball e1 x a <-> ball e2 y b).
- rewrite He, Hxy, Hab.
+ rewrite He Hxy Hab.
  reflexivity.
 simpl.
 split;
@@ -1006,7 +1006,7 @@ induction n;
   apply H0.
  apply H1.
 intros x Hx0 Hx1.
-rapply IHn.
+apply: IHn.
  apply H0; auto.
 apply H1; auto.
 Qed.
@@ -1022,7 +1022,7 @@ induction n;
   apply H0.
  apply H1.
 intros x Hx0 Hx1.
-rapply IHn.
+apply: IHn.
  apply H0; auto.
 apply H1; auto.
 Qed.
@@ -1034,7 +1034,7 @@ Proof.
 induction n.
  apply ball_sym.
 intros e f g H x Hx0 Hx1.
-rapply IHn.
+apply IHn.
 apply H; auto.
 Qed.
 
@@ -1046,7 +1046,7 @@ Proof.
 induction n.
  apply ball_triangle.
 intros e1 e2 f g h H0 H1 x Hx0 Hx1.
-rapply IHn.
+apply: IHn.
  apply H0; auto.
 apply H1; auto.
 Qed.
@@ -1065,7 +1065,7 @@ induction n;
  replace RHS with ((approximate p1 ((1 # 2) * d1)%Qpos - approximate p1 ((1 # 2) * d2)%Qpos)
                   +(approximate p2 ((1 # 2) * d1)%Qpos - approximate p3 ((1 # 2) * d2)%Qpos)) by ring.
  replace LHS with (((1 # 2) * d1 + (1 # 2) * d2)%Qpos+((1 # 2) * d1 + e + (1 # 2) * d2)%Qpos) by QposRing.
- rapply AbsSmall_plus.
+ apply AbsSmall_plus.
   change (ball ((1 # 2) * d1 + (1 # 2) * d2) (approximate p1 ((1 # 2) * d1)%Qpos) (approximate p1 ((1 # 2) * d2)%Qpos)).
   generalize ((1#2)*d1)%Qpos ((1#2)*d2)%Qpos.
   change (p1[=]p1).
@@ -1081,7 +1081,7 @@ eapply n_Function_ball01_wd;[| | |apply IHn].
   apply plus_apply.
  apply Morphism_prf.
  apply plus_apply.
-rapply H; auto.
+apply: H; auto.
 Qed.
 
 Lemma n_Function_ball01_mult_C : forall n e c q1 q2,
@@ -1098,7 +1098,7 @@ induction n;
  rstepr (c[*](q1[-]q2)).
  apply AbsSmall_leEq_trans with (c[*]'e)%CR.
   rstepr (One[*]('e))%CR.
-  rapply mult_resp_leEq_rht; auto.
+  apply mult_resp_leEq_rht; auto.
   change ('0<='e)%CR.
   rewrite CRle_Qle.
   auto with *.
@@ -1122,8 +1122,8 @@ eapply n_Function_ball01_wd.
  apply mult_wdl.
  simpl.
  apply c_apply.
-rapply IHn; auto.
-rapply H; auto.
+apply IHn; auto.
+apply: H; auto.
 Qed.
 
 Fixpoint MVP_is_Bound01 n (M:CR) : MultivariatePolynomial CRasCRing n -> Prop :=
@@ -1162,7 +1162,7 @@ Lemma MVP_is_Bound01_plus : forall n M N p q,
  MVP_is_Bound01 n (M+N)%CR (p[+]q).
 Proof.
 induction n; intros M N p q Hp Hq.
- rapply AbsSmall_plus; auto.
+ apply: AbsSmall_plus; auto.
 simpl.
 intros x Hx0 Hx1.
 rewrite plus_apply.
@@ -1218,15 +1218,15 @@ induction n; intros e x y p b Hb Hxy.
     simpl in Hq.
     injection Hq; clear Hq; intros Hq; rewrite <- Hq.
     assert (Z: (' ((db # nb) * e)%Qpos)%CR[#]Zero).
-     rapply Qap_CRap.
+     apply: Qap_CRap.
      apply Qpos_nonzero.
     apply shift_mult_leEq with Z.
-     rapply CRlt_Qlt; auto with *.
+     apply: CRlt_Qlt; auto with *.
     rewrite <- CRabs_AbsSmall in Hb.
     stepr ('(nb#db))%CR; auto.
     change ((' (nb # db))%CR[=](' e)%CR[*]CRinv (' ((db # nb) * e)%Qpos)%CR Z).
     rewrite CRinv_Qinv.
-    rewrite CRmult_Qmult.
+    rewrite -> CRmult_Qmult.
     rewrite CReq_Qeq.
     autorewrite with QposElim.
     rewrite Qinv_mult_distr.
@@ -1237,7 +1237,7 @@ induction n; intros e x y p b Hb Hxy.
     apply Qpos_nonzero.
    elim (Qle_not_lt 0 (Zneg nb # db)); auto with *.
    rewrite <- CRle_Qle.
-   rapply AbsSmall_nonneg.
+   apply: AbsSmall_nonneg.
    apply Hb.
   cut (Not (Not (AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))))).
    unfold Not, AbsSmall.
@@ -1271,7 +1271,7 @@ induction n; intros e x y p b Hb Hxy.
  rstepl (Zero[*](x[-]y))%CR.
  apply mult_wdl.
  destruct Hb as [Hb0 Hb1].
- rapply leEq_imp_eq.
+ apply: leEq_imp_eq.
   stepl (-(' (0 # db)))%CR; auto.
   rewrite CRopp_Qopp.
   change ('(0#db)=='0)%CR.
@@ -1297,7 +1297,7 @@ eapply n_Function_ball01_wd.
  apply csbf_wd.
   apply c_apply.
  reflexivity.
-rapply IHn; auto.
+apply: IHn; auto.
 Qed.
 
 Fixpoint MVP_poor_Bound01 n : MultivariatePolynomial Q_as_CRing n -> Q :=
@@ -1380,7 +1380,7 @@ induction p; intros x Hx0 Hx1.
   apply AbsSmall_reflexive.
   apply leEq_reflexive.
  intros y _ _.
- rapply IHn.
+ apply IHn.
 change (MVP_is_Bound01 n
   (' (MVP_poor_Bound01 n s +
       (fix MVP_poor_Bound01_H (p0 : cpoly
@@ -1418,7 +1418,7 @@ induction p; intros e.
  induction n.
   apply ball_refl.
  intros s a _ _.
- rapply IHn.
+ apply IHn.
 simpl.
 destruct (IHp ((1#2)*e)%Qpos) as [d0 Hd0].
 set (b:=MVP_poor_Bound01 (S n) p).
@@ -1526,7 +1526,7 @@ assert (Z:ball_ex d x (' Qclamp01 (approximate x d))%CR).
   intros H.
   eapply leEq_transitive;[apply Z0|].
   apply minus_resp_leEq_rht.
-  rewrite CRle_Qle.
+  rewrite ->  CRle_Qle.
   apply Qmin_lb_r.
  rewrite Qmax_min_distr_r.
  apply Qmin_case.
@@ -1541,7 +1541,7 @@ assert (Z:ball_ex d x (' Qclamp01 (approximate x d))%CR).
  intros H.
  eapply leEq_transitive;[|apply Z1].
  apply minus_resp_leEq_rht.
- rewrite CRle_Qle.
+ rewrite ->  CRle_Qle.
  apply Qmax_ub_r.
 eapply MVP_uc_fun_close_right;
  [|apply n_Function_ball01_sym;apply Hd0].
@@ -1549,8 +1549,8 @@ eapply MVP_uc_fun_close_right;
   apply uc_prf.
   eapply ball_ex_weak_le;[|apply Z].
   apply QposInf_min_lb_r.
- rewrite CRle_Qle in Hy0.
- rewrite CRle_Qle in Hy1.
+ rewrite ->  CRle_Qle in Hy0.
+ rewrite ->  CRle_Qle in Hy1.
  rewrite MVP_uc_fun_sub_Q;auto.
  eapply MVP_uc_fun_close_sig_wd.
     reflexivity.
@@ -1590,7 +1590,7 @@ induction n; intros a b H.
  apply ball_eq.
  auto.
 intros x Hx0 Hx1.
-rapply IHn.
+apply IHn.
 intros e.
 apply H; auto.
 Qed.

@@ -71,11 +71,11 @@ Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
 split.
  replace RHS with ((1*a)*a) by ring.
- rapply (sqr_nonneg _ a).
+ apply (sqr_nonneg _ a).
 rewrite Qle_minus_iff.
 replace RHS with ((1-a)*(1+a)) by ring.
 destruct Ha as [Ha0 Ha1].
-rsapply mult_resp_nonneg;
+apply: mult_resp_nonneg;
  [unfold Qminus|replace RHS with (a + - (-(1))) by ring];
  rewrite <- Qle_minus_iff;
  try assumption.
@@ -86,7 +86,7 @@ Qed.
 
 Lemma arctanSequence_dnn : DecreasingNonNegative arctanSequence.
 Proof.
-rapply mult_Streams_dnn.
+apply mult_Streams_dnn.
  apply everyOther_dnn.
  apply recip_positives_dnn.
 apply powers_help_dnn.
@@ -122,16 +122,16 @@ assert (X:(olor ([--]One) One (inj_Q IR a))).
    apply shift_zero_less_minus'.
    rstepr (One:IR).
    apply pos_one.
-  stepl (inj_Q IR 0) by rapply (inj_Q_nring IR 0).
+  stepl (inj_Q IR 0) by apply (inj_Q_nring IR 0).
   apply inj_Q_leEq.
   destruct Ha; assumption.
  rstepr (nring 1:IR).
- stepr (inj_Q IR 1) by rapply (inj_Q_nring IR 1).
+ stepr (inj_Q IR 1) by apply (inj_Q_nring IR 1).
  apply inj_Q_less.
  assumption.  
 eapply eq_transitive_unfolded;
  [|apply (arctan_series (inj_Q IR a) (arctan_series_convergent_IR) X)].
-rapply series_sum_wd.
+apply: series_sum_wd.
 intros n.
 change (inj_Q IR ((- (1)) ^ n * Str_nth n (arctanSequence a))[=]
 (([--]One[^]n[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))[*]

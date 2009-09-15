@@ -22,7 +22,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Set Implicit Arguments.
 
 Require Export Setoid.
-Require Import CornTac.
+Require Import ssreflect.
+(* Require Import CornTac.*)
 
 (**
 * Classic Setoids
@@ -89,8 +90,8 @@ abstract (
 destruct f0 as [f0 Hf0];
 destruct f1 as [f1 Hf1];
 intros x1 x2 Hx;
-rapply Hf0;
-rapply Hf1;
+apply Hf0;
+apply Hf1;
 assumption).
 Defined.
 
@@ -100,8 +101,8 @@ exists (compose1 f0).
 abstract (
 destruct f0 as [f0 Hf0];
 intros x1 x2 H y;
-rapply Hf0;
-rapply H).
+apply: Hf0;
+apply H).
 Defined.
 
 Definition compose (X Y Z:Setoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
@@ -109,7 +110,7 @@ intros X Y Z.
 exists (@compose2 X Y Z).
 abstract (
 intros x1 x2 H y z;
-rapply H).
+apply: H).
 Defined.
 (* begin hide *)
 Implicit Arguments compose [X Y Z].
@@ -117,16 +118,13 @@ Implicit Arguments compose [X Y Z].
 Definition const0 (X Y:Setoid) : X->Y-->X.
 intros X Y x.
 exists (fun y => x).
-abstract (
-intros x1 x2 Hx;
-reflexivity).
+abstract reflexivity.
 Defined.
 
 Definition const (X Y:Setoid) : X-->Y-->X.
 intros X Y.
 exists (@const0 X Y).
-abstract (
-intros x1 x2 Hx y;
+abstract ( intros x1 x2 Hx y;
 assumption).
 Defined.
 (* begin hide *)
@@ -150,7 +148,7 @@ destruct f as [f Hf];
 intros x1 x2 H y;
 simpl;
 destruct (f y) as [g Hg];
-rapply Hg;
+apply Hg;
 auto).
 Defined.
 
@@ -159,7 +157,7 @@ intros X Y Z.
 exists (@flip1 X Y Z).
 abstract (
 intros x1 x2 H y z;
-rapply H).
+apply: H).
 Defined.
 (* begin hide *)
 Implicit Arguments flip [X Y Z].
@@ -173,7 +171,7 @@ intros x1 x2 H;
 simpl;
 transitivity (f x1 x2);
 [destruct (f x1) as [g Hg];
- rapply Hg; auto
+ apply Hg; auto
 |apply Hf; auto]).
 Defined.
 
@@ -182,7 +180,7 @@ intros X Y.
 exists (@join0 X Y).
 abstract (
 intros x1 x2 H y;
-rapply H).
+apply: H).
 Defined.
 (* begin hide *)
 Implicit Arguments join [X Y].

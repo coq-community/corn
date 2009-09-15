@@ -61,9 +61,9 @@ simpl.
 ring.
 
 simpl.
-rewrite H.
+rewrite -> H.
 rewrite Cmap_fun_correct.
-rapply MonadLaw1.
+apply: MonadLaw1.
 Qed.
 
 (** Lifting translate yields binary addition over CR. *)
@@ -105,7 +105,7 @@ intros a b.
 unfold translate, Cmap.
 simpl.
 rewrite Cmap_fun_correct.
-rapply MonadLaw3.
+apply: MonadLaw3.
 Qed.
 
 Hint Rewrite translate_Qplus : CRfast_compute.
@@ -119,7 +119,7 @@ intros e a b H.
 simpl in *.
 unfold Qball in *.
 stepr (b - a) by (simpl;ring).
-rapply AbsSmall_minus.
+apply AbsSmall_minus.
 assumption.
 Qed.
 
@@ -140,7 +140,7 @@ Notation "x - y" := (x + (- y))%CR : CR_scope.
 (* begin hide *)
 Add Morphism CRopp with signature (@st_eq _) ==> (@st_eq _) as CRopp_wd.
 Proof.
-rapply uc_wd.
+apply uc_wd.
 Qed.
 (* end hide *)
 (**
@@ -154,26 +154,26 @@ regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
 intros x y Hxy Hx e.
 apply Qnot_lt_le.
 intros He.
-rewrite Qlt_minus_iff in He.
+rewrite ->  Qlt_minus_iff in He.
 pose (e' := mkQpos He).
 pose (H1:=(Hx ((1#3)*e')%Qpos)).
 pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
 destruct H2 as [_ H2].
 simpl in H2.
-rewrite Qle_minus_iff in H1.
-rewrite Qle_minus_iff in H2.
+rewrite -> Qle_minus_iff in H1.
+rewrite -> Qle_minus_iff in H2.
 autorewrite with QposElim in *.
 ring_simplify in H1.
 ring_simplify in H2.
 assert (H3: 0+0<=(approximate x ((1 # 3) * e')%Qpos + (1 # 3) * e') + ((1 # 3) * e' + e + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos + approximate y e)).
-rsapply plus_resp_leEq_both; assumption.
+apply: plus_resp_leEq_both; assumption.
 ring_simplify in H3.
 setoid_replace ((6 # 9) * e' + e + approximate y e) with ((6#9)*e'-e') in H3.
 ring_simplify in H3.
 apply (Qle_not_lt _ _ H3).
 rewrite Qlt_minus_iff.
 ring_simplify.
-rsapply mult_resp_pos.
+apply: mult_resp_pos.
 constructor.
 apply Qpos_prf.
 unfold e'.
@@ -198,26 +198,26 @@ regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
 intros x y Hxy Hx e.
 apply Qnot_lt_le.
 intros He.
-rewrite Qlt_minus_iff in He.
+rewrite -> Qlt_minus_iff in He.
 pose (e' := mkQpos He).
 pose (H1:=(Hx ((1#3)*e')%Qpos)).
 pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
 destruct H2 as [H2 _].
 simpl in H2.
-rewrite Qle_minus_iff in H1.
-rewrite Qle_minus_iff in H2.
+rewrite -> Qle_minus_iff in H1.
+rewrite -> Qle_minus_iff in H2.
 autorewrite with QposElim in *.
 ring_simplify in H1.
 ring_simplify in H2.
 assert (H3: 0+0<=((1 # 3) * e' + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos)+(approximate x ((1 # 3) * e')%Qpos + (-1 # 1) * approximate y e + (1 # 3) * e' + e)).
-rsapply plus_resp_leEq_both; assumption.
+apply: plus_resp_leEq_both; assumption.
 ring_simplify in H3.
 setoid_replace ((6 # 9) * e' + (-1 # 1) * approximate y e + e) with ((6#9)*e'-e') in H3.
 ring_simplify in H3.
 apply (Qle_not_lt _ _ H3).
 rewrite Qlt_minus_iff.
 ring_simplify.
-rsapply mult_resp_pos.
+apply: mult_resp_pos.
 constructor.
 apply Qpos_prf.
 unfold e'.
@@ -243,7 +243,7 @@ intros x1 x2 Hx y1 y2 Hy.
 change (x1==x2)%CR in Hx.
 change (y1==y2)%CR in Hy.
 unfold CRle.
-rapply CRnonNeg_wd.
+apply: CRnonNeg_wd.
 apply ucFun2_wd.
 assumption.
 apply CRopp_wd.
@@ -269,13 +269,13 @@ split;[intros H;rewrite H;split; apply CRle_refl|].
 intros [H1 H2].
 rewrite <- (doubleSpeed_Eq x).
 rewrite <- (doubleSpeed_Eq y).
-rapply regFunEq_e.
+apply: regFunEq_e.
 intros e.
 apply ball_weak.
-split;[rapply H2|].
-rsapply inv_cancel_leEq.
+split;[apply H2|].
+apply: inv_cancel_leEq;simpl.
 replace RHS with (approximate y ((1 # 2) * e)%Qpos - approximate x ((1 # 2) * e)%Qpos) by ring.
-rapply H1.
+apply H1.
 Qed.
 
 Lemma CRle_trans : forall x y z, (x <= y -> y <= z -> x <= z)%CR.
@@ -315,10 +315,10 @@ unfold AbsSmall in *.
 split.
 apply Qle_trans with (b0-b1).
 tauto.
-rapply (minus_resp_leEq _ b0).
+apply (minus_resp_leEq _ b0).
 assumption.
 apply Qle_trans with 0.
-rapply (shift_minus_leEq _ a).
+apply (shift_minus_leEq _ a).
 stepr b1.
 assumption.
 simpl; ring.
@@ -326,13 +326,13 @@ apply Qpos_nonneg.
 
 do 2 apply Qmax_case;
 intros H1 H2.
-rapply ball_refl.
+apply: ball_refl.
 eapply X.
 apply H.
 tauto.
-rapply ball_sym.
+apply: ball_sym.
 apply X with b1.
-rapply ball_sym.
+apply: ball_sym.
 apply H.
 tauto.
 assumption.
@@ -390,7 +390,7 @@ eapply ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -413,7 +413,7 @@ eapply ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -440,11 +440,11 @@ replace RHS with ((approximate z ((1#2)*((1 # 2) * e))%Qpos +
 apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
 cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
 (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
-rapply ball_weak_le;[|apply regFun_prf].
+apply: ball_weak_le;[|apply regFun_prf].
 rewrite Qle_minus_iff.
 autorewrite with QposElim.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -460,8 +460,8 @@ simpl in *.
 unfold Qball.
 stepr ((Qmax (- a) (-b1)) - (Qmax (-a) (-b0))).
 apply QboundBelow_uc_prf.
-rapply Qopp_uc_prf.
-rapply ball_sym.
+apply Qopp_uc_prf.
+apply ball_sym.
 assumption.
 unfold Qminus.
 simpl.
@@ -524,7 +524,7 @@ eapply ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -548,7 +548,7 @@ eapply ball_weak_le;[|apply regFun_prf].
 autorewrite with QposElim.
 rewrite Qle_minus_iff.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.
@@ -575,11 +575,11 @@ replace RHS with ((approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos +
 apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
 cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
 (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].
-rapply ball_weak_le;[|apply regFun_prf].
+apply: ball_weak_le;[|apply regFun_prf].
 rewrite Qle_minus_iff.
 autorewrite with QposElim.
 ring_simplify.
-rapply mult_resp_nonneg.
+apply: mult_resp_nonneg.
 discriminate.
 apply Qpos_nonneg.
 Qed.

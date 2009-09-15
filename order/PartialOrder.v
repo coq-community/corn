@@ -65,7 +65,7 @@ split.
 firstorder.
 firstorder.
 intros x y z.
-repeat rewrite po_equiv_le_def0 in *.
+repeat rewrite po_equiv_le_def0.
 firstorder.
 Qed.
 
@@ -73,7 +73,7 @@ Qed.
 Add Parametric Morphism (p:PartialOrder) : (le p) with signature (@st_eq p) ==> (@st_eq p) ==> iff as le_compat.
 assert (forall x1 x2 : p, x1 == x2 -> forall x3 x4 : p, x3 == x4 -> (x1 <= x3 -> x2 <= x4)).
 intros.
-rewrite (po_equiv_le_def (po_proof p)) in *|-.
+rewrite -> (po_equiv_le_def (po_proof p)) in *|-.
 destruct (po_proof p).
 clear - H H0 H1 po_le_trans0.
 firstorder.
