@@ -1128,7 +1128,7 @@ apply cpoly_plus_commutative.
 Qed.
 
 Definition cpoly_cabgroup := Build_CAbGroup _ cpoly_cag_proof.
-Canonical Structure cpoly_cgroup.
+Canonical Structure cpoly_cabgroup.
 
 (**
 *** The polynomials form a ring

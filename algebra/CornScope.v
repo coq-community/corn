@@ -5,7 +5,7 @@ Delimit Scope corn_scope with corn.
 Arguments Scope cs_ap [ _ corn_scope corn_scope].
 Arguments Scope cs_eq [ _ corn_scope corn_scope].
 
-Infix "#" := cs_ap (at level 70, no associativity) : corn_scope.
+(* Infix "#" := cs_ap (at level 70, no associativity) : corn_scope. *)
 Infix "==" := cs_eq (at level 70, no associativity) : corn_scope.
 
 Require Import CSemiGroups.
