@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 
 Require Export QSposgroup.
@@ -45,9 +45,9 @@ The positive rational numbers form with the operation  $(x,y) \mapsto xy/2$  #(x
 
 Lemma Qpos_multdiv2_is_CAbGroup : is_CAbGroup Qpos_multdiv2_as_CGroup.
 Proof.
-intros x y.
-simpl.
-QposRing.
+ intros x y.
+ simpl.
+ QposRing.
 Qed.
 
 Definition Qpos_multdiv2_as_CAbGroup := Build_CAbGroup

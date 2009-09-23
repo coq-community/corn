@@ -18,27 +18,27 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
-(** 200904: first experimental version submitted to corn; 
+(** 200904: first experimental version submitted to corn;
 things need to be improved and cleaned up!; hendriks@cs.ru.nl *)
-(* 
-110204: renamed setoid_rewrite into csetoid_rewrite 
-in order to avoid name clashes with setoid_rewrite 
+(*
+110204: renamed setoid_rewrite into csetoid_rewrite
+in order to avoid name clashes with setoid_rewrite
 in Coq's initial environment.
 *)
 
@@ -50,105 +50,102 @@ Lemma csr_wd :
  forall (S:CSetoid) (R:CSetoid_relation S) (x1 x2 y1 y2:S),
    R x1 x2 -> (x1[=]y1) -> (x2[=]y2) -> R y1 y2.
 Proof
-  fun S R x1 x2 y1 y2 h h0 h1 =>
-    csr_wdl S R x1 y2 y1 (csr_wdr S R x1 x2 y2 h h1) h0.
+ fun S R x1 x2 y1 y2 h h0 h1 => csr_wdl S R x1 y2 y1 (csr_wdr S R x1 x2 y2 h h1) h0.
 
 Lemma Ccsr_wd :
  forall (S:CSetoid) (R:CCSetoid_relation S) (x1 x2 y1 y2:S),
    R x1 x2 -> (x1[=]y1) -> (x2[=]y2) -> R y1 y2.
 Proof
-  fun S R x1 x2 y1 y2 h h0 h1 =>
-    Ccsr_wdl S R x1 y2 y1 (Ccsr_wdr S R x1 x2 y2 h h1) h0.
+ fun S R x1 x2 y1 y2 h h0 h1 => Ccsr_wdl S R x1 y2 y1 (Ccsr_wdr S R x1 x2 y2 h h1) h0.
 
 Lemma eq_wd :
  forall (S:CSetoid) (x1 x2 y1 y2:S),
    (x1[=]x2) -> (x1[=]y1) -> (x2[=]y2) -> y1[=]y2.
 Proof
-  fun S x1 x2 y1 y2 h h0 h1 =>
-    eq_transitive S y1 x1 y2 (eq_symmetric S x1 y1 h0)
-      (eq_transitive S x1 x2 y2 h h1).
+ fun S x1 x2 y1 y2 h h0 h1 => eq_transitive S y1 x1 y2 (eq_symmetric S x1 y1 h0)
+   (eq_transitive S x1 x2 y2 h h1).
 
 Lemma ap_wd :
  forall (S:CSetoid) (x1 x2 y1 y2:S),
    (x1[#]x2) -> (x1[=]y1) -> (x2[=]y2) -> y1[#]y2.
 Proof
-  fun S x1 x2 y1 y2 h h0 h1 =>
-    ap_wdl S x1 y2 y1 (ap_wdr S x1 x2 y2 h h1) h0.
+ fun S x1 x2 y1 y2 h h0 h1 => ap_wdl S x1 y2 y1 (ap_wdr S x1 x2 y2 h h1) h0.
 
 Lemma CAnd_proj1 : forall A B:CProp, A and B -> A.
 Proof.
-intros A B h; elim h; exact (fun a _ => a).
+ intros A B h; elim h; exact (fun a _ => a).
 Qed.
 
 Lemma CAnd_proj2 : forall A B:CProp, A and B -> B.
 Proof.
-intros A B h; elim h; exact (fun _ b => b).
+ intros A B h; elim h; exact (fun _ b => b).
 Qed.
 
 Lemma COr_elim : forall A B C:CProp, (A -> C) -> (B -> C) -> A or B -> C.
-intros A B C H H0 H1.
-elim H1; intro H2; [ exact (H H2) | exact (H0 H2) ].
+Proof.
+ intros A B C H H0 H1.
+ elim H1; intro H2; [ exact (H H2) | exact (H0 H2) ].
 Qed.
 
 End move_us.
 
-(** Definition of [csetoid_rewrite]: a rewrite tactic for setoid equality; 
-it rewrites within formulae of type [Prop] and [CProp], built up from 
-connectives [->], [and], [CAnd], [or], [COr], [iff], [Iff], [not], [Not], 
-[CNot], and atomic formulae [(P t)], [(R t s)], [t[=]s], [t[#]s] for 
-[T:CSetoid], [t,s:T], [P:(CSetoid_predicate T)], [R:(CSetoid_relation T)], 
-[R:(CCSetoid_relation T)]. Note that atoms are built up from predicates and 
+(** Definition of [csetoid_rewrite]: a rewrite tactic for setoid equality;
+it rewrites within formulae of type [Prop] and [CProp], built up from
+connectives [->], [and], [CAnd], [or], [COr], [iff], [Iff], [not], [Not],
+[CNot], and atomic formulae [(P t)], [(R t s)], [t[=]s], [t[#]s] for
+[T:CSetoid], [t,s:T], [P:(CSetoid_predicate T)], [R:(CSetoid_relation T)],
+[R:(CCSetoid_relation T)]. Note that atoms are built up from predicates and
 relations that are well-defined with respect to setoid equality.
 
-Setoid terms of type [T] are terms constructed by [(f s)], [(g s s')], 
-[(h s s_)], where [f:(CSetoid_fun S T)], [g:(CSetoid_bin_fun S S' T)], 
+Setoid terms of type [T] are terms constructed by [(f s)], [(g s s')],
+[(h s s_)], where [f:(CSetoid_fun S T)], [g:(CSetoid_bin_fun S S' T)],
 [h:(CSetoid_part_fun S T)], [s:S], [s':S'], [s_:(cspf_dom S T f s)];
 needless to say, those setoid functions respect setoid equality.
 
-Tactic [csetoid_rewrite] is composed of tactics [total_csetoid_rewrite] and 
-[partial_csetoid_rewrite]. The former is applied in case there are no partial 
-setoid functions present in the goal. The latter if there are. We further 
-explain this separation. 
+Tactic [csetoid_rewrite] is composed of tactics [total_csetoid_rewrite] and
+[partial_csetoid_rewrite]. The former is applied in case there are no partial
+setoid functions present in the goal. The latter if there are. We further
+explain this separation.
 
 To define the rewrite tactic we use the method of reflection, see [1].
-Because we have to deal with partial functions (see the definition of 
+Because we have to deal with partial functions (see the definition of
 [CSetoid_part_fun] in file [CSetoids.v]), we use %\emph{partial}%
 #<em>partial</em># reflection, see [2]. Partial reflection means to have an
-interpretation %\emph{relation}%#<em>relation</em># instead of an 
+interpretation %\emph{relation}%#<em>relation</em># instead of an
 interpretation function.
 
 Unfortunately, we were unable to define our tactic for the most general case,
-that is, for terms that contain both partial functions as well as setoid 
+that is, for terms that contain both partial functions as well as setoid
 functions whose domain(s) and co-domain are not necessarily the same.
-When proving lemmas involving statements [e II^r t] (saying [t] is an 
-interpretation of syntactic expression [e] under the variable assigment [r], 
-one often needs to reason by induction over [e] and then inverting the so 
-obtained instances of the inductively defined [e II^rho t]. However, in the 
-general case where we have to deal with functions whose domain and co-domain 
-differ, inversion doesn't yield the desired result. Consider, for instance, 
+When proving lemmas involving statements [e II^r t] (saying [t] is an
+interpretation of syntactic expression [e] under the variable assigment [r],
+one often needs to reason by induction over [e] and then inverting the so
+obtained instances of the inductively defined [e II^rho t]. However, in the
+general case where we have to deal with functions whose domain and co-domain
+differ, inversion doesn't yield the desired result. Consider, for instance,
 [var II^r t]. Here, we want to perform inversion and obtain [t=r], for
 [var II^r r] is a defining clause of [II] and moreover the only one mentioning
-[var]. However, inversion returns somthing like [<p,t> = <p,r>]. 
-This has got to do with the so-called elimination predicate which predicts 
-the type of the outcome of a case analysis dependent on the destructed 
+[var]. However, inversion returns somthing like [<p,t> = <p,r>].
+This has got to do with the so-called elimination predicate which predicts
+the type of the outcome of a case analysis dependent on the destructed
 variable. For more info ask the author and see his related
-#<a href="http://pauillac.inria.fr/pipermail/coq-club/2003/001127.html"> 
+#<a href="http://pauillac.inria.fr/pipermail/coq-club/2003/001127.html">
 mail</a># to the coq-club.
 
-We opted for the next best option of using two tactics, one using total 
-reflection, its application being restricted to terms constructed 
+We opted for the next best option of using two tactics, one using total
+reflection, its application being restricted to terms constructed
 from total functions (domain(s) and co-domain are allowed to be distinct).
 The other using partial reflection, its application being restricted to
 terms built up from (partial as well as total) %\emph{operations}%
-#<em>operations</em># (i.e.%\% functions whose domain(s) and co-domain are 
+#<em>operations</em># (i.e.%\% functions whose domain(s) and co-domain are
 equal).
 
 References:
 
-[1] Boutin, "Using Reflection to Build Efficient and Certified Decision 
+[1] Boutin, "Using Reflection to Build Efficient and Certified Decision
 Procedures", TACS, LNCS 1281, pp.%\% 515--529, 1997.
 
-[2] Geuvers, Wiedijk and Zwanenburg, "Equational Reasoning via Partial 
+[2] Geuvers, Wiedijk and Zwanenburg, "Equational Reasoning via Partial
 Reflection", TPHOLs, LNCS 1896, pp.%\% 162--178, 2000.
 *)
 
@@ -156,7 +153,7 @@ Reflection", TPHOLs, LNCS 1896, pp.%\% 162--178, 2000.
 
 Section syntactic_total_setoid_expressions.
 
-(** Syntactic setoid expressions reflecting setoid terms built from total 
+(** Syntactic setoid expressions reflecting setoid terms built from total
 setoid functions. [S] is the setoid of the subterm to be replaced. *)
 
 Inductive tot_set_exp (S:CSetoid) : CSetoid -> Type :=
@@ -186,19 +183,19 @@ Lemma tse_int_wd :
  forall (S T:CSetoid) (r1 r2:S),
    (r1[=]r2) -> forall e:tot_set_exp S T, tse_int S T r1 e[=]tse_int S T r2 e.
 Proof.
-intros S T r1 r2 h.
-induction e; simpl in |- *.
-exact h.
-apply csf_wd; assumption. 
-apply csbf_wd; assumption.
-apply eq_reflexive.
+ intros S T r1 r2 h.
+ induction e; simpl in |- *.
+    exact h.
+   apply csf_wd; assumption.
+  apply csbf_wd; assumption.
+ apply eq_reflexive.
 Qed.
 
 End syntactic_total_setoid_expressions.
 
-(** The `quote function' maps setoid terms [t:T] to syntactic expressions 
-[(tot_set_exp S T)]; term [r:S] (supposed to be a subterm of [t:T] to be 
-replaced later on) is mapped to [(tse_var r)]. Other `leafs' [t0:T'] of [t] 
+(** The `quote function' maps setoid terms [t:T] to syntactic expressions
+[(tot_set_exp S T)]; term [r:S] (supposed to be a subterm of [t:T] to be
+replaced later on) is mapped to [(tse_var r)]. Other `leafs' [t0:T'] of [t]
 are mapped to [(tse_con S T' t0)]. *)
 
 Ltac tse_quote S T r t :=
@@ -224,8 +221,8 @@ Ltac tse_quote S T r t :=
            constr:(tse_con S T t0)
   end.
 
-(** Given [S:CSetoid;r1,r2:S] and [A:Prop] or [A:CProp], 
-[(replace_in_formula1 S r1 r2 A)] 
+(** Given [S:CSetoid;r1,r2:S] and [A:Prop] or [A:CProp],
+[(replace_in_formula1 S r1 r2 A)]
 replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 
 Ltac tot_repl_in_form S r1 r2 A :=
@@ -319,8 +316,8 @@ Ltac tot_repl_in_form S r1 r2 A :=
 (**
 Given [S:CSetoid;r1,r2:S;h:r1[=]r2;h0:r2[=]r1] and [A:CProp] or [A:Prop],
 we get [(tot_set_rewr_prf1 S r1 r2 h h0 A) : A->A[r1:=r2]] and
-[(tot_set_rewr_prf2 S r1 r2 h h0 A) : A[r1:=r2]->A] where [A[r1:=r2]] denotes 
-[(tot_repl_in_form S r1 r2 A)]. The argument [h0:r2[=]r1] is present to avoid 
+[(tot_set_rewr_prf2 S r1 r2 h h0 A) : A[r1:=r2]->A] where [A[r1:=r2]] denotes
+[(tot_repl_in_form S r1 r2 A)]. The argument [h0:r2[=]r1] is present to avoid
 iterated application of [eq_symmetric].
 *)
 
@@ -668,7 +665,7 @@ Inductive part_set_exp : Type :=
   | pse_pop : CSetoid_part_op T -> part_set_exp -> part_set_exp
   | pse_con : T -> part_set_exp.
 
-(** Interpretation as a relation between syntactic expressions and 
+(** Interpretation as a relation between syntactic expressions and
 (semantical) setoid terms; [r] is the term to be replaced (later on). *)
 
 Variable r : T.
@@ -679,11 +676,11 @@ Inductive pse_int : part_set_exp -> T -> Type :=
       forall (F:CSetoid_un_op T) (e:part_set_exp) (t:T),
         pse_int e t -> pse_int (pse_uop F e) (F t)
   | pse_int_bop :
-      forall (F:CSetoid_bin_op T) (e1 e2:part_set_exp) 
+      forall (F:CSetoid_bin_op T) (e1 e2:part_set_exp)
         (t1 t2:T),
         pse_int e1 t1 -> pse_int e2 t2 -> pse_int (pse_bop F e1 e2) (F t1 t2)
   | pse_int_pop :
-      forall (F:CSetoid_part_op T) (e:part_set_exp) 
+      forall (F:CSetoid_part_op T) (e:part_set_exp)
         (t:T),
         pse_int e t ->
         forall Ht:cspf_dom T T F t, pse_int (pse_pop F e) (F t Ht)
@@ -704,7 +701,7 @@ Inductive part_set_xexp : T -> Type :=
         part_set_xexp t -> part_set_xexp (F t Ht)
   | psxe_con : forall t:T, part_set_xexp t.
 
-(** Interpretation of proof loaded (`heavy') syntactic expressions; 
+(** Interpretation of proof loaded (`heavy') syntactic expressions;
 extracts the semantical component from heavy expressions. *)
 
 Definition psxe_int t (_:part_set_xexp t) := t.
@@ -721,31 +718,31 @@ Fixpoint forget (t:T) (e:part_set_xexp t) {struct e} : part_set_exp :=
   | psxe_con t => pse_con t
   end.
 
-(** The second extraction of an heavy expression is an interpretation 
+(** The second extraction of an heavy expression is an interpretation
 of its first extraction (note [(xexp_int t e)=t]). *)
 
 Lemma extract_correct :
  forall (t:T) (e:part_set_xexp t), pse_int (forget e) t.
 Proof.
-simple induction e; clear e t; simpl in |- *.
-exact pse_int_var.
-intros F t e h.
-apply pse_int_uop; exact h.
-intros F t1 t2 e1 h1 e2 h2.
-apply pse_int_bop with (1 := h1) (2 := h2).
-intros F t Ht e h.
-apply pse_int_pop; exact h.
-exact pse_int_con.
+ simple induction e; clear e t; simpl in |- *.
+     exact pse_int_var.
+    intros F t e h.
+    apply pse_int_uop; exact h.
+   intros F t1 t2 e1 h1 e2 h2.
+   apply pse_int_bop with (1 := h1) (2 := h2).
+  intros F t Ht e h.
+  apply pse_int_pop; exact h.
+ exact pse_int_con.
 Defined.
 
 Lemma pse_int_var_inv : forall t:T, pse_int pse_var t -> t = r.
 Proof.
-intros t h; inversion h; reflexivity.
+ intros t h; inversion h; reflexivity.
 Defined.
 
 Lemma pse_int_con_inv : forall c t:T, pse_int (pse_con c) t -> t = c.
 Proof.
-intros c t h; inversion h; reflexivity.
+ intros c t h; inversion h; reflexivity.
 Defined.
 
 (** The interpretation relation [pse_int] is a partial function. *)
@@ -753,24 +750,24 @@ Defined.
 Lemma pse_int_ext :
  forall (e:part_set_exp) (t t':T), pse_int e t -> pse_int e t' -> t[=]t'.
 Proof.
-simple induction e; clear e.
-intros t t' h h0.
-rewrite (pse_int_var_inv h).
-rewrite (pse_int_var_inv h0).
-apply eq_reflexive.
-intros F e IH t t' h h0.
-inversion_clear h; inversion_clear h0.
-apply csf_wd; apply IH; assumption.
-intros F e1 IH1 e2 IH2 t t' h h0.
-inversion_clear h; inversion_clear h0.
-apply csbf_wd; [ apply IH1 | apply IH2 ]; assumption.
-intros F e IH t t' h h0.
-inversion_clear h; inversion_clear h0.
-apply cspf_wd; apply IH; assumption.
-intros c t t' h h0.
-rewrite (pse_int_con_inv h).
-rewrite (pse_int_con_inv h0).
-apply eq_reflexive.
+ simple induction e; clear e.
+     intros t t' h h0.
+     rewrite (pse_int_var_inv h).
+     rewrite (pse_int_var_inv h0).
+     apply eq_reflexive.
+    intros F e IH t t' h h0.
+    inversion_clear h; inversion_clear h0.
+    apply csf_wd; apply IH; assumption.
+   intros F e1 IH1 e2 IH2 t t' h h0.
+   inversion_clear h; inversion_clear h0.
+   apply csbf_wd; [ apply IH1 | apply IH2 ]; assumption.
+  intros F e IH t t' h h0.
+  inversion_clear h; inversion_clear h0.
+  apply cspf_wd; apply IH; assumption.
+ intros c t t' h h0.
+ rewrite (pse_int_con_inv h).
+ rewrite (pse_int_con_inv h0).
+ apply eq_reflexive.
 Qed.
 
 End syntactic_partial_setoid_expressions.
@@ -783,74 +780,74 @@ Lemma pse_int_wd :
    forall (e:part_set_exp T) (t t':T),
      pse_int r e t -> pse_int r' e t' -> t[=]t'.
 Proof.
-intros T r r' h.
-simple induction e; clear e.
-intros t t' h0 h1.
-rewrite (pse_int_var_inv h0). 
-rewrite (pse_int_var_inv h1). 
-exact h.
-intros F e IH t t' h0 h1.
-inversion_clear h0; inversion_clear h1.
-apply csf_wd; apply IH; assumption.
-intros F e1 IH1 e2 IH2 t t' h0 h1.
-inversion_clear h0; inversion_clear h1.
-apply csbf_wd; [ apply IH1 | apply IH2 ]; assumption.
-intros F e IH t t' h0 h1.
-inversion_clear h0; inversion_clear h1.
-apply cspf_wd; apply IH; assumption.
-intros c t t' h0 h1.
-rewrite (pse_int_con_inv h0).
-rewrite (pse_int_con_inv h1).
-apply eq_reflexive.
+ intros T r r' h.
+ simple induction e; clear e.
+     intros t t' h0 h1.
+     rewrite (pse_int_var_inv h0).
+     rewrite (pse_int_var_inv h1).
+     exact h.
+    intros F e IH t t' h0 h1.
+    inversion_clear h0; inversion_clear h1.
+    apply csf_wd; apply IH; assumption.
+   intros F e1 IH1 e2 IH2 t t' h0 h1.
+   inversion_clear h0; inversion_clear h1.
+   apply csbf_wd; [ apply IH1 | apply IH2 ]; assumption.
+  intros F e IH t t' h0 h1.
+  inversion_clear h0; inversion_clear h1.
+  apply cspf_wd; apply IH; assumption.
+ intros c t t' h0 h1.
+ rewrite (pse_int_con_inv h0).
+ rewrite (pse_int_con_inv h1).
+ apply eq_reflexive.
 Defined.
 
-(** The following lemma states that if [r1[=]r2] and [t1] is an interpretation 
-of [e] under the variable assigment [r1], then there exists an interpretation 
+(** The following lemma states that if [r1[=]r2] and [t1] is an interpretation
+of [e] under the variable assigment [r1], then there exists an interpretation
 [t2] of [e] under the assignment [r2]. *)
 
 Lemma replacement_lemma :
  forall (T:CSetoid) (e:part_set_exp T) (r1 r2 t1:T),
    (r1[=]r2) -> pse_int r1 e t1 -> my_sigT T (pse_int r2 e).
 Proof.
-intros T e r1 r2 t1 H H0.
-elim H0; clear H0 e t1.
-exists r2.
-apply pse_int_var.
-intros F e a1 Ha1 IH.
-elim IH; intros a2 Ha2.
-exists (F a2); apply pse_int_uop with (1 := Ha2).
-intros F ea a1 eb b1 Ha1 IHa Hb1 IHb.
-elim IHa; intros a2 Ha2.
-elim IHb; intros b2 Hb2.
-exists (F a2 b2); apply pse_int_bop with (1 := Ha2) (2 := Hb2).
-intros F e a1 Ha1 IH Da1.
-elim IH; intros a2 Ha2.
-assert (Da2 := cspf_dom_wd T T F a1 a2 Da1 (pse_int_wd H Ha1 Ha2)).
-exists (F a2 Da2).
-apply pse_int_pop with (1 := Ha2).
-intro t; exists t; apply pse_int_con.
+ intros T e r1 r2 t1 H H0.
+ elim H0; clear H0 e t1.
+     exists r2.
+     apply pse_int_var.
+    intros F e a1 Ha1 IH.
+    elim IH; intros a2 Ha2.
+    exists (F a2); apply pse_int_uop with (1 := Ha2).
+   intros F ea a1 eb b1 Ha1 IHa Hb1 IHb.
+   elim IHa; intros a2 Ha2.
+   elim IHb; intros b2 Hb2.
+   exists (F a2 b2); apply pse_int_bop with (1 := Ha2) (2 := Hb2).
+  intros F e a1 Ha1 IH Da1.
+  elim IH; intros a2 Ha2.
+  assert (Da2 := cspf_dom_wd T T F a1 a2 Da1 (pse_int_wd H Ha1 Ha2)).
+  exists (F a2 Da2).
+  apply pse_int_pop with (1 := Ha2).
+ intro t; exists t; apply pse_int_con.
 Defined.
 
-(** Given [H:r1[=]r2] and [H0:(pse_int r1 e t1)], the first projection of 
-[(replacement_lemma H H0)] is the term [t2] obtained by replacing in [t1] 
-subterm [r1] by [r2]. The second projection is the proof of 
+(** Given [H:r1[=]r2] and [H0:(pse_int r1 e t1)], the first projection of
+[(replacement_lemma H H0)] is the term [t2] obtained by replacing in [t1]
+subterm [r1] by [r2]. The second projection is the proof of
 [(pse_int r2 e t2)]. *)
 
-Definition replace_in_term (T:CSetoid) (r1 r2 t1:T) 
+Definition replace_in_term (T:CSetoid) (r1 r2 t1:T)
   (e:part_set_exp T) (H:r1[=]r2) (H0:pse_int r1 e t1) :=
   proj1_my_sigT T (pse_int r2 e) (replacement_lemma H H0).
 
-Definition replace_in_term_proof (T:CSetoid) (r1 r2 t1:T) 
+Definition replace_in_term_proof (T:CSetoid) (r1 r2 t1:T)
   (e:part_set_exp T) (H:r1[=]r2) (H0:pse_int r1 e t1) :=
   proj2_my_sigT T (pse_int r2 e) (replacement_lemma H H0).
 
 Set Strict Implicit.
 Unset Implicit Arguments.
 
-(** The `quote function' maps from the semantical level to heavy syntactic 
-expressions: given a setoid term [t:T], [psxe_quote] yields a 
-[(part_set_xexp T)]. Term [r:T] (supposed to be a subterm of [t:T] to be 
-replaced later on) is mapped to [(psxe_var r)]. Other `leafs' [t0] of [t] are 
+(** The `quote function' maps from the semantical level to heavy syntactic
+expressions: given a setoid term [t:T], [psxe_quote] yields a
+[(part_set_xexp T)]. Term [r:T] (supposed to be a subterm of [t:T] to be
+replaced later on) is mapped to [(psxe_var r)]. Other `leafs' [t0] of [t] are
 mapped to [(psxe_con r t0)]. *)
 
 Ltac psxe_quote r t :=
@@ -875,7 +872,7 @@ Ltac psxe_quote r t :=
            constr:(psxe_con r t0)
   end.
 
-(** Given [H:r1[=]r2] and [A:Prop] or [A:CProp], [(replace_in_formula2 H A)] 
+(** Given [H:r1[=]r2] and [A:Prop] or [A:CProp], [(replace_in_formula2 H A)]
 replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 
 Ltac part_repl_in_form H A :=
@@ -968,10 +965,10 @@ Ltac part_repl_in_form H A :=
   end.
 
 (**
-Given [T:CSetoid;r1,r2:T;H:r1[=]r2;H0:r2[=]r1] (checked by main call) 
-and [A:CProp] or [A:Prop], we get [(part_set_rewr_prf1 H H0 A) : A->A[r2/r1]] 
-and [(part_set_rewr_prf2 r1 r2 H H0 A) : A[r2/r1]->A] where [A[r2/r1]] denotes 
-[(part_repl_in_form H A)]. The argument [H0:r2[=]r1] is present to avoid 
+Given [T:CSetoid;r1,r2:T;H:r1[=]r2;H0:r2[=]r1] (checked by main call)
+and [A:CProp] or [A:Prop], we get [(part_set_rewr_prf1 H H0 A) : A->A[r2/r1]]
+and [(part_set_rewr_prf2 r1 r2 H H0 A) : A[r2/r1]->A] where [A[r2/r1]] denotes
+[(part_repl_in_form H A)]. The argument [H0:r2[=]r1] is present to avoid
 iterated application of [eq_symmetric].
 *)
 

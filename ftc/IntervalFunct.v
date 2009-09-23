@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export PartFunEquality.
 
@@ -80,8 +80,9 @@ Constant and identity functions are defined.
 Variable c : IR.
 
 Lemma IConst_strext : forall x y : subset I, c [#] c -> x [#] y.
-intros x y H.
-elim (ap_irreflexive_unfolded _ c H).
+Proof.
+ intros x y H.
+ elim (ap_irreflexive_unfolded _ c H).
 Qed.
 
 Definition IConst := Build_CSetoid_fun _ _ (fun x => c) IConst_strext.
@@ -89,7 +90,8 @@ Definition IConst := Build_CSetoid_fun _ _ (fun x => c) IConst_strext.
 End Const.
 
 Lemma IId_strext : forall x y : subset I, scs_elem _ _ x [#] scs_elem _ _ y -> x [#] y.
-intros x y; case x; case y; intros; algebra.
+Proof.
+ intros x y; case x; case y; intros; algebra.
 Qed.
 
 Definition IId := Build_CSetoid_fun _ _ _ IId_strext.
@@ -99,33 +101,34 @@ Next, we define addition, algebraic inverse, subtraction and product of function
 *)
 
 Lemma IPlus_strext : forall x y : subset I, f x[+]g x [#] f y[+]g y -> x [#] y.
-intros x y H.
-elim (bin_op_strext_unfolded _ _ _ _ _ _ H); intro H0;
- exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ elim (bin_op_strext_unfolded _ _ _ _ _ _ H); intro H0; exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IPlus := Build_CSetoid_fun _ _ (fun x => f x[+]g x) IPlus_strext.
 
 Lemma IInv_strext : forall x y : subset I, [--] (f x) [#] [--] (f y) -> x [#] y.
-intros x y H.
-generalize (un_op_strext_unfolded _ _ _ _ H); intro H0.
-exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ generalize (un_op_strext_unfolded _ _ _ _ H); intro H0.
+ exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IInv := Build_CSetoid_fun _ _ (fun x => [--] (f x)) IInv_strext.
 
 Lemma IMinus_strext : forall x y : subset I, f x[-]g x [#] f y[-]g y -> x [#] y.
-intros x y H.
-elim (cg_minus_strext _ _ _ _ _ H); intro H0;
- exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ elim (cg_minus_strext _ _ _ _ _ H); intro H0; exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IMinus := Build_CSetoid_fun _ _ (fun x => f x[-]g x) IMinus_strext.
 
 Lemma IMult_strext : forall x y : subset I, f x[*]g x [#] f y[*]g y -> x [#] y.
-intros x y H.
-elim (bin_op_strext_unfolded _ _ _ _ _ _ H); intro H0;
- exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ elim (bin_op_strext_unfolded _ _ _ _ _ _ H); intro H0; exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IMult := Build_CSetoid_fun _ _ (fun x => f x[*]g x) IMult_strext.
@@ -139,9 +142,10 @@ Exponentiation to a natural power [n] is also useful.
 Variable n : nat.
 
 Lemma INth_strext : forall x y : subset I, f x[^]n [#] f y[^]n -> x [#] y.
-intros.
-apply csf_strext_unfolded with (IR:CSetoid) f.
-apply nexp_strext with n; assumption.
+Proof.
+ intros.
+ apply csf_strext_unfolded with (IR:CSetoid) f.
+ apply nexp_strext with n; assumption.
 Qed.
 
 Definition INth := Build_CSetoid_fun _ _ (fun x => f x[^]n) INth_strext.
@@ -159,18 +163,19 @@ Hypothesis Hg : forall x : subset I, g x [#] Zero.
 (* end show *)
 
 Lemma IRecip_strext : forall x y : subset I, (One[/] g x[//]Hg x) [#] (One[/] g y[//]Hg y) -> x [#] y.
-intros x y H.
-elim (div_strext _ _ _ _ _ _ _ H); intro H0.
-elim (ap_irreflexive_unfolded _ _ H0).
-exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ elim (div_strext _ _ _ _ _ _ _ H); intro H0.
+  elim (ap_irreflexive_unfolded _ _ H0).
+ exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IRecip := Build_CSetoid_fun _ _ (fun x => One[/] g x[//]Hg x) IRecip_strext.
 
 Lemma IDiv_strext : forall x y : subset I, (f x[/] g x[//]Hg x) [#] (f y[/] g y[//]Hg y) -> x [#] y.
-intros x y H.
-elim (div_strext _ _ _ _ _ _ _ H); intro H0;
- exact (csf_strext_unfolded _ _ _ _ _ H0).
+Proof.
+ intros x y H.
+ elim (div_strext _ _ _ _ _ _ _ H); intro H0; exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
 Definition IDiv := Build_CSetoid_fun _ _ (fun x => f x[/] g x[//]Hg x) IDiv_strext.
@@ -182,18 +187,19 @@ Absolute value will also be needed at some point.
 *)
 
 Lemma IAbs_strext : forall x y : subset I, AbsIR (f x) [#] AbsIR (f y) -> x [#] y.
-intros x y H.
-apply csf_strext_unfolded with (IR:CSetoid) f.
-simpl in H; unfold ABSIR in H; elim (bin_op_strext_unfolded _ _ _ _ _ _ H).
-auto.
-intro; apply un_op_strext_unfolded with (cg_inv (c:=IR)); assumption.
+Proof.
+ intros x y H.
+ apply csf_strext_unfolded with (IR:CSetoid) f.
+ simpl in H; unfold ABSIR in H; elim (bin_op_strext_unfolded _ _ _ _ _ _ H).
+  auto.
+ intro; apply un_op_strext_unfolded with (cg_inv (c:=IR)); assumption.
 Qed.
 
 Definition IAbs := Build_CSetoid_fun _ _ (fun x => AbsIR (f x)) IAbs_strext.
 
 End Operations.
 
-(** 
+(**
 The set of these functions form a ring with relation to the operations
 of sum and multiplication.  As they actually form a set, this fact can
 be proved in Coq for this class of functions; unfortunately, due to a
@@ -232,9 +238,10 @@ Hypothesis Hfg : forall x : subset I, I' (f x).
 Lemma IComp_strext : forall x y : subset I,
  g (Build_subcsetoid_crr _ _ _ (Hfg x)) [#] g (Build_subcsetoid_crr _ _ _ (Hfg y)) ->
  x [#] y.
-intros x y H.
-apply csf_strext_unfolded with (IR:CSetoid) f.
-exact (csf_strext_unfolded _ _ _ _ _ H).
+Proof.
+ intros x y H.
+ apply csf_strext_unfolded with (IR:CSetoid) f.
+ exact (csf_strext_unfolded _ _ _ _ _ H).
 Qed.
 
 Definition IComp := Build_CSetoid_fun _ _

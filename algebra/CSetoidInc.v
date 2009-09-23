@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (** printing included %\ensuremath{\subseteq}% #&sube;# *)
 
@@ -54,53 +54,61 @@ Section Basics.
 Variables P Q R : S -> CProp.
 
 Lemma included_refl : included P P.
-red in |- *; intros.
-auto.
+Proof.
+ red in |- *; intros.
+ auto.
 Qed.
 
 Lemma included_trans : included P Q -> included Q R -> included P R.
-intros.
-red in |- *; intros.
-apply X0; apply X; auto.
+Proof.
+ intros.
+ red in |- *; intros.
+ apply X0; apply X; auto.
 Qed.
 
 Lemma included_conj : forall P Q R, included P Q -> included P R -> included P (Conj Q R).
-intros.
-red in |- *; red in X, X0.
-intros; red in |- *.
-split.
-apply X; assumption.
-apply X0; assumption.
+Proof.
+ intros.
+ red in |- *; red in X, X0.
+ intros; red in |- *.
+ split.
+  apply X; assumption.
+ apply X0; assumption.
 Qed.
 
 Lemma included_conj' : included (Conj P Q) P.
-exact (prj1 _ P Q).
+Proof.
+ exact (prj1 _ P Q).
 Qed.
 
 Lemma included_conj'' : included (Conj P Q) Q.
-exact (prj2 _ P Q).
+Proof.
+ exact (prj2 _ P Q).
 Qed.
 
 Lemma included_conj_lft : included R (Conj P Q) -> included R P.
-red in |- *.
-unfold conjP.
-intros H1 x H2.
-elim (H1 x); auto.
+Proof.
+ red in |- *.
+ unfold conjP.
+ intros H1 x H2.
+ elim (H1 x); auto.
 Qed.
 
 Lemma included_conj_rht : included R (Conj P Q) -> included R Q.
-red in |- *. unfold conjP.
-intros H1 x H2.
-elim (H1 x); auto.
+Proof.
+ red in |- *. unfold conjP.
+ intros H1 x H2.
+ elim (H1 x); auto.
 Qed.
 
 Lemma included_extend : forall (H : forall x, P x -> CProp),
  included R (extend P H) -> included R P.
-intros H0 H1.
-red in |- *.
-unfold extend in H1.
-intros.
-elim (H1 x); auto.
+Proof.
+ intros H0 H1.
+ red in |- *.
+ unfold extend in H1.
+ intros.
+ elim (H1 x); auto.
 Qed.
 
 End Basics.
@@ -121,17 +129,19 @@ Let Q := Dom G.
 Variable R : S -> CProp.
 
 Lemma included_FComp : included R P -> (forall x Hx, (R x) -> Q (F x Hx)) -> included R (Dom (G[o]F)).
-intros HP HQ.
-simpl in |- *.
-red in |- *; intros x Hx.
-exists (HP x Hx).
-apply HQ.
-assumption.
+Proof.
+ intros HP HQ.
+ simpl in |- *.
+ red in |- *; intros x Hx.
+ exists (HP x Hx).
+ apply HQ.
+ assumption.
 Qed.
 
 Lemma included_FComp' : included R (Dom (G[o]F)) -> included R P.
-intro H; simpl in H; red in |- *; intros x Hx.
-elim (H x Hx); auto.
+Proof.
+ intro H; simpl in H; red in |- *; intros x Hx.
+ elim (H x Hx); auto.
 Qed.
 
 End inclusion.

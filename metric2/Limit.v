@@ -59,40 +59,38 @@ else fun (n : P s -> False) => cons (hd s)
 Lemma takeUntil_wd : forall (A B:Type) (P : Stream A -> bool)(s:Stream A)(ex1 ex2:LazyExists P s) (cons: A -> B -> B) (nil:B),
   takeUntil P ex1 cons nil = takeUntil P ex2 cons nil.
 Proof.
-intros A B P s ex1 ex2 cons nil.
-assert (H:=ex1).
-induction H;
-case ex1; clear ex1; case ex2; clear ex2;
-simpl;
-destruct (P x); try contradiction; auto.
-intros ex2 ex1.
-rewrite (H0 tt (ex1 tt) (ex2 tt)).
-reflexivity.
+ intros A B P s ex1 ex2 cons nil.
+ assert (H:=ex1).
+ induction H; case ex1; clear ex1; case ex2; clear ex2; simpl;
+   destruct (P x); try contradiction; auto.
+ intros ex2 ex1.
+ rewrite (H0 tt (ex1 tt) (ex2 tt)).
+ reflexivity.
 Qed.
 
 Lemma takeUntil_end : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons:A -> B -> B) (nil : B),
  P seq -> takeUntil P ex cons nil = nil.
 Proof.
-intros A B P seq ex cons nil H.
-rewrite <- (takeUntil_wd (B:=B) P (LazyHere P _ H)).
-unfold takeUntil.
-destruct (P seq);[|contradiction].
-reflexivity.
+ intros A B P seq ex cons nil H.
+ rewrite <- (takeUntil_wd (B:=B) P (LazyHere P _ H)).
+ unfold takeUntil.
+ destruct (P seq);[|contradiction].
+ reflexivity.
 Qed.
 
 Lemma takeUntil_step : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons: A -> B -> B) (nil: B),
  ~P seq -> exists ex':(LazyExists P (tl seq)), takeUntil P ex cons nil = cons (hd seq) (takeUntil P ex' cons nil).
 Proof.
-intros A B P seq ex cons nil H.
-assert (ex':=ex).
-destruct ex' as [H0|ex'].
-elim H; assumption.
-exists (ex' tt).
-rewrite <- (takeUntil_wd (B:=B) P (LazyFurther seq ex')).
-simpl.
-destruct (P seq).
-elim H; constructor.
-reflexivity.
+ intros A B P seq ex cons nil H.
+ assert (ex':=ex).
+ destruct ex' as [H0|ex'].
+  elim H; assumption.
+ exists (ex' tt).
+ rewrite <- (takeUntil_wd (B:=B) P (LazyFurther seq ex')).
+ simpl.
+ destruct (P seq).
+  elim H; constructor.
+ reflexivity.
 Qed.
 
 Lemma takeUntil_elim : forall (A B:Type) (P:Stream A -> bool) (cons: A -> B -> B) (nil: B)
@@ -101,28 +99,28 @@ Lemma takeUntil_elim : forall (A B:Type) (P:Stream A -> bool) (cons: A -> B -> B
  (forall seq x, Q (tl seq) x -> ~P seq -> Q seq (cons (hd seq) x)) ->
  forall seq (ex:LazyExists P seq), Q seq (takeUntil P ex cons nil).
 Proof.
-intros A B P cons nil Q c1 c2 seq ex.
-assert (ex':=ex).
-induction ex'.
- rewrite takeUntil_end; try assumption.
- eapply c1.
- apply H.
-assert (Z0:=takeUntil_end P ex cons nil).
-assert (Z1:=takeUntil_step P ex cons nil).
-assert (Z0':=c1 x).
-assert (Z1':=c2 x).
-destruct (P x).
- clear Z1.
- rewrite Z0; try constructor.
- apply Z0'.
+ intros A B P cons nil Q c1 c2 seq ex.
+ assert (ex':=ex).
+ induction ex'.
+  rewrite takeUntil_end; try assumption.
+  eapply c1.
+  apply H.
+ assert (Z0:=takeUntil_end P ex cons nil).
+ assert (Z1:=takeUntil_step P ex cons nil).
+ assert (Z0':=c1 x).
+ assert (Z1':=c2 x).
+ destruct (P x).
+  clear Z1.
+  rewrite Z0; try constructor.
+  apply Z0'.
+  constructor.
+ clear Z0 Z0'.
+ destruct (Z1 (fun x => x)) as [ex' Z].
+ rewrite Z.
+ clear Z Z1.
+ eapply Z1'; auto.
+ apply H0.
  constructor.
-clear Z0 Z0'.
-destruct (Z1 (fun x => x)) as [ex' Z].
-rewrite Z.
-clear Z Z1.
-eapply Z1'; auto.
-apply H0.
-constructor.
 Qed.
 
 End TakeUntil.
@@ -136,44 +134,41 @@ Definition NearBy (l:X)(e:QposInf) := ForAll (fun (s:Stream X) => ball_ex e (hd 
 
 Lemma NearBy_comp: forall l1 l2, st_eq l1 l2 -> forall (e1 e2:Qpos), QposEq e1 e2 -> forall s, (NearBy l1 e1 s <-> NearBy l2 e2 s).
 Proof.
-cut (forall l1 l2 : X,
-st_eq l1 l2 ->
-forall e1 e2 : Qpos,
-QposEq e1 e2 -> forall s : Stream X, NearBy l1 e1 s -> NearBy l2 e2 s).
-intros.
-split.
-firstorder.
-intros.
-eapply H.
-symmetry.
-apply H0.
-unfold QposEq; symmetry.
-apply H1.
-assumption.
-
-unfold NearBy; simpl.
-intros l1 l2 Hl e1 e2 He.
-cofix.
-intros s [H0 H].
-constructor.
-simpl.
-rewrite <- Hl.
-rewrite <- He.
-assumption.
-auto.
+ cut (forall l1 l2 : X, st_eq l1 l2 -> forall e1 e2 : Qpos,
+   QposEq e1 e2 -> forall s : Stream X, NearBy l1 e1 s -> NearBy l2 e2 s).
+  intros.
+  split.
+   firstorder.
+  intros.
+  eapply H.
+    symmetry.
+    apply H0.
+   unfold QposEq; symmetry.
+   apply H1.
+  assumption.
+ unfold NearBy; simpl.
+ intros l1 l2 Hl e1 e2 He.
+ cofix.
+ intros s [H0 H].
+ constructor.
+  simpl.
+  rewrite <- Hl.
+  rewrite <- He.
+  assumption.
+ auto.
 Qed.
 
 Lemma NearBy_weak: forall l (e1 e2:Qpos), e1 <= e2 -> forall s, NearBy l e1 s -> NearBy l e2 s.
 Proof.
-unfold NearBy; simpl.
-intros l e1 e2 He.
-cofix.
-intros s [H0 H].
-constructor.
-eapply ball_weak_le.
-apply He.
-assumption.
-auto.
+ unfold NearBy; simpl.
+ intros l e1 e2 He.
+ cofix.
+ intros s [H0 H].
+ constructor.
+  eapply ball_weak_le.
+   apply He.
+  assumption.
+ auto.
 Qed.
 
 (** l is the limit if for every e there exists a point where the stream is
@@ -182,22 +177,22 @@ Definition Limit (s:Stream X)(l:X) := forall e, LazyExists (NearBy l e) s.
 
 Lemma Limit_tl : forall s l, Limit s l -> Limit (tl s) l.
 Proof.
-intros s l H e.
-destruct (H e) as [[_ H']|H'].
-left; auto.
-apply H'.
-constructor.
+ intros s l H e.
+ destruct (H e) as [[_ H']|H'].
+  left; auto.
+ apply H'.
+ constructor.
 Defined.
 
 Lemma Limit_Str_nth_tl : forall n s l, Limit s l -> Limit (Str_nth_tl n s) l.
 Proof.
-induction n.
- tauto.
-intros.
-simpl.
-apply IHn.
-apply Limit_tl.
-assumption.
+ induction n.
+  tauto.
+ intros.
+ simpl.
+ apply IHn.
+ apply Limit_tl.
+ assumption.
 Defined.
 
 End Limit.

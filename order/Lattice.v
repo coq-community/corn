@@ -96,7 +96,7 @@ End Join.
 (* begin hide *)
 Add Parametric Morphism X : (@join X) with signature (@st_eq (sl X)) ==> (@st_eq X) ==> (@st_eq X) as join_compat.
 Proof.
-exact (meet_compat (Dual X)).
+ exact (meet_compat (Dual X)).
 Qed.
 (* end hide *)
 Section MeetJoin.
@@ -105,51 +105,51 @@ Variable X : Lattice.
 (** Lemma about how meet and join interact. *)
 Lemma meet_join_absorb_l_l : forall x y:X, meet x (join x y) == x.
 Proof.
-intros.
-apply le_antisym.
-apply meet_lb_l.
-apply meet_glb.
-apply le_refl.
-apply join_ub_l.
+ intros.
+ apply le_antisym.
+  apply meet_lb_l.
+ apply meet_glb.
+  apply le_refl.
+ apply join_ub_l.
 Qed.
 
 Lemma meet_join_absorb_l_r : forall x y:X, meet x (join y x) == x.
 Proof.
-intros.
-rewrite (join_comm X).
-apply meet_join_absorb_l_l.
+ intros.
+ rewrite (join_comm X).
+ apply meet_join_absorb_l_l.
 Qed.
 
 Lemma meet_join_absorb_r_l : forall x y:X, meet (join x y) x == x.
 Proof.
-intros.
-rewrite (meet_comm X).
-apply meet_join_absorb_l_l.
+ intros.
+ rewrite (meet_comm X).
+ apply meet_join_absorb_l_l.
 Qed.
 
 Lemma meet_join_absorb_r_r : forall x y:X, meet (join y x) x == x.
 Proof.
-intros.
-rewrite (join_comm X).
-apply meet_join_absorb_r_l.
+ intros.
+ rewrite (join_comm X).
+ apply meet_join_absorb_r_l.
 Qed.
 
 Lemma meet_join_eq : forall x y : X, meet x y == join x y -> x == y.
 Proof.
-intros.
-rewrite <- (meet_join_absorb_l_l y x).
-rewrite (join_comm X y x).
-rewrite <- H.
-rewrite (meet_comm X x y).
-rewrite (meet_assoc X).
-rewrite (meet_idem X).
-set (RHS := meet y x).
-rewrite <- (meet_join_absorb_l_l x y).
-rewrite <- H.
-rewrite (meet_assoc X).
-rewrite (meet_idem X).
-rewrite (meet_comm X).
-reflexivity.
+ intros.
+ rewrite <- (meet_join_absorb_l_l y x).
+ rewrite (join_comm X y x).
+ rewrite <- H.
+ rewrite (meet_comm X x y).
+ rewrite (meet_assoc X).
+ rewrite (meet_idem X).
+ set (RHS := meet y x).
+ rewrite <- (meet_join_absorb_l_l x y).
+ rewrite <- H.
+ rewrite (meet_assoc X).
+ rewrite (meet_idem X).
+ rewrite (meet_comm X).
+ reflexivity.
 Qed.
 
 End MeetJoin.

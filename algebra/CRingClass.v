@@ -24,7 +24,7 @@ Require Import CornTac. (* For rapply*)
 Section cring_is_ring.
 Global Instance CRing_is_Ring (CR : CRing) : Ring (@cm_unit CR) (@cr_one CR) (@csg_op CR) (@cr_mult CR) (fun x y => x [-] y) (@cg_inv CR).
 Proof with auto.
-intro CR. split;split;algebra.
+ intro CR. split;split;algebra.
 Qed.
 End cring_is_ring.
 
@@ -43,21 +43,21 @@ Let submult : CSetoid_bin_op subcrr := Build_SubCSetoid_bin_op _ _ _ mul_pres_P.
 
 Lemma isring_scrr : is_CRing subcrr (Build_subcsetoid_crr _ _ _ Pone) submult.
 Proof.
-assert (associative submult).
-intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply mult_assoc.
-apply (Build_is_CRing _ _ _ H).
-split; intro x; destruct x as [x xpf]; simpl; algebra. 
-intros x y; destruct x as [x xpf]; destruct y as [y ypf]; simpl; apply mult_commutes.
-intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply dist.
-simpl; apply ring_non_triv.
+ assert (associative submult).
+  intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply mult_assoc.
+ apply (Build_is_CRing _ _ _ H).
+    split; intro x; destruct x as [x xpf]; simpl; algebra.
+   intros x y; destruct x as [x xpf]; destruct y as [y ypf]; simpl; apply mult_commutes.
+  intros x y z; destruct x as [x xpf]; destruct y as [y ypf]; destruct z as [z zpf]; simpl; apply dist.
+ simpl; apply ring_non_triv.
 Qed.
 
 Definition Build_SubCRing : CRing := Build_CRing _ _ _ isring_scrr.
 
 Global Instance SubCRing_is_SubRing : SubRing P.
 Proof.
-constructor; auto.
-intros x y Px Py; apply op_pres_P; [ | apply inv_pres_P ]; assumption.
+ constructor; auto.
+ intros x y Px Py; apply op_pres_P; [ | apply inv_pres_P ]; assumption.
 Qed.
 
 End SubCRings.

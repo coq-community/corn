@@ -44,8 +44,8 @@ Variable X : MetricSpace.
 (** This is the (weak) hemiMetric, which makes an asymmetric metric.
 We make use of the classical quantifer in this definition.
 *)
-Definition hemiMetric (e:Qpos) (A B: X -> Prop) := 
- forall x:X, A x -> 
+Definition hemiMetric (e:Qpos) (A B: X -> Prop) :=
+ forall x:X, A x ->
  existsC X (fun y => B y /\ ball e x y).
 
 (** This (weak) metric, makes the full symmetric metric. *)
@@ -55,66 +55,66 @@ Definition hausdorffBall (e:Qpos) (A B: X -> Prop) :=
 Lemma hemiMetric_wd1 : forall (e0 e1:Qpos) A B,
  (QposEq e0 e1) -> hemiMetric e0 A B -> hemiMetric e1 A B.
 Proof.
-intros e0 e1 A B He H x Hx.
-destruct (H x Hx) as [HG | y [Hy Hxy]] using existsC_ind.
- apply existsC_stable; assumption.
-apply existsWeaken.
-exists y.
-rewrite -> He in Hxy; auto.
+ intros e0 e1 A B He H x Hx.
+ destruct (H x Hx) as [HG | y [Hy Hxy]] using existsC_ind.
+  apply existsC_stable; assumption.
+ apply existsWeaken.
+ exists y.
+ rewrite -> He in Hxy; auto.
 Qed.
 
 Lemma hausdorffBall_wd1 : forall (e0 e1:Qpos) A B,
  (QposEq e0 e1) -> hausdorffBall e0 A B -> hausdorffBall e1 A B.
 Proof.
-intros e0 e1 A B He [H0 H1].
-split; apply hemiMetric_wd1 with e0; assumption.
+ intros e0 e1 A B He [H0 H1].
+ split; apply hemiMetric_wd1 with e0; assumption.
 Qed.
 
 Lemma hemiMetric_refl : forall e A, hemiMetric e A A.
 Proof.
-intros e A x Hx.
-apply existsWeaken.
-exists x.
-split; try assumption.
-apply ball_refl.
+ intros e A x Hx.
+ apply existsWeaken.
+ exists x.
+ split; try assumption.
+ apply ball_refl.
 Qed.
 
 Lemma hausdorffBall_refl : forall e A, hausdorffBall e A A.
 Proof.
-intros e A.
-split; apply hemiMetric_refl.
+ intros e A.
+ split; apply hemiMetric_refl.
 Qed.
 
-Lemma hausdorffBall_sym : forall e A B, 
+Lemma hausdorffBall_sym : forall e A B,
  hausdorffBall e A B -> hausdorffBall e B A.
 Proof.
-intros e A B [H0 H1].
-split; assumption.
+ intros e A B [H0 H1].
+ split; assumption.
 Qed.
 
 Lemma hemiMetric_triangle : forall e0 e1 A B C,
  hemiMetric e0 A B -> hemiMetric e1 B C -> hemiMetric (e0 + e1) A C.
 Proof.
-intros e0 e1 A B C H0 H1 x Hx.
-destruct (H0 x Hx) as [HG | y [Hy Hxy]] using existsC_ind.
- apply existsC_stable; assumption.
-destruct (H1 y Hy) as [HG | z [Hz Hyz]] using existsC_ind.
- apply existsC_stable; assumption.
-apply existsWeaken.
-exists z.
-split; try assumption.
-apply ball_triangle with y; assumption.
+ intros e0 e1 A B C H0 H1 x Hx.
+ destruct (H0 x Hx) as [HG | y [Hy Hxy]] using existsC_ind.
+  apply existsC_stable; assumption.
+ destruct (H1 y Hy) as [HG | z [Hz Hyz]] using existsC_ind.
+  apply existsC_stable; assumption.
+ apply existsWeaken.
+ exists z.
+ split; try assumption.
+ apply ball_triangle with y; assumption.
 Qed.
 
 Lemma hausdorffBall_triangle : forall e0 e1 A B C,
  hausdorffBall e0 A B -> hausdorffBall e1 B C -> hausdorffBall (e0 + e1) A C.
 Proof.
-intros e0 e1 A B C [H0A H0B] [H1A H1B].
-split.
+ intros e0 e1 A B C [H0A H0B] [H1A H1B].
+ split.
+  apply hemiMetric_triangle with B; assumption.
+ apply hemiMetric_wd1 with (e1 + e0)%Qpos.
+  QposRing.
  apply hemiMetric_triangle with B; assumption.
-apply hemiMetric_wd1 with (e1 + e0)%Qpos.
- QposRing.
-apply hemiMetric_triangle with B; assumption.
 Qed.
 
 (** Unfortunately this isn't a metric for an aribitrary predicate.  More
@@ -125,58 +125,54 @@ Hypothesis stableX : stableMetric X.
 
 Lemma hemiMetric_stable :forall e A B, ~~(hemiMetric e A B) -> hemiMetric e A B.
 Proof.
-unfold hemiMetric.
-auto 7 using existsC_stable.
+ unfold hemiMetric.
+ auto 7 using existsC_stable.
 Qed.
 
 Lemma hausdorffBall_stable :forall e A B, ~~(hausdorffBall e A B) -> hausdorffBall e A B.
 Proof.
-unfold hausdorffBall.
-firstorder using hemiMetric_stable.
+ unfold hausdorffBall.
+ firstorder using hemiMetric_stable.
 Qed.
 
-Lemma hemiMetric_wd :forall (e1 e2:Qpos), (e1==e2) -> 
+Lemma hemiMetric_wd :forall (e1 e2:Qpos), (e1==e2) ->
  forall A1 A2, (forall x, A1 x <-> A2 x) ->
  forall B1 B2, (forall x, B1 x <-> B2 x) ->
  (hemiMetric e1 A1 B1 <-> hemiMetric e2 A2 B2).
 Proof.
-cut (forall e1 e2 : Qpos,
-e1 == e2 ->
-forall A1 A2 : X -> Prop,
-(forall x : X, A1 x <-> A2 x) ->
-forall B1 B2 : X -> Prop,
-(forall x : X, B1 x <-> B2 x) ->
-(hemiMetric e1 A1 B1 -> hemiMetric e2 A2 B2)).
- intros; split.
+ cut (forall e1 e2 : Qpos, e1 == e2 -> forall A1 A2 : X -> Prop, (forall x : X, A1 x <-> A2 x) ->
+   forall B1 B2 : X -> Prop, (forall x : X, B1 x <-> B2 x) ->
+     (hemiMetric e1 A1 B1 -> hemiMetric e2 A2 B2)).
+  intros; split.
+   eauto.
+  symmetry in H0.
+  assert (H1':forall x : X, A2 x <-> A1 x) by firstorder.
+  assert (H2':forall x : X, B2 x <-> B1 x) by firstorder.
   eauto.
- symmetry in H0.
- assert (H1':forall x : X, A2 x <-> A1 x) by firstorder.
- assert (H2':forall x : X, B2 x <-> B1 x) by firstorder.
- eauto.
-intros e1 e2 He A1 A2 HA B1 B2 HB H x Hx.
-rewrite <- HA in Hx.
-destruct (H x Hx) as [HG | y [Hy0 Hy1]] using existsC_ind.
- auto using existsC_stable.
-apply existsWeaken.
-exists y.
-change (QposEq e1 e2) in He.
-rewrite <- HB.
-rewrite <- He.
-auto.
+ intros e1 e2 He A1 A2 HA B1 B2 HB H x Hx.
+ rewrite <- HA in Hx.
+ destruct (H x Hx) as [HG | y [Hy0 Hy1]] using existsC_ind.
+  auto using existsC_stable.
+ apply existsWeaken.
+ exists y.
+ change (QposEq e1 e2) in He.
+ rewrite <- HB.
+ rewrite <- He.
+ auto.
 Qed.
 
-Lemma hausdorffBall_wd :forall (e1 e2:Qpos), (e1==e2) -> 
+Lemma hausdorffBall_wd :forall (e1 e2:Qpos), (e1==e2) ->
  forall A1 A2, (forall x, A1 x <-> A2 x) ->
  forall B1 B2, (forall x, B1 x <-> B2 x) ->
  (hausdorffBall e1 A1 B1 <-> hausdorffBall e2 A2 B2).
 Proof.
-intros.
-unfold hausdorffBall.
-setoid_replace (hemiMetric e1 A1 B1) with (hemiMetric e2 A2 B2).
- setoid_replace (hemiMetric e1 B1 A1) with (hemiMetric e2 B2 A2).
-  reflexivity.
+ intros.
+ unfold hausdorffBall.
+ setoid_replace (hemiMetric e1 A1 B1) with (hemiMetric e2 A2 B2).
+  setoid_replace (hemiMetric e1 B1 A1) with (hemiMetric e2 B2 A2).
+   reflexivity.
+  apply hemiMetric_wd; auto.
  apply hemiMetric_wd; auto.
-apply hemiMetric_wd; auto.
 Qed.
 
 End HausdorffMetric.
@@ -190,8 +186,8 @@ This section introduces an alternative stronger notition of Haudorff metric
 that uses a constructive existential.
 *)
 
-Definition hemiMetricStrong (e:Qpos) (A B: X -> Prop) := 
- forall x:X, A x -> 
+Definition hemiMetricStrong (e:Qpos) (A B: X -> Prop) :=
+ forall x:X, A x ->
  forall d:Qpos, {y:X | B y /\ ball (e+d) x y}.
 
 Definition hausdorffBallStrong (e:Qpos) (A B: X -> Prop) :=
@@ -200,61 +196,61 @@ Definition hausdorffBallStrong (e:Qpos) (A B: X -> Prop) :=
 Lemma hemiMetricStrong_wd1 : forall (e0 e1:Qpos) A B,
  (QposEq e0 e1) -> hemiMetricStrong e0 A B -> hemiMetricStrong e1 A B.
 Proof.
-intros e0 e1 A B He H x Hx d.
-destruct (H x Hx d) as [y [Hy Hxy]].
-exists y.
-rewrite -> He in Hxy; auto.
+ intros e0 e1 A B He H x Hx d.
+ destruct (H x Hx d) as [y [Hy Hxy]].
+ exists y.
+ rewrite -> He in Hxy; auto.
 Qed.
 
 Lemma hausdorffBallStrong_wd1 : forall (e0 e1:Qpos) A B,
  (QposEq e0 e1) -> hausdorffBallStrong e0 A B -> hausdorffBallStrong e1 A B.
 Proof.
-intros e0 e1 A B He [H0 H1].
-split; apply hemiMetricStrong_wd1 with e0; assumption.
+ intros e0 e1 A B He [H0 H1].
+ split; apply hemiMetricStrong_wd1 with e0; assumption.
 Qed.
 
 Lemma hemiMetricStrong_refl : forall e A, hemiMetricStrong e A A.
 Proof.
-intros e A x Hx d.
-exists x.
-split; try assumption.
-apply ball_refl.
+ intros e A x Hx d.
+ exists x.
+ split; try assumption.
+ apply ball_refl.
 Qed.
 
 Lemma hausdorffBallStrong_refl : forall e A, hausdorffBallStrong e A A.
 Proof.
-intros e A.
-split; apply hemiMetricStrong_refl.
+ intros e A.
+ split; apply hemiMetricStrong_refl.
 Qed.
 
-Lemma hausdorffBallStrong_sym : forall e A B, 
+Lemma hausdorffBallStrong_sym : forall e A B,
  hausdorffBallStrong e A B -> hausdorffBallStrong e B A.
 Proof.
-intros e A B [H0 H1].
-split; assumption.
+ intros e A B [H0 H1].
+ split; assumption.
 Qed.
 
 Lemma hemiMetricStrong_triangle : forall e0 e1 A B C,
  hemiMetricStrong e0 A B -> hemiMetricStrong e1 B C -> hemiMetricStrong (e0 + e1) A C.
 Proof.
-intros e0 e1 A B C H0 H1 x Hx d.
-destruct (H0 x Hx ((1#2)*d)%Qpos) as [y [Hy Hxy]].
-destruct (H1 y Hy ((1#2)*d)%Qpos) as [z [Hz Hyz]].
-exists z.
-split; try assumption.
-setoid_replace (e0 + e1 + d)%Qpos with ((e0 + (1 # 2) * d) +(e1 + (1 # 2) * d))%Qpos by QposRing.
-apply ball_triangle with y; assumption.
+ intros e0 e1 A B C H0 H1 x Hx d.
+ destruct (H0 x Hx ((1#2)*d)%Qpos) as [y [Hy Hxy]].
+ destruct (H1 y Hy ((1#2)*d)%Qpos) as [z [Hz Hyz]].
+ exists z.
+ split; try assumption.
+ setoid_replace (e0 + e1 + d)%Qpos with ((e0 + (1 # 2) * d) +(e1 + (1 # 2) * d))%Qpos by QposRing.
+ apply ball_triangle with y; assumption.
 Qed.
 
 Lemma hausdorffBallStrong_triangle : forall e0 e1 A B C,
  hausdorffBallStrong e0 A B -> hausdorffBallStrong e1 B C -> hausdorffBallStrong (e0 + e1) A C.
 Proof.
-intros e0 e1 A B C [H0A H0B] [H1A H1B].
-split.
+ intros e0 e1 A B C [H0A H0B] [H1A H1B].
+ split.
+  apply hemiMetricStrong_triangle with B; assumption.
+ apply hemiMetricStrong_wd1 with (e1 + e0)%Qpos.
+  QposRing.
  apply hemiMetricStrong_triangle with B; assumption.
-apply hemiMetricStrong_wd1 with (e1 + e0)%Qpos.
- QposRing.
-apply hemiMetricStrong_triangle with B; assumption.
 Qed.
 
 (*
@@ -277,8 +273,8 @@ Lemma hausdorffBallStrong_closed : forall e A B,
  hausdorffBallStrong e A B.
 Proof.
 intros e A B HA HB H.
-split; 
- apply hemiMetricStrong_closed; 
+split;
+ apply hemiMetricStrong_closed;
  try assumption;
  intros d;
  destruct (H d);
@@ -286,7 +282,7 @@ split;
 Qed.
 *)
 (*
-Lemma HemiMetricStrongHemiMetric : stableMetric X -> 
+Lemma HemiMetricStrongHemiMetric : stableMetric X ->
  forall (e:Qpos) A B,
  SubFinite X B ->
  hemiMetricStrong e A B -> hemiMetric X e A B.
@@ -301,7 +297,7 @@ exists y.
 assumption.
 Qed.
 
-Lemma HausdorffBallStrongHausdorffBall : stableMetric X -> 
+Lemma HausdorffBallStrongHausdorffBall : stableMetric X ->
  forall (e:Qpos) A B,
  SubFinite X A -> SubFinite X B ->
  hausdorffBallStrong e A B -> hausdorffBall X e A B.
@@ -369,7 +365,7 @@ intros e A B HA HB [H0 H1].
 split; auto using HemiMetricHemiMetricStrong.
 Defined.
 
-Definition HemiMetricStrongAlmostDecidable : 
+Definition HemiMetricStrongAlmostDecidable :
  forall (e d:Qpos) A B,
  FinitelyEnumerable X A -> FinitelyEnumerable X B ->
  e < d -> hemiMetricStrong d A B + {hemiMetricStrong e A B->False}.
@@ -460,7 +456,7 @@ induction lA.
  destruct (HA x) as [HAx _].
  elim (HAx Hx).
  auto with *.
-intros A Ha HB Hed.   
+intros A Ha HB Hed.
 pose (A':=fun x => ~~In x lA).
 destruct (IHlA A') as [I|I]; try assumption.
   unfold A'; tauto.
@@ -491,7 +487,7 @@ destruct (IHlA A') as [I|I]; try assumption.
  apply H.
  rewrite Ha.
  rewrite Hx.
- auto with *. 
+ auto with *.
 right.
 intros H.
 apply I.
@@ -503,7 +499,7 @@ unfold A'.
 auto 7 with *.
 Defined.
 
-Definition HausdorffBallStrongAlmostDecidable : 
+Definition HausdorffBallStrongAlmostDecidable :
  forall (e d:Qpos) A B,
  FinitelyEnumerable X A -> FinitelyEnumerable X B ->
  e < d -> hausdorffBallStrong d A B + {hausdorffBallStrong e A B->False}.
@@ -523,7 +519,7 @@ Defined.
 End HausdorffMetricStrong.
 
 (*
-Definition HausdorffBallAlmostDecidable : 
+Definition HausdorffBallAlmostDecidable :
  forall X, locatedMetric X ->
  forall (e d:Qpos) A B,
  FinitelyEnumerable X A -> FinitelyEnumerable X B ->

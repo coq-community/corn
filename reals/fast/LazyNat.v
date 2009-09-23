@@ -24,7 +24,7 @@ Require Export BinPos.
 (**
 * Lazy Nat
 This s a lazified version of the natural number that allow one to delay
-computation until demanded.  This is useful for large natural numbers 
+computation until demanded.  This is useful for large natural numbers
 (often upper bounds) where only a small number of terms are actually need
 for compuation.
 *)
@@ -55,7 +55,7 @@ end.
 
 Lemma LazifyPred : forall n, LazifyNat (pred n) = LazyPred (LazifyNat n).
 Proof.
-induction n; reflexivity.
+ induction n; reflexivity.
 Qed.
 
 (**
@@ -69,12 +69,12 @@ Fixpoint LazyPlus (n m : LazyNat) {struct n} : LazyNat :=
 
 Lemma LazifyPlus : forall n m, (LazifyNat (n + m) = LazyPlus (LazifyNat n) (LazifyNat m))%nat.
 Proof.
-induction n.
-reflexivity.
-simpl.
-intros m.
-rewrite IHn.
-reflexivity.
+ induction n.
+  reflexivity.
+ simpl.
+ intros m.
+ rewrite IHn.
+ reflexivity.
 Qed.
 
 (**
@@ -89,9 +89,7 @@ Fixpoint Pmult_LazyNat (x:positive) (pow2:LazyNat) {struct x} : LazyNat :=
 
 Lemma LazifyPmult_LazyNat : forall x pow2, LazifyNat (Pmult_nat x pow2) = Pmult_LazyNat x (LazifyNat pow2).
 Proof.
-induction x; simpl; intros pow2;
-repeat (rewrite LazifyPlus||rewrite IHx);
-reflexivity.
+ induction x; simpl; intros pow2; repeat (rewrite LazifyPlus||rewrite IHx); reflexivity.
 Qed.
 
 (** Convert a positive to a lazy nat.  This is the most common way of
@@ -100,8 +98,8 @@ Definition LazyNat_of_P (x:positive) := Pmult_LazyNat x (LazyS (fun _ => LazyO))
 
 Lemma LazifyNat_of_P : forall x, LazifyNat (nat_of_P x) = LazyNat_of_P x.
 Proof.
-intros x.
-refine (LazifyPmult_LazyNat _ _).
+ intros x.
+ refine (LazifyPmult_LazyNat _ _).
 Qed.
 (* begin hide *)
 Hint Rewrite <- LazifyNat_of_P LazifyPmult_LazyNat LazifyPlus LazifyPred : UnLazyNat.

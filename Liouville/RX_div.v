@@ -30,37 +30,37 @@ Add Ring rx_r : (r_rt (Ring:=CRing_is_Ring (cpoly_cring R))).
 
 Lemma _X_monic : forall a : R, monic 1 (_X_ [-] _C_ a).
 Proof.
-split.
+ split.
   reflexivity.
-intro m; destruct m.
+ intro m; destruct m.
   intro H; inversion H.
-destruct m.
+ destruct m.
   intro H; destruct (lt_irrefl _ H).
-reflexivity.
+ reflexivity.
 Qed.
 
 Definition RX_div (p : RX) (a : R) : RX.
 Proof.
-intros p a; destruct (cpoly_div p (_X_monic a)) as [qr Hunq Heq]; exact (fst qr).
+ intros p a; destruct (cpoly_div p (_X_monic a)) as [qr Hunq Heq]; exact (fst qr).
 Defined.
 
 Lemma RX_div_spec : forall (p : RX) (a : R), p [=] (RX_div p a) [*] (_X_ [-] _C_ a) [+] _C_ (p ! a).
 Proof.
-intros p a.
-unfold RX_div.
-destruct (cpoly_div p (_X_monic a)).
-destruct x as [q r].
-unfold fst, snd in *.
-destruct c.
-rewrite s0.
-apply cs_bin_op_wd; [reflexivity|].
-destruct d.
-destruct (_X_monic a).
-destruct (degree_le_zero _ _ (d _ H0)).
-rewrite s2.
-apply csf_wd.
-rewrite plus_apply mult_apply minus_apply.
-rewrite x_apply c_apply c_apply; unfold cg_minus; ring.
+ intros p a.
+ unfold RX_div.
+ destruct (cpoly_div p (_X_monic a)).
+ destruct x as [q r].
+ unfold fst, snd in *.
+ destruct c.
+ rewrite s0.
+ apply cs_bin_op_wd; [reflexivity|].
+ destruct d.
+ destruct (_X_monic a).
+ destruct (degree_le_zero _ _ (d _ H0)).
+ rewrite s2.
+ apply csf_wd.
+ rewrite plus_apply mult_apply minus_apply.
+ rewrite x_apply c_apply c_apply; unfold cg_minus; ring.
 Qed.
 
 End RX_div.

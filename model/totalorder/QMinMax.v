@@ -27,13 +27,12 @@ Require Import TotalOrder.
 *)
 
 Definition Qlt_le_dec_fast x y : {x < y} + {y <= x}.
-intros x y.
-change ({x ?= y = Lt}+{y<=x}).
-cut (x ?= y <> Lt -> y <= x).
-destruct (x?=y); intros H;
- (right; abstract(apply H; discriminate)) ||
- (left; reflexivity).
-refine (Qnot_lt_le _ _).
+Proof.
+ intros x y.
+ change ({x ?= y = Lt}+{y<=x}).
+ cut (x ?= y <> Lt -> y <= x).
+  destruct (x?=y); intros H; (right; abstract(apply H; discriminate)) || (left; reflexivity).
+ refine (Qnot_lt_le _ _).
 Defined.
 
 Definition Qle_total x y : {x <= y} + {y <= x} :=
@@ -44,11 +43,11 @@ end.
 
 Lemma Qeq_le_def : forall x y, x == y <-> x <= y /\ y <= x.
 Proof.
-intros.
-split.
-intros H; rewrite H.
-firstorder using Qle_refl.
-firstorder using Qle_antisym.
+ intros.
+ split.
+  intros H; rewrite H.
+  firstorder using Qle_refl.
+ firstorder using Qle_antisym.
 Qed.
 
 Definition Qmonotone : (Q -> Q) -> Prop := Default.monotone Qle.
@@ -64,26 +63,28 @@ Definition Qmax_case :
  Default.max_case Q Qle Qle_total.
 
 Definition QTotalOrder : TotalOrder.
-apply makeTotalOrder with 
-  Q Qeq Qle Qmonotone Qantitone Qmin Qmax.
-apply Qeq_le_def.
-apply Qle_refl.
-apply Qle_trans.
-apply Qle_total.
-firstorder using PartialOrder.Default.monotone_def.
-firstorder using PartialOrder.Default.antitone_def.
-apply (TotalOrder.Default.min_def1 Q Qeq Qle Qeq_le_def Qle_total).
-apply (TotalOrder.Default.min_def2 Q Qeq Qle Qeq_le_def Qle_total).
-apply (TotalOrder.Default.max_def1 Q Qeq Qle Qeq_le_def Qle_total).
-apply (TotalOrder.Default.max_def2 Q Qeq Qle Qeq_le_def Qle_total).
+ apply makeTotalOrder with Q Qeq Qle Qmonotone Qantitone Qmin Qmax.
+Proof.
+          apply Qeq_le_def.
+         apply Qle_refl.
+        apply Qle_trans.
+       apply Qle_total.
+      firstorder using PartialOrder.Default.monotone_def.
+     firstorder using PartialOrder.Default.antitone_def.
+    apply (TotalOrder.Default.min_def1 Q Qeq Qle Qeq_le_def Qle_total).
+   apply (TotalOrder.Default.min_def2 Q Qeq Qle Qeq_le_def Qle_total).
+  apply (TotalOrder.Default.max_def1 Q Qeq Qle Qeq_le_def Qle_total).
+ apply (TotalOrder.Default.max_def2 Q Qeq Qle Qeq_le_def Qle_total).
 Defined.
 (* begin hide *)
 Add Morphism Qmin : Qmin_compat.
-exact (@meet_compat QTotalOrder).
+Proof.
+ exact (@meet_compat QTotalOrder).
 Qed.
 
 Add Morphism Qmax : Qmax_compat.
-exact (@join_compat QTotalOrder).
+Proof.
+ exact (@join_compat QTotalOrder).
 Qed.
 (* end hide *)
 Section QTotalOrder.
@@ -95,7 +96,7 @@ Definition Qmin_lb_r : forall x y : Q, Qmin x y <= y := @meet_lb_r Qto.
 Definition Qmin_glb : forall x y z : Q, z <= x -> z <= y -> z <= (Qmin x y) :=
  @meet_glb Qto.
 Definition Qmin_comm : forall x y : Q, Qmin x y == Qmin y x := @meet_comm Qto.
-Definition Qmin_assoc : forall x y z : Q, Qmin x (Qmin y z) == Qmin (Qmin x y) z:= 
+Definition Qmin_assoc : forall x y z : Q, Qmin x (Qmin y z) == Qmin (Qmin x y) z:=
  @meet_assoc Qto.
 Definition Qmin_idem : forall x : Q, Qmin x x == x := @meet_idem Qto.
 Definition Qle_min_l : forall x y : Q, x <= y <-> Qmin x y == x := @le_meet_l Qto.
@@ -105,7 +106,7 @@ Definition Qmin_monotone_r : forall a : Q, Qmonotone (Qmin a) :=
  @meet_monotone_r Qto.
 Definition Qmin_monotone_l : forall a : Q, Qmonotone (fun x => Qmin x a) :=
  @meet_monotone_l Qto.
-Definition Qmin_le_compat : 
+Definition Qmin_le_compat :
  forall w x y z : Q, w <= y -> x <= z -> Qmin w x <= Qmin y z :=
  @meet_le_compat Qto.
 
@@ -114,7 +115,7 @@ Definition Qmax_ub_r : forall x y : Q, y <= Qmax x y := @join_ub_r Qto.
 Definition Qmax_lub : forall x y z : Q, x <= z -> y <= z -> (Qmax x y) <= z :=
  @join_lub Qto.
 Definition Qmax_comm : forall x y : Q, Qmax x y == Qmax y x := @join_comm Qto.
-Definition Qmax_assoc : forall x y z : Q, Qmax x (Qmax y z) == Qmax (Qmax x y) z:= 
+Definition Qmax_assoc : forall x y z : Q, Qmax x (Qmax y z) == Qmax (Qmax x y) z:=
  @join_assoc Qto.
 Definition Qmax_idem : forall x : Q, Qmax x x == x := @join_idem Qto.
 Definition Qle_max_l : forall x y : Q, y <= x <-> Qmax x y == x := @le_join_l Qto.
@@ -149,40 +150,42 @@ Definition Qmin_max_eq : forall x y : Q, Qmin x y == Qmax x y -> x == y :=
  @meet_join_eq Qto.
 
 Definition Qmax_min_distr_r : forall x y z : Q,
- Qmax x (Qmin y z) == Qmin (Qmax x y) (Qmax x z) := 
+ Qmax x (Qmin y z) == Qmin (Qmax x y) (Qmax x z) :=
  @join_meet_distr_r Qto.
 Definition Qmax_min_distr_l : forall x y z : Q,
- Qmax (Qmin y z) x == Qmin (Qmax y x) (Qmax z x) := 
+ Qmax (Qmin y z) x == Qmin (Qmax y x) (Qmax z x) :=
  @join_meet_distr_l Qto.
 Definition Qmin_max_distr_r : forall x y z : Q,
- Qmin x (Qmax y z) == Qmax (Qmin x y) (Qmin x z) := 
+ Qmin x (Qmax y z) == Qmax (Qmin x y) (Qmin x z) :=
  @meet_join_distr_r Qto.
 Definition Qmin_max_distr_l : forall x y z : Q,
- Qmin (Qmax y z) x == Qmax (Qmin y x) (Qmin z x) := 
+ Qmin (Qmax y z) x == Qmax (Qmin y x) (Qmin z x) :=
  @meet_join_distr_l Qto.
 
 (*I don't know who wants modularity laws, but here they are *)
 Definition Qmax_min_modular_r : forall x y z : Q,
- Qmax x (Qmin y (Qmax x z)) == Qmin (Qmax x y) (Qmax x z) := 
+ Qmax x (Qmin y (Qmax x z)) == Qmin (Qmax x y) (Qmax x z) :=
  @join_meet_modular_r Qto.
 Definition Qmax_min_modular_l : forall x y z : Q,
- Qmax (Qmin (Qmax x z) y) z == Qmin (Qmax x z) (Qmax y z) := 
+ Qmax (Qmin (Qmax x z) y) z == Qmin (Qmax x z) (Qmax y z) :=
  @join_meet_modular_l Qto.
 Definition Qmin_max_modular_r : forall x y z : Q,
- Qmin x (Qmax y (Qmin x z)) == Qmax (Qmin x y) (Qmin x z) := 
+ Qmin x (Qmax y (Qmin x z)) == Qmax (Qmin x y) (Qmin x z) :=
  @meet_join_modular_r Qto.
 Definition Qmin_max_modular_l : forall x y z : Q,
- Qmin (Qmax (Qmin x z) y) z == Qmax (Qmin x z) (Qmin y z) := 
+ Qmin (Qmax (Qmin x z) y) z == Qmax (Qmin x z) (Qmin y z) :=
  @meet_join_modular_l Qto.
 
 Definition Qmin_max_disassoc : forall x y z : Q, Qmin (Qmax x y) z <= Qmax x (Qmin y z) :=
  @meet_join_disassoc Qto.
 
 Lemma Qplus_monotone_r : forall a, Qmonotone (Qplus a).
-firstorder using Qle_refl Qplus_le_compat .
+Proof.
+ firstorder using Qle_refl Qplus_le_compat .
 Qed.
 Lemma Qplus_monotone_l : forall a, Qmonotone (fun x => Qplus x a).
-firstorder using Qle_refl Qplus_le_compat.
+Proof.
+ firstorder using Qle_refl Qplus_le_compat.
 Qed.
 Definition Qmin_plus_distr_r : forall x y z : Q, x + Qmin y z == Qmin (x+y) (x+z)  :=
  fun a => @monotone_meet_distr Qto _ (Qplus_monotone_r a).
@@ -203,10 +206,10 @@ Definition Qmax_min_de_morgan : forall x y : Q, -(Qmax x y) == Qmin (-x) (-y) :=
  @antitone_join_meet_distr Qto _ Qopp_le_compat.
 
 Lemma Qminus_antitone : forall a : Q, Qantitone (fun x => a - x).
-change (forall a x y : Q, x <= y -> a + - y <= a + - x).
-intros.
-apply Qplus_le_compat;
- firstorder using Qle_refl Qopp_le_compat.
+Proof.
+ change (forall a x y : Q, x <= y -> a + - y <= a + - x).
+ intros.
+ apply Qplus_le_compat; firstorder using Qle_refl Qopp_le_compat.
 Qed.
 
 Definition Qminus_min_max_antidistr_r : forall x y z : Q, x - Qmin y z == Qmax (x-y) (x-z) :=
@@ -215,14 +218,16 @@ Definition Qminus_max_min_antidistr_r : forall x y z : Q, x - Qmax y z == Qmin (
  fun a => @antitone_join_meet_distr Qto _ (Qminus_antitone a).
 
 Lemma Qmult_pos_monotone_r : forall a, (0 <= a) -> Qmonotone (Qmult a).
-intros a Ha b c H.
-do 2 rewrite (Qmult_comm a).
-apply Qmult_le_compat_r; auto with *.
+Proof.
+ intros a Ha b c H.
+ do 2 rewrite (Qmult_comm a).
+ apply Qmult_le_compat_r; auto with *.
 Qed.
 
 Lemma Qmult_pos_monotone_l : forall a, (0 <= a) -> Qmonotone (fun x => x*a).
-intros a Ha b c H.
-apply Qmult_le_compat_r; auto with *.
+Proof.
+ intros a Ha b c H.
+ apply Qmult_le_compat_r; auto with *.
 Qed.
 
 Definition Qmin_mult_pos_distr_r : forall x y z : Q, 0 <= x -> x * Qmin y z == Qmin (x*y) (x*z)  :=

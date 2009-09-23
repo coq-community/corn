@@ -30,15 +30,15 @@ Fixpoint list_nat (p : nat) : list nat :=
 
 Lemma list_nat_spec : forall p a, a <= p -> In a (list_nat p).
 Proof.
-intro p; induction p.
+ intro p; induction p.
   intros a Hle; inversion Hle; left; reflexivity.
-intros a Hle; simpl.
-case (eq_nat_dec (S p) a).
+ intros a Hle; simpl.
+ case (eq_nat_dec (S p) a).
   left; assumption.
-right; apply IHp.
-inversion Hle.
+ right; apply IHp.
+ inversion Hle.
   destruct n; symmetry; assumption.
-assumption.
+ assumption.
 Qed.
 
 Definition list_nat_prod (p q : nat) : list (nat * nat) :=
@@ -47,7 +47,7 @@ Definition list_nat_prod (p q : nat) : list (nat * nat) :=
 Lemma list_nat_prod_spec : forall p q a b,
   a <= p -> b <= q -> In (a, b) (list_nat_prod p q).
 Proof.
-intros; apply in_prod; apply list_nat_spec; assumption.
+ intros; apply in_prod; apply list_nat_spec; assumption.
 Qed.
 
 Definition nat_prod_to_Q (pq : nat * nat) : list Q_as_CRing :=
@@ -68,8 +68,8 @@ Definition list_Q (a b : Z_as_CRing) : list Q_as_CRing :=
 Lemma list_Q_spec_pos : forall a b c d, Zabs_nat c <= Zabs_nat a ->
   Zabs_nat (Zpos d) <= Zabs_nat b -> In (Qmake c d) (list_Q a b).
 Proof.
-intros a b c d Hca Hdb.
-case (dec_Qeq (c#d)%Q Zero).
+ intros a b c d Hca Hdb.
+ case (dec_Qeq (c#d)%Q Zero).
   unfold Qeq; simpl; rewrite Zmult_1_r.
   intro Heq; rewrite Heq.
   clear c Hca Heq.
@@ -77,9 +77,9 @@ case (dec_Qeq (c#d)%Q Zero).
   rewrite in_flat_map.
   exists (0, pred (nat_of_P d)).
   split.
-    apply list_nat_prod_spec.
-      apply le_O_n.
-    apply (le_trans _ _ _ (le_pred_n _) Hdb).
+   apply list_nat_prod_spec.
+    apply le_O_n.
+   apply (le_trans _ _ _ (le_pred_n _) Hdb).
   left.
   f_equal.
   destruct (ZL4 d).
@@ -87,92 +87,92 @@ case (dec_Qeq (c#d)%Q Zero).
   simpl.
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H.
   apply nat_of_P_inj; symmetry; assumption.
-unfold list_Q.
-rewrite in_flat_map.
-exists (Zabs_nat c, Zabs_nat d).
-split.
+ unfold list_Q.
+ rewrite in_flat_map.
+ exists (Zabs_nat c, Zabs_nat d).
+ split.
   apply list_nat_prod_spec; assumption.
-simpl.
-case (ZL4 d).
-intros d' Hd'.
-unfold Zabs_nat at 1 in Hdb.
-rewrite Hd'.
-rewrite Hd' in Hdb.
-case_eq (Zabs_nat c).
+ simpl.
+ case (ZL4 d).
+ intros d' Hd'.
+ unfold Zabs_nat at 1 in Hdb.
+ rewrite Hd'.
+ rewrite Hd' in Hdb.
+ case_eq (Zabs_nat c).
   intro Heq.
   destruct H.
   destruct c.
-      reflexivity.
-    simpl in Heq; destruct (ZL4 p); rewrite Heq in H; discriminate.
+    reflexivity.
+   simpl in Heq; destruct (ZL4 p); rewrite Heq in H; discriminate.
   simpl in Heq; destruct (ZL4 p); rewrite Heq in H; discriminate.
-intros.
-destruct c as [|c|c].
-    discriminate.
+ intros.
+ destruct c as [|c|c].
+   discriminate.
   constructor 1.
   unfold Qeq; simpl.
   assert (c = P_of_succ_nat n).
-    rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H0.
-    simpl in H.
-    apply nat_of_P_inj; assumption.
+   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H0.
+   simpl in H.
+   apply nat_of_P_inj; assumption.
   rewrite H1.
   cut (P_of_succ_nat d' = d).
-    intro H2; rewrite H2; reflexivity.
+   intro H2; rewrite H2; reflexivity.
   apply nat_of_P_inj.
   rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
   symmetry; assumption.
-constructor 2.
-constructor 1.
-unfold Qeq; simpl.
-assert (c = P_of_succ_nat n).
+ constructor 2.
+ constructor 1.
+ unfold Qeq; simpl.
+ assert (c = P_of_succ_nat n).
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H0.
   simpl in H.
   apply nat_of_P_inj; assumption.
-rewrite H1.
-cut (P_of_succ_nat d' = d).
+ rewrite H1.
+ cut (P_of_succ_nat d' = d).
   intro H2; rewrite H2; reflexivity.
-apply nat_of_P_inj.
-rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
-symmetry; assumption.
+ apply nat_of_P_inj.
+ rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
+ symmetry; assumption.
 Qed.
 
 Lemma list_Q_spec_neg : forall a b c d, Zabs_nat c <= Zabs_nat a ->
   Zabs_nat (Zneg d) <= Zabs_nat b -> In (Qmake c d) (list_Q a b).
 Proof.
-intros a b c d.
-apply list_Q_spec_pos.
+ intros a b c d.
+ apply list_Q_spec_pos.
 Qed.
 
 Lemma list_Q_spec_zero : forall a b d, nat_of_P d <= Zabs_nat b ->
   In (Qmake Z0 d) (list_Q a b).
 Proof.
-intros a b d Hle.
-unfold list_Q.
-rewrite in_flat_map.
-exists (0, pred (nat_of_P d)).
-split.
+ intros a b d Hle.
+ unfold list_Q.
+ rewrite in_flat_map.
+ exists (0, pred (nat_of_P d)).
+ split.
   apply list_nat_prod_spec.
-    apply le_O_n.
+   apply le_O_n.
   apply (le_trans _ _ _ (le_pred_n _) Hle).
-left.
-f_equal.
-destruct (ZL4 d).
-rewrite H.
-simpl.
-rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H.
-apply nat_of_P_inj; symmetry; assumption.
+ left.
+ f_equal.
+ destruct (ZL4 d).
+ rewrite H.
+ simpl.
+ rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H.
+ apply nat_of_P_inj; symmetry; assumption.
 Qed.
 
 Lemma div_imp_leq : forall a b : Z_as_CRing,
   b [#] Zero -> Zdivides a b -> Zabs_nat a <= Zabs_nat b.
 Proof.
-intros a b Hap Hdiv.
-destruct Hdiv.
-rewrite <- H.
-rewrite Zabs_nat_mult.
-rewrite <- H in Hap.
-destruct x.
-    destruct Hap.
-    reflexivity.
+ intros a b Hap Hdiv.
+ destruct Hdiv.
+ rewrite <- H.
+ rewrite Zabs_nat_mult.
+ rewrite <- H in Hap.
+ destruct x.
+   destruct Hap.
+   reflexivity.
   simpl.
   destruct (ZL4 p).
   rewrite H0.
@@ -180,45 +180,45 @@ destruct x.
   rewrite <- (plus_0_r (Zabs_nat a)) at 1.
   apply plus_le_compat_l.
   apply le_O_n.
-simpl.
-destruct (ZL4 p).
-rewrite H0.
-simpl.
-rewrite <- (plus_0_r (Zabs_nat a)) at 1.
-apply plus_le_compat_l.
-apply le_O_n.
+ simpl.
+ destruct (ZL4 p).
+ rewrite H0.
+ simpl.
+ rewrite <- (plus_0_r (Zabs_nat a)) at 1.
+ apply plus_le_compat_l.
+ apply le_O_n.
 Qed.
 
 Lemma list_Q_spec : forall (a b : Z_as_CRing) q, a [#] Zero -> b [#] Zero ->
   Zdivides (Q_can_num q) a -> Zdivides (Zabs_nat (Q_can_den_pos_val q)) b ->
   In (Q_can q) (list_Q a b).
 Proof.
-intros a b q Hapa Hapb Ha Hb.
-destruct q as [qn qd].
-destruct qn.
-    apply list_Q_spec_zero.
-    revert Hb; generalize (Q_can_den_pos_val (0#qd)%Q).
-    intros p Hdiv.
-    assert (nat_of_P p = Zabs_nat p).
-      reflexivity.
-    rewrite H; apply div_imp_leq.
-      assumption.
-    rewrite inj_Zabs_nat in Hdiv.
-    apply Zdivides_abs_intro_lft; assumption.
-  apply list_Q_spec_pos.
-    apply div_imp_leq; assumption.
-  apply div_imp_leq.
+ intros a b q Hapa Hapb Ha Hb.
+ destruct q as [qn qd].
+ destruct qn.
+   apply list_Q_spec_zero.
+   revert Hb; generalize (Q_can_den_pos_val (0#qd)%Q).
+   intros p Hdiv.
+   assert (nat_of_P p = Zabs_nat p).
+    reflexivity.
+   rewrite H; apply div_imp_leq.
     assumption.
+   rewrite inj_Zabs_nat in Hdiv.
+   apply Zdivides_abs_intro_lft; assumption.
+  apply list_Q_spec_pos.
+   apply div_imp_leq; assumption.
+  apply div_imp_leq.
+   assumption.
   apply Zdivides_abs_intro_lft.
   rewrite <- inj_Zabs_nat.
   assumption.
-apply list_Q_spec_neg.
+ apply list_Q_spec_neg.
   apply div_imp_leq; assumption.
-apply div_imp_leq.
+ apply div_imp_leq.
   assumption.
-apply Zdivides_abs_intro_lft.
-rewrite <- inj_Zabs_nat.
-assumption.
+ apply Zdivides_abs_intro_lft.
+ rewrite <- inj_Zabs_nat.
+ assumption.
 Qed.
 
 End nat_Q_lists.

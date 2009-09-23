@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (** printing Feq %\ensuremath{\approx}% #&asymp;# *)
 
@@ -115,20 +115,23 @@ this definition:
 
 Lemma eq_imp_Feq : included I P -> included I Q ->
  (forall x, I x -> forall Hx Hx', F x Hx [=] G x Hx') -> Feq I F G.
-intros.
-split.
-assumption.
-split; assumption.
+Proof.
+ intros.
+ split.
+  assumption.
+ split; assumption.
 Qed.
 
 Lemma Feq_imp_eq : Feq I F G -> forall x, I x -> forall Hx Hx', F x Hx [=] G x Hx'.
-intros H x Hx1 Hx Hx'.
-elim H; intros H0 H1.
-elim H1; auto.
+Proof.
+ intros H x Hx1 Hx Hx'.
+ elim H; intros H0 H1.
+ elim H1; auto.
 Qed.
 
 Lemma included_IR : included I (fun x : IR => CTrue).
-split.
+Proof.
+ split.
 Qed.
 
 End Equality_Results.
@@ -142,18 +145,19 @@ If two function coincide on a given subset then they coincide in any smaller sub
 *)
 
 Lemma included_Feq : forall P Q F G, included P Q -> Feq Q F G -> Feq P F G.
-intros P Q F G H H0.
-elim H0; clear H0; intros H0 H1.
-elim H1; clear H1; intros H1 H2.
-apply eq_imp_Feq.
-eapply included_trans.
-apply H.
-assumption.
-eapply included_trans.
-apply H.
-assumption.
-intros; apply H2.
-apply H; assumption.
+Proof.
+ intros P Q F G H H0.
+ elim H0; clear H0; intros H0 H1.
+ elim H1; clear H1; intros H1 H2.
+ apply eq_imp_Feq.
+   eapply included_trans.
+    apply H.
+   assumption.
+  eapply included_trans.
+   apply H.
+  assumption.
+ intros; apply H2.
+ apply H; assumption.
 Qed.
 
 End Some_More.
@@ -193,32 +197,35 @@ Hypothesis Hf : bnd_away_zero.
 (* end show *)
 
 Lemma bnd_imp_ap_zero : forall x Hx, (I x) -> F x Hx [#] Zero.
-intros.
-apply AbsIR_cancel_ap_zero.
-apply Greater_imp_ap.
-elim Hf; intros.
-inversion_clear b.
-eapply less_leEq_trans; auto.
-auto.
+Proof.
+ intros.
+ apply AbsIR_cancel_ap_zero.
+ apply Greater_imp_ap.
+ elim Hf; intros.
+ inversion_clear b.
+ eapply less_leEq_trans; auto.
+ auto.
 Qed.
 
 Lemma bnd_imp_inc_recip : included I (Dom {1/}F).
-intros x Hx.
-elim Hf; intros H H0.
-split.
-apply (H x Hx).
-intro.
-apply bnd_imp_ap_zero; auto.
+Proof.
+ intros x Hx.
+ elim Hf; intros H H0.
+ split.
+  apply (H x Hx).
+ intro.
+ apply bnd_imp_ap_zero; auto.
 Qed.
 
 Lemma bnd_imp_inc_div : forall G, included I (Dom G) -> included I (Dom (G{/}F)).
-intros G HG x Hx.
-split; auto.
-elim Hf; intros H0 H1.
-split.
-apply (H0 x Hx).
-intro.
-apply bnd_imp_ap_zero; auto.
+Proof.
+ intros G HG x Hx.
+ split; auto.
+ elim Hf; intros H0 H1.
+ split.
+  apply (H0 x Hx).
+ intro.
+ apply bnd_imp_ap_zero; auto.
 Qed.
 
 End Definitions.
@@ -234,20 +241,22 @@ Variable F : PartIR.
 Variables P Q : IR -> CProp.
 
 Lemma included_imp_bnd : included Q P -> bnd_away_zero P F -> bnd_away_zero Q F.
-intros H H0.
-elim H0; clear H0; intros H1 H2; split.
-apply included_trans with P; auto.
-elim H2; intros c Hc Hc'.
-exists c; auto.
+Proof.
+ intros H H0.
+ elim H0; clear H0; intros H1 H2; split.
+  apply included_trans with P; auto.
+ elim H2; intros c Hc Hc'.
+ exists c; auto.
 Qed.
 
 Lemma FRestr_bnd : forall (HP : pred_wd _ P) (H : included P (Dom F)),
  included Q P -> bnd_away_zero Q F -> bnd_away_zero Q (Frestr HP H).
-intros HP H H0 H1.
-elim H1; clear H1; intros H2 H3; split.
-auto.
-elim H3; intro c; intros.
-exists c; simpl in |- *; auto.
+Proof.
+ intros HP H H0 H1.
+ elim H1; clear H1; intros H2 H3; split.
+  auto.
+ elim H3; intro c; intros.
+ exists c; simpl in |- *; auto.
 Qed.
 
 (**
@@ -266,25 +275,27 @@ An immediate consequence:
 
 Lemma bnd_in_P_imp_ap_zero : pred_wd _ P -> bnd_away_zero_in_P ->
  forall x, P x -> forall Hx, F x Hx [#] Zero.
-intros H H0 x H1 Hx.
-apply bnd_imp_ap_zero with (Compact (leEq_reflexive _ x)).
-apply H0.
-red in |- *; intros x0 H2.
-cut (x [=] x0); intros.
-apply H with x; auto.
-inversion_clear H2; apply leEq_imp_eq; auto.
-split; apply leEq_reflexive.
+Proof.
+ intros H H0 x H1 Hx.
+ apply bnd_imp_ap_zero with (Compact (leEq_reflexive _ x)).
+  apply H0.
+  red in |- *; intros x0 H2.
+  cut (x [=] x0); intros.
+   apply H with x; auto.
+  inversion_clear H2; apply leEq_imp_eq; auto.
+ split; apply leEq_reflexive.
 Qed.
 
 Lemma FRestr_bnd' : forall (HP : pred_wd _ P) (H : included P (Dom F)),
  bnd_away_zero_everywhere F -> bnd_away_zero_everywhere (Frestr HP H).
-intros HP H H0 a b Hab H1.
-elim (H0 a b Hab); intros.
-split.
-auto.
-elim b0; intro c; intros.
-exists c; simpl in |- *; auto.
-apply included_trans with P; simpl in H1; auto.
+Proof.
+ intros HP H H0 a b Hab H1.
+ elim (H0 a b Hab); intros.
+  split.
+   auto.
+  elim b0; intro c; intros.
+  exists c; simpl in |- *; auto.
+ apply included_trans with P; simpl in H1; auto.
 Qed.
 
 End Away_from_Zero.
@@ -299,7 +310,7 @@ This tactic splits a goal of the form [Feq I F G] into the three subgoals
 and applies [Included] to the first two and [rational] to the third.
 *)
 
-(* begin hide *) 
+(* begin hide *)
 Ltac FEQ := apply eq_imp_Feq;
    [ Included | Included | intros; try (simpl in |- *; rational) ].
 (* end hide *)
@@ -323,27 +334,30 @@ Section Feq_Equivalence.
 Variables F G H : PartIR.
 
 Lemma Feq_reflexive : included I (Dom F) -> Feq I F F.
-intro; FEQ.
+Proof.
+ intro; FEQ.
 Qed.
 
 Lemma Feq_symmetric : Feq I F G -> Feq I G F.
-intro H0.
-elim H0; intros H' H1.
-elim H1; intros incF incG.
-FEQ; algebra.
+Proof.
+ intro H0.
+ elim H0; intros H' H1.
+ elim H1; intros incF incG.
+ FEQ; algebra.
 Qed.
 
 Lemma Feq_transitive : Feq I F G -> Feq I G H -> Feq I F H.
-intro H0.
-elim H0; intros incF H'.
-elim H'; intros incG H1.
-clear H0 H'.
-intro H0.
-elim H0; intros incG' H'.
-elim H'; intros incH H2.
-clear H0 H'.
-FEQ.
-Step_final (G x (incG x X)).
+Proof.
+ intro H0.
+ elim H0; intros incF H'.
+ elim H'; intros incG H1.
+ clear H0 H'.
+ intro H0.
+ elim H0; intros incG' H'.
+ elim H'; intros incH H2.
+ clear H0 H'.
+ FEQ.
+ Step_final (G x (incG x X)).
 Qed.
 
 End Feq_Equivalence.
@@ -357,111 +371,120 @@ Also it is preserved through application of functional constructors and restrict
 Variables F F' G G' : PartIR.
 
 Lemma Feq_plus : Feq I F F' -> Feq I G G' -> Feq I (F{+}G) (F'{+}G').
-intros H0 H1.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incG H2.
-elim H1; intros incF' H1'.
-elim H1'; clear H1 H1'; intros incG' H1.
-FEQ; simpl in |- *; algebra.
+Proof.
+ intros H0 H1.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incG H2.
+ elim H1; intros incF' H1'.
+ elim H1'; clear H1 H1'; intros incG' H1.
+ FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_inv : Feq I F F' -> Feq I {--}F {--}F'.
-intro H0.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incF' H1.
-FEQ; simpl in |- *; algebra.
+Proof.
+ intro H0.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incF' H1.
+ FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_minus : Feq I F F' -> Feq I G G' -> Feq I (F{-}G) (F'{-}G').
-intros H0 H1.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incG H2.
-elim H1; intros incF' H1'.
-elim H1'; clear H1 H1'; intros incG' H0.
-FEQ; simpl in |- *; algebra.
+Proof.
+ intros H0 H1.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incG H2.
+ elim H1; intros incF' H1'.
+ elim H1'; clear H1 H1'; intros incG' H0.
+ FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_mult : Feq I F F' -> Feq I G G' -> Feq I (F{*}G) (F'{*}G').
-intros H0 H1.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incG H2.
-elim H1; intros incF' H1'.
-elim H1'; clear H1 H1'; intros incG' H0.
-FEQ; simpl in |- *; algebra.
+Proof.
+ intros H0 H1.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incG H2.
+ elim H1; intros incF' H1'.
+ elim H1'; clear H1 H1'; intros incG' H0.
+ FEQ; simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_nth : forall n : nat, Feq I F F' -> Feq I (F{^}n) (F'{^}n).
-intros n H0.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incF' H1.
-FEQ.
-astepl (F x Hx[^]n); Step_final (Part F' x Hx'[^]n).
+Proof.
+ intros n H0.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incF' H1.
+ FEQ.
+ astepl (F x Hx[^]n); Step_final (Part F' x Hx'[^]n).
 Qed.
 
 Lemma Feq_recip : bnd_away_zero I F -> Feq I F F' -> Feq I {1/}F {1/}F'.
-intros Hbnd H0.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incF' H1.
-FEQ.
-apply included_FRecip.
-auto.
-intros x H Hx; apply ap_wdl_unfolded with (F x (incF x H)).
-apply bnd_imp_ap_zero with I; assumption.
-auto.
-simpl in |- *; algebra.
+Proof.
+ intros Hbnd H0.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incF' H1.
+ FEQ.
+  apply included_FRecip.
+   auto.
+  intros x H Hx; apply ap_wdl_unfolded with (F x (incF x H)).
+   apply bnd_imp_ap_zero with I; assumption.
+  auto.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_recip' : bnd_away_zero I F -> Feq I F' F -> Feq I {1/}F' {1/}F.
-intros.
-apply Feq_symmetric; apply Feq_recip.
-assumption.
-apply Feq_symmetric; assumption.
+Proof.
+ intros.
+ apply Feq_symmetric; apply Feq_recip.
+  assumption.
+ apply Feq_symmetric; assumption.
 Qed.
 
 Lemma Feq_div : bnd_away_zero I G ->
  Feq I F F' -> Feq I G G' -> Feq I (F{/}G) (F'{/}G').
-intros Hbnd H0 H1.
-elim H0; intros incF H0'.
-elim H0'; clear H0 H0'; intros incF' H2.
-elim H1; intros incG H1'.
-elim H1'; clear H1 H1'; intros incG' H0.
-FEQ.
-apply included_FDiv; auto.
-intros x H Hx; apply ap_wdl_unfolded with (G x (incG x H)).
-apply bnd_imp_ap_zero with I; assumption.
-auto.
-simpl in |- *; algebra.
+Proof.
+ intros Hbnd H0 H1.
+ elim H0; intros incF H0'.
+ elim H0'; clear H0 H0'; intros incF' H2.
+ elim H1; intros incG H1'.
+ elim H1'; clear H1 H1'; intros incG' H0.
+ FEQ.
+  apply included_FDiv; auto.
+  intros x H Hx; apply ap_wdl_unfolded with (G x (incG x H)).
+   apply bnd_imp_ap_zero with I; assumption.
+  auto.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma Feq_div' : bnd_away_zero I G ->
  Feq I F' F -> Feq I G' G -> Feq I (F'{/}G') (F{/}G).
-intros.
-apply Feq_symmetric; apply Feq_div.
-assumption.
-apply Feq_symmetric; assumption.
-apply Feq_symmetric; assumption.
+Proof.
+ intros.
+ apply Feq_symmetric; apply Feq_div.
+   assumption.
+  apply Feq_symmetric; assumption.
+ apply Feq_symmetric; assumption.
 Qed.
 
 Lemma Feq_comp : forall (J : IR -> CProp),
 (forall x Hx, I x -> J (F x Hx)) -> (forall x Hx, I x -> J (F' x Hx)) ->
 Feq I F F' -> Feq J G G' -> Feq I (G[o]F) (G'[o]F').
 Proof.
-intros J Hmap Hmap' [HF0 [HF1 HF2]] [HG0 [HG1 HG2]].
-repeat split; try (apply included_FComp; Included).
-intros x Habx [Hx0 Hx1] [Hx'0 Hx'1].
-simpl.
-assert (F x Hx0[=]F' x Hx'0).
-apply HF2.
-Included.
-assert (X:Dom G' (F x Hx0)).
-eapply dom_wd.
- apply Hx'1.
- apply eq_symmetric; assumption.
-apply eq_transitive with (G' (F x Hx0) X).
-apply HG2.
-Included.
-apply pfwdef.
-assumption.
+ intros J Hmap Hmap' [HF0 [HF1 HF2]] [HG0 [HG1 HG2]].
+ repeat split; try (apply included_FComp; Included).
+ intros x Habx [Hx0 Hx1] [Hx'0 Hx'1].
+ simpl.
+ assert (F x Hx0[=]F' x Hx'0).
+  apply HF2.
+  Included.
+ assert (X:Dom G' (F x Hx0)).
+  eapply dom_wd.
+   apply Hx'1.
+  apply eq_symmetric; assumption.
+ apply eq_transitive with (G' (F x Hx0) X).
+  apply HG2.
+  Included.
+ apply pfwdef.
+ assumption.
 Qed.
 
 (**
@@ -471,8 +494,9 @@ The restriction of a function is well defined.
 *)
 
 Lemma FRestr_wd : forall Iwd Hinc, Feq I F (Frestr (F:=F) (P:=I) Iwd Hinc).
-intros.
-FEQ.
+Proof.
+ intros.
+ FEQ.
 Qed.
 
 (**
@@ -480,16 +504,17 @@ The image of a set is extensional.
 *)
 
 Lemma fun_image_wd : Feq I F G -> forall x, fun_image F I x -> fun_image G I x.
-intros H x H0.
-elim H; clear H; intros H H1.
-elim H1; clear H1; intros H2 H3.
-elim H0; intros y Hy.
-exists y.
-elim Hy; intros H4 H1.
-elim H1; clear Hy H1; intros H5 H6.
-split; auto.
-split; auto.
-intro; Step_final (F y H5).
+Proof.
+ intros H x H0.
+ elim H; clear H; intros H H1.
+ elim H1; clear H1; intros H2 H3.
+ elim H0; intros y Hy.
+ exists y.
+ elim Hy; intros H4 H1.
+ elim H1; clear Hy H1; intros H5 H6.
+ split; auto.
+ split; auto.
+ intro; Step_final (F y H5).
 Qed.
 
 End Operations.
@@ -521,22 +546,24 @@ Hypothesis H : included Q (fun x : IR => CTrue).
 Hypothesis Hf : included Q (Dom F).
 
 Lemma FNth_zero : forall x, Q x -> forall Hx Hx', [-C-]One x Hx [=] (F{^}0) x Hx'.
-intros.
-algebra.
+Proof.
+ intros.
+ algebra.
 Qed.
 
 Variable n : nat.
 Hypothesis H' : included Q (Dom (F{*}F{^}n)).
 
 Lemma FNth_mult : forall x, Q x -> forall Hx Hx', (F{*}F{^}n) x Hx [=] (F{^}S n) x Hx'.
-intros.
-simpl in |- *.
-eapply eq_transitive_unfolded.
-2: apply mult_commutes.
-apply mult_wd.
-rational.
-change (F x (ProjIR2 Hx) [^]n [=] F x Hx'[^]n) in |- *.
-apply nexp_wd; rational.
+Proof.
+ intros.
+ simpl in |- *.
+ eapply eq_transitive_unfolded.
+  2: apply mult_commutes.
+ apply mult_wd.
+  rational.
+ change (F x (ProjIR2 Hx) [^]n [=] F x Hx'[^]n) in |- *.
+ apply nexp_wd; rational.
 Qed.
 
 End Nth_Power.
@@ -559,18 +586,20 @@ Variable F : PartIR.
 Hypothesis incF : included I (Dom F).
 
 Lemma FNth_zero' : Feq I [-C-]One (F{^}0).
-FEQ.
+Proof.
+ FEQ.
 Qed.
 
 Lemma FNth_mult' : forall n, Feq I (F{*}F{^}n) (F{^}S n).
-intro; FEQ.
-simpl in |- *.
-eapply eq_transitive_unfolded.
-2: apply mult_commutes.
-apply bin_op_wd_unfolded.
-rational.
-change (F x (ProjIR2 Hx) [^]n [=] F x Hx'[^]n) in |- *.
-apply nexp_wd; rational.
+Proof.
+ intro; FEQ.
+ simpl in |- *.
+ eapply eq_transitive_unfolded.
+  2: apply mult_commutes.
+ apply bin_op_wd_unfolded.
+  rational.
+ change (F x (ProjIR2 Hx) [^]n [=] F x Hx'[^]n) in |- *.
+ apply nexp_wd; rational.
 Qed.
 
 End Strong_Nth_Power.

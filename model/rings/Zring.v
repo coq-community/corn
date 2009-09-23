@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export Zabgroup.
 Require Import CRings.
@@ -43,12 +43,12 @@ Require Import CRings.
 The multiplication and the addition are distributive.
 *)
 
-Lemma Z_mult_plus_is_dist : distributive Zmult_is_bin_fun Zplus_is_bin_fun. 
+Lemma Z_mult_plus_is_dist : distributive Zmult_is_bin_fun Zplus_is_bin_fun.
 Proof.
-red in |- *.
-simpl in |- *.
-intros x y z.
-apply Zmult_plus_distr_r.
+ red in |- *.
+ simpl in |- *.
+ intros x y z.
+ apply Zmult_plus_distr_r.
 Qed.
 
 Definition Z_is_CRing := Build_is_CRing Z_as_CAbGroup _ _ Zmult_is_assoc

@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export IntervalFunct.
 
@@ -69,18 +69,17 @@ Hypothesis Hf : included I (Dom F).
 
 Lemma IntPartIR_strext : fun_strext
  (fun x : subset I => F (scs_elem _ _ x) (Hf _ (scs_prf _ _ x))).
-red in |- *; intros x y H.
-generalize (pfstrx _ _ _ _ _ _ H).
-case x; case y; auto.
+Proof.
+ red in |- *; intros x y H.
+ generalize (pfstrx _ _ _ _ _ _ H).
+ case x; case y; auto.
 Qed.
 
 Definition IntPartIR : CSetoid_fun (subset I) IR.
-apply
- Build_CSetoid_fun
-  with
-    (fun x : subset I =>
-     Part F (scs_elem _ _ x) (Hf (scs_elem _ _ x) (scs_prf _ _ x))).
-exact IntPartIR_strext.
+Proof.
+ apply Build_CSetoid_fun with (fun x : subset I =>
+   Part F (scs_elem _ _ x) (Hf (scs_elem _ _ x) (scs_prf _ _ x))).
+ exact IntPartIR_strext.
 Defined.
 
 End Conversion.
@@ -104,16 +103,16 @@ Variable f : CSetoid_fun (subset I) IR.
 
 Lemma PartInt_strext : forall x y Hx Hy,
  f (Build_subcsetoid_crr IR _ x Hx) [#] f (Build_subcsetoid_crr IR _ y Hy) -> x [#] y.
-intros x y Hx Hy H.
-exact (csf_strext_unfolded _ _ _ _ _ H).
+Proof.
+ intros x y Hx Hy H.
+ exact (csf_strext_unfolded _ _ _ _ _ H).
 Qed.
 
 Definition PartInt : PartIR.
-apply
- Build_PartFunct
-  with (pfpfun := fun (x : IR) Hx => f (Build_subcsetoid_crr IR _ x Hx)).
-exact (compact_wd _ _ _).
-exact PartInt_strext.
+ apply Build_PartFunct with (pfpfun := fun (x : IR) Hx => f (Build_subcsetoid_crr IR _ x Hx)).
+Proof.
+  exact (compact_wd _ _ _).
+ exact PartInt_strext.
 Defined.
 
 End AntiConversion.
@@ -128,7 +127,8 @@ In one direction these operators are inverses.
 
 Lemma int_part_int : forall a b Hab F (Hf : included (compact a b Hab) (Dom F)),
  Feq (compact a b Hab) F (PartInt (IntPartIR Hf)).
-intros; FEQ.
+Proof.
+ intros; FEQ.
 Qed.
 
 End Inverses.
@@ -160,75 +160,82 @@ Hypothesis Ff : Feq I F (PartInt f).
 Hypothesis Gg : Feq I G (PartInt g).
 
 Lemma part_int_const : Feq I [-C-]c (PartInt (IConst (Hab:=Hab) c)).
-apply eq_imp_Feq.
-red in |- *; simpl in |- *; intros; auto.
-unfold I in |- *; apply included_refl.
-intros; simpl in |- *; algebra.
+Proof.
+ apply eq_imp_Feq.
+   red in |- *; simpl in |- *; intros; auto.
+  unfold I in |- *; apply included_refl.
+ intros; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_id : Feq I FId (PartInt (IId (Hab:=Hab))).
-apply eq_imp_Feq.
-red in |- *; simpl in |- *; intros; auto.
-unfold I in |- *; apply included_refl.
-intros; simpl in |- *; algebra.
+Proof.
+ apply eq_imp_Feq.
+   red in |- *; simpl in |- *; intros; auto.
+  unfold I in |- *; apply included_refl.
+ intros; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_plus : Feq I (F{+}G) (PartInt (IPlus f g)).
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-elim Gg; intros incG Hg.
-elim Hg; clear Gg Hg; intros incG' Hg.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; algebra.
+Proof.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ elim Gg; intros incG Hg.
+ elim Hg; clear Gg Hg; intros incG' Hg.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in |- *; simpl in Hf, Hg.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_inv : Feq I {--}F (PartInt (IInv f)).
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in |- *; simpl in Hf.
-simpl in |- *; algebra.
+Proof.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in |- *; simpl in Hf.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_minus : Feq I (F{-}G) (PartInt (IMinus f g)).
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-elim Gg; intros incG Hg.
-elim Hg; clear Gg Hg; intros incG' Hg.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; algebra.
+Proof.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ elim Gg; intros incG Hg.
+ elim Hg; clear Gg Hg; intros incG' Hg.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in |- *; simpl in Hf, Hg.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_mult : Feq I (F{*}G) (PartInt (IMult f g)).
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-elim Gg; intros incG Hg.
-elim Hg; clear Gg Hg; intros incG' Hg.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in |- *; simpl in Hf, Hg.
-simpl in |- *; algebra.
+Proof.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ elim Gg; intros incG Hg.
+ elim Hg; clear Gg Hg; intros incG' Hg.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in |- *; simpl in Hf, Hg.
+ simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_nth : forall n : nat, Feq I (F{^}n) (PartInt (INth f n)).
-intro.
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in |- *; simpl in Hf.
-astepl (Part F x Hx[^]n); astepr (f (Build_subcsetoid_crr IR _ x Hx')[^]n).
-apply nexp_wd; algebra.
+Proof.
+ intro.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in |- *; simpl in Hf.
+ astepl (Part F x Hx[^]n); astepr (f (Build_subcsetoid_crr IR _ x Hx')[^]n).
+ apply nexp_wd; algebra.
 Qed.
 
 (* begin show *)
@@ -237,24 +244,26 @@ Hypothesis Hg : forall x : subset I, g x [#] Zero.
 (* end show *)
 
 Lemma part_int_recip : Feq I {1/}G (PartInt (IRecip g Hg)).
-elim Gg; intros incG Hg'.
-elim Hg'; clear Gg Hg'; intros incG' Hg'.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in Hg'; simpl in |- *; algebra.
+Proof.
+ elim Gg; intros incG Hg'.
+ elim Hg'; clear Gg Hg'; intros incG' Hg'.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in Hg'; simpl in |- *; algebra.
 Qed.
 
 Lemma part_int_div : Feq I (F{/}G) (PartInt (IDiv f g Hg)).
-elim Ff; intros incF Hf.
-elim Hf; clear Ff Hf; intros incF' Hf.
-elim Gg; intros incG Hg'.
-elim Hg'; clear Gg Hg'; intros incG' Hg'.
-apply eq_imp_Feq.
-Included.
-Included.
-intros; simpl in Hf, Hg'; simpl in |- *.
-algebra.
+Proof.
+ elim Ff; intros incF Hf.
+ elim Hf; clear Ff Hf; intros incF' Hf.
+ elim Gg; intros incG Hg'.
+ elim Hg'; clear Gg Hg'; intros incG' Hg'.
+ apply eq_imp_Feq.
+   Included.
+  Included.
+ intros; simpl in Hf, Hg'; simpl in |- *.
+ algebra.
 Qed.
 
 End Equivalences.

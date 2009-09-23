@@ -41,7 +41,8 @@ Definition inject_Q : Q -> CR := (@Cunit Q_as_MetricSpace).
 
 (* begin hide *)
 Add Morphism (inject_Q) with signature Qeq ==> (@st_eq _) as inject_Q_wd.
-exact (uc_wd (@Cunit Q_as_MetricSpace)).
+Proof.
+ exact (uc_wd (@Cunit Q_as_MetricSpace)).
 Qed.
 (* end hide *)
 

@@ -31,39 +31,34 @@ Require Import CornTac.
 
 Lemma CRisCSetoid : is_CSetoid CR (@st_eq CR) CRapart.
 Proof.
-split;simpl.
-
-intros x H.
-eapply ap_irreflexive.
-apply CR_ap_as_Cauchy_IR_ap_1.
-apply H.
-
-intros x y H.
-apply CR_ap_as_Cauchy_IR_ap_2.
-eapply ap_symmetric.
-apply CR_ap_as_Cauchy_IR_ap_1.
-apply H.
-
-intros x y H1 z.
-destruct (ap_cotransitive _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H1) (CRasCauchy_IR z));[left|right];
- apply CR_ap_as_Cauchy_IR_ap_2; assumption.
-
-intros x y.
-change (Not (CRapart x y)<->(x==y)%CR).
-rewrite <- CR_eq_as_Cauchy_IR_eq.
-destruct (ap_tight _ (CRasCauchy_IR x) (CRasCauchy_IR y)) as [A B].
-split.
-intros H.
-apply A.
-intros X.
-apply H.
-apply CR_ap_as_Cauchy_IR_ap_2.
-assumption.
-
-intros H X.
-apply (B H).
-apply CR_ap_as_Cauchy_IR_ap_1.
-apply X.
+ split;simpl.
+    intros x H.
+    eapply ap_irreflexive.
+    apply CR_ap_as_Cauchy_IR_ap_1.
+    apply H.
+   intros x y H.
+   apply CR_ap_as_Cauchy_IR_ap_2.
+   eapply ap_symmetric.
+   apply CR_ap_as_Cauchy_IR_ap_1.
+   apply H.
+  intros x y H1 z.
+  destruct (ap_cotransitive _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H1) (CRasCauchy_IR z));[left|right];
+    apply CR_ap_as_Cauchy_IR_ap_2; assumption.
+ intros x y.
+ change (Not (CRapart x y)<->(x==y)%CR).
+ rewrite <- CR_eq_as_Cauchy_IR_eq.
+ destruct (ap_tight _ (CRasCauchy_IR x) (CRasCauchy_IR y)) as [A B].
+ split.
+  intros H.
+  apply A.
+  intros X.
+  apply H.
+  apply CR_ap_as_Cauchy_IR_ap_2.
+  assumption.
+ intros H X.
+ apply (B H).
+ apply CR_ap_as_Cauchy_IR_ap_1.
+ apply X.
 Qed.
 
 Definition CRasCSetoid : CSetoid := makeCSetoid CR _ CRisCSetoid.

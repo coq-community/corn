@@ -1,10 +1,10 @@
 Require Import Rreals_iso.
 Require Import CRsign.
 
-Ltac R_dec_precompute := 
+Ltac R_dec_precompute :=
  try apply Rlt_le;
  apply R_lt_as_IR;
- match goal with 
+ match goal with
  | |- (Ccsr_rel ?A ?B ?X ?Y) =>
                   let X0 := fresh "R_dec" in
                   pose (X0:=X);

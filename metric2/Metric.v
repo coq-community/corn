@@ -50,9 +50,9 @@ Record is_MetricSpace (X:Setoid) (B: Qpos -> relation X) : Prop :=
 Record MetricSpace : Type :=
 { msp_is_setoid :> Setoid
 ; ball : Qpos -> msp_is_setoid -> msp_is_setoid -> Prop
-; ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) -> 
-            forall x1 x2, (st_eq x1 x2) -> 
-            forall y1 y2, (st_eq y1 y2) -> 
+; ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
+            forall x1 x2, (st_eq x1 x2) ->
+            forall y1 y2, (st_eq y1 y2) ->
             (ball e1 x1 y1 <-> ball e2 x2 y2)
 ; msp : is_MetricSpace msp_is_setoid ball
 }.
@@ -66,7 +66,8 @@ Definition ms_id (m:MetricSpace) (x:m) : m := x.
 Implicit Arguments ms_id [m].
 
 Add Parametric Morphism (m:MetricSpace) : (@ball m) with signature QposEq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
-exact (@ball_wd m).
+Proof.
+ exact (@ball_wd m).
 Qed.
 (* end hide *)
 
@@ -78,41 +79,41 @@ Section Metric_Space.
 
 Variable X : MetricSpace.
 
-(** These lemmas give direct access to the ball axioms of a metric space 
+(** These lemmas give direct access to the ball axioms of a metric space
 *)
 
 Lemma ball_refl : forall e (a:X), ball e a a.
 Proof.
-apply (msp_refl (msp X)).
+ apply (msp_refl (msp X)).
 Qed.
 
 Lemma ball_sym : forall e (a b:X), ball e a b -> ball e b a.
 Proof.
-apply (msp_sym (msp X)).
+ apply (msp_sym (msp X)).
 Qed.
 
 Lemma ball_triangle : forall e1 e2 (a b c:X), ball e1 a b -> ball e2 b c -> ball (e1+e2) a c.
 Proof.
-apply (msp_triangle (msp X)).
+ apply (msp_triangle (msp X)).
 Qed.
 
 Lemma ball_closed :  forall e (a b:X), (forall d, ball (e+d) a b) -> ball e a b.
 Proof.
-apply (msp_closed (msp X)).
+ apply (msp_closed (msp X)).
 Qed.
 
 Lemma ball_eq : forall (a b:X), (forall e, ball e a b) -> st_eq a b.
 Proof.
-apply (msp_eq (msp X)).
+ apply (msp_eq (msp X)).
 Qed.
 
 Lemma ball_eq_iff : forall (a b:X), (forall e, ball e a b) <-> st_eq a b.
 Proof.
-split.
-apply ball_eq.
-intros H e.
-rewrite H.
-apply ball_refl.
+ split.
+  apply ball_eq.
+ intros H e.
+ rewrite H.
+ apply ball_refl.
 Qed.
 
 (** The ball constraint on a and b can always be weakened.  Here are
@@ -121,26 +122,26 @@ two forms of the weakening lemma.
 
 Lemma ball_weak : forall e d (a b:X), ball e a b -> ball (e+d) a b.
 Proof.
-intros e d a b B1.
-eapply ball_triangle.
-apply B1.
-apply ball_refl.
+ intros e d a b B1.
+ eapply ball_triangle.
+  apply B1.
+ apply ball_refl.
 Qed.
 
 Hint Resolve ball_refl ball_triangle ball_weak : metric.
 
 Lemma ball_weak_le : forall (e d:Qpos) (a b:X), e<=d ->  ball e a b -> ball d a b.
 Proof.
-intros e d a b Hed B1.
-destruct (Qle_lt_or_eq _ _ Hed).
-destruct (Qpos_lt_plus H) as [c Hc].
-rewrite <- Q_Qpos_plus in Hc.
-change (QposEq d (e+c)) in Hc.
-rewrite Hc; clear - B1.
-auto with *.
-change (QposEq e d) in H.
-rewrite <- H.
-assumption.
+ intros e d a b Hed B1.
+ destruct (Qle_lt_or_eq _ _ Hed).
+  destruct (Qpos_lt_plus H) as [c Hc].
+  rewrite <- Q_Qpos_plus in Hc.
+  change (QposEq d (e+c)) in Hc.
+  rewrite Hc; clear - B1.
+  auto with *.
+ change (QposEq e d) in H.
+ rewrite <- H.
+ assumption.
 Qed.
 
 End Metric_Space.

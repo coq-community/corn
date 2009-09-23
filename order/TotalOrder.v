@@ -28,7 +28,7 @@ Open Local Scope po_scope.
 * Total Order
 A total order is a lattice were x <= y or y <= x.
 *)
-Record TotalOrder : Type := 
+Record TotalOrder : Type :=
 { L :> Lattice
 ; le_total : forall x y:L, {x <= y}+{y <= x}
 }.
@@ -38,12 +38,13 @@ Section MinMax.
 Variable X : TotalOrder.
 (** meet x y is either x or y. *)
 Definition meet_irred : forall x y : X, {meet x y == x} + {meet x y == y}.
-intros.
-destruct (le_total _ x y) as [H|H].
-left.
-firstorder using le_meet_l.
-right.
-firstorder using le_meet_r.
+Proof.
+ intros.
+ destruct (le_total _ x y) as [H|H].
+  left.
+  firstorder using le_meet_l.
+ right.
+ firstorder using le_meet_r.
 Defined.
 
 Section Monotone.
@@ -52,29 +53,30 @@ Variable f : X -> X.
 Hypothesis Hf : monotone X f.
 
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X)  as monotone_compat.
-move:Hf;rewrite monotone_def;intros.
-move: H0; do 2 rewrite equiv_le_def.
-firstorder.
+Proof.
+ move:Hf;rewrite monotone_def;intros.
+ move: H0; do 2 rewrite equiv_le_def.
+ firstorder.
 Qed.
 
 (** meet distributes over any monotone function. *)
 Lemma monotone_meet_distr : forall x y : X, f (meet x y) == meet (f x) (f y).
 Proof.
-move: Hf; rewrite monotone_def. clear Hf. intro Hf.
-assert (forall x y : X, x <= y -> f (meet x y) == meet (f x) (f y)).
-intros x y Hxy.
-assert (Hfxfy:=Hf _ _ Hxy).
-rewrite -> le_meet_l in Hxy.
-rewrite Hxy.
-rewrite -> le_meet_l in Hfxfy.
-rewrite Hfxfy.
-reflexivity.
-intros.
-destruct (le_total _ x y).
-auto.
-rewrite (meet_comm X).
-rewrite (meet_comm _ (f x)).
-auto.
+ move: Hf; rewrite monotone_def. clear Hf. intro Hf.
+ assert (forall x y : X, x <= y -> f (meet x y) == meet (f x) (f y)).
+  intros x y Hxy.
+  assert (Hfxfy:=Hf _ _ Hxy).
+  rewrite -> le_meet_l in Hxy.
+  rewrite Hxy.
+  rewrite -> le_meet_l in Hfxfy.
+  rewrite Hfxfy.
+  reflexivity.
+ intros.
+ destruct (le_total _ x y).
+  auto.
+ rewrite (meet_comm X).
+ rewrite (meet_comm _ (f x)).
+ auto.
 Qed.
 
 End Monotone.
@@ -92,31 +94,32 @@ Variable f : X -> X.
 Hypothesis Hf : antitone X f.
 
 (* begin hide *)
-Add Morphism f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat. 
-move: Hf; rewrite antitone_def; clear Hf;intros.
-rewrite -> equiv_le_def in *.
-firstorder.
+Add Morphism f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat.
+Proof.
+ move: Hf; rewrite antitone_def; clear Hf;intros.
+ rewrite -> equiv_le_def in *.
+ firstorder.
 Qed.
 (* end hide *)
 
 (* meet transforms into join for antitone functions *)
 Lemma antitone_meet_join_distr : forall x y : X, f (meet x y) == join (f x) (f y).
 Proof.
-move: Hf;rewrite antitone_def; clear Hf; intro Hf.
-assert (forall x y : X, x <= y -> f (meet x y) == join (f x) (f y)).
-intros x y Hxy.
-assert (Hfxfy:=Hf _ _ Hxy).
-rewrite -> le_meet_l in Hxy.
-rewrite Hxy.
-rewrite -> le_join_l in Hfxfy.
-rewrite Hfxfy.
-reflexivity.
-intros.
-destruct (le_total _ x y).
-auto.
-rewrite (meet_comm X).
-rewrite (join_comm X).
-auto.
+ move: Hf;rewrite antitone_def; clear Hf; intro Hf.
+ assert (forall x y : X, x <= y -> f (meet x y) == join (f x) (f y)).
+  intros x y Hxy.
+  assert (Hfxfy:=Hf _ _ Hxy).
+  rewrite -> le_meet_l in Hxy.
+  rewrite Hxy.
+  rewrite -> le_join_l in Hfxfy.
+  rewrite Hfxfy.
+  reflexivity.
+ intros.
+ destruct (le_total _ x y).
+  auto.
+ rewrite (meet_comm X).
+ rewrite (join_comm X).
+ auto.
 Qed.
 
 End Antitone.
@@ -124,31 +127,31 @@ End Antitone.
 (** Lemmas of distributive lattices *)
 Lemma join_meet_modular_r : forall x y z : X, join x (meet y (join x z)) == meet (join x y) (join x z).
 Proof.
-intros.
-rewrite join_meet_distr_r.
-rewrite (join_assoc X).
-rewrite (join_idem X).
-reflexivity.
+ intros.
+ rewrite join_meet_distr_r.
+ rewrite (join_assoc X).
+ rewrite (join_idem X).
+ reflexivity.
 Qed.
 
 Lemma join_meet_modular_l : forall x y z : X, join (meet (join x z) y) z == meet (join x z) (join y z).
 Proof.
-intros.
-rewrite (join_comm X (meet (join x z) y) z).
-rewrite (meet_comm X (join x z) y).
-rewrite (meet_comm X (join x z) (join y z)).
-rewrite (join_comm X x z).
-rewrite (join_comm X y z).
-apply join_meet_modular_r.
+ intros.
+ rewrite (join_comm X (meet (join x z) y) z).
+ rewrite (meet_comm X (join x z) y).
+ rewrite (meet_comm X (join x z) (join y z)).
+ rewrite (join_comm X x z).
+ rewrite (join_comm X y z).
+ apply join_meet_modular_r.
 Qed.
 
 Lemma meet_join_disassoc : forall x y z : X, meet (join x y) z <= join x (meet y z).
 Proof.
-intros.
-rewrite join_meet_distr_r. 
-apply meet_le_compat.
-apply le_refl.
-apply join_ub_r.
+ intros.
+ rewrite join_meet_distr_r.
+ apply meet_le_compat.
+  apply le_refl.
+ apply join_ub_r.
 Qed.
 
 End MinMax.
@@ -161,10 +164,10 @@ Variable X : TotalOrder.
 The dual of a total order is a total order.
 *)
 Definition Dual : TotalOrder.
-eapply Build_TotalOrder with 
- (L:= Dual X).
-intros.
-destruct (le_total _ x y); auto.
+ eapply Build_TotalOrder with (L:= Dual X).
+Proof.
+ intros.
+ destruct (le_total _ x y); auto.
 Defined.
 (** The duals of the previous lemmas hold. *)
 Definition join_irred : forall x y : X, {join x y == x} + {join x y == y} :=
@@ -202,35 +205,35 @@ Hypothesis min_def2 : forall x y:X, y <= x -> min x y == y.
 
 Lemma min_lb_l : forall x y:X, min x y <= x.
 Proof.
-intros.
-destruct (le_total x y).
-rewrite min_def1; auto.
-apply le_refl.
-rewrite min_def2; auto.
+ intros.
+ destruct (le_total x y).
+  rewrite min_def1; auto.
+  apply le_refl.
+ rewrite min_def2; auto.
 Qed.
 
 Lemma min_lb_r : forall x y:X, min x y <= y.
 Proof.
-intros.
-destruct (le_total x y).
-rewrite min_def1; auto.
-rewrite min_def2; auto.
-apply le_refl.
+ intros.
+ destruct (le_total x y).
+  rewrite min_def1; auto.
+ rewrite min_def2; auto.
+ apply le_refl.
 Qed.
 
 Lemma min_glb : forall x y z, z <= x -> z <= y -> z <= min x y.
 Proof.
-intros.
-destruct (le_total x y).
-rewrite min_def1; assumption.
-rewrite min_def2; assumption.
+ intros.
+ destruct (le_total x y).
+  rewrite min_def1; assumption.
+ rewrite min_def2; assumption.
 Qed.
 
 End TotalOrderMinDef.
 
 (** With a total order has a new characterization. *)
 Definition makeTotalOrder :
- forall (A : Type) (equiv : A -> A -> Prop) (le : A -> A -> Prop) 
+ forall (A : Type) (equiv : A -> A -> Prop) (le : A -> A -> Prop)
   (monotone antitone : (A -> A) -> Prop)
   (meet join : A -> A -> A),
   (forall x y : A, equiv x y <-> (le x y /\ le y x)) ->
@@ -244,18 +247,16 @@ Definition makeTotalOrder :
   (forall x y : A, le y x -> equiv (join x y) x) ->
   (forall x y : A, le x y -> equiv (join x y) y) ->
   TotalOrder.
-intros A0 eq0 le0 monotone0 antitone0 min max eq0_def refl trans total monotone0_def antitone0_def min_def1 min_def2 max_def1 max_def2.
-pose (PO:=makePartialOrder eq0 le0 monotone0 antitone0 eq0_def refl trans monotone0_def antitone0_def).
-pose (DPO := (PartialOrder.Dual PO)).
-pose (flip_total := fun x y => total y x).
-pose (L0:=makeLattice PO min max 
- (min_lb_l PO min total min_def1 min_def2)
- (min_lb_r PO min total min_def1 min_def2)
- (min_glb PO min total min_def1 min_def2)
- (min_lb_l DPO max flip_total max_def1 max_def2)
- (min_lb_r DPO max flip_total max_def1 max_def2)
- (min_glb DPO max flip_total max_def1 max_def2)).
-exact (Build_TotalOrder L0 total).
+Proof.
+ intros A0 eq0 le0 monotone0 antitone0 min max eq0_def refl trans total monotone0_def antitone0_def min_def1 min_def2 max_def1 max_def2.
+ pose (PO:=makePartialOrder eq0 le0 monotone0 antitone0 eq0_def refl trans monotone0_def antitone0_def).
+ pose (DPO := (PartialOrder.Dual PO)).
+ pose (flip_total := fun x y => total y x).
+ pose (L0:=makeLattice PO min max (min_lb_l PO min total min_def1 min_def2)
+   (min_lb_r PO min total min_def1 min_def2) (min_glb PO min total min_def1 min_def2)
+     (min_lb_l DPO max flip_total max_def1 max_def2) (min_lb_r DPO max flip_total max_def1 max_def2)
+       (min_glb DPO max flip_total max_def1 max_def2)).
+ exact (Build_TotalOrder L0 total).
 Defined.
 
 Module Default.
@@ -281,14 +282,14 @@ end.
 
 Lemma min_def1 : forall x y, le x y -> equiv (min x y) x.
 Proof.
-intros.
-apply min_case; firstorder.
+ intros.
+ apply min_case; firstorder.
 Qed.
 
 Lemma min_def2 : forall x y, le y x -> equiv (min x y) y.
 Proof.
-intros.
-apply min_case; firstorder.
+ intros.
+ apply min_case; firstorder.
 Qed.
 
 End MinDefault.
@@ -312,14 +313,14 @@ Definition max_case :
 
 Lemma max_def1 : forall x y, le y x -> equiv (max x y) x.
 Proof.
-refine (min_def1 A equiv flip_le _ flip_le_total).
-firstorder.
+ refine (min_def1 A equiv flip_le _ flip_le_total).
+ firstorder.
 Qed.
 
 Lemma max_def2 : forall x y, le x y -> equiv (max x y) y.
 Proof.
-refine (min_def2 A equiv flip_le _ flip_le_total).
-firstorder.
+ refine (min_def2 A equiv flip_le _ flip_le_total).
+ firstorder.
 Qed.
 
 End MaxDefault.

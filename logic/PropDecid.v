@@ -23,7 +23,8 @@ Here we show the decidability of logical connectives.
 *)
 
 Lemma imp_dec : (forall A B, ({A} + {~A}) -> ({B} + {~B}) -> ({A -> B} + {~(A -> B)})).
-tauto.
+Proof.
+ tauto.
 Qed.
 
 (* TODO: other connectives *)

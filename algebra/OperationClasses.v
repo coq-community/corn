@@ -120,10 +120,10 @@ Existing Instance mulC_id_l.
 
 Global Instance opA_zero_l : left_absorbing mul zero.
 Proof.
-intro; rewrite <- (left_id (mul _ _)); rewrite <- (left_id zero) at 3.
-set (e := left_inv (mul zero x)); rewrite <- e at 1 3; clear e.
-rewrite (commut (mul _ _)), <- assoc, <- assoc; apply add_morph; try reflexivity.
-rewrite <- left_dist, (left_id zero), (right_id (mul _ _)); reflexivity.
+ intro; rewrite <- (left_id (mul _ _)); rewrite <- (left_id zero) at 3.
+ set (e := left_inv (mul zero x)); rewrite <- e at 1 3; clear e.
+ rewrite (commut (mul _ _)), <- assoc, <- assoc; apply add_morph; try reflexivity.
+ rewrite <- left_dist, (left_id zero), (right_id (mul _ _)); reflexivity.
 Qed.
 End Left.
 Section Right.
@@ -136,10 +136,10 @@ Existing Instance mulC_id_r.
 
 Global Instance opA_zero_r : right_absorbing mul zero.
 Proof.
-intro; rewrite <- (right_id (mul _ _)); rewrite <- (right_id zero) at 3.
-set (e := right_inv (mul x zero)); rewrite <- e at 2 4; clear e.
-rewrite (commut (opp _)), assoc, assoc; apply add_morph; try reflexivity.
-rewrite <- right_dist, (right_id zero), (left_id (mul _ _)); reflexivity.
+ intro; rewrite <- (right_id (mul _ _)); rewrite <- (right_id zero) at 3.
+ set (e := right_inv (mul x zero)); rewrite <- e at 2 4; clear e.
+ rewrite (commut (opp _)), assoc, assoc; apply add_morph; try reflexivity.
+ rewrite <- right_dist, (right_id zero), (left_id (mul _ _)); reflexivity.
 Qed.
 End Right.
 End AssociativeCommutative.

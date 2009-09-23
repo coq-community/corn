@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 (* CRing_Homomorphisms.v, v1.0, 28april2004, Bart Kirkels *)
 
 (** printing [+] %\ensuremath+% #+# *)
@@ -74,7 +74,7 @@ Record RingHom : Type :=
    rh1 : fun_pres_plus rhmap;
    rh2 : fun_pres_mult rhmap;
    rh3 : fun_pres_unit rhmap}.
-   
+
 End RingHom_Definition.
 
 (**
@@ -92,20 +92,24 @@ Section RingHom_Axioms.
 Variable f : RingHom R S.
 
 Lemma rh_strext : forall x y:R, (f x) [#] (f y) -> x [#] y.
-elim f; intuition.
-assert (fun_strext rhmap0); elim rhmap0; intuition.
+Proof.
+ elim f; intuition.
+ assert (fun_strext rhmap0); elim rhmap0; intuition.
 Qed.
 
 Lemma rh_pres_plus : forall x y:R, f (x[+]y) [=] (f x) [+] (f y).
-elim f; auto.
+Proof.
+ elim f; auto.
 Qed.
 
 Lemma rh_pres_mult : forall x y:R, f (x[*]y) [=] (f x) [*] (f y).
-elim f; auto.
+Proof.
+ elim f; auto.
 Qed.
 
 Lemma rh_pres_unit : (f (One:R)) [=] (One:S).
-elim f; auto.
+Proof.
+ elim f; auto.
 Qed.
 
 End RingHom_Axioms.
@@ -122,44 +126,48 @@ Section RingHom_Basics.
 Variable f : RingHom R S.
 
 Lemma rh_pres_zero : (f (Zero:R)) [=] (Zero:S).
-astepr ((f Zero)[-](f Zero)).
-astepr ((f (Zero[+]Zero))[-](f Zero)).
-Step_final ((f Zero[+]f Zero)[-]f Zero).
+Proof.
+ astepr ((f Zero)[-](f Zero)).
+ astepr ((f (Zero[+]Zero))[-](f Zero)).
+ Step_final ((f Zero[+]f Zero)[-]f Zero).
 Qed.
 
 Lemma rh_pres_inv : forall x:R, (f [--]x) [=] [--] (f x).
-intro x; apply (cg_cancel_lft S (f x)).
-astepr (Zero:S).
-astepl (f (x[+][--]x)).
-Step_final (f (Zero:R)); try apply rh_pres_zero.
+Proof.
+ intro x; apply (cg_cancel_lft S (f x)).
+ astepr (Zero:S).
+ astepl (f (x[+][--]x)).
+ Step_final (f (Zero:R)); try apply rh_pres_zero.
 Qed.
 
 Lemma rh_pres_minus : forall x y:R, f (x[-]y) [=] (f x) [-] (f y).
-unfold cg_minus.
-intros x y.
-rewrite rh_pres_plus.
-rewrite rh_pres_inv.
-reflexivity.
+Proof.
+ unfold cg_minus.
+ intros x y.
+ rewrite rh_pres_plus.
+ rewrite rh_pres_inv.
+ reflexivity.
 Qed.
 
 Lemma rh_apzero : forall x:R, (f x) [#] Zero -> x [#] Zero.
-intros x X; apply (cg_ap_cancel_rht R x (Zero:R) x).
-astepr x.
-apply (rh_strext f (x[+]x) x).
-astepl ((f x)[+](f x)).
-astepr ((Zero:S) [+] (f x)).
-apply (op_rht_resp_ap S (f x) (Zero:S) (f x)).
-assumption.
+Proof.
+ intros x X; apply (cg_ap_cancel_rht R x (Zero:R) x).
+ astepr x.
+ apply (rh_strext f (x[+]x) x).
+ astepl ((f x)[+](f x)).
+ astepr ((Zero:S) [+] (f x)).
+ apply (op_rht_resp_ap S (f x) (Zero:S) (f x)).
+ assumption.
 Qed.
 
 
 Lemma rh_pres_nring : forall n, (f (nring n:R)) [=] (nring n:S).
 Proof.
-induction n.
- apply rh_pres_zero.
-simpl.
-rewrite rh_pres_plus.
-auto with *.
+ induction n.
+  apply rh_pres_zero.
+ simpl.
+ rewrite rh_pres_plus.
+ auto with *.
 Qed.
 
 End RingHom_Basics.
@@ -171,11 +179,12 @@ Hint Resolve rh_pres_zero rh_pres_minus rh_pres_inv rh_apzero : algebra.
 Hint Rewrite rh_pres_zero rh_pres_plus rh_pres_minus rh_pres_inv rh_pres_mult rh_pres_unit : ringHomPush.
 
 Definition RHid R : RingHom R R.
-intros R.
-exists (id_un_op R).
+Proof.
+ intros R.
+ exists (id_un_op R).
+   intros x y; apply eq_reflexive.
   intros x y; apply eq_reflexive.
- intros x y; apply eq_reflexive.
-apply eq_reflexive.
+ apply eq_reflexive.
 Defined.
 
 Section Compose.
@@ -186,26 +195,26 @@ Variable psi : RingHom R S.
 
 Lemma RHcompose1 : fun_pres_plus _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
-intros x y.
-simpl.
-repeat rewrite rh_pres_plus.
-reflexivity.
+ intros x y.
+ simpl.
+ repeat rewrite rh_pres_plus.
+ reflexivity.
 Qed.
 
 Lemma RHcompose2 : fun_pres_mult _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
-intros x y.
-simpl.
-repeat rewrite rh_pres_mult.
-reflexivity.
+ intros x y.
+ simpl.
+ repeat rewrite rh_pres_mult.
+ reflexivity.
 Qed.
 
 Lemma RHcompose3 : fun_pres_unit _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
-unfold fun_pres_unit.
-simpl.
-repeat rewrite rh_pres_unit.
-reflexivity.
+ unfold fun_pres_unit.
+ simpl.
+ repeat rewrite rh_pres_unit.
+ reflexivity.
 Qed.
 
 Definition RHcompose : RingHom R T := Build_RingHom _ _ _ RHcompose1 RHcompose2 RHcompose3.

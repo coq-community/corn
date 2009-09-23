@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (**
 * On density of the image of [Q] in an arbitrary real number structure
@@ -62,29 +62,33 @@ Variable R1 : CReals.
 (* We clone these proofs from CReals1.v just because there IR is an axiom *)
 (* begin hide *)
 Lemma CReals_is_CReals : is_CReals R1 (Lim (IR:=R1)).
-unfold Lim in |- *.
-elim R1; intros.
-exact crl_proof.
+Proof.
+ unfold Lim in |- *.
+ elim R1; intros.
+ exact crl_proof.
 Qed.
 
 Lemma Lim_Cauchy : forall s : CauchySeq R1, SeqLimit s (Lim s).
-elim CReals_is_CReals.
-intros.
-apply ax_Lim.  
+Proof.
+ elim CReals_is_CReals.
+ intros.
+ apply ax_Lim.
 Qed.
 
 Lemma Archimedes : forall x : R1, {n : nat | x [<=] nring n}.
-elim CReals_is_CReals.
-intros.
-apply ax_Arch.
+Proof.
+ elim CReals_is_CReals.
+ intros.
+ apply ax_Arch.
 Qed.
-   
+
 Lemma Archimedes' : forall x : R1, {n : nat | x [<] nring n}.
-intro x.
-elim (Archimedes (x[+]One)); intros n Hn.
-exists n.
-apply less_leEq_trans with (x[+]One); auto.
-apply less_plusOne.
+Proof.
+ intro x.
+ elim (Archimedes (x[+]One)); intros n Hn.
+ exists n.
+ apply less_leEq_trans with (x[+]One); auto.
+ apply less_plusOne.
 Qed.
 (*--------------------------------------*)
 
@@ -104,19 +108,19 @@ Proof.
  apply nring_ap_zero.
  intro.
  absurd (0 < Qden x).
- rewrite H.
- auto with arith.
+  rewrite H.
+  auto with arith.
  apply lt_O_nat_of_P.
 Qed.
 
 (** And we define the injection in the natural way, using [zring] and [nring]. We call this [inj_Q], in contrast with [inject_Q] defined in [Cauchy_CReals]. *)
 
 Definition inj_Q : Q_as_COrdField -> R1.
+Proof.
  intro x.
  case x.
  intros num0 den0.
- exact 
- (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Qmake num0 den0)).
+ exact (zring num0[/]nring (R:=R1) den0[//]den_is_nonzero (Qmake num0 den0)).
 Defined.
 
 (** Next we need some properties of [nring], on the setoid of natural numbers: *)
@@ -127,77 +131,72 @@ Proof.
  intros m n.
  case m.
   case n.
-   
    intro H.
    simpl in |- *.
    red in |- *.
    simpl in H.
    cut (Not (Zero [#] (Zero:R1))).
-   intro.
-   intro.
-   elim H0.
-   assumption.
+    intro.
+    intro.
+    elim H0.
+    assumption.
    apply eq_imp_not_ap.
    apply eq_reflexive_unfolded.
-
-   intros.
-   simpl in |- *. 
-   red in |- *.
-   discriminate.
-
-  case n.
-   
-   intros.
-   simpl in |- *. 
-   red in |- *.
-   discriminate.
-
-   intros.
-   simpl in |- *.
-   red in |- *.
-   intro.
-   cut (Not (nring (R:=R1) (S n1) [#] nring (R:=R1) (S n0))).
-   intro H1.
-   elim H1.
-   assumption.
-   apply eq_imp_not_ap.
-   rewrite H.
-   apply eq_reflexive_unfolded.
+  intros.
+  simpl in |- *.
+  red in |- *.
+  discriminate.
+ case n.
+  intros.
+  simpl in |- *.
+  red in |- *.
+  discriminate.
+ intros.
+ simpl in |- *.
+ red in |- *.
+ intro.
+ cut (Not (nring (R:=R1) (S n1) [#] nring (R:=R1) (S n0))).
+  intro H1.
+  elim H1.
+  assumption.
+ apply eq_imp_not_ap.
+ rewrite H.
+ apply eq_reflexive_unfolded.
 Qed.
 
 Lemma nring_wd : forall m n : nat_as_CMonoid,
  (m [=] n) -> nring (R:=R1) m [=] nring (R:=R1) n.
 Proof.
  intros.
- simpl in H. 
+ simpl in H.
  rewrite H.
  apply eq_reflexive_unfolded.
 Qed.
- 
-Lemma nring_eq : forall m n : nat, m = n -> nring (R:=R1) m [=] nring (R:=R1) n. 
+
+Lemma nring_eq : forall m n : nat, m = n -> nring (R:=R1) m [=] nring (R:=R1) n.
 Proof.
  intros.
  rewrite H.
  apply eq_reflexive_unfolded.
 Qed.
- 
+
 Lemma nring_leEq : forall (OF : COrdField) m n,
- m <= n -> nring (R:=OF) m [<=] nring (R:=OF) n. 
+ m <= n -> nring (R:=OF) m [<=] nring (R:=OF) n.
 Proof.
  intros.
- induction  m as [| m Hrecm]. 
- simpl in |- *.
- case n.
- simpl in |- *.
- apply leEq_reflexive.
- intro.
- apply less_leEq.
- apply pos_nring_S.
+ induction  m as [| m Hrecm].
+  simpl in |- *.
+  case n.
+   simpl in |- *.
+   apply leEq_reflexive.
+  intro.
+  apply less_leEq.
+  apply pos_nring_S.
  case (le_lt_eq_dec (S m) n H).
- intro.
- apply less_leEq.
- apply nring_less.
- assumption.
+  intro.
+  apply less_leEq.
+  apply nring_less.
+  assumption.
  intro.
  rewrite e.
  apply leEq_reflexive.
@@ -210,74 +209,63 @@ Lemma zring_strext : forall m n : Z_as_CRing,
 Proof.
  intros m n.
  case m.
+   case n.
+     intro H.
+     elimtype False.
+     cut (Zero [=] (Zero:R1)).
+      change (~ (Zero [=] (Zero:R1))) in |- *.
+      apply ap_imp_neq.
+      simpl in H.
+      assumption.
+     apply eq_reflexive_unfolded.
+    intros.
+    simpl in |- *.
+    red in |- *.
+    discriminate.
+   intros.
+   simpl in |- *.
+   red in |- *.
+   discriminate.
+  case n.
+    intros.
+    simpl in |- *.
+    red in |- *.
+    discriminate.
+   intros.
+   simpl in |- *.
+   intro.
+   cut (Not (zring (R:=R1) (BinInt.Zpos p0) [#] zring (R:=R1) (BinInt.Zpos p))).
+    intro H1.
+    elim H1.
+    assumption.
+   apply eq_imp_not_ap.
+   rewrite H.
+   apply eq_reflexive_unfolded.
+  intros.
+  simpl in |- *.
+  red in |- *.
+  discriminate.
  case n.
- 
- intro H.
- elimtype False.
- cut (Zero [=] (Zero:R1)).
- change (~ (Zero [=] (Zero:R1))) in |- *.
- apply ap_imp_neq.
- simpl in H.
- assumption.
- apply eq_reflexive_unfolded.
-
- intros.
- simpl in |- *. 
- red in |- *.
- discriminate.
-
- intros.
- simpl in |- *.
- red in |- *.
- discriminate.
-
- case n.
- 
- intros.
- simpl in |- *.
- red in |- *.
- discriminate.
-
- intros.
- simpl in |- *.
- intro.
- cut (Not (zring (R:=R1) (BinInt.Zpos p0) [#] zring (R:=R1) (BinInt.Zpos p))).
- intro H1.
- elim H1.
- assumption.
- apply eq_imp_not_ap.
- rewrite H. 
- apply eq_reflexive_unfolded.
-
- intros.
- simpl in |- *.
- red in |- *.
- discriminate.
-
- case n.
- 
- intros.
- simpl in |- *.
- red in |- *.
- discriminate.
-
- intros.
- simpl in |- *.
- red in |- *. 
- discriminate.
- 
+   intros.
+   simpl in |- *.
+   red in |- *.
+   discriminate.
+  intros.
+  simpl in |- *.
+  red in |- *.
+  discriminate.
  intros.
  simpl in |- *.
  intro.
  cut (Not (zring (R:=R1) (Zneg p0) [#] zring (R:=R1) (Zneg p))).
- intro H1.
- elim H1.
- assumption.
+  intro H1.
+  elim H1.
+  assumption.
  apply eq_imp_not_ap.
  rewrite H.
  apply eq_reflexive_unfolded.
 Qed.
- 
+
 Lemma zring_wd : forall m n : Z_as_CRing,
  (m [=] n) -> zring (R:=R1) m [=] zring (R:=R1) n.
 Proof.
@@ -292,95 +280,85 @@ Lemma zring_less : forall m n : Z_as_CRing,
 Proof.
  intros m n.
  case m.
+   case n.
+     intro.
+     apply False_rect.
+     generalize H.
+     change (~ (0 < 0)%Z) in |- *.
+     apply Zlt_irrefl.
+    intros.
+    simpl in |- *.
+    astepl (nring (R:=R1) 0).
+    astepr (nring (R:=R1) (nat_of_P p)).
+    apply nring_less.
+    case (ZL4' p).
+    intro a.
+    intro H0.
+    rewrite H0.
+    apply lt_O_Sn.
+   intros.
+   apply False_rect.
+   generalize H.
+   change (~ (0 < Zneg p)%Z) in |- *.
+   apply Zlt_asym.
+   constructor.
+  case n.
+    intros.
+    apply False_rect.
+    generalize H.
+    change (~ (BinInt.Zpos p < 0)%Z) in |- *.
+    apply Zlt_asym.
+    constructor.
+   intros p1 p2.
+   intro.
+   simpl in |- *.
+   astepl (nring (R:=R1) (nat_of_P p2)).
+   astepr (nring (R:=R1) (nat_of_P p1)).
+   apply nring_less.
+   apply nat_of_P_lt_Lt_compare_morphism.
+   red in H.
+   simpl in H.
+   assumption.
+  intros p1 p2.
+  intro.
+  apply False_rect.
+  generalize H.
+  change (~ (BinInt.Zpos p2 < Zneg p1)%Z) in |- *.
+  apply Zlt_asym.
+  constructor.
  case n.
-  
- intro.
- apply False_rect.
- generalize H.
- change (~ (0 < 0)%Z) in |- *.
- apply Zlt_irrefl.
-
- intros.
- simpl in |- *.
- astepl (nring (R:=R1) 0).
- astepr (nring (R:=R1) (nat_of_P p)).
- apply nring_less.
- case (ZL4' p).
- intro a.
- intro H0.
- rewrite H0.
- apply lt_O_Sn.
-
- intros.
- apply False_rect.
- generalize H.
- change (~ (0 < Zneg p)%Z) in |- *.
- apply Zlt_asym.
- constructor. 
-
- case n.
-
- intros.
- apply False_rect.
- generalize H.
- change (~ (BinInt.Zpos p < 0)%Z) in |- *.
- apply Zlt_asym.
- constructor.
-
+   intros.
+   simpl in |- *.
+   astepl [--](nring (R:=R1) (nat_of_P p)).
+   astepr (Zero:R1).
+   apply inv_cancel_less.
+   astepl (Zero:R1).
+   astepr (nring (R:=R1) (nat_of_P p)).
+   case (ZL4' p).
+   intro h.
+   intros H0.
+   rewrite H0.
+   apply pos_nring_S.
+  intros p1 p2.
+  intro.
+  simpl in |- *.
+  case (ZL4' p1).
+  intro h1.
+  case (ZL4' p2).
+  intro h2.
+  intros.
+  apply less_transitive_unfolded with (y := Zero:R1).
+   astepl [--](nring (R:=R1) (nat_of_P p2)).
+   apply inv_cancel_less.
+   astepl (Zero:R1).
+   astepr (nring (R:=R1) (nat_of_P p2)).
+   rewrite e.
+   apply pos_nring_S.
+  astepr (nring (R:=R1) p1).
+  rewrite e0.
+  apply pos_nring_S.
  intros p1 p2.
  intro.
- simpl in |- *.
- astepl (nring (R:=R1) (nat_of_P p2)). 
- astepr (nring (R:=R1) (nat_of_P p1)).
- apply nring_less.
- apply nat_of_P_lt_Lt_compare_morphism.
- red in H.
- simpl in H.
- assumption.
-
- intros p1 p2.
- intro.
- apply False_rect.
- generalize H.
- change (~ (BinInt.Zpos p2 < Zneg p1)%Z) in |- *.
- apply Zlt_asym.
- constructor.
-
- case n.
- intros.
- simpl in |- *.
- astepl [--](nring (R:=R1) (nat_of_P p)).
- astepr (Zero:R1).
- apply inv_cancel_less.
- astepl (Zero:R1).
- astepr (nring (R:=R1) (nat_of_P p)).
- case (ZL4' p).
- intro h.
- intros H0.
- rewrite H0.
- apply pos_nring_S.
-
- intros p1 p2.
- intro.
- simpl in |- *.
- case (ZL4' p1).
- intro h1.
- case (ZL4' p2).
- intro h2.
- intros.
- apply less_transitive_unfolded with (y := Zero:R1).
- astepl [--](nring (R:=R1) (nat_of_P p2)).
- apply inv_cancel_less.
- astepl (Zero:R1).
- astepr (nring (R:=R1) (nat_of_P p2)).
- rewrite e.
- apply pos_nring_S.
- astepr (nring (R:=R1) p1). 
- rewrite e0.
- apply pos_nring_S.
-
- intros p1 p2.
- intro. 
  simpl in |- *.
  astepl [--](nring (R:=R1) (nat_of_P p2)).
  astepr [--](nring (R:=R1) (nat_of_P p1)).
@@ -399,7 +377,7 @@ Lemma inj_Q_strext : forall q1 q2, (inj_Q q1 [#] inj_Q q2) -> q1 [#] q2.
 Proof.
  intros q1 q2.
  generalize (den_is_nonzero q1).
- generalize (den_is_nonzero q2).	
+ generalize (den_is_nonzero q2).
  case q1.
  intros n1 d1.
  case q2.
@@ -412,46 +390,43 @@ Proof.
  unfold Qeq in |- *.
  unfold Qnum in |- *.
  unfold Qden in |- *.
- 
  intro.
-
  cut (~ (inj_Q (Qmake n1 d1) [=] inj_Q (Qmake n2 d2))).
- intro.
- elim H3.
- simpl in |- *.
- apply mult_cancel_lft with (z := nring (R:=R1) d1[*]nring (R:=R1) d2).
- 
- apply mult_resp_ap_zero.
- assumption. 
- assumption.
- rstepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
- rstepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
- astepr (zring (R:=R1) (n1 * d2)).
- astepr (zring (R:=R1) n1[*]zring (R:=R1) d2).
- apply mult_wdr.
- astepl (zring (R:=R1) (Z_of_nat (nat_of_P d2))).
- rewrite inject_nat_convert.
- algebra.
- rewrite H2.
- astepl (zring (R:=R1) n2[*]zring (R:=R1) d1).
- apply mult_wdr.
- astepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
- rewrite inject_nat_convert.
- algebra.
- change (inj_Q (Qmake n1 d1)[~=]inj_Q (Qmake n2 d2)) in |- *. 
+  intro.
+  elim H3.
+  simpl in |- *.
+  apply mult_cancel_lft with (z := nring (R:=R1) d1[*]nring (R:=R1) d2).
+   apply mult_resp_ap_zero.
+    assumption.
+   assumption.
+  rstepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
+  rstepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
+  astepr (zring (R:=R1) (n1 * d2)).
+   astepr (zring (R:=R1) n1[*]zring (R:=R1) d2).
+   apply mult_wdr.
+   astepl (zring (R:=R1) (Z_of_nat (nat_of_P d2))).
+   rewrite inject_nat_convert.
+   algebra.
+  rewrite H2.
+  astepl (zring (R:=R1) n2[*]zring (R:=R1) d1).
+  apply mult_wdr.
+  astepr (zring (R:=R1) (Z_of_nat (nat_of_P d1))).
+  rewrite inject_nat_convert.
+  algebra.
+ change (inj_Q (Qmake n1 d1)[~=]inj_Q (Qmake n2 d2)) in |- *.
  apply ap_imp_neq.
  assumption.
 Qed.
 
 Lemma inj_Q_wd : forall q1 q2, (q1 [=] q2) -> inj_Q q1 [=] inj_Q q2.
 Proof.
- intros. 
+ intros.
  apply not_ap_imp_eq.
  intro.
  cut (~ (q1 [=] q2)).
- intro H1.
- apply H1.
- assumption.
+  intro H1.
+  apply H1.
+  assumption.
  change (q1[~=]q2) in |- *.
  apply ap_imp_neq.
  apply inj_Q_strext.
@@ -469,31 +444,26 @@ Proof.
  intros n2 d2.
  simpl in |- *.
  intros.
- 
  apply mult_cancel_lft with (z := nring (R:=R1) d1[*]nring (R:=R1) d2).
- apply mult_resp_ap_zero.
- assumption.
- assumption.
- 
+  apply mult_resp_ap_zero.
+   assumption.
+  assumption.
  astepr (zring (R:=R1) (n1 * d2 + n2 * d1)).
- astepr
-  (nring (R:=R1) (d1 * d2)%positive[*]
-   (zring (R:=R1) (n1 * d2 + n2 * d1)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Qmake (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
- apply mult_wdl.
- rewrite nat_of_P_mult_morphism.
- algebra.
- 
- astepr
-  (zring (R:=R1) n1[*]nring (R:=R1) d2[+]zring (R:=R1) n2[*]nring (R:=R1) d1).
- astepl (zring (R:=R1) (n1 * d2)[+]zring (R:=R1) (n2 * d1)).
- apply bin_op_wd_unfolded.
- astepr (zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat (nat_of_P d2))).
- rewrite inject_nat_convert.
- algebra.
- astepr (zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat (nat_of_P d1))).
- rewrite inject_nat_convert.
- algebra.
+  astepr (nring (R:=R1) (d1 * d2)%positive[*]
+    (zring (R:=R1) (n1 * d2 + n2 * d1)[/]nring (R:=R1) (d1 * d2)%positive[//]
+      den_is_nonzero (Qmake (n1 * d2 + n2 * d1)%Z (d1 * d2)%positive))).
+  apply mult_wdl.
+  rewrite nat_of_P_mult_morphism.
+  algebra.
+ astepr (zring (R:=R1) n1[*]nring (R:=R1) d2[+]zring (R:=R1) n2[*]nring (R:=R1) d1).
+  astepl (zring (R:=R1) (n1 * d2)[+]zring (R:=R1) (n2 * d1)).
+  apply bin_op_wd_unfolded.
+   astepr (zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat (nat_of_P d2))).
+   rewrite inject_nat_convert.
+   algebra.
+  astepr (zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat (nat_of_P d1))).
+  rewrite inject_nat_convert.
+  algebra.
  rational.
 Qed.
 
@@ -508,24 +478,19 @@ Proof.
  intros n2 d2.
  simpl in |- *.
  intros.
- 
  apply mult_cancel_lft with (z := nring (R:=R1) d1[*]nring (R:=R1) d2).
- apply mult_resp_ap_zero.
- assumption.
- trivial.
-
+  apply mult_resp_ap_zero.
+   assumption.
+  trivial.
  astepr (zring (R:=R1) (n1 * n2)).
- astepr
-  (nring (R:=R1) (d1 * d2)%positive[*]
-   (zring (R:=R1) (n1 * n2)[/]nring (R:=R1) (d1 * d2)%positive[//]
-    den_is_nonzero (Qmake (n1 * n2)%Z (d1 * d2)%positive))).
-
- apply mult_wdl.
- rewrite nat_of_P_mult_morphism.
- algebra.
-
+  astepr (nring (R:=R1) (d1 * d2)%positive[*]
+    (zring (R:=R1) (n1 * n2)[/]nring (R:=R1) (d1 * d2)%positive[//]
+      den_is_nonzero (Qmake (n1 * n2)%Z (d1 * d2)%positive))).
+  apply mult_wdl.
+  rewrite nat_of_P_mult_morphism.
+  algebra.
  astepr (zring (R:=R1) n1[*]zring (R:=R1) n2).
- apply zring_mult.
+  apply zring_mult.
  rational.
 Qed.
 
@@ -541,30 +506,28 @@ Proof.
  unfold Qlt in H.
  simpl in H.
  simpl in |- *.
-
  apply mult_cancel_less with (z := nring (R:=R1) d1[*]nring (R:=R1) d2).
- apply mult_resp_pos.
- elim (ZL4' d1); intros.
- rewrite p.
- apply pos_nring_S.
- elim (ZL4' d2); intros.
- rewrite p.
- apply pos_nring_S. 
-
+  apply mult_resp_pos.
+   elim (ZL4' d1); intros.
+   rewrite p.
+   apply pos_nring_S.
+  elim (ZL4' d2); intros.
+  rewrite p.
+  apply pos_nring_S.
  rstepl (zring (R:=R1) n1[*]nring (R:=R1) d2).
  rstepr (zring (R:=R1) n2[*]nring (R:=R1) d1).
  apply less_wdl with (x := zring (R:=R1) n1[*]zring (R:=R1) (Z_of_nat d2)).
- apply less_wdr with (y := zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat d1)).
- apply less_wdl with (x := zring (R:=R1) (n1 * d2)).
- apply less_wdr with (y := zring (R:=R1) (n2 * d1)).
- apply zring_less.
- apply CZlt_to.
- assumption.
- rewrite inject_nat_convert.
- apply zring_mult.
- rewrite inject_nat_convert.
- apply zring_mult.
- algebra.
+  apply less_wdr with (y := zring (R:=R1) n2[*]zring (R:=R1) (Z_of_nat d1)).
+   apply less_wdl with (x := zring (R:=R1) (n1 * d2)).
+    apply less_wdr with (y := zring (R:=R1) (n2 * d1)).
+     apply zring_less.
+     apply CZlt_to.
+     assumption.
+    rewrite inject_nat_convert.
+    apply zring_mult.
+   rewrite inject_nat_convert.
+   apply zring_mult.
+  algebra.
  algebra.
 Qed.
 
@@ -572,18 +535,18 @@ Lemma less_inj_Q : forall q1 q2, (inj_Q q1 [<] inj_Q q2) -> q1 [<] q2.
 Proof.
  intros.
  cut (q1 [#] q2).
- intro H0.
- case (ap_imp_less _ q1 q2 H0).
- intro.
- assumption.
- intro.
- elimtype False.
- cut (inj_Q q2 [<] inj_Q q1).
- change (Not (inj_Q q2 [<] inj_Q q1)) in |- *.
- apply less_antisymmetric_unfolded.
- assumption.
- apply inj_Q_less.
- assumption.
+  intro H0.
+  case (ap_imp_less _ q1 q2 H0).
+   intro.
+   assumption.
+  intro.
+  elimtype False.
+  cut (inj_Q q2 [<] inj_Q q1).
+   change (Not (inj_Q q2 [<] inj_Q q1)) in |- *.
+   apply less_antisymmetric_unfolded.
+   assumption.
+  apply inj_Q_less.
+  assumption.
  apply inj_Q_strext.
  apply less_imp_ap.
  assumption.
@@ -591,26 +554,26 @@ Qed.
 
 Lemma inj_Q_ap : forall q1 q2, (q1 [#] q2) -> inj_Q q1 [#] inj_Q q2.
 Proof.
-intros q1 q2 H.
-destruct (ap_imp_less _ _ _ H);
- [apply less_imp_ap|apply Greater_imp_ap];
- apply inj_Q_less; assumption.
+ intros q1 q2 H.
+ destruct (ap_imp_less _ _ _ H); [apply less_imp_ap|apply Greater_imp_ap];
+   apply inj_Q_less; assumption.
 Qed.
 
 Lemma leEq_inj_Q : forall q1 q2, (inj_Q q1 [<=] inj_Q q2) -> q1 [<=] q2.
-intros.
-rewrite leEq_def; intro.
-apply less_irreflexive_unfolded with (x := inj_Q q2).
-eapply less_leEq_trans.
-2: apply H.
-apply inj_Q_less.
-auto.
+Proof.
+ intros.
+ rewrite leEq_def; intro.
+ apply less_irreflexive_unfolded with (x := inj_Q q2).
+ eapply less_leEq_trans.
+  2: apply H.
+ apply inj_Q_less.
+ auto.
 Qed.
 
 Lemma inj_Q_leEq : forall q1 q2, (q1 [<=] q2) -> inj_Q q1 [<=] inj_Q q2.
 Proof.
  intros.
- rewrite leEq_def; intro. 
+ rewrite leEq_def; intro.
  rewrite -> leEq_def in H; apply H.
  apply less_inj_Q.
  assumption.
@@ -621,28 +584,28 @@ Proof.
  intro.
  apply cg_cancel_lft with (x := inj_Q q1).
  astepr (inj_Q (q1[+][--]q1)).
- apply eq_symmetric_unfolded.
- apply inj_Q_plus.
+  apply eq_symmetric_unfolded.
+  apply inj_Q_plus.
  astepr (inj_Q Zero).
- apply inj_Q_wd.
- algebra.
+  apply inj_Q_wd.
+  algebra.
  simpl in |- *.
  rstepl (Zero:R1).
  algebra.
 Qed.
 
-Lemma inj_Q_minus : forall q1 q2, inj_Q (q1[-]q2) [=] inj_Q q1[-]inj_Q q2. 
+Lemma inj_Q_minus : forall q1 q2, inj_Q (q1[-]q2) [=] inj_Q q1[-]inj_Q q2.
 Proof.
  intros.
  astepl (inj_Q (q1[+][--]q2)).
  astepr (inj_Q q1[+]inj_Q [--]q2).
- apply inj_Q_plus.
+  apply inj_Q_plus.
  astepr (inj_Q q1[+][--](inj_Q q2)).
  apply plus_resp_eq.
  apply inj_Q_inv.
 Qed.
 
-Lemma inj_Q_div : forall q1 q2 H, inj_Q (q1/q2)%Q [=] (inj_Q q1[/]inj_Q q2[//]H). 
+Lemma inj_Q_div : forall q1 q2 H, inj_Q (q1/q2)%Q [=] (inj_Q q1[/]inj_Q q2[//]H).
 Proof.
  intros.
  apply mult_cancel_rht with (inj_Q q2);[apply H|].
@@ -654,7 +617,7 @@ Proof.
  field.
  apply inj_Q_strext.
  stepr (Zero:R1).
- apply H.
+  apply H.
  rstepl (inj_Q q1[-]inj_Q q1).
  apply eq_symmetric.
  eapply eq_transitive;[|apply inj_Q_minus].
@@ -677,13 +640,13 @@ Proof.
  elim H.
  intros.
  split.
- astepl (inj_Q [--]q1).
- apply inj_Q_leEq.
- assumption.
+  astepl (inj_Q [--]q1).
+  apply inj_Q_leEq.
+  assumption.
  apply inj_Q_leEq.
  assumption.
 Qed.
- 
+
 Lemma AbsSmall_inj_Q : forall q e,
  AbsSmall (inj_Q e) (inj_Q q) -> AbsSmall e q.
 Proof.
@@ -691,12 +654,12 @@ Proof.
  elim H.
  intros.
  split.
+  apply leEq_inj_Q.
+  apply leEq_wdl with (x := [--](inj_Q e)).
+   assumption.
+  apply eq_symmetric_unfolded.
+  apply inj_Q_inv.
  apply leEq_inj_Q.
- apply leEq_wdl with (x := [--](inj_Q e)).
- assumption.
- apply eq_symmetric_unfolded.
- apply inj_Q_inv.
- apply leEq_inj_Q. 
  assumption.
 Qed.
 
@@ -716,53 +679,45 @@ Proof.
  simpl in |- *.
  red in |- *.
  intros e H.
-
  cut {n : nat | (One[/]e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
- intro H0.
- case H0.
- intros N1 H1.
- unfold Cauchy_prop in pg.
- cut
-  {N : nat |
-  forall m : nat,
-  N <= m ->
-  AbsSmall (R:=Q_as_COrdField) (Qmake 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
- intro H2.
- case H2.
- intro N.
- intro.
- exists N.
- intros.
- apply AbsSmall_leEq_trans with (e1 := inj_Q (Qmake 1%Z (P_of_succ_nat N1))).
- apply less_leEq.
- apply
-  mult_cancel_less
-   with (z := nring (R:=R1) (S N1)[*](One[/]e[//]Greater_imp_ap _ e Zero H)).
- apply mult_resp_pos.
- apply pos_nring_S.
- apply div_resp_pos.
- assumption.
- apply pos_one.
- unfold inj_Q in |- *.
- rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N1.
- rstepl (One[/]e[//]Greater_imp_ap _ e Zero H).
- rstepr (nring (R:=R1) (P_of_succ_nat N1)).
- apply less_transitive_unfolded with (y := nring (R:=R1) N1).
- assumption.
- apply nring_less.
- rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
- apply lt_n_Sn.
- astepr (inj_Q (g_ m[-]g_ N)).
- apply inj_Q_AbsSmall.
- apply a.
- assumption.
-
- apply pg.
- simpl in |- *.
- red in |- *. 
- simpl in |- *.
- constructor.
- 
+  intro H0.
+  case H0.
+  intros N1 H1.
+  unfold Cauchy_prop in pg.
+  cut {N : nat | forall m : nat, N <= m ->
+    AbsSmall (R:=Q_as_COrdField) (Qmake 1%Z (P_of_succ_nat N1)) (g_ m[-]g_ N)}.
+   intro H2.
+   case H2.
+   intro N.
+   intro.
+   exists N.
+   intros.
+   apply AbsSmall_leEq_trans with (e1 := inj_Q (Qmake 1%Z (P_of_succ_nat N1))).
+    apply less_leEq.
+    apply mult_cancel_less with (z := nring (R:=R1) (S N1)[*](One[/]e[//]Greater_imp_ap _ e Zero H)).
+     apply mult_resp_pos.
+      apply pos_nring_S.
+     apply div_resp_pos.
+      assumption.
+     apply pos_one.
+    unfold inj_Q in |- *.
+    rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N1.
+    rstepl (One[/]e[//]Greater_imp_ap _ e Zero H).
+    rstepr (nring (R:=R1) (P_of_succ_nat N1)).
+    apply less_transitive_unfolded with (y := nring (R:=R1) N1).
+     assumption.
+    apply nring_less.
+    rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
+    apply lt_n_Sn.
+   astepr (inj_Q (g_ m[-]g_ N)).
+   apply inj_Q_AbsSmall.
+   apply a.
+   assumption.
+  apply pg.
+  simpl in |- *.
+  red in |- *.
+  simpl in |- *.
+  constructor.
  apply Archimedes'.
 Qed.
 
@@ -775,116 +730,118 @@ Proof.
  intro.
  simpl in |- *.
  induction  n as [| n Hrecn].
- simpl in |- *.
- rational.
+  simpl in |- *.
+  rational.
  change (inj_Q (nring n[+]One) [=] nring (R:=R1) n[+]One) in |- *.
  astepr (inj_Q (nring n)[+]inj_Q One).
- apply inj_Q_plus.
+  apply inj_Q_plus.
  apply bin_op_wd_unfolded.
- assumption.
+  assumption.
  simpl in |- *.
  unfold pring in |- *; simpl in |- *.
  rational.
 Qed.
 
 Lemma inj_Q_pring : forall n, inj_Q (pring _ n) [=] pring R1 n.
-intros n.
-change (inj_Q (zring n)[=]zring n).
-stepr (inj_Q (nring n)).
- apply inj_Q_wd.
+Proof.
+ intros n.
+ change (inj_Q (zring n)[=]zring n).
+ stepr (inj_Q (nring n)).
+  apply inj_Q_wd.
+  rewrite <- inject_nat_convert.
+  apply zring_plus_nat.
+ stepr (nring n:R1).
+  apply inj_Q_nring.
+ apply eq_symmetric.
  rewrite <- inject_nat_convert.
  apply zring_plus_nat.
-stepr (nring n:R1).
- apply inj_Q_nring.
-apply eq_symmetric.
-rewrite <- inject_nat_convert.
-apply zring_plus_nat.
 Qed.
 
 Lemma inj_Q_zring : forall n, inj_Q (zring n) [=] zring (R:=R1) n.
 Proof.
-intros [|n|n].
+ intros [|n|n].
+   simpl.
+   rational.
   simpl.
-  rational.
- simpl.
- apply inj_Q_pring.
-change (inj_Q ([--](pring _ n))[=][--](pring _ n)).
-stepl ([--](inj_Q (zring (R:=Q_as_COrdField) n))).
- apply un_op_wd_unfolded.
- simpl.
- apply inj_Q_pring. 
-apply eq_symmetric.
-apply inj_Q_inv.
+  apply inj_Q_pring.
+ change (inj_Q ([--](pring _ n))[=][--](pring _ n)).
+ stepl ([--](inj_Q (zring (R:=Q_as_COrdField) n))).
+  apply un_op_wd_unfolded.
+  simpl.
+  apply inj_Q_pring.
+ apply eq_symmetric.
+ apply inj_Q_inv.
 Qed.
 
 Lemma inj_Q_One : inj_Q One [=] One.
 Proof.
-rstepr ((nring 1):R1).
-apply (inj_Q_nring 1).
+ rstepr ((nring 1):R1).
+ apply (inj_Q_nring 1).
 Qed.
 
 Lemma inj_Q_Zero : inj_Q Zero [=] Zero.
 Proof.
-rstepr ((nring 0):R1).
-apply (inj_Q_nring 0).
+ rstepr ((nring 0):R1).
+ apply (inj_Q_nring 0).
 Qed.
 
 Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring inj_Q_One inj_Q_Zero : algebra.
 
 Definition inj_Q_hom : RingHom Q_as_CRing R1.
-exists (Build_CSetoid_fun _ _ _ inj_Q_strext).
-  refine inj_Q_plus.
- refine inj_Q_mult.
-refine inj_Q_One.
+Proof.
+ exists (Build_CSetoid_fun _ _ _ inj_Q_strext).
+   refine inj_Q_plus.
+  refine inj_Q_mult.
+ refine inj_Q_One.
 Defined.
 
-Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n). 
+Lemma inj_Q_power : forall q1 (n:nat), inj_Q (q1^n)%Q [=] (inj_Q q1[^]n).
 Proof.
-intros q.
-induction n.
- apply inj_Q_One.
-rewrite inj_S.
-unfold Zsucc.
-stepr (inj_Q (q^n*q)%Q).
- apply inj_Q_wd.
+ intros q.
+ induction n.
+  apply inj_Q_One.
+ rewrite inj_S.
+ unfold Zsucc.
+ stepr (inj_Q (q^n*q)%Q).
+  apply inj_Q_wd.
+  simpl.
+  apply Qpower_plus'.
+  auto with *.
+ stepr (inj_Q (q^n)%Q[*]inj_Q q).
+  apply inj_Q_mult.
  simpl.
- apply Qpower_plus'.
- auto with *.
-stepr (inj_Q (q^n)%Q[*]inj_Q q).
- apply inj_Q_mult.
-simpl.
-apply mult_wdl.
-assumption.
+ apply mult_wdl.
+ assumption.
 Qed.
 
-Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^]n. 
+Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^]n.
 Proof.
-intros q [|n|n] H.
-  change (inj_Q (q ^ 0)%Q[=]One).
-  apply inj_Q_One.
- simpl.
- change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
- csetoid_rewrite_rev (inj_Q_power q n).
- rewrite inject_nat_convert.
- apply eq_reflexive.
-change ((inj_Q (/q ^ n))%Q[=](One[/]inj_Q q[//]H)[^]n).
-stepl (inj_Q ((1/q)^n)%Q).
- stepr ((inj_Q (1/q)%Q)[^]n).
-  csetoid_rewrite_rev (inj_Q_power (1/q)%Q n).
+ intros q [|n|n] H.
+   change (inj_Q (q ^ 0)%Q[=]One).
+   apply inj_Q_One.
+  simpl.
+  change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
+  csetoid_rewrite_rev (inj_Q_power q n).
   rewrite inject_nat_convert.
   apply eq_reflexive.
- apply nexp_wd.
- stepr (inj_Q 1%Q[/]_[//]H).
-  apply inj_Q_div.
- apply div_wd.
-  rstepr (nring 1:R1).
-  apply (inj_Q_nring 1).
- apply eq_reflexive.
-apply inj_Q_wd.
-change (((1 * / q) ^ n)%Q==(/ q ^ n))%Q.
-rewrite <- Qinv_power.
-rewrite Qmult_1_l.
-reflexivity.
+ change ((inj_Q (/q ^ n))%Q[=](One[/]inj_Q q[//]H)[^]n).
+ stepl (inj_Q ((1/q)^n)%Q).
+  stepr ((inj_Q (1/q)%Q)[^]n).
+   csetoid_rewrite_rev (inj_Q_power (1/q)%Q n).
+   rewrite inject_nat_convert.
+   apply eq_reflexive.
+  apply nexp_wd.
+  stepr (inj_Q 1%Q[/]_[//]H).
+   apply inj_Q_div.
+  apply div_wd.
+   rstepr (nring 1:R1).
+   apply (inj_Q_nring 1).
+  apply eq_reflexive.
+ apply inj_Q_wd.
+ change (((1 * / q) ^ n)%Q==(/ q ^ n))%Q.
+ rewrite <- Qinv_power.
+ rewrite Qmult_1_l.
+ reflexivity.
 Qed.
 
 Hint Resolve inj_Q_power inj_Q_power_Z : algebra.
@@ -906,30 +863,28 @@ Theorem start_of_sequence : forall x : R1,
 Proof.
  intros.
  cut {n : nat | x [<] nring (R:=R1) n}.
- intro H.
- cut {n : nat | [--]x [<] nring (R:=R1) n}.
- intro H0.
- case H.
- intro n2.
- intro.
- case H0.
- intro n1.
- intro.
- exists (Qmake (- n1) 1).
- exists (Qmake n2 1).
-  simpl in |- *.
-  rstepl (zring (R:=R1) (- Z_of_nat n1)).
-  astepl [--](nring (R:=R1) n1).
-  apply inv_cancel_less.
-  astepr (nring (R:=R1) n1).
-  assumption.
-
-  simpl in |- *.
-  rstepr (zring (R:=R1) (Z_of_nat n2)).
-  astepr (nring (R:=R1) n2).
-  assumption.
-
- apply Archimedes'.
+  intro H.
+  cut {n : nat | [--]x [<] nring (R:=R1) n}.
+   intro H0.
+   case H.
+   intro n2.
+   intro.
+   case H0.
+   intro n1.
+   intro.
+   exists (Qmake (- n1) 1).
+   exists (Qmake n2 1).
+    simpl in |- *.
+    rstepl (zring (R:=R1) (- Z_of_nat n1)).
+    astepl [--](nring (R:=R1) n1).
+    apply inv_cancel_less.
+    astepr (nring (R:=R1) n1).
+    assumption.
+   simpl in |- *.
+   rstepr (zring (R:=R1) (Z_of_nat n2)).
+   astepr (nring (R:=R1) n2).
+   assumption.
+  apply Archimedes'.
  apply Archimedes'.
 Qed.
 
@@ -943,40 +898,34 @@ Lemma Q_dense_in_CReals : forall e : R1,
 Proof.
  intros e H.
  cut {n : nat | (One[/] e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
- intro H0.
- case H0.
- intro N.
- intros.
- exists (Qmake 1 (P_of_succ_nat N)).
-  simpl in |- *.
-  unfold pring in |- *; simpl in |- *.
-  apply mult_cancel_less with (z := nring (R:=R1) N[+]One).
-  change (Zero [<] nring (R:=R1) (S N)) in |- *.
-  apply pos_nring_S.
-  astepl (Zero:R1).
-  astepr
-   ((Zero[+]One[-]Zero[/] nring (P_of_succ_nat N)[//]
-     den_is_nonzero (Qmake 1%positive (P_of_succ_nat N)))[*]
-    nring (S N)).
-
-  rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N.
-
-  rstepr (One:R1).
-  apply pos_one.
-  
-  apply bin_op_wd_unfolded.
-  rational.
-  algebra.
-
+  intro H0.
+  case H0.
+  intro N.
+  intros.
+  exists (Qmake 1 (P_of_succ_nat N)).
+   simpl in |- *.
+   unfold pring in |- *; simpl in |- *.
+   apply mult_cancel_less with (z := nring (R:=R1) N[+]One).
+    change (Zero [<] nring (R:=R1) (S N)) in |- *.
+    apply pos_nring_S.
+   astepl (Zero:R1).
+   astepr ((Zero[+]One[-]Zero[/] nring (P_of_succ_nat N)[//]
+     den_is_nonzero (Qmake 1%positive (P_of_succ_nat N)))[*] nring (S N)).
+    rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N.
+    rstepr (One:R1).
+    apply pos_one.
+   apply bin_op_wd_unfolded.
+    rational.
+   algebra.
   simpl in |- *.
   apply swap_div with (z_ := Greater_imp_ap _ e Zero H).
-  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
-  apply pos_nring_S.
-  assumption.
+    rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
+    apply pos_nring_S.
+   assumption.
   unfold pring in |- *; simpl in |- *.
   rstepl (One[/] e[//]Greater_imp_ap _ e Zero H).
   apply less_transitive_unfolded with (y := nring (R:=R1) N).
-  assumption.
+   assumption.
   rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
   apply nring_less_succ.
  apply Archimedes'.
@@ -985,61 +934,58 @@ Qed.
 Lemma Q_dense_in_CReals' : forall a b : R1,
  a [<] b -> {q : Q_as_COrdField | a [<] inj_Q q | inj_Q q [<] b}.
 Proof.
-cut (forall a b : R1, Zero[<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
-intros H a b Hab.
-destruct (less_cotransitive_unfolded _ _ _ Hab Zero);[|apply H;assumption].
-assert (X:Zero[<][--]a).
- rstepl ([--]Zero:R1).
- apply inv_resp_less.
- assumption.
-assert (Y:=inv_resp_less _ _ _ Hab).
- destruct (H _ _ X Y) as [q Hqa Hqb].
-exists (-q)%Q.
- stepr ([--](inj_Q q)).
- apply inv_cancel_less.
-  stepl (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
- apply eq_symmetric; apply inj_Q_inv. 
-stepl ([--](inj_Q q)).
-apply inv_cancel_less.
- stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
-apply eq_symmetric; apply inj_Q_inv.
-
-cut  (forall a b : R1,
-Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
-intros H a b Hb Hab.
-destruct (Q_dense_in_CReals _ (shift_zero_less_minus _ _ _ Hab)) as [q Haq Hbq].
-assert (X0 := pos_ap_zero _ _ Haq).
-assert (X1 : Zero[<](b[/]inj_Q q[//]X0)).
- apply div_resp_pos; assumption.
-assert (X2 : (a[/]inj_Q q[//]X0)[+]One[<](b[/]inj_Q q[//]X0)).
- apply shift_plus_less'.
- rstepr ((b[-]a)[/]inj_Q q[//]X0).
- apply shift_less_div.
-  assumption.
- rstepl (inj_Q q).
- assumption.
-destruct (H _ _ X1 X2) as [r Hra Hrb].
-exists ((nring r)[*]q)%Q; csetoid_rewrite (inj_Q_mult (nring r) q).
- eapply shift_less_mult.
-  assumption.
- stepr (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
- apply Hra.
-eapply shift_mult_less.
- assumption.
-stepl (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
-apply Hrb.
-
-intros a b Hb Hab.
-destruct (Archimedes' a) as [n Hn].
-induction n.
- exists 0; try assumption.
-destruct (less_cotransitive_unfolded _ _ _ Hab (nring (R:=R1) (S n))).
- apply IHn.
- apply plus_cancel_less with One.
- apply c.
-exists (S n); assumption.
+ cut (forall a b : R1, Zero[<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
+  intros H a b Hab.
+  destruct (less_cotransitive_unfolded _ _ _ Hab Zero);[|apply H;assumption].
+  assert (X:Zero[<][--]a).
+   rstepl ([--]Zero:R1).
+   apply inv_resp_less.
+   assumption.
+  assert (Y:=inv_resp_less _ _ _ Hab).
+  destruct (H _ _ X Y) as [q Hqa Hqb].
+  exists (-q)%Q.
+   stepr ([--](inj_Q q)).
+    apply inv_cancel_less.
+    stepl (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+   apply eq_symmetric; apply inj_Q_inv.
+  stepl ([--](inj_Q q)).
+   apply inv_cancel_less.
+   stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
+  apply eq_symmetric; apply inj_Q_inv.
+ cut  (forall a b : R1, Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
+  intros H a b Hb Hab.
+  destruct (Q_dense_in_CReals _ (shift_zero_less_minus _ _ _ Hab)) as [q Haq Hbq].
+  assert (X0 := pos_ap_zero _ _ Haq).
+  assert (X1 : Zero[<](b[/]inj_Q q[//]X0)).
+   apply div_resp_pos; assumption.
+  assert (X2 : (a[/]inj_Q q[//]X0)[+]One[<](b[/]inj_Q q[//]X0)).
+   apply shift_plus_less'.
+   rstepr ((b[-]a)[/]inj_Q q[//]X0).
+   apply shift_less_div.
+    assumption.
+   rstepl (inj_Q q).
+   assumption.
+  destruct (H _ _ X1 X2) as [r Hra Hrb].
+  exists ((nring r)[*]q)%Q; csetoid_rewrite (inj_Q_mult (nring r) q).
+   eapply shift_less_mult.
+    assumption.
+   stepr (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+   apply Hra.
+  eapply shift_mult_less.
+   assumption.
+  stepl (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
+  apply Hrb.
+ intros a b Hb Hab.
+ destruct (Archimedes' a) as [n Hn].
+ induction n.
+  exists 0; try assumption.
+ destruct (less_cotransitive_unfolded _ _ _ Hab (nring (R:=R1) (S n))).
+  apply IHn.
+  apply plus_cancel_less with One.
+  apply c.
+ exists (S n); assumption.
 Qed.
- 
+
 End Rational_sequence_prelogue.
 
 Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.

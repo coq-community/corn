@@ -34,7 +34,7 @@ Definition CR_epsilon_sign_dec (e:Qpos) (x:CR) : comparison :=
 let z := (approximate x e) in
  match (Qle_total z (2*e)) with
  | right p => Gt
- | left _ => 
+ | left _ =>
   match (Qle_total (-(2)*e) z) with
   | right p => Lt
   | left _ => Eq
@@ -43,16 +43,13 @@ let z := (approximate x e) in
 
 (** This helper lemma reduces a CRpos problem to a sigma type with
 a simple equality proposition. *)
-Lemma CR_epsilon_sign_dec_pos : forall x, 
+Lemma CR_epsilon_sign_dec_pos : forall x,
 {e:Qpos | CR_epsilon_sign_dec e x = Gt} -> CRpos x.
 Proof.
-intros x [e H].
-apply (@CRpos_char e).
-abstract (
-unfold CR_epsilon_sign_dec in H;
-destruct (Qle_total (approximate x e) (2 * e)) as [A|A];
- [destruct (Qle_total (- (2) * e) (approximate x e)) as [B|B]; discriminate H|];
-assumption).
+ intros x [e H].
+ apply (@CRpos_char e).
+ abstract ( unfold CR_epsilon_sign_dec in H; destruct (Qle_total (approximate x e) (2 * e)) as [A|A];
+   [destruct (Qle_total (- (2) * e) (approximate x e)) as [B|B]; discriminate H|]; assumption).
 Defined.
 
 (** Automatically solve the goal [{e:Qpos | CR_epsilon_sign_dec e x = Gt}]
@@ -61,7 +58,7 @@ the problem is solved.  (This tactic may not terminate.) *)
 Ltac CR_solve_pos_loop e :=
  (exists e;
   vm_compute;
-  match goal with 
+  match goal with
   | |- Gt = Gt => reflexivity
   | |- Lt = Gt => fail 2 "CR number is negative"
   end)
@@ -71,10 +68,10 @@ Ltac CR_solve_pos_loop e :=
 It tries to clear the context to make sure that e is a closed term.
 Then it applies the helper lemma and runs [CR_solve_pos_loop]. *)
 Ltac CR_solve_pos e :=
- repeat (match goal with 
+ repeat (match goal with
  | H:_ |-_  => clear H
  end);
- match goal with 
+ match goal with
  | H:_ |-_  => fail 1 "Context cannot be cleared"
  | |-_ => idtac
  end;
@@ -84,11 +81,11 @@ Ltac CR_solve_pos e :=
 (** This tactic is used to transform an inequality over IR into an
 problem bout CRpos over CR.  Some fancy work needs to be done because
 autorewrite will not in CRpos, because it is in Type and not Prop. *)
-Ltac IR_dec_precompute := 
+Ltac IR_dec_precompute :=
  try apply less_leEq;
  apply CR_less_as_IR;
  unfold CRlt;
- match goal with 
+ match goal with
  | |- CRpos ?X => let X0 := fresh "IR_dec" in
                   set (X0:=X);
                   let XH := fresh "IR_dec" in

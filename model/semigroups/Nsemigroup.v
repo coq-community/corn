@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export Nsetoid.
 Require Import CSemiGroups.
@@ -49,11 +49,12 @@ Definition nat_as_CSemiGroup := Build_CSemiGroup _ plus_is_bin_fun plus_is_assoc
 Canonical Structure nat_as_CSemiGroup.
 
 Lemma Nmult_is_CSemiGroup : is_CSemiGroup nat_as_CSetoid mult_as_bin_fun.
-unfold is_CSemiGroup in |- *.
-unfold associative in |- *.
-unfold mult_as_bin_fun in |- *.
-simpl in |- *.
-auto with arith.
+Proof.
+ unfold is_CSemiGroup in |- *.
+ unfold associative in |- *.
+ unfold mult_as_bin_fun in |- *.
+ simpl in |- *.
+ auto with arith.
 Qed.
 
 Definition Nmult_as_CSemiGroup := Build_CSemiGroup

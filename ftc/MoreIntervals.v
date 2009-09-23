@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export NthDerivative.
 
@@ -199,31 +199,33 @@ Definition compact_ (I : interval) : CProp :=
 (** Finite intervals have a left end and a right end. *)
 
 Definition left_end (I : interval) : finite I -> IR.
-intro.
-destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-apply c.
-apply c.
-apply c.
-apply c.
+Proof.
+ intro.
+ destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
+         inversion H.
+        inversion H.
+       inversion H.
+      inversion H.
+     inversion H.
+    apply c.
+   apply c.
+  apply c.
+ apply c.
 Defined.
 
 Definition right_end (I : interval) : finite I -> IR.
-intro.
-destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-apply c0.
-apply c0.
-apply c0.
-apply c0.
+Proof.
+ intro.
+ destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; rename X into H.
+         inversion H.
+        inversion H.
+       inversion H.
+      inversion H.
+     inversion H.
+    apply c0.
+   apply c0.
+  apply c0.
+ apply c0.
 Defined.
 
 (**
@@ -231,44 +233,46 @@ Some trivia: compact intervals are finite; proper intervals are nonvoid; an inte
 *)
 
 Lemma compact_finite : forall I : interval, compact_ I -> finite I.
-intros; induction  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *;
- auto.
+ intros; induction  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; auto.
 Qed.
 
 Lemma proper_nonvoid : forall I : interval, proper I -> nonvoid I.
-intro.
-elim I; simpl in |- *; intros; auto.
-apply less_leEq; auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; auto.
+ apply less_leEq; auto.
 Qed.
 
 Lemma nonvoid_point : forall I : interval, nonvoid I -> {x : IR | I x}.
-intro.
-destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try rename X into H.
-exists ZeroR; auto.
-exists (c[+]One); apply less_plusOne.
-exists (c[-]One); apply shift_minus_less; apply less_plusOne.
-exists c; apply leEq_reflexive.
-exists c; apply leEq_reflexive.
-exists (c[+] (c0[-]c) [/]TwoNZ); split.
-astepl (c[+]Zero); apply plus_resp_less_lft.
-apply div_resp_pos.
-apply pos_two.
-apply shift_less_minus; astepl c; auto.
-rstepr (c[+] (c0[-]c)).
-apply plus_resp_less_lft.
-apply pos_div_two'.
-apply shift_less_minus; astepl c; auto.
-exists c0; split; auto; apply leEq_reflexive.
-exists c; split; auto; apply leEq_reflexive.
-exists c; split; [ apply leEq_reflexive | auto ].
+Proof.
+ intro.
+ destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try rename X into H.
+         exists ZeroR; auto.
+        exists (c[+]One); apply less_plusOne.
+       exists (c[-]One); apply shift_minus_less; apply less_plusOne.
+      exists c; apply leEq_reflexive.
+     exists c; apply leEq_reflexive.
+    exists (c[+] (c0[-]c) [/]TwoNZ); split.
+     astepl (c[+]Zero); apply plus_resp_less_lft.
+     apply div_resp_pos.
+      apply pos_two.
+     apply shift_less_minus; astepl c; auto.
+    rstepr (c[+] (c0[-]c)).
+    apply plus_resp_less_lft.
+    apply pos_div_two'.
+    apply shift_less_minus; astepl c; auto.
+   exists c0; split; auto; apply leEq_reflexive.
+  exists c; split; auto; apply leEq_reflexive.
+ exists c; split; [ apply leEq_reflexive | auto ].
 Qed.
 
 Lemma nonvoid_char : forall (I : interval) (x : IR), I x -> nonvoid I.
-intro; induction I; simpl in |- *; intros x H; auto; inversion_clear H.
-apply less_transitive_unfolded with x; auto.
-apply less_leEq_trans with x; auto.
-apply leEq_less_trans with x; auto.
-apply leEq_transitive with x; auto.
+Proof.
+ intro; induction I; simpl in |- *; intros x H; auto; inversion_clear H.
+    apply less_transitive_unfolded with x; auto.
+   apply less_leEq_trans with x; auto.
+  apply leEq_less_trans with x; auto.
+ apply leEq_transitive with x; auto.
 Qed.
 
 (**
@@ -284,7 +288,8 @@ to the right end.
 *)
 
 Lemma Lend_leEq_Rend : forall I cI, Lend I cI [<=] Rend I cI.
-intro; elim I; simpl in |- *; intros; try inversion cI; auto.
+Proof.
+ intro; elim I; simpl in |- *; intros; try inversion cI; auto.
 Qed.
 
 (**
@@ -293,43 +298,44 @@ Some nice characterizations of inclusion:
 
 Lemma compact_included : forall a b Hab (I : interval),
  I a -> I b -> included (compact a b Hab) I.
-induction I; red in |- *; simpl in |- *; intros X X0 x X1; 
- try inversion_clear X; try inversion_clear X0; try inversion_clear X1.
-auto.
-apply less_leEq_trans with a; auto.
-apply leEq_less_trans with b; auto.
-apply leEq_transitive with a; auto.
-apply leEq_transitive with b; auto.
-split; [ apply less_leEq_trans with a | apply leEq_less_trans with b ]; auto.
-split; [ apply less_leEq_trans with a | apply leEq_transitive with b ]; auto.
-split; [ apply leEq_transitive with a | apply leEq_less_trans with b ]; auto.
-split; [ apply leEq_transitive with a | apply leEq_transitive with b ]; auto.
+Proof.
+ induction I; red in |- *; simpl in |- *; intros X X0 x X1;
+   try inversion_clear X; try inversion_clear X0; try inversion_clear X1.
+         auto.
+        apply less_leEq_trans with a; auto.
+       apply leEq_less_trans with b; auto.
+      apply leEq_transitive with a; auto.
+     apply leEq_transitive with b; auto.
+    split; [ apply less_leEq_trans with a | apply leEq_less_trans with b ]; auto.
+   split; [ apply less_leEq_trans with a | apply leEq_transitive with b ]; auto.
+  split; [ apply leEq_transitive with a | apply leEq_less_trans with b ]; auto.
+ split; [ apply leEq_transitive with a | apply leEq_transitive with b ]; auto.
 Qed.
 
 Lemma included_interval' : forall (I : interval) x y z w, I x -> I y -> I z -> I w ->
  forall H, included (compact (Min x z) (Max y w) H) I.
-intros I x y z w; induction I; simpl in |- *; intros X X0 X1 X2 H; 
- red in |- *; intros t Ht;
- inversion_clear Ht; simpl in |- *; try inversion_clear X;
- try inversion_clear X0; try inversion_clear X1; try inversion_clear X2;
- try split.
-apply less_leEq_trans with (Min x z); try apply less_Min; auto.
-apply leEq_less_trans with (Max y w); try apply Max_less; auto.
-apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
-apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
-apply less_leEq_trans with (Min x z); try apply less_Min; auto.
-apply leEq_less_trans with (Max y w); try apply Max_less; auto.
-apply less_leEq_trans with (Min x z); try apply less_Min; auto.
-apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
-apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
-apply leEq_less_trans with (Max y w); try apply Max_less; auto.
-apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
-apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
+Proof.
+ intros I x y z w; induction I; simpl in |- *; intros X X0 X1 X2 H; red in |- *; intros t Ht;
+   inversion_clear Ht; simpl in |- *; try inversion_clear X;
+     try inversion_clear X0; try inversion_clear X1; try inversion_clear X2; try split.
+            apply less_leEq_trans with (Min x z); try apply less_Min; auto.
+           apply leEq_less_trans with (Max y w); try apply Max_less; auto.
+          apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
+         apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
+        apply less_leEq_trans with (Min x z); try apply less_Min; auto.
+       apply leEq_less_trans with (Max y w); try apply Max_less; auto.
+      apply less_leEq_trans with (Min x z); try apply less_Min; auto.
+     apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
+    apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
+   apply leEq_less_trans with (Max y w); try apply Max_less; auto.
+  apply leEq_transitive with (Min x z); try apply leEq_Min; auto.
+ apply leEq_transitive with (Max y w); try apply Max_leEq; auto.
 Qed.
 
 Lemma included_interval : forall (I : interval) x y, I x -> I y ->
  forall H, included (compact (Min x y) (Max x y) H) I.
-intros; apply included_interval'; auto.
+Proof.
+ intros; apply included_interval'; auto.
 Qed.
 
 (**
@@ -338,12 +344,13 @@ A weirder inclusion result.
 
 Lemma included3_interval : forall (I : interval) x y z Hxyz, I x -> I y -> I z ->
  included (compact (Min (Min x y) z) (Max (Max x y) z) Hxyz) I.
-intros I x y z Hxyz H H0 H1.
-apply included_interval'; auto.
-apply (included_interval I x y H H0 (Min_leEq_Max _ _)).
-apply compact_inc_lft.
-apply (included_interval I x y H H0 (Min_leEq_Max _ _)).
-apply compact_inc_rht.
+Proof.
+ intros I x y z Hxyz H H0 H1.
+ apply included_interval'; auto.
+  apply (included_interval I x y H H0 (Min_leEq_Max _ _)).
+  apply compact_inc_lft.
+ apply (included_interval I x y H H0 (Min_leEq_Max _ _)).
+ apply compact_inc_rht.
 Qed.
 
 (**
@@ -351,25 +358,26 @@ Finally, all intervals are characterized by well defined predicates.
 *)
 
 Lemma iprop_wd : forall I : interval, pred_wd _ I.
-induction I; unfold iprop in |- *; red in |- *; intros x y X X0;
- try inversion_clear X; try inversion X0.
-auto.
-astepr x; auto.
-astepl x; auto.
-astepr x; auto.
-astepl x; auto.
-split.
-astepr x; auto.
-astepl x; auto.
-split.
-astepr x; auto.
-astepl x; auto.
-split.
-astepr x; auto.
-astepl x; auto.
-split.
-astepr x; auto.
-astepl x; auto.
+Proof.
+ induction I; unfold iprop in |- *; red in |- *; intros x y X X0;
+   try inversion_clear X; try inversion X0.
+         auto.
+        astepr x; auto.
+       astepl x; auto.
+      astepr x; auto.
+     astepl x; auto.
+    split.
+     astepr x; auto.
+    astepl x; auto.
+   split.
+    astepr x; auto.
+   astepl x; auto.
+  split.
+   astepr x; auto.
+  astepl x; auto.
+ split.
+  astepr x; auto.
+ astepl x; auto.
 Qed.
 
 End Intervals.
@@ -406,19 +414,22 @@ This interval contains [x] and only (elements equal to) [x]; furthermore, for ev
 *)
 
 Lemma compact_single_prop : compact_single x.
-split; apply leEq_reflexive.
+Proof.
+ split; apply leEq_reflexive.
 Qed.
 
 Lemma compact_single_pt : forall y : IR, compact_single y -> x [=] y.
-intros y H.
-inversion_clear H; apply leEq_imp_eq; auto.
+Proof.
+ intros y H.
+ inversion_clear H; apply leEq_imp_eq; auto.
 Qed.
 
 Lemma compact_single_inc : included compact_single P.
-red in |- *; intros.
-apply wdP with x.
-auto.
-apply compact_single_pt; auto.
+Proof.
+ red in |- *; intros.
+ apply wdP with x.
+  auto.
+ apply compact_single_pt; auto.
 Qed.
 
 End Single_Compact_Interval.
@@ -441,244 +452,263 @@ Section Proper_Compact_with_One_or_Two_Points.
 
 (* begin hide *)
 Let cip1' : forall c x : IR, c [<=] x -> x[-] (x[-]c) [/]TwoNZ [<=] x.
-intros.
-astepr (x[-]Zero).
-unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
-apply inv_resp_leEq; apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl c; auto.
+Proof.
+ intros.
+ astepr (x[-]Zero).
+ unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
+ apply inv_resp_leEq; apply shift_leEq_div.
+  apply pos_two.
+ apply shift_leEq_minus; rstepl c; auto.
 Qed.
 
 Let cip1'' : forall c x : IR, c [<] x -> x[-] (x[-]c) [/]TwoNZ [<] x.
-intros.
-astepr (x[-]Zero).
-unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
-apply inv_resp_less; apply shift_less_div.
-apply pos_two.
-apply shift_less_minus; rstepl c; auto.
+Proof.
+ intros.
+ astepr (x[-]Zero).
+ unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
+ apply inv_resp_less; apply shift_less_div.
+  apply pos_two.
+ apply shift_less_minus; rstepl c; auto.
 Qed.
 
 Let cip1''' : forall c0 x : IR, x [<=] c0 -> x [<=] x[+] (c0[-]x) [/]TwoNZ.
-intros.
-astepl (x[+]Zero).
-apply plus_resp_leEq_lft.
-apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl x; auto.
+Proof.
+ intros.
+ astepl (x[+]Zero).
+ apply plus_resp_leEq_lft.
+ apply shift_leEq_div.
+  apply pos_two.
+ apply shift_leEq_minus; rstepl x; auto.
 Qed.
 
 Let cip1'''' : forall c0 x : IR, x [<] c0 -> x [<] x[+] (c0[-]x) [/]TwoNZ.
-intros.
-astepl (x[+]Zero).
-apply plus_resp_less_lft.
-apply shift_less_div.
-apply pos_two.
-apply shift_less_minus; rstepl x; auto.
+Proof.
+ intros.
+ astepl (x[+]Zero).
+ apply plus_resp_less_lft.
+ apply shift_less_div.
+  apply pos_two.
+ apply shift_less_minus; rstepl x; auto.
 Qed.
 
 Let cip2 :
   forall c x x0 : IR, c [<=] x -> x[-] (x[-]c) [/]TwoNZ [<=] x0 -> c [<=] x0.
-intros.
-apply leEq_transitive with (c[+] (x[-]c) [/]TwoNZ).
-astepl (c[+]Zero); apply plus_resp_leEq_lft.
-apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl c; auto.
-eapply leEq_wdl.
-apply H0.
-rational.
+Proof.
+ intros.
+ apply leEq_transitive with (c[+] (x[-]c) [/]TwoNZ).
+  astepl (c[+]Zero); apply plus_resp_leEq_lft.
+  apply shift_leEq_div.
+   apply pos_two.
+  apply shift_leEq_minus; rstepl c; auto.
+ eapply leEq_wdl.
+  apply H0.
+ rational.
 Qed.
 
 Let cip2' : forall c x x0 : IR, c [<] x -> x[-] (x[-]c) [/]TwoNZ [<=] x0 -> c [<] x0.
-intros c x x0 H H0.
-apply less_leEq_trans with (c[+] (x[-]c) [/]TwoNZ).
-astepl (c[+]Zero); apply plus_resp_less_lft.
-apply shift_less_div.
-apply pos_two.
-apply shift_less_minus; rstepl c; auto.
-eapply leEq_wdl.
-apply H0.
-rational.
+Proof.
+ intros c x x0 H H0.
+ apply less_leEq_trans with (c[+] (x[-]c) [/]TwoNZ).
+  astepl (c[+]Zero); apply plus_resp_less_lft.
+  apply shift_less_div.
+   apply pos_two.
+  apply shift_less_minus; rstepl c; auto.
+ eapply leEq_wdl.
+  apply H0.
+ rational.
 Qed.
 
 Let cip2'' :
   forall c x x0 : IR, c [<=] x -> x[-] (x[-]c) [/]TwoNZ [<] x0 -> c [<] x0.
-intros c x x0 H H0.
-apply leEq_less_trans with (c[+] (x[-]c) [/]TwoNZ).
-astepl (c[+]Zero); apply plus_resp_leEq_lft.
-apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl c; auto.
-eapply less_wdl.
-apply H0.
-rational.
+Proof.
+ intros c x x0 H H0.
+ apply leEq_less_trans with (c[+] (x[-]c) [/]TwoNZ).
+  astepl (c[+]Zero); apply plus_resp_leEq_lft.
+  apply shift_leEq_div.
+   apply pos_two.
+  apply shift_leEq_minus; rstepl c; auto.
+ eapply less_wdl.
+  apply H0.
+ rational.
 Qed.
 
 Let cip2''' :
   forall c x x0 : IR, c [<] x -> x[-] (x[-]c) [/]TwoNZ [<] x0 -> c [<] x0.
-intros c x x0 H H0.
-apply cip2'' with x.
-apply less_leEq; auto.
-auto.
+Proof.
+ intros c x x0 H H0.
+ apply cip2'' with x.
+  apply less_leEq; auto.
+ auto.
 Qed.
 
 Let cip3 :
   forall c0 x x0 : IR, x [<=] c0 -> x0 [<=] x[+] (c0[-]x) [/]TwoNZ -> x0 [<=] c0.
-intros c0 x x0 H H0.
-eapply leEq_transitive.
-apply H0.
-rstepl (c0[-] (c0[-]x) [/]TwoNZ).
-astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
-apply inv_resp_leEq.
-apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl x; auto.
+Proof.
+ intros c0 x x0 H H0.
+ eapply leEq_transitive.
+  apply H0.
+ rstepl (c0[-] (c0[-]x) [/]TwoNZ).
+ astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
+ apply inv_resp_leEq.
+ apply shift_leEq_div.
+  apply pos_two.
+ apply shift_leEq_minus; rstepl x; auto.
 Qed.
 
 Let cip3' :
   forall c0 x x0 : IR, x [<] c0 -> x0 [<=] x[+] (c0[-]x) [/]TwoNZ -> x0 [<] c0.
-intros c0 x x0 H H0.
-eapply leEq_less_trans.
-apply H0.
-rstepl (c0[-] (c0[-]x) [/]TwoNZ).
-astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
-apply inv_resp_less.
-apply shift_less_div.
-apply pos_two.
-apply shift_less_minus; rstepl x; auto.
+Proof.
+ intros c0 x x0 H H0.
+ eapply leEq_less_trans.
+  apply H0.
+ rstepl (c0[-] (c0[-]x) [/]TwoNZ).
+ astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
+ apply inv_resp_less.
+ apply shift_less_div.
+  apply pos_two.
+ apply shift_less_minus; rstepl x; auto.
 Qed.
 
 Let cip3'' :
   forall c0 x x0 : IR, x [<=] c0 -> x0 [<] x[+] (c0[-]x) [/]TwoNZ -> x0 [<] c0.
-intros c0 x x0 H H0.
-eapply less_leEq_trans.
-apply H0.
-rstepl (c0[-] (c0[-]x) [/]TwoNZ).
-astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
-apply inv_resp_leEq.
-apply shift_leEq_div.
-apply pos_two.
-apply shift_leEq_minus; rstepl x; auto.
+Proof.
+ intros c0 x x0 H H0.
+ eapply less_leEq_trans.
+  apply H0.
+ rstepl (c0[-] (c0[-]x) [/]TwoNZ).
+ astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
+ apply inv_resp_leEq.
+ apply shift_leEq_div.
+  apply pos_two.
+ apply shift_leEq_minus; rstepl x; auto.
 Qed.
 
 Let cip3''' :
   forall c0 x x0 : IR, x [<] c0 -> x0 [<] x[+] (c0[-]x) [/]TwoNZ -> x0 [<] c0.
-intros c0 x x0 H H0.
-apply cip3'' with x; try apply less_leEq; auto.
+Proof.
+ intros c0 x x0 H H0.
+ apply cip3'' with x; try apply less_leEq; auto.
 Qed.
 (* end hide *)
 
 Definition compact_in_interval I (pI : proper I) x (Hx : I x) : interval.
-intros; destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
-apply (clcr x (x[+]One)).
-apply (clcr x (x[+]One)).
-apply (clcr (x[-]One) x).
-apply (clcr x (x[+]One)).
-apply (clcr (x[-]One) x).
-apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
-apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
-apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
-apply (clcr c c0).
+Proof.
+ intros; destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
+         apply (clcr x (x[+]One)).
+        apply (clcr x (x[+]One)).
+       apply (clcr (x[-]One) x).
+      apply (clcr x (x[+]One)).
+     apply (clcr (x[-]One) x).
+    apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
+   apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
+  apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
+ apply (clcr c c0).
 Defined.
 
 Lemma compact_compact_in_interval : forall I pI x Hx,
  compact_ (compact_in_interval I pI x Hx).
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try apply ts;
- apply less_leEq.
-apply less_plusOne.
-apply less_plusOne.
-apply shift_minus_less; apply less_plusOne.
-apply less_plusOne.
-apply shift_minus_less; apply less_plusOne.
-eapply less_transitive_unfolded; [ apply cip1'' | apply cip1'''' ]; auto.
-eapply less_leEq_trans; [ apply cip1'' | apply cip1''' ]; auto.
-eapply leEq_less_trans; [ apply cip1' | apply cip1'''' ]; auto.
-auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; try apply ts; apply less_leEq.
+         apply less_plusOne.
+        apply less_plusOne.
+       apply shift_minus_less; apply less_plusOne.
+      apply less_plusOne.
+     apply shift_minus_less; apply less_plusOne.
+    eapply less_transitive_unfolded; [ apply cip1'' | apply cip1'''' ]; auto.
+   eapply less_leEq_trans; [ apply cip1'' | apply cip1''' ]; auto.
+  eapply leEq_less_trans; [ apply cip1' | apply cip1'''' ]; auto.
+ auto.
 Qed.
 
 Lemma proper_compact_in_interval : forall I pI x Hx,
  proper (compact_in_interval I pI x Hx).
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx.
-apply less_plusOne.
-apply less_plusOne.
-apply shift_minus_less; apply less_plusOne.
-apply less_plusOne.
-apply shift_minus_less; apply less_plusOne.
-eapply less_transitive_unfolded; [ apply cip1'' | apply cip1'''' ]; auto.
-eapply less_leEq_trans; [ apply cip1'' | apply cip1''' ]; auto.
-eapply leEq_less_trans; [ apply cip1' | apply cip1'''' ]; auto.
-auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx.
+         apply less_plusOne.
+        apply less_plusOne.
+       apply shift_minus_less; apply less_plusOne.
+      apply less_plusOne.
+     apply shift_minus_less; apply less_plusOne.
+    eapply less_transitive_unfolded; [ apply cip1'' | apply cip1'''' ]; auto.
+   eapply less_leEq_trans; [ apply cip1'' | apply cip1''' ]; auto.
+  eapply leEq_less_trans; [ apply cip1' | apply cip1'''' ]; auto.
+ auto.
 Qed.
 
 Lemma proper_compact_in_interval' : forall I pI x Hx
  (H : compact_ (compact_in_interval I pI x Hx)), Lend H [<] Rend H.
-do 4 intro.
-cut (proper (compact_in_interval I pI x Hx)).
-2: apply proper_compact_in_interval.
-elim (compact_in_interval I pI x Hx); intros; try inversion H.
-simpl in |- *; simpl in H; auto.
+Proof.
+ do 4 intro.
+ cut (proper (compact_in_interval I pI x Hx)).
+  2: apply proper_compact_in_interval.
+ elim (compact_in_interval I pI x Hx); intros; try inversion H.
+ simpl in |- *; simpl in H; auto.
 Qed.
 
 Lemma included_compact_in_interval : forall I pI x Hx,
  included (compact_in_interval I pI x Hx) I.
-induction I; simpl in |- *; intros X x X0; try inversion_clear Hx; red in |- *;
- simpl in |- *; intros x0 X1; try inversion_clear X; try inversion_clear X0;
- try inversion_clear X1; auto.
-apply less_leEq_trans with x; auto.
-apply leEq_less_trans with x; auto.
-apply leEq_transitive with x; auto.
-apply leEq_transitive with x; auto.
-split.
-apply cip2' with x; auto.
-apply cip3' with x; auto.
-split.
-apply cip2' with x; auto.
-apply cip3 with x; auto.
-split.
-apply cip2 with x; auto.
-apply cip3' with x; auto.
+Proof.
+ induction I; simpl in |- *; intros X x X0; try inversion_clear Hx; red in |- *;
+   simpl in |- *; intros x0 X1; try inversion_clear X; try inversion_clear X0;
+     try inversion_clear X1; auto.
+       apply less_leEq_trans with x; auto.
+      apply leEq_less_trans with x; auto.
+     apply leEq_transitive with x; auto.
+    apply leEq_transitive with x; auto.
+   split.
+    apply cip2' with x; auto.
+   apply cip3' with x; auto.
+  split.
+   apply cip2' with x; auto.
+  apply cip3 with x; auto.
+ split.
+  apply cip2 with x; auto.
+ apply cip3' with x; auto.
 Qed.
 
 Lemma iprop_compact_in_interval : forall I pI x Hx, compact_in_interval I pI x Hx x.
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; split; auto;
- try apply leEq_reflexive.
-apply less_leEq; apply less_plusOne.
-apply less_leEq; apply less_plusOne.
-apply less_leEq; apply shift_minus_less; apply less_plusOne.
-apply less_leEq; apply less_plusOne.
-apply less_leEq; apply shift_minus_less; apply less_plusOne.
-apply less_leEq; apply cip1''; auto.
-apply less_leEq; apply cip1''''; auto.
-apply less_leEq; apply cip1''; auto.
-apply less_leEq; apply cip1''''; auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; split; auto; try apply leEq_reflexive.
+         apply less_leEq; apply less_plusOne.
+        apply less_leEq; apply less_plusOne.
+       apply less_leEq; apply shift_minus_less; apply less_plusOne.
+      apply less_leEq; apply less_plusOne.
+     apply less_leEq; apply shift_minus_less; apply less_plusOne.
+    apply less_leEq; apply cip1''; auto.
+   apply less_leEq; apply cip1''''; auto.
+  apply less_leEq; apply cip1''; auto.
+ apply less_leEq; apply cip1''''; auto.
 Qed.
 
 Lemma iprop_compact_in_interval' : forall I pI x Hx
  (H : compact_ (compact_in_interval I pI x Hx)) H', compact (Lend H) (Rend H) H' x.
-do 4 intro.
-cut (compact_in_interval I pI x Hx x).
-2: apply iprop_compact_in_interval.
-elim (compact_in_interval I pI x Hx); intros; try inversion H.
-simpl in |- *; auto.
+Proof.
+ do 4 intro.
+ cut (compact_in_interval I pI x Hx x).
+  2: apply iprop_compact_in_interval.
+ elim (compact_in_interval I pI x Hx); intros; try inversion H.
+ simpl in |- *; auto.
 Qed.
 
 Lemma iprop_compact_in_interval_inc1 : forall I pI x Hx
  (H : compact_ (compact_in_interval I pI x Hx)) H',
  included (compact (Lend H) (Rend H) H') (compact_in_interval I pI x Hx).
-do 4 intro.
-elim (compact_in_interval I pI x Hx); intros; try inversion H.
-unfold compact in |- *; simpl in |- *; Included.
+Proof.
+ do 4 intro.
+ elim (compact_in_interval I pI x Hx); intros; try inversion H.
+ unfold compact in |- *; simpl in |- *; Included.
 Qed.
 
 Lemma iprop_compact_in_interval_inc2 : forall I pI x Hx
  (H : compact_ (compact_in_interval I pI x Hx)) H',
  included (compact_in_interval I pI x Hx) (compact (Lend H) (Rend H) H').
-do 4 intro.
-elim (compact_in_interval I pI x Hx); intros; try inversion H.
-unfold compact in |- *; simpl in |- *; Included.
+Proof.
+ do 4 intro.
+ elim (compact_in_interval I pI x Hx); intros; try inversion H.
+ unfold compact in |- *; simpl in |- *; Included.
 Qed.
 
 (**
@@ -692,14 +722,16 @@ Lemma compact_in_interval_wd1 : forall I pI x Hx y Hy
  (H : compact_ (compact_in_interval I pI x Hx))
  (H' : compact_ (compact_in_interval I pI y Hy)),
  x [=] y -> Lend H [=] Lend H'.
-intro I; elim I; simpl in |- *; intros; algebra.
+Proof.
+ intro I; elim I; simpl in |- *; intros; algebra.
 Qed.
 
 Lemma compact_in_interval_wd2 : forall I pI x Hx y Hy
  (H : compact_ (compact_in_interval I pI x Hx))
  (H' : compact_ (compact_in_interval I pI y Hy)),
  x [=] y -> Rend H [=] Rend H'.
-intro I; elim I; simpl in |- *; intros; algebra.
+Proof.
+ intro I; elim I; simpl in |- *; intros; algebra.
 Qed.
 
 (**
@@ -707,254 +739,237 @@ We can make an analogous construction for two points.
 *)
 
 Definition compact_in_interval2 I (pI : proper I) x y : I x -> I y -> interval.
-intros.
-set (z1 := Min x y) in *.
-set (z2 := Max x y) in *.
-destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
-apply (clcr z1 (z2[+]One)).
-apply (clcr z1 (z2[+]One)).
-apply (clcr (z1[-]One) z2).
-apply (clcr z1 (z2[+]One)).
-apply (clcr (z1[-]One) z2).
-apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
-apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
-apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
-apply (clcr c c0).
+Proof.
+ intros.
+ set (z1 := Min x y) in *.
+ set (z2 := Max x y) in *.
+ destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
+         apply (clcr z1 (z2[+]One)).
+        apply (clcr z1 (z2[+]One)).
+       apply (clcr (z1[-]One) z2).
+      apply (clcr z1 (z2[+]One)).
+     apply (clcr (z1[-]One) z2).
+    apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
+   apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
+  apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
+ apply (clcr c c0).
 Defined.
 
 Lemma compact_compact_in_interval2 : forall I pI x y Hx Hy,
  compact_ (compact_in_interval2 I pI x y Hx Hy).
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
- try apply ts; apply less_leEq.
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply shift_minus_less; apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply shift_minus_less; apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-eapply less_transitive_unfolded;
- [ apply cip1''
- | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
- try apply less_Min; try apply Max_less; auto.
-eapply less_leEq_trans;
- [ apply cip1''
- | eapply leEq_transitive; [ apply Min_leEq_Max | apply cip1''' ] ];
- try apply less_Min; try apply Max_leEq; auto.
-eapply leEq_less_trans;
- [ apply cip1'
- | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
- try apply leEq_Min; try apply Max_less; auto.
-auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
+   try apply ts; apply less_leEq.
+         apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+        apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+       apply shift_minus_less; apply leEq_less_trans with (Max x y);
+         [ apply Min_leEq_Max | apply less_plusOne ].
+      apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+     apply shift_minus_less; apply leEq_less_trans with (Max x y);
+       [ apply Min_leEq_Max | apply less_plusOne ].
+    eapply less_transitive_unfolded; [ apply cip1''
+      | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
+        try apply less_Min; try apply Max_less; auto.
+   eapply less_leEq_trans; [ apply cip1''
+     | eapply leEq_transitive; [ apply Min_leEq_Max | apply cip1''' ] ];
+       try apply less_Min; try apply Max_leEq; auto.
+  eapply leEq_less_trans; [ apply cip1'
+    | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
+      try apply leEq_Min; try apply Max_less; auto.
+ auto.
 Qed.
 
 Lemma proper_compact_in_interval2 : forall I pI x y Hx Hy,
  proper (compact_in_interval2 I pI x y Hx Hy).
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy.
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply shift_minus_less; apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-apply shift_minus_less; apply leEq_less_trans with (Max x y);
- [ apply Min_leEq_Max | apply less_plusOne ].
-eapply less_transitive_unfolded;
- [ apply cip1''
- | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
- try apply less_Min; try apply Max_less; auto.
-eapply less_leEq_trans;
- [ apply cip1''
- | eapply leEq_transitive; [ apply Min_leEq_Max | apply cip1''' ] ];
- try apply less_Min; try apply Max_leEq; auto.
-eapply leEq_less_trans;
- [ apply cip1'
- | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
- try apply leEq_Min; try apply Max_less; auto.
-auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy.
+         apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+        apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+       apply shift_minus_less; apply leEq_less_trans with (Max x y);
+         [ apply Min_leEq_Max | apply less_plusOne ].
+      apply leEq_less_trans with (Max x y); [ apply Min_leEq_Max | apply less_plusOne ].
+     apply shift_minus_less; apply leEq_less_trans with (Max x y);
+       [ apply Min_leEq_Max | apply less_plusOne ].
+    eapply less_transitive_unfolded; [ apply cip1''
+      | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
+        try apply less_Min; try apply Max_less; auto.
+   eapply less_leEq_trans; [ apply cip1''
+     | eapply leEq_transitive; [ apply Min_leEq_Max | apply cip1''' ] ];
+       try apply less_Min; try apply Max_leEq; auto.
+  eapply leEq_less_trans; [ apply cip1'
+    | eapply leEq_less_trans; [ apply Min_leEq_Max | apply cip1'''' ] ];
+      try apply leEq_Min; try apply Max_less; auto.
+ auto.
 Qed.
 
 Lemma proper_compact_in_interval2' : forall I pI x y Hx Hy H,
- Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<] 
+ Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<]
    Rend (I:=compact_in_interval2 I pI x y Hx Hy) H.
-do 6 intro.
-cut (proper (compact_in_interval2 I pI x y Hx Hy)).
-2: apply proper_compact_in_interval2.
-elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
-simpl in |- *; simpl in H; auto.
+Proof.
+ do 6 intro.
+ cut (proper (compact_in_interval2 I pI x y Hx Hy)).
+  2: apply proper_compact_in_interval2.
+ elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
+ simpl in |- *; simpl in H; auto.
 Qed.
 
 Lemma included_compact_in_interval2 : forall I pI x y Hx Hy,
  included (compact_in_interval2 I pI x y Hx Hy) I.
-induction I; simpl in |- *; intros; try inversion_clear Hx as (H,H0);
- try inversion_clear Hy as (H1,H2); red in |- *; simpl in |- *;
- intros x0 X; try inversion_clear X; auto.
-apply less_leEq_trans with (Min x y); try apply less_Min; auto.
-apply leEq_less_trans with (Max x y); try apply Max_less; auto.
-apply leEq_transitive with (Min x y); try apply leEq_Min; auto.
-apply leEq_transitive with (Max x y); try apply Max_leEq; auto.
-split.
-apply cip2' with (Min x y); try apply less_Min; auto.
-apply cip3' with (Max x y); try apply Max_less; auto.
-split.
-apply cip2' with (Min x y); try apply less_Min; auto.
-apply cip3 with (Max x y); try apply Max_leEq; auto.
-split.
-apply cip2 with (Min x y); try apply leEq_Min; auto.
-apply cip3' with (Max x y); try apply Max_less; auto.
+Proof.
+ induction I; simpl in |- *; intros; try inversion_clear Hx as (H,H0);
+   try inversion_clear Hy as (H1,H2); red in |- *; simpl in |- *;
+     intros x0 X; try inversion_clear X; auto.
+       apply less_leEq_trans with (Min x y); try apply less_Min; auto.
+      apply leEq_less_trans with (Max x y); try apply Max_less; auto.
+     apply leEq_transitive with (Min x y); try apply leEq_Min; auto.
+    apply leEq_transitive with (Max x y); try apply Max_leEq; auto.
+   split.
+    apply cip2' with (Min x y); try apply less_Min; auto.
+   apply cip3' with (Max x y); try apply Max_less; auto.
+  split.
+   apply cip2' with (Min x y); try apply less_Min; auto.
+  apply cip3 with (Max x y); try apply Max_leEq; auto.
+ split.
+  apply cip2 with (Min x y); try apply leEq_Min; auto.
+ apply cip3' with (Max x y); try apply Max_less; auto.
 Qed.
 
 Lemma iprop_compact_in_interval2x : forall I pI x y Hx Hy,
  compact_in_interval2 I pI x y Hx Hy x.
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
- split; auto; try apply Min_leEq_lft; try apply lft_leEq_Max.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply lft_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply lft_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply shift_minus_less; apply leEq_less_trans with x;
- [ apply Min_leEq_lft | apply less_plusOne ].
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply lft_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply shift_minus_less; apply leEq_less_trans with x;
- [ apply Min_leEq_lft | apply less_plusOne ].
-apply less_leEq; eapply less_leEq_trans;
- [ apply cip1'' | apply Min_leEq_lft ]; try apply less_Min; 
- auto.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply lft_leEq_Max | apply cip1'''' ]; try apply Max_less; 
- auto.
-apply less_leEq; eapply less_leEq_trans;
- [ apply cip1'' | apply Min_leEq_lft ]; try apply less_Min; 
- auto.
-apply leEq_transitive with (Max x y); [ apply lft_leEq_Max | apply cip1''' ];
- try apply Max_leEq; auto.
-eapply leEq_transitive; [ apply cip1' | apply Min_leEq_lft ];
- try apply leEq_Min; auto.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply lft_leEq_Max | apply cip1'''' ]; try apply Max_less; 
- auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
+   split; auto; try apply Min_leEq_lft; try apply lft_leEq_Max.
+           apply less_leEq; apply leEq_less_trans with (Max x y); [ apply lft_leEq_Max | apply less_plusOne ].
+          apply less_leEq; apply leEq_less_trans with (Max x y); [ apply lft_leEq_Max | apply less_plusOne ].
+         apply less_leEq; apply shift_minus_less; apply leEq_less_trans with x;
+           [ apply Min_leEq_lft | apply less_plusOne ].
+        apply less_leEq; apply leEq_less_trans with (Max x y); [ apply lft_leEq_Max | apply less_plusOne ].
+       apply less_leEq; apply shift_minus_less; apply leEq_less_trans with x;
+         [ apply Min_leEq_lft | apply less_plusOne ].
+      apply less_leEq; eapply less_leEq_trans; [ apply cip1'' | apply Min_leEq_lft ]; try apply less_Min;
+        auto.
+     apply less_leEq; apply leEq_less_trans with (Max x y);
+       [ apply lft_leEq_Max | apply cip1'''' ]; try apply Max_less; auto.
+    apply less_leEq; eapply less_leEq_trans; [ apply cip1'' | apply Min_leEq_lft ]; try apply less_Min;
+      auto.
+   apply leEq_transitive with (Max x y); [ apply lft_leEq_Max | apply cip1''' ];
+     try apply Max_leEq; auto.
+  eapply leEq_transitive; [ apply cip1' | apply Min_leEq_lft ]; try apply leEq_Min; auto.
+ apply less_leEq; apply leEq_less_trans with (Max x y);
+   [ apply lft_leEq_Max | apply cip1'''' ]; try apply Max_less; auto.
 Qed.
 
 Lemma iprop_compact_in_interval2y : forall I pI x y Hx Hy,
  compact_in_interval2 I pI x y Hx Hy y.
-intro.
-elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
- split; auto; try apply Min_leEq_rht; try apply rht_leEq_Max.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply rht_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply rht_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply shift_minus_less; apply leEq_less_trans with y;
- [ apply Min_leEq_rht | apply less_plusOne ].
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply rht_leEq_Max | apply less_plusOne ].
-apply less_leEq; apply shift_minus_less; apply leEq_less_trans with y;
- [ apply Min_leEq_rht | apply less_plusOne ].
-apply less_leEq; eapply less_leEq_trans;
- [ apply cip1'' | apply Min_leEq_rht ]; try apply less_Min; 
- auto.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply rht_leEq_Max | apply cip1'''' ]; try apply Max_less; 
- auto.
-apply less_leEq; eapply less_leEq_trans;
- [ apply cip1'' | apply Min_leEq_rht ]; try apply less_Min; 
- auto.
-apply leEq_transitive with (Max x y); [ apply rht_leEq_Max | apply cip1''' ];
- try apply Max_leEq; auto.
-eapply leEq_transitive; [ apply cip1' | apply Min_leEq_rht ];
- try apply leEq_Min; auto.
-apply less_leEq; apply leEq_less_trans with (Max x y);
- [ apply rht_leEq_Max | apply cip1'''' ]; try apply Max_less; 
- auto.
+Proof.
+ intro.
+ elim I; simpl in |- *; intros; try inversion_clear Hx; try inversion_clear Hy;
+   split; auto; try apply Min_leEq_rht; try apply rht_leEq_Max.
+           apply less_leEq; apply leEq_less_trans with (Max x y); [ apply rht_leEq_Max | apply less_plusOne ].
+          apply less_leEq; apply leEq_less_trans with (Max x y); [ apply rht_leEq_Max | apply less_plusOne ].
+         apply less_leEq; apply shift_minus_less; apply leEq_less_trans with y;
+           [ apply Min_leEq_rht | apply less_plusOne ].
+        apply less_leEq; apply leEq_less_trans with (Max x y); [ apply rht_leEq_Max | apply less_plusOne ].
+       apply less_leEq; apply shift_minus_less; apply leEq_less_trans with y;
+         [ apply Min_leEq_rht | apply less_plusOne ].
+      apply less_leEq; eapply less_leEq_trans; [ apply cip1'' | apply Min_leEq_rht ]; try apply less_Min;
+        auto.
+     apply less_leEq; apply leEq_less_trans with (Max x y);
+       [ apply rht_leEq_Max | apply cip1'''' ]; try apply Max_less; auto.
+    apply less_leEq; eapply less_leEq_trans; [ apply cip1'' | apply Min_leEq_rht ]; try apply less_Min;
+      auto.
+   apply leEq_transitive with (Max x y); [ apply rht_leEq_Max | apply cip1''' ];
+     try apply Max_leEq; auto.
+  eapply leEq_transitive; [ apply cip1' | apply Min_leEq_rht ]; try apply leEq_Min; auto.
+ apply less_leEq; apply leEq_less_trans with (Max x y);
+   [ apply rht_leEq_Max | apply cip1'''' ]; try apply Max_less; auto.
 Qed.
 
 Lemma iprop_compact_in_interval2x' : forall I pI x y Hx Hy
  (H : compact_ (compact_in_interval2 I pI x y Hx Hy)) H',
  compact (Lend H) (Rend H) H' x.
-do 6 intro.
-cut (compact_in_interval2 I pI x y Hx Hy x).
-2: apply iprop_compact_in_interval2x.
-elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
-simpl in |- *; auto.
+Proof.
+ do 6 intro.
+ cut (compact_in_interval2 I pI x y Hx Hy x).
+  2: apply iprop_compact_in_interval2x.
+ elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
+ simpl in |- *; auto.
 Qed.
 
 Lemma iprop_compact_in_interval2y' : forall I pI x y Hx Hy
  (H : compact_ (compact_in_interval2 I pI x y Hx Hy)) H',
  compact (Lend H) (Rend H) H' y.
-do 6 intro.
-cut (compact_in_interval2 I pI x y Hx Hy y).
-2: apply iprop_compact_in_interval2y.
-elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
-simpl in |- *; auto.
+Proof.
+ do 6 intro.
+ cut (compact_in_interval2 I pI x y Hx Hy y).
+  2: apply iprop_compact_in_interval2y.
+ elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
+ simpl in |- *; auto.
 Qed.
 
 Lemma iprop_compact_in_interval2_inc1 : forall I pI x y Hx Hy
  (H : compact_ (compact_in_interval2 I pI x y Hx Hy)) H',
  included (compact (Lend H) (Rend H) H') (compact_in_interval2 I pI x y Hx Hy).
-do 6 intro.
-elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
-unfold compact in |- *; unfold iprop in |- *; simpl in |- *; Included.
+Proof.
+ do 6 intro.
+ elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
+ unfold compact in |- *; unfold iprop in |- *; simpl in |- *; Included.
 Qed.
 
 Lemma iprop_compact_in_interval2_inc2 : forall I pI x y Hx Hy
  (H : compact_ (compact_in_interval2 I pI x y Hx Hy)) H',
  included (compact_in_interval2 I pI x y Hx Hy) (compact (Lend H) (Rend H) H').
-do 6 intro.
-elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
-unfold compact in |- *; unfold iprop in |- *; simpl in |- *; Included.
+Proof.
+ do 6 intro.
+ elim (compact_in_interval2 I pI x y Hx Hy); intros; try inversion H.
+ unfold compact in |- *; unfold iprop in |- *; simpl in |- *; Included.
 Qed.
 
 Lemma compact_in_interval_x_lft : forall I pI x y Hx Hy H H',
- Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=] 
+ Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=]
    Lend (I:=compact_in_interval I pI x Hx) H'.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
- try apply Min_leEq_lft; try apply leEq_reflexive;
- (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (x[-]c) [/]TwoNZ);
-   apply plus_resp_leEq_lft; apply div_resp_leEq;
-   [ apply pos_two | apply minus_resp_leEq; apply Min_leEq_lft ]).
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
+   try apply Min_leEq_lft; try apply leEq_reflexive;
+     (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (x[-]c) [/]TwoNZ);
+       apply plus_resp_leEq_lft; apply div_resp_leEq;
+         [ apply pos_two | apply minus_resp_leEq; apply Min_leEq_lft ]).
 Qed.
 
 Lemma compact_in_interval_y_lft : forall I pI x y Hx Hy H H',
- Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=] 
+ Lend (I:=compact_in_interval2 I pI x y Hx Hy) H [<=]
    Lend (I:=compact_in_interval I pI y Hy) H'.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
- try apply Min_leEq_rht; try apply leEq_reflexive;
- (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (y[-]c) [/]TwoNZ);
-   apply plus_resp_leEq_lft; apply div_resp_leEq;
-   [ apply pos_two | apply minus_resp_leEq; apply Min_leEq_rht ]).
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply minus_resp_leEq;
+   try apply Min_leEq_rht; try apply leEq_reflexive;
+     (rstepl (c[+] (Min x y[-]c) [/]TwoNZ); rstepr (c[+] (y[-]c) [/]TwoNZ);
+       apply plus_resp_leEq_lft; apply div_resp_leEq;
+         [ apply pos_two | apply minus_resp_leEq; apply Min_leEq_rht ]).
 Qed.
 
 Lemma compact_in_interval_x_rht : forall I pI x y Hx Hy H H',
- Rend (I:=compact_in_interval I pI x Hx) H [<=] 
+ Rend (I:=compact_in_interval I pI x Hx) H [<=]
    Rend (I:=compact_in_interval2 I pI x y Hx Hy) H'.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
- try apply lft_leEq_Max; try apply leEq_reflexive;
- (rstepl (c0[-] (c0[-]x) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
-   unfold cg_minus in |- *; apply plus_resp_leEq_lft; 
-   apply inv_resp_leEq; apply div_resp_leEq;
-   [ apply pos_two
-   | apply plus_resp_leEq_lft; apply inv_resp_leEq; apply lft_leEq_Max ]).
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
+   try apply lft_leEq_Max; try apply leEq_reflexive;
+     (rstepl (c0[-] (c0[-]x) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
+       unfold cg_minus in |- *; apply plus_resp_leEq_lft; apply inv_resp_leEq; apply div_resp_leEq;
+         [ apply pos_two | apply plus_resp_leEq_lft; apply inv_resp_leEq; apply lft_leEq_Max ]).
 Qed.
 
 Lemma compact_in_interval_y_rht : forall I pI x y Hx Hy H H',
- Rend (I:=compact_in_interval I pI y Hy) H [<=] 
+ Rend (I:=compact_in_interval I pI y Hy) H [<=]
    Rend (I:=compact_in_interval2 I pI x y Hx Hy) H'.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
- try apply rht_leEq_Max; try apply leEq_reflexive;
- (rstepl (c0[-] (c0[-]y) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
-   unfold cg_minus in |- *; apply plus_resp_leEq_lft; 
-   apply inv_resp_leEq; apply div_resp_leEq;
-   [ apply pos_two
-   | apply plus_resp_leEq_lft; apply inv_resp_leEq; apply rht_leEq_Max ]).
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try apply plus_resp_leEq;
+   try apply rht_leEq_Max; try apply leEq_reflexive;
+     (rstepl (c0[-] (c0[-]y) [/]TwoNZ); rstepr (c0[-] (c0[-]Max x y) [/]TwoNZ);
+       unfold cg_minus in |- *; apply plus_resp_leEq_lft; apply inv_resp_leEq; apply div_resp_leEq;
+         [ apply pos_two | apply plus_resp_leEq_lft; apply inv_resp_leEq; apply rht_leEq_Max ]).
 Qed.
 
 End Proper_Compact_with_One_or_Two_Points.
@@ -965,21 +980,23 @@ Compact intervals are exactly compact intervals(!).
 
 Lemma interval_compact_inc : forall I (cI : compact_ I) H,
  included I (compact (Lend cI) (Rend cI) H).
-intros [| c| c| c| c| c c0| c c0| c c0| c c0];intros; try inversion cI.
-generalize c c0 cI H; clear H cI c0 c.
-simpl in |- *; intros a b Hab Hab'.
-intros x H.
-simpl in H.
-inversion_clear H; split; auto.
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0];intros; try inversion cI.
+ generalize c c0 cI H; clear H cI c0 c.
+ simpl in |- *; intros a b Hab Hab'.
+ intros x H.
+ simpl in H.
+ inversion_clear H; split; auto.
 Qed.
 
 Lemma compact_interval_inc : forall I (cI : compact_ I) H,
  included (compact (Lend cI) (Rend cI) H) I.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI H; clear H cI c0 c.
-simpl in |- *; intros a b Hab.
-intros H x H0.
-inversion_clear H0; split; auto.
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI H; clear H cI c0 c.
+ simpl in |- *; intros a b Hab.
+ intros H x H0.
+ inversion_clear H0; split; auto.
 Qed.
 
 (**
@@ -992,25 +1009,21 @@ Lemma compact_proper_in_interval : forall (J : interval) a b Hab,
  included (compact a b Hab) J -> proper J -> {a' : IR | {b' : IR | {Hab' : _ |
  included (compact a' b' (less_leEq _ _ _ Hab')) J |
    included (Compact Hab) (Compact (less_leEq _ _ _ Hab'))}}}.
-intros J a b Hab H H0.
-exists
- (Lend
-    (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
-       (H _ (compact_inc_rht _ _ Hab)))).
-exists
- (Rend
-    (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
-       (H _ (compact_inc_rht _ _ Hab)))).
-exists
- (proper_compact_in_interval2' _ _ _ _ _ _
-    (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
-       (H _ (compact_inc_rht _ _ Hab)))).
-eapply included_trans.
-apply compact_interval_inc.
-apply included_compact_in_interval2.
-apply included_compact.
-apply iprop_compact_in_interval2x'.
-apply iprop_compact_in_interval2y'.
+Proof.
+ intros J a b Hab H H0.
+ exists (Lend (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
+   (H _ (compact_inc_rht _ _ Hab)))).
+ exists (Rend (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
+   (H _ (compact_inc_rht _ _ Hab)))).
+ exists (proper_compact_in_interval2' _ _ _ _ _ _
+   (compact_compact_in_interval2 J H0 a b (H _ (compact_inc_lft _ _ Hab))
+     (H _ (compact_inc_rht _ _ Hab)))).
+  eapply included_trans.
+   apply compact_interval_inc.
+  apply included_compact_in_interval2.
+ apply included_compact.
+  apply iprop_compact_in_interval2x'.
+ apply iprop_compact_in_interval2y'.
 Qed.
 
 End Compact_Constructions.
@@ -1059,89 +1072,95 @@ In the case of compact intervals, this definitions collapse to the old ones.
 Lemma Continuous_Int :
  forall (I : interval) (cI : compact_ I) H (F : PartIR),
  Continuous_I (a:=Lend cI) (b:=Rend cI) H F -> Continuous I F.
-intros I cI H F H0.
-cut (included I (compact (Lend cI) (Rend cI) H)).
-2: apply interval_compact_inc; auto.
-cut (included (compact (Lend cI) (Rend cI) H) I).
-2: apply compact_interval_inc; auto.
-generalize cI H H0; clear H0 H cI.
-destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI H H0 X X0; clear X0 X H0 H cI c0 c.
-simpl in |- *; intros a b Hab Hab' contF inc1 inc2.
-split.
-apply included_trans with (Compact Hab'); Included.
-intros.
-apply included_imp_contin with (Hab := Hab'); Included.
+Proof.
+ intros I cI H F H0.
+ cut (included I (compact (Lend cI) (Rend cI) H)).
+  2: apply interval_compact_inc; auto.
+ cut (included (compact (Lend cI) (Rend cI) H) I).
+  2: apply compact_interval_inc; auto.
+ generalize cI H H0; clear H0 H cI.
+ destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI H H0 X X0; clear X0 X H0 H cI c0 c.
+ simpl in |- *; intros a b Hab Hab' contF inc1 inc2.
+ split.
+  apply included_trans with (Compact Hab'); Included.
+ intros.
+ apply included_imp_contin with (Hab := Hab'); Included.
 Qed.
 
 Lemma Int_Continuous :
  forall (I : interval) (cI : compact_ I) H (F : PartIR),
  Continuous I F -> Continuous_I (a:=Lend cI) (b:=Rend cI) H F.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI H F X; clear X F H cI c0 c.
-simpl in |- *; intros a b Hab Hab' F contF.
-inversion_clear contF.
-Contin.
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI H F X; clear X F H cI c0 c.
+ simpl in |- *; intros a b Hab Hab' F contF.
+ inversion_clear contF.
+ Contin.
 Qed.
 
 Lemma Derivative_Int :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F F' : PartIR),
  Derivative_I (a:=Lend cI) (b:=Rend cI) H F F' -> Derivative I pI F F'.
-do 4 intro.
-cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
-2: apply interval_compact_inc; auto.
-cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
-2: apply compact_interval_inc; auto.
-generalize cI pI H; clear H cI pI.
-destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI pI H X X0 F F' X1; clear X1 F' F X0 X H pI cI c0 c.
-simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F F' derF.
-split.
-apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
-split.
-apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
-intros c d Hcd' Hinc.
-apply included_imp_deriv with (Hab := Hab'); Included.
+Proof.
+ do 4 intro.
+ cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
+  2: apply interval_compact_inc; auto.
+ cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
+  2: apply compact_interval_inc; auto.
+ generalize cI pI H; clear H cI pI.
+ destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI pI H X X0 F F' X1; clear X1 F' F X0 X H pI cI c0 c.
+ simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F F' derF.
+ split.
+  apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
+ split.
+  apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
+ intros c d Hcd' Hinc.
+ apply included_imp_deriv with (Hab := Hab'); Included.
 Qed.
 
 Lemma Int_Derivative :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F F' : PartIR),
  Derivative I pI F F' -> Derivative_I (a:=Lend cI) (b:=Rend cI) H F F'.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI pI H F F' X; clear X F' F H pI cI c0 c.
-simpl in |- *; intros a b Hab Hnonv Hab' F F' derF.
-elim derF; intros H H0.
-elim H0; intros H1 H2.
-Included.
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI pI H F F' X; clear X F' F H pI cI c0 c.
+ simpl in |- *; intros a b Hab Hnonv Hab' F F' derF.
+ elim derF; intros H H0.
+ elim H0; intros H1 H2.
+ Included.
 Qed.
 
 Lemma Diffble_Int :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F : PartIR),
  Diffble_I (a:=Lend cI) (b:=Rend cI) H F -> Diffble I pI F.
-do 4 intro.
-cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
-2: apply interval_compact_inc; auto.
-cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
-2: apply compact_interval_inc; auto.
-generalize cI pI H; clear H pI cI.
-destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI pI H X X0 F X1; clear X1 F X0 X H pI cI c0 c.
-simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F diffF.
-red in |- *; simpl in |- *.
-split.
-apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
-intros c d Hcd' Hinc.
-apply included_imp_diffble with (Hab := Hab'); auto.
+Proof.
+ do 4 intro.
+ cut (included I (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H))).
+  2: apply interval_compact_inc; auto.
+ cut (included (compact (Lend cI) (Rend cI) (less_leEq _ _ _ H)) I).
+  2: apply compact_interval_inc; auto.
+ generalize cI pI H; clear H pI cI.
+ destruct I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI pI H X X0 F X1; clear X1 F X0 X H pI cI c0 c.
+ simpl in |- *; intros a b Hab Hnonv Hab' inc1 inc2 F diffF.
+ red in |- *; simpl in |- *.
+ split.
+  apply included_trans with (Compact (less_leEq _ _ _ Hab')); Included.
+ intros c d Hcd' Hinc.
+ apply included_imp_diffble with (Hab := Hab'); auto.
 Qed.
 
 Lemma Int_Diffble :
  forall (I : interval) (cI : compact_ I) (pI : proper I) H (F : PartIR),
  Diffble I pI F -> Diffble_I (a:=Lend cI) (b:=Rend cI) H F.
-intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
-generalize c c0 cI pI H F X; clear X F H pI cI c0 c.
-simpl in |- *; intros a b Hab Hnonv Hab' F diffF.
-inversion_clear diffF.
-Included.
+Proof.
+ intros [| c| c| c| c| c c0| c c0| c c0| c c0]; intros; try inversion cI.
+ generalize c c0 cI pI H F X; clear X F H pI cI c0 c.
+ simpl in |- *; intros a b Hab Hnonv Hab' F diffF.
+ inversion_clear diffF.
+ Included.
 Qed.
 
 End Reflexivity_Properties.
@@ -1154,64 +1173,67 @@ Interestingly, inclusion and equality in an interval are also characterizable in
 
 Lemma included_imp_inc : forall (J : interval) P,
  (forall a b Hab, included (compact a b Hab) J -> included (compact a b Hab) P) -> included J P.
-intros J P H x H0.
-apply (H _ _ (leEq_reflexive _ _) (compact_single_iprop J x H0)).
-apply compact_inc_lft.
+Proof.
+ intros J P H x H0.
+ apply (H _ _ (leEq_reflexive _ _) (compact_single_iprop J x H0)).
+ apply compact_inc_lft.
 Qed.
 
 Lemma included_Feq'' : forall I F G, proper I -> (forall a b Hab (Hab':=(less_leEq _ a b Hab)),
  included (Compact Hab') I -> Feq (Compact Hab') F G) -> Feq I F G.
-intros I F G H H0.
-apply eq_imp_Feq.
-intros x H1.
-elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
-2: exact (compact_single_iprop I x H1).
-intros a Ha.
-elim Ha; clear Ha.
-intros b Hb.
-elim Hb; clear Hb.
-intros Hab H2 H3.
-elim (H0 _ _ _ H2); intros.
-apply a0; apply H3; apply compact_single_prop.
-intros x H1.
-elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
-2: exact (compact_single_iprop I x H1).
-intros a Ha.
-elim Ha; clear Ha.
-intros b Hb.
-elim Hb; clear Hb.
-intros Hab H2 H3.
-elim (H0 _ _ _ H2); intros.
-inversion_clear b0.
-apply X; apply H3; apply compact_single_prop.
-intros x H1 Hx Hx'.
-elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
-2: exact (compact_single_iprop I x H1).
-intros a Ha.
-elim Ha; clear Ha.
-intros b Hb.
-elim Hb; clear Hb.
-intros Hab H2 H3.
-elim (H0 _ _ _ H2); intros.
-inversion_clear b0.
-apply H4; apply H3; apply compact_single_prop.
+Proof.
+ intros I F G H H0.
+ apply eq_imp_Feq.
+   intros x H1.
+   elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
+    2: exact (compact_single_iprop I x H1).
+   intros a Ha.
+   elim Ha; clear Ha.
+   intros b Hb.
+   elim Hb; clear Hb.
+   intros Hab H2 H3.
+   elim (H0 _ _ _ H2); intros.
+   apply a0; apply H3; apply compact_single_prop.
+  intros x H1.
+  elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
+   2: exact (compact_single_iprop I x H1).
+  intros a Ha.
+  elim Ha; clear Ha.
+  intros b Hb.
+  elim Hb; clear Hb.
+  intros Hab H2 H3.
+  elim (H0 _ _ _ H2); intros.
+  inversion_clear b0.
+  apply X; apply H3; apply compact_single_prop.
+ intros x H1 Hx Hx'.
+ elim (compact_proper_in_interval I x x (leEq_reflexive _ x)); Included.
+  2: exact (compact_single_iprop I x H1).
+ intros a Ha.
+ elim Ha; clear Ha.
+ intros b Hb.
+ elim Hb; clear Hb.
+ intros Hab H2 H3.
+ elim (H0 _ _ _ H2); intros.
+ inversion_clear b0.
+ apply H4; apply H3; apply compact_single_prop.
 Qed.
 
 Lemma included_Feq' : forall (I : interval) F G,
  (forall a b Hab, included (compact a b Hab) I -> Feq (Compact Hab) F G) -> Feq I F G.
-intros I F G H.
-apply eq_imp_Feq.
-intros x H0.
-elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
-apply a; apply compact_single_prop.
-intros x H0.
-elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
-inversion_clear b.
-apply X; apply compact_single_prop.
-intros x H0 Hx Hx'.
-elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
-inversion_clear b.
-apply H1; apply compact_single_prop.
+Proof.
+ intros I F G H.
+ apply eq_imp_Feq.
+   intros x H0.
+   elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
+   apply a; apply compact_single_prop.
+  intros x H0.
+  elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
+  inversion_clear b.
+  apply X; apply compact_single_prop.
+ intros x H0 Hx Hx'.
+ elim (H x x (leEq_reflexive _ x) (compact_single_iprop I x H0)); intros.
+ inversion_clear b.
+ apply H1; apply compact_single_prop.
 Qed.
 
 End Lemmas.

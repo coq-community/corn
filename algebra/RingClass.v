@@ -56,8 +56,8 @@ Global Instance rmul_morph : Morphism (req==>req==>req) rmul.
 Proof. reduce; apply (Rmul_ext r_ree); auto. Qed.
 Global Instance rsub_morph : Morphism (req==>req==>req) rsub.
 Proof.
-reduce; rewrite (Rsub_def r_rt), (Rsub_def r_rt y y0).
-apply (Radd_ext r_ree); auto; apply (Ropp_ext r_ree); auto.
+ reduce; rewrite (Rsub_def r_rt), (Rsub_def r_rt y y0).
+ apply (Radd_ext r_ree); auto; apply (Ropp_ext r_ree); auto.
 Qed.
 Global Instance ropp_morph : Morphism (req==>req) ropp.
 Proof. reduce; apply (Ropp_ext r_ree); auto. Qed.
@@ -100,11 +100,9 @@ Coercion proj1' : R'>->R.
 Let req' : relation R' := fun x y => req (projT1 x) (projT1 y).
 Instance r_st' : Equivalence req'.
 Proof.
-constructor;
-intro x; destruct x as [x Px];
-try (intro y; destruct y as [y Py]);
-try (intro z; destruct z as [z Pz]);
-unfold req'; [ reflexivity | intro; symmetry; assumption | intros eqxy eqyz; rewrite eqxy; assumption ].
+ constructor; intro x; destruct x as [x Px]; try (intro y; destruct y as [y Py]);
+   try (intro z; destruct z as [z Pz]);
+     unfold req'; [ reflexivity | intro; symmetry; assumption | intros eqxy eqyz; rewrite eqxy; assumption ].
 Qed.
 Let rO' := existT P rO zero_stab.
 Let rI' := existT P rI one_stab.
@@ -114,15 +112,13 @@ Let rsub' : binop R' := fun x y => existT P (rsub x y) (rsub_int (projT2 x) (pro
 Let ropp' : unop R' := fun x => existT P (ropp x) (ropp_int (projT2 x)).
 Global Instance sr_ring : @Ring R' req' r_st' rO' rI' radd' rmul' rsub' ropp'.
 Proof.
-constructor.
-constructor; unfold R', req', radd', rmul', rsub', ropp', proj1';
-intro x; destruct x as [ x Px ];
-try (intro y; destruct y as [ y Py ]);
-try (intro z; destruct z as [ z Pz ]); simpl; ring.
-constructor; unfold R', req', radd', rmul', rsub', ropp', proj1'; simpl;
-intros x x'; destruct x as [ x Px ]; destruct x' as [ x' Px' ]; simpl; intro eqx;
-try (intros y y'; destruct y as [ y Py ]; destruct y' as [ y' Py' ]; simpl; intro eqy; simpl);
-[ apply radd_morph | apply rmul_morph | apply ropp_morph ]; assumption.
+ constructor.
+  constructor; unfold R', req', radd', rmul', rsub', ropp', proj1'; intro x; destruct x as [ x Px ];
+    try (intro y; destruct y as [ y Py ]); try (intro z; destruct z as [ z Pz ]); simpl; ring.
+ constructor; unfold R', req', radd', rmul', rsub', ropp', proj1'; simpl;
+   intros x x'; destruct x as [ x Px ]; destruct x' as [ x' Px' ]; simpl; intro eqx;
+     try (intros y y'; destruct y as [ y Py ]; destruct y' as [ y' Py' ]; simpl; intro eqy; simpl);
+       [ apply radd_morph | apply rmul_morph | apply ropp_morph ]; assumption.
 Qed.
 
 End SubRing_is_Ring.

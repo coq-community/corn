@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (* begin hide *)
 Require Export CRings.
@@ -111,50 +111,31 @@ Fixpoint xforgetR (x:R) (e:xexprR x) {struct e} : expr :=
 Definition xinterpR (x:R) (e:xexprR x) := x.
 
 Lemma xexprR2interpR : forall (x:R) (e:xexprR x), interpR (xforgetR _ e) x.
-intros x e.
-induction e.
-
-apply (interpR_var i); algebra.
-
-apply (interpR_int k); algebra.
-
-apply (interpR_plus (xforgetR _ e1) (xforgetR _ e2) x y (x[+]y)); algebra.
-
-apply (interpR_mult (xforgetR _ e1) (xforgetR _ e2) x y (x[*]y)); algebra.
-
-apply (interpR_unop (xforgetR _ e) f x (unop f x)); algebra.
-
-apply (interpR_binop (xforgetR _ e1) (xforgetR _ e2) f x y (binop f x y));
- algebra.
-
-eapply (interpR_part (xforgetR _ e) f x (pfun f x Hx)).
- apply eq_reflexive_unfolded.
-algebra.
-
-apply (interpR_int 0); algebra.
-
-apply (interpR_int 1); Step_final (One:R).
-
-apply (interpR_int (Z_of_nat n)); algebra.
-
-apply (interpR_mult (xforgetR _ e) (expr_int (-1)) x (zring (-1)) [--]x);
- auto.
-Step_final (zring (-1)[*]x).
-apply (interpR_int (-1)); algebra.
-
-apply
- (interpR_plus (xforgetR _ e1) (xforgetR _ (xexprR_inv _ e2)) x [--]y (x[-]y));
- algebra.
-apply (interpR_mult (xforgetR _ e2) (expr_int (-1)) y (zring (-1)) [--]y);
- auto.
-Step_final (zring (-1)[*]y).
-apply (interpR_int (-1)); algebra.
-
-induction n.
- apply (interpR_int 1); Step_final (One:R).
-apply
- (interpR_mult (xforgetR _ e) (expr_power n (xforgetR _ e)) x (
-    x[^]n) (x[^]S n)); algebra.
+Proof.
+ intros x e.
+ induction e.
+             apply (interpR_var i); algebra.
+            apply (interpR_int k); algebra.
+           apply (interpR_plus (xforgetR _ e1) (xforgetR _ e2) x y (x[+]y)); algebra.
+          apply (interpR_mult (xforgetR _ e1) (xforgetR _ e2) x y (x[*]y)); algebra.
+         apply (interpR_unop (xforgetR _ e) f x (unop f x)); algebra.
+        apply (interpR_binop (xforgetR _ e1) (xforgetR _ e2) f x y (binop f x y)); algebra.
+       eapply (interpR_part (xforgetR _ e) f x (pfun f x Hx)).
+        apply eq_reflexive_unfolded.
+       algebra.
+      apply (interpR_int 0); algebra.
+     apply (interpR_int 1); Step_final (One:R).
+    apply (interpR_int (Z_of_nat n)); algebra.
+   apply (interpR_mult (xforgetR _ e) (expr_int (-1)) x (zring (-1)) [--]x); auto.
+    Step_final (zring (-1)[*]x).
+   apply (interpR_int (-1)); algebra.
+  apply (interpR_plus (xforgetR _ e1) (xforgetR _ (xexprR_inv _ e2)) x [--]y (x[-]y)); algebra.
+  apply (interpR_mult (xforgetR _ e2) (expr_int (-1)) y (zring (-1)) [--]y); auto.
+   Step_final (zring (-1)[*]y).
+  apply (interpR_int (-1)); algebra.
+ induction n.
+  apply (interpR_int 1); Step_final (One:R).
+ apply (interpR_mult (xforgetR _ e) (expr_power n (xforgetR _ e)) x ( x[^]n) (x[^]S n)); algebra.
 Qed.
 
 Definition xexprR_diagram_commutes :
@@ -162,9 +143,10 @@ Definition xexprR_diagram_commutes :
   xexprR2interpR.
 
 Lemma xexprR2wfR : forall (x:R) (e:xexprR x), wfR (xforgetR _ e).
-intros x e.
-exists x.
-apply xexprR2interpR.
+Proof.
+ intros x e.
+ exists x.
+ apply xexprR2interpR.
 Qed.
 
 Record fexprR : Type :=  {finterpR : R; fexprR2xexprR : xexprR finterpR}.
@@ -183,16 +165,18 @@ Definition fexprR_mult (e e':fexprR) :=
 Definition fforgetR (e:fexprR) := xforgetR (finterpR e) (fexprR2xexprR e).
 
 Lemma fexprR2interp : forall e:fexprR, interpR (fforgetR e) (finterpR e).
-intros e.
-elim e. intros x e'.
-unfold fforgetR in |- *. simpl in |- *.
-apply xexprR2interpR.
+Proof.
+ intros e.
+ elim e. intros x e'.
+ unfold fforgetR in |- *. simpl in |- *.
+ apply xexprR2interpR.
 Qed.
 
 Lemma fexprR2wf : forall e:fexprR, wfR (fforgetR e).
-intro e.
-unfold fforgetR in |- *.
-apply xexprR2wfR.
+Proof.
+ intro e.
+ unfold fforgetR in |- *.
+ apply xexprR2wfR.
 Qed.
 
 Opaque csg_crr.
@@ -215,63 +199,56 @@ Opaque nexp_op.
 
 Lemma refl_interpR :
  forall (e:expr) (x y:R), interpR e x -> interpR e y -> x[=]y.
-intro e.
-induction e.
-
-intros x y Hx Hy.
-inversion Hx.
-inversion Hy.
-Step_final (val v).
-
-intros x y Hx Hy.
-inversion Hx.
-inversion Hy.
-Step_final (zring z:R).
-
-intros x y H1 H2.
-inversion H1.
-inversion H2.
-astepl (x0[+]y0).
-Step_final (x1[+]y1).
-
-intros x y H1 H2.
-inversion H1.
-inversion H2.
-astepl (x0[*]y0).
-Step_final (x1[*]y1).
-
-intros x y H0 H1.
-inversion H0.
-
-intros x y H0 H1.
-inversion H0.
-inversion H1.
-astepl (unop u x0); Step_final (unop u x1).
-
-intros x y H0 H1.
-inversion H0.
-inversion H1.
-astepl (binop b x0 y0); Step_final (binop b x1 y1).
-
-intros x y H0 H1.
-inversion H0.
-inversion H1.
-astepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
+Proof.
+ intro e.
+ induction e.
+        intros x y Hx Hy.
+        inversion Hx.
+        inversion Hy.
+        Step_final (val v).
+       intros x y Hx Hy.
+       inversion Hx.
+       inversion Hy.
+       Step_final (zring z:R).
+      intros x y H1 H2.
+      inversion H1.
+      inversion H2.
+      astepl (x0[+]y0).
+      Step_final (x1[+]y1).
+     intros x y H1 H2.
+     inversion H1.
+     inversion H2.
+     astepl (x0[*]y0).
+     Step_final (x1[*]y1).
+    intros x y H0 H1.
+    inversion H0.
+   intros x y H0 H1.
+   inversion H0.
+   inversion H1.
+   astepl (unop u x0); Step_final (unop u x1).
+  intros x y H0 H1.
+  inversion H0.
+  inversion H1.
+  astepl (binop b x0 y0); Step_final (binop b x1 y1).
+ intros x y H0 H1.
+ inversion H0.
+ inversion H1.
+ astepl (pfun p x0 Hx); Step_final (pfun p x1 Hx0).
 Qed.
 
 Lemma interpR_wd :
  forall (e:expr) (x y:R), interpR e x -> (x[=]y) -> interpR e y.
-intros e x y H H0.
-inversion H; 
-  (* inversion bug fixed in V8.1 makes these rewritings useless *) 
-  try (rewrite <- H2; rewrite H3 in H1).
-apply interpR_var. Step_final x.
-apply interpR_int. Step_final x.
-apply interpR_plus with x0 y0; auto. Step_final x.
-apply interpR_mult with x0 y0; auto. Step_final x.
-apply interpR_unop with x0; auto. Step_final x.
-apply interpR_binop with x0 y0; auto. Step_final x.
-apply interpR_part with x0 Hx; auto. Step_final x.
+Proof.
+ intros e x y H H0.
+ inversion H; (* inversion bug fixed in V8.1 makes these rewritings useless *)
+ try (rewrite <- H2; rewrite H3 in H1).
+       apply interpR_var. Step_final x.
+       apply interpR_int. Step_final x.
+      apply interpR_plus with x0 y0; auto. Step_final x.
+     apply interpR_mult with x0 y0; auto. Step_final x.
+    apply interpR_unop with x0; auto. Step_final x.
+   apply interpR_binop with x0 y0; auto. Step_final x.
+  apply interpR_part with x0 Hx; auto. Step_final x.
 Qed.
 
 End Ring_Interpretation_Function.
@@ -303,402 +280,366 @@ P: sorted on M, all M's not an I
 Opaque Zmult.
 Lemma MI_mult_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (MI_mult e f) (x[*]y).
-cut (forall x y:R, II (expr_int 0) y -> II (expr_int 0) (x[*]y)).
-cut
- (forall (e1 e2 f:expr) (x y:R),
+Proof.
+ cut (forall x y:R, II (expr_int 0) y -> II (expr_int 0) (x[*]y)).
+  cut (forall (e1 e2 f:expr) (x y:R),
     (forall (f:expr) (x y:R), II e2 x -> II f y -> II (MI_mult e2 f) (x[*]y)) ->
-    II (expr_mult e1 e2) x ->
-    II f y -> II (expr_mult e1 (MI_mult e2 f)) (x[*]y)).
-cut
- (forall (i j:Z) (x y:R),
-    II (expr_int i) x -> II (expr_int j) y -> II (expr_int (i * j)) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
-simple induction e; simple induction f; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-simple induction z0; induction z; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-induction f; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-simple induction z0; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-simple induction z; simpl in |- *; auto.
-intros; apply interpR_mult with x y; algebra.
-intros; apply interpR_wd with (zring (i * j):R).
-apply interpR_int; algebra.
-inversion X. inversion X0.
-Step_final (zring i[*]zring j:R).
-intros. inversion X0. 
+      II (expr_mult e1 e2) x -> II f y -> II (expr_mult e1 (MI_mult e2 f)) (x[*]y)).
+   cut (forall (i j:Z) (x y:R),
+     II (expr_int i) x -> II (expr_int j) y -> II (expr_int (i * j)) (x[*]y)).
+    cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
+     simple induction e; simple induction f; simpl in |- *; auto.
+            simple induction z; simpl in |- *; auto.
+           simple induction z0; induction z; simpl in |- *; auto.
+          simple induction z; simpl in |- *; auto.
+         simple induction z; simpl in |- *; auto.
+        induction f; simpl in |- *; auto.
+         simple induction z; simpl in |- *; auto.
+        simple induction z0; simpl in |- *; auto.
+       simple induction z; simpl in |- *; auto.
+      simple induction z; simpl in |- *; auto.
+     simple induction z; simpl in |- *; auto.
+    intros; apply interpR_mult with x y; algebra.
+   intros; apply interpR_wd with (zring (i * j):R).
+    apply interpR_int; algebra.
+   inversion X. inversion X0.
+   Step_final (zring i[*]zring j:R).
+  intros. inversion X0.
   try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (x0[*](y0[*]y)); algebra.
-apply interpR_mult with x0 (y0[*]y); algebra.
-Step_final (x0[*]y0[*]y).
-intros. inversion X. 
-  try (rewrite H in H0; rewrite H1 in H0). (* compat 8.0 *)
-apply interpR_wd with (zring 0:R).
-apply interpR_int; algebra.
-astepl (Zero:R).
-astepl (x[*]Zero).
-Step_final (x[*]zring 0).
+  apply interpR_wd with (x0[*](y0[*]y)); algebra.
+   apply interpR_mult with x0 (y0[*]y); algebra.
+  Step_final (x0[*]y0[*]y).
+ intros. inversion X.
+ try (rewrite H in H0; rewrite H1 in H0). (* compat 8.0 *)
+ apply interpR_wd with (zring 0:R).
+  apply interpR_int; algebra.
+ astepl (Zero:R).
+ astepl (x[*]Zero).
+ Step_final (x[*]zring 0).
 Qed.
 Transparent Zmult.
 
 Opaque MI_mult.
 Lemma MV_mult_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (MV_mult e f) (x[*]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (MV_mult e2 f) (x[*]y)) ->
-    II (expr_mult e1 e2) x ->
-    II f y -> II (expr_mult e1 (MV_mult e2 f)) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R),
-    II e x -> II f y -> II (MI_mult (expr_mult f expr_one) e) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult f e) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
-intros H H0 H1 H2 e. elim e.
-simpl in |- *; auto.
-simpl in |- *; auto.
-intros e1 H3 e2 H4.
-elim e1; simpl in |- *; auto.
-intros e1 H3 e2 H4.
-elim e1; simpl in |- *; auto.
-intros n f.
-elim f; simpl in |- *; auto.
-intro m.
-elim (lt_nat n m); simpl in |- *; auto.
-intros u e0 H5 f.
-elim f; simpl in |- *; auto.
-intros u0 e3 H6.
-elim lt_nat; simpl in |- *; auto.
-elim andb; simpl in |- *; auto.
-intros b e0 H6 e3 H7 f.
-elim f; simpl in |- *; auto.
-intros b0 e4 H8 e5 H9.
-elim lt_nat; simpl in |- *; auto.
-elim andb; simpl in |- *; auto.
-elim andb; simpl in |- *; auto.
-intros n f H5 f0.
-elim f0; simpl in |- *; auto.
-intros f1 e0 H6.
-elim lt_nat; simpl in |- *; auto.
-elim andb; simpl in |- *; auto.
-intros. inversion X1.
-intros n e0 H3 f.
-elim f; simpl in |- *; auto.
-intros n e0 H3 e1 H4 f.
-elim f; simpl in |- *; auto.
-intros n e0 H3 f.
-elim f; simpl in |- *; auto.
-intros; apply interpR_mult with x y; algebra.
-intros; apply interpR_wd with (y[*]x); algebra.
-apply interpR_mult with y x; algebra.
-intros; apply interpR_wd with (y[*]One[*]x).
-apply MI_mult_corr_R; auto.
-apply interpR_mult with y (One:R); algebra.
-apply (interpR_int R val unop binop pfun 1); algebra.
-Step_final (x[*](y[*]One)).
-intros. inversion X0.
-  try (rewrite H0 in H2; rewrite H in X2; rewrite H1 in X3). (* compat 8.0 *)
-apply interpR_wd with (x0[*](y0[*]y)).
-apply interpR_mult with x0 (y0[*]y); algebra.
-Step_final (x0[*]y0[*]y).
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (MV_mult e2 f) (x[*]y)) ->
+     II (expr_mult e1 e2) x -> II f y -> II (expr_mult e1 (MV_mult e2 f)) (x[*]y)).
+  cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (MI_mult (expr_mult f expr_one) e) (x[*]y)).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult f e) (x[*]y)).
+    cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
+     intros H H0 H1 H2 e. elim e.
+     simpl in |- *; auto.
+           simpl in |- *; auto.
+          intros e1 H3 e2 H4.
+          elim e1; simpl in |- *; auto.
+         intros e1 H3 e2 H4.
+         elim e1; simpl in |- *; auto.
+            intros n f.
+            elim f; simpl in |- *; auto.
+            intro m.
+            elim (lt_nat n m); simpl in |- *; auto.
+           intros u e0 H5 f.
+           elim f; simpl in |- *; auto.
+           intros u0 e3 H6.
+           elim lt_nat; simpl in |- *; auto.
+           elim andb; simpl in |- *; auto.
+          intros b e0 H6 e3 H7 f.
+          elim f; simpl in |- *; auto.
+          intros b0 e4 H8 e5 H9.
+          elim lt_nat; simpl in |- *; auto.
+          elim andb; simpl in |- *; auto.
+          elim andb; simpl in |- *; auto.
+         intros n f H5 f0.
+         elim f0; simpl in |- *; auto.
+         intros f1 e0 H6.
+         elim lt_nat; simpl in |- *; auto.
+         elim andb; simpl in |- *; auto.
+        intros. inversion X1.
+        intros n e0 H3 f.
+       elim f; simpl in |- *; auto.
+      intros n e0 H3 e1 H4 f.
+      elim f; simpl in |- *; auto.
+     intros n e0 H3 f.
+     elim f; simpl in |- *; auto.
+    intros; apply interpR_mult with x y; algebra.
+   intros; apply interpR_wd with (y[*]x); algebra.
+   apply interpR_mult with y x; algebra.
+  intros; apply interpR_wd with (y[*]One[*]x).
+   apply MI_mult_corr_R; auto.
+   apply interpR_mult with y (One:R); algebra.
+   apply (interpR_int R val unop binop pfun 1); algebra.
+  Step_final (x[*](y[*]One)).
+ intros. inversion X0.
+ try (rewrite H0 in H2; rewrite H in X2; rewrite H1 in X3). (* compat 8.0 *)
+ apply interpR_wd with (x0[*](y0[*]y)).
+  apply interpR_mult with x0 (y0[*]y); algebra.
+ Step_final (x0[*]y0[*]y).
 Qed.
 Transparent MI_mult.
 
 Opaque MV_mult MI_mult.
 Lemma MM_mult_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (MM_mult e f) (x[*]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (MM_mult e2 f) (x[*]y)) ->
-    II (expr_mult e1 e2) x ->
-    II f y -> II (MV_mult (MM_mult e2 f) e1) (x[*]y)).
-cut
- (forall (i:Z) (f:expr) (x y:R),
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (MM_mult e2 f) (x[*]y)) ->
+     II (expr_mult e1 e2) x -> II f y -> II (MV_mult (MM_mult e2 f) e1) (x[*]y)).
+  cut (forall (i:Z) (f:expr) (x y:R),
     II (expr_int i) x -> II f y -> II (MI_mult f (expr_int i)) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
-intros H H0 H1 e.
-elim e; intros; simpl in |- *; auto.
-intros; apply interpR_mult with x y; algebra.
-intros; apply interpR_wd with (y[*]x); algebra.
-apply MI_mult_corr_R; auto.
-intros. inversion X0. 
-  try (rewrite H0 in H2; rewrite H in X2; rewrite H1 in X3). (* compat 8.0 *)
-apply interpR_wd with (y0[*]y[*]x0).
-apply MV_mult_corr_R; auto.
-astepl (x0[*](y0[*]y)).
-Step_final (x0[*]y0[*]y).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
+    intros H H0 H1 e.
+    elim e; intros; simpl in |- *; auto.
+   intros; apply interpR_mult with x y; algebra.
+  intros; apply interpR_wd with (y[*]x); algebra.
+  apply MI_mult_corr_R; auto.
+ intros. inversion X0.
+ try (rewrite H0 in H2; rewrite H in X2; rewrite H1 in X3). (* compat 8.0 *)
+ apply interpR_wd with (y0[*]y[*]x0).
+  apply MV_mult_corr_R; auto.
+ astepl (x0[*](y0[*]y)).
+ Step_final (x0[*]y0[*]y).
 Qed.
 Transparent MV_mult MI_mult.
 
 Opaque MV_mult.
 Lemma MM_plus_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (MM_plus e f) (x[+]y).
-cut
- (forall (i j:Z) (x y:R),
-    II (expr_int i) x -> II (expr_int j) y -> II (expr_int (i + j)) (x[+]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
-intros H H0 e; elim e.
-simpl in |- *; auto.
-intros z f; elim f; simpl in |- *; auto.
-simpl in |- *; auto.
-intros e1 H1 e2 H2.
-elim e1; simpl in |- *; auto.
-intros n f.
-elim f; simpl in |- *; auto.
-intros f1 H3 f2 H4.
-elim f1; simpl in |- *; auto.
-intro m.
-cut (eq_nat n m = true -> n = m).
-elim (eq_nat n m); simpl in |- *; auto.
-intros. inversion X. 
-  try (rewrite H6 in X1; rewrite H8 in X2; rewrite H7 in H9). (* compat 8.0 *)
-inversion X0.
-  try (rewrite H10 in X3; rewrite H12 in X4; rewrite H11 in H13). (* compat 8.0 *)
-apply interpR_wd with ((y0[+]y1)[*]x0).
-apply MV_mult_corr_R; auto.
-astepl (x0[*](y0[+]y1)).
-astepl (x0[*]y0[+]x0[*]y1).
-cut (x0[=]x1). intro.
-Step_final (x0[*]y0[+]x1[*]y1).
-apply refl_interpR with val unop binop pfun (expr_var n).
-assumption.
-rewrite (H5 (refl_equal true)). assumption.
-intros; apply eq_nat_corr; auto.
-
-intros u e0 H3 f.
-elim f; simpl in |- *; auto.
-intros e3 H4 e4 H5.
-elim e3; simpl in |- *; auto.
-intros u0 e5 H6.
-cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> u = u0).
-cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> e0 = e5).
-elim andb; simpl in |- *; auto.
-intros H' H''. intros.
-inversion X.
-  try (rewrite -> H7 in X1; rewrite H9 in X2; rewrite H8 in H10). (* compat 8.0 *)
-inversion X0.
-  try (rewrite H11 in X3; rewrite H13 in X4; rewrite H12 in H14). (* compat 8.0 *)
-apply interpR_wd with ((y0[+]y1)[*]x0).
-apply MV_mult_corr_R; auto.
-astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
-apply refl_interpR with val unop binop pfun (expr_unop u e0).
-auto. rewrite H'. rewrite H''. auto. auto. auto.
-intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
-intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
-
-intros u e0 H3 e3 H4 f.
-elim f; simpl in |- *; auto.
-intros e4 H5 e5 H6.
-elim e4; simpl in |- *; auto.
-intros u0 e6 H7 e7 H8.
-cut
- (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> u = u0).
-cut
- (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> e0 = e6).
-cut
- (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> e3 = e7).
-elim andb; simpl in |- *; auto.
-intros H' H'' H'''. intros.
-inversion X. 
-  try (rewrite H9 in X1; rewrite H11 in X2; rewrite H10 in H12). (* compat 8.0 *)
-inversion X0. 
-  try (rewrite H13 in X3; rewrite H15 in X4; rewrite H14 in H16). (* compat 8.0 *)
-apply interpR_wd with ((y0[+]y1)[*]x0).
-apply MV_mult_corr_R; auto.
-astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
-apply refl_interpR with val unop binop pfun (expr_binop u e0 e3).
-auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
-auto.
-intro. elim (andb_prop _ _ H9); intros. elim (andb_prop _ _ H11); intros.
- apply eq_expr_corr; auto. 
-intro. elim (andb_prop _ _ H9); intros. elim (andb_prop _ _ H11); intros.
- apply eq_expr_corr; auto. 
-intro. elim (andb_prop _ _ H9); intros. apply eq_nat_corr; auto.
-
-intros f e0 H3.
-intro f0.
-elim f0; simpl in |- *; auto.
-intros e3 H4 e4 H5.
-elim e3; simpl in |- *; auto.
-intros f1 e5 H6.
-cut (andb (eq_nat f f1) (eq_expr e0 e5) = true -> f = f1).
-cut (andb (eq_nat f f1) (eq_expr e0 e5) = true -> e0 = e5).
-elim (andb (eq_nat f f1) (eq_expr e0 e5)); simpl in |- *; auto.
-intros. 
-inversion X. 
-  try (rewrite H9 in X1; rewrite H11 in X2; rewrite H10 in H12). (* compat 8.0 *)
-inversion X0. 
-  try (rewrite H13 in X3; rewrite H15 in X4; rewrite H14 in H16). (* compat 8.0 *)
-apply interpR_wd with ((y0[+]y1)[*]x0).
-apply MV_mult_corr_R; auto.
-astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
-apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
-apply refl_interpR with val unop binop pfun (expr_part f e0).
-auto. rewrite H7. rewrite H8; auto. auto.
-intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto. 
-intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
-simpl in |- *; auto.
-
-intros u e0 H1 f.
-elim f; simpl in |- *; auto.
-intros u e0 H1 e1 H2 f.
-elim f; simpl in |- *; auto.
-intros u e0 H1 f.
-elim f; simpl in |- *; auto.
-
-intros; apply interpR_plus with x y; algebra.
-intros. inversion X. 
-  try (rewrite H1 in H0; rewrite H in H0). (* compat 8.0 *)
-inversion X0. 
-  try (rewrite H2 in H3; rewrite H4 in H3). (* compat 8.0 *)
-apply interpR_wd with (zring (i + j):R).
-apply interpR_int; algebra.
-Step_final (zring i[+]zring j:R).
+Proof.
+ cut (forall (i j:Z) (x y:R),
+   II (expr_int i) x -> II (expr_int j) y -> II (expr_int (i + j)) (x[+]y)).
+  cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
+   intros H H0 e; elim e.
+          simpl in |- *; auto.
+         intros z f; elim f; simpl in |- *; auto.
+        simpl in |- *; auto.
+       intros e1 H1 e2 H2.
+       elim e1; simpl in |- *; auto.
+          intros n f.
+          elim f; simpl in |- *; auto.
+          intros f1 H3 f2 H4.
+          elim f1; simpl in |- *; auto.
+          intro m.
+          cut (eq_nat n m = true -> n = m).
+           elim (eq_nat n m); simpl in |- *; auto.
+           intros. inversion X.
+           try (rewrite H6 in X1; rewrite H8 in X2; rewrite H7 in H9). (* compat 8.0 *)
+           inversion X0.
+           try (rewrite H10 in X3; rewrite H12 in X4; rewrite H11 in H13). (* compat 8.0 *)
+           apply interpR_wd with ((y0[+]y1)[*]x0).
+            apply MV_mult_corr_R; auto.
+           astepl (x0[*](y0[+]y1)).
+           astepl (x0[*]y0[+]x0[*]y1).
+           cut (x0[=]x1). intro.
+            Step_final (x0[*]y0[+]x1[*]y1).
+           apply refl_interpR with val unop binop pfun (expr_var n).
+            assumption.
+           rewrite (H5 (refl_equal true)). assumption.
+           intros; apply eq_nat_corr; auto.
+         intros u e0 H3 f.
+         elim f; simpl in |- *; auto.
+         intros e3 H4 e4 H5.
+         elim e3; simpl in |- *; auto.
+         intros u0 e5 H6.
+         cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> u = u0).
+          cut (andb (eq_nat u u0) (eq_expr e0 e5) = true -> e0 = e5).
+           elim andb; simpl in |- *; auto.
+           intros H' H''. intros.
+           inversion X.
+           try (rewrite -> H7 in X1; rewrite H9 in X2; rewrite H8 in H10). (* compat 8.0 *)
+           inversion X0.
+           try (rewrite H11 in X3; rewrite H13 in X4; rewrite H12 in H14). (* compat 8.0 *)
+           apply interpR_wd with ((y0[+]y1)[*]x0).
+            apply MV_mult_corr_R; auto.
+           astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+           apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
+            apply refl_interpR with val unop binop pfun (expr_unop u e0).
+            auto. rewrite H'. rewrite H''. auto. auto. auto.
+           intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto.
+          intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
+         intros u e0 H3 e3 H4 f.
+        elim f; simpl in |- *; auto.
+        intros e4 H5 e5 H6.
+        elim e4; simpl in |- *; auto.
+        intros u0 e6 H7 e7 H8.
+        cut (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> u = u0).
+         cut (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> e0 = e6).
+          cut (andb (eq_nat u u0) (andb (eq_expr e0 e6) (eq_expr e3 e7)) = true -> e3 = e7).
+           elim andb; simpl in |- *; auto.
+           intros H' H'' H'''. intros.
+           inversion X.
+           try (rewrite H9 in X1; rewrite H11 in X2; rewrite H10 in H12). (* compat 8.0 *)
+           inversion X0.
+           try (rewrite H13 in X3; rewrite H15 in X4; rewrite H14 in H16). (* compat 8.0 *)
+           apply interpR_wd with ((y0[+]y1)[*]x0).
+            apply MV_mult_corr_R; auto.
+           astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+           apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
+            apply refl_interpR with val unop binop pfun (expr_binop u e0 e3).
+            auto. rewrite H'. rewrite H''. rewrite H'''. auto. auto. auto.
+           auto.
+          intro. elim (andb_prop _ _ H9); intros. elim (andb_prop _ _ H11); intros.
+          apply eq_expr_corr; auto.
+         intro. elim (andb_prop _ _ H9); intros. elim (andb_prop _ _ H11); intros.
+         apply eq_expr_corr; auto.
+        intro. elim (andb_prop _ _ H9); intros. apply eq_nat_corr; auto.
+        intros f e0 H3.
+       intro f0.
+       elim f0; simpl in |- *; auto.
+       intros e3 H4 e4 H5.
+       elim e3; simpl in |- *; auto.
+       intros f1 e5 H6.
+       cut (andb (eq_nat f f1) (eq_expr e0 e5) = true -> f = f1).
+        cut (andb (eq_nat f f1) (eq_expr e0 e5) = true -> e0 = e5).
+         elim (andb (eq_nat f f1) (eq_expr e0 e5)); simpl in |- *; auto.
+         intros.
+         inversion X.
+         try (rewrite H9 in X1; rewrite H11 in X2; rewrite H10 in H12). (* compat 8.0 *)
+         inversion X0.
+         try (rewrite H13 in X3; rewrite H15 in X4; rewrite H14 in H16). (* compat 8.0 *)
+         apply interpR_wd with ((y0[+]y1)[*]x0).
+          apply MV_mult_corr_R; auto.
+         astepr (x0[*]y0[+]x1[*]y1). astepl (y0[*]x0[+]y1[*]x0).
+         apply bin_op_wd_unfolded. algebra. astepr (y1[*]x1). apply mult_wdr.
+          apply refl_interpR with val unop binop pfun (expr_part f e0).
+          auto. rewrite H7. rewrite H8; auto. auto.
+         intro. elim (andb_prop _ _ H7); intros. apply eq_expr_corr; auto.
+        intro. elim (andb_prop _ _ H7); intros. apply eq_nat_corr; auto.
+       simpl in |- *; auto.
+     intros u e0 H1 f.
+     elim f; simpl in |- *; auto.
+    intros u e0 H1 e1 H2 f.
+    elim f; simpl in |- *; auto.
+   intros u e0 H1 f.
+   elim f; simpl in |- *; auto.
+  intros; apply interpR_plus with x y; algebra.
+ intros. inversion X.
+ try (rewrite H1 in H0; rewrite H in H0). (* compat 8.0 *)
+ inversion X0.
+ try (rewrite H2 in H3; rewrite H4 in H3). (* compat 8.0 *)
+ apply interpR_wd with (zring (i + j):R).
+  apply interpR_int; algebra.
+ Step_final (zring i[+]zring j:R).
 Qed.
 Transparent MV_mult.
 
 Opaque MM_plus.
 Lemma PM_plus_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (PM_plus e f) (x[+]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PM_plus e2 f) (x[+]y)) ->
+     II (expr_plus e1 e2) x -> II f y -> II (expr_plus e1 (PM_plus e2 f)) (x[+]y)).
+  cut (forall (e1 e2 f:expr) (x y:R),
     (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PM_plus e2 f) (x[+]y)) ->
-    II (expr_plus e1 e2) x ->
-    II f y -> II (expr_plus e1 (PM_plus e2 f)) (x[+]y)).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PM_plus e2 f) (x[+]y)) ->
-    II (expr_plus e1 e2) x ->
-    II f y -> II (PM_plus e2 (MM_plus e1 f)) (x[+]y)).
-cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (MM_plus e f) (x[+]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus f e) (x[+]y)).
-intros H H0 H1 H2 H3 e. elim e.
-simpl in |- *; auto.
-intros z f; elim f; intros; simpl in |- *; auto.
-intros e1 H4 e2 H5 f. simpl in |- *.
-elim (lt_monom e1 f); elim (eq_monom e1 f); elim f; intros; simpl in |- *;
- auto.
-simpl in |- *; auto.
-simpl in |- *; auto.
-simpl in |- *; auto.
-simpl in |- *; auto.
-simpl in |- *; auto.
-intros; apply interpR_wd with (y[+]x); algebra.
-apply interpR_plus with y x; algebra.
-intros; apply interpR_plus with x y; algebra.
-intros; apply MM_plus_corr_R; auto.
-intros. inversion X0. 
+      II (expr_plus e1 e2) x -> II f y -> II (PM_plus e2 (MM_plus e1 f)) (x[+]y)).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (MM_plus e f) (x[+]y)).
+    cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
+     cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus f e) (x[+]y)).
+      intros H H0 H1 H2 H3 e. elim e.
+      simpl in |- *; auto.
+            intros z f; elim f; intros; simpl in |- *; auto.
+           intros e1 H4 e2 H5 f. simpl in |- *.
+           elim (lt_monom e1 f); elim (eq_monom e1 f); elim f; intros; simpl in |- *; auto.
+          simpl in |- *; auto.
+         simpl in |- *; auto.
+        simpl in |- *; auto.
+       simpl in |- *; auto.
+      simpl in |- *; auto.
+     intros; apply interpR_wd with (y[+]x); algebra.
+     apply interpR_plus with y x; algebra.
+    intros; apply interpR_plus with x y; algebra.
+   intros; apply MM_plus_corr_R; auto.
+  intros. inversion X0.
   try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (y0[+](x0[+]y)).
-apply X; auto.
-apply MM_plus_corr_R; auto.
-astepl (y0[+]x0[+]y).
-Step_final (x0[+]y0[+]y).
-intros. inversion X0. 
-  try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (x0[+](y0[+]y)).
-apply interpR_plus with x0 (y0[+]y); algebra.
-Step_final (x0[+]y0[+]y).
+  apply interpR_wd with (y0[+](x0[+]y)).
+   apply X; auto.
+   apply MM_plus_corr_R; auto.
+  astepl (y0[+]x0[+]y).
+  Step_final (x0[+]y0[+]y).
+ intros. inversion X0.
+ try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
+ apply interpR_wd with (x0[+](y0[+]y)).
+  apply interpR_plus with x0 (y0[+]y); algebra.
+ Step_final (x0[+]y0[+]y).
 Qed.
 Transparent MM_plus.
 
 Opaque PM_plus.
 Lemma PP_plus_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (PP_plus e f) (x[+]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PP_plus e2 f) (x[+]y)) ->
-    II (expr_plus e1 e2) x ->
-    II f y -> II (PM_plus (PP_plus e2 f) e1) (x[+]y)).
-cut
- (forall (i:Z) (f:expr) (x y:R),
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PP_plus e2 f) (x[+]y)) ->
+     II (expr_plus e1 e2) x -> II f y -> II (PM_plus (PP_plus e2 f) e1) (x[+]y)).
+  cut (forall (i:Z) (f:expr) (x y:R),
     II (expr_int i) x -> II f y -> II (PM_plus f (expr_int i)) (x[+]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
-intros H H0 H1 e.
-elim e; intros; simpl in |- *; auto.
-intros. apply interpR_plus with x y; algebra.
-intros. apply interpR_wd with (y[+]x); algebra.
-apply PM_plus_corr_R; auto.
-intros. inversion X0. 
-  try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (y0[+]y[+]x0).
-apply PM_plus_corr_R; auto.
-astepl (x0[+](y0[+]y)).
-Step_final (x0[+]y0[+]y).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_plus e f) (x[+]y)).
+    intros H H0 H1 e.
+    elim e; intros; simpl in |- *; auto.
+   intros. apply interpR_plus with x y; algebra.
+   intros. apply interpR_wd with (y[+]x); algebra.
+  apply PM_plus_corr_R; auto.
+ intros. inversion X0.
+ try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
+ apply interpR_wd with (y0[+]y[+]x0).
+  apply PM_plus_corr_R; auto.
+ astepl (x0[+](y0[+]y)).
+ Step_final (x0[+]y0[+]y).
 Qed.
 Transparent PM_plus.
 
 Opaque PM_plus MM_mult MI_mult.
 Lemma PM_mult_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (PM_mult e f) (x[*]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PM_mult e2 f) (x[*]y)) ->
-    II (expr_plus e1 e2) x ->
-    II f y -> II (PM_plus (PM_mult e2 f) (MM_mult e1 f)) (x[*]y)).
-cut
- (forall (i:Z) (f:expr) (x y:R),
-    II (expr_int i) x ->
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PM_mult e2 f) (x[*]y)) ->
+     II (expr_plus e1 e2) x -> II f y -> II (PM_plus (PM_mult e2 f) (MM_mult e1 f)) (x[*]y)).
+  cut (forall (i:Z) (f:expr) (x y:R), II (expr_int i) x ->
     II f y -> II (PM_plus (expr_int 0) (MI_mult f (expr_int i))) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
-intros H H0 H1 e.
-elim e; intros; simpl in |- *; auto.
-intros. apply interpR_mult with x y; algebra.
-intros. apply interpR_wd with (zring 0[+]y[*]x).
-apply PM_plus_corr_R.
-apply interpR_int; algebra.
-apply MI_mult_corr_R; auto.
-astepl (Zero[+]y[*]x).
-Step_final (y[*]x).
-intros. inversion X0. 
-  try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (y0[*]y[+]x0[*]y).
-apply PM_plus_corr_R; auto.
-apply MM_mult_corr_R; auto.
-astepl ((y0[+]x0)[*]y).
-Step_final ((x0[+]y0)[*]y).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
+    intros H H0 H1 e.
+    elim e; intros; simpl in |- *; auto.
+   intros. apply interpR_mult with x y; algebra.
+   intros. apply interpR_wd with (zring 0[+]y[*]x).
+  apply PM_plus_corr_R.
+    apply interpR_int; algebra.
+   apply MI_mult_corr_R; auto.
+  astepl (Zero[+]y[*]x).
+  Step_final (y[*]x).
+ intros. inversion X0.
+ try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
+ apply interpR_wd with (y0[*]y[+]x0[*]y).
+  apply PM_plus_corr_R; auto.
+  apply MM_mult_corr_R; auto.
+ astepl ((y0[+]x0)[*]y).
+ Step_final ((x0[+]y0)[*]y).
 Qed.
 
 Opaque PM_mult.
 Lemma PP_mult_corr_R :
  forall (e f:expr) (x y:R), II e x -> II f y -> II (PP_mult e f) (x[*]y).
-cut
- (forall (e1 e2 f:expr) (x y:R),
-    (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PP_mult e2 f) (x[*]y)) ->
-    II (expr_plus e1 e2) x ->
-    II f y -> II (PP_plus (PM_mult f e1) (PP_mult e2 f)) (x[*]y)).
-cut
- (forall (i:Z) (f:expr) (x y:R),
+Proof.
+ cut (forall (e1 e2 f:expr) (x y:R),
+   (forall (f:expr) (x y:R), II e2 x -> II f y -> II (PP_mult e2 f) (x[*]y)) ->
+     II (expr_plus e1 e2) x -> II f y -> II (PP_plus (PM_mult f e1) (PP_mult e2 f)) (x[*]y)).
+  cut (forall (i:Z) (f:expr) (x y:R),
     II (expr_int i) x -> II f y -> II (PM_mult f (expr_int i)) (x[*]y)).
-cut
- (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
-intros H H0 H1 e.
-elim e; intros; simpl in |- *; auto.
-intros. apply interpR_mult with x y; algebra.
-intros. apply interpR_wd with (y[*]x); algebra.
-apply PM_mult_corr_R; auto.
-intros. inversion X0. 
-  try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
-apply interpR_wd with (y[*]x0[+]y0[*]y).
-apply PP_plus_corr_R; auto.
-apply PM_mult_corr_R; auto.
-astepl (x0[*]y[+]y0[*]y).
-Step_final ((x0[+]y0)[*]y).
+   cut (forall (e f:expr) (x y:R), II e x -> II f y -> II (expr_mult e f) (x[*]y)).
+    intros H H0 H1 e.
+    elim e; intros; simpl in |- *; auto.
+   intros. apply interpR_mult with x y; algebra.
+   intros. apply interpR_wd with (y[*]x); algebra.
+  apply PM_mult_corr_R; auto.
+ intros. inversion X0.
+ try (rewrite H in X2; rewrite H1 in X3; rewrite H0 in H2). (* compat 8.0 *)
+ apply interpR_wd with (y[*]x0[+]y0[*]y).
+  apply PP_plus_corr_R; auto.
+  apply PM_mult_corr_R; auto.
+ astepl (x0[*]y[+]y0[*]y).
+ Step_final ((x0[+]y0)[*]y).
 Qed.
 
 (*
@@ -762,74 +703,51 @@ Qed.
 *)
 
 Lemma NormR_corr : forall (e:expr) (x:R), II e x -> II (NormR e) x.
-intro; induction e; intros; simpl in |- *.
-
-apply
- (interpR_plus R val unop binop pfun (expr_mult (expr_var v) expr_one)
-    expr_zero x (Zero:R) x).
-algebra.
-apply (interpR_mult R val unop binop pfun (expr_var v) expr_one x (One:R) x);
- algebra.
-apply (interpR_int R val unop binop pfun 1); algebra.
-apply (interpR_int R val unop binop pfun 0); algebra.
-
-assumption.
-
-inversion X. 
-  try (rewrite H in X0; rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
- apply interpR_wd with (x0[+]y). apply PP_plus_corr_R; auto. auto.
-
-inversion X. 
- try (rewrite H in X0; rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
- apply interpR_wd with (x0[*]y). apply PP_mult_corr_R; auto. auto.
-
-assumption.
-
-inversion X. 
-  try (rewrite H in H2; rewrite H1 in X0; rewrite H0 in H2). (* compat 8.0 *)
-apply
- (interpR_plus R val unop binop pfun
-    (expr_mult (expr_unop u (NormR e)) expr_one) expr_zero x (
-    Zero:R) x).
-algebra.
-apply
- (interpR_mult R val unop binop pfun (expr_unop u (NormR e)) expr_one x
-    (One:R) x); algebra.
-apply (interpR_unop R val unop binop pfun (NormR e) u x0); algebra.
-apply (interpR_int R val unop binop pfun 1); algebra.
-apply (interpR_int R val unop binop pfun 0); algebra.
-
-inversion X. 
+Proof.
+ intro; induction e; intros; simpl in |- *.
+        apply (interpR_plus R val unop binop pfun (expr_mult (expr_var v) expr_one) expr_zero x (Zero:R) x).
+          algebra.
+         apply (interpR_mult R val unop binop pfun (expr_var v) expr_one x (One:R) x); algebra.
+         apply (interpR_int R val unop binop pfun 1); algebra.
+        apply (interpR_int R val unop binop pfun 0); algebra.
+       assumption.
+      inversion X.
+      try (rewrite H in X0; rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
+      apply interpR_wd with (x0[+]y). apply PP_plus_corr_R; auto. auto.
+       inversion X.
+     try (rewrite H in X0; rewrite H1 in X1; rewrite H0 in H2). (* compat 8.0 *)
+     apply interpR_wd with (x0[*]y). apply PP_mult_corr_R; auto. auto.
+      assumption.
+   inversion X.
+   try (rewrite H in H2; rewrite H1 in X0; rewrite H0 in H2). (* compat 8.0 *)
+   apply (interpR_plus R val unop binop pfun (expr_mult (expr_unop u (NormR e)) expr_one) expr_zero x (
+     Zero:R) x).
+     algebra.
+    apply (interpR_mult R val unop binop pfun (expr_unop u (NormR e)) expr_one x (One:R) x); algebra.
+     apply (interpR_unop R val unop binop pfun (NormR e) u x0); algebra.
+    apply (interpR_int R val unop binop pfun 1); algebra.
+   apply (interpR_int R val unop binop pfun 0); algebra.
+  inversion X.
   (* compat 8.0 *)
   try (rewrite H in H3; rewrite H1 in X0; rewrite H2 in X1; rewrite H0 in H3).
-apply
- (interpR_plus R val unop binop pfun
-    (expr_mult (expr_binop b (NormR e1) (NormR e2)) expr_one) expr_zero x
-    (Zero:R) x).
-algebra.
-apply
- (interpR_mult R val unop binop pfun (expr_binop b (NormR e1) (NormR e2))
-    expr_one x (One:R) x); algebra.
-apply (interpR_binop R val unop binop pfun (NormR e1) (NormR e2) b x0 y);
- algebra.
-apply (interpR_int R val unop binop pfun 1); algebra.
-apply (interpR_int R val unop binop pfun 0); algebra.
-
-inversion X. 
-  try ((generalize Hx H2; clear Hx H2; rewrite H; intros Hx H2);
-        rewrite H1 in X0; rewrite H0 in H2). (* compat 8.0 *)
-apply
- (interpR_plus R val unop binop pfun
-    (expr_mult (expr_part p (NormR e)) expr_one) expr_zero x (
-    Zero:R) x).
-algebra.
-apply
- (interpR_mult R val unop binop pfun (expr_part p (NormR e)) expr_one x
-    (One:R) x); algebra.
-apply (interpR_part R val unop binop pfun (NormR e) p x0) with (Hx := Hx);
- algebra.
-apply (interpR_int R val unop binop pfun 1); algebra.
-apply (interpR_int R val unop binop pfun 0); algebra.
+  apply (interpR_plus R val unop binop pfun
+    (expr_mult (expr_binop b (NormR e1) (NormR e2)) expr_one) expr_zero x (Zero:R) x).
+    algebra.
+   apply (interpR_mult R val unop binop pfun (expr_binop b (NormR e1) (NormR e2))
+     expr_one x (One:R) x); algebra.
+    apply (interpR_binop R val unop binop pfun (NormR e1) (NormR e2) b x0 y); algebra.
+   apply (interpR_int R val unop binop pfun 1); algebra.
+  apply (interpR_int R val unop binop pfun 0); algebra.
+ inversion X.
+ try ((generalize Hx H2; clear Hx H2; rewrite H; intros Hx H2);
+   rewrite H1 in X0; rewrite H0 in H2). (* compat 8.0 *)
+ apply (interpR_plus R val unop binop pfun (expr_mult (expr_part p (NormR e)) expr_one) expr_zero x (
+   Zero:R) x).
+   algebra.
+  apply (interpR_mult R val unop binop pfun (expr_part p (NormR e)) expr_one x (One:R) x); algebra.
+   apply (interpR_part R val unop binop pfun (NormR e) p x0) with (Hx := Hx); algebra.
+  apply (interpR_int R val unop binop pfun 1); algebra.
+ apply (interpR_int R val unop binop pfun 0); algebra.
 Qed.
 
 Lemma Tactic_lemmaR :
@@ -837,11 +755,12 @@ Lemma Tactic_lemmaR :
    (f:xexprR R val unop binop pfun y),
    eq_expr (NormR (xforgetR _ _ _ _ _ _ e)) (NormR (xforgetR _ _ _ _ _ _ f)) =
    true -> x[=]y.
-intros x y e f H.
-apply refl_interpR with val unop binop pfun (NormR (xforgetR _ _ _ _ _ _ e)).
-apply NormR_corr; apply xexprR2interpR.
-rewrite (eq_expr_corr _ _ H).
-apply NormR_corr; apply xexprR2interpR.
+Proof.
+ intros x y e f H.
+ apply refl_interpR with val unop binop pfun (NormR (xforgetR _ _ _ _ _ _ e)).
+  apply NormR_corr; apply xexprR2interpR.
+ rewrite (eq_expr_corr _ _ H).
+ apply NormR_corr; apply xexprR2interpR.
 Qed.
 
 End Ring_NormCorrect.
@@ -858,11 +777,11 @@ match l with
     match (ClosedZ k) with
     | true => constr:(xexprR_int R a b c d k)
     end
- | (csbf_fun _ _ _ csg_op ?x ?y) => 
+ | (csbf_fun _ _ _ csg_op ?x ?y) =>
     let x' := QuoteR R l x in
     let y' := QuoteR R l y in
     constr:(xexprR_plus R a b c d _ _ x' y')
- | (csbf_fun _ _ _ cr_mult ?x ?y) => 
+ | (csbf_fun _ _ _ cr_mult ?x ?y) =>
     let x' := QuoteR R l x in
     let y' := QuoteR R l y in
     constr:(xexprR_mult R a b c d _ _ x' y')
@@ -872,86 +791,86 @@ match l with
     match (ClosedNat n) with
     | true => constr:(xexprR_nat R a b c d n)
     end
- | (csf_fun _ _ cg_inv ?x) => 
+ | (csf_fun _ _ cg_inv ?x) =>
     let x' := QuoteR R l x in
     constr:(xexprR_inv R a b c d _ x')
- | (cg_minus ?x ?y) => 
+ | (cg_minus ?x ?y) =>
     let x' := QuoteR R l x in
     let y' := QuoteR R l y in
     constr:(xexprR_minus R a b c d _ _ x' y')
- | (csf_fun _ _ (@nexp_op _ ?n) ?x) => 
+ | (csf_fun _ _ (@nexp_op _ ?n) ?x) =>
     match (ClosedNat n) with
     | true => let x' := QuoteR R l x in
               constr:(xexprR_power R a b c d _ x' n)
     end
- | (pfpfun ?f ?x ?h) => 
+ | (pfpfun ?f ?x ?h) =>
     let x' := QuoteR R l x in
     let i := FindIndex f pl in
-    constr:(xexprR_part R a b c d _ i x' h) 
- | (csf_fun _ _ ?f ?x) => 
+    constr:(xexprR_part R a b c d _ i x' h)
+ | (csf_fun _ _ ?f ?x) =>
     let x' := QuoteR R l x in
     let i := FindIndex f ul in
-    constr:(xexprR_unop R a b c d _ i x') 
- | (csbf_fun _ _ _ ?f ?x ?y) => 
+    constr:(xexprR_unop R a b c d _ i x')
+ | (csbf_fun _ _ _ ?f ?x ?y) =>
     let x' := QuoteR R l x in
     let y' := QuoteR R l y in
     let i := FindIndex f bl in
-    constr:(xexprR_binop R a b c d _ _ i x' y') 
- | ?t => 
-    let i := FindIndex t vl in 
+    constr:(xexprR_binop R a b c d _ _ i x' y')
+ | ?t =>
+    let i := FindIndex t vl in
     constr:(xexprR_var R a b c d i)
 end)
 end.
 
-Ltac FindTermVariablesR t l := 
+Ltac FindTermVariablesR t l :=
 match t with
 | (zring ?k) =>
     match (ClosedZ k) with
     | true => constr:l
     end
-| (csbf_fun _ _ _ csg_op ?x ?y) => 
+| (csbf_fun _ _ _ csg_op ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
     constr:l2
-| (csbf_fun _ _ _ cr_mult ?x ?y) => 
+| (csbf_fun _ _ _ cr_mult ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
     constr:l2
 | (Zero) => constr:l
 | (One) => constr:l
-| (nring ?n) =>    
+| (nring ?n) =>
     match (ClosedNat n) with
     | true => constr:l
     end
-| (csf_fun _ _ cg_inv ?x) => 
+| (csf_fun _ _ cg_inv ?x) =>
     let l1 := FindTermVariablesR x l in
     constr:l1
-| (cg_minus ?x ?y) => 
+| (cg_minus ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
     constr:l2
-| (csf_fun _ _ (@nexp_op _ ?n) ?x) => 
+| (csf_fun _ _ (@nexp_op _ ?n) ?x) =>
     match (ClosedNat n) with
     | true => let l1 := FindTermVariablesR x l in
               constr:l1
     end
-| (pfpfun ?f ?x ?h) => 
+| (pfpfun ?f ?x ?h) =>
     let l1 := FindTermVariablesR x l in
     match l1 with
      (Quad ?vl ?ul ?bl ?pl) => constr:(Quad vl ul bl (Mcons f pl))
     end
-| (csf_fun _ _ ?f ?x) => 
+| (csf_fun _ _ ?f ?x) =>
     let l1 := FindTermVariablesR x l in
     match l1 with
      (Quad ?vl ?ul ?bl ?pl) => constr:(Quad vl (Mcons f ul) bl pl)
     end
-| (csbf_fun _ _ _ ?f ?x ?y) => 
+| (csbf_fun _ _ _ ?f ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
     match l2 with
      (Quad ?vl ?ul ?bl ?pl) => constr:(Quad vl ul (Mcons f bl) pl)
     end
-| ?t => match l with 
+| ?t => match l with
          (Quad ?vl ?ul ?bl ?pl) => constr:(Quad (Mcons t vl) ul bl pl)
         end
 end.
@@ -961,10 +880,10 @@ Ltac FindTermsVariablesR fn t1 t2 :=
     let l2 := FindTermVariablesR t2 l1 in
     constr:l2.
 
-Ltac rationalR R x y := 
+Ltac rationalR R x y :=
                  let l:=FindTermsVariablesR R x y in
-                 let t1:=(QuoteR R l x) in 
-                 let t2:=(QuoteR R l y) in 
+                 let t1:=(QuoteR R l x) in
+                 let t2:=(QuoteR R l y) in
                  eapply Tactic_lemmaR with (e:=t1) (f:=t2)
                  ; reflexivity.
 

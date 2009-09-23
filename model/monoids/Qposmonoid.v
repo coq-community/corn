@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 
 Require Export Qpossemigroup.
@@ -45,16 +45,16 @@ One is the unit for multiplication on positive integers. Therefore the positive 
 
 Lemma QONEpos_is_rht_unit : is_rht_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
 Proof.
-intros x.
-simpl.
-QposRing.
+ intros x.
+ simpl.
+ QposRing.
 Qed.
 
 Lemma QONEpos_is_lft_unit : is_lft_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
 Proof.
-intros x.
-simpl.
-QposRing.
+ intros x.
+ simpl.
+ QposRing.
 Qed.
 
 Definition Qpos_mult_is_CMonoid := Build_is_CMonoid

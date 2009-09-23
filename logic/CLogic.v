@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (** printing Not %\ensuremath\neg% #~# *)
 (** printing CNot %\ensuremath\neg% #~# *)
@@ -105,12 +105,12 @@ Inductive CAnd (A B : CProp) : CProp := CAnd_intro : A -> B -> CAnd A B.
 
 Lemma CAnd_proj1 : forall A B : CProp, (CAnd A B) -> A.
 Proof.
-intros A B [H _]; exact H.
+ intros A B [H _]; exact H.
 Qed.
 
 Lemma CAnd_proj2 : forall A B : CProp, (CAnd A B) -> B.
 Proof.
-intros A B [ _ H ]; exact H.
+ intros A B [ _ H ]; exact H.
 Qed.
 
 Definition Iff (A B : CProp) : CProp := CAnd (A -> B) (B -> A).
@@ -155,11 +155,12 @@ Definition proj2b_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
 Inductive toCProp (A : Prop) : CProp := ts : A -> toCProp A.
 
 Lemma toCProp_e : forall A : Prop, toCProp A -> forall P : Prop, (A -> P) -> P.
-intros A H P H0.
-elim H.
-intros H1.
-apply H0.
-assumption.
+Proof.
+ intros A H P H0.
+ elim H.
+ intros H1.
+ apply H0.
+ assumption.
 Qed.
 
 Definition CNot (A : Prop): CProp := A -> CFalse.
@@ -191,53 +192,53 @@ Notation ProjT1 := (proj1_sigT _ _).
 Notation ProjT2 := (proj2_sigT _ _).
 (* end hide *)
 
-(** 
-Some lemmas to make it possible to use [Step] 
+(**
+Some lemmas to make it possible to use [Step]
 when reasoning with bi-implications. *)
 
-Lemma Iff_left : 
-  forall (A B C : CProp), 
+Lemma Iff_left :
+  forall (A B C : CProp),
   (A IFF B) -> (A IFF C) -> (C IFF B).
 Proof.
-unfold Iff. 
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
-Lemma Iff_right: 
-  forall (A B C : CProp), 
+Lemma Iff_right:
+  forall (A B C : CProp),
   (A IFF B) -> (A IFF C) -> (B IFF C).
 Proof.
-unfold Iff. 
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
 Lemma Iff_refl : forall (A : CProp), (A IFF A).
 Proof.
-unfold Iff. 
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
-Lemma Iff_sym : 
+Lemma Iff_sym :
   forall (A B : CProp),(A IFF B) -> (B IFF A).
 Proof.
-unfold Iff. 
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
-Lemma Iff_trans : 
-  forall (A B C : CProp), 
+Lemma Iff_trans :
+  forall (A B C : CProp),
   (CAnd (A IFF B) (B IFF C)) -> (A IFF C).
 Proof.
-unfold Iff. 
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
-Lemma Iff_imp_imp : 
+Lemma Iff_imp_imp :
   forall (A B : CProp),
   (A IFF B) -> (CAnd (A->B) (B->A)).
 Proof.
-unfold Iff.
-intuition.
+ unfold Iff.
+ intuition.
 Qed.
 
 Declare Right Step Iff_right.
@@ -246,26 +247,26 @@ Hint Resolve Iff_trans Iff_sym Iff_refl Iff_right Iff_left Iff_imp_imp : algebra
 
 
 
-Lemma not_r_cor_rect : 
-  forall (A B : CProp) (S : Type) (l r : S), 
-  Not B -> 
+Lemma not_r_cor_rect :
+  forall (A B : CProp) (S : Type) (l r : S),
+  Not B ->
   forall H : A or B,
   COr_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = l.
 Proof.
-intros. elim H0.
-intros. reflexivity.
-intro. elim H. assumption.
+ intros. elim H0.
+ intros. reflexivity.
+  intro. elim H. assumption.
 Qed.
 
-Lemma not_l_cor_rect : 
-  forall (A B : CProp) (S : Type) (l r : S), 
-  Not A -> 
+Lemma not_l_cor_rect :
+  forall (A B : CProp) (S : Type) (l r : S),
+  Not A ->
   forall H : A or B,
   COr_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = r.
 Proof.
-intros. elim H0.
-intro. elim H. assumption.
-intros. reflexivity.
+ intros. elim H0.
+ intro. elim H. assumption.
+  intros. reflexivity.
 Qed.
 
 (* begin hide *)
@@ -303,13 +304,13 @@ Let [P] be a predicate on $\NN^2$#N times N#.
 
 Variable P : nat -> nat -> Prop.
 
-Lemma choice : 
-  (forall n : nat, {m : nat | P n m}) -> 
+Lemma choice :
+  (forall n : nat, {m : nat | P n m}) ->
   {d : nat -> nat | forall n : nat, P n (d n)}.
 Proof.
-intro H.
-exists (fun i : nat => proj1_sigT _ _ (H i)).
-apply (fun i : nat => proj2_sigT _ _ (H i)).
+ intro H.
+ exists (fun i : nat => proj1_sigT _ _ (H i)).
+ apply (fun i : nat => proj2_sigT _ _ (H i)).
 Qed.
 
 End Choice.
@@ -322,13 +323,14 @@ when [A], [B] and [C] are non trivial.
 
 Lemma CNot_Not_or : forall A B C : CProp,
  (A -> Not C) -> (B -> Not C) -> ~ Not (A or B) -> Not C.
-intros A B C H H0 H1.
-intro H2.
-apply H1.
-intro H3.
-elim H3.
-intro; apply H; auto.
-intro; apply H0; auto.
+Proof.
+ intros A B C H H0 H1.
+ intro H2.
+ apply H1.
+ intro H3.
+ elim H3.
+  intro; apply H; auto.
+ intro; apply H0; auto.
 Qed.
 
 Lemma CdeMorgan_ex_all : forall (A : Type) (P : A -> CProp) (X : Type),
@@ -356,16 +358,16 @@ Definition Crelation := A -> A -> CProp.
 
 Variable R : Crelation.
 
-Definition Creflexive : CProp := 
+Definition Creflexive : CProp :=
   forall x : A, R x x.
 
-Definition Ctransitive : CProp := 
+Definition Ctransitive : CProp :=
   forall x y z : A, R x y -> R y z -> R x z.
 
-Definition Csymmetric : CProp := 
+Definition Csymmetric : CProp :=
   forall x y : A, R x y -> R y x.
 
-Record Cequivalence : CProp := 
+Record Cequivalence : CProp :=
   {Cequiv_refl  : Creflexive;
    Cequiv_symm  : Csymmetric;
    Cequiv_trans : Ctransitive}.
@@ -421,102 +423,104 @@ Theorem Cnat_double_ind : forall R : nat -> nat -> CProp,
  (forall n : nat, R 0 n) -> (forall n : nat, R (S n) 0) ->
  (forall n m : nat, R n m -> R (S n) (S m)) -> forall n m : nat, R n m.
 Proof.
-  simple induction n; auto.
-  simple induction m; auto.
+ simple induction n; auto.
+ simple induction m; auto.
 Qed.
 
 Theorem my_Cle_ind : forall (n : nat) (P : nat -> CProp),
  P n -> (forall m : nat, Cle n m -> P m -> P (S m)) ->
  forall n0 : nat, Cle n n0 -> P n0.
 Proof.
-intros n P.
-generalize (Cle_rect n (fun (n0 : nat) (H : Cle n n0) => P n0)); intro.
-assumption.
+ intros n P.
+ generalize (Cle_rect n (fun (n0 : nat) (H : Cle n n0) => P n0)); intro.
+ assumption.
 Qed.
 
 Theorem Cle_n_S : forall n m : nat, Cle n m -> Cle (S n) (S m).
 Proof.
-intros n m H.
-pattern m in |- *.
-apply (my_Cle_ind n).
-apply Cle_n.
-intros.
-apply Cle_S.
-assumption.
-assumption.
+ intros n m H.
+ pattern m in |- *.
+ apply (my_Cle_ind n).
+   apply Cle_n.
+  intros.
+  apply Cle_S.
+  assumption.
+ assumption.
 Qed.
 
 Lemma toCle : forall m n : nat, m <= n -> Cle m n.
-intros m.
-induction  m as [| m Hrecm].
-simple induction n.
-intro H.
-apply Cle_n.
-intros n0 H H0.
-apply Cle_S.
-apply H.
-apply le_O_n.
-simple induction n.
-intro.
-elimtype False.
-inversion H.
-intros n0 H H0.
-generalize (le_S_n _ _ H0); intro H1.
-generalize (Hrecm _ H1); intro H2.
-apply Cle_n_S.
-assumption.
+Proof.
+ intros m.
+ induction  m as [| m Hrecm].
+  simple induction n.
+   intro H.
+   apply Cle_n.
+  intros n0 H H0.
+  apply Cle_S.
+  apply H.
+  apply le_O_n.
+ simple induction n.
+  intro.
+  elimtype False.
+  inversion H.
+ intros n0 H H0.
+ generalize (le_S_n _ _ H0); intro H1.
+ generalize (Hrecm _ H1); intro H2.
+ apply Cle_n_S.
+ assumption.
 Qed.
 
 Hint Resolve toCle.
 
 Lemma Cle_to : forall m n : nat, Cle m n -> m <= n.
-intros m n H.
-elim H.
-apply le_n.
-intros m0 s H0.
-apply le_S.
-assumption.
+Proof.
+ intros m n H.
+ elim H.
+  apply le_n.
+ intros m0 s H0.
+ apply le_S.
+ assumption.
 Qed.
 
 Definition Clt (m n : nat) : CProp := Cle (S m) n.
 
 Lemma toCProp_lt : forall m n : nat, m < n -> Clt m n.
 Proof.
-unfold lt in |- *.
-unfold Clt in |- *.
-intros m n H.
-apply toCle.
-assumption.
+ unfold lt in |- *.
+ unfold Clt in |- *.
+ intros m n H.
+ apply toCle.
+ assumption.
 Qed.
 
 Lemma Clt_to : forall m n : nat, Clt m n -> m < n.
 Proof.
-unfold lt in |- *.
-unfold Clt in |- *.
-intros m n H.
-apply Cle_to.
-assumption.
+ unfold lt in |- *.
+ unfold Clt in |- *.
+ intros m n H.
+ apply Cle_to.
+ assumption.
 Qed.
 
 Lemma Cle_le_S_eq : forall p q : nat, p <= q -> {S p <= q} + {p = q}.
 Proof.
-intros p q H.
-elim (gt_eq_gt_dec p q); intro H0.
-elim H0; auto.
-elimtype False.
-apply lt_not_le with q p; auto.
+ intros p q H.
+ elim (gt_eq_gt_dec p q); intro H0.
+  elim H0; auto.
+ elimtype False.
+ apply lt_not_le with q p; auto.
 Qed.
 
 Lemma Cnat_total_order : forall m n : nat, m <> n -> {m < n} + {n < m}.
 Proof.
-intros m n H.
-elim (gt_eq_gt_dec m n).
-intro H0.
-elim H0; intros.
-left; auto.
-elimtype False.
-auto.
-auto.
+ intros m n H.
+ elim (gt_eq_gt_dec m n).
+  intro H0.
+  elim H0; intros.
+   left; auto.
+  elimtype False.
+  auto.
+ auto.
 Qed.
 
 Inductive Codd : nat -> CProp :=
@@ -527,72 +531,73 @@ with Ceven : nat -> CProp :=
 
 Lemma Codd_even_to : forall n : nat, (Codd n -> odd n) /\ (Ceven n -> even n).
 Proof.
-simple induction n.
-split.
-intro H.
-inversion H.
-intro.
-apply even_O.
-intros n0 H.
-elim H; intros H0 H1.
-split.
-intro H2.
-inversion H2.
-apply odd_S.
-apply H1.
-assumption.
-intro H2.
-inversion H2.
-apply even_S.
-apply H0.
-assumption.
+ simple induction n.
+  split.
+   intro H.
+   inversion H.
+  intro.
+  apply even_O.
+ intros n0 H.
+ elim H; intros H0 H1.
+ split.
+  intro H2.
+  inversion H2.
+  apply odd_S.
+  apply H1.
+  assumption.
+ intro H2.
+ inversion H2.
+ apply even_S.
+ apply H0.
+ assumption.
 Qed.
 
 Lemma Codd_to : forall n : nat, Codd n -> odd n.
 Proof.
-intros n H.
-elim (Codd_even_to n); auto.
+ intros n H.
+ elim (Codd_even_to n); auto.
 Qed.
 
 Lemma Ceven_to : forall n : nat, Ceven n -> even n.
 Proof.
-intros n H.
-elim (Codd_even_to n); auto.
+ intros n H.
+ elim (Codd_even_to n); auto.
 Qed.
 
 Lemma to_Codd_even : forall n : nat, (odd n -> Codd n) and (even n -> Ceven n).
 Proof.
-simple induction n.
-split.
-intro H.
-elimtype False.
-inversion H.
-intro H.
-apply Ceven_O.
-intros n0 H.
-elim H; intros H0 H1.
-split.
-intro H2.
-apply Codd_S.
-apply H1.
-inversion H2.
-assumption.
-intro H2.
-apply Ceven_S.
-apply H0.
-inversion H2.
-assumption.
+ simple induction n.
+  split.
+   intro H.
+   elimtype False.
+   inversion H.
+  intro H.
+  apply Ceven_O.
+ intros n0 H.
+ elim H; intros H0 H1.
+ split.
+  intro H2.
+  apply Codd_S.
+  apply H1.
+  inversion H2.
+  assumption.
+ intro H2.
+ apply Ceven_S.
+ apply H0.
+ inversion H2.
+ assumption.
 Qed.
 
 Lemma to_Codd : forall n : nat, odd n -> Codd n.
 Proof.
-intros.
-elim (to_Codd_even n); auto.
+ intros.
+ elim (to_Codd_even n); auto.
 Qed.
 
 Lemma to_Ceven : forall n : nat, even n -> Ceven n.
-intros.
-elim (to_Codd_even n); auto.
+Proof.
+ intros.
+ elim (to_Codd_even n); auto.
 Qed.
 
 End le_odd.
@@ -605,95 +610,95 @@ Section Misc.
 
 Lemma CZ_exh : forall z : Z, {n : nat | z = n} or {n : nat | z = (- n)%Z}.
 Proof.
-intro z.
-elim z.
-left.
-exists 0.
-auto.
-intro p.
-left.
-exists (nat_of_P p).
-rewrite convert_is_POS.
-reflexivity.
-intro p.
-right.
-exists (nat_of_P p).
-rewrite min_convert_is_NEG.
-reflexivity.
+ intro z.
+ elim z.
+   left.
+   exists 0.
+   auto.
+  intro p.
+  left.
+  exists (nat_of_P p).
+  rewrite convert_is_POS.
+  reflexivity.
+ intro p.
+ right.
+ exists (nat_of_P p).
+ rewrite min_convert_is_NEG.
+ reflexivity.
 Qed.
 
 Lemma Cnats_Z_ind : forall P : Z -> CProp,
  (forall n : nat, P n) -> (forall n : nat, P (- n)%Z) -> forall z : Z, P z.
 Proof.
-intros P H H0 z.
-elim (CZ_exh z); intros H1.
-elim H1; intros n H2.
-rewrite H2.
-apply H.
-elim H1; intros n H2.
-rewrite H2.
-apply H0.
+ intros P H H0 z.
+ elim (CZ_exh z); intros H1.
+  elim H1; intros n H2.
+  rewrite H2.
+  apply H.
+ elim H1; intros n H2.
+ rewrite H2.
+ apply H0.
 Qed.
 
 Lemma Cdiff_Z_ind : forall P : Z -> CProp,
  (forall m n : nat, P (m - n)%Z) -> forall z : Z, P z.
 Proof.
-intros P H z.
-apply Cnats_Z_ind.
-intro n.
-replace (Z_of_nat n) with (n - 0%nat)%Z.
-apply H.
-simpl in |- *.
-auto with zarith.
-intro n.
-replace (- n)%Z with (0%nat - n)%Z.
-apply H.
-simpl in |- *.
-reflexivity.
+ intros P H z.
+ apply Cnats_Z_ind.
+  intro n.
+  replace (Z_of_nat n) with (n - 0%nat)%Z.
+   apply H.
+  simpl in |- *.
+  auto with zarith.
+ intro n.
+ replace (- n)%Z with (0%nat - n)%Z.
+  apply H.
+ simpl in |- *.
+ reflexivity.
 Qed.
 
 Lemma Cpred_succ_Z_ind : forall P : Z -> CProp,
  P 0%Z -> (forall n : Z, P n -> P (n + 1)%Z) ->
  (forall n : Z, P n -> P (n - 1)%Z) -> forall z : Z, P z.
 Proof.
-intros P H H0 H1 z.
-apply Cnats_Z_ind.
-intro n.
-elim n.
-exact H.
-intros n0 H2.
-replace (S n0:Z) with (n0 + 1)%Z.
-apply H0.
-assumption.
-rewrite Znat.inj_S.
-reflexivity.
-intro n.
-elim n.
-exact H.
-intros n0 H2.
-replace (- S n0)%Z with (- n0 - 1)%Z.
-apply H1.
-assumption.
-rewrite Znat.inj_S.
-unfold Zsucc in |- *.
-rewrite Zopp_plus_distr.
-reflexivity.
+ intros P H H0 H1 z.
+ apply Cnats_Z_ind.
+  intro n.
+  elim n.
+   exact H.
+  intros n0 H2.
+  replace (S n0:Z) with (n0 + 1)%Z.
+   apply H0.
+   assumption.
+  rewrite Znat.inj_S.
+  reflexivity.
+ intro n.
+ elim n.
+  exact H.
+ intros n0 H2.
+ replace (- S n0)%Z with (- n0 - 1)%Z.
+  apply H1.
+  assumption.
+ rewrite Znat.inj_S.
+ unfold Zsucc in |- *.
+ rewrite Zopp_plus_distr.
+ reflexivity.
 Qed.
 
 Lemma not_r_sum_rec : forall (A B S : Set) (l r : S), Not B -> forall H : A + B,
  sum_rec (fun _ : A + B => S) (fun x : A => l) (fun x : B => r) H = l.
 Proof.
-intros A B S l r H H0. elim H0.
-intro a. reflexivity.
-intro b. elim H. assumption.
+ intros A B S l r H H0. elim H0.
+ intro a. reflexivity.
+  intro b. elim H. assumption.
 Qed.
 
 Lemma not_l_sum_rec : forall (A B S : Set) (l r : S), Not A -> forall H : A + B,
  sum_rec (fun _ : A + B => S) (fun x : A => l) (fun x : B => r) H = r.
 Proof.
-intros A B S l r H H0. elim H0.
-intro a. elim H. assumption.
-intros. reflexivity.
+ intros A B S l r H H0. elim H0.
+ intro a. elim H. assumption.
+  intros. reflexivity.
 Qed.
 
 (**
@@ -704,45 +709,45 @@ Let [M:Type].
 
 Variable M : Type.
 
-Lemma member_app : 
-  forall (x : M) (l k : (list M)), 
-  (Iff (member x (app k l)) 
+Lemma member_app :
+  forall (x : M) (l k : (list M)),
+  (Iff (member x (app k l))
        ((member x k) or (member x l))).
 Proof.
-intros x l.
-induction k.
-simpl.
-unfold Iff.
-intuition.
-simpl.
-unfold Iff in IHk |- *.
-elim IHk.
-intros IHk0 IHk1.
-split.
-intros H0.
-elim H0.
-clear H0.
-intro H0.
-intuition.
-intuition.
-intro H0.
-elim H0.
-clear H0.
-intro H0.
-elim H0.
-clear H0.
-intro H0.
-left.
-apply IHk1.
-left.
-exact H0.
-intuition.
-clear H0.
-intro H0.
-left.
-apply IHk1.
-right.
-exact H0.
+ intros x l.
+ induction k.
+  simpl.
+  unfold Iff.
+  intuition.
+ simpl.
+ unfold Iff in IHk |- *.
+ elim IHk.
+ intros IHk0 IHk1.
+ split.
+  intros H0.
+  elim H0.
+   clear H0.
+   intro H0.
+   intuition.
+  intuition.
+ intro H0.
+ elim H0.
+  clear H0.
+  intro H0.
+  elim H0.
+   clear H0.
+   intro H0.
+   left.
+   apply IHk1.
+   left.
+   exact H0.
+  intuition.
+ clear H0.
+ intro H0.
+ left.
+ apply IHk1.
+ right.
+ exact H0.
 Qed.
 
 End Misc.
@@ -776,19 +781,19 @@ Next, we prove the usual results about sums of even and odd numbers:
 
 Lemma even_plus_n_n : forall n : nat, even (n + n).
 Proof.
-intro n; induction  n as [| n Hrecn].
-auto with arith.
-replace (S n + S n) with (S (S (n + n))).
-apply even_S; apply odd_S; apply Hrecn.
-rewrite plus_n_Sm; simpl in |- *; auto.
+ intro n; induction  n as [| n Hrecn].
+  auto with arith.
+ replace (S n + S n) with (S (S (n + n))).
+  apply even_S; apply odd_S; apply Hrecn.
+ rewrite plus_n_Sm; simpl in |- *; auto.
 Qed.
 
 Lemma even_or_odd_plus : forall k : nat, {j : nat &  {k = j + j} + {k = S (j + j)}}.
 Proof.
-intro k.
-elim (even_odd_dec k); intro H.
-elim (even_2n k H); intros j Hj; exists j; auto.
-elim (odd_S2n k H); intros j Hj; exists j; auto.
+ intro k.
+ elim (even_odd_dec k); intro H.
+  elim (even_2n k H); intros j Hj; exists j; auto.
+ elim (odd_S2n k H); intros j Hj; exists j; auto.
 Qed.
 
 (** Finally, we prove that an arbitrary natural number can be written in some canonical way.
@@ -797,12 +802,12 @@ Qed.
 Lemma even_or_odd_plus_gt : forall i j : nat,
  i <= j -> {k : nat &  {j = i + (k + k)} + {j = i + S (k + k)}}.
 Proof.
-intros i j H.
-elim (even_or_odd_plus (j - i)).
-intros k Hk.
-elim Hk; intro H0.
-exists k; left; rewrite <- H0; auto with arith.
-exists k; right; rewrite <- H0; auto with arith.
+ intros i j H.
+ elim (even_or_odd_plus (j - i)).
+ intros k Hk.
+ elim Hk; intro H0.
+  exists k; left; rewrite <- H0; auto with arith.
+ exists k; right; rewrite <- H0; auto with arith.
 Qed.
 
 End Odd_and_Even.
@@ -823,78 +828,79 @@ definitions keeping conciseness.
 
 Lemma Clt_le_weak : forall i j : nat, Clt i j -> Cle i j.
 Proof.
-intros.
-apply toCle; apply lt_le_weak; apply Clt_to; assumption.
+ intros.
+ apply toCle; apply lt_le_weak; apply Clt_to; assumption.
 Qed.
 
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
 Proof.
-intros; apply le_lt_trans with (pred n).
-apply le_pred; auto with arith.
-apply lt_pred_n_n; apply le_lt_trans with i; auto with arith.
+ intros; apply le_lt_trans with (pred n).
+  apply le_pred; auto with arith.
+ apply lt_pred_n_n; apply le_lt_trans with i; auto with arith.
 Qed.
 
 Lemma lt_8 : forall m n : nat, m < pred n -> m < n.
 Proof.
-intros; apply lt_le_trans with (pred n); auto with arith.
+ intros; apply lt_le_trans with (pred n); auto with arith.
 Qed.
 
 Lemma pred_lt : forall m n : nat, m < pred n -> S m < n.
 Proof.
-intros; apply le_lt_trans with (pred n); auto with arith.
-apply lt_pred_n_n; apply le_lt_trans with m.
-auto with arith.
-apply lt_le_trans with (pred n); auto with arith.
+ intros; apply le_lt_trans with (pred n); auto with arith.
+ apply lt_pred_n_n; apply le_lt_trans with m.
+  auto with arith.
+ apply lt_le_trans with (pred n); auto with arith.
 Qed.
 
 Lemma lt_10 : forall i m n : nat,
  0 < i -> i < pred (m + n) -> pred i < pred m + pred n.
 Proof.
-intros; omega.
+ intros; omega.
 Qed.
 
 Lemma lt_pred' : forall m n : nat, 0 < m -> m < n -> pred m < pred n.
 Proof.
-intros m n H H0; red in |- *.
-destruct n.
-inversion H0.
-rewrite <- (S_pred m 0); auto.
-simpl in |- *.
-auto with arith.
+ intros m n H H0; red in |- *.
+ destruct n.
+  inversion H0.
+ rewrite <- (S_pred m 0); auto.
+ simpl in |- *.
+ auto with arith.
 Qed.
 
 Lemma le_1 : forall m n : nat, Cle m n -> pred m <= n.
 Proof.
-intros.
-cut (m <= n); [ intro | apply Cle_to; assumption ].
-apply le_trans with (pred n); auto with arith.
-apply le_pred; auto.
+ intros.
+ cut (m <= n); [ intro | apply Cle_to; assumption ].
+ apply le_trans with (pred n); auto with arith.
+ apply le_pred; auto.
 Qed.
 
 Lemma le_2 : forall i j : nat, i < j -> i <= pred j.
-intros; omega.
+Proof.
+ intros; omega.
 Qed.
 
 Lemma plus_eq_one_imp_eq_zero : forall m n : nat,
  m + n <= 1 -> {m = 0} + {n = 0}.
 Proof.
-intros m n H.
-elim (le_lt_dec m 0); intro.
-left; auto with arith.
-right; omega.
+ intros m n H.
+ elim (le_lt_dec m 0); intro.
+  left; auto with arith.
+ right; omega.
 Qed.
 
 Lemma not_not_lt : forall i j : nat, ~ ~ i < j -> i < j.
 Proof.
-intros; omega.
+ intros; omega.
 Qed.
 
-Lemma plus_pred_pred_plus : 
-  forall i j k, 
-  k <= pred i + pred j -> 
+Lemma plus_pred_pred_plus :
+  forall i j k,
+  k <= pred i + pred j ->
   k <= pred (i + j).
 Proof.
-intros; omega.
+ intros; omega.
 Qed.
 
 (** We now prove some properties of functions on the natural numbers.
@@ -911,34 +917,34 @@ for every natural number [n] then [h] is monotonous.  An analogous result
 holds for weak monotonicity.
 *)
 
-Lemma nat_local_mon_imp_mon : 
+Lemma nat_local_mon_imp_mon :
   (forall i : nat, h i < h (S i)) ->
   forall i j : nat, i < j -> h i < h j.
 Proof.
-intros H i j H0.
-induction  j as [| j Hrecj].
-elimtype False; omega.
-cut (i <= j); [ intro H1 | auto with arith ].
-elim (le_lt_eq_dec _ _ H1); intro H2.
-cut (h i < h j); [ intro | apply Hrecj; assumption ].
-cut (h j < h (S j)); [ intro | apply H ].
-apply lt_trans with (h j); auto.
-rewrite H2; apply H.
+ intros H i j H0.
+ induction  j as [| j Hrecj].
+  elimtype False; omega.
+ cut (i <= j); [ intro H1 | auto with arith ].
+ elim (le_lt_eq_dec _ _ H1); intro H2.
+  cut (h i < h j); [ intro | apply Hrecj; assumption ].
+  cut (h j < h (S j)); [ intro | apply H ].
+  apply lt_trans with (h j); auto.
+ rewrite H2; apply H.
 Qed.
 
-Lemma nat_local_mon_imp_mon_le : 
+Lemma nat_local_mon_imp_mon_le :
   (forall i : nat, h i <= h (S i)) ->
   forall i j : nat, i <= j -> h i <= h j.
 Proof.
-intros H i j H0.
-induction  j as [| j Hrecj].
-cut (i = 0); [ intro H1 | auto with arith ].
-rewrite H1; apply le_n.
-elim (le_lt_eq_dec _ _ H0); intro H1.
-cut (h i <= h j); [ intro | apply Hrecj; auto with arith ].
-cut (h j <= h (S j)); [ intro | apply H ].
-apply le_trans with (h j); auto.
-rewrite H1; apply le_n.
+ intros H i j H0.
+ induction  j as [| j Hrecj].
+  cut (i = 0); [ intro H1 | auto with arith ].
+  rewrite H1; apply le_n.
+ elim (le_lt_eq_dec _ _ H0); intro H1.
+  cut (h i <= h j); [ intro | apply Hrecj; auto with arith ].
+  cut (h j <= h (S j)); [ intro | apply H ].
+  apply le_trans with (h j); auto.
+ rewrite H1; apply le_n.
 Qed.
 
 (** A strictly increasing function is injective: *)
@@ -946,12 +952,12 @@ Qed.
 Lemma nat_mon_imp_inj : (forall i j : nat, i < j -> h i < h j) ->
  forall i j : nat, h i = h j -> i = j.
 Proof.
-intros H i j H0.
-cut (~ i <> j); [ omega | intro H1 ].
-cut (i < j \/ j < i); [ intro H2 | omega ].
-inversion_clear H2.
-cut (h i < h j); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
-cut (h j < h i); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
+ intros H i j H0.
+ cut (~ i <> j); [ omega | intro H1 ].
+ cut (i < j \/ j < i); [ intro H2 | omega ].
+ inversion_clear H2.
+  cut (h i < h j); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
+ cut (h j < h i); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
 Qed.
 
 (** And (not completely trivial) a function that preserves [lt] also preserves [le]. *)
@@ -959,10 +965,10 @@ Qed.
 Lemma nat_mon_imp_mon' : (forall i j : nat, i < j -> h i < h j) ->
  forall i j : nat, i <= j -> h i <= h j.
 Proof.
-intros H i j H0.
-elim (le_lt_eq_dec _ _ H0); intro H1.
-apply lt_le_weak; apply H; assumption.
-rewrite H1; apply le_n.
+ intros H i j H0.
+ elim (le_lt_eq_dec _ _ H0); intro H1.
+  apply lt_le_weak; apply H; assumption.
+ rewrite H1; apply le_n.
 Qed.
 
 (**
@@ -975,47 +981,44 @@ These are useful for integration.
 Lemma mon_fun_covers : (forall i j, i < j -> h i < h j) -> h 0 = 0 ->
  forall n, {k : nat | S n <= h k} -> {i : nat | h i <= n | S n <= h (S i)}.
 Proof.
-intros H H0 n H1.
-elim H1; intros k Hk.
-induction  k as [| k Hreck].
-exists 0.
-rewrite H0; auto with arith.
-cut (h 0 < h 1);
- [ intro; apply le_trans with (h 0); auto with arith
- | apply H; apply lt_n_Sn ].
-
-cut (h k < h (S k)); [ intro H2 | apply H; apply lt_n_Sn ].
-elim (le_lt_dec (S n) (h k)); intro H3.
-elim (Hreck H3); intros i Hi.
-exists i; assumption.
-exists k; auto with arith.
+ intros H H0 n H1.
+ elim H1; intros k Hk.
+ induction  k as [| k Hreck].
+  exists 0.
+   rewrite H0; auto with arith.
+  cut (h 0 < h 1); [ intro; apply le_trans with (h 0); auto with arith | apply H; apply lt_n_Sn ].
+ cut (h k < h (S k)); [ intro H2 | apply H; apply lt_n_Sn ].
+ elim (le_lt_dec (S n) (h k)); intro H3.
+  elim (Hreck H3); intros i Hi.
+  exists i; assumption.
+ exists k; auto with arith.
 Qed.
 
 Lemma weird_mon_covers : forall n (f : nat -> nat), (forall i, f i < n -> f i < f (S i)) ->
  {m : nat | n <= f m | forall i, i < m -> f i < n}.
 Proof.
-intros; induction  n as [| n Hrecn].
-exists 0.
-auto with arith.
-intros; inversion H0.
-elim Hrecn.
-2: auto.
-intros m Hm Hm'.
-elim (le_lt_eq_dec _ _ Hm); intro.
-exists m.
-assumption.
-auto with arith.
-exists (S m).
-apply le_lt_trans with (f m).
-rewrite b; auto with arith.
-apply H.
-rewrite b; apply lt_n_Sn.
-intros.
-elim (le_lt_eq_dec _ _ H0); intro.
-auto with arith.
-cut (i = m); [ intro | auto ].
-rewrite b; rewrite <- H1.
-apply lt_n_Sn.
+ intros; induction  n as [| n Hrecn].
+  exists 0.
+   auto with arith.
+  intros; inversion H0.
+ elim Hrecn.
+  2: auto.
+ intros m Hm Hm'.
+ elim (le_lt_eq_dec _ _ Hm); intro.
+  exists m.
+   assumption.
+  auto with arith.
+ exists (S m).
+  apply le_lt_trans with (f m).
+   rewrite b; auto with arith.
+  apply H.
+  rewrite b; apply lt_n_Sn.
+ intros.
+ elim (le_lt_eq_dec _ _ H0); intro.
+  auto with arith.
+ cut (i = m); [ intro | auto ].
+ rewrite b; rewrite <- H1.
+ apply lt_n_Sn.
 Qed.
 
 End Natural_Numbers.
@@ -1024,56 +1027,56 @@ End Natural_Numbers.
 Useful for the Fundamental Theorem of Algebra.
 *)
 
-Lemma kseq_prop : 
+Lemma kseq_prop :
   forall (k : nat -> nat) (n : nat),
-  (forall i : nat, 1 <= k i /\ k i <= n) -> 
+  (forall i : nat, 1 <= k i /\ k i <= n) ->
   (forall i : nat, k (S i) <= k i) ->
   {j : nat | S j < 2 * n /\ k j = k (S j) /\ k (S j) = k (S (S j))}.
 Proof.
-intros k n.
-generalize k; clear k.
-induction  n as [| n Hrecn]; intros k H H0.
- elim (H 0); intros H1 H2.
- generalize (le_trans _ _ _ H1 H2); intro H3.
- elimtype False.
- inversion H3.
-elim (eq_nat_dec (k 0) (k 2)).
- intro H1.
- exists 0.
- cut (k 0 = k 1).
- intro H2.
- repeat split.
-   omega.
-  assumption.
- rewrite <- H1.
- auto.
- apply le_antisym.
-  rewrite H1.
+ intros k n.
+ generalize k; clear k.
+ induction  n as [| n Hrecn]; intros k H H0.
+  elim (H 0); intros H1 H2.
+  generalize (le_trans _ _ _ H1 H2); intro H3.
+  elimtype False.
+  inversion H3.
+ elim (eq_nat_dec (k 0) (k 2)).
+  intro H1.
+  exists 0.
+  cut (k 0 = k 1).
+   intro H2.
+   repeat split.
+     omega.
+    assumption.
+   rewrite <- H1.
+   auto.
+  apply le_antisym.
+   rewrite H1.
+   apply H0.
   apply H0.
- apply H0.
-intro H1.
-elim (Hrecn (fun m : nat => k (S (S m)))).
-  3: intro; apply H0.
- intros m Hm.
- exists (S (S m)); omega.
-intro i.
-split.
- elim (H (S (S i))); auto.
-elim (lt_eq_lt_dec (k 0) (k 2)); intro H2.
- elim H2; intro H3.
-  generalize (H0 0); intro H4.
-  generalize (H0 1); intro H5.
-  omega.
- tauto.
-generalize (H 0); intro H3.
-elim H3; intros H4 H5.
-generalize (lt_le_trans _ _ _ H2 H5); intro H6.
-cut (k 2 <= n).
- 2: omega.
-intro H7.
-induction  i as [| i Hreci].
- assumption.
-apply le_trans with (k (S (S i))); auto.
+ intro H1.
+ elim (Hrecn (fun m : nat => k (S (S m)))).
+   3: intro; apply H0.
+  intros m Hm.
+  exists (S (S m)); omega.
+ intro i.
+ split.
+  elim (H (S (S i))); auto.
+ elim (lt_eq_lt_dec (k 0) (k 2)); intro H2.
+  elim H2; intro H3.
+   generalize (H0 0); intro H4.
+   generalize (H0 1); intro H5.
+   omega.
+  tauto.
+ generalize (H 0); intro H3.
+ elim H3; intros H4 H5.
+ generalize (lt_le_trans _ _ _ H2 H5); intro H6.
+ cut (k 2 <= n).
+  2: omega.
+ intro H7.
+ induction  i as [| i Hreci].
+  assumption.
+ apply le_trans with (k (S (S i))); auto.
 Qed.
 
 Section Predicates_to_CProp.
@@ -1087,204 +1090,202 @@ for [CProp]- and [Prop]-valued predicates.  We begin by presenting the
 results for [CProp]-valued predicates:
 *)
 
-Lemma even_induction : 
+Lemma even_induction :
   forall P : nat -> CProp,
-  P 0 -> 
-  (forall n, even n -> P n -> P (S (S n))) -> 
+  P 0 ->
+  (forall n, even n -> P n -> P (S (S n))) ->
   forall n, even n -> P n.
 Proof.
-intros P H H0 n.
-pattern n in |- *; apply lt_wf_rect.
-clear n.
-intros n H1 H2.
-induction  n as [| n Hrecn].
-auto.
-induction  n as [| n Hrecn0].
-elimtype False; inversion H2; inversion H4.
-apply H0.
-inversion H2; inversion H4; auto.
-apply H1.
-auto with arith.
-inversion H2; inversion H4; auto.
+ intros P H H0 n.
+ pattern n in |- *; apply lt_wf_rect.
+ clear n.
+ intros n H1 H2.
+ induction  n as [| n Hrecn].
+  auto.
+ induction  n as [| n Hrecn0].
+  elimtype False; inversion H2; inversion H4.
+ apply H0.
+  inversion H2; inversion H4; auto.
+ apply H1.
+  auto with arith.
+ inversion H2; inversion H4; auto.
 Qed.
 
-Lemma odd_induction : 
+Lemma odd_induction :
   forall P : nat -> CProp,
-  P 1 -> 
-  (forall n, odd n -> P n -> P (S (S n))) -> 
+  P 1 ->
+  (forall n, odd n -> P n -> P (S (S n))) ->
   forall n, odd n -> P n.
 Proof.
-intros P H H0 n; case n.
-intro H1; elimtype False; inversion H1.
-clear n; intros n H1.
-pattern n in |- *; apply even_induction; auto.
-intros n0 H2 H3; auto with arith.
-inversion H1; auto.
+ intros P H H0 n; case n.
+  intro H1; elimtype False; inversion H1.
+ clear n; intros n H1.
+ pattern n in |- *; apply even_induction; auto.
+  intros n0 H2 H3; auto with arith.
+ inversion H1; auto.
 Qed.
 
-Lemma four_induction : 
+Lemma four_induction :
   forall P : nat -> CProp,
-  P 0 -> P 1 -> P 2 -> P 3 -> 
-  (forall n, P n -> P (S (S (S (S n))))) -> 
+  P 0 -> P 1 -> P 2 -> P 3 ->
+  (forall n, P n -> P (S (S (S (S n))))) ->
   forall n, P n.
 Proof.
-intros.
-apply lt_wf_rect.
-intro m.
-case m; auto.
-clear m; intro m.
-case m; auto.
-clear m; intro m.
-case m; auto.
-clear m; intro m.
-case m; auto with arith.
+ intros.
+ apply lt_wf_rect.
+ intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto with arith.
 Qed.
 
 Lemma nat_complete_double_induction : forall P : nat -> nat -> CProp,
  (forall m n, (forall m' n', m' < m -> n' < n -> P m' n') -> P m n) -> forall m n, P m n.
 Proof.
-intros P H m.
-pattern m in |- *; apply lt_wf_rect; auto with arith.
+ intros P H m.
+ pattern m in |- *; apply lt_wf_rect; auto with arith.
 Qed.
 
 Lemma odd_double_ind : forall P : nat -> CProp, (forall n, odd n -> P n) ->
  (forall n, 0 < n -> P n -> P (double n)) -> forall n, 0 < n -> P n.
 Proof.
-cut (forall n : nat, 0 < double n -> 0 < n). intro.
-intro. intro H0. intro H1. intro n.
-pattern n in |- *.
-apply lt_wf_rect. intros n0 H2 H3.
-generalize (even_odd_dec n0). intro H4. elim H4.
-intro.
-rewrite (even_double n0).
-apply H1.
-apply H.
-rewrite <- (even_double n0). assumption.
-assumption.
-apply H2.
-apply lt_div2. assumption.
-rewrite (even_double n0) in H3.
-apply H. assumption.
-assumption.
-assumption.
-exact (H0 n0).
-unfold double in |- *. intros.
-case (zerop n). intro.
-absurd (0 < n + n).
-rewrite e. auto with arith.
-assumption.
-intro. assumption.
+ cut (forall n : nat, 0 < double n -> 0 < n). intro.
+  intro. intro H0. intro H1. intro n.
+  pattern n in |- *.
+  apply lt_wf_rect. intros n0 H2 H3.
+  generalize (even_odd_dec n0). intro H4. elim H4.
+  intro.
+   rewrite (even_double n0).
+    apply H1.
+     apply H.
+     rewrite <- (even_double n0). assumption.
+      assumption.
+    apply H2.
+     apply lt_div2. assumption.
+     rewrite (even_double n0) in H3.
+     apply H. assumption.
+     assumption.
+   assumption.
+  exact (H0 n0).
+ unfold double in |- *. intros.
+ case (zerop n). intro.
+  absurd (0 < n + n).
+   rewrite e. auto with arith.
+   assumption.
+ intro. assumption.
 Qed.
 
 (** For subsetoid predicates in the natural numbers we can eliminate
 disjunction (and existential quantification) as follows.
 *)
 
-Lemma finite_or_elim : 
+Lemma finite_or_elim :
   forall (n : nat) (P Q : forall i, i <= n -> CProp),
-  nat_less_n_pred' P -> 
-  nat_less_n_pred' Q -> 
+  nat_less_n_pred' P ->
+  nat_less_n_pred' Q ->
   (forall i H, P i H or Q i H) ->
   {m : nat | {Hm : m <= n | P m Hm}} or (forall i H, Q i H).
 Proof.
-intro n; induction  n as [| n Hrecn].
-intros P Q HP HQ H.
-elim (H _ (le_n 0)); intro H0.
-left; exists 0; exists (le_n 0); assumption.
-right; intros i H1.
-apply HQ with (H := le_n 0); auto with arith.
-intros P Q H H0 H1.
-elim (H1 _ (le_n (S n))); intro H2.
-left; exists (S n); exists (le_n (S n)); assumption.
-set (P' := fun (i : nat) (H : i <= n) => P i (le_S _ _ H)) in *.
-set (Q' := fun (i : nat) (H : i <= n) => Q i (le_S _ _ H)) in *.
-cut
- ({m : nat | {Hm : m <= n | P' m Hm}}
-  or (forall (i : nat) (H : i <= n), Q' i H)).
-intro H3; elim H3; intro H4.
-left.
-elim H4; intros m Hm; elim Hm; clear H4 Hm; intros Hm Hm'.
-exists m.
-unfold P' in Hm'.
-exists (le_S _ _ Hm).
-eapply H with (i := m); [ omega | apply Hm' ].
-right.
-intros i H5.
-unfold Q' in H4.
-elim (le_lt_eq_dec _ _ H5); intro H6.
-cut (i <= n); [ intro | auto with arith ].
-eapply H0 with (i := i); [ auto with arith | apply (H4 i H7) ].
-eapply H0 with (i := S n); [ auto with arith | apply H2 ].
-apply Hrecn.
-intro i; intros j H3 H4 H5 H6.
-unfold P' in |- *.
-exact (H _ _ H3 _ _ H6).
-intro i; intros j H3 H4 H5 H6.
-unfold Q' in |- *.
-exact (H0 _ _ H3 _ _ H6).
-intros i H3.
-unfold P', Q' in |- *; apply H1.
+ intro n; induction  n as [| n Hrecn].
+  intros P Q HP HQ H.
+  elim (H _ (le_n 0)); intro H0.
+   left; exists 0; exists (le_n 0); assumption.
+  right; intros i H1.
+  apply HQ with (H := le_n 0); auto with arith.
+ intros P Q H H0 H1.
+ elim (H1 _ (le_n (S n))); intro H2.
+  left; exists (S n); exists (le_n (S n)); assumption.
+ set (P' := fun (i : nat) (H : i <= n) => P i (le_S _ _ H)) in *.
+ set (Q' := fun (i : nat) (H : i <= n) => Q i (le_S _ _ H)) in *.
+ cut ({m : nat | {Hm : m <= n | P' m Hm}} or (forall (i : nat) (H : i <= n), Q' i H)).
+  intro H3; elim H3; intro H4.
+   left.
+   elim H4; intros m Hm; elim Hm; clear H4 Hm; intros Hm Hm'.
+   exists m.
+   unfold P' in Hm'.
+   exists (le_S _ _ Hm).
+   eapply H with (i := m); [ omega | apply Hm' ].
+  right.
+  intros i H5.
+  unfold Q' in H4.
+  elim (le_lt_eq_dec _ _ H5); intro H6.
+   cut (i <= n); [ intro | auto with arith ].
+   eapply H0 with (i := i); [ auto with arith | apply (H4 i H7) ].
+  eapply H0 with (i := S n); [ auto with arith | apply H2 ].
+ apply Hrecn.
+   intro i; intros j H3 H4 H5 H6.
+   unfold P' in |- *.
+   exact (H _ _ H3 _ _ H6).
+  intro i; intros j H3 H4 H5 H6.
+  unfold Q' in |- *.
+  exact (H0 _ _ H3 _ _ H6).
+ intros i H3.
+ unfold P', Q' in |- *; apply H1.
 Qed.
 
-Lemma str_finite_or_elim : 
+Lemma str_finite_or_elim :
   forall (n : nat) (P Q : forall i, i <= n -> CProp),
-  nat_less_n_pred' P -> 
-  nat_less_n_pred' Q -> 
+  nat_less_n_pred' P ->
+  nat_less_n_pred' Q ->
   (forall i H, P i H or Q i H) ->
   {j : nat | {Hj : j <= n | P j Hj and (forall j' Hj', j' < j -> Q j' Hj')}}
   or (forall i H, Q i H).
 Proof.
-intro n; induction  n as [| n Hrecn].
-intros P Q H H0 H1.
-elim (H1 0 (le_n 0)); intro HPQ.
-left.
-exists 0; exists (le_n 0).
-split.
-apply H with (H := le_n 0); auto.
-intros; elimtype False; inversion H2.
-right; intros.
-apply H0 with (H := le_n 0); auto with arith.
-intros P Q H H0 H1.
-set (P' := fun (i : nat) (H : i <= n) => P i (le_S _ _ H)) in *.
-set (Q' := fun (i : nat) (H : i <= n) => Q i (le_S _ _ H)) in *.
-elim (Hrecn P' Q').
-intro H2.
-left.
-elim H2; intros m Hm; elim Hm; clear H2 Hm; intros Hm Hm'.
-exists m.
-unfold P' in Hm'.
-exists (le_S _ _ Hm).
-elim Hm'; clear Hm'; intros Hm' Hj.
-split.
-eapply H with (i := m); [ auto with arith | apply Hm' ].
-unfold Q' in Hj; intros j' Hj' H2.
-cut (j' <= n); [ intro H4 | apply le_trans with m; auto with arith ].
-apply H0 with (H := le_S _ _ H4); [ auto | apply Hj; assumption ].
-elim (H1 (S n) (le_n (S n))); intro H1'.
-intro H2.
-left; exists (S n); exists (le_n (S n)); split.
-assumption.
-intros j' Hj' H3; unfold Q' in H1'.
-cut (j' <= n); [ intro H4 | auto with arith ].
-unfold Q' in H2.
-apply H0 with (H := le_S _ _ H4); auto.
-intro H2.
-right; intros i H3.
-unfold Q' in H1'.
-elim (le_lt_eq_dec _ _ H3); intro H4.
-cut (i <= n); [ intro H5 | auto with arith ].
-unfold Q' in H2.
-apply H0 with (H := le_S _ _ H5); auto.
-apply H0 with (H := le_n (S n)); auto.
-intro i; intros j H2 H3 H4 H5.
-unfold P' in |- *.
-exact (H _ _ H2 _ _ H5).
-intro i; intros j H2 H3 H4 H5.
-unfold Q' in |- *.
-exact (H0 _ _ H2 _ _ H5).
-intros i H2.
-unfold P', Q' in |- *.
-apply H1.
+ intro n; induction  n as [| n Hrecn].
+  intros P Q H H0 H1.
+  elim (H1 0 (le_n 0)); intro HPQ.
+   left.
+   exists 0; exists (le_n 0).
+   split.
+    apply H with (H := le_n 0); auto.
+   intros; elimtype False; inversion H2.
+  right; intros.
+  apply H0 with (H := le_n 0); auto with arith.
+ intros P Q H H0 H1.
+ set (P' := fun (i : nat) (H : i <= n) => P i (le_S _ _ H)) in *.
+ set (Q' := fun (i : nat) (H : i <= n) => Q i (le_S _ _ H)) in *.
+ elim (Hrecn P' Q').
+     intro H2.
+     left.
+     elim H2; intros m Hm; elim Hm; clear H2 Hm; intros Hm Hm'.
+     exists m.
+     unfold P' in Hm'.
+     exists (le_S _ _ Hm).
+     elim Hm'; clear Hm'; intros Hm' Hj.
+     split.
+      eapply H with (i := m); [ auto with arith | apply Hm' ].
+     unfold Q' in Hj; intros j' Hj' H2.
+     cut (j' <= n); [ intro H4 | apply le_trans with m; auto with arith ].
+     apply H0 with (H := le_S _ _ H4); [ auto | apply Hj; assumption ].
+    elim (H1 (S n) (le_n (S n))); intro H1'.
+     intro H2.
+     left; exists (S n); exists (le_n (S n)); split.
+      assumption.
+     intros j' Hj' H3; unfold Q' in H1'.
+     cut (j' <= n); [ intro H4 | auto with arith ].
+     unfold Q' in H2.
+     apply H0 with (H := le_S _ _ H4); auto.
+    intro H2.
+    right; intros i H3.
+    unfold Q' in H1'.
+    elim (le_lt_eq_dec _ _ H3); intro H4.
+     cut (i <= n); [ intro H5 | auto with arith ].
+     unfold Q' in H2.
+     apply H0 with (H := le_S _ _ H5); auto.
+    apply H0 with (H := le_n (S n)); auto.
+   intro i; intros j H2 H3 H4 H5.
+   unfold P' in |- *.
+   exact (H _ _ H2 _ _ H5).
+  intro i; intros j H2 H3 H4 H5.
+  unfold Q' in |- *.
+  exact (H0 _ _ H2 _ _ H5).
+ intros i H2.
+ unfold P', Q' in |- *.
+ apply H1.
 Qed.
 
 End Predicates_to_CProp.
@@ -1298,55 +1299,55 @@ completeness's sake.
 Lemma even_ind : forall P : nat -> Prop,
  P 0 -> (forall n, even n -> P n -> P (S (S n))) -> forall n, even n -> P n.
 Proof.
-intros P H H0 n.
-pattern n in |- *; apply lt_wf_ind.
-clear n.
-intros n H1 H2.
-induction  n as [| n Hrecn].
-auto.
-induction  n as [| n Hrecn0].
-elimtype False; inversion H2; inversion H4.
-apply H0.
-inversion H2; inversion H4; auto.
-apply H1.
-auto with arith.
-inversion H2; inversion H4; auto.
+ intros P H H0 n.
+ pattern n in |- *; apply lt_wf_ind.
+ clear n.
+ intros n H1 H2.
+ induction  n as [| n Hrecn].
+  auto.
+ induction  n as [| n Hrecn0].
+  elimtype False; inversion H2; inversion H4.
+ apply H0.
+  inversion H2; inversion H4; auto.
+ apply H1.
+  auto with arith.
+ inversion H2; inversion H4; auto.
 Qed.
 
 Lemma odd_ind : forall P : nat -> Prop,
  P 1 -> (forall n, P n -> P (S (S n))) -> forall n, odd n -> P n.
 Proof.
-intros P H H0 n; case n.
-intro H1; elimtype False; inversion H1.
-clear n; intros n H1.
-pattern n in |- *; apply even_ind; auto.
-inversion H1; auto.
+ intros P H H0 n; case n.
+  intro H1; elimtype False; inversion H1.
+ clear n; intros n H1.
+ pattern n in |- *; apply even_ind; auto.
+ inversion H1; auto.
 Qed.
 
-Lemma nat_complete_double_ind : 
+Lemma nat_complete_double_ind :
   forall P : nat -> nat -> Prop,
-  (forall m n, (forall m' n', m' < m -> n' < n -> P m' n') -> P m n) -> 
+  (forall m n, (forall m' n', m' < m -> n' < n -> P m' n') -> P m n) ->
   forall m n, P m n.
 Proof.
-intros P H m.
-pattern m in |- *; apply lt_wf_ind; auto.
+ intros P H m.
+ pattern m in |- *; apply lt_wf_ind; auto.
 Qed.
 
-Lemma four_ind : 
+Lemma four_ind :
   forall P : nat -> Prop,
-  P 0 -> P 1 -> P 2 -> P 3 -> 
+  P 0 -> P 1 -> P 2 -> P 3 ->
   (forall n, P n -> P (S (S (S (S n))))) -> forall n, P n.
 Proof.
-intros.
-apply lt_wf_ind.
-intro m.
-case m; auto.
-clear m; intro m.
-case m; auto.
-clear m; intro m.
-case m; auto.
-clear m; intro m.
-case m; auto with arith.
+ intros.
+ apply lt_wf_ind.
+ intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto.
+ clear m; intro m.
+ case m; auto with arith.
 Qed.
 
 End Predicates_to_Prop.
@@ -1381,31 +1382,31 @@ Qed.
 
 Lemma Zsgn_1 : forall x : Z, {Zsgn x = 0%Z} + {Zsgn x = 1%Z} + {Zsgn x = (-1)%Z}.
 Proof.
-intro x.
-case x.
-left.
-left.
-unfold Zsgn in |- *.
-reflexivity.
-intro p.
-simpl in |- *.
-left.
-right.
-reflexivity.
-intro p.
-right.
-simpl in |- *.
-reflexivity.
+ intro x.
+ case x.
+   left.
+   left.
+   unfold Zsgn in |- *.
+   reflexivity.
+  intro p.
+  simpl in |- *.
+  left.
+  right.
+  reflexivity.
+ intro p.
+ right.
+ simpl in |- *.
+ reflexivity.
 Qed.
 
 Lemma Zsgn_2 : forall x : Z, Zsgn x = 0%Z -> x = 0%Z.
 Proof.
  intro x.
  case x.
- intro H.
- reflexivity.
- intros p H.
- inversion H.
+   intro H.
+   reflexivity.
+  intros p H.
+  inversion H.
  intros p H.
  inversion H.
 Qed.
@@ -1414,12 +1415,12 @@ Lemma Zsgn_3 : forall x : Z, x <> 0%Z -> Zsgn x <> 0%Z.
 Proof.
  intro x.
  case x.
- intro H.
- elim H.
- reflexivity.
- intros p H.
- simpl in |- *.
- discriminate.
+   intro H.
+   elim H.
+   reflexivity.
+  intros p H.
+  simpl in |- *.
+  discriminate.
  intros p H.
  simpl in |- *.
  discriminate.
@@ -1431,53 +1432,50 @@ fast_integers.v.
 
 Lemma ZL4' : forall y : positive, {h : nat | nat_of_P y = S h}.
 Proof.
- simple induction y;
-  [ intros p H; elim H; intros x H1; exists (S x + S x);
-     unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
-     rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H1; 
-     rewrite H1; auto with arith
-  | intros p H1; elim H1; intros x H2; exists (x + S x);
-     unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
-     rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H2; 
-     rewrite H2; auto with arith
-  | exists 0; auto with arith ].
+ simple induction y; [ intros p H; elim H; intros x H1; exists (S x + S x);
+   unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
+     rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H1; rewrite H1; auto with arith
+       | intros p H1; elim H1; intros x H2; exists (x + S x);
+         unfold nat_of_P in |- *; simpl in |- *; rewrite ZL0;
+           rewrite Pmult_nat_r_plus_morphism; unfold nat_of_P in H2; rewrite H2; auto with arith
+             | exists 0; auto with arith ].
 Qed.
 
 Lemma ZL9 : forall p : positive, Z_of_nat (nat_of_P p) = Zpos p.
 Proof.
-intro p.
-elim (ZL4 p).
-intros x H0.
-rewrite H0.
-unfold Z_of_nat in |- *.
-apply f_equal with (A := positive) (B := Z) (f := Zpos).
-cut (P_of_succ_nat (nat_of_P p) = P_of_succ_nat (S x)).
-intro H1.
-rewrite P_of_succ_nat_o_nat_of_P_eq_succ in H1.
-cut (Ppred (Psucc p) = Ppred (P_of_succ_nat (S x))).
-intro H2.
-rewrite Ppred_succ in H2.
-simpl in H2.
-rewrite Ppred_succ in H2.
-auto.
-apply f_equal with (A := positive) (B := positive) (f := Ppred).
-assumption.
-apply f_equal with (f := P_of_succ_nat).
-assumption.
+ intro p.
+ elim (ZL4 p).
+ intros x H0.
+ rewrite H0.
+ unfold Z_of_nat in |- *.
+ apply f_equal with (A := positive) (B := Z) (f := Zpos).
+ cut (P_of_succ_nat (nat_of_P p) = P_of_succ_nat (S x)).
+  intro H1.
+  rewrite P_of_succ_nat_o_nat_of_P_eq_succ in H1.
+  cut (Ppred (Psucc p) = Ppred (P_of_succ_nat (S x))).
+   intro H2.
+   rewrite Ppred_succ in H2.
+   simpl in H2.
+   rewrite Ppred_succ in H2.
+   auto.
+  apply f_equal with (A := positive) (B := positive) (f := Ppred).
+  assumption.
+ apply f_equal with (f := P_of_succ_nat).
+ assumption.
 Qed.
 
 Theorem Zsgn_4 : forall a : Z, a = (Zsgn a * Zabs_nat a)%Z.
 Proof.
  intro a.
  case a.
- simpl in |- *.
- reflexivity.
- intro p.
- unfold Zsgn in |- *.
- unfold Zabs_nat in |- *.
- rewrite Zmult_1_l.
- symmetry  in |- *.
- apply ZL9.
+   simpl in |- *.
+   reflexivity.
+  intro p.
+  unfold Zsgn in |- *.
+  unfold Zabs_nat in |- *.
+  rewrite Zmult_1_l.
+  symmetry  in |- *.
+  apply ZL9.
  intro p.
  unfold Zsgn in |- *.
  unfold Zabs_nat in |- *.
@@ -1490,73 +1488,73 @@ Theorem Zsgn_5 : forall a b x y : Z, x <> 0%Z -> y <> 0%Z ->
 Proof.
  intros a b x y H H0.
  case a.
- case b.
-  simpl in |- *.
-  trivial.
+   case b.
+     simpl in |- *.
+     trivial.
+    intro p.
+    unfold Zsgn in |- *.
+    intro H1.
+    rewrite Zmult_1_l in H1.
+    simpl in H1.
+    elim H0.
+    auto.
+   intro p.
+   unfold Zsgn in |- *.
+   intro H1.
+   elim H0.
+   apply Zopp_inj.
+   simpl in |- *.
+   transitivity (-1 * y)%Z; auto.
   intro p.
-  unfold Zsgn in |- *.
+  unfold Zsgn at 1 in |- *.
+  unfold Zsgn at 2 in |- *.
   intro H1.
+  transitivity y.
+   rewrite Zmult_1_l.
+   reflexivity.
+  transitivity (Zsgn b * (Zsgn b * y))%Z.
+   case (Zsgn_1 b).
+    intro H2.
+    case H2.
+     intro H3.
+     elim H.
+     rewrite H3 in H1.
+     change ((1 * x)%Z = 0%Z) in H1.
+     rewrite Zmult_1_l in H1.
+     assumption.
+    intro H3.
+    rewrite H3.
+    rewrite Zmult_1_l.
+    rewrite Zmult_1_l.
+    reflexivity.
+   intro H2.
+   rewrite H2.
+   ring.
   rewrite Zmult_1_l in H1.
-  simpl in H1.
-  elim H0.
-  auto.
-  intro p.
-  unfold Zsgn in |- *.
-  intro H1.
-  elim H0.
-  apply Zopp_inj.
-  simpl in |- *.
-  transitivity (-1 * y)%Z; auto.
- intro p.
- unfold Zsgn at 1 in |- *.
- unfold Zsgn at 2 in |- *.
- intro H1.
- transitivity y.
- rewrite Zmult_1_l.
- reflexivity.
- transitivity (Zsgn b * (Zsgn b * y))%Z.
- case (Zsgn_1 b).
-  intro H2.
-  case H2.
-  intro H3.
-  elim H.
-  rewrite H3 in H1.
-  change ((1 * x)%Z = 0%Z) in H1.
-  rewrite Zmult_1_l in H1.
-  assumption.
-  intro H3.
-  rewrite H3.
-  rewrite Zmult_1_l.
-  rewrite Zmult_1_l.
+  rewrite H1.
   reflexivity.
-  intro H2.
-  rewrite H2.
-  ring.
- rewrite Zmult_1_l in H1.
- rewrite H1.
- reflexivity.
  intro p.
  unfold Zsgn at 1 in |- *.
  unfold Zsgn at 2 in |- *.
  intro H1.
  transitivity (Zsgn b * (-1 * (Zsgn b * y)))%Z.
- case (Zsgn_1 b).
+  case (Zsgn_1 b).
+   intro H2.
+   case H2.
+    intro H3.
+    elim H.
+    apply Zopp_inj.
+    transitivity (-1 * x)%Z.
+     ring.
+    unfold Zopp in |- *.
+    rewrite H3 in H1.
+    transitivity (0 * y)%Z; auto.
+   intro H3.
+   rewrite H3.
+   ring.
   intro H2.
-  case H2.
-  intro H3.
-  elim H.
-  apply Zopp_inj.
-  transitivity (-1 * x)%Z.
+  rewrite H2.
   ring.
-  unfold Zopp in |- *.
-  rewrite H3 in H1.
-  transitivity (0 * y)%Z; auto.
-  intro H3.
-  rewrite H3.
-  ring.
- intro H2.
- rewrite H2.
- ring.
  rewrite <- H1.
  ring.
 Qed.
@@ -1564,155 +1562,155 @@ Qed.
 
 Lemma nat_nat_pos : forall m n : nat, ((m + 1) * (n + 1) > 0)%Z.
 Proof.
-intros m n.
-apply Zlt_gt.
-cut (Z_of_nat m + 1 > 0)%Z.
-intro H.
-cut (0 < Z_of_nat n + 1)%Z.
-intro H0.
-cut ((Z_of_nat m + 1) * 0 < (Z_of_nat m + 1) * (Z_of_nat n + 1))%Z.
-rewrite Zmult_0_r.
-auto.
-apply Zlt_reg_mult_l; auto.
-change (0 < Zsucc (Z_of_nat n))%Z in |- *.
-apply Zle_lt_succ.
-change (Z_of_nat 0 <= Z_of_nat n)%Z in |- *.
-apply Znat.inj_le.
-apply le_O_n.
-apply Zlt_gt.
-change (0 < Zsucc (Z_of_nat m))%Z in |- *.
-apply Zle_lt_succ.
-change (Z_of_nat 0 <= Z_of_nat m)%Z in |- *.
-apply Znat.inj_le.
-apply le_O_n.
+ intros m n.
+ apply Zlt_gt.
+ cut (Z_of_nat m + 1 > 0)%Z.
+  intro H.
+  cut (0 < Z_of_nat n + 1)%Z.
+   intro H0.
+   cut ((Z_of_nat m + 1) * 0 < (Z_of_nat m + 1) * (Z_of_nat n + 1))%Z.
+    rewrite Zmult_0_r.
+    auto.
+   apply Zlt_reg_mult_l; auto.
+  change (0 < Zsucc (Z_of_nat n))%Z in |- *.
+  apply Zle_lt_succ.
+  change (Z_of_nat 0 <= Z_of_nat n)%Z in |- *.
+  apply Znat.inj_le.
+  apply le_O_n.
+ apply Zlt_gt.
+ change (0 < Zsucc (Z_of_nat m))%Z in |- *.
+ apply Zle_lt_succ.
+ change (Z_of_nat 0 <= Z_of_nat m)%Z in |- *.
+ apply Znat.inj_le.
+ apply le_O_n.
 Qed.
 
 Theorem S_predn : forall m : nat, m <> 0 -> S (pred m) = m.
 Proof.
-intros m H.
-symmetry  in |- *.
-apply S_pred with 0.
-omega.
+ intros m H.
+ symmetry  in |- *.
+ apply S_pred with 0.
+ omega.
 Qed.
 
 Lemma absolu_1 : forall x : Z, Zabs_nat x = 0 -> x = 0%Z.
 Proof.
-intros x H.
-case (dec_eq x 0).
-auto.
-intro H0.
-apply False_ind.
-ElimCompare x 0%Z.
-intro H2.
-apply H0.
-elim (Zcompare_Eq_iff_eq x 0%nat).
-intros H3 H4.
-auto.
-intro H2.
-cut (exists h : nat, Zabs_nat x = S h).
-intro H3.
-case H3.
-rewrite H.
-exact O_S.
-change (x < 0)%Z in H2.
-set (H3 := Zlt_gt _ _ H2) in *.
-elim (Zcompare_Gt_spec _ _ H3).
-intros x0 H5.
-cut (exists q : positive, x = Zneg q).
-intro H6.
-case H6.
-intros x1 H7.
-rewrite H7.
-unfold Zabs_nat in |- *.
-generalize x1.
-exact ZL4.
-cut (x = (- Zpos x0)%Z).
-simpl in |- *.
-intro H6.
-exists x0.
-assumption.
-rewrite <- (Zopp_involutive x).
-exact (f_equal Zopp H5).
-intro H2.
-cut (exists h : nat, Zabs_nat x = S h).
-intro H3.
-case H3.
-rewrite H.
-exact O_S.
-elim (Zcompare_Gt_spec _ _ H2).
-simpl in |- *.
-rewrite Zplus_0_r.
-intros x0 H4.
-rewrite H4.
-unfold Zabs_nat in |- *.
-generalize x0.
-exact ZL4.
+ intros x H.
+ case (dec_eq x 0).
+  auto.
+ intro H0.
+ apply False_ind.
+ ElimCompare x 0%Z.
+   intro H2.
+   apply H0.
+   elim (Zcompare_Eq_iff_eq x 0%nat).
+   intros H3 H4.
+   auto.
+  intro H2.
+  cut (exists h : nat, Zabs_nat x = S h).
+   intro H3.
+   case H3.
+   rewrite H.
+   exact O_S.
+  change (x < 0)%Z in H2.
+  set (H3 := Zlt_gt _ _ H2) in *.
+  elim (Zcompare_Gt_spec _ _ H3).
+  intros x0 H5.
+  cut (exists q : positive, x = Zneg q).
+   intro H6.
+   case H6.
+   intros x1 H7.
+   rewrite H7.
+   unfold Zabs_nat in |- *.
+   generalize x1.
+   exact ZL4.
+  cut (x = (- Zpos x0)%Z).
+   simpl in |- *.
+   intro H6.
+   exists x0.
+   assumption.
+  rewrite <- (Zopp_involutive x).
+  exact (f_equal Zopp H5).
+ intro H2.
+ cut (exists h : nat, Zabs_nat x = S h).
+  intro H3.
+  case H3.
+  rewrite H.
+  exact O_S.
+ elim (Zcompare_Gt_spec _ _ H2).
+ simpl in |- *.
+ rewrite Zplus_0_r.
+ intros x0 H4.
+ rewrite H4.
+ unfold Zabs_nat in |- *.
+ generalize x0.
+ exact ZL4.
 Qed.
 
 Lemma absolu_2 : forall x : Z, x <> 0%Z -> Zabs_nat x <> 0.
 Proof.
-intros x H.
-intro H0.
-apply H.
-apply absolu_1.
-assumption.
+ intros x H.
+ intro H0.
+ apply H.
+ apply absolu_1.
+ assumption.
 Qed.
 
 Lemma Zgt_mult_conv_absorb_l : forall a x y : Z,
  (a < 0)%Z -> (a * x > a * y)%Z -> (x < y)%Z.
 Proof.
-intros a x y H H0.
-case (dec_eq x y).
-intro H1.
-apply False_ind.
-rewrite H1 in H0.
-cut ((a * y)%Z = (a * y)%Z).
-change ((a * y)%Z <> (a * y)%Z) in |- *.
-apply Zgt_not_eq.
-assumption.
-trivial.
-intro H1.
-case (not_Zeq x y H1).
-trivial.
-intro H2.
-apply False_ind.
-cut (a * y > a * x)%Z.
-apply Zgt_asym with (m := (a * y)%Z) (n := (a * x)%Z).
-assumption.
-apply Zlt_conv_mult_l.
-assumption.
-assumption.
+ intros a x y H H0.
+ case (dec_eq x y).
+  intro H1.
+  apply False_ind.
+  rewrite H1 in H0.
+  cut ((a * y)%Z = (a * y)%Z).
+   change ((a * y)%Z <> (a * y)%Z) in |- *.
+   apply Zgt_not_eq.
+   assumption.
+  trivial.
+ intro H1.
+ case (not_Zeq x y H1).
+  trivial.
+ intro H2.
+ apply False_ind.
+ cut (a * y > a * x)%Z.
+  apply Zgt_asym with (m := (a * y)%Z) (n := (a * x)%Z).
+  assumption.
+ apply Zlt_conv_mult_l.
+  assumption.
+ assumption.
 Qed.
 
 Lemma Zgt_mult_reg_absorb_l : forall a x y : Z,
  (a > 0)%Z -> (a * x > a * y)%Z -> (x > y)%Z.
 Proof.
-intros a x y H H0.
-cut (- a < - (0))%Z.
-rewrite <- (Zopp_involutive a) in H.
-rewrite <- (Zopp_involutive 0) in H.
-simpl in |- *.
-intro H1.
-rewrite <- (Zopp_involutive x).
-rewrite <- (Zopp_involutive y).
-apply Zlt_opp.
-apply Zgt_mult_conv_absorb_l with (a := (- a)%Z) (x := (- x)%Z).
-assumption.
-rewrite Zopp_mult_distr_l_reverse.
-rewrite Zopp_mult_distr_l_reverse.
-apply Zlt_opp.
-rewrite <- Zopp_mult_distr_r.
-rewrite <- Zopp_mult_distr_r.
-apply Zgt_lt.
-apply Zlt_opp.
-apply Zgt_lt.
-assumption.
-omega.
+ intros a x y H H0.
+ cut (- a < - (0))%Z.
+  rewrite <- (Zopp_involutive a) in H.
+  rewrite <- (Zopp_involutive 0) in H.
+  simpl in |- *.
+  intro H1.
+  rewrite <- (Zopp_involutive x).
+  rewrite <- (Zopp_involutive y).
+  apply Zlt_opp.
+  apply Zgt_mult_conv_absorb_l with (a := (- a)%Z) (x := (- x)%Z).
+   assumption.
+  rewrite Zopp_mult_distr_l_reverse.
+  rewrite Zopp_mult_distr_l_reverse.
+  apply Zlt_opp.
+  rewrite <- Zopp_mult_distr_r.
+  rewrite <- Zopp_mult_distr_r.
+  apply Zgt_lt.
+  apply Zlt_opp.
+  apply Zgt_lt.
+  assumption.
+ omega.
 Qed.
 
 Lemma Zmult_Sm_Sn : forall m n : Z,
  ((m + 1) * (n + 1))%Z = (m * n + (m + n) + 1)%Z.
 Proof.
-intros.
-ring.
+ intros.
+ ring.
 Qed.

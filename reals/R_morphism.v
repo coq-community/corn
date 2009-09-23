@@ -18,30 +18,30 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 (* begin hide *)
-(* In this file a notion of morphism between two arbitrary real number 
-   structures, is introduced together with te proofs that this notion of 
-   morphism preserves the basic algebraic structure. *) 
+(* In this file a notion of morphism between two arbitrary real number
+   structures, is introduced together with te proofs that this notion of
+   morphism preserves the basic algebraic structure. *)
 
 Require Import CReals.
 
 (* This comes from CReals1.v *)
-Definition Cauchy_Lim_prop2 (IR : CReals) (seq : nat -> IR) 
+Definition Cauchy_Lim_prop2 (IR : CReals) (seq : nat -> IR)
   (y : IR) :=
   forall eps : IR,
   Zero[<]eps ->
@@ -58,7 +58,7 @@ Variable phi : R1 -> R2.
 Variable p1 : R1 -> R1 -> CProp.
 Variable p2 : R2 -> R2 -> CProp.
 Variable f1 : R1 -> R1.
-Variable f2 : R2 -> R2. 
+Variable f2 : R2 -> R2.
 Variable g1 : R1 -> R1 -> R1.
 Variable g2 : R2 -> R2 -> R2.
 
@@ -77,13 +77,13 @@ Definition fun_pres_partial_fun:=(x:R1;H1:x[#]Zero;H2:(phi x)[#]Zero)
 Definition fun_pres_Lim :=
   forall (a : nat -> R1) (l_a : R1),
   Cauchy_Lim_prop2 R1 a l_a ->
-  Cauchy_Lim_prop2 R2 (fun n : nat => phi (a n)) (phi l_a). 
+  Cauchy_Lim_prop2 R2 (fun n : nat => phi (a n)) (phi l_a).
 
 
 End morphism_details.
 
 
-Record Homomorphism : Type := 
+Record Homomorphism : Type :=
   {map :> R1 -> R2;
    map_strext : fun_strext map;
    map_pres_less :
@@ -95,10 +95,10 @@ Record Homomorphism : Type :=
 
 
 
-(* This might be useful later... 
+(* This might be useful later...
 Definition Homo_as_CSetoid_fun:=
     [f:Homomorphism]
-         (Build_CSetoid_fun R1 R2 f 
+         (Build_CSetoid_fun R1 R2 f
            (fun_strext_imp_wd R1 R2 f (!map_strext f))
            (!map_strext f)
           ).
@@ -122,10 +122,10 @@ Proof.
  apply not_ap_imp_eq.
  intro H0.
  cut (Not (x[#]y)).
- intro H1.
- apply H1.
- apply map_strext_unfolded with (f := f).
- exact H0.
+  intro H1.
+  apply H1.
+  apply map_strext_unfolded with (f := f).
+  exact H0.
  apply eq_imp_not_ap.
  exact H.
 Qed.
@@ -136,7 +136,7 @@ Proof.
  intro f.
  case f.
  intros. rename X into H.
- apply map_pres_less. 
+ apply map_pres_less.
  exact H.
 Qed.
 
@@ -165,15 +165,16 @@ Proof.
  intros.
  apply cg_cancel_lft with (x := f Zero).
  apply eq_transitive_unfolded with (f Zero).
- apply eq_transitive_unfolded with (f (Zero[+]Zero)).
- apply eq_symmetric_unfolded.
- apply map_pres_plus_unfolded.
- apply map_wd_unfolded with (f := f).
- algebra.
+  apply eq_transitive_unfolded with (f (Zero[+]Zero)).
+   apply eq_symmetric_unfolded.
+   apply map_pres_plus_unfolded.
+  apply map_wd_unfolded with (f := f).
+  algebra.
  algebra.
 Qed.
 
 Lemma map_pres_zero_unfolded : forall f : Homomorphism, f Zero[=]Zero.
+Proof.
  intro.
  apply map_pres_zero.
 Qed.
@@ -188,16 +189,16 @@ Proof.
  apply cg_cancel_lft with (x := f x).
  astepr (Zero:R2).
  apply eq_transitive_unfolded with (f (x[+][--]x)).
- apply eq_symmetric_unfolded.
- apply map_pres_plus_unfolded.
+  apply eq_symmetric_unfolded.
+  apply map_pres_plus_unfolded.
  astepl (f Zero).
- apply map_pres_zero_unfolded.
+  apply map_pres_zero_unfolded.
  apply map_wd_unfolded.
  algebra.
 Qed.
-  
+
 Lemma map_pres_minus_unfolded :
- forall (f : Homomorphism) (x : R1), f [--]x[=][--](f x).                      
+ forall (f : Homomorphism) (x : R1), f [--]x[=][--](f x).
 Proof.
  exact map_pres_minus.
 Qed.
@@ -207,16 +208,16 @@ Lemma map_pres_apartness :
 Proof.
  intros f x y H.
  cut (x[<]y or y[<]x).
- intro H0.
- case H0.
- intro.
- apply less_imp_ap.
- apply map_pres_less_unfolded.
- assumption.
- intro H1.
- apply Greater_imp_ap.
- apply map_pres_less_unfolded.
- exact H1.
+  intro H0.
+  case H0.
+   intro.
+   apply less_imp_ap.
+   apply map_pres_less_unfolded.
+   assumption.
+  intro H1.
+  apply Greater_imp_ap.
+  apply map_pres_less_unfolded.
+  exact H1.
  apply ap_imp_less.
  exact H.
 Qed.
@@ -227,8 +228,8 @@ Lemma map_pres_ap_zero :
 Proof.
  intros. rename X into H.
  apply ap_wdr_unfolded with (y := f Zero).
- apply map_pres_apartness with (y := Zero:R1).
- exact H.
+  apply map_pres_apartness with (y := Zero:R1).
+  exact H.
  apply map_pres_zero_unfolded.
 Qed.
 
@@ -237,16 +238,17 @@ Proof.
  intros.
  apply eq_symmetric_unfolded.
  apply mult_cancel_lft with (z := f One).
- apply map_pres_ap_zero.
- apply ring_non_triv.
+  apply map_pres_ap_zero.
+  apply ring_non_triv.
  astepl (f One).
- astepl (f (One[*]One)). 
- apply map_pres_mult_unfolded.
+ astepl (f (One[*]One)).
+  apply map_pres_mult_unfolded.
  apply map_wd_unfolded with (f := f).
  algebra.
 Qed.
 
 Lemma map_pres_one_unfolded : forall f : Homomorphism, f One[=]One.
+Proof.
  intro.
  apply map_pres_one.
 Qed.
@@ -259,13 +261,13 @@ Lemma map_pres_inv_unfolded :
 Proof.
  intros.
  apply mult_cancel_lft with (z := f x).
- apply map_pres_ap_zero.
- assumption.
+  apply map_pres_ap_zero.
+  assumption.
  rstepr (One:R2).
  astepl (f One).
- apply map_pres_one_unfolded.
+  apply map_pres_one_unfolded.
  astepl (f (x[*](One[/] x[//]H))).
- apply map_pres_mult_unfolded.
+  apply map_pres_mult_unfolded.
  apply map_wd_unfolded.
  rational.
 Qed.
@@ -311,7 +313,7 @@ Proof.
  intros g_1 g_2 g_3 g_4.
  intros.
  simpl in |- *.
- apply g_2.                                                     
+ apply g_2.
  apply f_2.
  assumption.
 Qed.
@@ -324,18 +326,18 @@ Proof.
  case f.
  intro f_.
  intros f_1 f_2 f_3 f_4.
- cut (fun_wd g). 
- case g.
- intro g_.
- intros g_1 g_2 g_3 g_4.
- intros.
- simpl in H.
- simpl in |- *.
- astepl (g_ (f_ x[+]f_ y)).
- apply g_3.
+ cut (fun_wd g).
+  case g.
+  intro g_.
+  intros g_1 g_2 g_3 g_4.
+  intros.
+  simpl in H.
+  simpl in |- *.
+  astepl (g_ (f_ x[+]f_ y)).
+  apply g_3.
  red in |- *.
  intros.
- apply map_wd_unfolded.  
+ apply map_wd_unfolded.
  assumption.
 Qed.
 
@@ -347,36 +349,33 @@ Proof.
  case f.
  intro f_.
  intros f_1 f_2 f_3 f_4.
- cut (fun_wd g). 
- case g.
- intro g_.
- intros g_1 g_2 g_3 g_4.
- intros.
- simpl in H.
- simpl in |- *.
- astepl (g_ (f_ x[*]f_ y)).
- apply g_4.
+ cut (fun_wd g).
+  case g.
+  intro g_.
+  intros g_1 g_2 g_3 g_4.
+  intros.
+  simpl in H.
+  simpl in |- *.
+  astepl (g_ (f_ x[*]f_ y)).
+  apply g_4.
  red in |- *.
  intros.
- apply map_wd_unfolded.  
+ apply map_wd_unfolded.
  assumption.
-Qed. 
+Qed.
 
 Lemma compose_pres_Lim : fun_pres_Lim R1 R3 compose.
-Proof. 
+Proof.
  red in |- *.
  unfold compose in |- *.
  case f.
  intro f_.
  intros f_1 f_2 f_3 f_4 f_5.
-
  case g.
  intro g_.
  intros g_1 g_2 g_3 g_4 g_5.
  intros.
-
  simpl in |- *.
-
  apply g_5 with (a := fun n : nat => f_ (a n)).
  apply f_5.
  assumption.
@@ -387,9 +386,9 @@ Definition Compose :=
   Build_Homomorphism R1 R3 compose compose_strext compose_pres_less
     compose_pres_plus compose_pres_mult compose_pres_Lim.
 
- 
 
-End composition. 
+
+End composition.
 
 Section isomorphism.
 
@@ -405,7 +404,7 @@ Definition map_is_id := forall x : R3, f x[=]x.
 End identity_map.
 
 
-Record Isomorphism : Type := 
+Record Isomorphism : Type :=
   {iso_map_lft : Homomorphism R1 R2;
    iso_map_rht : Homomorphism R2 R1;
    inversity_lft : map_is_id R2 (Compose R2 R1 R2 iso_map_rht iso_map_lft);
@@ -436,11 +435,11 @@ Proof.
  apply not_ap_imp_eq.
  intro.
  cut (Not (x[#]y)).
- intro H2.
- apply H2.
- red in H1.
- apply H1.
- assumption. 
+  intro H2.
+  apply H2.
+  red in H1.
+  apply H1.
+  assumption.
  apply eq_imp_not_ap.
  assumption.
 Qed.
@@ -454,52 +453,54 @@ Lemma less_pres_f : forall x y : R1, f x[<]f y -> x[<]y.
 Proof.
  intros.
  case (ap_imp_less R1 x y).
- red in H1.
- apply H1.
- apply less_imp_ap.
- assumption.
- intro.
- assumption.
+   red in H1.
+   apply H1.
+   apply less_imp_ap.
+   assumption.
+  intro.
+  assumption.
  intro.
  elimtype False.
  cut (f y[<]f x).
- change (Not (f y[<]f x)) in |- *.
- apply less_antisymmetric_unfolded.
- assumption.
+  change (Not (f y[<]f x)) in |- *.
+  apply less_antisymmetric_unfolded.
+  assumption.
  red in H2.
  apply H2.
  assumption.
 Qed.
- 
+
 Lemma leEq_pres_f : forall x y : R1, f x[<=]f y -> x[<=]y.
-intros; rewrite leEq_def; intro.
-apply less_irreflexive_unfolded with (x := f x).
-apply leEq_less_trans with (f y); auto.
+Proof.
+ intros; rewrite leEq_def; intro.
+ apply less_irreflexive_unfolded with (x := f x).
+ apply leEq_less_trans with (f y); auto.
 Qed.
 
 Lemma f_pres_leEq : forall x y : R1, x[<=]y -> f x[<=]f y.
-intros; rewrite leEq_def; intro.
-apply less_irreflexive_unfolded with (x := x).
-apply leEq_less_trans with y; auto.
-apply less_pres_f; auto.
+Proof.
+ intros; rewrite leEq_def; intro.
+ apply less_irreflexive_unfolded with (x := x).
+ apply leEq_less_trans with y; auto.
+ apply less_pres_f; auto.
 Qed.
 
 Lemma f_pres_apartness : forall x y : R1, x[#]y -> f x[#]f y.
 Proof.
  intros.
  cut (x[<]y or y[<]x).
- intro H0.
- case H0.
- intro.
- apply less_imp_ap.
- red in H2.
- apply H2.
- assumption.
- intro.
- apply Greater_imp_ap.
- red in H2.
- apply H2. 
- assumption.
+  intro H0.
+  case H0.
+   intro.
+   apply less_imp_ap.
+   red in H2.
+   apply H2.
+   assumption.
+  intro.
+  apply Greater_imp_ap.
+  red in H2.
+  apply H2.
+  assumption.
  apply ap_imp_less.
  assumption.
 Qed.
@@ -524,14 +525,14 @@ Qed.
 
 Lemma f_pres_minus : forall x : R1, f [--]x[=][--](f x).
 Proof.
- intro. 
+ intro.
  apply cg_cancel_lft with (x := f x).
  astepr (Zero:R2).
- astepl (f (x[+][--]x)). 
+ astepl (f (x[+][--]x)).
  astepr (f Zero).
- apply f_well_def.
- algebra.
- apply f_pres_Zero. 
+  apply f_well_def.
+  algebra.
+ apply f_pres_Zero.
 Qed.
 
 
@@ -539,14 +540,14 @@ Lemma f_pres_min : forall x y : R1, f (x[-]y)[=]f x[-]f y.
 Proof.
  intros.
  astepr (f (x[+][--]y)).
- apply f_well_def.
- algebra.
+  apply f_well_def.
+  algebra.
  astepr (f x[+][--](f y)).
  red in H3.
  astepr (f x[+]f [--]y).
- apply H3.
+  apply H3.
  apply bin_op_wd_unfolded.
- apply eq_reflexive_unfolded.
+  apply eq_reflexive_unfolded.
  apply f_pres_minus.
 Qed.
 
@@ -563,13 +564,13 @@ Lemma f_pres_ap_zero : forall x : R1, x[#]Zero -> f x[#]Zero.
 Proof.
  intros.
  apply ap_wdr_unfolded with (y := f Zero).
- apply f_pres_apartness with (y := Zero:R1).
- assumption.
- assumption.
- apply f_pres_Zero. 
+  apply f_pres_apartness with (y := Zero:R1).
+   assumption.
+  assumption.
+ apply f_pres_Zero.
  assumption.
 Qed.
-    
+
 Section surjectivity_helps.
 Hypothesis f_surj : map_is_surjective R1 R2 f.
 
@@ -582,48 +583,48 @@ Proof.
  red in f_surj.
  unfold Cauchy_Lim_prop2 in H.
  cut {x : R1 | e2[=]f x}.
- intro H4.
- case H4.
- intros e1 H5.
- cut {N : nat | forall m : nat, N <= m -> AbsSmall e1 (a m[-]l_a)}.
- intro H6.
- case H6.
- intro N.
- intros.
- exists N.
- intros.
- cut (AbsSmall e1 (a m[-]l_a)).
- intro.
- elim H8.
- intros.
- astepl (f e1).
- astepr (f (a m[-]l_a)).
- split.
- astepl (f [--]e1).
- apply f_pres_leEq.
- assumption.
- assumption.
- apply f_pres_minus.
- assumption.
- apply f_pres_leEq.
- assumption.
- assumption.
- apply f_pres_min.
- assumption.
- apply a0.
- assumption.
- apply H.
- apply less_pres_f.
- assumption.
- astepl (Zero:R2).
- astepr e2.
- assumption.
- apply eq_symmetric_unfolded.
- apply f_pres_Zero.
- assumption.
+  intro H4.
+  case H4.
+  intros e1 H5.
+  cut {N : nat | forall m : nat, N <= m -> AbsSmall e1 (a m[-]l_a)}.
+   intro H6.
+   case H6.
+   intro N.
+   intros.
+   exists N.
+   intros.
+   cut (AbsSmall e1 (a m[-]l_a)).
+    intro.
+    elim H8.
+    intros.
+    astepl (f e1).
+    astepr (f (a m[-]l_a)).
+     split.
+      astepl (f [--]e1).
+       apply f_pres_leEq.
+        assumption.
+       assumption.
+      apply f_pres_minus.
+      assumption.
+     apply f_pres_leEq.
+      assumption.
+     assumption.
+    apply f_pres_min.
+    assumption.
+   apply a0.
+   assumption.
+  apply H.
+  apply less_pres_f.
+   assumption.
+  astepl (Zero:R2).
+   astepr e2.
+   assumption.
+  apply eq_symmetric_unfolded.
+  apply f_pres_Zero.
+  assumption.
  apply f_surj.
 Qed.
- 
+
 End surjectivity_helps.
 
 Section with_mult_plus_less.
@@ -635,28 +636,28 @@ Proof.
  intros.
  apply eq_symmetric_unfolded.
  apply mult_cancel_lft with (z := f One).
- apply f_pres_ap_zero.
- apply ring_non_triv.
+  apply f_pres_ap_zero.
+  apply ring_non_triv.
  astepl (f One).
- astepr (f (One[*]One)). 
+ astepr (f (One[*]One)).
  apply f_well_def.
  algebra.
 Qed.
- 
+
 Lemma f_pres_inv :
  forall (x : R1) (H : x[#]Zero),
  f (One[/] x[//]H)[=](One[/] f x[//]f_pres_ap_zero x H).
 Proof.
  intros.
  apply mult_cancel_lft with (z := f x).
- apply f_pres_ap_zero.
- assumption.
+  apply f_pres_ap_zero.
+  assumption.
  rstepr (One:R2).
  astepr (f One).
- astepl (f (x[*](One[/] x[//]H))).
- apply eq_symmetric_unfolded.
- apply f_well_def.
- rational.
+  astepl (f (x[*](One[/] x[//]H))).
+  apply eq_symmetric_unfolded.
+  apply f_well_def.
+  rational.
  apply f_pres_one.
 Qed.
 

@@ -35,25 +35,25 @@ Open Local Scope Q_scope.
 Lemma Qabs_uc_prf : is_UniformlyContinuousFunction
  (Qabs:Q_as_MetricSpace -> Q_as_MetricSpace) Qpos2QposInf.
 Proof.
-intros e a b Hab.
-simpl in *.
-unfold Qball in *.
-rewrite <- AbsSmall_Qabs in *.
-apply Qabs_case.
+ intros e a b Hab.
+ simpl in *.
+ unfold Qball in *.
+ rewrite <- AbsSmall_Qabs in *.
+ apply Qabs_case.
+  intros _.
+  eapply Qle_trans;[|apply Hab].
+  apply Qabs_triangle_reverse.
  intros _.
+ replace LHS with (Qabs b - Qabs a) by ring.
+ setoid_replace (a - b) with (- (b - a)) in Hab by ring.
+ rewrite -> Qabs_opp in Hab.
  eapply Qle_trans;[|apply Hab].
  apply Qabs_triangle_reverse.
-intros _.
-replace LHS with (Qabs b - Qabs a) by ring.
-setoid_replace (a - b) with (- (b - a)) in Hab by ring.
-rewrite -> Qabs_opp in Hab.
-eapply Qle_trans;[|apply Hab].
-apply Qabs_triangle_reverse.
 Qed.
 
 Open Local Scope uc_scope.
 
-Definition Qabs_uc : Q_as_MetricSpace --> Q_as_MetricSpace := 
+Definition Qabs_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qabs_uc_prf.
 
 Definition CRabs : CR --> CR := Cmap QPrelengthSpace Qabs_uc.
@@ -61,89 +61,89 @@ Definition CRabs : CR --> CR := Cmap QPrelengthSpace Qabs_uc.
 Lemma CRabs_correct : forall x,
  (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR.
 Proof.
-intros x.
-apply stableEq.
- apply Complete_stable.
- apply stableQ.
-generalize (leEq_or_leEq _ Zero x).
-cut ((x[<=]Zero or Zero[<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
- unfold Not.
- tauto.
-intros [H|H].
- transitivity (IRasCR ([--]x)).
+ intros x.
+ apply stableEq.
+  apply Complete_stable.
+  apply stableQ.
+ generalize (leEq_or_leEq _ Zero x).
+ cut ((x[<=]Zero or Zero[<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
+  unfold Not.
+  tauto.
+ intros [H|H].
+  transitivity (IRasCR ([--]x)).
+   apply IRasCR_wd.
+   apply AbsIR_eq_inv_x; auto.
+  rewrite IR_opp_as_CR.
+  rewrite -> IR_leEq_as_CR in H.
+  rewrite -> IR_Zero_as_CR in H.
+  revert H.
+  generalize (IRasCR x).
+  intros m Hm.
+  rewrite -> CRle_min_r in Hm.
+  rewrite -> CRmin_boundAbove in Hm.
+  setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
+  apply CRopp_wd.
+  rewrite <- Hm.
+  apply: regFunEq_e.
+  intros e.
+  simpl.
+  rewrite Qabs_neg; auto with *.
+  rewrite Qopp_involutive.
+  apply: ball_refl.
+ transitivity (IRasCR x).
   apply IRasCR_wd.
-  apply AbsIR_eq_inv_x; auto.
- rewrite IR_opp_as_CR.
+  apply AbsIR_eq_x; auto.
  rewrite -> IR_leEq_as_CR in H.
  rewrite -> IR_Zero_as_CR in H.
  revert H.
  generalize (IRasCR x).
  intros m Hm.
- rewrite -> CRle_min_r in Hm.
- rewrite -> CRmin_boundAbove in Hm.
- setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
- apply CRopp_wd.
+ rewrite -> CRle_max_r in Hm.
+ rewrite -> CRmax_boundBelow in Hm.
  rewrite <- Hm.
  apply: regFunEq_e.
  intros e.
- simpl. 
- rewrite Qabs_neg; auto with *.
- rewrite Qopp_involutive.
+ simpl.
+ rewrite Qabs_pos; auto with *.
  apply: ball_refl.
-transitivity (IRasCR x).
- apply IRasCR_wd.
- apply AbsIR_eq_x; auto.
-rewrite -> IR_leEq_as_CR in H.
-rewrite -> IR_Zero_as_CR in H.
-revert H.
-generalize (IRasCR x).
-intros m Hm.
-rewrite -> CRle_max_r in Hm.
-rewrite -> CRmax_boundBelow in Hm.
-rewrite <- Hm.
-apply: regFunEq_e.
-intros e.
-simpl. 
-rewrite Qabs_pos; auto with *.
-apply: ball_refl.
 Qed.
 
 Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.
 Proof.
-intros a b.
-rewrite <- (CRasIRasCR_id a).
-rewrite <- (CRasIRasCR_id b).
-rewrite <- CRabs_correct.
-rewrite <- IR_AbsSmall_as_CR.
-rewrite <- IR_leEq_as_CR.
-split.
- apply AbsIR_imp_AbsSmall.
-apply AbsSmall_imp_AbsIR.
+ intros a b.
+ rewrite <- (CRasIRasCR_id a).
+ rewrite <- (CRasIRasCR_id b).
+ rewrite <- CRabs_correct.
+ rewrite <- IR_AbsSmall_as_CR.
+ rewrite <- IR_leEq_as_CR.
+ split.
+  apply AbsIR_imp_AbsSmall.
+ apply AbsSmall_imp_AbsIR.
 Qed.
 
 Lemma CRabs_pos : forall x:CR, ('0 <= x -> CRabs x == x)%CR.
 Proof.
-intros x.
-rewrite <- (CRasIRasCR_id x).
-rewrite <- CRabs_correct.
-intros H.
-apply IRasCR_wd.
-apply AbsIR_eq_x.
-rewrite IR_leEq_as_CR.
-rewrite IR_Zero_as_CR.
-auto.
+ intros x.
+ rewrite <- (CRasIRasCR_id x).
+ rewrite <- CRabs_correct.
+ intros H.
+ apply IRasCR_wd.
+ apply AbsIR_eq_x.
+ rewrite IR_leEq_as_CR.
+ rewrite IR_Zero_as_CR.
+ auto.
 Qed.
 
 Lemma CRabs_neg: forall x, (x <= '0 -> CRabs x == - x)%CR.
 Proof.
-intros x.
-rewrite <- (CRasIRasCR_id x).
-rewrite <- CRabs_correct.
-intros H.
-rewrite <- IR_opp_as_CR.
-apply IRasCR_wd.
-apply AbsIR_eq_inv_x.
-rewrite IR_leEq_as_CR.
-rewrite IR_Zero_as_CR.
-auto.
+ intros x.
+ rewrite <- (CRasIRasCR_id x).
+ rewrite <- CRabs_correct.
+ intros H.
+ rewrite <- IR_opp_as_CR.
+ apply IRasCR_wd.
+ apply AbsIR_eq_inv_x.
+ rewrite IR_leEq_as_CR.
+ rewrite IR_Zero_as_CR.
+ auto.
 Qed.

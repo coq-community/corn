@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export CMonoids.
 Require Export Nmonoid.
@@ -48,7 +48,8 @@ Let A:= (CSetoid_of_less 1).
 
 (* begin hide *)
 Let ZerolessOne: 0<1.
-intuition.
+Proof.
+ intuition.
 Qed.
 
 (* end hide *)
@@ -60,126 +61,119 @@ match n with
 end.
 
 Definition to_word_: nat_as_CMonoid -> (free_monoid_as_CMonoid A).
-simpl.
-unfold Astar.
-unfold A.
-intro n.
-unfold CSetoid_of_less.
-simpl.
-apply to_word.
-exact n.
+Proof.
+ simpl.
+ unfold Astar.
+ unfold A.
+ intro n.
+ unfold CSetoid_of_less.
+ simpl.
+ apply to_word.
+ exact n.
 Defined.
 
 Lemma  to_word_strext: (fun_strext to_word_).
-simpl.
-unfold fun_strext.
-double induction x y.
-simpl.
-intuition.
-
-intros  n H2.
-simpl.
-unfold ap_nat.
-unfold CNot.
-intros T H.
-set (H1:= (O_S n H)).
-elim H1.
-
-intros n H3.
-simpl.
-unfold ap_nat.
-unfold CNot.
-intros T H.
-cut (0= (S n)).
-intro H2.
-set (H1:= (O_S n H2 )).
-elim H1.
-intuition.
-
-intros n H1 n0 H2.
-simpl.
-cut ( ap_fm A (to_word_ n0) (to_word_ n) -> S n0{#N}S n).
-intuition.
-
-intro H3.
-simpl in H2.
-set (H4:=(H2 n H3)).
-unfold ap_nat in H4 |- *.
-unfold CNot in H4 |- *.
-intro H5.
-apply H4.
-apply (eq_add_S n0 n H5).
+Proof.
+ simpl.
+ unfold fun_strext.
+ double induction x y.
+    simpl.
+    intuition.
+   intros  n H2.
+   simpl.
+   unfold ap_nat.
+   unfold CNot.
+   intros T H.
+   set (H1:= (O_S n H)).
+   elim H1.
+  intros n H3.
+  simpl.
+  unfold ap_nat.
+  unfold CNot.
+  intros T H.
+  cut (0= (S n)).
+   intro H2.
+   set (H1:= (O_S n H2 )).
+   elim H1.
+  intuition.
+ intros n H1 n0 H2.
+ simpl.
+ cut ( ap_fm A (to_word_ n0) (to_word_ n) -> S n0{#N}S n).
+  intuition.
+ intro H3.
+ simpl in H2.
+ set (H4:=(H2 n H3)).
+ unfold ap_nat in H4 |- *.
+ unfold CNot in H4 |- *.
+ intro H5.
+ apply H4.
+ apply (eq_add_S n0 n H5).
 Qed.
 
 Definition to_word_as_CSetoid_fun:=
 (Build_CSetoid_fun nat_as_CSetoid (free_csetoid_as_csetoid  A) to_word_ to_word_strext).
 
 Lemma to_word_bijective: (bijective to_word_as_CSetoid_fun).
-unfold bijective.
-split.
-unfold injective.
-simpl.
-intros a0.
-induction a0.
-intro a1.
-case a1.
-unfold ap_nat.
-unfold CNot.
-intuition.
-
-simpl.
-intuition.
-
-intro a1.
-case a1.
-simpl.
-intuition.
-
-intros n H.
-unfold ap_nat in H.
-unfold CNot in H.
-simpl.
-apply Cinright.
-apply IHa0.
-unfold ap_nat.
-unfold CNot.
-intro H1.
-rewrite H1 in H.
-apply H.
-reflexivity.
-
-unfold surjective.
-simpl.
-unfold Astar.
-unfold A.
-intro b.
-induction b.
-exists 0.
-simpl.
-exact I.
-
-elim IHb.
-intros c H.
-exists (S c).
-split.
-simpl in a.
-elim a.
-simpl.
-intuition.
-
-exact H.
+Proof.
+ unfold bijective.
+ split.
+  unfold injective.
+  simpl.
+  intros a0.
+  induction a0.
+   intro a1.
+   case a1.
+    unfold ap_nat.
+    unfold CNot.
+    intuition.
+   simpl.
+   intuition.
+  intro a1.
+  case a1.
+   simpl.
+   intuition.
+  intros n H.
+  unfold ap_nat in H.
+  unfold CNot in H.
+  simpl.
+  apply Cinright.
+  apply IHa0.
+  unfold ap_nat.
+  unfold CNot.
+  intro H1.
+  rewrite H1 in H.
+  apply H.
+  reflexivity.
+ unfold surjective.
+ simpl.
+ unfold Astar.
+ unfold A.
+ intro b.
+ induction b.
+  exists 0.
+  simpl.
+  exact I.
+ elim IHb.
+ intros c H.
+ exists (S c).
+ split.
+  simpl in a.
+  elim a.
+  simpl.
+  intuition.
+ exact H.
 Qed.
 
-Lemma pres_plus_to_word: 
+Lemma pres_plus_to_word:
 forall (n m: nat_as_CMonoid),(to_word_ n)[+](to_word_ m)[=](to_word_ (n[+]m)).
-simpl.
-intros n m.
-induction n.
-simpl.
-apply eq_fm_reflexive.
-
-simpl.
-intuition.
+Proof.
+ simpl.
+ intros n m.
+ induction n.
+  simpl.
+  apply eq_fm_reflexive.
+ simpl.
+ intuition.
 Qed.
 
 End p70text.

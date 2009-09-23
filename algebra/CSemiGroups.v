@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (** printing [+] %\ensuremath+% #+# *)
 (** printing {+} %\ensuremath+% #+# *)
@@ -48,7 +48,7 @@ Require Export CSetoidInc.
 
 Definition is_CSemiGroup A (op : CSetoid_bin_op A) := associative op.
 
-Record CSemiGroup : Type := 
+Record CSemiGroup : Type :=
   {csg_crr   :> CSetoid;
    csg_op    :  CSetoid_bin_op csg_crr;
    csg_proof :  is_CSemiGroup csg_crr csg_op}.
@@ -74,11 +74,13 @@ Section CSemiGroup_axioms.
 Variable G : CSemiGroup.
 
 Lemma CSemiGroup_is_CSemiGroup : is_CSemiGroup G csg_op.
-elim G; auto.
+Proof.
+ elim G; auto.
 Qed.
 
 Lemma plus_assoc : associative (csg_op (c:=G)).
-exact CSemiGroup_is_CSemiGroup.
+Proof.
+ exact CSemiGroup_is_CSemiGroup.
 Qed.
 
 End CSemiGroup_axioms.
@@ -98,7 +100,8 @@ Variable G : CSemiGroup.
 (* End_SpecReals *)
 
 Lemma plus_assoc_unfolded : forall (G : CSemiGroup) (x y z : G), x[+] (y[+]z) [=] x[+]y[+]z.
-exact plus_assoc.
+Proof.
+ exact plus_assoc.
 Qed.
 
 End CSemiGroup_basics.
@@ -142,23 +145,24 @@ Implicit Arguments is_rht_unit [S].
 Definition is_unit (S:CSemiGroup): S -> Prop :=
 fun e => forall (a:S), e[+]a [=] a /\ a[+]e [=]a.
 
-Lemma cs_unique_unit : forall (S:CSemiGroup) (e f:S), 
+Lemma cs_unique_unit : forall (S:CSemiGroup) (e f:S),
 (is_unit S e) /\ (is_unit S f) -> e[=]f.
-intros S e f.
-unfold is_unit.
-intros H.
-elim H.
-clear H.
-intros H0 H1.
-elim (H0 f).
-clear H0.
-intros H2 H3.
-elim (H1 e).
-clear H1.
-intros H4 H5.
-astepr (e[+]f). 
-astepl (e[+]f).
-apply eq_reflexive.
+Proof.
+ intros S e f.
+ unfold is_unit.
+ intros H.
+ elim H.
+ clear H.
+ intros H0 H1.
+ elim (H0 f).
+ clear H0.
+ intros H2 H3.
+ elim (H1 e).
+ clear H1.
+ intros H4 H5.
+ astepr (e[+]f).
+ astepl (e[+]f).
+ apply eq_reflexive.
 Qed.
 
 
@@ -191,9 +195,9 @@ Let Q := Dom F'.
 
 Lemma part_function_plus_strext : forall x y (Hx : Conj P Q x) (Hy : Conj P Q y),
  F x (Prj1 Hx) [+]F' x (Prj2 Hx) [#] F y (Prj1 Hy) [+]F' y (Prj2 Hy) -> x [#] y.
-intros x y Hx Hy H.
-elim: (cs_bin_op_strext  _ _ _ _ _ _  H); intro H1;
- exact (pfstrx _ _ _ _ _ _ H1).
+Proof.
+ intros x y Hx Hy H.
+ elim: (cs_bin_op_strext  _ _ _ _ _ _  H); intro H1; exact (pfstrx _ _ _ _ _ _ H1).
 Qed.
 
 Definition Fplus := Build_PartFunct G _ (conj_wd (dom_wd _ F) (dom_wd _ F'))
@@ -207,15 +211,18 @@ Definition Fplus := Build_PartFunct G _ (conj_wd (dom_wd _ F) (dom_wd _ F'))
 Variable R : G -> CProp.
 
 Lemma included_FPlus : included R P -> included R Q -> included R (Dom Fplus).
-intros; simpl in |- *; apply included_conj; assumption.
+Proof.
+ intros; simpl in |- *; apply included_conj; assumption.
 Qed.
 
 Lemma included_FPlus' : included R (Dom Fplus) -> included R P.
-intro H; simpl in H; eapply included_conj_lft; apply H.
+Proof.
+ intro H; simpl in H; eapply included_conj_lft; apply H.
 Qed.
 
 Lemma included_FPlus'' : included R (Dom Fplus) -> included R Q.
-intro H; simpl in H; eapply included_conj_rht; apply H.
+Proof.
+ intro H; simpl in H; eapply included_conj_rht; apply H.
 Qed.
 
 End Part_Function_Plus.
@@ -264,44 +271,41 @@ let (y1, y2):= y in
 
 Lemma dprod_strext:(bin_fun_strext (ProdCSetoid M1 M2)(ProdCSetoid M1 M2)
   (ProdCSetoid M1 M2)dprod).
-unfold bin_fun_strext.
-intros x1 x2 y1 y2.
-unfold dprod.
-case x1.
-intros a1 a2.
-case x2.
-intros b1 b2.
-case y1.
-intros c1 c2.
-case y2.
-intros d1 d2.
-simpl.
-intro H.
-elim H.
-clear H.
-intro H.
-cut (a1[#]b1 or c1[#]d1).
-intuition.
-
-set (H0:= (@csg_op M1)).
-unfold CSetoid_bin_op in H0.
-set (H1:= (@csbf_strext M1 M1 M1 H0)).
-unfold bin_fun_strext in H1.
-apply H1.
-exact H.
-
-
-clear H.
-intro H.
-cut (a2[#]b2 or c2[#]d2).
-intuition.
-
-set (H0:= (@csg_op M2)).
-unfold CSetoid_bin_op in H0.
-set (H1:= (@csbf_strext M2 M2 M2 H0)).
-unfold bin_fun_strext in H1.
-apply H1.
-exact H.
+Proof.
+ unfold bin_fun_strext.
+ intros x1 x2 y1 y2.
+ unfold dprod.
+ case x1.
+ intros a1 a2.
+ case x2.
+ intros b1 b2.
+ case y1.
+ intros c1 c2.
+ case y2.
+ intros d1 d2.
+ simpl.
+ intro H.
+ elim H.
+  clear H.
+  intro H.
+  cut (a1[#]b1 or c1[#]d1).
+   intuition.
+  set (H0:= (@csg_op M1)).
+  unfold CSetoid_bin_op in H0.
+  set (H1:= (@csbf_strext M1 M1 M1 H0)).
+  unfold bin_fun_strext in H1.
+  apply H1.
+  exact H.
+ clear H.
+ intro H.
+ cut (a2[#]b2 or c2[#]d2).
+  intuition.
+ set (H0:= (@csg_op M2)).
+ unfold CSetoid_bin_op in H0.
+ set (H1:= (@csbf_strext M2 M2 M2 H0)).
+ unfold bin_fun_strext in H1.
+ apply H1.
+ exact H.
 Qed.
 
 Definition dprod_as_csb_fun:
@@ -309,25 +313,26 @@ Definition dprod_as_csb_fun:
   (Build_CSetoid_bin_fun (ProdCSetoid M1 M2)(ProdCSetoid M1 M2)
   (ProdCSetoid M1 M2) dprod dprod_strext).
 
-Lemma direct_product_is_CSemiGroup: 
+Lemma direct_product_is_CSemiGroup:
   (is_CSemiGroup (ProdCSetoid M1 M2) dprod_as_csb_fun).
-unfold is_CSemiGroup.
-unfold associative.
-intros x y z.
-case x.
-intros x1 x2.
-case y.
-intros y1 y2.
-case z.
-intros z1 z2.
-simpl.
-split.
-apply CSemiGroup_is_CSemiGroup.
-apply CSemiGroup_is_CSemiGroup.
+Proof.
+ unfold is_CSemiGroup.
+ unfold associative.
+ intros x y z.
+ case x.
+ intros x1 x2.
+ case y.
+ intros y1 y2.
+ case z.
+ intros z1 z2.
+ simpl.
+ split.
+  apply CSemiGroup_is_CSemiGroup.
+ apply CSemiGroup_is_CSemiGroup.
 Qed.
 
 Definition direct_product_as_CSemiGroup:=
-  (Build_CSemiGroup (ProdCSetoid M1 M2) dprod_as_csb_fun 
+  (Build_CSemiGroup (ProdCSetoid M1 M2) dprod_as_csb_fun
   direct_product_is_CSemiGroup).
 
 End D9S.
@@ -337,10 +342,11 @@ End D9S.
 ** The SemiGroup of Setoid functions
 *)
 
-Lemma FS_is_CSemiGroup: 
+Lemma FS_is_CSemiGroup:
 forall (X:CSetoid),(is_CSemiGroup (FS_as_CSetoid X X) (comp_as_bin_op  X )).
-unfold is_CSemiGroup.
-exact assoc_comp.
+Proof.
+ unfold is_CSemiGroup.
+ exact assoc_comp.
 Qed.
 
 Definition FS_as_CSemiGroup (A : CSetoid) :=
@@ -356,24 +362,24 @@ Section p66E2b4.
 
 Variable A:CSetoid.
 
-Lemma Astar_is_CSemiGroup: 
+Lemma Astar_is_CSemiGroup:
   (is_CSemiGroup (free_csetoid_as_csetoid A) (app_as_csb_fun A)).
-unfold is_CSemiGroup.
-unfold associative.
-intros x.
-unfold app_as_csb_fun.
-simpl.
-induction x.
-simpl.
-intros x y.
-apply eq_fm_reflexive.
-
-simpl.
-intuition.
+Proof.
+ unfold is_CSemiGroup.
+ unfold associative.
+ intros x.
+ unfold app_as_csb_fun.
+ simpl.
+ induction x.
+  simpl.
+  intros x y.
+  apply eq_fm_reflexive.
+ simpl.
+ intuition.
 Qed.
 
-Definition Astar_as_CSemiGroup:= 
-  (Build_CSemiGroup (free_csetoid_as_csetoid A) (app_as_csb_fun A) 
+Definition Astar_as_CSemiGroup:=
+  (Build_CSemiGroup (free_csetoid_as_csetoid A) (app_as_csb_fun A)
    Astar_is_CSemiGroup).
 
 End p66E2b4.

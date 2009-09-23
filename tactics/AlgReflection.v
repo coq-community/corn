@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 (* begin hide *)
 Require Export CLogic.
@@ -400,76 +400,78 @@ End Normalization_Function.
 Section Correctness_Results.
 
 Lemma eq_nat_corr : forall n m:nat, eq_nat n m = true -> n = m.
-simple induction n; simple induction m; simpl in |- *; intros.
-trivial.
-inversion H0.
-inversion H0.
-rewrite (H n1 H1). trivial.
+Proof.
+ simple induction n; simple induction m; simpl in |- *; intros.
+    trivial.
+   inversion H0.
+  inversion H0.
+ rewrite (H n1 H1). trivial.
 Qed.
 
 Lemma eq_int_corr : forall n m:Z, eq_int n m = true -> n = m.
-simple induction n; simple induction m; simpl in |- *; intros.
-trivial.
-inversion H.
-inversion H.
-inversion H.
-rewrite <- (convert_is_POS p). rewrite <- (convert_is_POS p0). 
-cut (nat_of_P p = nat_of_P p0). auto. apply eq_nat_corr. assumption.
-inversion H.
-inversion H.
-inversion H.
-cut (p = p0); intros.
-rewrite H0; auto.
-rewrite (anti_convert_pred_convert p). rewrite (anti_convert_pred_convert p0).
-cut (nat_of_P p = nat_of_P p0). intro. auto. apply eq_nat_corr. assumption.
+Proof.
+ simple induction n; simple induction m; simpl in |- *; intros.
+         trivial.
+        inversion H.
+       inversion H.
+      inversion H.
+     rewrite <- (convert_is_POS p). rewrite <- (convert_is_POS p0).
+     cut (nat_of_P p = nat_of_P p0). auto. apply eq_nat_corr. assumption.
+      inversion H.
+   inversion H.
+  inversion H.
+ cut (p = p0); intros.
+  rewrite H0; auto.
+ rewrite (anti_convert_pred_convert p). rewrite (anti_convert_pred_convert p0).
+ cut (nat_of_P p = nat_of_P p0). intro. auto. apply eq_nat_corr. assumption.
 Qed.
 
 Lemma eq_expr_corr : forall e e':expr, eq_expr e e' = true -> e = e'.
-simple induction e; simple induction e'; simpl in |- *; intros;
- try inversion H3; try inversion H2; try inversion H1; 
- try inversion H0; try inversion H.
-cut (v = v0). intro. rewrite H0; auto. apply eq_nat_corr; assumption. 
-cut (z = z0). intro. rewrite H0; auto. apply eq_int_corr; assumption. 
-clear H1 H2. elim (andb_prop _ _ H3); intros. 
-cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto. 
-apply H0. assumption. apply H. assumption.
-clear H1 H2. elim (andb_prop _ _ H3); intros. 
-cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto. 
-apply H0. assumption. apply H. assumption.
-clear H1 H2. elim (andb_prop _ _ H3); intros. 
-cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto. 
-apply H0. assumption. apply H. assumption.
-clear H0. elim (andb_prop _ _ H1); intros. 
-cut (u = u0). cut (e0 = e1). intros. rewrite H4. rewrite H5. auto. 
-apply H. assumption. apply eq_nat_corr. assumption.
-clear H1 H2. elim (andb_prop _ _ H3). intros. elim (andb_prop _ _ H2); intros. 
-cut (b = b0). cut (e0 = e2). cut (e1 = e3).
-intros. rewrite H7. rewrite H8. rewrite H9. auto. 
-auto. auto. apply eq_nat_corr. assumption.
-clear H0. elim (andb_prop _ _ H1); intros. 
-cut (p = p0). cut (e0 = e1). intros. rewrite H4. rewrite H5. auto. 
-auto. apply eq_nat_corr. assumption.
+Proof.
+ simple induction e; simple induction e'; simpl in |- *; intros;
+   try inversion H3; try inversion H2; try inversion H1; try inversion H0; try inversion H.
+        cut (v = v0). intro. rewrite H0; auto. apply eq_nat_corr; assumption.
+         cut (z = z0). intro. rewrite H0; auto. apply eq_int_corr; assumption.
+        clear H1 H2. elim (andb_prop _ _ H3); intros.
+      cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto.
+       apply H0. assumption. apply H. assumption.
+       clear H1 H2. elim (andb_prop _ _ H3); intros.
+     cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto.
+      apply H0. assumption. apply H. assumption.
+      clear H1 H2. elim (andb_prop _ _ H3); intros.
+    cut (e0 = e2). cut (e1 = e3). intros. rewrite H4; rewrite H6. auto.
+     apply H0. assumption. apply H. assumption.
+     clear H0. elim (andb_prop _ _ H1); intros.
+   cut (u = u0). cut (e0 = e1). intros. rewrite H4. rewrite H5. auto.
+    apply H. assumption. apply eq_nat_corr. assumption.
+    clear H1 H2. elim (andb_prop _ _ H3). intros. elim (andb_prop _ _ H2); intros.
+  cut (b = b0). cut (e0 = e2). cut (e1 = e3).
+   intros. rewrite H7. rewrite H8. rewrite H9. auto.
+     auto. auto. apply eq_nat_corr. assumption.
+   clear H0. elim (andb_prop _ _ H1); intros.
+ cut (p = p0). cut (e0 = e1). intros. rewrite H4. rewrite H5. auto.
+  auto. apply eq_nat_corr. assumption.
 Qed.
 
 End Correctness_Results.
 
 Ltac ClosedNat t :=
-match t with 
+match t with
 | O => constr:true
 | (S ?n) => ClosedNat n
 | _ => constr:false
 end.
 
-Ltac ClosedPositive t := 
-match t with 
+Ltac ClosedPositive t :=
+match t with
 | xH => constr:true
 | (xI ?n) => ClosedPositive n
 | (xO ?n) => ClosedPositive n
 | _ => constr:false
 end.
 
-Ltac ClosedZ t := 
-match t with 
+Ltac ClosedZ t :=
+match t with
 | Z0 => constr:true
 | (Zpos ?n) => ClosedPositive n
 | (Zneg ?n) => ClosedPositive n
@@ -500,7 +502,7 @@ Implicit Arguments Mcons [A].
 Implicit Arguments Mnth [A].
 
 Ltac FindIndex t l :=
-match l with 
+match l with
 | (Mcons ?x ?xs) =>
   match x with
   | t => constr:O
@@ -514,7 +516,7 @@ rather than using the ProdT multiple times *)
 Section Quadruple.
 Variable A B C D: Type.
 
-Inductive quadruple : Type := 
+Inductive quadruple : Type :=
  Quad : A -> B -> C -> D -> quadruple.
 End Quadruple.
 Implicit Arguments Quad [A B C D].

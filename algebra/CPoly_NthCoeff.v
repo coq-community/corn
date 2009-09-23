@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 
 Require Export CPolynomials.
 
@@ -71,57 +71,59 @@ Fixpoint nth_coeff (n : nat) (p : RX) {struct p} : R :=
   end.
 
 Lemma nth_coeff_strext : forall n p p', nth_coeff n p [#] nth_coeff n p' -> p [#] p'.
-do 3 intro.
-generalize n.
-clear n.
-pattern p, p' in |- *.
-apply Ccpoly_double_sym_ind.
-unfold Csymmetric in |- *.
-intros.
-apply ap_symmetric_unfolded.
-apply X with n.
-apply ap_symmetric_unfolded.
-assumption.
-intro p0.
-pattern p0 in |- *.
-apply Ccpoly_induc.
-simpl in |- *.
-intros.
-elim (ap_irreflexive_unfolded _ _ X).
-do 4 intro.
-elim n.
-simpl in |- *.
-auto.
-intros.
-cut (c [#] Zero or p1 [#] Zero).
-intro; apply _linear_ap_zero.
-auto.
-right.
-apply X with n0.
-astepr (Zero:R). auto.
-intros.
-induction  n as [| n Hrecn].
-simpl in X0.
-cut (c [#] d or p0 [#] q).
-auto.
-auto.
-cut (c [#] d or p0 [#] q).
-auto.
-right.
-apply X with n.
-exact X0.
+Proof.
+ do 3 intro.
+ generalize n.
+ clear n.
+ pattern p, p' in |- *.
+ apply Ccpoly_double_sym_ind.
+   unfold Csymmetric in |- *.
+   intros.
+   apply ap_symmetric_unfolded.
+   apply X with n.
+   apply ap_symmetric_unfolded.
+   assumption.
+  intro p0.
+  pattern p0 in |- *.
+  apply Ccpoly_induc.
+   simpl in |- *.
+   intros.
+   elim (ap_irreflexive_unfolded _ _ X).
+  do 4 intro.
+  elim n.
+   simpl in |- *.
+   auto.
+  intros.
+  cut (c [#] Zero or p1 [#] Zero).
+   intro; apply _linear_ap_zero.
+   auto.
+  right.
+  apply X with n0.
+  astepr (Zero:R). auto.
+  intros.
+ induction  n as [| n Hrecn].
+  simpl in X0.
+  cut (c [#] d or p0 [#] q).
+   auto.
+  auto.
+ cut (c [#] d or p0 [#] q).
+  auto.
+ right.
+ apply X with n.
+ exact X0.
 Qed.
 
 Lemma nth_coeff_wd : forall n p p', p [=] p' -> nth_coeff n p [=] nth_coeff n p'.
-intros.
-generalize (fun_strext_imp_wd _ _ (nth_coeff n)); intro.
-unfold fun_wd in H0.
-apply H0.
-unfold fun_strext in |- *.
-intros.
-apply nth_coeff_strext with n.
-assumption.
-assumption.
+Proof.
+ intros.
+ generalize (fun_strext_imp_wd _ _ (nth_coeff n)); intro.
+ unfold fun_wd in H0.
+ apply H0.
+  unfold fun_strext in |- *.
+  intros.
+  apply nth_coeff_strext with n.
+  assumption.
+ assumption.
 Qed.
 
 Definition nth_coeff_fun n := Build_CSetoid_fun _ _ _ (nth_coeff_strext n).
@@ -168,7 +170,8 @@ The [cpoly_zero] case should be [c [=] Zero] in order to be extensional.
 
 Lemma nth_coeff_S : forall m p c,
  in_coeff (nth_coeff m p) p -> in_coeff (nth_coeff (S m) (c[+X*]p)) (c[+X*]p).
-simpl in |- *; auto.
+Proof.
+ simpl in |- *; auto.
 Qed.
 
 End NthCoeff_def.
@@ -190,266 +193,270 @@ Notation RX := (cpoly_cring R).
 (* end hide *)
 
 Lemma nth_coeff_zero : forall n, nth_coeff n (Zero:RX) [=] Zero.
-intros.
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_O_lin : forall p (c : R), nth_coeff 0 (c[+X*]p) [=] c.
-intros.
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_Sm_lin : forall p (c : R) m, nth_coeff (S m) (c[+X*]p) [=] nth_coeff m p.
-intros.
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_O_c_ : forall c : R, nth_coeff 0 (_C_ c) [=] c.
-intros.
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_O_x_mult : forall p : RX, nth_coeff 0 (_X_[*]p) [=] Zero.
-intros.
-astepl (nth_coeff 0 (Zero[+]_X_[*]p)).
-astepl (nth_coeff 0 (_C_ Zero[+]_X_[*]p)).
-astepl (nth_coeff 0 (Zero[+X*]p)).
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ astepl (nth_coeff 0 (Zero[+]_X_[*]p)).
+ astepl (nth_coeff 0 (_C_ Zero[+]_X_[*]p)).
+ astepl (nth_coeff 0 (Zero[+X*]p)).
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_Sm_x_mult : forall (p : RX) m, nth_coeff (S m) (_X_[*]p) [=] nth_coeff m p.
-intros.
-astepl (nth_coeff (S m) (Zero[+]_X_[*]p)).
-astepl (nth_coeff (S m) (_C_ Zero[+]_X_[*]p)).
-astepl (nth_coeff (S m) (Zero[+X*]p)).
-simpl in |- *.
-algebra.
+Proof.
+ intros.
+ astepl (nth_coeff (S m) (Zero[+]_X_[*]p)).
+ astepl (nth_coeff (S m) (_C_ Zero[+]_X_[*]p)).
+ astepl (nth_coeff (S m) (Zero[+X*]p)).
+ simpl in |- *.
+ algebra.
 Qed.
 
 Lemma coeff_Sm_mult_x_ : forall (p : RX) m, nth_coeff (S m) (p[*]_X_) [=] nth_coeff m p.
-intros.
-astepl (nth_coeff (S m) (_X_[*]p)).
-apply coeff_Sm_x_mult.
+Proof.
+ intros.
+ astepl (nth_coeff (S m) (_X_[*]p)).
+ apply coeff_Sm_x_mult.
 Qed.
 
 Hint Resolve nth_coeff_zero coeff_O_lin coeff_Sm_lin coeff_O_c_
   coeff_O_x_mult coeff_Sm_x_mult coeff_Sm_mult_x_: algebra.
 
 Lemma nth_coeff_ap_zero_imp : forall (p : RX) n, nth_coeff n p [#] Zero -> p [#] Zero.
-intros.
-cut (nth_coeff n p [#] nth_coeff n Zero).
-intro H0.
-apply (nth_coeff_strext _ _ _ _ H0).
-algebra.
+Proof.
+ intros.
+ cut (nth_coeff n p [#] nth_coeff n Zero).
+  intro H0.
+  apply (nth_coeff_strext _ _ _ _ H0).
+ algebra.
 Qed.
 
 Lemma nth_coeff_plus : forall (p q : RX) n,
  nth_coeff n (p[+]q) [=] nth_coeff n p[+]nth_coeff n q.
-do 2 intro.
-pattern p, q in |- *.
-apply poly_double_comp_ind.
-intros.
-astepl (nth_coeff n (p1[+]q1)).
-astepr (nth_coeff n p1[+]nth_coeff n q1).
-apply H1.
-intros.
-simpl in |- *.
-algebra.
-intros.
-elim n.
-simpl in |- *.
-algebra.
-intros.
-astepl (nth_coeff n0 (p0[+]q0)).
-generalize (H n0); intro.
-astepl (nth_coeff n0 p0[+]nth_coeff n0 q0).
-algebra.
+Proof.
+ do 2 intro.
+ pattern p, q in |- *.
+ apply poly_double_comp_ind.
+   intros.
+   astepl (nth_coeff n (p1[+]q1)).
+   astepr (nth_coeff n p1[+]nth_coeff n q1).
+   apply H1.
+  intros.
+  simpl in |- *.
+  algebra.
+ intros.
+ elim n.
+  simpl in |- *.
+  algebra.
+ intros.
+ astepl (nth_coeff n0 (p0[+]q0)).
+ generalize (H n0); intro.
+ astepl (nth_coeff n0 p0[+]nth_coeff n0 q0).
+ algebra.
 Qed.
 
 Lemma nth_coeff_inv : forall (p : RX) n, nth_coeff n [--]p [=] [--] (nth_coeff n p).
-intro.
-pattern p in |- *.
-apply cpoly_induc.
-intros.
-simpl in |- *.
-algebra.
-intros.
-elim n.
-simpl in |- *.
-algebra.
-intros. simpl in |- *.
-apply H.
+Proof.
+ intro.
+ pattern p in |- *.
+ apply cpoly_induc.
+  intros.
+  simpl in |- *.
+  algebra.
+ intros.
+ elim n.
+  simpl in |- *.
+  algebra.
+ intros. simpl in |- *.
+ apply H.
 Qed.
 
 Hint Resolve nth_coeff_inv: algebra.
 
 Lemma nth_coeff_c_mult_p : forall (p : RX) c n, nth_coeff n (_C_ c[*]p) [=] c[*]nth_coeff n p.
-do 2 intro.
-pattern p in |- *.
-apply cpoly_induc.
-intros.
-astepl (nth_coeff n (Zero:RX)).
-astepr (c[*]Zero).
-astepl (Zero:R).
-algebra.
-intros.
-elim n.
-simpl in |- *.
-algebra.
-intros.
-astepl (nth_coeff (S n0) (c[*]c0[+X*]_C_ c[*]p0)).
-astepl (nth_coeff n0 (_C_ c[*]p0)).
-astepl (c[*]nth_coeff n0 p0).
-algebra.
+Proof.
+ do 2 intro.
+ pattern p in |- *.
+ apply cpoly_induc.
+  intros.
+  astepl (nth_coeff n (Zero:RX)).
+  astepr (c[*]Zero).
+  astepl (Zero:R).
+  algebra.
+ intros.
+ elim n.
+  simpl in |- *.
+  algebra.
+ intros.
+ astepl (nth_coeff (S n0) (c[*]c0[+X*]_C_ c[*]p0)).
+ astepl (nth_coeff n0 (_C_ c[*]p0)).
+ astepl (c[*]nth_coeff n0 p0).
+ algebra.
 Qed.
 
 Lemma nth_coeff_p_mult_c_ : forall (p : RX) c n, nth_coeff n (p[*]_C_ c) [=] nth_coeff n p[*]c.
-intros.
-astepl (nth_coeff n (_C_ c[*]p)).
-astepr (c[*]nth_coeff n p).
-apply nth_coeff_c_mult_p.
+Proof.
+ intros.
+ astepl (nth_coeff n (_C_ c[*]p)).
+ astepr (c[*]nth_coeff n p).
+ apply nth_coeff_c_mult_p.
 Qed.
 
 Hint Resolve nth_coeff_c_mult_p nth_coeff_p_mult_c_ nth_coeff_plus: algebra.
 
 Lemma nth_coeff_complicated : forall a b (p : RX) n,
  nth_coeff (S n) ((_C_ a[*]_X_[+]_C_ b) [*]p) [=] a[*]nth_coeff n p[+]b[*]nth_coeff (S n) p.
-intros.
-astepl (nth_coeff (S n) (_C_ a[*]_X_[*]p[+]_C_ b[*]p)).
-astepl (nth_coeff (S n) (_C_ a[*]_X_[*]p) [+]nth_coeff (S n) (_C_ b[*]p)).
-astepl (nth_coeff (S n) (_C_ a[*] (_X_[*]p)) [+]b[*]nth_coeff (S n) p).
-astepl (a[*]nth_coeff (S n) (_X_[*]p) [+]b[*]nth_coeff (S n) p).
-algebra.
+Proof.
+ intros.
+ astepl (nth_coeff (S n) (_C_ a[*]_X_[*]p[+]_C_ b[*]p)).
+ astepl (nth_coeff (S n) (_C_ a[*]_X_[*]p) [+]nth_coeff (S n) (_C_ b[*]p)).
+ astepl (nth_coeff (S n) (_C_ a[*] (_X_[*]p)) [+]b[*]nth_coeff (S n) p).
+ astepl (a[*]nth_coeff (S n) (_X_[*]p) [+]b[*]nth_coeff (S n) p).
+ algebra.
 Qed.
 
 Lemma all_nth_coeff_eq_imp : forall p p' : RX,
  (forall i, nth_coeff i p [=] nth_coeff i p') -> p [=] p'.
-intro. induction  p as [| s p Hrecp]; intros;
-  [ induction  p' as [| s p' Hrecp'] | induction  p' as [| s0 p' Hrecp'] ];
-  intros.
-algebra.
-simpl in |- *. simpl in H. simpl in Hrecp'. split.
-apply eq_symmetric_unfolded. apply (H 0). apply Hrecp'.
-intros. apply (H (S i)).
-simpl in |- *. simpl in H. simpl in Hrecp. split.
-apply (H 0).
-change (Zero [=] (p:RX)) in |- *. apply eq_symmetric_unfolded. simpl in |- *. apply Hrecp.
-intros. apply (H (S i)).
-simpl in |- *. simpl in H. split.
-apply (H 0).
-change ((p:RX) [=] (p':RX)) in |- *. apply Hrecp. intros. apply (H (S i)).
+Proof.
+ intro. induction  p as [| s p Hrecp]; intros;
+   [ induction  p' as [| s p' Hrecp'] | induction  p' as [| s0 p' Hrecp'] ]; intros.
+    algebra.
+   simpl in |- *. simpl in H. simpl in Hrecp'. split.
+   apply eq_symmetric_unfolded. apply (H 0). apply Hrecp'.
+    intros. apply (H (S i)).
+   simpl in |- *. simpl in H. simpl in Hrecp. split.
+  apply (H 0).
+  change (Zero [=] (p:RX)) in |- *. apply eq_symmetric_unfolded. simpl in |- *. apply Hrecp.
+  intros. apply (H (S i)).
+  simpl in |- *. simpl in H. split.
+ apply (H 0).
+ change ((p:RX) [=] (p':RX)) in |- *. apply Hrecp. intros. apply (H (S i)).
 Qed.
 
 Lemma poly_at_zero : forall p : RX, p ! Zero [=] nth_coeff 0 p.
-intros. induction  p as [| s p Hrecp]; intros.
-simpl in |- *. algebra.
-simpl in |- *. Step_final (s[+]Zero).
+Proof.
+ intros. induction  p as [| s p Hrecp]; intros.
+ simpl in |- *. algebra.
+  simpl in |- *. Step_final (s[+]Zero).
 Qed.
 
 Lemma nth_coeff_inv' : forall (p : RX) i,
  nth_coeff i (cpoly_inv _ p) [=] [--] (nth_coeff i p).
-intros. change (nth_coeff i [--] (p:RX) [=] [--] (nth_coeff i p)) in |- *. algebra.
+Proof.
+ intros. change (nth_coeff i [--] (p:RX) [=] [--] (nth_coeff i p)) in |- *. algebra.
 Qed.
 
 Lemma nth_coeff_minus : forall (p q : RX) i,
  nth_coeff i (p[-]q) [=] nth_coeff i p[-]nth_coeff i q.
-intros.
-astepl (nth_coeff i (p[+][--]q)).
-astepl (nth_coeff i p[+]nth_coeff i [--]q).
-Step_final (nth_coeff i p[+][--] (nth_coeff i q)).
+Proof.
+ intros.
+ astepl (nth_coeff i (p[+][--]q)).
+ astepl (nth_coeff i p[+]nth_coeff i [--]q).
+ Step_final (nth_coeff i p[+][--] (nth_coeff i q)).
 Qed.
 
 Hint Resolve nth_coeff_minus: algebra.
 
 Lemma nth_coeff_sum0 : forall (p_ : nat -> RX) k n,
  nth_coeff k (Sum0 n p_) [=] Sum0 n (fun i => nth_coeff k (p_ i)).
-intros. induction  n as [| n Hrecn]; intros.
-simpl in |- *. algebra.
-change
-  (nth_coeff k (Sum0 n p_[+]p_ n) [=] 
-   Sum0 n (fun i : nat => nth_coeff k (p_ i)) [+]nth_coeff k (p_ n)) 
- in |- *.
-Step_final (nth_coeff k (Sum0 n p_) [+]nth_coeff k (p_ n)).
+Proof.
+ intros. induction  n as [| n Hrecn]; intros.
+ simpl in |- *. algebra.
+  change (nth_coeff k (Sum0 n p_[+]p_ n) [=]
+    Sum0 n (fun i : nat => nth_coeff k (p_ i)) [+]nth_coeff k (p_ n)) in |- *.
+ Step_final (nth_coeff k (Sum0 n p_) [+]nth_coeff k (p_ n)).
 Qed.
 
 Lemma nth_coeff_sum : forall (p_ : nat -> RX) k m n,
  nth_coeff k (Sum m n p_) [=] Sum m n (fun i => nth_coeff k (p_ i)).
-unfold Sum in |- *. unfold Sum1 in |- *. intros.
-astepl (nth_coeff k (Sum0 (S n) p_) [-]nth_coeff k (Sum0 m p_)).
-apply cg_minus_wd; apply nth_coeff_sum0.
+Proof.
+ unfold Sum in |- *. unfold Sum1 in |- *. intros.
+ astepl (nth_coeff k (Sum0 (S n) p_) [-]nth_coeff k (Sum0 m p_)).
+ apply cg_minus_wd; apply nth_coeff_sum0.
 Qed.
 
 Lemma nth_coeff_nexp_eq : forall i, nth_coeff i (_X_[^]i) [=] (One:R).
-intros. induction  i as [| i Hreci]; intros.
-simpl in |- *. algebra.
-change (nth_coeff (S i) (_X_[^]i[*]_X_) [=] (One:R)) in |- *.
-Step_final (nth_coeff i (_X_[^]i):R).
+Proof.
+ intros. induction  i as [| i Hreci]; intros.
+ simpl in |- *. algebra.
+  change (nth_coeff (S i) (_X_[^]i[*]_X_) [=] (One:R)) in |- *.
+ Step_final (nth_coeff i (_X_[^]i):R).
 Qed.
 
 Lemma nth_coeff_nexp_neq : forall i j, i <> j -> nth_coeff i (_X_[^]j) [=] (Zero:R).
-intro; induction  i as [| i Hreci]; intros;
- [ induction  j as [| j Hrecj] | induction  j as [| j Hrecj] ]; 
- intros.
-elim (H (refl_equal _)).
-Step_final (nth_coeff 0 (_X_[*]_X_[^]j):R).
-simpl in |- *. algebra.
-change (nth_coeff (S i) (_X_[^]j[*]_X_) [=] (Zero:R)) in |- *.
-astepl (nth_coeff i (_X_[^]j):R).
-apply Hreci. auto.
+Proof.
+ intro; induction  i as [| i Hreci]; intros;
+   [ induction  j as [| j Hrecj] | induction  j as [| j Hrecj] ]; intros.
+    elim (H (refl_equal _)).
+   Step_final (nth_coeff 0 (_X_[*]_X_[^]j):R).
+  simpl in |- *. algebra.
+  change (nth_coeff (S i) (_X_[^]j[*]_X_) [=] (Zero:R)) in |- *.
+ astepl (nth_coeff i (_X_[^]j):R).
+ apply Hreci. auto.
 Qed.
 
 Lemma nth_coeff_mult : forall (p q : RX) n,
  nth_coeff n (p[*]q) [=] Sum 0 n (fun i => nth_coeff i p[*]nth_coeff (n - i) q).
-intro; induction  p as [| s p Hrecp]. intros.
-stepl (nth_coeff n (Zero:RX)).
-simpl in |- *. apply eq_symmetric_unfolded.
-apply Sum_zero. auto with arith. intros. algebra.
-apply nth_coeff_wd.
-change (Zero[=]Zero[*]q).
-algebra.
-intros.
-apply
- eq_transitive_unfolded with (nth_coeff n (_C_ s[*]q[+]_X_[*] ((p:RX) [*]q))).
-apply nth_coeff_wd.
-change ((s[+X*]p) [*]q [=] _C_ s[*]q[+]_X_[*] ((p:RX) [*]q)) in |- *.
-astepl ((_C_ s[+]_X_[*]p) [*]q).
-Step_final (_C_ s[*]q[+]_X_[*]p[*]q).
-astepl (nth_coeff n (_C_ s[*]q) [+]nth_coeff n (_X_[*] ((p:RX) [*]q))).
-astepl (s[*]nth_coeff n q[+]nth_coeff n (_X_[*] ((p:RX) [*]q))).
-induction  n as [| n Hrecn]; intros.
-astepl (s[*]nth_coeff 0 q[+]Zero).
-astepl (s[*]nth_coeff 0 q).
-astepl (nth_coeff 0 (cpoly_linear _ s p) [*]nth_coeff 0 q).
-pattern 0 at 2 in |- *. replace 0 with (0 - 0).
-apply eq_symmetric_unfolded.
-apply
- Sum_one
-  with
-    (f := fun i : nat =>
-          nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (0 - i) q).
-auto.
-astepl (s[*]nth_coeff (S n) q[+]nth_coeff n ((p:RX) [*]q)).
-apply
- eq_transitive_unfolded
-  with
-    (nth_coeff 0 (cpoly_linear _ s p) [*]nth_coeff (S n - 0) q[+]
-     Sum 1 (S n)
-       (fun i : nat =>
-        nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (S n - i) q)).
-apply bin_op_wd_unfolded. algebra.
-astepl (Sum 0 n (fun i : nat => nth_coeff i p[*]nth_coeff (n - i) q)).
-apply Sum_shift. intros. simpl in |- *. algebra.
-apply eq_symmetric_unfolded.
-apply
- Sum_first
-  with
-    (f := fun i : nat =>
-          nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (S n - i) q).
+Proof.
+ intro; induction  p as [| s p Hrecp]. intros.
+  stepl (nth_coeff n (Zero:RX)).
+   simpl in |- *. apply eq_symmetric_unfolded.
+   apply Sum_zero. auto with arith. intros. algebra.
+    apply nth_coeff_wd.
+  change (Zero[=]Zero[*]q).
+  algebra.
+ intros.
+ apply eq_transitive_unfolded with (nth_coeff n (_C_ s[*]q[+]_X_[*] ((p:RX) [*]q))).
+  apply nth_coeff_wd.
+  change ((s[+X*]p) [*]q [=] _C_ s[*]q[+]_X_[*] ((p:RX) [*]q)) in |- *.
+  astepl ((_C_ s[+]_X_[*]p) [*]q).
+  Step_final (_C_ s[*]q[+]_X_[*]p[*]q).
+ astepl (nth_coeff n (_C_ s[*]q) [+]nth_coeff n (_X_[*] ((p:RX) [*]q))).
+ astepl (s[*]nth_coeff n q[+]nth_coeff n (_X_[*] ((p:RX) [*]q))).
+ induction  n as [| n Hrecn]; intros.
+  astepl (s[*]nth_coeff 0 q[+]Zero).
+  astepl (s[*]nth_coeff 0 q).
+  astepl (nth_coeff 0 (cpoly_linear _ s p) [*]nth_coeff 0 q).
+  pattern 0 at 2 in |- *. replace 0 with (0 - 0).
+  apply eq_symmetric_unfolded.
+   apply Sum_one with (f := fun i : nat => nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (0 - i) q).
+  auto.
+ astepl (s[*]nth_coeff (S n) q[+]nth_coeff n ((p:RX) [*]q)).
+ apply eq_transitive_unfolded with (nth_coeff 0 (cpoly_linear _ s p) [*]nth_coeff (S n - 0) q[+]
+   Sum 1 (S n) (fun i : nat => nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (S n - i) q)).
+  apply bin_op_wd_unfolded. algebra.
+   astepl (Sum 0 n (fun i : nat => nth_coeff i p[*]nth_coeff (n - i) q)).
+  apply Sum_shift. intros. simpl in |- *. algebra.
+  apply eq_symmetric_unfolded.
+ apply Sum_first with (f := fun i : nat => nth_coeff i (cpoly_linear _ s p) [*]nth_coeff (S n - i) q).
 Qed.
 
 End NthCoeff_props.

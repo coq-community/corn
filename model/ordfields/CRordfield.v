@@ -29,14 +29,13 @@ Open Local Scope uc_scope.
 
 Lemma CRlt_strext : Crel_strext CRasCField CRlt.
 Proof.
-intros x1 x2 y1 y2 H.
-destruct (Ccsr_strext _ _ _ (CRasCauchy_IR x2) _ (CRasCauchy_IR y2) (CR_lt_as_Cauchy_IR_lt_1 _ _ H)) as[H0|H0].
-left.
-apply CR_lt_as_Cauchy_IR_lt_2.
-assumption.
-right.
-destruct H0;[left|right];
-apply CR_ap_as_Cauchy_IR_ap_2; assumption.
+ intros x1 x2 y1 y2 H.
+ destruct (Ccsr_strext _ _ _ (CRasCauchy_IR x2) _ (CRasCauchy_IR y2) (CR_lt_as_Cauchy_IR_lt_1 _ _ H)) as[H0|H0].
+  left.
+  apply CR_lt_as_Cauchy_IR_lt_2.
+  assumption.
+ right.
+ destruct H0;[left|right]; apply CR_ap_as_Cauchy_IR_ap_2; assumption.
 Qed.
 
 Definition CRltasCCsetoidRelation : CCSetoid_relation CRasCField :=
@@ -46,64 +45,51 @@ Lemma CRisCOrdField : is_COrdField CRasCField
  CRltasCCsetoidRelation CRle
  (default_greater _ CRltasCCsetoidRelation) (default_grEq CRasCField CRle).
 Proof.
-split.
-
-split.
-intros x y z H0 H1.
-apply CR_lt_as_Cauchy_IR_lt_2.
-apply less_transitive_unfolded with (CRasCauchy_IR y);
- apply CR_lt_as_Cauchy_IR_lt_1; assumption.
-intros x y H0 H1.
-apply (less_antisymmetric_unfolded _ (CRasCauchy_IR x) (CRasCauchy_IR y));
- apply CR_lt_as_Cauchy_IR_lt_1; assumption.
-
-intros x y H z.
-change (x+z < y + z)%CR.
-apply CR_lt_as_Cauchy_IR_lt_2.
-stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR z)) by
- apply CR_plus_as_Cauchy_IR_plus.
-stepr ((CRasCauchy_IR y)[+](CRasCauchy_IR z)) by
- apply CR_plus_as_Cauchy_IR_plus.
-apply plus_resp_less_rht.
-apply CR_lt_as_Cauchy_IR_lt_1.
-assumption.
-
-intros x y Hx Hy.
-change ((' 0%Q) < x*y)%CR.
-apply CR_lt_as_Cauchy_IR_lt_2.
-stepr ((CRasCauchy_IR x)[*](CRasCauchy_IR y)) by
- apply CR_mult_as_Cauchy_IR_mult.
-apply: less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
-apply mult_resp_pos;(
- apply: less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
- apply CR_lt_as_Cauchy_IR_lt_1;assumption).
-
-intros x y.
-split.
-intros H.
-destruct (ap_imp_less _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H));[left|right];
- apply CR_lt_as_Cauchy_IR_lt_2; assumption.
-intros [H|H];
- apply CR_ap_as_Cauchy_IR_ap_2;
- [apply less_imp_ap|apply Greater_imp_ap];
- apply CR_lt_as_Cauchy_IR_lt_1;assumption.
-
-intros x y.
-rewrite <- CR_le_as_Cauchy_IR_le.
-split.
-intros H0 H1.
-apply H0.
-apply CR_lt_as_Cauchy_IR_lt_1.
-assumption.
-intros H0 H1.
-apply H0.
-apply CR_lt_as_Cauchy_IR_lt_2.
-assumption.
-
-intros x y.
-split; intros; assumption.
-
-reflexivity.
+ split.
+       split.
+        intros x y z H0 H1.
+        apply CR_lt_as_Cauchy_IR_lt_2.
+        apply less_transitive_unfolded with (CRasCauchy_IR y); apply CR_lt_as_Cauchy_IR_lt_1; assumption.
+       intros x y H0 H1.
+       apply (less_antisymmetric_unfolded _ (CRasCauchy_IR x) (CRasCauchy_IR y));
+         apply CR_lt_as_Cauchy_IR_lt_1; assumption.
+      intros x y H z.
+      change (x+z < y + z)%CR.
+      apply CR_lt_as_Cauchy_IR_lt_2.
+      stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR z)) by apply CR_plus_as_Cauchy_IR_plus.
+      stepr ((CRasCauchy_IR y)[+](CRasCauchy_IR z)) by apply CR_plus_as_Cauchy_IR_plus.
+      apply plus_resp_less_rht.
+      apply CR_lt_as_Cauchy_IR_lt_1.
+      assumption.
+     intros x y Hx Hy.
+     change ((' 0%Q) < x*y)%CR.
+     apply CR_lt_as_Cauchy_IR_lt_2.
+     stepr ((CRasCauchy_IR x)[*](CRasCauchy_IR y)) by apply CR_mult_as_Cauchy_IR_mult.
+     apply: less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
+     apply mult_resp_pos;(
+       apply: less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
+         apply CR_lt_as_Cauchy_IR_lt_1;assumption).
+    intros x y.
+    split.
+     intros H.
+     destruct (ap_imp_less _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H));[left|right];
+       apply CR_lt_as_Cauchy_IR_lt_2; assumption.
+    intros [H|H]; apply CR_ap_as_Cauchy_IR_ap_2; [apply less_imp_ap|apply Greater_imp_ap];
+      apply CR_lt_as_Cauchy_IR_lt_1;assumption.
+   intros x y.
+   rewrite <- CR_le_as_Cauchy_IR_le.
+   split.
+    intros H0 H1.
+    apply H0.
+    apply CR_lt_as_Cauchy_IR_lt_1.
+    assumption.
+   intros H0 H1.
+   apply H0.
+   apply CR_lt_as_Cauchy_IR_lt_2.
+   assumption.
+  intros x y.
+  split; intros; assumption.
+ reflexivity.
 Qed.
 
 Definition CRasCOrdField : COrdField :=

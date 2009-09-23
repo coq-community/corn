@@ -18,21 +18,21 @@
  * Dan Synek
  * Freek Wiedijk
  * Jan Zwanenburg
- * 
+ *
  * This work is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This work is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *) 
+ *)
 Require Export CMonoids.
 
 Section Abelian_Monoids.
@@ -44,7 +44,7 @@ Now we introduce commutativity and add some results.
 
 Definition is_CAbMonoid (G : CMonoid) := commutes (csg_op (c:=G)).
 
-Record CAbMonoid : Type := 
+Record CAbMonoid : Type :=
  {cam_crr   :> CMonoid;
   cam_proof :  is_CAbMonoid cam_crr}.
 
@@ -57,11 +57,13 @@ Variable M : CAbMonoid.
 *)
 
 Lemma CAbMonoid_is_CAbMonoid : is_CAbMonoid M.
-elim M; auto.
+Proof.
+ elim M; auto.
 Qed.
 
 Lemma cam_commutes : commutes (csg_op (c:=M)).
-exact CAbMonoid_is_CAbMonoid.
+Proof.
+ exact CAbMonoid_is_CAbMonoid.
 Qed.
 
 Lemma cam_commutes_unfolded : forall x y : M, x[+]y [=] y[+]x.
@@ -89,8 +91,9 @@ that contains [Zero] and is closed under [[+]] and [[--]].
 Let subcrr : CMonoid := Build_SubCMonoid _ _ Punit op_pres_P.
 
 Lemma isabgrp_scrr : is_CAbMonoid subcrr.
-red in |- *. intros x y. case x. case y. intros.
-simpl in |- *. apply cam_commutes_unfolded.
+Proof.
+ red in |- *. intros x y. case x. case y. intros.
+ simpl in |- *. apply cam_commutes_unfolded.
 Qed.
 
 Definition Build_SubCAbMonoid : CAbMonoid := Build_CAbMonoid _ isabgrp_scrr.

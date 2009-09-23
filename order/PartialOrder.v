@@ -30,7 +30,7 @@ A partial order is a relfexive, transitive, antisymetric ordering relation.
 *)
 
 (* Perhaps adding monotone and antitone to the signature is going too far *)
-Record is_PartialOrder 
+Record is_PartialOrder
  (car : Type)
  (eq : car -> car -> Prop)
  (le : car -> car -> Prop)
@@ -59,30 +59,31 @@ Open Local Scope po_scope.
 
 Lemma po_st : forall X eq le mnt ant, @is_PartialOrder X eq le mnt ant -> Setoid_Theory X eq.
 Proof.
-intros X eq le0 mnt ant H.
-destruct H.
-split.
-firstorder.
-firstorder.
-intros x y z.
-repeat rewrite po_equiv_le_def0.
-firstorder.
+ intros X eq le0 mnt ant H.
+ destruct H.
+ split.
+   firstorder.
+  firstorder.
+ intros x y z.
+ repeat rewrite po_equiv_le_def0.
+ firstorder.
 Qed.
 
 (* begin hide *)
 Add Parametric Morphism (p:PartialOrder) : (le p) with signature (@st_eq p) ==> (@st_eq p) ==> iff as le_compat.
-assert (forall x1 x2 : p, x1 == x2 -> forall x3 x4 : p, x3 == x4 -> (x1 <= x3 -> x2 <= x4)).
-intros.
-rewrite -> (po_equiv_le_def (po_proof p)) in *|-.
-destruct (po_proof p).
-clear - H H0 H1 po_le_trans0.
-firstorder.
-intros x y Hxy x0 y0 Hx0y0.
-assert (y==x).
-symmetry; assumption.
-assert (y0==x0).
-symmetry; assumption.
-firstorder.
+Proof.
+ assert (forall x1 x2 : p, x1 == x2 -> forall x3 x4 : p, x3 == x4 -> (x1 <= x3 -> x2 <= x4)).
+  intros.
+  rewrite -> (po_equiv_le_def (po_proof p)) in *|-.
+  destruct (po_proof p).
+  clear - H H0 H1 po_le_trans0.
+  firstorder.
+ intros x y Hxy x0 y0 Hx0y0.
+ assert (y==x).
+  symmetry; assumption.
+ assert (y0==x0).
+  symmetry; assumption.
+ firstorder.
 Qed.
 (* end hide *)
 Section PartialOrder.
@@ -111,12 +112,12 @@ Proof (po_antitone_def (po_proof X)).
 
 Lemma le_equiv_refl : forall x y:X, x == y -> x <= y.
 Proof.
-firstorder using equiv_le_def.
+ firstorder using equiv_le_def.
 Qed.
 
 Lemma le_antisym : forall x y:X, x <= y -> y <= x -> x == y.
 Proof.
-firstorder using equiv_le_def.
+ firstorder using equiv_le_def.
 Qed.
 
 (**
@@ -124,16 +125,14 @@ Qed.
 The dual of a partial order is made by fliping the order relation.
 *)
 Definition Dual : PartialOrder.
-eapply makePartialOrder with
- (eq := @st_eq X)
- (le:= (fun x y => le X y x))
- (monotone := @monotone X)
- (antitone := @antitone X).
-firstorder using equiv_le_def.
-firstorder using le_refl.
-firstorder using le_trans.
-firstorder using monotone_def. (* Notice the use of <-> in monotone_def here *)
-firstorder using antitone_def.
+Proof.
+ eapply makePartialOrder with (eq := @st_eq X) (le:= (fun x y => le X y x)) (monotone := @monotone X)
+   (antitone := @antitone X).
+     firstorder using equiv_le_def.
+    firstorder using le_refl.
+   firstorder using le_trans.
+  firstorder using monotone_def. (* Notice the use of <-> in monotone_def here *)
+ firstorder using antitone_def.
 Defined.
 
 End PartialOrder.
@@ -152,14 +151,14 @@ Definition monotone (f: A -> A) := forall x y, le x y -> le (f x) (f y).
 
 Lemma monotone_def : forall f, monotone f <-> (forall x y, le x y -> le (f x) (f y)).
 Proof.
-firstorder.
+ firstorder.
 Qed.
 
 Definition antitone (f: A -> A) := forall x y, le x y -> le (f y) (f x).
 
 Lemma antitone_def : forall f, antitone f <-> (forall x y, le x y -> le (f y) (f x)).
 Proof.
-firstorder.
+ firstorder.
 Qed.
 
 End MonotoneAntitone.
