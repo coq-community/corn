@@ -106,9 +106,9 @@ Hint Rewrite IR_Zero_as_CR : IRtoCR.
 
 Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< '0 -> x[#]Zero)%CR.
 Proof.
- intros.
+ intros x H.
  apply CR_ap_as_IR.
- generalize X.
+ generalize H.
  apply CRapart_wd.
   reflexivity.
  symmetry.

@@ -52,10 +52,9 @@ Time Eval vm_compute in answer 3 (ContinuousSup01 Cunit).
 
 (* An example of an elliptic integral that cannot be solved symbolically
 \int_0^1  (1-\fract{1}{4}\sin^2\phi)^{-\fract{1}{2}} d\phi *)
-(*
+
 Definition sinsquare:= (uc_compose (CRpower_positive_bounded 2 (1#1)) sin_uc).
 Definition quartersinsquare:=(uc_compose (scale (1#4)) sinsquare).
 Definition body:=(uc_compose (translate 1) quartersinsquare).
 Definition rootbody:=(uc_compose CRsqrt body).
-Time Eval vm_compute in answer 2 (Integrate01 rootbody).
-*)
+Time Eval vm_compute in answer 1 (Integrate01 rootbody).

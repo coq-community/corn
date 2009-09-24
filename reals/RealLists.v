@@ -195,7 +195,7 @@ Lemma maxlist_leEq_eps : forall l : list IR, {x : IR | member x l} ->
  forall e, Zero [<] e -> {x : IR | member x l | maxlist l[-]e [<=] x}.
 Proof.
  intro l; induction  l as [| a l Hrecl].
-  intro H; simpl in H; inversion H; rename X into H0; inversion H0.
+  intro H; simpl in H; inversion H as [x H0]; inversion H0.
  clear Hrecl.
  intro H; induction  l as [| a0 l Hrecl]; intros e H0.
   simpl in |- *; exists a.
@@ -343,7 +343,7 @@ Lemma minlist_leEq_eps : forall l : list IR, {x : IR | member x l} ->
  forall e, Zero [<] e -> {x : IR | member x l | x [<=] minlist l[+]e}.
 Proof.
  intro l; induction  l as [| a l Hrecl].
-  intro H; simpl in H; inversion H; rename X into H0; inversion H0.
+  intro H; simpl in H; inversion H as [x H0]; inversion H0.
  clear Hrecl.
  intro H; induction  l as [| a0 l Hrecl]; intros e He.
   simpl in |- *; exists a.

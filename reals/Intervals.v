@@ -248,8 +248,7 @@ Proof.
   intros.
   exists (a::nil).
    intros x H1.
-   inversion H1. rename X into H2.
-    elim H2.
+   inversion H1 as [H2 | H2]. elim H2.
    apply compact_wd with a; algebra.
    apply compact_inc_lft.
   intros.

@@ -835,6 +835,7 @@ Proof.
   refine (Continuous_imp_inc _ _ _ _ _).
    apply contf.
   Included.
+ rename H0 into X1. 
  assert (Z:=fun_conv_imp_seq_conv _ _ _ _ _ _ _  (X a b Hab Hinc) x X1 Y Hx).
  pose (seq:= Build_CauchySeq2_y _ _ Z).
  assert (Z0:=Limits_unique seq (F x Hx) Z).

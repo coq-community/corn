@@ -166,7 +166,7 @@ Proof.
     apply Habcd.
    eapply derivative_imp_inc.
    apply HGG'.
-  destruct HGF as [HGF0 HGF1].
+  rename H0 into X2. destruct HGF as [HGF0 HGF1].
   simpl.
   apply leEq_imp_eq.
    apply leEq_transitive with d0.

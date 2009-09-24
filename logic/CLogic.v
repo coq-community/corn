@@ -90,7 +90,7 @@ propositions, such as [(le m n)], we have to introduce a [CProp]-valued
 version.
 *)
 
-Definition CProp := Type.
+Notation "'CProp'":= Type.
 
 Section Basics.
 (**
