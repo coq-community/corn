@@ -141,6 +141,7 @@ COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
   -I $(COQTOP)/contrib/omega -I $(COQTOP)/contrib/romega \
   -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
   -I $(CAMLP4LIB)
+TIME := /usr/bin/time --format "%E"
 COQC := $(COQBIN)/coqc
 COQIDE := $(SSRDIR)/bin/ssrcoqide
 COQDEP := $(COQBIN)/coqdep
@@ -272,9 +273,9 @@ $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 
 %.vo %.glob : %.v | %.d
 	@set -e; \
-	echo "Compiling $<"; \
+	echo -n "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
-	$(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
+	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
 else
 .PHONY: always
 
