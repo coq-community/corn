@@ -227,7 +227,7 @@ Proof.
  cut ('0 <= x)%CR.
   unfold CRle.
   intros H.
-  setoid_replace (x - '0)%CR with x in H by ring.
+  setoid_replace (x - '0)%CR with x in H; [| by ring].
   assumption.
  apply CRle_trans with (' c)%CR; auto with *.
  rewrite CRle_Qle; auto with *.
@@ -239,7 +239,7 @@ Proof.
  cut (x <= '0)%CR.
   unfold CRle.
   intros H.
-  setoid_replace ('0 - x)%CR with (-x)%CR in H by ring.
+  setoid_replace ('0 - x)%CR with (-x)%CR in H; [| by ring].
   intros e.
   rewrite <- (Qopp_involutive e).
   rewrite <- (Qopp_involutive (approximate x e)).

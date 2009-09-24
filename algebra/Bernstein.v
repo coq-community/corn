@@ -266,9 +266,10 @@ Lemma RaiseDegree : forall n i (H: i<=n),
  (nring (S n))[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H)[+](nring (S i))[*]Bernstein (le_n_S _ _ H).
 Proof.
  intros n i H.
- stepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H) by rational.
- rewrite RaiseDegreeA RaiseDegreeB.
- reflexivity.
+ stepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
+  rewrite RaiseDegreeA RaiseDegreeB.
+  reflexivity.
+ rational.
 Qed.
 
 Opaque Bernstein.

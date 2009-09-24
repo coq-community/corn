@@ -371,8 +371,8 @@ Proof.
  simpl in |- *.
  unfold Qeq in |- *.
  intros x y e1.
- rewrite Zopp_mult_distr_l_reverse with (n := Qnum x) (m := Qden y).
- rewrite Zopp_mult_distr_l_reverse with (n := Qnum y) (m := Qden x).
+ rewrite (Zopp_mult_distr_l_reverse (Qnum x) (Qden y)).
+ rewrite (Zopp_mult_distr_l_reverse (Qnum y) (Qden x)).
  exact (f_equal Zopp e1).
 Qed.
 
@@ -403,7 +403,7 @@ Proof.
  intros n m p q e1 e2.
  change ((Qnum n * Qnum p * (Qden m * Qden q))%Z = (Qnum m * Qnum q * (Qden n * Qden p))%Z) in |- *.
  rewrite <- Zmult_assoc.
- rewrite Zmult_permute with (m := Qden m).
+ rewrite (Zmult_permute _ (Qden m)).
  rewrite e2.
  rewrite Zmult_assoc.
  rewrite e1.
@@ -433,7 +433,7 @@ Proof.
  intro n.
  red in |- *.
  simpl in |- *.
- rewrite Zmult_1_r with (n := Qnum n).
+ rewrite (Zmult_1_r (Qnum n)).
  rewrite Pmult_comm.
  simpl in |- *; trivial.
 Qed.
@@ -475,10 +475,10 @@ Proof.
  intros x y.
  unfold Qeq in |- *.
  simpl in |- *.
- rewrite Zmult_1_r with (n := Qnum x).
- rewrite Zmult_1_r with (n := (Qnum x * Qnum y)%Z).
- rewrite Zmult_1_r with (n := Qnum y).
- rewrite Zmult_comm with (n := Qnum x) (m := Qnum y).
+ rewrite (Zmult_1_r (Qnum x)).
+ rewrite (Zmult_1_r ((Qnum x * Qnum y)%Z)).
+ rewrite (Zmult_1_r (Qnum y)).
+ rewrite (Zmult_comm (Qnum x) (Qnum y)).
  intro H.
  cut (Qnum x <> 0%Z :>Z).
   intros H0 H1.
@@ -660,7 +660,7 @@ Proof.
   rewrite H1 in H.
   simpl in H.
   rewrite <- Zmult_0_r with (n := Qden x).
-  rewrite Zmult_comm with (n := Qnum z).
+  rewrite (Zmult_comm (Qnum z)).
   apply Zlt_reg_mult_l.
    auto with zarith.
   apply Zgt_lt.
@@ -719,15 +719,15 @@ Proof.
     assumption.
    apply Zgt_trans with (m := (Qnum x * Qnum z * Qden y)%Z).
     rewrite Zmult_assoc.
-    rewrite Zmult_comm with (n := Qnum y).
+    rewrite (Zmult_comm (Qnum y)).
     rewrite <- Zmult_assoc.
     rewrite <- Zmult_assoc.
     apply Zlt_conv_mult_l.
      assumption.
     assumption.
-   rewrite Zmult_comm with (n := Qnum x).
+   rewrite (Zmult_comm (Qnum x)).
    rewrite Zmult_assoc.
-   rewrite Zmult_comm with (n := Qnum y).
+   rewrite (Zmult_comm (Qnum y)).
    rewrite <- Zmult_assoc.
    rewrite <- Zmult_assoc.
    apply Zlt_conv_mult_l.
@@ -768,8 +768,8 @@ Proof.
   assumption.
  apply Zgt_trans with (m := (Qnum x * Qnum z * Qden y)%Z).
   rewrite Zmult_assoc.
-  rewrite Zmult_comm with (n := Qnum y).
-  rewrite Zmult_comm with (n := Qnum x).
+  rewrite (Zmult_comm (Qnum y)).
+  rewrite (Zmult_comm (Qnum x)).
   rewrite <- Zmult_assoc.
   rewrite <- Zmult_assoc.
   apply Zlt_gt.
@@ -802,7 +802,7 @@ Proof.
    assumption.
   assumption.
  rewrite Zmult_assoc.
- rewrite Zmult_comm with (n := Qnum y).
+ rewrite (Zmult_comm (Qnum y)).
  rewrite <- Zmult_assoc.
  rewrite <- Zmult_assoc.
  apply Zlt_gt.
@@ -810,7 +810,6 @@ Proof.
   apply Zlt_gt.
   assumption.
  assumption.
-
 Qed.
 
 Lemma Qlt_strext_unfolded : forall x1 x2 y1 y2 : Q,
@@ -939,30 +938,30 @@ Proof.
    (Qnum y * Qden z + Qnum z * Qden y) * (Qden x * Qden z))%Z in |- *.
  rewrite Zmult_assoc.
  rewrite Zmult_assoc.
- rewrite Zmult_comm with (m := Qden z).
- rewrite Zmult_comm with (m := Qden z) (n := ((Qnum y * Qden z + Qnum z * Qden y) * Qden x)%Z).
+ rewrite (Zmult_comm _ (Qden z)).
+ rewrite (Zmult_comm (((Qnum y * Qden z + Qnum z * Qden y) * Qden x)%Z) (Qden z)).
  apply Zlt_reg_mult_l.
   auto with zarith.
  rewrite Zmult_comm.
- rewrite Zmult_comm with (m := Qden x) (n := (Qnum y * Qden z + Qnum z * Qden y)%Z).
- rewrite Zmult_plus_distr_r with (n := Qden y).
- rewrite Zmult_plus_distr_r with (n := Qden x).
- rewrite Zmult_permute with (m := Qnum z).
- rewrite Zmult_permute with (m := Qnum z).
- rewrite Zmult_comm with (n := Qden x) (m := Qden y).
+ rewrite (Zmult_comm ((Qnum y * Qden z + Qnum z * Qden y)%Z) (Qden x)).
+ rewrite (Zmult_plus_distr_r (Qden y)).
+ rewrite (Zmult_plus_distr_r (Qden x)).
+ rewrite (Zmult_permute _ (Qnum z)).
+ rewrite (Zmult_permute _ (Qnum z)).
+ rewrite (Zmult_comm (Qden x) (Qden y)).
  apply Zgt_lt.
- rewrite Zplus_comm with (m := (Qnum z * (Qden y * Qden x))%Z).
- rewrite Zplus_comm with (m := (Qnum z * (Qden y * Qden x))%Z).
+ rewrite (Zplus_comm _ ((Qnum z * (Qden y * Qden x))%Z)).
+ rewrite (Zplus_comm _ ((Qnum z * (Qden y * Qden x))%Z)).
  apply Zplus_gt_compat_l.
  rewrite Zmult_assoc.
  rewrite Zmult_assoc.
- rewrite Zmult_comm with (m := Qden z).
- rewrite Zmult_comm with (m := Qden z).
+ rewrite (Zmult_comm _ (Qden z)).
+ rewrite (Zmult_comm _ (Qden z)).
  apply Zlt_gt.
  apply Zlt_reg_mult_l.
   auto with zarith.
  rewrite Zmult_comm.
- rewrite Zmult_comm with (m := Qnum y).
+ rewrite (Zmult_comm _ (Qnum y)).
  apply CZlt_to.
  assumption.
 Qed.

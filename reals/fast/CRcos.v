@@ -93,9 +93,9 @@ Proof.
   apply cos_poly_fun_correct.
  simpl; intros x' _ [Hx0 Hx1].
  set (x:=(inj_Q IR x')) in *.
- stepr (Four:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 4)).
- stepl (ABSIR ([--](Four[*]x))) by (apply AbsIR_wd; rational).
- stepl (ABSIR (Four[*]x)) by apply AbsIR_inv.
+ stepr (Four:IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR 4))].
+ stepl (ABSIR ([--](Four[*]x))); [| by (apply AbsIR_wd; rational)].
+ stepl (ABSIR (Four[*]x)); [| by apply AbsIR_inv].
  rstepr (Four[*]One:IR).
  apply AbsSmall_imp_AbsIR.
  apply mult_resp_AbsSmall.
@@ -141,7 +141,7 @@ Proof.
   rewrite <- Qle_min_r.
   apply leEq_inj_Q with IR.
   destruct Hq0; assumption.
- destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_inv|];assumption.
+ destruct Hx; split;[stepl [--](inj_Q IR (1:Q)); [| by apply eq_symmetric; apply inj_Q_inv]|];assumption.
 Qed.
 
 Lemma Cos_double_angle : forall x, (Cos(Two[*]x)[=]One[-]Two[*]Sin x[^]2).
@@ -177,11 +177,11 @@ Proof.
   csetoid_rewrite_rev (Cos_double_angle (inj_Q IR (a/2))).
   apply Cos_wd.
   csetoid_replace (Two:IR) (inj_Q IR (2:Q));[|apply eq_symmetric; apply (inj_Q_nring IR 2)].
-  stepl (inj_Q IR (2*(a/2))) by apply inj_Q_mult.
+  stepl (inj_Q IR (2*(a/2))); [| by apply inj_Q_mult].
   apply inj_Q_wd.
   simpl; field; discriminate.
  apply AbsIR_imp_AbsSmall.
- stepr (nring 1:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 1)).
+ stepr (nring 1:IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR 1))].
  rstepr (One:IR).
  apply AbsIR_Sin_leEq_One.
 Qed.
@@ -202,7 +202,7 @@ Proof.
  intros x [] _.
  stepr (One:IR).
   change (AbsIR ([--](Sin x))[<=]One).
-  stepl (AbsIR (Sin x)) by apply AbsIR_inv.
+  stepl (AbsIR (Sin x)); [| by apply AbsIR_inv].
   apply AbsIR_Sin_leEq_One.
  rstepl (nring 1:IR).
  apply eq_symmetric.

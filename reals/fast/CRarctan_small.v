@@ -118,11 +118,11 @@ Proof.
     apply shift_zero_less_minus'.
     rstepr (One:IR).
     apply pos_one.
-   stepl (inj_Q IR 0) by apply (inj_Q_nring IR 0).
+   stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
    apply inj_Q_leEq.
    destruct Ha; assumption.
   rstepr (nring 1:IR).
-  stepr (inj_Q IR 1) by apply (inj_Q_nring IR 1).
+  stepr (inj_Q IR 1); [| by apply (inj_Q_nring IR 1)].
   apply inj_Q_less.
   assumption.
  eapply eq_transitive_unfolded; [|apply (arctan_series (inj_Q IR a) (arctan_series_convergent_IR) X)].
@@ -146,10 +146,10 @@ Proof.
  apply mult_cancel_lft with (nring (R:=IR) (S (2 * n))).
   apply nringS_ap_zero.
  rstepr (inj_Q IR a[^](2 * n + 1)).
- stepr (inj_Q IR (a^(2*n+1)%nat)) by apply inj_Q_power.
- stepl ((inj_Q IR (nring (S (2*n))))[*]inj_Q IR (Str_nth n (arctanSequence a))) by
-   apply mult_wdl; apply inj_Q_nring.
- stepl (inj_Q IR (nring (S (2*n))[*]Str_nth n (arctanSequence a))) by apply inj_Q_mult.
+ stepr (inj_Q IR (a^(2*n+1)%nat)); [| by apply inj_Q_power].
+ stepl ((inj_Q IR (nring (S (2*n))))[*]inj_Q IR (Str_nth n (arctanSequence a))); [| by
+   apply mult_wdl; apply inj_Q_nring].
+ stepl (inj_Q IR (nring (S (2*n))[*]Str_nth n (arctanSequence a))); [| by apply inj_Q_mult].
  apply inj_Q_wd.
  csetoid_rewrite (nring_Q (S (2*n))).
  change (S (2 * n)*Str_nth n (arctanSequence a)==a ^ (2 * n + 1)%nat).

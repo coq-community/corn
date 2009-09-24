@@ -68,14 +68,11 @@ Qed.
 Lemma mult_resp_Npos0 : forall x y : nat, x <> 0 -> y <> 0 -> (x*y) <> 0.
 Proof.
  intros x y H H0.
- set (H1 := Npos_is_suc y H0) in *.
- elim H1.
- intros y0 H2.
- rewrite H2 in H1.
+ destruct (Npos_is_suc y H0) as [y0 H2].
  rewrite H2 in H0.
  rewrite H2.
  generalize y0.
- clear H1 H0 H2 y0 y.
+ clear H0 H2 y0 y.
  intro y0.
  induction  y0 as [| y0 Hrecy0].
   rewrite mult_comm.

@@ -622,7 +622,7 @@ Proof.
  assert (X:Zero[<]x[^]n).
   apply nexp_resp_pos.
   assumption.
- stepl (Log _ X[+]Log x Hx) by (apply eq_symmetric; apply (Log_mult _ _ X Hx)).
+ stepl (Log _ X[+]Log x Hx); [| apply eq_symmetric; apply (Log_mult _ _ X Hx)].
  astepr ((nring n [+] One)[*]Log x Hx).
  rstepr (nring n[*]Log x Hx[+]Log x Hx).
  apply bin_op_wd_unfolded; try apply eq_reflexive.

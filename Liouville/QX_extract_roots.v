@@ -39,7 +39,7 @@ Let QX_deg := RX_deg Q_as_CRing Q_dec.
 Fixpoint QX_test_list (P : QX) (l : list Q_as_CRing) : option Q_as_CRing :=
   match l with
     | nil => None
-    | cons q l => if (Q_dec (P ! q) Zero) then Some q else QX_test_list P l
+    | cons q l => match Q_dec (P ! q) Zero with Cinleft _ => Some q | Cinright _ => QX_test_list P l end
   end.
 
 Lemma QX_test_list_spec_none : forall P l, QX_test_list P l = None ->
@@ -82,7 +82,7 @@ Let P0 (P : QX) := nth_coeff 0 (QX_ZX.qx2zx P).
 Let Pn (P : QX) := nth_coeff (QX_deg P) (QX_ZX.qx2zx P).
 
 Definition QX_find_root (P : QX) : option Q_as_CRing :=
-    if (Q_dec (P ! Zero) Zero) then Some Zero else QX_test_list P (list_Q (P0 P) (Pn P)).
+    match Q_dec (P ! Zero) Zero with Cinleft _ => Some Zero | Cinright _ => QX_test_list P (list_Q (P0 P) (Pn P)) end.
 
 Lemma QX_find_root_spec_none : forall P, QX_find_root P = None -> forall q : Q_as_CRing, P ! q [#] Zero.
 Proof.

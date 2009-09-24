@@ -1642,13 +1642,12 @@ End misc.
 End Properties_of_Ordering.
 
 Add Parametric Morphism c : (@cof_leEq c) with signature (@cs_eq (cof_crr c)) ==> (@cs_eq c) ==> iff as cof_leEq_wd.
-Proof.
+Proof with try assumption.
  intros x1 x2 Hx y1 y2 Hy.
  split; intros.
-  stepl x1 by assumption.
-  stepr y1 by assumption.
-  assumption.
- stepl x2 by symmetry;assumption.
- stepr y2 by symmetry;assumption.
- assumption.
+  stepl x1...
+  stepr y1...
+ symmetry in Hx, Hy.
+ stepl x2...
+ stepr y2...
 Qed.

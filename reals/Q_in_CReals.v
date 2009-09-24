@@ -969,12 +969,14 @@ Proof.
   exists ((nring r)[*]q)%Q; csetoid_rewrite (inj_Q_mult (nring r) q).
    eapply shift_less_mult.
     assumption.
-   stepr (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
-   apply Hra.
+   stepr (nring (R:=R1) r).
+    apply Hra.
+   apply eq_symmetric. apply inj_Q_nring.
   eapply shift_mult_less.
    assumption.
-  stepl (nring (R:=R1) r) by (apply eq_symmetric; apply inj_Q_nring).
-  apply Hrb.
+  stepl (nring (R:=R1) r).
+   apply Hrb.
+  apply eq_symmetric. apply inj_Q_nring.
  intros a b Hb Hab.
  destruct (Archimedes' a) as [n Hn].
  induction n.

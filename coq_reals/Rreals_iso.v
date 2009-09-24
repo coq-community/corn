@@ -139,8 +139,8 @@ Qed.
 Lemma IR_lt_as_R_back : forall x y, (IRasR x < IRasR y -> x [<] y).
 Proof.
  intros.
- stepl (RasIR (IRasR x)) by apply IRasRasIR_id.
- stepr (RasIR (IRasR y)) by apply IRasRasIR_id.
+ stepl (RasIR (IRasR x)); [| by apply IRasRasIR_id].
+ stepr (RasIR (IRasR y)); [| by apply IRasRasIR_id].
  apply map_pres_less.
  assumption.
 Qed.
@@ -178,8 +178,8 @@ Proof.
  cut (~ (IRasR y < IRasR x)); intro.
   apply H0.
   apply R_lt_as_IR.
-  stepl y by rewrite IRasRasIR_id; reflexivity.
-  stepr x by rewrite IRasRasIR_id; reflexivity.
+  stepl y; [| by rewrite IRasRasIR_id; reflexivity].
+  stepr x; [| by rewrite IRasRasIR_id; reflexivity].
   assumption .
  apply (RIneq.Rle_not_lt (IRasR y) (IRasR x)).
   assumption.
@@ -303,7 +303,7 @@ Proof.
    intro Hxn.
    rewrite (AbsIR_eq_inv_x (RasIR x) Hxn).
    autorewrite with RtoIR; reflexivity.
-  stepr (RasIR 0) by apply R_Zero_as_IR.
+  stepr (RasIR 0); [| by apply R_Zero_as_IR].
   apply less_leEq.
   apply IR_lt_as_R.
   assumption.
@@ -311,7 +311,7 @@ Proof.
   intro Hxn.
   rewrite (AbsIR_eq_x _ Hxn).
   reflexivity.
- stepl (RasIR 0) by apply R_Zero_as_IR.
+ stepl (RasIR 0); [| by apply R_Zero_as_IR].
  apply IR_le_as_R.
  fourier.
 Qed.
@@ -382,10 +382,10 @@ Proof.
  rewrite <- R_sum_as_IR.
  rewrite <- R_minus_as_IR.
  apply AbsIR_imp_AbsSmall.
- stepl (RasIR (Rabs(sum_f_R0 a m - sum_f_R0 a N))) by apply R_abs_as_IR.
+ stepl (RasIR (Rabs(sum_f_R0 a m - sum_f_R0 a N))); [| by apply R_abs_as_IR].
  apply less_leEq.
  unfold R_dist in HH.
- stepr (RasIR (IRasR e)) by apply IRasRasIR_id.
+ stepr (RasIR (IRasR e)); [| by apply IRasRasIR_id].
  apply IR_lt_as_R.
  assumption.
 Qed.
@@ -416,8 +416,8 @@ Proof.
   apply (Hay).
   unfold Rgt.
   apply R_lt_as_IR.
-  stepl (Zero:IR)  by symmetry;apply R_Zero_as_IR.
-  stepr (e) by symmetry; apply IRasRasIR_id.
+  stepl (Zero:IR); [| by symmetry;apply R_Zero_as_IR].
+  stepr (e); [| by symmetry; apply IRasRasIR_id].
   assumption.
  destruct H as [N HN].
  exists (S N).
@@ -435,8 +435,8 @@ Proof.
  unfold R_dist in HH.
  simpl in HH.
  apply less_leEq.
- stepl (RasIR (Rabs(sum_f_R0 a m - y))) by apply R_abs_as_IR.
- stepr (RasIR (IRasR e)) by apply IRasRasIR_id.
+ stepl (RasIR (Rabs(sum_f_R0 a m - y))); [| apply R_abs_as_IR].
+ stepr (RasIR (IRasR e)); [| apply IRasRasIR_id].
  apply IR_lt_as_R.
  assumption.
 Qed.
@@ -572,7 +572,7 @@ Proof.
    replace (n + 0)%nat with n by auto with *.
    assert (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fact (n + n))))).
     simpl.
-    stepr (RasIR 0) by apply R_Zero_as_IR.
+    stepr (RasIR 0); [| by apply R_Zero_as_IR].
     apply R_ap_as_IR_back.
     apply (nring_fac_ap_zero RReals (n + n)).
    rewrite (R_div_as_IR ((-1)^n) (nring (R := RRing) (fact (n + n))) X).
@@ -673,7 +673,7 @@ Proof.
    simpl.
    reflexivity.
   simpl.
-  stepr (RasIR 0) by apply R_Zero_as_IR.
+  stepr (RasIR 0); [| by apply R_Zero_as_IR].
   apply R_ap_as_IR_back.
   apply (nring_fac_ap_zero RReals (n + n + 1)).
  induction n; simpl.
@@ -708,12 +708,12 @@ Proof.
     symmetry; apply R_sin_as_IR.
    symmetry; apply R_cos_as_IR.
   unfold pfdom,f_rcpcl' in *.
-  stepl (RasIR (cos x)) by apply R_cos_as_IR.
+  stepl (RasIR (cos x)); [| by apply R_cos_as_IR].
   assumption.
  unfold pfdom,f_rcpcl', Tang,Fdiv in *.
  destruct dom.
  destruct e.
- stepl (Cos (RasIR x)) by symmetry; apply R_cos_as_IR.
+ stepl (Cos (RasIR x)); [| by symmetry; apply R_cos_as_IR].
  apply: c.
 Qed.
 
@@ -735,7 +735,7 @@ Proof.
  apply R_as_IR_wd.
  apply exp_ln.
  apply R_lt_as_IR.
- stepl (Zero:IR) by symmetry; apply R_Zero_as_IR.
+ stepl (Zero:IR); [| by symmetry; apply R_Zero_as_IR].
  assumption.
 Qed.
 
@@ -823,16 +823,16 @@ Proof.
  elim z.
    simpl.
    rstepr (Zero:IR).
-   stepr (RasIR 0) by apply R_Zero_as_IR.
+   stepr (RasIR 0); [| by apply R_Zero_as_IR].
    apply R_ap_as_IR_back.
    apply PI_neq0.
   intro p.
   rewrite <- convert_is_POS.
-  stepr (nring (R := IR) (nat_of_P p) [*] Pi) by apply mult_wdl; symmetry; apply (zring_plus_nat IR).
+  stepr (nring (R := IR) (nat_of_P p) [*] Pi); [| by apply mult_wdl; symmetry; apply (zring_plus_nat IR)].
   case (nat_of_P p).
    simpl.
    rstepr (Zero:IR).
-   stepr (RasIR 0) by apply R_Zero_as_IR.
+   stepr (RasIR 0); [| by apply R_Zero_as_IR].
    apply R_ap_as_IR_back.
    apply PI_neq0.
   intro n.
@@ -862,7 +862,7 @@ Proof.
    simpl.
    apply (plus_resp_leEq).
    apply (plus_resp_leEq).
-   stepl (nring (R := IR) 0) by auto with *.
+   stepl (nring (R := IR) 0); [| by auto with *].
    apply nring_leEq; auto with *.
   apply less_leEq.
   apply pos_Pi.
@@ -884,7 +884,7 @@ Proof.
    apply eq_imp_leEq.
    reflexivity.
   auto with *.
- stepl (RasIR 0) by apply R_Zero_as_IR.
+ stepl (RasIR 0); [| by apply R_Zero_as_IR].
  apply IR_lt_as_R.
  apply PI_RGT_0.
 Qed.
@@ -927,7 +927,7 @@ Proof.
    simpl.
    auto.
   simpl.
-  stepr (RasIR 0) by apply R_Zero_as_IR.
+  stepr (RasIR 0); [| by apply R_Zero_as_IR].
   apply R_ap_as_IR_back.
   apply Rgt_not_eq.
   rewrite DF.
@@ -963,7 +963,7 @@ Proof.
    apply R_zring_as_IR.
   apply R_nring_as_IR.
  simpl.
- stepr (RasIR 0) by apply R_Zero_as_IR.
+ stepr (RasIR 0); [| by apply R_Zero_as_IR].
  apply IR_ap_as_R.
  apply Rgt_not_eq.
  unfold Rgt.

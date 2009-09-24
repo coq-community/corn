@@ -2695,9 +2695,10 @@ Proof.
   intros p.
   change (st_car RX) in p.
   change (cpoly_zero R) with (Zero:RX).
-  stepl (cpoly_map_csf (Zero:RX)) by (apply csf_wd; rational).
-  change (cpoly_map_csf Zero) with (Zero:SX).
-  rational.
+  stepl (cpoly_map_csf (Zero:RX)).
+   change (cpoly_map_csf Zero) with (Zero:SX).
+   rational.
+  apply csf_wd; rational.
  intros p q c d H.
  split.
   autorewrite with ringHomPush.
@@ -2705,11 +2706,11 @@ Proof.
  change (st_car RX) in p,q.
  change (cpoly_map_csf ((cpoly_mult_cr _ q c)[+](p[*](cpoly_linear _ d q)))
    [=](cpoly_mult_cr _ (cpoly_map_csf q) (f c))[+](cpoly_map_csf p)[*](cpoly_map_csf (cpoly_linear _ d q))).
- stepl ((cpoly_map_csf (cpoly_mult_cr R q c))[+](cpoly_map_csf (p[*]cpoly_linear R d q))) by
-   apply eq_symmetric; apply cpoly_map_pres_plus.
+ stepl ((cpoly_map_csf (cpoly_mult_cr R q c))[+](cpoly_map_csf (p[*]cpoly_linear R d q)));
+  [| apply eq_symmetric; apply cpoly_map_pres_plus].
  apply csbf_wd.
   apply X.
- stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)) by apply csf_wd;rational.
+ stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)); [| apply csf_wd;rational].
  stepr (cpoly_map_csf (cpoly_linear R d q)[*]cpoly_map_csf p).
   2:apply (mult_commut_unfolded SX).
  change ((cpoly_linear R d q:RX)[*]p) with (cpoly_mult_fast_cs _ (cpoly_linear R d q) p).
@@ -2719,8 +2720,8 @@ Proof.
    with (cpoly_mult_fast_cs _ (cpoly_linear S (f d) (cpoly_map_csf q)) (cpoly_map_csf p)).
  rewrite cpoly_mult_fast_equiv.
  rewrite cpoly_lin_mult.
- stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p))) by
-   apply eq_symmetric; apply cpoly_map_pres_plus.
+ stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p)));
+  [| apply eq_symmetric; apply cpoly_map_pres_plus].
  change (cpoly_map_fun (cpoly_mult_cr_cs R p d)[+] cpoly_map_fun (Zero[+X*] (cpoly_mult_cs R q p))[=]
    (cpoly_mult_cr_cs S (cpoly_map_fun p) (f d))[+]
      (Zero[+X*](cpoly_mult_cs S (cpoly_map_fun q) (cpoly_map_fun p)))).

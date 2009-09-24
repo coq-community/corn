@@ -123,7 +123,7 @@ Proof.
  apply almostIn_closed.
  intros d.
  set (d':=((1#2)*d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos by (unfold d';QposRing).
+ setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos; [| unfold d'; QposRing].
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -162,7 +162,7 @@ Proof.
  apply regFunBall_e.
  intros e2.
  set (e':=((1#6)*e1)%Qpos).
- setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos by (unfold e';QposRing).
+ setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos; [| unfold e';QposRing].
  set (d' := graphPoint_modulus e').
  assert (Hd'1 : d' <= e').
   unfold d', graphPoint_modulus.
@@ -356,7 +356,7 @@ Proof.
   Qauto_le.
  unfold Cjoin_raw.
  rewrite <- ball_Cunit.
- setoid_replace (e1 + e2)%Qpos with ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2)%Qpos by QposRing.
+ setoid_replace (e1 + e2)%Qpos with ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2)%Qpos; [| QposRing].
  eapply ball_triangle;[|apply ball_approx_r].
  eapply ball_triangle.
   apply (ball_approx_l (approximate (Cmap_fun plX f x) ((1 # 2)%Qpos * e1)) ((1#2)*e1)).
@@ -385,7 +385,7 @@ Proof.
  apply almostIn_closed.
  intros d.
  set (d':=((1#2)*d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos by (unfold d';QposRing).
+ setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos; [| unfold d';QposRing].
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -431,7 +431,7 @@ Proof.
  apply regFunBall_e.
  intros e2.
  set (e':=((1#6)*e1)%Qpos).
- setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos by (unfold e';QposRing).
+ setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos; [| unfold e'; QposRing].
  set (d' := graphPoint_modulus f ((1#2)*e')).
  assert (Hd'1 : d' <= e').
   unfold d', graphPoint_modulus.

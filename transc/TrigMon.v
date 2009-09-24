@@ -409,7 +409,7 @@ Qed.
 Lemma Cos_ap_Zero : forall x:IR, (forall z, x[#]Pi[/]TwoNZ[+](zring z)[*]Pi) -> Cos x [#] Zero.
 Proof.
  intros x Hx.
- stepl (Cos (x[-](Pi[/]TwoNZ)[+](Pi[/]TwoNZ))) by apply Cos_wd; rational.
+ stepl (Cos (x[-](Pi[/]TwoNZ)[+](Pi[/]TwoNZ))); [| by apply Cos_wd; rational].
  csetoid_rewrite (Cos_plus_HalfPi (x[-](Pi[/]TwoNZ))).
  rstepr ([--]Zero:IR).
  apply inv_resp_ap.
@@ -444,12 +444,12 @@ Proof.
   apply shift_leEq_minus.
   rstepl (((zring z)[+](zring 1))[*]Pi).
   apply mult_resp_leEq_rht;[|apply less_leEq; auto with *].
-  stepl (zring (z+1):IR) by apply zring_plus.
+  stepl (zring (z+1):IR); [| by apply zring_plus].
   replace (z+1)%Z with (-(-z-1))%Z by ring.
   assert (0<=-z-1)%Z.
    auto with *.
   rewrite (Z_to_nat_correct H).
-  stepl ([--](nring (Z_to_nat H)):IR) by apply eq_symmetric; apply zring_inv_nat.
+  stepl ([--](nring (Z_to_nat H)):IR); [| by apply eq_symmetric; apply zring_inv_nat].
   apply inv_resp_leEq.
   apply nring_nonneg.
  apply less_imp_ap.
@@ -459,7 +459,7 @@ Proof.
  apply plus_resp_leEq_lft.
  apply mult_resp_nonneg;[|apply less_leEq; auto with *].
  rewrite (Z_to_nat_correct z0).
- stepr (nring (Z_to_nat z0):IR) by auto with *.
+ stepr (nring (Z_to_nat z0):IR); [| by auto with *].
  apply nring_nonneg.
 Qed.
 

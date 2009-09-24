@@ -259,7 +259,7 @@ Proof.
    set (a':=inj_Q IR (a/2)).
    simpl.
    rstepl (Exp a'[*]Exp a').
-   stepl (Exp (a'[+]a')) by apply Exp_plus.
+   stepl (Exp (a'[+]a')); [| by apply Exp_plus].
    apply Exp_wd.
    unfold a'.
    eapply eq_transitive.
@@ -271,7 +271,7 @@ Proof.
    apply less_leEq; apply Exp_pos.
   stepr (One:IR).
    apply Exp_leEq_One.
-   stepr (inj_Q IR 0) by apply (inj_Q_nring IR 0).
+   stepr (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
    apply inj_Q_leEq.
    apply mult_cancel_leEq with (2:Q).
     constructor.
@@ -365,9 +365,9 @@ Proof.
  rewrite rational_exp_neg_correct.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
- stepl (inj_Q IR (1#3)[^]n) by (apply eq_symmetric; apply inj_Q_power).
+ stepl (inj_Q IR (1#3)[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
  assert (X:Zero[<]inj_Q IR (1#3)).
-  stepl (inj_Q IR 0) by apply (inj_Q_nring IR 0).
+  stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   constructor.
  astepl (inj_Q IR (1#3)[!](nring n)[//]X).
@@ -375,7 +375,7 @@ Proof.
  apply Exp_resp_leEq.
  destruct n.
   rstepl (Zero:IR).
-  stepl (inj_Q IR 0) by apply (inj_Q_nring IR 0).
+  stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
  apply (fun a b => (shift_mult_leEq' _ a b _ (nringS_ap_zero IR n))).
@@ -405,7 +405,7 @@ Proof.
   apply rational_exp_small_neg_posH.
  assert (X0:inj_Q IR (inject_Z (S n))[#]Zero).
   stepl (inj_Q IR (nring (S n))).
-   stepl (nring (S n):IR) by (apply eq_symmetric; apply (inj_Q_nring IR (S n))).
+   stepl (nring (S n):IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR (S n)))].
    apply (nringS_ap_zero).
   apply inj_Q_wd.
   apply nring_Q.
@@ -700,7 +700,7 @@ Proof.
  intros e.
  assert (Y:=X e).
  simpl in *.
- do 2 (unfold Cap_raw in *; simpl in *).
+ do 2 (unfold Cap_raw in *; simpl in * ).
  replace RHS with (approximate x (1 # 1)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos) by QposRing.
  assumption.

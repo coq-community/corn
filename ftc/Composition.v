@@ -505,13 +505,13 @@ Proof.
   assert (fnx := pfwdef _ _ _ _ Y0 Y1 (eq_reflexive _ x)).
   assert (Y4 : Dom (g n) (f n x Y1)).
    apply (dom_wd _ (g n) (f n x Y0));assumption.
-  stepl (ABSIR (g n (f n x Y1) Y4[-]G (f n x Y1) Y3)) by (apply AbsIR_wd; rational).
+  stepl (ABSIR (g n (f n x Y1) Y4[-]G (f n x Y1) Y3)); [| apply AbsIR_wd; rational].
   generalize (rangef n x Y1 Hx).
   generalize (f n x Y1) Y4 Y3.
   clear Y0 Y1 Y2 Y3 fnx Y4.
   intros y Hy0 Hy1 Hy.
   stepl (ABSIR (g n y (contin_imp_inc c d Hcd (g n) (contg n) y Hy)[-]
-    G y (contin_imp_inc c d Hcd G contG y Hy))) by (apply AbsIR_wd; rational).
+    G y (contin_imp_inc c d Hcd G contG y Hy))); [| apply AbsIR_wd; rational].
   apply HN.
   assumption.
  apply AbsIR_imp_AbsSmall.
@@ -520,7 +520,7 @@ Proof.
    apply rangef; assumption.
   apply rangeF; assumption.
  stepl (AbsIR (f n x (contin_imp_inc a b Hab (f n) (contf n) x Hx)[-]
-   F x (contin_imp_inc a b Hab F contF x Hx))) by (apply AbsIR_wd; rational).
+   F x (contin_imp_inc a b Hab F contF x Hx))); [| apply AbsIR_wd; rational].
  apply HM.
  assumption.
 Qed.

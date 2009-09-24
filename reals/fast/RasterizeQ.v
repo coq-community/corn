@@ -168,9 +168,9 @@ Proof.
    rewrite (inj_S n).
    unfold Zsucc.
    do 2 rewrite injz_plus.
-   setoid_replace ((2%positive * n)%Z:Q) with (2*n) by (unfold Qeq; simpl; auto with *).
+   setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| by (unfold Qeq; simpl; auto with * )].
    setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-     with ((w / (2 * (n + 1%positive)))) by (field; unfold Qeq; simpl; auto with *).
+     with ((w / (2 * (n + 1%positive)))); [| by (field; unfold Qeq; simpl; auto with * )].
    rewrite Qabs_pos;[apply Qle_refl|].
    apply Qle_shift_div_l; [apply: mult_resp_pos; simpl; auto with *; unfold Qlt; simpl; auto with *|].
    replace LHS with 0 by ring.
@@ -186,7 +186,7 @@ Proof.
  rewrite <- (Qfloor_Z n).
  apply Qfloor_resp_le.
  setoid_replace x with (l+w).
-  setoid_replace (l + w - l) with (w:Q) by ring.
+  setoid_replace (l + w - l) with (w:Q); [| by ring].
   field_simplify;[|apply Qpos_nonzero].
   unfold Qle.
   simpl.

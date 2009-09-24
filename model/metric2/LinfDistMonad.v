@@ -169,7 +169,7 @@ Proof.
    apply ball_weak_le  with  ((1 # 2) * ((1 # 2) * e1))%Qpos.
     rewrite Qle_minus_iff.
     replace RHS with (e1 - (1#2)*(1#2)*e1).
-     replace RHS with ((3#4)*e1) by ring.
+     replace RHS with ((3#4)*e1); [| ring].
      Qauto_nonneg. auto with *.
     apply ball_approx_r.
   simpl.
@@ -253,7 +253,7 @@ Proof.
   2: apply (regFun_prf_ex x e ((1 # 2) * e1)%Qpos).
  rewrite Qle_minus_iff.
  replace RHS with (e1 - (1#2)*e1).
-  replace RHS with ((1#2)*e1) by ring.
+  replace RHS with ((1#2)*e1); [| ring].
   Qauto_nonneg. replace LHS with ((e + e1)+ - (e + (1 # 2) * e1)).
  ring. reflexivity. Qed.
 

@@ -1012,7 +1012,7 @@ Proof.
  intros x Hx n Hn _ _.
  rstepr (ABSIR (nexp IR n x)[*]MAX (ABSIR a) (ABSIR b)).
  change (AbsIR (nexp IR n x[*]x)[<=]AbsIR (nexp IR n x)[*]Max (AbsIR a) (AbsIR b)).
- stepl (AbsIR (nexp IR n x)[*]AbsIR x) by apply eq_symmetric; apply AbsIR_resp_mult.
+ stepl (AbsIR (nexp IR n x)[*]AbsIR x); [| apply eq_symmetric; apply AbsIR_resp_mult].
  apply mult_resp_leEq_lft;[|apply AbsIR_nonneg].
  apply AbsSmall_imp_AbsIR.
  destruct Hx.

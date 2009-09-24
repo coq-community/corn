@@ -37,17 +37,17 @@ Proof.
  split.
   change (x*(CRinv x x_)==(' 1%Q))%CR.
   rewrite <- CR_eq_as_Cauchy_IR_eq.
-  stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (CRinv x x_))) by apply CR_mult_as_Cauchy_IR_mult.
-  stepl ((CRasCauchy_IR x)[*](f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))) by
-    apply bin_op_is_wd_un_op_rht; apply CR_inv_as_Cauchy_IR_inv.
+  stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (CRinv x x_))); [| by apply CR_mult_as_Cauchy_IR_mult].
+  stepl ((CRasCauchy_IR x)[*](f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))); [| by
+    apply bin_op_is_wd_un_op_rht; apply CR_inv_as_Cauchy_IR_inv].
   apply: eq_transitive.
    apply field_mult_inv.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
  change ((CRinv x x_)*x==(' 1%Q))%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
- stepl ((CRasCauchy_IR (CRinv x x_))[*](CRasCauchy_IR x)) by apply CR_mult_as_Cauchy_IR_mult.
- stepl ((f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))[*](CRasCauchy_IR x)) by
-   apply bin_op_is_wd_un_op_lft; apply CR_inv_as_Cauchy_IR_inv.
+ stepl ((CRasCauchy_IR (CRinv x x_))[*](CRasCauchy_IR x)); [| by apply CR_mult_as_Cauchy_IR_mult].
+ stepl ((f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))[*](CRasCauchy_IR x)); [| by
+   apply bin_op_is_wd_un_op_lft; apply CR_inv_as_Cauchy_IR_inv].
  apply: eq_transitive.
   apply field_mult_inv_op.
  apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
@@ -59,10 +59,10 @@ Proof.
  apply CR_ap_as_Cauchy_IR_ap_2.
  apply cf_rcpsx with
    (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ y_).
- stepl (CRasCauchy_IR (CRinv x x_)%CR) by
-   apply eq_symmetric; apply (CR_inv_as_Cauchy_IR_inv_short x x_).
- stepr (CRasCauchy_IR (CRinv y y_)%CR) by
-   apply eq_symmetric; apply (CR_inv_as_Cauchy_IR_inv_short y y_).
+ stepl (CRasCauchy_IR (CRinv x x_)%CR); [| by
+   apply eq_symmetric; apply (CR_inv_as_Cauchy_IR_inv_short x x_)].
+ stepr (CRasCauchy_IR (CRinv y y_)%CR); [| by
+   apply eq_symmetric; apply (CR_inv_as_Cauchy_IR_inv_short y y_)].
  apply CR_ap_as_Cauchy_IR_ap_1.
  apply H.
 Qed.

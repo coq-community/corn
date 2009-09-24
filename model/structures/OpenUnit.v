@@ -123,9 +123,9 @@ Proof.
  exists ((b-a)/(1-a)).
  abstract ( assert (X:OpenUnitDual b < OpenUnitDual a); [rewrite -> Qlt_minus_iff in *; simpl;
    (replace RHS with (b + - a) by ring); assumption |split;
-     [(replace RHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with *);
+     [(replace RHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with * );
        auto with *
-         |(replace LHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with *);
+         |(replace LHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with * );
            auto with *]]).
 Defined.
 

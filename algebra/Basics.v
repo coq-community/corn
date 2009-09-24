@@ -50,6 +50,7 @@ Require Export Even.
 Require Export Max.
 Require Export Min.
 Require Export List.
+Require Export ssreflect.
 Require Import Eqdep_dec.
 
 (**
@@ -123,7 +124,7 @@ Proof.
  assert (e':=e).
  assert (e0':=e0).
  revert e e0 l0.
- rewrite e', (eq_add_S _ _ e0').
+ rewrite e' (eq_add_S _ _ e0').
  intros e.
  elim e using K_dec_set.
   decide equality.
@@ -502,8 +503,7 @@ Proof.
  rewrite Zmult_comm.
  rewrite Zmult_minus_distr_r.
  rewrite Zmult_comm.
- pattern (m * p)%Z in |- *.
- rewrite Zmult_comm.
+ rewrite (Zmult_comm m p).
  reflexivity.
 Qed.
 
@@ -592,7 +592,7 @@ Proof.
   simpl in |- *.
   reflexivity.
  intros n0 m0 H0.
- rewrite H with (S n0) (S m0) n0 m0.
+ rewrite (H (S n0) (S m0) n0 m0).
   rewrite <- H0.
   replace (S n0 - S m0)%Z with (n0 - m0)%Z.
    reflexivity.
@@ -872,20 +872,23 @@ End InductionTT.
 (** This new version of postive recursion gives access to
 both n and n+1 for the 2n+1 case, while still maintaining efficency.
 *)
+
 Fixpoint positive_rect2_helper
  (P : positive -> Type)
  (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
  (c2 : forall p : positive, P p -> P (xO p))
  (c3 : P 1%positive)
  (b : bool) (p : positive) {struct p} : P (if b then Psucc p else p) :=
- match p return (P (if b then Psucc p else p)) with
- | xH    => if b return P (if b then (Psucc xH) else xH) then (c2 _ c3) else c3
- | xO p' => if b return P (if b then (Psucc (xO p')) else xO p')
-             then (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
-             else (c2 _ (positive_rect2_helper P c1 c2 c3 false _))
- | xI p' => if b return P (if b then (Psucc (xI p')) else xI p')
-             then (c2 _ (positive_rect2_helper P c1 c2 c3 true _))
-             else (c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _))
+ match p with
+ | xH    => match b with true => c2 _ c3 | false => c3 end
+ | xO p' => match b with
+             | true => c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _)
+             | false => c2 _ (positive_rect2_helper P c1 c2 c3 false _)
+             end
+ | xI p' => match b with
+             | true => c2 _ (positive_rect2_helper P c1 c2 c3 true _)
+             | false =>c1 _ (positive_rect2_helper P c1 c2 c3 true _) (positive_rect2_helper P c1 c2 c3 false _)
+             end
  end.
 
 Definition positive_rect2

@@ -159,9 +159,9 @@ Qed.
 
 (** A boolean version of Qball. *)
 Definition Qball_ex_bool e a b : bool :=
- if ball_ex_dec _ Qmetric_dec e a b then true else false.
+ match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
 
-Lemma sumbool_eq_true : forall P (dec:{P}+{~P}), (if dec then true else false) = true <-> P.
+Lemma sumbool_eq_true : forall P (dec:{P}+{~P}), (match dec with left _ => true | right _ => false end) = true <-> P.
 Proof.
  intros.
  destruct dec; simpl;split;auto.
@@ -226,7 +226,7 @@ Proof.
   intros seq dnn ex2 [Hseq1 Hseq2].
   apply: AbsSmall_minus;simpl.
   change (AbsSmall (e1:Q) ((PartialAlternatingSumUntil _ (ex2))-0)).
-  stepr (PartialAlternatingSumUntil _ (ex2)) by (simpl; ring).
+  stepr (PartialAlternatingSumUntil _ (ex2)); [| by (simpl; ring)].
   destruct (PartialAlternatingSumUntil_small _ dnn (ex2)) as [Hl1 Hl2].
   apply AbsSmall_leEq_trans with (hd seq).
    stepl (hd seq - 0);[assumption|simpl;ring].
@@ -250,12 +250,12 @@ Proof.
    try solve[intros; elim case2].
  intros ex4.
  simpl.
- set (a := (takeUntil (fun s : Stream Q => if Qmetric_dec e1 (hd s) 0 then true else false)
+ set (a := (takeUntil (fun s : Stream Q => match Qmetric_dec e1 (hd s) 0 with left _ => true | right _ => false end)
    (ex3 tt)) Qminus' 0).
- set (b:=(takeUntil (fun s : Stream Q => if Qmetric_dec e2 (hd s) 0 then true else false)
+ set (b:=(takeUntil (fun s : Stream Q => match Qmetric_dec e2 (hd s) 0 with left _ => true | right _ => false end)
    (ex4 tt)) Qminus' 0).
- stepr (b-a) by (simpl; repeat rewrite Qminus'_correct;
-   change (b - a == hd x - a - (hd x - b)); ring).
+ stepr (b-a); [| by (simpl; repeat rewrite Qminus'_correct;
+   change (b - a == hd x - a - (hd x - b)); ring)].
  apply AbsSmall_minus.
  rename H0 into IHExists.
  apply (IHExists tt).
@@ -363,11 +363,11 @@ Proof.
  cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
   apply convergent_wd.
   intros n.
-  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq))) by (apply eq_symmetric; apply inj_Q_mult).
+  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq))); [| by (apply eq_symmetric; apply inj_Q_mult)].
   apply mult_wdl.
-  stepr ((inj_Q IR (-(1)))[^]n) by (apply eq_symmetric; apply inj_Q_power).
+  stepr ((inj_Q IR (-(1)))[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
   apply nexp_wd.
-  stepr ([--](inj_Q IR 1)) by (apply eq_symmetric; apply inj_Q_inv).
+  stepr ([--](inj_Q IR 1)); [| by (apply eq_symmetric; apply inj_Q_inv)].
   apply un_op_wd_unfolded.
   rstepl ((nring 1):IR).
   apply eq_symmetric; apply (inj_Q_nring IR 1).
@@ -375,7 +375,7 @@ Proof.
    intros n.
    unfold Str_nth.
    change (Zero:IR) with (nring 0:IR).
-   stepl (inj_Q IR (nring 0)) by apply inj_Q_nring.
+   stepl (inj_Q IR (nring 0)); [| by apply inj_Q_nring].
    apply inj_Q_leEq.
    simpl.
    destruct (dnn_Str_nth_tl n dnn) as [[[H _] _] _].
@@ -458,9 +458,9 @@ Proof.
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
  assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq)))%CR)).
   stepr (IRasCR (x n)).
-   stepr (Sum n n (fun n => IRasCR (x n))) by apply: Sum_one.
+   stepr (Sum n n (fun n => IRasCR (x n))); [| by apply: Sum_one].
    unfold Sum, Sum1.
-   stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )) by (apply cg_minus_wd; apply IR_Sum0_as_CR).
+   stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )); [| by (apply cg_minus_wd; apply IR_Sum0_as_CR)].
    apply Hn.
    auto.
   simpl.
@@ -477,7 +477,7 @@ Proof.
   induction n; intros e seq dnn zl X.
    simpl in *.
    apply AbsSmall_minus.
-   stepr (InfiniteAlternatingSum dnn zl) by (unfold cg_minus;simpl;ring).
+   stepr (InfiniteAlternatingSum dnn zl); [| by (unfold cg_minus;simpl;ring)].
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
    apply: leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.

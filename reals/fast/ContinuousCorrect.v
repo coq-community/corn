@@ -108,7 +108,7 @@ Proof.
  clear Hf0.
  destruct X as [_ X].
  assert (He : Zero[<](inj_Q IR (((1#2)*e)%Qpos:Q))).
-  stepl (inj_Q IR (nring 0)) by apply (inj_Q_nring IR 0).
+  stepl (inj_Q IR (nring 0)); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   apply Qpos_prf.
  destruct (X _ He) as [d0 Hd0 Hf].
@@ -143,8 +143,8 @@ Proof.
   assumption.
  apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
   rewrite <- CRAbsSmall_ball.
-  stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)) by (simpl; apply IR_minus_as_CR).
-  stepl (IRasCR (inj_Q IR (((1 # 2) * e)%Qpos:Q))) by (simpl; apply IR_inj_Q_as_CR).
+  stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)); [| by (simpl; apply IR_minus_as_CR)].
+  stepl (IRasCR (inj_Q IR (((1 # 2) * e)%Qpos:Q))); [| by (simpl; apply IR_inj_Q_as_CR)].
   rewrite <- IR_AbsSmall_as_CR.
   apply AbsIR_imp_AbsSmall.
   apply Hf; try assumption.
@@ -161,8 +161,8 @@ Proof.
  simpl.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- CRAbsSmall_ball.
- stepr (IRasCR (inj_Q IR q[-]x)) by (simpl; apply IR_minus_as_CR).
- stepl (IRasCR (inj_Q IR (q0:Q))) by (simpl; apply IR_inj_Q_as_CR).
+ stepr (IRasCR (inj_Q IR q[-]x)); [| by (simpl; apply IR_minus_as_CR)].
+ stepl (IRasCR (inj_Q IR (q0:Q))); [| by (simpl; apply IR_inj_Q_as_CR)].
  rewrite <- IR_AbsSmall_as_CR.
  apply AbsSmall_minus.
  eapply AbsSmall_leEq_trans;[|apply Hq1].

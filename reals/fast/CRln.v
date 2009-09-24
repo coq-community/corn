@@ -130,19 +130,19 @@ Proof.
   apply Zle_refl.
  clear - Y.
  assert (X:inj_Q IR (a + 1)[#]Zero).
-  stepl (inj_Q IR a [+]inj_Q IR (nring 1)) by apply eq_symmetric; apply inj_Q_plus.
+  stepl (inj_Q IR a [+]inj_Q IR (nring 1)); [| by apply eq_symmetric; apply inj_Q_plus].
   csetoid_rewrite (inj_Q_nring IR 1).
   rstepl (inj_Q IR a[+]One).
   assumption.
- stepl (inj_Q IR (a - 1)[/]_[//]X) by apply eq_symmetric; apply inj_Q_div.
+ stepl (inj_Q IR (a - 1)[/]_[//]X); [| by apply eq_symmetric; apply inj_Q_div].
  apply div_wd.
-  stepl (inj_Q IR a[-]inj_Q IR 1) by apply eq_symmetric; apply inj_Q_minus.
+  stepl (inj_Q IR a[-]inj_Q IR 1); [| by apply eq_symmetric; apply inj_Q_minus].
   apply bin_op_wd_unfolded.
    apply eq_reflexive.
   apply un_op_wd_unfolded.
   rstepr (nring 1:IR).
   apply (inj_Q_nring IR 1).
- stepl (inj_Q IR a[+]inj_Q IR 1) by apply eq_symmetric; apply inj_Q_plus.
+ stepl (inj_Q IR a[+]inj_Q IR 1); [| by apply eq_symmetric; apply inj_Q_plus].
  apply bin_op_wd_unfolded.
   apply eq_reflexive.
  rstepr (nring 1:IR).

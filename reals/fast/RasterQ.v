@@ -228,15 +228,15 @@ Proof.
   symmetry; auto.
  intros [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
  destruct (InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
- destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by] [Hb0 [Hb1 Hb2]]].
+ destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by'] [Hb0 [Hb1 Hb2]]].
  rewrite Hb1 in Ha1.
  rewrite Hb2 in Ha1.
  unfold snd, fst in Ha1.
  destruct x2 as [x2l x2r].
  destruct y2 as [y2l y2r].
- assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * by + 1 # 1) / (2 * n # 1)),
+ assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * by' + 1 # 1) / (2 * n # 1)),
    (x2r + (y2r - x2r) * (2 * bx + 1 # 1) / (2 * m # 1)))).
-  transitivity ((x1l + (y1l - x1l) * (2 * by + 1 # 1) / (2 * n # 1)),
+  transitivity ((x1l + (y1l - x1l) * (2 * by' + 1 # 1) / (2 * n # 1)),
     (x1r + (y1r - x1r) * (2 * bx + 1 # 1) / (2 * m # 1))).
    auto.
   clear - Hx Hy.

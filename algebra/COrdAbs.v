@@ -669,13 +669,12 @@ Declare Left Step AbsBig_wdl_unfolded.
 Declare Right Step AbsBig_wdr_unfolded.
 
 Add Parametric Morphism c : (@AbsSmall c) with signature (@cs_eq (cof_crr c)) ==> (@cs_eq c) ==> iff as AbsSmall_morph_wd.
-Proof.
+Proof with try assumption.
  intros x1 x2 xeq y1 y2 yeq.
  split; intro H.
-  stepr y1 by assumption.
-  stepl x1 by assumption.
-  assumption.
- stepr y2 by symmetry; assumption.
- stepl x2 by symmetry; assumption.
- assumption.
+  stepr y1...
+  stepl x1...
+ symmetry in xeq, yeq.
+ stepr y2...
+ stepl x2...
 Qed.

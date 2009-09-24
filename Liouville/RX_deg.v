@@ -52,11 +52,11 @@ Qed.
 Fixpoint RX_deg (p : RX) : nat :=
   match p with
     | cpoly_zero => 0
-    | cpoly_linear c p => if (RX_dec p Zero) then 0 else S (RX_deg p)
+    | cpoly_linear c p => match RX_dec p Zero with Cinleft _ => 0 | Cinright _ => S (RX_deg p) end
   end.
 
 Lemma RX_deg_zero : RX_deg Zero = 0. Proof. reflexivity. Qed.
-Lemma RX_deg_linear : forall c p, RX_deg (c[+X*]p) = if (RX_dec p Zero) then 0 else S (RX_deg p).
+Lemma RX_deg_linear : forall c p, RX_deg (c[+X*]p) = match RX_dec p Zero with Cinleft _ => 0 | Cinright _ => S (RX_deg p) end.
 Proof. reflexivity. Qed.
 
 Lemma RX_deg_spec : forall p : RX, p [#] Zero -> degree (RX_deg p) p.

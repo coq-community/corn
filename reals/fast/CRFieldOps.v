@@ -153,7 +153,7 @@ Proof.
  simpl.
  apply H2.
  autorewrite with QposElim.
- stepl (/(xd#xn))%Q by (simpl;field).
+ stepl (/(xd#xn))%Q; [| simpl; field].
   change (/(xd#xn))%Q with (xn#xd)%Q.
   apply AbsSmall_reflexive.
   discriminate.
@@ -190,20 +190,20 @@ Proof.
    simpl in *.
    setoid_replace ((0 # ad)) with 0 by constructor.
    unfold Qball.
-   stepr 0 by (simpl; ring).
+   stepr 0; [| simpl; ring].
    apply zero_AbsSmall.
    simpl.
    auto with *.
   simpl in *.
   unfold Qball in *.
   autorewrite with QposElim.
-  stepr ((an#ad)*(b0-b1)) by (simpl; ring).
+  stepr ((an#ad)*(b0-b1)); [| simpl; ring].
   apply (fun x y => (AbsSmall_cancel_mult _ x y (ad#an))).
    constructor.
-  stepl (((ad # an) * e)%Qpos:Q) by (simpl;QposRing).
+  stepl (((ad # an) * e)%Qpos:Q); [| simpl; QposRing].
   stepr (b0 - b1).
    apply H.
-  stepr ((an#ad)*(ad#an)*(b0-b1)) by (simpl;ring).
+  stepr ((an#ad)*(ad#an)*(b0-b1)); [| simpl; ring].
   simpl.
   setoid_replace ((an#ad)*(ad#an)) with 1.
    ring.
@@ -215,14 +215,14 @@ Proof.
  simpl in *.
  unfold Qball in *.
  autorewrite with QposElim.
- stepr ((Zneg an#ad)*(b0-b1)) by (simpl; ring).
+ stepr ((Zneg an#ad)*(b0-b1)); [| simpl; ring].
  apply (fun x y => (AbsSmall_cancel_mult _ x y (ad#an))).
   constructor.
- stepl (((ad # an) * e)%Qpos:Q) by (simpl;QposRing).
+ stepl (((ad # an) * e)%Qpos:Q); [| simpl;QposRing].
  stepr (b1 - b0).
   apply AbsSmall_minus.
   apply H.
- stepr ((Zneg an#ad)*(ad#an)*(b0-b1)) by (simpl;ring).
+ stepr ((Zneg an#ad)*(ad#an)*(b0-b1)); [| simpl; ring].
  simpl.
  setoid_replace ((Zneg an#ad)*(ad#an)) with ([--]1).
   simpl; ring.
@@ -565,7 +565,7 @@ Proof.
   intros a b.
   rewrite <- (QposAsmkQpos (Qpos_Qmax a b)).
   apply Qpos_nonzero.
- stepr (Qmax c a1 - Qmax c a0) by simpl; field; repeat split; apply H.
+ stepr (Qmax c a1 - Qmax c a0); [| simpl; field; repeat split; apply H].
  apply: AbsSmall_leEq_trans.
   instantiate (1:=(c*c*e)).
   rewrite Qmult_comm.

@@ -177,8 +177,8 @@ Proof.
  unfold n' in H1.
  replace m with n by omega.
  clear Hm H1.
- stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))) by
-   (apply eq_symmetric; apply inj_Q_mult).
+ stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| by
+   (apply eq_symmetric; apply inj_Q_mult)].
  change (inj_Q IR ((- (1)) ^ n)[*]inj_Q IR (Str_nth n (sinSequence a))[=]
    (nexp IR n [--]One[/]nring (R:=IR) (fac (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
      (nexp IR (S n') (inj_Q IR a[-]Zero))).
@@ -299,8 +299,8 @@ Proof.
   apply sin_poly_fun_correct.
  simpl; intros x' _ [Hx0 Hx1].
  set (x:=(inj_Q IR x')) in *.
- stepr (Nine:IR) by (apply eq_symmetric; apply (inj_Q_nring IR 9)).
- stepl (ABSIR (Three[-]Twelve[*]x[*]x)) by (apply AbsIR_wd; rational).
+ stepr (Nine:IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR 9))].
+ stepl (ABSIR (Three[-]Twelve[*]x[*]x)); [| by (apply AbsIR_wd; rational)].
  apply AbsSmall_imp_AbsIR.
  split.
   apply shift_zero_leEq_minus'.
@@ -308,7 +308,7 @@ Proof.
   repeat apply mult_resp_nonneg.
     apply (nring_nonneg IR 12).
    apply shift_zero_leEq_minus.
-   stepr (inj_Q IR (nring 1)) by apply inj_Q_nring.
+   stepr (inj_Q IR (nring 1)); [| by apply inj_Q_nring].
    assumption.
   apply shift_zero_leEq_minus.
   stepl (inj_Q IR (-(1))).
@@ -361,7 +361,7 @@ Proof.
   rewrite <- Qle_min_r.
   apply leEq_inj_Q with IR.
   destruct Hq0; assumption.
- destruct Hx; split;[stepl [--](inj_Q IR (1:Q)) by apply eq_symmetric; apply inj_Q_inv|];assumption.
+ destruct Hx; split;[stepl [--](inj_Q IR (1:Q)); [| by apply eq_symmetric; apply inj_Q_inv] |];assumption.
 Qed.
 
 Lemma Sin_triple_angle : forall x, (Sin(Three[*]x)[=]Three[*]Sin x[-]Four[*]Sin x[^]3).
@@ -421,7 +421,7 @@ Proof.
  destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
  rewrite IHn.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
-   (stepr (nring 1:IR) by apply eq_symmetric; apply (inj_Q_nring IR 1)); rstepr (One:IR);
+   (stepr (nring 1:IR); [| by apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
      apply AbsIR_Sin_leEq_One].
  apply IRasCR_wd.
  stepl (Sin (inj_Q IR (a/3*3))).

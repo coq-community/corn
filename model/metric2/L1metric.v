@@ -309,7 +309,7 @@ Proof.
  apply glue_StepF_eq.
   apply IHs1.
   unfold L1Norm.
-  setoid_replace 0 with (0/o) by (field; auto with *).
+  setoid_replace 0 with (0/o); [| field; auto with *].
   apply Qle_shift_div_l; auto with *.
   rewrite Qmult_comm.
   apply Qle_trans with (-((1 - o) * IntegralQ (QabsS ^@> s2)))%Q.
@@ -324,7 +324,7 @@ Proof.
   apply: L1Norm_nonneg.
  apply IHs2.
  unfold L1Norm.
- setoid_replace 0 with (0/(1-o)) by (field; auto with *).
+ setoid_replace 0 with (0/(1-o)); [| field; auto with *].
  apply Qle_shift_div_l; auto with *.
  rewrite Qmult_comm.
  apply Qle_trans with (-(o * IntegralQ (QabsS ^@> s1)))%Q.
@@ -365,7 +365,7 @@ Lemma L1ball_refl : forall e x, (L1Ball e x x).
 Proof.
  intros e x.
  unfold L1Ball, L1Distance.
- setoid_replace (x-x) with (constStepF (0:QS)) by ring.
+ setoid_replace (x-x) with (constStepF (0:QS)); [| ring].
  change (0 <= e)%Q.
  auto with *.
 Qed.
@@ -375,7 +375,7 @@ Proof.
  intros e x y.
  unfold L1Ball, L1Distance.
  unfold L1Norm.
- setoid_replace (x-y) with (-(y-x)) by ring.
+ setoid_replace (x-y) with (-(y-x)); [| ring].
  rewrite StepQabsOpp.
  auto.
 Qed.
@@ -385,7 +385,7 @@ Proof.
  intros e d x y z.
  unfold L1Ball, L1Distance.
  unfold L1Norm.
- setoid_replace (x-z) with ((x-y)+(y-z)) by ring.
+ setoid_replace (x-z) with ((x-y)+(y-z)); [| ring].
  intros He Hd.
  autorewrite with QposElim.
  apply Qle_trans with (IntegralQ (StepQabs (x-y) + StepQabs (y-z)))%Q.
@@ -412,9 +412,9 @@ Lemma L1ball_eq : forall x y, (forall e : Qpos, L1Ball e x y) -> StepF_eq x y.
 Proof.
  intros x y H.
  unfold L1Ball in H.
- setoid_replace y with (constStepF (0:QS)+y) by ring.
+ setoid_replace y with (constStepF (0:QS)+y); [| ring].
  set (z:=constStepF (0:QS)).
- setoid_replace x with (x - y + y) by ring.
+ setoid_replace x with (x - y + y); [| ring].
  apply StepQplus_wd; try reflexivity.
  unfold z; clear z.
  apply L1Norm_Zero.
@@ -494,7 +494,7 @@ Proof.
    apply Qle_shift_div_r; auto with *.
    apply: mult_resp_leEq_lft; simpl; auto with *.
    apply Qle_trans with e; auto with *.
-  setoid_replace (x - f) with (constStepF (1:QS)*x - f) by ring.
+  setoid_replace (x - f) with (constStepF (1:QS)*x - f); [| ring].
   rewrite <- X.
   unfold f.
   ring.
@@ -507,7 +507,7 @@ Proof.
   apply Qle_shift_div_r; auto with *.
   apply: mult_resp_leEq_lft; simpl;auto with *.
   apply Qle_trans with e; auto with *.
- setoid_replace (f- y) with (f - constStepF (1:QS)*y) by ring.
+ setoid_replace (f- y) with (f - constStepF (1:QS)*y); [| ring].
  rewrite <- X.
  unfold f.
  ring.

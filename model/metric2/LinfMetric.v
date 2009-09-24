@@ -157,7 +157,7 @@ Proof.
  apply Qabs_case; intros H; [|rewrite <- Qabs_opp in H0, H1; rewrite -> X in *];
    (rewrite Qmax_minus_distr_l; unfold Qminus; apply Qmax_lub;[|clear H0; rename H1 into H0];
      (eapply Qle_trans;[|apply H0; auto]); (eapply Qle_trans;[|apply Qle_Qabs]); unfold Qminus;
-       apply: plus_resp_leEq_lft; simpl; auto with *).
+       apply: plus_resp_leEq_lft; simpl; auto with * ).
 Qed.
 
 Open Local Scope uc_scope.
@@ -189,7 +189,7 @@ Proof.
  unfold StepQabs.
  rewrite MapGlue.
  rewrite Integral_glue.
- setoid_replace (e:Q) with (o*e + (1-o)*e)%Q by ring.
+ setoid_replace (e:Q) with (o*e + (1-o)*e)%Q; [| ring].
  simpl in H.
  unfold StepFSupBall, StepFfoldProp in H.
  simpl in H.

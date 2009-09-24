@@ -42,6 +42,9 @@ in order to avoid name clashes with setoid_rewrite
 in Coq's initial environment.
 *)
 
+Ltac typeof x := type of x.
+  (* Quickly secure "type of" before the following Require brings in ssreflect which destroys it. *)
+
 Require Export CSetoidFun.
 
 Section move_us.
@@ -558,7 +561,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
 
 (* rewrite -> h *)
 Ltac total_csetoid_rewrite h :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
@@ -574,7 +577,7 @@ Ltac total_csetoid_rewrite h :=
 
 (* rewrite <- h *)
 Ltac total_csetoid_rewrite_rev h :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
@@ -590,11 +593,11 @@ Ltac total_csetoid_rewrite_rev h :=
 
 (* rewrite -> h in h0 *)
 Ltac total_csetoid_rewrite_cxt h h0 :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
-      let h1 := constr:(eq_symmetric S r1 r2 h) with A := type of h0 in
+      let h1 := constr:(eq_symmetric S r1 r2 h) with A := typeof h0 in
       let B := tot_repl_in_form S r1 r2 A
       with d := tot_set_rewr_prf1 S r1 r2 h h1 A in
       ((*:A->B*) cut B;
@@ -603,11 +606,11 @@ Ltac total_csetoid_rewrite_cxt h h0 :=
 
 (* rewrite <- h in h0 *)
 Ltac total_csetoid_rewrite_cxt_rev h h0 :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
-      let h1 := constr:(eq_symmetric S r2 r1 h) with A := type of h0 in
+      let h1 := constr:(eq_symmetric S r2 r1 h) with A := typeof h0 in
       let B := tot_repl_in_form S r1 r2 A
       with d := tot_set_rewr_prf1 S r1 r2 h1 h A in
       ((*:A->B*) cut B;
@@ -876,7 +879,7 @@ Ltac psxe_quote r t :=
 replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 
 Ltac part_repl_in_form H A :=
-  let type_of_H := type of H in
+  let type_of_H := typeof H in
   match constr:type_of_H with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let r1 := constr:X2 with r2 := constr:X3 in
@@ -1231,7 +1234,7 @@ Ltac Unfold_partial_csetoid_rewrite_stuff :=
 
 (* rewrite -> h *)
 Ltac partial_csetoid_rewrite h :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
@@ -1247,7 +1250,7 @@ Ltac partial_csetoid_rewrite h :=
 
 (* rewrite <- h *)
 Ltac partial_csetoid_rewrite_rev h :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
@@ -1263,11 +1266,11 @@ Ltac partial_csetoid_rewrite_rev h :=
 
 (* rewrite -> h in h0 *)
 Ltac partial_csetoid_rewrite_cxt h h0 :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
-      let h1 := constr:(eq_symmetric T r1 r2 h) with A := type of h0 in
+      let h1 := constr:(eq_symmetric T r1 r2 h) with A := typeof h0 in
       let B := part_repl_in_form h A
       with d := part_set_rewr_prf1 r1 r2 h h1 A in
       ((*:A->B*) cut B;
@@ -1277,11 +1280,11 @@ Ltac partial_csetoid_rewrite_cxt h h0 :=
 
 (* rewrite <- h in h0 *)
 Ltac partial_csetoid_rewrite_cxt_rev h h0 :=
-  let type_of_h := type of h in
+  let type_of_h := typeof h in
   match constr:type_of_h with
   | (cs_eq (s:=(cs_crr ?X1)) ?X2 ?X3) =>
       let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
-      let h1 := constr:(eq_symmetric T r2 r1 h) with A := type of h0 in
+      let h1 := constr:(eq_symmetric T r2 r1 h) with A := typeof h0 in
       let B := part_repl_in_form h A
       with d := part_set_rewr_prf1 r1 r2 h1 h A in
       ((*:A->B*) cut B;
@@ -1476,7 +1479,7 @@ Ltac csetoid_rewrite_rev h :=
   end.
 
 Ltac csetoid_rewrite_cxt h h0 :=
-  let A := type of h0 in
+  let A := typeof h0 in
       let b := form_cont_part A in
       let c := eval compute in b in
       match constr:c with
@@ -1485,7 +1488,7 @@ Ltac csetoid_rewrite_cxt h h0 :=
       end.
 
 Ltac csetoid_rewrite_cxt_rev h h0 :=
-  let A := type of h0 in
+  let A := typeof h0 in
       let b := form_cont_part A in
       let c := eval compute in b in
       match constr:c with

@@ -80,7 +80,7 @@ Proof.
   apply Zle_refl.
  rewrite inj_S.
  unfold Zsucc.
- do 2 (rewrite Zpower_exp;try auto with *).
+ do 2 (rewrite Zpower_exp;try auto with * ).
  ring_simplify.
  apply Zmult_le_compat; try discriminate.
   assumption.

@@ -727,9 +727,10 @@ Proof.
  stepl (f a Ha).
   apply lft_leEq_Max.
  apply pfwdef.
- stepr (Max b a) by apply Max_comm.
- apply eq_symmetric; apply leEq_imp_Max_is_rht.
- assumption.
+ stepr (Max b a).
+  apply eq_symmetric; apply leEq_imp_Max_is_rht.
+  assumption.
+ by apply Max_comm.
 Qed.
 
 Lemma Min_monotone : forall (f: PartIR),
@@ -756,9 +757,10 @@ Proof.
  stepr (f b Hb).
   apply Min_leEq_rht.
  apply pfwdef.
- stepr (Min b a) by apply Min_comm.
- apply eq_symmetric; apply leEq_imp_Min_is_lft.
- assumption.
+ stepr (Min b a).
+  apply eq_symmetric; apply leEq_imp_Min_is_lft.
+  assumption.
+ apply Min_comm.
 Qed.
 
 End Minimum.
@@ -1268,14 +1270,17 @@ Proof.
  intros a.
  apply Qabs_case; intros H.
   apply AbsIR_eq_x.
-  stepl (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
-  apply inj_Q_leEq.
-  assumption.
- stepr ([--](inj_Q IR a)) by apply eq_symmetric;apply inj_Q_inv.
- apply AbsIR_eq_inv_x.
- stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0).
- apply inj_Q_leEq.
- assumption.
+  stepl (inj_Q IR Zero).
+   apply inj_Q_leEq.
+   assumption.
+  by apply (inj_Q_nring IR 0).
+ stepr ([--](inj_Q IR a)).
+  apply AbsIR_eq_inv_x.
+  stepr (inj_Q IR Zero).
+   apply inj_Q_leEq.
+   assumption.
+  by apply (inj_Q_nring IR 0).
+ apply eq_symmetric. apply inj_Q_inv.
 Qed.
 
 End Absolute.

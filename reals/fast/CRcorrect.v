@@ -165,7 +165,7 @@ Proof.
  simpl in Hc.
  unfold Qball.
  set (n:=max (max a b) c).
- stepr ((x a - x n) + (y n - y b) + (x n - y n))%Q by (simpl;ring).
+ stepr ((x a - x n) + (y n - y b) + (x n - y n))%Q; [| simpl; ring].
  autorewrite with QposElim.
  repeat (apply: AbsSmall_plus).
    apply AbsSmall_minus.
@@ -248,7 +248,7 @@ Proof.
    apply le_trans with (max n (nat_of_P ed));auto with *.
   change (1*P_of_succ_nat m <= en * P_of_succ_nat m)%Z.
   apply Zmult_lt_0_le_compat_r;auto with *.
- stepl ((1#2)*(en#ed)%Qpos+(1#2)*(en#ed)%Qpos)%Q by (simpl;ring).
+ stepl ((1#2)*(en#ed)%Qpos+(1#2)*(en#ed)%Qpos)%Q; [| simpl; ring].
  rstepr ((x m[-]x n)[+](x n[-]x n')).
  assert (Y:n <= m).
   apply le_trans with (max n (nat_of_P ed));auto with *.
@@ -265,8 +265,8 @@ Proof.
  intros x y.
  split;[|apply Cauchy_IRasCR_wd].
  intros H.
- stepl (CRasCauchy_IR (Cauchy_IRasCR x)) by (apply Cauchy_IRasCauchy_IR).
- stepr (CRasCauchy_IR (Cauchy_IRasCR y)) by (apply Cauchy_IRasCauchy_IR).
+ stepl (CRasCauchy_IR (Cauchy_IRasCR x)); [| apply Cauchy_IRasCauchy_IR].
+ stepr (CRasCauchy_IR (Cauchy_IRasCR y)); [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  assumption.
 Qed.
@@ -297,7 +297,7 @@ forall (x:CR),
 (f (CRasCauchy_IR x) [=] CRasCauchy_IR (g x)).
 Proof.
  intros f g g_wd H x.
- stepl (CRasCauchy_IR (Cauchy_IRasCR (f (CRasCauchy_IR x)))) by apply Cauchy_IRasCauchy_IR.
+ stepl (CRasCauchy_IR (Cauchy_IRasCR (f (CRasCauchy_IR x)))); [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  symmetry.
  transitivity (g (Cauchy_IRasCR (CRasCauchy_IR x))); try apply H.
@@ -330,8 +330,8 @@ forall (x y:CR),
 (f (CRasCauchy_IR x) (CRasCauchy_IR y) [=] CRasCauchy_IR (g x y)).
 Proof.
  intros f g g_wd H x y.
- stepl (CRasCauchy_IR (Cauchy_IRasCR (f (CRasCauchy_IR x) (CRasCauchy_IR y)))) by
-   apply Cauchy_IRasCauchy_IR.
+ stepl (CRasCauchy_IR (Cauchy_IRasCR (f (CRasCauchy_IR x) (CRasCauchy_IR y))));
+   [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  symmetry.
  transitivity (g (Cauchy_IRasCR (CRasCauchy_IR x)) (Cauchy_IRasCR (CRasCauchy_IR y))); [|apply H].
@@ -400,13 +400,13 @@ Proof.
  apply ball_triangle with (x n + y n)%Q.
   setoid_replace e with (((1 # 2) * e +(1 # 2) * e)%Qpos ) by QposRing.
   apply ball_triangle with (x n1 + y n)%Q; simpl; unfold Qball.
-   stepr (y n2 - y n)%Q by (simpl;ring).
+   stepr (y n2 - y n)%Q; [| simpl; ring].
    apply AbsSmall_minus.
    apply Hn2.
    unfold n.
    rewrite max_assoc.
    auto with *.
-  stepr (x n1 - x n)%Q by (simpl;ring).
+  stepr (x n1 - x n)%Q; [| simpl; ring].
   apply AbsSmall_minus.
   apply Hn1.
   unfold n.
@@ -438,7 +438,7 @@ Proof.
  set (n:=(max n1 n2)).
  change (ball (e+e) (- x n1) (- x n2))%Q.
  apply ball_triangle with (- x n)%Q; simpl; unfold Qball;
-   [stepr (x n - x n1)%Q by (simpl;ring);apply Hn1| apply Hn2]; unfold n; auto with*.
+   [stepr (x n - x n1)%Q; [| simpl; ring];apply Hn1| apply Hn2]; unfold n; auto with*.
 Qed.
 
 Hint Rewrite Cauchy_IR_opp_as_CR_opp : CRtoCauchy_IR.
@@ -554,11 +554,11 @@ Proof.
   simpl.
   rewrite <- Hxn1.
   unfold Qball.
-  stepr ((x n - x n1)*y n)%Q by (simpl; ring).
+  stepr ((x n - x n1)*y n)%Q; [| simpl; ring].
   apply AbsSmall_trans with ((1#2)*e)%Q.
    apply half_3.
    apply Qpos_prf.
-  stepl (((1#2)*e/z)*z)%Q by (simpl;field;apply Qpos_nonzero).
+  stepl (((1#2)*e/z)*z)%Q; [| simpl;field;apply Qpos_nonzero].
   apply mult_AbsSmall;[apply Hn1|apply Hz]; unfold n; apply le_trans with (max n1 N); auto with *.
  intros w Hw.
  simpl.
@@ -573,9 +573,9 @@ Proof.
  clear Hn3.
  setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
  apply ball_triangle with (x n1 * y n)%Q; apply ball_sym; simpl; unfold Qball.
-  stepr (x n1*(y n - Qmax (- z) (Qmin z (y n2))))%Q by (simpl;ring).
+  stepr (x n1*(y n - Qmax (- z) (Qmin z (y n2))))%Q; [| simpl;ring].
   autorewrite with QposElim.
-  stepl (((1#2)*e/w)*w)%Q by (simpl;field;apply Qpos_nonzero).
+  stepl (((1#2)*e/w)*w)%Q; [| simpl;field;apply Qpos_nonzero].
   apply mult_AbsSmall;[apply Hw|].
   destruct (Hz n H2) as [X0 X1].
   destruct (Hn2 _ H0) as [X2 X3].
@@ -606,9 +606,9 @@ Proof.
   rewrite Qle_minus_iff.
   replace RHS with ((w + (-1 # 1) * y n + y n2)+(- z + - y n2))%Q by ring.
   apply: plus_resp_nonneg; assumption.
- stepr ((x n - x n1)*y n)%Q by (simpl;ring).
+ stepr ((x n - x n1)*y n)%Q; [| simpl; ring].
  autorewrite with QposElim.
- stepl (((1#2)*e/z)*z)%Q by (simpl;field;apply Qpos_nonzero).
+ stepl (((1#2)*e/z)*z)%Q; [| simpl; field; apply Qpos_nonzero].
  apply mult_AbsSmall;[apply Hn1;assumption|apply Hz;assumption].
 Qed.
 
@@ -625,7 +625,7 @@ Proof.
    split.
     apply inv_resp_AbsSmall.
    intros X.
-   stepr (- - y)%Q by (simpl; ring).
+   stepr (- - y)%Q; [| simpl; ring].
    apply inv_resp_AbsSmall.
    assumption.
   rewrite X.
@@ -717,8 +717,8 @@ Lemma Cauchy_IR_lt_as_CR_lt_2 : forall (x y:Cauchy_IR),
 ((Cauchy_IRasCR x) < (Cauchy_IRasCR y))%CR -> x[<]y.
 Proof.
  intros x y H.
- stepl (CRasCauchy_IR (Cauchy_IRasCR (x))) by (apply Cauchy_IRasCauchy_IR).
- stepr (CRasCauchy_IR (Cauchy_IRasCR (y))) by (apply Cauchy_IRasCauchy_IR).
+ stepl (CRasCauchy_IR (Cauchy_IRasCR (x))); [| apply Cauchy_IRasCauchy_IR].
+ stepr (CRasCauchy_IR (Cauchy_IRasCR (y))); [| apply Cauchy_IRasCauchy_IR].
  apply CR_lt_as_Cauchy_IR_lt_1.
  assumption.
 Qed.
@@ -796,8 +796,8 @@ Proof.
     auto with *.
    unfold m; auto with *.
   apply Qlt_le_trans with z; auto with *.
- stepr ((/(Qmax z (x b))*/(x m))*(x m - (Qmax z (x b))))%Q by (simpl; field; assumption).
- stepl ((/ Qmax z (x b) * / x m)*((Qmax z (x b))*(x m)*e))%Q by (simpl;field; assumption).
+ stepr ((/(Qmax z (x b))*/(x m))*(x m - (Qmax z (x b))))%Q; [| simpl; field; assumption].
+ stepl ((/ Qmax z (x b) * / x m)*((Qmax z (x b))*(x m)*e))%Q; [| simpl;field; assumption].
  apply mult_resp_AbsSmall.
   assert (foo:forall q:Q, (0<=q -> 0<=/q)%Q).
    intros [[|p|p] q] qH; apply qH.
@@ -921,7 +921,7 @@ Lemma CR_inv_as_Cauchy_IR_inv : forall (x:CR) x_ H,
 f_rcpcl (CRasCauchy_IR x) H [=] CRasCauchy_IR (@CRinv x x_).
 Proof.
  intros x x_ H.
- stepl (CRasCauchy_IR (Cauchy_IRasCR (f_rcpcl (CRasCauchy_IR x) H))) by apply Cauchy_IRasCauchy_IR.
+ stepl (CRasCauchy_IR (Cauchy_IRasCR (f_rcpcl (CRasCauchy_IR x) H))); [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  rewrite <- Cauchy_IR_inv_as_CR_inv_short.
  apply CRinv_wd.

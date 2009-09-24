@@ -292,8 +292,8 @@ Proof.
    apply Qinv_lt_0_compat.
    assumption.
   assert (0 <e) by auto with *.
-  replace RHS with (/a^n) by (field; split; auto with *).
-  replace LHS with (/e) by (field; split; auto with *).
+  replace RHS with (/a^n) by (field; split; auto with * ).
+  replace LHS with (/e) by (field; split; auto with * ).
   rewrite -> Qlt_minus_iff in Ha1.
   change (0<1-a) in Ha1.
   rewrite -> Qle_minus_iff in H.
@@ -386,7 +386,7 @@ Proof.
   destruct (Qlt_le_dec 0 (Qabs (hd series))).
    apply Qmult_lt_0_le_reg_r with (/Qabs (hd series)).
     apply Qinv_lt_0_compat; assumption.
-   replace LHS with (a ^ InfiniteGeometricSum_maxIter series err) by (field; auto with *).
+   replace LHS with (a ^ InfiniteGeometricSum_maxIter series err) by (field; auto with * ).
    cut (a ^ InfiniteGeometricSum_maxIter series err <= (err * mkQpos X / mkQpos q)%Qpos).
     autorewrite with QposElim; auto.
    apply GeometricCovergenceLemma.
@@ -568,7 +568,7 @@ Proof.
     rewrite <- Qlt_minus_iff.
     assumption.
    clear - He' Ha0 X.
-   replace LHS with ((Qabs (hd series)/(1-a))*(1-a)) by (field; auto with *).
+   replace LHS with ((Qabs (hd series)/(1-a))*(1-a)) by (field; auto with * ).
    replace RHS with (e*1) by ring.
    apply: mult_resp_leEq_both; simpl; try solve[Qauto_nonneg]; auto with *.
    rewrite Qle_minus_iff.
@@ -649,7 +649,7 @@ Proof.
   unfold e in *.
   autorewrite with QposElim in *.
   split; assumption.
- stepr (InfiniteGeometricSum Gs[-]'0)%CR by (unfold cg_minus; simpl; ring).
+ stepr (InfiniteGeometricSum Gs[-]'0)%CR; [| by (unfold cg_minus; simpl; ring)].
  rewrite CRAbsSmall_ball.
  apply: regFunBall_e.
  intros d.
@@ -698,22 +698,22 @@ Proof.
  exists 0%nat.
  exists (inj_Q IR a).
   rstepr (nring 1:IR).
-  stepr (inj_Q IR (nring 1)) by apply (inj_Q_nring IR 1).
+  stepr (inj_Q IR (nring 1)); [| by apply (inj_Q_nring IR 1)].
   apply inj_Q_less.
   assumption.
  assert (Ha0':Zero[<=]inj_Q IR a).
   rstepl (nring 0:IR).
-  stepl (inj_Q IR (nring 0)) by apply (inj_Q_nring IR 0).
+  stepl (inj_Q IR (nring 0)); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
  split.
   assumption.
  intros n _.
  destruct (ForAll_Str_nth_tl n H) as [H0 _].
- stepr (inj_Q IR a[*](inj_Q IR (Qabs (Str_nth n series)))) by
-   apply mult_wdr; apply eq_symmetric; apply AbsIR_Qabs.
- stepl (inj_Q IR (Qabs (Str_nth (S n) series))) by apply eq_symmetric; apply AbsIR_Qabs.
- stepr (inj_Q IR (a[*]Qabs (Str_nth n series))) by apply inj_Q_mult.
+ stepr (inj_Q IR a[*](inj_Q IR (Qabs (Str_nth n series)))); [| by
+   apply mult_wdr; apply eq_symmetric; apply AbsIR_Qabs].
+ stepl (inj_Q IR (Qabs (Str_nth (S n) series))); [| by apply eq_symmetric; apply AbsIR_Qabs].
+ stepr (inj_Q IR (a[*]Qabs (Str_nth n series))); [| by apply inj_Q_mult].
  apply inj_Q_leEq.
  replace (S n) with (1+n)%nat by auto with *.
  rewrite <- Str_nth_plus.
@@ -761,13 +761,13 @@ Proof.
     simpl.
     rewrite IR_Zero_as_CR.
     ring.
-   stepl (IRasCR (CRasIR (e[/]TwoNZ)))%CR by apply CRasIRasCR_id.
-   stepr (IRasCR (CRasIR (InfiniteGeometricSum Gs)))%CR by apply CRasIRasCR_id.
+   stepl (IRasCR (CRasIR (e[/]TwoNZ)))%CR; [| by apply CRasIRasCR_id].
+   stepr (IRasCR (CRasIR (InfiniteGeometricSum Gs)))%CR; [| by apply CRasIRasCR_id].
    rewrite <- IR_AbsSmall_as_CR.
    apply AbsSmall_approach.
    intros d Hd.
    rewrite IR_AbsSmall_as_CR.
-   stepr (InfiniteGeometricSum Gs) by apply eq_symmetric; apply CRasIRasCR_id.
+   stepr (InfiniteGeometricSum Gs); [| by apply eq_symmetric; apply CRasIRasCR_id].
    destruct (Q_dense_in_CReals IR d) as [q Hq0 Hq].
     assumption.
    assert (Hq0': 0 < q).
@@ -777,12 +777,12 @@ Proof.
     apply eq_symmetric; apply (inj_Q_nring IR 0).
    destruct (InfiniteGeometricSum_small_tail (mkQpos Hq0') Gs) as [m Hm].
    rstepr ((IRasCR (Sum0 (G:=IR) m x))[+]((InfiniteGeometricSum Gs)[-](IRasCR (Sum0 (G:=IR) m x)))).
-   stepl (IRasCR (CRasIR (e [/]TwoNZ))[+](IRasCR d)) by apply eq_symmetric; apply IR_plus_as_CR.
+   stepl (IRasCR (CRasIR (e [/]TwoNZ))[+](IRasCR d)); [| by apply eq_symmetric; apply IR_plus_as_CR].
    apply AbsSmall_plus.
-    stepl (e [/]TwoNZ) by apply eq_symmetric; apply CRasIRasCR_id.
+    stepl (e [/]TwoNZ); [| by apply eq_symmetric; apply CRasIRasCR_id].
     apply Hn'; auto with *.
    apply AbsSmall_leEq_trans with ('q)%CR.
-    stepl (IRasCR (inj_Q IR q)) by apply IR_inj_Q_as_CR.
+    stepl (IRasCR (inj_Q IR q)); [| by apply IR_inj_Q_as_CR].
     rewrite <- IR_leEq_as_CR.
     apply less_leEq.
     assumption.
@@ -837,7 +837,7 @@ Proof.
      intros; apply eq_reflexive.
     intros m.
     unfold y.
-    stepr ((inj_Q IR (Str_nth (m+1) seq))) by apply (Hx (m + 1)%nat).
+    stepr ((inj_Q IR (Str_nth (m+1) seq))); [| by apply (Hx (m + 1)%nat)].
     rewrite <- Str_nth_plus.
     apply eq_reflexive.
    intros m Hm.

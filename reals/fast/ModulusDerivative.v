@@ -98,11 +98,11 @@ Proof.
  rewrite <- CRAbsSmall_ball.
  unfold cg_minus.
  simpl.
- stepl (IRasCR (inj_Q IR (e:Q))) by simpl; apply IR_inj_Q_as_CR.
+ stepl (IRasCR (inj_Q IR (e:Q))); [| by simpl; apply IR_inj_Q_as_CR].
  stepr (IRasCR ((f (inj_Q IR (clamp a))
    (Derivative_imp_inc I properI f f' Hf (inj_Q IR (clamp a)) (X a)))[-] (f (inj_Q IR (clamp b))
      (Derivative_imp_inc I properI f f' Hf (inj_Q IR (clamp b)) (X b)))))
-       by simpl; apply IR_minus_as_CR.
+       ; [| by simpl; apply IR_minus_as_CR].
  rewrite <- IR_AbsSmall_as_CR.
  apply AbsIR_imp_AbsSmall.
  eapply leEq_transitive;[eapply Law_of_the_Mean_Abs_ineq;try apply Hf;try apply X|].
@@ -131,13 +131,13 @@ Proof.
    apply inj_Q_leEq.
    destruct Hyc; auto.
   apply AbsSmall_imp_AbsIR.
-  stepr (inj_Q IR (clamp a - clamp b)%Q) by apply inj_Q_minus.
+  stepr (inj_Q IR (clamp a - clamp b)%Q); [| by apply inj_Q_minus].
   apply inj_Q_AbsSmall.
   change (ball y (clamp a) (clamp b)).
   apply ball_clamp.
   auto.
  assert (Z:Zero[<]inj_Q IR (y:Q)).
-  (stepl (inj_Q IR (Zero:Q)) by apply (inj_Q_nring IR 0)); apply inj_Q_less; apply Qpos_prf.
+  (stepl (inj_Q IR (Zero:Q)); [| by apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_prf.
  apply: eq_transitive.
   apply mult_wdl.
   apply (inj_Q_div IR e _ (pos_ap_zero _ _ Z)).

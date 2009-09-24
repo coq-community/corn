@@ -130,7 +130,7 @@ Proof.
  destruct y as [y|];[|constructor].
  simpl.
  unfold Qball.
- stepr ((hd a-0)*(hd b-0)) by (simpl;ring).
+ stepr ((hd a-0)*(hd b-0)); [| by (simpl;ring)].
  autorewrite with QposElim.
  apply mult_AbsSmall; assumption.
 Qed.
@@ -361,7 +361,7 @@ Proof.
  constructor.
   simpl.
   unfold Qball.
-  stepr b by (simpl;ring).
+  stepr b; [| by (simpl;ring)].
   split;simpl.
    apply Qle_trans with 0;[discriminate|assumption].
   assumption.
@@ -433,7 +433,7 @@ Proof.
  constructor.
   simpl.
   unfold Qball.
-  stepr (1#q) by (simpl;ring).
+  stepr (1#q); [| by (simpl;ring)].
   apply (AbsSmall_leEq_trans _ (1#q)).
    change (1*d <= n*q)%Z.
    apply Zmult_le_compat; auto with *.
@@ -507,7 +507,7 @@ Proof.
  pose (ONE:=1%positive).
  replace (fac n) with ((nat_of_P 1)*fac (pred (nat_of_P ONE) + n))%nat by (simpl;auto).
  replace (nat_of_P (Str_nth n (factorials_help 1 1)))
-   with ((fac (pred (nat_of_P ONE)))*(nat_of_P (Str_nth n (factorials_help ONE 1))))%nat by (simpl; auto with *).
+   with ((fac (pred (nat_of_P ONE)))*(nat_of_P (Str_nth n (factorials_help ONE 1))))%nat by (simpl; auto with * ).
  change (factorials_help 1 1) with (factorials_help ONE 1).
  generalize ONE.
  generalize 1%positive.

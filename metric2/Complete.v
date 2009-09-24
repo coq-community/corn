@@ -68,12 +68,13 @@ Proof.
  intros f g H e1 e2.
  apply ball_closed.
  intros d.
- setoid_replace (e1+e2+d)%Qpos with ((e1 + ((1#4)*d) + (((1#4)*d)+((1#4)*d)) +(((1#4)*d)+e2)))%Qpos by (QposRing).
- eapply ball_triangle.
+ setoid_replace (e1+e2+d)%Qpos with ((e1 + ((1#4)*d) + (((1#4)*d)+((1#4)*d)) +(((1#4)*d)+e2)))%Qpos.
   eapply ball_triangle.
-   apply regFun_prf.
-  apply H.
- apply regFun_prf.
+   eapply ball_triangle.
+    apply regFun_prf.
+   apply H.
+  apply regFun_prf.
+ by QposRing.
 Qed.
 
 Lemma regFunEq_e_small : forall (f g : RegularFunction) (E:Qpos), (forall (e:Qpos), e <= E -> ball (m:=X) (e+e) (approximate f e) (approximate g e)) -> (regFunEq f g).
@@ -86,8 +87,9 @@ Proof.
  set (e':=Qpos_min ((1#4)*d) E).
  apply ball_weak_le with ((e+e')+(e'+e')+(e'+e))%Qpos.
   autorewrite with QposElim.
-  setoid_replace (e+e+d) with ((e+(1#4)*d)+((1#4)*d+(1#4)*d)+((1#4)*d+e)) by QposRing.
-  repeat apply: plus_resp_leEq_both;simpl; try apply: Qpos_min_lb_l; auto with *.
+  setoid_replace (e+e+d) with ((e+(1#4)*d)+((1#4)*d+(1#4)*d)+((1#4)*d+e)).
+   repeat apply: plus_resp_leEq_both;simpl; try apply: Qpos_min_lb_l; auto with *.
+  by QposRing.
  apply ball_triangle with (approximate g e').
   apply ball_triangle with (approximate f e').
    apply regFun_prf.
@@ -104,16 +106,18 @@ Proof.
   unfold Symmetric, regFunEq.
   intros.
   apply ball_sym.
-  setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
-  auto.
+  setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos.
+   auto.
+  by QposRing.
  unfold Transitive, regFunEq.
  intros.
  apply ball_closed.
  intros.
- setoid_replace (e1+e2+d)%Qpos with ((e1 + (1#2)*d) + ((1#2)*d+e2))%Qpos by QposRing.
- eapply ball_triangle.
-  apply H.
- apply H0.
+ setoid_replace (e1+e2+d)%Qpos with ((e1 + (1#2)*d) + ((1#2)*d+e2))%Qpos.
+  eapply ball_triangle.
+   apply H.
+  apply H0.
+ by QposRing.
 Qed.
 
 Definition regFun_Setoid := Build_Setoid regFun_is_setoid.
@@ -135,7 +139,8 @@ Proof.
   clear a2 Ha.
   apply ball_closed.
   intros d.
-  setoid_replace (d1 + a1 + d2 + d)%Qpos with (((1#4)*d+d1)+((1#4)*d + a1 + (1#4)*d)+((1#4)*d+d2))%Qpos by QposRing.
+  setoid_replace (d1 + a1 + d2 + d)%Qpos with (((1#4)*d+d1)+((1#4)*d + a1 + (1#4)*d)+((1#4)*d+d2))%Qpos;
+   [| QposRing].
   eapply ball_triangle.
    eapply ball_triangle.
     apply ball_sym.
@@ -162,34 +167,34 @@ Proof.
 Qed.
 
 Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid regFunBall.
-Proof.
+Proof with try QposRing.
  unfold regFunBall.
  split.
      intros e f d1 d2.
-     setoid_replace (d1 + e + d2)%Qpos with (d1+d2+e)%Qpos by QposRing.
+     setoid_replace (d1 + e + d2)%Qpos with (d1+d2+e)%Qpos...
      apply ball_weak.
      apply regFun_prf.
     intros e f g H d1 d2.
     apply ball_sym.
-    setoid_replace (d1 + e + d2)%Qpos with (d2+e+d1)%Qpos by QposRing.
+    setoid_replace (d1 + e + d2)%Qpos with (d2+e+d1)%Qpos...
     auto.
    intros e1 e2 a b c Hab Hbc d1 d2.
    apply ball_closed.
    intros d3.
-   setoid_replace (d1+(e1+e2)+d2+d3)%Qpos with ((d1 + e1 + (1#2)*d3)+((1#2)*d3 + e2 + d2))%Qpos by QposRing.
+   setoid_replace (d1+(e1+e2)+d2+d3)%Qpos with ((d1 + e1 + (1#2)*d3)+((1#2)*d3 + e2 + d2))%Qpos...
    eapply ball_triangle.
     apply Hab.
    apply Hbc.
   intros e a b H d1 d2.
   apply ball_closed.
   intros d.
-  setoid_replace (d1+e+d2+d)%Qpos with (d1 + (e+d) + d2)%Qpos by QposRing.
+  setoid_replace (d1+e+d2+d)%Qpos with (d1 + (e+d) + d2)%Qpos...
   auto.
  unfold regFunEq.
  intros a b H e1 e2.
  apply ball_closed.
  intros d.
- setoid_replace (e1+e2+d)%Qpos with (e1+d+e2)%Qpos by QposRing.
+ setoid_replace (e1+e2+d)%Qpos with (e1+d+e2)%Qpos...
  auto.
 Qed.
 
@@ -203,12 +208,13 @@ in ways that you would expect. *)
 Lemma regFunBall_ball : forall (x y:Complete) (e0 e1 e2:Qpos), ball e0 (approximate x e1) (approximate y e2) -> ball (e1 + e0 + e2) x y.
 Proof.
  intros x y e0 e1 e2 H d1 d2.
- setoid_replace (d1+(e1+e0+e2)+d2)%Qpos with ((d1+e1)+e0+(e2+d2))%Qpos by QposRing.
- eapply ball_triangle.
+ setoid_replace (d1+(e1+e0+e2)+d2)%Qpos with ((d1+e1)+e0+(e2+d2))%Qpos.
   eapply ball_triangle.
-   apply regFun_prf.
-  apply H.
- apply regFun_prf.
+   eapply ball_triangle.
+    apply regFun_prf.
+   apply H.
+  apply regFun_prf.
+ QposRing.
 Qed.
 
 Lemma regFunBall_e : forall (x y:Complete) e, (forall d, ball (d + e + d) (approximate x d) (approximate y d)) -> ball e x y.
@@ -216,9 +222,10 @@ Proof.
  intros x y e H.
  apply ball_closed.
  intros d.
- setoid_replace (e + d)%Qpos with ((1#4)*d + ((1#4)*d+e+(1#4)*d) + (1#4)*d)%Qpos by QposRing.
- apply regFunBall_ball.
- apply H.
+ setoid_replace (e + d)%Qpos with ((1#4)*d + ((1#4)*d+e+(1#4)*d) + (1#4)*d)%Qpos.
+  apply regFunBall_ball.
+  apply H.
+ by QposRing.
 Qed.
 
 (**
@@ -238,9 +245,10 @@ Lemma Cunit_prf : is_UniformlyContinuousFunction Cunit_fun Qpos2QposInf.
 Proof.
  intros e a b Hab d1 d2.
  simpl in *.
- setoid_replace (d1+e+d2)%Qpos with (e+(d1+d2))%Qpos by QposRing.
- apply ball_weak.
- assumption.
+ setoid_replace (d1+e+d2)%Qpos with (e+(d1+d2))%Qpos.
+  apply ball_weak.
+  assumption.
+ by QposRing.
 Qed.
 
 Definition Cunit : X --> Complete :=
@@ -256,8 +264,9 @@ Proof.
  split.
   intros H.
   do 2 (apply ball_closed; intro).
-  setoid_replace (e+d+d0)%Qpos with (d+e+d0)%Qpos by QposRing.
-  apply H.
+  setoid_replace (e+d+d0)%Qpos with (d+e+d0)%Qpos.
+   apply H.
+  by QposRing.
  intros H d1 d2.
  apply: Cunit_prf.
  assumption.
@@ -413,7 +422,7 @@ Lemma Cjoin_fun_prf (x:Complete (Complete X)) : is_RegularFunction (Cjoin_raw x)
 Proof.
  intros x d1 d2.
  rewrite <- ball_Cunit.
- setoid_replace (d1 + d2)%Qpos with ((1#2)*d1 + ((1#2)*d1+(1#2)*d2) + (1#2)*d2)%Qpos by QposRing.
+ setoid_replace (d1 + d2)%Qpos with ((1#2)*d1 + ((1#2)*d1+(1#2)*d2) + (1#2)*d2)%Qpos; [| QposRing].
  apply ball_triangle with (approximate x ((1#2)*d2))%Qpos.
   apply ball_triangle with (approximate x ((1#2)*d1))%Qpos.
    apply ball_approx_l.
@@ -428,7 +437,7 @@ Lemma Cjoin_prf : is_UniformlyContinuousFunction Cjoin_fun Qpos2QposInf.
 Proof.
  intros e x y Hab d1 d2.
  do 2 rewrite <- ball_Cunit.
- setoid_replace (d1 + e + d2)%Qpos with (((1#2)*d1 + (1#2)*d1) + e + (((1#2)*d2) + (1#2)*d2))%Qpos by QposRing.
+ setoid_replace (d1 + e + d2)%Qpos with (((1#2)*d1 + (1#2)*d1) + e + (((1#2)*d2) + (1#2)*d2))%Qpos; [| QposRing].
  apply ball_triangle with y.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1 # 2) * d1)%Qpos)).
@@ -510,8 +519,9 @@ Proof.
   destruct (H0 (mu f e2) (mu f e1)).
    auto.
   apply ball_sym.
-  setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
-  auto.
+  setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos.
+   auto.
+  by QposRing.
  clear e1 e2.
  intros e1 e2 H.
  apply ball_weak.
@@ -647,7 +657,7 @@ Proof.
   do 2 rewrite <- ball_Cunit.
   set (b:= (approximate (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)
     ((1 # 2) * ((1 # 2) * q))%Qpos)).
-  setoid_replace q with (((1#4)*q + (1#4)*q)+ ((1#4)*q+ (1#4)*q))%Qpos by QposRing.
+  setoid_replace q with (((1#4)*q + (1#4)*q)+ ((1#4)*q+ (1#4)*q))%Qpos; [| QposRing].
   unfold b; clear b.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
@@ -675,7 +685,7 @@ Proof.
  simpl.
  do 2 rewrite <- ball_Cunit.
  set (b:= (approximate (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos) ((1 # 2) * q)%Qpos)).
- setoid_replace q with (((1#2)*q + (1#4)*q)+ ((1#8)*q+ (1#8)*q))%Qpos by QposRing.
+ setoid_replace q with (((1#2)*q + (1#4)*q)+ ((1#8)*q+ (1#8)*q))%Qpos; [| QposRing].
  unfold b; clear b.
  apply ball_triangle with x.
   apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
@@ -700,18 +710,20 @@ Lemma MonadLaw5 : forall a, (Cjoin_fun (X:=X) (Cunit_fun _ a)) =m a.
 Proof.
  intros x e1 e2.
  simpl.
- setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + e2 + (1#2)*e1)%Qpos by QposRing.
- apply ball_weak.
- apply regFun_prf.
+ setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + e2 + (1#2)*e1)%Qpos.
+  apply ball_weak.
+  apply regFun_prf.
+ by QposRing.
 Qed.
 
 Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=X) Cunit) a) =m a.
 Proof.
  intros a e1 e2.
  simpl.
- setoid_replace (e1+e2)%Qpos with ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos by QposRing.
- apply ball_weak.
- apply: regFun_prf.
+ setoid_replace (e1+e2)%Qpos with ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos.
+  apply ball_weak.
+  apply: regFun_prf.
+ by QposRing.
 Qed.
 
 Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=Complete (Complete X)) Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
@@ -788,7 +800,7 @@ Proof.
  set (he0 := ((1#2)*e0)%Qpos).
  set (d0 := QposInf_min ((1#2)%Qpos*(mu f he0)) ((1#2)%Qpos*(mu g he0))).
  set (a0 := approximate x d0).
- setoid_replace (e+e0)%Qpos with (he0 + e + he0)%Qpos by (unfold he0;QposRing).
+ setoid_replace (e+e0)%Qpos with (he0 + e + he0)%Qpos; [| unfold he0; QposRing].
  apply ball_triangle with (Cunit (g a0)).
   apply ball_triangle with (Cunit (f a0)).
    rewrite <- (MonadLaw3 f a0).
@@ -833,7 +845,7 @@ Proof.
  change (Cmap_slow (Y:=Y) f2) with (Cmap_strong_slow f2).
  set (y1 :=(Cmap_strong_slow f1 x)).
  set (y2 :=(Cmap_strong_slow f2 x)).
- setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos by (unfold he1, he2; QposRing).
+ setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos; [| unfold he1, he2; QposRing].
  rewrite <- ball_Cunit.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
@@ -854,7 +866,7 @@ Proof.
  set (y1 := (Cmap_slow f1 x)).
  set (y2 := (Cmap_slow f2 x)).
  change (ball (d1 + e + d2) (approximate y1 d1') (approximate y2 d2)).
- setoid_replace (d1 + e + d2)%Qpos with (d1' + (d1' + e) + d2)%Qpos by (unfold d1'; QposRing).
+ setoid_replace (d1 + e + d2)%Qpos with (d1' + (d1' + e) + d2)%Qpos; [| unfold d1'; QposRing].
  rewrite <- ball_Cunit.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
@@ -868,7 +880,7 @@ Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction 
 Proof.
  intros f e x y H.
  set (e' := ((1#3)*e)%Qpos).
- setoid_replace e with (e'+e'+e')%Qpos by (unfold e';QposRing).
+ setoid_replace e with (e'+e'+e')%Qpos; [| unfold e'; by QposRing].
  apply ball_triangle with (Cmap_slow (approximate f e') y).
   apply ball_triangle with (Cmap_slow (approximate f e') x).
    apply Cap_slow_help.
@@ -886,7 +898,7 @@ Proof.
  intros e f1 f2 H x.
  apply ball_closed.
  intros d.
- setoid_replace (e+d)%Qpos with ((1#4)*d + ((1#4)*d + e + (1#4)*d) + (1#4)*d)%Qpos by QposRing.
+ setoid_replace (e+d)%Qpos with ((1#4)*d + ((1#4)*d + e + (1#4)*d) + (1#4)*d)%Qpos; [| QposRing].
  apply ball_triangle with (Cmap_strong_slow (approximate f2 ((1#4)*d)%Qpos) x).
   apply ball_triangle with (Cmap_strong_slow (approximate f1 ((1#4)*d)%Qpos) x).
    apply: Cap_slow_help.
@@ -970,11 +982,11 @@ Proof.
  destruct (Qpos_lt_plus Hed) as [c Hc].
  set (c':=((1#5)*c)%Qpos).
  assert (H:(c'+e+c')%Qpos < (e+(3#1)*c')%Qpos).
-  abstract ( rewrite Qlt_minus_iff; autorewrite with QposElim; ring_simplify; auto with *).
+  abstract ( rewrite Qlt_minus_iff; autorewrite with QposElim; ring_simplify; auto with * ).
  destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
   left.
   abstract ( change (QposEq d (e+c)) in Hc; rewrite Hc; rewrite <- ball_Cunit in H0;
-    (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos by (unfold c';QposRing));
+    (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos; [ | (unfold c';QposRing)]);
       eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
         [apply ball_approx_r|apply ball_approx_l]).
  right.

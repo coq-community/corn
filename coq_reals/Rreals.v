@@ -359,12 +359,14 @@ Proof.
  exists N.
  intros n m ngt mgt.
  assert (AbsSmall (eps / 2) ((seq n) - (seq m)) )%R.
-  stepr ((seq n - seq N) + (seq N - seq m))%R by (simpl; ring).
-  stepl (eps / 2 / 2 + eps / 2 / 2)%R by (simpl; field).
-  apply AbsSmall_plus.
-   apply NProp; assumption.
-  apply (AbsSmall_minus).
-  apply NProp; assumption.
+  stepr ((seq n - seq N) + (seq N - seq m))%R.
+   stepl (eps / 2 / 2 + eps / 2 / 2)%R.
+    apply AbsSmall_plus.
+     apply NProp; assumption.
+    apply (AbsSmall_minus).
+    apply NProp; assumption.
+   simpl; field.
+  simpl; ring.
  destruct H.
  unfold Rfunctions.R_dist.
  apply Rabs_def1.

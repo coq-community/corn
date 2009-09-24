@@ -604,11 +604,11 @@ Proof.
      replace LHS with (- (x-y)) by ring.
      auto.
     apply (shift_minus_leEq Q_as_COrdField).
-    stepr (Qclamp01 y) by (simpl; ring).
+    stepr (Qclamp01 y); [| by (simpl; ring)].
     apply Qclamp01_le.
     auto.
    apply (shift_minus_leEq Q_as_COrdField).
-   stepr y by (simpl; ring).
+   stepr y; [| by (simpl; ring)].
    auto.
   rewrite Qabs_pos.
    intros He.

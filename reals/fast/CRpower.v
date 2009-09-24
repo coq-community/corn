@@ -107,36 +107,36 @@ Proof.
  intros x _ Hx.
  change (AbsIR ((nring (R:=IR) (S n))[*](One[*]nexp IR n (inj_Q IR x)))[<=]
    inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
- stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))) by
-   (apply eq_symmetric; apply inj_Q_mult).
- stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n (inj_Q IR x)))) by apply AbsIR_mult;apply nring_nonneg; auto with *.
+ stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))); [| by
+   (apply eq_symmetric; apply inj_Q_mult)].
+ stepl ((nring (R:=IR) (S n)[*]AbsIR (One[*]nexp IR n (inj_Q IR x)))); [| by apply AbsIR_mult;apply nring_nonneg; auto with *].
  apply mult_resp_leEq_both.
     apply nring_nonneg; auto with *.
    apply AbsIR_nonneg.
-  stepl (inj_Q IR (nring (S n))) by apply inj_Q_nring.
+  stepl (inj_Q IR (nring (S n))); [| by apply inj_Q_nring].
   apply inj_Q_leEq.
   rewrite Hn.
   rewrite <- POS_anti_convert.
-  stepl ((S n):Q) by apply eq_symmetric; apply nring_Q.
+  stepl ((S n):Q); [| by apply eq_symmetric; apply nring_Q].
   apply leEq_reflexive.
- stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))) by apply AbsIR_mult; apply less_leEq; apply pos_one.
- stepl (AbsIR (nexp IR n (inj_Q _ x))) by apply eq_symmetric; apply one_mult.
- stepl (nexp IR n (AbsIR (inj_Q _ x))) by apply eq_symmetric; apply AbsIR_nexp.
- stepr (inj_Q IR (c ^ Zpred p)) by apply inj_Q_wd; simpl; rewrite Q_Qpos_power; reflexivity.
+ stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))); [| by apply AbsIR_mult; apply less_leEq; apply pos_one].
+ stepl (AbsIR (nexp IR n (inj_Q _ x))); [| by apply eq_symmetric; apply one_mult].
+ stepl (nexp IR n (AbsIR (inj_Q _ x))); [| by apply eq_symmetric; apply AbsIR_nexp].
+ stepr (inj_Q IR (c ^ Zpred p)); [| by apply inj_Q_wd; simpl; rewrite Q_Qpos_power; reflexivity].
  rewrite Hn.
  rewrite <- POS_anti_convert.
  rewrite inj_S.
  rewrite <- Zpred_succ.
  destruct n.
   change (One[<=]inj_Q IR (nring 1)).
-  stepr (nring (R:=IR) 1) by apply eq_symmetric; apply inj_Q_nring.
+  stepr (nring (R:=IR) 1); [| by apply eq_symmetric; apply inj_Q_nring].
   stepr (One:IR).
    apply leEq_reflexive.
   simpl; algebra.
  rewrite  <- (nat_of_P_o_P_of_succ_nat_eq_succ n).
  rewrite convert_is_POS.
  simpl.
- stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) CI) by apply eq_symmetric; apply Qpower_positive_correct.
+ stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) CI); [| by apply eq_symmetric; apply Qpower_positive_correct].
  simpl.
  apply: power_resp_leEq.
   apply AbsIR_nonneg.
@@ -185,7 +185,7 @@ Proof.
     reflexivity.
    rewrite <- Qle_max_r.
    apply leEq_inj_Q with IR.
-   stepl [--](inj_Q IR (c:Q)) by apply eq_symmetric; apply inj_Q_inv.
+   stepl [--](inj_Q IR (c:Q)); [| by apply eq_symmetric; apply inj_Q_inv].
    destruct Hq; assumption.
   rewrite <- Qle_min_r.
   apply leEq_inj_Q with IR.
@@ -205,16 +205,16 @@ Proof.
   symmetry.
   apply CRpower_positive_bounded_correct.
   rewrite IR_AbsSmall_as_CR.
-  stepl ('c1)%CR by simpl; symmetry; apply IR_inj_Q_as_CR.
-  stepr x by simpl; symmetry; apply CRasIRasCR_id.
+  stepl ('c1)%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
+  stepr x; [| by simpl; symmetry; apply CRasIRasCR_id].
   assumption.
  apply CRpower_positive_bounded_correct.
  apply AbsSmall_leEq_trans with (inj_Q IR (c1:Q)).
   apply inj_Q_leEq.
   assumption.
  rewrite IR_AbsSmall_as_CR.
- stepl ('c1)%CR by simpl; symmetry; apply IR_inj_Q_as_CR.
- stepr x by simpl; symmetry; apply CRasIRasCR_id.
+ stepl ('c1)%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
+ stepr x; [| by simpl; symmetry; apply CRasIRasCR_id].
  assumption.
 Qed.
 
@@ -244,7 +244,7 @@ Proof.
  intros x.
  apply CRpower_positive_bounded_correct.
  rewrite IR_AbsSmall_as_CR.
- stepl ('(CR_b (1#1) (IRasCR x)))%CR by simpl; symmetry; apply IR_inj_Q_as_CR.
+ stepl ('(CR_b (1#1) (IRasCR x)))%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
  split; simpl.
   rewrite CRopp_Qopp.
   apply CR_b_lowerBound.

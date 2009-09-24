@@ -584,7 +584,8 @@ Lemma Zmod0_Zdivides_pos :
 Proof.
  intros a b Hb Hdiv.
  elim Hdiv; intros q Hq.
- rewrite (Z_div_mod_eq a b) in Hq; rewrite <- (Zplus_0_r (q * b)) in Hq.
+ rewrite (Z_div_mod_eq a b) in Hq.
+  rewrite <- (Zplus_0_r (q * b)) in Hq.
   symmetry  in |- *.
   apply (Zdiv_remainder_unique (q * b + 0) b q 0 (a / b) (a mod b)).
      reflexivity.

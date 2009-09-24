@@ -407,7 +407,7 @@ Proof.
  intros d.
  set (d':=((1 # 4) * d)%Qpos).
  setoid_replace (e1 + e2 + d)%Qpos
-   with ((e1 + d') + (d' + d') +  (d' + e2))%Qpos by (unfold d';QposRing).
+   with ((e1 + d') + (d' + d') +  (d' + e2))%Qpos; [| unfold d';QposRing].
  apply almostIn_triangle_r with (approximate y1 d');[|apply Hy].
  symmetry in Hx.
  apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
@@ -446,7 +446,7 @@ Proof.
  exists (Cjoin a).
   abstract ( intros e1 e2; unfold inCompact in H; eapply almostIn_weak_le;
     [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos]; autorewrite with QposElim; rewrite Qle_minus_iff;
-      ring_simplify; auto with *).
+      ring_simplify; auto with * ).
  apply CunitCjoin.
 Defined.
 
@@ -468,11 +468,11 @@ Proof.
  intros H.
  destruct (locatedX x a Hed).
   exists a.
-  abstract (auto with *).
+  abstract (auto with * ).
  destruct IHs as [y Hy].
   abstract ( apply almostIn_stable; intros H0; apply H; split; auto).
  exists y.
- abstract (destruct Hy; auto with *).
+ abstract (destruct Hy; auto with * ).
 Defined.
 
 (** The limit of this stream is going to be used to construct a point
@@ -603,7 +603,7 @@ Lemma CompactTotallyBoundedStreamCauchy2 : forall (m n:nat) s (k d1 d2:Qpos) pt 
   (Str_nth (m + n) (CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
 Proof.
  induction m; intros n s k d1 d2 pt Hpt Hd Hk.
-  setoid_replace (k^0 * (mkQpos Hd))%Qpos with (mkQpos Hd) by QposRing.
+  setoid_replace (k^0 * (mkQpos Hd))%Qpos with (mkQpos Hd); [| QposRing].
   apply CompactTotallyBoundedStreamCauchy1; assumption.
  pose (e':=(CompactTotallyBoundedStreamCauchyLemma n (((1#1)+k)*(k*d1) + (k*d2)) Hk)%Qpos).
  setoid_replace (k^S m*mkQpos Hd)%Qpos with (k^m*mkQpos e')%Qpos.
@@ -710,7 +710,7 @@ Proof.
    rewrite Zpos_mult_morphism.
    ring_simplify.
    rewrite Zmult_comm.
-   replace LHS with (d * (n / d) + n mod d)%Z by (apply Z_div_mod_eq; auto with *).
+   replace LHS with (d * (n / d) + n mod d)%Z by (apply Z_div_mod_eq; auto with * ).
    apply Zplus_le_compat_l.
    destruct (Z_mod_lt n d); auto with *.
   generalize (Zsucc (n/d)).
@@ -816,7 +816,7 @@ Proof.
   intros Z s d1 d2 pt Hpt e1 e2.
   destruct (le_lt_dec (CompactTotallyBoundedIndex e1 d1 d2) (CompactTotallyBoundedIndex e2 d1 d2)).
    apply Z; auto.
-  setoid_replace (e1 + e2)%Qpos with (e2 + e1)%Qpos by QposRing.
+  setoid_replace (e1 + e2)%Qpos with (e2 + e1)%Qpos; [| QposRing].
   apply ball_sym.
   apply Z; auto with *.
  intros s d1 d2 pt Hpt e1 e2 H.
@@ -948,7 +948,7 @@ Proof.
     left.
     reflexivity.
    rewrite Hx.
-   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
+   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
    apply L.
   set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
   assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
@@ -972,7 +972,7 @@ Proof.
    left.
    reflexivity.
   rewrite Hx.
-  setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos by QposRing.
+  setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
   apply ball_sym.
   apply L.
  set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
@@ -1035,7 +1035,7 @@ Proof.
     reflexivity.
    rewrite <- H in Hy1.
    clear - Hy1 HF.
-   setoid_replace e with ((1#20)*e + (7#20)*e + (3#5)*e)%Qpos by QposRing.
+   setoid_replace e with ((1#20)*e + (7#20)*e + (3#5)*e)%Qpos; [| QposRing].
    apply ball_triangle with (Cunit a);[|apply HF].
    apply ball_triangle with (Cunit (approximate x ((1#20)*e)%Qpos)).
     apply ball_approx_r.
@@ -1046,7 +1046,7 @@ Proof.
   intros pt Hpt.
   apply: HF.
  intros pt Hpt.
- setoid_replace ((3#5)*e)%Qpos with ((5#3)*((1#5)*e) + (4#3)*((1#5)*e))%Qpos by QposRing.
+ setoid_replace ((3#5)*e)%Qpos with ((5#3)*((1#5)*e) + (4#3)*((1#5)*e))%Qpos; [| QposRing].
  apply CompactTotallyBoundedNotFar.
 Qed.
 
@@ -1142,7 +1142,7 @@ Proof.
   apply: orWeaken.
   right.
   apply IHr; auto.
- setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + (1#2)*e2 + (1#2)*e2 + (1#2)*e1)%Qpos by QposRing.
+ setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + (1#2)*e2 + (1#2)*e2 + (1#2)*e1)%Qpos; [| QposRing].
  apply ball_weak.
  rewrite <- ball_Cunit.
  repeat eapply ball_triangle.
@@ -1183,7 +1183,7 @@ Proof.
   apply: orWeaken.
   left.
   rewrite <- ball_Cunit.
-  setoid_replace (e1+e2)%Qpos with (e1 + ((1 # 2) * e2 + (1 # 2) * e2))%Qpos by QposRing.
+  setoid_replace (e1+e2)%Qpos with (e1 + ((1 # 2) * e2 + (1 # 2) * e2))%Qpos; [| QposRing].
   apply ball_triangle with x.
    apply ball_approx_l.
   apply ball_triangle with y.
@@ -1228,7 +1228,7 @@ Proof.
    clear - Hx'.
    rewrite <- ball_Cunit in Hx'.
    setoid_replace ((7 # 8) * e)%Qpos with ((1#16)*e + ((1 # 16) * e + (1 # 2) * e) + (((1 # 2) * ((1 # 2) * e))))%Qpos
-     by QposRing.
+     ; [| QposRing].
    eapply ball_triangle.
     eapply ball_triangle.
      apply ball_approx_r.
@@ -1262,7 +1262,7 @@ Proof.
  rewrite -> s.
  intros e1 e2.
  apply ball_sym.
- setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
+ setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos; [| QposRing].
  apply ball_weak.
  apply Hf0.
 Qed.
@@ -1281,7 +1281,7 @@ Lemma Compact_BishopCompact_Compact : forall s,
  st_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
 Proof.
  intros s e1 e2.
- setoid_replace (e1 + e2)%Qpos with (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2)%Qpos by QposRing.
+ setoid_replace (e1 + e2)%Qpos with (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2)%Qpos; [| QposRing].
  apply ball_weak.
  apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
   apply regFun_prf.
@@ -1596,7 +1596,7 @@ Proof.
   simpl in Z1.
   set (w0:=((1 # 2) * e1 + ((1 # 2) * e1 + (1 # 2) * e2) + (1 # 2) * d)%Qpos) in *.
   set (w1:= ((1 # 2) * d + (1 # 2) * e2)%Qpos) in *.
-  setoid_replace (e1 + e2 + d)%Qpos with (w0 + w1)%Qpos by (unfold w0, w1; QposRing).
+  setoid_replace (e1 + e2 + d)%Qpos with (w0 + w1)%Qpos; [| unfold w0, w1; QposRing].
   eapply almostIn_triangle_l.
    apply Z0.
   apply Z1.
@@ -1604,7 +1604,7 @@ Proof.
  apply almostIn_closed.
  intros d.
  set (d':=((1#4)*d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos with ((e1 + (1#2)*d' + (1#2)*d') + (((d' + d') + (1#2)*d') + ((1#2)*d' + e2)))%Qpos by (unfold d'; QposRing).
+ setoid_replace (e1 + e2 + d)%Qpos with ((e1 + (1#2)*d' + (1#2)*d') + (((d' + d') + (1#2)*d') + ((1#2)*d' + e2)))%Qpos; [| unfold d'; QposRing].
  eapply almostIn_triangle_l.
   eapply ball_triangle.
    apply regFun_prf.
@@ -1706,7 +1706,7 @@ Proof.
  apply almostIn_closed.
  intros d1.
  setoid_replace (e1 + e2 + d1)%Qpos
-   with ((e1 + (1#4)*d1) + ((1#4)*d1 + ((1#4)*d1)) + ((1#4)*d1 + e2))%Qpos by QposRing.
+   with ((e1 + (1#4)*d1) + ((1#4)*d1 + ((1#4)*d1)) + ((1#4)*d1 + e2))%Qpos; [| QposRing].
  apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*d1)%Qpos); [|apply regFun_prf].
  apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*d1)%Qpos); [apply regFun_prf|].
  simpl.

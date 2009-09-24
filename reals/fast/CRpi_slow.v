@@ -142,7 +142,7 @@ Proof.
   apply (inj_Q_nring IR 1).
  assert (One[-](inj_Q IR x)[*](inj_Q IR y)[#]Zero).
   stepl (inj_Q IR (1[-]x[*]y)).
-   (stepr (inj_Q IR Zero) by apply (inj_Q_nring IR 0)).
+   (stepr (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)]).
    apply inj_Q_ap; assumption.
   eapply eq_transitive.
    apply inj_Q_minus.
@@ -159,7 +159,7 @@ Proof.
   symmetry.
   apply f_char.
  assert (H0:(inj_Q IR (One[-]x * y))[#]Zero).
-  (stepr (inj_Q IR 0) by apply (inj_Q_nring IR 0)).
+  (stepr (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)]).
   apply inj_Q_ap; assumption.
  apply eq_transitive with (inj_Q IR (x[+]y)[/]inj_Q IR (One[-]x * y)[//]H0).
   apply (inj_Q_div).
@@ -179,7 +179,7 @@ Proof.
  intros x Hx.
  induction n.
   right.
-  abstract ( rstepl (Zero:IR); (stepl (ArcTan Zero) by apply ArcTan_zero); apply ArcTan_wd;
+  abstract ( rstepl (Zero:IR); (stepl (ArcTan Zero); [| by apply ArcTan_zero]); apply ArcTan_wd;
     apply eq_symmetric; apply (inj_Q_nring IR 0)).
  simpl.
  destruct (IHn) as [H|H].
@@ -196,7 +196,7 @@ Proof.
    apply ArcTan_plus_ArcTan_Q; try assumption; split; assumption).
 Defined.
 
-Lemma reflect_right : forall A B (x:{A}+{B}), (if x then False else True) -> B.
+Lemma reflect_right : forall A B (x:{A}+{B}), (match x with left _ => False | right _ => True end) -> B.
 Proof.
  intros A B x.
  elim x.

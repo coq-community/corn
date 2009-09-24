@@ -42,8 +42,9 @@ Proof.
  intros a e b0 b1 H.
  simpl in *.
  unfold Qball in *.
- stepr (b0-b1) by (simpl; ring).
- assumption.
+ stepr (b0-b1).
+  assumption.
+ simpl; ring.
 Qed.
 
 Definition Qtranslate_uc (a:Q_as_MetricSpace) : Q_as_MetricSpace --> Q_as_MetricSpace :=
@@ -117,9 +118,10 @@ Proof.
  intros e a b H.
  simpl in *.
  unfold Qball in *.
- stepr (b - a) by (simpl;ring).
- apply AbsSmall_minus.
- assumption.
+ stepr (b - a).
+  apply AbsSmall_minus.
+  assumption.
+ simpl. ring.
 Qed.
 
 Definition Qopp_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=

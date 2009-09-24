@@ -134,11 +134,11 @@ Proof.
    apply leEq_imp_eq.
     apply leEq_transitive with d0.
      destruct (HGF1 _ HGa (compact_Min_lft _ _ Hab)); assumption.
-    stepl c0 by assumption.
+    stepl c0; [| assumption].
     destruct (HGF1 _ HGb (compact_Min_rht _ _ Hab)); assumption.
    apply leEq_transitive with d0.
     destruct (HGF1 _ HGb (compact_Min_rht _ _ Hab)); assumption.
-   stepl c0 by assumption.
+   stepl c0; [| assumption].
    destruct (HGF1 _ HGa (compact_Min_lft _ _ Hab)); assumption.
   stepl (Zero:IR).
    apply eq_symmetric; apply Integral_empty.
@@ -171,11 +171,11 @@ Proof.
   apply leEq_imp_eq.
    apply leEq_transitive with d0.
     destruct (HGF1 _ HGa (compact_Min_lft _ _ Hab)); assumption.
-   stepl c0 by assumption.
+   stepl c0; [| assumption].
    destruct (HGF1 _ Hx'0 X2); assumption.
   apply leEq_transitive with d0.
    destruct (HGF1 _ Hx'0 X2); assumption.
-  stepl c0 by assumption.
+  stepl c0; [| assumption].
   destruct (HGF1 _ HGa (compact_Min_lft _ _ Hab)); assumption.
  assert (Hab':a[=]b).
   apply not_ap_imp_eq.
@@ -279,7 +279,7 @@ Proof.
   unfold G.
   simpl.
   split.
-   stepl (Min a b) by (apply MIN_wd;rational).
+   stepl (Min a b); [| apply MIN_wd; rational].
    assert (Z:=leEq_or_leEq _ a b).
    rewrite leEq_def.
    intros Z0.
@@ -290,19 +290,19 @@ Proof.
    change (Not ((b[-]a)[*]x[+]a[<]Min a b)).
    rewrite <- leEq_def.
    destruct Z.
-    stepl a by (apply eq_symmetric; apply leEq_imp_Min_is_lft; auto).
+    stepl a; [| apply eq_symmetric; apply leEq_imp_Min_is_lft; auto].
     apply shift_leEq_plus.
     rstepl (Zero:IR).
     apply mult_resp_nonneg; auto.
     apply shift_leEq_lft.
     assumption.
-   stepl (Min b a) by apply Min_comm.
-   stepl b by (apply eq_symmetric; apply leEq_imp_Min_is_lft; auto).
+   stepl (Min b a); [| apply Min_comm].
+   stepl b; [| apply eq_symmetric; apply leEq_imp_Min_is_lft; auto].
    apply shift_leEq_plus.
    apply shift_leEq_rht.
    rstepr ((a[-]b)[*](One[-]x)).
    apply mult_resp_nonneg; apply shift_leEq_lft; assumption.
-  stepr (Max a b) by (apply MAX_wd;rational).
+  stepr (Max a b); [| apply MAX_wd;rational].
   assert (Z:=leEq_or_leEq _ a b).
   rewrite leEq_def.
   intros Z0.
@@ -313,13 +313,13 @@ Proof.
   change (Not (Max a b[<](b[-]a)[*]x[+]a)).
   rewrite <- leEq_def.
   destruct Z.
-   stepr b by (apply eq_symmetric; apply leEq_imp_Max_is_rht; auto).
+   stepr b; [| apply eq_symmetric; apply leEq_imp_Max_is_rht; auto].
    apply shift_plus_leEq.
    apply shift_leEq_rht.
    rstepr ((b[-]a)[*](One[-]x)).
    apply mult_resp_nonneg; apply shift_leEq_lft; assumption.
-  stepr (Max b a) by apply Max_comm.
-  stepr a by (apply eq_symmetric; apply leEq_imp_Max_is_rht; auto).
+  stepr (Max b a); [| apply Max_comm].
+  stepr a; [| apply eq_symmetric; apply leEq_imp_Max_is_rht; auto].
   apply shift_plus_leEq.
   rstepr (Zero:IR).
   apply shift_leEq_rht.

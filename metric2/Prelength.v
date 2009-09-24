@@ -152,7 +152,7 @@ Proof.
  intros e0 es f a b Hab.
  apply ball_closed.
  intros e'.
- setoid_replace (fold_right Qpos_plus e0 es + e')%Qpos with (fold_right Qpos_plus e0 (e'::es)) by (simpl;QposRing).
+ setoid_replace (fold_right Qpos_plus e0 es + e')%Qpos with (fold_right Qpos_plus e0 (e'::es)); [| simpl;QposRing].
  set (ds := map (mu f) es) in *.
  set (d0 := (mu f e0)) in *.
  set (d' := (mu f e')) in *.
@@ -314,14 +314,14 @@ Lemma Cmap_prf : is_UniformlyContinuousFunction Cmap_fun (mu f).
 Proof.
  intros e0 x y Hxy e1 e2.
  simpl.
- setoid_replace (e1+e0+e2)%Qpos with (e1+(e0+e2))%Qpos by QposRing.
+ setoid_replace (e1+e0+e2)%Qpos with (e1+(e0+e2))%Qpos; [| QposRing].
  apply (@mu_sum X plX Y e2 (e1::e0::nil)).
  simpl.
  destruct (mu f e1) as [d1|];[|constructor].
  destruct (mu f e0) as [d0|];[|constructor].
  destruct (mu f e2) as [d2|];[|constructor].
  simpl in *.
- setoid_replace (d1+(d0+d2))%Qpos with (d1+d0+d2)%Qpos by QposRing.
+ setoid_replace (d1+(d0+d2))%Qpos with (d1+d0+d2)%Qpos; [| QposRing].
  apply Hxy.
 Qed.
 
@@ -406,7 +406,7 @@ Proof.
  change (Cmap (Y:=Y) plX f2) with (Cmap_strong Y plX f2).
  set (y1 :=(Cmap_strong Y plX f1 x)).
  set (y2 :=(Cmap_strong Y plX f2 x)).
- setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos by (unfold he1, he2; QposRing).
+ setoid_replace (e1 + e2)%Qpos with (he1 + (he1 + he2) + he2)%Qpos; [| unfold he1, he2; QposRing].
  rewrite <- ball_Cunit.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
@@ -426,7 +426,7 @@ Proof.
  set (e2':=((1 # 2)%Qpos * e2)%Qpos).
  change (ball (e1 + e2) (approximate (Cmap plX (approximate f ((1 # 2) * e1)%Qpos) x) e1')
    (approximate (Cmap_slow (approximate f ((1 # 2) * e2)%Qpos) x) e2')).
- setoid_replace (e1 + e2)%Qpos with (e1' + (((1 # 2) * e1)%Qpos + ((1 # 2) * e2)%Qpos) + e2')%Qpos by (unfold e1', e2'; QposRing).
+ setoid_replace (e1 + e2)%Qpos with (e1' + (((1 # 2) * e1)%Qpos + ((1 # 2) * e2)%Qpos) + e2')%Qpos; [| unfold e1', e2'; QposRing].
  generalize x e1' e2'.
  change (ball ((1 # 2) * e1 + (1 # 2) * e2) (Cmap plX (approximate f ((1 # 2) * e1)%Qpos))
    (Cmap_slow (approximate f ((1 # 2) * e2)%Qpos))).
@@ -443,7 +443,7 @@ Lemma Cap_weak_prf X Y plX (f:Complete (X --> Y)) : is_UniformlyContinuousFuncti
 Proof.
  intros X Y plX f e x y H.
  set (e' := ((1#3)*e)%Qpos).
- setoid_replace e with (e'+e'+e')%Qpos by (unfold e';QposRing).
+ setoid_replace e with (e'+e'+e')%Qpos; [| unfold e';QposRing].
  apply ball_triangle with (Cmap plX (approximate f e') y).
   apply ball_triangle with (Cmap plX (approximate f e') x).
    rewrite Cap_fun_correct.
@@ -520,7 +520,7 @@ we have not formalized the notion of a length space yet. *)
 Lemma CompletePL : forall X, PrelengthSpace X -> PrelengthSpace (Complete X).
 Proof.
  intros X Xpl x y e d1 d2 He Hxy.
- setoid_replace (d1+d2) with ((d1+d2)%Qpos:Q) in He by QposRing.
+ setoid_replace (d1+d2) with ((d1+d2)%Qpos:Q) in He; [| QposRing].
  destruct (Qpos_lt_plus He).
  pose (gA := ((1#5)*x0)%Qpos).
  pose (g := Qpos_min (Qpos_min ((1#2)*d1) ((1#2)*d2)) gA).
@@ -577,7 +577,7 @@ Proof.
  rewrite <- Q_Qpos_plus in Hd2'.
  change (QposEq d2 (g + d2')) in Hd2'.
  rewrite Hd2'.
- setoid_replace (g + d2')%Qpos with (d2' + g)%Qpos by QposRing.
+ setoid_replace (g + d2')%Qpos with (d2' + g)%Qpos; [| QposRing].
  eapply ball_triangle with (Cunit (approximate y g)).
   rewrite ball_Cunit.
   assumption.

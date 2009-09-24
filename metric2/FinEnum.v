@@ -398,7 +398,7 @@ Proof.
    abstract ( autorewrite with QposElim; rewrite Qlt_minus_iff; ring_simplify; auto with * ).
   exists a.
   clear - b0.
-  abstract (auto using InFinEnumC_weaken with *).
+  abstract (auto using InFinEnumC_weaken with * ).
  assert (Z:existsC X (fun y : X => InFinEnumC y b /\ ball (m:=X) e x y)).
   clear - H n.
   abstract ( destruct (H) as [HG | y [Hy0 Hy1]] using existsC_ind; [auto using existsC_stable|];
@@ -428,7 +428,7 @@ Proof.
   intros Hed.
   right.
   abstract ( intros H; apply (H a); try reflexivity; intros x [Hx0 Hx1];
-    auto using InFinEnumC_weaken with *).
+    auto using InFinEnumC_weaken with * ).
  intros Hed.
  destruct (IHb Hed) as [H|H].
   left.
@@ -438,7 +438,7 @@ Proof.
  destruct (almostDecideX a a0 Hed).
   left.
   abstract ( intros x Hx; apply existsWeaken; exists a0; rewrite Hx;
-    auto using InFinEnumC_weaken with *).
+    auto using InFinEnumC_weaken with * ).
  right.
  abstract ( intros H0; assert (Haa:st_eq a a) by reflexivity;
    destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind; [tauto|];
