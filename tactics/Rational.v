@@ -35,7 +35,6 @@
  *)
 Require Export FieldReflection.
 Require Export RingReflection.
-Require Export GroupReflection.
 
 Inductive AlgebraName : Type :=
 |cfield : CField -> AlgebraName
@@ -61,7 +60,6 @@ match goal with
  match GetStructureName T with
  |(cfield ?F) => rationalF F x y
  |(cring ?R) => rationalR R x y
- |(cabgroup ?G) => rationalG G x y
  end
 end.
 
