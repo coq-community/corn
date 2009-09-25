@@ -271,11 +271,16 @@ ifdef CoRN_MF_sub
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
+#%.vo.md5 %.glob : %.v | %.d
 %.vo %.glob : %.v | %.d
 	@set -e; \
 	echo -n "Compiling $<"; \
 	GLOB="$(<:.v=.glob)"; \
 	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
+# %.vo: %.vo.md5
+#	@{ [ -f $< ] && md5sum -c --status $<; } ||     \
+#	{ md5sum $@ >$<; }
+
 else
 .PHONY: always
 

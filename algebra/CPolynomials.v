@@ -1843,8 +1843,15 @@ Proof.
  exact cpoly_x_minus_c_strext.
 Qed.
 
+Definition cpoly_ring_th:(@ring_theory cpoly_cring Zero cpoly_one (@csg_op cpoly_cring)
+         (@cr_mult cpoly_cring) (fun x y : cpoly_cring => x [-] y)
+         (@cg_inv cpoly_cring) (@st_eq cpoly_cring )).
+Proof (CRing_Ring cpoly_cring).
+
 End CPoly_CRing.
 
+
+Canonical Structure cpoly_cring.
 Notation "'_X_'" := (@cpoly_var _).
 
 Definition cpoly_linear_fun' (CR : CRing) :
@@ -1868,6 +1875,7 @@ elements of the ring.
 %\end{convention}%
 *)
 Variable CR : CRing.
+Add Ring cpolycring_th : (cpoly_ring_th CR).
 
 Notation RX := (cpoly_cring CR).
 
@@ -2078,7 +2086,7 @@ Let [R] be a ring and write [RX] for the ring of polynomials over [R].
 
 Section Poly_properties.
 Variable R : CRing.
-
+Add Ring cpolycring_thR : (cpoly_ring_th R).
 Notation RX := (cpoly_cring R).
 
 Lemma cpoly_const_one : One [=] cpoly_constant_fun _ (One:R).
@@ -2451,7 +2459,7 @@ Notation "'_C_'" := (@polyconst _).
 Section Poly_Prop_Induction.
 
 Variable CR : CRing.
-
+Add Ring cpolycring_thCR : (cpoly_ring_th CR).
 Notation Cpoly := (cpoly CR).
 
 Notation Cpoly_zero := (cpoly_zero CR).
@@ -2485,7 +2493,8 @@ Ltac poly_apply:= autorewrite with apply; simpl.
 Section Derivative.
 
 Variable R:CRing.
-Let RX := cpoly_cring R.
+Add Ring cpolycring_thR1 : (cpoly_ring_th R).
+Notation RX:= (cpoly_cring R).
 
 Fixpoint cpoly_diff (p : RX) : RX :=
 match p with
@@ -2545,31 +2554,13 @@ Proof.
  simpl; split; auto with *.
 Qed.
 
-Definition cpoly_ring_th:(@ring_theory RX Zero (cpoly_one R) (@csg_op RX)
-         (@cr_mult RX) (fun x y : RX => x [-] y)
-         (@cg_inv RX) (@st_eq RX)).
-exact (CRing_Ring RX).
-Defined.
-
-Definition cpoly_ring_th':(@ring_theory (cpoly_cring R) Zero (cpoly_one R) (@csg_op (cpoly_cring R))
-         (@cr_mult (cpoly_cring R)) (fun x y : (cpoly_cring R) => x [-] y)
-         (@cg_inv (cpoly_cring R)) (@st_eq (cpoly_cring R))).
-exact (CRing_Ring (cpoly_cring R)).
-Defined.
-
-Add Ring cpolycring_th: cpoly_ring_th.
-Add Ring cpolycring_th': cpoly_ring_th'.
-Canonical Structure cpoly_cring.
-
 Lemma diff_linear : forall a (p:RX), _D_ (a[+X*]p)[=]p[+]_X_[*]_D_ p.
 Proof.
  intros a p.
  change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
  rewrite cpoly_lin.
  rewrite <- c_zero. 
- fold RX.
-(* fold RX. Ring behaves badly with unfoldings.*)
- rational.
+ ring.
 Qed.
 
 Lemma diff_plus : forall (p q:RX), _D_ (p[+]q)[=]_D_ p[+]_D_ q.
@@ -2588,7 +2579,7 @@ Proof.
    p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
  rewrite (IHp q).
  rewrite <- c_zero.
- fold RX. legacy_rational.
+ ring.
 Qed.
 
 Lemma diff_c_mult : forall c (p:RX), _D_ (_C_ c[*]p)[=]_C_ c[*]_D_ p.
@@ -2603,7 +2594,6 @@ Proof.
  rewrite IHp.
  do 2 rewrite cpoly_lin.
  rewrite <- c_zero.
- fold RX.
  (* (cpoly_csemi_grp R) should be folded to RX *)
  change
  (@st_eq RX
@@ -2613,7 +2603,7 @@ Proof.
   (@cr_mult RX (polyconst R c)
      (@csg_op RX p
         (@csg_op RX (cm_unit RX) (@cr_mult RX (cpoly_var R) (cpolyder p)))))).
- rational.
+ ring.
 Qed.
 
 Lemma diff_mult : forall (p q:RX), _D_ (p[*]q)[=]_D_ p[*]q [+] p[*]_D_ q.
@@ -2621,28 +2611,25 @@ Proof.
  induction p.
   intros q.
   change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
-  fold RX. stepl (_D_(Zero:RX)). 2:legacy_rational.
+  rstepl (_D_(Zero:RX)).
   rewrite diff_zero.
-  rational.
+  ring.
  intros q.
  change (st_car RX) in p.
  change (_D_((s[+X*]p)[*]q)[=]_D_(s[+X*]p)[*]q[+](s[+X*]p)[*]_D_ q).
  do 2 rewrite lin_mult.
  rewrite diff_linear.
- fold RX.
  rewrite diff_plus.
  setoid_replace (_D_ ((_C_ s:RX)[*]q)) with (_C_ s[*]_D_ q) by apply diff_c_mult.
  setoid_replace (((_X_:RX)[*](p[*]q)):RX)
    with ((((_X_:RX)[*](p[*]q)))[+]Zero) by (symmetry;apply cm_rht_unit_unfolded).
  setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply c_zero.
- unfold RX.
  rewrite <- poly_linear.
- fold RX.
  change (_D_ (cpoly_linear R Zero (p[*]q))) with (p[*]q [+] (Zero[+X*]_D_ (p[*]q))).
  rewrite cpoly_lin.
  rewrite <- c_zero.
  rewrite IHp.
- fold RX. legacy_rational.
+ ring.
 Qed.
 
 End Derivative.
@@ -2652,9 +2639,11 @@ Hint Rewrite diff_zero diff_one diff_const diff_x diff_plus diff_c_mult diff_mul
 Section Map.
 
 Variable R S : CRing.
+Add Ring cpolycring_thRR : (cpoly_ring_th R).
+Add Ring cpolycring_thSS : (cpoly_ring_th S).
 Variable f : RingHom R S.
-Let RX := cpoly_cring R.
-Let SX := cpoly_cring S.
+Notation RX := (cpoly_cring R).
+Notation SX := (cpoly_cring S).
 
 Fixpoint cpoly_map_fun (p:RX) : SX :=
 match p with
@@ -2700,11 +2689,10 @@ Proof.
  apply (cpoly_double_ind0 R).
    intros p.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
-   stepr (cpoly_map_csf p). 2:legacy_rational. (* SX! *)
+   rstepr (cpoly_map_csf p).
    apply csf_wd.
-   legacy_rational.
-  intros p.
-  apply eq_reflexive.
+   rational.
+  reflexivity.
  intros p q c d H.
  split.
   apply rh_pres_plus.
@@ -2728,8 +2716,8 @@ Proof.
   change (cpoly_zero R) with (Zero:RX).
   stepl (cpoly_map_csf (Zero:RX)).
    change (cpoly_map_csf Zero) with (Zero:SX).
-   legacy_rational. (*SX*)
-  apply csf_wd; legacy_rational.
+   ring.
+  apply csf_wd; ring. 
  intros p q c d H.
  split.
   autorewrite with ringHomPush.
@@ -2741,7 +2729,7 @@ Proof.
   [| apply eq_symmetric; apply cpoly_map_pres_plus].
  apply csbf_wd.
   apply X.
- stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)); [| apply csf_wd;legacy_rational].
+ stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)); [| apply csf_wd;ring].
  stepr (cpoly_map_csf (cpoly_linear R d q)[*]cpoly_map_csf p).
   2:apply (mult_commut_unfolded SX).
  change ((cpoly_linear R d q:RX)[*]p) with (cpoly_mult_fast_cs _ (cpoly_linear R d q) p).
@@ -2763,10 +2751,9 @@ Proof.
  change ((cpoly_map_csf (cpoly_mult_cs R q p))[=](cpoly_mult_cs S (cpoly_map_csf q) (cpoly_map_csf p))).
  repeat setoid_rewrite <- cpoly_mult_fast_equiv.
  change (cpoly_map_csf (q[*]p)[=]cpoly_map_csf q[*]cpoly_map_csf p).
- stepr (cpoly_map_csf p[*]cpoly_map_csf q). 2:legacy_rational.
+ rstepr (cpoly_map_csf p[*]cpoly_map_csf q).
  rewrite <- H.
- apply csf_wd.
- legacy_rational.
+ apply csf_wd;ring.
 Qed.
 
 Lemma cpoly_map_pres_unit : fun_pres_unit _ _ cpoly_map_csf.
@@ -2786,21 +2773,18 @@ Proof.
 Qed.
 
 Lemma cpoly_map_C : forall c, cpoly_map (_C_ c)[=]_C_ (f c).
-Proof.
- reflexivity.
-Qed.
+Proof. reflexivity. Qed.
 
 Lemma cpoly_map_diff : forall p, cpoly_map (_D_ p) [=] _D_ (cpoly_map p).
 Proof.
  induction p.
-  apply eq_reflexive.
+  reflexivity.
  change (cpoly_map (_D_ (s[+X*]p))[=]_D_ (f s[+X*](cpoly_map p))).
  do 2 rewrite diff_linear.
- unfold RX.
  autorewrite with ringHomPush.
  rewrite IHp.
  rewrite cpoly_map_X.
- apply eq_reflexive.
+ reflexivity.
 Qed.
 
 Lemma cpoly_map_apply : forall p x, f (p ! x)[=] (cpoly_map p) ! (f x).
@@ -2809,7 +2793,6 @@ Proof.
   intros x.
   apply rh_pres_zero.
  intros x.
- simpl in *.
  rewrite rh_pres_plus.
  rewrite rh_pres_mult.
  rewrite IHp.
