@@ -627,7 +627,7 @@ Proof.
    apply R_integral_domain; auto.
   apply minus_ap_zero; apply ap_symmetric_unfolded; auto.
  rstepl (y[*]R_recip y y_[*]x[-]x[*]R_recip x x_[*]y).
- rstepr (One[*]x[-]One[*]y).
+ rstepr (One[*]x[-]One[*]y). 
  apply cg_minus_wd; apply mult_wdl; apply R_recip_inverse.
 Qed.
 

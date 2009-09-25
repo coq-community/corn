@@ -85,7 +85,7 @@ Proof.
  apply eq_symmetric_unfolded.
  cut (_C_ (a[*]g''[+]s) [=] _C_ a[*]_C_ g''[+]_C_ s). intro.
   astepl ((_X_[-]_C_ a) [*] (_X_[*]g'[+]_C_ g'') [+] (_C_ a[*]_C_ g''[+]_C_ s)).
-  rational.
+  legacy_rational. (* Does not recognize polyring *)
  Step_final (_C_ (a[*]g'') [+]_C_ s).
 Qed.
 Load "Opaque_algebra".

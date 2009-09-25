@@ -469,7 +469,7 @@ Proof.
  exists (nth_coeff 1 p). exists (nth_coeff 0 p).
  apply all_nth_coeff_eq_imp. intros.
  elim i; intros.
-  simpl in |- *. rational.
+  simpl in |- *. legacy_rational.
   elim n; intros.
   simpl in |- *. algebra.
   simpl in |- *. apply H. auto with arith.

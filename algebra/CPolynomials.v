@@ -2478,7 +2478,10 @@ Hint Resolve poly_inv_apply: algebra.
 Hint Resolve c_mult_lin: algebra.
 
 Hint Rewrite one_apply c_apply x_apply mult_apply plus_apply minus_apply : apply.
-
+Hint Rewrite inv_apply nexp_apply c_mult_apply poly_inv_apply : apply.
+Ltac poly_apply:= autorewrite with apply; simpl.
+(** The tactic [poly_apply] applies polynomials to arguments *)
+ 
 Section Derivative.
 
 Variable R:CRing.
@@ -2542,12 +2545,30 @@ Proof.
  simpl; split; auto with *.
 Qed.
 
+Definition cpoly_ring_th:(@ring_theory RX Zero (cpoly_one R) (@csg_op RX)
+         (@cr_mult RX) (fun x y : RX => x [-] y)
+         (@cg_inv RX) (@st_eq RX)).
+exact (CRing_Ring RX).
+Defined.
+
+Definition cpoly_ring_th':(@ring_theory (cpoly_cring R) Zero (cpoly_one R) (@csg_op (cpoly_cring R))
+         (@cr_mult (cpoly_cring R)) (fun x y : (cpoly_cring R) => x [-] y)
+         (@cg_inv (cpoly_cring R)) (@st_eq (cpoly_cring R))).
+exact (CRing_Ring (cpoly_cring R)).
+Defined.
+
+Add Ring cpolycring_th: cpoly_ring_th.
+Add Ring cpolycring_th': cpoly_ring_th'.
+Canonical Structure cpoly_cring.
+
 Lemma diff_linear : forall a (p:RX), _D_ (a[+X*]p)[=]p[+]_X_[*]_D_ p.
 Proof.
  intros a p.
  change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
  rewrite cpoly_lin.
- rewrite <- c_zero.
+ rewrite <- c_zero. 
+ fold RX.
+(* fold RX. Ring behaves badly with unfoldings.*)
  rational.
 Qed.
 
@@ -2567,7 +2588,7 @@ Proof.
    p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
  rewrite (IHp q).
  rewrite <- c_zero.
- rational.
+ fold RX. legacy_rational.
 Qed.
 
 Lemma diff_c_mult : forall c (p:RX), _D_ (_C_ c[*]p)[=]_C_ c[*]_D_ p.
@@ -2582,6 +2603,16 @@ Proof.
  rewrite IHp.
  do 2 rewrite cpoly_lin.
  rewrite <- c_zero.
+ fold RX.
+ (* (cpoly_csemi_grp R) should be folded to RX *)
+ change
+ (@st_eq RX
+  (@csg_op RX (@cr_mult RX (polyconst R c) p)
+     (@csg_op RX (cm_unit RX)
+        (@cr_mult RX (cpoly_var R) (@cr_mult RX (polyconst R c) (cpolyder p)))))
+  (@cr_mult RX (polyconst R c)
+     (@csg_op RX p
+        (@csg_op RX (cm_unit RX) (@cr_mult RX (cpoly_var R) (cpolyder p)))))).
  rational.
 Qed.
 
@@ -2590,7 +2621,7 @@ Proof.
  induction p.
   intros q.
   change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
-  rstepl (_D_(Zero:RX)).
+  fold RX. stepl (_D_(Zero:RX)). 2:legacy_rational.
   rewrite diff_zero.
   rational.
  intros q.
@@ -2611,7 +2642,7 @@ Proof.
  rewrite cpoly_lin.
  rewrite <- c_zero.
  rewrite IHp.
- rational.
+ fold RX. legacy_rational.
 Qed.
 
 End Derivative.
@@ -2669,9 +2700,9 @@ Proof.
  apply (cpoly_double_ind0 R).
    intros p.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
-   rstepr (cpoly_map_csf p).
+   stepr (cpoly_map_csf p). 2:legacy_rational. (* SX! *)
    apply csf_wd.
-   rational.
+   legacy_rational.
   intros p.
   apply eq_reflexive.
  intros p q c d H.
@@ -2697,8 +2728,8 @@ Proof.
   change (cpoly_zero R) with (Zero:RX).
   stepl (cpoly_map_csf (Zero:RX)).
    change (cpoly_map_csf Zero) with (Zero:SX).
-   rational.
-  apply csf_wd; rational.
+   legacy_rational. (*SX*)
+  apply csf_wd; legacy_rational.
  intros p q c d H.
  split.
   autorewrite with ringHomPush.
@@ -2710,7 +2741,7 @@ Proof.
   [| apply eq_symmetric; apply cpoly_map_pres_plus].
  apply csbf_wd.
   apply X.
- stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)); [| apply csf_wd;rational].
+ stepl (cpoly_map_csf ((cpoly_linear R d q:RX)[*]p)); [| apply csf_wd;legacy_rational].
  stepr (cpoly_map_csf (cpoly_linear R d q)[*]cpoly_map_csf p).
   2:apply (mult_commut_unfolded SX).
  change ((cpoly_linear R d q:RX)[*]p) with (cpoly_mult_fast_cs _ (cpoly_linear R d q) p).
@@ -2732,10 +2763,10 @@ Proof.
  change ((cpoly_map_csf (cpoly_mult_cs R q p))[=](cpoly_mult_cs S (cpoly_map_csf q) (cpoly_map_csf p))).
  repeat setoid_rewrite <- cpoly_mult_fast_equiv.
  change (cpoly_map_csf (q[*]p)[=]cpoly_map_csf q[*]cpoly_map_csf p).
- rstepr (cpoly_map_csf p[*]cpoly_map_csf q).
+ stepr (cpoly_map_csf p[*]cpoly_map_csf q). 2:legacy_rational.
  rewrite <- H.
  apply csf_wd.
- rational.
+ legacy_rational.
 Qed.
 
 Lemma cpoly_map_pres_unit : fun_pres_unit _ _ cpoly_map_csf.

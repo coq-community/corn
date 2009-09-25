@@ -35,22 +35,27 @@
  *)
 Require Export FieldReflection.
 Require Export RingReflection.
+Require Export CRing_as_Ring.
 
 Inductive AlgebraName : Type :=
 |cfield : CField -> AlgebraName
-|cring : CRing -> AlgebraName
-|cabgroup : CAbGroup -> AlgebraName.
+|cring : CRing -> AlgebraName.
 
 Ltac GetStructureName t :=
 match t with
-| (csg_crr (cm_crr (cg_crr (cag_crr ?s)))) =>
- match s with
- | (cr_crr ?r) =>
+| (csg_crr (cm_crr (cg_crr (cag_crr (cr_crr ?r))))) =>
   match r with
   | (cf_crr ?q) => constr:(cfield q)
   | _ => constr:(cring r)
-  end
- | _ => constr:(cabgroup s)
+ end
+end.
+
+Ltac legacy_rational:=
+match goal with
+[|-@cs_eq (cs_crr ?T) ?x ?y] =>
+ match GetStructureName T with
+ |(cfield ?F) => rationalF F x y
+ |(cring ?R) => rationalR R x y
  end
 end.
 
@@ -59,7 +64,8 @@ match goal with
 [|-@cs_eq (cs_crr ?T) ?x ?y] =>
  match GetStructureName T with
  |(cfield ?F) => rationalF F x y
- |(cring ?R) => rationalR R x y
+ |(cring ?R) => (try (repeat (try apply csf_fun_wd);ring));rationalR R x y
+ (* Perhaps we should add wd for partial functions too *)
  end
 end.
 

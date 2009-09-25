@@ -117,12 +117,12 @@ Proof.
   do 2 rewrite mult_distr_sum0_lft.
   rewrite -> Sumx_to_Sum in IHn; auto with *.
    setoid_replace (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A))
-     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero);[|rational].
+     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero);[|legacy_rational].
    change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero)
      with (Sum 0 (S n) (part_tot_nat_fun (cpoly_cring R) (S n) A)).
    set (C:=(fun i : nat => match i with | 0 => (Zero : cpoly_cring R)
      | S i' => part_tot_nat_fun (cpoly_cring R) (S n) A i' end)).
-   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero);[|rational].
+   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero);[|legacy_rational].
    change (Sum0 (S (S n)) C[-]Zero) with (Sum 0 (S n) C).
    rewrite Sum_last.
    rewrite IHn.
@@ -131,7 +131,7 @@ Proof.
     change (C 0) with (Zero:cpoly_cring R).
     rewrite <- (Sum_shift _ (part_tot_nat_fun (cpoly_cring R) (S n) A)).
      rewrite IHn.
-     rational.
+     legacy_rational.
     reflexivity.
    unfold part_tot_nat_fun.
    destruct (le_lt_dec (S n) (S n)).
@@ -150,7 +150,7 @@ Proof.
   intros l l0.
   simpl (Bernstein l).
   replace l0 with (le_O_n n) by apply le_irrelevent.
-  rational.
+  legacy_rational.
  destruct (le_lt_dec (S n) i).
   elimtype False; omega.
  destruct (le_lt_dec (S n) (S i)); simpl (Bernstein (lt_n_Sm_le (S i) (S n) Hi));
@@ -158,7 +158,7 @@ Proof.
     elimtype False; omega.
    replace  (lt_n_Sm_le i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
    simpl.
-   rational.
+   legacy_rational.
   replace (le_S_n i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   replace l1 with l0 by apply le_irrelevent.
   reflexivity.
@@ -169,13 +169,13 @@ Lemma RaiseDegreeA : forall n i (H:i<=n), (nring (S n))[*]_X_[*]Bernstein H[=](n
 Proof.
  induction n.
   intros [|i] H; [|elimtype False; omega].
-  repeat split; rational.
+  repeat split; legacy_rational.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
- rstepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H).
+ stepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H). 2:legacy_rational.
  destruct i as [|i].
   simpl (Bernstein H) at 1.
-  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
+  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H). 
   rewrite IHn.
   rstepl ((nring 1)[*]((One[-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
   set (l0:=(lt_n_Sm_le _ _ (le_n_S 1 (S n) (gt_le_S 0 (S n) (gt_Sn_O n))))).
