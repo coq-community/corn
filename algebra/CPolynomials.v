@@ -41,7 +41,6 @@
 (** printing FX %\ensuremath{F[x]}% #F[x]# *)
 
 Require Export CRingClass.
-(* Require Export RingReflection.*)
 Require Import CRing_Homomorphisms.
 Require Import Rational.
 
@@ -1843,11 +1842,7 @@ Proof.
  exact cpoly_x_minus_c_strext.
 Qed.
 
-Definition cpoly_ring_th:(@ring_theory cpoly_cring Zero cpoly_one (@csg_op cpoly_cring)
-         (@cr_mult cpoly_cring) (fun x y : cpoly_cring => x [-] y)
-         (@cg_inv cpoly_cring) (@st_eq cpoly_cring )).
-Proof (CRing_Ring cpoly_cring).
-
+Definition cpoly_ring_th:= (CRing_Ring cpoly_cring).
 End CPoly_CRing.
 
 
@@ -1875,7 +1870,7 @@ elements of the ring.
 %\end{convention}%
 *)
 Variable CR : CRing.
-Add Ring cpolycring_th : (cpoly_ring_th CR).
+Add Ring cpolycring_th : (CRing_Ring (cpoly_cring CR)).
 
 Notation RX := (cpoly_cring CR).
 
@@ -1883,7 +1878,7 @@ Section helpful_section.
 
 Variables p q : RX.
 Variables c d : CR.
-
+(** It should be possible to merge most of this section using the new apply *)
 Lemma linear_eq_zero_ : c[+X*]p [=] Zero -> c [=] Zero /\ p [=] Zero.
 Proof cpoly_lin_eq_zero_ CR p c.
 
@@ -2691,7 +2686,7 @@ Proof.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
    rstepr (cpoly_map_csf p).
    apply csf_wd.
-   rational.
+   rationtal (* ring cannot find the ring structure *)
   reflexivity.
  intros p q c d H.
  split.
