@@ -214,7 +214,7 @@ Proof.
  unfold ArTangH.
  unfold Half.
  eapply Derivative_wdr; [|apply Derivative_scal;
-   eapply (Derivative_comp DomArTanH (openl Zero) H CI);[apply ArTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
+   eapply (Derivative_comp DomArTanH (openl Zero) H I);[apply ArTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
   FEQ.
    apply included_FScalMult.
    apply included_FMult.
@@ -427,7 +427,7 @@ Proof.
  set (F:=([-C-](Half (R:=IR)){*} ((Logarithm[o][-C-]One{+}FId){-}(Logarithm[o][-C-]One{-}FId)))).
  assert (F0:Dom F c).
   destruct Hc0 as [A B].
-  repeat (constructor || exists (CAnd_intro _ _ CI CI)); simpl.
+  repeat (constructor || exists (I, I)); simpl.
    apply shift_less_plus'.
    rstepl ([--]One:IR).
    assumption.

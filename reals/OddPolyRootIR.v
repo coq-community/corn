@@ -260,9 +260,9 @@ Proof.
  unfold poly_norm in |- *. unfold monic in |- *. unfold degree in |- *. unfold degree_le in |- *. intros.
  elim H. intros H0 H1.
  split.
-  Step_final ((One[/] nth_coeff n p[//]poly_norm_aux p n (CAnd_intro _ _ H0 H1)) [*] nth_coeff n p).
+  Step_final ((One[/] nth_coeff n p[//]poly_norm_aux p n (pair H0 H1)) [*] nth_coeff n p).
  intros.
- astepl ((One[/] nth_coeff n p[//]poly_norm_aux p n (CAnd_intro _ _ H0 H1)) [*] nth_coeff m p).
+ astepl ((One[/] nth_coeff n p[//]poly_norm_aux p n (pair H0 H1)) [*] nth_coeff m p).
  Step_final ((One[/] nth_coeff n p[//]poly_norm_aux p n H) [*]Zero).
 Qed.
 

@@ -44,7 +44,7 @@ Variable p: positive.
 Definition Qpower_positive_modulus (c:Qpos) (e:Qpos) : QposInf :=
 Qpos2QposInf (e/((p#1)*c^(Zpred p))).
 
-Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}(nat_of_P p)) (inj_Q IR q) CI)).
+Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}(nat_of_P p)) (inj_Q IR q) I)).
 Proof.
  clear p.
  intros p.
@@ -136,7 +136,7 @@ Proof.
  rewrite  <- (nat_of_P_o_P_of_succ_nat_eq_succ n).
  rewrite convert_is_POS.
  simpl.
- stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) CI); [| by apply eq_symmetric; apply Qpower_positive_correct].
+ stepr ((FId{^}(nat_of_P (P_of_succ_nat n))) (inj_Q IR (c:Q)) I); [| by apply eq_symmetric; apply Qpower_positive_correct].
  simpl.
  apply: power_resp_leEq.
   apply AbsIR_nonneg.
@@ -168,7 +168,9 @@ Proof.
   apply shift_zero_less_minus'.
   rstepr (inj_Q IR (c:Q)[+]inj_Q IR (c:Q)).
   apply plus_resp_pos; assumption.
- change (x[^](nat_of_P p)) with ((FId{^}(nat_of_P p)) x CI).
+ rename I into temp.
+ change (x[^](nat_of_P p)) with ((FId{^}(nat_of_P p)) x True_constr).
+ rename temp into I.
  destruct Hx as [Hx0 Hx1].
  apply (ContinuousCorrect HI (Continuous_nth I FId (Continuous_id I)  (nat_of_P p)));[|split;assumption].
  intros q [] Hq.

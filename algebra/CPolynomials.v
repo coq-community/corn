@@ -156,7 +156,7 @@ Qed.
 
 Fixpoint cpoly_ap_zero (p : cpoly) : CProp :=
   match p with
-  | cpoly_zero        => CFalse
+  | cpoly_zero        => False
   | cpoly_linear c p1 => c [#] Zero or cpoly_ap_zero p1
   end.
 

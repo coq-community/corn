@@ -394,7 +394,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
       constr:(fun p:A1 and A2 =>
-                CAnd_intro _ _ (d1 (CAnd_proj1 _ _ p))
+                pair _ _ (d1 (CAnd_proj1 _ _ p))
                   (d2 (CAnd_proj2 _ _ p)))
   | (?X1 \/ ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
@@ -406,8 +406,8 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
-      constr:(COr_elim A1 A2 _ (fun a => Cinleft _ _ (d1 a))
-                (fun a => Cinright _ _ (d2 a)))
+      constr:(COr_elim A1 A2 _ (fun a => inl _ _ (d1 a))
+                (fun a => inr _ _ (d2 a)))
   | (?X1 <-> ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
@@ -424,7 +424,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with ba2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun p:Iff A1 A2 =>
-                CAnd_intro _ _ (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
+                pair (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
                   (fun b2 => ab1 (CAnd_proj2 _ _ p (ba2 b2))))
   | (~ ?X1) =>
       let A0 := constr:X1 in
@@ -511,7 +511,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q:_ and _ =>
-                CAnd_intro A1 A2 (d1 (CAnd_proj1 _ _ q))
+                @pair A1 A2 (d1 (CAnd_proj1 _ _ q))
                   (d2 (CAnd_proj2 _ _ q)))
   | (?X1 \/ ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
@@ -523,8 +523,8 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
-      constr:(COr_elim _ _ (A1 or A2) (fun b => Cinleft A1 A2 (d1 b))
-                (fun b => Cinright A1 A2 (d2 b)))
+      constr:(COr_elim _ _ (A1 or A2) (fun b => inl A1 A2 (d1 b))
+                (fun b => inr A1 A2 (d2 b)))
   | (?X1 <-> ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
@@ -541,7 +541,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with ba2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q:Iff _ _ =>
-                CAnd_intro _ _ (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
+                pair (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
                   (fun a2:A2 => ba1 (CAnd_proj2 _ _ q (ab2 a2))))
   | (~ ?X1) =>
       let A0 := constr:X1 in
@@ -1054,7 +1054,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
       constr:(fun p:A1 and A2 =>
-                CAnd_intro _ _ (d1 (CAnd_proj1 _ _ p))
+                pair (d1 (CAnd_proj1 _ _ p))
                   (d2 (CAnd_proj2 _ _ p)))
   | (?X1 \/ ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
@@ -1066,8 +1066,8 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
-      constr:(COr_elim A1 A2 _ (fun a => Cinleft _ _ (d1 a))
-                (fun a => Cinright _ _ (d2 a)))
+      constr:(COr_elim A1 A2 _ (fun a => inl _ _ (d1 a))
+                (fun a => inr _ _ (d2 a)))
   | (?X1 <-> ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
@@ -1084,7 +1084,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with ba2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun p:Iff A1 A2 =>
-                CAnd_intro _ _ (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
+                pair (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
                   (fun b2 => ab1 (CAnd_proj2 _ _ p (ba2 b2))))
   | (~ ?X1) =>
       let A0 := constr:X1 in
@@ -1180,7 +1180,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q:_ and _ =>
-                CAnd_intro A1 A2 (d1 (CAnd_proj1 _ _ q))
+                @pair A1 A2 (d1 (CAnd_proj1 _ _ q))
                   (d2 (CAnd_proj2 _ _ q)))
   | (?X1 \/ ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
@@ -1192,8 +1192,8 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A1 := constr:X1 with A2 := constr:X2 in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
-      constr:(COr_elim _ _ (A1 or A2) (fun b => Cinleft A1 A2 (d1 b))
-                (fun b => Cinright A1 A2 (d2 b)))
+      constr:(COr_elim _ _ (A1 or A2) (fun b => inl A1 A2 (d1 b))
+                (fun b => inr A1 A2 (d2 b)))
   | (?X1 <-> ?X2) =>
       let A1 := constr:X1 with A2 := constr:X2 in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
@@ -1210,7 +1210,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with ba2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q:Iff _ _ =>
-                CAnd_intro _ _ (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
+                pair (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
                   (fun a2:A2 => ba1 (CAnd_proj2 _ _ q (ab2 a2))))
   | (~ ?X1) =>
       let A0 := constr:X1 in

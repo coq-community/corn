@@ -88,20 +88,20 @@ Proof.
   auto.
  clear H2 H1 t; intros t H1 H2 Ht.
  set (x := pi_seq n) in *.
- apply less_wdr with (Cosine x CI[+] ( {--}Cosine x CI[-] {--}Cosine t Ht)).
+ apply less_wdr with (Cosine x I[+] ( {--}Cosine x I[-] {--}Cosine t Ht)).
   2: simpl in |- *; rational.
- assert (H3 : Derivative realline CI {--}Cosine Sine).
+ assert (H3 : Derivative realline I {--}Cosine Sine).
   apply Derivative_wdr with ( {--}{--}Sine).
    Opaque Sine.
    FEQ. Deriv.
   assert (H4 : Continuous_I (Min_leEq_Max x t) Sine).
   apply included_imp_Continuous with realline; Contin.
- set (B := Barrow _ _ Continuous_Sin CI {--}Cosine) in *.
- set (B' := B H3 x t H4 CI CI) in *.
- apply less_wdr with (Cosine x CI[-]Integral H4).
+ set (B := Barrow _ _ Continuous_Sin I {--}Cosine) in *.
+ set (B' := B H3 x t H4 I I) in *.
+ apply less_wdr with (Cosine x I[-]Integral H4).
   2: unfold cg_minus at 1 in |- *; apply bin_op_wd_unfolded.
    2: algebra.
-  2: rstepr ( [--] ( {--}Cosine t Ht[-] {--}Cosine x CI)).
+  2: rstepr ( [--] ( {--}Cosine t Ht[-] {--}Cosine x I)).
   2: apply un_op_wd_unfolded; eapply eq_transitive_unfolded.
    2: apply B'.
   2: algebra.
@@ -116,7 +116,7 @@ Proof.
  eapply leEq_less_trans.
   apply leEq_AbsIR.
  eapply less_leEq_trans.
-  apply (ub_Integral _ _ _ _ H4 (less_imp_ap _ _ _ H1) One) with x CI.
+  apply (ub_Integral _ _ _ _ H4 (less_imp_ap _ _ _ H1) One) with x I.
     intros.
     apply leEq_wdl with (AbsIR (Sin x0)).
      apply AbsIR_Sin_leEq_One.
@@ -166,7 +166,7 @@ Qed.
 Lemma sin_pi_seq_mon : forall x y n, Zero [<=] x -> x [<=] y -> y [<=] pi_seq n -> Sin x [<=] Sin y.
 Proof.
  intros; simpl in |- *.
- apply Derivative_imp_resp_leEq with realline CI Cosine.
+ apply Derivative_imp_resp_leEq with realline I Cosine.
      Deriv.
     auto.
    simpl in |- *; auto.
@@ -259,7 +259,7 @@ Lemma pi_seq_bnd :
 Proof.
  intros.
  set (F := FId{+}Cosine) in *.
- assert (H : Derivative realline CI F ( [-C-]One{+}{--}Sine)). unfold F in |- *; Deriv.
+ assert (H : Derivative realline I F ( [-C-]One{+}{--}Sine)). unfold F in |- *; Deriv.
   astepr (Zero[+] (One[-]Sin One) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
  apply shift_leEq_plus.
  apply approach_zero_weak; intros e H0.
@@ -289,7 +289,7 @@ Proof.
   astepl (pi_seq (S n)); apply pi_seq_incr.
  eapply leEq_transitive.
   apply leEq_AbsIR.
- set (H3 := CAnd_intro _ _ CI CI) in *.
+ set (H3 := (I, I)) in *.
  eapply leEq_wdl.
   apply (H2 H3 H3 H3).
  apply AbsIR_wd.
@@ -340,7 +340,7 @@ Lemma Sin_One_pos : Zero [<] Sin One.
 Proof.
  astepl (Sin Zero).
  simpl in |- *.
- apply Derivative_imp_resp_less with realline CI Cosine.
+ apply Derivative_imp_resp_less with realline I Cosine.
      Deriv.
     apply pos_one.
    simpl in |- *; auto.
@@ -971,11 +971,11 @@ Proof.
  set (y:=x[+]Pi [/]TwoNZ) in *.
  assert (H0:Cos y[#]Zero).
   destruct Hy as [[] [[] Hy]].
-  apply (Hy CI).
+  apply (Hy I).
  assert (H1:Cos x[#]Zero).
   clear H.
   destruct Hx as [[] [[] Hx]].
-  apply (Hx CI).
+  apply (Hx I).
  csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
  unfold y.
  assert (H2:([--](Sin x))[#]Zero).

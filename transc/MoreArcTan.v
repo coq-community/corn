@@ -80,7 +80,7 @@ Lemma ArcTan_resp_less : forall x y, x[<]y -> ArcTan x[<]ArcTan y.
 Proof.
  intros x y H.
  unfold ArcTan.
- eapply (Derivative_imp_resp_less realline CI).
+ eapply (Derivative_imp_resp_less realline I).
      apply Derivative_ArcTan.
     assumption.
    constructor.
@@ -428,8 +428,8 @@ Proof.
    apply AbsIR_nonneg.
   apply AbsIR_less; assumption.
  simpl.
- generalize (ext2 (S:=IR) (P:=Conj (fun _ : IR => CTrue) (fun _ : IR => CTrue))
-   (R:=fun (x : IR) (_ : Conj (fun _ : IR => CTrue) (fun _ : IR => CTrue) x) =>
+ generalize (ext2 (S:=IR) (P:=Conj (fun _ : IR => True) (fun _ : IR => True))
+   (R:=fun (x : IR) (_ : Conj (fun _ : IR => True) (fun _ : IR => True) x) =>
      One[+]One[*]x[*]x[#]Zero) (x:=c) D1).
  intros H.
  assert (Y:One[-]([--](c[^]2))[#]Zero).
@@ -579,10 +579,10 @@ Proof.
   destruct (FTC2 J _ (Included_imp_Continuous _ _ ArcTan_def_lemma J Y0) Zero Y1 _ _ X) as [z Hz].
   clear X.
   apply eq_transitive with z.
-   eapply eq_transitive; [|apply (Feq_imp_eq _ _ _ Hz _ Hc (CAnd_intro _ _ Hc Hc) CI)].
+   eapply eq_transitive; [|apply (Feq_imp_eq _ _ _ Hz _ Hc (Hc, Hc) I)].
    apply: bin_op_wd_unfolded;[|apply un_op_wd_unfolded]; apply pfwdef; apply eq_reflexive.
   apply eq_symmetric.
-  eapply eq_transitive; [|apply (Feq_imp_eq _ _ _ Hz _ Y1 (CAnd_intro _ _ Y1 Y1) CI)].
+  eapply eq_transitive; [|apply (Feq_imp_eq _ _ _ Hz _ Y1 (Y1, Y1) I)].
   rstepl (Zero[-]Zero:IR).
   apply: cg_minus_wd.
    stepr (ArcTan Zero).

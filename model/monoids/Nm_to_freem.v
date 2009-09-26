@@ -136,7 +136,7 @@ Proof.
   unfold ap_nat in H.
   unfold CNot in H.
   simpl.
-  apply Cinright.
+  right.
   apply IHa0.
   unfold ap_nat.
   unfold CNot.

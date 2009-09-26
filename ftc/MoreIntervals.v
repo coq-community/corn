@@ -121,7 +121,7 @@ To each interval a predicate (set) is assigned by the following map:
 
 Definition iprop (I : interval) (x : IR) : CProp :=
   match I with
-  | realline => CTrue
+  | realline => True
   | openr b  => x [<] b
   | openl a  => a [<] x
   | closer b => x [<=] b
@@ -146,11 +146,11 @@ finite and compact in the obvious way.
 
 Definition nonvoid (I : interval) : CProp :=
   match I with
-  | realline => CTrue
-  | openr b  => CTrue
-  | openl a  => CTrue
-  | closer b => CTrue
-  | closel a => CTrue
+  | realline => True
+  | openr b  => True
+  | openl a  => True
+  | closer b => True
+  | closel a => True
   | olor a b => a [<] b
   | olcr a b => a [<] b
   | clor a b => a [<] b
@@ -159,11 +159,11 @@ Definition nonvoid (I : interval) : CProp :=
 
 Definition proper (I : interval) : CProp :=
   match I with
-  | realline => CTrue
-  | openr b  => CTrue
-  | openl a  => CTrue
-  | closer b => CTrue
-  | closel a => CTrue
+  | realline => True
+  | openr b  => True
+  | openl a  => True
+  | closer b => True
+  | closel a => True
   | olor a b => a [<] b
   | olcr a b => a [<] b
   | clor a b => a [<] b
@@ -172,27 +172,27 @@ Definition proper (I : interval) : CProp :=
 
 Definition finite (I : interval) : CProp :=
   match I with
-  | realline => CFalse
-  | openr b  => CFalse
-  | openl a  => CFalse
-  | closer b => CFalse
-  | closel a => CFalse
-  | olor a b => CTrue
-  | olcr a b => CTrue
-  | clor a b => CTrue
-  | clcr a b => CTrue
+  | realline => False
+  | openr b  => False
+  | openl a  => False
+  | closer b => False
+  | closel a => False
+  | olor a b => True
+  | olcr a b => True
+  | clor a b => True
+  | clcr a b => True
   end.
 
 Definition compact_ (I : interval) : CProp :=
   match I with
-  | realline => CFalse
-  | openr b  => CFalse
-  | openl a  => CFalse
-  | closer b => CFalse
-  | closel a => CFalse
-  | olor a b => CFalse
-  | olcr a b => CFalse
-  | clor a b => CFalse
+  | realline => False
+  | openr b  => False
+  | openl a  => False
+  | closer b => False
+  | closel a => False
+  | olor a b => False
+  | olcr a b => False
+  | clor a b => False
   | clcr a b => a [<=] b
   end.
 

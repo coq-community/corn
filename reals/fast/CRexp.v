@@ -637,8 +637,8 @@ Qed.
 Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (Qscale_modulus (exp_bound z)).
 Proof.
  intros z.
- assert (Z:Derivative (closer (inj_Q IR (z:Q))) CI Expon Expon).
-  apply (Included_imp_Derivative realline CI).
+ assert (Z:Derivative (closer (inj_Q IR (z:Q))) I Expon Expon).
+  apply (Included_imp_Derivative realline I).
    Deriv.
   Included.
  apply (is_UniformlyContinuousD None (Some (z:Q)) I _ _ Z).
@@ -662,7 +662,7 @@ Proof.
   apply (Included_imp_Continuous realline).
    Contin.
   Included.
- apply (fun a b c => @ContinuousCorrect _ a Expon Z b c x CI); auto with *.
+ apply (fun a b c => @ContinuousCorrect _ a Expon Z b c x I); auto with *.
   constructor.
  intros q [] H.
  transitivity (exp_bound_uc z q);[|].

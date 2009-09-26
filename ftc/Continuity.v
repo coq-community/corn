@@ -131,7 +131,7 @@ Proof.
  exists (map2 F l (fun (x : IR) (Hx : member x l) => H0 x (Hl' x Hx))).
   intros x H.
   clear Hl; induction  l as [| a0 l Hrecl].
-   elimtype CFalse; assumption.
+   elimtype False; assumption.
   simpl in H; elim H; clear H; intro H1.
    cut (forall x : IR, member x l -> compact a b Hab x).
     intro H.
@@ -788,13 +788,13 @@ Proof.
    apply: bin_op_wd_unfolded; apply eq_symmetric; try apply un_op_wd_unfolded; apply: NRoot_power.
   csetoid_rewrite (Abs_Max (x'[^]n) (y'[^]n)).
   apply: bin_op_wd_unfolded; try apply un_op_wd_unfolded.
-   change (Max ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Max x' y') CI)).
+   change (Max ((FId{^}n) x' True_constr) ((FId{^}n) y' True_constr)[=]((FId{^}n) (Max x' y') True_constr)).
    apply Max_monotone.
    simpl; intros r s _ _ X0 X1 X2.
    apply: nexp_resp_leEq; try assumption.
    eapply leEq_transitive;[|apply X0].
    apply leEq_Min; apply: NRoot_nonneg.
-  change (Min ((FId{^}n) x' CI) ((FId{^}n) y' CI)[=]((FId{^}n) (Min x' y') CI)).
+  change (Min ((FId{^}n) x' True_constr) ((FId{^}n) y' True_constr)[=]((FId{^}n) (Min x' y') True_constr)).
   apply Min_monotone.
   simpl; intros r s _ _ X0 X1 X2.
   apply: nexp_resp_leEq; try assumption.

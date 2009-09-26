@@ -543,7 +543,7 @@ Proof.
  elim (Law_of_the_Mean _ _ _ _ H _ _ Hx0 H0 e H1).
  intros y H2 H3.
  eapply leEq_wdl.
-  apply (H3 (Derivative_imp_inc _ _ _ _ H _ Hx0) Hx CI).
+  apply (H3 (Derivative_imp_inc _ _ _ _ H _ Hx0) Hx I).
  apply AbsIR_wd; simpl in |- *; rational.
 Qed.
 
@@ -687,9 +687,9 @@ Proof.
  intro; case n.
   intros; elimtype False; inversion H.
  clear n; intros.
- astepl (Part (FId{^}S n) x CI).
- astepr (Part (FId{^}S n) y CI).
- apply Derivative_imp_resp_leEq with realline CI (nring (R:=IR) (S n) {**}FId{^}n).
+ astepl (Part (FId{^}S n) x I).
+ astepr (Part (FId{^}S n) y I).
+ apply Derivative_imp_resp_leEq with realline I (nring (R:=IR) (S n) {**}FId{^}n).
      Opaque nring.
      Derivative_Help.
      FEQ.

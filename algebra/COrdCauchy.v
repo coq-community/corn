@@ -485,9 +485,9 @@ Lemma resp_less_char : forall (f : R -> R) x y,
  (x [#] y -> f x [#] f y) -> (x [<=] y -> f x [<=] f y) -> x [<] y -> f x [<] f y.
 Proof.
  intros.
- set (f' := fun (x : R) (H : CTrue) => f x) in *.
- change (f' x CI [<] f' y CI) in |- *.
- apply resp_less_char' with (P := fun x : R => CTrue); auto.
+ set (f' := fun (x : R) (H : True) => f x) in *.
+ change (f' x I [<] f' y I) in |- *.
+ apply resp_less_char' with (P := fun x : R => True); auto.
 Qed.
 
 Lemma resp_leEq_char' : forall (P : R -> CProp) (f : forall x : R, P x -> R) x y Hx Hy,
@@ -513,9 +513,9 @@ Lemma resp_leEq_char : forall (f : R -> R) x y,
  (x [=] y -> f x [=] f y) -> (x [<] y -> f x [<] f y) -> x [<=] y -> f x [<=] f y.
 Proof.
  intros.
- set (f' := fun (x : R) (H : CTrue) => f x) in *.
- change (f' x CI [<=] f' y CI) in |- *.
- apply resp_leEq_char' with (P := fun x : R => CTrue); auto.
+ set (f' := fun (x : R) (H : True) => f x) in *.
+ change (f' x I [<=] f' y I) in |- *.
+ apply resp_leEq_char' with (P := fun x : R => True); auto.
 Qed.
 
 (**

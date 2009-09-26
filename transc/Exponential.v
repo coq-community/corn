@@ -85,8 +85,8 @@ Proof.
     (One[/] _[//]nring_fac_ap_zero IR n) [*]nexp _ n (Zero[-]Zero)).
    algebra.
   exact (fun_series_conv_imp_conv Zero Zero (leEq_reflexive IR Zero) Exp_ps
-    (Exp_conv Zero Zero (leEq_reflexive IR Zero) (compact_single_iprop realline Zero CI)) Zero
-      (compact_single_prop Zero) (fun_series_inc_IR realline Exp_ps Exp_conv Zero CI)).
+    (Exp_conv Zero Zero (leEq_reflexive IR Zero) (compact_single_iprop realline Zero I)) Zero
+      (compact_single_prop Zero) (fun_series_inc_IR realline Exp_ps Exp_conv Zero I)).
  simple destruct n; simpl in |- *; intros; rational.
 Qed.
 
@@ -129,7 +129,7 @@ Hint Resolve Derivative_Exp: derivate.
 
 Lemma Continuous_Exp : Continuous realline Expon.
 Proof.
- apply Derivative_imp_Continuous with CI Expon.
+ apply Derivative_imp_Continuous with I Expon.
  apply Derivative_Exp.
 Qed.
 
@@ -211,22 +211,22 @@ Proof.
  Included.
 Qed.
 
-Lemma Exp_unique : forall F, Derivative realline CI F F -> (forall H1, F Zero H1 [=] One) -> Feq realline Expon F.
+Lemma Exp_unique : forall F, Derivative realline I F F -> (forall H1, F Zero H1 [=] One) -> Feq realline Expon F.
 Proof.
  intros F H H0.
- cut (forall n : nat, Derivative_n n realline CI Expon Expon).
+ cut (forall n : nat, Derivative_n n realline I Expon Expon).
   intro derF.
   cut (Taylor_bnd (fun n : nat => Expon)); [ intro bndf | apply Exp_bnd ].
-  cut (forall n : nat, Derivative_n n realline CI F F).
+  cut (forall n : nat, Derivative_n n realline I F F).
    intros derG.
    apply Taylor_unique_crit with (f := fun _ : nat => Expon) (a := ZeroR) (g := fun n : nat => F)
      (bndf := bndf) (derF := derF); auto.
      apply bnd_imp_Taylor_bnd with F.
        intros; apply eq_imp_leEq; algebra.
-      apply Derivative_n_imp_Continuous with CI 1 F; auto with arith.
+      apply Derivative_n_imp_Continuous with I 1 F; auto with arith.
      intro n.
      change (included realline (Dom F)) in |- *.
-     apply Derivative_n_imp_inc with CI 1 F; auto with arith.
+     apply Derivative_n_imp_inc with I 1 F; auto with arith.
     intros; astepr OneR.
     astepr (Exp Zero).
     Opaque Expon.
@@ -248,12 +248,12 @@ Proof.
  apply mult_wdl.
  unfold Exp at 1 in |- *.
  simpl in |- *.
- assert (H0 : Dom F x). repeat split; exists (CAnd_intro _ _ CI CI); apply Exp_domain.
+ assert (H0 : Dom F x). repeat split; exists (I, I); apply Exp_domain.
   apply eq_transitive_unfolded with (Part F x H0).
   2: unfold F, Exp in |- *; simpl in |- *; rational.
  apply Feq_imp_eq with realline.
   apply Exp_unique.
-   assert (H1 : Derivative realline CI Expon Expon). apply Derivative_Exp.
+   assert (H1 : Derivative realline I Expon Expon). apply Derivative_Exp.
     unfold F in |- *; Derivative_Help.
     apply eq_imp_Feq.
       apply included_FScalMult; apply included_FMult.
@@ -262,7 +262,7 @@ Proof.
      apply included_FScalMult; apply included_FComp; Included.
     intros; simpl in |- *; rational.
    apply Derivative_scal.
-   apply Derivative_comp with realline CI; Deriv.
+   apply Derivative_comp with realline I; Deriv.
    red in |- *; intros a b Hab H2.
    exists (a[+]z); exists (b[+]z[+]One).
    cut (a[+]z [<] b[+]z[+]One).
@@ -488,7 +488,7 @@ Hint Resolve Derivative_Log: derivate.
 
 Lemma Continuous_Log : Continuous (openl Zero) Logarithm.
 Proof.
- apply Derivative_imp_Continuous with CI ( {1/} (Fid IR)).
+ apply Derivative_imp_Continuous with I ( {1/} (Fid IR)).
  Deriv.
 Qed.
 
@@ -544,11 +544,11 @@ Proof.
     astepr c; clear H2.
     cut (Dom (Logarithm{-}G) x); [ intro H2 | repeat split; simpl in |- *; auto ].
      eapply eq_transitive_unfolded.
-      2: apply (H5 x Hx H2 CI).
+      2: apply (H5 x Hx H2 I).
      Opaque Logarithm.
      simpl in |- *; algebra.
     clear H5.
-    exists (CAnd_intro _ _ CI CI); apply mult_resp_pos; auto.
+    exists (I, I); apply mult_resp_pos; auto.
    intros z w t H3.
    rstepl (z[-]t[+]t).
    apply bin_op_wd_unfolded.
@@ -559,20 +559,20 @@ Proof.
    apply un_op_wd_unfolded; auto.
   cut (Dom (Logarithm{-}G) One); [ intro H2 | repeat split; simpl in |- *; auto ].
     apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
-     2: apply (H5 One (pos_one IR) H2 CI).
+     2: apply (H5 One (pos_one IR) H2 I).
     simpl in |- *.
     rstepl (Zero[-] (Log y Hy[-]Log y Hy)).
     algebra.
    Transparent Logarithm.
    simpl in |- *; apply pos_one.
-  exists (CAnd_intro _ _ CI CI); simpl in |- *; apply mult_resp_pos; auto; apply pos_one.
+  exists (I, I); simpl in |- *; apply mult_resp_pos; auto; apply pos_one.
  unfold G in |- *.
  cut (Derivative (openl Zero) H Logarithm {1/}FId);
    [ intro H0 | unfold Logarithm in |- *; apply FTC1 ].
  Derivative_Help.
   apply eq_imp_Feq.
     repeat split.
-    exists (CAnd_intro _ _ CI CI); simpl in |- *.
+    exists (I, I); simpl in |- *.
     repeat split.
     intros; apply Greater_imp_ap; apply mult_resp_pos; auto.
    Included.
@@ -646,19 +646,19 @@ numerical and as a functional equation.
 
 Lemma Log_Exp_inv : Feq realline (Logarithm[o]Expon) FId.
 Proof.
- apply Feq_criterium with CI (Fconst (S:=IR) One) ZeroR.
-    cut (Derivative realline CI Expon Expon); [ intro H | apply Derivative_Exp ].
-    cut (Derivative (openl Zero) CI Logarithm {1/}FId); [ intro H0 | apply Derivative_Log ].
+ apply Feq_criterium with I (Fconst (S:=IR) One) ZeroR.
+    cut (Derivative realline I Expon Expon); [ intro H | apply Derivative_Exp ].
+    cut (Derivative (openl Zero) I Logarithm {1/}FId); [ intro H0 | apply Derivative_Log ].
     Derivative_Help.
      apply eq_imp_Feq.
        split; auto.
-       exists CI.
+       exists I.
        split; auto.
        intro; simpl in |- *; apply Greater_imp_ap.
        apply less_wdr with (Exp x); [ apply Exp_pos | simpl in |- *; algebra ].
       Included.
      intros; simpl in |- *; rational.
-    apply Derivative_comp with (openl Zero) CI; Deriv.
+    apply Derivative_comp with (openl Zero) I; Deriv.
     red in |- *; intros a b Hab H1.
     exists (Exp a); exists (Exp b[+]One); exists
       (leEq_less_trans _ _ _ _ (Exp_resp_leEq _ _ Hab) (less_plusOne _ _)).
@@ -693,11 +693,11 @@ Proof.
   intro H0.
   unfold Log in |- *; simpl in |- *; apply eq_transitive_unfolded with (Part _ _ H0).
    simpl in |- *; algebra.
-  astepr (Part FId x CI).
+  astepr (Part FId x I).
   apply Feq_imp_eq with realline.
    apply Log_Exp_inv.
   split.
- exists CI.
+ exists I.
  apply Log_domain.
  apply less_wdr with (Exp x); auto.
  simpl in |- *; algebra.
@@ -819,7 +819,7 @@ Qed.
 Lemma Log_resp_less : forall (x y : IR) Hx Hy, x [<] y -> Log x Hx [<] Log y Hy.
 Proof.
  intros x y Hx Hy H.
- unfold Log in |- *; apply Derivative_imp_resp_less with (openl Zero) CI ( {1/} (Fid IR));
+ unfold Log in |- *; apply Derivative_imp_resp_less with (openl Zero) I ( {1/} (Fid IR));
    simpl in |- *; auto.
   apply Derivative_Log.
  intro contF.
@@ -832,7 +832,7 @@ Proof.
   elim H1; intros H2 H3.
   elim H3; clear Hz H1 H3; intros H1 H3.
   assert (H0 := H3 H1); simpl in H0.
-  astepr (One[/] t[//]ext2 (P:=fun _ : IR => CTrue) H1).
+  astepr (One[/] t[//]ext2 (P:=fun _ : IR => True) H1).
   elim H2; intros HMin HMax.
   apply recip_resp_leEq; auto.
    apply less_leEq_trans with (Min x y); auto.

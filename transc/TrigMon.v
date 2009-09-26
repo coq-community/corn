@@ -106,7 +106,7 @@ Qed.
 Lemma Cos_nonneg : forall x, [--] (Pi [/]TwoNZ) [<=] x -> x [<=] Pi [/]TwoNZ -> Zero [<=] Cos x.
 Proof.
  simpl in |- *.
- intros; apply olor_pos_clcr_nonneg with ( [--] (Pi [/]TwoNZ)) (Pi [/]TwoNZ) CI CI.
+ intros; apply olor_pos_clcr_nonneg with ( [--] (Pi [/]TwoNZ)) (Pi [/]TwoNZ) I I.
      PiSolve.
     intros x0 H1 Hx; inversion_clear H1.
     apply less_wdr with (Cos x0); [ apply Cos_pos; auto | simpl in |- *; algebra ].
@@ -118,7 +118,7 @@ Qed.
 Lemma Sin_nonneg : forall x, Zero [<=] x -> x [<=] Pi -> Zero [<=] Sin x.
 Proof.
  simpl in |- *.
- intros; apply olor_pos_clcr_nonneg with ZeroR Pi CI CI.
+ intros; apply olor_pos_clcr_nonneg with ZeroR Pi I I.
      PiSolve.
     intros x0 H1 Hx; inversion_clear H1.
     apply less_wdr with (Sin x0); [ apply Sin_pos; auto | simpl in |- *; algebra ].
@@ -168,7 +168,7 @@ Proof.
  intros; simpl in |- *.
  cut ( [--] (Pi [/]TwoNZ) [<] Pi [/]TwoNZ). intro H2.
   apply Derivative_imp_resp_leEq with (clcr [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) H2 Cosine; auto.
-     apply Included_imp_Derivative with realline CI; Deriv.
+     apply Included_imp_Derivative with realline I; Deriv.
     split; auto; apply leEq_transitive with y; auto.
    split; auto; apply leEq_transitive with x; auto.
   intros.
@@ -234,9 +234,9 @@ Proof.
   apply un_op_wd_unfolded; apply eq_symmetric_unfolded; apply Integral_op.
  apply eq_transitive_unfolded with (Integral H5).
   apply eq_symmetric_unfolded; apply Integral_inv.
- assert (H6 : Derivative realline CI Cosine {--}Sine). Deriv.
+ assert (H6 : Derivative realline I Cosine {--}Sine). Deriv.
   eapply eq_transitive_unfolded.
-  apply Barrow with (derG0 := H6) (Ha := CI) (Hb := CI) (pJ := CI); Contin; split.
+  apply Barrow with (derG0 := H6) (Ha := I) (Hb := I) (pJ := I); Contin; split.
  simpl in |- *; algebra.
 Qed.
 
@@ -577,9 +577,9 @@ Lemma Derivative_Tan_1 : forall H, Derivative (olor [--] (Pi [/]TwoNZ) (Pi [/]Tw
 Proof.
  intros.
  assert (H0 : Derivative _ H Sine Cosine).
-  apply Included_imp_Derivative with realline CI; Deriv.
+  apply Included_imp_Derivative with realline I; Deriv.
  assert (H1 : Derivative _ H Cosine {--}Sine).
-  apply Included_imp_Derivative with realline CI; Deriv.
+  apply Included_imp_Derivative with realline I; Deriv.
  assert (H2 : forall x : IR, olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ) x -> Cos x [#] Zero).
   intros x H2; apply Greater_imp_ap; inversion_clear H2; apply Cos_pos; auto.
  unfold Tang in |- *.
@@ -600,8 +600,8 @@ Proof.
   apply eq_transitive_unfolded with (Cos x[*]Cos x[-]Sin x[*][--] (Sin x) [/] _[//]
     mult_resp_ap_zero _ _ _ (H2 x H3) (H2 x H3)).
    elim Hx; intros H4 H5.
-   astepl (Part _ _ (ProjIR1 (CAnd_intro _ _ H4 H5)) [/] _[//]
-     ext2 (S:=IR) (ProjIR2 (CAnd_intro _ _ H4 H5))).
+   astepl (Part _ _ (ProjIR1 (H4, H5)) [/] _[//]
+     ext2 (S:=IR) (ProjIR2 (H4, H5))).
    astepl (Part _ _ H4[/] _[//]ext2 (S:=IR) H5); clear Hx.
    apply div_wd.
     simpl in |- *.

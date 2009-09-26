@@ -127,9 +127,9 @@ Proof.
  generalize (fun_series_conv_imp_conv (inj_Q IR a) (inj_Q IR a)
    (leEq_reflexive IR (inj_Q IR a)) sin_ps
      (sin_conv (inj_Q IR a) (inj_Q IR a) (leEq_reflexive IR (inj_Q IR a))
-       (compact_single_iprop realline (inj_Q IR a) CI)) (inj_Q IR a)
+       (compact_single_iprop realline (inj_Q IR a) I)) (inj_Q IR a)
          (compact_single_prop (inj_Q IR a))
-           (fun_series_inc_IR realline sin_ps sin_conv (inj_Q IR a) CI)).
+           (fun_series_inc_IR realline sin_ps sin_conv (inj_Q IR a) I)).
  intros H.
  rewrite InfiniteAlternatingSum_correct'.
  apply IRasCR_wd.
@@ -488,7 +488,7 @@ Proof.
   change (/1) with 1.
   replace RHS with (x:Q) by ring.
   apply Qle_refl.
- apply (is_UniformlyContinuousD None None I Sine Cosine (Derivative_Sin CI) rational_sin).
+ apply (is_UniformlyContinuousD None None I Sine Cosine (Derivative_Sin I) rational_sin).
   intros q [] _.
   apply rational_sin_correct.
  intros x [] _.
@@ -508,7 +508,7 @@ Lemma sin_slow_correct : forall x,
  (IRasCR (Sin x) == sin_slow (IRasCR x))%CR.
 Proof.
  intros x.
- apply: (ContinuousCorrect (CI:proper realline)); [apply Continuous_Sin | | constructor].
+ apply: (ContinuousCorrect (I:proper realline)); [apply Continuous_Sin | | constructor].
  intros q [] _.
  transitivity (rational_sin q);[|apply rational_sin_correct].
  unfold sin_slow.

@@ -26,9 +26,9 @@ Variable R : CRing.
 Let RX := cpoly_cring R.
 Add Ring r_r : (r_rt (Ring:=CRing_is_Ring R)).
 Add Ring rx_r : (r_rt (Ring:=CRing_is_Ring (cpoly_cring R))).
-Hypothesis R_dec : forall x y : R, COr (x [=] y) (x [#] y).
+Hypothesis R_dec : forall x y : R, sum (x [=] y) (x [#] y).
 
-Lemma RX_dec : forall p q : RX, COr (p [=] q) (p [#] q).
+Lemma RX_dec : forall p q : RX, sum (p [=] q) (p [#] q).
 Proof.
  unfold RX; intros p q; pattern p, q; apply Ccpoly_double_sym_ind; clear p q.
    intros p q H.
@@ -52,11 +52,11 @@ Qed.
 Fixpoint RX_deg (p : RX) : nat :=
   match p with
     | cpoly_zero => 0
-    | cpoly_linear c p => match RX_dec p Zero with Cinleft _ => 0 | Cinright _ => S (RX_deg p) end
+    | cpoly_linear c p => match RX_dec p Zero with inl _ => 0 | inr _ => S (RX_deg p) end
   end.
 
 Lemma RX_deg_zero : RX_deg Zero = 0. Proof. reflexivity. Qed.
-Lemma RX_deg_linear : forall c p, RX_deg (c[+X*]p) = match RX_dec p Zero with Cinleft _ => 0 | Cinright _ => S (RX_deg p) end.
+Lemma RX_deg_linear : forall c p, RX_deg (c[+X*]p) = match RX_dec p Zero with inl _ => 0 | inr _ => S (RX_deg p) end.
 Proof. reflexivity. Qed.
 
 Lemma RX_deg_spec : forall p : RX, p [#] Zero -> degree (RX_deg p) p.

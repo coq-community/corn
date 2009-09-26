@@ -60,7 +60,6 @@ Proof.
    reflexivity.
   intros p H3.
   2:intuition.
- Set Printing Coercions.
  cut False.
   intuition.
  cut (Zneg p < 0)%Z.
@@ -88,15 +87,14 @@ Lemma mod_nat_correct: forall (k l:nat)(H:(l>0)%Z),
 Proof.
  intros k l H.
  unfold mod_nat.
- unfold COr_rec.
- unfold COr_rect.
+ unfold sum_rec.
+ unfold sum_rect.
  case ( Zmod_pos k l H).
   tauto.
  unfold sigT_rec.
  unfold sigT_rect.
  intro H0.
  case H0.
- Set Printing Coercions.
  simpl.
  intro x.
  set (H1:= (inject_nat_convert x)).

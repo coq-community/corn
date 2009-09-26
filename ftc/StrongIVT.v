@@ -139,7 +139,7 @@ Definition IVT'_iter : IVT'_aux_seq_type -> IVT'_aux_seq_type.
 Proof.
  intro Haux; elim Haux; intros.
  elim (IVT'_seq_lemma (pairT IVT'seq3 IVT'seq4) (pairT IVT'H3 IVT'H4) IVT'prf0
-   (CAnd_intro _ _ IVT'z3 IVT'z4)).
+   (IVT'z3, IVT'z4)).
  intro x; elim x; simpl in |- *; clear x; intros.
  elim p.
  intro x; elim x; simpl in |- *; clear x; intros.

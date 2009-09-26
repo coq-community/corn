@@ -1297,7 +1297,7 @@ Proof.
  intros a b Hab H0.
  cut (Diffble_I_n Hab n F). intro H1. 2: auto.
   eapply Derivative_I_n_wdr.
-  apply Feq_symmetric; apply (N_Deriv_Feq n F (CAnd_intro _ _ incF diffF) _ _ Hab H1 H0).
+  apply Feq_symmetric; apply (N_Deriv_Feq n F (incF, diffF) _ _ Hab H1 H0).
  apply n_deriv_lemma.
 Qed.
 
@@ -1313,9 +1313,9 @@ Proof.
  cut (Diffble_I_n Hab n F). intro H1. 2: auto.
   cut (Diffble_I_n Hab (S n) F). intro H2. 2: auto.
   eapply Derivative_I_wdl.
-  apply Feq_symmetric; apply (N_Deriv_Feq n F (CAnd_intro _ _ incF diffFn) _ _ Hab H1 H0).
+  apply Feq_symmetric; apply (N_Deriv_Feq n F (incF, diffFn) _ _ Hab H1 H0).
  eapply Derivative_I_wdr.
-  apply Feq_symmetric; apply (N_Deriv_Feq _ _ (CAnd_intro _ _ incF' diffFSn) _ _ Hab H2 H0).
+  apply Feq_symmetric; apply (N_Deriv_Feq _ _ (incF', diffFSn) _ _ Hab H2 H0).
  apply n_Sn_deriv.
 Qed.
 

@@ -129,7 +129,7 @@ Proof.
  elim H1; auto.
 Qed.
 
-Lemma included_IR : included I (fun x : IR => CTrue).
+Lemma included_IR : included I (fun x : IR => True).
 Proof.
  split.
 Qed.
@@ -542,7 +542,7 @@ Let P := Dom F.
 (* end hide *)
 
 Variable Q : IR -> CProp.
-Hypothesis H : included Q (fun x : IR => CTrue).
+Hypothesis H : included Q (fun x : IR => True).
 Hypothesis Hf : included Q (Dom F).
 
 Lemma FNth_zero : forall x, Q x -> forall Hx Hx', [-C-]One x Hx [=] (F{^}0) x Hx'.

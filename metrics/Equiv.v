@@ -327,8 +327,7 @@ Proof.
    simpl in |- *.
    intro H7.
    set (H6 := inv_strext) in *.
-   set (H5 := H6 X Y f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ a
-     (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 b2))))) in *.
+   set (H5 := H6 X Y f (isopsmetry_imp_bij X Y f (a, ((a1, b1), (a2, b2))))) in *.
    generalize H5.
    unfold fun_strext in |- *.
    intros H4.
@@ -377,21 +376,21 @@ Proof.
   unfold bin_fun_wd in |- *.
   intro H6.
   apply H6.
-   cut (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-     (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+   cut (invfun f (isopsmetry_imp_bij X Y f ((a3, b3),
+     (pair (a1, b1) (pair a2 (existT (fun n : nat =>
        forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x0)[=] invfun f
-         (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-           (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+         (isopsmetry_imp_bij X Y f (pair (a3, b3)
+           (pair (a1, b1) (pair a2 (existT (fun n : nat =>
              forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) y0).
     intros.
-    astepr (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-      (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+    astepr (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
+      (pair (a1, b1) (pair a2 (existT (fun n : nat =>
         forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x0)).
     apply eq_symmetric.
     apply inv2.
    set (H10 := csf_wd) in *.
-   set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-     (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat => forall x y : X,
+   set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (a3, b3)
+     (pair (a1, b1) (pair a2 (existT (fun n : nat => forall x y : X,
        f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))))) in *.
    generalize H7.
    unfold fun_wd in |- *.
@@ -400,21 +399,21 @@ Proof.
    intro H8.
    apply H8.
    exact b4.
-  cut (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-    (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+  cut (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
+    (pair (a1, b1) (pair a2 (existT (fun n : nat =>
       forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x1)[=] invfun f
-        (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-          (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+        (isopsmetry_imp_bij X Y f (pair (a3, b3)
+          (pair (a1, b1) (pair a2 (existT (fun n : nat =>
             forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) y1).
    intros.
-   astepr (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-     (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat =>
+   astepr (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
+     (pair (a1, b1) (pair a2 (existT (fun n : nat =>
        forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x1)).
    apply eq_symmetric.
    apply inv2.
   set (H10 := csf_wd) in *.
-  set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-    (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ a2 (existT (fun n : nat => forall x y : X,
+  set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (a3, b3)
+    (pair (a1, b1) (pair a2 (existT (fun n : nat => forall x y : X,
       f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))))) in *.
   generalize H7.
   unfold fun_wd in |- *.
@@ -445,20 +444,20 @@ Proof.
  unfold bin_fun_wd in |- *.
  intro H6.
  apply H6.
-  cut (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-    (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+  cut (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+    (pair (pair a1 b1) (pair (existT (fun n : nat =>
       forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) y0[=] invfun f
-        (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-          (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+        (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+          (pair (pair a1 b1) (pair (existT (fun n : nat =>
             forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x0)).
    intros.
-   astepl (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-     (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+   astepl (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+     (pair (pair a1 b1) (pair (existT (fun n : nat =>
        forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x0)).
    apply inv2.
   set (H10 := csf_wd) in *.
-  set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-    (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat => forall x y : X,
+  set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+    (pair (pair a1 b1) (pair (existT (fun n : nat => forall x y : X,
       x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))))) in *.
   generalize H7.
   unfold fun_wd in |- *.
@@ -468,20 +467,20 @@ Proof.
   apply H8.
   apply eq_symmetric.
   exact b4.
- cut (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-   (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+ cut (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+   (pair (pair a1 b1) (pair (existT (fun n : nat =>
      forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) y1[=] invfun f
-       (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-         (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+       (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+         (pair (pair a1 b1) (pair (existT (fun n : nat =>
            forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x1)).
   intros.
-  astepl (invfun f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-    (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat =>
+  astepl (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+    (pair (pair a1 b1) (pair (existT (fun n : nat =>
       forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x1)).
   apply inv2.
  set (H10 := csf_wd) in *.
- set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (CAnd_intro _ _ (CAnd_intro _ _ a3 b3)
-   (CAnd_intro _ _ (CAnd_intro _ _ a1 b1) (CAnd_intro _ _ (existT (fun n : nat => forall x y : X,
+ set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
+   (pair (pair a1 b1) (pair (existT (fun n : nat => forall x y : X,
      x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))))) in *.
  generalize H7.
  unfold fun_wd in |- *.
