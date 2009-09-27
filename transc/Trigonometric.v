@@ -388,7 +388,7 @@ Proof.
     simpl in |- *; apply plus_resp_leEq; auto.
    simpl in |- *; apply plus_resp_leEq; auto.
   apply plus_resp_leEq; auto.
- apply four_induction with (P := fun n : nat => included (fun _ : IR => CTrue) (Dom (F' y n)));
+ apply four_induction with (P := fun n : nat => included (fun _ : IR => True) (Dom (F' y n)));
    auto; unfold F' in |- *; Included.
 Qed.
 
@@ -472,7 +472,7 @@ Proof.
     apply AbsIR_minus.
    auto.
   Contin.
- apply four_induction with (P := fun n : nat => included (fun _ : IR => CTrue) (Dom (G' y n)));
+ apply four_induction with (P := fun n : nat => included (fun _ : IR => True) (Dom (G' y n)));
    auto; unfold G' in |- *.
     apply included_FPlus; Included.
    apply included_FMinus; Included.
@@ -517,7 +517,7 @@ Proof.
  simpl in |- *; auto.
 Qed.
 
-Lemma Sin_plus_der_lft : forall y n, Derivative_n n realline CI (F y) (F' y n).
+Lemma Sin_plus_der_lft : forall y n, Derivative_n n realline I (F y) (F' y n).
 Proof.
  intro; apply Derivative_n_chain.
   simpl in |- *; unfold F in |- *.
@@ -525,47 +525,47 @@ Proof.
   apply included_FComp; Included.
  intro.
  cut (maps_compacts_into realline realline (FId{+} [-C-]y)); [ intro | apply maps_translation ].
- cut (Derivative realline CI (FId{+} [-C-]y) [-C-]One); intros.
+ cut (Derivative realline I (FId{+} [-C-]y) [-C-]One); intros.
   2: apply Derivative_wdr with ( [-C-]One{+} [-C-]Zero:PartIR).
    2: FEQ.
   2: Deriv.
- apply four_induction with (P := fun n : nat => Derivative realline CI (F' y n) (F' y (S n))).
+ apply four_induction with (P := fun n : nat => Derivative realline I (F' y n) (F' y (S n))).
      simpl in |- *.
      apply Derivative_wdr with ((Cosine[o]FId{+} [-C-]y) {*} [-C-]One).
       FEQ.
-     apply Derivative_comp with realline CI; auto.
+     apply Derivative_comp with realline I; auto.
      Deriv.
     simpl in |- *.
     apply Derivative_wdr with (( {--}Sine[o]FId{+} [-C-]y) {*} [-C-]One).
      FEQ.
-    apply Derivative_comp with realline CI; auto.
+    apply Derivative_comp with realline I; auto.
     Deriv.
    simpl in |- *.
    apply Derivative_inv.
    apply Derivative_wdr with ((Cosine[o]FId{+} [-C-]y) {*} [-C-]One).
     FEQ.
-   apply Derivative_comp with realline CI; auto.
+   apply Derivative_comp with realline I; auto.
    Deriv.
   simpl in |- *.
   apply Derivative_wdr with ( {--} (( {--}Sine[o]FId{+} [-C-]y) {*} [-C-]One)).
    FEQ.
   apply Derivative_inv.
-  apply Derivative_comp with realline CI; auto.
+  apply Derivative_comp with realline I; auto.
   Deriv.
  intros.
  auto.
 Qed.
 
-Lemma Sin_plus_der_rht : forall y n, Derivative_n n realline CI (G y) (G' y n).
+Lemma Sin_plus_der_rht : forall y n, Derivative_n n realline I (G y) (G' y n).
 Proof.
  intro; apply Derivative_n_chain.
   simpl in |- *; unfold G in |- *.
   apply Feq_reflexive.
   apply included_FPlus; Included.
  intro.
- cut (Derivative realline CI Sine Cosine); [ intro | Deriv ].
- cut (Derivative realline CI Cosine {--}Sine); [ intro | Deriv ].
- apply four_induction with (P := fun n : nat => Derivative realline CI (G' y n) (G' y (S n))).
+ cut (Derivative realline I Sine Cosine); [ intro | Deriv ].
+ cut (Derivative realline I Cosine {--}Sine); [ intro | Deriv ].
+ apply four_induction with (P := fun n : nat => Derivative realline I (G' y n) (G' y (S n))).
      simpl in |- *.
      let r := PartIR_to_symbPF (Sine{*} [-C-] (Cos y) {+}Cosine{*} [-C-] (Sin y)) in
        apply Derivative_wdr with (symbPF_deriv r).
@@ -634,12 +634,12 @@ Opaque Sine Cosine.
 Lemma Cos_plus_fun : forall y, Feq realline (Cosine[o]FId{+} [-C-]y) (Cosine{*} [-C-] (Cos y) {-}Sine{*} [-C-] (Sin y)).
 Proof.
  intro.
- assert (H : Derivative realline CI Sine Cosine). Deriv.
-  assert (H0 : Derivative realline CI Cosine {--}Sine). Deriv.
-  apply Derivative_unique with CI (Sine[o]FId{+} [-C-]y).
+ assert (H : Derivative realline I Sine Cosine). Deriv.
+  assert (H0 : Derivative realline I Cosine {--}Sine). Deriv.
+  apply Derivative_unique with I (Sine[o]FId{+} [-C-]y).
   Derivative_Help.
    FEQ.
-  apply Derivative_comp with realline CI.
+  apply Derivative_comp with realline I.
     apply maps_translation.
    Deriv.
   Deriv.

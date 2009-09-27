@@ -67,7 +67,7 @@ Fixpoint minlist (l : list IR) : IR :=
 
 Fixpoint member (x : IR) (l : list IR) {struct l} : CProp :=
   match l with
-  | nil      => CFalse
+  | nil      => False
   | cons y m => member x m or x [=] y
   end.
 
@@ -116,7 +116,7 @@ Proof.
   simpl in |- *; simpl in H0; assumption.
  simpl in H0; inversion_clear H0. rename X into H0.
   simpl in |- *; left.
-  apply Hrecl with (fun (y : IR) (H0 : member y l) => H y (Cinleft (member y l) (y [=] a) H0)).
+  apply Hrecl with (fun (y : IR) (H0 : member y l) => H y (@inl (member y l) (y [=] a) H0)).
   assumption.
  right.
  eapply eq_transitive_unfolded.
@@ -144,7 +144,7 @@ Lemma maxlist_greater : forall l x, member x l -> x [<=] maxlist l.
 Proof.
  intros l x H.
  induction  l as [| a l Hrecl].
-  elimtype CFalse; assumption.
+  elimtype False; assumption.
  simpl in |- *.
  induction  l as [| a0 l Hrecl0].
   simpl in H; elim H.
@@ -292,7 +292,7 @@ Lemma minlist_smaller : forall l x, member x l -> minlist l [<=] x.
 Proof.
  intros l x H.
  induction  l as [| a l Hrecl].
-  elimtype CFalse; assumption.
+  done.
  simpl in |- *.
  astepl match l with | nil => a | cons _ _ => Min a (minlist l) end.
  induction  l as [| a0 l Hrecl0].

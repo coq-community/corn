@@ -386,9 +386,9 @@ Lemma Derivative_power : forall (J : interval) pJ F F' G G', positive_fun J F ->
 Proof.
  intros J pJ F F' G G' H H0 H1.
  unfold FPower in |- *.
- assert (H2 : Derivative (openl Zero) CI Logarithm {1/}FId).
+ assert (H2 : Derivative (openl Zero) I Logarithm {1/}FId).
   apply Derivative_Log.
- assert (H3 : Derivative realline CI Expon Expon).
+ assert (H3 : Derivative realline I Expon Expon).
   apply Derivative_Exp.
  elim H; intros incF H'.
  elim H'; intros c H4 H5; clear incF H'.
@@ -447,11 +447,11 @@ Proof.
   astepl (Part _ (Part _ _ Hx1) Hx3[*]Part _ _ Hx2).
   generalize Hx3; clear Hx3.
   elim Hx1; intros Hx4 Hx5.
-  intro; astepl (Part _ (Part _ _ (ProjIR1 (CAnd_intro _ _ Hx4 Hx5)) [*]
-    Part _ _ (ProjIR2 (CAnd_intro _ _ Hx4 Hx5))) Hx3[*] Part _ _ Hx2).
+  intro; astepl (Part _ (Part _ _ (ProjIR1 (Hx4, Hx5)) [*]
+    Part _ _ (ProjIR2 (Hx4, Hx5))) Hx3[*] Part _ _ Hx2).
   cut (Dom Expon (Part _ _ Hx4[*]Part _ _ Hx5)). intro H7.
-   2: apply dom_wd with (x := Part _ _ (ProjIR1 (CAnd_intro _ _ Hx4 Hx5)) [*]
-     Part _ _ (ProjIR2 (CAnd_intro _ _ Hx4 Hx5))); algebra.
+   2: apply dom_wd with (x := Part _ _ (ProjIR1 (Hx4, Hx5)) [*]
+     Part _ _ (ProjIR2 (Hx4, Hx5))); algebra.
   astepl (Part _ (Part _ _ Hx4[*]Part _ _ Hx5) H7[*]Part _ _ Hx2).
   clear Hx3; rename H7 into Hx3.
   astepl (Part _ (Part _ _ Hx4[*]Part _ _ (ProjT2 Hx5)) Hx3[*]Part _ _ Hx2).
@@ -517,8 +517,8 @@ Proof.
    generalize Hx3; clear Hx3.
    elim Hx2; clear Hx2; intros Hx4 Hx5 Hx3.
    assert (H13 : Dom Expon (Part _ _ Hx4[*]Part _ _ Hx5)). apply Exp_domain.
-    astepr (Part _ _ Hx1[+] Part _ (Part _ _ (ProjIR1 (CAnd_intro _ _ Hx4 Hx5)) [*]
-      Part _ _ (ProjIR2 (CAnd_intro _ _ Hx4 Hx5))) Hx3[*] (Part _ _ H12[*]Log _ H9)).
+    astepr (Part _ _ Hx1[+] Part _ (Part _ _ (ProjIR1 (Hx4, Hx5)) [*]
+      Part _ _ (ProjIR2 (Hx4, Hx5))) Hx3[*] (Part _ _ H12[*]Log _ H9)).
    apply eq_transitive_unfolded with (Part _ _ Hx1[+]Part _ _ H13[*] (Part _ _ H12[*]Log _ H9)).
     2: apply bin_op_wd_unfolded; algebra.
    generalize H13; clear H13 Hx3.
@@ -567,7 +567,7 @@ Proof.
   Transparent Logarithm.
   astepr (Part _ _ Hx16); auto.
  Opaque Logarithm.
- apply Derivative_comp with realline CI; Deriv.
+ apply Derivative_comp with realline I; Deriv.
   apply Continuous_imp_maps_compacts_into.
   apply Continuous_mult.
    apply Derivative_imp_Continuous with pJ G'; auto.
@@ -578,7 +578,7 @@ Proof.
   apply Continuous_Log.
  apply Derivative_mult.
   auto.
- apply Derivative_comp with (openl Zero) CI; Deriv.
+ apply Derivative_comp with (openl Zero) I; Deriv.
  apply positive_imp_maps_compacts_into; auto.
  apply Derivative_imp_Continuous with pJ F'; auto.
 Qed.

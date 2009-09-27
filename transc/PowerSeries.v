@@ -549,7 +549,7 @@ As most of these functions are total, it makes sense to treat them as setoid fun
 Definition Exp : CSetoid_un_op IR.
 Proof.
  red in |- *.
- apply Build_CSetoid_fun with (fun x : IR => Expon x CI).
+ apply Build_CSetoid_fun with (fun x : IR => Expon x I).
  intros x y H.
  exact (pfstrx _ _ _ _ _ _ H).
 Defined.
@@ -557,7 +557,7 @@ Defined.
 Definition Sin : CSetoid_un_op IR.
 Proof.
  red in |- *.
- apply Build_CSetoid_fun with (fun x : IR => Sine x CI).
+ apply Build_CSetoid_fun with (fun x : IR => Sine x I).
  intros x y H.
  exact (pfstrx _ _ _ _ _ _ H).
 Defined.
@@ -565,7 +565,7 @@ Defined.
 Definition Cos : CSetoid_un_op IR.
 Proof.
  red in |- *.
- apply Build_CSetoid_fun with (fun x : IR => Cosine x CI).
+ apply Build_CSetoid_fun with (fun x : IR => Cosine x I).
  intros x y H.
  exact (pfstrx _ _ _ _ _ _ H).
 Defined.

@@ -383,11 +383,11 @@ end.
 Fixpoint ap_fm (m:Astar)(k:Astar){struct m}: CProp :=
 match m with
 |nil => match k with
-        |nil => CFalse
-        |cons a l => CTrue
+        |nil => False
+        |cons a l => True
         end
 |cons b n => match k with
-        |nil => CTrue
+        |nil => True
         |cons a l => b[#]a or (ap_fm n l)
         end
 end.
@@ -834,7 +834,7 @@ why we chose to altogether do away with this approach.
 We now present some methods for defining partial functions.
 *)
 
-Hint Resolve CI: core.
+Hint Resolve I: core.
 
 Section CSetoid_Ops.
 
@@ -847,7 +847,7 @@ To begin with, we want to be able to ``see'' each total function as a partial fu
 Definition total_eq_part : CSetoid_un_op S -> PartFunct S.
 Proof.
  intros f.
- apply Build_PartFunct with (fun x : S => CTrue) (fun (x : S) (H : CTrue) => f x).
+ apply Build_PartFunct with (fun x : S => True) (fun (x : S) (H : True) => f x).
   red in |- *; intros; auto.
  intros x y Hx Hy H.
  exact (csf_strext _ _ f _ _ H).
@@ -1109,8 +1109,8 @@ Proof.
   intros b0 b1 H2.
   elim (H1 b0) => a0 H3.
   elim (H1 b1) => a1 H4.
-  astepl (Inv f (CAnd_intro _ _ H0 H1) (f a0)).
-  astepr (Inv f (CAnd_intro _ _ H0 H1) (f a1)).
+  astepl (Inv f (pair H0 H1) (f a0)).
+  astepr (Inv f (pair H0 H1) (f a1)).
   cut (fun_strext f).
    intros H5.
    apply H5.

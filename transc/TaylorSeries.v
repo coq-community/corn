@@ -203,7 +203,7 @@ Proof.
     2: intros w z H0 H2; fold (z[-]w) in |- *; unfold r in |- *.
     set (r' := Two[*]Max r One) in *.
     set (H' := Taylor_Series_lemma_cont r') in *.
-    elim (bndf r' H' _ _ (Min_leEq_Max' x y t) (included_interval' realline _ _ _ _ CI CI CI CI _) e He);
+    elim (bndf r' H' _ _ (Min_leEq_Max' x y t) (included_interval' realline _ _ _ _ I I I I _) e He);
       intros N HN.
     exists N. intros n H2 w z H3 H4 Hw Hz.
     simpl in |- *; fold (Two:IR) in |- *.
@@ -479,7 +479,7 @@ Proof.
  elim (Taylor' _ _ _ _ _ Ha (Hinc x Hx) n (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n)))
    (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF n)) _ ( pos_div_two _ _ H4)).
  intros y H5 H6.
- set (H7 := CAnd_intro _ _ (CAnd_intro _ _ CI CI) (CAnd_intro _ _ CI CI) :Dom
+ set (H7 := pair (I, I) (I, I) :Dom
    (N_Deriv _ _ _ _ (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))) {*}
      [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]x{-}FId) {^}n) y) in *.
  eapply leEq_wdl.
@@ -503,9 +503,9 @@ Proof.
  rstepr (nring (S n) [*] (e [/]TwoNZ[/] _[//]H1 (S n))).
  apply shift_leEq_mult' with (pos_ap_zero _ _ (pos_nring_S IR n)).
   apply pos_nring_S.
- set (H9 := CAnd_intro _ _ CI (CAnd_intro _ _ (CAnd_intro _ _ CI CI) (CAnd_intro _ _ CI CI))) in *.
+ set (H9 := pair I (pair (I, I) (I, I))) in *.
  eapply leEq_wdl.
-  apply HN with (n := n) (w := y) (z := x) (Hw := CI) (Hz := H9); auto with arith.
+  apply HN with (n := n) (w := y) (z := x) (Hw := I) (Hz := H9); auto with arith.
   inversion_clear Hx; inversion_clear H5; split.
    apply leEq_transitive with (Min a x); auto.
    apply leEq_Min.
@@ -520,7 +520,7 @@ Proof.
  simpl in |- *.
  unfold Taylor_Rem in |- *; simpl in |- *.
  clear H8 H6 H4 He Hx Hp HN Hab' H3 H2 H0 bndf.
- set (fy := Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S n)) y CI)) in *.
+ set (fy := Part _ _ (Derivative_n_imp_inc' _ _ _ _ _ (derF (S n)) y I)) in *.
  set (Fy := Part (N_Deriv _ _ _ _ (Derivative_n_imp_Diffble_n _ _ _ _ _ (derF (S n))))
    y (ProjIR1 (ProjIR1 H7))) in *.
  astepr (AbsIR (Fy[*] (One[/] _[//]nring_fac_ap_zero _ n) [*] (x[+][--]y) [^]n[*] (x[-]a)) [/]
@@ -600,7 +600,7 @@ Qed.
 
 Lemma bnd_imp_Taylor_bnd : forall (f : nat -> PartIR) (F : PartIR),
  (forall n x Hx Hx', AbsIR (f n x Hx) [<=] AbsIR (F x Hx')) -> Continuous realline F ->
- (forall n, included (fun _ => CTrue) (Dom (f n))) -> Taylor_bnd f.
+ (forall n, included (fun _ => True) (Dom (f n))) -> Taylor_bnd f.
 Proof.
  intros f F H H0 H1.
  apply Taylor_bnd_trans with (fun n : nat => F); auto.
@@ -627,8 +627,8 @@ Variables F G : PartIR.
 Variable a : IR.
 
 Variables f g : nat -> PartIR.
-Hypothesis derF : forall n, Derivative_n n realline CI F (f n).
-Hypothesis derG : forall n, Derivative_n n realline CI G (g n).
+Hypothesis derF : forall n, Derivative_n n realline I F (f n).
+Hypothesis derG : forall n, Derivative_n n realline I G (g n).
 
 Hypothesis bndf : Taylor_bnd f.
 Hypothesis bndg : Taylor_bnd g.
@@ -638,13 +638,13 @@ Hypothesis Heq : forall n HaF HaG, f n a HaF [=] g n a HaG.
 (* end show *)
 
 (* begin hide *)
-Let Hf := Taylor_Series_conv_IR CI F a CI f derF bndf.
+Let Hf := Taylor_Series_conv_IR I F a I f derF bndf.
 (* end hide *)
 
 Lemma Taylor_unique_crit : Feq realline F (FSeries_Sum Hf) -> Feq realline F G.
 Proof.
  intro H.
- cut (fun_series_convergent_IR realline (Taylor_Series realline CI G a CI g derG)).
+ cut (fun_series_convergent_IR realline (Taylor_Series realline I G a I g derG)).
   intro Hg.
   apply Feq_transitive with (FSeries_Sum Hf); auto.
   apply Feq_transitive with (FSeries_Sum Hg).

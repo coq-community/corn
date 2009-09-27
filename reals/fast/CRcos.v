@@ -196,7 +196,7 @@ Proof.
   change (/1) with 1.
   replace RHS with (x:Q) by ring.
   apply Qle_refl.
- apply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos CI) rational_cos).
+ apply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos I) rational_cos).
   intros q [] _.
   apply rational_cos_correct.
  intros x [] _.
@@ -218,7 +218,7 @@ Lemma cos_slow_correct : forall x,
  (IRasCR (Cos x) == cos_slow (IRasCR x))%CR.
 Proof.
  intros x.
- apply: (ContinuousCorrect (CI:proper realline)); [apply Continuous_Cos | | constructor].
+ apply: (ContinuousCorrect (I:proper realline)); [apply Continuous_Cos | | constructor].
  intros q [] _.
  transitivity (rational_cos q);[|apply rational_cos_correct].
  unfold cos_slow.

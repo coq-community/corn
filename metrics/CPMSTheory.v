@@ -51,7 +51,7 @@ finite sets of representants, instead of finite subsetoids. This seems to make
 
 Fixpoint MSmember (X : CSetoid) (x : X) (l : list X) {struct l} : CProp :=
   match l with
-  | nil => CFalse
+  | nil => False
   | cons y m => MSmember X x m or x = y
   end.
 
@@ -128,12 +128,12 @@ Proof.
  intros H.
  elim H.
   intro H1.
-  apply Cinleft.
+  left.
   apply Hrecl.
   exact H1.
  simpl in |- *.
  intros.
- apply Cinright.
+ right.
  rewrite b.
  intuition.
 Qed.
@@ -155,11 +155,11 @@ Proof.
  intro H.
  elim H.
   intro H1.
-  apply Cinleft.
+  left.
   apply Hrecl.
   exact H1.
  intro H1.
- apply Cinright.
+ right.
  rewrite H1.
  intuition.
 Qed.
@@ -231,11 +231,11 @@ Proof.
  intro H.
  elim H.
   intro H1.
-  apply Cinleft.
+  left.
   apply Hrecl.
   exact H1.
  intro H1.
- apply Cinright.
+ right.
  rewrite H1.
  intuition.
 Qed.

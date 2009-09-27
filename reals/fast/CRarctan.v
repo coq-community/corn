@@ -289,7 +289,7 @@ Proof.
   change (/1) with 1.
   replace RHS with (x:Q) by ring.
   apply Qle_refl.
- apply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan CI) rational_arctan).
+ apply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan I) rational_arctan).
   intros q [] _.
   apply rational_arctan_correct.
  intros x Hx _.
@@ -325,7 +325,7 @@ Lemma arctan_correct : forall x,
  (IRasCR (ArcTan x) == arctan (IRasCR x))%CR.
 Proof.
  intros x.
- apply (ContinuousCorrect (CI:proper realline)); [apply Continuous_ArcTan | | constructor].
+ apply (ContinuousCorrect (I:proper realline)); [apply Continuous_ArcTan | | constructor].
  intros q [] _.
  transitivity (rational_arctan q);[|apply rational_arctan_correct].
  unfold arctan.

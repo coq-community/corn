@@ -78,9 +78,9 @@ Proof.
        2: apply H2.
       algebra.
      algebra.
-    apply Feq_imp_eq with (fun x : IR => CTrue); auto.
+    apply Feq_imp_eq with (fun x : IR => True); auto.
    repeat split.
-  exists (CAnd_intro _ _ CI CI); split.
+  exists (I, I); done.
  unfold F, G in |- *; apply Sin_plus_fun.
 Qed.
 
@@ -95,11 +95,11 @@ Proof.
    simpl in |- *.
    eapply eq_transitive_unfolded.
     eapply eq_transitive_unfolded.
-     2: apply (H0 x CI H1 H2).
+     2: apply (H0 x I H1 H2).
     algebra.
    algebra.
   repeat split.
- exists (CAnd_intro _ _ CI CI); repeat split.
+ by exists (I, I).
 Qed.
 
 Opaque Sine Cosine.
@@ -308,7 +308,7 @@ Proof.
    (fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) x (prj2 IR _ _ _ Hx)))[//]
      ext2 (S:=IR) (P:=Dom Cosine)
        (R:=fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) (x:=x)
-         (prj2 _ _ _ _ Hx))[=](Sine x CI[/]Cosine x CI[//]H)).
+         (prj2 _ _ _ _ Hx))[=](Sine x I[/]Cosine x I[//]H)).
  algebra.
 Qed.
 

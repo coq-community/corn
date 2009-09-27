@@ -281,8 +281,8 @@ Proof.
    elim (Qle_not_lt _ _ q).
    apply: ln_uc_prf_pos.
   intros [xn xd]; apply: Qle_refl.
- assert (Z:Derivative (closel (inj_Q IR (c:Q))) CI Logarithm {1/}FId).
-  apply (Included_imp_Derivative (openl Zero) CI).
+ assert (Z:Derivative (closel (inj_Q IR (c:Q))) I Logarithm {1/}FId).
+  apply (Included_imp_Derivative (openl Zero) I).
    Deriv.
   intros x Hx.
   simpl.

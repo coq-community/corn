@@ -99,30 +99,12 @@ Here we treat conversion from [Prop] to [CProp] and vice versa,
 and some basic connectives in [CProp].
 *)
 
+Definition True_constr := I.
+  (* The name I is occasionally used for other things, hiding True's constructor. *)
+
 Definition Not (P : CProp) := P -> False.
 
-Inductive CAnd (A B : CProp) : CProp := CAnd_intro : A -> B -> CAnd A B.
-
-Lemma CAnd_proj1 : forall A B : CProp, (CAnd A B) -> A.
-Proof.
- intros A B [H _]; exact H.
-Qed.
-
-Lemma CAnd_proj2 : forall A B : CProp, (CAnd A B) -> B.
-Proof.
- intros A B [ _ H ]; exact H.
-Qed.
-
-Definition Iff (A B : CProp) : CProp := CAnd (A -> B) (B -> A).
-
-Inductive CFalse : CProp :=.
-
-Inductive CTrue : CProp := CI : CTrue.
-
-(* [sumT] should be in $COQTOP/theories/Init/Logic_Type.v *)
-Inductive sumT (A B : Type) : Type :=
-  | inlT : A -> sumT A B
-  | inrT : B -> sumT A B.
+Definition Iff (A B : CProp) : CProp := prod (A -> B) (B -> A).
 
 Definition proj1_sigT (A : Type) (P : A -> CProp) (e : sigT P) :=
   match e with
@@ -152,18 +134,7 @@ Definition proj2b_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
   | exist2T a b c => c
   end.
 
-Inductive toCProp (A : Prop) : CProp := ts : A -> toCProp A.
-
-Lemma toCProp_e : forall A : Prop, toCProp A -> forall P : Prop, (A -> P) -> P.
-Proof.
- intros A H P H0.
- elim H.
- intros H1.
- apply H0.
- assumption.
-Qed.
-
-Definition CNot (A : Prop): CProp := A -> CFalse.
+Definition CNot (A : Prop): CProp := A -> False.
 
 Lemma Ccontrapos' : forall A phi : Prop, (A -> phi) -> ~ phi -> CNot A.
 Proof.
@@ -173,17 +144,13 @@ Proof.
  auto.
 Qed.
 
-Inductive COr (A B : CProp) : CProp :=
-  | Cinleft : A -> COr A B
-  | Cinright : B -> COr A B.
-
 End Basics.
 
 
 (* begin hide *)
-Infix "or" := COr (at level 85, right associativity).
+Infix "or" := sum (at level 85, right associativity).
 
-Infix "and" := CAnd (at level 80, right associativity).
+Infix "and" := prod (at level 80, right associativity).
 
 Notation "A 'IFF' B" := (Iff A B) (at level 95, no associativity).
 
@@ -227,7 +194,7 @@ Qed.
 
 Lemma Iff_trans :
   forall (A B C : CProp),
-  (CAnd (A IFF B) (B IFF C)) -> (A IFF C).
+  (prod (A IFF B) (B IFF C)) -> (A IFF C).
 Proof.
  unfold Iff.
  intuition.
@@ -235,7 +202,7 @@ Qed.
 
 Lemma Iff_imp_imp :
   forall (A B : CProp),
-  (A IFF B) -> (CAnd (A->B) (B->A)).
+  (A IFF B) -> (prod (A->B) (B->A)).
 Proof.
  unfold Iff.
  intuition.
@@ -251,7 +218,7 @@ Lemma not_r_cor_rect :
   forall (A B : CProp) (S : Type) (l r : S),
   Not B ->
   forall H : A or B,
-  COr_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = l.
+  @sum_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = l.
 Proof.
  intros. elim H0.
  intros. reflexivity.
@@ -262,7 +229,7 @@ Lemma not_l_cor_rect :
   forall (A B : CProp) (S : Type) (l r : S),
   Not A ->
   forall H : A or B,
-  COr_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = r.
+  @sum_rect A B (fun _ : A or B => S) (fun x : A => l) (fun x : B => r) H = r.
 Proof.
  intros. elim H0.
  intro. elim H. assumption.
@@ -295,7 +262,7 @@ Check {x:A | (X x) | (P x)}.
 End test.
 *)
 
-Hint Resolve CI CAnd_intro Cinleft Cinright existT exist2T : core.
+Hint Resolve pair inl inr existT exist2T : core.
 
 Section Choice.
 (* **Choice
@@ -378,7 +345,7 @@ End CRelation_Definition.
 
 Fixpoint member (A : Type) (n : A) (l : list A) {struct l} : CProp :=
   match l with
-  | nil => CFalse
+  | nil => False
   | cons y m => member A n m or y = n
   end.
 

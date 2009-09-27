@@ -155,7 +155,7 @@ Proof.
   simpl in Hx'.
   apply eq_symmetric.
   apply x_mult_zero.
-  change (Zero:IR) with ([-C-]Zero x CI).
+  change (Zero:IR) with ([-C-]Zero x I).
   apply Feq_imp_eq with (I:=Compact (less_leEq _ _ _ X1)); auto.
   apply Derivative_I_unique with G.
    eapply included_imp_deriv;[|apply HGG'].

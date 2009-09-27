@@ -884,7 +884,7 @@ Proof.
   apply IRasCR_wd.
   apply: NRoot_wd.
   apply eq_reflexive.
- apply (ContinuousCorrect (CI:proper (closel Zero))); try assumption.
+ apply (ContinuousCorrect (I:proper (closel Zero))); try assumption.
   apply Continuous_NRoot.
    Contin.
   intros; assumption.

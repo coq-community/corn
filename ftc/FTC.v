@@ -301,8 +301,8 @@ Proof.
   fold G in H0.
   apply cg_minus_wd; unfold Ga, Gb, G0a, G0b in |- *; apply H; auto.
    simpl in H0.
-   apply eq_transitive_unfolded with ((G{-}G0) b (CAnd_intro _ _ Hb Hb')).
-    2: apply H0 with (Hx := CAnd_intro _ _ Hb Hb').
+   apply eq_transitive_unfolded with ((G{-}G0) b (Hb, Hb')).
+    2: apply H0 with (Hx := (Hb, Hb')).
      simpl.
      apply cg_minus_wd.
       apply Integral_wd.
@@ -312,9 +312,9 @@ Proof.
      algebra.
     auto.
    auto.
-  change c with ([-C-]c a CI).
-  apply eq_transitive_unfolded with ((G{-}G0) a (CAnd_intro _ _ Ha Ha')).
-   2: apply H0 with (Hx := CAnd_intro _ _ Ha Ha').
+  change c with ([-C-]c a I).
+  apply eq_transitive_unfolded with ((G{-}G0) a (Ha, Ha')).
+   2: apply H0 with (Hx := (Ha, Ha')).
    simpl.
    apply cg_minus_wd.
     apply Integral_wd.

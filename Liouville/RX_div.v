@@ -48,10 +48,8 @@ Lemma RX_div_spec : forall (p : RX) (a : R), p [=] (RX_div p a) [*] (_X_ [-] _C_
 Proof.
  intros p a.
  unfold RX_div.
- destruct (cpoly_div p (_X_monic a)).
- destruct x as [q r].
+ destruct (cpoly_div p (_X_monic a)) as [[q r] s [s0 d]].
  unfold fst, snd in *.
- destruct c.
  rewrite s0.
  apply cs_bin_op_wd; [reflexivity|].
  destruct d.

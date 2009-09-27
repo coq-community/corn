@@ -760,7 +760,7 @@ Defined.
 (** inv is preserved. *)
 Lemma Cauchy_IR_inv_as_CRinv_pos : forall (x:Cauchy_IR) x_,
 forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> (z <= (CS_seq _ x i))%Q) ->
-(CRinv_pos z (Cauchy_IRasCR x) == Cauchy_IRasCR (f_rcpcl x (Cinright _ _ x_)))%CR.
+(CRinv_pos z (Cauchy_IRasCR x) == Cauchy_IRasCR (f_rcpcl x (@inr _ _ x_)))%CR.
 Proof.
  intros [x Hx] [a [d d_ x_]] z n Hn.
  apply: regFunEq_e.
@@ -866,7 +866,7 @@ Proof.
    apply inv_cancel_less.
    rstepl x'.
    assumption.
-  set (y:= (Cauchy_IRasCR [--](f_rcpcl (F:=Cauchy_IR) ([--](x':Cauchy_IR)) (Cinright _ _ H')))%CR).
+  set (y:= (Cauchy_IRasCR [--](f_rcpcl (F:=Cauchy_IR) ([--](x':Cauchy_IR)) (@inr _ _ H')))%CR).
   transitivity y.
    destruct H as [n [e He H]].
    change (-(CRinv_pos (mkQpos He) (- Cauchy_IRasCR (Build_CauchySeq Q_as_COrdField x Hx)))==y)%CR.
@@ -874,7 +874,7 @@ Proof.
    rewrite <- Cauchy_IR_opp_as_CR_opp.
    apply CRopp_wd.
    set (X := (Cauchy_IRasCR (f_rcpcl (F:=Cauchy_IR) [--](x':Cauchy_IR)
-     (Cinright (R_lt Q_as_COrdField [--](x':Cauchy_IR) (Zero:Cauchy_IR)) (Zero[<][--](x':Cauchy_IR)) H')))%CR).
+     (@inr (R_lt Q_as_COrdField [--](x':Cauchy_IR) (Zero:Cauchy_IR)) (Zero[<][--](x':Cauchy_IR)) H')))%CR).
    rewrite Cauchy_IR_opp_as_CR_opp.
    apply: Cauchy_IR_inv_as_CRinv_pos.
    intros i Hi.
