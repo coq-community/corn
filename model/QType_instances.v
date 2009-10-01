@@ -27,6 +27,7 @@ Require Import
 Require Export
  Metric
  Complete
+ SetoidDec
  SetoidClass.
 
 Require Import
@@ -35,6 +36,8 @@ Require Import
  Qmetric
  Qsec
  QSig.
+
+Require decsetoid.
 
 Module QType_instances (anyQ: QType).
 
@@ -64,7 +67,8 @@ Instance std_Setoid: Setoid anyQ.t := { equiv := anyQ.eq; setoid_equiv := Equiva
 
 (* furthermore, the equality is decidable *)
 
-Lemma eq_dec (x y: anyQ.t): (x == y) + ~ (x == y).
+Instance eq_dec: EqDec std_Setoid.
+Proof.
  intros x y.
  pose proof (anyQ.spec_eq_bool x y).
  destruct anyQ.eq_bool in H; intuition.
@@ -107,6 +111,14 @@ Proof.
  rewrite H. reflexivity.
 Qed.
 
+Add Morphism anyQ.inv with signature (anyQ.eq ==> anyQ.eq) as inv_mor.
+Proof.
+ unfold anyQ.eq.
+ intros x y H.
+ do 2 rewrite anyQ.spec_inv.
+ rewrite H. reflexivity.
+Qed.
+
 Add Morphism anyQ.lt with signature (anyQ.eq ==> anyQ.eq ==> iff) as lt_mor.
 Proof.
  unfold anyQ.lt, anyQ.eq.
@@ -114,7 +126,7 @@ Proof.
  do 2 rewrite anyQ.spec_compare.
  rewrite H H0. tauto.
 Qed.
-  
+
 Add Morphism anyQ.le with signature (anyQ.eq ==> anyQ.eq ==> iff) as le_mor.
 Proof.
  unfold anyQ.le, anyQ.eq.
@@ -215,39 +227,12 @@ Hint Resolve anyQle_to_Qle.
 Hint Resolve anyQlt_from_Qlt.
 Hint Resolve anyQle_from_Qle.
 
-(* We now build models for the CoRN hierarchy, starting with CSetoid, for which we need
- an apartness relation: *)
+(* We now build models for the CoRN hierarchy, starting with CSetoid, which we
+ get for free (using module decsetoid) because our setoid equality is decidable. *)
 
-Definition ap (a b: anyQ.t): Prop := ~ (a == b).
+Let ap := decsetoid.ap.
 
-Lemma ap_irreflexive: irreflexive ap.
-Proof. do 2 intro. intuition. Qed.
-
-Lemma ap_symmetric: Csymmetric ap.
-Proof. do 4 intro. intuition. Qed.
-
-Lemma ap_cotransitive: cotransitive ap.
-Proof with intuition.
- intros x y H z.
- destruct (eq_dec x z)...
- destruct (eq_dec z y)...
- elimtype False.
- apply H.
- transitivity z...
-Qed.
-
-Lemma ap_tight: tight_apart anyQ.eq ap.
-Proof with intuition.
- red. unfold ap, Not. split...
- destruct (eq_dec x y)...
-Qed.
-
-(* With this apartness, anyQ.t is a CSetoid: *)
-
-Definition is_CSetoid: is_CSetoid anyQ.t anyQ.eq ap
-  := Build_is_CSetoid anyQ.t anyQ.eq ap ap_irreflexive ap_symmetric ap_cotransitive ap_tight.
-
-Definition CSetoid: CSetoid := Build_CSetoid _ _ _ is_CSetoid.
+Definition CSetoid: CSetoid := @Build_CSetoid anyQ.t (@equiv anyQ.t std_Setoid) ap decsetoid.is_CSetoid.
 
 Canonical Structure CSetoid.
 Canonical Structure is_Setoid := cs_crr CSetoid.
@@ -261,74 +246,19 @@ Proof.
 Qed.
 
 Lemma add_strext: bin_fun_strext _ _ _ anyQ.add.
-Proof with intuition.
- red. simpl.
- unfold ap.
- intros.
- unfold anyQ.eq in *.
- destruct (eq_dec x1 x2)...
- destruct (eq_dec y1 y2)...
- elimtype False.
- apply H.
- unfold anyQ.eq in *.
- repeat rewrite anyQ.spec_add.
- rewrite e e0...
-Qed.
+Proof. apply decsetoid.bin_fun_strext. auto with *. Qed.
 
 Lemma mul_strext: bin_fun_strext _ _ _ anyQ.mul.
-Proof with intuition.
- red. simpl.
- unfold ap.
- unfold anyQ.eq.
- intros.
- destruct (eq_dec x1 x2)...
- destruct (eq_dec y1 y2)...
- elimtype False.
- apply H.
- unfold anyQ.eq in *.
- repeat rewrite anyQ.spec_mul.
- rewrite e e0...
-Qed.
+Proof. apply decsetoid.bin_fun_strext. auto with *. Qed.
 
 Lemma opp_strext: fun_strext anyQ.opp.
-Proof with auto.
- repeat intro.
- apply X.
- unfold anyQ.eq in *.
- repeat rewrite anyQ.spec_opp.
- rewrite H.
- reflexivity.
-Qed.
+Proof. apply decsetoid.fun_strext. auto with *. Qed.
 
-Lemma inv_strext (x y: anyQ.t):
-  x [#] anyQ.zero -> y [#] anyQ.zero ->
-  anyQ.inv x [#] anyQ.inv y -> x [#] y.
-Proof.
- simpl.
- unfold ap.
- simpl.
- unfold anyQ.eq.
- intros.
- intro.
- clear H H0.
- apply H1.
- simpl.
- do 2 rewrite anyQ.spec_inv.
- rewrite H2.
- reflexivity.
-Qed.
+Lemma inv_strext: fun_strext anyQ.inv.
+Proof. apply decsetoid.fun_strext. auto with *. Qed.
 
-Lemma anyQ_lt_strext: Crel_strext CSetoid anyQ.lt.
-Proof with intuition.
- repeat intro.
- simpl.
- unfold ap.
- destruct (eq_dec x1 x2)...
- destruct (eq_dec y1 y2)...
- left.
- rewrite <- e.
- rewrite <- e0...
-Qed.
+Lemma lt_strext: Crel_strext CSetoid anyQ.lt.
+Proof. apply decsetoid.Crel_strext. auto with *. Qed.
 
 (* Some more nice properties: *)
 
@@ -438,7 +368,7 @@ Lemma is_CField: is_CField CRing (fun x _ => anyQ.inv x).
 Proof with auto.
  red.
  unfold is_inverse. simpl.
- unfold ap. simpl.
+ unfold ap, decsetoid.ap. simpl.
  unfold anyQ.eq.
  intro x.
  do 2 rewrite anyQ.spec_mul.
@@ -448,14 +378,14 @@ Proof with auto.
  split; field...
 Qed.
 
-Definition CField: CField := Build_CField _ _ is_CField inv_strext.
+Definition CField: CField := Build_CField _ _ is_CField (fun a b c d e => inv_strext a b e).
 
 Canonical Structure CField.
 
 (* And a COrdField: *)
 
 Definition lt_CCSetoid_relation: CCSetoid_relation CField :=
- Build_CCSetoid_relation CSetoid anyQ.lt anyQ_lt_strext.
+ Build_CCSetoid_relation CSetoid anyQ.lt lt_strext.
 
 Definition Q_is_COrdField := Build_is_COrdField Q_as_CField
  Qlt_is_CSetoid_relation Qle (default_greater Q_as_CField Qlt_is_CSetoid_relation)
