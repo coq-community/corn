@@ -1,12 +1,12 @@
-(* This module provides C-CoRN models for modules implementing the QType
+(** This module provides C-CoRN models for modules implementing the QType
  signature.
 
 One example of such a module is BigQ, which uses fast machine integers, so with
 the current module one can say:
 
-  Require Import BigQ.
-  Module BigCQ := QType_instances BigQ.
-  Check BigCQ.CR.
+  [Require Import BigQ.]
+  [Module BigCQ := QType_instances BigQ.]
+  [Check BigCQ.CR.]
 
 to obtain an equivalent of CR that uses BigQ instead of of Q.
 
@@ -147,8 +147,7 @@ Proof.
  intros.
  unfold anyQ.lt.
  rewrite anyQ.spec_compare.
- apply -> Qlt_alt.
- assumption.
+ by apply -> Qlt_alt.
 Qed.
 
 Lemma Qlt_to_anyQlt (x y: Q): x < y -> anyQ.lt x y.
@@ -156,8 +155,7 @@ Proof.
  intros.
  unfold anyQ.lt.
  rewrite anyQ.spec_compare.
- do 2 rewrite anyQ.spec_of_Q.
- assumption.
+ by do 2 rewrite anyQ.spec_of_Q.
 Qed.
 
 Lemma anyQlt_to_Qlt (x y: anyQ.t): anyQ.lt x y -> x < y.
