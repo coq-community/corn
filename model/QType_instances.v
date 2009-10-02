@@ -27,7 +27,8 @@ Require Import
  Metric
  Complete
  SetoidDec
- SetoidClass.
+ SetoidClass
+ Morphisms.
 
 Require Import
  Qabs

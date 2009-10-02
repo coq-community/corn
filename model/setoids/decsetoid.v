@@ -2,11 +2,13 @@
  apartness defined as negation of equivalence. Also, morphisms on these
  setoids yield fun_strext/bin_fun_strext/Crel_strext. *)
 
+Set Implicit Arguments.
+
 Require Import
  CSetoids
- SetoidClass
  SetoidDec
- Morphisms.
+ Morphisms
+ SetoidClass.
 
 Class Apartness `{SetoidClass.Setoid A} (ap: Crelation A): Type :=
   { ap_irreflexive: irreflexive ap

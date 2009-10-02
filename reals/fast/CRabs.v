@@ -105,7 +105,6 @@ Proof.
  intros e.
  simpl.
  rewrite Qabs_pos; auto with *.
- apply: ball_refl.
 Qed.
 
 Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.

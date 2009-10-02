@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CPoly_Degree.
-Require Import rings.Qring.
+Require Import CoRN.model.rings.Qring.
 Require Import Zring.
 Require Import Qordfield.
 Require Import CRing_Homomorphisms.

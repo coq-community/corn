@@ -659,7 +659,7 @@ Proof.
   2: repeat rewrite Znat.inj_plus.
   2: repeat rewrite Znat.inj_mult.
   2: repeat rewrite BinInt.Zmult_minus_distr_r.
-  2: repeat rewrite Basics.Zmult_minus_distr_r.
+  2: repeat rewrite CornBasics.Zmult_minus_distr_r.
   2: auto with zarith.
  astepl (nring (R:=R) (m * m0 + n * n0) [-]nring (n * m0 + m * n0)).
  astepl (nring (R:=R) (m * m0) [+]nring (n * n0) [-] (nring (n * m0) [+]nring (m * n0))).
