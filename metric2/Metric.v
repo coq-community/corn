@@ -40,8 +40,8 @@ by the axioms given in the record structure below.
 *)
 
 Record is_MetricSpace (X:Setoid) (B: Qpos -> relation X) : Prop :=
-{ msp_refl: forall e, reflexive _ (B e)
-; msp_sym: forall e, symmetric _ (B e)
+{ msp_refl: forall e, Reflexive (B e)
+; msp_sym: forall e, Symmetric (B e)
 ; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2)%Qpos a c
 ; msp_closed: forall e a b, (forall d, B (e+d)%Qpos a b) -> B e a b
 ; msp_eq: forall a b, (forall e, B e a b) -> st_eq a b
