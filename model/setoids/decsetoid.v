@@ -2,44 +2,64 @@
  apartness defined as negation of equivalence. Also, morphisms on these
  setoids yield fun_strext/bin_fun_strext/Crel_strext. *)
 
+Set Implicit Arguments.
+
 Require Import
  CSetoids
- SetoidClass
  SetoidDec
- Morphisms.
+ Morphisms
+ SetoidClass.
+
+Class Apartness `{SetoidClass.Setoid A} (ap: Crelation A): Type :=
+  { ap_irreflexive: irreflexive ap
+  ; ap_symmetric: Csymmetric ap
+  ; ap_cotransitive: cotransitive ap
+  ; ap_tight: tight_apart equiv ap
+  }.
+
+Class CSetoid_class `(Setoid A): Type :=
+  { apart: Crelation A
+  ; csetoid_apart:> Apartness apart
+  }.
+
+Definition is_CSetoid_from_class `{@Apartness A Asetoid apa}: is_CSetoid _ equiv apa.
+ intros.
+ destruct H.
+ apply Build_is_CSetoid; assumption.
+Defined.
+
+Definition CSetoid_from_class `{@CSetoid_class A Asetoid}: CSetoid.
+Proof.
+ intros.
+ apply (Build_CSetoid A equiv apart is_CSetoid_from_class).
+Defined.
 
 Section contents.
 
   Context {T: Type} {S: Setoid T} {eq_dec: EqDec S}.
 
-  Definition ap (a b: T): Prop := ~ (a == b).
+  Let ap (a b: T): Prop := ~ (a == b).
 
-  Lemma ap_irreflexive: irreflexive ap.
-  Proof. do 2 intro. intuition. Qed.
-
-  Lemma ap_symmetric: Csymmetric ap.
-  Proof. do 4 intro. intuition. Qed.
-
-  Lemma ap_cotransitive: cotransitive ap.
-  Proof with intuition.
-   intros x y H z.
-   destruct (eq_dec x z)...
-   destruct (eq_dec z y)...
-   elimtype False.
-   apply H.
-   transitivity z...
-  Qed.
-
-  Lemma ap_tight: tight_apart (@equiv _ S) ap.
-  Proof with intuition.
+  Instance ap_apart: Apartness ap.
+  Proof with auto.
+   apply Build_Apartness.
+      do 2 intro. intuition.
+     do 4 intro. intuition.
+    intros x y H z.
+    destruct (eq_dec x z)...
+    destruct (eq_dec z y)...
+    elimtype False.
+    apply H.
+    transitivity z...
    red. unfold ap, Not. split...
    destruct (eq_dec x y)...
+   intuition.
   Qed.
 
-  Definition is_CSetoid: is_CSetoid T equiv ap
-    := Build_is_CSetoid T equiv ap ap_irreflexive ap_symmetric ap_cotransitive ap_tight.
+  Global Instance dec_CSetoid: CSetoid_class S := { apart := ap; csetoid_apart := ap_apart }.
 
-  Definition CSetoid: CSetoid := Build_CSetoid _ _ _ is_CSetoid.
+  Definition is_CSetoid: is_CSetoid T equiv ap := is_CSetoid_from_class.
+  Definition CSetoid: CSetoid := CSetoid_from_class.
 
   Lemma fun_strext (S': CSetoids.CSetoid) (f: T -> S'):
     Morphism (equiv ==> @st_eq _) f -> @fun_strext CSetoid S' f.
@@ -59,6 +79,14 @@ Section contents.
   Qed.
 
 End contents.
+
+Module test.
+
+  (* If we now have an equality-decidable setoid, we can immediately refer to apartness without any
+   explicit invocation. *)
+  Definition test `{eq_dec: @EqDec T TS} (x y: T) := apart x y.
+
+End test.
 
 Section binary.
 

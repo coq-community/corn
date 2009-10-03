@@ -24,7 +24,7 @@ Require Export List.
 Require Export Classification.
 Require Import Complete.
 Require Import Prelength.
-Require Import Basics.
+Require Import CornBasics.
 Require Import Qauto.
 Require Import CornTac.
 

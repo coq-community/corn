@@ -45,7 +45,7 @@
 (** printing and %\ensuremath{\mathrel\wedge}% *)
 
 Require Export Compare_dec.
-Require Export Basics.
+Require Export CornBasics.
 Require Export ZArith.
 Require Export ZArithRing.
 Require Export Div2.

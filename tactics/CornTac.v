@@ -42,6 +42,7 @@ Ltac rsapply T := rapply T; simpl.
 (* Replace the LHS or RHS of an expression with another expression
   This tactic along with the setiod functionality, basically replaces the step
   tactic *)
+
 Tactic Notation "replace" "LHS" "with" constr (a) "by" tactic (t) :=
 match goal with
 | |-(?r ?b ?c) =>

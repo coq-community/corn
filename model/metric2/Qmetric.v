@@ -83,19 +83,27 @@ Qed.
 
 Notation QS  := Q_is_Setoid (only parsing).
 
+Instance Qball_Reflexive e: Reflexive (Qball e).
+Proof.
+ intros e x.
+ unfold Qball.
+ apply AbsSmall_wdr with 0.
+  apply (zero_AbsSmall _ (e:Q)).
+  apply less_leEq.
+  apply Qpos_prf.
+ simpl; ring.
+Qed.
+
+Instance Qball_symmetric e: Symmetric (Qball e).
+Proof.
+ intros e x y.
+ unfold Qball.
+ apply AbsSmall_minus.
+Qed. 
+
 Lemma Q_is_MetricSpace : is_MetricSpace QS Qball.
 Proof.
- split.
-     intros e x.
-     unfold Qball.
-     apply AbsSmall_wdr with 0.
-      apply (zero_AbsSmall _ (e:Q)).
-      apply less_leEq.
-      apply Qpos_prf.
-     simpl; ring.
-    intros e x y.
-    unfold Qball.
-    apply AbsSmall_minus.
+ split; auto with typeclass_instances.
    intros [e1  He1] [e2 He2] a b c H1 H2.
    unfold Qball.
    apply AbsSmall_wdr with ((a-b)+(b-c)).

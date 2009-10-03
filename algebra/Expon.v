@@ -676,7 +676,7 @@ Proof.
   astepl ((x[//]Hx) [^^] (m * n0) [*] (x[//]Hx) [^^] (m)).
   algebra.
  intros.
- rewrite Basics.Zmult_minus_distr_r.
+ rewrite CornBasics.Zmult_minus_distr_r.
  astepr (((x[//]Hx) [^^] (m) [//]He) [^^] (n0) [/] (x[//]Hx) [^^] (m) [//]He).
  rewrite Zmult_1_r.
  astepl ((x[//]Hx) [^^] (m * n0) [/] (x[//]Hx) [^^] (m) [//]He).

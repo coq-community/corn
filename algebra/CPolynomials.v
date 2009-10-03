@@ -2686,7 +2686,7 @@ Proof.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
    rstepr (cpoly_map_csf p).
    apply csf_wd.
-   rationtal (* ring cannot find the ring structure *)
+   rational. (* ring cannot find the ring structure *)
   reflexivity.
  intros p q c d H.
  split.

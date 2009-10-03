@@ -69,6 +69,5 @@ match goal with
  end
 end.
 
-Tactic Notation "rstepl" constr(c) :=  stepl c;[idtac | rational].
-
-Tactic Notation "rstepr" constr(c) :=  stepr c;[idtac | rational].
+Tactic Notation "rstepl" constr(c) :=  stepl c;[idtac|rational].
+Tactic Notation "rstepr" constr(c) :=  stepr c;[idtac|rational].

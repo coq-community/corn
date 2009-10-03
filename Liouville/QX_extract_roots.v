@@ -20,7 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CPoly_Degree.
 Require Import CRing_Homomorphisms.
-Require Import ordfields.Qordfield.
+Require Import CoRN.model.ordfields.Qordfield.
 Require Import CauchySeq.
 Require Import Q_in_CReals.
 
