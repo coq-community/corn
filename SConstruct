@@ -20,7 +20,7 @@ ssr_include = '-I ' + ssrdir + '/theories'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
 rs = '-R . CoRN'
 
-coqc = 'ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + rs
+coqc = ssrdir + '/bin/ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + rs
 
 env = DefaultEnvironment(ENV = os.environ)
 env.Append(BUILDERS = {'Coq' : Builder(action = coqc, suffix = '.vo', src_suffix = '.v')})
