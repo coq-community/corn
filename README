@@ -159,6 +159,31 @@ or
 to build it.
 This requires graphviz and a haskell interpreter.
 
+BUILDING WITH SCONS
+-------------------
+
+A rudimentary SConstruct file is provided that lets C-CoRN be built
+with SCons (a modern Python-based Make-replacement).
+
+To build C-CoRN with SCons:
+
+1. Point environment variable SSRDIR to the directory where ssreflect
+   can be found (i.e. the one with subdirectories 'bin' and 'theories').
+
+2. Say "scons" to build the whole library, or "scons some/module.vo"
+   to just build some/module.vo (and its dependencies).
+
+The SConstruct file currently only lets one build the C-CoRN library
+itself, not the documentation or dependency visualizations, etc.
+
+In addition to common Make options like -j N and -k, SCons
+supports some useful options of its own, such as --debug=time, which
+displays the time spent executing individual build commands.
+
+For more information, see the SCons documentation at
+
+  http://www.scons.org/
+
 OTHERS
 ------
 
