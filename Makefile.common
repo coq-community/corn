@@ -271,16 +271,27 @@ ifdef CoRN_MF_sub
 $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
-#%.vo.md5 %.glob : %.v | %.d
-%.vo %.glob : %.v | %.d
+%.vo.new %.glob.new : %.v | %.d
+#%.vo %.glob : %.v | %.d
 	@set -e; \
 	echo -n "Compiling $<"; \
-	GLOB="$(<:.v=.glob)"; \
-	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<
-# %.vo: %.vo.md5
-#	@{ [ -f $< ] && md5sum -c --status $<; } ||     \
-#	{ md5sum $@ >$<; }
+	GLOB="$(<:.v=.glob.new)"; \
+	VO="$(<:.v=.vo)"; \
+	mv "$${VO}" "$${VO}.bak"; \
+	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<; \
+	mv "$${VO}" "$${VO}.new"; \
+	mv "$${VO}.bak" "$${VO}"
+%.vo: %.vo.new
+	@echo "Checking for changes in $<"
+	@{ [ -f "$@".md5 ] && md5sum -c --status "$@".md5; } ||     \
+        { md5sum "$<" >"$@".md5; cp "$<" "$@"; }
 
+%.glob: %.glob.new
+	@echo "Checking for changes in $<"
+	@{ [ -f "$@".md5 ] && md5sum -c --status "$@".md5; } ||     \
+        { md5sum "$<" >"$@".md5; cp "$<" "$@"; }
+
+.SECONDARY: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
 else
 .PHONY: always
 
@@ -316,7 +327,7 @@ dep : $(DEPEND) $(DOCDEPEND)
 	canon="`canonicalise $<`"; \
 	canond="$$(echo $${canon} | sed 's/\.v$$/.d/')"; \
 	$(COQDEP) $(COQDEPFLAGS) "$${canon}" \
-	| sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo \1.glob:/' \
+	| sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo.new \1.glob.new:/' \
 	> "$${canond}" || ( RV=$$?; rm -f "$${canond}"; exit "$${RV}" )
 
 $(DOCDEPEND) : $(DEPEND)
