@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Export CRings RingClass.
-Require Import CornTac. (* For rapply*)
 
 Section cring_is_ring.
 Global Instance CRing_is_Ring (CR : CRing) : Ring (@cm_unit CR) (@cr_one CR) (@csg_op CR) (@cr_mult CR) (fun x y => x [-] y) (@cg_inv CR).

@@ -528,44 +528,30 @@ Qed.
 
 Lemma cpoly_zero_ap_lin : forall p c,
  (cpoly_zero_cs [#] cpoly_linear_cs c p) = (c [#] Zero or cpoly_zero_cs [#] p).
-Proof.
- intros.
- simpl in |- *.
- reflexivity.
-Qed.
+Proof. reflexivity. Qed.
 
 Lemma cpoly_lin_ap_lin_ : forall p q c d,
  cpoly_linear_cs c p [#] cpoly_linear_cs d q -> c [#] d or p [#] q.
-Proof.
- auto.
-Qed.
+Proof.  auto. Qed.
 
 Lemma _cpoly_lin_ap_lin : forall p q c d,
  c [#] d or p [#] q -> cpoly_linear_cs c p [#] cpoly_linear_cs d q.
-Proof.
- auto.
-Qed.
+Proof. auto. Qed.
 
 Lemma cpoly_lin_ap_lin : forall p q c d,
  (cpoly_linear_cs c p [#] cpoly_linear_cs d q) = (c [#] d or p [#] q).
-Proof.
- intros.
- simpl in |- *.
- reflexivity.
-Qed.
+Proof. reflexivity. Qed.
 
 Lemma cpoly_linear_strext : bin_fun_strext _ _ _ cpoly_linear_cs.
 Proof.
  unfold bin_fun_strext in |- *.
- intros.
- apply cpoly_lin_ap_lin_.
- assumption.
+ intros until 1.
+ apply cpoly_lin_ap_lin_;assumption.
 Qed.
 
 Lemma cpoly_linear_wd : bin_fun_wd _ _ _ cpoly_linear_cs.
 Proof.
- apply bin_fun_strext_imp_wd.
- exact cpoly_linear_strext.
+ by apply bin_fun_strext_imp_wd.
 Qed.
 
 Definition cpoly_linear_fun := Build_CSetoid_bin_fun _ _ _ _ cpoly_linear_strext.
@@ -577,27 +563,21 @@ Lemma Ccpoly_double_comp_ind : forall P : cpoly_csetoid -> cpoly_csetoid -> CPro
 Proof.
  intros.
  apply Ccpoly_double_ind0_cs.
-   intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs.
-    assumption.
+   intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs;[assumption|].
    intros p1 c. intros.
    apply X with (cpoly_linear_cs c p1) (cpoly_linear_cs Zero cpoly_zero_cs).
      algebra.
     apply _cpoly_lin_eq_zero.
     split; algebra.
-   apply X1.
-   assumption.
+   apply X1; assumption.
   intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs.
    assumption.
   intros.
   apply X with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs c p1).
-    apply _cpoly_lin_eq_zero.
-    split; algebra.
+    apply _cpoly_lin_eq_zero;split; algebra.
    algebra.
-  apply X1.
-  assumption.
- intros.
- apply X1.
- assumption.
+  apply X1;  assumption.
+ by apply X1.
 Qed.
 
 Lemma Ccpoly_triple_comp_ind :
@@ -664,11 +644,8 @@ Proof.
     apply _cpoly_lin_eq_zero.
     split; algebra.
    algebra.
-  apply H1.
-  assumption.
- intros.
- apply H1.
- assumption.
+  by apply H1.
+ by apply H1.
 Qed.
 
 Lemma cpoly_triple_comp_ind :
@@ -1062,11 +1039,7 @@ Qed.
 
 Lemma cpoly_inv_lin : forall p c,
  cpoly_inv_cs (cpoly_linear_cs c p) = cpoly_linear_cs [--]c (cpoly_inv_cs p).
-Proof.
- simple induction p.
-  auto.
- auto.
-Qed.
+Proof. simple induction p; auto. Qed.
 
 Lemma cpoly_inv_op_strext : un_op_strext cpoly_csetoid cpoly_inv_cs.
 Proof.
@@ -1115,17 +1088,14 @@ Qed.
 
 Lemma cpoly_inv_op_wd : un_op_wd cpoly_csetoid cpoly_inv_cs.
 Proof.
- unfold un_op_wd in |- *.
- apply fun_strext_imp_wd.
- exact cpoly_inv_op_strext.
+ apply fun_strext_imp_wd.  exact cpoly_inv_op_strext.
 Qed.
 
 Definition cpoly_inv_op := Build_CSetoid_un_op _ _ cpoly_inv_op_strext.
 
 Lemma cpoly_cg_proof : is_CGroup cpoly_cmonoid cpoly_inv_op.
 Proof.
- unfold is_CGroup in |- *.
- intro.
+ intro x.
  unfold is_inverse in |- *.
  assert (x[+]cpoly_inv_cs x [=] Zero).
   pattern x in |- *; apply cpoly_ind_cs.
@@ -1136,9 +1106,7 @@ Proof.
   rewrite cpoly_inv_lin.
   rewrite ->  cpoly_lin_plus_lin.
   apply _cpoly_lin_eq_zero.
-  split.
-   algebra.
-  assumption.
+  split;[algebra|assumption].
  split; auto.
  eapply eq_transitive_unfolded.
   apply cpoly_plus_commutative.
@@ -1149,11 +1117,7 @@ Definition cpoly_cgroup := Build_CGroup _ _ cpoly_cg_proof.
 Canonical Structure cpoly_cgroup.
 
 Lemma cpoly_cag_proof : is_CAbGroup cpoly_cgroup.
-Proof.
- unfold is_CAbGroup in |- *.
- red in |- *; intros.
- apply cpoly_plus_commutative.
-Qed.
+Proof. apply: cpoly_plus_commutative. Qed.
 
 Definition cpoly_cabgroup := Build_CAbGroup _ cpoly_cag_proof.
 Canonical Structure cpoly_cabgroup.
@@ -1180,16 +1144,12 @@ Definition cpoly_mult_cr_cs (p : cpoly_csetoid) c : cpoly_csetoid :=
 
 Lemma cpoly_zero_mult_cr : forall c,
  cpoly_mult_cr_cs cpoly_zero_cs c = cpoly_zero_cs.
-Proof.
- auto.
-Qed.
+Proof. auto. Qed.
 
 Lemma cpoly_lin_mult_cr : forall c d q,
  cpoly_mult_cr_cs (cpoly_linear_cs d q) c =
   cpoly_linear_cs (c[*]d) (cpoly_mult_cr_cs q c).
-Proof.
- auto.
-Qed.
+Proof. auto. Qed.
 
 Lemma cpoly_mult_cr_zero : forall p, cpoly_mult_cr_cs p Zero [=] cpoly_zero_cs.
 Proof.
@@ -1279,16 +1239,12 @@ Qed.
 Definition cpoly_mult_cs (p q : cpoly_csetoid) : cpoly_csetoid := cpoly_mult p q.
 
 Lemma cpoly_zero_mult : forall q, cpoly_mult_cs cpoly_zero_cs q = cpoly_zero_cs.
-Proof.
- auto.
-Qed.
+Proof. auto. Qed.
 
 Lemma cpoly_lin_mult : forall c p q,
  cpoly_mult_cs (cpoly_linear_cs c p) q =
   cpoly_plus_cs (cpoly_mult_cr_cs q c) (cpoly_linear_cs Zero (cpoly_mult_cs p q)).
-Proof.
- auto.
-Qed.
+Proof. auto. Qed.
 
 Lemma cpoly_mult_op_strext : bin_op_strext cpoly_csetoid cpoly_mult_cs.
 Proof.
@@ -1368,9 +1324,7 @@ Qed.
 
 Lemma cpoly_mult_op_wd : bin_op_wd cpoly_csetoid cpoly_mult.
 Proof.
- unfold bin_op_wd in |- *.
- apply bin_fun_strext_imp_wd.
- exact cpoly_mult_op_strext.
+ apply bin_fun_strext_imp_wd. exact cpoly_mult_op_strext.
 Qed.
 
 Definition cpoly_mult_op := Build_CSetoid_bin_op _ _ cpoly_mult_op_strext.
@@ -1928,61 +1882,45 @@ End helpful_section.
 
 Lemma Ccpoly_induc : forall P : RX -> CProp, P Zero ->
  (forall p c, P p -> P (c[+X*]p)) -> forall p, P p.
-Proof.
- exact (Ccpoly_ind_cs CR).
-Qed.
+Proof (Ccpoly_ind_cs CR).
 
 Lemma Ccpoly_double_sym_ind : forall P : RX -> RX -> CProp,
  Csymmetric P -> (forall p, P p Zero) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
-Proof.
- exact (Ccpoly_double_sym_ind0_cs CR).
-Qed.
+Proof (Ccpoly_double_sym_ind0_cs CR).
 
 Lemma Cpoly_double_comp_ind : forall P : RX -> RX -> CProp,
  (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P Zero Zero ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
-Proof.
- exact (Ccpoly_double_comp_ind CR).
-Qed.
+Proof (Ccpoly_double_comp_ind CR).
 
 Lemma Cpoly_triple_comp_ind : forall P : RX -> RX -> RX -> CProp,
  (forall p1 p2 q1 q2 r1 r2,
   p1 [=] p2 -> q1 [=] q2 -> r1 [=] r2 -> P p1 q1 r1 -> P p2 q2 r2) ->
  P Zero Zero Zero -> (forall p q r c d e, P p q r -> P (c[+X*]p) (d[+X*]q) (e[+X*]r)) ->
  forall p q r, P p q r.
-Proof.
- exact (Ccpoly_triple_comp_ind CR).
-Qed.
+Proof (Ccpoly_triple_comp_ind CR).
 
 Lemma cpoly_induc : forall P : RX -> Prop,
  P Zero -> (forall p c, P p -> P (c[+X*]p)) -> forall p, P p.
-Proof.
- exact (cpoly_ind_cs CR).
-Qed.
+Proof (cpoly_ind_cs CR).
 
 Lemma cpoly_double_sym_ind : forall P : RX -> RX -> Prop,
  Tsymmetric P -> (forall p, P p Zero) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
-Proof.
- exact (cpoly_double_sym_ind0_cs CR).
-Qed.
+Proof (cpoly_double_sym_ind0_cs CR).
 
 Lemma poly_double_comp_ind : forall P : RX -> RX -> Prop,
  (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P Zero Zero ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
-Proof.
- exact (cpoly_double_comp_ind CR).
-Qed.
+Proof (cpoly_double_comp_ind CR).
 
 Lemma poly_triple_comp_ind : forall P : RX -> RX -> RX -> Prop,
  (forall p1 p2 q1 q2 r1 r2,
   p1 [=] p2 -> q1 [=] q2 -> r1 [=] r2 -> P p1 q1 r1 -> P p2 q2 r2) ->
  P Zero Zero Zero ->
  (forall p q r c d e, P p q r -> P (c[+X*]p) (d[+X*]q) (e[+X*]r)) -> forall p q r, P p q r.
-Proof.
- exact (cpoly_triple_comp_ind CR).
-Qed.
+Proof (cpoly_triple_comp_ind CR).
 
 Transparent cpoly_cring.
 Transparent cpoly_cgroup.
@@ -2085,7 +2023,7 @@ Add Ring cpolycring_thR : (cpoly_ring_th R).
 Notation RX := (cpoly_cring R).
 
 Lemma cpoly_const_one : One [=] cpoly_constant_fun _ (One:R).
-Proof.
+Proof. 
  simpl in |- *; split; algebra.
 Qed.
 
@@ -2119,8 +2057,7 @@ Qed.
 
 Lemma c_zero : Zero [=] _C_ (Zero:R).
 Proof.
- simpl in |- *.
- split; algebra.
+ simpl in |- *; split; algebra.
 Qed.
 
 (**
@@ -2141,7 +2078,6 @@ Hint Resolve cpoly_X_ cpoly_C_: algebra.
 
 Lemma cpoly_const_eq : forall c d : R, c [=] d -> _C_ c [=] _C_ d.
 Proof.
- intros.
  algebra.
 Qed.
 
@@ -2240,13 +2176,11 @@ Qed.
 
 Lemma apply_wd : forall (p p' : RX) x x', p [=] p' -> x [=] x' -> p ! x [=] p' ! x'.
 Proof.
- intros.
  algebra.
 Qed.
 
 Lemma cpolyap_pres_eq : forall (f : RX) x y, x [=] y -> f ! x [=] f ! y.
 Proof.
- intros.
  algebra.
 Qed.
 
@@ -2411,9 +2345,7 @@ Qed.
 
 (* SUPERFLUOUS *)
 Lemma poly_inv_apply : forall (p : RX) x, (cpoly_inv _ p) ! x [=] [--]p ! x.
-Proof.
- exact inv_apply.
-Qed.
+Proof inv_apply.
 
 Lemma Sum0_cpoly_ap : forall (f : nat -> RX) a k, (Sum0 k f) ! a [=] Sum0 k (fun i => (f i) ! a).
 Proof.
@@ -2466,9 +2398,7 @@ Notation Cpoly_cring := (cpoly_cring CR).
 Lemma cpoly_double_ind : forall P : Cpoly_cring -> Cpoly_cring -> Prop,
  (forall p, P p Zero) -> (forall p, P Zero p) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
-Proof.
- exact (cpoly_double_ind0_cs CR).
-Qed.
+Proof (cpoly_double_ind0_cs CR).
 
 End Poly_Prop_Induction.
 
@@ -2589,6 +2519,19 @@ Proof.
  rewrite IHp.
  do 2 rewrite cpoly_lin.
  rewrite <- c_zero.
+(* An attempt to avoid the following "change" 
+Bind Scope ring_scope with CRing.
+Notation "a '====' b":=(a [=] b)(at level 80, right associativity): ring_scope.
+set (LHS:=_C_ c[*]p[+](Zero[+]_X_[*](_C_ c[*]_D_ p))).
+set (RHS:=(_C_ c[*](p[+](Zero[+]_X_[*]_D_ p)))).
+change  (LHS ==== RHS).
+
+Or even:
+Ltac preRing :=
+match goal with
+| |-(@st_eq ?s ?l ?r) => change (l ==== r) end.
+preRing.*) 
+
  (* (cpoly_csemi_grp R) should be folded to RX *)
  change
  (@st_eq RX
