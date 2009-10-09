@@ -153,7 +153,7 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN .devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
 OTHERFLAGS = -I $(SRCDIR)/tactics -I $(SSRDIR)/theories $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
-#COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
+COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
@@ -378,7 +378,8 @@ $(DOCDEPEND) : $(DEPEND)
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
 tree.dot : PreDot.hs $(DEPEND)
-	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
+	@echo "Building $@"
+	@cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
 
 tree.svg : tree.dot
 	dot -Tsvg < $< > $@
@@ -407,7 +408,7 @@ doc-html : doc-pre
 
 doc : doc-ps doc-html tree.svg
 
-clean : depclean binaries-clean lib-clean doc-clean
+clean : metaclean binaries-clean lib-clean doc-clean
 	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
@@ -416,8 +417,13 @@ clean : depclean binaries-clean lib-clean doc-clean
 	$(MAKE) -C $(SRCDIR)/tools/depend clean
 	$(MAKE) -f $(SRCDIR)/Makefile.realpath TOPDIR="$(TOPDIR)" clean
 
-depclean : 
+depclean :
 	rm -f $(DEPEND) $(DOCDEPEND)
+
+hashclean:
+	find $(SRCDIR) '(' -name '*.md5' -or -name '*.bak' -or -name '*.new' ')' -print0 | xargs --null rm -f
+
+metaclean: hashclean depclean
 
 distclean : clean
 	for i in $(PRIVFILES); do rm -rf "$$i"; done
