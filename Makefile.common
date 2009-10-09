@@ -407,7 +407,7 @@ doc-html : doc-pre
 
 doc : doc-ps doc-html tree.svg
 
-clean : depclean binaries-clean lib-clean doc-clean
+clean : metaclean binaries-clean lib-clean doc-clean
 	find $(SRCDIR) '(' -name '*.cm[oix]' -or -name '*.[go]' -or -name '*.glob' -or -name '*.v[oi]' -or -name '*~' -or -name '.*~' ')' -print0 | xargs --null rm -f
 	set -e; for m in $(SRCDIR)/Makefile.auto.*; do \
 	  ls -i "$${m}" | ( read inode bitbucket; find $(SRCDIR) '(' -xdev -inum "$${inode}" ')' -print0 | xargs --null rm -f ); \
@@ -416,8 +416,13 @@ clean : depclean binaries-clean lib-clean doc-clean
 	$(MAKE) -C $(SRCDIR)/tools/depend clean
 	$(MAKE) -f $(SRCDIR)/Makefile.realpath TOPDIR="$(TOPDIR)" clean
 
-depclean : 
+depclean :
 	rm -f $(DEPEND) $(DOCDEPEND)
+
+hashclean:
+	find $(SRCDIR) '(' -name '*.md5' -or -name '*.bak' -or -name '*.new' ')' -print0 | xargs --null rm -f
+
+metaclean: hashclean depclean
 
 distclean : clean
 	for i in $(PRIVFILES); do rm -rf "$$i"; done
