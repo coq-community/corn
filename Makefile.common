@@ -314,8 +314,12 @@ endef
 	$(call hash-template)
 
 # This informs make not to remake a .vo only because the corresponding
-# .vo.new does not exist, and that .vo.new can be safely deleted.
-.INTERMEDIATE: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
+# .vo.new does not exist, but not to delete .vo.new file when it is
+# finished, and the same for .glob instead of .vo. We don't delete the
+# .new file because else in "make all && make doc" everything gets
+# rebuilt twice: once to get the .vo files and once to get the .glob
+# file (because the .glob.new files have been deleted).
+.SECONDARY: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
 else
 .PHONY: always
 
