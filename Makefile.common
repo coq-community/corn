@@ -278,12 +278,15 @@ $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	VO="$(<:.v=.vo)"; \
 	BAK="$${VO}.bak"; \
 	[ -f "$${VO}" ] && mv "$${VO}" "$${BAK}"; \
-	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<; \
+	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< \
+	 || ( RV=$$?; echo RV $$RV; if [ -f "$${BAK}" ]; then mv "$${BAK}" "$${VO}"; else rm -f "$${VO}"; fi ; exit "$${RV}" ); \
+	echo BLAH $$?; \
 	mv "$${VO}" "$${VO}.new"; \
-	[ -f "$${BAK}" ] && mv "$${VO}.bak" "$${VO}"
+	if [ -f "$${BAK}" ]; then mv "$${BAK}" "$${VO}"; fi
 
 define hash-template
-	@set -e; \
+	@echo FOO $<
+	set -e; \
 	md5file="$@.md5"; \
 	oldfile="$@"; \
 	newfile="$<"; \
@@ -293,7 +296,7 @@ define hash-template
 	      md5sum -b -c --status "$@".md5; \
 	      return; \
 	    fi; \
-	    return 0;
+	    return 0; \
 	  ); \
 	}; \
 	if no_change; then \
