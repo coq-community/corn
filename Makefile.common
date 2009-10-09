@@ -378,7 +378,8 @@ $(DOCDEPEND) : $(DEPEND)
 	done ) > $@ || ( RV=$$?; rm -f $@; exit $${RV} )
 
 tree.dot : PreDot.hs $(DEPEND)
-	cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
+	@echo "Building $@"
+	@cat $(DEPEND) | runhaskell PreDot.hs $(TREE_FILTER) > $@ 
 
 tree.svg : tree.dot
 	dot -Tsvg < $< > $@
