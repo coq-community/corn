@@ -26,6 +26,3 @@ Arguments Scope cr_mult [ _ corn_scope corn_scope ].
 Infix "*" := cr_mult (at level 40, left associativity) : corn_scope.
 Notation "x ^ n" := (nexp_op _ n x) : corn_scope.
 Notation "1" := One : corn_scope.
-
-Require Import CModules.
-Notation "a ' x" := (rm_mu _ a x) (at level 20, right associativity) : corn_scope.
