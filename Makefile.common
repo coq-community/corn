@@ -405,3 +405,7 @@ showcommands :
 	@echo "$(REALPATH)"
 
 -include $(DEPEND)
+
+# Local Variables:
+# mode: makefile
+# End:

@@ -50,3 +50,7 @@ $(BINDIR)/realpath: $(BINDIR) $(SRCDIR)/tools/realpath
 clean:
 	rm -f $(SRCDIR)/tools/realpath{,.o} "$(BINDIR)/realpath"
 	if [ -d "$(BINDIR)" ]; then rmdir --ignore-fail-on-non-empty "$(BINDIR)"; fi
+
+# Local Variables:
+# mode: makefile
+# End:
