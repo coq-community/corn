@@ -272,26 +272,47 @@ $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	cat $$(sed 's/\.v$$/.glob/' < "$(DOCLIST)" ) > "$@"
 
 %.vo.new %.glob.new : %.v | %.d
-#%.vo %.glob : %.v | %.d
 	@set -e; \
-	echo -n "Compiling $<"; \
+	echo -n "Compiling $< "; \
 	GLOB="$(<:.v=.glob.new)"; \
 	VO="$(<:.v=.vo)"; \
-	mv "$${VO}" "$${VO}.bak"; \
+	BAK="$${VO}.bak"; \
+	[ -f "$${VO}" ] && mv "$${VO}" "$${BAK}"; \
 	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $<; \
 	mv "$${VO}" "$${VO}.new"; \
-	mv "$${VO}.bak" "$${VO}"
+	[ -f "$${BAK}" ] && mv "$${VO}.bak" "$${VO}"
+
+define hash-template
+	@set -e; \
+	md5file="$@.md5"; \
+	oldfile="$@"; \
+	newfile="$<"; \
+	no_change () { \
+	  [ -f "$${md5file}" ] && ( \
+	    if [ "$${newfile}" -nt "$${md5file}" ]; then \
+	      md5sum -b -c --status "$@".md5; \
+	      return; \
+	    fi; \
+	    return 0;
+	  ); \
+	}; \
+	if no_change; then \
+	  [ "$${newfile}" -nt "$${md5file}" ] && touch -c -m "$${md5file}"; \
+	else \
+	  md5sum "$${newfile}" > "$${md5file}"; \
+	  cp "$${newfile}" "$${oldfile}"; \
+	fi
+endef
+
 %.vo: %.vo.new
-	@echo "Checking for changes in $<"
-	@{ [ -f "$@".md5 ] && md5sum -c --status "$@".md5; } ||     \
-        { md5sum "$<" >"$@".md5; cp "$<" "$@"; }
+	$(call hash-template)
 
 %.glob: %.glob.new
-	@echo "Checking for changes in $<"
-	@{ [ -f "$@".md5 ] && md5sum -c --status "$@".md5; } ||     \
-        { md5sum "$<" >"$@".md5; cp "$<" "$@"; }
+	$(call hash-template)
 
-.SECONDARY: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
+# This informs make not to remake a .vo only because the corresponding
+# .vo.new does not exist, and that .vo.new can be safely deleted.
+.INTERMEDIATE: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
 else
 .PHONY: always
 
