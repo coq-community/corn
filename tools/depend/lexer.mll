@@ -29,25 +29,26 @@
   let seen_eof = ref(false);;
   let lex_debug = false;;
   let lex_debug_print x = if lex_debug then print_string x;;
+  let rmnewsuffix x = Filename.chop_suffix x ".new";;
 }
 
 let whitespace = [ ' ' '\t' ]
 let separator = ':'
 let basename = [ ^ ' ' '\t' ':' '\n' ]+
 let eol = '\n'
-let coqSource = basename ".v"
-let coqBinary = basename ".vo"
-let coqGlob   = basename ".glob"
-let ocamlBinary =  basename ".cmo"
+let coqSource = basename ".v" as name
+let coqBinary = (basename ".vo") as name ( ".new" ? )
+let coqGlob   = (basename ".glob") as name ( ".new" ? )
+let ocamlBinary =  basename ".cmo" as name
 
 rule token = parse
   | whitespace+         { lex_debug_print "WS"; token lexbuf }
   | eol                 { lex_debug_print "EOL"; EOL }
   | separator+          { lex_debug_print "SEP"; Separator }
-  | ocamlBinary as name { lex_debug_print "OBIN: "; lex_debug_print name; Binary (OCamlBinaryFile name) }
-  | coqBinary as name   { lex_debug_print "CBIN: "; lex_debug_print name; Binary (CoqBinaryFile name) }
-  | coqGlob   as name   { lex_debug_print "CGLB: "; lex_debug_print name; Binary (CoqGlobalFile name) }
-  | coqSource as name   { lex_debug_print "CSRC: "; lex_debug_print name; Source (CoqSourceFile name) }
+  | ocamlBinary         { lex_debug_print "OBIN: "; lex_debug_print name; Binary (OCamlBinaryFile name) }
+  | coqBinary           { lex_debug_print "CBIN: "; lex_debug_print name; Binary (CoqBinaryFile name) }
+  | coqGlob             { lex_debug_print "CGLB: "; lex_debug_print name; Binary (CoqGlobalFile name) }
+  | coqSource           { lex_debug_print "CSRC: "; lex_debug_print name; Source (CoqSourceFile name) }
   | eof                 { lex_debug_print "EOF"; if !seen_eof then raise Eof
                                                             else (seen_eof := true; EOL ) }
 
