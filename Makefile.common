@@ -153,7 +153,7 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN .devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
 OTHERFLAGS = -I $(SRCDIR)/tactics -I $(SSRDIR)/theories $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
-COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
+#COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \
   --glob-from $(GLOBFILE) -g -l --multi-index --files-from $(DOCLIST)
 COQDEPFLAGS := $(shell echo $(COQDIRS) | awk -v RS=' ' -v ORS=' ' -v pwd="`pwd`" '{ if ( $$1 != pwd ) print "-I " $$1}')
@@ -279,31 +279,38 @@ $(GLOBFILE): $(COQGLOBS) $(DOCLIST)
 	BAK="$${VO}.bak"; \
 	[ -f "$${VO}" ] && mv "$${VO}" "$${BAK}"; \
 	$(TIME) $(COQC) $(COQFLAGS) -dump-glob "$${GLOB}" $(COQCFLAGS) $< \
-	 || ( RV=$$?; echo RV $$RV; if [ -f "$${BAK}" ]; then mv "$${BAK}" "$${VO}"; else rm -f "$${VO}"; fi ; exit "$${RV}" ); \
-	echo BLAH $$?; \
+	 || ( RV=$$?; if [ -f "$${BAK}" ]; then mv "$${BAK}" "$${VO}"; else rm -f "$${VO}"; fi ; exit "$${RV}" ); \
 	mv "$${VO}" "$${VO}.new"; \
 	if [ -f "$${BAK}" ]; then mv "$${BAK}" "$${VO}"; fi
 
 define hash-template
-	@echo FOO $<
 	set -e; \
 	md5file="$@.md5"; \
 	oldfile="$@"; \
 	newfile="$<"; \
+	needs_remake=0; \
+	remake_md5 () { md5sum -b "$${newfile}" > "$${md5file}"; }; \
 	no_change () { \
-	  [ -f "$${md5file}" ] && ( \
+	  if [ -f "$${md5file}" ]; then \
 	    if [ "$${newfile}" -nt "$${md5file}" ]; then \
-	      md5sum -b -c --status "$@".md5; \
+	      md5sum -c --status "$@".md5; \
 	      return; \
 	    fi; \
 	    return 0; \
-	  ); \
+	  else \
+	    needs_remake=1; \
+	    cmp -s "$${newfile}" "$${oldfile}"; \
+	    return; \
+	  fi; \
 	}; \
 	if no_change; then \
-	  [ "$${newfile}" -nt "$${md5file}" ] && touch -c -m "$${md5file}"; \
+	  if [ "$${needs_remake}" -ne 0 ]; then \
+	    remake_md5; \
+	  elif [ "$${newfile}" -nt "$${md5file}" ]; then \
+	    touch -c -m "$${md5file}"; \
+	  fi; \
 	else \
-	  md5sum "$${newfile}" > "$${md5file}"; \
-	  cp "$${newfile}" "$${oldfile}"; \
+	  ln -f "$${newfile}" "$${oldfile}" && remake_md5 && rm -f "$${newfile}"; \
 	fi
 endef
 
@@ -315,10 +322,9 @@ endef
 
 # This informs make not to remake a .vo only because the corresponding
 # .vo.new does not exist, but not to delete .vo.new file when it is
-# finished, and the same for .glob instead of .vo. We don't delete the
-# .new file because else in "make all && make doc" everything gets
-# rebuilt twice: once to get the .vo files and once to get the .glob
-# file (because the .glob.new files have been deleted).
+# finished, and the same for .glob instead of .vo. It is important not
+# to let make delete them, because else if the .v file is newer than
+# the .vo file, it will constantly recompile it.
 .SECONDARY: $(COQOBJECTS:.vo=.vo.new) $(COQGLOBS:.glob=.glob.new)
 else
 .PHONY: always
@@ -326,7 +332,7 @@ else
 $(GLOBFILE): always $(DOCLIST)
 	exec $(MAKE) CoRN_MF_sub=1 "$@"
 
-%.vo %.glob: always
+%.vo %.vo.new %.glob %.glob.new: always
 	@set -e; \
 	canonicalise () \
 	{ \
