@@ -108,9 +108,14 @@ untransitive g = Map.mapWithKey p g
 
 -- process a line of dependency information.  Return (a,s) where s is the set
 -- of children of a
-processLine l = (header, Set.fromList rest)
+processLine l = (rmnewsuffix header, Set.fromList rest)
  where
-  header:rest = filter (\x -> takeExtension x == ".vo") $ words l
+  rmnewsuffix s = let (base, ext) = splitExtension s in
+                  if ext == ".new" then base else s
+  header:rest = filter f $ words l
+   where
+    f = \x -> let (base, ext)=splitExtension x in
+              ext == ".vo" || ( ext == ".new" && takeExtension base == ".vo" )
 
 name = dropExtension . takeFileName
 
