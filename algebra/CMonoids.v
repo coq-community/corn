@@ -351,14 +351,14 @@ Proof.
  intros H0' H0''.
  cut ( power_CMonoid u l[=]power_CMonoid u k).
   intro H4.
-  csetoid_rewrite H4.
+  rewrite H4.
   2:apply eq_symmetric.
   2:exact H0'.
  set (H5:=(power_plus M  u k (s*(l-k)))).
  cut (csbf_fun M M M (csg_op (c:=M)) (power_CMonoid  u k)
    (power_CMonoid u (s * (l - k)))[=]power_CMonoid u (k + s * (l - k))).
   intros H6.
-  csetoid_rewrite H6.
+  rewrite H6.
   exact IHs.
  apply eq_symmetric.
  exact H5.
@@ -395,13 +395,10 @@ Proof.
   replace (power_CMonoid u n) with (power_CMonoid u ((k+s*(l-k))+((n-k)-s*(l-k)))).
    2: replace ((k + s * (l - k))+((n - k) - s * (l - k))) with n.
     2:reflexivity.
-   set (H10:=(power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k)))).
-   csetoid_rewrite H10.
-   set (H11:=(power_plus M u k (n-k-s*(l-k)))).
-   csetoid_rewrite H11.
-   csetoid_replace (power_CMonoid u (k + s * (l - k))) (power_CMonoid u k).
-    apply eq_reflexive.
-   intuition.
+   rewrite (power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k))).
+   rewrite (power_plus M u k (n-k-s*(l-k))).
+   setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). reflexivity.
+  intuition.
   cut (n=k+(n-k)).
    intro H10.
    cut (n=((k+(n-k))+(s*(l-k)-s*(l-k)))).
@@ -501,11 +498,11 @@ Proof.
  intros nx Hx.
  elim (H y).
  intros ny Hy.
- csetoid_rewrite_rev Hx.
- csetoid_rewrite_rev Hy.
- csetoid_rewrite_rev (power_plus M c0 nx ny).
+ rewrite <- Hx.
+ rewrite <- Hy.
+ rewrite <- (power_plus M c0 nx ny).
  replace (nx+ny) with (ny+nx).
-  csetoid_rewrite (power_plus M c0 ny nx).
+  rewrite (power_plus M c0 ny nx).
   apply eq_reflexive.
  intuition.
 Qed.
@@ -555,7 +552,7 @@ Proof.
     intros H7 H8.
     replace (b+(l-b)) with l.
      csetoid_rewrite_rev H7.
-     apply ap_symmetric_unfolded.
+     apply: ap_symmetric.
      apply H8.
      split.
       intuition.
