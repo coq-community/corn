@@ -983,5 +983,3 @@ move=> *; rewrite -> bigA_distr_big; apply eq_bigl => ?; exact/familyP.
 Qed.
 
 End Distributivity.
-
-Check eq_big_idx.

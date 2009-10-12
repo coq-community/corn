@@ -247,7 +247,6 @@ Proof.
    simpl.
    apply inv2.
   intros a b.  elim isof. intros H0 H1. move: H1 => [H1 H2].
-  (* set (Ha:= (H2 a)). set (Hb:= (H2 b)).*)
   move: (H2 a) => [a' fa'a]. move: (H2 b) => [b' fb'b].
   unfold morphism in H0.
   astepl ((Inv f iso_imp_bij) (f a' [+] f b')).
