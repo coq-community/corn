@@ -180,6 +180,8 @@ In addition to common Make options like -j N and -k, SCons
 supports some useful options of its own, such as --debug=time, which
 displays the time spent executing individual build commands.
 
+scons -c replaces Make clean
+
 For more information, see the SCons documentation at
 
   http://www.scons.org/
