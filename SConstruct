@@ -16,7 +16,7 @@ while nodes:
     dirs += [node]
     nodes += glob.glob(node + '/*')
 
-ssr_include = '-R ' + ssrdir + '/theories Ssreflect'
+ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
 rs = '-R . CoRN'
 
