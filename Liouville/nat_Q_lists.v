@@ -74,7 +74,7 @@ Proof.
   intro Heq; rewrite Heq.
   clear c Hca Heq.
   unfold list_Q.
-  rewrite in_flat_map.
+  rewrite -> in_flat_map.
   exists (0, pred (nat_of_P d)).
   split.
    apply list_nat_prod_spec.
@@ -88,7 +88,7 @@ Proof.
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H.
   apply nat_of_P_inj; symmetry; assumption.
  unfold list_Q.
- rewrite in_flat_map.
+ rewrite -> in_flat_map.
  exists (Zabs_nat c, Zabs_nat d).
  split.
   apply list_nat_prod_spec; assumption.
@@ -147,7 +147,7 @@ Lemma list_Q_spec_zero : forall a b d, nat_of_P d <= Zabs_nat b ->
 Proof.
  intros a b d Hle.
  unfold list_Q.
- rewrite in_flat_map.
+ rewrite -> in_flat_map.
  exists (0, pred (nat_of_P d)).
  split.
   apply list_nat_prod_spec.

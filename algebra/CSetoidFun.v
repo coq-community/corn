@@ -1089,7 +1089,7 @@ Proof.
    apply eq_symmetric; apply inv1.
   apply eq_symmetric; apply inv1.
  apply injective_imp_injective_weak with (f := f); auto.
- rewrite inv1. algebra.
+ rewrite -> inv1. algebra.
 Qed.
 
 Definition Inv A B f (H : bijective f) :=

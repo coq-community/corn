@@ -88,22 +88,17 @@ Proof.
  intro q; destruct q as [qn qd]; unfold Q_can_den.
  simpl.
  set (Zdiv_le_lower_bound qd (Zgcd qn qd) 1).
- assert (0 <= qd)%Z.
-  discriminate.
+ assert (0 <= qd)%Z by  discriminate.
  assert (0 < Zgcd qn qd)%Z.
-  apply Zgcd_pos.
-  right.
-  discriminate.
+  apply Zgcd_pos; right;  discriminate.
  assert (1 * Zgcd qn qd <= qd)%Z.
   rewrite Zmult_1_l.
-  apply Zgcd_le_rht.
-  reflexivity.
- set (z H H0 H1).
+  by apply Zgcd_le_rht.
+ set (z H0 H1).
  revert z0; generalize (qd / Zgcd qn qd)%Z; clear; intros x H.
- destruct x.
-   destruct H; reflexivity.
+ destruct x. by destruct H.
   reflexivity.
- destruct H; reflexivity.
+ by destruct H.
 Qed.
 
 Definition Q_can_den_pos_val (q : Q_as_CRing) : positive :=

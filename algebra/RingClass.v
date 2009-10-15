@@ -50,16 +50,16 @@ End Definitions.
 Section Properties.
 
 Context `{r_ring : Ring}.
-Global Instance radd_morph : Morphism (req==>req==>req) radd.
+Global Instance radd_morph : Proper (req==>req==>req) radd.
 Proof. reduce; apply (Radd_ext r_ree); auto. Qed.
-Global Instance rmul_morph : Morphism (req==>req==>req) rmul.
+Global Instance rmul_morph : Proper (req==>req==>req) rmul.
 Proof. reduce; apply (Rmul_ext r_ree); auto. Qed.
-Global Instance rsub_morph : Morphism (req==>req==>req) rsub.
+Global Instance rsub_morph : Proper (req==>req==>req) rsub.
 Proof.
- reduce; rewrite (Rsub_def r_rt), (Rsub_def r_rt y y0).
+ reduce; rewrite -> (Rsub_def r_rt), -> (Rsub_def r_rt y y0).
  apply (Radd_ext r_ree); auto; apply (Ropp_ext r_ree); auto.
 Qed.
-Global Instance ropp_morph : Morphism (req==>req) ropp.
+Global Instance ropp_morph : Proper (req==>req) ropp.
 Proof. reduce; apply (Ropp_ext r_ree); auto. Qed.
 Global Instance radd_assoc : associative radd.
 Proof. reduce; apply (Radd_assoc r_rt). Qed.

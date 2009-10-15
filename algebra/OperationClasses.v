@@ -67,7 +67,10 @@ Class right_inverse (op : binop R) (idm : R) (inv : unop R) :=
 End Definitions.
 
 Section Commutative.
-
+(*
+Class monoid `{r_st : Equivalence R req}:=
+{mul :> binop R
+;mulC : commutative mul}.*)
 Context `{r_st : Equivalence R req}.
 Context {mul : binop R} {mulC : commutative mul}.
 Global Instance mulC_id_l {idm : R} {H : left_unit mul idm} : right_unit mul idm.
@@ -85,18 +88,18 @@ Proof. reduce; rewrite commut; apply right_inv. Qed.
 
 Section distributivity.
 Context {op : binop R}.
-Context {op_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
+Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Global Instance mulC_distr_l {H : left_distributive op mul} : right_distributive op mul.
-Proof. intros l_d x y z; rewrite (commut x (op _ _)), (commut x y), (commut x z); apply left_dist. Qed.
+Proof. intros l_d x y z; rewrite -> (commut x (op _ _)), -> (commut x y), -> (commut x z); apply left_dist. Qed.
 Global Instance mulC_distr_r {H : right_distributive op mul} : left_distributive op mul.
-Proof. intros l_d x y z; rewrite (commut (op _ _) z), (commut x z), (commut y z); apply right_dist. Qed.
+Proof. intros l_d x y z; rewrite -> (commut (op _ _) z), -> (commut x z), -> (commut y z); apply right_dist. Qed.
 End distributivity.
 
 Section Associativity.
-Context {mul_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
+Context {mul_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
 Context {mulA : associative mul}.
 Global Instance mulAC_comm_l : left_commutative mul.
-Proof. intros x y z; rewrite assoc, assoc, (commut x y); reflexivity. Qed.
+Proof. intros x y z; rewrite -> assoc, assoc, (commut x y); reflexivity. Qed.
 Global Instance mulAC_comm_r : right_commutative mul.
 Proof. intros x y z; rewrite <- assoc, <- assoc, (commut y z); reflexivity. Qed.
 End Associativity.
@@ -106,8 +109,8 @@ End Commutative.
 Section AssociativeCommutative.
 Context `{r_st : Equivalence R req}.
 Context {add mul : binop R} {opp : unop R} {zero : R}.
-Context {add_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
-Context {mul_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
+Context {add_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
+Context {mul_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
 Context {opA : associative add}.
 Context {opC : commutative add}.
 Section Left.
@@ -122,7 +125,7 @@ Global Instance opA_zero_l : left_absorbing mul zero.
 Proof.
  intro; rewrite <- (left_id (mul _ _)); rewrite <- (left_id zero) at 3.
  set (e := left_inv (mul zero x)); rewrite <- e at 1 3; clear e.
- rewrite (commut (mul _ _)), <- assoc, <- assoc; apply add_morph; try reflexivity.
+ rewrite -> (commut (mul _ _)), <- assoc, <-assoc; apply add_morph; try reflexivity.
  rewrite <- left_dist, (left_id zero), (right_id (mul _ _)); reflexivity.
 Qed.
 End Left.
@@ -138,7 +141,7 @@ Global Instance opA_zero_r : right_absorbing mul zero.
 Proof.
  intro; rewrite <- (right_id (mul _ _)); rewrite <- (right_id zero) at 3.
  set (e := right_inv (mul x zero)); rewrite <- e at 2 4; clear e.
- rewrite (commut (opp _)), assoc, assoc; apply add_morph; try reflexivity.
+ rewrite -> (commut (opp _)), assoc, assoc; apply add_morph; try reflexivity.
  rewrite <- right_dist, (right_id zero), (left_id (mul _ _)); reflexivity.
 Qed.
 End Right.

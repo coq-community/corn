@@ -144,8 +144,8 @@ Lemma rh_pres_minus : forall x y:R, f (x[-]y) [=] (f x) [-] (f y).
 Proof.
  unfold cg_minus.
  intros x y.
- rewrite rh_pres_plus.
- rewrite rh_pres_inv.
+ rewrite -> rh_pres_plus.
+ rewrite -> rh_pres_inv.
  reflexivity.
 Qed.
 
@@ -166,8 +166,7 @@ Proof.
  induction n.
   apply rh_pres_zero.
  simpl.
- rewrite rh_pres_plus.
- auto with *.
+ rewrite -> rh_pres_plus;auto with *.
 Qed.
 
 End RingHom_Basics.
@@ -197,24 +196,21 @@ Lemma RHcompose1 : fun_pres_plus _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
  intros x y.
  simpl.
- repeat rewrite rh_pres_plus.
- reflexivity.
+ repeat rewrite -> rh_pres_plus;reflexivity.
 Qed.
 
 Lemma RHcompose2 : fun_pres_mult _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
  intros x y.
  simpl.
- repeat rewrite rh_pres_mult.
- reflexivity.
+ repeat rewrite -> rh_pres_mult; reflexivity.
 Qed.
 
 Lemma RHcompose3 : fun_pres_unit _ _ (compose_CSetoid_fun _ _ _ psi phi).
 Proof.
  unfold fun_pres_unit.
  simpl.
- repeat rewrite rh_pres_unit.
- reflexivity.
+ repeat rewrite -> rh_pres_unit; reflexivity.
 Qed.
 
 Definition RHcompose : RingHom R T := Build_RingHom _ _ _ RHcompose1 RHcompose2 RHcompose3.

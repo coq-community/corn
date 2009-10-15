@@ -350,17 +350,14 @@ Proof.
  intros H0' H0''.
  cut ( power_CMonoid u l[=]power_CMonoid u k).
   intro H4.
-  rewrite H4.
-  2:apply eq_symmetric.
-  2:exact H0'.
+  rewrite -> H4.
+  2: by apply eq_symmetric.
  set (H5:=(power_plus M  u k (s*(l-k)))).
  cut (csbf_fun M M M (csg_op (c:=M)) (power_CMonoid  u k)
    (power_CMonoid u (s * (l - k)))[=]power_CMonoid u (k + s * (l - k))).
   intros H6.
-  rewrite H6.
-  exact IHs.
- apply eq_symmetric.
- exact H5.
+  by rewrite -> H6.
+ by symmetry. 
 Qed.
 
 Lemma power_k_n:forall (M:CMonoid)(u:M)(k l n :nat)
@@ -392,45 +389,39 @@ Proof.
   intros H9 H9'.
   rewrite H9.
   replace (power_CMonoid u n) with (power_CMonoid u ((k+s*(l-k))+((n-k)-s*(l-k)))).
-   2: replace ((k + s * (l - k))+((n - k) - s * (l - k))) with n.
-    2:reflexivity.
-   rewrite (power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k))).
-   rewrite (power_plus M u k (n-k-s*(l-k))).
-   setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). reflexivity.
-  intuition.
+   2: (replace ((k + s * (l - k))+((n - k) - s * (l - k))) with n). 2:reflexivity.
+   rewrite -> (power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k))).
+   rewrite -> (power_plus M u k (n-k-s*(l-k))).
+   setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). by reflexivity.
+  by intuition.
   cut (n=k+(n-k)).
    intro H10.
    cut (n=((k+(n-k))+(s*(l-k)-s*(l-k)))).
     intro H11.
     cut  ((k+(n-k))+(s*(l-k)-s*(l-k)) = (k + s * (l - k) + (n - k - s * (l - k)))).
      intro H12.
-     rewrite<- H11 in H12.
-     exact H12.
+     by rewrite<- H11 in H12.
     apply minus4.
     split.
-     intuition.
+     by intuition.
     exact H9'.
    rewrite<- H10.
    cut ((s*(l-k)-s*(l-k))=0).
     intro H11.
     rewrite H11.
-    intuition.
-   intuition.
+    by intuition.
+   by intuition.
   cut (n=n+(k-k)).
    intro H10.
    cut (n+(k-k)=k+(n-k)).
     intro H11.
-    rewrite<- H10 in H11.
-    exact H11.
+    by rewrite<- H10 in H11.
    apply minus3.
-   split.
-    intuition.
-   intuition.
+   split;by intuition.
   cut ((k-k)=0).
    intro H10.
-   rewrite H10.
-   intuition.
-  intuition.
+   by rewrite H10.
+  by intuition.
  simpl.
  cut (l-k>0).
   intro H9.
@@ -452,8 +443,7 @@ Proof.
    intuition.
   cut (r= (mod_nat (n-k)(l-k)H2)).
    intro H11.
-   rewrite<- H11.
-   exact H10'.
+   by rewrite<- H11.
   simpl.
   cut ((Z_of_nat r)=(mod_nat (n - k) (l - k) H2)).
    intro H11.
@@ -501,8 +491,8 @@ Proof.
  rewrite <- Hy.
  rewrite <- (power_plus M c0 nx ny).
  replace (nx+ny) with (ny+nx).
-  rewrite (power_plus M c0 ny nx).
-  apply eq_reflexive.
+  rewrite -> (power_plus M c0 ny nx).
+  by apply eq_reflexive.
  intuition.
 Qed.
 

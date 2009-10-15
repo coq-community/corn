@@ -556,11 +556,9 @@ Lemma Qinv_is_inv : forall (x : Q) (Hx : x/=QZERO),
 Proof.
  intros x Hx.
  split.
-  apply (Qmult_inv_r x).
-  assumption.
- rewrite Qmult_comm.
- apply (Qmult_inv_r x).
- assumption.
+  by apply (Qmult_inv_r x).
+ rewrite -> Qmult_comm.
+ by apply (Qmult_inv_r x).
 Qed.
 
 

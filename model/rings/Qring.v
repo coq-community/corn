@@ -118,18 +118,14 @@ Qed.
 
 Lemma zring_Q : forall z, zring (R:=Q_as_CRing) z[=]inject_Z z.
 Proof.
- destruct z; simpl.
-   reflexivity.
-  rewrite pring_convert.
-  rewrite nring_Q.
-  rewrite convert_is_POS.
-  reflexivity.
- rewrite pring_convert.
- rewrite nring_Q.
- unfold Qeq.
- simpl.
+ destruct z; simpl; try reflexivity.
+  rewrite -> pring_convert.
+  rewrite -> nring_Q.
+  by rewrite convert_is_POS. 
+ rewrite -> pring_convert.
+ rewrite -> nring_Q.
+ unfold Qeq. simpl.
  ring_simplify.
  rewrite min_convert_is_NEG.
- rewrite Pmult_comm.
- reflexivity.
+ by rewrite Pmult_comm.
 Qed.
