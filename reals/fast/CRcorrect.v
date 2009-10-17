@@ -66,7 +66,7 @@ Proof.
    omega.
   assumption.
  rewrite <- anti_convert_pred_convert.
- replace LHS with ((2#1)*(1#(2*ed)))%Q by ring.
+ stepl ((2#1)*(1#(2*ed)))%Q; [|simpl; ring].
  change ((2#1)*((1/2)*(1/ed)) <= en#ed)%Q.
  ring_simplify.
  change ((2#2)*(1/ed)<=en#ed)%Q.
@@ -226,7 +226,7 @@ Proof.
  clearbody e'.
  clear e He.
  assert (Z:(0<(1#2)*e')%Q).
-  replace LHS with ((1#2)*0)%Q by ring.
+  rewrite <- (Qmult_0_r (1#2)).
   apply: mult_resp_less_lft.
    apply Qpos_prf.
   constructor.
@@ -479,8 +479,8 @@ Proof.
    apply: mult_resp_less.
     constructor.
    assumption.
-  replace LHS with (e + - ((1#2)*((1#3)*e)) + - ((1#2)*((1#3)*e)))%Q by ring.
-  replace RHS with ((x m - y m) + (y m - y n1) + -(x m - x n2))%Q by ring.
+  stepl (e + - ((1#2)*((1#3)*e)) + - ((1#2)*((1#3)*e)))%Q; [| simpl; ring].
+  stepr ((x m - y m) + (y m - y n1) + -(x m - x n2))%Q; [| simpl; ring].
   apply: plus_resp_leEq_both.
    apply plus_resp_leEq_both.
     apply H2; assumption.
@@ -505,9 +505,9 @@ Proof.
  intros m Hm.
  unfold cg_minus.
  simpl.
- replace RHS with ((x m - x n2) + -(y m - y n1) + -(y n1 + - x n2))%Q by ring.
+ stepr ((x m - x n2) + -(y m - y n1) + -(y n1 + - x n2))%Q; [| simpl; ring].
  apply: plus_resp_leEq.
- replace LHS with (-((1 # 2) * e) + - ((1 # 2) * e))%Q by ring.
+ stepl (-((1 # 2) * e) + - ((1 # 2) * e))%Q; [| simpl; ring].
  apply plus_resp_leEq_both.
   refine (proj1 (Hn2 _ _)).
   apply le_trans with n; [unfold n;auto with *|assumption].
@@ -523,7 +523,7 @@ CRasCauchy_IR x[<=]CRasCauchy_IR y <-> (x<=y)%CR.
 Proof.
  intros x y.
  rewrite <- Cauchy_IR_le_as_CR_le.
- do 2 rewrite CRasCR.
+ do 2 rewrite -> CRasCR.
  reflexivity.
 Qed.
 
@@ -544,10 +544,11 @@ Proof.
  apply Qscale_modulus_elim.
   intros Hxn1.
   pose (n:=(max n3 (max n1 N))).
-  rewrite Hxn1.
-  setoid_replace (0 * Qmax (- z) (Qmin z
-    (Cauchy_IRasCR_raw (Build_CauchySeq Q_as_COrdField y Hy)(QposInf_bind (fun e0 : Qpos => e0) QposInfinity))))%Q
-      with (0 * y n)%Q by ring.
+  rewrite -> Hxn1.
+  assert (Qeq (0 * Qmax (- z) (Qmin z
+    (Cauchy_IRasCR_raw (Build_CauchySeq Q_as_COrdField y Hy)(QposInf_bind (fun e0 : Qpos => e0) QposInfinity))))%Q (0 * y n)%Q).
+   ring.
+  rewrite -> H. clear H.
   change (ball (e+e) (0 * y n) (x n3 * y n3))%Q.
   apply ball_triangle with (x n*y n)%Q;[|apply: Hn3; unfold n; auto with *].
   apply ball_sym.
@@ -583,7 +584,7 @@ Proof.
   simpl in *.
   change (Qmax (- z) (Qmin z (y n2)))%Q with (QboundAbs z (y n2))%Q.
   assert (A0:(-w<=0)%Q).
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    apply Qpos_nonneg.
   rewrite -> Qle_minus_iff in *.
@@ -599,12 +600,12 @@ Proof.
    apply leEq_imp_AbsSmall.
     apply X1.
    rewrite -> Qle_minus_iff.
-   replace RHS with ((y n + (-1 # 1) * y n2 + w)+(y n2 + - z))%Q by ring.
+   stepr ((y n + (-1 # 1) * y n2 + w)+(y n2 + - z))%Q; [| simpl; ring].
    apply: plus_resp_nonneg; assumption.
   apply: leEq_imp_AbsSmall; simpl; ring_simplify.
    apply X0.
-  rewrite Qle_minus_iff.
-  replace RHS with ((w + (-1 # 1) * y n + y n2)+(- z + - y n2))%Q by ring.
+  rewrite -> Qle_minus_iff.
+  stepr ((w + (-1 # 1) * y n + y n2)+(- z + - y n2))%Q; [| simpl; ring].
   apply: plus_resp_nonneg; assumption.
  stepr ((x n - x n1)*y n)%Q; [| simpl; ring].
  autorewrite with QposElim.
@@ -618,7 +619,7 @@ Proof.
   intros H x y.
   generalize (H x y) (H x (-y)%Q).
   clear H.
-  rewrite Qabs_opp.
+  rewrite -> Qabs_opp.
   apply Qabs_case; intros H H1 H2.
    auto.
   assert (X:AbsSmall (R:=Q_as_COrdField) x y <-> AbsSmall (R:=Q_as_COrdField) x (- y)%Q).
@@ -628,14 +629,14 @@ Proof.
    stepr (- - y)%Q; [| simpl; ring].
    apply inv_resp_AbsSmall.
    assumption.
-  rewrite X.
+  rewrite -> X.
   apply: H2.
   rewrite -> Qle_minus_iff in H.
   ring_simplify in H.
   ring_simplify.
   apply H.
  intros x y H.
- rewrite Qabs_pos;[|assumption].
+ rewrite -> Qabs_pos;[|assumption].
  split.
   intros H0.
   apply leEq_imp_AbsSmall; assumption.
@@ -656,14 +657,14 @@ Proof.
     apply CR_b_lowerBound.
    apply CR_b_upperBound.
   autorewrite with QposElim.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   discriminate.
  apply Cauchy_IR_mult_as_CRmult_bounded with n.
  intros i Hi.
  apply: AbsSmall_trans;[|apply Hn;assumption].
  simpl.
- rewrite Qlt_minus_iff.
+ rewrite -> Qlt_minus_iff.
  unfold k'.
  autorewrite with QposElim.
  ring_simplify.
@@ -687,7 +688,7 @@ Proof.
  intros x y [n [e He Hn]].
  exists (mkQpos He).
  abstract ( autorewrite with CRtoCauchy_IR; intros [m [d Hd Hm]];
-   refine (Qle_not_lt _ _ (Hn (max n m) _) _);[auto with *|]; rewrite Qlt_minus_iff;
+   refine (Qle_not_lt _ _ (Hn (max n m) _) _);[auto with *|]; rewrite -> Qlt_minus_iff;
      apply Qlt_le_trans with d;[assumption|]; autorewrite with QposElim in Hm; apply: Hm; auto with *
        ).
 Defined.
@@ -704,7 +705,7 @@ Proof.
  stepr (CRasCauchy_IR (y-x))%CR.
   stepl (CRasCauchy_IR (' e)%CR).
    rewrite <- Cauchy_IR_le_as_CR_le.
-   do 2 rewrite CRasCR.
+   do 2 rewrite -> CRasCR.
    assumption.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
  stepl (CRasCauchy_IR y[+]CRasCauchy_IR(- x)%CR).
@@ -827,8 +828,8 @@ Proof.
   apply Hn.
   apply le_trans with (max a n); unfold m; auto with *.
  apply Qle_trans with (x m - x b)%Q.
-  rewrite Qle_minus_iff.
-  replace RHS with (z + - x b)%Q by ring.
+  rewrite -> Qle_minus_iff.
+  stepr (z + - x b)%Q; [| simpl; ring].
   rewrite <- Qle_minus_iff.
   assumption.
  destruct W; assumption.
@@ -875,12 +876,12 @@ Proof.
    apply CRopp_wd.
    set (X := (Cauchy_IRasCR (f_rcpcl (F:=Cauchy_IR) [--](x':Cauchy_IR)
      (@inr (R_lt Q_as_COrdField [--](x':Cauchy_IR) (Zero:Cauchy_IR)) (Zero[<][--](x':Cauchy_IR)) H')))%CR).
-   rewrite Cauchy_IR_opp_as_CR_opp.
+   rewrite -> Cauchy_IR_opp_as_CR_opp.
    apply: Cauchy_IR_inv_as_CRinv_pos.
    intros i Hi.
    autorewrite with QposElim.
    simpl.
-   replace RHS with (0 - x i)%Q by ring.
+   stepr (0 - x i)%Q; [| simpl; ring].
    apply: H.
    apply Hi.
   unfold y.
@@ -902,7 +903,7 @@ Proof.
  intros i Hi.
  autorewrite with QposElim.
  simpl in *.
- replace RHS with (x i- 0)%Q by ring.
+ stepr (x i- 0)%Q; [| simpl; ring].
  apply H.
  apply Hi.
 Qed.

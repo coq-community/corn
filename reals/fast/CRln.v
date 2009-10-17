@@ -49,10 +49,10 @@ Lemma lnDomainAdaptor : forall a, (0 < a) ->
 Proof.
  intros [[|n|n] d] Ha; try solve [elim (Qlt_not_le _ _ Ha); auto with *].
  simpl.
- replace LHS with ((n-d)*(n-d)/((n+d)*(n+d))) by field; auto with *.
+ replace LHS with ((n-d)*(n-d)/((n+d)*(n+d))) by simpl; field; auto with *.
  apply Qlt_shift_div_r.
   auto with *.
- rewrite Qlt_minus_iff.
+ rewrite -> Qlt_minus_iff.
  ring_simplify.
  Qauto_pos.
 Qed.
@@ -77,7 +77,7 @@ Proof.
  intros a Ha Ha0.
  unfold rational_ln_slow.
  assert (X:=artanh_DomArTanH (lnDomainAdaptor Ha)).
- rewrite (fun x => rational_artanh_slow_correct x X).
+ rewrite -> (fun x => rational_artanh_slow_correct x X).
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
@@ -111,7 +111,7 @@ Proof.
   destruct a as [n d].
   simpl.
   unfold b.
-  rewrite Qmake_Qdiv.
+  rewrite -> Qmake_Qdiv.
   field.
   split.
    unfold Qeq.
@@ -163,7 +163,7 @@ Definition ln2 : CR := rational_ln_slow (pos_two Q_as_COrdField).
 Lemma ln2_correct : (ln2 == IRasCR (Log Two (pos_two IR)))%CR.
 Proof.
  unfold ln2.
- rewrite rational_ln_slow_correct'.
+ rewrite -> rational_ln_slow_correct'.
  apply IRasCR_wd.
  apply Log_wd.
  apply (inj_Q_nring IR 2).
@@ -182,8 +182,8 @@ Qed.
 Lemma ln_scale_by_two_power : forall (n:Z) q (Hq:0 < q), (rational_ln_slow Hq + scale n ln2 == rational_ln_slow (ln_scale_by_two_power_adapt n Hq))%CR.
 Proof.
  intros n q Hq.
- rewrite ln2_correct.
- do 2 rewrite rational_ln_slow_correct'.
+ rewrite -> ln2_correct.
+ do 2 rewrite -> rational_ln_slow_correct'.
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
@@ -275,7 +275,7 @@ Proof.
    intros x.
    unfold lnf.
    destruct (Qlt_le_dec 0 (QboundBelow_uc c x)).
-    do 2 rewrite rational_ln_correct'.
+    do 2 rewrite -> rational_ln_correct'.
     apply IRasCR_wd.
     algebra.
    elim (Qle_not_lt _ _ q).
@@ -354,10 +354,10 @@ Proof.
  transitivity (ln_pos_uc c q);[|].
   unfold CRln_pos.
   change (' q)%CR with (Cunit_fun _ q).
-  rewrite (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
+  rewrite -> (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
   apply: BindLaw1.
  simpl.
- rewrite rational_ln_correct'.
+ rewrite -> rational_ln_correct'.
  apply IRasCR_wd.
  apply Log_wd.
  apply inj_Q_wd.
@@ -377,9 +377,9 @@ Proof.
  intros x Hx [c Hc].
  apply CRln_pos_correct.
  change ((inj_Q IR (c:Q))[<=]x).
- rewrite IR_leEq_as_CR.
- rewrite IR_inj_Q_as_CR.
- setoid_replace (IRasCR x) with (IRasCR x - '0)%CR by ring.
+ rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_inj_Q_as_CR.
+ setoid_replace (IRasCR x) with (IRasCR x - '0)%CR by (simpl; ring).
  assumption.
 Qed.
 
@@ -391,9 +391,9 @@ Proof.
  assert (X:Zero[<](CRasIR x)).
   apply CR_less_as_IR.
   apply CRlt_wd with ('0)%CR x; try assumption.
-   rewrite IR_Zero_as_CR.
+   rewrite -> IR_Zero_as_CR.
    reflexivity.
-  rewrite CRasIRasCR_id.
+  rewrite -> CRasIRasCR_id.
   reflexivity.
  destruct Hx as [d Hd].
  unfold CRln.
@@ -402,15 +402,15 @@ Proof.
   rewrite <- (CRln_pos_correct d _ X).
    reflexivity.
   change (inj_Q IR (d:Q)[<=](CRasIR x)).
-  rewrite IR_leEq_as_CR.
+  rewrite -> IR_leEq_as_CR.
   autorewrite with IRtoCR.
-  rewrite CRasIRasCR_id.
+  rewrite -> CRasIRasCR_id.
   ring_simplify in Hd.
   assumption.
  change (inj_Q IR (c:Q)[<=](CRasIR x)).
- rewrite IR_leEq_as_CR.
+ rewrite -> IR_leEq_as_CR.
  autorewrite with IRtoCR.
- rewrite CRasIRasCR_id.
+ rewrite -> CRasIRasCR_id.
  assumption.
 Qed.
 
@@ -418,7 +418,7 @@ Lemma CRln_wd : forall (x y:CR) Hx Hy, (x == y -> CRln x Hx == CRln y Hy)%CR.
 Proof.
  intros x y [c Hc] Hy Hxy.
  unfold CRln at 1.
- rewrite Hxy.
+ rewrite -> Hxy.
  apply CRln_pos_ln.
  rewrite <- Hxy.
  ring_simplify in Hc.

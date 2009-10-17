@@ -45,7 +45,7 @@ Lemma Qeq_le_def : forall x y, x == y <-> x <= y /\ y <= x.
 Proof.
  intros.
  split.
-  intros H; rewrite H.
+  intros H; rewrite -> H.
   firstorder using Qle_refl.
  firstorder using Qle_antisym.
 Qed.
@@ -220,7 +220,7 @@ Definition Qminus_max_min_antidistr_r : forall x y z : Q, x - Qmax y z == Qmin (
 Lemma Qmult_pos_monotone_r : forall a, (0 <= a) -> Qmonotone (Qmult a).
 Proof.
  intros a Ha b c H.
- do 2 rewrite (Qmult_comm a).
+ do 2 rewrite -> (Qmult_comm a).
  apply Qmult_le_compat_r; auto with *.
 Qed.
 

@@ -54,28 +54,28 @@ Hypothesis Hf : monotone X f.
 
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X)  as monotone_compat.
 Proof.
- move:Hf;rewrite monotone_def;intros.
- move: H0; do 2 rewrite equiv_le_def.
+ move:Hf;rewrite -> monotone_def;intros.
+ move: H0; do 2 rewrite -> equiv_le_def.
  firstorder.
 Qed.
 
 (** meet distributes over any monotone function. *)
 Lemma monotone_meet_distr : forall x y : X, f (meet x y) == meet (f x) (f y).
 Proof.
- move: Hf; rewrite monotone_def. clear Hf. intro Hf.
+ move: Hf; rewrite -> monotone_def. clear Hf. intro Hf.
  assert (forall x y : X, x <= y -> f (meet x y) == meet (f x) (f y)).
   intros x y Hxy.
   assert (Hfxfy:=Hf _ _ Hxy).
   rewrite -> le_meet_l in Hxy.
-  rewrite Hxy.
+  rewrite -> Hxy.
   rewrite -> le_meet_l in Hfxfy.
-  rewrite Hfxfy.
+  rewrite -> Hfxfy.
   reflexivity.
  intros.
  destruct (le_total _ x y).
   auto.
- rewrite (meet_comm X).
- rewrite (meet_comm _ (f x)).
+ rewrite -> (meet_comm X).
+ rewrite -> (meet_comm _ (f x)).
  auto.
 Qed.
 
@@ -96,7 +96,7 @@ Hypothesis Hf : antitone X f.
 (* begin hide *)
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat.
 Proof.
- move: Hf; rewrite antitone_def; clear Hf;intros.
+ move: Hf; rewrite -> antitone_def; clear Hf;intros.
  rewrite -> equiv_le_def in *.
  firstorder.
 Qed.
@@ -105,20 +105,20 @@ Qed.
 (* meet transforms into join for antitone functions *)
 Lemma antitone_meet_join_distr : forall x y : X, f (meet x y) == join (f x) (f y).
 Proof.
- move: Hf;rewrite antitone_def; clear Hf; intro Hf.
+ move: Hf;rewrite -> antitone_def; clear Hf; intro Hf.
  assert (forall x y : X, x <= y -> f (meet x y) == join (f x) (f y)).
   intros x y Hxy.
   assert (Hfxfy:=Hf _ _ Hxy).
   rewrite -> le_meet_l in Hxy.
-  rewrite Hxy.
+  rewrite -> Hxy.
   rewrite -> le_join_l in Hfxfy.
-  rewrite Hfxfy.
+  rewrite -> Hfxfy.
   reflexivity.
  intros.
  destruct (le_total _ x y).
   auto.
- rewrite (meet_comm X).
- rewrite (join_comm X).
+ rewrite -> (meet_comm X).
+ rewrite -> (join_comm X).
  auto.
 Qed.
 
@@ -128,27 +128,27 @@ End Antitone.
 Lemma join_meet_modular_r : forall x y z : X, join x (meet y (join x z)) == meet (join x y) (join x z).
 Proof.
  intros.
- rewrite join_meet_distr_r.
- rewrite (join_assoc X).
- rewrite (join_idem X).
+ rewrite -> join_meet_distr_r.
+ rewrite -> (join_assoc X).
+ rewrite -> (join_idem X).
  reflexivity.
 Qed.
 
 Lemma join_meet_modular_l : forall x y z : X, join (meet (join x z) y) z == meet (join x z) (join y z).
 Proof.
  intros.
- rewrite (join_comm X (meet (join x z) y) z).
- rewrite (meet_comm X (join x z) y).
- rewrite (meet_comm X (join x z) (join y z)).
- rewrite (join_comm X x z).
- rewrite (join_comm X y z).
+ rewrite -> (join_comm X (meet (join x z) y) z).
+ rewrite -> (meet_comm X (join x z) y).
+ rewrite -> (meet_comm X (join x z) (join y z)).
+ rewrite -> (join_comm X x z).
+ rewrite -> (join_comm X y z).
  apply join_meet_modular_r.
 Qed.
 
 Lemma meet_join_disassoc : forall x y z : X, meet (join x y) z <= join x (meet y z).
 Proof.
  intros.
- rewrite join_meet_distr_r.
+ rewrite -> join_meet_distr_r.
  apply meet_le_compat.
   apply le_refl.
  apply join_ub_r.
@@ -207,17 +207,17 @@ Lemma min_lb_l : forall x y:X, min x y <= x.
 Proof.
  intros.
  destruct (le_total x y).
-  rewrite min_def1; auto.
+  rewrite -> min_def1; auto.
   apply le_refl.
- rewrite min_def2; auto.
+ rewrite -> min_def2; auto.
 Qed.
 
 Lemma min_lb_r : forall x y:X, min x y <= y.
 Proof.
  intros.
  destruct (le_total x y).
-  rewrite min_def1; auto.
- rewrite min_def2; auto.
+  rewrite -> min_def1; auto.
+ rewrite -> min_def2; auto.
  apply le_refl.
 Qed.
 
@@ -225,8 +225,8 @@ Lemma min_glb : forall x y z, z <= x -> z <= y -> z <= min x y.
 Proof.
  intros.
  destruct (le_total x y).
-  rewrite min_def1; assumption.
- rewrite min_def2; assumption.
+  rewrite -> min_def1; assumption.
+ rewrite -> min_def2; assumption.
 Qed.
 
 End TotalOrderMinDef.

@@ -52,8 +52,8 @@ Proof.
  assert (X:forall e:Qpos, ((1 # p) * e)%Qpos*(length t) + ((1 # p) * e)%Qpos <= e).
   intros e.
   autorewrite with QposElim.
-  replace LHS with (((1#p)*(length t) + (1#p))*e) by ring.
-  rewrite Qmake_Qdiv.
+  replace LHS with (((1#p)*(length t) + (1#p))*e) by simpl; ring.
+  rewrite -> Qmake_Qdiv.
   field_simplify (1%positive / p * length t + 1%positive / p);[|unfold Qeq; auto with *].
   setoid_replace ((length t + 1) / p) with 1.
    auto with *.
@@ -89,8 +89,8 @@ Proof.
    try (autorewrite with QposElim; ring_simplify; assumption).
  unfold Qball.
  autorewrite with QposElim.
- replace RHS with ((x - y) + (approximate a e1'' - approximate a e2'')) by ring.
- replace LHS with ((e1' + e2') + (e1'' + e2'')) by ring.
+ replace RHS with ((x - y) + (approximate a e1'' - approximate a e2'')) by simpl; ring.
+ replace LHS with ((e1' + e2') + (e1'' + e2'')) by simpl; ring.
  apply AbsSmall_plus.
   auto.
  apply: (regFun_prf a).
@@ -127,17 +127,17 @@ Proof.
     ((1 # Psucc (P_of_succ_nat n)) * e)%Qpos ((1 # Psucc (P_of_succ_nat n)) * e +
       (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos).
     simpl.
-    rewrite Qplus_0_l.
+    rewrite -> Qplus_0_l.
     apply: regFun_prf.
    ring.
   autorewrite with QposElim.
   replace LHS with ((1 # Psucc (P_of_succ_nat n)) * (2+n) *e +
-    ((1 # P_of_succ_nat n) * (1 + n) * ((1 # 2) * e)  + (1 # 2) * e)) by ring.
-  repeat rewrite Qmake_Qdiv.
+    ((1 # P_of_succ_nat n) * (1 + n) * ((1 # 2) * e)  + (1 # 2) * e)) by simpl; ring.
+  repeat rewrite -> Qmake_Qdiv.
   change (Zpos (Psucc (P_of_succ_nat n))) with (Z_of_nat (1+1+n)).
   change (Zpos (P_of_succ_nat n)) with (Z_of_nat (1+n)).
-  repeat rewrite inj_plus.
-  repeat rewrite injz_plus.
+  repeat rewrite -> inj_plus.
+  repeat rewrite -> injz_plus.
   field_simplify.
    apply Qle_shift_div_r; auto with *.
    field_simplify.
@@ -154,9 +154,9 @@ Proof.
   simpl in *.
   ring_simplify in H.
   ring_simplify.
-  rewrite H0.
+  rewrite -> H0.
   unfold Qball.
-  replace RHS with ((approximate a e3 - approximate a e4) + (z1 - z2)) by ring.
+  replace RHS with ((approximate a e3 - approximate a e4) + (z1 - z2)) by simpl; ring.
   apply AbsSmall_leEq_trans with (e3 + e4 + e5); auto.
   apply AbsSmall_plus; auto.
   apply: (regFun_prf a).
@@ -164,12 +164,12 @@ Proof.
  apply (IHl (z1 + approximate a0 e1) e3 (e5 + (e1 + e2))%Qpos).
    simpl.
    unfold Qball.
-   replace RHS with ((z1 - z2) + (approximate a0 e1 - approximate a0 e2)) by ring.
+   replace RHS with ((z1 - z2) + (approximate a0 e1 - approximate a0 e2)) by simpl; ring.
    rewrite Q_Qpos_plus.
    apply AbsSmall_plus.
     auto.
    apply (regFun_prf a0).
-  rewrite H0.
+  rewrite -> H0.
   ring.
  autorewrite with QposElim.
  simpl in H.
@@ -177,6 +177,6 @@ Proof.
  change (Zpos (P_of_succ_nat n)) with (Z_of_nat (1+n)) in H.
  rewrite inj_plus in H.
  rewrite -> injz_plus in H.
- replace LHS with (e1 * (1 + n) + e2 * (1 + n) + e3 + e4 + e5) by ring.
+ replace LHS with (e1 * (1 + n) + e2 * (1 + n) + e3 + e4 + e5) by simpl; ring.
  auto.
 Qed.

@@ -56,7 +56,7 @@ Proof.
   change (-d <= e + - (x' - y')) in H2'.
   rewrite -> Qle_minus_iff in *.
   apply: ball_weak.
-  split; simpl; autorewrite with QposElim; rewrite Qle_minus_iff.
+  split; simpl; autorewrite with QposElim; rewrite -> Qle_minus_iff.
    replace RHS with (x' - y' + - - e + - - d) by ring.
    assumption.
   replace RHS with (e + - (x' - y') + - - d) by ring.
@@ -70,14 +70,14 @@ Proof.
   autorewrite with QposElim in H1.
   change (- ((1 # 2) * d + e + (1 # 2) * d)<=x' - y') in H1.
   change (-d <= x' - y' + - - e).
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   rewrite -> Qle_minus_iff in H1.
   replace RHS with (x' - y' + - - ((1 # 2) * d + e + (1 # 2) * d)) by ring.
   assumption.
  autorewrite with QposElim in H2.
  change (x' - y'<=((1 # 2) * d + e + (1 # 2) * d)) in H2.
  change (-d <= e + - (x' - y')).
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  rewrite -> Qle_minus_iff in H2.
  replace RHS with ((1 # 2) * d + e + (1 # 2) * d + - (x' - y')) by ring.
  assumption.
@@ -90,8 +90,8 @@ Proof.
  exists c.
  intros d.
  change (-d <= b + - a + - c).
- rewrite Hc.
- rewrite Qle_minus_iff.
+ rewrite -> Hc.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply Qpos_nonneg.
 Qed.
@@ -116,7 +116,7 @@ Proof.
   exists n.
   intros m Hm.
   apply AbsSmall_leEq_trans with (inject_Q d);[rstepr (e[-]Zero);assumption|].
-  rewrite CRAbsSmall_ball.
+  rewrite -> CRAbsSmall_ball.
   change (nat -> Complete Q_as_MetricSpace) in f.
   change (ball d (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
   rewrite <- (MonadLaw5 (f m)).
@@ -134,12 +134,12 @@ Proof.
    intros x.
    autorewrite with QposElim.
    change (-x <= e1 + d + e2 - e2).
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    change (0<=(e1+d+x)%Qpos).
    apply Qpos_nonneg.
   apply ball_weak_le with ((1#2)*d+(1#2)*d)%Qpos.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    autorewrite with QposElim.
    ring_simplify.
    change (0<=(e1+e2)%Qpos).
@@ -161,7 +161,7 @@ Proof.
  unfold Cap_raw.
  simpl.
  apply Qle_trans with 0.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   apply Qpos_nonneg.
  destruct (ZL4 n) as [a Ha].
@@ -182,14 +182,14 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  replace RHS with
    ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by ring.
  rewrite<- Qle_minus_iff.
  apply: Qle_trans;[|apply IHa].
  generalize (P_of_succ_nat a).
  intros p.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  replace RHS with (((p#d) + 1) + - (Psucc p # d)) by ring.
  rewrite <- Qle_minus_iff.

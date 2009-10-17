@@ -44,8 +44,8 @@ Proof.
   eapply Qle_trans;[|apply Hab].
   apply Qabs_triangle_reverse.
  intros _.
- replace LHS with (Qabs b - Qabs a) by ring.
- setoid_replace (a - b) with (- (b - a)) in Hab by ring.
+ stepl (Qabs b - Qabs a); [| simpl; ring].
+ setoid_replace (a - b) with (- (b - a)) in Hab; [| simpl; ring].
  rewrite -> Qabs_opp in Hab.
  eapply Qle_trans;[|apply Hab].
  apply Qabs_triangle_reverse.
@@ -73,7 +73,7 @@ Proof.
   transitivity (IRasCR ([--]x)).
    apply IRasCR_wd.
    apply AbsIR_eq_inv_x; auto.
-  rewrite IR_opp_as_CR.
+  rewrite -> IR_opp_as_CR.
   rewrite -> IR_leEq_as_CR in H.
   rewrite -> IR_Zero_as_CR in H.
   revert H.
@@ -81,15 +81,18 @@ Proof.
   intros m Hm.
   rewrite -> CRle_min_r in Hm.
   rewrite -> CRmin_boundAbove in Hm.
-  setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR by ring.
-  apply CRopp_wd.
-  rewrite <- Hm.
-  apply: regFunEq_e.
-  intros e.
-  simpl.
-  rewrite Qabs_neg; auto with *.
-  rewrite Qopp_involutive.
-  apply: ball_refl.
+  setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR.
+   apply CRopp_wd.
+   rewrite <- Hm.
+   apply: regFunEq_e.
+   intros e.
+   simpl.
+   rewrite -> Qabs_neg; auto with *.
+   rewrite -> Qopp_involutive.
+   apply: ball_refl.
+  cut (CRabs m== - - CRabs m)%CR.
+   intros. assumption.
+  ring.
  transitivity (IRasCR x).
   apply IRasCR_wd.
   apply AbsIR_eq_x; auto.
@@ -104,7 +107,7 @@ Proof.
  apply: regFunEq_e.
  intros e.
  simpl.
- rewrite Qabs_pos; auto with *.
+ rewrite -> Qabs_pos; auto with *.
 Qed.
 
 Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.
@@ -128,8 +131,8 @@ Proof.
  intros H.
  apply IRasCR_wd.
  apply AbsIR_eq_x.
- rewrite IR_leEq_as_CR.
- rewrite IR_Zero_as_CR.
+ rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_Zero_as_CR.
  auto.
 Qed.
 
@@ -142,7 +145,7 @@ Proof.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.
  apply AbsIR_eq_inv_x.
- rewrite IR_leEq_as_CR.
- rewrite IR_Zero_as_CR.
+ rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_Zero_as_CR.
  auto.
 Qed.

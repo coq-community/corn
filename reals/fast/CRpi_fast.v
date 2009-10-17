@@ -86,7 +86,7 @@ Lemma f_char : forall a b, f a b == (a+b)/(1-a*b).
 Proof.
  intros [x y] [w z].
  unfold f.
- rewrite Qred_correct.
+ rewrite -> Qred_correct.
  destruct (Z_eq_dec (y*z) (x*w)) as [H|H].
   unfold Qmult.
   simpl ((Qnum (x # y) * Qnum (w # z) # Qden (x # y) * Qden (w # z))).
@@ -95,19 +95,19 @@ Proof.
   setoid_replace (1-(y * z # y * z)) with 0.
    change ((x * z + y * w)%Z * 0 == ((x # y) + (w # z)) * 0).
    ring.
-  rewrite (Qmake_Qdiv (y*z)).
+  rewrite -> (Qmake_Qdiv (y*z)).
   change (1 - (y * z)%positive / (y * z)%positive == 0).
   field; discriminate.
  unfold Zminus.
- repeat rewrite injz_plus.
+ repeat rewrite -> injz_plus.
  change (((x * z) + (y * w)) / (y * z - x * w) == ((x # y) + (w # z)) / (1 - (x #y)*(w # z))).
- repeat rewrite Qmake_Qdiv.
+ repeat rewrite -> Qmake_Qdiv.
  field.
  repeat split; try discriminate.
  cut (~(y * z)%Z == (x * w)%Z).
   intros X Y.
   apply X.
-  replace RHS with ((x * w)%Z + 0) by ring.
+  replace RHS with ((x * w)%Z + 0) by simpl; ring.
   rewrite <- Y.
   change ((y * z) == (x * w) + (y * z - x * w)).
   ring.
@@ -265,17 +265,17 @@ Proof.
  intros r.
  unfold r_pi.
  repeat rewrite <- (CRmult_scale).
- setoid_replace ((176*r)) with ((4*r*44)) by ring.
- setoid_replace (28*r) with (4*r*7) by ring.
- setoid_replace (-(48)*r) with (4*r*-(12)) by ring.
- setoid_replace (96*r) with (4*r*24) by ring.
+ setoid_replace ((176*r)) with ((4*r*44)) by (simpl; ring).
+ setoid_replace (28*r) with (4*r*7) by (simpl; ring).
+ setoid_replace (-(48)*r) with (4*r*-(12)) by (simpl; ring).
+ setoid_replace (96*r) with (4*r*24) by (simpl; ring).
  repeat rewrite <- CRmult_Qmult.
  transitivity ('4 * 'r *(' 44 * rational_arctan_small_pos small_per_57 +
    ' 7 * rational_arctan_small_pos small_per_239 +
      (' (-(12)) * rational_arctan_small_pos small_per_682 +
        ' 24 * rational_arctan_small_pos small_per_12943)))%CR.
   ring.
- repeat (rewrite (rational_arctan_small_pos_correct); [|constructor]).
+ repeat (rewrite -> (rational_arctan_small_pos_correct); [|constructor]).
  repeat rewrite <- IR_inj_Q_as_CR.
  repeat (rewrite <- IR_mult_as_CR || rewrite <- IR_plus_as_CR).
  apply IRasCR_wd.
@@ -303,7 +303,7 @@ Definition CRpi : CR := (r_pi 1).
 Lemma CRpi_correct : (IRasCR Pi == CRpi)%CR.
 Proof.
  unfold CRpi.
- rewrite r_pi_correct.
+ rewrite -> r_pi_correct.
  apply IRasCR_wd.
  rstepl ((nring 1)[*]Pi).
  apply mult_wdl.

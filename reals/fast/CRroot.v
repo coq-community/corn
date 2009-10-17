@@ -62,9 +62,9 @@ Add Morphism root_has_error with signature QposEq ==> Qeq ==> iff as root_has_er
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
  unfold root_has_error.
- rewrite Hy.
+ rewrite -> Hy.
  unfold QposEq in Hx.
- rewrite Hx.
+ rewrite -> Hx.
  reflexivity.
 Qed.
 (* end hide *)
@@ -72,10 +72,10 @@ Lemma root_has_error_le : forall (e1 e2:Qpos) (b:Q), e2 <= b -> e1 <= e2 -> root
 Proof.
  intros e1 e2 b Hb He [H0 H1].
  rewrite -> Qle_minus_iff in *.
- split; rewrite Qle_minus_iff.
-  replace RHS with (((b + e1) ^ 2 + - a) + (e2 + - e1)*(2*(b + - e2 + e2) + e2 + e1)) by ring.
+ split; rewrite -> Qle_minus_iff.
+  replace RHS with (((b + e1) ^ 2 + - a) + (e2 + - e1)*(2*(b + - e2 + e2) + e2 + e1)) by (simpl; ring).
   Qauto_nonneg.
- replace RHS with ((a + - (b-e1)^2) + (e2 + -e1)*((e2 + - e1) + 2*(b + - e2))) by ring.
+ replace RHS with ((a + - (b-e1)^2) + (e2 + -e1)*((e2 + - e1) + 2*(b + - e2))) by (simpl; ring).
  Qauto_nonneg.
 Qed.
 
@@ -87,13 +87,13 @@ Proof.
  assert (X:0 < 2 + b - e).
   apply Qlt_le_trans with 2.
    constructor.
-  rewrite Qle_minus_iff.
-  replace RHS with ((b + -(1)) + (1 + - e)) by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with ((b + -(1)) + (1 + - e)) by (simpl; ring).
   Qauto_nonneg.
- replace RHS with (((4  + - a) + (a + - (b - e)^2))/(2 + b - e)) by field; auto with *.
+ replace RHS with (((4  + - a) + (a + - (b - e)^2))/(2 + b - e)) by simpl; field; auto with *.
  apply Qle_shift_div_l.
   assumption.
- replace LHS with 0 by ring.
+ replace LHS with 0 by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -105,10 +105,10 @@ Proof.
  rewrite -> Qle_minus_iff in *.
  unfold root_has_error.
  autorewrite with QposElim.
- split; rewrite Qle_minus_iff.
-  replace RHS with (((b1 + e1)^2 + - a) + (b2 + - (1)  + e1 + e2 + (b1 + -(1)) + 2 + e1)*(e2 - (b1 - b2))) by ring.
+ split; rewrite -> Qle_minus_iff.
+  replace RHS with (((b1 + e1)^2 + - a) + (b2 + - (1)  + e1 + e2 + (b1 + -(1)) + 2 + e1)*(e2 - (b1 - b2))) by simpl; ring.
   Qauto_nonneg.
- replace RHS with ((a + - (b1 - e1)^2) +  (b1 - b2 + - - e2)*((b1 + -(1)) + (1 + - (e1 + e2)) + e2 + (b2 + -(1)) + (1 + - (e1 + e2)))) by ring.
+ replace RHS with ((a + - (b1 - e1)^2) +  (b1 - b2 + - - e2)*((b1 + -(1)) + (1 + - (e1 + e2)) + e2 + (b2 + -(1)) + (1 + - (e1 + e2)))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -117,20 +117,20 @@ Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  clear Ha.
  rewrite -> Qle_minus_iff in *.
- split; simpl; autorewrite with QposElim; rewrite Qle_minus_iff.
+ split; simpl; autorewrite with QposElim; rewrite -> Qle_minus_iff.
   assert (A0:0 < (b1 + e1 + b2 - e2)).
    apply Qlt_le_trans with 1;[constructor|].
-   rewrite Qle_minus_iff.
-   replace RHS with (b1 + - (1) + (b2 + - (1)) + 2 * e1 + (1 - (e1 + e2))) by ring.
+   rewrite -> Qle_minus_iff.
+   replace RHS with (b1 + - (1) + (b2 + - (1)) + 2 * e1 + (1 - (e1 + e2))) by simpl; ring.
    Qauto_nonneg.
-  replace RHS with ((((b1 + e1)^2 + - a) + (a + - (b2 - e2)^2))/(b1 + e1 +b2 - e2)) by (field; auto with * ).
+  replace RHS with ((((b1 + e1)^2 + - a) + (a + - (b2 - e2)^2))/(b1 + e1 +b2 - e2)) by (simpl; field; auto with * ).
   Qauto_nonneg.
  assert (A0:0 < (b2 + e2 + b1 - e1)).
   apply Qlt_le_trans with 1;[constructor|].
-  rewrite Qle_minus_iff.
-  replace RHS with (b2 + - (1) + (b1 + - (1)) + 2 * e2 + (1 - (e1 + e2))) by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with (b2 + - (1) + (b1 + - (1)) + 2 * e2 + (1 - (e1 + e2))) by simpl; ring.
   Qauto_nonneg.
- replace RHS with (((a + -(b1 - e1)^2) + ((b2 + e2)^2 + - a))/(b2 + e2 + b1 - e1)) by (field;auto with * ).
+ replace RHS with (((a + -(b1 - e1)^2) + ((b2 + e2)^2 + - a))/(b2 + e2 + b1 - e1)) by (simpl; field;auto with * ).
  Qauto_nonneg.
 Qed.
 
@@ -142,7 +142,7 @@ Proof.
   apply Qlt_le_trans with 1; try assumption.
   Qauto_pos.
  assert (A1:(0 <= b - e^2)).
-  replace RHS with (b + - e^2) by ring.
+  replace RHS with (b + - e^2) by simpl; ring.
   rewrite <- Qle_minus_iff.
   apply Qle_trans with ((1:Q)[^]2); try assumption.
   replace LHS with ((e:Q)[^]2) by (simpl; unfold QONE; ring).
@@ -155,29 +155,29 @@ Proof.
  split.
   apply Qle_trans with ((b / 2 + a / (2 * b))^2); [|Qauto_le].
   field_simplify (b / 2 + a / (2 * b)); auto with *.
-  rewrite Qdiv_power.
+  rewrite -> Qdiv_power.
   apply Qle_shift_div_l.
    Qauto_pos.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   replace RHS with ((b^2 - a)[^]2) by (simpl; unfold QONE; ring).
   apply: sqr_nonneg.
  field_simplify (b / 2 + a / (2 * b) - ((1#2)*e * e)); auto with *.
- rewrite Qdiv_power.
+ rewrite -> Qdiv_power.
  apply Qle_shift_div_r.
   Qauto_pos.
- replace LHS with ((a + b^2 - b*e^2)^2) by ring.
+ replace LHS with ((a + b^2 - b*e^2)^2) by simpl; ring.
  apply Qle_trans with ((a + b^2 - e^2)^2).
   replace RHS with ((a + b ^ 2 - e ^ 2)[^]2) by (simpl; unfold QONE; ring).
   replace LHS with ((a + b ^ 2 - b * e ^ 2)[^]2) by (simpl; unfold QONE; ring).
   apply: (power_resp_leEq).
-   replace RHS with (a + b*(b-e^2)) by ring.
+   replace RHS with (a + b*(b-e^2)) by simpl; ring.
    Qauto_nonneg.
   rewrite -> Qle_minus_iff;ring_simplify.
   replace RHS with ((b-1)*((e:Q)[^]2)) by (simpl; unfold QONE; ring).
   rewrite -> Qle_minus_iff in Hb.
   Qauto_nonneg.
- rewrite Qle_minus_iff.
- replace RHS with ((a-(b-e)^2)*((b+e)^2-a)) by ring.
+ rewrite -> Qle_minus_iff.
+ replace RHS with ((a-(b-e)^2)*((b+e)^2-a)) by simpl; ring.
  rewrite -> Qle_minus_iff in *|-.
  apply: mult_resp_nonneg; assumption.
 Qed.
@@ -192,14 +192,14 @@ Proof.
  autorewrite with QposElim.
  split.
   Qauto_le.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  assert (A0:(0<=1 + -((1#4)*a))).
   rewrite <- Qle_minus_iff.
-  replace LHS with (a/4) by (field; discriminate).
+  replace LHS with (a/4) by (simpl; field; discriminate).
   apply Qle_shift_div_r; try assumption.
   Qauto_pos.
  rewrite -> Qle_minus_iff in Ha0.
- replace RHS with ((a + -(1) + 1)*(1 +- ((1#4)*a))) by ring.
+ replace RHS with ((a + -(1) + 1)*(1 +- ((1#4)*a))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -215,7 +215,7 @@ Proof.
  apply Qle_shift_div_l.
   Qauto_pos.
  ring_simplify.
- replace RHS with (((b -1) ^ 2 +  (a + -(1)))) by ring.
+ replace RHS with (((b -1) ^ 2 +  (a + -(1)))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -224,7 +224,7 @@ Proof.
  destruct Ha as [Ha0 Ha1].
  unfold initial_root.
  rewrite -> Qle_minus_iff in *.
- replace RHS with ((1#2)*(a + - (1))) by ring.
+ replace RHS with ((1#2)*(a + - (1))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -356,7 +356,7 @@ Proof.
  apply ball_root_has_error; try first [apply root_loop_one_le; apply initial_root_one_le
    |apply root_loop_error; try first [apply initial_root_one_le |apply initial_root_error
      |(destruct e1; destruct e2); apply root_max_steps]].
- setoid_replace (1:Q) with ((1#2)%Qpos + (1#2)%Qpos) by QposRing.
+ setoid_replace (1:Q) with ((1#2)%Qpos + (1#2)%Qpos) by (simpl; QposRing).
  apply: plus_resp_leEq_both; apply Qpos_min_lb_l.
 Qed.
 
@@ -406,7 +406,7 @@ Proof.
  replace RHS with ((1#2)%Qpos + - Qpos_min (1 # 2) e + (1#2)).
   Qauto_nonneg.
  autorewrite with QposElim.
- ring.
+ simpl. ring.
 Qed.
 
 Opaque root_loop.
@@ -418,7 +418,7 @@ Proof.
    intros e.
    change (-e <= sqrt_raw (Qpos2QposInf ((1#2)*e)) + - - (3#1)).
    apply Qle_trans with 0.
-    rewrite Qle_minus_iff.
+    rewrite -> Qle_minus_iff.
     ring_simplify.
     auto with *.
    rewrite <- Qle_minus_iff.
@@ -428,7 +428,7 @@ Proof.
   intros e.
   change (-e <= 3 + - sqrt_raw (Qpos2QposInf ((1#2)*e))).
   apply Qle_trans with 0.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    auto with *.
   rewrite <- Qle_minus_iff.
@@ -462,14 +462,14 @@ Proof.
   autorewrite with QposElim in *.
   change ((e*(1#6))^2 <= e).
   rewrite ->  Qle_minus_iff in *.
-  replace RHS with (e*(1 + -e + (35#36)* e)) by ring.
+  replace RHS with (e*(1 + -e + (35#36)* e)) by simpl; ring.
   Qauto_nonneg.
  destruct Z; split; simpl; rewrite ->  Qle_minus_iff in *; autorewrite with QposElim in *.
   replace RHS with (((z+d)^2 + - a) + 2*(3 + -z)*d + (e + - d^2))
-    by (unfold d; autorewrite with QposElim;field;discriminate).
+    by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
   Qauto_nonneg.
  replace RHS with (a + - (z-d)^2 + 2*(3 + - z)*d + d^2 + e)
-   by (unfold d; autorewrite with QposElim;field;discriminate).
+   by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
  Qauto_nonneg.
 Qed.
 
@@ -492,15 +492,15 @@ Proof.
   apply sqr_nonneg.
  stepl (sqrt _ X).
   apply sqrt_wd.
-  rewrite IR_eq_as_CR.
-  rewrite (CRpower_positive_correct 2).
-  rewrite IR_inj_Q_as_CR.
-  rewrite (CRasIRasCR_id).
+  rewrite -> IR_eq_as_CR.
+  rewrite -> (CRpower_positive_correct 2).
+  rewrite -> IR_inj_Q_as_CR.
+  rewrite -> (CRasIRasCR_id).
   apply rational_sqrt_mid_correct0.
  apply sqrt_to_nonneg.
- rewrite IR_leEq_as_CR.
- rewrite IR_Zero_as_CR.
- rewrite CRasIRasCR_id.
+ rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_Zero_as_CR.
+ rewrite -> CRasIRasCR_id.
  apply rational_sqrt_mid_correct1.
 Qed.
 
@@ -544,7 +544,7 @@ Proof.
    stepl (inj_Q IR (1*1)); [| by apply (inj_Q_mult IR)].
    apply inj_Q_wd.
    simpl.
-   rewrite Qeq_le_def.
+   rewrite -> Qeq_le_def.
    assumption.
   apply sqrt_to_nonneg.
   stepr (nring 1:IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR 1))].
@@ -565,7 +565,7 @@ Proof.
   apply inj_Q_leEq.
   discriminate.
  set (X0:= (rational_sqrt_big_bounded_subproof0 n a Ha q)).
- rewrite (IHn (a/4%positive) X0 X).
+ rewrite -> (IHn (a/4%positive) X0 X).
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
@@ -613,8 +613,8 @@ Proof.
   clear rational_sqrt_small_bounded.
   abstract ( destruct H; split;[ rewrite -> Zpower_Qpower in *; auto with *;
     replace (Z_of_nat n) with ((S n) + (-1))%Z by (rewrite inj_S; ring);
-      rewrite Qpower_plus; try discriminate; change (4%positive^(-1)) with (/4);
-        rewrite Qinv_mult_distr; change ( / / 4) with (4:Q); rewrite Qmult_comm
+      rewrite -> Qpower_plus; try discriminate; change (4%positive^(-1)) with (/4);
+        rewrite -> Qinv_mult_distr; change ( / / 4) with (4:Q); rewrite -> Qmult_comm
           |replace RHS with (4*1) by constructor];
             (apply: mult_resp_leEq_lft;simpl;[assumption|discriminate])).
  clear rational_sqrt_small_bounded.
@@ -639,7 +639,7 @@ Proof.
    discriminate.
   assumption.
  set (X0:= (rational_sqrt_small_bounded_subproof n a Ha q)).
- rewrite (IHn (4%positive*a) X0 X).
+ rewrite -> (IHn (4%positive*a) X0 X).
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
@@ -750,10 +750,10 @@ Proof.
    destruct Hab.
    split; simpl in *.
     rewrite ->  Qle_minus_iff in *.
-    replace RHS with ((a + - 0) + (e*e)%Qpos) by ring.
+    replace RHS with ((a + - 0) + (e*e)%Qpos) by simpl; ring.
     Qauto_nonneg.
    rewrite ->  Qle_minus_iff in *.
-   replace RHS with ((e*e)%Qpos + - (a - b) + (0 + - b)) by ring.
+   replace RHS with ((e*e)%Qpos + - (a - b) + (0 + - b)) by simpl; ring.
    Qauto_nonneg.
   unfold rational_sqrt at 1.
   destruct (Qlt_le_dec_fast 0 a) as [Z0|_].
@@ -765,10 +765,10 @@ Proof.
    destruct Hab.
    split; simpl in *.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((a - b) + - - (e*e)%Qpos + (0 + - a)) by ring.
+    replace RHS with ((a - b) + - - (e*e)%Qpos + (0 + - a)) by simpl; ring.
     Qauto_nonneg.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with ((e*e)%Qpos + (b + - 0)) by ring.
+   replace RHS with ((e*e)%Qpos + (b + - 0)) by simpl; ring.
    Qauto_nonneg.
   unfold rational_sqrt at 2.
   destruct (Qlt_le_dec_fast 0 b) as [Z0|_].
@@ -781,12 +781,12 @@ Proof.
   stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
- rewrite (rational_sqrt_correct _ Z).
+ rewrite -> (rational_sqrt_correct _ Z).
  assert (Z0:Zero[<=]inj_Q IR b).
   stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
- rewrite (rational_sqrt_correct _ Z0).
+ rewrite -> (rational_sqrt_correct _ Z0).
  rewrite <- CRAbsSmall_ball.
  cut (AbsSmall (R:=CRasCOrdField) (IRasCR (inj_Q IR (e:Q)))%CR
    (IRasCR (sqrt (inj_Q IR a) Z[-](sqrt (inj_Q IR b) Z0)))).
@@ -891,7 +891,7 @@ Proof.
  intros q Hq Y.
  transitivity (rational_sqrt q);[|apply: rational_sqrt_correct].
  unfold CRsqrt.
- rewrite (Cbind_correct QPrelengthSpace sqrt_uc ('q)%CR).
+ rewrite -> (Cbind_correct QPrelengthSpace sqrt_uc ('q)%CR).
  apply: BindLaw1.
 Qed.
 (* begin hide *)

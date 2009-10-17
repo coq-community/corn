@@ -77,7 +77,7 @@ Proof.
  intros o s t.
  unfold IntegralQ.
  simpl.
- rewrite Qred_correct.
+ rewrite -> Qred_correct.
  reflexivity.
 Qed.
 
@@ -91,20 +91,20 @@ Proof.
  induction x using StepF_ind.
   unfold IntegralQ. simpl. intros. unfold affineCombo; simpl in x; ring.
   intros p.
- rewrite Integral_glue.
+ rewrite -> Integral_glue.
  apply SplitLR_glue_ind; intros H.
-   rewrite Integral_glue.
+   rewrite -> Integral_glue.
    unfold affineCombo in *.
-   rewrite (IHx1 (OpenUnitDiv p o H)).
+   rewrite -> (IHx1 (OpenUnitDiv p o H)).
    unfold IntegralQ; simpl; fold IntegralQ. unfold affineCombo; field; auto with *. (*why does this not work*)
-   rewrite Integral_glue.
+   rewrite -> Integral_glue.
   simpl. unfold IntegralQ; simpl; fold IntegralQ.
   repeat rewrite Qred_correct.
   unfold affineCombo in *.
   rewrite -> (IHx2 (OpenUnitDualDiv p o H)).
   unfold IntegralQ; simpl; fold IntegralQ. unfold affineCombo; field; auto with *.
   unfold affineCombo in *.
- rewrite H.
+ rewrite -> H.
  reflexivity.
 Qed.
 (* begin hide *)
@@ -117,7 +117,7 @@ Proof.
  induction x using StepF_ind.
   intros x2 H. simpl. induction x2 using StepF_ind.
   auto with *.
-  rewrite Integral_glue.
+  rewrite -> Integral_glue.
   simpl.
   destruct H as [H0 H1] using (eq_glue_ind x2_1).
   rewrite <- IHx2_1; auto with *.
@@ -125,9 +125,9 @@ Proof.
   simpl in x; unfold affineCombo; ring.
  intros y H.
  destruct H as [H0 H1] using (glue_eq_ind x1).
- rewrite Integral_glue.
- rewrite (IHx1 _ H0).
- rewrite (IHx2 _ H1).
+ rewrite -> Integral_glue.
+ rewrite -> (IHx1 _ H0).
+ rewrite -> (IHx2 _ H1).
  symmetry.
  apply IntegralSplit.
 Qed.
@@ -138,7 +138,7 @@ Add Morphism L1Norm
 Proof.
  unfold L1Norm.
  intros x y Hxy.
- rewrite Hxy.
+ rewrite -> Hxy.
  reflexivity.
 Qed.
 
@@ -148,8 +148,8 @@ Add Morphism L1Distance
 Proof.
  unfold L1Distance.
  intros x1 x2 Hx y1 y2 Hy.
- rewrite Hx.
- rewrite Hy.
+ rewrite -> Hx.
+ rewrite -> Hy.
  reflexivity.
 Qed.
 
@@ -162,12 +162,12 @@ Lemma Integral_plus:forall s t,
 Proof.
  apply StepF_ind2; try reflexivity.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs Ht; auto.
+  rewrite -> Hs, Ht; auto.
  intros o s s0 t t0 H0 H1.
  unfold StepQplus.
  rewriteStepF.
- replace LHS with (o*(IntegralQ s + IntegralQ t) + (1-o)*(IntegralQ s0 + IntegralQ t0))%Q by ring.
- rewrite H0 H1.
+ replace LHS with (o*(IntegralQ s + IntegralQ t) + (1-o)*(IntegralQ s0 + IntegralQ t0))%Q by simpl; ring.
+ rewrite -> H0, H1.
  reflexivity.
 Qed.
 
@@ -188,7 +188,7 @@ Lemma Integral_minus:forall s t,
 Proof.
  intros s t.
  unfold Qminus.
- rewrite Integral_opp Integral_plus.
+ rewrite -> Integral_opp, Integral_plus.
  apply IntegralQ_wd.
  ring.
 Qed.
@@ -214,9 +214,9 @@ Proof.
  rewriteStepF.
  eapply Qle_trans.
   apply Qabs_triangle.
- do 2 rewrite Qabs_Qmult.
- rewrite (Qabs_pos o); auto with *.
- rewrite (Qabs_pos (1-o)); auto with *.
+ do 2 rewrite -> Qabs_Qmult.
+ rewrite -> (Qabs_pos o); auto with *.
+ rewrite -> (Qabs_pos (1-o)); auto with *.
  apply: plus_resp_leEq_both;simpl; apply: mult_resp_leEq_lft; simpl; auto with *.
 Qed.
 
@@ -244,8 +244,8 @@ Lemma Integral_resp_le :forall x y,
  x <= y -> (IntegralQ x <= IntegralQ y)%Q.
 Proof.
  intros x y H.
- rewrite Qle_minus_iff.
- rewrite Integral_opp Integral_plus.
+ rewrite -> Qle_minus_iff.
+ rewrite -> Integral_opp, Integral_plus.
  apply Integral_resp_nonneg.
  revert H.
  apply StepF_imp_imp.
@@ -261,7 +261,7 @@ Proof.
  apply StepFfoldPropForall_Map2.
  intros a b.
  change (a <= b -> 0 <= b + (- a))%Q.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  tauto.
 Qed.
 
@@ -301,7 +301,7 @@ Proof.
   change 0 with (- (- 0))%Q.
   apply Qopp_le_compat.
   eapply Qle_trans;[apply Qle_Qabs|].
-  rewrite Qabs_opp.
+  rewrite -> Qabs_opp.
   assumption.
  unfold L1Norm, StepQabs in *.
  rewrite MapGlue in Hs.
@@ -309,14 +309,14 @@ Proof.
  apply glue_StepF_eq.
   apply IHs1.
   unfold L1Norm.
-  setoid_replace 0 with (0/o); [| field; auto with *].
+  setoid_replace 0 with (0/o); [| simpl; field; auto with *].
   apply Qle_shift_div_l; auto with *.
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   apply Qle_trans with (-((1 - o) * IntegralQ (QabsS ^@> s2)))%Q.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    rewrite -> Qle_minus_iff in Hs.
    replace RHS with (0 +
-     - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by ring.
+     - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by simpl; ring.
    assumption.
   change 0 with (-0)%Q.
   apply Qopp_le_compat.
@@ -324,14 +324,14 @@ Proof.
   apply: L1Norm_nonneg.
  apply IHs2.
  unfold L1Norm.
- setoid_replace 0 with (0/(1-o)); [| field; auto with *].
+ setoid_replace 0 with (0/(1-o)); [| simpl; field; auto with *].
  apply Qle_shift_div_l; auto with *.
- rewrite Qmult_comm.
+ rewrite -> Qmult_comm.
  apply Qle_trans with (-(o * IntegralQ (QabsS ^@> s1)))%Q.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   rewrite -> Qle_minus_iff in Hs.
   replace RHS with (0 +
-    - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by ring.
+    - (o * IntegralQ (QabsS ^@> s1) + (1 - o) * IntegralQ (QabsS ^@> s2)))%Q by simpl; ring.
   assumption.
  change 0 with (-0)%Q.
  apply Qopp_le_compat.
@@ -344,7 +344,7 @@ Lemma L1Norm_scale : forall q s,
 Proof.
  intros q s.
  unfold L1Norm.
- rewrite Integral_scale.
+ rewrite -> Integral_scale.
  apply IntegralQ_wd.
  unfold StepF_eq.
  set (g:= st_eqS QS).
@@ -376,7 +376,7 @@ Proof.
  unfold L1Ball, L1Distance.
  unfold L1Norm.
  setoid_replace (x-y) with (-(y-x)); [| ring].
- rewrite StepQabsOpp.
+ rewrite -> StepQabsOpp.
  auto.
 Qed.
 
@@ -402,7 +402,7 @@ Proof.
   intros. apply: shift_zero_leEq_minus'.
   apply inv_cancel_leEq. apply approach_zero_weak.
   intros. replace LHS with (x[-](e:Q)).
-  apply: shift_minus_leEq;simpl. replace RHS with (e+e0)%Q by ring. rewrite <- (QposAsmkQpos X).
+  apply: shift_minus_leEq;simpl. replace RHS with (e+e0)%Q by simpl; ring. rewrite <- (QposAsmkQpos X).
    apply (H0 (mkQpos X)).
   unfold cg_minus; simpl; ring.
  apply H0. exact H.
@@ -454,9 +454,9 @@ Proof.
  intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
  unfold L1Ball.
  change (x1 == x2)%Q in Hx.
- rewrite Hx.
- rewrite Hy.
- rewrite Hz.
+ rewrite -> Hx.
+ rewrite -> Hy.
+ rewrite -> Hz.
  reflexivity.
 Qed.
 (* end hide *)
@@ -487,30 +487,30 @@ Proof.
  exists (f).
   setoid_replace (x - f)%SQ with (d1' * d' * (x - y))%SQ.
    change ((d1' * d')%SQ * (x - y)%SQ) with (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
-   rewrite L1Norm_scale.
-   rewrite Qabs_pos; auto with *.
+   rewrite -> L1Norm_scale.
+   rewrite -> Qabs_pos; auto with *.
    autorewrite with QposElim.
-   replace LHS with ((d1*L1Norm (x - y))/d) by (field; apply Qpos_nonzero).
+   replace LHS with ((d1*L1Norm (x - y))/d) by (simpl; field; apply Qpos_nonzero).
    apply Qle_shift_div_r; auto with *.
    apply: mult_resp_leEq_lft; simpl; auto with *.
    apply Qle_trans with e; auto with *.
-  setoid_replace (x - f) with (constStepF (1:QS)*x - f); [| ring].
+  setoid_replace (x - f) with (constStepF (1:QS)*x - f); [| simpl; ring].
   rewrite <- X.
   unfold f.
-  ring.
+  simpl; ring.
  setoid_replace (f -y) with (d2' * d' * (x - y))%SQ.
   change ((d2' * d')%SQ * (x - y)%SQ) with (QscaleS (d2/d)%Qpos ^@> (x-y)%SQ).
-  rewrite L1Norm_scale.
-  rewrite Qabs_pos; auto with *.
+  rewrite -> L1Norm_scale.
+  rewrite -> Qabs_pos; auto with *.
   autorewrite with QposElim.
-  replace LHS with ((d2*L1Norm (x - y))/d) by (field; apply Qpos_nonzero).
+  replace LHS with ((d2*L1Norm (x - y))/d) by (simpl; field; apply Qpos_nonzero).
   apply Qle_shift_div_r; auto with *.
   apply: mult_resp_leEq_lft; simpl;auto with *.
   apply Qle_trans with e; auto with *.
- setoid_replace (f- y) with (f - constStepF (1:QS)*y); [| ring].
+ setoid_replace (f- y) with (f - constStepF (1:QS)*y); [| simpl; ring].
  rewrite <- X.
  unfold f.
- ring.
+ simpl. ring.
 Qed.
 
 (** Integration is uniformly continuous. *)
@@ -518,8 +518,8 @@ Lemma integral_uc_prf : is_UniformlyContinuousFunction IntegralQ Qpos2QposInf.
 Proof.
  intros e x y.
  simpl in *.
- rewrite Qball_Qabs.
- rewrite Integral_minus.
+ rewrite -> Qball_Qabs.
+ rewrite -> Integral_minus.
  unfold L1Ball, L1Distance.
  generalize (x - y).
  clear x y.

@@ -166,9 +166,9 @@ Proof.
   rewrite <- H1.
   auto.
  intros.
- rewrite H.
- rewrite H0.
- rewrite H1.
+ rewrite -> H.
+ rewrite -> H0.
+ rewrite -> H1.
  auto.
 Qed.
 
@@ -197,7 +197,7 @@ Proof.
  apply uc_prf.
  destruct (mu f e);[|constructor].
  simpl.
- rewrite Hx.
+ rewrite -> Hx.
  apply ball_refl.
 Qed.
 
@@ -207,10 +207,10 @@ Add Parametric Morphism (X Y Z:MetricSpace) f : (@ucFun2 X Y Z f) with signature
 Proof.
  intros x y Hxy x0 y0 Hxy0.
  unfold ucFun2.
- rewrite Hxy0.
+ rewrite -> Hxy0.
  generalize y0.
  change (st_eq (f x) (f y)).
- rewrite Hxy.
+ rewrite -> Hxy.
  reflexivity.
 Qed.
 (* end hide *)
@@ -251,9 +251,9 @@ Proof.
  intros x1 x2 Hx y1 y2 Hy.
  intros x.
  simpl.
- rewrite (Hx (y1 x)).
+ rewrite -> (Hx (y1 x)).
  apply uc_wd.
- rewrite (Hy x).
+ rewrite -> (Hy x).
  reflexivity.
 Qed.
 (* end hide *)

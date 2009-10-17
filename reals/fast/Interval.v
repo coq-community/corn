@@ -78,7 +78,7 @@ Proof.
  destruct (Zle_lt_or_eq _ _ H0) as [H2 | H2].
   simpl.
   right.
-  rewrite IHn.
+  rewrite -> IHn.
   rewrite inj_S in H1.
   auto with *.
  rewrite H2.
@@ -102,20 +102,20 @@ Proof.
   destruct (Hs a) as [Hz0 Hz1]; auto with *.
   clear - Hz0 Hz1 Hlr.
   split.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    unfold f, Qdiv.
-   replace RHS with ((r + - l) * ((2 * a + 1 # 1) * / (2 * (S n) # 1))) by ring.
+   replace RHS with ((r + - l) * ((2 * a + 1 # 1) * / (2 * (S n) # 1))) by simpl; ring.
    apply: mult_resp_nonneg.
     rewrite ->Qle_minus_iff in Hlr; auto.
    apply Qle_shift_div_l; auto with *.
    replace LHS with 0 by (simpl; ring).
    change (0 <= (2*a + 1)*1)%Z.
    auto with *.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   unfold f.
-  replace RHS with (((r-l)*((2*S n#1) + - (2 * a + 1 # 1))) / (2 * S n # 1)) by (field; discriminate).
+  replace RHS with (((r-l)*((2*S n#1) + - (2 * a + 1 # 1))) / (2 * S n # 1)) by (simpl; field; discriminate).
   apply Qle_shift_div_l; auto with *.
-  replace LHS with 0 by ring.
+  replace LHS with 0 by simpl; ring.
   apply: mult_resp_nonneg.
    rewrite -> Qle_minus_iff in Hlr; auto.
   change (0 <= ((2*S n)*1 + - (2*a + 1)*1)*1)%Z.
@@ -145,7 +145,7 @@ Proof.
  intros Hlr' n x.
  rewrite -> Qlt_minus_iff in Hlr'.
  assert (A:~ r - l == 0 /\ ~ S n == 0) by (split;auto with *;discriminate).
- replace RHS with ((1#2)/((S n)/(r - l))) by (field;auto).
+ replace RHS with ((1#2)/((S n)/(r - l))) by (simpl; field;auto).
  apply Qle_shift_div_l.
   apply Qlt_shift_div_l; auto with *.
  rewrite <- (Qabs_pos (S n/(r-l))); [|apply Qle_shift_div_l; auto with *].
@@ -153,23 +153,23 @@ Proof.
  unfold f.
  change (2*S n # 1) with (2*S n).
  setoid_replace ((x - (l + (r - l) * (2 * rasterize1 (S n) x + 1 # 1) / (2 * S n))) * (S n / (r - l)))
-   with ((S n)*(x-l)/(r-l) - (2*rasterize1 (S n) x + 1 # 1)/2); [| by (field; auto)].
- rewrite Qmake_Qdiv.
- rewrite injz_plus.
+   with ((S n)*(x-l)/(r-l) - (2*rasterize1 (S n) x + 1 # 1)/2); [| by (simpl; field; auto)].
+ rewrite -> Qmake_Qdiv.
+ rewrite -> injz_plus.
  setoid_replace ((2 * rasterize1 (S n) x + 1%positive) / 1%positive / 2)
    with (rasterize1 (S n) x + (1#2)).
-  2:field.
+  2:simpl; field.
  unfold rasterize1.
  generalize (S n * (x - l) / (r - l)).
  intros q.
  clear - q.
- apply Qabs_case; intros H; rewrite Qle_minus_iff.
-  replace RHS with (Qfloor q + 1 + - q) by ring.
+ apply Qabs_case; intros H; rewrite -> Qle_minus_iff.
+  replace RHS with (Qfloor q + 1 + - q) by simpl; ring.
   rewrite <- Qle_minus_iff.
   apply Qlt_le_weak.
   rewrite <- (injz_plus (Qfloor q) 1).
   apply Qlt_floor.
- replace RHS with (q + -Qfloor q) by ring.
+ replace RHS with (q + -Qfloor q) by simpl; ring.
  rewrite <- Qle_minus_iff.
  apply Qfloor_le.
 Qed.
@@ -183,12 +183,12 @@ Proof.
   rewrite -> Qlt_minus_iff in Hlr'.
   rewrite -> Qle_minus_iff in Hx.
   apply Qle_shift_div_l; auto with *.
-  replace LHS with 0 by ring.
+  replace LHS with 0 by simpl; ring.
   apply: mult_resp_nonneg; simpl; auto with *.
   unfold Qle;simpl.
   auto with *.
  rewrite -> Hlr'.
- setoid_replace (r-r) with 0; [| by ring].
+ setoid_replace (r-r) with 0; [| by simpl; ring].
  unfold Qdiv.
  change (/0) with 0.
  ring_simplify.
@@ -212,14 +212,14 @@ Proof.
   apply Qlt_shift_div_r.
    auto with *.
   apply: mult_resp_less_lft;simpl; auto with *.
-  rewrite Qlt_minus_iff.
-  replace RHS with (r + - x) by ring.
+  rewrite -> Qlt_minus_iff.
+  replace RHS with (r + - x) by simpl; ring.
   rewrite <- Qlt_minus_iff; auto.
- rewrite Hlr'.
- setoid_replace (r-r) with 0; [| by ring].
+ rewrite -> Hlr'.
+ setoid_replace (r-r) with 0; [| by simpl; ring].
  unfold Qdiv.
  change (/0) with 0.
- replace LHS with 0 by ring.
+ replace LHS with 0 by simpl; ring.
  auto with *.
 Qed.
 
@@ -229,20 +229,20 @@ Proof.
  intros n x Hx.
  destruct (Qlt_le_dec_fast x r).
   exists (f (S n) (rasterize1 (S n) x)).
-  abstract ( destruct Hx as [Hlx Hxr]; split; [apply in_map; rewrite UniformPartitionZ; split;
+  abstract ( destruct Hx as [Hlx Hxr]; split; [apply in_map; rewrite -> UniformPartitionZ; split;
     [apply rasterize1_boundL; auto |apply rasterize1_boundR; auto] |apply rasterize1_close;
       apply Qle_lt_trans with x; auto]).
  exists (f (S n) n).
- abstract ( split; [apply: in_map; rewrite UniformPartitionZ; rewrite inj_S; auto with *|];
+ abstract ( split; [apply: in_map; rewrite -> UniformPartitionZ; rewrite inj_S; auto with *|];
    destruct Hx as [_ Hx]; (setoid_replace x with r; [| by apply Qle_antisym; auto with *]); unfold f;
      change (2*S n #1) with (2*S n); change (2*n + 1#1) with ((2*n + 1)%Z:Q); rewrite (inj_S n);
-       unfold Zsucc; do 2 rewrite injz_plus; (setoid_replace ((2%positive * n)%Z:Q) with (2*n)
+       unfold Zsucc; do 2 rewrite -> injz_plus; (setoid_replace ((2%positive * n)%Z:Q) with (2*n)
          ; [| by unfold Qeq; simpl; auto with *]);
            (setoid_replace (r - (l + (r - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-             with (((r-l) / (2 * (n + 1%positive)))); [| by field; unfold Qeq; simpl; auto with *]);
-               rewrite Qabs_pos;[apply Qle_refl|]; apply Qle_shift_div_l;
+             with (((r-l) / (2 * (n + 1%positive)))); [| by simpl; field; unfold Qeq; simpl; auto with *]);
+               rewrite -> Qabs_pos;[apply Qle_refl|]; apply Qle_shift_div_l;
                  [apply: mult_resp_pos; simpl;auto with *; unfold Qlt; simpl; auto with *|];
-                   (replace LHS with 0 by ring); rewrite -> Qle_minus_iff in Hlr; auto).
+                   (replace LHS with 0 by simpl; ring); rewrite -> Qle_minus_iff in Hlr; auto).
 Defined.
 
 (** Construct the compact set. *)
@@ -283,7 +283,7 @@ Proof.
   induction (UniformPartition e1').
    contradiction.
   destruct (Qeq_dec a a0) as [A|A].
-   rewrite A.
+   rewrite -> A.
    auto with *.
   apply IHl0; auto with *.
   destruct Ha as [G | Ha | Ha] using orC_ind.
@@ -302,12 +302,12 @@ Proof.
  split.
   auto using InFinEnumC_weaken.
  simpl.
- rewrite Qball_Qabs.
+ rewrite -> Qball_Qabs.
  eapply Qle_trans;[apply Hy1|].
  apply Qle_trans with e2.
   apply Qle_shift_div_r.
    destruct e2'; auto with *.
-  replace RHS with (e2'*(2%positive*e2)) by ring.
+  replace RHS with (e2'*(2%positive*e2)) by simpl; ring.
   rewrite <- (Qinv_involutive (2%positive*e2)).
   apply Qle_shift_div_l; auto with *.
   change ( (r - l) / (2%positive * e2) <= e2').
@@ -341,12 +341,12 @@ Proof.
  intros x Hx.
  split.
   unfold CRle.
-  setoid_replace (x - 'l)%CR with ('(-l) + x)%CR; [| by ring].
-  rewrite CRplus_translate.
+  assert (x - 'l == '(-l) + x)%CR. ring. rewrite -> H. clear H.
+  rewrite -> CRplus_translate.
   intros e.
   simpl.
-  rewrite Qle_minus_iff.
-  replace RHS with (e + - (l - approximate x e))%Q by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with (e + - (l - approximate x e))%Q by simpl; ring.
   rewrite <- Qle_minus_iff.
   apply Qle_closed.
   intros e2.
@@ -363,17 +363,17 @@ Proof.
    eapply Qle_trans;[|apply L].
    rewrite <- Qabs_opp.
    eapply Qle_trans;[|apply Qle_Qabs].
-   rewrite Qle_minus_iff.
-   replace RHS with (a0 + - l)%Q by ring.
+   rewrite -> Qle_minus_iff.
+   replace RHS with (a0 + - l)%Q by simpl; ring.
    rewrite <- Qle_minus_iff.
    destruct (L0 a0); auto with *.
   apply IHl0; auto with *.
  unfold CRle.
- rewrite CRplus_translate.
+ rewrite -> CRplus_translate.
  intros e.
  simpl.
- rewrite Qle_minus_iff.
- replace RHS with (e + - (approximate x e - r))%Q by ring.
+ rewrite -> Qle_minus_iff.
+ replace RHS with (e + - (approximate x e - r))%Q by simpl; ring.
  rewrite <- Qle_minus_iff.
  apply Qle_closed.
  intros e2.
@@ -389,8 +389,8 @@ Proof.
   rewrite -> Qball_Qabs in L.
   eapply Qle_trans;[|apply L].
   eapply Qle_trans;[|apply Qle_Qabs].
-  rewrite Qle_minus_iff.
-  replace RHS with (r + - a0)%Q by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with (r + - a0)%Q by simpl; ring.
   rewrite <- Qle_minus_iff.
   destruct (L0 a0); auto with *.
  apply IHl0; auto with *.
@@ -410,28 +410,28 @@ Proof.
    intros H _.
    split; simpl.
     unfold CRle in Hlx.
-    setoid_replace (x - 'l) with ('(-l) + x) in Hlx; [| by ring].
+    assert (x - 'l == '(-l) + x). ring. rewrite -> H0 in Hlx. clear H0.
     rewrite -> CRplus_translate in Hlx.
     assert (H0:=Hlx e1).
     simpl in H0.
     clear - H0.
     rewrite ->  Qle_minus_iff in *.
-    replace RHS with (-l + approximate x e1 + - - e1)%Q by ring.
+    replace RHS with (-l + approximate x e1 + - - e1)%Q by simpl; ring.
     auto.
    apply Qle_trans with 0; auto with *.
    clear - H.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with (l + - approximate x e1)%Q by ring.
+   replace RHS with (l + - approximate x e1)%Q by simpl; ring.
    auto.
   intros H.
   rewrite -> Qle_max_l in Hlr.
   simpl.
-  rewrite Hlr.
+  rewrite -> Hlr.
   split; simpl.
    clear - H.
    apply Qle_trans with 0; auto with *.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with (approximate x e1 + - r)%Q by ring.
+   replace RHS with (approximate x e1 + - r)%Q by simpl; ring.
    auto.
   unfold CRle in Hxr.
   rewrite -> CRplus_translate in Hxr.
@@ -439,7 +439,7 @@ Proof.
   simpl in H0.
   clear - H0.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ( r + - approximate x e1 + - - e1)%Q by ring.
+  replace RHS with ( r + - approximate x e1 + - - e1)%Q by simpl; ring.
   auto.
  assert (L: l <= y <= r).
   unfold y.
@@ -460,10 +460,10 @@ Proof.
    left.
    rewrite Hz0.
    simpl.
-   rewrite Qball_Qabs.
+   rewrite -> Qball_Qabs.
    eapply Qle_trans;[apply Hz1|].
    apply Qle_shift_div_r;auto.
-   replace RHS with (n*(2%positive*e2))%Q by ring.
+   replace RHS with (n*(2%positive*e2))%Q by simpl; ring.
    rewrite <- (Qinv_involutive (2%positive*e2)).
    apply Qle_shift_div_l; auto with *.
    unfold n.

@@ -65,7 +65,7 @@ Proof.
  unfold expSequence.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
- rewrite Str_nth_powers.
+ rewrite -> Str_nth_powers.
  rewrite Str_nth_recip_factorials.
  reflexivity.
 Qed.
@@ -97,11 +97,11 @@ Proof.
  intros a n H.
  stepr (inj_Q IR ((1 # P_of_succ_nat (pred (fac n))) * a ^ n)%Q).
   apply inj_Q_wd;simpl.
-  rewrite Str_nth_expSequence.
+  rewrite -> Str_nth_expSequence.
   setoid_replace (a^n)%Q with ((-(1))^n*(-a)^n)%Q.
    ring.
   rewrite <- Qmult_power.
-  setoid_replace (- (1) * - a) with a by ring.
+  setoid_replace (- (1) * - a) with a by (simpl; ring).
   reflexivity.
  generalize H; clear H.
  induction n.
@@ -133,7 +133,7 @@ Proof.
    rewrite <- pred_Sn.
    rewrite inj_S.
    unfold Zsucc.
-   rewrite Qpower_plus'; auto with *.
+   rewrite -> Qpower_plus'; auto with *.
    change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fac n))%positive))%Q
      with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fac n))))%Q.
    ring.
@@ -163,7 +163,7 @@ Proof.
   induction n.
    reflexivity.
   simpl.
-  rewrite IHn.
+  rewrite -> IHn.
   unfold Qeq.
   simpl.
   rewrite Pplus_one_succ_r.
@@ -216,19 +216,19 @@ Proof.
   apply Qmult_lt_0_le_reg_r with 2.
    constructor.
   change ((-(2 ^ n)%Z) * 2 <= a / 2 * 2).
-  rewrite Zpower_Qpower; auto with *.
+  rewrite -> Zpower_Qpower; auto with *.
   rewrite (inj_S n) in H0.
-  replace LHS with (-(2%positive^n*2^1)) by ring.
+  replace LHS with (-(2%positive^n*2^1)) by simpl; ring.
   rewrite <- Qpower_plus;[|discriminate].
-  replace RHS with a by (field; discriminate).
+  replace RHS with a by (simpl; field; discriminate).
   change (- (2 ^ Zsucc n)%Z <= a) in H0.
   rewrite ->  Zpower_Qpower in H0.
    assumption.
   auto with *.
  apply: (fun a b => mult_cancel_leEq _ a b (2:Q));simpl.
   constructor.
- replace LHS with a by (field; discriminate).
- replace RHS with 0 by ring.
+ replace LHS with a by (simpl; field; discriminate).
+ replace RHS with 0 by simpl; ring.
  assumption.
 Qed.
 
@@ -251,9 +251,9 @@ Proof.
   apply rational_exp_small_neg_correct.
  intros a Ha.
  destruct (Qlt_le_dec_fast a (- (1))).
-  rewrite IHn.
+  rewrite -> IHn.
   clear IHn.
-  rewrite compress_correct.
+  rewrite -> compress_correct.
   rewrite <- CRpower_positive_bounded_correct.
    apply IRasCR_wd.
    set (a':=inj_Q IR (a/2)).
@@ -276,7 +276,7 @@ Proof.
    apply mult_cancel_leEq with (2:Q).
     constructor.
    change (a/2*2<=0).
-   replace LHS with a by (field; discriminate).
+   replace LHS with a by (simpl; field; discriminate).
    apply Qle_trans with (-(1)); try discriminate.
    apply Qlt_le_weak.
    assumption.
@@ -291,12 +291,12 @@ Proof.
    discriminate.
   elim Ha.
   reflexivity.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  change (0<=(-(n#d) + - (-2^Psize n)%Z)).
- rewrite Qplus_comm.
+ rewrite -> Qplus_comm.
  rewrite <- Qle_minus_iff.
  change (n # d <= - - (2 ^ Psize n)%Z).
- replace RHS with ((2^Psize n)%Z:Q) by ring.
+ replace RHS with ((2^Psize n)%Z:Q) by simpl; ring.
  unfold Qle.
  simpl.
  change (n * 1 <= 2 ^ Psize n * d)%Z.
@@ -351,7 +351,7 @@ Proof.
   unfold CRle.
   apply CRpos_nonNeg.
   CR_solve_pos (1#1)%Qpos.
- do 2 rewrite (rational_exp_small_neg_correct).
+ do 2 rewrite -> (rational_exp_small_neg_correct).
  rewrite <- IR_leEq_as_CR.
  apply Exp_resp_leEq.
  apply inj_Q_leEq.
@@ -362,7 +362,7 @@ Lemma rational_exp_neg_posH : forall (n:nat) (a:Q) Ha, (-n <= a) ->
  ('((1#3)^n) <= @rational_exp_neg a Ha)%CR.
 Proof.
  intros n a Ha Hn.
- rewrite rational_exp_neg_correct.
+ rewrite -> rational_exp_neg_correct.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
  stepl (inj_Q IR (1#3)[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
@@ -383,20 +383,20 @@ Proof.
  stepr (inj_Q IR (a/(S n))).
   apply Exp_cancel_leEq.
   astepl (inj_Q IR (1#3)).
-  rewrite IR_leEq_as_CR.
-  rewrite IR_inj_Q_as_CR.
+  rewrite -> IR_leEq_as_CR.
+  rewrite -> IR_inj_Q_as_CR.
   assert (Ha0 : -(1)<=(a/S n)<=0).
    split.
-    rewrite Qle_minus_iff.
-    replace RHS with ((a + S n)*(1/(S n))) by (field;discriminate).
-    replace LHS with (0*(1/(S n))) by ring.
+    rewrite -> Qle_minus_iff.
+    replace RHS with ((a + S n)*(1/(S n))) by (simpl; field;discriminate).
+    replace LHS with (0*(1/(S n))) by simpl; ring.
     apply: mult_resp_leEq_rht;simpl.
-     replace RHS with (a + - (- (P_of_succ_nat n))) by ring.
+     replace RHS with (a + - (- (P_of_succ_nat n))) by simpl; ring.
      rewrite <- Qle_minus_iff.
      assumption.
     rewrite <- (Qmake_Qdiv 1 (P_of_succ_nat n)).
     discriminate.
-   replace RHS with (0*(1/(S n))) by ring.
+   replace RHS with (0*(1/(S n))) by simpl; ring.
    apply: mult_resp_leEq_rht;simpl.
     assumption.
    rewrite <- (Qmake_Qdiv 1 (P_of_succ_nat n)).
@@ -458,9 +458,9 @@ Proof.
   destruct (Z_mod_lt n _ X1).
   assumption.
  rewrite <- Z_to_nat_correct.
- rewrite Q_Qpos_power.
+ rewrite -> Q_Qpos_power.
  change (1#3) with (/3).
- rewrite Qinv_power.
+ rewrite -> Qinv_power.
  rewrite <- Qpower_opp.
  replace (- - c)%Z with c by ring.
  reflexivity.
@@ -492,7 +492,7 @@ Proof.
  unfold rational_exp.
  destruct (Qle_total 0 a); try apply rational_exp_neg_correct.
  assert (X0:=rational_exp_neg_correct (Qopp_le_compat 0 a q)).
- rewrite X0.
+ rewrite -> X0.
  assert (X:((IRasCR (Exp (inj_Q IR (- a)%Q)) >< '0)%CR)).
   cut (rational_exp_neg (Qopp_le_compat 0 a q) >< ' 0)%CR.
    apply CRapart_wd; assumption || reflexivity.
@@ -500,7 +500,7 @@ Proof.
   exists ((3 # 1) ^ (Qnum (-a) / Qden (-a)))%Qpos.
   ring_simplify.
   apply rational_exp_neg_posH'.
- rewrite (@CRinv_pos_inv ((3 # 1) ^ (Qnum (-a) / Qden (-a))) _ X);
+ rewrite -> (@CRinv_pos_inv ((3 # 1) ^ (Qnum (-a) / Qden (-a))) _ X);
    [|rewrite <- X0; apply rational_exp_neg_posH'].
  rewrite <- IR_recip_as_CR_2.
  apply IRasCR_wd.
@@ -520,7 +520,7 @@ Definition CRe : CR := rational_exp 1.
 Lemma CRe_correct : (CRe == IRasCR E)%CR.
 Proof.
  unfold CRe.
- rewrite rational_exp_correct.
+ rewrite -> rational_exp_correct.
  apply IRasCR_wd.
  csetoid_replace (inj_Q IR 1) (One:IR).
   algebra.
@@ -668,10 +668,10 @@ Proof.
  transitivity (exp_bound_uc z q);[|].
   change (' q)%CR with (Cunit_fun _ q).
   unfold exp_bounded.
-  rewrite (Cbind_correct QPrelengthSpace (exp_bound_uc z) (Cunit_fun Q_as_MetricSpace q)).
+  rewrite -> (Cbind_correct QPrelengthSpace (exp_bound_uc z) (Cunit_fun Q_as_MetricSpace q)).
   apply: BindLaw1.
  change (rational_exp (Qmin z q) == IRasCR (Exp (inj_Q IR q)))%CR.
- rewrite rational_exp_correct.
+ rewrite -> rational_exp_correct.
  apply IRasCR_wd.
  apply Exp_wd.
  apply inj_Q_wd.
@@ -696,13 +696,13 @@ Proof.
  simpl in X.
  rewrite <- CRplus_Qplus.
  apply CRle_trans with (doubleSpeed x).
-  rewrite (doubleSpeed_Eq x); apply CRle_refl.
+  rewrite -> (doubleSpeed_Eq x); apply CRle_refl.
  intros e.
  assert (Y:=X e).
  simpl in *.
  do 2 (unfold Cap_raw in *; simpl in * ).
  replace RHS with (approximate x (1 # 1)%Qpos +
-   - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos) by QposRing.
+   - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos) by simpl; QposRing.
  assumption.
 Qed.
 
@@ -714,8 +714,8 @@ Proof.
  simpl.
  apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
    [|apply inj_Q_leEq; simpl;auto with *].
- rewrite IR_leEq_as_CR.
- rewrite IR_inj_Q_as_CR.
+ rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_inj_Q_as_CR.
  apply exp_bound_lemma.
 Qed.
 (* begin hide *)
@@ -733,17 +733,17 @@ Proof.
   rewrite <- exp_bounded_correct.
    reflexivity.
   change (CRasIR x [<=] inj_Q IR (Qceiling a:Q)).
-  rewrite IR_leEq_as_CR.
+  rewrite -> IR_leEq_as_CR.
   autorewrite with IRtoCR.
-  rewrite CRasIRasCR_id.
+  rewrite -> CRasIRasCR_id.
   apply CRle_trans with ('a)%CR.
    apply exp_bound_lemma.
-  rewrite CRle_Qle.
+  rewrite -> CRle_Qle.
   auto with *.
  change (CRasIR x [<=] inj_Q IR (z:Q)).
- rewrite IR_leEq_as_CR.
+ rewrite -> IR_leEq_as_CR.
  autorewrite with IRtoCR.
- rewrite CRasIRasCR_id.
+ rewrite -> CRasIRasCR_id.
  assumption.
 Qed.
 (* begin hide *)
@@ -752,12 +752,12 @@ Proof.
  intros x y Hxy.
  unfold exp at 1.
  set (a :=  (approximate x (1 # 1)%Qpos + 1)).
- rewrite Hxy.
+ rewrite -> Hxy.
  apply exp_bound_exp.
  rewrite <- Hxy.
  apply CRle_trans with ('a)%CR.
   apply exp_bound_lemma.
- rewrite CRle_Qle.
+ rewrite -> CRle_Qle.
  auto with *.
 Qed.
 (* end hide *)

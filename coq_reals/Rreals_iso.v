@@ -153,7 +153,7 @@ Proof.
  cut (~ (y < x)).
   apply Rnot_lt_le.
  intro xy.
- move:H. rewrite leEq_def. apply.
+ move:H. rewrite -> leEq_def. apply.
  apply IR_lt_as_R.
  assumption.
 Qed.
@@ -161,7 +161,7 @@ Qed.
 Lemma IR_le_as_R : forall x y, (x <= y -> RasIR x [<=] RasIR y).
 Proof.
  intros x y H.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intro xy.
  assert (~ (y < x)).
   apply RIneq.Rle_not_lt; assumption .
@@ -173,13 +173,13 @@ Qed.
 Lemma IR_le_as_R_back : forall x y, (IRasR x <= IRasR y -> x [<=] y).
 Proof.
  intros.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intro xy.
  cut (~ (IRasR y < IRasR x)); intro.
   apply H0.
   apply R_lt_as_IR.
-  stepl y; [| by rewrite IRasRasIR_id; reflexivity].
-  stepr x; [| by rewrite IRasRasIR_id; reflexivity].
+  stepl y; [| by rewrite -> IRasRasIR_id; reflexivity].
+  stepr x; [| by rewrite -> IRasRasIR_id; reflexivity].
   assumption .
  apply (RIneq.Rle_not_lt (IRasR y) (IRasR x)).
   assumption.
@@ -284,7 +284,7 @@ Lemma R_div_as_IR : forall x y Hy, (RasIR (x/y) [=] (RasIR x [/] RasIR y [//] Hy
 Proof.
  intros x y Hy.
  unfold Rdiv.
- rewrite R_mult_as_IR.
+ rewrite -> R_mult_as_IR.
  rstepr ((RasIR x) [*] (One [/]RasIR y[//]Hy)).
  replace (/ y) with (1 / y).
   rewrite <- R_recip_as_IR; reflexivity.
@@ -301,7 +301,7 @@ Proof.
  destruct (Rcase_abs x) as [Hx | Hx].
   cut (RasIR x[<=]Zero).
    intro Hxn.
-   rewrite (AbsIR_eq_inv_x (RasIR x) Hxn).
+   rewrite -> (AbsIR_eq_inv_x (RasIR x) Hxn).
    autorewrite with RtoIR; reflexivity.
   stepr (RasIR 0); [| by apply R_Zero_as_IR].
   apply less_leEq.
@@ -309,7 +309,7 @@ Proof.
   assumption.
  cut (Zero [<=] RasIR x).
   intro Hxn.
-  rewrite (AbsIR_eq_x _ Hxn).
+  rewrite -> (AbsIR_eq_x _ Hxn).
   reflexivity.
  stepl (RasIR 0); [| by apply R_Zero_as_IR].
  apply IR_le_as_R.
@@ -328,7 +328,7 @@ Proof.
   rational.
  simpl.
  autorewrite with RtoIR.
- rewrite IHm.
+ rewrite -> IHm.
  simpl.
  reflexivity.
 Qed.
@@ -464,7 +464,7 @@ Proof.
   apply R_Zero_as_IR.
  simpl.
  autorewrite with RtoIR.
- rewrite IHi.
+ rewrite -> IHi.
  reflexivity.
 Qed.
 Hint Rewrite R_nring_as_IR : RtoIR.
@@ -480,7 +480,7 @@ Proof.
   apply R_One_as_IR.
  simpl.
  autorewrite with RtoIR.
- rewrite IHi.
+ rewrite -> IHi.
  auto with *.
 Qed.
 Hint Rewrite R_pow_as_IR : RtoIR.
@@ -492,7 +492,7 @@ Proof.
  intro x; case (exist_exp x).
  unfold exp_in.
  intros y rsums.
- rewrite ( R_infsum_f_as_IR x y ((fun x i => / INR (fact i) * Rpow_def.pow x i)) rsums
+ rewrite -> ( R_infsum_f_as_IR x y ((fun x i => / INR (fact i) * Rpow_def.pow x i)) rsums
    (R_infsum_as_IR_convergent _ _ rsums) ).
  simpl.
  apply series_sum_wd.
@@ -503,9 +503,9 @@ Proof.
   2: field; apply (nring_fac_ap_zero RReals i).
  cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fac i)))).
   intro Hy.
-  rewrite (R_recip_as_IR (nring (fac i)) Hy).
+  rewrite -> (R_recip_as_IR (nring (fac i)) Hy).
   clear.
-  rewrite (cg_inv_zero IR (RasIR x)).
+  rewrite -> (cg_inv_zero IR (RasIR x)).
   apply mult_wdl.
   apply div_wd.
    reflexivity.
@@ -528,7 +528,7 @@ Proof.
  case (exist_cos (Rsqr x)).
  unfold cos_in.
  intros y rsums.
- rewrite (R_infsum_f_as_IR x y (fun x i => cos_n i * Rsqr x ^ i) rsums
+ rewrite -> (R_infsum_f_as_IR x y (fun x i => cos_n i * Rsqr x ^ i) rsums
    (R_infsum_as_IR_convergent _ _ rsums) ).
  simpl.
  unfold series_sum.
@@ -538,7 +538,7 @@ Proof.
  induction n.
   reflexivity.
  simpl in *.
- rewrite IHn.
+ rewrite -> IHn.
  rewrite (plus_comm n (S (n + 0))).
  simpl.
  rstepr ( seq_part_sum (fun n0 : nat =>
@@ -575,7 +575,7 @@ Proof.
     stepr (RasIR 0); [| by apply R_Zero_as_IR].
     apply R_ap_as_IR_back.
     apply (nring_fac_ap_zero RReals (n + n)).
-   rewrite (R_div_as_IR ((-1)^n) (nring (R := RRing) (fact (n + n))) X).
+   rewrite -> (R_div_as_IR ((-1)^n) (nring (R := RRing) (fact (n + n))) X).
    apply div_wd.
     autorewrite with RtoIR.
     replace n with x0 by omega.
@@ -585,7 +585,7 @@ Proof.
   clear.
   induction n; simpl.
    reflexivity.
-  rewrite IHn.
+  rewrite -> IHn.
   replace (n + S n)%nat with (S (n + n))%nat by auto with *.
   simpl.
   rstepr ( nexp IR (n + n) (RasIR x[-]Zero)[*]((RasIR x[-]Zero)[*](RasIR x[-]Zero)) ).
@@ -608,8 +608,8 @@ Proof.
  case (exist_sin (Rsqr x)).
  unfold sin_in.
  intros y rsums.
- rewrite R_mult_as_IR.
- rewrite (R_infsum_f_as_IR x y (fun x i => sin_n i * Rsqr x ^ i) rsums
+ rewrite -> R_mult_as_IR.
+ rewrite -> (R_infsum_f_as_IR x y (fun x i => sin_n i * Rsqr x ^ i) rsums
    (R_infsum_as_IR_convergent _ _ rsums) ).
  assert (convergent (fun n : nat => RasIR x[*](fun i : nat => RasIR (sin_n i * Rsqr x ^ i)) n)).
   apply conv_series_mult_scal.
@@ -624,7 +624,7 @@ Proof.
  induction n.
   reflexivity.
  simpl in *.
- rewrite IHn.
+ rewrite -> IHn.
  rewrite (plus_comm n (S (n + 0))).
  simpl.
  replace (n + 0 + n)%nat with (n + n)%nat by auto with *.
@@ -663,7 +663,7 @@ Proof.
  apply bin_op_wd_unfolded.
   cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fact (n + n + 1))))).
    intro X.
-   rewrite (R_div_as_IR ((-1)^n) (nring (R:=RRing) (fact (n + n + 1))) X).
+   rewrite -> (R_div_as_IR ((-1)^n) (nring (R:=RRing) (fact (n + n + 1))) X).
    apply div_wd.
     autorewrite with RtoIR; reflexivity.
    autorewrite with RtoIR.
@@ -680,7 +680,7 @@ Proof.
   reflexivity.
  replace (n + S n)%nat with (S(n + n)) by omega.
  simpl.
- rewrite IHn.
+ rewrite -> IHn.
  autorewrite with RtoIR.
  rational.
 Qed.
@@ -693,7 +693,7 @@ Proof.
  unfold tan.
  cut (Dom (f_rcpcl' IR) (RasIR (cos x))).
   intro Hdiv.
-  rewrite (R_div_as_IR (sin x) (cos x) Hdiv).
+  rewrite -> (R_div_as_IR (sin x) (cos x) Hdiv).
   cut (Dom (f_rcpcl' IR) (Cos (RasIR x))).
    intro ndom.
    stepl (Sin(RasIR x) [/] Cos(RasIR x) [//] ndom).
@@ -730,7 +730,7 @@ Lemma R_ln_as_IR : forall x prf, RasIR (ln x) [=] Log (RasIR x) prf.
 Proof.
  intros x prf.
  apply Exp_cancel.
- rewrite Exp_Log.
+ rewrite -> Exp_Log.
  rewrite <- R_exp_as_IR.
  apply R_as_IR_wd.
  apply exp_ln.
@@ -760,8 +760,8 @@ Proof.
  induction x; simpl.
    apply R_Zero_as_IR.
   apply R_pring_as_IR.
- rewrite R_opp_as_IR.
- rewrite R_pring_as_IR.
+ rewrite -> R_opp_as_IR.
+ rewrite -> R_pring_as_IR.
  reflexivity.
 Qed.
 
@@ -793,11 +793,11 @@ Proof.
  induction x; simpl.
    apply R_Zero_as_IR.
   rewrite R_INR_as_IR.
-  rewrite R_nring_as_IR.
+  rewrite -> R_nring_as_IR.
   auto with *.
- rewrite R_opp_as_IR.
+ rewrite -> R_opp_as_IR.
  rewrite R_INR_as_IR.
- rewrite R_nring_as_IR.
+ rewrite -> R_nring_as_IR.
  auto with *.
 Qed.
 
@@ -870,7 +870,7 @@ Proof.
  apply Greater_imp_ap.
  simpl.
  apply leEq_less_trans with (Zero:IR).
-  rewrite pring_convert.
+  rewrite -> pring_convert.
   apply less_leEq.
   apply inv_cancel_less.
   rstepl (Zero[*]Zero:IR).
@@ -897,13 +897,13 @@ Proof.
  unfold pi_series.
  unfold tg_alt in prf.
  unfold PI_tg in prf.
- rewrite R_mult_as_IR.
+ rewrite -> R_mult_as_IR.
  apply mult_wd.
-  rewrite R_mult_as_IR.
-  rewrite R_plus_as_IR.
-  rewrite R_One_as_IR.
+  rewrite -> R_mult_as_IR.
+  rewrite -> R_plus_as_IR.
+  rewrite -> R_One_as_IR.
   rational.
- rewrite (R_infsum_as_IR x ( (fun i : nat => (-1) ^ i * / INR (2 * i + 1))
+ rewrite -> (R_infsum_as_IR x ( (fun i : nat => (-1) ^ i * / INR (2 * i + 1))
    ) prf (R_infsum_as_IR_convergent _ _ prf) ).
  apply series_sum_wd.
  intro n.
@@ -918,10 +918,10 @@ Proof.
   intro DF.
   cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RReals) (2 * n + 1)))).
    intro H.
-   rewrite (R_recip_as_IR (nring (R:=RReals) (2 * n + 1)) H).
+   rewrite -> (R_recip_as_IR (nring (R:=RReals) (2 * n + 1)) H).
    apply div_wd.
     reflexivity.
-   rewrite R_nring_as_IR.
+   rewrite -> R_nring_as_IR.
    apply nring_wd.
    rewrite <- DF.
    simpl.

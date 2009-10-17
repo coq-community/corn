@@ -58,12 +58,12 @@ Proof.
   replace (rasterize1 x2 x6 n (fst x)) with (rasterize1 x3 x7 n (fst x)).
    reflexivity.
   unfold rasterize1.
-  rewrite H0.
-  rewrite H2.
+  rewrite -> H0.
+  rewrite -> H2.
   reflexivity.
  unfold rasterize1.
- rewrite H.
- rewrite H1.
+ rewrite -> H.
+ rewrite -> H1.
  reflexivity.
 Qed.
 (* end hide *)
@@ -124,9 +124,9 @@ Proof.
     (Zle_max_l 0 (rasterize1 l (l + w) (S n) x))))) with (rasterize1 l (l + w) (S n) x).
    apply ball_sym.
    simpl.
-   rewrite Qball_Qabs.
+   rewrite -> Qball_Qabs.
    assert (l < l + w).
-    rewrite Qlt_minus_iff.
+    rewrite -> Qlt_minus_iff.
     ring_simplify.
     auto with *.
    eapply Qle_trans.
@@ -134,8 +134,8 @@ Proof.
     apply (rasterize1_close H).
    change ((l + w - l) / (2 * S n) <=(/ 2%positive) * (/ P_of_succ_nat n) * w).
    unfold Qdiv.
-   rewrite Qinv_mult_distr.
-   replace LHS with (((/ 2) * (/ S n) * w)) by ring.
+   rewrite -> Qinv_mult_distr.
+   replace LHS with (((/ 2) * (/ S n) * w)) by simpl; ring.
    apply Qle_refl.
   rewrite inj_min.
   rewrite <- Z_to_nat_correct.
@@ -146,7 +146,7 @@ Proof.
     apply Zlt_succ_le.
     rewrite <- inj_S.
     apply rasterize1_boundR; auto.
-    rewrite Qle_minus_iff.
+    rewrite -> Qle_minus_iff.
     ring_simplify.
     auto with *.
    reflexivity.
@@ -161,19 +161,19 @@ Proof.
    rewrite ->  Qball_Qabs.
    unfold C.
    autorewrite with QposElim.
-   replace RHS with (w*(1#xO (P_of_succ_nat n))) by ring.
+   replace RHS with (w*(1#xO (P_of_succ_nat n))) by simpl; ring.
    change (1 # xO (P_of_succ_nat n)) with (/(2*(S n))).
    change (2*S n #1) with (2*S n).
    change (2*n + 1#1) with ((2*n + 1)%Z:Q).
    rewrite (inj_S n).
    unfold Zsucc.
-   do 2 rewrite injz_plus.
+   do 2 rewrite -> injz_plus.
    setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| by (unfold Qeq; simpl; auto with * )].
    setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-     with ((w / (2 * (n + 1%positive)))); [| by (field; unfold Qeq; simpl; auto with * )].
-   rewrite Qabs_pos;[apply Qle_refl|].
+     with ((w / (2 * (n + 1%positive)))); [| by (simpl; field; unfold Qeq; simpl; auto with * )].
+   rewrite -> Qabs_pos;[apply Qle_refl|].
    apply Qle_shift_div_l; [apply: mult_resp_pos; simpl; auto with *; unfold Qlt; simpl; auto with *|].
-   replace LHS with 0 by ring.
+   replace LHS with 0 by simpl; ring.
    auto with *.
   destruct H0.
   apply Qle_antisym; auto.
@@ -186,7 +186,7 @@ Proof.
  rewrite <- (Qfloor_Z n).
  apply Qfloor_resp_le.
  setoid_replace x with (l+w).
-  setoid_replace (l + w - l) with (w:Q); [| by ring].
+  setoid_replace (l + w - l) with (w:Q); [| by simpl; ring].
   field_simplify;[|apply Qpos_nonzero].
   unfold Qle.
   simpl.
@@ -194,7 +194,7 @@ Proof.
   ring_simplify.
   apply inj_le.
   auto with *.
- destruct H0; auto with *.
+ destruct H0; simpl; auto with *.
 Qed.
 
 Lemma switch_line_interp : forall t b m j, (j <= m)%nat -> C t b (S m) (m - j)%nat == C b t (S m) j.
@@ -205,15 +205,15 @@ Proof.
  change (2 * (m - j) + 1 # 1) with ((2 * (m - j) + 1)%Z:Q).
  change (2*S m#1) with (2*(S m)).
  change ((2*j +1)#1) with ((2*j+1)%Z:Q).
- do 2 rewrite injz_plus.
+ do 2 rewrite -> injz_plus.
  change ((2%positive * (m - j))%Z:Q) with (2 * (m - j)%Z).
  change ((2%positive * j)%Z:Q) with (2 * j).
  change (1%Z:Q) with (1:Q).
  unfold Zminus.
- rewrite injz_plus.
+ rewrite -> injz_plus.
  rewrite (inj_S m).
  unfold Zsucc.
- rewrite injz_plus.
+ rewrite -> injz_plus.
  change ((-j)%Z:Q) with (-j).
  field.
  unfold Qeq.
@@ -279,7 +279,7 @@ Proof.
   split.
    change (ball err (C l r (S n) i) x).
    change (st_eq x (fst a)) in Hl.
-   rewrite Hl.
+   rewrite -> Hl.
    eapply ball_weak_le.
     unfold err.
     apply Qpos_max_ub_l.
@@ -289,12 +289,12 @@ Proof.
    auto.
   change (ball err (C t b (S m) (m-j)%nat) y).
   change (st_eq y (snd a)) in Hr.
-  rewrite Hr.
+  rewrite -> Hr.
   eapply ball_weak_le.
    unfold err.
    apply Qpos_max_ub_r.
   simpl (ball (m:=Q_as_MetricSpace)).
-  rewrite switch_line_interp;[|unfold j; auto with *].
+  rewrite -> switch_line_interp;[|unfold j; auto with *].
   apply rasterization_error.
   simpl in Hr.
   rewrite -> Hr in Hfr.
@@ -309,7 +309,7 @@ Proof.
  clear - Hz0.
  destruct z as [zx zy].
  destruct (InStrengthen _ _ Hz0) as [[zx' zy'] [Hz'0 Hz'1]].
- rewrite (fun a => InFinEnumC_wd1 _ _ _ a Hz'1).
+ rewrite -> (fun a => InFinEnumC_wd1 _ _ _ a Hz'1).
  apply InFinEnumC_weaken.
  destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Hz'0) as [[ax ay] [Ha1 [Ha2 Ha3]]].
  rewrite Ha2.
@@ -387,7 +387,7 @@ Proof.
   clear Hf'.
   split.
    unfold fst.
-   rewrite Hx'.
+   rewrite -> Hx'.
    apply ball_sym.
    eapply ball_weak_le.
     unfold err.
@@ -395,14 +395,14 @@ Proof.
    apply rasterization_error.
    auto.
   unfold snd.
-  rewrite Hy'.
+  rewrite -> Hy'.
   apply ball_sym.
   eapply ball_weak_le.
    unfold err.
    apply Qpos_max_ub_r.
   fold (C t b (S m) (m - j0)%nat).
   simpl (ball (m:=Q_as_MetricSpace)).
-  rewrite switch_line_interp;[|unfold j0; auto with *].
+  rewrite -> switch_line_interp;[|unfold j0; auto with *].
   apply rasterization_error.
   auto.
  assert (L0:existsC (Q * Q) (fun p : Q * Q =>

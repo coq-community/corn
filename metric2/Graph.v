@@ -221,7 +221,7 @@ Proof.
     simpl in *.
     autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((q + - d') + (q + - d')) by ring.
+    replace RHS with ((q + - d') + (q + - d')) by simpl; ring.
     Qauto_nonneg.
    apply Hl.
   apply ball_sym.
@@ -229,7 +229,7 @@ Proof.
   autorewrite with QposElim.
   clear - Hd'1.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((e' + - d') + (e' + - d')) by ring.
+  replace RHS with ((e' + - d') + (e' + - d')) by simpl; ring.
   Qauto_nonneg.
  eapply ball_weak_le;[|apply regFun_prf].
  autorewrite with QposElim.
@@ -269,7 +269,7 @@ Proof.
   apply CoupleCorrect3.
  destruct H as [H0 H1].
  change (x, y) with (PairMS x y).
- rewrite H1.
+ rewrite -> H1.
  apply: CompactGraph_correct1.
  auto.
 Qed.
@@ -351,7 +351,7 @@ Proof.
   destruct (mu f ((1#2)*e2)); autorewrite with QposElim.
    assert (Qmin ((1#2)*e2) q <= ((1#2)*e2)) by auto with *.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with ((1 # 2) * e2 + ((1 # 2) * e2 + - Qmin ((1 # 2) * e2) q)) by ring.
+   replace RHS with ((1 # 2) * e2 + ((1 # 2) * e2 + - Qmin ((1 # 2) * e2) q)) by simpl; ring.
    Qauto_nonneg.
   Qauto_le.
  unfold Cjoin_raw.
@@ -415,10 +415,10 @@ Proof.
   autorewrite with QposElim.
   assert (Qmin ((1#2)*d') d0 <= ((1#2)*d')) by auto with *.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((1 # 2) * d' + - Qmin ((1 # 2) * d') d0 + (1#2)*d') by ring.
+  replace RHS with ((1 # 2) * d' + - Qmin ((1 # 2) * d') d0 + (1#2)*d') by simpl; ring.
   Qauto_nonneg.
  autorewrite with QposElim.
- replace RHS with ((1 # 2) * d' + e2 + (1#2)*d') by ring.
+ replace RHS with ((1 # 2) * d' + e2 + (1#2)*d') by simpl; ring.
  Qauto_le.
 Qed.
 
@@ -437,10 +437,10 @@ Proof.
   unfold d', graphPoint_modulus.
   destruct (mu f ((1#2)*e')); autorewrite with QposElim.
    apply Qle_trans with ((1#2)*e'); auto with *.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    Qauto_nonneg.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   Qauto_nonneg.
  assert (Hd'2 : QposInf_le (d') (mu f ((1#2)*e'))).
@@ -458,7 +458,7 @@ Proof.
     autorewrite with QposElim.
     clear - Hd'1.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((1 # 2) * (e' + - d')) by ring.
+    replace RHS with ((1 # 2) * (e' + - d')) by simpl; ring.
     Qauto_nonneg.
    cut (ball ((1 # 2) * e2 + (1 # 2) * e') (f (Cfst_raw p (mu f ((1 # 2) * e2))))
      (f (Cfst_raw p ((1 # 2) * d')%Qpos))).
@@ -473,7 +473,7 @@ Proof.
     simpl in *.
     autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with (q0 + - d' + (1#2)*d') by ring.
+    replace RHS with (q0 + - d' + (1#2)*d') by simpl; ring.
     Qauto_nonneg.
    unfold Cfst_raw.
    simpl.
@@ -507,7 +507,7 @@ Proof.
     clear - Hd'1.
     autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with (e' + - d') by ring.
+    replace RHS with (e' + - d') by simpl; ring.
     auto.
    simpl.
    rewrite <- ball_Cunit.
@@ -522,7 +522,7 @@ Proof.
     simpl in *.
     autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((q + - d') + (q + - d')) by ring.
+    replace RHS with ((q + - d') + (q + - d')) by simpl; ring.
     Qauto_nonneg.
    simpl.
    eapply ball_weak_le;[|apply Hl].
@@ -533,12 +533,12 @@ Proof.
   autorewrite with QposElim.
   clear - Hd'1.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((e' + - d') + (e' + - d') + (1#2)*d') by ring.
+  replace RHS with ((e' + - d') + (e' + - d') + (1#2)*d') by simpl; ring.
   Qauto_nonneg.
  eapply ball_weak_le;[|apply (regFun_prf (Csnd p) ((1#2)*d')%Qpos)].
  autorewrite with QposElim.
  rewrite -> Qle_minus_iff in *.
- replace RHS with ((e' + - d') + (1#2)*d') by ring.
+ replace RHS with ((e' + - d') + (1#2)*d') by simpl; ring.
  Qauto_nonneg.
 Qed.
 
@@ -574,7 +574,7 @@ Proof.
   apply CoupleCorrect3.
  destruct H as [H0 H1].
  change (x, y) with (PairMS x y).
- rewrite H1.
+ rewrite -> H1.
  apply CompactGraph_b_correct1.
  auto.
 Qed.

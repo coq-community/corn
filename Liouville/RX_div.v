@@ -50,15 +50,15 @@ Proof.
  unfold RX_div.
  destruct (cpoly_div p (_X_monic a)) as [[q r] s [s0 d]].
  unfold fst, snd in *.
- rewrite s0.
+ rewrite -> s0.
  apply cs_bin_op_wd; [reflexivity|].
  destruct d.
  destruct (_X_monic a).
  destruct (degree_le_zero _ _ (d _ H0)).
- rewrite s2.
+ rewrite -> s2.
  apply csf_wd.
- rewrite plus_apply mult_apply minus_apply.
- rewrite x_apply c_apply c_apply; unfold cg_minus; ring.
+ rewrite -> plus_apply, mult_apply, minus_apply.
+ rewrite -> x_apply, c_apply, c_apply; unfold cg_minus; ring.
 Qed.
 
 End RX_div.

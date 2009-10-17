@@ -65,7 +65,7 @@ Proof.
    firstorder.
   firstorder.
  intros x y z.
- repeat rewrite po_equiv_le_def0.
+ repeat rewrite -> po_equiv_le_def0.
  firstorder.
 Qed.
 

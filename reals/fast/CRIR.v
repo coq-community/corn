@@ -149,8 +149,8 @@ Lemma IR_minus_as_CR : forall x y,
 Proof.
  unfold cg_minus.
  intros x y.
- rewrite IR_plus_as_CR.
- rewrite IR_opp_as_CR.
+ rewrite -> IR_plus_as_CR.
+ rewrite -> IR_opp_as_CR.
  reflexivity.
 Qed.
 
@@ -204,9 +204,9 @@ Lemma IR_recip_as_CR :forall y y_ y__,
 Proof.
  intros y y_ y__.
  assert (X:=(IR_div_as_CR One y y_ y__)).
- rewrite X.
+ rewrite -> X.
  change ((IRasCR One * CRinv (IRasCR y) y__) == (CRinv (IRasCR y) y__))%CR.
- rewrite IR_One_as_CR.
+ rewrite -> IR_One_as_CR.
  change (('1 * CRinv (IRasCR y) y__ == CRinv (IRasCR y) y__)%CR).
  ring.
 Qed.
@@ -232,9 +232,9 @@ Proof.
  simpl in *.
  set (a:= (nring (R:=CRasCRing) n)) in *.
  clearbody a.
- rewrite IR_plus_as_CR.
- rewrite IHn.
- rewrite IR_One_as_CR.
+ rewrite -> IR_plus_as_CR.
+ rewrite -> IHn.
+ rewrite -> IR_One_as_CR.
  reflexivity.
 Qed.
 
@@ -252,32 +252,32 @@ Proof.
    simpl.
    assert (IRasCR ((Zero[+]One[+]One)[*]b)== (Zero[+]One[+]One)[*]a)%CR.
     simpl.
-    rewrite IR_mult_as_CR.
-    repeat rewrite IR_plus_as_CR.
-    repeat rewrite IR_One_as_CR.
+    rewrite -> IR_mult_as_CR.
+    repeat rewrite -> IR_plus_as_CR.
+    repeat rewrite -> IR_One_as_CR.
     simpl.
-    rewrite IR_Zero_as_CR.
+    rewrite -> IR_Zero_as_CR.
     simpl.
-    rewrite Hab.
+    rewrite -> Hab.
     reflexivity.
    assert (X:= (IHp _ _ H)).
    simpl in X.
    set (c:=pring_aux CRasCRing p ((' 0 + ' 1 + ' 1) * a)%CR) in *.
    clearbody c.
    rewrite <- X.
-   rewrite IR_plus_as_CR.
-   rewrite Hab.
+   rewrite -> IR_plus_as_CR.
+   rewrite -> Hab.
    reflexivity.
   simpl.
   assert (IRasCR ((Zero[+]One[+]One)[*]b)== (Zero[+]One[+]One)[*]a)%CR.
    simpl.
-   rewrite IR_mult_as_CR.
-   repeat rewrite IR_plus_as_CR.
-   repeat rewrite IR_One_as_CR.
+   rewrite -> IR_mult_as_CR.
+   repeat rewrite -> IR_plus_as_CR.
+   repeat rewrite -> IR_One_as_CR.
    simpl.
-   rewrite IR_Zero_as_CR.
+   rewrite -> IR_Zero_as_CR.
    simpl.
-   rewrite Hab.
+   rewrite -> Hab.
    reflexivity.
   apply (IHp _ _ H).
  simpl.
@@ -292,7 +292,7 @@ Proof.
    apply IR_Zero_as_CR.
   apply IR_pring_as_CR.
  change ((IRasCR [--](pring IR p) == - ((pring CRasCRing p):CR))%CR).
- rewrite IR_opp_as_CR.
+ rewrite -> IR_opp_as_CR.
  apply CRopp_wd.
  apply IR_pring_as_CR.
 Qed.
@@ -303,12 +303,12 @@ Lemma IR_inj_Q_as_CR : forall (a:Q), (IRasCR (inj_Q IR a)==('a))%CR.
 Proof.
  intros [n d].
  unfold inj_Q.
- rewrite IR_div_as_CR_1.
+ rewrite -> IR_div_as_CR_1.
  generalize (map_pres_ap_zero IR CRasCReals (iso_map_rht CRasCReals IR CRIR_iso) (nring (R:=IR) (nat_of_P d))
    (den_is_nonzero IR (n # d)%Q)).
  intros d_.
  change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) == ' (n # d))%CR).
- rewrite Qmake_Qdiv.
+ rewrite -> Qmake_Qdiv.
  change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) ==
    ' ((n # 1) * / (d # 1)))%CR).
  rewrite <- CRmult_Qmult.
@@ -326,12 +326,12 @@ Proof.
   induction (nat_of_P x); clear x.
    apply IR_Zero_as_CR.
   simpl.
-  rewrite IR_plus_as_CR.
-  rewrite IHn.
-  rewrite IR_One_as_CR.
+  rewrite -> IR_plus_as_CR.
+  rewrite -> IHn.
+  rewrite -> IR_One_as_CR.
   simpl.
-  rewrite CRplus_Qplus.
-  rewrite CReq_Qeq.
+  rewrite -> CRplus_Qplus.
+  rewrite -> CReq_Qeq.
   unfold Qeq.
   simpl.
   rewrite Pmult_1_r.
@@ -350,9 +350,9 @@ Proof.
   apply IRasCR_wd.
   apply csf_wd_unfolded.
   apply pring_convert.
- rewrite IR_opp_as_CR.
- rewrite X.
- rewrite CRopp_Qopp.
+ rewrite -> IR_opp_as_CR.
+ rewrite -> X.
+ rewrite -> CRopp_Qopp.
  reflexivity.
 Qed.
 
@@ -393,7 +393,7 @@ Proof.
  unfold AbsSmall.
  intros x y.
  simpl.
- do 2 rewrite IR_leEq_as_CR.
- rewrite IR_opp_as_CR.
+ do 2 rewrite -> IR_leEq_as_CR.
+ rewrite -> IR_opp_as_CR.
  reflexivity.
 Qed.

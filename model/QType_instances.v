@@ -48,7 +48,7 @@ Lemma spec_to_Q q: anyQ.eq (anyQ.of_Q (anyQ.to_Q q)) q.
 Proof.
  intros.
  unfold anyQ.eq.
- rewrite anyQ.spec_of_Q.
+ rewrite -> anyQ.spec_of_Q.
  reflexivity.
 Qed.
 
@@ -87,37 +87,39 @@ Hint Rewrite
 Hint Rewrite <-
  anyQ.spec_add anyQ.spec_sub anyQ.spec_mul anyQ.spec_div
  anyQ.spec_opp anyQ.spec_inv anyQ.spec_0 anyQ.spec_1
- anyQ.spec_of_Q anyQ.spec_compare
+ anyQ.spec_compare
    : fromQ_db.
+
+Hint Rewrite anyQ.spec_of_Q spec_to_Q: fromQ_db.
 
 Ltac toQ := unfold anyQ.eq in *; try autorewrite with toQ_db; intros; autorewrite with toQ_db.
 Ltac fromQ := intros; autorewrite with fromQ_db.
 
 (* First, all operations on anyQ are morphisms: *)
 
-Instance add_mor: Morphism (equiv ==> equiv ==> equiv) anyQ.add.
-Proof. repeat intro. simpl in *. toQ. by rewrite H H0. Qed.
+Instance add_mor: Proper (equiv ==> equiv ==> equiv) anyQ.add.
+Proof. repeat intro. simpl in *. toQ. by rewrite -> H, H0. Qed.
  (* Hm, why can't congruence do these rewrites? *)
 
-Instance sub_mor: Morphism (equiv ==> equiv ==> equiv) anyQ.sub.
-Proof. repeat intro. simpl in *. toQ. by rewrite H H0. Qed.
+Instance sub_mor: Proper (equiv ==> equiv ==> equiv) anyQ.sub.
+Proof. repeat intro. simpl in *. toQ. by rewrite -> H, H0. Qed.
 
-Instance mul_mor: Morphism (equiv ==> equiv ==> equiv) anyQ.mul.
-Proof. repeat intro. simpl in *. toQ. by rewrite H H0. Qed.
+Instance mul_mor: Proper (equiv ==> equiv ==> equiv) anyQ.mul.
+Proof. repeat intro. simpl in *. toQ. by rewrite -> H, H0. Qed.
 
-Instance opp_mor: Morphism (equiv ==> equiv) anyQ.opp.
-Proof. repeat intro. simpl in *. toQ. by rewrite H. Qed.
+Instance opp_mor: Proper (equiv ==> equiv) anyQ.opp.
+Proof. repeat intro. simpl in *. toQ. by rewrite -> H. Qed.
 
-Instance inv_mor: Morphism (equiv ==> equiv) anyQ.inv.
-Proof. repeat intro. simpl in *. toQ. by rewrite H. Qed.
+Instance inv_mor: Proper (equiv ==> equiv) anyQ.inv.
+Proof. repeat intro. simpl in *. toQ. by rewrite -> H. Qed.
 
-Instance lt_mor: Morphism (equiv ==> equiv ==> iff) anyQ.lt.
-Proof. repeat intro. simpl in *. unfold anyQ.lt. toQ. by rewrite H H0. Qed.
+Instance lt_mor: Proper (equiv ==> equiv ==> iff) anyQ.lt.
+Proof. repeat intro. simpl in *. unfold anyQ.lt. toQ. by rewrite -> H, H0. Qed.
 
-Instance le_mor: Morphism (equiv ==> equiv ==> iff) anyQ.le.
-Proof. repeat intro. unfold anyQ.le. simpl in *. toQ. by rewrite H H0. Qed.
+Instance le_mor: Proper (equiv ==> equiv ==> iff) anyQ.le.
+Proof. repeat intro. unfold anyQ.le. simpl in *. toQ. by rewrite -> H, H0. Qed.
 
-Instance of_Q_mor: Morphism (Qeq ==> equiv) anyQ.of_Q.
+Instance of_Q_mor: Proper (Qeq ==> equiv) anyQ.of_Q.
 Proof. repeat intro. simpl. by toQ. Qed.
 
 (* anyQ is a ring *)
@@ -136,7 +138,7 @@ Lemma anyQle_Qle_bidir_in_anyQ (x y: anyQ.t): anyQ.le x y <-> x <= y.
 Proof. unfold anyQ.le. by toQ. Qed.
 
 Hint Rewrite anyQlt_Qlt_bidir_in_anyQ anyQle_Qle_bidir_in_anyQ spec_to_Q: toQ_db.
-Hint Rewrite <- anyQlt_Qlt_bidir_in_anyQ anyQle_Qle_bidir_in_anyQ spec_to_Q: fromQ_db.
+Hint Rewrite <- anyQlt_Qlt_bidir_in_anyQ anyQle_Qle_bidir_in_anyQ: fromQ_db.
 
 (* We now build models for the CoRN hierarchy, starting with CSetoid, which we
  get for free (using module decsetoid) because our setoid equality is decidable. *)
@@ -298,9 +300,6 @@ Next Obligation. Proof.
  by apply H.
 Qed.
 
-Next Obligation. firstorder. Qed.
-Next Obligation. unfold default_grEq. firstorder. Qed.
-
 Definition COrdField: COrdField := Build_COrdField _ _ _ _ _ is_COrdField.
 
 Canonical Structure COrdField.
@@ -310,11 +309,11 @@ Canonical Structure COrdField.
 Definition ball (e : Qpos): relation anyQ.t
   := fun a b => AbsSmall (anyQ.of_Q e) (anyQ.sub a b).
 
-Instance QposAsQ_mor: Morphism (QposEq ==> Qeq) QposAsQ.
+Instance QposAsQ_mor: Proper (QposEq ==> Qeq) QposAsQ.
 Proof. done. Qed.
 
-Instance ball_mor: Morphism (QposEq ==> equiv ==> equiv ==> iff) ball.
-Proof. repeat intro. unfold ball. rewrite H H0 H1. reflexivity. Qed.
+Instance ball_mor: Proper (QposEq ==> equiv ==> equiv ==> iff) ball.
+Proof. repeat intro. unfold ball. rewrite -> H, H0, H1. reflexivity. Qed.
 
 (* .. which corresponds to Qball: *)
 

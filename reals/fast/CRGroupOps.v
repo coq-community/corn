@@ -62,7 +62,7 @@ Proof.
   ring.
  simpl.
  rewrite -> H.
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  apply: MonadLaw1.
 Qed.
 
@@ -71,7 +71,7 @@ Lemma Qplus_uc_prf :  is_UniformlyContinuousFunction Qtranslate_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H b.
  simpl in *.
- repeat rewrite (fun x => Qplus_comm x b).
+ repeat rewrite -> (fun x => Qplus_comm x b).
  apply Qtranslate_uc_prf.
  assumption.
 Qed.
@@ -90,10 +90,10 @@ Proof.
  unfold Cmap2.
  unfold inject_Q.
  simpl.
- do 2 rewrite Cmap_fun_correct.
- rewrite Cap_fun_correct.
- rewrite MonadLaw3.
- rewrite StrongMonadLaw1.
+ do 2 rewrite -> Cmap_fun_correct.
+ rewrite -> Cap_fun_correct.
+ rewrite -> MonadLaw3.
+ rewrite -> StrongMonadLaw1.
  reflexivity.
 Qed.
 
@@ -104,7 +104,7 @@ Proof.
  intros a b.
  unfold translate, Cmap.
  simpl.
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  apply: MonadLaw3.
 Qed.
 
@@ -173,14 +173,14 @@ Proof.
   setoid_replace ((6 # 9) * e' + e + approximate y e) with ((6#9)*e'-e') in H3.
    ring_simplify in H3.
    apply (Qle_not_lt _ _ H3).
-   rewrite Qlt_minus_iff.
+   rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply: mult_resp_pos.
     constructor.
    apply Qpos_prf.
   unfold e'.
   rewrite QposAsmkQpos.
-  ring.
+  simpl; ring.
  intros.
  split.
   apply H; assumption.
@@ -217,14 +217,14 @@ Proof.
   setoid_replace ((6 # 9) * e' + (-1 # 1) * approximate y e + e) with ((6#9)*e'-e') in H3.
    ring_simplify in H3.
    apply (Qle_not_lt _ _ H3).
-   rewrite Qlt_minus_iff.
+   rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply: mult_resp_pos.
     constructor.
    apply Qpos_prf.
   unfold e'.
   rewrite QposAsmkQpos.
-  ring.
+  simpl; ring.
  intros.
  split.
   apply H; assumption.
@@ -259,7 +259,7 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply Qpos_nonneg.
 Qed.
@@ -267,7 +267,7 @@ Qed.
 Lemma CRle_def : forall x y, (x==y <-> (x <= y /\ y <= x))%CR.
 Proof.
  intros x y.
- split;[intros H;rewrite H;split; apply CRle_refl|].
+ split;[intros H;rewrite -> H;split; apply CRle_refl|].
  intros [H1 H2].
  rewrite <- (doubleSpeed_Eq x).
  rewrite <- (doubleSpeed_Eq y).
@@ -276,7 +276,7 @@ Proof.
  apply ball_weak.
  split;[apply H2|].
  apply: inv_cancel_leEq;simpl.
- replace RHS with (approximate y ((1 # 2) * e)%Qpos - approximate x ((1 # 2) * e)%Qpos) by ring.
+ stepr (approximate y ((1 # 2) * e)%Qpos - approximate x ((1 # 2) * e)%Qpos); [| simpl; ring].
  apply H1.
 Qed.
 
@@ -292,10 +292,10 @@ Proof.
  simpl in *.
  unfold Cap_raw in *.
  simpl in *.
- replace RHS with ((approximate z ((1 # 2) * ((1 # 2) * e))%Qpos
+ stepr ((approximate z ((1 # 2) * ((1 # 2) * e))%Qpos
    - approximate y ((1 # 2) * ((1 # 2) * e))%Qpos + (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos
-     - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos))) by ring.
- replace LHS with (-(1#2)*e + - (1#2)*e) by ring.
+     - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos))); [| simpl; ring].
+ stepl (-(1#2)*e + - (1#2)*e); [| simpl; ring].
  apply Qplus_le_compat;assumption.
 Qed.
 
@@ -347,7 +347,7 @@ Lemma Qmax_uc_prf :  is_UniformlyContinuousFunction QboundBelow_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H b.
  simpl in *.
- repeat rewrite (fun x => Qmax_comm x b).
+ repeat rewrite -> (fun x => Qmax_comm x b).
  apply QboundBelow_uc_prf.
  assumption.
 Qed.
@@ -364,10 +364,10 @@ Proof.
  unfold Cmap2.
  unfold inject_Q.
  simpl.
- do 2 rewrite Cmap_fun_correct.
- rewrite Cap_fun_correct.
- rewrite MonadLaw3.
- rewrite StrongMonadLaw1.
+ do 2 rewrite -> Cmap_fun_correct.
+ rewrite -> Cap_fun_correct.
+ rewrite -> MonadLaw3.
+ rewrite -> StrongMonadLaw1.
  reflexivity.
 Qed.
 (** Basic properties of CRmax. *)
@@ -379,14 +379,14 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qmax_plus_distr_l.
+ rewrite -> Qmax_plus_distr_l.
  eapply Qle_trans;[|apply Qmax_ub_l].
  cut (AbsSmall (e:Q) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
@@ -401,14 +401,14 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qmax_plus_distr_l.
+ rewrite -> Qmax_plus_distr_l.
  eapply Qle_trans;[|apply Qmax_ub_r].
  cut (AbsSmall (e:Q) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
@@ -428,17 +428,17 @@ Proof.
  simpl in *.
  unfold Cap_raw.
  simpl.
- replace LHS with ((-(1#2)*e) + (- (1#2)*e)) by ring.
- replace RHS with ((approximate z ((1#2)*((1 # 2) * e))%Qpos +
+ stepl ((-(1#2)*e) + (- (1#2)*e)); [| simpl; ring].
+ stepr ((approximate z ((1#2)*((1 # 2) * e))%Qpos +
    - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos) +
      (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos
        - Qmax (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
-         (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos))) by ring.
+         (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos))); [|simpl; ring].
  apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
    (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
  apply: ball_weak_le;[|apply regFun_prf].
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
  apply: mult_resp_nonneg.
@@ -462,9 +462,9 @@ Proof.
   assumption.
  unfold Qminus.
  simpl.
- rewrite Qmin_max_de_morgan.
- rewrite Qmax_min_de_morgan.
- repeat rewrite Qopp_involutive.
+ rewrite -> Qmin_max_de_morgan.
+ rewrite -> Qmax_min_de_morgan.
+ repeat rewrite -> Qopp_involutive.
  ring.
 Qed.
 
@@ -478,7 +478,7 @@ Lemma Qmin_uc_prf :  is_UniformlyContinuousFunction QboundAbove_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H b.
  simpl in *.
- repeat rewrite (fun x => Qmin_comm x b).
+ repeat rewrite -> (fun x => Qmin_comm x b).
  apply QboundAbove_uc_prf.
  assumption.
 Qed.
@@ -495,10 +495,10 @@ Proof.
  unfold Cmap2.
  unfold inject_Q.
  simpl.
- do 2 rewrite Cmap_fun_correct.
- rewrite Cap_fun_correct.
- rewrite MonadLaw3.
- rewrite StrongMonadLaw1.
+ do 2 rewrite -> Cmap_fun_correct.
+ rewrite -> Cap_fun_correct.
+ rewrite -> MonadLaw3.
+ rewrite -> StrongMonadLaw1.
  reflexivity.
 Qed.
 
@@ -511,15 +511,15 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qmin_max_de_morgan.
- rewrite Qmax_plus_distr_r.
+ rewrite -> Qmin_max_de_morgan.
+ rewrite -> Qmax_plus_distr_r.
  eapply Qle_trans;[|apply Qmax_ub_l].
  cut (AbsSmall (e:Q) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
@@ -534,15 +534,15 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qmin_max_de_morgan.
- rewrite Qmax_plus_distr_r.
+ rewrite -> Qmin_max_de_morgan.
+ rewrite -> Qmax_plus_distr_r.
  eapply Qle_trans;[|apply Qmax_ub_r].
  cut (AbsSmall (e:Q) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
@@ -562,16 +562,16 @@ Proof.
  simpl in *.
  unfold Cap_raw.
  simpl.
- replace LHS with ((-(1#2)*e) + (- (1#2)*e)) by ring.
- replace RHS with ((approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos +
+ stepl ((-(1#2)*e) + (- (1#2)*e)); [| simpl; ring].
+ stepr ((approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos +
    - approximate z ((1#2)*((1 # 2) * e))%Qpos) + (Qmin (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
      (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos) +
-       - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)) by ring.
+       - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)); [| simpl; ring].
  apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
    (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].
  apply: ball_weak_le;[|apply regFun_prf].
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
  apply: mult_resp_nonneg.

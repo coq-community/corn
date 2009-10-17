@@ -56,11 +56,11 @@ Proof.
  intros.
  split.
   apply Qle_trans with (-(Qabs (-c))).
-   rewrite Qabs_opp.
+   rewrite -> Qabs_opp.
    auto with *.
   rewrite <- (Qopp_involutive c).
   apply Qopp_le_compat.
-  rewrite Qopp_involutive.
+  rewrite -> Qopp_involutive.
   apply Qle_Qabs.
  apply Qle_trans with (Qabs c); auto with *.
  apply Qle_Qabs.
@@ -75,7 +75,7 @@ Proof.
  intros.
  replace LHS with (x[-](e:Q)).
   apply: shift_minus_leEq;simpl.
-  replace RHS with (e+e0) by ring.
+  stepr (e+e0); [| simpl; ring].
   rewrite <- (QposAsmkQpos H0).
   apply (H (mkQpos H0)).
  unfold cg_minus; simpl; ring.
@@ -114,12 +114,12 @@ Proof.
   unfold Qball.
   split.
    apply inv_cancel_leEq;simpl.
-   replace RHS with (e:Q) by ring.
+   stepr (e: Q); [| simpl; ring].
    apply Qle_closed.
    intros.
    destruct (H d).
    apply: inv_cancel_leEq;simpl.
-   replace RHS with (a-b) by ring.
+   stepr (a-b); [| simpl; ring].
    destruct e; destruct d; apply H0.
   apply Qle_closed.
   intros d.
@@ -139,11 +139,11 @@ Proof.
  unfold Qball.
  unfold AbsSmall.
  simpl.
- rewrite H0.
- rewrite H1.
+ rewrite -> H0.
+ rewrite -> H1.
  unfold QposEq in H.
  simpl in H.
- rewrite H.
+ rewrite -> H.
  tauto.
 Qed.
 (* end hide *)
@@ -164,7 +164,7 @@ Proof.
    apply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
   destruct d1; destruct d2; apply (AbsSmall_trans _ (e:Q)); assumption.
  simpl.
- rewrite Hc.
+ rewrite -> Hc.
  pose (@Qpos_nonzero (d1 + d2)%Qpos).
  QposField.
  assumption.
@@ -180,7 +180,7 @@ Proof.
   reflexivity.
  apply ball_sym.
  eapply QPrelengthSpace_help.
-   rewrite Qplus_comm.
+   rewrite -> Qplus_comm.
    apply He.
   apply ball_sym.
   apply Hab.

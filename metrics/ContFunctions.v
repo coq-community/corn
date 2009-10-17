@@ -471,7 +471,7 @@ Proof.
  astepr (Two[^]1[*](x[-d]y)).
  astepr (Two[*](x[-d]y)).
  unfold Const_CSetoid_fun in |- *.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  red in |- *.
  simpl in |- *.
  intros H.

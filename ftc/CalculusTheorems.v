@@ -215,7 +215,7 @@ Proof.
     apply shift_div_leEq; [ apply pos_two | rstepr (b[+]b) ].
     apply plus_resp_leEq; apply less_leEq; auto.
    apply Min_leEq_rht.
-  rewrite leEq_def; intro H6.
+  rewrite -> leEq_def; intro H6.
   cut (y [<=] b). intro H7.
    apply (less_irreflexive_unfolded _ (F y Hy)).
    eapply less_wdr.
@@ -223,7 +223,7 @@ Proof.
    apply pfwdef; eapply eq_transitive_unfolded.
     apply Min_comm.
    apply leEq_imp_Min_is_lft; auto.
-  rewrite leEq_def; intro H7.
+  rewrite -> leEq_def; intro H7.
   apply (less_irreflexive_unfolded _ (F y Hy)).
   eapply less_transitive_unfolded.
    apply H6.
@@ -278,12 +278,12 @@ Proof.
    2: apply shift_leEq_div; [ apply pos_two | rstepl (b[+]b) ].
    2: apply plus_resp_leEq; apply less_leEq; auto.
   2: apply rht_leEq_Max.
- rewrite leEq_def; intro H6.
- cut (b [<=] x); rewrite leEq_def; intro H7.
+ rewrite -> leEq_def; intro H6.
+ cut (b [<=] x); rewrite -> leEq_def; intro H7.
   apply (less_irreflexive_unfolded _ (F x Hx)).
   eapply less_wdl.
    apply H6.
-  apply pfwdef; apply leEq_imp_Max_is_rht; rewrite leEq_def; auto.
+  apply pfwdef; apply leEq_imp_Max_is_rht; rewrite -> leEq_def; auto.
  apply (less_irreflexive_unfolded _ (F x Hx)).
  eapply less_transitive_unfolded.
   2: apply H6.
@@ -350,14 +350,14 @@ Proof.
     apply shift_div_leEq; [ apply pos_two | rstepr (b[+]b) ].
     apply plus_resp_leEq; apply less_leEq; auto.
    apply Min_leEq_rht.
-  rewrite leEq_def; intro H6.
-  cut (y [<=] b); rewrite leEq_def; intro H7.
+  rewrite -> leEq_def; intro H6.
+  cut (y [<=] b); rewrite -> leEq_def; intro H7.
    apply (less_irreflexive_unfolded _ (F y Hy)).
    eapply less_wdr.
     apply H6.
    apply pfwdef; eapply eq_transitive_unfolded.
     apply Min_comm.
-   apply leEq_imp_Min_is_lft; rewrite leEq_def; auto.
+   apply leEq_imp_Min_is_lft; rewrite -> leEq_def; auto.
   apply (less_irreflexive_unfolded _ (F y Hy)).
   eapply less_transitive_unfolded.
    apply H6.
@@ -412,12 +412,12 @@ Proof.
    2: apply shift_leEq_div; [ apply pos_two | rstepl (b[+]b) ].
    2: apply plus_resp_leEq; apply less_leEq; auto.
   2: apply rht_leEq_Max.
- rewrite leEq_def; intro H6.
- cut (b [<=] x); rewrite leEq_def; intro H7.
+ rewrite -> leEq_def; intro H6.
+ cut (b [<=] x); rewrite -> leEq_def; intro H7.
   apply (less_irreflexive_unfolded _ (F x Hx)).
   eapply less_wdl.
    apply H6.
-  apply pfwdef; apply leEq_imp_Max_is_rht; rewrite leEq_def; auto.
+  apply pfwdef; apply leEq_imp_Max_is_rht; rewrite -> leEq_def; auto.
  apply (less_irreflexive_unfolded _ (F x Hx)).
  eapply less_transitive_unfolded.
   2: apply H6.
@@ -464,7 +464,7 @@ Lemma olor_pos_clor_nonneg : forall a b (F : PartIR),
  Zero [<=] F a Ha -> forall x, clor a b x -> forall Hx, Zero [<=] F x Hx.
 Proof.
  intros a b F H Ha H0 x H1 Hx.
- rewrite leEq_def; intros H2.
+ rewrite -> leEq_def; intros H2.
  cut (Not (olor a b x)); intro H3.
   cut (x [=] a). intro H4.
    rewrite -> leEq_def in H0; apply H0.
@@ -483,7 +483,7 @@ Lemma olor_pos_olcr_nonneg : forall a b (F : PartIR),
  Zero [<=] F b Hb -> forall x, olcr a b x -> forall Hx, Zero [<=] F x Hx.
 Proof.
  intros a b F H Ha H0 x H1 Hx.
- rewrite leEq_def; intros H2.
+ rewrite -> leEq_def; intros H2.
  cut (Not (olor a b x)); intro H3.
   cut (x [=] b). intro H4.
    rewrite -> leEq_def in H0; apply H0.
@@ -502,7 +502,7 @@ Lemma olor_pos_clcr_nonneg : forall a b (F : PartIR), a [<] b ->
  forall x, clcr a b x -> forall Hx, Zero [<=] F x Hx.
 Proof.
  intros a b F Hab H Ha H0 Hb H1 x H2 Hx.
- rewrite leEq_def; intros H3.
+ rewrite -> leEq_def; intros H3.
  cut (Not (olor a b x)); intro H4.
   elim (less_cotransitive_unfolded _ _ _ Hab x); intro H5.
    cut (x [=] b). intro H6.

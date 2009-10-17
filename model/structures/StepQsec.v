@@ -16,65 +16,65 @@ Section QS.
 Definition QabsS : QS-->QS.
 Proof.
  exists Qabs.
- abstract( simpl; intros x1 x2 Hx; rewrite Hx; reflexivity).
+ abstract( simpl; intros x1 x2 Hx; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition Qplus0 : QS -> QS --> QS.
 Proof.
  intros q.
  exists (Qplus q).
- abstract ( simpl; intros x1 x2 Hx; rewrite Hx; reflexivity).
+ abstract ( simpl; intros x1 x2 Hx; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QplusS : QS --> QS --> QS.
 Proof.
  exists (Qplus0).
- abstract ( intros x1 x2 Hx y; simpl in *; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx y; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QoppS : QS --> QS.
 Proof.
  exists (Qopp).
- abstract ( simpl; intros x1 x2 Hx; simpl in *; rewrite Hx; reflexivity).
+ abstract ( simpl; intros x1 x2 Hx; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition Qminus0 : QS -> QS --> QS.
 Proof.
  intros q.
  exists (Qminus q).
- abstract ( simpl; intros x1 x2 Hx; rewrite Hx; reflexivity).
+ abstract ( simpl; intros x1 x2 Hx; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QminusS : QS --> QS --> QS.
 Proof.
  exists (Qminus0).
- abstract ( intros x1 x2 Hx y; simpl in *; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx y; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QscaleS : QS -> QS --> QS.
 Proof.
  intros q.
  exists (Qmult q).
- abstract ( intros x1 x2 Hx; simpl in *; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QmultS : QS --> QS --> QS.
 Proof.
  exists (QscaleS).
- abstract ( intros x1 x2 Hx y; simpl in *; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx y; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition Qle0 : QS -> QS --> iffSetoid.
 Proof.
  intros q.
  exists (Qle q).
- abstract ( simpl; intros x1 x2 Hx; rewrite Hx; reflexivity).
+ abstract ( simpl; intros x1 x2 Hx; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition QleS : QS --> QS --> iffSetoid.
 Proof.
  exists (Qle0).
- abstract ( intros x1 x2 Hx y; simpl in *; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx y; simpl in *; rewrite -> Hx; reflexivity).
 Defined.
 
 End QS.
@@ -100,8 +100,8 @@ Add Morphism StepQplus with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@St
 Proof.
  intros.
  unfold StepQplus.
- rewrite H.
- rewrite H0.
+ rewrite -> H.
+ rewrite -> H0.
  reflexivity.
 Qed.
 
@@ -109,7 +109,7 @@ Add Morphism StepQopp with signature (@StepF_eq QS) ==> (@StepF_eq QS) as StepQo
 Proof.
  intros.
  unfold StepQopp.
- rewrite H.
+ rewrite -> H.
  reflexivity.
 Qed.
 
@@ -117,8 +117,8 @@ Add Morphism StepQminus with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@S
 Proof.
  intros.
  unfold StepQminus.
- rewrite H.
- rewrite H0.
+ rewrite -> H.
+ rewrite -> H0.
  reflexivity.
 Qed.
 
@@ -126,8 +126,8 @@ Add Morphism StepQmult with signature (@StepF_eq QS) ==> (@StepF_eq QS) ==> (@St
 Proof.
  intros.
  unfold StepQmult.
- rewrite H.
- rewrite H0.
+ rewrite -> H.
+ rewrite -> H0.
  reflexivity.
 Qed.
 
@@ -223,7 +223,7 @@ Proof.
   rewrite <- (Radd_assoc).
   apply StepQplus_wd.
    reflexivity.
-  rewrite Radd_comm.
+  rewrite -> Radd_comm.
   rewrite <- Rsub_def.
   unfold StepF_eq.
   revert H.
@@ -237,7 +237,7 @@ Proof.
   split.
    apply IHs1; symmetry; assumption.
   apply IHs2; symmetry; assumption.
- rewrite Radd_comm.
+ rewrite -> Radd_comm.
  apply Radd_0_l.
 Qed.
 
@@ -280,7 +280,7 @@ Add Morphism StepQabs with signature (@StepF_eq QS) ==> (@StepF_eq QS) as StepQa
 Proof.
  intros.
  unfold StepQabs.
- rewrite H.
+ rewrite -> H.
  reflexivity.
 Qed.
 
@@ -294,8 +294,8 @@ Add Morphism StepQ_le
 Proof.
  unfold StepQ_le.
  intros x1 x2 Hx y1 y2 Hy.
- rewrite Hx.
- rewrite Hy.
+ rewrite -> Hx.
+ rewrite -> Hy.
  reflexivity.
 Qed.
 (* end hide *)

@@ -135,11 +135,11 @@ Proof.
   Transparent CR.
   change (ball (m:=Complete Q_as_MetricSpace) (1 # p) (Cunit (approximate x (1 # p)%Qpos))
     (Cunit (approximateQ (approximate x (1 # p)%Qpos) p))).
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   apply approximateQ_correct.
  unfold QposEq.
  autorewrite with QposElim.
- repeat rewrite Qmake_Qdiv.
+ repeat rewrite -> Qmake_Qdiv.
  unfold Qdiv.
  ring.
 Qed.
@@ -173,7 +173,7 @@ Qed.
 Lemma compress_uc : is_UniformlyContinuousFunction compress_fun Qpos2QposInf.
 Proof.
  intros e x y H.
- do 2 rewrite compress_fun_correct.
+ do 2 rewrite -> compress_fun_correct.
  assumption.
 Qed.
 

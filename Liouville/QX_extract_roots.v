@@ -56,7 +56,7 @@ Proof.
  case (Q_dec a q).
   intros Haq Hin Hval.
   destruct Hap.
-  rewrite Haq; assumption.
+  rewrite -> Haq; assumption.
  intros.
  apply IHl.
   assumption.
@@ -149,7 +149,7 @@ Proof.
  unfold fst, snd in *.
  intro Hq.
  rewrite -> Hq in s.
- assert (H : p [=] r); [rewrite s; unfold cg_minus; unfold QX; ring|].
+ assert (H : p [=] r); [rewrite -> s; unfold cg_minus; unfold QX; ring|].
  unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ H); fold QX_deg.
  destruct (_X_monic _ a).
  destruct (degree_le_zero _ _ (d _ H1)).
@@ -211,7 +211,7 @@ Proof.
   destruct (degree_le_zero _ _ d).
   case (Q_dec P ! a Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); clear Hap; revert Heq.
-  rewrite s c_apply; intro H; rewrite H; split; [reflexivity|apply I].
+  rewrite -> s, c_apply; intro H; rewrite -> H; split; [reflexivity|apply I].
  unfold QX_extract_roots_rec.
  intros P Hdeg Hap.
  case_eq (QX_find_root P).
@@ -251,23 +251,23 @@ Proof.
   rewrite Hdeg; apply QX_div_deg.
   rewrite <- Hdeg; discriminate.
  clear IHn; revert Hval.
- rewrite {1} (RX_div_spec _ P y).
- rewrite rh_pres_plus.
- rewrite rh_pres_mult.
- rewrite rh_pres_minus.
- rewrite (cpoly_map_X _ _ inj_Q_rh).
- rewrite (cpoly_map_C _ _ inj_Q_rh).
- rewrite (cpoly_map_C _ _ inj_Q_rh).
- rewrite plus_apply.
- rewrite mult_apply.
- rewrite minus_apply.
- rewrite x_apply.
- rewrite c_apply.
- rewrite c_apply.
- rewrite (QX_find_root_spec_some _ _ Hsome).
- rewrite rh_pres_zero.
- rewrite cm_rht_unit.
- rewrite mult_commutes.
+ rewrite -> (RX_div_spec _ P y) at 1.
+ rewrite -> rh_pres_plus.
+ rewrite -> rh_pres_mult.
+ rewrite -> rh_pres_minus.
+ rewrite -> (cpoly_map_X _ _ inj_Q_rh).
+ rewrite -> (cpoly_map_C _ _ inj_Q_rh).
+ rewrite -> (cpoly_map_C _ _ inj_Q_rh).
+ rewrite -> plus_apply.
+ rewrite -> mult_apply.
+ rewrite -> minus_apply.
+ rewrite -> x_apply.
+ rewrite -> c_apply.
+ rewrite -> c_apply.
+ rewrite -> (QX_find_root_spec_some _ _ Hsome).
+ rewrite -> rh_pres_zero.
+ rewrite -> cm_rht_unit.
+ rewrite -> mult_commutes.
  set (H := Hx y); revert H; generalize (RX_div Q_as_CRing P y).
  clear; intros P Hap Heq.
  apply (mult_eq_zero IR (x[-]inj_Q_rh y)); [|assumption].

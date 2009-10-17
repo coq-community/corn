@@ -72,7 +72,7 @@ Proof.
     assumption.
    intro m; case m.
     intro H1; inversion H1.
-   intros; rewrite coeff_Sm_lin.
+   intros; rewrite -> coeff_Sm_lin.
    rewrite <- (nth_coeff_zero _ n).
    apply nth_coeff_wd; assumption.
   intros Hap Heq; destruct (eq_imp_not_ap _ _ _ Heq Hap).
@@ -84,7 +84,7 @@ Proof.
   tauto.
  intro m; case m.
   intro H1; inversion H1.
- clear m; intros m Hlt; rewrite coeff_Sm_lin.
+ clear m; intros m Hlt; rewrite -> coeff_Sm_lin.
  apply Hdeg; apply le_S_n; assumption.
 Qed.
 
@@ -112,7 +112,7 @@ Proof.
   rewrite <- H0; assumption.
  case (RX_dec Q Zero).
   intros H1 H2; destruct (ap_imp_neq _ _ _ H2).
-  rewrite H0; assumption.
+  rewrite -> H0; assumption.
  intros HQ HP.
  f_equal; apply Hrec; assumption.
 Qed.
@@ -151,7 +151,7 @@ Proof.
  intro p.
  case (RX_dec p Zero).
   intro H; rewrite (RX_deg_wd _ _ H) RX_deg_zero.
-  rewrite <- RX_deg_zero; apply RX_deg_wd; rewrite H; unfold RX; ring.
+  rewrite <- RX_deg_zero; apply RX_deg_wd; rewrite -> H; unfold RX; ring.
  intro Hp.
  apply (degree_inj p).
   apply RX_deg_spec; assumption.
@@ -166,11 +166,11 @@ Proof.
  intros p q Hneq.
  case (RX_dec p Zero).
   intro H; rewrite (RX_deg_wd _ _  H).
-  transitivity (RX_deg q); [apply RX_deg_wd; rewrite H; unfold RX; ring|].
+  transitivity (RX_deg q); [apply RX_deg_wd; rewrite -> H; unfold RX; ring|].
   rewrite RX_deg_zero; reflexivity.
  case (RX_dec q Zero).
   intro H; rewrite (RX_deg_wd _ _  H).
-  transitivity (RX_deg p); [apply RX_deg_wd; rewrite H; unfold RX; ring|].
+  transitivity (RX_deg p); [apply RX_deg_wd; rewrite -> H; unfold RX; ring|].
   rewrite RX_deg_zero; rewrite max_comm; reflexivity.
  intros Hq Hp.
  set (RX_deg_spec _ Hp).

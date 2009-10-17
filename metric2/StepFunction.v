@@ -192,7 +192,7 @@ Proof.
  induction s; induction t; intros Hst; simpl in *; try assumption; try contradiction.
  destruct Hst as [Ho [Hst1 Hst2]].
  repeat split.
-   rewrite Ho; reflexivity.
+   rewrite -> Ho; reflexivity.
   apply IHs2; assumption.
  apply IHs1; assumption.
 Qed.
@@ -215,9 +215,9 @@ Proof.
  induction s; induction t; intros a b Hab Hst; simpl in *; try assumption; try contradiction.
  destruct Hst as [Ho [Hst1 Hst2]].
  apply SplitR_glue_ind; intros Hao; apply SplitR_glue_ind; intros Hbo; repeat split; auto with *;
-   try solve [elim (Qlt_not_le _ _ Hao); rewrite Hab; rewrite Ho; try rewrite Hbo; auto with *
-     |elim (Qlt_not_le _ _ Hbo); rewrite <- Hab; rewrite <- Ho; try rewrite Hao; auto with *];
-       try apply IHs1; try apply IHs2; auto with *; simpl; try (rewrite Hab; rewrite Ho; reflexivity).
+   try solve [elim (Qlt_not_le _ _ Hao); rewrite -> Hab; rewrite -> Ho; try rewrite -> Hbo; auto with *
+     |elim (Qlt_not_le _ _ Hbo); rewrite <- Hab; rewrite <- Ho; try rewrite -> Hao; auto with *];
+       try apply IHs1; try apply IHs2; auto with *; simpl; try (rewrite -> Hab; rewrite -> Ho; reflexivity).
 Qed.
 (* begin hide *)
 Hint Resolve SplitR_resp_Qeq.
@@ -229,46 +229,46 @@ Proof.
  intros a b Hab; simpl in Hab.
  simpl.
  apply SplitL_glue_ind; intros Hao; apply: SplitR_glue_ind; intros Hoa; simpl in Hoa;
-   try (repeat split; auto with *; try apply IHs1; try apply IHs2; simpl; rewrite Hab; field; auto with * ).
+   try (repeat split; auto with *; try apply IHs1; try apply IHs2; simpl; rewrite -> Hab; field; auto with * ).
        elim (Qlt_not_le _ _ Hao).
        rewrite -> Qlt_minus_iff in Hoa.
-       rewrite Qle_minus_iff.
+       rewrite -> Qle_minus_iff.
        replace RHS with (1 - o + - (1 - a)).
         rewrite <- Hab.
         auto with *.
-       by ring.
+       by simpl; ring.
       elim (Qlt_not_le _ _ Hao).
-      rewrite Qle_minus_iff.
+      rewrite -> Qle_minus_iff.
       replace RHS with (1 - o + - (1 - a)).
        rewrite <- Hab.
        rewrite <- Hoa.
        ring_simplify.
        auto with *.
-      by ring.
+      by simpl; ring.
      intros H; ring_simplify in H.
      revert H; change (~(a==0)); auto with *.
     elim (Qlt_not_le _ _ Hao).
-    rewrite Qle_minus_iff.
+    rewrite -> Qle_minus_iff.
     rewrite -> Qlt_minus_iff in Hoa.
     replace RHS with (1 - a + - (1 - o)).
      rewrite <- Hab.
      auto with *.
-    by ring.
+    by simpl; ring.
    elim (Qlt_not_le _ _ Hao).
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    replace RHS with (1 - a + - (1 - o)).
     rewrite <- Hab.
     rewrite <- Hoa.
     ring_simplify.
     auto with *.
-   by ring.
+   by simpl; ring.
   elim (Qlt_not_le _ _ Hoa).
-  rewrite Hab.
-  rewrite Hao.
+  rewrite -> Hab.
+  rewrite -> Hao.
   auto with *.
  elim (Qlt_not_le _ _ Hoa).
- rewrite Hab.
- rewrite Hao.
+ rewrite -> Hab.
+ rewrite -> Hao.
  auto with *.
 Qed.
 
@@ -281,7 +281,7 @@ Proof.
  apply StepF_Qeq_sym.
  apply MirrorSplitL_Qeq.
  simpl in *.
- rewrite H.
+ rewrite -> H.
  ring.
 Qed.
 
@@ -295,7 +295,7 @@ Proof.
  apply StepF_Qeq_trans with (Mirror (SplitR (Mirror t) (OpenUnitDual b))).
   apply Mirror_resp_Qeq.
   apply SplitR_resp_Qeq; auto with *.
-  simpl; rewrite H; reflexivity.
+  simpl; rewrite -> H; reflexivity.
  apply StepF_Qeq_trans with (Mirror (Mirror (SplitL t b))); auto with *.
  apply Mirror_resp_Qeq.
  apply StepF_Qeq_sym.
@@ -325,17 +325,17 @@ Proof.
     replace RHS with (1*a).
      replace LHS with (b*a).
       apply Qmult_le_compat_r; auto with *.
-     by ring.
-    by ring.
+     by simpl; ring.
+    by simpl; ring.
    elim (Qlt_not_le a c).
-    rewrite Hco.
+    rewrite -> Hco.
     apply Qlt_le_trans with o; auto with *.
    rewrite <- H.
    replace RHS with (1*a).
     replace LHS with (b*a).
      apply Qmult_le_compat_r; auto with *.
-    by ring.
-   by ring.
+    by simpl; ring.
+   by simpl; ring.
   apply SplitL_glue_ind; intros Hbd.
     apply SplitL_glue_ind; intros Hco.
       apply SplitL_resp_Qeq; auto with *.
@@ -345,16 +345,16 @@ Proof.
      elim (Qlt_not_le _ _ Hbd).
      simpl.
      apply Qle_shift_div_r; auto with *.
-     rewrite Qmult_comm; rewrite  H; auto with *.
+     rewrite -> Qmult_comm; rewrite -> H; auto with *.
     elim (Qlt_not_le _ _ Hbd).
     simpl.
     apply Qle_shift_div_r; auto with *.
-    rewrite Qmult_comm; rewrite H; rewrite Hco; auto with *.
+    rewrite -> Qmult_comm; rewrite -> H; rewrite -> Hco; auto with *.
    apply SplitL_glue_ind; intros Hco.
      elim (Qlt_not_le _ _ Hbd).
      simpl.
      apply Qle_shift_div_l; auto with *.
-     rewrite Qmult_comm; rewrite  H; auto with *.
+     rewrite -> Qmult_comm; rewrite -> H; auto with *.
     repeat split; auto with *.
      simpl.
      rewrite <- H.
@@ -368,20 +368,20 @@ Proof.
    elim (Qlt_not_le _ _ Hbd).
    simpl.
    apply Qle_shift_div_l; auto with *.
-   rewrite Qmult_comm; rewrite H; auto with *.
+   rewrite -> Qmult_comm; rewrite -> H; auto with *.
   assert (Y:o==c).
    rewrite <- H.
-   rewrite Hbd.
+   rewrite -> Hbd.
    simpl.
    field.
    auto with *.
-  apply SplitL_glue_ind; intros Hco; try (elim (Qlt_not_le _ _ Hco); rewrite Y; auto with * ).
+  apply SplitL_glue_ind; intros Hco; try (elim (Qlt_not_le _ _ Hco); rewrite -> Y; auto with * ).
   auto with *.
  apply SplitL_glue_ind; intros Hco.
    apply SplitL_resp_Qeq; auto with *.
    simpl.
    rewrite <- H.
-   rewrite Hao.
+   rewrite -> Hao.
    field; auto with *.
   elim (Qlt_not_le _ _ Hco).
   rewrite <- H.
@@ -389,8 +389,8 @@ Proof.
   replace RHS with (1*a).
    replace LHS with (b*a).
     apply Qmult_le_compat_r; auto with *.
-   by ring.
-  by ring.
+   by simpl; ring.
+  by simpl; ring.
  elim (Qlt_not_le b 1).
   auto with *.
  rewrite <- Hao in Hco.
@@ -398,7 +398,7 @@ Proof.
  apply Qmult_lt_0_le_reg_r with a.
   auto with *.
  ring_simplify.
- rewrite H.
+ rewrite -> H.
  auto with *.
 Qed.
 
@@ -434,44 +434,44 @@ Proof.
    assert (Hao':~ o - a == 0).
     intros H.
     elim (Qlt_not_le _ _ Hao).
-    rewrite Qle_minus_iff.
+    rewrite -> Qle_minus_iff.
     replace RHS with (- (o- a)).
-     rewrite H.
+     rewrite -> H.
      auto with *.
-    by ring.
+    by simpl; ring.
    apply SplitL_glue_ind; intros Hbz; simpl in Hbz.
      apply SplitL_glue_ind; intros Hco.
        apply IHs1; simpl; [rewrite <- H0|rewrite <- H1]; field; auto with *.
       elim (Qlt_not_le _ _ Hbz).
       rewrite -> Qlt_minus_iff in Hco.
-      rewrite Qle_minus_iff.
+      rewrite -> Qle_minus_iff.
       replace RHS with ((a + b - a*b + -o)/(1 -a)).
-       rewrite H0.
+       rewrite -> H0.
        apply Qle_shift_div_l; auto with *.
        replace LHS with 0.
         auto with *.
-       by ring.
-      by (field; auto with * ).
+       by simpl; ring.
+      by (simpl; field; auto with * ).
      elim (Qlt_not_le _ _ Hbz).
-     rewrite Qle_minus_iff.
+     rewrite -> Qle_minus_iff.
      replace RHS with ((a + b - a*b + -o)/(1 -a)).
-      rewrite H0.
-      rewrite Hco.
+      rewrite -> H0.
+      rewrite -> Hco.
       replace RHS with 0.
        auto with *.
-      by (field; auto with * ).
-     by (field; auto with * ).
+      by (simpl; field; auto with * ).
+     by (simpl; field; auto with * ).
     apply SplitL_glue_ind; intros Hco.
       elim (Qlt_not_le _ _ Hbz).
       rewrite -> Qlt_minus_iff in Hco.
-      rewrite Qle_minus_iff.
+      rewrite -> Qle_minus_iff.
       replace RHS with ((o + -(a + b - a*b))/(1 -a)).
-       rewrite H0.
+       rewrite -> H0.
        apply Qle_shift_div_l; auto with *.
        replace LHS with 0.
         auto with *.
-       by ring.
-      field. by auto with *.
+       by simpl; ring.
+      simpl; field. by auto with *.
      apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
        repeat split; simpl.
          field_simplify; auto with *.
@@ -479,41 +479,41 @@ Proof.
           rewrite <- H1; ring.
          apply Qinv_comp.
          replace LHS with (a + b - a*b - a).
-          rewrite H0.
+          rewrite -> H0.
           replace RHS with (c - (d*c)).
-           rewrite H1.
+           rewrite -> H1.
            reflexivity.
-          by ring.
-         by ring.
+          by simpl; ring.
+         by simpl; ring.
         apply SplitR_resp_Qeq; auto with *; simpl.
         rewrite <- H1; field; auto with *.
        apply SplitL_resp_Qeq; auto with *; simpl.
        rewrite <- H0; field; auto with *.
       elim (Qlt_not_le _ _ Hdz).
       apply Qle_shift_div_l; auto with *.
-      rewrite H1; auto with *.
+      rewrite -> H1; auto with *.
      elim (Qlt_not_le _ _ Hao).
      rewrite <- H1.
-     rewrite Hdz.
+     rewrite -> Hdz.
      replace RHS with (o:Q).
       auto with *.
-     field. by auto with *.
+     simpl. field. by auto with *.
     elim (Qlt_not_le _ _ Hbz).
     rewrite <- Hco.
     rewrite <- H0.
-    replace RHS with (b:Q); [ | field]; auto with *.
+    replace RHS with (b:Q); [ | simpl; field]; auto with *.
    apply SplitL_glue_ind; intros Hco.
      elim (Qlt_not_le _ _ Hco).
      rewrite <- H0.
-     rewrite Hbz.
-     replace RHS with (o:Q); [ | field]; auto with *.
+     rewrite -> Hbz.
+     replace RHS with (o:Q); [ | simpl; field]; auto with *.
     elim (Qlt_not_le _ _ Hco).
     rewrite <- H0.
-    rewrite Hbz.
-    replace LHS with (o:Q); [ | field]; auto with *.
+    rewrite -> Hbz.
+    replace LHS with (o:Q); [ | simpl; field]; auto with *.
    apply SplitR_resp_Qeq; simpl; auto with *.
    rewrite <- H1.
-   rewrite Hco.
+   rewrite -> Hco.
    field; auto with *.
   apply SplitL_glue_ind; intros Hco.
     elim (Qlt_not_le _ _ Hco).
@@ -523,63 +523,63 @@ Proof.
     replace RHS with (a + - o + b*(1-a)).
      assert (Z:0 < (1-a)) by auto with *.
      Qauto_pos.
-    by ring.
+    by simpl; ring.
    assert (Hco':~ c - o == 0).
     intros H.
     elim (Qlt_not_le _ _ Hco).
     rewrite -> Qle_minus_iff.
-    replace RHS with (c-o). rewrite H. auto with *.
-     replace LHS with (-(c-o)). rewrite H. ring. by ring.
+    replace RHS with (c-o). rewrite -> H. auto with *.
+     replace LHS with (-(c-o)). rewrite -> H. simpl; ring. by simpl; ring.
     apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
      elim (Qlt_not_le _ _ Hdz).
      apply Qle_shift_div_r; auto with *.
-     rewrite H1; auto with *.
+     rewrite -> H1; auto with *.
     apply IHs2; simpl; [rewrite <- H0|rewrite <- H1]; field; auto with *.
    elim (Qlt_not_le _ _ Hao).
    rewrite <- H1.
-   rewrite Hdz.
-   replace LHS with (o:Q); [ | field]; auto with *.
+   rewrite -> Hdz.
+   replace LHS with (o:Q); [ | simpl; field]; auto with *.
   elim (Qlt_not_le _ _ Hao).
   rewrite <- H1.
   rewrite <- Hco.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   replace RHS with (c * (1-d)).
    apply Qlt_le_weak.
    assert (Z:0 < (1-d)) by auto with *.
    Qauto_pos.
-  by ring.
+  by simpl; ring.
  apply SplitL_glue_ind; intros Hco.
    elim (Qlt_not_le _ _ Hco).
    rewrite <- Hao.
    rewrite <- H1.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    replace RHS with (c * (1-d)).
     apply Qlt_le_weak.
     assert (Z:0 < (1-d)) by auto with *.
     Qauto_pos.
-   by ring.
+   by simpl; ring.
   apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
     elim (Qlt_not_le _ _ Hdz).
     apply Qle_shift_div_r; auto with *.
     rewrite <- Hao.
-    rewrite H1; auto with *.
+    rewrite -> H1; auto with *.
    elim (Qlt_not_le _ _ Hdz).
    apply Qle_shift_div_l; auto with *.
    rewrite <- Hao.
-   rewrite H1; auto with *.
+   rewrite -> H1; auto with *.
   apply SplitL_resp_Qeq; simpl; auto with *.
   rewrite <- H0.
   rewrite <- Hao.
   field; auto with *.
  elim (Qlt_not_le (d*c) a).
-  rewrite Hao.
-  rewrite Hco.
-  rewrite Qlt_minus_iff.
+  rewrite -> Hao.
+  rewrite -> Hco.
+  rewrite -> Qlt_minus_iff.
   replace RHS with (o * (1-d)).
    assert (Z:0 < (1-d)) by auto with *.
    Qauto_pos.
-  by ring.
- rewrite H1.
+  by simpl; ring.
+ rewrite -> H1.
  auto with *.
 Qed.
 

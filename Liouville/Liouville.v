@@ -45,14 +45,14 @@ Lemma Abs_poly_nth_coeff : forall P i, nth_coeff i (AbsPoly P) [=] AbsIR (nth_co
 Proof.
  intro P.
  pattern P; apply Ccpoly_induc; clear P.
-  intro; rewrite AbsPoly_zero nth_coeff_zero.
+  intro; rewrite -> AbsPoly_zero, nth_coeff_zero.
   symmetry; apply AbsIRz_isz.
  intros P c Hrec n.
  rewrite AbsPoly_linear.
  destruct n.
-  rewrite coeff_O_lin; reflexivity.
- rewrite coeff_Sm_lin.
- rewrite Hrec.
+  rewrite -> coeff_O_lin; reflexivity.
+ rewrite -> coeff_Sm_lin.
+ rewrite -> Hrec.
  apply AbsIR_wd.
  symmetry; apply coeff_Sm_lin.
 Qed.
@@ -76,7 +76,7 @@ Proof.
  apply (leEq_transitive _ _ (AbsIR a)); [|apply lft_leEq_Max].
  apply (leEq_transitive _ _ ([--]a)).
   apply inv_resp_leEq; assumption.
- rewrite AbsIR_inv; apply leEq_AbsIR.
+ rewrite -> AbsIR_inv; apply leEq_AbsIR.
 Qed.
 
 Lemma Abs_min_max : forall x, I x ->
@@ -97,18 +97,18 @@ Proof.
  set (degree_le_mon _ _ _ _ (le_max_r n m) HdegA).
  revert HI d d0; generalize (max n m); clear.
  intros n HI HdegP HdegA.
- rewrite (poly_as_sum _ _ _ HdegP).
- rewrite (poly_as_sum _ _ _ HdegA).
+ rewrite -> (poly_as_sum _ _ _ HdegP).
+ rewrite -> (poly_as_sum _ _ _ HdegA).
  apply (leEq_transitive _ _ (Sum 0 n (fun i => AbsIR (nth_coeff i P[*]x[^]i)))).
   apply triangle_SumIR.
   apply le_O_n.
  apply Sum_resp_leEq.
   apply le_O_n.
  intros i H1 H2.
- rewrite AbsIR_resp_mult.
- rewrite Abs_poly_nth_coeff.
+ rewrite -> AbsIR_resp_mult.
+ rewrite -> Abs_poly_nth_coeff.
  apply mult_resp_leEq_lft; [|apply AbsIR_nonneg].
- rewrite AbsIR_nexp_op.
+ rewrite -> AbsIR_nexp_op.
  apply nexp_resp_leEq; [apply AbsIR_nonneg|].
  apply Abs_min_max; assumption.
 Qed.
@@ -230,7 +230,7 @@ Lemma Liouville_lemma4 : forall p : Z_as_CRing,
 Proof.
  intros p Hap.
  change (One[<=]AbsIR(inj_Q IR p)).
- rewrite AbsIR_Qabs.
+ rewrite -> AbsIR_Qabs.
  unfold Qabs.Qabs.
  unfold inject_Z.
  rewrite <- inj_Q_One.
@@ -255,9 +255,9 @@ Proof.
   rewrite <- nexp_Sn.
   rewrite <- nexp_Sn.
   rewrite Zabs_Zmult.
-  rewrite IHn.
+  rewrite -> IHn.
   reflexivity.
- rewrite H; clear H.
+ rewrite -> H; clear H.
  rewrite <- (AbsIR_Qabs ((q:Z_as_CRing)[^]n)).
  rewrite <- AbsIR_resp_mult.
  change (inj_Q IR ((q:Z_as_CRing)[^]n)) with (inj_Q_rh ((q:Z_as_CRing)[^]n)).
@@ -268,12 +268,12 @@ Proof.
   rewrite <- nexp_Sn.
   rewrite <- IHn.
   reflexivity.
- rewrite H; clear H.
+ rewrite -> H; clear H.
  set (H:=Q_Z_poly_apply P p q).
  cbv zeta in H.
  fold ZX_deg in H.
  fold n in H.
- rewrite H.
+ rewrite -> H.
  apply Liouville_lemma4.
  intro.
  destruct (ap_imp_neq _ _ _ Hap); clear Hap.
@@ -301,8 +301,8 @@ Proof.
  assert ((zx2qx (qx2zx P)) ! (p#q)%Q[#]Zero).
   case (Q_dec ((zx2qx (qx2zx P)) ! (p#q)%Q) Zero); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); revert Heq.
-  rewrite qx2zx_spec.
-  rewrite mult_apply c_apply.
+  rewrite -> qx2zx_spec.
+  rewrite -> mult_apply, c_apply.
   intro Heq.
   apply (mult_eq_zero _ (Zlcm_den_poly P:Q_as_CField)).
    intro Heq2; injection Heq2.
@@ -314,8 +314,8 @@ Proof.
  apply mult_wdr.
  apply AbsIR_wd.
  apply csf_wd.
- rewrite qx2zx_spec.
- rewrite mult_apply c_apply; reflexivity.
+ rewrite -> qx2zx_spec.
+ rewrite -> mult_apply, c_apply; reflexivity.
 Qed.
 
 Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] Zero ->
@@ -325,7 +325,7 @@ Proof.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma6 _ _ Hap)).
  rewrite <- mult_assoc.
  apply mult_wdr.
- rewrite rh_pres_mult.
+ rewrite -> rh_pres_mult.
  apply AbsIR_resp_mult.
 Qed.
 
@@ -360,10 +360,10 @@ Proof.
   apply mult_resp_leEq_lft; [|apply AbsIR_nonneg].
   apply (leEq_wdl _ _ _ _ (Liouville_lemma2 _ _ _ Hle)).
   apply AbsIR_wd.
-  rewrite Ha.
-  rewrite cg_inv_zero.
+  rewrite -> Ha.
+  rewrite -> cg_inv_zero.
   unfold inj_QX_rh.
-  rewrite cpoly_map_apply; reflexivity.
+  rewrite -> cpoly_map_apply; reflexivity.
  set (Liouville_lemma8 (QX_deg P) q).
  apply (leEq_transitive _ _ One); [apply less_leEq; apply pos_one|].
  apply Liouville_lemma8.
@@ -437,9 +437,9 @@ Proof.
   rewrite <- mult_nexp.
   rewrite <- (one_nexp _ Liouville_degree).
   apply nexp_wd; reflexivity.
- rewrite H; clear H.
- rewrite rh_pres_unit.
- rewrite mult_one.
+ rewrite -> H; clear H.
+ rewrite -> rh_pres_unit.
+ rewrite -> mult_one.
  unfold Liouville_constant.
  apply shift_div_leEq'.
   apply constant_pos.
@@ -449,10 +449,10 @@ Proof.
   apply QX_extract_roots_spec_rat; assumption.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma10 _ _ H _ _ H1)).
  fold C.
- rewrite (mult_commutes _ _ C).
+ rewrite -> (mult_commutes _ _ C).
  rewrite <- mult_assoc.
  apply mult_wdr.
- rewrite mult_commutes.
+ rewrite -> mult_commutes.
  apply mult_wdr.
  unfold Liouville_degree.
  symmetry; apply nexp_ring_hom.

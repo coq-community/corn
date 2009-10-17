@@ -30,14 +30,13 @@ Unset Strict Implicit.
 
 Section Definitions.
 
-Context `{r_st : Equivalence R req}.
-Class Ring (rO rI : R) (radd rmul rsub : binop R) (ropp : unop R) :=
+Context {R: Type} {req: relation R}.
+Class Ring {r_st : Equivalence req} (rO rI : R) (radd rmul rsub : binop R) (ropp : unop R) :=
   { r_rt : ring_theory rO rI radd rmul rsub ropp req;
     r_ree : ring_eq_ext radd rmul ropp req
 }.
 
-Context `{r_ring : Ring}.
-Class SubRing (P : R -> Type) :=
+Class SubRing {r_st : Equivalence req} `{r_ring : Ring} (P : R -> Type) :=
   {zero_stab : P rO;
    one_stab : P rI;
    radd_int : binop_intern P radd;

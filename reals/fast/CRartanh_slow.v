@@ -60,7 +60,7 @@ Lemma Qsqr_lt_one : forall (a:Q), (-(1) < a) -> a < 1 -> (a^2 < 1).
 Proof.
  intros a H0 H1.
  rewrite -> Qlt_minus_iff in *.
- replace RHS with ((1 + - a)*(a + - -(1))) by ring.
+ replace RHS with ((1 + - a)*(a + - -(1))) by simpl; ring.
  Qauto_pos.
 Qed.
 
@@ -74,7 +74,7 @@ Proof.
    intros H.
    apply (Qlt_not_le _ _ Ha).
    rewrite ->  Qle_minus_iff in *.
-   replace RHS with ((- (1) + - a + 2)*(-(1) +- a)) by ring.
+   replace RHS with ((- (1) + - a + 2)*(-(1) +- a)) by simpl; ring.
    Qauto_nonneg.
   stepr ([--](inj_Q IR 1)).
    apply inj_Q_inv.
@@ -87,7 +87,7 @@ Proof.
   intros H.
   apply (Qlt_not_le _ _ Ha).
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((a + - (1) + 2)*(a +- (1))) by ring.
+  replace RHS with ((a + - (1) + 2)*(a +- (1))) by simpl; ring.
   Qauto_nonneg.
  rstepr (nring 1:IR).
  apply (inj_Q_nring IR 1).
@@ -103,7 +103,7 @@ Lemma rational_artanh_slow_correct : forall (a:Q) Ha Ha0,
 Proof.
  intros a Ha Ha0.
  unfold rational_artanh_slow.
- rewrite InfiniteGeometricSum_correct'.
+ rewrite -> InfiniteGeometricSum_correct'.
  apply IRasCR_wd.
  eapply eq_transitive_unfolded;
    [|apply (ArTanH_series (inj_Q IR a) (ArTanH_series_convergent_IR) (artanh_DomArTanH Ha) Ha0)].

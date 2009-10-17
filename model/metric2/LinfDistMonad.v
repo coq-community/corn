@@ -92,7 +92,7 @@ Proof.
  rewrite StepFunction.SplitLMap StepFunction.SplitRMap.
  fold (glue o (Map (fun z : RegularFunction X => approximate z d1) x1)
    (Map (fun z : RegularFunction X => approximate z d1) x2)).
- rewrite StepFSupBallGlueGlue.
+ rewrite -> StepFSupBallGlueGlue.
  split; revert d1 d2.
   apply: IHx1; assumption.
  apply: IHx2; assumption.
@@ -157,7 +157,7 @@ Proof.
  unfold dist_raw.
  fold (glue o (Map (fun z : RegularFunction X => approximate z e) x)
    (Map (fun z : RegularFunction X => approximate z e) y)).
- rewrite StepFSupBallGlueGlue.
+ rewrite -> StepFSupBallGlueGlue.
  assert (forall w:StepF (Complete X), StepFSupBall (X:=X) (e + e1)
    (Map (fun z : RegularFunction X => approximate z e) w) (Map (fun z : RegularFunction X =>
      approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w)).
@@ -167,17 +167,17 @@ Proof.
    apply ball_triangle with x0.
     apply ball_approx_l.
    apply ball_weak_le  with  ((1 # 2) * ((1 # 2) * e1))%Qpos.
-    rewrite Qle_minus_iff.
+    rewrite -> Qle_minus_iff.
     replace RHS with (e1 - (1#2)*(1#2)*e1).
-     replace RHS with ((3#4)*e1); [| ring].
-     Qauto_nonneg. auto with *.
+     replace RHS with ((3#4)*e1); [| simpl; ring].
+     Qauto_nonneg. simpl. auto with *.
     apply ball_approx_r.
   simpl.
   change (StepFSupBall (X:=X) (e + e1) (glue o0 (Map (fun z : RegularFunction X => approximate z e) w1)
     (Map (fun z : RegularFunction X => approximate z e) w2)) (glue o0 (Map
       (fun z : RegularFunction X => approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w1) (Map
         (fun z : RegularFunction X => approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w2))).
-  rewrite StepFSupBallGlueGlue.
+  rewrite -> StepFSupBallGlueGlue.
   intuition.
  split;auto.
 Qed.
@@ -232,7 +232,7 @@ Proof.
        (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x1)) (Map f (Map
          (fun z : RegularFunction X => approximate z
            (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x2)))).
- rewrite (@StepFSupBallGlueGlue Y (e1+e2) o).
+ rewrite -> (@StepFSupBallGlueGlue Y (e1+e2) o).
  split; [apply IHx1|apply IHx2].
 Qed.
 
@@ -251,11 +251,12 @@ Proof.
  simpl.
  apply ball_weak_le with (Qpos_plus e ((1 # 2) * e1)%Qpos).
   2: apply (regFun_prf_ex x e ((1 # 2) * e1)%Qpos).
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  replace RHS with (e1 - (1#2)*e1).
-  replace RHS with ((1#2)*e1); [| ring].
+  replace RHS with ((1#2)*e1); [| simpl; ring].
   Qauto_nonneg. replace LHS with ((e + e1)+ - (e + (1 # 2) * e1)).
- ring. reflexivity. Qed.
+ simpl. ring. reflexivity.
+Qed.
 
 (*dist . mapN returnM≍returnM*)
 Lemma distmapret: forall X, (ucEq

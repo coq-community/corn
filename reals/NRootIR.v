@@ -230,7 +230,7 @@ Lemma NRoot_resp_leEq : forall x y xpos ypos k kpos,
  x [<=] y -> NRoot (x:=x) (n:=k) xpos kpos [<=] NRoot (x:=y) (n:=k) ypos kpos.
 Proof.
  intros.
- rewrite leEq_def; intro H0.
+ rewrite -> leEq_def; intro H0.
  assert (NRoot ypos kpos[^]k [<=] NRoot xpos kpos[^]k).
   apply power_resp_leEq.
    apply NRoot_nonneg.

@@ -89,6 +89,7 @@ Proof.
   autorewrite with QposElim.
   setoid_replace (e+e+d) with ((e+(1#4)*d)+((1#4)*d+(1#4)*d)+((1#4)*d+e)).
    repeat apply: plus_resp_leEq_both;simpl; try apply: Qpos_min_lb_l; auto with *.
+  simpl.
   by QposRing.
  apply ball_triangle with (approximate g e').
   apply ball_triangle with (approximate f e').
@@ -276,7 +277,7 @@ Lemma Cunit_eq : forall a b, st_eq (Cunit a) (Cunit b) <-> st_eq a b.
 Proof.
  intros a b.
  do 2 rewrite <- ball_eq_iff.
- split; intros H e; [rewrite <- ball_Cunit | rewrite ball_Cunit]; apply H.
+ split; intros H e; [rewrite <- ball_Cunit | rewrite -> ball_Cunit]; apply H.
 Qed.
 
 Lemma ball_approx_r : forall (x:Complete) e, ball e x (Cunit (approximate x e)).
@@ -377,7 +378,7 @@ End FasterInGeneral.
 Lemma QreduceApprox_prf : forall (e:Qpos), QposRed e <= e.
 Proof.
  intros e.
- rewrite QposRed_correct.
+ rewrite -> QposRed_correct.
  apply Qle_refl.
 Qed.
 
@@ -391,7 +392,7 @@ Lemma doubleSpeed_prf : forall (e:Qpos), ((1#2)*e)%Qpos <= e.
 Proof.
  intros e.
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
@@ -441,13 +442,13 @@ Proof.
  apply ball_triangle with y.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1 # 2) * d1)%Qpos)).
-    rewrite ball_Cunit.
+    rewrite -> ball_Cunit.
     apply: ball_approx_l.
    apply ball_approx_l.
   assumption.
  eapply ball_triangle.
   apply ball_approx_r.
- rewrite ball_Cunit.
+ rewrite -> ball_Cunit.
  apply: ball_approx_r.
 Qed.
 
@@ -485,7 +486,7 @@ Proof.
   rewrite Hq in Hd.
   eapply ball_weak_le;[|apply regFun_prf].
   rewrite Q_Qpos_plus.
-  replace RHS with (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos) by QposRing.
+  stepr (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos); [| simpl; QposRing].
   apply: plus_resp_leEq.
   assumption.
  unfold Cmap_slow_raw.
@@ -561,7 +562,7 @@ Proof.
    simpl.
    destruct (mu f e1); try constructor.
    destruct d0; simpl; autorewrite with QposElim;
-     (replace RHS with (((1 # 2) * q + (1 # 2) * q)) by ring); try rewrite Qmin_plus_distr_r;
+     (stepr (((1 # 2) * q + (1 # 2) * q)); [| simpl; ring]); [rewrite -> Qmin_plus_distr_r |]; simpl;
        auto with *.
   apply uc_prf.
   destruct (mu f e0); try constructor.
@@ -573,7 +574,7 @@ Proof.
    2:apply Hxy.
   autorewrite with QposElim.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with (((1 # 4) * q + - z0) + ((1 # 4) * q + - z1)) by ring.
+  stepr (((1 # 4) * q + - z0) + ((1 # 4) * q + - z1)); [| simpl; ring].
   Qauto_nonneg.
  apply: uc_prf.
  eapply ball_ex_weak_le;[|apply regFun_prf_ex].
@@ -581,7 +582,7 @@ Proof.
  simpl.
  destruct (mu f e2); try constructor.
  destruct d0; simpl; autorewrite with QposElim;
-   (replace RHS with (((1 # 2) * q + (1 # 2) * q)) by ring); try rewrite Qmin_plus_distr_l;
+   (stepr (((1 # 2) * q + (1 # 2) * q)); [| simpl;ring]); try rewrite -> Qmin_plus_distr_l; simpl;
      auto with *.
 Qed.
 
@@ -661,7 +662,7 @@ Proof.
   unfold b; clear b.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
-    rewrite ball_Cunit.
+    rewrite -> ball_Cunit.
     apply ball_approx_l.
    apply ball_approx_l.
   apply ball_triangle with (Cunit (approximate x d0)).
@@ -670,7 +671,7 @@ Proof.
     apply QposInf_min_lb_l.
    destruct d0 as [d0|]; try constructor.
    apply ball_approx_r.
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   change (ball_ex ((1 # 4) * q)%Qpos (approximate x d0) (Cunit (approximate (approximate x d0) d0))).
   apply ball_ex_weak_le with (d0)%QposInf.
    apply QposInf_min_lb_l.
@@ -689,7 +690,7 @@ Proof.
  unfold b; clear b.
  apply ball_triangle with x.
   apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
-   rewrite ball_Cunit.
+   rewrite -> ball_Cunit.
    apply ball_approx_l.
   apply ball_approx_l.
  apply ball_triangle with (Cunit (approximate x d0)).
@@ -698,7 +699,7 @@ Proof.
    apply QposInf_min_lb_r.
   destruct d0 as [d0|]; try constructor.
   apply ball_approx_r.
- rewrite ball_Cunit.
+ rewrite -> ball_Cunit.
  change (ball_ex ((1 # 8) * q)%Qpos (approximate x d0) (Cunit (approximate (approximate x d0) d0))).
  apply ball_ex_weak_le with (d0)%QposInf.
   apply QposInf_min_lb_r.
@@ -747,7 +748,7 @@ Proof.
      (approximate (approximate x e2) d2)).
  apply ball_weak_le with (((1 # 2) * d1 + ((1 # 2) * d1 + e2) + d2))%Qpos.
   autorewrite with QposElim.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   auto with *.
  apply (regFun_prf x).
@@ -760,7 +761,7 @@ Lemma BindLaw1 : forall X Y (f:X--> Complete Y) a, (st_eq (Cbind_slow f (Cunit_f
 Proof.
  intros X Y f a.
  change (st_eq (Cjoin (Cmap_slow_fun f (Cunit_fun X a))) (f a)).
- rewrite (MonadLaw3 f a).
+ rewrite -> (MonadLaw3 f a).
  apply MonadLaw5.
 Qed.
 
@@ -774,10 +775,10 @@ Proof.
  intros X Y Z a f g.
  change (st_eq (Cjoin (Cmap_slow_fun g (Cjoin_fun (Cmap_slow f a))))
    (Cjoin (Cmap_slow_fun (uc_compose (Cbind_slow g) f) a))).
- rewrite (MonadLaw2 (Cbind_slow g) f).
+ rewrite -> (MonadLaw2 (Cbind_slow g) f).
  unfold Cbind_slow.
- rewrite (MonadLaw4 g).
- rewrite (MonadLaw2 (Cjoin (X:=Z)) (Cmap_slow g)).
+ rewrite -> (MonadLaw4 g).
+ rewrite -> (MonadLaw2 (Cjoin (X:=Z)) (Cmap_slow g)).
  symmetry.
  apply MonadLaw7.
 Qed.
@@ -811,7 +812,7 @@ Proof.
     apply QposInf_min_lb_l.
    destruct d0 as [d0|];[|constructor].
    apply ball_approx_r.
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   apply H.
  rewrite <- (MonadLaw3 g a0).
  apply: (uc_prf (Cmap_slow g)).
@@ -918,7 +919,7 @@ Proof.
  intros e.
  apply ball_weak_le with ((1#2)*e+e)%Qpos.
   autorewrite with QposElim.
-  rewrite Qle_minus_iff; ring_simplify.
+  rewrite -> Qle_minus_iff; ring_simplify.
   apply: mult_resp_nonneg.
    discriminate.
   apply Qpos_nonneg.
@@ -982,10 +983,10 @@ Proof.
  destruct (Qpos_lt_plus Hed) as [c Hc].
  set (c':=((1#5)*c)%Qpos).
  assert (H:(c'+e+c')%Qpos < (e+(3#1)*c')%Qpos).
-  abstract ( rewrite Qlt_minus_iff; autorewrite with QposElim; ring_simplify; auto with * ).
+  abstract ( rewrite -> Qlt_minus_iff; autorewrite with QposElim; ring_simplify; auto with * ).
  destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
   left.
-  abstract ( change (QposEq d (e+c)) in Hc; rewrite Hc; rewrite <- ball_Cunit in H0;
+  abstract ( change (QposEq d (e+c)) in Hc; rewrite -> Hc; rewrite <- ball_Cunit in H0;
     (setoid_replace (e+c)%Qpos  with (c' + (e + (3 # 1) * c') + c')%Qpos; [ | (unfold c';QposRing)]);
       eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
         [apply ball_approx_r|apply ball_approx_l]).

@@ -101,7 +101,7 @@ Definition ProductMS : MetricSpace.
 Proof.
  exists (prodS X Y) prod_ball.
   abstract ( intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1]; unfold prod_ball;
-    change (QposEq e1 e2) in He; rewrite He Ha0 Ha1 Hb0 Hb1; reflexivity) using prod_ball_wd.
+    change (QposEq e1 e2) in He; rewrite -> He, Ha0, Ha1, Hb0, Hb1; reflexivity) using prod_ball_wd.
  apply prod_is_MetricSpace.
 Defined.
 

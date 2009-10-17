@@ -58,7 +58,7 @@ Section addition.
 Lemma plus_resp_leEq : forall x y z : R, x [<=] y -> x[+]z [<=] y[+]z.
 Proof.
  intros x y z.
- do 2 rewrite leEq_def.
+ do 2 rewrite -> leEq_def.
  intros. intro.
  apply H.
  apply (plus_cancel_less _ _ _ _ X).
@@ -83,7 +83,7 @@ Qed.
 Lemma inv_resp_leEq : forall x y : R, x [<=] y -> [--]y [<=] [--]x.
 Proof.
  intros x y.
- repeat rewrite leEq_def.
+ repeat rewrite -> leEq_def.
  do 2 intro.
  apply H.
  apply inv_cancel_less.
@@ -276,7 +276,7 @@ Multiplication and division respect [[<=]]
 Lemma mult_resp_leEq_rht : forall x y z : R, x [<=] y -> Zero [<=] z -> x[*]z [<=] y[*]z.
 Proof.
  intros x y z .
- repeat rewrite leEq_def.
+ repeat rewrite -> leEq_def.
  intros H H0 H1.
  generalize (shift_zero_less_minus _ _ _ H1); intro H2.
  cut (Zero [<] (x[-]y) [*]z).
@@ -362,7 +362,7 @@ Qed.
 Lemma recip_resp_leEq : forall (x y : R) x_ y_, Zero [<] y -> y [<=] x -> (One[/] x[//]x_) [<=] (One[/] y[//]y_).
 Proof.
  intros x y x_ y_ H.
- do 2 rewrite leEq_def.
+ do 2 rewrite -> leEq_def.
  intros H0 H1. apply H0.
  cut ((One[/] x[//]x_) [#] Zero). intro x'_.
   cut ((One[/] y[//]y_) [#] Zero). intro y'_.
@@ -395,7 +395,7 @@ Hint Resolve recip_resp_leEq: algebra.
 Lemma mult_cancel_leEq : forall x y z : R, Zero [<] z -> x[*]z [<=] y[*]z -> x [<=] y.
 Proof.
  intros x y z H.
- do 2 rewrite leEq_def.
+ do 2 rewrite -> leEq_def.
  intros H0 H1.
  apply H0.
  apply mult_resp_less.
@@ -422,7 +422,7 @@ Qed.
 
 Lemma shift_leEq_mult' : forall (x y z : R) y_, Zero [<] y -> (x[/] y[//]y_) [<=] z -> x [<=] y[*]z.
 Proof.
- intros x y z H H0. repeat rewrite leEq_def. intros H1 H2. apply H1.
+ intros x y z H H0. repeat rewrite -> leEq_def. intros H1 H2. apply H1.
  apply shift_less_div. auto.
   astepl (y[*]z). auto.
 Qed.
@@ -447,7 +447,7 @@ Qed.
 
 Lemma shift_leEq_div : forall (x y z : R) y_, Zero [<] y -> x[*]y [<=] z -> x [<=] (z[/] y[//]y_).
 Proof.
- intros x y z H X. repeat rewrite leEq_def. intros H0 H1. apply H0.
+ intros x y z H X. repeat rewrite -> leEq_def. intros H0 H1. apply H0.
  astepr (y[*]x).
  apply shift_less_mult' with H; auto.
 Qed.
@@ -531,7 +531,7 @@ Section misc.
 
 Lemma sqr_nonneg : forall x : R, Zero [<=] x[^]2.
 Proof.
- intros. rewrite leEq_def in |- *. intro H.
+ intros. rewrite -> leEq_def in |- *. intro H.
  cut (Zero [<] x[^]2). intro H0.
   elim (less_antisymmetric_unfolded _ _ _ H H0).
  cut (x [<] Zero or Zero [<] x). intro H0. elim H0; clear H0; intros H0.
@@ -601,7 +601,7 @@ Proof.
   apply nring_less.
   apply lt_le_trans with (S n).
    auto with arith.
-  elimtype False. move: H; rewrite leEq_def; apply.
+  elimtype False. move: H; rewrite -> leEq_def; apply.
   apply nring_less; auto with arith.
  cut (n <= m).
   auto with arith.
@@ -637,7 +637,7 @@ Load "Opaque_algebra".
 
 Lemma mult_resp_nonneg : forall x y : R, Zero [<=] x -> Zero [<=] y -> Zero [<=] x[*]y.
 Proof.
- intros x y. repeat rewrite leEq_def. intros  H H0 H1. apply H0.
+ intros x y. repeat rewrite -> leEq_def. intros  H H0 H1. apply H0.
  cut (x[*]y [#] Zero). intro H2.
   cut (x [#] Zero). intro H3.
    cut (y [#] Zero). intro H4.
@@ -697,8 +697,8 @@ Qed.
 
 Lemma power_cancel_leEq : forall (x y : R) k, 0 < k -> Zero [<=] y -> x[^]k [<=] y[^]k -> x [<=] y.
 Proof.
- intros x y k H. repeat rewrite leEq_def. intros H0 H1 H2. apply H1.
- apply nexp_resp_less; try rewrite leEq_def; auto.
+ intros x y k H. repeat rewrite -> leEq_def. intros H0 H1 H2. apply H1.
+ apply nexp_resp_less; try rewrite -> leEq_def; auto.
 Qed.
 
 Lemma power_cancel_less : forall (x y : R) k, Zero [<=] y -> x[^]k [<] y[^]k -> x [<] y.
@@ -805,7 +805,7 @@ Qed.
 Lemma approach_zero : forall x : R, (forall e, Zero [<] e -> x [<] e) -> x [<=] Zero.
 Proof.
  intros.
- rewrite leEq_def; intro.
+ rewrite -> leEq_def; intro.
  cut (x [<] x [/]TwoNZ).
   change (Not (x [<] x [/]TwoNZ)) in |- *.
   apply less_antisymmetric_unfolded.
@@ -823,9 +823,9 @@ Qed.
 Lemma approach_zero_weak : forall x : R, (forall e, Zero [<] e -> x [<=] e) -> x [<=] Zero.
 Proof.
  intros.
- rewrite leEq_def; intro.
+ rewrite -> leEq_def; intro.
  cut (x [<=] x [/]TwoNZ).
-  rewrite leEq_def.
+  rewrite -> leEq_def.
   change (~ Not (x [/]TwoNZ [<] x)) in |- *.
   intro H1.
   apply H1.
@@ -845,7 +845,7 @@ Lemma equal_less_leEq : forall a b x y : R,
  (a [<] b -> x [<=] y) -> (a [=] b -> x [<=] y) -> a [<=] b -> x [<=] y.
 Proof.
  intros.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  red in |- *.
  apply CNot_Not_or with (a [<] b) (a [=] b).
    firstorder using leEq_def.
@@ -854,7 +854,7 @@ Proof.
  cut (a [=] b); intros.
   2: apply leEq_imp_eq; auto.
   auto.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intro; auto.
 Qed.
 

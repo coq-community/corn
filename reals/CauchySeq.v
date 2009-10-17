@@ -342,7 +342,7 @@ Qed.
 Lemma leEq_seq_so_leEq_Lim : forall (seq : CauchySeqR) y, (forall i, y [<=] seq i) -> y [<=] Lim seq.
 Proof.
  intros.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  intro H0.
  generalize (Lim_less_so_seq_less _ _ H0); intro H1.
  elim H1; intros N H2.
@@ -357,7 +357,7 @@ Lemma str_leEq_seq_so_leEq_Lim : forall (seq : CauchySeq IR) y,
  (exists N : nat, (forall i, N <= i -> y [<=] seq i)) -> y [<=] Lim seq.
 Proof.
  intros.
- rewrite leEq_def; intro H0.
+ rewrite -> leEq_def; intro H0.
  generalize (Lim_less_so_seq_less _ _ H0).
  elim H; intros N HN.
  intro H1.
@@ -373,7 +373,7 @@ Lemma Lim_leEq_Lim : forall seq1 seq2 : CauchySeqR,
  (forall i, seq1 i [<=] seq2 i) -> Lim seq1 [<=] Lim seq2.
 Proof.
  intros.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  intro H0.
  generalize (Lim_less_Lim_so_seq_less_seq _ _ H0); intro H1.
  elim H1; intros N H2.
@@ -387,7 +387,7 @@ Qed.
 Lemma seq_leEq_so_Lim_leEq : forall (seq : CauchySeqR) y, (forall i, seq i [<=] y) -> Lim seq [<=] y.
 Proof.
  intros.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  intro H0.
  generalize (less_Lim_so_less_seq _ _ H0); intro H1.
  elim H1; intros N H2.
@@ -402,7 +402,7 @@ Lemma str_seq_leEq_so_Lim_leEq : forall (seq : CauchySeq IR) y,
  (exists N : nat, (forall i, N <= i -> seq i [<=] y)) -> Lim seq [<=] y.
 Proof.
  intros.
- rewrite leEq_def; intro H0.
+ rewrite -> leEq_def; intro H0.
  generalize (less_Lim_so_less_seq _ _ H0).
  elim H; intros N HN.
  intro H1.

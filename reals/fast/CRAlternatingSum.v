@@ -148,11 +148,11 @@ Proof.
  intros seq b IH H [[[Za Zb] [[_ Zd] _]] dnn].
  destruct (IH dnn) as [H0 H1].
  split.
-  rewrite Qminus'_correct.
+  rewrite -> Qminus'_correct.
   apply: shift_zero_leEq_minus.
   apply Qle_trans with (hd (tl seq)); auto.
- rewrite Qle_minus_iff.
- rewrite Qminus'_correct.
+ rewrite -> Qle_minus_iff.
+ rewrite -> Qminus'_correct.
  ring_simplify.
  assumption.
 Qed.
@@ -233,7 +233,7 @@ Proof.
   split;[|assumption].
   apply Qle_trans with 0;[|assumption].
   simpl.
-  rewrite Qle_minus_iff; ring_simplify.
+  rewrite -> Qle_minus_iff; ring_simplify.
   destruct dnn as [[[X _] _] _]; assumption.
  assert(H:=ex1).
  induction H;
@@ -254,7 +254,7 @@ Proof.
    (ex3 tt)) Qminus' 0).
  set (b:=(takeUntil (fun s : Stream Q => match Qmetric_dec e2 (hd s) 0 with left _ => true | right _ => false end)
    (ex4 tt)) Qminus' 0).
- stepr (b-a); [| by (simpl; repeat rewrite Qminus'_correct;
+ stepr (b-a); [| by (simpl; repeat rewrite -> Qminus'_correct;
    change (b - a == hd x - a - (hd x - b)); ring)].
  apply AbsSmall_minus.
  rename H0 into IHExists.
@@ -273,7 +273,7 @@ Lemma InfiniteAlternatingSum_step : forall seq (dnn:DecreasingNonNegative seq) (
   ('(hd seq))-(InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)))%CR.
 Proof.
  intros [hd seq] [dnn_hd dnn] zl.
- rewrite CRplus_translate.
+ rewrite -> CRplus_translate.
  apply: regFunEq_e.
  intros e.
  simpl.
@@ -304,20 +304,20 @@ Proof.
   destruct dnn_hd as [_ [[Z0 Z1] dnn_hd0]].
   split;simpl.
    apply Qle_trans with 0.
-    rewrite Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
+    rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
    ring_simplify.
    apply Z0.
   ring_simplify.
   eapply Qle_trans.
    apply Z1.
   destruct X as [_ X].
-  replace LHS with (hd - 0) by ring.
+  stepl (hd - 0); [| simpl; ring].
   apply X.
  destruct (takeUntil_step P (Limit_near zl e) Qminus' 0) as [ex' rw]; [rewrite H;auto|].
  rewrite rw; clear rw.
  simpl.
  rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
- rewrite Qminus'_correct.
+ rewrite -> Qminus'_correct.
  apply: ball_refl.
 Qed.
 
@@ -327,7 +327,7 @@ Lemma InfiniteAlternatingSum_nonneg : forall seq (dnn:DecreasingNonNegative seq)
 Proof.
  intros seq dnn zl e.
  apply Qle_trans with 0.
-  rewrite Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
+  rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
  unfold InfiniteAlternatingSum.
  simpl.
  unfold Cap_raw.
@@ -345,7 +345,7 @@ Lemma InfiniteAlternatingSum_bound : forall seq (dnn:DecreasingNonNegative seq) 
  (InfiniteAlternatingSum dnn zl <= inject_Q (hd seq))%CR.
 Proof.
  intros seq dnn zl.
- rewrite InfiniteAlternatingSum_step.
+ rewrite -> InfiniteAlternatingSum_step.
  change (inject_Q (hd seq) - InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)[<=]inject_Q (hd seq))%CR.
  stepr (inject_Q (hd seq) - inject_Q 0%Q)%CR.
   apply: minus_resp_leEq_rht.
@@ -442,7 +442,7 @@ Lemma InfiniteAlternatingSum_correct : forall (seq:Stream Q) (x:nat -> IR),
 Proof.
  intros seq x Hx dnn zl H.
  unfold series_sum.
- rewrite IR_Lim_as_CR.
+ rewrite -> IR_Lim_as_CR.
  apply: SeqLimit_unique.
  intros e He.
  generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
@@ -481,7 +481,7 @@ Proof.
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
    apply: leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.
-   setoid_replace (hd seq) with (1*hd seq)%Q by ring.
+   assert ((hd seq)%CR == (1*hd seq)%Q). ring. rewrite -> H. clear H.
    destruct X; assumption.
   apply AbsSmall_minus.
   stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  ((- (1)) ^ n0 * Str_nth n0 (tl seq))%Q)))%CR)[-]
@@ -492,16 +492,16 @@ Proof.
    stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq))%CR;[assumption|].
    simpl.
    change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq)) == - ' ((- (1)) ^ n * Str_nth n (tl seq)))%CR).
-   rewrite Qpower_plus;[|discriminate].
+   rewrite -> Qpower_plus;[|discriminate].
    simpl.
    ring.
   stepl (InfiniteAlternatingSum dnn zl[-](('(((- (1)) ^ 0 * Str_nth 0 seq)%Q[+]
     ((Sum0 (G:=Q_as_CAbGroup) n
       (fun n0 : nat => ((- (1)) ^ (S n0) * Str_nth n0 (tl seq))%Q))):Q))%CR));[
-        apply cg_minus_wd;[reflexivity| rewrite CReq_Qeq; apply: Sum0_shift;
+        apply cg_minus_wd;[reflexivity| rewrite -> CReq_Qeq; apply: Sum0_shift;
           intros i; simpl; reflexivity]|].
   unfold cg_minus; simpl.
-  rewrite InfiniteAlternatingSum_step.
+  rewrite -> InfiniteAlternatingSum_step.
   generalize (InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)).
   intros x.
   change (Str_nth 0 seq) with (hd seq).
@@ -515,9 +515,9 @@ Proof.
   change (Qpower_positive (- (1)) (P_of_succ_nat i)) with ((-(1))^ S i).
   rewrite inj_S.
   unfold Zsucc.
-  rewrite Qpower_plus;[|discriminate].
+  rewrite -> Qpower_plus;[|discriminate].
   ring.
- apply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
+ apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].
  clear - Hx.
  induction n.
   reflexivity.

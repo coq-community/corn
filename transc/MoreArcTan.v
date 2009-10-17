@@ -136,7 +136,7 @@ Qed.
 Lemma ArcTan_resp_leEq : forall x y, x[<=]y -> ArcTan x[<=]ArcTan y.
 Proof.
  intros x y Hxy.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intros H.
  apply (leEq_less_or_equal _ _ _ Hxy).
  intros H0.

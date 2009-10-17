@@ -94,7 +94,7 @@ Proof.
   destruct l as [|l];destruct r as [|r]; try split; unfold clamp; apply: inj_Q_leEq; simpl;
     auto with *.
   assert (Y:=(fun a=> (Hg _ (Derivative_imp_inc _ _ _ _ Hf _ (X a)) (X a)))).
- do 2 rewrite Y.
+ do 2 rewrite -> Y.
  rewrite <- CRAbsSmall_ball.
  unfold cg_minus.
  simpl.
@@ -116,7 +116,7 @@ Proof.
    apply inj_Q_leEq.
    simpl; auto with *.
   setoid_replace (inj_Q IR c) with (inj_Q IR (nring 0)).
-   rewrite inj_Q_nring.
+   rewrite -> inj_Q_nring.
    rational.
   apply inj_Q_wd.
   auto.
@@ -201,7 +201,7 @@ Proof.
   rewrite <- leEq_def.
   rewrite -> H0, <- H1.
   apply leEq_reflexive.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intros Z0.
  apply Z.
  intros Z'.

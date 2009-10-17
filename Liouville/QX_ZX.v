@@ -55,14 +55,14 @@ Proof.
  intros p H.
  destruct (RX_deg_spec _ Q_dec _ H) as [Hcoeff Hdeg].
  split.
-  rewrite nth_coeff_c_mult_p.
+  rewrite -> nth_coeff_c_mult_p.
   unfold QX_normalize.
   case (dec_Qeq (nth_coeff (QX_deg p) p) Zero).
    intro; destruct Hcoeff; assumption.
   intro Hap.
   apply (div_1 Q_as_CField).
- intros m Hlt; rewrite nth_coeff_c_mult_p.
- rewrite (Hdeg m Hlt).
+ intros m Hlt; rewrite -> nth_coeff_c_mult_p.
+ rewrite -> (Hdeg m Hlt).
  ring.
 Qed.
 
@@ -79,7 +79,7 @@ Lemma QX_to_monic_apply : forall (p : QX) (a : Q), p ! a [=] Zero ->
   (QX_to_monic p) ! a [=] Zero.
 Proof.
  intros p a Heq.
- unfold QX_to_monic; rewrite mult_apply; rewrite Heq; ring.
+ unfold QX_to_monic; rewrite -> mult_apply; rewrite -> Heq; ring.
 Qed.
 
 Fixpoint den_list (P : QX) : list Z_as_CRing :=
@@ -258,7 +258,7 @@ Proof.
  destruct n.
   reflexivity.
  rewrite Q_can_num_poly_linear.
- rewrite coeff_Sm_lin.
+ rewrite -> coeff_Sm_lin.
  rewrite H.
  apply Q_can_num_spec.
  symmetry; apply coeff_Sm_lin.
@@ -331,7 +331,7 @@ Proof.
  rewrite zx2qx_linear.
  induction n.
   reflexivity.
- rewrite coeff_Sm_lin coeff_Sm_lin.
+ rewrite -> coeff_Sm_lin, coeff_Sm_lin.
  apply Hrec.
 Qed.
 
@@ -341,8 +341,8 @@ Proof.
  apply all_nth_coeff_eq_imp.
  intro n.
  set (Hin n).
- rewrite nth_coeff_zx2qx.
- rewrite (injZ_spec _ i).
+ rewrite -> nth_coeff_zx2qx.
+ rewrite -> (injZ_spec _ i).
  unfold inject_Z; simpl; unfold Qeq; simpl.
  rewrite Zmult_1_r Zmult_1_r.
  symmetry; apply nth_coeff_Q_can_num_poly_spec.
@@ -351,7 +351,7 @@ Qed.
 Lemma Zlcm_den_poly_spec0 : forall P n, nth_coeff n (_C_ (Zlcm_den_poly P:Q_as_CRing) [*] P) [=] Qmake (Zlcm_den_poly P * Qnum (nth_coeff n P)) (Qden (nth_coeff n P)).
 Proof.
  intros P n.
- rewrite nth_coeff_c_mult_p.
+ rewrite -> nth_coeff_c_mult_p.
  simpl.
  generalize (Zlcm_den_poly P), (nth_coeff n P); clear; intros z q.
  destruct q as [qn qd]; simpl.
@@ -369,7 +369,7 @@ Proof.
    apply Q_can_den_spec.
    apply nth_coeff_c_mult_p.
   simpl; unfold Qmult; simpl.
-  rewrite den_1_div_iff.
+  rewrite -> den_1_div_iff.
   unfold Qmult; simpl.
   unfold Zlcm_den_poly.
   rewrite (Zgcd_div_mult_rht (Qnum (nth_coeff n P)) (Qden (nth_coeff n P)));
@@ -388,13 +388,13 @@ Proof.
   intro H.
   transitivity (nth_coeff n (Zero:QX)).
    apply nth_coeff_wd.
-   rewrite {2} H.
+   rewrite -> H at 2.
    apply I.
   reflexivity.
  intro Hap.
- rewrite nth_coeff_c_mult_p.
+ rewrite -> nth_coeff_c_mult_p.
  cut (nth_coeff n P [=] Zero).
-  intro H; rewrite H; ring.
+  intro H; rewrite -> H; ring.
  cut (degree_le (QX_deg P) P).
   intro H; apply H; assumption.
  destruct (RX_deg_spec _ Q_dec P); assumption.

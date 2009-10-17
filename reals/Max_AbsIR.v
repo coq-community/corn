@@ -259,7 +259,7 @@ Proof.
  unfold Max in |- *.
  simpl in |- *.
  intros.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  intro H1.
  generalize (less_MAX_imp _ _ _ H1); intro H2.
  elim H2; intros.
@@ -349,7 +349,7 @@ Qed.
 Lemma Max_is_rht_imp_leEq : forall x y : IR, Max x y [=] y -> x [<=] y.
 Proof.
  intros.
- rewrite leEq_def in |- *.
+ rewrite -> leEq_def in |- *.
  intro H0.
  generalize (less_leEq _ _ _ H0); intro H1.
  generalize (leEq_imp_Max_is_rht _ _ H1); intro.
@@ -711,7 +711,7 @@ Proof.
  apply leEq_imp_eq.
   apply Max_leEq; apply H; (apply leEq_reflexive || apply Min_leEq_lft || apply Min_leEq_rht ||
     apply lft_leEq_Max || apply rht_leEq_Max).
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intros X.
  apply (leEq_or_leEq IR a b).
  intros H0.
@@ -741,7 +741,7 @@ Proof.
  intros f H Ha Hb Hc.
  apply leEq_imp_eq;[| apply leEq_Min; apply H; (apply leEq_reflexive || apply Min_leEq_lft ||
    apply Min_leEq_rht || apply lft_leEq_Max || apply rht_leEq_Max)].
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intros X.
  apply (leEq_or_leEq IR a b).
  intros H0.
@@ -835,7 +835,7 @@ Qed.
 
 Lemma AbsIR_nonneg : forall x : IR, Zero [<=] AbsIR x.
 Proof.
- intro x; rewrite leEq_def; intro H.
+ intro x; rewrite -> leEq_def; intro H.
  cut (Zero [<] ZeroR).
   apply less_irreflexive.
  apply less_wdl with (AbsIR x); auto.

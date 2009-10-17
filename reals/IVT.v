@@ -116,7 +116,7 @@ Lemma Cnested_intervals_limit : {z : IR | forall i, a i [<=] z | forall i, z [<=
 Proof.
  exists (Lim a').
   intros.
-  rewrite leEq_def in |- *. unfold Not in |- *. intros.
+  rewrite -> leEq_def in |- *. unfold Not in |- *. intros.
   elim (Lim_less_so_seq_less a' (a i)). intro n. intros H0.
    elim (le_lt_dec n i); intro H1.
     cut (Not (a i [<] a i)). intro H2.
@@ -131,7 +131,7 @@ Proof.
     auto.
    intros. apply a_mon'; auto.
    auto.
- intros i. rewrite leEq_def. unfold Not. intros H.
+ intros i. rewrite -> leEq_def. unfold Not. intros H.
  elim (less_Lim_so_less_seq a' (b i) H). intro n. intros H0.
  elim (le_lt_dec n i); intro H1.
   cut (Not (a i [<] b i)). unfold Not in |- *. intro.

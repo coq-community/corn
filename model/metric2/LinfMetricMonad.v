@@ -60,7 +60,7 @@ Definition ballS (m : MetricSpace): Qpos ->  m --> m --> iffSetoid.
 Proof.
  intros m e.
  exists (ballS0  m e).
- intros. simpl. split; rewrite H; auto with *.
+ intros. simpl. split; rewrite -> H; auto with *.
 Defined.
 
 (** The definition of the usp metric *)
@@ -89,13 +89,13 @@ Proof.
  unfold StepFSupBall.
  intros a1 a2 Ha x1 x2 Hx y1 y2 Hy.
  apply StepFfoldProp_morphism.
- rewrite Hx.
- rewrite Hy.
+ rewrite -> Hx.
+ rewrite -> Hy.
  setoid_replace (ballS X a1) with (ballS X a2).
   reflexivity.
  intros x y.
  simpl.
- rewrite Ha.
+ rewrite -> Ha.
  reflexivity.
 Qed.
 
@@ -160,7 +160,7 @@ Proof.
  intros e.
  apply: (StepF_ind2).
    intros. rewrite -> H, H0 in H1. apply H1.
-   intro. rewrite H H0. apply H2.
+   intro. rewrite -> H, H0. apply H2.
    apply: ball_closed.
  intros o s s0 t t0 IH0 IH1 H.
  unfold StepFSupBall in *.
@@ -181,7 +181,7 @@ Lemma StepFSupBall_eq : forall (x y : StepF X),
 Proof.
  apply: (StepF_ind2).
    intros s s0 t t0 H H0 H1 H2. rewrite -> H, H0 in H1. apply H1.
-   intro. rewrite H H0. apply H2.
+   intro. rewrite -> H, H0. apply H2.
    apply ball_eq.
  intros o s s0 t t0 H H0 H1.
  unfold StepFSupBall in *. apply glue_resp_StepF_eq.
@@ -231,7 +231,7 @@ Proof.
  destruct H as [Hl Hr].
  destruct (IHl _ _ _ He Hl) as [c Hc0 Hc1].
  destruct (IHr _ _ _ He Hr) as [d Hd0 Hd1].
- exists (glue o c d); simpl; rewrite StepFSupBallGlueGlue; auto.
+ exists (glue o c d); simpl; rewrite -> StepFSupBallGlueGlue; auto.
 Qed.
 
 End SupMetric.
@@ -252,8 +252,8 @@ Proof.
    intros f Hf H. simpl in H. unfold StepFSupBall in H. rewrite -> GlueAp in H.
   rewrite -> StepFfoldPropglue_rew in H. destruct H as [H H1].
   simpl.
-  unfold StepFSupBall. rewrite GlueAp.
-  rewrite StepFfoldPropglue_rew. split.
+  unfold StepFSupBall. rewrite -> GlueAp.
+  rewrite -> StepFfoldPropglue_rew. split.
   pose (HH:=IHb1  (compose1 (SplitLS X o) f)). simpl in HH.
    simpl in HH. unfold StepFSupBall in HH. unfold compose0 in HH.
    assert (rew:(ballS X e ^@> SplitLS0 o (f x)) ==
@@ -272,10 +272,10 @@ Proof.
   intros b f Hf H.
  simpl.
  unfold StepFSupBall. simpl. rewrite MapGlue.
- rewrite ApGlue. rewrite StepFfoldPropglue_rew. split.
+ rewrite ApGlue. rewrite -> StepFfoldPropglue_rew. split.
  clear IHa2. pose (HH:=IHa1 (SplitL b o) (compose1 (SplitLS X o) f)). simpl in HH.
   unfold compose0 in HH. unfold StepFSupBall in HH.
-  rewrite SplitLBind. apply HH; clear HH.
+  rewrite -> SplitLBind. apply HH; clear HH.
   intros. unfold SplitLS0. rewrite <- SplitLMap. rewrite <- SplitLAp.
    apply StepFfoldPropSplitL. apply (Hf c d H0).
    pose (HH:=StepFfoldPropSplitL _ o H). rewrite -> SplitLAp in HH. rewrite SplitLMap in HH.
@@ -283,7 +283,7 @@ Proof.
    assumption. rewrite SplitLGlue;reflexivity.
   clear IHa1. pose (HH:=IHa2 (SplitR b o) (compose1 (SplitRS X o) f)). simpl in HH.
  unfold compose0 in HH. unfold StepFSupBall in HH.
- rewrite SplitRBind. apply HH; clear HH.
+ rewrite -> SplitRBind. apply HH; clear HH.
  intros. unfold SplitRS0. rewrite <- SplitRMap. rewrite <- SplitRAp.
   apply StepFfoldPropSplitR. apply (Hf c d H0).
   pose (HH:=StepFfoldPropSplitR _ o H). rewrite -> SplitRAp in HH. rewrite SplitRMap in HH.
@@ -353,7 +353,7 @@ Definition glue_uc0 (o:OpenUnit):
 Proof.
  intros o x.
  exists (fun y=>(glue o x y)) (fun x:Qpos=> x).
- abstract( intros e a b;  simpl; rewrite StepFSupBallGlueGlue; intuition; apply StepFSupBall_refl).
+ abstract( intros e a b;  simpl; rewrite -> StepFSupBallGlueGlue; intuition; apply StepFSupBall_refl).
 Defined.
 
 Definition glue_uc (o:OpenUnit):
@@ -361,7 +361,7 @@ Definition glue_uc (o:OpenUnit):
 Proof.
  intros o.
  exists (fun y=>(glue_uc0 o y)) (fun x:Qpos=> x).
- abstract (intros e a b; simpl; unfold ucBall; simpl; intros; rewrite StepFSupBallGlueGlue; intuition;
+ abstract (intros e a b; simpl; unfold ucBall; simpl; intros; rewrite -> StepFSupBallGlueGlue; intuition;
    apply StepFSupBall_refl).
 Defined.
 

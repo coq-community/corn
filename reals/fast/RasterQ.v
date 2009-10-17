@@ -243,11 +243,11 @@ Proof.
   destruct Hx as [Hx1 Hx2].
   destruct Hy as [Hy1 Hy2].
   split; unfold fst,snd in *.
-   rewrite Hx1 Hy1.
+   rewrite -> Hx1, Hy1.
    reflexivity.
-  rewrite Hx2 Hy2.
+  rewrite -> Hx2, Hy2.
   reflexivity.
- rewrite (InFinEnumC_wd1 _ _ _ (InterpRaster bm (x2l, x2r) (y2l, y2r)) L0).
+ rewrite -> (InFinEnumC_wd1 _ _ _ (InterpRaster bm (x2l, x2r) (y2l, y2r)) L0).
  apply InFinEnumC_weaken.
  auto using InterpRaster_correct1.
 Qed.

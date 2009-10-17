@@ -68,7 +68,7 @@ Proof.
  simpl.
  cut ((st_eq x a)<->(st_eq y a)).
   unfold orC; tauto.
- rewrite H.
+ rewrite -> H.
  reflexivity.
 Qed.
 
@@ -232,7 +232,7 @@ Proof.
   apply Xstable; assumption.
  eapply ball_weak_le;[|apply Hm].
  autorewrite with QposElim.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  rewrite <- Qle_minus_iff.
  apply Zmult_le_compat; auto with *.
@@ -294,7 +294,7 @@ Proof.
    split; auto 7 with *.
   destruct (infinitePidgeonHolePrinicple _ _ _ H'') as [HG | y [Hy0 Hy1]] using existsC_ind.
    auto using InFinEnumC_stable.
-  rewrite (InFinEnumC_wd1 x y).
+  rewrite -> (InFinEnumC_wd1 x y).
    auto using InFinEnumC_weaken.
   apply ball_eq.
   intros [n d].
@@ -351,7 +351,7 @@ Proof.
    |apply existsWeaken |]).
     exists (f a);split.
      apply: orWeaken; left; reflexivity.
-    rewrite y; apply H.
+    rewrite -> y; apply H.
    destruct (IHs0 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
    apply existsWeaken.
@@ -363,7 +363,7 @@ Proof.
   split.
    apply orWeaken; left; reflexivity.
   apply ball_sym.
-  rewrite y.
+  rewrite -> y.
   apply H.
  destruct (IHs1 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
   auto using existsC_stable.
@@ -395,7 +395,7 @@ Proof.
   abstract ( generalize H; apply existsC_ind;[tauto|]; intros y [Hy0 Hy1]; apply Hy0).
  destruct (@almostDecideX e (e+d)%Qpos x a).
    clear - e d.
-   abstract ( autorewrite with QposElim; rewrite Qlt_minus_iff; ring_simplify; auto with * ).
+   abstract ( autorewrite with QposElim; rewrite -> Qlt_minus_iff; ring_simplify; auto with * ).
   exists a.
   clear - b0.
   abstract (auto using InFinEnumC_weaken with * ).
@@ -437,13 +437,13 @@ Proof.
       auto).
  destruct (almostDecideX a a0 Hed).
   left.
-  abstract ( intros x Hx; apply existsWeaken; exists a0; rewrite Hx;
+  abstract ( intros x Hx; apply existsWeaken; exists a0; rewrite -> Hx;
     auto using InFinEnumC_weaken with * ).
  right.
  abstract ( intros H0; assert (Haa:st_eq a a) by reflexivity;
    destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind; [tauto|];
      destruct (Hz0) as [HG | Hz0 | Hz0] using orC_ind; [tauto |rewrite -> Hz0 in Hz1; contradiction
-       |]; apply H; intros x Hx; apply existsWeaken; exists z; rewrite Hx; auto).
+       |]; apply H; intros x Hx; apply existsWeaken; exists z; rewrite -> Hx; auto).
 Defined.
 
 Lemma HemiMetricStrongAlmostDecidable :
@@ -506,7 +506,7 @@ Proof.
   destruct (Z _ _ He _ _ Hl) as [c0 Hc0 Hc0c].
   assert (He0:e < d2 + d1).
    clear - He.
-   abstract (rewrite Qplus_comm; assumption).
+   abstract (rewrite -> Qplus_comm; assumption).
   destruct (Z _ _ He0 _ _ Hr) as [c1 Hc1 Hc1c].
   clear Z Hl Hr.
   exists (c0 ++ c1).
@@ -538,23 +538,23 @@ Proof.
   abstract (apply orWeaken; left; reflexivity).
  clear H.
  destruct (@preLengthX a b0 (e + (1 # 2) * g)%Qpos d1 d2) as [c Hc0 Hc1].
-   abstract ( clear - Hg; rewrite Hg; autorewrite with QposElim; rewrite Qlt_minus_iff; ring_simplify;
+   abstract ( clear - Hg; rewrite -> Hg; autorewrite with QposElim; rewrite -> Qlt_minus_iff; ring_simplify;
      Qauto_pos).
   abstract (clear - Hb0; destruct Hb0; auto).
  exists (c :: c1).
   abstract ( split; intros x Hx; [destruct Hx as [ G | Hx | Hx ] using orC_ind;
     [auto using existsC_stable |apply existsWeaken; exists c; split; [apply orWeaken;left; reflexivity
-      |rewrite Hx; auto] |destruct Hc1a as [Hc1a _];
+      |rewrite -> Hx; auto] |destruct Hc1a as [Hc1a _];
         destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind; [auto using existsC_stable|];
           apply existsWeaken; exists y; split; auto; apply orWeaken; right; auto]
             |destruct Hx as [ G | Hx | Hx ] using orC_ind; [auto using existsC_stable
               |apply existsWeaken; exists a; split; [apply orWeaken;left; reflexivity
-                |rewrite Hx; auto with *] |destruct Hc1a as [_ Hc1a];
+                |rewrite -> Hx; auto with *] |destruct Hc1a as [_ Hc1a];
                   destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
                     [auto using existsC_stable|]; apply existsWeaken; exists y; split; auto;
                       apply orWeaken; right; auto]]).
  abstract ( destruct Hb0 as [Hb0a Hb0b]; intros x Hx; destruct Hx as [ G | Hx | Hx ] using orC_ind;
-   [auto using existsC_stable |apply existsWeaken; exists b0; split; auto; rewrite Hx; auto
+   [auto using existsC_stable |apply existsWeaken; exists b0; split; auto; rewrite -> Hx; auto
      |apply Hc1b; auto]).
 Defined.
 
@@ -606,7 +606,7 @@ Proof.
    auto using InFinEnumC_stable.
   apply: orWeaken.
   left.
-  rewrite Ha; reflexivity.
+  rewrite -> Ha; reflexivity.
  apply: orWeaken.
  right.
  apply IHl.
@@ -659,7 +659,7 @@ Proof.
   exists (f y).
   split.
    apply InFinEnumC_map; assumption.
-  rewrite Ha.
+  rewrite -> Ha.
   apply (uc_prf f).
   apply ball_ex_weak_le with d; auto.
  apply IHs1; auto.
@@ -712,7 +712,7 @@ Proof.
    split.
     apply orWeaken.
     left; reflexivity.
-   rewrite Ha.
+   rewrite -> Ha.
    rewrite <- ball_Cunit.
    rewrite <- Hy0.
    assumption.

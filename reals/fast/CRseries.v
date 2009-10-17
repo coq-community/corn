@@ -155,7 +155,7 @@ Proof.
   left.
   abstract ( destruct e as [e|];[|apply ForAll_True]; assert (Heq:e==((e*Qpos_inv x)*x)%Qpos);[
     autorewrite with QposElim; field; apply Qpos_nonzero
-      |rewrite (NearBy_comp _ 0 0 (Qeq_refl 0) Heq ); apply (mult_Streams_nbz H Hb)] ).
+      |rewrite -> (NearBy_comp _ 0 0 (Qeq_refl 0) Heq ); apply (mult_Streams_nbz H Hb)] ).
  right.
  simpl.
  rename H0 into IHExists.
@@ -247,14 +247,14 @@ Proof.
   destruct Hy as [Hy _].
   destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
   simpl.
-  rewrite Qabs_Qmult.
+  rewrite -> Qabs_Qmult.
   apply Qle_trans with (Qabs (hd x) * Qabs (hd (tl y))).
    apply Qmult_le_compat_r.
-    do 2 (rewrite Qabs_pos; try assumption).
+    do 2 (rewrite -> Qabs_pos; try assumption).
    apply Qabs_nonneg.
-  rewrite Qabs_Qmult.
-  replace LHS with (Qabs (hd (tl y))*Qabs (hd x)) by ring.
-  replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by ring.
+  rewrite -> Qabs_Qmult.
+  replace LHS with (Qabs (hd (tl y))*Qabs (hd x)) by simpl; ring.
+  replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by simpl; ring.
   apply Qmult_le_compat_r; try assumption.
   apply Qabs_nonneg.
  apply: mult_Streams_Gs.
@@ -285,13 +285,13 @@ Proof.
  unfold Str_nth in *.
  rewrite inj_S.
  simpl.
- rewrite IHn.
+ rewrite -> IHn.
  unfold Zsucc.
  destruct (Qeq_dec a 0).
-  rewrite q.
-  rewrite (Qpower_0 (n+1)); auto with *.
+  rewrite -> q.
+  rewrite -> (Qpower_0 (n+1)); auto with *.
   ring.
- rewrite Qpower_plus;[|assumption].
+ rewrite -> Qpower_plus;[|assumption].
  ring.
 Qed.
 
@@ -299,7 +299,7 @@ Lemma Str_nth_powers : forall n, Str_nth n powers == a^n.
 Proof.
  intros n.
  unfold powers.
- rewrite Str_nth_powers_help.
+ rewrite -> Str_nth_powers_help.
  ring.
 Qed.
 
@@ -312,9 +312,9 @@ Proof.
  intros c.
  constructor.
   simpl.
-  rewrite Qmult_comm.
-  rewrite Qabs_Qmult.
-  rewrite Qabs_pos; try assumption.
+  rewrite -> Qmult_comm.
+  rewrite -> Qabs_Qmult.
+  rewrite -> Qabs_pos; try assumption.
   apply Qle_refl.
  apply: powers_help_Gs.
 Qed.
@@ -340,7 +340,7 @@ Proof.
   simpl.
   split.
    apply: mult_resp_nonneg; assumption.
-  replace RHS with (b*1) by ring.
+  replace RHS with (b*1) by simpl; ring.
   apply: mult_resp_leEq_lft; assumption.
  simpl.
  apply powers_help_dnn.
@@ -369,7 +369,7 @@ Proof.
  apply powers_help_nbz.
  split.
   apply: mult_resp_nonneg; assumption.
- replace RHS with (1*1) by ring.
+ replace RHS with (1*1) by simpl; ring.
  apply: mult_resp_leEq_both; assumption.
 Qed.
 

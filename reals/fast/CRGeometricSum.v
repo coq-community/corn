@@ -83,10 +83,10 @@ Lemma err_prop_key : forall (e:Q) (s: Stream Q) (x:Q),
  err_prop e s -> Qabs x <= a*e -> Qabs (Qplus' (hd s) x) <= e.
 Proof.
  intros e s x Hs Hx.
- rewrite Qplus'_correct.
+ rewrite -> Qplus'_correct.
  eapply Qle_trans.
   apply Qabs_triangle.
- replace RHS with (e*(1-a) + a*e) by ring.
+ stepr (e*(1-a) + a*e); [| simpl; ring].
  assert (X:0 < 1 - a).
   change (0 < 1 + - a).
   rewrite <- Qlt_minus_iff.
@@ -98,6 +98,7 @@ Proof.
   apply Qinv_lt_0_compat; assumption.
  replace RHS with (e:Q).
   assumption.
+ simpl.
  field.
  auto with *.
 Qed.
@@ -112,6 +113,7 @@ Proof.
  rewrite -> Qlt_minus_iff in Ha1.
  replace RHS with (a * (e + - (Qabs (hd s)/(1-a)))+ (a * Qabs (hd s) + - Qabs (hd (tl s)))/(1+-a)).
   Qauto_nonneg.
+ simpl.
  field.
  auto with *.
 Qed.
@@ -132,7 +134,7 @@ Proof.
  apply: mult_resp_leEq_rht.
   destruct Hs as [H0 _].
   eapply Qle_trans;[apply H0|].
-  replace RHS with (1*Qabs(hd s)) by ring.
+  stepr (1*Qabs(hd s)); [| simpl; ring].
   apply: mult_resp_leEq_rht; auto with *.
   apply Qabs_nonneg.
  apply Qinv_le_0_compat.
@@ -292,14 +294,14 @@ Proof.
    apply Qinv_lt_0_compat.
    assumption.
   assert (0 <e) by auto with *.
-  replace RHS with (/a^n) by (field; split; auto with * ).
-  replace LHS with (/e) by (field; split; auto with * ).
+  stepr (/a^n); [| simpl; field; split; auto with *].
+  stepl (/e); [| simpl; field; split; auto with *].
   rewrite -> Qlt_minus_iff in Ha1.
   change (0<1-a) in Ha1.
   rewrite -> Qle_minus_iff in H.
   apply Qle_trans with (1 + n*(/a -1)).
-   rewrite Qle_minus_iff.
-   replace RHS with (1+(1 - a)*((n*(1-a)*/a + (n +-(/(e*(1 - a))))))) by field; split; auto with *.
+   rewrite -> Qle_minus_iff.
+   stepr (1+(1 - a)*((n*(1-a)*/a + (n +-(/(e*(1 - a))))))); [| simpl; field; split; auto with *].
    apply: plus_resp_nonneg; try discriminate.
    repeat apply: mult_resp_nonneg; simpl; auto with *.
    assert (0 <= 1-a) by auto with *.
@@ -307,23 +309,23 @@ Proof.
   clear -n Ha0'.
   induction n using Pind.
    simpl.
-   replace LHS with (/a) by ring.
+   stepl (/a); [| simpl; ring].
    apply Qle_refl.
   rewrite Zpos_succ_morphism.
   unfold Zsucc.
-  rewrite Qpower_plus;[|auto with *].
-  rewrite Qinv_mult_distr.
-  rewrite injz_plus.
+  rewrite -> Qpower_plus;[|auto with *].
+  rewrite -> Qinv_mult_distr.
+  rewrite -> injz_plus.
   apply Qle_trans with ((1 + n * (/ a - 1))*/a).
-   rewrite Qle_minus_iff.
-   replace RHS with (n*(/a -1)^2) by ring.
+   rewrite -> Qle_minus_iff.
+   stepr (n*(/a -1)^2); [| simpl; ring].
    Qauto_nonneg.
   apply: mult_resp_leEq_rht.
    assumption.
   apply Qinv_le_0_compat; auto with *.
  intros n e _.
  rewrite <- Ha0'.
- rewrite Qpower_0; auto with *.
+ rewrite -> Qpower_0; auto with *.
 Qed.
 
 Definition InfiniteGeometricSum_maxIter series (err:Qpos) : positive :=
@@ -362,11 +364,11 @@ Proof.
   assumption.
  apply Qle_shift_div_l.
   Qauto_pos.
- replace LHS with (Qabs (hd (tl series))) by field;split; auto with *; apply Qpos_nonzero.
+ stepl (Qabs (hd (tl series))); [| simpl; field;split; auto with *; apply Qpos_nonzero].
  destruct Gs as [H _].
  eapply Qle_trans.
   apply H.
- replace RHS with (1*Qabs (hd series)) by ring.
+ stepr (1*Qabs (hd series)); [| simpl; ring].
  apply: mult_resp_leEq_rht;simpl; auto with *.
  apply Qabs_nonneg.
 Qed.
@@ -375,7 +377,7 @@ Lemma InfiniteGeometricSum_maxIter_correct : forall series (err:Qpos), Geometric
  err_prop err (Str_nth_tl (nat_of_P (InfiniteGeometricSum_maxIter series err)) series).
 Proof.
  intros series err H.
- rewrite err_prop_prop.
+ rewrite -> err_prop_prop.
  unfold err_bound.
  assert (X:0 < 1 - a).
   change (0 < 1 + - a).
@@ -386,14 +388,14 @@ Proof.
   destruct (Qlt_le_dec 0 (Qabs (hd series))).
    apply Qmult_lt_0_le_reg_r with (/Qabs (hd series)).
     apply Qinv_lt_0_compat; assumption.
-   replace LHS with (a ^ InfiniteGeometricSum_maxIter series err) by (field; auto with * ).
+   stepl (a ^ InfiniteGeometricSum_maxIter series err); [| simpl; field; auto with *].
    cut (a ^ InfiniteGeometricSum_maxIter series err <= (err * mkQpos X / mkQpos q)%Qpos).
     autorewrite with QposElim; auto.
    apply GeometricCovergenceLemma.
    autorewrite with QposElim.
    unfold InfiniteGeometricSum_maxIter.
-   replace LHS with (Qabs (hd series) / (err * (1 - a) * (1 - a))) by
-     (field;repeat split;auto with *;apply Qpos_nonzero).
+   stepl (Qabs (hd series) / (err * (1 - a) * (1 - a))); [| simpl;
+     (field;repeat split;auto with *;apply Qpos_nonzero)].
    cut (0 < (Qabs (hd series) / (err * (1 - a) * (1 - a)))).
     generalize (Qabs (hd series) / (err * (1 - a) * (1 - a))).
     intros [n d] Hnd.
@@ -416,7 +418,7 @@ Proof.
     autorewrite with QposElim; auto.
    auto with *.
   setoid_replace (Qabs (hd series)) with 0.
-   replace LHS with 0 by ring.
+   stepl 0; [| simpl; ring].
    apply Qlt_le_weak; Qauto_pos.
   apply Qle_antisym; try assumption.
   apply Qabs_nonneg.
@@ -428,20 +430,20 @@ Proof.
  induction p using Pind; intros series H.
   simpl.
   destruct H.
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   assumption.
  rewrite nat_of_P_succ_morphism.
  rewrite Zpos_succ_morphism.
  unfold Zsucc.
- rewrite Qpower_plus';[|discriminate].
- replace RHS with ((Qabs (hd series) * a ^ p)*a) by ring.
+ rewrite -> Qpower_plus';[|discriminate].
+ stepr ((Qabs (hd series) * a ^ p)*a); [| simpl; ring].
  apply Qle_trans with (Qabs (hd (Str_nth_tl (nat_of_P p) series))*a).
   change (S (nat_of_P p)) with (1+(nat_of_P p))%nat.
   rewrite <- Str_nth_tl_plus.
   cut (GeometricSeries (Str_nth_tl (nat_of_P p) series)).
    generalize (Str_nth_tl (nat_of_P p) series).
    intros s [H0 _].
-   rewrite Qmult_comm.
+   rewrite -> Qmult_comm.
    assumption.
   clear -H.
   induction (nat_of_P p).
@@ -499,7 +501,7 @@ Proof.
   unfold Qball.
   rewrite <- AbsSmall_Qabs.
   unfold Qminus.
-  rewrite Qplus_0_r.
+  rewrite -> Qplus_0_r.
   apply err_prop_correct; assumption.
  intros s rec Hs Ind Gs H1.
  clear P0.
@@ -514,10 +516,11 @@ Proof.
  intros H.
  unfold Qball.
  rewrite <- AbsSmall_Qabs.
- repeat rewrite Qplus'_correct.
+ repeat rewrite -> Qplus'_correct.
  set (x:=InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) (err_prop e1) (tl s)) in *.
- setoid_replace (hd s + rec - (hd s + x)) with (rec - x) by ring.
- rewrite AbsSmall_Qabs.
+ set (Qplus' (hd s) rec - Qplus' (hd s) x).
+ setoid_replace (hd s + rec - (hd s + x)) with (rec - x) by (simpl; ring).
+ rewrite -> AbsSmall_Qabs.
  apply Ind.
   destruct Gs; assumption.
  rewrite <- tl_nth_tl.
@@ -540,7 +543,7 @@ Lemma InfiniteGeometricSum_step : forall series (Gs:GeometricSeries series),
   ('(hd series))+(InfiniteGeometricSum (ForAll_Str_nth_tl 1%nat Gs)))%CR.
 Proof.
  intros series Gs.
- rewrite CRplus_translate.
+ rewrite -> CRplus_translate.
  apply: regFunEq_e.
  intros e.
  simpl.
@@ -568,10 +571,10 @@ Proof.
     rewrite <- Qlt_minus_iff.
     assumption.
    clear - He' Ha0 X.
-   replace LHS with ((Qabs (hd series)/(1-a))*(1-a)) by (field; auto with * ).
-   replace RHS with (e*1) by ring.
+   stepl ((Qabs (hd series)/(1-a))*(1-a)); [| simpl; field; auto with *].
+   stepr (e*1); [| simpl; ring].
    apply: mult_resp_leEq_both; simpl; try solve[Qauto_nonneg]; auto with *.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    assumption.
   apply err_prop_correct.
@@ -586,7 +589,7 @@ Proof.
   apply err_prop_monotone'; try assumption.
   apply ForAll_Str_nth_tl.
   assumption.
- rewrite Qplus'_correct.
+ rewrite -> Qplus'_correct.
  rewrite (@InfiniteSum_raw_N_extend' (InfiniteGeometricSum_maxIter (tl series) e)
    (InfiniteGeometricSum_maxIter series e)).
    apply: ball_refl.
@@ -607,8 +610,8 @@ Proof.
   assumption.
  destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
   stepr ('0)%CR.
-   split; simpl; rewrite Hq; try apply CRle_refl.
-   setoid_replace (-'0)%CR with ('0)%CR by ring.
+   split; simpl; rewrite -> Hq; try apply CRle_refl.
+   setoid_replace (-'0)%CR with ('0)%CR by (simpl; ring).
    apply CRle_refl.
   apply: regFunEq_e.
   intros e.
@@ -621,8 +624,8 @@ Proof.
   simpl.
   ring_simplify.
   assert (X:err_prop e series).
-   rewrite err_prop_prop.
-   rewrite Hq.
+   rewrite -> err_prop_prop.
+   rewrite -> Hq.
    apply Qpos_nonneg.
   destruct  (InfiniteGeometricSum_maxIter series e) using Pind.
    simpl.
@@ -650,7 +653,7 @@ Proof.
   autorewrite with QposElim in *.
   split; assumption.
  stepr (InfiniteGeometricSum Gs[-]'0)%CR; [| by (unfold cg_minus; simpl; ring)].
- rewrite CRAbsSmall_ball.
+ rewrite -> CRAbsSmall_ball.
  apply: regFunBall_e.
  intros d.
  simpl.
@@ -660,12 +663,12 @@ Proof.
  rewrite <- AbsSmall_Qabs.
  setoid_replace (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) e'
    series - 0) with (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) e'
-     series) by ring.
+     series) by (simpl; ring).
  apply err_prop_correct; try assumption.
   apply err_prop_monotone with e.
    autorewrite with QposElim.
    Qauto_le.
-  rewrite err_prop_prop.
+  rewrite -> err_prop_prop.
   unfold e.
   autorewrite with QposElim.
   apply Qle_refl.
@@ -729,7 +732,7 @@ Lemma InfiniteGeometricSum_correct : forall (series:Stream Q) (x:nat -> IR),
 Proof.
  intros seq x Hx Gs H.
  unfold series_sum.
- rewrite IR_Lim_as_CR.
+ rewrite -> IR_Lim_as_CR.
  apply: SeqLimit_unique.
  intros e He.
  generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
@@ -759,14 +762,14 @@ Proof.
      apply Hn; assumption.
     unfold cg_minus.
     simpl.
-    rewrite IR_Zero_as_CR.
+    rewrite -> IR_Zero_as_CR.
     ring.
    stepl (IRasCR (CRasIR (e[/]TwoNZ)))%CR; [| by apply CRasIRasCR_id].
    stepr (IRasCR (CRasIR (InfiniteGeometricSum Gs)))%CR; [| by apply CRasIRasCR_id].
    rewrite <- IR_AbsSmall_as_CR.
    apply AbsSmall_approach.
    intros d Hd.
-   rewrite IR_AbsSmall_as_CR.
+   rewrite -> IR_AbsSmall_as_CR.
    stepr (InfiniteGeometricSum Gs); [| by apply eq_symmetric; apply CRasIRasCR_id].
    destruct (Q_dense_in_CReals IR d) as [q Hq0 Hq].
     assumption.
@@ -795,7 +798,7 @@ Proof.
      apply Hm.
     unfold cg_minus.
     simpl.
-    rewrite IR_Zero_as_CR.
+    rewrite -> IR_Zero_as_CR.
     ring.
    intros seq x Hx Gs Hm.
    stepr ((InfiniteGeometricSum (ForAll_Str_nth_tl 1 Gs)[-]IRasCR (Sum0 (G:=IR) m (fun n => (x (S n)))))).
@@ -810,11 +813,11 @@ Proof.
      IRasCR (Sum0 (G:=IR) m (fun n : nat => (x (S n)))) ==
        InfiniteGeometricSum Gs-IRasCR (Sum0 (G:=IR) (S m) x))%CR.
    symmetry.
-   rewrite InfiniteGeometricSum_step.
+   rewrite -> InfiniteGeometricSum_step.
    setoid_replace (IRasCR (Sum0 (G:=IR) (S m) x))
      with (IRasCR (inj_Q _ (hd seq) [+](Sum0 (G:=IR) m (fun n0 : nat => (x (S n0)))%Q))).
-    rewrite (IR_plus_as_CR).
-    rewrite IR_inj_Q_as_CR.
+    rewrite -> (IR_plus_as_CR).
+    rewrite -> IR_inj_Q_as_CR.
     ring.
    apply IRasCR_wd.
    apply eq_symmetric.
@@ -856,7 +859,7 @@ Proof.
     InfiniteGeometricSum (ForAll_Str_nth_tl 1 Gs) == ' (Sum0 (G:=Q_as_CAbGroup) (S n)
       (fun n0 : nat => (Str_nth n0 seq)%Q)) - InfiniteGeometricSum Gs))%CR.
   symmetry.
-  rewrite InfiniteGeometricSum_step.
+  rewrite -> InfiniteGeometricSum_step.
   set (z:=(fun n0 : nat => (Str_nth n0 seq)%Q)).
   setoid_replace ((Sum0 (G:=Q_as_CAbGroup) (S n) z):Q) with ((z O + (Sum0 (G:=Q_as_CAbGroup) n
     (fun n0 : nat => (Str_nth n0 (tl seq))%Q)))).
@@ -865,10 +868,10 @@ Proof.
    simpl.
    ring.
   symmetry.
-  apply Sum0_shift.
+  apply: Sum0_shift.
   intros i.
   reflexivity.
- apply cg_minus_wd;[rewrite IR_Sum0_as_CR|reflexivity].
+ apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].
  clear - Hx.
  induction n.
   reflexivity.

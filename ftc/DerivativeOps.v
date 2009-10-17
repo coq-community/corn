@@ -566,7 +566,7 @@ Proof.
   simpl.
   intros x _ _ _.
   change (Zero[+](x[*](_D_ p)!x[+]One[*]p!x)[=] (p[+](Zero[+X*](_D_ p)))!x).
-  rewrite cpoly_lin.
+  rewrite -> cpoly_lin.
   autorewrite with apply.
   rational.
  Deriv.

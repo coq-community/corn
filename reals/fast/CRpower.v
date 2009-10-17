@@ -67,7 +67,7 @@ Proof.
  stepl (inj_Q IR (Qpower_positive q (P_of_succ_nat n)*q)).
   apply inj_Q_wd.
   simpl.
-  rewrite Qpower_plus_positive.
+  rewrite -> Qpower_plus_positive.
   reflexivity.
  apply inj_Q_mult.
 Qed.
@@ -80,7 +80,7 @@ Proof.
  destruct (p_is_some_anti_convert p) as [n Hn].
  assert (X:=(fun I pI => Derivative_nth I pI _ _ (Derivative_id I pI) n)).
  assert (-c < c)%Q.
-  rewrite Qlt_minus_iff.
+  rewrite -> Qlt_minus_iff.
   ring_simplify.
   change (0 < ((2#1)*c)%Qpos).
   apply Qpos_prf.
@@ -92,7 +92,7 @@ Proof.
   intros [qn qd].
   simpl.
   autorewrite with QposElim.
-  rewrite Qmult_sym.
+  rewrite -> Qmult_sym.
   apply Qle_refl.
  apply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
   simpl.
@@ -122,7 +122,7 @@ Proof.
  stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))); [| by apply AbsIR_mult; apply less_leEq; apply pos_one].
  stepl (AbsIR (nexp IR n (inj_Q _ x))); [| by apply eq_symmetric; apply one_mult].
  stepl (nexp IR n (AbsIR (inj_Q _ x))); [| by apply eq_symmetric; apply AbsIR_nexp].
- stepr (inj_Q IR (c ^ Zpred p)); [| by apply inj_Q_wd; simpl; rewrite Q_Qpos_power; reflexivity].
+ stepr (inj_Q IR (c ^ Zpred p)); [| by apply inj_Q_wd; simpl; rewrite -> Q_Qpos_power; reflexivity].
  rewrite Hn.
  rewrite <- POS_anti_convert.
  rewrite inj_S.
@@ -175,12 +175,12 @@ Proof.
  apply (ContinuousCorrect HI (Continuous_nth I FId (Continuous_id I)  (nat_of_P p)));[|split;assumption].
  intros q [] Hq.
  transitivity (IRasCR (inj_Q IR (Qpower_positive q p))).
-  rewrite IR_inj_Q_as_CR.
+  rewrite -> IR_inj_Q_as_CR.
   simpl.
   change (' q)%CR with (Cunit_fun _ q).
-  rewrite Cmap_fun_correct.
-  rewrite MonadLaw3.
-  rewrite CReq_Qeq.
+  rewrite -> Cmap_fun_correct.
+  rewrite -> MonadLaw3.
+  rewrite -> CReq_Qeq.
   simpl.
   setoid_replace (Qmin c q) with q.
    setoid_replace (Qmax (- c) q) with q.
@@ -206,7 +206,7 @@ Proof.
  transitivity (IRasCR ((CRasIR x)[^](nat_of_P p))).
   symmetry.
   apply CRpower_positive_bounded_correct.
-  rewrite IR_AbsSmall_as_CR.
+  rewrite -> IR_AbsSmall_as_CR.
   stepl ('c1)%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
   stepr x; [| by simpl; symmetry; apply CRasIRasCR_id].
   assumption.
@@ -214,7 +214,7 @@ Proof.
  apply AbsSmall_leEq_trans with (inj_Q IR (c1:Q)).
   apply inj_Q_leEq.
   assumption.
- rewrite IR_AbsSmall_as_CR.
+ rewrite -> IR_AbsSmall_as_CR.
  stepl ('c1)%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
  stepr x; [| by simpl; symmetry; apply CRasIRasCR_id].
  assumption.
@@ -231,7 +231,7 @@ Proof.
  intros c x Hc.
  assert (Hx:(AbsSmall ('(CR_b (1#1) x)) x)%CR).
   split; simpl.
-   rewrite CRopp_Qopp.
+   rewrite -> CRopp_Qopp.
    apply CR_b_lowerBound.
   apply CR_b_upperBound.
  unfold CRpower_positive.
@@ -245,10 +245,10 @@ Lemma CRpower_positive_correct : forall x, (IRasCR (x[^](nat_of_P p))==CRpower_p
 Proof.
  intros x.
  apply CRpower_positive_bounded_correct.
- rewrite IR_AbsSmall_as_CR.
+ rewrite -> IR_AbsSmall_as_CR.
  stepl ('(CR_b (1#1) (IRasCR x)))%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
  split; simpl.
-  rewrite CRopp_Qopp.
+  rewrite -> CRopp_Qopp.
   apply CR_b_lowerBound.
  apply CR_b_upperBound.
 Qed.
@@ -274,7 +274,7 @@ Proof.
   apply uc_wd; assumption.
  apply CRpositive_power_bounded_positive_power.
  split; simpl; rewrite <- Hx.
-  rewrite CRopp_Qopp.
+  rewrite -> CRopp_Qopp.
   apply CR_b_lowerBound.
  apply CR_b_upperBound.
 Qed.

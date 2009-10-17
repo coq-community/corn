@@ -47,21 +47,21 @@ Lemma Sum0_ring_hom : forall R S (phi : RingHom R S) f n,
 Proof.
  intros.
  induction n; [apply rh_pres_zero|].
- simpl; rewrite rh_pres_plus IHn; reflexivity.
+ simpl; rewrite -> rh_pres_plus, IHn; reflexivity.
 Qed.
 
 Lemma Sum_ring_hom : forall R S (phi : RingHom R S) f i j,
   phi (Sum i j f) [=] Sum i j (fun i => phi (f i)).
 Proof.
  intros; unfold Sum, Sum1; simpl.
- rewrite rh_pres_minus rh_pres_plus.
- rewrite Sum0_ring_hom Sum0_ring_hom; reflexivity.
+ rewrite -> rh_pres_minus, rh_pres_plus.
+ rewrite -> Sum0_ring_hom, Sum0_ring_hom; reflexivity.
 Qed.
 
 Lemma nexp_ring_hom : forall R S (phi : RingHom R S) a n, phi (a[^]n) [=] phi a[^]n.
 Proof.
  intros; induction n; [apply rh_pres_unit|].
- rewrite <- nexp_Sn, <- nexp_Sn; rewrite rh_pres_mult IHn; reflexivity.
+ rewrite <- nexp_Sn, <- nexp_Sn; rewrite -> rh_pres_mult, IHn; reflexivity.
 Qed.
 
 Lemma Q_Z_nexp : forall (p : Z_as_CRing) (q : positive) i, ((p#q)[^]i[*](q:Q_as_CRing)[^]i [=] p[^]i)%Q.
@@ -70,13 +70,13 @@ Proof.
  induction i.
   reflexivity.
  rewrite <- nexp_Sn, <- nexp_Sn, <- nexp_Sn.
- rewrite (mult_commutes _ (p#q)%Q).
+ rewrite -> (mult_commutes _ (p#q)%Q).
  rewrite <- CRings.mult_assoc.
- rewrite (mult_commutes _ (p#q)%Q).
- rewrite (mult_commutes _ (q:Q_as_CRing)).
- rewrite CRings.mult_assoc.
- rewrite CRings.mult_assoc.
- rewrite IHi.
+ rewrite -> (mult_commutes _ (p#q)%Q).
+ rewrite -> (mult_commutes _ (q:Q_as_CRing)).
+ rewrite -> CRings.mult_assoc.
+ rewrite -> CRings.mult_assoc.
+ rewrite -> IHi.
  rewrite (mult_commutes _ p).
  rewrite <- CRings.mult_assoc.
  apply (mult_wdr _ (inject_Z ((p:Z_as_CRing)[^]i)) ((q:Q_as_CRing)[*](p # q)%Q) p).
@@ -94,7 +94,7 @@ Proof.
  assert (degree_le n (zx2qx P)).
   case (ZX_dec P Zero).
    intro H; apply (degree_le_wd _ (_C_ Zero)).
-    rewrite H; split; [reflexivity|apply I].
+    rewrite -> H; split; [reflexivity|apply I].
    apply (degree_le_mon _ _ 0).
     apply le_O_n.
    apply degree_le_c_.
@@ -102,28 +102,28 @@ Proof.
   destruct (RX_deg_spec _ Z_dec _ Hap).
   clear c; fold (ZX_deg P) in d; fold n in d.
   intros m Hlt.
-  rewrite nth_coeff_zx2qx.
+  rewrite -> nth_coeff_zx2qx.
   rewrite d; [reflexivity|assumption].
- rewrite (poly_as_sum _ _ _ H).
+ rewrite -> (poly_as_sum _ _ _ H).
  rewrite <- mult_distr_sum_lft.
  rewrite -> (Sum_ring_hom _ _ injZ_rh).
  apply Sum_wd'.
   apply le_O_n.
  intros i H0 Hn.
- rewrite nth_coeff_zx2qx.
- rewrite rh_pres_mult.
- rewrite rh_pres_mult.
- rewrite mult_commutes.
- rewrite nexp_ring_hom nexp_ring_hom.
+ rewrite -> nth_coeff_zx2qx.
+ rewrite -> rh_pres_mult.
+ rewrite -> rh_pres_mult.
+ rewrite -> mult_commutes.
+ rewrite -> nexp_ring_hom, nexp_ring_hom.
  rewrite <- CRings.mult_assoc, <- CRings.mult_assoc.
  apply mult_wdr.
  rewrite {1} (le_plus_minus _ _ Hn).
  clear H0 Hn.
  rewrite <- nexp_plus.
- rewrite CRings.mult_assoc.
+ rewrite -> CRings.mult_assoc.
  apply mult_wdl.
  simpl (injZ_rh p).
- rewrite (Q_Z_nexp p q i).
+ rewrite -> (Q_Z_nexp p q i).
  apply (nexp_ring_hom _ _ injZ_rh).
 Qed.
 
@@ -132,14 +132,14 @@ Proof.
  intros P a Hap.
  case (QX_dec P Zero).
   intro; apply RX_deg_wd.
-  rewrite s; ring.
+  rewrite -> s; ring.
  intro HapP.
  apply (degree_inj _ (_C_ a [*] P)).
   case (QX_dec (_C_ a[*]P) Zero).
    intro Heq; destruct (ap_imp_neq _ _ _ HapP); clear HapP.
    apply all_nth_coeff_eq_imp.
    intro i; set (nth_coeff_wd _ i _ _ Heq).
-   revert s; rewrite nth_coeff_c_mult_p.
+   revert s; rewrite -> nth_coeff_c_mult_p.
    fold QX; simpl (nth_coeff i (Zero:QX)).
    intro Heq2; apply (mult_eq_zero _ a); [apply Hap|assumption].
   apply RX_deg_spec.
@@ -150,8 +150,8 @@ Proof.
   rewrite -> nth_coeff_c_mult_p in H.
   apply (mult_eq_zero _ _ _ Hap H).
  intros m Hlt.
- rewrite nth_coeff_c_mult_p.
- rewrite (d m Hlt); ring.
+ rewrite -> nth_coeff_c_mult_p.
+ rewrite -> (d m Hlt); ring.
 Qed.
 
 Lemma den_div_Pn0 : forall (Q : ZX) (n : nat) (p q : Z_as_CRing),
@@ -161,14 +161,14 @@ Proof.
  clear QX QX_dec QX_deg.
  intros P n p q.
  destruct n.
-  rewrite Sum_one.
+  rewrite -> Sum_one.
   simpl.
   rewrite Zmult_1_r; intro H; rewrite H.
   apply Zdivides_zero_rht.
- rewrite Sum_last.
+ rewrite -> Sum_last.
  rewrite minus_diag.
  simpl (q[^]0).
- rewrite mult_one.
+ rewrite -> mult_one.
  generalize (nth_coeff (S n) P[*]p[^]S n); intro r.
  exists ([--](Sum 0 n (fun i : nat => nth_coeff i P[*]p[^]i[*]q[^](n - i)))).
  rewrite Zopp_mult_distr_l_reverse.
@@ -208,16 +208,16 @@ Proof.
  intros P a Hval.
  set (P0 := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
  assert (H : P0 ! a [=] Zero).
-  unfold P0; rewrite mult_apply c_apply Hval; ring.
+  unfold P0; rewrite -> mult_apply, c_apply, Hval; ring.
  clear Hval; revert H.
- rewrite (zx2qx_spec P0); [|apply Zlcm_den_poly_spec].
+ rewrite -> (zx2qx_spec P0); [|apply Zlcm_den_poly_spec].
  unfold P0; clear P0.
  destruct a as [p q]; unfold Qnum, Qden.
  set (Q := qx2zx P).
  intro Hval.
  assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] Zero).
   unfold Q.
-  rewrite Hval; ring.
+  rewrite -> Hval; ring.
  assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] Zero).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
@@ -278,21 +278,21 @@ Proof.
  clear Pn QX QX_dec QX_deg.
  intros P n p q.
  destruct n.
-  rewrite Sum_one.
+  rewrite -> Sum_one.
   simpl.
   rewrite Zmult_1_r; intro H; rewrite H.
   apply Zdivides_zero_rht.
- rewrite Sum_first.
- rewrite Sum_shift_simpl.
+ rewrite -> Sum_first.
+ rewrite -> Sum_shift_simpl.
  simpl (p[^]0).
- rewrite mult_one.
+ rewrite -> mult_one.
  simpl (S n - 0).
  generalize (nth_coeff 0 P[*]q[^]S n); intro r.
  exists ([--](Sum 0 n (fun i : nat => nth_coeff (S i) P[*]p[^]i[*]q[^](n - i)))).
  rewrite Zopp_mult_distr_l_reverse.
  symmetry; apply (cg_inv_unique Z_as_CRing).
  rewrite <- H.
- rewrite cag_commutes.
+ rewrite -> cag_commutes.
  apply cs_bin_op_wd; [reflexivity|].
  rewrite <- (mult_distr_sum_rht Z_as_CRing).
  apply Sum_wd'.
@@ -311,16 +311,16 @@ Proof.
  intros P a Hval.
  set (Q := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
  assert (H : Q ! a [=] Zero).
-  unfold Q; rewrite mult_apply c_apply Hval; ring.
+  unfold Q; rewrite -> mult_apply, c_apply, Hval; ring.
  clear Hval; revert H.
- rewrite (zx2qx_spec Q); [|apply Zlcm_den_poly_spec].
+ rewrite -> (zx2qx_spec Q); [|apply Zlcm_den_poly_spec].
  unfold Q; clear Q.
  destruct a as [p q]; unfold Qnum, Qden.
  set (Q := qx2zx P).
  intro Hval.
  assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] Zero).
   unfold Q.
-  rewrite Hval; ring.
+  rewrite -> Hval; ring.
  assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] Zero).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
@@ -362,21 +362,21 @@ Proof.
     intro; apply Hap; clear Hap.
     unfold P0 in H.
     cut ((_C_ (Zlcm_den_poly P:Q_as_CRing) [*] P) ! Zero [=] Zero).
-     rewrite mult_apply c_apply.
+     rewrite -> mult_apply, c_apply.
      intro H0; apply (Qmult_eq (Zlcm_den_poly P)); [|assumption].
      intro H1; destruct (Zlcm_den_poly_nz P).
      unfold Qeq in H1; simpl in H1.
      rewrite Zmult_1_r in H1; assumption.
     cut ((zx2qx (qx2zx P)) ! Zero [=] Zero).
-     rewrite qx2zx_spec; tauto.
+     rewrite -> qx2zx_spec; tauto.
     unfold zx2qx.
     rewrite <- (rh_pres_zero _ _ injZ_rh) at 1.
     rewrite <- cpoly_map_apply.
     cut ((qx2zx P) ! Zero [=] Zero).
      intro H0; rewrite H0; reflexivity.
-    rewrite poly_at_zero; assumption.
+    rewrite -> poly_at_zero; assumption.
    case (QX_dec P Zero).
-    intro H; destruct Hap; rewrite H; reflexivity.
+    intro H; destruct Hap; rewrite -> H; reflexivity.
    intros Hap2 Heq; apply (ap_imp_neq _ _ _ Hap2); clear Hap Hval; revert Heq.
    unfold Pn.
    destruct (RX_deg_spec _ Z_dec (qx2zx P)); [|].
@@ -390,10 +390,10 @@ Proof.
       rewrite Zmult_1_r in H1; assumption.
      set (nth_coeff_wd _ i _ _ Heq2).
      revert s.
-     rewrite nth_coeff_c_mult_p.
+     rewrite -> nth_coeff_c_mult_p.
      simpl; tauto.
     rewrite <- qx2zx_spec.
-    rewrite Heq.
+    rewrite -> Heq.
     apply (rh_pres_zero _ _ zx2qx).
    intro H; destruct c; fold (ZX_deg (qx2zx P)).
    rewrite <- qx2zx_deg; assumption.

@@ -38,7 +38,7 @@ Lemma Qpos_eq_le_def : forall (x y: Qpos), x == y <-> x <= y /\ y <= x.
 Proof.
  intros.
  split.
-  intros H; rewrite H.
+  intros H; rewrite -> H.
   firstorder using Qle_refl.
  firstorder using Qle_antisym.
 Qed.
@@ -176,7 +176,7 @@ Definition Qpos_min_max_disassoc : forall x y z : Qpos, Qpos_min (Qpos_max x y) 
 Lemma Qplus_monotone_r : forall a, Qpos_monotone (Qpos_plus a).
 Proof.
  intros a x y Hxy.
- repeat rewrite Q_Qpos_plus.
+ repeat rewrite -> Q_Qpos_plus.
  firstorder using Qle_refl Qplus_le_compat .
 Qed.
 Lemma Qplus_monotone_l : forall a, Qpos_monotone (fun x => Qpos_plus x a).

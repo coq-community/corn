@@ -56,10 +56,10 @@ Proof.
  rewrite Str_nth_zipWith.
  rewrite Str_nth_everyOther.
  rewrite Str_nth_recip_positives.
- rewrite Str_nth_powers_help.
+ rewrite -> Str_nth_powers_help.
  rewrite <- Qpower_mult.
  rewrite inj_plus.
- rewrite (Qpower_plus' a 1 (2*n)%nat); auto with *.
+ rewrite -> (Qpower_plus' a 1 (2*n)%nat); auto with *.
  rewrite inj_mult.
  reflexivity.
 Qed.
@@ -69,12 +69,12 @@ Hypothesis Ha: 0 <= a <= 1.
 Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
  split.
-  replace RHS with ((1*a)*a) by ring.
+  replace RHS with ((1*a)*a) by simpl; ring.
   apply (sqr_nonneg _ a).
- rewrite Qle_minus_iff.
- replace RHS with ((1-a)*(1+a)) by ring.
+ rewrite -> Qle_minus_iff.
+ replace RHS with ((1-a)*(1+a)) by simpl; ring.
  destruct Ha as [Ha0 Ha1].
- apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by ring];
+ apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by simpl; ring];
    rewrite <- Qle_minus_iff; try assumption.
  apply Qle_trans with 0.
   discriminate.
@@ -110,7 +110,7 @@ Lemma rational_arctan_small_pos_correct : forall (a:Q) Ha, a < 1 ->
 Proof.
  intros a Ha Ha0.
  unfold rational_arctan_small_pos.
- rewrite InfiniteAlternatingSum_correct'.
+ rewrite -> InfiniteAlternatingSum_correct'.
  apply IRasCR_wd.
  assert (X:(olor ([--]One) One (inj_Q IR a))).
   split.
@@ -153,8 +153,8 @@ Proof.
  apply inj_Q_wd.
  csetoid_rewrite (nring_Q (S (2*n))).
  change (S (2 * n)*Str_nth n (arctanSequence a)==a ^ (2 * n + 1)%nat).
- rewrite Str_nth_arctanSequence.
- rewrite (Qmake_Qdiv).
+ rewrite -> Str_nth_arctanSequence.
+ rewrite -> (Qmake_Qdiv).
  rewrite plus_comm.
  generalize (a^(2*n+1)%nat).
  intros b.
@@ -172,8 +172,8 @@ Proof.
  intros a.
  destruct (Qle_total a 0); intros Ha.
   refine (-(@rational_arctan_small_pos (-a)%Q _))%CR.
-  abstract ( split; [(replace RHS with (0+-a) by ring); rewrite <- Qle_minus_iff; assumption
-    |rewrite Qle_minus_iff; (replace RHS with (a + - - (1)) by ring); rewrite <- Qle_minus_iff;
+  abstract ( split; [(replace RHS with (0+-a) by simpl; ring); rewrite <- Qle_minus_iff; assumption
+    |rewrite -> Qle_minus_iff; (replace RHS with (a + - - (1)) by simpl; ring); rewrite <- Qle_minus_iff;
       destruct Ha; assumption]).
  apply (@rational_arctan_small_pos a).
  abstract ( split;[|destruct Ha; assumption]; apply Qnot_lt_le; apply Qle_not_lt; assumption).
@@ -184,7 +184,7 @@ Lemma rational_arctan_small_correct : forall (a:Q) Ha, -(1) < a -> a < 1 ->
 Proof.
  intros a Ha Ha0 Ha1.
  unfold rational_arctan_small.
- destruct (Qle_total a 0); rewrite rational_arctan_small_pos_correct.
+ destruct (Qle_total a 0); rewrite -> rational_arctan_small_pos_correct.
     rewrite <- IR_opp_as_CR.
     apply IRasCR_wd.
     csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
@@ -194,8 +194,8 @@ Proof.
     apply inj_Q_wd.
     simpl.
     ring.
-   rewrite Qlt_minus_iff.
-   replace RHS with (a + - - (1)) by ring.
+   rewrite -> Qlt_minus_iff.
+   replace RHS with (a + - - (1)) by simpl; ring.
    rewrite <- Qlt_minus_iff.
    assumption.
   reflexivity.

@@ -43,7 +43,7 @@ Proof.
  cut (st_eq x y -> ball (m:=ms) e x y).
   tauto.
  intros H.
- rewrite H.
+ rewrite -> H.
  apply ball_refl.
 Qed.
 
@@ -76,7 +76,7 @@ Proof.
  intros d.
  destruct (H e (e+d)%Qpos x y); try (assumption || contradiction).
  autorewrite with QposElim.
- rewrite Qlt_minus_iff; ring_simplify; auto with *.
+ rewrite -> Qlt_minus_iff; ring_simplify; auto with *.
 Qed.
 (* begin hide *)
 Hint Resolve decidable_located located_stable : classification.

@@ -838,7 +838,7 @@ Proof.
    intro; apply H3; split; try left; assumption.
   assert (H5 : ~ x_ m[-]y_ m [<=] [--]e2).
    intro; apply H3; split; try right; assumption.
-  split; rewrite leEq_def; intro.
+  split; rewrite -> leEq_def; intro.
    apply H5.
    apply leEq_transitive with ([--]e).
     apply less_leEq; assumption.

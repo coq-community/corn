@@ -141,13 +141,13 @@ Proof.
   unfold SupDistanceToLinear.
   simpl.
   autorewrite with QposElim.
-  rewrite Hl.
-  rewrite Hr.
+  rewrite -> Hl.
+  rewrite -> Hr.
   reflexivity.
- do 2 rewrite SupDistanceToLinear_glue.
+ do 2 rewrite -> SupDistanceToLinear_glue.
  assert (X:(affineCombo (OpenUnitDual o) l1 r1==affineCombo (OpenUnitDual o) l2 r2)%Q).
-  rewrite Hl.
-  rewrite Hr.
+  rewrite -> Hl.
+  rewrite -> Hr.
   reflexivity.
  apply Qmax_compat.
   apply IHx1; auto.
@@ -159,10 +159,10 @@ Lemma Qmax_affineCombo : forall x a b o, a < b -> (Qmax (Qmax (x - a) (affineCom
 Proof.
  intros x a b o H.
  rewrite <- Qmax_assoc.
- rewrite (Qmax_assoc (affineCombo o a b - x)).
- rewrite (Qmax_comm (affineCombo o a b - x)).
+ rewrite -> (Qmax_assoc (affineCombo o a b - x)).
+ rewrite -> (Qmax_comm (affineCombo o a b - x)).
  rewrite <- (Qmax_assoc (x - affineCombo o a b)).
- rewrite Qmax_assoc.
+ rewrite -> Qmax_assoc.
  apply Qmax_compat.
   rewrite <- Qle_max_l.
   apply: plus_resp_leEq_lft;simpl; auto with *.
@@ -182,32 +182,32 @@ Proof.
   unfold SupDistanceToLinear.
   simpl.
   autorewrite with QposElim.
-  rewrite Hc.
+  rewrite -> Hc.
   apply Qmax_affineCombo; auto with *.
   apply Qlt_trans with c; assumption.
  intros p a b c H0 H1 Hc.
  apply SplitLR_glue_ind; intros H.
-   do 2 rewrite SupDistanceToLinear_glue.
-   rewrite Qmax_assoc.
-   rewrite IHx1.
-    apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite Hc; unfold affineCombo;
+   do 2 rewrite -> SupDistanceToLinear_glue.
+   rewrite -> Qmax_assoc.
+   rewrite -> IHx1.
+    apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite -> Hc; unfold affineCombo;
       simpl; field; auto with *.
-   rewrite Hc.
+   rewrite -> Hc.
    unfold affineCombo.
    simpl.
    field; auto with *.
-  do 2 rewrite SupDistanceToLinear_glue.
+  do 2 rewrite -> SupDistanceToLinear_glue.
   rewrite <- Qmax_assoc.
-  rewrite IHx2.
-   apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite Hc; unfold affineCombo;
+  rewrite -> IHx2.
+   apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite -> Hc; unfold affineCombo;
      simpl; field; auto with *.
-  rewrite Hc.
+  rewrite -> Hc.
   unfold affineCombo.
   simpl.
   field; auto with *.
- rewrite SupDistanceToLinear_glue.
- apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite Hc; unfold affineCombo;
-   simpl; rewrite H; field; auto with *.
+ rewrite -> SupDistanceToLinear_glue.
+ apply Qmax_compat; apply SupDistanceToLinear_wd1; try reflexivity; rewrite -> Hc; unfold affineCombo;
+   simpl; rewrite -> H; field; auto with *.
 Qed.
 
 Lemma SupDistanceToLinear_wd2 : forall x1 x2 a b (H: a < b), x1 == x2 ->
@@ -220,21 +220,21 @@ Proof.
    simpl in *.
    autorewrite with QposElim.
    change (x == x0)%Q in Hx.
-   rewrite Hx.
+   rewrite -> Hx.
    reflexivity.
   intros a b H Hx.
   destruct Hx as [H0 H1] using (eq_glue_ind x2_1).
-  rewrite SupDistanceToLinear_glue.
+  rewrite -> SupDistanceToLinear_glue.
   rewrite <- IHx2_1; auto with *.
   rewrite <- IHx2_2; auto with *.
   unfold SupDistanceToLinear.
   simpl.
   autorewrite with QposElim.
   rewrite <- Qmax_assoc.
-  rewrite (Qmax_assoc (affineCombo (OpenUnitDual o) a b - x)).
-  rewrite (Qmax_comm (affineCombo (OpenUnitDual o) a b - x)).
+  rewrite -> (Qmax_assoc (affineCombo (OpenUnitDual o) a b - x)).
+  rewrite -> (Qmax_comm (affineCombo (OpenUnitDual o) a b - x)).
   rewrite <- (Qmax_assoc (x - affineCombo (OpenUnitDual o) a b)).
-  rewrite Qmax_assoc.
+  rewrite -> Qmax_assoc.
   symmetry.
   apply Qmax_compat.
    rewrite <- Qle_max_l.
@@ -243,10 +243,10 @@ Proof.
   apply: plus_resp_leEq;simpl; auto with *.
  intros x2 a b H Hx.
  destruct Hx as [H0 H1] using (glue_eq_ind x1_1).
- rewrite SupDistanceToLinear_glue.
- rewrite (IHx1_1 _ _ _ (affineCombo_gt (OpenUnitDual o) H) H0).
- rewrite (IHx1_2 _ _ _ (affineCombo_lt (OpenUnitDual o) H) H1).
- rewrite SupDistanceToLinear_split; [|reflexivity].
+ rewrite -> SupDistanceToLinear_glue.
+ rewrite -> (IHx1_1 _ _ _ (affineCombo_gt (OpenUnitDual o) H) H0).
+ rewrite -> (IHx1_2 _ _ _ (affineCombo_lt (OpenUnitDual o) H) H1).
+ rewrite -> SupDistanceToLinear_split; [|reflexivity].
  apply SupDistanceToLinear_wd1; try reflexivity.
 Qed.
 
@@ -261,7 +261,7 @@ Proof.
  intros c a b H H0.
  change (constStepF (X:=QS) c + glue o x1 x2)
    with (glue o (constStepF (c:QS) + x1) (constStepF (c:QS) + x2)).
- do 2 rewrite SupDistanceToLinear_glue.
+ do 2 rewrite -> SupDistanceToLinear_glue.
  set (A:=(affineCombo_gt (OpenUnitDual o) H)).
  apply Qmax_compat.
   eapply Seq_trans.
@@ -285,19 +285,19 @@ Proof.
  assert (X:0 < c).
   rewrite -> Qlt_minus_iff in *|-.
   apply: (mult_cancel_less _ 0 c (b + - a))%Q; simpl; auto with *.
-  replace LHS with 0 by ring.
-  replace RHS with (c* b + - (c*a))%Q by ring.
+  replace LHS with 0 by simpl; ring.
+  replace RHS with (c* b + - (c*a))%Q by simpl; ring.
   assumption.
  revert c a b H H0 X.
  induction x using StepF_ind.
   intros; unfold SupDistanceToLinear; simpl.
   autorewrite with QposElim.
-  rewrite Qmax_mult_pos_distr_r; auto with *.
+  rewrite -> Qmax_mult_pos_distr_r; auto with *.
   apply Qmax_compat; ring.
  intros c a b H H0 X.
  change (constStepF (X:=QS) c * glue o x1 x2)
    with (glue o (constStepF (c:QS) * x1) (constStepF (c:QS) * x2)).
- do 2 rewrite SupDistanceToLinear_glue.
+ do 2 rewrite -> SupDistanceToLinear_glue.
  eapply Seq_trans.
    apply Q_Setoid.
   apply Qmax_mult_pos_distr_r; auto with *.
@@ -332,26 +332,26 @@ Proof.
   intros x x0 a b H.
   unfold StepFSupBall, StepFfoldProp.
   simpl.
-  rewrite Qball_Qabs.
+  rewrite -> Qball_Qabs.
   unfold SupDistanceToLinear.
   simpl.
   autorewrite with QposElim.
   apply Qabs_case; intros  H0.
-   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q; [| by ring].
+   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q; [| by simpl; ring].
    apply: plus_resp_leEq_both; simpl; auto with *.
-   replace RHS with (Qmax (x-a) (b-x) + 0)%Q by ring.
+   replace RHS with (Qmax (x-a) (b-x) + 0)%Q by simpl; ring.
    apply: plus_resp_leEq_both; simpl; auto with *.
    apply Qlt_le_weak.
    rewrite -> Qlt_minus_iff in *.
-   replace RHS with (b + -a)%Q by ring.
+   replace RHS with (b + -a)%Q by simpl; ring.
    assumption.
-  setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q; [| by ring].
+  setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q; [| by simpl; ring].
   apply: plus_resp_leEq_both; simpl; auto with *.
-  replace RHS with (Qmax (x-a) (b-x) + 0)%Q by ring.
+  replace RHS with (Qmax (x-a) (b-x) + 0)%Q by simpl; ring.
   apply: plus_resp_leEq_both; simpl; auto with *.
   apply Qlt_le_weak.
   rewrite ->  Qlt_minus_iff in *.
-  replace RHS with (b + -a)%Q by ring.
+  replace RHS with (b + -a)%Q by simpl; ring.
   assumption.
  intros o s s0 t t0 H0 H1 a b H.
  assert (X:forall (o : OpenUnit) (l r : StepQ) (a b : Q) (H : a < b),
@@ -362,8 +362,8 @@ Proof.
   unfold QposEq.
   autorewrite with QposElim.
   reflexivity.
- do 2 rewrite X.
- rewrite StepFSupBallGlueGlue.
+ do 2 rewrite -> X.
+ rewrite -> StepFSupBallGlueGlue.
  split.
   apply: ball_weak_le;[|simpl; apply H0].
   autorewrite with QposElim.
@@ -382,7 +382,7 @@ Proof.
    replace (stepSample (xI p))
      with (glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * (stepSample (Psucc p))) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*(stepSample p))))
        by (symmetry;apply: positive_rect2_red1).
-   rewrite SupDistanceToLinear_glue.
+   rewrite -> SupDistanceToLinear_glue.
    generalize (@affineCombo_gt (OpenUnitDual (Build_OpenUnit (oddGluePoint p))) 0 1 (pos_one Q_as_COrdField))
      (@affineCombo_lt (OpenUnitDual (Build_OpenUnit (oddGluePoint p))) 0 1 (pos_one Q_as_COrdField)).
    intros A B.
@@ -390,32 +390,32 @@ Proof.
    transitivity (Qmax (1#2*xI p) (1#2*xI p))%Q;[|apply Qmax_idem].
    apply Qmax_compat.
     set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (Psucc p # xI p) * stepSample (Psucc p)) A)).
-    transitivity ((Psucc p#xI p)*(SupDistanceToLinear (stepSample (Psucc p)) C))%Q; [|rewrite IHp;
+    transitivity ((Psucc p#xI p)*(SupDistanceToLinear (stepSample (Psucc p)) C))%Q; [|rewrite -> IHp;
       change ((Psucc p * 1 * (2 * (2* p + 1)) = 2* (Psucc p + p * (2* (Psucc p))))%Z);
         repeat rewrite Zpos_succ_morphism; ring].
     assert (X:(Psucc p # xI p) *0 < (Psucc p # xI p) *1).
      constructor.
-    rewrite (fun a => SupDistanceToLinear_scale a C X).
+    rewrite -> (fun a => SupDistanceToLinear_scale a C X).
     apply SupDistanceToLinear_wd1.
      simpl; ring.
     unfold affineCombo; simpl; unfold QONE; ring.
    set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (1 # xI p) *
      (constStepF (X:=QS) (Psucc p) + constStepF (X:=QS) p * stepSample p)) B)%Q).
-   transitivity ((1#xI p)*(p*(SupDistanceToLinear (stepSample (p)) C)))%Q; [|rewrite IHp0;
+   transitivity ((1#xI p)*(p*(SupDistanceToLinear (stepSample (p)) C)))%Q; [|rewrite -> IHp0;
      change ((p * 1 * (2 * (2* p + 1)) = 2* (p + p * (2* p)))%Z); ring].
    assert (X0:(p *0 < p *1)).
     constructor.
-   rewrite (fun a => SupDistanceToLinear_scale a C X0).
+   rewrite -> (fun a => SupDistanceToLinear_scale a C X0).
    assert (X1:(p*0 + Psucc p < p*1 + Psucc p)).
     apply: plus_resp_less_rht.
     assumption.
-   rewrite (fun a => SupDistanceToLinear_translate a X0 X1).
+   rewrite -> (fun a => SupDistanceToLinear_translate a X0 X1).
    assert (X2:((1# xI p)*(p*0 + Psucc p) < (1#xI p)*(p*1 + Psucc p))).
     apply: mult_resp_less_lft;simpl; auto with *.
-   rewrite (fun a => SupDistanceToLinear_scale a X1 X2).
+   rewrite -> (fun a => SupDistanceToLinear_scale a X1 X2).
    apply SupDistanceToLinear_wd1.
     unfold affineCombo; simpl; unfold QONE.
-    repeat rewrite Zpos_succ_morphism; repeat rewrite Qmake_Qdiv; repeat rewrite Zpos_xI;
+    repeat rewrite -> Zpos_succ_morphism; repeat rewrite -> Qmake_Qdiv; repeat rewrite -> Zpos_xI;
       field; auto with *.
    change (2*(p*1) + 1 = ((p*1*1 + Psucc p*1)*1))%Z.
    rewrite Zpos_succ_morphism; ring.
@@ -423,7 +423,7 @@ Proof.
   replace (stepSample (xO p)) with (glue (ou (1#2)) (constStepF (1#2:QS) * (stepSample p))
     (constStepF (1#2:QS) * (constStepF (1:QS) + (stepSample p))))
       by (symmetry;apply: positive_rect2_red2).
-  rewrite SupDistanceToLinear_glue.
+  rewrite -> SupDistanceToLinear_glue.
   generalize (@affineCombo_gt (OpenUnitDual (ou (1#2))) 0 1 (pos_one Q_as_COrdField))
     (@affineCombo_lt (OpenUnitDual (ou (1#2))) 0 1 (pos_one Q_as_COrdField)).
   intros A B.
@@ -436,14 +436,14 @@ Proof.
   apply Qmax_compat.
    assert (X:((1#2) *0 < (1#2) *1)).
     constructor.
-   rewrite (fun a c => SupDistanceToLinear_scale a c X).
+   rewrite -> (fun a c => SupDistanceToLinear_scale a c X).
    apply SupDistanceToLinear_wd1; constructor.
   assert (X0:0 + 1 < 1 +1).
    constructor.
-  rewrite (fun a c => SupDistanceToLinear_translate a c X0).
+  rewrite -> (fun a c => SupDistanceToLinear_translate a c X0).
   assert (X1:(1#2)*(0 + 1) < (1#2)*(1 +1)).
    constructor.
-  rewrite (fun a => SupDistanceToLinear_scale a X0 X1).
+  rewrite -> (fun a => SupDistanceToLinear_scale a X0 X1).
   apply SupDistanceToLinear_wd1; constructor.
  reflexivity.
 Qed.
@@ -474,7 +474,7 @@ Proof.
  rewrite Zpos_xO.
  rewrite -> Qle_minus_iff in *.
  change ((2%positive * p)%Z:Q) with (2%positive * p)%Q.
- replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q by (field; split; discriminate).
+ replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q by (simpl; field; split; discriminate).
  apply: mult_resp_nonneg; simpl; auto with *.
 Qed.
 
@@ -518,7 +518,7 @@ Proof.
  set (g:=(fun z : RegularFunction Q_as_MetricSpace => approximate z b)) in *.
  change (Map f (glue o x1 x2)) with (glue o (Map f x1:StepQ) (Map f x2)).
  change (Map g (glue o x1 x2)) with (glue o (Map g x1:StepQ) (Map g x2)).
- rewrite StepFSupBallGlueGlue.
+ rewrite -> StepFSupBallGlueGlue.
  auto.
 Qed.
 
@@ -544,7 +544,7 @@ Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _)
 Proof.
  intros x1 x2 Hx.
  unfold ComposeContinuous_raw.
- rewrite Hx.
+ rewrite -> Hx.
  reflexivity.
 Qed.
 (* end hide *)
@@ -560,7 +560,7 @@ Proof.
    apply H.
    destruct (mu f e); try constructor.
    change (ball q s t).
-   rewrite Hs Ht.
+   rewrite -> Hs, Ht.
    assumption.
   intros x y e H.
   change (ball e (f x) (f y)).
@@ -570,7 +570,7 @@ Proof.
   assumption.
  intros o s s0 t t0 H0 H1 e H.
  unfold ComposeContinuous_raw in *.
- repeat rewrite MapGlue dist_glue.
+ repeat rewrite -> MapGlue, dist_glue.
  intros d1 d2.
  apply ball_weak_le with (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos.
   autorewrite with QposElim.
@@ -578,7 +578,7 @@ Proof.
  simpl.
  unfold Cap_slow_raw.
  simpl.
- rewrite StepFSupBallGlueGlue.
+ rewrite -> StepFSupBallGlueGlue.
  split; [apply H0 | apply H1]; destruct (mu f e); try constructor; simpl in *;
    rewrite -> StepFSupBallGlueGlue in H; tauto.
 Qed.
@@ -639,8 +639,12 @@ Proof.
  intros e.
  eapply ball_triangle; [|apply (@ball_approx_l Q_as_MetricSpace)].
  change (Cunit (approximate (Integrate01 f) e)) with ('(approximate (Integrate01 f) e))%CR.
+
  setoid_replace ('(approximate (Integrate01 f) e))%CR
-   with ('((1-0)*(approximate (Integrate01 f) e)))%CR; [| by ring].
+   with ('((1-0)*(approximate (Integrate01 f) e)))%CR.
+  Focus 2.
+  change (' approximate (Integrate01 f) e == ' ((1 - 0) * approximate (Integrate01 f) e))%CR.
+  ring.
  rewrite <- CRAbsSmall_ball.
  stepl ('((1-0)*e))%CR; [| by (apply inject_Q_wd; ring)].
  set (z:=(integral (inj_Q IR 0) (inj_Q IR 1) H01 F HF)).
@@ -657,7 +661,7 @@ Proof.
   destruct (mu f ((1#2) *e)); try constructor.
   unfold QposEq in Hs.
   simpl.
-  rewrite Hs.
+  rewrite -> Hs.
   apply id01_raw_help_le.
  clear Hs.
  rename X into Hs.
@@ -674,12 +678,12 @@ Proof.
  generalize 0 1.
  intros a b Hf Hab HF Hab0 s Hs.
  destruct (Qpos_lt_plus Hab0) as [ba Hba].
- stepl ('(ba*e)%Qpos)%CR; [| by (apply inject_Q_wd; rewrite Hba; QposRing)].
+ stepl ('(ba*e)%Qpos)%CR; [| by (apply inject_Q_wd; rewrite -> Hba; QposRing)].
  revert a b Hab0 ba Hba F Hab HF Hf Hs.
  induction s using StepF_ind; intros a b Hab0 ba Hba F Hab HF Hf Hs.
   change (AbsSmall (R:=CRasCOrdField) ('(ba*e)%Qpos)%CR (IRasCR (integral _ _ Hab F HF)[-]
     ('((b-a)*(approximate (f x) ((1 # 2) * e)%Qpos)))%CR)).
-  rewrite CRAbsSmall_ball.
+  rewrite -> CRAbsSmall_ball.
   rewrite <- IR_inj_Q_as_CR.
   rewrite <- CRAbsSmall_ball.
   unfold cg_minus.
@@ -693,17 +697,17 @@ Proof.
   set (e':=(inj_Q IR (e:Q))).
   assert (X:forall y : IR, Compact Hab y -> forall Hy : Dom F y, AbsSmall e' ((F y Hy)[-]a0)).
    intros y Hy Hyf.
-   rewrite IR_AbsSmall_as_CR.
+   rewrite -> IR_AbsSmall_as_CR.
    unfold e'.
    apply AbsSmall_wdr with (IRasCR (F y Hyf)[-]IRasCR a0)%CR;[|apply eq_symmetric; apply IR_minus_as_CR].
    eapply AbsSmall_wdl;[|apply eq_symmetric; apply IR_inj_Q_as_CR].
-   rewrite CRAbsSmall_ball.
-   unfold a0; rewrite IR_inj_Q_as_CR.
+   rewrite -> CRAbsSmall_ball.
+   unfold a0; rewrite -> IR_inj_Q_as_CR.
    assert (X0:(forall (q : Q) (Hq : Dom F (inj_Q IR q)), clcr (inj_Q IR a) (inj_Q IR b) (inj_Q IR q) ->
      (Cbind QPrelengthSpace f (' q) == IRasCR (F (inj_Q IR q) Hq))%CR)).
     intros q Hq [Hq0 H1].
-    rewrite (Cbind_correct QPrelengthSpace f (' q))%CR.
-    rewrite (BindLaw1 f).
+    rewrite -> (Cbind_correct QPrelengthSpace f (' q))%CR.
+    rewrite -> (BindLaw1 f).
     apply Hf.
     split.
      apply (leEq_inj_Q IR).
@@ -713,7 +717,7 @@ Proof.
    assert (X:=@ContinuousCorrect (clcr (inj_Q IR a) (inj_Q IR b)) (inj_Q_less _ _ _ Hab0) F (Continuous_Int (clcr (inj_Q IR a) (inj_Q IR b)) Hab Hab F HF)
      (Cbind QPrelengthSpace f) X0 y Hyf Hy).
    set (z:=(' approximate (f x) ((1 # 2) * e)%Qpos)%CR).
-   rewrite X.
+   rewrite -> X.
    setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos; [| by QposRing].
    apply ball_triangle with (f x); [|apply ball_approx_r].
    rewrite <- (BindLaw1 f).
@@ -738,7 +742,7 @@ Proof.
    rewrite <- IR_AbsSmall_as_CR.
    apply AbsIR_imp_AbsSmall.
    assert(X:=leEq_or_leEq _ (inj_Q IR x) y).
-   rewrite leEq_def.
+   rewrite -> leEq_def.
    intros Y.
    apply X.
    clear X.
@@ -781,7 +785,7 @@ Proof.
     stepl (inj_Q IR ((b-a)*e)%Q); [| by apply inj_Q_mult].
     apply: inj_Q_wd;simpl.
     autorewrite with QposElim.
-    rewrite Hba.
+    rewrite -> Hba.
     ring.
    apply eq_symmetric; apply inj_Q_mult.
   apply shift_minus_leEq.
@@ -798,7 +802,7 @@ Proof.
    stepl (inj_Q IR ((b-a)*e)%Q); [| by apply inj_Q_mult].
    apply: inj_Q_wd;simpl.
    autorewrite with QposElim.
-   rewrite Hba.
+   rewrite -> Hba.
    ring.
   apply eq_symmetric; apply inj_Q_mult.
  set (z:=(IntegralQ (glue o (Map (fun z : RegularFunction Q_as_MetricSpace =>
@@ -806,7 +810,7 @@ Proof.
      (fun z : RegularFunction Q_as_MetricSpace => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
  change (AbsSmall (R:=CRasCOrdField) ('(ba* e)%Qpos)%CR
    (IRasCR (integral _ _ Hab F HF)[-]'((b-a)*z))%CR).
- rewrite CRAbsSmall_ball.
+ rewrite -> CRAbsSmall_ball.
  set (c:=(affineCombo (OpenUnitDual o) a b:Q)).
  assert (Hac:inj_Q IR a[<=]inj_Q IR c).
   unfold c.
@@ -832,7 +836,7 @@ Proof.
    with (IRasCR (integral _ _ Hac F HFl)+IRasCR (integral _ _ Hcb F HFr))%CR;
      [| by (rewrite <- IR_plus_as_CR;apply IRasCR_wd; apply eq_symmetric; apply integral_plus_integral)].
  unfold z.
- rewrite Integral_glue.
+ rewrite -> Integral_glue.
  clear z.
  set (zl:=IntegralQ (Map (fun z : RegularFunction Q_as_MetricSpace =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s1))).
@@ -851,10 +855,10 @@ Proof.
   autorewrite with QposElim.
   rewrite -> Hba in Hbc.
   rewrite -> Hca in Hbc.
-  replace LHS with (- a + (a + ba))%Q by ring.
-  rewrite Hbc.
+  replace LHS with (- a + (a + ba))%Q by simpl; ring.
+  rewrite -> Hbc.
   ring.
- rewrite Z.
+ rewrite -> Z.
  clear Z.
  setoid_replace ((ca + bc)*e)%Qpos with (ca*e + bc*e)%Qpos; [| by QposRing].
  rewrite <- CRAbsSmall_ball.
@@ -869,7 +873,7 @@ Proof.
     destruct (mu f ((1#2)*e)) as [q|];[|constructor].
     simpl in Hs|-*.
     eapply Qle_trans;[|apply Hs].
-    rewrite SupDistanceToLinear_glue.
+    rewrite -> SupDistanceToLinear_glue.
     replace LHS with (SupDistanceToLinear s1 (affineCombo_gt (OpenUnitDual o) Hab0):Q).
      apply Qmax_ub_l.
     apply SupDistanceToLinear_wd1; reflexivity.
@@ -881,7 +885,7 @@ Proof.
    destruct (mu f ((1#2)*e)) as [q|];[|constructor].
    simpl in Hs|-*.
    eapply Qle_trans;[|apply Hs].
-   rewrite SupDistanceToLinear_glue.
+   rewrite -> SupDistanceToLinear_glue.
    replace LHS with (SupDistanceToLinear s2 (affineCombo_lt (OpenUnitDual o) Hab0):Q).
     apply Qmax_ub_r.
    apply SupDistanceToLinear_wd1; reflexivity.

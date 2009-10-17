@@ -59,13 +59,13 @@ Proof.
  induction x using StepF_ind.
   intros o.
   change (x == Qmax x x)%Q.
-  rewrite Qmax_idem.
+  rewrite -> Qmax_idem.
   reflexivity.
  intros s.
  apply SplitLR_glue_ind; intros H.
    change (Qmax (StepQSup x1) (StepQSup x2) == Qmax (StepQSup (SplitL x1 (OpenUnitDiv s o H)))
      (Qmax (StepQSup (SplitR x1 (OpenUnitDiv s o H))) (StepQSup x2)))%Q.
-   rewrite Qmax_assoc.
+   rewrite -> Qmax_assoc.
    rewrite <- IHx1.
    reflexivity.
   change (Qmax (StepQSup x1) (StepQSup x2) == Qmax (Qmax (StepQSup x1) (StepQSup (SplitL x2 (OpenUnitDualDiv s o H))))
@@ -91,8 +91,8 @@ Proof.
  intros y H.
  destruct H as [H0 H1] using (glue_eq_ind x1).
  change (StepQSup (glue o x1 x2))%Q with (Qmax (StepQSup x1) (StepQSup x2)).
- rewrite (IHx1 _ H0).
- rewrite (IHx2 _ H1).
+ rewrite -> (IHx1 _ H0).
+ rewrite -> (IHx2 _ H1).
  symmetry.
  apply StepQSupSplit.
 Qed.
@@ -102,7 +102,7 @@ Lemma StepQSup_resp_le : forall x y, x <= y -> (StepQSup x <= StepQSup y)%Q.
 Proof.
  apply: StepF_ind2; auto.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs Ht; auto.
+  rewrite -> Hs, Ht; auto.
  intros o s s0 t t0 H0 H1.
  unfold StepQ_le.
  rewriteStepF.
@@ -115,13 +115,13 @@ Lemma StepQSup_plus : forall x y, (StepQSup (x + y) <= StepQSup x + StepQSup y )
 Proof.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs Ht; auto.
+  rewrite -> Hs, Ht; auto.
  intros o s s0 t t0 H0 H1.
  unfold StepQplus.
  rewriteStepF.
  repeat rewrite StepQSup_glue.
  eapply Qle_trans;[apply Qmax_le_compat;[apply H0|apply H1]|].
- rewrite Qmax_plus_distr_l.
+ rewrite -> Qmax_plus_distr_l.
  apply Qmax_le_compat; apply: plus_resp_leEq_lft; simpl; auto with *.
 Qed.
 
@@ -135,12 +135,12 @@ Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos
 Proof.
  intros e x y.
  simpl.
- rewrite Qball_Qabs.
+ rewrite -> Qball_Qabs.
  revert x y.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht.
    simpl.
-   rewrite Hs Ht.
+   rewrite -> Hs, Ht.
    auto.
   intros x y.
   rewrite <- Qball_Qabs.
@@ -155,7 +155,7 @@ Proof.
  rewriteStepF.
  intros [H2a H2b].
  apply Qabs_case; intros H; [|rewrite <- Qabs_opp in H0, H1; rewrite -> X in *];
-   (rewrite Qmax_minus_distr_l; unfold Qminus; apply Qmax_lub;[|clear H0; rename H1 into H0];
+   (rewrite -> Qmax_minus_distr_l; unfold Qminus; apply Qmax_lub;[|clear H0; rename H1 into H0];
      (eapply Qle_trans;[|apply H0; auto]); (eapply Qle_trans;[|apply Qle_Qabs]); unfold Qminus;
        apply: plus_resp_leEq_lft; simpl; auto with * ).
 Qed.
@@ -188,8 +188,8 @@ Proof.
  rewrite ApGlueGlue.
  unfold StepQabs.
  rewrite MapGlue.
- rewrite Integral_glue.
- setoid_replace (e:Q) with (o*e + (1-o)*e)%Q; [| ring].
+ rewrite -> Integral_glue.
+ setoid_replace (e:Q) with (o*e + (1-o)*e)%Q; [| simpl; ring].
  simpl in H.
  unfold StepFSupBall, StepFfoldProp in H.
  simpl in H.
@@ -197,11 +197,11 @@ Proof.
  rewrite ApGlueGlue in H.
  destruct H as [H0 H1].
  apply Qplus_le_compat.
-  repeat rewrite (Qmult_comm o).
+  repeat rewrite -> (Qmult_comm o).
   apply Qmult_le_compat_r; auto with *.
   apply Hst.
   assumption.
- repeat rewrite (Qmult_comm (1-o)).
+ repeat rewrite -> (Qmult_comm (1-o)).
  apply Qmult_le_compat_r; auto with *.
  apply Hst0.
  assumption.

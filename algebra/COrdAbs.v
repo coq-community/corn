@@ -475,7 +475,7 @@ Lemma mult_AbsSmall_rht : forall x y X Y : R, Zero [<=] X ->
  Zero [<=] Y -> [--]X [<=] x -> x [<=] X -> [--]Y [<=] y -> y [<=] Y -> x[*]y [<=] X[*]Y.
 Proof.
  intros.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intro.
  cut (Zero [<] x[*]y); intros.
   2: apply leEq_less_trans with (X[*]Y); auto.

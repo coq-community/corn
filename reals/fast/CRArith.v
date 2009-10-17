@@ -54,7 +54,7 @@ Proof.
   autorewrite with QposElim in Y.
   ring_simplify in Y.
   elim (Qle_not_lt _ _ Y).
-  rewrite Qlt_minus_iff.
+  rewrite -> Qlt_minus_iff.
   ring_simplify.
   apply: Qpos_prf.
  intros H e.
@@ -62,7 +62,7 @@ Proof.
  unfold Cap_raw; simpl.
  rewrite -> Qle_minus_iff in H.
  apply Qle_trans with (0%Q);[|assumption].
- rewrite Qle_minus_iff; ring_simplify.
+ rewrite -> Qle_minus_iff; ring_simplify.
  apply Qpos_nonneg.
 Qed.
 
@@ -91,7 +91,7 @@ Hint Rewrite <- CRminus_Qminus : toCRring.
 Lemma CRmult_Qmult : forall (x y:Q), inject_Q x * inject_Q y == inject_Q (x * y)%Q.
 Proof.
  intros x y.
- rewrite CRmult_scale.
+ rewrite -> CRmult_scale.
  intros e1 e2; apply ball_refl.
 Qed.
 (* begin hide *)
@@ -101,18 +101,18 @@ Lemma Qap_CRap : forall (x y:Q), (~(x==y))%Q -> (' x)><(' y).
 Proof.
  intros x y Hxy.
  destruct (Q_dec x y) as [[H|H]|H]; try contradiction;
-   destruct (Qpos_lt_plus H) as [c Hc];[left|right]; exists c; abstract (rewrite CRminus_Qminus;
-     rewrite CRle_Qle; rewrite Hc; ring_simplify; apply Qle_refl).
+   destruct (Qpos_lt_plus H) as [c Hc];[left|right]; exists c; abstract (rewrite -> CRminus_Qminus;
+     rewrite -> CRle_Qle; rewrite -> Hc; ring_simplify; apply Qle_refl).
 Defined.
 
 Lemma CRinv_Qinv : forall (x:Q) x_, CRinv (inject_Q x) x_ == inject_Q (/x).
 Proof.
  intros x [[c x_]|[c x_]];
    [change (' c <= ' 0%Q + - ' x)%CR in x_|change (' c <= ' x + - ' 0%Q)%CR in x_]; unfold CRinv;
-     rewrite -> CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_; try rewrite CRopp_Qopp;
-       rewrite (@CRinv_pos_Qinv c).
-    rewrite CRopp_Qopp.
-    rewrite CReq_Qeq.
+     rewrite -> CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_; try rewrite -> CRopp_Qopp;
+       rewrite -> (@CRinv_pos_Qinv c).
+    rewrite -> CRopp_Qopp.
+    rewrite -> CReq_Qeq.
     assert (~x==0)%Q.
      intros H.
      rewrite -> H in x_.
@@ -120,13 +120,11 @@ Proof.
      apply Qpos_prf.
     field.
     intros X; apply H.
-    replace LHS with (- - x)%Q by ring.
-    rewrite X.
-    reflexivity.
-   replace RHS with (0 + - x)%Q by ring.
+    assumption.
+   rewrite -> Qplus_0_l in x_.
    assumption.
   reflexivity.
- replace RHS with (x + - 0)%Q by ring.
+ rewrite -> Qplus_0_r in x_.
  assumption.
 Qed.
 (* begin hide *)
@@ -159,7 +157,7 @@ Proof.
   apply Qnot_le_lt.
   intros H.
   absurd ('y[<=]'x).
-   rewrite leEq_def.
+   rewrite -> leEq_def.
    auto with *.
   rewrite -> CRle_Qle.
   auto.
@@ -168,7 +166,7 @@ Proof.
  apply Qnot_le_lt.
  intros H.
  absurd ('x[<=]'y).
-  rewrite leEq_def.
+  rewrite -> leEq_def.
   auto with *.
  rewrite -> CRle_Qle.
  auto.
@@ -194,10 +192,10 @@ Proof.
  split; try reflexivity.
      apply CRplus_Qplus.
     apply CRminus_Qminus.
-   intros x y; rewrite CRmult_Qmult; reflexivity.
+   intros x y; rewrite -> CRmult_Qmult; reflexivity.
   apply CRopp_Qopp.
  intros x y H.
- rewrite CReq_Qeq.
+ rewrite -> CReq_Qeq.
  apply Qeq_bool_eq.
  assumption.
 Qed.
@@ -227,10 +225,10 @@ Proof.
  cut ('0 <= x)%CR.
   unfold CRle.
   intros H.
-  setoid_replace (x - '0)%CR with x in H; [| by ring].
+  assert (x == x - '0)%CR. ring. rewrite -> H0.
   assumption.
  apply CRle_trans with (' c)%CR; auto with *.
- rewrite CRle_Qle; auto with *.
+ rewrite -> CRle_Qle; auto with *.
 Qed.
 
 Lemma CRneg_nonPos : forall x, CRneg x -> CRnonPos x.
@@ -239,12 +237,12 @@ Proof.
  cut (x <= '0)%CR.
   unfold CRle.
   intros H.
-  setoid_replace ('0 - x)%CR with (-x)%CR in H; [| by ring].
+  assert ('0 - x == -x)%CR. ring. rewrite -> H0 in H.
   intros e.
   rewrite <- (Qopp_involutive e).
   rewrite <- (Qopp_involutive (approximate x e)).
   apply Qopp_le_compat.
   apply H.
  apply CRle_trans with (' - c)%CR; auto with *.
- rewrite CRle_Qle; auto with *.
+ rewrite -> CRle_Qle; auto with *.
 Qed.

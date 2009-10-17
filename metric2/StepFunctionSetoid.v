@@ -193,13 +193,13 @@ Definition st_eqS0 : X -> X --> iffSetoid.
 Proof.
  intros x.
  exists (st_eq x).
- abstract ( intros x1 x2 Hx; simpl; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx; simpl; rewrite -> Hx; reflexivity).
 Defined.
 
 Definition st_eqS : X --> X --> iffSetoid.
 Proof.
  exists (st_eqS0).
- abstract ( intros x1 x2 Hx y; simpl; rewrite Hx; reflexivity).
+ abstract ( intros x1 x2 Hx y; simpl; rewrite -> Hx; reflexivity).
 Defined.
 (**
 ** Equivalence
@@ -257,9 +257,9 @@ Proof.
  intros [H [H0 H1]].
  apply glue_StepF_eq.
   apply IHs1.
-  apply SplitL_glue_ind; intros H2; try (elim (Qlt_not_le _ _ H2); rewrite H); auto with *.
+  apply SplitL_glue_ind; intros H2; try (elim (Qlt_not_le _ _ H2); rewrite -> H); auto with *.
  apply IHs2.
- apply SplitR_glue_ind; intros H2; try (elim (Qlt_not_le _ _ H2); rewrite H); auto with *.
+ apply SplitR_glue_ind; intros H2; try (elim (Qlt_not_le _ _ H2); rewrite -> H); auto with *.
 Qed.
 
 Lemma glueSplit:forall (s : StepF X), forall a, (glue a (SplitL s a) (SplitR s a)) === s.
@@ -332,8 +332,8 @@ Proof.
  rewrite ApGlue in H0.
  destruct H0 as [H0l H0r].
  change ((StepFfoldProp x1 /\ StepFfoldProp x2) <-> StepFfoldProp y).
- rewrite (IHx1 (SplitL y o)); auto with *.
- rewrite (IHx2 (SplitR y o)); auto with *.
+ rewrite -> (IHx1 (SplitL y o)); auto with *.
+ rewrite -> (IHx2 (SplitR y o)); auto with *.
  apply: StepFfoldPropglue.
 Qed.
 
@@ -372,7 +372,7 @@ Proof.
   apply: (Map_resp_StepF_eq); auto with *.
   intros a b Hab.
   simpl.
-  rewrite Hab.
+  rewrite -> Hab.
   reflexivity.
  intros u v [H [Hst0 Hst1]] Huv Hsu.
  destruct Hsu as [Hsu1 Hsu2] using (glue_eq_ind s1).
@@ -413,11 +413,11 @@ Proof.
  apply glue_StepF_eq.
   apply StepF_eq_resp_Qeq with (Mirror s2) (Mirror (SplitR t o)); auto.
    apply MirrorSplitR_Qeq; apply Qeq_refl.
-  rewrite IHs2.
+  rewrite -> IHs2.
   assumption.
  apply StepF_eq_resp_Qeq with (Mirror s1) (Mirror (SplitL t o)); auto.
   apply MirrorSplitL_Qeq; apply Qeq_refl.
- rewrite IHs1.
+ rewrite -> IHs1.
  assumption.
 Qed.
 
@@ -455,9 +455,9 @@ Proof.
  pose (b:=OpenUnitDual a).
  apply StepF_eq_resp_Qeq with (Mirror (SplitL (Mirror s1) b)) (Mirror (SplitL (Mirror s2) b));
    try (unfold Mirror, SplitR, SplitL, b;eapply StepF_Qeq_trans;[apply Mirror_resp_Qeq; apply StepF_Qeq_sym; apply MirrorSplitR_Qeq; reflexivity|apply MirrorMirror]).
- rewrite Mirror_eq_Mirror.
+ rewrite -> Mirror_eq_Mirror.
  apply SplitL_resp_Xeq.
- rewrite Mirror_eq_Mirror.
+ rewrite -> Mirror_eq_Mirror.
  assumption.
 Qed.
 
@@ -471,7 +471,7 @@ Proof.
   apply: (Map_resp_StepF_eq); auto with *.
   intros a b Hab.
   simpl.
-  rewrite Hab.
+  rewrite -> Hab.
   reflexivity.
  intros.
  destruct H using (glue_eq_ind x1).
@@ -703,17 +703,17 @@ Proof.
   destruct Hfg as [Hfg0 Hfg1] using (eq_glue_ind g1).
   apply glue_StepF_eq; symmetry.
    rewrite SplitLMap.
-   apply IHg1; try rewrite H0; auto with *.
+   apply IHg1; try rewrite -> H0; auto with *.
   rewrite SplitRMap.
-  apply IHg2; try rewrite H0; auto with *.
+  apply IHg2; try rewrite -> H0; auto with *.
  intros s s' Hs.
  destruct Hfg as [Hfg0 Hfg1] using (glue_eq_ind f1).
  rewrite ApGlue.
  apply glue_StepF_eq; auto with *.
-  rewrite SplitLAp.
-  apply IHf1; try rewrite Hs; auto with *.
- rewrite SplitRAp.
- apply IHf2; try rewrite Hs; auto with *.
+  rewrite -> SplitLAp.
+  apply IHf1; try rewrite -> Hs; auto with *.
+ rewrite -> SplitRAp.
+ apply IHf2; try rewrite -> Hs; auto with *.
 Qed.
 (* end hide *)
 Lemma GlueAp : forall (X Y : Setoid) (f : StepF (X --> Y)) (o : OpenUnit) (l r : StepF X),
@@ -751,10 +751,10 @@ Proof.
   simpl.
   apply StepF_ind2; auto with *.
    intros s s0 t t0 Hs Ht.
-   rewrite Hs Ht.
+   rewrite -> Hs, Ht.
    auto.
   intros o s s0 t t0 H H0.
-  rewrite Map_homomorphism.
+  rewrite -> Map_homomorphism.
   rewrite ApGlueGlue.
   do 2 rewrite MapGlue.
   rewrite ApGlueGlue.
@@ -765,11 +765,11 @@ Proof.
  rewrite MapGlue.
  repeat rewrite ApGlue.
  apply glue_resp_StepF_eq.
-  rewrite IHa1.
-  rewrite SplitLAp.
+  rewrite -> IHa1.
+  rewrite -> SplitLAp.
   reflexivity.
- rewrite IHa2.
- rewrite SplitRAp.
+ rewrite -> IHa2.
+ rewrite -> SplitRAp.
  reflexivity.
 Qed.
 
@@ -783,11 +783,11 @@ Proof.
  intros X Y.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs Ht; auto.
+  rewrite -> Hs, Ht; auto.
  intros o s s0 t t0 H0 H1.
  rewrite MapGlue.
  rewrite ApGlueGlue.
- rewrite H0 H1;reflexivity.
+ rewrite -> H0, H1;reflexivity.
 Qed.
 
 Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
@@ -797,12 +797,12 @@ Proof.
   simpl.
   apply StepF_ind2; auto with *.
    intros s s0 t t0 Hs Ht.
-   rewrite Hs Ht;auto.
+   rewrite -> Hs, Ht;auto.
   intros o s s0 t t0 H0 H1.
-  rewrite Map_homomorphism.
+  rewrite -> Map_homomorphism.
   do 2 rewrite MapGlue.
   do 2 rewrite ApGlueGlue.
-  rewrite H0 H1; reflexivity.
+  rewrite -> H0, H1; reflexivity.
  intros x w.
  rewrite MapGlue.
  do 4 rewrite ApGlue.
@@ -815,11 +815,11 @@ Proof.
  intros X Y.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
-  rewrite Hs Ht; auto.
+  rewrite -> Hs, Ht; auto.
  intros o s s0 t t0 H0 H1.
  rewrite MapGlue.
  do 3 rewrite ApGlueGlue.
- rewrite H0 H1;reflexivity.
+ rewrite -> H0, H1;reflexivity.
 Qed.
 (* begin hide *)
 Hint Rewrite

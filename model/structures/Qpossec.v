@@ -261,7 +261,7 @@ Proof.
   change (~(Qpos_inv x) == 0).
   apply Qpos_nonzero.
  change ((/x)^p==0).
- rewrite Qinv_power.
+ rewrite -> Qinv_power.
  symmetry; assumption.
 Qed.
 
@@ -283,7 +283,7 @@ Proof.
  unfold QposEq in *.
  unfold Qpos_power.
  autorewrite with QposElim.
- rewrite Hx.
+ rewrite -> Hx.
  reflexivity.
 Qed.
 (* end hide *)
@@ -317,7 +317,7 @@ Qed.
 Lemma QposRed_prf : forall (a:Q), (0 < a) -> (0 < Qred a).
 Proof.
  intros a Ha.
- rewrite Qred_correct.
+ rewrite -> Qred_correct.
  assumption.
 Qed.
 

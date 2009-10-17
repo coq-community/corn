@@ -2483,7 +2483,7 @@ Lemma diff_linear : forall a (p:RX), _D_ (a[+X*]p)[=]p[+]_X_[*]_D_ p.
 Proof.
  intros a p.
  change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
- rewrite cpoly_lin.
+ rewrite -> cpoly_lin.
  rewrite <- c_zero. 
  ring.
 Qed.
@@ -2493,16 +2493,16 @@ Proof.
  induction p.
   reflexivity.
  intros [|a q].
-  rewrite cm_rht_unit_unfolded.
+  rewrite -> cm_rht_unit_unfolded.
   change (cpoly_zero R) with (Zero:cpoly_cring R).
-  rewrite diff_zero; algebra.
+  rewrite -> diff_zero; algebra.
  change ((p[+]q)[+]cpoly_linear _ Zero (_D_ (p[+]q))[=]
    (p[+]cpoly_linear _ Zero (_D_ p))[+](q[+]cpoly_linear _ Zero (_D_ q))).
- do 3 rewrite poly_linear.
+ do 3 rewrite -> poly_linear.
  change (st_car RX) in p, q.
  change (p[+]q[+](_X_[*]_D_ (p[+]q)[+]_C_ Zero)[=]
    p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
- rewrite (IHp q).
+ rewrite -> (IHp q).
  rewrite <- c_zero.
  ring.
 Qed.
@@ -2514,10 +2514,10 @@ Proof.
   auto with *.
  change (_D_ (cpoly_linear R s p)) with (p[+](Zero[+X*](_D_ p))).
  change (cpoly_linear R s p) with (s[+X*]p).
- rewrite c_mult_lin.
+ rewrite -> c_mult_lin.
  change (_D_ (c[*]s[+X*]_C_ c[*]p)) with (_C_ c[*]p [+] (Zero[+X*](_D_ (_C_ c[*]p)))).
- rewrite IHp.
- do 2 rewrite cpoly_lin.
+ rewrite -> IHp.
+ do 2 rewrite -> cpoly_lin.
  rewrite <- c_zero.
 (* An attempt to avoid the following "change" 
 Bind Scope ring_scope with CRing.
@@ -2550,23 +2550,23 @@ Proof.
   intros q.
   change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
   rstepl (_D_(Zero:RX)).
-  rewrite diff_zero.
+  rewrite -> diff_zero.
   ring.
  intros q.
  change (st_car RX) in p.
  change (_D_((s[+X*]p)[*]q)[=]_D_(s[+X*]p)[*]q[+](s[+X*]p)[*]_D_ q).
- do 2 rewrite lin_mult.
- rewrite diff_linear.
- rewrite diff_plus.
+ do 2 rewrite -> lin_mult.
+ rewrite -> diff_linear.
+ rewrite -> diff_plus.
  setoid_replace (_D_ ((_C_ s:RX)[*]q)) with (_C_ s[*]_D_ q) by apply diff_c_mult.
  setoid_replace (((_X_:RX)[*](p[*]q)):RX)
    with ((((_X_:RX)[*](p[*]q)))[+]Zero) by (symmetry;apply cm_rht_unit_unfolded).
  setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply c_zero.
  rewrite <- poly_linear.
  change (_D_ (cpoly_linear R Zero (p[*]q))) with (p[*]q [+] (Zero[+X*]_D_ (p[*]q))).
- rewrite cpoly_lin.
+ rewrite -> cpoly_lin.
  rewrite <- c_zero.
- rewrite IHp.
+ rewrite -> IHp.
  ring.
 Qed.
 
@@ -2671,11 +2671,11 @@ Proof.
  stepr (cpoly_map_csf (cpoly_linear R d q)[*]cpoly_map_csf p).
   2:apply (mult_commut_unfolded SX).
  change ((cpoly_linear R d q:RX)[*]p) with (cpoly_mult_fast_cs _ (cpoly_linear R d q) p).
- rewrite cpoly_mult_fast_equiv.
+ rewrite -> cpoly_mult_fast_equiv.
  rewrite cpoly_lin_mult.
  change (cpoly_map_csf (cpoly_linear R d q:RX)[*]cpoly_map_csf p)
    with (cpoly_mult_fast_cs _ (cpoly_linear S (f d) (cpoly_map_csf q)) (cpoly_map_csf p)).
- rewrite cpoly_mult_fast_equiv.
+ rewrite -> cpoly_mult_fast_equiv.
  rewrite cpoly_lin_mult.
  stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p)));
   [| apply eq_symmetric; apply cpoly_map_pres_plus].
@@ -2718,10 +2718,10 @@ Proof.
  induction p.
   reflexivity.
  change (cpoly_map (_D_ (s[+X*]p))[=]_D_ (f s[+X*](cpoly_map p))).
- do 2 rewrite diff_linear.
+ do 2 rewrite -> diff_linear.
  autorewrite with ringHomPush.
- rewrite IHp.
- rewrite cpoly_map_X.
+ rewrite -> IHp.
+ rewrite -> cpoly_map_X.
  reflexivity.
 Qed.
 
@@ -2731,9 +2731,10 @@ Proof.
   intros x.
   apply rh_pres_zero.
  intros x.
- rewrite rh_pres_plus.
- rewrite rh_pres_mult.
- rewrite IHp.
+ simpl in *.
+ rewrite -> rh_pres_plus.
+ rewrite -> rh_pres_mult.
+ rewrite -> IHp.
  reflexivity.
 Qed.
 

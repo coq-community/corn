@@ -158,7 +158,7 @@ Proof.
    auto using almostIn_stable.
   apply orWeaken.
   left.
-  rewrite H.
+  rewrite -> H.
   apply ball_refl.
  rewrite <- IHl in H.
  apply orWeaken.
@@ -194,7 +194,7 @@ Proof.
    autorewrite with QposElim.
    apply Qlt_le_weak.
    rewrite -> Qlt_minus_iff in *.
-   replace RHS with (d + - d0) by ring.
+   replace RHS with (d + - d0) by simpl; ring.
    assumption.
   apply almostIn_stable.
   intros Y.
@@ -207,7 +207,7 @@ Proof.
   apply (@ball_weak_le X (e + d)%Qpos).
    autorewrite with QposElim.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with (d0 + - d) by ring.
+   replace RHS with (d0 + - d) by simpl; ring.
    assumption.
   assumption.
  assumption.
@@ -299,7 +299,7 @@ Proof.
  apply orWeaken.
  right.
  change (almostIn e x s).
- rewrite IHs.
+ rewrite -> IHs.
  apply existsWeaken.
  exists y.
  auto.
@@ -445,7 +445,7 @@ Proof.
  intros x a H.
  exists (Cjoin a).
   abstract ( intros e1 e2; unfold inCompact in H; eapply almostIn_weak_le;
-    [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos]; autorewrite with QposElim; rewrite Qle_minus_iff;
+    [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos]; autorewrite with QposElim; rewrite -> Qle_minus_iff;
       ring_simplify; auto with * ).
  apply CunitCjoin.
 Defined.
@@ -546,7 +546,7 @@ Proof.
    assumption.
   simpl.
   rewrite Pplus_one_succ_l.
-  rewrite Qpower_plus_positive.
+  rewrite -> Qpower_plus_positive.
   apply Qlt_trans with (k*1).
    apply: mult_resp_less_lft;simpl; auto with *.
   ring_simplify.
@@ -586,13 +586,13 @@ Proof.
  repeat rewrite inj_plus.
  assert (~k==0).
   apply Qpos_nonzero.
- repeat rewrite Qpower_plus; auto.
+ repeat rewrite -> Qpower_plus; auto.
  simpl; field.
  intros H0.
  apply (Qlt_not_le _ _ Hk).
- rewrite Qle_minus_iff.
- replace RHS with (-(1-k)) by ring.
- rewrite H0.
+ rewrite -> Qle_minus_iff.
+ replace RHS with (-(1-k)) by simpl; ring.
+ rewrite -> H0.
  discriminate.
 Qed.
 
@@ -621,13 +621,13 @@ Proof.
  repeat rewrite inj_plus.
  assert (~k==0).
   apply Qpos_nonzero.
- repeat rewrite Qpower_plus; auto.
+ repeat rewrite -> Qpower_plus; auto.
  simpl; field.
  intros H0.
  apply (Qlt_not_le _ _ Hk).
- rewrite Qle_minus_iff.
- replace RHS with (-(1-k)) by ring.
- rewrite H0.
+ rewrite -> Qle_minus_iff.
+ replace RHS with (-(1-k)) by simpl; ring.
+ rewrite -> H0.
  discriminate.
 Qed.
 
@@ -650,7 +650,7 @@ Proof.
  change (q==k^(P_of_succ_nat n)*d1).
  rewrite Zpos_P_of_succ_nat.
  unfold Zsucc.
- rewrite Qpower_plus;[|apply Qpos_nonzero].
+ rewrite -> Qpower_plus;[|apply Qpos_nonzero].
  autorewrite with QposElim in Hq0.
  ring [Hq0].
 Qed.
@@ -669,22 +669,22 @@ Proof.
  unfold CompactTotallyBoundedIndex.
  set (a:=((1 + (1 # 4)) * d1 + d2)).
  set (b:=(1 - (1 # 4))).
- rewrite Qmake_Qdiv.
- rewrite Qdiv_power.
- rewrite Qpower_1.
+ rewrite -> Qmake_Qdiv.
+ rewrite -> Qdiv_power.
+ rewrite -> Qpower_1.
  unfold Qdiv.
  ring_simplify.
  rewrite <- Qmult_assoc.
- rewrite Qmult_comm.
+ rewrite -> Qmult_comm.
  rewrite <- Qmult_assoc.
- rewrite Qmult_comm.
+ rewrite -> Qmult_comm.
  apply Qle_shift_div_r.
   induction (let (n, d) := a * / e * / b in match Zsucc (n / d) with | Z0 => 0%nat
     | Zpos p => div2 (S (Z_to_nat (z:=log_sup p) (log_sup_correct1 p))) | Zneg _ => 0%nat end).
    constructor.
   change (S n) with (1+n)%nat.
   rewrite inj_plus.
-  rewrite Qpower_plus;[|discriminate].
+  rewrite -> Qpower_plus;[|discriminate].
   change 0 with (4*0).
   apply: mult_resp_less_lft; auto.
   constructor.
@@ -692,10 +692,10 @@ Proof.
   apply Qpos_nonzero.
  set (z:=a * / e * / b).
  rewrite <- (Qinv_involutive e).
- rewrite (Qmult_comm (/ /e)).
+ rewrite -> (Qmult_comm (/ /e)).
  apply Qle_shift_div_l.
   auto with *.
- replace LHS with z by (unfold z;ring).
+ replace LHS with z by (unfold z;simpl; ring).
  assert (Hz:0 < z).
   unfold z.
   auto with *.
@@ -703,7 +703,7 @@ Proof.
    elim (Qlt_not_le _ _ Hz).
    discriminate.
   apply Qle_trans with (Zsucc (n/d)).
-   rewrite Qmake_Qdiv.
+   rewrite -> Qmake_Qdiv.
    apply Qle_shift_div_r; auto with *.
    unfold Zsucc, Qle.
    simpl.
@@ -719,7 +719,7 @@ Proof.
   destruct z.
     discriminate.
    change (4%positive:Z) with (2^2)%Z.
-   rewrite Zpower_Qpower;[|discriminate].
+   rewrite -> Zpower_Qpower;[|discriminate].
    rewrite <- Qpower_mult.
    apply Qle_trans with (two_p (log_sup p)).
     unfold Qle; simpl.
@@ -830,10 +830,10 @@ Proof.
  autorewrite with QposElim.
  unfold Qdiv.
  set (C:=(((1 + (1 # 4)) * d1 + d2) * (1 # 4) ^ A * / (1 - (1 # 4)))).
- replace LHS with ((1 - (1 # 4) ^ S (B - A)) * C) by (unfold C; ring).
+ replace LHS with ((1 - (1 # 4) ^ S (B - A)) * C) by (unfold C; simpl; ring).
  apply Qle_trans with (1*C).
   apply: mult_resp_leEq_rht;simpl.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    apply Qpower_pos_positive.
    discriminate.
@@ -863,18 +863,18 @@ Proof.
  intros d.
  apply almostIn_weak_le with (d + (q + e2))%Qpos.
   autorewrite with QposElim.
-  rewrite Qle_minus_iff.
-  replace RHS with (e1 + - q) by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with (e1 + - q) by simpl; ring.
   rewrite <- Qle_minus_iff.
-  rewrite Hq0.
+  rewrite -> Hq0.
   eapply Qle_trans;[|apply (CompactTotallyBoundedIndexLemma e1 d1 d2)].
   autorewrite with QposElim.
   cut (0 <= (1 # 4) ^ CompactTotallyBoundedIndex e1 d1 d2).
    generalize ( (1 # 4) ^ CompactTotallyBoundedIndex e1 d1 d2).
    intros z Hz.
    clear - Hz.
-   rewrite Qle_minus_iff.
-   replace  RHS with (z*((d1 + 2*d2)/(3#2))) by field.
+   rewrite -> Qle_minus_iff.
+   replace  RHS with (z*((d1 + 2*d2)/(3#2))) by simpl; field.
    Qauto_nonneg.
   apply Qpower_pos.
   discriminate.
@@ -896,13 +896,13 @@ Proof.
  autorewrite with QposElim.
  apply Qle_trans with (((1 + (1 # 4)) * d1 + d2) / (1 - (1 # 4))).
   apply: mult_resp_leEq_rht; try discriminate.
-  replace RHS with (((1 + (1 # 4)) * d1 + d2)*1) by ring.
+  replace RHS with (((1 + (1 # 4)) * d1 + d2)*1) by simpl; ring.
   apply mult_resp_leEq_lft;simpl;[|Qauto_pos].
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   apply (Qpower_pos (1#4) (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2))).
   discriminate.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  unfold Qdiv.
  change (/(1-(1#4))) with (4#3).
  ring_simplify.
@@ -947,7 +947,7 @@ Proof.
     apply: orWeaken.
     left.
     reflexivity.
-   rewrite Hx.
+   rewrite -> Hx.
    setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
    apply L.
   set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
@@ -971,7 +971,7 @@ Proof.
    apply: orWeaken.
    left.
    reflexivity.
-  rewrite Hx.
+  rewrite -> Hx.
   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
   apply ball_sym.
   apply L.
@@ -1013,7 +1013,7 @@ Lemma CompactTotallyBoundedB : forall s e x, (inCompact x s) -> exists y, In y (
 Proof.
  intros s e x Hx.
  assert (Z:((1 # 20) * e + (1 # 5) * e)%Qpos < ((7 # 20) * e)%Qpos).
-  rewrite Qlt_minus_iff.
+  rewrite -> Qlt_minus_iff.
   autorewrite with QposElim.
   ring_simplify.
   Qauto_pos.
@@ -1039,7 +1039,7 @@ Proof.
    apply ball_triangle with (Cunit a);[|apply HF].
    apply ball_triangle with (Cunit (approximate x ((1#20)*e)%Qpos)).
     apply ball_approx_r.
-   rewrite ball_Cunit.
+   rewrite -> ball_Cunit.
    assumption.
   edestruct (fun F HF => IHl F HF H) as [y' [Hy'0 Hy'1]];
     [|exists y';split;[right;apply Hy'0|assumption]].
@@ -1067,7 +1067,7 @@ Proof.
  split.
    apply CompactCompleteSubset.
   apply CompactTotallyBounded.
- abstract ( intros a b Hab; unfold inCompact; rewrite Hab; reflexivity).
+ abstract ( intros a b Hab; unfold inCompact; rewrite -> Hab; reflexivity).
 Defined.
 
 End CompactTotallyBounded.
@@ -1118,7 +1118,7 @@ Proof.
    apply existsWeaken.
    exists a.
    split; auto with *.
-   rewrite Hx.
+   rewrite -> Hx.
    apply ball_approx_l.
   destruct (IHl Hx) as [G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.
@@ -1202,7 +1202,7 @@ Proof.
  intros P [HP1 HP2 HP3] x Hx.
  assert (Y:forall e:Qpos, ((7#8)*e)%Qpos < e).
   intros.
-  rewrite Qlt_minus_iff.
+  rewrite -> Qlt_minus_iff.
   autorewrite with QposElim.
   ring_simplify.
   Qauto_pos.
@@ -1257,7 +1257,7 @@ Proof.
  destruct (HP1 f') as [y Hy].
   intros [e|]; apply: Hf1.
  unfold ExtSubset in HP3.
- rewrite (HP3 x y); auto.
+ rewrite -> (HP3 x y); auto.
  rewrite <- Cunit_eq.
  rewrite -> s.
  intros e1 e2.
@@ -1286,7 +1286,7 @@ Proof.
  apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
   apply regFun_prf.
  clear e1.
- rewrite (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
+ rewrite -> (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
  apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
   apply CompactTotalBoundNotFar.
  simpl.
@@ -1300,7 +1300,7 @@ Proof.
     split.
      apply: orWeaken.
      left; reflexivity.
-    rewrite Hx.
+    rewrite -> Hx.
     apply ball_approx_r.
    destruct (IHlA x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
     auto using existsC_stable.
@@ -1314,7 +1314,7 @@ Proof.
   split.
    apply orWeaken.
    left; reflexivity.
-  rewrite Hx.
+  rewrite -> Hx.
   apply: ball_approx_l.
  destruct (IHlB x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -1367,7 +1367,7 @@ Proof.
   split.
    apply: orWeaken.
    left; reflexivity.
-  rewrite Hb.
+  rewrite -> Hb.
   apply regFun_prf.
  destruct (IHx b Hb) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -1425,7 +1425,7 @@ Proof.
    apply: orWeaken.
    left; reflexivity.
   rewrite -> Hz0 in Hz1.
-  rewrite Hd1.
+  rewrite -> Hd1.
   apply Hz1.
  destruct (IHb Hz0) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -1491,10 +1491,10 @@ Proof.
   apply ball_weak_le with (m' + (m' + m') + m')%Qpos.
    unfold m'.
    autorewrite with QposElim.
-   replace LHS with ((1#P_of_succ_nat m)/(1#4)) by field.
+   replace LHS with ((1#P_of_succ_nat m)/(1#4)) by simpl; field.
    apply Qle_shift_div_r.
     constructor.
-   rewrite Qmult_comm.
+   rewrite -> Qmult_comm.
    change ((1#4)*e) with (((1#4)*e)%Qpos:Q).
    rewrite He.
    unfold Qle; simpl.
@@ -1508,7 +1508,7 @@ Proof.
    auto with *.
   eapply ball_triangle;[|apply ball_approx_l].
   eapply ball_triangle;[apply ball_approx_r|].
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   apply Hm1.
  apply orWeaken.
  right.
@@ -1524,15 +1524,15 @@ Proof.
  set (m' := (1#P_of_succ_nat m)%Qpos).
  apply almostIn_weak_le with ((e1 + m') + (m' + m') + (m' + e2))%Qpos.
   autorewrite with QposElim.
-  rewrite Qle_minus_iff.
-  replace RHS with (d + - (m' + (m' + m') + m')) by ring.
+  rewrite -> Qle_minus_iff.
+  replace RHS with (d + - (m' + (m' + m') + m')) by simpl; ring.
   rewrite <- Qle_minus_iff.
   unfold m'.
   autorewrite with QposElim.
-  replace LHS with ((1#P_of_succ_nat m)/(1#4)) by field.
+  replace LHS with ((1#P_of_succ_nat m)/(1#4)) by simpl; field.
   apply Qle_shift_div_r.
    constructor.
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   change ((1#4)*d) with (((1#4)*d)%Qpos:Q).
   rewrite Hd.
   unfold Qle; simpl.
@@ -1620,7 +1620,7 @@ Proof.
  change (InFinEnumC (X:=X) z (approximate (FinCompact (approximate s ((1 # 2) * d')%Qpos))
    ((1 # 2) * d')%Qpos)) in Hz1.
  apply almostIn_triangle_l with (Cunit z).
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   assumption.
  clear - Hz1.
  induction ((approximate s ((1 # 2) * d')%Qpos)).
@@ -1629,7 +1629,7 @@ Proof.
    auto using almostIn_stable.
   apply orWeaken.
   left.
-  rewrite Hz1.
+  rewrite -> Hz1.
   apply ball_approx_l.
  apply orWeaken.
  right.

@@ -126,10 +126,10 @@ Proof.
   transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; apply cos_poly_fun_correct].
   simpl.
   change (' q)%CR with (Cunit_fun _ q).
-  rewrite Cmap_fun_correct.
-  rewrite MonadLaw3.
-  rewrite IR_inj_Q_as_CR.
-  rewrite CReq_Qeq.
+  rewrite -> Cmap_fun_correct.
+  rewrite -> MonadLaw3.
+  rewrite -> IR_inj_Q_as_CR.
+  rewrite -> CReq_Qeq.
   simpl.
   unfold cos_poly_fun.
   setoid_replace (Qmax (- (1 # 1)%Qpos) (Qmin (1 # 1)%Qpos q)) with q.
@@ -171,7 +171,7 @@ Lemma rational_cos_correct : forall (a:Q),
 Proof.
  intros a.
  unfold rational_cos.
- rewrite rational_sin_correct.
+ rewrite -> rational_sin_correct.
  rewrite <- cos_poly_correct.
   apply IRasCR_wd.
   csetoid_rewrite_rev (Cos_double_angle (inj_Q IR (a/2))).
@@ -194,7 +194,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   change (/1) with 1.
-  replace RHS with (x:Q) by ring.
+  replace RHS with (x:Q) by simpl; ring.
   apply Qle_refl.
  apply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos I) rational_cos).
   intros q [] _.
@@ -222,7 +222,7 @@ Proof.
  intros q [] _.
  transitivity (rational_cos q);[|apply rational_cos_correct].
  unfold cos_slow.
- rewrite (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
+ rewrite -> (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
  apply: BindLaw1.
 Qed.
 
@@ -236,13 +236,13 @@ Proof.
  generalize (Qceiling (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
    (1 # 2)%Qpos - (1 # 2)))%CR.
  intros z.
- rewrite compress_correct.
+ rewrite -> compress_correct.
  rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
    <- IR_minus_as_CR, <- cos_slow_correct.
  apply IRasCR_wd.
- rewrite inj_Q_mult.
+ rewrite -> inj_Q_mult.
  change (2:Q) with (Two:Q).
- rewrite inj_Q_nring.
+ rewrite -> inj_Q_nring.
  rstepr (Cos (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
  setoid_replace (inj_Q IR z) with (zring z:IR).
   rewrite <- zring_inv.

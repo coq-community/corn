@@ -92,33 +92,33 @@ Context `{r_st : Equivalence R req}.
 
 Definition mx_row m n i0 (A : 'M_(m, n)) :=
   \matrix_(i < 1, j < n) (A i0 j : R).
-Global Instance mx_row_morph m n i0 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@mx_row m n i0).
+Global Instance mx_row_morph m n i0 : Proper (Equivalence.equiv==>Equivalence.equiv) (@mx_row m n i0).
 Proof. by move=> m n i0 A B eqAB i; apply eqAB. Qed.
 Definition mx_col m n j0 (A : 'M_(m, n)) :=
   \matrix_(i < m, j < 1) (A i j0 : R).
-Global Instance mx_col_morph m n i0 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@mx_col m n i0).
+Global Instance mx_col_morph m n i0 : Proper (Equivalence.equiv==>Equivalence.equiv) (@mx_col m n i0).
 Proof. by move=> m n i0 A B eqAB i j; apply eqAB. Qed.
 Definition mx_row' m n i0 (A : 'M_(m, n)) :=
   \matrix_(i, j) (A (lift i0 i) j : R).
-Global Instance mx_row'_morph m n i0 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@mx_row' m n i0).
+Global Instance mx_row'_morph m n i0 : Proper (Equivalence.equiv==>Equivalence.equiv) (@mx_row' m n i0).
 Proof. by move=> m n i0 A B eqAB i; apply eqAB. Qed.
 Definition mx_col' m n j0 (A : 'M_(m, n)) :=
   \matrix_(i, j) (A i (lift j0 j) : R).
-Global Instance mx_col'_morph m n i0 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@mx_col' m n i0).
+Global Instance mx_col'_morph m n i0 : Proper (Equivalence.equiv==>Equivalence.equiv) (@mx_col' m n i0).
 Proof. by move=> m n i0 A B eqAB i j; apply eqAB. Qed.
 
 Definition rswap m n i1 i2 (A : 'M_(m, n)) :=
   \matrix_(i, j) (A (tperm i1 i2 i) j : R).
-Global Instance rswap_morph m n i1 i2 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@rswap m n i1 i2).
+Global Instance rswap_morph m n i1 i2 : Proper (Equivalence.equiv==>Equivalence.equiv) (@rswap m n i1 i2).
 Proof. by move=> m n i1 i2 A B eqAB i; apply eqAB. Qed.
 
 Definition cswap m n i1 i2 (A : 'M_(m, n)) :=
   \matrix_(i, j) (A i (tperm i1 i2 j) : R).
-Global Instance cswap_morph m n i1 i2 : Morphism (Equivalence.equiv==>Equivalence.equiv) (@cswap m n i1 i2).
+Global Instance cswap_morph m n i1 i2 : Proper (Equivalence.equiv==>Equivalence.equiv) (@cswap m n i1 i2).
 Proof. by move=> m n i1 i2 A B eqAB i j; apply eqAB. Qed.
     
 Definition trmx m n (A : 'M_(m, n)) := \matrix_(i, j) (A j i : R).
-Global Instance trmx_morph m n : Morphism (Equivalence.equiv==>Equivalence.equiv) (@trmx m n).
+Global Instance trmx_morph m n : Proper (Equivalence.equiv==>Equivalence.equiv) (@trmx m n).
 Proof. by move=> m n A B eqAB i j; apply eqAB. Qed.
 
 Lemma trmxK : forall m n, setoid_cancel (@trmx m n) (@trmx n m).
@@ -179,18 +179,18 @@ Variables m n1 n2 : nat.
 
 Definition lcutmx (A : 'M_(m, n1 + n2)):=
   \matrix_(i < m, j < n1) (A i (lshift n2 j) : R).
-Global Instance lcutmx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv) lcutmx.
+Global Instance lcutmx_morph : Proper (Equivalence.equiv==>Equivalence.equiv) lcutmx.
 Proof. by move=> A B eqAB i j; apply eqAB. Qed.
 
 Definition rcutmx (A : 'M_(m, n1 + n2)) :=
   \matrix_(i < m, j < n2) (A i (rshift n1 j) : R).
-Global Instance rcutmx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv) rcutmx.
+Global Instance rcutmx_morph : Proper (Equivalence.equiv==>Equivalence.equiv) rcutmx.
 Proof. by move=> A B eqAB i j; apply eqAB. Qed.
 
 Definition pastemx (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :=
    \matrix_(i < m, j < n1 + n2)
       (match split j with inl j1 => A1 i j1 | inr j2 => A2 i j2 end : R).
-Global Instance pastemx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) pastemx.
+Global Instance pastemx_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) pastemx.
 Proof.
 rewrite/pastemx=> A1 B1 eqAB1 A2 B2 eqAB2 i j; case: (splitP j)=> j' _; first by apply eqAB1.
 by apply eqAB2.
@@ -285,7 +285,7 @@ Variables m1 m2 n1 n2 : nat.
 
 Definition block_mx Aul Aur All Alr : 'M_(m1 + m2, n1 + n2) :=
   (pastemx (pastemx Aul Aur)^T (pastemx All Alr)^T)^T.
-Global Instance block_mx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) block_mx.
+Global Instance block_mx_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) block_mx.
 Proof.
 rewrite/block_mx=> Aul1 Aul2 eqAul Aur1 Aur2 eqAur All1 All2 eqAll Alr1 Alr2 eqAlr i j.
 by apply pastemx_morph; apply trmx_morph; apply pastemx_morph.
@@ -458,13 +458,13 @@ Definition oppmx A := \matrix_(i < m, j < n) (- A i j).
 Definition addmx A B := \matrix_(i < m, j < n) (A i j + B i j).
 Definition scalemx x A := \matrix_(i < m, j < n) (x * A i j).
 
-Global Instance addmx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) addmx.
+Global Instance addmx_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) addmx.
 Proof. by move=> A A' eqAA' B B' eqBB' i j; rewrite/addmx; setoid_rewrite eqAA'; setoid_rewrite eqBB'; reflexivity. Qed.
 
-Global Instance oppmx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv) oppmx.
+Global Instance oppmx_morph : Proper (Equivalence.equiv==>Equivalence.equiv) oppmx.
 Proof. by move=> A A' eqAA' i j ; rewrite/oppmx; setoid_rewrite eqAA'; reflexivity. Qed.
 
-Global Instance scalemx_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) scalemx.
+Global Instance scalemx_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) scalemx.
 Proof. by move=> A A' eqAA' B B' eqBB' i j ; rewrite/scalemx; setoid_rewrite eqAA'; setoid_rewrite eqBB'; reflexivity. Qed.
 
 Lemma summxE : forall I r (P : pred I) (E : I -> 'M_(m, n)) i j,

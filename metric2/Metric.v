@@ -112,7 +112,7 @@ Proof.
  split.
   apply ball_eq.
  intros H e.
- rewrite H.
+ rewrite -> H.
  apply ball_refl.
 Qed.
 
@@ -137,7 +137,7 @@ Proof.
   destruct (Qpos_lt_plus H) as [c Hc].
   rewrite <- Q_Qpos_plus in Hc.
   change (QposEq d (e+c)) in Hc.
-  rewrite Hc; clear - B1.
+  rewrite -> Hc; clear - B1.
   auto with *.
  change (QposEq e d) in H.
  rewrite <- H.

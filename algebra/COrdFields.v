@@ -332,7 +332,7 @@ Qed.
 Lemma leEq_reflexive : forall x : R, x [<=] x.
 Proof.
  intro x.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  apply less_irreflexive_unfolded.
 Qed.
 
@@ -358,7 +358,7 @@ Lemma lt_equiv_imp_eq : forall x x' : R,
  (forall y, x [<] y -> x' [<] y) -> (forall y, x' [<] y -> x [<] y) -> x [=] x'.
 Proof.
  intros x x' H H0.
- apply leEq_imp_eq; rewrite leEq_def in |- *; intro H1.
+ apply leEq_imp_eq; rewrite -> leEq_def in |- *; intro H1.
   apply (less_irreflexive_unfolded _ x); auto.
  apply (less_irreflexive_unfolded _ x'); auto.
 Qed.
@@ -385,7 +385,7 @@ Qed.
 Lemma leEq_transitive : forall x y z : R, x [<=] y -> y [<=] z -> x [<=] z.
 Proof.
  intros x y z.
- repeat rewrite leEq_def.
+ repeat rewrite -> leEq_def.
  intros H H0 H1.
  apply H.
  apply leEq_less_trans with (y := z); firstorder using leEq_def.
@@ -394,7 +394,7 @@ Qed.
 Lemma less_leEq : forall x y : R, x [<] y -> x [<=] y.
 Proof.
  intros.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  apply less_antisymmetric_unfolded.
  assumption.
 Qed.
@@ -404,7 +404,7 @@ Proof.
  intros x y H.
  apply H.
  right.
- rewrite leEq_def.
+ rewrite -> leEq_def.
  intros H0.
  apply H.
  left.
@@ -415,7 +415,7 @@ Qed.
 Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
 Proof.
  intros x y Hxy H. move: Hxy.
- rewrite leEq_def. intro Hxy. apply H.
+ rewrite -> leEq_def. intro Hxy. apply H.
  right.
  apply (not_ap_imp_eq).
  intros H0.
@@ -494,10 +494,10 @@ Lemma nring_leEq : forall m n : nat, m <= n -> (nring m:R) [<=] nring n.
 Proof.
  intros m n H.
  elim (le_lt_eq_dec _ _ H); intro H1.
-  rewrite leEq_def in |- *. apply less_antisymmetric_unfolded.
+  rewrite -> leEq_def in |- *. apply less_antisymmetric_unfolded.
   apply nring_less. auto.
   rewrite H1.
- rewrite leEq_def in |- *. apply less_irreflexive_unfolded.
+ rewrite -> leEq_def in |- *. apply less_irreflexive_unfolded.
 Qed.
 
 Lemma nring_apart : forall m n : nat, m <> n -> (nring m:R) [#] nring n.
@@ -1131,7 +1131,7 @@ Proof.
   apply leEq_less_trans with x; auto.
  (* Cut *)
  intros x y z.
- repeat rewrite leEq_def in |- *.
+ repeat rewrite -> leEq_def in |- *.
  intros H H0 H1.
  generalize (shift_zero_less_minus _ _ H1); intro H2.
  cut (Zero [<] (x[-]y)[*]z).

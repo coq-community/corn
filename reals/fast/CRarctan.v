@@ -48,8 +48,8 @@ Proof.
  split.
   abstract ( apply Qinv_le_0_compat; apply Qle_trans with 1; [discriminate|assumption]).
  abstract ( assert (H:0<a); [apply Qlt_le_trans with 1;[constructor|assumption]|];
-   apply: (mult_cancel_leEq _ (/a) 1 a);simpl;[assumption|]; (replace RHS with a by ring);
-     replace LHS with (1);[assumption|]; field; apply (Greater_imp_ap _ a 0); assumption).
+   apply: (mult_cancel_leEq _ (/a) 1 a);simpl;[assumption|]; (replace RHS with a by simpl; ring);
+     replace LHS with (1);[assumption|]; simpl; field; apply (Greater_imp_ap _ a 0); assumption).
 Defined.
 
 Lemma rational_arctan_big_pos_correct : forall a (Ha: 1 <= a), 1 < a ->
@@ -58,8 +58,8 @@ Proof.
  intros a Ha H.
  unfold rational_arctan_big_pos.
  assert (H0:0<a); [apply Qlt_trans with 1;[constructor|assumption]|].
- rewrite rational_arctan_small_pos_correct.
-  rewrite r_pi_correct.
+ rewrite -> rational_arctan_small_pos_correct.
+  rewrite -> r_pi_correct.
   assert (H1:(inj_Q IR a)[#]Zero).
    stepr (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)].
    apply inj_Q_ap.
@@ -102,7 +102,7 @@ Proof.
   ring_simplify.
  replace LHS with 1.
   assumption.
- field.
+ simpl. field.
  apply: (Greater_imp_ap _ a 0); assumption.
 Qed.
 
@@ -116,7 +116,7 @@ Proof.
    apply (Zle_not_lt _ _ Ha); unfold Qeq in H0; simpl in H0; rewrite <- H0; apply Zlt_0_minus_lt;
      ring_simplify; auto with *|]; change (-(1) <= ((inject_Z (n-d)%Z)[/]_[//]H) <= 1);
        split; [apply: shift_leEq_div;simpl | apply: shift_div_leEq';simpl];try
-         (unfold Qlt; simpl; auto with * ); rewrite Qle_minus_iff;
+         (unfold Qlt; simpl; auto with * ); rewrite -> Qle_minus_iff;
            try change (0 <= (n + d)%Z * 1  + (- (n - d))%Z); ring_simplify; unfold Qle; simpl;
              ring_simplify; auto with *.
 Defined.
@@ -149,8 +149,8 @@ Proof.
   simpl.
   change (Zneg (n+d))%Z with (-(n+d))%Z.
   auto with *.
- rewrite rational_arctan_small_correct; try assumption.
- rewrite r_pi_correct.
+ rewrite -> rational_arctan_small_correct; try assumption.
+ rewrite -> r_pi_correct.
  rewrite <- IR_plus_as_CR.
  apply IRasCR_wd.
  stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((n - d)%Z / (n + d)%Z))).
@@ -194,10 +194,10 @@ Proof.
    apply eq_transitive with (inj_Q IR ((n # d)[+][--](y'[*](n # d))));[| apply inj_Q_minus].
    apply inj_Q_wd.
    simpl.
-   rewrite (Qmake_Qdiv n d).
+   rewrite -> (Qmake_Qdiv n d).
    unfold y'.
    unfold Zminus.
-   repeat rewrite injz_plus.
+   repeat rewrite -> injz_plus.
    change (inject_Z (- d)) with (- (inject_Z d)).
    field.
    split; unfold Qeq; simpl; auto with *.
@@ -266,7 +266,7 @@ Lemma rational_arctan_correct : forall (a:Q),
 Proof.
  intros a.
  unfold rational_arctan.
- destruct (Qle_total a 0); rewrite rational_arctan_pos_correct; try reflexivity.
+ destruct (Qle_total a 0); rewrite -> rational_arctan_pos_correct; try reflexivity.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.
  csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
@@ -287,7 +287,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   change (/1) with 1.
-  replace RHS with (x:Q) by ring.
+  replace RHS with (x:Q) by simpl; ring.
   apply Qle_refl.
  apply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan I) rational_arctan).
   intros q [] _.
@@ -329,7 +329,7 @@ Proof.
  intros q [] _.
  transitivity (rational_arctan q);[|apply rational_arctan_correct].
  unfold arctan.
- rewrite (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
+ rewrite -> (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
  apply: BindLaw1.
 Qed.
 (* begin hide *)
@@ -339,7 +339,7 @@ Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
 Proof.
  intros x.
  unfold arctan.
- rewrite (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
+ rewrite -> (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
  apply: BindLaw1.
 Qed.
 (* begin hide *)

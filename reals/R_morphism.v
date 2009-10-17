@@ -472,14 +472,14 @@ Qed.
 
 Lemma leEq_pres_f : forall x y : R1, f x[<=]f y -> x[<=]y.
 Proof.
- intros; rewrite leEq_def; intro.
+ intros; rewrite -> leEq_def; intro.
  apply less_irreflexive_unfolded with (x := f x).
  apply leEq_less_trans with (f y); auto.
 Qed.
 
 Lemma f_pres_leEq : forall x y : R1, x[<=]y -> f x[<=]f y.
 Proof.
- intros; rewrite leEq_def; intro.
+ intros; rewrite -> leEq_def; intro.
  apply less_irreflexive_unfolded with (x := x).
  apply leEq_less_trans with y; auto.
  apply less_pres_f; auto.

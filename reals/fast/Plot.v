@@ -67,7 +67,7 @@ Proof.
  simpl.
  unfold FinCompact_raw.
  rewrite map_map.
- rewrite in_map_iff.
+ rewrite -> in_map_iff.
  unfold graphPoint_b_raw.
  simpl.
  unfold Couple_raw.
@@ -114,7 +114,7 @@ Proof.
  apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
   apply ball_approx_r.
  unfold Compact.
- rewrite ball_Cunit.
+ rewrite -> ball_Cunit.
  apply ball_sym.
  assert (L:st_eq ((l,t):Q2) (l,b + h)).
   split; simpl.
@@ -123,10 +123,10 @@ Proof.
  set (Z0:=(l, t):Q2) in *.
  set (Z1:=(r, b):Q2) in *.
  set (Z:=(l, (b + h)):Q2) in *.
- rewrite L.
+ rewrite -> L.
  setoid_replace Z1 with (l+w,b).
   unfold Z, PlotQ.
-  rewrite Hw Hh.
+  rewrite -> Hw, Hh.
   destruct n; try discriminate.
   destruct m; try discriminate.
   apply (RasterizeQ2_correct).
@@ -135,7 +135,7 @@ Proof.
   rewrite <- Hh.
   destruct (InStrengthen _ _ H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
   simpl in Hz1, Hz2.
-  rewrite Hz1 Hz2.
+  rewrite -> Hz1, Hz2.
   eapply graphQ_bonus.
   apply Hz0.
  split; simpl; auto with *.

@@ -85,8 +85,8 @@ Proof.
  autorewrite with QposElim in H.
  intros B.
  apply H.
- rewrite A.
- rewrite B.
+ rewrite -> A.
+ rewrite -> B.
  reflexivity.
 Qed.
 
@@ -116,8 +116,8 @@ Proof.
  autorewrite with QposElim in H.
  intros B.
  apply H.
- rewrite A.
- rewrite B.
+ rewrite -> A.
+ rewrite -> B.
  reflexivity.
 Qed.
 

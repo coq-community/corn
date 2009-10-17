@@ -66,8 +66,8 @@ Lemma OpenUnit_Dual_lt_1 : forall (a:OpenUnit), 1-a < 1.
 Proof.
  intros [a [H0 H1]].
  simpl.
- rewrite Qlt_minus_iff.
- replace RHS with a by ring.
+ rewrite -> Qlt_minus_iff.
+ replace RHS with a by simpl; ring.
  assumption.
 Qed.
 (* begin hide *)
@@ -101,7 +101,7 @@ Proof.
  intros a.
  exists (1-a).
  abstract (destruct a as [a [Ha0 Ha1]]; simpl; split; rewrite  -> Qlt_minus_iff in *;[
-   (replace RHS with (1+-a) by ring); auto| (replace RHS with (a+-0) by ring); auto]).
+   (replace RHS with (1+-a) by simpl; ring); auto| (replace RHS with (a+-0) by simpl; ring); auto]).
 Defined.
 
 (** The dual of multipliation: 1 - (1-a)*(1-b) or a + b - a*b *)
@@ -122,7 +122,7 @@ Proof.
  intros b a p.
  exists ((b-a)/(1-a)).
  abstract ( assert (X:OpenUnitDual b < OpenUnitDual a); [rewrite -> Qlt_minus_iff in *; simpl;
-   (replace RHS with (b + - a) by ring); assumption |split;
+   (replace RHS with (b + - a) by simpl; ring); assumption |split;
      [(replace RHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with * );
        auto with *
          |(replace LHS with (OpenUnitDual (OpenUnitDiv _ _ X):Q) by simpl; field; auto with * );
@@ -162,7 +162,7 @@ Proof.
  intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
  unfold affineCombo.
  unfold ou_eq in Hx.
- rewrite Hx Hy Hz; reflexivity.
+ rewrite -> Hx, Hy, Hz; reflexivity.
 Qed.
 
 (** Properties of an affine combination. *)
@@ -171,7 +171,7 @@ Proof.
  intros o a b H.
  unfold affineCombo.
  rewrite -> Qlt_minus_iff in *.
- replace RHS with ((1-o)*(b-a)) by ring.
+ replace RHS with ((1-o)*(b-a)) by simpl; ring.
  apply: mult_resp_pos; simpl; auto with *.
 Qed.
 
@@ -180,7 +180,7 @@ Proof.
  intros o a b H.
  unfold affineCombo.
  rewrite -> Qlt_minus_iff in *.
- replace RHS with (o*(b-a)) by ring.
+ replace RHS with (o*(b-a)) by simpl; ring.
  apply: mult_resp_pos; simpl; auto with *.
 Qed.
 (* begin hide *)

@@ -1020,16 +1020,16 @@ Proof.
    rational.
   rewrite <- Zsucc_succ'.
   unfold Zsucc.
-  rewrite zring_plus.
+  rewrite -> zring_plus.
   rstepl (Sin (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
-  rewrite Sin_periodic.
+  rewrite -> Sin_periodic.
   auto.
  rewrite <- Zpred_pred'.
  unfold Zpred.
- rewrite zring_plus.
+ rewrite -> zring_plus.
  rstepl (Sin (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).
  rstepr (Sin (x[-]Two[*]Pi[+]Two[*]Pi)).
- rewrite Sin_periodic.
+ rewrite -> Sin_periodic.
  auto.
 Qed.
 
@@ -1039,16 +1039,16 @@ Proof.
    rational.
   rewrite <- Zsucc_succ'.
   unfold Zsucc.
-  rewrite zring_plus.
+  rewrite -> zring_plus.
   rstepl (Cos (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
-  rewrite Cos_periodic.
+  rewrite -> Cos_periodic.
   auto.
  rewrite <- Zpred_pred'.
  unfold Zpred.
- rewrite zring_plus.
+ rewrite -> zring_plus.
  rstepl (Cos (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).
  rstepr (Cos (x[-]Two[*]Pi[+]Two[*]Pi)).
- rewrite Cos_periodic.
+ rewrite -> Cos_periodic.
  auto.
 Qed.
 
@@ -1074,7 +1074,7 @@ Proof.
   apply less_leEq.
   apply pos_one.
  unfold pi_seq.
- rewrite Cos_zero.
+ rewrite -> Cos_zero.
  apply eq_imp_leEq.
  rational.
 Qed.
@@ -1105,7 +1105,7 @@ Proof.
   clear IHi.
   induction i.
    unfold pi_seq.
-   rewrite Cos_zero.
+   rewrite -> Cos_zero.
    setoid_replace (Zero [+] One:IR) with (One:IR);[|rational].
    apply eq_imp_leEq.
    reflexivity.

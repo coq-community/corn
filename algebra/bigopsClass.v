@@ -131,7 +131,7 @@ Qed.
 Section Extensionality.
 
 Context `{Equivalence R req} {idx : R} {op : binop R}.
-Context `{Morphism (binop R) (req==>req==>req) op}.
+Context `{Proper (binop R) (req==>req==>req) op}.
 
 Section SeqExtension.
 
@@ -431,7 +431,7 @@ Section MonoidProperties.
 
 Section Plain.
 Context `{Equivalence R req} {op : binop R} {idm : R}.
-Context {op_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
+Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Context {op_assoc : associative op}.
 Context {op_left_id : left_unit op idm}.
 Context {op_right_id : right_unit op idm}.
@@ -575,7 +575,7 @@ Qed.
 Section Abelian.
 
 Context `{Equivalence R req} {op : binop R} {idm : R}.
-Context {op_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
+Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Context {op_assoc : associative op}.
 Context {op_left_id : left_unit op idm}.
 Context {op_right_id : right_unit op idm}.
@@ -776,8 +776,8 @@ Section BigProp.
 
 Context `{Equivalence R req} {Pb : R -> Prop}.
 Context {idx : R} {op1 : binop R}.
-Context {Pb_morph : Morphism (Equivalence.equiv==>Equivalence.equiv) Pb}.
-Context {op1_morph : Morphism (req==>req==>req) op1}.
+Context {Pb_morph : Proper (Equivalence.equiv==>Equivalence.equiv) Pb}.
+Context {op1_morph : Proper (req==>req==>req) op1}.
 Hypothesis (Pb_idx : Pb idx)
            (Pb_op1 : forall x y, Pb x -> Pb y -> Pb (op1 x y)).
 
@@ -786,7 +786,7 @@ Lemma big_prop : forall I r (P : pred I) F,
 Proof. by move=> I r P F PbF; elim: r => //= i *; case Pi: (P i); auto. Qed.
 
 Variable (op2 : binop R).
-Context {op2_morph : Morphism (req==>req==>req) op2}.
+Context {op2_morph : Proper (req==>req==>req) op2}.
 
 Hypothesis (Pb_eq_op : forall x y, Pb x -> Pb y -> op1 x y === op2 x y).
 
@@ -819,9 +819,9 @@ Variables (idx1 : R1) (op1 : binop R1).
 Context `{Equivalence R2 req2}.
 Variable Pr : R1 -> R2 -> Prop.
 Variables (idx2 : R2) (op2 : binop R2).
-Context {Pr_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) Pr}.
-Context {op1_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op1}.
-Context {op2_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
+Context {Pr_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) Pr}.
+Context {op1_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op1}.
+Context {op2_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
 
 Hypothesis Pr_idx : Pr idx1 idx2.
 Hypothesis Pr_rel : forall x1 x2 y1 y2,
@@ -853,7 +853,7 @@ Variables (idx2 : R2) (op2 : binop R2).
 Variable phi : R1 -> R2.
 Hypothesis phiM : forall x y, req2 (phi (op1 x y)) (op2 (phi x) (phi y)).
 Hypothesis phi_id : req2 (phi idx1) idx2.
-Context {op2_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
+Context {op2_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
 
 Lemma big_morph : forall I r (P : pred I) F,
   phi (\big[op1/idx1]_(i <- r | P i) F i) ===
@@ -874,8 +874,8 @@ Notation Local "0" := zero.
 Notation Local "+%M" := add (at level 0).
 Notation Local "x + y" := (add x y).
 
-Context {op_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
-Context {mul_morph : Morphism (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
+Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
+Context {mul_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
 Context {op_assoc : associative +%M}.
 Context {op_comm : commutative +%M}.
 Context {op_left_unit : left_unit +%M 0}.

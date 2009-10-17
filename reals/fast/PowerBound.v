@@ -99,14 +99,14 @@ Proof.
    constructor.
   assert (X:=power4bound (d#n)).
   simpl in X.
-  rewrite Zpower_Qpower; try auto with *.
+  rewrite -> Zpower_Qpower; try auto with *.
   apply Qle_shift_inv_r.
    clear - d.
    induction (Psize d).
     constructor.
    rewrite inj_S.
    unfold Zsucc.
-   rewrite Qpower_plus;[|discriminate].
+   rewrite -> Qpower_plus;[|discriminate].
    apply: mult_resp_pos;[assumption|constructor].
   rewrite <- Zpower_Qpower; try auto with *.
   destruct (inject_Z (4%positive ^ Psize d)%Z).

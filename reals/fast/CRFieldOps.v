@@ -60,12 +60,12 @@ Proof.
  intros e x H.
  exists e.
  abstract ( intros a; simpl; unfold Cap_raw; simpl; apply Qle_trans with (-(1#2)*a);
-   [rewrite Qle_minus_iff; ring_simplify; discriminate|]; rewrite Qle_minus_iff;
+   [rewrite -> Qle_minus_iff; ring_simplify; discriminate|]; rewrite -> Qle_minus_iff;
      destruct (regFun_prf x e ((1#2)*a)%Qpos) as [_ X];
-       (replace RHS with (approximate x ((1 # 2) * a)%Qpos + (1#2)*a + e + - (2*e)) by ring);
+       (stepr (approximate x ((1 # 2) * a)%Qpos + (1#2)*a + e + - (2*e)); [|simpl; ring]);
          rewrite <- Qle_minus_iff; apply Qle_trans with (approximate x e); try assumption; simpl in X;
-           rewrite -> Qle_minus_iff in X; rewrite Qle_minus_iff; autorewrite with QposElim in X;
-             (replace RHS with (e + (1 # 2) * a + - (approximate x e - approximate x ((1 # 2) * a)%Qpos)) by ring);
+           rewrite -> Qle_minus_iff in X; rewrite -> Qle_minus_iff; autorewrite with QposElim in X;
+             (stepr (e + (1 # 2) * a + - (approximate x e - approximate x ((1 # 2) * a)%Qpos)); [|simpl; ring]);
                assumption).
 Defined.
 
@@ -85,13 +85,13 @@ Proof.
  intros e x H.
  exists e.
  abstract ( intros a; simpl; unfold Cap_raw; simpl; apply Qle_trans with (-(1#2)*a);
-   [rewrite Qle_minus_iff; ring_simplify; discriminate|]; rewrite Qle_minus_iff;
+   [rewrite -> Qle_minus_iff; ring_simplify; discriminate|]; rewrite -> Qle_minus_iff;
      destruct (regFun_prf x e ((1#2)*a)%Qpos) as [X _];
-       (replace RHS with ( - e + - approximate x ((1 # 2) * a)%Qpos + (1 # 2) * a + approximate x e + - approximate x e) by ring);
+       (stepr ( - e + - approximate x ((1 # 2) * a)%Qpos + (1 # 2) * a + approximate x e + - approximate x e); [|simpl; ring]);
          rewrite <- Qle_minus_iff; apply Qle_trans with (-(2)*e); try assumption; simpl in X;
-           rewrite -> Qle_minus_iff in X; rewrite Qle_minus_iff; autorewrite with QposElim in X;
-             (replace RHS with (approximate x e - approximate x ((1 # 2) * a)%Qpos +
-               - - (e + (1 # 2) * a)) by ring); assumption).
+           rewrite -> Qle_minus_iff in X; rewrite -> Qle_minus_iff; autorewrite with QposElim in X;
+             (stepr (approximate x e - approximate x ((1 # 2) * a)%Qpos +
+               - - (e + (1 # 2) * a)); [| simpl; ring]); assumption).
 Defined.
 
 (** Strict inequality is defined in terms of positivity. *)
@@ -207,6 +207,7 @@ Proof.
   simpl.
   setoid_replace ((an#ad)*(ad#an)) with 1.
    ring.
+  simpl.
   unfold Qeq.
   simpl.
   rewrite Pmult_1_r.
@@ -226,6 +227,7 @@ Proof.
  simpl.
  setoid_replace ((Zneg an#ad)*(ad#an)) with ([--]1).
   simpl; ring.
+ simpl.
  unfold Qeq.
  simpl.
  rewrite Pmult_1_r.
@@ -251,17 +253,17 @@ Lemma QboundAbs_absorb: forall (a b:Qpos) (c:Q),
 Proof.
  intros a b c H.
  simpl.
- rewrite Qmin_max_distr_r.
+ rewrite -> Qmin_max_distr_r.
  setoid_replace (Qmin b (-a)) with (-a).
-  rewrite Qmax_assoc.
+  rewrite -> Qmax_assoc.
   rewrite <- Qmin_max_de_morgan.
-  rewrite Qmin_assoc.
+  rewrite -> Qmin_assoc.
   setoid_replace (Qmin b a) with (a:Q).
    reflexivity.
   rewrite <- Qle_min_r.
   assumption.
  rewrite <- Qle_min_r.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  auto with *.
 Qed.
@@ -275,7 +277,7 @@ Proof.
  unfold CRboundAbs.
  transitivity (uc_compose (Cmap QPrelengthSpace (QboundBelow_uc (-a))) (Cmap QPrelengthSpace (QboundAbove_uc a)) x).
   simpl.
-  repeat rewrite Cmap_fun_correct.
+  repeat rewrite -> Cmap_fun_correct.
   apply: MonadLaw2.
  simpl.
  change (boundBelow (-a)%Q (boundAbove a x) == x)%CR.
@@ -283,7 +285,7 @@ Proof.
   rewrite <- CRmin_boundAbove.
   rewrite <- CRle_min_r.
   assumption.
- rewrite X.
+ rewrite -> X.
  rewrite <- CRmax_boundBelow.
  rewrite <- CRle_max_r.
  assumption.
@@ -299,7 +301,7 @@ Proof.
  simpl.
  apply Qmax_case; apply Qmin_case; intros Z0 Z1; try solve [apply H1;assumption|apply H2;assumption].
   elim (Qle_not_lt _ _ Z1).
-  rewrite Qlt_minus_iff.
+  rewrite -> Qlt_minus_iff.
   ring_simplify.
   apply: mult_resp_pos.
    constructor.
@@ -317,7 +319,7 @@ Proof.
  intros c e a0 a1 H b.
  simpl in *.
  set (b' := Qmax (- c) (Qmin c b)).
- repeat rewrite (fun x => Qmult_comm x b').
+ repeat rewrite -> (fun x => Qmult_comm x b').
  apply Qscale_uc_prf.
  setoid_replace (e/c)%Qpos with (Qpos_inv c*e)%Qpos in H by QposRing.
  apply ball_ex_weak_le with (Qpos_inv c*e)%Qpos;[|assumption].
@@ -332,8 +334,8 @@ Proof.
      [change ((One[/](c:Q)[//](@Qpos_nonzero c))[<=](One[/](bn#bd)[//](@Qpos_nonzero (bn#bd)%Qpos)));
        apply recip_resp_leEq; [apply (@Qpos_prf (bn#bd)%Qpos) |] |apply Qpos_nonneg]).
   assumption.
- replace LHS with (- (- (bn # bd))) by ring.
- replace RHS with (- (- c)) by ring.
+ stepl (- (- (bn # bd))); [| simpl; ring].
+ stepr (- (- c)); [| simpl; ring].
  apply inv_resp_leEq.
  apply H2.
 Qed.
@@ -349,13 +351,13 @@ Definition CRmult_bounded (c:Qpos) : CR --> CR --> CR :=
 Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc c).
 
 (** CR_b computes a rational bound on the absolute value of x *)
-Definition CR_b (e:Qpos) (x:CR) : Qpos.
-Proof.
- intros e x.
- refine (@mkQpos (Qabs (approximate x e) + e:Q) _).
- abstract ( (replace RHS with (Qabs (approximate x e) - (-e)) by ring); apply: shift_zero_less_minus;
-   apply Qlt_le_trans with 0;[constructor|apply Qabs_nonneg] ).
-Defined.
+
+Program Definition CR_b (e:Qpos) (x:CR) : Qpos := @mkQpos (Qabs (approximate x e) + e:Q) _.
+Next Obligation.
+ assert (Qabs (approximate x e) + e == Qabs (approximate x e) - (-e)). ring. rewrite -> H. clear H.
+ apply: shift_zero_less_minus;
+  apply Qlt_le_trans with 0;[constructor|apply Qabs_nonneg].
+Qed.
 
 Lemma CR_b_lowerBound : forall e x, (' (-CR_b e x)%Q <= x)%CR.
 Proof.
@@ -365,7 +367,7 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  destruct (regFun_prf x ((1#2)*e')%Qpos e) as [H _].
  simpl in H.
@@ -373,7 +375,7 @@ Proof.
  ring_simplify in H.
  eapply Qle_trans.
   apply H.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
  clear H.
@@ -389,7 +391,7 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  ring_simplify.
  destruct (regFun_prf x ((1#2)*e')%Qpos e) as [_ H].
  simpl in H.
@@ -397,14 +399,14 @@ Proof.
  ring_simplify in H.
  eapply Qle_trans.
   apply H.
- rewrite Qle_minus_iff.
+ rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
  clear H.
  apply Qabs_case; intros H.
   ring_simplify;(apply: mult_resp_nonneg;[discriminate|apply Qpos_nonneg]).
  ring_simplify; repeat apply: plus_resp_nonneg;simpl.
-  replace RHS with ((2#1)*(-(approximate x e))) by ring.
+  stepr ((2#1)*(-(approximate x e))); [| simpl; ring].
   apply: mult_resp_nonneg.
    discriminate.
   apply (Qopp_le_compat (approximate x e) 0).
@@ -426,14 +428,14 @@ Proof.
  intros c1 c2 x y Hc1a Hc1b Hc2.
  assert (Hy:=CRboundAbs_Eq Hc1a Hc1b).
  set (y':= (CRboundAbs c1 y)) in *.
- transitivity (ucFun2 (CRmult_bounded c2) x y'); [|rewrite Hy;reflexivity].
+ transitivity (ucFun2 (CRmult_bounded c2) x y'); [|rewrite -> Hy;reflexivity].
  assert (H:forall x:Qpos, (x*c1/c2)%Qpos <= x).
   intros a.
   autorewrite with QposElim.
   change (((a* c1)[/](c2:Q)[//]@Qpos_nonzero c2)[<=](a:Q)).
   apply shift_div_leEq'.
    apply Qpos_prf.
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   apply mult_resp_leEq_rht.
    assumption.
   apply Qpos_nonneg.
@@ -443,7 +445,7 @@ Proof.
  set (x':=faster x''' (fun x => (x * c1 /c2)%Qpos) H).
  transitivity (ucFun2 (CRmult_bounded c1) x' y).
   unfold x'.
-  rewrite fasterIsEq.
+  rewrite -> fasterIsEq.
   reflexivity.
  apply: regFunEq_e; intros e.
  intros.
@@ -452,7 +454,7 @@ Proof.
  assert (X:=fun c => QboundAbs_absorb c Hc2).
  unfold QboundAbs in X.
  simpl in X.
- rewrite X.
+ rewrite -> X.
  clear X.
  replace (QposRed ((1 # 2) * e / c1 * c1 / c2)%Qpos) with (QposRed ((1 # 2) * e / c2)%Qpos);
    [repeat rewrite QposInf_bind_id;apply: ball_refl|].
@@ -483,8 +485,8 @@ Proof.
  unfold CRmult.
  set (c:=(CR_b (1 # 1) y1)).
  set (d:=(CR_b (1 # 1) y2)).
- rewrite Hx.
- rewrite Hy.
+ rewrite -> Hx.
+ rewrite -> Hy.
  unfold d.
  apply CRmult_bounded_mult; rewrite <- Hy.
   apply CR_b_lowerBound.
@@ -500,18 +502,18 @@ Proof.
  unfold Cmap2.
  unfold inject_Q.
  simpl.
- rewrite Cap_fun_correct.
- repeat rewrite Cmap_fun_correct.
- rewrite MonadLaw3.
- rewrite StrongMonadLaw1.
+ rewrite -> Cap_fun_correct.
+ repeat rewrite -> Cmap_fun_correct.
+ rewrite -> MonadLaw3.
+ rewrite -> StrongMonadLaw1.
  simpl.
  transitivity (uc_compose (Cmap QPrelengthSpace (Qscale_uc a))
    (Cmap QPrelengthSpace (QboundAbs (CR_b (1#1) y))) y).
   simpl.
-  repeat rewrite Cmap_fun_correct.
+  repeat rewrite -> Cmap_fun_correct.
   apply: MonadLaw2.
  simpl.
- repeat rewrite Cmap_fun_correct.
+ repeat rewrite -> Cmap_fun_correct.
  change (Cmap_slow (Qscale_uc a) (Cmap_slow_fun (QboundAbs (CR_b (1 # 1) y)) y) ==
    Cmap_slow (Qscale_uc a) y)%CR.
  apply uc_wd.
@@ -528,7 +530,7 @@ Proof.
  intros a b.
  unfold scale.
  simpl.
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  apply: MonadLaw3.
 Qed.
 (* begin hide *)
@@ -568,7 +570,7 @@ Proof.
  stepr (Qmax c a1 - Qmax c a0); [| simpl; field; repeat split; apply H].
  apply: AbsSmall_leEq_trans.
   instantiate (1:=(c*c*e)).
-  rewrite Qmult_comm.
+  rewrite -> Qmult_comm.
   apply mult_resp_leEq_lft;[|apply Qpos_nonneg].
   apply mult_resp_leEq_both; (apply Qpos_nonneg || apply Qmax_ub_l).
  change (ball (c*c*e) (Qmax c a1) (Qmax c a0)).
@@ -622,7 +624,7 @@ Proof.
   assert (Z:=Qinv_pos_uc_wd Hc).
   simpl in Z.
   simpl.
-  rewrite Z;[|apply Qmax_ub_l].
+  rewrite -> Z;[|apply Qmax_ub_l].
   unfold Qinv_modulus.
   replace (QposRed (c1 * c1 * e)) with (QposRed (f (c2 * c2 * e)%Qpos)); [apply: ball_refl|].
   apply QposRed_complete.
@@ -630,7 +632,7 @@ Proof.
   autorewrite with QposElim.
   field.
   apply Qpos_nonzero.
- rewrite fasterIsEq.
+ rewrite -> fasterIsEq.
  reflexivity.
 Qed.
 
@@ -678,7 +680,7 @@ Proof.
     apply X.
    simpl.
    do 2 (unfold Cap_raw;simpl).
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    apply Qle_refl.
   elim (Qlt_not_le _ _ (Qpos_prf c)).
@@ -687,7 +689,7 @@ Proof.
   do 2 (unfold Cap_raw in Y ;simpl in Y).
   rewrite -> Qle_minus_iff in Y.
   ring_simplify in Y.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify;assumption.
  assert (' e <= x)%CR.
   rewrite <- (doubleSpeed_Eq x).
@@ -723,8 +725,8 @@ Proof.
   apply: ball_refl.
  intros x y [[c x_]|[c x_]] [[d y_]|[d y_]] H.
     change (-(CRinv_pos c (-x))== (-(CRinv_pos d (-y))))%CR.
-    rewrite H in x_ *.
-    rewrite X in y_ *. intros.
+    rewrite -> H in *.
+    rewrite -> X in *. intros.
     apply: CRopp_wd.
     destruct (Qle_total c d);[|symmetry]; apply CRinv_pos_weaken; try assumption.
    elim (Qlt_not_le _ _ (Qpos_prf c)).
@@ -737,7 +739,7 @@ Proof.
    autorewrite with QposElim in Z.
    rewrite -> Qle_minus_iff in Z.
    ring_simplify in Z.
-   rewrite Qle_minus_iff.
+   rewrite -> Qle_minus_iff.
    ring_simplify.
    assumption.
   elim (Qlt_not_le _ _ (Qpos_prf c)).
@@ -750,7 +752,7 @@ Proof.
   autorewrite with QposElim in Z.
   rewrite -> Qle_minus_iff in Z.
   ring_simplify in Z.
-  rewrite Qle_minus_iff.
+  rewrite -> Qle_minus_iff.
   ring_simplify.
   assumption.
  change (CRinv_pos c x== (CRinv_pos d y))%CR.

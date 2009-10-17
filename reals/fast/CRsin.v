@@ -66,10 +66,10 @@ Proof.
  rewrite Str_nth_plus.
  rewrite plus_comm.
  rewrite Str_nth_recip_factorials.
- rewrite Str_nth_powers_help.
+ rewrite -> Str_nth_powers_help.
  rewrite <- Qpower_mult.
  rewrite inj_plus.
- rewrite Qpower_plus';[|rewrite <- inj_plus; auto with *].
+ rewrite -> Qpower_plus';[|rewrite <- inj_plus; auto with *].
  rewrite inj_mult.
  reflexivity.
 Qed.
@@ -80,12 +80,12 @@ Hypothesis Ha: 0 <= a <= 1.
 Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
  split.
-  replace RHS with ((1*a)*a) by ring.
+  replace RHS with ((1*a)*a) by simpl; ring.
   apply (sqr_nonneg _ a).
- rewrite Qle_minus_iff.
- replace RHS with ((1-a)*(1+a)) by ring.
+ rewrite -> Qle_minus_iff.
+ replace RHS with ((1-a)*(1+a)) by simpl; ring.
  destruct Ha as [Ha0 Ha1].
- apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by ring];
+ apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by simpl; ring];
    rewrite <- Qle_minus_iff; try assumption.
  apply Qle_trans with 0.
   discriminate.
@@ -131,7 +131,7 @@ Proof.
          (compact_single_prop (inj_Q IR a))
            (fun_series_inc_IR realline sin_ps sin_conv (inj_Q IR a) I)).
  intros H.
- rewrite InfiniteAlternatingSum_correct'.
+ rewrite -> InfiniteAlternatingSum_correct'.
  apply IRasCR_wd.
  unfold series_sum.
  apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
@@ -196,8 +196,8 @@ Proof.
  stepr (inj_Q IR ((1/P_of_succ_nat (pred (fac (1+2*n))))*a^(1+2*n)%nat)).
   apply inj_Q_wd.
   simpl.
-  rewrite Str_nth_sinSequence.
-  rewrite Qmake_Qdiv.
+  rewrite -> Str_nth_sinSequence.
+  rewrite -> Qmake_Qdiv.
   reflexivity.
  rstepr ((nring 1[/]nring (R:=IR) (fac (S n'))[//]
    nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-]Zero))).
@@ -233,8 +233,8 @@ Proof.
    rewrite inj_S.
    unfold Zsucc.
    simpl in *.
-   rewrite IHn0.
-   rewrite injz_plus.
+   rewrite -> IHn0.
+   rewrite -> injz_plus.
    reflexivity.
   destruct (fac (S n')).
    elimtype False; auto with *.
@@ -345,11 +345,11 @@ Proof.
   transitivity (IRasCR (inj_Q IR (sin_poly_fun q)));[|apply IRasCR_wd; apply sin_poly_fun_correct].
   simpl.
   change (' q)%CR with (Cunit_fun _ q).
-  rewrite compress_fun_correct.
-  rewrite Cmap_fun_correct.
-  rewrite MonadLaw3.
-  rewrite IR_inj_Q_as_CR.
-  rewrite CReq_Qeq.
+  rewrite -> compress_fun_correct.
+  rewrite -> Cmap_fun_correct.
+  rewrite -> MonadLaw3.
+  rewrite -> IR_inj_Q_as_CR.
+  rewrite -> CReq_Qeq.
   simpl.
   unfold sin_poly_fun.
   setoid_replace (Qmax (- (1 # 1)%Qpos) (Qmin (1 # 1)%Qpos q)) with q.
@@ -393,11 +393,11 @@ Proof.
   discriminate.
  apply Qmult_lt_0_le_reg_r with 3.
   constructor.
- rewrite Zpower_Qpower; auto with *.
+ rewrite -> Zpower_Qpower; auto with *.
  rewrite (inj_S n) in H1.
- replace RHS with (3%positive^n*3^1) by ring.
+ replace RHS with (3%positive^n*3^1) by simpl; ring.
  rewrite <- Qpower_plus;[|discriminate].
- replace LHS with a by (field; discriminate).
+ replace LHS with a by (simpl; field; discriminate).
  rewrite -> Zpower_Qpower in H1; auto with *.
 Qed.
 
@@ -419,7 +419,7 @@ Proof.
  intros a Ha.
  unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
  destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
- rewrite IHn.
+ rewrite -> IHn.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
    (stepr (nring 1:IR); [| by apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
      apply AbsIR_Sin_leEq_One].
@@ -466,7 +466,7 @@ Proof.
  unfold rational_sin.
  destruct (Qle_total 0 a).
   apply rational_sin_pos_correct.
- rewrite rational_sin_pos_correct.
+ rewrite -> rational_sin_pos_correct.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.
  csetoid_rewrite_rev (Sin_inv (inj_Q IR (-a))).
@@ -486,7 +486,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   change (/1) with 1.
-  replace RHS with (x:Q) by ring.
+  replace RHS with (x:Q) by simpl; ring.
   apply Qle_refl.
  apply (is_UniformlyContinuousD None None I Sine Cosine (Derivative_Sin I) rational_sin).
   intros q [] _.
@@ -512,7 +512,7 @@ Proof.
  intros q [] _.
  transitivity (rational_sin q);[|apply rational_sin_correct].
  unfold sin_slow.
- rewrite (Cbind_fun_correct QPrelengthSpace sin_uc).
+ rewrite -> (Cbind_fun_correct QPrelengthSpace sin_uc).
  apply: BindLaw1.
 Qed.
 
@@ -526,13 +526,13 @@ Proof.
  generalize (Qceiling (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
    (1 # 2)%Qpos - (1 # 2)))%CR.
  intros z.
- rewrite compress_correct.
+ rewrite -> compress_correct.
  rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
    <- IR_minus_as_CR, <- sin_slow_correct.
  apply IRasCR_wd.
- rewrite inj_Q_mult.
+ rewrite -> inj_Q_mult.
  change (2:Q) with (Two:Q).
- rewrite inj_Q_nring.
+ rewrite -> inj_Q_nring.
  rstepr (Sin (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
  setoid_replace (inj_Q IR z) with (zring z:IR).
   rewrite <- zring_inv.

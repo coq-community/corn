@@ -99,12 +99,12 @@ Proof.
     apply Qpos_prf.
    unfold Sigma.
    simpl.
-   replace LHS with (q+0) by ring.
+   stepl (q+0); [| simpl; ring].
    apply: plus_resp_leEq_lft.
    apply QposSumNonNeg.
   intros.
   apply: shift_minus_less;simpl.
-  replace RHS with (x+Sigma) by ring.
+  rewrite -> Qplus_comm.
   assumption.
  assert (Hg1:=Smallest_less_Average _ _ _ H).
  assert (0<g).
@@ -182,7 +182,7 @@ Proof.
    assert (H:(fold_right Qpos_plus g0 gs < QposSum ((g' :: gs)++(g0::nil)))).
     simpl.
     replace LHS with (QposSum (gs ++ g0::nil)).
-     rewrite Qlt_minus_iff.
+     rewrite -> Qlt_minus_iff.
      ring_simplify.
      apply Qpos_prf.
     clear - g0.
@@ -190,7 +190,7 @@ Proof.
      simpl; ring.
     simpl.
     rewrite Q_Qpos_plus.
-    rewrite IHgs.
+    rewrite -> IHgs.
     reflexivity.
    case (trail _ _ _ Hab H).
    clear Hab H.
@@ -241,14 +241,14 @@ Proof.
    induction es.
     simpl.
     rewrite Q_Qpos_plus.
-    rewrite Qlt_minus_iff.
+    rewrite -> Qlt_minus_iff.
     ring_simplify.
     apply Qpos_prf.
    simpl.
    replace RHS with (a+(fold_right Qpos_plus e0 (e'::es))) by (simpl;QposRing).
    eapply Qlt_trans.
     apply IHes.
-   rewrite Qlt_minus_iff.
+   rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply Qpos_prf.
   assumption.
@@ -261,14 +261,14 @@ Proof.
   apply H with a0.
    simpl.
    rewrite Q_Qpos_plus.
-   rewrite Qlt_minus_iff.
+   rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply Qpos_prf.
   assumption.
  simpl.
  eapply ball_weak_le with (fold_right Qpos_plus e0 l).
   rewrite Q_Qpos_plus.
-  rewrite Qle_minus_iff; ring_simplify.
+  rewrite -> Qle_minus_iff; ring_simplify.
   auto with *.
  auto.
 Qed.
@@ -360,7 +360,7 @@ Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), st_eq (Cbind plX f) (Cb
 Proof.
  unfold Cbind, Cbind_slow.
  intros X Y plX f.
- rewrite (Cmap_correct).
+ rewrite -> (Cmap_correct).
  reflexivity.
 Qed.
 
@@ -374,7 +374,7 @@ Lemma Cmap_strong_prf : forall (X Y:MetricSpace) (plX:PrelengthSpace X),
  is_UniformlyContinuousFunction (@Cmap X Y plX) Qpos2QposInf.
 Proof.
  intros X Y plX e a b Hab.
- do 2 rewrite Cmap_correct.
+ do 2 rewrite -> Cmap_correct.
  apply Cmap_strong_slow_prf.
  auto.
 Qed.
@@ -430,7 +430,7 @@ Proof.
  generalize x e1' e2'.
  change (ball ((1 # 2) * e1 + (1 # 2) * e2) (Cmap plX (approximate f ((1 # 2) * e1)%Qpos))
    (Cmap_slow (approximate f ((1 # 2) * e2)%Qpos))).
- rewrite Cmap_correct.
+ rewrite -> Cmap_correct.
  set (f1:=(approximate f ((1 # 2) * e1)%Qpos)).
  set (f2:=(approximate f ((1 # 2) * e2)%Qpos)).
  apply Cmap_strong_slow_prf.
@@ -446,16 +446,16 @@ Proof.
  setoid_replace e with (e'+e'+e')%Qpos; [| unfold e';QposRing].
  apply ball_triangle with (Cmap plX (approximate f e') y).
   apply ball_triangle with (Cmap plX (approximate f e') x).
-   rewrite Cap_fun_correct.
+   rewrite -> Cap_fun_correct.
    simpl (Cmap plX (approximate f e') x).
-   rewrite Cmap_fun_correct.
+   rewrite -> Cmap_fun_correct.
    apply Cap_slow_help.
   apply (uc_prf).
   apply H.
  apply ball_sym.
- rewrite Cap_fun_correct.
+ rewrite -> Cap_fun_correct.
  simpl (Cmap plX (approximate f e') y).
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  apply Cap_slow_help.
 Qed.
 
@@ -470,7 +470,7 @@ Qed.
 Lemma Cap_prf X Y plX : is_UniformlyContinuousFunction (@Cap_weak X Y plX) Qpos2QposInf.
 Proof.
  intros X Y plX e a b Hab.
- do 2 rewrite Cap_weak_correct.
+ do 2 rewrite -> Cap_weak_correct.
  apply Cap_slow_prf.
  auto.
 Qed.
@@ -488,9 +488,9 @@ Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX) with signature (@st_eq _) 
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
  change (st_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  set (a:=(Cmap_slow_fun x1 y1)).
- rewrite Cmap_fun_correct.
+ rewrite -> Cmap_fun_correct.
  apply Cmap_slow_wd; auto.
 Qed.
 
@@ -520,7 +520,7 @@ we have not formalized the notion of a length space yet. *)
 Lemma CompletePL : forall X, PrelengthSpace X -> PrelengthSpace (Complete X).
 Proof.
  intros X Xpl x y e d1 d2 He Hxy.
- setoid_replace (d1+d2) with ((d1+d2)%Qpos:Q) in He; [| QposRing].
+ setoid_replace (d1+d2) with ((d1+d2)%Qpos:Q) in He; [| simpl; QposRing]. 
  destruct (Qpos_lt_plus He).
  pose (gA := ((1#5)*x0)%Qpos).
  pose (g := Qpos_min (Qpos_min ((1#2)*d1) ((1#2)*d2)) gA).
@@ -546,22 +546,24 @@ Proof.
  assert (He':(g + e + g)%Qpos < d1' + d2').
   apply: plus_cancel_less;simpl.
   instantiate (1:= (g+g)).
-  replace RHS with ((g+d1')%Qpos+(g+d2')%Qpos) by QposRing.
+  assert (d1' + d2' + (g + g) == ((g+d1')%Qpos+(g+d2')%Qpos)).
+   QposRing.
+  rewrite -> H. clear H.
   unfold QposEq in *.
   rewrite <- Hd1'.
   rewrite <- Hd2'.
   clear d1' Hd1' d2' Hd2'.
   apply Qle_lt_trans with (e + 4*gA).
-   replace LHS with (e+4*g) by (unfold inject_Z;QposRing).
+   stepl (e+4*g); [| unfold inject_Z; simpl; QposRing].
    apply: plus_resp_leEq_lft.
    apply: mult_resp_leEq_lft.
     apply Qpos_min_lb_r.
    compute; discriminate.
-  replace RHS with ((d1+d2)%Qpos:Q) by QposRing.
-  rewrite q.
-  replace RHS with (e+1*x0) by QposRing.
+  assert (d1 + d2 == ((d1+d2)%Qpos:Q)). simpl; QposRing. rewrite -> H. clear H.
+  rewrite -> q.
+  assert (e + x0 == e+1*x0). QposRing. rewrite -> H. clear H.
   apply: plus_resp_less_lft;simpl.
-  replace LHS with ((4#5)*x0) by (unfold inject_Z, gA;QposRing).
+  assert (4%positive * gA == (4#5)*x0). unfold inject_Z, gA. QposRing. rewrite -> H. clear H.
   apply: mult_resp_less.
    constructor.
   apply Qpos_prf.
@@ -569,17 +571,17 @@ Proof.
  exists (Cunit c).
   rewrite <- Q_Qpos_plus in Hd1'.
   change (QposEq d1 (g + d1')) in Hd1'.
-  rewrite Hd1'.
+  rewrite -> Hd1'.
   eapply ball_triangle.
    apply ball_approx_r.
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   assumption.
  rewrite <- Q_Qpos_plus in Hd2'.
  change (QposEq d2 (g + d2')) in Hd2'.
- rewrite Hd2'.
+ rewrite -> Hd2'.
  setoid_replace (g + d2')%Qpos with (d2' + g)%Qpos; [| QposRing].
  eapply ball_triangle with (Cunit (approximate y g)).
-  rewrite ball_Cunit.
+  rewrite -> ball_Cunit.
   assumption.
  apply ball_approx_l.
 Qed.

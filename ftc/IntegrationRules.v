@@ -281,7 +281,7 @@ Proof.
   split.
    stepl (Min a b); [| apply MIN_wd; rational].
    assert (Z:=leEq_or_leEq _ a b).
-   rewrite leEq_def.
+   rewrite -> leEq_def.
    intros Z0.
    apply Z.
    clear Z.
@@ -304,7 +304,7 @@ Proof.
    apply mult_resp_nonneg; apply shift_leEq_lft; assumption.
   stepr (Max a b); [| apply MAX_wd;rational].
   assert (Z:=leEq_or_leEq _ a b).
-  rewrite leEq_def.
+  rewrite -> leEq_def.
   intros Z0.
   apply Z.
   clear Z.

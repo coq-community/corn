@@ -265,7 +265,7 @@ Proof.
  split.
   intro H.
   cut (ZeroR[<=]x[-d]y).
-   rewrite leEq_def in |- *.
+   rewrite -> leEq_def in |- *.
    intro H1.
    cut (Not (x[-d]y[#]Zero)).
     intro H2.
@@ -648,7 +648,7 @@ Proof.
   cut (nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
     nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[<=]
       (seq (max x y)[-d]a)[+](seq (max y x)[-d]b)).
-   rewrite leEq_def in |- *.
+   rewrite -> leEq_def in |- *.
    intro H16.
    auto.
   cut (nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
