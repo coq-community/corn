@@ -41,6 +41,7 @@
 (** printing AbsIR %\ensuremath{|\cdot|_{\mathbb R}}% *)
 
 Require Export CReals.
+Require CRreal.
 
 (**
 * Real Number Structures
@@ -48,13 +49,10 @@ Require Export CReals.
 %\end{convention}%
 *)
 
-(*
-Require Export R_CReals.
-Definition IR : CReals := Concrete_R.
-Opaque IR.
-*)
-
-Axiom IR : CReals.
+Definition IR : CReals.
+Proof. exact CRreal.CRasCReals. Qed.
+  (* Defining IR directly with := and then setting [Global Opaque] keeps it semi-transparent, so
+   we really need [Qed] to get full opacity. *)
 
 Notation PartIR := (PartFunct IR).
 Notation ProjIR1 := (prj1 IR _ _ _).
@@ -431,7 +429,7 @@ Proof.
   generalize (H6 _ H8); intro H10.
   generalize (H7 _ H9); intro H11.
   elim H11; intros H12 H13.
-  apply less_irreflexive_unfolded with (x := y[+]eps).
+  apply (less_irreflexive_unfolded _ (y[+]eps)).
   eapply less_leEq_trans.
    apply H10.
   apply plus_cancel_leEq_rht with ([--]y).
@@ -447,7 +445,7 @@ Proof.
  generalize (H6 _ H8); intro H10.
  generalize (H7 _ H9); intro H11.
  elim H11; intros H12 H13.
- apply less_irreflexive_unfolded with (x := y).
+ apply (less_irreflexive_unfolded _ y).
  eapply leEq_less_trans.
   2: apply H10.
  apply plus_cancel_leEq_rht with ([--]y[-]eps).
