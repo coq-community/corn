@@ -64,8 +64,10 @@ match goal with
 [|-@cs_eq (cs_crr ?T) ?x ?y] =>
  match GetStructureName T with
  |(cfield ?F) => rationalF F x y
- |(cring ?R) => (try (repeat (try apply csf_fun_wd);ring));rationalR R x y
- (* Perhaps we should add wd for partial functions too *)
+ |(cring ?R) => (repeat (try apply csf_fun_wd);simpl;ring)
+(*
+ |(cring ?R) => (try (repeat (try apply csf_fun_wd);simpl;ring));rationalR R x y
+*)(* Perhaps we should add wd for partial functions too *)
  end
 end.
 

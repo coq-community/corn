@@ -150,7 +150,7 @@ Proof.
  change ( [--]c[+]x[*] (cpoly_inv _ (flip q)) ! x [=] [--] (c[+][--]x[*]q ! ( [--]x))) in |- *.
  astepl ( [--]c[+]x[*][--] (flip q) ! x).
  astepl ( [--]c[+]x[*][--][--]q ! ( [--]x)).
- rational.
+ legacy_rational.
 Qed.
 
 Lemma flip_coefficient : forall (p : RX) i,
@@ -159,11 +159,11 @@ Proof.
  intro p. elim p.
  simpl in |- *. algebra.
   intros c q. intros.
- elim i. simpl in |- *. rational.
+ elim i. simpl in |- *. legacy_rational.
   intros. simpl in |- *.
  astepl ( [--] (nth_coeff n (flip q))).
  astepl ( [--] ( [--] ( [--]One[^]n) [*]nth_coeff n q)).
- simpl in |- *. rational.
+ simpl in |- *. legacy_rational.
 Qed.
 
 Hint Resolve flip_coefficient: algebra.

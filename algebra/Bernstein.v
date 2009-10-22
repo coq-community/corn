@@ -38,7 +38,7 @@ Section Bernstein.
 Opaque cpoly_cring.
 
 Variable R : CRing.
-
+Add Ring cpolycring_th : (CRing_Ring (cpoly_cring R)).
 (** [Bernstein n i] is the ith element of the n dimensional Bernstein basis *)
 
 Fixpoint Bernstein (n i:nat) {struct n}: (i <= n) -> cpoly_cring R :=
@@ -175,7 +175,7 @@ Proof.
  stepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H). 2:legacy_rational.
  destruct i as [|i].
   simpl (Bernstein H) at 1.
-  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H). 
+  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
   rewrite -> IHn.
   rstepl ((nring 1)[*]((One[-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
   set (l0:=(lt_n_Sm_le _ _ (le_n_S 1 (S n) (gt_le_S 0 (S n) (gt_Sn_O n))))).
@@ -210,7 +210,7 @@ Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*](One[-]_X_)[*]Bernstei
 Proof.
  induction n.
   intros [|i] H; [|elimtype False; omega].
-  repeat split; rational.
+  repeat split; legacy_rational.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
  set (X0:=(One[-](@cpoly_var R))) in *.
@@ -269,7 +269,7 @@ Proof.
  stepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
   rewrite -> RaiseDegreeA, RaiseDegreeB.
   reflexivity.
- rational.
+ legacy_rational.
 Qed.
 
 Opaque Bernstein.

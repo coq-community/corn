@@ -2549,7 +2549,7 @@ Proof.
  induction p.
   intros q.
   change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
-  rstepl (_D_(Zero:RX)).
+  stepl (_D_(Zero:RX)). 2:legacy_rational.
   rewrite -> diff_zero.
   ring.
  intros q.
@@ -2627,9 +2627,9 @@ Proof.
  apply (cpoly_double_ind0 R).
    intros p.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
-   rstepr (cpoly_map_csf p).
+   stepr (cpoly_map_csf p). 2:legacy_rational.
    apply csf_wd.
-   rational. (* ring cannot find the ring structure *)
+   legacy_rational. (* ring cannot find the ring structure *)
   reflexivity.
  intros p q c d H.
  split.
@@ -2689,7 +2689,7 @@ Proof.
  change ((cpoly_map_csf (cpoly_mult_cs R q p))[=](cpoly_mult_cs S (cpoly_map_csf q) (cpoly_map_csf p))).
  repeat setoid_rewrite <- cpoly_mult_fast_equiv.
  change (cpoly_map_csf (q[*]p)[=]cpoly_map_csf q[*]cpoly_map_csf p).
- rstepr (cpoly_map_csf p[*]cpoly_map_csf q).
+ stepr (cpoly_map_csf p[*]cpoly_map_csf q). 2:legacy_rational.
  rewrite <- H.
  apply csf_wd;ring.
 Qed.
