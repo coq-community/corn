@@ -107,6 +107,8 @@ Section Degree_props.
 
 Variable R : CRing.
 
+Add Ring R: (CRing_Ring R).
+
 (* begin hide *)
 Notation RX := (cpoly_cring R).
 (* end hide *)
@@ -468,11 +470,10 @@ Proof.
  unfold degree_le in |- *. intros.
  exists (nth_coeff 1 p). exists (nth_coeff 0 p).
  apply all_nth_coeff_eq_imp. intros.
- elim i; intros.
-  simpl in |- *. legacy_rational.
-  elim n; intros.
-  simpl in |- *. algebra.
-  simpl in |- *. apply H. auto with arith.
+ elim i; intros. simpl in |- *. ring.
+ elim n; intros.
+ simpl in |- *. algebra.
+ simpl in |- *. apply H. auto with arith.
 Qed.
 
 Lemma degree_le_cpoly_linear : forall (p : cpoly R) c n,

@@ -377,15 +377,23 @@ Proof.
  apply nexp_resp_pos; apply pos_three.
 Qed.
 
-Lemma Kneser_2a : forall (R : CRing) (m n i : nat) (f : nat -> R), 1 <= i ->
- Sum m n f [=] f m[+]f i[+] (Sum (S m) (pred i) f[+]Sum (S i) n f).
-Proof.
- intros.
- astepl (f m[+]Sum (S m) n0 f).
- astepl (f m[+] (Sum (S m) i f[+]Sum (S i) n0 f)).
- astepl (f m[+] (Sum (S m) (pred i) f[+]f i[+]Sum (S i) n0 f)).
- rational.
-Qed.
+Section with_CRing. (* We need a context so we can declare the ring structure. *)
+
+  Variable R: CRing.
+
+  Add Ring R: (CRing_Ring R).
+
+  Lemma Kneser_2a : forall (m n i : nat) (f : nat -> R), 1 <= i ->
+   Sum m n f [=] f m[+]f i[+] (Sum (S m) (pred i) f[+]Sum (S i) n f).
+  Proof.
+   intros.
+   astepl (f m[+]Sum (S m) n0 f).
+   astepl (f m[+] (Sum (S m) i f[+]Sum (S i) n0 f)).
+   astepl (f m[+] (Sum (S m) (pred i) f[+]f i[+]Sum (S i) n0 f)).
+   ring.
+  Qed.
+
+End with_CRing.
 
 Lemma Kneser_2b : forall (k : nat) (z : CC), 1 <= k ->
  let p_ := fun i => b i[*]z[^]i in

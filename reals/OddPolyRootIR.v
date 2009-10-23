@@ -132,6 +132,8 @@ Section Flip_Poly.
 
 Variable R : CRing.
 
+Add Ring R: (CRing_Ring R).
+
 (* begin hide *)
 Let RX := (cpoly R).
 (* end hide *)
@@ -150,7 +152,7 @@ Proof.
  change ( [--]c[+]x[*] (cpoly_inv _ (flip q)) ! x [=] [--] (c[+][--]x[*]q ! ( [--]x))) in |- *.
  astepl ( [--]c[+]x[*][--] (flip q) ! x).
  astepl ( [--]c[+]x[*][--][--]q ! ( [--]x)).
- legacy_rational.
+ ring.
 Qed.
 
 Lemma flip_coefficient : forall (p : RX) i,
@@ -159,11 +161,11 @@ Proof.
  intro p. elim p.
  simpl in |- *. algebra.
   intros c q. intros.
- elim i. simpl in |- *. legacy_rational.
+ elim i. simpl in |- *. ring.
   intros. simpl in |- *.
  astepl ( [--] (nth_coeff n (flip q))).
  astepl ( [--] ( [--] ( [--]One[^]n) [*]nth_coeff n q)).
- simpl in |- *. legacy_rational.
+ simpl in |- *. ring.
 Qed.
 
 Hint Resolve flip_coefficient: algebra.

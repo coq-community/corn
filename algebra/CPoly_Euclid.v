@@ -27,6 +27,9 @@ Unset Strict Implicit.
 Section poly_eucl.
 Variable CR : CRing.
 
+Add Ring CR: (CRing_Ring CR).
+Add Ring cpolycring_th : (CRing_Ring (cpoly_cring CR)).
+
 Lemma degree_poly_div : forall (m n : nat) (f g : cpoly CR),
   let f1 := (_C_ (nth_coeff n g) [*] f [-] _C_ (nth_coeff (S m) f) [*] ((_X_ [^] ((S m) - n)) [*] g)) in
     S m >= n -> degree_le (S m) f -> degree_le n g -> degree_le m f1.
@@ -36,10 +39,11 @@ Proof.
  rewrite -> (Sum_term _ _ _ (S m - n)); [ | omega | omega | intros ].
   rewrite -> nth_coeff_nexp_eq.
   destruct Hp.
-   replace (S m - (S m - n)) with n by omega; legacy_rational.
+   replace (S m - (S m - n)) with n by omega.
+   unfold cg_minus. ring.
   rewrite -> (dg (S m0 - (S m - n))); [ | omega].
-  rewrite -> df; [ legacy_rational | omega].
- rewrite -> nth_coeff_nexp_neq; [ legacy_rational | assumption].
+  rewrite -> df; [ unfold cg_minus; ring | omega].
+ rewrite nth_coeff_nexp_neq. ring. assumption.
 Qed.
 
 Theorem cpoly_div1 : forall (m n : nat) (f g : cpoly_cring CR),
@@ -52,7 +56,7 @@ Proof.
  generalize (m - n) at 1 as p; intro p; revert m n; induction p; intros.
   exists ((Zero : cpoly_cring CR),f).
    rewrite <- H.
-   simpl (nth_coeff (S n) g[^]0); rewrite <- c_one; legacy_rational.
+   simpl (nth_coeff (S n) g[^]0). rewrite <- c_one. ring.
   replace n with m by omega; assumption.
  set (f1 := (_C_ (nth_coeff (S n) g) [*] f [-] _C_ (nth_coeff m f) [*] ((_X_ [^] (m - (S n))) [*] g))).
  destruct (IHp (m - 1) n) with (f := f1) (g := g); [ omega | | assumption | omega | ].
@@ -67,7 +71,7 @@ Proof.
  replace (m - 1 - n) with (m - S n) by omega.
  rewrite <- nexp_Sn.
  generalize (nth_coeff (S n) g) (nth_coeff m f) (m - S n).
- intros; rewrite -> c_mult, c_mult; legacy_rational.
+ intros. rewrite c_mult c_mult. unfold cg_minus. ring.
 Qed.
 
 Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] Zero).
@@ -90,14 +94,14 @@ Proof.
  cut (a [=] Zero); [ intro aeqz; split; [ | apply aeqz ] | ].
   assert (s [=] nth_coeff m (_C_ s[*]b[+]_X_[*]a[*]b)).
    destruct H0; rewrite -> nth_coeff_plus, nth_coeff_c_mult_p, H0.
-   rewrite -> (nth_coeff_wd _ _ _ Zero); [ simpl; legacy_rational | ].
-   rewrite -> aeqz; legacy_rational.
+   rewrite -> (nth_coeff_wd _ _ _ Zero); [ simpl; ring | ].
+   rewrite -> aeqz; ring.
   rewrite -> H3.
   rewrite -> (nth_coeff_wd _ _ _ _ H2).
   destruct H1 as [d s0].
   destruct H0 as [H0 H1].
   destruct m; [ rewrite -> (nth_coeff_wd _ _ _ _ (s0 H1)); reflexivity | apply (d m H1); apply le_n ].
- apply (IHn (S m) _ (Zero [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H2, cpoly_lin, <- c_zero; legacy_rational ].
+ apply (IHn (S m) _ (Zero [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H2, cpoly_lin, <- c_zero; unfold cg_minus; ring ].
    unfold degree_le; intros; rewrite <- (coeff_Sm_lin _ _ s).
    apply H; apply lt_n_S; apply H3.
   split; [ rewrite -> coeff_Sm_lin; destruct H0; apply H0 | unfold degree_le; intros ].
@@ -113,7 +117,7 @@ Proof.
   apply (degree_le_mon _ _ n0); [ apply le_S; apply le_n | apply (degree_le_cpoly_linear _ _ _ _ H3) ].
  destruct (degree_le_zero _ _ H3) as [x s0]. move: s0. rewrite -> cpoly_C_. intro s0.
  destruct (linear_eq_linear_ _ _ _ _ _ s0) as [H4 H5].
- rewrite <- H2, -> H5. legacy_rational.
+ rewrite <- H2, -> H5. unfold cg_minus. ring.
 Qed.
 
 Lemma cpoly_div : forall (f g : cpoly_cring CR) (n : nat), monic n g ->
@@ -125,10 +129,10 @@ Proof.
   exists (f,Zero).
    intros; destruct y; simpl (snd (s0, s1)) in *; simpl (fst (s0, s1)) in *.
    rename H1 into X. destruct X; destruct d; split; [ | symmetry; apply (s3 H0) ].
-   rewrite -> s2, (s3 H0), s, <- c_one; legacy_rational.
+   rewrite -> s2, (s3 H0), s, <- c_one; ring.
   simpl (fst (f, Zero : cpoly_cring CR)); simpl (snd (f, Zero : cpoly_cring CR)).
   replace (cpoly_zero CR) with (Zero : cpoly_cring CR) by (simpl;reflexivity).
-  split; [ rewrite -> s, <- c_one; legacy_rational | ].
+  split; [ rewrite -> s, <- c_one; ring | ].
   split; [ | reflexivity ].
   unfold degree_le; intros; apply nth_coeff_zero.
  destruct (@cpoly_div1 (max (lth_of_poly f) n) n f g); [ | destruct H; assumption | apply le_max_r | ].
@@ -151,9 +155,9 @@ Proof.
   apply (@cpoly_div2 (lth_of_poly (q [-] q1)) (S n) (q [-] q1) g (r1 [-] r)); [ apply poly_degree_lth | split; assumption | | ].
    destruct d; destruct d0; split.
     intros; apply degree_le_minus; [ apply d0 | apply d ]; assumption.
-   intro; rewrite -> (s1 H1) ,(s2 H1); legacy_rational.
-  assert (r1[=]q1[*]g[+]r1[-]q1[*]g); [ legacy_rational | ].
-  rewrite -> H1, <- s0; legacy_rational.
+   intro; rewrite -> (s1 H1) ,(s2 H1); unfold cg_minus; ring.
+  assert (r1[=]q1[*]g[+]r1[-]q1[*]g); [ unfold cg_minus; ring | ].
+  rewrite -> H1, <- s0; unfold cg_minus; ring.
  split; [ assumption | ].
  rewrite -> H1 in s0; apply (cg_cancel_lft _ _ _ _ s0).
 Qed.

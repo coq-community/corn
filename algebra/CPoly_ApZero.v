@@ -61,6 +61,8 @@ Variable f : cpoly_cring R.
 Variable n : nat.
 Hypothesis degree_f : degree_le n f.
 
+Add Ring cpolycring_th : (cpoly_ring_th R).
+
 (* begin hide *)
 Notation RX := (cpoly_cring R).
 (* end hide *)
@@ -85,7 +87,7 @@ Proof.
  apply eq_symmetric_unfolded.
  cut (_C_ (a[*]g''[+]s) [=] _C_ a[*]_C_ g''[+]_C_ s). intro.
   astepl ((_X_[-]_C_ a) [*] (_X_[*]g'[+]_C_ g'') [+] (_C_ a[*]_C_ g''[+]_C_ s)).
-  legacy_rational. (* Does not recognize polyring *)
+  unfold cg_minus. ring.
  Step_final (_C_ (a[*]g'') [+]_C_ s).
 Qed.
 Load "Opaque_algebra".

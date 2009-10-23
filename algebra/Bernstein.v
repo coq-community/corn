@@ -38,6 +38,7 @@ Section Bernstein.
 Opaque cpoly_cring.
 
 Variable R : CRing.
+Add Ring R : (CRing_Ring R).
 Add Ring cpolycring_th : (CRing_Ring (cpoly_cring R)).
 (** [Bernstein n i] is the ith element of the n dimensional Bernstein basis *)
 
@@ -117,12 +118,13 @@ Proof.
   do 2 rewrite -> mult_distr_sum0_lft.
   rewrite -> Sumx_to_Sum in IHn; auto with *.
    setoid_replace (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A))
-     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero);[|legacy_rational].
+     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero);[|unfold cg_minus;ring].
    change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero)
      with (Sum 0 (S n) (part_tot_nat_fun (cpoly_cring R) (S n) A)).
    set (C:=(fun i : nat => match i with | 0 => (Zero : cpoly_cring R)
      | S i' => part_tot_nat_fun (cpoly_cring R) (S n) A i' end)).
-   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero);[|legacy_rational].
+   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero).
+     2: unfold cg_minus; ring.
    change (Sum0 (S (S n)) C[-]Zero) with (Sum 0 (S n) C).
    rewrite -> Sum_last.
    rewrite -> IHn.
@@ -131,7 +133,7 @@ Proof.
     change (C 0) with (Zero:cpoly_cring R).
     rewrite <- (Sum_shift _ (part_tot_nat_fun (cpoly_cring R) (S n) A)).
      rewrite -> IHn.
-     legacy_rational.
+     unfold cg_minus. ring.
     reflexivity.
    unfold part_tot_nat_fun.
    destruct (le_lt_dec (S n) (S n)).
@@ -150,15 +152,14 @@ Proof.
   intros l l0.
   simpl (Bernstein l).
   replace l0 with (le_O_n n) by apply le_irrelevent.
-  legacy_rational.
+  unfold cg_minus. ring.
  destruct (le_lt_dec (S n) i).
   elimtype False; omega.
  destruct (le_lt_dec (S n) (S i)); simpl (Bernstein (lt_n_Sm_le (S i) (S n) Hi));
    destruct (le_lt_eq_dec (S i) (S n) (lt_n_Sm_le (S i) (S n) Hi)).
     elimtype False; omega.
    replace  (lt_n_Sm_le i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
-   simpl.
-   legacy_rational.
+   simpl. unfold cg_minus. ring.
   replace (le_S_n i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   replace l1 with l0 by apply le_irrelevent.
   reflexivity.
@@ -169,10 +170,10 @@ Lemma RaiseDegreeA : forall n i (H:i<=n), (nring (S n))[*]_X_[*]Bernstein H[=](n
 Proof.
  induction n.
   intros [|i] H; [|elimtype False; omega].
-  repeat split; legacy_rational.
+  repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
- stepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H). 2:legacy_rational.
+ stepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H). 2: ring.
  destruct i as [|i].
   simpl (Bernstein H) at 1.
   rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
@@ -210,7 +211,7 @@ Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*](One[-]_X_)[*]Bernstei
 Proof.
  induction n.
   intros [|i] H; [|elimtype False; omega].
-  repeat split; legacy_rational.
+  repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
  set (X0:=(One[-](@cpoly_var R))) in *.
@@ -269,7 +270,7 @@ Proof.
  stepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
   rewrite -> RaiseDegreeA, RaiseDegreeB.
   reflexivity.
- legacy_rational.
+ unfold cg_minus. ring.
 Qed.
 
 Opaque Bernstein.
