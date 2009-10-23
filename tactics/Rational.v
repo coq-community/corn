@@ -50,6 +50,7 @@ match t with
  end
 end.
 
+(*
 Ltac legacy_rational:=
 match goal with
 [|-@cs_eq (cs_crr ?T) ?x ?y] =>
@@ -58,6 +59,7 @@ match goal with
  |(cring ?R) => rationalR R x y
  end
 end.
+*)
 
 Ltac rational :=
 match goal with
