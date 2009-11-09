@@ -1,0 +1,103 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Usage: coqindenter <coqtop-and-args> < input.v > output.v
+#  Here, <coqtop-and-args> is just one's normal coqtop (or ssrcoq) command and arguments (including -I's, -R's, etc).
+
+# Warning: Most likely screws up section/module indentation (TODO).
+
+import os, sys, time, re
+from subprocess import Popen, PIPE, STDOUT
+
+p = Popen(sys.argv[1:], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+
+sgre = re.compile('^(\d+) subgoal')
+
+is_prompt = re.compile("((\\n)|^)[\\w_']+ < $")
+
+def readuntilprompt():
+  s = ""
+  while True:
+    s += p.stdout.read(1)
+    if s.endswith(" < ") and is_prompt.search(s): return s
+
+# Looking at " < " is not enough, because it occurs in "x < y". Having the test obviously does make a huge speed difference.
+
+subgoals = 0
+extra = 0
+seen_Proof = False
+columns = 50
+line_cont = None
+
+def print_Proof_if_necessary():
+  global seen_Proof
+  if not seen_Proof:
+    print "Proof."
+    seen_Proof = True
+
+def to_be_continued(l):
+  return not (l.endswith('.\n') or l.endswith("*)\n"))
+
+pending_line = None
+
+def subgoals_changed(new_subgoals):
+  global subgoals
+  global pending_line
+  if subgoals == new_subgoals + 1:
+    if pending_line:
+      lstripped = pending_line.lstrip()
+      spl = lstripped.split(". ")
+      # todo: only add "by" if it's not already there!
+      print ' ' * (len(pending_line) - len(lstripped) - 1), lstripped # ". ".join(spl[:-1] + ['by ' + spl[-1]])
+      pending_line = None
+
+  subgoals = new_subgoals
+
+
+for l in sys.stdin:
+  l = l.rstrip().replace("CProp", "Type") + '\n'
+
+  prompt = readuntilprompt()
+  m = sgre.search(prompt)
+
+  if prompt.find("Proof completed.") != -1 or prompt.find(" is defined") != -1:
+    subgoals_changed(0)
+    seen_Proof = False
+  elif m: subgoals_changed(int(m.group(1)))
+    # "Proof completed." is not printed when the proof is "Proof <term>."
+
+  if pending_line:
+    print pending_line
+    pending_line = None
+
+  if l.startswith("Proof"): seen_Proof = True
+
+  if l == '\n':
+    if subgoals == 0: print
+  elif subgoals == 0 or l.startswith("Proof"):
+    print l,
+  else:
+    if line_cont != None:
+      if len(line_cont + l.strip()) > columns:
+        print_Proof_if_necessary()
+        print ' ' * subgoals + line_cont
+        extra += 1
+        line_cont = '  ' * extra + l.strip()
+      else:
+        line_cont += ' ' + l.strip()
+      if not to_be_continued(l):
+        print ' ' * subgoals + line_cont
+        line_cont = None
+        extra = 0
+    else:
+      if not to_be_continued(l):
+        print_Proof_if_necessary()
+        #print ' ' * subgoals + '  ' * extra + l.strip()
+        pending_line = ' ' * subgoals + '  ' * extra + l.strip()
+      else:
+        line_cont = l.strip()
+
+  p.stdin.write(l)
+
+assert(subgoals == 0)
+if pending_line: print pending_line
