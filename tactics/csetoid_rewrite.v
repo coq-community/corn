@@ -308,10 +308,10 @@ Ltac tot_repl_in_form S r1 r2 A :=
       let A0 := constr:X1 in
       let B0 := tot_repl_in_form S r1 r2 A0 in
       constr:(Not B0)
-  | (CNot ?X1) =>
+(*  | (CNot ?X1) =>
       let A0 := constr:X1 in
       let B0 := tot_repl_in_form S r1 r2 A0 in
-      constr:(CNot B0)
+      constr:(CNot B0)*)
   | ?X1 => let A0 := constr:X1 in
            constr:A0
   end.
@@ -434,10 +434,10 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf2 S r1 r2 h h0 A0 in
       constr:(fun (p:Not A0) b => p (d b))
-  | (CNot ?X1) =>
+(*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf2 S r1 r2 h h0 A0 in
-      constr:(fun (p:CNot A0) b => p (d b))
+      constr:(fun (p:CNot A0) b => p (d b)) *)
   | ?X1 => let A0 := constr:X1 in
            constr:(fun a:A0 => a)
   end
@@ -551,10 +551,10 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf1 S r1 r2 h h0 A0 in
       constr:(fun (q:Not _) (a:A0) => q (d a))
-  | (CNot ?X1) =>
+(*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf1 S r1 r2 h h0 A0 in
-      constr:(fun (q:CNot _) (a:A0) => q (d a))
+      constr:(fun (q:CNot _) (a:A0) => q (d a))*)
   | ?X1 => let A0 := constr:X1 in
            constr:(fun a:A0 => a)
   end.
@@ -958,10 +958,10 @@ Ltac part_repl_in_form H A :=
           let A0 := constr:X1 in
           let B0 := part_repl_in_form H A0 in
           constr:(Not B0)
-      | (CNot ?X1) =>
+(*      | (CNot ?X1) =>
           let A0 := constr:X1 in
           let B0 := part_repl_in_form H A0 in
-          constr:(CNot B0)
+          constr:(CNot B0)*)
       | ?X1 => let A0 := constr:X1 in
                constr:A0
       end
@@ -1094,10 +1094,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A0 := constr:X1 in
       let d := part_set_rewr_prf2 r1 r2 H H0 A0 in
       constr:(fun (p:Not A0) b => p (d b))
-  | (CNot ?X1) =>
+(*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := part_set_rewr_prf2 r1 r2 H H0 A0 in
-      constr:(fun (p:CNot A0) b => p (d b))
+      constr:(fun (p:CNot A0) b => p (d b))*)
   | ?X1 => let A0 := constr:X1 in
            constr:(fun a:A0 => a)
   end
@@ -1220,10 +1220,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let A0 := constr:X1 in
       let d := part_set_rewr_prf1 r1 r2 H H0 A0 in
       constr:(fun (q:Not _) (a:A0) => q (d a))
-  | (CNot ?X1) =>
+(*  | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := part_set_rewr_prf1 r1 r2 H H0 A0 in
-      constr:(fun (q:CNot _) (a:A0) => q (d a))
+      constr:(fun (q:CNot _) (a:A0) => q (d a)) *)
   | ?X1 => let A0 := constr:X1 in
            constr:(fun a:A0 => a)
   end.
@@ -1379,10 +1379,10 @@ Ltac form_cont_part A :=
       let A0 := constr:X1 in
       let b := form_cont_part A0 in
       constr:b
-  | (CNot ?X1) =>
+(*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let b := form_cont_part A0 in
-      constr:b
+      constr:b *)
   | _ => constr:false
   end.
 
@@ -1443,8 +1443,8 @@ Ltac fold_cspf_dom_in_form A :=
                fold_cspf_dom_in_form A0
   | (Not ?X1) => let A0 := constr:X1 in
                  fold_cspf_dom_in_form A0
-  | (CNot ?X1) => let A0 := constr:X1 in
-                  fold_cspf_dom_in_form A0
+(*   | (CNot ?X1) => let A0 := constr:X1 in
+                  fold_cspf_dom_in_form A0 *)
   | _ => idtac
   end.
 

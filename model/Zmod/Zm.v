@@ -68,7 +68,7 @@ Qed.
 Section zm_setoid.
 
 Definition ZModeq (a b:Z) : Prop := (Zmodeq m a b).
-Definition ZModap (a b:Z) : CProp := (CNot (Zmodeq m a b)).
+Definition ZModap (a b:Z) : CProp := (Not (Zmodeq m a b)).
 
 Lemma Zmodeq_wd : forall a b:Z, a=b -> a mod m = b mod m.
 Proof.

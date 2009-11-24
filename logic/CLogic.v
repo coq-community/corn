@@ -134,16 +134,6 @@ Definition proj2b_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
   | exist2T a b c => c
   end.
 
-Definition CNot (A : Prop): CProp := A -> False.
-
-Lemma Ccontrapos' : forall A phi : Prop, (A -> phi) -> ~ phi -> CNot A.
-Proof.
- intros A phi H H0.
- intro H1.
- elim H0.
- auto.
-Qed.
-
 End Basics.
 
 
@@ -237,6 +227,7 @@ Proof.
 Qed.
 
 (* begin hide *)
+(** This notation is incompatible with [Program]. It should be avoided *)
 Notation "{ x : A  |  P }" := (sigT (fun x : A => P):CProp)
   (at level 0, x at level 99) : type_scope.
 Notation "{ x : A  |  P  |  Q }" :=
@@ -244,23 +235,6 @@ Notation "{ x : A  |  P  |  Q }" :=
   type_scope.
 
 (* end hide *)
-
-(*
-Section test.
-
-Variable A : Type.
-Variables P Q : A -> Prop.
-Variables X Y : A -> CProp.
-
-Check {x:A | (P x)}.
-Check {x:A |(X x)}.
-Check {x:A | (X x) | (Y x)}.
-Check {x:A | (P x) | (Q x)}.
-Check {x:A | (P x) | (X x)}.
-Check {x:A | (X x) | (P x)}.
-
-End test.
-*)
 
 Hint Resolve pair inl inr existT exist2T : core.
 

@@ -62,8 +62,8 @@ Time Eval vm_compute in answer 20 (sin (compress (sin (compress (rational_sin 1)
 Time Eval vm_compute in answer 20 (CRsqrt (compress CRpi))%CR.
 (* sin e *)
 Time Eval vm_compute in answer 20 (sin (compress (rational_exp 1)))%CR.
-(* exp (pi * sqrt(163)) : Takes upt 3 minutes *)
-Time Eval vm_compute in answer 1 (exp (compress (rational_sqrt 163 * CRpi)))%CR. 
+(* exp (pi * sqrt(163)) : Takes upt 3 minutes
+Time Eval vm_compute in answer 1 (exp (compress (rational_sqrt 163 * CRpi)))%CR. *)
 (* exp (exp (exp (1))) *)
 Time Eval vm_compute in answer 1 (exp (compress (exp (compress (rational_exp 1)))))%CR. 
 
