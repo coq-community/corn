@@ -82,14 +82,12 @@ Proof.
    intros  n H2.
    simpl.
    unfold ap_nat.
-   unfold CNot.
    intros T H.
    set (H1:= (O_S n H)).
    elim H1.
   intros n H3.
   simpl.
   unfold ap_nat.
-  unfold CNot.
   intros T H.
   cut (0= (S n)).
    intro H2.
@@ -104,7 +102,6 @@ Proof.
  simpl in H2.
  set (H4:=(H2 n H3)).
  unfold ap_nat in H4 |- *.
- unfold CNot in H4 |- *.
  intro H5.
  apply H4.
  apply (eq_add_S n0 n H5).
@@ -124,7 +121,6 @@ Proof.
    intro a1.
    case a1.
     unfold ap_nat.
-    unfold CNot.
     intuition.
    simpl.
    intuition.
@@ -134,12 +130,10 @@ Proof.
    intuition.
   intros n H.
   unfold ap_nat in H.
-  unfold CNot in H.
   simpl.
   right.
   apply IHa0.
   unfold ap_nat.
-  unfold CNot.
   intro H1.
   rewrite H1 in H.
   apply H.

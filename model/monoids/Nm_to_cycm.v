@@ -74,18 +74,15 @@ Proof.
     unfold irreflexive in H1.
     unfold Not in H1.
     unfold ap_nat.
-    unfold CNot.
     intro H2.
     elim H1 with (cm_unit M).
      apply CSetoid_is_CSetoid.
     exact H.
    unfold ap_nat.
-   unfold CNot.
    intros n H H0.
    set (H1:= (O_S n)).
    intuition.
   unfold ap_nat.
-  unfold CNot.
   intros n H H0 H2.
   set (H1:= (O_S n)).
   cut (0=(S n)).
@@ -108,7 +105,6 @@ Proof.
  set (H4:= (H0 n H3)).
  set (H5:= (not_eq_S n0 n)).
  unfold ap_nat in H4 |- *.
- unfold CNot in H4 |- *.
  unfold not in H5.
  intro H6.
  elim H5.

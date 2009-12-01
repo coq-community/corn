@@ -68,7 +68,6 @@ Proof.
   case y.
    simpl.
    unfold ap_nat.
-   unfold CNot.
    intuition.
   simpl.
   intuition.
@@ -81,7 +80,6 @@ Proof.
  right.
  apply IHx.
  unfold ap_nat in H |- *.
- unfold CNot in H |- *.
  intuition.
 Qed.
 
