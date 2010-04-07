@@ -1,44 +1,50 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Usage: coqindenter <coqtop-and-args> < input.v > output.v
-#  Here, <coqtop-and-args> is just one's normal coqtop (or ssrcoq) command and arguments (including -I's, -R's, etc).
-
-# Warning: Most likely screws up section/module indentation (TODO).
-
 import os, sys, time, re
 from subprocess import Popen, PIPE, STDOUT
+from optparse import OptionParser
 
-p = Popen(sys.argv[1:], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+parser = OptionParser(usage=
+  "usage: %prog [options] coqtop-invocation < input.v > output.v")
+parser.add_option('-i', '--subgoal-indent', default='  ', metavar='STR', dest='subgoal_indentation',
+  help='indent each additional subgoal by STR (default: "%default")')
+parser.add_option('-w', '--wrap', metavar='N', type='int', dest='wrap',
+  help='wrap at natural break points after N columns')
+parser.add_option('--erase-empty-lines', default=False, dest='eraseEmptyLines', action='store_true',
+  help='erase empty lines in proof scripts')
+parser.add_option("--add-proof", default=False, dest='addProof', action='store_true',
+  help='begin multi-line proofs with "Proof."')
+
+(options, remaining_args) = parser.parse_args()
+
+if remaining_args == []: parser.error("Missing coqtop-invocation.")
+
+coq = Popen(remaining_args, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
 sgre = re.compile('^(\d+) subgoal')
-
 is_prompt = re.compile("((\\n)|^)[\\w_']+ < $")
 
 def readuntilprompt():
   s = ""
   while True:
-    s += p.stdout.read(1)
+    s += coq.stdout.read(1)
     if s.endswith(" < ") and is_prompt.search(s): return s
+  # Looking at " < " is not enough, because it occurs in "x < y". Having the test obviously does make a huge speed difference.
 
-# Looking at " < " is not enough, because it occurs in "x < y". Having the test obviously does make a huge speed difference.
+def split_indent(s):
+  i = 0
+  while i != len(s) and s[i].isspace(): i += 1
+  return (s[:i], s[i:])
+
+def to_be_continued(l): return not (l.endswith('.\n') or l.endswith("*)\n"))
 
 subgoals = 0
 extra = 0
 seen_Proof = False
-columns = 50
 line_cont = None
-
-def print_Proof_if_necessary():
-  global seen_Proof
-  if not seen_Proof:
-    print "Proof."
-    seen_Proof = True
-
-def to_be_continued(l):
-  return not (l.endswith('.\n') or l.endswith("*)\n"))
-
 pending_line = None
+base_indentation = ''
 
 def subgoals_changed(new_subgoals):
   global subgoals
@@ -47,15 +53,21 @@ def subgoals_changed(new_subgoals):
     if pending_line:
       lstripped = pending_line.lstrip()
       spl = lstripped.split(". ")
-      # todo: only add "by" if it's not already there!
-      print ' ' * (len(pending_line) - len(lstripped) - 1), lstripped # ". ".join(spl[:-1] + ['by ' + spl[-1]])
+      print ' ' * (len(pending_line) - len(lstripped) - 1), lstripped
       pending_line = None
-
   subgoals = new_subgoals
 
+def print_Proof_if_necessary():
+  global seen_Proof
+  if options.addProof and not seen_Proof:
+    print base_indentation + "Proof."
+    seen_Proof = True
+
+def subgoal_indentation():
+  return base_indentation + options.subgoal_indentation * subgoals
 
 for l in sys.stdin:
-  l = l.rstrip().replace("CProp", "Type") + '\n'
+  l = l.rstrip() + '\n'
 
   prompt = readuntilprompt()
   m = sgre.search(prompt)
@@ -66,38 +78,41 @@ for l in sys.stdin:
   elif m: subgoals_changed(int(m.group(1)))
     # "Proof completed." is not printed when the proof is "Proof <term>."
 
-  if pending_line:
-    print pending_line
-    pending_line = None
+  if pending_line: print pending_line; pending_line = None
 
-  if l.startswith("Proof"): seen_Proof = True
+  (indentation, content) = split_indent(l)
 
-  if l == '\n':
-    if subgoals == 0: print
-  elif subgoals == 0 or l.startswith("Proof"):
+  if content.startswith("Proof"): seen_Proof = True
+
+  if content[:1].isupper() and subgoals == 0:
+    base_indentation = indentation
+
+  if content == '':
+    if subgoals == 0 or not options.eraseEmptyLines: print
+  elif subgoals == 0 or content.startswith("Proof"):
     print l,
   else:
     if line_cont != None:
-      if len(line_cont + l.strip()) > columns:
+      if options.wrap and len(line_cont + l.strip()) > options.wrap:
         print_Proof_if_necessary()
-        print ' ' * subgoals + line_cont
+        print subgoal_indentation() + line_cont
         extra += 1
         line_cont = '  ' * extra + l.strip()
       else:
         line_cont += ' ' + l.strip()
       if not to_be_continued(l):
-        print ' ' * subgoals + line_cont
+        print subgoal_indentation() + line_cont
         line_cont = None
         extra = 0
     else:
       if not to_be_continued(l):
         print_Proof_if_necessary()
-        #print ' ' * subgoals + '  ' * extra + l.strip()
-        pending_line = ' ' * subgoals + '  ' * extra + l.strip()
+        pending_line = subgoal_indentation() + '  ' * extra + l.strip()
       else:
         line_cont = l.strip()
 
-  p.stdin.write(l)
+  coq.stdin.write(l)
 
 assert(subgoals == 0)
 if pending_line: print pending_line
+

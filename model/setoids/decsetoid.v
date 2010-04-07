@@ -10,25 +10,25 @@ Require Import
  Morphisms
  SetoidClass.
 
-Class Apartness `{SetoidClass.Setoid A} (ap: Crelation A): Type :=
+Class Apartness `{SetoidClass.Setoid} (ap: Crelation A): Type :=
   { ap_irreflexive: irreflexive ap
   ; ap_symmetric: Csymmetric ap
   ; ap_cotransitive: cotransitive ap
   ; ap_tight: tight_apart equiv ap
   }.
 
-Class CSetoid_class `(Setoid A): Type :=
+Class CSetoid_class `(Setoid): Type :=
   { apart: Crelation A
   ; csetoid_apart:> Apartness apart
   }.
 
-Definition is_CSetoid_from_class `{@Apartness A Asetoid apa}: is_CSetoid _ equiv apa.
- intros.
+Definition is_CSetoid_from_class `{Apartness}: is_CSetoid _ equiv ap0.
+ intros ? ? ap0 H.
  destruct H.
  apply Build_is_CSetoid; assumption.
 Defined.
 
-Definition CSetoid_from_class `{@CSetoid_class A Asetoid}: CSetoid.
+Definition CSetoid_from_class `{CSetoid_class}: CSetoid.
 Proof.
  intros.
  apply (Build_CSetoid A equiv apart is_CSetoid_from_class).
@@ -84,7 +84,7 @@ Module test.
 
   (* If we now have an equality-decidable setoid, we can immediately refer to apartness without any
    explicit invocation. *)
-  Definition test `{eq_dec: @EqDec T TS} (x y: T) := apart x y.
+  Definition test `{eq_dec: EqDec} := fun x y =>apart x y.
 
 End test.
 

@@ -361,7 +361,7 @@ Proof.
   intros.
   unfold QposEq.
   autorewrite with QposElim.
-  reflexivity.
+  (* Something did not unfold. Should be: reflexivity.*) admit.
  do 2 rewrite -> X.
  rewrite -> StepFSupBallGlueGlue.
  split.

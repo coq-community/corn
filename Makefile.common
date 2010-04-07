@@ -151,7 +151,7 @@ PP:=-pp "camlp4o -I $(SRCDIR)/tactics -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRA
 
 # COQMAP defines the mapping between physical and logical directories
 COQMAP:= $(shell for d in $(COQ_PRIMITIVE_DEVEL_DIRS); do echo -R "$${d}" CoRN .devel; done) $(shell for d in $(COQ_PRIMITIVE_DIRS); do echo -R "$${d}" CoRN.$$(basename "$${d}"); done)
-OTHERFLAGS = -I $(SRCDIR)/tactics -I $(SSRDIR)/theories $(COQMAP)
+OTHERFLAGS = -I $(SRCDIR)/tactics -R $(SSRDIR)/theories Ssreflect $(COQMAP)
 COQFLAGS = $(COQ_XML) $(OPT) $(OTHERFLAGS)
 COQCFLAGS = -image $(SSRDIR)/bin/ssrcoq
 COQDOCFLAGS = --toc -s -t "C-CoRN Documentation" $(COQMAP) \

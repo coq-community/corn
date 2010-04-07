@@ -121,8 +121,8 @@ Notation "\big [ op / idx ]_ ( i \in A | P ) F" :=
 Notation "\big [ op / idx ]_ ( i \in A ) F" :=
   (\big[op/idx]_(i | i \in A) F) : big_scope.
 
-Add Parametric Morphism R I `{Equivalence R req} : (@reducebig R I) with signature
-  (req==>(req==>req==>req)==>@eq (seq I)==>(@eq I==>@eq bool)==>(pointwise_relation I req)==>req) as reducebig_morph.
+Add Parametric Morphism I `{Equivalence} : (@reducebig A I) with signature
+  (R==>(R==>R==>R)==>@eq (seq I)==>(@eq I==>@eq bool)==>(pointwise_relation I R)==>R) as reducebig_morph.
 move=> x y eqxy op1 op2 eqop12 r P1 P2 eqP12 F1 F2 eqF12.
 elim: r=> //= h q HR; rewrite (eqP12 h h (refl_equal h)).
 by case: (P2 h)=> //=; apply: eqop12=> //=; apply: eqF12.
@@ -130,8 +130,8 @@ Qed.
 
 Section Extensionality.
 
-Context `{Equivalence R req} {idx : R} {op : binop R}.
-Context `{Proper (binop R) (req==>req==>req) op}.
+Context `{Equivalence} {idx : A} {op : binop A}.
+Context `{Proper (binop A) (R==>R==>R) op}.
 
 Section SeqExtension.
 
@@ -330,7 +330,7 @@ apply: (leq_trans lt_i_md1); rewrite subnKC // ltnW //.
 rewrite -subn_gt0 -(ltn_add2l m) addn0; exact: leq_trans lt_i_md1.
 Qed.
 
-Lemma big_ord_widen_cond : forall n1 n2 (P : pred nat) (F : nat -> R),
+Lemma big_ord_widen_cond : forall n1 n2 (P : pred nat) (F : nat -> A),
      n1 <= n2 ->
   \big[op/idx]_(i < n1 | P i) F i
       === \big[op/idx]_(i < n2 | P i && (i < n1)) F i.
@@ -339,7 +339,7 @@ move=> n1 n2 P F len12.
 rewrite <- big_mkord, (big_nat_widen _ _ _ len12), big_mkord; reflexivity.
 Qed.
 
-Lemma big_ord_widen : forall n1 n2 (F : nat -> R),
+Lemma big_ord_widen : forall n1 n2 (F : nat -> A),
  n1 <= n2 ->
   \big[op/idx]_(i < n1) F i === \big[op/idx]_(i < n2 | i < n1) F i.
 Proof. by move=> *; apply: (big_ord_widen_cond (predT)). Qed.
@@ -401,7 +401,7 @@ Lemma big_ord_recl : forall n F,
      op (F ord0) (\big[op/idx]_(i < n) F (@lift n.+1 ord0 i)).
 Proof.
 move=> n F; pose G i := F (inord i).
-have eqFG: forall i, req (F i) (G i) by move=> i; rewrite /G inord_val;reflexivity.
+have eqFG: forall i, R (F i) (G i) by move=> i; rewrite /G inord_val;reflexivity.
 transitivity (\big[op/idx]_(i < n.+1) G i); first by apply eq_bigr=> *; apply eqFG.
 rewrite <- (big_mkord (S n) (fun _ => true) G), eqFG.
 rewrite -> big_ltn=> //; rewrite -> big_add1=> /=; rewrite -> big_mkord.
@@ -409,9 +409,9 @@ apply H0; try reflexivity.
 by apply: eq_bigr => i _; rewrite -> eqFG; reflexivity.
 Qed.
 
-Lemma big_const : forall (I : finType) (A : pred I) x,
-  \big[op/idx]_(i \in A) x === iter #|A| (op x) idx.
-Proof. by move=> I A x; rewrite -> big_const_seq, count_filter, cardE; reflexivity. Qed.
+Lemma big_const : forall (I : finType) (P : pred I) x,
+  \big[op/idx]_(i \in P) x === iter #|P| (op x) idx.
+Proof. by move=> I P x; rewrite -> big_const_seq, count_filter, cardE; reflexivity. Qed.
 
 Lemma big_const_nat : forall m n x,
   \big[op/idx]_(m <= i < n) x === iter (n - m) (op x) idx.
@@ -430,7 +430,7 @@ End Extensionality.
 Section MonoidProperties.
 
 Section Plain.
-Context `{Equivalence R req} {op : binop R} {idm : R}.
+Context `{Equivalence } {op : binop A} {idm : A}.
 Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Context {op_assoc : associative op}.
 Context {op_left_id : left_unit op idm}.
@@ -529,6 +529,7 @@ Proof.
 move=> n F; rewrite -> (@big_cat_nat n), ?leqnSn, big_nat1=> //; reflexivity.
 Qed.
 
+(*
 Lemma big_ord_recr : forall n F,
   \big[*%M/1]_(i < n.+1) F i ===
      (\big[*%M/1]_(i < n) F (widen_ord (leqnSn n) i)) * F ord_max.
@@ -539,7 +540,7 @@ rewrite -> big_nat_recr, big_mkord; apply op_morph; last first.
   by (have: (inord n = @ord_max (S_pos_nat n)) by apply: val_inj; rewrite /= inordK); move <-; reflexivity.
 by apply eq_bigr => [] i _; (have: (inord i = widen_ord (m:=n.+1) (leqnSn n) i) by apply: ord_inj; rewrite inordK //= leqW); move <-; reflexivity.
 Qed.
-
+*)
 Lemma big_sumType : forall (I1 I2 : finType) (P : pred (I1 + I2)) F,
   \big[*%M/1]_(i | P i) F i ===
         (\big[*%M/1]_(i | P (inl _ i)) F (inl _ i))
@@ -574,7 +575,7 @@ Qed.
 
 Section Abelian.
 
-Context `{Equivalence R req} {op : binop R} {idm : R}.
+Context `{Equivalence} {op : binop A} {idm : A}.
 Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Context {op_assoc : associative op}.
 Context {op_left_id : left_unit op idm}.
@@ -632,14 +633,14 @@ rewrite <- big_split; apply eq_bigr => i _.
 by case: (P i) => //=; case: (a i) => //=; symmetry; try apply op_left_id; apply op_right_id.
 Qed.
 
-Lemma bigU : forall (I : finType) (A B : pred I) F,
-  [disjoint A & B] ->
-  \big[*%M/1]_(i \in [predU A & B]) F i ===
-    (\big[*%M/1]_(i \in A) F i) * (\big[*%M/1]_(i \in B) F i).
+Lemma bigU : forall (I : finType) (P Q : pred I) F,
+  [disjoint P & Q] ->
+  \big[*%M/1]_(i \in [predU P & Q]) F i ===
+    (\big[*%M/1]_(i \in P) F i) * (\big[*%M/1]_(i \in Q) F i).
 Proof.
-move=> I A B F dAB; rewrite -> (bigID _ (mem A)); apply op_morph.
+move=> I P Q F dAB; rewrite -> (bigID _ (mem P)); apply op_morph.
   by apply eq_bigl; rewrite /mem // /in_mem; move=> i //=; rewrite orbK.
-by apply eq_bigl; move=> i //=; have:= pred0P dAB i; rewrite andbC /= !inE; case: (i \in A).
+by apply eq_bigl; move=> i //=; have:= pred0P dAB i; rewrite andbC /= !inE; case: (i \in P).
 Qed.
 
 Lemma bigD1 : forall (I : finType) j (P : pred I) F,
@@ -710,11 +711,11 @@ Lemma pair_big : forall (I J : finType) (P : pred I) (Q : pred J) F,
   \big[*%M/1]_(i | P i) \big[*%M/1]_(j | Q j) F i j ===
     \big[*%M/1]_(p | P p.1 && Q p.2) F p.1 p.2.
 Proof. move=> *; exact: pair_big_dep. Qed.
-
+(*
 Lemma pair_bigA : forall (I J : finType) (F : I -> J -> R),
   \big[*%M/1]_i \big[*%M/1]_j F i j === \big[*%M/1]_p F p.1 p.2.
 Proof. move=> *; exact: pair_big_dep. Qed.
-
+*)
 Lemma exchange_big_dep :
     forall (I J : finType) (P : pred I) (Q : I -> pred J) (xQ : pred J) F,
     (forall i j, P i -> Q i j -> xQ j) ->
@@ -774,10 +775,10 @@ End MonoidProperties.
 
 Section BigProp.
 
-Context `{Equivalence R req} {Pb : R -> Prop}.
-Context {idx : R} {op1 : binop R}.
+Context `{Equivalence} {Pb : A -> Prop}.
+Context {idx : A} {op1 : binop A}.
 Context {Pb_morph : Proper (Equivalence.equiv==>Equivalence.equiv) Pb}.
-Context {op1_morph : Proper (req==>req==>req) op1}.
+Context {op1_morph : Proper (R==>R==>R) op1}.
 Hypothesis (Pb_idx : Pb idx)
            (Pb_op1 : forall x y, Pb x -> Pb y -> Pb (op1 x y)).
 
@@ -785,8 +786,8 @@ Lemma big_prop : forall I r (P : pred I) F,
   (forall i, P i -> Pb (F i)) -> Pb (\big[op1/idx]_(i <- r | P i) F i).
 Proof. by move=> I r P F PbF; elim: r => //= i *; case Pi: (P i); auto. Qed.
 
-Variable (op2 : binop R).
-Context {op2_morph : Proper (req==>req==>req) op2}.
+Variable (op2 : binop A).
+Context {op2_morph : Proper (R==>R==>R) op2}.
 
 Hypothesis (Pb_eq_op : forall x y, Pb x -> Pb y -> op1 x y === op2 x y).
 
@@ -814,11 +815,13 @@ Qed.
 End BigProp.
 
 Section BigRel.
-Context `{Equivalence R1 req1}.
-Variables (idx1 : R1) (op1 : binop R1).
-Context `{Equivalence R2 req2}.
-Variable Pr : R1 -> R2 -> Prop.
-Variables (idx2 : R2) (op2 : binop R2).
+Context (A1:Type). Context (R1:relation A1).
+Context `{@Equivalence A1 R1}.
+Variables (idx1 : A1) (op1 : binop A1).
+Context (A2:Type). Context (R2:relation A2).
+Context `{@Equivalence A2 R2}.
+Variables (idx2 : A2) (op2 : binop A2).
+Variable Pr : A1 -> A2 -> Prop.
 Context {Pr_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) Pr}.
 Context {op1_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op1}.
 Context {op2_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
@@ -845,13 +848,15 @@ Qed.
 
 End BigRel.
 
+(*
 Section Morphism.
 
-Context {R1 : Type} `{Equivalence R2 req2}.
-Variables (idx1 : R1) (op1 : binop R1).
+Context `{Equivalence}.
+Variables (idx1 : A) (op1 : binop A).
+Context {R2 : Type}.
 Variables (idx2 : R2) (op2 : binop R2).
-Variable phi : R1 -> R2.
-Hypothesis phiM : forall x y, req2 (phi (op1 x y)) (op2 (phi x) (phi y)).
+Variable phi : A -> R2.
+Hypothesis phiM : forall x y, R (phi (op1 x y)) (op2 (phi x) (phi y)).
 Hypothesis phi_id : req2 (phi idx1) idx2.
 Context {op2_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op2}.
 
@@ -864,10 +869,12 @@ case: (P i) => Heq; rewrite <- Heq; [apply phiM|reflexivity].
 Qed.
 
 End Morphism.
+*)
 
+(*
 Section Distributivity.
 
-Context `{Equivalence R req} {add mul : binop R} {zero : R}.
+Context `{Equivalence} {add mul : binop A} {zero : A}.
 Notation Local "*%M" := mul (at level 0).
 Notation Local "x * y" := (mul x y).
 Notation Local "0" := zero.
@@ -983,3 +990,4 @@ move=> *; rewrite -> bigA_distr_big; apply eq_bigl => ?; exact/familyP.
 Qed.
 
 End Distributivity.
+*)

@@ -34,7 +34,7 @@ Class unop_intern (P : R -> Type) (op : unop R) :=
   unop_int : forall x : R, P x -> P (op x).
 Class binop_intern (P : R -> Type) (op : binop R) :=
   binop_int : forall x y : R, P x -> P y -> P (op x y).
-Context `{r_st : Equivalence R req}.
+Context `{r_st : Equivalence R}.
 
 Class associative (op : binop R) :=
   assoc : forall x y z, op x (op y z) === op (op x y) z.
@@ -71,23 +71,23 @@ Section Commutative.
 Class monoid `{r_st : Equivalence R req}:=
 {mul :> binop R
 ;mulC : commutative mul}.*)
-Context `{r_st : Equivalence R req}.
-Context {mul : binop R} {mulC : commutative mul}.
-Global Instance mulC_id_l {idm : R} {H : left_unit mul idm} : right_unit mul idm.
+Context `{r_st : Equivalence}.
+Context {mul : binop A} {mulC : commutative mul}.
+Global Instance mulC_id_l {idm : A} {H : left_unit mul idm} : right_unit mul idm.
 Proof. reduce; rewrite commut; apply left_id. Qed.
-Global Instance mulC_id_r {idm : R} {H : right_unit mul idm} : left_unit mul idm.
+Global Instance mulC_id_r {idm : A} {H : right_unit mul idm} : left_unit mul idm.
 Proof. reduce; rewrite commut; apply right_id. Qed.
-Global Instance mulC_zero_l {zero : R} {H : left_absorbing mul zero} : right_absorbing mul zero.
+Global Instance mulC_zero_l {zero : A} {H : left_absorbing mul zero} : right_absorbing mul zero.
 Proof. reduce; rewrite commut; apply left_zero. Qed.
-Global Instance mulC_zero_r {zero : R} {H : right_absorbing mul zero} : left_absorbing mul zero.
+Global Instance mulC_zero_r {zero : A} {H : right_absorbing mul zero} : left_absorbing mul zero.
 Proof. reduce; rewrite commut; apply right_zero. Qed.
-Global Instance mulC_inv_l {idm : R} {inv : unop R} {H : left_inverse mul idm inv} : right_inverse mul idm inv.
+Global Instance mulC_inv_l {idm : A} {inv : unop A} {H : left_inverse mul idm inv} : right_inverse mul idm inv.
 Proof. reduce; rewrite commut; apply left_inv. Qed.
-Global Instance mulC_inv_r {idm : R} {inv : unop R} {H : right_inverse mul idm inv} : left_inverse mul idm inv.
+Global Instance mulC_inv_r {idm : A} {inv : unop A} {H : right_inverse mul idm inv} : left_inverse mul idm inv.
 Proof. reduce; rewrite commut; apply right_inv. Qed.
 
 Section distributivity.
-Context {op : binop R}.
+Context {op : binop A}.
 Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Global Instance mulC_distr_l {H : left_distributive op mul} : right_distributive op mul.
 Proof. intros l_d x y z; rewrite -> (commut x (op _ _)), -> (commut x y), -> (commut x z); apply left_dist. Qed.
@@ -107,8 +107,8 @@ End Associativity.
 End Commutative.
 
 Section AssociativeCommutative.
-Context `{r_st : Equivalence R req}.
-Context {add mul : binop R} {opp : unop R} {zero : R}.
+Context `{r_st : Equivalence}.
+Context {add mul : binop A} {opp : unop A} {zero : A}.
 Context {add_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
 Context {mul_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
 Context {opA : associative add}.
