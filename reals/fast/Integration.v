@@ -361,16 +361,16 @@ Proof.
   intros.
   unfold QposEq.
   autorewrite with QposElim.
-  (* Something did not unfold. Should be: reflexivity.*) admit.
+  apply SupDistanceToLinear_glue.
  do 2 rewrite -> X.
  rewrite -> StepFSupBallGlueGlue.
  split.
   apply: ball_weak_le;[|simpl; apply H0].
   autorewrite with QposElim.
-  apply Qplus_le_compat; apply Qpos_max_ub_l.
+  apply Qplus_le_compat; apply Qmax_ub_l.
  apply: ball_weak_le;[|simpl; apply H1].
  autorewrite with QposElim.
- apply Qplus_le_compat; apply Qpos_max_ub_r.
+ apply Qplus_le_compat; apply Qmax_ub_r.
 Qed.
 
 (** The [stepSample p] is as close to the virtual identity function as

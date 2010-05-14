@@ -45,13 +45,14 @@ Proof.
   rewrite -> df; [ unfold cg_minus; ring | omega].
  rewrite nth_coeff_nexp_neq. ring. assumption.
 Qed.
-(*
+
 Theorem cpoly_div1 : forall (m n : nat) (f g : cpoly_cring CR),
   degree_le m f -> degree_le (S n) g -> n <= m ->
     {qr: (cpoly_cring CR)*(cpoly_cring CR) &
     let (q,r):=qr in f [*] _C_ ((nth_coeff (S n) g) [^] (m - n)) [=] q [*] g [+] r &
     let (q,r):=qr in degree_le n r}.
 Proof.
+Admitted. (*
  intros m n; set (H := refl_equal (m - n)); revert H.
  generalize (m - n) at 1 as p; intro p; revert m n; induction p; intros.
   exists ((Zero : cpoly_cring CR),f).
@@ -75,12 +76,12 @@ Proof.
 Qed.
 *)
 
-(*
 Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] Zero).
 Lemma cpoly_div2 : forall (n m : nat) (a b c : cpoly_cring CR),
   degree_le n a -> monic m b -> degree_lt_pair c b -> a [*] b [=] c ->
     a [=] Zero.
 Proof.
+Admitted. (*
  induction n.
   intros m a b c H X H1 H2; destruct (degree_le_zero _ _ H) as [x s].
   move: H1. rewrite -> s; destruct X as [H0 H1]; rewrite -> c_zero. rewrite -> s in H2. intro. apply cpoly_const_eq.
@@ -123,7 +124,6 @@ Proof.
 Qed.
 *)
 
-(*
 Lemma cpoly_div : forall (f g : cpoly_cring CR) (n : nat), monic n g ->
   ex_unq (fun (qr : ProdCSetoid (cpoly_cring CR) (cpoly_cring CR)) => f[=](fst qr)[*]g[+](snd qr) and degree_lt_pair (snd qr) g).
 Proof.
@@ -165,6 +165,5 @@ Proof.
  split; [ assumption | ].
  rewrite -> H1 in s0; apply (cg_cancel_lft _ _ _ _ s0).
 Qed.
-*)
 
 End poly_eucl.

@@ -142,12 +142,8 @@ Proof.
   replace (lt_n_Sm_le j n Hi) with (lt_n_Sm_le j n Hj) by apply le_irrelevent.
   apply eq_reflexive.
  destruct i; intros Hi; unfold B, A, part_tot_nat_fun.
-  simpl (sumbool_rect (fun _ : {S n <= 0} + {0 < S n} => cpoly_cring R) (fun _ : S n <= 0 => Zero)
-    (fun b : 0 < S n => Bernstein (lt_n_Sm_le 0 n b)) (le_lt_dec (S n) 0)).
-  generalize (lt_n_Sm_le 0 (S n) Hi) (lt_n_Sm_le 0 n (gt_le_S 0 (S n) (lt_O_Sn n))).
-  intros l l0.
-  simpl (Bernstein l).
-  replace l0 with (le_O_n n) by apply le_irrelevent.
+  simpl. symmetry.
+  rewrite <- (le_irrelevent _ _ (le_0_n _) _).
   ring.
  destruct (le_lt_dec (S n) i).
   elimtype False; omega.
@@ -174,9 +170,12 @@ Proof.
   simpl (Bernstein H) at 1.
   rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
   rewrite -> IHn.
-  rstepl ((nring 1)[*]((One[-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
-  set (l0:=(lt_n_Sm_le _ _ (le_n_S 1 (S n) (gt_le_S 0 (S n) (gt_Sn_O n))))).
-  replace (le_n_S 0 n (le_O_n n)) with l0 by apply le_irrelevent.
+  rstepl (((One[-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
+  rstepr (Bernstein (le_n_S 0 (S n) H)).
+  set (le_n_S 0 n (le_0_n n)).
+  rewrite (Bernstein_inv1 l).
+  rewrite (le_irrelevent _ _ (lt_n_Sm_le 1 (S n) (lt_n_S 0 (S n) l)) l).
+  rewrite (le_irrelevent _ _ H (le_S_n 0 (S n) (le_n_S 0 (S n) H))).
   reflexivity.
  simpl (Bernstein H) at 1.
  destruct (le_lt_eq_dec _ _ H).

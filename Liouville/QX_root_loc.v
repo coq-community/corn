@@ -138,8 +138,8 @@ Proof.
   case (QX_dec (_C_ a[*]P) Zero).
    intro Heq; destruct (ap_imp_neq _ _ _ HapP); clear HapP.
    apply all_nth_coeff_eq_imp.
-   intro i; set (nth_coeff_wd _ i _ _ Heq).
-   revert s; rewrite -> nth_coeff_c_mult_p.
+   intro i; generalize (nth_coeff_wd _ i _ _ Heq).
+   rewrite -> nth_coeff_c_mult_p.
    fold QX; simpl (nth_coeff i (Zero:QX)).
    intro Heq2; apply (mult_eq_zero _ a); [apply Hap|assumption].
   apply RX_deg_spec.
@@ -183,7 +183,7 @@ Proof.
  apply mult_wd.
   reflexivity.
  rewrite <- minus_Sn_m; [|assumption].
- rewrite -> CRings.mult_commutes; reflexivity.
+ reflexivity.
 Qed.
 
 Lemma qx2zx_deg : forall P, QX_deg P = ZX_deg (qx2zx P).
@@ -388,8 +388,7 @@ Proof.
       intro H1; destruct (Zlcm_den_poly_nz P).
       unfold Qeq in H1; simpl in H1.
       rewrite Zmult_1_r in H1; assumption.
-     set (nth_coeff_wd _ i _ _ Heq2).
-     revert s.
+     generalize (nth_coeff_wd _ i _ _ Heq2).
      rewrite -> nth_coeff_c_mult_p.
      simpl; tauto.
     rewrite <- qx2zx_spec.

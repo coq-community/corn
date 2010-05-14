@@ -94,11 +94,7 @@ Proof.
  assert (1 * Zgcd qn qd <= qd)%Z.
   rewrite Zmult_1_l.
   by apply Zgcd_le_rht.
- set (z H0 H1).
- revert z0; generalize (qd / Zgcd qn qd)%Z; clear; intros x H.
- destruct x. by destruct H.
-  reflexivity.
- by destruct H.
+ omega.
 Qed.
 
 Definition Q_can_den_pos_val (q : Q_as_CRing) : positive :=
@@ -111,6 +107,7 @@ Lemma Q_can_den_pos_val_spec : forall q : Q_as_CRing, Q_can_den q = Q_can_den_po
 Proof.
  intro q; set (Q_can_den_pos q).
  unfold Q_can_den_pos_val.
+ clearbody z.
  revert z.
  case (Q_can_den q).
    intro; discriminate.

@@ -93,9 +93,10 @@ Proof.
  destruct (Cpoly_ex_degree _ P) as [n Hdeg].
  destruct (Cpoly_ex_degree _ (AbsPoly P)) as [m HdegA].
  unfold CPoly_bound.
- set (degree_le_mon _ _ _ _ (le_max_l n m) Hdeg).
- set (degree_le_mon _ _ _ _ (le_max_r n m) HdegA).
- revert HI d d0; generalize (max n m); clear.
+ generalize (degree_le_mon _ _ _ _ (le_max_l n m) Hdeg).
+ generalize (degree_le_mon _ _ _ _ (le_max_r n m) HdegA).
+ revert HI.
+ generalize (max n m). clear.
  intros n HI HdegP HdegA.
  rewrite -> (poly_as_sum _ _ _ HdegP).
  rewrite -> (poly_as_sum _ _ _ HdegA).

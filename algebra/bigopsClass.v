@@ -74,8 +74,7 @@ Open Scope signature_scope.
 Delimit Scope big_scope with BIG.
 Open Scope big_scope.
 
-Definition reducebig R I idx op r (P : pred I) (F : I -> R) : R :=
-  foldr (fun i x => if P i then op (F i) x else x) idx r.
+Require Import bigops.
 
 Definition index_iota m n := iota m (n - m).
 
