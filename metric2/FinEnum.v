@@ -227,7 +227,8 @@ Proof.
  exists y.
  split; auto using InFinEnumC_weaken.
  apply ball_closed.
- intros [n d].
+ apply Qpos_positive_numerator_rect.
+ intros n d.
  destruct (Hy1 (nat_of_P d)) as [HG | m [Hmd Hm]] using existsC_ind.
   apply Xstable; assumption.
  eapply ball_weak_le;[|apply Hm].
@@ -297,7 +298,8 @@ Proof.
   rewrite -> (InFinEnumC_wd1 x y).
    auto using InFinEnumC_weaken.
   apply ball_eq.
-  intros [n d].
+  apply Qpos_positive_numerator_rect.
+  intros n d.
   rewrite (anti_convert_pred_convert d).
   destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
    auto using Xstable.
@@ -435,7 +437,7 @@ Proof.
   abstract ( intros x Hx; destruct (H x Hx) as [HG | z [Hz0 Hz1]] using existsC_ind;
     [apply existsC_stable; auto|]; apply existsWeaken; exists z; split; try assumption; apply orWeaken;
       auto).
- destruct (almostDecideX a a0 Hed).
+ destruct (almostDecideX _ _ a a0 Hed).
   left.
   abstract ( intros x Hx; apply existsWeaken; exists a0; rewrite -> Hx;
     auto using InFinEnumC_weaken with * ).
@@ -459,7 +461,7 @@ Proof.
   apply Hx.
  intros b Hed.
  destruct (IHa b Hed) as [I|I].
-  destruct (HemiMetricStrongAlmostDecidableBody a b Hed) as [J|J].
+  destruct (HemiMetricStrongAlmostDecidableBody _ _ a b Hed) as [J|J].
    left.
    abstract ( intros x Hx; destruct (Hx) as [HG | Hx | Hx] using orC_ind; [auto using existsC_stable
      |apply J; assumption |apply I; assumption]).
@@ -473,8 +475,8 @@ Defined.
 Lemma FinEnum_located : locatedMetric FinEnum.
 Proof.
  intros e d a b Hed.
- destruct (HemiMetricStrongAlmostDecidable a b Hed).
-  destruct (HemiMetricStrongAlmostDecidable b a Hed).
+ destruct (HemiMetricStrongAlmostDecidable _ _ a b Hed).
+  destruct (HemiMetricStrongAlmostDecidable _ _ b a Hed).
    left.
    split; assumption.
   right.

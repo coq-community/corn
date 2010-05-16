@@ -47,7 +47,7 @@ Lemma Qpos_multdiv2_is_CGroup : is_CGroup Qpos_multdiv2_as_CMonoid divmult4.
 Proof.
  intro x.
  unfold is_inverse.
- split; simpl; autorewrite with QposElim; field; discriminate.
+ split; simpl; field; auto with *.
 Qed.
 
 Definition Qpos_multdiv2_as_CGroup := Build_CGroup

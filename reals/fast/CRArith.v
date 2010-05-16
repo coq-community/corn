@@ -56,7 +56,7 @@ Proof.
   elim (Qle_not_lt _ _ Y).
   rewrite -> Qlt_minus_iff.
   ring_simplify.
-  apply: Qpos_prf.
+  apply Qmult_lt_0_compat; auto with *.
  intros H e.
  simpl.
  unfold Cap_raw; simpl.

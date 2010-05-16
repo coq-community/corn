@@ -89,7 +89,8 @@ Proof.
   intros x.
   unfold Qpower_positive_modulus.
   generalize ((p # 1) * c ^ Zpred p)%Qpos.
-  intros [qn qd].
+  apply Qpos_positive_numerator_rect.
+  intros qn qd.
   simpl.
   autorewrite with QposElim.
   rewrite -> Qmult_sym.
@@ -122,7 +123,7 @@ Proof.
  stepl (One[*](AbsIR (nexp IR n (inj_Q IR x)))); [| by apply AbsIR_mult; apply less_leEq; apply pos_one].
  stepl (AbsIR (nexp IR n (inj_Q _ x))); [| by apply eq_symmetric; apply one_mult].
  stepl (nexp IR n (AbsIR (inj_Q _ x))); [| by apply eq_symmetric; apply AbsIR_nexp].
- stepr (inj_Q IR (c ^ Zpred p)); [| by apply inj_Q_wd; simpl; rewrite -> Q_Qpos_power; reflexivity].
+ stepr (inj_Q IR (c ^ Zpred p)); [| by apply inj_Q_wd; reflexivity].
  rewrite Hn.
  rewrite <- POS_anti_convert.
  rewrite inj_S.
@@ -230,7 +231,7 @@ CRpower_positive_bounded c x == CRpower_positive x)%CR.
 Proof.
  intros c x Hc.
  assert (Hx:(AbsSmall ('(CR_b (1#1) x)) x)%CR).
-  split; simpl.
+  split.
    rewrite -> CRopp_Qopp.
    apply CR_b_lowerBound.
   apply CR_b_upperBound.
@@ -247,7 +248,7 @@ Proof.
  apply CRpower_positive_bounded_correct.
  rewrite -> IR_AbsSmall_as_CR.
  stepl ('(CR_b (1#1) (IRasCR x)))%CR; [| by simpl; symmetry; apply IR_inj_Q_as_CR].
- split; simpl.
+ split.
   rewrite -> CRopp_Qopp.
   apply CR_b_lowerBound.
  apply CR_b_upperBound.
@@ -273,7 +274,7 @@ Proof.
   change (ucFun (CRpower_positive_bounded p (CR_b (1#1) x1)) x1==ucFun (CRpower_positive_bounded p (CR_b (1#1) x1)) x2)%CR.
   apply uc_wd; assumption.
  apply CRpositive_power_bounded_positive_power.
- split; simpl; rewrite <- Hx.
+ split; rewrite <- Hx.
   rewrite -> CRopp_Qopp.
   apply CR_b_lowerBound.
  apply CR_b_upperBound.

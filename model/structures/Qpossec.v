@@ -50,54 +50,93 @@ Open Local Scope Q_scope.
 We define [Qpos] as a pair of positives (n,d) which represents the
 fraction n/d.  *)
 
-Record Qpos : Set := QposMake
-{QposNumerator : positive
-;QposDenominator : positive
-}.
+Definition Qpos: Set := sig (Qlt 0).
+
+Program Definition QposMake (num den: positive): Qpos := num # den.
+Next Obligation. auto with *. Qed.
 
 Notation "a # b" := (QposMake a b) (at level 55, no associativity) : Qpos_scope.
 
 Bind Scope Qpos_scope with Qpos.
 Delimit Scope Qpos_scope with Qpos.
 
+Program Definition integral_Qpos (p: positive): Qpos := (p:Q).
+Next Obligation. auto with *. Qed.
+
+Coercion integral_Qpos: positive >-> Qpos.
+
 (** There is an injection from [Qpos] to [Q] that we make into a
 coersion. *)
-Definition QposAsQ (a:Qpos) : Q :=
-(Zpos (QposNumerator a))#(QposDenominator a).
+
+Definition QposAsQ: Qpos -> Q := @proj1_sig _ _.
 
 Coercion QposAsQ : Qpos >-> Q.
 
 (** Basic properties about [Qpos] *)
-Lemma Qpos_prf : forall a:Qpos, 0 < a.
-Proof.
- firstorder.
-Qed.
+Definition Qpos_prf : forall a:Qpos, 0 < a := @proj2_sig _ _.
+
+Hint Immediate Qpos_prf.
 
 Lemma Qpos_nonzero : forall x:Qpos, (x:Q)[#]0.
 Proof.
- intros x.
+ intros ?.
  apply: pos_ap_zero.
  apply Qpos_prf.
 Qed.
 
 Lemma Qpos_nonneg : forall a:Qpos, 0 <= a.
+Proof. intros [??]. auto with *. Qed.
+
+Hint Immediate Qpos_nonneg.
+
+(* Some things that should really be in the stdlib: *)
+
+(* todo: move these elsewhere *)
+
+Lemma Qopp_Qlt (x: Q): 0 < -x -> x < 0.
 Proof.
- intros a.
- apply Qlt_le_weak.
- apply Qpos_prf.
+ intros [n d].
+ unfold Qlt.
+ simpl.
+ intros.
+ apply Z.opp_pos_neg.
+ rewrite <- Zdiv.Z.mul_opp_l.
+ assumption.
 Qed.
 
-(** Any positive rational number can be transformed into a [Qpos]. *)
-Definition mkQpos (a:Q) (p:0 < a) : Qpos.
+Lemma Qmult_lt_0_compat (x y: Q): (0 < x -> 0 < y -> 0 < x * y)%Q.
 Proof.
- intros [an ad] p.
- destruct an as [|an|an].
-   compute in p.
-   abstract discriminate p.
-  exact (QposMake an ad).
- compute in p.
- abstract discriminate p.
-Defined.
+ unfold Qlt.
+ intros [n d] [n' d'].
+ simpl.
+ repeat rewrite Zmult_1_r.
+ apply Zmult_lt_0_compat.
+Qed.
+
+Hint Resolve Qmult_lt_0_compat. (* todo: put in appropriate hint db *)
+
+Lemma Qplus_lt_0_compat x y: 0 < x -> 0 <= y -> 0 < x + y.
+ unfold Qlt, Qle.
+ simpl.
+ intros x y.
+ repeat rewrite Zmult_1_r.
+ intros.
+ apply (Zplus_lt_le_compat 0); auto with *.
+Qed.
+
+Lemma Qopp_Qpos_neg (x: Qpos): -x < 0.
+Proof.
+ intros.
+ apply Qopp_Qlt.
+ rewrite Qopp_opp.
+ auto with *.
+Qed.
+
+Hint Immediate Qopp_Qpos_neg. (* todo: put in appropriate hint db *)
+
+(** Any positive rational number can be transformed into a [Qpos]. *)
+Definition mkQpos: forall (a:Q) (p:0 < a), Qpos := @exist Q (Qlt 0).
+
 (* begin hide *)
 Implicit Arguments mkQpos [a].
 (* end hide *)
@@ -111,10 +150,63 @@ Qed.
 (* begin hide *)
 Implicit Arguments QposAsmkQpos [a].
 (* end hide *)
+
+Lemma positive_Z (z: Z): Zlt 0 z -> sig (fun p: positive => Zpos p = z).
+ destruct z; intros.
+   intros.
+   elim (Zlt_irrefl _ H).
+  exists p.
+  reflexivity.
+ exfalso.
+ apply (Zlt_asym _ _ H).
+ auto with *.
+Defined.
+
+Require Eqdep_dec. (* todo: move this Qlt_uniq stuff elsewhere *)
+
+Definition comparison_eq_dec (a b: comparison): { a = b } + { a <> b}.
+ destruct a, b; try (left; reflexivity); try (right; discriminate).
+Defined.
+
+Lemma Zlt_uniq (a b: Z) (p q: (a < b)%Z): p = q.
+Proof.
+ unfold Zlt. destruct p. intros.
+ apply (Eqdep_dec.K_dec_set comparison_eq_dec).
+ reflexivity.
+Qed.
+
+Lemma Qlt_uniq (a b: Q) (p q: a < b): p = q.
+Proof. intros. apply Zlt_uniq. Qed.
+
+Program Definition Qpos_as_positive_ratio (q: Qpos):
+  sig (fun ps: positive * positive => q = QposMake (fst ps) (snd ps)) :=
+  (positive_Z (Qnum q) _, Qden q).
+
+Next Obligation.
+ destruct q as [[??] ?]. unfold Qlt in *. simpl in *. auto with *.
+Qed.
+
+Next Obligation.
+ destruct q as [[??] ?]. simpl.
+ destruct positive_Z. simpl.
+ subst. unfold QposMake.
+ f_equal. apply Qlt_uniq.
+Qed.
+
+Lemma Qpos_positive_numerator_rect (P: Qpos -> Type):
+  (forall (a b: positive), P (a # b)%Qpos) -> forall q, P q.
+Proof.
+ intros P H q.
+ destruct (Qpos_as_positive_ratio q).
+ subst.
+ apply H.
+Defined.
+
 Lemma QposAsQposMake : forall a b, (QposAsQ (QposMake a b)) = (Zpos a)#b.
 Proof.
  trivial.
 Qed.
+
 (* begin hide *)
 Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 (* end hide *)
@@ -131,15 +223,21 @@ Add Relation Qpos QposEq
 
 Definition QposAp (a b:Qpos) := Qap a b.
 
+Definition Qpos_PI (a b: Qpos): (a: Q) = b -> a = b.
+Proof.
+ destruct a, b.
+ simpl. intros. subst.
+ f_equal. apply Qlt_uniq.
+Qed.
+
 (**
 *** Addition
 *)
-Definition Qpos_plus (x y:Qpos) : Qpos.
-Proof.
- intros x y.
- apply mkQpos with (x+y).
- abstract (apply: plus_resp_pos; apply Qpos_prf).
-Defined.
+Program Definition Qpos_plus (x y:Qpos) : Qpos := Qplus x y.
+
+Next Obligation.
+ apply: plus_resp_pos; apply Qpos_prf.
+Qed.
 
 Infix "+" := Qpos_plus : Qpos_scope.
 (* begin hide *)
@@ -148,7 +246,7 @@ Proof.
  intros x1 x2 Hx y1 y2 Hy.
  unfold QposEq in *.
  unfold Qpos_plus.
- autorewrite with QposElim.
+ simpl.
  apply Qplus_comp; assumption.
 Qed.
 (* end hide *)
@@ -162,12 +260,8 @@ Hint Rewrite Q_Qpos_plus : QposElim.
 (**
 *** Multiplicaiton
 *)
-Definition Qpos_mult (x y:Qpos) : Qpos.
-Proof.
- intros x y.
- apply mkQpos with (x*y).
- abstract (apply: mult_resp_pos; apply Qpos_prf).
-Defined.
+
+Program Definition Qpos_mult (x y:Qpos) : Qpos := Qmult x y.
 
 Infix "*" := Qpos_mult : Qpos_scope.
 (* begin hide *)
@@ -176,7 +270,7 @@ Proof.
  intros x1 x2 Hx y1 y2 Hy.
  unfold QposEq in *.
  unfold Qpos_mult.
- autorewrite with QposElim.
+ simpl.
  apply Qmult_comp; assumption.
 Qed.
 (* end hide *)
@@ -190,20 +284,23 @@ Hint Rewrite Q_Qpos_mult : QposElim.
 (**
 *** Inverse
 *)
-Definition Qpos_inv (x:Qpos) : Qpos :=
-((QposDenominator x)#(QposNumerator x))%Qpos.
+
+Program Definition Qpos_inv (x:Qpos): Qpos := / x.
+
+Next Obligation.
+ apply Qinv_lt_0_compat.
+ destruct x.
+ assumption.
+Qed.
+
 (* begin hide *)
 Add Morphism Qpos_inv : Qpos_inv_wd.
 Proof.
- intros [x1n x1d] [x2n x2d] Hx.
+ intros [x P] [y Q] E.
  unfold QposEq in *.
- unfold Qpos_inv.
- unfold Qeq in *.
  simpl in *.
- rewrite Pmult_comm.
- symmetry.
- rewrite Pmult_comm.
- apply Hx.
+ rewrite E.
+ reflexivity.
 Qed.
 (* end hide *)
 Lemma Q_Qpos_inv : forall (x:Qpos), Qpos_inv x = / x :> Q.
@@ -283,6 +380,7 @@ Proof.
  unfold QposEq in *.
  unfold Qpos_power.
  autorewrite with QposElim.
+ simpl.
  rewrite -> Hx.
  reflexivity.
 Qed.
@@ -342,6 +440,6 @@ Lemma QposRed_correct : forall p, QposRed p == p.
 Proof.
  unfold QposRed.
  intros p.
- autorewrite with QposElim.
+ simpl.
  apply Qred_correct.
 Qed.

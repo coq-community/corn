@@ -110,7 +110,8 @@ Proof.
  assert (Hh:=(ProjT2 (Qpos_lt_plus Hbt))).
  fold w in Hw.
  fold h in Hh.
- simpl in Hw, Hh.
+ change (r == l + w) in Hw.
+ change (t == b + h) in Hh.
  apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
   apply ball_approx_r.
  unfold Compact.

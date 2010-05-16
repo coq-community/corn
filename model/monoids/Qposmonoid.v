@@ -43,18 +43,18 @@ Require Import CMonoids.
 One is the unit for multiplication on positive integers. Therefore the positive rational numbers together with the multiplication are a CMonoid.
 *)
 
-Lemma QONEpos_is_rht_unit : is_rht_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
+Lemma QONEpos_is_rht_unit : is_rht_unit Qpos_mult_is_bin_fun (1%positive:Qpos).
 Proof.
  intros x.
  simpl.
- QposRing.
+ ring.
 Qed.
 
-Lemma QONEpos_is_lft_unit : is_lft_unit Qpos_mult_is_bin_fun (1#1)%Qpos.
+Lemma QONEpos_is_lft_unit : is_lft_unit Qpos_mult_is_bin_fun (1%positive:Qpos).
 Proof.
  intros x.
  simpl.
- QposRing.
+ ring.
 Qed.
 
 Definition Qpos_mult_is_CMonoid := Build_is_CMonoid

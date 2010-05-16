@@ -153,16 +153,20 @@ Definition Q_as_MetricSpace : MetricSpace :=
 Canonical Structure Q_as_MetricSpace.
 (* end hide *)
 Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:QS), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
-Proof.
+Proof with auto with *.
  intros e d1 d2 He a b c Hab Hc.
  simpl.
  unfold Qball.
  apply AbsSmall_wdr with ((d1/(d1+d2)%Qpos)*(a - b)).
-  apply AbsSmall_wdl with ((d1/(d1+d2)%Qpos)*(d1+d2)%Qpos); [|simpl; field; apply Qpos_nonzero].
-  apply mult_resp_AbsSmall.
+  apply AbsSmall_wdl with ((d1/(d1+d2)%Qpos)*(d1+d2)%Qpos).
+   apply mult_resp_AbsSmall.
    apply less_leEq.
    apply (div_resp_pos _  _ (d1:Q) (@Qpos_nonzero (d1+d2)%Qpos)); apply Qpos_prf.
-  destruct d1; destruct d2; apply (AbsSmall_trans _ (e:Q)); assumption.
+   destruct d1; destruct d2; apply (AbsSmall_trans _ (e:Q)); assumption.
+  simpl. field. intro.
+  apply (Qlt_irrefl (d1 + d2)).
+  apply Qlt_trans with e...
+  rewrite H...
  simpl.
  rewrite -> Hc.
  pose (@Qpos_nonzero (d1 + d2)%Qpos).

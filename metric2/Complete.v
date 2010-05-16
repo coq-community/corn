@@ -486,9 +486,12 @@ Proof.
   rewrite Hq in Hd.
   eapply ball_weak_le;[|apply regFun_prf].
   rewrite Q_Qpos_plus.
-  stepr (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos); [| simpl; QposRing].
-  apply: plus_resp_leEq.
-  assumption.
+  stepr (((1 # 2) * q)%Qpos + ((1 # 2) * q)%Qpos).
+   apply: plus_resp_leEq.
+   assumption.
+  autorewrite with QposElim.
+  simpl.
+  ring.
  unfold Cmap_slow_raw.
  simpl in *.
  apply uc_prf.
@@ -651,6 +654,8 @@ Proof.
  unfold Cmap_slow_raw; simpl.
  unfold Cjoin_raw; simpl.
  unfold Cmap_slow_raw; simpl.
+ assert (halfhalf: forall q, QposEq ((1#4) * q) ((1 # 2) * ((1#2) * q))%Qpos).
+  unfold QposEq. intro. simpl. ring.
  apply ball_triangle with (f (approximate (approximate x d0) d0)).
   apply uc_prf.
   destruct (mu f e1) as [q|]; try constructor.
@@ -663,7 +668,9 @@ Proof.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
     rewrite -> ball_Cunit.
+    rewrite halfhalf.
     apply ball_approx_l.
+   rewrite halfhalf.
    apply ball_approx_l.
   apply ball_triangle with (Cunit (approximate x d0)).
    change (ball_ex ((1 # 4) * q)%Qpos x (Cunit (approximate x d0))).
@@ -692,6 +699,7 @@ Proof.
   apply ball_triangle with (Cunit (approximate x ((1 # 2) * ((1 # 2) * q))%Qpos)).
    rewrite -> ball_Cunit.
    apply ball_approx_l.
+  rewrite halfhalf.
   apply ball_approx_l.
  apply ball_triangle with (Cunit (approximate x d0)).
   change (ball_ex ((1 # 8) * q)%Qpos x (Cunit (approximate x d0))).

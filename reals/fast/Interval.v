@@ -309,7 +309,9 @@ Proof.
    destruct e2'; auto with *.
   replace RHS with (e2'*(2%positive*e2)) by simpl; ring.
   rewrite <- (Qinv_involutive (2%positive*e2)).
-  apply Qle_shift_div_l; auto with *.
+  apply Qle_shift_div_l.
+   apply Qinv_lt_0_compat.
+   auto with *.
   change ( (r - l) / (2%positive * e2) <= e2').
   unfold e2'.
   generalize (CompactIntervalQ_nat e2).
@@ -465,7 +467,8 @@ Proof.
    apply Qle_shift_div_r;auto.
    replace RHS with (n*(2%positive*e2))%Q by simpl; ring.
    rewrite <- (Qinv_involutive (2%positive*e2)).
-   apply Qle_shift_div_l; auto with *.
+   apply Qle_shift_div_l.
+    apply Qinv_lt_0_compat. auto with *.
    unfold n.
    fold ((r - l) / (2%positive * e2)).
    generalize (CompactIntervalQ_nat e2).

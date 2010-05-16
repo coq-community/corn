@@ -161,7 +161,7 @@ Proof.
   rewrite -> Qle_minus_iff.
   replace RHS with ((b^2 - a)[^]2) by (simpl; unfold QONE; ring).
   apply: sqr_nonneg.
- field_simplify (b / 2 + a / (2 * b) - ((1#2)*e * e)); auto with *.
+ field_simplify (b / 2 + a / (2 * b) - ((1#2)*(e * e)%Qpos)); auto with *.
  rewrite -> Qdiv_power.
  apply Qle_shift_div_r.
   Qauto_pos.
@@ -353,11 +353,25 @@ Proof.
  apply ball_weak_le with (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos.
   autorewrite with QposElim.
   apply: plus_resp_leEq_both; simpl; auto with *.
- apply ball_root_has_error; try first [apply root_loop_one_le; apply initial_root_one_le
-   |apply root_loop_error; try first [apply initial_root_one_le |apply initial_root_error
-     |(destruct e1; destruct e2); apply root_max_steps]].
- setoid_replace (1:Q) with ((1#2)%Qpos + (1#2)%Qpos) by (simpl; QposRing).
- apply: plus_resp_leEq_both; apply Qpos_min_lb_l.
+ apply ball_root_has_error.
+     setoid_replace (1:Q) with ((1#2)%Qpos + (1#2)%Qpos) by (simpl; QposRing).
+     apply: plus_resp_leEq_both; apply Qpos_min_lb_l.
+    apply root_loop_one_le.
+    apply initial_root_one_le.
+   apply root_loop_one_le.
+   apply initial_root_one_le.
+  apply root_loop_error.
+    apply initial_root_one_le.
+   apply initial_root_error.
+  revert e1.
+  apply Qpos_positive_numerator_rect.
+  apply root_max_steps.
+ apply root_loop_error.
+   apply initial_root_one_le.
+  apply initial_root_error.
+ revert e2.
+ apply Qpos_positive_numerator_rect.
+ apply root_max_steps.
 Qed.
 
 Definition rational_sqrt_mid : CR := Build_RegularFunction sqrt_regular.
@@ -373,7 +387,10 @@ Proof.
     apply Qpos_min_lb_r.
    apply initial_root_one_le.
   apply initial_root_error.
- destruct e; apply root_max_steps.
+ clear.
+ revert e.
+ apply Qpos_positive_numerator_rect.
+ apply root_max_steps.
 Qed.
 
 Lemma rational_sqrt_mid_one_le : forall (e:QposInf), 1 <= (approximate rational_sqrt_mid e).
@@ -393,7 +410,10 @@ Proof.
   apply root_loop_error.
     apply initial_root_one_le.
    apply initial_root_error.
-  destruct e; apply root_max_steps.
+  subst n.
+  clear. revert e.
+  apply Qpos_positive_numerator_rect.
+  apply root_max_steps.
  eapply Qle_trans.
   apply root_error_bnd;[| |apply H].
    eapply Qle_trans.
@@ -435,9 +455,30 @@ Proof.
   apply rational_sqrt_mid_le_3.
  rewrite <- (CRpositive_power_bounded_positive_power 2 (3#1));[|assumption].
  apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_positive_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
- intros e He.
+ intros e.
+ destruct (Qpos_as_positive_ratio e) as [[en ed] E].
+ subst e.
+ simpl fst.
+ simpl snd.
+ set (e := (en # ed)%Qpos).
+ intro He.
  set (d:=(e / (6#1))%Qpos).
- change (Qball (e + e) ((Qmax (- (3#1)) (Qmin (3#1) (approximate rational_sqrt_mid d)))^2) a).
+ change (Qball (e + e)
+  (approximate ((CRpower_positive_bounded 2 (3 # 1)) rational_sqrt_mid) e)
+  a).
+ assert (
+   (approximate ((CRpower_positive_bounded 2 (3 # 1)) rational_sqrt_mid) e) =
+   ((Qmax (- (3#1)) (Qmin (3#1) (approximate rational_sqrt_mid d)))^2)
+   ).
+  simpl.
+  replace d with (Qpos_mult e (Qpos_inv ((2 # 1) * ((3 # 1) ^ (2 - 1)%positive)))).
+   reflexivity.
+  subst e d.
+  f_equal.
+  unfold Qpos_mult, mkQpos, Qmult, QposMake. simpl.
+  f_equal. f_equal. apply Qlt_uniq.
+ rewrite H0.
+ clear H0.
  setoid_replace (Qmin (3#1) (approximate rational_sqrt_mid d))
    with ((approximate rational_sqrt_mid d)) by
      (rewrite <- Qle_min_r;destruct H;apply rational_sqrt_mid_le_3).
@@ -471,7 +512,7 @@ Proof.
  replace RHS with (a + - (z-d)^2 + 2*(3 + - z)*d + d^2 + e)
    by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
  Qauto_nonneg.
-Qed.
+Qed. (* todo: clean up *)
 
 Lemma rational_sqrt_mid_correct1 : ('0 <= rational_sqrt_mid)%CR.
 Proof.

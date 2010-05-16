@@ -161,7 +161,7 @@ Proof.
   pose (H1:=(Hx ((1#3)*e')%Qpos)).
   pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
   destruct H2 as [_ H2].
-  simpl in H2.
+  change (approximate x ((1 # 3) * e')%Qpos - approximate y e <= ((1 # 3) * e' + e)%Qpos) in H2.
   rewrite -> Qle_minus_iff in H1.
   rewrite -> Qle_minus_iff in H2.
   autorewrite with QposElim in *.
@@ -205,7 +205,7 @@ Proof.
   pose (H1:=(Hx ((1#3)*e')%Qpos)).
   pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
   destruct H2 as [H2 _].
-  simpl in H2.
+  change (-((1 # 3) * e' + e)%Qpos <= approximate x ((1 # 3) * e')%Qpos - approximate y e) in H2.
   rewrite -> Qle_minus_iff in H1.
   rewrite -> Qle_minus_iff in H2.
   autorewrite with QposElim in *.
@@ -296,7 +296,9 @@ Proof.
    - approximate y ((1 # 2) * ((1 # 2) * e))%Qpos + (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos
      - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos))); [| simpl; ring].
  stepl (-(1#2)*e + - (1#2)*e); [| simpl; ring].
- apply Qplus_le_compat;assumption.
+ destruct (Qpos_as_positive_ratio e).
+ subst.
+ apply Qplus_le_compat; assumption.
 Qed.
 
 (**
@@ -434,6 +436,11 @@ Proof.
      (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos
        - Qmax (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
          (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos))); [|simpl; ring].
+ destruct (Qpos_as_positive_ratio e) as [[n d] E].
+ simpl in E.
+ set (n # d)%Qpos in E.
+ subst.
+ rename q into e.
  apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
    (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
@@ -567,6 +574,11 @@ Proof.
    - approximate z ((1#2)*((1 # 2) * e))%Qpos) + (Qmin (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
      (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos) +
        - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)); [| simpl; ring].
+ destruct (Qpos_as_positive_ratio e) as [[n d] E].
+ simpl in E.
+ set (n # d)%Qpos in E.
+ subst.
+ rename q into e.
  apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
    (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].

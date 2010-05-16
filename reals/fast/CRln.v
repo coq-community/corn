@@ -280,7 +280,12 @@ Proof.
     algebra.
    elim (Qle_not_lt _ _ q).
    apply: ln_uc_prf_pos.
-  intros [xn xd]; apply: Qle_refl.
+  apply Qpos_positive_numerator_rect.
+  intros xn xd.
+  revert c.
+  apply Qpos_positive_numerator_rect.
+  intros.
+  apply: Qle_refl.
  assert (Z:Derivative (closel (inj_Q IR (c:Q))) I Logarithm {1/}FId).
   apply (Included_imp_Derivative (openl Zero) I).
    Deriv.
@@ -319,7 +324,11 @@ Proof.
    simpl; auto with *.
   apply (inj_Q_nring IR 0).
  stepl (((inj_Q IR 1)[/]_[//] Greater_imp_ap IR (inj_Q IR (c:Q)) Zero (Qpos_adaptor (Qpos_prf c)))).
-  change (inj_Q IR ((Qpos_inv c):Q)) with (inj_Q IR (1/c)).
+  clear.
+  revert c.
+  apply Qpos_positive_numerator_rect.
+  intros.
+  change (inj_Q IR ((Qpos_inv (a#b)):Q)) with (inj_Q IR (1/(a#b))).
   apply eq_symmetric.
   apply inj_Q_div.
  apply div_wd.

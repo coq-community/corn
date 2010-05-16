@@ -426,10 +426,15 @@ Proof.
 Qed.
 
 (** The limit of [recip_positives] is 0. *)
-Lemma recip_positives_help_nbz : forall (n d q:positive), (d <= q)%Z -> NearBy 0 (n#d)%Qpos (map (fun x => 1#x) (positives_help q)).
+Lemma recip_positives_help_nbz : forall (x: Qpos) (q:positive),
+ (Qden x <= q)%Z -> NearBy 0 x (map (fun x => 1#x) (positives_help q)).
 Proof.
+ intro x.
+ destruct (Qpos_as_positive_ratio x) as [[n d] U].
+ subst.
+ simpl.
  cofix.
- intros n d q Hpq.
+ intros q Hpq.
  constructor.
   simpl.
   unfold Qball.
@@ -455,8 +460,7 @@ Proof.
 Defined.
 
 Lemma recip_positives_zl : Limit recip_positives 0.
-Proof.
- intros [[n d]|];[|left;apply ForAll_True].
+ intros [[[n d] U] | ]; [| left; apply ForAll_True].
  unfold recip_positives.
  unfold positives.
  apply recip_positives_help_Exists with (LazyPred (LazyNat_of_P d)).

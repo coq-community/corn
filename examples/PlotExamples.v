@@ -53,7 +53,8 @@ match goal with
  [X:ball ?e ?a (@ucFun _ _ _ (_⇱?b⇲_))|-_] => set (E:=e) in X; set (B:=b) in X
 end.
 (* E is the error; a bound on the distance between our plot and the actual function *)
-vm_compute in E.
+set (E' := E: Q).
+vm_compute in E'.
 (* The error is 90/1800 *)
 (* B is the plot *)
 Time vm_compute in B.

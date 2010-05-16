@@ -98,7 +98,7 @@ Definition compress_raw (x:CR) (e:QposInf) : Q :=
 match e with
 | QposInfinity => approximate x e
 | Qpos2QposInf e =>
- let (n,d) := e in
+ let (n,d) := e: Q in
  match (Zsucc (Zdiv (2*d) n)) with
   Zpos p => approximateQ (approximate x (Qpos2QposInf (1#p))) p
  |_ => approximate x e
@@ -107,7 +107,9 @@ end.
 
 Lemma compress_raw_prop : forall x e, ball e x (Cunit (compress_raw x e)).
 Proof.
- intros x [n d].
+ intros x.
+ apply Qpos_positive_numerator_rect.
+ intros n d.
  simpl.
  case_eq (Zsucc (xO d / n));try (intros; apply: ball_approx_r).
  intros p Hp.

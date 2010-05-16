@@ -569,7 +569,7 @@ Proof.
     stepl (inj_Q IR (3^z)).
      apply inj_Q_wd.
      apply eq_symmetric.
-     apply Q_Qpos_power.
+     reflexivity.
     rewrite <- convert_is_POS.
     apply inj_Q_power.
    apply nexp_wd.
@@ -608,7 +608,7 @@ Proof.
    stepl (inj_Q IR ((1#2)^z)).
     apply inj_Q_wd.
     apply eq_symmetric.
-    apply Q_Qpos_power.
+    reflexivity.
    rewrite <- (convert_is_POS z).
    apply inj_Q_power.
   apply nexp_wd.

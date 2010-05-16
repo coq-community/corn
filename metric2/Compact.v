@@ -446,7 +446,7 @@ Proof.
  exists (Cjoin a).
   abstract ( intros e1 e2; unfold inCompact in H; eapply almostIn_weak_le;
     [|apply (H ((1#2)*e1) ((1#2)*e1) e2)%Qpos]; autorewrite with QposElim; rewrite -> Qle_minus_iff;
-      ring_simplify; auto with * ).
+      ring_simplify; auto with *; apply Qmult_le_0_compat; auto with * ).
  apply CunitCjoin.
 Defined.
 
@@ -466,7 +466,7 @@ Proof.
  induction s.
   contradiction.
  intros H.
- destruct (locatedX x a Hed).
+ destruct (locatedX _ _ x a Hed).
   exists a.
   abstract (auto with * ).
  destruct IHs as [y Hy].
@@ -569,7 +569,7 @@ Proof.
  set (e:=(((1#1) + k) * d1 + d2)%Qpos * (1 - k ^ S (S n)) / (1 - k)) in *.
  set (e':=(mkQpos Hd)).
  set (e0:=((d1 + k * d1 + d2) + mkQpos
-   (CompactTotallyBoundedStreamCauchyLemma n (((1#1)+k)*(k*d1) + (k*d2)) Hk))%Qpos).
+   (CompactTotallyBoundedStreamCauchyLemma n _ (((1#1)+k)*(k*d1) + (k*d2)) Hk))%Qpos).
  setoid_replace e' with e0.
   simpl.
   destruct (HausdorffBallHausdorffBallStrong locatedX (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
@@ -605,7 +605,7 @@ Proof.
  induction m; intros n s k d1 d2 pt Hpt Hd Hk.
   setoid_replace (k^0 * (mkQpos Hd))%Qpos with (mkQpos Hd); [| QposRing].
   apply CompactTotallyBoundedStreamCauchy1; assumption.
- pose (e':=(CompactTotallyBoundedStreamCauchyLemma n (((1#1)+k)*(k*d1) + (k*d2)) Hk)%Qpos).
+ pose (e':=(CompactTotallyBoundedStreamCauchyLemma n _ (((1#1)+k)*(k*d1) + (k*d2)) Hk)%Qpos).
  setoid_replace (k^S m*mkQpos Hd)%Qpos with (k^m*mkQpos e')%Qpos.
   replace (S m + n)%nat with (S (m + n))%nat by omega.
   unfold Str_nth.
@@ -662,6 +662,8 @@ let (n,d):=((1+(1#4))*d1 + d2)/e/(1-(1#4)) in
 | _ => O
 end.
 
+Hint Resolve Qinv_lt_0_compat. (* todo: move, and put in appropriate hint db *)
+
 Lemma CompactTotallyBoundedIndexLemma : forall (e d1 d2:Qpos),
 ((1+(1#4))*d1 + d2)*(1#4)^(CompactTotallyBoundedIndex e d1 d2)/(1-(1#4)) <= e.
 Proof.
@@ -698,7 +700,11 @@ Proof.
  replace LHS with z by (unfold z;simpl; ring).
  assert (Hz:0 < z).
   unfold z.
-  auto with *.
+  subst a.
+  apply Qmult_lt_0_compat; auto with *.
+  apply Qmult_lt_0_compat; auto with *.
+  apply Qplus_lt_0_compat; auto with *.
+    (* todo: this is ugly ^ *)
  destruct z as [[|n|n] d].
    elim (Qlt_not_le _ _ Hz).
    discriminate.
@@ -825,7 +831,7 @@ Proof.
  rewrite (le_plus_minus _ _ H).
  assert (Y:(1#4)%Qpos < 1).
   constructor.
- assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma (B-A) (((1#1)+(1#4))*d1 + d2) Y)%Qpos).
+ assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma (B-A) _ (((1#1)+(1#4))*d1 + d2) Y)%Qpos).
  eapply ball_weak_le; [|apply (CompactTotallyBoundedStreamCauchy2 A _ s pt Hpt Y0);constructor].
  autorewrite with QposElim.
  unfold Qdiv.
@@ -890,23 +896,28 @@ Proof.
  intros s d1 d2 pt Hpt e1 e2.
  simpl.
  assert (Z:(1#4)%Qpos < 1) by constructor.
- assert (Z0:=(CompactTotallyBoundedStreamCauchyLemma (CompactTotallyBoundedIndex e2 d1 d2) (((1#1)+(1#4))*(d1) + (d2)) Z)%Qpos).
+ assert (Z0:=(CompactTotallyBoundedStreamCauchyLemma (CompactTotallyBoundedIndex e2 d1 d2) _ (((1#1)+(1#4))*(d1) + (d2)) Z)%Qpos).
  eapply ball_weak_le;
    [|apply (CompactTotallyBoundedStreamCauchy1 (CompactTotallyBoundedIndex e2 d1 d2) s pt Hpt Z0);constructor].
  autorewrite with QposElim.
  apply Qle_trans with (((1 + (1 # 4)) * d1 + d2) / (1 - (1 # 4))).
   apply: mult_resp_leEq_rht; try discriminate.
   replace RHS with (((1 + (1 # 4)) * d1 + d2)*1) by simpl; ring.
-  apply mult_resp_leEq_lft;simpl;[|Qauto_pos].
-  rewrite -> Qle_minus_iff.
-  ring_simplify.
-  apply (Qpower_pos (1#4) (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2))).
-  discriminate.
+  apply mult_resp_leEq_lft.
+   simpl.
+   rewrite -> Qle_minus_iff.
+   ring_simplify.
+   apply (Qpower_pos (1#4) (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2))).
+   discriminate.
+  simpl.
+  apply Qlt_le_weak.
+  apply Qplus_lt_0_compat; auto with *.
  rewrite -> Qle_minus_iff.
  unfold Qdiv.
  change (/(1-(1#4))) with (4#3).
  ring_simplify.
- auto with *.
+ apply Qlt_le_weak.
+ apply Qplus_lt_0_compat; auto with *.
 Qed.
 
 (** Using CompactTotallyBounded_fun we can map the approximation of
@@ -1017,7 +1028,7 @@ Proof.
   autorewrite with QposElim.
   ring_simplify.
   Qauto_pos.
- destruct (AlmostInExists (approximate x ((1#20)*e)%Qpos) (approximate s ((1#5)*e)%Qpos) Z (Hx _ _))
+ destruct (AlmostInExists _ _ (approximate x ((1#20)*e)%Qpos) (approximate s ((1#5)*e)%Qpos) Z (Hx _ _))
    as [y [Hy0 Hy1]].
  clear Z.
  unfold CompactTotalBound.
@@ -1215,7 +1226,7 @@ Proof.
   clear Hl1.
   induction l.
    contradiction.
-  destruct (Complete_located locatedX x a (Y e)) as [A|A].
+  destruct (Complete_located locatedX _ _ x a (Y e)) as [A|A].
    exists a.
    split; auto.
    apply Hl0; auto with *.
@@ -1483,8 +1494,8 @@ Proof.
   unfold P in Hc.
   apply ball_eq.
   intros e.
-  case_eq ((1#4)*e)%Qpos.
-  intros en ed He.
+  destruct (Qpos_as_positive_ratio ((1#4)*e)%Qpos) as [[en ed] He].
+  simpl in He.
   destruct (Hc (pred (nat_of_P ed))) as [G | m [Hm0 Hm1]] using existsC_ind.
    auto using stableCX.
   set (m' := (1#P_of_succ_nat m)%Qpos).
@@ -1517,8 +1528,8 @@ Proof.
  intros e1 e2.
  apply almostIn_closed.
  intros d.
- case_eq ((1#4)*d)%Qpos.
- intros dn dd Hd.
+ destruct (Qpos_as_positive_ratio ((1#4)*d)%Qpos) as [[dn dd] Hd].
+ simpl in Hd.
  destruct (Hc (pred (nat_of_P dd))) as [G | m [Hm0 Hm1]] using existsC_ind.
   auto using almostIn_stable.
  set (m' := (1#P_of_succ_nat m)%Qpos).

@@ -150,7 +150,10 @@ Proof.
  (*Archimedean*)
  intros x.
  assert (X:=(CR_b_upperBound (1#1) x)).
- destruct (CR_b (1 # 1) x) as [n d].
+ revert X.
+ pattern (CR_b (1 # 1) x).
+ apply Qpos_positive_numerator_rect.
+ intros n d X.
  rewrite (anti_convert_pred_convert n) in X.
  exists (nat_of_P n)%nat.
  apply: leEq_transitive.
@@ -184,7 +187,7 @@ Proof.
  simpl.
  rewrite -> Qle_minus_iff.
  replace RHS with
-   ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by ring.
+   ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by (simpl; ring).
  rewrite<- Qle_minus_iff.
  apply: Qle_trans;[|apply IHa].
  generalize (P_of_succ_nat a).

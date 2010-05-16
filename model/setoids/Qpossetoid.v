@@ -151,7 +151,7 @@ Canonical Structure Qpos_inv_op.
 We define [multdiv2]: $(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#.
 *)
 
-Definition Qpos_div2 := projected_bin_fun _ _ _ Qpos_mult_is_bin_fun (Qpos_inv_op (2#1)%Qpos).
+Definition Qpos_div2 := projected_bin_fun _ _ _ Qpos_mult_is_bin_fun (Qpos_inv_op (2%positive : Qpos)).
 
 Definition multdiv2 := compose_CSetoid_un_bin_fun _ _ _ Qpos_mult_is_bin_fun Qpos_div2.
 
@@ -166,6 +166,6 @@ Qed.
 (** And its inverse [multdiv4]: $x \mapsto 4/x$ #x &#x21A6; 4/x#.
 *)
 
-Definition mult4 := projected_bin_fun _ _ _ Qpos_mult_is_bin_fun (4#1)%Qpos.
+Definition mult4 := projected_bin_fun _ _ _ Qpos_mult_is_bin_fun (4%positive:Qpos).
 
 Definition divmult4 := compose_CSetoid_fun _ _ _ Qpos_inv_op mult4.

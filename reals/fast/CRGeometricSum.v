@@ -370,7 +370,6 @@ Proof.
   apply H.
  stepr (1*Qabs (hd series)); [| simpl; ring].
  apply: mult_resp_leEq_rht;simpl; auto with *.
- apply Qabs_nonneg.
 Qed.
 
 Lemma InfiniteGeometricSum_maxIter_correct : forall series (err:Qpos), GeometricSeries series ->
@@ -416,7 +415,8 @@ Proof.
     discriminate.
    cut (0 < (mkQpos q)/(err * (mkQpos X)*(mkQpos X)))%Qpos.
     autorewrite with QposElim; auto.
-   auto with *.
+   apply Qmult_lt_0_compat; auto with *.
+   apply Qinv_lt_0_compat; auto with *.
   setoid_replace (Qabs (hd series)) with 0.
    stepl 0; [| simpl; ring].
    apply Qlt_le_weak; Qauto_pos.

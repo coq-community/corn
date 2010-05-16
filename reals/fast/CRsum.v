@@ -56,6 +56,7 @@ Proof.
   rewrite -> Qmake_Qdiv.
   field_simplify (1%positive / p * length t + 1%positive / p);[|unfold Qeq; auto with *].
   setoid_replace ((length t + 1) / p) with 1.
+   rewrite Qmult_1_l.
    auto with *.
   unfold p.
   change 1 with (1%nat:Q).

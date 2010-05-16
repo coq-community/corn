@@ -462,20 +462,30 @@ end.
 
 Lemma id01_raw_help_le : forall (q:Qpos),
  ((1#2*id01_raw_help q) <= q)%Q.
-Proof.
+Proof with auto with *.
  intros q.
  simpl.
- assert (X:=Qle_ceiling ((1#2)/q)%Qpos).
- revert X.
- generalize (Qceiling ((1#2)/q)%Qpos).
- intros [|p|p] H; try solve [elim (Qle_not_lt _ _ H); auto with *].
- autorewrite with QposElim in *.
- rewrite -> Qmake_Qdiv in *.
- rewrite Zpos_xO.
- rewrite -> Qle_minus_iff in *.
- change ((2%positive * p)%Z:Q) with (2%positive * p)%Q.
- replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q by (simpl; field; split; discriminate).
- apply: mult_resp_nonneg; simpl; auto with *.
+ generalize (Qle_ceiling ((1#2)*/q)).
+ generalize (Qceiling ((1#2)*/q)).
+ intros [|p|p] H.
+   elim (Qle_not_lt _ _ H).
+   apply Qmult_lt_0_compat...
+   apply Qinv_lt_0_compat...
+  autorewrite with QposElim in *.
+  rewrite -> Qmake_Qdiv in *.
+  rewrite Zpos_xO.
+  rewrite -> Qle_minus_iff in *.
+  change ((2%positive * p)%Z:Q) with (2%positive * p)%Q.
+  replace RHS with (((2*q)/(2*p))*(p - 1%positive/2%positive*/q))%Q.
+   apply: mult_resp_nonneg; simpl; auto with *.
+   apply Qlt_le_weak.
+   apply Qmult_lt_0_compat...
+  simpl. field. split...
+  apply (Qpos_nonzero p).
+ elim (Qle_not_lt _ _ H).
+ apply Qlt_trans with 0...
+ apply Qmult_lt_0_compat...
+ apply Qinv_lt_0_compat...
 Qed.
 
 (** Now define id01, the identity funciton on [[0,1]] as a bounded function,

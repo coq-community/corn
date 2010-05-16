@@ -48,7 +48,8 @@ Proof.
  rewrite <- (QposAsmkQpos He).
  generalize (mkQpos He).
  clear e He.
- intros [en ed].
+ apply Qpos_positive_numerator_rect.
+ intros en ed.
  unfold CRasCauchy_IR_raw.
  exists (pred (nat_of_P (2*ed))).
  rewrite <- anti_convert_pred_convert.
@@ -86,7 +87,8 @@ Proof.
  rewrite <- (QposAsmkQpos He).
  generalize (mkQpos He).
  clear He e.
- intros [en ed].
+ apply Qpos_positive_numerator_rect.
+ intros en ed.
  exists (pred(nat_of_P (2*ed))).
  intros m Hm.
  simpl.
@@ -184,7 +186,8 @@ Proof.
  destruct (CRasCauchy_IR_raw_is_Cauchy x (e:Q) (Qpos_prf e)) as [n Hn].
  unfold CRasCauchy_IR_raw in *.
  apply: ball_closed.
- intros [dn dd].
+ apply Qpos_positive_numerator_rect.
+ intros dn dd.
  setoid_replace (e+e+(dn#dd))%Qpos with (e+((dn#dd)+e))%Qpos by QposRing.
  apply ball_triangle with (approximate x (1#P_of_succ_nat (n+(nat_of_P dd))))%Qpos.
   apply ball_sym.
@@ -231,11 +234,12 @@ Proof.
    apply Qpos_prf.
   constructor.
  destruct (Hx _ Z) as [n Hn].
- destruct e' as [en ed].
+ destruct (Qpos_as_positive_ratio e') as [[en ed] E].
+ subst.
  exists (max n (nat_of_P ed)).
  intros m Hm.
  simpl.
- destruct (Hx ((1 # P_of_succ_nat m)%Qpos:Q) (Qpos_prf (1 # P_of_succ_nat m)%Qpos)) as [n' Hn'].
+ destruct Hx as [n' Hn'].
  apply AbsSmall_minus.
  destruct (le_lt_dec n' m) as [H|H].
   apply: AbsSmall_trans;[|apply Hn';assumption].
@@ -392,9 +396,9 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- destruct (Hx (((1 # 2) * e)%Qpos:Q) (Qpos_prf ((1 # 2) * e)%Qpos)) as [n1 Hn1].
- destruct (Hy (((1 # 2) * e)%Qpos:Q) (Qpos_prf ((1 # 2) * e)%Qpos)) as [n2 Hn2].
- destruct (CS_seq_plus Q_as_COrdField x y Hx Hy (e:Q) (Qpos_prf e)) as [n3 Hn3].
+ destruct (Hx (((1 # 2) * e)%Qpos:Q)) as [n1 Hn1].
+ destruct (Hy (((1 # 2) * e)%Qpos:Q)) as [n2 Hn2].
+ destruct (CS_seq_plus) as [n3 Hn3].
  set (n:= max n3 (max n1 n2)).
  change (ball (e+e) (x n1 + y n2) (x n3 + y n3))%Q.
  apply ball_triangle with (x n + y n)%Q.
@@ -461,10 +465,8 @@ Proof.
   clear H1.
   simpl in H1'.
   unfold Cap_raw in H1'; simpl in H1'.
-  destruct (Hy (((1 # 2) * ((1#3)*  mkQpos He))%Qpos:Q)
-    (Qpos_prf ((1 # 2) * ((1#3)*mkQpos He))%Qpos)) as [n1 Hn1].
-  destruct (Hx (((1 # 2) * ((1#3)* mkQpos He))%Qpos:Q)
-    (Qpos_prf ((1 # 2) * ((1#3)*mkQpos He))%Qpos)) as [n2 Hn2].
+  destruct (Hy (((1 # 2) * ((1#3)*  mkQpos He))%Qpos:Q)) as [n1 Hn1] in H1'.
+  destruct (Hx (((1 # 2) * ((1#3)* mkQpos He))%Qpos:Q)) as [n2 Hn2] in H1'.
   simpl in H2.
   set (m:=max n (max n1 n2)).
   assert (m1:n<=m);[unfold m; auto with *|].
@@ -491,8 +493,8 @@ Proof.
  intros H e.
  simpl.
  unfold Cap_raw; simpl.
- destruct (Hy (((1 # 2) * e)%Qpos:Q) (Qpos_prf ((1 # 2) * e)%Qpos)) as [n1 Hn1].
- destruct (Hx (((1 # 2) * e)%Qpos:Q) (Qpos_prf ((1 # 2) * e)%Qpos)) as [n2 Hn2].
+ destruct (Hy (((1 # 2) * e)%Qpos:Q)) as [n1 Hn1].
+ destruct (Hx (((1 # 2) * e)%Qpos:Q)) as [n2 Hn2].
  apply Qnot_lt_le.
  intros A.
  apply H; clear H.
@@ -537,10 +539,10 @@ Proof.
  apply: regFunEq_e.
  intros e.
  simpl.
- destruct (CS_seq_mult Q_as_COrdField x y Hx Hy (e:Q) (Qpos_prf e)) as [n3 Hn3].
+ destruct CS_seq_mult as [n3 Hn3].
  unfold Cap_raw.
  simpl in *.
- destruct (Hx (((1 # 2) * e / z)%Qpos:Q) (Qpos_prf ((1 # 2) * e / z)%Qpos)) as [n1 Hn1].
+ destruct Hx as [n1 Hn1].
  apply Qscale_modulus_elim.
   intros Hxn1.
   pose (n:=(max n3 (max n1 N))).
@@ -659,7 +661,7 @@ Proof.
   autorewrite with QposElim.
   rewrite -> Qle_minus_iff.
   ring_simplify.
-  discriminate.
+  auto with *.
  apply Cauchy_IR_mult_as_CRmult_bounded with n.
  intros i Hi.
  apply: AbsSmall_trans;[|apply Hn;assumption].
@@ -668,7 +670,10 @@ Proof.
  unfold k'.
  autorewrite with QposElim.
  ring_simplify.
- apply Qpos_prf.
+ clear.
+ destruct Hy.
+ rewrite Qplus_comm.
+ apply Qplus_lt_0_compat; auto with *.
 Qed.
 
 Hint Rewrite Cauchy_IR_mult_as_CR_mult : CRtoCauchy_IR.
@@ -768,11 +773,13 @@ Proof.
  intros e.
  simpl.
  unfold Qinv_modulus.
- destruct (Hx ((z * z * e)%Qpos:Q) (Qpos_prf (z * z * e)%Qpos)) as [b Hb].
- destruct (CS_seq_recip Q_as_COrdField x Hx d d_ a (fun (n0 : nat) (H : le a n0) =>
-   leEq_wdr Q_as_COrdField d (@cg_minus Q_as_CGroup (x n0) (Qmake Z0 xH)) (x n0) (x_ n0 H) (cg_inv_zero Q_as_CGroup (x n0))) (e:Q) (Qpos_prf e)) as [c Hc].
- set (y:=(CS_seq_recip_seq Q_as_COrdField x d d_ a (fun (n0 : nat) (H : le a n0) =>
-   leEq_wdr Q_as_COrdField d (@cg_minus Q_as_CGroup (x n0) (Qmake Z0 xH)) (x n0) (x_ n0 H) (cg_inv_zero Q_as_CGroup (x n0))))) in *.
+ destruct (Hx (z * z * e)%Q) as [b Hb].
+ destruct (CS_seq_recip) as [c Hc].
+ set (y := (CS_seq_recip_seq Q_as_COrdField x d d_ a
+             (fun (n : nat) (H : le a n) =>
+              leEq_wdr Q_as_COrdField d
+                (@cg_minus Q_as_CGroup (x n) (Qmake Z0 xH)) (x n) (x_ n H)
+                (cg_inv_zero Q_as_CGroup (x n))))) in *.
  unfold CS_seq_recip_seq in y.
  simpl in y.
  set (m:=max (max a n) (max b c)).

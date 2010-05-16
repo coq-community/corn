@@ -124,7 +124,7 @@ Proof.
   rewrite Hg.
   apply: Average_less_Greatest.
   assumption.
- destruct (prelength _ _ H1 B) as [c Hc1 Hc2].
+ destruct (prelength _ _ _ _ _ H1 B) as [c Hc1 Hc2].
  destruct (IHdl _ _ _ Hc2 H2) as [f' [Hf'1 Hf'2] Hf'3].
  exists (fun n => match n with O => a | S n' => f' n' end).
   auto.
@@ -189,10 +189,9 @@ Proof.
     induction gs.
      simpl; ring.
     simpl.
-    rewrite Q_Qpos_plus.
     rewrite -> IHgs.
     reflexivity.
-   case (trail _ _ _ Hab H).
+   case (trail _ _ _ _ Hab H).
    clear Hab H.
    cut (map Qpos2QposInf (g' :: gs) = map (mu f) (e' :: es)).
     clear H2 H1.
@@ -240,7 +239,6 @@ Proof.
    clear - es.
    induction es.
     simpl.
-    rewrite Q_Qpos_plus.
     rewrite -> Qlt_minus_iff.
     ring_simplify.
     apply Qpos_prf.
@@ -260,7 +258,6 @@ Proof.
  destruct Hds as [Ha0|Hds].
   apply H with a0.
    simpl.
-   rewrite Q_Qpos_plus.
    rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply Qpos_prf.
@@ -563,7 +560,8 @@ Proof.
   rewrite -> q.
   assert (e + x0 == e+1*x0). QposRing. rewrite -> H. clear H.
   apply: plus_resp_less_lft;simpl.
-  assert (4%positive * gA == (4#5)*x0). unfold inject_Z, gA. QposRing. rewrite -> H. clear H.
+  assert (4%positive * ((1 # 5) * x0) == (4#5)*x0). unfold inject_Z, gA. QposRing.
+  rewrite -> H. clear H.
   apply: mult_resp_less.
    constructor.
   apply Qpos_prf.

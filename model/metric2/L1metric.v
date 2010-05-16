@@ -483,14 +483,16 @@ Proof.
   apply constStepF_wd.
   simpl.
   field.
-  apply Qpos_nonzero.
+  intro.
+  apply (Qpos_nonzero (d1 + d2)).
+  assumption.
  exists (f).
   setoid_replace (x - f)%SQ with (d1' * d' * (x - y))%SQ.
    change ((d1' * d')%SQ * (x - y)%SQ) with (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
    rewrite -> L1Norm_scale.
    rewrite -> Qabs_pos; auto with *.
    autorewrite with QposElim.
-   replace LHS with ((d1*L1Norm (x - y))/d) by (simpl; field; apply Qpos_nonzero).
+   replace LHS with ((d1*L1Norm (x - y))/d) by (simpl; field; apply (Qpos_nonzero (d1 + d2))).
    apply Qle_shift_div_r; auto with *.
    apply: mult_resp_leEq_lft; simpl; auto with *.
    apply Qle_trans with e; auto with *.
@@ -503,7 +505,7 @@ Proof.
   rewrite -> L1Norm_scale.
   rewrite -> Qabs_pos; auto with *.
   autorewrite with QposElim.
-  replace LHS with ((d2*L1Norm (x - y))/d) by (simpl; field; apply Qpos_nonzero).
+  replace LHS with ((d2*L1Norm (x - y))/d) by (simpl; field; apply (Qpos_nonzero (d1 + d2))).
   apply Qle_shift_div_r; auto with *.
   apply: mult_resp_leEq_lft; simpl;auto with *.
   apply Qle_trans with e; auto with *.

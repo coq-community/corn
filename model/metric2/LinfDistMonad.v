@@ -170,8 +170,9 @@ Proof.
     rewrite -> Qle_minus_iff.
     replace RHS with (e1 - (1#2)*(1#2)*e1).
      replace RHS with ((3#4)*e1); [| simpl; ring].
-     Qauto_nonneg. simpl. auto with *.
-    apply ball_approx_r.
+     Qauto_nonneg.
+    simpl. ring.
+   apply ball_approx_r.
   simpl.
   change (StepFSupBall (X:=X) (e + e1) (glue o0 (Map (fun z : RegularFunction X => approximate z e) w1)
     (Map (fun z : RegularFunction X => approximate z e) w2)) (glue o0 (Map
