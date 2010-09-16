@@ -870,14 +870,9 @@ Proof.
 Qed.
 
 Lemma Map_compose_Map : forall X Y Z (f:Y->Z) (g:X -> Y) a,
-StepF_Qeq ((fun a => f (g a)) ^@> a) (f ^@> (g ^@> a)).
+ ((fun a => f (g a)) ^@> a) = (f ^@> (g ^@> a)).
 Proof.
- intros X Y Z f g a.
- change (StepF_Qeq (constStepF (compose f g) <@> a) (constStepF f <@> (constStepF g <@> a))).
- rewrite <- (Map_homomorphism (compose f) g).
- change (compose f ^@> constStepF g) with (constStepF (compose f) <@> constStepF g).
- rewrite <- (Map_homomorphism (@compose X Y Z) f).
- apply Map_composition_Qeq.
+ induction a; simpl; congruence.
 Qed.
 
 End ApplicativeFunctor.
