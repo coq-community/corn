@@ -374,7 +374,7 @@ Proof.
 Qed.
 
 (** The [stepSample p] is as close to the virtual identity function as
-we excpet. *)
+we expect. *)
 Lemma stepSampleDistanceToId : (forall p, QposEq (@SupDistanceToLinear (stepSample p) 0 1 (@pos_one _)) (1#(2*p))).
 Proof.
  unfold QposEq.
@@ -448,22 +448,20 @@ Proof.
  reflexivity.
 Qed.
 
-(** Given a requested error of q, what is smallest n for [stepFunction n]
+(** Given a requested error of q, what is smallest n for [stepSample n]
 that will satifiy this error requirement. *)
+
 Definition id01_raw_help (q:QposInf) : positive :=
 match q with
 |QposInfinity => 1%positive
-|Qpos2QposInf q =>
-  match (Qceiling ((1#2)/q)%Qpos) with
-  | Zpos p => p
-  | _ => 1%positive
-  end
+|Qpos2QposInf q => QposCeiling ((1#2)/q)
 end.
 
 Lemma id01_raw_help_le : forall (q:Qpos),
  ((1#2*id01_raw_help q) <= q)%Q.
 Proof with auto with *.
  intros q.
+ unfold id01_raw_help, QposCeiling.
  simpl.
  generalize (Qle_ceiling ((1#2)*/q)).
  generalize (Qceiling ((1#2)*/q)).
@@ -546,7 +544,7 @@ The map from g to f o g may not be uniformly continuous with modulus [mu f].
 However, I have not found a counter example where f o g is not uniformly
 continuous.  In fact, when f is lipschitz, then the map from g to
 f o g is Lipschitz.  However Lipschitz functions haven't been
-formalzied yet. *)
+formalized yet. *)
 
 Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := dist (uc_stdFun f ^@> z).
 (* begin hide *)
@@ -607,7 +605,7 @@ Definition IntegrateWithMeasure (f:Q_as_MetricSpace --> CR) : BoundedFunction --
 (uc_compose BoundedAsIntegrable (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f)))).
 
 (** The Riemann Integral uses the uniform measure on [[0,1]].  The
-inverse of it's cumlative distribution function is [id01]. *)
+inverse of its cumlative distribution function is [id01]. *)
 Definition Integrate01 f := IntegrateWithMeasure f id01.
 
 Definition ContinuousSup01 f :=

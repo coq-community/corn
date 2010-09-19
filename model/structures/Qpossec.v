@@ -42,13 +42,13 @@ Require Import Qordfield.
 Require Import COrdFields2.
 Require Import Eqdep_dec.
 Require Import CornTac.
+Require Import Qround.
 
 Open Local Scope Q_scope.
 
 (**
 * [Qpos]
-We define [Qpos] as a pair of positives (n,d) which represents the
-fraction n/d.  *)
+*)
 
 Definition Qpos: Set := sig (Qlt 0).
 
@@ -442,4 +442,23 @@ Proof.
  intros p.
  simpl.
  apply Qred_correct.
+Qed.
+
+(* For a Qpos we know its ceiling is positive: *)
+
+Definition QposCeiling (q: Qpos): positive :=
+  match Qceiling q with
+  | Zpos p => p
+  | _ => 1%positive (* impossible *)
+  end.
+
+Lemma QposCeiling_Qceiling (q: Qpos): (QposCeiling q: Z) = Qceiling q.
+Proof with auto with *.
+ unfold QposCeiling. intro.
+ pose proof Qle_ceiling q.
+ destruct (Qceiling q); try reflexivity; exfalso; destruct q; simpl in *.
+  apply (Qlt_not_le 0 x q)...
+ apply (Qlt_irrefl 0).
+ apply Qlt_le_trans with x...
+ apply Qle_trans with (Zneg p)...
 Qed.

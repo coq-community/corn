@@ -928,6 +928,28 @@ Proof.
  case a; case b; unfold Zgcd in |- *; simpl in |- *; auto with zarith.
 Qed.
 
+(* Zgcd_nonneg says Zgcd is never negative, so it might as well return nat: *)
+
+Definition Zgcd_nat (a b: Z): nat :=
+ match Zgcd a b with
+ | Zpos p => nat_of_P p
+ | _ => 0%nat
+ end.
+
+Lemma Zgcd_nat_divides (a b: Z): exists c: Z, (c * Zgcd_nat a b = a)%Z.
+Proof with auto.
+ intros. unfold Zgcd_nat.
+ pose proof (Zgcd_nonneg a b) as E.
+ destruct (Zgcd_is_divisor a b) as [c ?].
+ exists c.
+ destruct (Zgcd a b)...
+  rewrite inject_nat_convert...
+ exfalso. apply E. reflexivity.
+Qed.
+
+Lemma Zgcd_nat_sym (a b: Z): Zgcd_nat a b = Zgcd_nat b a.
+Proof. unfold Zgcd_nat. intros. rewrite Zgcd_symm. reflexivity. Qed.
+
 Lemma Zgcd_nonzero : forall a b : Z, 0%Z <> Zgcd a b -> a <> 0%Z \/ b <> 0%Z.
 Proof.
  intros a b.
