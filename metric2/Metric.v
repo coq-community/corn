@@ -148,3 +148,49 @@ End Metric_Space.
 (* begin hide *)
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
 (* end hide *)
+
+(** We can easily generalize ball to take the ratio from Q: *)
+
+Section gball.
+
+  Context {m: MetricSpace}.
+
+  Definition gball (q: Q) (x y: m): Prop :=
+    match Qdec_sign q with
+    | inleft (left _) => False (* q < 0, silly *)
+    | inleft (right p) => ball (exist (Qlt 0) q p) x y (* 0 < q, normal *)
+    | inright _ => x[=]y (* q == 0 *)
+    end.
+      (* Program can make this definition slightly cleaner, but the resulting term is much nastier... *)
+
+  Lemma ball_gball (q: Qpos) (x y: m): gball q x y <-> ball q x y.
+  Proof with auto.
+   unfold gball.
+   intros [q p] ??. simpl.
+   destruct Qdec_sign as [[A | A] | A].
+     exfalso.
+     apply (Qlt_is_antisymmetric_unfolded q 0)...
+    apply ball_wd; reflexivity.
+   exfalso.
+   apply (Qlt_irrefl 0).
+   rewrite <- A at 2...
+  Qed.
+
+  Global Instance: Proper (Qeq ==> @st_eq m ==> @st_eq m ==> iff) gball.
+  Proof with auto.
+   intros x y E a b F v w G.
+   unfold gball.
+   destruct Qdec_sign as [[A | B] | C];
+    destruct Qdec_sign as [[P | Q] | R].
+           reflexivity.
+          exfalso. apply (Qlt_irrefl 0). apply Qlt_trans with x... rewrite E...
+         exfalso. apply (Qlt_irrefl 0). rewrite <- R at 1. rewrite <- E...
+        exfalso. apply (Qlt_irrefl 0). apply Qlt_trans with x... rewrite E...
+       apply ball_wd...
+      exfalso. apply (Qlt_irrefl 0). rewrite <- R at 2. rewrite <- E...
+     exfalso. apply (Qlt_irrefl 0). rewrite <- C at 1. rewrite E...
+    exfalso. apply (Qlt_irrefl 0). rewrite <- C at 2. rewrite E...
+   rewrite F G. reflexivity.
+  Qed.
+
+End gball.
