@@ -58,6 +58,31 @@ Record RegularFunction : Type :=
 {approximate : QposInf -> X
 ;regFun_prf : is_RegularFunction approximate
 }.
+
+(** The value of the approximation function at infinity is irrelevant,
+ so we make a smart constructor that just takes a Qpos->X. *)
+
+Definition is_RegularFunction_noInf (x: Qpos -> X): Prop :=
+  forall e1 e2 : Qpos, ball (e1 + e2) (x e1) (x e2).
+
+Section mkRegularFunction.
+
+  Variables (dummy: X).
+
+  Let lift (f: Qpos -> X) (e: QposInf): X :=
+    match e with
+    | QposInfinity => dummy (* if the recipient doesn't care, fine with me! *)
+    | Qpos2QposInf e' => f e'
+    end.
+
+  Let transport (f: Qpos -> X): is_RegularFunction_noInf f -> is_RegularFunction (lift f).
+  Proof. firstorder. Qed.
+
+  Definition mkRegularFunction (f: Qpos -> X) (H: is_RegularFunction_noInf f): RegularFunction
+    := Build_RegularFunction (transport H).
+
+End mkRegularFunction.
+
 (** Regular functions form a metric space *)
 Definition regFunEq (f g : RegularFunction) :=
  forall e1 e2, ball (m:=X) (e1+e2) (approximate f e1) (approximate g e2).
