@@ -639,6 +639,17 @@ Proof.
  assumption.
 Qed.
 
+Program Definition Qdec_sign (q: Q): { q < 0 } + { 0 < q } + { q == 0 } :=
+  match Z_dec (Qnum q) Z0 with
+  | inleft (left _) => inleft (q == 0) (left _ _)
+  | inleft (right _) => inleft (q == 0) (right _ _)
+  | inright _ => inright _ _
+  end.
+
+Next Obligation. unfold Qlt. simpl. omega. Qed.
+Next Obligation. unfold Qlt. simpl. omega. Qed.
+Next Obligation. destruct q. simpl in *. subst. reflexivity. Qed.
+
 Lemma Qlt_is_transitive_unfolded : forall x y z : Q, (x<y) -> (y<z) -> x<z.
 Proof.
  intros x y z e e0.
