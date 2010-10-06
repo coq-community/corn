@@ -172,6 +172,24 @@ Proof.
  auto.
 Qed.
 
+(** mu_ex generalizes mu analogous to how ball_ex generalizes ball: *)
+
+Definition mu_ex (f: UniformlyContinuousFunction) (e: QposInf): QposInf :=
+  match e with
+  | Qpos2QposInf e' => mu f e'
+  | QposInfinity => QposInfinity
+  end.
+
+Lemma uc_ex_prf (u: UniformlyContinuousFunction) (e: QposInf) (a b: X):
+  ball_ex (mu_ex u e) a b -> ball_ex e (ucFun u a) (ucFun u b).
+Proof with auto.
+ intros.
+ destruct e...
+ simpl in *.
+ apply uc_prf.
+ assumption.
+Qed.
+
 End UniformlyContinuousFunction.
 
 (* begin hide *)
