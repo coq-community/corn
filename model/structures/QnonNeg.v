@@ -1,24 +1,34 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import Program Qpossec Qminmax.
+Require Import Program Qpossec QposInf Qminmax.
 
 Set Automatic Introduction.
 
-(* Non-negativity preservation: *)
-
-Lemma Qplus_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= x + y.
-Proof. apply (Qplus_le_compat 0 x 0); assumption. Qed.
-
-Lemma Qmin_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= Qmin x y.
-Proof. apply Q.min_glb; assumption. Qed.
+(* The data type and simple relations/constants: *)
 
 Definition T := sig (Qle 0).
 
 Program Definition eq: T -> T -> Prop := Qeq.
-Program Definition le: T -> T -> Prop := Qle.
-Program Definition lt: T -> T -> Prop := Qlt.
 Program Definition zero: T := 0.
 Program Definition one: T := 1.
+(*Program Definition le: T -> T -> Prop := Qle.
+Program Definition lt: T -> T -> Prop := Qlt.*)
+  (* Not really needed because we can just use Qle/Qlt directly. This
+  is not practical for eq because we want rewriting and Propers and so on. *)
+
+Local Infix "==" := eq.
+Local Notation "0" := zero.
+Local Notation "1" := one.
+
+Global Instance: Equivalence eq.
+Proof.
+ unfold eq. split.
+   intros ?. apply reflexivity.
+  intros ??. apply symmetry.
+ intros ???. apply transitivity.
+Qed.
+
+(* For addition, multiplication, and min/max (and their properties), we factor out the common bits: *)
 
 Section binop.
 
@@ -26,14 +36,12 @@ Section binop.
     (o: Q -> Q -> Q)
     (o_ok: forall x y, 0 <= x -> 0 <= y -> 0 <= o x y)
     (o_proper: Proper (Qeq ==> Qeq ==> Qeq) o)
-    (o_comm: forall x y, o x y == o y x)
-    (o_assoc: forall x y z, o x (o y z) == o (o x y) z).
+    (o_comm: (forall x y, o x y == o y x)%Q)
+    (o_assoc: (forall x y z, o x (o y z) == o (o x y) z)%Q).
 
   Program Definition binop: T -> T -> T := o.
 
   Next Obligation. apply o_ok; apply proj2_sig. Qed.
-
-  Local Infix "==" := eq.
 
   Lemma binop_comm (x y: T): binop x y == binop y x.
   Proof. unfold eq. simpl. apply o_comm. Qed.
@@ -46,33 +54,47 @@ Section binop.
 
 End binop.
 
+(* ... which we now instantiate: *)
+
+Lemma Qplus_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= x + y.
+Proof. apply (Qplus_le_compat 0 x 0); assumption. Qed.
+
+Lemma Qmin_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= Qmin x y.
+Proof. apply Q.min_glb; assumption. Qed.
+
+Lemma Qmax_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= Qmax x y.
+Proof. intros. apply Qle_trans with x. assumption. apply Q.le_max_l. Qed.
+
 Definition plus := binop Qplus Qplus_nonneg.
 Definition mult := binop Qmult Qmult_le_0_compat.
 Definition min := binop Qmin Qmin_nonneg.
+Definition max := binop Qmax Qmax_nonneg.
 
 Local Infix "+" := plus.
 Local Infix "*" := mult.
-Local Infix "==" := eq.
 
-Lemma plus_comm: forall x y, x + y == y + x.
-Proof binop_comm _ _ Qplus_comm.
+Lemma plus_comm: forall x y, x + y == y + x. Proof binop_comm _ _ Qplus_comm.
+Lemma mult_comm: forall x y, x * y == y * x. Proof binop_comm _ _ Qmult_comm.
+Lemma min_comm: forall x y, min x y == min y x. Proof binop_comm _ _ Q.min_comm.
+Lemma max_comm: forall x y, max x y == max y x. Proof binop_comm _ _ Q.max_comm.
+Lemma plus_assoc: forall x y z, x + (y + z) == (x + y) + z. Proof binop_assoc _ _ Qplus_assoc.
+Lemma mult_assoc: forall x y z, x * (y * z) == (x * y) * z. Proof binop_assoc _ _ Qmult_assoc.
+Lemma max_assoc: forall x y z, max x (max y z) == max (max x y) z. Proof binop_assoc _ _ Q.max_assoc.
+Lemma min_assoc: forall x y z, min x (min y z) == min (min x y) z. Proof binop_assoc _ _ Q.min_assoc.
 
-Lemma plus_assoc: forall x y z, x + (y + z) == (x + y) + z.
-Proof binop_assoc _ _ Qplus_assoc.
+Global Instance: Proper (eq ==> eq ==> eq) plus. Proof. unfold plus. apply _. Qed.
+Global Instance: Proper (eq ==> eq ==> eq) mult. Proof. unfold mult. apply _. Qed.
 
-Global Instance: Equivalence eq.
-Proof.
- unfold eq. split.
-   intros ?. apply reflexivity.
-  intros ??. apply symmetry.
- intros ???. apply transitivity.
-Qed.
+(* Some additional properties: *)
 
-Global Instance: Proper (eq ==> eq ==> eq) plus.
-Proof. unfold plus. apply _. Qed.
+Lemma plus_0_l x: 0 + x == x. Proof. unfold eq. simpl. apply Qplus_0_l. Qed.
+Lemma plus_0_r x: x + 0 == x. Proof. unfold eq. simpl. apply Qplus_0_r. Qed.
+Lemma mult_1_l x: 1 * x == x. Proof. unfold eq. simpl. apply Qmult_1_l. Qed.
+Lemma mult_1_r x: x * 1 == x. Proof. unfold eq. simpl. apply Qmult_1_r. Qed.
+Lemma mult_0_l q: 0 * q == 0. Proof. unfold eq. simpl. apply Qmult_0_l. Qed.
+Lemma mult_0_r q: q * 0 == 0. Proof. unfold eq. simpl. apply Qmult_0_r. Qed.
 
-Global Instance: Proper (eq ==> eq ==> eq) mult.
-Proof. unfold mult. apply _. Qed.
+(* Inverses: *)
 
 Program Definition inv: T -> T := Qinv.
 
@@ -81,6 +103,8 @@ Next Obligation. destruct x as [[[] ?] ?]; auto. Qed.
 Global Instance: Proper (eq ==> eq) inv.
 Proof. unfold eq. repeat intro. simpl. apply Qinv_comp. assumption. Qed.
 
+(* Coercions: *)
+
 Program Coercion from_Qpos (q: Qpos): T := q.
 
 Lemma from_Qpos_plus_homo (x y: Qpos): (x + y)%Qpos == x + y.
@@ -88,6 +112,19 @@ Proof. reflexivity. Qed.
 
 Global Instance from_Qpos_Proper: Proper (QposEq ==> eq) from_Qpos.
 Proof. repeat intro. assumption. Qed.
+
+Global Program Coercion from_nat (n: nat): T := n#1.
+
+Next Obligation. unfold Qle. simpl. auto with zarith. Qed.
+
+Definition to_Q: T -> Q := @proj1_sig Q (Qle 0).
+
+Global Coercion to_Q: T >-> Q.
+
+Global Instance: Proper (eq ==> Qeq) to_Q.
+Proof. repeat intro. assumption. Qed.
+
+(* Misc: *)
 
 Program Definition hash (num: nat) (den: positive): T := Qmake (Z_of_nat num) den.
 
@@ -111,6 +148,26 @@ Proof with auto.
  apply X with m... reflexivity.
 Qed.
 
+Lemma proj1_sig_nonNeg (q: T): 0 <= `q.
+Proof. apply proj2_sig. Qed.
+
+Hint Immediate proj1_sig_nonNeg.
+
+Program Definition is_pos (q: T): { r: Qpos | r == q } + (q == zero) :=
+  match Qsec.Qdec_sign (` q) with
+  | inl _ => inl q
+  | inr _ => inr _
+  end.
+
+Next Obligation. Proof with auto.
+ destruct wildcard'...
+ exfalso. apply (Qlt_not_le (` q) 0)...
+Qed.
+
+Next Obligation. reflexivity. Qed.
+
+(* Notations to be imported by clients: *)
+
 Module notations.
 
   Delimit Scope Qnn_scope with Qnn. 
@@ -126,8 +183,3 @@ Module notations.
   Global Notation QnonNeg := T.
 
 End notations.
-
-Lemma proj1_sig_nonNeg (q: T): (0 <= `q)%Q.
-Proof. apply proj2_sig. Qed.
-
-Hint Immediate proj1_sig_nonNeg.
