@@ -639,16 +639,26 @@ Proof.
  assumption.
 Qed.
 
-Program Definition Qdec_sign (q: Q): { q < 0 } + { 0 < q } + { q == 0 } :=
-  match Z_dec (Qnum q) Z0 with
-  | inleft (left _) => inleft (q == 0) (left _ _)
-  | inleft (right _) => inleft (q == 0) (right _ _)
-  | inright _ => inright _ _
+Program Definition Zdec_sign (z: Z): (z < Z0)%Z + (Z0 < z)%Z + (z = Z0) :=
+  match z with
+  | Zneg p => inl _ (inl _ _)
+  | Zpos p => inl _ (inr _ _)
+  | Z0 => inr  _ _
   end.
 
-Next Obligation. unfold Qlt. simpl. omega. Qed.
-Next Obligation. unfold Qlt. simpl. omega. Qed.
-Next Obligation. destruct q. simpl in *. subst. reflexivity. Qed.
+Next Obligation. reflexivity. Qed.
+Next Obligation. reflexivity. Qed.
+
+Program Definition Qdec_sign (q: Q): (q < 0) + (0 < q) + (q == 0) :=
+  match Zdec_sign (Qnum q) with
+  | inl (inr H) => inl _ (inr _ _)
+  | inl (inl _) => inl _ (inl _ _)
+  | inr _ => inr _ _
+  end.
+
+Next Obligation. unfold Qlt. simpl. rewrite Zmult_1_r. assumption. Qed.
+Next Obligation. unfold Qlt. simpl. rewrite Zmult_1_r. assumption. Qed.
+Next Obligation. unfold Qeq. simpl. rewrite Zmult_1_r. assumption. Qed.
 
 Lemma Qlt_is_transitive_unfolded : forall x y z : Q, (x<y) -> (y<z) -> x<z.
 Proof.
