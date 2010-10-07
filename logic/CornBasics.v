@@ -954,3 +954,11 @@ Proof.
  rewrite <- IHn.
  reflexivity.
 Qed.
+
+(* Some purely logical reasoning aids: *)
+
+Lemma iff_under_forall {X} (P Q: X -> Prop): (forall x, P x <-> Q x) -> ((forall x, P x) <-> (forall x, Q x)).
+Proof. firstorder. Qed.
+
+Lemma conjunction_under_forall {X} (P Q: X -> Prop): ((forall x, P x) /\ (forall x, Q x)) <-> (forall x, P x /\ Q x).
+Proof. firstorder. Qed.
