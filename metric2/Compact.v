@@ -701,9 +701,9 @@ Proof.
  assert (Hz:0 < z).
   unfold z.
   subst a.
-  apply Qmult_lt_0_compat; auto with *.
-  apply Qmult_lt_0_compat; auto with *.
-  apply Qplus_lt_0_compat; auto with *.
+  apply Q.Qmult_lt_0_compat; auto with *.
+  apply Q.Qmult_lt_0_compat; auto with *.
+  apply Q.Qplus_lt_le_0_compat; auto with *.
     (* todo: this is ugly ^ *)
  destruct z as [[|n|n] d].
    elim (Qlt_not_le _ _ Hz).
@@ -911,13 +911,13 @@ Proof.
    discriminate.
   simpl.
   apply Qlt_le_weak.
-  apply Qplus_lt_0_compat; auto with *.
+  apply Q.Qplus_lt_le_0_compat; auto with *.
  rewrite -> Qle_minus_iff.
  unfold Qdiv.
  change (/(1-(1#4))) with (4#3).
  ring_simplify.
  apply Qlt_le_weak.
- apply Qplus_lt_0_compat; auto with *.
+ apply Q.Qplus_lt_le_0_compat; auto with *.
 Qed.
 
 (** Using CompactTotallyBounded_fun we can map the approximation of
@@ -961,7 +961,7 @@ Proof.
    rewrite -> Hx.
    setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
    apply L.
-  set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
+  set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right Hpt)))).
   assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
     ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)) (Cunit pt) (H' pt Hpt)).
    intros pt Hpt.
@@ -986,7 +986,7 @@ Proof.
   setoid_replace ((3 # 5) * e)%Qpos with ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos; [| QposRing].
   apply ball_sym.
   apply L.
- set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right _ Hpt)))).
+ set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right Hpt)))).
  assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)) (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.

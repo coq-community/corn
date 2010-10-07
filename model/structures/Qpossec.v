@@ -43,6 +43,7 @@ Require Import COrdFields2.
 Require Import Eqdep_dec.
 Require Import CornTac.
 Require Import Qround.
+Require Import stdlib_omissions.Q.
 
 Open Local Scope Q_scope.
 
@@ -84,55 +85,21 @@ Proof.
  apply Qpos_prf.
 Qed.
 
+Lemma Qpos_nonzero' (q: Qpos): ~ q == 0.
+  (* simpler variant that actually shows up as proof obligations *)
+Proof Qpos_nonzero.
+
+Hint Immediate Qpos_nonzero'.
+
 Lemma Qpos_nonneg : forall a:Qpos, 0 <= a.
 Proof. intros [??]. auto with *. Qed.
 
 Hint Immediate Qpos_nonneg.
 
-(* Some things that should really be in the stdlib: *)
-
-(* todo: move these elsewhere *)
-
-Lemma Qopp_Qlt (x: Q): 0 < -x -> x < 0.
-Proof.
- intros [n d].
- unfold Qlt.
- simpl.
- intros.
- apply Z.opp_pos_neg.
- rewrite <- Zdiv.Z.mul_opp_l.
- assumption.
-Qed.
-
-Lemma Qmult_lt_0_compat (x y: Q): (0 < x -> 0 < y -> 0 < x * y)%Q.
-Proof.
- unfold Qlt.
- intros [n d] [n' d'].
- simpl.
- repeat rewrite Zmult_1_r.
- apply Zmult_lt_0_compat.
-Qed.
-
-Hint Resolve Qmult_lt_0_compat. (* todo: put in appropriate hint db *)
-
-Lemma Qplus_lt_0_compat x y: 0 < x -> 0 <= y -> 0 < x + y.
- unfold Qlt, Qle.
- simpl.
- intros x y.
- repeat rewrite Zmult_1_r.
- intros.
- apply (Zplus_lt_le_compat 0); auto with *.
-Qed.
-
 Lemma Qopp_Qpos_neg (x: Qpos): -x < 0.
-Proof.
- intros.
- apply Qopp_Qlt.
- rewrite Qopp_opp.
- auto with *.
-Qed.
+Proof. intro. apply Qopp_Qlt_0_r. auto. Qed.
 
-Hint Immediate Qopp_Qpos_neg. (* todo: put in appropriate hint db *)
+Hint Immediate Qopp_Qpos_neg.
 
 (** Any positive rational number can be transformed into a [Qpos]. *)
 Definition mkQpos: forall (a:Q) (p:0 < a), Qpos := @exist Q (Qlt 0).

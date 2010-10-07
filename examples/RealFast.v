@@ -25,7 +25,7 @@ Open Local Scope Q_scope.
 (* This file illustrates how to use the computational reals CR *)
 
 (* `∗' is used for trival proofs that a some concrete number is less than another *)
-Definition star := refl_equal Lt.
+Definition star := @refl_equal _ Lt.
 Notation "∗" := star.
 
 (* The answer function returns an approximation of r within 10^-n.

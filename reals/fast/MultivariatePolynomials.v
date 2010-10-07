@@ -247,7 +247,7 @@ Proof.
  clear H0.
  intros p [[Ha0 Ha1] Hv].
  stepl (@MVP_apply Q_as_CRing (S n) (let (n0, b) := BernsteinCoefficents (MVP_C_ Q_as_CRing n) p in
-   evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (Vcons Q a n v0));
+   evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (@Vcons Q a n v0));
      [|apply MVP_apply_wd;[apply evalBernsteinCoefficents|reflexivity]].
  simpl (MVP_upperBound (S n) p).
  destruct (BernsteinCoefficents (MVP_C_ Q_as_CRing n) p) as [m b].
@@ -267,8 +267,8 @@ Proof.
   match goal with |- (?A <= ?B) => set (L:=A); set (R:=B) end.
   change (L[<=]R).
   rstepr (R[*]One).
-  rewrite <- (@one_MVP_apply Q_as_CRing _ (Vcons _ a _ v0)).
-  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vcons _ a _ v0))).
+  rewrite <- (@one_MVP_apply Q_as_CRing _ (Vcons a v0)).
+  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vcons a v0))).
    fold (MultivariatePolynomial Q_as_CRing n).
    unfold L, R; clear L R.
    generalize (le_refl (S m)).
@@ -283,21 +283,21 @@ Proof.
        (fun (c : MultivariatePolynomial Q_as_CRing n) (n2 : nat)
          (_ : vector (MultivariatePolynomial Q_as_CRing n) n2) (rec : Q) =>
            Qmax (MVP_apply Q_as_CRing c v0) rec) (S n1)
-             (Vcons (MultivariatePolynomial Q_as_CRing n) a0 n1 b)).
+             (Vcons a0 b)).
    simpl (evalBernsteinBasisH (MultivariatePolynomial Q_as_CRing n)
-     (Vcons (MultivariatePolynomial Q_as_CRing n) a0 n1 b) l).
+     (@Vcons (MultivariatePolynomial Q_as_CRing n) a0 n1 b) l).
    simpl (Sumx (fun (i : nat) (H : (i < S n1)%nat) => Bernstein (MultivariatePolynomial Q_as_CRing n)
      (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) H l)))).
    do 2 rewrite -> MVP_plus_apply.
    rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (Vcons Q a n v0))).
+       (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (@Vcons Q a n v0))).
    rewrite -> Qmult_comm.
    rewrite -> Qmult_plus_distr_l.
    apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmax_mult_pos_distr_l.
       replace LHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
         (Bernstein (MultivariatePolynomial Q_as_CRing n)
-          (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vcons Q a n v0)).
+          (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vcons a v0)).
        apply Qmax_ub_l.
       simpl.
       rewrite <- (MVP_mult_apply Q_as_CRing).
@@ -314,7 +314,7 @@ Proof.
             Qmax (MVP_apply Q_as_CRing c v0) rec) n1 b) in *.
     replace RHS with (R*@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
-        (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vcons Q a n v0)).
+        (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vcons a v0)).
      apply IHb.
     apply: mult_wdr.
     apply MVP_apply_wd; try reflexivity.
@@ -333,7 +333,7 @@ Proof.
    apply: plus_resp_nonneg.
     stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
-        (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vcons Q a n v0)).
+        (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vcons a v0)).
      apply IHn1.
     apply MVP_apply_wd; try reflexivity.
     apply Sumx_wd.
@@ -369,7 +369,7 @@ Proof.
  clear H0.
  intros p [[Ha0 Ha1] Hv].
  stepr (@MVP_apply Q_as_CRing (S n) (let (n0, b) := BernsteinCoefficents (MVP_C_ Q_as_CRing n) p in
-   evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (Vcons Q a n v0));
+   evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (Vcons a v0));
      [|apply MVP_apply_wd;[apply evalBernsteinCoefficents|reflexivity]].
  simpl (MVP_lowerBound (S n) p).
  destruct (BernsteinCoefficents (MVP_C_ Q_as_CRing n) p) as [m b].
@@ -395,8 +395,8 @@ Proof.
  match goal with |- (?A <= ?B) => set (R:=A); set (L:=B) end.
  change (R[<=]L).
  rstepl (R[*]One).
- rewrite <- (@one_MVP_apply Q_as_CRing _ (Vcons _ a _ v0)).
- stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vcons _ a _ v0))).
+ rewrite <- (@one_MVP_apply Q_as_CRing _ (Vcons a v0)).
+ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vcons a v0))).
   fold (MultivariatePolynomial Q_as_CRing n).
   unfold L, R; clear L R.
   generalize (le_refl (S m)).
@@ -411,21 +411,21 @@ Proof.
       (fun (c : MultivariatePolynomial Q_as_CRing n) (n2 : nat)
         (_ : vector (MultivariatePolynomial Q_as_CRing n) n2) (rec : Q) =>
           Qmin (MVP_apply Q_as_CRing c v0) rec) (S n1)
-            (Vcons (MultivariatePolynomial Q_as_CRing n) a0 n1 b)).
+            (Vcons a0 b)).
   simpl (evalBernsteinBasisH (MultivariatePolynomial Q_as_CRing n)
-    (Vcons (MultivariatePolynomial Q_as_CRing n) a0 n1 b) l).
+    (Vcons a0 b) l).
   simpl (Sumx (fun (i : nat) (H : (i < S n1)%nat) => Bernstein (MultivariatePolynomial Q_as_CRing n)
     (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) H l)))).
   do 2 rewrite -> MVP_plus_apply.
   rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
     Bernstein (MultivariatePolynomial Q_as_CRing n)
-      (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (Vcons Q a n v0))).
+      (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (Vcons a v0))).
   rewrite ->  Qmult_comm.
   rewrite -> Qmult_plus_distr_l.
   apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmin_mult_pos_distr_l.
      replace RHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
        (Bernstein (MultivariatePolynomial Q_as_CRing n)
-         (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vcons Q a n v0)).
+         (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vcons a v0)).
       apply Qmin_lb_l.
      simpl.
      rewrite <- (MVP_mult_apply Q_as_CRing).
@@ -442,7 +442,7 @@ Proof.
            Qmin (MVP_apply Q_as_CRing c v0) rec) n1 b) in *.
    replace LHS with (R*@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vcons Q a n v0)).
+       (lt_n_Sm_le i m (lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vcons a v0)).
     apply IHb.
    apply: mult_wdr.
    apply MVP_apply_wd; try reflexivity.
@@ -461,7 +461,7 @@ Proof.
   apply: plus_resp_nonneg.
    stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vcons Q a n v0)).
+       (lt_n_Sm_le i m (lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vcons a v0)).
     apply IHn1.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
@@ -493,7 +493,7 @@ Qscale_modulus (Qmax (MVP_upperBound (S n) p') (-(MVP_lowerBound (S n) p'))).
 Lemma MVP_apply_modulus_correct : forall n (p:MultivariatePolynomial Q_as_CRing (S n)) x y e,
  (0 <= x) -> (x <= 1) -> (0 <= y) -> (y <= 1) ->
  ball_ex (MVP_apply_modulus p e) x y ->
- forall (v:vector Q n), UnitHyperInterval v -> ball e (MVP_apply _ p (Vcons _ x _ v):Q) (MVP_apply _ p (Vcons _ y _ v)).
+ forall (v:vector Q n), UnitHyperInterval v -> ball e (MVP_apply _ p (Vcons x v):Q) (MVP_apply _ p (Vcons y v)).
 Proof.
  intros n p x y e Hx0 Hx1 Hy0 Hy1 Hxy v Hv.
  assert (Hx : (Qmax 0 (Qmin 1 x))==x).
@@ -514,8 +514,8 @@ Proof.
  unfold MVP_apply_modulus in Hxy.
  set (c:=(Qmax (MVP_upperBound (S n) (_D_ p)) (- MVP_lowerBound (S n) (_D_ p)))) in *.
  set (fp:=cpoly_map (RHcompose _ _ _ (inj_Q_hom IR) (MVP_apply_hom _ v)) p).
- apply (fun A B e => is_UniformlyContinuousD_Q (Some 0) (Some 1) (refl_equal _) (FPoly _ fp) (FPoly _ (_D_ fp)) (Derivative_poly _ _ _)
-   (fun x => (MVP_apply _ p (Vcons _ x _ v))) A c B e x y); try assumption.
+ apply (fun A B e => is_UniformlyContinuousD_Q (Some 0) (Some 1) refl_equal (FPoly _ fp) (FPoly _ (_D_ fp)) (Derivative_poly _ _ _)
+   (fun x => (MVP_apply _ p (Vcons x v))) A c B e x y); try assumption.
   unfold fp.
   simpl.
   intros q _ _.
@@ -547,7 +547,7 @@ Proof.
   rewrite -> inj_Q_One.
   rstepr (One[/]Zero[+]One[//]den_is_nonzero IR 1); auto.
  setoid_replace ((cpoly_map (MVP_apply_hom Q_as_CRing v) (_D_ p)) ! x)
-   with (@MVP_apply Q_as_CRing (S n) (_D_ p) (Vcons _ x _ v)).
+   with (@MVP_apply Q_as_CRing (S n) (_D_ p) (Vcons x v)).
   apply Qabs_case; intros H.
    eapply Qle_trans;[|apply Qmax_ub_l].
    apply MVP_upperBound_correct.
@@ -697,9 +697,9 @@ Proof.
                        change (Q_as_CSetoid) with (csg_crr Q_as_CRing);
                          generalize (p ! (MVP_C_ Q_as_CRing n x')) (p ! (MVP_C_ Q_as_CRing n y'));
                            clear - e; induction n;[ simpl; intros p q s t H Hs Ht;
-                             rewrite <- Hs, <- Ht; apply (H (Vnil _)); constructor|]; simpl;
+                             rewrite <- Hs, <- Ht; apply (H Vnil); constructor|]; simpl;
                                intros p q s t H Hs Ht v; apply (fun H => IHn _ _ _ _ H (Hs v) (Ht v));
-                                 intros v0 Hv0; apply (H (Vcons _ (Qclamp01 v) _ v0)); split; auto;
+                                 intros v0 Hv0; apply (H (Vcons (Qclamp01 v) v0)); split; auto;
                                    apply Qclamp01_clamped).
  exists (Build_UniformlyContinuousFunction H).
  simpl.

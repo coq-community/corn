@@ -415,7 +415,7 @@ Proof.
     discriminate.
    cut (0 < (mkQpos q)/(err * (mkQpos X)*(mkQpos X)))%Qpos.
     autorewrite with QposElim; auto.
-   apply Qmult_lt_0_compat; auto with *.
+   apply Q.Qmult_lt_0_compat; auto with *.
    apply Qinv_lt_0_compat; auto with *.
   setoid_replace (Qabs (hd series)) with 0.
    stepl 0; [| simpl; ring].

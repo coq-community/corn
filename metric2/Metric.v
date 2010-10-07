@@ -27,6 +27,7 @@ Require Import Qordfield.
 Require Import QMinMax.
 Require Import List.
 Require Import CornTac.
+Require Import stdlib_omissions.Q.
 
 Require QnnInf.
 Import QnnInf.notations.
@@ -247,14 +248,14 @@ Section gball.
       intuition.
      destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
        assert (0 < e1 + e2).
-        apply Qplus_lt_0_compat...
+        apply Qplus_lt_le_0_compat...
        revert H1. apply Qle_not_lt...
       simpl.
       setoid_replace (exist (Qlt 0) (e1 + e2) q0) with (exist (Qlt 0) e1 B + exist (Qlt 0) e2 q)%Qpos by reflexivity.
       apply ball_triangle with b...
      exfalso.
      assert (0 < e1 + e2).
-      apply Qplus_lt_0_compat...
+      apply Qplus_lt_le_0_compat...
      revert H1. rewrite q0.
      apply Qlt_irrefl.
     destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].

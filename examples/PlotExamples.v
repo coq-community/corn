@@ -23,7 +23,7 @@ Require Import Plot.
 Require Import CRtrans.
 
 (* `∗' is used for trival proofs that a some concrete number is less than another *)
-Notation star := (refl_equal Lt).
+Notation star := (@refl_equal _ Lt).
 Notation "∗" := star.
 
 Open Local Scope Q_scope.
@@ -44,7 +44,7 @@ Goal True.
 (* (exp_bound_uc 0) is exp on ]-inf,0] which is one domain where it is uniformly continuous *)
 assert (X:=@Plot_correct (-(3)) 0 star 0 1 star
  (exp_bound_uc 0)
- 45 15 (refl_equal _) (refl_equal _)).
+ 45 15 refl_equal refl_equal).
 (* No plot is seen.  It is hidden in the uncomputed
   PlotQ (- (3)) 0 ∗ 0 1 ∗ (exp_bound_uc 0) 45 15 *)
 (* We use patern matchin to extract the parts of the statement we

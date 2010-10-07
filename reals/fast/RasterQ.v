@@ -106,7 +106,7 @@ Proof.
  generalize (f l r n) (f t b m).
  induction bitmap; intros f0 f1 i j H.
   unfold RasterIndex in H.
-  destruct (nth_in_or_default i (map (@vectorAsList _ _) (Vnil (vector bool n))) nil) as [A | A].
+  destruct (nth_in_or_default i (map (@vectorAsList _ _) (@Vnil (vector bool n))) nil) as [A | A].
    contradiction.
   rewrite A in H; clear A.
   destruct (nth_in_or_default j nil false) as [A | A].
@@ -122,7 +122,7 @@ Proof.
   clear bitmap IHbitmap.
   revert f0 j H.
   induction a; intros f0 j H.
-   destruct (nth_in_or_default j (Vnil bool) false) as [A | A].
+   destruct (nth_in_or_default j (@Vnil bool) false) as [A | A].
     contradiction.
    rewrite A in H; clear A.
    contradiction.

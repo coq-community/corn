@@ -170,7 +170,7 @@ Next Obligation. apply Qle_trans with (q0); assumption. Qed.
 
 Global Instance: Proper (QnonNeg.eq ==> eq) inject_Qnn.
 Proof with auto.
- unfold QnonNeg.eq, eq, le.
+ unfold eq, le.
  intros ?? H.
  split; simpl; intros.
   rewrite H. apply Qle_trans with (`q)...
@@ -178,9 +178,9 @@ Proof with auto.
 Qed.
 
 Definition bound_doesnt_matter (q: QnonNeg) b H H' U U':
-  make (QnonNeg.le q) b H U == make (QnonNeg.lt q) b H' U'.
+  make (Qle q) b H U == make (Qlt q) b H' U'.
 Proof with auto.
- unfold eq, le, QnonNeg.le, QnonNeg.lt in *. simpl.
+ unfold eq, le in *. simpl.
  split; intros e ???.
   apply Qle_trans with (`e)...
  apply Qle_lt_trans with (`e)...
@@ -417,7 +417,7 @@ Proof with auto.
 Qed.
 
 Lemma le_0 x: 0%Qnn <= x.
-Proof. unfold le. simpl. intros. apply proj2_sig. Qed.
+Proof. unfold le. simpl. auto. Qed.
 
 Hint Immediate le_0.
 
@@ -474,10 +474,10 @@ End notations.
 (* To show concretely that we've actually gotten beyond mere rationals, here's the square of two: *)
 
 Program Definition sqrt2: T :=
-  make (fun x => 2#1 <= x*x)%Qnn (2#1)%Qnn _ _.
+  make (fun x => (2#1) <= x*x)%Q (2#1)%Qnn _ _.
 
 Next Obligation. Proof with auto.
- unfold QnonNeg.le in *. simpl in *.
+ simpl in *.
  apply Qle_trans with (q * q)%Q...
  apply Qmult_le_compat...
 Qed.
@@ -499,7 +499,6 @@ Proof with auto.
   apply Qle_trans with ((2 # 1)%Q + x)%Q...
   apply Qplus_le_compat...
  inversion_clear H.
- unfold QnonNeg.le in *. simpl in *.
  destruct (Qlt_le_dec (`q0) (`q')).
   apply Qle_trans with (`q0*`q0)%Q...
   apply Qle_trans with (`q0*`q')%Q...
