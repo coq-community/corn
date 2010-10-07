@@ -27,6 +27,7 @@ Require Import QMinMax.
 Require Import CRcorrect.
 Require Import CRIR.
 Require Import CornTac.
+Require Import Stability.
 
 Open Local Scope Q_scope.
 (**
@@ -110,6 +111,10 @@ Proof.
  rewrite -> Qabs_pos; auto with *.
 Qed.
 
+Lemma approximate_CRabs (x: CR) (e: Qpos):
+  approximate (CRabs x) e = Qabs (approximate x e).
+Proof. reflexivity. Qed.
+
 Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.
 Proof.
  intros a b.
@@ -136,6 +141,9 @@ Proof.
  auto.
 Qed.
 
+Lemma CRabs_0: (CRabs ('0) == '0)%CR.
+Proof. apply CRabs_pos, CRle_refl. Qed.
+
 Lemma CRabs_neg: forall x, (x <= '0 -> CRabs x == - x)%CR.
 Proof.
  intros x.
@@ -148,4 +156,46 @@ Proof.
  rewrite -> IR_leEq_as_CR.
  rewrite -> IR_Zero_as_CR.
  auto.
+Qed.
+
+Lemma CRabs_cases
+  (P: CR -> Prop)
+  {Pp: Proper (@st_eq _ ==> iff) P}
+  {Ps: forall x, Stable (P x)}:
+    forall x, ((('0 <= x -> P x) /\ (x <= '0 -> P (- x))) <-> P (CRabs x))%CR.
+Proof with auto.
+ intros.
+ apply from_DN.
+ apply (DN_bind (CRle_dec x ('0)%CR)).
+ intro.
+ apply DN_return.
+ destruct H.
+  rewrite (CRabs_neg _ c)...
+  intuition.
+  revert H.
+  rewrite (proj2 (CRle_def x ('0)%CR))...
+  rewrite CRopp_0...
+ rewrite (CRabs_pos _ c)...
+ intuition.
+ revert H.
+ rewrite (proj2 (CRle_def x ('0)%CR))...
+ rewrite CRopp_0...
+Qed.
+
+Definition CRdistance (x y: CR): CR := CRabs (x - y)%CR.
+
+Hint Immediate CRle_refl.
+
+Lemma CRdistance_CRle (r x y: CR): (x - r <= y /\ y <= x + r <-> CRdistance x y <= r)%CR.
+Proof.
+ intros. unfold CRdistance.
+ rewrite CRabs_AbsSmall.
+ unfold AbsSmall. simpl.
+ rewrite (CRplus_le_l (x - r)%CR y (r - y)%CR).
+ assert (r - y + (x - r) == x - y)%CR as E by ring. rewrite E. clear E.
+ assert (r - y + y == r)%CR as E by ring. rewrite E. clear E.
+ rewrite (CRplus_le_l y (x + r)%CR (-r - y)%CR).
+ assert (- r - y + y == - r)%CR as E by ring. rewrite E. clear E.
+ assert (- r - y + (x + r) == x - y)%CR as E by ring. rewrite E. clear E.
+ intuition.
 Qed.
