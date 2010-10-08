@@ -232,3 +232,15 @@ Proof.
 Qed.
 
 Hint Resolve stableQ : metricQ.
+
+Lemma in_Qball (r: Qpos) (x y: Q): (x - r <= y <= x + r) <-> Qball r x y.
+Proof with auto.
+ intros [r rp] x y.
+ split; intro E.
+  apply Qball_Qabs.
+  simpl QposAsQ in *.
+  apply Q.Qabs_diff_Qle...
+ apply Qball_Qabs in E.
+ simpl QposAsQ in *.
+ apply Q.Qabs_diff_Qle...
+Qed.

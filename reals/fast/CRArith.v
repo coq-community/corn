@@ -292,17 +292,29 @@ Proof.
  apply Qplus_le_compat; auto.
 Qed.
 
-Lemma CRplus_le_r (x y z: CR): (x <= y <-> x+z <= y+z)%CR.
+Lemma CRplus_comm (x y: CR): x + y == y + x.
+Proof. intros. ring. Qed.
+
+Lemma CRplus_assoc (x y z: CR): x + (y + z) == (x + y) + z.
+Proof. intros. ring. Qed.
+
+Lemma CRplus_eq_l (z x y: CR): x == y <-> x + z == y + z.
+Proof with ring.
+ split; intro E. rewrite E...
+ rewrite <- (CRplus_0_r x), <- (CRplus_opp z), CRplus_assoc, E...
+Qed.
+
+Lemma CRplus_eq_r (z x y: CR): x == y <-> z + x == z + y.
+Proof. intros. do 2 rewrite (CRplus_comm z). apply CRplus_eq_l. Qed.
+
+Lemma CRplus_le_r (x y z: CR): x <= y <-> x+z <= y+z.
 Proof.
  unfold CRle. intros.
  assert (y + z - (x + z) == y - x)%CR as E by ring. rewrite E.
  intuition.
 Qed.
 
-Lemma CRplus_comm (x y: CR): x + y == y + x.
-Proof. intros. ring. Qed.
-
-Lemma CRplus_le_l x: forall y z : CR, (x <= y) <-> (z + x <= z + y).
+Lemma CRplus_le_l x: forall y z : CR, x <= y <-> z + x <= z + y.
 Proof.
  intros. rewrite (CRplus_le_r x y z) (CRplus_comm x) (CRplus_comm y). reflexivity.
 Qed.
@@ -589,3 +601,12 @@ Proof with auto.
  apply CRle_trans with x...
  apply CRle_trans with y...
 Qed.
+
+Lemma scale_0 x: scale 0 x == '0.
+Proof. intro. rewrite <- CRmult_scale. ring. Qed.
+
+Lemma scale_CRplus (q: Q) (x y: CR): scale q (x + y) == scale q x + scale q y.
+Proof. intros. do 3 rewrite <- CRmult_scale. ring. Qed.
+
+Lemma scale_CRopp (q: Q) (x: CR): scale q (-x) == - scale q x.
+Proof. intros. do 2 rewrite <- CRmult_scale. ring. Qed.

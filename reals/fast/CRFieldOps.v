@@ -249,6 +249,12 @@ Build_UniformlyContinuousFunction (Qscale_uc_prf a).
 
 Definition scale (a:Q) : CR --> CR := Cmap QPrelengthSpace (Qscale_uc a).
 
+Instance Qscale_uc_Proper: Proper (Qeq ==> @st_eq _) Qscale_uc.
+Proof. intros ?? E ?. simpl. rewrite E. reflexivity. Qed.
+
+Instance scale_Proper: Proper (Qeq ==> @st_eq _) scale.
+Proof. intros ?? E ?. simpl ucFun. rewrite E. reflexivity. Qed.
+
 (** [CRboundAbs] clamps a real number between -c and c where c is
 rational. *)
 Definition QboundAbs (c:Qpos) := uc_compose (QboundBelow_uc (-c)) (QboundAbove_uc c).

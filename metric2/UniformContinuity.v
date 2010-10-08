@@ -219,6 +219,10 @@ Proof.
  apply ball_refl.
 Qed.
 
+Instance uc_wd_more_Proper (X Y : MetricSpace):
+  Proper (@ucEq _ _ ==> @st_eq X ==> @st_eq Y) (@ucFun X Y).
+Proof. intros X Y ?? E ?? F. rewrite E F. reflexivity. Qed.
+
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 
 Add Parametric Morphism (X Y Z:MetricSpace) f : (@ucFun2 X Y Z f) with signature (@st_eq X) ==> (@st_eq Y) ==> (@st_eq Z) as ucFun2_wd.

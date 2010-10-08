@@ -128,7 +128,9 @@ Proof.
  apply AbsSmall_imp_AbsIR.
 Qed.
 
-Lemma CRabs_pos : forall x:CR, ('0 <= x -> CRabs x == x)%CR.
+Open Local Scope CR_scope.
+
+Lemma CRabs_pos : forall x:CR, '0 <= x -> CRabs x == x.
 Proof.
  intros x.
  rewrite <- (CRasIRasCR_id x).
@@ -141,10 +143,10 @@ Proof.
  auto.
 Qed.
 
-Lemma CRabs_0: (CRabs ('0) == '0)%CR.
+Lemma CRabs_0: CRabs ('0) == '0.
 Proof. apply CRabs_pos, CRle_refl. Qed.
 
-Lemma CRabs_neg: forall x, (x <= '0 -> CRabs x == - x)%CR.
+Lemma CRabs_neg: forall x, x <= '0 -> CRabs x == - x.
 Proof.
  intros x.
  rewrite <- (CRasIRasCR_id x).
@@ -162,40 +164,62 @@ Lemma CRabs_cases
   (P: CR -> Prop)
   {Pp: Proper (@st_eq _ ==> iff) P}
   {Ps: forall x, Stable (P x)}:
-    forall x, ((('0 <= x -> P x) /\ (x <= '0 -> P (- x))) <-> P (CRabs x))%CR.
+    forall x, (('0 <= x -> P x) /\ (x <= '0 -> P (- x))) <-> P (CRabs x).
 Proof with auto.
  intros.
  apply from_DN.
- apply (DN_bind (CRle_dec x ('0)%CR)).
+ apply (DN_bind (CRle_dec x ('0))).
  intro.
  apply DN_return.
  destruct H.
   rewrite (CRabs_neg _ c)...
   intuition.
   revert H.
-  rewrite (proj2 (CRle_def x ('0)%CR))...
+  rewrite (proj2 (CRle_def x ('0)))...
   rewrite CRopp_0...
  rewrite (CRabs_pos _ c)...
  intuition.
  revert H.
- rewrite (proj2 (CRle_def x ('0)%CR))...
+ rewrite (proj2 (CRle_def x ('0)))...
  rewrite CRopp_0...
 Qed.
 
-Definition CRdistance (x y: CR): CR := CRabs (x - y)%CR.
+Lemma CRabs_opp (x: CR): CRabs (-x) == CRabs x.
+Proof with auto.
+ intros.
+ apply from_DN.
+ apply (DN_bind (CRle_dec x ('0))).
+ intros [A | B]; apply DN_return.
+  rewrite (CRabs_neg _ A).
+  apply CRabs_pos.
+  change (-'0 <= -x).
+  apply -> CRle_opp...
+ rewrite (CRabs_pos _ B).
+ rewrite CRabs_neg.
+  apply CRopp_opp.
+ change (-x <= -'0).
+ apply -> CRle_opp...
+Qed.
 
-Hint Immediate CRle_refl.
+Definition CRdistance (x y: CR): CR := CRabs (x - y).
 
-Lemma CRdistance_CRle (r x y: CR): (x - r <= y /\ y <= x + r <-> CRdistance x y <= r)%CR.
+Lemma CRdistance_CRle (r x y: CR): x - r <= y /\ y <= x + r <-> CRdistance x y <= r.
 Proof.
  intros. unfold CRdistance.
  rewrite CRabs_AbsSmall.
  unfold AbsSmall. simpl.
- rewrite (CRplus_le_l (x - r)%CR y (r - y)%CR).
- assert (r - y + (x - r) == x - y)%CR as E by ring. rewrite E. clear E.
- assert (r - y + y == r)%CR as E by ring. rewrite E. clear E.
- rewrite (CRplus_le_l y (x + r)%CR (-r - y)%CR).
- assert (- r - y + y == - r)%CR as E by ring. rewrite E. clear E.
- assert (- r - y + (x + r) == x - y)%CR as E by ring. rewrite E. clear E.
+ rewrite (CRplus_le_l (x - r) y (r - y)).
+ CRring_replace (r - y + (x - r)) (x - y).
+ CRring_replace (r - y + y) r.
+ rewrite (CRplus_le_l y (x + r) (-r - y)).
+ CRring_replace (-r - y + y) (-r).
+ CRring_replace (- r - y + (x + r)) (x - y).
  intuition.
+Qed.
+
+Lemma CRdistance_comm (x y: CR): CRdistance x y == CRdistance y x.
+Proof.
+ unfold CRdistance. intros.
+ CRring_replace (x - y) (-(y - x)).
+ apply CRabs_opp.
 Qed.
