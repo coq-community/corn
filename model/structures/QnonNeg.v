@@ -153,31 +153,34 @@ Proof. apply proj2_sig. Qed.
 
 Hint Immediate proj1_sig_nonNeg.
 
-Program Definition is_pos (q: T): { r: Qpos | `r = `q } + (q == zero) :=
-  match Qsec.Qdec_sign (` q) with
-  | inl _ => inl q
-  | inr _ => inr _
-  end.
-
-Next Obligation. Proof with auto.
- destruct wildcard'...
- exfalso. apply (Qlt_not_le (` q) 0)...
-Qed.
-
-Lemma is_pos_ind (P: T -> Prop) (Pwd: Proper (eq ==> iff) P) (P0: P 0) (Pp: forall q: Qpos, P q): forall q, P q.
+Lemma rect (P: T -> Type)
+  (P0: forall (d: positive) H, P (exist (Qle 0) (0#d) H))
+  (Pp: forall (n d: positive) H, P (exist (Qle 0) (n#d) H)): forall q, P q.
 Proof.
- intro.
- destruct (is_pos q).
-  destruct s.
-  destruct q.
-  simpl in *.
-  subst x0.
-  apply (Pwd x (exist (Qle 0) (`x) q)).
-   reflexivity.
+ intros [[qn qd] E].
+ destruct qn.
+   apply P0.
   apply Pp.
- rewrite e.
- apply P0.
+ exfalso.
+ apply E.
+ reflexivity.
+Defined.
+
+Lemma Qpos_ind (P: T -> Prop) (Pwd: Proper (eq ==> iff) P) (P0: P 0) (Pp: forall q: Qpos, P q): forall q, P q.
+Proof with auto.
+ intro.
+ apply rect; intros.
+  apply (Pwd 0)...
+  reflexivity.
+ apply (Pwd (QposMake n d))...
+ reflexivity.
 Qed.
+
+(* Note: We can't make something as nice as Qpos_positive_numerator_rect for QnonNeg because
+whereas Qpos contains a Qlt which contains a Zlt which is an equality between "comparison"'s,
+proofs of which are unique because comparison is decidable, QnonNeg contains a Qle which
+contains a Zle which is a negation of an equality between comparisons, proofs of which we
+cannot prove uniqueness of. *)
 
 (* Notations to be imported by clients: *)
 

@@ -25,20 +25,20 @@ Proof with simpl; auto with *.
  unfold QnonNeg.eq. simpl.
  destruct bound; simpl.
   Focus 2. exists (1%nat, w). simpl. split... ring.
- destruct (QnonNeg.is_pos w) as [[x e] | e].
-  set (p := QposCeiling (x / q)).
-  exists (nat_of_P p, ((x / p)%Qpos):QnonNeg)...
-  split.
-   rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P, <- e.
-   change (p * (x * / p) == x)%Q.
-   field. discriminate.
-  subst p.
-  apply Qle_shift_div_r...
-  rewrite QposCeiling_Qceiling. simpl.
-  setoid_replace (x:Q) with (q * (x * / q))%Q at 1 by (simpl; field)...
-  do 2 rewrite (Qmult_comm q).
-  apply Qmult_le_compat_r...
- exists (0%nat, 0%Qnn)...
+ induction w using QnonNeg.rect.
+  exists (0%nat, 0%Qnn)...
+ set (p := QposCeiling (QposMake n d / q)%Qpos).
+ exists (nat_of_P p, ((QposMake n d / p)%Qpos):QnonNeg)...
+ split.
+  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
+  change (p * ((n#d) * / p) == (n#d))%Q.
+  field. discriminate.
+ subst p.
+ apply Qle_shift_div_r...
+ rewrite QposCeiling_Qceiling. simpl.
+ setoid_replace (n#d:Q) with (q * ((n#d) * / q))%Q at 1 by (simpl; field)...
+ do 2 rewrite (Qmult_comm q).
+ apply Qmult_le_compat_r...
 Qed.
 
 (** Riemann sums will play an important role in the theory about integrals, so let's
@@ -73,13 +73,13 @@ Hint Immediate ball_refl Qle_refl.
 
 (** Next up, the actual interface for integrable functions. *)
 
+Class Integral (f: Q_as_MetricSpace --> CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
+
+Notation "∫" := integrate.
+
 Section integral_interface.
 
-  Class Integral (f: Q_as_MetricSpace --> CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
-
   Variable (f: Q_as_MetricSpace --> CR).
-
-  Notation "∫" := integrate.
 
   Class Integrable `{!Integral f}: Prop :=
     { integral_additive:
@@ -161,20 +161,22 @@ Section integral_interface.
       (forall (x: Q), (from <= x <= from+width) -> gball r (f x) mid) ->
       gball (width * r) (∫ from width) (scale width mid).
     Proof with auto.
-     intro A.
-     destruct (QnonNeg.is_pos r) as [[x E] | E].
-      destruct x. simpl in E. subst.
-      apply (ball_gball (width * (exist (Qlt 0) r q))%Qpos), bounded_with_real_mid.
-      intros. apply ball_gball...
-     rewrite E Qmult_0_r gball_0.
-     apply ball_eq. intro .
-     setoid_replace e with (width * (e * Qpos_inv width))%Qpos by (unfold QposEq; simpl; field)...
-     apply bounded_with_real_mid.
-     intros q ?.
-     setoid_replace (f q) with mid...
-     apply -> (@gball_0 CR).
-     change (r == 0)%Q in E.
-     rewrite <- E...
+     pattern r.
+     apply QnonNeg.Qpos_ind.
+       intros ?? E.
+       split. intros H ?. rewrite <- E. apply H. intros. rewrite E...
+       intros H ?. rewrite E. apply H. intros. rewrite <- E...
+      rewrite Qmult_0_r gball_0.
+      intros.
+      apply ball_eq. intro .
+      setoid_replace e with (width * (e * Qpos_inv width))%Qpos by (unfold QposEq; simpl; field)...
+      apply bounded_with_real_mid.
+      intros q ?.
+      setoid_replace (f q) with mid...
+      apply -> (@gball_0 CR)...
+     intros.
+     apply (ball_gball (width * q)%Qpos), bounded_with_real_mid.
+     intros. apply ball_gball...
     Qed.
 
     (** Next, we generalize r to a full CR: *)
@@ -216,7 +218,7 @@ Section integral_interface.
     Proof with auto.
      revert A.
      pattern width.
-     apply QnonNeg.is_pos_ind; intros.
+     apply QnonNeg.Qpos_ind; intros.
        intros ?? E.
        split; intro; intros.
         rewrite <- E. apply H. intros. apply A. rewrite <- E...
@@ -327,7 +329,7 @@ Section integral_interface.
   Proof with auto.
    intros. apply ball_eq. intros.
    revert w.
-   apply QnonNeg.is_pos_ind.
+   apply QnonNeg.Qpos_ind.
      intros ?? E. rewrite E. reflexivity.
     do 2 rewrite zero_width_integral...
    intro x.
@@ -389,3 +391,63 @@ Proof.
   apply (Integrable_proper_l f g H0 H).
  assumption.
 Qed.
+
+(** Finally, we offer a smart constructor for implementations that would need to recognize and
+ treat the zero-width case specially anyway (which is the case for the implementation
+with Riemann sums, because there, a positive width is needed to divide the error by). *)
+
+Section extension_to_nn_width.
+
+  Context
+    (f: Q_as_MetricSpace --> CR)
+    (pre_integral: Q -> Qpos -> CR) (* Note the Qpos instead of QnonNeg. *)
+      (* The three properties limited to pre_integral: *)
+    (pre_additive: forall (a: Q) (b c: Qpos),
+      pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
+    (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
+      (forall x: Q, from <= x <= from + width -> ball r (f x) (' mid)) ->
+      ball (width * r) (pre_integral from width) (' (width * mid)))
+    {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
+
+  Instance integral_extended_to_nn_width: Integral f :=
+    fun from => QnonNeg.rect (fun _ => CR)
+      (fun _ _ => '0)
+      (fun n d _ => pre_integral from (QposMake n d)).
+
+  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) ∫.
+  Proof with auto.
+   intros ?????.
+   induction x0 using QnonNeg.rect;
+    induction y0 using QnonNeg.rect.
+       reflexivity.
+     discriminate.
+    discriminate.
+   intros. apply pre_wd...
+  Qed.
+
+  Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
+    (forall x, from <= x <= from + width -> ball r (f x) (' mid)) ->
+    ball (width * r) (∫ from width) (' (width * mid)).
+  Proof.
+   induction width using Qpos_positive_numerator_rect.
+   apply (pre_bounded from (a#b) mid r).
+  Qed.
+
+  Let additive (a: Q) (b c: QnonNeg): ∫ a b + ∫ (a + `b)%Q c  == ∫ a (b + c)%Qnn.
+  Proof.
+   unfold integrate.
+   induction b using QnonNeg.rect;
+    induction c using QnonNeg.rect; simpl integral_extended_to_nn_width; intros.
+      ring.
+     rewrite CRplus_0_l.
+     apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+    rewrite CRplus_0_r.
+    apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+   rewrite (pre_additive a (QposMake n d) (QposMake n0 d0)).
+   apply pre_wd; reflexivity.
+  Qed.
+
+  Lemma integral_extended_to_nn_width_correct: Integrable f.
+  Proof. constructor; auto. Qed.
+
+End extension_to_nn_width.
