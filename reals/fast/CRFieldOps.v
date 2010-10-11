@@ -169,6 +169,14 @@ Proof.
  split; apply Qpos_nonzero.
 Qed.
 
+Lemma Qscale_modulus_pos (a e: Qpos): exists P,
+  Qscale_modulus a e = Qpos2QposInf (exist (Qlt 0) (/ a * e)%Q P).
+Proof.
+ intros [[[] ad] P] e; try discriminate.
+ simpl. unfold Qpos_inv, Qpos_mult.
+ eauto.
+Qed.
+
 (*
 Lemma Qscale_modulus_pos : forall (a e:Qpos), Qscale_modulus a e = (Qpos_inv a*e)%Qpos.
 Proof.

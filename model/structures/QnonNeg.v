@@ -153,7 +153,7 @@ Proof. apply proj2_sig. Qed.
 
 Hint Immediate proj1_sig_nonNeg.
 
-Program Definition is_pos (q: T): { r: Qpos | r == q } + (q == zero) :=
+Program Definition is_pos (q: T): { r: Qpos | `r = `q } + (q == zero) :=
   match Qsec.Qdec_sign (` q) with
   | inl _ => inl q
   | inr _ => inr _
@@ -164,7 +164,20 @@ Next Obligation. Proof with auto.
  exfalso. apply (Qlt_not_le (` q) 0)...
 Qed.
 
-Next Obligation. reflexivity. Qed.
+Lemma is_pos_ind (P: T -> Prop) (Pwd: Proper (eq ==> iff) P) (P0: P 0) (Pp: forall q: Qpos, P q): forall q, P q.
+Proof.
+ intro.
+ destruct (is_pos q).
+  destruct s.
+  destruct q.
+  simpl in *.
+  subst x0.
+  apply (Pwd x (exist (Qle 0) (`x) q)).
+   reflexivity.
+  apply Pp.
+ rewrite e.
+ apply P0.
+Qed.
 
 (* Notations to be imported by clients: *)
 

@@ -337,6 +337,16 @@ Proof.
  constructor.
 Qed.
 
+Lemma regFunBall_Cunit (e: Qpos) (x: Complete) (y: X):
+  regFunBall e x (Cunit y) <-> (forall d: Qpos, ball (d + e) (approximate x d) y).
+Proof with auto.
+ unfold regFunBall.
+  split; intros.
+  apply ball_closed.
+  simpl in *...
+ apply ball_weak...
+Qed.
+
 Lemma regFun_prf_ex :
  forall (r : Complete) (e1 e2 : QposInf),
   ball_ex  (e1 + e2) (approximate r e1) (approximate r e2).

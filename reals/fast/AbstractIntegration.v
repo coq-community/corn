@@ -1,4 +1,4 @@
-(* An abstract interface for integrable uniformly continuous functions from Q to CR,
+(** An abstract interface for integrable uniformly continuous functions from Q to CR,
  with a proof that integrals satisfying this interface are unique. *)
 
 Require Import
@@ -16,7 +16,7 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-(* Any nonnegative width can be split up into an integral number of
+(** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)
 
 Definition split (w: QnonNeg) (bound: QposInf):
@@ -41,7 +41,7 @@ Proof with simpl; auto with *.
  exists (0%nat, 0%Qnn)...
 Qed.
 
-(* Riemann sums will play an important role in the theory about integrals, so let's
+(** Riemann sums will play an important role in the theory about integrals, so let's
 define very simple summation and a key property thereof: *)
 
 Fixpoint enum (n: nat): list nat :=
@@ -52,7 +52,7 @@ Fixpoint enum (n: nat): list nat :=
 
 Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum M (map f (enum n)).
 
-(* If the elementwise distance between two summations over the same domain
+(** If the elementwise distance between two summations over the same domain
  is bounded, then so is the distance between the summations: *)
 
 Lemma CRΣ_gball_ex (f g: nat -> CR) (e: QnnInf):
@@ -71,39 +71,44 @@ Qed.
 
 Hint Immediate ball_refl Qle_refl.
 
-(* Next up, the actual interface for integrable functions. *)
+(** Next up, the actual interface for integrable functions. *)
 
 Section integral_interface.
 
-  Variable (f: Q_as_MetricSpace --> CR).
+  Class Integral (f: Q_as_MetricSpace --> CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
-  Class Integral := integrate: forall (from: Q) (w: QnonNeg), CR.
+  Variable (f: Q_as_MetricSpace --> CR).
 
   Notation "∫" := integrate.
 
-  Class Integrable `{Integral}: Prop :=
+  Class Integrable `{!Integral f}: Prop :=
     { integral_additive:
       forall (a: Q) b c, ∫ a b + ∫ (a+` b) c == ∫ a (b+c)%Qnn
-    ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: CR) (r: Qpos),
-      (forall x, from <= x <= from+width -> ball r (f x) mid) ->
-      ball (width * r) (∫ from width) (scale width mid)
+
+    ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
+      (forall x, from <= x <= from+width -> ball r (f x) ('mid)) ->
+      ball (width * r) (∫ from width) (' (width * mid))
+
     ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) ∫
    }.
 
-  (* The boundedness property is stated very primitively here, in that r is a Qpos instead of a CR,
-   and w is a Qpos instead of a QnonNeg. This means that it's easy to show that particular
-   implementations satisfy this interface, but hard to use this property directly. Hence, we
-   will show in a moment that the property as stated actually implies its generalization with r in CR
-   and w in QnonNeg. *)
+  (** This closely resembles the axiomatization given in
+   Bridger's "Real Analysis: A Constructive Approach", Ch. 5. *)
 
-  (* Note: Other ways to state the property still more primitively (and thus more easily provable) might
-   be (1) to make the inequalities in "from <= x <= from+width" strict, and (2) to make mid a Q. *)
+  (** The boundedness property is stated very primitively here, in that r is a Qpos instead of a CR,
+   w is a Qpos instead of a QnonNeg, and mid is a Q instead of a CR. This means that it's easy to
+   show that particular implementations satisfy this interface, but hard to use this property directly.
+   Hence, we will show in a moment that the property as stated actually implies its generalization
+   with r and mid in CR and w in QnonNeg. *)
+
+  (** Note: Another way to state the property still more primitively (and thus more easily provable) might
+   be to make the inequalities in "from <= x <= from+width" strict. *)
 
   Section singular_props. (* Properties we can derive for a single integral of a function. *)
 
     Context `{Int: Integrable}.
 
-    (* The additive property implies that zero width intervals have zero surface: *)
+    (** The additive property implies that zero width intervals have zero surface: *)
 
     Lemma zero_width_integral q: ∫ q 0%Qnn == '0.
     Proof with auto.
@@ -112,7 +117,7 @@ Section integral_interface.
      rewrite Qplus_0_r QnonNeg.plus_0_l CRplus_0_l...
     Qed.
 
-    (* Iterating the additive property yields: *)
+    (** Iterating the additive property yields: *)
 
     Lemma integral_repeated_additive (a: Q) (b: QnonNeg) (n: nat):
         cmΣ n (fun i: nat => ∫ (a + i * ` b) b) == ∫ a (n * b)%Qnn.
@@ -129,23 +134,42 @@ Section integral_interface.
      rewrite S_Qplus...
     Qed.
 
-    (* As promised, we now move toward the aforementioned generalizations of the
-    boundedness property. We start by generalizing r to QnonNeg. *)
+    (** As promised, we now move toward the aforementioned generalizations of the
+    boundedness property. We start by generalizing mid to CR: *)
+
+    Lemma bounded_with_real_mid (from: Q) (width: Qpos) (mid: CR) (r: Qpos):
+      (forall x, from <= x <= from+width -> ball r (f x) mid) ->
+      ball (width * r) (∫ from width) (scale width mid).
+    Proof with auto.
+     intros H d1 d2.
+     simpl approximate.
+     destruct (Qscale_modulus_pos width d2) as [P E].
+     rewrite E. simpl.
+     set (v := (exist (Qlt 0) (/ width * d2)%Q P)).
+     setoid_replace (d1 + width * r + d2)%Qpos with (d1 + width * (r + v))%Qpos by
+       (unfold QposEq; simpl; field)...
+     apply regFunBall_Cunit.
+     apply integral_bounded_prim.
+     intros.
+     apply ball_triangle with mid...
+     apply ball_approx_r.
+    Qed.
+
+    (** Next, we generalize r to QnonNeg: *)
 
     Lemma bounded_with_nonneg_radius (from: Q) (width: Qpos) (mid: CR) (r: QnonNeg):
       (forall (x: Q), (from <= x <= from+width) -> gball r (f x) mid) ->
-      gball (width * r) (∫ from width) (scale width mid)%CR.
+      gball (width * r) (∫ from width) (scale width mid).
     Proof with auto.
      intro A.
      destruct (QnonNeg.is_pos r) as [[x E] | E].
-      rewrite <- E.
-      apply (ball_gball (width * x)%Qpos), integral_bounded_prim.
-      intros. apply ball_gball.
-      change (x == r)%Q in E. rewrite E...
+      destruct x. simpl in E. subst.
+      apply (ball_gball (width * (exist (Qlt 0) r q))%Qpos), bounded_with_real_mid.
+      intros. apply ball_gball...
      rewrite E Qmult_0_r gball_0.
      apply ball_eq. intro .
      setoid_replace e with (width * (e * Qpos_inv width))%Qpos by (unfold QposEq; simpl; field)...
-     apply integral_bounded_prim.
+     apply bounded_with_real_mid.
      intros q ?.
      setoid_replace (f q) with mid...
      apply -> (@gball_0 CR).
@@ -153,16 +177,16 @@ Section integral_interface.
      rewrite <- E...
     Qed.
 
-    (* Next, we generalize r to a full CR: *)
+    (** Next, we generalize r to a full CR: *)
 
     Lemma bounded_with_real_radius (from: Q) (width: Qpos) (mid: CR) (r: CR) (rnn: CRnonNeg r):
       (forall (x: Q), from <= x <= from+` width -> CRball r mid (f x)) ->
       CRball (scale width r) (∫ from width) (scale width mid).
     Proof with auto.
-     intros...
+     intro A.
      unfold CRball.
      intros.
-     unfold CRball in H0.
+     unfold CRball in A.
      setoid_replace q with (width * (q / width))%Q by (simpl; field; auto).
      assert (r <= ' (q / width)).
       apply (mult_cancel_leEq CRasCOrdField) with (' width).
@@ -184,21 +208,25 @@ Section integral_interface.
      intros. simpl. apply gball_sym...
     Qed.
 
-    (* Finally, we generalize to nonnegative width: *)
+    (** Finally, we generalize to nonnegative width: *)
 
     Lemma integral_bounded (from: Q) (width: QnonNeg) (mid: CR) (r: CR) (rnn: CRnonNeg r)
       (A: forall (x: Q), (from <= x <= from+` width) -> CRball r mid (f x)):
       CRball (scale width r) (∫ from width) (scale width mid).
     Proof with auto.
-     destruct (QnonNeg.is_pos width) as [[??]|?].
-      rewrite <- e.
-      apply (bounded_with_real_radius from x mid r rnn).
-      intros. apply A. rewrite <- e...
-     rewrite e zero_width_integral scale_0 scale_0.
-     apply CRball.reflexive, CRnonNeg_0.
+     revert A.
+     pattern width.
+     apply QnonNeg.is_pos_ind; intros.
+       intros ?? E.
+       split; intro; intros.
+        rewrite <- E. apply H. intros. apply A. rewrite <- E...
+       rewrite E. apply H. intros. apply A. rewrite E...
+      rewrite zero_width_integral scale_0 scale_0.
+      apply CRball.reflexive, CRnonNeg_0.
+     apply (bounded_with_real_radius from q mid r rnn)...
     Qed.
 
-    (* In some context a lower-bound-upper-bound formulation is more convenient
+    (** In some context a lower-bound-upper-bound formulation is more convenient
     than the the ball-based formulation: *)
 
     Lemma integral_lower_upper_bounded (from: Q) (width: QnonNeg) (lo hi: CR):
@@ -230,7 +258,7 @@ Section integral_interface.
      rewrite loE hiE...
     Qed.
 
-    (* We now start working towards unicity. An easy first step is to show
+    (** We now start working towards unicity. An easy first step is to show
      that the integral can be approximated arbitrarily well by a "rectangle"
      at sufficiently small intervals, where "sufficiently" is of course dictated
      by the mu from uniform continuity: *)
@@ -265,12 +293,12 @@ Section integral_interface.
      apply Qplus_le_compat...
     Qed.
 
-    (* Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
+    (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
 
     Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: QposInf) (iw: QnonNeg) (n: nat):
      (n * iw == w)%Qnn ->
      (iw <= mu_ex f e)%QnnInf ->
-     gball_ex (e * w)%QnnInf (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q))%CR (∫ a w).
+     gball_ex (e * w)%QnnInf (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ a w).
     Proof with auto.
      intros A B.
      rewrite <- A at 2.
@@ -285,46 +313,79 @@ Section integral_interface.
      apply QnnInf.mult_comm.
     Qed.
 
-    (* Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
+    (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
 
   End singular_props.
 
   Lemma unique
-    (c1: Integral)
-    (c2: Integral)
+    (c1: Integral f)
+    (c2: Integral f)
     (P1: @Integrable c1)
     (P2: @Integrable c2):
   forall (a: Q) (w: QnonNeg),
-    (@integrate c1 a w == @integrate c2 a w)%CR.
+    @integrate f c1 a w == @integrate f c2 a w.
   Proof with auto.
    intros. apply ball_eq. intros.
-   destruct (QnonNeg.is_pos w).
-    destruct s.
-    rewrite <- e0.
-    clear w e0.
-    destruct (split x (mu_ex f (QposInf_mult  ((1 # 2) * e)%Qpos (Qpos_inv x))))%QposInf.
-    destruct a0.
-    destruct x0.
-    simpl in H.
-    simpl @snd in H0.
-    set ( (((1 # 2) * e)%Qpos * Qpos_inv x))%Qpos in *.
-    setoid_replace (e) with (q * x + q * x)%Qpos.
-     apply ball_triangle with (cmΣ n (fun i: nat => (' `t * f (a + i * `t)%Q))).
-      apply ball_sym.
-      apply ball_gball.
-      apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
+   revert w.
+   apply QnonNeg.is_pos_ind.
+     intros ?? E. rewrite E. reflexivity.
+    do 2 rewrite zero_width_integral...
+   intro x.
+   destruct (split x (mu_ex f (QposInf_mult  ((1 # 2) * e)%Qpos (Qpos_inv x))))%QposInf.
+   destruct a0.
+   destruct x0.
+   simpl in H.
+   simpl @snd in H0.
+   set ( (((1 # 2) * e)%Qpos * Qpos_inv x))%Qpos in *.
+   setoid_replace (e) with (q * x + q * x)%Qpos.
+    apply ball_triangle with (cmΣ n (fun i: nat => (' `t * f (a + i * `t)%Q))).
+     apply ball_sym.
      apply ball_gball.
      apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
-    subst q.
-    unfold QposEq.
-    simpl.
-    rewrite <- Qmult_assoc.
-    rewrite (Qmult_comm (/x)).
-    rewrite Qmult_inv_r.
-     ring.
-    apply Qpos_nonzero.
-   rewrite e0.
-   repeat rewrite zero_width_integral...
+    apply ball_gball.
+    apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
+   subst q.
+   unfold QposEq.
+   simpl.
+   rewrite <- Qmult_assoc.
+   rewrite (Qmult_comm (/x)).
+   rewrite Qmult_inv_r...
+   ring.
   Qed.
 
 End integral_interface.
+
+(** If f==g, then an integral for f is an integral for g. *)
+
+Lemma Integrable_proper_l
+  (f g: Q_as_MetricSpace --> CR)
+   {fint: Integral f}:
+  (forall q: Q, f q == g q) ->
+   @Integrable f fint -> @Integrable g fint.
+Proof with auto.
+ constructor.
+   replace (@integrate g) with (@integrate f) by reflexivity.
+   apply integral_additive...
+  replace (@integrate g) with (@integrate f) by reflexivity.
+  intros.
+  apply integral_bounded_prim...
+  intros.
+  rewrite (H x)...
+ replace (@integrate g) with (@integrate f) by reflexivity.
+ apply integral_wd...
+Qed.
+
+Lemma integrate_proper
+  (f g: Q_as_MetricSpace --> CR)
+  {fint: Integral f} {gint: Integral g}
+  `{!@Integrable f fint}
+  `{!Integrable g}:
+  (forall q: Q, f q == g q) ->
+  forall (a: Q) (w: QnonNeg),
+  @integrate f fint a w == @integrate g gint a w.
+Proof.
+ intros.
+ apply (unique g fint gint).
+  apply (Integrable_proper_l f g H0 H).
+ assumption.
+Qed.
