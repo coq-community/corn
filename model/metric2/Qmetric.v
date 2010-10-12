@@ -244,3 +244,79 @@ Proof with auto.
  simpl QposAsQ in *.
  apply Q.Qabs_diff_Qle...
 Qed.
+
+Lemma in_centered_Qball (w: Qpos) (m x: Q):
+  m <= x <= m + w ->
+  Qball ((1#2) * w) (m + (1#2) * w) x.
+Proof.
+ intros ??? [??].
+ apply in_Qball.
+ split; simpl; ring_simplify; assumption.
+Qed. 
+
+Section Qball_Qmult.
+
+  Variables (d z: Qpos) (x y: Q) (B: Qball (d / z) x y).
+
+  Lemma Qball_Qmult_r: Qball d (x * z) (y * z).
+  Proof.
+   intros.
+   apply Qball_Qabs.
+   apply Qball_Qabs in B.
+   setoid_replace (x * z - y * z) with ((x - y) * z)%Q by (simpl; ring).
+   rewrite Qabs_Qmult.
+   setoid_replace (Qabs z) with z.
+    setoid_replace (QposAsQ d) with  (d * Qpos_inv z * z).
+     apply Qmult_le_compat_r. assumption.
+     apply Qpos_nonneg.
+    simpl. field. apply Qpos_nonzero.
+   apply Qabs_pos, Qpos_nonneg.
+  Qed.
+
+  Lemma Qball_Qmult_l: Qball d (z * x) (z * y).
+  Proof.
+   intros.
+   do 2 rewrite (Qmult_comm z).
+   apply Qball_Qmult_r.
+  Qed.
+
+End Qball_Qmult.
+
+Lemma Qball_plus (e d: Qpos) (x x' y y': Q):
+ Qball e x x' -> Qball d y y' -> Qball (e + d) (x + y) (x' + y').
+Proof with auto.
+ intros.
+ apply ball_triangle with (x' + y); apply Qball_Qabs.
+  setoid_replace (x + y - (x' + y))%Q with (x - x') by (simpl; ring).
+  apply Qball_Qabs...
+ setoid_replace (x' + y - (x' + y')) with (y - y') by (simpl; ring).
+ apply Qball_Qabs...
+Qed.
+
+Lemma Qball_plus_r (e: Qpos) (x y y': Q):
+ Qball e y y' -> Qball e (x + y) (x + y').
+Proof with auto.
+ intros e x y y' B.
+ apply Qball_Qabs.
+ apply Qball_Qabs in B.
+ setoid_replace (x + y - (x + y')) with (y - y') by (simpl; ring)...
+Qed.
+
+Require Import Qround.
+
+Lemma Qfloor_ball q:
+  Qball (1#2) (Qfloor q + (1#2)) q.
+Proof with auto with *.
+ intros.
+ apply Qball_Qabs.
+ simpl QposAsQ.
+ apply Qabs_case; intros.
+  apply Q.Qplus_le_l with ((-1#2)%Q + q).
+  ring_simplify...
+ apply Q.Qplus_le_l with ((-1#2)%Q + Qfloor q + 1).
+ ring_simplify.
+ setoid_replace (Qfloor q + 1) with ((Qfloor q + 1)%Z:Q)...
+ symmetry.
+ rewrite injz_plus.
+ reflexivity.
+Qed.

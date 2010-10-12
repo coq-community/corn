@@ -57,6 +57,20 @@ Proof. rewrite <- (Zle_Qle 0). apply Zle_0_nat. Qed.
 Lemma inject_Z_injective (a b: Z): inject_Z a = inject_Z b <-> a = b.
 Proof. unfold inject_Z. split; congruence. Qed.
 
+Lemma Qeq_Zeq (a b: Z): (inject_Z a == inject_Z b) = (a = b).
+Proof.
+ unfold Qeq.
+ simpl.
+ intros.
+ do 2 rewrite Zmult_1_r.
+ reflexivity.
+Qed.
+
+Lemma positive_nonzero_in_Q (p: positive): ~ inject_Z (Zpos p) == 0.
+Proof. discriminate. Qed.
+
+Hint Immediate positive_nonzero_in_Q.
+
 (* Properties of arithmetic: *)
 
 Lemma Qmult_injective_l (z: Q) (Znz: ~ z == 0): forall x y, (x * z == y * z <-> x == y).
@@ -103,6 +117,11 @@ Qed.
 
 (* Properties of arithmetic w.r.t. order: *)
 
+Lemma Qpos_nonNeg (n d: positive): 0 <= Zpos n # d.
+Proof. discriminate. Qed.
+
+Hint Immediate Qpos_nonNeg.
+
 Lemma Qplus_le_l (z x y : Q): x + z <= y + z <-> x <= y.
 Proof with auto with *.
  split; intros.
@@ -114,6 +133,26 @@ Qed.
 
 Lemma Qplus_le_r (z x y : Q): z + x <= z + y <-> x <= y.
 Proof. do 2 rewrite (Qplus_comm z). apply Qplus_le_l. Qed.
+
+Lemma Qplus_lt_r: forall (x y: Q), x < y -> forall z, x + z < y + z.
+Proof with auto.
+ intros [xn xd] [yn yd] H [zn zd].
+ unfold Qlt in *.
+ unfold Qplus.
+ simpl in *.
+ ring_simplify.
+ repeat rewrite Zpos_mult_morphism.
+ apply Zplus_lt_le_compat.
+  replace (xn * ' zd * (' yd * ' zd))%Z with (xn * ' yd * (' zd * ' zd))%Z by ring.
+  replace (' zd * yn * (' xd * ' zd))%Z with (yn * ' xd * (' zd * ' zd))%Z by ring.
+  apply Zmult_lt_compat_r...
+  apply Zmult_lt_0_compat; reflexivity.
+ ring_simplify.
+ apply Zle_refl.
+Qed.
+
+Lemma Qmult_le_compat_l (x y z : Q): x <= y -> 0 <= z -> z * x <= z * y.
+Proof. do 2 rewrite (Qmult_comm z). apply Qmult_le_compat_r. Qed.
 
 Lemma Qopp_Qlt_0_l (x: Q): 0 < -x <-> x < 0.
 Proof.
@@ -135,6 +174,15 @@ Qed.
 
 Hint Resolve Qmult_lt_0_compat.
 
+Lemma Qmult_nonneg_nonpos (x y: Q):
+  0 <= x -> y <= 0 -> x * y <= 0.
+Proof with auto.
+ unfold Qle. simpl.
+ repeat rewrite Zmult_1_r. intros.
+ rewrite <- (Zmult_0_r (Qnum x)).
+ apply (Zmult_le_compat_l (Qnum y) 0 (Qnum x))...
+Qed.
+
 Lemma Qplus_lt_le_0_compat x y: 0 < x -> 0 <= y -> 0 < x + y.
 Proof with auto.
  unfold Qlt, Qle. simpl.
@@ -150,6 +198,13 @@ Lemma Qplus_le_lt_0_compat x y: 0 <= x -> 0 < y -> 0 < x + y.
 Proof.
  rewrite Qplus_comm. intros.
  apply (Qplus_lt_le_0_compat y x); assumption.
+Qed.
+
+Lemma Qplus_nonneg (x y: Q): 0 <= x -> 0 <= y -> 0 <= x + y.
+Proof.
+ intros.
+ change (0 + 0 <= x + y).
+ apply Qplus_le_compat; assumption.
 Qed.
 
 Lemma Qabs_Qle x y: (Qabs x <= y) <-> (-y <= x <= y).
@@ -182,3 +237,29 @@ Proof with try ring.
  intuition.
 Qed.
  
+Lemma Qdiv_le_1 (x y: Q): 0 <= x <= y -> x / y <= 1.
+Proof with intuition.
+ intros.
+ assert (0 <= y) as ynnP by (apply Qle_trans with x; intuition).
+ destruct y.
+ destruct Qnum.
+   change (x * 0 <= 1).
+   rewrite Qmult_0_r...
+  rewrite <- (Qmult_inv_r ('p # Qden)).
+   unfold Qdiv.
+   apply Qmult_le_compat_r...
+  discriminate.
+ exfalso. apply ynnP...
+Qed.
+
+Lemma nat_lt_Qlt n m: (n < m)%nat -> (inject_Z (Z_of_nat n) + (1#2) < inject_Z (Z_of_nat m))%Q.
+Proof with intuition.
+ unfold lt.
+ intros.
+ apply Qlt_le_trans with (inject_Z (Z_of_nat n) + 1).
+  do 2 rewrite (Qplus_comm (inject_Z (Z_of_nat n))).
+  apply Qplus_lt_r...
+ pose proof (inj_le _ _ H).
+ rewrite Zle_Qle in H0.
+ rewrite <- S_Qplus...
+Qed.
