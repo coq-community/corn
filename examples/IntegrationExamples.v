@@ -20,7 +20,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import Integration.
+Require Import AbstractIntegration SimpleIntegration.
 Require Import CRtrans.
+Require QnonNeg.
+Import QnonNeg.notations.
 
 (* The answer function returns an approximation of r within 10^-n.
 Take the resulting integer and divide by 10^n to get the actual rational approximation.
@@ -38,7 +41,9 @@ Definition answer (n:positive) (r:CR) : Z :=
 (* Integrate01 requires that we integrate uniformly continuous functions.
    Therefore we cannot integerate (sin : CR -> CR), we must instead
    integrate the UniformlyContinuousFunction (sin_uc : Q --> CR). *)
-Time Eval vm_compute in answer 3 (Integrate01 sin_uc).
+
+Time Eval vm_compute in answer 3 (Integrate sin_uc 3 (1#2)).
+Time Eval vm_compute in answer 3 (∫ sin_uc 3 (1#2)%Qnn).
 
 (* Integrate01 the x^2 function 
 Time Eval vm_compute in answer 3 (Integrate01 (uc_compose (CRpower_positive_bounded 2 (1#1)) Cunit)).

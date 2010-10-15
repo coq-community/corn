@@ -5,7 +5,10 @@ Require Import
  Program
  CRArith CRabs
  Qauto Qround Qmetric
- stdlib_omissions.P stdlib_omissions.Z stdlib_omissions.Q.
+ stdlib_omissions.P
+ stdlib_omissions.Z
+ stdlib_omissions.Q
+ stdlib_omissions.N.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
@@ -44,12 +47,6 @@ Qed.
 (** Riemann sums will play an important role in the theory about integrals, so let's
 define very simple summation and a key property thereof: *)
 
-Fixpoint enum (n: nat): list nat :=
-  match n with
-  | O => nil
-  | S n' => n' :: enum n'
-  end.
-
 Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum M (map f (enum n)).
 
 (** If the elementwise distance between two summations over the same domain
@@ -75,6 +72,8 @@ Hint Immediate ball_refl Qle_refl.
 
 Class Integral (f: Q_as_MetricSpace --> CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
+Implicit Arguments integrate [[Integral]].
+
 Notation "∫" := integrate.
 
 Section integral_interface.
@@ -83,13 +82,13 @@ Section integral_interface.
 
   Class Integrable `{!Integral f}: Prop :=
     { integral_additive:
-      forall (a: Q) b c, ∫ a b + ∫ (a+` b) c == ∫ a (b+c)%Qnn
+      forall (a: Q) b c, ∫ f a b + ∫ f (a+` b) c == ∫ f a (b+c)%Qnn
 
     ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
       (forall x, from <= x <= from+width -> ball r (f x) ('mid)) ->
-      ball (width * r) (∫ from width) (' (width * mid))
+      ball (width * r) (∫ f from width) (' (width * mid))
 
-    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) ∫
+    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f)
    }.
 
   (** This closely resembles the axiomatization given in
@@ -110,9 +109,9 @@ Section integral_interface.
 
     (** The additive property implies that zero width intervals have zero surface: *)
 
-    Lemma zero_width_integral q: ∫ q 0%Qnn == '0.
+    Lemma zero_width_integral q: ∫ f q 0%Qnn == '0.
     Proof with auto.
-     apply CRplus_eq_l with (∫ q 0%Qnn).
+     apply CRplus_eq_l with (∫ f q 0%Qnn).
      generalize (integral_additive q 0%Qnn 0%Qnn).
      rewrite Qplus_0_r QnonNeg.plus_0_l CRplus_0_l...
     Qed.
@@ -120,7 +119,7 @@ Section integral_interface.
     (** Iterating the additive property yields: *)
 
     Lemma integral_repeated_additive (a: Q) (b: QnonNeg) (n: nat):
-        cmΣ n (fun i: nat => ∫ (a + i * ` b) b) == ∫ a (n * b)%Qnn.
+        cmΣ n (fun i: nat => ∫ f (a + i * ` b) b) == ∫ f a (n * b)%Qnn.
     Proof with try ring.
      unfold cmΣ.
      induction n; simpl cm_Sum.
@@ -139,7 +138,7 @@ Section integral_interface.
 
     Lemma bounded_with_real_mid (from: Q) (width: Qpos) (mid: CR) (r: Qpos):
       (forall x, from <= x <= from+width -> ball r (f x) mid) ->
-      ball (width * r) (∫ from width) (scale width mid).
+      ball (width * r) (∫ f from width) (scale width mid).
     Proof with auto.
      intros H d1 d2.
      simpl approximate.
@@ -159,7 +158,7 @@ Section integral_interface.
 
     Lemma bounded_with_nonneg_radius (from: Q) (width: Qpos) (mid: CR) (r: QnonNeg):
       (forall (x: Q), (from <= x <= from+width) -> gball r (f x) mid) ->
-      gball (width * r) (∫ from width) (scale width mid).
+      gball (width * r) (∫ f from width) (scale width mid).
     Proof with auto.
      pattern r.
      apply QnonNeg.Qpos_ind.
@@ -183,7 +182,7 @@ Section integral_interface.
 
     Lemma bounded_with_real_radius (from: Q) (width: Qpos) (mid: CR) (r: CR) (rnn: CRnonNeg r):
       (forall (x: Q), from <= x <= from+` width -> CRball r mid (f x)) ->
-      CRball (scale width r) (∫ from width) (scale width mid).
+      CRball (scale width r) (∫ f from width) (scale width mid).
     Proof with auto.
      intro A.
      unfold CRball.
@@ -214,7 +213,7 @@ Section integral_interface.
 
     Lemma integral_bounded (from: Q) (width: QnonNeg) (mid: CR) (r: CR) (rnn: CRnonNeg r)
       (A: forall (x: Q), (from <= x <= from+` width) -> CRball r mid (f x)):
-      CRball (scale width r) (∫ from width) (scale width mid).
+      CRball (scale width r) (∫ f from width) (scale width mid).
     Proof with auto.
      revert A.
      pattern width.
@@ -233,7 +232,7 @@ Section integral_interface.
 
     Lemma integral_lower_upper_bounded (from: Q) (width: QnonNeg) (lo hi: CR):
       (forall (x: Q), (from <= x <= from+` width)%Q -> lo <= f x /\ f x <= hi) ->
-      scale (` width) lo <= ∫ from width /\ ∫ from width <= scale (` width) hi.
+      scale (` width) lo <= ∫ f from width /\ ∫ f from width <= scale (` width) hi.
     Proof with auto with *.
      intro A.
      assert (from <= from <= from + `width) as B.
@@ -267,7 +266,7 @@ Section integral_interface.
 
     Lemma gball_integral (e: QposInf) (w: QnonNeg):
       (w <= mu_ex f e)%QnnInf ->
-      forall a, gball_ex (w * e)%QnnInf (' w * (f a)) (∫ a w).
+      forall a, gball_ex (w * e)%QnnInf (' w * (f a)) (∫ f a w).
     Proof with auto.
      intros A ?.
      destruct e...
@@ -300,7 +299,7 @@ Section integral_interface.
     Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: QposInf) (iw: QnonNeg) (n: nat):
      (n * iw == w)%Qnn ->
      (iw <= mu_ex f e)%QnnInf ->
-     gball_ex (e * w)%QnnInf (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ a w).
+     gball_ex (e * w)%QnnInf (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ f a w).
     Proof with auto.
      intros A B.
      rewrite <- A at 2.
@@ -414,7 +413,7 @@ Section extension_to_nn_width.
       (fun _ _ => '0)
       (fun n d _ => pre_integral from (QposMake n d)).
 
-  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) ∫.
+  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) (∫ f).
   Proof with auto.
    intros ?????.
    induction x0 using QnonNeg.rect;
@@ -427,13 +426,13 @@ Section extension_to_nn_width.
 
   Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
     (forall x, from <= x <= from + width -> ball r (f x) (' mid)) ->
-    ball (width * r) (∫ from width) (' (width * mid)).
+    ball (width * r) (∫ f from width) (' (width * mid)).
   Proof.
    induction width using Qpos_positive_numerator_rect.
    apply (pre_bounded from (a#b) mid r).
   Qed.
 
-  Let additive (a: Q) (b c: QnonNeg): ∫ a b + ∫ (a + `b)%Q c  == ∫ a (b + c)%Qnn.
+  Let additive (a: Q) (b c: QnonNeg): ∫ f a b + ∫ f (a + `b)%Q c  == ∫ f a (b + c)%Qnn.
   Proof.
    unfold integrate.
    induction b using QnonNeg.rect;

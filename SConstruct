@@ -2,7 +2,7 @@ import os, glob, string
 
 ssrdir = os.environ["SSRDIR"]
 
-dirs_to_compile = ['algebra', 'complex', 'coq_reals', 'fta', 'ftc', 'logic', 'metrics', 'model', 'raster', 'reals', 'tactics', 'transc', 'order', 'metric2', 'Liouville', 'examples', 'stdlib_omissions']
+dirs_to_compile = ['algebra', 'complex', 'coq_reals', 'fta', 'ftc', 'logic', 'metrics', 'model', 'raster', 'reals', 'tactics', 'transc', 'order', 'metric2', 'Liouville', 'examples', 'stdlib_omissions', 'util']
 
 nodes = map(lambda x: './' + x, dirs_to_compile)
 dirs = []

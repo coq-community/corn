@@ -302,6 +302,17 @@ Proof with auto.
  setoid_replace (x + y - (x + y')) with (y - y') by (simpl; ring)...
 Qed.
 
+Lemma Qball_Qdiv_inv (d z: Qpos) (x y: Q):
+  Qball (d / z) (x / z) (y / z) -> Qball d x y.
+Proof with auto.
+ intros.
+ rewrite
+   <- (Qmult_1_r x), <- (Qmult_1_r y),
+   <- (Qmult_inv_r z), (Qmult_comm z),
+   Qmult_assoc, Qmult_assoc...
+ apply Qball_Qmult_r...
+Qed.
+
 Require Import Qround.
 
 Lemma Qfloor_ball q:

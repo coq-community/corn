@@ -479,7 +479,6 @@ Proof with auto with *.
    apply Qlt_le_weak.
    apply Q.Qmult_lt_0_compat...
   simpl. field. split...
-  apply (Qpos_nonzero p).
  elim (Qle_not_lt _ _ H).
  apply Qlt_trans with 0...
  apply Q.Qmult_lt_0_compat...
@@ -610,6 +609,10 @@ Definition Integrate01 f := IntegrateWithMeasure f id01.
 
 Definition ContinuousSup01 f :=
 (uc_compose sup (Cbind (LinfStepQPrelengthSpace) (ComposeContinuous f))) id01.
+
+(** Integrating a different range is just a matter of scaling and translating a little: *)
+Definition Integrate (f: Q_as_MetricSpace --> CR) (from width: Q): CR :=
+  (' width * Integrate01 (f ∘ Qplus_uc from ∘ Qscale_uc width))%CR.
 
 (** Our integral on [[0,1]] is correct. *)
 Lemma Integrate01_correct : forall F (H01:Zero[<=](One:IR)) (HF:Continuous_I H01 F)

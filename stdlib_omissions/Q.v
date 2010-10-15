@@ -102,6 +102,9 @@ Proof with auto.
  intros [A ?]. rewrite A. field...
 Qed.
 
+Lemma Qdiv_1_r (q: Q): q / 1 == q.
+Proof. field. Qed.
+
 Lemma show_is_Qinv x q: x * q == 1 -> x == / q.
 Proof. intros. apply Qinv_char. assumption. Qed.
 
