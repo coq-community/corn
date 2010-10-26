@@ -755,7 +755,6 @@ End p71E2b2.
 
 Definition FS_id (A : CSetoid) : FS_as_CSetoid A A.
 Proof.
- intro A.
  unfold FS_as_CSetoid in |- *.
  simpl in |- *.
  exact (id_un_op A).

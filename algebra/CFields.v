@@ -88,7 +88,6 @@ Record CField : Type :=
 
 Definition f_rcpcl' (F : CField) : PartFunct F.
 Proof.
- intro F.
  apply Build_PartFunct with (fun x : F => x [#] Zero) (cf_rcpcl F).
   red in |- *; intros; astepl x. auto.
   exact (cf_rcpsx F).

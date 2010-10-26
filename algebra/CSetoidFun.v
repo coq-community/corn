@@ -171,14 +171,13 @@ End unary_function_composition.
 Definition comp (A B C : CSetoid) :
   FS_as_CSetoid A B -> FS_as_CSetoid B C -> FS_as_CSetoid A C.
 Proof.
- intros A B C f g.
+ intros f g.
  set (H := compose_CSetoid_fun A B C f g) in *.
  exact H.
 Defined.
 
 Definition comp_as_bin_op (A:CSetoid) : CSetoid_bin_op (FS_as_CSetoid A A).
 Proof.
- intro A.
  unfold CSetoid_bin_op in |- *.
  eapply Build_CSetoid_bin_fun with (comp A A A).
  unfold bin_fun_strext in |- *.
@@ -240,7 +239,6 @@ Section unary_and_binary_function_composition.
 Definition compose_CSetoid_bin_un_fun (A B C : CSetoid)
   (f : CSetoid_bin_fun B B C) (g : CSetoid_fun A B) : CSetoid_bin_fun A A C.
 Proof.
- intros A B C f g.
  apply (Build_CSetoid_bin_fun A A C (fun a0 a1 : A => f (g a0) (g a1))).
  intros x1 x2 y1 y2 H0.
  assert (H10:= csbf_strext B B C f).
@@ -253,7 +251,6 @@ Defined.
 Definition compose_CSetoid_bin_fun A B C (f g : CSetoid_fun A B)
   (h : CSetoid_bin_fun B B C) : CSetoid_fun A C.
 Proof.
- intros A B C f g h.
  apply (Build_CSetoid_fun A C (fun a : A => h (f a) (g a))).
  intros x y H.
  elim (csbf_strext _ _ _ _ _ _ _ _ H); apply csf_strext.
@@ -262,8 +259,7 @@ Defined.
 Definition compose_CSetoid_un_bin_fun A B C (f : CSetoid_bin_fun B B C)
  (g : CSetoid_fun C A) : CSetoid_bin_fun B B A.
 Proof.
- intros A0 B0 C f g.
- apply Build_CSetoid_bin_fun with (fun x y : B0 => g (f x y)).
+ apply Build_CSetoid_bin_fun with (fun x y : B => g (f x y)).
  intros x1 x2 y1 y2.
  case f.
  simpl in |- *.
@@ -1046,7 +1042,7 @@ Implicit Arguments inv [A B].
 
 Definition invfun A B (f : CSetoid_fun A B) (H : bijective f) : B -> A.
 Proof.
- intros A B f H H0.
+ intros H0.
  elim (inv f H H0); intros a H2.
  apply a.
 Defined.

@@ -137,7 +137,6 @@ Canonical Structure mult_as_bin_fun.
 Definition plus1 (n:nat)(m:nat): (n_ary_operation 1 nat_as_CSetoid).
 Proof.
  simpl.
- intros n  m.
  apply (projected_bin_fun _ _ _ plus_is_bin_fun (plus_is_bin_fun n m)).
 Defined.
 
@@ -183,7 +182,6 @@ Qed.
 Definition plus2 (n:nat): (n_ary_operation 2 nat_as_CSetoid).
 Proof.
  simpl.
- intro n.
  apply Build_CSetoid_fun with (fun m => (plus1 n m)).
  apply to_plus1_strext.
 Defined.

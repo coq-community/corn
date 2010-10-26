@@ -98,6 +98,7 @@ Qed.
 
 Definition CRlim (s:CauchySeq CRasCOrdField) : CR.
 Proof.
+ revert s.
  intros [f Hf].
  apply (ucFun (@Cjoin Q_as_MetricSpace)).
  exists (fun e:QposInf => match e with | QposInfinity => (inject_Q 0)

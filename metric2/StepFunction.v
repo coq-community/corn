@@ -594,6 +594,7 @@ Add Parametric Relation X : (StepF X) (@StepF_Qeq X)
 (** Step functions are a functor *)
 Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
 Proof.
+ revert X Y.
  fix 4. intros X Y f [x| a t1 t2].
  exact (constStepF (f x)).
  exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
@@ -664,7 +665,7 @@ Hint Resolve StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
 Lemma SplitMap (X Y:Type):forall x:(StepF X), forall a, forall f:X->Y,
     (Split (Map f x) a) = let (l,r) := Split x a in (Map f l,Map f r).
 Proof.
- intros X Y s a f. revert a. induction s. simpl; auto.
+ intros s a f. revert a. induction s. simpl; auto.
  intros a.
  simpl.
  destruct (Q_dec a o) as [[H0|H0]|H0].
@@ -725,7 +726,7 @@ Qed.
 Lemma MirrorMap (X Y:Type) : forall (f: X -> Y) s,
  (Mirror (Map f s)) = (Map f (Mirror s)).
 Proof.
- intros X Y f.
+ intros f.
  induction s.
   reflexivity.
  change (Mirror (glue o (Map f s1) (Map f s2)) =
@@ -738,7 +739,6 @@ Qed.
 Lemma MirrorAp_Qeq (X Y: Type) : forall (f: StepF (X -> Y)) s,
  StepF_Qeq (Mirror (f <@> s)) ((Mirror f) <@> (Mirror s)).
 Proof.
- intros X Y.
  induction f; intros s.
   simpl.
   rewrite MirrorMap.
@@ -764,7 +764,7 @@ Qed.
 Lemma SplitRAp_Qeq (X Y:Type) : forall (f: StepF (X -> Y)) s o,
  StepF_Qeq (SplitR (f <@> s) o) ((SplitR f o) <@> (SplitR s o)).
 Proof.
- intros X Y f s o.
+ intros f s o.
  eapply StepF_Qeq_trans.
   apply StepF_Qeq_sym.
   apply MirrorMirror.

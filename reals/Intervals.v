@@ -412,7 +412,7 @@ Let aux_seq_lub (P : IR -> CProp) (H : totally_bounded P) :
     (fun x : IR =>
      P x and (forall y : IR, P y -> y[-]x [<=] Two[*]one_div_succ k)).
 Proof.
- intros P H; elim H; clear H; intros non_empty H k.
+ elim H; clear H; intros non_empty H k.
  elim (H (one_div_succ k) (one_div_succ_pos IR k)).
  intros l Hl' Hl; clear H.
  cut {y : IR | member y l | maxlist l[-]one_div_succ k [<=] y}.
@@ -585,7 +585,7 @@ Let aux_seq_glb (P : IR -> CProp) (H : totally_bounded P) :
     (fun x : IR =>
      P x and (forall y : IR, P y -> x[-]y [<=] Two[*]one_div_succ k)).
 Proof.
- intros P H; elim H; clear H; intros non_empty H k.
+ elim H; clear H; intros non_empty H k.
  elim (H (one_div_succ k) (one_div_succ_pos IR k)).
  intros l Hl' Hl; clear H.
  cut {y : IR | member y l | y [<=] minlist l[+]one_div_succ k}.

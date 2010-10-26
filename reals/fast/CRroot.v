@@ -549,10 +549,8 @@ End SquareRoot.
 
 (** By scaling the input the range of square root can be extened upto 4^n.
 *)
-Definition rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4^n)%Z) : CR.
-Proof.
- fix 1.
- intros n.
+Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4^n)%Z) : CR.
+ revert a Ha.
  destruct n as [|n].
   intros _ _.
   exact ('1)%CR.
@@ -640,10 +638,8 @@ Qed.
 
 (** By scaling the other direction we can extend the range down to 4^(-n).
 *)
-Definition rational_sqrt_small_bounded (n:nat) a (Ha:/(4^n)%Z <= a <= 4) : CR.
-Proof.
- fix 1.
- intros n.
+Fixpoint rational_sqrt_small_bounded (n:nat) a (Ha:/(4^n)%Z <= a <= 4) : CR.
+ revert a Ha.
  destruct n as [|n].
   clear rational_sqrt_small_bounded.
   refine (@rational_sqrt_mid).
@@ -715,7 +711,6 @@ Qed.
 (** And hence it is defined for all postive numbers. *)
 Definition rational_sqrt_pos a (Ha:0<a) : CR.
 Proof.
- intros a Ha.
  destruct (Qle_total 1 a).
   refine (@rational_sqrt_big_bounded _ a _).
   split.

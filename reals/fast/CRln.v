@@ -227,8 +227,9 @@ Proof.
 Qed.
 
 Definition ln_scale_power_factor q (Hq:0 < q) : Z.
- intros [[|n|n] d] Hq; try abstract discriminate Hq.
 Proof.
+ revert q Hq.
+ intros [[|n|n] d] Hq; try abstract discriminate Hq.
  exact (Zpred (log_inf d - (log_sup n)))%Z.
 Defined.
 
@@ -269,7 +270,6 @@ Qpos2QposInf (c*e).
 
 Lemma ln_pos_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
 Proof.
- intros c.
  set (lnf := fun x => match (Qlt_le_dec 0 x) with | left p => rational_ln p | right _ => ('0)%CR end).
  apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (Qscale_modulus (Qpos_inv c)).
    intros x.

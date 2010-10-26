@@ -332,7 +332,7 @@ Proof with auto.
  intro.
  assert (x - x == ' 0)%CR by ring.
  intros.
- generalize (CRpos_wd H H0).
+ generalize (CRpos_wd H0 H).
  unfold CRpos.
  intros.
  destruct H1.
@@ -366,7 +366,7 @@ Qed.
   (* And the same for gball: *)
 Lemma in_CRgball (r: Q) (x y: CR): x - ' r <= y /\ y <= x + ' r <-> gball r x y.
 Proof with intuition.
- intros r x y. unfold gball.
+ unfold gball.
  destruct Qdec_sign as [[?|?]|?].
    intuition.
    generalize (CRle_trans H0 H1).
@@ -387,7 +387,6 @@ Qed.
 Lemma CRgball_plus (x x' y y': CR) e1 e2:
   gball e1 x x' -> gball e2 y y' -> gball (e1 + e2) (x + y)%CR (x' + y')%CR.
 Proof with auto.
- intros ??????.
  do 3 rewrite <- in_CRgball.
  intros [A B] [C D].
  CRring_replace (x + y - ' (e1 + e2)) (x - ' e1 + (y - ' e2)).
@@ -399,7 +398,7 @@ Lemma Qlt_from_CRlt (a b: Q): (' a < ' b)%CR -> (a < b)%Q.
 Proof with auto.
  unfold CRlt.
  unfold CRpos.
- intros a b [[e p] H].
+ intros [[e p] H].
  revert H.
  simpl.
  rewrite CRminus_Qminus.
@@ -422,7 +421,7 @@ Qed.
 
 Lemma CRle_lt_trans (x y z: CR): x <= y -> y < z -> x < z.
 Proof with auto.
- intros x y z ? [e ?]. exists e.
+ intros ? [e ?]. exists e.
  apply CRle_trans with (z - y)%CR...
  assert (z - x - (z - y) == y - x)%CR as E by ring.
  unfold CRle.
@@ -431,7 +430,7 @@ Qed.
 
 Lemma CRlt_le_trans (x y z: CR): x < y -> y <= z -> x < z.
 Proof with auto.
- intros x y z [e ?] ?. exists e.
+ intros [e ?] ?. exists e.
  apply CRle_trans with (y - x)%CR...
  assert (z - x - (y - x) == z - y)%CR as E by ring.
  unfold CRle.
@@ -461,7 +460,7 @@ Hint Immediate lower_CRapproximation upper_CRapproximation.
 
 Lemma CRlt_Qmid (x y: CR): x < y -> { q: Q & x < 'q and 'q < y }.
 Proof with auto.
- intros x y [q E].
+ intros [q E].
  set (quarter := ((1#4)*q)%Qpos).
  exists (quarter + (approximate x quarter + quarter))%Q.
  split.
@@ -494,7 +493,6 @@ Qed.
 
 Lemma CRnonNeg_le_0 x: CRnonNeg x <-> '0 <= x.
 Proof.
- intro x.
  unfold CRle.
  assert (x - '0 == x)%CR as E by ring.
  rewrite E.
@@ -558,7 +556,6 @@ Proof with auto with qarith.
   rewrite <- (Qmult_1_r e0) at 2.
   rewrite (Qmult_comm e0).
   apply Qmult_le_compat_r...
-  discriminate.
  apply Qle_refl.
 Qed.
 
@@ -603,7 +600,7 @@ Proof with auto.
 Qed.
 
 Lemma scale_0 x: scale 0 x == '0.
-Proof. intro. rewrite <- CRmult_scale. ring. Qed.
+Proof. rewrite <- CRmult_scale. ring. Qed.
 
 Lemma scale_CRplus (q: Q) (x y: CR): scale q (x + y) == scale q x + scale q y.
 Proof. intros. do 3 rewrite <- CRmult_scale. ring. Qed.

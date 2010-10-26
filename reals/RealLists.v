@@ -97,7 +97,7 @@ Implicit Arguments cons [A].
 Definition map2 (F : PartIR) (l : list IR) :
  (forall y, member y l -> Dom F y) -> list IR.
 Proof.
- intros F l H.
+ intros H.
  induction l as [| a l Hrecl].
   apply (@nil IR).
  apply cons.

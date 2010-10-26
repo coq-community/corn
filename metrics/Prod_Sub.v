@@ -51,7 +51,6 @@ $\RR^{2}$ #IR<SUP>2</SUP># out of the metric of $\RR$ #IR#.
 
 Definition dprod0 (A B : CPsMetricSpace) (c d : prodT A B) : IR.
 Proof.
- intros A B c d.
  case c.
  intros c0 c1.
  case d.
@@ -322,7 +321,6 @@ Implicit Arguments SubPsMetricSpace [X].
 Definition from_SubPsMetricSpace (X : CPsMetricSpace)
   (P : X -> CProp) : SubPsMetricSpace P -> X.
 Proof.
- intros X p.
  unfold SubPsMetricSpace in |- *.
  simpl in |- *.
  intro x.

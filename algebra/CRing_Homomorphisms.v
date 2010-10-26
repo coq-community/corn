@@ -179,7 +179,6 @@ Hint Rewrite rh_pres_zero rh_pres_plus rh_pres_minus rh_pres_inv rh_pres_mult rh
 
 Definition RHid R : RingHom R R.
 Proof.
- intros R.
  exists (id_un_op R).
    intros x y; apply eq_reflexive.
   intros x y; apply eq_reflexive.

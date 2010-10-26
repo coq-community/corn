@@ -247,7 +247,7 @@ Qed.
 
 Definition CS_seq_recip_seq (n : nat) : R.
 Proof.
- intro n; elim (lt_le_dec n N); intro Hdec.
+ elim (lt_le_dec n N); intro Hdec.
   apply (One:R).
  apply (One[/] _[//]CS_seq_recip_def n Hdec).
 Defined.

@@ -35,7 +35,7 @@ Set Implicit Arguments.
 relation with it. *)
 Definition StepFS (X:Setoid):Setoid.
 Proof.
- intro X. exists (StepF X) (@StepF_eq X).
+ exists (StepF X) (@StepF_eq X).
  apply StepF_Sth.
 Defined.
 
@@ -56,7 +56,7 @@ Definition SplitLS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
 
 Definition SplitLS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
 Proof.
- intros X o.
+ intros o.
  exists (fun x => (SplitLS0 o x)).
  abstract (intros; apply: SplitL_wd;auto with *).
 Defined.
@@ -66,14 +66,13 @@ Definition SplitRS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
 
 Definition SplitRS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
 Proof.
- intros X o.
+ intros o.
  exists (fun x => (SplitRS0 o x)).
  abstract (intros; apply: SplitR_wd;auto with *).
 Defined.
 
 Definition MirrorS(X:Setoid):(StepFS X)-->(StepFS X).
 Proof.
- intro X.
  exists (@Mirror X).
  abstract (intros; change (Mirror x1 == Mirror x2); rewrite -> Mirror_eq_Mirror; assumption).
 Defined.
@@ -83,7 +82,6 @@ Defined.
 Definition StFBind00(X Y:Setoid) :
   (StepFS X) -> (X --> (StepFS Y)) -> (StepFS Y).
 Proof.
- intros X Y .
  fix 1. intro m. case m.
  intros x f.
   exact (f x).
@@ -108,7 +106,7 @@ Qed.
 Definition StFBind1(X Y:Setoid) :
   (StepFS X) -> (X --> (StepFS Y)) --> (StepFS Y).
 Proof.
- intros X Y m.
+ intros m.
  exists (fun f=> (@StFBind00 X Y m f)).
  apply StFBind_wd1.
 Defined.
@@ -192,7 +190,6 @@ Lemma StFBind_wd(X Y:Setoid): forall x1 x2 : StepFS X,
 st_eq  x1 x2 ->
 st_eq (StFBind1 Y x1) (StFBind1 Y x2).
 Proof.
- intros X Y.
  induction x1 using StepF_ind. intro y.
   induction y using StepF_ind. simpl. intro H.
    intro f. apply f. auto with *.
@@ -220,7 +217,6 @@ Qed.
 Definition StFBind(X Y:Setoid) :
   (StepFS X) --> (X --> (StepFS Y)) --> (StepFS Y).
 Proof.
- intros X Y.
  exists (fun m => (@StFBind1 X Y m)).
  exact (@StFBind_wd X Y).
 Defined.
@@ -266,7 +262,7 @@ Let Bind_compose(Z:Setoid)(f:X-->StepFS Y)(g:Y-->StepFS Z):=
 Lemma BindBind(Z:Setoid)(m:StepF X)(f:X-->StepFS Y)(g:Y-->StepFS Z):
 (StFBind Y Z (StFBind X Y m f) g) == (StFBind X Z m (Bind_compose f g)).
 Proof.
- intros Z m.
+ revert f g.
  induction m. simpl. unfold compose0. simpl; auto with *.
   simpl.
  intros. apply glue_resp_StepF_eq.
@@ -286,7 +282,6 @@ Qed.
 
 Lemma BindReturn(m:StepF X): (StFBind X X m (StFReturn X)) == m.
 Proof.
- intro m.
  unfold StFBind.
  induction m using StepF_ind.
   simpl. auto with *.
@@ -334,7 +329,6 @@ Lemma ApBind(X Y:Setoid): forall (x:(StepFS X)) (f:StepFS (X-->Y)) ,
 (@StFBind _ _ f (compose (StFBind _ _ x)
 (compose (StFReturn _))))).
 Proof.
- intros X Y.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht H.
    rewrite <- Hs, <- Ht at 1.

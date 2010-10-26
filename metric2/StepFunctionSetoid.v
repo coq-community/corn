@@ -584,7 +584,7 @@ Lemma eq_glue_ind X : forall (s1 s2 s : StepF X) (a : OpenUnit) (P : Prop),
        ((SplitL s a) == s1 -> (SplitR s a) == s2 -> P) ->
        s == (glue a s1 s2) -> P.
 Proof.
- intros X s1 s2 s a P H H0.
+ intros s1 s2 s a P H H0.
  symmetry in H0.
  destruct H0 as [H0l H0r] using (glue_eq_ind s1).
  symmetry in H0l, H0r.
@@ -739,7 +739,7 @@ Qed.
 Lemma Map_identity X : forall (a:StepF X),
  (@id X) ^@> a == a.
 Proof.
- intros X a.
+ intros a.
  rewrite <- Map_identity.
  reflexivity.
 Qed.
@@ -780,7 +780,6 @@ applicative functor as is possible. *)
 Lemma Map_discardable X Y : forall (a:StepF X) (b:StepF Y),
  ((@const _ _) ^@> a <@> b == a).
 Proof.
- intros X Y.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
   rewrite -> Hs, Ht; auto.
@@ -812,7 +811,6 @@ Qed.
 Lemma Map_copyable X Y : forall (f:StepF (X --> X --> Y)) (x:StepF X),
  ((@join _ _) ^@> f <@> x) == (f <@> x <@> x).
 Proof.
- intros X Y.
  apply StepF_ind2; auto with *.
   intros s s0 t t0 Hs Ht.
   rewrite -> Hs, Ht; auto.
@@ -841,7 +839,7 @@ Ltac evalStepF := progress
 Lemma Ap_interchange (X Y:Setoid) : forall (f:StepF (X-->Y)) (a:X),
  (f <@^ a) == (flip id a) ^@> f.
 Proof.
- intros X Y f a.
+ intros f a.
  evalStepF.
  reflexivity.
 Qed.
@@ -850,7 +848,7 @@ Qed.
 Lemma Map_ap X Y Z : forall (f:StepF (X --> Y --> Z)) (x:StepF (X --> Y)) (a:StepF X),
  ((@ap _ _ _) ^@> f <@> x <@> a) == (f <@> a <@> (x <@> a)).
 Proof.
- intros X Y Z f x a.
+ intros f x a.
  unfold ap.
  evalStepF.
  reflexivity.

@@ -323,7 +323,7 @@ Qed.
 
 Definition rational_exp_neg (a:Q) : a <= 0 -> CR.
 Proof.
- intros a Ha.
+ intros Ha.
  refine (@rational_exp_neg_bounded _ a _).
  split.
   apply (rational_exp_bound_power_2 Ha).
@@ -478,7 +478,6 @@ Defined.
 is positive. *)
 Definition rational_exp (a:Q) : CR.
 Proof.
- intros a.
  destruct (Qle_total 0 a).
   refine (CRinv_pos ((3#1)^(Zdiv (Qnum (- a)) (Qden (- a))))%Qpos (@rational_exp_neg (-a) _)).
   apply (Qopp_le_compat 0); assumption.

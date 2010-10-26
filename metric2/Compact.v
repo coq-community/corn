@@ -925,7 +925,6 @@ a compact set to a new enumeration that contains only points inside
 the compact sets, without moving the points too much *)
 Definition CompactTotalBound (s:Compact) (e:Qpos) : list (Complete X).
 Proof.
- intros s e.
  generalize (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e)).
  induction (approximate s ((1 # 5) * e)%Qpos).
   intros _.

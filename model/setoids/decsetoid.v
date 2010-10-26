@@ -23,8 +23,7 @@ Class CSetoid_class `(Setoid): Type :=
   }.
 
 Definition is_CSetoid_from_class `{Apartness}: is_CSetoid _ equiv ap0.
- intros ? ? ap0 H.
- destruct H.
+ destruct H0.
  apply Build_is_CSetoid; assumption.
 Defined.
 

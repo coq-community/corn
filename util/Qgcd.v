@@ -14,6 +14,7 @@ Qed.
 
 Lemma Qgcd_divides (a b: Q): exists c: Z, inject_Z c * Qgcd a b == a.
 Proof.
+ revert a b.
  intros [an ad] [bn bd].
  unfold Qgcd. simpl.
  destruct (Zgcd_nat_divides (an * bd) (bn * ad)) as [c E].
@@ -25,6 +26,7 @@ Qed.
 
 Lemma Qgcd_nonneg a b: 0 <= Qgcd a b.
 Proof.
+ revert a b.
  intros [an ad] [bn bd]. simpl. unfold Qle. simpl. auto with *.
 Qed.
 
@@ -46,6 +48,7 @@ Qed.
 Lemma Qgcd_pos_divides (a b: Qpos):
   exists c: positive, c * Qcd_pos a b == a.
 Proof with auto with *.
+ revert a b.
  intros [a ap] [b bp].
  simpl.
  destruct (Qgcd_divides a b) as [x E].

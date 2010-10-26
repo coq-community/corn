@@ -85,7 +85,7 @@ Notation QS  := Q_is_Setoid (only parsing).
 
 Instance Qball_Reflexive e: Reflexive (Qball e).
 Proof.
- intros e x.
+ intros x.
  unfold Qball.
  apply AbsSmall_wdr with 0.
   apply (zero_AbsSmall _ (e:Q)).
@@ -96,7 +96,7 @@ Qed.
 
 Instance Qball_symmetric e: Symmetric (Qball e).
 Proof.
- intros e x y.
+ intros x y.
  unfold Qball.
  apply AbsSmall_minus.
 Qed. 
@@ -235,6 +235,7 @@ Hint Resolve stableQ : metricQ.
 
 Lemma in_Qball (r: Qpos) (x y: Q): (x - r <= y <= x + r) <-> Qball r x y.
 Proof with auto.
+ revert r x y.
  intros [r rp] x y.
  split; intro E.
   apply Qball_Qabs.
@@ -249,7 +250,7 @@ Lemma in_centered_Qball (w: Qpos) (m x: Q):
   m <= x <= m + w ->
   Qball ((1#2) * w) (m + (1#2) * w) x.
 Proof.
- intros ??? [??].
+ intros [??].
  apply in_Qball.
  split; simpl; ring_simplify; assumption.
 Qed. 
@@ -296,7 +297,7 @@ Qed.
 Lemma Qball_plus_r (e: Qpos) (x y y': Q):
  Qball e y y' -> Qball e (x + y) (x + y').
 Proof with auto.
- intros e x y y' B.
+ intros B.
  apply Qball_Qabs.
  apply Qball_Qabs in B.
  setoid_replace (x + y - (x + y')) with (y - y') by (simpl; ring)...

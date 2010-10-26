@@ -474,7 +474,7 @@ as an existential quantification of the nth derivative relation.
 
 Definition n_deriv_I n F (H : Diffble_I_n Hab' n F) : PartIR.
 Proof.
- intro; induction  n as [| n Hrecn].
+ revert F H; induction  n as [| n Hrecn].
   intros.
   simpl in H.
   apply (FRestr H).

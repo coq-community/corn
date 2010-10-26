@@ -48,7 +48,7 @@ ZF_prf1: (Zle 0 ZF_crr)
 
 Definition ZFeq (n : Z) : ZF n -> ZF n -> Prop.
 Proof.
- intros n a b.
+ intros a b.
  case a.
  case b.
  intros x H H' x0 H0 H0'.
@@ -57,7 +57,7 @@ Defined.
 
 Definition ZFap (n : Z) : ZF n -> ZF n -> CProp.
 Proof.
- intros n a b.
+ intros a b.
  case a.
  case b.
  intros x H H' x0 H0 H0'.

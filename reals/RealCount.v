@@ -135,7 +135,6 @@ Qed.
 
 Definition seq_fun (I : interv) (n:nat) : interv.
 Proof.
- intros I n.
  case (less_cotransitive_unfolded IR _ _  (less_pres_lft_rht _ _ (interv_lft_rht I)) (f n)).
   intro H1.
   apply (Build_interv (interv_lft I) (lft (interv_lft I) (interv_rht I))).

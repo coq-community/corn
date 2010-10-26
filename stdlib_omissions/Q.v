@@ -3,6 +3,8 @@ Require Import
   QArith ZArith NArith
   Qround Qabs.
 
+Require stdlib_omissions.Z.
+
 Set Automatic Introduction.
 
 Open Scope Q_scope.
@@ -190,7 +192,7 @@ Lemma Qplus_lt_le_0_compat x y: 0 < x -> 0 <= y -> 0 < x + y.
 Proof with auto.
  unfold Qlt, Qle. simpl.
  repeat rewrite Zmult_1_r. intros.
- apply Zdiv.Z.add_pos_nonneg.
+ apply Z.add_pos_nonneg.
   apply Zmult_lt_0_compat...
   reflexivity.
  apply Zmult_le_0_compat...

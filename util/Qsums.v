@@ -106,7 +106,7 @@ Proof with try reflexivity.
 Qed.
 
 Lemma Σ_mult_bound n m f:
-  Σ (n * m) f == Σ n (λ i => Σ m (λ j => f (i * m + j)%nat)).
+  Σ (n * m) f == Σ n (fun i => Σ m (fun j => f (i * m + j)%nat)).
 Proof.
  induction n; intros.
   reflexivity.
@@ -163,7 +163,7 @@ Proof with auto with *.
  intros.
  unfold flip.
  replace ((x * k + i) / k)%nat with x...
- apply (Nat.div_unique (x * k + i)%nat k x i)...
+ apply (div_unique (x * k + i)%nat k x i)...
 Qed.
 
 Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):

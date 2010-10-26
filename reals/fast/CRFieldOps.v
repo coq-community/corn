@@ -172,7 +172,8 @@ Qed.
 Lemma Qscale_modulus_pos (a e: Qpos): exists P,
   Qscale_modulus a e = Qpos2QposInf (exist (Qlt 0) (/ a * e)%Q P).
 Proof.
- intros [[[] ad] P] e; try discriminate.
+ revert a.
+ intros [[[] ad] P]; try discriminate.
  simpl. unfold Qpos_inv, Qpos_mult.
  eauto.
 Qed.
@@ -202,6 +203,7 @@ Proof Qscale_modulus_pos.
 
 Lemma Qscale_uc_prf (a:Q) :  is_UniformlyContinuousFunction (fun b:Q => a*b) (Qscale_modulus a).
 Proof.
+ revert a.
  intros [[|an|an] ad] e b0 b1 H.
    simpl in *.
    setoid_replace ((0 # ad)) with 0 by constructor.
@@ -339,7 +341,7 @@ Definition Qmult_modulus (c:Qpos)(e:Qpos) : QposInf := (e / c)%Qpos.
 
 Lemma Qmult_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun a => uc_compose (Qscale_uc a) (QboundAbs c)) (Qmult_modulus c).
 Proof with simpl in *; auto with *.
- intros c e a0 a1 H b.
+ intros e a0 a1 H b.
  simpl in *.
  set (b' := Qmax (- c) (Qmin c b)).
  repeat rewrite -> (fun x => Qmult_comm x b').
@@ -581,7 +583,7 @@ Qed.
 
 Lemma Qinv_pos_uc_prf (c:Qpos) :  is_UniformlyContinuousFunction (fun a:Q => /(Qmax c a) ) (Qinv_modulus c).
 Proof.
- intros c e a0 a1 Ha.
+ intros e a0 a1 Ha.
  simpl in *.
  unfold Qball in *.
  apply: AbsSmall_cancel_mult.
@@ -678,7 +680,8 @@ Qed.
 (** [CRinv] works for inputs apart from 0 *)
 Definition CRinv (x:CR)(x_: (x >< ' 0)%CR) : CR.
 Proof.
- intros x [[c H]|[c H]].
+ revert x_.
+ intros [[c H]|[c H]].
   exact ((-(CRinv_pos c (-x)))%CR).
  exact (CRinv_pos c x).
 Defined.

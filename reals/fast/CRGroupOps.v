@@ -39,7 +39,7 @@ Lifting addition over [Q] by one parameter yields a rational translation
 function. *)
 Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (a[+]b):QS) Qpos2QposInf.
 Proof.
- intros a e b0 b1 H.
+ intros e b0 b1 H.
  simpl in *.
  unfold Qball in *.
  stepr (b0-b1).
@@ -308,7 +308,7 @@ rational number.  It is the lifting of the first parameter of [Qmax].
 *)
 Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
 Proof.
- intros a e b0 b1 H.
+ intros e b0 b1 H.
  simpl in *.
  assert (X:forall a b0 b1, Qball e b0 b1 -> b0 <= a <= b1 -> Qball e a b1).
   clear a b0 b1 H.
@@ -459,7 +459,7 @@ rational number.  It is the lifting of the first parameter of [Qmin].
 *)
 Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
 Proof.
- intros a e b0 b1 H.
+ intros e b0 b1 H.
  simpl in *.
  unfold Qball.
  stepr ((Qmax (- a) (-b1)) - (Qmax (-a) (-b0))).

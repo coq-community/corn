@@ -66,7 +66,7 @@ Qed.
 
 Definition dist1 (x:StepFSup (Complete X)): (Complete (StepFSup X)).
 Proof.
- intro x. exists (dist_raw x).
+ exists (dist_raw x).
  abstract (apply (dist_prf x)).
 Defined.
 
@@ -136,7 +136,7 @@ Implicit Arguments dist [X].
 
 Definition distconst(X : MetricSpace):(Complete X)->Complete (StepFSup X).
 Proof.
- intros X0 x. exists (fun e => (constStepF (approximate x e ))).
+ intros x. exists (fun e => (constStepF (approximate x e ))).
  abstract (intros e1 e2; simpl; unfold StepFSupBall, StepFfoldProp; simpl; apply x).
 Defined.
 

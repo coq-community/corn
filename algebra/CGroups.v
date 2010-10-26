@@ -448,7 +448,6 @@ Section CGroup_Ops.
 
 Definition PS_Inv (A : CSetoid) : PS_as_CMonoid A -> PS_as_CMonoid A.
 Proof.
- intro A.
  simpl in |- *.
  intros f.
  elim f.
@@ -461,7 +460,6 @@ Defined.
 
 Definition Inv_as_un_op (A : CSetoid) : CSetoid_un_op (PS_as_CMonoid A).
 Proof.
- intro A.
  unfold CSetoid_un_op in |- *.
  apply Build_CSetoid_fun with (PS_Inv A).
  unfold fun_strext in |- *.

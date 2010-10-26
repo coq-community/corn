@@ -66,7 +66,6 @@ identity function, [stepSample]. *)
 
 Lemma oddGluePoint (p:positive) : 0 < Psucc p # xI p /\ Psucc p # xI p < 1.
 Proof.
- intros p.
  split; unfold Qlt.
   constructor.
  simpl.
@@ -558,7 +557,7 @@ Qed.
 Lemma ComposeContinuous_prf (f:Q_as_MetricSpace --> CR) :
  is_UniformlyContinuousFunction (ComposeContinuous_raw f) (mu f).
 Proof.
- intros f e a b.
+ intros e a b.
  revert a b e.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht H e H0.

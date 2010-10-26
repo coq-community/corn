@@ -87,7 +87,7 @@ Qed.
 
 Lemma Qpos_nonzero' (q: Qpos): ~ q == 0.
   (* simpler variant that actually shows up as proof obligations *)
-Proof Qpos_nonzero.
+Proof. apply Qpos_nonzero. Qed.
 
 Hint Immediate Qpos_nonzero'.
 
@@ -97,7 +97,7 @@ Proof. intros [??]. auto with *. Qed.
 Hint Immediate Qpos_nonneg.
 
 Lemma Qopp_Qpos_neg (x: Qpos): -x < 0.
-Proof. intro. apply Qopp_Qlt_0_r. auto. Qed.
+Proof. apply Qopp_Qlt_0_r. auto. Qed.
 
 Hint Immediate Qopp_Qpos_neg.
 
@@ -137,7 +137,7 @@ Defined.
 
 Lemma Zlt_uniq (a b: Z) (p q: (a < b)%Z): p = q.
 Proof.
- unfold Zlt. destruct p. intros.
+ unfold Zlt in *. destruct p. intros.
  apply (Eqdep_dec.K_dec_set comparison_eq_dec).
  reflexivity.
 Qed.
@@ -163,7 +163,7 @@ Qed.
 Lemma Qpos_positive_numerator_rect (P: Qpos -> Type):
   (forall (a b: positive), P (a # b)%Qpos) -> forall q, P q.
 Proof.
- intros P H q.
+ intros H q.
  destruct (Qpos_as_positive_ratio q).
  subst.
  apply H.
@@ -331,7 +331,6 @@ Qed.
 
 Definition Qpos_power (x:Qpos) (z:Z) : Qpos.
 Proof.
- intros x z.
  apply mkQpos with (x^z).
  apply Qpos_power_pos.
 Defined.
@@ -421,7 +420,7 @@ Definition QposCeiling (q: Qpos): positive :=
 
 Lemma QposCeiling_Qceiling (q: Qpos): (QposCeiling q: Z) = Qceiling q.
 Proof with auto with *.
- unfold QposCeiling. intro.
+ unfold QposCeiling.
  pose proof Qle_ceiling q.
  destruct (Qceiling q); try reflexivity; exfalso; destruct q; simpl in *.
   apply (Qlt_not_le 0 x q)...

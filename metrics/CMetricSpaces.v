@@ -478,7 +478,7 @@ In that case the induced metric space is equivalent to the original one:
 
 Definition emb (X : CPsMetricSpace) : X -> QuotientCMetricSpace X.
 Proof.
- intros X x.
+ intros x.
  unfold QuotientCMetricSpace in |- *.
  simpl in |- *.
  exact x.

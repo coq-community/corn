@@ -198,8 +198,7 @@ Qed.
 
 Definition Build_CSetoid (X:Type) (eq:Relation X) (ap:Crelation X) (p:is_CSetoid X eq ap) : CSetoid.
 Proof.
- intros X eq ap H.
- exists (Build_Setoid (is_CSetoid_Setoid _ _ _ H)) ap.
+ exists (Build_Setoid (is_CSetoid_Setoid _ _ _ p)) ap.
  assumption.
 Defined.
 
@@ -340,20 +339,18 @@ Section product_csetoid.
 
 Definition prod_ap (A B : CSetoid) (c d : prodT A B) : CProp.
 Proof.
- intros A B H0 H1.
- elim H0.
+ elim c.
  intros.
- elim H1.
+ elim d.
  intros.
  exact (cs_ap (c:=A) a a0 or cs_ap (c:=B) b b0).
 Defined.
 
 Definition prod_eq (A B : CSetoid) (c d : prodT A B) : Prop.
 Proof.
- intros A B H0 H1.
- elim H0.
+ elim c.
  intros.
- elim H1.
+ elim d.
  intros.
  exact (a [=] a0 /\ b [=] b0).
 Defined.

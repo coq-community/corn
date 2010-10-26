@@ -176,6 +176,7 @@ Section gball.
   Lemma ball_gball (q: Qpos) (x y: m): gball q x y <-> ball q x y.
   Proof with auto.
    unfold gball.
+   revert q x y.
    intros [q p] ??. simpl.
    destruct Qdec_sign as [[A | A] | A].
      exfalso.
@@ -287,6 +288,7 @@ Section gball.
 
   Lemma gball_weak_le (q q': Q): q <= q' -> forall x y, gball q x y -> gball q' x y.
   Proof with auto.
+   revert q q'.
    intros ?? E ?? F.
    unfold gball in F.
    destruct Qdec_sign as [[A | B] | C].

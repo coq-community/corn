@@ -59,7 +59,6 @@ Implicit Arguments MSmember [X].
 
 Definition to_IR (P : IR -> CProp) : subcsetoid_crr IR P -> IR.
 Proof.
- intro P.
  intro a.
  case a.
  intros b C.
@@ -68,7 +67,6 @@ Defined.
 
 Definition from_IR (P : IR -> CProp) (x : IR) (H : P x) : subcsetoid_crr IR P.
 Proof.
- intros P x H.
  set (H0 := Build_subcsetoid_crr IR P) in *.
  set (H1 := H0 x H) in *.
  exact H1.
@@ -77,7 +75,6 @@ Defined.
 Definition list_IR (P : IR -> CProp) :
   list (SubPsMetricSpace IR_as_CPsMetricSpace P) -> list IR.
 Proof.
- intro P.
  intro l.
  induction  l as [| a l Hrecl].
   apply (@nil IR).
@@ -174,7 +171,7 @@ Section loc_and_bound.
 Definition Re_co_do (X Z : CSetoid) (f : CSetoid_fun X Z) :
   X -> Build_SubCSetoid Z (fun y : Z => {x : X | f x[=]y}).
 Proof.
- intros X Z f x.
+ intros x.
  exists (f x).
  exists x.
  apply eq_reflexive.
@@ -575,7 +572,7 @@ Definition Floc (X : CPsMetricSpace) (P : X -> CProp)
      {y : SubPsMetricSpace P | x[-d]from_SubPsMetricSpace X P y[=]v}) z |
   x[-d]from_SubPsMetricSpace X P y[<=]z[+]one_div_succ n}}.
 Proof.
- intros X P H0 y n x.
+ rename H2 into y.
  unfold located' in H0.
  set (H1 := H0 x y) in *.
  elim H1.
@@ -761,7 +758,7 @@ subspace $P$#<I>P</I># of $X$#<I>X</I>#.
 Definition infima (X : CPsMetricSpace) (P : X -> CProp)
   (H : located' P) (a : SubPsMetricSpace P) : X -> IR.
 Proof.
- intros X P H a H0.
+ intros H0.
  unfold located' in H.
  elim (H H0 a).
  intros.

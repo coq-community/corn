@@ -169,7 +169,7 @@ Qed.
 (** Extend the range to [[-1,1]] by symmetry. *)
 Definition rational_arctan_small (a:Q) (p: -(1) <= a <= 1) : CR.
 Proof.
- intros a.
+ revert p.
  destruct (Qle_total a 0); intros Ha.
   refine (-(@rational_arctan_small_pos (-a)%Q _))%CR.
   abstract ( split; [(replace RHS with (0+-a) by simpl; ring); rewrite <- Qle_minus_iff; assumption

@@ -377,7 +377,7 @@ As we did for arbitrary groups, it is often useful to rewrite this sums as ordin
 
 Definition FSumx_to_FSum n : (forall i, i < n -> PartIR) -> nat -> PartIR.
 Proof.
- intros n f i.
+ intros f i.
  elim (le_lt_dec n i); intro.
   apply ( [-C-]Zero:PartIR).
  apply (f i b).

@@ -51,14 +51,14 @@ Variable X:MetricSpace.
 (** A setoid verion of the ball predicate *)
 Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
 Proof.
- intros m e x.
+ intros e x.
  exists (ball e x).
  intros. apply ball_wd;auto with *.
 Defined.
 
 Definition ballS (m : MetricSpace): Qpos ->  m --> m --> iffSetoid.
 Proof.
- intros m e.
+ intros e.
  exists (ballS0  m e).
  intros. simpl. split; rewrite -> H; auto with *.
 Defined.
@@ -246,7 +246,7 @@ forall f:(StepFS X) -->(StepFS X),
 StepFSupBall (X:=StepFSup X) e a b ->
 StepFSupBall (X:=X) e (StFBind00 a f) (StFBind00 b f))).
 Proof.
- intros X e a. unfold ball_ex.
+ intros e a. unfold ball_ex.
  induction a using StepF_ind. simpl. induction b using StepF_ind.
   intros. simpl. apply H. assumption.
    intros f Hf H. simpl in H. unfold StepFSupBall in H. rewrite -> GlueAp in H.
@@ -311,10 +311,10 @@ Proof.
  abstract (intros e a b H ; apply H).
 Defined.
 
-Lemma uc_stdFun(X Y:MetricSpace):
-(UniformlyContinuousFunction X Y) ->(extSetoid X Y).
+Lemma uc_stdFun(X0 Y0:MetricSpace):
+(UniformlyContinuousFunction X0 Y0) ->(extSetoid X0 Y0).
 Proof.
- intros X0 Y0 f. exists (ucFun f). abstract (intros; apply uc_wd; assumption).
+ intros f. exists (ucFun f). abstract (intros; apply uc_wd; assumption).
 Defined.
 
 (* Why doesn't this work?
@@ -351,7 +351,7 @@ Defined.
 Definition glue_uc0 (o:OpenUnit):
  StepFSup X -> StepFSup X --> StepFSup X.
 Proof.
- intros o x.
+ intros x.
  exists (fun y=>(glue o x y)) (fun x:Qpos=> x).
  abstract( intros e a b;  simpl; rewrite -> StepFSupBallGlueGlue; intuition; apply StepFSupBall_refl).
 Defined.
@@ -359,7 +359,6 @@ Defined.
 Definition glue_uc (o:OpenUnit):
  StepFSup X --> StepFSup X --> StepFSup X.
 Proof.
- intros o.
  exists (fun y=>(glue_uc0 o y)) (fun x:Qpos=> x).
  abstract (intros e a b; simpl; unfold ucBall; simpl; intros; rewrite -> StepFSupBallGlueGlue; intuition;
    apply StepFSupBall_refl).

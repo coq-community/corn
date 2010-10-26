@@ -118,7 +118,8 @@ Qed.
 
 Definition Cauchy_IRasCR_raw (x:Cauchy_IR) (e:QposInf) : Q.
 Proof.
- intros x [e|];[|exact 0%Q].
+ revert e.
+ intros [e|];[|exact 0%Q].
  destruct x as [f Hf].
  unfold Cauchy_prop in Hf.
  destruct (Hf (e:Q) (Qpos_prf e)) as [n Hn].

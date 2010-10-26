@@ -43,7 +43,6 @@ infinity.
 *)
 Definition rational_arctan_big_pos (a:Q) (Ha:1 <= a) : CR.
 Proof.
- intros a Ha.
  refine ((r_pi (1#2)) -(@rational_arctan_small_pos (/a) _))%CR.
  split.
   abstract ( apply Qinv_le_0_compat; apply Qle_trans with 1; [discriminate|assumption]).
@@ -110,6 +109,7 @@ Qed.
 that works for nonnegative numbers, and is particularly fast near 1. *)
 Definition rational_arctan_mid_pos (a:Q) (Ha:0 <= a) : CR.
 Proof.
+ revert a Ha.
  intros [n d] Ha.
  refine (r_pi (1#4) + (@rational_arctan_small ((n-d)%Z/(n+d)%Z) _))%CR.
  unfold Qle in Ha; simpl in Ha; rewrite -> Zmult_1_r in Ha; assert (H:~(n+d)%Z==0);[ intros H0;
@@ -224,7 +224,7 @@ Qed.
 a nice fast one that works for nonnegative numbers. *)
 Definition rational_arctan_pos (a:Q) (Ha:0 <= a) : CR.
 Proof.
- intros a.
+ revert Ha.
  destruct (Qle_total (2#5) a) as [A|A].
   destruct (Qle_total (5#2) a) as [B|_];  intros _.
    apply (@rational_arctan_big_pos a).
@@ -254,7 +254,6 @@ Qed.
 (** By symmetry we get arctangent for all numbers. *)
 Definition rational_arctan (a:Q) : CR.
 Proof.
- intros a.
  destruct (Qle_total a 0) as [H|H].
   refine (-(@rational_arctan_pos (-a)%Q _))%CR.
   abstract ( change (-0 <= -a); apply: (inv_resp_leEq); assumption).

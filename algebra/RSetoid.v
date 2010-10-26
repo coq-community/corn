@@ -60,7 +60,6 @@ Record Morphism (X Y:Setoid) :=
 Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq (f x) (g x).
 Definition extSetoid (X Y:Setoid) : Setoid.
 Proof.
- intros X Y.
  exists (Morphism X Y) (extEq Y).
  split.
    intros x y; reflexivity.
@@ -77,7 +76,6 @@ Open Local Scope setoid_scope.
 
 Definition id (X:Setoid) : X-->X.
 Proof.
- intros X.
  exists (fun x => x).
  abstract (auto).
 Defined.
@@ -88,7 +86,7 @@ Definition compose0 X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
 
 Definition compose1 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) -> X --> Z.
 Proof.
- intros X Y Z f0 f1.
+ intros f0 f1.
  exists (compose0 f0 f1).
  abstract ( destruct f0 as [f0 Hf0]; destruct f1 as [f1 Hf1]; intros x1 x2 Hx; apply Hf0; apply Hf1;
    assumption).
@@ -96,14 +94,13 @@ Defined.
 
 Definition compose2 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
 Proof.
- intros X Y Z f0.
+ intros f0.
  exists (compose1 f0).
  abstract ( destruct f0 as [f0 Hf0]; intros x1 x2 H y; apply: Hf0; apply H).
 Defined.
 
 Definition compose (X Y Z:Setoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
 Proof.
- intros X Y Z.
  exists (@compose2 X Y Z).
  abstract ( intros x1 x2 H y z; apply: H).
 Defined.
@@ -112,14 +109,13 @@ Implicit Arguments compose [X Y Z].
 (* end hide *)
 Definition const0 (X Y:Setoid) : X->Y-->X.
 Proof.
- intros X Y x.
+ intros x.
  exists (fun y => x).
  abstract reflexivity.
 Defined.
 
 Definition const (X Y:Setoid) : X-->Y-->X.
 Proof.
- intros X Y.
  exists (@const0 X Y).
  abstract ( intros x1 x2 Hx y; assumption).
 Defined.
@@ -128,21 +124,20 @@ Implicit Arguments const [X Y].
 (* end hide *)
 Definition flip0 (X Y Z:Setoid) : (X-->Y-->Z)->Y->X-->Z.
 Proof.
- intros X Y Z f y.
+ intros f y.
  exists (fun x => f x y).
  abstract ( destruct f as [f Hf]; intros x1 x2 H; apply Hf; auto).
 Defined.
 
 Definition flip1 (X Y Z:Setoid) : (X-->Y-->Z)->Y-->X-->Z.
 Proof.
- intros X Y Z f.
+ intros f.
  exists (flip0 f).
  abstract ( destruct f as [f Hf]; intros x1 x2 H y; simpl; destruct (f y) as [g Hg]; apply Hg; auto).
 Defined.
 
 Definition flip (X Y Z:Setoid) : (X-->Y-->Z)-->Y-->X-->Z.
 Proof.
- intros X Y Z.
  exists (@flip1 X Y Z).
  abstract ( intros x1 x2 H y z; apply: H).
 Defined.
@@ -151,7 +146,7 @@ Implicit Arguments flip [X Y Z].
 (* end hide *)
 Definition join0 (X Y:Setoid) : (X-->X-->Y)->X-->Y.
 Proof.
- intros X Y f.
+ intros f.
  exists (fun y => f y y).
  abstract ( destruct f as [f Hf]; intros x1 x2 H; simpl; transitivity (f x1 x2);
    [destruct (f x1) as [g Hg]; apply Hg; auto |apply Hf; auto]).
@@ -159,7 +154,6 @@ Defined.
 
 Definition join (X Y:Setoid) : (X-->X-->Y)-->X-->Y.
 Proof.
- intros X Y.
  exists (@join0 X Y).
  abstract ( intros x1 x2 H y; apply: H).
 Defined.

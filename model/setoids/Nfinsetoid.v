@@ -47,7 +47,7 @@ F_prf: F_crr<n
 
 Definition Feq (n : nat) : F n -> F n -> Prop.
 Proof.
- intros n a b.
+ intros a b.
  case a.
  case b.
  intros x H x0 H0.
@@ -56,7 +56,7 @@ Defined.
 
 Definition Fap (n : nat) : F n -> F n -> CProp.
 Proof.
- intros n a b.
+ intros a b.
  case a.
  case b.
  intros x H x0 H0.

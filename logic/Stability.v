@@ -40,7 +40,7 @@ Lemma DN_fmap {A: Type}: DN A -> forall B, (A -> B) -> DN B.
 Proof. firstorder. Qed.
 
 Lemma DN_liftM2 {A B C: Type} (f: A -> B -> C): DN A -> DN B -> DN C.
-Proof. clear. firstorder. Qed.
+Proof. firstorder. Qed.
   (* todo: this is a specialization for DN. make a normal monadic version *)
 
 Lemma DN_exists {T: Type} {P: T -> Prop} {x: T}: DN (P x) -> DN (ex P).

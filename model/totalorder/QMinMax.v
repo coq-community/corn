@@ -28,7 +28,6 @@ Require Import TotalOrder.
 
 Definition Qlt_le_dec_fast x y : {x < y} + {y <= x}.
 Proof.
- intros x y.
  change ({x ?= y = Lt}+{y<=x}).
  cut (x ?= y <> Lt -> y <= x).
   destruct (x?=y); intros H; (right; abstract(apply H; discriminate)) || (left; reflexivity).

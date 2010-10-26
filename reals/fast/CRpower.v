@@ -76,7 +76,6 @@ Let IRpower_p : PartFunct IR := FId{^}(nat_of_P p).
 
 Lemma Qpower_positive_uc_prf (c:Qpos) :  is_UniformlyContinuousFunction (fun x => Qpower_positive (QboundAbs c x) p) (Qpower_positive_modulus c).
 Proof.
- intros c.
  destruct (p_is_some_anti_convert p) as [n Hn].
  assert (X:=(fun I pI => Derivative_nth I pI _ _ (Derivative_id I pI) n)).
  assert (-c < c)%Q.

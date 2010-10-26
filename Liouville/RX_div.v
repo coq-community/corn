@@ -41,7 +41,7 @@ Qed.
 
 Definition RX_div (p : RX) (a : R) : RX.
 Proof.
- intros p a; destruct (cpoly_div p (_X_monic a)) as [qr Hunq Heq]; exact (fst qr).
+ destruct (cpoly_div p (_X_monic a)) as [qr Hunq Heq]; exact (fst qr).
 Defined.
 
 Lemma RX_div_spec : forall (p : RX) (a : R), p [=] (RX_div p a) [*] (_X_ [-] _C_ a) [+] _C_ (p ! a).

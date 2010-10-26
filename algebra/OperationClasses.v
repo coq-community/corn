@@ -90,9 +90,9 @@ Section distributivity.
 Context {op : binop A}.
 Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) op}.
 Global Instance mulC_distr_l {H : left_distributive op mul} : right_distributive op mul.
-Proof. intros l_d x y z; rewrite -> (commut x (op _ _)), -> (commut x y), -> (commut x z); apply left_dist. Qed.
+Proof. intros x y z; rewrite -> (commut x (op _ _)), -> (commut x y), -> (commut x z); apply left_dist. Qed.
 Global Instance mulC_distr_r {H : right_distributive op mul} : left_distributive op mul.
-Proof. intros l_d x y z; rewrite -> (commut (op _ _) z), -> (commut x z), -> (commut y z); apply right_dist. Qed.
+Proof. intros x y z; rewrite -> (commut (op _ _) z), -> (commut x z), -> (commut y z); apply right_dist. Qed.
 End distributivity.
 
 Section Associativity.

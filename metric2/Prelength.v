@@ -293,7 +293,7 @@ f (approximate x (QposInf_bind (mu f) e)).
 
 Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (approximate x (QposInf_bind (mu f) e))).
 Proof.
- intros x e1 e2.
+ intros e1 e2.
  simpl.
  apply (@mu_sum X plX Y e2 (e1::nil)).
  simpl.
@@ -391,7 +391,7 @@ Definition Cap_raw X Y plX (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
 
 Lemma Cap_fun_prf X Y plX (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_raw plX f x).
 Proof.
- intros X Y plX f x e1 e2.
+ intros e1 e2.
  unfold Cap_raw.
  unfold Cap_raw.
  unfold QposInf_mult, QposInf_bind.
@@ -438,7 +438,7 @@ Definition Cap_modulus X Y (f:Complete (X --> Y)) (e:Qpos) : QposInf := (mu (app
 
 Lemma Cap_weak_prf X Y plX (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_fun plX f) (Cap_modulus f).
 Proof.
- intros X Y plX f e x y H.
+ intros e x y H.
  set (e' := ((1#3)*e)%Qpos).
  setoid_replace e with (e'+e'+e')%Qpos; [| unfold e';QposRing].
  apply ball_triangle with (Cmap plX (approximate f e') y).
@@ -466,7 +466,7 @@ Qed.
 
 Lemma Cap_prf X Y plX : is_UniformlyContinuousFunction (@Cap_weak X Y plX) Qpos2QposInf.
 Proof.
- intros X Y plX e a b Hab.
+ intros e a b Hab.
  do 2 rewrite -> Cap_weak_correct.
  apply Cap_slow_prf.
  auto.

@@ -221,7 +221,7 @@ Qed.
 
 Instance uc_wd_more_Proper (X Y : MetricSpace):
   Proper (@ucEq _ _ ==> @st_eq X ==> @st_eq Y) (@ucFun X Y).
-Proof. intros X Y ?? E ?? F. rewrite E F. reflexivity. Qed.
+Proof. intros ?? E ?? F. rewrite E F. reflexivity. Qed.
 
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 
@@ -244,7 +244,7 @@ The identity function is uniformly continuous.
 *)
 Lemma uc_id_prf (X:MetricSpace) : is_UniformlyContinuousFunction  (fun (x:X) => x) Qpos2QposInf.
 Proof.
- intros X e a b Hab.
+ intros e a b Hab.
  assumption.
 Qed.
 
@@ -256,7 +256,8 @@ continuous *)
 Lemma uc_compose_prf (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) :
 is_UniformlyContinuousFunction (fun x => g (f x)) (fun e => QposInf_bind (mu f) (mu g e)).
 Proof.
- intros X Y Z [g mu_g Hg] [f mu_f Hf] e a b Hab.
+ revert g f.
+ intros [g mu_g Hg] [f mu_f Hf] e a b Hab.
  unfold is_UniformlyContinuousFunction in *.
  simpl in *.
  apply Hg.

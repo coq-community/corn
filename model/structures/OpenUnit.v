@@ -76,7 +76,6 @@ Hint Resolve OpenUnit_0_lt OpenUnit_lt_1 OpenUnit_0_lt_Dual OpenUnit_Dual_lt_1 :
 (** Multiplication *)
 Definition OpenUnitMult (a b:OpenUnit):OpenUnit.
 Proof.
- intros a b.
  exists (a * b).
  abstract(destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]]; split; simpl;
    [apply: mult_resp_pos; assumption |change (1:Q) with (1*1);
@@ -88,7 +87,7 @@ Notation "x * y":=(OpenUnitMult x y) : ou_scope.
 (** Division *)
 Definition OpenUnitDiv (a b:OpenUnit):(a<b)->OpenUnit.
 Proof.
- intros a b p.
+ intros p.
  exists (a/b).
  abstract (destruct a as [a [Ha0 Ha1]]; destruct b as [b [Hb0 Hb1]]; split; simpl;[
    apply Qlt_shift_div_l; auto; ring_simplify;  auto|
@@ -98,7 +97,6 @@ Defined.
 (** The dual of a is 1-a *)
 Definition OpenUnitDual (a:OpenUnit):OpenUnit.
 Proof.
- intros a.
  exists (1-a).
  abstract (destruct a as [a [Ha0 Ha1]]; simpl; split; rewrite  -> Qlt_minus_iff in *;[
    (replace RHS with (1+-a) by simpl; ring); auto| (replace RHS with (a+-0) by simpl; ring); auto]).
@@ -107,7 +105,6 @@ Defined.
 (** The dual of multipliation: 1 - (1-a)*(1-b) or a + b - a*b *)
 Definition OpenUnitDualMult (a b:OpenUnit):OpenUnit.
 Proof.
- intros a b.
  exists (a + b - a * b).
  abstract ( split;
    [(replace RHS with (OpenUnitDual ((OpenUnitDual a)*(OpenUnitDual b)):Q) by simpl; ring);
@@ -119,7 +116,7 @@ Defined.
 (** The dual of division: 1 - (1-b)/(1-a) or (b-a)/(1-a) *)
 Definition OpenUnitDualDiv (b a:OpenUnit):(a<b)->OpenUnit.
 Proof.
- intros b a p.
+ intros p.
  exists ((b-a)/(1-a)).
  abstract ( assert (X:OpenUnitDual b < OpenUnitDual a); [rewrite -> Qlt_minus_iff in *; simpl;
    (replace RHS with (b + - a) by simpl; ring); assumption |split;

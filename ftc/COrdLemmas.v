@@ -62,11 +62,11 @@ Qed.
 Definition om_fun n m (f : forall i, i < n -> F) (g : forall i, i < m -> F)
   (Hfg : forall i j Hi Hj, f i Hi [#] g j Hj) : forall i, i < m + n -> F.
 Proof.
- intro n. induction  n as [| n Hrecn].
- intros. apply (g i). rewrite <- plus_n_O in H; auto.
-  intro m. induction  m as [| m Hrecm].
- do 3 intro. apply f.
-  intros.
+ revert m f g Hfg. induction  n as [| n Hrecn].
+  intros. apply (g i). rewrite <- plus_n_O in H; auto.
+ intro m. induction  m as [| m Hrecm].
+  do 3 intro. apply f.
+ intros.
  elim (ap_imp_less _ _ _ (Hfg n m (lt_n_Sn n) (lt_n_Sn m))); intro.
   set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
   elim (le_lt_eq_dec _ _ H); intro.
@@ -78,7 +78,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H); intro.
   apply Hrecn with (f := h) (g := g) (i := i); unfold h in |- *; auto.
   apply om_fun_lt. rewrite plus_n_Sm. auto.
-  apply (f n (lt_n_Sn n)).
+ apply (f n (lt_n_Sn n)).
 Defined.
 
 Lemma om_fun_1 : forall n m f g Hfg,
@@ -389,7 +389,7 @@ Section More_Lemmas.
 (* begin hide *)
 Let f' (m : nat) (f : forall i, i <= m -> nat) : nat -> nat.
 Proof.
- intros m f i.
+ intros i.
  elim (le_lt_dec i m); intro.
   apply (f i a).
  apply (f m (le_n m) + i).

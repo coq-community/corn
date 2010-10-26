@@ -144,7 +144,6 @@ Build_CSetoid_fun _ _ _ (MVP_apply_hom_strext F v).
 
 Definition MVP_apply_hom (F:CRing) n (v:vector F n) : RingHom (MultivariatePolynomial F n) F.
 Proof.
- intros F n v.
  exists (MVP_apply_hom_csf F v).
    intros x y; apply: MVP_plus_apply.
   intros x y; apply: MVP_mult_apply.

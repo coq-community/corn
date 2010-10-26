@@ -260,7 +260,7 @@ There is an injection from the original space to the complete space
 given by the constant regular function. *)
 Lemma Cunit_fun_prf (x:X) : is_RegularFunction (fun _ => x).
 Proof.
- intros x d1 d2.
+ intros d1 d2.
  apply ball_refl.
 Qed.
 
@@ -456,7 +456,7 @@ Definition Cjoin_raw (x:Complete (Complete X)) (e:QposInf) :=
 
 Lemma Cjoin_fun_prf (x:Complete (Complete X)) : is_RegularFunction (Cjoin_raw x).
 Proof.
- intros x d1 d2.
+ intros d1 d2.
  rewrite <- ball_Cunit.
  setoid_replace (d1 + d2)%Qpos with ((1#2)*d1 + ((1#2)*d1+(1#2)*d2) + (1#2)*d2)%Qpos; [| QposRing].
  apply ball_triangle with (approximate x ((1#2)*d2))%Qpos.
@@ -545,7 +545,7 @@ Qed.
 
 Lemma Cmap_slow_fun_prf (x:Complete X) : is_RegularFunction (Cmap_slow_raw x).
 Proof.
- intros x e1 e2.
+ intros e1 e2.
  unfold Cmap_slow_raw.
  cut (forall (e1 e2:Qpos), (QposInf_le (mu f e2) (mu f e1)) -> ball (m:=Y) (e1 + e2)
    (f (approximate x (QposInf_mult (1 # 2)%Qpos (QposInf_bind (mu f) e1))))
@@ -878,7 +878,7 @@ Definition Cap_slow_raw (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
 
 Lemma Cap_slow_fun_prf (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_slow_raw f x).
 Proof.
- intros f x e1 e2.
+ intros e1 e2.
  unfold Cap_slow_raw.
  unfold QposInf_mult, QposInf_bind.
  set (he1 := ((1 # 2) * e1)%Qpos).
@@ -903,7 +903,7 @@ Build_RegularFunction (Cap_slow_fun_prf f x).
 Lemma Cap_slow_help (f:Complete (X --> Y)) (x:Complete X) (e:Qpos) :
  ball e (Cap_slow_fun f x) (Cmap_slow (approximate f e) x).
 Proof.
- intros f x e d1 d2.
+ intros d1 d2.
  set (d1' := ((1 # 2) * d1)%Qpos).
  set (f1 := (approximate f d1')).
  set (f2 := (approximate f e)).
@@ -922,7 +922,7 @@ Definition Cap_slow_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf := ((1#2)%
 
 Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_slow_fun f) (Cap_slow_modulus f).
 Proof.
- intros f e x y H.
+ intros e x y H.
  set (e' := ((1#3)*e)%Qpos).
  setoid_replace e with (e'+e'+e')%Qpos; [| unfold e'; by QposRing].
  apply ball_triangle with (Cmap_slow (approximate f e') y).

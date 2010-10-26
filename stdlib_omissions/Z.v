@@ -14,12 +14,12 @@ Proof.
   split.
    auto with *.
   apply inj_lt.
-  apply Nat.mod_upper_bound.
+  apply mod_upper_bound.
   assumption.
  rewrite <- inj_mult.
  rewrite <- inj_plus.
  apply inj_eq.
- apply Nat.div_mod.
+ apply div_mod.
  assumption.
 Qed.
 
@@ -29,10 +29,10 @@ Proof with auto with *.
  apply (Zmod_unique (Z_of_nat n) (Z_of_nat m) (Z_of_nat n / Z_of_nat m)).
   split...
   apply inj_lt.
-  apply Nat.mod_upper_bound...
+  apply mod_upper_bound...
  rewrite <- div_Zdiv...
  rewrite <- inj_mult, <- inj_plus.
- apply inj_eq, Nat.div_mod...
+ apply inj_eq, div_mod...
 Qed.
 
 Lemma P_of_succ_nat_Zplus (m: nat): Zpos (P_of_succ_nat m) = Z_of_nat m + 1.
@@ -49,10 +49,12 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Ple_Zle (p q: positive): Ple p q <-> Zle (Zpos p) (Zpos q).
+Lemma Ple_Zle (p q: positive): Ple p q <-> (Zpos p <= Zpos q).
 Proof.
  rewrite Ple_le, inj_le_iff.
  do 2 rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
  reflexivity.
 Qed.
 
+Lemma add_pos_nonneg (a b: Z): 0 < a -> 0 <= b -> 0 < a+b.
+Proof. intros. omega. Qed.

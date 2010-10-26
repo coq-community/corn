@@ -74,7 +74,7 @@ It is sometimes useful to view a function defined on $\{0,\ldots,i-1\}$
 
 Definition part_tot_nat_fun n (f : forall i, i < n -> G) : nat -> G.
 Proof.
- intros n f i.
+ intros i.
  elim (le_lt_dec n i).
   intro a; apply (Zero:G).
  intro b; apply (f i b).
@@ -120,7 +120,6 @@ defined outside where it is being added. *)
 
 Definition Sum2 m n (h : forall i : nat, m <= i -> i <= n -> G) : G.
 Proof.
- intros m n h.
  apply (Sum m n).
  intro i.
  elim (le_lt_dec m i); intro H.

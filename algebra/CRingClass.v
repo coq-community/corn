@@ -23,7 +23,7 @@ Require Export CRings RingClass.
 Section cring_is_ring.
 Global Instance CRing_is_Ring (CR : CRing) : Ring (@cm_unit CR) (@cr_one CR) (@csg_op CR) (@cr_mult CR) (fun x y => x [-] y) (@cg_inv CR).
 Proof with auto.
- intro CR. split;split;algebra.
+ split;split;algebra.
 Qed.
 End cring_is_ring.
 
