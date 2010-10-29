@@ -114,10 +114,14 @@ Proof.
  Step_final f0 ! a.
 Qed.
 
-Lemma zero_poly : forall n (f : RX),
+Lemma zero_poly : forall n,
+  (forall i j: nat, i <= n -> j <= n -> i <> j -> a_ i[#]a_ j) ->
+  forall (f : RX),
  degree_le n f -> (forall i, i <= n -> f ! (a_ i) [=] Zero) -> f [=] Zero.
-Proof.
+Proof with auto.
  intro.
+ clear degree_f n distinct_a_.
+ intro distinct_a_.
  induction  n0 as [| n0 Hrecn0]; intros.
   elim (degree_le_zero _ _ H). intros.
   astepl (_C_ x).
@@ -125,45 +129,41 @@ Proof.
   apply cpoly_const_eq.
   apply eq_transitive_unfolded with f0 ! (a_ 0).
    Step_final (_C_ x) ! (a_ 0).
-  apply H0.
-  auto.
- cut (f0 ! (a_ (S n0)) [=] Zero). intro.
-  elim (poly_linear_factor f0 (a_ (S n0)) H1). intro f'. intros.
-  astepl ((_X_[-]_C_ (a_ (S n0))) [*]f').
-  cut (f' [=] Zero). intro.
-   Step_final ((_X_[-]_C_ (a_ (S n0))) [*]Zero).
-  apply Hrecn0.
-   apply degree_le_mult_imp with (_X_[-]_C_ (a_ (S n0))) 1.
-    apply degree_minus_lft with 0.
-      apply degree_le_c_.
-     apply degree_x_.
-    auto.
-   apply degree_le_wd with f0.
-    auto.
-   auto.
-  intros.
-  apply mult_cancel_lft with (a_ i[-]a_ (S n0)).
-   apply minus_ap_zero.
-   apply distinct_a_.
-   intro; rewrite H3 in H2; exact (le_Sn_n _ H2).
-  astepr (Zero:R).
-  cut (a_ i[-]a_ (S n0) [=] (_X_[-]_C_ (a_ (S n0))) ! (a_ i)). intro.
-   astepl ((_X_[-]_C_ (a_ (S n0))) ! (a_ i) [*]f' ! (a_ i)).
-   astepl ((_X_[-]_C_ (a_ (S n0))) [*]f') ! (a_ i).
-   astepl f0 ! (a_ i).
-   apply H0.
-   auto with arith.
-  Step_final (_X_ ! (a_ i) [-] (_C_ (a_ (S n0))) ! (a_ i)).
- apply H0.
- auto.
+  apply H0...
+ cut (f0 ! (a_ (S n0)) [=] Zero)... intro.
+ elim (poly_linear_factor f0 (a_ (S n0)) H1). intro f'. intros.
+ astepl ((_X_[-]_C_ (a_ (S n0))) [*]f').
+ cut (f' [=] Zero). intro.
+  Step_final ((_X_[-]_C_ (a_ (S n0))) [*]Zero).
+ apply Hrecn0.
+   intuition.
+  apply degree_le_mult_imp with (_X_[-]_C_ (a_ (S n0))) 1.
+   apply degree_minus_lft with 0...
+    apply degree_le_c_.
+   apply degree_x_.
+  apply degree_le_wd with f0...
+ intros.
+ apply mult_cancel_lft with (a_ i[-]a_ (S n0)).
+  apply minus_ap_zero.
+  apply distinct_a_...
+  intro; rewrite H3 in H2; exact (le_Sn_n _ H2).
+ astepr (Zero:R).
+ cut (a_ i[-]a_ (S n0) [=] (_X_[-]_C_ (a_ (S n0))) ! (a_ i)). intro.
+  astepl ((_X_[-]_C_ (a_ (S n0))) ! (a_ i) [*]f' ! (a_ i)).
+  astepl ((_X_[-]_C_ (a_ (S n0))) [*]f') ! (a_ i).
+  astepl f0 ! (a_ i)...
+ Step_final (_X_ ! (a_ i) [-] (_C_ (a_ (S n0))) ! (a_ i)).
 Qed.
 
-Lemma identical_poly : forall f g : RX, degree_le n f -> degree_le n g ->
- (forall i, i <= n -> f ! (a_ i) [=] g ! (a_ i)) -> f [=] g.
+Lemma identical_poly :
+  (forall i j: nat, i <= n -> j <= n -> i <> j -> a_ i[#]a_ j) ->
+  forall f g : RX, degree_le n f -> degree_le n g ->
+   (forall i, i <= n -> f ! (a_ i) [=] g ! (a_ i)) -> f [=] g.
 Proof.
  intros.
  apply cg_inv_unique_2.
  apply zero_poly with n.
+   assumption.
   apply degree_le_minus; auto.
  intros.
  astepl (f0 ! (a_ i) [-]g ! (a_ i)).
@@ -417,8 +417,7 @@ Qed.
 
 Lemma poly_representation : f [=] Sum 0 n (fun i => _C_ f ! (a_ i) [*]poly_01 i n).
 Proof.
- apply identical_poly.
-   auto.
+ apply identical_poly; auto.
   apply Sum_degree_le. auto with arith. intros.
    replace n with (0 + n).
    apply degree_le_mult.
