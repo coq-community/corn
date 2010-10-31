@@ -35,6 +35,8 @@
  *)
 Require Export CMonoids.
 
+Require Import SetoidPermutation Setoid Morphisms.
+
 Section Abelian_Monoids.
 
 (**
@@ -70,6 +72,15 @@ Lemma cam_commutes_unfolded : forall x y : M, x[+]y [=] y[+]x.
 Proof cam_commutes.
 
 End AbMonoid_Axioms.
+
+Global Instance cm_Sum_AbMonoid_Proper: forall {M: CAbMonoid},
+ Proper (SetoidPermutation (@st_eq M) ==> @st_eq M) cm_Sum.
+Proof.
+ repeat intro.
+ apply cm_Sum_Proper.
+  apply cam_proof.
+ assumption.
+Qed.
 
 Section SubCAbMonoids.
 

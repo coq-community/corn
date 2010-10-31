@@ -1,7 +1,7 @@
 
 Require Import
   QArith ZArith NArith
-  Qround Qabs.
+  Qround Qabs List.
 
 Require stdlib_omissions.Z.
 
@@ -90,6 +90,22 @@ Lemma Qmult_injective_r (z: Q) (Znz: ~ z == 0): forall x y, (z * x == z * y <-> 
 Proof.
  intros. do 2 rewrite (Qmult_comm z).
  apply Qmult_injective_l. assumption.
+Qed.
+
+Lemma Qplus_injective_l (z: Q): forall x y, (x + z == y + z <-> x == y)%Q.
+Proof with intuition.
+ split; intro E.
+  setoid_replace x with (x + z - z)%Q by (simpl; ring).
+  setoid_replace y with (y + z - z)%Q by (simpl; ring).
+  rewrite E...
+ rewrite E...
+Qed.
+
+Lemma Qminus_eq (x y: Q): (x - y == 0 <-> x == y)%Q.
+Proof.
+ rewrite <- (Qplus_injective_l (-y) x y).
+ rewrite Qplus_opp_r.
+ reflexivity.
 Qed.
 
 Lemma Qinv_char x q: (x * q == 1) <-> (x == / q /\ ~ q == 0).
@@ -268,3 +284,12 @@ Proof with intuition.
  rewrite Zle_Qle in H0.
  rewrite <- S_Qplus...
 Qed.
+
+(** NoDup isn't /directly/ useful for Q because Q does not use a canonical representation
+ and NoDup doesn't support setoid equalities such as Qeq. However, since we have Qred,
+ which yields canonical representations, we can use: *)
+
+Definition QNoDup (l: list Q): Prop := NoDup (map Qred l).
+
+Instance: Proper (Qeq ==> eq) Qred.
+Proof. repeat intro. apply Qred_complete. assumption. Qed.

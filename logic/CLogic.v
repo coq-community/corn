@@ -1655,3 +1655,67 @@ Proof.
  intros.
  ring.
 Qed.
+
+
+Definition CForall {A: Type} (P: A -> Type): list A -> Type :=
+  fold_right (fun x => prod (P x)) True.
+
+Definition CForall_prop {A: Type} (P: A -> Prop) (l: list A):
+ (forall x, In x l -> P x)  IFF  CForall P l.
+Proof with firstorder. induction l... subst... Qed.
+
+Lemma CForall_indexed {A} (P: A -> Type) (l: list A): CForall P l ->
+  forall i (d: A), (i < length l)%nat -> P (nth i l d).
+Proof.
+ intros X i.
+ revert l X.
+ induction i; destruct l; simpl in *; intuition; exfalso; inversion H.
+Qed.
+
+Lemma CForall_map {A B} (P: B -> Type) (f: A -> B) (l: list A):
+  CForall P (map f l)  IFF  CForall (fun x => P (f x)) l.
+Proof. induction l; firstorder. Qed.
+
+Lemma CForall_weak {A} (P Q: A -> Type):
+  (forall x, P x -> Q x) ->
+  (forall l, CForall P l -> CForall Q l).
+Proof. induction l; firstorder. Qed.
+
+Fixpoint CNoDup {T: Type} (R: T -> T -> Type) (l: list T): Type :=
+  match l with
+  | nil => True
+  | h :: t => prod (CNoDup R t) (CForall (R h) t)
+  end.
+
+Lemma CNoDup_weak {A: Type} (Ra Rb: A -> A -> Type) (l: list A):
+  (forall x y, Ra x y -> Rb x y) ->
+  CNoDup Ra l -> CNoDup Rb l.
+Proof with auto.
+ induction l... firstorder.
+ apply CForall_weak with (Ra a)...
+Qed.
+
+
+Lemma CNoDup_indexed {T} (R: T -> T -> Type) (Rsym: Csymmetric _ R) (l: list T) (d: T): CNoDup R l ->
+  forall i j, (i < length l)%nat -> (j < length l)%nat -> i <> j -> R (nth i l d) (nth j l d).
+Proof with intuition.
+ induction l; simpl...
+  exfalso...
+ destruct i.
+  destruct j...
+  apply (CForall_indexed (R a) l)...
+ destruct j...
+ apply Rsym.
+ apply (CForall_indexed (R a) l)...
+Qed.
+
+Lemma CNoDup_map {A B: Type} (R: B -> B -> Type) (f: A -> B):
+  forall l, CNoDup (fun x y => R (f x) (f y)) l  IFF  CNoDup R (map f l).
+Proof with auto; intuition.
+ induction l; simpl...
+ split; intro; split.
+    apply IHl, X.
+   apply CForall_map...
+  apply IHl, X.
+ apply CForall_map...
+Qed.

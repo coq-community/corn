@@ -141,6 +141,9 @@ Proof.
  unfold degree in |- *. intros p n H. elim H. auto.
 Qed.
 
+Lemma degree_le_cpoly_zero n: degree_le n (cpoly_zero R).
+Proof. intro. reflexivity. Qed.
+
 Lemma degree_le_c_ : forall c : R, degree_le 0 (_C_ c).
 Proof.
  unfold degree_le in |- *. intros c m. elim m; intros.
@@ -232,6 +235,15 @@ Proof.
   apply nth_coeff_wd. algebra. algebra.
 Qed.
 
+Lemma degree_le_Sum (l: list (cpoly R)) n:
+  (forall p, In p l -> degree_le n p) -> degree_le n (cm_Sum l).
+Proof.
+ induction l; intros.
+  apply degree_le_cpoly_zero.
+ change (degree_le n (a [+] cm_Sum l)).
+ apply degree_le_plus; intuition.
+Qed.
+
 Lemma degree_inv : forall (p : RX) (n : nat), degree n p -> degree n [--]p.
 Proof.
  unfold degree in |- *. intros p n H.
@@ -310,6 +322,34 @@ Proof.
   omega.
  right.
  omega.
+Qed.
+
+Lemma degree_le_Product (l: list (cpoly R)) n:
+  (forall p, In p l -> degree_le n p) ->
+  degree_le (length l * n) (cr_Product l).
+Proof.
+ induction l; intros.
+  apply (degree_le_c_ One).
+ change (degree_le (n + length l * n) (a [*] cr_Product l)).
+ apply degree_le_mult; intuition.
+Qed.
+
+Lemma degree_le_mult_constant_l (p: cpoly R) (x: R) (n: nat):
+  degree_le n p -> degree_le n (_C_ x [*] p).
+Proof with auto.
+ intros.
+ replace n with (0 + n)%nat...
+ apply degree_le_mult...
+ apply degree_le_c_.
+Qed.
+
+Lemma degree_le_mult_constant_r (p: cpoly R) (x: R) (n: nat):
+  degree_le n p -> degree_le n (p [*] _C_ x).
+Proof with auto.
+ intros.
+ replace n with (n + 0)%nat...
+ apply degree_le_mult...
+ apply degree_le_c_.
 Qed.
 
 Lemma degree_mult_aux : forall (p q : RX) m n, degree_le m p -> degree_le n q ->
@@ -483,6 +523,10 @@ Proof.
  change (nth_coeff (S m) (cpoly_linear _ c p)  [=] Zero) in |- *.
  apply H. auto with arith.
 Qed.
+
+Lemma degree_le_cpoly_linear_inv (p: cpoly R) (c: R) (n: nat):
+  degree_le n p -> degree_le (S n) (c[+X*]p).
+Proof. intros H [|m] E. inversion E. apply (H m). auto with arith. Qed.
 
 Lemma monic_cpoly_linear : forall (p : cpoly R) c n, monic (S n) (c[+X*]p) -> monic n p.
 Proof.

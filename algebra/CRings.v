@@ -55,6 +55,7 @@
 
 Require Import CornTac.
 Require Export CSums.
+Require Import CAbMonoids Permutation SetoidPermutation Setoid Morphisms.
 
 Transparent sym_eq.
 Transparent f_equal.
@@ -181,6 +182,10 @@ Variable R : CRing.
 The multiplicative monoid of a ring is defined as follows.
 *)
 Definition Build_multCMonoid : CMonoid := Build_CMonoid _ _ (mult_mon R).
+
+(** Furthermore, this is an abelian monoid: *)
+Definition Build_multCAbMonoid: CAbMonoid :=
+  Build_CAbMonoid Build_multCMonoid (mult_commutes R).
 
 End Ring_constructions.
 
@@ -1316,6 +1321,48 @@ Proof.
 Qed.
 
 End ScalarMultiplication.
+
+Section cr_Product.
+
+  Context {R: CRing}.
+
+  Definition cr_Product: list R -> R := @cm_Sum (Build_multCAbMonoid R).
+
+  Lemma cr_Product_ones (l: list R): (forall x, In x l -> x [=] One) ->
+    cr_Product l [=] One.
+  Proof. apply (@cm_Sum_units (Build_multCMonoid R)). Qed.
+
+  Lemma cr_Product_0 (z: R) (zE: z [=] Zero): forall l, In z l -> cr_Product l [=] Zero.
+  Proof with auto.
+   induction l.
+    simpl.
+    intuition.
+   intros [?|?]; simpl.
+    subst. rewrite zE.
+    apply cring_mult_zero_op.
+   rewrite IHl...
+   apply cring_mult_zero.
+  Qed.
+
+  Global Instance cr_Product_Proper:
+    Proper (SetoidPermutation (@st_eq R) ==> @st_eq R) cr_Product.
+  Proof.
+   apply ( @cm_Sum_AbMonoid_Proper (Build_multCAbMonoid R)). 
+  Qed.
+
+  (* For convenience, we also make a weaker instance for Permutation: *)
+
+  Global Instance: Proper (@Permutation R ==> @st_eq R) cr_Product.
+  Proof.
+   repeat intro.
+   apply cr_Product_Proper.
+   apply SetoidPermutation_from_Permutation.
+    apply _.
+   assumption.
+  Qed.
+
+End cr_Product.
+
 
 Hint Resolve included_FMult included_FScalMult included_FNth : included.
 

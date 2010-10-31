@@ -36,6 +36,9 @@
 
 Require Export CPoly_Degree.
 Require Export COrdFields2.
+Require ne_list.
+Import ne_list.notations.
+
 
 (**
 * Polynomials apart from zero *)
@@ -568,3 +571,35 @@ Proof.
 Qed.
 
 End Poly_ApZero_Interval.
+
+Section interpolation.
+
+  Context {F: CField}.
+
+  Definition interpolates (l: list (F * F)) (p: cpoly F): Prop :=
+    forall xy, In xy l -> p ! (fst xy) [=] snd xy.
+
+  Lemma interpolation_unique (l: ne_list (F * F)): CNoDup (@cs_ap _) (map (@fst _ _) l) ->
+    forall p q: cpoly F,
+      degree_le (length (tl l)) p -> interpolates l p -> 
+      degree_le (length (tl l)) q -> interpolates l q ->
+        p [=] q.
+  Proof with auto with arith.
+   intros ???? A ? B.
+   apply (identical_poly F (fun i => fst (nth i l (Zero, Zero))) (length (tl l)))...
+    repeat intro.
+    rewrite <- map_nth.
+    rewrite <- (map_nth (@fst _ _) l).
+    simpl @fst.
+    apply CNoDup_indexed...
+      intros. apply ap_symmetric.
+     rewrite map_length. rewrite <- ne_list.tl_length...
+    rewrite map_length. rewrite <- ne_list.tl_length...
+   intros.
+   transitivity (snd (nth i l (Zero, Zero))).
+    apply A, nth_In... rewrite <- ne_list.tl_length...
+   symmetry.
+   apply B, nth_In... rewrite <- ne_list.tl_length...
+  Qed.
+
+End interpolation.

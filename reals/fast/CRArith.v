@@ -130,6 +130,26 @@ Proof.
  rewrite -> Qplus_0_r in x_.
  assumption.
 Qed.
+
+Lemma inject_Q_product (l: list Q): (' cr_Product l) [=] cr_Product (map inject_Q l).
+Proof.
+ induction l.
+  reflexivity.
+ change (' (a * cr_Product l)[=]cr_Product (map inject_Q (a :: l))).
+ rewrite <- CRmult_Qmult.
+ rewrite IHl.
+ reflexivity.
+Qed.
+
+Lemma inject_Qred_ap (x y: Q): Qred x <> Qred y -> ' x [#] ' y.
+Proof with auto.
+ intro.
+ apply Qap_CRap.
+ intro.
+ apply H.
+ apply Qred_complete...
+Qed.
+
 (* begin hide *)
 Hint Rewrite <- CRinv_Qinv : toCRring.
 (* end hide *)

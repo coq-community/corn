@@ -41,6 +41,7 @@ Require Export Cmod.
 Require Export CSemiGroups.
 Require Export csetoid_rewrite.
 Require Export Nsec.
+Require Import SetoidPermutation Setoid Morphisms.
 
 (* Begin_SpecReals *)
 
@@ -926,7 +927,7 @@ Let [M:CMonoid] and [D:M->CProp].
 %\end{convention}%
 *)
 
-Variable M:CMonoid.
+Context {M:CMonoid}.
 
 Fixpoint cm_Sum (l: list M) {struct l}: M :=
 match l with
@@ -962,6 +963,38 @@ Proof.
  apply csbf_wd_unfolded.
   intuition.
  exact IHk.
+Qed.
+
+Lemma cm_Sum_eq {A} (a: list A) (f g: A -> M):
+  (forall x, f x [=] g x) -> cm_Sum (map f a) [=] cm_Sum (map g a).
+  (* This is just a specialization of Proper-ness for cm_Sum which
+   I'm not doing right now because I don't want to involve the list
+   setoid (parameterized by the element setoid) right now. *)
+Proof with try reflexivity.
+ intro E.
+ induction a...
+ simpl. rewrite E IHa...
+Qed.
+
+Global Instance cm_Sum_Proper: commutes (@csg_op M) ->
+ Proper (SetoidPermutation (@st_eq M) ==> @st_eq M) cm_Sum.
+Proof with auto; try reflexivity.
+ intros E x y H.
+ induction H; simpl...
+   rewrite IHSetoidPermutation H...
+  rewrite plus_assoc_unfolded plus_assoc_unfolded (E _ y)...
+ transitivity (cm_Sum l')...
+Qed.
+
+Lemma cm_Sum_units (a: list M): (forall x, In x a -> x [=] Zero) -> cm_Sum a [=] Zero.
+Proof with intuition.
+ clear D.
+ induction a. intuition.
+ intros E.
+ simpl.
+ rewrite IHa...
+ rewrite (E a)...
+ apply cm_lft_unit_unfolded.
 Qed.
 
 Lemma op_pres_Dbrack : bin_op_pres_pred _ Dbrack csg_op.

@@ -2375,6 +2375,32 @@ Proof.
  apply Sum0_cpoly_ap.
 Qed.
 
+Lemma cm_Sum_apply (l: list (cpoly_cring R)) (x: R):
+ (cm_Sum l) ! x [=] cm_Sum (map (fun e => e ! x) l).
+Proof.
+ induction l.
+  reflexivity.
+ change ((a [+] cm_Sum l) ! x[=]cm_Sum (map (fun e : cpoly_cring R => e ! x) (a :: l))).
+ rewrite plus_apply IHl.
+ reflexivity.
+Qed.
+
+Hint Rewrite cm_Sum_apply: apply.
+
+Lemma cr_Product_apply (l: list (cpoly_cring R)) (x: R):
+ (cr_Product l) ! x [=] cr_Product (map (fun e => e ! x) l).
+Proof.
+ induction l.
+  simpl.
+  rewrite cring_mult_zero.
+  apply cm_rht_unit_unfolded.
+ change ((a [*] cr_Product l) ! x[=]cr_Product (map (fun e : cpoly_cring R => e ! x) (a :: l))).
+ rewrite mult_apply IHl.
+ reflexivity.
+Qed.
+
+Hint Rewrite cr_Product_apply: apply.
+
 End Poly_properties.
 
 (* Implicit Arguments _C_ [R].*)

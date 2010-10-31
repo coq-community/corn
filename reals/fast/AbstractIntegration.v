@@ -47,7 +47,7 @@ Qed.
 (** Riemann sums will play an important role in the theory about integrals, so let's
 define very simple summation and a key property thereof: *)
 
-Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum M (map f (enum n)).
+Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum (map f (enum n)).
 
 (** If the elementwise distance between two summations over the same domain
  is bounded, then so is the distance between the summations: *)
@@ -62,7 +62,7 @@ Proof with simpl; auto.
  change (gball (inject_Z (S n) * `q) (cmΣ (S n) f) (cmΣ (S n) g)).
  rewrite Q.S_Qplus.
  setoid_replace ((n+1) * q)%Q with (q + n * q)%Q by (simpl; ring).
- unfold cmΣ. simpl cm_Sum.
+ unfold cmΣ. simpl @cm_Sum.
  apply CRgball_plus...
 Qed.
 
@@ -122,7 +122,7 @@ Section integral_interface.
         cmΣ n (fun i: nat => ∫ f (a + i * ` b) b) == ∫ f a (n * b)%Qnn.
     Proof with try ring.
      unfold cmΣ.
-     induction n; simpl cm_Sum.
+     induction n; simpl @cm_Sum.
       setoid_replace (QnonNeg.from_nat 0) with 0%Qnn by reflexivity.
       rewrite QnonNeg.mult_0_l zero_width_integral...
      rewrite IHn.

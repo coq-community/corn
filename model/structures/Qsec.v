@@ -45,6 +45,7 @@ Require Import Arith.
 Require Import Peano_dec.
 Require Import Zsec.
 Require Export QArith.
+Require Import stdlib_omissions.Q.
 
 Close Scope Q_scope.
 Open Local Scope Q_scope.
@@ -1138,4 +1139,28 @@ Qed.
 Lemma Qgt_is_lt : forall x y : Q, x > y IFF  y < x.
 Proof.
  firstorder.
+Qed.
+
+Lemma QNoDup_CNoDup_Qap(l: list Q): QNoDup l  IFF  CNoDup Qap l.
+Proof with auto.
+ induction l; simpl; split; intro...
+   apply NoDup_nil.
+  split.
+   apply IHl. inversion_clear H...
+  apply (CForall_prop _).
+  intros ? A.
+  inversion_clear H.
+  intro E.
+  apply H0.
+  rewrite E.
+  apply in_map...
+ apply NoDup_cons. 2: firstorder.
+ intro.
+ destruct (proj1 (in_map_iff _ _ _) H) as [x [H0 H1]].
+ destruct X.
+ apply (snd (@CForall_prop Q (Qap a) l) c0 x)...
+ rewrite <- (Qred_correct x).
+ rewrite H0.
+ symmetry.
+ apply Qred_correct.
 Qed.
