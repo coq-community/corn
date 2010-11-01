@@ -34,3 +34,5 @@ for node in vs:
 
 os.system('coqdep ' + ' '.join(vs) + ' ' + includes + ' ' + rs + ' > deps')
 ParseDepends('deps')
+
+open('runcoqide', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + rs + ' $@ \n')
