@@ -6,11 +6,12 @@ This file contains some basic information about C-CoRN.
 PREREQUISITES
 -------------
 
-C-CoRN (notice the capitals) is designed to run with Coq version 8.2.
-
-Before installing C-CoRN, please check that you have:
- - Coq version 8.2
- - at least 128MiB RAM memory available (and preferably more) 
+ This version of C-CoRN is known to compile with:
+ - Coq version 8.3
+ - Ssreflect revision 1273 from the v8.3 branch in the coq-contrib repository.
+   This exact revision can be obtained by saying:
+    svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/branches/v8.3/Saclay/Ssreflect -r 1273
+ - at least 128MiB RAM memory available (and preferably more)
  - GNU make version 3.80 or later
  - a POSIX-compliant operating system. This means Unix, a clone
    thereof or a good emulation layer on top of another OS. In
