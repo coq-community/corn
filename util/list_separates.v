@@ -8,6 +8,10 @@ Fixpoint separates {A} (l: list A): list (A * list A) :=
   | x :: xs => (x, xs) :: map (fun pq => (fst pq, x :: snd pq)) (separates xs)
   end.
 
+(** 
+separates (0::1::2::nil)= (0, 1 :: 2 :: nil) :: (1, 0 :: 2 :: nil) :: (2, 0 :: 1 :: nil) :: nil
+*)
+
 Lemma separates_length {A} (l: list A): length (separates l) = length l.
 Proof.
  induction l. intuition.

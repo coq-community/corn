@@ -71,8 +71,7 @@ Section contents.
    apply degree_le_Sum.
    intros.
    apply in_map_iff in H.
-   destruct H.
-   destruct H.
+   destruct H as [x [H H0]].
    subst p.
    apply degree_le_mon with (length (tl x)).
     pose proof (ne_list.tails_are_shorter qpoints x H0).
@@ -221,7 +220,7 @@ Section contents.
   Lemma coincides_with_Lagrange (l: ne_list QPoint): QNoDup (map fst l) ->
     N l [=] lagrange_poly l.
   Proof with auto.
-   intros.
+   intros. Locate interpolation_unique.
    apply (@interpolation_unique CRasCField (ne_list.map (first inject_Q) l)).
        rewrite ne_list.list_map.
        rewrite map_fst_map_first.
