@@ -220,7 +220,7 @@ Section contents.
   Lemma coincides_with_Lagrange (l: ne_list QPoint): QNoDup (map fst l) ->
     N l [=] lagrange_poly l.
   Proof with auto.
-   intros. Locate interpolation_unique.
+   intros.
    apply (@interpolation_unique CRasCField (ne_list.map (first inject_Q) l)).
        rewrite ne_list.list_map.
        rewrite map_fst_map_first.
