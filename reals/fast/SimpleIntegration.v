@@ -169,7 +169,7 @@ Section definition.
 
   Definition pre_result fr w: CR := mkRegularFunction (0:Q_as_MetricSpace) (regular fr w).
 
-  Global Instance result: Integral f := @integral_extended_to_nn_width f pre_result.
+  Global Instance integrate: Integral f := @integral_extended_to_nn_width f pre_result.
 
   Global Instance: Proper (Qeq ==> QposEq ==> @st_eq _) pre_result.
   Proof.
@@ -324,7 +324,6 @@ Section implements_abstract_interface.
      intro e.
      simpl.
      unfold uneven_CRplus_approx.
-     unfold result.
      simpl.
      unfold approx.
      do 3 rewrite fastΣ_correct.
