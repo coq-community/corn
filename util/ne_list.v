@@ -1,7 +1,8 @@
 (** This module should be [Require]d but not [Import]ed (except for the notations submodule). *)
 
 Require Import
-  Unicode.Utf8 Setoid List Setoid Morphisms.
+  Unicode.Utf8 Setoid List Setoid Morphisms Permutation
+  stdlib_omissions.List.
 
 Section contents.
 
@@ -73,6 +74,30 @@ Section contents.
   Lemma tl_length (l: L): S (length (tl l)) = length l.
   Proof. destruct l; reflexivity. Qed.
 
+  Notation ListPermutation := (@Permutation.Permutation _).
+
+  Definition Permutation (x y: L): Prop := ListPermutation x y.
+
+  Global Instance: Equivalence Permutation.
+  Proof with intuition.
+   unfold Permutation.
+   split; repeat intro...
+   transitivity y...
+  Qed.
+
+  Global Instance: Proper (Permutation ==> ListPermutation) to_list.
+  Proof. firstorder. Qed.
+
+  Lemma Permutation_ne_tl_length (x y: L):
+    Permutation x y → length (tl x) = length (tl y).
+  Proof.
+   intro H.
+   apply eq_add_S.
+   do 2 rewrite tl_length.
+   rewrite H.
+   reflexivity.
+  Qed.
+
 End contents.
 
 Implicit Arguments L [].
@@ -84,7 +109,7 @@ Fixpoint tails {A} (l: L A): L (L A) :=
   end.
 
 Lemma tails_are_shorter {A} (y x: L A):
-  In x (tails y) ->
+  In x (tails y) →
   length x <= length y.
 Proof with auto.
  induction y; simpl.
@@ -100,6 +125,15 @@ Fixpoint map {A B} (f: A → B) (l: L A): L B :=
 
 Lemma list_map {A B} (f: A → B) (l: L A): to_list (map f l) = List.map f (to_list l).
 Proof. induction l. reflexivity. simpl. congruence. Qed.
+
+Global Instance: forall {A B} (f: A → B), Proper (Permutation ==> Permutation) (map f).
+Proof with auto.
+ intros ????? E.
+ unfold Permutation.
+ do 2 rewrite list_map.
+ rewrite E.
+ reflexivity.
+Qed.
 
 Module notations.
 

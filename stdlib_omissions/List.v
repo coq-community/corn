@@ -60,6 +60,9 @@ Proof with auto.
  intuition.
 Qed.
 
+Instance: forall A, Proper (@Permutation A ==> eq) (@length A).
+Proof Permutation_length.
+
 Section list_eq.
 
   Context {A} (R: relation A).
@@ -130,3 +133,6 @@ Proof. pose proof Permutation_in. firstorder. Qed.
 
 Lemma tl_map {A B} (l: list A) (f: A → B): tl (map f l) = map f (tl l).
 Proof. destruct l; reflexivity. Qed.
+
+Hint Resolve in_cons.
+Hint Immediate in_eq.

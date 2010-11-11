@@ -1228,7 +1228,6 @@ Proof.
   destruct (Complete_located locatedX _ _ x a (Y e)) as [A|A].
    exists a.
    split; auto.
-   apply Hl0; auto with *.
   apply IHl.
    intros y Hy.
    apply Hl0; auto with *.

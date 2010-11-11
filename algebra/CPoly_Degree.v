@@ -384,6 +384,25 @@ Proof.
  auto.
 Qed.
 
+Lemma lead_coeff_product_1 (n: nat) (l: list (cpoly R)):
+  (forall p, In p l -> (nth_coeff n p [=] One /\ degree_le n p)) ->
+  nth_coeff (length l * n) (cr_Product l) [=] One.
+Proof with auto.
+ intro H.
+ induction l.
+  simpl. reflexivity.
+ change (nth_coeff (n + length l * n) (a [*] cr_Product l)[=]One).
+ rewrite degree_mult_aux.
+   setoid_replace (nth_coeff n a) with (One:R).
+    rewrite IHl.
+     apply mult_one.
+    intros. apply H...
+   apply H...
+  apply H...
+ apply degree_le_Product.
+ intros. apply H...
+Qed.
+
 Hint Resolve degree_mult_aux: algebra.
 
 Lemma monic_mult : forall (p q : RX) m n,

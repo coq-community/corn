@@ -36,6 +36,7 @@
 
 Require Export CPoly_Degree.
 Require Export COrdFields2.
+Require Import Morphisms Permutation.
 Require ne_list.
 Import ne_list.notations.
 
@@ -572,6 +573,9 @@ Qed.
 
 End Poly_ApZero_Interval.
 
+Global Instance: forall {R: CRing} (n: nat), Proper (@st_eq _ ==> iff) (@degree_le R n).
+Proof. split; apply degree_le_wd; [| symmetry]; assumption. Qed.
+
 Section interpolation.
 
   Context {F: CField}.
@@ -579,13 +583,36 @@ Section interpolation.
   Definition interpolates (l: list (F * F)) (p: cpoly F): Prop :=
     forall xy, In xy l -> p ! (fst xy) [=] snd xy.
 
+  Definition interpolates_economically (l: ne_list (F * F)) (p: cpoly F): Prop :=
+    interpolates l p /\ degree_le (length (tl l)) p.
+
+  Global Instance: Proper (@Permutation _ ==> @st_eq _ ==> iff) interpolates.
+  Proof with auto.
+   cut (forall x y: list (F * F), Permutation x y ->
+    forall p q: cpoly F, p [=] q -> interpolates x p -> interpolates y q).
+    split; apply H; auto; symmetry...
+   unfold interpolates.
+   intros ?? E ?? G ??.
+   rewrite <- E, <- G...
+  Qed.
+
+  Global Instance: Proper (ne_list.Permutation ==> @st_eq _ ==> iff) interpolates_economically.
+  Proof with auto.
+   intros ?? E ?? U.
+   unfold interpolates_economically.
+   rewrite U.
+   rewrite (ne_list.Permutation_ne_tl_length x y)...
+   rewrite E.
+   reflexivity.
+  Qed.
+
   Lemma interpolation_unique (l: ne_list (F * F)): CNoDup (@cs_ap _) (map (@fst _ _) l) ->
     forall p q: cpoly F,
-      degree_le (length (tl l)) p -> interpolates l p -> 
-      degree_le (length (tl l)) q -> interpolates l q ->
+      interpolates_economically l p ->
+      interpolates_economically l q ->
         p [=] q.
   Proof with auto with arith.
-   intros ???? A ? B.
+   intros ??? [A ?] [B ?].
    apply (identical_poly F (fun i => fst (nth i l (Zero, Zero))) (length (tl l)))...
     repeat intro.
     rewrite <- map_nth.

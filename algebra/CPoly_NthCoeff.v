@@ -35,6 +35,7 @@
  *)
 
 Require Export CPolynomials.
+Require Import Morphisms.
 
 (**
 * Polynomials: Nth Coefficient
@@ -125,6 +126,9 @@ Proof.
   assumption.
  assumption.
 Qed.
+
+Global Instance: forall n, Proper (@st_eq _ ==> @st_eq _) (nth_coeff n).
+Proof. intros n ??. apply (nth_coeff_wd n). Qed.
 
 Definition nth_coeff_fun n := Build_CSetoid_fun _ _ _ (nth_coeff_strext n).
 

@@ -6,6 +6,8 @@ Require Import
  CRArith Qmetric Qring CReals
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation.
+Require ne_list.
+Import ne_list.notations.
 
 Open Local Scope CR_scope.
 
@@ -91,8 +93,9 @@ Section contents.
 
   Lemma interpolates: interpolates crpoints L.
   Proof with auto.
-   intros xy H0.
-   destruct (proj1 (in_map_iff _ _ _) H0) as [[xi y] [V W]]. clear H0.
+   intros xy.
+   rewrite in_map_iff.
+   intros [[xi y] [V W]].
    subst. simpl @fst. simpl @snd.
    rewrite apply. unfold functional.
    destruct (move_to_front _ _ W) as [x H1].
@@ -143,6 +146,18 @@ Section contents.
   Qed. (* Todo: Clean up more. *)
 
 End contents.
+
+Lemma interpolates_economically (qpoints: ne_list (Q * CR)): QNoDup (map fst qpoints) →
+  interpolates_economically (ne_list.map (first inject_Q) qpoints) (L qpoints).
+Proof with auto.
+ split.
+  rewrite ne_list.list_map.
+  apply interpolates...
+ rewrite ne_list.list_map.
+ rewrite tl_map.
+ rewrite map_length.
+ apply degree...
+Qed.
 
 Module notations.
 
