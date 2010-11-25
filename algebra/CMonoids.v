@@ -43,6 +43,8 @@ Require Export csetoid_rewrite.
 Require Export Nsec.
 Require Import SetoidPermutation Setoid Morphisms.
 
+Set Automatic Introduction.
+
 (* Begin_SpecReals *)
 
 (**

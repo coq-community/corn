@@ -23,6 +23,8 @@ Set Implicit Arguments.
 
 Require Export Setoid.
 Require Import ssreflect.
+Set Automatic Introduction.
+
 (* Require Import CornTac.*)
 
 (**

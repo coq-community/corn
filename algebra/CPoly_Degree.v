@@ -37,6 +37,7 @@
 Require Export CPoly_NthCoeff.
 Require Export CFields.
 Require Export Rational.
+Set Automatic Introduction.
 
 (**
 * Degrees of Polynomials

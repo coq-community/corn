@@ -35,6 +35,7 @@
  *)
 
 Require Export IR_CPMSpace.
+Set Automatic Introduction.
 
 Section prodpsmetrics.
 (**

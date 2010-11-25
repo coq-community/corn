@@ -35,6 +35,7 @@
  *)
 
 Require Export Prod_Sub.
+Set Automatic Introduction.
 
 Section lists.
 (**

@@ -51,6 +51,8 @@ Require Export ZArithRing.
 Require Export Div2.
 Require Export Wf_nat.
 
+Set Automatic Introduction.
+
 (**
 * Extending the Coq Logic
 Because notions of apartness and order have computational meaning, we

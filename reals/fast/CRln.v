@@ -33,6 +33,7 @@ Require Import ArTanH.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.

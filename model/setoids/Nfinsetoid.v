@@ -35,6 +35,7 @@
  *)
 
 Require Import CSetoids.
+Set Automatic Introduction.
 
 (**
 ** Setoids of the first [n] natural numbers

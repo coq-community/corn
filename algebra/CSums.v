@@ -43,6 +43,8 @@
 Require Export CAbGroups.
 Require Export Peano_dec.
 Require Import ssreflect.
+Set Automatic Introduction.
+
 (**
 * Sums
 

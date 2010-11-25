@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import QArith_base.
 Require Import TotalOrder.
+Set Automatic Introduction.
 
 (**
 ** Example of a Total Order: <Q, Qle, Qmin, Qmax>

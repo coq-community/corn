@@ -35,6 +35,7 @@
  *)
 Require Export ZArith.
 Require Import CSetoids.
+Set Automatic Introduction.
 
 (**
 ** Setoids of the integers between 0 and [z]

@@ -31,6 +31,7 @@ Require Import CornTac.
 Require Import Qauto.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 

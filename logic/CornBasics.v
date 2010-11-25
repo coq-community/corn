@@ -53,6 +53,8 @@ Require Export List.
 Require Export ssreflect.
 Require Import Eqdep_dec.
 
+Set Automatic Introduction.
+
 (**
 * Basics
 This is random stuff that should be in the Coq basic library.

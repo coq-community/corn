@@ -10,6 +10,8 @@ Require Import
  Morphisms
  SetoidClass.
 
+Set Automatic Introduction.
+
 Class Apartness `{SetoidClass.Setoid} (ap: Crelation A): Type :=
   { ap_irreflexive: irreflexive ap
   ; ap_symmetric: Csymmetric ap

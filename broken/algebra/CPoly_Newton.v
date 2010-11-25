@@ -9,6 +9,8 @@ Require Import
 Require ne_list.
 Import ne_list.notations.
 
+Set Automatic Introduction.
+
 Open Local Scope CR_scope.
 
 Local Notation Σ := cm_Sum.

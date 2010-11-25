@@ -42,6 +42,7 @@
 
 Require Import CornTac.
 Require Export CMonoids.
+Set Automatic Introduction.
 
 (* Begin_SpecReals *)
 

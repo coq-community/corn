@@ -43,6 +43,7 @@
 Require Export CRingClass.
 Require Import CRing_Homomorphisms.
 Require Import Rational.
+Set Automatic Introduction.
 
 (**
 * Polynomials
@@ -367,8 +368,6 @@ Lemma Ccpoly_ind_cs : forall P : cpoly_csetoid -> CProp,
  P cpoly_zero_cs -> (forall p c, P p -> P (cpoly_linear_cs c p)) -> forall p, P p.
 Proof.
  simple induction p; auto.
- unfold cpoly_linear_cs in X0.
- auto.
 Qed.
 
 Lemma Ccpoly_double_ind0_cs : forall P : cpoly_csetoid -> cpoly_csetoid -> CProp,
@@ -396,8 +395,6 @@ Lemma cpoly_ind_cs : forall P : cpoly_csetoid -> Prop,
  P cpoly_zero_cs -> (forall p c, P p -> P (cpoly_linear_cs c p)) -> forall p, P p.
 Proof.
  simple induction p; auto.
- unfold cpoly_linear_cs in H0.
- auto.
 Qed.
 
 Lemma cpoly_double_ind0_cs : forall P : cpoly_csetoid -> cpoly_csetoid -> Prop,
@@ -2778,4 +2775,4 @@ Proof.
  apply IHp.
 Qed.
 
-(* TODO: proof that the polynomials form a module over the ring*)
+(* TODO: prove that the polynomials form a module over the ring*)

@@ -55,6 +55,8 @@ Require Export CLogic.
 Require Export Step.
 Require Export RSetoid.
 
+Set Automatic Introduction.
+
 Delimit Scope corn_scope with corn.
 Open Scope corn_scope.
 

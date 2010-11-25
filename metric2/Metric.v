@@ -35,6 +35,8 @@ Import QnnInf.notations.
 Open Local Scope Q_scope.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
+
 (**
 * Metric Space
 In this version, a metric space over a setoid X is characterized by a

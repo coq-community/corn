@@ -40,6 +40,7 @@
 
 Require Export CSumsReals.
 Require Export PartFunEquality.
+Set Automatic Introduction.
 
 (**
 * Sums of Functions

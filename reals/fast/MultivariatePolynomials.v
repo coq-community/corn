@@ -12,6 +12,7 @@ Require Import ModulusDerivative.
 Require Import CRArith.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Opaque cpoly_cring.
 Opaque cpoly_apply_fun.

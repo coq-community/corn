@@ -40,6 +40,7 @@ Require Import Morphisms Permutation.
 Require ne_list.
 Import ne_list.notations.
 
+Set Automatic Introduction.
 
 (**
 * Polynomials apart from zero *)

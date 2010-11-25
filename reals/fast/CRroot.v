@@ -36,6 +36,7 @@ Require Import RealPowers.
 Require Import ContinuousCorrect.
 Require Import Qauto.
 Require Import CornTac.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 

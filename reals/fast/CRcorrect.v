@@ -27,6 +27,8 @@ Require Import QMinMax.
 Require Import Qabs.
 Require Export CRFieldOps.
 
+Set Automatic Introduction.
+
 Opaque Qmin Qmax.
 
 (**

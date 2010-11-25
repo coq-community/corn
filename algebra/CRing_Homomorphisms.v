@@ -47,6 +47,7 @@
 (** printing phi %\ensuremath{\phi}%  *)
 
 Require Export CRings.
+Set Automatic Introduction.
 
 (**
 * Ring Homomorphisms
