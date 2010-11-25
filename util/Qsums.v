@@ -7,6 +7,7 @@ Require Import
   stdlib_omissions.Q.
 
 Set Automatic Introduction.
+Set Automatic Introduction.
 
 Open Scope Q_scope.
 
@@ -163,7 +164,7 @@ Proof with auto with *.
  intros.
  unfold flip.
  replace ((x * k + i) / k)%nat with x...
- apply (div_unique (x * k + i)%nat k x i)...
+ apply (Nat.div_unique (x * k + i)%nat k x i)...
 Qed.
 
 Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):

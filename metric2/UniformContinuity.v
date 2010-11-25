@@ -25,6 +25,7 @@ Require Import List.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 (** This extended notition of ball operates over QposInf, allowing
 one to say, ball Infinity a b, holds for all a and b.

@@ -35,6 +35,7 @@ Require Import COrdFields2.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Open Local Scope sfstscope.
 Open Local Scope setoid_scope.

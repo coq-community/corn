@@ -37,6 +37,8 @@
 Require Export Nsec.
 Require Import CSetoidFun.
 
+Set Automatic Introduction.
+
 (**
 ** Example of a setoid: [nat]
 

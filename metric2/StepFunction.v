@@ -25,6 +25,7 @@ Require Import Qordfield.
 Require Import COrdFields.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 

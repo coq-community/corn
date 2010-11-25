@@ -24,6 +24,7 @@ Require Import COrdFields.
 Require Import Qauto.
 Require Import CornTac.
 
+Set Automatic Introduction.
 Set Implicit Arguments.
 
 Open Local Scope Q_scope.

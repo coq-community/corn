@@ -33,6 +33,8 @@ Require Import Qmetric.
 Require Import CornTac.
 Require Import Stability.
 
+Set Automatic Introduction.
+
 Open Local Scope CR_scope.
 
 (** Operations on rational numbers over CR are the same as the operations

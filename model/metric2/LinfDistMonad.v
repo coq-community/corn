@@ -33,6 +33,7 @@ We prove the that StepF distributes over Complete using the function
 swap (which we call dist) as in Jones, Duponcheel - composing monads
 *)
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope sfstscope.

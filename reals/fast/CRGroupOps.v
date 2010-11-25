@@ -27,6 +27,7 @@ Require Import Qmetric.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Opaque CR Qmin Qmax.
 

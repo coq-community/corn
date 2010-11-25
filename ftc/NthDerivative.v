@@ -35,6 +35,7 @@
  *)
 
 Require Export Differentiability.
+Set Automatic Introduction.
 
 Section Nth_Derivative.
 

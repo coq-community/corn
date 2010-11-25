@@ -36,6 +36,7 @@
 
 Require Export CSetoidInc.
 Require Export RealLists.
+Set Automatic Introduction.
 
 Section Intervals.
 

@@ -35,6 +35,7 @@
  *)
 
 Require Export Continuity.
+Set Automatic Introduction.
 
 (** printing Partition_Sum %\ensuremath{\sum_P}% #&sum;<sub>P</sub># *)
 

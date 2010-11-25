@@ -7,11 +7,12 @@ PREREQUISITES
 -------------
 
  This version of C-CoRN is known to compile with:
- - Coq version 8.3
- - Ssreflect revision 1273 from the v8.3 branch in the coq-contrib repository.
+ - Coq version revision 13650 from the trunk branch
+ - Ssreflect revision 1292 from the trunk branch in the coq-contrib repository.
    This exact revision can be obtained by saying:
-    svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/branches/v8.3/Saclay/Ssreflect -r 1273
- - at least 128MiB RAM memory available (and preferably more)
+    svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/trunk/Saclay/Ssreflect -r 1292
+   Currently only the ssreflect binary compiles, the standard library is broken.
+   However, CoRN does not depend on the library.
  - GNU make version 3.80 or later
  - a POSIX-compliant operating system. This means Unix, a clone
    thereof or a good emulation layer on top of another OS. In

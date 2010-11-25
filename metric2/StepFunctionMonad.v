@@ -30,6 +30,7 @@ satify the monad laws.
 *)
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 (** This version of [StepF] has type [Setoid] that carries its equivalence
 relation with it. *)

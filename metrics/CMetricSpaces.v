@@ -36,6 +36,7 @@
 
 Require Export Prod_Sub.
 Require Export Equiv.
+Set Automatic Introduction.
 
 Section Definition_MS.
 (**

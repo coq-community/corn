@@ -42,6 +42,7 @@ Require Import Qround.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Opaque CR.
 Opaque Exp.

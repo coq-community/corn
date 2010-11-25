@@ -44,6 +44,7 @@ Require Import Eqdep_dec.
 Require Import CornTac.
 Require Import Qround.
 Require Import stdlib_omissions.Q.
+Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 

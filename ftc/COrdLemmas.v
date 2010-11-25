@@ -35,6 +35,7 @@
  *)
 
 Require Export COrdCauchy.
+Set Automatic Introduction.
 
 Section Lemmas.
 

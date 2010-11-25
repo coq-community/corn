@@ -36,6 +36,9 @@
 
 Require Export CSetoids.
 Require Import ssreflect.
+
+Set Automatic Introduction.
+
 (**
 ** The Setoid of Setoid functions
 

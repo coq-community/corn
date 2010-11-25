@@ -44,6 +44,7 @@ Require Import MoreIntegrals.
 Require Import CornTac.
 
 Set Implicit Arguments.
+Set Automatic Introduction.
 
 Opaque Qmax Qabs inj_Q.
 

@@ -25,6 +25,7 @@ Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import Qmetric.
 Require Import CornTac.
+Set Automatic Introduction.
 
 Opaque CR inj_Q.
 

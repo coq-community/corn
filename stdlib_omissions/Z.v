@@ -14,7 +14,7 @@ Proof.
   split.
    auto with *.
   apply inj_lt.
-  apply mod_upper_bound.
+  apply Nat.mod_upper_bound.
   assumption.
  rewrite <- inj_mult.
  rewrite <- inj_plus.
@@ -29,7 +29,7 @@ Proof with auto with *.
  apply (Zmod_unique (Z_of_nat n) (Z_of_nat m) (Z_of_nat n / Z_of_nat m)).
   split...
   apply inj_lt.
-  apply mod_upper_bound...
+  apply Nat.mod_upper_bound...
  rewrite <- div_Zdiv...
  rewrite <- inj_mult, <- inj_plus.
  apply inj_eq, div_mod...

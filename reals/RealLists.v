@@ -35,6 +35,7 @@
  *)
 
 Require Export CReals1.
+Set Automatic Introduction.
 
 Section Lists.
 
