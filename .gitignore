@@ -1,6 +1,7 @@
 *.vo
 *.d
 *.glob
+*.pyc
 tree.dot
 tree.ps
 tree.pdf
