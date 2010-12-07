@@ -695,7 +695,7 @@ Qed.
 
 (** [CRinv] works for inputs apart from 0 *)
 Definition CRinv (x:CR)(x_: (x >< ' 0)%CR) : CR.
-Proof. destruct x_. destruct c
+Proof.
  revert x_.
  intros [[c H]|[c H]].
   exact ((-(CRinv_pos c (-x)))%CR).
