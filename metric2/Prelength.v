@@ -349,6 +349,28 @@ Qed.
 
 End Map.
 
+Section fast_Monad_Laws.
+Open Local Scope uc_scope.
+
+Variable X Y Z : MetricSpace.
+Hypothesis plX : PrelengthSpace X.
+Hypothesis plY : PrelengthSpace Y.
+
+Notation "a =m b" := (st_eq a b)  (at level 70, no associativity).
+
+Lemma fast_MonadLaw1 a : Cmap plX (uc_id X) a =m a.
+Proof. rewrite Cmap_correct. apply MonadLaw1. Qed.
+
+Lemma fast_MonadLaw2 (f:Y --> Z) (g:X --> Y) a : Cmap plX (uc_compose f g) a =m (Cmap plY f (Cmap plX g a)).
+Proof. do 3 rewrite Cmap_correct. simpl. apply MonadLaw2. Qed.
+
+Lemma fast_MonadLaw3 (f:X --> Y) a : Cmap plX f (Cunit a) =m Cunit (f a).
+Proof. rewrite Cmap_correct. simpl. apply MonadLaw3. Qed.
+
+(* State them all in such a shape some day... *)
+
+End fast_Monad_Laws.
+
 Open Local Scope uc_scope.
 
 (** Similarly we define a new Cbind *)

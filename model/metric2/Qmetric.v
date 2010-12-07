@@ -40,32 +40,39 @@ Opaque Qabs.
 
 Definition Qball (e : Qpos) (a b : Q) := AbsSmall (e:Q) (a - b).
 
-Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= e.
+Lemma AbsSmall_Qabs : forall x y, (Qabs y <= x)%Q <-> AbsSmall x y.
 Proof.
- intros e a b.
- unfold Qball, AbsSmall.
- simpl.
- generalize (a-b).
- intros c.
+ cut (forall x y, (0 <= y)%Q -> ((Qabs y <= x)%Q <-> AbsSmall (R:=Q_as_COrdField) x y)).
+  intros H x y.
+  generalize (H x y) (H x (-y)%Q).
+  clear H.
+  rewrite -> Qabs_opp.
+  apply Qabs_case; intros H H1 H2.
+   auto.
+  assert (X:AbsSmall (R:=Q_as_COrdField) x y <-> AbsSmall (R:=Q_as_COrdField) x (- y)%Q).
+   split.
+    apply inv_resp_AbsSmall.
+   intros X.
+   stepr (- - y)%Q; [| simpl; ring].
+   apply inv_resp_AbsSmall.
+   assumption.
+  rewrite -> X.
+  apply: H2.
+  rewrite -> Qle_minus_iff in H.
+  ring_simplify in H.
+  ring_simplify.
+  apply H.
+ intros x y H.
+ rewrite -> Qabs_pos;[|assumption].
  split.
-  apply Qabs_case.
-   tauto.
-  intros.
-  rewrite <- (Qopp_involutive e).
-  apply Qopp_le_compat.
-  tauto.
- intros.
- split.
-  apply Qle_trans with (-(Qabs (-c))).
-   rewrite -> Qabs_opp.
-   auto with *.
-  rewrite <- (Qopp_involutive c).
-  apply Qopp_le_compat.
-  rewrite -> Qopp_involutive.
-  apply Qle_Qabs.
- apply Qle_trans with (Qabs c); auto with *.
- apply Qle_Qabs.
+  intros H0.
+  apply leEq_imp_AbsSmall; assumption.
+ intros [_ H0].
+ assumption.
 Qed.
+
+Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= e.
+Proof. split; apply AbsSmall_Qabs. Qed.
 
 Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+d) -> x <= e).
 Proof.
@@ -258,31 +265,47 @@ Qed.
 
 Section Qball_Qmult.
 
-  Variables (d z: Qpos) (x y: Q) (B: Qball (d / z) x y).
+  Variables (d : Qpos) (z x y: Q) (B: Qball (d / QabsQpos z) x y).
 
-  Lemma Qball_Qmult_r: Qball d (x * z) (y * z).
-  Proof.
-   intros.
+  Lemma Qball_Qmult_Q_r : Qball d (x * z) (y * z).
+  Proof with auto.
+   destruct (Qeq_dec z 0) as [E|E].
+    rewrite E. do 2 rewrite Qmult_0_r. apply ball_refl.
    apply Qball_Qabs.
    apply Qball_Qabs in B.
    setoid_replace (x * z - y * z) with ((x - y) * z)%Q by (simpl; ring).
    rewrite Qabs_Qmult.
-   setoid_replace (Qabs z) with z.
-    setoid_replace (QposAsQ d) with  (d * Qpos_inv z * z).
-     apply Qmult_le_compat_r. assumption.
-     apply Qpos_nonneg.
+   setoid_replace (Qabs z) with (QabsQpos z).
+    setoid_replace (QposAsQ d) with  (d * Qpos_inv (QabsQpos z) * QabsQpos z).
+     apply Qmult_le_compat_r...
     simpl. field. apply Qpos_nonzero.
-   apply Qabs_pos, Qpos_nonneg.
+   symmetry. apply QabsQpos_correct...
   Qed.
 
-  Lemma Qball_Qmult_l: Qball d (z * x) (z * y).
+  Lemma Qball_Qmult_Q_l : Qball d (z * x) (z * y).
   Proof.
    intros.
    do 2 rewrite (Qmult_comm z).
-   apply Qball_Qmult_r.
+   apply Qball_Qmult_Q_r.
   Qed.
 
 End Qball_Qmult.
+
+Section more_Qball_Qmult.
+
+  Variables (d z : Qpos) (x y: Q) (B: Qball (d / z) x y).
+
+  Lemma Qball_Qmult_r: Qball d (x * z) (y * z).
+  Proof with auto.
+   apply Qball_Qmult_Q_r. rewrite QabsQpos_Qpos...
+  Qed.
+
+  Lemma Qball_Qmult_l: Qball d (z * x) (z * y).
+  Proof with auto.
+   apply Qball_Qmult_Q_l. rewrite QabsQpos_Qpos...
+  Qed.
+
+End more_Qball_Qmult.
 
 Lemma Qball_plus (e d: Qpos) (x x' y y': Q):
  Qball e x x' -> Qball d y y' -> Qball (e + d) (x + y) (x' + y').
@@ -313,6 +336,18 @@ Proof with auto.
    <- (Qmult_inv_r z), (Qmult_comm z),
    Qmult_assoc, Qmult_assoc...
  apply Qball_Qmult_r...
+Qed.
+
+Lemma Qball_opp (e : Qpos) (x x' : Q):
+ Qball e x x' -> Qball e (-x) (-x').
+Proof with auto.
+ intros.
+ apply Qball_Qabs.
+ unfold Qminus.
+ rewrite Qopp_involutive.
+ rewrite Qplus_comm.
+ apply Qball_Qabs. 
+ apply ball_sym...
 Qed.
 
 Require Import Qround.

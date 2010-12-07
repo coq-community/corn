@@ -21,7 +21,7 @@ while nodes:
 
 ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
-Rs = '-R MathClasses "" -R . CoRN'
+Rs = '-R . CoRN -exclude-dir MathClasses -I MathClasses '
 
 coqc = ssrdir + '/bin/ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + Rs
 

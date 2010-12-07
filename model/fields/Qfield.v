@@ -43,7 +43,7 @@ As we have seen, there is a inverse for the multiplication for non-zeroes.
 So, [Q] not only forms a ring, but even a field.
 *)
 
-Lemma Q_is_CField : is_CField Q_as_CRing Qinv.
+Lemma Q_is_CField : is_CField Q_as_CRing Qinv_dep.
 Proof.
  red in |- *.
  intro.

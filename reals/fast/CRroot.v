@@ -146,12 +146,12 @@ Proof.
   replace RHS with (b + - e^2) by simpl; ring.
   rewrite <- Qle_minus_iff.
   apply Qle_trans with ((1:Q)[^]2); try assumption.
-  replace LHS with ((e:Q)[^]2) by (simpl; unfold QONE; ring).
+  replace LHS with ((e:Q)[^]2) by (simpl; ring).
   apply: (power_resp_leEq);simpl; try assumption.
   apply Qpos_nonneg.
  assert (A2:(0 <= a)).
   eapply Qle_trans;[|apply H1].
-  replace RHS with ((b-e)[^]2) by (simpl; unfold QONE; ring).
+  replace RHS with ((b-e)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
  split.
   apply Qle_trans with ((b / 2 + a / (2 * b))^2); [|Qauto_le].
@@ -160,7 +160,7 @@ Proof.
   apply Qle_shift_div_l.
    Qauto_pos.
   rewrite -> Qle_minus_iff.
-  replace RHS with ((b^2 - a)[^]2) by (simpl; unfold QONE; ring).
+  replace RHS with ((b^2 - a)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
  field_simplify (b / 2 + a / (2 * b) - ((1#2)*(e * e)%Qpos)); auto with *.
  rewrite -> Qdiv_power.
@@ -168,13 +168,13 @@ Proof.
   Qauto_pos.
  replace LHS with ((a + b^2 - b*e^2)^2) by simpl; ring.
  apply Qle_trans with ((a + b^2 - e^2)^2).
-  replace RHS with ((a + b ^ 2 - e ^ 2)[^]2) by (simpl; unfold QONE; ring).
-  replace LHS with ((a + b ^ 2 - b * e ^ 2)[^]2) by (simpl; unfold QONE; ring).
+  replace RHS with ((a + b ^ 2 - e ^ 2)[^]2) by (simpl; ring).
+  replace LHS with ((a + b ^ 2 - b * e ^ 2)[^]2) by (simpl; ring).
   apply: (power_resp_leEq).
    replace RHS with (a + b*(b-e^2)) by simpl; ring.
    Qauto_nonneg.
   rewrite -> Qle_minus_iff;ring_simplify.
-  replace RHS with ((b-1)*((e:Q)[^]2)) by (simpl; unfold QONE; ring).
+  replace RHS with ((b-1)*((e:Q)[^]2)) by (simpl; ring).
   rewrite -> Qle_minus_iff in Hb.
   Qauto_nonneg.
  rewrite -> Qle_minus_iff.

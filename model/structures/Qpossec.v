@@ -43,6 +43,7 @@ Require Import COrdFields2.
 Require Import Eqdep_dec.
 Require Import CornTac.
 Require Import Qround.
+Require Import Qabs.
 Require Import stdlib_omissions.Q.
 Set Automatic Introduction.
 
@@ -185,9 +186,9 @@ Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 Definition QposEq (a b:Qpos) := Qeq a b.
 
 Add Relation Qpos QposEq
- reflexivity proved by (fun (x:Qpos) => refl_Qeq x)
- symmetry proved by (fun (x y:Qpos) => sym_Qeq x y)
- transitivity proved by (fun (x y z:Qpos) => trans_Qeq x y z) as QposSetoid.
+ reflexivity proved by (fun (x:Qpos) => Qeq_refl x)
+ symmetry proved by (fun (x y:Qpos) => Qeq_sym x y)
+ transitivity proved by (fun (x y z:Qpos) => Qeq_trans x y z) as QposSetoid.
 
 Definition QposAp (a b:Qpos) := Qap a b.
 
@@ -225,8 +226,22 @@ Qed.
 (* begin hide *)
 Hint Rewrite Q_Qpos_plus : QposElim.
 (* end hide *)
+
 (**
-*** Multiplicaiton
+*** One
+*)
+Program Definition Qpos_one : Qpos := 1.
+Next Obligation. auto with qarith. Qed.
+Notation "1" := Qpos_one : Qpos_scope.
+
+Lemma Q_Qpos_one : (1%Qpos:Q)=(1:Q).
+Proof. trivial. Qed.
+(* begin hide *)
+Hint Rewrite Q_Qpos_one : QposElim.
+(* end hide *)
+
+(**
+*** Multiplication
 *)
 
 Program Definition Qpos_mult (x y:Qpos) : Qpos := Qmult x y.
@@ -388,8 +403,13 @@ Qed.
 
 Definition QposRed (a:Qpos) : Qpos := mkQpos (QposRed_prf a (Qpos_prf a)).
 
-Lemma QposRed_complete : forall p q : Qpos, p == q -> QposRed p = QposRed q.
+Instance: Proper (QposEq ==> QposEq) QposRed.
 Proof.
+  intros x y E. unfold QposEq in *. simpl in *. rewrite E. reflexivity.
+Qed.
+ 
+Lemma QposRed_complete : forall p q : Qpos, p == q -> QposRed p = QposRed q.
+Proof. 
  intros p q H.
  unfold QposRed.
  generalize (QposRed_prf p (Qpos_prf p)).
@@ -428,4 +448,26 @@ Proof with auto with *.
  apply (Qlt_irrefl 0).
  apply Qlt_le_trans with x...
  apply Qle_trans with (Zneg p)...
+Qed.
+
+(* This function is only defined for non zero elements, so in case of 0, we yield a dummy *)
+Definition QabsQpos (x : Q) : Qpos :=
+  match x with
+  | 0 # _ => (1%Qpos)
+  | (Zpos an) # ad => (an # ad)%Qpos
+  | (Zneg an) # ad => (an # ad)%Qpos
+  end.
+
+Lemma QabsQpos_correct x : ~x == 0 -> QabsQpos x == Qabs x.
+Proof with auto with qarith.
+ intros E. destruct x as [n d]. simpl. 
+ destruct n...
+ destruct E...
+Qed.
+
+Lemma QabsQpos_Qpos (x : Qpos) : QposEq (QabsQpos x) x.
+Proof with auto with qarith.
+ unfold QposEq.
+ rewrite QabsQpos_correct...
+ apply Qabs_pos...
 Qed.

@@ -9,6 +9,11 @@ Set Automatic Introduction.
 
 Open Scope Q_scope.
 
+Lemma Qle_dec x y: {Qle x y} + {~Qle x y}.
+  intros.
+  destruct (Qlt_le_dec y x); [right | left]; [apply Qlt_not_le |]; assumption.
+Defined.
+
 (* Proofs that the various injections into Q are homomorphisms w.r.t. the various operations: *)
 
 Lemma Zplus_Qplus (m n: Z): inject_Z (m + n) = inject_Z m + inject_Z n.
@@ -155,22 +160,8 @@ Qed.
 Lemma Qplus_le_r (z x y : Q): z + x <= z + y <-> x <= y.
 Proof. do 2 rewrite (Qplus_comm z). apply Qplus_le_l. Qed.
 
-Lemma Qplus_lt_r: forall (x y: Q), x < y -> forall z, x + z < y + z.
-Proof with auto.
- intros [xn xd] [yn yd] H [zn zd].
- unfold Qlt in *.
- unfold Qplus.
- simpl in *.
- ring_simplify.
- repeat rewrite Zpos_mult_morphism.
- apply Zplus_lt_le_compat.
-  replace (xn * ' zd * (' yd * ' zd))%Z with (xn * ' yd * (' zd * ' zd))%Z by ring.
-  replace (' zd * yn * (' xd * ' zd))%Z with (yn * ' xd * (' zd * ' zd))%Z by ring.
-  apply Zmult_lt_compat_r...
-  apply Zmult_lt_0_compat; reflexivity.
- ring_simplify.
- apply Zle_refl.
-Qed.
+Lemma Qplus_lt_r (x y: Q) : x < y -> forall z, z + x < z + y.
+Proof. intros E z. do 2 rewrite (Qplus_comm z). apply Qplus_lt_l. assumption. Qed.
 
 Lemma Qmult_le_compat_l (x y z : Q): x <= y -> 0 <= z -> z * x <= z * y.
 Proof. do 2 rewrite (Qmult_comm z). apply Qmult_le_compat_r. Qed.
@@ -279,7 +270,7 @@ Proof with intuition.
  intros.
  apply Qlt_le_trans with (inject_Z (Z_of_nat n) + 1).
   do 2 rewrite (Qplus_comm (inject_Z (Z_of_nat n))).
-  apply Qplus_lt_r...
+  apply Qplus_lt_l...
  pose proof (inj_le _ _ H).
  rewrite Zle_Qle in H0.
  rewrite <- S_Qplus...

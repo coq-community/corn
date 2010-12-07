@@ -476,7 +476,7 @@ Proof.
      apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
        repeat split; simpl.
          field_simplify; auto with *.
-         apply Qmult_simpl.
+         apply Qmult_comp.
           rewrite <- H1; ring.
          apply Qinv_comp.
          replace LHS with (a + b - a*b - a).

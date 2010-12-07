@@ -223,3 +223,12 @@ Qed.
 (* begin hide *)
 Hint Rewrite Q_Qpos_max : QposElim.
 (* end hide *)
+
+Lemma Qpos_min_mult_distr_r : forall x y z : Qpos, Qpos_mult  x (Qpos_min y z) == Qpos_min (Qpos_mult x y) (Qpos_mult x z).
+Proof. intros x y z. autorewrite with QposElim. apply Qmin_mult_pos_distr_r. auto. Qed.
+Lemma Qpos_min_mult_distr_l : forall x y z : Qpos, Qpos_mult (Qpos_min y z) x == Qpos_min (Qpos_mult y x) (Qpos_mult z x).
+Proof. intros x y z. autorewrite with QposElim. apply Qmin_mult_pos_distr_l. auto. Qed.
+Lemma Qpos_max_mult_distr_r : forall x y z : Qpos, Qpos_mult x (Qpos_max y z) == Qpos_max (Qpos_mult x y) (Qpos_mult x z).
+Proof. intros x y z. autorewrite with QposElim. apply Qmax_mult_pos_distr_r. auto. Qed.
+Lemma Qpos_max_mult_distr_l : forall x y z : Qpos, Qpos_mult (Qpos_max y z) x == Qpos_max (Qpos_mult y x) (Qpos_mult z x).
+Proof. intros x y z. autorewrite with QposElim. apply Qmax_mult_pos_distr_l. auto. Qed.

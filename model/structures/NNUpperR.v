@@ -29,9 +29,9 @@ Proof with auto.
  exists ((1#2) * e)%Qpos.
  rewrite F.
  simpl. ring_simplify.
- apply Qplus_resp_Qlt.
+ apply Qplus_lt_l.
  do 2 rewrite (Qplus_comm x).
- apply Qplus_resp_Qlt.
+ apply Qplus_lt_l.
  rewrite <- (Qmult_1_l e) at 2.
  apply Qmult_lt_compat_r...
  reflexivity.
@@ -48,7 +48,7 @@ Proof with auto with *.
   rewrite E.
   rewrite Qmult_plus_distr_l.
   do 2 rewrite (Qplus_comm (x * y)).
-  apply Qplus_resp_Qlt.
+  apply Qplus_lt_l.
   simpl.
   setoid_replace (e * / ((2 # 1) * y) * y) with (/ (2 # 1) * e) by (simpl; field)...
   rewrite <- (Qmult_1_l e) at 2.
@@ -65,11 +65,11 @@ Proof with auto; try reflexivity.
  split.
   setoid_replace x with (x * (1#2) + x * (1#2)) at 1 by (simpl; ring).
   setoid_replace ((1 # 2) * (x + y)) with (y * (1 # 2) + x * (1 # 2)) by (simpl; ring).
-  apply Qplus_resp_Qlt.
+  apply Qplus_lt_l.
   apply Qmult_lt_compat_r...
  setoid_replace y with (y * (1#2) + y * (1#2)) at 2 by (simpl; ring).
  setoid_replace ((1 # 2) * (x + y)) with (x * (1 # 2) + y * (1 # 2)) by (simpl; ring).
- apply Qplus_resp_Qlt.
+ apply Qplus_lt_l.
  apply Qmult_lt_compat_r...
 Qed.
 
@@ -281,7 +281,7 @@ Section binop. (* used for addition and multiplication *)
    destruct (o_sneaky _ _ _ (proj2_sig _) (proj2_sig _) os).
    apply (is_binop_bound (is_bound x) (is_bound z)) with (v + x0)%Qnn w...
    apply H. simpl.
-   rewrite Qplus_comm. rewrite <- Qplus_0_l at 1. apply Qplus_resp_Qlt...
+   rewrite Qplus_comm. rewrite <- Qplus_0_l at 1. apply Qplus_lt_l...
   Qed.
 
   Lemma binop_le_compat (x y: T) (v w: T): x <= y -> v <= w -> binop x v <= binop y w.
@@ -409,7 +409,7 @@ Proof with auto.
  simpl.
  rewrite E.
  do 2 rewrite (Qplus_comm (`q)).
- apply Qplus_resp_Qlt.
+ apply Qplus_lt_l.
  simpl.
  rewrite <- (Qmult_1_l d).
  apply Qmult_lt_compat_r...

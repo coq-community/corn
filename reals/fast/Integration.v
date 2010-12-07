@@ -265,14 +265,14 @@ Proof.
  set (A:=(affineCombo_gt (OpenUnitDual o) H)).
  apply Qmax_compat.
   eapply Seq_trans.
-    apply Q_Setoid.
-   apply (IHx1 c _ _ A (Qplus_resp_Qlt _ _ A c)).
+    apply Q_Setoid. 
+   apply (IHx1 c _ _ A (proj2 (Qplus_lt_l _ _ c) A)).
   apply SupDistanceToLinear_wd1; try reflexivity.
   unfold affineCombo; ring.
  set (B:=(affineCombo_lt (OpenUnitDual o) H)).
  eapply Seq_trans.
    apply Q_Setoid.
-  apply (IHx2 c _ _ B (Qplus_resp_Qlt _ _ B c)).
+  apply (IHx2 c _ _ B (proj2 (Qplus_lt_l _ _ c) B)).
  apply SupDistanceToLinear_wd1; try reflexivity.
  unfold affineCombo; ring.
 Qed.
@@ -398,7 +398,7 @@ Proof.
     rewrite -> (fun a => SupDistanceToLinear_scale a C X).
     apply SupDistanceToLinear_wd1.
      simpl; ring.
-    unfold affineCombo; simpl; unfold QONE; ring.
+    unfold affineCombo; simpl; ring.
    set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (1 # xI p) *
      (constStepF (X:=QS) (Psucc p) + constStepF (X:=QS) p * stepSample p)) B)%Q).
    transitivity ((1#xI p)*(p*(SupDistanceToLinear (stepSample (p)) C)))%Q; [|rewrite -> IHp0;
@@ -414,7 +414,7 @@ Proof.
     apply: mult_resp_less_lft;simpl; auto with *.
    rewrite -> (fun a => SupDistanceToLinear_scale a X1 X2).
    apply SupDistanceToLinear_wd1.
-    unfold affineCombo; simpl; unfold QONE.
+    unfold affineCombo; simpl.
     repeat rewrite -> Zpos_succ_morphism; repeat rewrite -> Qmake_Qdiv; repeat rewrite -> Zpos_xI;
       field; auto with *.
    change (2*(p*1) + 1 = ((p*1*1 + Psucc p*1)*1))%Z.
@@ -685,7 +685,6 @@ Proof.
  clear z.
  revert H01 HF.
  revert Hf.
- unfold QONE.
  generalize 0 1.
  intros a b Hf Hab HF Hab0 s Hs.
  destruct (Qpos_lt_plus Hab0) as [ba Hba].

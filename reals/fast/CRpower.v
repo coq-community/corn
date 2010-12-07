@@ -93,7 +93,7 @@ Proof.
   intros qn qd.
   simpl.
   autorewrite with QposElim.
-  rewrite -> Qmult_sym.
+  rewrite -> Qmult_comm.
   apply Qle_refl.
  apply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
   simpl.

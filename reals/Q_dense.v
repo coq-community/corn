@@ -72,9 +72,7 @@ Lemma Qlt_eq_gt_dec' :
  forall q1 q2 : Q_as_COrdField, ((q1[<]q2) or (q2[<]q1)) or (q1[=]q2).
 Proof.
  intros.
- case (Qlt_eq_gt_dec q1 q2); auto.
- intro s.
- case s; auto.
+ case (Q_dec q1 q2); intuition.
 Qed.
 
 (*

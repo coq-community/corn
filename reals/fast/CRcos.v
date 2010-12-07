@@ -55,8 +55,8 @@ Proof.
  intros q.
  unfold cos_poly_fun.
  stepr (inj_Q IR (One[-]Two*q^2)).
-  apply inj_Q_wd.
-  unfold cg_minus; simpl; unfold QONE; ring.
+  apply inj_Q_wd. 
+  unfold cg_minus; simpl; ring.
  stepr (inj_Q IR (One)[-]inj_Q IR (Two[*]q ^ 2))%Q.
   apply inj_Q_minus.
  apply cg_minus_wd.

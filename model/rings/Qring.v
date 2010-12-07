@@ -53,17 +53,13 @@ Proof.
  exact Qmult_plus_distr_r.
 Qed.
 
-Definition Q_is_CRing : is_CRing Q_as_CAbGroup QONE Qmult_is_bin_fun.
+Definition Q_is_CRing : is_CRing Q_as_CAbGroup 1 Qmult_is_bin_fun.
 Proof.
  apply Build_is_CRing with Qmult_is_assoc.
     apply Q_mul_is_CMonoid.
    apply Qmult_is_commut.
   apply Q_mult_plus_is_dist.
- red in |- *.
- simpl in |- *.
- intro.
- elim ONEQ_neq_ZEROQ.
- auto.
+ apply Q_apart_0_1.
 Defined.
 
 Definition Q_as_CRing := Build_CRing _ _ _ Q_is_CRing.

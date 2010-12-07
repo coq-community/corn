@@ -78,19 +78,10 @@ Canonical Structure Q_is_Setoid := (cs_crr Q_as_CSetoid).
 *)
 
 Lemma Qplus_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplus.
-Proof.
- red in |- *.
- simpl in |- *.
- intros.
- exact (Qplus_simpl x1 x2 y1 y2 H H0).
-Qed.
+Proof. repeat intro. apply Qplus_comp; trivial. Qed.
 
 Lemma Qplus_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplus.
-Proof.
- red in |- *.
- simpl in |- *.
- exact Qplus_strext0.
-Qed.
+Proof. repeat intro. apply Qplus_strext0; trivial. Qed.
 
 Definition Qplus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qplus_strext1.
 Canonical Structure Qplus_is_bin_fun.
@@ -101,37 +92,19 @@ Canonical Structure Qplus_is_bin_fun.
 Lemma Qplus_is_assoc : associative Qplus_is_bin_fun.
 Proof Qplus_assoc.
 
-
 Lemma Qplus_is_commut1 : commutes Qplus_is_bin_fun.
-Proof.
- red in |- *.
- simpl in |- *.
- exact Qplus_is_commut0.
-Qed.
+Proof Qplus_comm.
 
 (**
 *** Opposite
 *)
 
 Lemma Qopp_wd : fun_wd (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Qopp.
-Proof.
- red in |- *.
- simpl in |- *.
- intros.
- exact (Qopp_simpl x y H).
-Qed.
+Proof. repeat intro. apply Qopp_comp; trivial. Qed.
 
 Lemma Qopp_strext : fun_strext (S1:=Q_as_CSetoid) (S2:=Q_as_CSetoid) Qopp.
-Proof.
- red in |- *.
- simpl in |- *.
- unfold Qap in |- *.
- intros.
- red in |- *.
- intro H0.
- apply H.
- exact (Qopp_simpl x y H0).
-Qed.
+Proof. firstorder using Qopp_comp. Qed.
+
 
 Definition Qopp_is_fun := Build_CSetoid_fun _ _ _ Qopp_strext.
 Canonical Structure Qopp_is_fun.
@@ -141,21 +114,10 @@ Canonical Structure Qopp_is_fun.
 *)
 
 Lemma Qmult_wd : bin_fun_wd Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmult.
-Proof.
- red in |- *.
- simpl in |- *.
- intros.
- apply Qmult_simpl.
-  assumption.
- assumption.
-Qed.
+Proof. repeat intro. apply Qmult_comp; trivial. Qed.
 
 Lemma Qmult_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmult.
-Proof.
- red in |- *.
- simpl in |- *.
- apply Qmult_strext0.
-Qed.
+Proof. repeat intro. apply Qmult_strext0; trivial. Qed.
 
 Definition Qmult_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qmult_strext1.
 Canonical Structure Qmult_is_bin_fun.
@@ -164,26 +126,17 @@ Canonical Structure Qmult_is_bin_fun.
 *)
 
 Lemma Qmult_is_assoc : associative Qmult_is_bin_fun.
-Proof.
- red in |- *.
- intros x y z.
- simpl in |- *.
- apply Qmult_assoc.
-Qed.
+Proof. repeat intro. apply Qmult_assoc. Qed.
 
 Lemma Qmult_is_commut : commutes Qmult_is_bin_fun.
-Proof.
- red in |- *.
- simpl in |- *.
- exact Qmult_sym.
-Qed.
+Proof. repeat intro. apply Qmult_comm. Qed.
 
 (**
 *** Less-than
 *)
 
 Lemma Qlt_strext : Crel_strext Q_as_CSetoid Qlt.
-Proof.
+Proof. 
  red in |- *.
  apply Qlt_strext_unfolded.
 Qed.

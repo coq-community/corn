@@ -378,16 +378,31 @@ the second argument is known. *)
 Definition CRmult_bounded (c:Qpos) : CR --> CR --> CR :=
 Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc c).
 
+Global Instance: Proper (QposEq ==> @st_eq _) Qmult_uc.
+Proof.
+ intros e1 e2 E x1 x2.
+ apply ball_eq_iff. intro e.
+ simpl. unfold QposEq in E. rewrite E. reflexivity.
+Qed.
+
+Global Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
+Proof.
+ intros e1 e2 E x1 x2. simpl. rewrite E. reflexivity.
+Qed.
+
 (** CR_b computes a rational bound on the absolute value of x *)
 
 Hint Immediate Qabs_nonneg. (* todo: move *)
 
-Program Definition CR_b (e:Qpos) (x:CR) : Qpos := @mkQpos (Qabs (approximate x e) + e:Q) _.
-Next Obligation.
- assert (Qabs (approximate x e) + e == Qabs (approximate x e) - (-e)). ring. rewrite -> H. clear H.
- apply: shift_zero_less_minus.
- apply Qlt_le_trans with 0; auto with *.
+Lemma CR_b_pos (e : Qpos) (x : CR) : 0 < Qabs (approximate x e) + e.
+Proof.
+  assert (Qabs (approximate x e) + e == Qabs (approximate x e) - (-e)). ring. rewrite -> H. clear H.
+  apply: shift_zero_less_minus.
+  apply Qlt_le_trans with 0; auto with *.
 Qed.
+ 
+Program Definition CR_b (e:Qpos) (x:CR) : Qpos := @mkQpos (Qabs (approximate x e) + e:Q) _.
+Next Obligation. apply CR_b_pos. Qed.
 
 Lemma CR_b_lowerBound : forall e x, (' (-CR_b e x)%Q <= x)%CR.
 Proof.
@@ -680,7 +695,7 @@ Qed.
 
 (** [CRinv] works for inputs apart from 0 *)
 Definition CRinv (x:CR)(x_: (x >< ' 0)%CR) : CR.
-Proof.
+Proof. destruct x_. destruct c
  revert x_.
  intros [[c H]|[c H]].
   exact ((-(CRinv_pos c (-x)))%CR).

@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Export QArith.
 Require Export Qpossec.
 Require Import QposMinMax.
 
@@ -61,13 +62,65 @@ Proof.
  intros [x|]; reflexivity.
 Qed.
 
-(** Addditon *)
+(** Equality *)
+Definition QposInfEq (a b:QposInf) := 
+ match a, b with 
+ | Qpos2QposInf x, Qpos2QposInf y => Qeq x y
+ | QposInfinity, QposInfinity => True
+ | _, _ => False
+ end.
+
+Lemma QposInfEq_refl x : QposInfEq x x.
+Proof.
+  intros [x|]. apply Qeq_refl.
+  simpl. trivial.
+Qed.
+
+Lemma QposInfEq_sym x y : QposInfEq x y -> QposInfEq y x.
+Proof.
+  intros [x|] [y|]; simpl; trivial. apply Qeq_sym.
+Qed.
+
+Lemma QposInfEq_trans x y z : QposInfEq x y -> QposInfEq y z -> QposInfEq x z.
+Proof.
+  intros [x|] [y|] [z|]; simpl; try tauto. apply Qeq_trans.
+Qed.
+
+Add Relation QposInf QposInfEq
+ reflexivity proved by QposInfEq_refl
+ symmetry proved by QposInfEq_sym
+ transitivity proved by QposInfEq_trans as QposInfSetoid.
+
+Instance: Proper (QposEq ==> QposInfEq) Qpos2QposInf.
+Proof. firstorder. Qed.
+
+Instance QposInf_bind_wd (f : Qpos -> QposInf) {f_wd : Proper (QposEq ==> QposInfEq) f} : 
+  Proper (QposInfEq ==> QposInfEq) (QposInf_bind f).
+Proof.
+  intros f f_wd [x|] [y|] E; simpl; auto.
+   destruct E.
+  destruct E.
+Qed.
+
+(** Addition *)
 Definition QposInf_plus (x y : QposInf) : QposInf :=
 QposInf_bind (fun x' => QposInf_bind (fun y' => x'+y') y) x.
+
+Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_plus.
+Proof with auto.
+  intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl...
+  apply Qplus_comp...
+Qed.
 
 (** Multiplication *)
 Definition QposInf_mult (x y : QposInf) : QposInf :=
 QposInf_bind (fun x' => QposInf_bind (fun y' => x'*y') y) x.
+
+Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_mult.
+Proof with auto.
+  intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl...
+  apply Qmult_comp...
+Qed.
 
 (** Order *)
 Definition QposInf_le (x y: QposInf) : Prop :=
@@ -90,6 +143,12 @@ match x with
  | Qpos2QposInf y' => Qpos2QposInf (Qpos_min x' y')
  end
 end.
+
+Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_min.
+Proof with intuition.
+  intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl in *...
+  apply Qpos_min_compat_Proper...
+Qed.
 
 Lemma QposInf_min_lb_l : forall x y, QposInf_le (QposInf_min x y) x.
 Proof.

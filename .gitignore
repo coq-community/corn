@@ -12,3 +12,7 @@ coqdoc.css
 .doclist
 deps
 .sconsign.dblite
+coqidescript
+*.new
+*#
+

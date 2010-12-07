@@ -426,9 +426,9 @@ Proof with auto.
  rewrite CRminus_Qminus.
  rewrite CRle_Qle.
  intros.
- apply Qlt_le_trans with (a + e)%Q.
-  pose proof (Qplus_resp_Qlt _ _ p a).
-  ring_simplify in H0...
+ apply Qlt_le_trans with (a + e)%Q. 
+  rewrite <-(Qplus_0_r a) at 1.
+  apply Qplus_lt_r...
  apply Q.Qplus_le_l with (-a)%Q.
  ring_simplify.
  rewrite Qplus_comm...
@@ -489,13 +489,13 @@ Proof with auto.
   apply CRle_lt_trans with (' (0 + (approximate x quarter + quarter)))%CR...
    rewrite Qplus_0_l...
   apply CRlt_Qlt.
-  apply Qplus_resp_Qlt...
+  apply Qplus_lt_l...
  apply CRlt_le_trans with (x + 'q)%CR.
   apply CRlt_le_trans with (' (approximate x quarter - quarter + q))%CR.
    apply CRlt_Qlt.
    setoid_replace (QposAsQ q) with (quarter + quarter + quarter + quarter)%Q.
     ring_simplify.
-    apply Qplus_resp_Qlt.
+    apply Qplus_lt_l.
     apply Qmult_lt_compat_r...
     reflexivity.
    simpl. ring.

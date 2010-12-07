@@ -657,40 +657,7 @@ Lemma member_app :
   (Iff (member x (app k l))
        ((member x k) or (member x l))).
 Proof.
- intros x l.
- induction k.
-  simpl.
-  unfold Iff.
-  intuition.
- simpl.
- unfold Iff in IHk |- *.
- elim IHk.
- intros IHk0 IHk1.
- split.
-  intros H0.
-  elim H0.
-   clear H0.
-   intro H0.
-   intuition.
-  intuition.
- intro H0.
- elim H0.
-  clear H0.
-  intro H0.
-  elim H0.
-   clear H0.
-   intro H0.
-   left.
-   apply IHk1.
-   left.
-   exact H0.
-  intuition.
- clear H0.
- intro H0.
- left.
- apply IHk1.
- right.
- exact H0.
+ induction k; firstorder.
 Qed.
 
 End Misc.

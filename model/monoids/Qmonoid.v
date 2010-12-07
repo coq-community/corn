@@ -47,18 +47,10 @@ The rational numbers form with addition a CMonoid. [QZERO] is the unit.
 *)
 
 Lemma ZEROQ_as_rht_unit3 : is_rht_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun 0.
-Proof.
- red in |- *.
- simpl in |- *.
- apply ZEROQ_as_rht_unit0.
-Qed.
+Proof. repeat intro. apply Qplus_0_r. Qed.
 
 Lemma ZEROQ_as_lft_unit3 : is_lft_unit (S:=Q_as_CSetoid) Qplus_is_bin_fun 0.
-Proof.
- red in |- *.
- simpl in |- *.
- apply ZEROQ_as_lft_unit0.
-Qed.
+Proof. repeat intro. apply Qplus_0_l. Qed.
 
 Definition Q_is_CMonoid := Build_is_CMonoid
  Q_as_CSemiGroup _ ZEROQ_as_rht_unit3 ZEROQ_as_lft_unit3.
@@ -73,20 +65,10 @@ Also with multiplication Q forms a CMonoid. Here, the unit is [QONE].
 *)
 
 Lemma ONEQ_as_rht_unit : is_rht_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun 1.
-Proof.
- red in |- *.
- simpl in |- *.
- exact Qmult_n_1.
-Qed.
+Proof. repeat intro. apply Qmult_1_r. Qed.
 
 Lemma ONEQ_as_lft_unit : is_lft_unit (S:=Q_as_CSetoid) Qmult_is_bin_fun 1.
-Proof.
- red in |- *.
- intro.
- eapply eq_transitive_unfolded.
-  apply Qmult_is_commut.
- apply ONEQ_as_rht_unit.
-Qed.
+Proof. repeat intro. apply Qmult_1_l. Qed.
 
 Definition Q_mul_is_CMonoid := Build_is_CMonoid
  Q_mul_as_CSemiGroup _ ONEQ_as_rht_unit ONEQ_as_lft_unit.
