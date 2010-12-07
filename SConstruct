@@ -1,12 +1,12 @@
 import os, glob, string
 
-ssrdir = os.environ["SSRDIR"]
-
 dirs_to_compile = ['algebra', 'complex', 'coq_reals', 'fta', 'ftc', 'logic', 'metrics', 'model', 'raster', 'reals', 'tactics', 'transc', 'order', 'metric2', 'Liouville', 'examples', 'stdlib_omissions', 'util']
 
 nodes = map(lambda x: './' + x, dirs_to_compile)
 dirs = []
 vs = []
+
+env = DefaultEnvironment(ENV = os.environ, tools=['default', 'Coq'])
 
 while nodes:
   node = nodes.pop()
@@ -14,25 +14,28 @@ while nodes:
   if (node.endswith('.v')
    and not b.startswith('Opaque_')
    and not b.startswith('Transparent_')):
-    vs += [node]
+    vs += [File(node)]
   if os.path.isdir(node):
     dirs += [node]
     nodes += glob.glob(node + '/*')
 
+ssrdir = os.environ["SSRDIR"]
+ssrcoq = ssrdir + '/bin/ssrcoq'
 ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
-rs = '-R . CoRN'
+Rs = '-R . CoRN'
+coqcmd = ssrcoq + ' -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + Rs
 
-coqc = ssrdir + '/bin/ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + rs
+env['COQFLAGS'] = Rs
 
-env = DefaultEnvironment(ENV = os.environ)
-env.Append(BUILDERS = {'Coq' : Builder(action = coqc, suffix = '.vo', src_suffix = '.v')})
+for node in vs: env.Coq(node, COQCMD=coqcmd)
 
-for node in vs:
-  vo = env.Coq(node)
-  env.Clean(vo, node[:-2] + '.glob')
+mc_vs, mc_vos, mc_globs = env.SConscript(dirs='MathClasses')
 
-os.system('coqdep ' + ' '.join(vs) + ' ' + includes + ' ' + rs + ' > deps')
+os.system('coqdep ' + ' '.join(map(str, vs+mc_vs)) + ' ' + includes + ' ' + Rs + ' > deps')
 ParseDepends('deps')
 
-open('runcoqide', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + rs + ' $@ \n')
+open('coqidescript', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
+os.chmod('coqidescript', 0755)
+
+env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name')
