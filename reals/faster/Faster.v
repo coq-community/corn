@@ -34,10 +34,6 @@ Section cmap.
 (*    → (∀ e, mu g e ≡ mu h e) *)
     → ∀ x y, F (Cmap2 plX plX g x y) [=] Cmap2 plY plY h (F x) (F y).
   Proof with auto with qarith.
-    intros E1 E2 x y ?. apply regFunEq_e. intro e.
-    SearchAbout ["Cmap"].
-    simpl. unfold Cap_raw.
-    do 5 red in E1. 
   Admitted.
 End cmap.
 
@@ -619,9 +615,10 @@ Section app_rationals_completion.
   Qed.
  
   Instance: Surjective ARtoCR.
-  Proof. 
+  Proof with auto. 
     split; try apply _.
-    intros x. apply ARtoCR_CRtoAR.
+    intros x y E. transitivity x...
+    apply ARtoCR_CRtoAR.
   Qed.
 
   Global Instance: Bijective ARtoCR.
