@@ -126,8 +126,8 @@ Qed.
 Instance: Surjective of_nat.
 Proof.
   split. 2: apply _.
-  intros [x Ex]. 
-  unfold to_nat, of_nat. unfold_equivs. 
+  intros [x Ex] y E. rewrite <- E.
+  unfold to_nat, of_nat. unfold_equivs.
   apply integers.abs_nonneg. assumption.
 Qed.
 
@@ -162,6 +162,7 @@ Lemma ZPos_to_nat_int_abs x p : naturals_to_semiring ZPos nat (exist _ x p) = in
 Proof.
   replace (int_abs Z nat x) with (to_nat (exist _ x p)) by reflexivity.
   apply naturals.to_semiring_unique'. apply _. apply ZPos_to_nat_sr_morphism.
+  reflexivity.
 Qed.
 
 Lemma ZPos_int_nat_precedes (x y : ZPos) : `x ≤ `y → x ≤ y.
@@ -214,7 +215,7 @@ Qed.
 Next Obligation with auto.
   case (decide (`x ≤ `y)); intros E; split; intros F.
   rewrite left_identity. apply (antisymmetry (≤))...
-  apply orders.precedes_neq_weaken...  apply ZPos_int_nat_precedes...
+  apply orders.strictly_precedes_weaken...  apply ZPos_int_nat_precedes...
   reflexivity.
   unfold equiv, ZPos_equiv. simpl. 
     rewrite rings.ring_minus_correct, <-associativity, rings.plus_opp_l, right_identity. reflexivity.

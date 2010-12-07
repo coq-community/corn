@@ -32,20 +32,21 @@ Qed.
 Lemma to_ring_unique' `{Integers Int} `{Ring R} (f g: Int → R) `{!Ring_Morphism f} `{!Ring_Morphism g}:
   f = g.
 Proof.
-  intro.
+  intros x y E.
   rewrite (to_ring_unique f), (to_ring_unique g).
+  rewrite E.
   reflexivity.
 Qed.
 
 (* A ring morphism from integers to another ring is injective if there's an injection in the other direction: *)
 Lemma to_ring_injective `{Integers Int} `{Ring R} (f: R → Int) (g: Int → R) `{!Ring_Morphism f} `{!Ring_Morphism g}: 
   Injective g.
-Proof.
+Proof with intuition.
   constructor. 2: constructor; apply _.
   intros x y E.
-  rewrite <- (to_ring_unique' (f ∘ g) id x).
-  rewrite <- (to_ring_unique' (f ∘ g) id y).
-  unfold compose. rewrite E. reflexivity.
+  rewrite <- (to_ring_unique' (f ∘ g) id x x)...
+  rewrite <- (to_ring_unique' (f ∘ g) id y y)...
+  unfold compose. rewrite E...
 Qed.
 
 Instance integers_to_integers_injective `{Integers Int} `{Integers Int2} (f: Int → Int2) `{!Ring_Morphism f}: 
@@ -80,11 +81,11 @@ Section retract_is_int.
       
     Lemma same_morphism: integers_to_ring Int R ∘ inverse f = h.
     Proof with auto.
-      intro x.
+      intros x y U.
       pose proof (to_ring_unique (h ∘ f)) as E.
       unfold compose in *.
-      rewrite <-E. apply sm_proper. 
-      apply jections.surjective_applied.
+      rewrite <- E. apply sm_proper. 
+      rewrite <- U. apply jections.surjective_applied.
     Qed.
   End for_another_ring.
   
@@ -127,10 +128,10 @@ Section contents.
   Next Obligation. rewrite <- (to_ring_involutive (Z nat) x), <- (to_ring_involutive (Z nat) y), E. reflexivity. Qed.
   Next Obligation. intro U. apply E. rewrite U. reflexivity. Qed.
 
-  Global Instance: ZeroNeOne Int.
+  Global Instance: NeZero (1:Int).
   Proof with auto.
    intros E.
-   apply (@zero_ne_one nat _ _ _ _).
+   apply (ne_zero (1:nat)).
    apply (injective (naturals_to_semiring nat Int)). 
    rewrite preserves_0, preserves_1...
   Qed.
@@ -364,13 +365,13 @@ Section contents.
 
   Global Instance: IntegralDomain Int.
 
-  Global Instance: ZeroNeTwo Int.
+  Global Instance: NeZero (2 : Int).
   Proof.
    intro E. unfold "2" in E. 
-   apply zero_ne_one.
-   symmetry. apply eq_opp_self.
+   apply (ne_zero 1).
+   apply eq_opp_self.
    apply (left_cancellation (+) 1); trivial.
-   rewrite <-E. ring.
+   rewrite E. ring.
   Qed.
 
 End contents.
@@ -403,8 +404,10 @@ Section preservation.
 
   End with_naturals.
 
-  Lemma preserve_sr_order (x y: A): x ≤ y → f x ≤ f y.
-  Proof. intros [z p]. 
+  Global Instance: OrderPreserving f.
+  Proof. 
+   repeat (split; try apply _).
+   intros x y [z p]. 
    exists (int_abs _ _ (f (naturals_to_semiring nat A z))).
    rewrite <- preserves_abs.
    rewrite <- p, preserves_sg_op, abs_nat. reflexivity.
@@ -422,7 +425,7 @@ Section int_order.
    intros x y.
    rewrite <- (to_ring_involutive (Z nat) x), <- (to_ring_involutive (Z nat) y).
    destruct (total_order (integers_to_ring Int (Z nat) x) (integers_to_ring Int (Z nat) y));
-     [left | right]; apply (preserve_sr_order _)...
+     [left | right]; apply (order_preserving (integers_to_ring (Z nat) Int))...
   Qed.
 
   Global Program Instance: ∀ x y: Int, Decision (x ≤ y) | 10 := λ x y,
@@ -433,11 +436,11 @@ Section int_order.
 
   Next Obligation.
    change (x ≤ y). rewrite <- (to_ring_involutive (Z nat) x), <- (to_ring_involutive (Z nat) y).
-   apply (preserve_sr_order _). assumption.
+   apply (order_preserving (integers_to_ring (Z nat) Int)). assumption.
   Qed. 
 
   Next Obligation.
-   intro. apply E. apply (preserve_sr_order _). assumption.
+   intro. apply E. pose proof (order_preserving (integers_to_ring Int (Z nat))). auto.
   Qed.
 
 End int_order.

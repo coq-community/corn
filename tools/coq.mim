@@ -1,0 +1,40 @@
+;; Usage: copy to /usr/share/m17n/
+
+(input-method t coq)
+(description "Input method for Coq")
+(title "Coq")
+
+(map (trans
+
+  ;; Coq built-ins:
+  ("\\forall" ?∀)
+  ("\\fun" ?λ)
+
+  ;; From Unicode.Utf8:
+  ("\\exists" ?∃)
+  ("\\not" ?¬)
+  ("\\/" ?∨)
+  ("/\\" ?∧)
+  ("->" "→")
+  ("<-" "←")
+  ("<->" "↔")
+
+  ;; Our notations:
+  ("-->" "⟶") ;; long arrow. not ideal, but should be sufficiently distinguishable from short arrow.
+  ("\\catcomp" ?◎)
+  ("\\==" ?≡)
+  ("\\/==" ?≢)
+  ("/=" ?≠)
+  ("\\<=" ?≤)
+  ("\\approx" ?≈)
+  
+  ;; From Program.Basics:
+  ("\\comp" ?∘)
+  
+  ("\\alpha" ?α)
+  ("\\beta" ?β)
+  ("\\gamma" ?γ)
+  ("\\delta" ?δ)
+  ("\\epsilon" ?ε)
+))
+(state (init (trans)))

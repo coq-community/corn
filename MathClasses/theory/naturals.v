@@ -29,9 +29,10 @@ Qed.
 Lemma to_semiring_unique' `{Naturals N} `{SemiRing SR} (f g: N → SR) `{!SemiRing_Morphism f} `{!SemiRing_Morphism g} :
   f = g.
 Proof.
-  intro.
+  intros x y E.
   rewrite (to_semiring_unique f).
   rewrite (to_semiring_unique g).
+  rewrite E.
   reflexivity.
 Qed.
 
@@ -60,11 +61,11 @@ Qed.
 
 Lemma to_semiring_injective `{Naturals N} `{SemiRing A}  
    (f: A → N) (g: N → A) `{!SemiRing_Morphism f} `{!SemiRing_Morphism g}: Injective g.
-Proof.
+Proof with intuition.
   constructor. 2: constructor; apply _.
   intros x y E.
-  rewrite <- (to_semiring_unique' (f ∘ g) id x).
-  rewrite <- (to_semiring_unique' (f ∘ g) id y).
+  rewrite <- (to_semiring_unique' (f ∘ g) id x x)...
+  rewrite <- (to_semiring_unique' (f ∘ g) id y y)...
   unfold compose. rewrite E. reflexivity.
 Qed.
 
@@ -90,10 +91,11 @@ Section retract_is_nat.
      
     Lemma same_morphism: naturals_to_semiring N R ∘ inverse f = h.
     Proof with auto.
-      intro x.
+      intros x y F.
       pose proof (to_semiring_unique (h ∘ f)) as E.
       unfold compose in *.
-      rewrite <-E. apply sm_proper. 
+      rewrite <- E. apply sm_proper. 
+      rewrite <- F.
       apply jections.surjective_applied.
     Qed.
   End for_another_semiring.
@@ -153,16 +155,16 @@ Section borrowed_from_nat.
   (* Some clever autoquoting tactic might make what follows even more automatic. *)
   (* The ugly [pose proof ... . apply that_thing.]'s are because of Coq bug 2185. *)
 
-  Global Instance: LeftCancellation (=) (λ x, True) (+).
+  Global Instance: ∀ z : N, LeftCancellation (+) z.
   Proof.
-   intros u _ v w.
+   intros u v w.
     pose proof (from_nat_stmt (x' + y' === x' + z' -=> y' === z')
       (λ _ d, match d with 0%nat => u | 1%nat => v | _ => w end)) as P.
     simpl in P.
     apply P. intro. simpl. apply Plus.plus_reg_l.
   Qed.
 
-  Global Instance: LeftCancellation (=) (λ x, x ≠ 0) ring_mult.
+  Global Instance: ∀ z : N, NeZero z → LeftCancellation ring_mult z.
   Proof.
    intros u E v w.
     pose proof (from_nat_stmt ((x' === 0 -=> Ext _ False) -=> x' * y' === x' * z' -=> y' === z')
@@ -170,15 +172,15 @@ Section borrowed_from_nat.
     apply P. intro. simpl. apply Mult_mult_reg_l. assumption.
   Qed.
 
-  Global Instance: ZeroNeOne N.
+  Global Instance: NeZero (1:N).
   Proof.
-   pose proof (from_nat_stmt (0 === 1 -=> Ext _ False) no_vars) as P.
+   pose proof (from_nat_stmt (1 === 0 -=> Ext _ False) no_vars) as P.
    apply P. discriminate.
   Qed.
 
-  Global Instance: ZeroNeTwo N.
+  Global Instance: NeZero (2:N).
   Proof.
-   pose proof (from_nat_stmt (0 === 2 -=> Ext _ False) no_vars) as P.
+   pose proof (from_nat_stmt (2 === 0 -=> Ext _ False) no_vars) as P.
    apply P. discriminate.
   Qed.
 
@@ -209,8 +211,8 @@ Section contents.
   Lemma nz_one_plus_zero x : 1 + x ≠ 0.
   Proof.
     intro E.
-    destruct (zero_sum 1 x E). 
-    apply zero_ne_one. symmetry. auto.
+    destruct (zero_sum 1 x E).
+    apply (ne_zero 1). assumption.
   Qed.  
 
   Obligation Tactic := idtac.
@@ -260,8 +262,8 @@ Section contents.
    rewrite A, E, F, B...
   Qed.
 
-  Lemma nat_distance_unique {a b: NatDistance N} x: a x = b x.
-  Proof. intro. apply nat_distance_unique_respectful; reflexivity. Qed.
+(*  Lemma nat_distance_unique {a b: NatDistance N} x: a x = b x.
+  Proof. intro. apply nat_distance_unique_respectful; reflexivity. Qed.*)
 
   Global Instance nat_distance_proper `{!NatDistance N}: Proper ((=) ==> (=) ==> (=)) (λ x y: N, ` (nat_distance x y)).
     (* Program *should* allow us to write plain nat_distance instead of the
