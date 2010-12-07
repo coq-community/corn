@@ -21,9 +21,9 @@ while nodes:
 
 ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
-Rs = '-R . CoRN -exclude-dir MathClasses -I MathClasses '
+rs = '-R . CoRN'
 
-coqc = ssrdir + '/bin/ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + Rs
+coqc = ssrdir + '/bin/ssrcoq -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + rs
 
 env = DefaultEnvironment(ENV = os.environ)
 env.Append(BUILDERS = {'Coq' : Builder(action = coqc, suffix = '.vo', src_suffix = '.v')})
@@ -32,8 +32,7 @@ for node in vs:
   vo = env.Coq(node)
   env.Clean(vo, node[:-2] + '.glob')
 
-os.system('coqdep ' + ' '.join(vs) + ' ' + includes + ' ' + Rs + ' > deps')
+os.system('coqdep ' + ' '.join(vs) + ' ' + includes + ' ' + rs + ' > deps')
 ParseDepends('deps')
 
-open('coqidescript', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
-os.chmod('coqidescript', 0755)
+open('runcoqide', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + rs + ' $@ \n')

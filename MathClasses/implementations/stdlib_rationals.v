@@ -1,5 +1,5 @@
 Require
-  signed_binary_positive_integers Field Qfield theory.fields.
+  signed_binary_positive_integers Field QArith.Qfield theory.fields.
 Require Import
   Ring Morphisms QArith_base
   abstract_algebra theory.rings interfaces.rationals canonical_names
