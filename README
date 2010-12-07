@@ -7,7 +7,7 @@ PREREQUISITES
 -------------
 
  This version of C-CoRN is known to compile with:
- - Coq version revision 13686 from the trunk branch
+ - Coq version revision 13689 from the trunk branch
  - Ssreflect revision 1292 from the trunk branch in the coq-contrib repository.
    This exact revision can be obtained by saying:
     svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/trunk/Saclay/Ssreflect -r 1292
