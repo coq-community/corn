@@ -3,9 +3,43 @@ Require Import
   Qabs stdlib_omissions.Q
   QMinMax QposMinMax
   Complete Prelength Qmetric 
-  CRGroupOps CRFieldOps
+  CRGroupOps CRFieldOps CRArith
   interfaces.abstract_algebra theory.rings implementations.stdlib_rationals
   orders.minmax.
+
+Lemma QposInf_bind_compose (f : Qpos -> QposInf) (g : Qpos -> Qpos) x :  
+  QposInf_bind f (QposInf_bind g x) ≡ QposInf_bind (fun y, f (g y)) x.
+Proof. destruct x as [|x]; reflexivity. Qed.
+
+Section cmap.
+  Open Scope uc_scope. 
+
+  Context {X : MetricSpace} {Y : MetricSpace} {plX : PrelengthSpace X} {plY : PrelengthSpace Y}.
+  Context {f : X --> Y}.
+  Let F := Cmap plX f.
+
+  Lemma Cmap_uc_compose g1 g2 h1 h2 : 
+        (∀ x, F (Cmap plX g1 x) [=] Cmap plY h1 (F x))
+    → (∀ x, F (Cmap plX g2 x) [=] Cmap plY h2 (F x))
+    → ∀ x, F (Cmap plX (g1 ∘ g2) x) [=] Cmap plY (h1 ∘ h2) (F x).
+  Proof with auto.
+    intros E1 E2 x.
+    do 2 rewrite fast_MonadLaw2.
+    rewrite <-E2. apply E1.
+  Qed.
+
+  (* Is this even true? I hope so, however... *)
+  Lemma Cmap_Cmap2 (g : X --> X --> X) (h : Y --> Y --> Y) :
+        (∀ x y, F (Cmap plX (g x) y) [=] Cmap plY (h (f x)) (F y))
+(*    → (∀ e, mu g e ≡ mu h e) *)
+    → ∀ x y, F (Cmap2 plX plX g x y) [=] Cmap2 plY plY h (F x) (F y).
+  Proof with auto with qarith.
+    intros E1 E2 x y ?. apply regFunEq_e. intro e.
+    SearchAbout ["Cmap"].
+    simpl. unfold Cap_raw.
+    do 5 red in E1. 
+  Admitted.
+End cmap.
 
 (* TODO: move various parts to separate files *)
 
@@ -30,6 +64,10 @@ Global Instance app_rationals_order `{AppRationals AQ f g} : Order AQ | 3 := λ 
 Class AppRationalsAbs `{AppRationals AQ f g} := app_rationals_abs_sig : ∀ x, 
   { y | (0 ≤ x → y = x) ∧ (x < 0 → y = -x) }.
 Definition app_rationals_abs `{AppRationalsAbs} := λ x, proj1_sig (app_rationals_abs_sig x).
+
+Class AppRationalsMultInv `{AppRationals AQ f g} := app_rationals_mult_inv_sig : ∀ ε x,
+  { y | Qball ε (f y) (/(f x)) }.
+Definition app_rationals_mult_inv `{AppRationalsMultInv} := λ ε x, proj1_sig (app_rationals_mult_inv_sig ε x).
 
 Section approximate_rationals_order.
   Context `{AppRationals AQ f g}. 
@@ -185,6 +223,8 @@ Global Instance: RingPlus CR := ucFun2 CRplus.
 Global Instance: RingMult CR := CRmult.
 Global Instance: GroupInv CR := CRopp.
 
+Instance: Ring CR := rings.from_stdlib_ring_theory CR_ring_theory.
+
 Section app_rationals_completion.
   Context `{AppRationals AQ f g}. 
 
@@ -268,21 +308,23 @@ Section app_rationals_completion.
   Proof. reflexivity. Qed.
 
   (* Constants *)
-  Global Instance: RingZero (Complete AQ_as_MetricSpace) := Cunit 0.
+  Definition inject_AQ : AQ → AR := (@Cunit AQ_as_MetricSpace).
+  Notation "' x" := (inject_AQ x).
+
+  Lemma ARtoCR_inject x : ARtoCR (' x) = (inject_Q (f x))%CR.
+  Proof. intros ? ?. apply ball_refl. Qed.
+
+  Global Instance ARzero: RingZero AR := '0.
   Lemma ARtoCR_preserves_0 : ARtoCR 0 = 0.
-  Proof.
-    intros ε1 ε2. simpl.
-    rewrite preserves_0. apply ball_refl.
-  Qed.
+  Proof. rewrite ARtoCR_inject. rewrite preserves_0. reflexivity. Qed.
+  Hint Rewrite ARtoCR_preserves_0 : ARtoCR.
 
-  Global Instance: RingOne (Complete AQ_as_MetricSpace) := Cunit 1.
+  Global Instance ARone: RingOne AR := '1.
   Lemma ARtoCR_preserves_1 : ARtoCR 1 = 1.
-  Proof.
-    intros ε1 ε2. simpl.
-    rewrite preserves_1. apply ball_refl.
-  Qed.
+  Proof. rewrite ARtoCR_inject. rewrite preserves_1. reflexivity. Qed.
+  Hint Rewrite ARtoCR_preserves_1 : ARtoCR.
 
-  (* Todo: generalize *)
+  (* (* Todo: generalize *)
   Lemma ARtoCR_uc_compose fA fR gA gR : 
     (∀ x : AR, st_eq (ARtoCR (Cmap AQPrelengthSpace fA x)) (Cmap QPrelengthSpace fR (ARtoCR x)))
     → (∀ x : AR, st_eq (ARtoCR (Cmap AQPrelengthSpace gA x)) (Cmap QPrelengthSpace gR (ARtoCR x)))
@@ -309,7 +351,7 @@ Section app_rationals_completion.
      setoid_replace (ε + ε)%Q with (1 * ε + 1 * ε)%Q by (unfold q_equiv; ring). 
      apply Qplus_le_compat; apply Qmult_le_compat_r...
     apply E.
-  Qed.
+  Qed. *)
 
   (* Plus *)
   Lemma AQtranslate_uc_prf (x : AQ_as_MetricSpace) : is_UniformlyContinuousFunction ((+) x) Qpos2QposInf.
@@ -331,6 +373,7 @@ Section app_rationals_completion.
     rewrite preserves_plus.
     apply Qball_plus_r, AQball_fold, regFun_prf.
   Qed.
+  Hint Rewrite ARtoCR_preserves_translate : ARtoCR.
 
   Lemma AQplus_uc_prf : is_UniformlyContinuousFunction AQtranslate_uc Qpos2QposInf.
   Proof with auto.
@@ -348,8 +391,9 @@ Section app_rationals_completion.
 
   Lemma ARtoCR_preserves_plus x y : ARtoCR (x + y) = ARtoCR x + ARtoCR y.
   Proof.
-    apply ARtoCR_uc_map2. apply ARtoCR_preserves_translate. trivial.
+    apply Cmap_Cmap2. apply ARtoCR_preserves_translate. 
   Qed.
+  Hint Rewrite ARtoCR_preserves_plus : ARtoCR.
 
   (* Inverse *)
   Lemma AQopp_uc_prf : is_UniformlyContinuousFunction (group_inv : AQ_as_MetricSpace → AQ_as_MetricSpace) Qpos2QposInf.
@@ -372,7 +416,8 @@ Section app_rationals_completion.
     apply Qball_opp.
     apply AQball_fold, regFun_prf.
   Qed.
-  
+  Hint Rewrite ARtoCR_preserves_opp : ARtoCR.
+
   (* mult *)
   Lemma AQboundBelow_uc_prf (x : AQ_as_MetricSpace) : is_UniformlyContinuousFunction (max x) Qpos2QposInf.
   Proof with auto.
@@ -395,6 +440,7 @@ Section app_rationals_completion.
      rewrite (proj1 (Qle_max_r _ _))... apply AQball_fold, regFun_prf.
     rewrite (proj1 (Qle_max_l _ _))... apply ball_refl.
   Qed.
+  Hint Rewrite ARtoCR_preserves_boundBelow : ARtoCR.
 
   Lemma AQboundAbove_uc_prf (x : AQ_as_MetricSpace) : is_UniformlyContinuousFunction (min x) Qpos2QposInf.
   Proof with auto.
@@ -417,6 +463,7 @@ Section app_rationals_completion.
      rewrite (proj1 (Qle_min_l _ _))... apply ball_refl.
     rewrite (proj1 (Qle_min_r _ _))... apply AQball_fold, regFun_prf.
   Qed.
+  Hint Rewrite ARtoCR_preserves_boundAbove : ARtoCR.
 
   Definition AQboundAbs_uc (c : AQpos) : AQ_as_MetricSpace --> AQ_as_MetricSpace
     := uc_compose (AQboundBelow_uc (-AQposAsAQ c)) (AQboundAbove_uc (AQposAsAQ c)).
@@ -425,12 +472,13 @@ Section app_rationals_completion.
 
   Lemma ARtoCR_preserves_bound_abs c x : ARtoCR (ARboundAbs c x) = CRboundAbs (AQpos2Qpos c) (ARtoCR x).
   Proof with auto.
-    apply ARtoCR_uc_compose.
+    apply Cmap_uc_compose.
      intros y ε1 ε2. simpl. setoid_replace (- f (AQposAsAQ c)) with (f (- AQposAsAQ c)).
       pose proof (ARtoCR_preserves_boundBelow (- AQposAsAQ c) y) as P. apply P.
      rewrite preserves_opp. reflexivity.
     apply ARtoCR_preserves_boundAbove.
   Qed.
+  Hint Rewrite ARtoCR_preserves_bound_abs : ARtoCR.
 
   Lemma AQscale_uc_prf (x : AQ_as_MetricSpace) :  is_UniformlyContinuousFunction (ring_mult x) (Qscale_modulus (f x)).
   Proof with auto.
@@ -457,6 +505,7 @@ Section app_rationals_completion.
      apply Qball_Qmult_Q_l. rewrite E. apply AQball_fold, regFun_prf.
     apply Qball_Qmult_Q_l. rewrite E. apply AQball_fold, regFun_prf.
   Qed.
+  Hint Rewrite ARtoCR_preserves_scale : ARtoCR.
 
   Lemma AQmult_uc_prf (c : AQpos) : is_UniformlyContinuousFunction 
     (λ x, uc_compose (AQscale_uc x) (AQboundAbs_uc c)) (Qmult_modulus (AQpos2Qpos c)).
@@ -479,14 +528,15 @@ Section app_rationals_completion.
   Lemma ARtoCR_preserves_mult_bounded x y c : 
     ARtoCR (ARmult_bounded c x y) = CRmult_bounded (AQpos2Qpos c) (ARtoCR x) (ARtoCR y).
   Proof with auto.
-    apply ARtoCR_uc_map2... clear x y. intros x y.
+    apply Cmap_Cmap2. clear x y. intros x y.
     assert (st_eq (ARtoCR (Cmap AQPrelengthSpace (uc_compose (AQscale_uc x) (AQboundAbs_uc c)) y))
       (Cmap QPrelengthSpace (uc_compose (Qscale_uc (f x)) (QboundAbs (AQpos2Qpos c))) (ARtoCR y))) as P.
-     apply ARtoCR_uc_compose.
+     apply Cmap_uc_compose.
      apply ARtoCR_preserves_scale.
      apply ARtoCR_preserves_bound_abs.
     apply P.
   Qed.
+  Hint Rewrite ARtoCR_preserves_mult_bounded : ARtoCR.
 
   Context `{abs : !AppRationalsAbs}.
   Lemma AR_b_correct (x : AR) : 
@@ -507,11 +557,11 @@ Section app_rationals_completion.
   Lemma ARtoCR_preserves_mult x y : ARtoCR (x * y) = ARtoCR x * ARtoCR y.
   Proof.
     rewrite ARtoCR_preserves_mult_bounded.
-    setoid_replace (AQpos2Qpos (AR_b y)) with (CR_b (1 # 1) (ARtoCR y)).
+    setoid_replace (AQpos2Qpos (AR_b y)) with (CR_b (1 # 1) (ARtoCR y)). 
      reflexivity.
-    unfold QposEq. simpl. rewrite AR_b_correct.
-    reflexivity. 
+    unfold QposEq. simpl. rewrite AR_b_correct. reflexivity. 
   Qed. 
+  Hint Rewrite ARtoCR_preserves_mult : ARtoCR.
 
   (* Embedding Q into X *)
   Lemma flip_g_is_regular (q : Q_as_MetricSpace) : is_RegularFunction_noInf _ (Basics.flip g q : Qpos → AQ_as_MetricSpace).
@@ -523,7 +573,7 @@ Section app_rationals_completion.
   Qed.
  
   Definition flip_g (q : Q_as_MetricSpace) : AR := mkRegularFunction 0 (flip_g_is_regular q).
-  
+
   Definition CRtoAR_prf : is_UniformlyContinuousFunction flip_g Qpos2QposInf.
   Proof with auto.
     intros ε x y E. intros δ1 δ2. 
@@ -538,7 +588,7 @@ Section app_rationals_completion.
   Definition CRtoAR_uc : Q_as_MetricSpace --> AR := Build_UniformlyContinuousFunction CRtoAR_prf.
 
   Definition CRtoAR : CR --> AR := Cbind QPrelengthSpace CRtoAR_uc.
-
+  
   Lemma CRtoAR_ARtoCR x : CRtoAR (ARtoCR x) = x.
   Proof with auto.
     intros ε1 ε2. simpl. unfold Cjoin_raw. simpl.
@@ -559,26 +609,133 @@ Section app_rationals_completion.
     eapply regFun_prf.
   Qed.
 
-  Lemma CRtoAR_preserves_0 : CRtoAR 0 = 0.
-  Proof. rewrite <-(CRtoAR_ARtoCR 0). rewrite ARtoCR_preserves_0. reflexivity. Qed.
+  Global Instance: Inverse ARtoCR := CRtoAR.
 
-  Lemma CRtoAR_preserves_1 : CRtoAR 1 = 1.
-  Proof. rewrite <-(CRtoAR_ARtoCR 1). rewrite ARtoCR_preserves_1. reflexivity. Qed.
-
-  Lemma CRtoAR_preserves_plus x y : CRtoAR (x + y) = CRtoAR x + CRtoAR y.
+  Instance: Injective ARtoCR. 
   Proof. 
-    rewrite <-(CRtoAR_ARtoCR (CRtoAR x + CRtoAR y)).
-    rewrite ARtoCR_preserves_plus. 
-    do 2 rewrite ARtoCR_CRtoAR.
-    reflexivity.
+    split; try apply _. 2: split; apply _.
+    intros x y E. 
+    rewrite <-(CRtoAR_ARtoCR x). rewrite E. rewrite CRtoAR_ARtoCR. reflexivity.
+  Qed.
+ 
+  Instance: Surjective ARtoCR.
+  Proof. 
+    split; try apply _.
+    intros x. apply ARtoCR_CRtoAR.
   Qed.
 
-  Lemma CRtoAR_preserves_mult x y : CRtoAR (x * y) = CRtoAR x * CRtoAR y.
+  Global Instance: Bijective ARtoCR.
+
+  (* The approximate reals form a ring *)
+  Add Ring CR: (rings.stdlib_ring_theory CR).
+  Opaque CR AR.
+
+  Instance: Proper (@st_eq _ ==> @st_eq _ ==> @st_eq _) ARmult. 
   Proof. 
-    rewrite <-(CRtoAR_ARtoCR (CRtoAR x * CRtoAR y)).
-    rewrite ARtoCR_preserves_mult. 
-    do 2 rewrite ARtoCR_CRtoAR.
-    reflexivity.
+    intros ? ? E1 ? ? E2. 
+    apply (injective ARtoCR). autorewrite with ARtoCR.
+    rewrite E1. rewrite E2. reflexivity.
   Qed.
+
+  Global Instance: Ring AR.
+  Proof. 
+    repeat (split; try apply _); 
+     repeat intro; apply (injective ARtoCR); autorewrite with ARtoCR; ring.
+  Qed.
+
+  Global Instance: Ring_Morphism ARtoCR.
+  Proof. repeat (split; try apply _); intros; autorewrite with ARtoCR; reflexivity. Qed.
+ 
+  Global Instance: Ring_Morphism CRtoAR.
+  Proof. change (Ring_Morphism (inverse ARtoCR)). apply _. Qed.
+
+  Lemma ARtoCR_preserves_minus x y : ARtoCR (x - y) = ARtoCR x - ARtoCR y.
+  Proof.
+    do 2 rewrite ring_minus_correct. autorewrite with ARtoCR. reflexivity.
+  Qed.
+  Hint Rewrite ARtoCR_preserves_minus : ARtoCR.
+
+  (* Order *)
+  Definition ARnonNeg (x : AR) := ∀ ε : Qpos, (-ε <= f (approximate x ε))%Q.
+  
+  Lemma ARtoCR_preserves_nonNeg x : ARnonNeg x ↔ CRnonNeg (ARtoCR x).
+  Proof. reflexivity. Qed.
+  
+  Definition ARnonPos (x : AR) := ∀ ε : Qpos, (f (approximate x ε) <= ε)%Q.
+
+  Lemma ARtoCR_preserves_nonPos x : ARnonPos x ↔ CRnonPos (ARtoCR x).
+  Proof. reflexivity. Qed.
+
+  Definition ARle x y := ARnonNeg (y - x).
+  
+  Lemma ARtoCR_preserves_le x y : ARle x y ↔ CRle (ARtoCR x) (ARtoCR y).
+  Proof.
+    unfold ARle, CRle.
+    replace (ARtoCR y - ARtoCR x)%CR with (ARtoCR y - ARtoCR x) by reflexivity.
+    rewrite <-ARtoCR_preserves_minus. reflexivity.
+  Qed.
+
+  Definition ARpos (x : AR) := sig (λ ε : AQpos, ARle (' AQposAsAQ ε) x).
+
+  Lemma yada (x ε : Qpos) : { y : AQpos | AQpos2Qpos y <= x ∧ Qball ε (AQpos2Qpos y) x }.
+  Proof. Admitted.
+
+  Lemma ARtoCR_preserves_pos x : ARpos x IFF CRpos (ARtoCR x).
+  Proof.
+    split; intros [ε E].
+     exists (AQpos2Qpos ε). simpl. rewrite <-ARtoCR_inject.
+     apply ARtoCR_preserves_le in E. apply E.
+    destruct (yada ε ε) as [δ Eδ1 Eδ2].
+    admit.
+  Qed.
+
+  Definition ARlt (x y : AR) := ARpos (y - x).
+
+  Lemma ARtoCR_preserves_lt x y : ARlt x y IFF CRlt (ARtoCR x) (ARtoCR y).
+  Proof.
+    unfold ARlt, CRlt.
+    replace (ARtoCR y - ARtoCR x)%CR with (ARtoCR y - ARtoCR x) by reflexivity.
+    stepl (CRpos (ARtoCR (y - x))). 
+     split; intros; eapply CRpos_wd; eauto. 
+      apply ARtoCR_preserves_minus.
+     symmetry. apply ARtoCR_preserves_minus.
+    split; apply ARtoCR_preserves_pos.
+  Qed.
+  
+  (* Apartness *)
+  Definition ARapart (x y : AR) := (ARlt x y or ARlt y x).
+  Notation "x >< y" := (ARapart x y).
+
+  Lemma ARtoCR_preserves_apart x y : (x >< y) IFF ((ARtoCR x) >< (ARtoCR y))%CR.
+  Proof. 
+    split; (intros [|]; [left|right]; apply ARtoCR_preserves_lt; assumption).
+  Qed.
+
+  (* Multiplicate inverse *)
+  Context `{app_inv : !AppRationalsMultInv}.
+
+  Lemma app_rationals_mult_inv_correct x ε : Qball ε (f (app_rationals_mult_inv ε x)) (/(f x)).
+  Proof.
+    unfold app_rationals_mult_inv, app_rationals_mult_inv_sig.
+    destruct app_inv as [y Ey]. assumption.
+  Qed.
+
+  Lemma flip_app_rationals_mult_inv_is_regular (q : AQ_as_MetricSpace) : 
+    is_RegularFunction_noInf _ (Basics.flip app_rationals_mult_inv q : Qpos → AQ_as_MetricSpace).
+  Proof with auto.
+    intros ε1 ε2. unfold Basics.flip. simpl.
+    eapply ball_triangle.
+     eapply app_rationals_mult_inv_correct.
+    eapply ball_sym, app_rationals_mult_inv_correct.
+  Qed.
+ 
+  Definition flip_app_rationals_mult_inv (q : AQ_as_MetricSpace) : AR := 
+    mkRegularFunction 0 (flip_app_rationals_mult_inv_is_regular q).
+
+  (*
+  Lemma AQinv_pos_uc_prf (c : AQpos) :  is_UniformlyContinuousFunction 
+    ((λ x : AQ_as_MetricSpace, app_rationals_mult_inv ((1#3) * AQpos2Qpos c) (max (AQposAsAQ c) x) : AQ_as_MetricSpace)) 
+    (Qinv_modulus ((2 # 3) * AQpos2Qpos c)).
+  *)  
 
 End app_rationals_completion.
