@@ -39,3 +39,5 @@ open('coqidescript', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr
 os.chmod('coqidescript', 0755)
 
 env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name')
+
+env.Command('deps.dot', [], 'tools/DepsToDot.hs < deps > $TARGET')
