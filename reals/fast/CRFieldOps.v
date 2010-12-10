@@ -378,14 +378,14 @@ the second argument is known. *)
 Definition CRmult_bounded (c:Qpos) : CR --> CR --> CR :=
 Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc c).
 
-Global Instance: Proper (QposEq ==> @st_eq _) Qmult_uc.
+Instance: Proper (QposEq ==> @st_eq _) Qmult_uc.
 Proof.
  intros e1 e2 E x1 x2.
  apply ball_eq_iff. intro e.
  simpl. unfold QposEq in E. rewrite E. reflexivity.
 Qed.
 
-Global Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
+Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
 Proof.
  intros e1 e2 E x1 x2. simpl. rewrite E. reflexivity.
 Qed.
@@ -679,6 +679,20 @@ Proof.
   apply Qpos_nonzero.
  rewrite -> fasterIsEq.
  reflexivity.
+Qed.
+
+Instance CRinv_pos_uc_Proper : Proper (QposEq ==> @st_eq _ ==> @st_eq _) Qinv_pos_uc.
+Proof.
+  intros [c1 ?] [c2 ?] E x1 x2 F. unfold QposEq in E. simpl in *.
+  rewrite E F. reflexivity.
+Qed.
+
+Instance: Proper (QposEq ==> @st_eq _ ==> @st_eq _) CRinv_pos.
+Proof with auto; try reflexivity.
+  intros c1 c2 E x1 x2 F. simpl.
+  rewrite F.
+  setoid_replace (Qinv_pos_uc c1) with (Qinv_pos_uc c2)...
+  intros y. apply CRinv_pos_uc_Proper...
 Qed.
 
 Lemma CRinv_pos_Qinv : forall (c:Qpos) x, (c <= x)%Q -> (CRinv_pos c (' x) == (' (/x)))%CR.
