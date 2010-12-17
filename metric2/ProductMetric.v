@@ -219,3 +219,33 @@ Qed.
 
 Definition together A B C D (f:A --> C) (g:B --> D) : (ProductMS A B --> ProductMS C D) :=
  Build_UniformlyContinuousFunction (together_uc f g).
+
+(** Uniformly continuous functions on the product space can be curried: *)
+
+Section uc_curry.
+
+  Context {A B C: MetricSpace} (f: ProductMS A B --> C).
+
+  Definition uc_curry_help_prf (a: A): is_UniformlyContinuousFunction (fun b => f (a, b)) (mu f).
+  Proof with auto.
+   repeat intro.
+   destruct f. clear f. simpl in *.
+   apply uc_prf.
+   destruct (mu e)...
+   split... apply ball_refl.
+  Qed.
+
+  Definition uc_curry_help (a: A): B --> C := Build_UniformlyContinuousFunction (uc_curry_help_prf a).
+
+  Definition uc_curry_prf: is_UniformlyContinuousFunction uc_curry_help (mu f).
+  Proof with auto.
+   repeat intro. simpl.
+   destruct f. clear f. simpl in *.
+   apply uc_prf.
+   destruct (mu e)...
+   split... apply ball_refl.
+  Qed.
+
+  Definition uc_curry: A --> B --> C := Build_UniformlyContinuousFunction uc_curry_prf.
+
+End uc_curry.
