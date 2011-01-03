@@ -16,6 +16,10 @@ PREREQUISITES
 
  - SCons 1.2
 
+ - In order to build the dependency graph you need a Haskell compiler and the
+   Graphviz library for Haskell. The latter can be obtained using the Cabal
+   package manager.
+   
 BUILDING C-CoRN
 ---------------
 
