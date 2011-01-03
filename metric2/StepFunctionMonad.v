@@ -34,7 +34,7 @@ Set Automatic Introduction.
 
 (** This version of [StepF] has type [Setoid] that carries its equivalence
 relation with it. *)
-Definition StepFS (X:Setoid):Setoid.
+Definition StepFS (X : RSetoid) : RSetoid.
 Proof.
  exists (StepF X) (@StepF_eq X).
  apply StepF_Sth.
@@ -45,34 +45,34 @@ Open Local Scope sfstscope.
 
 (** We redefine several functions to return a setoid type. *)
 
-Definition StFReturn (X:Setoid) : X-->(StepFS X).
+Definition StFReturn (X : RSetoid) : X-->(StepFS X).
 Proof.
  intros.
  exists (@constStepF X).
  abstract (auto with *).
 Defined.
 
-Definition SplitLS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
+Definition SplitLS0(X : RSetoid):OpenUnit->(StepFS X)->(StepFS X):=
 (fun o x => SplitL x o).
 
-Definition SplitLS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
+Definition SplitLS(X : RSetoid):OpenUnit->(StepFS X)-->(StepFS X).
 Proof.
  intros o.
  exists (fun x => (SplitLS0 o x)).
  abstract (intros; apply: SplitL_wd;auto with *).
 Defined.
 
-Definition SplitRS0(X:Setoid):OpenUnit->(StepFS X)->(StepFS X):=
+Definition SplitRS0(X : RSetoid):OpenUnit->(StepFS X)->(StepFS X):=
 (fun o x => SplitR x o).
 
-Definition SplitRS(X:Setoid):OpenUnit->(StepFS X)-->(StepFS X).
+Definition SplitRS(X : RSetoid):OpenUnit->(StepFS X)-->(StepFS X).
 Proof.
  intros o.
  exists (fun x => (SplitRS0 o x)).
  abstract (intros; apply: SplitR_wd;auto with *).
 Defined.
 
-Definition MirrorS(X:Setoid):(StepFS X)-->(StepFS X).
+Definition MirrorS(X : RSetoid):(StepFS X)-->(StepFS X).
 Proof.
  exists (@Mirror X).
  abstract (intros; change (Mirror x1 == Mirror x2); rewrite -> Mirror_eq_Mirror; assumption).
@@ -80,7 +80,7 @@ Defined.
 
 (** Definition of bind. *)
 
-Definition StFBind00(X Y:Setoid) :
+Definition StFBind00(X Y : RSetoid) :
   (StepFS X) -> (X --> (StepFS Y)) -> (StepFS Y).
 Proof.
  fix 1. intro m. case m.
@@ -90,7 +90,7 @@ Proof.
  exact (glue o (StFBind00 m1 (compose (SplitLS Y o) f)) (StFBind00 m2 (compose (SplitRS Y o) f))).
 Defined.
 
-Lemma StFBind_wd1(X Y:Setoid):forall m, forall x1 x2 : X --> StepFS Y,
+Lemma StFBind_wd1(X Y : RSetoid):forall m, forall x1 x2 : X --> StepFS Y,
 st_eq x1 x2 ->
 st_eq (StFBind00 m x1) (StFBind00 m x2).
 Proof.
@@ -104,7 +104,7 @@ Proof.
  apply SplitR_wd; auto with *. apply H.
 Qed.
 
-Definition StFBind1(X Y:Setoid) :
+Definition StFBind1(X Y : RSetoid) :
   (StepFS X) -> (X --> (StepFS Y)) --> (StepFS Y).
 Proof.
  intros m.
@@ -112,7 +112,7 @@ Proof.
  apply StFBind_wd1.
 Defined.
 
-Lemma MirrorBind(X Y:Setoid):forall (x:StepF X) (f:X --> (StepFS Y)),
+Lemma MirrorBind(X Y : RSetoid):forall (x:StepF X) (f:X --> (StepFS Y)),
 Mirror (StFBind00 x f)==(StFBind00 (Mirror x) (compose (MirrorS Y) f)).
 Proof.
  induction x using StepF_ind.
@@ -129,7 +129,7 @@ Proof.
  apply MirrorSplitL; auto with *.
 Qed.
 
-Lemma SplitLBind (X Y:Setoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
+Lemma SplitLBind (X Y : RSetoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
  SplitL (StFBind00 y f) o == StFBind00 (SplitL y o) (compose1 (SplitLS Y o) f).
 Proof.
  induction y using StepF_ind. reflexivity.
@@ -158,7 +158,7 @@ Proof.
   symmetry; auto with *.
 Qed.
 
-Lemma SplitRBind (X Y:Setoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
+Lemma SplitRBind (X Y : RSetoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
  SplitR (StFBind00 y f) o == StFBind00 (SplitR y o) (compose1 (SplitRS Y o) f).
 Proof.
  induction y using StepF_ind. reflexivity.
@@ -187,7 +187,7 @@ Proof.
  symmetry. auto with *.
 Qed.
 
-Lemma StFBind_wd(X Y:Setoid): forall x1 x2 : StepFS X,
+Lemma StFBind_wd(X Y : RSetoid): forall x1 x2 : StepFS X,
 st_eq  x1 x2 ->
 st_eq (StFBind1 Y x1) (StFBind1 Y x2).
 Proof.
@@ -215,7 +215,7 @@ Proof.
  reflexivity.
 Qed.
 
-Definition StFBind(X Y:Setoid) :
+Definition StFBind(X Y : RSetoid) :
   (StepFS X) --> (X --> (StepFS Y)) --> (StepFS Y).
 Proof.
  exists (fun m => (@StFBind1 X Y m)).
@@ -232,10 +232,10 @@ Qed.
 
 (** Join is defined in terms of bind. *)
 
-Definition StFJoin (X:Setoid):(StepFS (StepFS X))-->(StepFS X):=
+Definition StFJoin (X : RSetoid):(StepFS (StepFS X))-->(StepFS X):=
  (flip (@StFBind (StepFS X) X) (@id (StepFS X))).
 
-Lemma JoinGlue(X:Setoid): forall o a b,
+Lemma JoinGlue(X : RSetoid): forall o a b,
 (StFJoin X (glue o a b))==(glue o (StFBind (StepFS X) _ a (SplitLS X o)) (StFBind (StepFS X) _ b (SplitRS X o))).
 Proof.
  intros. simpl.
@@ -250,17 +250,17 @@ Qed.
 
 Section Monad_Laws.
 (** Here we prove the monad laws. *)
-Variable X Y:Setoid.
+Variable X Y : RSetoid.
 
 Lemma ReturnBind(x:X)(f:X-->StepFS Y): (StFBind X Y (StFReturn X x) f)==(f x).
 Proof.
  simpl; auto with *.
 Qed.
 
-Let Bind_compose(Z:Setoid)(f:X-->StepFS Y)(g:Y-->StepFS Z):=
+Let Bind_compose(Z : RSetoid)(f:X-->StepFS Y)(g:Y-->StepFS Z):=
 (compose ((flip (StFBind Y Z)) g) f).
 
-Lemma BindBind(Z:Setoid)(m:StepF X)(f:X-->StepFS Y)(g:Y-->StepFS Z):
+Lemma BindBind(Z : RSetoid)(m:StepF X)(f:X-->StepFS Y)(g:Y-->StepFS Z):
 (StFBind Y Z (StFBind X Y m f) g) == (StFBind X Z m (Bind_compose f g)).
 Proof.
  revert f g.
@@ -325,7 +325,7 @@ x >>= : (X --> S Y) --> SY     = (bind x)
 (** Lastly, we prove that the applicative functor is the canonical one
  for this monad. *)
 
-Lemma ApBind(X Y:Setoid): forall (x:(StepFS X)) (f:StepFS (X-->Y)) ,
+Lemma ApBind(X Y : RSetoid): forall (x:(StepFS X)) (f:StepFS (X-->Y)) ,
 (f<@>x==
 (@StFBind _ _ f (compose (StFBind _ _ x)
 (compose (StFReturn _))))).

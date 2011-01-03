@@ -72,18 +72,18 @@ Definition QposInfEq (a b:QposInf) :=
 
 Lemma QposInfEq_refl x : QposInfEq x x.
 Proof.
-  intros [x|]. apply Qeq_refl.
+  destruct x as [x|]. apply Qeq_refl.
   simpl. trivial.
 Qed.
 
 Lemma QposInfEq_sym x y : QposInfEq x y -> QposInfEq y x.
 Proof.
-  intros [x|] [y|]; simpl; trivial. apply Qeq_sym.
+  destruct x as [x|], y as [y|]; simpl; trivial. apply Qeq_sym.
 Qed.
 
 Lemma QposInfEq_trans x y z : QposInfEq x y -> QposInfEq y z -> QposInfEq x z.
 Proof.
-  intros [x|] [y|] [z|]; simpl; try tauto. apply Qeq_trans.
+  destruct x as [x|], y as [y|], z as  [z|]; simpl; try tauto. apply Qeq_trans.
 Qed.
 
 Add Relation QposInf QposInfEq
@@ -97,7 +97,7 @@ Proof. firstorder. Qed.
 Instance QposInf_bind_wd (f : Qpos -> QposInf) {f_wd : Proper (QposEq ==> QposInfEq) f} : 
   Proper (QposInfEq ==> QposInfEq) (QposInf_bind f).
 Proof.
-  intros f f_wd [x|] [y|] E; simpl; auto.
+  intros [x|] [y|] E; simpl; auto.
    destruct E.
   destruct E.
 Qed.

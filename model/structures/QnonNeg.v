@@ -21,12 +21,6 @@ Local Notation "0" := zero.
 Local Notation "1" := one.
 
 Global Instance: Equivalence eq.
-Proof.
- unfold eq. split.
-   intros ?. apply reflexivity.
-  intros ??. apply symmetry.
- intros ???. apply transitivity.
-Qed.
 
 (* For addition, multiplication, and min/max (and their properties), we factor out the common bits: *)
 

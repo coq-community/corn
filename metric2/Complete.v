@@ -147,7 +147,7 @@ Proof.
  by QposRing.
 Qed.
 
-Definition regFun_Setoid := Build_Setoid regFun_is_setoid.
+Definition regFun_Setoid := Build_RSetoid regFun_is_setoid.
 
 Definition regFunBall e (f g : RegularFunction) :=
 forall d1 d2, ball (m:=X) (d1+e+d2)%Qpos (approximate f d1) (approximate g d2).

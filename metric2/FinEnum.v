@@ -174,7 +174,7 @@ Proof.
  apply FinEnum_eq_trans.
 Qed.
 
-Definition FinEnumS : Setoid := Build_Setoid FinEnum_is_Setoid.
+Definition FinEnumS : RSetoid := Build_RSetoid FinEnum_is_Setoid.
 
 (**
 ** Metric Space

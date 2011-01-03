@@ -45,7 +45,7 @@ x and y are within e of each other ( d(x,y)<=e ).  This is characterized
 by the axioms given in the record structure below.
 *)
 
-Record is_MetricSpace (X:Setoid) (B: Qpos -> relation X) : Prop :=
+Record is_MetricSpace (X : RSetoid) (B: Qpos -> relation X) : Prop :=
 { msp_refl: forall e, Reflexive (B e)
 ; msp_sym: forall e, Symmetric (B e)
 ; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2)%Qpos a c
@@ -54,7 +54,7 @@ Record is_MetricSpace (X:Setoid) (B: Qpos -> relation X) : Prop :=
 }.
 
 Record MetricSpace : Type :=
-{ msp_is_setoid :> Setoid
+{ msp_is_setoid :> RSetoid
 ; ball : Qpos -> msp_is_setoid -> msp_is_setoid -> Prop
 ; ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
             forall x1 x2, (st_eq x1 x2) ->

@@ -131,7 +131,7 @@ Proof.
  apply H2.
 Qed.
 
-Definition uc_Setoid : Setoid := (Build_Setoid uc_setoid).
+Definition uc_Setoid : RSetoid := (Build_RSetoid uc_setoid).
 
 Definition ucBall e (f g : UniformlyContinuousFunction) := forall a, ball e (f a) (g a).
 
