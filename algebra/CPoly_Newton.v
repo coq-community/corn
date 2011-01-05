@@ -1,7 +1,7 @@
 
 Require Import
  Unicode.Utf8
- Setoid Arith List Program Permutation
+ Setoid Arith List Program Permutation metric2.Classified
  CSetoids CPoly_ApZero CRings CPoly_Degree
  CRArith Qmetric Qring CReals
  stdlib_omissions.Pair stdlib_omissions.Q
@@ -10,6 +10,42 @@ Require ne_list.
 Import ne_list.notations.
 
 Set Automatic Introduction.
+
+
+
+Instance: UniformlyContinuous_mu (util.uncurry Qplus).
+Admitted.
+Instance: UniformlyContinuous (util.uncurry Qplus).
+Admitted.
+Instance: forall x, UniformlyContinuous_mu (Qplus x).
+Admitted.
+Instance: forall x, UniformlyContinuous (Qplus x).
+Admitted.
+
+Instance: UniformlyContinuous_mu (util.uncurry Qminus).
+Admitted.
+Instance: UniformlyContinuous (util.uncurry Qminus).
+Admitted.
+Instance: forall x, UniformlyContinuous_mu (Qminus x).
+Admitted.
+Instance: forall x, UniformlyContinuous (Qminus x).
+Admitted.
+
+Instance: UniformlyContinuous_mu (util.uncurry Qmult).
+Admitted.
+Instance: UniformlyContinuous (util.uncurry Qmult).
+Admitted.
+Instance: forall x, UniformlyContinuous_mu (Qmult x).
+Admitted.
+Instance: forall x, UniformlyContinuous (Qmult x).
+Admitted.
+
+Instance: forall x, UniformlyContinuous_mu (Qscale_uc x).
+Admitted.
+Instance: forall x, UniformlyContinuous (Qscale_uc x).
+Admitted.
+  (** Todo: Prove and move. Only added here temporarily to make definition of repeated integral compile. *)
+
 
 Open Local Scope CR_scope.
 
@@ -80,7 +116,7 @@ Section contents.
 
     (** Applying this polynomial gives what you'd expect: *)
 
-    Definition an_applied (x: Q) (txs: ne_list QPoint) := divdiff txs [*] ' Π (map (Qminus x ∘ fst) (tail txs)).
+    Definition an_applied (x: Q) (txs: ne_list QPoint) := divdiff txs [*] ' Π (map (Qminus x ∘ fst)%prg (tail txs)).
 
     Definition applied (x: Q) := Σ (map (an_applied x) (ne_list.tails qpoints)).
 
@@ -142,10 +178,10 @@ Section contents.
       an_applied (fst x) (x ::: y ::: xs)+an_applied (fst x) (y ::: xs) + applied xs (fst x))%CR.
     ring.
    change ((divdiff_l x xs - divdiff_l y xs) * ' (/ (fst x - fst y))[*]
-     ' (Qminus (fst x) (fst y) * Π (map (Qminus (fst x) ∘ fst) xs))+
-     divdiff_l y xs[*]' Π (map (Qminus (fst x) ∘ fst) xs)[=]
-     divdiff_l x xs[*]' Π (map (Qminus (fst x) ∘ fst) xs)).
-   generalize (Π (map (Qminus (fst x) ∘ fst) xs)).
+     ' (Qminus (fst x) (fst y) * Π (map (Qminus (fst x) ∘ fst)%prg xs))+
+     divdiff_l y xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)[=]
+     divdiff_l x xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)).
+   generalize (Π (map (Qminus (fst x) ∘ fst)%prg xs)).
    intros.
    rewrite <- mult_assoc.
    change ((((divdiff_l x xs - divdiff_l y xs)*(' (/ (fst x - fst y))%Q*' ((fst x - fst y)*s)%Q) + divdiff_l y xs * ' s)) == divdiff_l x xs*' s)%CR.
@@ -321,5 +357,48 @@ Section contents.
    unfold QNoDup.
    rewrite <- P...
   Qed.
+
+  Section divdiff_as_repeated_integral.
+
+    Context
+      (nth_deriv: Q → CR)
+        `{!UniformlyContinuous_mu nth_deriv}
+        `{!UniformlyContinuous nth_deriv}
+          (* Todo: This should be replaced with some "n times differentiable" requirement on a subject function. *)
+      (integrate: Q * Q * UCFunction Q CR → CR)
+        `{!UniformlyContinuous_mu integrate}
+        `{!UniformlyContinuous integrate}.
+          (* Todo: The integration function should not be a parameter. We should just use SimpleIntegration's implementation. *)
+
+    Opaque Qmult Qplus Qminus.
+       (* Without these, instance resolution gets a little too enthusiastic and breaks these operations open when
+       looking for PointFree instances below. It's actually kinda neat that it can put these in PointFree form though. *)
+
+    Fixpoint go (p: ne_list Q): UCFunction (Q*Q) CR :=
+      match p with
+      | ne_list.one x => ucFunction (uncurry (λ left runningtotal,
+          nth_deriv (runningtotal + x * left)%Q))
+      | ne_list.cons x xs => ucFunction (uncurry (λ left runningtotal,
+          integrate (Zero, left, ucFunction (λ t, go xs (left - t, runningtotal + x * t)%Q))))
+      end.
+       (* It would be nicer to factor out the "ucFunction (uncurry (λ left runningtotal," part common to both branches,
+        but that would make the match part of the function that we're automatically inferring uniform continuity of,
+        and we're not quite ready yet to do that for matches of any kind. *)
+
+    (* Here we use a bundled return type for 'go' because in each recursive level, the definition depends on continuity
+     of the previous recursive level. Without bundling, we would need a way to *simultaneously* build up the
+     recursive function as well as proofs of its continuity at each level. That is, something along the lines of:
+
+      Fixpoint go (p: ne_list Q): Q*Q → CR := ....
+      with go_mu (p: ne_list Q): UniformlyContinuous_mu (go p) := ...
+      with go_uc (p: ne_list Q): UniformlyContinuous (go p) := ... .
+
+    Unfortunately, Coq does not support this kind of mutual recursion where one of the constants being
+    defined occurs in the type of another. And even if it did, achieving the same level of inference would probably
+    be pretty tricky. *)
+
+    Definition alt_divdiff (p: ne_list Q): CR := go p (1, 0)%Q.
+
+  End divdiff_as_repeated_integral.
 
 End contents.

@@ -1,15 +1,12 @@
 
 Require Import
- Unicode.Utf8 Setoid Arith List
+ Unicode.Utf8 Setoid Arith List Program
  CSetoids Qmetric Qring ProductMetric QposInf
  UniformContinuity
- stdlib_omissions.Pair stdlib_omissions.Q
+ stdlib_omissions.Pair stdlib_omissions.Q PointFree
  interfaces.canonical_names
  interfaces.abstract_algebra
  MathClasses.theory.setoids.
-
-Generalizable All Variables.
-
 
 Section make_RSetoid.
 
@@ -26,7 +23,6 @@ End make_RSetoid. (* Todo: Move. *)
 
 Instance: ∀ S: RSetoid.Setoid, Equiv S := @st_eq.
 Instance: ∀ S: RSetoid.Setoid, Setoid S.
-
 
 (** MathClasses-style operational & structural classes for a Russell-style metric space (i.e. MetricSpace).
  We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace
@@ -139,9 +135,27 @@ Section uniform_continuity.
     ; uniformlyContinuous: 
       ∀ (e: Qpos) (a b: X), mspc_ball_ex (uc_mu e) a b → mspc_ball _ e (f a) (f b) }.
 
-  (** If we have a function with this constraint, then we can bundle it into a UniformlyContinuousFunction: *)
-
   Context `{uc: UniformlyContinuous}.
+
+  Instance UniformlyContinuousFunction_Proper: Proper (=) f.
+    (* Deliberately not Global because uniform continuity is not a "structurally smaller" constraint than propriety. *)
+  Proof with auto.
+   intros ?? E.
+   pose proof uc_to.
+   apply (mspc_eq Y).
+   intro.
+   apply uniformlyContinuous.
+   destruct (@uc_mu f UniformlyContinuous_mu0 e).
+    simpl.
+    pose proof uc_from.
+    pose proof (mspc_setoid X).
+    pose proof (mspc_ball_proper X).
+    rewrite E.
+    reflexivity.
+   exact I.
+  Qed.
+
+  (** If we have a function with this constraint, then we can bundle it into a UniformlyContinuousFunction: *)
 
   Let hint := uc_from.
   Let hint' := uc_to.
@@ -156,12 +170,84 @@ Section uniform_continuity.
    destruct (uc_mu e); auto.
   Qed.
 
-  (** Note that wrap_uc_fun _also_ bundles the metric spaces. This is because the bundled data type
-   for uniform continuous functions is expressed in terms of the bundled data for metric spaces. *)
+  (** Note that wrap_uc_fun _also_ bundles the source and target metric spaces, because
+   UniformlyContinuousFunction is expressed in terms of the bundled data type for metric spaces. *)
 
 End uniform_continuity.
 
 Implicit Arguments uc_mu [[X] [Y] [UniformlyContinuous_mu]].
+
+(** Normally, we would like to use the type class constraints whenever we need uniform continuity of
+ functions, including in the types for higher order functions. For instance, we would like to assign
+ an integration function for uniformly continuous functions a type along the lines of:
+   ∀ (f: Q → CR) `{!UniformlyContinuous f}, CR
+ However, dependent types like these get in the way when we subsequently want to express continuity
+ of this higher order function itself. Hence, a modicum of bundling is hard to avoid. However, we
+ only need to bundle the components of the uniformly continuous function itself---there is no need to
+ also start bundling source and target metric spaces the way UniformlyContinuousFunction and
+ wrap_uc_fun do. Hence, we now introduce a record for uniformly continuous functions that does not
+ needlessly bundle the source and target metric spaces. *)
+
+Section shallowly_wrapped_ucfuns.
+
+  Context `{@MetricSpaceComponents X Xe Xb} `{@MetricSpaceComponents Y Ye Yb}.
+    (* We must name Xe/Xb/Ye/Yb here so that we can repeat them in the implicit argument
+     specification later on. This could have been avoided if Coq offered more flexible
+     commands for implicit argument specification that would let one reset implicit-ness for
+     individual parameters without restating the whole list. *)
+
+  Record UCFunction: Type := ucFunction
+    { ucFun_itself:> X → Y
+    ; ucFun_mu: UniformlyContinuous_mu ucFun_itself
+    ; ucFun_uc: UniformlyContinuous ucFun_itself }.
+
+  Global Instance: ∀ (f: UCFunction), Proper (=) (f: X → Y).
+  Proof. intros. destruct f. apply (UniformlyContinuousFunction_Proper _). Qed.
+    (* This is just the existing unregistered (local) instance for uniformly continuous functions,
+     turned into a global instance, which is now justified because (1) the goal for this instance
+     includes the coercion, making it far more specialized, and (2) this instance does not yield
+     new constraints, and so can never blow up the search space. *)
+
+End shallowly_wrapped_ucfuns.
+
+Existing Instance ucFun_mu.
+Existing Instance ucFun_uc.
+
+Implicit Arguments UCFunction [[Xe] [Xb] [Yb] [Ye]].
+Implicit Arguments ucFunction [[X] [Xe] [Xb] [Y] [Yb] [Ye] [ucFun_mu] [ucFun_uc]].
+
+
+Section functions.
+
+  Context `{MetricSpaceClass A} `{MetricSpaceClass B}.
+
+  Global Instance: Equiv (UCFunction A B) := equiv: relation (A→B).
+
+  Let hint := mspc_setoid A.
+  Let hint' := mspc_setoid B.
+
+  Global Instance: Setoid (UCFunction A B).
+  Proof with intuition.
+   constructor.
+     intros ????.
+     set (_: Proper (=) (ucFun_itself x)).
+     destruct x...
+    repeat intro. symmetry...
+   intros ? y ??? x. transitivity (y x)...
+  Qed.
+
+  Global Instance: MetricSpaceBall (UCFunction A B) := λ e f g, ∀ a, mspc_ball B e (f a) (g a).
+
+  Definition UCFunction_MetricSpace: MetricSpaceClass (UCFunction A B).
+   destruct (uc_is_MetricSpace (bundle_MetricSpace A) (bundle_MetricSpace B)).
+  Admitted. (* Todo. *)
+
+End functions.
+
+Existing Instance UCFunction_MetricSpace.
+  (* For some reason Coq hangs when we just declare UCFunction_MetricSpace as an
+   instance right away. This workaround seems to work... Todo: Investigate. *)
+
 
 (** If source and target are /already/ bundled, then we don't need to rebundle them when bundling
  a uniformly continuous function: *)
@@ -221,8 +307,8 @@ Qed. (* Todo: Clean up! (by making [rewrite] work)*)
 (** The identity function is uniformly continuous: *)
 
 Section id_uc. Context `{MetricSpaceClass X}.
-  Global Instance: UniformlyContinuous_mu (λ x: X, x) := { uc_mu := Qpos2QposInf }.
-  Global Instance: UniformlyContinuous (λ x: X, x).
+  Global Instance: UniformlyContinuous_mu (@Datatypes.id X) := { uc_mu := Qpos2QposInf }.
+  Global Instance: UniformlyContinuous (@Datatypes.id X).
   Proof. constructor; try apply _. intros. assumption. Qed.
 End id_uc.
   (* Note: We don't need a separate instance for the [id] constant. If such an instance
@@ -231,8 +317,8 @@ End id_uc.
 (** Constant functions are uniformly continuous: *)
 
 Section const_uc. Context `{MetricSpaceClass X} `{MetricSpaceClass Y} (y: Y).
-  Global Instance: UniformlyContinuous_mu (λ _: X, y) := { uc_mu := λ _, QposInfinity }.
-  Global Instance: UniformlyContinuous (λ _: X, y).
+  Global Instance: UniformlyContinuous_mu (@Basics.const Y X y) := { uc_mu := λ _, QposInfinity }.
+  Global Instance: UniformlyContinuous (@Basics.const Y X y).
   Proof. repeat intro. constructor; try apply _. intros. apply (mspc_refl Y). Qed.
 End const_uc.
 
@@ -279,6 +365,7 @@ Section pairops_uc.
   Global Instance: UniformlyContinuous_mu (@fst A B) := { uc_mu := Qpos2QposInf }.
   Global Instance: UniformlyContinuous_mu (@snd A B) := { uc_mu := Qpos2QposInf }.
   Global Instance: UniformlyContinuous_mu (uncurry (@pair A B)) := { uc_mu := Qpos2QposInf }.
+  Global Instance: ∀ a, UniformlyContinuous_mu (@pair A B a) := { uc_mu := Qpos2QposInf }.
 
   Global Instance: UniformlyContinuous (@fst A B).
   Proof. constructor; try apply _. intros ??? P. apply P. Qed. 
@@ -286,25 +373,23 @@ Section pairops_uc.
   Proof. constructor; try apply _. intros ??? P. apply P. Qed. 
   Global Instance: UniformlyContinuous (uncurry (@pair A B)).
   Proof. constructor; try apply _. intros ??? P. apply P. Qed.
+  Global Instance: ∀ a, UniformlyContinuous (@pair A B a).
+  Proof. constructor; try apply _. intros ??? P. split. reflexivity. apply P. Qed.
 End pairops_uc.
 
-
-(** We now move on to compositions of functions, starting with the simplest case: *)
-
-Section uc_comp_uc.
-
+Section compose_uc.
   Context `{MetricSpaceComponents X}  `{MetricSpaceComponents Y} `{MetricSpaceComponents Z'}
    (f: Y → Z') `{!UniformlyContinuous_mu f} `{!UniformlyContinuous f}
    (g: X → Y) `{!UniformlyContinuous_mu g} `{!UniformlyContinuous g}.
 
-  Global Instance uc_comp_mu: UniformlyContinuous_mu (λ x, f (g x)) :=
+  Global Instance compose_mu: UniformlyContinuous_mu (f ∘ g)%prg :=
     { uc_mu := λ e, QposInf_bind (uc_mu g) (uc_mu f e) }.
 
   Let hint := uc_from g.
   Let hint' := uc_to g.
   Let hint'' := uc_to f.
 
-  Global Instance uc_comp_uc: UniformlyContinuous (λ x, f (g x)).
+  Global Instance compose_uc: UniformlyContinuous (f ∘ g)%prg.
   Proof with auto.
    constructor; try apply _.
    intros ??? P.
@@ -314,123 +399,77 @@ Section uc_comp_uc.
    destruct q...
    apply (uniformlyContinuous g).
   Qed.
+End compose_uc.
 
-End uc_comp_uc.
+Section curried_uc.
 
-(** Now a slightly more interesting case: application of the "binary" function obtained
- by currying a function on products. Note that we need the g and h parameterization
- here because f is not the head function in the lambda. The class instances are
- elegantly obtained simply by observing that [curry f (g x) (h x) ≡ f (map_pair f g (diagonal x))],
- for which the instances can be derived automatically from those we've already defined. *)
+  Context `{MetricSpaceClass X} `{MetricSpaceClass Y} `{MetricSpaceClass Z'} (f: X → Y → Z')
+   `{fmu1: ∀ x: X, UniformlyContinuous_mu (f x)}
+   `{fuc1: ∀ x: X, UniformlyContinuous (f x)}
+   `{fmu: !UniformlyContinuous_mu (λ p, f (fst p) (snd p))}
+   `{fuc: !UniformlyContinuous (λ p, f (fst p) (snd p))}.
 
-Section cur_appl_inst.
+  Local Notation F := (λ x: X, {| ucFun_itself := λ y: Y, f x y; ucFun_mu := fmu1 x; ucFun_uc := fuc1 x |}).
 
-  Context
-    `{MetricSpaceComponents X} `{MetricSpaceComponents Y}
-    `{MetricSpaceComponents A} `{MetricSpaceComponents B}
-    (f: A * B → Y) `{!UniformlyContinuous_mu f}
-    (g: X → A) `{!UniformlyContinuous_mu g} 
-    (h: X → B) `{!UniformlyContinuous_mu h}.
+  Global Instance curried_mu: UniformlyContinuous_mu F := { uc_mu := uc_mu (λ p, f (fst p) (snd p)) }.
 
-  Global Instance appl_mu: UniformlyContinuous_mu (λ x, curry f (g x) (h x)).
-   change (UniformlyContinuous_mu (λ x, f (map_pair g h (diagonal x)))).
-   apply _.
-  Defined.
-
-  Context `{!UniformlyContinuous f} `{!UniformlyContinuous g} `{!UniformlyContinuous h}.
-
-  Let hint := uc_to g.
-  Let hint' := uc_to h.
-  Let hint''' := uc_to f.
-  Let hint'''' := uc_from g.
-
-  Global Instance uc_appl_inst: UniformlyContinuous (λ x, curry f (g x) (h x)).
-  Proof.
-   change (UniformlyContinuous (λ x, f (map_pair g h (diagonal x)))).
-   apply _.
+  Global Instance curried_uc: UniformlyContinuous F.
+  Proof with trivial.
+   constructor; try apply _.
+   repeat intro.
+   simpl in *.
+   destruct fuc.
+   apply (@uniformlyContinuous0 e (a, a0) (b, a0)).
+   simpl.
+   set (q := uc_mu (λ p, f (fst p) (snd p)) e) in *.
+   destruct q...
+   split...
+   reflexivity.
   Qed.
 
-End cur_appl_inst.
+End curried_uc.
 
 
-Hint Unfold Datatypes.id: typeclass_instances.
+Class HasLambda `{X: Type} (x: X): Prop.
 
-(** A lambda (λ x, f (g x) (h x)) applying a binary function f is uniformly continuous if f is uniformly
- continuous when uncurried and the argument x is piped through uniformly continuous functions g and h: *)
+Instance lambda_has_lambda `(f: A → B): HasLambda (λ x, f x).
+Instance application_has_lambda_left: ∀ `(f: A → B) (x: A), HasLambda f → HasLambda (f x).
+Instance application_has_lambda_right: ∀ `(f: A → B) (x: A), HasLambda x → HasLambda (f x).
 
-Section binary_uc_function_application.
 
-  Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y} `{MetricSpaceComponents A} `{MetricSpaceComponents B}
-    (f: A → B → Y) `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)}
-    (g: X → A) `{!UniformlyContinuous_mu g} `{!UniformlyContinuous g}
-    (h: X → B) `{!UniformlyContinuous_mu h} `{!UniformlyContinuous h}.
+Section lambda_uc.
 
-  Global Instance binary_uc_function_application_mu: UniformlyContinuous_mu (λ x, f (g x) (h x)).
-   change (UniformlyContinuous_mu (λ x, uncurry f (map_pair g h (diagonal x)))).
-   apply _.
-  Defined.
+  Context `{MetricSpaceComponents A} `{MetricSpaceComponents B}  (f: A → B).
 
-  Let hint := uc_to g.
-  Let hint' := uc_to h.
-  Let hint'' := uc_to (uncurry f).
-  Let hint''' := uc_from g.
+  Global Instance lambda_mu `{!HasLambda f} {free_f: A → B} `{!PointFree f free_f} `{!UniformlyContinuous_mu free_f}: UniformlyContinuous_mu f.
+    (* Note: The HasLambda and PointFree constraints cannot be added to the Context declaration
+     above because the definition of this mu needs to depend on them /despite/ not using them.
+     Without the dependency, lambda_mu would be allowed to find a random free_f of the right signature
+     for which it happens to have a mu already, and use that one.
+     We do not factor out the mu constraint either, because for (dubious) efficiency reasons it is critical
+     that it appear /after/ the PointFree constraint.*)
+  Proof. constructor. apply UniformlyContinuous_mu0. Defined.
 
-  Global Instance binary_uc_function_application: UniformlyContinuous (λ x, f (g x) (h x)).
+  Context `{!HasLambda f} {free_f: A → B} `{!PointFree f free_f} `{!UniformlyContinuous_mu free_f} `{!UniformlyContinuous free_f}.
+
+  Global Instance lambda_uc: UniformlyContinuous f.
   Proof.
-   change (UniformlyContinuous (λ x, uncurry f (map_pair g h (diagonal x)))).
-   apply _.
-  Qed.
-
-End binary_uc_function_application.
-
-(** This last instance is a bit awkward. Intuitively you'd expect that an instance
- for lambdas of the form (λ x, (f x) (g x)) should suffice. However, higher order unification
- is not clever enough to make the tests work if the above instance is replaced with
- the following two instances: *)
-
-(**
-Section application_under_lambda.
-
-  Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y} `{MetricSpaceComponents A}
-    (f: X → A → Y) `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)}
-    (g: X → A) `{!UniformlyContinuous_mu g} `{!UniformlyContinuous g}.
-
-  Global Instance uc_application_mu: UniformlyContinuous_mu (λ x, (f x) (g x)).
-   change (UniformlyContinuous_mu (λ x, uncurry f (map_pair Datatypes.id g (diagonal x)))).
-   apply _.
-  Defined.
-
-  Let hint := uc_from g.
-  Let hint' := uc_to g.
-  Let hint'' := uc_to (uncurry f).
-
-  Global Instance uc_application: UniformlyContinuous (λ x, (f x) (g x)).
-  Proof.
-   change (UniformlyContinuous (λ x, uncurry f (map_pair Datatypes.id g (diagonal x)))).
-   apply _.
-  Qed.
-
-End application_under_lambda.
-
-Section composition_under_uncurry.
-
-  Context
-    `{MetricSpaceComponents X} `{MetricSpaceComponents Y}
-    `{MetricSpaceComponents A} `{MetricSpaceComponents B}
-    (f: A → B → Y) `{!UniformlyContinuous_mu (uncurry f)}
-    (g: X → A) `{!UniformlyContinuous_mu g} .
-
-  Global Instance comp_under_uncurry_mu: UniformlyContinuous_mu (uncurry (fun x => f (g x))).
-   change (UniformlyContinuous_mu (λ p, uncurry f (g (fst p), snd p))).
-   change (UniformlyContinuous_mu (λ x, uncurry f (map_pair g Datatypes.id x))).
-   apply uc_comp_mu.
+   destruct UniformlyContinuous0.
+   constructor.
+     apply _.
     apply _.
-   apply _.
-  Defined.
+   destruct uc_from0.
+   destruct uc_to0.
+   intros.
+   unfold PointFree in PointFree0.
+   rewrite PointFree0.
+   apply uniformlyContinuous0.
+   unfold uc_mu in H5.
+   simpl in H5.
+   assumption.
+  Qed. (* Todo: Clean up. *)
 
-End composition_under_uncurry.
-*)
-
+End lambda_uc.
 
 Module test.
 Section test.
@@ -438,11 +477,9 @@ Section test.
   Context
     `{MetricSpaceClass A}
     (f: A → A → A)
-    `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)}.
+    `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)} `{!Proper (=) f}.
 
-  Definition composition (x: A): A := f (f x x) (f x (f x x)).
-
-  Definition t0: UniformlyContinuous_mu composition := _.
+  Definition t0: UniformlyContinuous_mu (λ (x: A), f (f x x) (f x (f x x))) := _.
 
 End test.
 End test.
