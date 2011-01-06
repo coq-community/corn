@@ -13,6 +13,9 @@ PREREQUISITES
     svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/trunk/Saclay/Ssreflect -r 1292
    Currently only the ssreflect binary compiles, the standard library is broken.
    However, CoRN does not depend on the library.
+   Build a customized Coqide interface linked with ssreflect. After having compiled ssreflect toplevel, go to the src/ subdirectory and execute the command
+   coqmktop -opt ssreflect.cmx -o ../bin/coqtop.opt
+   coqmktop -ide -opt ssreflect.cmx -o ../bin/ssrcoqide
 
  - SCons 1.2
 
@@ -48,6 +51,10 @@ To build CoqDoc documentation, say "scons coqdoc".
 
 A dependency graph in DOT format can be created with "scons deps.dot".
 
+PLOTS
+-----
+If you want high resolution plots in examples/Circle.v,
+follow the instructions in dump/INSTALL
 
 OTHERS
 ------
