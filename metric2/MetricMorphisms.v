@@ -208,7 +208,7 @@ Section dense_prelength_embedding.
     Definition unary_uc_prf : is_UniformlyContinuousFunction (g' : X → X) (mu h).
     Proof with auto.
       repeat intro. apply Eball_spec. do 2 rewrite g_eq_h.
-      eapply uc_prf. assumption.
+      eapply uc_prf. destruct (mu h e)...
     Qed.
 
     Definition unary_uc : X --> X := Build_UniformlyContinuousFunction unary_uc_prf.
@@ -233,6 +233,7 @@ Section dense_prelength_embedding.
       intros ε x y E z. 
       apply Eball_spec. do 2 rewrite g_eq_h.
       apply (uc_prf h)...
+      destruct (mu h ε)...
     Qed.
 
     Definition binary_uc : X --> X --> X := Build_UniformlyContinuousFunction binary_uc_prf.

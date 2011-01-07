@@ -8,6 +8,8 @@ Require Import
  interfaces.abstract_algebra
  MathClasses.theory.setoids.
 
+Generalizable All Variables.
+
 Section make_RSetoid.
 
   Context A `{@Setoid A e}.
@@ -112,11 +114,78 @@ Class MetricSpaceComponents X `{Equiv X} `{MetricSpaceBall X}: Prop.
 
  For this, we first define mspc_ball_ex, analogous to ball_ex: *)
 
-Definition mspc_ball_ex `{MetricSpaceBall X} (e: QposInf) (a b: X): Prop :=
-  match e with
-  | QposInfinity => True
-  | Qpos2QposInf e' => mspc_ball X e' a b
-  end.
+Section mspc_ball_ex.
+  Context `{MetricSpaceClass X}.
+
+  Definition mspc_ball_ex (e: QposInf): relation X :=
+    match e with
+    | QposInfinity => λ _ _, True
+    | Qpos2QposInf e' => mspc_ball X e'
+    end.
+
+  Global Instance mspc_ball_ex_Proper: ∀ e, Proper ((=) ==> (=) ==> iff) (mspc_ball_ex e).
+  Proof. destruct e. unfold mspc_ball_ex. apply _. repeat intro. intuition. Qed.
+
+  Global Instance mspc_ball_ex_Reflexive: ∀ e, Reflexive (mspc_ball_ex e).
+  Proof. destruct e. unfold mspc_ball_ex. apply _. repeat intro. intuition. Qed.
+
+  Global Instance mspc_ball_ex_Symmetric: ∀ e, Symmetric (mspc_ball_ex e).
+  Proof. destruct e. unfold mspc_ball_ex. apply _. repeat intro. intuition. Qed.
+End mspc_ball_ex.
+
+Section local_uniform_continuity.
+
+  Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y}.
+
+  Class LocallyUniformlyContinuous_mu (f: X → Y): Type :=
+    luc_mu (around: X) (radius: Qpos) (eps: Qpos): QposInf.
+
+  Context (f: X → Y) {mu: LocallyUniformlyContinuous_mu f}.
+
+  Definition luc_mu_nn (around: X) (radius: QnonNeg.T) (eps: Qpos): QposInf :=
+   QnonNeg.rect (fun x => QposInf) (fun _ _ => QposInfinity) (fun n d _ => luc_mu around (QposMake n d) eps) radius.
+
+  Class LocallyUniformlyContinuous: Prop :=
+    { luc_from: MetricSpaceClass X
+    ; luc_to: MetricSpaceClass Y
+    ; locallyUniformlyContinuous:
+      ∀ (around: X) (radius: Qpos) (e: Qpos) (a: X),
+        mspc_ball X radius around a → ∀ (b: X),
+        mspc_ball_ex (luc_mu around radius e) a b → mspc_ball _ e (f a) (f b) }.
+
+  Context `{LocallyUniformlyContinuous}.
+
+  Instance luc_Proper: Proper (=) f.
+  Proof with intuition.
+   repeat intro.
+   pose proof luc_from.
+   pose proof luc_to.
+   apply (mspc_eq Y).
+   intros.
+   apply (locallyUniformlyContinuous x e e).
+    reflexivity.
+   pose proof mspc_setoid X.
+   pose proof mspc_ball_ex_Proper.
+   refine (proj1 (mspc_ball_ex_Proper (luc_mu x e e) x x (reflexivity _) x y _) _)...
+  Qed.
+
+End local_uniform_continuity.
+
+Implicit Arguments luc_mu [[X] [Y] [LocallyUniformlyContinuous_mu]].
+
+Definition luc_from_equivalent_function `{LocallyUniformlyContinuous X Y f} (g: X → Y) (E: f = g): LocallyUniformlyContinuous g (mu:=luc_mu f).
+Proof with auto; try reflexivity.
+ intros.
+ pose proof (luc_from f).
+ pose proof (luc_to f).
+ pose proof (mspc_setoid X).
+ pose proof (mspc_setoid Y).
+ constructor; try apply _.
+ intros.
+ rewrite <- (E a)...
+ rewrite <- (E b)...
+ apply (locallyUniformlyContinuous f around radius)...
+Qed.
 
 Section uniform_continuity.
 
@@ -129,36 +198,23 @@ Section uniform_continuity.
 
   Context (f: X → Y) `{!UniformlyContinuous_mu f}.
 
+  Global Instance luc_from_uc_mu: LocallyUniformlyContinuous_mu f := { luc_mu := λ _ _, @uc_mu f _ }.
+
   Class UniformlyContinuous: Prop :=
     { uc_from: MetricSpaceClass X
     ; uc_to: MetricSpaceClass Y
     ; uniformlyContinuous: 
       ∀ (e: Qpos) (a b: X), mspc_ball_ex (uc_mu e) a b → mspc_ball _ e (f a) (f b) }.
 
-  Context `{uc: UniformlyContinuous}.
-
-  Instance UniformlyContinuousFunction_Proper: Proper (=) f.
-    (* Deliberately not Global because uniform continuity is not a "structurally smaller" constraint than propriety. *)
-  Proof with auto.
-   intros ?? E.
-   pose proof uc_to.
-   apply (mspc_eq Y).
-   intro.
-   apply uniformlyContinuous.
-   destruct (@uc_mu f UniformlyContinuous_mu0 e).
-    simpl.
-    pose proof uc_from.
-    pose proof (mspc_setoid X).
-    pose proof (mspc_ball_proper X).
-    rewrite E.
-    reflexivity.
-   exact I.
-  Qed.
-
   (** If we have a function with this constraint, then we can bundle it into a UniformlyContinuousFunction: *)
+
+  Context `{uc: UniformlyContinuous}.
 
   Let hint := uc_from.
   Let hint' := uc_to.
+
+  Global Instance: LocallyUniformlyContinuous f.
+  Proof with auto. constructor... intros. apply uniformlyContinuous... Qed.
 
   Program Definition wrap_uc_fun
     : UniformlyContinuousFunction (bundle_MetricSpace X) (bundle_MetricSpace Y)
@@ -202,11 +258,7 @@ Section shallowly_wrapped_ucfuns.
     ; ucFun_uc: UniformlyContinuous ucFun_itself }.
 
   Global Instance: ∀ (f: UCFunction), Proper (=) (f: X → Y).
-  Proof. intros. destruct f. apply (UniformlyContinuousFunction_Proper _). Qed.
-    (* This is just the existing unregistered (local) instance for uniformly continuous functions,
-     turned into a global instance, which is now justified because (1) the goal for this instance
-     includes the coercion, making it far more specialized, and (2) this instance does not yield
-     new constraints, and so can never blow up the search space. *)
+  Proof. intros. destruct f. apply (luc_Proper ucFun_itself0). Qed.
 
 End shallowly_wrapped_ucfuns.
 
@@ -258,11 +310,7 @@ Program Definition wrap_uc_fun' {X Y: MetricSpace} (f: X → Y)
     UniformlyContinuousFunction X Y :=
   @Build_UniformlyContinuousFunction X Y f (uc_mu f) _.
 
-Next Obligation.
- repeat intro.
- apply (uniformlyContinuous f).
- destruct (uc_mu f e); auto.
-Qed.
+Next Obligation. intros ??. apply (uniformlyContinuous f). Qed.
 
 (** Conversely, if we have a UniformlyContinuousFunction (between bundled metric spaces) and project
  the real function out of it, instances of the classes can easily be derived. *)
@@ -276,11 +324,7 @@ Section unwrap_uc.
   Global Instance unwrap_mu: UniformlyContinuous_mu f := { uc_mu := mu f }.
 
   Global Instance unwrap_uc_fun: UniformlyContinuous f.
-  Proof.
-   constructor; try apply _.
-   unfold uc_mu, unwrap_mu.
-   apply f.
-  Qed.
+  Proof. constructor; try apply _. apply f. Qed.
 
 End unwrap_uc.
 

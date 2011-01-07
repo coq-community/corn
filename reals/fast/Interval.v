@@ -185,8 +185,6 @@ Proof.
   apply Qle_shift_div_l; auto with *.
   replace LHS with 0 by simpl; ring.
   apply: mult_resp_nonneg; simpl; auto with *.
-  unfold Qle;simpl.
-  auto with *.
  rewrite -> Hlr'.
  setoid_replace (r-r) with 0; [| by simpl; ring].
  unfold Qdiv.

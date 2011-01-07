@@ -8,7 +8,7 @@
  makes it relatively generic, but it also means that it is fairly inefficient. *)
 
 Require Import
-  List NPeano
+  List NPeano Unicode.Utf8
   QArith Qabs Qpossec Qsums
   Qmetric
   CRArith AbstractIntegration
@@ -17,7 +17,9 @@ Require Import
   uneven_CRplus
   stdlib_omissions.P
   stdlib_omissions.Z
-  stdlib_omissions.Q.
+  stdlib_omissions.Q
+  metric2.Classified
+  implementations.stdlib_rationals.
 
 Open Scope uc_scope.
 
@@ -46,7 +48,7 @@ Definition plus_half_times (x y: Q): Q := x * y + (1#2)*y.
 
 Section definition.
 
-  Variable (f: Q_as_MetricSpace --> CR).
+  Context (f: Q -> CR) `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
 
   (** Note that in what follows we don't specialize for [0,1] or [0,w] ranges first. While this
   would make the definition marginally cleaner, the resulting definition is harder to prove
@@ -54,15 +56,17 @@ Section definition.
   don't come with Proper proofs, which means that common sense reasoning about
   those operations with their arguments transformed doesn't work well. *)
 
-  Definition intervals (w: Qpos) (error: Qpos): positive :=
-    match mu f (error / w) with
+  Definition intervals (from: Q) (w: Qpos) (error: Qpos): positive :=
+    match luc_mu f from w (error / w) with
+      (* Todo: This is nice and simple, but suboptimal. Better would be to take the luc_mu
+       around the midpoint and with radius (w/2). *)
     | QposInfinity => 1%positive
     | Qpos2QposInf mue => QposCeiling ((1#2) * w / mue)%Qpos
     end.
 
   Definition approx (from: Q) (w: Qpos) (e: Qpos): Q :=
     let halferror := (e * (1#2))%Qpos in
-    let ints := intervals w halferror in
+    let ints := intervals from w halferror in
     let iw := (w / ints) in
     let halfiw := ((1#2) * iw) in
       fastΣ (nat_of_P ints) (fun i => approximate (f (from + (i * iw + halfiw))) (halferror / w)%Qpos) * iw.
@@ -71,15 +75,50 @@ Section definition.
    Riemann sums over the same range divided into different numbers of intervals.
    For these cases, the following lemma is very useful. *)
 
-  Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos): ball (he / wb)
-    (f (fr + plus_half_times (i / t)%nat (wb * / intervals wb he)))
-    (f (fr + i * / (intervals wb he * t)%positive * wb)).
+  Hint Resolve  Qinv_le_0_compat Qmult_le_0_compat.
+  Hint Immediate Zle_0_POS Zlt_0_POS.
+
+  Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos) (ile: le i (intervals fr wb he * t)%positive): ball (he / wb)
+    (f (fr + plus_half_times (i / t)%nat (wb * / intervals fr wb he)))
+    (f (fr + i * / (intervals fr wb he * t)%positive * wb)).
   Proof with auto.
    unfold plus_half_times.
-   apply uc_prf.
+   apply ball_sym.
+   apply (locallyUniformlyContinuous f fr wb (he / wb)).
+    unfold mspc_ball.
+    unfold CRGroupOps.MetricSpaceBall_instance_0.
+    rewrite <- (Qplus_0_r fr) at 1.
+    apply Qball_plus_r.
+    apply in_Qball.
+    split.
+     apply Qle_trans with 0...
+     unfold Qminus.
+     rewrite Qplus_0_l.
+     change (-wb <= -0).
+     apply Qopp_le_compat...
+    rewrite Qplus_0_l.
+    rewrite <- (Qmult_1_l wb) at 2.
+    apply Qmult_le_compat_r...
+    apply Qmult_le_r with (intervals fr wb he * t)%positive...
+    rewrite <- Qmult_assoc.
+    rewrite Qmult_inv_r.
+     rewrite Qmult_1_r.
+     rewrite Qmult_1_l.
+     rewrite <- Zle_Qle.
+     rewrite <- ZL9.
+     apply inj_le...
+    intro.
+    assert (0 < / (intervals fr wb he * t)%positive).
+     apply Qinv_lt_0_compat...
+    revert H0.
+    rewrite H.
+    apply (Qlt_irrefl 0).
+   pose proof mspc_ball_ex_Symmetric.
+   symmetry.
    apply Qball_ex_plus_r.
    unfold intervals.
-   destruct (mu f (he / wb)); simpl...
+   set (luc_mu f fr wb (he / wb)).
+   destruct q; simpl...
    set (mym := QposCeiling ((1 # 2) * wb / q)).
    apply ball_weak_le with (wb * (1#2) * Qpos_inv mym)%Qpos.
     simpl.
@@ -93,6 +132,7 @@ Section definition.
     setoid_replace ((1#2) * wb) with (q * ((1#2) * wb / q)).
      apply Qmult_le_compat_l...
      auto with *.
+    change (Qeq ((1 # 2) * wb) (q * ((1 # 2) * wb / q))).
     field...
    simpl.
    rewrite Q.Pmult_Qmult.
@@ -116,6 +156,8 @@ Section definition.
    However, that property is essentially a specialization of a more general
    well-definedness property that we'll need anyway, so we prove that one first. *)
 
+  Let hint := luc_Proper f.
+
   Lemma wd
     (from1 from2: Q) (w: bool -> Qpos) (e: bool -> Qpos)
     (fE: from1 == from2) (wE: w true == w false):
@@ -124,15 +166,15 @@ Section definition.
         (approx from2 (w false) (e false)).
   Proof with auto.
    set (halfe b := (e b * (1 # 2))%Qpos).
-   set (m b := intervals (w b) (halfe b)).
+   set (m b := intervals (if b then from1 else from2) (w b) (halfe b)).
    intros.
    unfold approx.
    simpl.
    do 2 rewrite fastΣ_correct.
    replace (e true * (1#2))%Qpos with (halfe true) by reflexivity.
    replace (e false * (1#2))%Qpos with (halfe false) by reflexivity.
-   replace (intervals (w true) (halfe true)) with (m true) by reflexivity.
-   replace (intervals (w false) (halfe false)) with (m false) by reflexivity.
+   replace (intervals from1 (w true) (halfe true)) with (m true) by reflexivity.
+   replace (intervals from2 (w false) (halfe false)) with (m false) by reflexivity.
    do 2 rewrite Σ_mult.
    apply Qball_hetero_Σ.
    unfold Basics.compose, Qdiv.
@@ -141,7 +183,9 @@ Section definition.
    rewrite (Qmult_assoc (/m true)).
    setoid_replace (/ m false * (w true * / m true)) with (/ m true * (w false * / m false)).
     Focus 2.
-    rewrite wE. ring.
+    rewrite wE.
+    change (Qeq (/ m false * (w false * / m true)) (/ m true * (w false * / m false))).
+    ring.
    replace ((/ m true * (w false * / m false))%Q) with ((Qpos_inv (m true) * (w false * Qpos_inv (m false)))%Qpos: Q) by reflexivity.
    apply Qball_Qmult_l.
    setoid_replace (((e true + e false) / (m true * m false)%positive / (Qpos_inv (m true) * (w false / m false)))%Qpos)
@@ -153,12 +197,15 @@ Section definition.
    unfold intervals in m.
    apply (ball_triangle CR (halfe true/w true) (halfe false/w false)
      _ (f (from2 + i * / (m true * m false)%positive * w false)) _).
-    rewrite fE.
+    rewrite <- fE.
     rewrite <- wE.
-    apply sampling_over_subdivision.
+    apply (sampling_over_subdivision from1 i (m false) (halfe true) (w true)).
+    apply lt_le_weak...
    apply ball_sym.
    rewrite Pmult_comm.
    apply sampling_over_subdivision.
+   rewrite Pmult_comm.
+   apply lt_le_weak...
   Qed.
 
   Lemma regular fr w: is_RegularFunction_noInf Q_as_MetricSpace (approx fr w).
@@ -183,7 +230,7 @@ End definition.
 
 Section implements_abstract_interface.
 
-  Variables (f: Q_as_MetricSpace --> CR).
+  Context (f: Q → CR) `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
 
   Section additivity.
 
@@ -196,14 +243,16 @@ Section implements_abstract_interface.
       Variable e: Qpos.
 
       Let ec b := (e * (ww b / totalw))%Qpos.
-      Let wbints b := intervals f (ww b) (ec b * (1 # 2)).
-      Let w01ints := intervals f totalw (e * (1 # 2)).
+      Let wbints b := intervals f (if b then a else a+ww true) (ww b) (ec b * (1 # 2)).
+      Let w01ints := intervals f a totalw (e * (1 # 2)).
       Let approx0 (i: nat) :=
         approximate (f (a + plus_half_times i (ww true / wbints true))) (ec true * (1 # 2) / ww true)%Qpos.
       Let approx1 (i: nat) :=
         approximate (f (a + ww true + plus_half_times i (ww false / wbints false))) (ec false * (1 # 2) / ww false)%Qpos.
       Let approx01 (i: nat) :=
         approximate (f (a + plus_half_times i (totalw / w01ints))) (e * (1 # 2) / totalw)%Qpos.
+
+      Let hint := luc_Proper f.
 
       Lemma added_summations: Qball (e + e)
         (Σ (wbints true) approx0 * (ww true / wbints true) +
@@ -251,7 +300,7 @@ Section implements_abstract_interface.
        apply Qball_plus.
         (* left case: *)
         apply Σ_Qball_pos_bounds.
-        intros i0 _.
+        intros i0 i0E.
         set (ebit b := if b then (ec true * (1 # 2) / ww true)%Qpos else (e * (1 # 2) / totalw)%Qpos).
         setoid_replace ((ec true + ec true) / x / (i * wbints true)%positive)%Qpos
         with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
@@ -268,21 +317,38 @@ Section implements_abstract_interface.
          setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
          unfold ebit.
          setoid_replace (totalw / (w01ints * k)) with ((/ (wbints true * i) * ww true))
-          by (rewrite kE iE; simpl; field; auto).
+          by (rewrite kE iE; unfold q_equiv; simpl; field; auto).
          setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww true / totalw) * (1 # 2) / ww true)%Qpos
           by (unfold QposEq; simpl; field; auto).
          rewrite <- Pmult_Qmult.
          rewrite Qmult_assoc.
-         apply (sampling_over_subdivision f a i0 i (e * (ww true / totalw) * (1#2)) (ww true)).
+         apply sampling_over_subdivision...
+         rewrite Pmult_comm...
         apply ball_sym.
         unfold ebit.
         setoid_replace (i0 * (totalw / (w01ints * k))) with (i0 * / (w01ints * k)%positive * totalw).
-         apply (sampling_over_subdivision f a i0 k (e*(1#2)) totalw).
+         apply sampling_over_subdivision...
+         rewrite Pmult_comm.
+         apply lt_le_weak...
+         apply lt_trans with (i * wbints true)%positive...
+         apply inj_lt_iff.
+         rewrite Zlt_Qlt.
+         do 2 rewrite ZL9.
+         do 2 rewrite Pmult_Qmult.
+         fold w01ints.
+         rewrite iE.
+         rewrite kE.
+         simpl.
+         field_simplify...
+         apply Qmult_lt_compat_r...
+          apply Qinv_lt_0_compat...
+         rewrite <- Qplus_0_r at 1.
+         apply Qplus_lt_r...
         rewrite Pmult_Qmult.
-        unfold Qdiv. ring.
+        unfold Qdiv. unfold q_equiv. ring.
        (* right case: *)
        apply Σ_Qball_pos_bounds.
-       intros i0 _.
+       intros i0 i0E.
        set (ebit b := if b then (ec false * (1 # 2) / ww false)%Qpos else (e * (1 # 2) / totalw)%Qpos).
        setoid_replace ((ec false + ec false) / x / (j * wbints false)%positive)%Qpos
        with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
@@ -291,18 +357,30 @@ Section implements_abstract_interface.
        apply (ball_triangle CR (ebit true) (ebit false) _ (f (a + ww true + i0 * (totalw / (w01ints * k)))) _)...
         setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
         unfold ebit.
-        setoid_replace (totalw / (w01ints * k)) with ((/ (wbints false * j) * ww false)) by (rewrite kE jE; simpl; field; auto).
+        setoid_replace (totalw / (w01ints * k)) with ((/ (wbints false * j) * ww false)) by (rewrite kE jE; unfold q_equiv; simpl; field; auto).
         setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww false / totalw) * (1 # 2) / ww false)%Qpos by (unfold QposEq; simpl; field; auto).
         rewrite <- Pmult_Qmult.
         rewrite Qmult_assoc.
-        apply (sampling_over_subdivision f (a + ww true) i0 j (e * (ww false / totalw) * (1#2)) (ww false)).
+        apply sampling_over_subdivision...
+        rewrite Pmult_comm...
        apply ball_sym.
        setoid_replace (a + ww true + i0 * (totalw / (w01ints * k))) with (a + (i * wbints true + i0) * (totalw / (w01ints * k)))
-        by (rewrite iE kE; simpl; field; auto).
+        by (rewrite iE kE; unfold q_equiv; simpl; field; auto).
        rewrite <- Pmult_Qmult.
        setoid_replace (((i * wbints true)%positive + i0) * (totalw / (w01ints * k))) with
-         (((i * wbints true)%positive + i0)%nat * / (intervals f totalw (e * (1#2)) * k)%positive * totalw).
+         (((i * wbints true)%positive + i0)%nat * / (intervals f a totalw (e * (1#2)) * k)%positive * totalw).
         apply (sampling_over_subdivision f a ((i * wbints true)%positive + i0) k (e*(1#2)) totalw).
+        fold w01ints.
+        apply le_trans with ((i * wbints true)%positive + (j * wbints false)%positive)%nat...
+        apply inj_le_iff.
+        rewrite Zle_Qle.
+        rewrite inj_plus.
+        rewrite Zplus_Qplus.
+        do 3 rewrite ZL9.
+        do 3 rewrite Pmult_Qmult.
+        rewrite iE jE kE.
+        simpl.
+        field_simplify...
        unfold Qdiv. 
        rewrite (Qmult_comm totalw).
        rewrite inj_plus Zplus_Qplus. 
@@ -342,7 +420,7 @@ Section implements_abstract_interface.
    apply Qplus_le_compat...
    unfold Qdiv.
    setoid_replace (i * (`width * / ints) + (1 # 2) * (`width * / ints))
-     with (((i+(1#2)) * / ints) * `width) by ring.
+     with (((i+(1#2)) * / ints) * `width) by (unfold q_equiv; ring).
    rewrite <- (Qmult_1_l (`width)) at 2.
    apply Qmult_le_compat_r...
    apply Qdiv_le_1.
@@ -360,13 +438,13 @@ Section implements_abstract_interface.
    intro. unfold pre_result. simpl approximate.
    unfold approx.
    rewrite fastΣ_correct.
-   set (ints := intervals f width (d * (1 # 2))).
+   set (ints := intervals f from width (d * (1 # 2))).
    apply (ball_weak_le Q_as_MetricSpace (d*(1#2) + width * r) (d + width * r)).
     simpl. apply Qplus_le_compat...
    simpl.
    rewrite Σ_mult.
    setoid_replace (`width * mid) with ((ints:nat) * (`width / ints * mid)).
-    Focus 2. simpl. rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P. field...
+    Focus 2. simpl. rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P. unfold q_equiv. field...
    rewrite <- Σ_const.
    apply Σ_Qball_pos_bounds.
    intros.
