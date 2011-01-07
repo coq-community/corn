@@ -17,6 +17,9 @@ Definition stableR2:=(stableComplete Q2 stableQ2).
 
 Open Local Scope uc_scope.
 
+Require Import metric2.Classified.
+
+
 (* Should be moved *)
 Section diag.
 Variable X:MetricSpace.
@@ -74,7 +77,11 @@ Section PlotCirclePath.
 Require Import CRtrans.
 
 Definition CircleFunction_aux:=(together cos_uc sin_uc).
-Definition CirclePath:= (uc_compose Couple (uc_compose CircleFunction_aux (diag Q))).
+
+Definition CirclePath:UCFunction Q (CR*CR)= ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).
+(* was:
+(uc_compose Couple (uc_compose CircleFunction_aux (diag Q))).
+*)
 
 Notation star := (@refl_equal _ Lt).
 Notation "∗" := star.
