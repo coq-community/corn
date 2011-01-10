@@ -78,10 +78,11 @@ Require Import CRtrans.
 
 Definition CircleFunction_aux:=(together cos_uc sin_uc).
 
-Definition CirclePath:UCFunction Q (CR*CR)= ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).
-(* was:
-(uc_compose Couple (uc_compose CircleFunction_aux (diag Q))).
-*)
+Definition CirclePath:Q --> R2:= 
+  (Couple ∘ CircleFunction_aux ∘ (diag Q)).
+(* The following hangs:
+Definition CirclePath': UCFunction Q R2:= 
+  ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
 
 Notation star := (@refl_equal _ Lt).
 Notation "∗" := star.
