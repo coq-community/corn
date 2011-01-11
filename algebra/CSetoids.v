@@ -116,7 +116,7 @@ Record is_CSetoid (A : Type) (eq : Relation A) (ap : Crelation A) : CProp :=
    ax_ap_tight        : tight_apart eq ap}.
 
 Record CSetoid : Type := makeCSetoid
-  {cs_crr   :> Setoid;
+  {cs_crr   :> RSetoid;
    cs_ap    :  Crelation cs_crr;
    cs_proof :  is_CSetoid cs_crr (@st_eq cs_crr) cs_ap}.
 
@@ -152,7 +152,7 @@ Let [S] be a setoid.
 Section CSetoid_axioms.
 Variable S : CSetoid.
 
-Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (s:=S)) (cs_ap (c:=S)).
+Lemma CSetoid_is_CSetoid : is_CSetoid S (cs_eq (r:=S)) (cs_ap (c:=S)).
 Proof cs_proof S.
 
 Lemma ap_irreflexive : irreflexive (cs_ap (c:=S)).
@@ -170,7 +170,7 @@ Proof.
  elim CSetoid_is_CSetoid; auto.
 Qed.
 
-Lemma ap_tight : tight_apart (cs_eq (s:=S)) (cs_ap (c:=S)).
+Lemma ap_tight : tight_apart (cs_eq (r:=S)) (cs_ap (c:=S)).
 Proof.
  elim CSetoid_is_CSetoid; auto.
 Qed.
@@ -200,7 +200,7 @@ Qed.
 
 Definition Build_CSetoid (X:Type) (eq:Relation X) (ap:Crelation X) (p:is_CSetoid X eq ap) : CSetoid.
 Proof.
- exists (Build_Setoid (is_CSetoid_Setoid _ _ _ p)) ap.
+ exists (Build_RSetoid (is_CSetoid_Setoid _ _ _ p)) ap.
  assumption.
 Defined.
 
@@ -215,19 +215,19 @@ In `there exists a unique [a:S] such that %\ldots%#...#', we now mean unique wit
 
 Definition ex_unq (P : S -> CProp) := {x : S | forall y : S, P y -> x [=] y | P x}.
 
-Lemma eq_reflexive : Treflexive (cs_eq (s:=S)).
+Lemma eq_reflexive : Treflexive (cs_eq (r:=S)).
 Proof.
  intro x.
  reflexivity.
 Qed.
 
-Lemma eq_symmetric : Tsymmetric (cs_eq (s:=S)).
+Lemma eq_symmetric : Tsymmetric (cs_eq (r:=S)).
 Proof.
  intro x; intros y H.
  symmetry; assumption.
 Qed.
 
-Lemma eq_transitive : Ttransitive (cs_eq (s:=S)).
+Lemma eq_transitive : Ttransitive (cs_eq (r:=S)).
 Proof.
  intro x; intros y z H H0.
  transitivity y; assumption.
@@ -1003,7 +1003,7 @@ Definition Crestrict_relation (R : Crelation S) : Crelation subcsetoid_crr :=
   end.
 
 Definition subcsetoid_eq : Relation subcsetoid_crr :=
-  restrict_relation (cs_eq (s:=S)).
+  restrict_relation (cs_eq (r:=S)).
 
 Definition subcsetoid_ap : Crelation subcsetoid_crr :=
   Crestrict_relation (cs_ap (c:=S)).

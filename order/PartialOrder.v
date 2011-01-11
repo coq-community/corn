@@ -45,7 +45,7 @@ Record is_PartialOrder
 
 (* This ought to decend from RSetoid *)
 Record PartialOrder : Type :=
-{ po_car :> Setoid
+{ po_car :> RSetoid
 ; le : po_car -> po_car -> Prop
 ; monotone : (po_car -> po_car) -> Prop
 ; antitone : (po_car -> po_car) -> Prop
@@ -58,14 +58,13 @@ Notation "x <= y" := (le _ x y) : po_scope.
 Open Local Scope po_scope.
 
 Lemma po_st : forall X eq le mnt ant, @is_PartialOrder X eq le mnt ant -> Setoid_Theory X eq.
-Proof.
+Proof with trivial.
  intros X eq le0 mnt ant H.
- destruct H.
  split.
    firstorder.
-  firstorder.
+  intros x y E. apply (po_equiv_le_def H), and_comm, (po_equiv_le_def H)...
  intros x y z.
- repeat rewrite -> po_equiv_le_def0.
+ repeat rewrite ->(po_equiv_le_def H).
  firstorder.
 Qed.
 
@@ -92,7 +91,7 @@ Variable X : PartialOrder.
 
 Definition makePartialOrder car eq le monotone antitone p1 p2 p3 p4 p5 :=
 let p := (@Build_is_PartialOrder car eq le monotone antitone p1 p2 p3 p4 p5) in
- @Build_PartialOrder (Build_Setoid (po_st p)) le monotone antitone p.
+ @Build_PartialOrder (Build_RSetoid (po_st p)) le monotone antitone p.
 
 (** The axioms and basic properties of a partial order *)
 Lemma equiv_le_def : forall x y:X, x == y <-> (x <= y /\ y <= x).

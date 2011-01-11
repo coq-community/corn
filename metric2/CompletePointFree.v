@@ -56,3 +56,4 @@ Definition test': UCFunction (Complete X) (Complete Y):=
 
 (* Note that: unwrap_uc_fun automatically unwraps g *)
 End bind_uc.
+End ODE.

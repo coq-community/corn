@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import Integration.
 Require Import AbstractIntegration.
 Require SimpleIntegration.
-Require SimpsonIntegration.
+(*Require SimpsonIntegration.*)
 Require Import CRtrans.
 Require QnonNeg.
 Import QnonNeg.notations.
@@ -45,9 +45,9 @@ Definition answer (n:positive) (r:CR) : Z :=
    integrate the UniformlyContinuousFunction (sin_uc : Q --> CR). *)
 
 Time Eval vm_compute in answer 3 (Integrate sin_uc 3 (1#2)).
-Time Eval vm_compute in answer 3 (SimpleIntegration.integrate sin_uc 3 (1#2)%Qnn).
+(*Time Eval vm_compute in answer 3 (SimpleIntegration.integrate sin_uc 3 (1#2)%Qnn).*)
 (* 1 is a bound for the absolute value of sin's fourth derivative *)
-Time Eval vm_compute in answer 10 (SimpsonIntegration.integrate sin_uc 1 3 (1#2)%Qnn).
+(*Time Eval vm_compute in answer 10 (SimpsonIntegration.integrate sin_uc 1 3 (1#2)%Qnn).*)
 
 (* Integrate01 the x^2 function 
 Time Eval vm_compute in answer 3 (Integrate01 (uc_compose (CRpower_positive_bounded 2 (1#1)) Cunit)).

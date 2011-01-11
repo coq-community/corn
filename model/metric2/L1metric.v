@@ -431,7 +431,7 @@ Proof.
  assumption.
 Qed.
 
-Definition L1S : Setoid := Build_Setoid (StepF_Sth QS).
+Definition L1S : RSetoid := Build_RSetoid (StepF_Sth QS).
 (* begin hide *)
 Canonical Structure L1S.
 (* end hide *)

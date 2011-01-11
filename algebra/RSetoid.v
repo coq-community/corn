@@ -23,29 +23,41 @@ Set Implicit Arguments.
 
 Require Export Setoid.
 Require Import ssreflect.
+Require Import abstract_algebra.
+
 Set Automatic Introduction.
 
 (* Require Import CornTac.*)
 
 (**
-* Classic Setoids
+* Classic Setoids presented in a bundled way. 
+*
+* THIS NOTION IS OBSOLETE AND SHOULD NOT BE USED ANYMORE
+* Use [abstract_algebra.Setoid] instead
 *)
-Record Setoid: Type :=
+
+Structure RSetoid: Type :=
 { st_car:>Type;
   st_eq:st_car-> st_car ->Prop;
-  st_isSetoid: Setoid_Theory _ st_eq
+  st_isSetoid: Equivalence st_eq
 }.
 
-Implicit Arguments st_eq [s].
+Implicit Arguments st_eq [r].
 
-Add Parametric Relation s : (st_car s) (@st_eq s)
- reflexivity proved by (@Equivalence_Reflexive _ _ (st_isSetoid s))
- symmetry proved by (@Equivalence_Symmetric _ _ (st_isSetoid s))
- transitivity proved by (@Equivalence_Transitive _ _ (st_isSetoid s))
- as genericSetoid.
+Definition setoid_is_rsetoid X `{setoid : Setoid X} : RSetoid := Build_RSetoid setoid.
+(* Canonical Structure setoid_is_rsetoid. *)
+(* If we make this a canonical structure then StepQsec will break: investigate *)
+
+Section rsetoid_is_setoid.
+  Context {X : RSetoid}.
+
+  Global Instance rsetoid_equiv : Equiv X | 10 := @st_eq _.
+
+  Global Instance: Setoid X | 10. apply st_isSetoid. Qed.
+End rsetoid_is_setoid.
 
 (** Propositions form a setoid under iff *)
-Definition iffSetoid : Setoid.
+Definition iffSetoid : RSetoid.
 Proof.
  exists Prop iff.
  firstorder.
@@ -54,13 +66,13 @@ Defined.
 (**
 ** Morhpisms between Setoids
 *)
-Record Morphism (X Y:Setoid) :=
+Record Morphism (X Y : RSetoid) :=
 {evalMorphism :> X -> Y
 ;Morphism_prf : forall x1 x2, (st_eq x1 x2) -> (st_eq (evalMorphism x1) (evalMorphism x2))
 }.
 
-Definition extEq (X:Type) (Y:Setoid) (f g:X -> Y) := forall x, st_eq (f x) (g x).
-Definition extSetoid (X Y:Setoid) : Setoid.
+Definition extEq (X:Type) (Y : RSetoid) (f g:X -> Y) := forall x, st_eq (f x) (g x).
+Definition extSetoid (X Y : RSetoid) : RSetoid.
 Proof.
  exists (Morphism X Y) (extEq Y).
  split.
@@ -76,7 +88,7 @@ Open Local Scope setoid_scope.
 ** Basic Combinators for Setoids
 *)
 
-Definition id (X:Setoid) : X-->X.
+Definition id (X : RSetoid) : X-->X.
 Proof.
  exists (fun x => x).
  abstract (auto).
@@ -86,7 +98,7 @@ Implicit Arguments id [X].
 (* end hide *)
 Definition compose0 X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
 
-Definition compose1 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) -> X --> Z.
+Definition compose1 (X Y Z : RSetoid) : (Y-->Z) -> (X --> Y) -> X --> Z.
 Proof.
  intros f0 f1.
  exists (compose0 f0 f1).
@@ -94,14 +106,14 @@ Proof.
    assumption).
 Defined.
 
-Definition compose2 (X Y Z:Setoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
+Definition compose2 (X Y Z : RSetoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
 Proof.
  intros f0.
  exists (compose1 f0).
  abstract ( destruct f0 as [f0 Hf0]; intros x1 x2 H y; apply: Hf0; apply H).
 Defined.
 
-Definition compose (X Y Z:Setoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
+Definition compose (X Y Z : RSetoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
 Proof.
  exists (@compose2 X Y Z).
  abstract ( intros x1 x2 H y z; apply: H).
@@ -109,14 +121,14 @@ Defined.
 (* begin hide *)
 Implicit Arguments compose [X Y Z].
 (* end hide *)
-Definition const0 (X Y:Setoid) : X->Y-->X.
+Definition const0 (X Y : RSetoid) : X->Y-->X.
 Proof.
  intros x.
  exists (fun y => x).
  abstract reflexivity.
 Defined.
 
-Definition const (X Y:Setoid) : X-->Y-->X.
+Definition const (X Y : RSetoid) : X-->Y-->X.
 Proof.
  exists (@const0 X Y).
  abstract ( intros x1 x2 Hx y; assumption).
@@ -124,21 +136,21 @@ Defined.
 (* begin hide *)
 Implicit Arguments const [X Y].
 (* end hide *)
-Definition flip0 (X Y Z:Setoid) : (X-->Y-->Z)->Y->X-->Z.
+Definition flip0 (X Y Z : RSetoid) : (X-->Y-->Z)->Y->X-->Z.
 Proof.
  intros f y.
  exists (fun x => f x y).
  abstract ( destruct f as [f Hf]; intros x1 x2 H; apply Hf; auto).
 Defined.
 
-Definition flip1 (X Y Z:Setoid) : (X-->Y-->Z)->Y-->X-->Z.
+Definition flip1 (X Y Z : RSetoid) : (X-->Y-->Z)->Y-->X-->Z.
 Proof.
  intros f.
  exists (flip0 f).
  abstract ( destruct f as [f Hf]; intros x1 x2 H y; simpl; destruct (f y) as [g Hg]; apply Hg; auto).
 Defined.
 
-Definition flip (X Y Z:Setoid) : (X-->Y-->Z)-->Y-->X-->Z.
+Definition flip (X Y Z : RSetoid) : (X-->Y-->Z)-->Y-->X-->Z.
 Proof.
  exists (@flip1 X Y Z).
  abstract ( intros x1 x2 H y z; apply: H).
@@ -146,7 +158,7 @@ Defined.
 (* begin hide *)
 Implicit Arguments flip [X Y Z].
 (* end hide *)
-Definition join0 (X Y:Setoid) : (X-->X-->Y)->X-->Y.
+Definition join0 (X Y : RSetoid) : (X-->X-->Y)->X-->Y.
 Proof.
  intros f.
  exists (fun y => f y y).
@@ -154,7 +166,7 @@ Proof.
    [destruct (f x1) as [g Hg]; apply Hg; auto |apply Hf; auto]).
 Defined.
 
-Definition join (X Y:Setoid) : (X-->X-->Y)-->X-->Y.
+Definition join (X Y : RSetoid) : (X-->X-->Y)-->X-->Y.
 Proof.
  exists (@join0 X Y).
  abstract ( intros x1 x2 H y; apply: H).
@@ -162,16 +174,16 @@ Defined.
 (* begin hide *)
 Implicit Arguments join [X Y].
 (* end hide *)
-Definition ap (X Y Z:Setoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
+Definition ap (X Y Z : RSetoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
 := compose (compose (compose (@join _ _)) (@flip _ _ _)) (compose (@compose _ _ _)).
 (* begin hide *)
 Implicit Arguments ap [X Y Z].
 (* end hide *)
 
-Definition bind (X Y Z:Setoid) : (X--> Y) --> (Y --> X--> Z) --> (X--> Z):=
+Definition bind (X Y Z : RSetoid) : (X--> Y) --> (Y --> X--> Z) --> (X--> Z):=
 (compose (compose (@join _ _)) (flip (@compose X Y (X-->Z)))).
 
-Definition bind_compose (X Y Z W:Setoid) :
+Definition bind_compose (X Y Z W : RSetoid) :
  (W--> X--> Y) --> (Y --> X--> Z) --> (W--> X--> Z):=
  (flip (compose (@compose W _ _) ((flip (@bind X Y Z))))).
 (* begin hide *)

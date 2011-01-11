@@ -32,7 +32,7 @@ Set Implicit Arguments.
 The product of two metric spaces forms a metric space *)
 Section ProductSetoid.
 
-Variable X Y : Setoid.
+Variable X Y : RSetoid.
 
 Definition prod_st_eq (a b:X*Y) :=
 st_eq (fst a) (fst b) /\ st_eq (snd a) (snd b).
@@ -47,7 +47,7 @@ Proof.
  transitivity (snd y); assumption.
 Qed.
 
-Definition prodS : Setoid := Build_Setoid prodST.
+Definition prodS : RSetoid := Build_RSetoid prodST.
 End ProductSetoid.
 
 Section ProductMetric.

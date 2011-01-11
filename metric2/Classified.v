@@ -18,13 +18,13 @@ Section make_RSetoid.
    constructor; apply _.
   Qed.
 
-  Definition mcSetoid_as_RSetoid: RSetoid.Setoid
-    := @Build_Setoid A e mcSetoid_as_Setoid_Theory.
+  Definition mcSetoid_as_RSetoid: RSetoid.RSetoid
+    := @Build_RSetoid A e mcSetoid_as_Setoid_Theory.
 
 End make_RSetoid. (* Todo: Move. *)
 
-Instance: ∀ S: RSetoid.Setoid, Equiv S := @st_eq.
-Instance: ∀ S: RSetoid.Setoid, Setoid S.
+Instance: ∀ S: RSetoid.RSetoid, Equiv S := @st_eq.
+Instance: ∀ S: RSetoid.RSetoid, Setoid S.
 
 (** MathClasses-style operational & structural classes for a Russell-style metric space (i.e. MetricSpace).
  We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace

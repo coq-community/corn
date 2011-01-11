@@ -17,7 +17,6 @@ Open Local Scope Q_scope.
 Definition pred_eq {X} (p q: X -> Prop): Prop := forall x, p x <-> q x.
 
 Instance: forall X, Equivalence (@pred_eq X).
-Proof. firstorder. Qed.
 
 (* Some facts about Q: *)
 

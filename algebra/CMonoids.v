@@ -396,7 +396,7 @@ Proof.
    rewrite -> (power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k))).
    rewrite -> (power_plus M u k (n-k-s*(l-k))).
    setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). by reflexivity.
-  by intuition.
+  unfold rsetoid_equiv. by intuition. 
   cut (n=k+(n-k)).
    intro H10.
    cut (n=((k+(n-k))+(s*(l-k)-s*(l-k)))).

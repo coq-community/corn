@@ -7,7 +7,7 @@ Require Import Metric.
 
 Open Scope NNUpperR_scope.
 
-Record is_DistanceMetricSpace (X : Setoid) (distance: X -> X -> NNUpperR) : Prop
+Record is_DistanceMetricSpace (X : RSetoid) (distance: X -> X -> NNUpperR) : Prop
   := Build_is_DistanceMetricSpace
   { dmsp_refl: forall x y, st_eq x y <-> distance x y == 0%Qnn
   ; dmsp_sym: forall x y, distance x y == distance y x
@@ -15,7 +15,7 @@ Record is_DistanceMetricSpace (X : Setoid) (distance: X -> X -> NNUpperR) : Prop
   }.
 
 Record DistanceMetricSpace: Type := Build_alt_MetricSpace
-  { dmsp_is_setoid:> Setoid;
+  { dmsp_is_setoid:> RSetoid;
     distance: dmsp_is_setoid -> dmsp_is_setoid -> NNUpperR.T;
     distance_wd: Proper (@st_eq _ ==> @st_eq _ ==> NNUpperR.eq) distance;
     dmsp : is_DistanceMetricSpace dmsp_is_setoid distance }.
