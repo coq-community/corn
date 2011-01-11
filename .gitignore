@@ -16,6 +16,8 @@ deps
 coqidescript
 *.new
 *#
-*.dot
+deps.dot
 *.crashcoqide
-
+dump
+plot.pgm
+coqdoc
