@@ -34,7 +34,7 @@ mc_vs, mc_vos, mc_globs = env.SConscript(dirs='MathClasses')
 os.system('coqdep ' + ' '.join(map(str, vs+mc_vs)) + ' ' + includes + ' ' + Rs + ' > deps')
 ParseDepends('deps')
 
-open('coqidescript', 'w').write('coqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
+open('coqidescript', 'w').write('#!/bin/sh\ncoqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
 os.chmod('coqidescript', 0755)
 
 env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name')
