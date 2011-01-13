@@ -1,5 +1,7 @@
 Require Import CRtrans.
 
+Extraction Language Haskell.
+
 Extract Inductive bool => Bool [ True False ].
 Extract Inductive option => Maybe [ Just Nothing ].
 
@@ -8,12 +10,11 @@ Extract Inlined Constant tl => "tail".
 Extract Inlined Constant hd => "head".
 Extract Inlined Constant map => "map".
 
-Import Streams.
-Extract Inductive Stream => "([])" ["( : )"].
-Extract Inlined Constant tl => "tail".
-Extract Inlined Constant hd => "head".
-Extract Inlined Constant map => "map".
-Extract Inlined Constant zipWith => "zipWith".
+Extract Inductive Streams.Stream => "([])" ["( : )"].
+Extract Inlined Constant Streams.tl => "tail".
+Extract Inlined Constant Streams.hd => "head".
+Extract Inlined Constant Streams.map => "map".
+Extract Inlined Constant Streams.zipWith => "zipWith".
 
 Extract Inductive sum => "( :+: )" [ "Inl" "Inr" ].
 
@@ -78,7 +79,6 @@ Extract Inlined Constant Zcompare => "compare".
 Extract Inlined Constant Z_eq_dec => "(==)".
 Extraction Inline Z_rec.
 Extract Inlined Constant Z_of_nat => "id".
-Check Zggcd.
 
 (* QArith *)
 Extract Inductive Q => Rational [ "( :% )" ].
@@ -88,10 +88,9 @@ Extract Inlined Constant Qden => "denominator".
 Extract Inlined Constant Qplus => "(+)".
 Extract Inlined Constant Qplus' => "(+)".
 Extract Inlined Constant Qopp => "negate".
-Import QMinMax.
-Extract Inlined Constant Qmin => "min".
+Extract Inlined Constant QMinMax.Qmin => "min".
 Extract Inlined Constant Qminus' => "min".
-Extract Inlined Constant Qmax => "max".
+Extract Inlined Constant QMinMax.Qmax => "max".
 Extract Inlined Constant Qmult => "(*)".
 Extract Inlined Constant Qmult' => "(*)".
 Extract Inlined Constant Qinv => "recip".
@@ -106,4 +105,4 @@ Definition answer (n:positive) (r:CR) : Z :=
 
 Definition test := answer 10 (exp ('1))%CR.
 
-(* Recursive Extraction test. *)
+Recursive Extraction test.
