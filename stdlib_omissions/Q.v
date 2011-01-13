@@ -58,6 +58,12 @@ Proof with simpl; try reflexivity.
  rewrite Zdiv_opp_opp...
 Qed.
 
+Lemma QMake_Qdiv (n : Z) (d : positive) : n # d = (inject_Z n / inject_Z (Zpos d))%Q.
+Proof.
+  unfold Qdiv, Qinv, Qmult. simpl.
+  rewrite Zmult_1_r. reflexivity.
+Qed. 
+
 Lemma Qle_nat (n: nat): 0 <= inject_Z (Z_of_nat n).
 Proof. rewrite <- (Zle_Qle 0). apply Zle_0_nat. Qed.
 
