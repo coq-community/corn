@@ -20,11 +20,10 @@ while nodes:
     nodes += glob.glob(node + '/*')
 
 ssrdir = os.environ["SSRDIR"]
-ssrcoq = ssrdir + '/bin/ssrcoq'
-ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect'
+ssr_include = '-I ' + ssrdir + '/theories -as Ssreflect -I ' + ssrdir + '/src'
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:] + [ssrdir + '/theories']))
 Rs = '-R . CoRN'
-coqcmd = ssrcoq + ' -compile ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + Rs
+coqcmd = 'coqc ${str(SOURCE)[:-2]} ' + ssr_include + ' ' + Rs
 
 env['COQFLAGS'] = Rs
 
@@ -35,7 +34,7 @@ mc_vs, mc_vos, mc_globs = env.SConscript(dirs='MathClasses')
 os.system('coqdep ' + ' '.join(map(str, vs+mc_vs)) + ' ' + includes + ' ' + Rs + ' > deps')
 ParseDepends('deps')
 
-open('coqidescript', 'w').write('#!/bin/sh\n' + ssrdir + '/bin/ssrcoqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
+open('coqidescript', 'w').write('coqide ' + ssr_include + ' ' + Rs.replace('"', '\\"') + ' $@ \n')
 os.chmod('coqidescript', 0755)
 
 env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name')

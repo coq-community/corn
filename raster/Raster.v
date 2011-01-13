@@ -1,4 +1,5 @@
-Require Export Bvector.
+Require Vector.
+Export Vector.VectorNotations.
 Require Export List.
 Require Import Arith.
 
@@ -8,36 +9,34 @@ Set Implicit Arguments.
 * Rasters
 A n by m raster is a vector of vector of booleans.
 *)
-Definition raster n m := vector (vector bool n) m.
+Definition raster n m := Vector.t (Vector.t bool n) m.
 
 (** A series of notation allows rasters to be rendered (and to a certain
 extent parsed) in Coq *)
-Notation "'⎥' a b" := (Vcons (vector bool _) a _ b)
+Notation "'⎥' a b" := (Vector.cons _ a _ b)
   (format "'[v' '⎥' a '/' b ']'", at level 0, a, b at level 0) : raster.
-Notation "'⎥' a" := (Vcons (vector bool _) a _ (Vnil _))
+Notation "'⎥' a" := (Vector.cons _ a _ Vector.nil)
   (format "'⎥' a", at level 0, a, b at level 0) : raster.
 (*
 Notation "☙" := (Vnil (vector bool _)) (at level 0, right associativity) : raster.
 *)
-Notation "█ a" := (Vcons bool true _ a) (at level 0, right associativity) : raster.
-Notation "⎢" := (@Vnil bool) (at level 0, right associativity) : raster.
-Notation "' ' a" := (Vcons bool false _ a) (at level 0, right associativity) : raster.
-Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
+Notation "█ a" := (Vector.cons bool true _ a) (at level 0, right associativity) : raster.
+Notation "⎢" := (@Vector.nil bool) (at level 0, right associativity) : raster.
+Notation "' ' a" := (Vector.cons bool false _ a) (at level 0, right associativity) : raster.
+Notation "░ a" := (Vector.cons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
 
 (** Standard rasters. *)
-Definition emptyRaster n m : raster n m :=
-Vconst _ (Vconst _ false _) _.
+Definition emptyRaster n m : raster n m := Vector.const (Vector.const false _) _.
 
-Definition fullRaster n m : raster n m :=
-Vconst _ (Vconst _ false _) _.
+Fixpoint vectorAsList A n (v: Vector.t A n) : list A := 
+  match v with 
+  | Vector.nil => nil
+  | Vector.cons a' n' v' => a' :: vectorAsList v'
+  end.
 
-Definition vectorAsList A n (v:vector A n) : list A :=
-vector_rect A (fun (n0 : nat) (_ : vector A n0) => list A) nil
-  (fun (a : A) (n0 : nat) (_ : vector A n0) (IHv : list A) => a :: IHv) n v.
+Coercion vectorAsList : Vector.t>->list.
 
-Coercion vectorAsList : vector>->list.
-
-Lemma length_vectorAsList : forall A n (v:vector A n), (length v) = n.
+Lemma length_vectorAsList : forall A n (v: Vector.t A n), (length v) = n.
 Proof.
  induction v.
   reflexivity.
@@ -75,20 +74,20 @@ Qed.
 
 (** [setRaster] transforms a raster by setting (or reseting) the (i,j)th
 pixel. *)
-Definition updateVector A n (v:vector A n) (f:A->A) : nat -> vector A n :=
-vector_rect A (fun (n0 : nat) (_ : vector A n0) => nat -> vector A n0)
-  (fun (_ : nat) => Vnil A)
-  (fun (a : A) (n0 : nat) (v0 : vector A n0) (IHv : nat -> vector A n0)
-     (i : nat) =>
-   match i with
-   | 0 => Vcons A (f a) n0 v0
-   | S i0 => Vcons A a n0 (IHv i0)
-   end) n v.
+Fixpoint updateVector A n (v : Vector.t A n) (f : A->A) : nat -> Vector.t A n := 
+  match v with
+  | Vector.nil => fun _ => Vector.nil A
+  | Vector.cons a' n' v' => fun i =>
+    match i with
+    | 0 => Vector.cons A (f a') n' v'
+    | S i' => Vector.cons A a' n' (updateVector v' f i')
+    end
+  end.
 
 Definition setRaster n m (r:raster n m) (x:bool) (i j:nat) :=
 updateVector r (fun row => updateVector row (fun _ => x) j) i.
 
-Lemma updateVector_correct1 : forall A n (v:vector A n) f i d1 d2,
+Lemma updateVector_correct1 : forall A n (v: Vector.t A n) f i d1 d2,
 i < n -> nth i (updateVector v f i) d1 = f (nth i v d2).
 Proof.
  induction v.
@@ -101,7 +100,7 @@ Proof.
  auto with *.
 Qed.
 
-Lemma updateVector_correct2 : forall A n (v:vector A n) f d1 i j,
+Lemma updateVector_correct2 : forall A n (v: Vector.t A n) f d1 i j,
 i <> j ->
 nth i (updateVector v f j) d1 = nth i v d1.
 Proof.
@@ -121,46 +120,36 @@ Proof.
  intros n m r x i j Hi Hj.
  unfold RasterIndex.
  replace (nth i (map (@vectorAsList _ _) (setRaster r x i j)) nil)
-   with (nth i (map (@vectorAsList _ _) (setRaster r x i j)) (Vconst bool false n)).
+   with (nth i (map (@vectorAsList _ _) (setRaster r x i j)) (Vector.const false n)).
   rewrite map_nth.
   unfold setRaster.
-  rewrite (updateVector_correct1 r (fun row  => updateVector row (fun _ : bool => x) j) (Vconst bool false n) (Vconst bool false n) Hi).
+  rewrite (updateVector_correct1 r (fun row  => updateVector row (fun _ : bool => x) j) (Vector.const false n) (Vector.const false n) Hi).
   rewrite updateVector_correct1; auto.
  apply nth_indep.
  rewrite map_length.
  rewrite length_vectorAsList.
  auto.
 Qed.
+Print nth.
+
+Lemma updateVector_overflow : forall A n (v : Vector.t A n) f i, n <= i -> updateVector v f i = v.
+Proof with try reflexivity; auto with arith.
+ induction v...
+ intros f [|i] E.
+  inversion E.
+ simpl. rewrite IHv...
+Qed.
 
 Lemma setRaster_overflow : forall n m (r:raster n m) x i j,
  (m <= i) \/ (n <= j) ->
  (setRaster r x i j) = r.
-Proof.
+Proof with try reflexivity; auto.
+ unfold setRaster.
  intros n m r x i j [Hi | Hj].
-  revert i Hi.
-  induction r.
-   reflexivity.
-  intros [|i] Hi.
-   absurd (S n0 <= 0); auto with *.
-  simpl.
-  rewrite IHr; auto with *.
- revert i j Hj.
- induction r.
-  reflexivity.
- intros [|i] j Hj.
-  simpl.
-  replace (updateVector a (fun _ : bool => x) j) with a.
-   auto.
-  clear n0 IHr r.
-  revert j Hj.
-  induction a.
-   reflexivity.
-  intros [|j] Hj.
-   absurd (S n <= 0); auto with *.
-  simpl.
-  rewrite <- IHa; auto with *.
- simpl.
- rewrite IHr; auto with *.
+  apply updateVector_overflow...
+ revert i j Hj. induction r...
+ intros [|i] j Hj; simpl; f_equal...
+ apply updateVector_overflow...
 Qed.
 
 Lemma setRaster_correct2 : forall n m (r:raster n m) x i j i0 j0,
@@ -173,8 +162,8 @@ Proof.
  destruct (le_lt_dec n j0) as [Hn | Hn].
   rewrite setRaster_overflow; auto with *.
  unfold RasterIndex.
- assert (L:forall v : vector (Bvector n) m, nth j (nth i (map (@vectorAsList _ _) v) nil) false =
-   nth j (nth i (map (@vectorAsList _ _) v) (Vconst bool false n)) false).
+ assert (L:forall v : Vector.t (Vector.t bool n) m, nth j (nth i (map (@vectorAsList _ _) v) nil) false =
+   nth j (nth i (map (@vectorAsList _ _) v) (Vector.const false n)) false).
   intros v.
   destruct (le_lt_dec m i) as [Hi | Hi].
    transitivity false.
@@ -199,16 +188,16 @@ Proof.
   apply nth_indep.
   rewrite map_length, length_vectorAsList.
   auto.
- transitivity (nth j (nth i (map (@vectorAsList _ _) (setRaster r x i0 j0)) (Vconst bool false n)) false).
+ transitivity (nth j (nth i (map (@vectorAsList _ _) (setRaster r x i0 j0)) (Vector.const false n)) false).
   apply L.
- transitivity (nth j (nth i (map (@vectorAsList _ _) r) (Vconst bool false n)) false);[|symmetry;apply L].
+ transitivity (nth j (nth i (map (@vectorAsList _ _) r) (Vector.const false n)) false);[|symmetry;apply L].
  do 2 rewrite map_nth.
  destruct (eq_nat_dec i i0).
   destruct H as [Hi | Hj].
    elim Hi; auto.
   rewrite <- e in *; clear e.
   unfold setRaster.
-  rewrite (updateVector_correct1 r (fun row => updateVector row (fun _ : bool => x) j0) (Vconst bool false n) (Vconst bool false n) Hm).
+  rewrite (updateVector_correct1 r (fun row => updateVector row (fun _ : bool => x) j0) (Vector.const false n) (Vector.const false n) Hm).
   rewrite updateVector_correct2; auto.
  unfold setRaster.
  rewrite updateVector_correct2; auto.

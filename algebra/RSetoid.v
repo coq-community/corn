@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Set Implicit Arguments.
 
 Require Export Setoid.
-Require Import ssreflect.
+Require Import CornBasics.
 Require Import abstract_algebra.
 
 Set Automatic Introduction.
