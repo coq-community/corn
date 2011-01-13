@@ -276,6 +276,25 @@ Proof with intuition.
  rewrite <- S_Qplus...
 Qed.
 
+Lemma inject_Z_nonneg (z: Z): (0 <= z)%Z -> 0 <= inject_Z z.
+Proof with auto.
+ intro.
+ change (inject_Z 0 <= inject_Z z).
+ rewrite <- Zle_Qle.
+ assumption.
+Qed.
+
+Hint Resolve inject_Z_nonneg.
+
+Lemma positive_in_Q (p: positive): 0 < inject_Z (Zpos p).
+Proof.
+ change (inject_Z 0 < inject_Z (' p)).
+ rewrite <- Zlt_Qlt.
+ reflexivity.
+Qed.
+
+Hint Immediate positive_in_Q.
+
 (** NoDup isn't /directly/ useful for Q because Q does not use a canonical representation
  and NoDup doesn't support setoid equalities such as Qeq. However, since we have Qred,
  which yields canonical representations, we can use: *)

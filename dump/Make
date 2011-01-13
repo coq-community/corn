@@ -1,0 +1,6 @@
+-custom "$(COQBIN)coqmktop -opt -o dumpcoq dump.cmx" "dump.cmx" dumpcoq
+-custom "$(COQBIN)coqmktop -o dumpcoq.byte dump.cmo" "dump.cmo dumpcoq" dumpcoq.byte
+-custom "$(DUMPCOQ) $(COQFLAGS) -compile $*" "%.v $(DUMPCOQ)" "%.vo"
+CAMLP4OPTIONS = "-loc loc"
+DUMPCOQ = dumpcoq
+dump.ml

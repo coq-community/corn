@@ -50,6 +50,10 @@ To build CoqDoc documentation, say "scons coqdoc".
 
 A dependency graph in DOT format can be created with "scons deps.dot".
 
+PLOTS
+-----
+If you want high resolution plots in examples/Circle.v,
+follow the instructions in dump/INSTALL
 
 OTHERS
 ------

@@ -1,5 +1,9 @@
 Require Import Plot RasterQ Qmetric.
 (** Plotting graphs in the plane *)
+(* This file is based on examples/Plot.v *)
+(* I define the image of a path, a [Compact] subset of the plane.*)
+(* Finally, plot a hi-res Circle*)
+
 Notation Q:=Q_as_MetricSpace.
 Notation R2:=(Complete Q2).
 
@@ -12,6 +16,9 @@ Qed.
 Definition stableR2:=(stableComplete Q2 stableQ2).
 
 Open Local Scope uc_scope.
+
+Require Import metric2.Classified.
+
 
 (* Should be moved *)
 Section diag.
@@ -60,10 +67,10 @@ Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * w)
 
 Variable path:Q-->R2.
 (** The actual plot function *)
-Definition PlotPath := (RasterizeQ2 
+Definition PlotPath := (n, m, 2, (RasterizeQ2 
 (approximate 
 (FinCompact stableQ2 stableR2 (approximate (PathImage path from to Hfromto) err))
-err) n m t l b r ).
+err) n m t l b r )).
 End PlotPath.
 
 Section PlotCirclePath.
@@ -71,7 +78,36 @@ Require Import CRtrans.
 
 Definition CircleFunction_aux:=(together cos_uc sin_uc).
 
-Definition CirclePath:= (uc_compose Couple (uc_compose CircleFunction_aux (diag Q))).
+Definition CirclePath:Q --> R2:= 
+  (Couple ∘ CircleFunction_aux ∘ (diag Q)).
+(* The following hangs:
+Definition CirclePath': UCFunction Q R2:= 
+  ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
+
+Notation star := (@refl_equal _ Lt).
+Notation "∗" := star.
+Local Open Scope raster.
+
+Notation "#  a b" := (Vcons (vector bool _) a _ b)
+  (at level 0, a, b at level 0) : raster.
+
+Notation "'#' a" := (Vcons (vector bool _) a _ (Vnil _))
+  (at level 0, a, b at level 0) : raster.
+
+Notation "0 # a" := (Vcons bool true _ a) (at level 0, right associativity) : raster.
+Notation " # " := (@Vnil bool) (at level 0, right associativity) : raster.
+Notation "1 # a" := (Vcons bool false _ a) (at level 0, right associativity) : raster.
+(*
+Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
+*)
+
+Definition Circle:=Eval vm_compute in  (PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 40 40 CirclePath).
+Add ML Path "dump".
+Declare ML Module "dump".
+Dump Circle.
+(* Now have a look at plot.pgm *)
+End PlotCirclePath.
+
 
 (* We would really like to use the interval [0,2π]. However, real intervals are not yet supported.
 Require Import CRpi.
@@ -83,10 +119,3 @@ unfold CRlt.
 Time CR_solve_pos ((6#1))%Qpos.
 Qed.
 *)
-
-Notation star := (@refl_equal _ Lt).
-Notation "∗" := star.
-Local Open Scope raster.
-
-Timeout 5 Eval vm_compute in  (PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 10 10 CirclePath).
-End PlotCirclePath.

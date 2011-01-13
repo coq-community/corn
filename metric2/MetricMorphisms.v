@@ -26,7 +26,7 @@ Section metric_embedding.
     rewrite E F G. reflexivity.
   Qed.
 
-  Let is_MetricSpace: is_MetricSpace (setoid_is_rsetoid (X:=X')) Eball.
+  Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
   Proof with eauto.
     constructor; unfold ball; repeat intro.
         apply ball_refl.
@@ -204,7 +204,7 @@ Section dense_prelength_embedding.
     Definition unary_uc_prf : is_UniformlyContinuousFunction (g' : X → X) (mu h).
     Proof with auto.
       repeat intro. apply Eball_spec. do 2 rewrite g_eq_h.
-      eapply uc_prf. assumption.
+      eapply uc_prf. destruct (mu h e0)...
     Qed.
 
     Definition unary_uc : X --> X := Build_UniformlyContinuousFunction unary_uc_prf.
@@ -229,6 +229,7 @@ Section dense_prelength_embedding.
       intros ε x y E z. 
       apply Eball_spec. do 2 rewrite g_eq_h.
       apply (uc_prf h)...
+      destruct (mu h ε)...
     Qed.
 
     Definition binary_uc : X --> X --> X := Build_UniformlyContinuousFunction binary_uc_prf.

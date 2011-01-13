@@ -31,10 +31,10 @@ Set Automatic Introduction.
 one to say, ball Infinity a b, holds for all a and b.
 *)
 
-Definition ball_ex (X:MetricSpace) (e:QposInf) (a b:X) :=
+Definition ball_ex (X: MetricSpace) (e: QposInf): X -> X -> Prop :=
  match e with
-  | Qpos2QposInf e' => ball e' a b
-  | QposInfinity => True
+  | Qpos2QposInf e' => ball e'
+  | QposInfinity => fun a b => True
  end.
 (* begin hide *)
 Implicit Arguments ball_ex [X].

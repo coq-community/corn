@@ -22,6 +22,7 @@ Require Export Metric.
 Require Import Classification.
 Require Import UniformContinuity.
 Require Import Prelength.
+Require Import Complete.
 Require Import CornTac.
 
 Set Implicit Arguments.
@@ -219,3 +220,91 @@ Qed.
 
 Definition together A B C D (f:A --> C) (g:B --> D) : (ProductMS A B --> ProductMS C D) :=
  Build_UniformlyContinuousFunction (together_uc f g).
+
+(** Uniformly continuous functions on the product space can be curried: *)
+
+Section uc_curry.
+
+  Context {A B C: MetricSpace} (f: ProductMS A B --> C).
+
+  Definition uc_curry_help_prf (a: A): is_UniformlyContinuousFunction (fun b => f (a, b)) (mu f).
+  Proof with auto.
+   repeat intro.
+   destruct f. clear f. simpl in *.
+   apply uc_prf.
+   destruct (mu e)...
+   split... apply ball_refl.
+  Qed.
+
+  Definition uc_curry_help (a: A): B --> C := Build_UniformlyContinuousFunction (uc_curry_help_prf a).
+
+  Definition uc_curry_prf: is_UniformlyContinuousFunction uc_curry_help (mu f).
+  Proof with auto.
+   repeat intro. simpl.
+   destruct f. clear f. simpl in *.
+   apply uc_prf.
+   destruct (mu e)...
+   split... apply ball_refl.
+  Qed.
+
+  Definition uc_curry: A --> B --> C := Build_UniformlyContinuousFunction uc_curry_prf.
+
+End uc_curry.
+
+(** Uncurry probably cannot be defined because because there is no way to construct a
+ uniform modulus of continuity from the domain-indexed set of uni-formly continuous functions.
+
+Hence, we can convert only one way, and so non-curried versions of binary functions are
+strictly more valuable than their curried representations. Consequently, it can be argued
+that binary functions should always be defined in non-curried form. *)
+
+(** Completion distributes over products: *)
+
+Section completion_distributes.
+
+  Context {X Y: MetricSpace}.
+
+  Program Definition distrib_Complete (xy: Complete (ProductMS X Y)): ProductMS (Complete X) (Complete Y) :=
+   (@Build_RegularFunction _ (fun e => fst (approximate xy e)) _, @Build_RegularFunction _ (fun e => snd (approximate xy e)) _).
+
+  Next Obligation. repeat intro. apply xy. Qed.
+  Next Obligation. repeat intro. apply xy. Qed.
+
+  Lemma distrib_Complete_uc_prf: is_UniformlyContinuousFunction distrib_Complete (fun e => e).
+  Proof.
+   unfold distrib_Complete.
+   intros ??? H. split; repeat intro; simpl; apply H.
+  Qed.
+
+  Definition distrib_Complete_uc: Complete (ProductMS X Y) --> ProductMS (Complete X) (Complete Y) :=
+    Build_UniformlyContinuousFunction distrib_Complete_uc_prf.
+
+  Program Definition undistrib_Complete (xy: ProductMS (Complete X) (Complete Y)): Complete (ProductMS X Y) :=
+   @Build_RegularFunction _ (fun e => (approximate (fst xy) e, approximate (snd xy) e)) _.
+
+  Next Obligation. split. apply r. apply r0. Qed.
+
+  Lemma undistrib_Complete_uc_prf: is_UniformlyContinuousFunction undistrib_Complete (fun e => e).
+  Proof.
+   unfold distrib_Complete.
+   intros ??? H. split; repeat intro; simpl; apply H.
+  Qed.
+
+  Definition undistrib_Complete_uc: ProductMS (Complete X) (Complete Y) --> Complete (ProductMS X Y) :=
+    Build_UniformlyContinuousFunction undistrib_Complete_uc_prf.
+
+  Lemma distrib_after_undistrib_Complete xy: st_eq (distrib_Complete (undistrib_Complete xy)) xy.
+  Proof.
+   intros. unfold distrib_Complete, undistrib_Complete. simpl.
+   unfold prod_st_eq. simpl.
+   split; apply regFunEq_e; simpl; intros; apply ball_refl.
+  Qed.
+
+  Lemma undistrib_after_distrib_Complete xy: st_eq (undistrib_Complete (distrib_Complete xy)) xy.
+  Proof.
+   intros. unfold undistrib_Complete. simpl.
+   apply regFunEq_e.
+   split; simpl; apply ball_refl.
+  Qed.
+
+End completion_distributes.

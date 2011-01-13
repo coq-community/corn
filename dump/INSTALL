@@ -1,0 +1,9 @@
+Dump is a fast hack by Enrico Tassi, it can be used to export coq-objects.
+It is used in examples/Circle.v
+coq_makefile -f Make > Makefile
+COQBIN="YOURCODEDIR/bin/" 
+make
+./dumpcoq
+
+> Dump nat_ind.
+dumping to /tmp/dump.txt

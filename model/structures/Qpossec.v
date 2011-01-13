@@ -64,7 +64,6 @@ Bind Scope Qpos_scope with Qpos.
 Delimit Scope Qpos_scope with Qpos.
 
 Program Definition integral_Qpos (p: positive): Qpos := (p:Q).
-Next Obligation. auto with *. Qed.
 
 Coercion integral_Qpos: positive >-> Qpos.
 

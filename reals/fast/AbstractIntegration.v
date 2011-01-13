@@ -2,13 +2,14 @@
  with a proof that integrals satisfying this interface are unique. *)
 
 Require Import
- Program
+ Unicode.Utf8 Program
  CRArith CRabs
  Qauto Qround Qmetric
  stdlib_omissions.P
  stdlib_omissions.Z
  stdlib_omissions.Q
- stdlib_omissions.N.
+ stdlib_omissions.N
+ metric2.Classified.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
@@ -52,13 +53,14 @@ Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum (map f (enum n)
 (** If the elementwise distance between two summations over the same domain
  is bounded, then so is the distance between the summations: *)
 
-Lemma CRΣ_gball_ex (f g: nat -> CR) (e: QnnInf):
-   (forall n, gball_ex e (f n) (g n)) ->
-   (forall n: nat, gball_ex (n * e)%QnnInf (cmΣ n f) (cmΣ n g)).
+Lemma CRΣ_gball_ex (f g: nat -> CR) (e: QnnInf) (n: nat):
+   (forall m, (m < n)%nat -> gball_ex e (f m) (g m)) ->
+   (gball_ex (n * e)%QnnInf (cmΣ n f) (cmΣ n g)).
 Proof with simpl; auto.
  destruct e...
  induction n.
   reflexivity.
+ intros.
  change (gball (inject_Z (S n) * `q) (cmΣ (S n) f) (cmΣ (S n) g)).
  rewrite Q.S_Qplus.
  setoid_replace ((n+1) * q)%Q with (q + n * q)%Q by (simpl; ring).
@@ -70,7 +72,7 @@ Hint Immediate ball_refl Qle_refl.
 
 (** Next up, the actual interface for integrable functions. *)
 
-Class Integral (f: Q_as_MetricSpace --> CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
+Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
 Implicit Arguments integrate [[Integral]].
 
@@ -78,7 +80,7 @@ Notation "∫" := integrate.
 
 Section integral_interface.
 
-  Variable (f: Q_as_MetricSpace --> CR).
+  Context (f: Q → CR).
 
   Class Integrable `{!Integral f}: Prop :=
     { integral_additive:
@@ -88,8 +90,9 @@ Section integral_interface.
       (forall x, from <= x <= from+width -> ball r (f x) ('mid)) ->
       ball (width * r) (∫ f from width) (' (width * mid))
 
-    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f)
-   }.
+    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f) }.
+
+  (* Todo: Show that the sign function is integrable while not locally uniformly continuous. *)
 
   (** This closely resembles the axiomatization given in
    Bridger's "Real Analysis: A Constructive Approach", Ch. 5. *)
@@ -259,66 +262,93 @@ Section integral_interface.
      rewrite loE hiE...
     Qed.
 
-    (** We now start working towards unicity. An easy first step is to show
-     that the integral can be approximated arbitrarily well by a "rectangle"
-     at sufficiently small intervals, where "sufficiently" is of course dictated
-     by the mu from uniform continuity: *)
+    (** We now work towards unicity, for which we use that implementations must agree with Riemann
+     approximations. But since those are only valid for locally uniformly continuous functions, our proof
+     of unicity only works for such functions. Todo: There should really be a proof that does not depend
+     on continuity. *)
 
-    Lemma gball_integral (e: QposInf) (w: QnonNeg):
-      (w <= mu_ex f e)%QnnInf ->
-      forall a, gball_ex (w * e)%QnnInf (' w * (f a)) (∫ f a w).
+    Context `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
+
+    Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
+      (w <= @luc_mu Q CR f _ a ww e)%QnnInf ->
+      gball ww a a' ->
+      gball_ex (w * e)%QnnInf (' w * f a') (∫ f a' w).
     Proof with auto.
-     intros A ?.
-     destruct e...
-     rename q into e.
+     intros ??.
      simpl QnnInf.mult.
      apply in_CRgball.
      simpl.
      rewrite <- CRmult_Qmult.
-     CRring_replace (' w * f a - ' w * ' e) (' w * (f a - ' e)).
-     CRring_replace (' w * f a + ' w * ' e) (' w * (f a + ' e)).
+     CRring_replace (' w * f a' - ' w * ' e) (' w * (f a' - ' e)).
+     CRring_replace (' w * f a' + ' w * ' e) (' w * (f a' + ' e)).
      repeat rewrite CRmult_scale.
-     apply (integral_lower_upper_bounded a w (f a - ' e) (f a + ' e)).
+     apply (integral_lower_upper_bounded a' w (f a' - ' e) (f a' + ' e)).
      intros x [lo hi].
      apply in_CRball.
-     apply (uc_prf f e a x).
-     simpl in A.
-     destruct (mu f e); [| exact I].
+     apply (locallyUniformlyContinuous f a ww e).
+      apply ball_gball...
+     set (luc_mu f a ww e) in *.
+     destruct q...
      apply in_Qball.
      split.
-      apply Qle_trans with a...
-      apply Q.Qplus_le_l with (-a)%Q.
-      ring_simplify.
-      apply (Qopp_le_compat 0 q)...
-     apply Qle_trans with (a + w)%Q...
+      unfold Qminus.
+      rewrite <- (Qplus_0_r x).
+      apply Qplus_le_compat...
+      change (-q <= -0)%Q.
+      apply Qopp_le_compat...
+     apply Qle_trans with (a' + `w)%Q...
      apply Qplus_le_compat...
     Qed.
 
     (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
 
-    Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: QposInf) (iw: QnonNeg) (n: nat):
+    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
      (n * iw == w)%Qnn ->
-     (iw <= mu_ex f e)%QnnInf ->
-     gball_ex (e * w)%QnnInf (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ f a w).
+     (iw <= @luc_mu _ _ f _ a w e)%QnnInf ->
+     gball (e * w) (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ f a w).
     Proof with auto.
      intros A B.
-     rewrite <- A at 2.
+     simpl.
+     rewrite <- A.
      rewrite <- integral_repeated_additive...
-     setoid_replace (e * w)%QnnInf with (n * (iw * e))%QnnInf.
-      apply CRΣ_gball_ex.
+     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw * e))%Qnn: Q).
+      apply (CRΣ_gball_ex _ _ (iw * e)%Qnn).
       intros.
-      apply gball_integral...
-     rewrite QnnInf.mult_assoc.
-     change (e * w == (n * iw)%Qnn * e)%QnnInf.
+      simpl.
+      apply (gball_integral e a (a+m*`iw) w iw)...
+      apply ball_gball.
+      apply in_Qball.
+      split.
+       apply Qle_trans with (a + 0)%Q.
+        apply Qplus_le_compat...
+        change (-w <= -0)%Q.
+        apply Qopp_le_compat...
+       apply Qplus_le_compat...
+       apply Qmult_le_0_compat...
+       apply Qle_nat.
+      apply Qplus_le_compat...
+      change (n * iw == w)%Q in A.
+      rewrite <- A.
+      unfold QnonNeg.to_Q.
+      apply Qmult_le_compat_r...
+      apply Qlt_le_weak.
+      rewrite <- Zlt_Qlt.
+      apply inj_lt...
+     simpl in *.
+     unfold QnonNeg.eq in A.
+     simpl in A.
+     unfold QposAsQ.
+     rewrite Qmult_assoc.
      rewrite A.
-     apply QnnInf.mult_comm.
+     ring.
     Qed.
-
-    (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
 
   End singular_props.
 
+  (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
+
   Lemma unique
+    `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}
     (c1: Integral f)
     (c2: Integral f)
     (P1: @Integrable c1)
@@ -332,63 +362,54 @@ Section integral_interface.
      intros ?? E. rewrite E. reflexivity.
     do 2 rewrite zero_width_integral...
    intro x.
-   destruct (split x (mu_ex f (QposInf_mult  ((1 # 2) * e)%Qpos (Qpos_inv x))))%QposInf.
-   destruct a0.
-   destruct x0.
+   destruct (split x (@luc_mu Q CR f _ a x ((1 # 2) * e * Qpos_inv x)))%Qpos as [[n t] [H H0]].
    simpl in H.
    simpl @snd in H0.
-   set ( (((1 # 2) * e)%Qpos * Qpos_inv x))%Qpos in *.
-   setoid_replace (e) with (q * x + q * x)%Qpos.
-    apply ball_triangle with (cmΣ n (fun i: nat => (' `t * f (a + i * `t)%Q))).
-     apply ball_sym.
-     apply ball_gball.
-     apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
+   setoid_replace e with (((1 # 2) * e / x) * x + ((1 # 2) * e / x) * x)%Qpos by (unfold QposEq; simpl; field)...
+   apply ball_triangle with (cmΣ n (fun i: nat => (' `t * f (a + i * `t)%Q))).
+    apply ball_sym.
     apply ball_gball.
     apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
-   subst q.
-   unfold QposEq.
-   simpl.
-   rewrite <- Qmult_assoc.
-   rewrite (Qmult_comm (/x)).
-   rewrite Qmult_inv_r...
-   ring.
+   apply ball_gball.
+   apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
   Qed.
 
 End integral_interface.
 
 (** If f==g, then an integral for f is an integral for g. *)
 
-Lemma Integrable_proper_l
-  (f g: Q_as_MetricSpace --> CR)
-   {fint: Integral f}:
-  (forall q: Q, f q == g q) ->
-   @Integrable f fint -> @Integrable g fint.
+Lemma Integrable_proper_l (f g: Q → CR) {fint: Integral f}:
+  canonical_names.equiv f g → Integrable f → @Integrable g fint.
 Proof with auto.
  constructor.
    replace (@integrate g) with (@integrate f) by reflexivity.
-   apply integral_additive...
+   intros.
+   apply (integral_additive f).
   replace (@integrate g) with (@integrate f) by reflexivity.
   intros.
-  apply integral_bounded_prim...
+  apply (integral_bounded_prim f)...
   intros.
-  rewrite (H x)...
+  rewrite (H x x (refl_equal _))...
  replace (@integrate g) with (@integrate f) by reflexivity.
- apply integral_wd...
+ apply (integral_wd f)...
 Qed.
 
 Lemma integrate_proper
-  (f g: Q_as_MetricSpace --> CR)
-  {fint: Integral f} {gint: Integral g}
+  (f g: Q → CR)
+  `{!LocallyUniformlyContinuous_mu g}
+  `{!LocallyUniformlyContinuous g}
+  {fint: Integral f}
+  {gint: Integral g}
   `{!@Integrable f fint}
-  `{!Integrable g}:
-  (forall q: Q, f q == g q) ->
-  forall (a: Q) (w: QnonNeg),
+  `{!@Integrable g gint}:
+  canonical_names.equiv f g →
+  ∀ (a: Q) (w: QnonNeg),
   @integrate f fint a w == @integrate g gint a w.
-Proof.
+    (* This requires continuity for g only because [unique] does. *)
+Proof with try assumption.
  intros.
- apply (unique g fint gint).
-  apply (Integrable_proper_l f g H0 H).
- assumption.
+ apply (unique g)...
+ apply (Integrable_proper_l f)...
 Qed.
 
 (** Finally, we offer a smart constructor for implementations that would need to recognize and
@@ -398,8 +419,8 @@ with Riemann sums, because there, a positive width is needed to divide the error
 Section extension_to_nn_width.
 
   Context
-    (f: Q_as_MetricSpace --> CR)
-    (pre_integral: Q -> Qpos -> CR) (* Note the Qpos instead of QnonNeg. *)
+    (f: Q → CR)
+    (pre_integral: Q → Qpos → CR) (* Note the Qpos instead of QnonNeg. *)
       (* The three properties limited to pre_integral: *)
     (pre_additive: forall (a: Q) (b c: Qpos),
       pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
