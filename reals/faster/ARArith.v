@@ -9,33 +9,33 @@ Require Import
 Section app_rationals_completion.
   Context `{AppRationals AQ}
     {abs : AppRationalsAbs AQ}.
-
+  
   Open Scope uc_scope. 
-
-  Definition AQ_as_MetricSpace := Emetric f.
-  Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace f.
+  
+  Definition AQ_as_MetricSpace := Emetric inject.
+  Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace inject.
   Definition AR := Complete AQ_as_MetricSpace.
-  Definition ARtoCR_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc f.
-  Definition ARtoCR : AR --> CR := Eembed QPrelengthSpace f.
-  Definition CRtoAR : CR --> AR := Eembed_inverse QPrelengthSpace f.
+  Definition ARtoCR_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc inject.
+  Definition ARtoCR : AR --> CR := Eembed QPrelengthSpace inject.
+  Definition CRtoAR : CR --> AR := Eembed_inverse QPrelengthSpace inject.
 
-  Hint Rewrite (rings.preserves_0 (f:=f)) : aq_preservation.
-  Hint Rewrite (rings.preserves_1 (f:=f)) : aq_preservation.
-  Hint Rewrite (rings.preserves_plus (f:=f)) : aq_preservation.
-  Hint Rewrite (rings.preserves_mult (f:=f)) : aq_preservation.
-  Hint Rewrite (rings.preserves_opp (f:=f)) : aq_preservation.
+  Hint Rewrite (rings.preserves_0 (f:=inject)) : aq_preservation.
+  Hint Rewrite (rings.preserves_1 (f:=inject)) : aq_preservation.
+  Hint Rewrite (rings.preserves_plus (f:=inject)) : aq_preservation.
+  Hint Rewrite (rings.preserves_mult (f:=inject)) : aq_preservation.
+  Hint Rewrite (rings.preserves_opp (f:=inject)) : aq_preservation.
   Hint Rewrite aq_preserves_max : aq_preservation.
   Hint Rewrite aq_preserves_min : aq_preservation.
   Hint Rewrite aq_preserves_abs : aq_preservation.
   Ltac aq_preservation := autorewrite with aq_preservation; try reflexivity.
 
-  Lemma AQball_fold ε (x y : AQ_as_MetricSpace) : ball ε x y → Qball ε (f x) (f y).
+  Lemma AQball_fold ε (x y : AQ_as_MetricSpace) : ball ε x y → Qball ε ('x) ('y).
   Proof. intuition. Qed.
 
   (* Constants *)
   Global Instance inject_AQ : Inject AQ AR := (@Cunit AQ_as_MetricSpace).
   
-  Lemma ARtoCR_inject x : ARtoCR ('x) = '(f x).
+  Lemma ARtoCR_inject x : ARtoCR ('x) = ''x.
   Proof. intros ? ?. apply ball_refl. Qed.
 
   Global Instance AR_0: RingZero AR := inject_AQ 0.
@@ -50,7 +50,7 @@ Section app_rationals_completion.
 
   (* Plus *)
   Program Definition AQtranslate_uc (x : AQ_as_MetricSpace) 
-    := unary_uc f ((+) x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qtranslate_uc (f x)) _.
+    := unary_uc inject ((+) x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qtranslate_uc ('x)) _.
   Next Obligation. aq_preservation. Qed.
 
   Definition ARtranslate (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQtranslate_uc x).
@@ -60,7 +60,7 @@ Section app_rationals_completion.
   Hint Rewrite ARtoCR_preserves_translate : ARtoCR.
 
   Program Definition AQplus_uc
-    := binary_uc f ((+)  : AQ_as_MetricSpace →  AQ_as_MetricSpace → AQ_as_MetricSpace) Qplus_uc _.
+    := binary_uc inject ((+)  : AQ_as_MetricSpace →  AQ_as_MetricSpace → AQ_as_MetricSpace) Qplus_uc _.
   Next Obligation. aq_preservation. Qed.
 
   Definition ARplus_uc : AR --> AR --> AR := Cmap2 AQPrelengthSpace AQPrelengthSpace AQplus_uc.
@@ -72,7 +72,7 @@ Section app_rationals_completion.
 
   (* Inverse *)
   Program Definition AQopp_uc
-    := unary_uc f (group_inv : AQ_as_MetricSpace → AQ_as_MetricSpace) Qopp_uc _.
+    := unary_uc inject (group_inv : AQ_as_MetricSpace → AQ_as_MetricSpace) Qopp_uc _.
   Next Obligation. aq_preservation.  Qed.
   Definition ARopp_uc : AR --> AR := Cmap AQPrelengthSpace AQopp_uc.
   Global Instance AR_opp: GroupInv AR := ARopp_uc.
@@ -83,27 +83,27 @@ Section app_rationals_completion.
 
   (* Mult *) 
   Program Definition AQboundBelow_uc (x : AQ_as_MetricSpace) : AQ_as_MetricSpace --> AQ_as_MetricSpace 
-    := unary_uc f (max x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc (f x)) _.
+    := unary_uc inject (max x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc ('x)) _.
   Next Obligation. aq_preservation. Qed.
 
   Definition ARboundBelow (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundBelow_uc x).
 
-  Lemma ARtoCR_preserves_boundBelow x y : ARtoCR (ARboundBelow x y) = boundBelow (f x) (ARtoCR y).
+  Lemma ARtoCR_preserves_boundBelow x y : ARtoCR (ARboundBelow x y) = boundBelow ('x) (ARtoCR y).
   Proof. apply preserves_unary_fun. Qed.
   Hint Rewrite ARtoCR_preserves_boundBelow : ARtoCR.
 
   Program Definition AQboundAbove_uc (x : AQ_as_MetricSpace) : AQ_as_MetricSpace --> AQ_as_MetricSpace 
-    := unary_uc f (min x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc (f x)) _.
+    := unary_uc inject (min x : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc ('x)) _.
   Next Obligation. aq_preservation. Qed.
  
   Definition ARboundAbove (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbove_uc x).
 
-  Lemma ARtoCR_preserves_boundAbove x y : ARtoCR (ARboundAbove x y) = boundAbove (f x) (ARtoCR y).
+  Lemma ARtoCR_preserves_boundAbove x y : ARtoCR (ARboundAbove x y) = boundAbove ('x) (ARtoCR y).
   Proof. apply preserves_unary_fun. Qed.
   Hint Rewrite ARtoCR_preserves_boundAbove : ARtoCR.
 
   Program Definition AQboundAbs_uc (c : AQ₊) : AQ_as_MetricSpace --> AQ_as_MetricSpace 
-    := unary_uc f (λ x : AQ_as_MetricSpace, max (-AQposAsAQ c) (min (AQposAsAQ c) x) : AQ_as_MetricSpace)
+    := unary_uc inject (λ x : AQ_as_MetricSpace, max (-AQposAsAQ c) (min (AQposAsAQ c) x) : AQ_as_MetricSpace)
              (QboundAbs (AQpos2Qpos c)) _.
   Next Obligation. aq_preservation. Qed. 
  
@@ -114,17 +114,17 @@ Section app_rationals_completion.
   Hint Rewrite ARtoCR_preserves_bound_abs : ARtoCR.
 
   Program Definition AQscale_uc (x : AQ_as_MetricSpace) : AQ_as_MetricSpace --> AQ_as_MetricSpace 
-    := unary_uc f (ring_mult x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qscale_uc (f x)) _.
+    := unary_uc inject (ring_mult x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qscale_uc ('x)) _.
   Next Obligation. aq_preservation. Qed.
  
   Definition ARscale (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQscale_uc x).
 
-  Lemma ARtoCR_preserves_scale x y : ARtoCR (ARscale x y) = scale (f x) (ARtoCR y).
+  Lemma ARtoCR_preserves_scale x y : ARtoCR (ARscale x y) = scale ('x) (ARtoCR y).
   Proof. apply preserves_unary_fun. Qed.
   Hint Rewrite ARtoCR_preserves_scale : ARtoCR.
 
   Program Definition AQmult_uc (c : AQ₊) : AQ_as_MetricSpace --> AQ_as_MetricSpace --> AQ_as_MetricSpace 
-    := binary_uc f (λ x y : AQ_as_MetricSpace, x * AQboundAbs_uc c y : AQ_as_MetricSpace) 
+    := binary_uc inject (λ x y : AQ_as_MetricSpace, x * AQboundAbs_uc c y : AQ_as_MetricSpace) 
             (Qmult_uc (AQpos2Qpos c)) _.
   Next Obligation. aq_preservation. Qed. 
 
@@ -136,11 +136,11 @@ Section app_rationals_completion.
   Proof. apply preserves_binary_fun. Qed.
   Hint Rewrite ARtoCR_preserves_mult_bounded : ARtoCR.
 
-  Lemma ARtoCR_approximate (x : AR) (ε : Qpos) : f (approximate x ε) = approximate (ARtoCR x) ε.
+  Lemma ARtoCR_approximate (x : AR) (ε : Qpos) : '(approximate x ε) = approximate (ARtoCR x) ε.
   Proof. reflexivity. Qed.
 
   Lemma AR_b_correct (x : AR) :
-    f (aq_abs (approximate x (1#1)%Qpos) + 1) = Qabs (approximate (ARtoCR x) (1#1)%Qpos) + (1#1)%Qpos.
+    '(aq_abs (approximate x (1#1)%Qpos) + 1) = Qabs (approximate (ARtoCR x) (1#1)%Qpos) + (1#1)%Qpos.
   Proof. aq_preservation. Qed.
 
   Program Definition AR_b (x : AR) : AQ₊ := exist _ (aq_abs (approximate x (1#1)%Qpos) + 1) _.
@@ -190,7 +190,7 @@ Section app_rationals_completion.
   Transparent equiv.
 
   (* Order *)
-  Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, (-ε <= f (approximate x ε))%Q.
+  Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, (-ε <= '(approximate x ε))%Q.
   
   Lemma ARtoCR_preserves_nonNeg x : ARnonNeg x ↔ CRnonNeg (ARtoCR x).
   Proof. reflexivity. Qed.
@@ -202,7 +202,7 @@ Section app_rationals_completion.
     split; intros; apply ARtoCR_preserves_nonNeg; [rewrite <-E | rewrite E]; auto.
   Qed.
   
-  Definition ARnonPos (x : AR) := ∀ ε : Qpos, (f (approximate x ε) <= ε)%Q.
+  Definition ARnonPos (x : AR) := ∀ ε : Qpos, ('(approximate x ε) <= ε)%Q.
 
   Lemma ARtoCR_preserves_nonPos x : ARnonPos x ↔ CRnonPos (ARtoCR x).
   Proof. reflexivity. Qed.
@@ -243,7 +243,7 @@ Section app_rationals_completion.
     exists (exist _ z F). simpl. 
     apply ARtoCR_preserves_le.
     rewrite ARtoCR_inject.
-    apply CRle_trans with (' y)%CR...
+    apply CRle_trans with ('y)%CR...
     apply CRArith.CRle_Qle...
   Defined.
   Hint Resolve ARtoCR_preserves_pos.
@@ -305,37 +305,38 @@ Section app_rationals_completion.
     split; apply CRapart_wd; try reflexivity; rewrite ARtoCR_inject rings.preserves_0; reflexivity.
   Defined.
 
-  (* Multiplicative inverse *)
-  Lemma aq_mult_inv_regular_prf (x : {x | x ≠ 0}) : 
-    is_RegularFunction_noInf _ (app_mult_inv x : Qpos → AQ_as_MetricSpace).
+  Lemma aq_mult_inv_regular_prf x : 
+    is_RegularFunction_noInf _ (λ ε : Qpos, app_field_div 1 x (eps2pow ε) : AQ_as_MetricSpace).
   Proof.
     intros ε1 ε2. simpl.
-    eapply ball_triangle.
-     eapply aq_mult_inv.
-    eapply ball_sym, aq_mult_inv.
+    eapply ball_triangle. 
+     eapply aq_div_eps2pow.
+    eapply ball_sym, aq_div_eps2pow.
   Qed.
  
-  Definition aq_mult_inv_regular (x : {x | x ≠0}) : AR := 
+  Definition aq_mult_inv_regular x : AR := 
     mkRegularFunction (0 : AQ_as_MetricSpace) (aq_mult_inv_regular_prf x).
 
   Program Definition aq_mult_inv_bounded (c : AQ₊) (x : AQ_as_MetricSpace) : AR
     := aq_mult_inv_regular (max (AQposAsAQ c) x).
-  Next Obligation.
+  (* Next Obligation.
     intros E. destruct c as [c Ec].
     apply (Qle_not_lt (f c) (f 0)).
      rewrite <-E. rewrite aq_preserves_max. simpl. apply Qmax_ub_l.
     apply aq_preserves_lt. assumption.
   Qed.
-   
+  *)
+
   Lemma AQinv_pos_uc_prf (c : AQ₊) : is_UniformlyContinuousFunction 
     (aq_mult_inv_bounded c) (Qinv_modulus (AQpos2Qpos c)).
   Proof.
     intros ε x y E δ1 δ2. simpl in *.
     eapply ball_triangle.
-     2: eapply ball_sym, aq_mult_inv.
+     2: eapply ball_sym, aq_div_eps2pow.
     eapply ball_triangle.
-     eapply aq_mult_inv.
-    simpl. aq_preservation. apply Qinv_pos_uc_prf in E. apply E. 
+     eapply aq_div_eps2pow.
+    simpl. aq_preservation. apply Qinv_pos_uc_prf in E.
+    do 2 rewrite left_identity. apply E.
   Qed.
 
   Definition AQinv_pos_uc (c : AQ₊) :=
@@ -344,7 +345,7 @@ Section app_rationals_completion.
   Definition ARinv_pos (c : AQ₊) : AR --> AR := Cbind AQPrelengthSpace (AQinv_pos_uc c).
  
   Lemma ARtoCR_preserves_inv_pos_aux c (x : AR) : is_RegularFunction_noInf _
-     (λ γ, / Qmax (f (AQposAsAQ c)) (f (approximate x (Qinv_modulus (AQpos2Qpos c) γ))) : Q_as_MetricSpace).
+     (λ γ, / Qmax ('(AQposAsAQ c)) ('(approximate x (Qinv_modulus (AQpos2Qpos c) γ))) : Q_as_MetricSpace).
   Proof.
     intros ε1 ε2. 
     apply (Qinv_pos_uc_prf (AQpos2Qpos c)).
@@ -361,8 +362,9 @@ Section app_rationals_completion.
     simpl. unfold Cjoin_raw. simpl.
     setoid_replace (ε + ε) with ((1#2) * ε + ((1#2) * ε + ε))%Qpos by QposRing.
     eapply ball_triangle.
-     apply aq_mult_inv.
+     apply aq_div_eps2pow.
     rewrite aq_preserves_max. 
+    rewrite rings.preserves_1. rewrite left_identity.
     apply ARtoCR_preserves_inv_pos_aux.
   Qed.
   Hint Rewrite ARtoCR_preserves_inv_pos : ARtoCR.
