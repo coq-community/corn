@@ -9,8 +9,7 @@ Require Import
 Section cut_minus_properties.
   Context `{SemiRing R} `{!SemiRingOrder o} `{!TotalOrder o}
     `{∀ z, LeftCancellation (+) z}
-    `{cm : !CutMinus R}
-    `{∀ (x y : R), Decision (x = y)}.
+    `{cm : !CutMinus R}.
 
   Instance: ∀ z, RightCancellation (+) z.
   Proof. intros z. apply rings.right_cancel_from_left. Qed.
@@ -24,17 +23,11 @@ Section cut_minus_properties.
     unfold cut_minus, cut_minus_sig. 
     destruct cm as [z1 [Ez1 Fz1]]. destruct cm as [z2 [Ez2 Fz2]]. simpl.
     rewrite E, F in Ez1, Fz1. clear E F x1 y1.
-    destruct (orders.precedes_or_sprecedes x2 y2).
+    destruct (total_order x2 y2).
     rewrite Fz1, Fz2...
     apply (right_cancellation (+) y2)...
     rewrite Ez1, Ez2...
   Qed.
-
-  Lemma cut_minus_strictly_precedes x y : y < x → (x ∸ y) + y = x.
-  Proof.
-    unfold cut_minus, cut_minus_sig. destruct cm. simpl. tauto.
-  Qed.
-  Hint Resolve cut_minus_strictly_precedes.
 
   Lemma cut_minus_0 x y : x ≤ y → (x ∸ y) = 0.
   Proof.
@@ -44,11 +37,7 @@ Section cut_minus_properties.
 
   Lemma cut_minus_precedes x y : y ≤ x → (x ∸ y) + y = x.
   Proof.
-    intros E. destruct ((proj2 (orders.sprecedes_precedes y x)) E) as [F|].
-     rewrite F, cut_minus_0. 
-      ring. 
-     reflexivity.
-    auto.
+    unfold cut_minus, cut_minus_sig. destruct cm. simpl. tauto.
   Qed.  
   Hint Resolve cut_minus_precedes.
 
@@ -78,7 +67,7 @@ Section cut_minus_properties.
   Proof with auto.
     destruct (total_order x y) as [E|E].
      apply orders.equiv_precedes. symmetry...
-    apply (order_preserving_back (flip (+) y))...
+    apply (order_preserving_back (+ y))...
     unfold flip. rewrite cut_minus_precedes; ring_simplify...
   Qed.
 
@@ -103,16 +92,37 @@ Section cut_minus_properties.
     apply semirings.plus_compat...
   Qed.
 
+  Lemma cut_minus_mult_distr_l (x y z : R) : 0 ≤ x →  x * (y ∸ z) = x * y ∸ x * z.
+  Proof with auto.
+    intros E.
+    destruct (total_order y z).
+     repeat rewrite cut_minus_0...
+      ring.
+     apply semirings.mult_compat...
+    apply (right_cancellation (+) (x * z)). 
+    rewrite <-distribute_l.
+    repeat rewrite cut_minus_precedes...
+     reflexivity.
+    apply semirings.mult_compat...
+  Qed.
+
+  Lemma cut_minus_mult_distr_r (x y z : R) : 0 ≤ x →  (y ∸ z) * x = y * x ∸ z * x.
+  Proof with auto.
+    intros E.
+    do 3 rewrite (commutativity _ x).
+    apply cut_minus_mult_distr_l...
+  Qed.
+
   Lemma cut_minus_plus_l_rev x y z : y ∸ z = (x + y) ∸ (x + z).
   Proof with auto; try reflexivity.
     destruct (total_order y z) as [E|E].
      repeat rewrite cut_minus_0... 
-     apply (order_preserving ((+) x))...
+     apply (order_preserving (x +))...
     apply (right_cancellation (+) (x + z))...
     setoid_replace (y ∸ z + (x + z)) with ((y ∸ z + z) + x) by ring.
     repeat rewrite cut_minus_precedes... 
      apply commutativity.
-    apply (order_preserving ((+) x))...
+    apply (order_preserving (x +))...
   Qed.
 
   Lemma cut_minus_plus_r_rev x y z : y ∸ z = (y + x) ∸ (z + x).
@@ -170,11 +180,11 @@ Section cut_minus_properties.
 
   (* * Properties of min and minus *)
   Section min.
-  Context `{∀ (x y : R), Decision (x ≤ y)}.
+  Context `{prec_decide : ∀ (x y : R), Decision (x ≤ y)}.
   Lemma cut_minus_min1 x y z : x ∸ min y z = x ∸ y + (min x y ∸ z). 
   Proof with eauto; try ring.
     unfold min, sort.
-    case (decide (x ≤ y)); case (decide (y ≤ z)); intros F G; simpl.
+    case (prec_decide x y); case (prec_decide y z); intros F G; simpl.
        rewrite (cut_minus_0 x z)... transitivity y...
       rewrite (cut_minus_0 x y)...
      rewrite (cut_minus_0 y z)...
@@ -192,16 +202,16 @@ Section cut_minus_properties.
   Proof with auto; try reflexivity.
     destruct (total_order y z) as [G1|G1].
      rewrite (min_l y z), (min_l (x + y) (x + z))...
-     apply (order_preserving ((+) x))...
+     apply (order_preserving (x +))...
     rewrite (min_r y z), (min_r (x + y) (x + z))...
-    apply (order_preserving ((+) x))...
+    apply (order_preserving (x +))...
   Qed.
 
   Lemma cut_minus_min4 x1 x2 y1 y2 : 
     y1 ∸ x1 + (x1 ∸ x2 + (min x1 x2 ∸ min y1 y2)) = y1 ∸ y2 + (min y1 y2 ∸ min x1 x2) + (x1 ∸ y1).
   Proof with auto.
     unfold min, sort.
-    case (decide (x1 ≤ x2)); case (decide (y1 ≤ y2)); intros; simpl.
+    case (prec_decide x1 x2); case (prec_decide y1 y2); intros; simpl.
     (* case 1*)
     rewrite (cut_minus_0 x1 x2), (cut_minus_0 y1 y2)... ring.
     (* case 2 *)
@@ -264,7 +274,6 @@ Section cut_minus_default.
   Next Obligation with auto.
     case (decide (x ≤ y)); intros E; split; intros F...
        ring_simplify. apply (antisymmetry (≤))...
-       apply orders.sprecedes_weaken...
       reflexivity.
      ring.
     contradiction.

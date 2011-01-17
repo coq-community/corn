@@ -3,7 +3,7 @@ Require
 Require Import
   Morphisms Ring Field Program Setoid
   abstract_algebra interfaces.naturals interfaces.rationals interfaces.integers
-  natpair_integers theory.rationals theory.fields theory.rings orders.integers.
+  natpair_integers theory.rationals theory.fields theory.rings orders.integers orders.fields.
 
 Section rationals_order.
   Context `{Rationals Q} {o : Order Q} `{!RingOrder o} `{!TotalOrder o}.
@@ -20,11 +20,11 @@ Section rationals_order.
      exists (-num). exists (-den). split.
       split.
        apply rings.flip_nonpos_inv...
-      intros G. apply E1. apply (injective group_inv). rewrite <-G. symmetry. apply opp_0.
+      intros G. apply E1. apply (injective (-)). rewrite <-G. symmetry. apply opp_0.
      do 2 rewrite preserves_inv. rewrite E2. field.
      split.
       intros G. apply E1.
-      apply (injective (integers_to_ring Z Q)). apply (injective group_inv).
+      apply (injective (integers_to_ring Z Q)). apply (injective (-)).
       rewrite G. rewrite preserves_0. symmetry. apply opp_0.
      apply injective_not_0...
     exists num. exists den. split...
@@ -34,7 +34,7 @@ Section rationals_order.
 
   Section another_rationals.
   Context `{Rationals Q2} {oQ : Order Q2} `{!RingOrder oQ} `{!TotalOrder oQ}
-     {f : Q → Q2} `{!Ring_Morphism f} `{!Injective f}.
+     {f : Q → Q2} `{!SemiRing_Morphism f} `{!Injective f}.
 
   Notation i_to_r := (integers.integers_to_ring (SRpair nat) Q).
 
@@ -44,14 +44,14 @@ Section rationals_order.
     destruct (rationals_decompose_pos_den (SRpair nat) x) as [num [den [[E1a E1b] E2]]].
     rewrite E2 in E |- *. clear E2.
     rewrite preserves_mult, preserves_dec_mult_inv.
-    apply (maps.order_preserving_back_gt_0 ring_mult (f (i_to_r den))).
+    apply (order_preserving_back_gt_0 (.*.) (f (i_to_r den))).
      change (0 < (f ∘ i_to_r) den).
      rewrite (integers.to_ring_unique _).
      split.
       apply (order_preserving (integers_to_ring (SRpair nat) Q2)) in E1a.
       rewrite preserves_0 in E1a...
      apply not_symmetry. apply (injective_not_0). apply not_symmetry...
-    apply (maps.order_preserving_ge_0 ring_mult (i_to_r den)) in E.
+    apply (order_preserving_ge_0 (.*.) (i_to_r den)) in E.
      rewrite right_absorb. rewrite right_absorb in E.
      rewrite (commutativity (f (i_to_r num))), associativity, dec_mult_inverse, left_identity.
       rewrite (commutativity (i_to_r num)), associativity, dec_mult_inverse, left_identity in E. 
@@ -132,9 +132,9 @@ Section default_order.
       apply naturals.zero_sum with (d1 * n2).
       apply (injective n_to_sr).
       rewrite preserves_plus, preserves_mult, preserves_mult, preserves_0.
-      apply (left_cancellation_ne_0 ring_mult (/n_to_sr d1)).
+      apply (left_cancellation_ne_0 (.*.) (/n_to_sr d1)).
        apply dec_mult_inv_nonzero. apply injective_not_0...
-      apply (left_cancellation_ne_0 ring_mult (/n_to_sr d2)).
+      apply (left_cancellation_ne_0 (.*.) (/n_to_sr d2)).
        apply dec_mult_inv_nonzero. apply injective_not_0...
       ring_simplify. replace (zero) with (0 : Q) by reflexivity. 
       rewrite B2. field.
@@ -153,5 +153,28 @@ Section default_order.
     rewrite E1, E2, dec_mult_inv_distr. ring.
   Qed.
 
-  (* Todo: prove that rationals_precedes is total *)
+  Notation i_to_r := (integers_to_ring (SRpair nat) Q).
+  Global Instance: TotalOrder rationals_precedes.
+  Proof with auto.
+    assert (∀ xn xd yn yd, 0 < xd → 0 < yd → xn * yd ≤ yn * xd → i_to_r xn / i_to_r xd ≤ i_to_r yn / i_to_r yd).
+     intros xn xd yn yd [xd_ge0 xd_ne0] [yd_ge0 yd_ne0] E.
+     apply srorder_plus in E. destruct E as [z [Ez1 Ex2]].
+     apply integers_precedes_plus in xd_ge0. apply integers_precedes_plus in yd_ge0. apply integers_precedes_plus in Ez1.
+     destruct xd_ge0 as [xd' xd_ge0], yd_ge0 as [yd' yd_ge0], Ez1 as [z' Ez1].
+     rewrite left_identity in xd_ge0, yd_ge0, Ez1.
+     exists z'. exists (xd' * yd').
+     assert (∀ a, (i_to_r ∘ naturals_to_semiring nat (SRpair nat)) a = n_to_sr a) as F.
+      intros a. apply (naturals.to_semiring_unique _).
+     rewrite preserves_mult, <-F, <-F, <-F.
+     unfold compose. rewrite <-xd_ge0, <-yd_ge0, <-Ez1.
+     transitivity ((i_to_r yn * i_to_r xd) / (i_to_r yd * i_to_r xd)).
+      field. split; apply injective_not_0; apply not_symmetry...
+     rewrite <-preserves_mult, Ex2, preserves_plus, preserves_mult.
+     field. split; apply injective_not_0; apply not_symmetry...
+    intros x y.
+    destruct (rationals_decompose_pos_den (SRpair nat) x) as [xn [xd [E1x E2x]]].
+    destruct (rationals_decompose_pos_den (SRpair nat) y) as [yn [yd [E1y E2y]]].
+    rewrite E2x, E2y.
+    destruct (total_order (xn * yd) (yn * xd)); [left | right]; auto.
+  Qed.
 End default_order.

@@ -11,7 +11,7 @@ Implicit Arguments den_nonzero [[R] [e] [one]].
 
 Section contents.
 Context `{IntegralDomain R}.
-Context `{∀ z : R, NeZero z → LeftCancellation ring_mult z}.
+Context `{∀ z : R, NeZero z → LeftCancellation (.*.) z}.
 
 Add Ring R: (stdlib_ring_theory R).
 
@@ -23,7 +23,7 @@ Proof with auto.
     reflexivity.
    intros x y E. symmetry...
   intros [nx dx] [ny dy] [nz dz] V W. simpl in *.
-  apply (left_cancellation_ne_0 ring_mult dy)...
+  apply (left_cancellation_ne_0 (.*.) dy)...
   do 2 rewrite associativity. 
   do 2 rewrite (commutativity dy).
   rewrite V, <- W. ring.
@@ -107,11 +107,10 @@ Proof.
 Qed.
 
 (* A final word about inject *)
-Global Instance: Ring_Morphism Frac_inject.
+Global Instance: SemiRing_Morphism Frac_inject.
 Proof.
   repeat (constructor; try apply _); try reflexivity.
-    intros x y. change ((x + y) * (1 * 1) = (x * 1 + y * 1) * 1). ring.
-   intros x. unfolds. reflexivity.
+   intros x y. change ((x + y) * (1 * 1) = (x * 1 + y * 1) * 1). ring.
   intros x y. change ((x * y) * (1 * 1) = x * y * 1). ring.
 Qed.
 

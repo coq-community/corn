@@ -1,6 +1,7 @@
 Require Import
   Relation_Definitions Morphisms Ring Program Setoid
-  abstract_algebra theory.rings
+  abstract_algebra theory.rings.
+Require Export 
   orders.orders orders.maps.
 
 Section contents.
@@ -18,6 +19,17 @@ Proof with auto.
   rewrite <-(inv_involutive x), <-(inv_involutive y)...
 Qed.
 
+Lemma flip_inv_strict x y : x < y ↔ -y < -x.
+Proof with auto.
+  assert (∀ a b, a < b → -b < -a).
+   intros a b [E1 E2].
+   split.
+    apply ->flip_inv...
+   intros E3. apply E2. apply (injective (-)). symmetry...
+  split; intros...
+  rewrite <-(inv_involutive x), <-(inv_involutive y)...
+Qed.
+
 Lemma flip_nonneg_inv x : 0 ≤ x ↔ -x ≤ 0. 
 Proof with eauto.
   split; intros E.
@@ -29,6 +41,19 @@ Lemma flip_nonpos_inv x : x ≤ 0 ↔ 0 ≤ -x.
 Proof with auto.
   rewrite <-(inv_involutive x) at 1. 
   split; intros; apply flip_nonneg_inv; auto.
+Qed.
+
+Lemma flip_pos_inv x : 0 < x ↔ -x < 0. 
+Proof with eauto.
+  split; intros E.
+   rewrite <- opp_0... apply ->flip_inv_strict...
+  apply flip_inv_strict. rewrite opp_0...
+Qed.
+
+Lemma flip_neg_inv x : x < 0 ↔ 0 < -x. 
+Proof with auto.
+  rewrite <-(inv_involutive x) at 1. 
+  split; intros; apply flip_pos_inv; auto.
 Qed.
 
 Lemma flip_nonneg_minus (x y : R) : 0 ≤ y + -x ↔ x ≤ y.
@@ -60,7 +85,7 @@ Proof with trivial.
    ring.
   intros [z [Ez1 Ez2]].
   rewrite Ez2, <-(plus_0_r x) at 1.
-  apply (order_preserving ((+) x))...
+  apply (order_preserving (x +))...
 Qed.
 
 Global Instance: SemiRingOrder o.
@@ -87,6 +112,13 @@ Proof with auto.
   apply flip_nonpos_inv...
 Qed.
 
+Lemma nonneg_nonpos_mult x y : 0 ≤ x → y ≤ 0 → x * y ≤ 0.
+Proof with auto.
+  intros E F.
+  rewrite commutativity. 
+  apply nonpos_nonneg_mult...
+Qed.
+
 Context `{!TotalOrder o}.
 
 Lemma square_nonneg x : 0 ≤ x * x.
@@ -107,7 +139,7 @@ Qed.
 End contents.
 
 Section another_ring.
-  Context `{Ring R} `{!RingOrder o} `{Ring R2} `{o2 : Order R2} `{!RingOrder o2} {f : R → R2} `{!Ring_Morphism f}.
+  Context `{Ring R} `{!RingOrder o} `{Ring R2} `{o2 : Order R2} `{!RingOrder o2} {f : R → R2} `{!SemiRing_Morphism f}.
 
   Lemma preserving_back_preserves_0 : (∀ x, 0 ≤ f x → 0 ≤ x) → OrderPreservingBack f.
   Proof with trivial.
@@ -115,7 +147,7 @@ Section another_ring.
     repeat (split; try apply _).
     intros x y F.
     apply flip_nonneg_minus. apply E.
-    rewrite preserves_plus, preserves_opp.
+    rewrite preserves_plus, preserves_inv.
     apply flip_nonneg_minus. apply F.
   Qed.
 End another_ring.
