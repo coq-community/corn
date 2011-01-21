@@ -16,4 +16,6 @@ deps
 coqidescript
 *.new
 *#
+*.dot
+*.crashcoqide
 

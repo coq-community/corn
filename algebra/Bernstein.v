@@ -25,7 +25,8 @@ Require Import Rational.
 Require Import Qordfield.
 Require Import COrdFields2.
 Require Import CRing_Homomorphisms.
-Require Export Bvector.
+Require Vector.
+Export Vector.VectorNotations.
 
 Set Implicit Arguments.
 
@@ -270,24 +271,61 @@ Opaque Bernstein.
 
 (** Given a vector of coefficents for a polynomial in the Bernstein basis, return the polynomial *)
 
-Fixpoint evalBernsteinBasisH (n i:nat) (v:vector R i) : i <= n -> cpoly_cring R :=
-match v in vector _ i return i <= n -> cpoly_cring R with
-|Vnil => fun _ => Zero
-|Vcons a i' v' =>
+Fixpoint evalBernsteinBasisH (n i:nat) (v:Vector.t R i) : i <= n -> cpoly_cring R :=
+match v in Vector.t _ i return i <= n -> cpoly_cring R with
+|Vector.nil => fun _ => Zero
+|Vector.cons a i' v' =>
   match n as n return (S i' <= n) -> cpoly_cring R with
   | O => fun p => False_rect _ (le_Sn_O _ p)
   | S n' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (le_Sn_le _ _ p)
   end
 end.
 
-Definition evalBernsteinBasis (n:nat) (v:vector R n) : cpoly_cring R :=
+Definition evalBernsteinBasis (n:nat) (v:Vector.t R n) : cpoly_cring R :=
 evalBernsteinBasisH v (le_refl n).
 
 (** The coefficents are linear *)
 Opaque polyconst.
 
-Lemma evalBernsteinBasisPlus : forall n (v1 v2: vector R n),
-evalBernsteinBasis (Vbinary _ (fun (x y:R)=>x[+]y) _ v1 v2)[=]evalBernsteinBasis v1[+]evalBernsteinBasis v2.
+Section obsolute_stuff_from_Bvector.
+Variable A : Type.
+Variable (g : A -> A -> A).
+Lemma Vbinary : forall (n : nat), Vector.t A n -> Vector.t A n -> Vector.t A n.
+Proof.
+  induction n as [| n h]; intros v v0.
+  apply Vector.nil.
+
+  inversion v as [| a n0 H0 H1]; inversion v0 as [| a0 n1 H2 H3].
+  exact (Vector.cons A (g a a0) n (h H0 H2)).
+Defined.
+
+Definition Vid n : Vector.t A n -> Vector.t A n :=
+  match n with
+  | O => fun _ => Vector.nil A
+  | S n' => fun v : Vector.t A (S n') => Vector.cons A (Vector.hd v) _ (Vector.tl v)
+  end.
+
+Lemma Vid_eq : forall (n:nat) (v:Vector.t A n), v = Vid v.
+Proof.
+  destruct v; auto.
+Qed.
+
+Lemma VSn_eq :
+  forall (n : nat) (v : Vector.t A (S n)), v = Vector.cons A (Vector.hd v) _ (Vector.tl v).
+Proof.
+  intros.
+  exact (Vid_eq v).
+Qed.
+
+Lemma V0_eq : forall (v : Vector.t A 0), v = Vector.nil A.
+Proof.
+  intros.
+  exact (Vid_eq v).
+Qed.
+End obsolute_stuff_from_Bvector.
+
+Lemma evalBernsteinBasisPlus : forall n (v1 v2: Vector.t R n),
+evalBernsteinBasis (Vbinary (fun (x y:R)=>x[+]y) v1 v2)[=]evalBernsteinBasis v1[+]evalBernsteinBasis v2.
 Proof.
  unfold evalBernsteinBasis.
  intros n.
@@ -296,21 +334,21 @@ Proof.
  intros i.
  induction i.
   intros l v1 v2.
-  rewrite (V0_eq R v1) (V0_eq R v2). ring.
+  rewrite (V0_eq v1) (V0_eq v2). ring.
  intros l v1 v2.
  destruct n as [|n].
   elimtype False; auto with *.
- rewrite (VSn_eq R _ v1) (VSn_eq R _ v2).
+ rewrite (VSn_eq v1) (VSn_eq v2).
  simpl.
  rewrite IHi.
  rewrite -> c_plus. ring.
 Qed.
 
 Lemma evalBernsteinBasisConst : forall n c,
-evalBernsteinBasis (Vconst R c (S n))[=]_C_ c.
+evalBernsteinBasis (Vector.const c (S n))[=]_C_ c.
 Proof.
  intros n c.
- stepr (evalBernsteinBasis (Vconst R c (S n))[+]_C_ c[*]Sum (S n) n (part_tot_nat_fun _ _ (fun (i : nat) (H : i < S n) => Bernstein (lt_n_Sm_le i n H)))).
+ stepr (evalBernsteinBasis (Vector.const c (S n))[+]_C_ c[*]Sum (S n) n (part_tot_nat_fun _ _ (fun (i : nat) (H : i < S n) => Bernstein (lt_n_Sm_le i n H)))).
   rewrite -> Sum_empty by auto with *.
   ring.
  unfold evalBernsteinBasis.
@@ -326,7 +364,7 @@ Proof.
   intros H H'.
   replace (lt_n_Sm_le j n H) with (lt_n_Sm_le j n H') by apply le_irrelevent.
   reflexivity.
- rstepl (evalBernsteinBasisH (Vconst R c i) (le_Sn_le i (S n) l)[+]
+ rstepl (evalBernsteinBasisH (Vector.const c i) (le_Sn_le i (S n) l)[+]
    _C_ c[*](Bernstein (le_S_n i n l)[+] Sum (S i) n (part_tot_nat_fun (cpoly_cring R) (S n)
      (fun (i0 : nat) (H : i0 < S n) => Bernstein (lt_n_Sm_le i0 n H))))).
  replace (Bernstein (le_S_n _ _ l)) with (part_tot_nat_fun (cpoly_cring R) (S n)
@@ -347,26 +385,26 @@ Variable eta : RingHom Q_as_CRing R.
 Opaque Qred.
 Opaque Q_as_CRing.
 Opaque Vbinary.
-Opaque Vconst.
+Opaque Vector.const.
 
 (** To convert a polynomial to the Bernstein basis, we need to know how to
 multiply a bernstein basis element by [_X_] can convert it to the Bernstein basis.
 At this point we must work with rational coeffients.  So we assume there is a
 ring homomorphism from [Q] to R *)
 
-Fixpoint BernsteinBasisTimesXH (n i:nat) (v:vector R i) : i <= n -> vector R (S i) :=
-match v in vector _ i return i <= n -> vector R (S i) with
-| Vnil => fun _ => Vcons _ Zero _ (Vnil _)
-| Vcons a i' v' => match n as n return S i' <= n -> vector R (S (S i')) with
+Fixpoint BernsteinBasisTimesXH (n i:nat) (v:Vector.t R i) : i <= n -> Vector.t R (S i) :=
+match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
+| Vector.nil => fun _ => Vector.cons _ Zero _ (Vector.nil _)
+| Vector.cons a i' v' => match n as n return S i' <= n -> Vector.t R (S (S i')) with
   | O => fun p => False_rect _ (le_Sn_O _ p)
-  | S n' => fun p => Vcons _ (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
+  | S n' => fun p => Vector.cons _ (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
   end
 end.
 
-Definition BernsteinBasisTimesX (n:nat) (v:vector R n) : vector R (S n) :=
+Definition BernsteinBasisTimesX (n:nat) (v:Vector.t R n) : Vector.t R (S n) :=
 BernsteinBasisTimesXH v (le_refl n).
 
-Lemma evalBernsteinBasisTimesX : forall n (v:vector R n),
+Lemma evalBernsteinBasisTimesX : forall n (v:Vector.t R n),
  evalBernsteinBasis (BernsteinBasisTimesX v)[=]_X_[*]evalBernsteinBasis v.
 Proof.
  intros n.
@@ -376,21 +414,21 @@ Proof.
  intros i.
  induction i.
   intros l l0 v.
-  rewrite (V0_eq R v).
+  rewrite (V0_eq v).
   simpl.
   rewrite <- c_zero. ring.
  intros l l0 v.
  destruct n as [|n].
   elimtype False; auto with *.
- rewrite (VSn_eq R _ v).
+ rewrite (VSn_eq v).
  simpl.
  rewrite -> IHi.
  rewrite -> c_mult.
  rewrite -> ring_dist_unfolded.
  apply csbf_wd; try reflexivity.
  set (A:= (_C_ (eta (Qred (Qmake (Zpos (P_of_succ_nat i)) (P_of_succ_nat n)))))).
- rstepl (_C_ (Vhead R i v)[*](A[*]Bernstein (le_S_n (S i) (S n) l))).
- rstepr (_C_ (Vhead R i v)[*](_X_[*]Bernstein (le_S_n i n l0))).
+ rstepl (_C_ (Vector.hd v)[*](A[*]Bernstein (le_S_n (S i) (S n) l))).
+ rstepr (_C_ (Vector.hd v)[*](_X_[*]Bernstein (le_S_n i n l0))).
  apply mult_wdr.
  unfold A; clear A.
  assert (Hn : (nring (S n):Q)[#]Zero).
@@ -430,12 +468,12 @@ Proof.
 Qed.
 
 (** Convert a polynomial to the Bernstein basis *)
-Fixpoint BernsteinCoefficents (p:cpoly_cring R) : sigT (vector R) :=
+Fixpoint BernsteinCoefficents (p:cpoly_cring R) : sigT (Vector.t R) :=
 match p with
-| cpoly_zero => existT _ _ (Vnil R)
+| cpoly_zero => existT _ _ (Vector.nil R)
 | cpoly_linear c p' =>
   let (n', b') := (BernsteinCoefficents p') in
-  existT _ _  (Vbinary _ (fun (x y:R)=>x[+]y) _ (Vconst R c _) (BernsteinBasisTimesX b'))
+  existT _ _  (Vbinary (fun (x y:R)=>x[+]y) (Vector.const c _) (BernsteinBasisTimesX b'))
 end.
 
 Lemma evalBernsteinCoefficents : forall p, (let (n,b) := BernsteinCoefficents p in evalBernsteinBasis b)[=]p.

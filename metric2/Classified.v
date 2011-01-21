@@ -10,22 +10,6 @@ Require Import
 
 Generalizable All Variables.
 
-Section make_RSetoid.
-
-  Context A `{@Setoid A e}.
-
-  Definition mcSetoid_as_Setoid_Theory: Setoid_Theory A e.
-   constructor; apply _.
-  Qed.
-
-  Definition mcSetoid_as_RSetoid: RSetoid.RSetoid
-    := @Build_RSetoid A e mcSetoid_as_Setoid_Theory.
-
-End make_RSetoid. (* Todo: Move. *)
-
-Instance: ∀ S: RSetoid.RSetoid, Equiv S := @st_eq.
-Instance: ∀ S: RSetoid.RSetoid, Setoid S.
-
 (** MathClasses-style operational & structural classes for a Russell-style metric space (i.e. MetricSpace).
  We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace
  it is still bound to Qpos rather than an abstract Rationals model. *)
@@ -54,7 +38,6 @@ Section MetricSpaceClass.
   Let hint := mspc_setoid.
 
   (** Instances can be bundled to yield MetricSpaces: *)
-
   Program Definition bundle_MetricSpace: MetricSpace :=
    @Build_MetricSpace (mcSetoid_as_RSetoid X) mspc_ball _ _.
 

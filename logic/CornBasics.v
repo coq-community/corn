@@ -50,6 +50,7 @@ Require Export Even.
 Require Export Max.
 Require Export Min.
 Require Export List.
+Declare ML Module "ssreflect".
 Require Export ssreflect.
 Require Import Eqdep_dec.
 

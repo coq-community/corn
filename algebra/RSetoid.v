@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Set Implicit Arguments.
 
 Require Export Setoid.
-Require Import ssreflect.
+Require Import CornBasics.
 Require Import abstract_algebra.
 
 Set Automatic Introduction.
@@ -44,9 +44,11 @@ Structure RSetoid: Type :=
 
 Implicit Arguments st_eq [r].
 
-Definition setoid_is_rsetoid X `{setoid : Setoid X} : RSetoid := Build_RSetoid setoid.
-(* Canonical Structure setoid_is_rsetoid. *)
-(* If we make this a canonical structure then StepQsec will break: investigate *)
+Definition mcSetoid_as_RSetoid X {e : Equiv X} {setoid : Setoid X} : RSetoid := Build_RSetoid setoid.
+Implicit Arguments mcSetoid_as_RSetoid [[e] [setoid]].
+
+(* Canonical Structure mcSetoid_as_RSetoid. *)
+(* If we make this a canonical structure StepQsec will break: investigate *)
 
 Section rsetoid_is_setoid.
   Context {X : RSetoid}.

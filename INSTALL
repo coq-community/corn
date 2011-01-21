@@ -6,16 +6,11 @@ PREREQUISITES
 
  This version of C-CoRN is known to compile with:
 
- - Coq version revision 13689 from the trunk branch
+ - Coq version revision 13781 from the trunk branch
 
- - Ssreflect revision 1292 from the trunk branch in the coq-contrib repository.
+ - Ssreflect revision 1332 from the trunk branch in the coq-contrib repository.
    This exact revision can be obtained by saying:
-    svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/trunk/Saclay/Ssreflect -r 1292
-   Currently only the ssreflect binary compiles, the standard library is broken.
-   However, CoRN does not depend on the library.
-   Build a customized Coqide interface linked with ssreflect. After having compiled ssreflect toplevel, go to the src/ subdirectory and execute the command
-   coqmktop -opt ssreflect.cmx -o ../bin/coqtop.opt
-   coqmktop -ide -opt ssreflect.cmx -o ../bin/ssrcoqide
+    svn checkout svn://scm.gforge.inria.fr/svn/coq-contribs/trunk/Saclay/Ssreflect -r 1332
 
  - SCons 1.2
 

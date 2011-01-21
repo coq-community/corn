@@ -26,7 +26,7 @@ Section metric_embedding.
     rewrite E F G. reflexivity.
   Qed.
 
-  Let is_MetricSpace: is_MetricSpace (setoid_is_rsetoid (X:=X')) Eball.
+  Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
   Proof with eauto.
     constructor; unfold ball; repeat intro.
         apply ball_refl.

@@ -64,14 +64,14 @@ Proof.
  split; auto with *.
 Qed.
 
-Definition InterpRow (up : list Q) n (v:Bvector n) : FinEnum stableQ:=
+Definition InterpRow (up : list Q) n (v:Vector.t bool n) : FinEnum stableQ:=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
 Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricSpace Q_as_MetricSpace)) : FinEnum stableQ2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in
- flat_map (fun (p:Q*Bvector _) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r)) (combine (UniformPartition t b m) bitmap).
+ flat_map (fun (p:Q*Vector.t bool _) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r)) (combine (UniformPartition t b m) bitmap).
 
 (** Notation for the interpretation of a raster. *)
 Notation "a ⇱ b ⇲ c" := (InterpRaster b a c) (at level 1,
@@ -104,9 +104,9 @@ Proof.
  fold (f l r n).
  fold (f t b m).
  generalize (f l r n) (f t b m).
- induction bitmap; intros f0 f1 i j H.
+ induction bitmap as [ | a]; intros f0 f1 i j H.
   unfold RasterIndex in H.
-  destruct (nth_in_or_default i (map (@vectorAsList _ _) (@Vnil (vector bool n))) nil) as [A | A].
+  destruct (nth_in_or_default i (map (@Vector.to_list _ _) (@Vector.nil (@Vector.t bool n))) nil) as [A | A].
    contradiction.
   rewrite A in H; clear A.
   destruct (nth_in_or_default j nil false) as [A | A].
@@ -121,8 +121,8 @@ Proof.
   simpl in H.
   clear bitmap IHbitmap.
   revert f0 j H.
-  induction a; intros f0 j H.
-   destruct (nth_in_or_default j (@Vnil bool) false) as [A | A].
+  induction a as [|a]; intros f0 j H.
+   destruct (nth_in_or_default j (@Vector.nil bool) false) as [A | A].
     contradiction.
    rewrite A in H; clear A.
    contradiction.
@@ -164,7 +164,7 @@ Proof.
  fold (f l r n).
  fold (f t b m).
  generalize (f l r n) (f t b m).
- induction bitmap; intros f0 f1 H.
+ induction bitmap as [|a]; intros f0 f1 H.
   contradiction.
  simpl in H.
  destruct (in_app_or _ _ _ H) as [H0 | H0]; clear H.
@@ -175,7 +175,7 @@ Proof.
    auto.
   clear bitmap IHbitmap.
   revert f0 H0.
-  induction a; intros f0 H0.
+  induction a as [|a]; intros f0 H0.
    contradiction.
   destruct a.
    simpl in H0.
