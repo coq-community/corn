@@ -67,6 +67,47 @@ Section contents.
 
   Definition divdiff (l: ne_list QPoint): CR := divdiff_l (ne_list.head l) (ne_list.tail l).
 
+Require Import Bvector.
+
+ Definition divdiff_v `(l: vector QPoint (S n)) : CR.
+ induction n as [| n dd].
+ dependent destruction l.
+  exact (snd a).
+ dependent destruction l.   dependent destruction l.
+ exact ((dd (Vshiftin _ n a l) - dd (Vshiftin _ n a0 l)) * ' / (fst a - fst a0)).
+ Show Proof.
+ Defined.
+
+Definition vec2list (A:Set) (n:nat) (v: vector A n):list A.
+induction n.
+exact nil.
+dependent destruction v.
+exact (cons a (IHn v)).
+Defined.
+
+Definition list2vec (A:Set): forall l:list A, (vector A (length l)).
+fix 1.
+intro l. case l.
+exact Vnil.
+simpl. intros. exact (Vcons a (list2vec l0 )).
+Defined.
+
+(* Now continue to define length induction on lists by using the isomorphism
+   Perhaps better: use equations. *)
+
+  Lemma divdiff_e (l: ne_list QPoint):
+    divdiff l = 
+      match l with
+      | ne_list.one a => snd a
+      | ne_list.cons a (ne_list.one b) => (snd a - snd b) * ' / (fst a - fst b)
+      | ne_list.cons a (ne_list.cons b l) =>
+         (divdiff (ne_list.cons a l) - divdiff (ne_list.cons b l)) * ' / (fst a - fst b)
+      end.
+  Proof with auto.
+   induction l...
+   destruct l...
+  Qed.
+
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
     _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x) [+X*] One) (tl xs)).
 
