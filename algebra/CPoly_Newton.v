@@ -67,46 +67,100 @@ Section contents.
 
   Definition divdiff (l: ne_list QPoint): CR := divdiff_l (ne_list.head l) (ne_list.tail l).
 
-Require Import Bvector.
-
- Definition divdiff_v `(l: vector QPoint (S n)) : CR.
- induction n as [| n dd].
- dependent destruction l.
-  exact (snd a).
- dependent destruction l.   dependent destruction l.
- exact ((dd (Vshiftin _ n a l) - dd (Vshiftin _ n a0 l)) * ' / (fst a - fst a0)).
- Show Proof.
- Defined.
-
-Definition vec2list (A:Set) (n:nat) (v: vector A n):list A.
-induction n.
-exact nil.
-dependent destruction v.
-exact (cons a (IHn v)).
-Defined.
-
-Definition list2vec (A:Set): forall l:list A, (vector A (length l)).
-fix 1.
-intro l. case l.
-exact Vnil.
-simpl. intros. exact (Vcons a (list2vec l0 )).
-Defined.
-
-(* Now continue to define length induction on lists by using the isomorphism
-   Perhaps better: use equations. *)
-
   Lemma divdiff_e (l: ne_list QPoint):
     divdiff l = 
       match l with
       | ne_list.one a => snd a
-      | ne_list.cons a (ne_list.one b) => (snd a - snd b) * ' / (fst a - fst b)
-      | ne_list.cons a (ne_list.cons b l) =>
+      | a ::: ne_list.one b => (snd a - snd b) * ' / (fst a - fst b)
+      | a ::: b ::: l =>
          (divdiff (ne_list.cons a l) - divdiff (ne_list.cons b l)) * ' / (fst a - fst b)
       end.
-  Proof with auto.
-   induction l...
-   destruct l...
+  Proof. induction l as [|?[|]]; auto. Qed.
+
+  Definition divdiff_ind {T} (P: ne_list T → Prop)
+    (Pone: ∀ p, P (ne_list.one p))
+    (Ptwo: ∀ p q, P (p ::: ne_list.one q))
+    (Pmore: ∀ a b l, P (a ::: l) → P (b ::: l) → P (a ::: b ::: l)):
+    forall l, P l.
+  Proof with simpl; auto.
+   cut (forall t h, P (ne_list.from_list h t)).
+    intros. rewrite (ne_list.decomp_eq l)...
+   induction t...
+   destruct t; simpl...
+   intros. apply Pmore; apply IHt.
   Qed.
+
+  Opaque CR.
+
+  Lemma divdiff_sum (xs: ne_list (Q * (CR * CR))):
+    divdiff (ne_list.map (second fst) xs) + divdiff (ne_list.map (second snd) xs) ==
+    divdiff (ne_list.map (second (λ x: CR * CR, fst x + snd x)) xs).
+  Proof with auto.
+   induction xs using divdiff_ind; do 3 rewrite divdiff_e; simpl in *.
+     reflexivity.
+    generalize (' (/ (fst p - fst q))). intro. simpl. ring.
+   generalize (' (/ (fst a - fst b))).  intro. simpl.
+   rewrite <- IHxs, <- IHxs0.
+   simpl. ring.
+  Qed.
+
+  Lemma divdiff_scalar_mult (c: CR) (xs: ne_list QPoint):
+    c * divdiff xs == divdiff (ne_list.map (second (CRmult c)) xs).
+  Proof with auto.
+   induction xs using divdiff_ind; simpl.
+     reflexivity.
+    change ((c * ((snd p - snd q) * ' (/ (fst p - fst q)))) == (c * snd p - c * snd q) * ' (/ (fst p - fst q))).
+    set (/ (fst p - fst q)). ring.
+   rewrite divdiff_e.
+   set (' (/ (fst a - fst b))).
+   transitivity ((c * divdiff (a ::: xs) - c * divdiff (b ::: xs)) * s). ring.
+   rewrite IHxs IHxs0.
+   symmetry. rewrite divdiff_e.
+   simpl. fold s. ring.
+  Qed.
+
+  Lemma divdiff_product (xs: ne_list (Q * (CR * CR))):
+      divdiff (ne_list.map (second (λ x: CR * CR, fst x * snd x)) xs) ==
+      cm_Sum (map (λ p, divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p)))
+        (zip (ne_list.tails xs) (ne_list.inits xs))).
+  Proof with simpl in *; auto.
+   intros.
+   induction xs using divdiff_ind.
+     unfold divdiff... ring.
+    unfold divdiff... set (' (/ (fst p - fst q))). ring.
+   rewrite divdiff_e.
+   set (λ p : ne_list (Q and CR and CR) and ne_list (Q and CR and CR),
+       divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p))) in *.
+   simpl in *.
+   rewrite IHxs IHxs0.
+   repeat rewrite ne_list.list_map.
+   repeat rewrite zip_map_snd.
+   repeat rewrite map_map_comp.
+   generalize (zip (ne_list.tails xs) (ne_list.inits xs)). intro.
+   set (s0 := ' (/ (fst a - fst b))).
+   transitivity ((s (a ::: xs, ne_list.one a) - s (b ::: xs, ne_list.one b)) * s0 +
+     (Σ (map (s ∘ second (ne_list.cons a))%prg l) - Σ (map (s ∘ second (ne_list.cons b))%prg l)) * s0)...
+    ring.
+   setoid_replace ((s (a ::: xs, ne_list.one a) - s (b ::: xs, ne_list.one b)) * s0)
+     with (s (a ::: b ::: xs, ne_list.one a)[+](s (b ::: xs, a ::: ne_list.one b))).
+    setoid_replace ((Σ (map (s ∘ second (ne_list.cons a))%prg l) - Σ (map (s ∘ second (ne_list.cons b))%prg l)) * s0)
+      with (Σ (map (s ∘ second (ne_list.cons a) ∘ second (ne_list.cons b))%prg l))...
+     ring.
+    induction l... ring.
+    rewrite <- IHl.
+    unfold Basics.compose at 1 3 5 6...
+    subst s...
+    rewrite (divdiff_e (second snd a ::: second snd b ::: ne_list.map (second snd) (snd a0)))...
+    fold s0. ring.
+   subst s...
+   unfold divdiff at 2 4 6...
+   rewrite (divdiff_e (second fst a ::: second fst b ::: ne_list.map (second fst) xs)).
+   generalize (divdiff (second fst a ::: ne_list.map (second fst) xs)). intro.
+   generalize (divdiff (second fst b ::: ne_list.map (second fst) xs)). intro.
+   rewrite divdiff_e...
+   fold s0. ring.
+  Qed.
+
 
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
     _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x) [+X*] One) (tl xs)).

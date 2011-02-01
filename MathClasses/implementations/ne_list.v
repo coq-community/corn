@@ -42,7 +42,21 @@ Section contents.
 
   Global Coercion to_list: L >-> list.
 
+  Fixpoint from_list (x: T) (xs: list T): L :=
+    match xs with
+    | nil => one x
+    | List.cons h t => cons x (from_list h t)
+    end.
+
   Definition tail (l: L): list T := match l with one _ => nil | cons _ x => to_list x end.
+
+  Lemma decomp_eq (l: L): l = from_list (head l) (tail l).
+  Proof with auto.
+   induction l...
+   destruct l...
+   simpl in *.
+   rewrite IHl...
+  Qed.
 
   Definition last: L → T := foldr1 (fun x y => y).
 
@@ -138,6 +152,12 @@ Proof with auto.
  rewrite E.
  reflexivity.
 Qed.
+
+Fixpoint inits {A} (l: L A): L (L A) :=
+  match l with
+  | one x => one (one x)
+  | cons h t => cons (one h) (map (cons h) (inits t))
+  end.
 
 Module notations.
 

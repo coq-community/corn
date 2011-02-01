@@ -1,7 +1,20 @@
 Require Export Lists.List.
 
 Require Import
-  Unicode.Utf8 Setoid Permutation Setoid Morphisms.
+  Unicode.Utf8 Setoid Permutation Setoid Morphisms stdlib_omissions.Pair.
+
+Fixpoint zip {A B} (a: list A) (b: list B): list (A * B) :=
+  match a, b with
+  | ah :: au, bh :: bt => (ah, bh) :: zip au bt
+  | _, _ => nil
+  end.
+
+Lemma zip_map_snd {A B C} (a: list A) (b: list B) (f: B → C):
+  zip a (map f b) = map (second f) (zip a b).
+Proof with auto.
+ revert b. induction a; destruct b...
+ simpl in *. intros. rewrite IHa...
+Qed.
 
 Lemma move_to_front {A} (x: A) (l: list A): In x l →
   exists l', Permutation (x :: l') l.
