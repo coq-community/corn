@@ -17,9 +17,9 @@ Section rationals_order.
     destruct (total_order den 0).
      exists (-num). exists (-den). split.
       split.
-       now apply rings.flip_nonpos_inv.
+       now apply rings.flip_nonpos_opp.
       intros G. apply E1. apply (injective (-)). rewrite <-G. symmetry. now apply opp_0.
-     rewrite 2!preserves_inv. rewrite E2. field.
+     rewrite 2!preserves_opp. rewrite E2. field.
      split.
       intros G. apply E1.
       apply (injective (integers_to_ring Z Q)). apply (injective (-)).
@@ -82,11 +82,11 @@ Section rationals_order_isomorphic.
   Proof.
     split.
      apply morphism_order_preserving.
-    split; try apply _.
+    repeat (split; try apply _).
     intros x y E.
     rewrite <-(to_rationals_involutive x (Q2:=Q2)), <-(to_rationals_involutive y (Q2:=Q2)).
     rewrite <-2!(to_rationals_unique f).
-    now apply morphism_order_preserving.
+    now apply (morphism_order_preserving (f:=rationals_to_rationals Q2 Q1)).
   Qed.
 End rationals_order_isomorphic.
 

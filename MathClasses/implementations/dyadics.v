@@ -3,8 +3,6 @@
    for some [Integers] implementation [Z]. These numbers form a ring and can be 
    embedded into any [Rationals] implementation [Q]. 
 *)
-Require
-  theory.integers theory.rings theory.fields.
 Require Import
   Morphisms Ring Program RelationClasses Setoid
   abstract_algebra 
@@ -54,7 +52,7 @@ Section with_rationals.
 
   Notation DtoQ_slow' := (DtoQ_slow ZtoQ).
 
-  Lemma ZtoQ_shift (x : Z) (n : Z⁺) : ZtoQ (x ≪ n) = ZtoQ x * 2 ^ ('n : Z).
+  Lemma ZtoQ_shift (x n : Z) Pn : ZtoQ (x ≪ exist _ n Pn) = ZtoQ x * 2 ^ n.
   Proof.
     rewrite shiftl_nat_pow.
     rewrite rings.preserves_mult, nat_pow.preserves_nat_pow, rings.preserves_2.
@@ -67,14 +65,12 @@ Section with_rationals.
     unfold ring_plus at 1. unfold DtoQ_slow, dy_plus. simpl.
     destruct (precedes_dec xe ye) as [E | E]; simpl.
      rewrite rings.preserves_plus, ZtoQ_shift.
-     unfold inject, NonNeg_inject. simpl.
      rewrite min_l; try assumption. 
      ring_simplify.
      rewrite <-associativity, <-int_pow_exp_plus.
       now setoid_replace (ye - xe + xe) with ye by ring.
      now apply (ne_zero (2:Q)).
     rewrite rings.preserves_plus, ZtoQ_shift.
-    unfold inject, NonNeg_inject. simpl.
     rewrite min_r. 
      ring_simplify.
      rewrite <-associativity, <-int_pow_exp_plus.
@@ -86,7 +82,7 @@ Section with_rationals.
   Lemma DtoQ_slow_preserves_opp x : DtoQ_slow' (-x) = -DtoQ_slow' x.
   Proof.
     unfold DtoQ_slow. simpl.
-    rewrite rings.preserves_inv. ring.
+    rewrite rings.preserves_opp. ring.
   Qed.
 
   Lemma DtoQ_slow_preserves_mult x y : DtoQ_slow' (x * y) = DtoQ_slow' x * DtoQ_slow' y.
@@ -181,8 +177,7 @@ Proof.
    unfold equiv, dy_equiv, dy_inject, DtoQ_slow; simpl.
    case (precedes_dec 0 0); intros E; simpl.
     rewrite 2!rings.preserves_plus, ZtoQ_shift.
-    unfold inject, NonNeg_inject. simpl.
-    setoid_replace (0 - 0) with 0 by ring.
+    rewrite rings.plus_opp_r.
     rewrite min_l, int_pow_0. ring.
     reflexivity.
    now destruct E.
@@ -200,7 +195,6 @@ Proof.
   split; intros E.
    unfold equiv, dy_equiv, DtoQ_slow. simpl in *.
    rewrite E, ZtoQ_shift.
-   unfold inject, NonNeg_inject. simpl.
    rewrite <-associativity, <-int_pow_exp_plus.
     now setoid_replace (ye - xe + xe) with ye by ring.
    easy.
@@ -209,7 +203,6 @@ Proof.
   apply (rings.right_cancellation_ne_0 (.*.) (2 ^ xe)).
    now apply int_pow_nonzero.
   rewrite E, ZtoQ_shift.
-  unfold inject, NonNeg_inject. simpl.
   rewrite <-associativity, <-int_pow_exp_plus.
    now setoid_replace (ye - xe + xe) with ye by ring.
   easy.
@@ -310,7 +303,7 @@ Qed.
 
 Lemma nonpos_mant (x : Dyadic) : x ≤ 0 ↔ mant x ≤ 0.
 Proof.
-  rewrite 2!rings.flip_nonpos_inv.
+  rewrite 2!rings.flip_nonpos_opp.
   apply nonneg_mant.
 Qed.
 
@@ -332,7 +325,6 @@ Proof.
   intros E. unfold precedes, dy_precedes, DtoQ_slow. simpl in *.
   apply (order_preserving ZtoStdQ) in E.
   rewrite ZtoQ_shift in E.
-  unfold inject, NonNeg_inject in E. simpl in E.
   apply (maps.order_preserving_flip_ge_0 (.*.) (2 ^ xe)) in E. unfold flip in E.
    rewrite <-associativity, <-int_pow_exp_plus in E.
     now setoid_replace ((ye - xe) + xe) with ye in E by ring.
@@ -347,7 +339,7 @@ Global Program Instance dy_precedes_dec : ∀ (x y: Dyadic), Decision (x ≤ y) 
    then if precedes_dec (mant x) (mant y ≪ exist _ (expo y - expo x) _) then left _ else right _ 
    else if precedes_dec (mant x ≪ exist _ (expo x - expo y) _) (mant y) then left _ else right _.
 Next Obligation. 
-  intros. apply rings.flip_nonneg_minus. assumption. 
+  intros. now apply rings.flip_nonneg_minus. 
 Qed.
 Next Obligation. 
   intros x y E1 E2. eapply dy_precedes_dec_aux. eassumption.
@@ -355,9 +347,9 @@ Qed.
 Next Obligation.
   intros x y E1 E2.
   apply orders.not_precedes_sprecedes.
-  apply orders.not_precedes_sprecedes in E2. apply rings.flip_inv_strict in E2.
+  apply orders.not_precedes_sprecedes in E2. apply rings.flip_opp_strict in E2.
   destruct E2 as [E2a E2b]. split.
-   apply rings.flip_inv.
+   apply rings.flip_opp.
    eapply dy_precedes_dec_aux.
    simpl. rewrite opp_shiftl. eassumption.
   intros E3. apply E2b. apply inv_proper.
@@ -371,9 +363,9 @@ Next Obligation.
   apply orders.sprecedes_precedes in E2. destruct E2 as [E2 | E2].
    apply orders.equiv_precedes. symmetry in E2 |- *. 
    eapply dy_eq_dec_aux. eassumption.
-  apply rings.flip_inv.
+  apply rings.flip_opp.
   eapply dy_precedes_dec_aux.
-  simpl. rewrite opp_shiftl. apply (proj1 (rings.flip_inv _ _)). eapply E2.
+  simpl. rewrite opp_shiftl. apply (proj1 (rings.flip_opp _ _)). eapply E2.
 Qed.
 Next Obligation. 
   intros x y E1 E2.
@@ -397,7 +389,7 @@ Section DtoQ.
     then ZtoQ (mant x ≪ exist _ (expo x) _)
     else ZtoQ (mant x) // (ZtoQ (1 ≪ (exist _ (-expo x) _))).
   Next Obligation. 
-    apply rings.flip_nonpos_inv.
+    apply rings.flip_nonpos_opp.
     now apply orders.precedes_flip.
   Qed.
   Next Obligation.
