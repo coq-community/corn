@@ -452,11 +452,6 @@ Qed.
 
 (** factorial *)
 
-Lemma fac_fact : forall i, fac i = fact i.
-Proof.
- reflexivity.
-Qed.
-
 Lemma R_nring_as_IR : forall i, RasIR (nring i) [=] nring i.
 Proof.
  induction i.
@@ -498,20 +493,19 @@ Proof.
  apply series_sum_wd.
  intro i.
  autorewrite with RtoIR.
- rewrite <- fac_fact.
- replace (/ nring (fac i)) with (1 / nring (fac i)).
+ replace (/ nring (fact i)) with (1 / nring (fact i)).
   2: field; apply (nring_fac_ap_zero RReals i).
- cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fac i)))).
+ cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fact i)))).
   intro Hy.
-  rewrite -> (R_recip_as_IR (nring (fac i)) Hy).
+  rewrite -> (R_recip_as_IR (nring (fact i)) Hy).
   clear.
   rewrite -> (cg_inv_zero IR (RasIR x)).
   apply mult_wdl.
   apply div_wd.
    reflexivity.
-  apply (R_nring_as_IR (fac i)).
+  apply (R_nring_as_IR (fact i)).
  simpl.
- stepl (nring (R:=IR) (fac i)).
+ stepl (nring (R:=IR) (fact i)).
   apply (nring_fac_ap_zero IR i).
  symmetry.
  apply (R_nring_as_IR).
@@ -542,12 +536,12 @@ Proof.
  rewrite (plus_comm n (S (n + 0))).
  simpl.
  rstepr ( seq_part_sum (fun n0 : nat =>
-   (cos_seq n0[/]nring (R:=IR) (fac n0)[//]nring_fac_ap_zero IR n0)[*]
+   (cos_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
      nexp IR n0 (RasIR x[-]Zero)) (n + 0 + n)[+] (
-       (cos_seq (n + 0 + n)[/]nring (R:=IR) (fac (n + 0 + n))[//]
+       (cos_seq (n + 0 + n)[/]nring (R:=IR) (fact (n + 0 + n))[//]
          nring_fac_ap_zero IR (n + 0 + n))[*]nexp IR (n + 0 + n) (RasIR x[-]Zero)[+]
            (cos_seq (S (n + 0 + n))[/]
-             nring (R:=IR) (fac (n + 0 + n) + (n + 0 + n) * fac (n + 0 + n))[//]
+             nring (R:=IR) (fact (n + 0 + n) + (n + 0 + n) * fact (n + 0 + n))[//]
                nring_fac_ap_zero IR (S (n + 0 + n)))[*]
                  (nexp IR (n + 0 + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero))) ).
  apply bin_op_wd_unfolded.
@@ -566,7 +560,7 @@ Proof.
  destruct s0; simpl.
   elimtype False; auto with *.
  autorewrite with RtoIR.
- stepr ( (nexp IR x0 [--]One[/]nring (R:=IR) (fac (n + n))[//]
+ stepr ( (nexp IR x0 [--]One[/]nring (R:=IR) (fact (n + n))[//]
    nring_fac_ap_zero IR (n + n))[*]nexp IR (n + n) (RasIR x[-]Zero) ).
   apply bin_op_wd_unfolded.
    replace (n + 0)%nat with n by auto with *.
@@ -592,7 +586,7 @@ Proof.
   apply bin_op_wd_unfolded.
    reflexivity.
   rational.
- setoid_replace ((Zero[/]nring (R:=IR) (fac (n + n) + (n + n) * fac (n + n))[//]
+ setoid_replace ((Zero[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
    nring_fac_ap_zero IR (S (n + n)))[*] (nexp IR (n + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero)))
      with (Zero:IR).
   rational.
@@ -640,11 +634,11 @@ Proof.
  destruct s0; simpl.
   elimtype False; auto with *.
  rstepr ( seq_part_sum (fun n0 : nat =>
-   (sin_seq n0[/]nring (R:=IR) (fac n0)[//]nring_fac_ap_zero IR n0)[*]
+   (sin_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
      nexp IR n0 (RasIR x[-]Zero)) (n + n)[+](
-       (Zero[/]nring (R:=IR) (fac (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
+       (Zero[/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
          nexp IR (n + n) (RasIR x[-]Zero)[+]
-           (nexp IR x1 [--]One[/]nring (R:=IR) (fac (n + n) + (n + n) * fac (n + n))[//]
+           (nexp IR x1 [--]One[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
              nring_fac_ap_zero IR (S (n + n)))[*]
                (nexp IR (n + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero))) ).
  apply bin_op_wd_unfolded.
@@ -652,9 +646,9 @@ Proof.
  setoid_replace (RasIR x [-] Zero) with (RasIR x);[|rational].
  replace x1 with n by omega.
  clear.
- setoid_replace ((Zero[/]nring (R:=IR) (fac (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
+ setoid_replace ((Zero[/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
    nexp IR (n + n) (RasIR x)) with (Zero:IR);[|rational].
- rstepr ( RasIR x [*] ( (nexp IR n [--]One[/]nring (R:=IR) (fac (n + n) + (n + n) * fac (n + n))[//]
+ rstepr ( RasIR x [*] ( (nexp IR n [--]One[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
    nring_fac_ap_zero IR (S (n + n)))[*](nexp IR (n + n) (RasIR x))) ).
  apply bin_op_wd_unfolded.
   reflexivity.
@@ -668,7 +662,6 @@ Proof.
     autorewrite with RtoIR; reflexivity.
    autorewrite with RtoIR.
    apply nring_wd.
-   rewrite <- fac_fact.
    replace (n + n + 1)%nat with (S (n + n)) by omega.
    simpl.
    reflexivity.
