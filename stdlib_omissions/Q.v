@@ -1,6 +1,5 @@
-
 Require Import
-  QArith ZArith NArith
+  QArith ZArith NArith Qpower Qround
   Qround Qabs List.
 
 Require stdlib_omissions.Z.
@@ -8,6 +7,20 @@ Require stdlib_omissions.Z.
 Set Automatic Introduction.
 
 Open Scope Q_scope.
+
+Lemma Qnum_nonneg (x : Q) : (0 <= Qnum x)%Z <-> (0 <= x)%Q.
+Proof.
+  destruct x as [n d].
+  unfold Qle. simpl.
+  now rewrite Zmult_1_r.
+Qed.
+
+Lemma Qnum_nonpos (x : Q) : (Qnum x <= 0)%Z <-> (x <=  0)%Q.
+Proof.
+  destruct x as [n d].
+  unfold Qle. simpl.
+  now rewrite Zmult_1_r.
+Qed.
 
 Lemma Qle_dec x y: {Qle x y} + {~Qle x y}.
   intros.
@@ -57,12 +70,6 @@ Proof with simpl; try reflexivity.
  rewrite <- (Zopp_involutive (Zpos p)).
  rewrite Zdiv_opp_opp...
 Qed.
-
-Lemma QMake_Qdiv (n : Z) (d : positive) : n # d = (inject_Z n / inject_Z (Zpos d))%Q.
-Proof.
-  unfold Qdiv, Qinv, Qmult. simpl.
-  rewrite Zmult_1_r. reflexivity.
-Qed. 
 
 Lemma Qle_nat (n: nat): 0 <= inject_Z (Z_of_nat n).
 Proof. rewrite <- (Zle_Qle 0). apply Zle_0_nat. Qed.
@@ -145,6 +152,82 @@ Proof.
  rewrite <- Qopp_plus.
  rewrite Qplus_comm.
  apply Qabs_opp.
+Qed.
+
+Lemma Qlt_floor_alt (x : Q) :
+  x - 1 < inject_Z (Qfloor x).
+Proof.
+  apply Qplus_lt_l with 1.
+  ring_simplify.
+  change 1 with (inject_Z 1).
+  rewrite <-inject_Z_plus.
+  apply Qlt_floor.
+Qed.
+
+Lemma Qfloor_pos (x : Q) : 
+  1 <= x -> (0 < Qfloor x)%Z.
+Proof.
+  intros E.
+  rewrite Zlt_Qlt.
+  apply Qle_lt_trans with (x - 1).
+   apply Qplus_le_l with 1.
+   now ring_simplify.
+  apply Qlt_floor_alt.
+Qed.
+
+Lemma Qpower_not_0 (a : Q) (n : Z) : 
+  ~a==0 -> ~a ^ n == 0.
+Proof.
+  intros E1.
+  destruct n; simpl.
+    discriminate.
+   now apply Qpower_not_0_positive.
+  intros E2.
+  destruct (Qpower_not_0_positive a p).
+   easy.
+  now rewrite <-Qinv_involutive, E2.
+Qed.
+
+Lemma Qpower_0_lt (a : Q) (n : Z) : 
+  0 < a -> 0 < a ^ n.
+Proof.
+  intros E1.
+  destruct (Qle_lt_or_eq 0 (a ^ n)) as [E2|E2]; try assumption.
+   now apply Qpower_pos, Qlt_le_weak.
+  symmetry in E2. contradict E2.
+  apply Qpower_not_0.
+  intros E3. symmetry in E3. 
+  now destruct (Qlt_not_eq 0 a).
+Qed.
+
+Lemma Qneq_symmetry (x y : Q) :
+  ~x == y -> ~y == x.
+Proof. firstorder. Qed.
+
+Lemma Qdiv_flip_le (x y : Q) :
+  0 < x -> x <= y -> /y <= /x.
+Proof.
+  intros E1 E2.
+  assert (0 < y) by now apply Qlt_le_trans with x.
+  apply Qmult_le_l with x; try assumption.
+  apply Qmult_le_l with y; try assumption.
+  field_simplify. 
+    unfold Qdiv. now rewrite 2!Qmult_1_r.
+   now apply Qneq_symmetry, Qlt_not_eq.
+  now apply Qneq_symmetry, Qlt_not_eq.
+Qed.
+
+Lemma Qdiv_flip_lt (x y : Q) :
+  0 < x -> x < y -> /y < /x.
+Proof.
+  intros E1 E2.
+  assert (0 < y) by now apply Qlt_trans with x.
+  apply Qmult_lt_l with x; try assumption.
+  apply Qmult_lt_l with y; try assumption.
+  field_simplify. 
+    unfold Qdiv. now rewrite 2!Qmult_1_r.
+   now apply Qneq_symmetry, Qlt_not_eq.
+  now apply Qneq_symmetry, Qlt_not_eq.
 Qed.
 
 (* Properties of arithmetic w.r.t. order: *)
