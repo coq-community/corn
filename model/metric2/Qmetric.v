@@ -26,6 +26,7 @@ Require Import COrdAbs.
 Require Import Qordfield.
 Require Import Qabs.
 Require Import CornTac.
+Require Import UniformContinuity.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -263,6 +264,19 @@ Proof.
  split; simpl; ring_simplify; assumption.
 Qed. 
 
+Lemma nonneg_in_Qball_0 (x : Q) (Eq : 0 <= x) (ε : Qpos) : 
+  x <= ε <-> ball ε x 0.
+Proof.
+  rewrite <-in_Qball.
+  split.
+   intros ?. split.
+    apply (Q.Qplus_le_r ε). now ring_simplify.
+   now apply Q.Qplus_nonneg; auto with *.
+  intros [? ?].
+  apply (Q.Qplus_le_r (-ε)). 
+  rewrite Qplus_comm. now ring_simplify.
+Qed.
+
 Section Qball_Qmult.
 
   Variables (d : Qpos) (z x y: Q) (B: Qball (d / QabsQpos z) x y).
@@ -327,6 +341,18 @@ Proof with auto.
  setoid_replace (x + y - (x + y')) with (y - y') by (simpl; ring)...
 Qed.
 
+Lemma Qball_0_r (e: Qpos) : Qball e e 0.
+Proof with auto with qarith.
+ apply Qball_Qabs. 
+ setoid_replace (e - 0) with e by ring.
+ rewrite Qabs_pos...
+Qed.
+
+Lemma Qball_0_l (e: Qpos) : Qball e 0 e.
+Proof with auto with qarith.
+ apply ball_sym. apply Qball_0_r.
+Qed.
+
 Lemma Qball_Qdiv_inv (d z: Qpos) (x y: Q):
   Qball (d / z) (x / z) (y / z) -> Qball d x y.
 Proof with auto.
@@ -367,4 +393,33 @@ Proof with auto with *.
  symmetry.
  rewrite injz_plus.
  reflexivity.
+Qed.
+
+(** A boolean version of Qball. *)
+Definition Qball_ex_bool e a b : bool := 
+ match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
+
+Instance: Proper (QposInfEq ==> @st_eq _ ==> @st_eq _ ==> eq) Qball_ex_bool.
+Proof.
+  intros [ε1|] [ε2|] E1 x1 x2 E2 y1 y2 E3; try easy.
+  unfold Qball_ex_bool.
+  case (ball_ex_dec _ Qmetric_dec ε1 x1 y1); case (ball_ex_dec _ Qmetric_dec ε2 x2 y2); intros E4 E5; try easy.
+   destruct E4. now eapply ball_wd; eauto; symmetry.
+  destruct E5. now eapply ball_wd; eauto; symmetry.
+Qed.
+
+Lemma sumbool_eq_true P (dec: {P}+{~P}) : match dec with left _ => true | right _ => false end = true <-> P.
+Proof.
+ intros.
+ destruct dec; simpl; split; auto.
+ discriminate 1.
+Qed.
+
+Lemma Qball_ex_bool_correct (ε : Qpos) x y : Is_true (Qball_ex_bool ε x y) <-> Qball ε x y.
+Proof.
+  split; intros E.
+   apply Is_true_eq_true in E.
+   now apply sumbool_eq_true in E.
+  apply Is_true_eq_left.
+  now apply sumbool_eq_true.
 Qed.
