@@ -38,6 +38,9 @@
 
 Require Export ZArith.
 Require Import CLogic.
+Require Import Setoid.
+
+Instance Z_default : @DefaultRelation Z (@eq Z) | 3.
 
 (**
 * [Z]

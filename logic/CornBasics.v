@@ -53,8 +53,11 @@ Require Export List.
 Declare ML Module "ssreflect".
 Require Export ssreflect.
 Require Import Eqdep_dec.
+Require Import Setoid.
 
 Set Automatic Introduction.
+
+Instance: @DefaultRelation nat eq | 3.
 
 (**
 * Basics

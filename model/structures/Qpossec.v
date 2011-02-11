@@ -68,7 +68,7 @@ Program Definition integral_Qpos (p: positive): Qpos := (p:Q).
 Coercion integral_Qpos: positive >-> Qpos.
 
 (** There is an injection from [Qpos] to [Q] that we make into a
-coersion. *)
+coercion. *)
 
 Definition QposAsQ: Qpos -> Q := @proj1_sig _ _.
 
@@ -351,19 +351,15 @@ Proof.
 Defined.
 
 Infix "^" := Qpos_power : Qpos_scope.
-
-(** The default relation on Z is [eqm] otherwise. *)
-Instance Z_default : @DefaultRelation Z (@eq Z).
 (* begin hide *)
-Add Morphism Qpos_power : Qpos_power_wd.
+Instance Qpos_power_wd: Proper (QposEq ==> @eq Z ==> QposEq) Qpos_power.
 Proof.
- intros x1 x2 Hx y.
+ intros x1 x2 Hx y1 y2 Hy.
  unfold QposEq in *.
  unfold Qpos_power.
  autorewrite with QposElim.
  simpl.
- rewrite -> Hx.
- reflexivity.
+ now rewrite Hx Hy.
 Qed.
 (* end hide *)
 Lemma Q_Qpos_power : forall (x:Qpos) z, ((x^z)%Qpos:Q)==(x:Q)^z.
