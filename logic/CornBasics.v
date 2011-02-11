@@ -186,20 +186,6 @@ Fixpoint power (m : nat) : nat -> nat :=
   | S n => fun x : nat => power n x * x
   end.
 
-(** Factorial function. Does not exist in Arith.
-Needed for special operations on polynomials. *)
-
-Fixpoint fac (n : nat) : nat :=
-  match n with
-  | O => 1
-  | S m => S m * fac m
-  end.
-
-Lemma nat_fac_gtzero : forall n : nat, 0 < fac n.
-Proof.
- simple induction n; simpl in |- *; auto with arith.
-Qed.
-
 (* needed for computational behavior of "Inversion" tactic *)
 Transparent sym_eq.
 Transparent f_equal.

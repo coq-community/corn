@@ -1303,7 +1303,7 @@ Proof.
     astepl ((Two:IR) [*]Zero); apply mult_resp_less_lft.
      apply pos_nring_fac.
     apply pos_two.
-   cut (fac (S n) = S n * fac n).
+   cut (fact (S n) = S n * fact n).
     2: simpl in |- *; auto with arith.
    intro.
    rewrite H0.

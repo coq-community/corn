@@ -557,11 +557,11 @@ Proof.
  exact (pos_Snring m).
 Qed.
 
-Lemma nring_fac_ap_zero : forall n : nat, nring (R:=R) (fac n) [#] Zero.
+Lemma nring_fac_ap_zero : forall n : nat, nring (R:=R) (fact n) [#] Zero.
 Proof.
- intro n; apply nring_ap_zero. cut (0 < fac n).
+ intro n; apply nring_ap_zero. cut (0 < fact n).
  omega.
- apply nat_fac_gtzero.
+ apply lt_O_fact.
 Qed.
 
 Load "Opaque_algebra".
@@ -1481,12 +1481,12 @@ Proof.
  apply H.
 Qed.
 
-Lemma pos_nring_fac : forall n : nat, Zero [<] nring (R:=R) (fac n).
+Lemma pos_nring_fac : forall n : nat, Zero [<] nring (R:=R) (fact n).
 Proof.
  intro.
  astepl (nring (R:=R) 0).
  apply nring_less.
- apply nat_fac_gtzero.
+ apply lt_O_fact.
 Qed.
 
 Lemma Smallest_less_Average : forall a b : R, a [<] b -> a [<] (a[+]b) [/]TwoNZ.

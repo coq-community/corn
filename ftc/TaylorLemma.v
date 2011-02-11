@@ -497,7 +497,7 @@ Proof.
   set (x5 := Build_subcsetoid_crr IR _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) in *.
   simpl in (value of x5); fold x5 in |- *.
   set (fiSSp := fi (S n) Hf' (S (S p)) (lt_n_S (S p) (S n) Hi')) in *.
-  set (pp := One[/] nring (fac p + p * fac p) [//]nring_fac_ap_zero IR (S p)) in *.
+  set (pp := One[/] nring (fact p + p * fact p) [//]nring_fac_ap_zero IR (S p)) in *.
   set (bxp := nexp _ p (b[-]x)) in *.
   set (a1 := fiSp1 x1) in *; set (a5 := fiSSp x5) in *;
     simpl in (value of a1), (value of a5); fold a1 a5 in |- *.
@@ -512,12 +512,12 @@ Proof.
   apply mult_wdr; apply div_wd.
    algebra.
   clear X H bxp pp x5 x4 x3 x2 x1 fiSSp fiSp1 fiSp2 Hx.
-  cut (fac p + p * fac p = fac p * S p).
+  cut (fact p + p * fact p = fact p * S p).
    intro; rewrite H.
    eapply eq_transitive_unfolded.
     apply nring_comm_mult.
    algebra.
-  transitivity (S p * fac p); auto with arith.
+  transitivity (S p * fact p); auto with arith.
  unfold fiSp1, fiSp2 in |- *.
  apply eq_transitive_unfolded with (PartInt (fi n Hf (S p) Hi') (scs_elem _ _ x0) (scs_prf _ _ x0)).
   2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S p) (lt_n_S _ _ (lt_5 _ _ Hi')))
