@@ -2,15 +2,13 @@ Require
   theory.jections.
 Require Import 
   Setoid CornTac
-  stdlib_omissions.Q QMinMax QposMinMax
+  stdlib_omissions.Q QMinMax QposMinMax Qposclasses
   RSetoid CSetoids
   Complete Prelength
   abstract_algebra.
 
-Generalizable All Variables.
 Set Automatic Introduction.
-
-Open Scope uc_scope.
+Open Local Scope uc_scope.
 
 (* Given an embedding of a setoid [X] into a metric space [Y] then [X] is also a 
    metric space. Moreover this embedding is uniformly continuous. *)
@@ -23,17 +21,17 @@ Section metric_embedding.
   Global Instance Eball_wd : Proper (QposEq ==> (=) ==> (=) ==> iff) Eball.
   Proof.
     intros ?? E ?? F ?? G. unfold Eball.
-    rewrite E F G. reflexivity.
+    now rewrite E F G.
   Qed.
 
   Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
-  Proof with eauto.
+  Proof.
     constructor; unfold ball; repeat intro.
-        apply ball_refl.
-       apply ball_sym...
-      eapply ball_triangle...
-     apply ball_closed...
-    apply (injective f). apply ball_eq...
+        now apply ball_refl.
+       now apply ball_sym.
+      now eapply ball_triangle; eauto.
+     now apply ball_closed.
+    apply (injective f). now apply ball_eq.
   Qed.
 
   Program Definition Emetric: MetricSpace := Build_MetricSpace _ is_MetricSpace.
@@ -43,10 +41,11 @@ Section metric_embedding.
   Lemma Eball_spec ε (x y : X) : ball ε x y ↔ ball ε (f x) (f y).
   Proof. intuition. Qed.
 
+  Lemma Eball_ex_spec ε (x y : X) : ball_ex ε x y ↔ ball_ex ε (f x) (f y).
+  Proof. destruct ε; intuition. Qed.
+
   Lemma metric_embed_uc_prf : is_UniformlyContinuousFunction (f : X → Y) Qpos2QposInf.
-  Proof. 
-    intros ε x y E. auto.
-  Qed.
+  Proof. now intros ε x y E. Qed.
 
   Definition metric_embed_uc : X --> Y 
     := Build_UniformlyContinuousFunction metric_embed_uc_prf.
@@ -56,13 +55,11 @@ End metric_embedding.
 Class AppInverse `(f : X → Y) := app_inverse : Y → Qpos → X.
 Implicit Arguments app_inverse [[X] [Y] [AppInverse]].
 
-Require Import Qposclasses.
-
 Class DenseEmbedding `{Equiv X} {Y : MetricSpace} (f : X → Y) `{!AppInverse f} := {
   dense_embed_setoid : Setoid X ;
   dense_injective :> Injective f ;
   dense_inverse_proper :> Proper ((=) ==> QposEq ==> (=)) (app_inverse f) ;
-  dense_inverse : ∀ x ε, ball ε x (f (app_inverse f x ε))
+  dense_inverse : ∀ x ε, ball ε (f (app_inverse f x ε)) x
 }.
 
 (* Given a dense embedding of a setoid [X] into a prelength space [Y] then [X] 
@@ -121,12 +118,12 @@ Section dense_prelength_embedding.
     exists (app_inverse f z ((1#3) * Qpos_min γ (Qpos_min δ1 δ2))). 
      setoid_replace δ1 with (mkQpos E1 + ((1#3) * Qpos_min δ1 γ))%Qpos at 1 by (unfold QposEq; simpl; ring).
      eapply ball_triangle; eauto.
-     eapply ball_weak_le. 2: apply dense_inverse...
+     eapply ball_weak_le. 2: now apply ball_sym, dense_inverse.
      simpl. autorewrite with QposElim.
      apply Qmult_le_compat_l; eauto with qarith.
     setoid_replace δ2 with (((1#3) * Qpos_min δ2 γ + mkQpos E2))%Qpos at 1 by (unfold QposEq; simpl; ring).
     eapply ball_triangle; eauto.
-    eapply ball_weak_le. 2: eapply ball_sym, dense_inverse...
+    eapply ball_weak_le. 2: now apply dense_inverse.
     simpl. autorewrite with QposElim.
     apply Qmult_le_compat_l; eauto with qarith.
   Qed.
@@ -146,25 +143,25 @@ Section dense_prelength_embedding.
 
   (* And back... *)
   Lemma dense_regular_prf (y : Y) : is_RegularFunction_noInf _ (app_inverse f y : Qpos → X).
-  Proof with auto.
+  Proof.
     intros ε1 ε2. simpl.
     eapply ball_triangle.
-     eapply ball_sym, dense_inverse...
-    eapply dense_inverse...
+     now eapply dense_inverse.
+    now eapply ball_sym, dense_inverse.
   Qed.
  
   Definition dense_regular (y : Y) : Complete X 
     := mkRegularFunction (app_inverse f y 1 : X) (dense_regular_prf y).
 
   Definition metric_embed_back_prf : is_UniformlyContinuousFunction dense_regular Qpos2QposInf.
-  Proof with auto.
+  Proof.
     intros ε x y E δ1 δ2. 
     simpl in *. 
     eapply ball_triangle.
      eapply ball_triangle.
-      eapply ball_sym, dense_inverse...
+      now eapply dense_inverse.
      apply E.
-    eapply dense_inverse...
+    now eapply ball_sym, dense_inverse.
   Qed.
 
   Definition metric_embed_back_uc : Y --> Complete X 
@@ -176,15 +173,15 @@ Section dense_prelength_embedding.
   Instance: Setoid_Morphism Eembed_inverse.
 
   Instance Eembed_surjective : Surjective Eembed.
-  Proof with auto.
+  Proof.
     split; [| apply _].
     intros x y E. rewrite <-E. 
     intros ε1 ε2.
     simpl. unfold Cjoin_raw. simpl.
     setoid_replace (ε1 + ε2)%Qpos with ((1#2) * ε1 + ((1#2) * ε1 + ε2))%Qpos by QposRing.
     eapply ball_triangle.
-     eapply ball_sym, dense_inverse...
-    eapply regFun_prf.
+     now eapply dense_inverse.
+    now apply regFun_prf.
   Qed.
 
   Global Instance: Bijective Eembed.
@@ -195,16 +192,16 @@ Section dense_prelength_embedding.
 
   Let F := Eembed.
 
-  (* If we have a unary function [f] on [X] which agrees with a uniformly continious 
-     function g on [Y], then [f] is also uniformly continious and moreover [map f] 
-     and [map g] agree. *)
+  (* Given a function [g : X → X] that agrees with a uniformly continious 
+     function [h : Y → Y], then [g] is also uniformly continious. Moreover, [map g] 
+     and [map h] agree. *)
   Section unary_functions.
     Context (g' : X' → X') (h : Y --> Y) (g_eq_h : ∀ x, f (g' x) = h (f x)).
     
-    Definition unary_uc_prf : is_UniformlyContinuousFunction (g' : X → X) (mu h).
-    Proof with auto.
-      repeat intro. apply Eball_spec. do 2 rewrite g_eq_h.
-      eapply uc_prf. destruct (mu h e0)...
+    Lemma unary_uc_prf : is_UniformlyContinuousFunction (g' : X → X) (mu h).
+    Proof.
+      intros ε ? ? ?. apply Eball_spec. rewrite 2!g_eq_h.
+      eapply uc_prf. now destruct (mu h ε).
     Qed.
 
     Definition unary_uc : X --> X := Build_UniformlyContinuousFunction unary_uc_prf.
@@ -224,12 +221,12 @@ Section dense_prelength_embedding.
     
     Program Let g'' (x : X) := unary_uc (g' x) (h (f x)) _.
 
-    Definition binary_uc_prf : is_UniformlyContinuousFunction (g'' : X → (X --> X)) (mu h).
-    Proof with auto.
-      intros ε x y E z. 
-      apply Eball_spec. do 2 rewrite g_eq_h.
-      apply (uc_prf h)...
-      destruct (mu h ε)...
+    Lemma binary_uc_prf : is_UniformlyContinuousFunction (g'' : X → (X --> X)) (mu h).
+    Proof.
+      intros ε x y E z.
+      apply Eball_spec. rewrite 2!g_eq_h.
+      apply (uc_prf h).
+      now destruct (mu h ε).
     Qed.
 
     Definition binary_uc : X --> X --> X := Build_UniformlyContinuousFunction binary_uc_prf.
@@ -239,9 +236,41 @@ Section dense_prelength_embedding.
     Proof.
       intros ? ?. apply regFunEq_e. intros ε. 
       simpl. unfold Cap_raw. simpl. 
-      rewrite g_eq_h. do 2 rewrite QposInf_bind_id. 
+      rewrite g_eq_h. rewrite 2!QposInf_bind_id. 
       apply ball_refl.
     Qed.
   End binary_functions.
 
+  (* Given a function [g : X → Complete X] that agrees with a uniformly continious 
+     function [h : Y → Complete Y], then [g] is also uniformly continious. Moreover, [bind g] 
+     and [bind h] agree. *)
+  Section unary_complete_functions.
+    Context (g' : X' → Complete X) (h : Y --> Complete Y) (g_eq_h : ∀ x, F (g' x) = h (f x)).
+    
+    Definition unary_complete_uc_prf : is_UniformlyContinuousFunction (g' : X → Complete X) (mu h).
+    Proof.
+      intros ε x y E δ1 δ2. apply Eball_spec.
+      apply ball_closed. intros δ3.
+      setoid_replace (δ1 + ε + δ2 + δ3) with ((δ1 + (1#4) * δ3) + ((1#4) * δ3 + ε + (1#4) * δ3) + (δ2 + (1#4) * δ3))%Qpos by QposRing.
+      eapply ball_triangle.
+       2: apply ball_sym, (g_eq_h y).
+      eapply ball_triangle.
+       apply (g_eq_h x).
+      apply Eball_ex_spec in E.
+      now apply (uc_prf h).
+    Qed.
+
+    Definition unary_complete_uc : X --> Complete X := Build_UniformlyContinuousFunction unary_complete_uc_prf.
+    Let g := unary_complete_uc.
+
+    Lemma preserves_unary_complete_fun x : F (Cbind plX g x) = Cbind plY h (F x).
+    Proof.
+      intros ? ?. apply regFunEq_e. intros ε.
+      simpl. unfold Cjoin_raw. simpl.
+      rewrite QposInf_bind_id.
+      apply ball_weak.
+      setoid_replace ε with ((1#2) * ε + (1#2) * ε)%Qpos at 1 by QposRing.
+      now apply (g_eq_h (approximate x (mu h ((1 # 2) * ε)))).
+    Qed.
+  End unary_complete_functions.
 End dense_prelength_embedding.
