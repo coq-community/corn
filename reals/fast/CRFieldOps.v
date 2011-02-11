@@ -687,12 +687,12 @@ Proof.
   rewrite E F. reflexivity.
 Qed.
 
-Instance: Proper (QposEq ==> @st_eq _ ==> @st_eq _) CRinv_pos.
-Proof with auto; try reflexivity.
-  intros c1 c2 E x1 x2 F. simpl.
-  rewrite F.
-  setoid_replace (Qinv_pos_uc c1) with (Qinv_pos_uc c2)...
-  intros y. apply CRinv_pos_uc_Proper...
+Instance: Proper (QposEq ==> @st_eq _) CRinv_pos.
+Proof.
+  intros c1 c2 E x. simpl.
+  setoid_replace (Qinv_pos_uc c1) with (Qinv_pos_uc c2).
+   easy.
+  intros y. now apply CRinv_pos_uc_Proper.
 Qed.
 
 Lemma CRinv_pos_Qinv : forall (c:Qpos) x, (c <= x)%Q -> (CRinv_pos c (' x) == (' (/x)))%CR.
