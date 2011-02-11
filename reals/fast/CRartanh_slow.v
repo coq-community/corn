@@ -50,8 +50,7 @@ Lemma arctanSequence_Gs : forall a, GeometricSeries (a^2) (arctanSequence a).
 Proof.
  intros a.
  apply mult_Streams_Gs.
-  apply everyOther_dnn.
-  apply recip_positives_dnn.
+  apply _.
  apply powers_help_Gs.
  apply Qsqr_nonneg.
 Qed.
@@ -181,5 +180,5 @@ Proof.
  apply even_plus_n_n.
 Qed.
 
-(* This development is incomplete.  At the moment only what is need
+(* This development is incomplete.  At the moment only what is needed
 for logorithm has been developed. *)

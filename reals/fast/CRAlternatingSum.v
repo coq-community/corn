@@ -35,94 +35,16 @@ Require Import Qpower.
 Require Export Streams.
 Require Import PowerSeries.
 Require Import CornTac.
-
-Set Implicit Arguments.
+Require Import Qclasses.
+Require Import abstract_algebra theory.series theory.streams.
 
 Opaque CR.
-
-Open Local Scope Q_scope.
 
 (**
 ** Computing Alternating Series.
 Alternating series are particularly nice to sum because each term is also
 a bound on the error of the partial sum.
-*** Decreasing and Nonnegative
 *)
-
-(** We characterize a decreasing nonnegative stream of rational numbers
-by saying at every point in the stream s, then every
-further point in the stream is in [[0,s]]. *)
-Definition DecreasingNonNegative := ForAll (fun (s:Stream Q) => ForAll (fun (t:Stream Q) => 0 <= (hd t) <= (hd s)) s).
-
-(** An alternative charactherization is that at every point in the stream
-the second element is in between 0 and the head element. *)
-Definition DecreasingNonNegative_alt := ForAll (fun (s:Stream Q) => 0 <= (hd (tl s)) <= (hd s)).
-
-(** These two characterizations are equivalent. *)
-Lemma dnn_alt_dnn : forall s, DecreasingNonNegative_alt s -> DecreasingNonNegative s.
-Proof.
- cofix r1.
- intros s H.
- constructor.
-  cut (hd s <= hd s);[|apply Qle_refl].
-  set (x:=hd s).
-  unfold x at 1.
-  generalize s H x.
-  clear s H x.
-  cofix r2.
-  intros s H x Hx.
-  constructor.
-   destruct H.
-   split.
-    apply Qle_trans with (hd (tl s)); firstorder.
-   assumption.
-  destruct H.
-  apply r2.
-   apply H0.
-  apply Qle_trans with (hd s); firstorder.
- destruct H.
- apply r1.
- apply H0.
-Qed.
-
-Lemma dnn_dnn_alt : forall s, DecreasingNonNegative s -> DecreasingNonNegative_alt s.
-Proof.
- cofix.
- intros s H.
- constructor.
-  destruct H.
-  destruct H.
-  destruct H1.
-  assumption.
- apply dnn_dnn_alt.
- destruct H; assumption.
-Qed.
-
-Lemma dnn_alt_iff_dnn : forall s, DecreasingNonNegative_alt s <-> DecreasingNonNegative s.
-Proof.
- firstorder using dnn_alt_dnn dnn_dnn_alt.
-Qed.
-
-(** Every tail of a decreasing nonnegative stream is also decreasing and
-nonnegative. *)
-Lemma dnn_tl : forall s, DecreasingNonNegative s -> DecreasingNonNegative (tl s).
-Proof.
- intros s [_ H].
- assumption.
-Qed.
-(* begin hide *)
-Hint Resolve dnn_tl : dnn.
-(* end hide *)
-Lemma dnn_Str_nth_tl : forall n s, DecreasingNonNegative s -> DecreasingNonNegative (Str_nth_tl n s).
-Proof.
- induction n.
-  tauto.
- intros s X.
- simpl.
- apply IHn.
- apply dnn_tl.
- assumption.
-Qed.
 
 Section InfiniteAlternatingSum.
 (* begin hide *)
@@ -131,148 +53,222 @@ Coercion Local Is_true : bool >-> Sortclass.
 (** Given a stream, we can compute its alternating partial sum up to
 an point satifying a predicate, so long as that predicate eventually
 exists. *)
-Definition PartialAlternatingSumUntil (P:Stream Q -> bool)(seq:Stream Q)(ex:LazyExists P seq) : Q :=
-(takeUntil P ex Qminus' 0).
+
+Definition PartialAlternatingSumUntil {P : Stream Q → bool} `(ex : LazyExists P s) : Q := takeUntil P ex Qminus' 0.
 
 (** The value of the partial sum is between 0 and the head of the
 sequence if the sequence is decreasing and nonnegative. *)
-Lemma PartialAlternatingSumUntil_small : forall (P:Stream Q -> bool)(seq:Stream Q)(dnn:DecreasingNonNegative seq)(ex:LazyExists P seq), 0 <= (PartialAlternatingSumUntil P ex) <= (hd seq).
-Proof.
- intros P seq dnn ex.
- unfold PartialAlternatingSumUntil.
- generalize dnn; clear dnn.
- set (Q := (fun seq b => DecreasingNonNegative seq -> 0 <= b <= hd seq)).
- change (Q seq (takeUntil P ex Qminus' 0)).
- apply takeUntil_elim; unfold Q; clear seq ex Q.
-  intros seq _ [[[dnn _] _] _]; auto with *.
- intros seq b IH H [[[Za Zb] [[_ Zd] _]] dnn].
- destruct (IH dnn) as [H0 H1].
- split.
-  rewrite -> Qminus'_correct.
-  apply: shift_zero_leEq_minus.
-  apply Qle_trans with (hd (tl seq)); auto.
- rewrite -> Qle_minus_iff.
- rewrite -> Qminus'_correct.
- ring_simplify.
- assumption.
+Lemma PartialAlternatingSumUntil_take_small (s : Stream Q) {dnn : DecreasingNonNegative s} (n : nat) : 
+  0 ≤ take s n Qminus' 0 ≤ hd s.
+Proof with try easy.
+  revert s dnn.
+  induction n; simpl.
+   split... now apply dnn_hd_nonneg.
+  intros s dnn. 
+  rewrite Qminus'_correct. unfold Qminus.
+  split.
+   apply rings.flip_nonneg_minus.
+   transitivity (hd (tl s)).
+    now apply (IHn _ _).
+   now destruct dnn as [[? ?] ?].
+  setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
+  apply (order_preserving _).
+  apply rings.flip_nonneg_opp. 
+  now apply (IHn _ _).
 Qed.
 
-(** A boolean version of Qball. *)
-Definition Qball_ex_bool e a b : bool :=
- match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
-
-Lemma sumbool_eq_true : forall P (dec:{P}+{~P}), (match dec with left _ => true | right _ => false end) = true <-> P.
+Lemma PartialAlternatingSumUntil_small {P : Stream Q → bool} `(ex : LazyExists P s) {dnn : DecreasingNonNegative s} : 
+  0 ≤ PartialAlternatingSumUntil ex ≤ hd s.
 Proof.
- intros.
- destruct dec; simpl;split;auto.
- discriminate 1.
+  unfold PartialAlternatingSumUntil.
+  rewrite takeUntil_correct.
+  apply PartialAlternatingSumUntil_take_small, _.
 Qed.
 
-(** If a sequence has a limit of l, then there is a point that gets
-arbitrarily close to l. *)
-Lemma Limit_near : forall (seq:Stream Q) (l:Q), Limit seq l -> forall e, LazyExists (fun s => Qball_ex_bool e (hd s) l) seq.
+Lemma dnn_in_Qball_bool_0_tl (s : Stream Q) {dnn : DecreasingNonNegative s} (ε : Qpos) :
+  Qball_ex_bool ε (hd s) 0 → Qball_ex_bool ε (hd (tl s)) 0.
 Proof.
- intros seq l H e.
- assert (H' := (H e)).
- induction H'.
+  intros E.
+  apply Qball_ex_bool_correct.
+  apply (nonneg_in_Qball_0 (dnn_hd_nonneg (dnn_tl dnn))).
+  transitivity (hd s).
+   now destruct dnn as [[? ?] _].
+  apply (nonneg_in_Qball_0 (dnn_hd_nonneg dnn)).
+  now apply Qball_ex_bool_correct.
+Qed.
+
+Lemma dnn_in_Qball_bool_0_Str_nth_tl (seq:Stream Q) {dnn : DecreasingNonNegative seq} (n : nat) (ε : Qpos) :
+  Qball_ex_bool ε (hd seq) 0 → Qball_ex_bool ε (hd (Str_nth_tl n seq)) 0.
+Proof.
+  induction n.
+   easy.
+  intros E. 
+  simpl. rewrite <-tl_nth_tl.
+  now apply (dnn_in_Qball_bool_0_tl _ _), IHn.
+Qed.
+
+Lemma dnn_in_Qball_0_EventuallyForall (s : Stream Q) {dnn : DecreasingNonNegative s} (ε : Qpos) :
+  EventuallyForAll (λ s, Qball_ex_bool ε (hd s) 0) s.
+Proof.
+  revert s dnn.
+  cofix FIX. intros dnn.
+  constructor.
+   apply (dnn_in_Qball_bool_0_tl _ _).
+  simpl.
+  apply (FIX _ _).
+Qed.
+
+(** If a sequence has a limit of [l], then there is a point that gets arbitrarily close to [l]. *)
+Lemma Limit_near (s : Stream Q) (l:Q) {zl : Limit s l} ε : LazyExists (λ s, Qball_ex_bool ε (hd s) l) s.
+Proof.
+ assert (zl':=zl ε).
+ induction zl' as [s nb | ? ? IH].
   left.
-  destruct H0 as [H0 _].
+  destruct nb as [nb _].
   unfold Qball_ex_bool.
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (hd x) l).
+  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (hd s) l) as [|n].
    constructor.
   apply n; clear n.
-  apply H0.
+  apply nb.
  right.
- rename H1 into IHH'.
  intro.
- apply (IHH' tt).
- apply Limit_tl.
- assumption.
+ apply (IH tt _).
 Defined.
 
-(** The infinte sum of an alternating series is the limit of the
-partial sums. *)
-Definition InfiniteAlternatingSum_raw (seq:Stream Q)(zl:Limit seq 0)(e:QposInf) :=
-PartialAlternatingSumUntil _ (Limit_near zl e).
+(** The infinte sum of an alternating series is the limit of the partial sums. *)
+Definition InfiniteAlternatingSum_raw (s : Stream Q) `{zl : !Limit s 0} (ε : QposInf) := PartialAlternatingSumUntil (Limit_near s 0 ε).
 
-Lemma InfiniteAlternatingSum_prf : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0), is_RegularFunction (InfiniteAlternatingSum_raw zl).
-Proof.
- Opaque Qmetric_dec.
- intros seq dnn zl.
- unfold is_RegularFunction, ball, Qball.
- simpl.
- (*WLOG e2 <= e1*)
- cut (forall e1 e2 : Qpos, e2 <= e1 -> Qball (e1 + e2) (InfiniteAlternatingSum_raw zl e1)
-   (InfiniteAlternatingSum_raw zl e2)).
-  intros H e1 e2.
-  destruct (Qpos_le_total e1 e2).
-   setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
-   apply: ball_sym;simpl.
-   auto.
-  auto.
- intros e1 e2 He.
- apply: ball_weak;simpl.
- unfold Qball.
- unfold InfiniteAlternatingSum_raw.
- unfold PartialAlternatingSumUntil.
- generalize (Limit_near zl e1) (Limit_near zl e2).
- clear zl.
- intros ex1 ex2.
- simpl in *.
- pose (F:= fun e => (fun s : Stream Q => Qball_ex_bool e (hd s) 0)).
- assert(case1: forall seq (dnn:DecreasingNonNegative seq) (ex2: LazyExists _ seq), (Qball e1 (hd seq) 0) ->
-   AbsSmall (R:=Q_as_COrdField) (e1:Q) (0 - (takeUntil (F e2) ex2 Qminus' 0))).
-  clear seq dnn ex1 ex2.
-  intros seq dnn ex2 [Hseq1 Hseq2].
-  apply: AbsSmall_minus;simpl.
-  change (AbsSmall (e1:Q) ((PartialAlternatingSumUntil _ (ex2))-0)).
-  stepr (PartialAlternatingSumUntil _ (ex2)); [| by (simpl; ring)].
-  destruct (PartialAlternatingSumUntil_small _ dnn (ex2)) as [Hl1 Hl2].
-  apply AbsSmall_leEq_trans with (hd seq).
-   stepl (hd seq - 0);[assumption|simpl;ring].
-  split;[|assumption].
-  apply Qle_trans with 0;[|assumption].
-  simpl.
-  rewrite -> Qle_minus_iff; ring_simplify.
-  destruct dnn as [[[X _] _] _]; assumption.
- assert(H:=ex1).
- induction H;
-   case (ex1); unfold Qball_ex_bool in *; simpl in *; destruct (Qmetric_dec e1 (hd x) 0); try contradiction; auto.
- intros ex3.
- assert (case2:~(Qball e2 (hd x) 0)).
-  intros q.
-  apply n.
-  simpl.
-  unfold Qball.
-  apply AbsSmall_leEq_trans with (e2:Q); assumption.
- Opaque Qred.
- case (ex2); unfold Qball_ex_bool in *; simpl; destruct (Qmetric_dec e2 (hd x) 0); try contradiction;
-   try solve[intros; elim case2].
- intros ex4.
- simpl.
- set (a := (takeUntil (fun s : Stream Q => match Qmetric_dec e1 (hd s) 0 with left _ => true | right _ => false end)
-   (ex3 tt)) Qminus' 0).
- set (b:=(takeUntil (fun s : Stream Q => match Qmetric_dec e2 (hd s) 0 with left _ => true | right _ => false end)
-   (ex4 tt)) Qminus' 0).
- stepr (b-a); [| by (simpl; repeat rewrite -> Qminus'_correct;
-   change (b - a == hd x - a - (hd x - b)); ring)].
- apply AbsSmall_minus.
- rename H0 into IHExists.
- apply (IHExists tt).
- clear - dnn.
- destruct dnn.
- assumption.
-Transparent Qmetric_dec.
+Lemma InfiniteAlternatingSum_raw_wd {s1 s2} (zl1 : Limit s1 0) (zl2 : Limit s2 0) (ε : QposInf) : 
+  s1 = s2 → InfiniteAlternatingSum_raw s1 ε = InfiniteAlternatingSum_raw s2 ε.
+Proof. 
+  assert (Proper ((=) ==> eq) (λ s, Qball_ex_bool ε (hd s) 0)).
+   solve_proper.
+  intros E.
+  apply takeUntil_wd_alt. 
+   now apply _. 
+  easy.
 Qed.
 
-Definition InfiniteAlternatingSum (seq:Stream Q)(dnn:DecreasingNonNegative seq)(zl:Limit seq 0) : CR :=
-Build_RegularFunction (InfiniteAlternatingSum_prf dnn zl).
+Definition InfiniteAlternatingSum_length (s : Stream Q) `{zl : !Limit s 0} (e:QposInf) := takeUntil_length _ (Limit_near s 0 e).
 
-Lemma InfiniteAlternatingSum_step : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
- (InfiniteAlternatingSum dnn zl ==
-  ('(hd seq))-(InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)))%CR.
+Lemma InfiniteAlternatingSum_length_weak (s : Stream Q) {dnn:DecreasingNonNegative s} {zl : Limit s 0} (ε1 ε2 : Qpos) :
+  (ε1:Q) ≤ (ε2:Q) → InfiniteAlternatingSum_length s ε2 ≤ InfiniteAlternatingSum_length s ε1.
 Proof.
- intros [hd seq] [dnn_hd dnn] zl.
+  intros E.
+  apply takeUntil_length_ForAllIf.
+  revert s dnn zl.
+  cofix FIX; intros.
+  constructor.
+   do 2 rewrite Qball_ex_bool_correct.
+   now apply ball_weak_le.
+  apply (FIX _ _ _).
+Qed.
+
+Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNegative s} (k l : nat) (ε : Qpos) :
+  k ≤ l → Str_nth k s ≤ ε → ball ε (take s l Qminus' 0) (take s k Qminus' 0).
+Proof.
+  intros E.
+  apply naturals.natural_precedes_plus in E.
+  destruct E as [z E]. rewrite E. clear E l.
+  revert z s dnn ε.
+  induction k; intros.
+   destruct z; intros.
+    now apply ball_refl.
+   apply nonneg_in_Qball_0.
+    now apply (PartialAlternatingSumUntil_take_small _).
+   simpl. rewrite Qminus'_correct. unfold Qminus.
+   transitivity (hd s).
+    change (hd s + - take (tl s) z Qminus' 0 ≤ hd s).
+    setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
+    apply (order_preserving _).
+    apply rings.flip_nonneg_opp.
+    now apply (PartialAlternatingSumUntil_take_small _).
+   easy.
+  simpl. do 2 rewrite Qminus'_correct. unfold Qminus.
+  apply Qball_plus_r, Qball_opp.
+  now apply (IHk _ _ _).
+Qed.
+
+Lemma InfiniteAlternatingSum_further (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} (l : nat) (ε : Qpos) :
+  InfiniteAlternatingSum_length s ε ≤ l → ball ε (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε).
+Proof.
+  intros E.
+  unfold InfiniteAlternatingSum_raw, PartialAlternatingSumUntil.
+  rewrite takeUntil_correct.
+  apply (InfiniteAlternatingSum_further_aux _).
+   easy.
+  apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
+  apply Qball_ex_bool_correct.
+  unfold Str_nth.
+  now apply (takeUntil_length_correct (λ s, Qball_ex_bool ε (hd s) 0)).
+Qed.
+
+Lemma InfiniteAlternatingSum_further_alt (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} (l : nat) (ε1 ε2 : Qpos) :
+  InfiniteAlternatingSum_length s ε1 ≤ l → ball (ε1 + ε2) (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε2).
+Proof.
+  intros E1.
+  unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
+  rewrite takeUntil_correct.
+  destruct (total_order l (takeUntil_length (λ s, Qball_ex_bool ε2 (hd s) 0) (Limit_near s 0 ε2))) as [E2|E2].
+   apply ball_sym.
+   apply (InfiniteAlternatingSum_further_aux _).
+    easy.
+   apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
+   apply naturals.natural_precedes_plus in E1.
+   destruct E1 as [z E1]. rewrite E1. rewrite commutativity.
+   rewrite <-Str_nth_plus. 
+   apply ball_weak, Qball_ex_bool_correct.
+   apply (dnn_in_Qball_bool_0_Str_nth_tl _).
+   apply (takeUntil_length_correct (λ s, Qball_ex_bool ε1 (hd s) 0)).
+  setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+  apply ball_weak.
+  apply (InfiniteAlternatingSum_further_aux _).
+   easy.
+  apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
+  apply Qball_ex_bool_correct.
+  apply (takeUntil_length_correct (λ s, Qball_ex_bool ε2 (hd s) 0)).
+Qed.
+
+Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} :
+  is_RegularFunction (InfiniteAlternatingSum_raw s).
+Proof.
+  assert (∀ (ε1 ε2 : Qpos), (ε1:Q) ≤ (ε2:Q) → ball (ε1 + ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
+   intros ε1 ε2 E.
+   unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
+   rewrite takeUntil_correct.
+   setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+   apply ball_weak.
+   apply (InfiniteAlternatingSum_further _).
+   now apply (InfiniteAlternatingSum_length_weak _).
+  intros ε1 ε2.
+  destruct (total_order (ε1:Q) (ε2:Q)).
+   now auto.
+  setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+  apply ball_sym. now auto.
+Qed.
+
+Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : CR :=
+  Build_RegularFunction (InfiniteAlternatingSum_prf seq).
+
+Local Transparent CR.
+
+Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!Limit s1 0} `{!Limit s2 0} : 
+  s1 = s2 → InfiniteAlternatingSum s1 = InfiniteAlternatingSum s2.
+Proof.
+  intros E ε1 ε2. simpl.
+  unfold InfiniteAlternatingSum.
+  rewrite InfiniteAlternatingSum_raw_wd.
+   now apply (InfiniteAlternatingSum_prf s2).
+  easy.
+Qed.
+
+Local Opaque CR.
+Open Local Scope Q_scope.
+
+Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : 
+ (InfiniteAlternatingSum seq == '(hd seq) - InfiniteAlternatingSum (tl seq))%CR.
+Proof.
+ destruct seq as [hd seq], dnn as [dnn_hd dnn].
  rewrite -> CRplus_translate.
  apply: regFunEq_e.
  intros e.
@@ -287,6 +283,7 @@ Proof.
   case_eq (P seq); intros H0.
    rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
    simpl.
+   change (Qball (e + e) 0 (hd + -0))%Q.
    ring_simplify.
    unfold P in H.
    apply: ball_weak;simpl.
@@ -301,32 +298,36 @@ Proof.
   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd seq)) as [Y|Y]; [discriminate H0|].
   elim Y.
   simpl in dnn_hd.
-  destruct dnn_hd as [_ [[Z0 Z1] dnn_hd0]].
+  destruct dnn_hd as [Z0 Z1].
   split;simpl.
    apply Qle_trans with 0.
+   change (- e <= 0)%Q.
     rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
+   change (0 <= Streams.hd seq - 0)%Q.
    ring_simplify.
    apply Z0.
+  change (Streams.hd seq - 0 <= e)%Q.
   ring_simplify.
   eapply Qle_trans.
    apply Z1.
   destruct X as [_ X].
-  stepl (hd - 0); [| simpl; ring].
+  stepl (hd - 0)%Q; [| simpl; ring].
   apply X.
- destruct (takeUntil_step P (Limit_near zl e) Qminus' 0) as [ex' rw]; [rewrite H;auto|].
+ destruct (takeUntil_step P (Limit_near (Cons hd seq) 0 e) Qminus' 0) as [ex' rw]; [rewrite H;auto|].
  rewrite rw; clear rw.
  simpl.
- rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (Limit_tl zl) e)).
+ rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (tl (Cons hd seq)) 0 e)).
  rewrite -> Qminus'_correct.
  apply: ball_refl.
 Qed.
 
 (** The infinite alternating series is always nonnegative. *)
-Lemma InfiniteAlternatingSum_nonneg : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
- (inject_Q 0%Q <= InfiniteAlternatingSum dnn zl)%CR.
+Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+ (inject_Q 0%Q <= InfiniteAlternatingSum seq)%CR.
 Proof.
- intros seq dnn zl e.
+ intros e.
  apply Qle_trans with 0.
+  change (-e ≤ 0)%Q.
   rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
  unfold InfiniteAlternatingSum.
  simpl.
@@ -335,18 +336,17 @@ Proof.
  ring_simplify.
  unfold InfiniteAlternatingSum_raw.
  simpl.
- destruct (PartialAlternatingSumUntil_small _ dnn (Limit_near zl ((1 # 2) * e)%Qpos)).
+ destruct (PartialAlternatingSumUntil_small (Limit_near seq 0 ((1 # 2) * e)%Qpos)).
  assumption.
 Qed.
 
 (** The infinite alternating series is always bounded by the first term
 in the series. *)
-Lemma InfiniteAlternatingSum_bound : forall seq (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
- (InfiniteAlternatingSum dnn zl <= inject_Q (hd seq))%CR.
+Lemma InfiniteAlternatingSum_bound (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+ (InfiniteAlternatingSum seq <= inject_Q (hd seq))%CR.
 Proof.
- intros seq dnn zl.
  rewrite -> InfiniteAlternatingSum_step.
- change (inject_Q (hd seq) - InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)[<=]inject_Q (hd seq))%CR.
+ change (inject_Q (hd seq) - InfiniteAlternatingSum (tl seq) [<=]inject_Q (hd seq))%CR.
  stepr (inject_Q (hd seq) - inject_Q 0%Q)%CR.
   apply: minus_resp_leEq_rht.
   apply InfiniteAlternatingSum_nonneg.
@@ -355,15 +355,13 @@ Proof.
 Qed.
 
 (** [InfiniteAlternatingSum] is correct. *)
-Lemma dnn_zl_convergent : forall (seq:Stream Q),
- forall (dnn:DecreasingNonNegative seq) (zl:Limit seq 0),
- convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq)).
+Lemma dnn_zl_convergent (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+ convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq))%Q.
 Proof.
- intros seq dnn zl.
  cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
   apply convergent_wd.
   intros n.
-  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq))); [| by (apply eq_symmetric; apply inj_Q_mult)].
+  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| by (apply eq_symmetric; apply inj_Q_mult)].
   apply mult_wdl.
   stepr ((inj_Q IR (-(1)))[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
   apply nexp_wd.
@@ -377,12 +375,12 @@ Proof.
    change (Zero:IR) with (nring 0:IR).
    stepl (inj_Q IR (nring 0)); [| by apply inj_Q_nring].
    apply inj_Q_leEq.
-   simpl.
-   destruct (dnn_Str_nth_tl n dnn) as [[[H _] _] _].
-   assumption.
+   simpl. 
+   pose proof (_ : DecreasingNonNegative (Str_nth_tl n seq)) as dnn_tl.
+   apply (dnn_hd_nonneg (dnn_tl)).
   intros e He.
   destruct (Q_dense_in_CReals IR e He) as [c Hc].
-  cut {N : nat & forall m : nat, (N <= m)%nat -> AbsSmall c ((Str_nth m seq))}.
+  cut {N : nat | forall m : nat, (N <= m)%nat -> AbsSmall c ((Str_nth m seq))}.
    intros [N HN].
    exists N.
    intros m Hm.
@@ -393,13 +391,13 @@ Proof.
    apply HN.
    assumption.
   clear e He c0.
-  assert (Hc':0<c).
+  assert (Hc':(0<c)%Q).
    apply less_inj_Q with IR.
    change (0:Q) with (nring 0:Q).
    stepl (nring 0:IR).
     assumption.
    apply eq_symmetric; apply inj_Q_nring.
-  assert (L:=(Limit_near zl (mkQpos Hc'))).
+  assert (L:=(Limit_near seq 0 (mkQpos Hc'))).
   exists (takeUntil _ L (fun _ => S) O).
   generalize dnn; clear dnn.
   set (Q:= (fun seq b => DecreasingNonNegative seq -> forall m : nat, (b <= m)%nat ->
@@ -407,15 +405,17 @@ Proof.
   change (Q seq (takeUntil (fun s : Stream Q_as_MetricSpace =>
     Qball_ex_bool (mkQpos (a:=c) Hc') (hd s) 0) L (fun _ : Q_as_MetricSpace => S) 0%nat)).
   apply takeUntil_elim; unfold Q; clear seq zl L Q.
-   intros x H dnn m _.
+   intros seq H dnn m _.
    unfold Str_nth.
    unfold Qball_ex_bool in H.
-   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (mkQpos (a:=c) Hc') (hd x) 0) as [b|b]; try contradiction.
+   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (mkQpos (a:=c) Hc') (hd seq) 0) as [b|b]; try contradiction.
    simpl in b.
    apply leEq_imp_AbsSmall.
-    destruct (dnn_Str_nth_tl m dnn) as [[[X _] _] _];assumption.
+    pose proof (_ : DecreasingNonNegative (Str_nth_tl m seq)) as dnn_tl.
+    apply (dnn_hd_nonneg dnn_tl).
+   apply dnn_alt in dnn. 
    destruct dnn as [X _].
-   destruct (ForAll_Str_nth_tl m X) as [[_ Y] _].
+   destruct (ForAll_Str_nth_tl m X) as [[_ Y] _]. 
    simpl.
    eapply Qle_trans.
     apply Y.
@@ -429,18 +429,16 @@ Proof.
   apply IH; auto with *.
  intros n.
  apply inj_Q_leEq.
- rewrite <- dnn_alt_iff_dnn in dnn.
  destruct (ForAll_Str_nth_tl n dnn) as [[_ X] _].
  rewrite tl_nth_tl in X.
  assumption.
 Qed.
 
-Lemma InfiniteAlternatingSum_correct : forall (seq:Stream Q) (x:nat -> IR),
- (forall n:nat, inj_Q IR (((-(1))^n)*Str_nth n seq)%Q[=]x n) ->
- forall (dnn:DecreasingNonNegative seq) zl H,
- (InfiniteAlternatingSum dnn zl==IRasCR (series_sum x H))%CR.
+Lemma InfiniteAlternatingSum_correct (seq:Stream Q) (x:nat -> IR)
+ (Hx : forall n:nat, inj_Q IR (((-(1))^n)*Str_nth n seq)%Q[=]x n)
+ {dnn : DecreasingNonNegative seq} {zl : Limit seq 0} H :
+ (InfiniteAlternatingSum seq ==IRasCR (series_sum x H))%CR.
 Proof.
- intros seq x Hx dnn zl H.
  unfold series_sum.
  rewrite -> IR_Lim_as_CR.
  apply: SeqLimit_unique.
@@ -454,7 +452,7 @@ Proof.
  clear C.
  unfold seq_part_sum in *.
  rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
-   ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum dnn zl)))).
+   ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum seq)))).
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
  assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq)))%CR)).
   stepr (IRasCR (x n)).
@@ -468,7 +466,7 @@ Proof.
   rewrite <- IR_inj_Q_as_CR.
   apply IRasCR_wd.
   apply Hx.
- stepr (('(Sum0 n (fun n => ((-(1))^n)*(Str_nth n seq))%Q))%CR[-]InfiniteAlternatingSum dnn zl).
+ stepr (('(Sum0 n (fun n => ((-(1))^n)*(Str_nth n seq))%Q))%CR[-]InfiniteAlternatingSum seq).
   clear - X.
   generalize seq dnn zl X.
   clear seq dnn zl X.
@@ -477,7 +475,7 @@ Proof.
   induction n; intros e seq dnn zl X.
    simpl in *.
    apply AbsSmall_minus.
-   stepr (InfiniteAlternatingSum dnn zl); [| by (unfold cg_minus;simpl;ring)].
+   stepr (InfiniteAlternatingSum seq); [| by (unfold cg_minus;simpl;ring)].
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
    apply: leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.
@@ -485,7 +483,7 @@ Proof.
    destruct X; assumption.
   apply AbsSmall_minus.
   stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  ((- (1)) ^ n0 * Str_nth n0 (tl seq))%Q)))%CR)[-]
-    InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)))%CR; [apply IHn|].
+    InfiniteAlternatingSum (tl seq)))%CR; [apply IHn|].
    rewrite inj_S in X.
    rstepr ([--][--]('(((- (1)) ^ n * Str_nth n (tl seq))%Q))%CR).
    apply inv_resp_AbsSmall.
@@ -495,20 +493,21 @@ Proof.
    rewrite -> Qpower_plus;[|discriminate].
    simpl.
    ring.
-  stepl (InfiniteAlternatingSum dnn zl[-](('(((- (1)) ^ 0 * Str_nth 0 seq)%Q[+]
+  stepl (InfiniteAlternatingSum seq[-](('(((- (1)) ^ 0 * Str_nth 0 seq)%Q[+]
     ((Sum0 (G:=Q_as_CAbGroup) n
       (fun n0 : nat => ((- (1)) ^ (S n0) * Str_nth n0 (tl seq))%Q))):Q))%CR));[
         apply cg_minus_wd;[reflexivity| rewrite -> CReq_Qeq; apply: Sum0_shift;
           intros i; simpl; reflexivity]|].
   unfold cg_minus; simpl.
   rewrite -> InfiniteAlternatingSum_step.
-  generalize (InfiniteAlternatingSum (dnn_tl dnn) (Limit_tl zl)).
+  generalize (@InfiniteAlternatingSum (tl seq) _).
   intros x.
   change (Str_nth 0 seq) with (hd seq).
   setoid_replace ((Sum0 (G:=Q_as_CAbGroup) n
     (fun n0 : nat => Qpower_positive (- (1)) (P_of_succ_nat n0)  * Str_nth n0 (tl seq)))%Q:Q)
       with (-(Sum0 (G:=Q_as_CAbGroup) n
-        (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 (tl seq)))))%Q;[ring|].
+        (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 (tl seq)))))%Q.
+   simpl. ring.
   apply: eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
   apply: Sum0_wd.
   intros i; simpl.
@@ -531,12 +530,12 @@ Proof.
  apply Hx.
 Qed.
 
-Lemma InfiniteAlternatingSum_correct' : forall (seq:Stream Q),
- forall (dnn:DecreasingNonNegative seq) zl,
- (InfiniteAlternatingSum dnn zl==IRasCR (series_sum _ (dnn_zl_convergent dnn zl)))%CR.
+Lemma InfiniteAlternatingSum_correct' (seq:Stream Q)
+ {dnn:DecreasingNonNegative seq} {zl : Limit seq 0} :
+ (InfiniteAlternatingSum seq == IRasCR (series_sum _ (dnn_zl_convergent seq)))%CR.
 Proof.
- intros seq dnn zl.
  apply InfiniteAlternatingSum_correct.
  intros; apply eq_reflexive.
 Qed.
+
 End InfiniteAlternatingSum.

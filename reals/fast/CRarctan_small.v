@@ -47,7 +47,7 @@ taylor series.
 Section ArcTanSeries.
 Variable a:Q.
 
-Definition arctanSequence := (mult_Streams (everyOther recip_positives) (powers_help (a^2) a)).
+Definition arctanSequence := (mult_Streams (everyOther Qrecip_positives) (powers_help (a^2) a)).
 
 Lemma Str_nth_arctanSequence : forall n, (Str_nth n arctanSequence == (1#P_of_succ_nat (2*n))*a^(1+2*n)%nat)%Q.
 Proof.
@@ -56,8 +56,9 @@ Proof.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
  rewrite Str_nth_everyOther.
- rewrite Str_nth_recip_positives.
+ rewrite Str_nth_Qrecip_positives.
  rewrite -> Str_nth_powers_help.
+ rewrite <-int_pow.int_pow_nat_pow.
  rewrite <- Qpower_mult.
  rewrite inj_plus.
  rewrite -> (Qpower_plus' a 1 (2*n)%nat); auto with *.
@@ -86,7 +87,7 @@ Lemma arctanSequence_dnn : DecreasingNonNegative arctanSequence.
 Proof.
  apply mult_Streams_dnn.
   apply everyOther_dnn.
-  apply recip_positives_dnn.
+  apply Qrecip_positives_dnn.
  apply powers_help_dnn.
   apply square_zero_one; assumption.
  destruct Ha; assumption.
@@ -97,14 +98,13 @@ Proof.
  unfold arctanSequence.
  apply mult_Streams_zl with (1#1)%Qpos.
   apply everyOther_zl.
-  apply recip_positives_zl.
  abstract (apply powers_help_nbz; try apply square_zero_one; assumption).
 Defined.
 
 End ArcTanSeries.
 
 Definition rational_arctan_small_pos (a:Q) (p: 0 <= a <= 1) : CR :=
- InfiniteAlternatingSum (arctanSequence_dnn p) (arctanSequence_zl p).
+ @InfiniteAlternatingSum _ (arctanSequence_dnn p) (arctanSequence_zl p).
 
 Lemma rational_arctan_small_pos_correct : forall (a:Q) Ha, a < 1 ->
  (@rational_arctan_small_pos a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
