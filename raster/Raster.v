@@ -130,7 +130,6 @@ Proof.
  rewrite length_vectorAsList.
  auto.
 Qed.
-Print nth.
 
 Lemma updateVector_overflow : forall A n (v : Vector.t A n) f i, n <= i -> updateVector v f i = v.
 Proof with try reflexivity; auto with arith.

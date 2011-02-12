@@ -53,20 +53,21 @@ Sine is defined in terms of its alternating Taylor's series.
 Section SinSeries.
 Variable a:Q.
 
-Definition sinSequence := (mult_Streams (everyOther (tl recip_factorials)) (powers_help (a^2) a)).
+Definition sinSequence := (mult_Streams (everyOther (tl Qrecip_factorials)) (powers_help (a^2) a)).
 
-Lemma Str_nth_sinSequence : forall n, (Str_nth n sinSequence == (1#P_of_succ_nat (pred (fac (1+2*n))))*a^(1+2*n)%nat)%Q.
+Lemma Str_nth_sinSequence : forall n, (Str_nth n sinSequence == (1#P_of_succ_nat (pred (fact (1+2*n))))*a^(1+2*n)%nat)%Q.
 Proof.
  intros n.
  unfold sinSequence.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
  rewrite Str_nth_everyOther.
- change (tl recip_factorials) with (Str_nth_tl 1 recip_factorials).
+ change (tl Qrecip_factorials) with (Str_nth_tl 1 Qrecip_factorials).
  rewrite Str_nth_plus.
  rewrite plus_comm.
- rewrite Str_nth_recip_factorials.
+ rewrite Str_nth_Qrecip_factorials.
  rewrite -> Str_nth_powers_help.
+ rewrite <-int_pow.int_pow_nat_pow.
  rewrite <- Qpower_mult.
  rewrite inj_plus.
  rewrite -> Qpower_plus';[|rewrite <- inj_plus; auto with *].
@@ -93,11 +94,9 @@ Proof.
 Qed.
 
 Lemma sinSequence_dnn : DecreasingNonNegative sinSequence.
-Proof.
+Proof. 
  apply mult_Streams_dnn.
-  apply everyOther_dnn.
-  apply dnn_tl.
-  apply recip_factorials_dnn.
+  apply _.
  apply powers_help_dnn.
   apply square_zero_one; assumption.
  destruct Ha; assumption.
@@ -107,16 +106,14 @@ Lemma sinSequence_zl : Limit sinSequence 0.
 Proof.
  unfold sinSequence.
  apply mult_Streams_zl with (1#1)%Qpos.
-  apply everyOther_zl.
-  apply Limit_tl.
-  apply recip_factorials_zl.
+  apply _.
  apply powers_help_nbz; try apply square_zero_one; assumption.
 Defined.
 
 End SinSeries.
 
 Definition rational_sin_small_pos (a:Q) (p: 0 <= a <= 1) : CR :=
- InfiniteAlternatingSum (sinSequence_dnn p) (sinSequence_zl p).
+ @InfiniteAlternatingSum _ (sinSequence_dnn p) (sinSequence_zl p).
 
 Lemma rational_sin_small_pos_correct : forall (a:Q) Ha,
  (@rational_sin_small_pos a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
@@ -144,10 +141,10 @@ Proof.
  set (n':=(2*n)%nat) in *.
  simpl in *.
  rstepr (seq_part_sum (fun n0 : nat =>
-   (sin_seq n0[/]nring (R:=IR) (fac n0)[//]nring_fac_ap_zero IR n0)[*]
+   (sin_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
      nexp IR n0 (inj_Q IR a[-]Zero)) n'[+](
-       (sin_seq n'[/]nring (R:=IR) (fac n')[//]nring_fac_ap_zero IR n')[*]
-         nexp IR n' (inj_Q IR a[-]Zero)[+] (sin_seq (S n')[/]nring (R:=IR) (fac n' + n' * fac n')[//]
+       (sin_seq n'[/]nring (R:=IR) (fact n')[//]nring_fac_ap_zero IR n')[*]
+         nexp IR n' (inj_Q IR a[-]Zero)[+] (sin_seq (S n')[/]nring (R:=IR) (fact n' + n' * fact n')[//]
            nring_fac_ap_zero IR (S n'))[*] (nexp IR n' (inj_Q IR a[-]Zero)[*](inj_Q IR a[-]Zero)))).
  apply bin_op_wd_unfolded.
   assumption.
@@ -180,9 +177,9 @@ Proof.
  stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| by
    (apply eq_symmetric; apply inj_Q_mult)].
  change (inj_Q IR ((- (1)) ^ n)[*]inj_Q IR (Str_nth n (sinSequence a))[=]
-   (nexp IR n [--]One[/]nring (R:=IR) (fac (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
+   (nexp IR n [--]One[/]nring (R:=IR) (fact (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
      (nexp IR (S n') (inj_Q IR a[-]Zero))).
- rstepr ((nexp IR n [--]One[*](nexp IR (S n') (inj_Q IR a[-]Zero)[/]nring (R:=IR) (fac (S n'))[//]
+ rstepr ((nexp IR n [--]One[*](nexp IR (S n') (inj_Q IR a[-]Zero)[/]nring (R:=IR) (fact (S n'))[//]
    nring_fac_ap_zero IR (S n')))).
  apply mult_wd.
   stepr ((inj_Q IR (-(1)))[^]n).
@@ -193,22 +190,22 @@ Proof.
   apply un_op_wd_unfolded.
   rstepr (nring 1:IR).
   apply (inj_Q_nring IR 1).
- stepr (inj_Q IR ((1/P_of_succ_nat (pred (fac (1+2*n))))*a^(1+2*n)%nat)).
+ stepr (inj_Q IR ((1/P_of_succ_nat (pred (fact (1+2*n))))*a^(1+2*n)%nat)).
   apply inj_Q_wd.
   simpl.
   rewrite -> Str_nth_sinSequence.
   rewrite -> Qmake_Qdiv.
   reflexivity.
- rstepr ((nring 1[/]nring (R:=IR) (fac (S n'))[//]
+ rstepr ((nring 1[/]nring (R:=IR) (fact (S n'))[//]
    nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-]Zero))).
  change (1+2*n)%nat with (S n').
- stepr ((inj_Q IR (1 / P_of_succ_nat (pred (fac (S n'))))[*](inj_Q IR (a^S n')))).
+ stepr ((inj_Q IR (1 / P_of_succ_nat (pred (fact (S n'))))[*](inj_Q IR (a^S n')))).
   apply inj_Q_mult.
  apply mult_wd.
   rewrite <- POS_anti_convert.
-  assert (X:inj_Q IR (inject_Z (Z_of_nat (S (pred (fac (S n'))))))[#]Zero).
+  assert (X:inj_Q IR (inject_Z (Z_of_nat (S (pred (fact (S n'))))))[#]Zero).
    stepr (inj_Q IR Zero).
-    assert (inject_Z (Z_of_nat (S (pred (fac (S n')))))[#]Zero).
+    assert (inject_Z (Z_of_nat (S (pred (fact (S n')))))[#]Zero).
      discriminate.
     destruct (ap_imp_less _ _ _ X).
      apply less_imp_ap.
@@ -218,17 +215,17 @@ Proof.
     apply inj_Q_less.
     assumption.
    apply (inj_Q_nring IR 0).
-  stepr ((inj_Q IR 1)[/](inj_Q IR (inject_Z (Z_of_nat (S (pred (fac (S n')))))))[//]X).
+  stepr ((inj_Q IR 1)[/](inj_Q IR (inject_Z (Z_of_nat (S (pred (fact (S n')))))))[//]X).
    apply inj_Q_div.
   apply div_wd.
    apply (inj_Q_nring IR 1).
-  stepl (inj_Q IR (nring (fac (S n')))).
+  stepl (inj_Q IR (nring (fact (S n')))).
    apply inj_Q_nring.
-  assert (Y:=nat_fac_gtzero (S n')).
+  assert (Y:=lt_O_fact (S n')).
   apply inj_Q_wd.
-  stepr ((fac (S n')):Q).
+  stepr ((fact (S n')):Q).
    clear - n'.
-   induction (fac (S n')).
+   induction (fact (S n')).
     simpl; reflexivity.
    rewrite inj_S.
    unfold Zsucc.
@@ -236,7 +233,7 @@ Proof.
    rewrite -> IHn0.
    rewrite -> injz_plus.
    reflexivity.
-  destruct (fac (S n')).
+  destruct (fact (S n')).
    elimtype False; auto with *.
   simpl; reflexivity.
  stepr ((inj_Q IR a)[^](S n')).

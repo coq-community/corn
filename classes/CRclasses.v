@@ -1,7 +1,7 @@
-Require Import CRArith CRpartialorder.
-Require Import abstract_algebra theory.rings stdlib_rationals.
+Require Import CRArith CRpartialorder CRpower.
+Require Import abstract_algebra theory.rings stdlib_rationals additional_operations.
 
-Opaque CR.
+Local Opaque CR.
 
 (* I use underscores in the names to distinguish these instances from their definitions *)
 Instance CR_inject_Q: Inject Q CR := inject_Q.
@@ -25,11 +25,10 @@ Proof.
   intros x y E F. apply CRle_def. intuition.
 Qed.
   
-Instance: Ring_Morphism inject_Q.
+Instance: SemiRing_Morphism inject_Q.
 Proof.
   repeat (split; try apply _); intros; try reflexivity; symmetry.
-    apply CRplus_Qplus.
-   apply CRopp_Qopp. 
+   apply CRplus_Qplus.
   apply CRmult_Qmult.
 Qed.
 

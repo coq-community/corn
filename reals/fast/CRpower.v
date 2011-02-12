@@ -266,6 +266,18 @@ Qed.
 
 Hint Rewrite CRpower_positive_correct' : IRtoCR.
 
+Instance: Proper (eq ==> QposEq ==> @st_eq _) Qpower_positive_uc.
+Proof.
+ intros p1 p2 Ep e1 e2 Ee x.
+ apply ball_eq_iff. intro e.
+ simpl. unfold QposEq in Ee. rewrite Ep Ee. reflexivity.
+Qed.
+
+Instance: Proper (eq ==> QposEq ==> @st_eq _) CRpower_positive_bounded. 
+Proof. 
+ intros p1 p2 Ep e1 e2 Ee x. simpl. rewrite Ep Ee. reflexivity.
+Qed. 
+
 (* begin hide *)
 Add Parametric Morphism p : (@CRpower_positive p) with signature (@st_eq _) ==> (@st_eq _) as CRpower_positive_wd.
 Proof.

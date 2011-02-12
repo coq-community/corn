@@ -230,14 +230,14 @@ Proof.
    nring_fac_ap_zero _ (S n)).
  apply shift_div_leEq.
   apply pos_nring_fac.
- rstepr (One [/]TwoNZ[*] (AbsIR (a n) [*]nring (fac (S n)) [/] _[//]nring_fac_ap_zero _ n) [*]
+ rstepr (One [/]TwoNZ[*] (AbsIR (a n) [*]nring (fact (S n)) [/] _[//]nring_fac_ap_zero _ n) [*]
    AbsIR ((x[-]x0) [^]n)).
  apply leEq_wdr with (One [/]TwoNZ[*](AbsIR (a n) [*]nring (S n)) [*]AbsIR ((x[-]x0) [^]n)).
   2: apply mult_wdl; apply mult_wdr.
-  2: rstepr (AbsIR (a n) [*](nring (fac (S n)) [/] _[//]nring_fac_ap_zero _ n)).
+  2: rstepr (AbsIR (a n) [*](nring (fact (S n)) [/] _[//]nring_fac_ap_zero _ n)).
   2: apply mult_wdr.
-  2: astepr (nring (S n * fac n) [/] _[//]nring_fac_ap_zero IR n).
-  2: astepr (nring (S n) [*]nring (fac n) [/] _[//]nring_fac_ap_zero IR n); rational.
+  2: astepr (nring (S n * fact n) [/] _[//]nring_fac_ap_zero IR n).
+  2: astepr (nring (S n) [*]nring (fact n) [/] _[//]nring_fac_ap_zero IR n); rational.
  rstepr (One [/]TwoNZ[*]nring (S n) [*]AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n)).
  apply mult_resp_leEq_rht.
   2: apply AbsIR_nonneg.
@@ -369,7 +369,7 @@ Proof.
    FEQ.
   Deriv.
  simpl in |- *.
- Opaque nring fac.
+ Opaque nring fact.
  unfold F, G, FPowerSeries' in |- *; simpl in |- *.
  Derivative_Help.
  apply eq_imp_Feq.
@@ -383,7 +383,7 @@ Proof.
    mult_resp_ap_zero _ _ _ (pos_ap_zero _ _ (pos_nring_S _ n)) (nring_fac_ap_zero _ n))).
  apply mult_wdr.
  apply div_wd; algebra.
- Step_final (nring (R:=IR) (S n * fac n)).
+ Step_final (nring (R:=IR) (S n * fact n)).
 Qed.
 
 End More_on_PowerSeries.

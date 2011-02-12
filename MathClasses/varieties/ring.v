@@ -1,7 +1,4 @@
 (* To be imported qualified. *)
-
-Set Automatic Introduction.
-
 Require
   categories.variety theory.rings.
 Require Import
@@ -65,7 +62,7 @@ Section encode_with_ops.
   Context A `{Ring A}.
 
   Global Instance encode_operations: AlgebraOps sig (λ _, A) := λ o,
-    match o with plus => ring_plus | mult => ring_mult | zero => 0:A | one => 1:A | opp => group_inv end.
+    match o with plus => (+) | mult => (.*.) | zero => 0:A | one => 1:A | opp => (-) end.
 
   Global Instance encode_algebra_and_ops: Algebra sig _.
   Proof. constructor. intro. apply _. intro o. destruct o; simpl; try apply _; unfold Proper; reflexivity. Qed.
@@ -111,10 +108,8 @@ Qed.
 Lemma encode_morphism_only
   `{AlgebraOps theory A} `{∀ u, Equiv (A u)}
   `{AlgebraOps theory B} `{∀ u, Equiv (B u)}
-  (f: ∀ u, A u → B u) `{!Ring_Morphism (f tt)}: HomoMorphism sig A B f.
+  (f: ∀ u, A u → B u) `{!Ring (A tt)} `{!Ring (B tt)} `{!SemiRing_Morphism (f tt)}: HomoMorphism sig A B f.
 Proof.
- pose proof (ringmor_a (f tt)).
- pose proof (ringmor_b (f tt)).
  constructor.
     intros []. apply _.
    intros []; simpl.
@@ -127,37 +122,16 @@ Proof.
  apply encode_algebra_only.
 Qed.
 
-Lemma encode_morphism_and_ops `{Ring_Morphism A B f}:
+Lemma encode_morphism_and_ops `{Ring A} `{Ring B} {f : A → B} `{!SemiRing_Morphism f}:
   @HomoMorphism sig (λ _, A) (λ _, B) _ _ _ _ (λ _, f).
-Proof. intros. apply encode_morphism_only. assumption. Qed.
+Proof. intros. apply (encode_morphism_only _). Qed.
 
 Lemma decode_morphism_and_ops
   `{InVariety theory x} `{InVariety theory y} `{!HomoMorphism theory x y f}:
-    Ring_Morphism (f tt).
+    SemiRing_Morphism (f tt).
 Proof.
  pose proof (homo_proper theory x y f tt).
  pose proof (preserves theory x y f) as P.
  repeat (constructor; try apply _)
- ; [ apply (P plus) | apply (P zero) | apply (P opp) | apply (P mult) | apply (P one) ].
+ ; [ apply (P plus) | apply (P zero) | apply (P mult) | apply (P one) ].
 Qed.
-
-(* Finally, we use these encoding/decoding functions to specialize some universal results: *)
-
-Section specialized.
-
-  Context (A B : Type)
-    `{!RingPlus A} `{!RingMult A} `{!RingZero A} `{!RingOne A} `{!GroupInv A} `{!Equiv A}
-    `{!RingPlus B} `{!RingMult B} `{!RingZero B} `{!RingOne B} `{!GroupInv B} `{!Equiv B}
-     (f: A → B).
-
-  Global Instance: ∀ `{H: Ring_Morphism A B f} `{!Inverse f},
-    Bijective f → Ring_Morphism (inverse f).
-  Proof.
-   intros.
-   pose proof (encode_morphism_and_ops (f:=f)) as P.
-   pose proof (@invert_homomorphism theory _ _ _ _ _ _ _ _ _ _ P) as Q.
-   destruct H.
-   apply (@decode_morphism_and_ops _ _ _ _ _ _ _ _ _ Q).
-  Qed.
-
-End specialized.

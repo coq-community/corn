@@ -1,12 +1,13 @@
 Require
-  implementations.stdlib_rationals.
+  implementations.stdlib_rationals positive_semiring_elements.
 Require Import 
   Program
-  CornTac
-  stdlib_omissions.Q Qmetric Qabs Qclasses QMinMax
+  CornTac workaround_tactics
+  stdlib_omissions.Q Qdlog2 Qmetric Qabs Qclasses QMinMax
   RSetoid CSetoids MetricMorphisms
-  abstract_algebra
-  orders.minmax orders.fields.
+  orders.minmax orders.fields theory.abs theory.int_pow.
+Require Export
+  abstract_algebra interfaces.additional_operations.
 
 Set Automatic Introduction.
 
@@ -14,122 +15,152 @@ Set Automatic Introduction.
 
 (* Because [Q] is ``hard-wired'' nearly everywhere in CoRN, we take the easy
     way and require all operations to be sound with respect to [Q]. *)
+Class AppDiv AQ := app_div : AQ → AQ → Z → AQ.
+Class AppCompress AQ := app_compress : AQ → Z → AQ.
 
-Class AppFieldDiv AQ := app_field_div : AQ → AQ → Z → AQ.
-Class AppFieldShift AQ := app_field_shift : AQ → Z → AQ.
+Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Inject AQ Q_as_MetricSpace} 
+    `{!AppInverse AQtoQ} {ZtoAQ : Inject Z AQ} `{!AppDiv AQ} `{!AppCompress AQ} 
+    `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
+    `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
+  aq_ring :> @Ring AQ e plus mult zero one inv ;
+  aq_order_embed :> OrderEmbedding AQtoQ ;
+  aq_ring_morphism :> SemiRing_Morphism AQtoQ ;
+  aq_dense_embedding :> DenseEmbedding AQtoQ ;
+  aq_div_proper :> Proper ((=) ==> (=) ==> (=) ==> (=)) app_div ;
+  aq_div : ∀ x y k, ball (2 ^ k) ('app_div x y k) ('x / 'y) ;
+  aq_compress_proper :> Proper ((=) ==> (=) ==> (=)) app_compress ;
+  aq_compress : ∀ x k, ball (2 ^ k) ('app_compress x k) ('x) ;
+  aq_shift :> ShiftLSpec AQ Z (≪) ;
+  aq_nat_pow :> NatPowSpec AQ N (^) ;
+  aq_ints_mor :> SemiRing_Morphism ZtoAQ
+}.
 
-Section approximate_rationals.
-  Context `{e : Equiv AQ} {f : Inject AQ Q_as_MetricSpace} `{inverse : !AppInverse f}.
-
-  Context {zero : RingZero AQ} {one : RingOne AQ} {plus : RingPlus AQ}
-    {mult : RingMult AQ} {inv : GroupInv AQ} {div : AppFieldDiv AQ} {shift : AppFieldShift AQ}.
-
-  Class AppRationals : Prop := {
-    aq_ring :> @Ring AQ e plus mult zero one inv ;
-    aq_ring_morphism :> Ring_Morphism f ;
-    aq_dense_embedding :> DenseEmbedding f ;
-    aq_div : ∀ x y k, ball (Qpos_inv (2 ^ k)) ('app_field_div x y k) ('x / 'y) ;
-    aq_div_proper :> Proper ((=) ==> (=) ==> (=) ==> (=)) app_field_div ;
-    aq_shift : ∀ x k, 'app_field_shift x k = ('x * 2 ^ k)%Q ;
-    aq_shift_proper :> Proper ((=) ==> (=) ==> (=)) app_field_shift
-  }.
-End approximate_rationals.
-
-Definition eps2pow (ε : Qpos) : Z := 
-  match (QposAsQ ε) with
-  | d # n => Z.log2_up (n / d + 1)%Z
-  end.
-
-Lemma eps2pow_nonneg (q : Qpos) : 0 ≤ eps2pow q.
-Proof. 
-  destruct q as [[? ?] ?]. 
-  unfold eps2pow. simpl. 
-  apply Z.log2_up_nonneg. 
+Lemma Qpos_dlog2_spec (x : Qpos) : 
+  QposAsQ (2 ^ Qdlog2 x) ≤ QposAsQ x ∧ QposAsQ x < QposAsQ (2 ^ Zsucc (Qdlog2 x)).
+Proof.
+  simpl. split.
+   apply Qdlog2_spec. auto. 
+  apply stdlib_rationals.Qlt_coincides.
+  apply Qdlog2_spec. auto.
 Qed.
 
-Lemma eps2pow_correct (q : Qpos) : QposAsQ (Qpos_inv (2 ^ (eps2pow q))) ≤ QposAsQ q.
-Proof with auto with zarith qarith.
-  destruct q as [[n d] pos].
-  unfold eps2pow. simpl.
-  pose proof fields.flip_dec_mult_inv_l as P. apply P; clear P.
-   apply Qlt_coincides...
-  rewrite Qmake_Qdiv. unfold Qdiv.
-  pose proof fields.dec_mult_inv_swap_r as P. rewrite <-P; clear P.
-  transitivity (d / n + 1)%Z.
-   rewrite Zdiv_Qdiv. rewrite commutativity.
-   apply orders.sprecedes_weaken, Qlt_coincides, Qround.Qlt_floor.
-  replace (1 + 1)%Q with (inject_Z 2) by reflexivity.
-  rewrite <-Qpower.Zpower_Qpower.
-   rewrite <-Zle_Qle.
-   destruct (decide (d / n = 0))%Z as [E|E].
-    rewrite E. reflexivity.
-   apply Z.log2_up_spec.
-   apply signed_binary_positive_integers.Zlt_coincides.
-   apply semirings.pos_plus_compat_l; try reflexivity.
-   split.
-    apply Z_div_pos...
-    unfold Qlt in pos. simpl in pos. ring_simplify in pos...
-   apply not_symmetry...
-  apply Z.log2_up_nonneg. 
+(* The proof of this lemma is horrifying. Also, it doesn't belong here but in [Qdlog2.v].
+    However, proving it requires [int_pow_exp_sprecedes_back] for which no variant
+    exists in the standard library. *)
+Lemma Qdlog2_half (x : Qpos) : 
+  Qdlog2 x - 1 = Qdlog2 ((1#2) * x).
+Proof with auto.
+  setoid_rewrite commutativity at 2.
+  change (Qdlog2 x - 1 = Qdlog2 (x / 2)).
+  pose proof semirings.sprecedes_1_2.
+  pose proof semirings.precedes_1_2.
+  pose proof (ne_zero (2:Q)).
+  assert (GeZero (/2)). apply nonneg_dec_mult_inv_compat...
+    assert (GtZero (/2)). apply pos_dec_mult_inv_compat, semirings.sprecedes_0_2.
+  assert (0 < x / 2)%Q.
+   apply stdlib_rationals.Qlt_coincides.
+   apply_simplified (semirings.pos_mult_scompat (R:=Q))...
+    apply stdlib_rationals.Qlt_coincides...
+  apply (antisymmetry (≤)).
+   apply integers.precedes_sprecedes.
+   apply int_pow_exp_sprecedes_back with 2...
+   rewrite int_pow_exp_plus... rewrite int_pow_mult_inv int_pow_1.
+   apply sprecedes_trans_r with ((x : Q) / 2).
+    apply_simplified (order_preserving (.* (/ 2))).
+    apply Qdlog2_spec...
+   setoid_rewrite Z.add_1_r.
+   apply stdlib_rationals.Qlt_coincides.
+   apply Qdlog2_spec...
+  apply integers.precedes_sprecedes.
+  apply int_pow_exp_sprecedes_back with 2...
+  apply sprecedes_trans_r with ((x : Q) / 2).
+   apply Qdlog2_spec...
+  rewrite <-associativity. rewrite (commutativity _ 1) associativity.
+  rewrite int_pow_exp_plus... rewrite int_pow_mult_inv int_pow_1.
+  apply_simplified (strictly_order_preserving (.* (/ 2))).
+  apply stdlib_rationals.Qlt_coincides.
+  apply Qdlog2_spec...
 Qed.
-
-Instance aq_precedes `{AppRationals AQ}: Order AQ | 1 := λ x y, 'x ≤ 'y. 
-(* huh? *) Defined.
-
-Class AppRationalsAbs AQ `{AppRationals AQ} 
-  := aq_abs_sig : ∀ x : AQ, { y : AQ | 'y = Qabs ('x) }.
 
 Section approximate_rationals_more.
   Context `{AppRationals AQ}.
 
-  Lemma aq_div_eps2pow (x y : AQ) (ε : Qpos) : 
-    ball ε ('app_field_div x y (eps2pow ε)) ('x / 'y).
+  Lemma AQtoQ_ZtoAQ x : ' (' x) = inject_Z x.
   Proof.
-    eapply ball_weak_le.
-     apply eps2pow_correct.
-    apply aq_div.
+    pose proof (integers.to_ring_unique_alt ((inject : AQ → Q) ∘ (inject : Z → AQ)) inject_Z) as P.
+    apply P.
   Qed.
 
-  Global Instance: Proper ((=) ==> (=) ==> iff) aq_precedes.
-  Proof. intros ? ? E1 ? ? E2. unfold aq_precedes. rewrite E1 E2. reflexivity. Qed.
-  
-  Global Instance: PartialOrder aq_precedes.
-  Proof with auto.
-    unfold aq_precedes.
-    repeat (split; try apply _).
-      intros x. reflexivity.
-     intros x y z ? ?. transitivity ('y)...
-    intros x y ? ?. apply (injective (inject : AQ → Q_as_MetricSpace)). 
-    apply (antisymmetry (≤))...
+  Global Instance: Injective (inject : AQ → Q). 
+  Proof. change (Injective AQtoQ). apply _. Qed.
+
+  Global Instance: StrictlyOrderPreserving (inject : AQ → Q).
+  Proof. apply _. Qed. 
+
+  Global Instance: Injective (inject : Z → AQ).
+  Proof.
+    split; try apply _.
+    intros x y E.
+    apply (injective inject_Z).
+    rewrite <-2!AQtoQ_ZtoAQ.
+    now rewrite E.
   Qed.
 
-  Global Instance: TotalOrder aq_precedes.
-  Proof. intros x y. destruct (total_order ('x) ('y)); intuition. Qed.
+  Global Instance: RingOrder (_ : Order AQ).
+  Proof rings.embed_ringorder (inject : AQ → Q).
 
-  Global Instance: RingOrder aq_precedes.
-  Proof with auto.
-    repeat (split; try apply _); unfold precedes, aq_precedes.
-     intros x y ?. 
-     do 2 rewrite rings.preserves_plus.
-     apply ringorder_plus...
-    intros x E1 y E2. 
-    rewrite rings.preserves_mult. rewrite rings.preserves_0 in E1, E2 |- *; intros.
-    apply ringorder_mult...
-  Qed.
-
-  Global Instance aq_preserves_le: OrderPreserving (inject : AQ → Q_as_MetricSpace).
-  Proof. split; try apply _. intuition. Qed.
+  Global Instance: TotalOrder (_ : Order AQ).
+  Proof maps.embed_totalorder (inject : AQ → Q).
 
   Lemma aq_preserves_lt x y : x < y ↔ ('x < 'y)%Q.
   Proof with auto.
-    split.
-     intros [E1 E2]. 
-     destruct (proj1 (Qle_lteq _ _) E1)... destruct E2. 
-     apply (injective (inject : AQ → Q_as_MetricSpace))...
-    intros E1; split.
-     apply Qlt_le_weak...
-    intros E2. apply (Qlt_not_eq ('x) ('y))...
-    rewrite E2. reflexivity.
+    split; intros E.
+     apply Qlt_coincides. 
+     apply (strictly_order_preserving _)...
+    apply (strictly_order_preserving_back inject).
+    apply Qlt_coincides...
+  Qed.
+
+  Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
+  Proof.
+    pose proof (_ : NeZero (2:Q)).
+    rewrite shiftl.preserves_shiftl_int.
+    apply shiftl.shiftl_int_pow.
+  Qed.
+
+  Lemma aq_div_Qdlog2 (x y : AQ) (ε : Qpos) : 
+    ball ε ('app_div x y (Qdlog2 ε)) ('x / 'y).
+  Proof.
+    eapply ball_weak_le.
+     apply Qpos_dlog2_spec.
+    apply aq_div.
+  Qed.
+
+  Lemma aq_compress_Qdlog2 (x : AQ) (ε : Qpos) : 
+    ball ε ('app_compress x (Qdlog2 ε)) ('x).
+  Proof.
+    eapply ball_weak_le.
+     apply Qpos_dlog2_spec.
+    apply aq_compress.
+  Qed.
+
+  Definition app_div_above (x y : AQ) (k : Z) : AQ := app_div x y k + 1 ≪ k.
+  
+  Lemma aq_div_above (x y : AQ) (k : Z) : ('x / 'y : Q) ≤ 'app_div_above x y k.
+  Proof.
+    unfold app_div_above.
+    pose proof (aq_div x y k) as P.
+    apply in_Qball in P. destruct P as [_ P]. 
+    rewrite rings.preserves_plus.
+    rewrite aq_shift_correct.
+    now rewrite rings.preserves_1 left_identity.
+  Qed.
+
+  Lemma Zshift_opp_1 (x : AQ) : '(x ≪ (-(1) : Z)) = 'x / 2.
+  Proof.
+    rewrite aq_shift_correct.
+    posed_rewrite (int_pow_mult_inv 2 1).
+    now rewrite int_pow_1.
   Qed.
 
   Global Instance: NeZero (1:AQ).
@@ -138,7 +169,17 @@ Section approximate_rationals_more.
     destruct (ne_zero (1:Q)).
     rewrite <-(rings.preserves_1 (f:=inject : AQ → Q_as_MetricSpace)).
     rewrite <-(rings.preserves_0 (f:=inject : AQ → Q_as_MetricSpace)).
-    rewrite E. reflexivity.
+    now rewrite E.
+  Qed.
+
+  Global Instance: ZeroProduct AQ.
+  Proof.
+    intros x y E.
+    destruct (zero_product ('x) ('y)).
+      rewrite <-rings.preserves_mult.
+      rewrite E. now apply rings.preserves_0.
+     left. apply (injective inject). now rewrite rings.preserves_0.
+    right. apply (injective inject). now rewrite rings.preserves_0.
   Qed.
 
   Lemma aq_lt_mid (x y : Q) : (x < y)%Q → { z : AQ | (x < 'z ∧ 'z < y)%Q }.
@@ -155,46 +196,64 @@ Section approximate_rationals_more.
       apply Qplus_lt_r...
      replace LHS with ((1 # 2) * (x + y) - ((1 # 3) * γ)%Qpos)%Q...
       autorewrite with QposElim. unfold inject. 
-      apply (in_Qball ((1#3)*γ)), dense_inverse.
+      apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
      rewrite Eγ. QposRing.
     apply Qle_lt_trans with (y - (1#6) * γ)%Q.
      replace RHS with ((1 # 2) * (x + y) + ((1 # 3) * γ)%Qpos)%Q...
       autorewrite with QposElim. 
-      apply (in_Qball ((1#3)*γ)), dense_inverse.
+      apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
      rewrite Eγ. QposRing.
     replace RHS with (y - 0)%Q by ring.
     apply Qplus_lt_r. 
     apply Qopp_Qlt_0_r...
   Defined.
 
-  Lemma aq_preserves_min `{∀ x y : AQ, Decision (x ≤ y)} x y : 'min x y = Qmin ('x) ('y).
+  Definition AQball_bool (k : Z) (x y : AQ) := bool_decide_rel (≤) (abs (x - y)) (1 ≪ k).
+
+  Lemma AQball_bool_true (k : Z) (x y : AQ) : 
+    AQball_bool k x y ≡ true ↔ ball (2 ^ k) ('x) ('y).
+  Proof with auto.
+    rewrite bool_decide_rel_true. rewrite ->Qball_Qabs.
+    transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
+     split; intros.
+      apply (order_preserving _)...
+     apply (order_preserving_back inject)...
+    rewrite abs.preserves_abs rings.preserves_minus.
+    now rewrite aq_shift_correct rings.preserves_1 left_identity.
+  Qed.
+
+  Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ) : 
+    AQball_bool (Qdlog2 ε) x y ≡ true → ball ε ('x) ('y).
+  Proof with auto.
+    intros E.
+    apply AQball_bool_true in E.
+    apply Qball_Qabs in E. apply Qball_Qabs.
+    transitivity (2 ^ (Qdlog2 ε) : Q)...
+    apply (Qpos_dlog2_spec ε).
+  Qed.
+
+  Lemma aq_preserves_min x y : 'min x y = Qmin ('x) ('y).
   Proof.
     rewrite minmax.preserves_min.
     symmetry. apply Qmin_coincides.
   Qed.
 
-  Lemma aq_preserves_max `{∀ x y : AQ, Decision (x ≤ y)} x y : 'max x y = Qmax ('x) ('y).
+  Lemma aq_preserves_max x y : 'max x y = Qmax ('x) ('y).
   Proof. 
     rewrite minmax.preserves_max.
     symmetry. apply Qmax_coincides.
   Qed.
 
-  Definition aq_abs `{!AppRationalsAbs AQ} := λ x, proj1_sig (aq_abs_sig x).
-
-  Lemma aq_preserves_abs `{app_abs : !AppRationalsAbs AQ} x : '(aq_abs x) = Qabs ('x).
-  Proof.
-    unfold aq_abs, aq_abs_sig. 
-    destruct app_abs. assumption.
-  Qed.
-
-  Definition AQposAsAQ: AQ₊ → AQ := @proj1_sig _ _.
-  (* If we make this a coercion it will be gone after we close the section. Currently 
-      there seems to be no proper way to handle this. See Coq bug #2455. *)
-
-  Program Definition AQpos2Qpos (x : AQ₊) : Qpos := '(AQposAsAQ x) : Q.
+  Program Definition AQposAsQpos (x : AQ₊) : Qpos := '('x) : Q.
   Next Obligation.
     destruct x as [x Ex]. simpl.
-    pose proof (rings.preserves_0 (f:=inject : AQ → Q_as_MetricSpace)) as E. rewrite <-E.
+    posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q_as_MetricSpace)).
     apply aq_preserves_lt. assumption.
-  Qed.  
+  Qed.
+
+  Lemma AQposAsQpos_preserves_1 : AQposAsQpos 1 = 1.
+  Proof.
+    do 3 red. simpl.
+    now rewrite (rings.preserves_1 (f:=inject)).
+  Qed.
 End approximate_rationals_more.

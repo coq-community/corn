@@ -172,7 +172,7 @@ Definition Taylor_bnd := forall r H, conv_fun_seq'_IR realline
 Hypothesis bndf : Taylor_bnd.
 (* end show *)
 
-Opaque nexp_op fac.
+Opaque nexp_op fact.
 
 (* begin hide *)
 Let H1 : forall n, Two[^]n [#] ZeroR.
@@ -409,7 +409,7 @@ Proof.
  apply less_leEq; apply pos_two.
 Qed.
 
-Opaque N_Deriv fac.
+Opaque N_Deriv.
 
 Lemma Taylor_Series_conv_lemma3 :
   forall a' b d c e a'' x : IR,
@@ -532,11 +532,11 @@ Proof.
    apply Derivative_n_unique with H (S n) F; Deriv.
   eapply eq_transitive_unfolded.
    2: apply nring_comm_mult.
-  Transparent fac.
-  replace (fac (S n)) with (fac n * S n).
+  Transparent fact.
+  replace (fact (S n)) with (fact n * S n).
    algebra.
   Opaque mult.
-  unfold fac in |- *; fold (fac n) in |- *.
+  unfold fact in |- *; fold (fact n) in |- *.
   auto with arith.
  apply nring_nonneg.
 Qed.

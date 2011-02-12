@@ -32,7 +32,7 @@ Proof with auto.
 Qed.
 
 Global Instance SRpair_dec `{∀ x y : SR, Decision (x = y)} : ∀ x y : SRpair SR, Decision (x = y)
-  := λ x y, decide (pos x + neg y = pos y + neg x).
+  := λ x y, decide_rel (=) (pos x + neg y) (pos y + neg x).
 
 Instance: Proper ((=) ==> (=) ==> (=)) C.
 Proof.
@@ -48,15 +48,15 @@ Proof. intros x1 x2 E. unfold inject, equiv, SRpair_equiv. simpl. rewrite E. ref
 
 (* Relations, operations and constants *)
 Global Instance SRpair_plus: RingPlus (SRpair SR) := λ x y, C (pos x + pos y) (neg x + neg y).
-Global Instance SRpair_inv: GroupInv (SRpair SR) := λ x, C (neg x) (pos x).
+Global Instance SRpair_opp: GroupInv (SRpair SR) := λ x, C (neg x) (pos x).
 Global Instance SRpair_0: RingZero (SRpair SR) := ('0 : SRpair SR).
 Global Instance SRpair_mult: RingMult (SRpair SR) := λ x y, C (pos x * pos y + neg x * neg y) (pos x * neg y + neg x * pos y).
 Global Instance SRpair_1: RingOne (SRpair SR) := ('1 : SRpair SR).
 
-Ltac unfolds := unfold SRpair_inv, SRpair_plus, equiv, SRpair_equiv in *; simpl in *.
+Ltac unfolds := unfold SRpair_opp, SRpair_plus, equiv, SRpair_equiv in *; simpl in *.
 Ltac ring_on_sr := repeat intro; unfolds; try ring.
 
-Instance: Proper ((=) ==> (=)) SRpair_inv.
+Instance: Proper ((=) ==> (=)) SRpair_opp.
 Proof. 
   intros x y E. unfolds. 
   rewrite commutativity, <- E. ring.
@@ -172,7 +172,7 @@ Qed.
 
 Instance: ∀ z : SRpair SR, OrderPreserving ((+) z).
 Proof with trivial; try ring.
-  split; try apply _.
+  repeat (split; try apply _).
   unfold precedes, SRpair_order.
   destruct z as [zp zn]. intros [xp xn] [yp yn] E. simpl in *.
   apply srorder_plus in E. destruct E as [c [Ec1 Ec2]].
@@ -195,7 +195,7 @@ Proof with trivial; try ring.
 Qed. 
 
 Global Program Instance SRpair_le_dec `{∀ x y: SR, Decision (x ≤ y)} : ∀ x y : SRpair SR, Decision (x ≤ y) := λ x y,
-  match decide (pos x + neg y ≤ pos y + neg x) with
+  match decide_rel (≤) (pos x + neg y) (pos y + neg x) with
   | left E => left _
   | right E => right _
   end. 

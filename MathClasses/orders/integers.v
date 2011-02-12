@@ -1,44 +1,56 @@
 Require
   theory.integers theory.int_abs.
 Require Import
-  Morphisms Ring Program Setoid
+  Morphisms Ring Program Setoid workaround_tactics
   abstract_algebra interfaces.integers interfaces.naturals interfaces.additional_operations
   natpair_integers orders.semirings orders.naturals theory.rings.
 
+Section integers_order.
+Context `{Integers Int} `{!RingOrder o} `{!TotalOrder o}.
+
+Lemma integers_precedes_plus (x y: Int) : x ≤ y ↔ ∃ z: nat, y = x + naturals_to_semiring nat Int z.
+Proof with auto; try reflexivity.
+  split; intros E.
+   apply srorder_plus in E. destruct E as [z [Ez1 Ez2]].
+    destruct (int_abs_sig Int nat z) as [k [Ek | Ek]].
+     exists k. rewrite Ek...
+    exists (0 : nat).
+    rewrite preserves_0.
+    rewrite Ez2. apply sg_mor...
+    apply (antisymmetry (≤))...
+    rewrite <-Ek. apply flip_nonneg_opp. apply to_semiring_nonneg.
+   destruct E as [z E].
+   apply srorder_plus. exists (naturals_to_semiring nat Int z). split...
+   apply to_semiring_nonneg.
+Qed.
+
 Section another_ring.
-  Context `{Integers Int} {o : Order Int} `{!RingOrder o} `{!TotalOrder o} 
-    `{Ring R} {oR : Order R} `{!RingOrder oR} `{!TotalOrder oR}
-     {f : Int → R} `{!Ring_Morphism f}.
+  Context `{Ring R} {oR : Order R} `{!RingOrder oR} `{!TotalOrder oR}
+     {f : Int → R} `{!SemiRing_Morphism f}.
 
   Let f_preserves_0 x : 0 ≤ x → 0 ≤ f x.
-  Proof.
+  Proof with try reflexivity.
     intros E.
-    rewrite (integers.to_ring_unique f).
-    destruct (int_abs_sig Int nat x) as [z [Ez | Ez]].
-     rewrite <-Ez. 
-     change (0 ≤ (integers_to_ring Int R ∘ naturals_to_semiring nat Int) z).
-     rewrite (naturals.to_semiring_unique _).
+    apply integers_precedes_plus in E.
+    destruct E as [z E].
+    apply srorder_plus. exists (naturals_to_semiring nat R z). split...
      apply to_semiring_nonneg.
-    rewrite <-Ez in E |- *.
-    setoid_replace z with (0 : nat).
-     rewrite preserves_0, opp_0, preserves_0. reflexivity.
-    apply (injective (naturals_to_semiring nat Int)).
-    rewrite preserves_0.
-    apply (antisymmetry (≤)).
-     apply flip_nonpos_inv. assumption.
-    apply to_semiring_nonneg.
+    rewrite E.
+    rewrite preserves_plus, preserves_0. apply sg_mor...
+    change ((f ∘ naturals_to_semiring nat Int) z = naturals_to_semiring nat R z).
+    apply (naturals.to_semiring_unique _).
   Qed.
-
+   
   Global Instance morphism_order_preserving: OrderPreserving f.
-  Proof with trivial.
+  Proof.
     apply preserving_preserves_0. apply f_preserves_0.
   Qed.
 
   (* Because each morphism [f] between two [Integers] implementations is injective, we
-      obtain from the following lemma that the order on the integers is uniquely specified. *)
+      obtain, by the following lemma, that the order on the integers is uniquely specified. *)
   Context `{!Injective f}.
   Let f_preserves_0_back x : 0 ≤ f x → 0 ≤ x.
-  Proof with trivial.
+  Proof.
     intros E.
     rewrite (integers.to_ring_unique f) in E.
     destruct (int_abs_sig Int nat x) as [z [Ez | Ez]].
@@ -46,23 +58,24 @@ Section another_ring.
      apply to_semiring_nonneg. 
     rewrite <-Ez in E |- *.
     setoid_replace z with (0 : nat).
-     rewrite preserves_0, opp_0. reflexivity.
+     now rewrite preserves_0, opp_0.
     apply (injective (f ∘ naturals_to_semiring nat Int)).
     rewrite (naturals.to_semiring_unique _).
     unfold compose. do 2 rewrite preserves_0.
-    rewrite preserves_inv in E.
+    rewrite preserves_opp in E.
     apply (antisymmetry (≤)).
      rewrite <-(naturals.to_semiring_unique (integers_to_ring Int R ∘ naturals_to_semiring nat Int)).
-     apply flip_nonpos_inv...
+     now apply flip_nonpos_opp.
     apply to_semiring_nonneg.
   Qed.
   
   Global Instance: OrderEmbedding f.
-  Proof with trivial.
+  Proof.
     split. apply _.
     apply preserving_back_preserves_0. apply f_preserves_0_back.
   Qed.
 End another_ring.
+End integers_order.
 
 Section other_results.
 Context `{Integers Int} `{!RingOrder o} `{!TotalOrder o} .
@@ -74,12 +87,38 @@ Global Program Instance: ∀ x y: Int, Decision (x ≤ y) | 10 := λ x y,
   | right E => right _
   end.
 Next Obligation. 
-  apply (order_preserving_back (integers_to_ring _ (SRpair nat))). 
-  assumption.
+  now apply (order_preserving_back (integers_to_ring _ (SRpair nat))). 
 Qed.
 Next Obligation.
   intros F. apply E.
-  apply (order_preserving _). assumption.
+  now apply (order_preserving _).
+Qed.
+
+Add Ring nat : (stdlib_semiring_theory nat).
+
+Lemma precedes_sprecedes x y : x ≤ y ↔ x < y + 1.
+Proof.
+  split; intros E.
+   apply pos_plus_scompat_r. easy. apply sprecedes_0_1.
+  assert (∀ a b : SRpair nat, a < b + 1 → a ≤ b) as P.
+   intros a b [F1 F2].
+   unfold precedes, SRpair_order in *. simpl in *.
+   apply naturals.precedes_sprecedes.
+   split.
+    now ring_simplify in F1.
+   intros F3. apply F2. 
+   unfold ring_plus, SRpair_plus, equiv, SRpair_equiv. simpl.
+   rewrite associativity, F3. ring.
+  apply (order_preserving_back (integers_to_ring _ (SRpair nat))), P.
+  rewrite <-(preserves_1 (f:=integers_to_ring Int (SRpair nat))), <-preserves_plus.
+  now apply (strictly_order_preserving (integers_to_ring _ (SRpair nat))).
+Qed.
+
+Lemma precedes_sprecedes_alt x y : x + 1 ≤ y ↔ x < y.
+Proof.
+  split; intros E.
+   apply precedes_sprecedes in E. now apply (strictly_order_preserving_back (+ 1)) in E.
+  apply precedes_sprecedes. now apply (strictly_order_preserving (+ 1)) in E.
 Qed.
 
 Lemma induction
@@ -91,7 +130,7 @@ Proof with auto.
    rewrite <-E. clear E. pattern m. 
    apply naturals.induction; clear m.
      intros ? ? E. rewrite E. tauto.
-    rewrite preserves_0...
+    now rewrite preserves_0.
    intros m E. 
    rewrite preserves_plus, preserves_1.
    apply Psuc1... apply to_semiring_nonneg.
@@ -103,7 +142,21 @@ Proof with auto.
   rewrite preserves_plus, preserves_1.
   rewrite plus_opp_distr, commutativity.
   apply Psuc2...
-  apply inv_to_semiring_nonpos.
+  apply opp_to_semiring_nonpos.
+Qed.
+
+Lemma induction_nonneg
+  (P: Int → Prop) `{!Proper ((=) ==> iff) P}:
+  P 0 → (∀ n, 0 ≤ n → P n → P (1 + n)) → ∀ n, 0 ≤ n → P n.
+Proof with auto.
+  intros P0 PS n. pattern n. apply induction; clear n...
+   intros ? ? E. rewrite E. reflexivity.
+  intros n E1 ? E2.
+  destruct (ne_zero 1).
+  apply (antisymmetry (≤)).
+   apply (order_preserving_back ((n - 1) +)). ring_simplify. now transitivity 0.
+  transitivity (n - 1)... apply (order_preserving_back (1 +)). ring_simplify.
+  transitivity 0... apply semirings.precedes_0_2.
 Qed.
 
 Lemma biinduction
@@ -116,18 +169,18 @@ Proof with auto.
 Qed.
 End other_results.
 
+Instance int_precedes `{Integers Z} : Order Z | 10 :=  λ x y, ∃ z, y = x + naturals_to_semiring nat Z z.
+
 Section default_order.
 Context `{Integers Int}.
 Add Ring Int2 : (rings.stdlib_ring_theory Int).
 
-Global Instance int_precedes : Order Int | 9 :=  λ x y, ∃ z, y = x + naturals_to_semiring nat Int z.
-
 Global Instance: Proper ((=) ==> (=) ==> iff) int_precedes.
-Proof with assumption.
+Proof.
   intros x1 y1 E1 x2 y2 E2.
   split; intros [z p]; exists z.
-   rewrite <-E1, <-E2...
-  rewrite E1, E2...
+   now rewrite <-E1, <-E2.
+  now rewrite E1, E2.
 Qed.
 
 Global Instance: RingOrder int_precedes.
@@ -158,7 +211,7 @@ Proof with trivial; try reflexivity.
    change (a = (i_to_r ∘ naturals_to_semiring nat Int) (pos a ∸ neg a)).
    rewrite (naturals.to_semiring_unique_alt _ SRpair_inject).
    unfold equiv, SRpair_equiv, precedes, SRpair_order in *. simpl in *.
-   rewrite right_identity, cut_minus.cut_minus_precedes...
+   rewrite right_identity. posed_rewrite cut_minus_precedes...
    rewrite right_identity in A. rewrite left_identity in A...
   intros x y.
   destruct (total_order (i_to_r x) (i_to_r y)); intuition.

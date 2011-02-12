@@ -40,6 +40,8 @@ Require Import CRsign.
 Require Import Q_in_CReals.
 Require Import Qround.
 Require Import CornTac.
+Require Import theory.int_pow.
+Require Import abstract_algebra.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -58,17 +60,17 @@ Open Local Scope uc_scope.
 Section ExpSeries.
 Variable a:Q.
 
-Definition expSequence := mult_Streams recip_factorials (powers a).
+Definition expSequence := mult_Streams Qrecip_factorials (powers a).
 
-Lemma Str_nth_expSequence : forall n, (Str_nth n expSequence == (1#P_of_succ_nat (pred (fac n)))*a^n)%Q.
+Lemma Str_nth_expSequence : forall n, (Str_nth n expSequence = (1#P_of_succ_nat (pred (fact n)))*a^n)%Q.
 Proof.
  intros n.
  unfold expSequence.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
- rewrite -> Str_nth_powers.
- rewrite Str_nth_recip_factorials.
- reflexivity.
+ rewrite -> Str_nth_powers. 
+ rewrite <-(int_pow_nat_pow (f:=Z_of_nat)).
+ now rewrite Str_nth_Qrecip_factorials.
 Qed.
 
 (** The exponential is first defined on [[-1,0]]. *)
@@ -77,15 +79,15 @@ Hypothesis Ha: 0 <= a <= 1.
 Lemma expSequence_dnn : DecreasingNonNegative expSequence.
 Proof.
  apply mult_Streams_dnn.
-  apply recip_factorials_dnn.
+  apply Qrecip_factorials_dnn.
  apply powers_dnn.
  assumption.
 Qed.
 
 Lemma expSequence_zl : Limit expSequence 0.
 Proof.
- apply: mult_Streams_zl.
-  apply recip_factorials_zl.
+ eapply mult_Streams_zl.
+  apply Qrecip_factorials_zl.
  apply powers_nbz.
  assumption.
 Defined.
@@ -93,10 +95,10 @@ Defined.
 End ExpSeries.
 
 Lemma exp_ps_correct : forall a (n:nat) H,
-  inj_Q IR ((((-(1))^n)*Str_nth n (expSequence (-a)))%Q)[=]Exp_ps n (inj_Q IR a) H.
+  inj_Q IR ((((-(1))^n)*Str_nth n (expSequence (-a)))%Q) = Exp_ps n (inj_Q IR a) H.
 Proof.
  intros a n H.
- stepr (inj_Q IR ((1 # P_of_succ_nat (pred (fac n))) * a ^ n)%Q).
+ stepr (inj_Q IR ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)%Q).
   apply inj_Q_wd;simpl.
   rewrite -> Str_nth_expSequence.
   setoid_replace (a^n)%Q with ((-(1))^n*(-a)^n)%Q.
@@ -116,27 +118,27 @@ Proof.
   simpl.
   change (nring (R:=IR) n[+]One) with (nring (R:=IR) (S n)).
   rstepl (((One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]
-    (One[/]nring (R:=IR) (fac n)[//]nring_fac_ap_zero IR n))[*]
+    (One[/]nring (R:=IR) (fact n)[//]nring_fac_ap_zero IR n))[*]
       (nexp IR n (inj_Q IR a[-]Zero)[*]inj_Q IR a)).
   apply mult_wd;[|rational].
   assert (X:=(mult_resp_ap_zero _ _ _ (nringS_ap_zero IR n) (nring_fac_ap_zero IR n))).
-  rstepl (One[/]((nring (R:=IR) (S n))[*]nring (R:=IR) (fac n))[//]X).
+  rstepl (One[/]((nring (R:=IR) (S n))[*]nring (R:=IR) (fact n))[//]X).
   apply div_wd;[rational|].
   apply eq_symmetric.
-  change (fac n + n * fac n)%nat with (S n*(fac n))%nat.
+  change (fact n + n * fact n)%nat with (S n*(fact n))%nat.
   apply nring_comm_mult.
- stepl (inj_Q IR ((1#(P_of_succ_nat n))*a*((1 # P_of_succ_nat (pred (fac n))) * a ^ n))%Q).
+ stepl (inj_Q IR ((1#(P_of_succ_nat n))*a*((1 # P_of_succ_nat (pred (fact n))) * a ^ n))%Q).
   apply inj_Q_wd.
-  change ((1 # P_of_succ_nat n) * a * ((1 # P_of_succ_nat (pred (fac n))) * a ^ n) ==
-    (1 # P_of_succ_nat (pred (S n * fac n))) * a ^ S n)%Q.
-  replace (P_of_succ_nat (pred (S n * fac n))%nat) with
-    (P_of_succ_nat (pred (S n)) * P_of_succ_nat (pred (fac n)))%positive.
+  change ((1 # P_of_succ_nat n) * a * ((1 # P_of_succ_nat (pred (fact n))) * a ^ n) ==
+    (1 # P_of_succ_nat (pred (S n * fact n))) * a ^ S n)%Q.
+  replace (P_of_succ_nat (pred (S n * fact n))%nat) with
+    (P_of_succ_nat (pred (S n)) * P_of_succ_nat (pred (fact n)))%positive.
    rewrite <- pred_Sn.
    rewrite inj_S.
    unfold Zsucc.
    rewrite -> Qpower_plus'; auto with *.
-   change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fac n))%positive))%Q
-     with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fac n))))%Q.
+   change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fact n))%positive))%Q
+     with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fact n))))%Q.
    ring.
   apply nat_of_P_inj.
   rewrite nat_of_P_mult_morphism.
@@ -145,10 +147,10 @@ Proof.
   rewrite S_predn.
    rewrite S_predn.
     reflexivity.
-   cut (0 < S n * fac n)%nat;[auto with *|apply (nat_fac_gtzero (S n))].
-  cut (0 < fac n)%nat;[auto with *|apply (nat_fac_gtzero n)].
+   cut (0 < S n * fact n)%nat;[auto with *|apply (lt_O_fact (S n))].
+  cut (0 < fact n)%nat;[auto with *|apply (lt_O_fact n)].
  stepl ((One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]inj_Q IR a[*]
-   inj_Q IR ((1 # P_of_succ_nat (pred (fac n))) * a ^ n)%Q); [apply mult_wdr; apply IHn|].
+   inj_Q IR ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)%Q); [apply mult_wdr; apply IHn|].
  apply eq_symmetric.
  eapply eq_transitive;[apply inj_Q_mult|].
  eapply eq_transitive;[apply mult_wdl;apply inj_Q_mult|].
@@ -196,7 +198,16 @@ Proof.
 Qed.
 
 Definition rational_exp_small_neg (a:Q) (p:-(1) <= a <= 0) : CR
-:= let p':= (Qle_ZO_flip p) in InfiniteAlternatingSum (expSequence_dnn p') (expSequence_zl p').
+:= let p':= (Qle_ZO_flip p) in @InfiniteAlternatingSum (expSequence (-a)) (expSequence_dnn p') (expSequence_zl p').
+
+Lemma rational_exp_small_neg_wd (a1 a2 : Q) (p1 : -(1) <= a1 <= 0) (p2 : -(1) <= a2 <= 0) :
+  a1 = a2 → rational_exp_small_neg p1 = rational_exp_small_neg p2.
+Proof. 
+  intros E. unfold rational_exp_small_neg. 
+  apply InfiniteAlternatingSum_wd.
+  unfold expSequence.
+  now rewrite E.
+Qed.
 
 Lemma rational_exp_small_neg_correct : forall (a:Q) Ha,
  (@rational_exp_small_neg a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
@@ -208,6 +219,9 @@ Proof.
  clear Ha.
  apply exp_ps_correct.
 Qed.
+
+Program Definition CRe_inv := @rational_exp_small_neg (-(1)) _.
+Next Obligation. constructor; discriminate. Qed.
 
 (** exp is extended to work on [[-2^n, 0]] for all n. *)
 Lemma shrink_by_two : forall n a, (-(2^(S n)))%Z <= a <= 0 -> (-(2^n))%Z <= (a/2) <= 0.
@@ -243,9 +257,70 @@ match n return (-(2^n))%Z <= a <= 0 -> CR with
   end
 end.
 
+Local Opaque compress CRpower_positive_bounded.
+Lemma rational_exp_neg_bounded_wd_aux (a1 a2 : Q) (n1 n2 : nat) (p1 : (-(2^n1))%Z <= a1 <= 0) (p2 : (-(2^n2))%Z <= a2 <= 0) :
+  n1 ≤ n2 → a1 = a2 → rational_exp_neg_bounded n1 p1 = rational_exp_neg_bounded n2 p2.
+Proof.
+  revert n2 a1 a2 p1 p2.
+  induction n1.
+   intros [|n2] a1 a2 p1 p2 En Ea.
+    now apply rational_exp_small_neg_wd.
+   simpl.
+   case (Qlt_le_dec_fast a2 (- (1))); intros E2.
+    destruct (Qlt_not_le _ _ E2).
+    now rewrite <-Ea.
+   now apply rational_exp_small_neg_wd.
+  intros [|n2] a1 a2 p1 p2 En Ea.
+   inversion En.
+  simpl.
+  case (Qlt_le_dec_fast a1 (- (1))); case (Qlt_le_dec_fast a2 (- (1))); intros E2 E3.
+     rewrite IHn1. easy. now apply le_S_n. now rewrite Ea. 
+    destruct (Qle_not_lt _ _ E2). now rewrite <-Ea.
+   destruct (Qle_not_lt _ _ E3). now rewrite Ea.
+  now apply rational_exp_small_neg_wd.
+Qed.
+
+Lemma rational_exp_neg_bounded_wd (a1 a2 : Q) (n1 n2 : nat) (p1 : (-(2^n1))%Z <= a1 <= 0) (p2 : (-(2^n2))%Z <= a2 <= 0) :
+  a1 = a2 → rational_exp_neg_bounded n1 p1 = rational_exp_neg_bounded n2 p2.
+Proof.
+  destruct (total_order n1 n2); intros E.
+   now apply rational_exp_neg_bounded_wd_aux.
+  symmetry in E |- *. now apply rational_exp_neg_bounded_wd_aux.
+Qed.
+
+Lemma shrink_by_two_correct (a : Q) :
+  a ≤ 0 → (CRpower_positive_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2)))) = IRasCR (Exp (inj_Q IR a)).
+Proof.
+ intros Ea.
+ rewrite <- CRpower_positive_bounded_correct.
+  apply IRasCR_wd.
+  set (a':=inj_Q IR (a/2)).
+  simpl.
+  rstepl (Exp a'[*]Exp a').
+  stepl (Exp (a'[+]a')); [| by apply Exp_plus].
+  apply Exp_wd.
+  unfold a'.
+  eapply eq_transitive.
+   apply eq_symmetric; apply (inj_Q_plus IR).
+  apply inj_Q_wd.
+  change (a / (2#1) + a / (2#1) == a). field.
+ apply leEq_imp_AbsSmall.
+  apply less_leEq; apply Exp_pos.
+ stepr (One:IR).
+  apply Exp_leEq_One.
+  stepr (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
+  apply inj_Q_leEq.
+  apply mult_cancel_leEq with (2:Q).
+   constructor.
+  change (a/2*2<=0).
+  now replace LHS with a by (simpl; field; discriminate).
+ rstepl (nring 1:IR).
+ apply eq_symmetric; apply (inj_Q_nring IR 1).
+Qed.
+
 (** [exp] works on all nonpositive numbers. *)
 Lemma rational_exp_neg_bounded_correct : forall n (a:Q) Ha,
- (@rational_exp_neg_bounded n a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
+ (@rational_exp_neg_bounded n a Ha = IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
  unfold rational_exp_neg_bounded.
  induction n.
@@ -255,38 +330,12 @@ Proof.
   rewrite -> IHn.
   clear IHn.
   rewrite -> compress_correct.
-  rewrite <- CRpower_positive_bounded_correct.
-   apply IRasCR_wd.
-   set (a':=inj_Q IR (a/2)).
-   simpl.
-   rstepl (Exp a'[*]Exp a').
-   stepl (Exp (a'[+]a')); [| by apply Exp_plus].
-   apply Exp_wd.
-   unfold a'.
-   eapply eq_transitive.
-    apply eq_symmetric; apply (inj_Q_plus IR).
-   apply inj_Q_wd.
-   simpl.
-   field; discriminate.
-  apply leEq_imp_AbsSmall.
-   apply less_leEq; apply Exp_pos.
-  stepr (One:IR).
-   apply Exp_leEq_One.
-   stepr (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
-   apply inj_Q_leEq.
-   apply mult_cancel_leEq with (2:Q).
-    constructor.
-   change (a/2*2<=0).
-   replace LHS with a by (simpl; field; discriminate).
-   apply Qle_trans with (-(1)); try discriminate.
-   apply Qlt_le_weak.
-   assumption.
-  rstepl (nring 1:IR).
-  apply eq_symmetric; apply (inj_Q_nring IR 1).
+  now apply shrink_by_two_correct.
  apply rational_exp_small_neg_correct.
 Qed.
 
-Lemma rational_exp_bound_power_2 : forall (a:Q), a <= 0 -> (-2^(Z_of_nat match (Qnum a) with |Z0 => O | Zpos x => Psize x | Zneg x => Psize x end))%Z <= a.
+Lemma rational_exp_bound_power_2 : forall (a:Q), 
+  a <= 0 -> (-2^(Z_of_nat match (Qnum a) with |Z0 => O | Zpos x => Psize x | Zneg x => Psize x end))%Z <= a.
 Proof.
  intros [[|n|n] d] Ha; simpl.
    discriminate.
@@ -331,47 +380,44 @@ Proof.
  apply Ha.
 Defined.
 
+Lemma rational_exp_neg_wd (a1 a2 : Q) (p1 : a1 <= 0) (p2 : a2 <= 0) :
+  a1 = a2 → rational_exp_neg p1 = rational_exp_neg p2.
+Proof.
+  intros E.
+  now apply rational_exp_neg_bounded_wd.
+Qed.
+
 Lemma rational_exp_neg_correct : forall (a:Q) Ha,
  (@rational_exp_neg a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
  intros a Ha.
  apply rational_exp_neg_bounded_correct.
 Qed.
+
 (** exp(x) is bounded below by (3^x) for x nonpositive, and hence
 exp(x) is positive. *)
-Lemma minus_one_works_for_rational_exp_small_neg : -(1) <= -(1) <= 0.
+Lemma CRe_inv_posH : ('(1#3) <= CRe_inv)%CR.
 Proof.
- constructor; discriminate.
+ unfold CRle.
+ apply CRpos_nonNeg.
+ CR_solve_pos (1#1)%Qpos.
 Qed.
 
-Lemma rational_exp_small_neg_posH : forall (a:Q) (p:-(1) <= a <= 0),
- ('(1#3) <= rational_exp_small_neg p)%CR.
+(* We parametrize the following lemmas by a lowerbound of [CRe_inv] so that
+    we can easily swap lowerbounds. *)
+Lemma rational_exp_neg_posH (q : Qpos) (n:nat) (a:Q) Ha (Hn : -n <= a) :
+ ('q <= CRe_inv → '(q^n) <= @rational_exp_neg a Ha)%CR.
 Proof.
- intros a p.
- apply CRle_trans with (rational_exp_small_neg minus_one_works_for_rational_exp_small_neg).
-  unfold CRle.
-  apply CRpos_nonNeg.
-  CR_solve_pos (1#1)%Qpos.
- do 2 rewrite -> (rational_exp_small_neg_correct).
- rewrite <- IR_leEq_as_CR.
- apply Exp_resp_leEq.
- apply inj_Q_leEq.
- destruct p; assumption.
-Qed.
-
-Lemma rational_exp_neg_posH : forall (n:nat) (a:Q) Ha, (-n <= a) ->
- ('((1#3)^n) <= @rational_exp_neg a Ha)%CR.
-Proof.
- intros n a Ha Hn.
+ intros small.
  rewrite -> rational_exp_neg_correct.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
- stepl (inj_Q IR (1#3)[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
- assert (X:Zero[<]inj_Q IR (1#3)).
+ stepl (inj_Q IR q[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
+ assert (X:Zero[<]inj_Q IR q).
   stepl (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
-  constructor.
- astepl (inj_Q IR (1#3)[!](nring n)[//]X).
+  now destruct q.
+ astepl (inj_Q IR q[!](nring n)[//]X).
  unfold power.
  apply Exp_resp_leEq.
  destruct n.
@@ -383,7 +429,7 @@ Proof.
   apply nring_pos; auto with *.
  stepr (inj_Q IR (a/(S n))).
   apply Exp_cancel_leEq.
-  astepl (inj_Q IR (1#3)).
+  astepl (inj_Q IR q).
   rewrite -> IR_leEq_as_CR.
   rewrite -> IR_inj_Q_as_CR.
   assert (Ha0 : -(1)<=(a/S n)<=0).
@@ -403,7 +449,14 @@ Proof.
    rewrite <- (Qmake_Qdiv 1 (P_of_succ_nat n)).
    discriminate.
   rewrite <- (rational_exp_small_neg_correct Ha0).
-  apply rational_exp_small_neg_posH.
+  apply CRle_trans with CRe_inv.
+   apply small.
+  unfold CRe_inv.
+  do 2 rewrite -> (rational_exp_small_neg_correct).
+  rewrite <- IR_leEq_as_CR.
+  apply Exp_resp_leEq.
+  apply inj_Q_leEq.
+  tauto.
  assert (X0:inj_Q IR (inject_Z (S n))[#]Zero).
   stepl (inj_Q IR (nring (S n))).
    stepl (nring (S n):IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR (S n)))].
@@ -421,10 +474,10 @@ Proof.
  apply inj_Q_div.
 Qed.
 
-Lemma rational_exp_neg_posH' : forall (a:Q) Ha,
- ('((3#1)^(Zdiv (Qnum a) (Qden a)))%Qpos <= @rational_exp_neg a Ha)%CR.
+Lemma rational_exp_neg_posH' (q : Qpos) (a : Q) Ha : 
+ ('q <= CRe_inv → '(q^(-Zdiv (Qnum a) (Qden a)))%Qpos <= @rational_exp_neg a Ha)%CR.
 Proof.
- intros [n d] Ha.
+ destruct a as [n d]. intros small.
  simpl.
  assert (X1:(d > 0)%Z) by auto with *.
  assert (X:n = (d * (n / d) + n mod d)%Z).
@@ -447,32 +500,28 @@ Proof.
   simpl in Ha.
   replace LHS with (n*1)%Z by ring.
   assumption.
- setoid_replace (QposAsQ ((3#1)^c)%Qpos) with ((1#3)^(Z_to_nat X0)).
+ setoid_replace (QposAsQ (q^-c)%Qpos) with (q^Z_to_nat X0).
   apply rational_exp_neg_posH.
-  rewrite <- (Z_to_nat_correct X0).
-  unfold Qle.
-  simpl.
-  rewrite X.
-  replace LHS with (d*c + 0)%Z by ring.
-  replace RHS with (d*c + n mod d)%Z by ring.
-  apply Zplus_le_compat_l.
-  destruct (Z_mod_lt n _ X1).
+   rewrite <- (Z_to_nat_correct X0).
+   unfold Qle.
+   simpl.
+   rewrite X.
+   replace LHS with (d*c + 0)%Z by ring.
+   replace RHS with (d*c + n mod d)%Z by ring.
+   apply Zplus_le_compat_l.
+   destruct (Z_mod_lt n _ X1).
+   assumption.
   assumption.
- rewrite <- Z_to_nat_correct.
- rewrite -> Q_Qpos_power.
- change (1#3) with (/3).
- rewrite -> Qinv_power.
- rewrite <- Qpower_opp.
- replace (- - c)%Z with c by ring.
- reflexivity.
+ now rewrite <- Z_to_nat_correct.
 Qed.
 
 Lemma rational_exp_neg_pos : forall (a:Q) Ha,
  CRpos (@rational_exp_neg a Ha).
 Proof.
  intros a Ha.
- exists ((3#1)^(Zdiv (Qnum a) (Qden a)))%Qpos.
+ exists ((1#3)^(-Zdiv (Qnum a) (Qden a)))%Qpos.
  apply rational_exp_neg_posH'.
+ apply CRe_inv_posH.
 Defined.
 
 (** exp is extended to all numbers by saying exp(x) = 1/exp(-x) when x
@@ -480,36 +529,41 @@ is positive. *)
 Definition rational_exp (a:Q) : CR.
 Proof.
  destruct (Qle_total 0 a).
-  refine (CRinv_pos ((3#1)^(Zdiv (Qnum (- a)) (Qden (- a))))%Qpos (@rational_exp_neg (-a) _)).
+  refine (CRinv_pos ((1#3)^(-Zdiv (Qnum (-a)) (Qden (-a))))%Qpos (@rational_exp_neg (-a) _)).
   apply (Qopp_le_compat 0); assumption.
  apply (rational_exp_neg q).
 Defined.
 
-Lemma rational_exp_correct : forall (a:Q),
- (rational_exp a == IRasCR (Exp (inj_Q IR a)))%CR.
+Lemma rational_exp_pos_correct (a : Q) (Pa : 0 ≤ a) (c : Qpos) :
+  ('c <= IRasCR (Exp (inj_Q IR (-a)%Q)))%CR → 
+  CRinv_pos c (IRasCR (Exp (inj_Q IR (-a)))) = IRasCR (Exp (inj_Q IR a)).
 Proof.
- intros a.
- unfold rational_exp.
- destruct (Qle_total 0 a); try apply rational_exp_neg_correct.
- assert (X0:=rational_exp_neg_correct (Qopp_le_compat 0 a q)).
- rewrite -> X0.
- assert (X:((IRasCR (Exp (inj_Q IR (- a)%Q)) >< '0)%CR)).
-  cut (rational_exp_neg (Qopp_le_compat 0 a q) >< ' 0)%CR.
-   apply CRapart_wd; assumption || reflexivity.
-  right.
-  exists ((3 # 1) ^ (Qnum (-a) / Qden (-a)))%Qpos.
-  ring_simplify.
-  apply rational_exp_neg_posH'.
- rewrite -> (@CRinv_pos_inv ((3 # 1) ^ (Qnum (-a) / Qden (-a))) _ X);
-   [|rewrite <- X0; apply rational_exp_neg_posH'].
+ intros Ec.
+ assert (X: (IRasCR (Exp (inj_Q IR (-a)%Q)) >< '0)%CR).
+  right. exists c.
+  now ring_simplify.
+ rewrite (CRinv_pos_inv c X); trivial.
  rewrite <- IR_recip_as_CR_2.
  apply IRasCR_wd.
  apply eq_symmetric.
  eapply eq_transitive;[|apply div_wd; apply eq_reflexive].
  apply Exp_inv'.
  rstepl ([--][--](inj_Q IR a)).
- csetoid_rewrite_rev (inj_Q_inv IR a).
- apply eq_reflexive.
+ now csetoid_rewrite_rev (inj_Q_inv IR a).
+Qed.
+
+Lemma rational_exp_correct (a : Q) :
+ (rational_exp a = IRasCR (Exp (inj_Q IR a)))%CR.
+Proof.
+ unfold rational_exp.
+ destruct (Qle_total 0 a).
+  rewrite rational_exp_neg_correct.
+  apply rational_exp_pos_correct.
+   easy. 
+  rewrite <-(rational_exp_neg_correct (Qopp_le_compat 0 a q)).
+  apply rational_exp_neg_posH'.
+  apply CRe_inv_posH.
+ apply rational_exp_neg_correct.
 Qed.
 
 (**
@@ -517,7 +571,7 @@ Qed.
 *)
 Definition CRe : CR := rational_exp 1.
 
-Lemma CRe_correct : (CRe == IRasCR E)%CR.
+Lemma CRe_correct : (CRe = IRasCR E)%CR.
 Proof.
  unfold CRe.
  rewrite -> rational_exp_correct.
@@ -706,7 +760,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma exp_correct : forall x, (IRasCR (Exp x)==exp (IRasCR x))%CR.
+Lemma exp_correct : forall x, (IRasCR (Exp x) = exp (IRasCR x))%CR.
 Proof.
  intros x.
  unfold exp.
@@ -761,7 +815,7 @@ Proof.
  auto with *.
 Qed.
 (* end hide *)
-Lemma exp_Qexp : forall x : Q, (exp (' x) == rational_exp x)%CR.
+Lemma exp_Qexp : forall x : Q, (exp (' x) = rational_exp x)%CR.
 Proof.
  intros x.
  rewrite <- IR_inj_Q_as_CR.
@@ -769,6 +823,14 @@ Proof.
  rewrite <- rational_exp_correct.
  reflexivity.
 Qed.
+
+Instance: Proper ((=) ==> (=)) rational_exp.
+Proof.
+  intros x1 x2 E.
+  rewrite <-2!exp_Qexp.
+  now rewrite E.
+Qed.
+
 (* begin hide *)
 Hint Rewrite exp_Qexp : CRfast_compute.
 (* end hide *)

@@ -6,7 +6,9 @@ PREREQUISITES
 
  This version of C-CoRN is known to compile with:
 
- - Coq version revision 13781 from the trunk branch
+ - Coq version revision 13806 from the trunk branch with the following reverts:
+    svn diff -r 13717:13716 | patch -p0 due to bug #2481
+    svn diff -r 13787:13786 | patch -p0 due to bug #2491
 
  - Ssreflect revision 1332 from the trunk branch in the coq-contrib repository.
    This exact revision can be obtained by saying:

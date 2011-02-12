@@ -59,10 +59,10 @@ Definition QposTotalOrder : TotalOrder.
 Proof.
  apply makeTotalOrder with
    Qpos QposEq (fun (x y:Qpos) => x <= y) Qpos_monotone Qpos_antitone Qpos_min Qpos_max.
-          apply Qpos_eq_le_def.
-         firstorder using Qle_refl.
-        firstorder using Qle_trans.
-       firstorder using Qpos_le_total.
+          exact Qpos_eq_le_def.
+         exact Qle_refl.
+        exact Qle_trans.
+       exact Qpos_le_total.
       firstorder using PartialOrder.Default.monotone_def.
      firstorder using PartialOrder.Default.antitone_def.
     apply (TotalOrder.Default.min_def1 _ _ _ Qpos_eq_le_def Qpos_le_total).
@@ -177,13 +177,13 @@ Lemma Qplus_monotone_r : forall a, Qpos_monotone (Qpos_plus a).
 Proof.
  intros a x y Hxy.
  repeat rewrite -> Q_Qpos_plus.
- firstorder using Qle_refl Qplus_le_compat .
+ apply Qplus_le_compat. apply Qle_refl. assumption.
 Qed.
 Lemma Qplus_monotone_l : forall a, Qpos_monotone (fun x => Qpos_plus x a).
 Proof.
  intros a x y Hxy.
  repeat rewrite Q_Qpos_plus.
- firstorder using Qle_refl Qplus_le_compat.
+ apply Qplus_le_compat. assumption. apply Qle_refl.
 Qed.
 
 Open Local Scope Qpos_scope.

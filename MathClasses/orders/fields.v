@@ -1,7 +1,8 @@
 Require Import
   Relation_Definitions Morphisms Ring Program Setoid
-  abstract_algebra orders.semirings theory.rings theory.fields
-  orders.orders orders.maps.
+  abstract_algebra theory.rings theory.fields.
+Require Export
+  orders.semirings.
 
 Section contents.
 Context `{Field F} `{!RingOrder o} `{!TotalOrder o} `{!DecMultInv F} `{∀ x y : F, Decision (x = y)}.
@@ -11,7 +12,7 @@ Lemma pos_dec_mult_inv_compat x : 0 < x → 0 < /x.
 Proof with trivial.
   intros E.
   split.
-   apply (order_preserving_back_gt_0 ring_mult x)...
+   apply (order_preserving_back_gt_0 (.*.) x)...
    rewrite dec_mult_inverse.
     ring_simplify. apply precedes_0_1.
    apply not_symmetry, neq_precedes_sprecedes...
@@ -31,10 +32,10 @@ Qed.
 Lemma flip_dec_mult_inv x y : 0 < y → y ≤ x  → /x ≤ /y.
 Proof with trivial.
   intros E1 E2.
-  apply (order_preserving_back_gt_0 ring_mult x)...
+  apply (order_preserving_back_gt_0 (.*.) x)...
    apply sprecedes_trans_l with y...
   rewrite dec_mult_inverse.
-   apply (order_preserving_back_gt_0 ring_mult y)...
+   apply (order_preserving_back_gt_0 (.*.) y)...
    rewrite (commutativity x), associativity, dec_mult_inverse.
     ring_simplify...
    apply not_symmetry, neq_precedes_sprecedes...
@@ -51,9 +52,19 @@ Proof with trivial.
 Qed.
 
 Lemma flip_dec_mult_inv_r x y : 0 < y → y ≤ /x  → x ≤ /y.
-Proof with trivial.
+Proof.
   intros E1 E2.
   rewrite <-(dec_mult_inv_involutive x).
-  apply flip_dec_mult_inv...
+  now apply flip_dec_mult_inv.
+Qed.
+
+Lemma precedes_0_half : 0 ≤ 1/2.
+Proof.
+  apply (order_preserving_back_gt_0 (.*.) 2).
+   apply sprecedes_0_2.
+  ring_simplify.
+  rewrite dec_mult_inverse.
+   apply precedes_0_1.
+  apply (ne_zero 2).
 Qed.
 End contents.

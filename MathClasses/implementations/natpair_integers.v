@@ -61,22 +61,18 @@ Section for_another_ring.
   Let preserves_0: z_to_r 0 = 0.
   Proof. derive_preservation. Qed.
 
-  Let preserves_opp x: z_to_r (- x) = - z_to_r x.
-  Proof. derive_preservation. Qed.
-
-  Global Instance: Ring_Morphism z_to_r.
+  Global Instance: SemiRing_Morphism z_to_r.
   Proof.
     pose proof (_ : Ring (SRpair N)).
     repeat (split; try apply _).
-        exact preserves_plus.
-       exact preserves_0.
-      exact preserves_opp.
+       exact preserves_plus.
+      exact preserves_0.
      exact preserves_mult.
     exact preserves_1.
   Qed.
 
   Section for_another_morphism.
-    Context (f : Z → R) `{!Ring_Morphism f}.
+    Context (f : Z → R) `{!SemiRing_Morphism f}.
 
     Definition g : N → R := f ∘ inject.
 
@@ -96,7 +92,7 @@ Section for_another_ring.
      intros [p n] z' E. rewrite <- E. clear E z'.
      rewrite SRpair_splits.
      preservation.
-     do 2 rewrite preserves_inv.
+     rewrite 2!rings.preserves_opp.
      rewrite (agree_on_nat p p), (agree_on_nat n n)...
      unfold integers_to_ring, z_to_ring. simpl. 
      rewrite rings.preserves_0.
@@ -143,10 +139,10 @@ Proof with auto.
   destruct (simpleZ_abs x) as [a [A|A]], (simpleZ_abs y) as [b [B|B]]; rewrite <-A, <-B in E |- *.
      apply zero_product_aux...
     destruct (zero_product_aux a b) as [C|C]...
-     apply rings.inv_zero_prod_r...
+     apply rings.opp_zero_prod_r...
     right. rewrite C. apply rings.opp_0.
    destruct (zero_product_aux a b) as [C|C]...
-    apply rings.inv_zero_prod_l...
+    apply rings.opp_zero_prod_l...
    left. rewrite C. apply rings.opp_0.
   rewrite rings.opp_mult_opp in E. 
   destruct (zero_product_aux a b) as [C|C]...
