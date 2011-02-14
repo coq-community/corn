@@ -83,6 +83,21 @@ Section products.
 
 End products.
 
+
+Section sig_metricspace.
+
+  Context `{MetricSpaceClass X} (P: X → Prop).
+
+  Global Instance sig_mspc_ball: MetricSpaceBall (sig P).
+  Admitted.
+
+  Global Instance sig_mspc: MetricSpaceClass (sig P).
+  Proof with auto.
+  Admitted.
+ 
+End sig_metricspace.
+
+
 (** I decided to experiment with a class used strictly to declare a metric space's
  components in a section using [Context] without also declaring the metric space structure
  itself, and risking accidental parameterization of the section context on the proof of that
