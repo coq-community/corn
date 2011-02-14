@@ -166,7 +166,7 @@ Section contents.
    let sndl:=(ne_list.map snd l) in
    ¬(u-v == 0)%Q ->
    (divdiff (ne_list.map (second f ) l)) == 
-   (divdiff (ne_zip _ _ sndl (ne_list.map f sndl))) * (divdiff (ne_list.map (second inject_Q ) l)).
+   (divdiff (ne_zip sndl (ne_list.map f sndl))) * (divdiff (ne_list.map (second inject_Q ) l)).
   Proof with auto;simpl.
   intros. do 3 rewrite divdiff_e...
   (* want a combination of ring and a rewrite database for inject_Q ? *)  
