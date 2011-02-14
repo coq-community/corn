@@ -30,6 +30,7 @@ Require Import Qmetric.
 Require Import QMinMax.
 Require Import MoreArcTan.
 Require Import CornTac.
+Require Import abstract_algebra.
 
 Set Implicit Arguments.
 
@@ -103,6 +104,15 @@ End ArcTanSeries.
 
 Definition rational_arctan_small_pos (a:Q) (p: 0 <= a <= 1) : CR :=
  @InfiniteAlternatingSum _ (arctanSequence_dnn p) (arctanSequence_zl p).
+
+Lemma rational_arctan_small_pos_wd (a1 a2 : Q) (p1 : 0 <= a1 <= 1) (p2 : 0 <= a2 <= 1) :
+  a1 = a2 → rational_arctan_small_pos p1 = rational_arctan_small_pos p2.
+Proof.
+  intros E. unfold rational_arctan_small_pos.
+  apply InfiniteAlternatingSum_wd.
+  unfold arctanSequence.
+  now rewrite E.
+Qed.
 
 Lemma rational_arctan_small_pos_correct : forall (a:Q) Ha, a < 1 ->
  (@rational_arctan_small_pos a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.

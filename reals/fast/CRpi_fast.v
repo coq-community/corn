@@ -26,6 +26,7 @@ Require Import QMinMax.
 Require Import CRarctan_small.
 Require Import MoreArcTan.
 Require Import CornTac.
+Require Import abstract_algebra.
 
 Set Implicit Arguments.
 
@@ -295,6 +296,12 @@ Proof.
   csetoid_rewrite (inj_Q_nring IR 12).
   apply eq_reflexive.
  apply (inj_Q_nring IR 24).
+Qed.
+
+Global Instance: Proper ((=) ==> (=)) r_pi.
+Proof.
+  intros ? ? E. unfold r_pi.
+  now rewrite E.
 Qed.
 
 Definition CRpi : CR := (r_pi 1).

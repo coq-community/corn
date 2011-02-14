@@ -62,7 +62,7 @@ Proof with auto.
   apply (antisymmetry (≤)).
    apply integers.precedes_sprecedes.
    apply int_pow_exp_sprecedes_back with 2...
-   rewrite int_pow_exp_plus... rewrite int_pow_mult_inv, int_pow_1.
+   rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
    apply sprecedes_trans_r with ((x : Q) / 2).
     apply_simplified (order_preserving (.* (/ 2))).
     apply Qdlog2_spec...
@@ -74,7 +74,7 @@ Proof with auto.
   apply sprecedes_trans_r with ((x : Q) / 2).
    apply Qdlog2_spec...
   rewrite <-associativity. rewrite (commutativity _ 1), associativity.
-  rewrite int_pow_exp_plus... rewrite int_pow_mult_inv, int_pow_1.
+  rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
   apply_simplified (strictly_order_preserving (.* (/ 2))).
   apply stdlib_rationals.Qlt_coincides.
   apply Qdlog2_spec...
