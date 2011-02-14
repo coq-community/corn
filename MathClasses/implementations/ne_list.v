@@ -165,4 +165,14 @@ Module notations.
   Global Infix ":::" := cons (at level 60, right associativity).
     (* Todo: Try to get that "[ x ; .. ; y ]" notation working. *)
 
+Fixpoint ne_zip (A B : Type) (l : ne_list A) (m : ne_list B) {struct l} : ne_list (A * B) :=
+  match l with
+  | one a => one (a, head m)
+  | a ::: l =>
+      match m with
+      | one b => one (a, b)
+      | b ::: m => (a, b) ::: ne_zip A B l m
+      end
+  end.
+
 End notations.

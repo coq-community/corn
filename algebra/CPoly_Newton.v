@@ -161,6 +161,22 @@ Section contents.
    fold s0. ring.
   Qed.
 
+  Lemma divdiff_chain (f : Q ->CR) (x y u v: Q): 
+   let l:=(x,u):::ne_list.one (y,v) in
+   let sndl:=(ne_list.map snd l) in
+   ¬(u-v == 0)%Q ->
+   (divdiff (ne_list.map (second f ) l)) == 
+   (divdiff (ne_zip _ _ sndl (ne_list.map f sndl))) * (divdiff (ne_list.map (second inject_Q ) l)).
+  Proof with auto;simpl.
+  intros. do 3 rewrite divdiff_e...
+  (* want a combination of ring and a rewrite database for inject_Q ? *)  
+  set s:=(f u - f v). set t:=('(/ (x - y))). 
+  rewrite CRminus_Qminus. set a:=(u-v)%Q.
+  transitivity (s * ' (/ (a) * (a)) * t).
+  rewrite <- (Qmult_comm a).
+  rewrite Qmult_inv_r... ring.
+  rewrite <- (@CRmult_Qmult (/a) a). set (' (/a)). ring.
+  Qed.
 
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
     _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x) [+X*] One) (tl xs)).
