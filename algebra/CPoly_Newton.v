@@ -109,7 +109,7 @@ Section contents.
    rewrite divdiff_e.
    set (' (/ (fst a - fst b))).
    transitivity ((c * divdiff (a ::: xs) - c * divdiff (b ::: xs)) * s). ring.
-   rewrite IHxs IHxs0.
+   rewrite IHxs, IHxs0.
    symmetry. rewrite divdiff_e.
    simpl. fold s. ring.
   Qed.
@@ -127,7 +127,7 @@ Section contents.
    set (λ p : ne_list (Q and CR and CR) and ne_list (Q and CR and CR),
        divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p))) in *.
    simpl in *.
-   rewrite IHxs IHxs0.
+   rewrite IHxs, IHxs0.
    repeat rewrite ne_list.list_map.
    repeat rewrite zip_map_snd.
    repeat rewrite map_map_comp.
@@ -165,8 +165,8 @@ Section contents.
   Proof with auto;simpl.
   intros. do 3 rewrite divdiff_e...
   (* want a combination of ring and a rewrite database for inject_Q ? *)  
-  set s:=(f u - f v). set t:=('(/ (x - y))). 
-  rewrite CRminus_Qminus. set a:=(u-v)%Q.
+  set (s:=f u - f v). set (t:='(/ (x - y))). 
+  rewrite CRminus_Qminus. set (a:=(u-v)%Q).
   transitivity (s * ' (/ (a) * (a)) * t).
   rewrite <- (Qmult_comm a).
   rewrite Qmult_inv_r... ring.

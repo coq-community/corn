@@ -60,7 +60,7 @@ Notation "( f , g )":= (together f g).
 We would like to define fun x => v (x, f x), more precisely:
 *)
 
-Check (Cbind_slowC v).
+(* Check (Cbind_slowC v).
 Definition vxfx : UCFunction Q CR := 
   ucFunction (fun x => (Couple (Cunit x, f x) >>= v)).
 
@@ -72,4 +72,6 @@ Where Cunit is derived from the Coercion inject_Q.
 Coercion inject_Q: QArith_base.Q>-> CR.
 But this cannot be a Coercion(?)
 *)
+
 End test.
+End ODE.
