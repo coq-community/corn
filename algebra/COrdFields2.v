@@ -601,7 +601,7 @@ Proof.
   apply nring_less.
   apply lt_le_trans with (S n).
    auto with arith.
-  elimtype False. move: H; rewrite -> leEq_def; apply.
+  elimtype False. revert H; rewrite -> leEq_def. intro H; destruct H.
   apply nring_less; auto with arith.
  cut (n <= m).
   auto with arith.

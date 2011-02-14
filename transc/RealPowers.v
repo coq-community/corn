@@ -272,7 +272,7 @@ Proof.
  intros x p q Hx Hx' Hx0 H.
  unfold power.
  apply Exp_resp_leEq.
- stepr (q[*]Log x Hx); [| by csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive].
+ stepr (q[*]Log x Hx); [| now csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive].
  apply mult_resp_leEq_rht; try assumption.
  apply Zero_leEq_Log.
  assumption.
@@ -284,7 +284,7 @@ Proof.
  intros x p q Hx Hx' Hx0 H.
  unfold power.
  apply Exp_resp_less.
- stepr (q[*]Log x Hx); [| by csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive].
+ stepr (q[*]Log x Hx); [| now csetoid_rewrite (Log_wd x x Hx Hx' (eq_reflexive IR x)); apply eq_reflexive].
  apply mult_resp_less; try assumption.
  apply Zero_less_Log.
  assumption.

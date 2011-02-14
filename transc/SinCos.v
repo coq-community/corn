@@ -80,7 +80,7 @@ Proof.
      algebra.
     apply Feq_imp_eq with (fun x : IR => True); auto.
    repeat split.
-  exists (I, I); done.
+  now exists (I, I).
  unfold F, G in |- *; apply Sin_plus_fun.
 Qed.
 
@@ -99,7 +99,7 @@ Proof.
     algebra.
    algebra.
   repeat split.
- by exists (I, I).
+ now exists (I, I).
 Qed.
 
 Opaque Sine Cosine.

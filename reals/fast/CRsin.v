@@ -66,8 +66,7 @@ Proof.
  rewrite Str_nth_plus.
  rewrite plus_comm.
  rewrite Str_nth_Qrecip_factorials.
- rewrite -> Str_nth_powers_help.
- rewrite <-int_pow.int_pow_nat_pow.
+ rewrite -> (Str_nth_powers_help_int_pow _ _).
  rewrite <- Qpower_mult.
  rewrite inj_plus.
  rewrite -> Qpower_plus';[|rewrite <- inj_plus; auto with *].
@@ -174,7 +173,7 @@ Proof.
  unfold n' in H1.
  replace m with n by omega.
  clear Hm H1.
- stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| by
+ stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| now
    (apply eq_symmetric; apply inj_Q_mult)].
  change (inj_Q IR ((- (1)) ^ n)[*]inj_Q IR (Str_nth n (sinSequence a))[=]
    (nexp IR n [--]One[/]nring (R:=IR) (fact (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
@@ -296,8 +295,8 @@ Proof.
   apply sin_poly_fun_correct.
  simpl; intros x' _ [Hx0 Hx1].
  set (x:=(inj_Q IR x')) in *.
- stepr (Nine:IR); [| by (apply eq_symmetric; apply (inj_Q_nring IR 9))].
- stepl (ABSIR (Three[-]Twelve[*]x[*]x)); [| by (apply AbsIR_wd; rational)].
+ stepr (Nine:IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR 9))].
+ stepl (ABSIR (Three[-]Twelve[*]x[*]x)); [| now (apply AbsIR_wd; rational)].
  apply AbsSmall_imp_AbsIR.
  split.
   apply shift_zero_leEq_minus'.
@@ -305,7 +304,7 @@ Proof.
   repeat apply mult_resp_nonneg.
     apply (nring_nonneg IR 12).
    apply shift_zero_leEq_minus.
-   stepr (inj_Q IR (nring 1)); [| by apply inj_Q_nring].
+   stepr (inj_Q IR (nring 1)); [| now apply inj_Q_nring].
    assumption.
   apply shift_zero_leEq_minus.
   stepl (inj_Q IR (-(1))).
@@ -358,7 +357,7 @@ Proof.
   rewrite <- Qle_min_r.
   apply leEq_inj_Q with IR.
   destruct Hq0; assumption.
- destruct Hx; split;[stepl [--](inj_Q IR (1:Q)); [| by apply eq_symmetric; apply inj_Q_inv] |];assumption.
+ destruct Hx; split;[stepl [--](inj_Q IR (1:Q)); [| now apply eq_symmetric; apply inj_Q_inv] |];assumption.
 Qed.
 
 Lemma Sin_triple_angle : forall x, (Sin(Three[*]x)[=]Three[*]Sin x[-]Four[*]Sin x[^]3).
@@ -418,7 +417,7 @@ Proof.
  destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
  rewrite -> IHn.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
-   (stepr (nring 1:IR); [| by apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
+   (stepr (nring 1:IR); [| now apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
      apply AbsIR_Sin_leEq_One].
  apply IRasCR_wd.
  stepl (Sin (inj_Q IR (a/3*3))).

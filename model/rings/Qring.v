@@ -117,11 +117,11 @@ Proof.
  destruct z; simpl; try reflexivity.
   rewrite -> pring_convert.
   rewrite -> nring_Q.
-  by rewrite convert_is_POS. 
+  now rewrite convert_is_POS. 
  rewrite -> pring_convert.
  rewrite -> nring_Q.
  unfold Qeq. simpl.
  ring_simplify.
  rewrite min_convert_is_NEG.
- by rewrite Pmult_comm.
+ now rewrite Pmult_comm.
 Qed.

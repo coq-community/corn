@@ -25,8 +25,6 @@ Require Export Setoid.
 Require Import CornBasics.
 Require Import abstract_algebra.
 
-Set Automatic Introduction.
-
 (* Require Import CornTac.*)
 
 (**

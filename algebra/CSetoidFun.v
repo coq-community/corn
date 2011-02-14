@@ -35,9 +35,6 @@
  *)
 
 Require Export CSetoids.
-Require Import ssreflect.
-
-Set Automatic Introduction.
 
 (**
 ** The Setoid of Setoid functions
@@ -1065,23 +1062,23 @@ Lemma inv2 : forall A B (f : CSetoid_fun A B) (H : bijective f) (a : A),
 Proof.
  intros.
  unfold invfun in |- *; case inv; simpl.
- move:H => [H0 H1] x.
- by apply injective_imp_injective_weak.
+ destruct H as [H0 H1]. intros x.
+ now apply injective_imp_injective_weak.
 Qed.
 
 Lemma inv_strext : forall A B (f : CSetoid_fun A B) (H : bijective f),
  fun_strext (invfun f H).
 Proof.
  intros A B f H x y H1.
- elim H => [H00 H01].
- elim (H01 x) => a0 H2.
- elim (H01 y) => a1 H3.
+ case H. intros H00 H01.
+ destruct (H01 x) as [a0 H2].
+ destruct  (H01 y) as [a1 H3].
  astepl (f a0).
  astepr (f a1).
  apply H00.
  astepl (invfun f H x).
-  astepr (invfun f H y); first exact H1.
-  astepl (invfun f H (f a1)); first apply inv2.
+  astepr (invfun f H y); [exact H1|].
+  astepl (invfun f H (f a1)); [apply inv2|].
   apply injective_imp_injective_weak with (f := f); auto.
   astepl (f a1).
    astepl y.
@@ -1104,10 +1101,10 @@ Proof.
   unfold injective in |- *.
   unfold bijective in H.
   unfold surjective in H.
-  elim H => H0 H1.
+  case H; intros H0 H1.
   intros b0 b1 H2.
-  elim (H1 b0) => a0 H3.
-  elim (H1 b1) => a1 H4.
+  destruct (H1 b0) as [a0 H3].
+  destruct (H1 b1) as [a1 H4].
   astepl (Inv f (pair H0 H1) (f a0)).
   astepr (Inv f (pair H0 H1) (f a1)).
   cut (fun_strext f).
@@ -1116,7 +1113,7 @@ Proof.
    astepl (f a0).
     astepr (f a1).
      astepl b0.
-     by astepr b1.
+     now astepr b1.
     apply eq_symmetric.
     unfold Inv in |- *.
     apply inv1.

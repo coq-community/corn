@@ -10,9 +10,6 @@ Require Export
 Section ARexp.
 Context `{AppRationals AQ}.
 
-Local Opaque AR CR ARtoCR ARpower_positive_bounded.
-Close Scope uc_scope.
-
 Section exp_small_neg.
 Context {a : AQ} (Pa : -(1) ≤ 'a ≤ 0).
 
@@ -24,8 +21,7 @@ Proof.
   rewrite Str_nth_zipWith.
   rewrite commutativity.
   apply sg_mor.
-   rewrite 2!Str_nth_powers.
-   rewrite preserves_nat_pow.
+   rewrite preserves_powers.
    now rewrite rings.preserves_opp.
   rewrite Str_nth_Qrecip_factorials'.
   now rewrite preserves_factorials.
@@ -69,7 +65,8 @@ Proof.
   rewrite <-shrink_by_two_correct; [|easy].
   rewrite <-rational_exp_correct.
   rewrite IHn.
-  now rewrite Zshift_opp_1.
+  rewrite Zshift_opp_1. 
+  reflexivity.
 Qed.
 
 Section exp_neg.
@@ -127,7 +124,7 @@ Proof.
   transitivity (inject_Z (-2 ^ AQexp_neg_bound)).
    apply (order_preserving _).
    apply (proj1 (rings.flip_opp _ _)).
-   rewrite rings.preserves_plus.
+   posed_rewrite (rings.preserves_plus (f:=Z_of_nat)).
    rewrite Zpower_exp; auto with *.
    apply semirings.ge1_mult_compat_l.
      now apply Z.pow_nonneg.
@@ -165,7 +162,7 @@ Proof.
   rewrite aq_shift_correct.
   rewrite <-int_pow_nat_pow.
   rewrite AQtoQ_ZtoAQ.
-  rewrite Z_of_N_abs Z.abs_neq.
+  rewrite Z_of_N_abs, Z.abs_neq.
    rewrite rational_exp_correct.
    rewrite <-(rational_exp_neg_correct Pa).
    pose proof (@rational_exp_neg_posH' (1%positive * 2 ^ -2)) as P.
@@ -223,7 +220,7 @@ Program Definition ARexp_bounded_uc (z : Z) :=
   unary_complete_uc QPrelengthSpace inject (λ x, AQexp (min ('z : AQ) x)) (exp_bound_uc z) _.
 Next Obligation. 
   intros. 
-  rewrite ARexp_correct aq_preserves_min AQtoQ_ZtoAQ.
+  rewrite ARexp_correct, aq_preserves_min, AQtoQ_ZtoAQ.
   reflexivity.
 Qed.
 

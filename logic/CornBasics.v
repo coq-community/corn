@@ -50,12 +50,29 @@ Require Export Even.
 Require Export Max.
 Require Export Min.
 Require Export List.
-Declare ML Module "ssreflect".
-Require Export ssreflect.
 Require Import Eqdep_dec.
 Require Import Setoid.
 
-Set Automatic Introduction.
+Tactic Notation "apply" ":" constr(x) := pose proof x as HHH; first [
+  refine HHH | 
+  refine (HHH _) |
+  refine (HHH _ _) |
+  refine (HHH _ _ _) |
+  refine (HHH _ _ _ _) |
+  refine (HHH _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _ _ _ _ _) |
+  refine (HHH _ _ _ _ _ _ _ _ _ _ _ _ _ _)]; clear HHH.
+
+Global Set Automatic Coercions Import.
+
+Global Set Automatic Introduction.
 
 Instance: @DefaultRelation nat eq | 3.
 
@@ -130,7 +147,7 @@ Proof.
  assert (e':=e).
  assert (e0':=e0).
  revert e e0 l0.
- rewrite e' (eq_add_S _ _ e0').
+ rewrite e', (eq_add_S _ _ e0').
  intros e.
  elim e using K_dec_set.
   decide equality.

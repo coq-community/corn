@@ -1,8 +1,6 @@
 Require Import
   QArith Qpossec Qmetric CRArith.
 
-Set Automatic Introduction.
-
 (** The approximation function for CRplus results distributes a given error evenly
 among its two operands. This is a perfectly reasonable implementation choice,
 but it is conceptually arbitrary: any ratio works fine. Furthermore, when
@@ -45,7 +43,7 @@ Section uneven_CRplus.
     apply (regFun_prf y (e1*rr)%Qpos (e2*rr)%Qpos).
    unfold QposEq.
    transitivity ((e1 + e2) * (ll + rr))%Qpos; simpl.
-    rewrite llrr. ring.
+    simpl in llrr. rewrite llrr. ring.
    ring.
   Qed.
 
@@ -61,7 +59,7 @@ Section uneven_CRplus.
     apply Qball_plus; apply regFun_prf.
    unfold QposEq.
    transitivity (e + e * (ll + rr))%Qpos...
-   rewrite llrr...
+   simpl in llrr. rewrite llrr...
   Qed.
 
 End uneven_CRplus.

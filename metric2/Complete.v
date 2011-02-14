@@ -30,7 +30,6 @@ Require Import COrdFields2.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
@@ -100,7 +99,7 @@ Proof.
     apply regFun_prf.
    apply H.
   apply regFun_prf.
- by QposRing.
+ now QposRing.
 Qed.
 
 Lemma regFunEq_e_small : forall (f g : RegularFunction) (E:Qpos), (forall (e:Qpos), e <= E -> ball (m:=X) (e+e) (approximate f e) (approximate g e)) -> (regFunEq f g).
@@ -116,7 +115,7 @@ Proof.
   setoid_replace (e+e+d) with ((e+(1#4)*d)+((1#4)*d+(1#4)*d)+((1#4)*d+e)).
    repeat apply: plus_resp_leEq_both;simpl; try apply: Qpos_min_lb_l; auto with *.
   simpl.
-  by QposRing.
+  now QposRing.
  apply ball_triangle with (approximate g e').
   apply ball_triangle with (approximate f e').
    apply regFun_prf.
@@ -135,7 +134,7 @@ Proof.
   apply ball_sym.
   setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos.
    auto.
-  by QposRing.
+  now QposRing.
  unfold Transitive, regFunEq.
  intros.
  apply ball_closed.
@@ -144,7 +143,7 @@ Proof.
   eapply ball_triangle.
    apply H.
   apply H0.
- by QposRing.
+ now QposRing.
 Qed.
 
 Definition regFun_Setoid := Build_RSetoid regFun_is_setoid.
@@ -252,7 +251,7 @@ Proof.
  setoid_replace (e + d)%Qpos with ((1#4)*d + ((1#4)*d+e+(1#4)*d) + (1#4)*d)%Qpos.
   apply regFunBall_ball.
   apply H.
- by QposRing.
+ now QposRing.
 Qed.
 
 (**
@@ -275,7 +274,7 @@ Proof.
  setoid_replace (d1+e+d2)%Qpos with (e+(d1+d2))%Qpos.
   apply ball_weak.
   assumption.
- by QposRing.
+ now QposRing.
 Qed.
 
 Definition Cunit : X --> Complete :=
@@ -293,7 +292,7 @@ Proof.
   do 2 (apply ball_closed; intro).
   setoid_replace (e+d+d0)%Qpos with (d+e+d0)%Qpos.
    apply H.
-  by QposRing.
+  now QposRing.
  intros H d1 d2.
  apply: Cunit_prf.
  assumption.
@@ -561,7 +560,7 @@ Proof.
   apply ball_sym.
   setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos.
    auto.
-  by QposRing.
+  now QposRing.
  clear e1 e2.
  intros e1 e2 H.
  apply ball_weak.
@@ -758,7 +757,7 @@ Proof.
  setoid_replace (e1+e2)%Qpos with ((1#2)*e1 + e2 + (1#2)*e1)%Qpos.
   apply ball_weak.
   apply regFun_prf.
- by QposRing.
+ now QposRing.
 Qed.
 
 Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=X) Cunit) a) =m a.
@@ -768,7 +767,7 @@ Proof.
  setoid_replace (e1+e2)%Qpos with ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos.
   apply ball_weak.
   apply: regFun_prf.
- by QposRing.
+ now QposRing.
 Qed.
 
 Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=Complete (Complete X)) Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
@@ -925,7 +924,7 @@ Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction 
 Proof.
  intros e x y H.
  set (e' := ((1#3)*e)%Qpos).
- setoid_replace e with (e'+e'+e')%Qpos; [| unfold e'; by QposRing].
+ setoid_replace e with (e'+e'+e')%Qpos; [| unfold e'; now QposRing].
  apply ball_triangle with (Cmap_slow (approximate f e') y).
   apply ball_triangle with (Cmap_slow (approximate f e') x).
    apply Cap_slow_help.

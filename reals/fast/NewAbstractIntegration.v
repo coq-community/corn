@@ -1,4 +1,3 @@
-
 Require Import
  Unicode.Utf8 Program
  CRArith CRabs
@@ -12,8 +11,6 @@ Require Import
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
 
-Set Automatic Introduction.
-
 Implicit Arguments proj1_sig [[A] [P]].
 
 Open Local Scope Q_scope.
@@ -21,7 +18,6 @@ Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
 Hint Immediate ball_refl Qle_refl.
-
 
 (** A neat class for containment, taken from the hybrid systems project codebase. (Todo: Move elsewhere.) *)
 
@@ -56,7 +52,7 @@ Program Fixpoint enum' (n: nat): list (sig (ge n)) :=
 Lemma enum_enum' (n: nat): enum n = map (@proj1_sig _ _) (enum' n).
 Proof.
  induction n; simpl. reflexivity.
- rewrite IHn map_map. reflexivity.
+ rewrite IHn, map_map. reflexivity.
 Qed.
 
 Lemma length_enum' n: length (enum' n) = n.
@@ -85,7 +81,7 @@ Lemma cmΣ'_constant (c: CR) (n: nat): cmΣ' n (λ _, c) == ' n * c.
 Proof with auto.
  unfold cmΣ'.
  rewrite (cm_Sum_constant c).
-  rewrite map_length length_enum'. reflexivity.
+  rewrite map_length, length_enum'. reflexivity.
  intros.
  apply in_map_iff in H.
  destruct H.
@@ -243,8 +239,8 @@ Section additive.
    exists (Pmax x1 x2).
    intros.
    setoid_replace e with (h+h)%Qpos.
-    2: subst h; unfold QposEq; simpl; ring.
-   rewrite Riemann_plus.
+    2: subst h; unfold QposEq; simpl; ring. Check Riemann_plus.
+   unfold summed. rewrite Riemann_plus.
    admit. (* not hard *)
   Qed.
 

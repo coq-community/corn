@@ -45,7 +45,6 @@ Require Import CornTac.
 Require Import Qround.
 Require Import Qabs.
 Require Import stdlib_omissions.Q.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 
@@ -359,7 +358,7 @@ Proof.
  unfold Qpos_power.
  autorewrite with QposElim.
  simpl.
- now rewrite Hx Hy.
+ now rewrite Hx, Hy.
 Qed.
 (* end hide *)
 Lemma Q_Qpos_power : forall (x:Qpos) z, ((x^z)%Qpos:Q)==(x:Q)^z.

@@ -35,7 +35,6 @@ Import QnnInf.notations.
 Open Local Scope Q_scope.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 (**
 * Metric Space
@@ -203,7 +202,7 @@ Section gball.
       exfalso. apply (Qlt_irrefl 0). rewrite <- R at 2. rewrite <- E...
      exfalso. apply (Qlt_irrefl 0). rewrite <- C at 1. rewrite E...
     exfalso. apply (Qlt_irrefl 0). rewrite <- C at 2. rewrite E...
-   rewrite F G. reflexivity.
+   rewrite F, G. reflexivity.
   Qed.
 
   Global Instance gball_ex_Proper: Proper (QnnInf.eq ==> @st_eq m ==> @st_eq m ==> iff) gball_ex.
@@ -263,7 +262,7 @@ Section gball.
      apply Qlt_irrefl.
     destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
       revert q0. rewrite q. rewrite Qplus_0_r. apply Qle_not_lt...
-     apply ball_gball. simpl. rewrite q Qplus_0_r. rewrite <- H0. apply ball_gball in H. assumption.
+     apply ball_gball. simpl. rewrite q, Qplus_0_r. rewrite <- H0. apply ball_gball in H. assumption.
     exfalso.
     revert q0. rewrite q. rewrite Qplus_0_r. intro. clear H. revert B. rewrite H1. apply Qlt_irrefl.
    destruct (Qdec_sign e2) as [[?|?]|?].
@@ -273,11 +272,11 @@ Section gball.
     destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
       revert q0. rewrite C. rewrite Qplus_0_l. apply Qle_not_lt...
      apply ball_gball. simpl.
-     rewrite C Qplus_0_l H...
-    exfalso. revert q0. rewrite C Qplus_0_l. intro. clear H0. revert q. rewrite H1. apply Qlt_irrefl.
+     rewrite C, Qplus_0_l, H...
+    exfalso. revert q0. rewrite C, Qplus_0_l. intro. clear H0. revert q. rewrite H1. apply Qlt_irrefl.
    destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
-     revert q0. rewrite C q Qplus_0_l. apply Qlt_irrefl.
-    exfalso. revert q0. rewrite C q Qplus_0_l. apply Qlt_irrefl.
+     revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
+    exfalso. revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
    transitivity b...
   Qed. (* TODO: THE HORROR!! *)
 

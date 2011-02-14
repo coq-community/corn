@@ -23,8 +23,6 @@ Require Import
 
 Open Scope uc_scope.
 
-Set Automatic Introduction.
-
 Hint Resolve Qpos_nonzero.
 Hint Immediate Q.Qle_nat.
 Hint Resolve Qmult_le_0_compat.
@@ -166,7 +164,7 @@ Section definition.
         (approx from2 (w false) (e false)).
   Proof with auto.
    set (halfe b := (e b * (1 # 2))%Qpos).
-   set (m b := intervals (if b then from1 else from2) (w b) (halfe b)).
+   set (m (b : bool) := intervals (if b then from1 else from2) (w b) (halfe b)).
    intros.
    unfold approx.
    simpl.
@@ -243,7 +241,7 @@ Section implements_abstract_interface.
       Variable e: Qpos.
 
       Let ec b := (e * (ww b / totalw))%Qpos.
-      Let wbints b := intervals f (if b then a else a+ww true) (ww b) (ec b * (1 # 2)).
+      Let wbints (b : bool) := intervals f (if b then a else a+ww true) (ww b) (ec b * (1 # 2)).
       Let w01ints := intervals f a totalw (e * (1 # 2)).
       Let approx0 (i: nat) :=
         approximate (f (a + plus_half_times i (ww true / wbints true))) (ec true * (1 # 2) / ww true)%Qpos.
@@ -271,14 +269,14 @@ Section implements_abstract_interface.
         apply surj_eq.
         rewrite <- Q.Qeq_Zeq.
         apply Q.Qmult_injective_l with x...
-        rewrite inj_plus inj_mult inj_mult inj_mult.
+        rewrite inj_plus, inj_mult, inj_mult, inj_mult.
         repeat rewrite inject_nat_convert.
         rewrite Q.Zplus_Qplus.
         repeat rewrite Q.Zmult_Qmult.
         rewrite Qmult_plus_distr_l.
         rewrite (Qmult_comm i). rewrite (Qmult_comm j). rewrite (Qmult_comm k).
         repeat rewrite <- Qmult_assoc.
-        rewrite E F G.
+        rewrite E, F, G.
         simpl. field.
         repeat split; discriminate.
        do 2 rewrite <- nat_of_P_mult_morphism.
@@ -301,7 +299,7 @@ Section implements_abstract_interface.
         (* left case: *)
         apply Σ_Qball_pos_bounds.
         intros i0 i0E.
-        set (ebit b := if b then (ec true * (1 # 2) / ww true)%Qpos else (e * (1 # 2) / totalw)%Qpos).
+        set (ebit (b : bool) := if b then (ec true * (1 # 2) / ww true)%Qpos else (e * (1 # 2) / totalw)%Qpos).
         setoid_replace ((ec true + ec true) / x / (i * wbints true)%positive)%Qpos
         with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
          Focus 2.
@@ -317,7 +315,7 @@ Section implements_abstract_interface.
          setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
          unfold ebit.
          setoid_replace (totalw / (w01ints * k)) with ((/ (wbints true * i) * ww true))
-         by (unfold Q_eq; rewrite kE iE; simpl; field; auto).
+         by (unfold Q_eq; rewrite kE, iE; simpl; field; auto).
          setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww true / totalw) * (1 # 2) / ww true)%Qpos
           by (unfold QposEq; simpl; field; auto).
          rewrite <- Pmult_Qmult.
@@ -349,15 +347,15 @@ Section implements_abstract_interface.
        (* right case: *)
        apply Σ_Qball_pos_bounds.
        intros i0 i0E.
-       set (ebit b := if b then (ec false * (1 # 2) / ww false)%Qpos else (e * (1 # 2) / totalw)%Qpos).
+       set (ebit (b : bool) := if b then (ec false * (1 # 2) / ww false)%Qpos else (e * (1 # 2) / totalw)%Qpos).
        setoid_replace ((ec false + ec false) / x / (j * wbints false)%positive)%Qpos
        with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
         Focus 2.
-        unfold QposEq. simpl. rewrite Pmult_Qmult jE. simpl. field...
+        unfold QposEq. simpl. rewrite Pmult_Qmult, jE. simpl. field...
        apply (ball_triangle CR (ebit true) (ebit false) _ (f (a + ww true + i0 * (totalw / (w01ints * k)))) _)...
         setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
         unfold ebit.
-        setoid_replace (totalw / (w01ints * k)) with ((/ (wbints false * j) * ww false)) by (rewrite kE jE; unfold Q_eq; simpl; field; auto).
+        setoid_replace (totalw / (w01ints * k)) with ((/ (wbints false * j) * ww false)) by (rewrite kE, jE; unfold Q_eq; simpl; field; auto).
         setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww false / totalw) * (1 # 2) / ww false)%Qpos by (unfold QposEq; simpl; field; auto).
         rewrite <- Pmult_Qmult.
         rewrite Qmult_assoc.
@@ -365,7 +363,7 @@ Section implements_abstract_interface.
         rewrite Pmult_comm...
        apply ball_sym.
        setoid_replace (a + ww true + i0 * (totalw / (w01ints * k))) with (a + (i * wbints true + i0) * (totalw / (w01ints * k)))
-        by (rewrite iE kE; unfold Q_eq; simpl; field; auto).
+        by (rewrite iE, kE; unfold Q_eq; simpl; field; auto).
        rewrite <- Pmult_Qmult.
        setoid_replace (((i * wbints true)%positive + i0) * (totalw / (w01ints * k))) with
          (((i * wbints true)%positive + i0)%nat * / (intervals f a totalw (e * (1#2)) * k)%positive * totalw).
@@ -378,12 +376,12 @@ Section implements_abstract_interface.
         rewrite Zplus_Qplus.
         do 3 rewrite ZL9.
         do 3 rewrite Pmult_Qmult.
-        rewrite iE jE kE.
+        rewrite iE, jE, kE.
         simpl.
         field_simplify...
        unfold Qdiv. 
        rewrite (Qmult_comm totalw).
-       rewrite inj_plus Zplus_Qplus. 
+       rewrite inj_plus, Zplus_Qplus. 
        rewrite <- Pmult_Qmult.
        rewrite Qmult_assoc.
        rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.

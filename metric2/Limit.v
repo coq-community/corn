@@ -114,7 +114,7 @@ Proof with try easy.
      destruct (eq_true_false_abs (P s1))... now rewrite E.
     destruct (eq_true_false_abs (P s1))... now rewrite E.
    destruct (eq_true_false_abs (P s1))... now rewrite E.
-  now rewrite (IH tt) E. 
+  rewrite (IH tt); now rewrite E.
 Qed.
 
 Lemma takeUntil_end : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons:A -> B -> B) (nil : B),
@@ -236,7 +236,7 @@ Proof with auto with *.
   simpl.
   apply le_n_S.
   unfold takeUntil_length.
-  rewrite (takeUntil_wd P (LazyExists_Str_nth_tl ex Ptl (S n)) 
+  setoid_rewrite (takeUntil_wd P (LazyExists_Str_nth_tl ex Ptl (S n)) 
     (LazyExists_Str_nth_tl (LazyExists_tl ex Ptl) (ForAll_Str_nth_tl 1 Ptl) n) (λ _, S) O).
   apply IHn.
 Qed.

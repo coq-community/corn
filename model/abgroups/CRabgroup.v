@@ -35,8 +35,8 @@ Proof.
  intros x y.
  change (x+y==y+x)%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
- stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR y)); [| by apply CR_plus_as_Cauchy_IR_plus].
- stepr ((CRasCauchy_IR y)[+](CRasCauchy_IR x)); [| by apply CR_plus_as_Cauchy_IR_plus].
+ stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR y)); [| now apply CR_plus_as_Cauchy_IR_plus].
+ stepr ((CRasCauchy_IR y)[+](CRasCauchy_IR x)); [| now apply CR_plus_as_Cauchy_IR_plus].
  apply cag_commutes.
 Qed.
 

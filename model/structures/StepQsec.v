@@ -4,6 +4,7 @@ Require Export StepFunctionSetoid.
 Require Import Qabs.
 Require Import Bool.
 Require Import CornTac.
+Require Import CornBasics.
 Require Import RSetoid.
 
 Set Implicit Arguments.

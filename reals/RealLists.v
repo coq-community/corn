@@ -35,7 +35,6 @@
  *)
 
 Require Export CReals1.
-Set Automatic Introduction.
 
 Section Lists.
 
@@ -293,7 +292,7 @@ Lemma minlist_smaller : forall l x, member x l -> minlist l [<=] x.
 Proof.
  intros l x H.
  induction  l as [| a l Hrecl].
-  done.
+  easy.
  simpl in |- *.
  astepl match l with | nil => a | cons _ _ => Min a (minlist l) end.
  induction  l as [| a0 l Hrecl0].

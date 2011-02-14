@@ -31,7 +31,6 @@ Require Import ContinuousCorrect.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
@@ -61,14 +60,14 @@ Proof.
  rewrite -> rational_arctan_small_pos_correct.
   rewrite -> r_pi_correct.
   assert (H1:(inj_Q IR a)[#]Zero).
-   stepr (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)].
+   stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
    apply inj_Q_ap.
    apply (Greater_imp_ap _ a 0); assumption.
   rewrite <- IR_minus_as_CR.
   apply IRasCR_wd.
   stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
    assert (H2:Zero[<]inj_Q IR a).
-    stepl (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)].
+    stepl (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
     apply inj_Q_less; assumption.
    unfold cg_minus.
    csetoid_rewrite (ArcTan_recip _ H1 H2).
@@ -78,7 +77,7 @@ Proof.
    apply mult_wdl.
    change (1#2) with (1/2).
    assert (H2:(inj_Q IR (2#1))[#]Zero).
-    stepr (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)].
+    stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
     apply inj_Q_ap; discriminate.
    apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
     apply div_wd.
@@ -161,7 +160,7 @@ Proof.
    apply shift_zero_less_minus.
    rstepl y.
    rstepr (nring 1:IR).
-   stepr (inj_Q IR 1); [| by apply (inj_Q_nring IR 1)].
+   stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
    apply inj_Q_less.
    assumption.
   apply eq_transitive with (ArcTan (One[+]y[/]_[//](Greater_imp_ap _ _ _ Y))).
@@ -177,7 +176,7 @@ Proof.
     csetoid_rewrite_rev (inj_Q_nring IR 1).
     apply inj_Q_inv.
    rstepr (nring 1:IR).
-   stepr (inj_Q IR 1); [| by apply (inj_Q_nring IR 1)].
+   stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
    apply inj_Q_leEq.
    apply less_leEq; assumption.
   apply ArcTan_wd.
@@ -210,7 +209,7 @@ Proof.
  rstepl ((nring 1:IR)[*]Pi).
  rstepr ((Four[*]inj_Q IR (1 # 4))[*]Pi).
  apply mult_wdl.
- stepl (inj_Q IR 1); [| by apply (inj_Q_nring IR 1)].
+ stepl (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
  stepr (inj_Q IR (4*(1#4))).
   apply inj_Q_wd.
   simpl.

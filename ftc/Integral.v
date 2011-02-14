@@ -1016,7 +1016,7 @@ Proof.
   intros; apply mult_wd.
    apply pfwdef.
    cut (i = S (n + i) - S n); [ intro | omega ].
-   generalize Hi; clear Hi; rewrite {1 2} H; intro.
+   generalize Hi; clear Hi; pattern i at 1 2 in |- *; rewrite H; intro.
    apply eq_symmetric_unfolded; apply pjp_3; auto with arith.
   apply cg_minus_wd; simpl in |- *.
    Opaque minus.

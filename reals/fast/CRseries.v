@@ -79,7 +79,7 @@ Proof.
  destruct y as [y|];[|constructor].
  simpl.
  unfold Qball.
- stepr ((hd s1 - 0) * (hd s2 - 0)); [| by (simpl;ring_simplify; reflexivity)].
+ stepr ((hd s1 - 0) * (hd s2 - 0)); [| now (simpl;ring_simplify; reflexivity)].
  autorewrite with QposElim.
  apply mult_AbsSmall; assumption.
 Qed.
@@ -179,7 +179,8 @@ Proof.
   apply Qmult_le_compat_r; try assumption.
   apply Qabs_nonneg.
  apply: mult_Streams_Gs.
- destruct Hy; assumption.
+  apply _.
+ now destruct Hy.
 Qed.
 
 Section Qpowers.
@@ -242,7 +243,7 @@ Proof.
  constructor.
   simpl.
   unfold Qball.
-  stepr b; [| by (simpl;ring)].
+  stepr b; [| now (simpl;ring)].
   split;simpl.
    apply Qle_trans with 0;[discriminate|assumption].
   assumption.
@@ -294,7 +295,7 @@ Qed.
 
 Lemma Str_nth_ppositives' n : (Str_nth n ppositives : Q) = Str_nth n positives.
 Proof.
-  rewrite Str_nth_ppositives Str_nth_positives.
+  rewrite Str_nth_ppositives, Str_nth_positives.
   rewrite Z.P_of_succ_nat_Zplus.
   rewrite <-(naturals.to_semiring_unique (Basics.compose inject_Z Z_of_nat)).
   unfold Basics.compose.
@@ -324,7 +325,6 @@ Proof.
   rewrite Str_nth_map.
   rewrite Qmake_Qdiv.
   rewrite Str_nth_ppositives'.
-  rewrite rings.preserves_1.
   apply (left_identity (/ Str_nth n positives)).
 Qed.
 
@@ -341,7 +341,7 @@ Proof.
  constructor.
   simpl.
   unfold Qball.
-  stepr (1#q); [| by (simpl;ring)].
+  stepr (1#q); [| now (simpl;ring)].
   apply (AbsSmall_leEq_trans _ (1#q)).
    change (1*d <= n*q)%Z.
    apply Zmult_le_compat; auto with *.
@@ -485,7 +485,6 @@ Proof.
   rewrite Str_nth_map.
   rewrite Qmake_Qdiv.
   rewrite Str_nth_pfactorials'.
-  rewrite rings.preserves_1.
   now apply (left_identity (/ Str_nth n factorials)).
 Qed.
 
@@ -533,5 +532,6 @@ Proof.
  right.
  intros _.
  apply: Stream_Bound_zl.
- apply Qrecip_factorial_bounded.
+  apply Qrecip_factorial_bounded.
+ apply _.
 Defined.

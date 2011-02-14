@@ -153,7 +153,7 @@ Proof.
  unfold f.
  change (2*S n # 1) with (2*S n).
  setoid_replace ((x - (l + (r - l) * (2 * rasterize1 (S n) x + 1 # 1) / (2 * S n))) * (S n / (r - l)))
-   with ((S n)*(x-l)/(r-l) - (2*rasterize1 (S n) x + 1 # 1)/2); [| by (simpl; field; auto)].
+   with ((S n)*(x-l)/(r-l) - (2*rasterize1 (S n) x + 1 # 1)/2); [| now (simpl; field; auto)].
  rewrite -> Qmake_Qdiv.
  rewrite -> injz_plus.
  setoid_replace ((2 * rasterize1 (S n) x + 1%positive) / 1%positive / 2)
@@ -186,7 +186,7 @@ Proof.
   replace LHS with 0 by simpl; ring.
   apply: mult_resp_nonneg; simpl; auto with *.
  rewrite -> Hlr'.
- setoid_replace (r-r) with 0; [| by simpl; ring].
+ setoid_replace (r-r) with 0; [| now simpl; ring].
  unfold Qdiv.
  change (/0) with 0.
  ring_simplify.
@@ -214,7 +214,7 @@ Proof.
   replace RHS with (r + - x) by simpl; ring.
   rewrite <- Qlt_minus_iff; auto.
  rewrite -> Hlr'.
- setoid_replace (r-r) with 0; [| by simpl; ring].
+ setoid_replace (r-r) with 0; [| now simpl; ring].
  unfold Qdiv.
  change (/0) with 0.
  replace LHS with 0 by simpl; ring.
@@ -232,12 +232,12 @@ Proof.
       apply Qle_lt_trans with x; auto]).
  exists (f (S n) n).
  abstract ( split; [apply: in_map; rewrite -> UniformPartitionZ; rewrite inj_S; auto with *|];
-   destruct Hx as [_ Hx]; (setoid_replace x with r; [| by apply Qle_antisym; auto with *]); unfold f;
+   destruct Hx as [_ Hx]; (setoid_replace x with r; [| now apply Qle_antisym; auto with *]); unfold f;
      change (2*S n #1) with (2*S n); change (2*n + 1#1) with ((2*n + 1)%Z:Q); rewrite (inj_S n);
        unfold Zsucc; do 2 rewrite -> injz_plus; (setoid_replace ((2%positive * n)%Z:Q) with (2*n)
-         ; [| by unfold Qeq; simpl; auto with *]);
+         ; [| now unfold Qeq; simpl; auto with *]);
            (setoid_replace (r - (l + (r - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-             with (((r-l) / (2 * (n + 1%positive)))); [| by simpl; field; unfold Qeq; simpl; auto with *]);
+             with (((r-l) / (2 * (n + 1%positive)))); [| now simpl; field; unfold Qeq; simpl; auto with *]);
                rewrite -> Qabs_pos;[apply Qle_refl|]; apply Qle_shift_div_l;
                  [apply: mult_resp_pos; simpl;auto with *; unfold Qlt; simpl; auto with *|];
                    (replace LHS with 0 by simpl; ring); rewrite -> Qle_minus_iff in Hlr; auto).

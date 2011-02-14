@@ -92,7 +92,7 @@ Proof.
     intros n. 
     setoid_replace n with (1 + (n - 1)) using relation (@equiv Z _) at 1 by ring.
     rewrite int_pow_S.
-     rewrite rings.plus_mul_distribute_r left_identity. reflexivity.
+     unfold "2" at 1. now rewrite rings.plus_mul_distribute_r, left_identity.
     apply (ne_zero (2:Q)).
    posed_rewrite (G k).
    apply_simplified (semirings.plus_compat (R:=Q)); [| reflexivity].
@@ -115,7 +115,7 @@ Proof.
   unfold app_div_above. rewrite rings.preserves_plus.
   apply Qball_plus.
    now apply aq_div.
-  rewrite aq_shift_correct rings.preserves_1 left_identity.
+  rewrite aq_shift_correct, rings.preserves_1, left_identity.
   now apply Qball_0_r.
 Qed.
 
@@ -169,7 +169,7 @@ Proof.
   revert sQ sN sD d dnn zl.
   induction l using Pind; intros.
    simpl. 
-   rewrite rings.opp_0 rings.plus_0_r.
+   rewrite rings.opp_0, rings.plus_0_r.
    rewrite Qminus'_correct. unfold Qminus. rewrite Qplus_0_r.
    setoid_replace (1%positive * 2 ^ k)%Qpos with (2 ^ k)%Qpos.
     destruct d as [? ? ? E].
@@ -178,7 +178,7 @@ Proof.
    unfold QposEq. simpl. now apply rings.mult_1_l.
   rewrite Psucc_S.
   simpl.
-  rewrite rings.preserves_plus rings.preserves_opp.
+  rewrite rings.preserves_plus, rings.preserves_opp.
   rewrite Qminus'_correct. unfold Qminus.
   setoid_replace (Psucc l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
    apply Qball_plus.
@@ -189,7 +189,7 @@ Proof.
    apply IHl; try apply _.
    now destruct d.
   unfold QposEq. simpl. 
-  rewrite Pplus_one_succ_l Zpos_plus_distr Q.Zplus_Qplus.
+  rewrite Pplus_one_succ_l, Zpos_plus_distr, Q.Zplus_Qplus.
   now ring.
 Qed.
 
@@ -199,7 +199,7 @@ Proof.
   destruct l.
    now destruct Pl as [_ []]. 
   apply ball_weak_le with (P_of_succ_nat l * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
-   set l' := P_of_succ_nat l.
+   set (l':=P_of_succ_nat l).
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (ne_zero (2:Q))].
    apply (maps.order_preserving_back_gt_0 (.*.) ((2:Q) ^ Z.log2_up l')).
@@ -220,9 +220,9 @@ Proof.
      auto with zarith.
     now apply Z.log2_up_nonneg.
    rewrite int_pow_mult_inv.
-   rewrite (commutativity (l' : Q)) (commutativity (2 ^ k)).
+   rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
    rewrite <-associativity.
-   rewrite associativity fields.dec_mult_inverse.
+   rewrite associativity, fields.dec_mult_inverse.
     now apply left_identity.
    apply int_pow_nonzero.
    now apply (ne_zero (2:Q)).

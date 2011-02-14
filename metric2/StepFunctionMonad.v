@@ -23,6 +23,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export StepFunctionSetoid.
 Require Import OpenUnit.
 Require Import CornTac.
+Require Import CornBasics.
 
 (** ** Monad
 Here we define bind and join for the step function monad, and prove that they
@@ -30,7 +31,6 @@ satify the monad laws.
 *)
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 (** This version of [StepF] has type [Setoid] that carries its equivalence
 relation with it. *)
@@ -58,7 +58,7 @@ Definition SplitLS0(X : RSetoid):OpenUnit->(StepFS X)->(StepFS X):=
 Definition SplitLS(X : RSetoid):OpenUnit->(StepFS X)-->(StepFS X).
 Proof.
  intros o.
- exists (fun x => (SplitLS0 o x)).
+ exists (fun x => (SplitLS0 o x)). 
  abstract (intros; apply: SplitL_wd;auto with *).
 Defined.
 

@@ -50,7 +50,7 @@ Add Parametric Morphism (X:SemiLattice) : (@meet X) with signature (@st_eq X) ==
 Proof.
  assert (forall x1 x2 : X, x1 == x2 -> forall x3 x4 : X, x3 == x4 -> meet x1 x3 <= meet x2 x4).
   intros.
-  move: H H0; do 2 rewrite -> equiv_le_def; intros.
+  revert H H0; do 2 rewrite -> equiv_le_def; intros.
   pose (le_trans X).
   destruct (sl_proof X).
   apply sl_meet_glb0; firstorder.
@@ -138,7 +138,7 @@ Proof.
  intros.
  rewrite -> monotone_def.
  intros.
- move: H;rewrite -> le_meet_l, meet_comm; intro.
+ revert H;rewrite -> le_meet_l, meet_comm; intro.
  rewrite <- H.
  rewrite -> meet_assoc.
  apply meet_lb_l.
@@ -148,7 +148,7 @@ Lemma meet_monotone_l : forall a : X, monotone X (fun x => meet x a).
 Proof.
  intros.
  assert (A:=meet_monotone_r a).
- move: A; do 2 rewrite -> monotone_def;intros.
+ revert A; do 2 rewrite -> monotone_def;intros.
  rewrite -> (meet_comm x), (meet_comm y);auto.
 Qed.
 

@@ -1,4 +1,3 @@
-
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
@@ -8,10 +7,6 @@ Require Import
  list_separates SetoidPermutation.
 Require ne_list.
 Import ne_list.notations.
-
-Set Automatic Introduction.
-
-
 
 Instance: UniformlyContinuous_mu (util.uncurry Qplus).
 Admitted.
@@ -114,7 +109,7 @@ Section contents.
    rewrite divdiff_e.
    set (' (/ (fst a - fst b))).
    transitivity ((c * divdiff (a ::: xs) - c * divdiff (b ::: xs)) * s). ring.
-   rewrite IHxs IHxs0.
+   rewrite IHxs, IHxs0.
    symmetry. rewrite divdiff_e.
    simpl. fold s. ring.
   Qed.
@@ -132,7 +127,7 @@ Section contents.
    set (λ p : ne_list (Q and CR and CR) and ne_list (Q and CR and CR),
        divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p))) in *.
    simpl in *.
-   rewrite IHxs IHxs0.
+   rewrite IHxs, IHxs0.
    repeat rewrite ne_list.list_map.
    repeat rewrite zip_map_snd.
    repeat rewrite map_map_comp.
@@ -170,8 +165,8 @@ Section contents.
   Proof with auto;simpl.
   intros. do 3 rewrite divdiff_e...
   (* want a combination of ring and a rewrite database for inject_Q ? *)  
-  set s:=(f u - f v). set t:=('(/ (x - y))). 
-  rewrite CRminus_Qminus. set a:=(u-v)%Q.
+  set (s:=f u - f v). set (t:='(/ (x - y))). 
+  rewrite CRminus_Qminus. set (a:=(u-v)%Q).
   transitivity (s * ' (/ (a) * (a)) * t).
   rewrite <- (Qmult_comm a).
   rewrite Qmult_inv_r... ring.
@@ -234,7 +229,7 @@ Section contents.
     Lemma apply x: (N ! ' x) [=] applied x.
     Proof.
      unfold N, applied, an, an_applied.
-     rewrite cm_Sum_apply map_map.
+     rewrite cm_Sum_apply, map_map.
      apply cm_Sum_eq.
      intro.
      autorewrite with apply.
@@ -359,7 +354,7 @@ Section contents.
        unfold QNoDup.  simpl.
        apply NoDup_cons. intuition.
        inversion_clear H2. intuition.
-      intro. inversion_clear H. apply H2. rewrite H1...
+      intro. inversion_clear H. apply H2. simpl in H1. rewrite H1...
      rewrite applied_cons.
      assert (QNoDup (map fst (y :: l))).
       inversion_clear H...
@@ -376,7 +371,7 @@ Section contents.
     Proof.
      split. apply interpolates.
      unfold crpoints.
-     rewrite ne_list.list_map tl_map map_length.
+     rewrite ne_list.list_map, tl_map, map_length.
      apply degree.
     Qed.
 
@@ -389,7 +384,7 @@ Section contents.
       N qpoints [=] p.
     Proof with auto.
      apply (interpolation_unique crpoints).
-      rewrite ne_list.list_map map_fst_map_first.
+      unfold crpoints. rewrite ne_list.list_map, map_fst_map_first.
       apply (CNoDup_map _ inject_Q).
       apply CNoDup_weak with Qap...
        intros. apply Qap_CRap...
@@ -404,7 +399,7 @@ Section contents.
      simpl @length.
      rewrite N_cons.
      rewrite nth_coeff_plus.
-     rewrite (degree l).
+     rewrite (degree l (length l)).
       2: destruct l; simpl; auto.
      change (nth_coeff (length l) (an (p ::: l))+'0==divdiff (p ::: l)). (* to change [+] into + *)
      ring_simplify.

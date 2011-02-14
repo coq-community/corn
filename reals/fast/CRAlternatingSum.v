@@ -314,6 +314,7 @@ Proof.
   stepl (hd - 0)%Q; [| simpl; ring].
   apply X.
  destruct (takeUntil_step P (Limit_near (Cons hd seq) 0 e) Qminus' 0) as [ex' rw]; [rewrite H;auto|].
+ change ring_zero with (0:Q).
  rewrite rw; clear rw.
  simpl.
  rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (tl (Cons hd seq)) 0 e)).
@@ -361,11 +362,11 @@ Proof.
  cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
   apply convergent_wd.
   intros n.
-  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| by (apply eq_symmetric; apply inj_Q_mult)].
+  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| now (apply eq_symmetric; apply inj_Q_mult)].
   apply mult_wdl.
-  stepr ((inj_Q IR (-(1)))[^]n); [| by (apply eq_symmetric; apply inj_Q_power)].
+  stepr ((inj_Q IR (-(1)))[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
   apply nexp_wd.
-  stepr ([--](inj_Q IR 1)); [| by (apply eq_symmetric; apply inj_Q_inv)].
+  stepr ([--](inj_Q IR 1)); [| now (apply eq_symmetric; apply inj_Q_inv)].
   apply un_op_wd_unfolded.
   rstepl ((nring 1):IR).
   apply eq_symmetric; apply (inj_Q_nring IR 1).
@@ -373,7 +374,7 @@ Proof.
    intros n.
    unfold Str_nth.
    change (Zero:IR) with (nring 0:IR).
-   stepl (inj_Q IR (nring 0)); [| by apply inj_Q_nring].
+   stepl (inj_Q IR (nring 0)); [| now apply inj_Q_nring].
    apply inj_Q_leEq.
    simpl. 
    pose proof (_ : DecreasingNonNegative (Str_nth_tl n seq)) as dnn_tl.
@@ -456,9 +457,9 @@ Proof.
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
  assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq)))%CR)).
   stepr (IRasCR (x n)).
-   stepr (Sum n n (fun n => IRasCR (x n))); [| by apply: Sum_one].
+   stepr (Sum n n (fun n => IRasCR (x n))); [| now apply: Sum_one].
    unfold Sum, Sum1.
-   stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )); [| by (apply cg_minus_wd; apply IR_Sum0_as_CR)].
+   stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )); [| now (apply cg_minus_wd; apply IR_Sum0_as_CR)].
    apply Hn.
    auto.
   simpl.
@@ -475,7 +476,7 @@ Proof.
   induction n; intros e seq dnn zl X.
    simpl in *.
    apply AbsSmall_minus.
-   stepr (InfiniteAlternatingSum seq); [| by (unfold cg_minus;simpl;ring)].
+   stepr (InfiniteAlternatingSum seq); [| now (unfold cg_minus;simpl;ring)].
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
    apply: leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.

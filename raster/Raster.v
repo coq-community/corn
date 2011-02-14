@@ -28,13 +28,7 @@ Notation "░ a" := (Vector.cons bool false _ a) (at level 0, right associativit
 (** Standard rasters. *)
 Definition emptyRaster n m : raster n m := Vector.const (Vector.const false _) _.
 
-Fixpoint vectorAsList A n (v: Vector.t A n) : list A := 
-  match v with 
-  | Vector.nil => nil
-  | Vector.cons a' n' v' => a' :: vectorAsList v'
-  end.
-
-Coercion vectorAsList : Vector.t>->list.
+Coercion Vector.to_list : Vector.t>->list.
 
 Lemma length_vectorAsList : forall A n (v: Vector.t A n), (length v) = n.
 Proof.
@@ -46,7 +40,7 @@ Qed.
 
 (** Indexing into a raster *)
 Definition RasterIndex n m (r:raster n m) i j :=
- nth j (nth i (map (@vectorAsList _ _) r) nil) false.
+ nth j (nth i (map (@Vector.to_list _ _) r) nil) false.
 
 (** Indexing into an empty raster is alway empty *)
 Lemma emptyRasterEmpty : forall n m i j,
@@ -119,8 +113,8 @@ Lemma setRaster_correct1 : forall n m (r:raster n m) x i j,
 Proof.
  intros n m r x i j Hi Hj.
  unfold RasterIndex.
- replace (nth i (map (@vectorAsList _ _) (setRaster r x i j)) nil)
-   with (nth i (map (@vectorAsList _ _) (setRaster r x i j)) (Vector.const false n)).
+ replace (nth i (map (@Vector.to_list _ _) (setRaster r x i j)) nil)
+   with (nth i (map (@Vector.to_list _ _) (setRaster r x i j)) (Vector.const false n)).
   rewrite map_nth.
   unfold setRaster.
   rewrite (updateVector_correct1 r (fun row  => updateVector row (fun _ : bool => x) j) (Vector.const false n) (Vector.const false n) Hi).
@@ -161,12 +155,12 @@ Proof.
  destruct (le_lt_dec n j0) as [Hn | Hn].
   rewrite setRaster_overflow; auto with *.
  unfold RasterIndex.
- assert (L:forall v : Vector.t (Vector.t bool n) m, nth j (nth i (map (@vectorAsList _ _) v) nil) false =
-   nth j (nth i (map (@vectorAsList _ _) v) (Vector.const false n)) false).
+ assert (L:forall v : Vector.t (Vector.t bool n) m, nth j (nth i (map (@Vector.to_list _ _) v) nil) false =
+   nth j (nth i (map (@Vector.to_list _ _) v) (Vector.const false n)) false).
   intros v.
   destruct (le_lt_dec m i) as [Hi | Hi].
    transitivity false.
-    rewrite (nth_overflow (map (@vectorAsList _ _) v)).
+    rewrite (nth_overflow (map (@Vector.to_list _ _) v)).
      destruct j; reflexivity.
     rewrite map_length.
     rewrite length_vectorAsList.
@@ -187,9 +181,9 @@ Proof.
   apply nth_indep.
   rewrite map_length, length_vectorAsList.
   auto.
- transitivity (nth j (nth i (map (@vectorAsList _ _) (setRaster r x i0 j0)) (Vector.const false n)) false).
+ transitivity (nth j (nth i (map (@Vector.to_list _ _) (setRaster r x i0 j0)) (Vector.const false n)) false).
   apply L.
- transitivity (nth j (nth i (map (@vectorAsList _ _) r) (Vector.const false n)) false);[|symmetry;apply L].
+ transitivity (nth j (nth i (map (@Vector.to_list _ _) r) (Vector.const false n)) false);[|symmetry;apply L].
  do 2 rewrite map_nth.
  destruct (eq_nat_dec i i0).
   destruct H as [Hi | Hj].

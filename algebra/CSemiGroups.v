@@ -197,7 +197,7 @@ Lemma part_function_plus_strext : forall x y (Hx : Conj P Q x) (Hy : Conj P Q y)
  F x (Prj1 Hx) [+]F' x (Prj2 Hx) [#] F y (Prj1 Hy) [+]F' y (Prj2 Hy) -> x [#] y.
 Proof.
  intros x y Hx Hy H.
- elim: (cs_bin_op_strext  _ _ _ _ _ _  H); intro H1; exact (pfstrx _ _ _ _ _ _ H1).
+ case (cs_bin_op_strext  _ _ _ _ _ _  H); intros H1; exact (pfstrx _ _ _ _ _ _ H1).
 Qed.
 
 Definition Fplus := Build_PartFunct G _ (conj_wd (dom_wd _ F) (dom_wd _ F'))

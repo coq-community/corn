@@ -91,11 +91,11 @@ Qed.
 Lemma prod_is_MetricSpace : is_MetricSpace (prodS X Y) prod_ball.
 Proof.
  split.
-     apply: prod_ball_refl.
-    apply: prod_ball_sym.
-   apply: prod_ball_triangle.
-  apply: prod_ball_closed.
- apply: prod_ball_eq.
+     exact prod_ball_refl.
+    exact prod_ball_sym.
+   exact prod_ball_triangle.
+  exact prod_ball_closed.
+ exact prod_ball_eq.
 Qed.
 
 Definition ProductMS : MetricSpace.

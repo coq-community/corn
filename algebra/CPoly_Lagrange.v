@@ -1,4 +1,3 @@
-
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation
@@ -8,8 +7,6 @@ Require Import
  list_separates SetoidPermutation.
 Require ne_list.
 Import ne_list.notations.
-
-Set Automatic Introduction.
 
 Open Local Scope CR_scope.
 
@@ -96,7 +93,7 @@ Section contents.
   Lemma interpolates: interpolates crpoints L.
   Proof with auto.
    intros xy.
-   rewrite in_map_iff.
+   unfold crpoints. rewrite in_map_iff.
    intros [[xi y] [V W]].
    subst. simpl @fst. simpl @snd.
    rewrite apply. unfold functional.

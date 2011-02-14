@@ -43,7 +43,6 @@
 Require Export CRingClass.
 Require Import CRing_Homomorphisms.
 Require Import Rational.
-Set Automatic Introduction.
 
 (**
 * Polynomials
@@ -548,7 +547,7 @@ Qed.
 
 Lemma cpoly_linear_wd : bin_fun_wd _ _ _ cpoly_linear_cs.
 Proof.
- by apply bin_fun_strext_imp_wd.
+ apply bin_fun_strext_imp_wd. now repeat intro.
 Qed.
 
 Definition cpoly_linear_fun := Build_CSetoid_bin_fun _ _ _ _ cpoly_linear_strext.
@@ -574,7 +573,7 @@ Proof.
     apply _cpoly_lin_eq_zero;split; algebra.
    algebra.
   apply X1;  assumption.
- by apply X1.
+ now apply X1.
 Qed.
 
 Lemma Ccpoly_triple_comp_ind :
@@ -641,8 +640,8 @@ Proof.
     apply _cpoly_lin_eq_zero.
     split; algebra.
    algebra.
-  by apply H1.
- by apply H1.
+  now apply H1.
+ now apply H1.
 Qed.
 
 Lemma cpoly_triple_comp_ind :
@@ -1007,7 +1006,7 @@ Canonical Structure cpoly_csemi_grp.
 Lemma cpoly_cm_proof : is_CMonoid cpoly_csemi_grp cpoly_zero.
 Proof.
  apply Build_is_CMonoid.
-  - intro; rewrite -> cpoly_plus_zero;algebra.
+  intro; rewrite -> cpoly_plus_zero;algebra.
  intro x.
  eapply eq_transitive_unfolded.
   apply cpoly_plus_commutative.
@@ -1114,7 +1113,7 @@ Definition cpoly_cgroup := Build_CGroup _ _ cpoly_cg_proof.
 Canonical Structure cpoly_cgroup.
 
 Lemma cpoly_cag_proof : is_CAbGroup cpoly_cgroup.
-Proof. apply: cpoly_plus_commutative. Qed.
+Proof. repeat intro. apply: cpoly_plus_commutative. Qed.
 
 Definition cpoly_cabgroup := Build_CAbGroup _ cpoly_cag_proof.
 Canonical Structure cpoly_cabgroup.
@@ -1350,7 +1349,6 @@ Proof.
  intros.
  repeat rewrite cpoly_lin_mult_cr.
  repeat rewrite cpoly_lin_plus_lin.
- rewrite <- cpoly_lin_mult_cr.
  apply: _cpoly_lin_eq_lin.
  split; algebra.
 Qed.
@@ -2378,7 +2376,7 @@ Proof.
  induction l.
   reflexivity.
  change ((a [+] cm_Sum l) ! x[=]cm_Sum (map (fun e : cpoly_cring R => e ! x) (a :: l))).
- rewrite plus_apply IHl.
+ rewrite plus_apply, IHl.
  reflexivity.
 Qed.
 
@@ -2392,7 +2390,7 @@ Proof.
   rewrite cring_mult_zero.
   apply cm_rht_unit_unfolded.
  change ((a [*] cr_Product l) ! x[=]cr_Product (map (fun e : cpoly_cring R => e ! x) (a :: l))).
- rewrite mult_apply IHl.
+ rewrite mult_apply, IHl.
  reflexivity.
 Qed.
 
@@ -2572,7 +2570,7 @@ Proof.
  induction p.
   intros q.
   change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
-  stepl (_D_(Zero:RX)). 2: by destruct q.
+  stepl (_D_(Zero:RX)). 2: now destruct q.
   rewrite -> diff_zero.
   ring.
  intros q.
@@ -2652,7 +2650,7 @@ Proof.
    change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
    stepr (cpoly_map_csf p). 2: ring.
    apply csf_wd.
-   cut (forall p: cpoly_cring R, csg_op p Zero [=] p). done.
+   cut (forall p: cpoly_cring R, csg_op p Zero [=] p). easy.
    intros. ring.
   reflexivity.
  intros p q c d H.
