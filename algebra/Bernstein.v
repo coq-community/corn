@@ -264,7 +264,7 @@ Lemma RaiseDegree : forall n i (H: i<=n),
 Proof.
  intros n i H.
  rstepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
- rewrite RaiseDegreeA RaiseDegreeB. reflexivity.
+ rewrite RaiseDegreeA, RaiseDegreeB. reflexivity.
 Qed.
 
 Opaque Bernstein.
@@ -334,11 +334,11 @@ Proof.
  intros i.
  induction i.
   intros l v1 v2.
-  rewrite (V0_eq v1) (V0_eq v2). ring.
+  rewrite (V0_eq v1), (V0_eq v2). ring.
  intros l v1 v2.
  destruct n as [|n].
   elimtype False; auto with *.
- rewrite (VSn_eq v1) (VSn_eq v2).
+ rewrite (VSn_eq v1), (VSn_eq v2).
  simpl.
  rewrite IHi.
  rewrite -> c_plus. ring.

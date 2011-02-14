@@ -9,8 +9,6 @@ Require Import
 Require Export
   abstract_algebra interfaces.additional_operations.
 
-Set Automatic Introduction.
-
 (* We describe the approximate rationals as a ring that is dense in the rationals *)
 
 (* Because [Q] is ``hard-wired'' nearly everywhere in CoRN, we take the easy
@@ -64,7 +62,7 @@ Proof with auto.
   apply (antisymmetry (≤)).
    apply integers.precedes_sprecedes.
    apply int_pow_exp_sprecedes_back with 2...
-   rewrite int_pow_exp_plus... rewrite int_pow_mult_inv int_pow_1.
+   rewrite int_pow_exp_plus... rewrite int_pow_mult_inv, int_pow_1.
    apply sprecedes_trans_r with ((x : Q) / 2).
     apply_simplified (order_preserving (.* (/ 2))).
     apply Qdlog2_spec...
@@ -75,8 +73,8 @@ Proof with auto.
   apply int_pow_exp_sprecedes_back with 2...
   apply sprecedes_trans_r with ((x : Q) / 2).
    apply Qdlog2_spec...
-  rewrite <-associativity. rewrite (commutativity _ 1) associativity.
-  rewrite int_pow_exp_plus... rewrite int_pow_mult_inv int_pow_1.
+  rewrite <-associativity. rewrite (commutativity _ 1), associativity.
+  rewrite int_pow_exp_plus... rewrite int_pow_mult_inv, int_pow_1.
   apply_simplified (strictly_order_preserving (.* (/ 2))).
   apply stdlib_rationals.Qlt_coincides.
   apply Qdlog2_spec...
@@ -153,7 +151,7 @@ Section approximate_rationals_more.
     apply in_Qball in P. destruct P as [_ P]. 
     rewrite rings.preserves_plus.
     rewrite aq_shift_correct.
-    now rewrite rings.preserves_1 left_identity.
+    now rewrite rings.preserves_1, left_identity.
   Qed.
 
   Lemma Zshift_opp_1 (x : AQ) : '(x ≪ (-(1) : Z)) = 'x / 2.
@@ -212,14 +210,14 @@ Section approximate_rationals_more.
 
   Lemma AQball_bool_true (k : Z) (x y : AQ) : 
     AQball_bool k x y ≡ true ↔ ball (2 ^ k) ('x) ('y).
-  Proof with auto.
-    rewrite bool_decide_rel_true. rewrite ->Qball_Qabs.
+  Proof.
+    unfold AQball_bool. rewrite bool_decide_rel_true. rewrite ->Qball_Qabs.
     transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
      split; intros.
-      apply (order_preserving _)...
-     apply (order_preserving_back inject)...
-    rewrite abs.preserves_abs rings.preserves_minus.
-    now rewrite aq_shift_correct rings.preserves_1 left_identity.
+      now apply (order_preserving _).
+     now apply (order_preserving_back inject).
+    rewrite abs.preserves_abs, rings.preserves_minus.
+    now rewrite aq_shift_correct, rings.preserves_1, left_identity.
   Qed.
 
   Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ) : 
@@ -254,6 +252,6 @@ Section approximate_rationals_more.
   Lemma AQposAsQpos_preserves_1 : AQposAsQpos 1 = 1.
   Proof.
     do 3 red. simpl.
-    now rewrite (rings.preserves_1 (f:=inject)).
+    now posed_rewrite (rings.preserves_1 (f:=inject : AQ → Q)).
   Qed.
 End approximate_rationals_more.

@@ -178,7 +178,7 @@ Proof.
   apply ArcTan_pos.
   assumption.
  rstepr ([--](ArcTan x)[+]Pi[/]TwoNZ).
- stepr (ArcTan (Tan _ (Tang_Domain' _ H0))); [| by destruct H0; apply ArcTan_Tan; assumption].
+ stepr (ArcTan (Tan _ (Tang_Domain' _ H0))); [| now destruct H0; apply ArcTan_Tan; assumption].
  apply ArcTan_wd.
  apply eq_symmetric.
  assert (H1:Dom Tang ([--](ArcTan x))).
@@ -190,7 +190,7 @@ Proof.
   apply inv_resp_less.
   assumption.
  assert (H2:(Tan [--](ArcTan x) H1)[#]Zero).
-  stepl ([--](Tan (ArcTan x) (Dom_Tang_ArcTan x))); [| by apply eq_symmetric; apply Tan_inv].
+  stepl ([--](Tan (ArcTan x) (Dom_Tang_ArcTan x))); [| now apply eq_symmetric; apply Tan_inv].
   rstepr ([--]Zero:IR).
   apply inv_resp_ap.
   apply Greater_imp_ap.
@@ -233,9 +233,9 @@ Proof.
    rstepl (One[-]x[*]y).
    assumption.
   rstepl (ArcTan y[+]ArcTan x).
-  stepr (ArcTan ((y[+]x)[/](One[-]y[*]x)[//]Hxy')); [| by apply ArcTan_wd; rational].
+  stepr (ArcTan ((y[+]x)[/](One[-]y[*]x)[//]Hxy')); [| now apply ArcTan_wd; rational].
   apply G; try assumption.
-   stepl (One:IR); [| by apply eq_symmetric; assumption].
+   stepl (One:IR); [| now apply eq_symmetric; assumption].
    apply leEq_reflexive.
   destruct Hx1' as [c|c]; try assumption.
   elimtype False.
@@ -266,17 +266,17 @@ Proof.
    assumption.
   destruct Hx0' as [Hx0'|Hx0']; destruct Hx1' as [Hx1'|Hx1'].
      rstepl (ArcTan y[+]ArcTan x).
-     stepr (ArcTan ((y[+]x)[/](One[-]y[*]x)[//]Hxy')); [| by apply ArcTan_wd; rational].
+     stepr (ArcTan ((y[+]x)[/](One[-]y[*]x)[//]Hxy')); [| now apply ArcTan_wd; rational].
      apply G; try assumption.
-      stepr ([--]One:IR); [| by assumption].
+      stepr ([--]One:IR); [| easy ].
       apply leEq_reflexive.
-     stepl ([--]One:IR); [| by assumption].
+     stepl ([--]One:IR); [| easy ].
      apply shift_zero_leEq_minus'.
      rstepr (Two:IR).
      apply less_leEq; apply pos_two.
     csetoid_replace (ArcTan y) ([--](ArcTan x)).
      rstepl (Zero:IR).
-     stepl (ArcTan Zero); [| by apply ArcTan_zero].
+     stepl (ArcTan Zero); [| now apply ArcTan_zero].
      apply ArcTan_wd.
      rstepl (Zero[/](One[-]x[*]y)[//]Hxy).
      apply div_wd.
@@ -297,7 +297,7 @@ Proof.
    rational.
   elimtype False.
   refine (eq_imp_not_ap _ [--]One One _ _).
-   stepr x; by assumption.
+   now stepr x.
   apply ap_symmetric.
   apply zero_minus_apart.
   rstepl (Two:IR).
@@ -347,7 +347,7 @@ Proof.
   FEQ.
   change ([--](One[*]x[*]x)[^]n[=]([--]One)[^]n[*]x[^](2*n)).
   rstepl (([--]One[*](x[*]x))[^]n).
-  stepl (([--]One)[^]n[*]((x[*]x)[^]n)); [| by apply eq_symmetric; apply mult_nexp].
+  stepl (([--]One)[^]n[*]((x[*]x)[^]n)); [| now apply eq_symmetric; apply mult_nexp].
   apply mult_wdr.
   replace (2*n)%nat with (n+n)%nat by auto with *.
   eapply eq_transitive.
@@ -436,7 +436,7 @@ Proof.
   rstepl (One[+]One[*]c[*]c).
   assumption.
  rstepr (One[/](One[-]([--](c[^]2)))[//]Y).
- stepr (series_sum (power_series [--](c[^]2)) (power_series_conv [--](c[^]2) X)); [| by
+ stepr (series_sum (power_series [--](c[^]2)) (power_series_conv [--](c[^]2) X)); [| now
    apply (power_series_sum ([--](c[^]2)) X Y (power_series_conv _ X))].
  apply series_sum_wd.
  intros n.
@@ -487,15 +487,15 @@ Proof.
  set (d:= 2*n + 1).
  change (AbsIR (([--]One[^]S n[/]nring (R:=IR) a[//]Z1)[*]x[^]b)[<=]
    C[*]AbsIR (([--]One[^]n[/]nring (R:=IR) c[//]Z0)[*]x[^]d)).
- stepl (AbsIR (([--]One[^]S n[/]nring (R:=IR) a[//]Z1))[*]AbsIR (x[^]b)); [| by
+ stepl (AbsIR (([--]One[^]S n[/]nring (R:=IR) a[//]Z1))[*]AbsIR (x[^]b)); [| now
    apply eq_symmetric; apply AbsIR_resp_mult].
- stepr (C[*](AbsIR (([--]One[^]n[/]nring (R:=IR) c[//]Z0))[*]AbsIR(x[^]d))); [| by
+ stepr (C[*](AbsIR (([--]One[^]n[/]nring (R:=IR) c[//]Z0))[*]AbsIR(x[^]d))); [| now
    apply mult_wdr; apply eq_symmetric; apply AbsIR_resp_mult].
  rstepr (AbsIR (([--]One[^]n[/]nring (R:=IR) c[//]Z0))[*](C[*]AbsIR(x[^]d))).
  apply mult_resp_leEq_both; try apply AbsIR_nonneg.
-  stepl (AbsIR ([--]One[^]S n)[/]_[//](AbsIR_resp_ap_zero _ Z1)); [| by
+  stepl (AbsIR ([--]One[^]S n)[/]_[//](AbsIR_resp_ap_zero _ Z1)); [| now
     apply eq_symmetric; apply AbsIR_division].
-  stepr ((AbsIR ([--]One[^]n)[/]_[//](AbsIR_resp_ap_zero _ Z0))); [| by
+  stepr ((AbsIR ([--]One[^]n)[/]_[//](AbsIR_resp_ap_zero _ Z0))); [| now
     apply eq_symmetric; apply AbsIR_division].
   assert (H0:forall n, AbsIR([--]One[^]n)[=]One).
    intros i.
@@ -507,10 +507,10 @@ Proof.
    apply eq_symmetric; apply AbsIR_eq_x.
    apply less_leEq; apply pos_one.
   stepl (One[/]AbsIR (nring (R:=IR) (S (2 * S n)))[//]
-    AbsIR_resp_ap_zero (nring (R:=IR) (S (2 * S n))) Z1); [| by
+    AbsIR_resp_ap_zero (nring (R:=IR) (S (2 * S n))) Z1); [| now
       apply div_wd; try apply eq_reflexive; apply eq_symmetric; apply H0].
   stepr (One[/]AbsIR (nring (R:=IR) (S (2 * n)))[//]
-    AbsIR_resp_ap_zero (nring (R:=IR) (S (2 * n))) Z0); [| by
+    AbsIR_resp_ap_zero (nring (R:=IR) (S (2 * n))) Z0); [| now
       apply div_wd; try apply eq_reflexive; apply eq_symmetric; apply H0].
   apply recip_resp_leEq; try (apply AbsIR_pos; assumption).
   eapply leEq_transitive;[|apply leEq_AbsIR].
@@ -520,13 +520,13 @@ Proof.
   apply nring_leEq.
   auto with *.
  replace b with (2+d);[|unfold b, d; auto with *].
- stepl (AbsIR x[^](2+d)); [| by apply eq_symmetric; apply AbsIR_nexp_op].
- stepl (AbsIR x[^]2[*]AbsIR x[^]d); [| by apply nexp_plus].
- stepr (C[*]AbsIR x[^]d); [| by apply mult_wdr; apply eq_symmetric; apply AbsIR_nexp_op].
+ stepl (AbsIR x[^](2+d)); [| now apply eq_symmetric; apply AbsIR_nexp_op].
+ stepl (AbsIR x[^]2[*]AbsIR x[^]d); [| now apply nexp_plus].
+ stepr (C[*]AbsIR x[^]d); [| now apply mult_wdr; apply eq_symmetric; apply AbsIR_nexp_op].
  apply mult_resp_leEq_rht; try (apply nexp_resp_nonneg; apply AbsIR_nonneg).
  apply leEq_transitive with (C[^]2).
-  stepl (AbsIR(x[^]2)); [| by apply AbsIR_nexp_op].
-  stepl (x[^]2); [| by apply eq_symmetric; apply AbsIR_eq_x; apply sqr_nonneg].
+  stepl (AbsIR(x[^]2)); [| now apply AbsIR_nexp_op].
+  stepl (x[^]2); [| now apply eq_symmetric; apply AbsIR_eq_x; apply sqr_nonneg].
   apply shift_zero_leEq_minus'.
   rstepr ((C[-]x)[*](C[-][--]x)).
   unfold C.

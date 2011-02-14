@@ -21,7 +21,7 @@ Proof.
  destruct (Zgcd_nat_divides (an * bd) (bn * ad)) as [c E].
  exists c.
  unfold Qmult, Qeq. simpl.
- rewrite E Zpos_mult_morphism.
+ rewrite E, Zpos_mult_morphism.
  ring.
 Qed.
 

@@ -25,7 +25,6 @@ Require Import List.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 (** This extended notition of ball operates over QposInf, allowing
 one to say, ball Infinity a b, holds for all a and b.
@@ -43,7 +42,7 @@ Lemma ball_ex_weak_le : forall (X:MetricSpace) (e d:QposInf) (a b:X), QposInf_le
 Proof.
  intros X e d a b Hed Hab.
  destruct d as [d|]; destruct e as [e|].
-    apply: (ball_weak_le X).
+    eapply (ball_weak_le X).
      apply Hed.
     assumption.
    elim Hed.
@@ -222,7 +221,7 @@ Qed.
 
 Instance uc_wd_more_Proper (X Y : MetricSpace):
   Proper (@ucEq _ _ ==> @st_eq X ==> @st_eq Y) (@ucFun X Y).
-Proof. intros ?? E ?? F. rewrite E F. reflexivity. Qed.
+Proof. intros ?? E ?? F. now rewrite F. Qed.
 
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 

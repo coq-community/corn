@@ -43,8 +43,6 @@ Require Export csetoid_rewrite.
 Require Export Nsec.
 Require Import SetoidPermutation Setoid Morphisms.
 
-Set Automatic Introduction.
-
 (* Begin_SpecReals *)
 
 (**
@@ -249,8 +247,8 @@ Proof.
    unfold Inv.
    simpl.
    apply inv2.
-  intros a b.  elim isof. intros H0 H1. move: H1 => [H1 H2].
-  move: (H2 a) => [a' fa'a]. move: (H2 b) => [b' fb'b].
+  intros a b.  elim isof. intros H0 H1. destruct H1 as [H1 H2].
+  destruct (H2 a) as [a' fa'a]. destruct (H2 b) as [b' fb'b].
   unfold morphism in H0.
   astepl ((Inv f iso_imp_bij) (f a' [+] f b')).
   astepl ((Inv f iso_imp_bij) ( f ( a'[+] b'))).
@@ -354,13 +352,13 @@ Proof.
  cut ( power_CMonoid u l[=]power_CMonoid u k).
   intro H4.
   rewrite -> H4.
-  2: by apply eq_symmetric.
+  2: now apply eq_symmetric.
  set (H5:=(power_plus M  u k (s*(l-k)))).
  cut (csbf_fun M M M (csg_op (c:=M)) (power_CMonoid  u k)
    (power_CMonoid u (s * (l - k)))[=]power_CMonoid u (k + s * (l - k))).
   intros H6.
-  by rewrite -> H6.
- by symmetry. 
+  now rewrite -> H6.
+ now symmetry. 
 Qed.
 
 Lemma power_k_n:forall (M:CMonoid)(u:M)(k l n :nat)
@@ -395,36 +393,36 @@ Proof.
    2: (replace ((k + s * (l - k))+((n - k) - s * (l - k))) with n). 2:reflexivity.
    rewrite -> (power_plus M  u  (k+(s*(l-k))) ((n-k)-s*(l-k))).
    rewrite -> (power_plus M u k (n-k-s*(l-k))).
-   setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). by reflexivity.
-  unfold rsetoid_equiv. by intuition. 
+   setoid_replace (power_CMonoid u (k + s * (l - k))) with (power_CMonoid u k). now reflexivity.
+  unfold rsetoid_equiv. now intuition. 
   cut (n=k+(n-k)).
    intro H10.
    cut (n=((k+(n-k))+(s*(l-k)-s*(l-k)))).
     intro H11.
     cut  ((k+(n-k))+(s*(l-k)-s*(l-k)) = (k + s * (l - k) + (n - k - s * (l - k)))).
      intro H12.
-     by rewrite<- H11 in H12.
+     now rewrite<- H11 in H12.
     apply minus4.
     split.
-     by intuition.
+     now intuition.
     exact H9'.
    rewrite<- H10.
    cut ((s*(l-k)-s*(l-k))=0).
     intro H11.
     rewrite H11.
-    by intuition.
-   by intuition.
+    now intuition.
+   now intuition.
   cut (n=n+(k-k)).
    intro H10.
    cut (n+(k-k)=k+(n-k)).
     intro H11.
-    by rewrite<- H10 in H11.
+    now rewrite<- H10 in H11.
    apply minus3.
-   split;by intuition.
+   split; now intuition.
   cut ((k-k)=0).
    intro H10.
-   by rewrite H10.
-  by intuition.
+   now rewrite H10.
+  now intuition.
  simpl.
  cut (l-k>0).
   intro H9.
@@ -446,7 +444,7 @@ Proof.
    intuition.
   cut (r= (mod_nat (n-k)(l-k)H2)).
    intro H11.
-   by rewrite<- H11.
+   now rewrite<- H11.
   simpl.
   cut ((Z_of_nat r)=(mod_nat (n - k) (l - k) H2)).
    intro H11.
@@ -495,7 +493,7 @@ Proof.
  rewrite <- (power_plus M c0 nx ny).
  replace (nx+ny) with (ny+nx).
   rewrite -> (power_plus M c0 ny nx).
-  by apply eq_reflexive.
+  now apply eq_reflexive.
  intuition.
 Qed.
 
@@ -975,7 +973,7 @@ Lemma cm_Sum_eq {A} (a: list A) (f g: A -> M):
 Proof with try reflexivity.
  intro E.
  induction a...
- simpl. rewrite E IHa...
+ simpl. rewrite E, IHa...
 Qed.
 
 Global Instance cm_Sum_Proper: commutes (@csg_op M) ->
@@ -983,8 +981,8 @@ Global Instance cm_Sum_Proper: commutes (@csg_op M) ->
 Proof with auto; try reflexivity.
  intros E x y H.
  induction H; simpl...
-   rewrite IHSetoidPermutation H...
-  rewrite plus_assoc_unfolded plus_assoc_unfolded (E _ y)...
+   rewrite IHSetoidPermutation, H...
+  rewrite plus_assoc_unfolded, plus_assoc_unfolded, (E _ y)...
  transitivity (cm_Sum l')...
 Qed.
 

@@ -29,7 +29,6 @@ Require Import Qmetric.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
@@ -684,7 +683,7 @@ Qed.
 Instance CRinv_pos_uc_Proper : Proper (QposEq ==> @st_eq _ ==> @st_eq _) Qinv_pos_uc.
 Proof.
   intros [c1 ?] [c2 ?] E x1 x2 F. unfold QposEq in E. simpl in *.
-  rewrite E F. reflexivity.
+  rewrite E, F. reflexivity.
 Qed.
 
 Instance: Proper (QposEq ==> @st_eq _) CRinv_pos.

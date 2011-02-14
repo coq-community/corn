@@ -55,8 +55,6 @@ Require Export CLogic.
 Require Export Step.
 Require Export RSetoid.
 
-Set Automatic Introduction.
-
 Delimit Scope corn_scope with corn.
 Open Scope corn_scope.
 
@@ -256,11 +254,9 @@ Proof eq_symmetric.
 Lemma eq_transitive_unfolded : forall x y z : S, x [=] y -> y [=] z -> x [=] z.
 Proof eq_transitive.
 
-Require Import ssreflect.
-
 Lemma eq_wdl : forall x y z : S, x [=] y -> x [=] z -> z [=] y.
 Proof.
- intros. by apply: (eq_transitive _ x);[apply: eq_symmetric|].
+ intros. now apply (eq_transitive _ x);[apply: eq_symmetric|].
 Qed.
 
 
@@ -305,32 +301,32 @@ Qed.
 Lemma neq_imp_notnot_ap : forall x y : S, x [~=] y -> ~ Not (x [#] y).
 Proof.
  intros x y H H0.
- by apply: H; apply: not_ap_imp_eq.
+ now apply: H; apply: not_ap_imp_eq.
 Qed.
 
 Lemma notnot_ap_imp_neq : forall x y : S, ~ Not (x [#] y) -> x [~=] y.
 Proof.
  intros x y H H0.
- by apply H; apply eq_imp_not_ap.
+ now apply H; apply eq_imp_not_ap.
 Qed.
 
 Lemma ap_imp_neq : forall x y : S, x [#] y -> x [~=] y.
 Proof.
  intros x y H H1.
- by apply (eq_imp_not_ap _ _ H1).
+ now apply (eq_imp_not_ap _ _ H1).
 Qed.
 
 Lemma not_neq_imp_eq : forall x y : S, ~ x [~=] y -> x [=] y.
 Proof.
  intros x y H.
  apply: not_ap_imp_eq.
- move => H0.
- apply: H. by apply: ap_imp_neq.
+ intros H0.
+ apply: H. now apply: ap_imp_neq.
 Qed.
 
 Lemma eq_imp_not_neq : forall x y : S, x [=] y -> ~ x [~=] y.
 Proof.
- intros x y H H0. by [].
+ intros x y H H0. easy.
 Qed.
 
 End CSetoid_basics.
@@ -341,19 +337,13 @@ Section product_csetoid.
 
 Definition prod_ap (A B : CSetoid) (c d : prodT A B) : CProp.
 Proof.
- elim c.
- intros.
- elim d.
- intros.
+ destruct c as [a b], d as [a0 b0].
  exact (cs_ap (c:=A) a a0 or cs_ap (c:=B) b b0).
 Defined.
 
 Definition prod_eq (A B : CSetoid) (c d : prodT A B) : Prop.
 Proof.
- elim c.
- intros.
- elim d.
- intros.
+ destruct c as [a b], d as [a0 b0].
  exact (a [=] a0 /\ b [=] b0).
 Defined.
 
@@ -364,20 +354,20 @@ Proof.
  (* Can be shortened *)
  intros A B.
  apply (Build_is_CSetoid _ (prod_eq A B) (prod_ap A B)).
-    move => x. case x. move =>  c c0 H.
+    intros x. case x. intros c c0 H.
     elim H.
-     move =>H1.
-     by apply: (ap_irreflexive A _ H1).
+     intros H1.
+     now apply: (ap_irreflexive A _ H1).
     apply (ap_irreflexive B _ ).
    intros x y. case x. case y.
    intros c c0 c1 c2 H.
    elim H.
     intros.
     left.
-    by apply ap_symmetric.
+    now apply ap_symmetric.
    intros.
    right.
-   by apply ap_symmetric.
+   now apply ap_symmetric.
   intros x y. case x. case y.
   intros c c0 c1 c2 H z. case z.
   intros c3 c4.
@@ -386,31 +376,31 @@ Proof.
   elim H.
    intros.
    cut (c1 [#] c3 or c3 [#] c).
-    move => [H1|H2].
+    intros [H1|H2].
      left.
-     by left.
+     now left.
     intros.
     right.
-    by left.
-   by apply: ap_cotransitive.
+    now left.
+   now apply: ap_cotransitive.
   intros.
   cut (c2 [#] c4 or c4 [#] c0).
    intros [H1|H2].
-    left;by right.
-   by right;right.
-  by apply: ap_cotransitive.
+    left; now right.
+   now right;right.
+  now apply: ap_cotransitive.
  intros x y. case x. case y.
  intros c c0 c1 c2.
  split.
   intros.
   split.
    apply not_ap_imp_eq.
-   move =>H1. by cut (c1 [#] c or c2 [#] c0);[|left].
-   apply not_ap_imp_eq. move =>H1. by cut (c1 [#] c or c2 [#] c0);[|right].
+   intros H1. now cut (c1 [#] c or c2 [#] c0);[|left].
+   apply not_ap_imp_eq. intros H1. now cut (c1 [#] c or c2 [#] c0);[|right].
   intros.
  elim H.
  intros H0 H1 H2.
- by elim H2;apply eq_imp_not_ap.
+ now elim H2;apply eq_imp_not_ap.
 Qed.
 
 Definition ProdCSetoid (A B : CSetoid) : CSetoid := Build_CSetoid
@@ -642,7 +632,7 @@ Proof.
  elim (ap_cotransitive _ _ _ H z); intro H2.
   assumption.
  elim H1.
- by apply: ap_symmetric.
+ now apply: ap_symmetric.
 Qed.
 
 Lemma ap_wdl : Crel_wdl (cs_ap (c:=S)).
@@ -650,7 +640,7 @@ Proof.
  intros x y z H H0.
  generalize (ap_wdr y x z); intro H1.
  apply ap_symmetric.
- by apply H1;[apply ap_symmetric|].
+ now apply H1;[apply ap_symmetric|].
 Qed.
 
 Lemma ap_wdr_unfolded : forall x y z : S, x [#] y -> y [=] z -> x [#] z.
@@ -665,7 +655,7 @@ Proof.
  case (ap_cotransitive _ _ _ H x2); intro H0;auto.
  case (ap_cotransitive _ _ _ H0 y2); intro H1;auto.
  right; right.
- by apply ap_symmetric.
+ now apply ap_symmetric.
 Qed.
 
 Definition predS_well_def (P : S -> CProp) : CProp := forall x y : S,
@@ -711,7 +701,7 @@ Proof.
  apply not_ap_imp_eq.
  intro H1.
  generalize (H _ _ H1); intro H2.
- generalize (eq_imp_not_ap _ _ _ H0). by apply.
+ now generalize (eq_imp_not_ap _ _ _ H0).
 Qed.
 
 End unary_functions.
@@ -758,8 +748,8 @@ Proof.
  intro H2.
  generalize (H _ _ _ _ H2); intro H3.
  elim H3; intro H4.
-  by set (eq_imp_not_ap _ _ _ H0).
- by set (eq_imp_not_ap _ _ _ H1).
+  now set (eq_imp_not_ap _ _ _ H0).
+ now set (eq_imp_not_ap _ _ _ H1).
 Qed.
 
 End binary_functions.
@@ -787,20 +777,20 @@ Lemma bin_fun_is_wd_fun_lft : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c 
  fun_wd _ _ (fun x : S1 => f x c).
 Proof.
  intros S1 S2 S3 f c x y H.
- by apply csbf_wd; [|apply eq_reflexive].
+ now apply csbf_wd; [|apply eq_reflexive].
 Qed.
 
 Lemma bin_fun_is_wd_fun_rht : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S1),
  fun_wd _ _ (fun x : S2 => f c x).
 Proof.
- intros S1 S2 S3 f c x y H. by apply csbf_wd; [apply eq_reflexive|].
+ intros S1 S2 S3 f c x y H. now apply csbf_wd; [apply eq_reflexive|].
 Qed.
 
 Lemma bin_fun_is_strext_fun_lft : forall S1 S2 S3 (f : CSetoid_bin_fun S1 S2 S3) (c : S2),
  fun_strext _ _ (fun x : S1 => f x c).
 Proof.
  intros S1 S2 S3 f c x y H. cut (x [#] y or c [#] c). intros [H1|H2];auto.
- by set (ap_irreflexive _ c H2).
+ now set (ap_irreflexive _ c H2).
  eapply csbf_strext. apply H.
 Defined.
 
@@ -858,13 +848,10 @@ Definition CSetoid_un_op  := CSetoid_fun S S.
 Definition Build_CSetoid_un_op := Build_CSetoid_fun S S.
 
 Lemma id_strext : un_op_strext (fun x : S => x).
-Proof.
- by[].
-Qed.
+Proof. now repeat intro. Qed.
 
 Lemma id_pres_eq : un_op_wd (fun x : S => x).
-Proof.
- by[]. Qed.
+Proof. now repeat intro. Qed.
 
 Definition id_un_op := Build_CSetoid_un_op (fun x : S => x) id_strext.
 
@@ -1070,7 +1057,7 @@ Definition restr_un_op (a : subcsetoid_crr) : subcsetoid_crr :=
 
 Lemma restr_un_op_wd : un_op_wd Build_SubCSetoid restr_un_op.
 Proof.
- intros x y. case y. case x. intros. by apply: (csf_wd _ _ f).
+ intros x y. case y. case x. intros. now apply: (csf_wd _ _ f).
 Qed.
 
 Lemma restr_un_op_strext : un_op_strext Build_SubCSetoid restr_un_op.
@@ -1164,7 +1151,7 @@ Proof.
    replace (S n0 - S m0)%Z with (n0 - m0)%Z.
     apply eq_reflexive.
    repeat rewrite Znat.inj_S; clear H1; auto with zarith.
-  by apply eq_symmetric.
+  now apply eq_symmetric.
  clear H1; auto with zarith.
 Qed.
 
@@ -1190,11 +1177,11 @@ Add Parametric Relation c : (cs_crr c) (@cs_eq c)
 Add Parametric Morphism (c1 c2 c3 : CSetoid) f: (csbf_fun c1 c2 c3 f) with signature (@cs_eq c1) ==> (@cs_eq c2) ==> (@cs_eq c3) as csbf_fun_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
- by apply csbf_wd.
+ now apply csbf_wd.
 Qed.
 
 Add Parametric Morphism (c1 c2 : CSetoid) f: (@csf_fun c1 c2 f) with signature (@cs_eq c1) ==> (@cs_eq c2) as csf_fun_wd.
 Proof.
  intros x1 x2 Hx.
- by apply csf_wd.
+ now apply csf_wd.
 Qed.

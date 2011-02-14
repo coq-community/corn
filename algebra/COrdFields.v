@@ -414,7 +414,7 @@ Qed.
 
 Lemma leEq_less_or_equal : forall x y:R, x[<=]y -> Not (Not (x[<]y or x[=]y)).
 Proof.
- intros x y Hxy H. move: Hxy.
+ intros x y Hxy H. revert Hxy.
  rewrite -> leEq_def. intro Hxy. apply H.
  right.
  apply (not_ap_imp_eq).

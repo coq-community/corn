@@ -7,7 +7,6 @@ Require Import
   Complete Prelength
   abstract_algebra.
 
-Set Automatic Introduction.
 Open Local Scope uc_scope.
 
 (* Given an embedding of a setoid [X] into a metric space [Y] then [X] is also a 
@@ -21,7 +20,7 @@ Section metric_embedding.
   Global Instance Eball_wd : Proper (QposEq ==> (=) ==> (=) ==> iff) Eball.
   Proof.
     intros ?? E ?? F ?? G. unfold Eball.
-    now rewrite E F G.
+    now rewrite E, F, G.
   Qed.
 
   Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
@@ -224,7 +223,7 @@ Section dense_prelength_embedding.
     Lemma binary_uc_prf : is_UniformlyContinuousFunction (g'' : X → (X --> X)) (mu h).
     Proof.
       intros ε x y E z.
-      apply Eball_spec. rewrite 2!g_eq_h.
+      apply Eball_spec. simpl. rewrite 2!g_eq_h.
       apply (uc_prf h).
       now destruct (mu h ε).
     Qed.

@@ -33,8 +33,6 @@ Require Import Qmetric.
 Require Import CornTac.
 Require Import Stability.
 
-Set Automatic Introduction.
-
 Open Local Scope CR_scope.
 
 (** Operations on rational numbers over CR are the same as the operations
@@ -338,7 +336,7 @@ Qed.
 
 Lemma CRplus_le_l x: forall y z : CR, x <= y <-> z + x <= z + y.
 Proof.
- intros. rewrite (CRplus_le_r x y z) (CRplus_comm x) (CRplus_comm y). reflexivity.
+ intros. rewrite (CRplus_le_r x y z), (CRplus_comm x), (CRplus_comm y). reflexivity.
 Qed.
 
 Lemma CRplus_le_compat (x x' y y': CR): x <= x' -> y <= y' -> x+y <= x'+y'.
@@ -403,7 +401,7 @@ Proof with intuition.
     apply Qopp_lt_compat...
    apply Qle_trans with r...
   rewrite <- in_CRball...
- rewrite q CRopp_Qopp CRplus_0_r CRle_def...
+ rewrite q, CRopp_Qopp, ?CRplus_0_r, CRle_def... 
 Qed.  
 
 Lemma CRgball_plus (x x' y y': CR) e1 e2:
@@ -602,12 +600,12 @@ Proof with auto.
  rewrite CRle_opp.
  rewrite <- Qle_CRle_r.
  split; intros.
-  rewrite CRle_opp CRopp_opp CRopp_Qopp.
+  rewrite CRle_opp, CRopp_opp, CRopp_Qopp.
   apply H.
-  rewrite CRle_opp CRopp_Qopp Qopp_opp...
- rewrite CRle_opp CRopp_Qopp.
+  rewrite CRle_opp, CRopp_Qopp, Qopp_opp...
+ rewrite CRle_opp, CRopp_Qopp.
  apply H.
- rewrite CRle_opp CRopp_Qopp CRopp_opp Qopp_opp...
+ rewrite CRle_opp, CRopp_Qopp, CRopp_opp, Qopp_opp...
 Qed.
 
 Lemma Qle_CRle (x y: CR): (forall x' y', ' x' <= x -> y <= ' y' -> (x' <= y')%Q) <-> x <= y.

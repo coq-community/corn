@@ -25,7 +25,6 @@ Require Import Qordfield.
 Require Import COrdFields.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 
@@ -237,7 +236,7 @@ Proof.
        replace RHS with (1 - o + - (1 - a)).
         rewrite <- Hab.
         auto with *.
-       by simpl; ring.
+       now simpl; ring.
       elim (Qlt_not_le _ _ Hao).
       rewrite -> Qle_minus_iff.
       replace RHS with (1 - o + - (1 - a)).
@@ -245,7 +244,7 @@ Proof.
        rewrite <- Hoa.
        ring_simplify.
        auto with *.
-      by simpl; ring.
+      now simpl; ring.
      intros H; ring_simplify in H.
      revert H; change (~(a==0)); auto with *.
     elim (Qlt_not_le _ _ Hao).
@@ -254,7 +253,7 @@ Proof.
     replace RHS with (1 - a + - (1 - o)).
      rewrite <- Hab.
      auto with *.
-    by simpl; ring.
+    now simpl; ring.
    elim (Qlt_not_le _ _ Hao).
    rewrite -> Qle_minus_iff.
    replace RHS with (1 - a + - (1 - o)).
@@ -262,7 +261,7 @@ Proof.
     rewrite <- Hoa.
     ring_simplify.
     auto with *.
-   by simpl; ring.
+   now simpl; ring.
   elim (Qlt_not_le _ _ Hoa).
   rewrite -> Hab.
   rewrite -> Hao.
@@ -326,8 +325,8 @@ Proof.
     replace RHS with (1*a).
      replace LHS with (b*a).
       apply Qmult_le_compat_r; auto with *.
-     by simpl; ring.
-    by simpl; ring.
+     now simpl; ring.
+    now simpl; ring.
    elim (Qlt_not_le a c).
     rewrite -> Hco.
     apply Qlt_le_trans with o; auto with *.
@@ -335,8 +334,8 @@ Proof.
    replace RHS with (1*a).
     replace LHS with (b*a).
      apply Qmult_le_compat_r; auto with *.
-    by simpl; ring.
-   by simpl; ring.
+    now simpl; ring.
+   now simpl; ring.
   apply SplitL_glue_ind; intros Hbd.
     apply SplitL_glue_ind; intros Hco.
       apply SplitL_resp_Qeq; auto with *.
@@ -390,8 +389,8 @@ Proof.
   replace RHS with (1*a).
    replace LHS with (b*a).
     apply Qmult_le_compat_r; auto with *.
-   by simpl; ring.
-  by simpl; ring.
+   now simpl; ring.
+  now simpl; ring.
  elim (Qlt_not_le b 1).
   auto with *.
  rewrite <- Hao in Hco.
@@ -439,7 +438,7 @@ Proof.
     replace RHS with (- (o- a)).
      rewrite -> H.
      auto with *.
-    by simpl; ring.
+    now simpl; ring.
    apply SplitL_glue_ind; intros Hbz; simpl in Hbz.
      apply SplitL_glue_ind; intros Hco.
        apply IHs1; simpl; [rewrite <- H0|rewrite <- H1]; field; auto with *.
@@ -451,8 +450,8 @@ Proof.
        apply Qle_shift_div_l; auto with *.
        replace LHS with 0.
         auto with *.
-       by simpl; ring.
-      by (simpl; field; auto with * ).
+       now simpl; ring.
+      now (simpl; field; auto with * ).
      elim (Qlt_not_le _ _ Hbz).
      rewrite -> Qle_minus_iff.
      replace RHS with ((a + b - a*b + -o)/(1 -a)).
@@ -460,8 +459,8 @@ Proof.
       rewrite -> Hco.
       replace RHS with 0.
        auto with *.
-      by (simpl; field; auto with * ).
-     by (simpl; field; auto with * ).
+      now (simpl; field; auto with * ).
+     now (simpl; field; auto with * ).
     apply SplitL_glue_ind; intros Hco.
       elim (Qlt_not_le _ _ Hbz).
       rewrite -> Qlt_minus_iff in Hco.
@@ -471,8 +470,8 @@ Proof.
        apply Qle_shift_div_l; auto with *.
        replace LHS with 0.
         auto with *.
-       by simpl; ring.
-      simpl; field. by auto with *.
+       now simpl; ring.
+      simpl; field. now auto with *.
      apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
        repeat split; simpl.
          field_simplify; auto with *.
@@ -484,8 +483,8 @@ Proof.
           replace RHS with (c - (d*c)).
            rewrite -> H1.
            reflexivity.
-          by simpl; ring.
-         by simpl; ring.
+          now simpl; ring.
+         now simpl; ring.
         apply SplitR_resp_Qeq; auto with *; simpl.
         rewrite <- H1; field; auto with *.
        apply SplitL_resp_Qeq; auto with *; simpl.
@@ -498,7 +497,7 @@ Proof.
      rewrite -> Hdz.
      replace RHS with (o:Q).
       auto with *.
-     simpl. field. by auto with *.
+     simpl. field. now auto with *.
     elim (Qlt_not_le _ _ Hbz).
     rewrite <- Hco.
     rewrite <- H0.
@@ -524,13 +523,13 @@ Proof.
     replace RHS with (a + - o + b*(1-a)).
      assert (Z:0 < (1-a)) by auto with *.
      Qauto_pos.
-    by simpl; ring.
+    now simpl; ring.
    assert (Hco':~ c - o == 0).
     intros H.
     elim (Qlt_not_le _ _ Hco).
     rewrite -> Qle_minus_iff.
     replace RHS with (c-o). rewrite -> H. auto with *.
-     replace LHS with (-(c-o)). rewrite -> H. simpl; ring. by simpl; ring.
+     replace LHS with (-(c-o)). rewrite -> H. simpl; ring. now simpl; ring.
     apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
      elim (Qlt_not_le _ _ Hdz).
      apply Qle_shift_div_r; auto with *.
@@ -548,7 +547,7 @@ Proof.
    apply Qlt_le_weak.
    assert (Z:0 < (1-d)) by auto with *.
    Qauto_pos.
-  by simpl; ring.
+  now simpl; ring.
  apply SplitL_glue_ind; intros Hco.
    elim (Qlt_not_le _ _ Hco).
    rewrite <- Hao.
@@ -558,7 +557,7 @@ Proof.
     apply Qlt_le_weak.
     assert (Z:0 < (1-d)) by auto with *.
     Qauto_pos.
-   by simpl; ring.
+   now simpl; ring.
   apply SplitR_glue_ind; intros Hdz; simpl in Hdz.
     elim (Qlt_not_le _ _ Hdz).
     apply Qle_shift_div_r; auto with *.
@@ -579,7 +578,7 @@ Proof.
   replace RHS with (o * (1-d)).
    assert (Z:0 < (1-d)) by auto with *.
    Qauto_pos.
-  by simpl; ring.
+  now simpl; ring.
  rewrite -> H1.
  auto with *.
 Qed.
@@ -638,7 +637,7 @@ Qed.
 Lemma ApGlueGlue : forall X Y (fl fr:StepF (X -> Y)) o l r, (glue o fl fr) <@> (glue o l r) = glue o (fl <@> l) (fr <@> r).
 Proof.
  intros.
- rewrite ApGlue SplitLGlue SplitRGlue.
+ rewrite ApGlue, SplitLGlue, SplitRGlue.
  reflexivity.
 Qed.
 (* begn hide *)

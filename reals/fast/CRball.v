@@ -1,8 +1,5 @@
-
 Require Import
  CRArith CRabs.
-
-Set Automatic Introduction.
 
 Hint Immediate CRle_refl. (* todo: move *)
 
@@ -18,7 +15,7 @@ Section contents.
   Proof.
    intros ?? E ?? F ?? G.
    apply iff_under_forall.
-   intro. rewrite E F G.
+   intro. rewrite E, F, G.
    reflexivity.
   Qed.
 

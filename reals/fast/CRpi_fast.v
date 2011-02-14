@@ -141,7 +141,7 @@ Proof.
   apply (inj_Q_nring IR 1).
  assert (One[-](inj_Q IR x)[*](inj_Q IR y)[#]Zero).
   stepl (inj_Q IR (1[-]x[*]y)).
-   (stepr (inj_Q IR Zero); [| by apply (inj_Q_nring IR 0)]).
+   (stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)]).
    apply inj_Q_ap; assumption.
   eapply eq_transitive.
    apply inj_Q_minus.
@@ -158,7 +158,7 @@ Proof.
   symmetry.
   apply f_char.
  assert (H0:(inj_Q IR (One[-]x * y))[#]Zero).
-  (stepr (inj_Q IR 0); [| by apply (inj_Q_nring IR 0)]).
+  (stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)]).
   apply inj_Q_ap; assumption.
  apply eq_transitive with (inj_Q IR (x[+]y)[/]inj_Q IR (One[-]x * y)[//]H0).
   apply (inj_Q_div).
@@ -178,7 +178,7 @@ Proof.
  intros x Hx.
  induction n.
   right.
-  abstract ( rstepl (Zero:IR); (stepl (ArcTan Zero); [| by apply ArcTan_zero]); apply ArcTan_wd;
+  abstract ( rstepl (Zero:IR); (stepl (ArcTan Zero); [| now apply ArcTan_zero]); apply ArcTan_wd;
     apply eq_symmetric; apply (inj_Q_nring IR 0)).
  simpl.
  destruct (IHn) as [H|H].
@@ -227,33 +227,32 @@ Proof.
      (nring 7[*]ArcTan (inj_Q IR (1 / 239%positive))[+]
        nring 24[*]ArcTan (inj_Q IR (1 / 12943%positive)))).
  csetoid_replace ((nring 44)[*]ArcTan (inj_Q IR (1 / 57%positive)))
-   (ArcTan (inj_Q IR y0)); [|apply: (reflect_right (ArcTan_multiple H0 44));
-     lazy beta delta iota zeta; constructor].
+   (ArcTan (inj_Q IR y0)); [|apply: (reflect_right (ArcTan_multiple H0 44)); now vm_compute].
  csetoid_replace ((nring 7)[*]ArcTan (inj_Q IR (1 / 239%positive))) (ArcTan (inj_Q IR y1));
-   [|apply: (reflect_right (ArcTan_multiple H1 7)); lazy beta delta iota zeta; constructor].
+   [|apply: (reflect_right (ArcTan_multiple H1 7)); now vm_compute].
  csetoid_replace ((nring 12)[*]ArcTan (inj_Q IR (1 / 682%positive))) (ArcTan (inj_Q IR y2));
-   [|apply: (reflect_right (ArcTan_multiple H2 12)); lazy beta delta iota zeta; constructor].
+   [|apply: (reflect_right (ArcTan_multiple H2 12)); now vm_compute].
  csetoid_replace ((nring 24)[*]ArcTan (inj_Q IR (1 / 12943%positive))) (ArcTan (inj_Q IR y3));
-   [|apply: (reflect_right (ArcTan_multiple H3 24)); lazy beta delta iota zeta; constructor].
- compute in y0.
- compute in y1.
- compute in y2.
- compute in y3.
+   [|apply: (reflect_right (ArcTan_multiple H3 24)); now vm_compute].
+ vm_compute in y0.
+ vm_compute in y1.
+ vm_compute in y2.
+ vm_compute in y3.
  csetoid_replace ([--](ArcTan (inj_Q IR y2))) (ArcTan (inj_Q IR (-y2)));
    [|csetoid_rewrite_rev (ArcTan_inv (inj_Q IR y2));
      apply ArcTan_wd; apply eq_symmetric; apply (inj_Q_inv IR y2)].
  csetoid_replace (ArcTan (inj_Q IR y0)[+]ArcTan (inj_Q IR (-y2))) (ArcTan (inj_Q IR (f y0 (-y2))));
-   [|apply ArcTan_plus_ArcTan_Q; try split; lazy beta delta iota zeta; discriminate].
+   [|apply ArcTan_plus_ArcTan_Q; try split; now vm_compute].
  csetoid_replace (ArcTan (inj_Q IR y1)[+]ArcTan (inj_Q IR y3)) (ArcTan (inj_Q IR (f y1 y3)));
-   [|apply ArcTan_plus_ArcTan_Q; try split; lazy beta delta iota zeta; discriminate].
+   [|apply ArcTan_plus_ArcTan_Q; try split; now vm_compute].
  set (z0 := (f y0 (-y2))).
  set (z1 := (f y1 y3)).
- compute in z0.
- compute in z1.
+ vm_compute in z0.
+ vm_compute in z1.
  csetoid_replace (ArcTan (inj_Q IR z0)[+]ArcTan (inj_Q IR z1)) (ArcTan (inj_Q IR (f z0 z1)));
-   [|apply ArcTan_plus_ArcTan_Q; try split; lazy beta delta iota zeta; try discriminate].
+   [|apply ArcTan_plus_ArcTan_Q; try split; now vm_compute].
  set (z3:= (f z0 z1)).
- compute in z3.
+ vm_compute in z3.
  eapply eq_transitive;[|apply ArcTan_one].
  apply ArcTan_wd.
  rstepr (nring 1:IR).

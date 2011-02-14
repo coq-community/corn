@@ -6,8 +6,6 @@ Require Import
 Require QnonNeg.
 Import QnonNeg.notations.
 
-Set Automatic Introduction.
-
 Local Hint Resolve Qle_refl.
 
 Open Local Scope Q_scope.
@@ -53,7 +51,7 @@ Proof with auto with *.
   rewrite <- (Qmult_1_l e) at 2.
   apply Qmult_lt_compat_r...
  exists (1#1)%Qpos. revert xyz.
- rewrite C Qmult_0_r Qmult_0_r...
+ rewrite C, Qmult_0_r, Qmult_0_r...
 Qed.
 
 Lemma Qmid (x y: Q): x < y ->

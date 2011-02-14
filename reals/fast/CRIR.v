@@ -62,8 +62,8 @@ Proof.
  split.
   apply: map_wd_unfolded.
  intros H.
- stepl (CRasIR (IRasCR x)); [| by apply IRasCRasIR_id].
- stepr (CRasIR (IRasCR y)); [| by apply IRasCRasIR_id].
+ stepl (CRasIR (IRasCR x)); [| now apply IRasCRasIR_id].
+ stepr (CRasIR (IRasCR y)); [| now apply IRasCRasIR_id].
  apply map_wd_unfolded.
  assumption.
 Qed.
@@ -76,8 +76,8 @@ Qed.
 Lemma CR_less_as_IR : forall x y, (IRasCR x < IRasCR y -> x[<]y)%CR.
 Proof.
  intros x y H.
- stepl (CRasIR (IRasCR x)); [| by apply IRasCRasIR_id].
- stepr (CRasIR (IRasCR y)); [| by apply IRasCRasIR_id].
+ stepl (CRasIR (IRasCR x)); [| now apply IRasCRasIR_id].
+ stepr (CRasIR (IRasCR y)); [| now apply IRasCRasIR_id].
  apply map_pres_less.
  assumption.
 Qed.
@@ -85,8 +85,8 @@ Qed.
 Lemma CR_ap_as_IR : forall x y, (IRasCR x >< IRasCR y -> x[#]y)%CR.
 Proof.
  intros.
- stepl (CRasIR (IRasCR x)); [| by apply IRasCRasIR_id].
- stepr (CRasIR (IRasCR y)); [| by apply IRasCRasIR_id].
+ stepl (CRasIR (IRasCR x)); [| now apply IRasCRasIR_id].
+ stepr (CRasIR (IRasCR y)); [| now apply IRasCRasIR_id].
  apply map_pres_apartness.
  assumption.
 Qed.

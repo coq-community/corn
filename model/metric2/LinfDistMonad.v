@@ -33,7 +33,6 @@ We prove the that StepF distributes over Complete using the function
 swap (which we call dist) as in Jones, Duponcheel - composing monads
 *)
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Open Local Scope Q_scope.
 Open Local Scope sfstscope.
@@ -90,7 +89,7 @@ Proof.
  destruct H as [Hl Hr] using (glue_eq_ind x1 x2 y o).
  rewrite <- (glueSplit (Map (fun z : RegularFunction X => approximate z d2) y) o).
  unfold SplitL, SplitR.
- rewrite StepFunction.SplitLMap StepFunction.SplitRMap.
+ rewrite StepFunction.SplitLMap, StepFunction.SplitRMap.
  fold (glue o (Map (fun z : RegularFunction X => approximate z d1) x1)
    (Map (fun z : RegularFunction X => approximate z d1) x2)).
  rewrite -> StepFSupBallGlueGlue.

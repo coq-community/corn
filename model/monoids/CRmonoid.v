@@ -37,13 +37,13 @@ Proof.
  split; intros x.
   change (x+(' 0%Q)==x)%CR.
   rewrite <- CR_eq_as_Cauchy_IR_eq.
-  stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (inject_Q 0))); [| by apply: CR_plus_as_Cauchy_IR_plus].
-  stepl ((CRasCauchy_IR x)[+]Zero); [| by apply: plus_resp_eq; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
+  stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (inject_Q 0))); [| now apply: CR_plus_as_Cauchy_IR_plus].
+  stepl ((CRasCauchy_IR x)[+]Zero); [| now apply: plus_resp_eq; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
   apply cm_rht_unit.
  change ((inject_Q 0%Q)+x==x)%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
- stepl ((CRasCauchy_IR (inject_Q 0))[+](CRasCauchy_IR x)); [| by apply CR_plus_as_Cauchy_IR_plus].
- stepl (Zero[+](CRasCauchy_IR x)); [| by
+ stepl ((CRasCauchy_IR (inject_Q 0))[+](CRasCauchy_IR x)); [| now apply CR_plus_as_Cauchy_IR_plus].
+ stepl (Zero[+](CRasCauchy_IR x)); [| now
    apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
  apply cm_lft_unit.
 Qed.

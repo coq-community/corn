@@ -12,7 +12,6 @@ Require Import ModulusDerivative.
 Require Import CRArith.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Opaque cpoly_cring.
 Opaque cpoly_apply_fun.
@@ -604,11 +603,11 @@ Proof.
      replace LHS with (- (x-y)) by simpl; ring.
      auto.
     apply (shift_minus_leEq Q_as_COrdField).
-    stepr (Qclamp01 y); [| by (simpl; ring)].
+    stepr (Qclamp01 y); [| now (simpl; ring)].
     apply Qclamp01_le.
     auto.
    apply (shift_minus_leEq Q_as_COrdField).
-   stepr y; [| by (simpl; ring)].
+   stepr y; [| now (simpl; ring)].
    auto.
   rewrite -> Qabs_pos.
    intros He.

@@ -50,7 +50,7 @@ Section from_alt.
   Instance ball_wd: Proper (QposEq ==> @st_eq X ==> @st_eq X ==> iff) ball.
   Proof.
    intros ?? E ?? F ?? G. unfold ball.
-   rewrite E F G. reflexivity.
+   rewrite E, F, G. reflexivity.
   Qed.
 
   Lemma ball_refl e: Reflexive (ball e).

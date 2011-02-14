@@ -671,7 +671,7 @@ Proof.
      cut (0 < j); intros.
       apply plus_resp_leEq_both.
        cut (j = S (pred j)); [ intro | apply S_pred with 0; auto ].
-       generalize H4; rewrite {1 2}H7; intro.
+       generalize H4 H5 H6; rewrite H7; intros.
        apply Mesh_lemma.
       apply less_leEq.
       apply less_wdl with (P (pred j) H5[-]P _ a0).

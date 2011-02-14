@@ -82,7 +82,7 @@ Proof.
   rewrite setRaster_overflow; auto.
  destruct (eq_nat_dec i i0).
   destruct (eq_nat_dec j j0).
-   rewrite e e0.
+   rewrite e, e0.
    rewrite setRaster_correct1; try constructor; congruence.
   rewrite setRaster_correct2; auto.
  rewrite setRaster_correct2; auto.
@@ -168,9 +168,9 @@ Proof.
    rewrite (inj_S n).
    unfold Zsucc.
    do 2 rewrite -> injz_plus.
-   setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| by (unfold Qeq; simpl; auto with * )].
+   setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| now (unfold Qeq; simpl; auto with * )].
    setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-     with ((w / (2 * (n + 1%positive)))); [| by (simpl; field; unfold Qeq; simpl; auto with * )].
+     with ((w / (2 * (n + 1%positive)))); [| now (simpl; field; unfold Qeq; simpl; auto with * )].
    rewrite -> Qabs_pos;[apply Qle_refl|].
    apply Qle_shift_div_l; [apply: mult_resp_pos; simpl; auto with *; unfold Qlt; simpl; auto with *|].
    replace LHS with 0 by simpl; ring.
@@ -186,7 +186,7 @@ Proof.
  rewrite <- (Qfloor_Z n).
  apply Qfloor_resp_le.
  setoid_replace x with (l+w).
-  setoid_replace (l + w - l) with (w:Q); [| by simpl; ring].
+  setoid_replace (l + w - l) with (w:Q); [| now simpl; ring].
   field_simplify;[|apply Qpos_nonzero].
   unfold Qle.
   simpl.
@@ -371,8 +371,8 @@ Proof.
  assert (L:((i=i0)/\(j=m-j0) \/ ((j<>(m-j0)) \/ (i<>i0)))%nat) by omega.
  destruct L as [[Hi Hj] | L].
   clear IHl0.
-  rewrite Hi Hj in Hx'.
-  rewrite Hi Hj in Hy'.
+  rewrite Hi, Hj in Hx'.
+  rewrite Hi, Hj in Hy'.
   unfold fst, snd in *.
   apply existsWeaken.
   exists a.

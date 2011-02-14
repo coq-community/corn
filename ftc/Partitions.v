@@ -35,7 +35,6 @@
  *)
 
 Require Export Continuity.
-Set Automatic Introduction.
 
 (** printing Partition_Sum %\ensuremath{\sum_P}% #&sum;<sub>P</sub># *)
 
@@ -401,7 +400,7 @@ Lemma Part_Mesh_List_lemma : forall n (a b : IR) (Hab : a [<=] b) (P : Partition
 Proof.
  intro; induction  n as [| n Hrecn].
   simpl in |- *; intros.
-  done.
+  easy.
  intros a b Hab P x H.
  simpl in H; elim H; clear H; intro H0.
   elim (Hrecn _ _ _ _ _ H0); clear Hrecn.

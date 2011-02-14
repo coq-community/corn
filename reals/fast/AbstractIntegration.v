@@ -14,8 +14,6 @@ Require Import
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
 
-Set Automatic Introduction.
-
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
@@ -116,7 +114,7 @@ Section integral_interface.
     Proof with auto.
      apply CRplus_eq_l with (∫ f q 0%Qnn).
      generalize (integral_additive q 0%Qnn 0%Qnn).
-     rewrite Qplus_0_r QnonNeg.plus_0_l CRplus_0_l...
+     rewrite Qplus_0_r, QnonNeg.plus_0_l, CRplus_0_l...
     Qed.
 
     (** Iterating the additive property yields: *)
@@ -127,7 +125,7 @@ Section integral_interface.
      unfold cmΣ.
      induction n; simpl @cm_Sum.
       setoid_replace (QnonNeg.from_nat 0) with 0%Qnn by reflexivity.
-      rewrite QnonNeg.mult_0_l zero_width_integral...
+      rewrite QnonNeg.mult_0_l, zero_width_integral...
      rewrite IHn.
      rewrite CRplus_comm.
      setoid_replace (S n * b)%Qnn with (n * b + b)%Qnn.
@@ -168,7 +166,7 @@ Section integral_interface.
        intros ?? E.
        split. intros H ?. rewrite <- E. apply H. intros. rewrite E...
        intros H ?. rewrite E. apply H. intros. rewrite <- E...
-      rewrite Qmult_0_r gball_0.
+      rewrite Qmult_0_r, gball_0.
       intros.
       apply ball_eq. intro .
       setoid_replace e with (width * (e * Qpos_inv width))%Qpos by (unfold QposEq; simpl; field)...
@@ -225,7 +223,7 @@ Section integral_interface.
        split; intro; intros.
         rewrite <- E. apply H. intros. apply A. rewrite <- E...
        rewrite E. apply H. intros. apply A. rewrite E...
-      rewrite zero_width_integral scale_0 scale_0.
+      rewrite zero_width_integral, scale_0, scale_0.
       apply CRball.reflexive, CRnonNeg_0.
      apply (bounded_with_real_radius from q mid r rnn)...
     Qed.
@@ -248,7 +246,7 @@ Section integral_interface.
      assert (mid - r == lo) as loE by (subst mid r; ring).
      assert (mid + r == hi) as hiE by (subst mid r; ring).
      rewrite <- loE, <- hiE.
-     rewrite scale_CRplus scale_CRplus scale_CRopp CRdistance_CRle CRdistance_comm.
+     rewrite scale_CRplus, scale_CRplus, scale_CRopp, CRdistance_CRle, CRdistance_comm.
      apply CRball.as_distance_bound.
      apply integral_bounded.
       subst r.
@@ -259,7 +257,7 @@ Section integral_interface.
       apply (CRplus_le_r lo hi (-lo))...
      intros.
      apply CRball.as_distance_bound, CRdistance_CRle.
-     rewrite loE hiE...
+     rewrite loE, hiE...
     Qed.
 
     (** We now work towards unicity, for which we use that implementations must agree with Riemann

@@ -44,7 +44,6 @@ Require Import MoreIntegrals.
 Require Import CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Opaque Qmax Qabs inj_Q.
 
@@ -73,7 +72,7 @@ Proof.
  rewrite Pmult_comm.
  simpl.
  apply Zlt_left_rev.
- rewrite Zpos_succ_morphism Zpos_xI.
+ rewrite Zpos_succ_morphism, Zpos_xI.
  unfold Zsucc.
  ring_simplify.
  auto with *.
@@ -337,7 +336,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   apply Qabs_case; intros  H0.
-   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q; [| by simpl; ring].
+   setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q; [| now simpl; ring].
    apply: plus_resp_leEq_both; simpl; auto with *.
    replace RHS with (Qmax (x-a) (b-x) + 0)%Q by simpl; ring.
    apply: plus_resp_leEq_both; simpl; auto with *.
@@ -345,7 +344,7 @@ Proof.
    rewrite -> Qlt_minus_iff in *.
    replace RHS with (b + -a)%Q by simpl; ring.
    assumption.
-  setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q; [| by simpl; ring].
+  setoid_replace (-(x - x0))%Q with ((b - x) + - (b - a) + (x0 - a))%Q; [| now simpl; ring].
   apply: plus_resp_leEq_both; simpl; auto with *.
   replace RHS with (Qmax (x-a) (b-x) + 0)%Q by simpl; ring.
   apply: plus_resp_leEq_both; simpl; auto with *.
@@ -644,7 +643,7 @@ Proof.
  clear H01' HF'.
  apply ball_eq.
  intros e.
- setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos; [| by QposRing].
+ setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos; [| now QposRing].
  generalize ((1#2)*e)%Qpos.
  clear e.
  intros e.
@@ -657,7 +656,7 @@ Proof.
   change (' approximate (Integrate01 f) e == ' ((1 - 0) * approximate (Integrate01 f) e))%CR.
   ring.
  rewrite <- CRAbsSmall_ball.
- stepl ('((1-0)*e))%CR; [| by (apply inject_Q_wd; ring)].
+ stepl ('((1-0)*e))%CR; [| now (apply inject_Q_wd; ring)].
  set (z:=(integral (inj_Q IR 0) (inj_Q IR 1) H01 F HF)).
  simpl.
  unfold Cjoin_raw.
@@ -688,7 +687,7 @@ Proof.
  generalize 0 1.
  intros a b Hf Hab HF Hab0 s Hs.
  destruct (Qpos_lt_plus Hab0) as [ba Hba].
- stepl ('(ba*e)%Qpos)%CR; [| by (apply inject_Q_wd; rewrite -> Hba; QposRing)].
+ stepl ('(ba*e)%Qpos)%CR; [| now (apply inject_Q_wd; rewrite -> Hba; QposRing)].
  revert a b Hab0 ba Hba F Hab HF Hf Hs.
  induction s using StepF_ind; intros a b Hab0 ba Hba F Hab HF Hf Hs.
   change (AbsSmall (R:=CRasCOrdField) ('(ba*e)%Qpos)%CR (IRasCR (integral _ _ Hab F HF)[-]
@@ -728,7 +727,7 @@ Proof.
      (Cbind QPrelengthSpace f) X0 y Hyf Hy).
    set (z:=(' approximate (f x) ((1 # 2) * e)%Qpos)%CR).
    rewrite -> X.
-   setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos; [| by QposRing].
+   setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos; [| now QposRing].
    apply ball_triangle with (f x); [|apply ball_approx_r].
    rewrite <- (BindLaw1 f).
    rewrite <- (Cbind_correct QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x)).
@@ -765,7 +764,7 @@ Proof.
     apply leEq_imp_AbsSmall.
      apply shift_leEq_lft; assumption.
     apply leEq_transitive with (inj_Q IR (b - x)%Q).
-     stepr ((inj_Q IR b)[-](inj_Q IR x)); [| by (apply eq_symmetric; apply inj_Q_minus)].
+     stepr ((inj_Q IR b)[-](inj_Q IR x)); [| now (apply eq_symmetric; apply inj_Q_minus)].
      apply minus_resp_leEq.
      destruct Hy; assumption.
     apply inj_Q_leEq.
@@ -774,7 +773,7 @@ Proof.
    apply leEq_imp_AbsSmall.
     apply shift_leEq_lft; assumption.
    apply leEq_transitive with (inj_Q IR (x - a)%Q).
-    stepr ((inj_Q IR x)[-](inj_Q IR a)); [| by (apply eq_symmetric; apply inj_Q_minus)].
+    stepr ((inj_Q IR x)[-](inj_Q IR a)); [| now (apply eq_symmetric; apply inj_Q_minus)].
     apply minus_resp_leEq_rht.
     destruct Hy; assumption.
    apply inj_Q_leEq.
@@ -792,7 +791,7 @@ Proof.
    apply bin_op_wd_unfolded.
     apply un_op_wd_unfolded.
     unfold e'.
-    stepl (inj_Q IR ((b-a)*e)%Q); [| by apply inj_Q_mult].
+    stepl (inj_Q IR ((b-a)*e)%Q); [| now apply inj_Q_mult].
     apply: inj_Q_wd;simpl.
     autorewrite with QposElim.
     rewrite -> Hba.
@@ -809,7 +808,7 @@ Proof.
     [|apply eq_symmetric; apply inj_Q_minus].
   apply bin_op_wd_unfolded.
    unfold e'.
-   stepl (inj_Q IR ((b-a)*e)%Q); [| by apply inj_Q_mult].
+   stepl (inj_Q IR ((b-a)*e)%Q); [| now apply inj_Q_mult].
    apply: inj_Q_wd;simpl.
    autorewrite with QposElim.
    rewrite -> Hba.
@@ -844,7 +843,7 @@ Proof.
   apply leEq_transitive with (inj_Q IR c); auto.
  setoid_replace (IRasCR (integral _ _ Hab F HF))
    with (IRasCR (integral _ _ Hac F HFl)+IRasCR (integral _ _ Hcb F HFr))%CR;
-     [| by (rewrite <- IR_plus_as_CR;apply IRasCR_wd; apply eq_symmetric; apply integral_plus_integral)].
+     [| now (rewrite <- IR_plus_as_CR;apply IRasCR_wd; apply eq_symmetric; apply integral_plus_integral)].
  unfold z.
  rewrite -> Integral_glue.
  clear z.
@@ -853,7 +852,7 @@ Proof.
  set (zr:=IntegralQ (Map (fun z : RegularFunction Q_as_MetricSpace =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s2))).
  setoid_replace ((b - a) * (o * zl + (1 - o) * zr))%Q with ((c - a)*zl + (b - c)*zr)%Q;
-   [| by (unfold c, affineCombo, OpenUnitDual; simpl; ring)].
+   [| now (unfold c, affineCombo, OpenUnitDual; simpl; ring)].
  assert (Hac0: a < c).
   unfold c; auto with*.
  assert (Hcb0: c < b).
@@ -870,7 +869,7 @@ Proof.
   ring.
  rewrite -> Z.
  clear Z.
- setoid_replace ((ca + bc)*e)%Qpos with (ca*e + bc*e)%Qpos; [| by QposRing].
+ setoid_replace ((ca + bc)*e)%Qpos with (ca*e + bc*e)%Qpos; [| now QposRing].
  rewrite <- CRAbsSmall_ball.
  stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl)))+
    ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr)))))%CR.

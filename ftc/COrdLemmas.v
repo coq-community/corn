@@ -35,7 +35,6 @@
  *)
 
 Require Export COrdCauchy.
-Set Automatic Introduction.
 
 Section Lemmas.
 
@@ -337,7 +336,7 @@ Proof.
      red in |- *; intros; rewrite H1; algebra.
     algebra.
    cut (f n = S (pred (f n))); [ intro | apply S_pred with 0; auto ].
-   rewrite  {4} H1.
+   setoid_rewrite H1 at 3.
    eapply eq_transitive_unfolded.
     2: apply Sum_Sum with (m := pred (f n)).
    apply bin_op_wd_unfolded; apply Sum_wd'.
@@ -351,7 +350,7 @@ Proof.
       apply le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
        elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try elimtype False; try omega.
-    rewrite -H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
+    rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
       cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
         rewrite <- H3; apply lt_le_weak; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);

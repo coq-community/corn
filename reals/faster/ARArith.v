@@ -77,12 +77,12 @@ Proof. intros ? ?. apply ball_refl. Qed.
 
 Global Instance AR_0: RingZero AR := inject_AQ (0:AQ).
 Lemma ARtoCR_preserves_0 : ARtoCR 0 = 0.
-Proof. rewrite ARtoCR_inject. aq_preservation. Qed.
+Proof. unfold "0", AR_0. rewrite ARtoCR_inject. aq_preservation. Qed.
 Hint Rewrite ARtoCR_preserves_0 : ARtoCR.
 
 Global Instance AR_1: RingOne AR := inject_AQ 1.
 Lemma ARtoCR_preserves_1 : ARtoCR 1 = 1.
-Proof. rewrite ARtoCR_inject. aq_preservation. Qed.
+Proof. unfold "1", AR_1. rewrite ARtoCR_inject. aq_preservation. Qed.
 Hint Rewrite ARtoCR_preserves_1 : ARtoCR.
 
 (* Plus *)
@@ -172,19 +172,20 @@ Lemma AR_b_correct (x : AR) :
 Proof. aq_preservation. Qed.
 
 Program Definition AR_b (x : AR) : AQ₊ := exist _ (abs (approximate x (1#1)%Qpos) + 1) _.
-Next Obligation with auto with qarith.
+Next Obligation.
   apply aq_preserves_lt. rewrite AR_b_correct. aq_preservation.
   apply CR_b_pos.
 Qed.
 
-Global Instance AR_mult: RingMult AR := λ x y, ucFun2 (ARmult_bounded (AR_b y)) x y.
+Global Instance AR_mult: RingMult AR := λ x y, ARmult_bounded (AR_b y) x y.
 
 Lemma ARtoCR_preserves_mult x y : ARtoCR (x * y) = ARtoCR x * ARtoCR y.
 Proof.
-  rewrite ARtoCR_preserves_mult_bounded.
+  unfold "*", AR_mult at 1. rewrite ARtoCR_preserves_mult_bounded.
   setoid_replace (AQposAsQpos (AR_b y)) with (CR_b (1 # 1) (ARtoCR y)). 
    reflexivity.
-  unfold QposEq. simpl. rewrite AR_b_correct. reflexivity. 
+  unfold QposEq. simpl.
+  now rewrite ARtoCR_approximate, <-AR_b_correct.
 Qed. 
 Hint Rewrite ARtoCR_preserves_mult : ARtoCR.
 
@@ -241,7 +242,7 @@ Global Instance AR_le: Order AR := λ x y, ARnonNeg (y + - x).
 Global Instance: Proper ((=) ==> (=) ==> iff) AR_le.
 Proof.
   intros x1 x2 E y1 y2 F. unfold AR_le in *.
-  now rewrite E F.
+  now rewrite E, F.
 Qed.
 
 Lemma ARtoCR_preserves_le x y : x ≤ y ↔ ARtoCR x ≤ ARtoCR y.
@@ -300,7 +301,7 @@ Lemma ARlt_wd : ∀ x1 x2 : AR, x1 = x2 → ∀ y1 y2, y1 = y2 → x1 ⋖ y1 →
 Proof.
   intros x1 x2 E y1 y2 F G. 
   apply ARpos_wd with (y1 + - x1); trivial.
-  rewrite E F. reflexivity.
+  rewrite E, F. reflexivity.
 Qed.
 
 Lemma ARtoCR_preserves_lt_0 x : 0 ⋖ x IFF 0 ⋖ ARtoCR x.
@@ -329,7 +330,7 @@ Lemma ARtoCR_preserves_apart_0 x : x >< 0 IFF ARtoCR x >< 0.
 Proof.
   stepr (ARtoCR x >< ARtoCR 0).
    split; apply ARtoCR_preserves_apart. 
-  split; apply CRapart_wd; try reflexivity; rewrite ARtoCR_inject rings.preserves_0; reflexivity.
+  split; apply CRapart_wd; try rewrite ARtoCR_preserves_0; reflexivity. 
 Defined.
 
 Lemma aq_mult_inv_regular_prf x : 
@@ -443,7 +444,7 @@ Proof.
   intros E.
   apply (injective ARtoCR). 
   destruct (ARtoCR_preserves_inv_l x x_) as [x__ Ex], (ARtoCR_preserves_inv_l y y_) as [y__ Ey].
-  rewrite Ex Ey. 
+  rewrite Ex, Ey. 
   now apply CRinv_wd.
 Qed.
 
@@ -472,9 +473,11 @@ Definition ARpower_positive (p : positive) (x : AR) : AR := ucFun (ARpower_posit
 Lemma ARtoCR_preserves_power_positive x p : 
   ARtoCR (ARpower_positive p x) = CRpower_positive p (ARtoCR x).
 Proof.
+  unfold ARpower_positive.
   rewrite ARtoCR_preserves_power_positive_bounded.
   setoid_replace (AQposAsQpos (AR_b x)) with (CR_b (1#1) (ARtoCR x)). 
    reflexivity.
-  unfold QposEq. simpl. now rewrite AR_b_correct.
+  unfold QposEq. simpl.
+  now rewrite ARtoCR_approximate, <-AR_b_correct.
 Qed. 
 End ARarith.
