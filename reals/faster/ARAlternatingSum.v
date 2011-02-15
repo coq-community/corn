@@ -219,7 +219,7 @@ Proof.
      apply Z.log2_up_spec. 
      auto with zarith.
     now apply Z.log2_up_nonneg.
-   rewrite int_pow_mult_inv.
+   rewrite int_pow_opp.
    rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
    rewrite <-associativity.
    rewrite associativity, fields.dec_mult_inverse.
