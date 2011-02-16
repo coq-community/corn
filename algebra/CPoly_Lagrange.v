@@ -109,7 +109,11 @@ Section contents.
     apply inject_Q_wd.
     rewrite B. reflexivity.
    pose proof (separates_Proper _ _ H1) as H3.
-   rewrite <- (@map_perm_proper _ CR (pair_rel eq (@Permutation _)) (@st_eq _) _ _ _ _ H2 _ _ H3).
+   assert (@Equivalence ((Q * CR) * list (Q * CR)) (pair_rel (@eq _) (@Permutation _))) as T.
+    apply Pair.Equivalence_instance_0.
+     apply _.
+    apply _.
+   rewrite <- (@map_perm_proper _ CR (pair_rel eq (@Permutation _)) (@st_eq _) T _ _ _ H2 _ _ H3).
    clear H2 H3.
    subst s.
    simpl @cm_Sum.
@@ -124,7 +128,8 @@ Section contents.
     apply Qmult_inv_r.
     unfold QNoDup in distinct.
     revert distinct.
-    rewrite <- H1.
+    apply Permutation_sym in H1. (* only needed to work around evar anomaly *)
+    rewrite H1.
     intros H3 H5.
     simpl in H3.
     inversion_clear H3.
@@ -135,7 +140,7 @@ Section contents.
      apply Qred_complete.
      symmetry...
      apply -> Qminus_eq...
-    apply in_map...
+    apply in_map... 
    intros.
    destruct (proj1 (in_map_iff _ _ _) H) as [[[v w] u] [[] H4]]. clear H.
    destruct (proj1 (in_map_iff _ _ _) H4) as [[[n m] k] [A B]].
