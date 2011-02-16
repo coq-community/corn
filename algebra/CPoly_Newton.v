@@ -5,13 +5,34 @@ Require Import
  CSetoids CPoly_ApZero CRings CPoly_Degree
  CRArith Qmetric Qring CReals
  stdlib_omissions.Pair stdlib_omissions.Q
- list_separates SetoidPermutation.
+ list_separates SetoidPermutation
+ util.Container.
+
 Require ne_list.
 Import ne_list.notations.
 
 Set Automatic Introduction.
 
+Fixpoint iterate {T: nat → Type} (f: ∀ {n}, T (S n) → T n) {n}: T n → T O :=
+  match n return T n → T O with
+  | O => Datatypes.id
+  | S n' => (iterate f ∘ f n')%prg
+  end.
+  (* Todo: Move into some util module. *)
 
+Coercion Vector.to_list: Vector.t >-> list.
+Definition Q01 := sig (λ x: Q, 0 <= x <= 1).
+Definition Range (T: Type) := prod T T.
+Instance in_QRange: Container Q (Range Q) := λ r x, fst r <= x <= snd r. 
+Implicit Arguments proj1_sig [[A] [P]].
+Program Instance in_sig_QRange (P: Q → Prop): Container (sig P) (Range (sig P)) := λ r x, fst r <= x <= snd r. 
+Definition B01: Ball Q Qpos := (1#2, (1#2)%Qpos).
+Definition D01 := sig (∈ B01).
+Program Definition D01zero: D01 := 0.
+Next Obligation. admit. Qed.
+Instance: Canonical (QnonNeg.T → Qinf).
+Admitted.
+  (* Todo: All this belongs elsewhere. *)
 
 Instance: UniformlyContinuous_mu (util.uncurry Qplus).
 Admitted.
@@ -51,6 +72,27 @@ Open Local Scope CR_scope.
 
 Local Notation Σ := cm_Sum.
 Local Notation Π := cr_Product.
+
+Section continuous_vector_operations.
+
+  Context `{MetricSpaceClass X} (n: nat).
+
+  Definition uncurry_Vector_cons: X * Vector.t X n → Vector.t X (S n)
+    := λ p, Vector.cons _ (fst p) _ (snd p).
+
+  Global Instance Vector_cons_mu: UniformlyContinuous_mu uncurry_Vector_cons := { uc_mu := Qpos2QposInf }.
+
+  Global Instance Vector_cons_uc: UniformlyContinuous uncurry_Vector_cons.
+  Proof with auto.
+   constructor.
+     apply _.
+    apply _.
+   intros ??? A.
+   constructor; apply A.
+  Qed.
+
+End continuous_vector_operations. (* Todo: Move elsewhere. *)
+
 
 Section contents.
 
@@ -248,7 +290,7 @@ Section contents.
   Proof. reflexivity. Qed.
 
   Lemma an_applied_0 (t: QPoint) (x: Q) (xs: ne_list QPoint):
-    In x (map fst xs) -> an_applied x (t ::: xs) [=] '0.
+    List.In x (map fst xs) -> an_applied x (t ::: xs) [=] '0.
   Proof with auto.
    intros. unfold an_applied.
    simpl @tl.
@@ -324,7 +366,11 @@ Section contents.
        apply -> Q.Qminus_eq in H0.
        inversion_clear H.
        apply H1.
-       rewrite H0...
+       simpl.
+       left.
+       apply Q.Proper_instance_0. (* For some reason using [rewrite] here is crazy slow. Todo: Investigate. *)
+       symmetry.
+       assumption.
       destruct H0.
        subst.
        simpl @fst. simpl @snd.
@@ -456,11 +502,20 @@ Section contents.
   Section divdiff_as_repeated_integral.
 
     Context
-      (nth_deriv: Q → CR)
+      (n: nat) (points: Vector.t Q (S n))
+      (lo hi: Q).
+
+    Definition lohi (q: Q): Prop := lo <= q <= hi.
+    Definition Qbp: Type := sig lohi.
+
+    Context 
+      (points_lohi: Vector.Forall lohi points)
+      (upper: CR)
+      (nth_deriv: Q → CR (*sig (λ x: CR, x <= upper)*))
         `{!UniformlyContinuous_mu nth_deriv}
         `{!UniformlyContinuous nth_deriv}
           (* Todo: This should be replaced with some "n times differentiable" requirement on a subject function. *)
-      (integrate: Q * Q * UCFunction Q CR → CR)
+      (integrate: Range Q01 * UCFunction Q01 CR → CR)
         `{!UniformlyContinuous_mu integrate}
         `{!UniformlyContinuous integrate}.
           (* Todo: The integration function should not be a parameter. We should just use SimpleIntegration's implementation. *)
@@ -469,30 +524,81 @@ Section contents.
        (* Without these, instance resolution gets a little too enthusiastic and breaks these operations open when
        looking for PointFree instances below. It's actually kinda neat that it can put these in PointFree form though. *)
 
-    Fixpoint go (p: ne_list Q): UCFunction (Q*Q) CR :=
-      match p with
-      | ne_list.one x => ucFunction (uncurry (λ left runningtotal,
-          nth_deriv (runningtotal + x * left)%Q))
-      | ne_list.cons x xs => ucFunction (uncurry (λ left runningtotal,
-          integrate (Zero, left, ucFunction (λ t, go xs (left - t, runningtotal + x * t)%Q))))
-      end.
-       (* It would be nicer to factor out the "ucFunction (uncurry (λ left runningtotal," part common to both branches,
-        but that would make the match part of the function that we're automatically inferring uniform continuity of,
-        and we're not quite ready yet to do that for matches of any kind. *)
 
-    (* Here we use a bundled return type for 'go' because in each recursive level, the definition depends on continuity
-     of the previous recursive level. Without bundling, we would need a way to *simultaneously* build up the
-     recursive function as well as proofs of its continuity at each level. That is, something along the lines of:
+    Notation SomeWeights n := ((*sig (λ ts:*) Vector.t Q01 n (*, cm_Sum (map proj1_sig ts) <= 1)%Q*)).
+    Notation Weights := ((*sig (λ ts:*) Vector.t Q01 (S n) (*, cm_Sum (map proj1_sig ts) == 1)%Q*)).
 
-      Fixpoint go (p: ne_list Q): Q*Q → CR := ....
-      with go_mu (p: ne_list Q): UniformlyContinuous_mu (go p) := ...
-      with go_uc (p: ne_list Q): UniformlyContinuous (go p) := ... .
+    (** apply_weights: *)
 
-    Unfortunately, Coq does not support this kind of mutual recursion where one of the constants being
-    defined occurs in the type of another. And even if it did, achieving the same level of inference would probably
-    be pretty tricky. *)
+    Program Definition apply_weights (w: Weights): Qbp :=
+      cm_Sum (map (λ p, Qmult (fst p) (` (snd p))) (zip points (Vector.to_list w))).
 
-    Definition alt_divdiff (p: ne_list Q): CR := go p (1, 0)%Q.
+    Next Obligation.
+    Admitted.
+
+    Instance apply_weights_mu: UniformlyContinuous_mu apply_weights.
+    Admitted.
+
+    Instance apply_weights_uc: UniformlyContinuous apply_weights.
+    Admitted.
+
+    Obligation Tactic := idtac.
+
+    (** "inner", the function of n weights: *)
+
+    Program Definition inner: SomeWeights n → CR
+      := λ ts, nth_deriv (apply_weights
+        (Vector.cons _ (1 - cm_Sum (map proj1_sig (Vector.to_list ts)): Q01) _ ts))%Q.
+
+    Next Obligation.
+     intros ts (*[ts ?]*).
+     simpl @proj1_sig.
+     split.
+      admit. (* easy *)
+     admit. (* easy *)
+    Qed.
+
+    Instance inner_mu: UniformlyContinuous_mu inner.
+    Admitted.
+
+    Instance inner_uc: UniformlyContinuous inner.
+    Admitted.
+
+    (** Next up is "reduce" *)
+
+    Definition G (n: nat): Type := UCFunction (Vector.t Q01 n) CR.
+
+    Section reduce.
+
+      Variables (m: nat) (X: G (S m)).
+
+      Definition integrand (ts: SomeWeights m) (t: Q01): CR := X (uncurry_Vector_cons _ (t, ts)).
+
+      Program Definition reduce_raw: SomeWeights m → CR
+       := λ ts, integrate ((0, 1 - cm_Sum (map proj1_sig (Vector.to_list ts)))%Q, ucFunction (integrand ts)).
+
+      Next Obligation. split. reflexivity. auto. Qed.
+
+      Next Obligation.
+       intros ts (*[ts ?]*).
+       simpl.
+       split. admit. (* easy *)
+       admit. (* easy *)
+      Qed.
+
+      Axiom reduce_mu: UniformlyContinuous_mu reduce_raw.
+      Existing Instance reduce_mu.
+      Axiom reduce_uc: UniformlyContinuous reduce_raw.
+      Existing Instance reduce_uc.
+
+      Definition reduce: G m := ucFunction reduce_raw.
+
+    End reduce.
+
+    (** Finally, the divided difference arises from iterated reduction of the inner function: *)
+
+    (*Program*) Definition alt_divdiff: CR (*sig (λ r, r <= upper)*)
+      := iterate reduce (ucFunction inner) (Vector.nil Q01).
 
   End divdiff_as_repeated_integral.
 
