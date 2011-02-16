@@ -89,31 +89,35 @@ we show that separately: *)
 Instance uncurried_Qplus_mu: UniformlyContinuous_mu (uncurry Qplus)
   := { uc_mu := fun e => ((1#2) * e)%Qpos }.
 
-Instance: MetricSpaceBall Q := Qball.
+Instance: MetricSpaceBall Q := genball Qball.
 Instance: MetricSpaceClass Q := class_from_MetricSpace Q_as_MetricSpace.
 
-Instance: UniformlyContinuous (uncurry Qplus).
+Instance wtf: UniformlyContinuous (uncurry Qplus).
 Proof with auto.
  constructor; try apply _.
  intros e a b [P Q].
  simpl in *.
+ apply ball_genball.
+  apply _.
+ (* apply <- ball_genball in P. *)
+Admitted. (*
  setoid_replace e with ((1 # 2) * e + (1 # 2) * e)%Qpos.
   apply Qball_plus...
  unfold QposEq. simpl. field.
-Qed.
+Qed. *) (* Getting weird anomalies again. Going to try again with more recent Coq. *)
 
 Notation QQ := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
-Definition uncurried_Qplus_uc: QQ --> Q_as_MetricSpace
-  := @wrap_uc_fun' QQ Q_as_MetricSpace (uncurry Qplus) _ _.
+(*Definition uncurried_Qplus_uc: QQ --> Q_as_MetricSpace
+  := @wrap_uc_fun' QQ Q_as_MetricSpace (uncurry Qplus) _ _.*)
     (* The curried version could easily be derived from this one, but that would
      probably break lots of code. *)
 
 (* Because [ucFun2 Qplus_uc] reduces to [Qplus], we immediately get continuity
  of [uncurry (ucFun2 Qplus_uc)] as well: *)
 
-Goal UniformlyContinuous (uncurry (ucFun2 Qplus_uc)).
-Proof. apply _. Qed.
+(*Goal UniformlyContinuous (uncurry (ucFun2 Qplus_uc)).
+Proof. apply _. Qed.*)
 
 (** Finally, CRplus: *)
 
@@ -127,9 +131,9 @@ Notation "x + y" := (ucFun2 CRplus x y) : CR_scope.
 
 Local Notation CRCR := (ProductMS CR CR).
 
-Definition uncurried_CRplus: CRCR --> CR :=
+(*Definition uncurried_CRplus: CRCR --> CR :=
   Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace) uncurried_Qplus_uc
-  ∘ undistrib_Complete_uc.
+  ∘ undistrib_Complete_uc.*)
 
 (** Uniform continuity of the uncurried original then follows from extentionality: *)
 
@@ -138,11 +142,13 @@ Instance: UniformlyContinuous_mu (uncurry (ucFun2 CRplus))
 
 Instance: UniformlyContinuous (uncurry (ucFun2 CRplus)).
 Proof with intuition.
+Admitted.
+(*
  apply UniformlyContinuous_proper with (ucFun uncurried_CRplus) (unwrap_mu uncurried_CRplus)...
   apply (@regFunEq_e Q_as_MetricSpace).
   intros. apply ball_refl.
  apply _.
-Qed.
+Qed.*)
 
 (** To show that this actually works, we can now write lambdas that use CRplus
  and automatically have them be proven to be uniformly continuous: *)
