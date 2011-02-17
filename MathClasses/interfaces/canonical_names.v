@@ -1,9 +1,6 @@
 Global Generalizable All Variables.
 Global Set Automatic Introduction.
 
-Set Automatic Coercions Import.
-  (* Needed to recover old behavior. Todo: Figure out why the behavior was changed; what was wrong with it? *)
-
 Require Import
  RelationClasses Relation_Definitions Morphisms Setoid Program.
 Require Export Unicode.Utf8 Utf8_core.
@@ -22,9 +19,8 @@ Notation "x ≠ y":= (¬x = y): type_scope.
 Infix "≡" := eq (at level 70, no associativity).
   (* Hm, we could define a very low priority Equiv instance for Leibniz equality.. *)
 
-Instance ext_eq `{Equiv A} `{Equiv B}: Equiv (A → B)
-  := ((=) ==> (=))%signature.
-
+Definition ext_equiv `{Equiv A} `{Equiv B}: Equiv (A → B) := ((=) ==> (=))%signature.
+Hint Extern 10 (Equiv (_ → _)) => apply @ext_equiv : typeclass_instances. (* Due to bug #2491 *)
 (** Interestingly, most of the development works fine if this is defined as
   ∀ x, f x = g x.
 However, in the end that version was just not strong enough for comfortable rewriting
@@ -37,7 +33,6 @@ Class MonoidUnit A := mon_unit: A.
 Class RingPlus A := ring_plus: A → A → A.
 Class RingMult A := ring_mult: A → A → A.
 Class RingOne A := ring_one: A.
-Definition ring_two `{RingOne A} `{RingPlus A} := ring_plus ring_one ring_one.
 Class RingZero A := ring_zero: A.
 Class GroupInv A := group_inv: A → A.
 Class MultInv A `{Equiv A} `{RingZero A} := mult_inv: { x: A | x ≠ ring_zero } → A.
@@ -64,19 +59,23 @@ Instance ringmult_is_semigroupop `{f: RingMult A}: SemiGroupOp A := f.
 Instance ringone_is_monoidunit `{c: RingOne A}: MonoidUnit A := c.
 Instance ringzero_is_monoidunit `{c: RingZero A}: MonoidUnit A := c.
 
+Hint Extern 10 (Equiv (_ ⟶ _)) => apply @ext_equiv : typeclass_instances.
+
 (* Notations: *)
 Notation "0" := ring_zero.
 Notation "1" := ring_one.
-Notation "2" := ring_two.
 Infix "&" := sg_op (at level 50, left associativity).
 Infix "+" := ring_plus.
+Notation "2" := (1 + 1).
+Notation "3" := (1 + (1 + 1)).
+Notation "4" := (1 + (1 + (1 + 1))).
 Notation "(+)" := ring_plus (only parsing).
 Notation "( x +)" := (ring_plus x) (only parsing).
-Notation "(+ x )" := (flip ring_plus x) (only parsing).
+Notation "(+ x )" := (λ y, y + x) (only parsing).
 Infix "*" := ring_mult.
 Notation "( x *.)" := (ring_mult x) (only parsing).
 Notation "(.*.)" := ring_mult (only parsing).
-Notation "(.* x )" := (flip ring_mult x) (only parsing).
+Notation "(.* x )" := (λ y, y * x) (only parsing).
   (* We don't add "( * )", "( * x )" and "( x * )" notations because they conflict with comments. *)
 Notation "- x" := (group_inv x).
 Notation "(-)" := group_inv (only parsing).

@@ -5,6 +5,21 @@ Require Import
   abstract_algebra interfaces.naturals interfaces.integers interfaces.additional_operations
   theory.nat_pow theory.int_pow.
 
+Section shift_left.
+  Context `{SemiRing A} `{SemiRing B} `{!ShiftLSpec A B sl}.
+
+  Add Ring A1 : (rings.stdlib_semiring_theory A).
+
+  Global Instance: Proper ((=) ==> (=) ==> (=)) (≪) | 1.
+  Proof. apply shiftl_proper. Qed.
+
+  Lemma shiftl_1 x : x ≪ (1:B) = 2 * x.
+  Proof. now rewrite <-(rings.plus_0_r 1), shiftl_S, shiftl_0. Qed.
+
+  Lemma shiftl_2 x : x ≪ (2:B) = 4 * x.
+  Proof. rewrite shiftl_S, shiftl_1. ring. Qed.
+End shift_left.
+
 (* * Properties of [shiftl] on the naturals *)
 Section shift_left_naturals.
   Context `{SemiRing A} `{Naturals B}.
@@ -18,15 +33,12 @@ Section shift_left_naturals.
     intros spec.
     split.
       intros ? ? E1 ? ? E2.
-      do 2 rewrite spec. now rewrite E1, E2.
+      rewrite 2!spec. now rewrite E1, E2.
      intro x. rewrite spec, nat_pow_0. ring.
-    intros x n. do 2 rewrite spec. rewrite nat_pow_S. ring.
+    intros x n. rewrite 2!spec. rewrite nat_pow_S. ring.
   Qed.
 
   Context `{!ShiftLSpec A B sl}.
-
-  Global Instance: Proper ((=) ==> (=) ==> (=)) (≪) | 1.
-  Proof. apply shiftl_proper. Qed.
 
   Lemma shiftl_nat_pow `{!NatPowSpec A B np} x n : x ≪ n = x * 2 ^ n.
   Proof.
@@ -88,7 +100,7 @@ Section shift_left_naturals.
   Lemma shiftl_inj n : Injective (flip shiftl n).
   Proof with auto.
     repeat (split; try apply _).
-    intros x y E. unfold flip in E. do 2 rewrite shiftl_nat_pow in E.
+    intros x y E. unfold flip in E. rewrite 2!shiftl_nat_pow in E.
     apply (rings.right_cancellation_ne_0 (.*.) (2 ^ n))...
     apply nat_pow_nonzero. apply (ne_zero 2).
   Qed.
@@ -100,7 +112,7 @@ Section preservation.
 
   Lemma preserves_shiftl x (n : B) : f (x ≪ n) = (f x) ≪ n.
   Proof.
-    do 2 rewrite shiftl_nat_pow.
+    rewrite 2!shiftl_nat_pow.
     rewrite rings.preserves_mult.
     rewrite preserves_nat_pow.
     now rewrite rings.preserves_2.
@@ -119,8 +131,7 @@ End default_shiftl.
 Section shift_left_integers.
   Context `{Field A} `{Integers B} `{∀ x y : A, Decision (x = y)} `{!NeZero (2:A)}.
 
-  Add Ring A: (rings.stdlib_semiring_theory A).
-  Add Ring B: (rings.stdlib_ring_theory B).
+  Add Ring A3: (rings.stdlib_semiring_theory A).
 
   Lemma shiftl_spec_from_int_pow `{!IntPowSpec A B ip} (sl : ShiftL A B) :
     (∀ x n, x ≪ n = x * 2 ^ n) → ShiftLSpec A B sl.
@@ -128,16 +139,13 @@ Section shift_left_integers.
     intros spec.
     split.
       intros ? ? E1 ? ? E2.
-      do 2 rewrite spec. now rewrite E1, E2.
+      rewrite 2!spec. now rewrite E1, E2.
      intro x. rewrite spec, int_pow_0. ring.
-    intros x n. do 2 rewrite spec. rewrite int_pow_S. ring.
+    intros x n. rewrite 2!spec. rewrite int_pow_S. ring.
     apply (ne_zero (2:A)).
   Qed.
 
   Context `{!ShiftLSpec A B sl}.
-
-  Global Instance: Proper ((=) ==> (=) ==> (=)) (≪) | 1.
-  Proof. apply shiftl_proper. Qed.
 
   Lemma shiftl_int_pow `{!IntPowSpec A B ipw} x n : x ≪ n = x * 2 ^ n.
   Proof. 
@@ -158,15 +166,13 @@ Section preservation_integers.
   Context `{Integers B} `{Ring A1} `{!ShiftLSpec A1 B sl1} `{Ring A2} `{!ShiftLSpec A2 B sl2} 
     {f : A1 → A2} `{!SemiRing_Morphism f} `{!LeftCancellation (.*.) (2:A2)}.
 
-  Add Ring Ba: (rings.stdlib_ring_theory B).
-
   Lemma preserves_shiftl_int x (n : B) : f (x ≪ n) = (f x) ≪ n.
   Proof.
     revert n. apply integers.biinduction.
       solve_proper.
-     now do 2 rewrite shiftl_0.
+     now rewrite 2!shiftl_0.
     intros n; split; intros IH.
-     do 2 rewrite shiftl_S.
+     rewrite 2!shiftl_S.
      now rewrite rings.preserves_mult, rings.preserves_2, IH.
     apply (left_cancellation (.*.) 2).
     rewrite <-(rings.preserves_2 (f:=f)) at 1. 
