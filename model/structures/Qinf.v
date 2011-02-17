@@ -1,8 +1,7 @@
 Require Import
- Unicode.Utf8 Setoid Arith
+ Setoid Arith
  Qring QposInf
  stdlib_omissions.Q
- interfaces.canonical_names
  interfaces.abstract_algebra
  stdlib_rationals
  MathClasses.theory.setoids.
@@ -43,7 +42,7 @@ Instance: Proper (=) le.
 Proof.
  intros [|] [|] E [|] [|] F; intuition; simpl; try reflexivity.
  unfold equiv in * |-. simpl in *.
- rewrite E F. reflexivity.
+ now rewrite E, F.
 Qed.
 
 Instance: RingZero T := finite 0%Q.
