@@ -417,6 +417,9 @@ Class Canonical (T: Type): Type := canonical: T.
 
 Instance: Canonical (Qpos → Qinf) := Qinf.finite ∘ QposAsQ.
 Instance: ∀ {T: Type}, Canonical (T → T) := @Datatypes.id.
+Notation " ' a":=(canonical a).
+
+
 
 Instance composed_Proper `{Equiv A} `{Equiv B} `{Equiv C} (f: B → C) (g: A → B):
   Proper (=) f → Proper (=) g → Proper (=) (f ∘ g).
@@ -439,7 +442,7 @@ Section Ball.
 
   Definition Ball := prod X R.
 
-  Global Instance ball_contains: Container X Ball := fun b => mspc_ball (canonical (snd b)) (fst b).
+  Global Instance ball_contains: Container X Ball := fun b => mspc_ball (' (snd b)) (fst b).
 
   Context `{Equiv X} `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (canonical: R → Qinf)}.
 
@@ -1041,3 +1044,13 @@ Section test.
 
 End test.
 End test.
+
+Require Import CRArith.
+Instance: Canonical (Q->CR) :=inject_Q.
+Instance: Canonical (Z -> Q) :=inject_Z.
+Instance composed_canonical {A B C: Type} {f: Canonical (A -> B)} {g: Canonical (B -> C)}: Canonical _ :=
+fun x=> g (f x).
+
+(* Runs away ...
+Definition test: (Canonical (Z->CR)):=_. *)
+(* Should be moved *)
