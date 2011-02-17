@@ -1,12 +1,13 @@
 
-(** MathClasses-style operational & structural classes for a Russell-style metric space (i.e. MetricSpace). We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace it is still bound to stdlib Q rather than an abstract Rationals implementation. *)
+(** MathClasses-style operational & structural classes for a Russell-style metric space (i.e. MetricSpace). 
+  We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace 
+  it is still bound to stdlib Q rather than an abstract Rationals implementation. *)
 
 Require Import
- Unicode.Utf8 Setoid Arith List Program
+ Setoid Arith List Program
  CSetoids Qmetric Qring Qinf ProductMetric QposInf
  UniformContinuity stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
- interfaces.canonical_names
  interfaces.abstract_algebra
  MathClasses.theory.setoids.
 
@@ -43,10 +44,10 @@ Section MetricSpaceClass.
 
   Class MetricSpaceClass: Prop :=
     { mspc_setoid: Setoid X
-    ; mspc_ball_proper:> Proper (=) mspc_ball
+    ; mspc_ball_proper:> Proper ((=) ==> (=) ==> (=)) mspc_ball
     ; mspc_ball_inf: ∀ x y, mspc_ball Qinf.infinite x y
     ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ mspc_ball e x y
-    ; mspc_ball_zero: ∀ x y, mspc_ball 0 x y ↔ x = y
+    ; mspc_ball_zero: ∀ x y, mspc_ball 0 x y ↔ x = y 
     ; mspc_refl:> ∀ e, (0 <= e)%Qinf → Reflexive (mspc_ball e)
     ; mspc_sym:> ∀ e, Symmetric (mspc_ball e)
     ; mspc_triangle: ∀ (e1 e2: Qinf) (a b c: X),
@@ -118,7 +119,7 @@ Section genball.
 
   Context
     `{Setoid X}
-    (R: Qpos → relation X) `{!Proper (=) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
+    (R: Qpos → relation X) `{!Proper ((=) ==> (=) ==> (=)) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
     (Rtriangle: ∀ (e1 e2: Qpos) (a b c: X), R e1 a b → R e2 b c → R (e1 + e2)%Qpos a c)
     (Req: ∀ (a b: X), (∀ d: Qpos, R d a b) → a = b)
     (Rclosed: ∀ (e: Qpos) (a b: X), (∀ d: Qpos, R (e + d)%Qpos a b) → R e a b).
@@ -162,7 +163,7 @@ Section genball.
    split; destruct Qdec_sign as [[|]|]; auto.
   Qed.
 
-  Instance genball_Proper: Proper (=) genball.
+  Instance genball_Proper: Proper ((=) ==> (=) ==> (=)) genball.
   Proof with auto; intuition.
    unfold genball.
    intros u e' E.
@@ -174,10 +175,10 @@ Section genball.
             exfalso. revert q1. rewrite E. rewrite q2. apply Qlt_irrefl.
            exfalso. revert q1. rewrite E. apply Qlt_is_antisymmetric_unfolded...
           apply Proper0...
-         exfalso. revert q1. rewrite E q2. apply Qlt_irrefl.
+         exfalso. revert q1. rewrite E, q2. apply Qlt_irrefl.
         exfalso. revert q2. rewrite <- E, q1. apply Qlt_irrefl.
        exfalso. revert q2. rewrite <- E, q1. apply Qlt_irrefl.
-      intros ?? A ?? B. rewrite A B...
+      intros ?? A ?? B. rewrite A, B...
      repeat intro...
     intuition.
    repeat intro.
@@ -221,14 +222,14 @@ Section genball.
    destruct (Qdec_sign e1) as [[A | B] | C];
    destruct (Qdec_sign e2) as [[D | E] | F]; intuition.
               revert G. apply (Qlt_is_antisymmetric_unfolded _ _)...
-             revert G. rewrite F Qplus_0_r. apply (Qlt_is_antisymmetric_unfolded _ _ B)...
-            revert G. rewrite C Qplus_0_l. apply (Qlt_is_antisymmetric_unfolded _ _ E)...
-           revert G. rewrite C F. apply Qlt_irrefl.
+             revert G. rewrite F, Qplus_0_r. apply (Qlt_is_antisymmetric_unfolded _ _ B)...
+            revert G. rewrite C, Qplus_0_l. apply (Qlt_is_antisymmetric_unfolded _ _ E)...
+           revert G. rewrite C, F. apply Qlt_irrefl.
           change (genball (exist _ e1 B + exist _ e2 E )%Qpos a c).
           apply ball_genball.
           apply Rtriangle with b; apply ball_genball...
-         rewrite <- V. rewrite F Qplus_0_r...
-        rewrite U C Qplus_0_l...
+         rewrite <- V. rewrite F, Qplus_0_r...
+        rewrite U, C, Qplus_0_l...
        exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> C at 1. rewrite -> F at 1...
       exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> J at 1...
      revert U. rewrite <- V, <- (Qplus_0_r e1), <- F, J...
@@ -323,7 +324,7 @@ Section products.
         apply (mspc_ball_negative X _ H3 _ _ H4).
        intros.
        change ((mspc_ball X 0 (fst x) (fst y) ∧ mspc_ball Y 0 (snd x) (snd y)) ↔ x = y).
-       rewrite (mspc_ball_zero X) (mspc_ball_zero Y). reflexivity.
+       rewrite (mspc_ball_zero X), (mspc_ball_zero Y). reflexivity.
       split. apply (mspc_refl X)...
       apply (mspc_refl Y)...
      split; apply (@symmetry _ _ ); try apply _; apply H3. (* just using [symmetry] here causes evar anomalies.. *)
@@ -341,7 +342,7 @@ Section products.
 
 End products.
 
-Definition vector_zip {X Y}: ∀ {n}, Vector.t X n → Vector.t Y n → Vector.t (X * Y) n :=
+Definition vector_zip {X Y} {n} : Vector.t X n → Vector.t Y n → Vector.t (X * Y) n :=
   Vector.rect2 (λ n _ _, Vector.t (X * Y) n)
     (Vector.nil _)
     (λ _ _ _ r (x: X) (y: Y), Vector.cons _ (x, y) _ r).
@@ -431,8 +432,6 @@ Instance: Proper (=) QposAsQ.
 Proof. repeat intro. assumption. Qed.
 
 Require Import util.Container.
-
-
 
 Section Ball.
 
@@ -560,7 +559,7 @@ Section local_uniform_continuity.
 
   Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y}.
 
-  Definition restrict (b: Ball X Qpos) (f: X → Y): sig (∈ b) → Y
+  Definition restrict (b: Ball X Qpos) (f: X → Y): sig ((∈ b)) → Y
     := f ∘ @proj1_sig _ _.
 
   Class LocallyUniformlyContinuous_mu (f: X → Y): Type :=

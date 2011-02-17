@@ -24,7 +24,7 @@ Instance in_QRange: Container Q (Range Q) := λ r x, fst r <= x <= snd r.
 Implicit Arguments proj1_sig [[A] [P]].
 Program Instance in_sig_QRange (P: Q → Prop): Container (sig P) (Range (sig P)) := λ r x, fst r <= x <= snd r. 
 Definition B01: Ball Q Qpos := (1#2, (1#2)%Qpos).
-Definition D01 := sig (∈ B01).
+Definition D01 := sig ((∈ B01)).
 Program Definition D01zero: D01 := 0.
 Next Obligation. admit. Qed.
 Instance: Canonical (QnonNeg.T → Qinf).

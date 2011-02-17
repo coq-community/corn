@@ -239,7 +239,7 @@ Section additive.
    exists (Pmax x1 x2).
    intros.
    setoid_replace e with (h+h)%Qpos.
-    2: subst h; unfold QposEq; simpl; ring. Check Riemann_plus.
+    2: subst h; unfold QposEq; simpl; ring.
    unfold summed. rewrite Riemann_plus.
    admit. (* not hard *)
   Qed.
