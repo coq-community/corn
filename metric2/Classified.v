@@ -415,9 +415,25 @@ Implicit Arguments mspc_ball [[X] [MetricSpaceBall]].
 Class Canonical (T: Type): Type := canonical: T.
   (* Todo: Move. *)
 
-Instance: Canonical (Qpos → Qinf) := Qinf.finite ∘ QposAsQ.
 Instance: ∀ {T: Type}, Canonical (T → T) := @Datatypes.id.
-Notation " ' a":=(canonical a).
+
+Class Coerce (A B: Type): Type := coerce: A → B.
+Instance injectcoerce {A B: Type} {f: Inject A B}: Coerce A B:=f.
+Instance: Inject Qpos Qinf := Qinf.finite ∘ QposAsQ.
+(* Require Import CRArith.
+Should exist already 
+Instance: Inject Q CR :=inject_Q.*)
+Instance: Inject Z Q :=inject_Z.
+Instance: Inject N Z :=Z_of_N.
+(* We need to distinguish between Coerce and Inject since instance resolution will first try to find 
+an instance of type A -> A (or is it C -> C ?) and hence it will loop *)
+Instance compose_coerce {A B C: Type} (f: Coerce A B) (g: Inject B C): Coerce A C := λ x, g (f x).
+(* Definition test: (Coerce N Q):=_.*)
+
+(* Should be moved *)
+Notation " ' a":=(coerce a).
+
+
 
 
 
@@ -438,13 +454,13 @@ Require Import util.Container.
 
 Section Ball.
 
-  Context X `{MetricSpaceBall X} (R: Type) `{Canonical (R → Qinf)}.
+  Context X `{MetricSpaceBall X} (R: Type) `{Coerce R Qinf}.
 
   Definition Ball := prod X R.
 
   Global Instance ball_contains: Container X Ball := fun b => mspc_ball (' (snd b)) (fst b).
 
-  Context `{Equiv X} `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (canonical: R → Qinf)}.
+  Context `{Equiv X} `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (coerce: R → Qinf)}.
 
   Global Instance ball_contains_Proper: Proper (=) (In: Ball → X → Prop).
   Proof with auto.
@@ -502,7 +518,7 @@ End sig_metricspace.
 Instance Qpos_mspc_ball: MetricSpaceBall Qpos := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
 Instance Qpos_mspc: MetricSpaceClass Qpos := @sig_mspc Q_as_MetricSpace _ _ _ (Qlt 0).
 
-Instance: Canonical (QnnInf.T → Qinf) :=
+Instance: Coerce QnnInf.T Qinf :=
   λ x, match x with
     | QnnInf.Infinite => Qinf.infinite
     | QnnInf.Finite q => Qinf.finite q
@@ -1044,13 +1060,3 @@ Section test.
 
 End test.
 End test.
-
-Require Import CRArith.
-Instance: Canonical (Q->CR) :=inject_Q.
-Instance: Canonical (Z -> Q) :=inject_Z.
-Instance composed_canonical {A B C: Type} {f: Canonical (A -> B)} {g: Canonical (B -> C)}: Canonical _ :=
-fun x=> g (f x).
-
-(* Runs away ...
-Definition test: (Canonical (Z->CR)):=_. *)
-(* Should be moved *)
