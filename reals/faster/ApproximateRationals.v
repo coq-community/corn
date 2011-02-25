@@ -16,8 +16,8 @@ Require Export
 Class AppDiv AQ := app_div : AQ → AQ → Z → AQ.
 Class AppCompress AQ := app_compress : AQ → Z → AQ.
 
-Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Inject AQ Q_as_MetricSpace} 
-    `{!AppInverse AQtoQ} {ZtoAQ : Inject Z AQ} `{!AppDiv AQ} `{!AppCompress AQ} 
+Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ Q_as_MetricSpace} 
+    `{!AppInverse AQtoQ} {ZtoAQ : Coerce Z AQ} `{!AppDiv AQ} `{!AppCompress AQ} 
     `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
     `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
   aq_ring :> @Ring AQ e plus mult zero one inv ;
@@ -52,9 +52,9 @@ Proof with auto.
   change (Qdlog2 x - 1 = Qdlog2 (x / 2)).
   pose proof semirings.sprecedes_1_2.
   pose proof semirings.precedes_1_2.
-  pose proof (ne_zero (2:Q)).
-  assert (GeZero (/2)). apply nonneg_dec_mult_inv_compat...
-    assert (GtZero (/2)). apply pos_dec_mult_inv_compat, semirings.sprecedes_0_2.
+  pose proof (rings.ne_0 (2:Q)).
+  assert (PropHolds (0 ≤ /2)). apply nonneg_dec_mult_inv_compat...
+    assert (PropHolds (0 < /2)). apply pos_dec_mult_inv_compat, semirings.sprecedes_0_2.
   assert (0 < x / 2)%Q.
    apply stdlib_rationals.Qlt_coincides.
    apply_simplified (semirings.pos_mult_scompat (R:=Q))...
@@ -64,7 +64,7 @@ Proof with auto.
    apply int_pow_exp_sprecedes_back with 2...
    rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
    apply sprecedes_trans_r with ((x : Q) / 2).
-    apply_simplified (order_preserving (.* (/ 2))).
+    apply_simplified (order_preserving (.* / 2)).
     apply Qdlog2_spec...
    setoid_rewrite Z.add_1_r.
    apply stdlib_rationals.Qlt_coincides.
@@ -73,9 +73,9 @@ Proof with auto.
   apply int_pow_exp_sprecedes_back with 2...
   apply sprecedes_trans_r with ((x : Q) / 2).
    apply Qdlog2_spec...
-  rewrite <-associativity. rewrite (commutativity _ 1), associativity.
+  rewrite <-associativity. rewrite (commutativity (-(1)) 1), associativity.
   rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
-  apply_simplified (strictly_order_preserving (.* (/ 2))).
+  apply_simplified (strictly_order_preserving (.* / 2)).
   apply stdlib_rationals.Qlt_coincides.
   apply Qdlog2_spec...
 Qed.
@@ -85,17 +85,17 @@ Section approximate_rationals_more.
 
   Lemma AQtoQ_ZtoAQ x : ' (' x) = inject_Z x.
   Proof.
-    pose proof (integers.to_ring_unique_alt ((inject : AQ → Q) ∘ (inject : Z → AQ)) inject_Z) as P.
+    pose proof (integers.to_ring_unique_alt ((coerce : AQ → Q) ∘ (coerce : Z → AQ)) inject_Z) as P.
     apply P.
   Qed.
 
-  Global Instance: Injective (inject : AQ → Q). 
+  Global Instance: Injective (coerce : AQ → Q). 
   Proof. change (Injective AQtoQ). apply _. Qed.
 
-  Global Instance: StrictlyOrderPreserving (inject : AQ → Q).
+  Global Instance: StrictlyOrderPreserving (coerce : AQ → Q).
   Proof. apply _. Qed. 
 
-  Global Instance: Injective (inject : Z → AQ).
+  Global Instance: Injective (coerce : Z → AQ).
   Proof.
     split; try apply _.
     intros x y E.
@@ -105,23 +105,22 @@ Section approximate_rationals_more.
   Qed.
 
   Global Instance: RingOrder (_ : Order AQ).
-  Proof rings.embed_ringorder (inject : AQ → Q).
+  Proof rings.embed_ringorder (coerce : AQ → Q).
 
   Global Instance: TotalOrder (_ : Order AQ).
-  Proof maps.embed_totalorder (inject : AQ → Q).
+  Proof maps.embed_totalorder (coerce : AQ → Q).
 
   Lemma aq_preserves_lt x y : x < y ↔ ('x < 'y)%Q.
   Proof with auto.
     split; intros E.
      apply Qlt_coincides. 
      apply (strictly_order_preserving _)...
-    apply (strictly_order_preserving_back inject).
+    apply (strictly_order_preserving_back coerce).
     apply Qlt_coincides...
   Qed.
 
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof.
-    pose proof (_ : NeZero (2:Q)).
     rewrite shiftl.preserves_shiftl_int.
     apply shiftl.shiftl_int_pow.
   Qed.
@@ -161,12 +160,12 @@ Section approximate_rationals_more.
     now rewrite int_pow_1.
   Qed.
 
-  Global Instance: NeZero (1:AQ).
+  Global Instance: PropHolds ((1:AQ) ≠ 0).
   Proof. 
     intros E.
-    destruct (ne_zero (1:Q)).
-    rewrite <-(rings.preserves_1 (f:=inject : AQ → Q_as_MetricSpace)).
-    rewrite <-(rings.preserves_0 (f:=inject : AQ → Q_as_MetricSpace)).
+    destruct (rings.ne_0 (1:Q)).
+    rewrite <-(rings.preserves_1 (f:=coerce : AQ → Q_as_MetricSpace)).
+    rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q_as_MetricSpace)).
     now rewrite E.
   Qed.
 
@@ -176,8 +175,8 @@ Section approximate_rationals_more.
     destruct (zero_product ('x) ('y)).
       rewrite <-rings.preserves_mult.
       rewrite E. now apply rings.preserves_0.
-     left. apply (injective inject). now rewrite rings.preserves_0.
-    right. apply (injective inject). now rewrite rings.preserves_0.
+     left. apply (injective coerce). now rewrite rings.preserves_0.
+    right. apply (injective coerce). now rewrite rings.preserves_0.
   Qed.
 
   Lemma aq_lt_mid (x y : Q) : (x < y)%Q → { z : AQ | (x < 'z ∧ 'z < y)%Q }.
@@ -187,21 +186,21 @@ Section approximate_rationals_more.
     (* We need to pick a rational [x] such that [x < 1#2]. Since we do not
         use this lemma for computations yet, we just pick [1#3]. However,
         whenever we will it might be worth to reconsider. *)
-    exists (app_inverse inject ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
+    exists (app_inverse coerce ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
     split.
      apply Qlt_le_trans with (x + (1#6) * γ)%Q.
-      replace LHS with (x + 0)%Q by ring.
+      rewrite <-(rings.plus_0_r x) at 1.
       apply Qplus_lt_r...
      replace LHS with ((1 # 2) * (x + y) - ((1 # 3) * γ)%Qpos)%Q...
-      autorewrite with QposElim. unfold inject. 
+      autorewrite with QposElim.
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. QposRing.
+     rewrite Eγ. simpl. unfold Q_eq. ring.
     apply Qle_lt_trans with (y - (1#6) * γ)%Q.
      replace RHS with ((1 # 2) * (x + y) + ((1 # 3) * γ)%Qpos)%Q...
       autorewrite with QposElim. 
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. QposRing.
-    replace RHS with (y - 0)%Q by ring.
+     rewrite Eγ. simpl. unfold Q_eq. ring.
+    setoid_replace y with (y - 0)%Q at 2 by (unfold Q_eq; ring).
     apply Qplus_lt_r. 
     apply Qopp_Qlt_0_r...
   Defined.
@@ -215,7 +214,7 @@ Section approximate_rationals_more.
     transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
      split; intros.
       now apply (order_preserving _).
-     now apply (order_preserving_back inject).
+     now apply (order_preserving_back coerce).
     rewrite abs.preserves_abs, rings.preserves_minus.
     now rewrite aq_shift_correct, rings.preserves_1, left_identity.
   Qed.
@@ -242,16 +241,16 @@ Section approximate_rationals_more.
     symmetry. apply Qmax_coincides.
   Qed.
 
-  Program Definition AQposAsQpos (x : AQ₊) : Qpos := '('x) : Q.
+  Global Program Instance AQposAsQpos: Coerce (AQ₊) Qpos := λ x, '(positive_semiring_elements.Pos_inject x) : Q.
   Next Obligation.
     destruct x as [x Ex]. simpl.
-    posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q_as_MetricSpace)).
-    apply aq_preserves_lt. assumption.
+    posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q_as_MetricSpace)).
+    now apply aq_preserves_lt.
   Qed.
 
   Lemma AQposAsQpos_preserves_1 : AQposAsQpos 1 = 1.
   Proof.
     do 3 red. simpl.
-    now posed_rewrite (rings.preserves_1 (f:=inject : AQ → Q)).
+    now posed_rewrite (rings.preserves_1 (f:=coerce : AQ → Q)).
   Qed.
 End approximate_rationals_more.

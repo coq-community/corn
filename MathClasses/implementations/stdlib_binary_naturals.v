@@ -67,6 +67,9 @@ Proof with trivial.
   intros [E1 E2]. now apply N.T.le_neq_lt.
 Qed.
 
+Instance inject_nat_N: Coerce nat N := N_of_nat.
+Instance inject_N_nat: Coerce N nat := nat_of_N.
+
 Instance: SemiRing_Morphism nat_of_N.
 Proof. 
   repeat (split; try apply _); repeat intro.

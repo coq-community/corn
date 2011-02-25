@@ -88,7 +88,7 @@ Proof.
     now rewrite E2.
    transitivity (-(1):Q).
     easy.
-   rewrite <-(rings.preserves_1 (f:=inject : AQ → Q)).
+   rewrite <-(rings.preserves_1 (f:=coerce : AQ → Q)).
    rewrite <-rings.preserves_opp.
    now apply (order_preserving _).
   case (decide ('a = 0)); intros E2.
@@ -97,7 +97,7 @@ Proof.
   assert (0 ≤ Qdlog2 (-'a)).
    apply Qdlog2_nonneg. change (- -(1) ≤ -'a).
    apply (proj1 (rings.flip_opp _ _)).
-   rewrite <-(rings.preserves_1 (f:=inject : AQ → Q)).
+   rewrite <-(rings.preserves_1 (f:=coerce : AQ → Q)).
    rewrite <-rings.preserves_opp.
    apply (order_preserving _).
    now apply orders.precedes_flip.
@@ -143,7 +143,7 @@ Program Definition AQexp_inv_pos_bound : AQ₊ :=
   let aQ := 'a in exist _ (('(1 : Z) ≪ -(2 : Z)) ^ Zabs_N (Zdiv (Qnum aQ) (Qden aQ))) _. (* 11 $ 5 *)
 Next Obligation.
   apply nat_pow_pos.
-  apply (maps.strictly_order_preserving_back (inject : AQ → Q)).
+  apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
   rewrite rings.preserves_0.
   rewrite aq_shift_correct.
   apply semirings.pos_mult_scompat.
@@ -157,7 +157,7 @@ Lemma AQexp_inv_pos_bound_correct :
   '(AQposAsQpos AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 
 Proof.
   unfold AQexp_inv_pos_bound.
-  unfold AQposAsQpos. unfold inject at 3. unfold positive_semiring_elements.Pos_inject. simpl.
+  unfold AQposAsQpos, positive_semiring_elements.Pos_inject. simpl.
   rewrite preserves_nat_pow.
   rewrite aq_shift_correct.
   rewrite <-int_pow_nat_pow.
@@ -177,14 +177,14 @@ End exp_neg.
 
 Lemma AQexp_prf1 {a : AQ} (pA : 0 ≤ a) : '(-a) ≤ 0.
 Proof.
-  posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q)).
+  posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
   apply (order_preserving _).
   now apply rings.flip_nonneg_opp.
 Qed.
 
 Lemma AQexp_prf2 {a : AQ} (pA : ¬0 ≤ a) : 'a ≤ 0.
 Proof.
-  posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q)).
+  posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
   apply (order_preserving _).
   now apply orders.precedes_flip.
 Qed.
@@ -204,12 +204,12 @@ Proof.
    rewrite rings.preserves_opp.
    rewrite 2!rational_exp_correct.
    apply rational_exp_pos_correct.
-    posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q)).
+    posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
     now apply (order_preserving _).
    rewrite <-rational_exp_correct.
-   posed_rewrite <-(rings.preserves_opp (f:=inject : AQ → Q)).
+   posed_rewrite <-(rings.preserves_opp (f:=coerce : AQ → Q)).
    apply AQexp_inv_pos_bound_correct.
-   posed_rewrite <-(rings.preserves_0 (f:=inject : AQ → Q)).
+   posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
    apply (order_preserving _).
    now apply rings.flip_nonneg_opp.
   apply ARexp_neg_correct.
@@ -217,7 +217,7 @@ Qed.
 
 Local Obligation Tactic := idtac.
 Program Definition ARexp_bounded_uc (z : Z) := 
-  unary_complete_uc QPrelengthSpace inject (λ x, AQexp (min ('z : AQ) x)) (exp_bound_uc z) _.
+  unary_complete_uc QPrelengthSpace coerce (λ x, AQexp (min ('z : AQ) x)) (exp_bound_uc z) _.
 Next Obligation. 
   intros. 
   rewrite ARexp_correct, aq_preserves_min, AQtoQ_ZtoAQ.
@@ -227,7 +227,7 @@ Qed.
 Definition ARexp_bounded (z : Z) := Cbind AQPrelengthSpace (ARexp_bounded_uc z).
 
 Lemma ARtoCR_preserves_exp_bounded z x : ARtoCR (ARexp_bounded z x) = exp_bounded z (ARtoCR x).
-Proof. apply (preserves_unary_complete_fun QPrelengthSpace inject (λ x, AQexp (min ('z : AQ) x))). Qed.
+Proof. apply (preserves_unary_complete_fun QPrelengthSpace coerce (λ x, AQexp (min ('z : AQ) x))). Qed.
 
 Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
 

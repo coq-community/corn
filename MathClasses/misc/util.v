@@ -1,5 +1,5 @@
 Require Import
-  Setoid canonical_names.
+  Program Morphisms Setoid canonical_names.
 
 Section pointwise_dependent_relation. 
   Context A (B: A → Type) (R: ∀ a, relation (B a)).
@@ -58,6 +58,11 @@ Section obvious.
   Global Instance obvious_sum_dst_r `{Obvious (A → B)}: Obvious (A → C+B). 
   Proof. repeat intro. intuition. Defined.
 End obvious.
+
+Class PropHolds (P : Prop) := prop_holds: P.
+
+Instance: Proper (iff ==> iff) PropHolds.
+Proof. now repeat intro. Qed.
 
 Definition bool_decide (P : Prop) `{dec : !Decision P} : bool := if dec then true else false.
 

@@ -4,7 +4,7 @@ Require Import abstract_algebra theory.rings stdlib_rationals additional_operati
 Local Opaque CR.
 
 (* I use underscores in the names to distinguish these instances from their definitions *)
-Instance CR_inject_Q: Inject Q CR := inject_Q.
+Instance inject_Q_CR: Coerce Q CR :=inject_Q.
 Instance CR_0: RingZero CR := (' 0)%CR.
 Instance CR_1: RingOne CR := (' 1)%CR.
 Instance CR_plus: RingPlus CR := ucFun2 CRplus.

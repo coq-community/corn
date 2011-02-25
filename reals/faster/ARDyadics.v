@@ -9,7 +9,7 @@ Require Import
 Notation fastD := (Dyadic fastZ).
 
 Definition fastZtoQ : fastZ → Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
-Instance fastDtoQ: Inject fastD Q_as_MetricSpace := DtoQ fastZtoQ.
+Instance fastDtoQ: Coerce fastD Q_as_MetricSpace := DtoQ fastZtoQ.
 
 Program Instance fastD_compress : AppCompress fastD := λ x k,
   let s := BigZ.of_Z k - expo x
@@ -19,19 +19,36 @@ Program Instance fastD_compress : AppCompress fastD := λ x k,
 
 Instance: Proper ((=) ==> (=) ==> (=)) fastD_compress.
 Proof.
-  intros [x1m x1e] [x2m x2e] Ex k1 k2 Ek.
-  unfold equiv, Z_equiv in Ek. rewrite Ek. clear k1 Ek.
-  unfold equiv, dy_equiv, DtoQ_slow, fastD_compress in Ex |- *.
-  case (decide_rel _); case (decide_rel _); intros E1 E2; simpl in *.
+  assert (∀ x1 x2 k, x1 = x2 → expo x1 ≤ expo x2 → fastD_compress x1 k = fastD_compress x2 k).
+   intros [x1m x1e] [x2m x2e] k Ex Ee.
+   apply rings.flip_nonneg_minus in Ee.
+   pose proof (proj2 (dy_eq_dec_aux (x1m $ x1e) (x2m $ x2e) Ee) Ex) as Ex'.
+   unfold equiv, dy_equiv, DtoQ_slow, fastD_compress.
+   case (decide_rel _); case (decide_rel _); intros E1 E2; simpl in *.
+      apply sg_mor; [| reflexivity].
+      apply sm_proper.
+      unfold shiftr, BigZ_Integers.ShiftR_instance_0. simpl.
+      rewrite Ex'. unfold shiftl, BigZ_Integers.ZType_shiftl. simpl.
+      rewrite BigZ.shiftr_shiftl_r; [|easy].
+      admit.
      admit.
+    rewrite Ex'.
+    rewrite ZtoQ_shift.
     admit.
-   admit.
-  easy.
+   easy.
+  intros x1 x2 Ex k1 k2 Ek.
+  unfold equiv, Z_equiv in Ek. rewrite Ek.
+  destruct (total_order (expo x1) (expo x2)).
+   auto.
+  symmetry. symmetry in Ex. auto.
 Qed.
 
 Lemma fastD_compress_correct (x : fastD) (k : Z) : Qball (2 ^ k) ('app_compress x k) ('x).
 Proof.
-  admit.
+  unfold app_compress, fastD_compress.
+  case (decide_rel _); intros E; simpl in *.
+   admit.
+  apply ball_refl.
 Qed.
 
 Program Instance fastD_div : AppDiv fastD := λ x y k,
@@ -92,13 +109,13 @@ Instance: NatPowSpec fastD N fastD_NPow.
 Proof.
 Admitted.
 
-Instance ZtofastD : Inject Z fastD := dy_inject ∘ BigZ.of_Z.
+Instance ZtofastD: Coerce Z fastD := dy_inject ∘ BigZ.of_Z.
 
 Instance: AppRationals fastD.
 Proof.
   split; try apply _.
    apply fastD_div_correct.
   apply fastD_compress_correct.
-Qed.  
+Qed.
 
 Definition fastAR := AR (AQ:=fastD).

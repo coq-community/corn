@@ -35,7 +35,7 @@ Global Program Instance dy_plus: RingPlus Dyadic := λ x y,
 Next Obligation. now apply rings.flip_nonneg_minus. Qed.
 Next Obligation. apply rings.flip_nonneg_minus. now apply orders.precedes_flip. Qed.
 
-Global Instance dy_inject: Inject Z Dyadic := λ x, x $ 0.
+Global Instance dy_inject: Coerce Z Dyadic := λ x, x $ 0.
 Global Instance dy_opp: GroupInv Dyadic := λ x, -mant x $ expo x.
 Global Instance dy_mult: RingMult Dyadic := λ x y, mant x * mant y $ expo x + expo y.
 Global Instance dy_0: RingZero Dyadic := ('0:Dyadic).
@@ -69,13 +69,13 @@ Section with_rationals.
      ring_simplify.
      rewrite <-associativity, <-int_pow_exp_plus.
       now setoid_replace (ye - xe + xe) with ye by ring.
-     now apply (ne_zero (2:Q)).
+     now apply (rings.ne_0 (2:Q)).
     rewrite rings.preserves_plus, ZtoQ_shift.
     rewrite min_r. 
      ring_simplify.
      rewrite <-associativity, <-int_pow_exp_plus.
       now setoid_replace (xe - ye + ye) with xe by ring.
-     now apply (ne_zero (2:Q)).
+     now apply (rings.ne_0 (2:Q)).
     now apply orders.precedes_flip.
   Qed. 
 
@@ -92,7 +92,7 @@ Section with_rationals.
     rewrite rings.preserves_mult.
     rewrite int_pow_exp_plus. 
      ring.
-    apply (ne_zero (2:Q)).
+    apply (rings.ne_0 (2:Q)).
   Qed.
 
   Lemma DtoQ_slow_preserves_0 : DtoQ_slow' 0 = 0.
@@ -119,13 +119,7 @@ Add Ring StdQ : (rings.stdlib_ring_theory StdQ).
 Global Instance dy_equiv: Equiv Dyadic := λ x y, DtoStdQ x = DtoStdQ y.
 
 Instance: Setoid Dyadic.
-Proof.
-  split; red; unfold equiv, dy_equiv, DtoQ_slow.
-    intros x. reflexivity.
-   intros x y E. now symmetry.
-  intros x y z E1 E2. 
-  now transitivity (DtoStdQ y).
-Qed.
+Proof. unfold Setoid, equiv, dy_equiv. apply setoids.projected_equivalence. Qed.
 
 Instance: Proper ((=) ==> (=)) DtoStdQ.
 Proof. now repeat red. Qed.
@@ -191,7 +185,6 @@ Proof.
   destruct x as [xm xe], y as [ym ye].
   assert (xe ≤ ye).
    now apply rings.flip_nonneg_minus.
-  pose proof (_ : NeZero (2:StdQ)).
   split; intros E.
    unfold equiv, dy_equiv, DtoQ_slow. simpl in *.
    rewrite E, ZtoQ_shift.
@@ -200,8 +193,7 @@ Proof.
    easy.
   unfold equiv, dy_equiv, DtoQ_slow in E. simpl in *.
   apply (injective ZtoStdQ).
-  apply (rings.right_cancellation_ne_0 (.*.) (2 ^ xe)).
-   now apply int_pow_nonzero.
+  apply (right_cancellation (.*.) (2 ^ xe)).
   rewrite E, ZtoQ_shift.
   rewrite <-associativity, <-int_pow_exp_plus.
    now setoid_replace (ye - xe + xe) with ye by ring.
@@ -252,7 +244,7 @@ Proof.
   split. 
     intros [xm xe] [ym ye] E1 n1 n2 E2. 
     unfold shiftl, dy_shiftl, equiv, dy_equiv, DtoQ_slow in *. simpl in *.
-    rewrite 2!int_pow_exp_plus; try apply (ne_zero (2:StdQ)).
+    rewrite 2!int_pow_exp_plus; try apply (rings.ne_0 (2:StdQ)).
     transitivity (ZtoStdQ xm * 2 ^ xe * 2 ^ n1).
      ring.
     rewrite E1, E2. ring.
@@ -265,7 +257,7 @@ Proof.
   rewrite <-associativity, int_pow_S.
    rewrite rings.preserves_mult, rings.preserves_2.
    rewrite rings.plus_0_l. ring.
-  apply (ne_zero (2:StdQ)).
+  apply (rings.ne_0 (2:StdQ)).
 Qed.
 
 Global Instance dy_precedes: Order Dyadic := λ x y, DtoStdQ x ≤ DtoStdQ y.
@@ -291,14 +283,12 @@ Proof.
   split; intros E.
    unfold precedes, dy_precedes, DtoQ_slow in E. simpl in *.
    apply (order_preserving_back ZtoStdQ).
-   apply (maps.order_preserving_back_flip_gt_0 (.*.) (2 ^ (expo x))). 
-    apply int_pow_pos. now apply semirings.sprecedes_0_2.
+   apply (order_preserving_back (.* 2 ^ expo x)).
    now rewrite rings.preserves_0, left_absorb in E |- *.
   unfold precedes, dy_precedes, DtoQ_slow. simpl.
   apply (order_preserving ZtoStdQ) in E.
-  apply (maps.order_preserving_flip_ge_0 (.*.) (2 ^ (expo x))) in E. 
-   now rewrite rings.preserves_0, left_absorb in E |- *.
-  apply int_pow_nonneg. now apply semirings.sprecedes_0_2.
+  apply (order_preserving (.* 2 ^ expo x)) in E. 
+  now rewrite rings.preserves_0, left_absorb in E |- *.
 Qed.
 
 Lemma nonpos_mant (x : Dyadic) : x ≤ 0 ↔ mant x ≤ 0.
@@ -325,12 +315,10 @@ Proof.
   intros E. unfold precedes, dy_precedes, DtoQ_slow. simpl in *.
   apply (order_preserving ZtoStdQ) in E.
   rewrite ZtoQ_shift in E.
-  apply (maps.order_preserving_flip_ge_0 (.*.) (2 ^ xe)) in E.
-   rewrite <-associativity, <-int_pow_exp_plus in E.
-    now setoid_replace ((ye - xe) + xe) with ye in E by ring.
-   now apply (ne_zero (2:StdQ)).
-  apply int_pow_nonneg. 
-  now apply semirings.precedes_0_2.
+  apply (order_preserving (.* 2 ^ xe)) in E.
+  rewrite <-associativity, <-int_pow_exp_plus in E.
+   now setoid_replace ((ye - xe) + xe) with ye in E by ring.
+  now apply (rings.ne_0 (2:StdQ)).
 Qed.
 
 Local Obligation Tactic := idtac.
@@ -396,7 +384,7 @@ Section DtoQ.
     apply rings.injective_ne_0.
     pose proof (shiftl_nonzero (A:=Z) (B:=Z⁺)) as P.
     apply P.
-    apply (ne_zero 1).
+    apply (rings.ne_0 1).
   Qed.
 End DtoQ.
 

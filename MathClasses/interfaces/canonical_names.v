@@ -11,23 +11,33 @@ Class Equiv A := equiv: relation A.
 (* We use this virtually everywhere, and so use "=" for it: *)
 Infix "=" := equiv: type_scope.
 Notation "(=)" := equiv (only parsing).
-Notation "( f =)" := (equiv f) (only parsing).
-Notation "(= f )" := (λ g, equiv g f) (only parsing).
+Notation "( x =)" := (equiv x) (only parsing).
+Notation "(= x )" := (λ y, equiv y x) (only parsing).
 Notation "x ≠ y":= (¬x = y): type_scope.
+Notation "( x ≠)" := (λ y, x ≠ y) (only parsing).
+Notation "(≠ x )" := (λ y, y ≠ x) (only parsing).
+
+(* TODO: r13842 is horribly slow, figure out why? 
+Instance equiv_default_relation `{Equiv A} : DefaultRelation (=) | 0.
+Instance equiv_rewrite_relation `{Equiv A} : RewriteRelation (=) | 0.
+Since r13842 Coq chooses an incorrect default relation, so we override it. *)
 
 (* For Leibniz equality we use "≡": *)
 Infix "≡" := eq (at level 70, no associativity).
   (* Hm, we could define a very low priority Equiv instance for Leibniz equality.. *)
 
 Definition ext_equiv `{Equiv A} `{Equiv B}: Equiv (A → B) := ((=) ==> (=))%signature.
-Hint Extern 10 (Equiv (_ → _)) => apply @ext_equiv : typeclass_instances. (* Due to bug #2491 *)
+Hint Extern 10 (Equiv (_ → _)) => apply @ext_equiv : typeclass_instances. 
+Hint Extern 10 (Equiv (relation _)) => apply @ext_equiv : typeclass_instances. (* Due to bug #2491 *)
+
 (** Interestingly, most of the development works fine if this is defined as
   ∀ x, f x = g x.
 However, in the end that version was just not strong enough for comfortable rewriting
 in setoid-pervasive contexts. *)
 
 (* Other canonically named relations/operations/constants: *)
-Class Decision P := decide: sumbool P (~ P).
+Class Decision P := decide: sumbool P (¬P).
+
 Class SemiGroupOp A := sg_op: A → A → A.
 Class MonoidUnit A := mon_unit: A.
 Class RingPlus A := ring_plus: A → A → A.
@@ -35,24 +45,31 @@ Class RingMult A := ring_mult: A → A → A.
 Class RingOne A := ring_one: A.
 Class RingZero A := ring_zero: A.
 Class GroupInv A := group_inv: A → A.
-Class MultInv A `{Equiv A} `{RingZero A} := mult_inv: { x: A | x ≠ ring_zero } → A.
+Definition NonZero R `{RingZero R} `{Equiv R} := sig (≠ ring_zero).
+Class MultInv A `{Equiv A} `{RingZero A} := mult_inv: NonZero A → A.
+
+Class Order A := precedes: relation A.
+Definition strictly_precedes `{Equiv A} `{Order A} : Order A := λ (x y : A),  precedes x y ∧ x ≠ y.
+Definition NonNeg R `{RingZero R} `{Order R} := sig (precedes ring_zero).
+Definition Pos R `{RingZero R} `{Equiv R} `{Order R} := sig (strictly_precedes ring_zero).
+Definition NonPos R `{RingZero R} `{Order R} := sig (λ y, precedes y ring_zero).
+
 Class Arrows (O: Type): Type := Arrow: O → O → Type.
 Infix "⟶" := Arrow (at level 90, right associativity).
 Class CatId O `{Arrows O} := cat_id: `(x ⟶ x).
 Class CatComp O `{Arrows O} := comp: ∀ {x y z}, (y ⟶ z) → (x ⟶ y) → (x ⟶ z).
-Class Order A := precedes: relation A.
-Definition strictly_precedes `{Equiv A} `{Order A} : Order A := λ (x y : A),  precedes x y ∧ x ≠ y.
 Class RalgebraAction A B := ralgebra_action: A → B → B.
 Class RingMultInverse {R} (x: R): Type := ring_mult_inverse: R.
+
 Implicit Arguments ring_mult_inverse [[R] [RingMultInverse]].
 Implicit Arguments cat_id [[O] [H] [CatId] [x]].
 Implicit Arguments decide [[Decision]].
 
-Instance: Params (@precedes) 2.
-Instance: Params (@strictly_precedes) 3.
 Instance: Params (@ring_mult) 2.
 Instance: Params (@ring_plus) 2.
 Instance: Params (@equiv) 2.
+Instance: Params (@precedes) 2.
+Instance: Params (@strictly_precedes) 3.
 
 Instance ringplus_is_semigroupop `{f: RingPlus A}: SemiGroupOp A := f.
 Instance ringmult_is_semigroupop `{f: RingMult A}: SemiGroupOp A := f.
@@ -62,6 +79,11 @@ Instance ringzero_is_monoidunit `{c: RingZero A}: MonoidUnit A := c.
 Hint Extern 10 (Equiv (_ ⟶ _)) => apply @ext_equiv : typeclass_instances.
 
 (* Notations: *)
+Notation "R ₀" := (NonZero R) (at level 20, no associativity).
+Notation "R ⁺" := (NonNeg R) (at level 20, no associativity).
+Notation "R ₊" := (Pos R) (at level 20, no associativity).
+Notation "R ⁻" := (NonPos R) (at level 20, no associativity).
+
 Notation "0" := ring_zero.
 Notation "1" := ring_one.
 Infix "&" := sg_op (at level 50, left associativity).
@@ -85,8 +107,12 @@ Notation "(//)" := mult_inv (only parsing).
 Notation "x // y" := (x * //y) (at level 35, right associativity).
 Infix "≤" := precedes.
 Notation "(≤)" := precedes (only parsing).
+Notation "( x ≤)" := (precedes x) (only parsing).
+Notation "(≤ x )" := (λ y, y ≤ x) (only parsing).
 Infix "<" := strictly_precedes.
 Notation "(<)" := strictly_precedes (only parsing).
+Notation "( x <)" := (strictly_precedes x) (only parsing).
+Notation "(< x )" := (λ y, y < x) (only parsing).
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z) (at level 70, y at next level).
 Notation "x ≤ y < z" := (x ≤ y /\ y < z) (at level 70, y at next level).
 Notation "x < y < z" := (x < y /\ y < z) (at level 70, y at next level).
@@ -103,9 +129,9 @@ Notation "(◎ f )" := (λ g, comp g f) (only parsing).
 
 Notation "(→)" := (λ x y, x → y).
 
-Class Inject A B := inject: A → B.
-Notation "' x" := (inject x) (at level 20).
-Instance: Params (@inject) 3.
+Class Coerce A B := coerce: A → B.
+Notation "' x" := (coerce x) (at level 20).
+Instance: Params (@coerce) 3.
 
 (* Apartness *)
 Class Apart A := apart: A → A → Type.
@@ -155,18 +181,6 @@ Notation "f ⁻¹" := (inverse f) (at level 30).
 Class ZeroProduct A `{Equiv A} `{!RingMult A} `{!RingZero A}: Prop :=
   zero_product: `(x * y = 0 → x = 0 ∨ y = 0).
 
-Section compare_zero.
-  Context `{Equiv A} `{!Order A} `{!RingZero A} (x : A).
-  Class NeZero  : Prop := ne_zero: x ≠ 0.
-  Class GeZero : Prop := ge_zero: 0 ≤ x.
-  Class GtZero : Prop := gt_zero: 0 < x.
-End compare_zero.
-
-Section compare_one.
-  Context `{Equiv A} `{!Order A} `{!RingOne A} (x : A).
-  Class GeOne : Prop := ge_one: 1 ≤ x.
-End compare_one.
-
 Class ZeroDivisor {R} `{Equiv R} `{RingZero R} `{RingMult R} (x: R): Prop
   := zero_divisor: x ≠ 0 ∧ ∃ y, y ≠ 0 ∧ x * y = 0.
 
@@ -178,12 +192,3 @@ Proof. intros x [? [? [? E]]]. destruct (zero_product _ _ E); intuition. Qed.
 
 Class RingUnit `{Equiv R} `{RingMult R} `{RingOne R} (x: R) `{!RingMultInverse x}: Prop
   := ring_unit_mult_inverse: x * ring_mult_inverse x = 1.
-
-Definition NonNeg R `{RingZero R} `{Order R} := { z : R | 0 ≤ z }.
-Notation "R ⁺" := (NonNeg R) (at level 20, no associativity).
-
-Definition Pos R `{RingZero R} `{Equiv R} `{Order R} := { z : R | 0 < z }.
-Notation "R ₊" := (Pos R) (at level 20, no associativity).
-
-Definition NonPos R `{RingZero R} `{Order R} := { z : R | z ≤ 0 }.
-Notation "R ⁻" := (NonPos R) (at level 20, no associativity).
