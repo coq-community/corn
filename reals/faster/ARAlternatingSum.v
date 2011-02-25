@@ -92,8 +92,8 @@ Proof.
     intros n. 
     setoid_replace n with (1 + (n - 1)) using relation (@equiv Z _) at 1 by ring.
     rewrite int_pow_S.
-     unfold "2" at 1. now rewrite rings.plus_mul_distribute_r, left_identity.
-    apply (ne_zero (2:Q)).
+     now rewrite rings.plus_mul_distribute_r, left_identity.
+    apply (rings.ne_0 (2:Q)).
    posed_rewrite (G k).
    apply_simplified (semirings.plus_compat (R:=Q)); [| reflexivity].
    posed_rewrite (G (k - 1)).
@@ -201,16 +201,12 @@ Proof.
   apply ball_weak_le with (P_of_succ_nat l * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
    set (l':=P_of_succ_nat l).
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
-   rewrite int_pow_exp_plus; [| apply (ne_zero (2:Q))].
-   apply (maps.order_preserving_back_gt_0 (.*.) ((2:Q) ^ Z.log2_up l')).
-    apply int_pow_pos.
-    now apply semirings.sprecedes_0_2.
+   rewrite int_pow_exp_plus; [| apply (rings.ne_0 (2:Q))].
+   apply (order_preserving_back ((2:Q) ^ Z.log2_up l' *.)).
    setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l'))))
      with (2 ^ k * (l':Q)) using relation (@equiv Q _).
     rewrite (commutativity _ ((2:Q) ^ k)).
-    apply (maps.order_preserving_ge_0 (.*.) (2 ^ k)).
-     apply int_pow_nonneg. 
-     now apply semirings.precedes_0_2.
+    apply (order_preserving (2 ^ k *.)).
     replace (2:Q) with (inject_Z 2) by reflexivity.
     rewrite <-Qpower.Zpower_Qpower.
      apply (order_preserving _).
@@ -224,14 +220,13 @@ Proof.
    rewrite <-associativity.
    rewrite associativity, fields.dec_mult_inverse.
     now apply left_identity.
-   apply int_pow_nonzero.
-   now apply (ne_zero (2:Q)).
+   apply (_ : PropHolds (2 ^ Z.log2_up l' ≠ 0)).
   rewrite <-nat_of_P_of_succ_nat.
   rewrite convert_is_POS.
   now apply ARAltSum_correct_aux.
 Qed.
 
-Definition ARInfAltSum_raw `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (ε : Qpos) : AQ := 
+Definition ARInfAltSum_raw `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (ε : Qpos) : AQ_as_MetricSpace := 
   let εk:= Qdlog2 ε - 1 in 
   let l:= ARInfAltSum_length d εk
   in ARAltSum sN sD l (εk - Z.log2_up (Z_of_nat l)).
@@ -254,7 +249,7 @@ Proof.
 Qed.
 
 Lemma ARInfAltSum_prf `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0} :
-  is_RegularFunction_noInf _ (ARInfAltSum_raw d : Qpos → AQ_as_MetricSpace).
+  is_RegularFunction_noInf _ (ARInfAltSum_raw d).
 Proof.
   intros ε1 ε2. simpl.
   apply ball_closed. intros δ.

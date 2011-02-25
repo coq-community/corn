@@ -265,15 +265,15 @@ Proof.
  intros r.
  unfold r_pi.
  repeat rewrite <- (CRmult_scale).
- setoid_replace ((176*r)) with ((4*r*44)) by (simpl; ring).
- setoid_replace (28*r) with (4*r*7) by (simpl; ring).
- setoid_replace (-(48)*r) with (4*r*-(12)) by (simpl; ring).
- setoid_replace (96*r) with (4*r*24) by (simpl; ring).
+ setoid_replace (176%Z* r) with (4%Z * r * 44%Z) by (simpl; ring).
+ setoid_replace (28%Z * r) with (4%Z * r * 7%Z) by (simpl; ring).
+ setoid_replace (-(48)%Z * r) with (4%Z * r * -(12)%Z) by (simpl; ring).
+ setoid_replace (96%Z * r) with (4%Z * r * 24%Z) by (simpl; ring).
  repeat rewrite <- CRmult_Qmult.
- transitivity ('4 * 'r *(' 44 * rational_arctan_small_pos small_per_57 +
-   ' 7 * rational_arctan_small_pos small_per_239 +
-     (' (-(12)) * rational_arctan_small_pos small_per_682 +
-       ' 24 * rational_arctan_small_pos small_per_12943)))%CR.
+ transitivity ('4%Z * 'r *(' 44%Z * rational_arctan_small_pos small_per_57 +
+   ' 7%Z * rational_arctan_small_pos small_per_239 +
+     (' (-(12)%Z) * rational_arctan_small_pos small_per_682 +
+       ' 24%Z * rational_arctan_small_pos small_per_12943)))%CR.
   ring.
  repeat (rewrite -> (rational_arctan_small_pos_correct); [|constructor]).
  repeat rewrite <- IR_inj_Q_as_CR.

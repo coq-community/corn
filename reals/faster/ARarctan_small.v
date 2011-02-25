@@ -26,7 +26,7 @@ Proof.
   apply sg_mor.
    rewrite 2!preserves_powers_help.
    rewrite 3!(Str_nth_powers_help_int_pow _ _).
-   rewrite 2!(preserves_nat_pow (f:=inject : AQ → Q)).
+   rewrite 2!(preserves_nat_pow (f:=coerce : AQ → Q)).
    rewrite <-2!(int_pow_nat_pow (f:=Z_of_N)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ Z_of_N 2).
    rewrite 2!int_pow_mult. 

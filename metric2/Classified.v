@@ -20,7 +20,7 @@ Section MetricSpaceClass.
   Variable X: Type.
 
   Class MetricSpaceBall: Type := mspc_ball: Qinf → relation X.
-
+Hint Unfold relation : type_classes.
   (** We used to have mspc_ball take a Qpos instead of a Qinf. Because it is sometimes convenient
    to speak in terms of a generalized notion of balls that can have infinite or negative radius, we used
    a separate derived definition for that (which return False for negative radii, True for an infinite radius,
@@ -44,7 +44,7 @@ Section MetricSpaceClass.
 
   Class MetricSpaceClass: Prop :=
     { mspc_setoid: Setoid X
-    ; mspc_ball_proper:> Proper ((=) ==> (=) ==> (=)) mspc_ball
+    ; mspc_ball_proper:> Proper (=) mspc_ball
     ; mspc_ball_inf: ∀ x y, mspc_ball Qinf.infinite x y
     ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ mspc_ball e x y
     ; mspc_ball_zero: ∀ x y, mspc_ball 0 x y ↔ x = y 
@@ -119,7 +119,7 @@ Section genball.
 
   Context
     `{Setoid X}
-    (R: Qpos → relation X) `{!Proper ((=) ==> (=) ==> (=)) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
+    (R: Qpos → relation X) `{!Proper (=) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
     (Rtriangle: ∀ (e1 e2: Qpos) (a b c: X), R e1 a b → R e2 b c → R (e1 + e2)%Qpos a c)
     (Req: ∀ (a b: X), (∀ d: Qpos, R d a b) → a = b)
     (Rclosed: ∀ (e: Qpos) (a b: X), (∀ d: Qpos, R (e + d)%Qpos a b) → R e a b).
