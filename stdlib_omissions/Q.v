@@ -6,6 +6,10 @@ Require stdlib_omissions.Z.
 
 Set Automatic Introduction.
 
+Notation "x <= y < z" := (x <= y /\ y < z) : Q_scope.
+Notation "x < y <= z" := (x < y /\ y <= z) : Q_scope.
+Notation "x < y < z" := (x < y /\ y < z) : Q_scope.
+
 Open Scope Q_scope.
 
 Lemma Qnum_nonneg (x : Q) : (0 <= Qnum x)%Z <-> (0 <= x)%Q.
