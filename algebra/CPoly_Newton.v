@@ -5,7 +5,7 @@ Require Import
  CRArith Qmetric Qring CReals
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation
- util.Container.
+ util.Container NewAbstractIntegration.
 
 Require ne_list.
 Import ne_list.notations.
@@ -515,39 +515,29 @@ Section contents.
   Section divdiff_as_repeated_integral.
 
     Context
-      (n: nat) (points: Vector.t Q (S n))
-      (lo hi: Q).
-
-    Definition lohi (q: Q): Prop := lo <= q <= hi.
-    Definition Qbp: Type := sig lohi.
+      (n: nat) (points: Vector.t Q (S n)).
 
     Context 
-      (points_lohi: Vector.Forall lohi points)
-      (upper: CR)
-      (nth_deriv: Q → CR (*sig (λ x: CR, x <= upper)*))
+      (nth_deriv_bound: Range CR)
+      (nth_deriv: Q → sig ((∈ nth_deriv_bound)))
+        (* Todo: only require boundedness on the interval that contains the points. *)
         `{!UniformlyContinuous_mu nth_deriv}
-        `{!UniformlyContinuous nth_deriv}
+        `{!UniformlyContinuous nth_deriv}.
           (* Todo: This should be replaced with some "n times differentiable" requirement on a subject function. *)
-      (integrate: Range Q01 * UCFunction Q01 CR → CR)
-        `{!UniformlyContinuous_mu integrate}
-        `{!UniformlyContinuous integrate}.
-          (* Todo: The integration function should not be a parameter. We should just use SimpleIntegration's implementation. *)
 
     Opaque Qmult Qplus Qminus.
        (* Without these, instance resolution gets a little too enthusiastic and breaks these operations open when
        looking for PointFree instances below. It's actually kinda neat that it can put these in PointFree form though. *)
 
 
-    Notation SomeWeights n := ((*sig (λ ts:*) Vector.t Q01 n (*, cm_Sum (map proj1_sig ts) <= 1)%Q*)).
-    Notation Weights := ((*sig (λ ts:*) Vector.t Q01 (S n) (*, cm_Sum (map proj1_sig ts) == 1)%Q*)).
+    Definition totalweight {n} (ws: Vector.t Q n): Q := cm_Sum ws.
+
+    Notation SomeWeights n := (sig (λ ts: Vector.t Q n, totalweight ts <= 1)%Q).
 
     (** apply_weights: *)
 
-    Program Definition apply_weights (w: Weights): Qbp :=
-      cm_Sum (map (λ p, Qmult (fst p) (` (snd p))) (zip points (Vector.to_list w))).
-
-    Next Obligation.
-    Admitted.
+    Definition apply_weights (w: Vector.t Q (S n)): Q :=
+      cm_Sum (map (λ p, Qmult (fst p) (snd p)) (zip points (Vector.to_list w))).
 
     Instance apply_weights_mu: UniformlyContinuous_mu apply_weights.
     Admitted.
@@ -559,19 +549,15 @@ Section contents.
 
     (** "inner", the function of n weights: *)
 
-    Program Definition inner: SomeWeights n → CR
-      := λ ts, nth_deriv (apply_weights
-        (Vector.cons _ (1 - cm_Sum (map proj1_sig (Vector.to_list ts)): Q01) _ ts))%Q.
-
-    Next Obligation.
-     intros ts (*[ts ?]*).
-     simpl @proj1_sig.
-     split.
-      admit. (* easy *)
-     admit. (* easy *)
-    Qed.
+    Program Definition inner: SomeWeights n → sig ((∈ nth_deriv_bound))
+      := λ ts, nth_deriv (apply_weights (Vector.cons _ (1 - totalweight ts) _ ts))%Q.
 
     Instance inner_mu: UniformlyContinuous_mu inner.
+     unfold inner.
+     apply compose_mu.
+      apply _.
+     apply (@compose_mu (SomeWeights n) (Vector.t Q (S n)) Q (apply_weights)).
+      apply _.
     Admitted.
 
     Instance inner_uc: UniformlyContinuous inner.
@@ -579,30 +565,68 @@ Section contents.
 
     (** Next up is "reduce" *)
 
-    Definition G (n: nat): Type := UCFunction (Vector.t Q01 n) CR.
+    Definition G (n: nat): Type := UCFunction (SomeWeights n) (sig ((∈ nth_deriv_bound))).
 
     Section reduce.
 
       Variables (m: nat) (X: G (S m)).
 
-      Definition integrand (ts: SomeWeights m) (t: Q01): CR := X (uncurry_Vector_cons _ (t, ts)).
+      Program Definition integrand (ts: SomeWeights m) (t: sig ((∈ (0, (1 - totalweight ts))))%Q): sig ((∈ nth_deriv_bound)) :=
+        X (@uncurry_Vector_cons Q m (` t, ` ts)).
 
-      Program Definition reduce_raw: SomeWeights m → CR
-       := λ ts, integrate ((0, 1 - cm_Sum (map proj1_sig (Vector.to_list ts)))%Q, ucFunction (integrand ts)).
+      Next Obligation. intros. change (`t + Σ  (` ts) <= 1)%Q. admit. Qed.
 
-      Next Obligation. split. reflexivity. auto. Qed.
+      Instance integrand_mu: ∀ ts, UniformlyContinuous_mu (integrand ts).
+       unfold integrand.
+       intros.
+       apply compose_mu.
+        apply _.
+       constructor.
+       intro.
+       apply Qpos2QposInf.
+       exact H.
+      Defined.
 
-      Next Obligation.
-       intros ts (*[ts ?]*).
+      Instance integrand_uc: ∀ ts, UniformlyContinuous (integrand ts).
+      Proof.
+       unfold integrand. intros.
+       apply compose_uc. apply _.
+       constructor; try apply _.
+       simpl. intros.
+       constructor. assumption.
        simpl.
-       split. admit. (* easy *)
-       admit. (* easy *)
+       admit. (* doable *)
       Qed.
 
-      Axiom reduce_mu: UniformlyContinuous_mu reduce_raw.
-      Existing Instance reduce_mu.
-      Axiom reduce_uc: UniformlyContinuous reduce_raw.
-      Existing Instance reduce_uc.
+      Program Definition reduce_raw: SomeWeights m → sig ((∈ nth_deriv_bound))
+       := λ ts, @integrate_ucFunc_wrapped_for_continuity nth_deriv_bound (existT _ (0, 1 - totalweight  (` ts))%Q
+         (ucFunction (integrand ts))).
+
+      Next Obligation.
+       intros.
+       unfold integrate_ucFunc_wrapped_for_continuity.
+       simpl.
+      Admitted. (* need to show that the result is bounded *)
+
+      Instance reduce_mu: UniformlyContinuous_mu reduce_raw.
+      Proof with auto.
+       unfold reduce_raw.
+       apply exist_mu.
+       set (integrate_ucFunc_wrapped_for_continuity nth_deriv_bound).
+       apply (@compose_mu  (SomeWeights m)  {r : Range Q & UCFunction (sig ((∈r))) (sig ((∈nth_deriv_bound)))} CR s).
+        apply _.
+       admit.
+      Defined.
+
+      Instance reduce_uc: UniformlyContinuous reduce_raw.
+      Proof with auto.
+       unfold reduce_raw.
+       apply exist_uc.
+       set (integrate_ucFunc_wrapped_for_continuity nth_deriv_bound).
+       apply (@compose_uc  (SomeWeights m)  _ _ {r : Range Q & UCFunction (sig ((∈r))) (sig ((∈nth_deriv_bound)))} _ _ CR _ _ s).
+        apply _.
+       admit.
+      Qed.
 
       Definition reduce: G m := ucFunction reduce_raw.
 
@@ -610,9 +634,14 @@ Section contents.
 
     (** Finally, the divided difference arises from iterated reduction of the inner function: *)
 
-    (*Program*) Definition alt_divdiff: CR (*sig (λ r, r <= upper)*)
-      := iterate reduce (ucFunction inner) (Vector.nil Q01).
+    Definition alt_divdiff: CR.
+     apply (iterate reduce (ucFunction inner)).
+     exists (Vector.nil Q).
+     abstract (unfold totalweight; simpl; auto).
+    Defined. (* Todo: Why won't Program work here? *)
 
   End divdiff_as_repeated_integral.
+
+  Print Assumptions alt_divdiff.
 
 End contents.
