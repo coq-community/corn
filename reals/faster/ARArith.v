@@ -243,17 +243,15 @@ Proof.
   now rewrite E, F.
 Qed.
 
-Lemma ARtoCR_preserves_le x y : x ≤ y ↔ ARtoCR x ≤ ARtoCR y.
+Global Instance ARtoCR_preserves_le: OrderEmbedding ARtoCR.
 Proof.
-  unfold precedes, AR_le, CR_le, CRle.
-  change (ARnonNeg (y - x) ↔ CRnonNeg (ARtoCR y - ARtoCR x)).
-  rewrite <-rings.preserves_opp.
-  now rewrite <-rings.preserves_plus.
+  repeat (split; try apply _); unfold precedes, AR_le, CR_le, CRle.
+   intros. change (CRnonNeg (ARtoCR y - ARtoCR x)). now rewrite <-rings.preserves_minus.
+  intros. apply ARtoCR_preserves_nonNeg. now rewrite rings.preserves_minus.
 Qed.
-Hint Resolve ARtoCR_preserves_le.
 
-Global Instance: OrderEmbedding ARtoCR.
-Proof. repeat (split; try apply _); intros; now apply ARtoCR_preserves_le. Qed.
+Global Instance: PartialOrder AR_le.
+Proof maps.embed_partialorder ARtoCR.
 
 Definition ARpos (x : AR) : CProp := sig (λ y : AQ₊, '('y : AQ) ≤ x).
 
@@ -264,13 +262,12 @@ Proof with auto with qarith.
    apply ARtoCR_preserves_le in E. apply E.
   destruct (aq_lt_mid 0 y) as [z [Ez1 Ez2]]...
   assert (0 < z) as F. apply aq_preserves_lt. aq_preservation...
-  exists (exist _ z F). simpl. 
-  apply ARtoCR_preserves_le. 
+  exists (exist _ z F). simpl.
+  apply (order_preserving_back ARtoCR). 
   rewrite ARtoCR_inject.
   apply CRle_trans with (''y)...
   apply CRArith.CRle_Qle...
 Defined.
-Hint Resolve ARtoCR_preserves_pos.
 
 Lemma ARpos_wd : ∀ x1 x2, x1 = x2 → ARpos x1 → ARpos x2.
 Proof.
@@ -291,7 +288,6 @@ Proof with reflexivity.
    autorewrite with ARtoCR...
   split; apply ARtoCR_preserves_pos.
 Defined.
-Hint Resolve ARtoCR_preserves_lt.
 
 Lemma ARlt_wd : ∀ x1 x2 : AR, x1 = x2 → ∀ y1 y2, y1 = y2 → x1 ⋖ y1 → x2 ⋖ y2.
 Proof.
