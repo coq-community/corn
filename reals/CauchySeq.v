@@ -41,7 +41,7 @@
 (** printing AbsIR %\ensuremath{|\cdot|_{\mathbb R}}% *)
 
 Require Export CReals.
-Require CRreal.
+Require Cauchy_IR.
 
 (**
 * Real Number Structures
@@ -50,7 +50,7 @@ Require CRreal.
 *)
 
 Definition IR : CReals.
-Proof. exact CRreal.CRasCReals. Qed.
+Proof. exact Cauchy_IR.Cauchy_IR. Qed.
   (* Defining IR directly with := and then setting [Global Opaque] keeps it semi-transparent, so
    we really need [Qed] to get full opacity. *)
 
