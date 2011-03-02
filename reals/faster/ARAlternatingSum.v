@@ -103,7 +103,7 @@ Proof.
     rewrite <-associativity.
     apply (order_preserving (k +)).
     rewrite <-rings.plus_opp_distr.
-    apply (proj1 (rings.flip_opp _ _)).
+    apply rings.flip_opp.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.
    now apply semirings.plus_compat.
