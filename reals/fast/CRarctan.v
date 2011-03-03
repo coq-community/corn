@@ -31,7 +31,7 @@ Require Import ContinuousCorrect.
 Require Import CornTac.
 Require Import stdlib_omissions.Q.
 Require Import abstract_algebra.
-
+Require Import Psatz.
 Set Implicit Arguments.
 
 Open Local Scope Q_scope.
@@ -108,17 +108,7 @@ Qed.
 
 Lemma rational_arctan_mid_pos_prf a : 0 < a → - (1) < (a - 1) / (a + 1) < 1.
 Proof.
- intros H.
- split.
-  apply Qlt_shift_div_l; auto with qarith.
-  rewrite Qmult_plus_distr_r.
-  apply Qplus_lt_l.
-  transitivity 0. 
-   now apply Qopp_Qlt_0_r.
-  easy.
- apply Qlt_shift_div_r; auto with qarith.
- rewrite Qmult_plus_distr_r, Qmult_1_l.
- now apply Qplus_lt_r.
+split;(try apply Qlt_shift_div_l; try apply Qlt_shift_div_r; psatzl Q).
 Qed.
 
 (** Because we have slow convergence near 1, we have another compuation
