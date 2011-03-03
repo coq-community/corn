@@ -73,6 +73,8 @@ Time Eval vm_compute in answer 1 (exp (compress (exp (compress (rational_exp 1))
 Time Eval vm_compute in answer 20 (CRsqrt (compress (rational_exp (1))*compress (CRinv_pos (3#1) CRpi)))%CR.
 (* sin((e+1)^3) *)
 Time Eval vm_compute in answer 20 (sin (compress (CRpower_positive 3 (translate (1#1) (compress (rational_exp (1)))))))%CR.
+(* sin(10^22) still takes too long, see http://www.derekroconnor.net/DAMQ/FPArithSlidesHO.pdf *)
+Time Eval vm_compute in answer 10 (rational_sin (10^14))%CR.
 (* exp (exp (exp (1/2))) *)
 Time Eval vm_compute in answer 10 (exp (compress (exp (compress (rational_exp (1#2))))))%CR.
 

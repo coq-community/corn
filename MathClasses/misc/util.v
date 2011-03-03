@@ -26,6 +26,7 @@ Proof.
  split; repeat intro; unfold sigT_equiv in *; try intuition.
  transitivity (projT1 y); intuition.
 Qed.
+  (* Todo: Remove these sigT instances, because sometimes we need equality of the second component as well. *)
 
 Definition iffT (A B: Type): Type := prod (A → B) (B → A).
 

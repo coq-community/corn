@@ -6,7 +6,8 @@ Require Import
  stdlib_omissions.Z
  stdlib_omissions.Q
  stdlib_omissions.N
- metric2.Classified.
+ metric2.Classified
+ util.Container.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
@@ -18,16 +19,6 @@ Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
 Hint Immediate ball_refl Qle_refl.
-
-(** A neat class for containment, taken from the hybrid systems project codebase. (Todo: Move elsewhere.) *)
-
-Class Container (Elem C: Type) := In: C → Elem → Prop.
-Hint Unfold In.
-
-Notation "x ∈ y" := (In y x) (at level 40).
-Notation "x ∉ y" := (In y x → False) (at level 40).
-Notation "(∈ y )" := (In y).
-
 
 (** Some missing theory about positive: *)
 
@@ -338,9 +329,6 @@ End implementable.
  we'll need to do (hopefully) in the implementation is show that it does indeed produce
  Riemann approximations, and we no longer have to show Bishop's properties. *)
 
-
-
-
 (** It should be fairly easy to prove that the implementation above
  is continuous in the function parameter: *)
 
@@ -370,26 +358,63 @@ Section continuity_in_f. (* with fixed range *)
 End continuity_in_f.
 
 
+(** Continuity in both range and function simultaneously is trickier. *)
 
-(** But most importantly, it should be possible to prove that it is continuous
- in /both/ parameters at the same time, if the functions are bounded: *)
+Section extend.
+
+  Context (T: Type) (P: T → Prop) `{∀ t, canonical_names.Decision (P t)} (f: sig P → CR).
+
+  Definition extend (t: T): CR :=
+    match canonical_names.decide (P t) with
+    | left H => f (exist _ _ H)
+    | right _ => ' 0
+    end.
+
+  Context `{te: canonical_names.Equiv T}.
+
+  Global Instance: Proper canonical_names.equiv extend.
+  Admitted.
+
+End extend.
 
 Section continuity_in_both.
 
-  Context (r: Range Q) (bound: Range CR).
+  Context (bound: Range CR).
 
-  (* We first wrap it in the right form: *)
+  Definition IntegrationInput := sigT (λ r: Range Q, UCFunction (sig (∈ r)) (sig (∈ bound))).
+    (* Hm, I think this probably needs an a-priori bound on r as well.. *)
 
-  Program Let raw: Range (sig (∈ r)) * UCFunction (sig (∈ r)) (sig (∈ bound)) → CR :=
-    λ p, integrate_ucFunc (fst (fst p), snd (fst p)) (λ x, snd p (` x)).
-
-  Next Obligation. Admitted. (* this is about nested ranges *)
-
-  Instance: UniformlyContinuous_mu raw.
+  Instance dec_in: ∀ (a: Range Q), (∀ t : Q, canonical_names.Decision ((∈ a) t)).
   Admitted.
 
-  Instance: UniformlyContinuous raw.
+  Program Definition metric: IntegrationInput → Range Q * @sig (Q → CR) (Proper canonical_names.equiv) :=
+   λ ab, (projT1 ab, (@extend Q (∈ projT1 ab) _ (@proj1_sig _ _ ∘ ucFun_itself (projT2 ab))%prg)).
+     (* should never actually run at runtime *)
+
+  Global Instance IntegrationInput_equiv: canonical_names.Equiv IntegrationInput := delegated_equiv _ metric.
+  Global Instance IntegrationInput_ball: MetricSpaceBall IntegrationInput := delegated_ball _ metric.
+  Global Instance IntegrationInput_mspc: MetricSpaceClass IntegrationInput.
+  Proof. apply (delegated_mspc _ metric). Qed.
+
+  Program Definition integrate_ucFunc_wrapped_for_continuity: IntegrationInput → CR :=
+    λ p, integrate_ucFunc (fst (projT1 p), snd (projT1 p)) (λ x, projT2 p (` x)).
+
+  Next Obligation.
+   intros.
+   destruct x.
+   simpl.
+   assumption.
+  Qed.
+
+  Global Instance integrate_ucFunc_wrapped_for_continuity_mu: UniformlyContinuous_mu integrate_ucFunc_wrapped_for_continuity.
   Admitted.
+
+  Global Instance integrate_ucFunc_wrapped_for_continuity_uc: UniformlyContinuous integrate_ucFunc_wrapped_for_continuity.
+  Proof.
+   constructor.
+     apply _.
+    apply _.
+   admit.
+  Qed.
 
 End continuity_in_both.
-

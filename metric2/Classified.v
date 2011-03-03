@@ -411,12 +411,12 @@ Class MetricSpaceComponents X `{Equiv X} `{MetricSpaceBall X}: Prop.
 
 Implicit Arguments mspc_ball [[X] [MetricSpaceBall]].
 
-
 Class Canonical (T: Type): Type := canonical: T.
   (* Todo: Move. *)
 
-Instance: Canonical (Qpos → Qinf) := Qinf.finite ∘ QposAsQ.
 Instance: ∀ {T: Type}, Canonical (T → T) := @Datatypes.id.
+
+Instance: Canonical (Qpos → Qinf) := Qinf.finite ∘ QposAsQ.
 
 Instance composed_Proper `{Equiv A} `{Equiv B} `{Equiv C} (f: B → C) (g: A → B):
   Proper (=) f → Proper (=) g → Proper (=) (f ∘ g).
@@ -499,16 +499,11 @@ End sig_metricspace.
 Instance Qpos_mspc_ball: MetricSpaceBall Qpos := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
 Instance Qpos_mspc: MetricSpaceClass Qpos := @sig_mspc Q_as_MetricSpace _ _ _ (Qlt 0).
 
-Instance: Canonical (QnnInf.T → Qinf) :=
+Instance: Coerce QnnInf.T Qinf :=
   λ x, match x with
     | QnnInf.Infinite => Qinf.infinite
     | QnnInf.Finite q => Qinf.finite q
     end.
-
-
-
-
-
 
 Section uniform_continuity.
 
@@ -672,7 +667,168 @@ Implicit Arguments UCFunction [[Xe] [Xb] [Yb] [Ye]].
 Implicit Arguments ucFunction [[X] [Xe] [Xb] [Y] [Yb] [Ye] [ucFun_mu] [ucFun_uc]].
 
 
-Section functions.
+Section delegated_mspc.
+
+  Context (X: Type) `{MetricSpaceClass Y} (xy: X → Y).
+
+  Instance delegated_ball: MetricSpaceBall X := λ e a b, mspc_ball e (xy a) (xy b).
+
+  Instance delegated_equiv: Equiv X := λ a b, xy a = xy b.
+
+  Instance delegated_mspc: MetricSpaceClass X.
+  Proof with intuition.
+   constructor.
+           admit.
+          repeat intro.
+          unfold mspc_ball, delegated_ball.
+          apply (mspc_ball_proper Y)...
+         intros.
+         unfold mspc_ball, delegated_ball.
+         apply (mspc_ball_inf Y).
+        repeat intro.
+        apply (mspc_ball_negative Y e H1 (xy x) (xy y))...
+       intros.
+       unfold mspc_ball, delegated_ball.
+       rewrite (mspc_ball_zero Y).
+       reflexivity.
+      unfold mspc_ball, delegated_ball.
+      repeat intro.
+      apply (mspc_refl Y e H1).
+     unfold mspc_ball, delegated_ball.
+     repeat intro.
+     apply (mspc_sym Y)...
+    unfold mspc_ball, delegated_ball.
+    intros e1 e2 a b c.
+    apply (mspc_triangle Y e1 e2).
+   unfold mspc_ball, delegated_ball.
+   intros.
+   apply (mspc_closed Y)...
+  Qed.
+
+End delegated_mspc.
+
+
+Section proper_functions.
+
+  (* Todo: This is bad. Make instances for (@sig (A → B) (Proper equiv)) instead and delegate to it for UCFunction. *)
+
+  Context `{Setoid A} `{MetricSpaceClass B}.
+
+  Let T := (@sig (A → B) (Proper equiv)).
+
+  Global Instance: Equiv T := λ x y, proj1_sig x = proj1_sig y.
+
+  Let hint' := mspc_setoid B.
+
+  Global Instance: Setoid T.
+  Proof with intuition.
+   constructor.
+     intros ????.
+     destruct x...
+    repeat intro. symmetry...
+   repeat intro.
+   transitivity (proj1_sig y x0)...
+  Qed.
+
+  Global Instance: MetricSpaceBall T := λ e f g, Qinf.le 0 e ∧ ∀ a, mspc_ball e (` f a) (` g a).
+    (* The 0<=e condition is needed because otherwise if A is empty, we cannot deduce
+     False from a premise of two functions being inside a negative ball of eachother.
+     If this turns out to be annoying, we can make a separate higher-priority metric space instance
+     for functions from a known-nonempty type (registered with a NonEmpty type class). *)
+
+  Global Instance ProperFunction_mspc: MetricSpaceClass T.
+  Proof with simpl; auto; try reflexivity.
+   constructor; try apply _.
+          split.
+           split.
+            rewrite <- H2.
+            apply H5.
+           intros.
+           rewrite <- H2.
+           rewrite <- (H3 a). 2: reflexivity.
+           rewrite <- (H4 a). 2: reflexivity.
+           apply H5...
+          split.
+           rewrite H2. apply H5.
+          intros.
+          rewrite H2.
+          rewrite (H3 a). 2: reflexivity.
+          rewrite (H4 a). 2: reflexivity.
+          apply H5.
+         split.
+          simpl.
+          auto.
+         intros.
+         apply (mspc_ball_inf B).
+        repeat intro.
+        unfold mspc_ball in H3.
+        destruct H3.
+        simpl in H3.
+        apply (Qlt_not_le e0 0)...
+       unfold mspc_ball.
+       unfold MetricSpaceBall_instance_2.
+       intros.
+       split.
+        repeat intro.
+        destruct H2.
+        destruct x.
+        simpl.
+        rewrite H3.
+        apply (mspc_ball_zero B)...
+       split.
+        simpl. auto with *.
+       intros.
+       apply (mspc_ball_zero B)...
+       apply H2.
+       reflexivity.
+      split. simpl. auto.
+      intros.
+      apply (mspc_refl B e0)...
+     split.
+      apply H2.
+     intros.
+     apply (mspc_sym B).
+     apply H2.
+    split.
+     apply Qinf.le_0_plus_compat.
+      apply H2.
+     apply H3.
+    intros.
+    apply (mspc_triangle B) with (proj1_sig b a0).
+     apply H2.
+    apply H3.
+   split.
+    destruct e0. 2: simpl; auto.
+    unfold mspc_ball in H2.
+    unfold MetricSpaceBall_instance_2 in H2.
+    destruct (Qdec_sign q) as [[|]|].
+      exfalso.
+      assert (0 < (1#2) * -q)%Q.
+       apply Qmult_lt_0_compat...
+       apply Qopp_Qlt_0_l...
+      destruct (H2 (exist _ _ H3)).
+      simpl in H4.
+      clear H3 H5.
+      ring_simplify in H4.
+      apply (Qlt_not_le q 0). auto.
+      setoid_replace q with ((1 # 2) * q + (1 # 2) * q)%Q by (simpl; ring).
+      apply Qplus_nonneg...
+     simpl. auto with *.
+    rewrite q0.
+    simpl.
+    apply Qle_refl.
+   intros.
+   apply (mspc_closed B).
+   intros.
+   apply H2.
+  Qed. (* Todo: This is awful. Clean it up once these blasted evar anomalies are under control. *)
+
+End proper_functions.
+
+
+Section uc_functions.
+
+  (* Todo: Just delegate to proper_functions. *)
 
   Context `{MetricSpaceClass A} `{MetricSpaceClass B}.
 
@@ -782,7 +938,7 @@ Section functions.
    apply H3.
   Qed. (* Todo: This is awful. Clean it up once these blasted evar anomalies are under control. *)
 
-End functions.
+End uc_functions.
 
 (** If source and target are /already/ bundled, then we don't need to rebundle them when bundling
  a uniformly continuous function: *)
@@ -879,6 +1035,24 @@ End const_uc.
 
 (** Mapping both of a pair's components by uniformly continuous functions
  is uniformly continuous: *)
+
+Section exist_uc.
+  Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y} (P: Y → Prop)
+    (f: X → Y) (g: ∀ x, P (f x)) `{!UniformlyContinuous_mu f} `{!UniformlyContinuous f}.
+
+  Global Instance exist_mu: UniformlyContinuous_mu (λ x: X, exist P (f x) (g x)) := { uc_mu := uc_mu f }.
+
+  Global Instance exist_uc: UniformlyContinuous (λ x: X, exist P (f x) (g x)).
+  Proof with auto.
+   constructor.
+     apply (uc_from f).
+    pose proof (uc_to f).
+    apply _.
+   intros.
+   apply (uniformlyContinuous f).
+   assumption.
+  Qed.
+End exist_uc.
 
 Section map_pair_uc.
   Context `{MetricSpaceComponents X} `{MetricSpaceComponents Y}
