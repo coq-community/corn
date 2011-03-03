@@ -27,6 +27,7 @@ Require Import CRarctan_small.
 Require Import MoreArcTan.
 Require Import CornTac.
 Require Import abstract_algebra.
+Require Import stdlib_omissions.Q.
 
 Set Implicit Arguments.
 
@@ -47,25 +48,17 @@ Pi is defined as
 *)
 Section Pi.
 
-Lemma small_per_57 : (0 <= (1#(57%positive)) <= 1)%Q.
-Proof.
- split; discriminate.
-Qed.
+Lemma small_per_57 : (0 <= (1#(57%positive)) < 1)%Q.
+Proof. split; easy. Qed.
 
-Lemma small_per_239 : (0 <= (1#(239%positive)) <= 1)%Q.
-Proof.
- split; discriminate.
-Qed.
+Lemma small_per_239 : (0 <= (1#(239%positive)) < 1)%Q.
+Proof. split; easy. Qed.
 
-Lemma small_per_682 : (0 <= (1#(682%positive)) <= 1)%Q.
-Proof.
- split; discriminate.
-Qed.
+Lemma small_per_682 : (0 <= (1#(682%positive)) < 1)%Q.
+Proof. split; easy. Qed.
 
-Lemma small_per_12943 : (0 <= (1#(12943%positive)) <= 1)%Q.
-Proof.
- split; discriminate.
-Qed.
+Lemma small_per_12943 : (0 <= (1#(12943%positive)) < 1)%Q.
+Proof. split; easy. Qed.
 
 Definition r_pi (r:Q) : CR :=
 ((scale (176%Z*r) (rational_arctan_small_pos small_per_57) +
@@ -274,8 +267,8 @@ Proof.
    ' 7%Z * rational_arctan_small_pos small_per_239 +
      (' (-(12)%Z) * rational_arctan_small_pos small_per_682 +
        ' 24%Z * rational_arctan_small_pos small_per_12943)))%CR.
-  ring.
- repeat (rewrite -> (rational_arctan_small_pos_correct); [|constructor]).
+  ring. 
+ repeat rewrite rational_arctan_small_pos_correct.
  repeat rewrite <- IR_inj_Q_as_CR.
  repeat (rewrite <- IR_mult_as_CR || rewrite <- IR_plus_as_CR).
  apply IRasCR_wd.

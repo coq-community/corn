@@ -29,6 +29,8 @@ Require Import MoreArcTan.
 Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import CornTac.
+Require Import stdlib_omissions.Q.
+Require Import abstract_algebra.
 
 Set Implicit Arguments.
 
@@ -41,128 +43,106 @@ Opaque inj_Q CR.
 Using pi and properties of arctangent, we define arctangent from 1 to
 infinity.
 *)
-Definition rational_arctan_big_pos (a:Q) (Ha:1 <= a) : CR.
-Proof.
- refine ((r_pi (1#2)) -(@rational_arctan_small_pos (/a) _))%CR.
+Program Definition rational_arctan_big_pos (a:Q) (Ha:1 < a) : CR := 
+  (r_pi (1#2) - @rational_arctan_small_pos (/a) _)%CR.
+Next Obligation.
  split.
-  abstract ( apply Qinv_le_0_compat; apply Qle_trans with 1; [discriminate|assumption]).
- abstract ( assert (H:0<a); [apply Qlt_le_trans with 1;[constructor|assumption]|];
-   apply: (mult_cancel_leEq _ (/a) 1 a);simpl;[assumption|]; (replace RHS with a by simpl; ring);
-     replace LHS with (1);[assumption|]; simpl; field; apply (Greater_imp_ap _ a 0); assumption).
-Defined.
+  apply Qinv_le_0_compat; apply Qle_trans with 1; auto with qarith.
+ change (/a < /1); apply Q.Qdiv_flip_lt; auto with qarith.
+Qed.
 
-Lemma rational_arctan_big_pos_correct : forall a (Ha: 1 <= a), 1 < a ->
+Lemma rational_arctan_big_pos_correct_aux (a : Q) :
+  0 < a → (r_pi (1 # 2) - IRasCR (ArcTan (inj_Q IR (/ a))))%CR = IRasCR (ArcTan (inj_Q IR a)).
+Proof.
+ intros Ha.
+ rewrite -> r_pi_correct.
+ assert (H1:(inj_Q IR a)[#]Zero).
+  stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+  apply inj_Q_ap.
+  apply (Greater_imp_ap _ a 0); assumption.
+ rewrite <- IR_minus_as_CR.
+ apply IRasCR_wd.
+ stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
+  assert (H2:Zero[<]inj_Q IR a).
+   stepl (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+   apply inj_Q_less; assumption.
+  unfold cg_minus.
+  csetoid_rewrite (ArcTan_recip _ H1 H2).
+  rational.
+ apply bin_op_wd_unfolded.
+  rstepl (((nring 1)[/]TwoNZ)[*]Pi).
+  apply mult_wdl.
+  change (1#2) with (1/2).
+  assert (H2:(inj_Q IR (2#1))[#]Zero).
+   stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+   apply inj_Q_ap; discriminate.
+  apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
+   apply div_wd.
+    apply eq_symmetric; apply (inj_Q_nring IR 1).
+   apply eq_symmetric; apply (inj_Q_nring IR 2).
+  apply eq_symmetric; apply inj_Q_div.
+ apply un_op_wd_unfolded.
+ apply ArcTan_wd.
+ apply eq_transitive with ((inj_Q IR 1)[/]_[//]H1).
+  apply div_wd.
+   rstepl (nring 1:IR).
+   apply eq_symmetric; apply (inj_Q_nring IR 1).
+  apply eq_reflexive.
+ eapply eq_transitive.
+  apply eq_symmetric; apply inj_Q_div.
+ apply inj_Q_wd.
+ simpl.
+ unfold Qdiv.
+ ring.
+Qed.
+
+Lemma rational_arctan_big_pos_correct : forall a (Ha: 1 < a),
  (rational_arctan_big_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
- intros a Ha H.
+ intros a Ha.
  unfold rational_arctan_big_pos.
- assert (H0:0<a); [apply Qlt_trans with 1;[constructor|assumption]|].
  rewrite -> rational_arctan_small_pos_correct.
-  rewrite -> r_pi_correct.
-  assert (H1:(inj_Q IR a)[#]Zero).
-   stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
-   apply inj_Q_ap.
-   apply (Greater_imp_ap _ a 0); assumption.
-  rewrite <- IR_minus_as_CR.
-  apply IRasCR_wd.
-  stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
-   assert (H2:Zero[<]inj_Q IR a).
-    stepl (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
-    apply inj_Q_less; assumption.
-   unfold cg_minus.
-   csetoid_rewrite (ArcTan_recip _ H1 H2).
-   rational.
-  apply bin_op_wd_unfolded.
-   rstepl (((nring 1)[/]TwoNZ)[*]Pi).
-   apply mult_wdl.
-   change (1#2) with (1/2).
-   assert (H2:(inj_Q IR (2#1))[#]Zero).
-    stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
-    apply inj_Q_ap; discriminate.
-   apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
-    apply div_wd.
-     apply eq_symmetric; apply (inj_Q_nring IR 1).
-    apply eq_symmetric; apply (inj_Q_nring IR 2).
-   apply eq_symmetric; apply inj_Q_div.
-  apply un_op_wd_unfolded.
-  apply ArcTan_wd.
-  apply eq_transitive with ((inj_Q IR 1)[/]_[//]H1).
-   apply div_wd.
-    rstepl (nring 1:IR).
-    apply eq_symmetric; apply (inj_Q_nring IR 1).
-   apply eq_reflexive.
-  eapply eq_transitive.
-   apply eq_symmetric; apply inj_Q_div.
-  apply inj_Q_wd.
-  simpl.
-  unfold Qdiv.
-  ring.
- apply: (mult_cancel_less _ (/a) 1 a);simpl. assumption.
-  ring_simplify.
- replace LHS with 1.
-  assumption.
- simpl. field.
- apply: (Greater_imp_ap _ a 0); assumption.
+ apply rational_arctan_big_pos_correct_aux.
+ now apply Qlt_trans with 1.
+Qed.
+
+Lemma rational_arctan_mid_pos_prf a : 0 < a → - (1) < (a - 1) / (a + 1) < 1.
+Proof.
+ intros H.
+ split.
+  apply Qlt_shift_div_l; auto with qarith.
+  rewrite Qmult_plus_distr_r.
+  apply Qplus_lt_l.
+  transitivity 0. 
+   now apply Qopp_Qlt_0_r.
+  easy.
+ apply Qlt_shift_div_r; auto with qarith.
+ rewrite Qmult_plus_distr_r, Qmult_1_l.
+ now apply Qplus_lt_r.
 Qed.
 
 (** Because we have slow convergence near 1, we have another compuation
 that works for nonnegative numbers, and is particularly fast near 1. *)
-Definition rational_arctan_mid_pos (a:Q) (Ha:0 <= a) : CR.
-Proof.
- revert a Ha.
- intros [n d] Ha.
- refine (r_pi (1#4) + (@rational_arctan_small ((n-d)%Z/(n+d)%Z) _))%CR.
- unfold Qle in Ha; simpl in Ha; rewrite -> Zmult_1_r in Ha; assert (H:~(n+d)%Z==0);[ intros H0;
-   apply (Zle_not_lt _ _ Ha); unfold Qeq in H0; simpl in H0; rewrite <- H0; apply Zlt_0_minus_lt;
-     ring_simplify; auto with *|]; change (-(1) <= ((inject_Z (n-d)%Z)[/]_[//]H) <= 1);
-       split; [apply: shift_leEq_div;simpl | apply: shift_div_leEq';simpl];try
-         (unfold Qlt; simpl; auto with * ); rewrite -> Qle_minus_iff;
-           try change (0 <= (n + d)%Z * 1  + (- (n - d))%Z); ring_simplify; unfold Qle; simpl;
-             ring_simplify; auto with *.
-Defined.
+Definition rational_arctan_mid_pos (a:Q) (Ha : 0 < a) : CR :=
+ (r_pi (1#4) + (rational_arctan_small (rational_arctan_mid_pos_prf Ha)))%CR.
 
-Lemma rational_arctan_mid_pos_correct : forall a (Ha: 0 <= a), 0 < a ->
- (rational_arctan_mid_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Lemma rational_arctan_mid_pos_correct_aux (a : Q) : 
+  0 < a → (r_pi (1#4) + IRasCR (ArcTan (inj_Q IR ((a - 1) / (a + 1)))))%CR = IRasCR (ArcTan (inj_Q IR a)).
 Proof.
- intros [[|n|n] d] Ha H; try solve [elim (Qlt_not_le _ _ H); unfold Qle; auto with *].
- unfold rational_arctan_mid_pos.
- assert (X:(n - d)%Z / (n + d)%Z < 1).
-  assert ((n-d) < (n+d))%Z.
-   apply Zlt_0_minus_lt.
-   ring_simplify.
-   auto with *.
-  generalize (n - d)%Z H0.
-  intros z Hz.
-  unfold Qlt.
-  simpl.
-  ring_simplify.
-  auto with *.
- assert (X0:- (1) < (n - d)%Z / (n + d)%Z).
-  assert ((d-n) < (n+d))%Z.
-   apply Zlt_0_minus_lt.
-   ring_simplify.
-   auto with *.
-  replace (n-d)%Z with (-(d-n))%Z by ring.
-  generalize (d - n)%Z H0.
-  intros z Hz.
-  unfold Qlt.
-  simpl.
-  change (Zneg (n+d))%Z with (-(n+d))%Z.
-  auto with *.
- rewrite -> rational_arctan_small_correct; try assumption.
- rewrite -> r_pi_correct.
- rewrite <- IR_plus_as_CR.
+ intros Ha.
+ rewrite r_pi_correct.
+ rewrite <-IR_plus_as_CR.
  apply IRasCR_wd.
- stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((n - d)%Z / (n + d)%Z))).
+ stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((a - 1) / (a + 1)))).
   csetoid_rewrite_rev (ArcTan_one).
-  set (y:= (inj_Q IR ((n - d)%Z / (n + d)%Z))).
+  set (y:= (inj_Q IR ((a - 1) / (a + 1)))).
   assert (Y:Zero[<]One[-]One[*]y).
    apply shift_zero_less_minus.
    rstepl y.
    rstepr (nring 1:IR).
    stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
    apply inj_Q_less.
-   assumption.
+   now apply rational_arctan_mid_pos_prf.
   apply eq_transitive with (ArcTan (One[+]y[/]_[//](Greater_imp_ap _ _ _ Y))).
    apply ArcTan_plus_ArcTan.
       apply shift_zero_leEq_minus'.
@@ -172,35 +152,31 @@ Proof.
     rstepl ([--](nring 1:IR)).
     stepl (inj_Q IR ([--](1))).
      apply inj_Q_leEq.
-     apply less_leEq; assumption.
+     apply less_leEq. now apply rational_arctan_mid_pos_prf.
     csetoid_rewrite_rev (inj_Q_nring IR 1).
     apply inj_Q_inv.
    rstepr (nring 1:IR).
    stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
    apply inj_Q_leEq.
-   apply less_leEq; assumption.
+   apply less_leEq. now apply rational_arctan_mid_pos_prf.
   apply ArcTan_wd.
   apply mult_cancel_lft with (One[-]One[*]y).
    apply Greater_imp_ap; assumption.
   rstepl (One[+]y).
-  rstepr (inj_Q IR (n # d)[-]y[*]inj_Q IR (n # d)).
+  rstepr (inj_Q IR a[-]y[*]inj_Q IR a).
   csetoid_replace (One:IR) (inj_Q IR 1).
    unfold y.
-   set (y' := ((n - d)%Z / (n + d)%Z)).
+   set (y' := ((a - 1) / (a + 1))).
    unfold cg_minus.
-   csetoid_rewrite_rev (inj_Q_mult IR y' (n#d)).
+   csetoid_rewrite_rev (inj_Q_mult IR y' a).
    eapply eq_transitive.
     apply eq_symmetric; apply inj_Q_plus.
-   apply eq_transitive with (inj_Q IR ((n # d)[+][--](y'[*](n # d))));[| apply inj_Q_minus].
+   apply eq_transitive with (inj_Q IR (a[+][--](y'[*]a)));[| apply inj_Q_minus].
    apply inj_Q_wd.
    simpl.
-   rewrite -> (Qmake_Qdiv n d).
-   unfold y'.
-   unfold Zminus.
-   repeat rewrite -> injz_plus.
-   change (inject_Z (- d)) with (- (inject_Z d)).
+   unfold y'. 
    field.
-   split; unfold Qeq; simpl; auto with *.
+   auto with qarith.
   rstepl (nring 1:IR).
   apply eq_symmetric; apply (inj_Q_nring IR 1).
  apply bin_op_wd_unfolded;[|apply eq_reflexive].
@@ -213,11 +189,20 @@ Proof.
  stepr (inj_Q IR (4*(1#4))).
   apply inj_Q_wd.
   simpl.
-  ring.
+  reflexivity.
  eapply eq_transitive.
   apply inj_Q_mult.
  apply mult_wdl.
  apply (inj_Q_nring IR 4).
+Qed.
+
+Lemma rational_arctan_mid_pos_correct : forall a (Ha: 0 < a),
+ (rational_arctan_mid_pos Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
+Proof.
+ intros.
+ unfold rational_arctan_mid_pos.
+ rewrite rational_arctan_small_correct.
+ now apply rational_arctan_mid_pos_correct_aux.
 Qed.
 
 (** We glue all of are different methods of computing arctangent into
@@ -228,12 +213,12 @@ Proof.
  destruct (Qle_total (2#5) a) as [A|A].
   destruct (Qle_total (5#2) a) as [B|_];  intros _.
    apply (@rational_arctan_big_pos a).
-   abstract (eapply Qle_trans;[|apply B];discriminate).
+   abstract (eapply Qlt_le_trans;[|apply B];auto with qarith).
   apply (@rational_arctan_mid_pos a).
-  abstract (eapply Qle_trans;[|apply A];discriminate).
+  abstract (eapply Qlt_le_trans;[|apply A];auto with qarith).
  intros H.
  apply (@rational_arctan_small_pos a).
- abstract ( split;[assumption| abstract (eapply Qle_trans;[apply A|discriminate])]).
+ abstract ( split;[assumption| eapply Qle_lt_trans;[apply A|auto with qarith]]).
 Defined.
 
 Lemma rational_arctan_pos_correct : forall a (Ha: 0 <= a),
@@ -244,11 +229,8 @@ Proof.
  destruct (Qle_total (2 # 5) a).
   destruct (Qle_total (5 # 2) a).
    apply rational_arctan_big_pos_correct.
-   apply Qlt_le_trans with (5#2); [constructor|assumption].
   apply rational_arctan_mid_pos_correct.
-  apply Qlt_le_trans with (2#5); [constructor|assumption].
  apply rational_arctan_small_pos_correct.
- apply Qle_lt_trans with (2#5); [assumption|constructor].
 Qed.
 
 (** By symmetry we get arctangent for all numbers. *)
@@ -265,16 +247,32 @@ Lemma rational_arctan_correct : forall (a:Q),
 Proof.
  intros a.
  unfold rational_arctan.
- destruct (Qle_total a 0); rewrite -> rational_arctan_pos_correct; try reflexivity.
- rewrite <- IR_opp_as_CR.
- apply IRasCR_wd.
- csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
- apply ArcTan_wd.
- eapply eq_transitive.
-  apply eq_symmetric; apply (inj_Q_inv IR (-a)).
- apply inj_Q_wd.
- simpl.
- ring.
+ destruct (Qle_total a 0); rewrite -> rational_arctan_pos_correct.
+  apply rational_arctan_small_correct_aux.
+ reflexivity.
+Qed.
+
+Lemma rational_arctan_opp (a : Q) :
+  (-rational_arctan (-a) = rational_arctan a)%CR.
+Proof.
+  do 2 rewrite rational_arctan_correct.
+  now apply rational_arctan_small_correct_aux.
+Qed.
+
+Lemma rational_arctan_half_pi (a : Q) :
+  0 < a → (r_pi (1 # 2) - rational_arctan (/ a) = rational_arctan a)%CR.
+Proof.
+  intros.
+  do 2 rewrite rational_arctan_correct.
+  now apply rational_arctan_big_pos_correct_aux.
+Qed.
+
+Lemma rational_arctan_fourth_pi (a : Q) :
+  0 < a → (r_pi (1 # 4) + rational_arctan ((a - 1) / (a + 1)) = rational_arctan a)%CR.
+Proof.
+  intros.
+  do 2 rewrite rational_arctan_correct.
+  now apply rational_arctan_mid_pos_correct_aux.
 Qed.
 
 (** Lift arctangent on the rationals to the reals. *)
@@ -344,3 +342,10 @@ Qed.
 (* begin hide *)
 Hint Rewrite arctan_Qarctan : CRfast_compute.
 (* end hide *)
+
+Instance: Proper ((=) ==> (=)) rational_arctan.
+Proof.
+  intros x1 x2 E.
+  rewrite <-2!arctan_Qarctan.
+  now rewrite E.
+Qed.

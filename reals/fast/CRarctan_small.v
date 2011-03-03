@@ -31,6 +31,7 @@ Require Import QMinMax.
 Require Import MoreArcTan.
 Require Import CornTac.
 Require Import abstract_algebra.
+Require Import stdlib_omissions.Q.
 
 Set Implicit Arguments.
 
@@ -65,7 +66,7 @@ Proof.
  reflexivity.
 Qed.
 
-Hypothesis Ha: 0 <= a <= 1.
+Hypothesis Ha: (0 <= a < 1).
 
 Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
@@ -76,7 +77,8 @@ Proof.
  replace RHS with ((1-a)*(1+a)) by simpl; ring.
  destruct Ha as [Ha0 Ha1].
  apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by simpl; ring];
-   rewrite <- Qle_minus_iff; try assumption.
+   rewrite <- Qle_minus_iff; try assumption. 
+  auto with qarith.
  apply Qle_trans with 0.
   discriminate.
  assumption.
@@ -97,15 +99,15 @@ Proof.
  unfold arctanSequence.
  apply mult_Streams_zl with (1#1)%Qpos.
   apply everyOther_zl.
- abstract (apply powers_help_nbz; try apply square_zero_one; assumption).
+ abstract (apply powers_help_nbz; [apply square_zero_one | destruct Ha; split; auto with qarith]).
 Defined.
 
 End ArcTanSeries.
 
-Definition rational_arctan_small_pos (a:Q) (p: 0 <= a <= 1) : CR :=
+Definition rational_arctan_small_pos (a:Q) (p: 0 <= a < 1) : CR :=
  @InfiniteAlternatingSum _ (arctanSequence_dnn p) (arctanSequence_zl p).
 
-Lemma rational_arctan_small_pos_wd (a1 a2 : Q) (p1 : 0 <= a1 <= 1) (p2 : 0 <= a2 <= 1) :
+Lemma rational_arctan_small_pos_wd (a1 a2 : Q) (p1 : 0 <= a1 < 1) (p2 : 0 <= a2 < 1) :
   a1 = a2 → rational_arctan_small_pos p1 = rational_arctan_small_pos p2.
 Proof.
   intros E. unfold rational_arctan_small_pos.
@@ -114,10 +116,10 @@ Proof.
   now rewrite E.
 Qed.
 
-Lemma rational_arctan_small_pos_correct : forall (a:Q) Ha, a < 1 ->
+Lemma rational_arctan_small_pos_correct : forall (a:Q) Ha,
  (@rational_arctan_small_pos a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
- intros a Ha Ha0.
+ intros a Ha.
  unfold rational_arctan_small_pos.
  rewrite -> InfiniteAlternatingSum_correct'.
  apply IRasCR_wd.
@@ -133,7 +135,7 @@ Proof.
   rstepr (nring 1:IR).
   stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
   apply inj_Q_less.
-  assumption.
+  easy.
  eapply eq_transitive_unfolded; [|apply (arctan_series (inj_Q IR a) (arctan_series_convergent_IR) X)].
  apply: series_sum_wd.
  intros n.
@@ -176,37 +178,38 @@ Proof.
 Qed.
 
 (** Extend the range to [[-1,1]] by symmetry. *)
-Definition rational_arctan_small (a:Q) (p: -(1) <= a <= 1) : CR.
+Definition rational_arctan_small (a:Q) (p: -(1) < a < 1) : CR.
 Proof.
  revert p.
  destruct (Qle_total a 0); intros Ha.
   refine (-(@rational_arctan_small_pos (-a)%Q _))%CR.
-  abstract ( split; [(replace RHS with (0+-a) by simpl; ring); rewrite <- Qle_minus_iff; assumption
-    |rewrite -> Qle_minus_iff; (replace RHS with (a + - - (1)) by simpl; ring); rewrite <- Qle_minus_iff;
+  abstract (split; [(replace RHS with (0+-a) by simpl; ring); rewrite <- Qle_minus_iff; assumption
+    |rewrite -> Qlt_minus_iff; (replace RHS with (a + - - (1)) by simpl; ring); rewrite <- Qlt_minus_iff;
       destruct Ha; assumption]).
  apply (@rational_arctan_small_pos a).
  abstract ( split;[|destruct Ha; assumption]; apply Qnot_lt_le; apply Qle_not_lt; assumption).
 Defined.
 
-Lemma rational_arctan_small_correct : forall (a:Q) Ha, -(1) < a -> a < 1 ->
+Lemma rational_arctan_small_correct_aux (a : Q) : 
+  (- IRasCR (ArcTan (inj_Q IR (- a)%Q)))%CR[=]IRasCR (ArcTan (inj_Q IR a)).
+Proof.
+ rewrite <- IR_opp_as_CR.
+ apply IRasCR_wd.
+ csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
+ apply ArcTan_wd.
+ eapply eq_transitive.
+  apply eq_symmetric; apply (inj_Q_inv IR (-a)).
+ apply inj_Q_wd.
+ simpl.
+ ring.
+Qed.
+
+Lemma rational_arctan_small_correct : forall (a:Q) Ha,
  (@rational_arctan_small a Ha == IRasCR (ArcTan (inj_Q IR a)))%CR.
 Proof.
- intros a Ha Ha0 Ha1.
+ intros a Ha.
  unfold rational_arctan_small.
  destruct (Qle_total a 0); rewrite -> rational_arctan_small_pos_correct.
-    rewrite <- IR_opp_as_CR.
-    apply IRasCR_wd.
-    csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
-    apply ArcTan_wd.
-    eapply eq_transitive.
-     apply eq_symmetric; apply (inj_Q_inv IR (-a)).
-    apply inj_Q_wd.
-    simpl.
-    ring.
-   rewrite -> Qlt_minus_iff.
-   replace RHS with (a + - - (1)) by simpl; ring.
-   rewrite <- Qlt_minus_iff.
-   assumption.
-  reflexivity.
- assumption.
+  apply rational_arctan_small_correct_aux.
+ reflexivity.
 Qed.
