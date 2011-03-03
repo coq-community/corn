@@ -1,10 +1,10 @@
-Require Import ARDyadics CRArith ARexp ARpi.
+Require Import ARDyadics CRArith ARexp ARpi ARarctan.
 
 Definition answer (n:positive) (r : CR) : Z :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
  Zdiv a b.
-
+(*
 Let ARtest : CR := ARtoCR (2 * ARexp (ARexp (AQexp (1 : fastD)))).
 Time Eval vm_compute in (answer 200 ARtest).
 
@@ -16,6 +16,11 @@ Time Eval vm_compute in (answer 1500 ARtest3).
 
 Let ARtest4 : CR := ARtoCR (ARexp ARpi - ARpi : fastAR).
 Time Eval vm_compute in (answer 350 ARtest4).
+*)
+
+Timeout 3 Let ARtest5 : CR := ARtoCR (ARarctan (ARcompress (ARpi : fastAR))).
+(* (ARcompress (AQexp (1 : fastD)))). *)
+Timeout 10 Time Eval vm_compute in (answer 10 ARtest5).
 
 (*
 

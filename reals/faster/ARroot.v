@@ -119,10 +119,9 @@ Proof with auto.
   apply semirings.plus_compat.
    rewrite commutativity.
    reflexivity.
-  apply ->rings.flip_opp.
+  apply rings.flip_opp.
   apply semirings.precedes_2_4.
 Qed.
-
 
 Definition AQroot_mid_bounded_raw (n : N) : AQ_as_MetricSpace := snd (AQroot_loop ('n)) ≪ -('n + 1 : Z).
 
@@ -155,7 +154,7 @@ Proof.
   rewrite preserves_nat_pow, rings.preserves_2.
   rewrite int_pow_opp, int_pow_nat_pow, preserves_nat_pow_exp.
   apply fields.dec_mult_inverse.
-  apply (_ : PropHolds (2 ^ z ≠ 0)).
+  apply _.
 Qed.
 
 Lemma AQroot_mid_bounded_regular_aux2 (n m : N) :
