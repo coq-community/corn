@@ -16,6 +16,15 @@ Section contents.
 
   Notation QPoint := (Q * CR)%type.
   Notation CRPoint := (CR * CR)%type.
+  Local Notation Σ := cm_Sum.
+Require Import Qabs.
+  Section inner_space.
+(* Need vector space, norm, inner product, metric from norm, Lipschitz continuity from boundedness *)
+  Definition norm `(x: Vector.t Q n):=Σ (map Qabs x).
+  
+  Definition inner (n:nat)(x y : Vector.t Q n):=Σ(map (λ p, Qmult (fst p) (snd p)) (zip x y)).
+  
+  End Hilbert_space.
 
   Section divdiff_as_repeated_integral.
 
@@ -40,16 +49,21 @@ Section contents.
     Notation SomeWeights n := (sig (λ ts: Vector.t Q n, totalweight ts <= 1)%Q).
 
     (** apply_weights: *)
-
+    (** Note that this an innerproduct *)
+    (** |<points,w>|≤|points| |w|
+         |<points,w>-<points,v>|=|<points,w-v>| ≤||points|| ||w-v||
+       , the function is Lipshitz  with constant norm ||points||*)
     Definition apply_weights (w: Vector.t Q (S n)): Q :=
       cm_Sum (map (λ p, Qmult (fst p) (snd p)) (zip points (Vector.to_list w))).
 
     Instance apply_weights_mu: UniformlyContinuous_mu apply_weights.
-    Admitted.
+    constructor. exact (fun x => x).
+    Defined.
 
     Instance apply_weights_uc: UniformlyContinuous apply_weights.
-    Admitted.
-
+    constructor; try apply _.
+    intros ??? H.
+    Check apply_weights. 
     Obligation Tactic := idtac.
 
     (** "inner", the function of n weights: *)
