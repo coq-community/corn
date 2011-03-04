@@ -75,6 +75,8 @@ End PlotPath.
 
 Section PlotCirclePath.
 Require Import CRtrans.
+Require Import Vector.
+Export Vector.VectorNotations.
 
 Definition CircleFunction_aux:=(together cos_uc sin_uc).
 
@@ -88,14 +90,16 @@ Notation star := (@refl_equal _ Lt).
 Notation "∗" := star.
 Local Open Scope raster.
 
-Notation "#  a b" := (Vcons (vector bool _) a _ b)
+Notation "'Vcons'" := Vector.cons.
+Notation "'Vnil'" := Vector.nil.
+Notation "#  a b" := (Vcons (Vector.t bool _) a _ b)
   (at level 0, a, b at level 0) : raster.
 
-Notation "'#' a" := (Vcons (vector bool _) a _ (Vnil _))
+Notation "'#' a" := (Vcons (Vector.t bool _) a _ (Vnil _))
   (at level 0, a, b at level 0) : raster.
 
 Notation "0 # a" := (Vcons bool true _ a) (at level 0, right associativity) : raster.
-Notation " # " := (@Vnil bool) (at level 0, right associativity) : raster.
+Notation " # " := (Vnil bool) (at level 0, right associativity) : raster.
 Notation "1 # a" := (Vcons bool false _ a) (at level 0, right associativity) : raster.
 (*
 Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
@@ -103,8 +107,10 @@ Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, onl
 
 Definition Circle:=Eval vm_compute in  (PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 40 40 CirclePath).
 Add ML Path "dump".
+(* Needs fixing:
 Declare ML Module "dump".
 Dump Circle.
+*)
 (* Now have a look at plot.pgm *)
 End PlotCirclePath.
 
