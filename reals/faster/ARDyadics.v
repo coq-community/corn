@@ -12,9 +12,9 @@ Definition fastZtoQ : fastZ → Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
 Instance fastDtoQ: Coerce fastD Q_as_MetricSpace := DtoQ fastZtoQ.
 
 Program Instance fastD_compress : AppCompress fastD := λ x k,
-  let s := BigZ.of_Z k - expo x
+  let s := (BigZ.of_Z k - 1) - expo x
   in if decide_rel (≤) 0 s
-  then (mant x ≫ exist _ s _) $ BigZ.of_Z k
+  then (mant x ≫ exist _ s _) $ (BigZ.of_Z k - 1)
   else x.
 
 Instance: Proper ((=) ==> (=) ==> (=)) fastD_compress.
@@ -52,10 +52,10 @@ Proof.
 Qed.
 
 Program Instance fastD_div : AppDiv fastD := λ x y k,
-  let s := -BigZ.of_Z k + expo x - expo y
+  let s := -(BigZ.of_Z k - 1) + expo x - expo y
   in if decide_rel (≤) 0 s 
-  then (mant x ≪ exist _ s _) `div` (mant y) $ BigZ.of_Z k
-  else (mant x ≫ exist _ (-s) _) `div` (mant y) $ BigZ.of_Z k.
+  then (mant x ≪ exist _ s _) `div` (mant y) $ (BigZ.of_Z k - 1)
+  else (mant x ≫ exist _ (-s) _) `div` (mant y) $ (BigZ.of_Z k - 1).
 Next Obligation.
   apply rings.flip_nonpos_opp.
   now apply orders.precedes_flip. 
