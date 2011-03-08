@@ -107,10 +107,8 @@ Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, onl
 
 Definition Circle:=Eval vm_compute in  (PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 40 40 CirclePath).
 Add ML Path "dump".
-(* Needs fixing:
 Declare ML Module "dump".
 Dump Circle.
-*)
 (* Now have a look at plot.pgm *)
 End PlotCirclePath.
 
