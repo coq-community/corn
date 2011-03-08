@@ -19,6 +19,12 @@ coqidescript
 deps.dot
 deps.pdf
 *.crashcoqide
-dump
+*.cmi
+*.cmo
+*.cmx
+*.cmxs
+*.byte
+*.ml.d
+*.o
 plot.pgm
 coqdoc
