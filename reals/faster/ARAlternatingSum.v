@@ -92,7 +92,7 @@ Proof.
     intros n. 
     setoid_replace n with (1 + (n - 1)) using relation (@equiv Z _) at 1 by ring.
     rewrite int_pow_S.
-     now rewrite rings.plus_mul_distribute_r, left_identity.
+     now rewrite rings.plus_mul_distr_r, left_identity.
     apply (rings.ne_0 (2:Q)).
    posed_rewrite (G k).
    apply_simplified (semirings.plus_compat (R:=Q)); [| reflexivity].
@@ -102,7 +102,7 @@ Proof.
      now apply semirings.precedes_1_2.
     rewrite <-associativity.
     apply (order_preserving (k +)).
-    rewrite <-rings.plus_opp_distr.
+    rewrite <-rings.opp_distr.
     apply rings.flip_opp.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.

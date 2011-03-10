@@ -1106,7 +1106,7 @@ Proof.
   induction i.
    unfold pi_seq.
    rewrite -> Cos_zero.
-   setoid_replace (Zero [+] One:IR) with (One:IR);[|rational].
+   setoid_replace (Zero [+] One:IR) with (One:IR) using relation (@st_eq IR); [|rational].
    apply eq_imp_leEq.
    reflexivity.
   apply leEq_transitive with (pi_seq (S (S i))).

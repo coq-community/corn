@@ -182,6 +182,7 @@ Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 *** Equality
 *)
 Definition QposEq (a b:Qpos) := Qeq a b.
+Instance Qpos_default : @DefaultRelation Qpos QposEq | 2.
 
 Add Relation Qpos QposEq
  reflexivity proved by (fun (x:Qpos) => Qeq_refl x)
@@ -298,12 +299,12 @@ These tactics solve Ring and Field equations over [Qpos] by converting
 them to problems over [Q].
 *)
 Ltac QposRing :=
- unfold QposEq;
+ unfold canonical_names.equiv, QposEq;
  autorewrite with QposElim;
  ring.
 
 Ltac QposField :=
- unfold QposEq;
+ unfold canonical_names.equiv, QposEq;
  autorewrite with QposElim;
  field.
 

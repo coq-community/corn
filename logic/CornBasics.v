@@ -74,7 +74,7 @@ Global Set Automatic Coercions Import.
 
 Global Set Automatic Introduction.
 
-Instance: @DefaultRelation nat eq | 3.
+Instance: @DefaultRelation nat eq | 2.
 
 (**
 * Basics

@@ -63,6 +63,8 @@ b,n\rangle$#&lang;a,m&rang;=&lang;b,n&rang;# iff [an [=] bm]. We
 also define apartness, order, addition, multiplication, opposite,
 inverse an de constants 0 and 1.  *)
 
+Instance Q_default : @DefaultRelation Q Qeq | 2.
+
 Definition Qap (x y : Q) := ~(Qeq x y).
 Infix "/=" := Qap (no associativity, at level 70) : Q_scope.
 

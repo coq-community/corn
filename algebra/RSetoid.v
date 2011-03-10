@@ -35,10 +35,13 @@ Require Import abstract_algebra.
 *)
 
 Structure RSetoid: Type :=
-{ st_car:>Type;
-  st_eq:st_car-> st_car ->Prop;
-  st_isSetoid: Equivalence st_eq
+{ st_car :> Type;
+  st_eq : Equiv st_car ;
+  st_isSetoid : Setoid st_car
 }.
+
+Hint Extern 10 (Equiv _) => apply @st_eq : typeclass_instances.
+Hint Extern 10 (Setoid _) => apply @st_isSetoid  : typeclass_instances.
 
 Implicit Arguments st_eq [r].
 
@@ -47,14 +50,6 @@ Implicit Arguments mcSetoid_as_RSetoid [[e] [setoid]].
 
 (* Canonical Structure mcSetoid_as_RSetoid. *)
 (* If we make this a canonical structure StepQsec will break: investigate *)
-
-Section rsetoid_is_setoid.
-  Context {X : RSetoid}.
-
-  Global Instance rsetoid_equiv : Equiv X | 10 := @st_eq _.
-
-  Global Instance: Setoid X | 10. apply st_isSetoid. Qed.
-End rsetoid_is_setoid.
 
 (** Propositions form a setoid under iff *)
 Definition iffSetoid : RSetoid.
