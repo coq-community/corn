@@ -34,6 +34,7 @@ End cancellation.
 
 Section semiring_props.
   Context `{SemiRing R}.
+  Add Ring SR: (stdlib_semiring_theory R).
 
   Global Instance mult_ne_zero `{NoZeroDivisors R} x y : PropHolds (x ≠ 0) → PropHolds (y ≠ 0) → PropHolds (x * y ≠ 0).
   Proof.
@@ -47,8 +48,13 @@ Section semiring_props.
   Global Instance mult_1_l: LeftIdentity (.*.) 1 := left_identity.
   Global Instance mult_1_r: RightIdentity (.*.) 1 := right_identity.
 
+  Global Instance mult_0_l: LeftAbsorb (.*.) 0 := left_absorb.
+
   Global Instance mult_0_r: RightAbsorb (.*.) 0.
-  Proof. intro. rewrite commutativity. apply left_absorb. Qed.
+  Proof. intro. ring. Qed.
+
+  Lemma plus_mul_distr_r x y z: (x + y) * z = x * z + y * z. Proof. ring. Qed.
+  Lemma plus_mul_distr_l x y z: x * (y + z) = x * y + x * z. Proof. ring. Qed.  
 
   Global Instance: ∀ r : R, @Monoid_Morphism R R _ _ (0:R) (0:R) (+) (+) (r *.).
   Proof.
@@ -131,16 +137,14 @@ Section ring_props.
   Lemma opp_involutive x: - -x = x. Proof. ring. Qed.
   Lemma plus_opp_r x: x + -x = 0. Proof. ring. Qed.
   Lemma plus_opp_l x: -x + x = 0. Proof. ring. Qed.
-  Lemma plus_mul_distribute_r x y z: (x + y) * z = x * z + y * z. Proof. ring. Qed.
-  Lemma plus_mul_distribute_l x y z: x * (y + z) = x * y + x * z. Proof. ring. Qed.
-  Lemma opp_swap x y: x + - y = - (y + - x). Proof. ring. Qed.
-  Lemma plus_opp_distr x y: - (x + y) = - x + - y. Proof. ring. Qed.
+  Lemma opp_swap_r x y: x + - y = - (y - x). Proof. ring. Qed.
+  Lemma opp_swap_l x y: -x + y = - (x - y). Proof. ring. Qed.
+  Lemma opp_distr x y: - (x + y) = - x + - y. Proof. ring. Qed.
   Lemma opp_mult a: -a = -1 * a. Proof. ring. Qed.
-  Lemma distr_opp_mult_l a b: -(a * b) = -a * b. Proof. ring. Qed.
-  Lemma distr_opp_mult_r a b: -(a * b) = a * -b. Proof. ring. Qed.
+  Lemma opp_mult_distr_l a b: -(a * b) = -a * b. Proof. ring. Qed.
+  Lemma opp_mult_distr_r a b: -(a * b) = a * -b. Proof. ring. Qed.
   Lemma opp_mult_opp a b: -a * -b = a * b. Proof. ring. Qed.
   Lemma opp_0: -0 = 0. Proof. ring. Qed.
-  Lemma distr_opp a b: -(a+b) = -a+-b. Proof. ring. Qed.
 
   Lemma equal_by_zero_sum x y : x + - y = 0 ↔ x = y.
   Proof. 
@@ -162,8 +166,8 @@ Section ring_props.
   Lemma opp_zero_prod_l x y : -x * y = 0 ↔ x * y = 0.
   Proof.
     split; intros E.
-     apply (injective (-)). now rewrite distr_opp_mult_l, opp_0.
-    apply (injective (-)). now rewrite distr_opp_mult_l, opp_involutive, opp_0.
+     apply (injective (-)). now rewrite opp_mult_distr_l, opp_0.
+    apply (injective (-)). now rewrite opp_mult_distr_l, opp_involutive, opp_0.
   Qed.
 
   Lemma opp_zero_prod_r x y : x * -y = 0 ↔ x * y = 0.

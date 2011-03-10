@@ -75,6 +75,7 @@ Proof. now repeat intro. Qed.
 
 Ltac solve_propholds := 
   match goal with
+  | [ |- PropHolds (?P) ] => apply _
   | [ |- ?P ] => change (PropHolds P); apply _
   end.
 
