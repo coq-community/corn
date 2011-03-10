@@ -24,9 +24,7 @@ Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ
   aq_order_embed :> OrderEmbedding AQtoQ ;
   aq_ring_morphism :> SemiRing_Morphism AQtoQ ;
   aq_dense_embedding :> DenseEmbedding AQtoQ ;
-  aq_div_proper :> Proper ((=) ==> (=) ==> (=) ==> (=)) app_div ;
   aq_div : ∀ x y k, ball (2 ^ k) ('app_div x y k) ('x / 'y) ;
-  aq_compress_proper :> Proper ((=) ==> (=) ==> (=)) app_compress ;
   aq_compress : ∀ x k, ball (2 ^ k) ('app_compress x k) ('x) ;
   aq_shift :> ShiftLSpec AQ Z (≪) ;
   aq_nat_pow :> NatPowSpec AQ N (^) ;

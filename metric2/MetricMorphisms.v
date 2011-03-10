@@ -57,7 +57,6 @@ Implicit Arguments app_inverse [[X] [Y] [AppInverse]].
 Class DenseEmbedding `{Equiv X} {Y : MetricSpace} (f : X → Y) `{!AppInverse f} := {
   dense_embed_setoid : Setoid X ;
   dense_injective :> Injective f ;
-  dense_inverse_proper :> Proper ((=) ==> QposEq ==> (=)) (app_inverse f) ;
   dense_inverse : ∀ x ε, ball ε (f (app_inverse f x ε)) x
 }.
 
