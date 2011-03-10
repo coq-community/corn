@@ -98,6 +98,7 @@ Extract Inlined Constant Qcompare => "compare".
 Extract Inlined Constant inject_Z => "fromInteger".
 Extract Inlined Constant Qeq_dec => "(==)".
 
+(*
 Definition answer (n:positive) (r:CR) : Z :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
@@ -106,3 +107,4 @@ Definition answer (n:positive) (r:CR) : Z :=
 Definition test := answer 10 (exp ('1))%CR.
 
 Recursive Extraction test.
+*)
