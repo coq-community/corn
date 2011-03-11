@@ -15,7 +15,7 @@ open Namegen
 open Recordops
 open Tacmach
 open Coqlib
-open Rawterm
+open Glob_term
 open Util
 open Evd
 open Extend

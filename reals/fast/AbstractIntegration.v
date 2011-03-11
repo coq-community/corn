@@ -266,9 +266,8 @@ Section integral_interface.
      on continuity. *)
 
     Context `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
-
     Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
-      (w <= @luc_mu Q CR f _ a ww e)%QnnInf ->
+      (w <= @luc_mu Q _ CR f _ a ww e)%QnnInf ->
       gball ww a a' ->
       gball_ex (w * e)%QnnInf (' w * f a') (∫ f a' w).
     Proof with auto.
