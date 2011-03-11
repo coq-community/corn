@@ -51,7 +51,7 @@ Proof.
   split.
    apply (order_preserving_back (2 *.)).
    rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
-   now rewrite <-rings.distr_opp_mult_r.
+   now rewrite <-rings.opp_mult_distr_r.
   apply (order_preserving_back (2 *.)).
   rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
   now rewrite right_absorb.

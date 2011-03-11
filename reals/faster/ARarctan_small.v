@@ -115,10 +115,10 @@ Proof.
    apply AQarctan_small_pos_correct.
   rewrite rings.preserves_opp.
   rewrite AQarctan_small_pos_correct.
-  setoid_replace ('(-num) / 'den) with (-('num / 'den)) using relation (@equiv Q _).
+  ms_setoid_replace ('(-num) / 'den) with (-('num / 'den)).
    apply rational_arctan_opp.
   rewrite rings.preserves_opp.
-  now rewrite <-rings.distr_opp_mult_l.
+  now rewrite <-rings.opp_mult_distr_l.
 Qed.
 End arctan_small.
 End ARarctan_small.

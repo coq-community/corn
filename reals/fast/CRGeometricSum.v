@@ -611,7 +611,7 @@ Proof.
  destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
   stepr ('0)%CR.
    split; simpl; rewrite -> Hq; try apply CRle_refl.
-   setoid_replace (-'0)%CR with ('0)%CR using relation (@st_eq CR) by (simpl; ring).
+   setoid_replace (-'0)%CR with ('0)%CR by (simpl; ring).
    apply CRle_refl.
   apply: regFunEq_e.
   intros e.

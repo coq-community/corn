@@ -26,8 +26,6 @@ Require Import CRcorrect.
 Require Import Qmetric.
 Require Import CornTac.
 
-Set Automatic Introduction.
-
 Opaque CR.
 
 Open Local Scope uc_scope.

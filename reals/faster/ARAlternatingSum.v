@@ -90,7 +90,7 @@ Proof.
    simpl.
    assert (∀ n : Z, (2:Q) ^ n = 2 ^ (n - 1) + 2 ^ (n - 1)) as G. 
     intros n. 
-    setoid_replace n with (1 + (n - 1)) using relation (@equiv Z _) at 1 by ring.
+    ms_setoid_replace n with (1 + (n - 1)) at 1 by ring.
     rewrite int_pow_S.
      now rewrite rings.plus_mul_distr_r, left_identity.
     apply (rings.ne_0 (2:Q)).
@@ -203,8 +203,7 @@ Proof.
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.ne_0 (2:Q))].
    apply (order_preserving_back ((2:Q) ^ Z.log2_up l' *.)).
-   setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l'))))
-     with (2 ^ k * (l':Q)) using relation (@equiv Q _).
+   ms_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
     rewrite (commutativity _ ((2:Q) ^ k)).
     apply (order_preserving (2 ^ k *.)).
     replace (2:Q) with (inject_Z 2) by reflexivity.

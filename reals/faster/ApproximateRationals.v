@@ -48,31 +48,27 @@ Lemma Qdlog2_half (x : Qpos) :
 Proof with auto.
   setoid_rewrite commutativity at 2.
   change (Qdlog2 x - 1 = Qdlog2 (x / 2)).
-  pose proof semirings.sprecedes_1_2.
-  pose proof semirings.precedes_1_2.
-  pose proof (rings.ne_0 (2:Q)).
-  assert (PropHolds (0 ≤ /2)). apply nonneg_dec_mult_inv_compat...
-    assert (PropHolds (0 < /2)). apply pos_dec_mult_inv_compat, semirings.sprecedes_0_2.
   assert (0 < x / 2)%Q.
    apply stdlib_rationals.Qlt_coincides.
-   apply_simplified (semirings.pos_mult_scompat (R:=Q))...
+   apply_simplified (semirings.pos_mult_scompat (R:=Q)).
     apply stdlib_rationals.Qlt_coincides...
+   solve_propholds.
   apply (antisymmetry (≤)).
    apply integers.precedes_sprecedes.
-   apply int_pow_exp_sprecedes_back with 2...
-   rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
+   apply int_pow_exp_sprecedes_back with 2; [ apply semirings.sprecedes_1_2 |].
+   rewrite int_pow_exp_plus, int_pow_opp, int_pow_1 by solve_propholds.
    apply sprecedes_trans_r with ((x : Q) / 2).
     apply_simplified (order_preserving (.* / 2)).
     apply Qdlog2_spec...
    setoid_rewrite Z.add_1_r.
    apply stdlib_rationals.Qlt_coincides.
-   apply Qdlog2_spec...
+   now apply Qdlog2_spec.
   apply integers.precedes_sprecedes.
-  apply int_pow_exp_sprecedes_back with 2...
+  apply int_pow_exp_sprecedes_back with 2; [ apply semirings.sprecedes_1_2 |].
   apply sprecedes_trans_r with ((x : Q) / 2).
    apply Qdlog2_spec...
   rewrite <-associativity. rewrite (commutativity (-1) 1), associativity.
-  rewrite int_pow_exp_plus... rewrite int_pow_opp, int_pow_1.
+  rewrite int_pow_exp_plus, int_pow_opp, int_pow_1 by solve_propholds.
   apply_simplified (strictly_order_preserving (.* / 2)).
   apply stdlib_rationals.Qlt_coincides.
   apply Qdlog2_spec...
@@ -189,13 +185,13 @@ Section approximate_rationals_more.
      replace LHS with ((1 # 2) * (x + y) - ((1 # 3) * γ)%Qpos)%Q...
       autorewrite with QposElim.
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. simpl. unfold Q_eq. ring.
+     rewrite Eγ. simpl. ring.
     apply Qle_lt_trans with (y - (1#6) * γ)%Q.
      replace RHS with ((1 # 2) * (x + y) + ((1 # 3) * γ)%Qpos)%Q...
       autorewrite with QposElim. 
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. simpl. unfold Q_eq. ring.
-    setoid_replace y with (y - 0)%Q at 2 by (unfold Q_eq; ring).
+     rewrite Eγ. simpl. ring.
+    setoid_replace y with (y - 0)%Q at 2 by ring.
     apply Qplus_lt_r. 
     apply Qopp_Qlt_0_r...
   Defined.

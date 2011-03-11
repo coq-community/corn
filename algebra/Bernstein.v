@@ -118,12 +118,12 @@ Proof.
   do 2 rewrite -> mult_distr_sum0_lft.
   rewrite -> Sumx_to_Sum in IHn; auto with *.
    setoid_replace (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A))
-     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero) by ring.
+     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero) using relation (@st_eq (cpoly_cring R)) by ring.
    change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero)
      with (Sum 0 (S n) (part_tot_nat_fun (cpoly_cring R) (S n) A)).
    set (C:=(fun i : nat => match i with | 0 => (Zero : cpoly_cring R)
      | S i' => part_tot_nat_fun (cpoly_cring R) (S n) A i' end)).
-   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero) by ring.
+   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero) using relation (@st_eq (cpoly_cring R)) by ring.
    change (Sum0 (S (S n)) C[-]Zero) with (Sum 0 (S n) C).
    rewrite -> Sum_last.
    rewrite -> IHn.

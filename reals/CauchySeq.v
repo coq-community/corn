@@ -54,6 +54,8 @@ Proof. exact Cauchy_IR.Cauchy_IR. Qed.
   (* Defining IR directly with := and then setting [Global Opaque] keeps it semi-transparent, so
    we really need [Qed] to get full opacity. *)
 
+Instance IR_default : @DefaultRelation IR (@st_eq IR) | 2.
+
 Notation PartIR := (PartFunct IR).
 Notation ProjIR1 := (prj1 IR _ _ _).
 Notation ProjIR2 := (prj2 IR _ _ _).

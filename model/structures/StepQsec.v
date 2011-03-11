@@ -81,6 +81,7 @@ Defined.
 End QS.
 
 Notation "'StepQ'" := (StepF QS) : StepQ_scope.
+Instance StepQ_default : @DefaultRelation (StepF QS) (@StepF_eq QS) | 2.
 
 Delimit Scope StepQ_scope with SQ.
 Bind Scope StepQ_scope with StepF.

@@ -19,7 +19,7 @@ Proof.
   rewrite ARtoCR_preserves_AQpi.
   rewrite Zshift_opp_1, rings.preserves_1.
   rewrite AQarctan_small_pos_correct.
-  setoid_replace ('1 / 'a : Q) with (/ 'a) using relation (@equiv Q _).
+  ms_setoid_replace ('1 / 'a : Q) with (/'a).
    apply rational_arctan_half_pi.
    apply stdlib_rationals.Qlt_coincides.
    transitivity (1:Q).
@@ -32,7 +32,7 @@ Program Definition AQarctan_mid_pos {a : AQ} (Ha : 0 < a) : AR :=
   AQpi (1 ≪ (-2)) + AQarctan_small (num:=a - 1) (den:=a + 1) _.
 Next Obligation.
   split.
-   rewrite rings.plus_opp_distr.
+   rewrite rings.opp_distr.
    apply (strictly_order_preserving (+ _)).
    now apply rings.between_pos.
   apply (strictly_order_preserving (_ +)).
@@ -48,7 +48,7 @@ Proof.
   rewrite ARtoCR_preserves_AQpi.
   rewrite AQarctan_small_correct.
   rewrite Zshift_opp_2, rings.preserves_1.
-  setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1)) using relation (@equiv Q _).
+  ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1)).
    apply rational_arctan_fourth_pi.
    apply stdlib_rationals.Qlt_coincides.
    now apply semirings.preserves_pos.
@@ -97,7 +97,7 @@ Proof.
   unfold AQarctan_pos.
   case (decide_rel _); intros.
    rewrite AQarctan_small_pos_correct.
-   setoid_replace ('a / '1 : Q) with ('a) using relation (@equiv Q _).
+   ms_setoid_replace ('a / '1 : Q) with ('a).
     reflexivity.
    rewrite rings.preserves_1.
    rewrite fields.dec_mult_inv_1.

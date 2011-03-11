@@ -24,6 +24,8 @@ Require Export CRmetric.
 Require Export CSetoids.
 Require Import CornTac.
 
+Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2.
+
 (**
 ** Example of a setoid: [CR]
 *** [CR]

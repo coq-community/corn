@@ -144,11 +144,11 @@ Proof.
    apply rings.nonneg_minus_compat. apply semirings.precedes_0_4. reflexivity.
   apply orders.equiv_precedes.
   rewrite rings.preserves_mult, rings.preserves_plus, rings.preserves_4.
-  rewrite <-(associativity ('z)), rings.plus_opp_distr.
+  rewrite <-(associativity ('z)), rings.opp_distr.
   rewrite int_pow_exp_plus by apply (rings.ne_0 (2:Q)).
   assert (∀ a b c d : Q, a * b * (c * d) = (a * c) * b * d) as E by (intros; ring). rewrite E.
-  setoid_replace ('(2 ^ ('z : nat)) * 2 ^ (-'z) : Q) with (1 : Q) using relation (@equiv Q _).
-   setoid_replace (-'m + 1) with (-('m + 1) + 2) using relation (@equiv Z _) by ring.
+  ms_setoid_replace ('(2 ^ ('z : nat)) * 2 ^ (-'z) : Q) with (1 : Q).
+   ms_setoid_replace (-'m + 1) with (-('m + 1) + 2) by ring.
    rewrite int_pow_exp_plus by apply (rings.ne_0 (2:Q)).
    ring_simplify. now rewrite commutativity.
   rewrite preserves_nat_pow, rings.preserves_2.
@@ -177,7 +177,7 @@ Proof.
     (AQroot_mid_bounded_raw (n + 3)) (AQroot_mid_bounded_raw (m + 3))) as P.
    intros n m E.
    simpl. apply Qball_Qabs. change Qabs.Qabs with (abs : Q → Q). rewrite abs.abs_nonneg.
-   setoid_replace (-'m - 2) with (-'(m + 3) + 1) using relation (@equiv Z _).
+   ms_setoid_replace (-'m - 2) with (-'(m + 3) + 1).
     apply AQroot_mid_bounded_regular_aux1.
     now apply (order_preserving (+3)) in E.
    rewrite rings.preserves_plus, rings.preserves_3. ring.

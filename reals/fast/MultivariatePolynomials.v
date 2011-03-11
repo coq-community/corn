@@ -220,7 +220,7 @@ Proof.
  simpl.
  replace RHS with (MVP_apply Q_as_CRing (Bernstein _ H) ! (MVP_C_ Q_as_CRing n0 a) v).
   apply IHv.
- apply MVP_apply_wd;try reflexivity.
+ apply: MVP_apply_wd; try reflexivity.
  rewrite -> BernsteinApplyRingHom.
  auto with *.
 Qed.

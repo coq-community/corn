@@ -82,7 +82,7 @@ Proof.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) - 2 ^ k = ((z - 1) - 1) * 2 ^ (k - 1)) as E2.
     intros.
-    setoid_replace k with ((k - 1) + 1) using relation (@equiv Z _) at 2 by ring.
+    ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
     ring_simplify. apply sg_mor; [reflexivity | now rewrite commutativity].
    intros. rewrite E1, E2.
@@ -118,7 +118,7 @@ Proof.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) + 2 ^ k = ((z + 1) + 1) * 2 ^ (k - 1)) as E2.
     intros.
-    setoid_replace k with ((k - 1) + 1) using relation (@equiv Z _) at 2 by ring.
+    ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
     ring_simplify. apply sg_mor; [reflexivity| apply commutativity].
    intros. rewrite E1, E2.
