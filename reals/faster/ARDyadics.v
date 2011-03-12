@@ -1,5 +1,5 @@
 Require Import
-  Program QArith ZArith BigZ Qpossec BigZeuclid
+  Program QArith ZArith BigZ Qpossec
   MetricMorphisms Qmetric Qdlog2
   ApproximateRationals ARArith
   interfaces.integers interfaces.rationals
