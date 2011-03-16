@@ -6,7 +6,7 @@ Require Import
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation
  util.Container NewAbstractIntegration
- algebra.CPoly_Newton.
+ algebra.CPoly_Newton Ranges.
 
 Require ne_list.
 Import ne_list.notations.
@@ -18,13 +18,15 @@ Section contents.
   Notation CRPoint := (CR * CR)%type.
   Local Notation Σ := cm_Sum.
 Require Import Qabs.
+
+(*
   Section inner_space.
 (* Need vector space, norm, inner product, metric from norm, Lipschitz continuity from boundedness *)
   Definition norm `(x: Vector.t Q n):=Σ (map Qabs x).
   
   Definition inner (n:nat)(x y : Vector.t Q n):=Σ(map (λ p, Qmult (fst p) (snd p)) (zip x y)).
   
-  End Hilbert_space.
+  End inner_space.*)
 
   Section divdiff_as_repeated_integral.
 
@@ -64,6 +66,8 @@ Require Import Qabs.
     constructor; try apply _.
     intros ??? H.
     Check apply_weights. 
+    Admitted.
+
     Obligation Tactic := idtac.
 
     (** "inner", the function of n weights: *)
@@ -121,7 +125,7 @@ Local Notation Π := cr_Product.
        simpl.
        admit. (* doable *)
       Qed.
-(* Does not compile 
+
       Program Definition reduce_raw: SomeWeights m → sig ((∈ nth_deriv_bound))
        := λ ts, @integrate_ucFunc_wrapped_for_continuity nth_deriv_bound (existT _ (0, 1 - totalweight  (` ts))%Q
          (ucFunction (integrand ts))).
@@ -153,17 +157,19 @@ Local Notation Π := cr_Product.
       Qed.
 
       Definition reduce: G m := ucFunction reduce_raw.
-*)
+
     End reduce.
 
     (** Finally, the divided difference arises from iterated reduction of the inner function: *)
-(*
+
     Definition alt_divdiff: CR.
      apply (iterate reduce (ucFunction inner)).
      exists (Vector.nil Q).
      abstract (unfold totalweight; simpl; auto).
     Defined. (* Todo: Why won't Program work here? *)
-*)
+
   End divdiff_as_repeated_integral.
-(*  Print Assumptions alt_divdiff.*)
+
+  (*Print Assumptions alt_divdiff.*)
+
 End contents.

@@ -7,7 +7,7 @@ Require Import
  stdlib_omissions.Q
  stdlib_omissions.N
  metric2.Classified
- util.Container.
+ util.Container Ranges.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
@@ -81,26 +81,6 @@ Proof with auto.
  subst.
  reflexivity.
 Qed.
-
-
-
-
-(** Simple ranges: *)
-
-Definition Range (T: Type) := prod T T.
-
-Instance in_QRange: Container Q (Range Q) := λ r x, Qmin (fst r) (snd r) <= x <= Qmax (fst r) (snd r).
-
-Lemma alt_in_QRange (q: Q) (r: Range Q): q ∈ r <->
-  (∃ e, 0 <= e <= 1 ∧ fst r + e * (snd r - fst r) == q)%Q.
-Proof with auto.
-Admitted.
-  (* also: ∃ e, 0 <= e <= 1 ∧ q == fst r * e + snd r * (1 - e) *)
-
-Instance in_CRRange: Container CR (Range CR) :=
-   λ r x, CRmin (fst r) (snd r) <= x ∧ x <= CRmax (fst r) (snd r).
-
-
 
 (** A straightforward definition of a Riemann approximation with n samples: *)
 
