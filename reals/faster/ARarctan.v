@@ -17,7 +17,7 @@ Proof.
   unfold AQarctan_big_pos.
   rewrite rings.preserves_minus.
   rewrite ARtoCR_preserves_AQpi.
-  rewrite Zshift_opp_1, rings.preserves_1.
+  rewrite aq_shift_opp_1, rings.preserves_1.
   rewrite AQarctan_small_pos_correct.
   ms_setoid_replace ('1 / 'a : Q) with (/'a).
    apply rational_arctan_half_pi.
@@ -47,7 +47,7 @@ Proof.
   rewrite rings.preserves_plus.
   rewrite ARtoCR_preserves_AQpi.
   rewrite AQarctan_small_correct.
-  rewrite Zshift_opp_2, rings.preserves_1.
+  rewrite aq_shift_opp_2, rings.preserves_1.
   ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1)).
    apply rational_arctan_fourth_pi.
    apply stdlib_rationals.Qlt_coincides.
@@ -59,10 +59,9 @@ Qed.
 Lemma AQarctan_pos_prf1 {a : AQ} : 0 ≤ a → a ≤ 1 ≪ (-1) → 0 ≤ a < 1.
 Proof.
   split; trivial.
-  apply orders.sprecedes_trans_r with (1 ≪ (-1)).
-   easy.
+  apply orders.sprecedes_trans_r with (1 ≪ (-1)); [easy |].
   apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
-  rewrite Zshift_opp_1, rings.preserves_1.
+  rewrite aq_shift_opp_1, rings.preserves_1.
   split; easy.
 Qed.
 
@@ -70,7 +69,7 @@ Lemma AQarctan_pos_prf2 {a : AQ} : ¬a ≤ 1 ≪ (-1) → 0 < a.
 Proof.
   intros. apply orders.sprecedes_trans_l with (1 ≪ (-1)).
    apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
-   rewrite Zshift_opp_1, rings.preserves_0, rings.preserves_1.
+   rewrite aq_shift_opp_1, rings.preserves_0, rings.preserves_1.
    split; easy.
   now apply orders.precedes_flip.
 Qed.

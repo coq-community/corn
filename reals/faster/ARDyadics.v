@@ -1,6 +1,6 @@
 Require Import
   Program QArith ZArith BigZ Qpossec
-  MetricMorphisms Qmetric Qdlog2
+  MetricMorphisms Qmetric Qdlog
   ApproximateRationals ARArith
   interfaces.integers interfaces.rationals
   theory.int_pow theory.nat_pow
@@ -152,12 +152,12 @@ Qed.
 Instance QtofastD: AppInverse fastDtoQ := λ x ε, 
   app_div ('Qnum x) ('(Qden x : Z)) (Qdlog2 ε).
 
-Instance fastD_compress : AppCompress fastD := λ x k,
+Instance fastD_approx : AppApprox fastD := λ x k,
   BigZ.shiftl (mant x) (-('k - 1) + expo x) $ ('k - 1).
 
-Lemma fastD_compress_correct (x y : fastD) (k : Z) : Qball (2 ^ k) ('app_compress x k) ('x).
+Lemma fastD_approx_correct (x y : fastD) (k : Z) : Qball (2 ^ k) ('app_approx x k) ('x).
 Proof.
-  setoid_replace (app_compress x k) with (app_div x 1 k).
+  setoid_replace (app_approx x k) with (app_div x 1 k).
    setoid_replace ('x) with ('x / '1).
     now apply fastD_div_correct.
    rewrite rings.preserves_1, fields.dec_mult_inv_1.
@@ -224,7 +224,7 @@ Instance: AppRationals fastD.
 Proof.
   split; try apply _; intros.
    now apply fastD_div_correct.
-  now apply fastD_compress_correct.
+  now apply fastD_approx_correct.
 Qed.
 
 Notation fastAR := (AR (AQ:=fastD)).

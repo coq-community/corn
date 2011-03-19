@@ -1,6 +1,6 @@
 Require Import
   Program workaround_tactics
-  QMinMax Qround Qdlog2 stdlib_omissions.Q 
+  QMinMax Qround Qdlog stdlib_omissions.Q 
   CRexp CRseries CRAlternatingSum Compress
   MetricMorphisms ARAlternatingSum abstract_algebra 
   minmax nat_pow int_pow.
@@ -72,12 +72,12 @@ Proof.
   unfold AQexp_neg_bounded. fold (AQexp_neg_bounded (AQexp_neg_bounded_prf p)).
   rewrite ARtoCR_preserves_power_positive_bounded.
   rewrite ARcompress_correct.
-  setoid_replace (AQposAsQpos 1) with (1#1)%Qpos by now rewrite AQposAsQpos_preserves_1.
+  setoid_replace ('1 : Qpos) with (1#1)%Qpos by now rewrite AQposAsQpos_preserves_1.
   rewrite rational_exp_correct.
   rewrite <-shrink_by_two_correct.
    rewrite <-rational_exp_correct.
    rewrite IHn.
-   rewrite Zshift_opp_1. 
+   rewrite aq_shift_opp_1. 
    reflexivity.
   now apply semirings.preserves_nonpos.
 Qed.
@@ -88,7 +88,7 @@ Context {a : AQ} (Pa : a ≤ 0).
 Definition AQexp_neg_bound : nat := 
   match decide_rel (≤) (-1) a with
   | left _ => 0
-  | right _ => Zabs_nat (Zsucc (Qdlog2 (-'a)))
+  | right _ => Zabs_nat (1 + Qdlog2 (-'a))
   end.
 
 Lemma AQexp_neg_bound_correct : -2 ^ AQexp_neg_bound ≤ a ≤ 0.
@@ -106,14 +106,14 @@ Proof.
   rewrite inj_Zabs_nat, Z.abs_eq.
    apply rings.flip_opp.
    rewrite rings.opp_involutive.
-   apply stdlib_rationals.Qlt_coincides.
    apply Qdlog2_spec.
-   apply stdlib_rationals.Qlt_coincides.
    apply rings.flip_neg_opp.
    apply orders.sprecedes_trans_r with (-1).
     now apply rings.preserves_le_opp1.
-   apply rings.flip_pos_opp. now apply semirings.sprecedes_0_1.
-  apply Zle_le_succ.
+   apply rings.flip_pos_opp. solve_propholds.
+  change (0 ≤ 1 + Qdlog2 (-'a)).
+  apply integers.precedes_sprecedes_alt.
+  rewrite commutativity. apply (order_preserving _).
   apply Qdlog2_nonneg. 
   change (- -1 ≤ -'a).
   apply rings.flip_opp.
@@ -129,8 +129,8 @@ Proof.
    apply rings.flip_opp.
    rewrite nat_pow_exp_plus.
    apply semirings.ge1_mult_compat_l.
-     apply nat_pow_nonneg. apply _.
-    apply nat_pow_ge1. 
+     solve_propholds.
+    apply nat_pow_ge1.
      apply semirings.precedes_1_2.
     apply naturals.naturals_nonneg.
    reflexivity.
@@ -146,13 +146,7 @@ Proof. apply AQexp_neg_bounded_correct. Qed.
     to make it slower. *)
 Program Definition AQexp_inv_pos_bound : AQ₊ :=
   let b := 'a in ((1 ≪ -(2 : Z)) ^ Zabs_N (Zdiv (Qnum b) (Qden b)))↾_.
-Next Obligation.
-  apply nat_pow_pos.
-  apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
-  rewrite aq_shift_correct.
-  rewrite rings.preserves_0, rings.preserves_1. 
-  split; easy.
-Qed.
+Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
   '(AQposAsQpos AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 

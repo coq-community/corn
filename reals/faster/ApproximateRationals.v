@@ -3,9 +3,9 @@ Require
 Require Import 
   Program
   CornTac workaround_tactics
-  stdlib_omissions.Q Qdlog2 Qmetric Qabs Qclasses QMinMax
+  stdlib_omissions.Q Qdlog Qmetric Qabs Qclasses QMinMax
   RSetoid CSetoids MetricMorphisms
-  orders.minmax orders.fields theory.abs theory.int_pow.
+  orders.minmax orders.fields theory.abs theory.shiftl theory.int_pow.
 Require Export
   abstract_algebra interfaces.additional_operations.
 
@@ -14,10 +14,10 @@ Require Export
 (* Because [Q] is ``hard-wired'' nearly everywhere in CoRN, we take the easy
     way and require all operations to be sound with respect to [Q]. *)
 Class AppDiv AQ := app_div : AQ → AQ → Z → AQ.
-Class AppCompress AQ := app_compress : AQ → Z → AQ.
+Class AppApprox AQ := app_approx : AQ → Z → AQ.
 
 Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ Q_as_MetricSpace} 
-    `{!AppInverse AQtoQ} {ZtoAQ : Coerce Z AQ} `{!AppDiv AQ} `{!AppCompress AQ} 
+    `{!AppInverse AQtoQ} {ZtoAQ : Coerce Z AQ} `{!AppDiv AQ} `{!AppApprox AQ} 
     `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
     `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
   aq_ring :> @Ring AQ e plus mult zero one inv ;
@@ -25,62 +25,19 @@ Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ
   aq_ring_morphism :> SemiRing_Morphism AQtoQ ;
   aq_dense_embedding :> DenseEmbedding AQtoQ ;
   aq_div : ∀ x y k, ball (2 ^ k) ('app_div x y k) ('x / 'y) ;
-  aq_compress : ∀ x k, ball (2 ^ k) ('app_compress x k) ('x) ;
+  aq_compress : ∀ x k, ball (2 ^ k) ('app_approx x k) ('x) ;
   aq_shift :> ShiftLSpec AQ Z (≪) ;
   aq_nat_pow :> NatPowSpec AQ N (^) ;
   aq_ints_mor :> SemiRing_Morphism ZtoAQ
 }.
-
-Lemma Qpos_dlog2_spec (x : Qpos) : 
-  QposAsQ (2 ^ Qdlog2 x) ≤ QposAsQ x ∧ QposAsQ x < QposAsQ (2 ^ Zsucc (Qdlog2 x)).
-Proof.
-  simpl. split.
-   apply Qdlog2_spec. auto. 
-  apply stdlib_rationals.Qlt_coincides.
-  apply Qdlog2_spec. auto.
-Qed.
-
-(* The proof of this lemma is horrifying. Also, it doesn't belong here but in [Qdlog2.v].
-    However, proving it requires [int_pow_exp_sprecedes_back] for which no variant
-    exists in the standard library. *)
-Lemma Qdlog2_half (x : Qpos) : 
-  Qdlog2 x - 1 = Qdlog2 ((1#2) * x).
-Proof with auto.
-  setoid_rewrite commutativity at 2.
-  change (Qdlog2 x - 1 = Qdlog2 (x / 2)).
-  assert (0 < x / 2)%Q.
-   apply stdlib_rationals.Qlt_coincides.
-   apply_simplified (semirings.pos_mult_scompat (R:=Q)).
-    apply stdlib_rationals.Qlt_coincides...
-   solve_propholds.
-  apply (antisymmetry (≤)).
-   apply integers.precedes_sprecedes.
-   apply int_pow_exp_sprecedes_back with 2; [ apply semirings.sprecedes_1_2 |].
-   rewrite int_pow_exp_plus, int_pow_opp, int_pow_1 by solve_propholds.
-   apply sprecedes_trans_r with ((x : Q) / 2).
-    apply_simplified (order_preserving (.* / 2)).
-    apply Qdlog2_spec...
-   setoid_rewrite Z.add_1_r.
-   apply stdlib_rationals.Qlt_coincides.
-   now apply Qdlog2_spec.
-  apply integers.precedes_sprecedes.
-  apply int_pow_exp_sprecedes_back with 2; [ apply semirings.sprecedes_1_2 |].
-  apply sprecedes_trans_r with ((x : Q) / 2).
-   apply Qdlog2_spec...
-  rewrite <-associativity. rewrite (commutativity (-1) 1), associativity.
-  rewrite int_pow_exp_plus, int_pow_opp, int_pow_1 by solve_propholds.
-  apply_simplified (strictly_order_preserving (.* / 2)).
-  apply stdlib_rationals.Qlt_coincides.
-  apply Qdlog2_spec...
-Qed.
 
 Section approximate_rationals_more.
   Context `{AppRationals AQ}.
 
   Lemma AQtoQ_ZtoAQ x : ' (' x) = inject_Z x.
   Proof.
-    pose proof (integers.to_ring_unique_alt ((coerce : AQ → Q) ∘ (coerce : Z → AQ)) inject_Z) as P.
-    apply P.
+    change (((coerce : AQ → Q) ∘ (coerce : Z → AQ)) x = x).
+    now apply (integers.to_ring_unique_alt _ _).
   Qed.
 
   Global Instance: Injective (coerce : AQ → Q). 
@@ -109,17 +66,19 @@ Section approximate_rationals_more.
     split; intros E.
      apply Qlt_coincides. 
      apply (strictly_order_preserving _)...
-    apply (strictly_order_preserving_back coerce).
-    apply Qlt_coincides...
+    apply (strictly_order_preserving_back coerce)...
   Qed.
 
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
-  Proof.
-    rewrite shiftl.preserves_shiftl_int.
-    apply shiftl.shiftl_int_pow.
-  Qed.
+  Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.
 
-  Lemma aq_div_Qdlog2 (x y : AQ) (ε : Qpos) : 
+  Lemma aq_shift_opp_1 (x : AQ) : '(x ≪ (-1 : Z)) = 'x / 2.
+  Proof. now rewrite aq_shift_correct. Qed.
+
+  Lemma aq_shift_opp_2 (x : AQ) : '(x ≪ (-2 : Z)) = 'x / 4.
+  Proof. now rewrite aq_shift_correct. Qed.
+
+  Lemma aq_div_dlog2 (x y : AQ) (ε : Qpos) : 
     ball ε ('app_div x y (Qdlog2 ε)) ('x / 'y).
   Proof.
     eapply ball_weak_le.
@@ -127,8 +86,8 @@ Section approximate_rationals_more.
     apply aq_div.
   Qed.
 
-  Lemma aq_compress_Qdlog2 (x : AQ) (ε : Qpos) : 
-    ball ε ('app_compress x (Qdlog2 ε)) ('x).
+  Lemma aq_approx_dlog2 (x : AQ) (ε : Qpos) : 
+    ball ε ('app_approx x (Qdlog2 ε)) ('x).
   Proof.
     eapply ball_weak_le.
      apply Qpos_dlog2_spec.
@@ -146,12 +105,6 @@ Section approximate_rationals_more.
     rewrite aq_shift_correct.
     now rewrite rings.preserves_1, left_identity.
   Qed.
-
-  Lemma Zshift_opp_1 (x : AQ) : '(x ≪ (-1 : Z)) = 'x / 2.
-  Proof. now rewrite aq_shift_correct. Qed.
-
-  Lemma Zshift_opp_2 (x : AQ) : '(x ≪ (-2 : Z)) = 'x / 4.
-  Proof. now rewrite aq_shift_correct. Qed.
 
   Global Instance: IntegralDomain AQ.
   Proof.
@@ -239,9 +192,9 @@ Section approximate_rationals_more.
     now apply aq_preserves_lt.
   Qed.
 
-  Lemma AQposAsQpos_preserves_1 : AQposAsQpos 1 = 1.
-  Proof.
-    do 3 red. simpl.
-    now posed_rewrite (rings.preserves_1 (f:=coerce : AQ → Q)).
-  Qed.
+  Lemma AQposAsQpos_preserves_1 : '(1 : AQ₊) = (1 : Qpos).
+  Proof. change ('(1:AQ) = (1:Q)). apply rings.preserves_1. Qed.
+
+  Lemma AQposAsQpos_preserves_4 : '(4 : AQ₊) = (4 : Qpos).
+  Proof. change ('(4:AQ) = (4:Q)). apply rings.preserves_4. Qed.
 End approximate_rationals_more.

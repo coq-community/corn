@@ -1,6 +1,6 @@
 Require Import 
   Program CornTac workaround_tactics
-  Qmetric CRAlternatingSum Qdlog2
+  Qmetric CRAlternatingSum Qdlog
   ApproximateRationals ARArith
   abstract_algebra int_pow theory.streams theory.series.
 
@@ -233,18 +233,18 @@ Definition ARInfAltSum_raw `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (ε 
 Lemma ARInfAltSum_raw_correct `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0} (ε1 ε2 : Qpos) :
   ball (ε1 + ε2) ('ARInfAltSum_raw d ε1) (InfiniteAlternatingSum_raw sQ ε2).
 Proof.
-  setoid_replace (ε1 + ε2)%Qpos with ((1#2) * ε1 + ((1#2) * ε1 + ε2))%Qpos by QposRing.
+  setoid_replace (ε1 + ε2)%Qpos with (ε1 * (1#2) + (ε1 * (1#2) + ε2))%Qpos by QposRing.
   eapply ball_triangle.
    apply ball_weak_le with (2 ^ (Qdlog2 ε1 - 1))%Qpos.
-    change (2 ^ (Qdlog2 ε1 - 1) ≤ (1 # 2) * (ε1:Q)).
-    rewrite Qdlog2_half.
-    apply_simplified Qdlog2_spec. auto with *. 
+    change (2 ^ (Qdlog2 ε1 - 1) ≤ (ε1:Q) * (1 # 2)).
+    rewrite Qdlog2_half; auto.
+    apply Qdlog2_spec, stdlib_rationals.Qlt_coincides; now auto with *. 
    unfold ARInfAltSum_raw.
    apply (ARAltSum_correct d).
    now apply ARInfAltSum_length_pos.
   apply (InfiniteAlternatingSum_further_alt _).
-  rewrite Qdlog2_half.
-  apply (ARInfAltSum_length_ge d ((1 # 2) * ε1)).
+  rewrite (Qdlog2_half ε1); auto.
+  apply (ARInfAltSum_length_ge d (ε1 * (1 # 2))).
 Qed.
 
 Lemma ARInfAltSum_prf `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0} :
