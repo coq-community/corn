@@ -1,51 +1,52 @@
 Require Import
-  Ring Setoid 
-  Complete Qmetric ZArith Qdlog2 Qpossec
+  Ring Setoid  stdlib_omissions.Z
+  Complete Qmetric ZArith Qdlog Qpossec
   CRroot
   abstract_algebra theory.shiftl theory.nat_pow theory.int_pow.
 Require Export 
   ARArith.
 
-Section ARroot.
+Section ARsqrt.
 Context `{AppRationals AQ}.
 
 Add Ring AQ : (rings.stdlib_ring_theory AQ).
 Add Ring Q : (rings.stdlib_ring_theory Q).
 Add Ring Z : (rings.stdlib_ring_theory Z).
 
-Section root_mid.
+Section sqrt_mid.
 Context `(Pa : 1 ≤ a ≤ 4).
 
-Fixpoint AQroot_loop (n : nat) : AQ * AQ :=
+Fixpoint AQsqrt_loop (n : nat) : AQ * AQ :=
   match n with
   | O => (a, 0)
   | S n => 
-     let (r, s) := AQroot_loop n in
+     let (r, s) := AQsqrt_loop n in
      if decide_rel (≤) (s + 1) r
      then ((r - (s + 1)) ≪ (2:Z), (s + 2) ≪ (1:Z))
      else (r ≪ (2:Z), s ≪ (1:Z))
   end.
 
-Instance: Proper (=) AQroot_loop.
+Instance: Proper (=) AQsqrt_loop.
 Proof. intros x y E. change (x ≡ y) in E. now rewrite E. Qed.
 
-Lemma AQroot_loop_invariant1 (n : nat) : 
-  snd (AQroot_loop n) * snd (AQroot_loop n) + 4 * fst (AQroot_loop n) = 4 * 4 ^ n * a.
+Lemma AQsqrt_loop_invariant1 (n : nat) : 
+  snd (AQsqrt_loop n) ^ (2:N) + 4 * fst (AQsqrt_loop n) = 4 * 4 ^ n * a.
 Proof.
+  rewrite nat_pow_2.
   induction n; unfold pow; simpl.
    ring.
-  case_eq (AQroot_loop n); intros r s E. rewrite E in IHn. clear E.
-  case (decide_rel (≤) (s + 1) r); intros Esr; simpl in *;
+  revert IHn; case (AQsqrt_loop n); intros r s IHn.
+  case (decide_rel (≤) (s + 1) r); intros; simpl in *;
    rewrite shiftl_1, shiftl_2, <-(associativity 4), <-IHn; ring.
 Qed.
 
-Lemma AQroot_loop_invariant2 (n : nat) : 
-  fst (AQroot_loop n) ≤ 2 * snd (AQroot_loop n) + 4.
+Lemma AQsqrt_loop_invariant2 (n : nat) : 
+  fst (AQsqrt_loop n) ≤ 2 * snd (AQsqrt_loop n) + 4.
 Proof.
   induction n; simpl.
    now setoid_replace (2 * 0 + 4) with 4 by ring.
-  case_eq (AQroot_loop n); intros r s E. rewrite E in IHn. clear E.
-  case (decide_rel (≤) (s + 1) r); intros Esr; simpl in *.
+  revert IHn; case (AQsqrt_loop n); intros r s IHn.
+  case (decide_rel (≤) (s + 1) r); intros; simpl in *.
    rewrite shiftl_1, shiftl_2.
    setoid_replace (2 * (2 * (s + 2)) + 4) with (4 * ((2 * s + 4) - (s + 1))) by ring.
    apply (order_preserving (4 *.)).
@@ -56,189 +57,380 @@ Proof.
   now apply orders.precedes_flip.
 Qed.
 
-Lemma AQroot_loop_fst_nonneg (n : nat) : 0 ≤ fst (AQroot_loop n).
+Lemma AQsqrt_loop_snd_lower_bound (n z : nat) :
+  snd (AQsqrt_loop n) * 2 ^ z ≤ snd (AQsqrt_loop (z + n)).
+Proof.
+  induction z; unfold pow; simpl.
+   apply orders.equiv_precedes. ring.
+  revert IHz. case (AQsqrt_loop (z + n)); intros r s IHz.
+  case (decide_rel (≤) _); intros; simpl in *.
+   rewrite shiftl_1.
+   setoid_replace (snd (AQsqrt_loop n) * (2 * 2 ^ z)) with (2 * (snd (AQsqrt_loop n) * 2 ^ z)) by ring.
+   apply (order_preserving (2 *.)).
+   apply semirings.nonneg_plus_compat_r; [assumption | solve_propholds].
+  rewrite shiftl_1.
+  setoid_replace (snd (AQsqrt_loop n) * (2 * 2 ^ z)) with (2 * (snd (AQsqrt_loop n) * 2 ^ z)) by ring.
+  now apply (order_preserving (2 *.)).
+Qed.
+
+Lemma AQsqrt_loop_snd_upper_bound (n z : nat) :
+  snd (AQsqrt_loop (z + n)) ≤ (snd (AQsqrt_loop n) + 4) * 2 ^ z - 4.
+Proof.
+  induction z; unfold pow; simpl.
+   apply orders.equiv_precedes. ring.
+  revert IHz. case (AQsqrt_loop (z + n)); intros r s IHz.
+  case (decide_rel (≤)); simpl; intros E.
+   rewrite shiftl_1.
+   setoid_replace ((snd (AQsqrt_loop n) + 4) * (2 * 2 ^ z) - 4) with (2 * ((snd (AQsqrt_loop n) + 4) * 2 ^ z - 4 + 2)) by ring.
+   apply (order_preserving (2 *.)).
+   now apply (order_preserving (+2)).
+  rewrite shiftl_1.
+  setoid_replace ((snd (AQsqrt_loop n) + 4) * (2 * 2 ^ z) - 4) with (2 * ((snd (AQsqrt_loop n) + 4) * 2 ^ z - 4 + 2)) by ring.
+  apply (order_preserving (2 *.)).
+  apply semirings.nonneg_plus_compat_r; [assumption | solve_propholds].
+Qed.
+
+Lemma AQsqrt_loop_snd_nonneg (n : nat) : 0 ≤ snd (AQsqrt_loop n).
+Proof.
+  rewrite <-(rings.plus_0_r n) at 1.
+  etransitivity.
+   2: apply AQsqrt_loop_snd_lower_bound.
+  simpl. apply orders.equiv_precedes. ring.
+Qed.
+
+Lemma AQsqrt_loop_fst_nonneg (n : nat) : 0 ≤ fst (AQsqrt_loop n).
 Proof.
   induction n; simpl.
-   transitivity 1. apply (rings.ge_0 1). easy.
-  case_eq (AQroot_loop n); intros r s E. rewrite E in IHn. clear E.
-  case (decide_rel (≤) (s + 1) r); intros Esr; simpl in *.
+   transitivity 1; [solve_propholds | easy].
+  revert IHn; case (AQsqrt_loop n); intros r s IHn.
+  case (decide_rel (≤) (s + 1) r); intros; simpl in *.
    rewrite shiftl_2.
-   apply semirings.nonneg_mult_compat.
-    now apply (rings.ge_0 4).
+   apply semirings.nonneg_mult_compat; [solve_propholds |].
    now apply rings.flip_nonneg_minus.
   rewrite shiftl_2.
   now apply (semirings.nonneg_mult_compat _ _ _).
 Qed.
 
-Lemma AQroot_loop_snd_nonneg (n : nat) : 0 ≤ snd (AQroot_loop n).
-Proof.
-  induction n; simpl.
-   reflexivity.
-  case_eq (AQroot_loop n); intros r s E. rewrite E in IHn. clear E.
-  case (decide_rel (≤) (s + 1) r); intros Esr; simpl in *.
-   rewrite shiftl_1.
-   apply semirings.nonneg_mult_compat. now apply (rings.ge_0 2).
-   apply semirings.nonneg_plus_compat. easy. now apply (rings.ge_0 2).
-  rewrite shiftl_1.
-  apply semirings.nonneg_mult_compat. now apply (rings.ge_0 2). easy.
-Qed.
-
-Lemma AQroot_loop_snd_bound (n z : nat) : (* snd (AQroot_loop n) * 2 ^ m ≤ *)
-  snd (AQroot_loop (z + n)) ≤ 2 ^ z * (snd (AQroot_loop n) + 4) - 4.
-Proof.
-  induction z; unfold pow; simpl.
-   apply orders.equiv_precedes. ring.
-  revert IHz. case (AQroot_loop (z + n)); case (AQroot_loop n); simpl; intros r1 s1 r2 s2 IHz.
-  case (decide_rel (≤) _); simpl; intros E.
-   rewrite shiftl_1.
-   setoid_replace (2 * 2 ^ z * (s1 + 4) - 4) with (2 * (2 ^ z * (s1 + 4) - 4 + 2)) by ring.
-   apply (order_preserving (2 *.)).
-   now apply (order_preserving (+2)).
-  rewrite shiftl_1.
-  setoid_replace (2 * 2 ^ z * (s1 + 4) - 4) with (2 * (2 ^ z * (s1 + 4) - 4 + 2)) by ring.
-  apply (order_preserving (2 *.)).
-  apply semirings.nonneg_plus_compat_r.
-   easy.
-  apply (rings.ge_0 2).
-Qed.
-
-Lemma AQroot_loop_fst_bound (n : nat) :
-  fst (AQroot_loop n) ≤ 2 ^ (3 + n).
+Lemma AQsqrt_loop_fst_upper_bound (n : nat) :
+  fst (AQsqrt_loop n) ≤ 2 ^ (3 + n).
 Proof with auto.
-  transitivity (2 * snd (AQroot_loop n) + 4).
-   apply AQroot_loop_invariant2.
-  unfold pow. simpl.
-  setoid_replace (2 * snd (AQroot_loop n) + 4) with (2 * (snd (AQroot_loop n) + 2)) by ring.
+  transitivity (2 * snd (AQsqrt_loop n) + 4).
+   apply AQsqrt_loop_invariant2.
+  change (2 ^ (3 + n)) with (2 * (2 * (2 * 2 ^ n))).
+  setoid_replace (2 * snd (AQsqrt_loop n) + 4) with (2 * (snd (AQsqrt_loop n) + 2)) by ring.
   apply (order_preserving (2 *.)).
   setoid_replace (2 * (2 * 2 ^ n)) with ((4 * 2 ^ n - 2) + 2) by ring.
   apply (order_preserving (+ 2)).
-  transitivity (2 ^ n * 4 - 4).
+  transitivity (4 * 2 ^ n - 4).
    rewrite <-(rings.plus_0_r n) at 1.
    rewrite <-(rings.plus_0_l 4) at 1.
-   now apply AQroot_loop_snd_bound.
+   now apply AQsqrt_loop_snd_upper_bound.
   apply semirings.plus_compat.
-   rewrite commutativity.
-   reflexivity.
-  apply rings.flip_opp.
-  apply semirings.precedes_2_4.
+   now rewrite commutativity.
+  now apply rings.flip_opp, semirings.precedes_2_4.
 Qed.
 
-Definition AQroot_mid_bounded_raw (n : N) : AQ_as_MetricSpace := snd (AQroot_loop ('n)) ≪ -('n + 1 : Z).
+Definition AQsqrt_mid_bounded_raw (n : N) := snd (AQsqrt_loop ('n)) ≪ -(1 + 'n : Z).
 
-Lemma AQroot_mid_bounded_regular_aux1 (n m : N) :
-  m ≤ n → 'AQroot_mid_bounded_raw n - 'AQroot_mid_bounded_raw m ≤ 2 ^ (-'m + 1).
+Lemma AQsqrt_mid_bounded_raw_lower_bound (n : N) :
+  0 ≤ AQsqrt_mid_bounded_raw n.
+Proof. unfold AQsqrt_mid_bounded_raw. apply shiftl_nonneg, AQsqrt_loop_snd_nonneg. Qed.
+
+Lemma AQsqrt_mid_bounded_raw_upper_bound (n : N) :
+  AQsqrt_mid_bounded_raw n ≤ 4.
+Proof.
+  unfold AQsqrt_mid_bounded_raw.
+  apply (order_preserving_back (≪ 1 + 'n)).
+  rewrite shiftl_reverse by ring.
+  etransitivity.
+   rewrite <-(rings.plus_0_r ('n)).
+   now apply AQsqrt_loop_snd_upper_bound.
+  simpl. 
+  apply rings.nonneg_minus_compat; [solve_propholds|].
+  rewrite rings.plus_0_l, shiftl_S.
+  apply semirings.ge1_mult_compat_l.
+    solve_propholds.
+   now apply semirings.sprecedes_1_2.
+  apply orders.equiv_precedes.
+  now rewrite shiftl_nat_pow_alt, preserves_nat_pow_exp.
+Qed.
+
+Lemma AQsqrt_mid_bounded_regular_aux1 (n m : N) :
+  m ≤ n → AQsqrt_mid_bounded_raw n - AQsqrt_mid_bounded_raw m ≤ 1 ≪ (1 - 'm : Z).
 Proof.
   intros E.
   apply naturals.natural_precedes_plus in E.
   destruct E as [z E]. rewrite commutativity in E. 
-  change (n ≡ z + m) in E. rewrite E. clear E n.
-  unfold AQroot_mid_bounded_raw.
-  rewrite 2!aq_shift_correct.
-  rewrite 2!rings.preserves_plus.
+  change (n ≡ z + m) in E. subst.
+  unfold AQsqrt_mid_bounded_raw.
+  rewrite rings.preserves_plus.
   etransitivity.
    apply semirings.plus_compat; [| reflexivity].
-   apply (order_preserving (.* _)).
-   apply (order_preserving _).
+   apply (order_preserving (≪ _)).
    etransitivity.
-    apply AQroot_loop_snd_bound.
-   apply rings.nonneg_minus_compat. apply semirings.precedes_0_4. reflexivity.
+    now apply AQsqrt_loop_snd_upper_bound.
+   apply rings.nonneg_minus_compat; [solve_propholds | reflexivity].
   apply orders.equiv_precedes.
-  rewrite rings.preserves_mult, rings.preserves_plus, rings.preserves_4.
-  rewrite <-(associativity ('z)), rings.opp_distr.
-  rewrite int_pow_exp_plus by apply (rings.ne_0 (2:Q)).
-  assert (∀ a b c d : Q, a * b * (c * d) = (a * c) * b * d) as E by (intros; ring). rewrite E.
-  ms_setoid_replace ('(2 ^ ('z : nat)) * 2 ^ (-'z) : Q) with (1 : Q).
-   ms_setoid_replace (-'m + 1) with (-('m + 1) + 2) by ring.
-   rewrite int_pow_exp_plus by apply (rings.ne_0 (2:Q)).
-   ring_simplify. now rewrite commutativity.
-  rewrite preserves_nat_pow, rings.preserves_2.
-  rewrite int_pow_opp, int_pow_nat_pow, preserves_nat_pow_exp.
-  apply fields.dec_mult_inverse.
-  apply _.
+  rewrite <-(shiftl_nat_pow_alt (f:=coerce : nat → Z)).
+  rewrite (naturals.to_semiring_twice _ _ (coerce : N → Z)).
+  rewrite <-shiftl_exp_plus, rings.preserves_plus.
+  ms_setoid_replace ('z - (1 + ('z + 'm)) : Z) with (-(1 + 'm) : Z) by ring.
+  rewrite shiftl_base_plus. ring_simplify.
+  ms_setoid_replace (1 - ' m : Z) with (2 - (1 + 'm) : Z) by ring.
+  now rewrite shiftl_exp_plus, shiftl_2, rings.mult_1_r.
 Qed.
 
-Lemma AQroot_mid_bounded_regular_aux2 (n m : N) :
-  n ≤ m → 'AQroot_mid_bounded_raw n ≤ 'AQroot_mid_bounded_raw m.
+Lemma AQsqrt_mid_bounded_regular_aux2 (n m : N) :
+  n ≤ m → AQsqrt_mid_bounded_raw n ≤ AQsqrt_mid_bounded_raw m.
 Proof.
   intros E.
   apply naturals.natural_precedes_plus in E.
   destruct E as [z E]. rewrite commutativity in E. 
-  change (m ≡ z + n) in E. rewrite E. clear E m.
-  unfold AQroot_mid_bounded_raw.
-  rewrite 2!aq_shift_correct.
+  change (m ≡ z + n) in E. subst.
+  unfold AQsqrt_mid_bounded_raw.
   rewrite 2!rings.preserves_plus.
-Admitted.
-
-Definition AQroot_mid_raw (ε : Qpos) : AQ_as_MetricSpace := AQroot_mid_bounded_raw (Zabs_N (Qdlog2 ε) + 3).
-
-Lemma AQroot_mid_bounded_prf: is_RegularFunction_noInf _ AQroot_mid_raw.
-Proof.
-  assert (∀ n m, m ≤ n → ball (2 ^ (-coerce m - 2)) 
-    (AQroot_mid_bounded_raw (n + 3)) (AQroot_mid_bounded_raw (m + 3))) as P.
-   intros n m E.
-   simpl. apply Qball_Qabs. change Qabs.Qabs with (abs : Q → Q). rewrite abs.abs_nonneg.
-   ms_setoid_replace (-'m - 2) with (-'(m + 3) + 1).
-    apply AQroot_mid_bounded_regular_aux1.
-    now apply (order_preserving (+3)) in E.
-   rewrite rings.preserves_plus, rings.preserves_3. ring.
-  unfold Qminus. apply rings.flip_nonneg_minus.
-  apply AQroot_mid_bounded_regular_aux2.
-  now apply (order_preserving (+3)) in E.
-  intros ε1 ε2.
-  unfold AQroot_mid_raw.
-  destruct (total_order (Zabs_N (Qdlog2 ε1)) (Zabs_N (Qdlog2 ε2))).
-   apply ball_sym.
-   eapply ball_weak_le.
-    2: now apply P.
-   simpl. admit.
-  eapply ball_weak_le.
-   2: now apply P.
-  admit.
+  ms_setoid_replace (-(1 + 'n) : Z) with ('z - (1 + ('z + 'n) : Z)) by ring.
+  rewrite shiftl_exp_plus.
+  apply (order_preserving (≪ _)).
+  rewrite shiftl_nat_pow_alt, <-(preserves_nat_pow_exp (f:=coerce : N → nat)).
+  now apply AQsqrt_loop_snd_lower_bound.
 Qed.
 
-Definition AQroot_mid : AR := mkRegularFunction (0 : AQ_as_MetricSpace) AQroot_mid_bounded_prf.
-
-Lemma AQroot_mid_spec : ARpower_positive 2 AQroot_mid = 'a.
+Lemma AQsqrt_mid_bounded_spec (n : N) : 
+  (AQsqrt_mid_bounded_raw n ^ (2:N)) = a - fst (AQsqrt_loop ('n)) ≪ -(2 * 'n).
 Proof.
-  intros ? ?. apply regFunEq_e. intros ε.
-  simpl.
-  unfold Prelength.Cap_raw, Prelength.Cmap. simpl.
-  apply Qball_Qabs. change Qabs.Qabs with (abs : Q → Q). rewrite abs.abs_nonpos. 
-Admitted.
-End root_mid.
+  unfold AQsqrt_mid_bounded_raw.
+  rewrite shiftl_base_nat_pow, rings.preserves_2.
+  apply (injective (≪ (2 + 2 * 'n))).
+  rewrite shiftl_reverse by ring.
+  rewrite shiftl_base_plus, shiftl_opp, <-shiftl_exp_plus.
+  ms_setoid_replace (-(2 * 'n) + (2 + 2 * 'n)) with (2 : Z) by ring.
+  rewrite shiftl_exp_plus, ?shiftl_2, <-shiftl_mult_l.
+  rewrite <-(rings.preserves_2 (f:=coerce : N → Z)), <-rings.preserves_mult.
+  rewrite shiftl_nat_pow_alt, nat_pow_exp_mult.
+  rewrite (commutativity a), associativity.
+  rewrite <-(preserves_nat_pow_exp (f:=coerce : N → nat) _ n).
+  setoid_replace (2 ^ 2) with 4 by (rewrite nat_pow_2; ring).
+  apply (right_cancellation (+) (4 * fst (AQsqrt_loop (' n)))).
+  rewrite AQsqrt_loop_invariant1. ring.
+Qed.
 
-Section root_pos.
+Lemma AQsqrt_mid_bounded_raw_square_upper_bound (n : N) :
+  AQsqrt_mid_bounded_raw n ^ (2:N) ≤ a.
+Proof.
+  rewrite AQsqrt_mid_bounded_spec.
+  apply rings.nonneg_minus_compat; [| reflexivity].
+  now apply shiftl_nonneg, AQsqrt_loop_fst_nonneg.
+Qed.
+
+Definition AQsqrt_mid_raw (ε : Qpos) := AQsqrt_mid_bounded_raw (ring_plus (N_of_Z (-Qdlog2 ε)) 3).
+
+Instance: Proper ((=) ==> (=)) AQsqrt_mid_raw.
+Proof. unfold AQsqrt_mid_raw. intros ? ? E. now rewrite E. Qed.
+
+Lemma AQsqrt_mid_bounded_prf: is_RegularFunction_noInf _ (AQsqrt_mid_raw : Qpos → AQ_as_MetricSpace).
+Proof.
+  assert (∀ n m, m ≤ n → ball (2 ^ (-coerce m - 2))
+    (AQsqrt_mid_bounded_raw (n + 3) : AQ_as_MetricSpace) (AQsqrt_mid_bounded_raw (m + 3))).
+   intros n m E.
+   simpl. apply Qball_Qabs. rewrite Qabs.Qabs_pos. 
+    change ('AQsqrt_mid_bounded_raw (n + 3) - 'AQsqrt_mid_bounded_raw (m + 3) ≤ 2 ^ (-'m - 2)).
+    rewrite <-rings.preserves_minus, <-(rings.mult_1_l (2 ^ (-'m - 2))).
+    rewrite <-shiftl_int_pow.
+    rewrite <-(rings.preserves_1 (f:=coerce : AQ → Q)), <-(preserves_shiftl (f:=coerce : AQ → Q)).
+    apply (order_preserving _).
+    ms_setoid_replace (-'m - 2) with (1 - '(m + 3)).
+     apply AQsqrt_mid_bounded_regular_aux1.
+     now apply: (order_preserving (+ (3:N))).
+    rewrite rings.preserves_plus, rings.preserves_3. ring.
+   change (0 ≤ 'AQsqrt_mid_bounded_raw (n + 3) - 'AQsqrt_mid_bounded_raw (m + 3)).
+   apply rings.flip_nonneg_minus.
+   apply (order_preserving _).
+   apply AQsqrt_mid_bounded_regular_aux2.
+   now apply: (order_preserving (+ (3:N))).
+  assert (∀ ε1 ε2 : Qpos, N_of_Z (-Qdlog2 ε2) ≤ N_of_Z (-Qdlog2 ε1) → 
+     ball (ε1 + ε2) (AQsqrt_mid_raw ε1 : AQ_as_MetricSpace) (AQsqrt_mid_raw ε2)).
+   intros ε1 ε2 E.
+   unfold AQsqrt_mid_raw.
+   eapply ball_weak_le; auto.
+   change ((2:Q) ^ (-'N_of_Z (-Qdlog2 ε2) - 2) ≤ (ε1 : Q) + (ε2 : Q)).
+   apply semirings.nonneg_plus_compat_l.
+    apply stdlib_rationals.Qlt_coincides; now auto.
+   destruct (total_order (ε2:Q) 1).
+    rewrite N_of_Z_nonneg.
+     change (- (-Qdlog2 ε2)%Z) with (- -Qdlog2 ε2).
+     rewrite rings.opp_involutive.
+     rewrite int_pow_exp_plus by solve_propholds.
+     transitivity (2 ^ Qdlog2 ε2 : Q).
+      2: apply Qdlog2_spec; auto.
+     rewrite <-(rings.mult_1_r (2 ^ Qdlog2 ε2 : Q)) at 2.
+     now apply (order_preserving (_ *.)).
+    change (0 ≤ -Qdlog2 ε2). now apply rings.flip_nonpos_opp, Qdlog2_nonpos.
+   transitivity (1:Q); auto.
+   rewrite N_of_Z_nonpos; [easy|].
+   change (-Qdlog2 ε2 ≤ 0). now apply rings.flip_nonneg_opp, Qdlog2_nonneg.
+  intros ε1 ε2.
+  destruct (total_order (N_of_Z (-Qdlog2 ε1)) (N_of_Z (-Qdlog2 ε2))); auto.
+  apply ball_sym. 
+  setoid_replace (ε1 + ε2)%Qpos with (ε2 + ε1)%Qpos 
+    by (unfold QposEq; simpl; apply commutativity); auto.
+Qed.
+
+Definition AQsqrt_mid : AR := mkRegularFunction (0 : AQ_as_MetricSpace) AQsqrt_mid_bounded_prf.
+
+Lemma AQsqrt_mid_upper_bound : AQsqrt_mid ≤ 4.
+Proof.
+  intros ε.
+  transitivity (0 : Q).
+   apply rings.flip_pos_opp. now auto.
+  change (0 ≤ '(4 - AQsqrt_mid_raw ((1#2) * ε))).
+  apply semirings.preserves_nonneg, rings.flip_nonneg_minus.
+  now apply AQsqrt_mid_bounded_raw_upper_bound.
+Qed.
+
+Lemma AQsqrt_mid_nonneg : 0 ≤ AQsqrt_mid.
+Proof.
+  intros ε.
+  transitivity (0 : Q).
+   apply rings.flip_pos_opp. now auto.
+  change (0 ≤ '(AQsqrt_mid_raw ((1#2) * ε) - 0)).
+  apply semirings.preserves_nonneg, rings.flip_nonneg_minus.
+  now apply AQsqrt_mid_bounded_raw_lower_bound.
+Qed.
+
+Lemma AQsqrt_mid_spec : ARpower_positive 2 AQsqrt_mid = 'a.
+Proof.
+  assert (∀ ε, Qball ε ('(AQsqrt_mid_raw ε ^ (2:N))) ('a)) as P.
+   intros ε. apply Qball_Qabs. rewrite Qabs.Qabs_neg.
+    etransitivity.
+     2: apply Qpos_dlog2_spec.
+    change (-( '(AQsqrt_mid_raw ε ^ 2) - 'a) ≤ 2 ^ Qdlog2 ε).
+    rewrite <-rings.opp_swap_r.
+    unfold AQsqrt_mid_raw. rewrite AQsqrt_mid_bounded_spec.
+    rewrite rings.preserves_minus, preserves_shiftl. ring_simplify.
+    apply shiftl_precedes_flip_l.
+    etransitivity.
+     apply (order_preserving _).
+     now apply AQsqrt_loop_fst_upper_bound.
+    rewrite preserves_nat_pow, rings.preserves_2.
+    rewrite <-(int_pow_nat_pow (f:=coerce : nat → Z)).
+    rewrite shiftl_int_pow, <-int_pow_exp_plus by solve_propholds.
+    apply int_pow_exp_precedes; [apply semirings.precedes_1_2|].
+    rewrite rings.preserves_plus, (naturals.to_semiring_twice _ _ (coerce : N → Z)).
+    rewrite (rings.preserves_plus _ 3), ?rings.preserves_3.
+    apply (order_preserving_back (+ -(3 + 3))). ring_simplify.
+    destruct (total_order (ε:Q) 1).
+     rewrite N_of_Z_nonneg.
+      apply orders.equiv_precedes. change (-Qdlog2 ε = 2 * -Qdlog2 ε + Qdlog2 ε). ring.
+     change (0 ≤ -Qdlog2 ε). now apply rings.flip_nonpos_opp, Qdlog2_nonpos.
+    rewrite N_of_Z_nonpos.
+     now apply: Qdlog2_nonneg.
+    change (-Qdlog2 ε ≤ 0). now apply rings.flip_nonneg_opp, Qdlog2_nonneg.
+   change ('(AQsqrt_mid_raw ε ^ 2) - 'a ≤ 0).
+   apply rings.flip_nonpos_minus.
+   apply (order_preserving _).
+   now apply AQsqrt_mid_bounded_raw_square_upper_bound.
+  rewrite <-(ARpositive_power_bounded_positive_power _ _ 4). 
+   intros ε1 ε2. simpl.
+   rewrite minmax.min_r, minmax.max_r.
+     apply ball_weak. apply ball_weak_le with (ε1 / (8 # 1))%Qpos.
+      change ('ε1 / (8#1) ≤ 'ε1). 
+      rewrite <-(rings.mult_1_r ('ε1)) at 2.
+      now apply (order_preserving (_ *.)).
+     rewrite AQposAsQpos_preserves_4.
+     now apply: P.
+    transitivity (0:AQ).
+     apply rings.flip_nonneg_opp. now apply: semirings.precedes_0_4.
+    now apply AQsqrt_mid_bounded_raw_lower_bound.
+   now apply AQsqrt_mid_bounded_raw_upper_bound.
+  split.
+   transitivity (0:AR).
+    apply rings.flip_nonneg_opp. 
+    apply (semirings.preserves_nonneg (f:=coerce : AQ → AR)).
+    simpl. solve_propholds.
+   now apply AQsqrt_mid_nonneg.
+  now apply AQsqrt_mid_upper_bound.
+Qed.
+
+Lemma AQsqrt_mid_correct : ARtoCR AQsqrt_mid = rational_sqrt ('a).
+Proof.
+  apply rational_sqrt_unique.
+    apply semirings.preserves_nonneg.
+    red. transitivity 1; [solve_propholds | intuition].
+   rewrite <-ARtoCR_preserves_power_positive.
+   rewrite AQsqrt_mid_spec.
+   now apply ARtoCR_inject.
+  change ('0%Q) with (0:CR).
+  rewrite <-(rings.preserves_0 (f:=ARtoCR)).
+  apply (order_preserving _).
+  now apply AQsqrt_mid_nonneg.
+Qed.
+End sqrt_mid.
+
+Section sqrt_pos.
 Context `(Pa : 0 < a).
 
 Local Obligation Tactic := idtac.
-Program Definition AQroot_pos :=
-  let n := Zdiv (Qdlog2 ('a)) 2 in ARscale (1 ≪ n) (AQroot_mid (a:=a ≪ (2 * -n)) _).
+Program Definition AQsqrt_pos :=
+  let n := Qdlog4 ('a) in ARscale (1 ≪ n) (AQsqrt_mid (a:=a ≪ (2 * -n)) _).
 Next Obligation.
   simpl. split.
    apply (order_preserving_back (coerce : AQ → Q)).
    rewrite rings.preserves_1, aq_shift_correct.
-   admit.
-  admit.
+   rewrite int_pow_exp_mult.
+   change (2 ^ 2 : Q) with (4 : Q).
+   apply (order_preserving_back (.* 4 ^ Qdlog4 ('a))).
+   rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
+   rewrite rings.mult_1_l, rings.plus_opp_l, int_pow_0, rings.mult_1_r.
+   apply Qdlog4_spec.
+   now apply semirings.preserves_pos.
+  apply (order_preserving_back (coerce : AQ → Q)).
+  rewrite aq_shift_correct, rings.preserves_4.
+  rewrite int_pow_exp_mult.
+  change (2 ^ 2 : Q) with (4 : Q).
+  apply (order_preserving_back (.* 4 ^ Qdlog4 ('a))).
+  rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
+  rewrite rings.plus_opp_l, int_pow_0, rings.mult_1_r.
+  rewrite <-int_pow_S by (compute; discriminate).
+  apply Qdlog4_spec.
+  now apply semirings.preserves_pos.
 Qed.
-End root_pos.
 
-Program Definition AQroot (a : AQ) : AR := 
-  match decide_rel (≤) a 0 with
-  | left _ => 0
-  | right _ => AQroot_pos (a:=a)
-  end.
-
-Lemma AQroot_correct (a : AQ) : ARtoCR (AQroot a) = rational_sqrt ('a).
+Lemma AQsqrt_pos_correct : ARtoCR AQsqrt_pos = rational_sqrt ('a).
 Proof.
-Admitted.
+  unfold AQsqrt_pos.
+  rewrite ARtoCR_preserves_scale, AQsqrt_mid_correct.
+  rewrite 2!aq_shift_correct, rings.preserves_1, rings.mult_1_l.
+  rewrite int_pow_exp_mult.
+  apply rational_sqrt_scale.
+  apply semirings.preserves_nonneg.
+  now apply orders.sprecedes_weaken.
+Qed.
+End sqrt_pos.
+
+Program Definition AQsqrt (a : AQ) : AR := 
+  if decide_rel (≤) a 0 then 0 else AQsqrt_pos (a:=a) _.
+Next Obligation. now apply orders.not_precedes_sprecedes. Qed.
+
+Lemma AQsqrt_correct (a : AQ) : ARtoCR (AQsqrt a) = rational_sqrt ('a).
+Proof.
+  unfold AQsqrt.
+  case (decide_rel _); intros E.
+   rewrite rational_sqrt_nonpos.
+    now apply rings.preserves_0.
+   now apply semirings.preserves_nonpos.
+  now apply AQsqrt_pos_correct.
+Qed.
 
 Local Obligation Tactic := idtac.
 Require Import MetricMorphisms.
 
-Program Definition ARroot_uc := 
-  unary_complete_uc QPrelengthSpace coerce AQroot sqrt_uc _.
-Next Obligation. intros a. apply AQroot_correct. Qed.
+Program Definition ARsqrt_uc := 
+  unary_complete_uc QPrelengthSpace coerce AQsqrt sqrt_uc _.
+Next Obligation. intros a. apply AQsqrt_correct. Qed.
 
-Definition ARroot := Cbind AQPrelengthSpace ARroot_uc.
+Definition ARsqrt := Cbind AQPrelengthSpace ARsqrt_uc.
 
-End ARroot.
+Lemma ARtoCR_preserves_sqrt (x : AR) : ARtoCR (ARsqrt x) = CRsqrt (ARtoCR x).
+Proof. apply preserves_unary_complete_fun. Qed.
+End ARsqrt.
