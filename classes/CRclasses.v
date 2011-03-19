@@ -40,3 +40,12 @@ Proof.
   repeat (split; try apply _); intros.
   apply CReq_Qeq. assumption.
 Qed.
+
+Instance: RingOrder CR_le.
+Proof.
+  repeat (split; try apply _).
+   intros x y E. now apply CRplus_le_l.
+  intros x E1 y E2.
+  rewrite <-(rings.mult_0_r x).
+  now apply: mult_resp_leEq_lft.
+Qed.
