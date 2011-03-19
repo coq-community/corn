@@ -36,6 +36,8 @@ Require Import RealPowers.
 Require Import ContinuousCorrect.
 Require Import Qauto.
 Require Import CornTac.
+Require Import abstract_algebra.
+Require Import CRclasses.
 
 Open Local Scope Q_scope.
 
@@ -54,7 +56,7 @@ Variable a : Q.
 Hypothesis Ha : 1 <= a <= 4.
 (** Square root is first defined on [[1,4]].  Iterating this formula will
 converge to the square root of [a]. *)
-Definition root_step (b:Q) : Q := b/2 + a/(2*b).
+Definition root_step (b:Q) : Q := b / (2#1) + a / ((2#1) * b).
 
 Definition root_has_error (e:Qpos) (b:Q) := a <= (b+e)^2 /\ (b-e)^2 <= a.
 (* begin hide *)
@@ -73,13 +75,13 @@ Proof.
  intros e1 e2 b Hb He [H0 H1].
  rewrite -> Qle_minus_iff in *.
  split; rewrite -> Qle_minus_iff.
-  replace RHS with (((b + e1) ^ 2 + - a) + (e2 + - e1)*(2*(b + - e2 + e2) + e2 + e1)) by (simpl; ring).
+  replace RHS with (((b + e1) ^ 2 + - a) + (e2 + - e1)*((2#1) * (b + - e2 + e2) + e2 + e1)) by ring.
   Qauto_nonneg.
- replace RHS with ((a + - (b-e1)^2) + (e2 + -e1)*((e2 + - e1) + 2*(b + - e2))) by (simpl; ring).
+ replace RHS with ((a + - (b-e1)^2) + (e2 + -e1)*((e2 + - e1) + (2#1) * (b + - e2))) by ring.
  Qauto_nonneg.
 Qed.
 
-Lemma root_error_bnd : forall (e:Qpos) b, e <= 1 -> 1 <= b -> (root_has_error e b) -> b <= 2 + e.
+Lemma root_error_bnd : forall (e:Qpos) b, e <= 1 -> 1 <= b -> (root_has_error e b) -> b <= (2#1) + e.
 Proof.
  intros e b He Hb [H0 H1].
  destruct Ha as [Ha0 Ha1].
@@ -90,14 +92,15 @@ Proof.
   rewrite -> Qle_minus_iff.
   replace RHS with ((b + -(1)) + (1 + - e)) by (simpl; ring).
   Qauto_nonneg.
- replace RHS with (((4  + - a) + (a + - (b - e)^2))/(2 + b - e)) by simpl; field; auto with *.
+ replace RHS with ((((4#1)  + - a) + (a + - (b - e)^2))/((2#1) + b - e)) by simpl; field; auto with *.
  apply Qle_shift_div_l.
   assumption.
  replace LHS with 0 by simpl; ring.
  Qauto_nonneg.
 Qed.
 
-Lemma root_has_error_ball : forall (e1 e2:Qpos) (b1 b2:Q), (e1 + e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1 -> Qball e2 b1 b2 -> root_has_error (e1+e2) b2.
+Lemma root_has_error_ball : forall (e1 e2:Qpos) (b1 b2:Q), 
+  (e1 + e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1 -> Qball e2 b1 b2 -> root_has_error (e1+e2) b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  simpl in H2, H3.
@@ -106,13 +109,14 @@ Proof.
  unfold root_has_error.
  autorewrite with QposElim.
  split; rewrite -> Qle_minus_iff.
-  replace RHS with (((b1 + e1)^2 + - a) + (b2 + - (1)  + e1 + e2 + (b1 + -(1)) + 2 + e1)*(e2 - (b1 - b2))) by simpl; ring.
+  replace RHS with (((b1 + e1)^2 + - a) + (b2 + - (1)  + e1 + e2 + (b1 + -(1)) + (2#1) + e1)*(e2 - (b1 - b2))) by simpl; ring.
   Qauto_nonneg.
  replace RHS with ((a + - (b1 - e1)^2) +  (b1 - b2 + - - e2)*((b1 + -(1)) + (1 + - (e1 + e2)) + e2 + (b2 + -(1)) + (1 + - (e1 + e2)))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
-Lemma ball_root_has_error : forall (e1 e2:Qpos) (b1 b2:Q), ((e1 + e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1 -> root_has_error e2 b2 -> Qball (e1+e2) b1 b2.
+Lemma ball_root_has_error : forall (e1 e2:Qpos) (b1 b2:Q), 
+  ((e1 + e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1 -> root_has_error e2 b2 -> Qball (e1+e2) b1 b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  clear Ha.
@@ -121,20 +125,21 @@ Proof.
   assert (A0:0 < (b1 + e1 + b2 - e2)).
    apply Qlt_le_trans with 1;[constructor|].
    rewrite -> Qle_minus_iff.
-   replace RHS with (b1 + - (1) + (b2 + - (1)) + 2 * e1 + (1 - (e1 + e2))) by simpl; ring.
+   replace RHS with (b1 + - (1) + (b2 + - (1)) + (2#1) * e1 + (1 - (e1 + e2))) by simpl; ring.
    Qauto_nonneg.
   replace RHS with ((((b1 + e1)^2 + - a) + (a + - (b2 - e2)^2))/(b1 + e1 +b2 - e2)) by (simpl; field; auto with * ).
   Qauto_nonneg.
  assert (A0:0 < (b2 + e2 + b1 - e1)).
   apply Qlt_le_trans with 1;[constructor|].
   rewrite -> Qle_minus_iff.
-  replace RHS with (b2 + - (1) + (b1 + - (1)) + 2 * e2 + (1 - (e1 + e2))) by simpl; ring.
+  replace RHS with (b2 + - (1) + (b1 + - (1)) + (2#1) * e2 + (1 - (e1 + e2))) by simpl; ring.
   Qauto_nonneg.
  replace RHS with (((a + -(b1 - e1)^2) + ((b2 + e2)^2 + - a))/(b2 + e2 + b1 - e1)) by (simpl; field;auto with * ).
  Qauto_nonneg.
 Qed.
 
-Lemma root_step_error : forall b (e:Qpos), (1 <= b) ->  (e <= 1) -> root_has_error e b -> root_has_error ((1#2)*(e*e)) (root_step b).
+Lemma root_step_error : forall b (e:Qpos), 
+  (1 <= b) ->  (e <= 1) -> root_has_error e b -> root_has_error ((1#2)*(e*e)) (root_step b).
 Proof.
  intros b e Hb He [H0 H1].
  unfold root_step.
@@ -153,15 +158,15 @@ Proof.
   replace RHS with ((b-e)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
  split.
-  apply Qle_trans with ((b / 2 + a / (2 * b))^2); [|Qauto_le].
-  field_simplify (b / 2 + a / (2 * b)); auto with *.
+  apply Qle_trans with ((b / (2#1) + a / ((2#1) * b))^2); [|Qauto_le].
+  field_simplify (b / (2#1) + a / ((2#1) * b)); auto with *.
   rewrite -> Qdiv_power.
   apply Qle_shift_div_l.
    Qauto_pos.
   rewrite -> Qle_minus_iff.
   replace RHS with ((b^2 - a)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
- field_simplify (b / 2 + a / (2 * b) - ((1#2)*(e * e)%Qpos)); auto with *.
+ field_simplify (b / (2#1) + a / ((2#1) * b) - ((1#2)*(e * e)%Qpos)); auto with *.
  rewrite -> Qdiv_power.
  apply Qle_shift_div_r.
   Qauto_pos.
@@ -195,7 +200,7 @@ Proof.
  rewrite -> Qle_minus_iff.
  assert (A0:(0<=1 + -((1#4)*a))).
   rewrite <- Qle_minus_iff.
-  replace LHS with (a/4) by (simpl; field; discriminate).
+  replace LHS with (a/(4#1)) by (simpl; field; discriminate).
   apply Qle_shift_div_r; try assumption.
   Qauto_pos.
  rewrite -> Qle_minus_iff in Ha0.
@@ -211,7 +216,7 @@ Proof.
  destruct Ha as [Ha0 Ha1].
  unfold root_step.
  rewrite -> Qle_minus_iff in *.
- field_simplify (b / 2 + a / (2 * b) + -(1));auto with *.
+ field_simplify (b / (2#1) + a / ((2#1) * b) + -(1));auto with *.
  apply Qle_shift_div_l.
   Qauto_pos.
  ring_simplify.
@@ -403,7 +408,7 @@ Qed.
 Lemma rational_sqrt_mid_le_3 : forall (e:QposInf), (approximate rational_sqrt_mid e) <= 3.
 Proof.
  intros [e|];[|discriminate].
- change (sqrt_raw e <= 3).
+ change (sqrt_raw e <= (3#1)).
  unfold sqrt_raw.
  set (n:= (S (Psize (Qden e)))).
  assert (root_has_error (Qpos_min (1 # 2) e) (root_loop e n initial_root 2)).
@@ -506,10 +511,10 @@ Proof.
   replace RHS with (e*(1 + -e + (35#36)* e)) by simpl; ring.
   Qauto_nonneg.
  destruct Z; split; simpl; rewrite ->  Qle_minus_iff in *; autorewrite with QposElim in *.
-  replace RHS with (((z+d)^2 + - a) + 2*(3 + -z)*d + (e + - d^2))
+  replace RHS with (((z+d)^2 + - a) + (2#1) * ((3#1) + -z) * d + (e + - d^2))
     by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
   Qauto_nonneg.
- replace RHS with (a + - (z-d)^2 + 2*(3 + - z)*d + d^2 + e)
+ replace RHS with (a + - (z-d)^2 + (2#1) * ((3#1) + - z)*d + d^2 + e)
    by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
  Qauto_nonneg.
 Qed. (* todo: clean up *)
@@ -523,50 +528,90 @@ Proof.
  ring_simplify.
  apply rational_sqrt_mid_one_le.
 Qed.
+End SquareRoot.
 
-Lemma rational_sqrt_mid_correct : forall H, (rational_sqrt_mid == IRasCR (sqrt (inj_Q IR a) H))%CR.
+Lemma rational_sqrt_mid_correct_aux (x : Q) (y : CR) Px :
+  CRpower_positive 2 y = 'x → '0 ≤ y → y = IRasCR (sqrt (inj_Q IR x) Px).
 Proof.
- intros H.
- rewrite <- (CRasIRasCR_id rational_sqrt_mid).
+ intros f_sqrt f_nonneg.
+ rewrite <- (CRasIRasCR_id y).
  apply IRasCR_wd.
- assert (X:Zero[<=](CRasIR rational_sqrt_mid)[^]2).
+ assert (X:Zero[<=](CRasIR y)[^]2).
   apply sqr_nonneg.
  stepl (sqrt _ X).
   apply sqrt_wd.
   rewrite -> IR_eq_as_CR.
   rewrite -> (CRpower_positive_correct 2).
   rewrite -> IR_inj_Q_as_CR.
-  rewrite -> (CRasIRasCR_id).
-  apply rational_sqrt_mid_correct0.
+  now rewrite -> (CRasIRasCR_id).
  apply sqrt_to_nonneg.
  rewrite -> IR_leEq_as_CR.
  rewrite -> IR_Zero_as_CR.
- rewrite -> CRasIRasCR_id.
- apply rational_sqrt_mid_correct1.
+ now rewrite -> CRasIRasCR_id.
 Qed.
 
-End SquareRoot.
+Lemma rational_sqrt_mid_correct a Pa H : 
+  (rational_sqrt_mid a Pa == IRasCR (sqrt (inj_Q IR a) H))%CR.
+Proof.
+ apply rational_sqrt_mid_correct_aux.
+  now apply rational_sqrt_mid_correct0.
+ now apply rational_sqrt_mid_correct1.
+Qed.
 
 (** By scaling the input the range of square root can be extened upto 4^n.
 *)
-Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4^n)%Z) : CR.
+Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) : CR.
  revert a Ha.
  destruct n as [|n].
   intros _ _.
   exact ('1)%CR.
  intros a H.
- destruct (Qle_total a 4).
+ destruct (Qle_total a (4#1)).
   clear rational_sqrt_big_bounded.
   refine (@rational_sqrt_mid a _).
   abstract (destruct H; tauto).
- refine (scale 2 _).
- refine (@rational_sqrt_big_bounded n (a/4) _).
+ refine (scale (2#1) _).
+ refine (@rational_sqrt_big_bounded n (a / (4#1)) _).
  clear rational_sqrt_big_bounded.
  abstract ( destruct H; split;[apply Qle_shift_div_l;[constructor|assumption]|];
    apply Qle_shift_div_r;[constructor|]; rewrite -> Zpower_Qpower in *; try auto with *;
-     change (a <= (4^n)*4^1); rewrite <- Qpower_plus; try discriminate; change (n+1)%Z with (Zsucc n);
+     change (a <= ((4#1) ^ n) * (4#1)^1); rewrite <- Qpower_plus; try discriminate; change (n+1)%Z with (Zsucc n);
        rewrite <- inj_S; assumption).
 Defined.
+
+Lemma rational_sqrt_big_bounded_correct_aux a Xa4 Xa :
+  (scale (2#1)) (IRasCR (sqrt (inj_Q IR (a / (4#1))) Xa4)) [=] IRasCR (sqrt (inj_Q IR a) Xa).
+Proof.
+ rewrite <- CRmult_scale.
+ rewrite <- IR_inj_Q_as_CR.
+ rewrite <- IR_mult_as_CR.
+ apply IRasCR_wd.
+ assert (X1:Zero[<=](inj_Q IR (4#1))).
+  stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+  apply inj_Q_leEq.
+  discriminate.
+ csetoid_replace (inj_Q IR (2#1)) (sqrt _ X1).
+  assert (X2:Zero[<=](inj_Q IR (4#1)[*]inj_Q IR (a/4%positive))).
+   apply mult_resp_nonneg;assumption.
+  astepl (sqrt _ X2).
+  apply sqrt_wd.
+  csetoid_rewrite_rev (inj_Q_mult IR (4#1) (a/4%positive)).
+  apply inj_Q_wd.
+  simpl.
+  field; discriminate.
+ change (inj_Q IR (4#1)) with (inj_Q IR ((2#1)[*](2#1))).
+ assert (X2:Zero[<=](inj_Q IR (2#1))[^]2).
+  apply sqr_nonneg.
+ stepr (sqrt _ X2).
+  apply eq_symmetric; apply sqrt_to_nonneg.
+  stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+  apply inj_Q_leEq.
+  discriminate.
+ apply sqrt_wd.
+ rstepl ((inj_Q IR (2#1))[*](inj_Q IR (2#1))).
+ apply eq_symmetric.
+ apply (inj_Q_mult IR (2#1) (2#1)).
+Qed.
 
 Lemma rational_sqrt_big_bounded_correct : forall n a Ha H,
  (@rational_sqrt_big_bounded n a Ha == IRasCR (sqrt (inj_Q IR a) H))%CR.
@@ -591,7 +636,7 @@ Proof.
   apply less_leEq; apply pos_one.
  intros a Ha H.
  simpl.
- destruct (Qle_total a 4%positive).
+ destruct (Qle_total a).
   apply rational_sqrt_mid_correct.
  change (scale 2 (rational_sqrt_big_bounded n (a / 4%positive)(rational_sqrt_big_bounded_subproof0 n a Ha q)) ==
    IRasCR (sqrt (inj_Q IR a) H))%CR.
@@ -605,40 +650,12 @@ Proof.
   discriminate.
  set (X0:= (rational_sqrt_big_bounded_subproof0 n a Ha q)).
  rewrite -> (IHn (a/4%positive) X0 X).
- rewrite <- CRmult_scale.
- rewrite <- IR_inj_Q_as_CR.
- rewrite <- IR_mult_as_CR.
- apply IRasCR_wd.
- assert (X1:Zero[<=](inj_Q IR (4:Q))).
-  stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
-  apply inj_Q_leEq.
-  discriminate.
- csetoid_replace (inj_Q IR (2:Q)) (sqrt _ X1).
-  assert (X2:Zero[<=](inj_Q IR (4:Q)[*]inj_Q IR (a/4%positive))).
-   apply mult_resp_nonneg;assumption.
-  astepl (sqrt _ X2).
-  apply sqrt_wd.
-  csetoid_rewrite_rev (inj_Q_mult IR (4:Q) (a/4%positive)).
-  apply inj_Q_wd.
-  simpl.
-  field; discriminate.
- change (inj_Q IR (4:Q)) with (inj_Q IR ((2:Q)[*](2:Q))).
- assert (X2:Zero[<=](inj_Q IR (2:Q))[^]2).
-  apply sqr_nonneg.
- stepr (sqrt _ X2).
-  apply eq_symmetric; apply sqrt_to_nonneg.
-  stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
-  apply inj_Q_leEq.
-  discriminate.
- apply sqrt_wd.
- rstepl ((inj_Q IR (2:Q))[*](inj_Q IR (2:Q))).
- apply eq_symmetric.
- apply (inj_Q_mult IR (2:Q) (2:Q)).
+ apply rational_sqrt_big_bounded_correct_aux.
 Qed.
 
 (** By scaling the other direction we can extend the range down to 4^(-n).
 *)
-Fixpoint rational_sqrt_small_bounded (n:nat) a (Ha:/(4^n)%Z <= a <= 4) : CR.
+Fixpoint rational_sqrt_small_bounded (n:nat) a (Ha: / (4^n)%Z <= a <= (4#1)) : CR.
  revert a Ha.
  destruct n as [|n].
   clear rational_sqrt_small_bounded.
@@ -646,37 +663,22 @@ Fixpoint rational_sqrt_small_bounded (n:nat) a (Ha:/(4^n)%Z <= a <= 4) : CR.
  intros a H.
  destruct (Qle_total a 1).
   refine (scale (1#2) _).
-  refine (@rational_sqrt_small_bounded n (4*a) _).
+  refine (@rational_sqrt_small_bounded n ((4#1) * a) _).
   clear rational_sqrt_small_bounded.
   abstract ( destruct H; split;[ rewrite -> Zpower_Qpower in *; auto with *;
     replace (Z_of_nat n) with ((S n) + (-1))%Z by (rewrite inj_S; ring);
-      rewrite -> Qpower_plus; try discriminate; change (4%positive^(-1)) with (/4);
-        rewrite -> Qinv_mult_distr; change ( / / 4) with (4:Q); rewrite -> Qmult_comm
-          |replace RHS with (4*1) by constructor];
+      rewrite -> Qpower_plus; try discriminate; change (4%positive^(-1)) with (/(4#1));
+        rewrite -> Qinv_mult_distr; change ( / / (4#1)) with (4#1); rewrite -> Qmult_comm
+          |replace RHS with ((4#1)*1) by constructor];
             (apply: mult_resp_leEq_lft;simpl;[assumption|discriminate])).
  clear rational_sqrt_small_bounded.
  refine (@rational_sqrt_mid a _).
  abstract (destruct H; tauto).
 Defined.
 
-Lemma rational_sqrt_small_bounded_correct : forall n a Ha H,
- (@rational_sqrt_small_bounded n a Ha == IRasCR (sqrt (inj_Q IR a) H))%CR.
+Lemma rational_sqrt_small_bounded_correct_aux a X4a Xa :
+  (scale (1 # 2)) (IRasCR (sqrt (inj_Q IR (4%positive * a)) X4a))[=]IRasCR (sqrt (inj_Q IR a) Xa).
 Proof.
- induction n; try apply rational_sqrt_mid_correct.
- intros a Ha H.
- simpl.
- destruct (Qle_total a 1); try apply rational_sqrt_mid_correct.
- change (scale (1#2) (rational_sqrt_small_bounded n (4%positive*a) (rational_sqrt_small_bounded_subproof n a Ha q)) ==
-   IRasCR (sqrt (inj_Q IR a) H))%CR.
- assert (X:Zero[<=]inj_Q IR (4%positive*a)).
-  stepr (inj_Q IR (4%positive:Q)[*]inj_Q IR a); [| now apply eq_symmetric; apply (inj_Q_mult IR)].
-  apply mult_resp_nonneg.
-   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
-   apply inj_Q_leEq.
-   discriminate.
-  assumption.
- set (X0:= (rational_sqrt_small_bounded_subproof n a Ha q)).
- rewrite -> (IHn (4%positive*a) X0 X).
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
@@ -706,6 +708,27 @@ Proof.
  rstepl ((inj_Q IR (1#2))[*](inj_Q IR (1#2))).
  apply eq_symmetric.
  apply (inj_Q_mult IR).
+Qed.
+
+Lemma rational_sqrt_small_bounded_correct : forall n a Ha H,
+ (@rational_sqrt_small_bounded n a Ha == IRasCR (sqrt (inj_Q IR a) H))%CR.
+Proof.
+ induction n; try apply rational_sqrt_mid_correct.
+ intros a Ha H.
+ simpl.
+ destruct (Qle_total a 1); try apply rational_sqrt_mid_correct.
+ change (scale (1#2) (rational_sqrt_small_bounded n (4%positive*a) (rational_sqrt_small_bounded_subproof n a Ha q)) ==
+   IRasCR (sqrt (inj_Q IR a) H))%CR.
+ assert (X:Zero[<=]inj_Q IR (4%positive*a)).
+  stepr (inj_Q IR (4%positive:Q)[*]inj_Q IR a); [| now apply eq_symmetric; apply (inj_Q_mult IR)].
+  apply mult_resp_nonneg.
+   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+   apply inj_Q_leEq.
+   discriminate.
+  assumption.
+ set (X0:= (rational_sqrt_small_bounded_subproof n a Ha q)).
+ rewrite -> (IHn (4%positive*a) X0 X).
+ apply rational_sqrt_small_bounded_correct_aux.
 Qed.
 
 (** And hence it is defined for all postive numbers. *)
@@ -933,3 +956,71 @@ Qed.
 (* begin hide *)
 Hint Rewrite CRsqrt_correct : IRtoCR.
 (* end hide *)
+
+Lemma CRsqrt_Qsqrt : forall x : Q, (CRsqrt ('x) == rational_sqrt x)%CR.
+Proof.
+ intros x.
+ unfold CRsqrt.
+ rewrite -> (Cbind_correct QPrelengthSpace sqrt_uc (' x))%CR.
+ apply: BindLaw1.
+Qed.
+
+Instance: Proper ((=) ==> (=)) rational_sqrt.
+Proof.
+  intros x1 x2 E.
+  rewrite <-2!CRsqrt_Qsqrt.
+  now rewrite E.
+Qed.
+
+Lemma rational_sqrt_nonpos (a : Q) :
+  a ≤ 0 → rational_sqrt a = '0.
+Proof.
+ intros. unfold rational_sqrt.
+ case Qlt_le_dec_fast; intros; [|reflexivity].
+ edestruct Qle_not_lt; eassumption.
+Qed.
+
+Lemma rational_sqrt_unique (a : Q) (y : CR) :
+  0 ≤ a → CRpower_positive 2 y = 'a → '0 ≤ y → y = rational_sqrt a.
+Proof.
+ intros.
+ assert (Pa : Zero[<=](inj_Q IR a)).
+  stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+  now apply inj_Q_leEq.
+ rewrite (rational_sqrt_correct _ Pa).
+ now apply rational_sqrt_mid_correct_aux.
+Qed.
+
+Lemma rational_sqrt_scale (n : Z) a : 
+  0 ≤ a → scale ((2#1) ^ n) (rational_sqrt (a * (4#1) ^ (-n))) = rational_sqrt a.
+Proof.
+ intros E.
+ rewrite <-CRmult_scale.
+ revert n. apply integers.biinduction.
+   solve_proper. 
+  simpl. rewrite Qmult_1_r.
+  now ring_simplify.
+ intros n.
+ setoid_replace ('((2#1) ^ (1 + n)) * rational_sqrt (a * (4#1) ^ -(1 + n)))%CR
+    with ('((2#1) ^ n) * scale (2#1) (rational_sqrt ((a * (4#1) ^ -n) / (4#1))))%CR.
+  assert (Pa1 : Zero[<=](inj_Q IR (a * (4#1) ^ (- n)))).
+   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+   apply inj_Q_leEq.
+   apply Qmult_le_0_compat; [assumption|].
+   now apply Qpower_pos.
+  assert (Pa2 : Zero[<=](inj_Q IR (a * (4#1) ^ (- n) / (4 # 1)))).
+   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
+   apply inj_Q_leEq.
+   apply Qmult_le_0_compat; [|easy].
+   apply Qmult_le_0_compat; [assumption|].
+   now apply Qpower_pos.
+  rewrite (rational_sqrt_correct _ Pa1), (rational_sqrt_correct _ Pa2).
+  split; intros E2; rewrite <-E2; now rewrite rational_sqrt_big_bounded_correct_aux.
+ rewrite Zopp_plus_distr.
+ rewrite <-CRmult_scale.
+ rewrite 2!Qpower_plus by discriminate.
+ simpl.
+ rewrite (Qmult_comm (2#1) ((2#1) ^ n)), <-CRmult_Qmult.
+ rewrite (Qmult_comm (/(4#1))), Qmult_assoc.
+ symmetry. apply associativity.
+Qed.
