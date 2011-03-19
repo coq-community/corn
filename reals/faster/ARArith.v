@@ -73,6 +73,7 @@ Qed.
 (* Constants *)
 Global Instance inject_AQ_AR: Coerce AQ AR := (@Cunit AQ_as_MetricSpace).
 Global Instance inject_PosAQ_AR: Coerce (AQ₊) AR := Basics.compose inject_AQ_AR positive_semiring_elements.Pos_inject.
+Global Instance inject_Z_AR: Coerce Z AR := Basics.compose inject_AQ_AR (coerce : Z → AQ).
 
 Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
 
