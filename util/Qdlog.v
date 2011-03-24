@@ -1,6 +1,6 @@
 (* Discrete logarithm with base 2 and 4 on [Q] *)
 Require Import 
-  ZArith QArith Qround stdlib_omissions.Q Qposclasses
+  Program ZArith QArith Qround stdlib_omissions.Q Qposclasses
   abstract_algebra additional_operations 
   int_pow orders.rationals stdlib_rationals.
 
@@ -90,6 +90,14 @@ Proof.
   contradiction.
 Qed.
 
+Lemma Qdlog2_0 (x : Q) :
+  0 < x → Qdlog2 x = 0 → x < 2.
+Proof.
+  intros ? E.
+  change (x < 2 ^ (1 + 0)). rewrite <-E.
+  now apply Qdlog2_spec.
+Qed.
+
 Lemma Qpos_dlog2_spec (x : Qpos) : 
   '(2 ^ Qdlog2 x) ≤ ('x : Q) ∧ 'x < '(2 ^ (1 + Qdlog2 x)).
 Proof. unfold coerce. simpl. split; apply Qdlog2_spec; auto. Qed.
@@ -133,6 +141,121 @@ Proof. intros E. now rewrite Qdlog2_mult_pow2. Qed.
 Lemma Qdlog2_double (x : Q) : 
   0 < x → Qdlog2 x + 1 = Qdlog2 (ring_mult x 2).
 Proof. intros E. now rewrite Qdlog2_mult_pow2. Qed.
+
+Lemma Qdlog2_preserving (x y : Q) :
+  0 < x → x ≤ y → Qdlog2 x ≤ Qdlog2 y.
+Proof.
+  intros E1 E2.
+  apply integers.precedes_sprecedes. rewrite commutativity.
+  apply int_pow_exp_sprecedes_back with (2:Q); [ apply semirings.sprecedes_1_2 |].
+  apply orders.sprecedes_trans_r with x; [now apply Qdlog2_spec | ].
+  apply orders.sprecedes_trans_r with y; [assumption |].
+  apply Qdlog2_spec. 
+  now apply orders.sprecedes_trans_l with x.
+Qed.
+
+(* This function computes log n by repeatedly dividing by n. 
+  Warning, it only works in case 1 ≤ x and 2 ≤ n. *)
+Fixpoint Qdlog_bounded (b : nat) (n : Z) (x : Q) : Z := 
+  match b with
+  | O => 0
+  | S c => if (decide_rel (<) x (n:Q)) 
+    then 0 
+    else 1 + Qdlog_bounded c n (x / (n:Q))
+  end.
+
+Definition Qdlog (n : Z) (x : Q) : Z := Qdlog_bounded (Zabs_nat (Qdlog2 x)) n x.
+
+Lemma Qdlog_bounded_nonneg (b : nat) (n : Z) (x : Q) :
+  0 ≤ Qdlog_bounded b n x.
+Proof.
+  revert x. induction b; simpl; [reflexivity |].
+  intros. case (decide_rel _); intros; [reflexivity |].
+  apply semirings.nonneg_plus_compat; [easy | apply IHb].
+Qed.
+
+Lemma Qdlog2_le1 (n : Z) (x : Q) : 
+  2 ≤ n → x ≤ 1 → Qdlog n x = 0.
+Proof.
+  intros En Ex. unfold Qdlog.
+  generalize (Zabs_nat (Qdlog2 x)). 
+  intros b. induction b; simpl; [reflexivity |].
+  case (decide_rel _); intros E; [reflexivity |].
+  destruct E.
+  apply orders.sprecedes_trans_r with 1; try assumption.
+  apply orders.sprecedes_trans_l with 2.
+   now apply semirings.sprecedes_1_2.
+  now apply (order_preserving (coerce : Z → Q)) in En.
+Qed.
+
+Instance: Proper (=) Qdlog_bounded.
+Proof.
+  intros b1 b2 Eb n1 n2 En x1 x2 Ex.
+  change (b1 ≡ b2) in Eb. change (n1 ≡ n2) in En. subst.
+  revert x1 x2 Ex. induction b2; simpl; [reflexivity |].
+  intros x1 x2 Ex.
+  case (decide_rel _); case (decide_rel _); intros E1 E2.
+     reflexivity.
+    destruct E1. now rewrite <-Ex.
+   destruct E2. now rewrite Ex.
+  rewrite IHb2; [reflexivity| now rewrite Ex].
+Qed.
+
+Instance: Proper (=) Qdlog.
+Proof. unfold Qdlog. intros ? ? E1 ? ? E2. now rewrite E1, E2. Qed.
+
+Lemma Qdlog_spec_bounded (b : nat) (n : Z) (x : Q) : 
+  2 ≤ n → Qdlog2 x ≤ b → 1 ≤ x → 'n ^ Qdlog_bounded b n x ≤ x ∧ x < 'n ^ (1 + Qdlog_bounded b n x).
+Proof.
+  intros En Eb Ex.
+  apply (order_preserving (coerce : Z → Q)) in En.
+  assert (PropHolds (0 < ('n : Q)))
+    by (apply orders.sprecedes_trans_l with 2; [solve_propholds | assumption]).
+  revert x Eb Ex.
+  induction b; simpl.
+   intros x Eb Ex.
+   split; [assumption|].
+   apply orders.sprecedes_trans_l with 2; try assumption.
+   apply Qdlog2_0.
+    apply orders.sprecedes_trans_l with 1; [ solve_propholds | easy].
+   apply (antisymmetry (≤)); try assumption.
+   now apply Qdlog2_nonneg.
+  intros x Eb Ex.
+  case (decide_rel _); [intuition |]; intros E.
+  apply orders.not_sprecedes_precedes in E.
+  assert (x = 'n * (x / 'n)) as Ex2.
+   rewrite (commutativity x), associativity.
+   rewrite fields.dec_mult_inverse, rings.mult_1_l; [reflexivity |].
+   now apply orders.sprecedes_ne_flip.
+  rewrite ZBasics.succ_nat in Eb.
+  assert (1 ≤ x / 'n).
+   apply (order_preserving_back (('n:Q) *.)).
+   now rewrite <-Ex2, rings.mult_1_r.
+  destruct IHb with (x / 'n) as [IHb1 IHb2]; trivial.
+   transitivity (Qdlog2 (ring_mult x (/2))).
+    apply Qdlog2_preserving.
+     apply orders.sprecedes_trans_l with 1; [solve_propholds | assumption].
+    apply (maps.order_preserving_ge_0 (.*.) x).
+     now transitivity 1.
+    apply fields.flip_dec_mult_inv; [solve_propholds | assumption].
+   rewrite <-Qdlog2_half.
+    now apply rings.flip_minus_l.
+   now apply orders.sprecedes_trans_l with 1; [solve_propholds | assumption].
+  rewrite int_pow_S_nonneg by (now apply Qdlog_bounded_nonneg).
+  rewrite int_pow_S_nonneg by (apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg]).
+  setoid_rewrite Ex2 at 2 3.
+  split.
+   now apply (order_preserving (('n:Q) *.)).
+  now apply (strictly_order_preserving (('n:Q) *.)).
+Qed.
+
+Lemma Qdlog_spec (n : Z) (x : Q) : 
+  2 ≤ n → 1 ≤ x → 'n ^ Qdlog n x ≤ x ∧ x < 'n ^ (1 + Qdlog n x).
+Proof. 
+  intros. apply Qdlog_spec_bounded; trivial.
+  rewrite inj_Zabs_nat, Zabs_eq; [reflexivity |].
+  now apply Qdlog2_nonneg.
+Qed.
 
 Definition Qdlog4 (x : Q) : Z := Zdiv (Qdlog2 x) 2.
 
