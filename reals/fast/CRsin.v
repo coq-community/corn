@@ -38,6 +38,7 @@ Require Import Ndigits.
 Require Import Compress.
 Require Import PowerBound.
 Require Import CornTac.
+Require Import abstract_algebra.
 
 Set Implicit Arguments.
 
@@ -248,6 +249,9 @@ Section Sin_Poly.
 
 Definition sin_poly_fun (x:Q) :Q := x*(3 - 4*x*x).
 
+Global Instance: Proper ((=) ==> (=)) sin_poly_fun.
+Proof. unfold sin_poly_fun. solve_proper. Qed.
+
 Lemma sin_poly_fun_correct : forall (q:Q),
  inj_Q IR (sin_poly_fun q)[=]Three[*]inj_Q IR q[-]Four[*](inj_Q IR q[^]3).
 Proof.
@@ -407,15 +411,9 @@ match n return 0 <= a <= (3^n)%Z -> CR with
   end
 end.
 
-Lemma rational_sin_pos_bounded_correct :  forall n (a:Q) Ha,
- (@rational_sin_pos_bounded n a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
+Lemma rational_sin_pos_bounded_correct_aux a :
+  sin_poly (IRasCR (Sin (inj_Q IR (a / 3))))[=]IRasCR (Sin (inj_Q IR a)).
 Proof.
- induction n.
-  apply rational_sin_small_pos_correct.
- intros a Ha.
- unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
- destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
- rewrite -> IHn.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
    (stepr (nring 1:IR); [| now apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
      apply AbsIR_Sin_leEq_One].
@@ -436,6 +434,17 @@ Proof.
  apply Sin_triple_angle.
 Qed.
 
+Lemma rational_sin_pos_bounded_correct :  forall n (a:Q) Ha,
+ (@rational_sin_pos_bounded n a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
+Proof.
+ induction n.
+  apply rational_sin_small_pos_correct.
+ intros a Ha.
+ unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
+ destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
+ rewrite -> IHn.
+ apply rational_sin_pos_bounded_correct_aux.
+Qed.
 End Sin_Poly.
 
 (** Therefore sin works on all nonnegative numbers. *)
@@ -455,14 +464,9 @@ match (Qle_total 0 a) with
 | right H => (-rational_sin_pos (Qopp_le_compat _ _ H))%CR
 end.
 
-Lemma rational_sin_correct : forall (a:Q),
- (@rational_sin a == IRasCR (Sin (inj_Q IR a)))%CR.
+Lemma rational_sin_correct_aux (a : Q) :
+ (- IRasCR (Sin (inj_Q IR (- a)%Q)))%CR[=]IRasCR (Sin (inj_Q IR a)).
 Proof.
- intros a.
- unfold rational_sin.
- destruct (Qle_total 0 a).
-  apply rational_sin_pos_correct.
- rewrite -> rational_sin_pos_correct.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.
  csetoid_rewrite_rev (Sin_inv (inj_Q IR (-a))).
@@ -471,6 +475,38 @@ Proof.
  apply inj_Q_wd.
  simpl.
  ring.
+Qed.
+
+Lemma rational_sin_correct : forall (a:Q),
+ (@rational_sin a == IRasCR (Sin (inj_Q IR a)))%CR.
+Proof.
+ intros a.
+ unfold rational_sin.
+ destruct (Qle_total 0 a).
+  apply rational_sin_pos_correct.
+ rewrite -> rational_sin_pos_correct.
+ apply rational_sin_correct_aux.
+Qed.
+
+Instance: Proper ((=) ==> (=)) rational_sin.
+Proof.
+ intros ? ? E.
+ rewrite ?rational_sin_correct.
+ now apply IRasCR_wd, Sin_wd, inj_Q_wd.
+Qed.
+
+Lemma rational_sin_poly (a : Q) :
+  sin_poly (rational_sin (a / 3)) = rational_sin a.
+Proof.
+ rewrite ?rational_sin_correct.
+ apply rational_sin_pos_bounded_correct_aux.
+Qed.
+
+Lemma rational_sin_opp (a : Q) :
+  (-rational_sin (-a) = rational_sin a)%CR.
+Proof.
+  rewrite ?rational_sin_correct.
+  now apply rational_sin_correct_aux.
 Qed.
 
 (** Sine is uniformly continuous everywhere. *)

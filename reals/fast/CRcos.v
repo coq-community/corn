@@ -33,6 +33,7 @@ Require Import ContinuousCorrect.
 Require Import Qmetric.
 Require Import SinCos.
 Require Import CornTac.
+Require Import abstract_algebra.
 
 Opaque inj_Q CR Qmin Qmax.
 
@@ -47,7 +48,10 @@ to the real numbers. *)
 
 Section Cos_Poly.
 
-Definition cos_poly_fun (x:Q) :Q := 1-2*x*x.
+Definition cos_poly_fun (x:Q) :Q := 1 - (2#1) * x * x.
+
+Global Instance: Proper ((=) ==> (=)) cos_poly_fun.
+Proof. unfold cos_poly_fun. solve_proper. Qed.
 
 Lemma cos_poly_fun_correct : forall (q:Q),
  inj_Q IR (cos_poly_fun q)[=]One[-]Two[*](inj_Q IR q[^]2).
@@ -165,13 +169,9 @@ End Cos_Poly.
 
 Definition rational_cos (x:Q) := cos_poly (rational_sin (x/2)).
 
-(** Cosine is correct. *)
-Lemma rational_cos_correct : forall (a:Q),
- (rational_cos a == IRasCR (Cos (inj_Q IR a)))%CR.
+Lemma rational_cos_correct_aux a :
+  cos_poly (IRasCR (Sin (inj_Q IR (a / 2))))[=]IRasCR (Cos (inj_Q IR a)).
 Proof.
- intros a.
- unfold rational_cos.
- rewrite -> rational_sin_correct.
  rewrite <- cos_poly_correct.
   apply IRasCR_wd.
   csetoid_rewrite_rev (Cos_double_angle (inj_Q IR (a/2))).
@@ -184,6 +184,23 @@ Proof.
  stepr (nring 1:IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR 1))].
  rstepr (One:IR).
  apply AbsIR_Sin_leEq_One.
+Qed.
+
+(** Cosine is correct. *)
+Lemma rational_cos_correct : forall (a:Q),
+ (rational_cos a == IRasCR (Cos (inj_Q IR a)))%CR.
+Proof.
+ intros a.
+ unfold rational_cos.
+ rewrite -> rational_sin_correct.
+ apply rational_cos_correct_aux.
+Qed.
+
+Lemma rational_cos_sin a :
+  cos_poly (rational_sin (a / 2)) = rational_cos a.
+Proof.
+ rewrite rational_sin_correct, rational_cos_correct.
+ now apply rational_cos_correct_aux.
 Qed.
 
 Definition cos_uc_prf : is_UniformlyContinuousFunction rational_cos Qpos2QposInf.
