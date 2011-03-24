@@ -185,7 +185,9 @@ Section approximate_rationals_more.
     symmetry. apply Qmax_coincides.
   Qed.
 
-  Global Program Instance AQposAsQpos: Coerce (AQ₊) Qpos := λ x, '('x : AQ) : Q.
+  Global Program Instance AQposAsQ: Coerce (AQ₊) Q := (coerce : AQ → Q) ∘ (coerce : AQ₊ → AQ).
+
+  Global Program Instance AQposAsQpos: Coerce (AQ₊) Qpos := λ x, ('x : Q).
   Next Obligation.
     destruct x as [x Ex]. simpl.
     posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).

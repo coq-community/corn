@@ -149,14 +149,12 @@ Program Definition AQexp_inv_pos_bound : AQ₊ :=
 Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
-  '(AQposAsQpos AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 
+  '('AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 
 Proof.
-  unfold AQexp_inv_pos_bound.
-  unfold AQposAsQpos. simpl. 
-  unfold coerce at 3. unfold positive_semiring_elements.Pos_inject. simpl.
+  change ('('((1 ≪ (-2)) ^ Zabs_N (Zdiv (Qnum ('a)) (Qden ('a)))) : Q) ≤ rational_exp (AQtoQ a)).
   rewrite preserves_nat_pow.
   rewrite aq_shift_correct.
-  rewrite rings.preserves_1, left_identity.
+  rewrite rings.preserves_1, rings.mult_1_l.
   rewrite <-int_pow_nat_pow.
   rewrite Z_of_N_abs, Z.abs_neq.
    rewrite rational_exp_correct.
@@ -197,7 +195,7 @@ Proof.
     now apply semirings.preserves_nonneg.
    rewrite <-rational_exp_correct.
    posed_rewrite <-(rings.preserves_opp (f:=coerce : AQ → Q)).
-   apply AQexp_inv_pos_bound_correct.
+   apply: (AQexp_inv_pos_bound_correct (a:=-a)).
    now apply rings.flip_nonneg_opp.
   apply AQexp_neg_correct.
 Qed.

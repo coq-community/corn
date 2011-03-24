@@ -72,7 +72,7 @@ Qed.
 
 (* Constants *)
 Global Instance inject_AQ_AR: Coerce AQ AR := (@Cunit AQ_as_MetricSpace).
-Global Instance inject_PosAQ_AR: Coerce (AQ₊) AR := Basics.compose inject_AQ_AR positive_semiring_elements.Pos_inject.
+Global Instance inject_PosAQ_AR: Coerce (AQ₊) AR := Basics.compose inject_AQ_AR (coerce : AQ₊ → AQ).
 Global Instance inject_Z_AR: Coerce Z AR := Basics.compose inject_AQ_AR (coerce : Z → AQ).
 
 Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
@@ -286,19 +286,46 @@ Qed.
 Global Instance: PropHolds ((0:AR) ≤ (1:AR)).
 Proof. apply (order_preserving (coerce : AQ → AR)). solve_propholds. Qed.
 
-Definition ARpos (x : AR) : CProp := sig (λ y : AQ₊, '('y : AQ) ≤ x).
+Definition ARpos (x : AR) : CProp := sig (λ y : AQ₊, 'y ≤ x).
+
+Program Definition ARpos_char (ε : AQ₊) (x : AR) (Pε : 2 * 'ε ≤ approximate x ('ε : Qpos)) : ARpos x := ε ↾ _.
+Next Obligation.
+  intros δ.
+  change (-'δ ≤ '(approximate x ((1 # 2) * δ)%Qpos - 'ε)).
+  transitivity (-'((1 # 2) * δ)%Qpos).
+   apply rings.flip_opp.
+   change ((1 # 2) * δ ≤ δ).
+   rewrite <-(rings.mult_1_l (δ:Q)) at 2.
+   now apply (order_preserving (.* (δ:Q))).
+  apply rings.flip_nonneg_minus.
+  transitivity ('approximate x ('ε : Qpos) - 2 * 'ε : Q).
+   apply (order_preserving (coerce : AQ → Q)) in Pε.
+   rewrite rings.preserves_mult, rings.preserves_2 in Pε.
+   now apply rings.flip_nonneg_minus.
+  apply rings.flip_minus_l.
+  transitivity (('ε + (1 # 2) * δ) + 'approximate x ((1 # 2) * δ)%Qpos).
+   apply rings.flip_minus_l.
+   now destruct (regFun_prf x ('ε : Qpos) ((1#2) * δ)%Qpos).
+  rewrite rings.preserves_minus.
+  apply orders.equiv_precedes.
+  change ('ε + (1 # 2) * δ + 'approximate x ((1 # 2) * δ)%Qpos ==
+    'approximate x ((1 # 2) * δ)%Qpos - 'ε - - ((1 # 2) * δ) + (2#1) * ' ε)%Q. ring.
+Qed.  
 
 Lemma ARtoCR_preserves_pos x : ARpos x IFF CRpos (ARtoCR x).
 Proof with auto with qarith.
   split; intros [y E].
-   exists ('y : Qpos). simpl. rewrite <-ARtoCR_inject.
-   apply ARtoCR_preserves_le in E. apply E.
+   exists ('y : Qpos).
+   change ('('('y : AQ) : Q) ≤ ARtoCR x). 
+   rewrite <-ARtoCR_inject.
+   now apply (order_preserving _).
   destruct (aq_lt_mid 0 y) as [z [Ez1 Ez2]]...
   assert (0 < z) as F. apply aq_preserves_lt. aq_preservation...
   exists (exist _ z F). simpl.
-  apply (order_preserving_back ARtoCR). 
+  change ('('(z ↾ F) : AQ) ≤ x).
+  apply (order_preserving_back ARtoCR).
   rewrite ARtoCR_inject.
-  apply CRle_trans with (''y)...
+  apply CRle_trans with (''y); trivial.
   apply CRArith.CRle_Qle...
 Defined.
 
@@ -417,7 +444,6 @@ Definition ARinv (x : AR) (x_ : x >< 0) : AR :=
   | inr (exist c _) => ARinv_pos c x
   end.
 
-Opaque ARtoCR.
 Lemma ARtoCR_preserves_inv x x_ x__: ARtoCR (ARinv x x_) = CRinv (ARtoCR x) x__. 
 Proof with auto with qarith; try reflexivity.
   unfold ARinv.
@@ -429,8 +455,9 @@ Proof with auto with qarith; try reflexivity.
    autorewrite with ARtoCR.
    destruct (Qlt_le_dec d ('c : Qpos)).
     rewrite (CRinv_pos_weaken d ('c))...
-    simpl. rewrite <-ARtoCR_inject. rewrite <-ARtoCR_preserves_opp.
-    apply ARtoCR_preserves_le. 
+    change ('('('c : AQ) : Q) ≤ -ARtoCR x).
+    rewrite <-ARtoCR_inject, <-rings.preserves_opp.
+    apply (order_preserving _).
     rewrite <-(rings.plus_0_l (-x))...
    rewrite (CRinv_pos_weaken ('c) d)...
    rewrite <-(rings.plus_0_l (-ARtoCR x))...
@@ -441,14 +468,13 @@ Proof with auto with qarith; try reflexivity.
   autorewrite with ARtoCR.
   destruct (Qlt_le_dec d ('c : Qpos)).
    rewrite (CRinv_pos_weaken d ('c))...
-   simpl. rewrite <-ARtoCR_inject. 
-   apply ARtoCR_preserves_le. 
-   setoid_replace x with (x - 0 : AR)...
-   ring.
+   change ('('('c : AQ) : Q) ≤ ARtoCR x).
+   rewrite <-ARtoCR_inject. 
+   apply (order_preserving _).
+   setoid_replace x with (x - 0 : AR) by ring...
   rewrite (CRinv_pos_weaken ('c) d)...
   rewrite <-(rings.plus_0_r (ARtoCR x))...
 Qed.
-Transparent ARtoCR.
 
 Lemma ARtoCR_preserves_inv_l x x_ : {x__ | ARtoCR (ARinv x x_) = CRinv (ARtoCR x) x__}.
 Proof.

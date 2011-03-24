@@ -347,7 +347,7 @@ Proof.
    transitivity (0:AR).
     apply rings.flip_nonneg_opp. 
     apply (semirings.preserves_nonneg (f:=coerce : AQ → AR)).
-    simpl. solve_propholds.
+    now apply: semirings.precedes_0_4.
    now apply AQsqrt_mid_nonneg.
   now apply AQsqrt_mid_upper_bound.
 Qed.

@@ -1,12 +1,12 @@
-Require Import BigZ ARDyadics CRArith ARexp ARpi ARarctan ARroot.
+Require Import BigZ ARDyadics CRArith ARexp ARpi ARarctan ARroot ARsign.
 
 Definition answer (n:positive) (r : fastAR) : bigZ :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in 
  let (a, b) := (approximate r (1#m)%Qpos : fastD) * 'Zpos m in 
  BigZ.shiftl a b.
 
-Let ARtest : fastAR := 2 * ARexp (ARexp (AQexp 1)).
-Time Eval vm_compute in (answer 150 ARtest).
+Let ARtest1 : fastAR := 2 * ARexp (ARexp (AQexp 1)).
+Time Eval vm_compute in (answer 150 ARtest1).
 
 Let ARtest2 : fastAR := '(4 : Z) + AQexp ('(10 : Z)).
 Time Eval vm_compute in (answer 1250 ARtest2).
@@ -28,3 +28,12 @@ Time Eval vm_compute in (answer 500 ARtest7).
 
 Let ARtest8 : fastAR := ARexp (ARsqrt 2).
 Time Eval vm_compute in (answer 200 ARtest8).
+
+Local Obligation Tactic := idtac.
+Program Let ARtest9 := ARinv (ARsqrt (ARpi : fastAR)) _.
+Next Obligation. right. AR_solve_lt (-8)%Z. Defined.
+
+Time Eval vm_compute in (answer 300 ARtest9).
+
+Example xkcd217A : ARtest4 ⋖ '20%Z.
+Proof. Time AR_solve_lt (-8)%Z. Defined.
