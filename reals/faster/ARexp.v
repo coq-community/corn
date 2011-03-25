@@ -60,7 +60,7 @@ Qed.
 Fixpoint AQexp_neg_bounded {n : nat} {a : AQ} : -2^n ≤ a ≤ 0 → AR :=
   match n with
   | O => AQexp_small_neg
-  | S n' => λ Pa, ARpower_positive_bounded 2 1 (ARcompress (AQexp_neg_bounded (AQexp_neg_bounded_prf Pa)))
+  | S n' => λ Pa, ARpower_N_bounded 2 1 (ARcompress (AQexp_neg_bounded (AQexp_neg_bounded_prf Pa)))
   end.
 
 Lemma AQexp_neg_bounded_correct {n : nat} {a : AQ} (Pa : -2^n ≤ a ≤ 0) : 
@@ -71,7 +71,7 @@ Proof.
    apply AQexp_small_neg_correct.
   unfold AQexp_neg_bounded. fold (AQexp_neg_bounded (AQexp_neg_bounded_prf p)).
   rewrite ARcompress_correct.
-  rewrite ARtoCR_preserves_power_positive_bounded.
+  rewrite ARtoCR_preserves_power_N_bounded.
   rewrite IHn.
   setoid_replace ('1 : Qpos) with (1#1)%Qpos by now rewrite AQposAsQpos_preserves_1.
   rewrite aq_shift_opp_1.

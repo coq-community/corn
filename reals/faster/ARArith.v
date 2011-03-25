@@ -500,35 +500,49 @@ Qed.
 Lemma ARinv_irrelevent x x_ x__ : ARinv x x_ = ARinv x x__.
 Proof. apply ARinv_wd. reflexivity. Qed.
 
-Program Definition AQpower_positive_uc (p : positive) (c : AQ₊) : AQ_as_MetricSpace --> AQ_as_MetricSpace
-  := unary_uc coerce (λ x : AQ_as_MetricSpace, (AQboundAbs_uc c x) ^ (Npos p) : AQ_as_MetricSpace)
-           (Qpower_positive_uc p ('c)) _.
+Program Definition AQpower_N_uc (n : N) (c : AQ₊) : AQ_as_MetricSpace --> AQ_as_MetricSpace
+  := unary_uc coerce (λ x : AQ_as_MetricSpace, (AQboundAbs_uc c x) ^ n : AQ_as_MetricSpace)
+           (Qpower_N_uc n ('c)) _.
 Next Obligation.
-  assert (∀ x : AQ, '(x ^ Npos p) = Qpower_positive ('x) p) as preserves_pow_pos.
-   intros y. 
+  assert (∀ y : AQ, '(y ^ n) = 'y ^ 'n) as preserves_pow_pos.
+   intros y.
    rewrite nat_pow.preserves_nat_pow.
-   now rewrite <-(int_pow.int_pow_nat_pow (f:=Z_of_N)).
+   now rewrite (int_pow.int_pow_nat_pow (f:=coerce : N → Z)).
   rewrite preserves_pow_pos. aq_preservation. 
 Qed.
 
-Definition ARpower_positive_bounded (p : positive) (c : AQ₊) : AR --> AR := Cmap AQPrelengthSpace (AQpower_positive_uc p c).
+Definition ARpower_N_bounded (n : N) (c : AQ₊) : AR --> AR := Cmap AQPrelengthSpace (AQpower_N_uc n c).
 
-Lemma ARtoCR_preserves_power_positive_bounded x p c : 
-  ARtoCR (ARpower_positive_bounded p c x) = CRpower_positive_bounded p ('c) (ARtoCR x).
+Lemma ARtoCR_preserves_power_N_bounded x n c : 
+  ARtoCR (ARpower_N_bounded n c x) = CRpower_N_bounded n ('c) (ARtoCR x).
 Proof. apply preserves_unary_fun. Qed.
 
-Definition ARpower_positive (p : positive) (x : AR) : AR := ucFun (ARpower_positive_bounded p (AR_b x)) x.
+Global Instance AR_power_N: Pow AR N := λ x n, ucFun (ARpower_N_bounded n (AR_b x)) x.
 
-Lemma ARtoCR_preserves_power_positive x p : 
-  ARtoCR (ARpower_positive p x) = CRpower_positive p (ARtoCR x).
+Lemma ARtoCR_preserves_power_N (x : AR) (n : N) : 
+  ARtoCR (x ^ n) = (ARtoCR x) ^ n.
 Proof.
-  unfold ARpower_positive.
-  rewrite ARtoCR_preserves_power_positive_bounded.
+  unfold pow, CR_power_N, AR_power_N.
+  rewrite ARtoCR_preserves_power_N_bounded.
   setoid_replace ('AR_b x : Qpos) with (CR_b (1#1) (ARtoCR x)). 
    reflexivity.
   unfold QposEq. simpl.
   now rewrite ARtoCR_approximate, <-AR_b_correct.
 Qed. 
+
+Hint Rewrite ARtoCR_preserves_power_N : ARtoCR.
+
+Global Instance: NatPowSpec AR N _.
+Proof.
+  split.
+    intros ? ? Ex ? ? En.
+    apply (injective ARtoCR). autorewrite with ARtoCR.
+    now rewrite Ex, En.
+   intros. apply (injective ARtoCR). autorewrite with ARtoCR.
+   now rewrite nat_pow_0.
+  intros. apply (injective ARtoCR). autorewrite with ARtoCR.
+  now rewrite nat_pow_S.
+Qed.
 
 (* Misc properties *)
 Lemma ARmult_bounded_mult (x y : AR) c : 
@@ -548,14 +562,14 @@ Proof.
   apply (order_preserving _). intuition.
 Qed.
 
-Lemma ARpositive_power_bounded_positive_power (p : positive) (x : AR) (c : AQ₊) : 
-  -'c ≤ x ≤ 'c → ARpower_positive_bounded p c x = ARpower_positive p x.
+Lemma ARpower_N_bounded_N_power (n : N) (x : AR) (c : AQ₊) : 
+  -'c ≤ x ≤ 'c → ARpower_N_bounded n c x = x ^ n.
 Proof.
   intros.
   apply (injective ARtoCR).
-  rewrite ARtoCR_preserves_power_positive, ARtoCR_preserves_power_positive_bounded.
+  rewrite ARtoCR_preserves_power_N, ARtoCR_preserves_power_N_bounded.
   destruct c as [c Pc].
-  apply CRpositive_power_bounded_positive_power. split.
+  apply CRpower_N_bounded_N_power. split.
    change ('(-'c : Q) ≤ ARtoCR x).
    rewrite <-rings.preserves_opp.
    rewrite <-ARtoCR_inject.

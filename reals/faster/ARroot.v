@@ -298,7 +298,7 @@ Proof.
   now apply AQsqrt_mid_bounded_raw_lower_bound.
 Qed.
 
-Lemma AQsqrt_mid_spec : ARpower_positive 2 AQsqrt_mid = 'a.
+Lemma AQsqrt_mid_spec : AQsqrt_mid ^ (2:N)= 'a.
 Proof.
   assert (∀ ε, Qball ε ('(AQsqrt_mid_raw ε ^ (2:N))) ('a)) as P.
    intros ε. apply Qball_Qabs. rewrite Qabs.Qabs_neg.
@@ -330,7 +330,7 @@ Proof.
    apply rings.flip_nonpos_minus.
    apply (order_preserving _).
    now apply AQsqrt_mid_bounded_raw_square_upper_bound.
-  rewrite <-(ARpositive_power_bounded_positive_power _ _ 4). 
+  rewrite <-(ARpower_N_bounded_N_power _ _ 4). 
    intros ε1 ε2. simpl.
    rewrite minmax.min_r, minmax.max_r.
      apply ball_weak. apply ball_weak_le with (ε1 / (8 # 1))%Qpos.
@@ -357,7 +357,8 @@ Proof.
   apply rational_sqrt_unique.
     apply semirings.preserves_nonneg.
     red. transitivity 1; [solve_propholds | intuition].
-   rewrite <-ARtoCR_preserves_power_positive.
+   change (ARtoCR AQsqrt_mid ^ (2 : N) = '('a : Q)).
+   rewrite <-preserves_nat_pow.
    rewrite AQsqrt_mid_spec.
    now apply ARtoCR_inject.
   change ('0%Q) with (0:CR).

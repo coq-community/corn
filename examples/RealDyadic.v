@@ -1,7 +1,7 @@
 Require Import BigZ CRArith ARDyadics ARtrans ARsign.
 
 Definition answer (n:positive) (r : fastAR) : bigZ :=
- let m := (iter_pos n _ (Pmult 10) 1%positive) in 
+ let m := iter_pos n _ (Pmult 10) 1%positive in 
  let (a, b) := (approximate r (1#m)%Qpos : fastD) * 'Zpos m in 
  BigZ.shiftl a b.
 
@@ -34,7 +34,7 @@ Proof. right. AR_solve_lt (-8)%Z. Defined.
 Definition C02 : fastAR := ARsqrt (AQexp 1 * ARinv ARpi C02_prf).
 Time Eval vm_compute in (answer 150 C02).
 
-Definition C03 : fastAR := ARsin (ARcompress (ARpower_positive 3 (AQexp 1 + 1))).
+Definition C03 : fastAR := ARsin (ARcompress ((AQexp 1 + 1) ^ (3:N))).
 Time Eval vm_compute in (answer 200 C03).
 
 Definition C04 : fastAR := ARexp (ARcompress (ARpi * AQsqrt ('2011%Z))).
