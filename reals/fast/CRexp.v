@@ -251,12 +251,12 @@ match n return (-(2^n))%Z <= a <= 0 -> CR with
 | O => @rational_exp_small_neg a
 | S n' =>
   match (Qlt_le_dec_fast a (-(1))) with
-  | left _ => fun H => CRpower_positive_bounded 2 (1#1) (compress (rational_exp_neg_bounded n' (shrink_by_two n' H)))
+  | left _ => fun H => CRpower_N_bounded 2 (1#1) (compress (rational_exp_neg_bounded n' (shrink_by_two n' H)))
   | right H' => fun H => rational_exp_small_neg (conj H' (proj2 H))
   end
 end.
 
-Local Opaque compress CRpower_positive_bounded.
+Local Opaque compress CRpower_N_bounded.
 Lemma rational_exp_neg_bounded_wd_aux (a1 a2 : Q) (n1 n2 : nat) (p1 : (-(2^n1))%Z <= a1 <= 0) (p2 : (-(2^n2))%Z <= a2 <= 0) :
   n1 ≤ n2 → a1 = a2 → rational_exp_neg_bounded n1 p1 = rational_exp_neg_bounded n2 p2.
 Proof.
@@ -288,10 +288,10 @@ Proof.
 Qed.
 
 Lemma rational_exp_neg_bounded_correct_aux (a : Q) :
-  a ≤ 0 → (CRpower_positive_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2)))) = IRasCR (Exp (inj_Q IR a)).
+  a ≤ 0 → (CRpower_N_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2)))) = IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ea.
- rewrite <- CRpower_positive_bounded_correct.
+ rewrite <- CRpower_N_bounded_correct.
   apply IRasCR_wd.
   set (a':=inj_Q IR (a/2)).
   simpl.
@@ -543,7 +543,7 @@ Proof.
 Qed.
 
 Lemma rational_exp_square (a : Q) :
-  a ≤ 0 → CRpower_positive_bounded 2 (1 # 1) (rational_exp (a / 2)) = rational_exp a.
+  a ≤ 0 → CRpower_N_bounded 2 (1 # 1) (rational_exp (a / 2)) = rational_exp a.
 Proof.
  intros.
  rewrite 2!rational_exp_correct.

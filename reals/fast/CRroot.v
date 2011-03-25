@@ -436,7 +436,7 @@ Qed.
 
 Opaque root_loop.
 
-Lemma rational_sqrt_mid_correct0 : (CRpower_positive 2 rational_sqrt_mid == ' a)%CR.
+Lemma rational_sqrt_mid_correct0 : (CRpower_N 2 rational_sqrt_mid == ' a)%CR.
 Proof.
  assert (H:AbsSmall (R:=CRasCOrdField) (' (3 # 1)%Qpos)%CR rational_sqrt_mid).
   split; simpl.
@@ -458,8 +458,8 @@ Proof.
    auto with *.
   rewrite <- Qle_minus_iff.
   apply rational_sqrt_mid_le_3.
- rewrite <- (CRpositive_power_bounded_positive_power 2 (3#1));[|assumption].
- apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_positive_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
+ rewrite <- (CRpower_N_bounded_N_power 2 (3#1));[|assumption].
+ apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_N_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
  intros e.
  destruct (Qpos_as_positive_ratio e) as [[en ed] E].
  subst e.
@@ -469,10 +469,10 @@ Proof.
  intro He.
  set (d:=(e / (6#1))%Qpos).
  change (Qball (e + e)
-  (approximate ((CRpower_positive_bounded 2 (3 # 1)) rational_sqrt_mid) e)
+  (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid) e)
   a).
  assert (
-   (approximate ((CRpower_positive_bounded 2 (3 # 1)) rational_sqrt_mid) e) =
+   (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid) e) =
    ((Qmax (- (3#1)) (Qmin (3#1) (approximate rational_sqrt_mid d)))^2)
    ).
   simpl.
@@ -531,7 +531,7 @@ Qed.
 End SquareRoot.
 
 Lemma rational_sqrt_mid_correct_aux (x : Q) (y : CR) Px :
-  CRpower_positive 2 y = 'x → '0 ≤ y → y = IRasCR (sqrt (inj_Q IR x) Px).
+  CRpower_N 2 y = 'x → '0 ≤ y → y = IRasCR (sqrt (inj_Q IR x) Px).
 Proof.
  intros f_sqrt f_nonneg.
  rewrite <- (CRasIRasCR_id y).
@@ -541,7 +541,7 @@ Proof.
  stepl (sqrt _ X).
   apply sqrt_wd.
   rewrite -> IR_eq_as_CR.
-  rewrite -> (CRpower_positive_correct 2).
+  rewrite -> (CRpower_N_correct 2).
   rewrite -> IR_inj_Q_as_CR.
   now rewrite -> (CRasIRasCR_id).
  apply sqrt_to_nonneg.
@@ -981,7 +981,7 @@ Proof.
 Qed.
 
 Lemma rational_sqrt_unique (a : Q) (y : CR) :
-  0 ≤ a → CRpower_positive 2 y = 'a → '0 ≤ y → y = rational_sqrt a.
+  0 ≤ a → CRpower_N 2 y = 'a → '0 ≤ y → y = rational_sqrt a.
 Proof.
  intros.
  assert (Pa : Zero[<=](inj_Q IR a)).

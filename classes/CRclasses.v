@@ -1,4 +1,4 @@
-Require Import CRArith CRpartialorder.
+Require Import CRArith CRpartialorder CRpower.
 Require Import abstract_algebra theory.rings stdlib_rationals additional_operations.
 
 Local Opaque CR.
@@ -49,3 +49,22 @@ Proof.
   rewrite <-(rings.mult_0_r x).
   now apply: mult_resp_leEq_lft.
 Qed.
+
+Instance: ∀ x y : CR, Stable (x = y).
+Proof. exact (stableEq _ (Complete_stable Qmetric.stableQ)). Qed.
+
+Instance CR_power_N: Pow CR N := λ x n, CRpower_N n x.
+
+Instance: NatPowSpec CR N _.
+Proof.
+  split; unfold pow, CR_power_N. 
+    solve_proper.
+   intros x. change ('(1 : Q) = (1 : CR)). now apply rings.preserves_1.
+  intros x n.
+  rewrite <-(CRasIRasCR_id x).
+  rewrite <-?CRpower_N_correct.
+  rewrite <-IR_mult_as_CR.
+  rewrite Nnat.nat_of_Nplus.
+  apply IRasCR_wd. symmetry. now apply nexp_Sn.
+Qed. 
+  
