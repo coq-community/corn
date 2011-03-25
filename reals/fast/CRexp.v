@@ -42,6 +42,7 @@ Require Import Qround.
 Require Import CornTac.
 Require Import theory.int_pow.
 Require Import abstract_algebra.
+Require Import CRclasses.
 
 Set Implicit Arguments.
 
@@ -218,7 +219,7 @@ Proof.
  apply exp_ps_correct.
 Qed.
 
-Program Definition CRe_inv := @rational_exp_small_neg (-(1)) _.
+Program Definition CRe_inv := @rational_exp_small_neg (-1) _.
 Next Obligation. constructor; discriminate. Qed.
 
 (** exp is extended to work on [[-2^n, 0]] for all n. *)
@@ -286,7 +287,7 @@ Proof.
   symmetry in E |- *. now apply rational_exp_neg_bounded_wd_aux.
 Qed.
 
-Lemma shrink_by_two_correct (a : Q) :
+Lemma rational_exp_neg_bounded_correct_aux (a : Q) :
   a ≤ 0 → (CRpower_positive_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2)))) = IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ea.
@@ -328,7 +329,7 @@ Proof.
   rewrite -> IHn.
   clear IHn.
   rewrite -> compress_correct.
-  now apply shrink_by_two_correct.
+  now apply rational_exp_neg_bounded_correct_aux.
  apply rational_exp_small_neg_correct.
 Qed.
 
@@ -403,11 +404,10 @@ Qed.
 
 (* We parametrize the following lemmas by a lowerbound of [CRe_inv] so that
     we can easily swap lowerbounds. *)
-Lemma rational_exp_neg_posH (q : Qpos) (n:nat) (a:Q) Ha (Hn : -n <= a) :
- ('q <= CRe_inv → '(q^n) <= @rational_exp_neg a Ha)%CR.
+Lemma rational_exp_neg_posH (q : Qpos) (n:nat) (a:Q) :
+ -n ≤ a → a ≤ 0 → '(q : Q) ≤ CRe_inv → '(q^n) ≤ IRasCR (Exp (inj_Q IR a)).
 Proof.
- intros small.
- rewrite -> rational_exp_neg_correct.
+ intros Hn Ha small.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
  stepl (inj_Q IR q[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
@@ -472,44 +472,20 @@ Proof.
  apply inj_Q_div.
 Qed.
 
-Lemma rational_exp_neg_posH' (q : Qpos) (a : Q) Ha : 
- ('q <= CRe_inv → '(q^(-Zdiv (Qnum a) (Qden a)))%Qpos <= @rational_exp_neg a Ha)%CR.
+Lemma rational_exp_neg_posH' (c : Qpos) (a : Q) : 
+  a ≤ 0 → '(c : Q) ≤ CRe_inv → '(c ^ (-Qfloor a) : Q) ≤ IRasCR (Exp (inj_Q IR a)).
 Proof.
- destruct a as [n d]. intros small.
- simpl.
- assert (X1:(d > 0)%Z) by auto with *.
- assert (X:n = (d * (n / d) + n mod d)%Z).
-  apply Z_div_mod_eq.
-  assumption.
- set (c:=(n/d)%Z) in *.
- assert (X0:(0 <= -c)%Z).
-  apply Zmult_le_0_reg_r with d.
-   auto with *.
-  replace RHS with (-(d*c))%Z by ring.
-  change (-(d*c))%Z with (0-(d*c))%Z.
-  rewrite <- Zle_plus_swap.
-  replace LHS with (d*c + 0)%Z by ring.
-  apply Zle_trans with n.
-   rewrite X.
-   apply Zplus_le_compat_l.
-   destruct (Z_mod_lt n _ X1).
-   assumption.
-  unfold Qle in Ha.
-  simpl in Ha.
-  replace LHS with (n*1)%Z by ring.
-  assumption.
- setoid_replace (QposAsQ (q^-c)%Qpos) with (q^Z_to_nat X0).
-  apply rational_exp_neg_posH.
-   rewrite <- (Z_to_nat_correct X0).
-   unfold Qle.
-   simpl.
-   rewrite X.
-   replace LHS with (d*c + 0)%Z by ring.
-   replace RHS with (d*c + n mod d)%Z by ring.
-   apply Zplus_le_compat_l.
-   destruct (Z_mod_lt n _ X1).
-   assumption.
-  assumption.
+ intros Ha small.
+ assert (X0:(0 <= -Qfloor a)%Z).
+  apply Z.opp_nonneg_nonpos.
+  rewrite Q.Zle_Qle.
+  transitivity a; [| assumption].
+  now apply Qfloor_le.
+ setoid_replace (c ^ (-Qfloor a)) with (c ^ Z_to_nat X0).
+  apply rational_exp_neg_posH; trivial.
+  rewrite <- (Z_to_nat_correct X0).
+  rewrite inject_Z_opp, Qopp_involutive.
+  now apply Qfloor_le.
  now rewrite <- Z_to_nat_correct.
 Qed.
 
@@ -517,8 +493,9 @@ Lemma rational_exp_neg_pos : forall (a:Q) Ha,
  CRpos (@rational_exp_neg a Ha).
 Proof.
  intros a Ha.
- exists ((1#3)^(-Zdiv (Qnum a) (Qden a)))%Qpos.
- apply rational_exp_neg_posH'.
+ exists ((1#3)^(-Qfloor a))%Qpos. simpl.
+ rewrite rational_exp_neg_correct.
+ apply (rational_exp_neg_posH' (1#3)); trivial.
  apply CRe_inv_posH.
 Defined.
 
@@ -527,7 +504,7 @@ is positive. *)
 Definition rational_exp (a:Q) : CR.
 Proof.
  destruct (Qle_total 0 a).
-  refine (CRinv_pos ((1#3)^(-Zdiv (Qnum (-a)) (Qden (-a))))%Qpos (@rational_exp_neg (-a) _)).
+  refine (CRinv_pos ((1#3)^(Qceiling a))%Qpos (@rational_exp_neg (-a) _)).
   apply (Qopp_le_compat 0); assumption.
  apply (rational_exp_neg q).
 Defined.
@@ -558,10 +535,33 @@ Proof.
   rewrite rational_exp_neg_correct.
   apply rational_exp_pos_correct.
    easy. 
-  rewrite <-(rational_exp_neg_correct (Qopp_le_compat 0 a q)).
-  apply rational_exp_neg_posH'.
-  apply CRe_inv_posH.
- apply rational_exp_neg_correct.
+  apply (rational_exp_neg_posH' (1#3)).
+   change (-a ≤ -0).
+   now apply Qopp_le_compat.
+  now apply CRe_inv_posH.
+ now apply rational_exp_neg_correct.
+Qed.
+
+Lemma rational_exp_square (a : Q) :
+  a ≤ 0 → CRpower_positive_bounded 2 (1 # 1) (rational_exp (a / 2)) = rational_exp a.
+Proof.
+ intros.
+ rewrite 2!rational_exp_correct.
+ now apply rational_exp_neg_bounded_correct_aux.
+Qed.
+
+Lemma rational_exp_opp (c : Qpos) (a : Q) :
+  0 ≤ a → '(c : Q) ≤ rational_exp (-a) → CRinv_pos c (rational_exp (-a)) = rational_exp a.
+Proof.
+  rewrite ?rational_exp_correct.
+  intros. now apply rational_exp_pos_correct.
+Qed.
+
+Lemma rational_exp_lower_bound (c : Qpos) (a : Q) : 
+  a ≤ 0 → '(c : Q) ≤ CRe_inv → '(c ^ (-Qfloor a) : Q) ≤ rational_exp a.
+Proof.
+ rewrite rational_exp_correct.
+ now apply rational_exp_neg_posH'.
 Qed.
 
 (**

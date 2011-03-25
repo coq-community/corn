@@ -70,15 +70,12 @@ Proof.
   induction n; intros a p.
    apply AQexp_small_neg_correct.
   unfold AQexp_neg_bounded. fold (AQexp_neg_bounded (AQexp_neg_bounded_prf p)).
-  rewrite ARtoCR_preserves_power_positive_bounded.
   rewrite ARcompress_correct.
+  rewrite ARtoCR_preserves_power_positive_bounded.
+  rewrite IHn.
   setoid_replace ('1 : Qpos) with (1#1)%Qpos by now rewrite AQposAsQpos_preserves_1.
-  rewrite rational_exp_correct.
-  rewrite <-shrink_by_two_correct.
-   rewrite <-rational_exp_correct.
-   rewrite IHn.
-   rewrite aq_shift_opp_1. 
-   reflexivity.
+  rewrite aq_shift_opp_1.
+  apply rational_exp_square.
   now apply semirings.preserves_nonpos.
 Qed.
 
@@ -144,29 +141,26 @@ Proof. apply AQexp_neg_bounded_correct. Qed.
 
 (* We could use a number closer to 1/exp 1, for example 11 $ -5, but in practice this seems
     to make it slower. *)
-Program Definition AQexp_inv_pos_bound : AQ₊ :=
-  let b := 'a in ((1 ≪ -(2 : Z)) ^ Zabs_N (Zdiv (Qnum b) (Qden b)))↾_.
+Program Definition AQexp_inv_pos_bound : AQ₊ := ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))↾_.
 Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
   '('AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 
 Proof.
-  change ('('((1 ≪ (-2)) ^ Zabs_N (Zdiv (Qnum ('a)) (Qden ('a)))) : Q) ≤ rational_exp (AQtoQ a)).
+  change ('('((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a))) : Q) ≤ rational_exp ('a)).
   rewrite preserves_nat_pow.
-  rewrite aq_shift_correct.
+  rewrite aq_shift_opp_2.
   rewrite rings.preserves_1, rings.mult_1_l.
   rewrite <-int_pow_nat_pow.
   rewrite Z_of_N_abs, Z.abs_neq.
-   rewrite rational_exp_correct.
-   rewrite <-(rational_exp_neg_correct (semirings.preserves_nonpos (f:=coerce : AQ → Q) a Pa)).
-   pose proof (@rational_exp_neg_posH' (1%positive * 2 ^ -2)) as P.
-   apply P. clear. unfold CRle. apply CRpos_nonNeg.
-   CRsign.CR_solve_pos (1#1)%Qpos.
-  apply Zdiv_le_upper_bound.
-   auto with *.
-  rewrite left_absorb.
-  apply Qnum_nonpos.
-  change ('a ≤ 0).
+   apply (rational_exp_lower_bound (1#4)).
+    now apply semirings.preserves_nonpos.
+   apply CRpos_nonNeg.
+   now CRsign.CR_solve_pos (1#1)%Qpos.
+  change (Qfloor ('a) ≤ 0).
+  apply (order_preserving_back (coerce : Z → Q)).
+  transitivity ('a : Q).
+   now apply Qfloor_le.
   now apply semirings.preserves_nonpos.
 Qed.
 End exp_neg.
@@ -190,10 +184,8 @@ Proof.
    rewrite ARtoCR_preserves_inv_pos.
    rewrite AQexp_neg_correct.
    rewrite rings.preserves_opp.
-   rewrite 2!rational_exp_correct.
-   apply rational_exp_pos_correct.
+   apply rational_exp_opp.
     now apply semirings.preserves_nonneg.
-   rewrite <-rational_exp_correct.
    posed_rewrite <-(rings.preserves_opp (f:=coerce : AQ → Q)).
    apply: (AQexp_inv_pos_bound_correct (a:=-a)).
    now apply rings.flip_nonneg_opp.
