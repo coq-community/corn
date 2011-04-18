@@ -149,30 +149,6 @@ Section approximate_rationals_more.
     apply Qopp_Qlt_0_r...
   Defined.
 
-  Definition AQball_bool (k : Z) (x y : AQ) := bool_decide_rel (≤) (abs (x - y)) (1 ≪ k).
-
-  Lemma AQball_bool_true (k : Z) (x y : AQ) : 
-    AQball_bool k x y ≡ true ↔ ball (2 ^ k) ('x) ('y).
-  Proof.
-    unfold AQball_bool. rewrite bool_decide_rel_true. rewrite ->Qball_Qabs.
-    transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
-     split; intros.
-      now apply (order_preserving _).
-     now apply (order_preserving_back coerce).
-    rewrite abs.preserves_abs, rings.preserves_minus.
-    now rewrite aq_shift_correct, rings.preserves_1, left_identity.
-  Qed.
-
-  Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ) : 
-    AQball_bool (Qdlog2 ε) x y ≡ true → ball ε ('x) ('y).
-  Proof with auto.
-    intros E.
-    apply AQball_bool_true in E.
-    apply Qball_Qabs in E. apply Qball_Qabs.
-    transitivity (2 ^ (Qdlog2 ε) : Q)...
-    apply (Qpos_dlog2_spec ε).
-  Qed.
-
   Lemma aq_preserves_min x y : 'min x y = Qmin ('x) ('y).
   Proof.
     rewrite minmax.preserves_min.

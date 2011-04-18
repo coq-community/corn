@@ -6,20 +6,14 @@ Require Import
   CRGroupOps CRFieldOps CRpower CRclasses Qposclasses
   stdlib_binary_naturals minmax.
 Require Export
-  ApproximateRationals.
+  ApproximateRationals
+  AQmetric.
 
 Section ARarith.
 Context `{AppRationals AQ}.
 
 Open Local Scope uc_scope. 
 Local Opaque regFunEq.
-
-Definition AQ_as_MetricSpace := Emetric (coerce : AQ → Q_as_MetricSpace).
-Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (coerce : AQ → Q_as_MetricSpace).
-Definition AR := Complete AQ_as_MetricSpace.
-Definition ARtoCR_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc (coerce : AQ → Q_as_MetricSpace).
-Definition ARtoCR : AR --> CR := Eembed QPrelengthSpace (coerce : AQ → Q_as_MetricSpace). 
-Definition CRtoAR : CR --> AR := Eembed_inverse QPrelengthSpace (coerce : AQ → Q_as_MetricSpace).
 
 Hint Rewrite (rings.preserves_0 (f:=coerce : AQ → Q)) : aq_preservation.
 Hint Rewrite (rings.preserves_1 (f:=coerce : AQ → Q)) : aq_preservation.
@@ -32,11 +26,8 @@ Hint Rewrite (abs.preserves_abs (f:=coerce : AQ → Q)): aq_preservation.
 Ltac aq_preservation := autorewrite with aq_preservation; try reflexivity.
 Local Obligation Tactic := program_simpl; aq_preservation.
 
-Lemma AQball_fold ε (x y : AQ_as_MetricSpace) : ball ε x y → Qball ε ('x) ('y).
-Proof. intuition. Qed.
-
 (* Compress *)
-Lemma aq_approx_regular_prf x : 
+Lemma aq_approx_regular_prf (x : AQ) : 
   is_RegularFunction_noInf _ (λ ε : Qpos, app_approx x (Qdlog2 ε) : AQ_as_MetricSpace).
 Proof.
   intros ε1 ε2. simpl.
@@ -111,7 +102,7 @@ Hint Rewrite ARtoCR_preserves_plus : ARtoCR.
 
 (* Inverse *)
 Program Definition AQopp_uc
-  := unary_uc coerce ((-) : AQ_as_MetricSpace → AQ_as_MetricSpace) Qopp_uc _.
+  := unary_uc coerce ((-) : AQ → AQ) Qopp_uc _.
 Definition ARopp_uc : AR --> AR := Cmap AQPrelengthSpace AQopp_uc.
 Global Instance AR_opp: GroupInv AR := ARopp_uc.
 
@@ -385,7 +376,7 @@ Proof.
   split; apply CRapart_wd; try rewrite ARtoCR_preserves_0; reflexivity. 
 Defined.
 
-Lemma aq_mult_inv_regular_prf x : 
+Lemma aq_mult_inv_regular_prf (x : AQ) : 
   is_RegularFunction_noInf _ (λ ε : Qpos, app_div 1 x (Qdlog2 ε) : AQ_as_MetricSpace).
 Proof.
   intros ε1 ε2. simpl.
@@ -486,6 +477,14 @@ Lemma ARtoCR_preserves_inv_r x x__ : {x_ | ARtoCR (ARinv x x_) = CRinv (ARtoCR x
 Proof.
   exists (snd (ARtoCR_preserves_apart_0 x) x__).
   apply ARtoCR_preserves_inv.
+Qed.
+
+Lemma ARinverse (x : AR) (x_ : x >< 0) : x * ARinv x x_ = 1.
+Proof.
+  apply (injective ARtoCR).
+  rewrite rings.preserves_mult, rings.preserves_1.
+  destruct (ARtoCR_preserves_inv_l x x_) as [x__ E]. rewrite E.
+  apply: field_mult_inv.
 Qed.
 
 Lemma ARinv_wd x y x_ y_ : x = y → ARinv x x_ = ARinv y y_.

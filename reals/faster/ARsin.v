@@ -79,14 +79,16 @@ Proof.
 Qed.
 End sin_small_pos.
 
-Definition AQsin_poly_fun (x : AQ) : AQ := x * (3 - 4 * x * x).
+Definition AQsin_poly_fun (x : AQ) : AQ := x * (3 - 4 * x ^ (2:N)).
 
 Lemma AQsin_poly_fun_correct (x : AQ) :
   'AQsin_poly_fun x = sin_poly_fun ('x).
 Proof.
   unfold AQsin_poly_fun, sin_poly_fun.
+  rewrite nat_pow_2.
   rewrite rings.preserves_mult, rings.preserves_minus, ?rings.preserves_mult.
-  now rewrite rings.preserves_3, rings.preserves_4.
+  rewrite rings.preserves_3, rings.preserves_4.
+  now rewrite <-(associativity 4 ('x) ('x : Q)).
 Qed.
 
 Program Definition AQsin_poly_uc := unary_uc coerce 

@@ -29,7 +29,7 @@ Definition P08 : fastAR := AQcos ('(10^50)%Z).
 Time Eval vm_compute in (answer 350 P08).
 
 Definition C02_prf : (ARpi : fastAR) >< (0 : fastAR).
-Proof. right. AR_solve_lt (-8)%Z. Defined.
+Proof. AR_solve_apart (-8)%Z. Defined.
 
 Definition C02 : fastAR := ARsqrt (AQexp 1 * ARinv ARpi C02_prf).
 Time Eval vm_compute in (answer 150 C02).
