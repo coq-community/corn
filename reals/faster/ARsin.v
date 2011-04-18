@@ -32,10 +32,10 @@ Proof.
    rewrite 3!(Str_nth_powers_help_int_pow _ _).
    rewrite 2!(preserves_nat_pow (f:=coerce : AQ → Q)).
    rewrite <-2!(int_pow_nat_pow (f:=coerce : N → Z)).
-   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N))).
+   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_mult_inv.
-   change (Qdiv ('num) ('den)) with ('num * / 'den).
+   change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    destruct (decide ('den = (0:Q))) as [Pden | Pden].
     rewrite ?Pden, rings.mult_0_l, fields.dec_mult_inv_0. ring.
    assert (PropHolds ('den ≠ (0:Q))) by assumption. 
@@ -50,7 +50,7 @@ Proof.
   now rewrite preserves_factorials.
 Qed.
 
-Lemma AQsin_small_pos_Qprf : 0 ≤ 'num / 'den ≤ 1.
+Lemma AQsin_small_pos_Qprf : 0 ≤ ('num / 'den : Q) ≤ 1.
 Proof.
   split.
    apply semirings.nonneg_mult_compat.
@@ -132,7 +132,7 @@ Proof.
   unfold AQsin_pos_bounded. fold (AQsin_pos_bounded (AQsin_pos_bounded_prf2 Pnd)).
   rewrite ARtoCR_preserves_sin_poly.
   rewrite IHn.
-  change (Qdiv ('num) ('(den * 3))) with ('num / '(den * 3)).
+  change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
   rewrite rings.preserves_mult, rings.preserves_3.
   rewrite fields.dec_mult_inv_distr, associativity.
   now apply rational_sin_poly.
@@ -151,7 +151,7 @@ Proof.
   rewrite preserves_nat_pow.
   rewrite rings.preserves_3.
   rewrite <-(int_pow_nat_pow (f:=Z_of_nat)).
-  destruct (total_order ('a) 1).
+  destruct (total_order ('a : Q) 1).
    rewrite Qdlog2_le1; simpl; try easy.
    now transitivity (1:Q).
   rewrite inj_Zabs_nat, Z.abs_eq.

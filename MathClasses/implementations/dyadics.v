@@ -25,6 +25,9 @@ Context `{Integers Z} `{!RingOrder oZ} `{!TotalOrder oZ}
   `{precedes_dec : ∀ (x y : Z), Decision (x ≤ y)}
   `{!ShiftLSpec Z (Z⁺) sl}.
 
+Remove Hints shiftl_nonzero : typeclass_instances.
+(* workarround for #2528, otherwise the [apply (right_cancellation (.*.) (2 ^ xe)).] in [dy_eq_dec_aux] loops *)
+
 Notation Dyadic := (Dyadic Z).
 Add Ring Z: (rings.stdlib_ring_theory Z).
 
@@ -56,7 +59,7 @@ Section with_rationals.
   Proof.
     rewrite shiftl_nat_pow.
     rewrite rings.preserves_mult, nat_pow.preserves_nat_pow, rings.preserves_2.
-    now rewrite <-int_pow_nat_pow.
+    now rewrite <-(int_pow_nat_pow (f:=coerce : Z⁺ → Z)).
   Qed.
 
   Lemma DtoQ_slow_preserves_plus x y : DtoQ_slow' (x + y) = DtoQ_slow' x + DtoQ_slow' y.
@@ -167,7 +170,7 @@ Qed.
 Global Instance: SemiRing_Morphism dy_inject.
 Proof.
   repeat (split; try apply _).
-   intros x y. unfold sg_op at 2, dy_plus.
+   intros x y. unfold sg_op at 2, ringplus_is_semigroupop, dy_plus.
    unfold equiv, dy_equiv, dy_inject, DtoQ_slow; simpl.
    case (precedes_dec 0 0); intros E; simpl.
     rewrite 2!rings.preserves_plus, ZtoQ_shift.
@@ -175,7 +178,7 @@ Proof.
     rewrite min_l, int_pow_0. ring.
     reflexivity.
    now destruct E.
-  intros x y. unfold sg_op at 2, dy_mult. simpl.
+  intros x y. unfold sg_op at 2, ringmult_is_semigroupop, dy_mult. simpl.
   now setoid_replace (0 + 0) with 0 by ring.
 Qed.
 
@@ -219,8 +222,10 @@ Global Instance dy_pow `{!Pow Z (Z⁺)} : Pow Dyadic (Z⁺) := λ x n, (mant x) 
 
 Global Instance dy_pow_spec `{!NatPowSpec Z (Z⁺) pw} : NatPowSpec Dyadic (Z⁺) dy_pow.
 Proof.
-  split; unfold pow, dy_pow, equiv, dy_equiv, DtoQ_slow.
-    intros [xm xe] [ym ye] E1 e1 e2 E2. simpl in *.
+  split; unfold pow, dy_pow.
+    intros [xm xe] [ym ye] E1 e1 e2 E2. 
+    unfold equiv, dy_equiv, DtoQ_slow in E1 |- *. simpl in *.
+    setoid_replace (xm ^ e1) with (xm ^ e2) by now apply (_ : Proper ((=) ==> (=) ==> (=)) pw). (* fixme *)
     rewrite E2. clear e1 E2.
     rewrite 2!(preserves_nat_pow (f:=ZtoStdQ)).
     rewrite 2!(commutativity ('e2 : Z)).
@@ -381,6 +386,8 @@ Section DtoQ.
     now apply orders.precedes_flip.
   Qed.
   Next Obligation.
+    apply rings.injective_ne_0.
+    apply shiftl_nonzero.
     solve_propholds.
   Qed.
 End DtoQ.

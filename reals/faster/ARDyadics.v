@@ -75,10 +75,10 @@ Proof.
    rewrite 2!int_pow_exp_plus by solve_propholds.
    rewrite fields.dec_mult_inv_distr.
    rewrite 2!int_pow_opp.
-   transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1))); [| ring].
+   transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1)) : Q); [| ring].
    rewrite fields.dec_mult_inverse by apply _. ring.
   assert (∀ xm xe ym ye : Z, 
-      'Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye)) as Pleft.
+      'Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) - 2 ^ k = ((z - 1) - 1) * 2 ^ (k - 1)) as E2.
     intros.
@@ -114,7 +114,7 @@ Proof.
     now apply orders.sprecedes_weaken. 
    now apply Qpow_bounded_Zshiftl.
   assert (∀ xm xe ym ye : Z, 
-      ('xm * 2 ^ xe) / ('ym * 2 ^ ye) ≤ '(Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
+      ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) + 2 ^ k = ((z + 1) + 1) * 2 ^ (k - 1)) as E2.
     intros.
@@ -158,7 +158,7 @@ Instance fastD_approx : AppApprox fastD := λ x k,
 Lemma fastD_approx_correct (x y : fastD) (k : Z) : Qball (2 ^ k) ('app_approx x k) ('x).
 Proof.
   setoid_replace (app_approx x k) with (app_div x 1 k).
-   setoid_replace ('x) with ('x / '1).
+   setoid_replace ('x : Q) with ('x / '1 : Q).
     now apply fastD_div_correct.
    rewrite rings.preserves_1, fields.dec_mult_inv_1.
    now rewrite rings.mult_1_r.
@@ -206,7 +206,7 @@ Proof.
     intros [xm xe] [ym ye] E1 e1 e2 E2. simpl in *.
     rewrite E2. clear e1 E2.
     rewrite 2!(preserves_nat_pow (f:=integers_to_ring fastZ Q)).
-    rewrite 2!(commutativity ('e2)).
+    rewrite 2!(commutativity ('e2 : fastZ)).
     rewrite 2!int_pow_exp_mult.
     rewrite 2!(int_pow_nat_pow (f:=coerce : N → fastZ)).
     rewrite <-2!nat_pow_base_mult.

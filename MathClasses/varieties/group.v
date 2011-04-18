@@ -52,7 +52,7 @@ Definition forget: Object → setoid.Object :=
  signature and theory. *)
 
 Instance encode_operations A `{!SemiGroupOp A} `(GroupInv A) `{!MonoidUnit A}: AlgebraOps sig (λ _, A) :=
-  λ o, match o with mult => sg_op | inv => group_inv | one => mon_unit: A end.
+  λ o, match o with mult => (&) | inv => (-) | one => mon_unit: A end.
 
 Section decode_operations.
   Context `{AlgebraOps theory A}.
@@ -75,8 +75,8 @@ Section encode_variety_and_ops.
        apply associativity.
       apply left_identity.
      apply right_identity.
-    eapply ginv_l. 
-   eapply ginv_r.
+    eapply left_inverse. 
+   eapply right_inverse.
   Qed.
 
   Definition object: Object := variety.object theory (λ _, A).

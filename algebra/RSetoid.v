@@ -40,6 +40,7 @@ Structure RSetoid: Type :=
   st_isSetoid : Setoid st_car
 }.
 
+Typeclasses Transparent Equiv.
 Hint Extern 10 (Equiv _) => apply @st_eq : typeclass_instances.
 Hint Extern 10 (Setoid _) => apply @st_isSetoid  : typeclass_instances.
 

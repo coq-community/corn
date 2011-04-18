@@ -48,7 +48,7 @@ Proof.
   rewrite ARtoCR_preserves_AQpi.
   rewrite AQarctan_small_correct.
   rewrite aq_shift_opp_2, rings.preserves_1.
-  ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1)).
+  ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1) : Q).
    apply rational_arctan_fourth_pi.
    apply stdlib_rationals.Qlt_coincides.
    now apply semirings.preserves_pos.

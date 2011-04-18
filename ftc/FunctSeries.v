@@ -625,12 +625,12 @@ Proof.
          apply Feq_transitive with (FSum N (pred m) f).
           unfold I in |- *; apply fun_seq_part_sum_n; auto with arith.
           apply le_lt_trans with k; [ idtac | apply lt_le_trans with N ]; auto with arith.
-         FEQ.
+         apply eq_imp_Feq.
            unfold I in |- *; apply contin_imp_inc; Contin.
           simpl in |- *.
           red in |- *; intros; auto.
          simpl in |- *.
-         apply Sum_wd; intros; rational.
+         intros. apply Sum_wd; intros; rational.
         auto.
        split; simpl in |- *.
         apply (contin_imp_inc _ _ _ _ (fun_seq_part_sum_cont _ _ _ _ H0 m)); auto.

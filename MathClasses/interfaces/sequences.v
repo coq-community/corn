@@ -101,16 +101,21 @@ Section practical.
 
   Next Obligation. apply PS, _. Qed.
 
+  (* Needed for some type conversions. *)
+  Typeclasses Transparent compose.
+
   Program Definition posh_extend (x: setoid.Object) (y: monoid.Object)
     (X: x ⟶ monoid.forget y): posh_free x ⟶ y
     := λ u, match u return posh_free x u → y u with
-      tt => @extend free _ x (monoid.forget y) _ _ X end.
+      tt => @extend free ExtendToSeq0 x (monoid.forget y) _ _ X end.
+
   Next Obligation. apply _. Defined.
   Next Obligation. apply _. Defined.
 
   Next Obligation.
    apply monoid.encode_morphism_only.
-   destruct X. simpl in *. apply _.
+   destruct X. simpl in *. 
+   apply (sequence_extend_makes_morphisms _). apply _.
   Qed.
 
   (* ... and show that they form a posh sequence: *)

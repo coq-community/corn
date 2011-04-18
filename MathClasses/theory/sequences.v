@@ -49,7 +49,7 @@ Section contents.
   Qed.
 
   Lemma fmap_alt `{Equiv A} `{Equiv B} (f: A → B) `{!Setoid_Morphism f} :
-    extend (inject B ∘ f) = (fmap sq f: sq A → sq B).
+    extend (inject B ∘ f) = (fmap (v:=A) (w:=B) sq f: sq A → sq B). (* Remove (v:=A) (w:=B) *)
   Proof with try apply _.
    intros.
    pose proof (setoidmor_a f).
@@ -64,15 +64,16 @@ Section contents.
   Proof. apply (sequence_extend_commutes sq id). apply _. Qed.
 
   Lemma fold_map `{Setoid A} `{Monoid B} (f: A → B) `{!Setoid_Morphism f} :
-    extend f (free:=sq) = fold sq ∘ fmap sq f.
+    extend f (free:=sq) = fold sq ∘ fmap (v:=A) (w:=B) sq f. (* Remove (v:=A) (w:=B) *)
   Proof with try apply _.
    intros.
    symmetry.
    apply (sequence_only_extend_commutes sq _)...
    symmetry.
-   change (f = extend id ∘ (fmap sq f ∘ inject A)).
+   change (f = extend id ∘ (fmap (v:=A) (w:=B) sq f ∘ inject A)).
    rewrite <- (sequence_inject_natural sq f _).
    change (f = fold sq ∘ inject B ∘ f).
+   pose proof (_ : Morphisms.ProperProxy equiv f).
    rewrite fold_inject.
    rewrite compose_id_left.
    apply sm_proper.
@@ -88,13 +89,13 @@ Section semiring_folds.
 
   (* These are implicitly Monoid_Morphisms, and we also easily have: *)
 
-  Lemma distribute_sum (a: R): (a *.) ∘ sum = sum ∘ fmap sq (a *.).
+  Lemma distribute_sum (a: R): (a *.) ∘ sum = sum ∘ fmap (v:=R) (w:=R) sq (a *.).
   Proof.
    unfold sum, fold.
    pose proof (_ : Monoid_Morphism (a *.)).
    rewrite <-(extend_comp (a *.) id).
    rewrite compose_id_right.
-   rewrite (fold_map (a *.)). 
-   apply sm_proper.
+   rewrite (fold_map (a *.)).
+   intros x y E. now rewrite E.
   Qed.
 End semiring_folds.

@@ -33,7 +33,8 @@ Implicit Arguments arrow [[x] [y]].
 Existing Instance Fmap_inst.
 Existing Instance Functor_inst.
 
-Hint Extern 4 (Arrows Object) => exact Arrow: typeclass_instances.
+Instance: Arrows Object := Arrow.
+(* Hint Extern 4 (Arrows Object) => exact Arrow: typeclass_instances. *)
   (* Matthieu is adding [Existing Instance (c: T).], which is nicer. *)
 
 Section contents.
@@ -92,12 +93,13 @@ Section contents.
      reflexivity.
     Qed.
 
-    Instance: Equivalence e.
     Global Instance: Setoid (x ⟶ y).
+    Proof. split; apply _. Qed.
   End more_arrows.
 
   Let obj_iso (x: Object): Equiv x := @iso x _ _ _ _.
 
+  Typeclasses Transparent Arrows.
   Global Instance: ∀ (x y: Object) (a: x ⟶ y), Setoid_Morphism (map_obj a).
   Proof with try apply _.
    constructor...
@@ -202,5 +204,5 @@ Section contents.
      rewrite left_identity, right_identity. reflexivity.
     Qed.
 
-  Global Instance: Category Object.
+  Global Instance: Category Object := {}.
 End contents.

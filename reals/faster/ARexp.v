@@ -27,7 +27,7 @@ Proof.
   now rewrite preserves_factorials.
 Qed.
 
-Definition AQexp_small_neg_prf : -1 ≤ 'a ≤ 0.
+Definition AQexp_small_neg_prf : -1 ≤ ('a : Q) ≤ 0.
 Proof.
   split.
    now apply rings.preserves_ge_opp1.
@@ -112,7 +112,7 @@ Proof.
   apply integers.precedes_sprecedes_alt.
   rewrite commutativity. apply (order_preserving _).
   apply Qdlog2_nonneg. 
-  change (- -1 ≤ -'a).
+  change ((- -1 : Q) ≤ -'a).
   apply rings.flip_opp.
   now apply rings.preserves_le_opp1.
 Qed.

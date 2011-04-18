@@ -28,7 +28,8 @@ Implicit Arguments arrow [[x] [y]].
 Existing Instance Fmap_inst.
 Existing Instance Functor_inst.
 
-Hint Extern 4 (Arrows Object) => exact Arrow: typeclass_instances.
+Instance: Arrows Object := Arrow.
+(* Hint Extern 4 (Arrows Object) => exact Arrow: typeclass_instances. *)
 
 Section contents.
   Implicit Arguments map_obj [[x] [y]].
@@ -59,8 +60,8 @@ Section contents.
      apply JMrelation.transitive with _ (=) (fmap b f)...
     Qed.
 
-    Instance: Equivalence e.
     Global Instance: Setoid (x ⟶ y).
+    Proof. split; try apply _. Qed.
   End more_arrows.
 
   Global Instance: CatId Object := λ _, arrow id _ _.

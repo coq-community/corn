@@ -138,7 +138,7 @@ Defined.
 (** The infinte sum of an alternating series is the limit of the partial sums. *)
 Definition InfiniteAlternatingSum_raw (s : Stream Q) `{zl : !Limit s 0} (ε : QposInf) := PartialAlternatingSumUntil (Limit_near s 0 ε).
 
-Lemma InfiniteAlternatingSum_raw_wd {s1 s2} (zl1 : Limit s1 0) (zl2 : Limit s2 0) (ε : QposInf) : 
+Lemma InfiniteAlternatingSum_raw_wd (s1 s2 : Stream Q) {zl1 : Limit s1 0} {zl2 : Limit s2 0} (ε : QposInf) : 
   s1 = s2 → InfiniteAlternatingSum_raw s1 ε = InfiniteAlternatingSum_raw s2 ε.
 Proof. 
   assert (Proper ((=) ==> eq) (λ s, Qball_ex_bool ε (hd s) 0)).
@@ -250,19 +250,14 @@ Qed.
 Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : CR :=
   Build_RegularFunction (InfiniteAlternatingSum_prf seq).
 
-Local Transparent CR.
-
 Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!Limit s1 0} `{!Limit s2 0} : 
   s1 = s2 → InfiniteAlternatingSum s1 = InfiniteAlternatingSum s2.
 Proof.
-  intros E ε1 ε2. simpl.
-  unfold InfiniteAlternatingSum.
-  rewrite InfiniteAlternatingSum_raw_wd.
-   now apply (InfiniteAlternatingSum_prf s2).
-  easy.
+  intros E. apply: regFunEq_e. intros ε.
+  unfold InfiniteAlternatingSum. simpl. 
+  now rewrite (InfiniteAlternatingSum_raw_wd s1 s2).
 Qed.
 
-Local Opaque CR.
 Open Local Scope Q_scope.
 
 Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : 

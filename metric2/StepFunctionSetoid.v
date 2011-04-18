@@ -741,8 +741,7 @@ Lemma Map_identity X : forall (a:StepF X),
  (@id X) ^@> a == a.
 Proof.
  intros a.
- rewrite <- Map_identity.
- reflexivity.
+ now rewrite <-(Map_identity a) at 2.
 Qed.
 
 Lemma Map_composition X Y Z: forall (a:StepF (Y-->Z)) (b:StepF (X-->Y)) (c:StepF X),

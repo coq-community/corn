@@ -102,7 +102,7 @@ Section list_eq.
   Global Instance list_eq_trans: Transitive R → Transitive list_eq.
   Proof. intros H x. induction x; destruct y; destruct z; simpl; intuition; eauto. Qed.
 
-  Global Instance: Equivalence R → Equivalence list_eq.
+  Global Instance: Equivalence R → Equivalence list_eq := {}.
 
   Lemma Perm_list_eq_commute (x y y': list A): Permutation x y → list_eq y y' → exists x', list_eq x x' ∧ Permutation x' y'.
   Proof with simpl; intuition.

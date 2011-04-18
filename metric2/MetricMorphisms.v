@@ -131,7 +131,7 @@ Section dense_prelength_embedding.
   (* Now we also have an embedding of the completion of [X] into the completion of [Y] *)
   Definition Eembed : Complete X --> Complete Y := Cmap plX (metric_embed_uc f).
   
-  Instance: Setoid_Morphism Eembed.
+  Instance: Setoid_Morphism Eembed := {}.
 
   Instance Eembed_injective: Injective Eembed.
   Proof.
@@ -168,7 +168,7 @@ Section dense_prelength_embedding.
   Definition Eembed_inverse : Complete Y --> Complete X := Cbind plY metric_embed_back_uc.
   Global Instance: Inverse Eembed := Eembed_inverse.
 
-  Instance: Setoid_Morphism Eembed_inverse.
+  Instance: Setoid_Morphism Eembed_inverse := {}.
 
   Instance Eembed_surjective : Surjective Eembed.
   Proof.
@@ -182,7 +182,7 @@ Section dense_prelength_embedding.
     now apply regFun_prf.
   Qed.
 
-  Global Instance: Bijective Eembed.
+  Global Instance: Bijective Eembed := {}.
 
   Global Instance: Inverse Eembed_inverse := Eembed.
   Global Instance: Bijective Eembed_inverse.

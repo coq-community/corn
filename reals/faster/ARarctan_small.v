@@ -31,10 +31,10 @@ Proof.
    rewrite 3!(Str_nth_powers_help_int_pow _ _).
    rewrite 2!(preserves_nat_pow (f:=coerce : AQ → Q)).
    rewrite <-2!(int_pow_nat_pow (f:=coerce : N → Z)).
-   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N))).
+   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_mult_inv.
-   change (Qdiv ('num) ('den)) with ('num * / 'den).
+   change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    assert (PropHolds ('den ≠ (0:Q))). 
     apply rings.injective_ne_0.
     apply orders.sprecedes_ne_flip.
@@ -50,7 +50,7 @@ Qed.
 Lemma AQarctan_small_pos_Qprf : (0 <= 'num / 'den < 1)%Q.
 Proof.
   split.
-   change (0 ≤ ' num / ' den).
+   change ((0 : Q) ≤ ' num / ' den).
    apply semirings.nonneg_mult_compat.
     now apply semirings.preserves_nonneg.
    apply fields.nonneg_dec_mult_inv_compat.
@@ -115,7 +115,7 @@ Proof.
    apply AQarctan_small_pos_correct.
   rewrite rings.preserves_opp.
   rewrite AQarctan_small_pos_correct.
-  ms_setoid_replace ('(-num) / 'den) with (-('num / 'den)).
+  ms_setoid_replace ('(-num) / 'den : Q) with (-('num / 'den) : Q).
    apply rational_arctan_opp.
   rewrite rings.preserves_opp.
   now rewrite <-rings.opp_mult_distr_l.

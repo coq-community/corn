@@ -77,7 +77,7 @@ Global Instance inject_Z_AR: Coerce Z AR := Basics.compose inject_AQ_AR (coerce 
 
 Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
 
-Lemma ARtoCR_inject x : ARtoCR ('x) = '('x : Q).
+Lemma ARtoCR_inject (x : AQ) : ARtoCR ('x) = '('x : Q).
 Proof. apply: regFunEq_e. intros ε. apply ball_refl. Qed.
 
 Global Instance AR_0: RingZero AR := '0 : AR.
@@ -291,7 +291,7 @@ Definition ARpos (x : AR) : CProp := sig (λ y : AQ₊, 'y ≤ x).
 Program Definition ARpos_char (ε : AQ₊) (x : AR) (Pε : 2 * 'ε ≤ approximate x ('ε : Qpos)) : ARpos x := ε ↾ _.
 Next Obligation.
   intros δ.
-  change (-'δ ≤ '(approximate x ((1 # 2) * δ)%Qpos - 'ε)).
+  change (-('δ : Q) ≤ '(approximate x ((1 # 2) * δ)%Qpos - 'ε)).
   transitivity (-'((1 # 2) * δ)%Qpos).
    apply rings.flip_opp.
    change ((1 # 2) * δ ≤ δ).

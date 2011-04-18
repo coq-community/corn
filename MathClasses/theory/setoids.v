@@ -9,18 +9,18 @@ Instance ext_equiv_sym `{Setoid A} `{Setoid B}: Symmetric (_ : Equiv (A → B)).
 Proof. firstorder. Qed.
 
 Instance: Equiv Prop := iff.
-Instance: Setoid Prop.
+Instance: Setoid Prop := {}.
 
-Instance sig_Setoid `{Setoid A} (P: A → Prop): Setoid (sig P).
-Instance sigT_Setoid `{Setoid A} (P: A → Type): Setoid (sigT P).
+Instance sig_Setoid `{Setoid A} (P: A → Prop): Setoid (sig P) := {}.
+Instance sigT_Setoid `{Setoid A} (P: A → Type): Setoid (sigT P) := {}.
 
 Section simple_product.
   Context `{Setoid A} `{Setoid B}.
 
   Global Instance prod_equiv: Equiv (A * B) := λ p q, fst p = fst q ∧ snd p = snd q.
 
-  Global Instance: Setoid (A * B).
-  Proof. firstorder. Qed.
+  Global Instance: Setoid (A * B) := {}.
+  Proof. firstorder auto. Qed.
 
   Global Instance pair_proper : Proper ((=) ==> (=) ==> (=)) (@pair A B).
   Proof. firstorder. Qed.
@@ -51,7 +51,7 @@ Section product.
   Proof. firstorder. Qed.
 End product.
 
-Instance id_morphism `{Setoid T}: Setoid_Morphism (@id T).
+Instance id_morphism `{Setoid T}: Setoid_Morphism (@id T) := {}.
 
 Instance compose_morphisms (A B C: Type)
   `{!Equiv A} `{!Equiv B} `{!Equiv C} (f: A → B) (g: B → C)
