@@ -28,6 +28,7 @@ Require Import CornTac.
 Require Import ProductMetric.
 Require Import stdlib_omissions.Pair.
 Require Import metric2.Classified.
+Require Import canonical_names.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -36,6 +37,12 @@ Opaque CR Qmin Qmax.
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
+
+Instance CR0: RingZero CR := coerce Q CR 0.
+Notation "0" := (inject_Q_CR 0) : CR_scope.
+
+Instance CR1: RingOne CR := coerce Q CR 1.
+Notation "1" := (inject_Q_CR 1) : CR_scope.
 
 (**
 ** Addition
@@ -121,9 +128,9 @@ Proof. apply _. Qed.*)
 
 (** Finally, CRplus: *)
 
-Definition CRplus : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qplus_uc.
-
-Notation "x + y" := (ucFun2 CRplus x y) : CR_scope.
+Definition CRplus_uc : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qplus_uc.
+Instance CRplus: RingPlus CR := ucFun2 CRplus_uc.
+Notation "x + y" := (ucFun2 CRplus_uc x y) : CR_scope.
 
 (** But here, too having CRplus as a CR-->CR-->CR does not show that it is uniformly continuous
  in both arguments. This time we can get the uncurried version just by lifting the uncurried uniformly
@@ -137,10 +144,10 @@ Local Notation CRCR := (ProductMS CR CR).
 
 (** Uniform continuity of the uncurried original then follows from extentionality: *)
 
-Instance: UniformlyContinuous_mu (uncurry (ucFun2 CRplus))
+Instance: UniformlyContinuous_mu (uncurry (ucFun2 CRplus_uc))
   := { uc_mu := fun e => ((1#2) * e)%Qpos }.
 
-Instance: UniformlyContinuous (uncurry (ucFun2 CRplus)).
+Instance: UniformlyContinuous (uncurry (ucFun2 CRplus_uc)).
 Proof with intuition.
 Admitted.
 (*
@@ -156,13 +163,12 @@ Qed.*)
 Definition CRplus_uc_example (y: CR): CR --> CR :=
  wrap_uc_fun' (fun x => (y + x) + (x + x) + (x + y))%CR.
 
-
 Lemma CRplus_translate : forall (a:Q) (y:CR), (' a + y == translate a y)%CR.
 Proof.
  intros a y.
  unfold ucFun2, CRplus.
  unfold Cmap2.
- unfold inject_Q.
+ unfold inject_Q_CR.
  simpl.
  do 2 rewrite -> Cmap_fun_correct.
  rewrite -> Cap_fun_correct.
@@ -201,7 +207,7 @@ Qed.
 Definition Qopp_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qopp_uc_prf.
 
-Definition CRopp : CR -> CR := Cmap QPrelengthSpace Qopp_uc.
+Instance CRopp: GroupInv CR := Cmap QPrelengthSpace Qopp_uc.
 
 Notation "- x" := (CRopp x) : CR_scope.
 
@@ -309,9 +315,9 @@ Proof.
 Qed.
 (* end hide *)
 (** Inequality is defined in terms of nonnegativity. *)
-Definition CRle (x y:CR) := (CRnonNeg (y - x))%CR.
-
+Instance CRle: Le CR := λ x y, (CRnonNeg (y - x))%CR.
 Infix "<=" := CRle : CR_scope.
+
 (* begin hide *)
 Add Morphism CRle with signature (@st_eq _) ==> (@st_eq _) ==> iff as CRle_wd.
 Proof.
@@ -438,7 +444,7 @@ Proof.
  intros a y.
  unfold ucFun2, CRmax.
  unfold Cmap2.
- unfold inject_Q.
+ unfold inject_Q_CR.
  simpl.
  do 2 rewrite -> Cmap_fun_correct.
  rewrite -> Cap_fun_correct.
@@ -574,7 +580,7 @@ Proof.
  intros a y.
  unfold ucFun2, CRmin.
  unfold Cmap2.
- unfold inject_Q.
+ unfold inject_Q_CR.
  simpl.
  do 2 rewrite -> Cmap_fun_correct.
  rewrite -> Cap_fun_correct.

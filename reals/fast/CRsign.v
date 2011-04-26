@@ -21,36 +21,13 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export CRIR.
 Require Import QMinMax.
+Require Import CRArith.
 
 (**
 ** Tactics for Inequalities
 This module defines tactics for automatically proving inequalities
 over real numbers.
 *)
-
-(** This returs GT if x is clearly greater than e, returns LT if x
-is clearly less than (-e), and returns Eq otherwise. *)
-Definition CR_epsilon_sign_dec (e:Qpos) (x:CR) : comparison :=
-let z := (approximate x e) in
- match (Qle_total z (2*e)) with
- | right p => Gt
- | left _ =>
-  match (Qle_total (-(2)*e) z) with
-  | right p => Lt
-  | left _ => Eq
-  end
- end.
-
-(** This helper lemma reduces a CRpos problem to a sigma type with
-a simple equality proposition. *)
-Lemma CR_epsilon_sign_dec_pos : forall x,
-{e:Qpos | CR_epsilon_sign_dec e x = Gt} -> CRpos x.
-Proof.
- intros x [e H].
- apply (@CRpos_char e).
- abstract ( unfold CR_epsilon_sign_dec in H; destruct (Qle_total (approximate x e) (2 * e)) as [A|A];
-   [destruct (Qle_total (- (2) * e) (approximate x e)) as [B|B]; discriminate H|]; assumption).
-Defined.
 
 (** Automatically solve the goal [{e:Qpos | CR_epsilon_sign_dec e x = Gt}]
 by starting with approximating by e, and halving the allowed error until
@@ -84,7 +61,7 @@ autorewrite will not in CRpos, because it is in Type and not Prop. *)
 Ltac IR_dec_precompute :=
  try apply less_leEq;
  apply CR_less_as_IR;
- unfold CRlt;
+ unfold CRltT;
  match goal with
  | |- CRpos ?X => let X0 := fresh "IR_dec" in
                   set (X0:=X);

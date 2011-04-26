@@ -205,20 +205,20 @@ Section contents.
    let sndl:=(ne_list.map snd l) in
    ¬(u-v == 0)%Q ->
    (divdiff (ne_list.map (second f ) l)) == 
-   (divdiff (ne_zip sndl (ne_list.map f sndl))) * (divdiff (ne_list.map (second inject_Q ) l)).
+   (divdiff (ne_zip sndl (ne_list.map f sndl))) * (divdiff (ne_list.map (second inject_Q_CR) l)).
   Proof with auto;simpl.
   intros. do 3 rewrite divdiff_e...
   (* want a combination of ring and a rewrite database for inject_Q ? *)  
   set (s:=f u - f v). set (t:='(/ (x - y))). 
   rewrite CRminus_Qminus. set (a:=(u-v)%Q).
-  transitivity (s * ' (/ (a) * (a)) * t).
+  transitivity (s * ' (/ (a) * (a))%Q * t).
   rewrite <- (Qmult_comm a).
   rewrite Qmult_inv_r... ring.
   rewrite <- (@CRmult_Qmult (/a) a). set (' (/a)). ring.
   Qed.
 
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
-    _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x) [+X*] One) (tl xs)).
+    _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x)%Q [+X*] One) (tl xs)).
 
   Section with_qpoints.
 
@@ -235,7 +235,7 @@ Section contents.
      replace (length (tl xs)) with (0 + length (tl xs))%nat by reflexivity.
      apply degree_le_mult.
       apply degree_le_c_.
-     replace (length (tl xs)) with (length (map (fun x => ' (-fst x)[+X*]One) (tl xs)) * 1)%nat.
+     replace (length (tl xs)) with (length (map (fun x => ' (-fst x)%Q[+X*]One) (tl xs)) * 1)%nat.
       apply degree_le_Product.
       intros.
       apply in_map_iff in H.
@@ -285,7 +285,7 @@ Section contents.
      intro.
      unfold Basics.compose.
      rewrite <- CRminus_Qminus.
-     change ((' (- fst x1) + ' x * (' 1 + ' x * ' 0)) [=] (' x - ' fst x1)).
+     change ((' (- fst x1)%Q + ' x * (1 + 'x * 0)) [=] (' x - ' fst x1)).
      ring.
     Qed.
 
@@ -303,7 +303,7 @@ Section contents.
   Proof. reflexivity. Qed.
 
   Lemma an_applied_0 (t: QPoint) (x: Q) (xs: ne_list QPoint):
-    List.In x (map fst xs) -> an_applied x (t ::: xs) [=] '0.
+    List.In x (map fst xs) -> an_applied x (t ::: xs) [=] 0.
   Proof with auto.
    intros. unfold an_applied.
    simpl @tl.
@@ -328,7 +328,7 @@ Section contents.
       an_applied (fst x) (x ::: y ::: xs)+an_applied (fst x) (y ::: xs) + applied xs (fst x))%CR.
     ring.
    change ((divdiff_l x xs - divdiff_l y xs) * ' (/ (fst x - fst y))[*]
-     ' (Qminus (fst x) (fst y) * Π (map (Qminus (fst x) ∘ fst)%prg xs))+
+     ' (Qminus (fst x) (fst y) * Π (map (Qminus (fst x) ∘ fst)%prg xs))%Q +
      divdiff_l y xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)[=]
      divdiff_l x xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)).
    generalize (Π (map (Qminus (fst x) ∘ fst)%prg xs)).
@@ -350,7 +350,7 @@ Section contents.
 
     Variables (qpoints: ne_list QPoint) (H: QNoDup (map fst qpoints)).
 
-    Let crpoints := ne_list.map (first inject_Q) qpoints.
+    Let crpoints := ne_list.map (first inject_Q_CR) qpoints.
 
     Lemma interpolates: interpolates crpoints (N qpoints).
     Proof with simpl; auto.
@@ -364,15 +364,15 @@ Section contents.
      rewrite apply.
      revert x y B.
      induction qpoints using ne_list.two_level_rect.
-       intros u v [? | []]. subst x. change (v * '1 + '0 == v)%CR. ring.
+       intros u v [? | []]. subst x. change (v * 1 + 0 == v)%CR. ring.
       intros.
       rewrite applied_cons.
-      change (((snd x - snd y) * ' (/ (fst x - fst y)) [*] ' ((x0 - fst y) * 1) + (snd y * ' 1 + ' 0)) == y0)%CR.
+      change (((snd x - snd y) * ' (/ (fst x - fst y)) [*] ' ((x0 - fst y) * 1)%Q + (snd y * 1 + 0)) == y0)%CR.
       rewrite Qmult_1_r.
       destruct B.
        subst.
        rewrite <- mult_assoc.
-       change ((y0 - snd y)*(' (/ (x0 - fst y))*' (x0 - fst y)) + (snd y * ' 1 + ' 0)==y0)%CR.
+       change ((y0 - snd y)*(' (/ (x0 - fst y))* '(x0 - fst y)%Q) + (snd y * 1 + 0)==y0)%CR.
        rewrite CRmult_Qmult.
        setoid_replace  (/ (x0 - fst y) * (x0 - fst y))%Q with 1%Q. ring.
        simpl. field. intro.
@@ -389,7 +389,7 @@ Section contents.
        simpl @fst. simpl @snd.
        rewrite (proj2 (Q.Qminus_eq x0 x0)).
         rewrite cring_mult_zero.
-        change (' 0 + (y0 * ' 1 + ' 0) == y0)%CR. ring.
+        change (0 + (y0 * 1 + 0) == y0)%CR. ring.
        reflexivity.
       exfalso...
      clear qpoints.
@@ -408,7 +408,7 @@ Section contents.
       inversion_clear H...
      rewrite (H0 y H2 x0 y0).
       rewrite an_applied_0...
-       change ('0 + y0 == y0). ring.
+       change (0 + y0 == y0). ring.
       destruct H1. subst...
       right...
       apply (in_map fst l (x0, y0))...
@@ -433,7 +433,7 @@ Section contents.
     Proof with auto.
      apply (interpolation_unique crpoints).
       unfold crpoints. rewrite ne_list.list_map, map_fst_map_first.
-      apply (CNoDup_map _ inject_Q).
+      apply (CNoDup_map _ inject_Q_CR).
       apply CNoDup_weak with Qap...
        intros. apply Qap_CRap...
       apply QNoDup_CNoDup_Qap...
@@ -443,21 +443,21 @@ Section contents.
     Lemma N_leading_coefficient: nth_coeff (length (tl qpoints)) (N qpoints) == divdiff qpoints.
     Proof with try ring.
      destruct qpoints.
-      change (divdiff (ne_list.one p) * ' 1 + ' 0[=]divdiff (ne_list.one p))...
+      change (divdiff (ne_list.one p) * 1 + 0[=]divdiff (ne_list.one p))...
      simpl @length.
      rewrite N_cons.
      rewrite nth_coeff_plus.
      rewrite (degree l (length l)).
       2: destruct l; simpl; auto.
-     change (nth_coeff (length l) (an (p ::: l))+'0==divdiff (p ::: l)). (* to change [+] into + *)
+     change (nth_coeff (length l) (an (p ::: l)) + 0==divdiff (p ::: l)). (* to change [+] into + *)
      ring_simplify.
      unfold an.
      rewrite nth_coeff_c_mult_p.
      simpl tl.
-     set (f := fun x: Q and CR => ' (- fst x)[+X*]One).
+     set (f := fun x: Q and CR => ' (- fst x)%Q [+X*]One).
      replace (length l) with (length (map f l) * 1)%nat.
       rewrite lead_coeff_product_1.
-       change (divdiff (p ::: l)*' 1[=]divdiff (p ::: l))... (* to change [*] into * *)
+       change (divdiff (p ::: l) * 1 [=] divdiff (p ::: l))... (* to change [*] into * *)
       intros q. rewrite in_map_iff. intros [x [[] B]].
       split. reflexivity.
       apply degree_le_cpoly_linear_inv.
@@ -482,10 +482,10 @@ Section contents.
   Lemma N_Permutation (x y: ne_list QPoint): QNoDup (map fst x) → ne_list.Permutation x y → N x [=] N y.
   Proof with auto.
    intros D E.
-   apply (interpolation_unique (ne_list.map (first inject_Q) x)).
+   apply (interpolation_unique (ne_list.map (first inject_Q_CR) x)).
      rewrite ne_list.list_map.
      rewrite map_fst_map_first.
-     apply (CNoDup_map _ inject_Q).
+     apply (CNoDup_map _ inject_Q_CR).
      apply CNoDup_weak with Qap...
       intros. apply Qap_CRap...
      apply QNoDup_CNoDup_Qap...

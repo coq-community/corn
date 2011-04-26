@@ -651,12 +651,12 @@ Proof.
  change (Cunit (approximate (Integrate01 f) e)) with ('(approximate (Integrate01 f) e))%CR.
 
  setoid_replace ('(approximate (Integrate01 f) e))%CR
-   with ('((1-0)*(approximate (Integrate01 f) e)))%CR.
+   with ('((1-0)*(approximate (Integrate01 f) e))%Q)%CR.
   Focus 2.
-  change (' approximate (Integrate01 f) e == ' ((1 - 0) * approximate (Integrate01 f) e))%CR.
+  change (' approximate (Integrate01 f) e == ' ((1 - 0) * approximate (Integrate01 f) e)%Q)%CR.
   ring.
  rewrite <- CRAbsSmall_ball.
- stepl ('((1-0)*e))%CR; [| now (apply inject_Q_wd; ring)].
+ stepl ('((1-0)*e)%Q)%CR; [| apply inject_Q_CR_wd; change ((1 - 0) * e == e)%Q; ring].
  set (z:=(integral (inj_Q IR 0) (inj_Q IR 1) H01 F HF)).
  simpl.
  unfold Cjoin_raw.
@@ -687,11 +687,11 @@ Proof.
  generalize 0 1.
  intros a b Hf Hab HF Hab0 s Hs.
  destruct (Qpos_lt_plus Hab0) as [ba Hba].
- stepl ('(ba*e)%Qpos)%CR; [| now (apply inject_Q_wd; rewrite -> Hba; QposRing)].
+ stepl ('(ba*e)%Qpos)%CR; [| now (apply inject_Q_CR_wd; unfold canonical_names.equiv, stdlib_rationals.Q_eq; rewrite -> Hba; QposRing)].
  revert a b Hab0 ba Hba F Hab HF Hf Hs.
  induction s using StepF_ind; intros a b Hab0 ba Hba F Hab HF Hf Hs.
   change (AbsSmall (R:=CRasCOrdField) ('(ba*e)%Qpos)%CR (IRasCR (integral _ _ Hab F HF)[-]
-    ('((b-a)*(approximate (f x) ((1 # 2) * e)%Qpos)))%CR)).
+    ('((b-a)*(approximate (f x) ((1 # 2) * e)%Qpos))%Q)%CR)).
   rewrite -> CRAbsSmall_ball.
   rewrite <- IR_inj_Q_as_CR.
   rewrite <- CRAbsSmall_ball.
@@ -818,7 +818,7 @@ Proof.
    approximate z ((1 # 2) * e)%Qpos) (Map f s1):StepQ) (Map
      (fun z : RegularFunction Q_as_MetricSpace => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
  change (AbsSmall (R:=CRasCOrdField) ('(ba* e)%Qpos)%CR
-   (IRasCR (integral _ _ Hab F HF)[-]'((b-a)*z))%CR).
+   (IRasCR (integral _ _ Hab F HF)[-]'((b-a)*z)%Q)%CR).
  rewrite -> CRAbsSmall_ball.
  set (c:=(affineCombo (OpenUnitDual o) a b:Q)).
  assert (Hac:inj_Q IR a[<=]inj_Q IR c).
@@ -871,8 +871,8 @@ Proof.
  clear Z.
  setoid_replace ((ca + bc)*e)%Qpos with (ca*e + bc*e)%Qpos; [| now QposRing].
  rewrite <- CRAbsSmall_ball.
- stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl)))+
-   ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr)))))%CR.
+ stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl))%Q)+
+   ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr))))%Q)%CR.
   stepl ('(ca * e)%Qpos + '(bc * e)%Qpos)%CR.
    apply: AbsSmall_plus.
     apply (IHs1 _ _ Hac0); auto.
@@ -905,6 +905,6 @@ Proof.
    (IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)).
  intros x y.
  clear - x y.
- change ((x-' ((c - a) * zl) + (y-' ((b - c) * zr)))== (x + y)-(' ((c - a) * zl + (b - c) * zr)))%CR.
+ change ((x-' ((c - a) * zl)%Q + (y-' ((b - c) * zr)%Q))== (x + y)-(' ((c - a) * zl + (b - c) * zr)%Q))%CR.
  ring.
 Qed.

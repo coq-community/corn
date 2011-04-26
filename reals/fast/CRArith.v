@@ -32,18 +32,22 @@ Require Import CRing_Homomorphisms.
 Require Import Qmetric.
 Require Import CornTac.
 Require Import Stability.
+Require Import ConstructiveEpsilon.
+Require Import Qdlog.
+Require Import abstract_algebra.
+Require Import interfaces.orders.
 
 Open Local Scope CR_scope.
 
 (** Operations on rational numbers over CR are the same as the operations
 on rational numbers. *)
-Lemma CReq_Qeq : forall (x y:Q), inject_Q x == inject_Q y <-> (x == y)%Q.
+Lemma CReq_Qeq : forall (x y:Q), inject_Q_CR x == inject_Q_CR y <-> (x == y)%Q.
 Proof.
  intros x y.
  apply Cunit_eq.
 Qed.
 
-Lemma CRle_Qle : forall (x y:Q), inject_Q x <= inject_Q y <-> (x <= y)%Q.
+Lemma CRle_Qle : forall (x y:Q), inject_Q_CR x <= inject_Q_CR y <-> (x <= y)%Q.
 Proof.
  split.
   intros H.
@@ -69,14 +73,14 @@ Proof.
  apply Qpos_nonneg.
 Qed.
 
-Lemma CRplus_Qplus : forall (x y:Q), inject_Q x + inject_Q y == inject_Q (x + y)%Q.
+Lemma CRplus_Qplus : forall (x y:Q), inject_Q_CR x + inject_Q_CR y == inject_Q_CR (x + y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
 Qed.
 
 Hint Rewrite <- CRplus_Qplus : toCRring.
 
-Lemma CRopp_Qopp : forall (x:Q), - inject_Q x == inject_Q (- x)%Q.
+Lemma CRopp_Qopp : forall (x:Q), - inject_Q_CR x == inject_Q_CR (- x)%Q.
 Proof.
  intros x e1 e2; apply ball_refl.
 Qed.
@@ -84,14 +88,14 @@ Qed.
 Hint Rewrite CRopp_Qopp : CRfast_compute.
 Hint Rewrite <- CRopp_Qopp : toCRring.
 (* end hide *)
-Lemma CRminus_Qminus : forall (x y:Q), inject_Q x - inject_Q y == inject_Q (x - y)%Q.
+Lemma CRminus_Qminus : forall (x y:Q), inject_Q_CR x - inject_Q_CR y == inject_Q_CR (x - y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRminus_Qminus : toCRring.
 (* end hide *)
-Lemma CRmult_Qmult : forall (x y:Q), inject_Q x * inject_Q y == inject_Q (x * y)%Q.
+Lemma CRmult_Qmult : forall (x y:Q), inject_Q_CR x * inject_Q_CR y == inject_Q_CR (x * y)%Q.
 Proof.
  intros x y.
  rewrite -> CRmult_scale.
@@ -108,10 +112,10 @@ Proof.
      rewrite -> CRle_Qle; rewrite -> Hc; ring_simplify; apply Qle_refl).
 Defined.
 
-Lemma CRinv_Qinv : forall (x:Q) x_, CRinv (inject_Q x) x_ == inject_Q (/x).
+Lemma CRinv_Qinv : forall (x:Q) x_, CRinvT (inject_Q_CR x) x_ == inject_Q_CR (/x)%Q.
 Proof.
  intros x [[c x_]|[c x_]];
-   [change (' c <= ' 0%Q + - ' x)%CR in x_|change (' c <= ' x + - ' 0%Q)%CR in x_]; unfold CRinv;
+   [change (' c <= 0 + - 'x)%CR in x_|change (' c <= ' x + - 0)%CR in x_]; unfold CRinvT;
      rewrite -> CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_; try rewrite -> CRopp_Qopp;
        rewrite -> (@CRinv_pos_Qinv c).
     rewrite -> CRopp_Qopp.
@@ -131,11 +135,11 @@ Proof.
  assumption.
 Qed.
 
-Lemma inject_Q_product (l: list Q): (' cr_Product l) [=] cr_Product (map inject_Q l).
+Lemma inject_Q_product (l: list Q): (' cr_Product l) [=] cr_Product (map inject_Q_CR l).
 Proof.
  induction l.
   reflexivity.
- change (' (a * cr_Product l)[=]cr_Product (map inject_Q (a :: l))).
+ change (' (a * cr_Product l)%Q[=]cr_Product (map inject_Q_CR (a :: l))).
  rewrite <- CRmult_Qmult.
  rewrite IHl.
  reflexivity.
@@ -158,7 +162,7 @@ Hint Rewrite <- CRinv_Qinv : toCRring.
 CR forms a ring for the ring tactic.
 *)
 Lemma CR_ring_theory :
- @ring_theory CR (' 0%Q) (' 1%Q) (ucFun2 CRplus) CRmult
+ @ring_theory CR 0 1 (ucFun2 CRplus_uc) CRmult
  (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
 Proof.
  split.
@@ -173,7 +177,7 @@ Proof.
  apply: cg_minus_correct.
 Qed.
 
-Lemma inject_Q_strext : fun_strext inject_Q.
+Lemma inject_Q_strext : fun_strext inject_Q_CR.
 Proof.
  intros x y [Hxy|Hxy].
   apply: Qlt_not_eq.
@@ -208,9 +212,9 @@ Proof.
 Defined.
 
 Lemma CR_Q_ring_morphism :
- ring_morph (inject_Q 0%Q) (inject_Q 1%Q) (ucFun2 CRplus) CRmult
+ ring_morph 0%CR 1%CR (ucFun2 CRplus_uc) CRmult
  (fun x y => (x + - y)) CRopp (@st_eq CR)
-  (0%Q) (1%Q) Qplus Qmult Qminus Qopp Qeq_bool (inject_Q).
+  (0%Q) (1%Q) Qplus Qmult Qminus Qopp Qeq_bool (inject_Q_CR).
 Proof.
  split; try reflexivity.
      apply CRplus_Qplus.
@@ -225,13 +229,13 @@ Qed.
 
 Ltac CRcst t :=
   match t with
-  | (inject_Q ?z) => Qcst z
+  | (inject_Q_CR ?z) => Qcst z
   | _ => NotConstant
   end.
 
 Ltac CRring_pre := autorewrite with toCRring.
 
-Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus) CRmult CRopp (@st_eq CR).
+Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus_uc) CRmult CRopp (@st_eq CR).
 Proof.
  split.
    apply ucFun2_wd.
@@ -245,10 +249,10 @@ Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@st_isSe
 Lemma CRpos_nonNeg : forall x, CRpos x -> CRnonNeg x.
 Proof.
  intros x [c Hx].
- cut ('0 <= x)%CR.
+ cut (0 <= x)%CR.
   unfold CRle.
   intros H.
-  assert (x == x - '0)%CR. ring. rewrite -> H0.
+  assert (x == x - 0)%CR. ring. rewrite -> H0.
   assumption.
  apply CRle_trans with (' c)%CR; auto with *.
  rewrite -> CRle_Qle; auto with *.
@@ -257,16 +261,16 @@ Qed.
 Lemma CRneg_nonPos : forall x, CRneg x -> CRnonPos x.
 Proof.
  intros x [c Hx].
- cut (x <= '0)%CR.
+ cut (x <= 0)%CR.
   unfold CRle.
   intros H.
-  assert ('0 - x == -x)%CR. ring. rewrite -> H0 in H.
+  assert (0 - x == -x)%CR. ring. rewrite -> H0 in H.
   intros e.
   rewrite <- (Qopp_involutive e).
   rewrite <- (Qopp_involutive (approximate x e)).
   apply Qopp_le_compat.
   apply H.
- apply CRle_trans with (' - c)%CR; auto with *.
+ apply CRle_trans with ('(-c)%Q)%CR; auto with *.
  rewrite -> CRle_Qle; auto with *.
 Qed.
 
@@ -289,16 +293,16 @@ Qed.
 Lemma CRopp_opp (x: CR): (--x == x)%CR.
 Proof. intros. ring. Qed.
 
-Lemma CRplus_opp (x: CR): (x  + - x == ' 0)%CR.
+Lemma CRplus_opp (x: CR): (x  + - x == 0)%CR.
 Proof. intros. ring. Qed.
 
-Lemma CRopp_0: (-'0 == '0)%CR.
+Lemma CRopp_0: (-0 == 0)%CR.
 Proof. intros. ring. Qed.
 
-Lemma CRplus_0_l (x: CR): ('0 + x == x)%CR.
+Lemma CRplus_0_l (x: CR): (0 + x == x)%CR.
 Proof. intros. ring. Qed.
 
-Lemma CRplus_0_r (x: CR): (x + '0 == x)%CR.
+Lemma CRplus_0_r (x: CR): (x + 0 == x)%CR.
 Proof. intros. ring. Qed.
 
 Lemma approximate_CRplus (x y: CR) (e: Qpos):
@@ -348,9 +352,9 @@ Qed.
 
 Lemma CRlt_irrefl (x: CR): x < x -> False.
 Proof with auto.
- unfold CRlt.
+ unfold CRltT.
  intro.
- assert (x - x == ' 0)%CR by ring.
+ assert (x - x == 0)%CR by ring.
  intros.
  generalize (CRpos_wd H0 H).
  unfold CRpos.
@@ -360,7 +364,7 @@ Proof with auto.
  simpl in c.
  assert (x0 <= 0)%Q.
   rewrite <- CRle_Qle...
- apply Qlt_irrefl with 0.
+ apply Qlt_irrefl with 0%Q.
  apply Qlt_le_trans with x0...
 Qed.
 
@@ -395,7 +399,7 @@ Proof with intuition.
    rewrite CRle_Qle.
    clear H0 H1.
    intros.
-   apply Qlt_irrefl with 0.
+   apply Qlt_irrefl with 0%Q.
    apply Qlt_le_trans with (-r)%Q.
     change (- 0 < - r)%Q.
     apply Qopp_lt_compat...
@@ -409,14 +413,14 @@ Lemma CRgball_plus (x x' y y': CR) e1 e2:
 Proof with auto.
  do 3 rewrite <- in_CRgball.
  intros [A B] [C D].
- CRring_replace (x + y - ' (e1 + e2)) (x - ' e1 + (y - ' e2)).
- CRring_replace (x + y + ' (e1 + e2)) (x + ' e1 + (y + ' e2)).
+ CRring_replace (x + y - ' (e1 + e2)%Q) (x - ' e1 + (y - ' e2)).
+ CRring_replace (x + y + ' (e1 + e2)%Q) (x + ' e1 + (y + ' e2)).
  split; apply CRplus_le_compat...
 Qed.
 
 Lemma Qlt_from_CRlt (a b: Q): (' a < ' b)%CR -> (a < b)%Q.
 Proof with auto.
- unfold CRlt.
+ unfold CRltT.
  unfold CRpos.
  intros [[e p] H].
  revert H.
@@ -460,7 +464,7 @@ Qed.
 Lemma CRlt_le_weak (x y: CR): (x < y -> x <= y)%CR.
 Proof. intros. apply CRpos_nonNeg. assumption. Qed.
 
-Lemma lower_CRapproximation (x: CR) (e: Qpos): ' (approximate x e - e) <= x.
+Lemma lower_CRapproximation (x: CR) (e: Qpos): ' (approximate x e - e)%Q <= x.
 Proof.
  intros. rewrite <- CRminus_Qminus.
  apply CRplus_le_r with ('e)%CR.
@@ -468,7 +472,7 @@ Proof.
  apply in_CRball, ball_approx_r.
 Qed.
 
-Lemma upper_CRapproximation (x: CR) (e: Qpos): x <= ' (approximate x e + e).
+Lemma upper_CRapproximation (x: CR) (e: Qpos): x <= ' (approximate x e + e)%Q.
 Proof.
  intros. rewrite <- CRplus_Qplus.
  apply CRplus_le_r with (-'e)%CR.
@@ -478,18 +482,18 @@ Qed.
 
 Hint Immediate lower_CRapproximation upper_CRapproximation.
 
-Lemma CRlt_Qmid (x y: CR): x < y -> { q: Q & x < 'q and 'q < y }.
+Lemma CRlt_Qmid (x y: CR): x < y -> sigT (λ q: Q, x < 'q and 'q < y).
 Proof with auto.
  intros [q E].
  set (quarter := ((1#4)*q)%Qpos).
  exists (quarter + (approximate x quarter + quarter))%Q.
  split.
-  apply CRle_lt_trans with (' (0 + (approximate x quarter + quarter)))%CR...
+  apply CRle_lt_trans with (' (0 + (approximate x quarter + quarter))%Q)%CR...
    rewrite Qplus_0_l...
   apply CRlt_Qlt.
   apply Qplus_lt_l...
  apply CRlt_le_trans with (x + 'q)%CR.
-  apply CRlt_le_trans with (' (approximate x quarter - quarter + q))%CR.
+  apply CRlt_le_trans with (' (approximate x quarter - quarter + q)%Q)%CR.
    apply CRlt_Qlt.
    setoid_replace (QposAsQ q) with (quarter + quarter + quarter + quarter)%Q.
     ring_simplify.
@@ -511,15 +515,15 @@ Proof.
  apply def_leEq.
 Qed.
 
-Lemma CRnonNeg_le_0 x: CRnonNeg x <-> '0 <= x.
+Lemma CRnonNeg_le_0 x: CRnonNeg x <-> 0 <= x.
 Proof.
  unfold CRle.
- assert (x - '0 == x)%CR as E by ring.
+ assert (x - 0 == x)%CR as E by ring.
  rewrite E.
  intuition.
 Qed.
 
-Lemma CRnonNeg_0: CRnonNeg ('0)%CR.
+Lemma CRnonNeg_0: CRnonNeg (0)%CR.
 Proof.
  unfold CRnonNeg. simpl. intros.
  rewrite <- (Qopp_opp 0).
@@ -619,7 +623,7 @@ Proof with auto.
  apply CRle_trans with y...
 Qed.
 
-Lemma scale_0 x: scale 0 x == '0.
+Lemma scale_0 x: scale 0 x == 0.
 Proof. rewrite <- CRmult_scale. ring. Qed.
 
 Lemma scale_CRplus (q: Q) (x y: CR): scale q (x + y) == scale q x + scale q y.
@@ -627,3 +631,201 @@ Proof. intros. do 3 rewrite <- CRmult_scale. ring. Qed.
 
 Lemma scale_CRopp (q: Q) (x: CR): scale q (-x) == - scale q x.
 Proof. intros. do 2 rewrite <- CRmult_scale. ring. Qed.
+
+(** This returs GT if x is clearly greater than e, returns LT if x
+is clearly less than (-e), and returns Eq otherwise. *)
+Definition CR_epsilon_sign_dec (e:Qpos) (x:CR) : comparison :=
+let z := approximate x e in
+ match Q.Qle_dec ((2#1) * e) z with
+ | left p => Gt
+ | right _ =>
+  match Q.Qle_dec z (-(2#1) * e)%Q with
+  | left p => Datatypes.Lt
+  | right _ => Eq
+  end
+ end.
+
+(** This helper lemma reduces a CRpos problem to a sigma type with
+a simple equality proposition. *)
+Lemma CR_epsilon_sign_dec_pos : forall x,
+{e:Qpos | CR_epsilon_sign_dec e x ≡ Gt} -> CRpos x.
+Proof.
+ intros x [e H].
+ apply (@CRpos_char e).
+ abstract (unfold CR_epsilon_sign_dec in H; destruct (Q.Qle_dec ((2#1) * e) (approximate x e)) as [A|A];
+  [assumption | destruct (Q.Qle_dec (approximate x e) (- (2#1) * e)) as [B|B]; discriminate H]).
+Defined.
+
+Lemma CR_epsilon_sign_dec_Gt (e:Qpos) (x:CR) : 
+  ((2#1) * e <= approximate x e)%Q -> CR_epsilon_sign_dec e x ≡ Gt.
+Proof.
+  intros.
+  unfold CR_epsilon_sign_dec.
+  destruct Q.Qle_dec; intuition.
+Qed.
+
+(* nasty because approximate is not Proper *)
+Lemma CR_epsilon_sign_dec_pos_rev (x : CR) (e : Qpos) :
+  ('e <= x)%CR -> CR_epsilon_sign_dec ((1#4) * e) x ≡ Gt.
+Proof.
+  intros E.
+  apply CR_epsilon_sign_dec_Gt.
+  apply Qplus_le_l with (-e)%Q.
+  simpl. setoid_replace ((2#1) * ((1 # 4) * e) + - e)%Q with (-((1#2) * e))%Q by QposRing.
+  replace ((1#4) * e)%Qpos with ((1#2) * ((1#2) * e))%Qpos.
+   now apply (E ((1#2) * e))%Qpos.
+  apply Qpos_PI.
+  now destruct e as [[[ | | ] ?] ?].
+Qed.
+
+(* Type class versions of a lot of the above *)
+Close Scope CR_scope.
+Local Opaque CR.
+
+Instance: Ring CR.
+Proof. apply (rings.from_stdlib_ring_theory CR_ring_theory). Qed.
+
+(* We need the (1#4) because CR_epsilon_sign_dec_pos_rev is nasty *)
+Instance CRlt: Lt CR := λ x y, 
+  ∃ n : nat, CR_epsilon_sign_dec ((1#4) * (2#1) ^ -coerce nat Z n) (y - x) ≡ Gt.
+
+Lemma CR_lt_ltT x y : x < y IFF CRltT x y.
+Proof.
+  split.
+   intros E.
+   apply CR_epsilon_sign_dec_pos.
+   apply constructive_indefinite_description_nat in E. 
+    destruct E as [n En].
+    now exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+   intros. now apply comparison_eq_dec.
+  intros [ε Eε].
+  exists (Z.nat_of_Z (-Qdlog2 ('ε))).
+  apply CR_epsilon_sign_dec_pos_rev.
+  apply CRle_trans with ('(ε : Q)); auto.
+  apply CRle_Qle. simpl.
+  destruct (decide ((ε : Q) ≤ 1)).
+   rewrite Z.nat_of_Z_nonneg.
+    rewrite Zopp_involutive.
+    apply Qdlog2_spec.
+    now destruct ε.
+   apply Z.opp_nonneg_nonpos.
+   now apply Qdlog2_nonpos.
+  rewrite Z.nat_of_Z_nonpos.
+   now apply Qlt_le_weak, Qnot_le_lt.
+  apply Z.opp_nonpos_nonneg.
+  apply Qdlog2_nonneg.
+  now apply Qlt_le_weak, Qnot_le_lt.
+Qed.
+
+Instance CRapart: Apart CR := λ x y, x < y ∨ y < x.
+
+Lemma CR_apart_apartT x y : x ⪥ y IFF CRapartT x y.
+Proof.
+  split.
+   intros E.
+   set (f (n : nat) := CR_epsilon_sign_dec ((1#4) * (2#1) ^ -coerce nat Z n)).
+   assert (∃ n, f n (y - x) ≡ Gt ∨ f n (x - y) ≡ Gt) as E2.
+    now destruct E as [[n En] | [n En]]; exists n; [left | right].
+   apply constructive_indefinite_description_nat in E2.
+    destruct E2 as [n E2].
+    destruct (comparison_eq_dec (f n (y - x)) Gt) as [En|En].
+     left. apply CR_epsilon_sign_dec_pos. 
+     now exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+    right. apply CR_epsilon_sign_dec_pos. 
+    exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+    destruct E2; tauto.
+   intros n. 
+   destruct (comparison_eq_dec (f n (y - x)) Gt); auto.
+   destruct (comparison_eq_dec (f n (x - y)) Gt); tauto.
+  intros [E|E].
+   left. now apply CR_lt_ltT.
+  right. now apply CR_lt_ltT.
+Qed.
+
+Instance: StrongSetoid CR.
+Proof with auto; try solve [now apply CR_apart_apartT].
+  split.
+     intros x E. 
+     destruct (ap_irreflexive _ x)...
+    intros x y E. 
+    apply CR_apart_apartT.
+    apply: ap_symmetric...
+   intros x y E z.
+   destruct (ap_cotransitive _ x y) with z; [|left|right]...
+  intros x y; split; intros E.
+   apply ap_tight. intros E2. destruct E...
+  intros E2. destruct (proj2 (ap_tight _ x y))...
+Qed.
+
+Instance: StrongSetoid_BinaryMorphism CRmult.
+Proof with auto; try solve [now apply CR_apart_apartT].
+  split; try apply _.
+  intros x₁ y₁ x₂ y₂ E.
+  destruct (CRmult_strext x₁ x₂ y₁ y₂); [|left|right]...
+Qed.
+
+Instance: PseudoPartialOrder CRle CRlt.
+Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
+  split.
+   split; try apply _.
+     intros x y [E1 E2].
+     destruct (less_antisymmetric_unfolded _ x y)...
+    intros x y E z.
+    edestruct (less_cotransitive _ x y); [| left | right]...
+   reflexivity.
+  intros x y; split.
+   intros E1 E2.
+   apply (leEq_def _ x y)...
+  intros E1. apply (leEq_def _ x y).
+  intros E2. destruct E1...
+Qed.
+
+Instance: PseudoRingOrder CRle CRlt.
+Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
+  repeat (split; try apply _).
+   intros x y E.
+   apply CR_lt_ltT, (plus_resp_less_lft _ x y z)...
+  intros x y E1 E2.
+  apply CR_lt_ltT, (mult_resp_pos _ x y)...
+Qed.
+
+Program Instance CRinv: MultInv CR := λ x, CRinvT x _.
+Next Obligation. apply CR_apart_apartT. now destruct x. Qed.
+
+Instance: Field CR.
+Proof.
+  split; try apply _.
+    apply CR_apart_apartT.
+    now apply: ring_non_triv.
+   split; try apply _.
+   intros [x Px] [y Py] E.
+   now apply: CRinvT_wd.
+  intros x.
+  now apply: field_mult_inv.
+Qed.
+
+Instance: StrongSetoid_Morphism inject_Q_CR.
+Proof. 
+  apply strong_setoids.dec_strong_morphism.
+  split; try apply _.
+Qed.
+
+Instance: StrongSemiRing_Morphism inject_Q_CR.
+Proof.
+  repeat (split; try apply _); intros; try reflexivity; symmetry.
+   now apply CRplus_Qplus.
+  now apply CRmult_Qmult.
+Qed.
+
+Instance: StrongInjective inject_Q_CR.
+Proof.
+  repeat (split; try apply _); intros.
+  apply CR_apart_apartT.
+  now apply: Qap_CRap.
+Qed.
+
+Instance: OrderEmbedding inject_Q_CR.
+Proof. repeat (split; try apply _); now apply CRle_Qle. Qed.
+
+Instance: StrictOrderEmbedding inject_Q_CR.
+Proof. split; apply _. Qed.

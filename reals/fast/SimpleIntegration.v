@@ -1,3 +1,4 @@
+(*
 
 (** A straightforward implementation of the abstract integration interface
  in AbstractionIntegration using Riemann sums. The sole product of
@@ -462,3 +463,4 @@ Section implements_abstract_interface.
   Qed.
 
 End implements_abstract_interface.
+*)

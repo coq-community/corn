@@ -6,20 +6,20 @@ Require Import
   theory.int_pow theory.nat_pow
   stdlib_rationals stdlib_binary_integers fast_integers dyadics.
 
-Add Field Q : (fields.stdlib_field_theory Q).
+Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Notation fastD := (Dyadic fastZ).
-Instance fastZtoQ : Coerce fastZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
-Instance ZtofastD : Coerce Z fastD := dy_inject ∘ BigZ.of_Z.
-Instance NtofastZ : Coerce N fastZ := BigZ.of_Z ∘ Z_of_N.
-Instance fastDtoQ : Coerce fastD Q_as_MetricSpace := DtoQ fastZtoQ.
+Instance fastZtoQ: Coerce fastZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
+Instance ZtofastD: Coerce Z fastD := dy_inject ∘ BigZ.of_Z.
+Instance NtofastZ: Coerce N fastZ := BigZ.of_Z ∘ Z_of_N.
+Instance fastDtoQ: Coerce fastD Q_as_MetricSpace := DtoQ fastZtoQ.
 
-Lemma fastDtoQ_correct x : fastDtoQ x = 'mant x * 2 ^ ('expo x : Z).
+Lemma fastDtoQ_correct x : fastDtoQ x = 'mant x * 2 ^ (coerce fastZ Z (expo x)).
 Proof.
   unfold fastDtoQ.
   rewrite (DtoQ_correct _ _ (reflexivity x)).
   unfold DtoQ_slow.
-  now rewrite (preserves_int_pow_exp (f:=coerce : bigZ → Z)).
+  now rewrite (preserves_int_pow_exp (f:=coerce fastZ Z)).
 Qed.
 
 (* 
@@ -27,7 +27,7 @@ Qed.
   in math-classes yet. Moreover, BigZ.shiftl behaves as shiftr on its negative domain,
   which is quite convenient here.
 *)
-Program Instance fastD_div : AppDiv fastD := λ x y k,
+Program Instance fastD_div: AppDiv fastD := λ x y k,
   BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) $ ('k - 1).
 
 Lemma Qdiv_bounded_Zdiv (x y : Z) :
@@ -36,22 +36,21 @@ Proof.
   rewrite Qround.Zdiv_Qdiv.
   split.
    now apply Qround.Qfloor_le.
-  rewrite <-(rings.preserves_1 (f:=coerce : Z → Q)).
+  rewrite <-(rings.preserves_1 (f:=coerce Z Q)).
   rewrite <-rings.preserves_plus.
-  apply stdlib_rationals.Qlt_coincides.
   now apply Qround.Qlt_floor.
 Qed.
 
 Lemma Qpow_bounded_Zshiftl (x n : Z) : 
-  'Zshiftl x n ≤ ('x * 2 ^ n : Q) < 'Zshiftl x n + 1.
+  'Zshiftl x n ≤ coerce Z Q x * 2 ^ n < 'Zshiftl x n + 1.
 Proof.
-  destruct (total_order 0 n) as [En | En].
+  destruct (total (≤) 0 n) as [En | En].
    rewrite Z.shiftl_mul_pow2 by trivial.
    rewrite inject_Z_mult.
    rewrite Qpower.Zpower_Qpower by trivial.
    split; try reflexivity.
-   apply semirings.pos_plus_scompat_r; try reflexivity.
-   apply semirings.sprecedes_0_1.
+   apply semirings.pos_plus_lt_compat_r.
+   now apply (semirings.lt_0_1 (R:=Q)).
   rewrite Z.shiftl_div_pow2 by trivial.
   assert (('x * 2 ^ n : Q) = 'x / 'Zpower 2 (-n)).
    rewrite Qpower.Zpower_Qpower.
@@ -61,9 +60,9 @@ Proof.
   split.
    transitivity ('x / 'Zpower 2 (-n) : Q).
     now apply Qdiv_bounded_Zdiv.
-   apply orders.equiv_precedes. now symmetry.
-  apply orders.sprecedes_trans_r with ('x / 'Zpower 2 (-n) : Q).
-   now apply orders.equiv_precedes.
+   apply orders.eq_le. now symmetry.
+  apply orders.le_lt_trans with ('x / 'Zpower 2 (-n) : Q).
+   now apply orders.eq_le.
   now apply Qdiv_bounded_Zdiv.
 Qed.
 
@@ -73,10 +72,10 @@ Proof.
       ('xm * 2 ^ xe : Q) / ('ym * 2 ^ ye : Q) = ('xm * 2 ^ (-(k - 1) + xe - ye)) / 'ym * 2 ^ (k - 1)) as E1.
    intros.
    rewrite 2!int_pow_exp_plus by solve_propholds.
-   rewrite fields.dec_mult_inv_distr.
+   rewrite dec_fields.dec_mult_inv_distr.
    rewrite 2!int_pow_opp.
    transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1)) : Q); [| ring].
-   rewrite fields.dec_mult_inverse by apply _. ring.
+   rewrite dec_mult_inverse by solve_propholds. ring.
   assert (∀ xm xe ym ye : Z, 
       'Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
    clear x y.
@@ -84,35 +83,37 @@ Proof.
     intros.
     ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
-    ring_simplify. apply sg_mor; [reflexivity | now rewrite commutativity].
+    ring_simplify. apply sm_proper. now rewrite commutativity.
    intros. rewrite E1, E2.
    apply (order_preserving (.* _)).
-   apply rings.flip_minus_l. apply semirings.nonneg_plus_compat_r; [| easy].
+   apply rings.flip_le_minus_l. 
+   apply semirings.plus_le_compat_r; [easy |].
    transitivity ('Zshiftl xm (-(k - 1) + xe - ye) / 'ym - 1 : Q).
     apply (order_preserving (+ -1)). now apply Qdiv_bounded_Zdiv.
-   destruct (orders.precedes_or_sprecedes 0 ym) as [E | E].
-    apply rings.flip_minus_l. apply semirings.nonneg_plus_compat_r; [| easy].
-    apply (maps.order_preserving_flip_ge_0 (.*.) (/ 'ym : Q)).
-     apply fields.nonneg_dec_mult_inv_compat.
+   destruct (orders.le_or_lt 0 ym) as [E | E].
+    apply rings.flip_le_minus_l. 
+    apply semirings.plus_le_compat_r; [easy |].
+    apply (maps.order_preserving_flip_nonneg (.*.) (/ 'ym : Q)).
+     apply dec_fields.nonneg_dec_mult_inv_compat.
      now apply semirings.preserves_nonneg.
     now apply Qpow_bounded_Zshiftl.
    transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / 'ym : Q).
-    rewrite rings.plus_mul_distr_r.
-    apply semirings.plus_compat; [reflexivity |].
+    rewrite rings.plus_mult_distr_r.
+    apply semirings.plus_le_compat; [reflexivity |].
     rewrite rings.mult_1_l.
-    apply rings.flip_opp.
-    rewrite rings.opp_involutive, fields.dec_mult_inv_opp.
-    apply fields.flip_dec_mult_inv_l; [solve_propholds |].
+    apply rings.flip_le_opp.
+    rewrite rings.opp_involutive, dec_fields.dec_mult_inv_opp.
+    apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
     rewrite <-rings.preserves_opp.
-    apply semirings.preserves_ge1.
-    apply rings.flip_opp.
+    apply semirings.preserves_ge_1.
+    apply rings.flip_le_opp.
     rewrite rings.opp_involutive.
-    now apply integers.precedes_sprecedes.
-   apply rings.flip_nonpos_mult_r.
-    apply fields.nonpos_dec_mult_inv_compat.
+    now apply integers.le_iff_lt_plus_1.
+   apply semirings.flip_nonpos_mult_r.
+    apply dec_fields.nonpos_dec_mult_inv_compat.
     apply semirings.preserves_nonpos.
-    now apply orders.sprecedes_weaken. 
-   now apply Qpow_bounded_Zshiftl.
+    now apply orders.lt_le.
+   now apply orders.lt_le, Qpow_bounded_Zshiftl.
   assert (∀ xm xe ym ye : Z, 
       ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
    clear x y.
@@ -120,29 +121,29 @@ Proof.
     intros.
     ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
-    ring_simplify. apply sg_mor; [reflexivity| apply commutativity].
+    ring_simplify. apply sm_proper. now apply commutativity.
    intros. rewrite E1, E2.
    apply (order_preserving (.* _)).
    transitivity ('Zshiftl xm (-(k - 1) + xe - ye) / 'ym + 1 : Q).
-    2: now apply (order_preserving (+1)), Qdiv_bounded_Zdiv.
-   destruct (orders.precedes_or_sprecedes ym 0) as [E3 | E3].
-    apply semirings.nonneg_plus_compat_r; [|easy].
-    apply rings.flip_nonpos_mult_r.
-     apply fields.nonpos_dec_mult_inv_compat.
+    2: now apply (order_preserving (+1)); apply orders.lt_le, Qdiv_bounded_Zdiv.
+   destruct (orders.le_or_lt ym 0) as [E3 | E3].
+    apply semirings.plus_le_compat_r; [easy |].
+    apply semirings.flip_nonpos_mult_r.
+     apply dec_fields.nonpos_dec_mult_inv_compat.
      now apply semirings.preserves_nonpos.
     now apply Qpow_bounded_Zshiftl.
    transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / ' ym : Q).
-    apply (maps.order_preserving_flip_ge_0 (.*.) (/ 'ym : Q)).
-     apply fields.nonneg_dec_mult_inv_compat.
+    apply (maps.order_preserving_flip_nonneg (.*.) (/ 'ym : Q)).
+     apply dec_fields.nonneg_dec_mult_inv_compat.
      apply semirings.preserves_nonneg.
-     now apply orders.sprecedes_weaken. 
-    now apply Qpow_bounded_Zshiftl.
-   rewrite rings.plus_mul_distr_r.
-   apply semirings.plus_compat; [reflexivity |].
+     now apply orders.lt_le.
+    now apply orders.lt_le, Qpow_bounded_Zshiftl.
+   rewrite rings.plus_mult_distr_r.
+   apply semirings.plus_le_compat; [reflexivity |].
    rewrite rings.mult_1_l.
-   apply fields.flip_dec_mult_inv_l; [solve_propholds |].
-   apply semirings.preserves_ge1.
-   now apply integers.precedes_sprecedes_alt in E3.
+   apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
+   apply semirings.preserves_ge_1.
+   now apply integers.lt_iff_plus_1_le in E3.
   unfold coerce. rewrite 3!fastDtoQ_correct.
   destruct x as [xm xe], y as [ym ye].
   unfold fastZtoQ, coerce, "∘". simpl. unfold coerce. BigZ.zify.
@@ -160,7 +161,7 @@ Proof.
   setoid_replace (app_approx x k) with (app_div x 1 k).
    setoid_replace ('x : Q) with ('x / '1 : Q).
     now apply fastD_div_correct.
-   rewrite rings.preserves_1, fields.dec_mult_inv_1.
+   rewrite rings.preserves_1, dec_fields.dec_mult_inv_1.
    now rewrite rings.mult_1_r.
   unfold app_div, fastD_div.
   simpl. rewrite BigZ.div_1_r.
@@ -174,7 +175,7 @@ Proof.
   intros [n d] ε.
   unfold app_inverse, QtofastD.
   apply ball_weak_le with (2 ^ Qdlog2 ε)%Qpos.
-   now apply Qpos_dlog2_spec.
+   now apply (Qpos_dlog2_spec ε).
   simpl. rewrite Qmake_Qdiv.
   rewrite 2!(integers.to_ring_unique_alt inject_Z (fastDtoQ ∘ dy_inject ∘ BigZ.of_Z)).
   apply fastD_div_correct.
@@ -208,7 +209,7 @@ Proof.
     rewrite 2!(preserves_nat_pow (f:=integers_to_ring fastZ Q)).
     rewrite 2!(commutativity ('e2 : fastZ)).
     rewrite 2!int_pow_exp_mult.
-    rewrite 2!(int_pow_nat_pow (f:=coerce : N → fastZ)).
+    rewrite 2!(int_pow_nat_pow (f:=coerce N fastZ)).
     rewrite <-2!nat_pow_base_mult.
     now rewrite E1.
    intros [xm xe]. simpl.
@@ -223,6 +224,7 @@ Qed.
 Instance: AppRationals fastD.
 Proof.
   split; try apply _; intros.
+    split; apply _.
    now apply fastD_div_correct.
   now apply fastD_approx_correct.
 Qed.

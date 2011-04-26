@@ -736,32 +736,32 @@ Lemma CR_lt_as_Cauchy_IR_lt_2 : forall (x y:CR),
 (CRasCauchy_IR x)[<](CRasCauchy_IR y) -> (x < y)%CR.
 Proof.
  intros x y H.
- eapply CRlt_wd;try apply CRasCR.
+ eapply CRltT_wd;try apply CRasCR.
  apply Cauchy_IR_lt_as_CR_lt_1.
  assumption.
 Qed.
 
 (** appartness is preserved. *)
 Lemma Cauchy_IR_ap_as_CR_ap_1 : forall (x y:Cauchy_IR),
-x[#]y -> (CRapart (Cauchy_IRasCR x) (Cauchy_IRasCR y))%CR.
+x[#]y -> (CRapartT (Cauchy_IRasCR x) (Cauchy_IRasCR y))%CR.
 Proof.
  intros x y [H|H];[left|right];apply Cauchy_IR_lt_as_CR_lt_1; apply H.
 Defined.
 
 Lemma CR_ap_as_Cauchy_IR_ap_1 : forall (x y:CR),
-CRapart x y -> (CRasCauchy_IR x) [#] (CRasCauchy_IR y).
+CRapartT x y -> (CRasCauchy_IR x) [#] (CRasCauchy_IR y).
 Proof.
  intros x y [H|H];[left|right];apply CR_lt_as_Cauchy_IR_lt_1; apply H.
 Defined.
 
 Lemma Cauchy_IR_ap_as_CR_ap_2 : forall (x y:Cauchy_IR),
-(CRapart (Cauchy_IRasCR x) (Cauchy_IRasCR y))%CR -> x[#]y.
+(CRapartT (Cauchy_IRasCR x) (Cauchy_IRasCR y))%CR -> x[#]y.
 Proof.
  intros x y [H|H];[left|right];apply Cauchy_IR_lt_as_CR_lt_2; apply H.
 Qed.
 
 Lemma CR_ap_as_Cauchy_IR_ap_2 : forall (x y:CR),
-(CRasCauchy_IR x) [#] (CRasCauchy_IR y) -> CRapart x y.
+(CRasCauchy_IR x) [#] (CRasCauchy_IR y) -> CRapartT x y.
 Proof.
  intros x y [H|H];[left|right];apply CR_lt_as_Cauchy_IR_lt_2; apply H.
 Defined.
@@ -846,10 +846,10 @@ Proof.
 Qed.
 
 Lemma Cauchy_IR_nonZero_as_CR_nonZero_1 : forall (x:Cauchy_IR),
-Dom (f_rcpcl' _) x -> (CRapart (Cauchy_IRasCR x) (inject_Q 0%Q))%CR.
+Dom (f_rcpcl' _) x -> (CRapartT (Cauchy_IRasCR x) 0)%CR.
 Proof.
  intros x x_.
- eapply CRapart_wd.
+ eapply CRapartT_wd.
    reflexivity.
   symmetry.
   apply Cauchy_IR_inject_Q_as_CR_inject_Q.
@@ -858,18 +858,18 @@ Proof.
 Defined.
 
 Lemma CR_nonZero_as_Cauchy_IR_nonZero_1 : forall (x:CR),
-(CRapart x (inject_Q 0%Q))%CR -> Dom (f_rcpcl' _) (CRasCauchy_IR x).
+(CRapartT x 0)%CR -> Dom (f_rcpcl' _) (CRasCauchy_IR x).
 Proof.
  intros x x_.
  change ((CRasCauchy_IR x)[#]Zero).
- stepr (CRasCauchy_IR (inject_Q 0)).
+ stepr (CRasCauchy_IR 0%CR).
   apply CR_ap_as_Cauchy_IR_ap_1.
   assumption.
  apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Defined.
 
 Lemma Cauchy_IR_inv_as_CR_inv_short : forall (x:Cauchy_IR) x_,
-(@CRinv (Cauchy_IRasCR x) (Cauchy_IR_nonZero_as_CR_nonZero_1 _ x_) == Cauchy_IRasCR (f_rcpcl x x_))%CR.
+(@CRinvT (Cauchy_IRasCR x) (Cauchy_IR_nonZero_as_CR_nonZero_1 _ x_) == Cauchy_IRasCR (f_rcpcl x x_))%CR.
 Proof.
  intros [x Hx] [H|H].
   set (x':=(Build_CauchySeq Q_as_COrdField x Hx)) in *.
@@ -921,26 +921,26 @@ Qed.
 Hint Rewrite Cauchy_IR_inv_as_CR_inv_short : CRtoCauchy_IR.
 
 Lemma Cauchy_IR_inv_as_CR_inv : forall (x:Cauchy_IR) x_ H,
-(@CRinv (Cauchy_IRasCR x) H == Cauchy_IRasCR (f_rcpcl x x_))%CR.
+(@CRinvT (Cauchy_IRasCR x) H == Cauchy_IRasCR (f_rcpcl x x_))%CR.
 Proof.
  intros x x_ H.
  rewrite <- Cauchy_IR_inv_as_CR_inv_short.
- apply CRinv_irrelvent.
+ apply CRinvT_irrelevant.
 Qed.
 
 Lemma CR_inv_as_Cauchy_IR_inv : forall (x:CR) x_ H,
-f_rcpcl (CRasCauchy_IR x) H [=] CRasCauchy_IR (@CRinv x x_).
+f_rcpcl (CRasCauchy_IR x) H [=] CRasCauchy_IR (@CRinvT x x_).
 Proof.
  intros x x_ H.
  stepl (CRasCauchy_IR (Cauchy_IRasCR (f_rcpcl (CRasCauchy_IR x) H))); [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  rewrite <- Cauchy_IR_inv_as_CR_inv_short.
- apply CRinv_wd.
+ apply CRinvT_wd.
  apply CRasCR.
 Qed.
 
 Lemma CR_inv_as_Cauchy_IR_inv_short : forall (x:CR) x_,
-f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_) [=] CRasCauchy_IR (@CRinv x x_).
+f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_) [=] CRasCauchy_IR (@CRinvT x x_).
 Proof.
  intros.
  apply CR_inv_as_Cauchy_IR_inv.

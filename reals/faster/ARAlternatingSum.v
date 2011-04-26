@@ -4,11 +4,11 @@ Require Import
   ApproximateRationals ARArith
   abstract_algebra int_pow theory.streams theory.series.
 
-Add Ring Z : (rings.stdlib_ring_theory Z).
-Local Coercion Is_true : bool >-> Sortclass.
-
 Section alt_sum.
 Context `{AppRationals AQ}.
+
+Add Ring Z : (rings.stdlib_ring_theory Z).
+Local Coercion Is_true : bool >-> Sortclass.
 
 CoInductive DivisionStream: Stream Q_as_MetricSpace → Stream AQ → Stream AQ → Prop :=
   division_stream_eq: ∀ sQ sN sD, 
@@ -65,14 +65,14 @@ Proof with auto.
     transitivity (hd (tl sQ))...
     now rewrite <-E2.
    rewrite Qabs.Qabs_pos...
-   transitivity (2 ^ Qdlog2 ε)%Qpos.
-    transitivity (Qabs.Qabs ('app_div_above (hd sN) (hd sD) (Qdlog2 ε - Z.log2_up l) - '0))...
+   apply Qle_trans with (2 ^ Qdlog2 ε)%Qpos.
+    apply Qle_trans with (Qabs.Qabs ('app_div_above (hd sN) (hd sD) (Qdlog2 ε - Z.log2_up l) - '0))...
     rewrite rings.preserves_0. unfold Qminus. rewrite Qplus_0_r.
     rewrite Qabs.Qabs_pos.
      now apply aq_div_above.
-    transitivity ('hd sN / 'hd sD : Q)...
+    apply Qle_trans with ('hd sN / 'hd sD : Q)...
     now apply aq_div_above.
-   now apply Qpos_dlog2_spec.
+   now apply (Qpos_dlog2_spec ε).
   simpl.
   apply FIX.
    now apply DivisionStream_tl.
@@ -92,21 +92,21 @@ Proof.
     intros n. 
     ms_setoid_replace n with (1 + (n - 1)) at 1 by ring.
     rewrite int_pow_S.
-     now rewrite rings.plus_mul_distr_r, left_identity.
-    apply (rings.ne_0 (2:Q)).
+     now rewrite rings.plus_mult_distr_r, left_identity.
+    apply (rings.is_ne_0 (2:Q)).
    posed_rewrite (G k).
-   apply_simplified (semirings.plus_compat (R:=Q)); [| reflexivity].
+   apply_simplified (semirings.plus_le_compat (R:=Q)); [| reflexivity].
    posed_rewrite (G (k - 1)).
    assert ((2:Q) ^ (k - Z.log2_up l) ≤ 2 ^ (k - 1 - 1)).
-    apply int_pow.int_pow_exp_precedes.
-     now apply semirings.precedes_1_2.
+    apply int_pow.int_pow_exp_le.
+     now apply semirings.le_1_2.
     rewrite <-associativity.
     apply (order_preserving (k +)).
     rewrite <-rings.opp_distr.
-    apply rings.flip_opp.
+    apply rings.flip_le_opp.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.
-   now apply semirings.plus_compat.
+   now apply semirings.plus_le_compat.
   eapply ball_triangle. 
    2: now apply E. 
   simpl. unfold app_div_above.
@@ -115,7 +115,7 @@ Proof.
   unfold app_div_above. rewrite rings.preserves_plus.
   apply Qball_plus.
    now apply aq_div.
-  rewrite aq_shift_correct, rings.preserves_1, left_identity.
+  rewrite aq_shift_1_correct.
   now apply Qball_0_r.
 Qed.
 
@@ -127,7 +127,7 @@ Proof.
    left. now apply (ARInfAltSum_lazylength_Further d k El).
   right. intros _. 
   simpl. apply (IH tt).
-   abstract (apply semirings.nonneg_plus_compat_r; [auto | apply semirings.precedes_0_1]).
+   now apply semirings.plus_le_compat_r.
   now destruct d.
 Defined.
 
@@ -151,10 +151,9 @@ Lemma ARInfAltSum_length_pos `(d : DivisionStream sQ sN sD) {dnn : DecreasingNon
   0 < ARInfAltSum_length d k.
 Proof.
   unfold ARInfAltSum_length.
-  apply semirings.pos_plus_scompat_l.
-   split; try discriminate.
-   now do 4 apply le_S.
-  apply naturals.naturals_nonneg.
+  apply semirings.nonneg_plus_lt_compat_r.
+   apply naturals.naturals_nonneg.
+  apply: (semirings.lt_0_4 (R:=nat)).
 Qed.
 
 Fixpoint ARAltSum (sN sD : Stream AQ) (l : nat) (k : Z) :=
@@ -197,11 +196,11 @@ Lemma ARAltSum_correct `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegati
   ball (2 ^ k) ('ARAltSum sN sD l (k - Z.log2_up l)) (take sQ l Qminus' 0).
 Proof.
   destruct l.
-   now destruct Pl as [_ []]. 
+   now destruct (irreflexivity (<) (0 : nat)).
   apply ball_weak_le with (P_of_succ_nat l * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
    set (l':=P_of_succ_nat l).
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
-   rewrite int_pow_exp_plus; [| apply (rings.ne_0 (2:Q))].
+   rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
    apply (order_preserving_back ((2:Q) ^ Z.log2_up l' *.)).
    ms_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
     rewrite (commutativity _ ((2:Q) ^ k)).
@@ -217,9 +216,8 @@ Proof.
    rewrite int_pow_opp.
    rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
    rewrite <-associativity.
-   rewrite associativity, fields.dec_mult_inverse.
-    now apply left_identity.
-   apply (_ : PropHolds (2 ^ Z.log2_up l' ≠ 0)).
+   rewrite associativity, dec_mult_inverse by solve_propholds.
+   now apply left_identity.
   rewrite <-nat_of_P_of_succ_nat.
   rewrite convert_is_POS.
   now apply ARAltSum_correct_aux.
@@ -237,13 +235,14 @@ Proof.
   eapply ball_triangle.
    apply ball_weak_le with (2 ^ (Qdlog2 ε1 - 1))%Qpos.
     change (2 ^ (Qdlog2 ε1 - 1) ≤ (ε1:Q) * (1 # 2)).
-    rewrite Qdlog2_half; auto.
-    apply Qdlog2_spec, stdlib_rationals.Qlt_coincides; now auto with *. 
+    rewrite Qdlog2_half by apply Qpos_prf.
+    apply Qdlog2_spec. 
+    apply pos_mult_compat. apply Qpos_prf. easy.
    unfold ARInfAltSum_raw.
    apply (ARAltSum_correct d).
    now apply ARInfAltSum_length_pos.
   apply (InfiniteAlternatingSum_further_alt _).
-  rewrite (Qdlog2_half ε1); auto.
+  rewrite (Qdlog2_half ε1) by apply Qpos_prf.
   apply (ARInfAltSum_length_ge d (ε1 * (1 # 2))).
 Qed.
 
@@ -265,10 +264,10 @@ Definition ARInfAltSum `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegati
   := mkRegularFunction (0 : AQ_as_MetricSpace) (ARInfAltSum_prf d).
 
 Lemma ARInfAltSum_correct `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0} :
-   ARtoCR (ARInfAltSum d) = InfiniteAlternatingSum sQ.
+   'ARInfAltSum d = InfiniteAlternatingSum sQ.
 Proof.
   intros ? ?.
-  unfold ARtoCR. simpl.
+  unfold coerce, ARtoCR. simpl.
   now apply ARInfAltSum_raw_correct.
 Qed.
 End alt_sum.

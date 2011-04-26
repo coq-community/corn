@@ -23,6 +23,8 @@ Require Export Complete.
 Require Export Prelength.
 Require Import Qmetric.
 Require Import CornTac.
+Require Import canonical_names.
+Require Import stdlib_rationals.
 
 Set Implicit Arguments.
 
@@ -37,15 +39,13 @@ Definition CR := Complete Q_as_MetricSpace.
 Delimit Scope CR_scope with CR.
 Bind Scope CR_scope with CR.
 
-Definition inject_Q : Q -> CR := (@Cunit Q_as_MetricSpace).
+Instance inject_Q_CR: Coerce Q CR := (@Cunit Q_as_MetricSpace).
 
 (* begin hide *)
-Add Morphism (inject_Q) with signature Qeq ==> (@st_eq _) as inject_Q_wd.
-Proof.
- exact (uc_wd (@Cunit Q_as_MetricSpace)).
-Qed.
+Instance inject_Q_CR_wd: Proper ((=) ==> (=)) inject_Q_CR.
+Proof uc_wd (@Cunit Q_as_MetricSpace).
 (* end hide *)
 
-Notation "' x" := (inject_Q x) : CR_scope.
+Notation "' x" := (inject_Q_CR x) : CR_scope.
 
 Notation "x == y" := (@st_eq CR x y) (at level 70, no associativity) : CR_scope.

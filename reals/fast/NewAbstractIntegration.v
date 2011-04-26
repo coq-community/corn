@@ -186,7 +186,7 @@ Section constant_integral.
 
   Notation f := (λ _: sig (In r), y).
 
-  Program Definition integrate_constant: Integral f := ' (snd r - fst r) * y.
+  Program Definition integrate_constant: Integral f := ' (snd r - fst r)%Q * y.
 
   Next Obligation. Proof with auto.
    intros.
@@ -367,7 +367,7 @@ Section extend.
   Definition extend (t: T): CR :=
     match canonical_names.decide (P t) with
     | left H => f (exist _ _ H)
-    | right _ => ' 0
+    | right _ => 0
     end.
 
   Context `{te: canonical_names.Equiv T}.
@@ -390,7 +390,7 @@ Section continuity_in_both.
   Program Definition metric: IntegrationInput → Range Q * @sig (Q → CR) (Proper canonical_names.equiv) :=
    λ ab, (projT1 ab, (@extend Q (∈ projT1 ab) _ (@proj1_sig _ _ ∘ ucFun_itself (projT2 ab))%prg)).
      (* should never actually run at runtime *)
-
+(*
   Global Instance IntegrationInput_equiv: canonical_names.Equiv IntegrationInput := delegated_equiv _ metric.
   Global Instance IntegrationInput_ball: MetricSpaceBall IntegrationInput := delegated_ball _ metric.
   Global Instance IntegrationInput_mspc: MetricSpaceClass IntegrationInput.
@@ -416,5 +416,5 @@ Section continuity_in_both.
     apply _.
    admit.
   Qed.
-
+*)
 End continuity_in_both.

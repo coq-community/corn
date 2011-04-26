@@ -28,10 +28,10 @@ Time Eval vm_compute in (answer 500 P07).
 Definition P08 : fastAR := AQcos ('(10^50)%Z).
 Time Eval vm_compute in (answer 350 P08).
 
-Definition C02_prf : (ARpi : fastAR) >< (0 : fastAR).
-Proof. AR_solve_apart (-8)%Z. Defined.
+Definition C02_prf : ARapartT (ARpi : fastAR) (0 : fastAR).
+Proof. AR_solve_apartT (-8)%Z. Defined.
 
-Definition C02 : fastAR := ARsqrt (AQexp 1 * ARinv ARpi C02_prf).
+Definition C02 : fastAR := ARsqrt (AQexp 1 * ARinvT ARpi C02_prf).
 Time Eval vm_compute in (answer 150 C02).
 
 Definition C03 : fastAR := ARsin (ARcompress ((AQexp 1 + 1) ^ (3:N))).
@@ -55,5 +55,5 @@ Time Eval vm_compute in (answer 1000 ARtest3).
 Definition ARtest4 : fastAR := ARsin ARpi.
 Time Eval vm_compute in (answer 200 ARtest4).
 
-Example xkcd217A : ARtest4 ⋖ '20%Z.
-Proof. Time AR_solve_lt (-8)%Z. Defined.
+Example xkcd217A : ARltT ARtest4 ('20%Z).
+Proof. Time AR_solve_ltT (-8)%Z. Defined.

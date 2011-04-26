@@ -86,7 +86,7 @@ Section integral_interface.
 
     ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
       (forall x, from <= x <= from+width -> ball r (f x) ('mid)) ->
-      ball (width * r) (∫ f from width) (' (width * mid))
+      ball (width * r) (∫ f from width) (' (width * mid)%Q)
 
     ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f) }.
 
@@ -110,7 +110,7 @@ Section integral_interface.
 
     (** The additive property implies that zero width intervals have zero surface: *)
 
-    Lemma zero_width_integral q: ∫ f q 0%Qnn == '0.
+    Lemma zero_width_integral q: ∫ f q 0%Qnn == 0.
     Proof with auto.
      apply CRplus_eq_l with (∫ f q 0%Qnn).
      generalize (integral_additive q 0%Qnn 0%Qnn).
@@ -266,8 +266,10 @@ Section integral_interface.
      on continuity. *)
 
     Context `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
+
+(*
     Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
-      (w <= @luc_mu Q _ CR f _ a ww e)%QnnInf ->
+      (w <= @uc_mu _ _ _ (@luc_mu Q _ CR f _ (a, ww)) e)%QnnInf ->
       gball ww a a' ->
       gball_ex (w * e)%QnnInf (' w * f a') (∫ f a' w).
     Proof with auto.
@@ -296,9 +298,9 @@ Section integral_interface.
      apply Qle_trans with (a' + `w)%Q...
      apply Qplus_le_compat...
     Qed.
-
+*)
     (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
-
+(*
     Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
      (n * iw == w)%Qnn ->
      (iw <= @luc_mu _ _ f _ a w e)%QnnInf ->
@@ -339,11 +341,11 @@ Section integral_interface.
      rewrite A.
      ring.
     Qed.
-
+*)
   End singular_props.
 
   (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
-
+(*
   Lemma unique
     `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}
     (c1: Integral f)
@@ -359,7 +361,7 @@ Section integral_interface.
      intros ?? E. rewrite E. reflexivity.
     do 2 rewrite zero_width_integral...
    intro x.
-   destruct (split x (@luc_mu Q CR f _ a x ((1 # 2) * e * Qpos_inv x)))%Qpos as [[n t] [H H0]].
+   destruct (split x (@uc_mu _ _ _ (@luc_mu Q _ CR f _ (a, x)) ((1 # 2) * e * Qpos_inv x)))%Qpos as [[n t] [H H0]].
    simpl in H.
    simpl @snd in H0.
    setoid_replace e with (((1 # 2) * e / x) * x + ((1 # 2) * e / x) * x)%Qpos by (unfold QposEq; simpl; field)...
@@ -370,7 +372,7 @@ Section integral_interface.
    apply ball_gball.
    apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
   Qed.
-
+*)
 End integral_interface.
 
 (** If f==g, then an integral for f is an integral for g. *)
@@ -391,6 +393,7 @@ Proof with auto.
  apply (integral_wd f)...
 Qed.
 
+(*
 Lemma integrate_proper
   (f g: Q → CR)
   `{!LocallyUniformlyContinuous_mu g}
@@ -468,3 +471,4 @@ Section extension_to_nn_width.
   Proof. constructor; auto. Qed.
 
 End extension_to_nn_width.
+*)

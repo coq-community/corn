@@ -1,3 +1,5 @@
+(* todo: remove *)
+
 Require Export Qpossec.
 Require Import abstract_algebra additional_operations stdlib_rationals.
 
@@ -11,4 +13,4 @@ Instance: Pow Qpos Z := Qpos_power.
 Instance inject_Qpos_Q: Coerce Qpos Q := QposAsQ.
 
 Instance: ∀ x : Qpos, PropHolds (0 < (x:Q)).
-Proof. intros x. red. auto. Qed.
+Proof. intros x. now destruct x. Qed.

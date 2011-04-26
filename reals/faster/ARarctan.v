@@ -9,10 +9,10 @@ Context `{AppRationals AQ}.
 
 Program Definition AQarctan_big_pos {a : AQ} `(Pa : 1 < a) : AR := 
   AQpi (1 ≪ (-1)) - AQarctan_small_pos (num:=1) (den:=a) _.
-Next Obligation. split. apply semirings.precedes_0_1. easy. Qed. 
+Next Obligation. split. apply semirings.le_0_1. easy. Qed. 
 
 Lemma AQarctan_big_pos_correct {a : AQ} `(Pa : 1 < a) : 
-  ARtoCR (AQarctan_big_pos Pa) = rational_arctan ('a).
+  'AQarctan_big_pos Pa = rational_arctan ('a).
 Proof.
   unfold AQarctan_big_pos.
   rewrite rings.preserves_minus.
@@ -21,10 +21,9 @@ Proof.
   rewrite AQarctan_small_pos_correct.
   ms_setoid_replace ('1 / 'a : Q) with (/'a).
    apply rational_arctan_half_pi.
-   apply stdlib_rationals.Qlt_coincides.
    transitivity (1:Q).
-    now apply semirings.sprecedes_0_1.
-   now apply semirings.preserves_gt1.
+    now apply (semirings.lt_0_1 (R:=Q)).
+   now apply semirings.preserves_gt_1.
   now rewrite rings.preserves_1, rings.mult_1_l.
 Qed.
 
@@ -37,11 +36,11 @@ Next Obligation.
    now apply rings.between_pos.
   apply (strictly_order_preserving (_ +)).
   apply rings.between_pos.
-  apply semirings.sprecedes_0_1.
+  apply semirings.lt_0_1.
 Qed.
 
 Lemma AQarctan_mid_pos_correct {a : AQ} `(Pa : 0 < a) : 
-  ARtoCR (AQarctan_mid_pos Pa) = rational_arctan ('a).
+  'AQarctan_mid_pos Pa = rational_arctan ('a).
 Proof.
   unfold AQarctan_mid_pos.
   rewrite rings.preserves_plus.
@@ -50,7 +49,6 @@ Proof.
   rewrite aq_shift_opp_2, rings.preserves_1.
   ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1) : Q).
    apply rational_arctan_fourth_pi.
-   apply stdlib_rationals.Qlt_coincides.
    now apply semirings.preserves_pos.
   rewrite rings.preserves_minus, rings.preserves_plus.
   now rewrite rings.preserves_1.
@@ -59,26 +57,26 @@ Qed.
 Lemma AQarctan_pos_prf1 {a : AQ} : 0 ≤ a → a ≤ 1 ≪ (-1) → 0 ≤ a < 1.
 Proof.
   split; trivial.
-  apply orders.sprecedes_trans_r with (1 ≪ (-1)); [easy |].
-  apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
+  apply orders.le_lt_trans with (1 ≪ (-1)); [easy |].
+  apply (strictly_order_preserving_back (coerce AQ Q)).
   rewrite aq_shift_opp_1, rings.preserves_1.
   split; easy.
 Qed.
 
 Lemma AQarctan_pos_prf2 {a : AQ} : ¬a ≤ 1 ≪ (-1) → 0 < a.
 Proof.
-  intros. apply orders.sprecedes_trans_l with (1 ≪ (-1)).
-   apply (maps.strictly_order_preserving_back (coerce : AQ → Q)).
+  intros. apply orders.lt_le_trans with (1 ≪ (-1)).
+   apply (strictly_order_preserving_back (coerce AQ Q)).
    rewrite aq_shift_opp_1, rings.preserves_0, rings.preserves_1.
    split; easy.
-  now apply orders.precedes_flip.
+  now apply orders.le_flip.
 Qed.
 
 Lemma AQarctan_pos_prf3 {a : AQ} : ¬a ≤ 2 → 1 < a.
 Proof.
-  intros. apply orders.sprecedes_trans_l with 2.
-   apply semirings.sprecedes_1_2.
-  now apply orders.precedes_flip.
+  intros. apply orders.lt_le_trans with 2.
+   apply semirings.lt_1_2.
+  now apply orders.le_flip.
 Qed.
 
 Definition AQarctan_pos {a : AQ} (Pa1 : 0 ≤ a) : AR :=
@@ -91,7 +89,7 @@ Definition AQarctan_pos {a : AQ} (Pa1 : 0 ≤ a) : AR :=
   end.
 
 Lemma AQarctan_pos_correct {a : AQ} `(Pa : 0 ≤ a) : 
-  ARtoCR (AQarctan_pos Pa) = rational_arctan ('a).
+  'AQarctan_pos Pa = rational_arctan ('a).
 Proof.
   unfold AQarctan_pos.
   case (decide_rel _); intros.
@@ -99,7 +97,7 @@ Proof.
    ms_setoid_replace ('a / '1 : Q) with ('a).
     reflexivity.
    rewrite rings.preserves_1.
-   rewrite fields.dec_mult_inv_1.
+   rewrite dec_fields.dec_mult_inv_1.
    now apply rings.mult_1_r.
   case (decide_rel _); intros.
    apply AQarctan_mid_pos_correct.
@@ -107,7 +105,7 @@ Proof.
 Qed.
 
 Lemma AQarctan_prf {a : AQ} : ¬0 ≤ a → 0 ≤ - a.
-Proof. intros. apply rings.flip_nonpos_opp. now apply orders.precedes_flip. Qed.
+Proof. intros. apply rings.flip_nonpos_opp. now apply orders.le_flip. Qed.
 
 Definition AQarctan (a : AQ) : AR :=
   match decide_rel (≤) 0 a with
@@ -116,7 +114,7 @@ Definition AQarctan (a : AQ) : AR :=
   end.
 
 Lemma AQarctan_correct (a : AQ) : 
-  ARtoCR (AQarctan a) = rational_arctan ('a).
+  'AQarctan a = rational_arctan ('a).
 Proof.
   unfold AQarctan.
   case (decide_rel _); intros.
@@ -128,12 +126,12 @@ Proof.
 Qed.
 
 Local Obligation Tactic := idtac.
-Program Definition ARarctan_uc := 
-  unary_complete_uc Qmetric.QPrelengthSpace coerce AQarctan arctan_uc _.
+Program Definition ARarctan_uc := unary_complete_uc 
+  Qmetric.QPrelengthSpace (coerce AQ Qmetric.Q_as_MetricSpace) AQarctan arctan_uc _.
 Next Obligation. apply AQarctan_correct. Qed. 
 
 Definition ARarctan := Cbind AQPrelengthSpace ARarctan_uc.
 
-Lemma ARtoCR_preserves_arctan x : ARtoCR (ARarctan x) = arctan (ARtoCR x).
+Lemma ARtoCR_preserves_arctan x : 'ARarctan x = arctan ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
 End ARarctan.

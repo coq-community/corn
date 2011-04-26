@@ -37,7 +37,6 @@ Require Import ContinuousCorrect.
 Require Import Qauto.
 Require Import CornTac.
 Require Import abstract_algebra.
-Require Import CRclasses.
 
 Open Local Scope Q_scope.
 
@@ -436,7 +435,7 @@ Qed.
 
 Opaque root_loop.
 
-Lemma rational_sqrt_mid_correct0 : (CRpower_N 2 rational_sqrt_mid == ' a)%CR.
+Lemma rational_sqrt_mid_correct0 : (CRpower_N rational_sqrt_mid 2 == ' a)%CR.
 Proof.
  assert (H:AbsSmall (R:=CRasCOrdField) (' (3 # 1)%Qpos)%CR rational_sqrt_mid).
   split; simpl.
@@ -519,7 +518,7 @@ Proof.
  Qauto_nonneg.
 Qed. (* todo: clean up *)
 
-Lemma rational_sqrt_mid_correct1 : ('0 <= rational_sqrt_mid)%CR.
+Lemma rational_sqrt_mid_correct1 : (0 <= rational_sqrt_mid)%CR.
 Proof.
  intros e.
  apply Qle_trans with 1.
@@ -531,7 +530,7 @@ Qed.
 End SquareRoot.
 
 Lemma rational_sqrt_mid_correct_aux (x : Q) (y : CR) Px :
-  CRpower_N 2 y = 'x → '0 ≤ y → y = IRasCR (sqrt (inj_Q IR x) Px).
+  CRpower_N y 2 = 'x → 0%CR ≤ y → y = IRasCR (sqrt (inj_Q IR x) Px).
 Proof.
  intros f_sqrt f_nonneg.
  rewrite <- (CRasIRasCR_id y).
@@ -564,7 +563,7 @@ Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) : CR.
  revert a Ha.
  destruct n as [|n].
   intros _ _.
-  exact ('1)%CR.
+  exact 1%CR.
  intros a H.
  destruct (Qle_total a (4#1)).
   clear rational_sqrt_big_bounded.
@@ -760,7 +759,7 @@ Qed.
 Definition rational_sqrt a : CR :=
 match (Qlt_le_dec_fast 0 a) with
 |left H => rational_sqrt_pos a H
-|right _ => (' 0)%CR
+|right _ => 0%CR
 end.
 
 Lemma rational_sqrt_correct : forall a H,
@@ -803,7 +802,7 @@ Proof.
    unfold rational_sqrt at 2.
    destruct (Qlt_le_dec_fast 0 b) as [Z|_].
     elim (Qle_not_lt _ _ Hb Z).
-   change (' 0)%CR with (rational_sqrt 0).
+   change 0%CR with (rational_sqrt 0).
    apply X; try assumption.
     apply Qle_refl.
    destruct Hab.
@@ -817,7 +816,7 @@ Proof.
   unfold rational_sqrt at 1.
   destruct (Qlt_le_dec_fast 0 a) as [Z0|_].
    elim (Qle_not_lt _ _ Ha Z0).
-  change (' 0)%CR with (rational_sqrt 0).
+  change 0%CR with (rational_sqrt 0).
   destruct (Qle_total 0 b) as [Hb|Hb].
    apply X; try assumption.
     apply Qle_refl.
@@ -832,7 +831,7 @@ Proof.
   unfold rational_sqrt at 2.
   destruct (Qlt_le_dec_fast 0 b) as [Z0|_].
    elim (Qle_not_lt _ _ Hb Z0).
-  change (' 0)%CR with (rational_sqrt 0).
+  change 0%CR with (rational_sqrt 0).
   apply ball_refl.
  clear a.
  intros a b Ha Hb Hab.
@@ -973,7 +972,7 @@ Proof.
 Qed.
 
 Lemma rational_sqrt_nonpos (a : Q) :
-  a ≤ 0 → rational_sqrt a = '0.
+  a ≤ 0 → rational_sqrt a = 0%CR.
 Proof.
  intros. unfold rational_sqrt.
  case Qlt_le_dec_fast; intros; [|reflexivity].
@@ -981,7 +980,7 @@ Proof.
 Qed.
 
 Lemma rational_sqrt_unique (a : Q) (y : CR) :
-  0 ≤ a → CRpower_N 2 y = 'a → '0 ≤ y → y = rational_sqrt a.
+  0 ≤ a → CRpower_N y 2 = 'a → 0%CR ≤ y → y = rational_sqrt a.
 Proof.
  intros.
  assert (Pa : Zero[<=](inj_Q IR a)).

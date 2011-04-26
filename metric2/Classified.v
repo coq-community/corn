@@ -118,7 +118,7 @@ Section genball.
 
   Context
     `{Setoid X}
-    (R: Qpos → relation X) `{!Proper (=) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
+    (R: Qpos → relation X) `{!Proper (QposEq ==> (=)) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
     (Rtriangle: ∀ (e1 e2: Qpos) (a b c: X), R e1 a b → R e2 b c → R (e1 + e2)%Qpos a c)
     (Req: ∀ (a b: X), (∀ d: Qpos, R d a b) → a = b)
     (Rclosed: ∀ (e: Qpos) (a b: X), (∀ d: Qpos, R (e + d)%Qpos a b) → R e a b).
@@ -427,22 +427,22 @@ Proof with auto.
  assumption.
 Qed.
 
-Instance: Proper (=) QposAsQ.
+Instance: Proper (QposEq ==> (=)) QposAsQ.
 Proof. repeat intro. assumption. Qed.
 
 Require Import util.Container.
 
-Section Ball.
+Definition Ball X R := prod X R.
+Hint Extern 0 (Equiv (Ball _ _)) => eapply @prod_equiv : typeclass_instances.
 
+Section Ball.
   Context X `{MetricSpaceBall X} (R: Type) `{Canonical (R → Qinf)}.
 
-  Definition Ball := prod X R.
-
-  Global Instance ball_contains: Container X Ball := fun b => mspc_ball (canonical (snd b)) (fst b).
+  Global Instance ball_contains: Container X (Ball X R) := fun b => mspc_ball (canonical (snd b)) (fst b).
 
   Context `{Equiv X} `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (canonical: R → Qinf)}.
 
-  Global Instance ball_contains_Proper: Proper (=) (In: Ball → X → Prop).
+  Global Instance ball_contains_Proper: Proper (=) (In: Ball X R → X → Prop).
   Proof with auto.
    repeat intro.
    unfold In, ball_contains.

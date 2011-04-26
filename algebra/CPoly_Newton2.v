@@ -1,3 +1,4 @@
+(*
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
@@ -167,3 +168,4 @@ Local Notation Π := cr_Product.
   End divdiff_as_repeated_integral.
 (*  Print Assumptions alt_divdiff.*)
 End contents.
+*)

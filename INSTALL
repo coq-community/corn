@@ -6,7 +6,7 @@ PREREQUISITES
 
  This version of C-CoRN is known to compile with:
 
- - Coq version revision 13841 from the trunk branch
+ - Coq version revision 14023 from the trunk branch
 
  - SCons 1.2
 

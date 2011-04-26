@@ -99,12 +99,12 @@ Qed.
 
 Definition CRsum_list (l:list CR) : CR := Build_RegularFunction (CRsum_list_prf l).
 
-Lemma CRsum_correct : forall l, (CRsum_list l == fold_right (fun x y => x + y) ('0) l)%CR.
+Lemma CRsum_correct : forall l, (CRsum_list l == fold_right (fun x y => x + y) 0 l)%CR.
 Proof.
  induction l.
   apply: regFunEq_e; intros e.
   apply ball_refl.
- simpl (fold_right (fun x y : CR => (x + y)%CR) (' 0)%CR (a :: l)).
+ simpl (fold_right (fun x y : CR => (x + y)%CR) 0%CR (a :: l)).
  rewrite <- IHl.
  clear -l.
  apply: regFunEq_e; intros e.

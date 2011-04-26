@@ -16,6 +16,7 @@ Section metric_embedding.
   Context (f : X' -> Y) {inj : Injective f}.
 
   Definition Eball (q: Qpos) (x y: X'): Prop := ball q (f x) (f y).
+  Local Existing Instance injective_mor.
 
   Global Instance Eball_wd : Proper (QposEq ==> (=) ==> (=) ==> iff) Eball.
   Proof.

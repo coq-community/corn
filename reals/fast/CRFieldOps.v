@@ -27,6 +27,7 @@ Require Import COrdAbs.
 Require Import Qordfield.
 Require Import Qmetric.
 Require Import CornTac.
+Require Import canonical_names.
 
 Set Implicit Arguments.
 
@@ -55,10 +56,10 @@ Defined.
 replace [2*e] with [e], the theorem still holds, but it could be
 very expensive to call.  We prefer to avoid that. *)
 
-Program Definition CRpos_char (e:Qpos) (x:CR) (H: 2*e <= (approximate x e)): CRpos x := e.
+Program Definition CRpos_char (e:Qpos) (x:CR) (H: (2#1)*e <= (approximate x e)): CRpos x := e.
 
 Next Obligation.
- change (CRle (inject_Q (QposAsQ e)) x).
+ change (CRle (inject_Q_CR (QposAsQ e)) x).
  intros a.
  simpl.
  unfold Cap_raw.
@@ -69,7 +70,7 @@ Next Obligation.
   apply Qmult_le_0_compat; auto with *.
  rewrite -> Qle_minus_iff.
  destruct (regFun_prf x e ((1#2)*a)%Qpos) as [_ X].
- stepr (approximate x ((1 # 2) * a)%Qpos + (1#2)*a + e + - (2*e)); [|simpl; ring].
+ stepr (approximate x ((1 # 2) * a)%Qpos + (1#2)*a + e + - ((2#1)*e)); [|simpl; ring].
  rewrite <- Qle_minus_iff; apply Qle_trans with (approximate x e); try assumption; simpl in X.
  rewrite -> Qle_minus_iff in X; rewrite -> Qle_minus_iff; autorewrite with QposElim in X.
  stepr (e + (1 # 2) * a + - (approximate x e - approximate x ((1 # 2) * a)%Qpos)). assumption.
@@ -86,28 +87,28 @@ Proof.
  abstract ( rewrite <- Hxy; assumption ).
 Defined.
 
-Program Definition CRneg_char (e:Qpos) (x:CR) (H: (approximate x e) <= -(2)*e): CRneg x := e.
+Program Definition CRneg_char (e:Qpos) (x:CR) (H: (approximate x e) <= -(2#1)*e): CRneg x := e.
 
 Next Obligation.
- change (x <= ' (- e))%CR.
+ change (x <= '(-e)%Q)%CR.
  intros a; simpl; unfold Cap_raw; simpl; apply Qle_trans with (-(1#2)*a).
   rewrite -> Qle_minus_iff; ring_simplify.
   apply Qmult_le_0_compat; auto with *.
  (rewrite -> Qle_minus_iff;
      destruct (regFun_prf x e ((1#2)*a)%Qpos) as [X _];
        (stepr ( - e + - approximate x ((1 # 2) * a)%Qpos + (1 # 2) * a + approximate x e + - approximate x e); [|simpl; ring]);
-         rewrite <- Qle_minus_iff; apply Qle_trans with (-(2)*e); try assumption; simpl in X;
+         rewrite <- Qle_minus_iff; apply Qle_trans with (-(2#1)*e); try assumption; simpl in X;
            rewrite -> Qle_minus_iff in X; rewrite -> Qle_minus_iff; autorewrite with QposElim in X;
              (stepr (approximate x e - approximate x ((1 # 2) * a)%Qpos +
                - - (e + (1 # 2) * a)); [| simpl; ring]); assumption).
 Qed.
 
 (** Strict inequality is defined in terms of positivity. *)
-Definition CRlt (x y:CR) := CRpos (y-x)%CR.
+Definition CRltT (x y:CR) := CRpos (y-x)%CR.
 
-Infix "<" := CRlt : CR_scope.
+Infix "<" := CRltT : CR_scope.
 
-Lemma CRlt_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
+Lemma CRltT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
 Proof.
  intros x1 x2 Hx y1 y2 Hy H.
  apply: CRpos_wd;[|apply H].
@@ -117,13 +118,13 @@ Defined.
 (**
 ** Apartness
 *)
-Definition CRapart (x y:CR) := (x < y or y < x)%CR.
+Definition CRapartT (x y:CR) := (x < y or y < x)%CR.
 
-Notation "x >< y" := (CRapart x y) (at level 70, no associativity) : CR_scope.
+Notation "x >< y" := (CRapartT x y) (at level 70, no associativity) : CR_scope.
 
-Lemma CRapart_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1><y1 -> x2><y2)%CR.
+Lemma CRapartT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1><y1 -> x2><y2)%CR.
 Proof.
- intros x1 x2 Hx y1 y2 Hy [H|H];[left;apply (CRlt_wd Hx Hy)|right;apply (CRlt_wd Hy Hx)];assumption.
+ intros x1 x2 Hx y1 y2 Hy [H|H];[left;apply (CRltT_wd Hx Hy)|right;apply (CRltT_wd Hy Hx)];assumption.
 Defined.
 (**
 ** Multiplication
@@ -170,7 +171,7 @@ Proof.
 Qed.
 
 Lemma Qscale_modulus_pos (a e: Qpos): exists P,
-  Qscale_modulus a e = Qpos2QposInf (exist (Qlt 0) (/ a * e)%Q P).
+  Qscale_modulus a e ≡ Qpos2QposInf (exist (Qlt 0) (/ a * e)%Q P).
 Proof.
  revert a.
  intros [[[] ad] P]; try discriminate.
@@ -461,7 +462,7 @@ Qed.
 (** This version of multiply computes a bound on the second argument
 just in time.  It should be avoided in favour of the bounded version
 whenever possible. *)
-Definition CRmult x y := ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
+Instance CRmult: RingMult CR := λ x y, ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
 
 Infix "*" := CRmult : CR_scope.
 
@@ -503,6 +504,7 @@ Proof.
  replace (QposRed ((1 # 2) * e / c1 * c1 / c2)%Qpos) with (QposRed ((1 # 2) * e / c2)%Qpos);
    [repeat rewrite QposInf_bind_id;apply: ball_refl|].
  apply QposRed_complete.
+ unfold QposEq.
  autorewrite with QposElim.
  field.
  split;apply Qpos_nonzero.
@@ -544,7 +546,7 @@ Proof.
  unfold CRmult_bounded.
  unfold ucFun2.
  unfold Cmap2.
- unfold inject_Q.
+ unfold inject_Q_CR.
  simpl.
  rewrite -> Cap_fun_correct.
  repeat rewrite -> Cmap_fun_correct.
@@ -673,6 +675,7 @@ Proof.
   replace (QposRed (c1 * c1 * e)) with (QposRed (f (c2 * c2 * e)%Qpos)); [apply: ball_refl|].
   apply QposRed_complete.
   unfold f.
+  unfold QposEq.
   autorewrite with QposElim.
   field.
   apply Qpos_nonzero.
@@ -706,8 +709,8 @@ Proof.
  assumption.
 Qed.
 
-(** [CRinv] works for inputs apart from 0 *)
-Definition CRinv (x:CR)(x_: (x >< ' 0)%CR) : CR.
+(** [CRinvT] works for inputs apart from 0 *)
+Definition CRinvT (x:CR)(x_: (x >< 0)%CR) : CR.
 Proof.
  revert x_.
  intros [[c H]|[c H]].
@@ -715,11 +718,11 @@ Proof.
  exact (CRinv_pos c x).
 Defined.
 
-Implicit Arguments CRinv [].
+Implicit Arguments CRinvT [].
 
-Lemma CRinv_pos_inv : forall (c:Qpos) (x:CR) x_,
- (inject_Q c <= x ->
-  CRinv_pos c x == CRinv x x_)%CR.
+Lemma CRinvT_pos_inv : forall (c:Qpos) (x:CR) x_,
+ ('c <= x ->
+  CRinv_pos c x == CRinvT x x_)%CR.
 Proof.
  intros c x [[e He]|[e He]] H.
   assert (X:(' e <= -x)%CR).
@@ -762,9 +765,9 @@ Proof.
  destruct (Qle_total c e);[|symmetry]; apply: CRinv_pos_weaken; assumption.
 Qed.
 
-Lemma CRinv_wd : forall (x y:CR) x_ y_, (x == y -> CRinv x x_ == CRinv y y_)%CR.
+Lemma CRinvT_wd : forall (x y:CR) x_ y_, (x == y -> CRinvT x x_ == CRinvT y y_)%CR.
 Proof.
- assert (X:forall x, ((' 0%Q) + x == x)%CR).
+ assert (X:forall x, (0 + x == x)%CR).
   intros x.
   transitivity (doubleSpeed x);[|apply: doubleSpeed_Eq].
   apply: regFunEq_e.
@@ -773,7 +776,7 @@ Proof.
   unfold Cap_raw; simpl.
   ring_simplify.
   apply: ball_refl.
- assert (Y:forall x, (x + - (' 0%Q) == x)%CR).
+ assert (Y:forall x, (x + - 0 == x)%CR).
   intros x.
   transitivity (doubleSpeed x);[|apply: doubleSpeed_Eq].
   apply: regFunEq_e.
@@ -820,9 +823,9 @@ Proof.
  destruct (Qle_total c d);[|symmetry]; apply CRinv_pos_weaken; try assumption.
 Qed.
 
-Lemma CRinv_irrelvent : forall x x_ x__, (CRinv x x_ == CRinv x x__)%CR.
+Lemma CRinvT_irrelevant : forall x x_ x__, (CRinvT x x_ == CRinvT x x__)%CR.
 Proof.
  intros.
- apply CRinv_wd.
+ apply CRinvT_wd.
  reflexivity.
 Qed.

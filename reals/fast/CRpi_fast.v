@@ -265,7 +265,7 @@ Proof.
  repeat rewrite <- CRmult_Qmult.
  transitivity ('4%Z * 'r *(' 44%Z * rational_arctan_small_pos small_per_57 +
    ' 7%Z * rational_arctan_small_pos small_per_239 +
-     (' (-(12)%Z) * rational_arctan_small_pos small_per_682 +
+     (' (-12)%Z * rational_arctan_small_pos small_per_682 +
        ' 24%Z * rational_arctan_small_pos small_per_12943)))%CR.
   ring. 
  repeat rewrite rational_arctan_small_pos_correct.

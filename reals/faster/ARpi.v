@@ -7,7 +7,7 @@ Section ARpi.
 Context `{AppRationals AQ}.
 
 Lemma AQpi_prf (x : Z) : 1 < x → 0 ≤ 1 < ('x : AQ).
-Proof. split. now apply semirings.precedes_0_1. now apply semirings.preserves_gt1. Qed.
+Proof. split. now apply semirings.le_0_1. now apply semirings.preserves_gt_1. Qed.
 
 Program Definition AQpi (x : AQ) : AR :=
   (ARscale ('176%Z * x) (AQarctan_small_pos (AQpi_prf (57%Z) _)) +
@@ -16,11 +16,11 @@ Program Definition AQpi (x : AQ) : AR :=
     ARscale ('96%Z * x) (AQarctan_small_pos (AQpi_prf (12943%Z) _))).
 Solve Obligations using compute; now split.
 
-Lemma ARtoCR_preserves_AQpi x : ARtoCR (AQpi x) = r_pi ('x).
+Lemma ARtoCR_preserves_AQpi x : 'AQpi x = r_pi ('x).
 Proof.
   unfold AQpi, r_pi.
-  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < ('(d:Z) : AQ)) (Pa : (0 <= 1 # d < 1)%Q),
-    ARtoCR (ARscale ('k * x) (AQarctan_small_pos Pnd)) = scale (k * 'x) (rational_arctan_small_pos (a:=1 # d) Pa)) as P.
+  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < coerce Z AQ d) (Pa : (0 <= 1#d < 1)%Q),
+    'ARscale ('k * x) (AQarctan_small_pos Pnd) = scale (k * 'x) (rational_arctan_small_pos Pa)) as P.
    intros.
    rewrite ARtoCR_preserves_scale.
    rewrite rings.preserves_mult, AQtoQ_ZtoAQ.
@@ -28,13 +28,14 @@ Proof.
    rewrite rational_arctan_small_pos_wd.
     reflexivity.
    now rewrite rings.preserves_1, AQtoQ_ZtoAQ.
-  rewrite ?ARtoCR_preserves_plus, ?P.
+  rewrite !rings.preserves_plus.
+  rewrite !P.
   f_equiv; f_equiv. (* no idea why reflexivity doesn't work *)
 Qed.
 
 Definition ARpi := AQpi 1.
 
-Lemma ARtoCR_preserves_pi : ARtoCR ARpi = CRpi.
+Lemma ARtoCR_preserves_pi : 'ARpi = CRpi.
 Proof.
   unfold ARpi, CRpi.
   rewrite ARtoCR_preserves_AQpi.

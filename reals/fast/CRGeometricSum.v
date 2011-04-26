@@ -609,9 +609,9 @@ Proof.
   rewrite <- Qlt_minus_iff.
   assumption.
  destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
-  stepr ('0)%CR.
+  stepr 0%CR.
    split; simpl; rewrite -> Hq; try apply CRle_refl.
-   setoid_replace (-'0)%CR with ('0)%CR by (simpl; ring).
+   setoid_replace (-0)%CR with 0%CR by (simpl; ring).
    apply CRle_refl.
   apply: regFunEq_e.
   intros e.
@@ -652,7 +652,7 @@ Proof.
   unfold e in *.
   autorewrite with QposElim in *.
   split; assumption.
- stepr (InfiniteGeometricSum Gs[-]'0)%CR; [| now (unfold cg_minus; simpl; ring)].
+ stepr (InfiniteGeometricSum Gs[-]0)%CR; [| now (unfold cg_minus; simpl; ring)].
  rewrite -> CRAbsSmall_ball.
  apply: regFunBall_e.
  intros d.
@@ -875,7 +875,7 @@ Proof.
  clear - Hx.
  induction n.
   reflexivity.
- change ((' (Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => (Str_nth n0 seq)%Q) + (Str_nth n seq)) ==
+ change ((' (Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => (Str_nth n0 seq)) + (Str_nth n seq))%Q ==
    (Sum0 (G:=CRasCAbGroup) n (fun n0 : nat => IRasCR (x n0)):CR) + IRasCR (x n))%CR).
  rewrite <- CRplus_Qplus.
  apply ucFun2_wd;[apply IHn|].

@@ -36,7 +36,7 @@ Require Export Streams.
 Require Import PowerSeries.
 Require Import CornTac.
 Require Import Qclasses.
-Require Import abstract_algebra theory.series theory.streams.
+Require Import abstract_algebra interfaces.orders theory.series theory.streams.
 
 Opaque CR.
 
@@ -91,7 +91,7 @@ Proof.
   intros E.
   apply Qball_ex_bool_correct.
   apply (nonneg_in_Qball_0 (dnn_hd_nonneg (dnn_tl dnn))).
-  transitivity (hd s).
+  apply Qle_trans with (hd s).
    now destruct dnn as [[? ?] _].
   apply (nonneg_in_Qball_0 (dnn_hd_nonneg dnn)).
   now apply Qball_ex_bool_correct.
@@ -168,7 +168,7 @@ Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNega
   k ≤ l → Str_nth k s ≤ ε → ball ε (take s l Qminus' 0) (take s k Qminus' 0).
 Proof.
   intros E.
-  apply naturals.natural_precedes_plus in E.
+  apply naturals.natural_le_plus in E.
   destruct E as [z E]. rewrite E. clear E l.
   revert z s dnn ε.
   induction k; intros.
@@ -177,7 +177,7 @@ Proof.
    apply nonneg_in_Qball_0.
     now apply (PartialAlternatingSumUntil_take_small _).
    simpl. rewrite Qminus'_correct. unfold Qminus.
-   transitivity (hd s).
+   apply Qle_trans with (hd s).
     change (hd s + - take (tl s) z Qminus' 0 ≤ hd s).
     setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
     apply (order_preserving _).
@@ -209,12 +209,12 @@ Proof.
   intros E1.
   unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
   rewrite takeUntil_correct.
-  destruct (total_order l (takeUntil_length (λ s, Qball_ex_bool ε2 (hd s) 0) (Limit_near s 0 ε2))) as [E2|E2].
+  destruct (total (≤) l (takeUntil_length (λ s, Qball_ex_bool ε2 (hd s) 0) (Limit_near s 0 ε2))) as [E2|E2].
    apply ball_sym.
    apply (InfiniteAlternatingSum_further_aux _).
     easy.
    apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-   apply naturals.natural_precedes_plus in E1.
+   apply naturals.natural_le_plus in E1.
    destruct E1 as [z E1]. rewrite E1. rewrite commutativity.
    rewrite <-Str_nth_plus. 
    apply ball_weak, Qball_ex_bool_correct.
@@ -241,7 +241,7 @@ Proof.
    apply (InfiniteAlternatingSum_further _).
    now apply (InfiniteAlternatingSum_length_weak _).
   intros ε1 ε2.
-  destruct (total_order (ε1:Q) (ε2:Q)).
+  destruct (total (≤) (ε1:Q) (ε2:Q)).
    now auto.
   setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
   apply ball_sym. now auto.
@@ -319,7 +319,7 @@ Qed.
 
 (** The infinite alternating series is always nonnegative. *)
 Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
- (inject_Q 0%Q <= InfiniteAlternatingSum seq)%CR.
+ (0 <= InfiniteAlternatingSum seq)%CR.
 Proof.
  intros e.
  apply Qle_trans with 0.
@@ -339,11 +339,11 @@ Qed.
 (** The infinite alternating series is always bounded by the first term
 in the series. *)
 Lemma InfiniteAlternatingSum_bound (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
- (InfiniteAlternatingSum seq <= inject_Q (hd seq))%CR.
+ (InfiniteAlternatingSum seq <= inject_Q_CR (hd seq))%CR.
 Proof.
  rewrite -> InfiniteAlternatingSum_step.
- change (inject_Q (hd seq) - InfiniteAlternatingSum (tl seq) [<=]inject_Q (hd seq))%CR.
- stepr (inject_Q (hd seq) - inject_Q 0%Q)%CR.
+ change (inject_Q_CR (hd seq) - InfiniteAlternatingSum (tl seq) [<=]inject_Q_CR (hd seq))%CR.
+ stepr (inject_Q_CR (hd seq) - 0)%CR.
   apply: minus_resp_leEq_rht.
   apply InfiniteAlternatingSum_nonneg.
  simpl.
@@ -450,7 +450,7 @@ Proof.
  rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
    ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum seq)))).
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
- assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq)))%CR)).
+ assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq))%Q)%CR)).
   stepr (IRasCR (x n)).
    stepr (Sum n n (fun n => IRasCR (x n))); [| now apply: Sum_one].
    unfold Sum, Sum1.
@@ -483,9 +483,9 @@ Proof.
    rewrite inj_S in X.
    rstepr ([--][--]('(((- (1)) ^ n * Str_nth n (tl seq))%Q))%CR).
    apply inv_resp_AbsSmall.
-   stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq))%CR;[assumption|].
+   stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq)%Q)%CR;[assumption|].
    simpl.
-   change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq)) == - ' ((- (1)) ^ n * Str_nth n (tl seq)))%CR).
+   change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq))%Q == - ' ((- (1)) ^ n * Str_nth n (tl seq))%Q)%CR).
    rewrite -> Qpower_plus;[|discriminate].
    simpl.
    ring.
@@ -516,8 +516,8 @@ Proof.
  clear - Hx.
  induction n.
   reflexivity.
- change ((' (Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 seq)%Q) +
-   (- (1)) ^ n * Str_nth n seq) ==
+ change ((' (Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 seq)) +
+   (- (1)) ^ n * Str_nth n seq)%Q ==
      (Sum0 (G:=CRasCAbGroup) n (fun n0 : nat => IRasCR (x n0)):CR) + IRasCR (x n))%CR).
  rewrite <- CRplus_Qplus.
  apply ucFun2_wd;[apply IHn|].

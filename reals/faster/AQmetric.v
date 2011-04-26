@@ -11,12 +11,19 @@ Add Ring AQ : (rings.stdlib_ring_theory AQ).
 
 Open Local Scope uc_scope. 
 
-Definition AQ_as_MetricSpace := Emetric (coerce : AQ → Q_as_MetricSpace).
-Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (coerce : AQ → Q_as_MetricSpace).
+Definition AQ_as_MetricSpace := Emetric (coerce AQ Q_as_MetricSpace).
+Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (coerce AQ Q_as_MetricSpace).
 Definition AR := Complete AQ_as_MetricSpace.
-Definition ARtoCR_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc (coerce : AQ → Q_as_MetricSpace).
-Definition ARtoCR : AR --> CR := Eembed QPrelengthSpace (coerce : AQ → Q_as_MetricSpace). 
-Definition CRtoAR : CR --> AR := Eembed_inverse QPrelengthSpace (coerce : AQ → Q_as_MetricSpace).
+
+Definition AQtoQ_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc (coerce AQ Q_as_MetricSpace).
+
+Definition ARtoCR_uc : AR --> CR := Eembed QPrelengthSpace (coerce AQ Q_as_MetricSpace).
+Global Instance ARtoCR: Coerce AR CR := ARtoCR_uc.
+Definition CRtoAR_uc : CR --> AR := Eembed_inverse QPrelengthSpace (coerce AQ Q_as_MetricSpace).
+Global Instance CRtoAR: Coerce CR AR := CRtoAR_uc.
+
+Global Instance inject_AQ_AR: Coerce AQ AR := (@Cunit AQ_as_MetricSpace).
+Global Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
 
 Lemma AQball_fold ε (x y : AQ_as_MetricSpace) : ball ε x y → Qball ε ('x) ('y).
 Proof. easy. Qed.
@@ -38,7 +45,7 @@ Proof.
   transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
    split; intros.
     now apply (order_preserving _).
-   now apply (order_preserving_back coerce).
+   now apply (order_preserving_back (coerce AQ Q)).
   now rewrite aq_shift_correct, rings.preserves_1, left_identity.
 Qed.
 

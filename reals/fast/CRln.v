@@ -270,7 +270,7 @@ Qpos2QposInf (c*e).
 
 Lemma ln_pos_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
 Proof.
- set (lnf := fun x => match (Qlt_le_dec 0 x) with | left p => rational_ln p | right _ => ('0)%CR end).
+ set (lnf := fun x => match (Qlt_le_dec 0 x) with | left p => rational_ln p | right _ => 0%CR end).
  apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (Qscale_modulus (Qpos_inv c)).
    intros x.
    unfold lnf.
@@ -376,7 +376,7 @@ Proof.
  assumption.
 Qed.
 
-Definition CRln (x:CR) (Hx:('0 < x)%CR) : CR :=
+Definition CRln (x:CR) (Hx:(0 < x)%CR) : CR :=
 let (c,_) := Hx in CRln_pos c x.
 (* begin hide *)
 Implicit Arguments CRln [].
@@ -388,7 +388,7 @@ Proof.
  change ((inj_Q IR (c:Q))[<=]x).
  rewrite -> IR_leEq_as_CR.
  rewrite -> IR_inj_Q_as_CR.
- setoid_replace (IRasCR x) with (IRasCR x - '0)%CR by (simpl; ring).
+ setoid_replace (IRasCR x) with (IRasCR x - 0)%CR by (simpl; ring).
  assumption.
 Qed.
 
@@ -399,7 +399,7 @@ Proof.
  intros c x Hx Hc.
  assert (X:Zero[<](CRasIR x)).
   apply CR_less_as_IR.
-  apply CRlt_wd with ('0)%CR x; try assumption.
+  apply CRltT_wd with 0%CR x; try assumption.
    rewrite -> IR_Zero_as_CR.
    reflexivity.
   rewrite -> CRasIRasCR_id.

@@ -861,7 +861,7 @@ Qed.
 Fixpoint MVP_uc_fun_close_sig n e : n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop :=
 match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop with
 | O => fun a b => ball e a b
-| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> MVP_uc_fun_close_sig n' e (f x) (g x)
+| S n' => fun f g => forall x, (0 <= x)%CR -> (x <= 1)%CR -> MVP_uc_fun_close_sig n' e (f x) (g x)
 end.
 
 Add Parametric Morphism n :
@@ -896,7 +896,7 @@ Qed.
 Fixpoint n_Function_ball01 n e : n_Function CR CR n -> n_Function CR CR n -> Prop :=
 match n return n_Function CR CR n -> n_Function CR CR n -> Prop with
 | O => ball e
-| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> n_Function_ball01 n' e (f x) (g x)
+| S n' => fun f g => forall x, (0 <= x)%CR -> (x <= 1)%CR -> n_Function_ball01 n' e (f x) (g x)
 end.
 
 Add Parametric Morphism n :
@@ -1002,7 +1002,7 @@ Proof.
 Qed.
 
 Lemma n_Function_ball01_mult_C : forall n e c q1 q2,
-('0 <= c)%CR -> (c <= '1)%CR ->
+(0 <= c)%CR -> (c <= 1)%CR ->
 (n_Function_ball01 n e (MVP_CR_apply n q1) (MVP_CR_apply n q2)) ->
 (n_Function_ball01 n e (MVP_CR_apply n ((MVP_C_ _ _ c)[*]q1))
                        (MVP_CR_apply n ((MVP_C_ _ _ c)[*]q2))).
@@ -1015,7 +1015,7 @@ Proof.
   apply AbsSmall_leEq_trans with (c[*]'e)%CR.
    rstepr (One[*]('e))%CR.
    apply mult_resp_leEq_rht; auto.
-   change ('0<='e)%CR.
+   change (0<='e)%CR.
    rewrite -> CRle_Qle.
    auto with *.
   apply mult_resp_AbsSmall; auto.
@@ -1045,7 +1045,7 @@ Qed.
 Fixpoint MVP_is_Bound01 n (M:CR) : MultivariatePolynomial CRasCRing n -> Prop :=
 match n return MultivariatePolynomial CRasCRing n -> Prop with
 | O => fun a => AbsSmall M a
-| S n' => fun p => forall x, ('0 <= x)%CR -> (x <= '1)%CR ->
+| S n' => fun p => forall x, (0 <= x)%CR -> (x <= 1)%CR ->
   MVP_is_Bound01 n' M (p ! (MVP_C_ _ _ x))
 end.
 
@@ -1084,7 +1084,7 @@ Proof.
 Qed.
 
 Lemma MVP_is_Bound01_mult01 : forall n M p x,
- ('0 <= x)%CR -> (x <= '1)%CR ->
+ (0 <= x)%CR -> (x <= 1)%CR ->
  MVP_is_Bound01 n M p ->
  MVP_is_Bound01 n M (MVP_C_ _ n x[*]p).
 Proof.
@@ -1137,7 +1137,7 @@ Proof.
       apply: CRlt_Qlt; auto with *.
      rewrite <- CRabs_AbsSmall in Hb.
      stepr ('(nb#db))%CR; auto.
-     change ((' (nb # db))%CR[=](' e)%CR[*]CRinv (' ((db # nb) * e)%Qpos)%CR Z).
+     change ((' (nb # db))%CR[=](' e)%CR[*]CRinvT (' ((db # nb) * e)%Qpos)%CR Z).
      rewrite -> CRinv_Qinv.
      rewrite -> CRmult_Qmult.
      rewrite -> CReq_Qeq.
@@ -1187,11 +1187,11 @@ Proof.
   apply: leEq_imp_eq.
    stepl (-(' (0 # db)))%CR; auto.
    rewrite -> CRopp_Qopp.
-   change ('(0#db)=='0)%CR.
+   change ('(0#db)==0)%CR.
    rewrite -> CReq_Qeq.
    unfold Qeq; reflexivity.
   stepr ((' (0 # db)))%CR; auto.
-  change ('(0#db)=='0)%CR.
+  change ('(0#db)==0)%CR.
   rewrite -> CReq_Qeq.
   unfold Qeq; reflexivity.
  simpl.
@@ -1288,7 +1288,7 @@ Proof.
   apply Qle_Qabs.
  simpl.
  induction p; intros x Hx0 Hx1.
-  change (MVP_is_Bound01 n ('0)%CR (Zero)).
+  change (MVP_is_Bound01 n 0%CR (Zero)).
   clear - n.
   induction n.
    apply AbsSmall_reflexive.
@@ -1297,7 +1297,7 @@ Proof.
   apply IHn.
  change (MVP_is_Bound01 n (' (MVP_poor_Bound01 n s + (fix MVP_poor_Bound01_H (p0 : cpoly
    (MultivariatePolynomial Q_as_CRing n)) : Q := match p0 with | cpoly_zero => 0
-     | cpoly_linear s0 p' => (MVP_poor_Bound01 n s0 + MVP_poor_Bound01_H p')%Q end) p))%CR
+     | cpoly_linear s0 p' => (MVP_poor_Bound01 n s0 + MVP_poor_Bound01_H p')%Q end) p)%Q)%CR
        (MVP_map inject_Q_hom n s[+]MVP_C_ CRasCRing n x[*](cpoly_map (MVP_map inject_Q_hom n) p) ! (MVP_C_ CRasCRing n x))).
  rewrite <- CRplus_Qplus.
  apply MVP_is_Bound01_plus.
@@ -1307,8 +1307,8 @@ Qed.
 
 Lemma MVP_CR_apply_cont : forall n e (p:MultivariatePolynomial Q_as_CRing (S n)),
  {d | forall x y,
- ('0 <= x)%CR -> (x <= '1)%CR ->
- ('0 <= 'y)%CR -> ('y <= '1)%CR ->
+ (0 <= x)%CR -> (x <= 1)%CR ->
+ (0 <= 'y)%CR -> ('y <= 1)%CR ->
  ball_ex d x ('y)%CR ->
  n_Function_ball01 n e (MVP_CR_apply _ (MVP_map inject_Q_hom _ p) x)
                        (MVP_CR_apply _ (MVP_map inject_Q_hom _ p) ('y)%CR)}.
@@ -1417,7 +1417,7 @@ Proof.
     apply leEq_transitive with (Zero:CR).
      rstepr ([--](Zero:CR)).
      apply inv_resp_leEq.
-     change ('0<='d)%CR.
+     change (0<='d)%CR.
      rewrite -> CRle_Qle.
      auto with *.
     change (Zero[<=]x[-]Zero)%CR.
@@ -1431,11 +1431,11 @@ Proof.
   rewrite -> Qmax_min_distr_r.
   apply Qmin_case.
    intros _.
-   eapply leEq_transitive with ('1[-]'1)%CR.
+   eapply leEq_transitive with (1[-]1)%CR.
     apply minus_resp_leEq.
     auto.
    rstepl (Zero:CR).
-   change ('0<='d)%CR.
+   change (0<='d)%CR.
    rewrite -> CRle_Qle.
    auto with *.
   intros H.
@@ -1474,7 +1474,7 @@ Qed.
 Fixpoint MVP_uc_fun_correct_sig n : n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop :=
 match n return n_UniformlyContinuousFunction CR CR n -> n_Function CR CR n -> Prop with
 | O => fun a b => a[=]b
-| S n' => fun f g => forall x, ('0 <= x)%CR -> (x <= '1)%CR -> MVP_uc_fun_correct_sig n' (f x) (g x)
+| S n' => fun f g => forall x, (0 <= x)%CR -> (x <= 1)%CR -> MVP_uc_fun_correct_sig n' (f x) (g x)
 end.
 
 (** Finally, the correctness lemma. *)

@@ -5,9 +5,9 @@ Require Import
   CornTac workaround_tactics
   stdlib_omissions.Q Qdlog Qmetric Qabs Qclasses QMinMax
   RSetoid CSetoids MetricMorphisms
-  orders.minmax orders.fields theory.abs theory.shiftl theory.int_pow.
+  orders.minmax orders.dec_fields theory.abs theory.shiftl theory.int_pow.
 Require Export
-  abstract_algebra interfaces.additional_operations.
+  abstract_algebra interfaces.additional_operations interfaces.orders.
 
 (* We describe the approximate rationals as a ring that is dense in the rationals *)
 
@@ -16,12 +16,15 @@ Require Export
 Class AppDiv AQ := app_div : AQ → AQ → Z → AQ.
 Class AppApprox AQ := app_approx : AQ → Z → AQ.
 
-Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ Q_as_MetricSpace} 
+Class AppRationals AQ {e plus mult zero one inv} `{Apart AQ} `{Le AQ} `{Lt AQ}
+     {AQtoQ : Coerce AQ Q_as_MetricSpace} 
     `{!AppInverse AQtoQ} {ZtoAQ : Coerce Z AQ} `{!AppDiv AQ} `{!AppApprox AQ} 
     `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
     `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
   aq_ring :> @Ring AQ e plus mult zero one inv ;
+  aq_trivial_apart :> TrivialApart AQ ;
   aq_order_embed :> OrderEmbedding AQtoQ ;
+  aq_strict_order_embed :> StrictOrderEmbedding AQtoQ ;
   aq_ring_morphism :> SemiRing_Morphism AQtoQ ;
   aq_dense_embedding :> DenseEmbedding AQtoQ ;
   aq_div : ∀ x y k, ball (2 ^ k) ('app_div x y k) ('x / 'y) ;
@@ -34,43 +37,38 @@ Class AppRationals AQ {e plus mult zero one inv} `{!Order AQ} {AQtoQ : Coerce AQ
 Section approximate_rationals_more.
   Context `{AppRationals AQ}.
 
-  Lemma AQtoQ_ZtoAQ x : ' (' x) = inject_Z x.
-  Proof.
-    change (((coerce : AQ → Q) ∘ (coerce : Z → AQ)) x = x).
-    now apply (integers.to_ring_unique_alt _ _).
-  Qed.
+  Lemma AQtoQ_ZtoAQ (x : Z) : coerce AQ Q (coerce Z AQ x) = coerce Z Q x.
+  Proof. now apply (integers.to_ring_twice _ _ _). Qed.
 
-  Global Instance: Injective (coerce : AQ → Q). 
-  Proof. change (Injective (coerce : AQ → Q_as_MetricSpace)). apply _. Qed.
+  Global Instance: Injective (coerce AQ Q). 
+  Proof. change (Injective (coerce AQ Q_as_MetricSpace)). apply _. Qed.
 
-  Global Instance: StrictlyOrderPreserving (coerce : AQ → Q).
-  Proof. apply _. Qed. 
+  Global Instance: StrongSetoid AQ.
+  Proof strong_setoids.dec_strong_setoid.
 
-  Global Instance: Injective (coerce : Z → AQ).
+  Global Instance: StrongSetoid_Morphism (coerce AQ Q).
+  Proof strong_setoids.dec_strong_morphism (coerce AQ Q).
+
+  Global Instance: StrongInjective (coerce AQ Q). 
+  Proof strong_setoids.dec_strong_injective (coerce AQ Q).
+
+  Global Instance: Injective (coerce Z AQ).
   Proof.
     split; try apply _.
     intros x y E.
-    apply (injective inject_Z).
+    apply (injective (coerce Z Q)).
     rewrite <-2!AQtoQ_ZtoAQ.
     now rewrite E.
   Qed.
 
-  Global Instance: RingOrder (_ : Order AQ).
-  Proof rings.embed_ringorder (coerce : AQ → Q).
-
-  Global Instance: TotalOrder (_ : Order AQ).
-  Proof maps.embed_totalorder (coerce : AQ → Q).
-
-  Lemma aq_preserves_lt x y : x < y ↔ ('x < 'y)%Q.
-  Proof with auto.
-    split; intros E.
-     apply Qlt_coincides. 
-     apply (strictly_order_preserving _)...
-    apply (strictly_order_preserving_back coerce)...
-  Qed.
-
+  Global Instance: PseudoRingOrder (_ : Le AQ) (_ : Lt AQ).
+  Proof projected_pseudo_ringorder (coerce AQ Q).
+    
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.
+
+  Lemma aq_shift_1_correct (k : Z) :  '((1:AQ) ≪ k) = 2 ^ k.
+  Proof. now rewrite aq_shift_correct, rings.preserves_1, rings.mult_1_l. Qed.
 
   Lemma aq_shift_opp_1 (x : AQ) : '(x ≪ (-1 : Z)) = 'x / 2.
   Proof. now rewrite aq_shift_correct. Qed.
@@ -78,20 +76,20 @@ Section approximate_rationals_more.
   Lemma aq_shift_opp_2 (x : AQ) : '(x ≪ (-2 : Z)) = 'x / 4.
   Proof. now rewrite aq_shift_correct. Qed.
 
-  Lemma aq_div_dlog2 (x y : AQ) (ε : Qpos) : 
-    ball ε ('app_div x y (Qdlog2 ε)) ('x / 'y).
+  Lemma aq_div_dlog2 (x y : AQ) (ε : Q₊) : 
+    ball ε ('app_div x y (Qdlog2 ('ε))) ('x / 'y).
   Proof.
     eapply ball_weak_le.
-     apply Qpos_dlog2_spec.
-    apply aq_div.
+     now apply Qpos_dlog2_spec.
+    now apply: aq_div.
   Qed.
 
-  Lemma aq_approx_dlog2 (x : AQ) (ε : Qpos) : 
-    ball ε ('app_approx x (Qdlog2 ε)) ('x).
+  Lemma aq_approx_dlog2 (x : AQ) (ε : Q₊) : 
+    ball ε ('app_approx x (Qdlog2 ('ε))) ('x).
   Proof.
     eapply ball_weak_le.
-     apply Qpos_dlog2_spec.
-    apply aq_compress.
+     now apply Qpos_dlog2_spec.
+    now apply: aq_compress.
   Qed.
 
   Definition app_div_above (x y : AQ) (k : Z) : AQ := app_div x y k + 1 ≪ k.
@@ -110,9 +108,9 @@ Section approximate_rationals_more.
   Proof.
     split; try apply _.
      intros E.
-     destruct (rings.ne_0 (1:Q)).
-     rewrite <-(rings.preserves_1 (f:=coerce : AQ → Q)).
-     rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
+     destruct (rings.is_ne_0 (1:Q)).
+     rewrite <-(rings.preserves_1 (f:=coerce AQ Q)).
+     rewrite <-(rings.preserves_0 (f:=coerce AQ Q)).
      now rewrite E.
     intros x [? [y [? E]]].
     destruct (no_zero_divisors ('x : Q)). split.
@@ -130,7 +128,7 @@ Section approximate_rationals_more.
     (* We need to pick a rational [x] such that [x < 1#2]. Since we do not
         use this lemma for computations yet, we just pick [1#3]. However,
         whenever we will it might be worth to reconsider. *)
-    exists (app_inverse coerce ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
+    exists (app_inverse (coerce AQ Q) ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
     split.
      apply Qlt_le_trans with (x + (1#6) * γ)%Q.
       rewrite <-(rings.plus_0_r x) at 1.
@@ -161,18 +159,18 @@ Section approximate_rationals_more.
     symmetry. apply Qmax_coincides.
   Qed.
 
-  Global Program Instance AQposAsQ: Coerce (AQ₊) Q := (coerce : AQ → Q) ∘ (coerce : AQ₊ → AQ).
+  Global Program Instance AQposAsQ: Coerce (AQ₊) Q := coerce AQ Q ∘ coerce (AQ₊) AQ.
 
-  Global Program Instance AQposAsQpos: Coerce (AQ₊) Qpos := λ x, ('x : Q).
+  Global Program Instance AQposAsQpos: Coerce (AQ₊) (Q₊) := λ x, ('x : Q).
   Next Obligation.
     destruct x as [x Ex]. simpl.
-    posed_rewrite <-(rings.preserves_0 (f:=coerce : AQ → Q)).
-    now apply aq_preserves_lt.
+    posed_rewrite <-(rings.preserves_0 (f:=coerce AQ Q)).
+    now apply: (strictly_order_preserving (coerce AQ Q)).
   Qed.
 
-  Lemma AQposAsQpos_preserves_1 : '(1 : AQ₊) = (1 : Qpos).
-  Proof. change ('(1:AQ) = (1:Q)). apply rings.preserves_1. Qed.
+  Lemma AQposAsQpos_preserves_1 : coerce (AQ₊) (Q₊) 1 = 1.
+  Proof. change (coerce AQ Q 1 = 1). apply rings.preserves_1. Qed.
 
-  Lemma AQposAsQpos_preserves_4 : '(4 : AQ₊) = (4 : Qpos).
-  Proof. change ('(4:AQ) = (4:Q)). apply rings.preserves_4. Qed.
+  Lemma AQposAsQpos_preserves_4 : coerce (AQ₊) (Q₊) 4 = 4. 
+  Proof. change (coerce AQ Q 4 = 4). apply rings.preserves_4. Qed.
 End approximate_rationals_more.

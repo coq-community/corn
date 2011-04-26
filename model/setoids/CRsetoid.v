@@ -31,7 +31,7 @@ Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2.
 *** [CR]
 *)
 
-Lemma CRisCSetoid : is_CSetoid CR (@st_eq CR) CRapart.
+Lemma CRisCSetoid : is_CSetoid CR (@st_eq CR) CRapartT.
 Proof.
  split;simpl.
     intros x H.
@@ -47,7 +47,7 @@ Proof.
   destruct (ap_cotransitive _ _ _ (CR_ap_as_Cauchy_IR_ap_1 _ _ H1) (CRasCauchy_IR z));[left|right];
     apply CR_ap_as_Cauchy_IR_ap_2; assumption.
  intros x y.
- change (Not (CRapart x y)<->(x==y)%CR).
+ change (Not (CRapartT x y)<->(x==y)%CR).
  rewrite <- CR_eq_as_Cauchy_IR_eq.
  destruct (ap_tight _ (CRasCauchy_IR x) (CRasCauchy_IR y)) as [A B].
  split.

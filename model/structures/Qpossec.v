@@ -398,13 +398,8 @@ Qed.
 
 Definition QposRed (a:Qpos) : Qpos := mkQpos (QposRed_prf a (Qpos_prf a)).
 
-Instance: Proper (QposEq ==> QposEq) QposRed.
+Instance QposRed_complete: Proper (QposEq ==> eq) QposRed.
 Proof.
-  intros x y E. unfold QposEq in *. simpl in *. rewrite E. reflexivity.
-Qed.
- 
-Lemma QposRed_complete : forall p q : Qpos, p == q -> QposRed p = QposRed q.
-Proof. 
  intros p q H.
  unfold QposRed.
  generalize (QposRed_prf p (Qpos_prf p)).

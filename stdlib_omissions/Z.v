@@ -3,6 +3,27 @@ Require Import ZArith NPeano stdlib_omissions.P.
 
 Open Scope Z_scope.
 
+Definition nat_of_Z (x : Z) : nat :=
+  match x with
+  | Z0 => O
+  | Zpos p => nat_of_P p
+  | Zneg p => O
+  end.
+
+Lemma nat_of_Z_nonpos (x : Z) : x <= 0 -> nat_of_Z x = 0%nat.
+Proof.
+  destruct x; simpl; try reflexivity.
+  now intros [].
+Qed.
+
+Lemma nat_of_Z_nonneg (x : Z) : 0 <= x -> Z_of_nat (nat_of_Z x) = x.
+Proof.
+  destruct x; simpl.
+    reflexivity.
+   intros. apply Z_of_nat_of_P.
+  now intros [].
+Qed.
+
 Definition N_of_Z (x : Z) : N :=
   match x with
   | Z0 => 0%N

@@ -341,7 +341,7 @@ Proof.
  intros x Hx.
  split.
   unfold CRle.
-  assert (x - 'l == '(-l) + x)%CR. ring. rewrite -> H. clear H.
+  assert (x - 'l == '(-l)%Q + x)%CR. ring. rewrite -> H. clear H.
   rewrite -> CRplus_translate.
   intros e.
   simpl.
@@ -410,7 +410,7 @@ Proof.
    intros H _.
    split; simpl.
     unfold CRle in Hlx.
-    assert (x - 'l == '(-l) + x). ring. rewrite -> H0 in Hlx. clear H0.
+    assert (x - 'l == '(-l)%Q + x). ring. rewrite -> H0 in Hlx. clear H0.
     rewrite -> CRplus_translate in Hlx.
     assert (H0:=Hlx e1).
     simpl in H0.
@@ -418,7 +418,7 @@ Proof.
     rewrite ->  Qle_minus_iff in *.
     replace RHS with (-l + approximate x e1 + - - e1)%Q by simpl; ring.
     auto.
-   apply Qle_trans with 0; auto with *.
+   apply Qle_trans with 0%Q; auto with *.
    clear - H.
    rewrite -> Qle_minus_iff in *.
    replace RHS with (l + - approximate x e1)%Q by simpl; ring.
@@ -429,7 +429,7 @@ Proof.
   rewrite -> Hlr.
   split; simpl.
    clear - H.
-   apply Qle_trans with 0; auto with *.
+   apply Qle_trans with 0%Q; auto with *.
    rewrite -> Qle_minus_iff in *.
    replace RHS with (approximate x e1 + - r)%Q by simpl; ring.
    auto.

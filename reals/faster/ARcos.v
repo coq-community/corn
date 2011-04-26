@@ -1,4 +1,5 @@
 Require Import
+  workaround_tactics
   CRsin CRcos MetricMorphisms Complete ARsin abstract_algebra.
 Require Export
   ARArith.
@@ -6,7 +7,7 @@ Require Export
 Section ARcos.
 Context `{AppRationals AQ}.
 
-Add Field Q : (fields.stdlib_field_theory Q).
+Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Definition AQcos_poly_fun (x : AQ) : AQ := 1 - 2 * x ^ (2:N).
 
@@ -20,7 +21,7 @@ Proof.
   now rewrite associativity.
 Qed.
 
-Program Definition AQcos_poly_uc := unary_uc coerce 
+Program Definition AQcos_poly_uc := unary_uc (coerce AQ Qmetric.Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, AQcos_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) cos_poly_uc _.
 Next Obligation.
   rewrite AQcos_poly_fun_correct.
@@ -32,30 +33,31 @@ Qed.
 Definition ARcos_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQcos_poly_uc).
 
 Lemma ARtoCR_preserves_cos_poly x : 
-  ARtoCR (ARcos_poly x) = cos_poly (ARtoCR x).
+  'ARcos_poly x = cos_poly ('x).
 Proof.
-  change (ARtoCR (ARcompress (Cmap AQPrelengthSpace AQcos_poly_uc x)) = cos_poly (ARtoCR x)).
+  change ('ARcompress (Cmap AQPrelengthSpace AQcos_poly_uc x) = cos_poly ('x)).
   rewrite ARcompress_correct.
   now apply preserves_unary_fun.
 Qed.
 
 Definition AQcos (x : AQ) := ARcos_poly (AQsin (x ≪ (-1))).
 
-Lemma AQcos_correct a : ARtoCR (AQcos a) = rational_cos ('a).
+Lemma AQcos_correct a : 'AQcos a = rational_cos ('a).
 Proof.
   unfold AQcos.
-  rewrite ARtoCR_preserves_cos_poly, AQsin_correct.
+  rewrite ARtoCR_preserves_cos_poly. 
+  posed_rewrite AQsin_correct.
   rewrite aq_shift_opp_1.
   now apply rational_cos_sin.
 Qed.
 
 Local Obligation Tactic := idtac.
-Program Definition ARcos_uc := 
-  unary_complete_uc Qmetric.QPrelengthSpace coerce AQcos cos_uc _.
+Program Definition ARcos_uc := unary_complete_uc 
+  Qmetric.QPrelengthSpace (coerce AQ Qmetric.Q_as_MetricSpace) AQcos cos_uc _.
 Next Obligation. intros. apply AQcos_correct. Qed.
 
 Definition ARcos := Cbind AQPrelengthSpace ARcos_uc.
 
-Lemma ARtoCR_preserves_cos x : ARtoCR (ARcos x) = cos_slow (ARtoCR x).
+Lemma ARtoCR_preserves_cos x : 'ARcos x = cos_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
 End ARcos.

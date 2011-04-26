@@ -20,7 +20,7 @@ Proof.
   unfold expSequence, mult_Streams.
   rewrite Str_nth_zipWith.
   rewrite commutativity.
-  apply sg_mor.
+  apply sg_op_proper.
    rewrite preserves_powers.
    now rewrite rings.preserves_opp.
   rewrite Str_nth_Qrecip_factorials'.
@@ -37,7 +37,7 @@ Qed.
 Definition AQexp_small_neg : AR := ARInfAltSum ARexpSequence 
   (dnn:=expSequence_dnn (Qle_ZO_flip AQexp_small_neg_prf)) (zl:=expSequence_zl (Qle_ZO_flip AQexp_small_neg_prf)).
 
-Lemma AQexp_small_neg_correct : ARtoCR AQexp_small_neg = rational_exp ('a).
+Lemma AQexp_small_neg_correct : 'AQexp_small_neg = rational_exp ('a).
 Proof.
   rewrite rational_exp_correct.
   rewrite <-rational_exp_small_neg_correct.
@@ -64,7 +64,7 @@ Fixpoint AQexp_neg_bounded {n : nat} {a : AQ} : -2^n ≤ a ≤ 0 → AR :=
   end.
 
 Lemma AQexp_neg_bounded_correct {n : nat} {a : AQ} (Pa : -2^n ≤ a ≤ 0) : 
-  ARtoCR (AQexp_neg_bounded Pa) = rational_exp ('a).
+  'AQexp_neg_bounded Pa = rational_exp ('a).
 Proof.
   revert a Pa.
   induction n; intros a p.
@@ -94,26 +94,25 @@ Proof.
   unfold AQexp_neg_bound.
   case (decide_rel (≤)); intros E1.
    easy.
-  apply orders.precedes_flip in E1.
-  apply (order_preserving_back (coerce : AQ → Q)).
+  apply orders.le_flip in E1.
+  apply (order_preserving_back (coerce AQ Q)).
   rewrite rings.preserves_opp.
   rewrite preserves_nat_pow.
   rewrite rings.preserves_2.
   rewrite <-(int_pow_nat_pow (f:=Z_of_nat)).
   rewrite inj_Zabs_nat, Z.abs_eq.
-   apply rings.flip_opp.
+   apply rings.flip_le_opp.
    rewrite rings.opp_involutive.
-   apply Qdlog2_spec.
+   apply orders.lt_le, Qdlog2_spec.
    apply rings.flip_neg_opp.
-   apply orders.sprecedes_trans_r with (-1).
+   apply orders.le_lt_trans with (-1).
     now apply rings.preserves_le_opp1.
    apply rings.flip_pos_opp. solve_propholds.
   change (0 ≤ 1 + Qdlog2 (-'a)).
-  apply integers.precedes_sprecedes_alt.
-  rewrite commutativity. apply (order_preserving _).
-  apply Qdlog2_nonneg. 
+  apply semirings.plus_le_compat_r; [| solve_propholds].
+  apply Qdlog2_nonneg.
   change ((- -1 : Q) ≤ -'a).
-  apply rings.flip_opp.
+  apply rings.flip_le_opp.
   now apply rings.preserves_le_opp1.
 Qed.
 
@@ -123,20 +122,20 @@ Lemma AQexp_neg_bound_weaken (n : nat) : -2 ^ (n + AQexp_neg_bound) ≤ a ≤ 0.
 Proof.
   split; [|trivial].
   transitivity (-2 ^ AQexp_neg_bound).
-   apply rings.flip_opp.
+   apply rings.flip_le_opp.
    rewrite nat_pow_exp_plus.
-   apply semirings.ge1_mult_compat_l.
-     solve_propholds.
-    apply nat_pow_ge1.
-     apply semirings.precedes_1_2.
-    apply naturals.naturals_nonneg.
+   apply semirings.ge_1_mult_le_compat_l.
+     apply nat_pow_ge_1.
+      now apply semirings.le_1_2.
+     now apply naturals.naturals_nonneg.
+    solve_propholds.
    reflexivity.
   now apply AQexp_neg_bound_correct.
 Qed.
 
 Definition AQexp_neg : AR := AQexp_neg_bounded (AQexp_neg_bound_weaken 75).
 
-Lemma AQexp_neg_correct: ARtoCR AQexp_neg = rational_exp ('a).
+Lemma AQexp_neg_correct: 'AQexp_neg = rational_exp ('a).
 Proof. apply AQexp_neg_bounded_correct. Qed.
 
 (* We could use a number closer to 1/exp 1, for example 11 $ -5, but in practice this seems
@@ -145,20 +144,20 @@ Program Definition AQexp_inv_pos_bound : AQ₊ := ((1 ≪ (-2)) ^ Zabs_N (Qfloor
 Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
-  '('AQexp_inv_pos_bound : Q) ≤ rational_exp ('a). 
+  '(coerce (AQ₊) Q AQexp_inv_pos_bound) ≤ rational_exp ('a). 
 Proof.
-  change ('('((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a))) : Q) ≤ rational_exp ('a)).
+  change (coerce Q CR (coerce AQ Q ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))) ≤ rational_exp ('a)).
   rewrite preserves_nat_pow.
   rewrite aq_shift_opp_2.
   rewrite rings.preserves_1, rings.mult_1_l.
-  rewrite <-int_pow_nat_pow.
+  rewrite <-(int_pow_nat_pow (f:=coerce N Z)).
   rewrite Z_of_N_abs, Z.abs_neq.
    apply (rational_exp_lower_bound (1#4)).
     now apply semirings.preserves_nonpos.
    apply CRpos_nonNeg.
    now CRsign.CR_solve_pos (1#1)%Qpos.
   change (Qfloor ('a) ≤ 0).
-  apply (order_preserving_back (coerce : Z → Q)).
+  apply (order_preserving_back (coerce Z Q)).
   transitivity ('a : Q).
    now apply Qfloor_le.
   now apply semirings.preserves_nonpos.
@@ -169,7 +168,7 @@ Lemma AQexp_prf1 {a : AQ} (pA : 0 ≤ a) : -a ≤ 0.
 Proof. now apply rings.flip_nonneg_opp. Qed.
 
 Lemma AQexp_prf2 {a : AQ} (pA : ¬0 ≤ a) : a ≤ 0.
-Proof. now apply orders.precedes_flip. Qed.
+Proof. now apply orders.le_flip. Qed.
 
 Definition AQexp (a : AQ) : AR := 
   match (decide_rel (≤) 0 a) with
@@ -177,7 +176,7 @@ Definition AQexp (a : AQ) : AR :=
   | right Pa => AQexp_neg (AQexp_prf2 Pa)
   end.
 
-Lemma AQexp_correct a : ARtoCR (AQexp a) = rational_exp ('a).
+Lemma AQexp_correct a : 'AQexp a = rational_exp ('a).
 Proof.
   unfold AQexp.
   case (decide_rel _); intros.
@@ -186,29 +185,30 @@ Proof.
    rewrite rings.preserves_opp.
    apply rational_exp_opp.
     now apply semirings.preserves_nonneg.
-   posed_rewrite <-(rings.preserves_opp (f:=coerce : AQ → Q)).
+   posed_rewrite <-(rings.preserves_opp (f:=coerce AQ Q)).
    apply: (AQexp_inv_pos_bound_correct (a:=-a)).
    now apply rings.flip_nonneg_opp.
   apply AQexp_neg_correct.
 Qed.
 
 Local Obligation Tactic := idtac.
-Program Definition ARexp_bounded_uc (z : Z) := 
-  unary_complete_uc QPrelengthSpace coerce (λ x, AQexp (min ('z) x)) (exp_bound_uc z) _.
+Program Definition ARexp_bounded_uc (z : Z) := unary_complete_uc 
+  QPrelengthSpace (coerce AQ Q_as_MetricSpace) (λ x, AQexp (min ('z) x)) (exp_bound_uc z) _.
 Next Obligation. 
   intros. 
+  change ('AQexp (min (' z) x) = exp_bound_uc z (' x)).
   rewrite AQexp_correct, aq_preserves_min, AQtoQ_ZtoAQ.
   reflexivity.
 Qed.
 
 Definition ARexp_bounded (z : Z) := Cbind AQPrelengthSpace (ARexp_bounded_uc z).
 
-Lemma ARtoCR_preserves_exp_bounded z x : ARtoCR (ARexp_bounded z x) = exp_bounded z (ARtoCR x).
-Proof. apply (preserves_unary_complete_fun QPrelengthSpace coerce (λ x, AQexp (min ('z) x))). Qed.
+Lemma ARtoCR_preserves_exp_bounded z x : 'ARexp_bounded z x = exp_bounded z ('x).
+Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (min ('z) x))). Qed.
 
 Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
 
-Lemma ARtoCR_preserves_exp x : ARtoCR (ARexp x) = exp (ARtoCR x).
+Lemma ARtoCR_preserves_exp x : 'ARexp x = exp ('x).
 Proof. apply ARtoCR_preserves_exp_bounded. Qed.
 
 End ARexp.

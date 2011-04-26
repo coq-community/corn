@@ -97,19 +97,19 @@ Proof.
  split;[apply: f_pres_leEq|apply: leEq_pres_f]; solve [ apply map_strext |apply map_pres_less].
 Qed.
 
-Lemma IR_Zero_as_CR : (IRasCR Zero=='0)%CR.
+Lemma IR_Zero_as_CR : (IRasCR Zero==0)%CR.
 Proof.
  apply: map_pres_zero_unfolded.
 Qed.
 
 Hint Rewrite IR_Zero_as_CR : IRtoCR.
 
-Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< '0 -> x[#]Zero)%CR.
+Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< 0 -> x[#]Zero)%CR.
 Proof.
  intros x H.
  apply CR_ap_as_IR.
  generalize H.
- apply CRapart_wd.
+ apply CRapartT_wd.
   reflexivity.
  symmetry.
  apply IR_Zero_as_CR.
@@ -156,7 +156,7 @@ Qed.
 
 Hint Rewrite IR_minus_as_CR : IRtoCR.
 
-Lemma IR_One_as_CR : (IRasCR One=='1)%CR.
+Lemma IR_One_as_CR : (IRasCR One==1)%CR.
 Proof.
  apply: map_pres_one_unfolded.
 Qed.
@@ -200,25 +200,25 @@ Proof.
 Qed.
 
 Lemma IR_recip_as_CR :forall y y_ y__,
- (IRasCR (One[/]y[//]y_)==(CRinv (IRasCR y) y__))%CR.
+ (IRasCR (One[/]y[//]y_)==(CRinvT (IRasCR y) y__))%CR.
 Proof.
  intros y y_ y__.
  assert (X:=(IR_div_as_CR One y y_ y__)).
  rewrite -> X.
- change ((IRasCR One * CRinv (IRasCR y) y__) == (CRinv (IRasCR y) y__))%CR.
+ change ((IRasCR One * CRinvT (IRasCR y) y__) == (CRinvT (IRasCR y) y__))%CR.
  rewrite -> IR_One_as_CR.
- change (('1 * CRinv (IRasCR y) y__ == CRinv (IRasCR y) y__)%CR).
+ change ((1 * CRinvT (IRasCR y) y__ == CRinvT (IRasCR y) y__)%CR).
  ring.
 Qed.
 
 Lemma IR_recip_as_CR_1 :forall y y_,
- (IRasCR (One[/]y[//]y_)==(CRinv (IRasCR y) (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_)))%CR.
+ (IRasCR (One[/]y[//]y_)==(CRinvT (IRasCR y) (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_)))%CR.
 Proof.
  intros; apply IR_recip_as_CR.
 Qed.
 
 Lemma IR_recip_as_CR_2 :forall y y_,
- (IRasCR (One[/]y[//](CR_ap_zero_as_IR _ y_))==(CRinv (IRasCR y) y_))%CR.
+ (IRasCR (One[/]y[//](CR_ap_zero_as_IR _ y_))==(CRinvT (IRasCR y) y_))%CR.
 Proof.
  intros; apply IR_recip_as_CR.
 Qed.
@@ -262,7 +262,7 @@ Proof.
     reflexivity.
    assert (X:= (IHp _ _ H)).
    simpl in X.
-   set (c:=pring_aux CRasCRing p ((' 0 + ' 1 + ' 1) * a)%CR) in *.
+   set (c:=pring_aux CRasCRing p ((0 + 1 + 1) * a)%CR) in *.
    clearbody c.
    rewrite <- X.
    rewrite -> IR_plus_as_CR.
@@ -307,16 +307,16 @@ Proof.
  generalize (map_pres_ap_zero IR CRasCReals (iso_map_rht CRasCReals IR CRIR_iso) (nring (R:=IR) (nat_of_P d))
    (den_is_nonzero IR (n # d)%Q)).
  intros d_.
- change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) == ' (n # d))%CR).
+ change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) == ' (n # d)%Q)%CR).
  rewrite -> Qmake_Qdiv.
  change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) ==
-   ' ((n # 1) * / (d # 1)))%CR).
+   ' ((n # 1) * / (d # 1))%Q)%CR).
  rewrite <- CRmult_Qmult.
- assert (d__:('d><'0%Q)%CR).
+ assert (d__:('d >< 0)%CR).
   apply Qap_CRap.
   discriminate.
  change ((((IRasCR (zring (R:=IR) n)[/]IRasCR (nring (R:=IR) (nat_of_P d))[//]d_):CR) ==
-   ' (n # 1) * ' (/ (d # 1)))%CR).
+   ' (n # 1)%Q * ' (/ (d # 1))%Q)%CR).
  rewrite <- (CRinv_Qinv d d__).
  unfold cf_div.
  assert (X:(forall (n:positive), IRasCR (nring (R:=IR) (nat_of_P n)) == ' ('n)%Z)%CR).

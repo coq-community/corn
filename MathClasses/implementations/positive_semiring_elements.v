@@ -1,11 +1,11 @@
 Require Import
   Morphisms Ring Program Setoid
   abstract_algebra additional_operations 
-  orders.semirings theory.shiftl.
+  interfaces.orders interfaces.integers
+  orders.semirings theory.shiftl theory.int_pow.
 
 Section positive_semiring_elements.
-Context `{SemiRing R} `{!SemiRingOrder o} `{!TotalOrder o} `{!PropHolds (1 ≠ 0)}
-  `{∀ z : R, LeftCancellation (+) z} `{∀ z : R, PropHolds (z ≠ 0) → LeftCancellation (.*.) z}.
+Context `{SemiRing R} `{Apart R} `{!PseudoSemiRingOrder Rle Rlt} `{!PropHolds (1 ⪥ 0)}.
 
 Add Ring R : (rings.stdlib_semiring_theory R).
 
@@ -16,17 +16,17 @@ Global Instance Pos_inject: Coerce (R₊) R := @proj1_sig R _.
 Global Program Instance Pos_plus: RingPlus (R₊) := λ x y, (x + y : R). 
 Next Obligation.
   destruct x as [x Hx], y as [y Hy].
-  now apply pos_plus_scompat.
+  now apply pos_plus_compat.
 Qed.
 
 Global Program Instance Pos_mult: RingMult (R₊) := λ x y, (x * y : R). 
 Next Obligation with auto.
   destruct x as [x Hx], y as [y Hy].
-  now apply pos_mult_scompat.
+  now apply pos_mult_compat.
 Qed.
 
 Global Program Instance Pos_1: RingOne (R₊) := (1 : R).
-Next Obligation. apply sprecedes_0_1. Qed.
+Next Obligation. now apply lt_0_1. Qed.
 
 (* * Equalitity *)
 Local Ltac unfold_equivs := unfold equiv, sig_equiv in *; simpl in *.
@@ -56,3 +56,11 @@ Section shiftl.
   Next Obligation. destruct x. now apply shiftl_pos. Qed.
 End shiftl. 
 End positive_semiring_elements.
+
+Section int_pow.
+  Context `{DecField R} `{Apart R} `{!PseudoRingOrder Rle Rlt}
+    `{!TrivialApart R} `{∀ x y : R, Decision (x = y)} `{Integers B} `{!IntPowSpec R B ipw}.
+
+  Global Program Instance Pos_int_pow: Pow (R₊) B | 5 := λ x n, (x ^ n : R).
+  Next Obligation. destruct x. now apply int_pow_pos. Qed.
+End int_pow.

@@ -10,7 +10,7 @@ Require Export
 Section ARsin.
 Context `{AppRationals AQ}.
 
-Add Field Q : (fields.stdlib_field_theory Q).
+Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Section sin_small_pos.
 Context {num den : AQ} (Pnd : 0 ≤ num ≤ den).
@@ -25,19 +25,19 @@ Proof.
   unfold sinSequence, mult_Streams.
   rewrite ?Str_nth_zipWith.
   rewrite commutativity. 
-  rewrite rings.preserves_mult, fields.dec_mult_inv_distr.
+  rewrite rings.preserves_mult, dec_fields.dec_mult_inv_distr.
   rewrite associativity.
-  apply sg_mor.
+  apply sg_op_proper.
    rewrite 2!preserves_powers_help.
-   rewrite 3!(Str_nth_powers_help_int_pow _ _).
-   rewrite 2!(preserves_nat_pow (f:=coerce : AQ → Q)).
-   rewrite <-2!(int_pow_nat_pow (f:=coerce : N → Z)).
+   rewrite 3!(Str_nth_powers_help_int_pow _ (coerce nat Z)).
+   rewrite 2!(preserves_nat_pow (f:=coerce AQ Q)).
+   rewrite <-2!(int_pow_nat_pow (f:=coerce N Z)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_mult_inv.
    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, rings.mult_0_l, fields.dec_mult_inv_0. ring.
+    rewrite ?Pden, rings.mult_0_l, dec_mult_inv_0. ring.
    assert (PropHolds ('den ≠ (0:Q))) by assumption. 
    field_simplify. reflexivity.
     solve_propholds.
@@ -53,16 +53,16 @@ Qed.
 Lemma AQsin_small_pos_Qprf : 0 ≤ ('num / 'den : Q) ≤ 1.
 Proof.
   split.
-   apply semirings.nonneg_mult_compat.
+   apply nonneg_mult_compat.
     now apply semirings.preserves_nonneg.
-   apply fields.nonneg_dec_mult_inv_compat.
+   apply dec_fields.nonneg_dec_mult_inv_compat.
    apply semirings.preserves_nonneg.
    red. now transitivity num.
   destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, fields.dec_mult_inv_0. now ring_simplify.
-  rewrite <-(fields.dec_mult_inverse ('den : Q)) by assumption.
-  apply (maps.order_preserving_flip_ge_0 (.*.) (/'den)).
-   apply fields.nonneg_dec_mult_inv_compat.
+    rewrite ?Pden, dec_mult_inv_0. now ring_simplify.
+  rewrite <-(dec_mult_inverse ('den : Q)) by assumption.
+  apply (maps.order_preserving_flip_nonneg (.*.) (/'den)).
+   apply dec_fields.nonneg_dec_mult_inv_compat.
    apply semirings.preserves_nonneg.
    red. now transitivity num.
   now apply (order_preserving _).
@@ -71,7 +71,7 @@ Qed.
 Definition AQsin_small_pos : AR := ARInfAltSum ARsinSequence 
   (dnn:=sinSequence_dnn AQsin_small_pos_Qprf) (zl:=sinSequence_zl AQsin_small_pos_Qprf).
 
-Lemma AQsin_small_pos_correct : ARtoCR AQsin_small_pos = rational_sin ('num / 'den).
+Lemma AQsin_small_pos_correct : 'AQsin_small_pos = rational_sin ('num / 'den).
 Proof.
   rewrite rational_sin_correct.
   rewrite <-rational_sin_small_pos_correct.
@@ -91,7 +91,7 @@ Proof.
   now rewrite <-(associativity 4 ('x) ('x : Q)).
 Qed.
 
-Program Definition AQsin_poly_uc := unary_uc coerce 
+Program Definition AQsin_poly_uc := unary_uc (coerce AQ Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) sin_poly_uc _.
 Next Obligation.
   rewrite AQsin_poly_fun_correct.
@@ -102,11 +102,10 @@ Qed.
 
 Definition ARsin_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc).
 
-Lemma ARtoCR_preserves_sin_poly x : 
-  ARtoCR (ARsin_poly x) = sin_poly (ARtoCR x).
+Lemma ARtoCR_preserves_sin_poly x : 'ARsin_poly x = sin_poly ('x).
 Proof.
-  change (ARtoCR (ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc x)) 
-    = compress (Cmap QPrelengthSpace sin_poly_uc (ARtoCR x))).
+  change ('ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc x) 
+    = compress (Cmap QPrelengthSpace sin_poly_uc ('x))).
   rewrite ARcompress_correct, compress_correct.
   now apply preserves_unary_fun.
 Qed.
@@ -126,7 +125,7 @@ Fixpoint AQsin_pos_bounded {n : nat} {num den : AQ} : 0 ≤ num ≤ den * 3^n �
   end.
 
 Lemma AQsin_pos_bounded_correct {n : nat} {num den : AQ} (Pnd : 0 ≤ num ≤ den * 3^n) : 
-  ARtoCR (AQsin_pos_bounded Pnd) = rational_sin ('num / 'den).
+  'AQsin_pos_bounded Pnd = rational_sin ('num / 'den).
 Proof.
   revert num den Pnd.
   induction n; intros.
@@ -136,7 +135,7 @@ Proof.
   rewrite IHn.
   change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
   rewrite rings.preserves_mult, rings.preserves_3.
-  rewrite fields.dec_mult_inv_distr, associativity.
+  rewrite dec_fields.dec_mult_inv_distr, associativity.
   now apply rational_sin_poly.
 Qed.
 
@@ -149,15 +148,15 @@ Lemma AQsin_pos_bound_correct : 0 ≤ a ≤ 3 ^ AQsin_pos_bound.
 Proof.
   split; [assumption |].
   unfold AQsin_pos_bound.
-  apply (order_preserving_back (coerce : AQ → Q)).
+  apply (order_preserving_back (coerce AQ Q)).
   rewrite preserves_nat_pow.
   rewrite rings.preserves_3.
-  rewrite <-(int_pow_nat_pow (f:=Z_of_nat)).
-  destruct (total_order ('a : Q) 1).
+  rewrite <-(int_pow_nat_pow (f:=coerce nat Z)).
+  destruct (total (≤) ('a : Q) 1).
    rewrite Qdlog2_le1; simpl; try easy.
    now transitivity (1:Q).
   rewrite inj_Zabs_nat, Z.abs_eq.
-   now apply Qdlog_spec.
+   now apply orders.lt_le, Qdlog_spec.
   change (0 ≤ 1 + Qdlog 3 ('a)).
   apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg].
 Qed.
@@ -169,26 +168,26 @@ Proof.
   split; [assumption |].
   rewrite rings.mult_1_l.
   rewrite nat_pow_exp_plus.
-  apply semirings.ge1_mult_compat_l.
-    apply nat_pow_nonneg; solve_propholds.
-   apply nat_pow_ge1. 
-    now apply semirings.precedes_1_3.
-   now apply naturals.naturals_nonneg.
+  apply semirings.ge_1_mult_le_compat_l.
+    apply nat_pow_ge_1. 
+     now apply semirings.le_1_3.
+    now apply naturals.naturals_nonneg.
+   now apply nat_pow_nonneg; solve_propholds.
   now apply AQsin_pos_bound_correct.
 Qed.
 
 Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 75).
 
-Lemma AQsin_pos_correct: ARtoCR AQsin_pos = rational_sin ('a).
+Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).
 Proof. 
   ms_setoid_replace ('a : Q) with ('a / '1 : Q).
    now apply AQsin_pos_bounded_correct.
-  rewrite rings.preserves_1, fields.dec_mult_inv_1. ring.
+  rewrite rings.preserves_1, dec_fields.dec_mult_inv_1. ring.
 Qed.
 End sin_pos.
 
 Lemma AQsin_prf {a : AQ} (pA : ¬0 ≤ a) : 0 ≤ -a.
-Proof. apply rings.flip_nonpos_opp. now apply orders.precedes_flip. Qed.
+Proof. apply rings.flip_nonpos_opp. now apply orders.le_flip. Qed.
 
 Definition AQsin (a : AQ) : AR := 
   match (decide_rel (≤) 0 a) with
@@ -196,7 +195,7 @@ Definition AQsin (a : AQ) : AR :=
   | right Pa => -AQsin_pos (AQsin_prf Pa)
   end.
 
-Lemma AQsin_correct a : ARtoCR (AQsin a) = rational_sin ('a).
+Lemma AQsin_correct a : 'AQsin a = rational_sin ('a).
 Proof.
   unfold AQsin.
   case (decide_rel _); intros.
@@ -207,13 +206,13 @@ Proof.
 Qed.
 
 Local Obligation Tactic := idtac.
-Program Definition ARsin_uc := 
-  unary_complete_uc QPrelengthSpace coerce AQsin sin_uc _.
+Program Definition ARsin_uc := unary_complete_uc 
+  QPrelengthSpace (coerce AQ Q_as_MetricSpace) AQsin sin_uc _.
 Next Obligation. intros. apply AQsin_correct. Qed.
 
 Definition ARsin := Cbind AQPrelengthSpace ARsin_uc.
 
-Lemma ARtoCR_preserves_sin x : ARtoCR (ARsin x) = sin_slow (ARtoCR x).
+Lemma ARtoCR_preserves_sin x : 'ARsin x = sin_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
 
 End ARsin.

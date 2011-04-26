@@ -22,13 +22,13 @@ Section contents.
     (qpoints: list QPoint)
     (distinct: QNoDup (map fst qpoints)).
 
-  Let crpoints := map (first inject_Q) qpoints.
+  Let crpoints := map (first inject_Q_CR) qpoints.
 
   (** Definition of the Lagrange polynomial: *)
 
   Definition L: cpoly CRasCRing :=
     Σ (map (fun p => let '((x, y), rest) := p in
-      _C_ y [*] Π (map (fun xy' => (' (- fst xy') [+X*] One) [*] _C_ (' (/ (x - fst xy')))) rest))
+      _C_ y [*] Π (map (fun xy' => (' (- fst xy')%Q [+X*] One) [*] _C_ (' (/ (x - fst xy')))) rest))
      (separates qpoints)).
 
   (** Its degree follows easily from its structure: *)
@@ -45,7 +45,7 @@ Section contents.
     exfalso...
    simpl length.
    replace (@length (prod Q (RegularFunction Q_as_MetricSpace)) l) 
-    with (length (map (fun xi => (' (- fst xi)[+X*]One)[*]_C_ (' (/ (q - fst xi)))) v) * 1)%nat.
+    with (length (map (fun xi => (' (- fst xi)%Q[+X*]One)[*]_C_ (' (/ (q - fst xi)))) v) * 1)%nat.
     apply degree_le_Product.
     intros.
     destruct (proj1 (in_map_iff _ _ _) H) as [?[[]?]].
@@ -82,7 +82,7 @@ Section contents.
    intros [p q].
    rewrite <- CRmult_Qmult.
    autorewrite with apply.
-   change (((' (- p) + ' x * (' 1 + ' x * ' 0)) * ' (/ (u - p))) == (' (x + - p) * ' (/ (u - p))))%CR.
+   change (((' (- p)%Q + ' x * (1 + ' x * 0)) * ' (/ (u - p))) == (' (x + - p)%Q * ' (/ (u - p))))%CR.
    rewrite <- CRplus_Qplus.
    generalize (/ (u - p)).
    intros. ring.
@@ -103,21 +103,23 @@ Section contents.
     intros [u w] [[p q]] [A B].
     simpl in A, B. subst u. cbv beta iota.
     apply mult_wd. reflexivity.
-    apply inject_Q_wd.
+    apply inject_Q_CR_wd.
     rewrite B. reflexivity.
    pose proof (separates_Proper _ _ H1) as H3.
    assert (@Equivalence ((Q * CR) * list (Q * CR)) (pair_rel (@eq _) (@Permutation _))) as T.
     apply Pair.Equivalence_instance_0.
      apply _.
     apply _.
-   rewrite <- (@map_perm_proper _ CR (pair_rel eq (@Permutation _)) (@st_eq _) T _ _ _ H2 _ _ H3).
+   (* I'm really clueless why this rewrite has ever worked? *)
+   etransitivity. apply cm_Sum_Proper. apply cag_commutes. symmetry.
+   apply (@map_perm_proper _ CR (pair_rel eq (@Permutation _)) (@st_eq _) T _ _ _ H2 _ _ H3).
    clear H2 H3.
    subst s.
    simpl @cm_Sum.
    rewrite cm_Sum_units.
-    setoid_replace (' Π (map (fun xi0 : Q and CR => ((xi - fst xi0) * / (xi - fst xi0))%Q) x)) with ('1%CR).
-     change (y * ' 1 + ' 0 == y). ring.
-    apply inject_Q_wd.
+    setoid_replace (' Π (map (fun xi0 : Q and CR => ((xi - fst xi0) * / (xi - fst xi0))%Q) x)) with 1%CR.
+     change (y * 1 + 0 == y). ring.
+    apply inject_Q_CR_wd.
     rewrite cr_Product_ones. reflexivity.
     intros.
     destruct (proj1 (in_map_iff _ _ _) H) as [x1 [[] H4]].
@@ -145,14 +147,14 @@ Section contents.
    simpl @cr_Product.
    setoid_replace (xi - xi)%Q with 0%Q by (simpl; ring).
    repeat rewrite Qmult_0_l.
-   change ((w: CR) * '0 == '0).
+   change ((w: CR) * 0 == 0).
    ring.
   Qed. (* Todo: Clean up more. *)
 
 End contents.
 
 Lemma interpolates_economically (qpoints: ne_list (Q * CR)): QNoDup (map fst qpoints) →
-  interpolates_economically (ne_list.map (first inject_Q) qpoints) (L qpoints).
+  interpolates_economically (ne_list.map (first inject_Q_CR) qpoints) (L qpoints).
 Proof with auto.
  split.
   rewrite ne_list.list_map.

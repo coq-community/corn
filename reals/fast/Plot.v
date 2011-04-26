@@ -127,7 +127,9 @@ Proof.
  rewrite -> L.
  setoid_replace Z1 with (l+w,b).
   unfold Z, PlotQ.
-  rewrite -> Hw, Hh.
+  (* TODO: figure out why rewrite Hw, Hh hangs *)
+  replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r) with
+   (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + h) l b (l + w)) by now rewrite Hw, Hh.
   destruct n; try discriminate.
   destruct m; try discriminate.
   apply (RasterizeQ2_correct).

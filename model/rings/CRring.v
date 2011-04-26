@@ -63,21 +63,21 @@ Proof.
  apply mult_assoc_unfolded.
 Qed.
 
-Lemma CRisCRing : is_CRing CRasCAbGroup (' 1)%CR CRmultasBinOp.
+Lemma CRisCRing : is_CRing CRasCAbGroup 1%CR CRmultasBinOp.
 Proof.
  apply Build_is_CRing with CRmultAssoc.
     split.
      intros x.
-     change (x*(' 1%Q)==x)%CR.
+     change (x*1==x)%CR.
      rewrite <- CR_eq_as_Cauchy_IR_eq.
-     stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (inject_Q 1))); [| now apply CR_mult_as_Cauchy_IR_mult].
+     stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (inject_Q_CR 1))); [| now apply CR_mult_as_Cauchy_IR_mult].
      stepl ((CRasCauchy_IR x)[*]One); [| now
        apply bin_op_is_wd_un_op_rht; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
      rational.
     intros x.
-    change ((inject_Q 1%Q)*x==x)%CR.
+    change ((inject_Q_CR 1%Q)*x==x)%CR.
     rewrite <- CR_eq_as_Cauchy_IR_eq.
-    stepl ((CRasCauchy_IR (inject_Q 1))[*](CRasCauchy_IR x)); [| now apply CR_mult_as_Cauchy_IR_mult].
+    stepl ((CRasCauchy_IR (inject_Q_CR 1))[*](CRasCauchy_IR x)); [| now apply CR_mult_as_Cauchy_IR_mult].
     stepl (One[*](CRasCauchy_IR x)); [| now
       apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
     rational.
@@ -97,7 +97,7 @@ Proof.
   stepr (((CRasCauchy_IR x)[*](CRasCauchy_IR y))[+]((CRasCauchy_IR x)[*](CRasCauchy_IR z))).
    apply dist.
   apply cs_bin_op_wd; apply CR_mult_as_Cauchy_IR_mult.
- change (CRapart (inject_Q 1) (inject_Q 0)).
+ change (CRapartT 1 0)%CR.
  apply CR_ap_as_Cauchy_IR_ap_2.
  apply: ap_wd.
    apply one_ap_zero.

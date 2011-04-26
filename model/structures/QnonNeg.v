@@ -20,7 +20,8 @@ Local Infix "==" := eq.
 Local Notation "0" := zero.
 Local Notation "1" := one.
 
-Global Instance: Equivalence eq := {}.
+Global Instance: Equivalence eq.
+Proof. split; repeat intro; firstorder. unfold eq. etransitivity; eauto. Qed.
 
 (* For addition, multiplication, and min/max (and their properties), we factor out the common bits: *)
 

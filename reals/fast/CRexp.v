@@ -42,7 +42,6 @@ Require Import Qround.
 Require Import CornTac.
 Require Import theory.int_pow.
 Require Import abstract_algebra.
-Require Import CRclasses.
 
 Set Implicit Arguments.
 
@@ -282,7 +281,7 @@ Qed.
 Lemma rational_exp_neg_bounded_wd (a1 a2 : Q) (n1 n2 : nat) (p1 : (-(2^n1))%Z <= a1 <= 0) (p2 : (-(2^n2))%Z <= a2 <= 0) :
   a1 = a2 → rational_exp_neg_bounded n1 p1 = rational_exp_neg_bounded n2 p2.
 Proof.
-  destruct (total_order n1 n2); intros E.
+  destruct (total (≤) n1 n2); intros E.
    now apply rational_exp_neg_bounded_wd_aux.
   symmetry in E |- *. now apply rational_exp_neg_bounded_wd_aux.
 Qed.
@@ -479,7 +478,7 @@ Proof.
  assert (X0:(0 <= -Qfloor a)%Z).
   apply Z.opp_nonneg_nonpos.
   rewrite Q.Zle_Qle.
-  transitivity a; [| assumption].
+  apply Qle_trans with a; [| assumption].
   now apply Qfloor_le.
  setoid_replace (c ^ (-Qfloor a)) with (c ^ Z_to_nat X0).
   apply rational_exp_neg_posH; trivial.
@@ -514,10 +513,10 @@ Lemma rational_exp_pos_correct (a : Q) (Pa : 0 ≤ a) (c : Qpos) :
   CRinv_pos c (IRasCR (Exp (inj_Q IR (-a)))) = IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ec.
- assert (X: (IRasCR (Exp (inj_Q IR (-a)%Q)) >< '0)%CR).
+ assert (X: (IRasCR (Exp (inj_Q IR (-a)%Q)) >< 0)%CR).
   right. exists c.
   now ring_simplify.
- rewrite (CRinv_pos_inv c X); trivial.
+ rewrite (CRinvT_pos_inv c X); trivial.
  rewrite <- IR_recip_as_CR_2.
  apply IRasCR_wd.
  apply eq_symmetric.
@@ -739,7 +738,7 @@ Definition exp (x:CR) : CR := exp_bounded (Qceiling (approximate x ((1#1)%Qpos) 
 (* begin hide *)
 Implicit Arguments exp [].
 (* end hide *)
-Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1))%CR.
+Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1)%Q)%CR.
 Proof.
  intros x.
  assert (X:=ball_approx_l x (1#1)).

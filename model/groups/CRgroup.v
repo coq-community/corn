@@ -33,7 +33,7 @@ Open Local Scope uc_scope.
 Lemma CRopp_strext : un_op_strext CRasCSetoid CRopp.
 Proof.
  intros x y H.
- change (CRapart x y)%CR.
+ change (CRapartT x y)%CR.
  apply CR_ap_as_Cauchy_IR_ap_2.
  apply: un_op_strext_unfolded.
  stepl (CRasCauchy_IR (-x)%CR); [| now apply eq_symmetric; apply CR_opp_as_Cauchy_IR_opp].
@@ -48,7 +48,7 @@ Build_CSetoid_fun _ _ _ CRopp_strext.
 Lemma CRisCGroup : is_CGroup CRasCMonoid CRoppasUnOp.
 Proof.
  split.
-  change (x-x==(inject_Q 0%Q))%CR.
+  change (x-x==0)%CR.
   rewrite <- CR_eq_as_Cauchy_IR_eq.
   stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR (- x)%CR)); [| now apply CR_plus_as_Cauchy_IR_plus].
   stepl ((CRasCauchy_IR x)[+][--](CRasCauchy_IR x)); [| now
@@ -56,7 +56,7 @@ Proof.
   apply: eq_transitive.
    apply cg_rht_inv_unfolded.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
- change (-x + x==(inject_Q 0%Q))%CR.
+ change (-x + x==0)%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
  stepl ((CRasCauchy_IR (-x)%CR)[+](CRasCauchy_IR x)); [| now apply CR_plus_as_Cauchy_IR_plus].
  stepl ([--](CRasCauchy_IR x)[+](CRasCauchy_IR x)); [| now

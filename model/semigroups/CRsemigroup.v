@@ -32,7 +32,7 @@ Require Import CornTac.
 
 Open Local Scope uc_scope.
 
-Lemma CRplus_strext : bin_op_strext CRasCSetoid (ucFun2 CRplus).
+Lemma CRplus_strext : bin_op_strext CRasCSetoid (ucFun2 CRplus_uc).
 Proof.
  intros x1 x2 y1 y2 H.
  simpl in *.

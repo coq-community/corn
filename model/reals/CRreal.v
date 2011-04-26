@@ -34,7 +34,7 @@ Open Local Scope uc_scope.
 ** Example of a real number structure: $\langle$#&lang;#[CR]$\rangle$#&rang;#
 *)
 
-Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos), AbsSmall (R:=CRasCOrdField) (inject_Q e) ((x:CRasCOrdField)[-]y) <->
+Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos), AbsSmall (R:=CRasCOrdField) (inject_Q_CR e) ((x:CRasCOrdField)[-]y) <->
  ball e x y.
 Proof.
  intros x y e.
@@ -101,10 +101,10 @@ Proof.
  revert s.
  intros [f Hf].
  apply (ucFun (@Cjoin Q_as_MetricSpace)).
- exists (fun e:QposInf => match e with | QposInfinity => (inject_Q 0)
-   | Qpos2QposInf e => let (n,_) := Hf (inject_Q e) (CRlt_Qlt _ _ (Qpos_prf e)) in f n end).
- abstract ( intros e1 e2; destruct (Hf (inject_Q e1) (CRlt_Qlt _ _ (Qpos_prf e1))) as [n1 Hn1];
-   destruct (Hf (inject_Q e2) (CRlt_Qlt _ _ (Qpos_prf e2))) as [n2 Hn2];
+ exists (fun e:QposInf => match e with | QposInfinity => 0%CR
+   | Qpos2QposInf e => let (n,_) := Hf (inject_Q_CR e) (CRlt_Qlt _ _ (Qpos_prf e)) in f n end).
+ abstract ( intros e1 e2; destruct (Hf (inject_Q_CR e1) (CRlt_Qlt _ _ (Qpos_prf e1))) as [n1 Hn1];
+   destruct (Hf (inject_Q_CR e2) (CRlt_Qlt _ _ (Qpos_prf e2))) as [n2 Hn2];
      apply: ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball; [apply Hn1;apply le_max_l|
        apply Hn2;apply le_max_r]) using Rlim_subproof0.
 Defined.
@@ -116,7 +116,7 @@ Proof.
   destruct (Hf _ (CRlt_Qlt _ _ (Qpos_prf ((1#2)*d)%Qpos))) as [n Hn].
   exists n.
   intros m Hm.
-  apply AbsSmall_leEq_trans with (inject_Q d);[rstepr (e[-]Zero);assumption|].
+  apply AbsSmall_leEq_trans with (inject_Q_CR d);[rstepr (e[-]Zero);assumption|].
   rewrite -> CRAbsSmall_ball.
   change (nat -> Complete Q_as_MetricSpace) in f.
   change (ball d (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).

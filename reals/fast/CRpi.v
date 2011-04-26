@@ -4,9 +4,5 @@ and may be prefered for development. *)
 Require Export CRpi_fast.
 Require Import CRsign.
 
-Lemma CRpi_pos : ('0 < CRpi)%CR.
-Proof.
- exists (3#1)%Qpos.
- apply CRpos_nonNeg.
- CR_solve_pos (1#10)%Qpos.
-Qed.
+Lemma CRpi_pos : (0 < CRpi)%CR.
+Proof. CR_solve_pos (1#10)%Qpos. Qed.

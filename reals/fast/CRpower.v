@@ -25,6 +25,8 @@ Require Import ModulusDerivative.
 Require Import ContinuousCorrect.
 Require Import Qmetric.
 Require Import CornTac.
+Require Import canonical_names.
+Require Import additional_operations.
 
 Opaque CR inj_Q.
 
@@ -226,16 +228,17 @@ Proof.
  stepr x; [| now simpl; symmetry; apply CRasIRasCR_id].
  assumption.
 Qed.
+End CRpower_N.
 
 (** [CRpower_positive_bounded] is should be used when a known bound
 on the absolute value of x is available. *)
-Definition CRpower_N (x:CR) : CR := ucFun (CRpower_N_bounded (CR_b (1#1) x)) x.
+Instance CRpower_N: Pow CR N := λ x n, ucFun (CRpower_N_bounded n (CR_b (1#1) x)) x.
 
-Lemma CRpower_N_bounded_N_power : forall (c:Qpos) (x:CR),
+Lemma CRpower_N_bounded_N_power : forall (n : N) (c:Qpos) (x:CR),
 ((AbsSmall ('c) x) ->
-CRpower_N_bounded c x == CRpower_N x)%CR.
+CRpower_N_bounded n c x == CRpower_N x n)%CR.
 Proof.
- intros c x Hc.
+ intros n c x Hc.
  assert (Hx:(AbsSmall ('(CR_b (1#1) x)) x)%CR).
   split.
    rewrite -> CRopp_Qopp.
@@ -248,9 +251,9 @@ Proof.
  destruct (Qle_total c d);[|symmetry]; apply CRpower_N_bounded_weaken; assumption.
 Qed.
 
-Lemma CRpower_N_correct : forall x, (IRasCR (x[^](nat_of_N n))==CRpower_N (IRasCR x))%CR.
+Lemma CRpower_N_correct : forall n x, (IRasCR (x[^](nat_of_N n))==CRpower_N (IRasCR x) n)%CR.
 Proof.
- intros x.
+ intros n x.
  apply CRpower_N_bounded_correct.
  rewrite -> IR_AbsSmall_as_CR.
  stepl ('(CR_b (1#1) (IRasCR x)))%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
@@ -260,10 +263,8 @@ Proof.
  apply CR_b_upperBound.
 Qed.
 
-End CRpower_N.
-
 Lemma CRpower_N_correct' : forall n x,
-(IRasCR (x[^]n)==CRpower_N (N_of_nat n) (IRasCR x))%CR.
+(IRasCR (x[^]n)==CRpower_N (IRasCR x) (N_of_nat n))%CR.
 Proof.
  intros n x.
  etransitivity; [| apply CRpower_N_correct].
@@ -284,9 +285,9 @@ Proof.
  intros p1 p2 Ep e1 e2 Ee x. simpl. rewrite Ep, Ee. reflexivity.
 Qed. 
 
-Instance: Proper (eq ==> @st_eq _ ==> @st_eq _) CRpower_N.
+Instance: Proper (@st_eq _ ==> eq ==> @st_eq _) CRpower_N.
 Proof.
- intros ? n Hn x1 x2 Hx. subst.
+ intros x1 x2 Hx ? n Hn. subst.
  transitivity (CRpower_N_bounded n (CR_b (1 # 1) x1) x2).
   change (ucFun (CRpower_N_bounded n (CR_b (1#1) x1)) x1==ucFun (CRpower_N_bounded n (CR_b (1#1) x1)) x2)%CR.
   apply uc_wd; assumption.
@@ -297,3 +298,16 @@ Proof.
  apply CR_b_upperBound.
 Qed.
 (* end hide *)
+
+Instance: NatPowSpec CR N _.
+Proof.
+  split; unfold pow. 
+    apply _.
+   intros x. change (coerce Q CR 1 = CR1). now apply rings.preserves_1.
+  intros x n.
+  rewrite <-(CRasIRasCR_id x).
+  rewrite <-?CRpower_N_correct.
+  rewrite <-IR_mult_as_CR.
+  rewrite Nnat.nat_of_Nplus.
+  apply IRasCR_wd. symmetry. now apply nexp_Sn.
+Qed. 

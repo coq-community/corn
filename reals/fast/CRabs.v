@@ -130,7 +130,7 @@ Qed.
 
 Open Local Scope CR_scope.
 
-Lemma CRabs_pos : forall x:CR, '0 <= x -> CRabs x == x.
+Lemma CRabs_pos : forall x:CR, 0 <= x -> CRabs x == x.
 Proof.
  intros x.
  rewrite <- (CRasIRasCR_id x).
@@ -143,10 +143,10 @@ Proof.
  auto.
 Qed.
 
-Lemma CRabs_0: CRabs ('0) == '0.
+Lemma CRabs_0: CRabs 0 == 0.
 Proof. apply CRabs_pos, CRle_refl. Qed.
 
-Lemma CRabs_neg: forall x, x <= '0 -> CRabs x == - x.
+Lemma CRabs_neg: forall x, x <= 0 -> CRabs x == - x.
 Proof.
  intros x.
  rewrite <- (CRasIRasCR_id x).
@@ -164,23 +164,23 @@ Lemma CRabs_cases
   (P: CR -> Prop)
   {Pp: Proper (@st_eq _ ==> iff) P}
   {Ps: forall x, Stable (P x)}:
-    forall x, (('0 <= x -> P x) /\ (x <= '0 -> P (- x))) <-> P (CRabs x).
+    forall x, ((0 <= x -> P x) /\ (x <= 0 -> P (- x))) <-> P (CRabs x).
 Proof with auto.
  intros.
  apply from_DN.
- apply (DN_bind (CRle_dec x ('0))).
+ apply (DN_bind (CRle_dec x 0)).
  intro.
  apply DN_return.
  destruct H.
   rewrite (CRabs_neg _ c)...
   intuition.
   revert H.
-  rewrite (proj2 (CRle_def x ('0)))...
+  rewrite (proj2 (CRle_def x 0))...
   rewrite CRopp_0...
  rewrite (CRabs_pos _ c)...
  intuition.
  revert H.
- rewrite (proj2 (CRle_def x ('0)))...
+ rewrite (proj2 (CRle_def x 0))...
  rewrite CRopp_0...
 Qed.
 
@@ -188,16 +188,16 @@ Lemma CRabs_opp (x: CR): CRabs (-x) == CRabs x.
 Proof with auto.
  intros.
  apply from_DN.
- apply (DN_bind (CRle_dec x ('0))).
+ apply (DN_bind (CRle_dec x 0)).
  intros [A | B]; apply DN_return.
   rewrite (CRabs_neg _ A).
   apply CRabs_pos.
-  change (-'0 <= -x).
+  change (-0 <= -x).
   apply -> CRle_opp...
  rewrite (CRabs_pos _ B).
  rewrite CRabs_neg.
   apply CRopp_opp.
- change (-x <= -'0).
+ change (-x <= -0).
  apply -> CRle_opp...
 Qed.
 
