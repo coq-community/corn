@@ -538,8 +538,8 @@ Proof.
   now apply (strong_injective _).
 Qed.
 
-Global Instance: PseudoRingOrder ARle ARlt.
-Proof rings.projected_pseudo_ringorder (coerce AR CR).
+Global Instance: FullPseudoSemiRingOrder ARle ARlt.
+Proof rings.projected_full_pseudo_ring_order (coerce AR CR).
 
 (* Division *)
 Lemma aq_mult_inv_regular_prf (x : AQ) : 

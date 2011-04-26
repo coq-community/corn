@@ -61,8 +61,8 @@ Section approximate_rationals_more.
     now rewrite E.
   Qed.
 
-  Global Instance: PseudoRingOrder (_ : Le AQ) (_ : Lt AQ).
-  Proof projected_pseudo_ringorder (coerce AQ Q).
+  Global Instance: FullPseudoSemiRingOrder (_ : Le AQ) (_ : Lt AQ).
+  Proof projected_full_pseudo_ring_order (coerce AQ Q).
     
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.

@@ -764,7 +764,7 @@ Proof with auto; try solve [now apply CR_apart_apartT].
   destruct (CRmult_strext x₁ x₂ y₁ y₂); [|left|right]...
 Qed.
 
-Instance: PseudoPartialOrder CRle CRlt.
+Instance: FullPseudoOrder CRle CRlt.
 Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
   split.
    split; try apply _.
@@ -780,11 +780,13 @@ Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
   intros E2. destruct E1...
 Qed.
 
-Instance: PseudoRingOrder CRle CRlt.
+Instance: FullPseudoSemiRingOrder CRle CRlt.
 Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
-  repeat (split; try apply _).
-   intros x y E.
-   apply CR_lt_ltT, (plus_resp_less_lft _ x y z)...
+  apply rings.from_full_pseudo_ring_order. 
+    repeat (split; try apply _).
+    intros x y E.
+    apply CR_lt_ltT, (plus_resp_less_lft _ x y z)...
+   apply _.
   intros x y E1 E2.
   apply CR_lt_ltT, (mult_resp_pos _ x y)...
 Qed.
