@@ -2,7 +2,7 @@ Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
  CSetoids CPoly_ApZero CRings CPoly_Degree
- CRArith Qmetric Qring CReals
+ CRArith Qmetric Qring CReals Ranges
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation
  util.Container NewAbstractIntegration.
@@ -19,10 +19,7 @@ Fixpoint iterate {T: nat → Type} (f: ∀ {n}, T (S n) → T n) {n}: T n → T 
 
 Coercion Vector.to_list: Vector.t >-> list.
 Definition Q01 := sig (λ x: Q, 0 <= x <= 1).
-Definition Range (T: Type) := prod T T.
-Instance in_QRange: Container Q (Range Q) := λ r x, fst r <= x <= snd r. 
 Implicit Arguments proj1_sig [[A] [P]].
-Program Instance in_sig_QRange (P: Q → Prop): Container (sig P) (Range (sig P)) := λ r x, fst r <= x <= snd r. 
 Definition B01: Ball Q Qpos := (1#2, (1#2)%Qpos).
 Definition D01 := sig ((∈ B01)).
 Program Definition D01zero: D01 := 0.
