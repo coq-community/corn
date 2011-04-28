@@ -1,25 +1,23 @@
 Require Import
   Program QArith ZArith BigZ Qpossec
-  MetricMorphisms Qmetric Qdlog
-  ApproximateRationals ARArith
-  interfaces.integers interfaces.rationals
+  MetricMorphisms Qmetric Qdlog ARArith
   theory.int_pow theory.nat_pow
   stdlib_rationals stdlib_binary_integers fast_integers dyadics.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
-Notation fastD := (Dyadic fastZ).
-Instance fastZtoQ: Coerce fastZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
-Instance ZtofastD: Coerce Z fastD := dy_inject ∘ BigZ.of_Z.
-Instance NtofastZ: Coerce N fastZ := BigZ.of_Z ∘ Z_of_N.
-Instance fastDtoQ: Coerce fastD Q_as_MetricSpace := DtoQ fastZtoQ.
+Notation bigD := (Dyadic bigZ).
+Instance inject_bigZ_Q: Coerce bigZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
+Instance inject_Z_bigD: Coerce Z bigD := dy_inject ∘ BigZ.of_Z.
+Instance inject_N_bigZ: Coerce N bigZ := BigZ.of_Z ∘ Z_of_N.
+Instance inject_bigD_Q: Coerce bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
 
-Lemma fastDtoQ_correct x : fastDtoQ x = 'mant x * 2 ^ (coerce fastZ Z (expo x)).
+Lemma inject_bigD_Q_correct x : coerce bigD Q x = 'mant x * 2 ^ (coerce bigZ Z (expo x)).
 Proof.
-  unfold fastDtoQ.
+  unfold coerce at 1, inject_bigD_Q.
   rewrite (DtoQ_correct _ _ (reflexivity x)).
   unfold DtoQ_slow.
-  now rewrite (preserves_int_pow_exp (f:=coerce fastZ Z)).
+  now rewrite (preserves_int_pow_exp (f:=coerce bigZ Z)).
 Qed.
 
 (* 
@@ -27,7 +25,7 @@ Qed.
   in math-classes yet. Moreover, BigZ.shiftl behaves as shiftr on its negative domain,
   which is quite convenient here.
 *)
-Program Instance fastD_div: AppDiv fastD := λ x y k,
+Program Instance bigD_div: AppDiv bigD := λ x y k,
   BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) $ ('k - 1).
 
 Lemma Qdiv_bounded_Zdiv (x y : Z) :
@@ -66,7 +64,7 @@ Proof.
   now apply Qdiv_bounded_Zdiv.
 Qed.
 
-Lemma fastD_div_correct (x y : fastD) (k : Z) : Qball (2 ^ k) ('app_div x y k) ('x / 'y).
+Lemma bigD_div_correct (x y : bigD) (k : Z) : Qball (2 ^ k) ('app_div x y k) ('x / 'y).
 Proof.
   assert (∀ xm xe ym ye : Z, 
       ('xm * 2 ^ xe : Q) / ('ym * 2 ^ ye : Q) = ('xm * 2 ^ (-(k - 1) + xe - ye)) / 'ym * 2 ^ (k - 1)) as E1.
@@ -144,72 +142,72 @@ Proof.
    apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
    apply semirings.preserves_ge_1.
    now apply integers.lt_iff_plus_1_le in E3.
-  unfold coerce. rewrite 3!fastDtoQ_correct.
-  destruct x as [xm xe], y as [ym ye].
-  unfold fastZtoQ, coerce, "∘". simpl. unfold coerce. BigZ.zify.
+  unfold coerce. rewrite 3!inject_bigD_Q_correct.
+  destruct x as [xm xe], y as [ym ye]. simpl.
+  unfold coerce, inject_bigZ_Q, coerce, "∘". simpl. BigZ.zify.
   apply in_Qball. split. apply Pleft. apply Pright.
 Qed.
 
-Instance QtofastD: AppInverse fastDtoQ := λ x ε, 
+Instance inverse_Q_bigD: AppInverse inject_bigD_Q := λ x ε, 
   app_div ('Qnum x) ('(Qden x : Z)) (Qdlog2 ε).
 
-Instance fastD_approx : AppApprox fastD := λ x k,
+Instance bigD_approx : AppApprox bigD := λ x k,
   BigZ.shiftl (mant x) (-('k - 1) + expo x) $ ('k - 1).
 
-Lemma fastD_approx_correct (x y : fastD) (k : Z) : Qball (2 ^ k) ('app_approx x k) ('x).
+Lemma bigD_approx_correct (x : bigD) (k : Z) : Qball (2 ^ k) ('app_approx x k) ('x).
 Proof.
   setoid_replace (app_approx x k) with (app_div x 1 k).
    setoid_replace ('x : Q) with ('x / '1 : Q).
-    now apply fastD_div_correct.
+    now apply bigD_div_correct.
    rewrite rings.preserves_1, dec_fields.dec_mult_inv_1.
    now rewrite rings.mult_1_r.
-  unfold app_div, fastD_div.
+  unfold app_div, bigD_div.
   simpl. rewrite BigZ.div_1_r.
   setoid_replace (-('k - 1) + expo x - 0) with (-('k - 1) + expo x); [reflexivity |].
   now rewrite rings.opp_0, rings.plus_0_r.
 Qed.
 
-Instance: DenseEmbedding fastDtoQ.
+Instance: DenseEmbedding inject_bigD_Q.
 Proof.
   split; try apply _.
   intros [n d] ε.
-  unfold app_inverse, QtofastD.
+  unfold app_inverse, inverse_Q_bigD.
   apply ball_weak_le with (2 ^ Qdlog2 ε)%Qpos.
    now apply (Qpos_dlog2_spec ε).
   simpl. rewrite Qmake_Qdiv.
-  rewrite 2!(integers.to_ring_unique_alt inject_Z (fastDtoQ ∘ dy_inject ∘ BigZ.of_Z)).
-  apply fastD_div_correct.
+  rewrite 2!(integers.to_ring_unique_alt inject_Z (inject_bigD_Q ∘ dy_inject ∘ BigZ.of_Z)).
+  apply bigD_div_correct.
 Qed.
 
-Instance fastD_Zshiftl: ShiftL fastD Z := λ x n, x ≪ 'n.
+Instance bigD_Zshiftl: ShiftL bigD Z := λ x n, x ≪ 'n.
 
-Instance: Proper ((=) ==> (=) ==> (=)) fastD_Zshiftl.
-Proof. unfold fastD_Zshiftl. solve_proper. Qed.
+Instance: Proper ((=) ==> (=) ==> (=)) bigD_Zshiftl.
+Proof. unfold bigD_Zshiftl. solve_proper. Qed.
 
-Instance: ShiftLSpec fastD Z fastD_Zshiftl.
+Instance: ShiftLSpec bigD Z bigD_Zshiftl.
 Proof.
-  split; try apply _; unfold shiftl, fastD_Zshiftl.
+  split; try apply _; unfold shiftl, bigD_Zshiftl.
    intros x. rewrite rings.preserves_0. now apply shiftl_0.
   intros x n. rewrite rings.preserves_plus. now apply shiftl_S.
 Qed.
 
 (* 
   This function is more or less a copy of dy_pow, but uses [N] instead of [BigZ⁺] for the exponent. 
-  An alternative definition would have been fastD_Npow x n = dy_pow x (N_to_BigZ_NonNeg n).
+  An alternative definition would have been bigD_Npow x n = dy_pow x (N_to_BigZ_NonNeg n).
   However, then the exponent would be translated from [N] into [BigZ] and back again, due to the 
   definition of [BigZ.pow]. 
 *) 
-Instance fastD_Npow: Pow fastD N := λ x n, (mant x) ^ n $ 'n * expo x.
+Instance bigD_Npow: Pow bigD N := λ x n, (mant x) ^ n $ 'n * expo x.
 
-Instance: NatPowSpec fastD N fastD_Npow.
+Instance: NatPowSpec bigD N bigD_Npow.
 Proof.
-  split; unfold "^", fastD_Npow, equiv, dy_equiv, DtoQ_slow.
+  split; unfold "^", bigD_Npow, equiv, dy_equiv, DtoQ_slow.
     intros [xm xe] [ym ye] E1 e1 e2 E2. simpl in *.
     rewrite E2. clear e1 E2.
-    rewrite 2!(preserves_nat_pow (f:=integers_to_ring fastZ Q)).
-    rewrite 2!(commutativity ('e2 : fastZ)).
+    rewrite 2!(preserves_nat_pow (f:=integers.integers_to_ring bigZ Q)).
+    rewrite 2!(commutativity ('e2 : bigZ)).
     rewrite 2!int_pow_exp_mult.
-    rewrite 2!(int_pow_nat_pow (f:=coerce N fastZ)).
+    rewrite 2!(int_pow_nat_pow (f:=coerce N bigZ)).
     rewrite <-2!nat_pow_base_mult.
     now rewrite E1.
    intros [xm xe]. simpl.
@@ -221,12 +219,12 @@ Proof.
   now rewrite distribute_r, left_identity.
 Qed.
 
-Instance: AppRationals fastD.
+Instance: AppRationals bigD.
 Proof.
   split; try apply _; intros.
     split; apply _.
-   now apply fastD_div_correct.
-  now apply fastD_approx_correct.
+   now apply bigD_div_correct.
+  now apply bigD_approx_correct.
 Qed.
 
-Notation fastAR := (AR (AQ:=fastD)).
+Notation ARbigD := (AR (AQ:=bigD)).

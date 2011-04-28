@@ -1,24 +1,24 @@
-Require Import ARDyadics CRArith ARexp ARpi ARarctan.
+Require Import ARbigD CRArith ARexp ARpi ARarctan.
 Require Import CRArith Compress CRexp CRpi CRarctan.
 
 Definition eval (n:positive) (r : CR) : Q :=
  let m := iter_pos n _ (Pmult 10) 1%positive in approximate r (1#m)%Qpos.
 
-Definition deval (n:positive) (r : fastAR) : fastD :=
+Definition deval (n:positive) (r : ARbigD) : bigD :=
  let m := iter_pos n _ (Pmult 10) 1%positive in approximate r (1#m)%Qpos.
 
-Let ARtest1 : fastAR := ARpi.
+Let ARtest1 : ARbigD := ARpi.
 Let CRtest1 : CR := CRpi.
 
-Let ARtest2 : fastAR := ARexp (ARcompress (ARexp (ARcompress (AQexp (1 ≪ (-1)))))).
+Let ARtest2 : ARbigD := ARexp (ARcompress (ARexp (ARcompress (AQexp (1 ≪ (-1)))))).
 Let CRtest2 : CR := exp (compress (exp (compress (rational_exp (1#2))))).
 
-Let ARtest3 : fastAR := ARexp (ARcompress ARpi) - ARpi.
+Let ARtest3 : ARbigD := ARexp (ARcompress ARpi) - ARpi.
 Let CRtest3 : CR := exp (compress CRpi) - CRpi.
 
-Let ARtest4 : fastAR := ARarctan (ARcompress ARpi).
+Let ARtest4 : ARbigD := ARarctan (ARcompress ARpi).
 Let CRtest4 : CR := arctan (compress CRpi).
-
+(*
 Time Eval vm_compute in (deval 300 ARtest1).
 Time Eval vm_compute in (eval 300 CRtest1).
 Time Eval vm_compute in (deval 2000 ARtest1).
@@ -34,12 +34,12 @@ Time Eval vm_compute in (deval 425 ARtest3).
 Time Eval vm_compute in (deval 25 ARtest4).
 Time Eval vm_compute in (eval 25 CRtest4).
 Time Eval vm_compute in (deval 85 ARtest4).
-
+*)
 (* Finally, we compare our sqrt with an implementation not using type classes *)
 Require Import ARroot dyadics.
 
 Let n := Eval compute in (10 * 10 * 10 * 10)%nat.
-Let ARroot_test : nat -> fastD * fastD := AQsqrt_loop (a:=2).
+Let ARroot_test : nat -> bigD * bigD := AQsqrt_loop (a:=2).
 
 Time Eval vm_compute in (
   (fun _ _ _ _ _ _ _ _ _ _ => true)
@@ -56,8 +56,6 @@ Time Eval vm_compute in (
 
 Require Import BigZ.
 Open Scope bigZ_scope.
-
-Notation bigD := (Dyadic bigZ).
 
 Definition BigD_0 : bigD := (0 $ 0).
 Definition BigD_1 : bigD := (1 $ 0).
