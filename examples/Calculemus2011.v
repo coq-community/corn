@@ -1,5 +1,5 @@
-Require Import ARbigD CRArith ARexp ARpi ARarctan.
-Require Import CRArith Compress CRexp CRpi CRarctan.
+Require Import CRtrans Compress.
+Require Import ARtrans ARbigD.
 
 Definition eval (n:positive) (r : CR) : Q :=
  let m := iter_pos n _ (Pmult 10) 1%positive in approximate r (1#m)%Qpos.
@@ -18,14 +18,20 @@ Let CRtest3 : CR := exp (compress CRpi) - CRpi.
 
 Let ARtest4 : ARbigD := ARarctan (ARcompress ARpi).
 Let CRtest4 : CR := arctan (compress CRpi).
-(*
+
+Let ARtest5 : ARbigD := ARcos ('(10^50)%Z).
+Let CRtest5 : CR := cos ('inject_Z (10^50)%Z).
+
+Let ARtest6 : ARbigD := ARsin (ARcompress (ARsin (ARcompress (AQsin 1)))).
+Let CRtest6 : CR := sin (compress (sin (compress (rational_sin (1#1))))).
+
 Time Eval vm_compute in (deval 300 ARtest1).
 Time Eval vm_compute in (eval 300 CRtest1).
-Time Eval vm_compute in (deval 2000 ARtest1).
+Time Eval vm_compute in (deval 2100 ARtest1).
 
 Time Eval vm_compute in (deval 25 ARtest2).
 Time Eval vm_compute in (eval 25 CRtest2).
-Time Eval vm_compute in (deval 450 ARtest2).
+Time Eval vm_compute in (deval 425 ARtest2).
 
 Time Eval vm_compute in (deval 25 ARtest3).
 Time Eval vm_compute in (eval 25 CRtest3).
@@ -34,7 +40,15 @@ Time Eval vm_compute in (deval 425 ARtest3).
 Time Eval vm_compute in (deval 25 ARtest4).
 Time Eval vm_compute in (eval 25 CRtest4).
 Time Eval vm_compute in (deval 85 ARtest4).
-*)
+
+Time Eval vm_compute in (deval 40 ARtest5).
+Time Eval vm_compute in (eval 40 CRtest5).
+Time Eval vm_compute in (deval 3000 ARtest5).
+
+Time Eval vm_compute in (deval 25 ARtest6).
+Time Eval vm_compute in (eval 25 CRtest6).
+Time Eval vm_compute in (deval 425 ARtest6).
+
 (* Finally, we compare our sqrt with an implementation not using type classes *)
 Require Import ARroot dyadics.
 

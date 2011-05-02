@@ -28,7 +28,7 @@ Definition P07 : ARbigQ := AQexp ('1000%Z).
 Time Eval vm_compute in (answer 500 P07).
 
 Definition P08 : ARbigQ := AQcos ('(10^50)%Z).
-Time Eval vm_compute in (answer 350 P08).
+Time Eval vm_compute in (answer 750 P08).
 
 Definition C02_prf : ARapartT (ARpi : ARbigQ) (0 : ARbigQ).
 Proof. AR_solve_apartT (-8)%Z. Defined.
