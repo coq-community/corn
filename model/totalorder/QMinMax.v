@@ -180,13 +180,9 @@ Definition Qmin_max_disassoc : forall x y z : Q, Qmin (Qmax x y) z <= Qmax x (Qm
  @meet_join_disassoc Qto.
 
 Lemma Qplus_monotone_r : forall a, Qmonotone (Qplus a).
-Proof.
- firstorder using Qle_refl Qplus_le_compat .
-Qed.
+Proof. do 2 red. intros. now apply Qplus_le_r. Qed.
 Lemma Qplus_monotone_l : forall a, Qmonotone (fun x => Qplus x a).
-Proof.
- firstorder using Qle_refl Qplus_le_compat.
-Qed.
+Proof. do 2 red. intros. now apply Qplus_le_l. Qed.
 Definition Qmin_plus_distr_r : forall x y z : Q, x + Qmin y z == Qmin (x+y) (x+z)  :=
  fun a => @monotone_meet_distr Qto _ (Qplus_monotone_r a).
 Definition Qmin_plus_distr_l : forall x y z : Q, Qmin y z + x == Qmin (y+x) (z+x) :=
