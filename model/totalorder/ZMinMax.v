@@ -165,7 +165,7 @@ Proof.
  intros x y H.
  rewrite (Zsucc_pred x) in H.
  rewrite (Zsucc_pred y) in H.
- firstorder using Zsucc_monotone.
+  auto with zarith. 
 Qed.
 Definition Zpred_min_distr : forall x y : Z,
  Zpred (Zmin x y) = Zmin (Zpred x ) (Zpred y) :=
@@ -176,7 +176,7 @@ Definition Zpred_max_distr : forall x y : Z,
 
 Lemma Zplus_monotone_r : forall a, Zmonotone (Zplus a).
 Proof.
- firstorder using Zle_refl Zplus_le_compat .
+ do 2 red. auto with zarith.
 Qed.
 Lemma Zplus_monotone_l : forall a, Zmonotone (fun x => Zplus x a).
 Proof.
