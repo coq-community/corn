@@ -39,7 +39,7 @@ Definition CR := Complete Q_as_MetricSpace.
 Delimit Scope CR_scope with CR.
 Bind Scope CR_scope with CR.
 
-Instance inject_Q_CR: Coerce Q CR := (@Cunit Q_as_MetricSpace).
+Instance inject_Q_CR: Cast Q CR := (@Cunit Q_as_MetricSpace).
 
 (* begin hide *)
 Instance inject_Q_CR_wd: Proper ((=) ==> (=)) inject_Q_CR.

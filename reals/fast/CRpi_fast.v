@@ -167,7 +167,8 @@ Proof.
  apply inj_Q_mult.
 Qed.
 
-Definition ArcTan_multiple : forall x, -(1) <= x <= 1 -> forall n, {True} + {(nring n)[*]ArcTan (inj_Q _ x)[=]ArcTan (inj_Q _ (iter_nat n _ (f x) 0))}.
+Definition ArcTan_multiple : forall x, -(1) <= x <= 1 -> forall n,
+  sumbool True ((nring n)[*]ArcTan (inj_Q _ x)[=]ArcTan (inj_Q _ (iter_nat n _ (f x) 0))).
 Proof.
  intros x Hx.
  induction n.

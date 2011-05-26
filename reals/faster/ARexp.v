@@ -95,7 +95,7 @@ Proof.
   case (decide_rel (≤)); intros E1.
    easy.
   apply orders.le_flip in E1.
-  apply (order_preserving_back (coerce AQ Q)).
+  apply (order_preserving_back (cast AQ Q)).
   rewrite rings.preserves_opp.
   rewrite preserves_nat_pow.
   rewrite rings.preserves_2.
@@ -144,20 +144,20 @@ Program Definition AQexp_inv_pos_bound : AQ₊ := ((1 ≪ (-2)) ^ Zabs_N (Qfloor
 Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
-  '(coerce (AQ₊) Q AQexp_inv_pos_bound) ≤ rational_exp ('a). 
+  '(cast (AQ₊) Q AQexp_inv_pos_bound) ≤ rational_exp ('a). 
 Proof.
-  change (coerce Q CR (coerce AQ Q ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))) ≤ rational_exp ('a)).
+  change (cast Q CR (cast AQ Q ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))) ≤ rational_exp ('a)).
   rewrite preserves_nat_pow.
   rewrite aq_shift_opp_2.
   rewrite rings.preserves_1, rings.mult_1_l.
-  rewrite <-(int_pow_nat_pow (f:=coerce N Z)).
+  rewrite <-(int_pow_nat_pow (f:=cast N Z)).
   rewrite Z_of_N_abs, Z.abs_neq.
    apply (rational_exp_lower_bound (1#4)).
     now apply semirings.preserves_nonpos.
    apply CRpos_nonNeg.
    now CRsign.CR_solve_pos (1#1)%Qpos.
   change (Qfloor ('a) ≤ 0).
-  apply (order_preserving_back (coerce Z Q)).
+  apply (order_preserving_back (cast Z Q)).
   transitivity ('a : Q).
    now apply Qfloor_le.
   now apply semirings.preserves_nonpos.
@@ -185,7 +185,7 @@ Proof.
    rewrite rings.preserves_opp.
    apply rational_exp_opp.
     now apply semirings.preserves_nonneg.
-   posed_rewrite <-(rings.preserves_opp (f:=coerce AQ Q)).
+   posed_rewrite <-(rings.preserves_opp (f:=cast AQ Q)).
    apply: (AQexp_inv_pos_bound_correct (a:=-a)).
    now apply rings.flip_nonneg_opp.
   apply AQexp_neg_correct.
@@ -193,7 +193,7 @@ Qed.
 
 Local Obligation Tactic := idtac.
 Program Definition ARexp_bounded_uc (z : Z) := unary_complete_uc 
-  QPrelengthSpace (coerce AQ Q_as_MetricSpace) (λ x, AQexp (min ('z) x)) (exp_bound_uc z) _.
+  QPrelengthSpace (cast AQ Q_as_MetricSpace) (λ x, AQexp (min ('z) x)) (exp_bound_uc z) _.
 Next Obligation. 
   intros. 
   change ('AQexp (min (' z) x) = exp_bound_uc z (' x)).

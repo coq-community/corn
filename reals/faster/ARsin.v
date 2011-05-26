@@ -29,9 +29,9 @@ Proof.
   rewrite associativity.
   apply sg_op_proper.
    rewrite 2!preserves_powers_help.
-   rewrite 3!(Str_nth_powers_help_int_pow _ (coerce nat Z)).
-   rewrite 2!(preserves_nat_pow (f:=coerce AQ Q)).
-   rewrite <-2!(int_pow_nat_pow (f:=coerce N Z)).
+   rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
+   rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
+   rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_mult_inv.
@@ -91,7 +91,7 @@ Proof.
   now rewrite <-(associativity 4 ('x) ('x : Q)).
 Qed.
 
-Program Definition AQsin_poly_uc := unary_uc (coerce AQ Q_as_MetricSpace)
+Program Definition AQsin_poly_uc := unary_uc (cast AQ Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) sin_poly_uc _.
 Next Obligation.
   rewrite AQsin_poly_fun_correct.
@@ -148,10 +148,10 @@ Lemma AQsin_pos_bound_correct : 0 ≤ a ≤ 3 ^ AQsin_pos_bound.
 Proof.
   split; [assumption |].
   unfold AQsin_pos_bound.
-  apply (order_preserving_back (coerce AQ Q)).
+  apply (order_preserving_back (cast AQ Q)).
   rewrite preserves_nat_pow.
   rewrite rings.preserves_3.
-  rewrite <-(int_pow_nat_pow (f:=coerce nat Z)).
+  rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
   destruct (total (≤) ('a : Q) 1).
    rewrite Qdlog2_le1; simpl; try easy.
    now transitivity (1:Q).
@@ -207,7 +207,7 @@ Qed.
 
 Local Obligation Tactic := idtac.
 Program Definition ARsin_uc := unary_complete_uc 
-  QPrelengthSpace (coerce AQ Q_as_MetricSpace) AQsin sin_uc _.
+  QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsin sin_uc _.
 Next Obligation. intros. apply AQsin_correct. Qed.
 
 Definition ARsin := Cbind AQPrelengthSpace ARsin_uc.

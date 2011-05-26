@@ -303,7 +303,7 @@ Instance: NatPowSpec CR N _.
 Proof.
   split; unfold pow. 
     apply _.
-   intros x. change (coerce Q CR 1 = CR1). now apply rings.preserves_1.
+   intros x. change (cast Q CR 1 = CR1). now apply rings.preserves_1.
   intros x n.
   rewrite <-(CRasIRasCR_id x).
   rewrite <-?CRpower_N_correct.

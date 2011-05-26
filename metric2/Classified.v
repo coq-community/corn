@@ -498,7 +498,7 @@ End sig_metricspace.
 Instance Qpos_mspc_ball: MetricSpaceBall Qpos := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
 Instance Qpos_mspc: MetricSpaceClass Qpos := @sig_mspc Q_as_MetricSpace _ _ _ (Qlt 0).
 
-Instance: Coerce QnnInf.T Qinf :=
+Instance: Cast QnnInf.T Qinf :=
   λ x, match x with
     | QnnInf.Infinite => Qinf.infinite
     | QnnInf.Finite q => Qinf.finite q

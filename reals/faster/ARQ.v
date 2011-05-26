@@ -23,7 +23,7 @@ Qed.
 
 Instance Q_approx_div: AppDiv Q := λ x y k, app_approx (x / y) k.
 
-Instance inject_Q_Q: Coerce Q Q_as_MetricSpace := Datatypes.id.
+Instance inject_Q_Q: Cast Q Q_as_MetricSpace := Datatypes.id.
 Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 ε).
 
 Instance: AppRationals Q.

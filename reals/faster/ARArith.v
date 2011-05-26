@@ -18,14 +18,14 @@ Add Ring Z : (rings.stdlib_ring_theory Z).
 Open Local Scope uc_scope. 
 Local Opaque regFunEq.
 
-Hint Rewrite (rings.preserves_0 (f:=coerce AQ Q)) : aq_preservation.
-Hint Rewrite (rings.preserves_1 (f:=coerce AQ Q)) : aq_preservation.
-Hint Rewrite (rings.preserves_plus (f:=coerce AQ Q)) : aq_preservation.
-Hint Rewrite (rings.preserves_mult (f:=coerce AQ Q)) : aq_preservation.
-Hint Rewrite (rings.preserves_opp (f:=coerce AQ Q)) : aq_preservation.
+Hint Rewrite (rings.preserves_0 (f:=cast AQ Q)) : aq_preservation.
+Hint Rewrite (rings.preserves_1 (f:=cast AQ Q)) : aq_preservation.
+Hint Rewrite (rings.preserves_plus (f:=cast AQ Q)) : aq_preservation.
+Hint Rewrite (rings.preserves_mult (f:=cast AQ Q)) : aq_preservation.
+Hint Rewrite (rings.preserves_opp (f:=cast AQ Q)) : aq_preservation.
 Hint Rewrite aq_preserves_max : aq_preservation.
 Hint Rewrite aq_preserves_min : aq_preservation.
-Hint Rewrite (abs.preserves_abs (f:=coerce AQ Q)): aq_preservation.
+Hint Rewrite (abs.preserves_abs (f:=cast AQ Q)): aq_preservation.
 Ltac aq_preservation := autorewrite with aq_preservation; try reflexivity.
 Local Obligation Tactic := program_simpl; aq_preservation.
 
@@ -65,25 +65,25 @@ Proof.
 Qed.
 
 (* Constants *)
-Global Instance inject_PosAQ_AR: Coerce (AQ₊) AR := (coerce AQ AR ∘ coerce (AQ₊) AQ)%prg.
-Global Instance inject_Z_AR: Coerce Z AR := (coerce AQ AR ∘ coerce Z AQ)%prg.
+Global Instance inject_PosAQ_AR: Cast (AQ₊) AR := (cast AQ AR ∘ cast (AQ₊) AQ)%prg.
+Global Instance inject_Z_AR: Cast Z AR := (cast AQ AR ∘ cast Z AQ)%prg.
 
-Lemma ARtoCR_inject (x : AQ) : coerce AR CR (coerce AQ AR x) = coerce Q CR (coerce AQ Q x).
+Lemma ARtoCR_inject (x : AQ) : cast AR CR (cast AQ AR x) = cast Q CR (cast AQ Q x).
 Proof. apply: regFunEq_e. intros ε. apply ball_refl. Qed.
 
-Global Instance AR0: RingZero AR := coerce AQ AR 0.
-Lemma ARtoCR_preserves_0 : coerce AR CR 0 = 0.
+Global Instance AR0: RingZero AR := cast AQ AR 0.
+Lemma ARtoCR_preserves_0 : cast AR CR 0 = 0.
 Proof. unfold "0", AR0. rewrite ARtoCR_inject. aq_preservation. Qed.
 Hint Rewrite ARtoCR_preserves_0 : ARtoCR.
 
-Global Instance AR1: RingOne AR := coerce AQ AR 1.
-Lemma ARtoCR_preserves_1 : coerce AR CR 1 = 1.
+Global Instance AR1: RingOne AR := cast AQ AR 1.
+Lemma ARtoCR_preserves_1 : cast AR CR 1 = 1.
 Proof. unfold "1", AR1. rewrite ARtoCR_inject. aq_preservation. Qed.
 Hint Rewrite ARtoCR_preserves_1 : ARtoCR.
 
 (* Plus *)
 Program Definition AQtranslate_uc (x : AQ_as_MetricSpace) := unary_uc 
-  (coerce AQ Q_as_MetricSpace)
+  (cast AQ Q_as_MetricSpace)
   ((x +) : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qtranslate_uc ('x)) _.
 Definition ARtranslate (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQtranslate_uc x).
 
@@ -92,29 +92,29 @@ Proof. apply preserves_unary_fun. Qed.
 Hint Rewrite ARtoCR_preserves_translate : ARtoCR.
 
 Program Definition AQplus_uc := binary_uc
-  (coerce AQ Q_as_MetricSpace) 
+  (cast AQ Q_as_MetricSpace) 
   ((+) : AQ_as_MetricSpace →  AQ_as_MetricSpace → AQ_as_MetricSpace) Qplus_uc _.
 
 Definition ARplus_uc : AR --> AR --> AR := Cmap2 AQPrelengthSpace AQPrelengthSpace AQplus_uc.
 Global Instance ARplus: RingPlus AR := ucFun2 ARplus_uc.
 
-Lemma ARtoCR_preserves_plus x y : coerce AR CR (x + y) = 'x + 'y.
+Lemma ARtoCR_preserves_plus x y : cast AR CR (x + y) = 'x + 'y.
 Proof. apply preserves_binary_fun. Qed.
 Hint Rewrite ARtoCR_preserves_plus : ARtoCR.
 
 (* Inverse *)
-Program Definition AQopp_uc := unary_uc (coerce AQ Q_as_MetricSpace)  ((-) : AQ → AQ) Qopp_uc _.
+Program Definition AQopp_uc := unary_uc (cast AQ Q_as_MetricSpace)  ((-) : AQ → AQ) Qopp_uc _.
 Definition ARopp_uc : AR --> AR := Cmap AQPrelengthSpace AQopp_uc.
 Global Instance ARopp: GroupInv AR := ARopp_uc.
 
-Lemma ARtoCR_preserves_opp x : coerce AR CR (-x) = -'x.
+Lemma ARtoCR_preserves_opp x : cast AR CR (-x) = -'x.
 Proof. apply preserves_unary_fun. Qed.
 Hint Rewrite ARtoCR_preserves_opp : ARtoCR.
 
 (* Mult *) 
 Program Definition AQboundBelow_uc (x : AQ_as_MetricSpace) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := 
-  unary_uc (coerce AQ Q_as_MetricSpace)
+  unary_uc (cast AQ Q_as_MetricSpace)
   (max x  : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc ('x)) _.
 
 Definition ARboundBelow (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundBelow_uc x).
@@ -125,7 +125,7 @@ Hint Rewrite ARtoCR_preserves_boundBelow : ARtoCR.
 
 Program Definition AQboundAbove_uc (x : AQ_as_MetricSpace) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
-  (coerce AQ Q_as_MetricSpace)
+  (cast AQ Q_as_MetricSpace)
   (min x : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc ('x)) _.
 
 Definition ARboundAbove (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbove_uc x).
@@ -136,7 +136,7 @@ Hint Rewrite ARtoCR_preserves_boundAbove : ARtoCR.
 
 Program Definition AQboundAbs_uc (c : AQ₊) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
-  (coerce AQ Q_as_MetricSpace) 
+  (cast AQ Q_as_MetricSpace) 
   (λ x : AQ_as_MetricSpace, max (-'c) (min ('c) x) : AQ_as_MetricSpace) (QboundAbs ('c)) _.
 
 Definition ARboundAbs (c : AQ₊) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbs_uc c).
@@ -147,7 +147,7 @@ Hint Rewrite ARtoCR_preserves_bound_abs : ARtoCR.
 
 Program Definition AQscale_uc (x : AQ_as_MetricSpace) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
-  (coerce AQ Q_as_MetricSpace)
+  (cast AQ Q_as_MetricSpace)
   ((x *.)  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qscale_uc ('x)) _.
 
 Definition ARscale (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQscale_uc x).
@@ -158,7 +158,7 @@ Hint Rewrite ARtoCR_preserves_scale : ARtoCR.
 
 Program Definition AQmult_uc (c : AQ₊) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace --> AQ_as_MetricSpace := binary_uc 
-  (coerce AQ Q_as_MetricSpace)
+  (cast AQ Q_as_MetricSpace)
   (λ x y : AQ_as_MetricSpace, x * AQboundAbs_uc c y : AQ_as_MetricSpace) (Qmult_uc ('c)) _.
 
 Definition ARmult_bounded (c : AQ₊) : AR --> AR --> AR 
@@ -173,19 +173,19 @@ Lemma ARtoCR_approximate (x : AR) (ε : Qpos) : '(approximate x ε) = approximat
 Proof. reflexivity. Qed.
 
 Lemma AR_b_correct (x : AR) :
-  coerce AQ Q (abs (approximate x (1#1)%Qpos) + 1) = Qabs (approximate (coerce AR CR x) (1#1)%Qpos) + (1#1)%Qpos.
+  cast AQ Q (abs (approximate x (1#1)%Qpos) + 1) = Qabs (approximate (cast AR CR x) (1#1)%Qpos) + (1#1)%Qpos.
 Proof. aq_preservation. Qed.
 
 Program Definition AR_b (x : AR) : AQ₊ := exist _ (abs (approximate x (1#1)%Qpos) + 1) _.
 Next Obligation.
-  apply (strictly_order_preserving_back (coerce AQ Q)). 
+  apply (strictly_order_preserving_back (cast AQ Q)). 
   rewrite AR_b_correct. aq_preservation.
   apply CR_b_pos.
 Qed.
 
 Global Instance ARmult: RingMult AR := λ x y, ARmult_bounded (AR_b y) x y.
 
-Lemma ARtoCR_preserves_mult x y : coerce AR CR (x * y) = 'x * 'y.
+Lemma ARtoCR_preserves_mult x y : cast AR CR (x * y) = 'x * 'y.
 Proof.
   unfold "*", ARmult at 1. rewrite ARtoCR_preserves_mult_bounded.
   setoid_replace ('AR_b y : Qpos) with (CR_b (1 # 1) ('y)). 
@@ -197,7 +197,7 @@ Qed.
 Lemma ARmult_scale (x : AQ) (y : AR) :
   'x * y = ARscale x y.
 Proof.
-  apply (injective (coerce AR CR)).
+  apply (injective (cast AR CR)).
   rewrite ARtoCR_preserves_mult, ARtoCR_preserves_scale, ARtoCR_inject.
   now apply CRmult_scale.
 Qed.
@@ -207,7 +207,7 @@ Hint Rewrite ARtoCR_preserves_mult : ARtoCR.
 (* The approximate reals form a ring *)
 Instance: Ring AR.
 Proof.
-  apply (rings.projected_ring (coerce AR CR)).
+  apply (rings.projected_ring (cast AR CR)).
       exact ARtoCR_preserves_plus.
      exact ARtoCR_preserves_0.
     exact ARtoCR_preserves_mult.
@@ -215,7 +215,7 @@ Proof.
   exact ARtoCR_preserves_opp.
 Qed.
 
-Instance: SemiRing_Morphism (coerce AR CR).
+Instance: SemiRing_Morphism (cast AR CR).
 Proof.
   repeat (split; try apply _).
      exact ARtoCR_preserves_plus.
@@ -224,10 +224,10 @@ Proof.
   exact ARtoCR_preserves_1.
 Qed.
 
-Instance: SemiRing_Morphism (coerce CR AR).
-Proof. change (SemiRing_Morphism (inverse (coerce AR CR))). split; apply _. Qed.
+Instance: SemiRing_Morphism (cast CR AR).
+Proof. change (SemiRing_Morphism (inverse (cast AR CR))). split; apply _. Qed.
 
-Instance: SemiRing_Morphism (coerce AQ AR).
+Instance: SemiRing_Morphism (cast AQ AR).
 Proof.
   repeat (split; try apply _); intros; try reflexivity.
    apply: regFunEq_e. intros ε. now apply ball_refl. 
@@ -238,7 +238,7 @@ Add Ring CR : (rings.stdlib_ring_theory CR).
 Add Ring AR : (rings.stdlib_ring_theory AR).
 
 (* Non strict order *) 
-Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, -coerce Qpos Q ε ≤ coerce AQ Q (approximate x ε).
+Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, -cast Qpos Q ε ≤ cast AQ Q (approximate x ε).
 
 Lemma ARtoCR_preserves_nonNeg x : ARnonNeg x ↔ CRnonNeg ('x).
 Proof. reflexivity. Qed. 
@@ -263,17 +263,17 @@ Proof.
 Qed.
 
 Instance: PartialOrder ARle.
-Proof maps.projected_partial_order (coerce AR CR).
+Proof maps.projected_partial_order (cast AR CR).
 
 (* Strict order in Type *)
-Global Instance: OrderEmbedding (coerce AQ AR).
+Global Instance: OrderEmbedding (cast AQ AR).
 Proof.
   repeat (split; try apply _); intros x y E.
-   apply (order_preserving_back (coerce AR CR)).
+   apply (order_preserving_back (cast AR CR)).
    rewrite 2!ARtoCR_inject.
    now do 2 apply (order_preserving _).
-  apply (order_preserving_back (coerce AQ Q)).
-  apply (order_preserving_back (coerce Q CR)).
+  apply (order_preserving_back (cast AQ Q)).
+  apply (order_preserving_back (cast Q CR)).
   rewrite <-2!ARtoCR_inject.
   now apply (order_preserving _).
 Qed.
@@ -292,7 +292,7 @@ Next Obligation.
    now apply (order_preserving (.* (δ:Q))).
   apply rings.flip_nonneg_minus.
   transitivity ('approximate x ((1#2) * 'ε)%Qpos - 'ε : Q).
-   apply (order_preserving (coerce AQ Q)) in Pε.
+   apply (order_preserving (cast AQ Q)) in Pε.
    now apply rings.flip_nonneg_minus.
   apply rings.flip_le_minus_l.
   transitivity (((1 # 2) * 'ε + (1 # 2) * δ) + 'approximate x ((1 # 2) * δ)%Qpos).
@@ -307,18 +307,18 @@ Qed.
 Lemma ARtoCR_preserves_pos x : ARpos x IFF CRpos ('x).
 Proof with auto with qarith.
   split; intros [y E].
-   exists (coerce (AQ₊) (Q₊) y).
-   change (coerce Q CR (coerce AQ Q (coerce (AQ₊) AQ y)) ≤ coerce AR CR x). 
+   exists (cast (AQ₊) (Q₊) y).
+   change (cast Q CR (cast AQ Q (cast (AQ₊) AQ y)) ≤ cast AR CR x). 
    rewrite <-ARtoCR_inject.
    now apply (order_preserving _).
   destruct (aq_lt_mid 0 y) as [z [Ez1 Ez2]]...
   assert (0 < z) as F. 
-   apply (strictly_order_preserving_back (coerce AQ Q)). now aq_preservation...
+   apply (strictly_order_preserving_back (cast AQ Q)). now aq_preservation...
   exists (exist _ z F). simpl.
-  change (coerce AQ AR (coerce (AQ₊) AQ (z ↾ F)) ≤ x).
-  apply (order_preserving_back (coerce AR CR)).
+  change (cast AQ AR (cast (AQ₊) AQ (z ↾ F)) ≤ x).
+  apply (order_preserving_back (cast AR CR)).
   rewrite ARtoCR_inject.
-  transitivity (coerce Q CR (coerce Qpos Q y)); trivial.
+  transitivity (cast Q CR (cast Qpos Q y)); trivial.
   apply CRArith.CRle_Qle...
 Defined.
 
@@ -357,7 +357,7 @@ Proof. split; (intros [|]; [left|right]; now apply ARtoCR_preserves_ltT). Define
 
 Lemma ARtoCR_preserves_apartT_0 x : ARapartT x 0 IFF CRapartT ('x) 0.
 Proof.
-  stepr (CRapartT ('x) (coerce AR CR 0)).
+  stepr (CRapartT ('x) (cast AR CR 0)).
    split; apply ARtoCR_preserves_apartT.
   split; apply CRapartT_wd; try rewrite ARtoCR_preserves_0; reflexivity.
 Defined.
@@ -412,7 +412,7 @@ Proof.
 Qed.
 
 Lemma AR_epsilon_sign_dec_pos_rev (x : AR) (k : Z) :
-  coerce AQ AR (1 ≪ (1 + k)) ≤ x → AR_epsilon_sign_dec k x ≡ Gt.
+  cast AQ AR (1 ≪ (1 + k)) ≤ x → AR_epsilon_sign_dec k x ≡ Gt.
 Proof.
   intros E.
   apply AR_epsilon_sign_dec_Gt.
@@ -422,13 +422,13 @@ Proof.
    rewrite (commutativity _ k), shiftl.shiftl_exp_plus, shiftl.shiftl_1. 
    rewrite rings.plus_mult_distr_r, rings.mult_1_l.
    rewrite rings.opp_distr, associativity, rings.plus_opp_r. ring.
-  apply (order_preserving_back (coerce AQ Q)).
+  apply (order_preserving_back (cast AQ Q)).
   rewrite rings.preserves_opp.
   exact (E ('Pos_shiftl (1 : AQ₊) k)).
 Qed.
 
 Global Instance ARlt: Lt AR := λ x y, 
-  ∃ n : nat, AR_epsilon_sign_dec (-1 - coerce nat Z n) (y - x) ≡ Gt.
+  ∃ n : nat, AR_epsilon_sign_dec (-1 - cast nat Z n) (y - x) ≡ Gt.
 
 Lemma AR_lt_ltT x y : x < y IFF ARltT x y.
 Proof.
@@ -436,14 +436,14 @@ Proof.
    intros E.
    apply ConstructiveEpsilon.constructive_indefinite_description_nat in E. 
     destruct E as [n En].
-    now apply AR_epsilon_sign_dec_pos with (-1 - coerce nat Z n).
+    now apply AR_epsilon_sign_dec_pos with (-1 - cast nat Z n).
    intros. now apply comparison_eq_dec.
   intros [ε Eε].
   exists (Z.nat_of_Z (-Qdlog2 ('ε))).
   apply AR_epsilon_sign_dec_pos_rev.
   transitivity ('ε : AR); [| assumption].
-  rapply (order_preserving (coerce AQ AR)).
-  apply (order_preserving_back (coerce AQ Q)).
+  rapply (order_preserving (cast AQ AR)).
+  apply (order_preserving_back (cast AQ Q)).
   rewrite aq_shift_correct, rings.preserves_1, rings.mult_1_l.
   destruct (decide (('ε : Q) ≤ 1)).
    rewrite Z.nat_of_Z_nonneg.
@@ -466,7 +466,7 @@ Instance: Proper ((=) ==> (=) ==> iff) ARlt.
 Proof. split; intro E; apply AR_lt_ltT; apply AR_lt_ltT in E; 
   eapply ARltT_wd; eauto; now symmetry. Qed.
 
-Global Instance: StrictOrderEmbedding (coerce AR CR).
+Global Instance: StrictOrderEmbedding (cast AR CR).
 Proof.
   repeat (split; try apply _); intros x y E.
    now apply CR_lt_ltT, ARtoCR_preserves_ltT, AR_lt_ltT.
@@ -480,14 +480,14 @@ Lemma AR_apart_apartT x y : x ⪥ y IFF ARapartT x y.
 Proof.
   split.
    intros E.
-   set (f (n : nat) := AR_epsilon_sign_dec (-1 - coerce nat Z n)).
+   set (f (n : nat) := AR_epsilon_sign_dec (-1 - cast nat Z n)).
    assert (∃ n, f n (y - x) ≡ Gt ∨ f n (x - y) ≡ Gt) as E2.
     now destruct E as [[n En] | [n En]]; exists n; [left | right].
    apply ConstructiveEpsilon.constructive_indefinite_description_nat in E2.
     destruct E2 as [n E2].
     destruct (comparison_eq_dec (f n (y - x)) Gt) as [En|En].
-     left. now apply AR_epsilon_sign_dec_pos with (-1 - coerce nat Z n). 
-    right. apply AR_epsilon_sign_dec_pos with (-1 - coerce nat Z n).
+     left. now apply AR_epsilon_sign_dec_pos with (-1 - cast nat Z n). 
+    right. apply AR_epsilon_sign_dec_pos with (-1 - cast nat Z n).
     destruct E2; tauto.
    intros n. 
    destruct (comparison_eq_dec (f n (y - x)) Gt); auto.
@@ -497,49 +497,49 @@ Proof.
   right. now apply AR_lt_ltT.
 Qed.
 
-Let ARtoCR_preserves_apart x y : x ⪥ y ↔ coerce AR CR x ⪥ coerce AR CR y.
+Let ARtoCR_preserves_apart x y : x ⪥ y ↔ cast AR CR x ⪥ cast AR CR y.
 Proof.
   split.
-   intros [|]; [left | right]; now apply (strictly_order_preserving (coerce AR CR)).
-  intros [|]; [left | right]; now apply (strictly_order_preserving_back (coerce AR CR)).
+   intros [|]; [left | right]; now apply (strictly_order_preserving (cast AR CR)).
+  intros [|]; [left | right]; now apply (strictly_order_preserving_back (cast AR CR)).
 Qed.
 
 Instance: StrongSetoid AR.
 Proof.
-  apply (strong_setoids.projected_strong_setoid (coerce AR CR)).
-   split; intros E; [now rewrite E | now apply (injective (coerce AR CR))].
+  apply (strong_setoids.projected_strong_setoid (cast AR CR)).
+   split; intros E; [now rewrite E | now apply (injective (cast AR CR))].
   now apply ARtoCR_preserves_apart.
 Qed.
 
-Instance: StrongSetoid_Morphism (coerce AR CR).
+Instance: StrongSetoid_Morphism (cast AR CR).
 Proof. split; try apply _; now apply ARtoCR_preserves_apart. Qed.
 
-Global Instance: StrongInjective (coerce AR CR).
+Global Instance: StrongInjective (cast AR CR).
 Proof. split; try apply _; now apply ARtoCR_preserves_apart. Qed.
 
-Global Instance: StrongSemiRing_Morphism (coerce AR CR).
+Global Instance: StrongSemiRing_Morphism (cast AR CR).
 Proof. split; try apply _. Qed.
 
-Global Instance: StrongSemiRing_Morphism (coerce AQ AR).
+Global Instance: StrongSemiRing_Morphism (cast AQ AR).
 Proof.
   repeat (split; try apply _). intros.
-  apply (strong_extensionality (coerce AQ Q)).
-  apply (strong_extensionality (coerce Q CR)).
+  apply (strong_extensionality (cast AQ Q)).
+  apply (strong_extensionality (cast Q CR)).
   rewrite <-2!ARtoCR_inject.
   now apply (strong_injective _).
 Qed.
 
-Global Instance: StrongInjective (coerce AQ AR).
+Global Instance: StrongInjective (cast AQ AR).
 Proof.
   repeat (split; try apply _). intros.
-  apply (strong_extensionality (coerce AR CR)).
+  apply (strong_extensionality (cast AR CR)).
   rewrite 2!ARtoCR_inject.
   apply (strong_injective _).
   now apply (strong_injective _).
 Qed.
 
 Global Instance: FullPseudoSemiRingOrder ARle ARlt.
-Proof rings.projected_full_pseudo_ring_order (coerce AR CR).
+Proof rings.projected_full_pseudo_ring_order (cast AR CR).
 
 (* Division *)
 Lemma aq_mult_inv_regular_prf (x : AQ) : 
@@ -607,7 +607,7 @@ Proof with auto with qarith; try reflexivity.
   unfold ARinvT.
   destruct x_ as [Ec | Ec].
    assert (CRltT ('x) 0) as Px.
-    apply CRltT_wd with ('x) (coerce AR CR 0).
+    apply CRltT_wd with ('x) (cast AR CR 0).
       reflexivity.
      now apply rings.preserves_0.
     now apply ARtoCR_preserves_ltT.
@@ -617,14 +617,14 @@ Proof with auto with qarith; try reflexivity.
    autorewrite with ARtoCR.
    destruct (Qlt_le_dec d ('c : Qpos)).
     rewrite (CRinv_pos_weaken d ('c))...
-    change (coerce Q CR (coerce AQ Q (coerce (AQ₊) AQ c)) ≤ -coerce AR CR x).
+    change (cast Q CR (cast AQ Q (cast (AQ₊) AQ c)) ≤ -cast AR CR x).
     rewrite <-ARtoCR_inject, <-rings.preserves_opp.
     apply (order_preserving _).
     rewrite <-(rings.plus_0_l (-x))...
    rewrite (CRinv_pos_weaken ('c) d)...
-   rewrite <-(rings.plus_0_l (-coerce AR CR x))...
+   rewrite <-(rings.plus_0_l (-cast AR CR x))...
   assert (CRltT 0 ('x)) as Px.
-   apply CRltT_wd with (coerce AR CR 0) ('x).
+   apply CRltT_wd with (cast AR CR 0) ('x).
      now apply rings.preserves_0.
     reflexivity.
    now apply ARtoCR_preserves_ltT.
@@ -634,12 +634,12 @@ Proof with auto with qarith; try reflexivity.
   autorewrite with ARtoCR.
   destruct (Qlt_le_dec d ('c : Qpos)).
    rewrite (CRinv_pos_weaken d ('c))...
-   change (coerce Q CR (coerce AQ Q (coerce (AQ₊) AQ c)) ≤ coerce AR CR x).
+   change (cast Q CR (cast AQ Q (cast (AQ₊) AQ c)) ≤ cast AR CR x).
    rewrite <-ARtoCR_inject. 
    apply (order_preserving _).
    setoid_replace x with (x - 0) by ring...
   rewrite (CRinv_pos_weaken ('c) d)...
-  rewrite <-(rings.plus_0_r (coerce AR CR x))...
+  rewrite <-(rings.plus_0_r (cast AR CR x))...
 Qed.
 
 Lemma ARtoCR_preserves_invT_l x x_ : {x__ | 'ARinvT x x_ = CRinvT ('x) x__}.
@@ -656,7 +656,7 @@ Qed.
 
 Lemma AR_inverseT (x : AR) x_ : x * ARinvT x x_ = 1.
 Proof.
-  apply (injective (coerce AR CR)).
+  apply (injective (cast AR CR)).
   rewrite rings.preserves_mult, rings.preserves_1.
   destruct (ARtoCR_preserves_invT_l x x_) as [x__ E]. rewrite E.
   apply: field_mult_inv.
@@ -665,7 +665,7 @@ Qed.
 Lemma ARinvT_wd x y x_ y_ : x = y → ARinvT x x_ = ARinvT y y_.
 Proof.
   intros E.
-  apply (injective (coerce AR CR)). 
+  apply (injective (cast AR CR)). 
   destruct (ARtoCR_preserves_invT_l x x_) as [x__ Ex], 
     (ARtoCR_preserves_invT_l y y_) as [y__ Ey].
   rewrite Ex, Ey. 
@@ -682,7 +682,7 @@ Next Obligation. apply AR_apart_apartT. now destruct x. Qed.
 Global Instance: Field AR.
 Proof.
   repeat (split; try apply _).
-    apply (strong_injective (coerce AQ AR)).
+    apply (strong_injective (cast AQ AR)).
     solve_propholds.
    intros [x Px] [y Py] E.
    now apply: ARinvT_wd.
@@ -693,13 +693,13 @@ Qed.
 (* Nat pow *)
 Program Definition AQpower_N_uc (n : N) (c : AQ₊) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
-  (coerce AQ Q_as_MetricSpace)
+  (cast AQ Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, (AQboundAbs_uc c x) ^ n : AQ_as_MetricSpace) (Qpower_N_uc n ('c)) _.
 Next Obligation.
-  assert (∀ y : AQ, coerce AQ Q (y ^ n) = 'y ^ 'n) as preserves_pow_pos.
+  assert (∀ y : AQ, cast AQ Q (y ^ n) = 'y ^ 'n) as preserves_pow_pos.
    intros y.
    rewrite nat_pow.preserves_nat_pow.
-   now rewrite (int_pow.int_pow_nat_pow (f:=coerce N Z)).
+   now rewrite (int_pow.int_pow_nat_pow (f:=cast N Z)).
   rewrite preserves_pow_pos. aq_preservation. 
 Qed.
 
@@ -712,11 +712,11 @@ Proof. apply preserves_unary_fun. Qed.
 Global Instance ARpower_N: Pow AR N := λ x n, ucFun (ARpower_N_bounded n (AR_b x)) x.
 
 Lemma ARtoCR_preserves_power_N (x : AR) (n : N) : 
-  coerce AR CR (x ^ n) = ('x) ^ n.
+  cast AR CR (x ^ n) = ('x) ^ n.
 Proof.
   unfold pow, CRpower_N, ARpower_N.
   rewrite ARtoCR_preserves_power_N_bounded.
-  setoid_replace (coerce (AQ₊) (Q₊) (AR_b x)) with (CR_b (1#1) ('x)). 
+  setoid_replace (cast (AQ₊) (Q₊) (AR_b x)) with (CR_b (1#1) ('x)). 
    reflexivity.
   unfold QposEq. simpl.
   now rewrite ARtoCR_approximate, <-AR_b_correct.
@@ -728,11 +728,11 @@ Global Instance: NatPowSpec AR N _.
 Proof.
   split.
     intros ? ? Ex ? ? En.
-    apply (injective (coerce AR CR)). autorewrite with ARtoCR.
+    apply (injective (cast AR CR)). autorewrite with ARtoCR.
     now rewrite Ex, En.
-   intros. apply (injective (coerce AR CR)). autorewrite with ARtoCR.
+   intros. apply (injective (cast AR CR)). autorewrite with ARtoCR.
    now rewrite nat_pow_0.
-  intros. apply (injective (coerce AR CR)). autorewrite with ARtoCR.
+  intros. apply (injective (cast AR CR)). autorewrite with ARtoCR.
   now rewrite nat_pow_S.
 Qed.
 
@@ -741,15 +741,15 @@ Lemma ARmult_bounded_mult (x y : AR) c :
   -'c ≤ y ≤ 'c → ARmult_bounded c x y = x * y.
 Proof.
   intros. 
-  apply (injective (coerce AR CR)).
+  apply (injective (cast AR CR)).
   rewrite ARtoCR_preserves_mult, ARtoCR_preserves_mult_bounded.
   destruct c as [c Pc].
   apply CRmult_bounded_mult.
-   change (coerce Q CR (-coerce AQ Q c) ≤ coerce AR CR y).
+   change (cast Q CR (-cast AQ Q c) ≤ cast AR CR y).
    rewrite <-rings.preserves_opp.
    rewrite <-ARtoCR_inject.
    apply (order_preserving _). intuition.
-  change (coerce AR CR y ≤ coerce Q CR (coerce AQ Q c)).
+  change (cast AR CR y ≤ cast Q CR (cast AQ Q c)).
   rewrite <-ARtoCR_inject.
   apply (order_preserving _). intuition.
 Qed.
@@ -758,15 +758,15 @@ Lemma ARpower_N_bounded_N_power (n : N) (x : AR) (c : AQ₊) :
   -'c ≤ x ≤ 'c → ARpower_N_bounded n c x = x ^ n.
 Proof.
   intros.
-  apply (injective (coerce AR CR)).
+  apply (injective (cast AR CR)).
   rewrite ARtoCR_preserves_power_N, ARtoCR_preserves_power_N_bounded.
   destruct c as [c Pc].
   apply CRpower_N_bounded_N_power. split.
-   change (coerce Q CR (-coerce AQ Q c) ≤ coerce AR CR x).
+   change (cast Q CR (-cast AQ Q c) ≤ cast AR CR x).
    rewrite <-rings.preserves_opp.
    rewrite <-ARtoCR_inject.
    apply (order_preserving _). intuition.
-  change (coerce AR CR x ≤ coerce Q CR (coerce AQ Q c)).
+  change (cast AR CR x ≤ cast Q CR (cast AQ Q c)).
   rewrite <-ARtoCR_inject.
   apply (order_preserving _). intuition.
 Qed.

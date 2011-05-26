@@ -17,8 +17,8 @@ Class AppDiv AQ := app_div : AQ → AQ → Z → AQ.
 Class AppApprox AQ := app_approx : AQ → Z → AQ.
 
 Class AppRationals AQ {e plus mult zero one inv} `{Apart AQ} `{Le AQ} `{Lt AQ}
-     {AQtoQ : Coerce AQ Q_as_MetricSpace} 
-    `{!AppInverse AQtoQ} {ZtoAQ : Coerce Z AQ} `{!AppDiv AQ} `{!AppApprox AQ} 
+     {AQtoQ : Cast AQ Q_as_MetricSpace} 
+    `{!AppInverse AQtoQ} {ZtoAQ : Cast Z AQ} `{!AppDiv AQ} `{!AppApprox AQ} 
     `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
     `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
   aq_ring :> @Ring AQ e plus mult zero one inv ;
@@ -37,32 +37,32 @@ Class AppRationals AQ {e plus mult zero one inv} `{Apart AQ} `{Le AQ} `{Lt AQ}
 Section approximate_rationals_more.
   Context `{AppRationals AQ}.
 
-  Lemma AQtoQ_ZtoAQ (x : Z) : coerce AQ Q (coerce Z AQ x) = coerce Z Q x.
+  Lemma AQtoQ_ZtoAQ (x : Z) : cast AQ Q (cast Z AQ x) = cast Z Q x.
   Proof. now apply (integers.to_ring_twice _ _ _). Qed.
 
-  Global Instance: Injective (coerce AQ Q). 
-  Proof. change (Injective (coerce AQ Q_as_MetricSpace)). apply _. Qed.
+  Global Instance: Injective (cast AQ Q). 
+  Proof. change (Injective (cast AQ Q_as_MetricSpace)). apply _. Qed.
 
   Global Instance: StrongSetoid AQ.
   Proof strong_setoids.dec_strong_setoid.
 
-  Global Instance: StrongSetoid_Morphism (coerce AQ Q).
-  Proof strong_setoids.dec_strong_morphism (coerce AQ Q).
+  Global Instance: StrongSetoid_Morphism (cast AQ Q).
+  Proof strong_setoids.dec_strong_morphism (cast AQ Q).
 
-  Global Instance: StrongInjective (coerce AQ Q). 
-  Proof strong_setoids.dec_strong_injective (coerce AQ Q).
+  Global Instance: StrongInjective (cast AQ Q). 
+  Proof strong_setoids.dec_strong_injective (cast AQ Q).
 
-  Global Instance: Injective (coerce Z AQ).
+  Global Instance: Injective (cast Z AQ).
   Proof.
     split; try apply _.
     intros x y E.
-    apply (injective (coerce Z Q)).
+    apply (injective (cast Z Q)).
     rewrite <-2!AQtoQ_ZtoAQ.
     now rewrite E.
   Qed.
 
   Global Instance: FullPseudoSemiRingOrder (_ : Le AQ) (_ : Lt AQ).
-  Proof projected_full_pseudo_ring_order (coerce AQ Q).
+  Proof projected_full_pseudo_ring_order (cast AQ Q).
     
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.
@@ -109,8 +109,8 @@ Section approximate_rationals_more.
     split; try apply _.
      intros E.
      destruct (rings.is_ne_0 (1:Q)).
-     rewrite <-(rings.preserves_1 (f:=coerce AQ Q)).
-     rewrite <-(rings.preserves_0 (f:=coerce AQ Q)).
+     rewrite <-(rings.preserves_1 (f:=cast AQ Q)).
+     rewrite <-(rings.preserves_0 (f:=cast AQ Q)).
      now rewrite E.
     intros x [? [y [? E]]].
     destruct (no_zero_divisors ('x : Q)). split.
@@ -128,7 +128,7 @@ Section approximate_rationals_more.
     (* We need to pick a rational [x] such that [x < 1#2]. Since we do not
         use this lemma for computations yet, we just pick [1#3]. However,
         whenever we will it might be worth to reconsider. *)
-    exists (app_inverse (coerce AQ Q) ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
+    exists (app_inverse (cast AQ Q) ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
     split.
      apply Qlt_le_trans with (x + (1#6) * γ)%Q.
       rewrite <-(rings.plus_0_r x) at 1.
@@ -159,18 +159,18 @@ Section approximate_rationals_more.
     symmetry. apply Qmax_coincides.
   Qed.
 
-  Global Program Instance AQposAsQ: Coerce (AQ₊) Q := coerce AQ Q ∘ coerce (AQ₊) AQ.
+  Global Program Instance AQposAsQ: Cast (AQ₊) Q := cast AQ Q ∘ cast (AQ₊) AQ.
 
-  Global Program Instance AQposAsQpos: Coerce (AQ₊) (Q₊) := λ x, ('x : Q).
+  Global Program Instance AQposAsQpos: Cast (AQ₊) (Q₊) := λ x, ('x : Q).
   Next Obligation.
     destruct x as [x Ex]. simpl.
-    posed_rewrite <-(rings.preserves_0 (f:=coerce AQ Q)).
-    now apply: (strictly_order_preserving (coerce AQ Q)).
+    posed_rewrite <-(rings.preserves_0 (f:=cast AQ Q)).
+    now apply: (strictly_order_preserving (cast AQ Q)).
   Qed.
 
-  Lemma AQposAsQpos_preserves_1 : coerce (AQ₊) (Q₊) 1 = 1.
-  Proof. change (coerce AQ Q 1 = 1). apply rings.preserves_1. Qed.
+  Lemma AQposAsQpos_preserves_1 : cast (AQ₊) (Q₊) 1 = 1.
+  Proof. change (cast AQ Q 1 = 1). apply rings.preserves_1. Qed.
 
-  Lemma AQposAsQpos_preserves_4 : coerce (AQ₊) (Q₊) 4 = 4. 
-  Proof. change (coerce AQ Q 4 = 4). apply rings.preserves_4. Qed.
+  Lemma AQposAsQpos_preserves_4 : cast (AQ₊) (Q₊) 4 = 4. 
+  Proof. change (cast AQ Q 4 = 4). apply rings.preserves_4. Qed.
 End approximate_rationals_more.

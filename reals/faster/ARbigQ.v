@@ -5,7 +5,7 @@ Require Import
   stdlib_rationals stdlib_binary_integers field_of_fractions
   fast_rationals fast_integers.
 
-Instance inject_Z_bigQ: Coerce Z bigQ := coerce bigZ bigQ ∘ coerce Z bigZ.
+Instance inject_Z_bigQ: Cast Z bigQ := cast bigZ bigQ ∘ cast Z bigZ.
 
 Instance bigQ_approx: AppApprox bigQ := λ x k,
   match k with
@@ -26,7 +26,7 @@ Proof.
   destruct x as [n|n d]; simpl.
    rewrite Z.div_1_r, Qmake_Qdiv. simpl.
    now rewrite Q.Zmult_Qmult, Qdiv_mult_l by auto with zarith.
-  unfold coerce, BigQ_Rationals.inject_QType_Q, BigQ.to_Q.
+  unfold cast, BigQ_Rationals.inject_QType_Q, BigQ.to_Q.
   case_eq (BigN.eq_bool (BigN.shiftl 1 (BigN.of_pos p)) BigN.zero); intros Ep.
    apply BigNeqb_correct, BigN.shiftl_eq_0_iff in Ep.
    discriminate.
@@ -65,9 +65,9 @@ Proof.
   now rewrite rings.preserves_mult, dec_fields.preserves_dec_mult_inv.
 Qed.
 
-Instance inverse_Q_bigQ: AppInverse (coerce bigQ Q_as_MetricSpace) := λ x ε, 'x.
+Instance inverse_Q_bigQ: AppInverse (cast bigQ Q_as_MetricSpace) := λ x ε, 'x.
 
-Instance: DenseEmbedding (coerce bigQ Q_as_MetricSpace).
+Instance: DenseEmbedding (cast bigQ Q_as_MetricSpace).
 Proof.
   split; try apply _.
   intros. unfold app_inverse, inverse_Q_bigQ.

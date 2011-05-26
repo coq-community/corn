@@ -28,9 +28,9 @@ Proof.
   rewrite associativity.
   apply sg_op_proper.
    rewrite 2!preserves_powers_help. 
-   rewrite 3!(Str_nth_powers_help_int_pow _ (coerce nat Z)).
-   rewrite 2!(preserves_nat_pow (f:=coerce AQ Q)).
-   rewrite <-2!(int_pow_nat_pow (f:=coerce N Z)).
+   rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
+   rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
+   rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_mult_inv.

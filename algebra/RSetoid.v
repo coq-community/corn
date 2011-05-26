@@ -55,7 +55,7 @@ Implicit Arguments mcSetoid_as_RSetoid [[e] [setoid]].
 (** Propositions form a setoid under iff *)
 Definition iffSetoid : RSetoid.
 Proof.
- exists Prop iff.
+ eexists Prop iff.
  firstorder.
 Defined.
 
@@ -70,7 +70,7 @@ Record Morphism (X Y : RSetoid) :=
 Definition extEq (X:Type) (Y : RSetoid) (f g:X -> Y) := forall x, st_eq (f x) (g x).
 Definition extSetoid (X Y : RSetoid) : RSetoid.
 Proof.
- exists (Morphism X Y) (extEq Y).
+ eexists (Morphism X Y) (extEq Y).
  split.
    intros x y; reflexivity.
   intros x y H a; symmetry; auto.
@@ -86,7 +86,7 @@ Open Local Scope setoid_scope.
 
 Definition id (X : RSetoid) : X-->X.
 Proof.
- exists (fun x => x).
+ eexists (fun x => x).
  abstract (auto).
 Defined.
 (* begin hide *)
@@ -105,7 +105,7 @@ Defined.
 Definition compose2 (X Y Z : RSetoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
 Proof.
  intros f0.
- exists (compose1 f0).
+ eexists (compose1 f0).
  abstract ( destruct f0 as [f0 Hf0]; intros x1 x2 H y; apply: Hf0; apply H).
 Defined.
 
@@ -120,7 +120,7 @@ Implicit Arguments compose [X Y Z].
 Definition const0 (X Y : RSetoid) : X->Y-->X.
 Proof.
  intros x.
- exists (fun y => x).
+ eexists (fun y => x).
  abstract reflexivity.
 Defined.
 

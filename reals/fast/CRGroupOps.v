@@ -38,10 +38,10 @@ Opaque CR Qmin Qmax.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
-Instance CR0: RingZero CR := coerce Q CR 0.
+Instance CR0: RingZero CR := cast Q CR 0.
 Notation "0" := (inject_Q_CR 0) : CR_scope.
 
-Instance CR1: RingOne CR := coerce Q CR 1.
+Instance CR1: RingOne CR := cast Q CR 1.
 Notation "1" := (inject_Q_CR 1) : CR_scope.
 
 (**

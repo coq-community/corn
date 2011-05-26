@@ -10,7 +10,7 @@ Instance: RingMult Qpos := Qpos_mult.
 
 Instance: Pow Qpos Z := Qpos_power.
 
-Instance inject_Qpos_Q: Coerce Qpos Q := QposAsQ.
+Instance inject_Qpos_Q: Cast Qpos Q := QposAsQ.
 
 Instance: ∀ x : Qpos, PropHolds (0 < (x:Q)).
 Proof. intros x. now destruct x. Qed.

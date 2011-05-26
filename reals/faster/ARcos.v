@@ -21,7 +21,7 @@ Proof.
   now rewrite associativity.
 Qed.
 
-Program Definition AQcos_poly_uc := unary_uc (coerce AQ Qmetric.Q_as_MetricSpace)
+Program Definition AQcos_poly_uc := unary_uc (cast AQ Qmetric.Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, AQcos_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) cos_poly_uc _.
 Next Obligation.
   rewrite AQcos_poly_fun_correct.
@@ -53,7 +53,7 @@ Qed.
 
 Local Obligation Tactic := idtac.
 Program Definition ARcos_uc := unary_complete_uc 
-  Qmetric.QPrelengthSpace (coerce AQ Qmetric.Q_as_MetricSpace) AQcos cos_uc _.
+  Qmetric.QPrelengthSpace (cast AQ Qmetric.Q_as_MetricSpace) AQcos cos_uc _.
 Next Obligation. intros. apply AQcos_correct. Qed.
 
 Definition ARcos := Cbind AQPrelengthSpace ARcos_uc.

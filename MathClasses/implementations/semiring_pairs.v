@@ -1,7 +1,7 @@
 Require
   theory.rings.
 Require Import
-  Morphisms Ring Setoid Program
+  Ring
   abstract_algebra interfaces.orders orders.rings.
 
 Inductive SRpair (SR : Type) := C { pos : SR ; neg : SR }.
@@ -42,7 +42,7 @@ Proof.
 Qed.
 
 (* injection from SR *)
-Global Instance SRpair_inject: Coerce SR (SRpair SR) := λ r, C r 0.
+Global Instance SRpair_inject: Cast SR (SRpair SR) := λ r, C r 0.
 
 Global Instance: Proper ((=) ==> (=)) SRpair_inject.
 Proof. intros x1 x2 E. unfold equiv, SRpair_equiv. simpl. now rewrite E. Qed.

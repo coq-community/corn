@@ -7,17 +7,17 @@ Require Import
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Notation bigD := (Dyadic bigZ).
-Instance inject_bigZ_Q: Coerce bigZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
-Instance inject_Z_bigD: Coerce Z bigD := dy_inject ∘ BigZ.of_Z.
-Instance inject_N_bigZ: Coerce N bigZ := BigZ.of_Z ∘ Z_of_N.
-Instance inject_bigD_Q: Coerce bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
+Instance inject_bigZ_Q: Cast bigZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
+Instance inject_Z_bigD: Cast Z bigD := dy_inject ∘ BigZ.of_Z.
+Instance inject_N_bigZ: Cast N bigZ := BigZ.of_Z ∘ Z_of_N.
+Instance inject_bigD_Q: Cast bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
 
-Lemma inject_bigD_Q_correct x : coerce bigD Q x = 'mant x * 2 ^ (coerce bigZ Z (expo x)).
+Lemma inject_bigD_Q_correct x : cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
 Proof.
-  unfold coerce at 1, inject_bigD_Q.
+  unfold cast at 1, inject_bigD_Q.
   rewrite (DtoQ_correct _ _ (reflexivity x)).
   unfold DtoQ_slow.
-  now rewrite (preserves_int_pow_exp (f:=coerce bigZ Z)).
+  now rewrite (preserves_int_pow_exp (f:=cast bigZ Z)).
 Qed.
 
 (* 
@@ -34,13 +34,13 @@ Proof.
   rewrite Qround.Zdiv_Qdiv.
   split.
    now apply Qround.Qfloor_le.
-  rewrite <-(rings.preserves_1 (f:=coerce Z Q)).
+  rewrite <-(rings.preserves_1 (f:=cast Z Q)).
   rewrite <-rings.preserves_plus.
   now apply Qround.Qlt_floor.
 Qed.
 
 Lemma Qpow_bounded_Zshiftl (x n : Z) : 
-  'Zshiftl x n ≤ coerce Z Q x * 2 ^ n < 'Zshiftl x n + 1.
+  'Zshiftl x n ≤ cast Z Q x * 2 ^ n < 'Zshiftl x n + 1.
 Proof.
   destruct (total (≤) 0 n) as [En | En].
    rewrite Z.shiftl_mul_pow2 by trivial.
@@ -142,9 +142,9 @@ Proof.
    apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
    apply semirings.preserves_ge_1.
    now apply integers.lt_iff_plus_1_le in E3.
-  unfold coerce. rewrite 3!inject_bigD_Q_correct.
+  unfold cast. rewrite 3!inject_bigD_Q_correct.
   destruct x as [xm xe], y as [ym ye]. simpl.
-  unfold coerce, inject_bigZ_Q, coerce, "∘". simpl. BigZ.zify.
+  unfold cast, inject_bigZ_Q, cast, "∘". simpl. BigZ.zify.
   apply in_Qball. split. apply Pleft. apply Pright.
 Qed.
 
@@ -207,7 +207,7 @@ Proof.
     rewrite 2!(preserves_nat_pow (f:=integers.integers_to_ring bigZ Q)).
     rewrite 2!(commutativity ('e2 : bigZ)).
     rewrite 2!int_pow_exp_mult.
-    rewrite 2!(int_pow_nat_pow (f:=coerce N bigZ)).
+    rewrite 2!(int_pow_nat_pow (f:=cast N bigZ)).
     rewrite <-2!nat_pow_base_mult.
     now rewrite E1.
    intros [xm xe]. simpl.

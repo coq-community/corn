@@ -267,7 +267,7 @@ Lemma ARInfAltSum_correct `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNeg
    'ARInfAltSum d = InfiniteAlternatingSum sQ.
 Proof.
   intros ? ?.
-  unfold coerce, ARtoCR. simpl.
+  unfold cast, ARtoCR. simpl.
   now apply ARInfAltSum_raw_correct.
 Qed.
 End alt_sum.

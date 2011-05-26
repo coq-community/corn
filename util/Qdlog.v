@@ -24,7 +24,7 @@ Proof.
    destruct (decide (x = 1)) as [E3|E3].
     rewrite E3. compute; repeat split; discriminate.
    assert (1 < Qceiling (/x))%Z.
-    apply (strictly_order_preserving_back (coerce Z Q)).
+    apply (strictly_order_preserving_back (cast Z Q)).
     apply orders.lt_le_trans with (/x).
      apply dec_fields.flip_lt_dec_mult_inv_r; trivial.
      apply orders.lt_iff_le_ne. tauto.
@@ -101,7 +101,7 @@ Qed.
 
 Lemma Qpos_dlog2_spec (x : Q₊) : 
   '(2 ^ Qdlog2 ('x)) ≤ ('x : Q) ∧ 'x < '(2 ^ (1 + Qdlog2 ('x))).
-Proof. unfold coerce. simpl. split; apply Qdlog2_spec; now destruct x. Qed.
+Proof. unfold cast. simpl. split; apply Qdlog2_spec; now destruct x. Qed.
 
 Lemma Qdlog2_unique (x : Q) (y : Z) : 
   0 < x → 2 ^ y ≤ x ∧ x < 2 ^ (1 + y) → y = Qdlog2 x.
@@ -186,7 +186,7 @@ Proof.
   apply orders.le_lt_trans with 1; try assumption.
   apply orders.lt_le_trans with 2.
    now apply semirings.lt_1_2.
-  now apply (order_preserving (coerce Z Q)) in En.
+  now apply (order_preserving (cast Z Q)) in En.
 Qed.
 
 Instance: Proper (=) Qdlog_bounded.
@@ -209,7 +209,7 @@ Lemma Qdlog_spec_bounded (b : nat) (n : Z) (x : Q) :
   2 ≤ n → Qdlog2 x ≤ ('b) → 1 ≤ x → 'n ^ Qdlog_bounded b n x ≤ x ∧ x < 'n ^ (1 + Qdlog_bounded b n x).
 Proof.
   intros En Eb Ex.
-  apply (order_preserving (coerce Z Q)) in En.
+  apply (order_preserving (cast Z Q)) in En.
   assert (PropHolds (0 < ('n : Q)))
     by (apply orders.lt_le_trans with 2; [solve_propholds | assumption]).
   revert x Eb Ex.

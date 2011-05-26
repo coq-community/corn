@@ -687,7 +687,7 @@ Proof. apply (rings.from_stdlib_ring_theory CR_ring_theory). Qed.
 
 (* We need the (1#4) because CR_epsilon_sign_dec_pos_rev is nasty *)
 Instance CRlt: Lt CR := λ x y, 
-  ∃ n : nat, CR_epsilon_sign_dec ((1#4) * (2#1) ^ -coerce nat Z n) (y - x) ≡ Gt.
+  ∃ n : nat, CR_epsilon_sign_dec ((1#4) * (2#1) ^ -cast nat Z n) (y - x) ≡ Gt.
 
 Lemma CR_lt_ltT x y : x < y IFF CRltT x y.
 Proof.
@@ -696,7 +696,7 @@ Proof.
    apply CR_epsilon_sign_dec_pos.
    apply constructive_indefinite_description_nat in E. 
     destruct E as [n En].
-    now exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+    now exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
    intros. now apply comparison_eq_dec.
   intros [ε Eε].
   exists (Z.nat_of_Z (-Qdlog2 ('ε))).
@@ -723,16 +723,16 @@ Lemma CR_apart_apartT x y : x ⪥ y IFF CRapartT x y.
 Proof.
   split.
    intros E.
-   set (f (n : nat) := CR_epsilon_sign_dec ((1#4) * (2#1) ^ -coerce nat Z n)).
+   set (f (n : nat) := CR_epsilon_sign_dec ((1#4) * (2#1) ^ -cast nat Z n)).
    assert (∃ n, f n (y - x) ≡ Gt ∨ f n (x - y) ≡ Gt) as E2.
     now destruct E as [[n En] | [n En]]; exists n; [left | right].
    apply constructive_indefinite_description_nat in E2.
     destruct E2 as [n E2].
     destruct (comparison_eq_dec (f n (y - x)) Gt) as [En|En].
      left. apply CR_epsilon_sign_dec_pos. 
-     now exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+     now exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
     right. apply CR_epsilon_sign_dec_pos. 
-    exists ((1#4) * (2#1) ^ -coerce nat Z n)%Qpos.
+    exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
     destruct E2; tauto.
    intros n. 
    destruct (comparison_eq_dec (f n (y - x)) Gt); auto.
