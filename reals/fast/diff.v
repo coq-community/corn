@@ -1,3 +1,4 @@
+(*
 Require Import CPoly_Newton.
 Require Import CRArith.
 Require Import Unicode.Utf8
@@ -92,7 +93,7 @@ let l:= (ne_list.map (λ x: Q * Q, fst x + snd x)
 
 (* (map (λ x0 : Q and Q, let (p, q) := x0 in (f p - f q )* ' (/p -q))%CR)*)
 
-Check (diff_list 1 1 2 inject_Q).
+Check (diff_list 1 1 2 inject_Q_CR).
 
 Section telescope.
 (* 
@@ -206,3 +207,4 @@ admit.
 Qed.
 
 End bla.
+*)
