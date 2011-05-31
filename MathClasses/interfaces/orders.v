@@ -11,7 +11,7 @@ between the usual classical notions and these constructive notions.
  
 On the one hand, if we have an ordinary (total) partial order (≤) with a 
 corresponding strict order (<), we will prove that we can construct a
-StrictPartialOrder and PseudoPartialOrder, respectively.
+FullPartialOrder and PseudoPartialOrder, respectively.
   
 On the other hand, if equality is decidable, we will prove that we have the
 usual properties like Trichotomy (<) and TotalRelation (≤).
@@ -40,7 +40,7 @@ Class PseudoOrder `{e : Equiv A} `{ap : Apart A} (so : Lt A) : Prop :=
 
 (* A partial order (≤) with a corresponding (<). We will prove that (<) is in fact
   a StrictSetoidOrder *)
-Class StrictPartialOrder `{e : Equiv A} `{ap : Apart A} (o : Le A) (so : Lt A) : Prop :=
+Class FullPartialOrder `{e : Equiv A} `{ap : Apart A} (o : Le A) (so : Lt A) : Prop :=
   { strict_po_setoid : StrongSetoid A 
   ; strict_po_po :> PartialOrder (≤)
   ; strict_po_trans :> Transitive (<)
@@ -56,7 +56,7 @@ Section order_maps.
   Context {A B : Type} {Ae: Equiv A} {Ale: Le A} {Alt: Lt A} {Be: Equiv B} {Ble: Le B} {Blt: Lt B} (f : A → B).
 
   (* An Order_Morphism is just the factoring out of the common parts of 
-    OrderPreserving and OrderPreservingBack *)
+    OrderPreserving and OrderReflecting *)
   Class Order_Morphism := 
     { order_morphism_mor : Setoid_Morphism f
     ; order_morphism_proper_a :> Proper ((=) ==> (=) ==> iff) Ale
@@ -71,13 +71,13 @@ Section order_maps.
     { order_preserving_morphism :> Order_Morphism 
     ; order_preserving : `(x ≤ y → f x ≤ f y) }.
 
-  Class OrderPreservingBack := 
-    { order_preserving_back_morphism :> Order_Morphism
-    ; order_preserving_back : `(f x ≤ f y → x ≤ y) }.
+  Class OrderReflecting := 
+    { order_reflecting_morphism :> Order_Morphism
+    ; order_reflecting : `(f x ≤ f y → x ≤ y) }.
 
   Class OrderEmbedding := 
     { order_embedding_preserving :> OrderPreserving
-    ; order_embedding_back :> OrderPreservingBack }.
+    ; order_embedding_reflecting :> OrderReflecting }.
 
   Class OrderIsomorphism `{!Inverse f} := 
     { order_iso_embedding :> OrderEmbedding
@@ -87,13 +87,13 @@ Section order_maps.
     { strictly_order_preserving_morphism :> StrictOrder_Morphism
     ; strictly_order_preserving : `(x < y → f x < f y) }.
 
-  Class StrictlyOrderPreservingBack := 
-    { strictly_order_preserving_back_morphism :> StrictOrder_Morphism
-    ; strictly_order_preserving_back : `(f x < f y → x < y) }.
+  Class StrictlyOrderReflecting := 
+    { strictly_order_reflecting_morphism :> StrictOrder_Morphism
+    ; strictly_order_reflecting : `(f x < f y → x < y) }.
 
   Class StrictOrderEmbedding := 
     { strict_order_embedding_preserving :> StrictlyOrderPreserving
-    ; strict_order_embedding_back :> StrictlyOrderPreservingBack }.
+    ; strict_order_embedding_reflecting :> StrictlyOrderReflecting }.
 End order_maps.
 
 (*
