@@ -201,7 +201,7 @@ Proof.
    set (l':=P_of_succ_nat l).
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
-   apply (order_preserving_back ((2:Q) ^ Z.log2_up l' *.)).
+   apply (order_reflecting ((2:Q) ^ Z.log2_up l' *.)).
    ms_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
     rewrite (commutativity _ ((2:Q) ^ k)).
     apply (order_preserving (2 ^ k *.)).

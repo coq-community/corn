@@ -140,7 +140,7 @@ Lemma AQsqrt_mid_bounded_raw_upper_bound (n : N) :
   AQsqrt_mid_bounded_raw n ≤ 4.
 Proof.
   unfold AQsqrt_mid_bounded_raw.
-  apply (order_preserving_back (≪ 1 + 'n)).
+  apply (order_reflecting (≪ 1 + 'n)).
   rewrite shiftl_reverse by ring.
   etransitivity.
    rewrite <-(rings.plus_0_r ('n)).
@@ -320,7 +320,7 @@ Proof.
     apply int_pow_exp_le; [apply semirings.le_1_2|].
     rewrite rings.preserves_plus, (naturals.to_semiring_twice _ _ (cast N Z)).
     rewrite (rings.preserves_plus _ 3), !rings.preserves_3.
-    apply (order_preserving_back (+ -(3 + 3))). ring_simplify.
+    apply (order_reflecting (+ -(3 + 3))). ring_simplify.
     destruct (total (≤) (ε:Q) 1).
      rewrite N_of_Z_nonneg.
       apply orders.eq_le. 
@@ -379,20 +379,20 @@ Program Definition AQsqrt_pos :=
   let n := Qdlog4 ('a) in ARscale (1 ≪ n) (AQsqrt_mid (a:=a ≪ (2 * -n)) _).
 Next Obligation.
   simpl. split.
-   apply (order_preserving_back (cast AQ Q)).
+   apply (order_reflecting (cast AQ Q)).
    rewrite rings.preserves_1, aq_shift_correct.
    rewrite int_pow_exp_mult.
    change (2 ^ 2 : Q) with (4 : Q).
-   apply (order_preserving_back (.* 4 ^ Qdlog4 ('a))).
+   apply (order_reflecting (.* 4 ^ Qdlog4 ('a))).
    rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
    rewrite rings.mult_1_l, rings.plus_opp_l, int_pow_0, rings.mult_1_r.
    apply Qdlog4_spec.
    now apply semirings.preserves_pos.
-  apply (order_preserving_back (cast AQ Q)).
+  apply (order_reflecting (cast AQ Q)).
   rewrite aq_shift_correct, rings.preserves_4.
   rewrite int_pow_exp_mult.
   change (2 ^ 2 : Q) with (4 : Q).
-  apply (order_preserving_back (.* 4 ^ Qdlog4 ('a))).
+  apply (order_reflecting (.* 4 ^ Qdlog4 ('a))).
   rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
   rewrite rings.plus_opp_l, int_pow_0, rings.mult_1_r.
   rewrite <-int_pow_S by (compute; discriminate).

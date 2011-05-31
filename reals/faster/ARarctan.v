@@ -58,7 +58,7 @@ Lemma AQarctan_pos_prf1 {a : AQ} : 0 ≤ a → a ≤ 1 ≪ (-1) → 0 ≤ a < 1.
 Proof.
   split; trivial.
   apply orders.le_lt_trans with (1 ≪ (-1)); [easy |].
-  apply (strictly_order_preserving_back (cast AQ Q)).
+  apply (strictly_order_reflecting (cast AQ Q)).
   rewrite aq_shift_opp_1, rings.preserves_1.
   split; easy.
 Qed.
@@ -66,7 +66,7 @@ Qed.
 Lemma AQarctan_pos_prf2 {a : AQ} : ¬a ≤ 1 ≪ (-1) → 0 < a.
 Proof.
   intros. apply orders.lt_le_trans with (1 ≪ (-1)).
-   apply (strictly_order_preserving_back (cast AQ Q)).
+   apply (strictly_order_reflecting (cast AQ Q)).
    rewrite aq_shift_opp_1, rings.preserves_0, rings.preserves_1.
    split; easy.
   now apply orders.le_flip.

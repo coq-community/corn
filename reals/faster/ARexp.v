@@ -49,10 +49,10 @@ Lemma AQexp_neg_bounded_prf `(Pa : -2^S n ≤ a ≤ 0) :
   -2^n ≤ a ≪ (-1) ≤ 0.
 Proof.
   split.
-   apply (order_preserving_back (2 *.)).
+   apply (order_reflecting (2 *.)).
    rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
    now rewrite <-rings.opp_mult_distr_r.
-  apply (order_preserving_back (2 *.)).
+  apply (order_reflecting (2 *.)).
   rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
   now rewrite right_absorb.
 Qed.
@@ -95,7 +95,7 @@ Proof.
   case (decide_rel (≤)); intros E1.
    easy.
   apply orders.le_flip in E1.
-  apply (order_preserving_back (cast AQ Q)).
+  apply (order_reflecting (cast AQ Q)).
   rewrite rings.preserves_opp.
   rewrite preserves_nat_pow.
   rewrite rings.preserves_2.
@@ -157,7 +157,7 @@ Proof.
    apply CRpos_nonNeg.
    now CRsign.CR_solve_pos (1#1)%Qpos.
   change (Qfloor ('a) ≤ 0).
-  apply (order_preserving_back (cast Z Q)).
+  apply (order_reflecting (cast Z Q)).
   transitivity ('a : Q).
    now apply Qfloor_le.
   now apply semirings.preserves_nonpos.

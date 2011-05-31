@@ -178,7 +178,7 @@ Proof. aq_preservation. Qed.
 
 Program Definition AR_b (x : AR) : AQ₊ := exist _ (abs (approximate x (1#1)%Qpos) + 1) _.
 Next Obligation.
-  apply (strictly_order_preserving_back (cast AQ Q)). 
+  apply (strictly_order_reflecting (cast AQ Q)). 
   rewrite AR_b_correct. aq_preservation.
   apply CR_b_pos.
 Qed.
@@ -269,11 +269,11 @@ Proof maps.projected_partial_order (cast AR CR).
 Global Instance: OrderEmbedding (cast AQ AR).
 Proof.
   repeat (split; try apply _); intros x y E.
-   apply (order_preserving_back (cast AR CR)).
+   apply (order_reflecting (cast AR CR)).
    rewrite 2!ARtoCR_inject.
    now do 2 apply (order_preserving _).
-  apply (order_preserving_back (cast AQ Q)).
-  apply (order_preserving_back (cast Q CR)).
+  apply (order_reflecting (cast AQ Q)).
+  apply (order_reflecting (cast Q CR)).
   rewrite <-2!ARtoCR_inject.
   now apply (order_preserving _).
 Qed.
@@ -313,10 +313,10 @@ Proof with auto with qarith.
    now apply (order_preserving _).
   destruct (aq_lt_mid 0 y) as [z [Ez1 Ez2]]...
   assert (0 < z) as F. 
-   apply (strictly_order_preserving_back (cast AQ Q)). now aq_preservation...
+   apply (strictly_order_reflecting (cast AQ Q)). now aq_preservation...
   exists (exist _ z F). simpl.
   change (cast AQ AR (cast (AQ₊) AQ (z ↾ F)) ≤ x).
-  apply (order_preserving_back (cast AR CR)).
+  apply (order_reflecting (cast AR CR)).
   rewrite ARtoCR_inject.
   transitivity (cast Q CR (cast Qpos Q y)); trivial.
   apply CRArith.CRle_Qle...
@@ -416,13 +416,13 @@ Lemma AR_epsilon_sign_dec_pos_rev (x : AR) (k : Z) :
 Proof.
   intros E.
   apply AR_epsilon_sign_dec_Gt.
-  apply (order_preserving_back (+ -1 ≪ (1 + k))).
+  apply (order_reflecting (+ -1 ≪ (1 + k))).
   transitivity (-1 ≪ k).
    apply orders.eq_le.
    rewrite (commutativity _ k), shiftl.shiftl_exp_plus, shiftl.shiftl_1. 
    rewrite rings.plus_mult_distr_r, rings.mult_1_l.
    rewrite rings.opp_distr, associativity, rings.plus_opp_r. ring.
-  apply (order_preserving_back (cast AQ Q)).
+  apply (order_reflecting (cast AQ Q)).
   rewrite rings.preserves_opp.
   exact (E ('Pos_shiftl (1 : AQ₊) k)).
 Qed.
@@ -443,7 +443,7 @@ Proof.
   apply AR_epsilon_sign_dec_pos_rev.
   transitivity ('ε : AR); [| assumption].
   rapply (order_preserving (cast AQ AR)).
-  apply (order_preserving_back (cast AQ Q)).
+  apply (order_reflecting (cast AQ Q)).
   rewrite aq_shift_correct, rings.preserves_1, rings.mult_1_l.
   destruct (decide (('ε : Q) ≤ 1)).
    rewrite Z.nat_of_Z_nonneg.
@@ -501,7 +501,7 @@ Let ARtoCR_preserves_apart x y : x ⪥ y ↔ cast AR CR x ⪥ cast AR CR y.
 Proof.
   split.
    intros [|]; [left | right]; now apply (strictly_order_preserving (cast AR CR)).
-  intros [|]; [left | right]; now apply (strictly_order_preserving_back (cast AR CR)).
+  intros [|]; [left | right]; now apply (strictly_order_reflecting (cast AR CR)).
 Qed.
 
 Instance: StrongSetoid AR.

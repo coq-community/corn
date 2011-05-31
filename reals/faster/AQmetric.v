@@ -45,7 +45,7 @@ Proof.
   transitivity ('abs (x - y) ≤ ('(1 ≪ k) : Q)).
    split; intros.
     now apply (order_preserving _).
-   now apply (order_preserving_back (cast AQ Q)).
+   now apply (order_reflecting (cast AQ Q)).
   now rewrite aq_shift_correct, rings.preserves_1, left_identity.
 Qed.
 

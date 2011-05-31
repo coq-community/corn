@@ -148,7 +148,7 @@ Lemma AQsin_pos_bound_correct : 0 ≤ a ≤ 3 ^ AQsin_pos_bound.
 Proof.
   split; [assumption |].
   unfold AQsin_pos_bound.
-  apply (order_preserving_back (cast AQ Q)).
+  apply (order_reflecting (cast AQ Q)).
   rewrite preserves_nat_pow.
   rewrite rings.preserves_3.
   rewrite <-(int_pow_nat_pow (f:=cast nat Z)).

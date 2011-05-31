@@ -24,7 +24,7 @@ Proof.
    destruct (decide (x = 1)) as [E3|E3].
     rewrite E3. compute; repeat split; discriminate.
    assert (1 < Qceiling (/x))%Z.
-    apply (strictly_order_preserving_back (cast Z Q)).
+    apply (strictly_order_reflecting (cast Z Q)).
     apply orders.lt_le_trans with (/x).
      apply dec_fields.flip_lt_dec_mult_inv_r; trivial.
      apply orders.lt_iff_le_ne. tauto.
@@ -230,7 +230,7 @@ Proof.
    now apply orders.lt_ne_flip.
   rewrite peano_naturals.S_nat_plus_1, rings.preserves_plus, rings.preserves_1 in Eb.
   assert (1 ≤ x / 'n).
-   apply (order_preserving_back (('n:Q) *.)).
+   apply (order_reflecting (('n:Q) *.)).
    now rewrite <-Ex2, rings.mult_1_r.
   destruct IHb with (x / 'n) as [IHb1 IHb2]; trivial.
    transitivity (Qdlog2 (ring_mult x (/2))).
