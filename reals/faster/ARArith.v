@@ -427,6 +427,8 @@ Proof.
   exact (E ('Pos_shiftl (1 : AQ₊) k)).
 Qed.
 
+(* Hack: we write [-1 - cast nat Z n] instead of [cast nat Z n] because
+   approximate is not Proper. *)
 Global Instance ARlt: Lt AR := λ x y, 
   ∃ n : nat, AR_epsilon_sign_dec (-1 - cast nat Z n) (y - x) ≡ Gt.
 
