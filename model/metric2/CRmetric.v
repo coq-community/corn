@@ -41,6 +41,17 @@ Bind Scope CR_scope with CR.
 
 Instance inject_Q_CR: Cast Q CR := (@Cunit Q_as_MetricSpace).
 
+(* 
+Since (@Cunit Q_as_MetricSpace) is a bundled function with a modulus 
+and uses a bundled representation of a metricspace as its domain, we 
+can't define:
+  Coercion inject_Q: Q_as_MetricSpace --> CR := (@Cunit Q_as_MetricSpace).
+However, is is possible to define:
+  Coercion inject_Q' (x : Q) : CR := (@Cunit Q_as_MetricSpace x).
+We omit this for backward, and forward, compatibity 
+(we can't define it for Q → AR either).
+*)
+
 (* begin hide *)
 Instance inject_Q_CR_wd: Proper ((=) ==> (=)) inject_Q_CR.
 Proof uc_wd (@Cunit Q_as_MetricSpace).
