@@ -1,11 +1,11 @@
 Require Import CRtrans Compress.
 Require Import ARtrans ARbigD.
 
-Definition eval (n:positive) (r : CR) : Q :=
- let m := iter_pos n _ (Pmult 10) 1%positive in approximate r (1#m)%Qpos.
+Definition eval (n:positive) (r : CR) :=
+ let m := iter_pos n _ (Pmult 10) 1%positive in let _ := approximate r (1#m)%Qpos in tt.
 
-Definition deval (n:positive) (r : ARbigD) : bigD :=
- let m := iter_pos n _ (Pmult 10) 1%positive in approximate r (1#m)%Qpos.
+Definition deval (n:positive) (r : ARbigD) :=
+ let m := iter_pos n _ (Pmult 10) 1%positive in let _ := approximate r (1#m)%Qpos in tt.
 
 Definition P01 : CR := sin (compress (sin (compress (rational_sin 1)))).
 Definition dP01 : ARbigD := ARsin (ARsin (AQsin 1)).
@@ -49,10 +49,10 @@ Time Eval vm_compute in (deval 10 dP07).
 Time Eval vm_compute in (deval 25 dP08).
 
 Eval compute in "new bigger"%string.
-Time Eval vm_compute in (deval 250 dP01).
-Time Eval vm_compute in (deval 250 dP02).
-Time Eval vm_compute in (deval 250 dP03).
-Time Eval vm_compute in (deval 250 dP04).
-Time Eval vm_compute in (deval 250 dP05).
-Time Eval vm_compute in (deval 1000 dP07).
-Time Eval vm_compute in (deval 1000 dP08).
+Time Eval vm_compute in (deval 500 dP01).
+Time Eval vm_compute in (deval 500 dP02).
+Time Eval vm_compute in (deval 500 dP03).
+Time Eval vm_compute in (deval 500 dP04).
+Time Eval vm_compute in (deval 500 dP05).
+Time Eval vm_compute in (deval 2000 dP07).
+Time Eval vm_compute in (deval 2000 dP08).
