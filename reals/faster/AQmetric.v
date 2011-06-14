@@ -49,6 +49,15 @@ Proof.
   now rewrite aq_shift_correct, rings.preserves_1, left_identity.
 Qed.
 
+Global Instance: Proper ((=) ==> (=) ==> (=) ==> (≡)) AQball_bool | 1.
+Proof.
+  intros ε1 ε2 E1 x1 x2 E2 y1 y2 E3.
+  case_eq (AQball_bool ε2 x2 y2). 
+   intro. apply AQball_bool_true. rewrite E1, E2, E3. now apply AQball_bool_true.
+  rewrite <-2!not_true_iff_false. intros E4 ?. apply E4.
+  apply AQball_bool_true. rewrite <-E1, <-E2, <-E3. now apply AQball_bool_true.
+Qed.
+
 Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ_as_MetricSpace) : 
   AQball_bool (Qdlog2 ε) x y ≡ true → ball ε x y.
 Proof.

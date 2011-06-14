@@ -23,10 +23,8 @@ Require Import QArith.
 Require Import Bool.
 Require Export Complete.
 Require Export Streams.
-Require Import Unicode.Utf8 Utf8_core.
 Require Import abstract_algebra theory.streams orders.naturals.
 
-Set Implicit Arguments.
 (**
 ** Limits
 A predicate saying there exists a point in the stream where a predicate
@@ -35,11 +33,22 @@ is satsified.
 We take the unusual step of puting this inductive type in Prop even
 though it contains constructive information.  This is because we expect
 this proof to only be used in proofs of termination. *)
-Inductive LazyExists A (P:Stream A -> Prop) (x: Stream A) : Prop :=
-  | LazyHere : P x -> LazyExists P x
-  | LazyFurther : (unit -> LazyExists P (tl x)) -> LazyExists P x.
+Inductive LazyExists {A} (P : Stream A → Prop) (x : Stream A) : Prop :=
+  | LazyHere : P x → LazyExists P x
+  | LazyFurther : (unit → LazyExists P (tl x)) → LazyExists P x.
+Implicit Arguments LazyHere [[A] [P] [x]].
+Implicit Arguments LazyFurther [[A] [P] [x]].
 
-Lemma LazyExists_tl {A} (P:Stream A → Prop) `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) : 
+Instance LazyExists_proper `{Setoid A} `{!Proper ((=) ==> iff) (P : Stream A → Prop)} : Proper ((=) ==> iff) (LazyExists P).
+Proof.
+  assert (∀ s1, LazyExists P s1 → ∀ s2, s1 = s2 → LazyExists P s2) as prf.
+   induction 1 as [|? ? IH]; intros s2 E.
+    left. now rewrite <-E.
+   right. intros _. apply (IH tt). now rewrite E.
+  split; repeat intro; eapply prf; eauto. now symmetry.
+Qed.
+
+Lemma LazyExists_tl `{P : Stream A → Prop} `(ex : LazyExists P s) (Ptl : EventuallyForAll P s) : 
   LazyExists P (tl s).
 Proof. 
   destruct ex as [? | further]. 
@@ -47,7 +56,7 @@ Proof.
   apply (further tt).
 Defined.
 
-Lemma LazyExists_Str_nth_tl {A} (P:Stream A → Prop) `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) (n : nat) : 
+Lemma LazyExists_Str_nth_tl `{P : Stream A → Prop} `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) (n : nat) : 
    LazyExists P (Str_nth_tl n s).
 Proof.
   induction n.
@@ -59,6 +68,31 @@ Proof.
   now apply ForAll_Str_nth_tl.
 Defined.
 
+Fixpoint LazyExists_inc `{P : Stream A → Prop}
+    (n : nat) s : LazyExists P (Str_nth_tl n s) → LazyExists P s :=
+  match n return LazyExists P (Str_nth_tl n s) → LazyExists P s with
+  | O => λ x, x
+  | S n => λ ex, LazyFurther (λ _, LazyExists_inc n (tl s) ex)
+  end.
+
+(*
+Fixpoint f (n m : nat) :=
+  match n with
+  | O => m
+  | S n => S (f n (f n m))
+  end.
+Fixpoint LazyExists_inc `{P : Stream A → Prop}
+    (n : nat) `(ex : LazyExists P s) (H : EventuallyForAll P s) : LazyExists P s :=
+  match n with
+  | O => ex
+  | S n => LazyFurther (λ _, LazyExists_inc n 
+     (LazyExists_inc n 
+       (LazyExists_tl ex H)
+       (EventuallyForAll_tl _ _ H))
+     (EventuallyForAll_tl _ _ H))
+  end.
+*)
+
 Section TakeUntil.
 (* begin hide *)
 Coercion Local Is_true : bool >-> Sortclass.
@@ -67,16 +101,16 @@ Coercion Local Is_true : bool >-> Sortclass.
 P is satisfied.  For efficency reasons it doesn't actually build a list, but
 takes continuations for cons and nil instead.  To build an actual list pass in
 the const and nil constructors. *)
-Fixpoint takeUntil (A B:Type) (P : Stream A -> bool)(s:Stream A) (ex:LazyExists P s) (cons: A -> B -> B) (nil : B) {struct ex} : B :=
-(if P s as b return ((P s -> b) -> B)
-then fun _ => nil
-else fun (n : P s -> False) => cons (hd s)
+Fixpoint takeUntil {A B : Type} (P : Stream A → bool) {s : Stream A} (ex:LazyExists P s) (cons: A → B → B) (nil : B) : B :=
+  (if P s as b return ((P s → b) → B)
+   then λ _, nil
+   else λ (n : P s → False), cons (hd s)
      (@takeUntil A B P (tl s)
       match ex with
       | LazyHere H => (False_ind _ (n H))
       | LazyFurther ex0 => ex0 tt
       end cons nil))
-(fun x => x).
+  (λ x, x).
 
 Lemma Is_true_neq_left x : x ≡ false → ¬x.
 Proof.
@@ -85,10 +119,9 @@ Proof.
   subst. discriminate.
 Qed.
 
-Lemma takeUntil_wd : forall (A B:Type) (P : Stream A -> bool)(s:Stream A)(ex1 ex2:LazyExists P s) (cons: A -> B -> B) (nil:B),
+Lemma takeUntil_wd {A B} {P : Stream A → bool} {s:Stream A} (ex1 ex2 : LazyExists P s) (cons : A → B → B) (nil : B) : 
   takeUntil P ex1 cons nil ≡ takeUntil P ex2 cons nil.
 Proof.
- intros A B P s ex1 ex2 cons nil.
  assert (H:=ex1).
  induction H; case ex1; clear ex1; case ex2; clear ex2; simpl;
    destruct (P x); try contradiction; auto.
@@ -109,7 +142,7 @@ Proof with try easy.
           destruct (eq_true_false_abs (P s1))... now rewrite E.
          destruct (eq_true_false_abs (P s1))... now rewrite E.
         destruct (eq_true_false_abs (P s1))... now rewrite E.
-       now destruct (Is_true_neq_left P3).
+       now destruct (Is_true_neq_left _ P3).
       destruct (eq_true_false_abs (P s1))... now rewrite E.
      destruct (eq_true_false_abs (P s1))... now rewrite E.
     destruct (eq_true_false_abs (P s1))... now rewrite E.
@@ -117,38 +150,37 @@ Proof with try easy.
   rewrite (IH tt); now rewrite E.
 Qed.
 
-Lemma takeUntil_end : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons:A -> B -> B) (nil : B),
- P seq -> takeUntil P ex cons nil ≡ nil.
+Lemma takeUntil_end {A B} (P:Stream A → bool) `(ex:LazyExists P seq) (cons:A → B → B) (nil : B) :
+ P seq → takeUntil P ex cons nil ≡ nil.
 Proof.
- intros A B P seq ex cons nil H.
- rewrite <- (takeUntil_wd (B:=B) P (LazyHere P _ H)).
+ intros H.
+ rewrite <- (takeUntil_wd (B:=B) (LazyHere (P:=P) H)).
  unfold takeUntil.
  destruct (P seq);[|contradiction].
  reflexivity.
 Qed.
 
-Lemma takeUntil_step : forall (A B:Type) (P:Stream A -> bool) seq (ex:LazyExists P seq) (cons: A -> B -> B) (nil: B),
- ~P seq -> exists ex':(LazyExists P (tl seq)), takeUntil P ex cons nil ≡ cons (hd seq) (takeUntil P ex' cons nil).
+Lemma takeUntil_step {A B} (P:Stream A → bool) `(ex:LazyExists P s) (cons: A → B → B) (nil: B) :
+  ¬P s → ∃ ex' : LazyExists P (tl s), takeUntil P ex cons nil ≡ cons (hd s) (takeUntil P ex' cons nil).
 Proof.
- intros A B P seq ex cons nil H.
+ intros H.
  assert (ex':=ex).
  destruct ex' as [H0|ex'].
   elim H; assumption.
  exists (ex' tt).
- rewrite <- (takeUntil_wd (B:=B) P (LazyFurther seq ex')).
+ rewrite <- (takeUntil_wd (B:=B) (LazyFurther ex')).
  simpl.
- destruct (P seq).
+ destruct (P s).
   elim H; constructor.
  reflexivity.
 Qed.
 
-Lemma takeUntil_elim : forall (A B:Type) (P:Stream A -> bool) (cons: A -> B -> B) (nil: B)
- (Q: Stream A -> B -> Prop),
- (forall seq, P seq -> Q seq nil) ->
- (forall seq x, Q (tl seq) x -> ~P seq -> Q seq (cons (hd seq) x)) ->
- forall seq (ex:LazyExists P seq), Q seq (takeUntil P ex cons nil).
+Lemma takeUntil_elim {A B} (P:Stream A → bool) (cons: A → B → B) (nil: B) (Q: Stream A → B → Prop) :
+  (∀ s, P s → Q s nil) →
+  (∀ s x, Q (tl s) x → ¬P s → Q s (cons (hd s) x)) →
+  ∀ `(ex : LazyExists P s), Q s (takeUntil P ex cons nil).
 Proof.
- intros A B P cons nil Q c1 c2 seq ex.
+ intros c1 c2 s ex.
  assert (ex':=ex).
  induction ex'.
   rewrite takeUntil_end; try assumption.
@@ -164,7 +196,7 @@ Proof.
   apply Z0'.
   constructor.
  clear Z0 Z0'.
- destruct (Z1 (fun x => x)) as [ex' Z].
+ destruct (Z1 (λ x, x)) as [ex' Z].
  rewrite Z.
  clear Z Z1.
  eapply Z1'; auto.
@@ -173,7 +205,7 @@ Proof.
 Qed.
 
 (* Alternatively we can first compute the required length. This is useful in case we actually have to use the length *)
-Definition takeUntil_length {A} (P : Stream A → bool) (s : Stream A) (ex : LazyExists P s)
+Definition takeUntil_length `(P : Stream A → bool) `(ex : LazyExists P s)
   := takeUntil P ex (λ _, S) O.
 
 Fixpoint take {A B} (s : Stream A) (n : nat) (cons: A → B → B) (nil : B) : B := 
@@ -208,7 +240,7 @@ Proof with auto using Is_true_eq_left, Is_true_neq_left.
   rewrite E1. rewrite (IH tt)...
   destruct (takeUntil_step P ex (λ _, S) O) as [ex2 E2]...
   rewrite E2. simpl.
-  rewrite (takeUntil_wd P ex1 ex2 (λ _, S) O)...
+  rewrite (takeUntil_wd ex1 ex2 (λ _, S) O)...
 Qed.
 
 Lemma takeUntil_length_tl {A} (P : Stream A → bool) `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) :
@@ -236,13 +268,13 @@ Proof with auto with *.
   simpl.
   apply le_n_S.
   unfold takeUntil_length.
-  setoid_rewrite (takeUntil_wd P (LazyExists_Str_nth_tl ex Ptl (S n)) 
+  setoid_rewrite (takeUntil_wd (LazyExists_Str_nth_tl ex Ptl (S n)) 
     (LazyExists_Str_nth_tl (LazyExists_tl ex Ptl) (ForAll_Str_nth_tl 1 Ptl) n) (λ _, S) O).
   apply IHn.
 Qed.
 
-Lemma takeUntil_length_ForAllIf {A1 A2} (P1 : Stream A1 → bool) {s1 : Stream A1} (ex1 : LazyExists P1 s1)
-       (P2 : Stream A2 → bool) {s2 : Stream A2} (ex2 : LazyExists P2 s2) (F : ForAllIf P2 P1 s2 s1) :
+Lemma takeUntil_length_ForAllIf {A1 A2} (P1 : Stream A1 → bool) `(ex1 : LazyExists P1 s1)
+       {P2 : Stream A2 → bool} `(ex2 : LazyExists P2 s2) (F : ForAllIf P2 P1 s2 s1) :
   takeUntil_length P1 ex1 ≤ takeUntil_length P2 ex2.
 Proof with auto using Is_true_eq_left, Is_true_neq_left.
   revert s2 ex2 F.
@@ -252,7 +284,7 @@ Proof with auto using Is_true_eq_left, Is_true_neq_left.
    rewrite takeUntil_end... apply le_0_n.
   case_eq (P1 s1); intros EP1.
    rewrite takeUntil_end... apply le_0_n.
-  destruct (takeUntil_step P1 ex1 (λ _, S) O) as [ex1' E1']...
+  destruct (takeUntil_step _ ex1 (λ _, S) O) as [ex1' E1']...
   rewrite E1'. 
   assert (ex2':=ex2).
   induction ex2' as [s2|s2 ? IH2].
@@ -263,7 +295,7 @@ Proof with auto using Is_true_eq_left, Is_true_neq_left.
    destruct F. 
    rewrite takeUntil_end in E1'...
    discriminate.
-  destruct (takeUntil_step P2 ex2 (λ _, S) O) as [ex2' E2']...
+  destruct (takeUntil_step _ ex2 (λ _, S) O) as [ex2' E2']...
   rewrite E2'.
    apply le_n_S, (IH tt).
   destruct F...
@@ -272,16 +304,17 @@ Qed.
 End TakeUntil.
 
 Section Limit.
-
-Variable X : MetricSpace.
+Context {X : MetricSpace}.
 
 (** This proposition says that the entire stream is within e of l *)
-Definition NearBy (l:X)(e:QposInf) := ForAll (fun (s:Stream X) => ball_ex e (hd s) l).
+Definition NearBy (l : X) (ε : QposInf) := ForAll (λ s, ball_ex ε (hd s) l).
 
-Lemma NearBy_comp: forall l1 l2, st_eq l1 l2 -> forall (e1 e2:Qpos), QposEq e1 e2 -> forall s, (NearBy l1 e1 s <-> NearBy l2 e2 s).
+Lemma NearBy_comp l1 l2 :
+  l1 = l2 → ∀ ε1 ε2, QposEq ε1 ε2 → ∀ s, (NearBy l1 ε1 s ↔ NearBy l2 ε2 s).
 Proof.
- cut (forall l1 l2 : X, st_eq l1 l2 -> forall e1 e2 : Qpos,
-   QposEq e1 e2 -> forall s : Stream X, NearBy l1 e1 s -> NearBy l2 e2 s).
+ revert l1 l2.
+ cut (∀ l1 l2 : X, l1 = l2 → ∀ ε1 ε2 : Qpos,
+   QposEq ε1 ε2 → ∀ s : Stream X, NearBy l1 ε1 s → NearBy l2 ε2 s).
   intros.
   split.
    firstorder.
@@ -293,26 +326,26 @@ Proof.
    apply H1.
   assumption.
  unfold NearBy; simpl.
- intros l1 l2 Hl e1 e2 He.
+ intros l1 l2 Hl ε1 ε2 Hε.
  cofix.
  intros s [H0 H].
  constructor.
   simpl.
   rewrite <- Hl.
-  rewrite <- He.
+  rewrite <- Hε.
   assumption.
  auto.
 Qed.
 
-Lemma NearBy_weak: forall l (e1 e2:Qpos), e1 <= e2 -> forall s, NearBy l e1 s -> NearBy l e2 s.
+Lemma NearBy_weak l (ε1 ε2 : Qpos) : 
+  ε1 <= ε2 → ∀ s, NearBy l ε1 s → NearBy l ε2 s.
 Proof.
  unfold NearBy; simpl.
- intros l e1 e2 He.
  cofix.
- intros s [H0 H].
+ intros Hε s [H0 H].
  constructor.
   eapply ball_weak_le.
-   apply He.
+   apply Hε.
   assumption.
  auto.
 Qed.
@@ -325,20 +358,38 @@ Proof with trivial.
   constructor...
 Qed.
 
+Lemma Nearby_tl `(H : NearBy l ε s) : NearBy l ε (tl s).
+Proof. now destruct H. Defined.
+
+Lemma Nearby_Str_nth_tl `(H : NearBy l ε s) : ∀ n, NearBy l ε (Str_nth_tl n s).
+Proof.
+  induction n.
+   easy.
+  simpl. rewrite <-tl_nth_tl. now apply Nearby_tl.
+Defined.
+
+Lemma Nearby_EventuallyForAll l ε s : EventuallyForAll (NearBy l ε) s.
+Proof.
+  revert s.
+  cofix FIX. constructor.
+   now apply Nearby_tl.
+  now apply (FIX (tl s)).
+Defined.
+
 (** l is the limit if for every e there exists a point where the stream is
 always within e of l. *)
-Class Limit (s:Stream X) (l:X) := limit: forall e, LazyExists (NearBy l e) s.
+Class Limit (s : Stream X) (l:X) := limit: ∀ ε, LazyExists (NearBy l ε) s.
 
-Global Instance Limit_tl `{H : Limit s l} : Limit (tl s) l.
+Global Instance Limit_tl `(H : Limit s l) : Limit (tl s) l.
 Proof.
- intros e.
- destruct (H e) as [[_ H']|H'].
+ intros ε.
+ destruct (H ε) as [[_ H']|H'].
   left; auto.
  apply H'.
  constructor.
 Defined.
 
-Global Instance Limit_Str_nth_tl `{H : Limit s l} : forall n, Limit (Str_nth_tl n s) l.
+Global Instance Limit_Str_nth_tl `(H : Limit s l) : ∀ n, Limit (Str_nth_tl n s) l.
 Proof.
  intros n.
  revert s l H.
@@ -347,7 +398,7 @@ Proof.
  intros.
  simpl.
  apply IHn.
- apply Limit_tl.
+ now apply Limit_tl.
 Defined.
 
 End Limit.

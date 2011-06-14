@@ -46,6 +46,25 @@ CoFixpoint ARInfAltSum_approx (sN sD : Stream AQ) (k l : Z) : Stream AQ := Cons
   (app_div_above (hd sN) (hd sD) (k - Z.log2_up l))
   (ARInfAltSum_approx (tl sN) (tl sD) k (l + 1)).
 
+Definition ARInfAltSum_approx_tl sN sD k l :
+  tl (ARInfAltSum_approx sN sD k l) = ARInfAltSum_approx (tl sN) (tl sD) k (l + 1).
+Proof.
+  revert sN sD k l.
+  now constructor.
+Qed.
+
+Definition ARInfAltSum_approx_Str_nth_tl sN sD k l n :
+  Str_nth_tl n (ARInfAltSum_approx sN sD k l) = ARInfAltSum_approx (Str_nth_tl n sN) (Str_nth_tl n sD) k (l + n).
+Proof.
+  induction n.
+   change (l + 0%nat)%Z with (l + 0). now rewrite rings.plus_0_r.
+  rewrite !Str_nth_tl_S.
+  replace (l + S n)%Z with ((l + n) + 1)%Z.
+   rewrite IHn. now apply ARInfAltSum_approx_tl.
+  change (l + 'n + 1 = l + '(1 + n)).
+  rewrite rings.preserves_plus, rings.preserves_1. ring.
+Qed.
+
 Lemma ARInfAltSum_approx_ge `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} (ε : Qpos) (l : Z) :
   ForAllIf (λ s, AQball_bool (Qdlog2 ε) (hd s) 0) (λ s, Qball_ex_bool ε (hd s) 0) 
     (ARInfAltSum_approx sN sD (Qdlog2 ε) l) sQ.
@@ -79,8 +98,8 @@ Proof with auto.
   now apply _.
 Qed.
 
-Lemma ARInfAltSum_lazylength_Further `(d : DivisionStream sQ sN sD) (k : Z) `(Pl : 2 + 2 ≤ (l:Z)) :
-  NearBy 0 (Qpos2QposInf (2 ^ (k - 1))) sQ → Is_true (AQball_bool k (hd (ARInfAltSum_approx sN sD k l)) 0).
+Lemma ARInfAltSum_length_ball `(d : DivisionStream sQ sN sD) (k l : Z) `(Pl : 2 + 2 ≤ l) :
+  NearBy 0 (Qpos2QposInf (2 ^ (k - 1))) sQ → AQball_bool k (hd (ARInfAltSum_approx sN sD k l)) 0.
 Proof.
   intros E.
   apply Is_true_eq_left.
@@ -88,8 +107,8 @@ Proof.
   rewrite rings.preserves_0.
   apply ball_weak_le with ((2 ^ (k - Z.log2_up l)) + (2 ^ (k - Z.log2_up l)) + 2 ^ (k - 1))%Qpos.
    simpl.
-   assert (∀ n : Z, (2:Q) ^ n = 2 ^ (n - 1) + 2 ^ (n - 1)) as G. 
-    intros n. 
+   assert (∀ n : Z, (2:Q) ^ n = 2 ^ (n - 1) + 2 ^ (n - 1)) as G.
+    intros n.
     ms_setoid_replace n with (1 + (n - 1)) at 1 by ring.
     rewrite int_pow_S.
      now rewrite rings.plus_mult_distr_r, left_identity.
@@ -107,8 +126,8 @@ Proof.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.
    now apply semirings.plus_le_compat.
-  eapply ball_triangle. 
-   2: now apply E. 
+  eapply ball_triangle.
+   2: now apply E.
   simpl. unfold app_div_above.
   rewrite <-(rings.plus_0_r (hd sQ)).
   destruct d as [? ? ? F]. rewrite F.
@@ -119,20 +138,39 @@ Proof.
   now apply Qball_0_r.
 Qed.
 
-Lemma ARInfAltSum_lazylength_aux `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k : Z) `(Pl : 2 + 2 ≤ (l : Z)) :
+Lemma ARInfAltSum_length_ex `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k l : Z) (Pl : 2 + 2 ≤ l) :
   LazyExists (λ s, AQball_bool k (hd s) 0) (ARInfAltSum_approx sN sD k l).
 Proof.
   revert l Pl sN sD d.
   induction (zl (2 ^ (k - 1)))%Qpos as [sQ' E | ? ? IH]; intros l El sN sD d.
-   left. now apply (ARInfAltSum_lazylength_Further d k El).
-  right. intros _. 
+   left. now apply (ARInfAltSum_length_ball d k l El).
+  right. intros _.
   simpl. apply (IH tt).
    now apply semirings.plus_le_compat_r.
   now destruct d.
 Defined.
 
-Definition ARInfAltSum_length `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k : Z)
-  := 4 + takeUntil_length _ (ARInfAltSum_lazylength_aux (DivisionStream_Str_nth_tl d 4) k (reflexivity (2 + 2))).
+(* 
+Before using the proof of termination, we perform [big] steps. We pick [big] 
+such that computation will suffer from the implementation limits of Coq 
+(e.g. a stack overflow) or runs out of memory, before it ever refers to the proof.
+*)
+Definition big := Eval vm_compute in (5 * 10 * 10 * 10 * 10)%nat.
+Obligation Tactic := idtac.
+Program Definition ARInfAltSum_length `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k : Z) 
+  := 4 + takeUntil_length 
+      (λ s, AQball_bool k (hd s) 0) 
+      (LazyExists_inc big (ARInfAltSum_approx (Str_nth_tl 4 sN) (Str_nth_tl 4 sD) k 4) _).
+Next Obligation.
+  intros.
+  assert (Proper ((=) ==> iff) (λ s, AQball_bool k (hd s) 0)) by solve_proper.
+  rewrite ARInfAltSum_approx_Str_nth_tl.
+  rewrite 2!Str_nth_tl_plus.
+  eapply ARInfAltSum_length_ex.
+    eapply DivisionStream_Str_nth_tl. now eexact d.
+   now apply Limit_Str_nth_tl.
+  now vm_compute.
+Qed.
 
 Lemma ARInfAltSum_length_ge `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0} (ε : Qpos) :
   takeUntil_length _ (Limit_near sQ 0 ε) ≤ ARInfAltSum_length d (Qdlog2 ε).

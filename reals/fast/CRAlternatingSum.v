@@ -209,7 +209,7 @@ Proof.
   intros E1.
   unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
   rewrite takeUntil_correct.
-  destruct (total (≤) l (takeUntil_length (λ s, Qball_ex_bool ε2 (hd s) 0) (Limit_near s 0 ε2))) as [E2|E2].
+  destruct (total (≤) l (takeUntil_length _ (Limit_near s 0 ε2))) as [E2|E2].
    apply ball_sym.
    apply (InfiniteAlternatingSum_further_aux _).
     easy.

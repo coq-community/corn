@@ -95,7 +95,7 @@ Proof.
   left.
   abstract ( destruct e as [e|];[|apply ForAll_True]; assert (Heq:e==((e*Qpos_inv x)*x)%Qpos);[
     autorewrite with QposElim; field; apply Qpos_nonzero
-      |rewrite -> (NearBy_comp _ 0 0 (Qeq_refl 0) Heq ); apply (mult_Streams_nbz H Hb)] ).
+      |rewrite -> (NearBy_comp _ _ (Qeq_refl 0) _ _ Heq ); apply (mult_Streams_nbz H Hb)] ).
  right.
  simpl.
  rename H0 into IHExists.
