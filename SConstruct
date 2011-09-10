@@ -36,6 +36,6 @@ ParseDepends('deps')
 open('coqidescript', 'w').write('#!/bin/sh\ncoqide ' + Rs + ' $@ \n')
 os.chmod('coqidescript', 0755)
 
-env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name')
+env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name --coqlib http://coq.inria.fr/library')
 
 env.Command('deps.dot', [], 'tools/DepsToDot.hs < deps > $TARGET')
