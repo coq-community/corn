@@ -339,6 +339,7 @@ Qed.
 
 Definition ARInfAltSum := mkRegularFunction (0 : AQ_as_MetricSpace) ARInfAltSum_prf.
 
+
 Lemma ARInfAltSum_correct:
    'ARInfAltSum = InfiniteAlternatingSum sQ.
 Proof.
