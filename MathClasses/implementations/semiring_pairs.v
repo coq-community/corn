@@ -17,7 +17,7 @@ Add Ring SR : (rings.stdlib_semiring_theory SR).
 
 (* Equivalence *)
 Global Instance SRpair_equiv : Equiv (SRpair SR) := λ x y, pos x + neg y = pos y + neg x.
-Global Instance SRpair_apart `{Apart SR} : Apart (SRpair SR) := λ x y, pos x + neg y ⪥ pos y + neg x.
+Global Instance SRpair_apart `{Apart SR} : Apart (SRpair SR) := λ x y, pos x + neg y ≶ pos y + neg x.
 
 Global Instance SRpair_trivial_apart `{!TrivialApart SR} :  TrivialApart (SRpair SR).
 Proof. intros x y. now rapply trivial_apart. Qed. 
@@ -48,16 +48,16 @@ Global Instance: Proper ((=) ==> (=)) SRpair_inject.
 Proof. intros x1 x2 E. unfold equiv, SRpair_equiv. simpl. now rewrite E. Qed.
 
 (* Relations, operations and constants *)
-Global Instance SRpair_plus: RingPlus (SRpair SR) := λ x y, C (pos x + pos y) (neg x + neg y).
-Global Instance SRpair_opp: GroupInv (SRpair SR) := λ x, C (neg x) (pos x).
-Global Instance SRpair_0: RingZero (SRpair SR) := ('0 : SRpair SR).
-Global Instance SRpair_mult: RingMult (SRpair SR) := λ x y, C (pos x * pos y + neg x * neg y) (pos x * neg y + neg x * pos y).
-Global Instance SRpair_1: RingOne (SRpair SR) := ('1 : SRpair SR).
+Global Instance SRpair_plus: Plus (SRpair SR) := λ x y, C (pos x + pos y) (neg x + neg y).
+Global Instance SRpair_negate: Negate (SRpair SR) := λ x, C (neg x) (pos x).
+Global Instance SRpair_0: Zero (SRpair SR) := ('0 : SRpair SR).
+Global Instance SRpair_mult: Mult (SRpair SR) := λ x y, C (pos x * pos y + neg x * neg y) (pos x * neg y + neg x * pos y).
+Global Instance SRpair_1: One (SRpair SR) := ('1 : SRpair SR).
 
-Ltac unfolds := unfold SRpair_opp, SRpair_plus, equiv, SRpair_equiv in *; simpl in *.
+Ltac unfolds := unfold SRpair_negate, SRpair_plus, equiv, SRpair_equiv in *; simpl in *.
 Ltac ring_on_sr := repeat intro; unfolds; try ring.
 
-Instance: Proper ((=) ==> (=)) SRpair_opp.
+Instance: Proper ((=) ==> (=)) SRpair_negate.
 Proof. 
   intros x y E. unfolds. 
   rewrite commutativity, <- E. ring.
@@ -190,7 +190,7 @@ Section with_strict_semiring_order.
   Instance: Proper ((=) ==> (=) ==> iff) SRpair_lt.
   Proof.
     assert (∀ x1 y1 : SRpair SR, x1 = y1 → ∀ x2 y2, x2 = y2 → x1 < x2 → y1 < y2) as E.
-     unfold_le. intros [xp1 xn1] [yp1 yn1] E1 [xp2 xn2] [yp2 yn2] E2 F. simpl in *.
+     unfold_lt. intros [xp1 xn1] [yp1 yn1] E1 [xp2 xn2] [yp2 yn2] E2 F. simpl in *.
      apply (strictly_order_reflecting (+ (xp2 + xn1))).
      setoid_replace (yp1 + yn2 + (xp2 + xn1)) with ((yp1 + xn1) + (xp2 + yn2)) by ring.
      rewrite <-E1, E2.
@@ -248,7 +248,7 @@ Section with_full_pseudo_semiring_order.
   Instance: StrongSetoid (SRpair SR).
   Proof.
     split.
-       intros [??] E. now eapply (irreflexivity (⪥)); eauto.
+       intros [??] E. now eapply (irreflexivity (≶)); eauto.
       intros [??] [??] E. unfold apart, SRpair_apart. now symmetry.
      intros [xp xn] [yp yn] E [zp zn]. unfold apart, SRpair_apart in *. simpl in *.
      apply (strong_left_cancellation (+) zn) in E.

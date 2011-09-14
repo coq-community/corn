@@ -13,22 +13,22 @@ Add Ring R : (rings.stdlib_semiring_theory R).
 Global Instance NonNeg_inject: Cast (R⁺) R := @proj1_sig R _.
 
 (* Operations *)
-Global Program Instance NonNeg_plus: RingPlus (R⁺) := λ x y, (x + y)↾_. 
+Global Program Instance NonNeg_plus: Plus (R⁺) := λ x y, (x + y)↾_. 
 Next Obligation.
   destruct x as [x Hx], y as [y Hy].
   now apply nonneg_plus_compat.
 Qed.
 
-Global Program Instance NonNeg_mult: RingMult (R⁺) := λ x y, (x * y)↾_. 
+Global Program Instance NonNeg_mult: Mult (R⁺) := λ x y, (x * y)↾_. 
 Next Obligation.
   destruct x as [x Hx], y as [y Hy].
   now apply nonneg_mult_compat.
 Qed.
 
-Global Program Instance NonNeg_0: RingZero (R⁺) := 0↾_.
+Global Program Instance NonNeg_0: Zero (R⁺) := 0↾_.
 Next Obligation. reflexivity. Qed. 
 
-Global Program Instance NonNeg_1: RingOne (R⁺) := 1↾_.
+Global Program Instance NonNeg_1: One (R⁺) := 1↾_.
 Next Obligation. apply le_0_1. Qed.
 
 (* * Equalitity *)
@@ -66,8 +66,8 @@ Proof. intros x y. now rapply trivial_apart. Qed.
 Global Instance NonNeg_equiv_dec `{∀ x y : R, Decision (x = y)} : ∀ x y: R⁺, Decision (x = y) 
   := λ x y, decide_rel (=) ('x) ('y).
 
-Global Instance NonNeg_apart_dec `{∀ x y : R, Decision (x ⪥ y)} : ∀ x y: R⁺, Decision (x ⪥ y) 
-  := λ x y, decide_rel (⪥) ('x) ('y).
+Global Instance NonNeg_apart_dec `{∀ x y : R, Decision (x ≶ y)} : ∀ x y: R⁺, Decision (x ≶ y) 
+  := λ x y, decide_rel (≶) ('x) ('y).
 
 (* Order *)
 Global Instance NonNeg_le: Le (R⁺) := λ x y, 'x ≤ 'y.

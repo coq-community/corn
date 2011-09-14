@@ -1,15 +1,22 @@
 Require Import
   Morphisms Program
-  abstract_algebra interfaces.monads.
+  abstract_algebra interfaces.monads jections.
+
+Inductive option_equiv A `{Equiv A} : Equiv (option A) :=
+  | option_equiv_Some x₁ x₂ : x₁ = x₂ → Some x₁ = Some x₂
+  | option_equiv_None : None = None.
+
+Existing Instance option_equiv.
+Hint Constructors option_equiv.
 
 Section contents.
-  Context A `{Setoid A}.
+  Context `{Setoid A}.
 
-  Inductive option_equiv: Equiv (option A) :=
-    | option_equiv_Some x₁ x₂ : x₁ = x₂ → Some x₁ = Some x₂
-    | option_equiv_None : None = None.
-  Existing Instance option_equiv.
-  Hint Constructors option_equiv.
+  Lemma Some_ne_None x : Some x ≠ None.
+  Proof. intros E. inversion E. Qed.
+
+  Lemma None_ne_Some x : None ≠ Some x.
+  Proof. intros E. inversion E. Qed.
 
   Global Instance: Setoid (option A).
   Proof.
@@ -27,6 +34,36 @@ Section contents.
 
   Global Instance: Injective Some.
   Proof. split; try apply _. intros ? ? E. now inversion E. Qed.
+
+  Lemma option_equiv_alt x y :
+    x = y ↔ (∀ n, x = Some n ↔ y = Some n).
+  Proof.
+    split; intros E1.
+     intro. now rewrite E1.
+    destruct x, y.
+       now apply E1.
+      symmetry. now apply E1.
+     now apply E1.
+    easy.
+  Qed.
+ 
+  Program Instance option_dec `(A_dec : ∀ x y : A, Decision (x = y))
+     : ∀ x y : option A, Decision (x = y) := λ x y,
+    match x with
+    | Some r => 
+      match y with
+      | Some s => match A_dec r s with left _ => left _ | right _ => right _ end
+      | None => right _
+      end
+    | None =>
+      match y with
+      | Some s => right _
+      | None => left _
+      end
+    end.
+  Next Obligation. now apply (injective_ne Some). Qed.
+  Next Obligation. apply Some_ne_None. Qed.
+  Next Obligation. apply None_ne_Some. Qed.
 End contents.
 
 Hint Extern 10 (Equiv (option _)) => apply @option_equiv : typeclass_instances. 
