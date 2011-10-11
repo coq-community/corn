@@ -1,3 +1,5 @@
+(*
+
 (* This is a test of how to combine type classes with the old records.
 Specifically, how to use the pointfree machinery with the [Complete] monad *)
 Require Import CRtrans.
@@ -75,3 +77,5 @@ But this cannot be a Coercion(?)
 
 End test.
 End ODE.
+
+*)

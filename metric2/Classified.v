@@ -67,7 +67,7 @@ Hint Unfold relation : type_classes.
    apply mspc_ball_zero.
    apply mspc_closed.
    intros.
-   setoid_replace (@ring_plus Qinf _ 0 d) with (d: Qinf)...
+   setoid_replace (@plus Qinf _ 0 d) with (d: Qinf)...
    change (0 + d == d). ring.
   Qed. (* Todo: Use a bi-impl instead. *)
 
@@ -241,7 +241,7 @@ Section genball.
   Proof with auto with *.
    intros.
    unfold genball.
-   destruct e0...
+   destruct e...
    destruct Qdec_sign as [[|]|].
      assert (0 < (1#2) * -q)%Q.
       apply Qmult_lt_0_compat...
@@ -763,7 +763,7 @@ Section proper_functions.
         unfold mspc_ball in H3.
         destruct H3.
         simpl in H3.
-        apply (Qlt_not_le e0 0)...
+        apply (Qlt_not_le e 0)...
        unfold mspc_ball.
        unfold MetricSpaceBall_instance_2.
        intros.
@@ -782,7 +782,7 @@ Section proper_functions.
        reflexivity.
       split. simpl. auto.
       intros.
-      apply (mspc_refl B e0)...
+      apply (mspc_refl B e)...
      split.
       apply H2.
      intros.
@@ -797,7 +797,7 @@ Section proper_functions.
      apply H2.
     apply H3.
    split.
-    destruct e0. 2: simpl; auto.
+    destruct e. 2: simpl; auto.
     unfold mspc_ball in H2.
     unfold MetricSpaceBall_instance_2 in H2.
     destruct (Qdec_sign q) as [[|]|].

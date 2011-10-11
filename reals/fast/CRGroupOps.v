@@ -38,10 +38,10 @@ Opaque CR Qmin Qmax.
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 
-Instance CR0: RingZero CR := cast Q CR 0.
+Instance CR0: Zero CR := cast Q CR 0.
 Notation "0" := (inject_Q_CR 0) : CR_scope.
 
-Instance CR1: RingOne CR := cast Q CR 1.
+Instance CR1: One CR := cast Q CR 1.
 Notation "1" := (inject_Q_CR 1) : CR_scope.
 
 (**
@@ -129,7 +129,7 @@ Proof. apply _. Qed.*)
 (** Finally, CRplus: *)
 
 Definition CRplus_uc : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qplus_uc.
-Instance CRplus: RingPlus CR := ucFun2 CRplus_uc.
+Instance CRplus: Plus CR := ucFun2 CRplus_uc.
 Notation "x + y" := (ucFun2 CRplus_uc x y) : CR_scope.
 
 (** But here, too having CRplus as a CR-->CR-->CR does not show that it is uniformly continuous
@@ -207,7 +207,7 @@ Qed.
 Definition Qopp_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qopp_uc_prf.
 
-Instance CRopp: GroupInv CR := Cmap QPrelengthSpace Qopp_uc.
+Instance CRopp: Negate CR := Cmap QPrelengthSpace Qopp_uc.
 
 Notation "- x" := (CRopp x) : CR_scope.
 

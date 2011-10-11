@@ -1,3 +1,4 @@
+(*
 Require Import 
   Program CornTac workaround_tactics
   Qmetric Qdlog CRGeometricSum
@@ -88,6 +89,7 @@ Proof.
 Qed.
 
 
+End geom_sum.
 
 (** We now proof that as $i → ∞$ then $x_i → 0$, ie. the series has limit 0 *)
 
@@ -134,6 +136,8 @@ Fixpoint ARGeomSum (sN sD : Stream AQ) (l : nat) (k : Z) :=
   | O => 0
   | S l' => app_div (hd sN) (hd sD) k + ARGeomSum (tl sN) (tl sD) l' k
   end.
+
+End gs_zl.
 
 (*
 Definition ARInfGeomSum_raw (ε : Qpos) : AQ_as_MetricSpace :=
@@ -202,5 +206,7 @@ Definition bar `(g : GeometricSeries s) (ε:QposInf) : nat :=
   (* convert to base a *)
   let lg := Qdlog(a) / Qdlog(ε / hd s) in
     Qround.Qceiling(lg).
+
+*)
 
 *)

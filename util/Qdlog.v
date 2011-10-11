@@ -26,12 +26,12 @@ Proof.
    assert (1 < Qceiling (/x))%Z.
     apply (strictly_order_reflecting (cast Z Q)).
     apply orders.lt_le_trans with (/x).
-     apply dec_fields.flip_lt_dec_mult_inv_r; trivial.
+     apply dec_fields.flip_lt_dec_recip_r; trivial.
      apply orders.lt_iff_le_ne. tauto.
     now apply Qle_ceiling.
    split.
-    rewrite int_pow_opp. 
-    apply dec_fields.flip_le_dec_mult_inv_l; trivial.
+    rewrite int_pow_negate.
+    apply dec_fields.flip_le_dec_recip_l; trivial.
     transitivity ('Qceiling (/x)).
      now apply Qle_ceiling.
     change 2 with ('(2 : Z)). rewrite <-Qpower.Zpower_Qpower.
@@ -39,8 +39,8 @@ Proof.
      now apply Z.log2_up_spec.
     now apply Z.log2_up_nonneg.
    ms_setoid_replace (1 - Z.log2_up (Qceiling (/x))) with (-Zpred (Z.log2_up (Qceiling (/x)))).
-    rewrite int_pow_opp.
-    apply dec_fields.flip_lt_dec_mult_inv_r.
+    rewrite int_pow_negate.
+    apply dec_fields.flip_lt_dec_recip_r.
      solve_propholds.
     apply orders.le_lt_trans with ('Zpred (Qceiling (/x))).
      change 2 with ('(2 : Z)). rewrite <-Qpower.Zpower_Qpower.
@@ -51,7 +51,7 @@ Proof.
     now apply Qceiling_lt.
    rewrite <-Z.sub_1_r.
    change (1 - Z.log2_up (Qceiling (/ x)) = -(Z.log2_up (Qceiling (/ x)) - 1)).
-   now rewrite <-rings.opp_swap_l, commutativity.
+   now rewrite <-rings.negate_swap_l, commutativity.
   apply orders.le_flip in E2.
   split.
    transitivity ('Qfloor x).
@@ -121,7 +121,7 @@ Proof.
 Qed.
 
 Lemma Qdlog2_mult_pow2 (x : Q) (n : Z) : 
-  0 < x → Qdlog2 x + n = Qdlog2 (ring_mult x (2 ^ n)).
+  0 < x → Qdlog2 x + n = Qdlog2 (mult x (2 ^ n)).
 Proof.
   intros E. apply Qdlog2_unique.
    apply pos_mult_compat; [easy | solve_propholds].
@@ -136,11 +136,11 @@ Proof.
 Qed.
 
 Lemma Qdlog2_half (x : Q) : 
-  0 < x → Qdlog2 x - 1 = Qdlog2 (ring_mult x (/2)).
+  0 < x → Qdlog2 x - 1 = Qdlog2 (mult x (/2)).
 Proof. intros E. now rewrite Qdlog2_mult_pow2. Qed.
 
 Lemma Qdlog2_double (x : Q) : 
-  0 < x → Qdlog2 x + 1 = Qdlog2 (ring_mult x 2).
+  0 < x → Qdlog2 x + 1 = Qdlog2 (mult x 2).
 Proof. intros E. now rewrite Qdlog2_mult_pow2. Qed.
 
 Lemma Qdlog2_preserving (x y : Q) :
@@ -226,19 +226,19 @@ Proof.
   apply orders.not_lt_le_flip in E.
   assert (x = 'n * (x / 'n)) as Ex2.
    rewrite (commutativity x), associativity.
-   rewrite dec_mult_inverse, rings.mult_1_l; [reflexivity |].
+   rewrite dec_recip_inverse, rings.mult_1_l; [reflexivity |].
    now apply orders.lt_ne_flip.
   rewrite peano_naturals.S_nat_plus_1, rings.preserves_plus, rings.preserves_1 in Eb.
   assert (1 ≤ x / 'n).
    apply (order_reflecting (('n:Q) *.)).
    now rewrite <-Ex2, rings.mult_1_r.
   destruct IHb with (x / 'n) as [IHb1 IHb2]; trivial.
-   transitivity (Qdlog2 (ring_mult x (/2))).
+   transitivity (Qdlog2 (mult x (/2))).
     apply Qdlog2_preserving.
      apply orders.lt_le_trans with 1; [solve_propholds | assumption].
     apply (maps.order_preserving_nonneg (.*.) x).
      now transitivity (1:Q).
-    apply dec_fields.flip_le_dec_mult_inv; [solve_propholds | assumption].
+    apply dec_fields.flip_le_dec_recip; [solve_propholds | assumption].
    rewrite <-Qdlog2_half.
     now apply rings.flip_le_minus_l.
    now apply orders.lt_le_trans with 1; [solve_propholds | assumption].
