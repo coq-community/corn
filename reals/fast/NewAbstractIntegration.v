@@ -7,7 +7,8 @@ Require Import
  stdlib_omissions.Q
  stdlib_omissions.N
  metric2.Classified
- util.Container Ranges.
+ util.Container Ranges
+ decision.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
@@ -342,10 +343,10 @@ End continuity_in_f.
 
 Section extend.
 
-  Context (T: Type) (P: T → Prop) `{∀ t, canonical_names.Decision (P t)} (f: sig P → CR).
+  Context (T: Type) (P: T → Prop) `{∀ t, Decision (P t)} (f: sig P → CR).
 
   Definition extend (t: T): CR :=
-    match canonical_names.decide (P t) with
+    match decide (P t) with
     | left H => f (exist _ _ H)
     | right _ => 0
     end.
@@ -364,7 +365,7 @@ Section continuity_in_both.
   Definition IntegrationInput := sigT (λ r: Range Q, UCFunction (sig (∈ r)) (sig (∈ bound))).
     (* Hm, I think this probably needs an a-priori bound on r as well.. *)
 
-  Instance dec_in: ∀ (a: Range Q), (∀ t : Q, canonical_names.Decision ((∈ a) t)).
+  Instance dec_in: ∀ (a: Range Q), (∀ t : Q, Decision ((∈ a) t)).
   Admitted.
 
   Program Definition metric: IntegrationInput → Range Q * @sig (Q → CR) (Proper canonical_names.equiv) :=

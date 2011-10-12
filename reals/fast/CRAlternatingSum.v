@@ -73,7 +73,7 @@ Proof with try easy.
    now destruct dnn as [[? ?] ?].
   setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
   apply (order_preserving _).
-  apply rings.flip_nonneg_opp. 
+  apply rings.flip_nonneg_negate. 
   now apply (IHn _ _).
 Qed.
 
