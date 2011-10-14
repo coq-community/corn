@@ -111,7 +111,7 @@ Proof.
    apply AQarctan_small_pos_correct.
   rewrite rings.preserves_negate.
   rewrite AQarctan_small_pos_correct.
-  ms_setoid_replace ('(-num) / 'den : Q) with (-('num / 'den) : Q).
+  mc_setoid_replace ('(-num) / 'den : Q) with (-('num / 'den) : Q).
    apply rational_arctan_opp.
   rewrite rings.preserves_negate.
   now rewrite <-rings.negate_mult_distr_l.

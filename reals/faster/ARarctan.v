@@ -19,7 +19,7 @@ Proof.
   rewrite ARtoCR_preserves_AQpi.
   rewrite aq_shift_opp_1, rings.preserves_1.
   rewrite AQarctan_small_pos_correct.
-  ms_setoid_replace ('1 / 'a : Q) with (/'a).
+  mc_setoid_replace ('1 / 'a : Q) with (/'a).
    apply rational_arctan_half_pi.
    transitivity (1:Q).
     now apply (semirings.lt_0_1 (R:=Q)).
@@ -47,7 +47,7 @@ Proof.
   rewrite ARtoCR_preserves_AQpi.
   rewrite AQarctan_small_correct.
   rewrite aq_shift_opp_2, rings.preserves_1.
-  ms_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1) : Q).
+  mc_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1) : Q).
    apply rational_arctan_fourth_pi.
    now apply semirings.preserves_pos.
   rewrite rings.preserves_minus, rings.preserves_plus.
@@ -94,7 +94,7 @@ Proof.
   unfold AQarctan_pos.
   case (decide_rel _); intros.
    rewrite AQarctan_small_pos_correct.
-   ms_setoid_replace ('a / '1 : Q) with ('a).
+   mc_setoid_replace ('a / '1 : Q) with ('a).
     reflexivity.
    rewrite rings.preserves_1.
    rewrite dec_fields.dec_recip_1.

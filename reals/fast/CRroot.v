@@ -995,7 +995,7 @@ Lemma rational_sqrt_scale (n : Z) a :
 Proof.
  intros E.
  rewrite <-CRmult_scale.
- revert n. apply integers.biinduction.
+ revert n. apply biinduction.
    solve_proper. 
   simpl. rewrite Qmult_1_r.
   now ring_simplify.

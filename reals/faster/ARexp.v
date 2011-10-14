@@ -127,8 +127,7 @@ Proof.
    apply semirings.ge_1_mult_le_compat_l.
      apply nat_pow_ge_1.
       now apply semirings.le_1_2.
-     now apply naturals.naturals_nonneg.
-    solve_propholds.
+     solve_propholds.
    reflexivity.
   now apply AQexp_neg_bound_correct.
 Qed.
@@ -193,10 +192,10 @@ Qed.
 
 Local Obligation Tactic := idtac.
 Program Definition ARexp_bounded_uc (z : Z) := unary_complete_uc 
-  QPrelengthSpace (cast AQ Q_as_MetricSpace) (λ x, AQexp (min ('z) x)) (exp_bound_uc z) _.
+  QPrelengthSpace (cast AQ Q_as_MetricSpace) (λ x, AQexp (('z) ⊓ x)) (exp_bound_uc z) _.
 Next Obligation. 
   intros. 
-  change ('AQexp (min (' z) x) = exp_bound_uc z (' x)).
+  change ('AQexp ((' z) ⊓ x) = exp_bound_uc z (' x)).
   rewrite AQexp_correct, aq_preserves_min, AQtoQ_ZtoAQ.
   reflexivity.
 Qed.
@@ -204,7 +203,7 @@ Qed.
 Definition ARexp_bounded (z : Z) := Cbind AQPrelengthSpace (ARexp_bounded_uc z).
 
 Lemma ARtoCR_preserves_exp_bounded z x : 'ARexp_bounded z x = exp_bounded z ('x).
-Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (min ('z) x))). Qed.
+Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (('z) ⊓ x))). Qed.
 
 Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
 

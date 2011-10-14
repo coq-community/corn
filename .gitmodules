@@ -1,0 +1,3 @@
+[submodule "math-classes"]
+	path = math-classes
+	url = git@github.com:0x01/math-classes.git

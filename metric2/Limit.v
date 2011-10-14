@@ -248,11 +248,11 @@ Lemma takeUntil_length_tl {A} (P : Stream A → bool) `(ex : !LazyExists P s) (P
 Proof.
   unfold takeUntil_length.
   destruct ex.
-   rewrite takeUntil_end. now apply naturals_nonneg. easy. 
+   rewrite takeUntil_end. now apply nat_nonneg. easy. 
   simpl.
   case_eq (P s); intros E.
    rewrite takeUntil_end. 
-    now apply naturals_nonneg. 
+    now apply nat_nonneg. 
    apply Ptl. auto with *.
   reflexivity.
 Qed.

@@ -159,7 +159,7 @@ Lemma AQsqrt_mid_bounded_regular_aux1 (n m : N) :
   m ≤ n → AQsqrt_mid_bounded_raw n - AQsqrt_mid_bounded_raw m ≤ 1 ≪ (1 - 'm : Z).
 Proof.
   intros E.
-  apply naturals.natural_le_plus in E.
+  apply naturals.nat_le_plus in E.
   destruct E as [z E]. rewrite commutativity in E. 
   change (n ≡ z + m) in E. subst.
   unfold AQsqrt_mid_bounded_raw.
@@ -174,9 +174,9 @@ Proof.
   rewrite <-(shiftl_nat_pow_alt (f:=cast nat Z)).
   rewrite (naturals.to_semiring_twice _ _ (cast N Z)).
   rewrite <-shiftl_exp_plus, rings.preserves_plus.
-  ms_setoid_replace ('z - (1 + ('z + 'm)) : Z) with (-(1 + 'm) : Z) by ring.
+  mc_setoid_replace ('z - (1 + ('z + 'm)) : Z) with (-(1 + 'm) : Z) by ring.
   rewrite shiftl_base_plus. ring_simplify.
-  ms_setoid_replace (1 - ' m : Z) with (2 - (1 + 'm) : Z) by ring.
+  mc_setoid_replace (1 - ' m : Z) with (2 - (1 + 'm) : Z) by ring.
   now rewrite shiftl_exp_plus, shiftl_2, rings.mult_1_r.
 Qed.
 
@@ -184,12 +184,12 @@ Lemma AQsqrt_mid_bounded_regular_aux2 (n m : N) :
   n ≤ m → AQsqrt_mid_bounded_raw n ≤ AQsqrt_mid_bounded_raw m.
 Proof.
   intros E.
-  apply naturals.natural_le_plus in E.
+  apply naturals.nat_le_plus in E.
   destruct E as [z E]. rewrite commutativity in E. 
   change (m ≡ z + n) in E. subst.
   unfold AQsqrt_mid_bounded_raw.
   rewrite 2!rings.preserves_plus.
-  ms_setoid_replace (-(1 + 'n) : Z) with ('z - (1 + ('z + 'n) : Z)) by ring.
+  mc_setoid_replace (-(1 + 'n) : Z) with ('z - (1 + ('z + 'n) : Z)) by ring.
   rewrite shiftl_exp_plus.
   apply (order_preserving (≪ _)).
   rewrite shiftl_nat_pow_alt, <-(preserves_nat_pow_exp (f:=cast N nat)).
@@ -204,7 +204,7 @@ Proof.
   apply (injective (≪ (2 + 2 * 'n))).
   rewrite shiftl_reverse by ring.
   rewrite shiftl_base_plus, shiftl_negate, <-shiftl_exp_plus.
-  ms_setoid_replace (-(2 * 'n) + (2 + 2 * 'n) : Z) with (2 : Z) by ring.
+  mc_setoid_replace (-(2 * 'n) + (2 + 2 * 'n) : Z) with (2 : Z) by ring.
   rewrite shiftl_exp_plus, ?shiftl_2, <-shiftl_mult_l.
   rewrite <-(rings.preserves_2 (f:=cast N Z)), <-rings.preserves_mult.
   rewrite shiftl_nat_pow_alt, nat_pow_exp_mult.
@@ -239,7 +239,7 @@ Proof.
     rewrite <-shiftl_int_pow.
     rewrite <-(rings.preserves_1 (f:=cast AQ Q)), <-(preserves_shiftl (f:=cast AQ Q)).
     apply (order_preserving _).
-    ms_setoid_replace (-'m - 2 : Z) with (1 - '(m + 3) : Z).
+    mc_setoid_replace (-'m - 2 : Z) with (1 - '(m + 3) : Z).
      apply AQsqrt_mid_bounded_regular_aux1.
      now apply: (order_preserving (+ (3:N))).
     rewrite rings.preserves_plus, rings.preserves_3. ring.
@@ -335,7 +335,7 @@ Proof.
    now apply AQsqrt_mid_bounded_raw_square_upper_bound.
   rewrite <-(ARpower_N_bounded_N_power _ _ 4). 
    intros ε1 ε2. simpl.
-   rewrite minmax.min_r, minmax.max_r.
+   rewrite lattices.meet_r, lattices.join_r.
      apply ball_weak. apply ball_weak_le with (ε1 / (8 # 1))%Qpos.
       change ('ε1 / (8#1) ≤ 'ε1). 
       rewrite <-(rings.mult_1_r ('ε1)) at 2.

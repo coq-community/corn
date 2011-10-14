@@ -9,7 +9,7 @@ Require Import
  UniformContinuity stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
  interfaces.abstract_algebra
- MathClasses.theory.setoids.
+ MathClasses.theory.setoids theory.products.
 
 Import Qinf.notations.
 

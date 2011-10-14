@@ -168,7 +168,7 @@ Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNega
   k ≤ l → Str_nth k s ≤ ε → ball ε (take s l Qminus' 0) (take s k Qminus' 0).
 Proof.
   intros E.
-  apply naturals.natural_le_plus in E.
+  apply naturals.nat_le_plus in E.
   destruct E as [z E]. rewrite E. clear E l.
   revert z s dnn ε.
   induction k; intros.
@@ -214,7 +214,7 @@ Proof.
    apply (InfiniteAlternatingSum_further_aux _).
     easy.
    apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-   apply naturals.natural_le_plus in E1.
+   apply naturals.nat_le_plus in E1.
    destruct E1 as [z E1]. rewrite E1. rewrite commutativity.
    rewrite <-Str_nth_plus. 
    apply ball_weak, Qball_ex_bool_correct.

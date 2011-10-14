@@ -38,7 +38,7 @@ Proof.
      apply (order_preserving _).
      now apply Z.log2_up_spec.
     now apply Z.log2_up_nonneg.
-   ms_setoid_replace (1 - Z.log2_up (Qceiling (/x))) with (-Zpred (Z.log2_up (Qceiling (/x)))).
+   mc_setoid_replace (1 - Z.log2_up (Qceiling (/x))) with (-Zpred (Z.log2_up (Qceiling (/x)))).
     rewrite int_pow_negate.
     apply dec_fields.flip_lt_dec_recip_r.
      solve_propholds.
@@ -77,7 +77,7 @@ Lemma Qdlog2_nonneg (x : Q) :
 Proof.
   intros E. unfold Qdlog2.
   case (decide_rel _); intros.
-   now ms_setoid_replace x with (1:Q) by now apply (antisymmetry (≤)).
+   now mc_setoid_replace x with (1:Q) by now apply (antisymmetry (≤)).
   apply Z.log2_nonneg.
 Qed.
 
@@ -108,12 +108,12 @@ Lemma Qdlog2_unique (x : Q) (y : Z) :
 Proof.
   intros.
   apply (antisymmetry (≤)).
-   apply integers.le_iff_lt_plus_1.
+   apply nat_int.le_iff_lt_plus_1.
    rewrite commutativity.
    apply int_pow_exp_lt_back with (2 : Q); [ apply semirings.lt_1_2 |].
    apply orders.le_lt_trans with x; [ intuition |].
    now apply Qdlog2_spec.
-  apply integers.le_iff_lt_plus_1.
+  apply nat_int.le_iff_lt_plus_1.
   rewrite commutativity.
   apply int_pow_exp_lt_back with (2 : Q); [ apply semirings.lt_1_2 |].
   apply orders.le_lt_trans with x; [|intuition].
@@ -147,7 +147,7 @@ Lemma Qdlog2_preserving (x y : Q) :
   0 < x → x ≤ y → Qdlog2 x ≤ Qdlog2 y.
 Proof.
   intros E1 E2.
-  apply integers.le_iff_lt_plus_1. rewrite commutativity.
+  apply nat_int.le_iff_lt_plus_1. rewrite commutativity.
   apply int_pow_exp_lt_back with (2:Q); [ apply semirings.lt_1_2 |].
   apply orders.le_lt_trans with x; [now apply Qdlog2_spec | ].
   apply orders.le_lt_trans with y; [assumption |].
@@ -277,7 +277,7 @@ Proof.
   eapply orders.lt_le_trans.
    now apply Qdlog2_spec.
   apply int_pow_exp_le; [apply semirings.le_1_2 |].
-  apply integers.le_iff_lt_plus_1.
+  apply nat_int.le_iff_lt_plus_1.
   rewrite commutativity.
   apply (strictly_order_preserving (+1)).
   change (1 + (Qdlog2 x / 2)%Z) with (1 + Zdiv (Qdlog2 x) 2)%Z.

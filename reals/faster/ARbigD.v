@@ -15,6 +15,7 @@ Instance inject_bigD_Q: Cast bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
 Lemma inject_bigD_Q_correct x : cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
 Proof.
   unfold cast at 1, inject_bigD_Q.
+  unfold inject_bigZ_Q. 
   rewrite (DtoQ_correct _ _ (reflexivity x)).
   unfold DtoQ_slow.
   now rewrite (preserves_int_pow_exp (f:=cast bigZ Z)).
@@ -79,7 +80,7 @@ Proof.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) - 2 ^ k = ((z - 1) - 1) * 2 ^ (k - 1)) as E2.
     intros.
-    ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
+    mc_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
     ring_simplify. apply sm_proper. now rewrite commutativity.
    intros. rewrite E1, E2.
@@ -106,7 +107,7 @@ Proof.
     apply semirings.preserves_ge_1.
     apply rings.flip_le_negate.
     rewrite rings.negate_involutive.
-    now apply integers.le_iff_lt_plus_1.
+    now apply nat_int.le_iff_lt_plus_1.
    apply semirings.flip_nonpos_mult_r.
     apply dec_fields.nonpos_dec_recip_compat.
     apply semirings.preserves_nonpos.
@@ -117,7 +118,7 @@ Proof.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) + 2 ^ k = ((z + 1) + 1) * 2 ^ (k - 1)) as E2.
     intros.
-    ms_setoid_replace k with ((k - 1) + 1) at 2 by ring.
+    mc_setoid_replace k with ((k - 1) + 1) at 2 by ring.
     rewrite (int_pow_exp_plus (k - 1)) by solve_propholds.
     ring_simplify. apply sm_proper. now apply commutativity.
    intros. rewrite E1, E2.
@@ -141,7 +142,7 @@ Proof.
    rewrite rings.mult_1_l.
    apply dec_fields.flip_le_dec_recip_l; [solve_propholds |].
    apply semirings.preserves_ge_1.
-   now apply integers.lt_iff_plus_1_le in E3.
+   now apply nat_int.lt_iff_plus_1_le in E3.
   unfold cast. rewrite 3!inject_bigD_Q_correct.
   destruct x as [xm xe], y as [ym ye]. simpl.
   unfold cast, inject_bigZ_Q, cast, "∘". simpl. BigZ.zify.

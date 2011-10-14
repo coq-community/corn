@@ -171,7 +171,6 @@ Proof.
   apply semirings.ge_1_mult_le_compat_l.
     apply nat_pow_ge_1. 
      now apply semirings.le_1_3.
-    now apply naturals.naturals_nonneg.
    now apply nat_pow_nonneg; solve_propholds.
   now apply AQsin_pos_bound_correct.
 Qed.
@@ -179,8 +178,8 @@ Qed.
 Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 75).
 
 Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).
-Proof. 
-  ms_setoid_replace ('a : Q) with ('a / '1 : Q).
+Proof.
+  mc_setoid_replace ('a : Q) with ('a / '1 : Q).
    now apply AQsin_pos_bounded_correct.
   rewrite rings.preserves_1, dec_fields.dec_recip_1. ring.
 Qed.
