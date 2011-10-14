@@ -42,8 +42,8 @@
 (** printing [--] %\ensuremath-% #&minus;# *)
 (** printing [=] %\ensuremath=% #&equiv;# *)
 (** printing [#] %\ensuremath\#% *)
-(** printing Zero %\ensuremath{\mathbf0}% #0# *)
-(** printing One %\ensuremath{\mathbf1}% #1# *)
+(** printing [0] %\ensuremath{\mathbf0}% #0# *)
+(** printing [1] %\ensuremath{\mathbf1}% #1# *)
 (** printing phi %\ensuremath{\phi}%  *)
 
 Require Export CRings.
@@ -65,7 +65,7 @@ Variable phi : CSetoid_fun R S.
 
 Definition fun_pres_plus := forall x y:R, phi (x[+]y) [=] (phi x) [+] (phi y).
 Definition fun_pres_mult := forall x y:R, phi (x[*]y) [=] (phi x) [*] (phi y).
-Definition fun_pres_unit := (phi (One:R)) [=] (One:S).
+Definition fun_pres_unit := (phi ([1]:R)) [=] ([1]:S).
 
 End RingHom_Preliminary.
 
@@ -108,7 +108,7 @@ Proof.
  elim f; auto.
 Qed.
 
-Lemma rh_pres_unit : (f (One:R)) [=] (One:S).
+Lemma rh_pres_unit : (f ([1]:R)) [=] ([1]:S).
 Proof.
  elim f; auto.
 Qed.
@@ -126,19 +126,19 @@ Section RingHom_Basics.
 
 Variable f : RingHom R S.
 
-Lemma rh_pres_zero : (f (Zero:R)) [=] (Zero:S).
+Lemma rh_pres_zero : (f ([0]:R)) [=] ([0]:S).
 Proof.
- astepr ((f Zero)[-](f Zero)).
- astepr ((f (Zero[+]Zero))[-](f Zero)).
- Step_final ((f Zero[+]f Zero)[-]f Zero).
+ astepr ((f [0])[-](f [0])).
+ astepr ((f ([0][+][0]))[-](f [0])).
+ Step_final ((f [0][+]f [0])[-]f [0]).
 Qed.
 
 Lemma rh_pres_inv : forall x:R, (f [--]x) [=] [--] (f x).
 Proof.
  intro x; apply (cg_cancel_lft S (f x)).
- astepr (Zero:S).
+ astepr ([0]:S).
  astepl (f (x[+][--]x)).
- Step_final (f (Zero:R)); try apply rh_pres_zero.
+ Step_final (f ([0]:R)); try apply rh_pres_zero.
 Qed.
 
 Lemma rh_pres_minus : forall x y:R, f (x[-]y) [=] (f x) [-] (f y).
@@ -150,14 +150,14 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma rh_apzero : forall x:R, (f x) [#] Zero -> x [#] Zero.
+Lemma rh_apzero : forall x:R, (f x) [#] [0] -> x [#] [0].
 Proof.
- intros x X; apply (cg_ap_cancel_rht R x (Zero:R) x).
+ intros x X; apply (cg_ap_cancel_rht R x ([0]:R) x).
  astepr x.
  apply (rh_strext f (x[+]x) x).
  astepl ((f x)[+](f x)).
- astepr ((Zero:S) [+] (f x)).
- apply (op_rht_resp_ap S (f x) (Zero:S) (f x)).
+ astepr (([0]:S) [+] (f x)).
+ apply (op_rht_resp_ap S (f x) ([0]:S) (f x)).
  assumption.
 Qed.
 

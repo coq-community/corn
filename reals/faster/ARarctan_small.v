@@ -24,7 +24,7 @@ Proof.
   unfold arctanSequence, mult_Streams.
   rewrite ?Str_nth_zipWith.
   rewrite commutativity. 
-  rewrite rings.preserves_mult, dec_fields.dec_mult_inv_distr.
+  rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
   rewrite associativity.
   apply sg_op_proper.
    rewrite 2!preserves_powers_help. 
@@ -33,7 +33,7 @@ Proof.
    rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
-   rewrite 2!int_pow_mult_inv.
+   rewrite 2!int_pow_recip.
    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    assert (PropHolds ('den ≠ (0:Q))). 
     apply rings.injective_ne_0.
@@ -52,13 +52,13 @@ Proof.
   split.
    apply nonneg_mult_compat.
     now apply semirings.preserves_nonneg.
-   apply dec_fields.nonneg_dec_mult_inv_compat.
+   apply dec_fields.nonneg_dec_recip_compat.
    apply semirings.preserves_nonneg.
    red. transitivity num; [easy |].
    now apply orders.lt_le.
-  rewrite <-(dec_mult_inverse ('den : Q)).
+  rewrite <-(dec_recip_inverse ('den : Q)).
    apply (maps.strictly_order_preserving_flip_pos (.*.) (/'den)).
-    apply dec_fields.pos_dec_mult_inv_compat.
+    apply dec_fields.pos_dec_recip_compat.
     apply semirings.preserves_pos.
     now apply orders.le_lt_trans with num.
    now apply (strictly_order_preserving _).
@@ -93,8 +93,8 @@ Proof. split; easy. Qed.
 Lemma AQarctan_small_prf2 : ¬0 ≤ num → 0 ≤ -num < den.
 Proof. 
   split. 
-   now apply rings.flip_nonpos_opp, orders.le_flip.
-  apply rings.flip_lt_opp. now rewrite rings.opp_involutive.
+   now apply rings.flip_nonpos_negate, orders.le_flip.
+  apply rings.flip_lt_negate. now rewrite rings.negate_involutive.
 Qed.
 
 Definition AQarctan_small : AR :=
@@ -109,12 +109,12 @@ Proof.
   unfold AQarctan_small.
   case (decide_rel _); intros E.
    apply AQarctan_small_pos_correct.
-  rewrite rings.preserves_opp.
+  rewrite rings.preserves_negate.
   rewrite AQarctan_small_pos_correct.
   ms_setoid_replace ('(-num) / 'den : Q) with (-('num / 'den) : Q).
    apply rational_arctan_opp.
-  rewrite rings.preserves_opp.
-  now rewrite <-rings.opp_mult_distr_l.
+  rewrite rings.preserves_negate.
+  now rewrite <-rings.negate_mult_distr_l.
 Qed.
 End arctan_small.
 End ARarctan_small.

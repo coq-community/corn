@@ -52,7 +52,7 @@ Section More_Nexp.
 
 Variable R : COrdField.
 
-Lemma nexp_resp_ap_zero : forall (x : R) n, x [#] Zero -> x[^]n [#] Zero.
+Lemma nexp_resp_ap_zero : forall (x : R) n, x [#] [0] -> x[^]n [#] [0].
 Proof.
  intros.
  elim n.
@@ -89,14 +89,14 @@ Proof.
 Qed.
 
 Lemma small_nexp_resp_lt : forall (x : R) m n,
- Zero [<] x -> x [<] One -> m < n -> x[^]n [<] x[^]m.
+ [0] [<] x -> x [<] [1] -> m < n -> x[^]n [<] x[^]m.
 Proof.
  intros.
- cut (forall k : nat, 0 < k -> x[^]k [<] One).
+ cut (forall k : nat, 0 < k -> x[^]k [<] [1]).
   intro H2.
   replace n with (m + (n - m)).
    astepl (x[^]m[*]x[^] (n - m)).
-   astepr (x[^]m[*]One).
+   astepr (x[^]m[*][1]).
    apply mult_resp_less_lft.
     apply H2.
     omega.
@@ -113,7 +113,7 @@ Proof.
   assumption.
  intros.
  astepl (x[*]x[^]S n1).
- astepr (One[*] (One:R)).
+ astepr ([1][*] ([1]:R)).
  apply mult_resp_less_both.
     apply less_leEq.
     assumption.
@@ -124,7 +124,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma great_nexp_resp_lt : forall (x : R) m n, One [<] x -> m < n -> x[^]m [<] x[^]n.
+Lemma great_nexp_resp_lt : forall (x : R) m n, [1] [<] x -> m < n -> x[^]m [<] x[^]n.
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
  elimtype False.
@@ -134,23 +134,23 @@ Proof.
    elim (le_lt_eq_dec _ _ H0); intro y.
     apply less_transitive_unfolded with (x[^]n); auto.
    rewrite y. auto.
-   astepl (x[^]n[*]One).
+   astepl (x[^]n[*][1]).
   astepr (x[^]n[*]x).
   apply mult_resp_less_lft. auto.
    apply nexp_resp_pos.
-  apply leEq_less_trans with (One:R). apply less_leEq. apply pos_one. auto.
+  apply leEq_less_trans with ([1]:R). apply less_leEq. apply pos_one. auto.
    auto with arith.
 Qed.
 
 Lemma small_nexp_resp_le : forall (x : R) m n,
- Zero [<=] x -> x [<=] One -> m <= n -> x[^]n [<=] x[^]m.
+ [0] [<=] x -> x [<=] [1] -> m <= n -> x[^]n [<=] x[^]m.
 Proof.
  intros.
- cut (forall k : nat, x[^]k [<=] One).
+ cut (forall k : nat, x[^]k [<=] [1]).
   intro.
   replace n with (m + (n - m)).
    astepl (x[^]m[*]x[^] (n - m)).
-   astepr (x[^]m[*]One).
+   astepr (x[^]m[*][1]).
    apply mult_resp_leEq_lft.
     apply H2.
    apply nexp_resp_nonneg. auto.
@@ -158,12 +158,12 @@ Proof.
  simple induction k.
   apply leEq_reflexive.
  clear H1 n; intros.
- astepl (x[^]n[*]x); astepr ((One:R)[*]One).
+ astepl (x[^]n[*]x); astepr (([1]:R)[*][1]).
  apply mult_resp_leEq_both; auto.
  apply nexp_resp_nonneg; auto.
 Qed.
 
-Lemma great_nexp_resp_le : forall (x : R) m n, One [<=] x -> m <= n -> x[^]m [<=] x[^]n.
+Lemma great_nexp_resp_le : forall (x : R) m n, [1] [<=] x -> m <= n -> x[^]m [<=] x[^]n.
 Proof.
  intros.
  induction  n as [| n Hrecn]; intros.
@@ -171,36 +171,36 @@ Proof.
    apply leEq_reflexive.
   auto with arith.
  elim (le_lt_eq_dec _ _ H0); intro.
-  astepl (x[^]m[*]One).
+  astepl (x[^]m[*][1]).
   astepr (x[^]n[*]x).
   apply mult_resp_leEq_both; auto with arith.
    apply nexp_resp_nonneg; auto.
-   apply leEq_transitive with (One:R); auto.
+   apply leEq_transitive with ([1]:R); auto.
    apply less_leEq. apply pos_one.
    apply less_leEq. apply pos_one.
   rewrite b. apply leEq_reflexive.
 Qed.
 
-Lemma nexp_resp_leEq : forall (x y : R) k, Zero [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
+Lemma nexp_resp_leEq : forall (x y : R) k, [0] [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
 Proof.
  intros. rewrite -> leEq_def in *. intro. apply H0.
  apply power_cancel_less with k; firstorder using leEq_def.
 Qed.
 
-Lemma nexp_resp_leEq_one : forall c : R, Zero [<=] c -> c [<=] One -> forall n, c[^]n [<=] One.
+Lemma nexp_resp_leEq_one : forall c : R, [0] [<=] c -> c [<=] [1] -> forall n, c[^]n [<=] [1].
 Proof.
  simple induction n.
   red in |- *; apply eq_imp_leEq.
   algebra.
  clear n; intros.
  astepl (c[^]n[*]c).
- astepr ((One:R)[*]One).
+ astepr (([1]:R)[*][1]).
  apply mult_resp_leEq_both; auto.
  apply nexp_resp_nonneg; assumption.
 Qed.
 
 Lemma nexp_resp_leEq_neg_even : forall n, even n ->
- forall x y : R, y [<=] Zero -> x [<=] y -> y[^]n [<=] x[^]n.
+ forall x y : R, y [<=] [0] -> x [<=] y -> y[^]n [<=] x[^]n.
 Proof.
  do 2 intro; pattern n in |- *; apply even_ind.
    intros; simpl in |- *; apply leEq_reflexive.
@@ -210,7 +210,7 @@ Proof.
   apply mult_resp_leEq_both.
      eapply leEq_wdr.
       2: apply inv_nexp_even; auto.
-     apply nexp_resp_nonneg; astepl ([--] (Zero:R)); apply inv_resp_leEq; auto.
+     apply nexp_resp_nonneg; astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
     astepr (y[^]2); apply sqr_nonneg.
    auto.
   astepl (y[^]2); astepr (x[^]2).
@@ -219,13 +219,13 @@ Proof.
   eapply leEq_wdl.
    2: apply inv_nexp_even; auto with arith.
   apply nexp_resp_leEq.
-   astepl ([--] (Zero:R)); apply inv_resp_leEq; auto.
+   astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
   apply inv_resp_leEq; auto.
  auto.
 Qed.
 
 Lemma nexp_resp_leEq_neg_odd : forall n, odd n ->
- forall x y : R, y [<=] Zero -> x [<=] y -> x[^]n [<=] y[^]n.
+ forall x y : R, y [<=] [0] -> x [<=] y -> x[^]n [<=] y[^]n.
 Proof.
  intro; case n.
   intros; elimtype False; inversion H.
@@ -235,21 +235,21 @@ Proof.
  apply inv_resp_leEq; apply mult_resp_leEq_both.
     eapply leEq_wdr.
      2: apply inv_nexp_even; inversion H; auto.
-    apply nexp_resp_nonneg; astepl ([--] (Zero:R)); apply inv_resp_leEq; auto.
-   astepl ([--] (Zero:R)); apply inv_resp_leEq; auto.
+    apply nexp_resp_nonneg; astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
+   astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
   apply nexp_resp_leEq_neg_even; auto; inversion H; auto.
  apply inv_resp_leEq; auto.
 Qed.
 
-Lemma nexp_distr_recip : forall (x : R) n x_ xn_, (One[/] x[//]x_) [^]n [=] (One[/] x[^]n[//]xn_).
+Lemma nexp_distr_recip : forall (x : R) n x_ xn_, ([1][/] x[//]x_) [^]n [=] ([1][/] x[^]n[//]xn_).
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
  simpl in |- *. algebra.
-  astepl ((One[/] x[//]x_)[^]n[*] (One[/] x[//]x_)).
- cut (x[^]n [#] Zero). intro H.
-  astepl ((One[/] x[^]n[//]H)[*] (One[/] x[//]x_)).
-  cut (x[^]n[*]x [#] Zero). intro H2.
-   rstepl (One[/] x[^]n[*]x[//]H2).
+  astepl (([1][/] x[//]x_)[^]n[*] ([1][/] x[//]x_)).
+ cut (x[^]n [#] [0]). intro H.
+  astepl (([1][/] x[^]n[//]H)[*] ([1][/] x[//]x_)).
+  cut (x[^]n[*]x [#] [0]). intro H2.
+   rstepl ([1][/] x[^]n[*]x[//]H2).
    apply div_wd; algebra.
   apply mult_resp_ap_zero; auto.
  apply nexp_resp_ap_zero. auto.
@@ -257,7 +257,7 @@ Qed.
 
 Hint Resolve nexp_distr_recip: algebra.
 
-Lemma nexp_even_nonneg : forall n, even n -> forall x : R, Zero [<=] x[^]n.
+Lemma nexp_even_nonneg : forall n, even n -> forall x : R, [0] [<=] x[^]n.
 Proof.
  do 2 intro.
  pattern n in |- *; apply even_ind; intros.
@@ -270,14 +270,14 @@ Proof.
  auto.
 Qed.
 
-Lemma nexp_resp_le' : forall c : R, Zero [<=] c -> c [<=] One -> forall m n, m <= n -> c[^]n [<=] c[^]m.
+Lemma nexp_resp_le' : forall c : R, [0] [<=] c -> c [<=] [1] -> forall m n, m <= n -> c[^]n [<=] c[^]m.
 Proof.
  intros.
- astepl (Zero[+]c[^]n); apply shift_plus_leEq.
+ astepl ([0][+]c[^]n); apply shift_plus_leEq.
  set (N := n - m) in *.
  apply leEq_wdr with (c[^]m[-]c[^]m[*]c[^]N).
-  rstepr (c[^]m[*] (One[-]c[^]N)).
-  astepl ((Zero:R)[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+  rstepr (c[^]m[*] ([1][-]c[^]N)).
+  astepl (([0]:R)[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
    apply nexp_resp_nonneg; auto.
   apply shift_leEq_minus.
   astepl (c[^]N).
@@ -291,19 +291,19 @@ Proof.
  auto with arith.
 Qed.
 
-Lemma nexp_resp_le : forall c : R, One [<=] c -> forall m n, m <= n -> c[^]m [<=] c[^]n.
+Lemma nexp_resp_le : forall c : R, [1] [<=] c -> forall m n, m <= n -> c[^]m [<=] c[^]n.
 Proof.
  intros.
- cut (Zero [<] c); intros.
-  2: apply less_leEq_trans with (One:R); [ apply pos_one | assumption ].
- cut (c [#] Zero); intros.
+ cut ([0] [<] c); intros.
+  2: apply less_leEq_trans with ([1]:R); [ apply pos_one | assumption ].
+ cut (c [#] [0]); intros.
   2: apply Greater_imp_ap; assumption.
- cut (forall n : nat, c[^]n [#] Zero); intros H3.
+ cut (forall n : nat, c[^]n [#] [0]); intros H3.
   2: apply nexp_resp_ap_zero; assumption.
- cut (forall n : nat, (One[/] _[//]H3 n) [#] Zero); intros H4.
+ cut (forall n : nat, ([1][/] _[//]H3 n) [#] [0]); intros H4.
   2: apply div_resp_ap_zero_rev; apply one_ap_zero.
- rstepl (One[/] _[//]H4 m).
- rstepr (One[/] _[//]H4 n).
+ rstepl ([1][/] _[//]H4 m).
+ rstepr ([1][/] _[//]H4 n).
  apply recip_resp_leEq.
   apply recip_resp_pos; apply nexp_resp_pos; assumption.
  eapply leEq_wdl.
@@ -318,7 +318,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma bin_less_un : forall n H H1, (One[/] (Two:R) [^]S n[//]H) [<] (One[/] nring (S n) [//]H1).
+Lemma bin_less_un : forall n H H1, ([1][/] (Two:R) [^]S n[//]H) [<] ([1][/] nring (S n) [//]H1).
 Proof.
  intros n H H1.
  apply recip_resp_less.
@@ -328,8 +328,8 @@ Proof.
   apply pos_one.
  induction  n as [| n Hrecn].
   simpl in |- *.
-  astepl (One:R).
-  astepr ((One:R)[+]One).
+  astepl ([1]:R).
+  astepr (([1]:R)[+][1]).
    astepr (Two:R).
    apply one_less_two.
   rational.
@@ -371,9 +371,9 @@ have most properties now.
 
 Definition zexp (x : R) x_ (n : Z) : R :=
   match n with
-  | Z0     => One:R
+  | Z0     => [1]:R
   | Zpos p => x[^]nat_of_P p
-  | Zneg p => (One[/] x[//]x_) [^]nat_of_P p
+  | Zneg p => ([1][/] x[//]x_) [^]nat_of_P p
   end.
 
 End Zexp_def.
@@ -391,7 +391,7 @@ Section Zexp_properties.
 
 Variable R : COrdField.
 
-Lemma zexp_zero : forall (x : R) x_, (x[//]x_) [^^] (0) [=] One.
+Lemma zexp_zero : forall (x : R) x_, (x[//]x_) [^^] (0) [=] [1].
 Proof.
  intros.
  unfold zexp in |- *.
@@ -417,7 +417,7 @@ Qed.
 
 Hint Resolve zexp_nexp: algebra.
 
-Lemma zexp_inv_nexp : forall (x : R) x_ (n : nat), (x[//]x_) [^^] (- n) [=] (One[/] x[//]x_) [^]n.
+Lemma zexp_inv_nexp : forall (x : R) x_ (n : nat), (x[//]x_) [^^] (- n) [=] ([1][/] x[//]x_) [^]n.
 Proof.
  intros.
  unfold zexp in |- *.
@@ -434,11 +434,11 @@ Qed.
 
 Hint Resolve zexp_inv_nexp: algebra.
 
-Lemma zexp_inv_nexp' : forall (x : R) (n : nat) x_ xn_, (x[//]x_) [^^] (- n) [=] (One[/] x[^]n[//]xn_).
+Lemma zexp_inv_nexp' : forall (x : R) (n : nat) x_ xn_, (x[//]x_) [^^] (- n) [=] ([1][/] x[^]n[//]xn_).
 Proof.
  intros x n Hx H1.
- astepl ((One[/] x[//]Hx) [^]n).
- astepr (One[^]n[/] x[^]n[//]H1).
+ astepl (([1][/] x[//]Hx) [^]n).
+ astepr ([1][^]n[/] x[^]n[//]H1).
  apply nexp_distr_div.
 Qed.
 
@@ -457,7 +457,7 @@ Proof.
   intros.
  apply (nexp_strong_ext R n).
  change (x[^]n [#] y[^]n) in |- *.
- cut ((One[/] x[^]n[//]nexp_resp_ap_zero n Hx) [#] (One[/] y[^]n[//]nexp_resp_ap_zero n Hy)).
+ cut (([1][/] x[^]n[//]nexp_resp_ap_zero n Hx) [#] ([1][/] y[^]n[//]nexp_resp_ap_zero n Hy)).
   intro H0.
   generalize (div_strext _ _ _ _ _ _ _ H0); intro.
   elim X0; intros H2.
@@ -496,8 +496,8 @@ Proof.
   simpl in |- *.
   algebra.
  replace (- Z_of_nat (S n) + 1)%Z with (- n)%Z.
-  astepl ((One[/] x[//]Hx) [^]n).
-  astepr ((One[/] x[//]Hx) [^]S n[*]x).
+  astepl (([1][/] x[//]Hx) [^]n).
+  astepr (([1][/] x[//]Hx) [^]S n[*]x).
   simpl in |- *.
   rational.
  rewrite Znat.inj_S.
@@ -513,7 +513,7 @@ Qed.
 
 Hint Resolve zexp_plus1: algebra.
 
-Lemma zexp_resp_ap_zero : forall (x : R) m x_, (x[//]x_) [^^] (m) [#] Zero.
+Lemma zexp_resp_ap_zero : forall (x : R) m x_, (x[//]x_) [^^] (m) [#] [0].
 Proof.
  intros.
  pattern m in |- *.
@@ -523,7 +523,7 @@ Proof.
   apply nexp_resp_ap_zero.
   assumption.
  intro.
- astepl ((One[/] x[//]x_) [^]n).
+ astepl (([1][/] x[//]x_) [^]n).
  apply nexp_resp_ap_zero.
  apply div_resp_ap_zero_rev.
  algebra.
@@ -531,14 +531,14 @@ Qed.
 
 Hint Resolve zexp_resp_ap_zero: algebra.
 
-Lemma zexp_inv : forall (x : R) x_ m xm_, (x[//]x_) [^^] (- m) [=] (One[/] (x[//]x_) [^^] (m) [//]xm_).
+Lemma zexp_inv : forall (x : R) x_ m xm_, (x[//]x_) [^^] (- m) [=] ([1][/] (x[//]x_) [^^] (m) [//]xm_).
 Proof.
  intros x Hx m.
  pattern m in |- *.
  apply nats_Z_ind.
   intros.
   (* Here I would like to use Rewrite zexp_inv_nexp', i.e. Rewriting with our own equality. *)
-  apply eq_transitive_unfolded with (One[/] x[^]n[//]nexp_resp_ap_zero n Hx).
+  apply eq_transitive_unfolded with ([1][/] x[^]n[//]nexp_resp_ap_zero n Hx).
    apply zexp_inv_nexp'.
   apply div_wd.
    algebra.
@@ -548,10 +548,10 @@ Proof.
  astepl (x[^]n).
  astepl ((x[^]n) [/]OneNZ).
  apply eq_div.
- astepl (x[^]n[*] (One[/] x[//]Hx) [^]n).
- astepl ((x[*] (One[/] x[//]Hx)) [^]n).
- astepr (One:R).
- astepr ((One:R) [^]n).
+ astepl (x[^]n[*] ([1][/] x[//]Hx) [^]n).
+ astepl ((x[*] ([1][/] x[//]Hx)) [^]n).
+ astepr ([1]:R).
+ astepr (([1]:R) [^]n).
  apply nexp_wd.
  algebra.
 Qed.
@@ -563,10 +563,10 @@ Proof.
  intros x Hx; intros.
  replace (m - 1)%Z with (- (- m + 1))%Z.
   (* Here I would like to use Rewriting with our own equality. *)
-  astepl (One[/] (x[//]Hx) [^^] (- m + 1) [//]zexp_resp_ap_zero x (- m + 1) Hx).
+  astepl ([1][/] (x[//]Hx) [^^] (- m + 1) [//]zexp_resp_ap_zero x (- m + 1) Hx).
   apply eq_div.
   astepr ((x[//]Hx) [^^] (m) [*] ((x[//]Hx) [^^] (- m) [*]x)).
-  astepr ((x[//]Hx) [^^] (m) [*] ((One[/] (x[//]Hx) [^^] (m) [//]zexp_resp_ap_zero x m Hx) [*]x)).
+  astepr ((x[//]Hx) [^^] (m) [*] (([1][/] (x[//]Hx) [^^] (m) [//]zexp_resp_ap_zero x m Hx) [*]x)).
   rational.
  rewrite Zopp_plus_distr.
  rewrite Zopp_involutive.
@@ -609,29 +609,29 @@ Proof.
  intros x Hx m n Hexp.
  replace (m - n)%Z with (m + - n)%Z.
   astepl ((x[//]Hx) [^^] (m) [*] (x[//]Hx) [^^] (- n)).
-  astepl ((x[//]Hx) [^^] (m) [*] (One[/] (x[//]Hx) [^^] (n) [//]Hexp)).
-  astepl ((x[//]Hx) [^^] (m) [*]One[/] (x[//]Hx) [^^] (n) [//]Hexp).
+  astepl ((x[//]Hx) [^^] (m) [*] ([1][/] (x[//]Hx) [^^] (n) [//]Hexp)).
+  astepl ((x[//]Hx) [^^] (m) [*][1][/] (x[//]Hx) [^^] (n) [//]Hexp).
   algebra.
  reflexivity.
 Qed.
 
 Hint Resolve zexp_minus: algebra.
 
-Lemma one_zexp : forall z, (One[//]ring_non_triv _) [^^] (z) [=] (One:R).
+Lemma one_zexp : forall z, ([1][//]ring_non_triv _) [^^] (z) [=] ([1]:R).
 Proof.
  intro.
  pattern z in |- *.
  apply nats_Z_ind.
   intro.
   (* Rewrite would be nice *)
-  astepl ((One:R) [^]n).
+  astepl (([1]:R) [^]n).
   apply one_nexp.
  intros.
- astepl (One[/] (One[//]ring_non_triv _) [^^] (n) [//] zexp_resp_ap_zero One n (ring_non_triv _)).
- astepr ((One:R) [/]OneNZ).
+ astepl ([1][/] ([1][//]ring_non_triv _) [^^] (n) [//] zexp_resp_ap_zero [1] n (ring_non_triv _)).
+ astepr (([1]:R) [/]OneNZ).
  apply eq_div.
- astepr ((One:R) [*]One[^]n).
- astepr ((One:R) [*]One).
+ astepr (([1]:R) [*][1][^]n).
+ astepr (([1]:R) [*][1]).
  algebra.
 Qed.
 
@@ -648,12 +648,12 @@ Proof.
   astepr (x[^]n[*]y[^]n).
   apply mult_nexp.
  intros.
- astepl (One[/] (x[*]y[//]Hp) [^^] (n) [//]zexp_resp_ap_zero (x[*]y) n Hp).
- astepr ((One[/] (x[//]Hx) [^^] (n) [//]zexp_resp_ap_zero x n Hx) [*]
-   (One[/] (y[//]Hy) [^^] (n) [//]zexp_resp_ap_zero y n Hy)).
- astepl (One[/] (x[*]y) [^]n[//]nexp_resp_ap_zero n Hp).
- astepr ((One[/] x[^]n[//]nexp_resp_ap_zero n Hx) [*] (One[/] y[^]n[//]nexp_resp_ap_zero n Hy)).
- rstepr (One[/] x[^]n[*]y[^]n[//]
+ astepl ([1][/] (x[*]y[//]Hp) [^^] (n) [//]zexp_resp_ap_zero (x[*]y) n Hp).
+ astepr (([1][/] (x[//]Hx) [^^] (n) [//]zexp_resp_ap_zero x n Hx) [*]
+   ([1][/] (y[//]Hy) [^^] (n) [//]zexp_resp_ap_zero y n Hy)).
+ astepl ([1][/] (x[*]y) [^]n[//]nexp_resp_ap_zero n Hp).
+ astepr (([1][/] x[^]n[//]nexp_resp_ap_zero n Hx) [*] ([1][/] y[^]n[//]nexp_resp_ap_zero n Hy)).
+ rstepr ([1][/] x[^]n[*]y[^]n[//]
    mult_resp_ap_zero _ _ _ (nexp_resp_ap_zero n Hx) (nexp_resp_ap_zero n Hy)).
  apply eq_div.
  algebra.
@@ -769,7 +769,7 @@ Qed.
 
 Hint Resolve zexp_funny': algebra.
 
-Lemma zexp_pos : forall (x : R) x_ z, Zero [<] x -> Zero [<] (x[//]x_) [^^] (z).
+Lemma zexp_pos : forall (x : R) x_ z, [0] [<] x -> [0] [<] (x[//]x_) [^^] (z).
 Proof.
  intros.
  pattern z in |- *.
@@ -779,7 +779,7 @@ Proof.
   apply nexp_resp_pos.
   assumption.
  intros.
- astepr (One[/] x[^]n[//]nexp_resp_ap_zero n x_).
+ astepr ([1][/] x[^]n[//]nexp_resp_ap_zero n x_).
  apply div_resp_pos.
   apply nexp_resp_pos.
   assumption.
@@ -800,7 +800,7 @@ Section Root_Unique.
 Variable R : COrdField.
 
 Lemma root_unique : forall x y : R,
- Zero [<=] x -> Zero [<=] y -> forall n, 0 < n -> x[^]n [=] y[^]n -> x [=] y.
+ [0] [<=] x -> [0] [<=] y -> forall n, 0 < n -> x[^]n [=] y[^]n -> x [=] y.
 Proof.
  intros.
  apply leEq_imp_eq.
@@ -812,12 +812,12 @@ Proof.
  apply leEq_reflexive.
 Qed.
 
-Lemma root_one : forall x : R, Zero [<=] x -> forall n, 0 < n -> x[^]n [=] One -> x [=] One.
+Lemma root_one : forall x : R, [0] [<=] x -> forall n, 0 < n -> x[^]n [=] [1] -> x [=] [1].
 Proof.
  intros.
  apply root_unique with n; auto.
   apply less_leEq. apply pos_one.
-  Step_final (One:R).
+  Step_final ([1]:R).
 Qed.
 
 End Root_Unique.

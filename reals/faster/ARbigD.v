@@ -26,7 +26,7 @@ Qed.
   which is quite convenient here.
 *)
 Program Instance bigD_div: AppDiv bigD := λ x y k,
-  BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) $ ('k - 1).
+  BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) ▼ ('k - 1).
 
 Lemma Qdiv_bounded_Zdiv (x y : Z) :
   'Zdiv x y ≤ ('x / 'y : Q) < 'Zdiv x y + 1.
@@ -54,7 +54,7 @@ Proof.
    rewrite Qpower.Zpower_Qpower.
     rewrite <-Qpower.Qpower_opp, Zopp_involutive.
     reflexivity.
-   now apply rings.flip_nonpos_opp in En.
+   now apply rings.flip_nonpos_negate in En.
   split.
    transitivity ('x / 'Zpower 2 (-n) : Q).
     now apply Qdiv_bounded_Zdiv.
@@ -70,10 +70,10 @@ Proof.
       ('xm * 2 ^ xe : Q) / ('ym * 2 ^ ye : Q) = ('xm * 2 ^ (-(k - 1) + xe - ye)) / 'ym * 2 ^ (k - 1)) as E1.
    intros.
    rewrite 2!int_pow_exp_plus by solve_propholds.
-   rewrite dec_fields.dec_mult_inv_distr.
-   rewrite 2!int_pow_opp.
+   rewrite dec_fields.dec_recip_distr.
+   rewrite 2!int_pow_negate.
    transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1)) : Q); [| ring].
-   rewrite dec_mult_inverse by solve_propholds. ring.
+   rewrite dec_recip_inverse by solve_propholds. ring.
   assert (∀ xm xe ym ye : Z, 
       'Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
    clear x y.
@@ -92,23 +92,23 @@ Proof.
     apply rings.flip_le_minus_l. 
     apply semirings.plus_le_compat_r; [easy |].
     apply (maps.order_preserving_flip_nonneg (.*.) (/ 'ym : Q)).
-     apply dec_fields.nonneg_dec_mult_inv_compat.
+     apply dec_fields.nonneg_dec_recip_compat.
      now apply semirings.preserves_nonneg.
     now apply Qpow_bounded_Zshiftl.
    transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / 'ym : Q).
     rewrite rings.plus_mult_distr_r.
     apply semirings.plus_le_compat; [reflexivity |].
     rewrite rings.mult_1_l.
-    apply rings.flip_le_opp.
-    rewrite rings.opp_involutive, dec_fields.dec_mult_inv_opp.
-    apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
-    rewrite <-rings.preserves_opp.
+    apply rings.flip_le_negate.
+    rewrite rings.negate_involutive, dec_fields.dec_recip_negate.
+    apply dec_fields.flip_le_dec_recip_l; [solve_propholds |].
+    rewrite <-rings.preserves_negate.
     apply semirings.preserves_ge_1.
-    apply rings.flip_le_opp.
-    rewrite rings.opp_involutive.
+    apply rings.flip_le_negate.
+    rewrite rings.negate_involutive.
     now apply integers.le_iff_lt_plus_1.
    apply semirings.flip_nonpos_mult_r.
-    apply dec_fields.nonpos_dec_mult_inv_compat.
+    apply dec_fields.nonpos_dec_recip_compat.
     apply semirings.preserves_nonpos.
     now apply orders.lt_le.
    now apply orders.lt_le, Qpow_bounded_Zshiftl.
@@ -127,19 +127,19 @@ Proof.
    destruct (orders.le_or_lt ym 0) as [E3 | E3].
     apply semirings.plus_le_compat_r; [easy |].
     apply semirings.flip_nonpos_mult_r.
-     apply dec_fields.nonpos_dec_mult_inv_compat.
+     apply dec_fields.nonpos_dec_recip_compat.
      now apply semirings.preserves_nonpos.
     now apply Qpow_bounded_Zshiftl.
    transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / ' ym : Q).
     apply (maps.order_preserving_flip_nonneg (.*.) (/ 'ym : Q)).
-     apply dec_fields.nonneg_dec_mult_inv_compat.
+     apply dec_fields.nonneg_dec_recip_compat.
      apply semirings.preserves_nonneg.
      now apply orders.lt_le.
     now apply orders.lt_le, Qpow_bounded_Zshiftl.
    rewrite rings.plus_mult_distr_r.
    apply semirings.plus_le_compat; [reflexivity |].
    rewrite rings.mult_1_l.
-   apply dec_fields.flip_le_dec_mult_inv_l; [solve_propholds |].
+   apply dec_fields.flip_le_dec_recip_l; [solve_propholds |].
    apply semirings.preserves_ge_1.
    now apply integers.lt_iff_plus_1_le in E3.
   unfold cast. rewrite 3!inject_bigD_Q_correct.
@@ -152,19 +152,19 @@ Instance inverse_Q_bigD: AppInverse inject_bigD_Q := λ x ε,
   app_div ('Qnum x) ('(Qden x : Z)) (Qdlog2 ε).
 
 Instance bigD_approx : AppApprox bigD := λ x k,
-  BigZ.shiftl (mant x) (-('k - 1) + expo x) $ ('k - 1).
+  BigZ.shiftl (mant x) (-('k - 1) + expo x) ▼ ('k - 1).
 
 Lemma bigD_approx_correct (x : bigD) (k : Z) : Qball (2 ^ k) ('app_approx x k) ('x).
 Proof.
   setoid_replace (app_approx x k) with (app_div x 1 k).
    setoid_replace ('x : Q) with ('x / '1 : Q).
     now apply bigD_div_correct.
-   rewrite rings.preserves_1, dec_fields.dec_mult_inv_1.
+   rewrite rings.preserves_1, dec_fields.dec_recip_1.
    now rewrite rings.mult_1_r.
   unfold app_div, bigD_div.
   simpl. rewrite BigZ.div_1_r.
   setoid_replace (-('k - 1) + expo x - 0) with (-('k - 1) + expo x); [reflexivity |].
-  now rewrite rings.opp_0, rings.plus_0_r.
+  now rewrite rings.negate_0, rings.plus_0_r.
 Qed.
 
 Instance: DenseEmbedding inject_bigD_Q.
@@ -197,7 +197,7 @@ Qed.
   However, then the exponent would be translated from [N] into [BigZ] and back again, due to the 
   definition of [BigZ.pow]. 
 *) 
-Instance bigD_Npow: Pow bigD N := λ x n, (mant x) ^ n $ 'n * expo x.
+Instance bigD_Npow: Pow bigD N := λ x n, (mant x) ^ n ▼ 'n * expo x.
 
 Instance: NatPowSpec bigD N bigD_Npow.
 Proof.

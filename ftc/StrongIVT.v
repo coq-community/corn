@@ -356,7 +356,7 @@ theorem to more widely applicable forms.
 *)
 
 Lemma Weak_IVT : forall I F, Continuous I F -> forall a b Ha Hb (HFab : F a Ha [<] F b Hb),
- I a -> I b -> forall e, Zero [<] e -> forall y, Compact (less_leEq _ _ _ HFab) y ->
+ I a -> I b -> forall e, [0] [<] e -> forall y, Compact (less_leEq _ _ _ HFab) y ->
  {x : IR | Compact (Min_leEq_Max a b) x | forall Hx, AbsIR (F x Hx[-]y) [<=] e}.
 Proof.
  intros I F H a b Ha Hb HFab H0 H1 e H2 y H3.

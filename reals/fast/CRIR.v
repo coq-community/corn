@@ -97,14 +97,14 @@ Proof.
  split;[apply: f_pres_leEq|apply: leEq_pres_f]; solve [ apply map_strext |apply map_pres_less].
 Qed.
 
-Lemma IR_Zero_as_CR : (IRasCR Zero==0)%CR.
+Lemma IR_Zero_as_CR : (IRasCR [0]==0)%CR.
 Proof.
  apply: map_pres_zero_unfolded.
 Qed.
 
 Hint Rewrite IR_Zero_as_CR : IRtoCR.
 
-Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< 0 -> x[#]Zero)%CR.
+Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< 0 -> x[#][0])%CR.
 Proof.
  intros x H.
  apply CR_ap_as_IR.
@@ -156,7 +156,7 @@ Qed.
 
 Hint Rewrite IR_minus_as_CR : IRtoCR.
 
-Lemma IR_One_as_CR : (IRasCR One==1)%CR.
+Lemma IR_One_as_CR : (IRasCR [1]==1)%CR.
 Proof.
  apply: map_pres_one_unfolded.
 Qed.
@@ -200,25 +200,25 @@ Proof.
 Qed.
 
 Lemma IR_recip_as_CR :forall y y_ y__,
- (IRasCR (One[/]y[//]y_)==(CRinvT (IRasCR y) y__))%CR.
+ (IRasCR ([1][/]y[//]y_)==(CRinvT (IRasCR y) y__))%CR.
 Proof.
  intros y y_ y__.
- assert (X:=(IR_div_as_CR One y y_ y__)).
+ assert (X:=(IR_div_as_CR [1] y y_ y__)).
  rewrite -> X.
- change ((IRasCR One * CRinvT (IRasCR y) y__) == (CRinvT (IRasCR y) y__))%CR.
+ change ((IRasCR [1] * CRinvT (IRasCR y) y__) == (CRinvT (IRasCR y) y__))%CR.
  rewrite -> IR_One_as_CR.
  change ((1 * CRinvT (IRasCR y) y__ == CRinvT (IRasCR y) y__)%CR).
  ring.
 Qed.
 
 Lemma IR_recip_as_CR_1 :forall y y_,
- (IRasCR (One[/]y[//]y_)==(CRinvT (IRasCR y) (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_)))%CR.
+ (IRasCR ([1][/]y[//]y_)==(CRinvT (IRasCR y) (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_)))%CR.
 Proof.
  intros; apply IR_recip_as_CR.
 Qed.
 
 Lemma IR_recip_as_CR_2 :forall y y_,
- (IRasCR (One[/]y[//](CR_ap_zero_as_IR _ y_))==(CRinvT (IRasCR y) y_))%CR.
+ (IRasCR ([1][/]y[//](CR_ap_zero_as_IR _ y_))==(CRinvT (IRasCR y) y_))%CR.
 Proof.
  intros; apply IR_recip_as_CR.
 Qed.
@@ -245,12 +245,12 @@ Lemma IR_pring_as_CR : forall p,
 Proof.
  unfold ms_id, pring.
  intros p.
- cut (IRasCR One == One)%CR;[|apply IR_One_as_CR].
- generalize (One:IR).
- generalize (One:CR).
+ cut (IRasCR [1] == [1])%CR;[|apply IR_One_as_CR].
+ generalize ([1]:IR).
+ generalize ([1]:CR).
  induction p;intros a b Hab.
    simpl.
-   assert (IRasCR ((Zero[+]One[+]One)[*]b)== (Zero[+]One[+]One)[*]a)%CR.
+   assert (IRasCR (([0][+][1][+][1])[*]b)== ([0][+][1][+][1])[*]a)%CR.
     simpl.
     rewrite -> IR_mult_as_CR.
     repeat rewrite -> IR_plus_as_CR.
@@ -269,7 +269,7 @@ Proof.
    rewrite -> Hab.
    reflexivity.
   simpl.
-  assert (IRasCR ((Zero[+]One[+]One)[*]b)== (Zero[+]One[+]One)[*]a)%CR.
+  assert (IRasCR (([0][+][1][+][1])[*]b)== ([0][+][1][+][1])[*]a)%CR.
    simpl.
    rewrite -> IR_mult_as_CR.
    repeat rewrite -> IR_plus_as_CR.

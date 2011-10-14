@@ -38,12 +38,12 @@ Proof.
   change (x+0==x)%CR.
   rewrite <- CR_eq_as_Cauchy_IR_eq.
   stepl ((CRasCauchy_IR x)[+](CRasCauchy_IR 0%CR)); [| now apply: CR_plus_as_Cauchy_IR_plus].
-  stepl ((CRasCauchy_IR x)[+]Zero); [| now apply: plus_resp_eq; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
+  stepl ((CRasCauchy_IR x)[+][0]); [| now apply: plus_resp_eq; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
   apply cm_rht_unit.
  change (0+x==x)%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
  stepl ((CRasCauchy_IR 0%CR)[+](CRasCauchy_IR x)); [| now apply CR_plus_as_Cauchy_IR_plus].
- stepl (Zero[+](CRasCauchy_IR x)); [| now
+ stepl ([0][+](CRasCauchy_IR x)); [| now
    apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
  apply cm_lft_unit.
 Qed.

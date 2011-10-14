@@ -240,7 +240,7 @@ Qed.
 
 (* begin show *)
 Hypothesis HG : bnd_away_zero I G.
-Hypothesis Hg : forall x : subset I, g x [#] Zero.
+Hypothesis Hg : forall x : subset I, g x [#] [0].
 (* end show *)
 
 Lemma part_int_recip : Feq I {1/}G (PartInt (IRecip g Hg)).

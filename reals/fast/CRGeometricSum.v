@@ -704,7 +704,7 @@ Proof.
   stepr (inj_Q IR (nring 1)); [| now apply (inj_Q_nring IR 1)].
   apply inj_Q_less.
   assumption.
- assert (Ha0':Zero[<=]inj_Q IR a).
+ assert (Ha0':[0][<=]inj_Q IR a).
   rstepl (nring 0:IR).
   stepl (inj_Q IR (nring 0)); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
@@ -751,7 +751,7 @@ Proof.
   revert seq x H Hx Gs Hn.
   induction n.
    intros seq x H Hx Gs Hn.
-   stepr (Zero[-]InfiniteGeometricSum Gs);
+   stepr ([0][-]InfiniteGeometricSum Gs);
      [|apply csbf_wd_unfolded; try apply eq_reflexive; apply eq_symmetric; apply IR_Zero_as_CR].
    apply AbsSmall_minus.
    rstepr (InfiniteGeometricSum Gs).
@@ -775,7 +775,7 @@ Proof.
     assumption.
    assert (Hq0': 0 < q).
     apply (less_inj_Q IR).
-    stepl (Zero:IR).
+    stepl ([0]:IR).
      assumption.
     apply eq_symmetric; apply (inj_Q_nring IR 0).
    destruct (InfiniteGeometricSum_small_tail (mkQpos Hq0') Gs) as [m Hm].

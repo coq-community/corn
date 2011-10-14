@@ -31,7 +31,7 @@ Program Definition AQarctan_mid_pos {a : AQ} (Ha : 0 < a) : AR :=
   AQpi (1 ≪ (-2)) + AQarctan_small (num:=a - 1) (den:=a + 1) _.
 Next Obligation.
   split.
-   rewrite rings.opp_distr.
+   rewrite rings.negate_plus_distr.
    apply (strictly_order_preserving (+ _)).
    now apply rings.between_pos.
   apply (strictly_order_preserving (_ +)).
@@ -97,7 +97,7 @@ Proof.
    ms_setoid_replace ('a / '1 : Q) with ('a).
     reflexivity.
    rewrite rings.preserves_1.
-   rewrite dec_fields.dec_mult_inv_1.
+   rewrite dec_fields.dec_recip_1.
    now apply rings.mult_1_r.
   case (decide_rel _); intros.
    apply AQarctan_mid_pos_correct.
@@ -105,7 +105,7 @@ Proof.
 Qed.
 
 Lemma AQarctan_prf {a : AQ} : ¬0 ≤ a → 0 ≤ - a.
-Proof. intros. apply rings.flip_nonpos_opp. now apply orders.le_flip. Qed.
+Proof. intros. apply rings.flip_nonpos_negate. now apply orders.le_flip. Qed.
 
 Definition AQarctan (a : AQ) : AR :=
   match decide_rel (≤) 0 a with
@@ -119,9 +119,9 @@ Proof.
   unfold AQarctan.
   case (decide_rel _); intros.
    apply AQarctan_pos_correct.
-  rewrite rings.preserves_opp.
+  rewrite rings.preserves_negate.
   rewrite AQarctan_pos_correct.
-  rewrite rings.preserves_opp.
+  rewrite rings.preserves_negate.
   apply rational_arctan_opp.
 Qed.
 

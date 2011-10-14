@@ -170,7 +170,7 @@ Proof.
  eapply leEq_transitive; [ apply H1 | apply rht_leEq_Max ].
 Defined.
 
-Definition compact_map3 : forall a b e Hab Hab', Zero [<] e ->
+Definition compact_map3 : forall a b e Hab Hab', [0] [<] e ->
  included (compact a (b[-]e) Hab') (compact a b Hab).
 Proof.
  intros; red in |- *. try rename X into H.
@@ -204,7 +204,7 @@ Notice the use of lists for quantification.
 *)
 
 Definition totally_bounded (P : IR -> CProp) : CProp := {x : IR | P x} and (forall e,
- Zero [<] e -> {l : list IR | forall x, member x l -> P x |
+ [0] [<] e -> {l : list IR | forall x, member x l -> P x |
  forall x, P x -> {y : IR | member y l | AbsSmall e (x[-]y)}}).
 
 (**
@@ -220,7 +220,7 @@ Proof.
  intros; split.
   exists a.
   apply compact_inc_lft.
- cut (forall (n : nat) (a b e : IR) (Hab : a [<=] b) (He : Zero [<] e),
+ cut (forall (n : nat) (a b e : IR) (Hab : a [<=] b) (He : [0] [<] e),
    (b[-]a[/] e[//]pos_ap_zero _ _ He) [<=] nring n ->
      (2 <= n -> nring n[-]Two [<=] (b[-]a[/] e[//]pos_ap_zero _ _ He)) ->
        {l : list IR | forall x : IR, member x l -> compact a b Hab x | forall x : IR,
@@ -257,7 +257,7 @@ Proof.
    right; algebra.
   apply leEq_wdl with ZeroR.
    apply less_leEq; auto.
-  astepl (AbsIR Zero).
+  astepl (AbsIR [0]).
   apply AbsIR_wd.
   apply leEq_imp_eq. try rename X into H1.
    apply shift_leEq_minus; astepl a; elim H1; auto.
@@ -265,7 +265,7 @@ Proof.
   apply leEq_transitive with b. try rename X into H1.
    elim H1; auto.
   apply shift_leEq_plus.
-  apply mult_cancel_leEq with (One[/] _[//]pos_ap_zero _ _ He).
+  apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
    apply recip_resp_pos; auto.
   astepr ZeroR.
   rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
@@ -294,13 +294,13 @@ Proof.
    inversion_clear H1 as [H2|].
     inversion_clear H2.
    apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | algebra ].
-    astepl (a[+]Zero); apply shift_plus_leEq'.
+    astepl (a[+][0]); apply shift_plus_leEq'.
     apply mult_cancel_leEq with (Two:IR).
      apply pos_two.
     astepl ZeroR.
     rstepr (b[-]a).
     apply shift_leEq_minus; astepl a; auto.
-   astepr (b[+]Zero); apply shift_leEq_plus'.
+   astepr (b[+][0]); apply shift_leEq_plus'.
    apply mult_cancel_leEq with (Two:IR).
     apply pos_two.
    astepr ZeroR.
@@ -368,18 +368,18 @@ Proof.
     cut (b'[-]e [<] x or x [<] b'); [ tauto | apply less_cotransitive_unfolded ].
     apply shift_minus_less; apply shift_less_plus'; astepl ZeroR; assumption.
    unfold b' in |- *.
-   rstepl ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-]One).
+   rstepl ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
    apply shift_minus_leEq.
    astepr (nring (R:=IR) (S (S (S n)))); auto.
   intro.
   unfold b' in |- *.
-  rstepr ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-]One).
+  rstepr ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
   apply shift_leEq_minus.
-  rstepl (nring (R:=IR) (S (S n)) [+]One[-]Two).
+  rstepl (nring (R:=IR) (S (S n)) [+][1][-]Two).
   auto with arith.
  unfold b' in |- *.
  apply shift_leEq_minus; apply shift_plus_leEq'.
- astepl (One[*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
+ astepl ([1][*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
   auto.
  apply leEq_transitive with (nring (R:=IR) (S (S (S n))) [-]Two).
   apply shift_leEq_minus; rstepl (Three:IR); apply nring_leEq; auto with arith.
@@ -392,10 +392,10 @@ for arbitrary subsets of [IR] and for images of functions.
 *)
 
 Definition set_glb_IR (P : IR -> CProp) a : CProp := (forall x, P x -> a [<=] x) and
- (forall e, Zero [<] e -> {x : IR | P x | x[-]a [<] e}).
+ (forall e, [0] [<] e -> {x : IR | P x | x[-]a [<] e}).
 
 Definition set_lub_IR (P : IR -> CProp) a : CProp := (forall x, P x -> x [<=] a) and
- (forall e, Zero [<] e -> {x : IR | P x | a[-]x [<] e}).
+ (forall e, [0] [<] e -> {x : IR | P x | a[-]x [<] e}).
 
 Definition fun_image F (P : IR -> CProp) x : CProp := {y : IR |
  P y and Dom F y and (forall Hy, F y Hy [=] x)}.
@@ -494,7 +494,7 @@ Proof.
       apply Hseq'; assumption.
      apply eq_imp_leEq.
      apply eq_symmetric_unfolded; apply Limits_unique.
-     red in |- *; fold (SeqLimit twice_inv_seq Zero) in |- *.
+     red in |- *; fold (SeqLimit twice_inv_seq [0]) in |- *.
      apply twice_inv_seq_Lim.
     apply Lim_minus.
    cut (Cauchy_Lim_prop2 seq (Lim seq1)).
@@ -523,12 +523,12 @@ Proof.
    apply ax_Lim.
    apply crl_proof.
   red in |- *; intros. try rename X into H1.
-  elim (Archimedes (One[/] e[//]pos_ap_zero _ _ H1)).
+  elim (Archimedes ([1][/] e[//]pos_ap_zero _ _ H1)).
   intros n Hn.
   exists (S (2 * n)); intros.
-  cut (Zero [<] nring (R:=IR) n); intros.
+  cut ([0] [<] nring (R:=IR) n); intros.
    apply AbsIR_eq_AbsSmall. try rename X into H3.
-    apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H3)).
+    apply leEq_transitive with ( [--] ([1][/] nring n[//]pos_ap_zero _ _ H3)).
      apply inv_resp_leEq.
      apply shift_div_leEq.
       assumption.
@@ -539,38 +539,38 @@ Proof.
     apply leEq_transitive with (one_div_succ (R:=IR) n).
      unfold one_div_succ in |- *.
      unfold Snring in |- *.
-     rstepl (One[/] nring (S m) [/]TwoNZ[//]
+     rstepl ([1][/] nring (S m) [/]TwoNZ[//]
        div_resp_ap_zero_rev _ _ _ _ (nring_ap_zero IR (S m) (sym_not_eq (O_S m)))).
      apply recip_resp_leEq.
       apply pos_nring_S.
      apply shift_leEq_div.
       apply pos_two.
      simpl in |- *; fold (Two:IR) in |- *.
-     rstepl (Two[*]nring (R:=IR) n[+]One[+]One).
+     rstepl (Two[*]nring (R:=IR) n[+][1][+][1]).
      apply plus_resp_leEq.
      apply leEq_wdl with (nring (R:=IR) (S (2 * n))).
       apply nring_leEq; assumption.
-     Step_final (nring (R:=IR) (2 * n) [+]One).
+     Step_final (nring (R:=IR) (2 * n) [+][1]).
     unfold one_div_succ in |- *; unfold Snring in |- *; apply recip_resp_leEq.
      assumption.
     simpl in |- *; apply less_leEq; apply less_plusOne.
    apply leEq_transitive with (Two[*]one_div_succ (R:=IR) (S (2 * n))).
     auto.
    apply less_leEq. try rename X into H3.
-   apply less_leEq_trans with (One[/] nring n[//]pos_ap_zero _ _ H3).
+   apply less_leEq_trans with ([1][/] nring n[//]pos_ap_zero _ _ H3).
     astepl (one_div_succ (R:=IR) (S (2 * n)) [*]Two).
     unfold one_div_succ in |- *; unfold Snring in |- *.
     apply shift_mult_less with (two_ap_zero IR).
      apply pos_two.
-    rstepr (One[/] Two[*]nring n[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H3)).
+    rstepr ([1][/] Two[*]nring n[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H3)).
     apply recip_resp_less.
-     astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+     astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive;
        [ apply pos_two | assumption ].
-    apply less_wdr with (Two[*]nring (R:=IR) n[+]One[+]One).
-     apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+]One); apply less_plusOne.
-    astepr (nring (R:=IR) (S (2 * n)) [+]One).
-    Step_final (nring (R:=IR) (2 * n) [+]One[+]One).
-   rstepr (One[/] One[/] e[//]pos_ap_zero _ _ H1[//] div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
+    apply less_wdr with (Two[*]nring (R:=IR) n[+][1][+][1]).
+     apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+][1]); apply less_plusOne.
+    astepr (nring (R:=IR) (S (2 * n)) [+][1]).
+    Step_final (nring (R:=IR) (2 * n) [+][1][+][1]).
+   rstepr ([1][/] [1][/] e[//]pos_ap_zero _ _ H1[//] div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
    apply recip_resp_leEq; [ apply recip_resp_pos; assumption | assumption ].
   eapply less_leEq_trans.
    2: apply Hn.
@@ -665,7 +665,7 @@ Proof.
       apply H1; assumption.
      apply eq_imp_leEq.
      apply eq_symmetric_unfolded; apply Limits_unique.
-     red in |- *; fold (SeqLimit twice_inv_seq Zero) in |- *.
+     red in |- *; fold (SeqLimit twice_inv_seq [0]) in |- *.
      apply twice_inv_seq_Lim.
     apply Lim_minus.
    cut (Cauchy_Lim_prop2 seq (Lim seq1)).
@@ -695,13 +695,13 @@ Proof.
    apply ax_Lim.
    apply crl_proof.
   red in |- *; intros e H2.
-  elim (Archimedes (One[/] e[//]pos_ap_zero _ _ H2)).
+  elim (Archimedes ([1][/] e[//]pos_ap_zero _ _ H2)).
   intros n Hn.
   exists (S (2 * n)); intros.
-  cut (Zero [<] nring (R:=IR) n); intros.
+  cut ([0] [<] nring (R:=IR) n); intros.
    apply AbsIR_eq_AbsSmall.
     try rename X into H4.
-    apply leEq_transitive with ( [--] (One[/] nring n[//]pos_ap_zero _ _ H4)).
+    apply leEq_transitive with ( [--] ([1][/] nring n[//]pos_ap_zero _ _ H4)).
      apply inv_resp_leEq.
      apply shift_div_leEq.
       assumption.
@@ -714,33 +714,33 @@ Proof.
     unfold one_div_succ in |- *; unfold Snring in |- *.
     apply shift_mult_less with (two_ap_zero IR).
      apply pos_two.
-    rstepr (One[/] Two[*]nring n[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H4)).
+    rstepr ([1][/] Two[*]nring n[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (pos_ap_zero _ _ H4)).
     apply recip_resp_less.
-     astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+     astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive;
        [ apply pos_two | assumption ].
-    apply less_wdr with (Two[*]nring (R:=IR) n[+]One[+]One).
-     apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+]One); apply less_plusOne.
-    astepr (nring (R:=IR) (S (2 * n)) [+]One).
-    Step_final (nring (R:=IR) (2 * n) [+]One[+]One).
+    apply less_wdr with (Two[*]nring (R:=IR) n[+][1][+][1]).
+     apply less_transitive_unfolded with (Two[*]nring (R:=IR) n[+][1]); apply less_plusOne.
+    astepr (nring (R:=IR) (S (2 * n)) [+][1]).
+    Step_final (nring (R:=IR) (2 * n) [+][1][+][1]).
    apply leEq_transitive with (Two[*]one_div_succ (R:=IR) m).
     apply H1; apply H0.
    apply leEq_transitive with (one_div_succ (R:=IR) n).
     unfold one_div_succ in |- *.
     unfold Snring in |- *.
-    rstepl (One[/] nring (R:=IR) (S m) [/]TwoNZ[//]
+    rstepl ([1][/] nring (R:=IR) (S m) [/]TwoNZ[//]
       div_resp_ap_zero_rev _ _ _ _ (nring_ap_zero IR (S m) (sym_not_eq (O_S m)))).
     apply recip_resp_leEq.
      apply pos_nring_S.
     apply shift_leEq_div.
      apply pos_two.
     simpl in |- *; fold (Two:IR) in |- *.
-    rstepl (Two[*]nring (R:=IR) n[+]One[+]One).
+    rstepl (Two[*]nring (R:=IR) n[+][1][+][1]).
     apply plus_resp_leEq.
     apply leEq_wdl with (nring (R:=IR) (S (2 * n))).
      apply nring_leEq; assumption.
-    Step_final (nring (R:=IR) (2 * n) [+]One).
+    Step_final (nring (R:=IR) (2 * n) [+][1]).
    unfold one_div_succ in |- *; unfold Snring in |- *.
-   rstepr (One[/] One[/] e[//]pos_ap_zero _ _ H2[//] div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
+   rstepr ([1][/] [1][/] e[//]pos_ap_zero _ _ H2[//] div_resp_ap_zero_rev _ _ _ _ (one_ap_zero IR)).
    apply recip_resp_leEq.
     apply recip_resp_pos; assumption.
    apply leEq_transitive with (nring (R:=IR) n);
@@ -801,7 +801,7 @@ Let I := compact a b Hab.
 Hypothesis Hab' : a [<] b.
 
 Variable e : IR.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 (**
 We start by finding a natural number [n] such that [(b[-]a) [/] n [<] e].
@@ -811,10 +811,10 @@ Definition compact_nat := ProjT1 (Archimedes (b[-]a[/] e[//]pos_ap_zero _ _ He))
 
 (** Obviously such an [n] must be greater than zero.*)
 
-Lemma pos_compact_nat : Zero [<] nring (R:=IR) compact_nat.
+Lemma pos_compact_nat : [0] [<] nring (R:=IR) compact_nat.
 Proof.
  apply less_leEq_trans with (b[-]a[/] e[//]pos_ap_zero _ _ He).
-  rstepr ((b[-]a) [*] (One[/] e[//]pos_ap_zero _ _ He)).
+  rstepr ((b[-]a) [*] ([1][/] e[//]pos_ap_zero _ _ He)).
   apply mult_resp_pos.
    apply shift_less_minus; astepl a; assumption.
   apply recip_resp_pos; assumption.
@@ -837,8 +837,8 @@ Lemma compact_part_hyp : forall i Hi, compact a b Hab (compact_part i Hi).
 Proof.
  intros; unfold compact_part in |- *.
  split.
-  astepl (a[+]Zero); apply plus_resp_leEq_lft.
-  astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+  astepl (a[+][0]); apply plus_resp_leEq_lft.
+  astepl (ZeroR[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
    apply nring_nonneg.
   apply shift_leEq_div.
    apply pos_compact_nat.
@@ -856,7 +856,7 @@ Qed.
 This sequence is strictly increasing and each two consecutive points
 are apart by less than [e].*)
 
-Lemma compact_less : forall i Hi HSi, Zero [<] compact_part (S i) HSi[-]compact_part i Hi.
+Lemma compact_less : forall i Hi HSi, [0] [<] compact_part (S i) HSi[-]compact_part i Hi.
 Proof.
  intros i H1 H2.
  apply shift_less_minus; astepl (compact_part _ H1).
@@ -897,7 +897,7 @@ Proof.
   rstepl a; assumption.
  apply shift_plus_leEq'.
  rstepr (nring n[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
- astepl (Zero[+]nring i[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
+ astepl ([0][+]nring i[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
  apply shift_plus_leEq.
  rstepr ((nring n[-]nring i) [*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hn)).
  apply mult_resp_nonneg.

@@ -210,22 +210,22 @@ Proof.
  astepr (zxfpx (cpoly_mult_op Z_as_CRing (c[+X*]f) (c0[+X*]g))).
  astepl (cpoly_mult_op fp (zxfpx (c[+X*]f)) (zxfpx (c0[+X*]g))).
  astepr (zxfpx (cpoly_plus_op _ ((c[*]c0)[+X*](cpoly_mult_cr_cs _ g c))
-   ((Zero:Z_as_CRing)[+X*](cpoly_mult _ f (c0[+X*]g))))).
- astepr (zxfpx (((c[*]c0)[+](Zero:Z_as_CRing))[+X*](cpoly_plus_op _
+   (([0]:Z_as_CRing)[+X*](cpoly_mult _ f (c0[+X*]g))))).
+ astepr (zxfpx (((c[*]c0)[+]([0]:Z_as_CRing))[+X*](cpoly_plus_op _
    (cpoly_mult_cr_cs _ g c) (cpoly_mult _ f (c0[+X*]g))))).
  astepr (zxfpx ((c[*]c0)[+X*](cpoly_plus_op _ (cpoly_mult_cr_cs _ g c) (cpoly_mult _ f (c0[+X*]g))))).
  astepr ( (zfp c[*]c0) [+X*] (zxfpx (cpoly_plus_op _ (cpoly_mult_cr_cs _ g c)
    (cpoly_mult _ f (c0[+X*]g))))).
  astepl (cpoly_mult_op fp ((zfp c)[+X*](zxfpx f)) (zxfpx (c0[+X*]g))).
  astepl (cpoly_plus_op fp (cpoly_mult_cr_cs fp (zxfpx (c0[+X*]g)) (zfp c))
-   ((zfp (Zero:Z_as_CRing))[+X*](cpoly_mult_op fp (zxfpx f) (zxfpx (c0[+X*]g))))).
+   ((zfp ([0]:Z_as_CRing))[+X*](cpoly_mult_op fp (zxfpx f) (zxfpx (c0[+X*]g))))).
  astepl (cpoly_plus_op fp (cpoly_mult_cr_cs fp ((zfp c0)[+X*](zxfpx g)) (zfp c))
-   ((Zero:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
+   (([0]:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
  astepl (cpoly_plus_op fp (((zfp c)[*](zfp c0))[+X*](cpoly_mult_cr_cs fp (zxfpx g) (zfp c)))
-   ((Zero:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
+   (([0]:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
  astepl (cpoly_plus_op fp ((zfp (c[*]c0))[+X*](zxfpx (cpoly_mult_cr_cs _ g c)))
-   ((Zero:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
- astepl ((zfp (c[*]c0)[+](Zero:fp))[+X*](cpoly_plus_op fp
+   (([0]:fp)[+X*](zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
+ astepl ((zfp (c[*]c0)[+]([0]:fp))[+X*](cpoly_plus_op fp
    (zxfpx (cpoly_mult_cr_cs _ g c)) (zxfpx (cpoly_mult_op _ f (c0[+X*]g))))).
  intuition.
 Qed.
@@ -275,14 +275,14 @@ Proof.
  unfold monic.
  split.
   astepl (zfp (nth_coeff m f)).
-  assert (One[=]nth_coeff m f); intuition.
+  assert ([1][=]nth_coeff m f); intuition.
   simpl in H.
   rewrite <- H.
   intuition.
  red.
  intros.
  astepl (zfp (nth_coeff m0 f)).
- assert (Zero[=]nth_coeff m0 f); intuition.
+ assert ([0][=]nth_coeff m0 f); intuition.
  simpl in H0.
  rewrite <- H0.
  intuition.

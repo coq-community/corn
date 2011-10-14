@@ -109,12 +109,12 @@ Hint Resolve Cos_plus Sin_plus: algebra.
 (** As a corollary we get the rule for the tangent of the sum. *)
 
 Lemma Tan_plus : forall x y Hx Hy Hxy H,
- Tan (x[+]y) Hxy [=] (Tan x Hx[+]Tan y Hy[/] One[-]Tan x Hx[*]Tan y Hy[//]H).
+ Tan (x[+]y) Hxy [=] (Tan x Hx[+]Tan y Hy[/] [1][-]Tan x Hx[*]Tan y Hy[//]H).
 Proof.
  intros.
- cut (Cos (x[+]y) [#] Zero).
-  cut (Cos y [#] Zero).
-   cut (Cos x [#] Zero).
+ cut (Cos (x[+]y) [#] [0]).
+  cut (Cos y [#] [0]).
+   cut (Cos x [#] [0]).
     intros H0 H1 H2.
     apply eq_transitive_unfolded with (Sin (x[+]y) [/] _[//]H2).
      unfold Tan in |- *; simpl in |- *; algebra.
@@ -152,7 +152,7 @@ Proof.
  elim p; intros; simpl in |- *.
   2: rational.
  apply mult_wdr.
- astepl (( [--]x[-]Zero) [^]n); astepr ((x[-]Zero) [^]n).
+ astepl (( [--]x[-][0]) [^]n); astepr ((x[-][0]) [^]n).
  rewrite a.
  eapply eq_transitive_unfolded.
   2: apply inv_nexp_even; apply even_plus_n_n.
@@ -174,10 +174,10 @@ Proof.
  elim p; intros; simpl in |- *.
   rational.
  apply eq_transitive_unfolded
-   with ( [--]One[^]x0[*] ( [--]x[-]Zero) [^]n[/] _[//]nring_fac_ap_zero IR n).
+   with ( [--][1][^]x0[*] ( [--]x[-][0]) [^]n[/] _[//]nring_fac_ap_zero IR n).
   simpl in |- *; rational.
  apply eq_transitive_unfolded
-   with ( [--]One[^]x0[*][--] ((x[-]Zero) [^]n) [/] _[//]nring_fac_ap_zero IR n).
+   with ( [--][1][^]x0[*][--] ((x[-][0]) [^]n) [/] _[//]nring_fac_ap_zero IR n).
   2: simpl in |- *; rational.
  apply div_wd.
   2: algebra.
@@ -195,8 +195,8 @@ Hint Resolve Cos_inv Sin_inv: algebra.
 Lemma Tan_inv : forall x Hx Hx', Tan [--]x Hx' [=] [--] (Tan x Hx).
 Proof.
  intros; unfold Tan, Tang in |- *.
- cut (Cos x [#] Zero).
-  cut (Cos [--]x [#] Zero). intros H H0.
+ cut (Cos x [#] [0]).
+  cut (Cos [--]x [#] [0]). intros H H0.
    apply eq_transitive_unfolded with (Sin [--]x[/] _[//]H).
     simpl in |- *; algebra.
    astepl ( [--] (Sin x) [/] _[//]H0).
@@ -218,11 +218,11 @@ The fundamental formulas of trigonometry: $\cos(x)^2+\sin(x)^2=1$#cos(x)<sup>2</
 
 Hint Resolve Cos_zero: algebra.
 
-Theorem FFT : forall x : IR, Cos x[^]2[+]Sin x[^]2 [=] One.
+Theorem FFT : forall x : IR, Cos x[^]2[+]Sin x[^]2 [=] [1].
 Proof.
  intros.
  astepl (Cos x[*]Cos x[+]Sin x[*]Sin x).
- astepr (Cos Zero).
+ astepr (Cos [0]).
  apply eq_transitive_unfolded with (Cos (x[+][--]x)).
   2: algebra.
  apply eq_symmetric_unfolded.
@@ -239,11 +239,11 @@ Opaque Sine Cosine.
 
 Hint Resolve FFT: algebra.
 
-Lemma FFT' : forall x Hx H, One[+]Tan x Hx[^]2 [=] (One[/] Cos x[^]2[//]H).
+Lemma FFT' : forall x Hx H, [1][+]Tan x Hx[^]2 [=] ([1][/] Cos x[^]2[//]H).
 Proof.
  intros.
  unfold Tan, Tang in |- *.
- apply eq_transitive_unfolded with (One[+] (Sin x[^]2[/] _[//]H)).
+ apply eq_transitive_unfolded with ([1][+] (Sin x[^]2[/] _[//]H)).
   simpl in |- *; rational.
  astepr (Cos x[^]2[+]Sin x[^]2[/] _[//]H).
  rational.
@@ -305,9 +305,9 @@ Lemma Tan_Sin_over_Cos : forall x Hx H, Tan x Hx[=](Sin x[/]Cos x[//]H).
 Proof.
  intros x Hx H.
  change ((Sine x (prj1 IR _ _ _ Hx)[/] Cosine x (ProjT1 (ext2_a IR (Dom Cosine)
-   (fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) x (prj2 IR _ _ _ Hx)))[//]
+   (fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#][0]) x (prj2 IR _ _ _ Hx)))[//]
      ext2 (S:=IR) (P:=Dom Cosine)
-       (R:=fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#]Zero) (x:=x)
+       (R:=fun (x0 : IR) (Hx0 : Dom Cosine x0) => Cosine x0 Hx0[#][0]) (x:=x)
          (prj2 _ _ _ _ Hx))[=](Sine x I[/]Cosine x I[//]H)).
  algebra.
 Qed.
@@ -316,7 +316,7 @@ Qed.
 The sine and cosine produce values in [[-1,1]].
 *)
 
-Lemma AbsIR_Sin_leEq_One : forall x : IR, AbsIR (Sin x) [<=] One.
+Lemma AbsIR_Sin_leEq_One : forall x : IR, AbsIR (Sin x) [<=] [1].
 Proof.
  intros.
  eapply leEq_wdl.
@@ -333,7 +333,7 @@ Proof.
  apply sqr_nonneg.
 Qed.
 
-Lemma AbsIR_Cos_leEq_One : forall x : IR, AbsIR (Cos x) [<=] One.
+Lemma AbsIR_Cos_leEq_One : forall x : IR, AbsIR (Cos x) [<=] [1].
 Proof.
  intros.
  eapply leEq_wdl.
@@ -350,7 +350,7 @@ Proof.
  apply sqr_nonneg.
 Qed.
 
-Lemma Sin_leEq_One : forall x : IR, Sin x [<=] One.
+Lemma Sin_leEq_One : forall x : IR, Sin x [<=] [1].
 Proof.
  intro.
  eapply leEq_transitive.
@@ -358,7 +358,7 @@ Proof.
  apply AbsIR_Sin_leEq_One.
 Qed.
 
-Lemma Cos_leEq_One : forall x : IR, Cos x [<=] One.
+Lemma Cos_leEq_One : forall x : IR, Cos x [<=] [1].
 Proof.
  intro.
  eapply leEq_transitive.
@@ -370,7 +370,7 @@ Qed.
 If the cosine is positive then the sine is in [(-1,1)].
 *)
 
-Lemma Sin_less_One : forall x : IR, Zero [<] Cos x -> Sin x [<] One.
+Lemma Sin_less_One : forall x : IR, [0] [<] Cos x -> Sin x [<] [1].
 Proof.
  intros.
  apply power_cancel_less with 2.
@@ -384,7 +384,7 @@ Proof.
  apply pos_square; apply Greater_imp_ap; auto.
 Qed.
 
-Lemma AbsIR_Sin_less_One : forall x : IR, Zero [<] Cos x -> AbsIR (Sin x) [<] One.
+Lemma AbsIR_Sin_less_One : forall x : IR, [0] [<] Cos x -> AbsIR (Sin x) [<] [1].
 Proof.
  intros.
  apply power_cancel_less with 2.

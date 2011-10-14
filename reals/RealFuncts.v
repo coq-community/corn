@@ -79,18 +79,18 @@ functions:
 
 The limit of [f] in [p] is [l] if
 [[
-forall e [>] Zero, exists d [>] Zero, forall (x : IR)
+forall e [>] [0], exists d [>] [0], forall (x : IR)
 ( [--]d [<] p[-]x [<] d) -> ( [--]e [<] [--]f(x) [<] e)
 ]]
 *)
 
-Definition funLim (p l : IR) : CProp := forall e, Zero [<] e ->
-  {d : IR | Zero [<] d | forall x, AbsSmall d (p[-]x) -> AbsSmall e (l[-]f x)}.
+Definition funLim (p l : IR) : CProp := forall e, [0] [<] e ->
+  {d : IR | [0] [<] d | forall x, AbsSmall d (p[-]x) -> AbsSmall e (l[-]f x)}.
 
 (** The definition of limit of [f] in [p] using Cauchy sequences. *)
 
 Definition funLim_Cauchy (p l : IR) : CProp := forall s : CauchySeqR, Lim s [=] p ->
- forall e, Zero [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (f (s m) [-]l)}.
+ forall e, [0] [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (f (s m) [-]l)}.
 
 (** The first definition implies the second one. *)
 
@@ -100,7 +100,7 @@ Intros. Unfold funLim_Cauchy. Unfold funLim in H. Intros.
 Elim (H e H1). Intros.
 Elim s. Intros s_seq s_proof.
 Decompose [and] H2.
-Cut (Zero  [<]   x[/]TwoNZ).
+Cut ([0]  [<]   x[/]TwoNZ).
 Intro Hx2.
 Elim (s_proof (x[/]TwoNZ) Hx2).
 Intros N HN.
@@ -114,12 +114,12 @@ Intro HmN.
 
 (** The limit of [f] in [(p,p')] is [l] if
 [[
-forall e [>] Zero, exists d [>] Zero, forall (x : IR)
+forall e [>] [0], exists d [>] [0], forall (x : IR)
 ( [--]d [<] p[-]x [<] d) -> ( [--]d' [<] p'[-]y [<] d') -> ( [--]e [<] l[-]f(x,y) [<] e
 ]]
 *)
 
-Definition funLim2 (p p' l : IR) : CProp := forall e : IR, Zero [<] e -> {d : IR | Zero [<] d | forall x y,
+Definition funLim2 (p p' l : IR) : CProp := forall e : IR, [0] [<] e -> {d : IR | [0] [<] d | forall x y,
   AbsSmall d (p[-]x) -> AbsSmall d (p'[-]y) -> AbsSmall e (l[-]f2 x y)}.
 
 (** The function [f] is continuous at [p] if the limit of [f(x)] as
@@ -192,7 +192,7 @@ limit is $p$, $\lim_{n->\infty} f (s_n) =l$.
 
 Ax_iom funLim_isCauchy:
   (p,l:IR)(funLim p l)->(s:CauchySeqR)((Lim s)  [=]   p)->
-	(e:IR)(Zero  [<]  e)->(Ex [N:nat] (m:nat)(le N m)
+	(e:IR)([0]  [<]  e)->(Ex [N:nat] (m:nat)(le N m)
 			 ->(AbsSmall e ((s m) [-] (s N)))).
 
 End Sequence_and_function_limits.
@@ -221,8 +221,8 @@ $[0,\infty>$.
 
 Ax_iom strmonc_imp_ivt :(a,b:IR)(str_monotOnc a b)
            ->(x,y:IR)(x  [<]  y)->(Intclr a b x)->(Intclr a b y)
-               ->((f x)  [<]  Zero)->(Zero  [<]  (f y))
-                   ->(EX z:IR | (Intclr x y z)/\((f z)  [=]  Zero)).
+               ->((f x)  [<]  [0])->([0]  [<]  (f y))
+                   ->(EX z:IR | (Intclr x y z)/\((f z)  [=]  [0])).
 _**
 $\forall c\in\RR (f\mbox{ strongly monotonic on }[c,\infty>)
 \rightarrow \forall a,b\in\RR(c <a)\rightarrow( c< b)\rightarrow\ (f (a)<0)
@@ -233,9 +233,9 @@ $\forall c\in\RR (f\mbox{ strongly monotonic on }[c,\infty>)
 *_
 
 Ax_iom strmon_ivt_prem : (c:IR)(str_monotOncl c)->
-  (a,b:IR)(Intcl c a)->(Intcl c b)->((f a)  [<]   Zero)->(Zero   [<]  (f b))
+  (a,b:IR)(Intcl c a)->(Intcl c b)->((f a)  [<]   [0])->([0]   [<]  (f b))
        ->(x,y:IR)(Intclr a b x)->(Intclr a b y)->(x  [<]  y)
-              ->(EX z:IR | (Intclr x y z)/\((f z)  [#]  Zero)).
+              ->(EX z:IR | (Intclr x y z)/\((f z)  [#]  [0])).
 
 _** The following is lemma 5.8 from the skeleton
 
@@ -247,8 +247,8 @@ $\forall c\in\RR (f\mbox{ strongly monotonic on }[c,\infty>)
 
 Ax_iom strmoncl_imp_ivt : (c:IR)(str_monotOncl c)
            ->(a,b:IR)(a  [<]  b)->(Intcl c a)->(Intcl c b)
-               ->((f a)  [<]  Zero)->(Zero  [<]  (f b))
-                   ->(EX z:IR | (Intclr a b z)/\ ((f z)  [=]  Zero)).
+               ->((f a)  [<]  [0])->([0]  [<]  (f b))
+                   ->(EX z:IR | (Intclr a b z)/\ ((f z)  [=]  [0])).
 End Monotonic_functions.
 
 *)

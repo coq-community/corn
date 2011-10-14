@@ -94,27 +94,27 @@ Variable OF : COrdField.
 
 
 
-Lemma AbsSmall_pos_reflexive : forall x : OF, (Zero[<=]x) -> AbsSmall x x.
+Lemma AbsSmall_pos_reflexive : forall x : OF, ([0][<=]x) -> AbsSmall x x.
 Proof.
  intros.
  split.
-  apply leEq_transitive with (y := Zero:OF).
+  apply leEq_transitive with (y := [0]:OF).
    apply inv_cancel_leEq.
-   rstepl (Zero:OF).
+   rstepl ([0]:OF).
    rstepr x.
    assumption.
   assumption.
  apply leEq_reflexive.
 Qed.
 
-Lemma AbsSmall_neg_reflexive : forall x : OF, (Zero[<=]x) -> AbsSmall x [--]x.
+Lemma AbsSmall_neg_reflexive : forall x : OF, ([0][<=]x) -> AbsSmall x [--]x.
 Proof.
  intros.
  split.
   apply leEq_reflexive.
- apply leEq_transitive with (y := Zero:OF).
+ apply leEq_transitive with (y := [0]:OF).
   apply inv_cancel_leEq.
-  rstepl (Zero:OF).
+  rstepl ([0]:OF).
   rstepr x.
   assumption.
  assumption.
@@ -189,12 +189,12 @@ Proof.
  rstepl (q2[-](q2[-]q1) [/]ThreeNZ).
  rstepr q2.
  apply plus_cancel_less with (R := Q_as_COrdField) (z := [--]q2).
- rstepr [--](Zero:Q_as_COrdField).
+ rstepr [--]([0]:Q_as_COrdField).
  rstepl [--]((q2[-]q1) [/]ThreeNZ).
  apply inv_resp_less.
  apply mult_cancel_less with (R := Q_as_COrdField) (z := Three:Q_as_COrdField).
   apply pos_nring_S.
- rstepl (Zero:Q_as_COrdField).
+ rstepl ([0]:Q_as_COrdField).
  rstepr (q2[-]q1).
  apply shift_zero_less_minus.
  assumption.
@@ -206,7 +206,7 @@ Lemma shrink13 :
 Proof.
  intros.
  apply less_transitive_unfolded with (q1[+](q2[-]q1) [/]ThreeNZ).
-  astepl (q1[+]Zero).
+  astepl (q1[+][0]).
   apply plus_resp_less_lft.
   apply div_resp_pos.
    apply pos_three.
@@ -224,10 +224,10 @@ Proof.
   apply shrink23.
   assumption.
  astepl (q2[+][--]((q2[-]q1) [/]ThreeNZ)).
- astepr (q2[+]Zero).
+ astepr (q2[+][0]).
  apply plus_resp_less_lft.
  apply inv_cancel_less.
- rstepl (Zero:Q_as_COrdField).
+ rstepl ([0]:Q_as_COrdField).
  rstepr ((q2[-]q1) [/]ThreeNZ).
  apply div_resp_pos.
   apply pos_three.
@@ -284,7 +284,7 @@ Proof.
    intro a.
    exact (cotrans_analyze x (q1[+](q2[-]q1) [/]ThreeNZ) (q2[-](q2[-]q1) [/]ThreeNZ) (shrink23 q1 q2 a)).
   intro.
-  exact Zero.
+  exact [0].
  intro.
  exact q1.
 Defined.
@@ -484,7 +484,7 @@ Proof.
    intros H3 H4.
    change (fstT (Intrvl x n)[<=]fstT (if_cotrans x (Intrvl x n))) in |- *.
    rewrite H4.
-   astepl (fstT (Intrvl x n)[+]Zero).
+   astepl (fstT (Intrvl x n)[+][0]).
    simpl.
    apply (plus_resp_leEq_both Q_as_COrdField).
     apply leEq_reflexive.
@@ -544,12 +544,12 @@ Proof.
    intros H3 H4.
    change (sndT (if_cotrans x (Intrvl x n))[<=]sndT (Intrvl x n)) in |- *.
    rewrite H4.
-   astepr (sndT (Intrvl x n)[+]Zero).
+   astepr (sndT (Intrvl x n)[+][0]).
    astepl (sndT (Intrvl x n)[+] [--]((sndT (Intrvl x n)[-]fstT (Intrvl x n)) [/]ThreeNZ)).
    apply plus_resp_leEq_both.
     apply leEq_reflexive.
    apply inv_cancel_leEq.
-   astepl (Zero:Q_as_COrdField).
+   astepl ([0]:Q_as_COrdField).
    astepr ((sndT (Intrvl x n)[-]fstT (Intrvl x n)) [/]ThreeNZ).
    apply less_leEq.
    apply div_resp_pos.
@@ -599,7 +599,7 @@ Lemma a_simple_inequality :
  forall m : nat,
  4 <= m ->
  (Two [/]ThreeNZ)[^]m[<]
- ((One:Q_as_COrdField)[/] nring (S m)[//]nringS_ap_zero _ m).
+ (([1]:Q_as_COrdField)[/] nring (S m)[//]nringS_ap_zero _ m).
 Proof.
  intros.
  induction  m as [| m Hrecm].
@@ -610,7 +610,7 @@ Proof.
  case (le_lt_eq_dec 4 (S m) H).
   intro.
   apply less_transitive_unfolded with (Two [/]ThreeNZ[*]
-    ((One:Q_as_COrdField)[/] nring (S m)[//]nringS_ap_zero _ m)).
+    (([1]:Q_as_COrdField)[/] nring (S m)[//]nringS_ap_zero _ m)).
    astepl (((Two:Q_as_COrdField) [/]ThreeNZ)[^]m[*]Two [/]ThreeNZ).
    astepl ((Two:Q_as_COrdField) [/]ThreeNZ[*](Two [/]ThreeNZ)[^]m).
    apply mult_resp_less_lft.
@@ -631,9 +631,9 @@ Proof.
   rstepl ((Two:Q_as_COrdField)[*]nring (S (S m))).
   rstepr ((Three:Q_as_COrdField)[*]nring (S m)).
   astepl ((Two:Q_as_COrdField)[*](nring m[+]Two)).
-   astepr ((Three:Q_as_COrdField)[*](nring m[+]One)).
+   astepr ((Three:Q_as_COrdField)[*](nring m[+][1])).
    apply plus_cancel_less with ([--]((Two:Q_as_COrdField)[*]nring m[+]Three)).
-   rstepl (One:Q_as_COrdField).
+   rstepl ([1]:Q_as_COrdField).
    rstepr (nring (R:=Q_as_COrdField) m).
    astepl (nring (R:=Q_as_COrdField) 1).
    apply nring_less.
@@ -673,7 +673,7 @@ Proof.
  intros.
  apply AbsSmall_leEq_trans with (Length _ (Intrvl x m)).
   astepl ((Two [/]ThreeNZ)[^]m[*](start_r x[-]start_l x)).
-   rstepr ((One[/] nring (S m)[//]nringS_ap_zero _ m)[*](start_r x[-]start_l x)).
+   rstepr (([1][/] nring (S m)[//]nringS_ap_zero _ m)[*](start_r x[-]start_l x)).
    apply less_leEq.
    apply mult_resp_less.
     apply a_simple_inequality.
@@ -699,7 +699,7 @@ Proof.
  intros.
  unfold Cauchy_prop in |- *.
  intros e H.
- cut {n : nat | (start_r x[-]start_l x[/] e[//]Greater_imp_ap _ e Zero H)[<]nring n}.
+ cut {n : nat | (start_r x[-]start_l x[/] e[//]Greater_imp_ap _ e [0] H)[<]nring n}.
   intro H0.
   case H0.
   intro N.
@@ -710,7 +710,7 @@ Proof.
   apply AbsSmall_leEq_trans with (start_r x[-]start_l x[/] nring (S (S (N + 3)))[//]
     nringS_ap_zero Q_as_COrdField (S (N + 3))).
    apply less_leEq.
-   apply swap_div with (z_ := Greater_imp_ap _ e Zero H).
+   apply swap_div with (z_ := Greater_imp_ap _ e [0] H).
      apply pos_nring_S.
     assumption.
    apply less_transitive_unfolded with (nring (R:=Q_as_COrdField) N).
@@ -819,7 +819,7 @@ Proof.
   apply less_leEq.
   apply inj_Q_less.
   astepl ((Two [/]ThreeNZ)[^]m[*](start_r x[-]start_l x)).
-   rstepr ((One[/] nring (S m)[//]nringS_ap_zero _ m)[*](start_r x[-]start_l x)).
+   rstepr (([1][/] nring (S m)[//]nringS_ap_zero _ m)[*](start_r x[-]start_l x)).
    apply mult_resp_less.
     apply a_simple_inequality.
     assumption.
@@ -847,7 +847,7 @@ Proof.
  intros e H.
  unfold inj_Q_G_as_CauchySeq in |- *.
  unfold CS_seq in |- *.
- cut {n : nat | (inj_Q R1 (start_r x[-]start_l x)[/] e[//]Greater_imp_ap _ e Zero H)[<] nring n}.
+ cut {n : nat | (inj_Q R1 (start_r x[-]start_l x)[/] e[//]Greater_imp_ap _ e [0] H)[<] nring n}.
   intro H0.
   case H0.
   intro N.
@@ -874,7 +874,7 @@ Proof.
     apply shift_zero_less_minus.
     apply l_less_r.
    astepl (inj_Q R1 (start_r x[-]start_l x)[/]nring (S N)[//]nringS_ap_zero R1 N).
-    apply swap_div with (z_ := Greater_imp_ap _ e Zero H).
+    apply swap_div with (z_ := Greater_imp_ap _ e [0] H).
       apply pos_nring_S.
      assumption.
     apply less_transitive_unfolded with (y := nring (R:=R1) N).

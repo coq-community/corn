@@ -50,7 +50,7 @@ Proof.
  apply power_cancel_leEq with 2. auto. apply sqrt_nonneg.
    astepl (Re x[^]2).
  astepr (Re x[^]2[+]Im x[^]2).
- astepl (Re x[^]2[+]Zero).
+ astepl (Re x[^]2[+][0]).
  apply plus_resp_leEq_lft.
  apply sqr_nonneg.
 Qed.
@@ -63,7 +63,7 @@ Proof.
  apply power_cancel_leEq with 2. auto. apply sqrt_nonneg.
    astepl (Im x[^]2).
  astepr (Re x[^]2[+]Im x[^]2).
- astepl (Zero[+]Im x[^]2).
+ astepl ([0][+]Im x[^]2).
  apply plus_resp_leEq.
  apply sqr_nonneg.
 Qed.
@@ -95,12 +95,12 @@ Definition CC_Cauchy2im s := Build_CauchySeq _ _ (im_is_Cauchy s).
 Definition LimCC s : CC := (Lim (CC_Cauchy2re s)) [+I*] (Lim (CC_Cauchy2im s)).
 
 Definition CC_SeqLimit (seq : nat -> CC) (lim : CC) : CProp := forall e,
-  Zero [<] e -> {N : nat | forall m, N <= m -> AbsCC (seq m[-]lim) [<=] e}.
+  [0] [<] e -> {N : nat | forall m, N <= m -> AbsCC (seq m[-]lim) [<=] e}.
 
 Lemma AbsSmall_sqr : forall x e : IR, AbsSmall e x -> x[^]2 [<=] e[^]2.
 Proof.
  unfold AbsSmall in |- *. intros. elim H. clear H. intros.
- astepl (Zero[+]x[^]2).
+ astepl ([0][+]x[^]2).
  apply shift_plus_leEq.
  astepr ((e[-]x) [*] (e[+]x)).
  apply mult_resp_nonneg.
@@ -109,7 +109,7 @@ Proof.
  apply shift_leEq_minus. astepl ( [--]e). auto.
 Qed.
 
-Lemma AbsSmall_AbsCC : forall (z : CC) (e : IR), Zero [<] e ->
+Lemma AbsSmall_AbsCC : forall (z : CC) (e : IR), [0] [<] e ->
  AbsSmall (e [/]TwoNZ) (Re z) -> AbsSmall (e [/]TwoNZ) (Im z) -> AbsCC z [<=] e.
 Proof.
  intros. unfold AbsCC in |- *.
@@ -117,7 +117,7 @@ Proof.
    apply less_leEq. auto.
   astepl (Re z[^]2[+]Im z[^]2).
  rstepr ((e [/]TwoNZ) [^]2[+] (e [/]TwoNZ) [^]2[+] (e[^]2) [/]TwoNZ).
- astepl (Re z[^]2[+]Im z[^]2[+]Zero).
+ astepl (Re z[^]2[+]Im z[^]2[+][0]).
  apply plus_resp_leEq_both.
   apply plus_resp_leEq_both.
    apply AbsSmall_sqr. auto.
@@ -134,7 +134,7 @@ Proof.
   unfold SeqLimit in |- *. intro H0.
   cut (SeqLimit (seq_im s) (Lim (CC_Cauchy2im s))).
    unfold SeqLimit in |- *. intro H1.
-   cut (Zero [<] e [/]TwoNZ). intro H2.
+   cut ([0] [<] e [/]TwoNZ). intro H2.
     elim (H0 (e [/]TwoNZ) H2). unfold seq_re in |- *. intro N. intros H3.
     elim (H1 (e [/]TwoNZ) H2). unfold seq_im in |- *. intro N'. intros H4.
     cut {M : nat | N <= M | N' <= M}. intros H5.
@@ -159,7 +159,7 @@ Proof.
  unfold CC_SeqLimit in |- *. do 3 intro. intros H H0.
  apply cg_inv_unique_2.
  apply AbsCC_small_imp_eq. intros e H1.
- cut (Zero [<] e [/]ThreeNZ). intro H2.
+ cut ([0] [<] e [/]ThreeNZ). intro H2.
   elim (H (e [/]ThreeNZ)). intro N. intros H3.
    elim (H0 (e [/]ThreeNZ)). intro N'. intros H4.
     cut {M : nat | N <= M | N' <= M}. intros H5.
@@ -170,7 +170,7 @@ Proof.
         apply triangle.
        algebra.
       apply AbsCC_wd. rational.
-      rstepr (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ). astepl (Zero[+]AbsCC (s M[-]l) [+]AbsCC (s M[-]l')).
+      rstepr (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ). astepl ([0][+]AbsCC (s M[-]l) [+]AbsCC (s M[-]l')).
      apply plus_resp_less_leEq.
       apply plus_resp_less_leEq.
        auto.
@@ -201,8 +201,8 @@ Section Continuity_for_CC.
 
 Variable f : CC -> CC. (* (CSetoid_un_op CC). *)
 
-Definition CCfunLim (p l : CC) : CProp := forall e : IR, Zero [<] e ->
-  {d : IR | Zero [<] d | forall x, AbsCC (p[-]x) [<=] d -> AbsCC (l[-]f x) [<=] e}.
+Definition CCfunLim (p l : CC) : CProp := forall e : IR, [0] [<] e ->
+  {d : IR | [0] [<] d | forall x, AbsCC (p[-]x) [<=] d -> AbsCC (l[-]f x) [<=] e}.
 
 Definition CCcontinAt p : CProp := CCfunLim p (f p).
 
@@ -240,8 +240,8 @@ Qed.
 
 End Continuity_for_CC.
 
-Lemma seq_yields_zero : forall q : IR, Zero [<=] q -> q [<] One -> forall c : IR, Zero [<] c ->
- forall s, (forall i, AbsCC (s i) [<=] q[^]i[*]c) -> CC_SeqLimit s Zero.
+Lemma seq_yields_zero : forall q : IR, [0] [<=] q -> q [<] [1] -> forall c : IR, [0] [<] c ->
+ forall s, (forall i, AbsCC (s i) [<=] q[^]i[*]c) -> CC_SeqLimit s [0].
 Proof.
  intros q zltq qlt1 c zltc s H.
  unfold CC_SeqLimit in |- *.
@@ -262,7 +262,7 @@ Proof.
   inversion_clear H0.
   rstepr ((e[/] c[//]pos_ap_zero IR c zltc) [*]c).
   apply mult_resp_leEq_rht.
-   rstepl (q[^]m[-]Zero).
+   rstepl (q[^]m[-][0]).
    assumption.
   apply less_leEq. assumption.
   apply shift_less_div.

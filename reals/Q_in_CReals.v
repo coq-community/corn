@@ -85,9 +85,9 @@ Qed.
 Lemma Archimedes' : forall x : R1, {n : nat | x [<] nring n}.
 Proof.
  intro x.
- elim (Archimedes (x[+]One)); intros n Hn.
+ elim (Archimedes (x[+][1])); intros n Hn.
  exists n.
- apply less_leEq_trans with (x[+]One); auto.
+ apply less_leEq_trans with (x[+][1]); auto.
  apply less_plusOne.
 Qed.
 (*--------------------------------------*)
@@ -102,7 +102,7 @@ Coercion Local nat_of_P : positive >-> nat.
  To define the injection we need one elemntary lemma about the denominator:
 *)
 
-Lemma den_is_nonzero : forall x : Q_as_COrdField, nring (R:=R1) (Qden x) [#] Zero.
+Lemma den_is_nonzero : forall x : Q_as_COrdField, nring (R:=R1) (Qden x) [#] [0].
 Proof.
  intro.
  apply nring_ap_zero.
@@ -135,7 +135,7 @@ Proof.
    simpl in |- *.
    red in |- *.
    simpl in H.
-   cut (Not (Zero [#] (Zero:R1))).
+   cut (Not ([0] [#] ([0]:R1))).
     intro.
     intro.
     elim H0.
@@ -212,8 +212,8 @@ Proof.
    case n.
      intro H.
      elimtype False.
-     cut (Zero [=] (Zero:R1)).
-      change (~ (Zero [=] (Zero:R1))) in |- *.
+     cut ([0] [=] ([0]:R1)).
+      change (~ ([0] [=] ([0]:R1))) in |- *.
       apply ap_imp_neq.
       simpl in H.
       assumption.
@@ -330,9 +330,9 @@ Proof.
    intros.
    simpl in |- *.
    astepl [--](nring (R:=R1) (nat_of_P p)).
-   astepr (Zero:R1).
+   astepr ([0]:R1).
    apply inv_cancel_less.
-   astepl (Zero:R1).
+   astepl ([0]:R1).
    astepr (nring (R:=R1) (nat_of_P p)).
    case (ZL4' p).
    intro h.
@@ -347,10 +347,10 @@ Proof.
   case (ZL4' p2).
   intro h2.
   intros.
-  apply less_transitive_unfolded with (y := Zero:R1).
+  apply less_transitive_unfolded with (y := [0]:R1).
    astepl [--](nring (R:=R1) (nat_of_P p2)).
    apply inv_cancel_less.
-   astepl (Zero:R1).
+   astepl ([0]:R1).
    astepr (nring (R:=R1) (nat_of_P p2)).
    rewrite e.
    apply pos_nring_S.
@@ -586,11 +586,11 @@ Proof.
  astepr (inj_Q (q1[+][--]q1)).
   apply eq_symmetric_unfolded.
   apply inj_Q_plus.
- astepr (inj_Q Zero).
+ astepr (inj_Q [0]).
   apply inj_Q_wd.
   algebra.
  simpl in |- *.
- rstepl (Zero:R1).
+ rstepl ([0]:R1).
  algebra.
 Qed.
 
@@ -616,7 +616,7 @@ Proof.
  simpl.
  field.
  apply inj_Q_strext.
- stepr (Zero:R1).
+ stepr ([0]:R1).
   apply H.
  rstepl (inj_Q q1[-]inj_Q q1).
  apply eq_symmetric.
@@ -679,7 +679,7 @@ Proof.
  simpl in |- *.
  red in |- *.
  intros e H.
- cut {n : nat | (One[/]e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
+ cut {n : nat | ([1][/]e[//]Greater_imp_ap _ e [0] H) [<] nring (R:=R1) n}.
   intro H0.
   case H0.
   intros N1 H1.
@@ -694,7 +694,7 @@ Proof.
    intros.
    apply AbsSmall_leEq_trans with (e1 := inj_Q (Qmake 1%Z (P_of_succ_nat N1))).
     apply less_leEq.
-    apply mult_cancel_less with (z := nring (R:=R1) (S N1)[*](One[/]e[//]Greater_imp_ap _ e Zero H)).
+    apply mult_cancel_less with (z := nring (R:=R1) (S N1)[*]([1][/]e[//]Greater_imp_ap _ e [0] H)).
      apply mult_resp_pos.
       apply pos_nring_S.
      apply div_resp_pos.
@@ -702,7 +702,7 @@ Proof.
      apply pos_one.
     unfold inj_Q in |- *.
     rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N1.
-    rstepl (One[/]e[//]Greater_imp_ap _ e Zero H).
+    rstepl ([1][/]e[//]Greater_imp_ap _ e [0] H).
     rstepr (nring (R:=R1) (P_of_succ_nat N1)).
     apply less_transitive_unfolded with (y := nring (R:=R1) N1).
      assumption.
@@ -732,8 +732,8 @@ Proof.
  induction  n as [| n Hrecn].
   simpl in |- *.
   rational.
- change (inj_Q (nring n[+]One) [=] nring (R:=R1) n[+]One) in |- *.
- astepr (inj_Q (nring n)[+]inj_Q One).
+ change (inj_Q (nring n[+][1]) [=] nring (R:=R1) n[+][1]) in |- *.
+ astepr (inj_Q (nring n)[+]inj_Q [1]).
   apply inj_Q_plus.
  apply bin_op_wd_unfolded.
   assumption.
@@ -773,13 +773,13 @@ Proof.
  apply inj_Q_inv.
 Qed.
 
-Lemma inj_Q_One : inj_Q One [=] One.
+Lemma inj_Q_One : inj_Q [1] [=] [1].
 Proof.
  rstepr ((nring 1):R1).
  apply (inj_Q_nring 1).
 Qed.
 
-Lemma inj_Q_Zero : inj_Q Zero [=] Zero.
+Lemma inj_Q_Zero : inj_Q [0] [=] [0].
 Proof.
  rstepr ((nring 0):R1).
  apply (inj_Q_nring 0).
@@ -817,14 +817,14 @@ Qed.
 Lemma inj_Q_power_Z : forall q1 (n:Z) H, inj_Q (q1^n)%Q [=] ((inj_Q q1)[//]H)[^^]n.
 Proof.
  intros q [|n|n] H.
-   change (inj_Q (q ^ 0)%Q[=]One).
+   change (inj_Q (q ^ 0)%Q[=][1]).
    apply inj_Q_One.
   simpl.
   change (inj_Q (q ^ n)%Q[=]inj_Q q[^]n).
   csetoid_rewrite_rev (inj_Q_power q n).
   rewrite inject_nat_convert.
   apply eq_reflexive.
- change ((inj_Q (/q ^ n))%Q[=](One[/]inj_Q q[//]H)[^]n).
+ change ((inj_Q (/q ^ n))%Q[=]([1][/]inj_Q q[//]H)[^]n).
  stepl (inj_Q ((1/q)^n)%Q).
   stepr ((inj_Q (1/q)%Q)[^]n).
    csetoid_rewrite_rev (inj_Q_power (1/q)%Q n).
@@ -894,10 +894,10 @@ zero. This lemma can be used to prove the more general fact that there
 is a rational number between any two real numbers. *)
 
 Lemma Q_dense_in_CReals : forall e : R1,
- Zero [<] e -> {q : Q_as_COrdField | Zero [<] inj_Q q | inj_Q q [<] e}.
+ [0] [<] e -> {q : Q_as_COrdField | [0] [<] inj_Q q | inj_Q q [<] e}.
 Proof.
  intros e H.
- cut {n : nat | (One[/] e[//]Greater_imp_ap _ e Zero H) [<] nring (R:=R1) n}.
+ cut {n : nat | ([1][/] e[//]Greater_imp_ap _ e [0] H) [<] nring (R:=R1) n}.
   intro H0.
   case H0.
   intro N.
@@ -905,25 +905,25 @@ Proof.
   exists (Qmake 1 (P_of_succ_nat N)).
    simpl in |- *.
    unfold pring in |- *; simpl in |- *.
-   apply mult_cancel_less with (z := nring (R:=R1) N[+]One).
-    change (Zero [<] nring (R:=R1) (S N)) in |- *.
+   apply mult_cancel_less with (z := nring (R:=R1) N[+][1]).
+    change ([0] [<] nring (R:=R1) (S N)) in |- *.
     apply pos_nring_S.
-   astepl (Zero:R1).
-   astepr ((Zero[+]One[-]Zero[/] nring (P_of_succ_nat N)[//]
+   astepl ([0]:R1).
+   astepr (([0][+][1][-][0][/] nring (P_of_succ_nat N)[//]
      den_is_nonzero (Qmake 1%positive (P_of_succ_nat N)))[*] nring (S N)).
     rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ with N.
-    rstepr (One:R1).
+    rstepr ([1]:R1).
     apply pos_one.
    apply bin_op_wd_unfolded.
     rational.
    algebra.
   simpl in |- *.
-  apply swap_div with (z_ := Greater_imp_ap _ e Zero H).
+  apply swap_div with (z_ := Greater_imp_ap _ e [0] H).
     rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
     apply pos_nring_S.
    assumption.
   unfold pring in |- *; simpl in |- *.
-  rstepl (One[/] e[//]Greater_imp_ap _ e Zero H).
+  rstepl ([1][/] e[//]Greater_imp_ap _ e [0] H).
   apply less_transitive_unfolded with (y := nring (R:=R1) N).
    assumption.
   rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
@@ -934,11 +934,11 @@ Qed.
 Lemma Q_dense_in_CReals' : forall a b : R1,
  a [<] b -> {q : Q_as_COrdField | a [<] inj_Q q | inj_Q q [<] b}.
 Proof.
- cut (forall a b : R1, Zero[<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
+ cut (forall a b : R1, [0][<]b -> a[<]b -> {q : Q_as_COrdField | a[<]inj_Q q | inj_Q q[<]b}).
   intros H a b Hab.
-  destruct (less_cotransitive_unfolded _ _ _ Hab Zero);[|apply H;assumption].
-  assert (X:Zero[<][--]a).
-   rstepl ([--]Zero:R1).
+  destruct (less_cotransitive_unfolded _ _ _ Hab [0]);[|apply H;assumption].
+  assert (X:[0][<][--]a).
+   rstepl ([--][0]:R1).
    apply inv_resp_less.
    assumption.
   assert (Y:=inv_resp_less _ _ _ Hab).
@@ -952,13 +952,13 @@ Proof.
    apply inv_cancel_less.
    stepr (inj_Q q);[assumption|apply eq_symmetric; apply cg_inv_inv].
   apply eq_symmetric; apply inj_Q_inv.
- cut  (forall a b : R1, Zero[<]b -> (a[+]One)[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
+ cut  (forall a b : R1, [0][<]b -> (a[+][1])[<]b -> {n : nat | a[<]nring n | nring n[<]b}).
   intros H a b Hb Hab.
   destruct (Q_dense_in_CReals _ (shift_zero_less_minus _ _ _ Hab)) as [q Haq Hbq].
   assert (X0 := pos_ap_zero _ _ Haq).
-  assert (X1 : Zero[<](b[/]inj_Q q[//]X0)).
+  assert (X1 : [0][<](b[/]inj_Q q[//]X0)).
    apply div_resp_pos; assumption.
-  assert (X2 : (a[/]inj_Q q[//]X0)[+]One[<](b[/]inj_Q q[//]X0)).
+  assert (X2 : (a[/]inj_Q q[//]X0)[+][1][<](b[/]inj_Q q[//]X0)).
    apply shift_plus_less'.
    rstepr ((b[-]a)[/]inj_Q q[//]X0).
    apply shift_less_div.
@@ -983,7 +983,7 @@ Proof.
   exists 0; try assumption.
  destruct (less_cotransitive_unfolded _ _ _ Hab (nring (R:=R1) (S n))).
   apply IHn.
-  apply plus_cancel_less with One.
+  apply plus_cancel_less with [1].
   apply c.
  exists (S n); assumption.
 Qed.

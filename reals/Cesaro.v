@@ -99,7 +99,7 @@ Proof.
 Qed.
 
 Lemma algebraic_estimate1 :
-forall (e l: IR) (H1 : Zero [<] e) (x : nat -> IR) (y : nat->IR)
+forall (e l: IR) (H1 : [0] [<] e) (x : nat -> IR) (y : nat->IR)
 (H2 : seq_pos y) (m N1: nat) (H3 : S N1 <= m)
 (H4 : forall i, S N1 <= i -> i <= m -> AbsSmall e (x i[-]l)),
 AbsSmall
@@ -135,7 +135,7 @@ Proof.
  unfold Cauchy_Lim_prop2.
  intros.
  (* Find N such that forall m > N |x - l| < eps / 2*)
- assert (H4 : Zero [<] eps[/]TwoNZ). apply pos_div_two. auto.
+ assert (H4 : [0] [<] eps[/]TwoNZ). apply pos_div_two. auto.
   assert ({N : nat | forall m, N <= m -> AbsSmall (eps[/]TwoNZ) ((x m) [-] l) }).
   apply (H1 (eps[/]TwoNZ) H4).
  destruct X0 as [N1 H5].
@@ -167,9 +167,9 @@ Proof.
   astepl (eps[/]TwoNZ [*] (Sum (S N1) m (fun k: nat => y k)[/]
     seq_part_sum y (S m)[//]seq_pos_imp_ap_zero y H2 m)).
    2: apply algebraic_transform3.
-  astepr (eps[/]TwoNZ[*]One).
+  astepr (eps[/]TwoNZ[*][1]).
   apply mult_resp_leEq_lft.
-   cut (AbsSmall One (Sum (G:=IR) (S N1) m (fun k : nat => y k)[/]
+   cut (AbsSmall [1] (Sum (G:=IR) (S N1) m (fun k : nat => y k)[/]
      seq_part_sum y (S m)[//]seq_pos_imp_ap_zero y H2 m)).
     unfold AbsSmall. tauto.
     apply seq_inf_sum_ratio_bound.
@@ -188,7 +188,7 @@ Cauchy_Lim_prop2 (fun n : nat => seq_part_sum x (S n)
       [/]nring (S n)[//](nringS_ap_zero _ n)) l.
 Proof.
  intros.
- set (y := (fun k : nat => One : IR)).
+ set (y := (fun k : nat => [1] : IR)).
  assert (H2 : seq_pos y).
   apply One_seq_is_pos.
  assert (H3 : seq_inf_sum y).

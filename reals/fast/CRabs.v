@@ -66,8 +66,8 @@ Proof.
  apply stableEq.
   apply Complete_stable.
   apply stableQ.
- generalize (leEq_or_leEq _ Zero x).
- cut ((x[<=]Zero or Zero[<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
+ generalize (leEq_or_leEq _ [0] x).
+ cut ((x[<=][0] or [0][<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
   unfold Not.
   tauto.
  intros [H|H].

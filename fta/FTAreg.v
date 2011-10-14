@@ -52,26 +52,26 @@ Hypothesis lt0n : 0 < n.
 (**
 %\begin{convention}% Let [qK] be a real between 0 and 1, with
 [[
-forall (p : CCX), (monic n p) -> forall (c : IR), ((AbsCC (p!Zero)) [<] c) ->
+forall (p : CCX), (monic n p) -> forall (c : IR), ((AbsCC (p![0])) [<] c) ->
  {z:CC | ((AbsCC z) [^]n [<] c) | ((AbsCC (p!z)) [<] qK[*]c)}.
 ]]
 Let [p] be a monic polynomial over the complex numbers with degree
-[n], and let [c0] be such that [(AbsCC (p!Zero)) [<] c0].
+[n], and let [c0] be such that [(AbsCC (p![0])) [<] c0].
 %\end{convention}%
 *)
 
 Section Kneser_Sequence.
 Variable qK : IR.
-Variable zltq : Zero [<=] qK.
-Variable qlt1 : qK [<] One.
+Variable zltq : [0] [<=] qK.
+Variable qlt1 : qK [<] [1].
 Hypothesis q_prop : forall p : cpoly CC, monic n p -> forall c : IR,
-AbsCC p ! Zero [<] c -> {z : CC | AbsCC z[^]n [<=] c | AbsCC p ! z [<] qK[*]c}.
+AbsCC p ! [0] [<] c -> {z : CC | AbsCC z[^]n [<=] c | AbsCC p ! z [<] qK[*]c}.
 
 Variable p : cpoly CC.
 Hypothesis mp : monic n p.
 
 Variable c0 : IR.
-Hypothesis p0ltc0 : AbsCC p ! Zero [<] c0.
+Hypothesis p0ltc0 : AbsCC p ! [0] [<] c0.
 
 Record Knes_tup : Type :=
  {z_el    :> CC;
@@ -88,7 +88,7 @@ Proof.
  intro tup.
  elim tup.
  intros z c pzltc.
- cut (AbsCC (Shift z p) ! Zero [<] c).
+ cut (AbsCC (Shift z p) ! [0] [<] c).
   intro Hsh.
   generalize (q_prop (Shift z p) (Shift_monic z p n mp) c Hsh).
   intro Hex.
@@ -109,18 +109,18 @@ Proof.
   apply Shift_apply.
  apply less_wdl with (AbsCC p ! z).
   assumption.
- generalize (Shift_apply z p Zero).
+ generalize (Shift_apply z p [0]).
  intro H3.
  apply eq_symmetric_unfolded.
  apply AbsCC_wd.
- apply eq_transitive_unfolded with p ! (Zero[+]z).
+ apply eq_transitive_unfolded with p ! ([0][+]z).
   assumption.
  algebra.
 Defined.
 
 Fixpoint Knes_fun_it (i : nat) : Knes_tup :=
   match i with
-  | O   => Build_Knes_tup Zero c0 p0ltc0
+  | O   => Build_Knes_tup [0] c0 p0ltc0
   | S j => Knes_fun (Knes_fun_it j):Knes_tup
   end.
 
@@ -200,8 +200,8 @@ Section Seq_Exists_Main.
 ** Main results
 *)
 
-Lemma seq_exists : {q : IR | Zero [<=] q | q [<] One and (forall p : cpoly CC,
- monic n p -> forall c : IR, AbsCC p ! Zero [<] c -> {s : nat -> CC | forall i,
+Lemma seq_exists : {q : IR | [0] [<=] q | q [<] [1] and (forall p : cpoly CC,
+ monic n p -> forall c : IR, AbsCC p ! [0] [<] c -> {s : nat -> CC | forall i,
   AbsCC p ! (s i) [<=] q[^]i[*]c /\ AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*]c})}.
 Proof.
  elim (Kneser n lt0n).
@@ -227,37 +227,37 @@ Section N_Exists.
 Variable n : nat.
 Hypothesis lt0n : 0 < n.
 Variable q : IR.
-Hypothesis zleq : Zero [<=] q.
-Hypothesis qlt1 : q [<] One.
+Hypothesis zleq : [0] [<=] q.
+Hypothesis qlt1 : q [<] [1].
 Variable c : IR.
-Hypothesis zltc : Zero [<] c.
+Hypothesis zltc : [0] [<] c.
 (* begin hide *)
-Let q_ : q[-]One [#] Zero := qltone IR q qlt1.
+Let q_ : q[-][1] [#] [0] := qltone IR q qlt1.
 (* end hide *)
 Variable e : IR.
-Variable zlte : Zero [<] e.
+Variable zlte : [0] [<] e.
 
-Lemma N_exists : {N : nat | forall m, N <= m -> (q[^]m[-]q[^]N[/] q[-]One[//]q_) [*]c [<=] e}.
+Lemma N_exists : {N : nat | forall m, N <= m -> (q[^]m[-]q[^]N[/] q[-][1][//]q_) [*]c [<=] e}.
 Proof.
- cut (Zero [<] One[-]q).
+ cut ([0] [<] [1][-]q).
   intro H0.
-  cut (One[-]q [#] Zero).
+  cut ([1][-]q [#] [0]).
    intro H3.
-   cut (c [#] Zero).
+   cut (c [#] [0]).
     intro H1.
-    cut (Zero [<] (One[-]q) [*] (e[/] c[//]H1)).
+    cut ([0] [<] ([1][-]q) [*] (e[/] c[//]H1)).
      intro H2.
-     elim (qi_yields_zero q zleq qlt1 ((One[-]q) [*] (e[/] c[//]H1)) H2).
+     elim (qi_yields_zero q zleq qlt1 (([1][-]q) [*] (e[/] c[//]H1)) H2).
      intros N HN.
      exists N.
      intros m leNm.
-     rstepl ((q[^]N[-]q[^]m[/] One[-]q[//]H3) [*]c).
+     rstepl ((q[^]N[-]q[^]m[/] [1][-]q[//]H3) [*]c).
      apply shift_mult_leEq with H1.
       assumption.
      apply shift_div_leEq'.
       assumption.
      apply leEq_transitive with (q[^]N).
-      rstepl (Zero[+] (q[^]N[-]q[^]m)).
+      rstepl ([0][+] (q[^]N[-]q[^]m)).
       apply shift_plus_leEq.
       rstepr (q[^]m).
       apply nexp_resp_nonneg.
@@ -289,39 +289,39 @@ Section Seq_is_CC_CAuchy.
 Variable n : nat.
 Hypothesis lt0n : 0 < n.
 Variable q : IR.
-Hypothesis zleq : Zero [<=] q.
-Hypothesis qlt1 : q [<] One.
+Hypothesis zleq : [0] [<=] q.
+Hypothesis qlt1 : q [<] [1].
 Variable c : IR.
-Hypothesis zltc : Zero [<] c.
+Hypothesis zltc : [0] [<] c.
 
 (** %\begin{convention}% Let:
- - [q_] prove [q[-]One [#] Zero]
+ - [q_] prove [q[-][1] [#] [0]]
  - [nrtq := NRoot q n]
  - [nrtc := Nroot c n]
- - [nrtqlt1] prove [nrtq [<] One]
- - [nrtq_] prove [nrtq[-]One [#] Zero]
+ - [nrtqlt1] prove [nrtq [<] [1]]
+ - [nrtq_] prove [nrtq[-][1] [#] [0]]
 
 %\end{convention}% *)
 
 (* begin hide *)
-Let q_ : q[-]One [#] Zero := qltone IR q qlt1.
+Let q_ : q[-][1] [#] [0] := qltone IR q qlt1.
 Let nrtq : IR := NRoot zleq lt0n.
 Let nrtc : IR := NRoot (less_leEq _ _ _ zltc) lt0n.
-Let nrtqlt1 : nrtq [<] One := NRoot_less_one q zleq n lt0n qlt1.
-Let nrtq_ : nrtq[-]One [#] Zero := qltone IR nrtq nrtqlt1.
+Let nrtqlt1 : nrtq [<] [1] := NRoot_less_one q zleq n lt0n qlt1.
+Let nrtq_ : nrtq[-][1] [#] [0] := qltone IR nrtq nrtqlt1.
 (* end hide *)
 
-Lemma zlt_nrtq : Zero [<=] nrtq.
+Lemma zlt_nrtq : [0] [<=] nrtq.
 Proof.
  unfold nrtq; apply NRoot_nonneg.
 Qed.
 
-Lemma zlt_nrtc : Zero [<] nrtc.
+Lemma zlt_nrtc : [0] [<] nrtc.
 Proof.
  unfold nrtc; apply NRoot_pos; auto.
 Qed.
 
-Lemma nrt_pow : forall i (H : Zero [<=] q[^]i[*]c), NRoot H lt0n [=] nrtq[^]i[*]nrtc.
+Lemma nrt_pow : forall i (H : [0] [<=] q[^]i[*]c), NRoot H lt0n [=] nrtq[^]i[*]nrtc.
 Proof.
  intros.
  apply root_unique with n.
@@ -351,7 +351,7 @@ Proof.
    apply absCC_absIR_re.
   generalize (H i).
   intro Hi.
-  cut (Zero [<=] q[^]i[*]c).
+  cut ([0] [<=] q[^]i[*]c).
    intro H0.
    cut (AbsCC (s (S i) [-]s i) [<=] NRoot H0 lt0n).
     intro H1.
@@ -381,7 +381,7 @@ Proof.
    apply absCC_absIR_im.
   generalize (H i).
   intro Hi.
-  cut (Zero [<=] q[^]i[*]c).
+  cut ([0] [<=] q[^]i[*]c).
    intro H0.
    cut (AbsCC (s (S i) [-]s i) [<=] NRoot H0 lt0n).
     intro H1.
@@ -403,7 +403,7 @@ Proof.
 Qed.
 
 Lemma SublemmaRe : forall s, (forall i, AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*]c) -> forall N m,
- N <= m -> AbsIR (Re (s m) [-]Re (s N)) [<=] (nrtq[^]m[-]nrtq[^]N[/] nrtq[-]One[//]nrtq_) [*]nrtc.
+ N <= m -> AbsIR (Re (s m) [-]Re (s N)) [<=] (nrtq[^]m[-]nrtq[^]N[/] nrtq[-][1][//]nrtq_) [*]nrtc.
 Proof.
  intros s Hi N m leNm.
  elim (le_lt_eq_dec N m leNm).
@@ -451,7 +451,7 @@ Proof.
   exact (less_leEq _ _ _ zlt_nrtc).
  intro HNm.
  rewrite HNm.
- apply leEq_wdl with (AbsIR Zero).
+ apply leEq_wdl with (AbsIR [0]).
   apply leEq_wdl with ZeroR.
    apply leEq_wdr with ZeroR.
     exact (leEq_reflexive _ _).
@@ -462,7 +462,7 @@ Proof.
 Qed.
 
 Lemma SublemmaIm : forall s, (forall i, AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*]c) -> forall N m,
- N <= m -> AbsIR (Im (s m) [-]Im (s N)) [<=] (nrtq[^]m[-]nrtq[^]N[/] nrtq[-]One[//]nrtq_) [*]nrtc.
+ N <= m -> AbsIR (Im (s m) [-]Im (s N)) [<=] (nrtq[^]m[-]nrtq[^]N[/] nrtq[-][1][//]nrtq_) [*]nrtc.
 Proof.
  intros s Hi N m leNm.
  elim (le_lt_eq_dec N m leNm).
@@ -511,7 +511,7 @@ Proof.
   exact (less_leEq _ _ _ zlt_nrtc).
  intro HNm.
  rewrite HNm.
- apply leEq_wdl with (AbsIR Zero).
+ apply leEq_wdl with (AbsIR [0]).
   apply leEq_wdl with ZeroR.
    apply leEq_wdr with ZeroR.
     exact (leEq_reflexive _ _).
@@ -542,7 +542,7 @@ Proof.
   intro H3.
   eapply leEq_transitive.
    2: apply H3.
-  rstepr ((nrtq[^]m[-]nrtq[^]N[/] nrtq[-]One[//]nrtq_) [*]nrtc).
+  rstepr ((nrtq[^]m[-]nrtq[^]N[/] nrtq[-][1][//]nrtq_) [*]nrtc).
   exact H2.
  (* Prove (Cauchy_prop (seq_im s)) *)
  unfold Cauchy_prop in |- *.
@@ -560,14 +560,14 @@ Proof.
  intro H3.
  eapply leEq_transitive.
   2: apply H3.
- rstepr ((nrtq[^]m[-]nrtq[^]N[/] nrtq[-]One[//]nrtq_) [*]nrtc).
+ rstepr ((nrtq[^]m[-]nrtq[^]N[/] nrtq[-][1][//]nrtq_) [*]nrtc).
  exact H2.
 Qed.
 
 End Seq_is_CC_CAuchy.
 
 Lemma FTA_monic : forall (p : cpoly CC) (n : nat),
- 0 < n -> monic n p -> {c : CC | p ! c [=] Zero}.
+ 0 < n -> monic n p -> {c : CC | p ! c [=] [0]}.
 Proof.
  intros p n H0n mon.
  generalize (seq_exists n H0n).
@@ -578,30 +578,30 @@ Proof.
  intros qlt10 Hq2.
  generalize (Hq2 p mon).
  intro Hq3.
- cut (Zero [<] AbsCC p ! Zero[+]One).
+ cut ([0] [<] AbsCC p ! [0][+][1]).
   intro Hp.
-  elim (Hq3 (AbsCC p ! Zero[+]One)).
+  elim (Hq3 (AbsCC p ! [0][+][1])).
    intros s Hs.
-   cut (forall i : nat, AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*] (AbsCC p ! Zero[+]One)).
+   cut (forall i : nat, AbsCC (s (S i) [-]s i) [^]n [<=] q[^]i[*] (AbsCC p ! [0][+][1])).
     intro Hs2.
     cut (CC_Cauchy_prop s).
      intro Hs3.
      exists (LimCC (Build_CC_CauchySeq s Hs3)).
      apply CC_SeqLimit_uniq with (fun n : nat => p ! (s n)).
       exact (poly_pres_lim (fun x : CC => p ! x) (contin_polyCC p) (Build_CC_CauchySeq s Hs3)).
-     generalize (seq_yields_zero q qnonneg qlt10 (AbsCC p ! Zero[+]One) Hp (fun n0 : nat => p ! (s n0))).
+     generalize (seq_yields_zero q qnonneg qlt10 (AbsCC p ! [0][+][1]) Hp (fun n0 : nat => p ! (s n0))).
      intro H0. apply H0.
      intro i. generalize (Hs i).
      intro H1; inversion_clear H1; assumption.
-    exact (seq_is_CC_Cauchy n H0n q qnonneg qlt10 (AbsCC p ! Zero[+]One) Hp s Hs2).
+    exact (seq_is_CC_Cauchy n H0n q qnonneg qlt10 (AbsCC p ! [0][+][1]) Hp s Hs2).
    intro i; generalize (Hs i); intro Ha; elim Ha; intros; assumption.
-  exact (less_plusOne _ (AbsCC p ! Zero)).
+  exact (less_plusOne _ (AbsCC p ! [0])).
  apply zero_lt_posplus1.
  apply AbsCC_nonneg.
 Qed.
 
 Lemma FTA_reg : forall (p : cpoly CC) (n : nat),
- 0 < n -> degree n p -> {c : CC | p ! c [=] Zero}.
+ 0 < n -> degree n p -> {c : CC | p ! c [=] [0]}.
 Proof.
  intros p n H H0.
  elim (FTA_monic (poly_norm _ p n H0) n); auto.

@@ -78,7 +78,7 @@ enough to [z].
 *)
 
 Lemma Weak_IVT_ap_lft : forall Ha Hb (HFab : F a Ha [<] F b Hb) e,
- Zero [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
+ [0] [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
  {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z) [<=] e}.
 Proof.
  intros Ha Hb HFab e H z H0.
@@ -102,7 +102,7 @@ Proof.
       set (f := fun i Hi => F (compact_part _ _ Hab' d H4 i Hi)
         (incF _ (compact_part_hyp _ _ Hab Hab' d H4 i Hi)) [-]z) in *.
       set (n := compact_nat a b d H4) in *.
-      cut (forall i Hi, f i Hi [<=] Zero).
+      cut (forall i Hi, f i Hi [<=] [0]).
        intros.
        apply (less_irreflexive_unfolded _ (F b Hb[-]z)).
        eapply less_leEq_trans.
@@ -209,7 +209,7 @@ If [f(b) [<] f(a)], a similar result holds:
 *)
 
 Lemma Weak_IVT_ap_rht : forall Ha Hb (HFab : F b Hb [<] F a Ha) e,
- Zero [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
+ [0] [<] e -> forall z, Compact (less_leEq _ _ _ HFab) z ->
  {x : IR | Compact Hab x | forall Hx, AbsIR (F x Hx[-]z) [<=] e}.
 Proof.
  intros Ha Hb HFab e H z H0.

@@ -142,13 +142,13 @@ Proof.
  simpl in *.
  rstepr (seq_part_sum (fun n0 : nat =>
    (sin_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
-     nexp IR n0 (inj_Q IR a[-]Zero)) n'[+](
+     nexp IR n0 (inj_Q IR a[-][0])) n'[+](
        (sin_seq n'[/]nring (R:=IR) (fact n')[//]nring_fac_ap_zero IR n')[*]
-         nexp IR n' (inj_Q IR a[-]Zero)[+] (sin_seq (S n')[/]nring (R:=IR) (fact n' + n' * fact n')[//]
-           nring_fac_ap_zero IR (S n'))[*] (nexp IR n' (inj_Q IR a[-]Zero)[*](inj_Q IR a[-]Zero)))).
+         nexp IR n' (inj_Q IR a[-][0])[+] (sin_seq (S n')[/]nring (R:=IR) (fact n' + n' * fact n')[//]
+           nring_fac_ap_zero IR (S n'))[*] (nexp IR n' (inj_Q IR a[-][0])[*](inj_Q IR a[-][0])))).
  apply bin_op_wd_unfolded.
   assumption.
- rstepl (Zero[+]inj_Q IR ((- (1)) ^ n * Str_nth n (sinSequence a))).
+ rstepl ([0][+]inj_Q IR ((- (1)) ^ n * Str_nth n (sinSequence a))).
  unfold sin_seq.
  apply bin_op_wd_unfolded.
   destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
@@ -177,9 +177,9 @@ Proof.
  stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| now
    (apply eq_symmetric; apply inj_Q_mult)].
  change (inj_Q IR ((- (1)) ^ n)[*]inj_Q IR (Str_nth n (sinSequence a))[=]
-   (nexp IR n [--]One[/]nring (R:=IR) (fact (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
-     (nexp IR (S n') (inj_Q IR a[-]Zero))).
- rstepr ((nexp IR n [--]One[*](nexp IR (S n') (inj_Q IR a[-]Zero)[/]nring (R:=IR) (fact (S n'))[//]
+   (nexp IR n [--][1][/]nring (R:=IR) (fact (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
+     (nexp IR (S n') (inj_Q IR a[-][0]))).
+ rstepr ((nexp IR n [--][1][*](nexp IR (S n') (inj_Q IR a[-][0])[/]nring (R:=IR) (fact (S n'))[//]
    nring_fac_ap_zero IR (S n')))).
  apply mult_wd.
   stepr ((inj_Q IR (-(1)))[^]n).
@@ -197,15 +197,15 @@ Proof.
   rewrite -> Qmake_Qdiv.
   reflexivity.
  rstepr ((nring 1[/]nring (R:=IR) (fact (S n'))[//]
-   nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-]Zero))).
+   nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-][0]))).
  change (1+2*n)%nat with (S n').
  stepr ((inj_Q IR (1 / P_of_succ_nat (pred (fact (S n'))))[*](inj_Q IR (a^S n')))).
   apply inj_Q_mult.
  apply mult_wd.
   rewrite <- POS_anti_convert.
-  assert (X:inj_Q IR (inject_Z (Z_of_nat (S (pred (fact (S n'))))))[#]Zero).
-   stepr (inj_Q IR Zero).
-    assert (inject_Z (Z_of_nat (S (pred (fact (S n')))))[#]Zero).
+  assert (X:inj_Q IR (inject_Z (Z_of_nat (S (pred (fact (S n'))))))[#][0]).
+   stepr (inj_Q IR [0]).
+    assert (inject_Z (Z_of_nat (S (pred (fact (S n')))))[#][0]).
      discriminate.
     destruct (ap_imp_less _ _ _ X).
      apply less_imp_ap.
@@ -238,7 +238,7 @@ Proof.
   simpl; reflexivity.
  stepr ((inj_Q IR a)[^](S n')).
   apply inj_Q_power.
- change (inj_Q IR a[^]S n'[=](inj_Q IR a[-]Zero)[^]S n').
+ change (inj_Q IR a[^]S n'[=](inj_Q IR a[-][0])[^]S n').
  apply nexp_wd.
  rational.
 Qed.
@@ -282,7 +282,7 @@ Proof.
 Qed.
 
 Let D : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) (inj_Q_less _ _ _ X) ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)
- ((Three:IR){**}[-C-](One:IR){-}(Four:IR){**}((nring 3){**}([-C-]One{*}FId{^}2))).
+ ((Three:IR){**}[-C-]([1]:IR){-}(Four:IR){**}((nring 3){**}([-C-][1]{*}FId{^}2))).
 Proof.
  apply Derivative_minus.
   apply Derivative_scal.
@@ -317,7 +317,7 @@ Proof.
    apply inj_Q_inv.
   apply un_op_wd_unfolded.
   apply (inj_Q_nring IR 1).
- rstepr (Nine[-]Zero:IR).
+ rstepr (Nine[-][0]:IR).
  apply minus_resp_leEq_both.
   apply nring_leEq.
   omega.
@@ -376,10 +376,10 @@ Proof.
  set (cx:=Cos x).
  rstepl ((cx[^]2)[*](Three[*]sx)[-]sx[^]3).
  unfold cg_minus.
- csetoid_replace (cx[^]2) (One[-]sx[^]2).
+ csetoid_replace (cx[^]2) ([1][-]sx[^]2).
   rational.
  apply cg_inv_unique_2.
- rstepl ((cx[^]2[+]sx[^]2)[-]One).
+ rstepl ((cx[^]2[+]sx[^]2)[-][1]).
  apply x_minus_x.
  apply FFT.
 Qed.
@@ -415,7 +415,7 @@ Lemma rational_sin_pos_bounded_correct_aux a :
   sin_poly (IRasCR (Sin (inj_Q IR (a / 3))))[=]IRasCR (Sin (inj_Q IR a)).
 Proof.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
-   (stepr (nring 1:IR); [| now apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr (One:IR);
+   (stepr (nring 1:IR); [| now apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr ([1]:IR);
      apply AbsIR_Sin_leEq_One].
  apply IRasCR_wd.
  stepl (Sin (inj_Q IR (a/3*3))).
@@ -524,7 +524,7 @@ Proof.
   intros q [] _.
   apply rational_sin_correct.
  intros x [] _.
- stepr (One:IR).
+ stepr ([1]:IR).
   apply: AbsIR_Cos_leEq_One.
  rstepl (nring 1:IR).
  apply eq_symmetric.

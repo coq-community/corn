@@ -89,7 +89,7 @@ Section SubCAbMonoids.
 *)
 Variable M : CAbMonoid.
 Variable P : M -> CProp.
-Variable Punit : P Zero.
+Variable Punit : P [0].
 Variable op_pres_P : bin_op_pres_pred _ P csg_op.
 
 (**

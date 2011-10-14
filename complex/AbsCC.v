@@ -42,13 +42,13 @@ Require Export CComplex.
 
 Section AbsCC_properties.
 
-Lemma AbsCC_nonneg : forall x : CC, Zero [<=] AbsCC x.
+Lemma AbsCC_nonneg : forall x : CC, [0] [<=] AbsCC x.
 Proof.
  unfold AbsCC in |- *. intros.
  apply sqrt_nonneg.
 Qed.
 
-Lemma AbsCC_ap_zero_imp_pos : forall z : CC, AbsCC z [#] Zero -> Zero [<] AbsCC z.
+Lemma AbsCC_ap_zero_imp_pos : forall z : CC, AbsCC z [#] [0] -> [0] [<] AbsCC z.
 Proof.
  intros z H.
  apply leEq_not_eq.
@@ -99,17 +99,17 @@ Qed.
 
 Hint Resolve cc_mult_abs: algebra.
 
-Lemma AbsCC_minzero : forall x : CC, AbsCC (x[-]Zero) [=] AbsCC x.
+Lemma AbsCC_minzero : forall x : CC, AbsCC (x[-][0]) [=] AbsCC x.
 Proof.
  intros.
  apply AbsCC_wd.
  algebra.
 Qed.
 
-Lemma AbsCC_IR : forall x : IR, Zero [<=] x -> AbsCC (cc_IR x) [=] x.
+Lemma AbsCC_IR : forall x : IR, [0] [<=] x -> AbsCC (cc_IR x) [=] x.
 Proof.
  intros. unfold AbsCC in |- *.
- change (sqrt (x[^]2[+]Zero[^]2) (cc_abs_aid _ x Zero) [=] x) in |- *.
+ change (sqrt (x[^]2[+][0][^]2) (cc_abs_aid _ x [0]) [=] x) in |- *.
  apply eq_transitive_unfolded with (sqrt (x[^]2) (sqr_nonneg _ x)).
   apply sqrt_wd. rational.
   apply sqrt_to_nonneg. auto.
@@ -127,7 +127,7 @@ Proof.
 Qed.
 
 Lemma cc_div_abs' : forall (x : CC) (y : IR) y_ y__,
- Zero [<=] y -> AbsCC (x[/] cc_IR y[//]y__) [=] (AbsCC x[/] y[//]y_).
+ [0] [<=] y -> AbsCC (x[/] cc_IR y[//]y__) [=] (AbsCC x[/] y[//]y_).
 Proof.
  intros x y nz cnz H.
  rstepl (y[*]AbsCC (x[/] cc_IR y[//]cnz) [/] y[//]nz).
@@ -138,18 +138,18 @@ Proof.
  rational.
 Qed.
 
-Lemma AbsCC_zero : AbsCC Zero [=] Zero.
+Lemma AbsCC_zero : AbsCC [0] [=] [0].
 Proof.
- astepl (AbsCC (cc_IR Zero)).
+ astepl (AbsCC (cc_IR [0])).
  apply AbsCC_IR.
  apply leEq_reflexive.
 Qed.
 
 Hint Resolve AbsCC_zero: algebra.
 
-Lemma AbsCC_one : AbsCC One [=] One.
+Lemma AbsCC_one : AbsCC [1] [=] [1].
 Proof.
- astepl (AbsCC (cc_IR One)).
+ astepl (AbsCC (cc_IR [1])).
  apply AbsCC_IR.
  apply less_leEq. apply pos_one.
 Qed.
@@ -161,11 +161,11 @@ Proof.
   simpl in |- *. Step_final (AbsCC (x[^]n) [*]AbsCC x).
 Qed.
 
-Lemma AbsCC_pos : forall x : CC, x [#] Zero -> Zero [<] AbsCC x.
+Lemma AbsCC_pos : forall x : CC, x [#] [0] -> [0] [<] AbsCC x.
 Proof.
  intro. elim x. intros x1 x2.
  unfold AbsCC in |- *. simpl in |- *. unfold cc_ap in |- *. simpl in |- *. intros H.
- change (Zero [<] sqrt (x1[^]2[+]x2[^]2) (cc_abs_aid _ x1 x2)) in |- *.
+ change ([0] [<] sqrt (x1[^]2[+]x2[^]2) (cc_abs_aid _ x1 x2)) in |- *.
  apply power_cancel_less with 2. apply sqrt_nonneg.
   astepl ZeroR.
  astepr (x1[^]2[+]x2[^]2).
@@ -176,12 +176,12 @@ Proof.
   apply sqr_nonneg. apply pos_square. auto.
 Qed.
 
-Lemma AbsCC_ap_zero : forall x : CC, Zero [#] AbsCC x -> x [#] Zero.
+Lemma AbsCC_ap_zero : forall x : CC, [0] [#] AbsCC x -> x [#] [0].
 Proof.
  intro. elim x. intros x1 x2. simpl in |- *. unfold AbsCC in |- *. unfold cc_ap in |- *.
- change (Zero [#] sqrt (x1[^]2[+]x2[^]2) (cc_abs_aid _ x1 x2) -> x1 [#] Zero or x2 [#] Zero) in |- *.
+ change ([0] [#] sqrt (x1[^]2[+]x2[^]2) (cc_abs_aid _ x1 x2) -> x1 [#] [0] or x2 [#] [0]) in |- *.
  intros H.
- cut (x1[^]2 [#] Zero or x2[^]2 [#] Zero). intro H0.
+ cut (x1[^]2 [#] [0] or x2[^]2 [#] [0]). intro H0.
   elim H0; clear H0; intros.
    left.
    apply cring_mult_ap_zero with x1.
@@ -195,7 +195,7 @@ Proof.
  apply ap_symmetric_unfolded. auto.
 Qed.
 
-Lemma AbsCC_small_imp_eq : forall x : CC, (forall e, Zero [<] e -> AbsCC x [<] e) -> x [=] Zero.
+Lemma AbsCC_small_imp_eq : forall x : CC, (forall e, [0] [<] e -> AbsCC x [<] e) -> x [=] [0].
 Proof.
  intros x H.
  apply not_ap_imp_eq. intro.
@@ -264,7 +264,7 @@ Proof.
  intros. rstepr ((AbsCC x[*]AbsCC y) [^]2). algebra.
 Qed.
 
-Lemma AbsCC_square_ap_zero : forall z : CC, z [#] Zero -> AbsCC z[^]2 [#] Zero.
+Lemma AbsCC_square_ap_zero : forall z : CC, z [#] [0] -> AbsCC z[^]2 [#] [0].
 Proof.
  intros z H.
  astepl (Re z[^]2[+]Im z[^]2).
@@ -309,39 +309,39 @@ Proof.
    apply (nexp_strong_ext IR 2).
    assumption.
   apply (bin_op_strext_unfolded _ _ _ _ _ _ H'').
- assert (H1 : AbsCC z1[-]AbsCC z2 [#] Zero).
+ assert (H1 : AbsCC z1[-]AbsCC z2 [#] [0]).
   cut (AbsCC z1[-]AbsCC z2 [#] AbsCC z2[-]AbsCC z2).
    intro H0. astepr (AbsCC z2[-]AbsCC z2). assumption.
    apply minus_resp_ap_rht. assumption.
-  assert (H2 : AbsCC z1[+]AbsCC z2 [#] Zero).
+  assert (H2 : AbsCC z1[+]AbsCC z2 [#] [0]).
   apply Greater_imp_ap.
-  assert (H0 : AbsCC z1 [#] Zero or Zero [#] AbsCC z2).
+  assert (H0 : AbsCC z1 [#] [0] or [0] [#] AbsCC z2).
    apply ap_cotransitive_unfolded. assumption.
    elim H0.
    intro H'.
-   assert (H'' : Zero [<] AbsCC z1).
+   assert (H'' : [0] [<] AbsCC z1).
     apply (AbsCC_ap_zero_imp_pos _ H').
    apply leEq_less_trans with (y := AbsCC z2).
     apply AbsCC_nonneg.
-   rstepl (AbsCC z2[+]Zero).
+   rstepl (AbsCC z2[+][0]).
    rstepr (AbsCC z2[+]AbsCC z1).
    apply plus_resp_less_lft.
    assumption.
   intro H'.
-  assert (H'' : Zero [<] AbsCC z2).
+  assert (H'' : [0] [<] AbsCC z2).
    apply AbsCC_ap_zero_imp_pos.
    apply ap_symmetric_unfolded. assumption.
    apply leEq_less_trans with (y := AbsCC z1).
    apply AbsCC_nonneg.
-  rstepl (AbsCC z1[+]Zero).
+  rstepl (AbsCC z1[+][0]).
   apply plus_resp_less_lft.
   assumption.
- cut (AbsCC z1[^]2[-]AbsCC z2[^]2 [#] Zero).
+ cut (AbsCC z1[^]2[-]AbsCC z2[^]2 [#] [0]).
   intro H3.
   cut (AbsCC z1[^]2[-]AbsCC z2[^]2 [#] AbsCC z2[^]2[-]AbsCC z2[^]2).
    intro H4.
    rstepl (AbsCC z1[^]2[-]AbsCC z2[^]2[+]AbsCC z2[^]2).
-   rstepr (Zero[+]AbsCC z2[^]2).
+   rstepr ([0][+]AbsCC z2[^]2).
    apply op_rht_resp_ap with (x := AbsCC z1[^]2[-]AbsCC z2[^]2) (y := ZeroR) (z := AbsCC z2[^]2).
    rstepr (AbsCC z2[^]2[-]AbsCC z2[^]2).
    assumption.
@@ -353,7 +353,7 @@ Qed.
 
 Definition AbsSmallCC (e : IR) (x : CC) := AbsCC x [<=] e.
 
-Lemma Cexis_AFS_CC : forall x y eps, Zero [<] eps -> {y' : CC | AbsSmallCC eps (y'[-]y) | y' [#] x}.
+Lemma Cexis_AFS_CC : forall x y eps, [0] [<] eps -> {y' : CC | AbsSmallCC eps (y'[-]y) | y' [#] x}.
 Proof.
  unfold AbsSmallCC in |- *. intros.
  set (e := cc_IR eps) in *.
@@ -376,7 +376,7 @@ Proof.
    apply ap_symmetric_unfolded. auto.
   apply zero_minus_apart.
  apply ap_wdl_unfolded with (cc_IR ( [--]Two[*]eps)).
-  astepr (cc_IR Zero).
+  astepr (cc_IR [0]).
   apply cc_IR_resp_ap. apply mult_resp_ap_zero.
   apply inv_resp_ap_zero. apply two_ap_zero.
    apply pos_ap_zero; auto.
@@ -392,7 +392,7 @@ Qed.
 
 (* begin hide *)
 Let l_4_1_2 :
-  forall (z : CC) (H : z [#] Zero),
+  forall (z : CC) (H : z [#] [0]),
   z[*]cc_recip z H [=]
   (z[*]CC_conj z[/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H)).
 Proof.
@@ -409,7 +409,7 @@ Proof.
 Qed.
 
 Let l_4_2_3 :
-  forall (z : CC) (H : z [#] Zero),
+  forall (z : CC) (H : z [#] [0]),
   (z[*]CC_conj z[/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H)) [=]
   (cc_IR (AbsCC z[^]2) [/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H)).
 Proof.
@@ -421,9 +421,9 @@ Proof.
 Qed.
 
 Let l_4_3_4 :
-  forall (z : CC) (H : z [#] Zero),
+  forall (z : CC) (H : z [#] [0]),
   (cc_IR (AbsCC z[^]2) [/] _[//]cc_IR_resp_ap _ _ (AbsCC_square_ap_zero _ H)) [=]
-  One.
+  [1].
 Proof.
  intros.
  rational.
@@ -447,26 +447,26 @@ Proof.
  elim y. intros y1 y2.
  unfold AbsCC in |- *. simpl in |- *.
  apply power_cancel_leEq with 2. auto.
-   astepl (Zero[+]ZeroR).
+   astepl ([0][+]ZeroR).
   apply plus_resp_leEq_both; apply sqrt_nonneg.
- astepl (One[*](x1[+]y1)[*](x1[+]y1)[+]One[*](x2[+]y2)[*](x2[+]y2)).
- rstepr (sqrt (One[*]x1[*]x1[+]One[*]x2[*]x2) (cc_abs_aid _ x1 x2)[^]2[+]
-   sqrt (One[*]y1[*]y1[+]One[*]y2[*]y2) (cc_abs_aid _ y1 y2)[^]2[+]
-     Two[*]sqrt (One[*]x1[*]x1[+]One[*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
-       sqrt (One[*]y1[*]y1[+]One[*]y2[*]y2) (cc_abs_aid _ y1 y2)).
- astepr (One[*]x1[*]x1[+]One[*]x2[*]x2[+](One[*]y1[*]y1[+]One[*]y2[*]y2)[+]
-   Two[*]sqrt (One[*]x1[*]x1[+]One[*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
-     sqrt (One[*]y1[*]y1[+]One[*]y2[*]y2) (cc_abs_aid _ y1 y2)).
+ astepl ([1][*](x1[+]y1)[*](x1[+]y1)[+][1][*](x2[+]y2)[*](x2[+]y2)).
+ rstepr (sqrt ([1][*]x1[*]x1[+][1][*]x2[*]x2) (cc_abs_aid _ x1 x2)[^]2[+]
+   sqrt ([1][*]y1[*]y1[+][1][*]y2[*]y2) (cc_abs_aid _ y1 y2)[^]2[+]
+     Two[*]sqrt ([1][*]x1[*]x1[+][1][*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
+       sqrt ([1][*]y1[*]y1[+][1][*]y2[*]y2) (cc_abs_aid _ y1 y2)).
+ astepr ([1][*]x1[*]x1[+][1][*]x2[*]x2[+]([1][*]y1[*]y1[+][1][*]y2[*]y2)[+]
+   Two[*]sqrt ([1][*]x1[*]x1[+][1][*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
+     sqrt ([1][*]y1[*]y1[+][1][*]y2[*]y2) (cc_abs_aid _ y1 y2)).
  apply shift_leEq_rht.
- rstepr (Two[*] (sqrt (One[*]x1[*]x1[+]One[*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
-   sqrt (One[*]y1[*]y1[+]One[*]y2[*]y2) (cc_abs_aid _ y1 y2)[-] (x1[*]y1[+]x2[*]y2))).
+ rstepr (Two[*] (sqrt ([1][*]x1[*]x1[+][1][*]x2[*]x2) (cc_abs_aid _ x1 x2)[*]
+   sqrt ([1][*]y1[*]y1[+][1][*]y2[*]y2) (cc_abs_aid _ y1 y2)[-] (x1[*]y1[+]x2[*]y2))).
  apply mult_resp_nonneg. apply less_leEq. apply pos_two.
   apply shift_leEq_lft.
  apply power_cancel_leEq with 2. auto.
    apply mult_resp_nonneg; apply sqrt_nonneg.
- astepr (sqrt (One[*]x1[*]x1[+]One[*]x2[*]x2) (cc_abs_aid _ x1 x2)[^]2[*]
-   sqrt (One[*]y1[*]y1[+]One[*]y2[*]y2) (cc_abs_aid _ y1 y2)[^]2).
- astepr ((One[*]x1[*]x1[+]One[*]x2[*]x2)[*](One[*]y1[*]y1[+]One[*]y2[*]y2)).
+ astepr (sqrt ([1][*]x1[*]x1[+][1][*]x2[*]x2) (cc_abs_aid _ x1 x2)[^]2[*]
+   sqrt ([1][*]y1[*]y1[+][1][*]y2[*]y2) (cc_abs_aid _ y1 y2)[^]2).
+ astepr (([1][*]x1[*]x1[+][1][*]x2[*]x2)[*]([1][*]y1[*]y1[+][1][*]y2[*]y2)).
  apply shift_leEq_rht.
  rstepr ((x1[*]y2[-]x2[*]y1)[^]2).
  apply sqr_nonneg.
@@ -479,13 +479,13 @@ Proof.
  generalize (toCle _ _ H); clear H; intro H.
   inversion H as [|m0 H1 H2].
    unfold Sum in |- *. unfold Sum1 in |- *.
-   astepl (AbsCC Zero).
+   astepl (AbsCC [0]).
    astepr ZeroR.
-   astepr (AbsCC Zero).
+   astepr (AbsCC [0]).
    apply leEq_reflexive.
   inversion H1.
   unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
-  cut (AbsCC (Zero[+]z 0[-]Zero)[<=]Zero[+]AbsCC (z 0)[-]Zero).
+  cut (AbsCC ([0][+]z 0[-][0])[<=][0][+]AbsCC (z 0)[-][0]).
    auto.
   apply eq_imp_leEq.
   rstepr (AbsCC (z 0)).
@@ -500,8 +500,8 @@ Proof.
    apply Hrecn. auto with arith.
    apply eq_symmetric_unfolded. apply Sum_last with (f := fun i : nat => AbsCC (z i)).
   rewrite y. unfold Sum in |- *. unfold Sum1 in |- *.
- astepl (AbsCC Zero).
+ astepl (AbsCC [0]).
  astepr ZeroR.
- astepr (AbsCC Zero).
+ astepr (AbsCC [0]).
  apply leEq_reflexive.
 Qed.

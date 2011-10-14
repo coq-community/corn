@@ -81,10 +81,10 @@ Let incf (n : nat) := contin_imp_inc _ _ _ _ (contf n).
 Let incF := contin_imp_inc _ _ _ _ contF.
 (* end hide *)
 
-Definition Cauchy_fun_seq := forall e, Zero [<] e -> {N : nat | forall m n, N <= m -> N <= n ->
+Definition Cauchy_fun_seq := forall e, [0] [<] e -> {N : nat | forall m n, N <= m -> N <= n ->
  forall x Hx, AbsIR (f m x (incf m x Hx) [-]f n x (incf n x Hx)) [<=] e}.
 
-Definition conv_fun_seq' := forall e, Zero [<] e -> {N : nat | forall n, N <= n ->
+Definition conv_fun_seq' := forall e, [0] [<] e -> {N : nat | forall n, N <= n ->
  forall x Hx, AbsIR (f n x (incf n x Hx) [-]F x (incF x Hx)) [<=] e}.
 
 Definition conv_norm_fun_seq := forall k, {N : nat | forall n, N <= n ->
@@ -96,7 +96,7 @@ Definition Cauchy_fun_seq1 := forall k, {N : nat | forall m n, N <= m -> N <= n 
 Definition Cauchy_fun_seq' := forall k, {N : nat | forall m n, N <= m -> N <= n ->
   forall x Hx, AbsIR (Part _ _ (incf m x Hx) [-]Part _ _ (incf n x Hx)) [<=] one_div_succ k}.
 
-Definition Cauchy_fun_seq2 := forall e, Zero [<] e -> {N : nat | forall m, N <= m ->
+Definition Cauchy_fun_seq2 := forall e, [0] [<] e -> {N : nat | forall m, N <= m ->
   forall x Hx, AbsIR (Part _ _ (incf m x Hx) [-]Part _ _ (incf N x Hx)) [<=] e}.
 
 (**
@@ -116,9 +116,9 @@ Proof.
  intro H.
  red in |- *; red in H.
  intros e He.
- elim (Archimedes (One[/] e[//]pos_ap_zero _ _ He)).
+ elim (Archimedes ([1][/] e[//]pos_ap_zero _ _ He)).
  intros i Hei.
- cut (Zero [<] nring (R:=IR) i).
+ cut ([0] [<] nring (R:=IR) i).
   intro Hi.
   elim (H i).
   intros N HN; exists N.
@@ -126,14 +126,14 @@ Proof.
   apply leEq_transitive with (one_div_succ (R:=IR) i).
    apply HN; assumption.
   unfold one_div_succ in |- *.
-  rstepr (One[/] _[//]recip_ap_zero _ _ (pos_ap_zero _ _ He)).
+  rstepr ([1][/] _[//]recip_ap_zero _ _ (pos_ap_zero _ _ He)).
   unfold Snring in |- *.
   apply recip_resp_leEq.
    apply recip_resp_pos; assumption.
   apply less_leEq; apply leEq_less_trans with (nring (R:=IR) i).
    assumption.
   simpl in |- *; apply less_plusOne.
- apply less_leEq_trans with (One[/] e[//]pos_ap_zero _ _ He).
+ apply less_leEq_trans with ([1][/] e[//]pos_ap_zero _ _ He).
   apply recip_resp_pos; assumption.
  assumption.
 Qed.
@@ -204,7 +204,7 @@ Proof.
  intro H.
  red in |- *; red in H.
  intros e He.
- elim (Archimedes (One[/] _[//]pos_ap_zero _ _ He)).
+ elim (Archimedes ([1][/] _[//]pos_ap_zero _ _ He)).
  intros k Hk.
  elim (H k); clear H.
  intros N HN.
@@ -849,13 +849,13 @@ Proof.
  set (nF := Norm_Funct contF) in *.
  set (nG := Norm_Funct contG) in *.
  red in |- *; intros.
- set (ee := Min e One) in *.
- cut (Zero [<] ee); intros.
+ set (ee := Min e [1]) in *.
+ cut ([0] [<] ee); intros.
   set (eg := ee [/]ThreeNZ[/] _[//]max_one_ap_zero nF) in *.
   set (ef := ee [/]ThreeNZ[/] _[//]max_one_ap_zero nG) in *.
-  cut (Zero [<] eg).
+  cut ([0] [<] eg).
    intro Heg.
-   cut (Zero [<] ef).
+   cut ([0] [<] ef).
     intro Hef.
     elim (convF _ Hef); intros NF HNF; clear convF.
     elim (convG _ Heg); intros NG HNG; clear convG.
@@ -882,7 +882,7 @@ Proof.
      apply plus_resp_leEq_both.
       eapply leEq_wdl.
        2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
-      apply leEq_transitive with (Max nF One[*]AbsIR (Part _ _ (incg n x Hx) [-]Part _ _ (incG x Hx))).
+      apply leEq_transitive with (Max nF [1][*]AbsIR (Part _ _ (incg n x Hx) [-]Part _ _ (incG x Hx))).
        apply mult_resp_leEq_rht.
         apply leEq_transitive with nF.
          unfold nF in |- *; apply norm_bnd_AbsIR; assumption.
@@ -894,14 +894,14 @@ Proof.
      eapply leEq_wdl.
       2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
      apply leEq_transitive with (ee [/]ThreeNZ[*]ee [/]ThreeNZ).
-      2: astepr (ee [/]ThreeNZ[*]One); apply mult_resp_leEq_lft.
+      2: astepr (ee [/]ThreeNZ[*][1]); apply mult_resp_leEq_lft.
        apply mult_resp_leEq_both; try apply AbsIR_nonneg.
         eapply leEq_transitive.
          unfold incf in |- *; apply HNF; apply le_trans with (max NF NG); auto.
         unfold ef in |- *.
         apply shift_div_leEq.
          apply pos_max_one.
-        astepl (ee [/]ThreeNZ[*]One); apply mult_resp_leEq_lft.
+        astepl (ee [/]ThreeNZ[*][1]); apply mult_resp_leEq_lft.
          apply rht_leEq_Max.
         apply less_leEq; apply shift_less_div; astepl ZeroR; [ apply pos_three | assumption ].
        eapply leEq_transitive.
@@ -909,7 +909,7 @@ Proof.
        unfold eg in |- *.
        apply shift_div_leEq.
         apply pos_max_one.
-       astepl (ee [/]ThreeNZ[*]One); apply mult_resp_leEq_lft.
+       astepl (ee [/]ThreeNZ[*][1]); apply mult_resp_leEq_lft.
         apply rht_leEq_Max.
        apply less_leEq; apply shift_less_div; astepl ZeroR; [ apply pos_three | assumption ].
       apply shift_div_leEq.
@@ -923,7 +923,7 @@ Proof.
      astepl ZeroR; assumption.
     eapply leEq_wdl.
      2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
-    apply leEq_transitive with (Max nG One[*]AbsIR (Part _ _ (incf n x Hx) [-]Part _ _ (incF x Hx))).
+    apply leEq_transitive with (Max nG [1][*]AbsIR (Part _ _ (incf n x Hx) [-]Part _ _ (incF x Hx))).
      apply mult_resp_leEq_rht.
       apply leEq_transitive with nG.
        unfold nG in |- *; apply norm_bnd_AbsIR; assumption.
@@ -1077,26 +1077,26 @@ Lemma fun_Lim_seq_inv : forall H H', conv_fun_seq' a b Hab
  (fun n => {--} (f n)) {--} (Cauchy_fun_seq_Lim _ _ _ _ _ Hf) H H'.
 Proof.
  intros.
- cut (forall n : nat, Continuous_I Hab ( [-C-]Zero{-}f n)). intro H0.
-  unfold I in |- *; eapply conv_fun_seq'_wdl with (fun n : nat => [-C-]Zero{-}f n) H0 H'.
+ cut (forall n : nat, Continuous_I Hab ( [-C-][0]{-}f n)). intro H0.
+  unfold I in |- *; eapply conv_fun_seq'_wdl with (fun n : nat => [-C-][0]{-}f n) H0 H'.
    intro H1; FEQ; try (apply contin_imp_inc; apply contf).
-  cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (fun_Cauchy_prop_const a b Hab [-C-]Zero
+  cut (Continuous_I Hab (Cauchy_fun_seq_Lim _ _ _ _ _ (fun_Cauchy_prop_const a b Hab [-C-][0]
     (Continuous_I_const _ _ _ _)) {-} Cauchy_fun_seq_Lim _ _ _ _ _ Hf)).
    intros H1.
    apply conv_fun_seq'_wdr with H0 (Cauchy_fun_seq_Lim _ _ _ _ _
-     (fun_Cauchy_prop_const a b Hab [-C-]Zero (Continuous_I_const _ _ _ _)) {-}
+     (fun_Cauchy_prop_const a b Hab [-C-][0] (Continuous_I_const _ _ _ _)) {-}
        Cauchy_fun_seq_Lim _ _ _ _ _ Hf) H1.
     apply eq_imp_Feq.
       Included.
      Included.
     intros; simpl in |- *.
-    astepr (Zero[-]Lim (Build_CauchySeq _ _ (Cauchy_fun_real _ _ _ _ contf Hf x Hx'))).
+    astepr ([0][-]Lim (Build_CauchySeq _ _ (Cauchy_fun_real _ _ _ _ contf Hf x Hx'))).
     apply cg_minus_wd.
      eapply eq_transitive_unfolded.
       2: apply eq_symmetric_unfolded; apply Lim_const.
      apply Lim_wd'; intros; simpl in |- *; algebra.
     apply Lim_wd'; intros; simpl in |- *; rational.
-   apply fun_Lim_seq_minus with (f := fun n : nat => [-C-]Zero:PartIR).
+   apply fun_Lim_seq_minus with (f := fun n : nat => [-C-][0]:PartIR).
   Contin.
  Contin.
 Qed.

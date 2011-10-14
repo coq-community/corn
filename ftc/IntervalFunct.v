@@ -159,10 +159,10 @@ If a function is non-zero in all the interval then we can define its multiplicat
 Section Recip_Div.
 
 (* begin show *)
-Hypothesis Hg : forall x : subset I, g x [#] Zero.
+Hypothesis Hg : forall x : subset I, g x [#] [0].
 (* end show *)
 
-Lemma IRecip_strext : forall x y : subset I, (One[/] g x[//]Hg x) [#] (One[/] g y[//]Hg y) -> x [#] y.
+Lemma IRecip_strext : forall x y : subset I, ([1][/] g x[//]Hg x) [#] ([1][/] g y[//]Hg y) -> x [#] y.
 Proof.
  intros x y H.
  elim (div_strext _ _ _ _ _ _ _ H); intro H0.
@@ -170,7 +170,7 @@ Proof.
  exact (csf_strext_unfolded _ _ _ _ _ H0).
 Qed.
 
-Definition IRecip := Build_CSetoid_fun _ _ (fun x => One[/] g x[//]Hg x) IRecip_strext.
+Definition IRecip := Build_CSetoid_fun _ _ (fun x => [1][/] g x[//]Hg x) IRecip_strext.
 
 Lemma IDiv_strext : forall x y : subset I, (f x[/] g x[//]Hg x) [#] (f y[/] g y[//]Hg y) -> x [#] y.
 Proof.

@@ -77,19 +77,19 @@ Transparent nexp_op.
 ** Definition of the notion Field
 *)
 
-Definition is_CField (R : CRing) (cf_rcpcl : forall x : R, x [#] Zero -> R) : Prop :=
-  forall x Hx, is_inverse cr_mult One x (cf_rcpcl x Hx).
+Definition is_CField (R : CRing) (cf_rcpcl : forall x : R, x [#] [0] -> R) : Prop :=
+  forall x Hx, is_inverse cr_mult [1] x (cf_rcpcl x Hx).
 
 Record CField : Type :=
   {cf_crr   :> CRing;
-   cf_rcpcl :  forall x : cf_crr, x [#] Zero -> cf_crr;
+   cf_rcpcl :  forall x : cf_crr, x [#] [0] -> cf_crr;
    cf_proof :  is_CField cf_crr cf_rcpcl;
    cf_rcpsx :  forall x y x_ y_, cf_rcpcl x x_ [#] cf_rcpcl y y_ -> x [#] y}.
 (* End_SpecReals *)
 
 Definition f_rcpcl' (F : CField) : PartFunct F.
 Proof.
- apply Build_PartFunct with (fun x : F => x [#] Zero) (cf_rcpcl F).
+ apply Build_PartFunct with (fun x : F => x [#] [0]) (cf_rcpcl F).
   red in |- *; intros; astepl x. auto.
   exact (cf_rcpsx F).
 Defined.
@@ -101,7 +101,7 @@ Implicit Arguments f_rcpcl [F].
 (**
 [cf_div] is the division in a field. It is defined in terms of
 multiplication and the reciprocal. [x[/]y] is only defined if
-we have a proof of [y [#] Zero].
+we have a proof of [y [#] [0]].
 *)
 
 Definition cf_div (F : CField) (x y : F) y_ : F := x[*]f_rcpcl y y_.
@@ -112,8 +112,8 @@ Notation "x [/] y [//] Hy" := (cf_div x y Hy) (at level 80).
 (**
 %\begin{convention}\label{convention:div-form}%
 - Division in fields is a (type dependent) ternary function: [(cf_div x y Hy)] is denoted infix by [x [/] y [//] Hy].
-- In lemmas, a hypothesis that [t [#] Zero] will be named [t_].
-- We do not use [NonZeros], but write the condition [ [#] Zero] separately.
+- In lemmas, a hypothesis that [t [#] [0]] will be named [t_].
+- We do not use [Non[0]s], but write the condition [ [#] [0]] separately.
 - In each lemma, we use only variables for proof objects, and these variables
  are universally quantified.
 For example, the informal lemma
@@ -147,7 +147,7 @@ Proof.
  elim F; auto.
 Qed.
 
-Lemma rcpcl_is_inverse : forall x x_, is_inverse cr_mult One x (cf_rcpcl F x x_).
+Lemma rcpcl_is_inverse : forall x x_, is_inverse cr_mult [1] x (cf_rcpcl F x x_).
 Proof.
  apply CField_is_CField.
 Qed.
@@ -163,17 +163,17 @@ Section Field_basics.
 
 Variable F : CField.
 
-Lemma rcpcl_is_inverse_unfolded : forall x x_, x[*]cf_rcpcl F x x_ [=] One.
+Lemma rcpcl_is_inverse_unfolded : forall x x_, x[*]cf_rcpcl F x x_ [=] [1].
 Proof.
  intros x x_.
  elim (rcpcl_is_inverse F x x_); auto.
 Qed.
 
-Lemma field_mult_inv : forall (x : F) x_, x[*]f_rcpcl x x_ [=] One.
+Lemma field_mult_inv : forall (x : F) x_, x[*]f_rcpcl x x_ [=] [1].
 Proof rcpcl_is_inverse_unfolded.
 Hint Resolve field_mult_inv: algebra.
 
-Lemma field_mult_inv_op : forall (x : F) x_, f_rcpcl x x_[*]x [=] One.
+Lemma field_mult_inv_op : forall (x : F) x_, f_rcpcl x x_[*]x [=] [1].
 Proof.
  intros x x_.
  elim (rcpcl_is_inverse F x x_); auto.
@@ -192,19 +192,19 @@ Section Field_multiplication.
 
 Variable F : CField.
 
-Lemma mult_resp_ap_zero : forall x y : F, x [#] Zero -> y [#] Zero -> x[*]y [#] Zero.
+Lemma mult_resp_ap_zero : forall x y : F, x [#] [0] -> y [#] [0] -> x[*]y [#] [0].
 Proof.
  intros x y Hx Hy.
  apply cring_mult_ap_zero with (f_rcpcl y Hy).
  astepl x.
   auto.
- astepl (x[*]One).
+ astepl (x[*][1]).
  eapply eq_transitive_unfolded.
   2: apply CRings.mult_assoc.
  algebra.
 Qed.
 
-Lemma mult_lft_resp_ap : forall x y z : F, x [#] y -> z [#] Zero -> z[*]x [#] z[*]y.
+Lemma mult_lft_resp_ap : forall x y z : F, x [#] y -> z [#] [0] -> z[*]x [#] z[*]y.
 Proof.
  intros x y z H Hz.
  apply zero_minus_apart.
@@ -215,7 +215,7 @@ Proof.
  apply mult_resp_ap_zero; algebra.
 Qed.
 
-Lemma mult_rht_resp_ap : forall x y z : F, x [#] y -> z [#] Zero -> x[*]z [#] y[*]z.
+Lemma mult_rht_resp_ap : forall x y z : F, x [#] y -> z [#] [0] -> x[*]z [#] y[*]z.
 Proof.
  intros x y z H Hz.
  astepl (z[*]x).
@@ -223,15 +223,15 @@ Proof.
  apply mult_lft_resp_ap; assumption.
 Qed.
 
-Lemma mult_resp_neq_zero : forall x y : F, x[~=]Zero -> y[~=]Zero -> x[*]y[~=]Zero.
+Lemma mult_resp_neq_zero : forall x y : F, x[~=][0] -> y[~=][0] -> x[*]y[~=][0].
 Proof.
  intros x y Hx Hy.
- cut (~ Not (x [#] Zero)).
+ cut (~ Not (x [#] [0])).
   intro H.
-  cut (~ Not (y [#] Zero)).
+  cut (~ Not (y [#] [0])).
    intro H0.
    apply notnot_ap_imp_neq.
-   cut (x [#] Zero -> y [#] Zero -> x[*]y [#] Zero).
+   cut (x [#] [0] -> y [#] [0] -> x[*]y [#] [0]).
     intro H1.
     intro.
     apply H0; intro H3.
@@ -242,7 +242,7 @@ Proof.
  apply neq_imp_notnot_ap; auto.
 Qed.
 
-Lemma mult_resp_neq : forall x y z : F, x[~=]y -> z[~=]Zero -> x[*]z[~=]y[*]z.
+Lemma mult_resp_neq : forall x y z : F, x[~=]y -> z[~=][0] -> x[*]z[~=]y[*]z.
 Proof.
  intros x y z H Hz.
  generalize (neq_imp_notnot_ap _ _ _ H).
@@ -257,7 +257,7 @@ Proof.
  auto.
 Qed.
 
-Lemma mult_eq_zero : forall x y : F, x[~=]Zero -> x[*]y [=] Zero -> y [=] Zero.
+Lemma mult_eq_zero : forall x y : F, x[~=][0] -> x[*]y [=] [0] -> y [=] [0].
 Proof.
  intros x y Hx Hxy.
  apply not_ap_imp_eq.
@@ -269,7 +269,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma mult_cancel_lft : forall x y z : F, z [#] Zero -> z[*]x [=] z[*]y -> x [=] y.
+Lemma mult_cancel_lft : forall x y z : F, z [#] [0] -> z[*]x [=] z[*]y -> x [=] y.
 Proof.
  intros x y z Hz H.
  apply not_ap_imp_eq.
@@ -278,7 +278,7 @@ Proof.
  apply mult_lft_resp_ap; assumption.
 Qed.
 
-Lemma mult_cancel_rht : forall x y z : F, z [#] Zero -> x[*]z [=] y[*]z -> x [=] y.
+Lemma mult_cancel_rht : forall x y z : F, z [#] [0] -> x[*]z [=] y[*]z -> x [=] y.
 Proof.
  intros x y z Hz H.
  apply (mult_cancel_lft x y z).
@@ -287,7 +287,7 @@ Proof.
  Step_final (x[*]z).
 Qed.
 
-Lemma square_eq_aux : forall x a : F, x[^]2 [=] a[^]2 -> (x[+]a) [*] (x[-]a) [=] Zero.
+Lemma square_eq_aux : forall x a : F, x[^]2 [=] a[^]2 -> (x[+]a) [*] (x[-]a) [=] [0].
 Proof.
  intros x a H.
  astepl (x[^]2[-]a[^]2).
@@ -310,7 +310,7 @@ Proof.
 Qed.
 
 Lemma cond_square_eq : forall x a : F,
- (Two:F) [#] Zero -> a [#] Zero -> x[^]2 [=] a[^]2 -> x [=] a or x [=] [--]a.
+ (Two:F) [#] [0] -> a [#] [0] -> x[^]2 [=] a[^]2 -> x [=] a or x [=] [--]a.
 Proof.
  intros x a H Ha H0.
  cut (a [#] [--]a).
@@ -327,32 +327,32 @@ Proof.
   intro H3.
   elim (square_eq_weak _ _ H0); auto.
  apply plus_cancel_ap_lft with a.
- astepr (Zero:F).
+ astepr ([0]:F).
  astepl (Two[*]a).
  apply mult_resp_ap_zero; auto.
 Qed.
 End Field_multiplication.
 
 Section x_square.
-Lemma x_xminone : forall (F : CField) (x : F), x[^]2 [=] x -> x[*] (x[-]One) [=] Zero.
+Lemma x_xminone : forall (F : CField) (x : F), x[^]2 [=] x -> x[*] (x[-][1]) [=] [0].
 Proof.
  intros H x h.
- astepl (x[*]x[-]x[*]One).
+ astepl (x[*]x[-]x[*][1]).
  astepl (x[*]x[-]x).
  apply cg_cancel_rht with x.
  astepl (x[*]x[+][--]x[+]x).
  astepl (x[*]x[+]([--]x[+]x)).
- astepl (x[*]x[+]Zero).
+ astepl (x[*]x[+][0]).
  astepl (x[*]x).
  astepr x.
  astepl (x[^]2).
  exact h.
 Qed.
 
-Lemma square_id : forall (F : CField) (x : F), x[^]2 [=] x -> {x [=] Zero} + {x [=] One}.
+Lemma square_id : forall (F : CField) (x : F), x[^]2 [=] x -> {x [=] [0]} + {x [=] [1]}.
 Proof.
  intros F x H.
- cut ((Zero:F) [#] (One:F)).
+ cut (([0]:F) [#] ([1]:F)).
   intro H0.
   elim (ap_cotransitive_unfolded _ _ _ H0 x).
    intro H1.
@@ -360,23 +360,23 @@ Proof.
    apply not_ap_imp_eq.
    red in |- *.
    intro H2.
-   set (H3 := minus_resp_ap_rht F x One One H2) in *.
-   set (H4 := ap_wdr_unfolded F (x[-]One) (One[-]One) Zero H3 (cg_minus_correct F One)) in *.
-   set (H5 := ap_symmetric_unfolded F Zero x H1) in *.
-   set (H6 := mult_resp_ap_zero F x (x[-]One) H5 H4) in *.
+   set (H3 := minus_resp_ap_rht F x [1] [1] H2) in *.
+   set (H4 := ap_wdr_unfolded F (x[-][1]) ([1][-][1]) [0] H3 (cg_minus_correct F [1])) in *.
+   set (H5 := ap_symmetric_unfolded F [0] x H1) in *.
+   set (H6 := mult_resp_ap_zero F x (x[-][1]) H5 H4) in *.
    simpl in |- *.
    set (H7 := x_xminone F x H) in *.
-   set (H8 := eq_imp_not_ap F (x[*] (x[-]One)) Zero H7) in *.
+   set (H8 := eq_imp_not_ap F (x[*] (x[-][1])) [0] H7) in *.
    intuition.
   left.
   apply not_ap_imp_eq.
   red in |- *.
   intro H2.
-  set (H3 := minus_resp_ap_rht F x One One b) in *.
-  set (H4 := ap_wdr_unfolded F (x[-]One) (One[-]One) Zero H3 (cg_minus_correct F One)) in *.
-  set (H6 := mult_resp_ap_zero F x (x[-]One) H2 H4) in *.
+  set (H3 := minus_resp_ap_rht F x [1] [1] b) in *.
+  set (H4 := ap_wdr_unfolded F (x[-][1]) ([1][-][1]) [0] H3 (cg_minus_correct F [1])) in *.
+  set (H6 := mult_resp_ap_zero F x (x[-][1]) H2 H4) in *.
   set (H7 := x_xminone F x H) in *.
-  set (H8 := eq_imp_not_ap F (x[*] (x[-]One)) Zero H7) in *.
+  set (H8 := eq_imp_not_ap F (x[*] (x[-][1])) [0] H7) in *.
   intuition.
  apply ap_symmetric_unfolded.
  apply ring_non_triv.
@@ -396,9 +396,9 @@ Section Rcpcl_properties.
 
 Variable F : CField.
 
-Lemma inv_one : f_rcpcl One (ring_non_triv F) [=] One.
+Lemma inv_one : f_rcpcl [1] (ring_non_triv F) [=] [1].
 Proof.
- astepl (One[*]f_rcpcl One (ring_non_triv F)).
+ astepl ([1][*]f_rcpcl [1] (ring_non_triv F)).
  apply field_mult_inv.
 Qed.
 
@@ -414,20 +414,20 @@ Proof.
  intros y z nzy nzz nzyz.
  apply mult_cancel_lft with (y[*]z).
   assumption.
- astepl (One:F).
+ astepl ([1]:F).
  astepr (y[*]z[*] (f_rcpcl z nzz[*]f_rcpcl y nzy)).
  astepr (y[*] (z[*] (f_rcpcl z nzz[*]f_rcpcl y nzy))).
  astepr (y[*] (z[*]f_rcpcl z nzz[*]f_rcpcl y nzy)).
- astepr (y[*] (One[*]f_rcpcl y nzy)).
+ astepr (y[*] ([1][*]f_rcpcl y nzy)).
  astepr (y[*]f_rcpcl y nzy).
- Step_final (One:F).
+ Step_final ([1]:F).
 Qed.
 
-Lemma f_rcpcl_resp_ap_zero : forall (y : F) y_, f_rcpcl y y_ [#] Zero.
+Lemma f_rcpcl_resp_ap_zero : forall (y : F) y_, f_rcpcl y y_ [#] [0].
 Proof.
  intros y nzy.
  apply cring_mult_ap_zero_op with y.
- astepl (One:F). apply one_ap_zero.
+ astepl ([1]:F). apply one_ap_zero.
 Qed.
 
 Lemma f_rcpcl_f_rcpcl : forall (x : F) x_ r_, f_rcpcl (f_rcpcl x x_) r_ [=] x.
@@ -435,7 +435,7 @@ Proof.
  intros x nzx nzr.
  apply mult_cancel_rht with (f_rcpcl x nzx).
   assumption.
- astepr (One:F).
+ astepr ([1]:F).
  Step_final (f_rcpcl x nzx[*]f_rcpcl (f_rcpcl x nzx) nzr).
 Qed.
 
@@ -451,7 +451,7 @@ Section MultipGroup.
 Variable F : CField.
 
 (**
-The multiplicative monoid of NonZeros.
+The multiplicative monoid of Non[0]s.
 *)
 
 Definition NonZeroMonoid : CMonoid := Build_SubCMonoid
@@ -499,13 +499,13 @@ Section Div_properties.
 
 %\begin{nameconvention}%
 In the names of lemmas, we denote [[/]] by [div], and
-[One[/]] by [recip].
+[[1][/]] by [recip].
 %\end{nameconvention}%
 *)
 
 Variable F : CField.
 
-Lemma div_prop : forall (x : F) x_, (Zero[/] x[//]x_) [=] Zero.
+Lemma div_prop : forall (x : F) x_, ([0][/] x[//]x_) [=] [0].
 Proof.
  unfold cf_div in |- *; algebra.
 Qed.
@@ -515,7 +515,7 @@ Proof.
  intros x y y_.
  astepl (x[*]f_rcpcl y y_[*]y).
  astepl (x[*] (f_rcpcl y y_[*]y)).
- Step_final (x[*]One).
+ Step_final (x[*][1]).
 Qed.
 
 Lemma div_1' : forall (x y : F) y_, y[*] (x[/] y[//]y_) [=] x.
@@ -537,7 +537,7 @@ Qed.
 
 Hint Resolve div_1: algebra.
 
-Lemma x_div_x : forall (x : F) x_, (x[/] x[//]x_) [=] One.
+Lemma x_div_x : forall (x : F) x_, (x[/] x[//]x_) [=] [1].
 Proof.
  intros x x_.
  unfold cf_div in |- *.
@@ -546,12 +546,12 @@ Qed.
 
 Hint Resolve x_div_x: algebra.
 
-Lemma x_div_one : forall x : F, (x[/] One[//]ring_non_triv F) [=] x.
+Lemma x_div_one : forall x : F, (x[/] [1][//]ring_non_triv F) [=] x.
 Proof.
  intro x.
  unfold cf_div in |- *.
  generalize inv_one; intro H.
- astepl (x[*]One).
+ astepl (x[*][1]).
  apply mult_one.
 Qed.
 
@@ -597,7 +597,7 @@ Proof.
 Qed.
 
 
-Lemma div_resp_ap_zero_rev : forall (x y : F) y_, x [#] Zero -> (x[/] y[//]y_) [#] Zero.
+Lemma div_resp_ap_zero_rev : forall (x y : F) y_, x [#] [0] -> (x[/] y[//]y_) [#] [0].
 Proof.
  intros x y nzy Hx.
  unfold cf_div in |- *.
@@ -607,7 +607,7 @@ Proof.
 Qed.
 
 
-Lemma div_resp_ap_zero : forall (x y : F) y_, (x[/] y[//]y_) [#] Zero -> x [#] Zero.
+Lemma div_resp_ap_zero : forall (x y : F) y_, (x[/] y[//]y_) [#] [0] -> x [#] [0].
 Proof.
  intros x y nzy Hxy.
  astepl ((x[/] y[//]nzy) [*]y). algebra.
@@ -624,7 +624,7 @@ Proof.
  unfold cf_div in |- *.
  astepr (x[*] (z[*]f_rcpcl y nzy)).
  apply mult_wdr.
- cut (f_rcpcl z nzz [#] Zero).
+ cut (f_rcpcl z nzz [#] [0]).
   intro nzrz.
   apply eq_transitive_unfolded with (f_rcpcl y nzy[*]f_rcpcl (f_rcpcl z nzz) nzrz).
    apply f_rcpcl_mult.
@@ -677,13 +677,13 @@ Hint Resolve div_semi_sym: algebra.
 Lemma eq_div : forall (x y u v : F) y_ v_, x[*]v [=] u[*]y -> (x[/] y[//]y_) [=] (u[/] v[//]v_).
 Proof.
  intros x y u v Hy Hv H.
- astepl (x[*]One[/] y[//]Hy).
+ astepl (x[*][1][/] y[//]Hy).
  astepl (x[*] (v[/] v[//]Hv) [/] y[//]Hy).
  astepl ((x[*]v[/] v[//]Hv) [/] y[//]Hy).
  astepl ((u[*]y[/] v[//]Hv) [/] y[//]Hy).
  astepl ((u[*]y[/] y[//]Hy) [/] v[//]Hv).
  astepl (u[*] (y[/] y[//]Hy) [/] v[//]Hv).
- Step_final (u[*]One[/] v[//]Hv).
+ Step_final (u[*][1][/] v[//]Hv).
 Qed.
 
 Lemma div_strext : forall (x x' y y' : F) y_ y'_, (x[/] y[//]y_) [#] (x'[/] y'[//]y'_) -> x [#] x' or y [#] y'.
@@ -714,33 +714,33 @@ Section Mult_Cancel_Ap_Zero.
 
 Variable F : CField.
 
-Lemma mult_cancel_ap_zero_lft : forall x y : F, x[*]y [#] Zero -> x [#] Zero.
+Lemma mult_cancel_ap_zero_lft : forall x y : F, x[*]y [#] [0] -> x [#] [0].
 Proof.
  intros x y H.
- cut (x[*]y [#] Zero[*]Zero).
+ cut (x[*]y [#] [0][*][0]).
   intro H0.
   elim (bin_op_strext_unfolded _ _ _ _ _ _ H0); intro H1.
-   3: astepr (Zero:F); auto.
+   3: astepr ([0]:F); auto.
   assumption.
  astepl (x[*]y[/] y[//]H1).
  apply div_resp_ap_zero_rev.
  assumption.
 Qed.
 
-Lemma mult_cancel_ap_zero_rht : forall x y : F, x[*]y [#] Zero -> y [#] Zero.
+Lemma mult_cancel_ap_zero_rht : forall x y : F, x[*]y [#] [0] -> y [#] [0].
 Proof.
  intros x y H.
  apply mult_cancel_ap_zero_lft with x.
  astepl (x[*]y). auto.
 Qed.
 
-Lemma recip_ap_zero : forall (x : F) x_, (One[/] x[//]x_) [#] Zero.
+Lemma recip_ap_zero : forall (x : F) x_, ([1][/] x[//]x_) [#] [0].
 Proof.
  intros; apply cring_mult_ap_zero with x.
- astepl (One:F). algebra.
+ astepl ([1]:F). algebra.
 Qed.
 
-Lemma recip_resp_ap : forall (x y : F) x_ y_, x [#] y -> (One[/] x[//]x_) [#] (One[/] y[//]y_).
+Lemma recip_resp_ap : forall (x y : F) x_ y_, x [#] y -> ([1][/] x[//]x_) [#] ([1][/] y[//]y_).
 Proof.
  intros x y x_ y_ H.
  apply zero_minus_apart.
@@ -751,17 +751,17 @@ Proof.
  eapply eq_transitive_unfolded.
   2: apply eq_symmetric_unfolded; apply dist_2b.
  apply cg_minus_wd.
-  astepr (x[*]y[*] (One[/] x[//]x_)).
-  astepr (x[*]y[*]One[/] x[//]x_).
+  astepr (x[*]y[*] ([1][/] x[//]x_)).
+  astepr (x[*]y[*][1][/] x[//]x_).
   astepr (x[*]y[/] x[//]x_).
   astepr (y[*]x[/] x[//]x_).
   astepr (y[*] (x[/] x[//]x_)).
-  Step_final (y[*]One).
- astepr (x[*]y[*] (One[/] y[//]y_)).
- astepr (x[*]y[*]One[/] y[//]y_).
+  Step_final (y[*][1]).
+ astepr (x[*]y[*] ([1][/] y[//]y_)).
+ astepr (x[*]y[*][1][/] y[//]y_).
  astepr (x[*]y[/] y[//]y_).
  astepr (x[*] (y[/] y[//]y_)).
- Step_final (x[*]One).
+ Step_final (x[*][1]).
 Qed.
 
 End Mult_Cancel_Ap_Zero.
@@ -797,16 +797,16 @@ Section Part_Function_Recip.
 Some auxiliary notions are helpful in defining the domain.
 *)
 
-Let R := extend Q (fun x Hx => G x Hx [#] Zero).
+Let R := extend Q (fun x Hx => G x Hx [#] [0]).
 
-Let Ext2R := ext2 (S:=X) (P:=Q) (R:=fun x Hx => G x Hx [#] Zero).
+Let Ext2R := ext2 (S:=X) (P:=Q) (R:=fun x Hx => G x Hx [#] [0]).
 
 Lemma part_function_recip_strext : forall x y Hx Hy,
- (One[/] _[//]Ext2R x Hx) [#] (One[/] _[//]Ext2R y Hy) -> x [#] y.
+ ([1][/] _[//]Ext2R x Hx) [#] ([1][/] _[//]Ext2R y Hy) -> x [#] y.
 Proof.
  intros x y Hx Hy H.
  elim (div_strext _ _ _ _ _ _ _ H); intro H1.
-  elimtype False; apply ap_irreflexive_unfolded with (x := One:X); auto.
+  elimtype False; apply ap_irreflexive_unfolded with (x := [1]:X); auto.
  exact (pfstrx _ _ _ _ _ _ H1).
 Qed.
 
@@ -819,7 +819,7 @@ Proof.
 Qed.
 
 Definition Frecip := Build_PartFunct X _ part_function_recip_pred_wd
- (fun x Hx => One[/] _[//]Ext2R x Hx) part_function_recip_strext.
+ (fun x Hx => [1][/] _[//]Ext2R x Hx) part_function_recip_strext.
 
 End Part_Function_Recip.
 
@@ -829,9 +829,9 @@ Section Part_Function_Div.
 For division things work out almost in the same way.
 *)
 
-Let R := Conj P (extend Q (fun x Hx => G x Hx [#] Zero)).
+Let R := Conj P (extend Q (fun x Hx => G x Hx [#] [0])).
 
-Let Ext2R := ext2 (S:=X) (P:=Q) (R:=fun x Hx => G x Hx [#] Zero).
+Let Ext2R := ext2 (S:=X) (P:=Q) (R:=fun x Hx => G x Hx [#] [0]).
 
 Lemma part_function_div_strext : forall x y Hx Hy,
  (F x (prj1 X _ _ _ Hx) [/] _[//]Ext2R x (prj2 X _ _ _ Hx)) [#]
@@ -866,7 +866,7 @@ End Part_Function_Div.
 Variable R:X -> CProp.
 
 Lemma included_FRecip : included R Q ->
- (forall x, R x -> forall Hx, G x Hx [#] Zero) -> included R (Dom Frecip).
+ (forall x, R x -> forall Hx, G x Hx [#] [0]) -> included R (Dom Frecip).
 Proof.
  intros H H0.
  simpl in |- *.
@@ -882,7 +882,7 @@ Proof.
 Qed.
 
 Lemma included_FDiv : included R P -> included R Q ->
- (forall x, R x -> forall Hx, G x Hx [#] Zero) -> included R (Dom Fdiv).
+ (forall x, R x -> forall Hx, G x Hx [#] [0]) -> included R (Dom Fdiv).
 Proof.
  intros HP HQ Hx.
  simpl in |- *.

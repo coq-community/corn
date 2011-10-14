@@ -167,7 +167,7 @@ Section Away_from_Zero.
 Section Definitions.
 
 (**
-** Away from Zero
+** Away from [0]
 
 Before we prove our main results about the equality we have to do some
 work on division.  A function is said to be bounded away from zero in
@@ -185,7 +185,7 @@ Variable F : PartIR.
 Let P := Dom F.
 (* end hide *)
 
-Definition bnd_away_zero := included I P and {c : IR | Zero [<] c |
+Definition bnd_away_zero := included I P and {c : IR | [0] [<] c |
   forall y Hy, (I y) -> c [<=] AbsIR (F y Hy)}.
 
 (**
@@ -196,7 +196,7 @@ If [F] is bounded away from zero in [I] then [F] is necessarily apart from zero 
 Hypothesis Hf : bnd_away_zero.
 (* end show *)
 
-Lemma bnd_imp_ap_zero : forall x Hx, (I x) -> F x Hx [#] Zero.
+Lemma bnd_imp_ap_zero : forall x Hx, (I x) -> F x Hx [#] [0].
 Proof.
  intros.
  apply AbsIR_cancel_ap_zero.
@@ -274,7 +274,7 @@ An immediate consequence:
 *)
 
 Lemma bnd_in_P_imp_ap_zero : pred_wd _ P -> bnd_away_zero_in_P ->
- forall x, P x -> forall Hx, F x Hx [#] Zero.
+ forall x, P x -> forall Hx, F x Hx [#] [0].
 Proof.
  intros H H0 x H1 Hx.
  apply bnd_imp_ap_zero with (Compact (leEq_reflexive _ x)).
@@ -545,7 +545,7 @@ Variable Q : IR -> CProp.
 Hypothesis H : included Q (fun x : IR => True).
 Hypothesis Hf : included Q (Dom F).
 
-Lemma FNth_zero : forall x, Q x -> forall Hx Hx', [-C-]One x Hx [=] (F{^}0) x Hx'.
+Lemma FNth_zero : forall x, Q x -> forall Hx Hx', [-C-][1] x Hx [=] (F{^}0) x Hx'.
 Proof.
  intros.
  algebra.
@@ -585,7 +585,7 @@ Let I := compact a b Hab.
 Variable F : PartIR.
 Hypothesis incF : included I (Dom F).
 
-Lemma FNth_zero' : Feq I [-C-]One (F{^}0).
+Lemma FNth_zero' : Feq I [-C-][1] (F{^}0).
 Proof.
  FEQ.
 Qed.

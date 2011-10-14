@@ -241,7 +241,7 @@ Lemma Continuous_recip : bnd_away_zero_in_P G I -> Continuous I {1/}G.
 Proof.
  intro H.
  elim contG; intros incG' contG'.
- cut (forall x : IR, I x -> forall Hx, G x Hx [#] Zero). intro H0.
+ cut (forall x : IR, I x -> forall Hx, G x Hx [#] [0]). intro H0.
   split; Contin.
  intros x H0 Hx.
  apply bnd_imp_ap_zero with (Compact (leEq_reflexive _ x)); auto.
@@ -250,7 +250,7 @@ Proof.
  exact (compact_single_prop x).
 Qed.
 
-Lemma Continuous_NRoot : forall n H, (forall x : IR, I x -> forall Hx, Zero[<=]F x Hx)
+Lemma Continuous_NRoot : forall n H, (forall x : IR, I x -> forall Hx, [0][<=]F x Hx)
  -> Continuous I (FNRoot F n H).
 Proof.
  intros n H.
@@ -485,14 +485,14 @@ Proof.
  apply included_imp_Derivative; Included.
 Qed.
 
-Lemma Derivative_const : forall c : IR, Derivative I pI [-C-]c [-C-]Zero.
+Lemma Derivative_const : forall c : IR, Derivative I pI [-C-]c [-C-][0].
 Proof.
  intros; split.
   Included.
  split; Deriv.
 Qed.
 
-Lemma Derivative_id : Derivative I pI FId [-C-]One.
+Lemma Derivative_id : Derivative I pI FId [-C-][1].
 Proof.
  split.
   Included.
@@ -576,8 +576,8 @@ Proof.
  elim H'; intros incG' derivG.
  clear derF derG H'.
  intro.
- cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
-  cut (forall x : IR, I x -> forall Hx, (G{*}G) x Hx [#] Zero); intros.
+ cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] [0]); intros.
+  cut (forall x : IR, I x -> forall Hx, (G{*}G) x Hx [#] [0]); intros.
    split.
     Included.
    split; Deriv.
@@ -608,7 +608,7 @@ Proof.
  elim derG; intros incG derivG.
  elim derivG; intros incG' Hg'.
  clear Hf derivG.
- cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
+ cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] [0]); intros.
   split.
    Included.
   split.
@@ -807,7 +807,7 @@ Qed.
 Lemma Diffble_recip : bnd_away_zero_in_P G I -> Diffble I pI {1/}G.
 Proof.
  elim diffG; intros incG diffbleG Gbnd.
- cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] Zero); intros.
+ cut (forall x : IR, I x -> forall Hx, Part G x Hx [#] [0]); intros.
   split.
    Included.
   intros; apply Diffble_I_recip; auto.

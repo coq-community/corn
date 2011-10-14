@@ -535,7 +535,7 @@ Proof.
  intros f_sqrt f_nonneg.
  rewrite <- (CRasIRasCR_id y).
  apply IRasCR_wd.
- assert (X:Zero[<=](CRasIR y)[^]2).
+ assert (X:[0][<=](CRasIR y)[^]2).
   apply sqr_nonneg.
  stepl (sqrt _ X).
   apply sqrt_wd.
@@ -585,12 +585,12 @@ Proof.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
  apply IRasCR_wd.
- assert (X1:Zero[<=](inj_Q IR (4#1))).
+ assert (X1:[0][<=](inj_Q IR (4#1))).
   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
   apply inj_Q_leEq.
   discriminate.
  csetoid_replace (inj_Q IR (2#1)) (sqrt _ X1).
-  assert (X2:Zero[<=](inj_Q IR (4#1)[*]inj_Q IR (a/4%positive))).
+  assert (X2:[0][<=](inj_Q IR (4#1)[*]inj_Q IR (a/4%positive))).
    apply mult_resp_nonneg;assumption.
   astepl (sqrt _ X2).
   apply sqrt_wd.
@@ -599,7 +599,7 @@ Proof.
   simpl.
   field; discriminate.
  change (inj_Q IR (4#1)) with (inj_Q IR ((2#1)[*](2#1))).
- assert (X2:Zero[<=](inj_Q IR (2#1))[^]2).
+ assert (X2:[0][<=](inj_Q IR (2#1))[^]2).
   apply sqr_nonneg.
  stepr (sqrt _ X2).
   apply eq_symmetric; apply sqrt_to_nonneg.
@@ -620,7 +620,7 @@ Proof.
   simpl.
   rewrite <- IR_inj_Q_as_CR.
   apply IRasCR_wd.
-  assert (X:Zero[<=](inj_Q IR 1:IR)[^]2) by apply sqr_nonneg.
+  assert (X:[0][<=](inj_Q IR 1:IR)[^]2) by apply sqr_nonneg.
   stepl (sqrt _ X).
    apply sqrt_wd.
    rstepl (inj_Q IR 1[*]inj_Q IR 1).
@@ -631,7 +631,7 @@ Proof.
    assumption.
   apply sqrt_to_nonneg.
   stepr (nring 1:IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR 1))].
-  rstepr (One:IR).
+  rstepr ([1]:IR).
   apply less_leEq; apply pos_one.
  intros a Ha H.
  simpl.
@@ -639,7 +639,7 @@ Proof.
   apply rational_sqrt_mid_correct.
  change (scale 2 (rational_sqrt_big_bounded n (a / 4%positive)(rational_sqrt_big_bounded_subproof0 n a Ha q)) ==
    IRasCR (sqrt (inj_Q IR a) H))%CR.
- assert (X:Zero[<=]inj_Q IR (a/4%positive)).
+ assert (X:[0][<=]inj_Q IR (a/4%positive)).
   change (a/4%positive) with (a*(1#4)).
   stepr (inj_Q IR a[*]inj_Q IR (1#4)); [| now apply eq_symmetric; apply (inj_Q_mult IR)].
   apply mult_resp_nonneg.
@@ -682,12 +682,12 @@ Proof.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_mult_as_CR.
  apply IRasCR_wd.
- assert (X1:Zero[<=](inj_Q IR (1#4))).
+ assert (X1:[0][<=](inj_Q IR (1#4))).
   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
   apply inj_Q_leEq.
   discriminate.
  csetoid_replace (inj_Q IR (1#2)) (sqrt _ X1).
-  assert (X2:Zero[<=](inj_Q IR (1#4)[*]inj_Q IR (4%positive*a))).
+  assert (X2:[0][<=](inj_Q IR (1#4)[*]inj_Q IR (4%positive*a))).
    apply mult_resp_nonneg;assumption.
   astepl (sqrt _ X2).
   apply sqrt_wd.
@@ -696,7 +696,7 @@ Proof.
   simpl.
   field; discriminate.
  change (inj_Q IR (1#4)) with (inj_Q IR ((1#2)[*](1#2))).
- assert (X2:Zero[<=](inj_Q IR (1#2))[^]2).
+ assert (X2:[0][<=](inj_Q IR (1#2))[^]2).
   apply sqr_nonneg.
  stepr (sqrt _ X2).
   apply eq_symmetric; apply sqrt_to_nonneg.
@@ -718,7 +718,7 @@ Proof.
  destruct (Qle_total a 1); try apply rational_sqrt_mid_correct.
  change (scale (1#2) (rational_sqrt_small_bounded n (4%positive*a) (rational_sqrt_small_bounded_subproof n a Ha q)) ==
    IRasCR (sqrt (inj_Q IR a) H))%CR.
- assert (X:Zero[<=]inj_Q IR (4%positive*a)).
+ assert (X:[0][<=]inj_Q IR (4%positive*a)).
   stepr (inj_Q IR (4%positive:Q)[*]inj_Q IR a); [| now apply eq_symmetric; apply (inj_Q_mult IR)].
   apply mult_resp_nonneg.
    stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
@@ -772,12 +772,12 @@ Proof.
  rewrite <- (IR_nring_as_CR 0).
  apply IRasCR_wd.
  simpl.
- assert (X:Zero [<=] (Zero[^]2:IR)).
-  rstepr (Zero:IR).
+ assert (X:[0] [<=] ([0][^]2:IR)).
+  rstepr ([0]:IR).
   apply leEq_reflexive.
  stepl (sqrt _ X).
   apply sqrt_wd.
-  rstepl (Zero:IR).
+  rstepl ([0]:IR).
   apply leEq_imp_eq.
    assumption.
   stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
@@ -835,12 +835,12 @@ Proof.
   apply ball_refl.
  clear a.
  intros a b Ha Hb Hab.
- assert (Z:Zero[<=]inj_Q IR a).
+ assert (Z:[0][<=]inj_Q IR a).
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
  rewrite -> (rational_sqrt_correct _ Z).
- assert (Z0:Zero[<=]inj_Q IR b).
+ assert (Z0:[0][<=]inj_Q IR b).
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
@@ -867,13 +867,13 @@ Proof.
  set (e':=(inj_Q IR (e:Q))).
  set (a':=(sqrt (inj_Q IR a) Z)).
  set (b':=(sqrt (inj_Q IR b) Z0)).
- assert (He:Zero[<]e').
+ assert (He:[0][<]e').
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   simpl; auto with *.
  split.
   refine (mult_cancel_leEq _ _ _ (e'[+]a'[+]b') _ _).
-   rstepl (Zero[+]Zero[+]Zero:IR).
+   rstepl ([0][+][0][+][0]:IR).
    do 2 (apply plus_resp_less_leEq; try apply sqrt_nonneg).
    assumption.
   rstepl (([--](e'[*]e'))[+](e')[*]([--]a'[-]b')).
@@ -898,7 +898,7 @@ Proof.
    apply less_leEq; apply pos_two.
   apply sqrt_nonneg.
  refine (mult_cancel_leEq _ _ _ (e'[+]a'[+]b') _ _).
-  rstepl (Zero[+]Zero[+]Zero:IR).
+  rstepl ([0][+][0][+][0]:IR).
   do 2 (apply plus_resp_less_leEq; try apply sqrt_nonneg).
   assumption.
  rstepr (((e'[*]e'))[+](e')[*](a'[+]b')).
@@ -942,7 +942,7 @@ Proof.
   apply IRasCR_wd.
   apply: NRoot_wd.
   apply eq_reflexive.
- apply (ContinuousCorrect (I:proper (closel Zero))); try assumption.
+ apply (ContinuousCorrect (I:proper (closel [0]))); try assumption.
   apply Continuous_NRoot.
    Contin.
   intros; assumption.
@@ -983,7 +983,7 @@ Lemma rational_sqrt_unique (a : Q) (y : CR) :
   0 ≤ a → CRpower_N y 2 = 'a → 0%CR ≤ y → y = rational_sqrt a.
 Proof.
  intros.
- assert (Pa : Zero[<=](inj_Q IR a)).
+ assert (Pa : [0][<=](inj_Q IR a)).
   stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
   now apply inj_Q_leEq.
  rewrite (rational_sqrt_correct _ Pa).
@@ -1002,12 +1002,12 @@ Proof.
  intros n.
  setoid_replace ('((2#1) ^ (1 + n)) * rational_sqrt (a * (4#1) ^ -(1 + n)))%CR
     with ('((2#1) ^ n) * scale (2#1) (rational_sqrt ((a * (4#1) ^ -n) / (4#1))))%CR.
-  assert (Pa1 : Zero[<=](inj_Q IR (a * (4#1) ^ (- n)))).
+  assert (Pa1 : [0][<=](inj_Q IR (a * (4#1) ^ (- n)))).
    stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
    apply inj_Q_leEq.
    apply Qmult_le_0_compat; [assumption|].
    now apply Qpower_pos.
-  assert (Pa2 : Zero[<=](inj_Q IR (a * (4#1) ^ (- n) / (4 # 1)))).
+  assert (Pa2 : [0][<=](inj_Q IR (a * (4#1) ^ (- n) / (4 # 1)))).
    stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
    apply inj_Q_leEq.
    apply Qmult_le_0_compat; [|easy].

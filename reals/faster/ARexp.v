@@ -22,7 +22,7 @@ Proof.
   rewrite commutativity.
   apply sg_op_proper.
    rewrite preserves_powers.
-   now rewrite rings.preserves_opp.
+   now rewrite rings.preserves_negate.
   rewrite Str_nth_Qrecip_factorials'.
   now rewrite preserves_factorials.
 Qed.
@@ -30,7 +30,7 @@ Qed.
 Definition AQexp_small_neg_prf : -1 ≤ ('a : Q) ≤ 0.
 Proof.
   split.
-   now apply rings.preserves_ge_opp1.
+   now apply rings.preserves_ge_negate1.
   now apply semirings.preserves_nonpos.
 Qed.
 
@@ -50,10 +50,10 @@ Lemma AQexp_neg_bounded_prf `(Pa : -2^S n ≤ a ≤ 0) :
 Proof.
   split.
    apply (order_reflecting (2 *.)).
-   rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
-   now rewrite <-rings.opp_mult_distr_r.
+   rewrite <-shiftl_S, rings.plus_negate_r, shiftl_0.
+   now rewrite <-rings.negate_mult_distr_r.
   apply (order_reflecting (2 *.)).
-  rewrite <-shiftl_S, rings.plus_opp_r, shiftl_0.
+  rewrite <-shiftl_S, rings.plus_negate_r, shiftl_0.
   now rewrite right_absorb.
 Qed.
 
@@ -96,24 +96,24 @@ Proof.
    easy.
   apply orders.le_flip in E1.
   apply (order_reflecting (cast AQ Q)).
-  rewrite rings.preserves_opp.
+  rewrite rings.preserves_negate.
   rewrite preserves_nat_pow.
   rewrite rings.preserves_2.
   rewrite <-(int_pow_nat_pow (f:=Z_of_nat)).
   rewrite inj_Zabs_nat, Z.abs_eq.
-   apply rings.flip_le_opp.
-   rewrite rings.opp_involutive.
+   apply rings.flip_le_negate.
+   rewrite rings.negate_involutive.
    apply orders.lt_le, Qdlog2_spec.
-   apply rings.flip_neg_opp.
+   apply rings.flip_neg_negate.
    apply orders.le_lt_trans with (-1).
-    now apply rings.preserves_le_opp1.
-   apply rings.flip_pos_opp. solve_propholds.
+    now apply rings.preserves_le_negate1.
+   apply rings.flip_pos_negate. solve_propholds.
   change (0 ≤ 1 + Qdlog2 (-'a)).
   apply semirings.plus_le_compat_r; [| solve_propholds].
   apply Qdlog2_nonneg.
   change ((- -1 : Q) ≤ -'a).
-  apply rings.flip_le_opp.
-  now apply rings.preserves_le_opp1.
+  apply rings.flip_le_negate.
+  now apply rings.preserves_le_negate1.
 Qed.
 
 (* We can also divide by any additional number of 2 powers. Doing this generally 
@@ -122,7 +122,7 @@ Lemma AQexp_neg_bound_weaken (n : nat) : -2 ^ (n + AQexp_neg_bound) ≤ a ≤ 0.
 Proof.
   split; [|trivial].
   transitivity (-2 ^ AQexp_neg_bound).
-   apply rings.flip_le_opp.
+   apply rings.flip_le_negate.
    rewrite nat_pow_exp_plus.
    apply semirings.ge_1_mult_le_compat_l.
      apply nat_pow_ge_1.
@@ -165,7 +165,7 @@ Qed.
 End exp_neg.
 
 Lemma AQexp_prf1 {a : AQ} (pA : 0 ≤ a) : -a ≤ 0.
-Proof. now apply rings.flip_nonneg_opp. Qed.
+Proof. now apply rings.flip_nonneg_negate. Qed.
 
 Lemma AQexp_prf2 {a : AQ} (pA : ¬0 ≤ a) : a ≤ 0.
 Proof. now apply orders.le_flip. Qed.
@@ -182,12 +182,12 @@ Proof.
   case (decide_rel _); intros.
    rewrite ARtoCR_preserves_inv_pos.
    rewrite AQexp_neg_correct.
-   rewrite rings.preserves_opp.
+   rewrite rings.preserves_negate.
    apply rational_exp_opp.
     now apply semirings.preserves_nonneg.
-   posed_rewrite <-(rings.preserves_opp (f:=cast AQ Q)).
+   posed_rewrite <-(rings.preserves_negate (f:=cast AQ Q)).
    apply: (AQexp_inv_pos_bound_correct (a:=-a)).
-   now apply rings.flip_nonneg_opp.
+   now apply rings.flip_nonneg_negate.
   apply AQexp_neg_correct.
 Qed.
 

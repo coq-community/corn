@@ -614,10 +614,10 @@ Definition Integrate (f: Q_as_MetricSpace --> CR) (from width: Q): CR :=
   (' width * Integrate01 (f ∘ Qplus_uc from ∘ Qscale_uc width))%CR.
 
 (** Our integral on [[0,1]] is correct. *)
-Lemma Integrate01_correct : forall F (H01:Zero[<=](One:IR)) (HF:Continuous_I H01 F)
+Lemma Integrate01_correct : forall F (H01:[0][<=]([1]:IR)) (HF:Continuous_I H01 F)
  (f:Q_as_MetricSpace --> CR),
  (forall (o:Q) H, (0 <= o <= 1) -> (f o == IRasCR (F (inj_Q IR o) H)))%CR ->
- (IRasCR (integral Zero One H01 F HF)==Integrate01 f)%CR.
+ (IRasCR (integral [0] [1] H01 F HF)==Integrate01 f)%CR.
 Proof.
  intros F H01' HF' f Hf.
  assert (H01:(inj_Q IR 0)[<=](inj_Q IR 1)).
@@ -626,10 +626,10 @@ Proof.
  assert (HF:Continuous_I H01 F).
   apply (included_imp_contin _ _ H01').
    apply included_compact.
-    apply (compact_wd _ _ H01' Zero).
+    apply (compact_wd _ _ H01' [0]).
      apply compact_inc_lft.
     apply eq_symmetric; apply (inj_Q_nring IR 0).
-   apply (compact_wd _ _ H01' One).
+   apply (compact_wd _ _ H01' [1]).
     apply compact_inc_rht.
    rstepl (nring 1:IR).
    apply eq_symmetric; apply (inj_Q_nring IR 1).

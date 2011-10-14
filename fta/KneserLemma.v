@@ -48,7 +48,7 @@ Section Kneser_Lemma.
 
 (**
 %\begin{convention}% Let [b : nat->CC], [n : nat] and [c : IR]
-such that [0 < n], [b_0 := b 0], [b_n := (b n) [=] One] and
+such that [0 < n], [b_0 := b 0], [b_n := (b n) [=] [1]] and
 [(AbsCC b_0) [<] c].
 %\end{convention}%
 *)
@@ -60,7 +60,7 @@ Hypothesis gt_n_0 : 0 < n.
 Let b_0 := b 0.
 Let b_n := b n.
 (* end hide *)
-Hypothesis b_n_1 : b_n [=] One.
+Hypothesis b_n_1 : b_n [=] [1].
 Variable c : IR.
 Hypothesis b_0_lt_c : AbsCC b_0 [<] c.
 
@@ -70,7 +70,7 @@ Hypothesis b_0_lt_c : AbsCC b_0 [<] c.
  - [Small := p3m n]
  - [Smaller := p3m (two_n * n)]
  - [Smallest := Small[*]Smaller]
- - [q := One[-]Smallest]
+ - [q := [1][-]Smallest]
  - [a i := AbsCC (b i)]
 
 %\end{convention}%
@@ -81,18 +81,18 @@ Let two_n := 2 * n.
 Let Small := p3m n.
 Let Smaller := p3m (two_n * n).
 Let Smallest := Small[*]Smaller.
-Let q := One[-]Smallest.
+Let q := [1][-]Smallest.
 (* end hide *)
 
-Lemma b_0'_exists : forall eta : IR, Zero [<] eta -> {b_0' : CC | AbsCC (b_0'[-]b_0) [<=] eta | b_0' [#] Zero}.
+Lemma b_0'_exists : forall eta : IR, [0] [<] eta -> {b_0' : CC | AbsCC (b_0'[-]b_0) [<=] eta | b_0' [#] [0]}.
 Proof.
  intros.
- exact (Cexis_AFS_CC Zero b_0 eta X).
+ exact (Cexis_AFS_CC [0] b_0 eta X).
 Qed.
 
 Let eta_0 := ((c[-]AbsCC b_0) [/]FourNZ) [/]TwoNZ.
 
-Lemma eta_0_pos : Zero [<] eta_0.
+Lemma eta_0_pos : [0] [<] eta_0.
 Proof.
  unfold eta_0 in |- *.
  apply pos_div_two.
@@ -101,8 +101,8 @@ Proof.
  assumption.
 Qed.
 
-Lemma eta_exists : {eta : IR | Zero [<] eta |
- {b_0' : CC | AbsCC (b_0'[-]b_0) [<=] eta | b_0' [#] Zero and AbsCC b_0'[+]Three[*]eta [<] c}}.
+Lemma eta_exists : {eta : IR | [0] [<] eta |
+ {b_0' : CC | AbsCC (b_0'[-]b_0) [<=] eta | b_0' [#] [0] and AbsCC b_0'[+]Three[*]eta [<] c}}.
 Proof.
  exists eta_0.
   exact eta_0_pos.
@@ -126,12 +126,12 @@ Proof.
  unfold eta_0 in |- *; rational.
 Qed.
 
-Lemma eps_exists_1 : forall eps x y : IR, Zero [<] eps -> Zero [<] x -> Zero [<] y ->
- {eps' : IR | Zero [<] eps' | eps' [<=] eps /\ x[*]eps' [<=] y}.
+Lemma eps_exists_1 : forall eps x y : IR, [0] [<] eps -> [0] [<] x -> [0] [<] y ->
+ {eps' : IR | [0] [<] eps' | eps' [<=] eps /\ x[*]eps' [<=] y}.
 Proof.
  intros eps x y Heps Hx Hy.
- cut (Zero [<] Half[*]eps). intro H2.
-  cut (x [#] Zero). intro H3.
+ cut ([0] [<] Half[*]eps). intro H2.
+  cut (x [#] [0]). intro H3.
    2: apply pos_ap_zero; auto.
   elim (less_cotransitive_unfolded _ _ _ H2 ((y[/] x[//]H3) [-]Half[*]eps)); intro H5.
    exists (Half[*]eps).
@@ -140,16 +140,16 @@ Proof.
     astepr (x[*] (y[/] x[//]H3)).
    apply less_leEq.
    apply mult_resp_less_lft; auto.
-   astepl (Zero[+]Half[*]eps).
+   astepl ([0][+]Half[*]eps).
    apply shift_plus_less; auto.
-  cut (Zero [<] (y[/] x[//]H3)). intro H4.
+  cut ([0] [<] (y[/] x[//]H3)). intro H4.
    2: apply div_resp_pos; auto.
   exists (Half[*] (y[/] x[//]H3)).
    apply mult_resp_pos. apply pos_half. auto.
     split. apply leEq_transitive with (y[/] x[//]H3).
    apply less_leEq; apply half_3; auto.
    apply less_leEq.
-   astepr (One[*]eps).
+   astepr ([1][*]eps).
    astepr ((Half[+]Half) [*]eps).
    astepr (Half[*]eps[+]Half[*]eps).
    apply shift_less_plus'; auto.
@@ -160,20 +160,20 @@ Proof.
 Qed.
 
 (* less_cotransitive_unfolded on
-  {Zero  [<]  y[/]x[//]H3[-]Half[*]eps} +
+  {[0]  [<]  y[/]x[//]H3[-]Half[*]eps} +
   {y[/]x[//]H3[-]Half[*]eps  [<]  Half[*]eps}. *)
 
-Lemma eps_exists : forall eta a_0 : IR, Zero [<] eta -> Zero [<] a_0 ->
- {eps : IR | Zero [<] eps | Two[*] (Three[^]n[+]One) [*]eps [<=] eta /\ Three[*]eps [<=] Smaller[*]a_0 /\ eps [<=] a_0}.
+Lemma eps_exists : forall eta a_0 : IR, [0] [<] eta -> [0] [<] a_0 ->
+ {eps : IR | [0] [<] eps | Two[*] (Three[^]n[+][1]) [*]eps [<=] eta /\ Three[*]eps [<=] Smaller[*]a_0 /\ eps [<=] a_0}.
 Proof.
  intros eta a_0 Heta Ha_0.
- elim (eps_exists_1 ((Smaller[*]a_0) [/]ThreeNZ) (Three[^]n[+]One) (eta [/]TwoNZ)).
+ elim (eps_exists_1 ((Smaller[*]a_0) [/]ThreeNZ) (Three[^]n[+][1]) (eta [/]TwoNZ)).
     intros eps H H0.
     elim H0; intros H1 H2.
     exists eps.
      auto.
     split.
-     astepl (Two[*] ((Three[^]n[+]One) [*]eps)).
+     astepl (Two[*] ((Three[^]n[+][1]) [*]eps)).
      apply shift_mult_leEq' with (two_ap_zero IR); auto.
      apply pos_two.
     split.
@@ -202,32 +202,32 @@ Let a (i : nat) : IR := AbsCC (b i).
 (* end hide *)
 
 Lemma z_exists : forall (b_0' : CC) (k : nat) (r eta : IR), let a_0 := AbsCC b_0' in
- Zero [<] a_0 -> Zero [<] a k -> 1 <= k -> k <= n -> Zero [<=] r -> Zero [<] eta ->
+ [0] [<] a_0 -> [0] [<] a k -> 1 <= k -> k <= n -> [0] [<=] r -> [0] [<] eta ->
  AbsCC (b_0'[-]b_0) [<=] eta -> a k[*]r[^]k [<=] a_0 ->
  {z : CC | AbsCC z [=] r | AbsCC (b_0[+]b k[*]z[^]k) [<=] a_0[-]a k[*]r[^]k[+]eta}.
 Proof.
  (* begin hide *)
  intros b_0' k r eta a_0 H H0 H1 H2 H3 H4 H5 H6.
- cut (AbsCC b_0' [#] Zero). intro H7.
+ cut (AbsCC b_0' [#] [0]). intro H7.
   2: apply pos_ap_zero; auto.
- cut (cc_IR (AbsCC b_0') [#] Zero). intro H8.
-  2: astepr (cc_IR Zero); apply cc_IR_resp_ap; auto.
- cut (a k [#] Zero). intro H9.
+ cut (cc_IR (AbsCC b_0') [#] [0]). intro H8.
+  2: astepr (cc_IR [0]); apply cc_IR_resp_ap; auto.
+ cut (a k [#] [0]). intro H9.
   2: apply pos_ap_zero; auto.
- cut (b k [#] Zero). intro H10.
+ cut (b k [#] [0]). intro H10.
   2: apply AbsCC_ap_zero; apply ap_symmetric_unfolded; auto.
  cut (0 < k). intro H11.
   2: auto with arith.
  cut ( [--] ((cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] (b_0'[/] b k[//]H10)) [#]
-   Zero). intro H12.
+   [0]). intro H12.
   elim (CnrootCC [--] ((cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] (b_0'[/] b k[//]H10))
     H12 k H11).
   intros w H13.
-  cut (AbsCC w [=] One). intro H14.
+  cut (AbsCC w [=] [1]). intro H14.
    exists (cc_IR r[*]w).
     astepl (AbsCC (cc_IR r) [*]AbsCC w).
     astepl (r[*]AbsCC w).
-    Step_final (r[*]One).
+    Step_final (r[*][1]).
    apply leEq_transitive with (AbsCC (b_0'[+]b k[*] (cc_IR r[*]w) [^]k) [+]AbsCC (b_0[-]b_0')).
     apply leEq_wdl with (AbsCC (b_0'[+]b k[*] (cc_IR r[*]w) [^]k[+] (b_0[-]b_0'))).
      apply triangle.
@@ -241,7 +241,7 @@ Proof.
     2: algebra.
    apply eq_transitive_unfolded with (AbsCC ((b_0'[/] cc_IR (AbsCC b_0') [//]H8) [*]
      (cc_IR (AbsCC b_0') [-]cc_IR (a k) [*]cc_IR r[^]k))).
-    astepl (One[*] (AbsCC b_0'[-]a k[*]r[^]k)).
+    astepl ([1][*] (AbsCC b_0'[-]a k[*]r[^]k)).
     astepr (AbsCC (b_0'[/] cc_IR (AbsCC b_0') [//]H8) [*]
       AbsCC (cc_IR (AbsCC b_0') [-]cc_IR (a k) [*]cc_IR r[^]k)).
     apply bin_op_wd_unfolded.
@@ -253,7 +253,7 @@ Proof.
      2: apply AbsCC_wd; algebra.
     astepr (AbsCC (cc_IR (AbsCC b_0') [-]cc_IR (a k[*]r[^]k))).
     astepr (AbsCC (cc_IR (AbsCC b_0'[-]a k[*]r[^]k))).
-    cut (Zero [<=] AbsCC b_0'[-]a k[*]r[^]k). algebra.
+    cut ([0] [<=] AbsCC b_0'[-]a k[*]r[^]k). algebra.
      apply shift_leEq_lft; auto.
    apply AbsCC_wd.
    rstepl (b_0'[+] b k[*] (cc_IR r[^]k[*]
@@ -268,16 +268,16 @@ Proof.
   astepl (AbsCC ((cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] (b_0'[/] b k[//]H10))).
   astepl (AbsCC (cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] AbsCC (b_0'[/] b k[//]H10)).
   astepl (AbsCC (cc_IR (a k) [/] cc_IR (AbsCC b_0') [//]H8) [*] AbsCC (b_0'[/] b k[//]H10)).
-  cut (Zero [<=] AbsCC b_0'). intro. 2: apply AbsCC_nonneg.
+  cut ([0] [<=] AbsCC b_0'). intro. 2: apply AbsCC_nonneg.
    astepl ((AbsCC (cc_IR (a k)) [/] AbsCC b_0'[//]H7) [*]AbsCC (b_0'[/] b k[//]H10)).
   astepl ((AbsCC (cc_IR (a k)) [/] AbsCC b_0'[//]H7) [*]AbsCC (b_0'[/] b k[//]H10)).
-  cut (Zero [<=] a k). intro. 2: apply less_leEq; auto.
+  cut ([0] [<=] a k). intro. 2: apply less_leEq; auto.
    astepl ((a k[/] AbsCC b_0'[//]H7) [*]AbsCC (b_0'[/] b k[//]H10)).
   astepl ((a k[/] AbsCC b_0'[//]H7) [*] (AbsCC b_0'[/] AbsCC (b k) [//]H9)).
   unfold a in |- *; rational.
  apply ap_wdl_unfolded with (cc_IR [--] (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
   apply mult_resp_ap_zero.
-   astepr (cc_IR Zero).
+   astepr (cc_IR [0]).
    apply cc_IR_resp_ap.
    apply inv_resp_ap_zero.
    apply div_resp_ap_zero_rev; auto.
@@ -286,14 +286,14 @@ Proof.
   apply ap_symmetric_unfolded; auto.
  apply eq_transitive_unfolded with ( [--] (cc_IR (a k[/] AbsCC b_0'[//]H7)) [*] (b_0'[/] b k[//]H10)).
   apply mult_wdl.
-  astepl (cc_IR (Zero[-] (a k[/] AbsCC b_0'[//]H7))). astepr (Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7)).
-  Step_final (cc_IR Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7)).
- astepl ((Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7)) [*] (b_0'[/] b k[//]H10)).
- astepl ((cc_IR Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7)) [*] (b_0'[/] b k[//]H10)).
- astepl (cc_IR Zero[*] (b_0'[/] b k[//]H10) [-]
+  astepl (cc_IR ([0][-] (a k[/] AbsCC b_0'[//]H7))). astepr ([0][-]cc_IR (a k[/] AbsCC b_0'[//]H7)).
+  Step_final (cc_IR [0][-]cc_IR (a k[/] AbsCC b_0'[//]H7)).
+ astepl (([0][-]cc_IR (a k[/] AbsCC b_0'[//]H7)) [*] (b_0'[/] b k[//]H10)).
+ astepl ((cc_IR [0][-]cc_IR (a k[/] AbsCC b_0'[//]H7)) [*] (b_0'[/] b k[//]H10)).
+ astepl (cc_IR [0][*] (b_0'[/] b k[//]H10) [-]
    cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
- astepl (Zero[*] (b_0'[/] b k[//]H10) [-] cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
- astepl (Zero[-]cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
+ astepl ([0][*] (b_0'[/] b k[//]H10) [-] cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
+ astepl ([0][-]cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10)).
  astepl ( [--] (cc_IR (a k[/] AbsCC b_0'[//]H7) [*] (b_0'[/] b k[//]H10))).
  apply un_op_wd_unfolded.
  apply mult_wdl.
@@ -308,7 +308,7 @@ Proof.
  astepl (Smallest[+]Half).
  apply shift_plus_leEq.
  unfold Half in |- *.
- rstepr (One [/]TwoNZ:IR).
+ rstepr ([1] [/]TwoNZ:IR).
  unfold Smallest, Small, Smaller in |- *.
  generalize (p3m_smaller n gt_n_0).
  intro Hn.
@@ -322,52 +322,52 @@ Proof.
   unfold two_n in |- *.
   elim gt_n_0. auto with arith.
    intros. simpl in |- *. auto with arith.
-  rstepr (One [/]TwoNZ[*]OneR).
+  rstepr ([1] [/]TwoNZ[*]OneR).
  apply less_leEq.
  apply mult_resp_less_lft.
   exact (half_lt1 _).
  exact (pos_half _).
 Qed.
 
-Lemma Kneser_1'' : q [<] One.
+Lemma Kneser_1'' : q [<] [1].
 Proof.
  unfold q in |- *.
  apply shift_minus_less'.
- rstepl (Zero[+]OneR).
+ rstepl ([0][+]OneR).
  apply plus_resp_less_rht.
  unfold Smallest, Small, Smaller in |- *.
  apply mult_resp_pos; apply p3m_pos.
 Qed.
 
-Lemma Kneser_1 : forall a_0 eta eps : IR, Zero [<] eta -> Zero [<] eps ->
- a_0[+]Three[*]eta [<] c -> Two[*] (Three[^]n[+]One) [*]eps [<=] eta -> q[*]a_0[+]Three[^]n[*]eps[+]eps[+]eta [<] q[*]c.
+Lemma Kneser_1 : forall a_0 eta eps : IR, [0] [<] eta -> [0] [<] eps ->
+ a_0[+]Three[*]eta [<] c -> Two[*] (Three[^]n[+][1]) [*]eps [<=] eta -> q[*]a_0[+]Three[^]n[*]eps[+]eps[+]eta [<] q[*]c.
 Proof.
  intros.
- cut (One [/]TwoNZ[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta) [<=]
+ cut ([1] [/]TwoNZ[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta) [<=]
    q[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
   intro Hm.
   apply leEq_less_trans with (q[*] (a_0[+]Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
    rstepr (q[*]a_0[+]q[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
-   rstepl (q[*]a_0[+]One [/]TwoNZ[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
+   rstepl (q[*]a_0[+][1] [/]TwoNZ[*] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
    apply plus_resp_leEq_lft; auto.
   apply mult_resp_less_lft.
    apply leEq_less_trans with (a_0[+]Three[*]eta); auto.
    rstepl (a_0[+] (Two[*]Three[^]n[*]eps[+]Two[*]eps[+]Two[*]eta)).
    apply plus_resp_leEq_lft.
-   rstepl (Two[*] (Three[^]n[+]One) [*]eps[+]Two[*]eta).
+   rstepl (Two[*] (Three[^]n[+][1]) [*]eps[+]Two[*]eta).
    rstepr (eta[+]Two[*]eta).
    apply plus_resp_leEq; auto.
   apply less_leEq_trans with (Half:IR).
    apply pos_half. exact Kneser_1'.
   apply mult_resp_leEq_rht. exact Kneser_1'.
   apply less_leEq.
- apply less_leEq_trans with (Zero[+]Two[*]eta).
+ apply less_leEq_trans with ([0][+]Two[*]eta).
   rstepr (Two[*]eta).
   apply mult_resp_pos; auto.
   apply pos_two.
  apply less_leEq.
  apply plus_resp_less_rht.
- apply less_transitive_unfolded with (Zero[+]Two[*]eps).
+ apply less_transitive_unfolded with ([0][+]Two[*]eps).
   rstepr (Two[*]eps).
   apply mult_resp_pos; auto.
   apply pos_two.
@@ -459,28 +459,28 @@ Proof.
  elim eta_exists. intros eta H0 H1.
  elim H1. intros b_0' H3 H4. elim H4. intros H5 H6.
  clear H1 H4.
- cut (Zero [<] AbsCC b_0'). intro H7.
+ cut ([0] [<] AbsCC b_0'). intro H7.
   2: apply AbsCC_pos; auto.
  elim (eps_exists eta (AbsCC b_0') H0 H7). intros eps H9 H10. elim H10. intros H11 H12. elim H12. intros H13 H14.
  clear H10 H12.
- cut (forall k : nat, Zero [<=] a k). intro H15.
+ cut (forall k : nat, [0] [<=] a k). intro H15.
   2: intro; unfold a in |- *; apply AbsCC_nonneg.
- cut (a n [=] One). intro H16.
-  2: unfold a in |- *; Step_final (AbsCC One).
+ cut (a n [=] [1]). intro H16.
+  2: unfold a in |- *; Step_final (AbsCC [1]).
  elim (Main a n gt_n_0 eps H9 H15 H16 (AbsCC b_0') H14).
  intro r. intros H18 H19.
  elim H19. intros k H20.
  elim H20. intros H21 H22. elim H22. intros H23 H24. elim H24. intros H25 H26.
  elim H26. intros H27 H28. elim H28. intros H29 H30.
  clear H19 H20 H22 H24 H26 H28.
- cut (Zero [<] a k). intro H31.
+ cut ([0] [<] a k). intro H31.
   elim (z_exists b_0' k r eta H7 H31 H21 H23 H18 H0 H3 H30). intro z. intros H33 H34.
   exists z.
    astepl (r[^]n).
    apply leEq_transitive with (AbsCC b_0'); auto.
    apply leEq_transitive with (AbsCC b_0'[+]Three[*]eta).
     2: apply less_leEq; auto.
-   astepl (AbsCC b_0'[+]Zero).
+   astepl (AbsCC b_0'[+][0]).
    apply plus_resp_leEq_lft.
    apply less_leEq.
    apply mult_resp_pos; auto.
@@ -497,10 +497,10 @@ Proof.
     unfold p_'' in |- *.
    2: apply bin_op_wd_unfolded; [ algebra | apply bin_op_wd_unfolded; apply Sum_wd; algebra ].
   apply leEq_transitive with (AbsCC (b_0[+]b k[*]z[^]k) [+]
-    ((One[-]Small) [*] (a k[*]r[^]k) [+]Three[^]n[*]eps)).
+    (([1][-]Small) [*] (a k[*]r[^]k) [+]Three[^]n[*]eps)).
    apply plus_resp_leEq_lft; auto.
   apply leEq_transitive with (AbsCC b_0'[-]AbsCC (b k) [*]r[^]k[+]eta[+]
-    ((One[-]Small) [*] (a k[*]r[^]k) [+]Three[^]n[*]eps)).
+    (([1][-]Small) [*] (a k[*]r[^]k) [+]Three[^]n[*]eps)).
    apply plus_resp_leEq; auto.
   unfold a in |- *.
   rstepl (AbsCC b_0'[+]Three[^]n[*]eps[+]eta[-]Small[*] (AbsCC (b k) [*]r[^]k)).
@@ -513,7 +513,7 @@ Proof.
   apply leEq_wdl with (Small[*]Two[*]eps[+] (q[*]AbsCC b_0'[+]Three[^]n[*]eps[+]eta)).
    2: unfold q, Smallest in |- *; rational.
   apply plus_resp_leEq.
-  astepr (One[*]eps).
+  astepr ([1][*]eps).
   apply mult_resp_leEq_rht.
    2: apply less_leEq; auto.
   astepr (Half[*] (Two:IR)).
@@ -531,12 +531,12 @@ Qed.
 
 End Kneser_Lemma.
 
-Lemma Kneser : forall n : nat, 0 < n -> {q : IR | Zero [<=] q |
- q [<] One and (forall p : cpoly CC, monic n p -> forall c : IR,
-  AbsCC p ! Zero [<] c -> {z : CC | AbsCC z[^]n [<=] c | AbsCC p ! z [<] q[*]c})}.
+Lemma Kneser : forall n : nat, 0 < n -> {q : IR | [0] [<=] q |
+ q [<] [1] and (forall p : cpoly CC, monic n p -> forall c : IR,
+  AbsCC p ! [0] [<] c -> {z : CC | AbsCC z[^]n [<=] c | AbsCC p ! z [<] q[*]c})}.
 Proof.
  intros n H.
- exists (One[-]p3m n[*]p3m (2 * n * n)).
+ exists ([1][-]p3m n[*]p3m (2 * n * n)).
   apply less_leEq.
   apply less_leEq_trans with (Half:IR).
    apply pos_half.
@@ -544,10 +544,10 @@ Proof.
  split. apply Kneser_1''.
   intros p H0 c H1.
  elim H0. intros H2 H3.
- cut (nth_coeff n p [=] One). intro H4.
+ cut (nth_coeff n p [=] [1]). intro H4.
   2: auto.
  elim (Kneser_3 (fun i : nat => nth_coeff i p) n H H4 c). intros z H6 H7.
-  2: astepl (AbsCC p ! Zero); auto.
+  2: astepl (AbsCC p ! [0]); auto.
  exists z.
   auto.
  astepl (AbsCC (Sum 0 n (fun i : nat => nth_coeff i p[*]z[^]i))); auto.

@@ -234,7 +234,7 @@ Canonical Structure RRing.
 
 (** reciprocal *)
 
-Definition Rrecip : forall x : RRing, x [#] Zero -> RRing := fun x _ => Rinv x.
+Definition Rrecip : forall x : RRing, x [#] [0] -> RRing := fun x _ => Rinv x.
 
 Lemma R_is_Field : is_CField RRing Rrecip.
 Proof.
@@ -245,7 +245,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma R_is_Field2: forall (x y : RRing) (x_ : x[#]Zero) (y_ : y[#]Zero),
+Lemma R_is_Field2: forall (x y : RRing) (x_ : x[#][0]) (y_ : y[#][0]),
    Rrecip x x_[#]Rrecip y y_ -> x[#]y.
 Proof.
  intros x y x1 y1 H.

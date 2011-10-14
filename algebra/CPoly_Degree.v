@@ -61,7 +61,7 @@ a syntactical property, as the highest coefficient may be [0]. Note that
 the `zero' polynomial [cpoly_zero] has length [0],
 a constant polynomial has length [1] and so forth. So the length
 is always [1] higher than the `degree' (assuming that the highest
-coefficient is [[#]Zero])!
+coefficient is [[#][0]])!
 *)
 
 Fixpoint lth_of_poly (p : RX) : nat :=
@@ -73,7 +73,7 @@ Fixpoint lth_of_poly (p : RX) : nat :=
 (**
 When dealing with constructive polynomials, notably over the reals or
 complex numbers, the degree may be unknown, as we can not decide
-whether the highest coefficient is [[#]Zero]. Hence,
+whether the highest coefficient is [[#][0]]. Hence,
 degree is a relation between polynomials and natural numbers; if the
 degree is unknown for polynomial [p], degree(n,p) doesn't hold for
 any [n].  If we don't know the degree of [p], we may still
@@ -85,11 +85,11 @@ X^(n-1)#, if $p_i \mathrel{\#}0$#pi apart from 0#, we can say that the
 that the `degree is at most [j]'.
 *)
 
-Definition degree_le n (p : RX) : Prop := forall m, n < m -> nth_coeff m p [=] Zero.
+Definition degree_le n (p : RX) : Prop := forall m, n < m -> nth_coeff m p [=] [0].
 
-Definition degree n (p : RX) : CProp := nth_coeff n p [#] Zero and degree_le n p.
+Definition degree n (p : RX) : CProp := nth_coeff n p [#] [0] and degree_le n p.
 
-Definition monic n (p : RX) : Prop := nth_coeff n p [=] One /\ degree_le n p.
+Definition monic n (p : RX) : Prop := nth_coeff n p [=] [1] /\ degree_le n p.
 
 Definition odd_cpoly (p : RX) : CProp := {n : nat | Codd n | degree n p}.
 
@@ -152,12 +152,12 @@ Proof.
  simpl in |- *. algebra.
 Qed.
 
-Lemma degree_c_ : forall c : R, c [#] Zero -> degree 0 (_C_ c).
+Lemma degree_c_ : forall c : R, c [#] [0] -> degree 0 (_C_ c).
 Proof.
  unfold degree in |- *. intros. split. simpl in |- *. auto. apply degree_le_c_.
 Qed.
 
-Lemma monic_c_one : monic 0 (_C_ (One:R)).
+Lemma monic_c_one : monic 0 (_C_ ([1]:R)).
 Proof.
  unfold monic in |- *. intros. split. simpl in |- *. algebra. apply degree_le_c_.
 Qed.
@@ -191,7 +191,7 @@ Lemma degree_le_inv : forall (p : RX) n, degree_le n p -> degree_le n [--]p.
 Proof.
  unfold degree_le in |- *. intros.
  astepl ( [--] (nth_coeff m p)).
- Step_final ( [--] (Zero:R)).
+ Step_final ( [--] ([0]:R)).
 Qed.
 
 Lemma degree_le_plus : forall (p q : RX) n,
@@ -199,7 +199,7 @@ Lemma degree_le_plus : forall (p q : RX) n,
 Proof.
  unfold degree_le in |- *. intros.
  astepl (nth_coeff m p[+]nth_coeff m q).
- Step_final (Zero[+] (Zero:R)).
+ Step_final ([0][+] ([0]:R)).
 Qed.
 
 Lemma degree_le_minus : forall (p q : RX) n,
@@ -207,7 +207,7 @@ Lemma degree_le_minus : forall (p q : RX) n,
 Proof.
  unfold degree_le in |- *. intros.
  astepl (nth_coeff m p[-]nth_coeff m q).
- Step_final (Zero[-] (Zero:R)).
+ Step_final ([0][-] ([0]:R)).
 Qed.
 
 Lemma Sum_degree_le : forall (f : nat -> RX) (n k l : nat), k <= S l ->
@@ -217,22 +217,22 @@ Proof.
  generalize (toCle _ _ H); clear H; intro H.
   inversion H as [|m0 X].
    unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
-   apply eq_transitive_unfolded with (nth_coeff m (Zero:RX)).
+   apply eq_transitive_unfolded with (nth_coeff m ([0]:RX)).
     apply nth_coeff_wd. algebra. algebra.
     inversion X. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
   apply eq_transitive_unfolded with (nth_coeff m (f 0)).
-   apply nth_coeff_wd. cut (f 0[-]Zero [=] f 0). auto. algebra.
+   apply nth_coeff_wd. cut (f 0[-][0] [=] f 0). auto. algebra.
    apply H0; try auto. rewrite H2. auto.
   elim (le_lt_eq_dec _ _ H); intro y.
   apply eq_transitive_unfolded with (nth_coeff m (Sum k l f[+]f (S l))).
    apply nth_coeff_wd. algebra.
    astepl (nth_coeff m (Sum k l f) [+]nth_coeff m (f (S l))).
-  astepr (Zero[+] (Zero:R)). apply bin_op_wd_unfolded.
+  astepr ([0][+] ([0]:R)). apply bin_op_wd_unfolded.
   apply Hrecl. auto with arith. intros.
     apply H0. auto. auto. auto.
      apply H0. auto with arith. auto. auto.
     rewrite y. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
- apply eq_transitive_unfolded with (nth_coeff m (Zero:RX)).
+ apply eq_transitive_unfolded with (nth_coeff m ([0]:RX)).
   apply nth_coeff_wd. algebra. algebra.
 Qed.
 
@@ -260,12 +260,12 @@ Proof.
  elim X. clear X. intros.
  split.
   astepl (nth_coeff n p[+]nth_coeff n q).
-  astepl (Zero[+]nth_coeff n q).
+  astepl ([0][+]nth_coeff n q).
   astepl (nth_coeff n q). auto.
   intros.
  astepl (nth_coeff m0 p[+]nth_coeff m0 q).
  cut (m < m0). intro.
-  Step_final (Zero[+] (Zero:R)).
+  Step_final ([0][+] ([0]:R)).
  apply lt_trans with n; auto.
 Qed.
 
@@ -286,12 +286,12 @@ Proof.
  elim H0. clear H0. intros.
  split.
   astepl (nth_coeff n p[+]nth_coeff n q).
-  astepl (Zero[+]nth_coeff n q).
+  astepl ([0][+]nth_coeff n q).
   Step_final (nth_coeff n q).
  intros.
  astepl (nth_coeff m0 p[+]nth_coeff m0 q).
  cut (m < m0). intro.
-  Step_final (Zero[+] (Zero:R)).
+  Step_final ([0][+] ([0]:R)).
  apply lt_trans with n; auto.
 Qed.
 
@@ -314,8 +314,8 @@ Proof.
   intros.
  cut ({m < i} + {n < m0 - i}). intro.
   elim H4; clear H4; intros.
-   Step_final (Zero[*]nth_coeff (m0 - i) q).
-  Step_final (nth_coeff i p[*]Zero).
+   Step_final ([0][*]nth_coeff (m0 - i) q).
+  Step_final (nth_coeff i p[*][0]).
  elim (lt_eq_lt_dec m i); intro.
   elim a; intro.
    auto.
@@ -330,7 +330,7 @@ Lemma degree_le_Product (l: list (cpoly R)) n:
   degree_le (length l * n) (cr_Product l).
 Proof.
  induction l; intros.
-  apply (degree_le_c_ One).
+  apply (degree_le_c_ [1]).
  change (degree_le (n + length l * n) (a [*] cr_Product l)).
  apply degree_le_mult; intuition.
 Qed.
@@ -360,7 +360,7 @@ Proof.
  astepl (Sum 0 (m + n) (fun i : nat => nth_coeff i p[*]nth_coeff (m + n - i) q)).
  astepl (Sum 0 m (fun i : nat => nth_coeff i p[*]nth_coeff (m + n - i) q) [+]
    Sum (S m) (m + n) (fun i : nat => nth_coeff i p[*]nth_coeff (m + n - i) q)).
- astepr (nth_coeff m p[*]nth_coeff n q[+]Zero).
+ astepr (nth_coeff m p[*]nth_coeff n q[+][0]).
  apply bin_op_wd_unfolded.
   elim (O_or_S m); intro y.
    elim y. clear y. intros x y. rewrite <- y in H. rewrite <- y.
@@ -368,11 +368,11 @@ Proof.
      (Sum 0 x (fun i : nat => nth_coeff i p[*]nth_coeff (S x + n - i) q) [+]
        nth_coeff (S x) p[*]nth_coeff (S x + n - S x) q).
     apply Sum_last with (f := fun i : nat => nth_coeff i p[*]nth_coeff (S x + n - i) q).
-   astepr (Zero[+]nth_coeff (S x) p[*]nth_coeff n q).
+   astepr ([0][+]nth_coeff (S x) p[*]nth_coeff n q).
    apply bin_op_wd_unfolded.
     apply Sum_zero. auto with arith. intros.
      cut (n < S x + n - i). intro.
-     Step_final (nth_coeff i p[*]Zero).
+     Step_final (nth_coeff i p[*][0]).
     omega.
    replace (S x + n - S x) with n. algebra. auto with arith.
     rewrite <- y in H. rewrite <- y.
@@ -381,20 +381,20 @@ Proof.
   auto with arith.
  apply Sum_zero. auto with arith. intros.
   cut (m < i). intro.
-  Step_final (Zero[*]nth_coeff (m + n - i) q).
+  Step_final ([0][*]nth_coeff (m + n - i) q).
  auto.
 Qed.
 
 Lemma lead_coeff_product_1 (n: nat) (l: list (cpoly R)):
-  (forall p, In p l -> (nth_coeff n p [=] One /\ degree_le n p)) ->
-  nth_coeff (length l * n) (cr_Product l) [=] One.
+  (forall p, In p l -> (nth_coeff n p [=] [1] /\ degree_le n p)) ->
+  nth_coeff (length l * n) (cr_Product l) [=] [1].
 Proof with auto.
  intro H.
  induction l.
   simpl. reflexivity.
- change (nth_coeff (n + length l * n) (a [*] cr_Product l)[=]One).
+ change (nth_coeff (n + length l * n) (a [*] cr_Product l)[=][1]).
  rewrite degree_mult_aux.
-   setoid_replace (nth_coeff n a) with (One:R).
+   setoid_replace (nth_coeff n a) with ([1]:R).
     rewrite IHl.
      apply mult_one.
     intros. apply H...
@@ -412,7 +412,7 @@ Proof.
  unfold monic in |- *. intros.
  elim H. clear H. intros. elim H0. clear H0. intros. split.
  astepl (nth_coeff m p[*]nth_coeff n q).
-  Step_final (One[*] (One:R)).
+  Step_final ([1][*] ([1]:R)).
  apply degree_le_mult; auto.
 Qed.
 
@@ -421,7 +421,7 @@ Lemma degree_le_nexp : forall (p : RX) m n,
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
  replace (m * 0) with 0.
-   apply degree_le_wd with (_C_ (One:R)). algebra.
+   apply degree_le_wd with (_C_ ([1]:R)). algebra.
     apply degree_le_c_.
   auto.
  replace (m * S n) with (m * n + m).
@@ -434,7 +434,7 @@ Lemma monic_nexp : forall (p : RX) m n, monic m p -> monic (m * n) (p[^]n).
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
  replace (m * 0) with 0.
-   apply monic_wd with (_C_ (One:R)). algebra.
+   apply monic_wd with (_C_ ([1]:R)). algebra.
     apply monic_c_one.
   auto.
  replace (m * S n) with (m * n + m).
@@ -444,7 +444,7 @@ Proof.
 Qed.
 
 Lemma lt_i_lth_of_poly : forall i (p : RX),
- nth_coeff i p [#] Zero -> i < lth_of_poly p.
+ nth_coeff i p [#] [0] -> i < lth_of_poly p.
 Proof.
  intros i. induction  i as [| i Hreci]; intros; rename X into H.
  induction  p as [| s p Hrecp]; intros.
@@ -479,16 +479,16 @@ Proof.
    with (Sum 0 n (fun i0 : nat => nth_coeff i0 p[*]nth_coeff i (_X_[^]i0))).
   apply Sum_wd. intros. algebra.
   elim (le_lt_dec i n); intros.
-  astepr (nth_coeff i p[*]One).
+  astepr (nth_coeff i p[*][1]).
   astepr (nth_coeff i p[*]nth_coeff i (_X_[^]i)).
   apply Sum_term with (i := i) (f := fun i0 : nat => nth_coeff i0 p[*]nth_coeff i (_X_[^]i0)).
     auto with arith. auto.
    intros.
-  Step_final (nth_coeff j p[*]Zero).
- astepr (Zero:R).
+  Step_final (nth_coeff j p[*][0]).
+ astepr ([0]:R).
  apply Sum_zero. auto with arith. intros.
   cut (i <> i0). intro.
-  Step_final (nth_coeff i0 p[*]Zero).
+  Step_final (nth_coeff i0 p[*][0]).
  intro; rewrite <- H2 in H1.
  apply (le_not_lt i n); auto.
 Qed.
@@ -520,7 +520,7 @@ Proof.
  apply all_nth_coeff_eq_imp. intros.
  elim (O_or_S i); intro y.
   elim y. clear y. intros x y. rewrite <- y.
-  cut (0 < S x). intro. Step_final (Zero:R). auto with arith.
+  cut (0 < S x). intro. Step_final ([0]:R). auto with arith.
    rewrite <- y. algebra.
 Qed.
 
@@ -540,7 +540,7 @@ Lemma degree_le_cpoly_linear : forall (p : cpoly R) c n,
  degree_le (S n) (c[+X*]p) -> degree_le n p.
 Proof.
  unfold degree_le in |- *. intros.
- change (nth_coeff (S m) (cpoly_linear _ c p)  [=] Zero) in |- *.
+ change (nth_coeff (S m) (cpoly_linear _ c p)  [=] [0]) in |- *.
  apply H. auto with arith.
 Qed.
 
@@ -554,7 +554,7 @@ Proof.
  apply degree_le_cpoly_linear with c. auto.
 Qed.
 
-Lemma monic_one : forall (p : cpoly R) c, monic 1 (c[+X*]p) -> forall x, p ! x [=] One.
+Lemma monic_one : forall (p : cpoly R) c, monic 1 (c[+X*]p) -> forall x, p ! x [=] [1].
 Proof.
  intros. cut (monic 0 p). unfold monic in |- *. intros. elim H0. clear H0.
  intros H0 H1.
@@ -566,12 +566,12 @@ Proof.
  apply monic_cpoly_linear with c. auto.
 Qed.
 
-Lemma monic_apzero : forall (p : RX) n, monic n p -> p [#] Zero.
+Lemma monic_apzero : forall (p : RX) n, monic n p -> p [#] [0].
 Proof.
  unfold monic in |- *. intros.
  elim H. clear H. intros.
  apply nth_coeff_ap_zero_imp with n.
- astepl (One:R). apply one_ap_zero.
+ astepl ([1]:R). apply one_ap_zero.
 Qed.
 
 End Degree_props.
@@ -608,7 +608,7 @@ Lemma degree_nexp : forall (p : FX) m n, degree m p -> degree (m * n) (p[^]n).
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
  replace (m * 0) with 0.
-   apply degree_wd with (_C_ (One:F)). algebra.
+   apply degree_wd with (_C_ ([1]:F)). algebra.
     apply degree_c_. algebra.
    auto.
  replace (m * S n) with (m * n + m).
@@ -623,7 +623,7 @@ Proof.
  unfold degree in |- *. unfold degree_le in |- *. intros.  rename H0 into H1. rename H into H0. rename X into H. elim H. clear H. intros H2 H3.
  elim (Cpoly_ex_degree _ q). unfold degree_le in |- *. intro N. intro H4.
  (* Set_ not necessary *)
- cut (forall k i : nat, n < i -> N - k < i -> nth_coeff i q [=] Zero). intro H5.
+ cut (forall k i : nat, n < i -> N - k < i -> nth_coeff i q [=] [0]). intro H5.
   elim (le_lt_dec m0 N); intros H6.
    replace m0 with (N - (N - m0)). apply H5 with (N - n).
     omega. omega. omega.
@@ -631,7 +631,7 @@ Proof.
  intro. induction  k as [| k Hreck]; intros.
  apply H4. rewrite <- minus_n_O in H5; auto.
   elim (le_lt_eq_dec (N - k) i); try intro y. auto. rewrite y in Hreck.
-   apply mult_cancel_lft with (nth_coeff m p). auto. astepr (Zero:F).
+   apply mult_cancel_lft with (nth_coeff m p). auto. astepr ([0]:F).
    apply eq_transitive_unfolded with
      (Sum 0 (m + i) (fun j : nat => nth_coeff j p[*]nth_coeff (m + i - j) q)).
    pattern i at 1 in |- *. replace i with (m + i - m).
@@ -641,9 +641,9 @@ Proof.
      intros. elim (le_lt_dec j m); intros.
     cut (i < m + i - j). intro.
       cut (n < m + i - j). intro.
-       Step_final (nth_coeff j p[*]Zero).
+       Step_final (nth_coeff j p[*][0]).
       omega. omega.
-     Step_final (Zero[*]nth_coeff (m + i - j) q).
+     Step_final ([0][*]nth_coeff (m + i - j) q).
    auto with arith.
   astepl (nth_coeff (m + i) (p[*]q)).
   cut (m + n < m + i). intro.

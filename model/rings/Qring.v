@@ -74,11 +74,11 @@ Lemma injz_Nring : forall n,
 Proof.
  intro n.
  induction  n as [| n Hrecn].
-  change ((Zero:Q_as_CRing)[=]Zero) in |- *.
+  change (([0]:Q_as_CRing)[=][0]) in |- *.
   apply eq_reflexive_unfolded.
- change (nring (R:=Q_as_CRing) n[+]One[=]inject_Z (nring (R:=Z_as_CRing) n[+]One)) in |- *.
- Step_final ((inject_Z (nring (R:=Z_as_CRing) n):Q_as_CRing)[+]One).
- astepl ((inject_Z (nring (R:=Z_as_CRing) n):Q_as_CRing)[+] inject_Z (One:Z_as_CRing)).
+ change (nring (R:=Q_as_CRing) n[+][1][=]inject_Z (nring (R:=Z_as_CRing) n[+][1])) in |- *.
+ Step_final ((inject_Z (nring (R:=Z_as_CRing) n):Q_as_CRing)[+][1]).
+ astepl ((inject_Z (nring (R:=Z_as_CRing) n):Q_as_CRing)[+] inject_Z ([1]:Z_as_CRing)).
  apply eq_symmetric_unfolded.
  apply injz_plus.
 Qed.
@@ -98,10 +98,10 @@ Proof.
  intro n.
  induction  n as [| n Hrecn].
   change (Qmake 0%Z 1%positive==Qmake 0%Z 1%positive) in |- *.
-  change (Zero[=](Zero:Q_as_CRing)) in |- *.
+  change ([0][=]([0]:Q_as_CRing)) in |- *.
   apply eq_reflexive_unfolded.
- change (nring (R:=Q_as_CRing) n[+]One[=]inject_Z (S n)) in |- *.
- Step_final ((inject_Z n:Q_as_CRing)[+]One).
+ change (nring (R:=Q_as_CRing) n[+][1][=]inject_Z (S n)) in |- *.
+ Step_final ((inject_Z n:Q_as_CRing)[+][1]).
  astepl ((inject_Z n:Q_as_CRing)[+]inject_Z 1).
  simpl in |- *.
  red in |- *.

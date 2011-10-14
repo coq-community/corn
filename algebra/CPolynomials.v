@@ -75,7 +75,7 @@ Inductive cpoly : Type :=
 
 Definition cpoly_constant (c : CR) : cpoly := cpoly_linear c cpoly_zero.
 
-Definition cpoly_one : cpoly := cpoly_constant One.
+Definition cpoly_one : cpoly := cpoly_constant [1].
 
 (**
 Some useful induction lemmas for doubly quantified propositions.
@@ -135,7 +135,7 @@ Qed.
 Fixpoint cpoly_eq_zero (p : cpoly) : Prop :=
   match p with
   | cpoly_zero        => True
-  | cpoly_linear c p1 => c [=] Zero /\ cpoly_eq_zero p1
+  | cpoly_linear c p1 => c [=] [0] /\ cpoly_eq_zero p1
   end.
 
 Fixpoint cpoly_eq (p q : cpoly) {struct p} : Prop :=
@@ -156,7 +156,7 @@ Qed.
 Fixpoint cpoly_ap_zero (p : cpoly) : CProp :=
   match p with
   | cpoly_zero        => False
-  | cpoly_linear c p1 => c [#] Zero or cpoly_ap_zero p1
+  | cpoly_linear c p1 => c [#] [0] or cpoly_ap_zero p1
   end.
 
 Fixpoint cpoly_ap (p q : cpoly) {struct p} : CProp :=
@@ -229,7 +229,7 @@ Proof.
  elim H0; intro H1.
   induction  r as [| s r Hrecr].
    simpl in |- *.
-   generalize (ap_cotransitive_unfolded _ _ _ H1 Zero); intro H2.
+   generalize (ap_cotransitive_unfolded _ _ _ H1 [0]); intro H2.
    elim H2; auto.
    intro H3.
    right; left; apply ap_symmetric_unfolded; assumption.
@@ -248,7 +248,7 @@ Proof.
   simpl in |- *.
   intros p0 q0 c0 d0 H2 H3.
   elim H3; intro H4.
-   elim (ap_cotransitive_unfolded _ _ _ H4 Zero); intro H5.
+   elim (ap_cotransitive_unfolded _ _ _ H4 [0]); intro H5.
     auto.
    right; left; apply ap_symmetric_unfolded; assumption.
   elim (H2 H4); auto.
@@ -271,7 +271,7 @@ Proof.
     intros H H0; inversion H0.
    simpl in |- *.
    intros s c H.
-   cut (Not (s [#] Zero) <-> s [=] Zero).
+   cut (Not (s [#] [0]) <-> s [=] [0]).
     unfold Not in |- *.
     intro H0.
     elim H0; intros H1 H2.
@@ -293,7 +293,7 @@ Proof.
   simple induction p.
    simpl in |- *.
    intro c.
-   cut (Not (c [#] Zero) <-> c [=] Zero).
+   cut (Not (c [#] [0]) <-> c [=] [0]).
     unfold Not in |- *.
     intro H.
     elim H; intros H0 H1.
@@ -307,8 +307,8 @@ Proof.
   simpl in |- *.
   intros s c H d.
   generalize (H d).
-  generalize (ap_tight CR d Zero).
-  generalize (ap_tight CR s Zero).
+  generalize (ap_tight CR d [0]).
+  generalize (ap_tight CR s [0]).
   unfold Not in |- *.
   intros H0 H1 H2.
   elim H0; clear H0; intros H3 H4.
@@ -418,7 +418,7 @@ Proof.
 Qed.
 
 Lemma cpoly_lin_eq_zero_ : forall p c,
- cpoly_linear_cs c p [=] cpoly_zero_cs -> c [=] Zero /\ p [=] cpoly_zero_cs.
+ cpoly_linear_cs c p [=] cpoly_zero_cs -> c [=] [0] /\ p [=] cpoly_zero_cs.
 Proof.
  unfold cpoly_linear_cs in |- *.
  unfold cpoly_zero_cs in |- *.
@@ -431,7 +431,7 @@ Proof.
 Qed.
 
 Lemma _cpoly_lin_eq_zero : forall p c,
- c [=] Zero /\ p [=] cpoly_zero_cs -> cpoly_linear_cs c p [=] cpoly_zero_cs.
+ c [=] [0] /\ p [=] cpoly_zero_cs -> cpoly_linear_cs c p [=] cpoly_zero_cs.
 Proof.
  unfold cpoly_linear_cs in |- *.
  unfold cpoly_zero_cs in |- *.
@@ -444,13 +444,13 @@ Proof.
 Qed.
 
 Lemma cpoly_zero_eq_lin_ : forall p c,
- cpoly_zero_cs [=] cpoly_linear_cs c p -> c [=] Zero /\ cpoly_zero_cs [=] p.
+ cpoly_zero_cs [=] cpoly_linear_cs c p -> c [=] [0] /\ cpoly_zero_cs [=] p.
 Proof.
  auto.
 Qed.
 
 Lemma _cpoly_zero_eq_lin : forall p c,
- c [=] Zero /\ cpoly_zero_cs [=] p -> cpoly_zero_cs [=] cpoly_linear_cs c p.
+ c [=] [0] /\ cpoly_zero_cs [=] p -> cpoly_zero_cs [=] cpoly_linear_cs c p.
 Proof.
  auto.
 Qed.
@@ -470,7 +470,7 @@ Qed.
 
 
 Lemma cpoly_lin_ap_zero_ : forall p c,
- cpoly_linear_cs c p [#] cpoly_zero_cs -> c [#] Zero or p [#] cpoly_zero_cs.
+ cpoly_linear_cs c p [#] cpoly_zero_cs -> c [#] [0] or p [#] cpoly_zero_cs.
 Proof.
  unfold cpoly_zero_cs in |- *.
  intros p c H.
@@ -484,7 +484,7 @@ Proof.
 Qed.
 
 Lemma _cpoly_lin_ap_zero : forall p c,
- c [#] Zero or p [#] cpoly_zero_cs -> cpoly_linear_cs c p [#] cpoly_zero_cs.
+ c [#] [0] or p [#] cpoly_zero_cs -> cpoly_linear_cs c p [#] cpoly_zero_cs.
 Proof.
  unfold cpoly_zero_cs in |- *.
  intros.
@@ -497,7 +497,7 @@ Proof.
 Qed.
 
 Lemma cpoly_lin_ap_zero : forall p c,
- (cpoly_linear_cs c p [#] cpoly_zero_cs) = (c [#] Zero or p [#] cpoly_zero_cs).
+ (cpoly_linear_cs c p [#] cpoly_zero_cs) = (c [#] [0] or p [#] cpoly_zero_cs).
 Proof.
  intros.
  simpl in |- *.
@@ -507,7 +507,7 @@ Proof.
 Qed.
 
 Lemma cpoly_zero_ap_lin_ : forall p c,
- cpoly_zero_cs [#] cpoly_linear_cs c p -> c [#] Zero or cpoly_zero_cs [#] p.
+ cpoly_zero_cs [#] cpoly_linear_cs c p -> c [#] [0] or cpoly_zero_cs [#] p.
 Proof.
  intros.
  simpl in |- *.
@@ -515,7 +515,7 @@ Proof.
 Qed.
 
 Lemma _cpoly_zero_ap_lin : forall p c,
- c [#] Zero or cpoly_zero_cs [#] p -> cpoly_zero_cs [#] cpoly_linear_cs c p.
+ c [#] [0] or cpoly_zero_cs [#] p -> cpoly_zero_cs [#] cpoly_linear_cs c p.
 Proof.
  intros.
  simpl in |- *.
@@ -523,7 +523,7 @@ Proof.
 Qed.
 
 Lemma cpoly_zero_ap_lin : forall p c,
- (cpoly_zero_cs [#] cpoly_linear_cs c p) = (c [#] Zero or cpoly_zero_cs [#] p).
+ (cpoly_zero_cs [#] cpoly_linear_cs c p) = (c [#] [0] or cpoly_zero_cs [#] p).
 Proof. reflexivity. Qed.
 
 Lemma cpoly_lin_ap_lin_ : forall p q c d,
@@ -561,7 +561,7 @@ Proof.
  apply Ccpoly_double_ind0_cs.
    intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs;[assumption|].
    intros p1 c. intros.
-   apply X with (cpoly_linear_cs c p1) (cpoly_linear_cs Zero cpoly_zero_cs).
+   apply X with (cpoly_linear_cs c p1) (cpoly_linear_cs [0] cpoly_zero_cs).
      algebra.
     apply _cpoly_lin_eq_zero.
     split; algebra.
@@ -569,7 +569,7 @@ Proof.
   intro p0; pattern p0 in |- *; apply Ccpoly_ind_cs.
    assumption.
   intros.
-  apply X with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs c p1).
+  apply X with (cpoly_linear_cs [0] cpoly_zero_cs) (cpoly_linear_cs c p1).
     apply _cpoly_lin_eq_zero;split; algebra.
    algebra.
   apply X1;  assumption.
@@ -597,7 +597,7 @@ Proof.
   intro r; pattern r in |- *; apply Ccpoly_ind_cs.
    assumption.
   intros.
-  apply X with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs Zero cpoly_zero_cs)
+  apply X with (cpoly_linear_cs [0] cpoly_zero_cs) (cpoly_linear_cs [0] cpoly_zero_cs)
     (cpoly_linear_cs c p0).
      apply _cpoly_lin_eq_zero; split; algebra.
     apply _cpoly_lin_eq_zero; split; algebra.
@@ -606,7 +606,7 @@ Proof.
   assumption.
  do 6 intro.
  pattern r in |- *; apply Ccpoly_ind_cs.
-  apply X with (cpoly_linear_cs c p0) (cpoly_linear_cs d q0) (cpoly_linear_cs Zero cpoly_zero_cs).
+  apply X with (cpoly_linear_cs c p0) (cpoly_linear_cs d q0) (cpoly_linear_cs [0] cpoly_zero_cs).
      algebra.
     algebra.
    apply _cpoly_lin_eq_zero; split; algebra.
@@ -627,7 +627,7 @@ Proof.
    intro p0; pattern p0 in |- *; apply cpoly_ind_cs.
     assumption.
    intros.
-   apply H with (cpoly_linear_cs c p1) (cpoly_linear_cs Zero cpoly_zero_cs).
+   apply H with (cpoly_linear_cs c p1) (cpoly_linear_cs [0] cpoly_zero_cs).
      algebra.
     apply _cpoly_lin_eq_zero.
     split; algebra.
@@ -636,7 +636,7 @@ Proof.
   intro p0; pattern p0 in |- *; apply cpoly_ind_cs.
    assumption.
   intros.
-  apply H with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs c p1).
+  apply H with (cpoly_linear_cs [0] cpoly_zero_cs) (cpoly_linear_cs c p1).
     apply _cpoly_lin_eq_zero.
     split; algebra.
    algebra.
@@ -665,7 +665,7 @@ Proof.
   intro r; pattern r in |- *; apply cpoly_ind_cs.
    assumption.
   intros.
-  apply H with (cpoly_linear_cs Zero cpoly_zero_cs) (cpoly_linear_cs Zero cpoly_zero_cs)
+  apply H with (cpoly_linear_cs [0] cpoly_zero_cs) (cpoly_linear_cs [0] cpoly_zero_cs)
     (cpoly_linear_cs c p0).
      apply _cpoly_lin_eq_zero; split; algebra.
     apply _cpoly_lin_eq_zero; split; algebra.
@@ -674,7 +674,7 @@ Proof.
   assumption.
  do 6 intro.
  pattern r in |- *; apply cpoly_ind_cs.
-  apply H with (cpoly_linear_cs c p0) (cpoly_linear_cs d q0) (cpoly_linear_cs Zero cpoly_zero_cs).
+  apply H with (cpoly_linear_cs c p0) (cpoly_linear_cs d q0) (cpoly_linear_cs [0] cpoly_zero_cs).
      algebra.
     algebra.
    apply _cpoly_lin_eq_zero; split; algebra.
@@ -759,7 +759,7 @@ Proof.
   intros.
   2: apply cpoly_lin_ap_lin_.
   2: assumption.
- cut (c [#] Zero or p0 [#] cpoly_zero_cs).
+ cut (c [#] [0] or p0 [#] cpoly_zero_cs).
   intro. apply _cpoly_lin_ap_zero. assumption.
   elim X1; intro.
   left.
@@ -797,13 +797,13 @@ Proof.
  intros p0 q0 c d.
  rewrite cpoly_lin_plus_lin.
  intros.
- cut (c[+]d [#] Zero or cpoly_plus_cs p0 q0 [#] cpoly_zero_cs).
+ cut (c[+]d [#] [0] or cpoly_plus_cs p0 q0 [#] cpoly_zero_cs).
   2: apply cpoly_lin_ap_zero_.
   2: assumption.
  clear X0.
  intros H0.
  elim H0; intro H1.
-  cut (c[+]d [#] Zero[+]Zero).
+  cut (c[+]d [#] [0][+][0]).
    intro H2.
    elim (cs_bin_op_strext _ _ _ _ _ _ H2); intro H3.
     left.
@@ -811,22 +811,22 @@ Proof.
     left.
     assumption.
    right.
-   cut (d [#] Zero or q0 [#] cpoly_zero_cs).
+   cut (d [#] [0] or q0 [#] cpoly_zero_cs).
     intro H4.
     apply _cpoly_lin_ap_zero.
     auto.
    left.
    assumption.
-  astepr (Zero:CR). auto.
+  astepr ([0]:CR). auto.
   elim (X H1); intro.
   left.
-  cut (c [#] Zero or p0 [#] cpoly_zero_cs).
+  cut (c [#] [0] or p0 [#] cpoly_zero_cs).
    intro; apply _cpoly_lin_ap_zero.
    auto.
   right.
   assumption.
  right.
- cut (d [#] Zero or q0 [#] cpoly_zero_cs).
+ cut (d [#] [0] or q0 [#] cpoly_zero_cs).
   intro.
   apply _cpoly_lin_ap_zero.
   auto.
@@ -864,7 +864,7 @@ Proof.
    2: apply cpoly_lin_ap_lin_; assumption.
   clear X0; intro H1.
   elim H1; intro H2.
-   cut (c[+]c0 [#] Zero[+]d).
+   cut (c[+]c0 [#] [0][+]d).
     intro H3.
     elim (cs_bin_op_strext _ _ _ _ _ _ H3).
      intro H4.
@@ -895,7 +895,7 @@ Proof.
     2: apply cpoly_lin_ap_lin_.
     2: auto.
    elim H2; intro H3.
-    cut (c[+]c0 [#] d[+]Zero).
+    cut (c[+]c0 [#] d[+][0]).
      intro H4.
      elim (cs_bin_op_strext _ _ _ _ _ _ H4).
       intro.
@@ -925,7 +925,7 @@ Proof.
    2: assumption.
   clear X1; intro H1.
   elim H1; intro H2.
-   cut (c[+]Zero [#] d[+]c0).
+   cut (c[+][0] [#] d[+]c0).
     intro H3.
     elim (cs_bin_op_strext _ _ _ _ _ _ H3).
      intro.
@@ -1053,7 +1053,7 @@ Proof.
   intro p; pattern p in |- *; apply Ccpoly_ind_cs.
    auto.
   intros.
-  cut ( [--]c [#] Zero or cpoly_inv_cs p0 [#] cpoly_zero_cs).
+  cut ( [--]c [#] [0] or cpoly_inv_cs p0 [#] cpoly_zero_cs).
    2: apply cpoly_lin_ap_zero_.
    2: auto.
   clear X0; intro H0.
@@ -1093,7 +1093,7 @@ Lemma cpoly_cg_proof : is_CGroup cpoly_cmonoid cpoly_inv_op.
 Proof.
  intro x.
  unfold is_inverse in |- *.
- assert (x[+]cpoly_inv_cs x [=] Zero).
+ assert (x[+]cpoly_inv_cs x [=] [0]).
   pattern x in |- *; apply cpoly_ind_cs.
    rewrite cpoly_inv_zero.
    rewrite -> cpoly_plus_zero.
@@ -1132,7 +1132,7 @@ Fixpoint cpoly_mult (p q : cpoly) {struct p} : cpoly :=
   match p with
   | cpoly_zero        => cpoly_zero
   | cpoly_linear c p1 =>
-      cpoly_plus (cpoly_mult_cr q c) (cpoly_linear Zero (cpoly_mult p1 q))
+      cpoly_plus (cpoly_mult_cr q c) (cpoly_linear [0] (cpoly_mult p1 q))
   end.
 
 Definition cpoly_mult_cr_cs (p : cpoly_csetoid) c : cpoly_csetoid :=
@@ -1147,7 +1147,7 @@ Lemma cpoly_lin_mult_cr : forall c d q,
   cpoly_linear_cs (c[*]d) (cpoly_mult_cr_cs q c).
 Proof. auto. Qed.
 
-Lemma cpoly_mult_cr_zero : forall p, cpoly_mult_cr_cs p Zero [=] cpoly_zero_cs.
+Lemma cpoly_mult_cr_zero : forall p, cpoly_mult_cr_cs p [0] [=] cpoly_zero_cs.
 Proof.
  intro; pattern p in |- *; apply cpoly_ind_cs.
   rewrite cpoly_zero_mult_cr.
@@ -1178,11 +1178,11 @@ Proof.
    do 2 intro.
    rewrite cpoly_lin_mult_cr.
    intros.
-   cut (y1[*]c [#] Zero or cpoly_mult_cr_cs p0 y1 [#] cpoly_zero_cs).
+   cut (y1[*]c [#] [0] or cpoly_mult_cr_cs p0 y1 [#] cpoly_zero_cs).
     2: apply cpoly_lin_ap_zero_.
     2: auto.
    clear H0; intro H1.
-   cut (c [#] Zero or p0 [#] cpoly_zero_cs).
+   cut (c [#] [0] or p0 [#] cpoly_zero_cs).
     intro; apply _cpoly_lin_ap_zero.
     auto.
    elim H1; intro H2.
@@ -1200,11 +1200,11 @@ Proof.
   do 2 intro.
   rewrite cpoly_lin_mult_cr.
   intros.
-  cut (y2[*]c [#] Zero or cpoly_zero_cs [#] cpoly_mult_cr_cs p0 y2).
+  cut (y2[*]c [#] [0] or cpoly_zero_cs [#] cpoly_mult_cr_cs p0 y2).
    2: apply cpoly_zero_ap_lin_.
    2: auto.
   clear X1; intro H1.
-  cut (c [#] Zero or cpoly_zero_cs [#] p0).
+  cut (c [#] [0] or cpoly_zero_cs [#] p0).
    intro.
    apply _cpoly_zero_ap_lin. auto.
    elim H1; intro H2.
@@ -1239,7 +1239,7 @@ Proof. auto. Qed.
 
 Lemma cpoly_lin_mult : forall c p q,
  cpoly_mult_cs (cpoly_linear_cs c p) q =
-  cpoly_plus_cs (cpoly_mult_cr_cs q c) (cpoly_linear_cs Zero (cpoly_mult_cs p q)).
+  cpoly_plus_cs (cpoly_mult_cr_cs q c) (cpoly_linear_cs [0] (cpoly_mult_cs p q)).
 Proof. auto. Qed.
 
 Lemma cpoly_mult_op_strext : bin_op_strext cpoly_csetoid cpoly_mult_cs.
@@ -1254,11 +1254,11 @@ Proof.
    do 2 intro.
    rewrite cpoly_lin_mult.
    intros.
-   cut ((c [#] Zero or p0 [#] cpoly_zero_cs) or y1 [#] y2).
+   cut ((c [#] [0] or p0 [#] cpoly_zero_cs) or y1 [#] y2).
     intro H1. elim H1.  intro; left; apply _cpoly_lin_ap_zero; assumption.
     auto.
-   cut (cpoly_plus_cs (cpoly_mult_cr_cs y1 c) (cpoly_linear_cs Zero (cpoly_mult_cs p0 y1)) [#]
-     cpoly_plus_cs (cpoly_mult_cr_cs y2 Zero) (cpoly_linear_cs Zero (cpoly_mult_cs cpoly_zero_cs y2))).
+   cut (cpoly_plus_cs (cpoly_mult_cr_cs y1 c) (cpoly_linear_cs [0] (cpoly_mult_cs p0 y1)) [#]
+     cpoly_plus_cs (cpoly_mult_cr_cs y2 [0]) (cpoly_linear_cs [0] (cpoly_mult_cs cpoly_zero_cs y2))).
     intro H1.
     elim (cpoly_plus_op_strext _ _ _ _ H1); intro H2.
      elim (cpoly_mult_cr_strext _ _ _ _ H2); auto.
@@ -1278,12 +1278,12 @@ Proof.
   intro; pattern p in |- *; apply Ccpoly_ind_cs.
    auto.
   intros.
-  cut ((c [#] Zero or cpoly_zero_cs [#] p0) or y1 [#] y2).
+  cut ((c [#] [0] or cpoly_zero_cs [#] p0) or y1 [#] y2).
    intro.
    elim X1; try auto.
-  cut (cpoly_plus_cs (cpoly_mult_cr_cs y1 Zero)
-    (cpoly_linear_cs Zero (cpoly_mult_cs cpoly_zero_cs y1)) [#] cpoly_plus_cs (cpoly_mult_cr_cs y2 c)
-      (cpoly_linear_cs Zero (cpoly_mult_cs p0 y2))).
+  cut (cpoly_plus_cs (cpoly_mult_cr_cs y1 [0])
+    (cpoly_linear_cs [0] (cpoly_mult_cs cpoly_zero_cs y1)) [#] cpoly_plus_cs (cpoly_mult_cr_cs y2 c)
+      (cpoly_linear_cs [0] (cpoly_mult_cs p0 y2))).
    intro H1.
    elim (cpoly_plus_op_strext _ _ _ _ H1); intro H2.
     elim (cpoly_mult_cr_strext _ _ _ _ H2); auto.
@@ -1291,7 +1291,7 @@ Proof.
     left. left.
     apply ap_symmetric_unfolded.
     assumption.
-   cut ((Zero:CR) [#] Zero or cpoly_mult_cs cpoly_zero_cs y1 [#] cpoly_mult_cs p0 y2).
+   cut (([0]:CR) [#] [0] or cpoly_mult_cs cpoly_zero_cs y1 [#] cpoly_mult_cs p0 y2).
     2: apply cpoly_lin_ap_lin_; auto.
    clear H2; intro H2.
    elim H2; intro H3.
@@ -1367,8 +1367,8 @@ Proof.
  repeat rewrite cpoly_lin_mult.
  apply eq_transitive_unfolded with (cpoly_plus_cs
    (cpoly_plus_cs (cpoly_mult_cr_cs q c) (cpoly_mult_cr_cs r c))
-     (cpoly_plus_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))
-       (cpoly_linear_cs Zero (cpoly_mult_cs p0 r)))).
+     (cpoly_plus_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))
+       (cpoly_linear_cs [0] (cpoly_mult_cs p0 r)))).
   apply cpoly_plus_op_wd.
    apply cpoly_mult_cr_dist.
   rewrite cpoly_lin_plus_lin.
@@ -1378,21 +1378,21 @@ Proof.
   assumption.
  clear H.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cr_cs q c)
-   (cpoly_plus_cs (cpoly_mult_cr_cs r c) (cpoly_plus_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))
-     (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))))).
+   (cpoly_plus_cs (cpoly_mult_cr_cs r c) (cpoly_plus_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))
+     (cpoly_linear_cs [0] (cpoly_mult_cs p0 r))))).
   apply eq_symmetric_unfolded.
   apply cpoly_plus_associative.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cr_cs q c)
-   (cpoly_plus_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q)) (cpoly_plus_cs (cpoly_mult_cr_cs r c)
-     (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))))).
+   (cpoly_plus_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q)) (cpoly_plus_cs (cpoly_mult_cr_cs r c)
+     (cpoly_linear_cs [0] (cpoly_mult_cs p0 r))))).
   apply cpoly_plus_op_wd.
    algebra.
   apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_plus_cs (cpoly_mult_cr_cs r c)
-    (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))) (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))).
+    (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))) (cpoly_linear_cs [0] (cpoly_mult_cs p0 r))).
    apply cpoly_plus_associative.
   apply eq_transitive_unfolded with (cpoly_plus_cs
-    (cpoly_plus_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))
-      (cpoly_mult_cr_cs r c)) (cpoly_linear_cs Zero (cpoly_mult_cs p0 r))).
+    (cpoly_plus_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))
+      (cpoly_mult_cr_cs r c)) (cpoly_linear_cs [0] (cpoly_mult_cs p0 r))).
    apply cpoly_plus_op_wd.
     apply cpoly_plus_commutative.
    algebra.
@@ -1428,7 +1428,7 @@ Proof.
  repeat rewrite cpoly_lin_mult_cr.
  rewrite cpoly_lin_mult.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cr_cs (cpoly_mult_cr_cs q c0) c)
-   (cpoly_mult_cr_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q)) c)).
+   (cpoly_mult_cr_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q)) c)).
   apply cpoly_mult_cr_dist.
  apply cpoly_plus_op_wd.
   apply cpoly_mult_cr_assoc_mult_cr.
@@ -1452,7 +1452,7 @@ Qed.
 
 Lemma cpoly_mult_lin : forall c p q,
  cpoly_mult_cs p (cpoly_linear_cs c q) [=]
-  cpoly_plus_cs (cpoly_mult_cr_cs p c) (cpoly_linear_cs Zero (cpoly_mult_cs p q)).
+  cpoly_plus_cs (cpoly_mult_cr_cs p c) (cpoly_linear_cs [0] (cpoly_mult_cs p q)).
 Proof.
  intros.
  pattern p in |- *; apply cpoly_ind_cs.
@@ -1469,17 +1469,17 @@ Proof.
  algebra.
  apply eq_transitive_unfolded with (cpoly_plus_cs
    (cpoly_plus_cs (cpoly_mult_cr_cs p0 c) (cpoly_mult_cr_cs q c0))
-     (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))).
+     (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))).
   2: apply eq_symmetric_unfolded.
   2: apply cpoly_plus_associative.
  apply eq_transitive_unfolded with (cpoly_plus_cs
    (cpoly_plus_cs (cpoly_mult_cr_cs q c0) (cpoly_mult_cr_cs p0 c))
-     (cpoly_linear_cs Zero (cpoly_mult_cs p0 q))).
+     (cpoly_linear_cs [0] (cpoly_mult_cs p0 q))).
   2: apply cpoly_plus_op_wd.
    3: algebra.
   2: apply cpoly_plus_commutative.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cr_cs q c0)
-   (cpoly_plus_cs (cpoly_mult_cr_cs p0 c) (cpoly_linear_cs Zero (cpoly_mult_cs p0 q)))).
+   (cpoly_plus_cs (cpoly_mult_cr_cs p0 c) (cpoly_linear_cs [0] (cpoly_mult_cs p0 q)))).
   2: apply cpoly_plus_associative.
  apply cpoly_plus_op_wd.
   algebra.
@@ -1498,7 +1498,7 @@ Proof.
  intros.
  rewrite cpoly_lin_mult.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cr_cs q c)
-   (cpoly_linear_cs Zero (cpoly_mult_cs q p0))).
+   (cpoly_linear_cs [0] (cpoly_mult_cs q p0))).
   2: apply eq_symmetric_unfolded; apply cpoly_mult_lin.
  apply cpoly_plus_op_wd.
   algebra.
@@ -1536,12 +1536,12 @@ Proof.
  intros.
  repeat rewrite cpoly_lin_mult.
  apply eq_transitive_unfolded with (cpoly_plus_cs (cpoly_mult_cs (cpoly_mult_cr_cs q c) r)
-   (cpoly_mult_cs (cpoly_linear_cs Zero (cpoly_mult_cs p0 q)) r)).
+   (cpoly_mult_cs (cpoly_linear_cs [0] (cpoly_mult_cs p0 q)) r)).
   apply cpoly_plus_op_wd.
    apply cpoly_mult_cr_assoc_mult.
   rewrite cpoly_lin_mult.
   apply eq_transitive_unfolded with (cpoly_plus_cs cpoly_zero_cs
-    (cpoly_linear_cs Zero (cpoly_mult_cs (cpoly_mult_cs p0 q) r))).
+    (cpoly_linear_cs [0] (cpoly_mult_cs (cpoly_mult_cs p0 q) r))).
    rewrite cpoly_zero_plus.
    apply _cpoly_lin_eq_lin.
    split.
@@ -1558,7 +1558,7 @@ Proof.
  apply cpoly_mult_dist_rht.
 Qed.
 
-Lemma cpoly_mult_cr_one : forall p, cpoly_mult_cr_cs p One [=] p.
+Lemma cpoly_mult_cr_one : forall p, cpoly_mult_cr_cs p [1] [=] p.
 Proof.
  intro.
  pattern p in |- *; apply cpoly_ind_cs.
@@ -1574,7 +1574,7 @@ Proof.
  intro.
  unfold cpoly_one in |- *.
  unfold cpoly_constant in |- *.
- replace (cpoly_linear One cpoly_zero) with (cpoly_linear_cs One cpoly_zero).
+ replace (cpoly_linear [1] cpoly_zero) with (cpoly_linear_cs [1] cpoly_zero).
   2: reflexivity.
  rewrite cpoly_lin_mult.
  rewrite cpoly_zero_mult.
@@ -1603,8 +1603,8 @@ Qed.
 
 Lemma cpoly_cr_non_triv : cpoly_ap cpoly_one cpoly_zero.
 Proof.
- change (cpoly_linear_cs One cpoly_zero_cs [#] cpoly_zero_cs) in |- *.
- cut ((One:CR) [#] Zero or cpoly_zero_cs [#] cpoly_zero_cs).
+ change (cpoly_linear_cs [1] cpoly_zero_cs [#] cpoly_zero_cs) in |- *.
+ cut (([1]:CR) [#] [0] or cpoly_zero_cs [#] cpoly_zero_cs).
   auto.
  left.
  algebra.
@@ -1627,11 +1627,11 @@ Definition cpoly_cring_old : CRing := Build_CRing _ _ _ cpoly_is_CRing_old.
 
 (**
 [cpoly_mult_fast] produces smaller lengthed polynomials when multiplying by zero.
-For example [Eval simpl in cpoly_mult_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
+For example [Eval simpl in cpoly_mult_cs _ _X_ ([0]:cpoly_cring Q_as_CRing)]
 returns
 [cpoly_linear Q_as_CRing QZERO (cpoly_linear Q_as_CRing QZERO (cpoly_zero Q_as_CRing))]
 while
-[Eval simpl in cpoly_mult_fast_cs _ _X_ (Zero:cpoly_cring Q_as_CRing)]
+[Eval simpl in cpoly_mult_fast_cs _ _X_ ([0]:cpoly_cring Q_as_CRing)]
 returns
 [cpoly_zero Q_as_CRing].
 
@@ -1765,11 +1765,11 @@ Qed.
 
 Definition cpoly_constant_fun := Build_CSetoid_fun _ _ _ cpoly_constant_strext.
 
-Definition cpoly_var : cpoly_cring := cpoly_linear_cs Zero (One:cpoly_cring).
+Definition cpoly_var : cpoly_cring := cpoly_linear_cs [0] ([1]:cpoly_cring).
 Notation "'_X_'" := cpoly_var.
 
 Definition cpoly_x_minus_c c : cpoly_cring :=
- cpoly_linear_cs [--]c (One:cpoly_cring).
+ cpoly_linear_cs [--]c ([1]:cpoly_cring).
 
 Lemma cpoly_x_minus_c_strext :
  fun_strext (S1:=CR) (S2:=cpoly_cring) cpoly_x_minus_c.
@@ -1828,16 +1828,16 @@ Section helpful_section.
 Variables p q : RX.
 Variables c d : CR.
 (** It should be possible to merge most of this section using the new apply *)
-Lemma linear_eq_zero_ : c[+X*]p [=] Zero -> c [=] Zero /\ p [=] Zero.
+Lemma linear_eq_zero_ : c[+X*]p [=] [0] -> c [=] [0] /\ p [=] [0].
 Proof cpoly_lin_eq_zero_ CR p c.
 
-Lemma _linear_eq_zero : c [=] Zero /\ p [=] Zero -> c[+X*]p [=] Zero.
+Lemma _linear_eq_zero : c [=] [0] /\ p [=] [0] -> c[+X*]p [=] [0].
 Proof _cpoly_lin_eq_zero CR p c.
 
-Lemma zero_eq_linear_ : Zero [=] c[+X*]p -> c [=] Zero /\ Zero [=] p.
+Lemma zero_eq_linear_ : [0] [=] c[+X*]p -> c [=] [0] /\ [0] [=] p.
 Proof cpoly_zero_eq_lin_ CR p c.
 
-Lemma _zero_eq_linear : c [=] Zero /\ Zero [=] p -> Zero [=] c[+X*]p.
+Lemma _zero_eq_linear : c [=] [0] /\ [0] [=] p -> [0] [=] c[+X*]p.
 Proof _cpoly_zero_eq_lin CR p c.
 
 Lemma linear_eq_linear_ : c[+X*]p [=] d[+X*]q -> c [=] d /\ p [=] q.
@@ -1846,22 +1846,22 @@ Proof cpoly_lin_eq_lin_ CR p q c d.
 Lemma _linear_eq_linear : c [=] d /\ p [=] q -> c[+X*]p [=] d[+X*]q.
 Proof _cpoly_lin_eq_lin CR p q c d.
 
-Lemma linear_ap_zero_ : c[+X*]p [#] Zero -> c [#] Zero or p [#] Zero.
+Lemma linear_ap_zero_ : c[+X*]p [#] [0] -> c [#] [0] or p [#] [0].
 Proof cpoly_lin_ap_zero_ CR p c.
 
-Lemma _linear_ap_zero : c [#] Zero or p [#] Zero -> c[+X*]p [#] Zero.
+Lemma _linear_ap_zero : c [#] [0] or p [#] [0] -> c[+X*]p [#] [0].
 Proof _cpoly_lin_ap_zero CR p c.
 
-Lemma linear_ap_zero : (c[+X*]p [#] Zero) = (c [#] Zero or p [#] Zero).
+Lemma linear_ap_zero : (c[+X*]p [#] [0]) = (c [#] [0] or p [#] [0]).
 Proof cpoly_lin_ap_zero CR p c.
 
-Lemma zero_ap_linear_ : Zero [#] c[+X*]p -> c [#] Zero or Zero [#] p.
+Lemma zero_ap_linear_ : [0] [#] c[+X*]p -> c [#] [0] or [0] [#] p.
 Proof cpoly_zero_ap_lin_ CR p c.
 
-Lemma _zero_ap_linear : c [#] Zero or Zero [#] p -> Zero [#] c[+X*]p.
+Lemma _zero_ap_linear : c [#] [0] or [0] [#] p -> [0] [#] c[+X*]p.
 Proof _cpoly_zero_ap_lin CR p c.
 
-Lemma zero_ap_linear : (Zero [#] c[+X*]p) = (c [#] Zero or Zero [#] p).
+Lemma zero_ap_linear : ([0] [#] c[+X*]p) = (c [#] [0] or [0] [#] p).
 Proof cpoly_zero_ap_lin CR p c.
 
 Lemma linear_ap_linear_ : c[+X*]p [#] d[+X*]q -> c [#] d or p [#] q.
@@ -1875,45 +1875,45 @@ Proof cpoly_lin_ap_lin CR p q c d.
 
 End helpful_section.
 
-Lemma Ccpoly_induc : forall P : RX -> CProp, P Zero ->
+Lemma Ccpoly_induc : forall P : RX -> CProp, P [0] ->
  (forall p c, P p -> P (c[+X*]p)) -> forall p, P p.
 Proof (Ccpoly_ind_cs CR).
 
 Lemma Ccpoly_double_sym_ind : forall P : RX -> RX -> CProp,
- Csymmetric P -> (forall p, P p Zero) ->
+ Csymmetric P -> (forall p, P p [0]) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
 Proof (Ccpoly_double_sym_ind0_cs CR).
 
 Lemma Cpoly_double_comp_ind : forall P : RX -> RX -> CProp,
- (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P Zero Zero ->
+ (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P [0] [0] ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
 Proof (Ccpoly_double_comp_ind CR).
 
 Lemma Cpoly_triple_comp_ind : forall P : RX -> RX -> RX -> CProp,
  (forall p1 p2 q1 q2 r1 r2,
   p1 [=] p2 -> q1 [=] q2 -> r1 [=] r2 -> P p1 q1 r1 -> P p2 q2 r2) ->
- P Zero Zero Zero -> (forall p q r c d e, P p q r -> P (c[+X*]p) (d[+X*]q) (e[+X*]r)) ->
+ P [0] [0] [0] -> (forall p q r c d e, P p q r -> P (c[+X*]p) (d[+X*]q) (e[+X*]r)) ->
  forall p q r, P p q r.
 Proof (Ccpoly_triple_comp_ind CR).
 
 Lemma cpoly_induc : forall P : RX -> Prop,
- P Zero -> (forall p c, P p -> P (c[+X*]p)) -> forall p, P p.
+ P [0] -> (forall p c, P p -> P (c[+X*]p)) -> forall p, P p.
 Proof (cpoly_ind_cs CR).
 
 Lemma cpoly_double_sym_ind : forall P : RX -> RX -> Prop,
- Tsymmetric P -> (forall p, P p Zero) ->
+ Tsymmetric P -> (forall p, P p [0]) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
 Proof (cpoly_double_sym_ind0_cs CR).
 
 Lemma poly_double_comp_ind : forall P : RX -> RX -> Prop,
- (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P Zero Zero ->
+ (forall p1 p2 q1 q2, p1 [=] p2 -> q1 [=] q2 -> P p1 q1 -> P p2 q2) -> P [0] [0] ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
 Proof (cpoly_double_comp_ind CR).
 
 Lemma poly_triple_comp_ind : forall P : RX -> RX -> RX -> Prop,
  (forall p1 p2 q1 q2 r1 r2,
   p1 [=] p2 -> q1 [=] q2 -> r1 [=] r2 -> P p1 q1 r1 -> P p2 q2 r2) ->
- P Zero Zero Zero ->
+ P [0] [0] [0] ->
  (forall p q r c d e, P p q r -> P (c[+X*]p) (d[+X*]q) (e[+X*]r)) -> forall p q r, P p q r.
 Proof (cpoly_triple_comp_ind CR).
 
@@ -1923,7 +1923,7 @@ Transparent cpoly_csetoid.
 
 Fixpoint cpoly_apply (p : RX) (x : CR) {struct p} : CR :=
   match p with
-  | cpoly_zero        => Zero
+  | cpoly_zero        => [0]
   | cpoly_linear c p1 => c[+]x[*]cpoly_apply p1 x
   end.
 
@@ -1952,11 +1952,11 @@ Proof.
   intros.
   simpl in X0.
   simpl in X.
-  cut (c[+]y1[*]cpoly_apply p0 y1 [#] Zero[+]y1[*]Zero).
+  cut (c[+]y1[*]cpoly_apply p0 y1 [#] [0][+]y1[*][0]).
    intro.
    elim (cs_bin_op_strext _ _ _ _ _ _ X1); intro H2.
     left.
-    cut (c [#] Zero or p0 [#] Zero).
+    cut (c [#] [0] or p0 [#] [0]).
      intro.
      apply _linear_ap_zero.
      auto.
@@ -1966,14 +1966,14 @@ Proof.
     elim (ap_irreflexive _ _ H3).
    elim (X H3); intro H4.
     left.
-    cut (c [#] Zero or p0 [#] Zero).
+    cut (c [#] [0] or p0 [#] [0]).
      intro; apply _linear_ap_zero.
      auto.
     right.
     exact H4.
    auto.
-  astepr (Zero[+](Zero:CR)).
-  astepr (Zero:CR). auto.
+  astepr ([0][+]([0]:CR)).
+  astepr ([0]:CR). auto.
   simpl in |- *.
  intros.
  elim (cs_bin_op_strext _ _ _ _ _ _ X0); intro H1.
@@ -2017,7 +2017,7 @@ Variable R : CRing.
 Add Ring cpolycring_thR : (cpoly_ring_th R).
 Notation RX := (cpoly_cring R).
 
-Lemma cpoly_const_one : One [=] cpoly_constant_fun _ (One:R).
+Lemma cpoly_const_one : [1] [=] cpoly_constant_fun _ ([1]:R).
 Proof. 
  simpl in |- *; split; algebra.
 Qed.
@@ -2035,7 +2035,7 @@ Qed.
 Definition polyconst : RingHom R RX := Build_RingHom _ _ _ cpoly_const_plus cpoly_const_mult cpoly_const_one.
 Notation "'_C_'" := polyconst.
 
-Lemma c_one : One [=] _C_ (One:R).
+Lemma c_one : [1] [=] _C_ ([1]:R).
 Proof.
  simpl in |- *; split; algebra.
 Qed.
@@ -2050,7 +2050,7 @@ Proof.
  simpl in |- *; split; algebra.
 Qed.
 
-Lemma c_zero : Zero [=] _C_ (Zero:R).
+Lemma c_zero : [0] [=] _C_ ([0]:R).
 Proof.
  simpl in |- *; split; algebra.
 Qed.
@@ -2059,12 +2059,12 @@ Qed.
 *** Constant and identity
 *)
 
-Lemma cpoly_X_ : _X_ [=] (Zero:RX) [+X*]One.
+Lemma cpoly_X_ : _X_ [=] ([0]:RX) [+X*][1].
 Proof.
  algebra.
 Qed.
 
-Lemma cpoly_C_ : forall c : R, _C_ c [=] c[+X*]Zero.
+Lemma cpoly_C_ : forall c : R, _C_ c [=] c[+X*][0].
 Proof.
  algebra.
 Qed.
@@ -2079,17 +2079,17 @@ Qed.
 Lemma cpoly_lin : forall (p : RX) (c : R), c[+X*]p [=] _C_ c[+]_X_[*]p.
 Proof.
  intros.
- astepr (c[+X*]Zero[+] ((cpoly_mult_cr_cs _ p Zero:RX) [+] (cpoly_linear _ (Zero:R)
+ astepr (c[+X*][0][+] ((cpoly_mult_cr_cs _ p [0]:RX) [+] (cpoly_linear _ ([0]:R)
    (cpoly_mult_cs _ (cpoly_one R) (p:cpoly_csetoid R)) :cpoly_csetoid R))).
-  cut (cpoly_mult_cr_cs R p Zero [=] (Zero:RX)).
+  cut (cpoly_mult_cr_cs R p [0] [=] ([0]:RX)).
    intro.
-   astepr (c[+X*]Zero[+] ((Zero:RX) [+] (cpoly_linear _ (Zero:R)
+   astepr (c[+X*][0][+] (([0]:RX) [+] (cpoly_linear _ ([0]:R)
      (cpoly_mult_cs _ (cpoly_one R) (p:cpoly_csetoid R)) :cpoly_csetoid R))).
    2: apply (cpoly_mult_cr_zero R p).
   cut ((cpoly_mult_cs _ (cpoly_one R) (p:cpoly_csetoid R):cpoly_csetoid R) [=] p).
    intro.
    apply eq_transitive_unfolded with
-     (c[+X*]Zero[+]((Zero:RX) [+]cpoly_linear _ (Zero:R) (p:cpoly_csetoid R))).
+     (c[+X*][0][+](([0]:RX) [+]cpoly_linear _ ([0]:R) (p:cpoly_csetoid R))).
     2: apply bin_op_wd_unfolded.
      2: algebra.
     2: apply bin_op_wd_unfolded.
@@ -2098,8 +2098,8 @@ Proof.
      2: algebra.
     2: apply eq_symmetric_unfolded.
     2: apply cpoly_one_mult.
-   astepr (c[+X*]Zero[+]cpoly_linear _ (Zero:R) (p:cpoly_csetoid R)).
-   astepr (c[+]Zero[+X*](Zero[+]p)).
+   astepr (c[+X*][0][+]cpoly_linear _ ([0]:R) (p:cpoly_csetoid R)).
+   astepr (c[+][0][+X*]([0][+]p)).
    astepr (c[+X*]p).
    algebra.
   apply cpoly_one_mult.
@@ -2122,14 +2122,14 @@ Proof.
  exact (cpoly_lin f c).
 Qed.
 
-Lemma poly_c_apzero : forall a : R, _C_ a [#] Zero -> a [#] Zero.
+Lemma poly_c_apzero : forall a : R, _C_ a [#] [0] -> a [#] [0].
 Proof.
  intros.
- cut (_C_ a [#] _C_ Zero).
+ cut (_C_ a [#] _C_ [0]).
   intro H0.
   generalize (csf_strext _ _ _ _ _ H0); auto.
  Hint Resolve c_zero: algebra.
- astepr (Zero:RX). auto.
+ astepr ([0]:RX). auto.
 Qed.
 
 Lemma c_mult_lin : forall (p : RX) c d, _C_ c[*] (d[+X*]p) [=] c[*]d[+X*]_C_ c[*]p.
@@ -2141,7 +2141,7 @@ Proof.
   repeat split; algebra.
  intros. simpl in |- *.
  repeat split; algebra.
- change ((cpoly_mult_cr R p0 c:RX) [=] (cpoly_mult_cr R p0 c:RX)[+]Zero) in |- *.
+ change ((cpoly_mult_cr R p0 c:RX) [=] (cpoly_mult_cr R p0 c:RX)[+][0]) in |- *.
  algebra.
 Qed.
 
@@ -2161,11 +2161,11 @@ Hint Resolve lin_mult: algebra.
 *** Application of polynomials
 *)
 
-Lemma poly_eq_zero : forall p : RX, p [=] cpoly_zero R -> forall x, p ! x [=] Zero.
+Lemma poly_eq_zero : forall p : RX, p [=] cpoly_zero R -> forall x, p ! x [=] [0].
 Proof.
  intros.
  astepl (cpoly_zero R) ! x.
- change (Zero ! x [=] Zero) in |- *.
+ change ([0] ! x [=] [0]) in |- *.
  algebra.
 Qed.
 
@@ -2196,7 +2196,7 @@ Lemma c_apply : forall c x : R, (_C_ c) ! x [=] c.
 Proof.
  intros.
  simpl in |- *.
- astepl (c[+]Zero).
+ astepl (c[+][0]).
  algebra.
 Qed.
 
@@ -2204,9 +2204,9 @@ Lemma x_apply : forall x : R, _X_ ! x [=] x.
 Proof.
  intros.
  simpl in |- *.
- astepl (x[*](One[+]x[*]Zero)).
- astepl (x[*](One[+]Zero)).
- astepl (x[*]One).
+ astepl (x[*]([1][+]x[*][0])).
+ astepl (x[*]([1][+][0])).
+ astepl (x[*][1]).
  algebra.
 Qed.
 
@@ -2261,11 +2261,11 @@ Qed.
 Lemma c_mult_apply : forall (q : RX) c x, (_C_ c[*]q) ! x [=] c[*]q ! x.
 Proof.
  intros.
- astepl ((cpoly_mult_cr R q c:RX)[+](Zero[+X*]Zero)) ! x.
-  astepl ((cpoly_mult_cr R q c) ! x[+](Zero[+X*]Zero) ! x).
-  astepl ((cpoly_mult_cr R q c) ! x[+](Zero[+]x[*]Zero)).
-  astepl ((cpoly_mult_cr R q c) ! x[+](Zero[+]Zero)).
-  astepl ((cpoly_mult_cr R q c) ! x[+]Zero).
+ astepl ((cpoly_mult_cr R q c:RX)[+]([0][+X*][0])) ! x.
+  astepl ((cpoly_mult_cr R q c) ! x[+]([0][+X*][0]) ! x).
+  astepl ((cpoly_mult_cr R q c) ! x[+]([0][+]x[*][0])).
+  astepl ((cpoly_mult_cr R q c) ! x[+]([0][+][0])).
+  astepl ((cpoly_mult_cr R q c) ! x[+][0]).
   astepl (cpoly_mult_cr R q c) ! x.
   pattern q in |- *.
   apply cpoly_induc.
@@ -2297,16 +2297,16 @@ Proof.
  intros.
  pattern p in |- *.
  apply cpoly_induc.
-  astepl (Zero ! x).
+  astepl ([0] ! x).
   simpl in |- *.
   algebra.
  intros.
  astepl (_C_ c[*]q[+]_X_[*](p0[*]q)) ! x.
  astepl ((_C_ c[*]q) ! x[+](_X_[*](p0[*]q)) ! x).
- astepl ((_C_ c[*]q) ! x[+](Zero[+]_X_[*](p0[*]q)) ! x).
- astepl ((_C_ c[*]q) ! x[+](_C_ Zero[+]_X_[*](p0[*]q)) ! x).
- astepl ((_C_ c[*]q) ! x[+](Zero[+X*]p0[*]q) ! x).
- astepl ((_C_ c[*]q) ! x[+](Zero[+]x[*](p0[*]q) ! x)).
+ astepl ((_C_ c[*]q) ! x[+]([0][+]_X_[*](p0[*]q)) ! x).
+ astepl ((_C_ c[*]q) ! x[+](_C_ [0][+]_X_[*](p0[*]q)) ! x).
+ astepl ((_C_ c[*]q) ! x[+]([0][+X*]p0[*]q) ! x).
+ astepl ((_C_ c[*]q) ! x[+]([0][+]x[*](p0[*]q) ! x)).
  astepl (c[*]q ! x[+]x[*](p0[*]q) ! x).
  astepl (c[*]q ! x[+]x[*](p0 ! x[*]q ! x)).
  astepr ((c[+]x[*]p0 ! x)[*]q ! x).
@@ -2316,10 +2316,10 @@ Qed.
 
 Hint Resolve mult_apply: algebra.
 
-Lemma one_apply : forall x : R, One ! x [=] One.
+Lemma one_apply : forall x : R, [1] ! x [=] [1].
 Proof.
  intro.
- astepl (_C_ One) ! x.
+ astepl (_C_ [1]) ! x.
  apply c_apply.
 Qed.
 
@@ -2329,8 +2329,8 @@ Lemma nexp_apply : forall (p : RX) n x, (p[^]n) ! x [=] p ! x[^]n.
 Proof.
  intros.
  induction  n as [| n Hrecn].
-  astepl (One:RX) ! x.
-  astepl (One:R).
+  astepl ([1]:RX) ! x.
+  astepl ([1]:R).
   algebra.
  astepl (p[*]p[^]n) ! x.
  astepl (p ! x[*](p[^]n) ! x).
@@ -2417,7 +2417,7 @@ Notation Cpoly_linear := (cpoly_linear CR).
 Notation Cpoly_cring := (cpoly_cring CR).
 
 Lemma cpoly_double_ind : forall P : Cpoly_cring -> Cpoly_cring -> Prop,
- (forall p, P p Zero) -> (forall p, P Zero p) ->
+ (forall p, P p [0]) -> (forall p, P [0] p) ->
  (forall p q c d, P p q -> P (c[+X*]p) (d[+X*]q)) -> forall p q, P p q.
 Proof (cpoly_double_ind0_cs CR).
 
@@ -2444,8 +2444,8 @@ Notation RX:= (cpoly_cring R).
 
 Fixpoint cpoly_diff (p : RX) : RX :=
 match p with
-| cpoly_zero => Zero
-| cpoly_linear c p1 => p1[+](Zero[+X*](cpoly_diff p1))
+| cpoly_zero => [0]
+| cpoly_linear c p1 => p1[+]([0][+X*](cpoly_diff p1))
 end.
 
 Lemma cpoly_diff_strext : un_op_strext _ cpoly_diff.
@@ -2463,7 +2463,7 @@ Proof.
   right.
   abstract ( destruct (cpoly_ap_zero_plus _ _ _ Hxy) as [c|[c|c]]; [apply (ap_symmetric _ _ _ c)
     |elim (ap_irreflexive _ _ c)
-      |change (Zero[#]x); apply ap_symmetric; apply IHx; apply ap_symmetric; apply c]).
+      |change ([0][#]x); apply ap_symmetric; apply IHx; apply ap_symmetric; apply c]).
  right.
  destruct (cpoly_plus_op_strext _ _ _ _ _ Hxy) as [c|[c|c]].
    assumption.
@@ -2480,22 +2480,22 @@ Qed.
 Definition cpolyder := Build_CSetoid_un_op _ _ cpoly_diff_strext.
 Notation "'_D_'" := cpolyder.
 
-Lemma diff_zero : _D_ Zero[=]Zero.
+Lemma diff_zero : _D_ [0][=][0].
 Proof.
  reflexivity.
 Qed.
 
-Lemma diff_one : _D_ One[=]Zero.
+Lemma diff_one : _D_ [1][=][0].
 Proof.
  simpl; split; auto with *; reflexivity.
 Qed.
 
-Lemma diff_const : forall c, _D_ (_C_ c)[=]Zero.
+Lemma diff_const : forall c, _D_ (_C_ c)[=][0].
 Proof.
  simpl; split; auto with *.
 Qed.
 
-Lemma diff_x : _D_ _X_[=]One.
+Lemma diff_x : _D_ _X_[=][1].
 Proof.
  simpl; split; auto with *.
 Qed.
@@ -2503,7 +2503,7 @@ Qed.
 Lemma diff_linear : forall a (p:RX), _D_ (a[+X*]p)[=]p[+]_X_[*]_D_ p.
 Proof.
  intros a p.
- change (p[+](Zero[+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
+ change (p[+]([0][+X*]_D_ p)[=]p[+]_X_[*]_D_ p).
  rewrite -> cpoly_lin.
  rewrite <- c_zero. 
  ring.
@@ -2515,14 +2515,14 @@ Proof.
   reflexivity.
  intros [|a q].
   rewrite -> cm_rht_unit_unfolded.
-  change (cpoly_zero R) with (Zero:cpoly_cring R).
+  change (cpoly_zero R) with ([0]:cpoly_cring R).
   rewrite -> diff_zero; algebra.
- change ((p[+]q)[+]cpoly_linear _ Zero (_D_ (p[+]q))[=]
-   (p[+]cpoly_linear _ Zero (_D_ p))[+](q[+]cpoly_linear _ Zero (_D_ q))).
+ change ((p[+]q)[+]cpoly_linear _ [0] (_D_ (p[+]q))[=]
+   (p[+]cpoly_linear _ [0] (_D_ p))[+](q[+]cpoly_linear _ [0] (_D_ q))).
  do 3 rewrite -> poly_linear.
  change (st_car RX) in p, q.
- change (p[+]q[+](_X_[*]_D_ (p[+]q)[+]_C_ Zero)[=]
-   p[+](_X_[*]_D_ p[+]_C_ Zero)[+](q[+](_X_[*]_D_ q[+]_C_ Zero))).
+ change (p[+]q[+](_X_[*]_D_ (p[+]q)[+]_C_ [0])[=]
+   p[+](_X_[*]_D_ p[+]_C_ [0])[+](q[+](_X_[*]_D_ q[+]_C_ [0]))).
  rewrite -> (IHp q).
  rewrite <- c_zero.
  ring.
@@ -2533,18 +2533,18 @@ Proof.
  intros c p.
  induction p.
   auto with *.
- change (_D_ (cpoly_linear R s p)) with (p[+](Zero[+X*](_D_ p))).
+ change (_D_ (cpoly_linear R s p)) with (p[+]([0][+X*](_D_ p))).
  change (cpoly_linear R s p) with (s[+X*]p).
  rewrite -> c_mult_lin.
- change (_D_ (c[*]s[+X*]_C_ c[*]p)) with (_C_ c[*]p [+] (Zero[+X*](_D_ (_C_ c[*]p)))).
+ change (_D_ (c[*]s[+X*]_C_ c[*]p)) with (_C_ c[*]p [+] ([0][+X*](_D_ (_C_ c[*]p)))).
  rewrite -> IHp.
  do 2 rewrite -> cpoly_lin.
  rewrite <- c_zero.
 (* An attempt to avoid the following "change" 
 Bind Scope ring_scope with CRing.
 Notation "a '====' b":=(a [=] b)(at level 80, right associativity): ring_scope.
-set (LHS:=_C_ c[*]p[+](Zero[+]_X_[*](_C_ c[*]_D_ p))).
-set (RHS:=(_C_ c[*](p[+](Zero[+]_X_[*]_D_ p)))).
+set (LHS:=_C_ c[*]p[+]([0][+]_X_[*](_C_ c[*]_D_ p))).
+set (RHS:=(_C_ c[*](p[+]([0][+]_X_[*]_D_ p)))).
 change  (LHS ==== RHS).
 
 Or even:
@@ -2569,8 +2569,8 @@ Lemma diff_mult : forall (p q:RX), _D_ (p[*]q)[=]_D_ p[*]q [+] p[*]_D_ q.
 Proof.
  induction p.
   intros q.
-  change (_D_(Zero[*]q)[=]Zero[*]q[+]Zero[*]_D_ q).
-  stepl (_D_(Zero:RX)). 2: now destruct q.
+  change (_D_([0][*]q)[=][0][*]q[+][0][*]_D_ q).
+  stepl (_D_([0]:RX)). 2: now destruct q.
   rewrite -> diff_zero.
   ring.
  intros q.
@@ -2581,10 +2581,10 @@ Proof.
  rewrite -> diff_plus.
  setoid_replace (_D_ ((_C_ s:RX)[*]q)) with (_C_ s[*]_D_ q) by apply diff_c_mult.
  setoid_replace (((_X_:RX)[*](p[*]q)):RX)
-   with ((((_X_:RX)[*](p[*]q)))[+]Zero) by (symmetry;apply cm_rht_unit_unfolded).
- setoid_replace (Zero:RX) with (_C_ Zero:RX) by apply c_zero.
+   with ((((_X_:RX)[*](p[*]q)))[+][0]) by (symmetry;apply cm_rht_unit_unfolded).
+ setoid_replace ([0]:RX) with (_C_ [0]:RX) by apply c_zero.
  rewrite <- poly_linear.
- change (_D_ (cpoly_linear R Zero (p[*]q))) with (p[*]q [+] (Zero[+X*]_D_ (p[*]q))).
+ change (_D_ (cpoly_linear R [0] (p[*]q))) with (p[*]q [+] ([0][+X*]_D_ (p[*]q))).
  rewrite -> cpoly_lin.
  rewrite <- c_zero.
  rewrite -> IHp.
@@ -2627,7 +2627,7 @@ Proof.
    left.
    eapply rh_apzero; apply H.
   right.
-  change (Zero[#]x).
+  change ([0][#]x).
   apply ap_symmetric.
   apply IHx.
   apply ap_symmetric.
@@ -2647,10 +2647,10 @@ Proof.
  unfold fun_pres_plus.
  apply (cpoly_double_ind0 R).
    intros p.
-   change (cpoly_map_csf(p[+]Zero)[=]cpoly_map_csf p[+]Zero).
+   change (cpoly_map_csf(p[+][0])[=]cpoly_map_csf p[+][0]).
    stepr (cpoly_map_csf p). 2: ring.
    apply csf_wd.
-   cut (forall p: cpoly_cring R, csg_op p Zero [=] p). easy.
+   cut (forall p: cpoly_cring R, csg_op p [0] [=] p). easy.
    intros. ring.
   reflexivity.
  intros p q c d H.
@@ -2673,9 +2673,9 @@ Proof.
    apply eq_reflexive.
   intros p.
   change (st_car RX) in p.
-  change (cpoly_zero R) with (Zero:RX).
-  stepl (cpoly_map_csf (Zero:RX)).
-   change (cpoly_map_csf Zero) with (Zero:SX).
+  change (cpoly_zero R) with ([0]:RX).
+  stepl (cpoly_map_csf ([0]:RX)).
+   change (cpoly_map_csf [0]) with ([0]:SX).
    ring.
   apply csf_wd; ring. 
  intros p q c d H.
@@ -2699,11 +2699,11 @@ Proof.
    with (cpoly_mult_fast_cs _ (cpoly_linear S (f d) (cpoly_map_csf q)) (cpoly_map_csf p)).
  rewrite -> cpoly_mult_fast_equiv.
  rewrite cpoly_lin_mult.
- stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R Zero (cpoly_mult_cs R q p)));
+ stepl (cpoly_map_csf (cpoly_mult_cr_cs R p d)[+]cpoly_map_csf (cpoly_linear R [0] (cpoly_mult_cs R q p)));
   [| apply eq_symmetric; apply cpoly_map_pres_plus].
- change (cpoly_map_fun (cpoly_mult_cr_cs R p d)[+] cpoly_map_fun (Zero[+X*] (cpoly_mult_cs R q p))[=]
+ change (cpoly_map_fun (cpoly_mult_cr_cs R p d)[+] cpoly_map_fun ([0][+X*] (cpoly_mult_cs R q p))[=]
    (cpoly_mult_cr_cs S (cpoly_map_fun p) (f d))[+]
-     (Zero[+X*](cpoly_mult_cs S (cpoly_map_fun q) (cpoly_map_fun p)))).
+     ([0][+X*](cpoly_mult_cs S (cpoly_map_fun q) (cpoly_map_fun p)))).
  apply csbf_wd.
   apply X.
  split.

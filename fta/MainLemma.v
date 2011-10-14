@@ -51,7 +51,7 @@ Section Main_Lemma.
 (**
 %\begin{convention}%
 Let [a : nat->IR], [n : nat], [a_0 : IR]  and [eps : IR] such that [0 < n],
-[(Zero [<] eps)], [forall (k : nat)(Zero [<=] (a k))], [(a n) [=] One], and
+[([0] [<] eps)], [forall (k : nat)([0] [<=] (a k))], [(a n) [=] [1]], and
 [(eps [<=] a_0)].
 %\end{convention}%
 *)
@@ -60,13 +60,13 @@ Variable a : nat -> IR.
 Variable n : nat.
 Hypothesis gt_n_0 : 0 < n.
 Variable eps : IR.
-Hypothesis eps_pos : Zero [<] eps.
-Hypothesis a_nonneg : forall k : nat, Zero [<=] a k.
-Hypothesis a_n_1 : a n [=] One.
+Hypothesis eps_pos : [0] [<] eps.
+Hypothesis a_nonneg : forall k : nat, [0] [<=] a k.
+Hypothesis a_n_1 : a n [=] [1].
 Variable a_0 : IR.
 Hypothesis eps_le_a_0 : eps [<=] a_0.
 
-Lemma a_0_pos : Zero [<] a_0.
+Lemma a_0_pos : [0] [<] a_0.
 Proof.
  apply less_leEq_trans with eps; auto.
 Qed.
@@ -116,10 +116,10 @@ Proof.
 Qed.
 (* end hide *)
 
-Lemma Main_1a : forall (r : IR) (k : nat), Zero [<=] r -> 1 <= k -> k <= n ->
+Lemma Main_1a : forall (r : IR) (k : nat), [0] [<=] r -> 1 <= k -> k <= n ->
  (forall i, 1 <= i -> i <= n -> a i[*] (r [/]ThreeNZ) [^]i[-]eps [<=] a k[*] (r [/]ThreeNZ) [^]k) ->
  let p_ := fun i : nat => a i[*]r[^]i in let p_k := a k[*]r[^]k in
- Sum 1 (pred k) p_ [<=] Half[*] (One[-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps.
+ Sum 1 (pred k) p_ [<=] Half[*] ([1][-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps.
 Proof.
  (* begin hide *)
  intros r k H H0 H1 H2 p_ p_k.
@@ -145,22 +145,22 @@ Proof.
   apply three_ap_zero.
  apply leEq_wdl with (Sum 1 (pred k) (fun i : nat => Three[^]i) [*]
    (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
-  cut (Three[-]One [#] ZeroR).
+  cut (Three[-][1] [#] ZeroR).
    intro H3.
-   astepl ((Three[^]S (pred k) [-]Three[^]1[/] Three[-]One[//]H3) [*]
+   astepl ((Three[^]S (pred k) [-]Three[^]1[/] Three[-][1][//]H3) [*]
      (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
    rewrite <- (S_pred _ _ H0).
-   astepl ((Three[^]k[-]Three[/] Three[-]One[//]H3) [*] (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
-   rstepl (One [/]TwoNZ[*] (Three[^]k[-]Three) [*] (a k[*] (r [/]ThreeNZ) [^]k) [+]
-     One [/]TwoNZ[*] (Three[^]k[-]Three) [*]eps).
-   apply leEq_transitive with (Half[*] (One[-]Small) [*] (a k[*]r[^]k) [+]
-     One [/]TwoNZ[*] (Three[^]k[-]Three) [*]eps).
+   astepl ((Three[^]k[-]Three[/] Three[-][1][//]H3) [*] (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
+   rstepl ([1] [/]TwoNZ[*] (Three[^]k[-]Three) [*] (a k[*] (r [/]ThreeNZ) [^]k) [+]
+     [1] [/]TwoNZ[*] (Three[^]k[-]Three) [*]eps).
+   apply leEq_transitive with (Half[*] ([1][-]Small) [*] (a k[*]r[^]k) [+]
+     [1] [/]TwoNZ[*] (Three[^]k[-]Three) [*]eps).
     apply plus_resp_leEq.
     cut (Three[^]k [#] ZeroR).
      intro H4.
-     astepl (One [/]TwoNZ[*] (Three[^]k[-]Three) [*] (a k[*] (r[^]k[/] Three[^]k[//]H4))).
-     rstepl (One [/]TwoNZ[*]a k[*]r[^]k[*] (One[-] (Three[/] Three[^]k[//]H4))).
-     rstepr (Half[*]a k[*]r[^]k[*] (One[-]Small)).
+     astepl ([1] [/]TwoNZ[*] (Three[^]k[-]Three) [*] (a k[*] (r[^]k[/] Three[^]k[//]H4))).
+     rstepl ([1] [/]TwoNZ[*]a k[*]r[^]k[*] ([1][-] (Three[/] Three[^]k[//]H4))).
+     rstepr (Half[*]a k[*]r[^]k[*] ([1][-]Small)).
      unfold Half in |- *.
      apply mult_resp_leEq_lft.
       apply minus_resp_leEq_both.
@@ -169,10 +169,10 @@ Proof.
       unfold p3m in |- *.
       cut (Three[^]pred k [#] ZeroR).
        intro H5.
-       apply leEq_wdr with (One[/] Three[^]pred k[//]H5).
+       apply leEq_wdr with ([1][/] Three[^]pred k[//]H5).
         cut (Three[^]n [#] ZeroR).
          intro H6.
-         astepl (One[/] Three[^]n[//]H6).
+         astepl ([1][/] Three[^]n[//]H6).
          apply recip_resp_leEq.
           apply nexp_resp_pos.
           apply pos_three.
@@ -184,7 +184,7 @@ Proof.
        apply eq_div.
        pattern k at 1 in |- *.
        rewrite (S_pred _ _ H0).
-       astepl (One[*] (Three[*]Three[^]pred k):IR).
+       astepl ([1][*] (Three[*]Three[^]pred k):IR).
        clear H3 H4 H5.
        astepl ((Three[*]Three[^]pred k):IR). reflexivity.
        apply nexp_resp_ap_zero.
@@ -199,7 +199,7 @@ Proof.
     apply nexp_resp_ap_zero.
     apply three_ap_zero.
    apply plus_resp_leEq_lft.
-   rstepl (One [/]TwoNZ[*]eps[*] (Three[^]k[-]Three)).
+   rstepl ([1] [/]TwoNZ[*]eps[*] (Three[^]k[-]Three)).
    rstepr (Half[*]eps[*]Three[^]n).
    unfold Half in |- *.
    apply mult_resp_leEq_lft.
@@ -218,10 +218,10 @@ Proof.
 Qed.
 (* end hide *)
 
-Lemma Main_1b : forall (r : IR) (k : nat), Zero [<=] r -> 1 <= k -> k <= n ->
+Lemma Main_1b : forall (r : IR) (k : nat), [0] [<=] r -> 1 <= k -> k <= n ->
  (forall i,  1 <= i -> i <= n -> a i[*] (r[*]Three) [^]i[-]eps [<=] a k[*] (r[*]Three) [^]k) ->
  let p_ := fun i => a i[*]r[^]i in let p_k := a k[*]r[^]k in
- Sum (S k) n p_ [<=] Half[*] (One[-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps.
+ Sum (S k) n p_ [<=] Half[*] ([1][-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps.
 Proof.
  (* begin hide *)
  intros r k H H0 H1 H2 p_ p_k.
@@ -244,45 +244,45 @@ Proof.
   astepl (a i[*] (r[*]Three) [^]i[-]eps).
   apply H2; auto with arith.
   apply le_trans with (S k); auto.
- astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*]One[/] Three[^]i[//]H3 i)).
- astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*] (One[/] Three[^]i[//]H3 i))).
+ astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*][1][/] Three[^]i[//]H3 i)).
+ astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*] ([1][/] Three[^]i[//]H3 i))).
  apply leEq_wdl with ((a k[*] (r[*]Three) [^]k[+]eps) [*]
-   Sum (S k) n (fun i : nat => One[/] Three[^]i[//]H3 i)).
+   Sum (S k) n (fun i : nat => [1][/] Three[^]i[//]H3 i)).
   2: apply eq_symmetric_unfolded.
-  2: apply mult_distr_sum_lft with (f := fun i : nat => One[/] Three[^]i[//]H3 i).
- astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] Sum (S k) n (fun i : nat => (One [/]ThreeNZ) [^]i)).
- cut (One[-]One [/]ThreeNZ [#] ZeroR).
+  2: apply mult_distr_sum_lft with (f := fun i : nat => [1][/] Three[^]i[//]H3 i).
+ astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] Sum (S k) n (fun i : nat => ([1] [/]ThreeNZ) [^]i)).
+ cut ([1][-][1] [/]ThreeNZ [#] ZeroR).
   2: rstepl ((Two:IR) [/]ThreeNZ).
   2: apply div_resp_ap_zero_rev.
   2: apply two_ap_zero.
  intro H4.
- astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] ((One [/]ThreeNZ) [^]S k[-] (One [/]ThreeNZ) [^]S n[/]
-   One[-]One [/]ThreeNZ[//]H4)).
- astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] (One [/]ThreeNZ[*] (One [/]ThreeNZ) [^]k[-]
-   One [/]ThreeNZ[*] (One [/]ThreeNZ) [^]n[/] One[-]One [/]ThreeNZ[//]H4)).
- rstepl (One [/]TwoNZ[*] (a k[*] (r[*]Three) [^]k) [*]
-   ((One [/]ThreeNZ) [^]k[-] (One [/]ThreeNZ) [^]n) [+]
-     One [/]TwoNZ[*]eps[*] ((One [/]ThreeNZ) [^]k[-] (One [/]ThreeNZ) [^]n)).
- apply leEq_transitive with (Half[*] (One[-]Small) [*] (a k[*]r[^]k) [+]
-   One [/]TwoNZ[*]eps[*] ((One [/]ThreeNZ) [^]k[-] (One [/]ThreeNZ) [^]n)).
+ astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] (([1] [/]ThreeNZ) [^]S k[-] ([1] [/]ThreeNZ) [^]S n[/]
+   [1][-][1] [/]ThreeNZ[//]H4)).
+ astepl ((a k[*] (r[*]Three) [^]k[+]eps) [*] ([1] [/]ThreeNZ[*] ([1] [/]ThreeNZ) [^]k[-]
+   [1] [/]ThreeNZ[*] ([1] [/]ThreeNZ) [^]n[/] [1][-][1] [/]ThreeNZ[//]H4)).
+ rstepl ([1] [/]TwoNZ[*] (a k[*] (r[*]Three) [^]k) [*]
+   (([1] [/]ThreeNZ) [^]k[-] ([1] [/]ThreeNZ) [^]n) [+]
+     [1] [/]TwoNZ[*]eps[*] (([1] [/]ThreeNZ) [^]k[-] ([1] [/]ThreeNZ) [^]n)).
+ apply leEq_transitive with (Half[*] ([1][-]Small) [*] (a k[*]r[^]k) [+]
+   [1] [/]TwoNZ[*]eps[*] (([1] [/]ThreeNZ) [^]k[-] ([1] [/]ThreeNZ) [^]n)).
   apply plus_resp_leEq.
-  astepl (One [/]TwoNZ[*] (a k[*] (r[^]k[*]Three[^]k)) [*]
-    ((One [/]ThreeNZ) [^]k[-] (One [/]ThreeNZ) [^]n)).
-  rstepl (One [/]TwoNZ[*]a k[*]r[^]k[*]
-    (Three[^]k[*] (One [/]ThreeNZ) [^]k[-]Three[^]k[*] (One [/]ThreeNZ) [^]n)).
+  astepl ([1] [/]TwoNZ[*] (a k[*] (r[^]k[*]Three[^]k)) [*]
+    (([1] [/]ThreeNZ) [^]k[-] ([1] [/]ThreeNZ) [^]n)).
+  rstepl ([1] [/]TwoNZ[*]a k[*]r[^]k[*]
+    (Three[^]k[*] ([1] [/]ThreeNZ) [^]k[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n)).
   unfold Half in |- *.
-  rstepr (One [/]TwoNZ[*]a k[*]r[^]k[*] (One[-]Small)).
+  rstepr ([1] [/]TwoNZ[*]a k[*]r[^]k[*] ([1][-]Small)).
   apply mult_resp_leEq_lft.
-   astepl (((Three:IR) [*]One [/]ThreeNZ) [^]k[-]Three[^]k[*] (One [/]ThreeNZ) [^]n).
-   astepl ((((Three:IR) [*]One) [/]ThreeNZ) [^]k[-]Three[^]k[*] (One [/]ThreeNZ) [^]n).
-   astepl (((Three:IR) [/]ThreeNZ) [^]k[-]Three[^]k[*] (One [/]ThreeNZ) [^]n).
-   astepl (OneR[^]k[-]Three[^]k[*] (One [/]ThreeNZ) [^]n).
-   astepl (OneR[-]Three[^]k[*] (One [/]ThreeNZ) [^]n).
+   astepl (((Three:IR) [*][1] [/]ThreeNZ) [^]k[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n).
+   astepl ((((Three:IR) [*][1]) [/]ThreeNZ) [^]k[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n).
+   astepl (((Three:IR) [/]ThreeNZ) [^]k[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n).
+   astepl (OneR[^]k[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n).
+   astepl (OneR[-]Three[^]k[*] ([1] [/]ThreeNZ) [^]n).
    apply less_leEq.
    apply minus_resp_less_rht.
    unfold Small in |- *.
    unfold p3m in |- *.
-   rstepl (OneR[*] (One [/]ThreeNZ) [^]n).
+   rstepl (OneR[*] ([1] [/]ThreeNZ) [^]n).
    apply mult_resp_less.
     astepl (OneR[^]k).
     apply nexp_resp_less; auto.
@@ -302,12 +302,12 @@ Proof.
  apply mult_resp_leEq_lft.
   apply leEq_transitive with OneR.
    apply leEq_transitive with ((OneR [/]ThreeNZ) [^]k).
-    astepr ((OneR [/]ThreeNZ) [^]k[-]Zero).
+    astepr ((OneR [/]ThreeNZ) [^]k[-][0]).
     apply less_leEq.
     apply minus_resp_less_rht.
     apply nexp_resp_pos.
     apply pos_div_three; apply pos_one.
-   astepr (One[^]k:IR).
+   astepr ([1][^]k:IR).
    apply nexp_resp_leEq.
     apply less_leEq; apply pos_div_three; apply pos_one.
    astepr (OneR [/]OneNZ).
@@ -324,16 +324,16 @@ Proof.
 Qed.
 (* end hide *)
 
-Lemma Main_1 : forall (r : IR) (k : nat), Zero [<=] r -> 1 <= k -> k <= n ->
+Lemma Main_1 : forall (r : IR) (k : nat), [0] [<=] r -> 1 <= k -> k <= n ->
  (forall i,  1 <= i ->  i <= n -> a i[*] (r [/]ThreeNZ) [^]i[-]eps [<=] a k[*] (r [/]ThreeNZ) [^]k) ->
  (forall i,  1 <= i -> i <= n -> a i[*] (r[*]Three) [^]i[-]eps [<=] a k[*] (r[*]Three) [^]k) ->
  let p_ := fun i => a i[*]r[^]i in let p_k := a k[*]r[^]k in
- Sum 1 (pred k) p_[+]Sum (S k) n p_ [<=] (One[-]Small) [*]p_k[+]Three[^]n[*]eps.
+ Sum 1 (pred k) p_[+]Sum (S k) n p_ [<=] ([1][-]Small) [*]p_k[+]Three[^]n[*]eps.
 Proof.
  (* begin hide *)
  intros r k H H0 H1 H2 H3 p_ p_k.
  unfold p_, p_k in |- *.
- set (h := Half[*] (One[-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps) in *.
+ set (h := Half[*] ([1][-]Small) [*]p_k[+]Half[*]Three[^]n[*]eps) in *.
  apply leEq_wdr with (h[+]h); unfold h, p_k in |- *.
   apply plus_resp_leEq_both.
    apply Main_1a; auto.
@@ -350,11 +350,11 @@ Proof.
   astepl (a i[*] (t[*]p3m 0) [^]i[-]eps).
   astepr (a k[*] (t[*]p3m 0) [^]k).
   auto.
- Step_final (t[*]One).
+ Step_final (t[*][1]).
 Qed.
 
 Lemma Main_2 : forall (t : IR) (j k : nat), let r := t[*]p3m j in
- Zero [<=] t -> a k[*]t[^]k [=] a_0[-]eps -> (forall i, 1 <= i -> i <= n -> a i[*]t[^]i[-]eps [<=] a k[*]t[^]k) ->
+ [0] [<=] t -> a k[*]t[^]k [=] a_0[-]eps -> (forall i, 1 <= i -> i <= n -> a i[*]t[^]i[-]eps [<=] a k[*]t[^]k) ->
  forall i, 1 <= i -> i <= n -> a i[*]r[^]i [<=] a_0.
 Proof.
  (* begin hide *)
@@ -363,15 +363,15 @@ Proof.
  apply leEq_transitive with (a i[*]t[^]i).
   astepl (a i[*] (t[^]i[*]p3m j[^]i)).
   rstepl (p3m j[^]i[*] (a i[*]t[^]i)).
-  astepr (One[*] (a i[*]t[^]i)).
+  astepr ([1][*] (a i[*]t[^]i)).
   apply mult_resp_leEq_rht.
-   astepr (One[^]i:IR).
+   astepr ([1][^]i:IR).
    apply nexp_resp_leEq.
     apply less_leEq; apply p3m_pos.
    apply p3m_small.
-  astepl (Zero[*]t[^]i).
+  astepl ([0][*]t[^]i).
   apply mult_resp_leEq_rht; auto.
-  astepl (Zero[^]i:IR).
+  astepl ([0][^]i:IR).
   apply nexp_resp_leEq; auto.
   apply leEq_reflexive.
  apply leEq_wdr with (eps[+]a k[*]t[^]k).
@@ -399,7 +399,7 @@ Proof.
   apply mult_resp_leEq_rht.
    apply p3m_mon'; auto with arith.
   apply less_leEq; apply a_0_pos.
- astepr (One[*]eps).
+ astepr ([1][*]eps).
  apply mult_resp_leEq_rht.
   apply p3m_small.
  apply less_leEq; auto.
@@ -424,9 +424,9 @@ Proof.
 Qed.
 (* end hide *)
 
-Lemma Main : {r : IR | Zero [<=] r | {k : nat | 1 <= k /\ k <= n /\
+Lemma Main : {r : IR | [0] [<=] r | {k : nat | 1 <= k /\ k <= n /\
  (let p_ := fun i => a i[*]r[^]i in let p_k := a k[*]r[^]k in
-  Sum 1 (pred k) p_[+]Sum (S k) n p_ [<=] (One[-]Small) [*]p_k[+]Three[^]n[*]eps /\
+  Sum 1 (pred k) p_[+]Sum (S k) n p_ [<=] ([1][-]Small) [*]p_k[+]Three[^]n[*]eps /\
   r[^]n [<=] a_0 /\ Smaller[*]a_0[-]Two[*]eps [<=] p_k /\ p_k [<=] a_0)}}.
 Proof.
  (* begin hide *)
@@ -440,7 +440,7 @@ Proof.
  elim (kseq_prop k n H3 H5). intro j. intros H9.
  elim H9. intros H10 H11. elim H11. intros H12 H13.
  clear H9 H6 H4 H2 H1.
- cut (Zero [<=] t[*]p3m (S j)). intro H14.
+ cut ([0] [<=] t[*]p3m (S j)). intro H14.
   2: apply mult_resp_nonneg; auto.
   2: apply less_leEq; apply p3m_pos.
  exists (t[*]p3m (S j)).
@@ -464,7 +464,7 @@ Proof.
   apply H8; auto with arith.
   apply le_trans with (S j); auto with arith.
  split.
-  astepl (One[*] (t[*]p3m (S j)) [^]n).
+  astepl ([1][*] (t[*]p3m (S j)) [^]n).
   astepl (a n[*] (t[*]p3m (S j)) [^]n).
   apply Main_2 with (k 0); auto.
   intros i H15 H16.

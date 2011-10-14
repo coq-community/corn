@@ -25,9 +25,9 @@ The definition of the inverse hyperbolic tangent function.
 
 area tangens hyperbolicus *)
 
-Definition ArTangH : PartIR := Half{**}(Logarithm[o](([-C-]One{+}FId){/}([-C-]One{-}FId))).
+Definition ArTangH : PartIR := Half{**}(Logarithm[o](([-C-][1]{+}FId){/}([-C-][1]{-}FId))).
 
-Definition DomArTanH := olor ([--]One) One.
+Definition DomArTanH := olor ([--][1]) [1].
 
 Lemma proper_DomArTanH : proper DomArTanH.
 Proof.
@@ -42,7 +42,7 @@ Proof.
  intros x Hx.
  split.
   constructor.
- assert (X:Dom (([-C-]One{+}FId){/}([-C-]One{-}FId)) x).
+ assert (X:Dom (([-C-][1]{+}FId){/}([-C-][1]{-}FId)) x).
   split.
    repeat constructor.
   split.
@@ -57,7 +57,7 @@ Proof.
  apply div_resp_pos.
   apply shift_zero_less_minus.
   destruct Hx; assumption.
- rstepr (x[-][--]One).
+ rstepr (x[-][--][1]).
  apply shift_zero_less_minus.
  destruct Hx; assumption.
 Qed.
@@ -69,29 +69,29 @@ Proof.
  assert (Hx:=Hx0).
  destruct Hx as [_ [_ H]].
  simpl in H.
- assert (Hx:One[-]x[#]Zero).
+ assert (Hx:[1][-]x[#][0]).
   apply H.
   repeat constructor.
  clear H.
  destruct (ap_imp_less _ _ _ Hx) as [H|H].
-  elim (less_irreflexive IR Zero).
+  elim (less_irreflexive IR [0]).
   eapply less_transitive_unfolded.
    apply Hx1.
-  apply mult_cancel_less with (x[-]One).
+  apply mult_cancel_less with (x[-][1]).
    apply inv_cancel_less.
-   rstepl (One[-]x).
-   rstepr (Zero:IR).
+   rstepl ([1][-]x).
+   rstepr ([0]:IR).
    assumption.
-  rstepr (Zero[+][--]Zero:IR).
-  rstepl (One[-]x[+][--]Two).
+  rstepr ([0][+][--][0]:IR).
+  rstepl ([1][-]x[+][--]Two).
   apply plus_resp_less_both.
    assumption.
   apply inv_resp_less.
   apply pos_two.
  split.
   apply shift_zero_less_minus'.
-  rstepr (One[+]x).
-  rstepl (Zero[*](One[-]x)).
+  rstepr ([1][+]x).
+  rstepl ([0][*]([1][-]x)).
   eapply shift_mult_less.
    assumption.
   apply Hx1.
@@ -108,34 +108,34 @@ Proof.
  assumption.
 Qed.
 
-Lemma ArTanH_maps_compact_lemma : maps_compacts_into DomArTanH (openl Zero)
-  (([-C-]One{+}FId){/}([-C-]One{-}FId)).
+Lemma ArTanH_maps_compact_lemma : maps_compacts_into DomArTanH (openl [0])
+  (([-C-][1]{+}FId){/}([-C-][1]{-}FId)).
 Proof.
  intros a b Hab H.
- assert (Ha : Zero[<]One[-]a).
+ assert (Ha : [0][<][1][-]a).
   apply shift_zero_less_minus.
   destruct (H _ (compact_inc_lft _ _ Hab)) as [_ A].
   assumption.
- assert (Ha' : One[-]a[#]Zero).
+ assert (Ha' : [1][-]a[#][0]).
   apply Greater_imp_ap.
   assumption.
- exists (One[+]a[/]_[//]Ha').
- assert (Hb : Zero[<]One[-]b).
+ exists ([1][+]a[/]_[//]Ha').
+ assert (Hb : [0][<][1][-]b).
   apply shift_zero_less_minus.
   destruct (H _ (compact_inc_rht _ _ Hab)) as [_ A].
   assumption.
- assert (Hb' : One[-]b[#]Zero).
+ assert (Hb' : [1][-]b[#][0]).
   apply Greater_imp_ap.
   assumption.
- exists (One[+](One[+]b[/]_[//]Hb')).
- assert (Hcd : (One[+]a[/]_[//]Ha')[<](One[+](One[+]b[/]_[//]Hb'))).
-  rstepl (Zero[+](One[+]a[/]_[//]Ha')).
+ exists ([1][+]([1][+]b[/]_[//]Hb')).
+ assert (Hcd : ([1][+]a[/]_[//]Ha')[<]([1][+]([1][+]b[/]_[//]Hb'))).
+  rstepl ([0][+]([1][+]a[/]_[//]Ha')).
   apply plus_resp_less_leEq.
    apply pos_one.
   apply shift_leEq_div; try assumption.
-  rstepl (((One[-]a[*]b)[+](a[-]b))[/]_[//]Ha').
+  rstepl ((([1][-]a[*]b)[+](a[-]b))[/]_[//]Ha').
   apply shift_div_leEq; try assumption.
-  rstepr ((One[-]a[*]b)[+](b[-]a)).
+  rstepr (([1][-]a[*]b)[+](b[-]a)).
   apply plus_resp_leEq_lft.
   apply shift_minus_leEq.
   rstepr (Two[*]b[-]a).
@@ -150,24 +150,24 @@ Proof.
   apply div_resp_pos.
    assumption.
   destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
-  rstepr (a[-][--]One).
+  rstepr (a[-][--][1]).
   apply shift_zero_less_minus.
   assumption.
  intros x Hx H0.
  simpl.
- assert (Zero[<]One[-]x).
+ assert ([0][<][1][-]x).
   destruct (H0) as [_ A].
-  rstepr ((One[-]b)[+](b[-]x)).
-  rstepl (Zero[+]Zero:IR).
+  rstepr (([1][-]b)[+](b[-]x)).
+  rstepl ([0][+][0]:IR).
   apply plus_resp_less_leEq.
    assumption.
   apply shift_zero_leEq_minus.
   assumption.
  split.
   apply shift_leEq_div; try assumption.
-  rstepl (((One[-]x[*]a)[+](a[-]x))[/]_[//]Ha').
+  rstepl ((([1][-]x[*]a)[+](a[-]x))[/]_[//]Ha').
   apply shift_div_leEq; try assumption.
-  rstepr ((One[-]x[*]a)[+](x[-]a)).
+  rstepr (([1][-]x[*]a)[+](x[-]a)).
   apply plus_resp_leEq_lft.
   apply shift_minus_leEq.
   rstepr (Two[*]x[-]a).
@@ -176,11 +176,11 @@ Proof.
   apply mult_resp_leEq_lft; try assumption.
    destruct H0; assumption.
   apply less_leEq; apply pos_two.
- apply leEq_transitive with (Zero[+](One[+]b[/]_[//]Hb')).
+ apply leEq_transitive with ([0][+]([1][+]b[/]_[//]Hb')).
   apply shift_div_leEq; try assumption.
-  rstepr (((One[-]x[*]b)[+](b[-]x))[/]_[//]Hb').
+  rstepr ((([1][-]x[*]b)[+](b[-]x))[/]_[//]Hb').
   apply shift_leEq_div; try assumption.
-  rstepl ((One[-]x[*]b)[+](x[-]b)).
+  rstepl (([1][-]x[*]b)[+](x[-]b)).
   apply plus_resp_leEq_lft.
   apply shift_minus_leEq.
   rstepr (Two[*]b[-]x).
@@ -193,15 +193,15 @@ Proof.
  apply less_leEq; apply pos_one.
 Qed.
 
-Lemma Derivative_ArTanH : forall H, Derivative DomArTanH H ArTangH (Frecip ([-C-]One{-}FId{^}2)).
+Lemma Derivative_ArTanH : forall H, Derivative DomArTanH H ArTangH (Frecip ([-C-][1]{-}FId{^}2)).
 Proof.
  intros H.
- assert (bnd_away_zero_in_P ([-C-]One{-}FId) DomArTanH).
+ assert (bnd_away_zero_in_P ([-C-][1]{-}FId) DomArTanH).
   clear H.
   intros a b Hab H.
   split.
    Included.
-  exists (One[-]b).
+  exists ([1][-]b).
    destruct (H _ (compact_inc_rht _ _ Hab)) as [_ A].
    apply shift_zero_less_minus.
    assumption.
@@ -214,7 +214,7 @@ Proof.
  unfold ArTangH.
  unfold Half.
  eapply Derivative_wdr; [|apply Derivative_scal;
-   eapply (Derivative_comp DomArTanH (openl Zero) H I);[apply ArTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
+   eapply (Derivative_comp DomArTanH (openl [0]) H I);[apply ArTanH_maps_compact_lemma | Derivative_Help; apply Feq_reflexive|Deriv]].
   FEQ.
    apply included_FScalMult.
    apply included_FMult.
@@ -226,7 +226,7 @@ Proof.
     simpl; intros _.
     apply div_resp_ap_zero_rev.
     apply Greater_imp_ap.
-    rstepr (x[-][--]One).
+    rstepr (x[-][--][1]).
     apply shift_zero_less_minus.
     destruct Hx0; assumption.
    apply included_FDiv.
@@ -235,7 +235,7 @@ Proof.
    intros x Hx0 Hx.
    simpl.
    apply Greater_imp_ap.
-   rstepr ((One[-]x)[^]2).
+   rstepr (([1][-]x)[^]2).
    apply pos_square.
    apply Greater_imp_ap.
    apply shift_zero_less_minus.
@@ -244,7 +244,7 @@ Proof.
    repeat constructor.
   intros x Hx0 Hx.
   simpl.
-  rstepl ((One[-]x)[*](x[-][--]One)).
+  rstepl (([1][-]x)[*](x[-][--][1])).
   apply Greater_imp_ap.
   apply mult_resp_pos; apply shift_zero_less_minus; destruct Hx0; assumption.
  apply included_FDiv.
@@ -252,7 +252,7 @@ Proof.
   repeat constructor.
  intros x H0 Hx.
  simpl.
- rstepl ((One[-]x)[^]2).
+ rstepl (([1][-]x)[^]2).
  apply Greater_imp_ap.
  apply pos_square.
  apply Greater_imp_ap.
@@ -295,24 +295,24 @@ Proof.
  rational.
 Qed.
 
-Lemma ArTanH_zero : forall H, ArTanH Zero H[=]Zero.
+Lemma ArTanH_zero : forall H, ArTanH [0] H[=][0].
 Proof.
  intros H.
  apply mult_cancel_lft with (Two:IR).
   apply nringS_ap_zero.
- rstepr (Zero:IR).
- rstepl (ArTanH Zero H[+]ArTanH Zero H).
- assert (X:DomArTanH [--]Zero).
+ rstepr ([0]:IR).
+ rstepl (ArTanH [0] H[+]ArTanH [0] H).
+ assert (X:DomArTanH [--][0]).
   eapply iprop_wd.
    apply H.
   rational.
- astepl (ArTanH Zero H[+]ArTanH _ X).
+ astepl (ArTanH [0] H[+]ArTanH _ X).
  csetoid_rewrite (ArTanH_inv _ X H).
  rational.
 Qed.
 
 (** PowerSeries for the Inverse Hyperbolic Tangent Function. *)
-Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#]Zero.
+Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#][0].
 Proof.
  intros R [|n] H.
   elimtype False.
@@ -322,17 +322,17 @@ Qed.
 
 Definition ArTanH_series_coef (n:nat) :=
 match (even_odd_dec n) with
-| left _ => Zero
-| right H => One[/](nring n)[//](ArTanH_series_coef_lemma IR n H)
+| left _ => [0]
+| right H => [1][/](nring n)[//](ArTanH_series_coef_lemma IR n H)
 end.
 
-Definition ArTanH_ps := FPowerSeries Zero ArTanH_series_coef.
+Definition ArTanH_ps := FPowerSeries [0] ArTanH_series_coef.
 
 Lemma ArTanH_series_lemma :
 forall n : nat,
 Feq DomArTanH
   (Half (R:=IR){**}
-   ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId)))
+   ((Log_ps n[o][-C-][1]{+}FId){-}(Log_ps n[o][-C-][1]{-}FId)))
   (ArTanH_ps n).
 Proof.
  unfold Log_ps, ArTanH_ps.
@@ -342,8 +342,8 @@ Proof.
   apply included_FScalMult.
   apply included_FMinus; apply included_FComp;  Included;  repeat constructor.
  simpl.
- change (Half (R:=IR)[*] (Log_series_coef n[*](One[+]x[-]One)[^]n[-]
-   Log_series_coef n[*](One[-]x[-]One)[^]n)[=] ArTanH_series_coef n[*]nexp IR n (x[-]Zero)).
+ change (Half (R:=IR)[*] (Log_series_coef n[*]([1][+]x[-][1])[^]n[-]
+   Log_series_coef n[*]([1][-]x[-][1])[^]n)[=] ArTanH_series_coef n[*]nexp IR n (x[-][0])).
  unfold ArTanH_series_coef.
  destruct n as [|n].
   destruct (even_odd_dec 0) as [A|A]; try inversion A.
@@ -355,10 +355,10 @@ Proof.
  csetoid_rewrite (inv_nexp_odd _ x _ A).
  unfold Half.
  rstepl (Log_series_coef (S n)[*](x[^]S n)).
- apply mult_wd;[|change (x[^]S n[=](x[+][--]Zero)[^]S n); rational].
+ apply mult_wd;[|change (x[^]S n[=](x[+][--][0])[^]S n); rational].
  unfold Log_series_coef.
  apply div_wd; try apply eq_reflexive.
- csetoid_rewrite (inv_nexp_even IR One _ (even_S _ A)).
+ csetoid_rewrite (inv_nexp_even IR [1] _ (even_S _ A)).
  algebra.
 Qed.
 
@@ -366,13 +366,13 @@ Lemma ArTanH_series_lemma2 :
 fun_series_convergent_IR DomArTanH
   (fun n : nat =>
    Half (R:=IR){**}
-   ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId))).
+   ((Log_ps n[o][-C-][1]{+}FId){-}(Log_ps n[o][-C-][1]{-}FId))).
 Proof.
  apply FSeries_Sum_scal_conv;[|Contin].
- apply FSeries_Sum_minus_conv; apply FSeries_Sum_comp_conv with (olor Zero Two);
+ apply FSeries_Sum_minus_conv; apply FSeries_Sum_comp_conv with (olor [0] Two);
    try apply Log_series_convergent_IR; try Contin; intros a b Hab H; simpl.
-  exists (One[+]a); exists (One[+]b).
-  assert (H0:One[+]a[<=]One[+]b).
+  exists ([1][+]a); exists ([1][+]b).
+  assert (H0:[1][+]a[<=][1][+]b).
    apply plus_resp_leEq_lft; assumption.
   exists H0.
   split.
@@ -381,17 +381,17 @@ Proof.
     eapply less_leEq_trans;[|apply Hc0].
     destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
     apply shift_less_plus'.
-    rstepl ([--]One:IR).
+    rstepl ([--][1]:IR).
     assumption.
    eapply leEq_less_trans;[apply Hc1|].
-   rstepr (One[+]One:IR).
+   rstepr ([1][+][1]:IR).
    apply plus_resp_less_lft.
    destruct (H _ (compact_inc_rht _ _ Hab)) as [_ A].
    assumption.
   intros x _ [Hx0 Hx1].
   split; apply plus_resp_leEq_lft; assumption.
- exists (One[-]b); exists (One[-]a).
- assert (H0:One[-]b[<=]One[-]a).
+ exists ([1][-]b); exists ([1][-]a).
+ assert (H0:[1][-]b[<=][1][-]a).
   apply plus_resp_leEq_lft.
   apply inv_resp_leEq; assumption.
  exists H0.
@@ -403,7 +403,7 @@ Proof.
    apply shift_zero_less_minus.
    assumption.
   eapply leEq_less_trans;[apply Hc1|].
-  rstepr (One[+][--][--]One:IR).
+  rstepr ([1][+][--][--][1]:IR).
   apply plus_resp_less_lft.
   apply inv_resp_less.
   destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
@@ -424,12 +424,12 @@ Lemma ArTanH_series : forall c : IR,
 Proof.
  intros c Hs Hc0 Hc1.
  unfold ArTanH.
- set (F:=([-C-](Half (R:=IR)){*} ((Logarithm[o][-C-]One{+}FId){-}(Logarithm[o][-C-]One{-}FId)))).
+ set (F:=([-C-](Half (R:=IR)){*} ((Logarithm[o][-C-][1]{+}FId){-}(Logarithm[o][-C-][1]{-}FId)))).
  assert (F0:Dom F c).
   destruct Hc0 as [A B].
   repeat (constructor || exists (I, I)); simpl.
    apply shift_less_plus'.
-   rstepl ([--]One:IR).
+   rstepl ([--][1]:IR).
    assumption.
   apply shift_zero_less_minus.
   assumption.
@@ -438,10 +438,10 @@ Proof.
   eapply Feq_transitive.
    apply Feq_symmetric.
    apply (FSeries_Sum_wd' _ _ _ ArTanH_series_lemma2 Hs ArTanH_series_lemma).
-  assert (B0:maps_compacts_into_weak DomArTanH (olor Zero Two) ([-C-]One{+}FId)).
+  assert (B0:maps_compacts_into_weak DomArTanH (olor [0] Two) ([-C-][1]{+}FId)).
    intros a b Hab H; simpl.
-   exists (One[+]a); exists (One[+]b).
-   assert (H0:One[+]a[<=]One[+]b).
+   exists ([1][+]a); exists ([1][+]b).
+   assert (H0:[1][+]a[<=][1][+]b).
     apply plus_resp_leEq_lft; assumption.
    exists H0.
    split.
@@ -451,21 +451,21 @@ Proof.
      eapply less_leEq_trans;[|apply Hc0].
      destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
      apply shift_less_plus'.
-     rstepl ([--]One:IR).
+     rstepl ([--][1]:IR).
      assumption.
     eapply leEq_less_trans;[apply Hc1|].
-    rstepr (One[+]One:IR).
+    rstepr ([1][+][1]:IR).
     apply plus_resp_less_lft.
     destruct (H _ (compact_inc_rht _ _ Hab)) as [_ A].
     assumption.
    intros x _ [Hx0 Hx1].
    split; apply plus_resp_leEq_lft; assumption.
-  assert (A0:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-]One{+}FId))).
-   apply FSeries_Sum_comp_conv with (olor Zero Two); try apply Log_series_convergent_IR; try Contin.
-  assert (B1:maps_compacts_into_weak DomArTanH (olor Zero Two) ([-C-]One{-}FId)).
+  assert (A0:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-][1]{+}FId))).
+   apply FSeries_Sum_comp_conv with (olor [0] Two); try apply Log_series_convergent_IR; try Contin.
+  assert (B1:maps_compacts_into_weak DomArTanH (olor [0] Two) ([-C-][1]{-}FId)).
    intros a b Hab H; simpl.
-   exists (One[-]b); exists (One[-]a).
-   assert (H0:One[-]b[<=]One[-]a).
+   exists ([1][-]b); exists ([1][-]a).
+   assert (H0:[1][-]b[<=][1][-]a).
     apply plus_resp_leEq_lft.
     apply inv_resp_leEq; assumption.
    exists H0.
@@ -478,18 +478,18 @@ Proof.
      apply shift_zero_less_minus.
      assumption.
     eapply leEq_less_trans;[apply Hc1|].
-    rstepr (One[+][--][--]One:IR).
+    rstepr ([1][+][--][--][1]:IR).
     apply plus_resp_less_lft.
     apply inv_resp_less.
     destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].
     assumption.
    intros x _ [Hx0 Hx1].
    split; apply plus_resp_leEq_lft; apply inv_resp_leEq; assumption.
-  assert (A1:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-]One{-}FId))).
-   apply FSeries_Sum_comp_conv with (olor Zero Two); try apply Log_series_convergent_IR; try Contin.
-  assert (A2:fun_series_convergent_IR DomArTanH (fun n : nat => ((Log_ps n[o][-C-]One{+}FId){-}(Log_ps n[o][-C-]One{-}FId)))).
+  assert (A1:fun_series_convergent_IR DomArTanH (fun n : nat => Log_ps n[o]([-C-][1]{-}FId))).
+   apply FSeries_Sum_comp_conv with (olor [0] Two); try apply Log_series_convergent_IR; try Contin.
+  assert (A2:fun_series_convergent_IR DomArTanH (fun n : nat => ((Log_ps n[o][-C-][1]{+}FId){-}(Log_ps n[o][-C-][1]{-}FId)))).
    apply FSeries_Sum_minus_conv; assumption.
-  assert (A3:Feq (olor Zero Two) (FSeries_Sum (J:=olor Zero Two) (f:=Log_ps) Log_series_convergent_IR) Logarithm).
+  assert (A3:Feq (olor [0] Two) (FSeries_Sum (J:=olor [0] Two) (f:=Log_ps) Log_series_convergent_IR) Logarithm).
    split.
     Included.
    split.
@@ -508,30 +508,30 @@ Proof.
    apply (FSeries_Sum_minus _ _ _ A0 A1).
   apply Feq_minus.
    eapply Feq_transitive.
-    apply (FSeries_Sum_comp DomArTanH (olor Zero Two)); try assumption.
+    apply (FSeries_Sum_comp DomArTanH (olor [0] Two)); try assumption.
     Contin.
-   assert (X:forall (x : IR) (Hx : Dom ([-C-]One{+}FId) x),
-     DomArTanH x -> olor Zero Two (([-C-]One{+}FId) x Hx)).
+   assert (X:forall (x : IR) (Hx : Dom ([-C-][1]{+}FId) x),
+     DomArTanH x -> olor [0] Two (([-C-][1]{+}FId) x Hx)).
     intros x Hx [C0 C1].
     simpl; split.
      apply shift_less_plus'.
-     rstepl ([--]One:IR).
+     rstepl ([--][1]:IR).
      assumption.
-    rstepr (One[+]One:IR).
+    rstepr ([1][+][1]:IR).
     apply plus_resp_less_lft.
     assumption.
    eapply Feq_comp; try apply A3; try (apply Feq_reflexive; Included); assumption.
   eapply Feq_transitive.
-   apply (FSeries_Sum_comp DomArTanH (olor Zero Two)); try assumption.
+   apply (FSeries_Sum_comp DomArTanH (olor [0] Two)); try assumption.
    Contin.
-  assert (X:forall (x : IR) (Hx : Dom ([-C-]One{-}FId) x),
-    DomArTanH x -> olor Zero Two (([-C-]One{-}FId) x Hx)).
+  assert (X:forall (x : IR) (Hx : Dom ([-C-][1]{-}FId) x),
+    DomArTanH x -> olor [0] Two (([-C-][1]{-}FId) x Hx)).
    intros x Hx [C0 C1].
    simpl; split.
     apply shift_less_minus.
     rstepl (x:IR).
     assumption.
-   rstepr (One[-][--]One:IR).
+   rstepr ([1][-][--][1]:IR).
    apply plus_resp_less_lft.
    apply inv_resp_less.
    assumption.

@@ -53,14 +53,14 @@ We start by defining maximum and minimum of lists of reals and two membership pr
 
 Fixpoint maxlist (l : list IR) : IR :=
   match l with
-  | nil        => Zero
+  | nil        => [0]
   | cons x nil => x
   | cons x m   => Max x (maxlist m)
   end.
 
 Fixpoint minlist (l : list IR) : IR :=
   match l with
-  | nil        => Zero
+  | nil        => [0]
   | cons x nil => x
   | cons x m   => Min x (minlist m)
   end.
@@ -192,7 +192,7 @@ Qed.
 (* end hide *)
 
 Lemma maxlist_leEq_eps : forall l : list IR, {x : IR | member x l} ->
- forall e, Zero [<] e -> {x : IR | member x l | maxlist l[-]e [<=] x}.
+ forall e, [0] [<] e -> {x : IR | member x l | maxlist l[-]e [<=] x}.
 Proof.
  intro l; induction  l as [| a l Hrecl].
   intro H; simpl in H; inversion H as [x H0]; inversion H0.
@@ -340,7 +340,7 @@ Qed.
 (* end hide *)
 
 Lemma minlist_leEq_eps : forall l : list IR, {x : IR | member x l} ->
- forall e, Zero [<] e -> {x : IR | member x l | x [<=] minlist l[+]e}.
+ forall e, [0] [<] e -> {x : IR | member x l | x [<=] minlist l[+]e}.
 Proof.
  intro l; induction  l as [| a l Hrecl].
   intro H; simpl in H; inversion H as [x H0]; inversion H0.

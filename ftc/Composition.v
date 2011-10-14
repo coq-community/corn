@@ -253,21 +253,21 @@ Proof.
  intros e He.
  set (contF' := deriv_imp_contin'_I _ _ _ _ _ Hab derF) in *.
  set (nF' := Norm_Funct contF') in *.
- cut (Zero [<] One[+]nF'). intro H.
-  cut (One[+]nF'[#]Zero).
+ cut ([0] [<] [1][+]nF'). intro H.
+  cut ([1][+]nF'[#][0]).
    intro HnF'.
    2: apply Greater_imp_ap; assumption.
-  set (alpha := (One[/] _[//]HnF') [*]e [/]TwoNZ) in *.
+  set (alpha := ([1][/] _[//]HnF') [*]e [/]TwoNZ) in *.
   set (contG' := deriv_imp_contin'_I _ _ _ _ _ Hcd derG) in *.
   set (nH' := Norm_Funct contG') in *.
-  cut (Zero [<] alpha).
+  cut ([0] [<] alpha).
    intro Halpha.
-   cut (Zero [<] alpha[+]nH'). intro H0.
-    cut (alpha[+]nH'[#]Zero).
+   cut ([0] [<] alpha[+]nH'). intro H0.
+    cut (alpha[+]nH'[#][0]).
      intro HnH'.
      2: apply Greater_imp_ap; assumption.
-    set (beta := (One[/] _[//]HnH') [*]e [/]TwoNZ) in *.
-    cut (Zero [<] beta).
+    set (beta := ([1][/] _[//]HnH') [*]e [/]TwoNZ) in *.
+    cut ([0] [<] beta).
      intro Hbeta.
      elim (H2 _ Hbeta).
      intros df H1 H3.
@@ -333,14 +333,14 @@ Proof.
        2: apply AbsIR_nonneg.
       unfold alpha in |- *.
       rstepl ((nF'[/] _[//]HnF') [*]e [/]TwoNZ).
-      astepr (One[*]e [/]TwoNZ).
+      astepr ([1][*]e [/]TwoNZ).
       apply mult_resp_leEq_rht.
        2: apply less_leEq; apply pos_div_two; assumption.
       apply shift_div_leEq'.
        apply leEq_less_trans with nF'.
         unfold nF' in |- *; apply positive_norm.
-       astepr (nF'[+]One); apply less_plusOne.
-      apply less_leEq; rstepr (nF'[+]One); apply less_plusOne.
+       astepr (nF'[+][1]); apply less_plusOne.
+      apply less_leEq; rstepr (nF'[+][1]); apply less_plusOne.
      apply shift_mult_leEq' with HnH'.
       assumption.
      apply leEq_wdr with (beta[*]ABSIR (y[-]x)).
@@ -350,19 +350,19 @@ Proof.
       apply H11.
      apply Min_leEq_rht.
     unfold beta in |- *.
-    astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
+    astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive.
      apply recip_resp_pos; assumption.
     apply pos_div_two; assumption.
    apply leEq_less_trans with nH'.
     unfold nH' in |- *; apply positive_norm.
-   astepl (Zero[+]nH'); apply plus_resp_less_rht; assumption.
+   astepl ([0][+]nH'); apply plus_resp_less_rht; assumption.
   unfold alpha in |- *.
-  astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
+  astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive.
    apply recip_resp_pos; assumption.
   apply pos_div_two; assumption.
  apply leEq_less_trans with nF'.
   unfold nF' in |- *; apply positive_norm.
- astepr (nF'[+]One); apply less_plusOne.
+ astepr (nF'[+][1]); apply less_plusOne.
 Qed.
 
 (**
@@ -919,18 +919,18 @@ Finally, some criteria to prove that a function with a specific domain maps comp
 *)
 
 Definition positive_fun P F := included P (Dom F) and
- {c : IR | Zero [<] c | forall y, P y -> forall Hy, c [<=] F y Hy}.
+ {c : IR | [0] [<] c | forall y, P y -> forall Hy, c [<=] F y Hy}.
 
 Definition negative_fun P F := included P (Dom F) and
- {c : IR | c [<] Zero | forall y, P y -> forall Hy, F y Hy [<=] c}.
+ {c : IR | c [<] [0] | forall y, P y -> forall Hy, F y Hy [<=] c}.
 
 Lemma positive_imp_maps_compacts_into : forall (J : interval) F,
- positive_fun J F -> Continuous J F -> maps_compacts_into J (openl Zero) F.
+ positive_fun J F -> Continuous J F -> maps_compacts_into J (openl [0]) F.
 Proof.
  intros J F H H0 a b Hab H1.
  elim H; intros incF H2.
  elim H2; clear H H2 incF; intros MinF H H2.
- set (MaxF := Norm_Funct (included_imp_Continuous _ _ H0 _ _ _ H1) [+]One) in *.
+ set (MaxF := Norm_Funct (included_imp_Continuous _ _ H0 _ _ _ H1) [+][1]) in *.
  cut (MinF [<] MaxF). intro H3.
   exists MinF; exists MaxF; exists H3.
   split.
@@ -959,12 +959,12 @@ Proof.
 Qed.
 
 Lemma negative_imp_maps_compacts_into : forall (J : interval) F,
- negative_fun J F -> Continuous J F -> maps_compacts_into J (openr Zero) F.
+ negative_fun J F -> Continuous J F -> maps_compacts_into J (openr [0]) F.
 Proof.
  intros J F H H0 a b Hab H1.
  elim H; intros incF H2.
  elim H2; clear H H2 incF; intros MaxF H H2.
- set (MinF := [--] (Norm_Funct (included_imp_Continuous _ _ H0 _ _ _ H1)) [-]One) in *.
+ set (MinF := [--] (Norm_Funct (included_imp_Continuous _ _ H0 _ _ _ H1)) [-][1]) in *.
  cut (MinF [<] MaxF). intro H3.
   exists MinF; exists MaxF; exists H3.
   split.
@@ -1000,8 +1000,8 @@ Lemma Continuous_imp_maps_compacts_into : forall J F,
 Proof.
  intros J F H a b Hab H0.
  set (ModF := Norm_Funct (included_imp_Continuous _ _ H _ _ _ H0)) in *.
- cut ( [--]ModF [<] ModF[+]One). intro H1.
-  exists ( [--]ModF); exists (ModF[+]One); exists H1; split.
+ cut ( [--]ModF [<] ModF[+][1]). intro H1.
+  exists ( [--]ModF); exists (ModF[+][1]); exists H1; split.
    repeat split.
   intros; unfold ModF in |- *; split.
    astepr ( [--][--] (Part _ _ Hx)); apply inv_resp_leEq.

@@ -108,11 +108,11 @@ Proof.
     apply degree_plus_rht with 0. apply degree_le_c_. apply degree_x_.
      auto. auto.
   unfold degree_le in H.
- apply degree_le_wd with (_C_ (Zero:CC)).
-  astepl (Zero:cpoly_cring CC).
-  astepl (Zero[*] (_X_[+]_C_ a) [^]i).
+ apply degree_le_wd with (_C_ ([0]:CC)).
+  astepl ([0]:cpoly_cring CC).
+  astepl ([0][*] (_X_[+]_C_ a) [^]i).
   apply bin_op_wd_unfolded.
-   Step_final (_C_ (Zero:CC)).
+   Step_final (_C_ ([0]:CC)).
   algebra.
  apply degree_le_mon with 0.
   auto with arith.
@@ -124,7 +124,7 @@ Proof.
  intros.
  unfold monic in H. elim H. clear H. intros H H0. unfold degree_le in H0.
  apply monic_wd with (Sum 0 n (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i)).
-  astepl (Sum 0 n (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+]Zero).
+  astepl (Sum 0 n (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+][0]).
   apply eq_transitive_unfolded with
     (Sum 0 n (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+] Sum (S n) (lth_of_poly p)
       (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i)).
@@ -132,10 +132,10 @@ Proof.
     apply eq_symmetric_unfolded.
    apply Sum_zero.
     cut (n < lth_of_poly p). intro. auto with arith.
-     apply lt_i_lth_of_poly. astepl (One:CC). algebra.
+     apply lt_i_lth_of_poly. astepl ([1]:CC). algebra.
     intros. cut (n < i). intro.
-   astepl (_C_ Zero[*] (_X_[+]_C_ a) [^]i).
-    Step_final (Zero[*] (_X_[+]_C_ a) [^]i).
+   astepl (_C_ [0][*] (_X_[+]_C_ a) [^]i).
+    Step_final ([0][*] (_X_[+]_C_ a) [^]i).
    auto with arith.
   unfold Shift in |- *.
   apply Sum_Sum.
@@ -147,9 +147,9 @@ Proof.
      (Sum 0 x (fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i) [+]
        _C_ (nth_coeff (S x) p) [*] (_X_[+]_C_ a) [^]S x).
     apply bin_op_wd_unfolded. algebra.
-     astepl (One[*] (_X_[+]_C_ a) [^]S x).
+     astepl ([1][*] (_X_[+]_C_ a) [^]S x).
     apply bin_op_wd_unfolded.
-     Step_final (_C_ (One:CC)). algebra.
+     Step_final (_C_ ([1]:CC)). algebra.
     apply eq_symmetric_unfolded.
    apply Sum_last with (f := fun i : nat => _C_ (nth_coeff i p) [*] (_X_[+]_C_ a) [^]i).
   apply monic_plus with x.
@@ -169,11 +169,11 @@ Proof.
       apply monic_x_.
     auto. auto with arith. auto.
    rewrite <- y in H. rewrite <- y in H0. rewrite <- y.
- apply monic_wd with (One:CCX).
+ apply monic_wd with ([1]:CCX).
   unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *. split.
-  cut (One [=] nth_coeff 0 p[*]One[+]Zero). auto.
+  cut ([1] [=] nth_coeff 0 p[*][1][+][0]). auto.
     astepl (nth_coeff 0 p). rational. auto.
-   apply monic_wd with (_C_ (One:CC)). algebra.
+   apply monic_wd with (_C_ ([1]:CC)). algebra.
   apply monic_c_one.
 Qed.
 

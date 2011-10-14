@@ -44,7 +44,7 @@ Require Import CReals.
 Definition Cauchy_Lim_prop2 (IR : CReals) (seq : nat -> IR)
   (y : IR) :=
   forall eps : IR,
-  Zero[<]eps ->
+  [0][<]eps ->
   {N : nat | forall m : nat, N <= m -> AbsSmall eps (seq m[-]y)}.
 
 
@@ -70,7 +70,7 @@ Definition fun_pres_bin_fun :=
   forall x y : R1, phi (g1 x y)[=]g2 (phi x) (phi y).
 
 (*
-Definition fun_pres_partial_fun:=(x:R1;H1:x[#]Zero;H2:(phi x)[#]Zero)
+Definition fun_pres_partial_fun:=(x:R1;H1:x[#][0];H2:(phi x)[#][0])
 (phi (nzinj R1 (i1 (nzpro R1 x H1))))[=](nzinj R2 (i2 (nzpro R2 (phi x) H2))).
 *)
 
@@ -163,9 +163,9 @@ Qed.
 Lemma map_pres_zero : forall f : Homomorphism, f (cm_unit R1)[=]cm_unit R2.
 Proof.
  intros.
- apply cg_cancel_lft with (x := f Zero).
- apply eq_transitive_unfolded with (f Zero).
-  apply eq_transitive_unfolded with (f (Zero[+]Zero)).
+ apply cg_cancel_lft with (x := f [0]).
+ apply eq_transitive_unfolded with (f [0]).
+  apply eq_transitive_unfolded with (f ([0][+][0])).
    apply eq_symmetric_unfolded.
    apply map_pres_plus_unfolded.
   apply map_wd_unfolded with (f := f).
@@ -173,7 +173,7 @@ Proof.
  algebra.
 Qed.
 
-Lemma map_pres_zero_unfolded : forall f : Homomorphism, f Zero[=]Zero.
+Lemma map_pres_zero_unfolded : forall f : Homomorphism, f [0][=][0].
 Proof.
  intro.
  apply map_pres_zero.
@@ -187,11 +187,11 @@ Proof.
  red in |- *.
  intro.
  apply cg_cancel_lft with (x := f x).
- astepr (Zero:R2).
+ astepr ([0]:R2).
  apply eq_transitive_unfolded with (f (x[+][--]x)).
   apply eq_symmetric_unfolded.
   apply map_pres_plus_unfolded.
- astepl (f Zero).
+ astepl (f [0]).
   apply map_pres_zero_unfolded.
  apply map_wd_unfolded.
  algebra.
@@ -224,11 +224,11 @@ Qed.
 
      (* Merely a useful special case *)
 Lemma map_pres_ap_zero :
- forall (f : Homomorphism) (x : R1), x[#]Zero -> f x[#]Zero.
+ forall (f : Homomorphism) (x : R1), x[#][0] -> f x[#][0].
 Proof.
  intros. rename X into H.
- apply ap_wdr_unfolded with (y := f Zero).
-  apply map_pres_apartness with (y := Zero:R1).
+ apply ap_wdr_unfolded with (y := f [0]).
+  apply map_pres_apartness with (y := [0]:R1).
   exact H.
  apply map_pres_zero_unfolded.
 Qed.
@@ -237,17 +237,17 @@ Lemma map_pres_one : forall f : Homomorphism, f (cr_one R1)[=]cr_one R2.
 Proof.
  intros.
  apply eq_symmetric_unfolded.
- apply mult_cancel_lft with (z := f One).
+ apply mult_cancel_lft with (z := f [1]).
   apply map_pres_ap_zero.
   apply ring_non_triv.
- astepl (f One).
- astepl (f (One[*]One)).
+ astepl (f [1]).
+ astepl (f ([1][*][1])).
   apply map_pres_mult_unfolded.
  apply map_wd_unfolded with (f := f).
  algebra.
 Qed.
 
-Lemma map_pres_one_unfolded : forall f : Homomorphism, f One[=]One.
+Lemma map_pres_one_unfolded : forall f : Homomorphism, f [1][=][1].
 Proof.
  intro.
  apply map_pres_one.
@@ -256,17 +256,17 @@ Qed.
 (* I will not use the following lemma *)
 
 Lemma map_pres_inv_unfolded :
- forall (f : Homomorphism) (x : R1) (H : x[#]Zero),
- f (One[/] x[//]H)[=](One[/] f x[//]map_pres_ap_zero f x H).
+ forall (f : Homomorphism) (x : R1) (H : x[#][0]),
+ f ([1][/] x[//]H)[=]([1][/] f x[//]map_pres_ap_zero f x H).
 Proof.
  intros.
  apply mult_cancel_lft with (z := f x).
   apply map_pres_ap_zero.
   assumption.
- rstepr (One:R2).
- astepl (f One).
+ rstepr ([1]:R2).
+ astepl (f [1]).
   apply map_pres_one_unfolded.
- astepl (f (x[*](One[/] x[//]H))).
+ astepl (f (x[*]([1][/] x[//]H))).
   apply map_pres_mult_unfolded.
  apply map_wd_unfolded.
  rational.
@@ -511,12 +511,12 @@ Section with_plus.
 
 Hypothesis H3 : fun_pres_bin_fun R1 R2 f (csg_op (c:=R1)) (csg_op (c:=R2)).
 
-Lemma f_pres_Zero : f Zero[=]Zero.
+Lemma f_pres_One : f [0][=][0].
 Proof.
  intros.
- apply cg_cancel_lft with (x := f Zero).
- astepr (f Zero).
- astepl (f (Zero[+]Zero)).
+ apply cg_cancel_lft with (x := f [0]).
+ astepr (f [0]).
+ astepl (f ([0][+][0])).
  apply eq_symmetric_unfolded.
  red in H3.
  apply f_well_def.
@@ -527,12 +527,12 @@ Lemma f_pres_minus : forall x : R1, f [--]x[=][--](f x).
 Proof.
  intro.
  apply cg_cancel_lft with (x := f x).
- astepr (Zero:R2).
+ astepr ([0]:R2).
  astepl (f (x[+][--]x)).
- astepr (f Zero).
+ astepr (f [0]).
   apply f_well_def.
   algebra.
- apply f_pres_Zero.
+ apply f_pres_One.
 Qed.
 
 
@@ -560,14 +560,14 @@ Hypothesis
 
 Hypothesis H3 : fun_pres_bin_fun R1 R2 f (csg_op (c:=R1)) (csg_op (c:=R2)).
 
-Lemma f_pres_ap_zero : forall x : R1, x[#]Zero -> f x[#]Zero.
+Lemma f_pres_ap_zero : forall x : R1, x[#][0] -> f x[#][0].
 Proof.
  intros.
- apply ap_wdr_unfolded with (y := f Zero).
-  apply f_pres_apartness with (y := Zero:R1).
+ apply ap_wdr_unfolded with (y := f [0]).
+  apply f_pres_apartness with (y := [0]:R1).
    assumption.
   assumption.
- apply f_pres_Zero.
+ apply f_pres_One.
  assumption.
 Qed.
 
@@ -616,11 +616,11 @@ Proof.
   apply H.
   apply less_pres_f.
    assumption.
-  astepl (Zero:R2).
+  astepl ([0]:R2).
    astepr e2.
    assumption.
   apply eq_symmetric_unfolded.
-  apply f_pres_Zero.
+  apply f_pres_One.
   assumption.
  apply f_surj.
 Qed.
@@ -631,30 +631,30 @@ Section with_mult_plus_less.
 
 Hypothesis H4 : fun_pres_bin_fun R1 R2 f (cr_mult (c:=R1)) (cr_mult (c:=R2)).
 
-Lemma f_pres_one : f One[=]One.
+Lemma f_pres_one : f [1][=][1].
 Proof.
  intros.
  apply eq_symmetric_unfolded.
- apply mult_cancel_lft with (z := f One).
+ apply mult_cancel_lft with (z := f [1]).
   apply f_pres_ap_zero.
   apply ring_non_triv.
- astepl (f One).
- astepr (f (One[*]One)).
+ astepl (f [1]).
+ astepr (f ([1][*][1])).
  apply f_well_def.
  algebra.
 Qed.
 
 Lemma f_pres_inv :
- forall (x : R1) (H : x[#]Zero),
- f (One[/] x[//]H)[=](One[/] f x[//]f_pres_ap_zero x H).
+ forall (x : R1) (H : x[#][0]),
+ f ([1][/] x[//]H)[=]([1][/] f x[//]f_pres_ap_zero x H).
 Proof.
  intros.
  apply mult_cancel_lft with (z := f x).
   apply f_pres_ap_zero.
   assumption.
- rstepr (One:R2).
- astepr (f One).
-  astepl (f (x[*](One[/] x[//]H))).
+ rstepr ([1]:R2).
+ astepr (f [1]).
+  astepl (f (x[*]([1][/] x[//]H))).
   apply eq_symmetric_unfolded.
   apply f_well_def.
   rational.

@@ -67,12 +67,12 @@ Proof.
   elim a; intros N HN.
   elim HN; clear H0 a HN; intros e He HN; simpl in HN.
   apply (less_irreflexive_unfolded _ e).
-  apply leEq_less_trans with (Zero:F); auto.
+  apply leEq_less_trans with ([0]:F); auto.
   astepr (x[-]x); astepr (y[-]x); eauto with arith.
  elim b; intros N HN.
  elim HN; clear H0 b HN; intros e He HN; simpl in HN.
  apply (less_irreflexive_unfolded _ e).
- apply leEq_less_trans with (Zero:F); auto.
+ apply leEq_less_trans with ([0]:F); auto.
  astepr (x[-]x); astepr (x[-]y); eauto with arith.
 Qed.
 
@@ -85,12 +85,12 @@ Proof.
   elim a; intros N HN.
   elim HN; clear H a HN; intros e He HN; simpl in HN.
   apply (less_irreflexive_unfolded _ e).
-  apply leEq_less_trans with (Zero:F); auto.
+  apply leEq_less_trans with ([0]:F); auto.
   astepr (x[+]y[-] (x[+]y)); eauto with arith.
  elim b; intros N HN.
  elim HN; clear H b HN; intros e He HN; simpl in HN.
  apply (less_irreflexive_unfolded _ e).
- apply leEq_less_trans with (Zero:F); auto.
+ apply leEq_less_trans with ([0]:F); auto.
  astepr (x[+]y[-] (x[+]y)); eauto with arith.
 Qed.
 
@@ -103,12 +103,12 @@ Proof.
   elim a; intros N HN.
   elim HN; clear H a HN; intros e He HN; simpl in HN.
   apply (less_irreflexive_unfolded _ e).
-  apply leEq_less_trans with (Zero:F); auto.
+  apply leEq_less_trans with ([0]:F); auto.
   astepr ( [--]x[-][--]x); eauto with arith.
  elim b; intros N HN.
  elim HN; clear H b HN; intros e He HN; simpl in HN.
  apply (less_irreflexive_unfolded _ e).
- apply leEq_less_trans with (Zero:F); auto.
+ apply leEq_less_trans with ([0]:F); auto.
  astepr ( [--]x[-][--]x); eauto with arith.
 Qed.
 
@@ -145,7 +145,7 @@ Proof.
  intros x y H.
  elim H; intros N HN; elim HN; clear H HN; intros e He HN; simpl in HN.
  apply less_leEq_trans with (x[+]e).
-  apply shift_less_plus'; astepl (Zero:F); auto.
+  apply shift_less_plus'; astepl ([0]:F); auto.
  apply shift_plus_leEq'; eauto.
 Qed.
 
@@ -201,16 +201,16 @@ Proof.
  apply ing_plus.
 Qed.
 
-Lemma ing_One : inject_Q (One:F) [=] One.
+Lemma ing_One : inject_Q ([1]:F) [=] [1].
 Proof.
  apply not_ap_imp_eq; intro H.
  elim H; intro Hlt; elim Hlt; intros N HN; elim HN; clear H Hlt HN; intros e He HN; simpl in HN.
-  apply (less_irreflexive_unfolded F Zero).
+  apply (less_irreflexive_unfolded F [0]).
   apply less_leEq_trans with e; auto.
-  astepr (One[-] (One:F)); eauto.
- apply (less_irreflexive_unfolded F Zero).
+  astepr ([1][-] ([1]:F)); eauto.
+ apply (less_irreflexive_unfolded F [0]).
  apply less_leEq_trans with e; auto.
- astepr (One[-] (One:F)); eauto.
+ astepr ([1][-] ([1]:F)); eauto.
 Qed.
 
 Lemma ing_nring' : forall m n : nat,
@@ -225,12 +225,12 @@ Proof.
  intros.
  apply not_ap_imp_eq; intro Hap.
  elim Hap; intro Hlt; elim Hlt; intros N HN; elim HN; clear Hap Hlt HN; intros e He HN.
-  apply (less_irreflexive_unfolded F Zero).
+  apply (less_irreflexive_unfolded F [0]).
   apply less_leEq_trans with e; auto.
   eapply leEq_wdr.
    apply (HN N); auto.
   apply x_minus_x; apply eq_symmetric_unfolded; apply ing_nring'.
- apply (less_irreflexive_unfolded F Zero).
+ apply (less_irreflexive_unfolded F [0]).
  apply less_leEq_trans with e; auto.
  eapply leEq_wdr.
   apply (HN N); auto.
@@ -246,12 +246,12 @@ Proof.
   elim a; intros N HN.
   elim HN; clear H a HN; intros e He HN; simpl in HN.
   apply (less_irreflexive_unfolded _ e).
-  apply leEq_less_trans with (Zero:F); auto.
+  apply leEq_less_trans with ([0]:F); auto.
   astepr (x[*]y[-]x[*]y); eauto with arith.
  elim b; intros N HN.
  elim HN; clear H b HN; intros e He HN; simpl in HN.
  apply (less_irreflexive_unfolded _ e).
- apply leEq_less_trans with (Zero:F); auto.
+ apply leEq_less_trans with ([0]:F); auto.
  astepr (x[*]y[-]x[*]y); eauto with arith.
 Qed.
 
@@ -302,7 +302,7 @@ Proof.
  rational.
 Qed.
 
-Theorem expand_Q_R : forall (x : R_COrdField') e, Zero [<] e -> forall N,
+Theorem expand_Q_R : forall (x : R_COrdField') e, [0] [<] e -> forall N,
  (forall m, N <= m -> AbsSmall (e [/]FourNZ) (CS_seq F x m[-]CS_seq F x N)) ->
  forall m, N <= m -> AbsSmall (inject_Q e) (inject_Q (CS_seq F x m) [-]x).
 Proof.
@@ -337,7 +337,7 @@ Proof.
      apply mult_cancel_leEq with (nring (R:=F) 12).
       apply nring_pos.
       auto with arith.
-     rstepl (Zero[+]Three[*]e); rstepr (e[+]Three[*]e).
+     rstepl ([0][+]Three[*]e); rstepr (e[+]Three[*]e).
      apply plus_resp_leEq; apply less_leEq; auto.
     apply inv_cancel_leEq.
     rstepl (CS_seq F x n[-]CS_seq F x N).
@@ -346,7 +346,7 @@ Proof.
     apply mult_cancel_leEq with (nring (R:=F) 12).
      apply nring_pos.
      auto with arith.
-    rstepl (Zero[+]Three[*]e); rstepr (e[+]Three[*]e).
+    rstepl ([0][+]Three[*]e); rstepr (e[+]Three[*]e).
     apply plus_resp_leEq; apply less_leEq; auto.
    apply H0.
    assumption.
@@ -381,7 +381,7 @@ Proof.
     apply mult_cancel_leEq with (nring (R:=F) 12).
      apply nring_pos.
      auto with arith.
-    rstepl (Zero[+]Three[*]e); rstepr (e[+]Three[*]e).
+    rstepl ([0][+]Three[*]e); rstepr (e[+]Three[*]e).
     apply plus_resp_leEq; apply less_leEq; auto.
    apply inv_cancel_leEq.
    rstepr (CS_seq F x n[-]CS_seq F x N).
@@ -390,7 +390,7 @@ Proof.
    apply mult_cancel_leEq with (nring (R:=F) 12).
     apply nring_pos.
     auto with arith.
-   rstepl (Zero[+]Three[*]e); rstepr (e[+]Three[*]e).
+   rstepl ([0][+]Three[*]e); rstepr (e[+]Three[*]e).
    apply plus_resp_leEq; apply less_leEq; auto.
   apply H0.
   assumption.
@@ -431,12 +431,12 @@ Proof.
  intros.
  case x.
  intros x_ px.
- elim (px One (pos_one _)); intros Nx HNx.
+ elim (px [1] (pos_one _)); intros Nx HNx.
  elim (F_is_archemaedian (x_ Nx)); intros N HN.
  exists (S N).
  intro H.
  elim H; intros K HK; elim HK; clear H HK; intros e He HK; simpl in HK.
- apply (less_irreflexive_unfolded F Zero).
+ apply (less_irreflexive_unfolded F [0]).
  apply less_leEq_trans with e; auto.
  astepr (x_ (K + Nx) [-]x_ (K + Nx)).
  eapply leEq_transitive.
@@ -483,7 +483,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma expand_Q_R_2 : forall x e N, Zero [<] e ->
+Lemma expand_Q_R_2 : forall x e N, [0] [<] e ->
  (forall m, N <= m -> AbsSmall (e [/]FourNZ) (CS_seq F x m[-]CS_seq F x N)) ->
  AbsSmall (inject_Q e) (inject_Q (CS_seq F x N) [-]x).
 Proof.
@@ -506,9 +506,9 @@ Proof.
  intros.
  simpl in |- *.
  unfold Cauchy_prop in pa.
- cut (e [#] Zero).
+ cut (e [#] [0]).
   intro H0.
-  cut {n : nat | (Twelve[/] e[//]H0) [-]One [<] nring n}.
+  cut {n : nat | (Twelve[/] e[//]H0) [-][1] [<] nring n}.
    intro H1.
    case H1.
    intros M H2.
@@ -533,33 +533,33 @@ Proof.
           eauto with arith.
          apply less_leEq.
          apply pos_four.
-        apply mult_cancel_leEq with (R := F) (z := (nring M[+]One) [*] (Three:F)).
+        apply mult_cancel_leEq with (R := F) (z := (nring M[+][1]) [*] (Three:F)).
          apply mult_resp_pos.
           apply less_transitive_unfolded with (F := F) (y := Twelve[/] e[//]H0).
            apply mult_cancel_less with (R := F) (z := e).
             assumption.
-           rstepl (Zero:F).
+           rstepl ([0]:F).
            rstepr (Twelve:F).
            apply nring_pos.
            apply lt_O_Sn.
-          apply plus_cancel_less with (R := F) (z := [--] (One:F)).
-          rstepl ((Twelve[/] e[//]H0) [-]One).
+          apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
+          rstepl ((Twelve[/] e[//]H0) [-][1]).
           rstepr (nring (R:=F) M).
           exact H2.
          apply nring_pos.
          apply lt_O_Sn.
         unfold one_div_succ in |- *.
         unfold Snring in |- *.
-        change (Four[*] (One[/] nring M[+]One[//]nringS_ap_zero F M) [*]
-          ((nring M[+]One) [*]Three) [<=] e [/]ThreeNZ[*] ((nring M[+]One) [*]Three)) in |- *.
+        change (Four[*] ([1][/] nring M[+][1][//]nringS_ap_zero F M) [*]
+          ((nring M[+][1]) [*]Three) [<=] e [/]ThreeNZ[*] ((nring M[+][1]) [*]Three)) in |- *.
         rstepl (Twelve:F).
-        rstepr (e[*] (nring M[+]One)).
-        apply mult_cancel_leEq with (R := F) (z := One[/] e[//]H0).
+        rstepr (e[*] (nring M[+][1])).
+        apply mult_cancel_leEq with (R := F) (z := [1][/] e[//]H0).
          apply recip_resp_pos.
          assumption.
-        rstepr (nring (R:=F) M[+]One).
-        apply plus_cancel_leEq_rht with (R := F) (z := [--] (One:F)).
-        rstepl ((Twelve[/] e[//]H0) [-]One).
+        rstepr (nring (R:=F) M[+][1]).
+        apply plus_cancel_leEq_rht with (R := F) (z := [--] ([1]:F)).
+        rstepl ((Twelve[/] e[//]H0) [-][1]).
         rstepr (nring (R:=F) M).
         apply less_leEq; exact H2.
        apply expand_Q_R_2 with (x := a_ m) (e := Four[*]one_div_succ (R:=F) m) (N := T (a_ m) m).
@@ -576,32 +576,32 @@ Proof.
       apply AbsSmall_leEq_trans with (R := R_COrdField') (e1 := inject_Q (Four[*]one_div_succ (R:=F) M)).
        apply less_leEq.
        apply ing_lt.
-       apply mult_cancel_less with (R := F) (z := (nring M[+]One) [*] (Three:F)).
+       apply mult_cancel_less with (R := F) (z := (nring M[+][1]) [*] (Three:F)).
         apply mult_resp_pos.
          apply less_transitive_unfolded with (F := F) (y := Twelve[/] e[//]H0).
           apply mult_cancel_less with (R := F) (z := e).
            assumption.
-          rstepl (Zero:F).
+          rstepl ([0]:F).
           rstepr (Twelve:F).
           apply nring_pos.
           apply lt_O_Sn.
-         apply plus_cancel_less with (R := F) (z := [--] (One:F)).
-         rstepl ((Twelve[/] e[//]H0) [-]One).
+         apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
+         rstepl ((Twelve[/] e[//]H0) [-][1]).
          rstepr (nring (R:=F) M).
          exact H2.
         apply pos_three.
        unfold one_div_succ in |- *.
        unfold Snring in |- *.
-       change (Four[*] (One[/] nring M[+]One[//]nringS_ap_zero F M) [*]
-         ((nring M[+]One) [*]Three) [<] e [/]ThreeNZ[*] ((nring M[+]One) [*]Three)) in |- *.
+       change (Four[*] ([1][/] nring M[+][1][//]nringS_ap_zero F M) [*]
+         ((nring M[+][1]) [*]Three) [<] e [/]ThreeNZ[*] ((nring M[+][1]) [*]Three)) in |- *.
        rstepl (Twelve:F).
-       rstepr (e[*] (nring M[+]One)).
-       apply mult_cancel_less with (R := F) (z := One[/] e[//]H0).
+       rstepr (e[*] (nring M[+][1])).
+       apply mult_cancel_less with (R := F) (z := [1][/] e[//]H0).
         apply recip_resp_pos.
         assumption.
-       rstepr (nring (R:=F) M[+]One).
-       apply plus_cancel_less with (R := F) (z := [--] (One:F)).
-       rstepl ((Twelve[/] e[//]H0) [-]One).
+       rstepr (nring (R:=F) M[+][1]).
+       apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
+       rstepl ((Twelve[/] e[//]H0) [-][1]).
        rstepr (nring (R:=F) M).
        exact H2.
       apply AbsSmall_minus.
@@ -628,9 +628,9 @@ Proof.
    apply pa.
    apply mult_cancel_less with (R := R_COrdField') (z := Six:R_COrdField').
     apply pos_six.
-   rstepl (Zero:R_COrdField').
+   rstepl ([0]:R_COrdField').
    rstepr (inject_Q e).
-   change (inject_Q (Zero:F) [<] inject_Q e) in |- *.
+   change (inject_Q ([0]:F) [<] inject_Q e) in |- *.
    apply ing_lt.
    assumption.
   apply F_is_archemaedian.
@@ -643,22 +643,22 @@ Qed.
 We can also define a limit operator.
 *)
 
-Lemma Q_dense_in_R : forall x, Zero [<] x -> {q : F | Zero [<] q | inject_Q q [<] x}.
+Lemma Q_dense_in_R : forall x, [0] [<] x -> {q : F | [0] [<] q | inject_Q q [<] x}.
 Proof.
  intros.
- cut (x [#] Zero).
+ cut (x [#] [0]).
   intro H0.
-  cut {n : nat | (One[/] x[//]H0) [<=] nring n}.
+  cut {n : nat | ([1][/] x[//]H0) [<=] nring n}.
    intro H1.
    case H1.
    intros n H2.
-   cut (nring (R:=F) (S n) [#] Zero).
+   cut (nring (R:=F) (S n) [#] [0]).
     intro H3.
-    exists (One[/] nring (S n) [//]H3).
+    exists ([1][/] nring (S n) [//]H3).
      apply recip_resp_pos.
      apply ing_cancel_less.
-     change (Zero [<] inject_Q (nring (S n))) in |- *.
-     apply less_leEq_trans with (R := R_COrdField') (y := One[/] x[//]H0).
+     change ([0] [<] inject_Q (nring (S n))) in |- *.
+     apply less_leEq_trans with (R := R_COrdField') (y := [1][/] x[//]H0).
       apply recip_resp_pos.
       assumption.
      apply leEq_transitive with (inject_Q (nring n)).
@@ -667,21 +667,21 @@ Proof.
       apply ing_nring.
      astepl (nring (R:=R_COrdField') n).
       astepr (nring (R:=R_COrdField') (S n)).
-       apply less_leEq; astepr (nring (R:=R_COrdField') n[+]One); apply less_plusOne.
+       apply less_leEq; astepr (nring (R:=R_COrdField') n[+][1]); apply less_plusOne.
       apply ing_nring.
      apply ing_nring.
-    cut (nring (R:=R_COrdField') (S n) [#] Zero).
+    cut (nring (R:=R_COrdField') (S n) [#] [0]).
      intro H4.
-     astepl (inject_Q (One:F) [/] nring (S n) [//]H4).
+     astepl (inject_Q ([1]:F) [/] nring (S n) [//]H4).
       apply shift_div_less.
        apply nring_pos.
        auto with arith.
-      astepl (One:R_COrdField').
+      astepl ([1]:R_COrdField').
       apply shift_less_mult' with H0.
        assumption.
       eapply leEq_less_trans.
        apply H2.
-      astepr (nring (R:=R_COrdField') n[+]One); apply less_plusOne.
+      astepr (nring (R:=R_COrdField') n[+][1]); apply less_plusOne.
      apply ing_n.
     apply nringS_ap_zero.
    apply nringS_ap_zero.
@@ -706,7 +706,7 @@ Proof.
  set (He := pos_ap_zero _ _ H) in *.
  elim (Q_dense_in_R (e [/]ThreeNZ)); [ intros q Hq Hinj | apply pos_div_three; auto ].
  set (Hq' := pos_ap_zero _ _ Hq) in *.
- elim (F_is_archemaedian ((Four[/] q[//]Hq') [-]One)); intros M HM.
+ elim (F_is_archemaedian ((Four[/] q[//]Hq') [-][1])); intros M HM.
  unfold Cauchy_prop in pa.
  elim (pa (e [/]SixNZ)); [ intros N2 HN2 | apply pos_div_six; auto ].
  elim (CS_seq_diagonal (Build_CauchySeq R_COrdField' a_ pa) (q [/]EightNZ));
@@ -737,47 +737,47 @@ Proof.
      apply one_div_succ_resp_leEq.
      auto with arith.
     apply less_leEq; apply pos_four.
-   apply mult_cancel_less with (R := R_COrdField') (z := nring M[+]One:R_COrdField').
+   apply mult_cancel_less with (R := R_COrdField') (z := nring M[+][1]:R_COrdField').
     apply less_transitive_unfolded with (F := R_COrdField') (y := inject_Q (Four[/] q[//]Hq')).
-     change (inject_Q (Zero:F) [<] inject_Q (Four[/] q[//]Hq')) in |- *.
+     change (inject_Q ([0]:F) [<] inject_Q (Four[/] q[//]Hq')) in |- *.
      apply ing_lt.
      apply mult_cancel_less with (R := F) (z := q).
       assumption.
-     rstepl (Zero:F).
+     rstepl ([0]:F).
      rstepr (Four:F).
      apply pos_four.
     apply shift_less_plus.
-    astepl (inject_Q ((Four[/] q[//]Hq') [+][--]One)).
+    astepl (inject_Q ((Four[/] q[//]Hq') [+][--][1])).
      astepr (inject_Q (nring M)).
       apply ing_lt.
-      rstepl ((Four[/] q[//]Hq') [-]One).
+      rstepl ((Four[/] q[//]Hq') [-][1]).
       exact HM.
      apply eq_symmetric_unfolded.
      apply ing_nring.
     unfold cg_minus in |- *.
-    apply eq_transitive_unfolded with (inject_Q (Four[/] q[//]Hq') [+]inject_Q ( [--]One:F)).
+    apply eq_transitive_unfolded with (inject_Q (Four[/] q[//]Hq') [+]inject_Q ( [--][1]:F)).
      apply ing_plus.
     apply plus_resp_eq.
-    apply eq_transitive_unfolded with ( [--] (inject_Q (One:F))).
+    apply eq_transitive_unfolded with ( [--] (inject_Q ([1]:F))).
      apply ing_min.
-    astepl (Zero[-]inject_Q (One:F)).
-    Step_final (Zero[-] (One:R_COrdField')).
+    astepl ([0][-]inject_Q ([1]:F)).
+    Step_final ([0][-] ([1]:R_COrdField')).
    unfold one_div_succ in |- *.
    unfold Snring in |- *.
-   change (Four[*] (One[/] nring M[+]One[//]nringS_ap_zero R_COrdField' M) [*]
-     (nring M[+]One) [<] inject_Q q[*] (nring M[+]One)) in |- *.
+   change (Four[*] ([1][/] nring M[+][1][//]nringS_ap_zero R_COrdField' M) [*]
+     (nring M[+][1]) [<] inject_Q q[*] (nring M[+][1])) in |- *.
    rstepl (Four:R_COrdField').
-   astepr (inject_Q q[*]inject_Q (nring M[+]One)).
+   astepr (inject_Q q[*]inject_Q (nring M[+][1])).
     astepl (inject_Q (Four:F)).
-     astepr (inject_Q (q[*] (nring M[+]One))).
+     astepr (inject_Q (q[*] (nring M[+][1]))).
       apply ing_lt.
-      apply mult_cancel_less with (R := F) (z := One[/] q[//]Hq').
+      apply mult_cancel_less with (R := F) (z := [1][/] q[//]Hq').
        apply recip_resp_pos.
        assumption.
       rstepl (Four[/] q[//]Hq').
-      rstepr (nring (R:=F) M[+]One).
-      apply plus_cancel_less with (R := F) (z := [--] (One:F)).
-      rstepl ((Four[/] q[//]Hq') [-]One).
+      rstepr (nring (R:=F) M[+][1]).
+      apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
+      rstepl ((Four[/] q[//]Hq') [-][1]).
       rstepr (nring (R:=F) M).
       exact HM.
      apply ing_mult.
@@ -786,11 +786,11 @@ Proof.
    apply mult_wd.
     apply ing_eq.
     apply eq_reflexive_unfolded.
-   apply eq_transitive_unfolded with (inject_Q (nring M) [+]inject_Q (One:F)).
+   apply eq_transitive_unfolded with (inject_Q (nring M) [+]inject_Q ([1]:F)).
     apply ing_plus.
-   astepl (inject_Q (nring M) [+]One).
-   astepl (One[+]inject_Q (nring M)).
-   astepr (One[+]nring (R:=R_COrdField') M).
+   astepl (inject_Q (nring M) [+][1]).
+   astepl ([1][+]inject_Q (nring M)).
+   astepr ([1][+]nring (R:=R_COrdField') M).
    apply plus_resp_eq.
    apply eq_symmetric_unfolded.
    apply ing_nring.
@@ -816,9 +816,9 @@ Proof.
    apply eq_reflexive_unfolded.
   unfold one_div_succ in |- *.
   unfold Snring in |- *.
-  astepl (inject_Q (One[/] _[//]nringS_ap_zero _ (max M (max N1 N2)))).
-  Step_final (One[/] _[//]nringS_ap_zero R_COrdField' (max M (max N1 N2))).
-  apply eq_transitive_unfolded with (inject_Q (One:F) [/] _[//]nringS_ap_zero _ (max M (max N1 N2))).
+  astepl (inject_Q ([1][/] _[//]nringS_ap_zero _ (max M (max N1 N2)))).
+  Step_final ([1][/] _[//]nringS_ap_zero R_COrdField' (max M (max N1 N2))).
+  apply eq_transitive_unfolded with (inject_Q ([1]:F) [/] _[//]nringS_ap_zero _ (max M (max N1 N2))).
    apply eq_symmetric_unfolded.
    apply ing_n.
   apply div_wd.

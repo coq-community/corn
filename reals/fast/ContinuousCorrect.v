@@ -40,7 +40,7 @@ This is our main method of proving the corrections of functions defined
 on CR.
 *)
 Lemma Q_dense_in_compact : forall a b (Hab : a[<=]b) x, a[<]b -> Compact Hab x ->
- forall e, Zero[<]e -> {q:Q | Compact Hab (inj_Q IR q) | AbsSmall e (x[-]inj_Q IR q)}.
+ forall e, [0][<]e -> {q:Q | Compact Hab (inj_Q IR q) | AbsSmall e (x[-]inj_Q IR q)}.
 Proof.
  intros a b Hab x Hab0 Hx e He.
  set (l:=Max a (x[-]e)).
@@ -50,9 +50,9 @@ Proof.
   apply less_Min; apply Max_less.
      assumption.
     apply shift_minus_less.
-    rstepl (x[+]Zero).
+    rstepl (x[+][0]).
     apply plus_resp_leEq_less; assumption.
-   rstepl (a[+]Zero).
+   rstepl (a[+][0]).
    apply plus_resp_leEq_less; assumption.
   apply shift_zero_less_minus'.
   rstepr (e[+]e).
@@ -107,7 +107,7 @@ Proof.
   unfold J;  apply iprop_compact_in_interval_inc1.
  clear Hf0.
  destruct X as [_ X].
- assert (He : Zero[<](inj_Q IR (((1#2)*e)%Qpos:Q))).
+ assert (He : [0][<](inj_Q IR (((1#2)*e)%Qpos:Q))).
   stepl (inj_Q IR (nring 0)); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   apply Qpos_prf.
@@ -128,10 +128,10 @@ Proof.
  clearbody Hab a b.
  clear J HJ.
  pose (d:=match d1 with | Qpos2QposInf q => Min (inj_Q IR (q:Q)) d0 | QposInfinity => d0 end).
- assert (H0d : Zero[<]d).
+ assert (H0d : [0][<]d).
   destruct d1; try assumption.
   apply less_Min; try assumption.
-  stepl (inj_Q IR Zero).
+  stepl (inj_Q IR [0]).
    apply inj_Q_less.
    apply Qpos_prf.
   apply (inj_Q_nring IR 0).

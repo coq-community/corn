@@ -127,7 +127,7 @@ Proof with auto.
    now apply AQsqrt_loop_snd_upper_bound.
   apply semirings.plus_le_compat.
    now rewrite commutativity.
-  now apply rings.flip_le_opp, semirings.le_2_4.
+  now apply rings.flip_le_negate, semirings.le_2_4.
 Qed.
 
 Definition AQsqrt_mid_bounded_raw (n : N) := snd (AQsqrt_loop ('n)) ≪ -(1 + 'n : Z).
@@ -203,7 +203,7 @@ Proof.
   rewrite shiftl_base_nat_pow, rings.preserves_2.
   apply (injective (≪ (2 + 2 * 'n))).
   rewrite shiftl_reverse by ring.
-  rewrite shiftl_base_plus, shiftl_opp, <-shiftl_exp_plus.
+  rewrite shiftl_base_plus, shiftl_negate, <-shiftl_exp_plus.
   ms_setoid_replace (-(2 * 'n) + (2 + 2 * 'n) : Z) with (2 : Z) by ring.
   rewrite shiftl_exp_plus, ?shiftl_2, <-shiftl_mult_l.
   rewrite <-(rings.preserves_2 (f:=cast N Z)), <-rings.preserves_mult.
@@ -223,7 +223,7 @@ Proof.
   now apply shiftl_nonneg, AQsqrt_loop_fst_nonneg.
 Qed.
 
-Definition AQsqrt_mid_raw (ε : Qpos) := AQsqrt_mid_bounded_raw (ring_plus (N_of_Z (-Qdlog2 ε)) 3).
+Definition AQsqrt_mid_raw (ε : Qpos) := AQsqrt_mid_bounded_raw (plus (N_of_Z (-Qdlog2 ε)) 3).
 
 Instance: Proper ((=) ==> (=)) AQsqrt_mid_raw.
 Proof. unfold AQsqrt_mid_raw. intros ? ? E. now rewrite E. Qed.
@@ -259,16 +259,16 @@ Proof.
    destruct (total (≤) (ε2:Q) 1).
     rewrite N_of_Z_nonneg.
      change (- (-Qdlog2 ε2)%Z) with (- -Qdlog2 ε2).
-     rewrite rings.opp_involutive.
+     rewrite rings.negate_involutive.
      rewrite int_pow_exp_plus by solve_propholds.
      transitivity (2 ^ Qdlog2 ε2 : Q).
       2: now apply Qdlog2_spec, Qpos_prf.
      rewrite <-(rings.mult_1_r (2 ^ Qdlog2 ε2 : Q)) at 2.
      now apply (order_preserving (_ *.)).
-    change (0 ≤ -Qdlog2 ε2). now apply rings.flip_nonpos_opp, Qdlog2_nonpos.
+    change (0 ≤ -Qdlog2 ε2). now apply rings.flip_nonpos_negate, Qdlog2_nonpos.
    transitivity (1:Q); auto.
    rewrite N_of_Z_nonpos; [easy|].
-   change (-Qdlog2 ε2 ≤ 0). now apply rings.flip_nonneg_opp, Qdlog2_nonneg.
+   change (-Qdlog2 ε2 ≤ 0). now apply rings.flip_nonneg_negate, Qdlog2_nonneg.
   intros ε1 ε2.
   destruct (total (≤) (N_of_Z (-Qdlog2 ε1)) (N_of_Z (-Qdlog2 ε2))); auto.
   apply ball_sym. 
@@ -282,7 +282,7 @@ Lemma AQsqrt_mid_upper_bound : AQsqrt_mid ≤ 4.
 Proof.
   intros ε.
   transitivity (0 : Q).
-   apply rings.flip_nonneg_opp.
+   apply rings.flip_nonneg_negate.
    now apply orders.lt_le, Qpos_prf.
   change ((0:Q) ≤ '(4 - AQsqrt_mid_raw ((1#2) * ε))).
   apply semirings.preserves_nonneg, rings.flip_nonneg_minus.
@@ -293,7 +293,7 @@ Lemma AQsqrt_mid_nonneg : 0 ≤ AQsqrt_mid.
 Proof.
   intros ε.
   transitivity (0 : Q).
-   apply rings.flip_nonneg_opp.
+   apply rings.flip_nonneg_negate.
    now apply orders.lt_le, Qpos_prf.
   change ((0:Q) ≤ '(AQsqrt_mid_raw ((1#2) * ε) - 0)).
   apply semirings.preserves_nonneg, rings.flip_nonneg_minus.
@@ -307,7 +307,7 @@ Proof.
     eapply Qle_trans.
      2: now apply Qpos_dlog2_spec.
     change (-( '(AQsqrt_mid_raw ε ^ 2) - 'a) ≤ (2 ^ Qdlog2 ε : Q)).
-    rewrite <-rings.opp_swap_r.
+    rewrite <-rings.negate_swap_r.
     unfold AQsqrt_mid_raw. rewrite AQsqrt_mid_bounded_spec.
     rewrite rings.preserves_minus, preserves_shiftl. ring_simplify.
     apply shiftl_le_flip_l.
@@ -325,10 +325,10 @@ Proof.
      rewrite N_of_Z_nonneg.
       apply orders.eq_le. 
       change (-Qdlog2 ε = 2 * -Qdlog2 ε + Qdlog2 ε). ring.
-     change (0 ≤ -Qdlog2 ε). now apply rings.flip_nonpos_opp, Qdlog2_nonpos.
+     change (0 ≤ -Qdlog2 ε). now apply rings.flip_nonpos_negate, Qdlog2_nonpos.
     rewrite N_of_Z_nonpos.
      now apply: Qdlog2_nonneg.
-    change (-Qdlog2 ε ≤ 0). now apply rings.flip_nonneg_opp, Qdlog2_nonneg.
+    change (-Qdlog2 ε ≤ 0). now apply rings.flip_nonneg_negate, Qdlog2_nonneg.
    change ('(AQsqrt_mid_raw ε ^ 2) - 'a ≤ (0:Q)).
    apply rings.flip_nonpos_minus.
    apply (order_preserving _).
@@ -343,12 +343,12 @@ Proof.
      rewrite AQposAsQpos_preserves_4.
      now apply: P.
     transitivity (0:AQ).
-     apply rings.flip_nonneg_opp. now apply: semirings.le_0_4.
+     apply rings.flip_nonneg_negate. now apply: semirings.le_0_4.
     now apply AQsqrt_mid_bounded_raw_lower_bound.
    now apply AQsqrt_mid_bounded_raw_upper_bound.
   split.
    transitivity (0:AR).
-    apply rings.flip_nonneg_opp. 
+    apply rings.flip_nonneg_negate.
     apply (semirings.preserves_nonneg (f:=cast AQ AR)).
     now apply: semirings.le_0_4.
    now apply AQsqrt_mid_nonneg.
@@ -385,7 +385,7 @@ Next Obligation.
    change (2 ^ 2 : Q) with (4 : Q).
    apply (order_reflecting (.* 4 ^ Qdlog4 ('a))).
    rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
-   rewrite rings.mult_1_l, rings.plus_opp_l, int_pow_0, rings.mult_1_r.
+   rewrite rings.mult_1_l, rings.plus_negate_l, int_pow_0, rings.mult_1_r.
    apply Qdlog4_spec.
    now apply semirings.preserves_pos.
   apply (order_reflecting (cast AQ Q)).
@@ -394,7 +394,7 @@ Next Obligation.
   change (2 ^ 2 : Q) with (4 : Q).
   apply (order_reflecting (.* 4 ^ Qdlog4 ('a))).
   rewrite <-associativity, <-int_pow_exp_plus by (compute; discriminate).
-  rewrite rings.plus_opp_l, int_pow_0, rings.mult_1_r.
+  rewrite rings.plus_negate_l, int_pow_0, rings.mult_1_r.
   rewrite <-int_pow_S by (compute; discriminate).
   apply orders.lt_le, Qdlog4_spec.
   now apply semirings.preserves_pos.

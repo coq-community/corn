@@ -78,7 +78,7 @@ Section SubCAbGroups.
 *)
 Variable G : CAbGroup.
 Variable P : G -> CProp.
-Variable Punit : P Zero.
+Variable Punit : P [0].
 Variable op_pres_P : bin_op_pres_pred _ P csg_op.
 Variable inv_pres_P : un_op_pres_pred _ P cg_inv.
 
@@ -282,7 +282,7 @@ Variable G : CAbGroup.
 
 Fixpoint nmult (a:G) (n:nat) {struct n} : G :=
   match n with
-  | O => Zero
+  | O => [0]
   | S p => a[+]nmult a p
   end.
 
@@ -298,12 +298,12 @@ Proof.
  simpl in |- *; algebra.
 Qed.
 
-Lemma nmult_Zero : forall n:nat, nmult Zero n [=] Zero.
+Lemma nmult_Zero : forall n:nat, nmult [0] n [=] [0].
 Proof.
  intro n.
  induction n.
   algebra.
- simpl in |- *; Step_final ((Zero:G)[+]Zero).
+ simpl in |- *; Step_final (([0]:G)[+][0]).
 Qed.
 
 Lemma nmult_plus : forall m n x, nmult x m[+]nmult x n [=] nmult x (m + n).
@@ -371,7 +371,7 @@ Lemma zmult_char : forall (m n:nat) z, z = (m - n)%Z ->
 Proof.
  simple induction z; intros.
    simpl in |- *.
-   replace m with n. Step_final (Zero:G). auto with zarith.
+   replace m with n. Step_final ([0]:G). auto with zarith.
     simpl in |- *.
   astepl (nmult x (nat_of_P p)).
   apply cg_cancel_rht with (nmult x n).
@@ -388,7 +388,7 @@ Proof.
  apply un_op_wd_unfolded.
  apply cg_cancel_lft with (nmult x m).
  astepr (nmult x m[+] [--](nmult x m)[+]nmult x n).
- astepr (Zero[+]nmult x n).
+ astepr ([0][+]nmult x n).
  astepr (nmult x n).
  astepl (nmult x (m + nat_of_P p)).
  apply nmult_wd; algebra.
@@ -416,20 +416,20 @@ Qed.
 
 Lemma zmult_min_one : forall x:G, zmult x (-1) [=] [--]x.
 Proof.
- intros; simpl in |- *; Step_final (Zero[-]x).
+ intros; simpl in |- *; Step_final ([0][-]x).
 Qed.
 
-Lemma zmult_zero : forall x:G, zmult x 0 [=] Zero.
+Lemma zmult_zero : forall x:G, zmult x 0 [=] [0].
 Proof.
  simpl in |- *; algebra.
 Qed.
 
-Lemma zmult_Zero : forall k:Z, zmult Zero k [=] Zero.
+Lemma zmult_Zero : forall k:Z, zmult [0] k [=] [0].
 Proof.
  intro; induction k; simpl in |- *.
    algebra.
-  Step_final ((Zero:G)[-]Zero).
- Step_final ((Zero:G)[-]Zero).
+  Step_final (([0]:G)[-][0]).
+ Step_final (([0]:G)[-][0]).
 Qed.
 
 Hint Resolve zmult_zero: algebra.
@@ -437,10 +437,10 @@ Hint Resolve zmult_zero: algebra.
 Lemma zmult_plus : forall m n x, zmult x m[+]zmult x n [=] zmult x (m + n).
 Proof.
  intros; case m; case n; intros.
-         simpl in |- *; Step_final (Zero[+](Zero[-]Zero):G).
-        simpl in |- *; Step_final (Zero[+](nmult x (nat_of_P p)[-]Zero)).
-       simpl in |- *; Step_final (Zero[+](Zero[-]nmult x (nat_of_P p))).
-      simpl in |- *; Step_final (nmult x (nat_of_P p)[-]Zero[+]Zero).
+         simpl in |- *; Step_final ([0][+]([0][-][0]):G).
+        simpl in |- *; Step_final ([0][+](nmult x (nat_of_P p)[-][0])).
+       simpl in |- *; Step_final ([0][+]([0][-]nmult x (nat_of_P p))).
+      simpl in |- *; Step_final (nmult x (nat_of_P p)[-][0][+][0]).
      simpl in |- *.
      astepl (nmult x (nat_of_P p0)[+]nmult x (nat_of_P p)).
      astepr (nmult x (nat_of_P (p0 + p))).
@@ -450,7 +450,7 @@ Proof.
     astepl (nmult x (nat_of_P p0)[-]nmult x (nat_of_P p)).
     apply eq_symmetric_unfolded; apply zmult_char with (z := (Zpos p0 + Zneg p)%Z).
     rewrite convert_is_POS. unfold Zminus in |- *. rewrite min_convert_is_NEG; auto.
-    rewrite <- Zplus_0_r_reverse. Step_final (zmult x (Zneg p)[+]Zero).
+    rewrite <- Zplus_0_r_reverse. Step_final (zmult x (Zneg p)[+][0]).
    simpl (zmult x (Zneg p0)[+]zmult x (Zpos p)) in |- *.
   astepl ([--](nmult x (nat_of_P p0))[+]nmult x (nat_of_P p)).
   astepl (nmult x (nat_of_P p)[+] [--](nmult x (nat_of_P p0))).
@@ -469,29 +469,29 @@ Qed.
 Lemma zmult_mult : forall m n x, zmult (zmult x m) n [=] zmult x (m * n).
 Proof.
  simple induction m; simple induction n; simpl in |- *; intros.
-         Step_final (Zero[-]Zero[+](Zero:G)).
-        astepr (Zero:G). astepl (nmult (Zero[-]Zero) (nat_of_P p)).
-        Step_final (nmult Zero (nat_of_P p)).
-       astepr [--](Zero:G). astepl [--](nmult (Zero[-]Zero) (nat_of_P p)).
-       Step_final [--](nmult Zero (nat_of_P p)).
+         Step_final ([0][-][0][+]([0]:G)).
+        astepr ([0]:G). astepl (nmult ([0][-][0]) (nat_of_P p)).
+        Step_final (nmult [0] (nat_of_P p)).
+       astepr [--]([0]:G). astepl [--](nmult ([0][-][0]) (nat_of_P p)).
+       Step_final [--](nmult [0] (nat_of_P p)).
       algebra.
      astepr (nmult x (nat_of_P (p * p0))).
-     astepl (nmult (nmult x (nat_of_P p)) (nat_of_P p0)[-]Zero).
+     astepl (nmult (nmult x (nat_of_P p)) (nat_of_P p0)[-][0]).
      astepl (nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
      rewrite nat_of_P_mult_morphism. apply nmult_mult.
      astepr [--](nmult x (nat_of_P (p * p0))).
-    astepl (Zero[-]nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
+    astepl ([0][-]nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
     astepl [--](nmult (nmult x (nat_of_P p)) (nat_of_P p0)).
     rewrite nat_of_P_mult_morphism. apply un_op_wd_unfolded. apply nmult_mult.
     algebra.
   astepr [--](nmult x (nat_of_P (p * p0))).
-  astepl (nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)[-]Zero).
+  astepl (nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)[-][0]).
   astepl (nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)).
   rewrite nat_of_P_mult_morphism. eapply eq_transitive_unfolded.
   apply nmult_inv. apply un_op_wd_unfolded. apply nmult_mult.
   astepr (nmult x (nat_of_P (p * p0))).
  astepr [--][--](nmult x (nat_of_P (p * p0))).
- astepl (Zero[-]nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)).
+ astepl ([0][-]nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)).
  astepl [--](nmult [--](nmult x (nat_of_P p)) (nat_of_P p0)).
  rewrite nat_of_P_mult_morphism. apply un_op_wd_unfolded. eapply eq_transitive_unfolded.
  apply nmult_inv. apply un_op_wd_unfolded. apply nmult_mult.
@@ -502,12 +502,12 @@ Proof.
  intro z; pattern z in |- *.
  apply nats_Z_ind.
   intro n; case n.
-   intros; simpl in |- *. Step_final ((Zero:G)[+](Zero[-]Zero)).
+   intros; simpl in |- *. Step_final (([0]:G)[+]([0][-][0])).
    clear n; intros.
   rewrite POS_anti_convert; simpl in |- *. set (p := nat_of_P (P_of_succ_nat n)) in *.
   astepl (nmult x p[+]nmult y p). Step_final (nmult (x[+]y) p).
   intro n; case n.
-  intros; simpl in |- *. Step_final ((Zero:G)[+](Zero[-]Zero)).
+  intros; simpl in |- *. Step_final (([0]:G)[+]([0][-][0])).
   clear n; intros.
  rewrite NEG_anti_convert; simpl in |- *. set (p := nat_of_P (P_of_succ_nat n)) in *.
  astepl ([--](nmult x p)[+] [--](nmult y p)). astepr [--](nmult (x[+]y) p).

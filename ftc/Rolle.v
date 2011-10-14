@@ -72,7 +72,7 @@ Hypothesis Fab : F a Ha [=] F b Hb.
 
 (* begin hide *)
 Variable e : IR.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 Let contF' : Continuous_I Hab F'.
 Proof.
@@ -82,8 +82,8 @@ Qed.
 
 Let derivF :
   forall e : IR,
-  Zero [<] e ->
-  {d : IR | Zero [<] d |
+  [0] [<] e ->
+  {d : IR | [0] [<] d |
   forall x y : IR,
   I x ->
   I y ->
@@ -98,7 +98,7 @@ Proof.
 Qed.
 
 Let Rolle_lemma2 :
-  {d : IR | Zero [<] d |
+  {d : IR | [0] [<] d |
   forall x y : IR,
   I x ->
   I y ->
@@ -111,7 +111,7 @@ Qed.
 
 Let df := proj1_sig2T _ _ _ Rolle_lemma2.
 
-Let Hdf : Zero [<] df := proj2a_sig2T _ _ _ Rolle_lemma2.
+Let Hdf : [0] [<] df := proj2a_sig2T _ _ _ Rolle_lemma2.
 
 Let Hf :
   forall x y : IR,
@@ -123,7 +123,7 @@ Let Hf :
   proj2b_sig2T _ _ _ Rolle_lemma2.
 
 Let Rolle_lemma3 :
-  {d : IR | Zero [<] d |
+  {d : IR | [0] [<] d |
   forall x y : IR,
   I x ->
   I y ->
@@ -135,7 +135,7 @@ Qed.
 
 Let df' := proj1_sig2T _ _ _ Rolle_lemma3.
 
-Let Hdf' : Zero [<] df' := proj2a_sig2T _ _ _ Rolle_lemma3.
+Let Hdf' : [0] [<] df' := proj2a_sig2T _ _ _ Rolle_lemma3.
 
 Let Hf' :
   forall x y : IR,
@@ -147,7 +147,7 @@ Let Hf' :
 
 Let d := Min df df'.
 
-Let Hd : Zero [<] d.
+Let Hd : [0] [<] d.
 Proof.
  unfold d in |- *; apply less_Min; auto.
 Qed.
@@ -165,7 +165,7 @@ Let fcp (i : nat) (Hi : i <= n) :=
 
 Let Rolle_lemma1 :
   Sumx (fun (i : nat) (H : i < n) => fcp (S i) H[-]fcp i (lt_le_weak i n H)) [=]
-  Zero.
+  [0].
 Proof.
  apply eq_transitive_unfolded with (fcp _ (le_n n) [-]fcp 0 (le_O_n n)).
   apply Mengolli_Sum with (f := fun (i : nat) (H : i <= n) => fcp _ H).
@@ -197,7 +197,7 @@ Notation cp := (compact_part a b Hab' d Hd).
 Let Rolle_lemma4 :
   {i : nat |
   {H : i < n |
-  Zero [<]
+  [0] [<]
   (fcp' _ (lt_le_weak _ _ H) [+]e) [*] (cp (S i) H[-]cp i (lt_le_weak _ _ H))}}.
 Proof.
  apply positive_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (lt_le_weak _ _ H) [+]e) [*]
@@ -246,7 +246,7 @@ Let Rolle_lemma5 : {i : nat | {H : i <= n | [--]e [<] fcp' _ H}}.
 Proof.
  elim Rolle_lemma4; intros i Hi; elim Hi; clear Hi; intros Hi Hi'.
  exists i; exists (lt_le_weak _ _ Hi).
- astepl (Zero[-]e); apply shift_minus_less.
+ astepl ([0][-]e); apply shift_minus_less.
  eapply mult_cancel_less.
   2: eapply less_wdl.
    2: apply Hi'.
@@ -258,7 +258,7 @@ Let Rolle_lemma6 :
   {i : nat |
   {H : i < n |
   (fcp' _ (lt_le_weak _ _ H) [-]e) [*] (cp (S i) H[-]cp i (lt_le_weak _ _ H)) [<]
-  Zero}}.
+  [0]}}.
 Proof.
  apply negative_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (lt_le_weak _ _ H) [-]e) [*]
    (cp _ H[-]cp _ (lt_le_weak _ _ H))).
@@ -306,7 +306,7 @@ Let Rolle_lemma7 : {i : nat | {H : i <= n | fcp' _ H [<] e}}.
 Proof.
  elim Rolle_lemma6; intros i Hi; elim Hi; clear Hi; intros Hi Hi'.
  exists i; exists (lt_le_weak _ _ Hi).
- astepr (e[+]Zero); apply shift_less_plus'.
+ astepr (e[+][0]); apply shift_less_plus'.
  eapply mult_cancel_less.
   2: eapply less_wdr.
    2: apply Hi'.
@@ -389,10 +389,10 @@ Qed.
 Let Rolle_lemma11 :
   (forall (i : nat) (H : i <= n), e [/]TwoNZ [<] AbsIR (fcp' _ H)) ->
   (forall H : 0 <= n, fcp' _ H [<] [--] (e [/]TwoNZ)) ->
-  forall (i : nat) (H : i <= n), fcp' _ H [<] Zero.
+  forall (i : nat) (H : i <= n), fcp' _ H [<] [0].
 Proof.
  intros H H0.
- cut (forall H : 0 <= n, fcp' _ H [<] Zero).
+ cut (forall H : 0 <= n, fcp' _ H [<] [0]).
   intro.
   simple induction i.
    assumption.
@@ -408,7 +408,7 @@ Proof.
     intro H2.
     elim H2; clear H2; intro H3.
      elimtype False.
-     cut (e [/]TwoNZ [<] Zero).
+     cut (e [/]TwoNZ [<] [0]).
       apply less_antisymmetric_unfolded.
       apply pos_div_two; assumption.
      eapply less_transitive_unfolded; [ apply H3 | apply Hrec ].
@@ -439,10 +439,10 @@ Qed.
 Let Rolle_lemma12 :
   (forall (i : nat) (H : i <= n), e [/]TwoNZ [<] AbsIR (fcp' _ H)) ->
   (forall H : 0 <= n, e [/]TwoNZ [<] fcp' _ H) ->
-  forall (i : nat) (H : i <= n), Zero [<] fcp' _ H.
+  forall (i : nat) (H : i <= n), [0] [<] fcp' _ H.
 Proof.
  intros H H0.
- cut (forall H : 0 <= n, Zero [<] fcp' _ H).
+ cut (forall H : 0 <= n, [0] [<] fcp' _ H).
   intro.
   simple induction i.
    assumption.
@@ -460,7 +460,7 @@ Proof.
     intro H2; elim H2; clear H2; intro H3.
      assumption.
     elimtype False.
-    cut (Zero [<] [--] (e [/]TwoNZ)).
+    cut ([0] [<] [--] (e [/]TwoNZ)).
      apply less_antisymmetric_unfolded.
      astepr ( [--]ZeroR); apply inv_resp_less; apply pos_div_two; assumption.
     eapply less_transitive_unfolded; [ apply (Hrec Hi') | apply H3 ].
@@ -490,8 +490,8 @@ Proof.
 Qed.
 
 Let Rolle_lemma13 :
-  (forall (i : nat) (H : i <= n), fcp' _ H [<] Zero)
-  or (forall (i : nat) (H : i <= n), Zero [<] fcp' _ H) ->
+  (forall (i : nat) (H : i <= n), fcp' _ H [<] [0])
+  or (forall (i : nat) (H : i <= n), [0] [<] fcp' _ H) ->
   {x : IR | I x | forall Hx, AbsIR (F' x Hx) [<=] e}.
 Proof.
  intro H; elim H; clear H; intro H0.
@@ -580,7 +580,7 @@ Hypothesis HA : Dom F a.
 Hypothesis HB : Dom F b.
 (* end show *)
 
-Lemma Law_of_the_Mean_I : forall e, Zero [<] e ->
+Lemma Law_of_the_Mean_I : forall e, [0] [<] e ->
  {x : IR | I x | forall Hx, AbsIR (F b HB[-]F a HA[-]F' x Hx[*] (b[-]a)) [<=] e}.
 Proof.
  intros e H.
@@ -636,7 +636,7 @@ Variable F : PartIR.
 Hypothesis HF : Diffble_I Hab' F.
 (* end show *)
 
-Theorem Rolle' : (forall Ha Hb, F a Ha [=] F b Hb) -> forall e, Zero [<] e ->
+Theorem Rolle' : (forall Ha Hb, F a Ha [=] F b Hb) -> forall e, [0] [<] e ->
  {x : IR | Compact Hab x | forall Hx, AbsIR (PartInt (ProjT1 HF) x Hx) [<=] e}.
 Proof.
  intros.
@@ -648,7 +648,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma Law_of_the_Mean'_I : forall HA HB e, Zero [<] e ->
+Lemma Law_of_the_Mean'_I : forall HA HB e, [0] [<] e ->
  {x : IR | Compact Hab x | forall Hx,
   AbsIR (F b HB[-]F a HA[-]PartInt (ProjT1 HF) x Hx[*] (b[-]a)) [<=] e}.
 Proof.
@@ -686,7 +686,7 @@ Let incF := Derivative_imp_inc _ _ _ _ derF.
 Let incF' := Derivative_imp_inc' _ _ _ _ derF.
 (* end hide *)
 
-Theorem Law_of_the_Mean : forall a b, I a -> I b -> forall e, Zero [<] e ->
+Theorem Law_of_the_Mean : forall a b, I a -> I b -> forall e, [0] [<] e ->
  {x : IR | Compact (Min_leEq_Max a b) x | forall Ha Hb Hx,
   AbsIR (F b Hb[-]F a Ha[-]F' x Hx[*] (b[-]a)) [<=] e}.
 Proof.
@@ -730,8 +730,8 @@ Proof.
     eapply leEq_wdl; [ apply H3 | apply Min_comm ].
    eapply leEq_wdr; [ apply H4 | apply Max_comm ].
   apply ap_imp_Min_less_Max.
-  cut (Part _ _ (incF b Hb) [-]Part _ _ (incF a Ha) [#] Zero
-    or Part _ _ (incF' a Ha) [*] (b[-]a) [#] Zero).
+  cut (Part _ _ (incF b Hb) [-]Part _ _ (incF a Ha) [#] [0]
+    or Part _ _ (incF' a Ha) [*] (b[-]a) [#] [0]).
    intro H0.
    elim H0; clear H0; intro H1.
     apply pfstrx with F (incF a Ha) (incF b Hb).
@@ -759,7 +759,7 @@ Theorem Law_of_the_Mean_Abs_ineq : forall a b, I a -> I b -> forall c,
  forall Ha Hb, AbsIR (F b Hb[-]F a Ha) [<=] c[*]AbsIR (b[-]a).
 Proof.
  intros a b Ia Ib c Hc Ha Hb.
- astepr (c[*]AbsIR (b[-]a) [+]Zero).
+ astepr (c[*]AbsIR (b[-]a) [+][0]).
  apply shift_leEq_plus'.
  apply approach_zero_weak.
  intros e H.

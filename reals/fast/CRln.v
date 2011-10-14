@@ -62,7 +62,7 @@ only efficent for values close 1. *)
 Definition rational_ln_slow (a:Q) (p: 0 < a) : CR :=
  scale 2 (rational_artanh_slow (lnDomainAdaptor p)).
 
-Lemma Qpos_adaptor : forall q, 0 < q -> Zero[<]inj_Q IR q.
+Lemma Qpos_adaptor : forall q, 0 < q -> [0][<]inj_Q IR q.
 Proof.
  intros q H.
  stepl (inj_Q IR 0).
@@ -89,19 +89,19 @@ Proof.
  simpl.
  apply cspf_wd.
  set (b:=let (n, d) := a in (n - d) / (n + d)).
- assert (Y:inj_Q IR a[+]One[#]Zero).
+ assert (Y:inj_Q IR a[+][1][#][0]).
   apply Greater_imp_ap.
   apply plus_resp_pos; try assumption.
   apply pos_one.
- assert (Z:One[-](inj_Q IR a[-]One[/]_[//]Y)[#]Zero).
+ assert (Z:[1][-](inj_Q IR a[-][1][/]_[//]Y)[#][0]).
   apply Greater_imp_ap.
   rstepr (Two[/]_[//]Y).
   apply div_resp_pos.
    apply plus_resp_pos; try assumption.
    apply pos_one.
   apply pos_two.
- rstepr (One[+](inj_Q IR a[-]One[/]_[//]Y)[/]_[//]Z).
- cut (inj_Q IR b[=](inj_Q IR a[-]One[/]inj_Q IR a[+]One[//]Y)).
+ rstepr ([1][+](inj_Q IR a[-][1][/]_[//]Y)[/]_[//]Z).
+ cut (inj_Q IR b[=](inj_Q IR a[-][1][/]inj_Q IR a[+][1][//]Y)).
   intros.
   apply div_wd;
     apply bin_op_wd_unfolded; try apply eq_reflexive; try apply un_op_wd_unfolded; assumption.
@@ -129,10 +129,10 @@ Proof.
   rewrite H.
   apply Zle_refl.
  clear - Y.
- assert (X:inj_Q IR (a + 1)[#]Zero).
+ assert (X:inj_Q IR (a + 1)[#][0]).
   stepl (inj_Q IR a [+]inj_Q IR (nring 1)); [| now apply eq_symmetric; apply inj_Q_plus].
   csetoid_rewrite (inj_Q_nring IR 1).
-  rstepl (inj_Q IR a[+]One).
+  rstepl (inj_Q IR a[+][1]).
   assumption.
  stepl (inj_Q IR (a - 1)[/]_[//]X); [| now apply eq_symmetric; apply inj_Q_div].
  apply div_wd.
@@ -189,17 +189,17 @@ Proof.
  rewrite <- IR_mult_as_CR.
  rewrite <- IR_plus_as_CR.
  apply IRasCR_wd.
- assert (X:Zero[<](Two[//](two_ap_zero IR))[^^]n).
+ assert (X:[0][<](Two[//](two_ap_zero IR))[^^]n).
   apply zexp_pos.
   apply pos_two.
  stepl (Log _ (Qpos_adaptor Hq)[+]Log _ X).
-  assert (Y:Zero[<](inj_Q IR q)[*](Two[//](two_ap_zero IR))[^^]n).
+  assert (Y:[0][<](inj_Q IR q)[*](Two[//](two_ap_zero IR))[^^]n).
    apply mult_resp_pos.
     apply (Qpos_adaptor Hq).
    assumption.
   stepl (Log _ Y).
    apply Log_wd.
-   assert (Z:(inj_Q IR (2:Q))[#]Zero).
+   assert (Z:(inj_Q IR (2:Q))[#][0]).
     stepr (inj_Q IR (0:Q)).
      apply inj_Q_ap.
      discriminate.
@@ -287,7 +287,7 @@ Proof.
   intros.
   apply: Qle_refl.
  assert (Z:Derivative (closel (inj_Q IR (c:Q))) I Logarithm {1/}FId).
-  apply (Included_imp_Derivative (openl Zero) I).
+  apply (Included_imp_Derivative (openl [0]) I).
    Deriv.
   intros x Hx.
   simpl.
@@ -314,16 +314,16 @@ Proof.
     apply inj_Q_less.
     simpl; auto with *.
    apply (inj_Q_nring IR 0).
-  rstepl (Zero:IR).
+  rstepl ([0]:IR).
   apply less_leEq.
   apply pos_one.
- stepr (One[/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_prf c)))).
+ stepr ([1][/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_prf c)))).
   apply: recip_resp_leEq; try assumption.
   stepl (inj_Q IR 0).
    apply inj_Q_less.
    simpl; auto with *.
   apply (inj_Q_nring IR 0).
- stepl (((inj_Q IR 1)[/]_[//] Greater_imp_ap IR (inj_Q IR (c:Q)) Zero (Qpos_adaptor (Qpos_prf c)))).
+ stepl (((inj_Q IR 1)[/]_[//] Greater_imp_ap IR (inj_Q IR (c:Q)) [0] (Qpos_adaptor (Qpos_prf c)))).
   clear.
   revert c.
   apply Qpos_positive_numerator_rect.
@@ -346,7 +346,7 @@ Lemma CRln_pos_correct : forall (c:Qpos) x Hx, closel (inj_Q _ (c:Q)) x -> (IRas
 Proof.
  intros c x Hx Hx0.
  assert (Z:Continuous (closel (inj_Q IR (c:Q))) Logarithm).
-  apply (Included_imp_Continuous (openl Zero)).
+  apply (Included_imp_Continuous (openl [0])).
    Contin.
   clear - c.
   intros x Hx.
@@ -397,7 +397,7 @@ Lemma CRln_pos_ln : forall (c:Qpos) (x:CR) Hx,
   CRln_pos c x == CRln x Hx)%CR.
 Proof.
  intros c x Hx Hc.
- assert (X:Zero[<](CRasIR x)).
+ assert (X:[0][<](CRasIR x)).
   apply CR_less_as_IR.
   apply CRltT_wd with 0%CR x; try assumption.
    rewrite -> IR_Zero_as_CR.

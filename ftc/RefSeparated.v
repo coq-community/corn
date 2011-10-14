@@ -68,11 +68,11 @@ Proof.
 Qed.
 
 Variable alpha : IR.
-Hypothesis Halpha : Zero[<]alpha.
+Hypothesis Halpha : [0][<]alpha.
 
 Let e := alpha [/]TwoNZ[/] _[//]max_one_ap_zero (b[-]a).
 
-Lemma RS_He : Zero[<]e.
+Lemma RS_He : [0][<]e.
 Proof.
  unfold e in |- *; apply div_resp_pos.
   apply pos_max_one.
@@ -87,7 +87,7 @@ Proof.
  intros; apply x.
 Defined.
 
-Lemma RS_Hd : Zero[<]d.
+Lemma RS_Hd : [0][<]d.
 Proof.
  unfold d in |- *; elim (contF' e RS_He); auto.
 Qed.
@@ -101,7 +101,7 @@ Proof.
 Qed.
 
 Variable csi : IR.
-Hypothesis Hcsi : Zero[<]csi.
+Hypothesis Hcsi : [0][<]csi.
 
 Let M := Norm_Funct contF.
 
@@ -141,7 +141,7 @@ Proof.
  eapply leEq_transitive; apply Min_leEq_rht.
 Qed.
 
-Lemma RS_delta_pos : Zero[<]delta.
+Lemma RS_delta_pos : [0][<]delta.
 Proof.
  unfold delta in |- *; apply less_Min; apply less_Min.
     unfold deltaP in |- *; apply pos_AntiMesh; [ apply RS_pos_n | assumption ].
@@ -175,7 +175,7 @@ Proof.
     eapply less_wdr.
      2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
      rstepr (R _ Hj'[-]R _ H1[+](R _ H1[-]R _ Hj)[+](R _ Hj[-]P i Hi)).
-     rstepl (Zero[+]delta[+][--](delta [/]TwoNZ)).
+     rstepl ([0][+]delta[+][--](delta [/]TwoNZ)).
      apply plus_resp_leEq_less.
       apply plus_resp_leEq_both.
        apply shift_leEq_minus; astepl (R _ H1).
@@ -217,7 +217,7 @@ Proof.
   eapply less_wdr.
    2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
    rstepr (P i Hi[-]R _ Hj[+](R _ Hj[-]R jj H2)[+](R jj H2[-]R j' Hj')).
-   rstepl ([--](delta [/]TwoNZ)[+]delta[+]Zero).
+   rstepl ([--](delta [/]TwoNZ)[+]delta[+][0]).
    apply plus_resp_less_leEq.
     apply plus_resp_less_leEq.
      eapply less_wdr.
@@ -614,7 +614,7 @@ Proof.
     apply plus_resp_leEq_both.
      elim (gP i H); intros; assumption.
     apply RS_delta_d.
-   astepl (Zero[+]P i (lt_le_weak _ _ H)).
+   astepl ([0][+]P i (lt_le_weak _ _ H)).
    apply plus_resp_leEq_both.
     apply less_leEq; exact RS_Hd.
    elim (gP i H); intros; auto.
@@ -690,7 +690,7 @@ Proof.
    apply Sumx_resp_leEq; intros.
    apply mult_resp_leEq_both.
       apply AbsIR_nonneg.
-     astepl (ZeroR[+]Zero); apply plus_resp_leEq_both; apply AbsIR_nonneg.
+     astepl (ZeroR[+][0]); apply plus_resp_leEq_both; apply AbsIR_nonneg.
     unfold I, M in |- *; apply norm_bnd_AbsIR.
     apply Pts_part_lemma with n sep__sep_part; apply sep__sep_points_lemma.
    rstepr (delta [/]TwoNZ[+]delta [/]TwoNZ).
@@ -712,14 +712,14 @@ Proof.
  apply plus_resp_leEq_both.
   unfold e in |- *.
   apply leEq_wdl with (alpha [/]TwoNZ[*](b[-]a[/] _[//]max_one_ap_zero (b[-]a))).
-   rstepr (alpha [/]TwoNZ[*]One).
+   rstepr (alpha [/]TwoNZ[*][1]).
    apply mult_resp_leEq_lft.
     apply shift_div_leEq.
      apply pos_max_one.
-    astepr (Max (b[-]a) One); apply lft_leEq_Max.
+    astepr (Max (b[-]a) [1]); apply lft_leEq_Max.
    apply less_leEq; apply pos_div_two; assumption.
   simpl in |- *; rational.
- apply leEq_transitive with (Max (nring n[*]M) One[*]delta).
+ apply leEq_transitive with (Max (nring n[*]M) [1][*]delta).
   apply mult_resp_leEq_rht.
    apply lft_leEq_Max.
   apply less_leEq; apply RS_delta_pos.
@@ -763,7 +763,7 @@ Proof.
     apply cg_minus_wd; [ algebra | apply start ].
    generalize Hi'; rewrite H0; clear Hx Hi'; intro.
    apply leEq_wdl with (P 1 Hi'[-]P 0 (le_O_n _)).
-    fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
+    fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
      astepr (Mesh P); apply Mesh_lemma.
     apply plus_resp_leEq_lft.
     apply less_leEq; assumption.
@@ -772,7 +772,7 @@ Proof.
    unfold sep__sep_fun_i in |- *.
    elim (sep__sep_aux_lemma (S i)); elim (sep__sep_aux_lemma i); intros; simpl in |- *.
       rstepl (P (S i) Hi'[-]P i Hi).
-      fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
+      fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
        astepr (Mesh P); apply Mesh_lemma.
       apply plus_resp_leEq_lft.
       apply less_leEq; assumption.
@@ -791,7 +791,7 @@ Proof.
     apply leEq_transitive with delta.
      apply less_leEq; exact RS_delta_pos.
     apply RS_delta_csi.
-   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
+   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.
@@ -802,7 +802,7 @@ Proof.
   rewrite H0 in b1.
   clear Hx; rewrite H0 in Hi'.
   apply leEq_wdl with (P 1 Hi'[-]P 0 (le_O_n n)).
-   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
+   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.
@@ -826,7 +826,7 @@ Proof.
     generalize Hi'; rewrite b1; intro; apply finish.
    algebra.
   apply leEq_wdl with (P (S i) Hi'[-]P i Hi).
-   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+]Zero).
+   fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.

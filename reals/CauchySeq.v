@@ -36,7 +36,7 @@
 
 (** printing IR %\ensuremath{\mathbb R}% *)
 (** printing PartIR %\ensuremath{\mathbb R\!\not\rightarrow\!\mathbb R}% *)
-(** printing ZeroR %\ensuremath{\mathbf0}% #0# *)
+(** printing [0]R %\ensuremath{\mathbf0}% #0# *)
 (** printing OneR %\ensuremath{\mathbf1}% #1# *)
 (** printing AbsIR %\ensuremath{|\cdot|_{\mathbb R}}% *)
 
@@ -63,8 +63,8 @@ Notation ProjIR2 := (prj2 IR _ _ _).
 Load "Transparent_algebra".
 
 (* begin hide *)
-Notation ZeroR := (Zero:IR).
-Notation OneR := (One:IR).
+Notation ZeroR := ([0]:IR).
+Notation OneR := ([1]:IR).
 (* end hide *)
 
 Section CReals_axioms.
@@ -93,16 +93,16 @@ Qed.
 Lemma Archimedes' : forall x : IR, {n : nat | x [<] nring n}.
 Proof.
  intro x.
- elim (Archimedes (x[+]One)); intros n Hn.
+ elim (Archimedes (x[+][1])); intros n Hn.
  exists n.
- apply less_leEq_trans with (x[+]One); auto.
+ apply less_leEq_trans with (x[+][1]); auto.
  apply less_plusOne.
 Qed.
 
 (** A stronger version, which often comes in useful.  *)
 
 Lemma str_Archimedes : forall x : IR,
- Zero [<=] x -> {n : nat | x [<=] nring n /\ (2 <= n -> nring n[-]Two [<=] x)}.
+ [0] [<=] x -> {n : nat | x [<=] nring n /\ (2 <= n -> nring n[-]Two [<=] x)}.
 Proof.
  intros.
  elim (Archimedes x); intros n Hn.
@@ -160,7 +160,7 @@ Therefore it is useful to define an auxiliary predicate
 Variant 2 of Cauchy ([Cauchy_prop2]) is [exists y, (Cauchy_Lim_prop2 seq y)]
 where
 [[
-Cauchy_Lim_prop2 seq y := forall eps [>] Zero, exists N, forall m >= N, (AbsIR seq m - y) [<=] eps
+Cauchy_Lim_prop2 seq y := forall eps [>] [0], exists N, forall m >= N, (AbsIR seq m - y) [<=] eps
 ]]
 
 Note that [Cauchy_Lim_prop2] equals [seqLimit].
@@ -168,7 +168,7 @@ Note that [Cauchy_Lim_prop2] equals [seqLimit].
 Variant 3 of Cauchy ([Cauchy_prop3]) reads [exists y, (Cauchy_Lim_prop3 seq y)]
 where
 [[
-Cauchy_Lim_prop3 seq y := forall k, exists N, forall m >= N, (AbsIR seq m - y) [<=] One[/] (k[+]1)
+Cauchy_Lim_prop3 seq y := forall k, exists N, forall m >= N, (AbsIR seq m - y) [<=] [1][/] (k[+]1)
 ]]
 
 The following variant is more restricted.
@@ -176,7 +176,7 @@ The following variant is more restricted.
 Variant 4 of Cauchy ([Cauchy_prop4]): [exists y, (Cauchy_Lim_prop4 seq y)]
 where
 [[
-Cauchy_Lim_prop4 seq y := forall k, (AbsIR seq m - y) [<=] One[/] (k[+]1)
+Cauchy_Lim_prop4 seq y := forall k, (AbsIR seq m - y) [<=] [1][/] (k[+]1)
 ]]
 
 So
@@ -195,7 +195,7 @@ Definition Cauchy_prop1 (seq : nat -> IR) := forall k,
  {N : nat | forall m, N <= m -> AbsSmall (one_div_succ k) (seq m[-]seq N)}.
 
 Definition Cauchy_Lim_prop2 (seq : nat -> IR) (y : IR) := forall eps,
-  Zero [<] eps -> {N : nat | forall m, N <= m -> AbsSmall eps (seq m[-]y)}.
+  [0] [<] eps -> {N : nat | forall m, N <= m -> AbsSmall eps (seq m[-]y)}.
 
 Definition Cauchy_prop2 (seq : nat -> IR) := {y : IR | Cauchy_Lim_prop2 seq y}.
 
@@ -301,7 +301,7 @@ Qed.
 (** The next lemma follows from [less_Lim_so_less_seq] with [y := (y[+] (Lim seq)) [/]TwoNZ].  *)
 
 Lemma less_Lim_so : forall (seq : CauchySeq IR) y, y [<] Lim seq ->
- {eps : IR | Zero [<] eps | {N : nat | forall m, N <= m -> y[+]eps [<] seq m}}.
+ {eps : IR | [0] [<] eps | {N : nat | forall m, N <= m -> y[+]eps [<] seq m}}.
 Proof.
  intros.
  elim (less_Lim_so_less_seq seq ((y[+]Lim seq) [/]TwoNZ)).
@@ -320,7 +320,7 @@ Proof.
 Qed.
 
 Lemma Lim_less_so : forall (seq : CauchySeq IR) y, Lim seq [<] y ->
- {eps : IR | Zero [<] eps | {N : nat | forall m, N <= m -> seq m[+]eps [<] y}}.
+ {eps : IR | [0] [<] eps | {N : nat | forall m, N <= m -> seq m[+]eps [<] y}}.
 Proof.
  intros.
  elim (Lim_less_so_seq_less seq ((Lim seq[+]y) [/]TwoNZ)).
@@ -526,9 +526,9 @@ Proof.
  unfold Cauchy_prop1 in H.
  unfold Cauchy_prop in |- *.
  intros.
- cut (e [#] Zero).
+ cut (e [#] [0]).
   intro eNZ.
-  elim (Archimedes (One[/] e[//]eNZ)).
+  elim (Archimedes ([1][/] e[//]eNZ)).
   intros x H1.
   elim (H x).
   intros x0 H2.
@@ -591,7 +591,7 @@ Proof.
  intros eps H0.
  unfold Cauchy_Lim_prop3 in H.
  generalize (pos_ap_zero _ _ H0); intro Heps.
- elim (Archimedes (One[/] eps[//]Heps)).
+ elim (Archimedes ([1][/] eps[//]Heps)).
  intro K; intros H1.
  elim (H K).
  intro N; intros H2.
@@ -868,7 +868,7 @@ Proof.
  intros seq1 seq2 y1 y2 H H0.
  unfold Cauchy_Lim_prop2 in |- *.
  intros eps H1.
- cut (Zero [<] eps [/]TwoNZ).
+ cut ([0] [<] eps [/]TwoNZ).
   intro H2.
   elim (H _ H2); intros x H3.
   elim (H0 _ H2); intros x0 H4.

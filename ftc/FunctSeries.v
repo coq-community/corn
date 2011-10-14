@@ -212,14 +212,14 @@ Proof.
  algebra.
 Qed.
 
-Lemma conv_zero_fun_series : fun_series_convergent _ _ Hab (fun n => [-C-]Zero).
+Lemma conv_zero_fun_series : fun_series_convergent _ _ Hab (fun n => [-C-][0]).
 Proof.
  apply conv_fun_const_series with (x := fun n : nat => ZeroR).
  apply conv_zero_series.
 Qed.
 
-Lemma Fun_Series_Sum_zero : forall (H : fun_series_convergent _ _ Hab (fun n => [-C-]Zero))
- x Hx, Fun_Series_Sum H x Hx [=] Zero.
+Lemma Fun_Series_Sum_zero : forall (H : fun_series_convergent _ _ Hab (fun n => [-C-][0]))
+ x Hx, Fun_Series_Sum H x Hx [=] [0].
 Proof.
  intros.
  simpl in |- *.
@@ -707,7 +707,7 @@ Proof.
  intros; apply eq_imp_leEq; apply eq_symmetric_unfolded; apply FAbs_char.
 Qed.
 
-Lemma fun_ratio_test_conv : {N : nat | {c : IR | c [<] One | Zero [<=] c /\
+Lemma fun_ratio_test_conv : {N : nat | {c : IR | c [<] [1] | [0] [<=] c /\
  (forall x, I x -> forall n, N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx') [<=] c[*]AbsIR (f n x Hx))}} ->
  fun_series_convergent _ _ Hab f.
 Proof.
@@ -730,8 +730,8 @@ Proof.
     apply power_series_conv.
     apply AbsIR_less.
      assumption.
-    apply less_leEq_trans with Zero.
-     rstepr ([--]Zero:IR).
+    apply less_leEq_trans with [0].
+     rstepr ([--][0]:IR).
      apply inv_resp_less.
      apply pos_one.
     assumption.
@@ -748,7 +748,7 @@ Proof.
   intros.
   apply eq_imp_leEq.
   simpl in |- *.
-  astepl (AbsIR (Part _ _ Hx') [*]One); apply mult_wdl; apply AbsIR_wd; algebra.
+  astepl (AbsIR (Part _ _ Hx') [*][1]); apply mult_wdl; apply AbsIR_wd; algebra.
  intro.
  elim (le_lt_eq_dec _ _ H1); intro.
   intros; apply leEq_transitive with (c[*]AbsIR (f n x (contin_imp_inc _ _ _ _ (contF n) x H0))).

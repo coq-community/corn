@@ -118,7 +118,7 @@ Lemma ArcTan_plus_ArcTan_Q : forall x y, -(1) <= x <= 1 -> -(1) <= y <= 1 -> ~1-
  (ArcTan (inj_Q _ x)[+]ArcTan (inj_Q _ y)[=]ArcTan (inj_Q _ (f x y))).
 Proof.
  intros x y [Hx0 Hx1] [Hy0 Hy1] H.
- assert (X:forall z, -(1) <= z -> [--]One[<=]inj_Q IR z).
+ assert (X:forall z, -(1) <= z -> [--][1][<=]inj_Q IR z).
   intros z Hz.
   stepl ((inj_Q IR (-(1)))).
    apply inj_Q_leEq; assumption.
@@ -127,15 +127,15 @@ Proof.
   apply un_op_wd_unfolded.
   rstepr (nring 1:IR).
   apply (inj_Q_nring IR 1).
- assert (X0:forall z, z <= 1 -> inj_Q IR z[<=]One).
+ assert (X0:forall z, z <= 1 -> inj_Q IR z[<=][1]).
   intros z Hz.
   stepr ((inj_Q IR ((1)))).
    apply inj_Q_leEq; assumption.
   rstepr (nring 1:IR).
   apply (inj_Q_nring IR 1).
- assert (One[-](inj_Q IR x)[*](inj_Q IR y)[#]Zero).
+ assert ([1][-](inj_Q IR x)[*](inj_Q IR y)[#][0]).
   stepl (inj_Q IR (1[-]x[*]y)).
-   (stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)]).
+   (stepr (inj_Q IR [0]); [| now apply (inj_Q_nring IR 0)]).
    apply inj_Q_ap; assumption.
   eapply eq_transitive.
    apply inj_Q_minus.
@@ -143,18 +143,18 @@ Proof.
    rstepr (nring 1:IR); apply (inj_Q_nring IR 1).
   apply un_op_wd_unfolded.
   apply inj_Q_mult.
- apply eq_transitive with (ArcTan (inj_Q IR x[+]inj_Q IR y[/](One[-]inj_Q IR x[*]inj_Q IR y)[//]X1)).
+ apply eq_transitive with (ArcTan (inj_Q IR x[+]inj_Q IR y[/]([1][-]inj_Q IR x[*]inj_Q IR y)[//]X1)).
   apply ArcTan_plus_ArcTan; first [apply X; assumption |apply X0; assumption].
  apply ArcTan_wd.
- stepl (inj_Q IR ((x[+]y)/(One[-]x*y))).
+ stepl (inj_Q IR ((x[+]y)/([1][-]x*y))).
   apply inj_Q_wd.
   simpl.
   symmetry.
   apply f_char.
- assert (H0:(inj_Q IR (One[-]x * y))[#]Zero).
+ assert (H0:(inj_Q IR ([1][-]x * y))[#][0]).
   (stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)]).
   apply inj_Q_ap; assumption.
- apply eq_transitive with (inj_Q IR (x[+]y)[/]inj_Q IR (One[-]x * y)[//]H0).
+ apply eq_transitive with (inj_Q IR (x[+]y)[/]inj_Q IR ([1][-]x * y)[//]H0).
   apply (inj_Q_div).
  apply div_wd.
   apply inj_Q_plus.
@@ -173,7 +173,7 @@ Proof.
  intros x Hx.
  induction n.
   right.
-  abstract ( rstepl (Zero:IR); (stepl (ArcTan Zero); [| now apply ArcTan_zero]); apply ArcTan_wd;
+  abstract ( rstepl ([0]:IR); (stepl (ArcTan [0]); [| now apply ArcTan_zero]); apply ArcTan_wd;
     apply eq_symmetric; apply (inj_Q_nring IR 0)).
  simpl.
  destruct (IHn) as [H|H].

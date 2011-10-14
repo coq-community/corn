@@ -50,21 +50,21 @@ Section Key_Lemma.
 
 (**
 %\begin{convention}% Let [a:nat->IR] and [n:nat] such that [0 < n],
-[forall (k : nat) (Zero [<=] (a k))], [(a n) [=] One] and [a_0 : IR],
-and [eps : IR] such that [(Zero [<] eps)] and [(eps [<=] a_0)].
+[forall (k : nat) ([0] [<=] (a k))], [(a n) [=] [1]] and [a_0 : IR],
+and [eps : IR] such that [([0] [<] eps)] and [(eps [<=] a_0)].
 %\end{convention}%
 *)
 Variable a : nat -> IR.
 Variable n : nat.
 Hypothesis gt_n_0 : 0 < n.
 Variable eps : IR.
-Hypothesis eps_pos : Zero [<] eps.
-Hypothesis a_nonneg : forall k : nat, Zero [<=] a k.
-Hypothesis a_n_1 : a n [=] One.
+Hypothesis eps_pos : [0] [<] eps.
+Hypothesis a_nonneg : forall k : nat, [0] [<=] a k.
+Hypothesis a_n_1 : a n [=] [1].
 Variable a_0 : IR.
 Hypothesis eps_le_a_0 : eps [<=] a_0.
 
-Lemma a_0_eps_nonneg : Zero [<=] a_0[-]eps.
+Lemma a_0_eps_nonneg : [0] [<=] a_0[-]eps.
 Proof.
  apply shift_leEq_minus.
  astepl eps; auto.
@@ -72,7 +72,7 @@ Qed.
 
 Lemma a_0_eps_fuzz : a_0[-]eps [<] a_0.
 Proof.
- astepr (a_0[-]Zero).
+ astepr (a_0[-][0]).
  apply minus_resp_less_rht.
  apply eps_pos.
 Qed.
@@ -96,11 +96,11 @@ Proof.
  omega.
 Qed.
 
-Lemma lem_1 : {t : IR | Zero [<=] t |
+Lemma lem_1 : {t : IR | [0] [<=] t |
  {k : nat | 1 <= k /\ k <= n /\ a k[*]t[^]k [=] a_0[-]eps /\
  (forall i, 1 <= i -> i <= n -> a i[*]t[^]i [<=] a_0)}}.
 Proof.
- cut (forall j : nat, let l := n - j in 1 <= l -> l <= n -> {t : IR | Zero [<=] t | {k : nat |
+ cut (forall j : nat, let l := n - j in 1 <= l -> l <= n -> {t : IR | [0] [<=] t | {k : nat |
    l <= k /\ k <= n /\ a k[*]t[^]k [=] a_0[-]eps /\
      (forall i : nat, l <= i -> i <= n -> a i[*]t[^]i [<=] a_0)}}).
   intro H.
@@ -116,12 +116,12 @@ Proof.
   split. auto.
    split. auto.
    split.
-   astepl (One[*]NRoot a_0_eps_nonneg gt_n_0[^]n).
+   astepl ([1][*]NRoot a_0_eps_nonneg gt_n_0[^]n).
    Step_final (NRoot a_0_eps_nonneg gt_n_0[^]n).
   intros i H1 H2.
   replace i with n.
    2: apply le_antisym; auto.
-  astepl (One[*]NRoot a_0_eps_nonneg gt_n_0[^]n).
+  astepl ([1][*]NRoot a_0_eps_nonneg gt_n_0[^]n).
   astepl (NRoot a_0_eps_nonneg gt_n_0[^]n).
   astepl (a_0[-]eps).
   apply less_leEq; apply a_0_eps_fuzz.
@@ -135,10 +135,10 @@ Proof.
  elim H6. intros H7 H8. elim H8. intros H9 H10. elim H10. intros H11 H12.
  clear H10 H8 H6 H5.
  elim (less_cotransitive_unfolded _ _ _ a_0_eps_fuzz (a (n - S j) [*]t'[^] (n - S j))); intro H14.
-  cut (Zero [<] a (n - S j)). intro H15.
-   cut (a (n - S j) [#] Zero). intro H16.
+  cut ([0] [<] a (n - S j)). intro H15.
+   cut (a (n - S j) [#] [0]). intro H16.
     2: apply pos_ap_zero; auto.
-   cut (Zero [<=] (a_0[-]eps[/] a (n - S j) [//]H16)). intro H17.
+   cut ([0] [<=] (a_0[-]eps[/] a (n - S j) [//]H16)). intro H17.
     cut (0 < n - S j). intro H18.
      2: auto with arith.
     exists (NRoot H17 H18).
@@ -172,7 +172,7 @@ Proof.
     apply less_leEq; apply a_0_eps_fuzz.
    apply shift_leEq_div; auto.
    astepl ZeroR; apply a_0_eps_nonneg.
-  cut (Zero [<] a (n - S j) [*]t'[^] (n - S j)). intro H15.
+  cut ([0] [<] a (n - S j) [*]t'[^] (n - S j)). intro H15.
    2: apply leEq_less_trans with (a_0[-]eps); auto.
    2: apply a_0_eps_nonneg.
   apply leEq_not_eq.
@@ -198,9 +198,9 @@ Proof.
  apply less_leEq; auto.
 Qed.
 
-Definition p3m (i : nat) := (One [/]ThreeNZ) [^]i:IR.
+Definition p3m (i : nat) := ([1] [/]ThreeNZ) [^]i:IR.
 
-Lemma p3m_pos : forall i : nat, Zero [<] p3m i.
+Lemma p3m_pos : forall i : nat, [0] [<] p3m i.
 Proof.
  intros.
  unfold p3m in |- *.
@@ -214,7 +214,7 @@ Lemma p3m_S : forall i : nat, p3m (S i) [=] p3m i [/]ThreeNZ.
 Proof.
  intros.
  unfold p3m in |- *.
- astepl ((One [/]ThreeNZ) [^]i[*] (One [/]ThreeNZ:IR)).
+ astepl (([1] [/]ThreeNZ) [^]i[*] ([1] [/]ThreeNZ:IR)).
  rational.
 Qed.
 
@@ -230,9 +230,9 @@ Lemma p3m_aux : forall i j : nat, p3m (S i) [^]j [=] p3m j[*]p3m i[^]j.
 Proof.
  intros.
  unfold p3m in |- *.
- astepl ((One [/]ThreeNZ) [^] (S i * j):IR).
+ astepl (([1] [/]ThreeNZ) [^] (S i * j):IR).
  replace (S i * j) with (j + i * j).
-  Step_final ((One [/]ThreeNZ) [^]j[*] (One [/]ThreeNZ) [^] (i * j):IR).
+  Step_final (([1] [/]ThreeNZ) [^]j[*] ([1] [/]ThreeNZ) [^] (i * j):IR).
  reflexivity.
 Qed.
 
@@ -245,7 +245,7 @@ Qed.
 
 Hint Resolve p3m_aux: algebra.
 
-Lemma p3m_0 : p3m 0 [=] One.
+Lemma p3m_0 : p3m 0 [=] [1].
 Proof.
  unfold p3m in |- *.
  simpl in |- *.
@@ -254,7 +254,7 @@ Qed.
 
 Hint Resolve p3m_0: algebra.
 
-Lemma third_pos : ZeroR [<] One [/]ThreeNZ.
+Lemma third_pos : ZeroR [<] [1] [/]ThreeNZ.
 Proof.
  apply recip_resp_pos.
  apply pos_three.
@@ -262,7 +262,7 @@ Qed.
 
 Hint Resolve third_pos: algebra.
 
-Lemma third_less_one : One [/]ThreeNZ [<] OneR.
+Lemma third_less_one : [1] [/]ThreeNZ [<] OneR.
 Proof.
  apply pos_div_three'.
  apply pos_one.
@@ -284,7 +284,7 @@ Proof.
  apply small_nexp_resp_le; try apply less_leEq; algebra.
 Qed.
 
-Lemma p3m_small : forall i : nat, p3m i [<=] One.
+Lemma p3m_small : forall i : nat, p3m i [<=] [1].
 Proof.
  intro.
  astepr (p3m 0).
@@ -299,7 +299,7 @@ Proof.
   apply p3m_mon'.
   auto with arith.
  unfold p3m in |- *.
- astepl (One [/]ThreeNZ:IR).
+ astepl ([1] [/]ThreeNZ:IR).
  unfold Half in |- *.
  apply less_leEq.
  apply recip_resp_less.
@@ -358,7 +358,7 @@ Qed.
 
 Definition Halfeps := Half[*]eps.
 
-Lemma Halfeps_pos : Zero [<] Halfeps.
+Lemma Halfeps_pos : [0] [<] Halfeps.
 Proof.
  unfold Halfeps in |- *.
  apply mult_resp_pos.
@@ -421,7 +421,7 @@ Proof.
 Qed.
 
 Lemma Key_1 : forall (i k j : nat) (ai ak t : IR),
- 1 <= k -> k < i -> Zero [<=] ai -> Zero [<=] t -> ai[*] (t[*]p3m j) [^]i[-]eps [<=] ak[*] (t[*]p3m j) [^]k ->
+ 1 <= k -> k < i -> [0] [<=] ai -> [0] [<=] t -> ai[*] (t[*]p3m j) [^]i[-]eps [<=] ak[*] (t[*]p3m j) [^]k ->
  ai[*] (t[*]p3m (S j)) [^]i[-]Halfeps [<=] ak[*] (t[*]p3m (S j)) [^]k.
 Proof.
  intros i k j ai ak t H H0 H1 H2 H3.
@@ -431,7 +431,7 @@ Proof.
    apply mult_resp_leEq_rht.
     apply less_leEq.
     apply p3m_mon; auto.
-   astepl (ai[*]Zero).
+   astepl (ai[*][0]).
    apply mult_resp_leEq_lft; auto.
    apply nexp_resp_nonneg.
    apply mult_resp_nonneg; auto.
@@ -444,7 +444,7 @@ Proof.
 Qed.
 
 Lemma Key_2 : forall (i k k' j : nat) (ai ak ak' t : IR),
- 1 <= k -> k < i -> Zero [<=] ai -> Zero [<=] t ->
+ 1 <= k -> k < i -> [0] [<=] ai -> [0] [<=] t ->
  ak[*] (t[*]p3m (S j)) [^]k[-]Halfeps [<=] ak'[*] (t[*]p3m (S j)) [^]k' ->
  ai[*] (t[*]p3m j) [^]i[-]eps [<=] ak[*] (t[*]p3m j) [^]k -> ai[*] (t[*]p3m (S j)) [^]i[-]eps [<=] ak'[*] (t[*]p3m (S j)) [^]k'.
 Proof.
@@ -454,7 +454,7 @@ Proof.
  auto.
 Qed.
 
-Lemma Key : {t : IR | Zero [<=] t | forall J, {k : nat -> nat |
+Lemma Key : {t : IR | [0] [<=] t | forall J, {k : nat -> nat |
  (forall i, 1 <= k i /\ k i <= n) /\ (forall i, k (S i) <= k i) /\
  (let k_0 := k 0 in a k_0[*]t[^]k_0 [=] a_0[-]eps) /\
  (forall j,  j <= J -> let k_j := k j in let r := t[*]p3m j in
@@ -481,13 +481,13 @@ Proof.
   rewrite <- (le_n_O_eq _ H9).
   replace (p3m 0) with OneR.
    2: auto.
-  astepr (a k_0[*] (t[^]k_0[*]One[^]k_0)).
-  astepr (a k_0[*] (t[^]k_0[*]One)).
+  astepr (a k_0[*] (t[^]k_0[*][1][^]k_0)).
+  astepr (a k_0[*] (t[^]k_0[*][1])).
   astepr (a k_0[*]t[^]k_0).
   astepr (a_0[-]eps).
   apply minus_resp_leEq.
-  astepl (a i[*] (t[^]i[*]One[^]i)).
-  astepl (a i[*] (t[^]i[*]One)).
+  astepl (a i[*] (t[^]i[*][1][^]i)).
+  astepl (a i[*] (t[^]i[*][1])).
   astepl (a i[*]t[^]i); auto.
  elim HrecJ. intros k' H9.
  elim H9. intros H10 H11. elim H11. intros H12 H13. elim H13. intros H14 H15.

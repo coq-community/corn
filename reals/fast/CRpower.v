@@ -111,11 +111,11 @@ Proof.
   apply eq_reflexive.
  simpl.
  intros x _ Hx.
- change (AbsIR ((nring (R:=IR) (S m))[*](One[*]nexp IR m (inj_Q IR x)))[<=]
+ change (AbsIR ((nring (R:=IR) (S m))[*]([1][*]nexp IR m (inj_Q IR x)))[<=]
    inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
  stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))); [| now
    (apply eq_symmetric; apply inj_Q_mult)].
- stepl ((nring (R:=IR) (S m)[*]AbsIR (One[*]nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult;apply nring_nonneg; auto with *].
+ stepl ((nring (R:=IR) (S m)[*]AbsIR ([1][*]nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult;apply nring_nonneg; auto with *].
  apply mult_resp_leEq_both.
     apply nring_nonneg; auto with *.
    apply AbsIR_nonneg.
@@ -125,7 +125,7 @@ Proof.
   rewrite <- POS_anti_convert.
   stepl ((S m):Q); [| now apply eq_symmetric; apply nring_Q].
   apply leEq_reflexive.
- stepl (One[*](AbsIR (nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult; apply less_leEq; apply pos_one].
+ stepl ([1][*](AbsIR (nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult; apply less_leEq; apply pos_one].
  stepl (AbsIR (nexp IR m (inj_Q _ x))); [| now apply eq_symmetric; apply one_mult].
  stepl (nexp IR m (AbsIR (inj_Q _ x))); [| now apply eq_symmetric; apply AbsIR_nexp].
  stepr (inj_Q IR (c ^ Zpred p)); [| now apply inj_Q_wd; reflexivity].
@@ -134,9 +134,9 @@ Proof.
  rewrite inj_S.
  rewrite <- Zpred_succ.
  destruct m.
-  change (One[<=]inj_Q IR (nring 1)).
+  change ([1][<=]inj_Q IR (nring 1)).
   stepr (nring (R:=IR) 1); [| now apply eq_symmetric; apply inj_Q_nring].
-  stepr (One:IR).
+  stepr ([1]:IR).
    apply leEq_reflexive.
   simpl; algebra.
  rewrite  <- (nat_of_P_o_P_of_succ_nat_eq_succ m).
@@ -165,8 +165,8 @@ Lemma CRpower_N_bounded_correct : forall (c:Qpos) x,
 Proof.
  intros c x Hx.
  pose (I:=(clcr [--](inj_Q IR (c:Q)) (inj_Q IR (c:Q)))).
- assert (Hc: Zero[<]inj_Q IR (c:Q)).
-  stepl (inj_Q IR Zero).
+ assert (Hc: [0][<]inj_Q IR (c:Q)).
+  stepl (inj_Q IR [0]).
    apply inj_Q_less.
    apply Qpos_prf.
   apply (inj_Q_nring IR 0).

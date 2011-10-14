@@ -51,7 +51,7 @@ $x^y=e^{y\times\log(x)}$#x<sup>y</sup>=e<sup>y*log(x)</sup>#, whenever
 [x [>] 0], inspired by the rules for manipulating these expressions.
 *)
 
-Definition power x y (Hx : Zero [<] x) := Exp (y[*]Log x Hx).
+Definition power x y (Hx : [0] [<] x) := Exp (y[*]Log x Hx).
 
 Notation "x [!] y [//] Hy" := (power x y Hy) (at level 20).
 
@@ -85,10 +85,10 @@ Proof.
  Step_final (Exp (y[*]Log x Hx[+]z[*]Log x Hx)).
 Qed.
 
-Lemma power_inv : forall x y Hx Hxy, x[!] [--]y[//]Hx [=] (One[/] x[!]y[//]Hx[//]Hxy).
+Lemma power_inv : forall x y Hx Hxy, x[!] [--]y[//]Hx [=] ([1][/] x[!]y[//]Hx[//]Hxy).
 Proof.
  intros; unfold power in |- *.
- rstepr (One[/] _[//]Exp_ap_zero (y[*]Log x Hx)).
+ rstepr ([1][/] _[//]Exp_ap_zero (y[*]Log x Hx)).
  Step_final (Exp [--] (y[*]Log x Hx)).
 Qed.
 
@@ -99,7 +99,7 @@ Proof.
  intros.
  unfold cg_minus in |- *.
  astepl (x[!]y[//]Hx[*]x[!][--]z[//]Hx).
- rstepr (x[!]y[//]Hx[*] (One[/] _[//]Hxz)).
+ rstepr (x[!]y[//]Hx[*] ([1][/] _[//]Hxz)).
  algebra.
 Qed.
 
@@ -107,7 +107,7 @@ Lemma power_nat : forall x n Hx, x[!]nring n[//]Hx [=] x[^]n.
 Proof.
  intros; unfold power in |- *.
  induction  n as [| n Hrecn].
-  simpl in |- *; astepr (Exp Zero); simpl in |- *; algebra.
+  simpl in |- *; astepr (Exp [0]); simpl in |- *; algebra.
  simpl in |- *.
  astepr (Exp (nring n[*]Log x Hx) [*]Exp (Log x Hx)).
  astepr (Exp (nring n[*]Log x Hx[+]Log x Hx)).
@@ -116,14 +116,14 @@ Qed.
 
 Hint Resolve power_minus power_nat: algebra.
 
-Lemma power_zero : forall (x : IR) Hx, x[!]Zero[//]Hx [=] One.
+Lemma power_zero : forall (x : IR) Hx, x[!][0][//]Hx [=] [1].
 Proof.
  intros.
  astepl (x[!]nring 0[//]Hx).
  Step_final (x[^]0).
 Qed.
 
-Lemma power_one : forall (x : IR) Hx, x[!]One[//]Hx [=] x.
+Lemma power_one : forall (x : IR) Hx, x[!][1][//]Hx [=] x.
 Proof.
  intros.
  astepr (x[^]1).
@@ -131,12 +131,12 @@ Proof.
  simpl in |- *; algebra.
 Qed.
 
-Lemma one_power : forall (x : IR) H, One[!]x[//]H [=] One.
+Lemma one_power : forall (x : IR) H, [1][!]x[//]H [=] [1].
 Proof.
  intros x H.
  unfold power.
- astepl  (Exp (x[*]Zero)).
- rstepl (Exp (Zero)).
+ astepl  (Exp (x[*][0])).
+ rstepl (Exp ([0])).
  algebra.
 Qed.
 
@@ -148,13 +148,13 @@ Lemma power_int : forall x z Hx Hx', x[!]zring z[//]Hx [=] (x[//]Hx') [^^] (z).
 Proof.
  intros; induction  z as [| p| p].
    simpl in |- *.
-   Step_final (x[!]Zero[//]Hx).
+   Step_final (x[!][0][//]Hx).
   simpl in |- *.
   Step_final (x[!]nring (nat_of_P p) [//]Hx).
  simpl in |- *.
  astepl (x[!][--] (nring (nat_of_P p)) [//]Hx).
- astepl (One[/] x[!]nring (nat_of_P p) [//]Hx[//]Exp_ap_zero _).
- Step_final (One[/] x[^]nat_of_P p[//]nexp_resp_ap_zero _ Hx').
+ astepl ([1][/] x[!]nring (nat_of_P p) [//]Hx[//]Exp_ap_zero _).
+ Step_final ([1][/] x[^]nat_of_P p[//]nexp_resp_ap_zero _ Hx').
 Qed.
 
 Hint Resolve power_int: algebra.
@@ -162,7 +162,7 @@ Hint Resolve power_int: algebra.
 Lemma Exp_power : forall (x : IR) He, E[!]x[//]He [=] Exp x.
 Proof.
  intros; unfold power in |- *.
- Step_final (Exp (x[*]One)).
+ Step_final (Exp (x[*][1])).
 Qed.
 
 Lemma mult_power : forall x y z Hx Hy Hxy, (x[*]y) [!]z[//]Hxy [=] x[!]z[//]Hx[*]y[!]z[//]Hy.
@@ -172,10 +172,10 @@ Proof.
  Step_final (Exp (z[*] (Log _ Hx[+]Log _ Hy))).
 Qed.
 
-Lemma recip_power : forall x y Hx Hx' Hx'' Hxy, (One[/] x[//]Hx') [!]y[//]Hx'' [=] (One[/] x[!]y[//]Hx[//]Hxy).
+Lemma recip_power : forall x y Hx Hx' Hx'' Hxy, ([1][/] x[//]Hx') [!]y[//]Hx'' [=] ([1][/] x[!]y[//]Hx[//]Hxy).
 Proof.
  intros; unfold power in |- *.
- rstepr (One[/] _[//]Exp_ap_zero (y[*]Log x Hx)).
+ rstepr ([1][/] _[//]Exp_ap_zero (y[*]Log x Hx)).
  astepr (Exp [--] (y[*]Log _ Hx)).
  Step_final (Exp (y[*][--] (Log _ Hx))).
 Qed.
@@ -186,16 +186,16 @@ Lemma div_power : forall x y z Hx Hy Hy' Hxy Hyz,
  (x[/] y[//]Hy') [!]z[//]Hxy [=] (x[!]z[//]Hx[/] y[!]z[//]Hy[//]Hyz).
 Proof.
  intros.
- apply eq_transitive_unfolded with ((x[*] (One[/] _[//]Hy')) [!]z[//]
+ apply eq_transitive_unfolded with ((x[*] ([1][/] _[//]Hy')) [!]z[//]
    mult_resp_pos _ _ _ Hx (recip_resp_pos _ _ Hy' Hy)).
   apply power_wd; rational.
- rstepr (x[!]z[//]Hx[*] (One[/] _[//]Hyz)).
+ rstepr (x[!]z[//]Hx[*] ([1][/] _[//]Hyz)).
  Step_final (x[!]z[//]Hx[*]_[!]z[//]recip_resp_pos _ _ Hy' Hy).
 Qed.
 
 Hint Resolve div_power: algebra.
 
-Lemma power_ap_zero : forall (x y : IR) Hx, x[!]y[//]Hx [#] Zero.
+Lemma power_ap_zero : forall (x y : IR) Hx, x[!]y[//]Hx [#] [0].
 Proof.
  intros; unfold power in |- *.
  apply Exp_ap_zero.
@@ -210,7 +210,7 @@ Proof.
  algebra.
 Qed.
 
-Lemma power_pos : forall (x y : IR) Hx, Zero [<] x[!]y[//]Hx.
+Lemma power_pos : forall (x y : IR) Hx, [0] [<] x[!]y[//]Hx.
 Proof.
  intros; unfold power in |- *.
  apply Exp_pos.
@@ -218,34 +218,34 @@ Qed.
 
 Hint Resolve power_mult: algebra.
 
-Lemma power_recip : forall x q Hx (Hx' : Zero [<=] x) Hq (Hq' : 0 < q),
- x[!]One[/] nring q[//]Hq[//]Hx [=] NRoot Hx' Hq'.
+Lemma power_recip : forall x q Hx (Hx' : [0] [<=] x) Hq (Hq' : 0 < q),
+ x[!][1][/] nring q[//]Hq[//]Hx [=] NRoot Hx' Hq'.
 Proof.
  intros.
  apply NRoot_unique.
    apply less_leEq; apply power_pos.
   apply power_pos.
- astepr (x[!]One[//]Hx).
- astepl (_[!]nring q[//]power_pos _ (One[/] _[//]Hq) Hx).
- Step_final (x[!] (One[/] _[//]Hq) [*]nring q[//]Hx).
+ astepr (x[!][1][//]Hx).
+ astepl (_[!]nring q[//]power_pos _ ([1][/] _[//]Hq) Hx).
+ Step_final (x[!] ([1][/] _[//]Hq) [*]nring q[//]Hx).
 Qed.
 
 Hint Resolve power_recip: algebra.
 
-Lemma power_div : forall x p q Hx (Hx' : Zero [<=] x) Hq (Hq' : 0 < q),
+Lemma power_div : forall x p q Hx (Hx' : [0] [<=] x) Hq (Hq' : 0 < q),
  x[!]nring p[/] nring q[//]Hq[//]Hx [=] (NRoot Hx' Hq') [^]p.
 Proof.
  intros.
- apply eq_transitive_unfolded with (x[!] (One[/] _[//]Hq) [*]nring p[//]Hx).
+ apply eq_transitive_unfolded with (x[!] ([1][/] _[//]Hq) [*]nring p[//]Hx).
   apply power_wd; rational.
  astepr (NRoot Hx' Hq'[!]nring p[//]NRoot_pos _ Hx' _ Hq' Hx).
- Step_final ((x[!]One[/] _[//]Hq[//]Hx) [!]nring p[//]power_pos _ _ _).
+ Step_final ((x[!][1][/] _[//]Hq[//]Hx) [!]nring p[//]power_pos _ _ _).
 Qed.
 
 Hint Resolve power_div: algebra.
 
 Lemma real_power_resp_leEq_rht : forall x y p Hx Hy,
- Zero[<=] p -> x[<=]y -> x[!]p[//]Hx [<=] y[!]p[//]Hy.
+ [0][<=] p -> x[<=]y -> x[!]p[//]Hx [<=] y[!]p[//]Hy.
 Proof.
  intros x y p Hp Hx Hy H.
  unfold power.
@@ -256,7 +256,7 @@ Proof.
 Qed.
 
 Lemma real_power_resp_less_rht : forall x y p Hx Hy,
- Zero[<] p -> x[<]y -> x[!]p[//]Hx [<] y[!]p[//]Hy.
+ [0][<] p -> x[<]y -> x[!]p[//]Hx [<] y[!]p[//]Hy.
 Proof.
  intros x y p Hp Hx Hy H.
  unfold power.
@@ -267,7 +267,7 @@ Proof.
 Qed.
 
 Lemma real_power_resp_leEq_lft : forall x p q Hx Hx',
- One[<=]x -> p[<=]q -> x[!]p[//]Hx [<=] x[!]q[//]Hx'.
+ [1][<=]x -> p[<=]q -> x[!]p[//]Hx [<=] x[!]q[//]Hx'.
 Proof.
  intros x p q Hx Hx' Hx0 H.
  unfold power.
@@ -279,7 +279,7 @@ Proof.
 Qed.
 
 Lemma real_power_resp_less_lft : forall x p q Hx Hx',
- One[<]x -> p[<]q -> x[!]p[//]Hx [<] x[!]q[//]Hx'.
+ [1][<]x -> p[<]q -> x[!]p[//]Hx [<] x[!]q[//]Hx'.
 Proof.
  intros x p q Hx Hx' Hx0 H.
  unfold power.
@@ -291,7 +291,7 @@ Proof.
 Qed.
 
 Lemma real_power_resp_leEq_both : forall x y p q Hx Hy',
- One[<=]x -> Zero [<=] p -> x[<=]y -> p[<=]q ->
+ [1][<=]x -> [0] [<=] p -> x[<=]y -> p[<=]q ->
  x[!]p[//]Hx [<=] y[!]q[//]Hy'.
 Proof.
  intros x y p q Hx Hy Hx0 Hp H0 H1.
@@ -302,7 +302,7 @@ Proof.
 Qed.
 
 Lemma real_power_resp_less_both : forall x y p q Hx Hy',
- One[<]x -> Zero [<] p -> x[<]y -> p[<]q ->
+ [1][<]x -> [0] [<] p -> x[<]y -> p[<]q ->
  x[!]p[//]Hx [<] y[!]q[//]Hy'.
 Proof.
  intros x y p q Hx Hy Hx0 Hp H0 H1.
@@ -330,11 +330,11 @@ Variables F G : PartIR.
 Definition FPower := Expon[o]G{*} (Logarithm[o]F).
 
 Lemma FPower_domain : forall x, Dom F x -> Dom G x ->
- (forall Hx, Zero [<] F x Hx) -> Dom FPower x.
+ (forall Hx, [0] [<] F x Hx) -> Dom FPower x.
 Proof.
  intros x H H0 H1.
  simpl in |- *.
- cut (Conj (Dom G) (fun y : IR => {Hx : _ | Zero [<] Part F y Hx}) x). intro H2.
+ cut (Conj (Dom G) (fun y : IR => {Hx : _ | [0] [<] Part F y Hx}) x). intro H2.
   exists H2; split.
  split; auto.
  exists H; auto.
@@ -347,11 +347,11 @@ Proof.
  unfold FPower in |- *.
  apply Continuous_comp with realline.
    3: apply Continuous_Exp.
-  2: apply Continuous_mult; [ apply H1 | apply Continuous_comp with (openl Zero); auto ].
+  2: apply Continuous_mult; [ apply H1 | apply Continuous_comp with (openl [0]); auto ].
    3: apply Continuous_Log.
   apply maps_compacts_into_strict_imp_weak; apply Continuous_imp_maps_compacts_into.
   apply Continuous_mult; auto.
-  apply Continuous_comp with (openl Zero); auto.
+  apply Continuous_comp with (openl [0]); auto.
    2: apply Continuous_Log.
   apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
  apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
@@ -382,11 +382,11 @@ Qed.
 
 Lemma Derivative_power : forall (J : interval) pJ F F' G G', positive_fun J F ->
  Derivative J pJ F F' -> Derivative J pJ G G' ->
- Derivative J pJ (F{!}G) (G{*} (F{!} (G{-} [-C-]One) {*}F') {+}F{!}G{*} (G'{*} (Logarithm[o]F))).
+ Derivative J pJ (F{!}G) (G{*} (F{!} (G{-} [-C-][1]) {*}F') {+}F{!}G{*} (G'{*} (Logarithm[o]F))).
 Proof.
  intros J pJ F F' G G' H H0 H1.
  unfold FPower in |- *.
- assert (H2 : Derivative (openl Zero) I Logarithm {1/}FId).
+ assert (H2 : Derivative (openl [0]) I Logarithm {1/}FId).
   apply Derivative_Log.
  assert (H3 : Derivative realline I Expon Expon).
   apply Derivative_Exp.
@@ -485,12 +485,12 @@ Proof.
   elim Hx19; intros Hx20 Hx21.
   assert (H7 : Dom G x). auto.
    assert (H8 : Dom F x). auto.
-   cut (Zero [<] Part _ _ H8). intro H9.
-   assert (H10 : Part _ _ H8 [#] Zero). apply Greater_imp_ap; auto.
+   cut ([0] [<] Part _ _ H8). intro H9.
+   assert (H10 : Part _ _ H8 [#] [0]). apply Greater_imp_ap; auto.
     assert (H11 : Dom F' x). auto.
     assert (H12 : Dom G' x). auto.
     apply eq_transitive_unfolded with (Exp (Part _ _ H7[*]Log _ H9) [*]
-      (Part _ _ H7[*] ((One[/] _[//]H10) [*]Part _ _ H11) [+] Part _ _ H12[*]Log _ H9)).
+      (Part _ _ H7[*] (([1][/] _[//]H10) [*]Part _ _ H11) [+] Part _ _ H12[*]Log _ H9)).
     unfold A, Log in |- *; simpl in |- *.
     repeat first [ apply mult_wd | apply bin_op_wd_unfolded | apply pfwdef | apply div_wd
       | apply eq_reflexive_unfolded ].
@@ -553,12 +553,12 @@ Proof.
      with (Part _ _ H7[*] (Exp (Part _ _ Hx1[*]Part _ _ Hx2) [*]Part _ _ H11)).
     2: apply mult_wdr; algebra.
    apply eq_transitive_unfolded
-     with (Part _ _ H7[*] (Exp ((Part _ _ H7[-]One) [*]Log _ H9) [*]Part _ _ H11)).
+     with (Part _ _ H7[*] (Exp ((Part _ _ H7[-][1]) [*]Log _ H9) [*]Part _ _ H11)).
     2: unfold Log in |- *; simpl in |- *.
     2: apply mult_wdr; apply mult_wd; algebra.
    clear Hx1 Hx2.
    rstepl ((Exp (Part _ _ H7[*]Log _ H9) [/] _[//]H10) [*] (Part _ _ H7[*]Part _ _ H11)).
-   rstepr (Exp ((Part _ _ H7[-]One) [*]Log _ H9) [*] (Part _ _ H7[*]Part _ _ H11)).
+   rstepr (Exp ((Part _ _ H7[-][1]) [*]Log _ H9) [*] (Part _ _ H7[*]Part _ _ H11)).
    apply mult_wdl.
    apply eq_transitive_unfolded with (Exp (Part _ _ H7[*]Log _ H9[-]Log _ H9)).
     2: apply Exp_wd; rational.
@@ -571,14 +571,14 @@ Proof.
   apply Continuous_imp_maps_compacts_into.
   apply Continuous_mult.
    apply Derivative_imp_Continuous with pJ G'; auto.
-  apply Continuous_comp with (openl Zero).
+  apply Continuous_comp with (openl [0]).
     apply maps_compacts_into_strict_imp_weak; apply positive_imp_maps_compacts_into; auto.
     apply Derivative_imp_Continuous with pJ F'; auto.
    apply Derivative_imp_Continuous with pJ F'; auto.
   apply Continuous_Log.
  apply Derivative_mult.
   auto.
- apply Derivative_comp with (openl Zero) I; Deriv.
+ apply Derivative_comp with (openl [0]) I; Deriv.
  apply positive_imp_maps_compacts_into; auto.
  apply Derivative_imp_Continuous with pJ F'; auto.
 Qed.

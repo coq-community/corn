@@ -54,14 +54,14 @@ Global Instance: Proper ((=) ==> (=)) cos_poly_fun.
 Proof. unfold cos_poly_fun. solve_proper. Qed.
 
 Lemma cos_poly_fun_correct : forall (q:Q),
- inj_Q IR (cos_poly_fun q)[=]One[-]Two[*](inj_Q IR q[^]2).
+ inj_Q IR (cos_poly_fun q)[=][1][-]Two[*](inj_Q IR q[^]2).
 Proof.
  intros q.
  unfold cos_poly_fun.
- stepr (inj_Q IR (One[-]Two*q^2)).
+ stepr (inj_Q IR ([1][-]Two*q^2)).
   apply inj_Q_wd. 
   unfold cg_minus; simpl; ring.
- stepr (inj_Q IR (One)[-]inj_Q IR (Two[*]q ^ 2))%Q.
+ stepr (inj_Q IR ([1])[-]inj_Q IR (Two[*]q ^ 2))%Q.
   apply inj_Q_minus.
  apply cg_minus_wd.
   rstepr (nring 1:IR).
@@ -80,8 +80,8 @@ Proof.
  constructor.
 Qed.
 
-Let D : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) (inj_Q_less _ _ _ X) ([-C-](One:IR){-}(Two:IR){**}FId{^}2)
- ([-C-](Zero:IR){-}(Two:IR){**}((nring 2){**}([-C-]One{*}FId{^}1))).
+Let D : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) (inj_Q_less _ _ _ X) ([-C-]([1]:IR){-}(Two:IR){**}FId{^}2)
+ ([-C-]([0]:IR){-}(Two:IR){**}((nring 2){**}([-C-][1]{*}FId{^}1))).
 Proof.
  apply Derivative_minus.
   apply Derivative_const.
@@ -100,15 +100,15 @@ Proof.
  stepr (Four:IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR 4))].
  stepl (ABSIR ([--](Four[*]x))); [| now (apply AbsIR_wd; rational)].
  stepl (ABSIR (Four[*]x)); [| now apply AbsIR_inv].
- rstepr (Four[*]One:IR).
+ rstepr (Four[*][1]:IR).
  apply AbsSmall_imp_AbsIR.
  apply mult_resp_AbsSmall.
   apply nring_nonneg.
  split.
-  stepl ([--](pring IR 1)[/]Zero[+]One[//]den_is_nonzero IR (-1#1)).
+  stepl ([--](pring IR 1)[/][0][+][1][//]den_is_nonzero IR (-1#1)).
    assumption.
   unfold pring; simpl; rational.
- stepr  (pring IR 1[/]Zero[+]One[//]den_is_nonzero IR 1).
+ stepr  (pring IR 1[/][0][+][1][//]den_is_nonzero IR 1).
   assumption.
  unfold pring; simpl; rational.
 Qed.
@@ -118,10 +118,10 @@ Build_UniformlyContinuousFunction cos_poly_prf.
 
 Definition cos_poly : CR --> CR := Cmap QPrelengthSpace cos_poly_uc.
 
-Lemma cos_poly_correct : forall x, AbsSmall (inj_Q IR (1)) x -> (IRasCR (One[-]Two[*]x[^]2)==cos_poly (IRasCR x))%CR.
+Lemma cos_poly_correct : forall x, AbsSmall (inj_Q IR (1)) x -> (IRasCR ([1][-]Two[*]x[^]2)==cos_poly (IRasCR x))%CR.
 Proof.
  intros x Hx.
- assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ([-C-](One:IR){-}(Two:IR){**}FId{^}2)).
+ assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ([-C-]([1]:IR){-}(Two:IR){**}FId{^}2)).
   eapply Derivative_imp_Continuous.
   apply D.
  apply: (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
@@ -148,7 +148,7 @@ Proof.
  destruct Hx; split;[stepl [--](inj_Q IR (1:Q)); [| now apply eq_symmetric; apply inj_Q_inv]|];assumption.
 Qed.
 
-Lemma Cos_double_angle : forall x, (Cos(Two[*]x)[=]One[-]Two[*]Sin x[^]2).
+Lemma Cos_double_angle : forall x, (Cos(Two[*]x)[=][1][-]Two[*]Sin x[^]2).
 Proof.
  intros x.
  csetoid_replace (Two[*]x) (x[+]x);[|rational].
@@ -157,10 +157,10 @@ Proof.
  set (cx:=Cos x).
  rstepl ((cx[^]2)[-](sx[^]2)).
  unfold cg_minus.
- csetoid_replace (cx[^]2) (One[-]sx[^]2).
+ csetoid_replace (cx[^]2) ([1][-]sx[^]2).
   rational.
  apply cg_inv_unique_2.
- rstepl ((cx[^]2[+]sx[^]2)[-]One).
+ rstepl ((cx[^]2[+]sx[^]2)[-][1]).
  apply x_minus_x.
  apply FFT.
 Qed.
@@ -182,7 +182,7 @@ Proof.
   simpl; field; discriminate.
  apply AbsIR_imp_AbsSmall.
  stepr (nring 1:IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR 1))].
- rstepr (One:IR).
+ rstepr ([1]:IR).
  apply AbsIR_Sin_leEq_One.
 Qed.
 
@@ -217,8 +217,8 @@ Proof.
   intros q [] _.
   apply rational_cos_correct.
  intros x [] _.
- stepr (One:IR).
-  change (AbsIR ([--](Sin x))[<=]One).
+ stepr ([1]:IR).
+  change (AbsIR ([--](Sin x))[<=][1]).
   stepl (AbsIR (Sin x)); [| now apply AbsIR_inv].
   apply AbsIR_Sin_leEq_One.
  rstepl (nring 1:IR).

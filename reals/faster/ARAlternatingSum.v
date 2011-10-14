@@ -152,8 +152,8 @@ Proof.
      now apply semirings.le_1_2.
     rewrite <-associativity.
     apply (order_preserving (k +)).
-    rewrite <-rings.opp_distr.
-    apply rings.flip_le_opp.
+    rewrite <-rings.negate_plus_distr.
+    apply rings.flip_le_negate.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.
    now apply semirings.plus_le_compat.
@@ -244,7 +244,7 @@ Proof.
   revert sQ sN sD d dnn zl.
   induction l using Pind; intros.
    simpl. 
-   rewrite rings.opp_0, rings.plus_0_r.
+   rewrite rings.negate_0, rings.plus_0_r.
    rewrite Qminus'_correct. unfold Qminus. rewrite Qplus_0_r.
    setoid_replace (1%positive * 2 ^ k)%Qpos with (2 ^ k)%Qpos.
     (* ugly: make a duplicate of [d] to avoid Coq errors due to [d] being a section variable. *)
@@ -254,7 +254,7 @@ Proof.
    unfold QposEq. simpl. now apply rings.mult_1_l.
   rewrite Psucc_S.
   simpl.
-  rewrite rings.preserves_plus, rings.preserves_opp.
+  rewrite rings.preserves_plus, rings.preserves_negate.
   rewrite Qminus'_correct. unfold Qminus.
   setoid_replace (Psucc l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
    apply Qball_plus.
@@ -290,10 +290,10 @@ Proof.
      apply Z.log2_up_spec. 
      auto with zarith.
     now apply Z.log2_up_nonneg.
-   rewrite int_pow_opp.
+   rewrite int_pow_negate.
    rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
    rewrite <-associativity.
-   rewrite associativity, dec_mult_inverse by solve_propholds.
+   rewrite associativity, dec_recip_inverse by solve_propholds.
    now apply left_identity.
   rewrite <-nat_of_P_of_succ_nat.
   rewrite convert_is_POS.

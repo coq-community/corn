@@ -65,7 +65,7 @@ Proof.
 Qed.
 
 Lemma d_zero_imp_eq :
- forall (X : CMetricSpace) (a b : X), a[-d]b[=]Zero -> a[=]b.
+ forall (X : CMetricSpace) (a b : X), a[-d]b[=][0] -> a[=]b.
 Proof.
  intros X a b.
  intro H.
@@ -193,7 +193,7 @@ Proof.
  intros y Z2.
  intros H3.
  set (H4 := H3 x y Z2) in *.
- set (H5 := less_irreflexive_unfolded IR Zero H4) in *.
+ set (H5 := less_irreflexive_unfolded IR [0] H4) in *.
  exact H5.
 Qed.
 
@@ -201,9 +201,9 @@ Qed.
 But a pseudo metric space induces a metric space:
 *)
 
-Definition metric_ap (X : CPsMetricSpace) (x y : X) : CProp := Zero[<]x[-d]y.
+Definition metric_ap (X : CPsMetricSpace) (x y : X) : CProp := [0][<]x[-d]y.
 
-Definition metric_eq (X : CPsMetricSpace) (x y : X) : Prop := x[-d]y[=]Zero.
+Definition metric_eq (X : CPsMetricSpace) (x y : X) : Prop := x[-d]y[=][0].
 
 Lemma metric_ap_irreflexive :
  forall X : CPsMetricSpace, irreflexive (metric_ap X).
@@ -219,8 +219,8 @@ Proof.
  generalize H0.
  unfold diag_zero in |- *.
  intros H1 H2.
- set (H3 := less_wdr IR Zero (x[-d]x) Zero H2 (H1 x)) in *.
- set (H4 := less_irreflexive_unfolded IR Zero H3) in *.
+ set (H3 := less_wdr IR [0] (x[-d]x) [0] H2 (H1 x)) in *.
+ set (H4 := less_irreflexive_unfolded IR [0] H3) in *.
  exact H4.
 Qed.
 
@@ -268,13 +268,13 @@ Proof.
   cut (ZeroR[<=]x[-d]y).
    rewrite -> leEq_def in |- *.
    intro H1.
-   cut (Not (x[-d]y[#]Zero)).
+   cut (Not (x[-d]y[#][0])).
     intro H2.
     apply not_ap_imp_eq.
     exact H2.
    red in |- *.
    intro H2.
-   set (H3 := less_conf_ap IR (x[-d]y) Zero) in *.
+   set (H3 := less_conf_ap IR (x[-d]y) [0]) in *.
    elim H3.
    intros H4 H5.
    set (H6 := H4 H2) in *.
@@ -286,8 +286,8 @@ Proof.
  intro H.
  red in |- *.
  intro H0.
- set (H1 := less_wdr IR Zero (x[-d]y) Zero H0 H) in *.
- set (H2 := less_irreflexive_unfolded IR Zero H1) in *.
+ set (H1 := less_wdr IR [0] (x[-d]y) [0] H0 H) in *.
+ set (H2 := less_irreflexive_unfolded IR [0] H1) in *.
  exact H2.
 Qed.
 
@@ -319,7 +319,7 @@ Proof.
  set (H4 := H1 H) in *.
  elim H4.
   intro H5.
-  astepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
+  astepr ((x1[-d]x2)[+](y1[-d]y2)[+][0]).
   astepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x1[-d]y1)[-](x1[-d]y1))).
   astepr ((x1[-d]x2)[+](y1[-d]y2)[+](x1[-d]y1)[-](x1[-d]y1)).
   apply shift_less_minus.
@@ -347,7 +347,7 @@ Proof.
   apply ax_d_com.
   apply CPsMetricSpace_is_CPsMetricSpace.
  intro H5.
- astepr ((x1[-d]x2)[+](y1[-d]y2)[+]Zero).
+ astepr ((x1[-d]x2)[+](y1[-d]y2)[+][0]).
  astepr ((x1[-d]x2)[+](y1[-d]y2)[+]((x2[-d]y2)[-](x2[-d]y2))).
  astepr ((x1[-d]x2)[+](y1[-d]y2)[+](x2[-d]y2)[-](x2[-d]y2)).
  apply shift_less_minus.
@@ -622,38 +622,38 @@ Proof.
  set (H3 := Archimedes' (OneR[/] a[-d]b[//]H1)) in *.
  elim H3.
  intros n H4.
- set (H6 := less_transitive_unfolded IR (One[/] a[-d]b[//]H1) (
-   nring n) (nring n[+]One) H4 (nring_less_succ IR n)) in *.
+ set (H6 := less_transitive_unfolded IR ([1][/] a[-d]b[//]H1) (
+   nring n) (nring n[+][1]) H4 (nring_less_succ IR n)) in *.
  elim H.
  intros H5 H7.
- elim (H5 (S (S n)) (ap_symmetric_unfolded IR Zero (Zero[+]One[+]One)
-   (less_imp_ap IR Zero (Zero[+]One[+]One) (less_transitive_unfolded IR Zero (Zero[+]One) (
-     Zero[+]One[+]One) (less_plusOne IR Zero) (less_plusOne IR (ZeroR[+]One)))))).
+ elim (H5 (S (S n)) (ap_symmetric_unfolded IR [0] ([0][+][1][+][1])
+   (less_imp_ap IR [0] ([0][+][1][+][1]) (less_transitive_unfolded IR [0] ([0][+][1]) (
+     [0][+][1][+][1]) (less_plusOne IR [0]) (less_plusOne IR (ZeroR[+][1])))))).
  intros x H8.
- elim (H7 (S (S n)) (ap_symmetric_unfolded IR Zero (Zero[+]One[+]One)
-   (less_imp_ap IR Zero (Zero[+]One[+]One) (less_transitive_unfolded IR Zero (Zero[+]One) (
-     Zero[+]One[+]One) (less_plusOne IR Zero) (less_plusOne IR (Zero[+]One:IR)))))).
+ elim (H7 (S (S n)) (ap_symmetric_unfolded IR [0] ([0][+][1][+][1])
+   (less_imp_ap IR [0] ([0][+][1][+][1]) (less_transitive_unfolded IR [0] ([0][+][1]) (
+     [0][+][1][+][1]) (less_plusOne IR [0]) (less_plusOne IR ([0][+][1]:IR)))))).
  intros y H9.
  set (H10 := H9 (max y x)) in *.
  set (H11 := H8 (max x y)) in *.
  simpl in |- *.
  set (H12 := H11 (nz x y)) in *.
  set (H13 := H10 (nz y x)) in *.
- set (H14 := ap_symmetric_unfolded IR Zero (Zero[+]One[+]One) (less_imp_ap IR Zero (Zero[+]One[+]One)
-   (less_transitive_unfolded IR Zero (Zero[+]One) ( Zero[+]One[+]One) (less_plusOne IR Zero)
-     (less_plusOne IR (Zero[+]One))))) in *.
+ set (H14 := ap_symmetric_unfolded IR [0] ([0][+][1][+][1]) (less_imp_ap IR [0] ([0][+][1][+][1])
+   (less_transitive_unfolded IR [0] ([0][+][1]) ( [0][+][1][+][1]) (less_plusOne IR [0])
+     (less_plusOne IR ([0][+][1]))))) in *.
  cut ((seq (max x y)[-d]a)[+](seq (max y x)[-d]b)[<]
-   nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
-     nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
+   nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[+]
+     nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)).
   intro H15.
-  cut (nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
-    nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[<=]
+  cut (nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[+]
+    nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[<=]
       (seq (max x y)[-d]a)[+](seq (max y x)[-d]b)).
    rewrite -> leEq_def in |- *.
    intro H16.
    auto.
-  cut (nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[+]
-    nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)[<=] a[-d]b).
+  cut (nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[+]
+    nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[<=] a[-d]b).
    intro H16.
    apply leEq_transitive with (a[-d]b).
     exact H16.
@@ -675,13 +675,13 @@ Proof.
    intro H17.
    rewrite H17.
    apply eq_reflexive.
-  astepl ((Two:IR)[*]nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
-  astepl (nexp IR (S n) (One[/] Zero[+]One[+]One[//]H14)).
-   astepl ((One[/] Zero[+]One[+]One[//]H14)[^]S n).
-   astepl (One[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
-   apply leEq_transitive with (One[/] nring (S n)[//] ap_symmetric_unfolded IR Zero (nring (S n))
-     (less_imp_ap IR Zero (nring (S n)) (pos_Snring IR n))).
-    apply leEq_transitive with (One[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
+  astepl ((Two:IR)[*]nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)).
+  astepl (nexp IR (S n) ([1][/] [0][+][1][+][1][//]H14)).
+   astepl (([1][/] [0][+][1][+][1][//]H14)[^]S n).
+   astepl ([1][/] ([0][+][1][+][1])[^]S n[//]nexp_resp_ap_zero (S n) H14).
+   apply leEq_transitive with ([1][/] nring (S n)[//] ap_symmetric_unfolded IR [0] (nring (S n))
+     (less_imp_ap IR [0] (nring (S n)) (pos_Snring IR n))).
+    apply leEq_transitive with ([1][/] ([0][+][1][+][1])[^]S n[//]nexp_resp_ap_zero (S n) H14).
      2: apply less_leEq.
      2: set (Hn := bin_less_un) in *.
      2: generalize Hn.
@@ -699,7 +699,7 @@ Proof.
    apply shift_leEq_mult' with H1.
     2: apply less_leEq.
     2: apply H6.
-   cut (Zero[<]a[-d]b or a[-d]b[<]Zero).
+   cut ([0][<]a[-d]b or a[-d]b[<][0]).
     intro H16.
     elim H16.
      intro H17.
@@ -716,43 +716,43 @@ Proof.
    apply ap_imp_less.
    apply ap_symmetric_unfolded.
    exact H1.
-  astepl ((OneR[/] Zero[+]One[+]One[//]H14)[^]S n).
-  astepl (OneR[^]S n[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
-  astepl (OneR[/] (Zero[+]One[+]One)[^]S n[//]nexp_resp_ap_zero (S n) H14).
-  astepl ((OneR[+]One)[*] (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
-   apply mult_cancel_lft with (OneR[/] Zero[+]One[+]One[//]H14).
+  astepl ((OneR[/] [0][+][1][+][1][//]H14)[^]S n).
+  astepl (OneR[^]S n[/] ([0][+][1][+][1])[^]S n[//]nexp_resp_ap_zero (S n) H14).
+  astepl (OneR[/] ([0][+][1][+][1])[^]S n[//]nexp_resp_ap_zero (S n) H14).
+  astepl ((OneR[+][1])[*] ([1][/] ([0][+][1][+][1])[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
+   apply mult_cancel_lft with (OneR[/] [0][+][1][+][1][//]H14).
     apply div_resp_ap_zero_rev.
     apply ap_symmetric_unfolded.
     apply less_imp_ap.
     apply pos_one.
-   astepr ((One[/] Zero[+]One[+]One[//]H14)[*](Zero[+]One[+]One)[*]
-     (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
-    astepr (OneR[*] (One[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
-    astepr (OneR[/] (Zero[+]One[+]One)[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14).
-    astepr (OneR[*]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
-      mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
+   astepr (([1][/] [0][+][1][+][1][//]H14)[*]([0][+][1][+][1])[*]
+     ([1][/] ([0][+][1][+][1])[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
+    astepr (OneR[*] ([1][/] ([0][+][1][+][1])[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14)).
+    astepr (OneR[/] ([0][+][1][+][1])[^]S (S n)[//]nexp_resp_ap_zero (S (S n)) H14).
+    astepr (OneR[*][1][/] ([0][+][1][+][1])[*]([0][+][1][+][1])[^]S n[//]
+      mult_resp_ap_zero IR ([0][+][1][+][1]) (([0][+][1][+][1])[^]S n) H14
         (nexp_resp_ap_zero (S n) H14)).
-    astepr (One[*]One[/] (Zero[+]One[+]One)[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
+    astepr ([1][*][1][/] ([0][+][1][+][1])[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
     rational.
-   astepr ((One[/] Zero[+]One[+]One[//]H14)[*]Two[*]
-     nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
-   astepr ((One[/] Zero[+]One[+]One[//]H14)[*](Zero[+]One[+]One)[*]
-     nexp IR (S (S n)) (One[/] Zero[+]One[+]One[//]H14)).
+   astepr (([1][/] [0][+][1][+][1][//]H14)[*]Two[*]
+     nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)).
+   astepr (([1][/] [0][+][1][+][1][//]H14)[*]([0][+][1][+][1])[*]
+     nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)).
    apply mult_wdr.
    3: apply plus_resp_less_both.
     3: exact H12.
    3: exact H13.
-  astepr ((One[/] Zero[+]One[+]One[//]H14)[^]S (S n)).
+  astepr (([1][/] [0][+][1][+][1][//]H14)[^]S (S n)).
   apply eq_symmetric_unfolded.
   apply nexp_distr_recip.
- astepl (One[+]One[/] (Zero[+]One[+]One)[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
+ astepl ([1][+][1][/] ([0][+][1][+][1])[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
   2: rational.
- astepl (Zero[+]One[+]One[/] (Zero[+]One[+]One)[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
- rstepr (Zero[+]One[+]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
-   mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
+ astepl ([0][+][1][+][1][/] ([0][+][1][+][1])[^]S (S n)[//] nexp_resp_ap_zero (S (S n)) H14).
+ rstepr ([0][+][1][+][1][/] ([0][+][1][+][1])[*]([0][+][1][+][1])[^]S n[//]
+   mult_resp_ap_zero IR ([0][+][1][+][1]) (([0][+][1][+][1])[^]S n) H14
      (nexp_resp_ap_zero (S n) H14)).
- astepl (Zero[+]One[+]One[/] (Zero[+]One[+]One)[*](Zero[+]One[+]One)[^]S n[//]
-   mult_resp_ap_zero IR (Zero[+]One[+]One) ((Zero[+]One[+]One)[^]S n) H14
+ astepl ([0][+][1][+][1][/] ([0][+][1][+][1])[*]([0][+][1][+][1])[^]S n[//]
+   mult_resp_ap_zero IR ([0][+][1][+][1]) (([0][+][1][+][1])[^]S n) H14
      (nexp_resp_ap_zero (S n) H14)).
  apply eq_reflexive_unfolded.
 Qed.

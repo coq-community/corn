@@ -121,7 +121,7 @@ Lemma Integral_integral : forall Hab' HF', Integral [=] integral a b Hab' F HF'.
 Proof.
  intros.
  unfold Integral in |- *.
- astepr (integral a b Hab' F HF'[-]Zero).
+ astepr (integral a b Hab' F HF'[-][0]).
  apply cg_minus_wd.
   apply integral_wd'.
    apply leEq_imp_Min_is_lft; assumption.
@@ -269,11 +269,11 @@ Qed.
 If the endpoints are equal then the integral vanishes.
 *)
 
-Lemma Integral_empty : a [=] b -> Integral contF [=] Zero.
+Lemma Integral_empty : a [=] b -> Integral contF [=] [0].
 Proof.
  intros.
  unfold Integral in |- *.
- astepr (ZeroR[-]Zero).
+ astepr (ZeroR[-][0]).
  apply cg_minus_wd; apply integral_empty.
   astepr a; apply leEq_imp_Min_is_lft; apply eq_imp_leEq; assumption.
  apply leEq_imp_Min_is_lft; apply eq_imp_leEq; assumption.
@@ -700,8 +700,8 @@ Qed.
 End Corollaries.
 
 Lemma Integral_ap_zero : forall a b Hab (F : PartIR) contF, a [#] b -> forall x,
- Compact Hab x -> forall Hx, Zero [<] F x Hx -> (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) ->
- Zero [<] AbsIR (Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF).
+ Compact Hab x -> forall Hx, [0] [<] F x Hx -> (forall x, Compact Hab x -> forall Hx, [0] [<=] F x Hx) ->
+ [0] [<] AbsIR (Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF).
 Proof.
  intros a b Hab F contF H x H0 Hx H1 H2.
  elim (ap_imp_less _ _ _ H); intro.
@@ -744,13 +744,13 @@ Proof.
 Qed.
 
 Lemma Integral_eq_zero : forall a b Hab (F : PartIR) contF x, Compact Hab x ->
- (forall Hx, Zero [<] F x Hx) -> (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) ->
- Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF [=] Zero -> a [=] b.
+ (forall Hx, [0] [<] F x Hx) -> (forall x, Compact Hab x -> forall Hx, [0] [<=] F x Hx) ->
+ Integral (a:=a) (b:=b) (Hab:=Hab) (F:=F) contF [=] [0] -> a [=] b.
 Proof.
  intros a b Hab F contF x H X H0 H1.
  apply not_ap_imp_eq; intro.
  apply less_irreflexive_unfolded with (x := ZeroR).
  apply less_wdr with (AbsIR (Integral contF)).
-  2: Step_final (AbsIR Zero).
+  2: Step_final (AbsIR [0]).
  apply Integral_ap_zero with x (contin_imp_inc _ _ _ _ contF x H); auto.
 Qed.

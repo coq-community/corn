@@ -215,7 +215,7 @@ Section contents.
   Qed.
 
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
-    _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x)%Q [+X*] One) (tl xs)).
+    _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x)%Q [+X*] [1]) (tl xs)).
 
   Section with_qpoints.
 
@@ -232,7 +232,7 @@ Section contents.
      replace (length (tl xs)) with (0 + length (tl xs))%nat by reflexivity.
      apply degree_le_mult.
       apply degree_le_c_.
-     replace (length (tl xs)) with (length (map (fun x => ' (-fst x)%Q[+X*]One) (tl xs)) * 1)%nat.
+     replace (length (tl xs)) with (length (map (fun x => ' (-fst x)%Q[+X*][1]) (tl xs)) * 1)%nat.
       apply degree_le_Product.
       intros.
       apply in_map_iff in H.
@@ -240,7 +240,7 @@ Section contents.
       destruct H.
       rewrite <- H.
       apply degree_le_cpoly_linear_inv.
-      apply (degree_le_c_ CRasCRing One).
+      apply (degree_le_c_ CRasCRing [1]).
      ring_simplify.
      rewrite map_length.
      destruct xs; reflexivity.
@@ -305,7 +305,7 @@ Section contents.
    intros. unfold an_applied.
    simpl @tl.
    rewrite (cr_Product_0 (x - x))%Q.
-     change (divdiff (t ::: xs) [*] Zero [=] Zero).
+     change (divdiff (t ::: xs) [*] [0] [=] [0]).
      apply cring_mult_zero.
     change (x - x == 0)%Q. ring.
    unfold Basics.compose.
@@ -451,14 +451,14 @@ Section contents.
      unfold an.
      rewrite nth_coeff_c_mult_p.
      simpl tl.
-     set (f := fun x: Q and CR => ' (- fst x)%Q [+X*]One).
+     set (f := fun x: Q and CR => ' (- fst x)%Q [+X*][1]).
      replace (length l) with (length (map f l) * 1)%nat.
       rewrite lead_coeff_product_1.
        change (divdiff (p ::: l) * 1 [=] divdiff (p ::: l))... (* to change [*] into * *)
       intros q. rewrite in_map_iff. intros [x [[] B]].
       split. reflexivity.
       apply degree_le_cpoly_linear_inv.
-      apply (degree_le_c_ CRasCRing One).
+      apply (degree_le_c_ CRasCRing [1]).
      rewrite map_length...
     Qed.
 

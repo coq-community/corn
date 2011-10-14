@@ -42,7 +42,7 @@ Section CMetric_Fields.
 * Metric Fields *)
 
 Record is_CMetricField (F : CField) (abs : CSetoid_fun F IR) : Prop :=
-  {ax_abs_gt_zero   : forall x : F, Zero [<=] abs x;
+  {ax_abs_gt_zero   : forall x : F, [0] [<=] abs x;
    ax_abs_resp_mult : forall x y : F, abs (x[*]y) [=] abs x[*]abs y;
    ax_abs_triangle  : forall x y : F, abs (x[+]y) [<=] abs x[+]abs y}.
 
@@ -57,37 +57,37 @@ Notation MAbs := (cmf_abs _).
 Section basics.
 
 Lemma MAbs_one : forall F : CMetricField,
- {MAbs (One:F) [=] Zero} + {MAbs (One:F) [=] One}.
+ {MAbs ([1]:F) [=] [0]} + {MAbs ([1]:F) [=] [1]}.
 Proof.
  intro F.
  apply square_id.
- astepl (cmf_abs F One[*]cmf_abs F One).
- astepl (cmf_abs F (One[*]One)).
-  astepl (cmf_abs F One).
+ astepl (cmf_abs F [1][*]cmf_abs F [1]).
+ astepl (cmf_abs F ([1][*][1])).
+  astepl (cmf_abs F [1]).
   apply eq_reflexive.
  apply ax_abs_resp_mult.
  apply cmf_proof.
 Qed.
 
 Lemma MAbs_one_recip_one : forall F : CMetricField,
- MAbs (One:F) [=] MAbs ( [--]One:F).
+ MAbs ([1]:F) [=] MAbs ( [--][1]:F).
 Proof.
  intro F.
- cut ({cmf_abs F (One:F) [=] Zero} + {cmf_abs F (One:F) [=] One}).
+ cut ({cmf_abs F ([1]:F) [=] [0]} + {cmf_abs F ([1]:F) [=] [1]}).
   intro H.
   elim H.
    intro H2.
    astepl ZeroR.
-   astepr (cmf_abs F ( [--]One[*]One)).
-   astepr (cmf_abs F [--]One[*]cmf_abs F One).
-    astepr (cmf_abs F [--]One[*]Zero).
+   astepr (cmf_abs F ( [--][1][*][1])).
+   astepr (cmf_abs F [--][1][*]cmf_abs F [1]).
+    astepr (cmf_abs F [--][1][*][0]).
     astepr ZeroR.
     apply eq_reflexive_unfolded.
    apply eq_symmetric_unfolded.
    apply ax_abs_resp_mult.
    apply cmf_proof.
   intro H1.
-  cut (cmf_abs F [--]One [=] cmf_abs F One or cmf_abs F [--]One [=] [--] (cmf_abs F One)).
+  cut (cmf_abs F [--][1] [=] cmf_abs F [1] or cmf_abs F [--][1] [=] [--] (cmf_abs F [1])).
    intro H2.
    elim H2.
     intro H3.
@@ -96,15 +96,15 @@ Proof.
    intro H3.
    (* begin hide *)
    Lemma Hulp : forall F : CMetricField,
-     cmf_abs F One [=] One -> cmf_abs F [--]One [=] [--] (cmf_abs F One) -> False.
+     cmf_abs F [1] [=] [1] -> cmf_abs F [--][1] [=] [--] (cmf_abs F [1]) -> False.
  intros F G H.
  set (H0 := ax_abs_gt_zero) in *.
  generalize H0.
  intro H1.
- set (H2 := H1 F (cmf_abs F) (cmf_proof F) [--] (One:F)) in *.
+ set (H2 := H1 F (cmf_abs F) (cmf_proof F) [--] ([1]:F)) in *.
  rewrite -> leEq_def in H2.
  apply H2.
- astepl ( [--] (cmf_abs F One)).
+ astepl ( [--] (cmf_abs F [1])).
  astepl ( [--]OneR).
  apply plus_cancel_less with OneR.
  astepl ZeroR.
@@ -122,23 +122,23 @@ Proof.
     apply pos_two.
    astepl OneR.
    algebra.
-  astepl (cmf_abs F [--]One[*]cmf_abs F [--]One).
-  astepl (cmf_abs F ( [--]One[*][--]One)).
+  astepl (cmf_abs F [--][1][*]cmf_abs F [--][1]).
+  astepl (cmf_abs F ( [--][1][*][--][1])).
    2: apply ax_abs_resp_mult.
    2: apply cmf_proof.
-  astepl (cmf_abs F One).
+  astepl (cmf_abs F [1]).
    2: apply csf_wd.
-   2: astepl ( [--] ((One:F) [*][--]One)).
-    2: astepl ( [--] ( [--] (One:F) [*]One)).
-    2: astepl ( [--][--] ((One:F) [*]One)).
-    2: astepl ((One:F) [*]One).
+   2: astepl ( [--] (([1]:F) [*][--][1])).
+    2: astepl ( [--] ( [--] ([1]:F) [*][1])).
+    2: astepl ( [--][--] (([1]:F) [*][1])).
+    2: astepl (([1]:F) [*][1]).
     2: algebra.
-   astepl (cmf_abs F (One[*]One)).
-   astepl (cmf_abs F One[*]cmf_abs F One).
+   astepl (cmf_abs F ([1][*][1])).
+   astepl (cmf_abs F [1][*]cmf_abs F [1]).
     2: apply eq_symmetric_unfolded.
     2: apply ax_abs_resp_mult.
     2: apply cmf_proof.
-   astepr (cmf_abs F One[*]cmf_abs F One).
+   astepr (cmf_abs F [1][*]cmf_abs F [1]).
    apply eq_reflexive_unfolded.
   rational.
  apply MAbs_one.
@@ -155,14 +155,14 @@ Variable F : CMetricField.
 *)
 
 Definition MCauchy_prop (g : nat -> F) : CProp := forall e : IR,
-  Zero [<] e -> {N : nat | forall m, N <= m -> MAbs (g m[-]g N) [<=] e}.
+  [0] [<] e -> {N : nat | forall m, N <= m -> MAbs (g m[-]g N) [<=] e}.
 
 Record MCauchySeq : Type :=
  {MCS_seq   :> nat -> F;
   MCS_proof :  MCauchy_prop MCS_seq}.
 
 Definition MseqLimit (seq : nat -> F) (lim : F) : CProp := forall e : IR,
-  Zero [<] e -> {N : nat | forall m, N <= m -> MAbs (seq m[-]lim) [<=] e}.
+  [0] [<] e -> {N : nat | forall m, N <= m -> MAbs (seq m[-]lim) [<=] e}.
 
 Definition is_MCauchyCompl (lim : MCauchySeq -> F) : CProp :=
   forall (s : MCauchySeq), MseqLimit s (lim s).

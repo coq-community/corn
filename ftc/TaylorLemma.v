@@ -111,7 +111,7 @@ Let funct_i n Hf i Hi := [-C-] (fi n Hf i Hi A [/] _[//] nring_fac_ap_zero _ i) 
 
 (* begin hide *)
 Let funct_i' n Hf i Hi := PartInt (fi n Hf i Hi) {*}
- [-C-] (One[/] _[//]nring_fac_ap_zero IR i) {*} ( [-C-]b{-}FId) {^}i.
+ [-C-] ([1][/] _[//]nring_fac_ap_zero IR i) {*} ( [-C-]b{-}FId) {^}i.
 
 Lemma TL_a_i : forall n Hf i Hi, Dom (funct_i n Hf i Hi) a.
 Proof.
@@ -277,9 +277,9 @@ Definition Taylor_rem n Hf := F b Hb[-]Taylor_seq' n Hf b (TL_lemma_b n Hf).
 
 (* begin hide *)
 Let g n Hf Hab := [-C-] (F b Hb) {-}Taylor_seq'_aux n Hf{-}
- [-C-] (Taylor_rem n Hf) {*} (( [-C-]b{-}FId) {*} [-C-] (One[/] (b[-]a) [//]Hab)).
+ [-C-] (Taylor_rem n Hf) {*} (( [-C-]b{-}FId) {*} [-C-] ([1][/] (b[-]a) [//]Hab)).
 
-Lemma Taylor_lemma4 : forall n Hf Hab Ha', g n Hf Hab a Ha' [=] Zero.
+Lemma Taylor_lemma4 : forall n Hf Hab Ha', g n Hf Hab a Ha' [=] [0].
 Proof.
  unfold g in |- *; clear g; intros.
  cut (Dom ( [-C-] (F b Hb) {-}Taylor_seq'_aux n Hf{-} [-C-] (Taylor_rem n Hf)) a). intro H.
@@ -308,13 +308,13 @@ Proof.
      auto with arith.
     intros.
     cut (forall Hb' Ha', FSumx_to_FSum (S n) (funct_i n Hf) i b Hb'[-]
-      FSumx_to_FSum (S n) (funct_i' n Hf) i a Ha' [=] Zero); auto.
+      FSumx_to_FSum (S n) (funct_i' n Hf) i a Ha' [=] [0]); auto.
     unfold FSumx_to_FSum in |- *.
     elim le_lt_dec; intro; simpl in |- *.
      algebra.
     intros.
     set (w := fi n Hf i b0 (Build_subcsetoid_crr _ _ _ TL_compact_a) [*]
-      (One[/] _[//]nring_fac_ap_zero IR i) [*] (b[+][--]a) [^]i) in *.
+      ([1][/] _[//]nring_fac_ap_zero IR i) [*] (b[+][--]a) [^]i) in *.
     astepr (w[-]w); unfold w in |- *; simpl in |- *.
     repeat first [ apply cg_minus_wd | simple apply mult_wd ]; try apply csf_wd_unfolded; algebra.
      rational.
@@ -345,7 +345,7 @@ Qed.
 
 Transparent funct_i funct_i'.
 
-Lemma Taylor_lemma5 : forall n Hf Hab Hb', g n Hf Hab b Hb' [=] Zero.
+Lemma Taylor_lemma5 : forall n Hf Hab Hb', g n Hf Hab b Hb' [=] [0].
 Proof.
  unfold g in |- *; intros.
  cut (Dom ( [-C-] (F b Hb) {-}Taylor_seq'_aux n Hf) b). intro H.
@@ -369,13 +369,13 @@ Proof.
     algebra.
    eapply eq_transitive_unfolded.
     apply Sum_first.
-   astepr (Part _ _ Hb[+]Zero); apply bin_op_wd_unfolded.
+   astepr (Part _ _ Hb[+][0]); apply bin_op_wd_unfolded.
     cut (forall H', FSumx_to_FSum (S n) (funct_i' n Hf) 0 b H' [=] Part _ _ Hb); auto.
     unfold FSumx_to_FSum in |- *.
     elim le_lt_dec; intro; simpl in |- *.
      elimtype False; inversion a0.
     intros; simpl in |- *.
-    rstepr (Part _ _ Hb[*]One[*]One).
+    rstepr (Part _ _ Hb[*][1][*][1]).
     apply mult_wdl.
     apply mult_wd.
      2: rational.
@@ -389,13 +389,13 @@ Proof.
    apply Sum_zero.
     auto with arith.
    intros.
-   cut (forall H', FSumx_to_FSum (S n) (funct_i' n Hf) i b H' [=] Zero); auto.
+   cut (forall H', FSumx_to_FSum (S n) (funct_i' n Hf) i b H' [=] [0]); auto.
    unfold FSumx_to_FSum in |- *.
    elim le_lt_dec; intro; simpl in |- *.
     algebra.
    intro.
    astepr (fi n Hf i b0 (Build_subcsetoid_crr IR _ b (ProjIR1 (ProjIR1 H'))) [*]
-     (One[/] _[//]nring_fac_ap_zero _ i) [*]Zero).
+     ([1][/] _[//]nring_fac_ap_zero _ i) [*][0]).
    apply mult_wdr.
    astepl ((b[-]b) [^]i).
    Step_final (ZeroR[^]i).
@@ -414,7 +414,7 @@ Qed.
 Transparent funct_i' FSumx.
 
 Let funct_aux n Hf i Hi := PartInt (fi (S n) Hf (S i) (lt_n_S _ _ Hi)) {*}
-  [-C-] (One[/] _[//]nring_fac_ap_zero IR i) {*} ( [-C-]b{-}FId) {^}i.
+  [-C-] ([1][/] _[//]nring_fac_ap_zero IR i) {*} ( [-C-]b{-}FId) {^}i.
 
 Lemma Taylor_lemma6 :  forall n Hf Hf' i Hi, Derivative_I Hab'
  (PartInt (fi n Hf i Hi)) (PartInt (fi (S n) Hf' (S i) (lt_n_S _ _ Hi))).
@@ -497,17 +497,17 @@ Proof.
   set (x5 := Build_subcsetoid_crr IR _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) in *.
   simpl in (value of x5); fold x5 in |- *.
   set (fiSSp := fi (S n) Hf' (S (S p)) (lt_n_S (S p) (S n) Hi')) in *.
-  set (pp := One[/] nring (fact p + p * fact p) [//]nring_fac_ap_zero IR (S p)) in *.
+  set (pp := [1][/] nring (fact p + p * fact p) [//]nring_fac_ap_zero IR (S p)) in *.
   set (bxp := nexp _ p (b[-]x)) in *.
   set (a1 := fiSp1 x1) in *; set (a5 := fiSSp x5) in *;
     simpl in (value of a1), (value of a5); fold a1 a5 in |- *.
-  rstepl (a5[*]pp[*] (bxp[*] (b[-]x)) [-]a1[*] ((nring p[+]One) [*]pp) [*]bxp).
+  rstepl (a5[*]pp[*] (bxp[*] (b[-]x)) [-]a1[*] ((nring p[+][1]) [*]pp) [*]bxp).
   unfold a1, a5 in |- *; clear a1 a5.
   Lazy_Eq.
    unfold x4, x5 in |- *; algebra.
    simpl in |- *; algebra.
   unfold pp in |- *.
-  rstepr (nring (S p) [*] (One[/] _[//] mult_resp_ap_zero _ _ _ (nring_fac_ap_zero _ p)
+  rstepr (nring (S p) [*] ([1][/] _[//] mult_resp_ap_zero _ _ _ (nring_fac_ap_zero _ p)
     (pos_ap_zero _ _ (pos_nring_S IR p)))); simpl in |- *.
   apply mult_wdr; apply div_wd.
    algebra.
@@ -545,7 +545,7 @@ Proof.
  intros; simpl in |- *.
  apply eq_transitive_unfolded with (fi (S n) Hf' 1 (lt_n_S _ _ Hi)
    (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) [*]
-     (One[/] _[//]nring_fac_ap_zero IR 0) [*]One).
+     ([1][/] _[//]nring_fac_ap_zero IR 0) [*][1]).
   simpl in |- *; rational.
  Lazy_Eq; simpl in |- *; algebra.
 Qed.
@@ -561,9 +561,9 @@ Proof.
      split; split; simpl in |- *; auto.
     split; split; split; simpl in |- *; auto.
    intros; simpl in |- *.
-   apply eq_transitive_unfolded with (Zero[+] fi 0 Hf 0 (lt_n_Sn 0)
+   apply eq_transitive_unfolded with ([0][+] fi 0 Hf 0 (lt_n_Sn 0)
      (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR1 Hx))) [*]
-       (One[/] Zero[+]One[//]nring_fac_ap_zero IR 0) [*]One).
+       ([1][/] [0][+][1][//]nring_fac_ap_zero IR 0) [*][1]).
     simpl in |- *; rational.
    Lazy_Eq; simpl in |- *; algebra.
   apply Taylor_lemma8; assumption.
@@ -675,11 +675,11 @@ Now Taylor's theorem.
 *)
 
 Variable e : IR.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 (* begin hide *)
 Lemma Taylor_lemma11 : forall n Hf Hf' H, {c : IR | I c |
-  forall Hc, AbsIR (g' n Hf Hf' H c Hc) [<=] e[*]AbsIR (One[/] (b[-]a) [//]H)}.
+  forall Hc, AbsIR (g' n Hf Hf' H c Hc) [<=] e[*]AbsIR ([1][/] (b[-]a) [//]H)}.
 Proof.
  intros.
  cut (Dom (g n Hf H) (Min a b)). intro H0.
@@ -709,7 +709,7 @@ Proof.
       apply pfwdef; eapply eq_transitive_unfolded.
        apply Max_comm.
       apply leEq_imp_Max_is_rht; apply less_leEq; auto.
-     astepl (Zero[*]AbsIR (One[/] _[//]H)).
+     astepl ([0][*]AbsIR ([1][/] _[//]H)).
      apply mult_resp_less.
       assumption.
      apply AbsIR_pos.
@@ -750,11 +750,11 @@ Qed.
 
 (* begin show *)
 Let deriv_Sn' n Hf' :=
- n_deriv_I _ _ Hab' (S n) F Hf'{*} [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
+ n_deriv_I _ _ Hab' (S n) F Hf'{*} [-C-] ([1][/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
 (* end show *)
 
 (* begin hide *)
-Lemma TLH : b[-]a [#] Zero.
+Lemma TLH : b[-]a [#] [0].
 Proof.
  rstepl ( [--] (a[-]b)).
  apply inv_resp_ap_zero.
@@ -767,7 +767,7 @@ Lemma Taylor_lemma : forall n Hf Hf', {c : IR | I c |
 Proof.
  intros.
  assert (H := TLH).
- cut {c : IR | I c | forall Hc, AbsIR (g' n Hf Hf' H c Hc) [<=] e[*]AbsIR (One[/] _[//]H)};
+ cut {c : IR | I c | forall Hc, AbsIR (g' n Hf Hf' H c Hc) [<=] e[*]AbsIR ([1][/] _[//]H)};
    [ intro H0 | apply Taylor_lemma11; assumption ].
  elim H0; intros c Hc' Hc; clear H0; exists c.
   auto.
@@ -778,8 +778,8 @@ Proof.
     2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
    apply shift_mult_leEq with (AbsIR_resp_ap_zero _ H).
     apply AbsIR_pos; apply H.
-   rstepr (e[*] (One[/] _[//]AbsIR_resp_ap_zero _ H)).
-   apply leEq_wdr with (e[*]AbsIR (One[/] _[//]H)).
+   rstepr (e[*] ([1][/] _[//]AbsIR_resp_ap_zero _ H)).
+   apply leEq_wdr with (e[*]AbsIR ([1][/] _[//]H)).
     Opaque funct_aux.
     cut (Dom (g' n Hf Hf' H) c). intro H1.
      eapply leEq_wdl.
@@ -804,7 +804,7 @@ Proof.
    unfold deriv_Sn', funct_aux in |- *.
    cut (Dom (n_deriv_I _ _ Hab' (S n) F Hf') c). intro H1.
     simpl in |- *; apply eq_transitive_unfolded with (n_deriv_I _ _ Hab' (S n) F Hf' c H1[*]
-      (One[/] _[//]nring_fac_ap_zero _ n) [*] (b[-]c) [^]n).
+      ([1][/] _[//]nring_fac_ap_zero _ n) [*] (b[-]c) [^]n).
      repeat apply mult_wdl; apply pfwdef; algebra.
     repeat apply mult_wdl.
     apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S n) (lt_n_S _ _ (lt_n_Sn _))) c Hc').

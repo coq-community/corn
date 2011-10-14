@@ -187,8 +187,8 @@ Fixpoint deriv_deriv (r : deriv_function) : PartIR :=
   match r with
   | hyp Hab' f f' H => f'
   | hyp' Hab' f H => PartInt (ProjT1 H)
-  | const c => [-C-]Zero
-  | id => [-C-]One
+  | const c => [-C-][0]
+  | id => [-C-][1]
   | rplus f g => deriv_deriv f{+}deriv_deriv g
   | rinv f => {--}(deriv_deriv f)
   | rminus f g => deriv_deriv f{-}deriv_deriv g
@@ -197,7 +197,7 @@ Fixpoint deriv_deriv (r : deriv_function) : PartIR :=
   | rscalmult c f => c{**}deriv_deriv f
   | rnth f n =>
       match n with
-      | O => [-C-]Zero
+      | O => [-C-][0]
       | S p =>
           [-C-](nring (S p)){*}(deriv_deriv f{*}deriv_to_pfunct (rnth f p))
       end
@@ -220,7 +220,7 @@ Proof.
    exact (Derivative_I_mult _ _ _ _ _ _ _ Hrecf1 Hrecf0).
   exact (Derivative_I_scal _ _ _ _ _ Hrecf _).
  case n.
-  apply Derivative_I_wdl with (Fconst (S:=IR) One).
+  apply Derivative_I_wdl with (Fconst (S:=IR) [1]).
    apply FNth_zero'.
    exact (derivative_imp_inc _ _ _ _ _ Hrecf).
   exact (Derivative_I_const _ _ Hab' _).
