@@ -115,7 +115,7 @@ Hint Rewrite ARtoCR_preserves_opp : ARtoCR.
 Program Definition AQboundBelow_uc (x : AQ_as_MetricSpace) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := 
   unary_uc (cast AQ Q_as_MetricSpace)
-  (join x : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc ('x)) _.
+  ((x ⊔) : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc ('x)) _.
   
 Definition ARboundBelow (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundBelow_uc x).
 
@@ -126,7 +126,7 @@ Hint Rewrite ARtoCR_preserves_boundBelow : ARtoCR.
 Program Definition AQboundAbove_uc (x : AQ_as_MetricSpace) : 
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
   (cast AQ Q_as_MetricSpace)
-  (meet x : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc ('x)) _.
+  ((x ⊓) : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc ('x)) _.
 
 Definition ARboundAbove (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbove_uc x).
 
