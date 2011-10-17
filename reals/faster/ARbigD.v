@@ -12,6 +12,20 @@ Instance inject_Z_bigD: Cast Z bigD := dy_inject ∘ BigZ.of_Z.
 Instance inject_N_bigZ: Cast N bigZ := BigZ.of_Z ∘ Z_of_N.
 Instance inject_bigD_Q: Cast bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
 
+(* these casts ^^ are semiring (and thus setoid) morphims *)
+Instance mor_inject_bigZ_Q: SemiRing_Morphism (A := bigZ) (B := Q_as_MetricSpace) inject_bigZ_Q.
+Proof. unfold inject_bigZ_Q. now apply _. Qed.
+
+Instance mor_inject_Z_bigD: SemiRing_Morphism (A := Z) (B := bigD) inject_Z_bigD.
+Proof. unfold inject_Z_bigD. now apply _. Qed.
+
+Instance mor_inject_N_bigZ: SemiRing_Morphism (A := N) (B := bigZ) inject_N_bigZ.
+Proof. unfold inject_N_bigZ. now apply _. Qed.
+
+Instance mor_inject_bigD_Q: SemiRing_Morphism (A := bigD) (B := Q_as_MetricSpace) inject_bigD_Q.
+Proof. unfold inject_bigD_Q. now apply _. Qed.
+
+
 Lemma inject_bigD_Q_correct x : cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
 Proof.
   unfold cast at 1, inject_bigD_Q.
