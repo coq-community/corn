@@ -1,8 +1,7 @@
-
 Require Import
   List NPeano
   QArith Qabs Qpossec Qsums Qround
-  Qmetric
+  Qmetric ZArith
   CRArith CRsum AbstractIntegration
   util.Qgcd
   Program
@@ -20,11 +19,22 @@ Hint Immediate Q.Qle_nat.
 Hint Resolve Qmult_le_0_compat.
 Hint Resolve QnonNeg.Qplus_nonneg.
 
-Lemma Zsqrt_r_nonneg (z: Z) (E: Zle 0 z): (0 <= proj1_sig (projT2 (Zsqrt z E)))%Z.
+Parameter (z:Z).
+
+(* Zsqrt_plain_is_pos *)
+
+(*
+Lemma Zsqrt_r_nonneg (z: Z) (E: 0 <= z): (0 <= Zsqrt z)%Z.
 Proof with auto.
- destruct Zsqrt as [x [r [A [B C]]]].
+  destruct Zsqrt; try easy.
+  admit.
  subst. simpl. omega.
 Qed.
+*)
+
+Require Import Coq.ZArith.Zsqrt_compat.
+
+Open Scope Z_scope.
 
 Definition Z_4th_root_floor (x: Z): (0 <= x)%Z ->
   {s: Z & {r: Z | x = Zpower s 4 + r /\ Zpower s 4 <= x < Zpower (s + 1) 4}}%Z.
@@ -58,17 +68,22 @@ Proof.
  destruct z; try reflexivity.
  unfold Z_4th_root_floor_plain, Z_4th_root_floor.
  unfold projT1 at 1.
- generalize (Zsqrt_plain_is_pos p (Zle_0_pos p)).
+ generalize (Zsqrt_plain_is_pos). (* p (Zle_0_pos p)). *)
  unfold Zsqrt_plain.
- generalize (Zsqrt p (Zle_0_pos p)).
+ generalize (Zsqrt). (*p (Zle_0_pos p)).*)
+ admit.
+(*
  destruct s.
  simpl @projT1 at 1.
  destruct x.
-   simpl. reflexivity.
-  intro.
-  rewrite (Zle_uniq z (Zle_0_pos p0)).
+   simpl. reflexivity. *)
+admit.
+admit.
+(* 
+rewrite (Zle_uniq z (Zle_0_pos p)).
+   intro.
   reflexivity.
- simpl. intro. exfalso. apply z. reflexivity.
+ simpl. intro. exfalso. apply z. reflexivity.*)
 Qed.
 
 Definition Q_4th_root_floor_plain (q: Q): Z := Z_4th_root_floor_plain (Qceiling q).
@@ -90,7 +105,7 @@ Section definition.
 
     Definition iw: Qpos := (w / N)%Qpos.
     Definition halfiw: Qpos := (w / ((2#1) * N))%Qpos.
-
+Open Scope Q_scope.
     Definition simpson (fr: Q): CR :=
       (' (iw / 6) * (f fr + f (fr + halfiw)%Q * '4 + f (fr + iw)%Q))%CR.
 
@@ -100,9 +115,33 @@ Section definition.
 
   Lemma regular fr w: is_RegularFunction_noInf CR (approx fr w).
   Admitted.
+Print mkRegularFunction.
+  Definition simpson_integral fr w: CR := Cjoin (mkRegularFunction ('(0%Q))%CR (regular fr w)).
 
-  Definition pre_result fr w: CR := Cjoin (mkRegularFunction (' 0)%CR (regular fr w)).
-
+(*
   Global Instance integrate: Integral f := @integral_extended_to_nn_width f pre_result.
+*)
 
 End definition.
+
+(*
+Open Scope Q_scope.
+
+Definition answer (n:positive) (r:CR) : Z :=
+ let m := (iter_pos n _ (Pmult 10) 1%positive) in
+ let (a,b) := (approximate r (1#m)%Qpos)*m in
+ Zdiv a b.
+
+
+Require Import CRsin.
+
+Print simpson_integral.
+
+Time Eval compute in (answer 3 (simpson_integral sin_uc 1 0 1)).
+(*
+     = 459
+     : Z
+Finished transaction in 17. secs (16.597038u,0.064004s)
+*)
+
+*)
