@@ -15,6 +15,7 @@ TEXFILES=\
 	FTA.tex \
 	header.tex bibliography.tex skel.tex
 
+pdf: skel.pdf
 ps: skel.ps
 dvi: skel.dvi
 
@@ -27,5 +28,8 @@ skel.aux:
 skel.ps: skel.dvi
 	dvips -f < skel.dvi > skel.ps
 
+skel.pdf: ${TEXFILES} skel.aux
+	pdflatex skel.tex
+
 clean:
-	rm -f skel.aux skel.log skel.dvi skel.ps
+	rm -f skel.aux skel.log skel.dvi skel.ps skel.pdf
