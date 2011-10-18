@@ -29,12 +29,16 @@ PREREQUISITES
 GIT CHECKOUT & SUBMODULES
 -------------------------
 
-After checkout of the source from github you need to initialize the
-math-classes submodule.
+The corn repository contains the math-classes repository as a submodule.
+You can obtain it's contents automatically by giving the --recursive
+option when you clone this repository:
 
-  git clone https://github.com/0x01/corn
-  git submodule init
-  git submodule update
+  git clone --recursive https://github.com/c-corn/corn.git
+
+If you have already cloned this repository without --recursive, you can
+still get the submodules with
+
+  git submodule update --init --recursive
 
 If you don't do this, you will run into the following build error:
 
