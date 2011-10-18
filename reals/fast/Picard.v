@@ -47,7 +47,7 @@ End Banach_iter.
 
 Section example.
 
-Definition g : CR --> CR := Cbind QPrelengthSpace (@const_uc Q_as_MetricSpace 1).
+Definition g : CR --> CR := Cbind QPrelengthSpace (const_uc (1:Q_as_MetricSpace)).
 
 Definition picard (n:nat) := (Picard_seq g n).
 
@@ -56,7 +56,7 @@ Definition eval (n:positive) (r:CR) : Z :=
  let (a,b) := (approximate r (1#m)%Qpos)*m in
  Zdiv a b.
 
-Definition h := @const_uc Q_as_MetricSpace (5#7).
+Definition h := const_uc (5#7:Q_as_MetricSpace).
 Definition h' := uc_compose (scale (11#13)) h.
 
 Require Import Integration.
