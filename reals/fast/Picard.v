@@ -47,7 +47,7 @@ End Banach_iter.
 
 Section example.
 
-Definition g : CR --> CR := Cbind QPrelengthSpace (const_uc 1).
+Definition g : CR --> CR := Cbind QPrelengthSpace (@const_uc Q_as_MetricSpace 1).
 
 Definition picard (n:nat) := (Picard_seq g n).
 
@@ -56,7 +56,7 @@ Definition eval (n:positive) (r:CR) : Z :=
  let (a,b) := (approximate r (1#m)%Qpos)*m in
  Zdiv a b.
 
-Definition h := const_uc (5#7).
+Definition h := @const_uc Q_as_MetricSpace (5#7).
 Definition h' := uc_compose (scale (11#13)) h.
 
 Require Import Integration.
@@ -65,7 +65,7 @@ Require Import SimpsonIntegration.
 Time Eval vm_compute in (eval 3 (1 + (Integrate h' 0 (1#2)))%CR).
 Time Eval vm_compute in (eval 3 (1 + (simpson_integral h' 1 0 (1#2)))%CR).
 
-Time Eval vm_compute in (eval 3 (Picard_raw (const_uc (1#1)) 1)).
+Time Eval vm_compute in (eval 3 (Picard_raw (@const_uc Q_as_MetricSpace (1#1)) 1)).
 Time Eval vm_compute in (eval 3 (picard 1 1)).
 Time Eval vm_compute in (eval 2 (picard 2 1)).
 
