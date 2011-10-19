@@ -1,22 +1,25 @@
 Require Import Unicode.Utf8 Qmetric CRmetric UniformContinuity.
 
 
-(** The uniformly continuous constant function [Q_as_MetricSpace --> CR]. *)
 Section const_fun_uc.
- Variable c : Q_as_MetricSpace.
+ Variable X : MetricSpace.
+ Variable c : X.
 
- Definition const_raw : Q_as_MetricSpace → CR := λ _, ('(c%Q))%CR.
- Definition const_mu (ε:Qpos) : QposInf := ε.
+ (** The uniformly continuous constant function *)
+ Definition const_raw : X → Complete X := λ _, Cunit c.
 
-(* Anything modulus bigger than 0 will do, so we pick [id : Qpos → QposInf]
- written as [(λ ε, ε)%Qpos]. *)
- Lemma const_uc_prf : is_UniformlyContinuousFunction const_raw (λ ε, ε)%Qpos.
+ (* Any modulus bigger than 0 will do, so we pick \infty *)
+ Definition const_mu (ε:Qpos) : QposInf := QposInfinity.
+
+ Lemma const_uc_prf : is_UniformlyContinuousFunction const_raw const_mu.
  Proof.
-   admit.
+  unfold is_UniformlyContinuousFunction; now intuition.
  Qed.
 
  (** [const_uc c] defines the uniformly continuous function [λ _, c] *)
  Open Scope uc_scope.
- Definition const_uc : Q_as_MetricSpace --> CR :=
+ Definition const_uc : X --> Complete X :=
    Build_UniformlyContinuousFunction (const_uc_prf).
 End const_fun_uc.
+
+Implicit Arguments const_uc [[X]].
