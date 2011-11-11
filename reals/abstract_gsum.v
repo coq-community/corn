@@ -100,10 +100,7 @@ Notation "'x₀'" := (hd s).
 *)
 Require Import nat_pow.
 
-Lemma should_work x y: x ≤ y → r * x ≤ r * y. 
- apply (maps.order_preserving_nonneg (.*.) r).
- destruct Hr as [Ha Hb].
- (* 0 ≤ r ?? *)
+Lemma helper n `{xs:∞A} : Str_nth (1 + n) xs ≡ hd (tl (Str_nth_tl n xs)).
 Admitted.
 
 (* [peano_naturals.nat_induction] is a induction scheme that uses
@@ -117,11 +114,14 @@ Proof.
   apply (ForAll_Str_nth_tl n) in gs.
   destruct gs as [[GS1 GS2] FA].
   replace (hd (Str_nth_tl n s)) with (Str_nth n s) in GS2 by auto.
-  replace (hd (tl (Str_nth_tl n s))) with (Str_nth (1+n) s) in GS2 by (eapply _).
-  (* hmm *)
-  replace (Str_nth n s ≤ r ^ n * x₀) with (r * Str_nth n s ≤ r * r ^ n * x₀) in IHn.
-  rewrite <- IHn.
-  apply GS2.
+  replace (hd (tl (Str_nth_tl n s))) with (Str_nth (1+n) s) in GS2.
+  transitivity (r * Str_nth n s); [assumption|].
+  rewrite <- associativity.
+  apply (maps.order_preserving_nonneg (.*.) r).
+   apply orders.lt_le. destruct Hr as [Ha Hb].
+  auto.
+  assumption.
+  apply helper.
 Admitted.
 
 End properties.
@@ -129,12 +129,11 @@ End properties.
 (** A geometric series is decreasing and non negative. *)
 Lemma gs_dnn `(gs: ARGeometricSeries s) : DecreasingNonNegative s.
 Proof.
- unfold DecreasingNonNegative.
  revert s gs.
  cofix FIX; intros s gs.
  constructor.
   now split; auto using gs_positive, gs_tl, gs_decreasing.
- apply FIX, gs_tl; now assumption.
+ now apply FIX, gs_tl.
 Qed.
 
 End geom_sum.
