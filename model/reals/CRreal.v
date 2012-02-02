@@ -116,7 +116,7 @@ Proof.
   destruct (Hf _ (CRlt_Qlt _ _ (Qpos_prf ((1#2)*d)%Qpos))) as [n Hn].
   exists n.
   intros m Hm.
-  apply AbsSmall_leEq_trans with (inject_Q_CR d);[rstepr (e[-]Zero);assumption|].
+  apply AbsSmall_leEq_trans with (inject_Q_CR d);[rstepr (e[-][0]);assumption|].
   rewrite -> CRAbsSmall_ball.
   change (nat -> Complete Q_as_MetricSpace) in f.
   change (ball d (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).

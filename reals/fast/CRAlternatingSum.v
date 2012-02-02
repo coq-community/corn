@@ -73,7 +73,7 @@ Proof with try easy.
    now destruct dnn as [[? ?] ?].
   setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
   apply (order_preserving _).
-  apply rings.flip_nonneg_opp. 
+  apply rings.flip_nonneg_negate. 
   now apply (IHn _ _).
 Qed.
 
@@ -168,7 +168,7 @@ Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNega
   k ≤ l → Str_nth k s ≤ ε → ball ε (take s l Qminus' 0) (take s k Qminus' 0).
 Proof.
   intros E.
-  apply naturals.natural_le_plus in E.
+  apply naturals.nat_le_plus in E.
   destruct E as [z E]. rewrite E. clear E l.
   revert z s dnn ε.
   induction k; intros.
@@ -181,7 +181,7 @@ Proof.
     change (hd s + - take (tl s) z Qminus' 0 ≤ hd s).
     setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
     apply (order_preserving _).
-    apply rings.flip_nonneg_opp.
+    apply rings.flip_nonneg_negate.
     now apply (PartialAlternatingSumUntil_take_small _).
    easy.
   simpl. do 2 rewrite Qminus'_correct. unfold Qminus.
@@ -214,7 +214,7 @@ Proof.
    apply (InfiniteAlternatingSum_further_aux _).
     easy.
    apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-   apply naturals.natural_le_plus in E1.
+   apply naturals.nat_le_plus in E1.
    destruct E1 as [z E1]. rewrite E1. rewrite commutativity.
    rewrite <-Str_nth_plus. 
    apply ball_weak, Qball_ex_bool_correct.
@@ -309,7 +309,7 @@ Proof.
   stepl (hd - 0)%Q; [| simpl; ring].
   apply X.
  destruct (takeUntil_step P (Limit_near (Cons hd seq) 0 e) Qminus' 0) as [ex' rw]; [rewrite H;auto|].
- change ring_zero with (0:Q).
+ change zero with (0:Q).
  rewrite rw; clear rw.
  simpl.
  rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near (tl (Cons hd seq)) 0 e)).
@@ -354,7 +354,7 @@ Qed.
 Lemma dnn_zl_convergent (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
  convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq))%Q.
 Proof.
- cut (convergent (fun n : nat => [--]One[^]n[*]inj_Q IR (Str_nth n seq))).
+ cut (convergent (fun n : nat => [--][1][^]n[*]inj_Q IR (Str_nth n seq))).
   apply convergent_wd.
   intros n.
   stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| now (apply eq_symmetric; apply inj_Q_mult)].
@@ -368,7 +368,7 @@ Proof.
  apply alternate_series_conv.
    intros n.
    unfold Str_nth.
-   change (Zero:IR) with (nring 0:IR).
+   change ([0]:IR) with (nring 0:IR).
    stepl (inj_Q IR (nring 0)); [| now apply inj_Q_nring].
    apply inj_Q_leEq.
    simpl. 

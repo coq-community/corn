@@ -51,30 +51,30 @@ Proof.
     apply AbsCC_nonneg. apply AbsCC_nonneg. auto. auto.
 Qed.
 
-Lemma estimate_absCC : forall x : CC, {X : IR | Zero [<] X | AbsCC x [<=] X}.
+Lemma estimate_absCC : forall x : CC, {X : IR | [0] [<] X | AbsCC x [<=] X}.
 Proof.
  intros.
- exists (AbsCC x[+]One).
-  astepl (Zero[+]ZeroR).
+ exists (AbsCC x[+][1]).
+  astepl ([0][+]ZeroR).
   apply plus_resp_leEq_less. apply AbsCC_nonneg. apply pos_one.
-   astepl (AbsCC x[+]Zero).
+   astepl (AbsCC x[+][0]).
  apply less_leEq.
  apply plus_resp_less_lft. apply pos_one.
 Qed.
 
 Lemma mult_CC_contin : forall (x y : CC) (e : IR),
- Zero [<] e -> {c : IR | Zero [<] c | {d : IR | Zero [<] d | forall x' y',
+ [0] [<] e -> {c : IR | [0] [<] c | {d : IR | [0] [<] d | forall x' y',
  AbsCC (x[-]x') [<=] c -> AbsCC (y[-]y') [<=] d -> AbsCC (x[*]y[-]x'[*]y') [<=] e}}.
 Proof.
  do 3 intro. intro H.
- cut (Zero [<] e [/]TwoNZ). intro H0.
+ cut ([0] [<] e [/]TwoNZ). intro H0.
   elim (estimate_absCC x). intro X. intros H1 H2.
   elim (estimate_absCC y). intro Y. intros H3 H4.
-  cut (Y[#]Zero). intro H5.
+  cut (Y[#][0]). intro H5.
    exists (e [/]TwoNZ[/] Y[//]H5).
     apply div_resp_pos. auto. auto.
-     cut (Zero [<] X[+](e [/]TwoNZ[/] Y[//]H5)). intro.
-    cut (X[+](e [/]TwoNZ[/] Y[//]H5)[#]Zero). intro H7.
+     cut ([0] [<] X[+](e [/]TwoNZ[/] Y[//]H5)). intro.
+    cut (X[+](e [/]TwoNZ[/] Y[//]H5)[#][0]). intro H7.
      exists (e [/]TwoNZ[/] X[+](e [/]TwoNZ[/] Y[//]H5)[//]H7).
       apply div_resp_pos. auto. auto.
        intros.
@@ -118,15 +118,15 @@ Section CPoly_CC_Continuous.
 
 Variable g : CCX.
 
-Lemma cpoly_CC_contin : forall (x : CC) (e : IR), Zero [<] e ->
- {d : IR | Zero [<] d | forall x', AbsCC (x[-]x') [<=] d -> AbsCC (g ! x[-]g ! x') [<=] e}.
+Lemma cpoly_CC_contin : forall (x : CC) (e : IR), [0] [<] e ->
+ {d : IR | [0] [<] d | forall x', AbsCC (x[-]x') [<=] d -> AbsCC (g ! x[-]g ! x') [<=] e}.
 Proof.
  elim g.
   intros.
   exists OneR. intros. apply pos_one. intros.
    apply leEq_wdl with ZeroR. apply less_leEq. auto.
-   cut (Zero [=] AbsCC (Zero[-]Zero)). auto.
-   Step_final (AbsCC Zero).
+   cut ([0] [=] AbsCC ([0][-][0])). auto.
+   Step_final (AbsCC [0]).
  intros a f. intro H. do 2 intro. intro H0.
  elim (mult_CC_contin x f ! x e H0). intro d1. intros H1 H2.
  elim H2. clear H2. intro c. intros H2 H3.

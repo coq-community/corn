@@ -56,13 +56,13 @@ Variable G : CAbGroup. (* Sum1 and Sum use subtraction *)
 
 Fixpoint Sumlist (l : list G) : G :=
   match l with
-  | nil      => Zero:G
+  | nil      => [0]:G
   | cons x k => x[+]Sumlist k
   end.
 
 Fixpoint Sumx n : (forall i : nat, i < n -> G) -> G :=
   match n return ((forall i : nat, i < n -> G) -> G) with
-  | O   => fun _ => Zero:G
+  | O   => fun _ => [0]:G
   | S m => fun f => Sumx m (fun i l => f i (lt_S _ _ l)) [+]f m (lt_n_Sn m)
   end.
 
@@ -76,7 +76,7 @@ Definition part_tot_nat_fun n (f : forall i, i < n -> G) : nat -> G.
 Proof.
  intros i.
  elim (le_lt_dec n i).
-  intro a; apply (Zero:G).
+  intro a; apply ([0]:G).
  intro b; apply (f i b).
 Defined.
 
@@ -91,7 +91,7 @@ Proof.
 Qed.
 
 Lemma part_tot_nat_fun_ch2 : forall n (f : forall i, i < n -> G) i,
- n <= i -> part_tot_nat_fun n f i [=] Zero.
+ n <= i -> part_tot_nat_fun n f i [=] [0].
 Proof.
  intros n f i Hi.
  unfold part_tot_nat_fun in |- *.
@@ -104,7 +104,7 @@ Qed.
 
 Fixpoint Sum0 (n:nat) (f : nat -> G) {struct n} : G :=
   match n with
-  | O   => Zero:G
+  | O   => [0]:G
   | S m => Sum0 m f[+]f m
   end.
 
@@ -125,8 +125,8 @@ Proof.
  elim (le_lt_dec m i); intro H.
   elim (le_lt_dec i n); intro H0.
    apply (h i H H0).
-  apply (Zero:G).
- apply (Zero:G).
+  apply ([0]:G).
+ apply ([0]:G).
 Defined.
 
 Lemma Sum_one : forall n f, Sum n n f [=] f n.
@@ -140,7 +140,7 @@ Qed.
 
 Hint Resolve Sum_one: algebra.
 
-Lemma Sum_empty : forall n f, 0 < n -> Sum n (pred n) f [=] Zero.
+Lemma Sum_empty : forall n f, 0 < n -> Sum n (pred n) f [=] [0].
 Proof.
  intros n f H.
  unfold Sum in |- *.
@@ -158,9 +158,9 @@ Proof.
  astepl (Sum0 (S n) f[-]Sum0 (S m) f[+] (Sum0 (S m) f[-]Sum0 l f)).
  astepl (Sum0 (S n) f[-]Sum0 (S m) f[+]Sum0 (S m) f[-]Sum0 l f).
  astepl (Sum0 (S n) f[-] (Sum0 (S m) f[-]Sum0 (S m) f) [-]Sum0 l f).
- astepl (Sum0 (S n) f[-]Zero[-]Sum0 l f).
- astepl (Sum0 (S n) f[+] [--]Zero[-]Sum0 l f).
- Step_final (Sum0 (S n) f[+]Zero[-]Sum0 l f).
+ astepl (Sum0 (S n) f[-][0][-]Sum0 l f).
+ astepl (Sum0 (S n) f[+] [--][0][-]Sum0 l f).
+ Step_final (Sum0 (S n) f[+][0][-]Sum0 l f).
 Qed.
 
 Hint Resolve Sum_Sum: algebra.
@@ -180,7 +180,7 @@ Proof.
  astepr (f m[+] [--] (f m[+]Sum0 m f)).
  astepr (f m[+] ([--] (f m) [+] [--] (Sum0 m f))).
  astepr (f m[+] [--] (f m) [+] [--] (Sum0 m f)).
- astepr (Zero[+] [--] (Sum0 m f)).
+ astepr ([0][+] [--] (Sum0 m f)).
  algebra.
 Qed.
 
@@ -246,7 +246,7 @@ Proof.
   cut (0 = pred 1); [ intro H3 | auto ].
   rewrite H3 in H0.
   rewrite H2 in H0.
-  apply (ap_irreflexive_unfolded G Zero).
+  apply (ap_irreflexive_unfolded G [0]).
   eapply ap_wdl_unfolded.
    eapply ap_wdr_unfolded.
     apply H0.
@@ -267,7 +267,7 @@ Proof.
  cut (S n = pred (S (S n))); [ intro H1 | auto ].
  rewrite H1 in H0.
  rewrite Hmn in H0.
- apply (ap_irreflexive_unfolded G Zero).
+ apply (ap_irreflexive_unfolded G [0]).
  eapply ap_wdl_unfolded.
   eapply ap_wdr_unfolded.
    apply H0.
@@ -346,14 +346,14 @@ Lemma Sum_wd' : forall m n, m <= S n -> forall f f',
 Proof.
  intros m n. induction  n as [| n Hrecn]; intros H f f' H0.
  inversion H.
-   unfold Sum in |- *. unfold Sum1 in |- *. Step_final (Zero:G).
+   unfold Sum in |- *. unfold Sum1 in |- *. Step_final ([0]:G).
    inversion H2. astepl (f 0). astepr (f' 0). auto.
   elim (le_lt_eq_dec m (S (S n)) H); intro H1.
   astepl (Sum m n f[+]f (S n)).
   astepr (Sum m n f'[+]f' (S n)).
   apply bin_op_wd_unfolded; auto with arith.
  rewrite H1.
- unfold Sum in |- *. unfold Sum1 in |- *. Step_final (Zero:G).
+ unfold Sum in |- *. unfold Sum1 in |- *. Step_final ([0]:G).
 Qed.
 
 Lemma Sum2_wd : forall m n, m <= S n -> forall f g,
@@ -523,7 +523,7 @@ Proof.
 Qed.
 
 Lemma Sum_apzero : forall f m n,
- m <= n -> Sum m n f [#] Zero -> {i : nat | m <= i /\ i <= n | f i [#] Zero}.
+ m <= n -> Sum m n f [#] [0] -> {i : nat | m <= i /\ i <= n | f i [#] [0]}.
 Proof.
  intros a k l H H0. induction  l as [| l Hrecl].
  exists 0. split; auto. cut (k = 0).
@@ -531,7 +531,7 @@ Proof.
    astepl (Sum 0 0 a). auto.
    inversion H. auto.
   elim (le_lt_eq_dec k (S l) H); intro HH.
-  cut (Sum k l a [#] Zero or a (S l) [#] Zero). intro H1.
+  cut (Sum k l a [#] [0] or a (S l) [#] [0]). intro H1.
    elim H1; clear H1; intro H1.
     elim Hrecl; auto with arith.
     intro i. intros H2 H6. exists i; auto.
@@ -546,7 +546,7 @@ Proof.
 Qed.
 
 Lemma Sum_zero : forall f m n, m <= S n ->
- (forall i, m <= i -> i <= n -> f i [=] Zero) -> Sum m n f [=] Zero.
+ (forall i, m <= i -> i <= n -> f i [=] [0]) -> Sum m n f [=] [0].
 Proof.
  intros a k l H H0. induction  l as [| l Hrecl].
  elim (le_lt_eq_dec _ _ H); clear H; intro H.
@@ -556,7 +556,7 @@ Proof.
   unfold Sum in |- *. unfold Sum1 in |- *. algebra.
   elim (le_lt_eq_dec k (S (S l)) H); intro HH.
   astepl (Sum k l a[+]a (S l)).
-  astepr (Zero[+] (Zero:G)).
+  astepr ([0][+] ([0]:G)).
   apply bin_op_wd_unfolded.
    apply Hrecl; auto with arith.
   apply H0; auto with arith.
@@ -565,17 +565,17 @@ Proof.
 Qed.
 
 Lemma Sum_term : forall f m i n, m <= i -> i <= n ->
- (forall j, m <= j -> j <> i -> j <= n -> f j [=] Zero) -> Sum m n f [=] f i.
+ (forall j, m <= j -> j <> i -> j <= n -> f j [=] [0]) -> Sum m n f [=] f i.
 Proof.
  intros a k i0 l H H0 H1.
  astepl (Sum k i0 a[+]Sum (S i0) l a).
- astepr (a i0[+]Zero).
+ astepr (a i0[+][0]).
  apply bin_op_wd_unfolded.
   elim (O_or_S i0); intro H2.
    elim H2; intros m Hm.
    rewrite <- Hm.
    astepl (Sum k m a[+]a (S m)).
-   astepr (Zero[+]a (S m)).
+   astepr ([0][+]a (S m)).
    apply bin_op_wd_unfolded.
     apply Sum_zero. rewrite Hm; auto.
      intros i H3 H4. apply H1. auto. omega. omega.
@@ -673,7 +673,7 @@ Proof.
     apply H.
    apply cg_minus_wd; apply Hf; algebra.
   unfold f' in |- *; apply cg_minus_wd; apply Hf; algebra.
- astepr (f (S n) (le_n (S n)) [+]Zero[-]f 0 (le_O_n (S n))).
+ astepr (f (S n) (le_n (S n)) [+][0][-]f 0 (le_O_n (S n))).
  astepr (f (S n) (le_n (S n)) [+] ([--] (f n (le_S _ _ (le_n n))) [+]f n (le_S _ _ (le_n n))) [-]
    f 0 (le_O_n (S n))).
  Step_final (f (S n) (le_n (S n)) [+] [--] (f n (le_S _ _ (le_n n))) [+]
@@ -689,7 +689,7 @@ Proof.
    rewrite H1.
    eapply eq_transitive_unfolded; [ apply Sum_one | apply H ].
   cut (0 = pred 1); [ intro H1 | auto ].
-  rewrite H0; astepr (Zero:G); rewrite H1; apply Sum_empty.
+  rewrite H0; astepr ([0]:G); rewrite H1; apply Sum_empty.
   auto with arith.
  simpl in Hmn; elim (le_lt_eq_dec _ _ Hmn); intro H0.
   apply eq_transitive_unfolded with (f (S (S n)) [-]f (S n) [+] (f (S n) [-]f m)).
@@ -699,11 +699,11 @@ Proof.
     apply cag_commutes_unfolded.
    apply bin_op_wd_unfolded; [ apply H | apply Hrecn ].
    auto with arith.
-  astepr (f (S (S n)) [+]Zero[-]f m).
+  astepr (f (S (S n)) [+][0][-]f m).
   astepr (f (S (S n)) [+] ([--] (f (S n)) [+]f (S n)) [-]f m).
   Step_final (f (S (S n)) [+] [--] (f (S n)) [+]f (S n) [-]f m).
  rewrite H0.
- astepr (Zero:G).
+ astepr ([0]:G).
  cut (S n = pred (S (S n))); [ intro H2 | auto ].
  rewrite H2; apply Sum_empty.
  auto with arith.

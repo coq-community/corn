@@ -44,13 +44,13 @@ Add Ring cpolycring_th : (CRing_Ring (cpoly_cring R))  (preprocess [unfold cg_mi
 
 Fixpoint Bernstein (n i:nat) {struct n}: (i <= n) -> cpoly_cring R :=
 match n return (i <= n) -> cpoly_cring R  with
- O => fun _ => One
+ O => fun _ => [1]
 |S n' =>
   match i return (i <= S n') -> cpoly_cring R  with
-   O => fun _ => (One[-]_X_)[*](Bernstein (le_O_n n'))
+   O => fun _ => ([1][-]_X_)[*](Bernstein (le_O_n n'))
   |S i' => fun p =>
     match (le_lt_eq_dec _ _ p) with
-     | left p' => (One[-]_X_)[*](Bernstein (lt_n_Sm_le _ _ p'))[+]_X_[*](Bernstein (le_S_n _ _ p))
+     | left p' => ([1][-]_X_)[*](Bernstein (lt_n_Sm_le _ _ p'))[+]_X_[*](Bernstein (le_S_n _ _ p))
      | right _ => _X_[*](Bernstein (lt_n_Sm_le _ _ p))
     end
   end
@@ -58,7 +58,7 @@ end.
 
 (** These lemmas provide an induction principle for polynomials using the Bernstien basis *)
 Lemma Bernstein_inv1 : forall n i (H:i < n) (H0:S i <= S n),
- Bernstein H0[=](One[-]_X_)[*](Bernstein (lt_n_Sm_le _ _ (lt_n_S _ _ H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
+ Bernstein H0[=]([1][-]_X_)[*](Bernstein (lt_n_Sm_le _ _ (lt_n_S _ _ H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
 Proof.
  intros n i H H0.
  simpl (Bernstein H0).
@@ -80,10 +80,10 @@ Proof.
 Qed.
 
 Lemma Bernstein_ind : forall n i (H:i<=n) (P : nat -> nat -> cpoly_cring R -> Prop),
-P 0 0 One ->
-(forall n p, P n 0 p -> P (S n) 0 ((One[-]_X_)[*]p)) ->
+P 0 0 [1] ->
+(forall n p, P n 0 p -> P (S n) 0 (([1][-]_X_)[*]p)) ->
 (forall n p, P n n p -> P (S n) (S n) (_X_[*]p)) ->
-(forall i n p q, (i < n) -> P n i p -> P n (S i) q -> P (S n) (S i) ((One[-]_X_)[*]q[+]_X_[*]p)) ->
+(forall i n p q, (i < n) -> P n i p -> P n (S i) q -> P (S n) (S i) (([1][-]_X_)[*]q[+]_X_[*]p)) ->
 P n i (Bernstein H).
 Proof.
  intros n i H P H0 H1 H2 H3.
@@ -104,32 +104,32 @@ Proof.
  auto with *.
 Qed.
 
-(** One important property of the Bernstein basis is that its elements form a partition of unity *)
+(** [1] important property of the Bernstein basis is that its elements form a partition of unity *)
 
-Lemma partitionOfUnity : forall n, @Sumx (cpoly_cring R) _ (fun i H => Bernstein (lt_n_Sm_le i n H)) [=]One.
+Lemma partitionOfUnity : forall n, @Sumx (cpoly_cring R) _ (fun i H => Bernstein (lt_n_Sm_le i n H)) [=][1].
 Proof.
  induction n.
   reflexivity.
  set (A:=(fun (i : nat) (H : i < S n) => Bernstein (lt_n_Sm_le i n H))) in *.
- set (B:=(fun i => (One[-]_X_)[*](part_tot_nat_fun (cpoly_cring R) _ A i)[+]_X_[*]match i with O => Zero | S i' => (part_tot_nat_fun _ _ A i') end)).
+ set (B:=(fun i => ([1][-]_X_)[*](part_tot_nat_fun (cpoly_cring R) _ A i)[+]_X_[*]match i with O => [0] | S i' => (part_tot_nat_fun _ _ A i') end)).
  rewrite -> (fun a b => Sumx_Sum0 _ a b B).
   unfold B.
   rewrite -> Sum0_plus_Sum0.
   do 2 rewrite -> mult_distr_sum0_lft.
   rewrite -> Sumx_to_Sum in IHn; auto with *.
    setoid_replace (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A))
-     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero) using relation (@st_eq (cpoly_cring R)) by ring.
-   change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-]Zero)
+     with (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-][0]) using relation (@st_eq (cpoly_cring R)) by ring.
+   change (Sum0 (S (S n)) (part_tot_nat_fun (cpoly_cring R) (S n) A)[-][0])
      with (Sum 0 (S n) (part_tot_nat_fun (cpoly_cring R) (S n) A)).
-   set (C:=(fun i : nat => match i with | 0 => (Zero : cpoly_cring R)
+   set (C:=(fun i : nat => match i with | 0 => ([0] : cpoly_cring R)
      | S i' => part_tot_nat_fun (cpoly_cring R) (S n) A i' end)).
-   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-]Zero) using relation (@st_eq (cpoly_cring R)) by ring.
-   change (Sum0 (S (S n)) C[-]Zero) with (Sum 0 (S n) C).
+   setoid_replace (Sum0 (S (S n)) C) with (Sum0 (S (S n)) C[-][0]) using relation (@st_eq (cpoly_cring R)) by ring.
+   change (Sum0 (S (S n)) C[-][0]) with (Sum 0 (S n) C).
    rewrite -> Sum_last.
    rewrite -> IHn.
-   replace (part_tot_nat_fun (cpoly_cring R) (S n) A (S n)) with (Zero:cpoly_cring R).
+   replace (part_tot_nat_fun (cpoly_cring R) (S n) A (S n)) with ([0]:cpoly_cring R).
     rewrite -> Sum_first.
-    change (C 0) with (Zero:cpoly_cring R).
+    change (C 0) with ([0]:cpoly_cring R).
     rewrite <- (Sum_shift _ (part_tot_nat_fun (cpoly_cring R) (S n) A)) by reflexivity.
      rewrite -> IHn by ring.
     ring.
@@ -165,13 +165,13 @@ Proof.
   intros [|i] H; [|elimtype False; omega].
   repeat split; ring.
  intros i H.
- change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
+ change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
  rstepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H).
  destruct i as [|i].
   simpl (Bernstein H) at 1.
-  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
+  rstepl (([1][-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
   rewrite -> IHn.
-  rstepl (((One[-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
+  rstepl ((([1][-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
   rstepr (Bernstein (le_n_S 0 (S n) H)).
   set (le_n_S 0 n (le_0_n n)).
   rewrite (Bernstein_inv1 l).
@@ -180,13 +180,13 @@ Proof.
   reflexivity.
  simpl (Bernstein H) at 1.
  destruct (le_lt_eq_dec _ _ H).
-  rstepl ((One[-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (lt_n_Sm_le (S i) n l))[+]
+  rstepl (([1][-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (lt_n_Sm_le (S i) n l))[+]
     _X_[*](nring (S n)[*]_X_[*]Bernstein (le_S_n i n H))[+] _X_[*]Bernstein H).
   do 2 rewrite -> IHn.
-  change (nring (S (S i)):cpoly_cring R) with (nring (S i)[+]One:cpoly_cring R).
+  change (nring (S (S i)):cpoly_cring R) with (nring (S i)[+][1]:cpoly_cring R).
   set (l0:= (le_n_S (S i) n (lt_n_Sm_le (S i) n l))).
   replace (le_n_S i n (le_S_n i n H)) with H by apply le_irrelevent.
-  rstepl ((nring (S i)[+]One)[*]((One[-]_X_)[*]Bernstein l0[+]_X_[*]Bernstein H)).
+  rstepl ((nring (S i)[+][1])[*](([1][-]_X_)[*]Bernstein l0[+]_X_[*]Bernstein H)).
   rewrite (Bernstein_inv1 l).
   replace (lt_n_Sm_le (S (S i)) (S n) (lt_n_S (S i) (S n) l)) with l0 by apply le_irrelevent.
   replace (le_S_n (S i) (S n) (le_n_S (S i) (S n) H)) with H by apply le_irrelevent.
@@ -199,18 +199,18 @@ Proof.
  intros H.
  rewrite -> (Bernstein_inv2 (le_n_S _ _ H)).
  replace (le_S_n (S n) (S n) (le_n_S (S n) (S n) H)) with H by apply le_irrelevent.
- change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
+ change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
  ring.
 Qed.
 
-Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*](One[-]_X_)[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H).
+Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*]([1][-]_X_)[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H).
 Proof.
  induction n.
   intros [|i] H; [|elimtype False; omega].
   repeat split; ring.
  intros i H.
- change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
- set (X0:=(One[-](@cpoly_var R))) in *.
+ change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
+ set (X0:=([1][-](@cpoly_var R))) in *.
  rstepl (nring (S n)[*]X0[*]Bernstein H[+]X0[*]Bernstein H).
  destruct i as [|i].
   simpl (Bernstein H) at 1.
@@ -219,7 +219,7 @@ Proof.
   rewrite -> IHn.
   replace (le_S 0 n (le_O_n n)) with H by apply le_irrelevent.
   simpl (S n - 0).
-  change (nring (S (S n) - 0):cpoly_cring R) with (nring (S n)[+]One:cpoly_cring R).
+  change (nring (S (S n) - 0):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
   rstepl ((nring (S n))[*](X0[*]Bernstein H)[+]X0[*]Bernstein H).
   change (Bernstein (le_S _ _ H)) with (X0[*]Bernstein (le_O_n (S n))).
   replace (le_O_n (S n)) with H by apply le_irrelevent.
@@ -233,10 +233,10 @@ Proof.
   rewrite <- (minus_Sn_m n i) by auto with *.
   rewrite <-(minus_Sn_m (S n) (S i)) by auto with *.
   replace (S n - S i) with (n - i) by auto with *.
-  change (nring (S (n - i)):cpoly_cring R) with (nring (n - i)[+]One:cpoly_cring R).
+  change (nring (S (n - i)):cpoly_cring R) with (nring (n - i)[+][1]:cpoly_cring R).
   replace (le_S (S i) n (lt_n_Sm_le (S i) n l)) with H by apply le_irrelevent.
   set (l0:= (le_S i n (le_S_n i n H))).
-  rstepl ((nring (n - i)[+]One)[*](X0[*]Bernstein H[+]_X_[*]Bernstein l0)).
+  rstepl ((nring (n - i)[+][1])[*](X0[*]Bernstein H[+]_X_[*]Bernstein l0)).
   rewrite -> (Bernstein_inv1 H).
   fold X0.
   replace (lt_n_Sm_le _ _ (lt_n_S _ _ H)) with H by apply le_irrelevent.
@@ -263,7 +263,7 @@ Lemma RaiseDegree : forall n i (H: i<=n),
  (nring (S n))[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H)[+](nring (S i))[*]Bernstein (le_n_S _ _ H).
 Proof.
  intros n i H.
- rstepl ((nring (S n))[*](One[-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
+ rstepl ((nring (S n))[*]([1][-]_X_)[*]Bernstein H[+](nring (S n))[*]_X_[*]Bernstein H).
  rewrite RaiseDegreeA, RaiseDegreeB. reflexivity.
 Qed.
 
@@ -273,7 +273,7 @@ Opaque Bernstein.
 
 Fixpoint evalBernsteinBasisH (n i:nat) (v:Vector.t R i) : i <= n -> cpoly_cring R :=
 match v in Vector.t _ i return i <= n -> cpoly_cring R with
-|Vector.nil => fun _ => Zero
+|Vector.nil => fun _ => [0]
 |Vector.cons a i' v' =>
   match n as n return (S i' <= n) -> cpoly_cring R with
   | O => fun p => False_rect _ (le_Sn_O _ p)
@@ -356,7 +356,7 @@ Proof.
  generalize (S n) at 1 4 5 6.
  intros i l.
  induction i.
-  rstepr (_C_ c[*]One).
+  rstepr (_C_ c[*][1]).
   rewrite <- (partitionOfUnity n).
   rewrite -> Sumx_to_Sum; auto with *.
   intros i j Hij.
@@ -394,7 +394,7 @@ ring homomorphism from [Q] to R *)
 
 Fixpoint BernsteinBasisTimesXH (n i:nat) (v:Vector.t R i) : i <= n -> Vector.t R (S i) :=
 match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
-| Vector.nil => fun _ => Vector.cons _ Zero _ (Vector.nil _)
+| Vector.nil => fun _ => Vector.cons _ [0] _ (Vector.nil _)
 | Vector.cons a i' v' => match n as n return S i' <= n -> Vector.t R (S (S i')) with
   | O => fun p => False_rect _ (le_Sn_O _ p)
   | S n' => fun p => Vector.cons _ (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
@@ -431,17 +431,17 @@ Proof.
  rstepr (_C_ (Vector.hd v)[*](_X_[*]Bernstein (le_S_n i n l0))).
  apply mult_wdr.
  unfold A; clear A.
- assert (Hn : (nring (S n):Q)[#]Zero).
+ assert (Hn : (nring (S n):Q)[#][0]).
   stepl (S n:Q).
    simpl.
    unfold Qap, Qeq.
    auto with *.
   symmetry; apply nring_Q.
  setoid_replace (Qred (P_of_succ_nat i # P_of_succ_nat n))
-   with ((One[/](nring (S n))[//]Hn)[*](nring (S i))).
+   with (([1][/](nring (S n))[//]Hn)[*](nring (S i))).
   set (eta':=RHcompose _ _ _ _C_ eta).
-  change (_C_ (eta ((One[/]nring (S n)[//]Hn)[*]nring (S i))))
-    with ((eta' ((One[/]nring (S n)[//]Hn)[*]nring (S i))):cpoly_cring R).
+  change (_C_ (eta (([1][/]nring (S n)[//]Hn)[*]nring (S i))))
+    with ((eta' (([1][/]nring (S n)[//]Hn)[*]nring (S i))):cpoly_cring R).
   rewrite -> rh_pres_mult.
   rewrite -> rh_pres_nring.
   rewrite <- mult_assoc_unfolded.
@@ -451,7 +451,7 @@ Proof.
   rewrite <- mult_assoc_unfolded.
   rewrite -> mult_assoc_unfolded.
   rewrite <- rh_pres_mult.
-  setoid_replace (eta' ((One[/]nring (S n)[//]Hn)[*]nring (S n))) with (One:cpoly_cring R).
+  setoid_replace (eta' (([1][/]nring (S n)[//]Hn)[*]nring (S n))) with ([1]:cpoly_cring R).
    ring.
   rewrite <- (@rh_pres_unit _ _ eta').
   apply csf_wd.
@@ -501,8 +501,8 @@ Opaque cpoly_cring.
 (** A second important property of the Bernstein polynomials is that they
 are all non-negative on the unit interval. *)
 
-Lemma BernsteinNonNeg : forall x:F, Zero [<=] x -> x [<=] One ->
-forall n i (p:le i n), Zero[<=](Bernstein F p)!x.
+Lemma BernsteinNonNeg : forall x:F, [0] [<=] x -> x [<=] [1] ->
+forall n i (p:le i n), [0][<=](Bernstein F p)!x.
 Proof.
  intros x Hx0 Hx1.
  induction n.

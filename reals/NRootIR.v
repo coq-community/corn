@@ -54,19 +54,19 @@ Section NRoot.
 Variable n : nat.
 Hypothesis n_pos : 0 < n.
 Variable c : IR.
-Hypothesis c_nonneg : Zero [<=] c.
+Hypothesis c_nonneg : [0] [<=] c.
 
 (* begin hide *)
 Let p := _X_[^]n[-]_C_ c.
 (* end hide *)
 
-Lemma CnrootIR : {x : IR | Zero [<=] x | x[^]n [=] c}.
+Lemma CnrootIR : {x : IR | [0] [<=] x | x[^]n [=] c}.
 Proof.
  intros.
  cut (monic n p). intro.
-  elim (Ccpoly_pos' _ p Zero n); auto.
+  elim (Ccpoly_pos' _ p [0] n); auto.
   intro X. intros H0 H1.
-  cut {x : IR | Zero [<=] x /\ x [<=] X /\ p ! x [=] Zero}. intro H2.
+  cut {x : IR | [0] [<=] x /\ x [<=] X /\ p ! x [=] [0]}. intro H2.
    elim H2. clear H2. intro. intro H2.
    elim H2. clear H2. intros H2 H3. elim H3. clear H3. intros.
    exists x. auto.
@@ -77,10 +77,10 @@ Proof.
   apply Civt_poly; auto.
    apply monic_apzero with n; auto.
   unfold p in |- *.
-  astepl ((_X_[^]n) ! Zero[-] (_C_ c) ! Zero).
-  astepl (_X_ ! Zero[^]n[-]c).
-  astepl (Zero[^]n[-]c).
-  astepl (Zero[-]c).
+  astepl ((_X_[^]n) ! [0][-] (_C_ c) ! [0]).
+  astepl (_X_ ! [0][^]n[-]c).
+  astepl ([0][^]n[-]c).
+  astepl ([0][-]c).
   astepl ( [--]c).
   astepr ( [--]ZeroR). apply inv_resp_leEq. auto.
   unfold p in |- *.
@@ -99,17 +99,17 @@ End NRoot.
 prove its main properties:
  - $\left(\sqrt[n]x\right)^n=x$#(sqrt(n) x)^n =x#;
  - $0\leq\sqrt[n]x$#0&le;sqrt(n)x#;
- - if [Zero [<] x] then $0<\sqrt[n]x$#0&lt;sqrt(n)x#;
+ - if [[0] [<] x] then $0<\sqrt[n]x$#0&lt;sqrt(n)x#;
  - $\sqrt[n]{x^n}=x$#sqrt(n) x^n =x#;
  - the nth root is monotonous;
- - in particular, if [x [<] One] then $\sqrt[n]x<1$#sqrt(n) x&lt;1#.
+ - in particular, if [x [<] [1]] then $\sqrt[n]x<1$#sqrt(n) x&lt;1#.
 
 [(nroot ??)] will be written as [NRoot].
 *)
 
 Section Nth_Root.
 
-Lemma nroot : forall x k, Zero [<=] x -> 0 < k -> {y : IR | Zero [<=] y | y[^]k [=] x}.
+Lemma nroot : forall x k, [0] [<=] x -> 0 < k -> {y : IR | [0] [<=] y | y[^]k [=] x}.
 Proof.
  intros.
  elim (CnrootIR k H0 x H). intro y. intros.
@@ -127,18 +127,18 @@ Qed.
 
 Hint Resolve NRoot_power: algebra.
 
-Lemma NRoot_nonneg : forall x k Hx Hk, Zero [<=] NRoot x k Hx Hk.
+Lemma NRoot_nonneg : forall x k Hx Hk, [0] [<=] NRoot x k Hx Hk.
 Proof.
  intros.
  unfold NRoot in |- *.
  apply proj2a_sig2T.
 Qed.
 
-Lemma NRoot_pos : forall x Hx k Hk, Zero [<] x -> Zero [<] NRoot x k Hx Hk.
+Lemma NRoot_pos : forall x Hx k Hk, [0] [<] x -> [0] [<] NRoot x k Hx Hk.
 Proof.
  intros. rename X into H.
- cut (Zero [<=] NRoot x k Hx Hk); intros.
-  cut (NRoot x k Hx Hk [<] Zero or Zero [<] NRoot x k Hx Hk). intros H1.
+ cut ([0] [<=] NRoot x k Hx Hk); intros.
+  cut (NRoot x k Hx Hk [<] [0] or [0] [<] NRoot x k Hx Hk). intros H1.
    elim H1; clear H1; intro H1.
     rewrite -> leEq_def in H0; elim (H0 H1).
    auto.
@@ -149,7 +149,7 @@ Proof.
  apply NRoot_nonneg.
 Qed.
 
-Lemma NRoot_power' : forall x k Hx' Hk, Zero [<=] x -> NRoot (x[^]k) k Hx' Hk [=] x.
+Lemma NRoot_power' : forall x k Hx' Hk, [0] [<=] x -> NRoot (x[^]k) k Hx' Hk [=] x.
 Proof.
  intros.
  apply root_unique with k; auto.
@@ -169,7 +169,7 @@ Proof.
  auto.
 Qed.
 
-Lemma NRoot_less_one : forall x Hx k Hk, x [<] One -> NRoot x k Hx Hk [<] One.
+Lemma NRoot_less_one : forall x Hx k Hk, x [<] [1] -> NRoot x k Hx Hk [<] [1].
 Proof.
  intros.
  apply power_cancel_less with k.
@@ -194,8 +194,8 @@ Qed.
 %\end{convention}% *)
 
 Variables x y : IR.
-Hypothesis Hx : Zero [<=] x.
-Hypothesis Hy : Zero [<=] y.
+Hypothesis Hx : [0] [<=] x.
+Hypothesis Hy : [0] [<=] y.
 
 Lemma NRoot_wd : forall k Hk Hk', x [=] y -> NRoot x k Hx Hk [=] NRoot y k Hy Hk'.
 Proof.
@@ -210,7 +210,7 @@ Proof.
  apply eq_symmetric_unfolded; apply NRoot_power.
 Qed.
 
-Lemma NRoot_unique : forall k Hk, Zero [<] x -> x[^]k [=] y -> x [=] NRoot y k Hy Hk.
+Lemma NRoot_unique : forall k Hk, [0] [<] x -> x[^]k [=] y -> x [=] NRoot y k Hy Hk.
 Proof.
  intros. rename H into H0.
  apply root_unique with k; auto.
@@ -250,7 +250,7 @@ Proof.
  auto.
 Qed.
 
-Lemma NRoot_cancel_less : forall x (Hx:Zero[<=]x) y (Hy:Zero[<=]y) k (Hk Hk':0<k), NRoot Hx Hk [<] NRoot Hy Hk' -> x [<] y.
+Lemma NRoot_cancel_less : forall x (Hx:[0][<=]x) y (Hy:[0][<=]y) k (Hk Hk':0<k), NRoot Hx Hk [<] NRoot Hy Hk' -> x [<] y.
 Proof.
  intros x Hx y Hy k Hk Hk' H.
  astepl (NRoot Hx Hk[^]k).
@@ -261,7 +261,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma NRoot_str_ext : forall k (Hk Hk':0 < k) x y (Hx:Zero[<=]x) (Hy:Zero[<=]y), NRoot Hx Hk [#] NRoot Hy Hk' -> x[#]y.
+Lemma NRoot_str_ext : forall k (Hk Hk':0 < k) x y (Hx:[0][<=]x) (Hy:[0][<=]y), NRoot Hx Hk [#] NRoot Hy Hk' -> x[#]y.
 Proof.
  intros k Hk Hk' x y Hx Hy H0.
  destruct (ap_imp_less _ _ _ H0) as [H1|H1].
@@ -289,7 +289,7 @@ Qed.
 
 Hint Resolve sqrt_sqr: algebra.
 
-Lemma sqrt_nonneg : forall x xpos, Zero [<=] sqrt x xpos.
+Lemma sqrt_nonneg : forall x xpos, [0] [<=] sqrt x xpos.
 Proof.
  intros.
  unfold sqrt in |- *.
@@ -306,7 +306,7 @@ Qed.
 
 Hint Resolve sqrt_wd: algebra_c.
 
-Lemma sqrt_to_nonneg : forall x, Zero [<=] x -> forall x2pos, sqrt (x[^]2) x2pos [=] x.
+Lemma sqrt_to_nonneg : forall x, [0] [<=] x -> forall x2pos, sqrt (x[^]2) x2pos [=] x.
 Proof.
  intros.
  apply root_unique with 2.
@@ -314,7 +314,7 @@ Proof.
    Step_final (x[^]2).
 Qed.
 
-Lemma sqrt_to_nonpos : forall x, x [<=] Zero -> forall x2pos, sqrt (x[^]2) x2pos [=] [--]x.
+Lemma sqrt_to_nonpos : forall x, x [<=] [0] -> forall x2pos, sqrt (x[^]2) x2pos [=] [--]x.
 Proof.
  intros.
  apply root_unique with 2.
@@ -342,7 +342,7 @@ Lemma sqrt_mult_wd : forall x y z xpos ypos zpos,
  z [=] x[*]y -> sqrt z zpos [=] sqrt x xpos[*]sqrt y ypos.
 Proof.
  intros.
- cut (Zero [<=] x[*]y). intro.
+ cut ([0] [<=] x[*]y). intro.
   Step_final (sqrt (x[*]y) H0).
  apply mult_resp_nonneg; auto.
 Qed.
@@ -404,8 +404,8 @@ Proof.
      rstepl (x[+][--]x).
     rstepr (y[+]y).
     apply plus_resp_leEq_both; auto.
-   astepl (One[*]x[*]x).
-   rstepl (x[^]2[+]Zero).
+   astepl ([1][*]x[*]x).
+   rstepl (x[^]2[+][0]).
    apply shift_plus_leEq'.
    rstepr ((y[-]x) [*] (y[-][--]x)).
    apply mult_resp_nonneg.
@@ -432,13 +432,13 @@ Lemma AbsIR_resp_mult : forall x y, AbsIR (x[*]y) [=] AbsIR x[*]AbsIR y.
 Proof.
  intros.
  astepl (sqrt ((x[*]y) [^]2) (sqr_nonneg _ (x[*]y))).
- cut (Zero [<=] x[^]2[*]y[^]2). intro.
+ cut ([0] [<=] x[^]2[*]y[^]2). intro.
   astepl (sqrt (x[^]2[*]y[^]2) H).
   Step_final (sqrt (x[^]2) (sqr_nonneg _ x) [*]sqrt (y[^]2) (sqr_nonneg _ y)).
  apply mult_resp_nonneg; apply sqr_nonneg.
 Qed.
 
-Lemma AbsIR_mult_pos : forall x y, Zero [<=] y -> AbsIR (x[*]y) [=] AbsIR x[*]y.
+Lemma AbsIR_mult_pos : forall x y, [0] [<=] y -> AbsIR (x[*]y) [=] AbsIR x[*]y.
 Proof.
  intros.
  apply eq_transitive_unfolded with (AbsIR x[*]AbsIR y).
@@ -455,7 +455,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma AbsIR_mult_pos' : forall x y, Zero [<=] x -> AbsIR (x[*]y) [=] x[*]AbsIR y.
+Lemma AbsIR_mult_pos' : forall x y, [0] [<=] x -> AbsIR (x[*]y) [=] x[*]AbsIR y.
 Proof.
  intros.
  astepl (AbsIR (y[*]x)).
@@ -505,31 +505,31 @@ Qed.
 Lemma AbsIR_division : forall x y y_ y__, AbsIR (x[/] y[//]y_) [=] (AbsIR x[/] AbsIR y[//]y__).
 Proof.
  intros x y H Hy.
- rstepr (AbsIR x[*] (One[/] AbsIR y[//]Hy)).
- apply eq_transitive_unfolded with (AbsIR (x[*] (One[/] y[//]H))).
+ rstepr (AbsIR x[*] ([1][/] AbsIR y[//]Hy)).
+ apply eq_transitive_unfolded with (AbsIR (x[*] ([1][/] y[//]H))).
   apply un_op_wd_unfolded; rational.
- apply eq_transitive_unfolded with (AbsIR x[*]AbsIR (One[/] y[//]H)).
+ apply eq_transitive_unfolded with (AbsIR x[*]AbsIR ([1][/] y[//]H)).
   apply AbsIR_resp_mult.
  apply mult_wdr.
- cut (y [<] Zero or Zero [<] y).
+ cut (y [<] [0] or [0] [<] y).
   intros H0.
   elim H0.
    intros.
-   apply eq_transitive_unfolded with ( [--] (One[/] y[//]H)).
+   apply eq_transitive_unfolded with ( [--] ([1][/] y[//]H)).
     apply AbsIR_eq_inv_x.
-    rstepr (Zero[/] [--]y[//]inv_resp_ap_zero _ _ H).
+    rstepr ([0][/] [--]y[//]inv_resp_ap_zero _ _ H).
     apply shift_leEq_div.
      astepl ( [--]ZeroR).
      apply inv_resp_less; assumption.
     rstepl ( [--]OneR).
     astepr ( [--]ZeroR); apply inv_resp_leEq; apply less_leEq; apply pos_one.
-   rstepl (One[/] [--]y[//]inv_resp_ap_zero _ _ H).
+   rstepl ([1][/] [--]y[//]inv_resp_ap_zero _ _ H).
    apply div_wd.
     algebra.
    apply eq_symmetric_unfolded; apply AbsIR_eq_inv_x.
    apply less_leEq; assumption.
   intros.
-  apply eq_transitive_unfolded with (One[/] y[//]H).
+  apply eq_transitive_unfolded with ([1][/] y[//]H).
    apply AbsIR_eq_x.
    apply less_leEq; apply recip_resp_pos; assumption.
   apply div_wd; [ algebra
@@ -540,10 +540,10 @@ Qed.
 
 (** Some special cases. *)
 
-Lemma AbsIR_recip : forall x x_ x__, AbsIR (One[/] x[//]x_) [=] (One[/] AbsIR x[//]x__).
+Lemma AbsIR_recip : forall x x_ x__, AbsIR ([1][/] x[//]x_) [=] ([1][/] AbsIR x[//]x__).
 Proof.
  intros x H Ha.
- apply eq_transitive_unfolded with (AbsIR One[/] AbsIR x[//]Ha).
+ apply eq_transitive_unfolded with (AbsIR [1][/] AbsIR x[//]Ha).
   apply AbsIR_division.
  apply div_wd.
   2: algebra.
@@ -569,7 +569,7 @@ Proof.
  astepl (sqrt ((x[+]y) [^]2) (sqr_nonneg _ (x[+]y))).
  astepr (sqrt (x[^]2) (sqr_nonneg _ x) [+]sqrt (y[^]2) (sqr_nonneg _ y)).
  apply power_cancel_leEq with 2. auto.
-   astepl (Zero[+]ZeroR). apply plus_resp_leEq_both; apply sqrt_nonneg.
+   astepl ([0][+]ZeroR). apply plus_resp_leEq_both; apply sqrt_nonneg.
   astepl ((x[+]y) [^]2).
  rstepl (x[^]2[+]y[^]2[+]Two[*] (x[*]y)).
  rstepr (sqrt (x[^]2) (sqr_nonneg IR x) [^]2[+]sqrt (y[^]2) (sqr_nonneg IR y) [^]2[+]
@@ -594,7 +594,7 @@ Proof.
   inversion H as [|m H0 H1].
    unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
    rstepr ZeroR.
-   astepr (AbsIR Zero).
+   astepr (AbsIR [0]).
    apply eq_imp_leEq. apply AbsIR_wd. rational.
    inversion H0.
   unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
@@ -613,7 +613,7 @@ Proof.
    rewrite y.
   unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
   rstepr ZeroR.
-  astepr (AbsIR Zero).
+  astepr (AbsIR [0]).
   apply eq_imp_leEq. apply AbsIR_wd. rational.
   auto.
 Qed.
@@ -717,7 +717,7 @@ Cauchy sequence.
 *)
 
 Lemma Cauchy_Lim_recip : forall seq y, Cauchy_Lim_prop2 seq y ->
- forall seq_ y_, Cauchy_Lim_prop2 (fun n : nat => One[/] seq n[//]seq_ n) (One[/] y[//]y_).
+ forall seq_ y_, Cauchy_Lim_prop2 (fun n : nat => [1][/] seq n[//]seq_ n) ([1][/] y[//]y_).
 Proof.
  intros seq y H Hn Hy.
  red in |- *; red in H.
@@ -725,24 +725,24 @@ Proof.
  cut {n0 : nat | forall n : nat, n0 <= n -> AbsIR y [/]TwoNZ [<=] AbsIR (seq n)}.
   intro H0.
   elim H0; clear H0; intros n0 Hn0.
-  cut (Zero [<] eps [/]TwoNZ[*] (AbsIR y[*]AbsIR y)).
+  cut ([0] [<] eps [/]TwoNZ[*] (AbsIR y[*]AbsIR y)).
    intro H0.
    elim (H _ H0); clear H.
    intros N HN.
    exists (max N n0).
    intros.
    apply AbsIR_imp_AbsSmall.
-   apply leEq_wdl with ((One[/] _[//]AbsIR_resp_ap_zero _ (Hn m)) [*]
-     (One[/] _[//]AbsIR_resp_ap_zero _ Hy) [*]AbsIR (seq m[-]y)).
-    rstepr ((Two[/] _[//]AbsIR_resp_ap_zero _ Hy) [*] (One[/] _[//]AbsIR_resp_ap_zero _ Hy) [*]
+   apply leEq_wdl with (([1][/] _[//]AbsIR_resp_ap_zero _ (Hn m)) [*]
+     ([1][/] _[//]AbsIR_resp_ap_zero _ Hy) [*]AbsIR (seq m[-]y)).
+    rstepr ((Two[/] _[//]AbsIR_resp_ap_zero _ Hy) [*] ([1][/] _[//]AbsIR_resp_ap_zero _ Hy) [*]
       (eps [/]TwoNZ[*] (AbsIR y[*]AbsIR y))).
     apply mult_resp_leEq_both.
-       astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+       astepl (ZeroR[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
         apply less_leEq; apply recip_resp_pos; apply AbsIR_pos; apply Hn.
        apply less_leEq; apply recip_resp_pos; apply AbsIR_pos; apply Hy.
       apply AbsIR_nonneg.
      apply mult_resp_leEq_rht.
-      rstepr (One[/] _[//] div_resp_ap_zero_rev _ _ _ (two_ap_zero _) (AbsIR_resp_ap_zero _ Hy)).
+      rstepr ([1][/] _[//] div_resp_ap_zero_rev _ _ _ (two_ap_zero _) (AbsIR_resp_ap_zero _ Hy)).
       apply recip_resp_leEq.
        apply pos_div_two; apply AbsIR_pos; apply Hy.
       apply Hn0.
@@ -752,21 +752,21 @@ Proof.
     apply HN.
     apply le_trans with (max N n0); auto with arith.
    apply eq_transitive_unfolded with
-     (AbsIR (One[/] _[//]Hn m) [*]AbsIR (One[/] _[//]Hy) [*]AbsIR (y[-]seq m)).
+     (AbsIR ([1][/] _[//]Hn m) [*]AbsIR ([1][/] _[//]Hy) [*]AbsIR (y[-]seq m)).
     repeat apply mult_wd; apply eq_symmetric_unfolded.
       apply AbsIR_recip.
      apply AbsIR_recip.
     apply AbsIR_minus.
-   apply eq_transitive_unfolded with (AbsIR ((One[/] _[//]Hn m) [*] (One[/] _[//]Hy) [*] (y[-]seq m))).
+   apply eq_transitive_unfolded with (AbsIR (([1][/] _[//]Hn m) [*] ([1][/] _[//]Hy) [*] (y[-]seq m))).
     eapply eq_transitive_unfolded.
      2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
     apply mult_wdl.
     apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
    apply AbsIR_wd.
    rational.
-  astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
+  astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive.
    apply pos_div_two; assumption.
-  astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive;
+  astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive;
     apply AbsIR_pos; apply Hy.
  cut {n0 : nat | forall n : nat, n0 <= n -> AbsSmall (AbsIR y [/]TwoNZ) (seq n[-]y)}.
   2: apply H.
@@ -784,18 +784,18 @@ Proof.
  apply weird_triangleIR.
 Qed.
 
-Lemma Cauchy_recip : forall seq seq_, Lim seq [#] (Zero:IR) ->
- Cauchy_prop (fun n => One[/] seq n[//]seq_ n).
+Lemma Cauchy_recip : forall seq seq_, Lim seq [#] ([0]:IR) ->
+ Cauchy_prop (fun n => [1][/] seq n[//]seq_ n).
 Proof.
  intros seq Hn Hy.
  apply Cauchy_prop2_prop.
- exists (One[/] _[//]Hy).
+ exists ([1][/] _[//]Hy).
  apply Cauchy_Lim_recip.
  apply Cauchy_complete.
 Qed.
 
 Lemma Lim_recip : forall seq seq_ seq__,
- Lim (Build_CauchySeq _ _ (Cauchy_recip seq seq_ seq__)) [=] (One[/] _[//]seq__).
+ Lim (Build_CauchySeq _ _ (Cauchy_recip seq seq_ seq__)) [=] ([1][/] _[//]seq__).
 Proof.
  intros.
  apply eq_symmetric_unfolded; apply Limits_unique.
@@ -818,9 +818,9 @@ Variables F : PartIR.
 
 Let P := Dom F.
 
-Let R := extend P (fun x Hx => Zero[<=]F x Hx).
+Let R := extend P (fun x Hx => [0][<=]F x Hx).
 
-Let Ext2R := ext2 (P:=P) (R:=fun x Hx => Zero[<=]F x Hx).
+Let Ext2R := ext2 (P:=P) (R:=fun x Hx => [0][<=]F x Hx).
 
 Variable n : nat.
 
@@ -853,7 +853,7 @@ Section Included.
 Variable S:IR -> CProp.
 
 Lemma included_FNRoot : included S P ->
- (forall x, S x -> forall Hx, Zero[<=]F x Hx) -> included S (Dom FNRoot).
+ (forall x, S x -> forall Hx, [0][<=]F x Hx) -> included S (Dom FNRoot).
 Proof.
  intros H H0.
  simpl in |- *.

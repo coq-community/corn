@@ -49,7 +49,7 @@ Here we resume the results proved in four different files.  The aim is to prove 
 compact interval [[a,b]] with modulus of continuity%\footnote{%# (#From our
 point of view, the modulus of continuity is simply the proof that [f] is
 continuous.#)#%}% [omega].
-Let [P] be a partition of [[a,b]] and [eps [>] Zero] be such that
+Let [P] be a partition of [[a,b]] and [eps [>] [0]] be such that
 [mesh(P)  [<]  omega(eps)].
 Then
 %\[\left|S(f,P)-\int_a^bf(x)dx\right|\leq\varepsilon(b-a),\]%#|S(f,P)-&int;f(x)dx|&le;&epsilon;(b-a)#
@@ -58,7 +58,7 @@ where [S(f,P)] denotes any sum of the function [f] respecting the partition
 
 The proof of this theorem relies on the fact that for any two partitions [P]
 and [R] of [[a,b]] it is possible to define a partition [Q] which is
-``almost'' a common refinement of [P] and [R]---that is, given [eps [>] Zero]
+``almost'' a common refinement of [P] and [R]---that is, given [eps [>] [0]]
 it is possible to define [Q] such that for every point [x] of either [P] or
 [R] there is a point [y] of [Q] such that [|x[-]y|  [<]  eps].
 This requires three separate constructions (done in three separate files)
@@ -68,7 +68,7 @@ reader to ignore this technical constructions.
 First we prove that if [P] and [R] are both
 separated (though not necessarily separated from each other) then we can
 define a partition [P'] arbitrarily close to [P] (that is, such that given
-[alpha [>] Zero] and [xi [>] Zero] [P'] satisfies both
+[alpha [>] [0]] and [xi [>] [0]] [P'] satisfies both
 [mesh(P')  [<]  mesh(P) [+] xi] and for every choice of points [x_i] respecting
 [P] there is a choice of points [x'_i] respecting [P'] such that
 [|S(f,P)-S(f,P')|  [<]  alpha]) that is separated from [R].
@@ -124,7 +124,7 @@ respectively.
 *)
 
 Variable e : IR.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -315,8 +315,8 @@ Proof.
       (fun _ : {i0 <= pred (sub (S i))} + {pred (sub (S i)) < i0} => IR)
         (fun a1 : i0 <= pred (sub (S i)) => Part F (fQ i0 (H i i0 Hi a1)) just2[*]
           (Q (S i0) (H' i i0 Hi a1) [-] Q i0 (lt_le_weak i0 m (H i i0 Hi a1))))
-            (fun _ : pred (sub (S i)) < i0 => Zero) (le_lt_dec i0 (pred (sub (S i)))))
-              (fun _ : i0 < sub i => Zero) (le_lt_dec (sub i) i0)) (h := part_tot_nat_fun _ _
+            (fun _ : pred (sub (S i)) < i0 => [0]) (le_lt_dec i0 (pred (sub (S i)))))
+              (fun _ : i0 < sub i => [0]) (le_lt_dec (sub i) i0)) (h := part_tot_nat_fun _ _
                 (fun (i : nat) (H : i < m) =>
                   Part F (fQ i H) just2[*] (Q _ H[-]Q _ (lt_le_weak _ _ H)))).
      exact RL_sub_0.
@@ -623,8 +623,8 @@ Hypothesis HrefP : Refinement P Q.
 Hypothesis HrefR : Refinement R Q.
 
 Variables e e' : IR.
-Hypothesis He : Zero [<] e.
-Hypothesis He' : Zero [<] e'.
+Hypothesis He : [0] [<] e.
+Hypothesis He' : [0] [<] e'.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -685,8 +685,8 @@ Variable P : Partition Hab n.
 Variable R : Partition Hab m.
 
 Variables e e' : IR.
-Hypothesis He : Zero [<] e.
-Hypothesis He' : Zero [<] e'.
+Hypothesis He : [0] [<] e.
+Hypothesis He' : [0] [<] e'.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -707,19 +707,19 @@ Hypothesis HfR' : nat_less_n_fun fR.
 Hypothesis Hab' : a [<] b.
 
 Variable beta : IR.
-Hypothesis Hbeta : Zero [<] beta.
+Hypothesis Hbeta : [0] [<] beta.
 
 (* begin hide *)
 Let alpha := beta [/]ThreeNZ.
 
-Lemma RL_alpha : Zero [<] alpha.
+Lemma RL_alpha : [0] [<] alpha.
 Proof.
  unfold alpha in |- *; apply pos_div_three; assumption.
 Qed.
 
 Let csi1 := Min (b[-]a) ((d[-]Mesh P) [/]TwoNZ).
 
-Lemma RL_csi1 : Zero [<] csi1.
+Lemma RL_csi1 : [0] [<] csi1.
 Proof.
  unfold csi1 in |- *; apply less_Min.
   apply shift_less_minus; astepl a; assumption.
@@ -744,7 +744,7 @@ Proof.
    apply Min_leEq_lft.
   unfold csi1 in |- *.
   apply Min_leEq_lft.
- astepl (Zero[+] (b[-]a)); rstepr (b[-]a[+] (b[-]a)).
+ astepl ([0][+] (b[-]a)); rstepr (b[-]a[+] (b[-]a)).
  apply plus_resp_less_rht.
  apply shift_less_minus; astepl a; assumption.
 Qed.
@@ -793,7 +793,7 @@ Qed.
 
 Let csi2 := Min (b[-]a) ((d'[-]Mesh R) [/]TwoNZ).
 
-Lemma RL_csi2 : Zero [<] csi2.
+Lemma RL_csi2 : [0] [<] csi2.
 Proof.
  unfold csi2 in |- *; apply less_Min.
   apply shift_less_minus; astepl a; assumption.
@@ -818,7 +818,7 @@ Proof.
    apply Min_leEq_lft.
   unfold csi2 in |- *.
   apply Min_leEq_lft.
- astepl (Zero[+] (b[-]a)); rstepr (b[-]a[+] (b[-]a)).
+ astepl ([0][+] (b[-]a)); rstepr (b[-]a[+] (b[-]a)).
  apply plus_resp_less_rht.
  apply shift_less_minus; astepl a; assumption.
 Qed.
@@ -867,7 +867,7 @@ Qed.
 
 Let csi3 := d[-]Mesh P'.
 
-Lemma RL_csi3 : Zero [<] csi3.
+Lemma RL_csi3 : [0] [<] csi3.
 Proof.
  unfold csi3 in |- *.
  apply shift_less_minus; astepl (Mesh P').
@@ -999,8 +999,8 @@ Variable P : Partition Hab n.
 Variable R : Partition Hab m.
 
 Variables e e' : IR.
-Hypothesis He : Zero [<] e.
-Hypothesis He' : Zero [<] e'.
+Hypothesis He : [0] [<] e.
+Hypothesis He' : [0] [<] e'.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -1120,8 +1120,8 @@ Variable P : Partition Hab n.
 Variable R : Partition Hab m.
 
 Variables e e' : IR.
-Hypothesis He : Zero [<] e.
-Hypothesis He' : Zero [<] e'.
+Hypothesis He : [0] [<] e.
+Hypothesis He' : [0] [<] e'.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -1141,16 +1141,16 @@ Hypothesis HfR' : nat_less_n_fun fR.
 
 Lemma refinement_lemma : AbsIR (Partition_Sum HfP incF[-]Partition_Sum HfR incF) [<=] e[*] (b[-]a) [+]e'[*] (b[-]a).
 Proof.
- cut (Zero [<] Min d d').
+ cut ([0] [<] Min d d').
   intro H; elim (less_cotransitive_unfolded _ _ _ H (b[-]a)); intro.
-   astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]Zero).
+   astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+][0]).
    apply shift_leEq_plus'.
    apply approach_zero_weak.
    intros beta Hbeta.
    apply shift_minus_leEq.
    astepr (e[*] (b[-]a) [+]e'[*] (b[-]a) [+]beta).
    apply third_refinement_lemma with (He := He) (He' := He'); try assumption.
-   astepl (Zero[+]a); apply shift_plus_less; assumption.
+   astepl ([0][+]a); apply shift_plus_less; assumption.
   apply fourth_refinement_lemma with He He'.
   assumption.
  apply less_Min.

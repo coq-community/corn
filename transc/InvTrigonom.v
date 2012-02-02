@@ -60,7 +60,7 @@ Arccosine is defined in terms of arcsine by the relation
 
 Opaque Sine Cosine Expon Logarithm.
 
-Lemma ArcSin_def_lemma : Continuous (olor [--]One One) (( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)).
+Lemma ArcSin_def_lemma : Continuous (olor [--][1] [1]) (( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)).
 Proof.
  split.
   unfold FPower in |- *.
@@ -85,24 +85,24 @@ Proof.
   Included.
  simpl in H.
  set (c := Max (AbsIR a) (AbsIR b)) in *.
- cut (Zero [<=] c); intros.
+ cut ([0] [<=] c); intros.
   2: unfold c in |- *; apply leEq_transitive with (AbsIR a);
     [ apply AbsIR_nonneg | apply lft_leEq_Max ].
  elim (H _ (compact_inc_lft _ _ Hab)); intros.
  elim (H _ (compact_inc_rht _ _ Hab)); intros.
- assert (H1 : c [<] One).
+ assert (H1 : c [<] [1]).
   unfold c in |- *.
   apply Max_less; simpl in |- *; unfold ABSIR in |- *; apply Max_less; auto; apply inv_cancel_less.
    astepr a; auto. astepr b; auto.
   assert (Hc : [--]c [<=] c). apply leEq_transitive with ZeroR; auto.
   astepr ( [--]ZeroR); apply inv_resp_leEq; auto.
  cut (included (Compact Hab) (Compact Hc)). intro H2.
-  exists (One[-]c[^]2).
+  exists ([1][-]c[^]2).
    apply shift_less_minus.
    astepl (c[^]2); astepr (OneR[^]2).
    apply nexp_resp_less; auto.
   intros y H3 Hy.
-  astepr (One[-]y[^]2).
+  astepr ([1][-]y[^]2).
   apply minus_resp_leEq_both.
    apply leEq_reflexive.
   apply AbsIR_leEq_square.
@@ -119,7 +119,7 @@ Proof.
  eapply leEq_transitive; [ apply leEq_AbsIR | apply rht_leEq_Max ].
 Qed.
 
-Lemma ArcSin_def_zero : olor [--]One One Zero.
+Lemma ArcSin_def_zero : olor [--][1] [1] [0].
 Proof.
  split.
   astepr ( [--]ZeroR); apply inv_resp_less; apply pos_one.
@@ -128,18 +128,18 @@ Qed.
 
 Definition ArcSin := ( [-S-]ArcSin_def_lemma) _ ArcSin_def_zero.
 
-Lemma ArcSin_domain : forall x, [--]One [<] x -> x [<] One -> Dom ArcSin x.
+Lemma ArcSin_domain : forall x, [--][1] [<] x -> x [<] [1] -> Dom ArcSin x.
 Proof.
  intros; split; auto.
 Qed.
 
-Lemma Continuous_ArcSin : Continuous (olor [--]One One) ArcSin.
+Lemma Continuous_ArcSin : Continuous (olor [--][1] [1]) ArcSin.
 Proof.
  unfold ArcSin in |- *; apply Continuous_prim.
 Qed.
 
 Lemma Derivative_ArcSin : forall H,
- Derivative (olor [--]One One) H ArcSin (( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)).
+ Derivative (olor [--][1] [1]) H ArcSin (( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)).
 Proof.
  intros; unfold ArcSin in |- *.
  apply FTC1.
@@ -154,21 +154,21 @@ Hint Resolve Continuous_ArcSin: continuous.
 
 Definition ArcCos := [-C-] (Pi [/]TwoNZ) {-}ArcSin.
 
-Lemma ArcCos_domain : forall x : IR, [--]One [<] x -> x [<] One -> Dom ArcCos x.
+Lemma ArcCos_domain : forall x : IR, [--][1] [<] x -> x [<] [1] -> Dom ArcCos x.
 Proof.
  intros; repeat split; auto.
 Qed.
 
-Lemma Continuous_ArcCos : Continuous (olor [--]One One) ArcCos.
+Lemma Continuous_ArcCos : Continuous (olor [--][1] [1]) ArcCos.
 Proof.
  unfold ArcCos in |- *; Contin.
 Qed.
 
 Lemma Derivative_ArcCos : forall H,
- Derivative (olor [--]One One) H ArcCos {--} (( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)).
+ Derivative (olor [--][1] [1]) H ArcCos {--} (( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)).
 Proof.
  intros; unfold ArcCos in |- *.
- apply Derivative_wdr with ( [-C-]Zero{-} ( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)).
+ apply Derivative_wdr with ( [-C-][0]{-} ( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)).
   2: Deriv.
  apply eq_imp_Feq.
    apply included_FMinus.
@@ -178,16 +178,16 @@ Proof.
   apply Continuous_imp_inc; apply ArcSin_def_lemma.
  intros.
  astepl (Part _ _ (ProjIR1 Hx) [-]Part _ _ (ProjIR2 Hx)).
- astepl (Zero[-]Part _ _ (ProjIR2 Hx)).
+ astepl ([0][-]Part _ _ (ProjIR2 Hx)).
  astepl ( [--] (Part _ _ (ProjIR2 Hx))).
- Step_final ( [--] ((( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)) x Hx')).
+ Step_final ( [--] ((( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)) x Hx')).
 Qed.
 
 (**
 *** Arctangent
 *)
 
-Lemma ArcTan_def_lemma : Continuous realline {1/} ( [-C-]One{+}FId{^}2).
+Lemma ArcTan_def_lemma : Continuous realline {1/} ( [-C-][1]{+}FId{^}2).
 Proof.
  apply Continuous_recip.
   Contin.
@@ -204,7 +204,7 @@ Proof.
  apply sqr_nonneg.
 Qed.
 
-Definition ArcTang := ( [-S-]ArcTan_def_lemma) Zero I.
+Definition ArcTang := ( [-S-]ArcTan_def_lemma) [0] I.
 
 Lemma ArcTan_domain : forall x : IR, Dom ArcTang x.
 Proof.
@@ -218,7 +218,7 @@ Proof.
  unfold ArcTang in |- *; Contin.
 Qed.
 
-Lemma Derivative_ArcTan : forall H, Derivative realline H ArcTang {1/} ( [-C-]One{+}FId{^}2).
+Lemma Derivative_ArcTan : forall H, Derivative realline H ArcTang {1/} ( [-C-][1]{+}FId{^}2).
 Proof.
  intros; unfold ArcTang in |- *; apply FTC1.
 Qed.
@@ -244,11 +244,11 @@ We now prove that this functions are in fact inverses to the corresponding trigo
 *** Sine and Arcsine
 *)
 
-Lemma maps_Sin : maps_compacts_into (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) (olor [--]One One) Sine.
+Lemma maps_Sin : maps_compacts_into (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ)) (olor [--][1] [1]) Sine.
 Proof.
  intros a b Hab H.
- set (min := Min (Sin a) [--] (One [/]TwoNZ)) in *.
- set (max := Max (Sin b) (One [/]TwoNZ)) in *.
+ set (min := Min (Sin a) [--] ([1] [/]TwoNZ)) in *.
+ set (max := Max (Sin b) ([1] [/]TwoNZ)) in *.
  cut (min [<] max). intro H0.
   exists min; exists max; exists H0.
   elim (H _ (compact_inc_lft _ _ Hab)); intros Ha1 Ha2.
@@ -287,7 +287,7 @@ Proof.
  unfold min, max in |- *; apply less_transitive_unfolded with ZeroR.
   eapply leEq_less_trans.
    apply Min_leEq_rht.
-  astepr ( [--]Zero:IR); apply inv_resp_less; apply (pos_half IR).
+  astepr ( [--][0]:IR); apply inv_resp_less; apply (pos_half IR).
  eapply less_leEq_trans; [ apply (pos_half IR) | apply rht_leEq_Max ].
 Qed.
 
@@ -296,10 +296,10 @@ Proof.
  set (HPi1 := pos_HalfPi) in *.
  set (HPi2 := neg_invHalfPi) in *.
  set (H := invHalfPi_less_HalfPi:proper (olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ))) in *.
- apply Feq_criterium with H ( [-C-]One:PartIR) ZeroR.
+ apply Feq_criterium with H ( [-C-][1]:PartIR) ZeroR.
     assert (H0 : Derivative _ H Sine Cosine).
      apply Included_imp_Derivative with realline I; Deriv.
-    assert (H1 : [--]One [<] OneR).
+    assert (H1 : [--][1] [<] OneR).
      set (H' := pos_one IR) in *; apply less_transitive_unfolded with ZeroR; auto.
      astepr ( [--]ZeroR); apply inv_resp_less; auto.
     set (H2 := Derivative_ArcSin H1) in *.
@@ -311,14 +311,14 @@ Proof.
         Included.
        intros.
        unfold FPower in |- *.
-       cut (Dom ( [-C-] [--] (One [/]TwoNZ) {*} (Logarithm[o] [-C-]One{-}FId{^}2)) (Part _ _ Hx)). intro H3.
+       cut (Dom ( [-C-] [--] ([1] [/]TwoNZ) {*} (Logarithm[o] [-C-][1]{-}FId{^}2)) (Part _ _ Hx)). intro H3.
         exists H3; apply Exp_domain.
        split.
         auto.
        exists (I, I).
        apply Log_domain.
-       astepr (One[-]Sine x Hx[^]2).
-       astepl (OneR[-]One).
+       astepr ([1][-]Sine x Hx[^]2).
+       astepl (OneR[-][1]).
        unfold cg_minus in |- *; apply plus_resp_less_lft.
        apply inv_resp_less.
        astepr (OneR[^]2); apply AbsIR_less_square.
@@ -329,8 +329,8 @@ Proof.
      split.
     intros x H3 Hx Hx'.
     astepr OneR.
-    cut (Zero [<] One[-]Sin x[^]2). intro H4.
-     apply eq_transitive_unfolded with ((One[-]Sin x[^]2) [!] [--] (One [/]TwoNZ) [//]H4[*]Cos x).
+    cut ([0] [<] [1][-]Sin x[^]2). intro H4.
+     apply eq_transitive_unfolded with (([1][-]Sin x[^]2) [!] [--] ([1] [/]TwoNZ) [//]H4[*]Cos x).
       unfold power, FPower in |- *.
       unfold FPower in Hx.
       astepl (Part _ _ (ProjIR1 Hx) [*]Part _ _ (ProjIR2 Hx)).
@@ -346,9 +346,9 @@ Proof.
       elim Hx2; intros Hx3 Hx4.
       astepl (Part _ _ Hx3).
       clear Hx4 Hx2.
-      astepl ( [--] (One [/]TwoNZ) [*]Part _ _ (ProjIR2 Hx3)).
+      astepl ( [--] ([1] [/]TwoNZ) [*]Part _ _ (ProjIR2 Hx3)).
       elim Hx3; clear Hx3; intros Hx2 Hx3.
-      astepl ( [--] (One [/]TwoNZ) [*]Part _ _ Hx3).
+      astepl ( [--] ([1] [/]TwoNZ) [*]Part _ _ Hx3).
       apply mult_wdr.
       astepl (Part _ _ (ProjT2 Hx3)).
       unfold Log in |- *; apply pfwdef.
@@ -361,14 +361,14 @@ Proof.
        algebra.
       simpl in |- *; algebra.
      unfold power in |- *.
-     astepl (Exp [--] (One [/]TwoNZ[*]Log _ H4) [*]Cos x).
-     astepl ((One[/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)) [*]Cos x).
-     astepr (Exp (One [/]TwoNZ[*]Log _ H4) [/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)).
-     rstepl (Cos x[/] _[//]Exp_ap_zero (One [/]TwoNZ[*]Log _ H4)).
+     astepl (Exp [--] ([1] [/]TwoNZ[*]Log _ H4) [*]Cos x).
+     astepl (([1][/] _[//]Exp_ap_zero ([1] [/]TwoNZ[*]Log _ H4)) [*]Cos x).
+     astepr (Exp ([1] [/]TwoNZ[*]Log _ H4) [/] _[//]Exp_ap_zero ([1] [/]TwoNZ[*]Log _ H4)).
+     rstepl (Cos x[/] _[//]Exp_ap_zero ([1] [/]TwoNZ[*]Log _ H4)).
      apply div_wd.
       2: algebra.
-     astepr (Exp (Log _ H4[*]One [/]TwoNZ)).
-     assert (H5 : Zero [<] Cos x). inversion_clear H3; apply Cos_pos; auto.
+     astepr (Exp (Log _ H4[*][1] [/]TwoNZ)).
+     assert (H5 : [0] [<] Cos x). inversion_clear H3; apply Cos_pos; auto.
       astepl (Exp (Log _ H5)).
      apply Exp_wd.
      rstepl ((Log _ H5[+]Log _ H5) [/]TwoNZ).
@@ -379,7 +379,7 @@ Proof.
      astepl (Log _ (pos_square _ _ (pos_ap_zero _ _ H5))).
      apply Log_wd.
      astepr (Cos x[^]2[+]Sin x[^]2[-]Sin x[^]2); rational.
-    astepl (OneR[-]One).
+    astepl (OneR[-][1]).
     unfold cg_minus in |- *; apply plus_resp_less_lft.
     apply inv_resp_less.
     astepr (OneR[^]2); apply AbsIR_less_square.
@@ -387,7 +387,7 @@ Proof.
    Deriv.
   split; auto.
  intros; simpl in |- *; apply Integral_empty.
- astepl (Sin Zero); simpl in |- *; algebra.
+ astepl (Sin [0]); simpl in |- *; algebra.
 Qed.
 
 Opaque ArcSin.
@@ -451,8 +451,8 @@ Proof.
    simpl in H0.
    unfold y in H0.
    cut (Continuous_I (Min_leEq_Max x y)
-     (( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ))). intro H1.
-    cut (Integral H1 [=] Zero). intro H2.
+     (( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ))). intro H1.
+    cut (Integral H1 [=] [0]). intro H2.
      clear H0.
      elim H; intros H0 H3.
      elim Hx; clear H; intros H H4.
@@ -472,15 +472,15 @@ Proof.
     apply eq_transitive_unfolded with (ArcSin y H[-]ArcSin x Hx).
      rstepl (ArcSin x Hx[+]Integral H1[-]ArcSin x Hx).
      apply cg_minus_wd; [ simpl in |- * | algebra ].
-     apply eq_symmetric_unfolded; apply Integral_plus_Integral with (Min3_leEq_Max3 Zero y x).
-     apply included_imp_Continuous with (olor [--]One One).
+     apply eq_symmetric_unfolded; apply Integral_plus_Integral with (Min3_leEq_Max3 [0] y x).
+     apply included_imp_Continuous with (olor [--][1] [1]).
       exact ArcSin_def_lemma.
      apply included3_interval; auto.
      split.
       astepr ( [--]ZeroR); apply inv_resp_less; apply pos_one.
      apply pos_one.
     apply x_minus_x; simpl in |- *; algebra.
-   apply included_imp_Continuous with (olor [--]One One).
+   apply included_imp_Continuous with (olor [--][1] [1]).
     exact ArcSin_def_lemma.
    apply included_interval; auto.
   elim (ArcSin_range x Hx); intros; apply ArcSin_Sin; auto.
@@ -496,7 +496,7 @@ Proof.
  apply Cos_pos; auto.
 Qed.
 
-Lemma Sin_ArcSin_inv : Feq (olor [--]One One) (Sine[o]ArcSin) FId.
+Lemma Sin_ArcSin_inv : Feq (olor [--][1] [1]) (Sine[o]ArcSin) FId.
 Proof.
  apply eq_imp_Feq.
    apply included_FComp.
@@ -513,17 +513,17 @@ Proof.
 Qed.
 
 Lemma ArcSin_resp_leEq : forall x y,
- [--]One [<] x -> x [<=] y -> y [<] One -> forall Hx Hy, ArcSin x Hx [<=] ArcSin y Hy.
+ [--][1] [<] x -> x [<=] y -> y [<] [1] -> forall Hx Hy, ArcSin x Hx [<=] ArcSin y Hy.
 Proof.
  intros x y H H0 H1 Hx Hy.
- assert (H2 : [--]One [<] OneR).
+ assert (H2 : [--][1] [<] OneR).
   apply less_transitive_unfolded with ZeroR; [ astepr ( [--]ZeroR); apply inv_resp_less | idtac ];
     apply pos_one.
  apply Derivative_imp_resp_leEq
-   with (olor [--]One One) H2 (( [-C-]One{-}FId{^}2) {!} [-C-] [--] (One [/]TwoNZ)); Deriv.
+   with (olor [--][1] [1]) H2 (( [-C-][1]{-}FId{^}2) {!} [-C-] [--] ([1] [/]TwoNZ)); Deriv.
  intros; apply leEq_glb; intro z; intros.
  elim Hy0; intros.
- apply leEq_wdr with (Exp (( [-C-] [--] (One [/]TwoNZ) {*} (Logarithm[o] [-C-]One{-}FId{^}2)) z x0)).
+ apply leEq_wdr with (Exp (( [-C-] [--] ([1] [/]TwoNZ) {*} (Logarithm[o] [-C-][1]{-}FId{^}2)) z x0)).
   apply less_leEq; apply Exp_pos.
  simpl in |- *; algebra.
 Qed.
@@ -532,7 +532,7 @@ Qed.
 *** Cosine and Arcosine
 *)
 
-Lemma ArcCos_Cos : forall x, Zero [<] x -> x [<] Pi -> forall H, ArcCos (Cos x) H [=] x.
+Lemma ArcCos_Cos : forall x, [0] [<] x -> x [<] Pi -> forall H, ArcCos (Cos x) H [=] x.
 Proof.
  intros x H H0 H1.
  assert (H2 : Dom ArcCos (Sin (Pi [/]TwoNZ[-]x))).
@@ -559,7 +559,7 @@ Proof.
  apply Sin_ArcSin.
 Qed.
 
-Lemma ArcCos_Cos_inv : Feq (olor Zero Pi) (ArcCos[o]Cosine) FId.
+Lemma ArcCos_Cos_inv : Feq (olor [0] Pi) (ArcCos[o]Cosine) FId.
 Proof.
  apply eq_imp_Feq.
    apply included_FComp.
@@ -590,7 +590,7 @@ Proof.
  simpl in |- *; algebra.
 Qed.
 
-Lemma Cos_ArcCos_inv : Feq (olor [--]One One) (Cosine[o]ArcCos) FId.
+Lemma Cos_ArcCos_inv : Feq (olor [--][1] [1]) (Cosine[o]ArcCos) FId.
 Proof.
  apply eq_imp_Feq.
    apply included_FComp.
@@ -606,7 +606,7 @@ Proof.
 Qed.
 
 Lemma ArcCos_resp_leEq : forall x y,
- [--]One [<] x -> x [<=] y -> y [<] One -> forall Hx Hy, ArcCos y Hy [<=] ArcCos x Hx.
+ [--][1] [<] x -> x [<=] y -> y [<] [1] -> forall Hx Hy, ArcCos y Hy [<=] ArcCos x Hx.
 Proof.
  intros.
  Opaque ArcSin.
@@ -624,8 +624,8 @@ Proof.
  elim (H _ (compact_inc_lft _ _ Hab)); intros Ha1 Ha2.
  elim (H _ (compact_inc_rht _ _ Hab)); intros Hb1 Hb2.
  cut (Dom Tang b). cut (Dom Tang a). intros H0 H1.
-  set (min := Min (Tan a H0) Zero) in *.
-   set (max := Max (Tan b H1) One) in *.
+  set (min := Min (Tan a H0) [0]) in *.
+   set (max := Max (Tan b H1) [1]) in *.
    cut (min [<] max). intro H2.
     exists min; exists max; exists H2.
     split.
@@ -665,7 +665,7 @@ Proof.
  set (HPi1 := pos_HalfPi) in *.
  set (HPi2 := neg_invHalfPi) in *.
  set (H := invHalfPi_less_HalfPi) in *.
- apply Feq_criterium with H ( [-C-]One:PartIR) ZeroR.
+ apply Feq_criterium with H ( [-C-][1]:PartIR) ZeroR.
     set (H0 := Derivative_Tan_2 H) in *.
     set (H2 := Derivative_ArcTan I) in *.
     Derivative_Help.
@@ -677,9 +677,9 @@ Proof.
         split.
          repeat split.
         intros.
-        astepl (One[+]Tang x Hx[^]2).
+        astepl ([1][+]Tang x Hx[^]2).
         apply pos_ap_zero.
-        astepl (ZeroR[+]Zero); apply plus_resp_less_leEq.
+        astepl (ZeroR[+][0]); apply plus_resp_less_leEq.
          apply pos_one.
         apply sqr_nonneg.
        Included.
@@ -692,7 +692,7 @@ Proof.
      astepl (Part _ _ (ProjT2 H3) [*] (Part _ _ (ProjIR1 H4) [+]Part _ _ (ProjIR2 H4))).
      elim H3; intros x0 H5; elim H4; intros H6 H7.
      astepl (Part _ _ H5[*] (Part _ _ H6[+]Part _ _ H7)).
-     astepl (Part _ _ H5[*] (One[+]Tang x H7[^]2)).
+     astepl (Part _ _ H5[*] ([1][+]Tang x H7[^]2)).
      simpl in |- *; rational.
     apply Derivative_comp with realline I.
       apply maps_Tan.
@@ -730,18 +730,18 @@ Lemma Tan_ilim : forall x, {y : IR | olor [--] (Pi [/]TwoNZ) (Pi [/]TwoNZ) y | f
 Proof.
  intros.
  set (aux_val := sqrt _ (less_leEq _ _ _ (pos_two IR)) [/]TwoNZ) in *.
- assert (H : Zero [<] aux_val).
+ assert (H : [0] [<] aux_val).
   unfold aux_val in |- *.
   apply shift_less_div; [ apply pos_two | apply power_cancel_less with 2 ].
    apply sqrt_nonneg.
   astepl (ZeroR[^]2); astepl ZeroR; astepr (Two:IR); apply pos_two.
- assert (H0 : sqrt _ (less_leEq _ _ _ (pos_two _)) [#] Zero).
+ assert (H0 : sqrt _ (less_leEq _ _ _ (pos_two _)) [#] [0]).
   apply mult_cancel_ap_zero_lft with (OneR [/]TwoNZ).
   eapply ap_wdl_unfolded; [ apply pos_ap_zero; apply H | unfold aux_val in |- *; rational ].
- assert (H1 : aux_val [=] (One[/] _[//]H0)).
+ assert (H1 : aux_val [=] ([1][/] _[//]H0)).
   unfold aux_val in |- *.
   apply eq_div; astepr (Two:IR); Step_final (sqrt _ (less_leEq _ _ _ (pos_two _)) [^]2).
- assert (H2 : aux_val [<] One).
+ assert (H2 : aux_val [<] [1]).
   apply power_cancel_less with 2.
    apply less_leEq; apply pos_one.
   unfold aux_val in |- *; rstepl ((sqrt _ (less_leEq _ _ _ (pos_two IR)) [^]2) [/]FourNZ); astepr OneR.
@@ -749,11 +749,11 @@ Proof.
  elim (less_cotransitive_unfolded _ _ _ H2 x); intros.
   2: exists (Pi [/]FourNZ); repeat split; PiSolve.
   2: intro; astepr OneR; apply less_leEq; auto.
- assert (H3 : Two[*]x [#] Zero).
+ assert (H3 : Two[*]x [#] [0]).
   apply mult_resp_ap_zero.
    apply two_ap_zero.
   apply pos_ap_zero; apply less_transitive_unfolded with aux_val; auto.
- assert (H4 : Dom ArcCos (One[/] _[//]H3)).
+ assert (H4 : Dom ArcCos ([1][/] _[//]H3)).
   repeat split.
    apply less_transitive_unfolded with ZeroR; [ astepr ( [--]ZeroR); apply inv_resp_less; apply pos_one
      | apply recip_resp_pos ].
@@ -774,11 +774,11 @@ Proof.
   apply leEq_wdl with (ArcCos _ H5).
    2: assert (H6 : Dom ArcCos (Cos (Pi [/]FourNZ))).
     2: apply dom_wd with aux_val; auto.
-    2: Step_final (One[/] _[//]H0).
+    2: Step_final ([1][/] _[//]H0).
    2: apply eq_transitive_unfolded with (ArcCos _ H6).
     3: apply ArcCos_Cos; PiSolve.
    2: apply pfwdef; unfold aux_val in |- *.
-   2: Step_final (One[/] _[//]H0).
+   2: Step_final ([1][/] _[//]H0).
   apply ArcCos_resp_leEq.
     apply less_transitive_unfolded with ZeroR.
      astepr ( [--]ZeroR); apply inv_resp_less; apply pos_one.
@@ -804,7 +804,7 @@ Proof.
    rstepr Pi; apply less_transitive_unfolded with (Pi [/]TwoNZ); PiSolve.
   apply shift_minus_less; apply shift_less_plus'.
   astepl ZeroR.
-  assert (H6 : Dom ArcSin (Sin Zero)).
+  assert (H6 : Dom ArcSin (Sin [0])).
    apply dom_wd with ZeroR; [ split | algebra ]; [ astepr ( [--]ZeroR); apply inv_resp_less | idtac ];
      apply pos_one.
   apply less_wdl with (ArcSin _ H6).
@@ -816,14 +816,14 @@ Proof.
    apply mult_resp_pos; [ apply pos_two | apply less_transitive_unfolded with aux_val; auto ].
   apply pfstrx with Sine I I.
   apply ap_wdl_unfolded with ZeroR.
-   apply ap_wdr_unfolded with (One[/] _[//]H3).
+   apply ap_wdr_unfolded with ([1][/] _[//]H3).
     apply ap_symmetric_unfolded; apply pos_ap_zero; apply recip_resp_pos.
     apply mult_resp_pos; [ apply pos_two | apply less_transitive_unfolded with aux_val; auto ].
    apply eq_transitive_unfolded with (Sin (ArcSin _ H7)); [ apply Sin_ArcSin | simpl in |- *; algebra ].
   apply eq_transitive_unfolded with (Sin (ArcSin _ H6));
-    [ astepl (Sin Zero); apply Sin_ArcSin | simpl in |- *; algebra ].
+    [ astepl (Sin [0]); apply Sin_ArcSin | simpl in |- *; algebra ].
  intros; unfold Tan, Tang in |- *.
- assert (H6 : Cos (ArcCos _ H4) [#] Zero).
+ assert (H6 : Cos (ArcCos _ H4) [#] [0]).
   eapply ap_wdl_unfolded.
    2: apply Cos_ArcCos.
   apply recip_ap_zero; auto.
@@ -837,10 +837,10 @@ Proof.
    2: apply Sin_ArcSin.
   apply recip_resp_pos; apply mult_resp_pos;
     [ apply pos_two | apply less_transitive_unfolded with aux_val; auto ].
- apply leEq_wdl with (x[*] (One[/] _[//]H3)).
+ apply leEq_wdl with (x[*] ([1][/] _[//]H3)).
   2: apply mult_wdr; apply Cos_ArcCos.
  rstepl (OneR [/]TwoNZ).
- apply leEq_transitive with (One[/] _[//]H0).
+ apply leEq_transitive with ([1][/] _[//]H0).
   apply recip_resp_leEq.
    astepl (ZeroR[*]Two); apply shift_mult_less with (two_ap_zero IR); auto; apply pos_two.
   apply power_cancel_leEq with 2; auto.
@@ -850,7 +850,7 @@ Proof.
    PiSolve.
   astepl (Pi [/]TwoNZ[-]ArcSin _ (ProjIR2 H4)).
   apply shift_minus_leEq; apply shift_leEq_plus'; astepl ZeroR.
-  assert (H7 : Dom ArcSin (Sin Zero)).
+  assert (H7 : Dom ArcSin (Sin [0])).
    apply dom_wd with ZeroR; [ split | algebra ]; [ astepr ( [--]ZeroR); apply inv_resp_less | idtac ];
      apply pos_one.
   apply leEq_wdl with (ArcSin _ H7).
@@ -1210,19 +1210,19 @@ Proof.
   unfold y in |- *; apply eq_symmetric_unfolded; elim ArcTan_range with x;
     intros; apply ArcTan_Tan; auto.
  Transparent ArcTang.
- cut (Continuous_I (Min_leEq_Max x y) {1/} ( [-C-]One{+}FId{^}2)). intro H0.
-  cut (Integral H0 [=] Zero). intro H1.
+ cut (Continuous_I (Min_leEq_Max x y) {1/} ( [-C-][1]{+}FId{^}2)). intro H0.
+  cut (Integral H0 [=] [0]). intro H1.
    elim Hx; intros H2 H3.
    apply Integral_eq_zero with (contF := H0) (x := x).
       exact (pair (Min_leEq_lft x y) (lft_leEq_Max x y)).
      intros.
      simpl in |- *; apply recip_resp_pos.
-     astepl (ZeroR[+]Zero); apply plus_resp_less_leEq.
+     astepl (ZeroR[+][0]); apply plus_resp_less_leEq.
       apply pos_one.
      astepr (x[^]2); apply sqr_nonneg.
     intros x0 H4 Hx0; simpl in |- *.
     apply less_leEq; apply recip_resp_pos.
-    astepl (ZeroR[+]Zero); apply plus_resp_less_leEq.
+    astepl (ZeroR[+][0]); apply plus_resp_less_leEq.
      apply pos_one.
     astepr (x0[^]2); apply sqr_nonneg.
    auto.
@@ -1230,7 +1230,7 @@ Proof.
    rstepl (ArcTan x[+]Integral H0[-]ArcTan x).
    apply cg_minus_wd; [ simpl in |- * | algebra ].
    apply eq_symmetric_unfolded; unfold ArcTan in |- *; simpl in |- *.
-   apply Integral_plus_Integral with (Min3_leEq_Max3 Zero y x).
+   apply Integral_plus_Integral with (Min3_leEq_Max3 [0] y x).
    apply included_imp_Continuous with realline.
     exact ArcTan_def_lemma.
    apply included3_interval; split.

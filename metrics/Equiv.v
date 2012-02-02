@@ -226,10 +226,10 @@ Proof.
   intros m H1110'.
   exists (S m * S n).
   intros x y.
-  apply leEq_transitive with ((nring n[+]One)[*](f x[-d]f y)).
+  apply leEq_transitive with ((nring n[+][1])[*](f x[-d]f y)).
    apply H0110'.
-  apply leEq_transitive with ((nring n[+]One)[*](nring m[+]One)[*](g (f x)[-d]g (f y))).
-   astepr ((nring n[+]One)[*]((nring m[+]One)[*](g (f x)[-d]g (f y)))).
+  apply leEq_transitive with ((nring n[+][1])[*](nring m[+][1])[*](g (f x)[-d]g (f y))).
+   astepr ((nring n[+][1])[*]((nring m[+][1])[*](g (f x)[-d]g (f y)))).
    apply mult_resp_leEq_lft.
     apply H1110'.
    apply less_leEq.
@@ -238,7 +238,7 @@ Proof.
   apply mult_resp_leEq_rht.
    apply leEq_transitive with (nring (R:=IR) (S m * S n)).
     apply eq_imp_leEq.
-    astepl (nring (R:=IR) (S n)[*](nring m[+]One)).
+    astepl (nring (R:=IR) (S n)[*](nring m[+][1])).
     astepl (nring (R:=IR) (S n)[*]nring (S m)).
     astepl (nring (R:=IR) (S m)[*]nring (S n)).
     astepl (nring (R:=IR) (S m * S n)).
@@ -378,20 +378,20 @@ Proof.
   apply H6.
    cut (invfun f (isopsmetry_imp_bij X Y f ((a3, b3),
      (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-       forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x0)[=] invfun f
+       forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) (f x0)[=] invfun f
          (isopsmetry_imp_bij X Y f (pair (a3, b3)
            (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-             forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) y0).
+             forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) y0).
     intros.
     astepr (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
       (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-        forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x0)).
+        forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) (f x0)).
     apply eq_symmetric.
     apply inv2.
    set (H10 := csf_wd) in *.
    set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (a3, b3)
      (pair (a1, b1) (pair a2 (existT (fun n : nat => forall x y : X,
-       f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))))) in *.
+       f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))))) in *.
    generalize H7.
    unfold fun_wd in |- *.
    unfold Inv in |- *.
@@ -401,20 +401,20 @@ Proof.
    exact b4.
   cut (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
     (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-      forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x1)[=] invfun f
+      forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) (f x1)[=] invfun f
         (isopsmetry_imp_bij X Y f (pair (a3, b3)
           (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-            forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) y1).
+            forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) y1).
    intros.
    astepr (invfun f (isopsmetry_imp_bij X Y f (pair (a3, b3)
      (pair (a1, b1) (pair a2 (existT (fun n : nat =>
-       forall x y : X, f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))) (f x1)).
+       forall x y : X, f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))) (f x1)).
    apply eq_symmetric.
    apply inv2.
   set (H10 := csf_wd) in *.
   set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (a3, b3)
     (pair (a1, b1) (pair a2 (existT (fun n : nat => forall x y : X,
-      f x[-d]f y[<=](nring n[+]One)[*](x[-d]y)) m P))))))) in *.
+      f x[-d]f y[<=](nring n[+][1])[*](x[-d]y)) m P))))))) in *.
   generalize H7.
   unfold fun_wd in |- *.
   unfold Inv in |- *.
@@ -434,7 +434,7 @@ Proof.
  intros x0 b4.
  elim (b3 y1).
  intros x1 b5.
- astepr ((nring m[+]One)[*](f x0[-d]f x1)).
+ astepr ((nring m[+][1])[*](f x0[-d]f x1)).
  apply leEq_transitive with (x0[-d]x1).
   2: apply P.
  apply eq_imp_leEq.
@@ -446,19 +446,19 @@ Proof.
  apply H6.
   cut (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
     (pair (pair a1 b1) (pair (existT (fun n : nat =>
-      forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) y0[=] invfun f
+      forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) y0[=] invfun f
         (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
           (pair (pair a1 b1) (pair (existT (fun n : nat =>
-            forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x0)).
+            forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) (f x0)).
    intros.
    astepl (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
      (pair (pair a1 b1) (pair (existT (fun n : nat =>
-       forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x0)).
+       forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) (f x0)).
    apply inv2.
   set (H10 := csf_wd) in *.
   set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
     (pair (pair a1 b1) (pair (existT (fun n : nat => forall x y : X,
-      x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))))) in *.
+      x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))))) in *.
   generalize H7.
   unfold fun_wd in |- *.
   unfold Inv in |- *.
@@ -469,19 +469,19 @@ Proof.
   exact b4.
  cut (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
    (pair (pair a1 b1) (pair (existT (fun n : nat =>
-     forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) y1[=] invfun f
+     forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) y1[=] invfun f
        (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
          (pair (pair a1 b1) (pair (existT (fun n : nat =>
-           forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x1)).
+           forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) (f x1)).
   intros.
   astepl (invfun f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
     (pair (pair a1 b1) (pair (existT (fun n : nat =>
-      forall x y : X, x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))) (f x1)).
+      forall x y : X, x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))) (f x1)).
   apply inv2.
  set (H10 := csf_wd) in *.
  set (H7 := H10 Y X (Inv f (isopsmetry_imp_bij X Y f (pair (pair a3 b3)
    (pair (pair a1 b1) (pair (existT (fun n : nat => forall x y : X,
-     x[-d]y[<=](nring n[+]One)[*](f x[-d]f y)) m P) b2)))))) in *.
+     x[-d]y[<=](nring n[+][1])[*](f x[-d]f y)) m P) b2)))))) in *.
  generalize H7.
  unfold fun_wd in |- *.
  unfold Inv in |- *.
@@ -521,20 +521,20 @@ Proof.
  unfold zero_fun in |- *.
  unfold dIR in |- *.
  intro H7.
- cut (OneR[<=]Zero).
+ cut (OneR[<=][0]).
   rewrite -> leEq_def in |- *.
   intro H8.
   set (H9 := H8 (pos_one IR)) in *.
   exact H9.
- astepr ((nring (R:=IR) n[+]One)[*]Zero).
- astepl (ABSIR (One[-]Zero)).
+ astepr ((nring (R:=IR) n[+][1])[*][0]).
+ astepl (ABSIR ([1][-][0])).
   apply H7.
  unfold ABSIR in |- *.
- astepl (Max [--](One[-]Zero) (One[-]Zero)).
-  astepl (Max [--](One[-]Zero) One).
+ astepl (Max [--]([1][-][0]) ([1][-][0])).
+  astepl (Max [--]([1][-][0]) [1]).
   apply leEq_imp_Max_is_rht.
   astepl ([--]OneR).
-  astepl (ZeroR[-]One).
+  astepl (ZeroR[-][1]).
   apply shift_minus_leEq.
   astepr (Two:IR).
   apply less_leEq.

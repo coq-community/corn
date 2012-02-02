@@ -383,7 +383,7 @@ Proof.
  exists 0.
  intros m Hm.
  unfold cg_minus.
- rstepr (Zero:Q).
+ rstepr ([0]:Q).
  apply zero_AbsSmall.
  apply Qlt_le_weak.
  assumption.
@@ -706,7 +706,7 @@ Lemma CR_lt_as_Cauchy_IR_lt_1 : forall (x y:CR),
 Proof.
  intros x y [e He].
  apply shift_zero_less_minus'.
- apply (less_leEq_trans _ Zero (Cauchy_CReals.inject_Q _ (e:Q))).
+ apply (less_leEq_trans _ [0] (Cauchy_CReals.inject_Q _ (e:Q))).
   apply: ing_lt.
   apply Qpos_prf.
  unfold cg_minus.
@@ -861,7 +861,7 @@ Lemma CR_nonZero_as_Cauchy_IR_nonZero_1 : forall (x:CR),
 (CRapartT x 0)%CR -> Dom (f_rcpcl' _) (CRasCauchy_IR x).
 Proof.
  intros x x_.
- change ((CRasCauchy_IR x)[#]Zero).
+ change ((CRasCauchy_IR x)[#][0]).
  stepr (CRasCauchy_IR 0%CR).
   apply CR_ap_as_Cauchy_IR_ap_1.
   assumption.
@@ -885,7 +885,7 @@ Proof.
    rewrite <- Cauchy_IR_opp_as_CR_opp.
    apply CRopp_wd.
    set (X := (Cauchy_IRasCR (f_rcpcl (F:=Cauchy_IR) [--](x':Cauchy_IR)
-     (@inr (R_lt Q_as_COrdField [--](x':Cauchy_IR) (Zero:Cauchy_IR)) (Zero[<][--](x':Cauchy_IR)) H')))%CR).
+     (@inr (R_lt Q_as_COrdField [--](x':Cauchy_IR) ([0]:Cauchy_IR)) ([0][<][--](x':Cauchy_IR)) H')))%CR).
    rewrite -> Cauchy_IR_opp_as_CR_opp.
    apply: Cauchy_IR_inv_as_CRinv_pos.
    intros i Hi.
@@ -899,7 +899,7 @@ Proof.
   apply: mult_cancel_lft.
    left.
    apply H.
-  stepr (One:Cauchy_IR).
+  stepr ([1]:Cauchy_IR).
    eapply eq_transitive.
     apply cring_inv_mult_lft.
    apply eq_symmetric.

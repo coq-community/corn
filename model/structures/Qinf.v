@@ -45,9 +45,9 @@ Proof.
  now rewrite E, F.
 Qed.
 
-Instance: RingZero T := finite 0%Q.
+Instance: Zero T := finite 0%Q.
 
-Instance plus: RingPlus T := λ x y,
+Instance plus: Plus T := λ x y,
   match x, y with
   | finite a, finite b => (a + b)%Q
   | _, _ => infinite

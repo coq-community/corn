@@ -60,9 +60,9 @@ Instance bigQ_div: AppDiv bigQ := λ x y, app_approx (x / y).
 
 Lemma bigQ_div_correct (x y : bigQ) (k : Z) : Qball (2 ^ k) ('app_div x y k) ('x / 'y).
 Proof.
-  ms_setoid_replace ('x / 'y : Q) with ('(x / y) : Q).
+  mc_setoid_replace ('x / 'y : Q) with ('(x / y) : Q).
    now apply bigQ_approx_correct.
-  now rewrite rings.preserves_mult, dec_fields.preserves_dec_mult_inv.
+  now rewrite rings.preserves_mult, dec_fields.preserves_dec_recip.
 Qed.
 
 Instance inverse_Q_bigQ: AppInverse (cast bigQ Q_as_MetricSpace) := λ x ε, 'x.

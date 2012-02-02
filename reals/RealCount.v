@@ -48,13 +48,13 @@ Record interv : Type :=
    interv_lft_rht : interv_lft [<] interv_rht}.
 
 Lemma interv_0_correct:
-f 0[+]One[<]f 0[+]Two.
+f 0[+][1][<]f 0[+]Two.
 Proof.
  apply plus_resp_less_lft.
  apply one_less_two.
 Qed.
 
-Let interv_0 := (Build_interv (f 0 [+] One) (f 0[+]Two) interv_0_correct).
+Let interv_0 := (Build_interv (f 0 [+] [1]) (f 0[+]Two) interv_0_correct).
 
 (* FIXME: Reuse this code from IVT -----------------------------------*)
 
@@ -112,16 +112,16 @@ Qed.
 
 Hint Resolve smaller_lft smaller_rht: algebra.
 
-Lemma small_greater_zero : Zero [<=] Small.
+Lemma small_greater_zero : [0] [<=] Small.
 Proof.
  unfold Small.
- assert (Zero[<](Two[/]ThreeNZ:IR)).
+ assert ([0][<](Two[/]ThreeNZ:IR)).
   apply pos_div_three; auto.
   apply pos_two; auto.
  apply less_leEq; auto.
 Qed.
 
-Lemma small_less_one : Small [<] One.
+Lemma small_less_one : Small [<] [1].
 Proof.
  unfold Small.
  apply mult_cancel_less with (Three:IR).
@@ -190,14 +190,14 @@ seq1_rht N[-]seq1_lft N [<=]Small[^]N.
 Proof.
  intros.
  induction N.
-  astepl ((One[-]Zero):IR).
-   astepr (One:IR).
-   astepl (One:IR).
+  astepl (([1][-][0]):IR).
+   astepr ([1]:IR).
+   astepl ([1]:IR).
    apply leEq_reflexive.
   unfold seq1_lft.
   unfold seq1_rht.
   simpl.
-  astepr ((Two [-] One):IR); rational.
+  astepr ((Two [-] [1]):IR); rational.
  apply leEq_transitive with (Small[*](seq1_rht N[-]seq1_lft N)); auto.
   apply next_smaller; auto.
  astepr (Small[*]Small[^]N).
@@ -266,8 +266,8 @@ Proof.
  intros.
  unfold seq1_rht. unfold seq1_lft.
  unfold AbsSmall. split.
- apply leEq_transitive with (Zero:IR).
-   astepr ([--]Zero:IR).
+ apply leEq_transitive with ([0]:IR).
+   astepr ([--][0]:IR).
    apply inv_resp_leEq.
    apply shift_leEq_lft.
    apply less_leEq.

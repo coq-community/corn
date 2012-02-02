@@ -183,7 +183,7 @@ Proof.
    apply shift_leEq_div.
     apply nring_pos; clear Hi; apply neq_O_lt; auto.
    apply shift_leEq_minus.
-   astepl (Zero[+]a).
+   astepl ([0][+]a).
    astepl a; assumption.
   intros; simpl in |- *; apply even_part_1; auto.
  intros; simpl in |- *; apply even_part_2; auto.
@@ -424,7 +424,7 @@ Qed.
 Mesh and antimesh are always nonnegative.
 *)
 
-Lemma Mesh_nonneg : forall n (a b : IR) (Hab : a [<=] b) (P : Partition Hab n), Zero [<=] Mesh P.
+Lemma Mesh_nonneg : forall n (a b : IR) (Hab : a [<=] b) (P : Partition Hab n), [0] [<=] Mesh P.
 Proof.
  simple induction n.
   intros; unfold Mesh in |- *; simpl in |- *.
@@ -439,7 +439,7 @@ Proof.
 Qed.
 
 Lemma AntiMesh_nonneg : forall n (a b : IR) (Hab : a [<=] b) (P : Partition Hab n),
- Zero [<=] AntiMesh P.
+ [0] [<=] AntiMesh P.
 Proof.
  intro; induction  n as [| n Hrecn].
   intros; unfold AntiMesh in |- *; simpl in |- *.
@@ -647,7 +647,7 @@ Proof.
   apply leEq_imp_Max_is_rht.
   2: rational.
  apply eq_imp_leEq.
- rstepr (b[-]a[/] nring n[+]One[//]nring_ap_zero' _ _ Hm).
+ rstepr (b[-]a[/] nring n[+][1][//]nring_ap_zero' _ _ Hm).
  apply eq_transitive_unfolded with (Mesh (Partition_Dom (Even_Partition Hab _ Hm))).
   simpl in |- *; algebra.
  cut (0 <> n); intro.
@@ -760,7 +760,7 @@ Proof.
   unfold Q in |- *; apply refinement_resp_mult.
   exists m; auto with arith.
  clear P Q.
- cut (nring (R:=IR) (m * n) [#] Zero).
+ cut (nring (R:=IR) (m * n) [#] [0]).
   rewrite <- H; simpl in |- *.
   apply ap_irreflexive_unfolded.
  astepl (nring m[*]nring (R:=IR) n).
@@ -819,7 +819,7 @@ The antimesh of a separated partition is always positive.
 *)
 
 Lemma pos_AntiMesh : forall n (P : Partition Hab n),
- 0 < n -> _Separated P -> Zero [<] AntiMesh P.
+ 0 < n -> _Separated P -> [0] [<] AntiMesh P.
 Proof.
  intro; case n; clear n.
   intros P H H0; elimtype False; apply (lt_irrefl _ H).

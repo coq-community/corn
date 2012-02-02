@@ -9,7 +9,7 @@ Require Import
  UniformContinuity stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
  interfaces.abstract_algebra
- MathClasses.theory.setoids.
+ MathClasses.theory.setoids theory.products.
 
 Import Qinf.notations.
 
@@ -43,7 +43,7 @@ Hint Unfold relation : type_classes.
   Context `{!Equiv X} `{!MetricSpaceBall}.
 
   Class MetricSpaceClass: Prop :=
-    { mspc_setoid: Setoid X
+    { mspc_setoid : Setoid X
     ; mspc_ball_proper:> Proper (=) mspc_ball
     ; mspc_ball_inf: ∀ x y, mspc_ball Qinf.infinite x y
     ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ mspc_ball e x y
@@ -56,18 +56,15 @@ Hint Unfold relation : type_classes.
          (∀ d: Qpos, mspc_ball (e + d) a b) → mspc_ball e a b }.
 
   Context `{MetricSpaceClass}.
-
-  Let hint := mspc_setoid.
-
+Local Existing Instance mspc_setoid.
   (** Two simple derived properties: *)
-
   Lemma mspc_eq a b: (∀ e: Qpos, mspc_ball e a b) → a = b.
   Proof with auto.
    intros.
    apply mspc_ball_zero.
    apply mspc_closed.
    intros.
-   setoid_replace (@ring_plus Qinf _ 0 d) with (d: Qinf)...
+   setoid_replace (@plus Qinf _ 0 d) with (d: Qinf)...
    change (0 + d == d). ring.
   Qed. (* Todo: Use a bi-impl instead. *)
 
@@ -162,7 +159,7 @@ Section genball.
    split; destruct Qdec_sign as [[|]|]; auto.
   Qed.
 
-  Instance genball_Proper: Proper ((=) ==> (=) ==> (=)) genball.
+  Instance genball_Proper: Proper ((=) ==> (=) ==> (=) ==> iff) genball.
   Proof with auto; intuition.
    unfold genball.
    intros u e' E.
@@ -183,6 +180,9 @@ Section genball.
    repeat intro.
    reflexivity.
   Qed.
+
+Instance: ∀ e, Proper ((=) ==> (=) ==> iff) (genball e).
+Proof. intros; now apply genball_Proper. Qed.
 
   Lemma genball_negative (q: Q): (q < 0)%Q → ∀ x y: X, ~ genball q x y.
   Proof with auto.
@@ -227,7 +227,7 @@ Section genball.
           change (genball (exist _ e1 B + exist _ e2 E )%Qpos a c).
           apply ball_genball.
           apply Rtriangle with b; apply ball_genball...
-         rewrite <- V. rewrite F, Qplus_0_r...
+         rewrite <- V. rewrite F. rewrite Qplus_0_r...
         rewrite U, C, Qplus_0_l...
        exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> C at 1. rewrite -> F at 1...
       exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> J at 1...
@@ -241,7 +241,7 @@ Section genball.
   Proof with auto with *.
    intros.
    unfold genball.
-   destruct e0...
+   destruct e...
    destruct Qdec_sign as [[|]|].
      assert (0 < (1#2) * -q)%Q.
       apply Qmult_lt_0_compat...
@@ -763,7 +763,7 @@ Section proper_functions.
         unfold mspc_ball in H3.
         destruct H3.
         simpl in H3.
-        apply (Qlt_not_le e0 0)...
+        apply (Qlt_not_le e 0)...
        unfold mspc_ball.
        unfold MetricSpaceBall_instance_2.
        intros.
@@ -782,7 +782,7 @@ Section proper_functions.
        reflexivity.
       split. simpl. auto.
       intros.
-      apply (mspc_refl B e0)...
+      apply (mspc_refl B e)...
      split.
       apply H2.
      intros.
@@ -797,7 +797,7 @@ Section proper_functions.
      apply H2.
     apply H3.
    split.
-    destruct e0. 2: simpl; auto.
+    destruct e. 2: simpl; auto.
     unfold mspc_ball in H2.
     unfold MetricSpaceBall_instance_2 in H2.
     destruct (Qdec_sign q) as [[|]|].

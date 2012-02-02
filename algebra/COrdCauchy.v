@@ -53,7 +53,7 @@ Unset Strict Implicit.
 (* end hide *)
 
 Definition Cauchy_prop (g : nat -> R) : CProp := forall e : R,
- Zero [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (g m[-]g N)}.
+ [0] [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (g m[-]g N)}.
 
 (* begin hide *)
 Set Strict Implicit.
@@ -73,7 +73,7 @@ Record CauchySeq : Type :=
   CS_proof :  Cauchy_prop CS_seq}.
 
 Definition SeqLimit (seq : nat -> R) (lim : R) : CProp := forall e : R,
- Zero [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (seq m[-]lim)}.
+ [0] [<] e -> {N : nat | forall m, N <= m -> AbsSmall e (seq m[-]lim)}.
 
 (* End_SpecReals *)
 
@@ -88,7 +88,7 @@ hold).
 *)
 
 Theorem CS_seq_bounded : forall g : nat -> R, Cauchy_prop g ->
- {K : R | Zero [<] K | {N : nat | forall m, N <= m -> AbsSmall K (g m)}}.
+ {K : R | [0] [<] K | {N : nat | forall m, N <= m -> AbsSmall K (g m)}}.
 Proof.
  intros g Hg.
  unfold Cauchy_prop in |- *.
@@ -97,9 +97,9 @@ Proof.
  exists (g N[^]2[-]g N[+]Two).
   apply less_leEq_trans with (nring (R:=R) 7 [/]FourNZ).
    apply pos_div_four; apply nring_pos; auto with arith.
-  astepl (Zero[+]nring (R:=R) 7 [/]FourNZ).
+  astepl ([0][+]nring (R:=R) 7 [/]FourNZ).
   apply shift_plus_leEq.
-  rstepr ((g N[-]One [/]TwoNZ)[^]2).
+  rstepr ((g N[-][1] [/]TwoNZ)[^]2).
   apply sqr_nonneg.
  exists N.
  intros m Hm.
@@ -108,13 +108,13 @@ Proof.
   apply plus_cancel_leEq_rht with (z := [--](g N)).
   rstepr (g m[-]g N).
   rstepl ([--](g N[^]2[+]Two)).
-  apply leEq_transitive with ([--](One:R)).
+  apply leEq_transitive with ([--]([1]:R)).
    apply inv_cancel_leEq.
-   rstepl (One:R).
+   rstepl ([1]:R).
    rstepr (g N[^]2[+]Two).
-   apply plus_cancel_leEq_rht with ([--]One:R).
-   rstepl (Zero:R).
-   rstepr (g N[^]2[+]One).
+   apply plus_cancel_leEq_rht with ([--][1]:R).
+   rstepl ([0]:R).
+   rstepr (g N[^]2[+][1]).
    apply leEq_transitive with (y := g N[^]2).
     apply sqr_nonneg.
    apply less_leEq; apply less_plusOne.
@@ -124,13 +124,13 @@ Proof.
  astepr (g N[*]g N).
  apply plus_cancel_leEq_rht with ([--](Two[*]g N)[+]Two).
  rstepl (g m[-]g N).
- rstepr (g N[*]g N[+]One[-]Two[*]g N[+]One).
- apply leEq_transitive with (y := One:R).
+ rstepr (g N[*]g N[+][1][-]Two[*]g N[+][1]).
+ apply leEq_transitive with (y := [1]:R).
   assumption.
- rstepl (Zero[+](One:R)).
- apply plus_resp_leEq with (z := One:R).
- rstepr ((g N[-]One)[*](g N[-]One)).
- apply leEq_wdr with (y := (g N[-]One)[^]2).
+ rstepl ([0][+]([1]:R)).
+ apply plus_resp_leEq with (z := [1]:R).
+ rstepr ((g N[-][1])[*](g N[-][1])).
+ apply leEq_wdr with (y := (g N[-][1])[^]2).
   apply sqr_nonneg.
  algebra.
 Qed.
@@ -138,7 +138,7 @@ Qed.
 Lemma CS_seq_const : forall c : R, Cauchy_prop (fun n => c).
 Proof.
  exists 0.
- intros; astepr (Zero:R); apply zero_AbsSmall.
+ intros; astepr ([0]:R); apply zero_AbsSmall.
  apply less_leEq; auto.
 Qed.
 
@@ -157,7 +157,7 @@ Proof.
  unfold Cauchy_prop in |- *.
  intros.
  set (e_div_4 := e [/]FourNZ) in *.
- cut (Zero [<] e_div_4); [ intro Heps | unfold e_div_4 in |- *; apply pos_div_four; auto ].
+ cut ([0] [<] e_div_4); [ intro Heps | unfold e_div_4 in |- *; apply pos_div_four; auto ].
  unfold Cauchy_prop in Hf.
  unfold Cauchy_prop in Hg.
  elim (Hf e_div_4 Heps); intros N1 H21.
@@ -202,9 +202,9 @@ Proof.
  set (Mg_ap_zero := pos_ap_zero _ _ HMg) in *.
  set (ef := e[/] _[//]mult_resp_ap_zero _ _ _ (twelve_ap_zero _) Mf_ap_zero) in *.
  set (eg := e[/] _[//]mult_resp_ap_zero _ _ _ (twelve_ap_zero _) Mg_ap_zero) in *.
- cut (Zero [<] ef); [ intro Hef
+ cut ([0] [<] ef); [ intro Hef
    | unfold ef in |- *; apply div_resp_pos; try apply mult_resp_pos; auto; apply pos_twelve ].
- cut (Zero [<] eg); [ intro Heg
+ cut ([0] [<] eg); [ intro Heg
    | unfold eg in |- *; apply div_resp_pos; try apply mult_resp_pos; auto; apply pos_twelve ].
  elim (Hf eg Heg); intros Pf HPf.
  elim (Hg ef Hef); intros Pg HPg.
@@ -229,17 +229,17 @@ reciprocals from then onwards.
 
 %\begin{convention}%
 Let [e] be a postive element of [R] and let [N:nat] be such that from
-[N] onwards, [(f n) [#] Zero]
+[N] onwards, [(f n) [#] [0]]
 %\end{convention}%
 *)
 
 Variable e : R.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 Variable N : nat.
 Hypothesis f_bnd : forall n : nat, N <= n -> e [<=] f n.
 
-Lemma CS_seq_recip_def : forall n : nat, N <= n -> f n [#] Zero.
+Lemma CS_seq_recip_def : forall n : nat, N <= n -> f n [#] [0].
 Proof.
  intros.
  apply pos_ap_zero.
@@ -249,8 +249,8 @@ Qed.
 Definition CS_seq_recip_seq (n : nat) : R.
 Proof.
  elim (lt_le_dec n N); intro Hdec.
-  apply (One:R).
- apply (One[/] _[//]CS_seq_recip_def n Hdec).
+  apply ([1]:R).
+ apply ([1][/] _[//]CS_seq_recip_def n Hdec).
 Defined.
 
 Lemma CS_seq_recip : Cauchy_prop CS_seq_recip_seq.
@@ -295,7 +295,7 @@ well here anyway.
 *)
 
 Lemma maj_upto_eps : forall (F : COrdField) (a : nat -> F) (n : nat) (eps : F),
- 0 < n -> Zero [<] eps -> {k : nat | 1 <= k /\ k <= n /\ (forall i : nat, 1 <= i -> i <= n -> a i[-]eps [<=] a k)}.
+ 0 < n -> [0] [<] eps -> {k : nat | 1 <= k /\ k <= n /\ (forall i : nat, 1 <= i -> i <= n -> a i[-]eps [<=] a k)}.
 Proof.
  intros F a n eps Hn Heps.
  induction  n as [| n Hrecn].
@@ -306,10 +306,10 @@ Proof.
   repeat split; try auto with arith.
   intros.
   rewrite <- (le_antisym _ _ H H0).
-  astepr (a 1[+]Zero).
+  astepr (a 1[+][0]).
   unfold cg_minus in |- *.
   apply plus_resp_leEq_lft.
-  astepr ([--](Zero:F)).
+  astepr ([--]([0]:F)).
   apply less_leEq; apply inv_resp_less; auto.
  elim Hrecn; intros k Hk.
  cut (a (S (S n))[-]eps [<] a (S (S n))).
@@ -336,7 +336,7 @@ Proof.
     auto with arith.
    apply less_leEq; assumption.
   rewrite H2; apply less_leEq; auto.
- rstepr (a (S (S n))[-]Zero).
+ rstepr (a (S (S n))[-][0]).
  apply minus_resp_less_rht.
  assumption.
 Qed.
@@ -351,7 +351,7 @@ Variable R : COrdField.
 *)
 
 Lemma smaller : forall x y : R,
- Zero [<] x -> Zero [<] y -> {z : R | Zero [<] z | z [<=] x /\ z [<=] y}.
+ [0] [<] x -> [0] [<] y -> {z : R | [0] [<] z | z [<=] x /\ z [<=] y}.
 Proof.
  intros x y H H0.
  elim (less_cotransitive_unfolded _ _ _ (half_3 _ _ H) y); intro.
@@ -365,51 +365,51 @@ Proof.
  apply half_3. auto.
 Qed.
 
-Lemma estimate_abs : forall x : R, {X : R | Zero [<] X | AbsSmall X x}.
+Lemma estimate_abs : forall x : R, {X : R | [0] [<] X | AbsSmall X x}.
 Proof.
  intros.
  unfold AbsSmall in |- *.
- cut (x [<] x[+]One). intro H.
-  elim (less_cotransitive_unfolded _ x (x[+]One) H [--]x); intro.
-   exists ([--]x[+]One).
+ cut (x [<] x[+][1]). intro H.
+  elim (less_cotransitive_unfolded _ x (x[+][1]) H [--]x); intro.
+   exists ([--]x[+][1]).
     apply leEq_less_trans with ([--]x).
      2: apply less_plusOne.
     apply less_leEq; apply mult_cancel_less with (Two:R).
      apply pos_two.
-    astepl (Zero:R); rstepr ([--]x[-]x).
+    astepl ([0]:R); rstepr ([--]x[-]x).
     apply shift_less_minus.
     astepl x; auto.
    split; apply less_leEq.
     astepr ([--][--]x). apply inv_resp_less. apply less_plusOne.
     apply less_transitive_unfolded with ([--]x). auto. apply less_plusOne.
-    exists (x[+]One).
-   apply less_leEq_trans with ((One:R) [/]TwoNZ).
+    exists (x[+][1]).
+   apply less_leEq_trans with (([1]:R) [/]TwoNZ).
     apply pos_div_two; apply pos_one.
-   apply shift_leEq_plus; rstepl (([--]One:R) [/]TwoNZ).
+   apply shift_leEq_plus; rstepl (([--][1]:R) [/]TwoNZ).
    apply shift_div_leEq.
     apply pos_two.
    rstepr (x[+]x); apply shift_leEq_plus.
    unfold cg_minus in |- *; apply shift_plus_leEq'.
-   rstepr (x[+]One); apply less_leEq; auto.
+   rstepr (x[+][1]); apply less_leEq; auto.
   split; apply less_leEq.
    astepr ([--][--]x). apply inv_resp_less. auto. auto.
    apply less_plusOne.
 Qed.
 
-Lemma mult_contin : forall x y e : R, Zero [<] e ->
- {c : R | Zero [<] c | {d : R | Zero [<] d | forall x' y' : R,
+Lemma mult_contin : forall x y e : R, [0] [<] e ->
+ {c : R | [0] [<] c | {d : R | [0] [<] d | forall x' y' : R,
  AbsSmall c (x[-]x') -> AbsSmall d (y[-]y') -> AbsSmall e (x[*]y[-]x'[*]y')}}.
 Proof.
  intros x y e H.
  set (e2 := e [/]TwoNZ) in *.
- cut (Zero [<] e2). intro H0. 2: unfold e2 in |- *; apply pos_div_two; auto.
+ cut ([0] [<] e2). intro H0. 2: unfold e2 in |- *; apply pos_div_two; auto.
   elim (estimate_abs x). intro X. intros H1a H1b.
  elim (estimate_abs y). intro Y. intros H2 H3.
- cut (Y [#] Zero). intro H4.
+ cut (Y [#] [0]). intro H4.
   set (eY := e2[/] Y[//]H4) in *; exists eY.
    unfold eY in |- *. apply div_resp_pos. auto. auto.
-   cut (Zero [<] X[+]eY). intro H5.
-   cut (X[+]eY [#] Zero). intro H6.
+   cut ([0] [<] X[+]eY). intro H5.
+   cut (X[+]eY [#] [0]). intro H6.
     exists (e2[/] X[+]eY[//]H6).
      apply div_resp_pos. auto. auto.
       intros.
@@ -434,12 +434,12 @@ Qed.
 
 (** Addition is also continuous. *)
 
-Lemma plus_contin : forall (x y e : R), Zero [<] e ->
- {c : R | Zero [<] c | {d : R | Zero [<] d | forall x' y',
+Lemma plus_contin : forall (x y e : R), [0] [<] e ->
+ {c : R | [0] [<] c | {d : R | [0] [<] d | forall x' y',
  AbsSmall c (x[-]x') -> AbsSmall d (y[-]y') -> AbsSmall e (x[+]y[-] (x'[+]y'))}}.
 Proof.
  intros.
- cut (Zero [<] e [/]TwoNZ). intro.
+ cut ([0] [<] e [/]TwoNZ). intro.
   exists (e [/]TwoNZ). auto.
    exists (e [/]TwoNZ). auto.
    intros.

@@ -55,7 +55,7 @@ Proof.
 Admitted. (*
  intros m n; set (H := refl_equal (m - n)); revert H.
  generalize (m - n) at 1 as p; intro p; revert m n; induction p; intros.
-  exists ((Zero : cpoly_cring CR),f).
+  exists (([0] : cpoly_cring CR),f).
    rewrite <- H.
    simpl (nth_coeff (S n) g[^]0). rewrite <- c_one. ring.
   replace n with m by omega; assumption.
@@ -76,10 +76,10 @@ Admitted. (*
 Qed.
 *)
 
-Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] Zero).
+Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] [0]).
 Lemma cpoly_div2 : forall (n m : nat) (a b c : cpoly_cring CR),
   degree_le n a -> monic m b -> degree_lt_pair c b -> a [*] b [=] c ->
-    a [=] Zero.
+    a [=] [0].
 Proof.
 Admitted. (*
  induction n.
@@ -94,17 +94,17 @@ Admitted. (*
  induction a as [ | a s ] using cpoly_induc; [ reflexivity | ].
  apply _linear_eq_zero.
  move: H2. rewrite -> cpoly_lin, ring_distl_unfolded. intro H2.
- cut (a [=] Zero); [ intro aeqz; split; [ | apply aeqz ] | ].
+ cut (a [=] [0]); [ intro aeqz; split; [ | apply aeqz ] | ].
   assert (s [=] nth_coeff m (_C_ s[*]b[+]_X_[*]a[*]b)).
    destruct H0; rewrite -> nth_coeff_plus, nth_coeff_c_mult_p, H0.
-   rewrite -> (nth_coeff_wd _ _ _ Zero); [ simpl; ring | ].
+   rewrite -> (nth_coeff_wd _ _ _ [0]); [ simpl; ring | ].
    rewrite -> aeqz; ring.
   rewrite -> H3.
   rewrite -> (nth_coeff_wd _ _ _ _ H2).
   destruct H1 as [d s0].
   destruct H0 as [H0 H1].
   destruct m; [ rewrite -> (nth_coeff_wd _ _ _ _ (s0 H1)); reflexivity | apply (d m H1); apply le_n ].
- apply (IHn (S m) _ (Zero [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H2, cpoly_lin, <- c_zero; unfold cg_minus; ring ].
+ apply (IHn (S m) _ ([0] [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H2, cpoly_lin, <- c_zero; unfold cg_minus; ring ].
    unfold degree_le; intros; rewrite <- (coeff_Sm_lin _ _ s).
    apply H; apply lt_n_S; apply H3.
   split; [ rewrite -> coeff_Sm_lin; destruct H0; apply H0 | unfold degree_le; intros ].
@@ -130,12 +130,12 @@ Proof.
  intros f g n H; destruct n.
   destruct H; destruct (degree_le_zero _ _ H0).
   rewrite -> (nth_coeff_wd _ _ _ _ s) in H. simpl in H; rewrite -> H in s.
-  exists (f,Zero).
+  exists (f,[0]).
    intros; destruct y; simpl (snd (s0, s1)) in *; simpl (fst (s0, s1)) in *.
    rename H1 into X. destruct X; destruct d; split; [ | symmetry; apply (s3 H0) ].
    rewrite -> s2, (s3 H0), s, <- c_one; ring.
-  simpl (fst (f, Zero : cpoly_cring CR)); simpl (snd (f, Zero : cpoly_cring CR)).
-  replace (cpoly_zero CR) with (Zero : cpoly_cring CR) by (simpl;reflexivity).
+  simpl (fst (f, [0] : cpoly_cring CR)); simpl (snd (f, [0] : cpoly_cring CR)).
+  replace (cpoly_zero CR) with ([0] : cpoly_cring CR) by (simpl;reflexivity).
   split; [ rewrite -> s, <- c_one; ring | ].
   split; [ | reflexivity ].
   unfold degree_le; intros; apply nth_coeff_zero.

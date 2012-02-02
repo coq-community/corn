@@ -56,15 +56,15 @@ Lemma rational_arctan_big_pos_correct_aux (a : Q) :
 Proof.
  intros Ha.
  rewrite -> r_pi_correct.
- assert (H1:(inj_Q IR a)[#]Zero).
-  stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+ assert (H1:(inj_Q IR a)[#][0]).
+  stepr (inj_Q IR [0]); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_ap.
   apply (Greater_imp_ap _ a 0); assumption.
  rewrite <- IR_minus_as_CR.
  apply IRasCR_wd.
- stepl (Pi[/]TwoNZ[-](ArcTan (One[/]_[//]H1))).
-  assert (H2:Zero[<]inj_Q IR a).
-   stepl (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+ stepl (Pi[/]TwoNZ[-](ArcTan ([1][/]_[//]H1))).
+  assert (H2:[0][<]inj_Q IR a).
+   stepl (inj_Q IR [0]); [| now apply (inj_Q_nring IR 0)].
    apply inj_Q_less; assumption.
   unfold cg_minus.
   csetoid_rewrite (ArcTan_recip _ H1 H2).
@@ -73,8 +73,8 @@ Proof.
   rstepl (((nring 1)[/]TwoNZ)[*]Pi).
   apply mult_wdl.
   change (1#2) with (1/2).
-  assert (H2:(inj_Q IR (2#1))[#]Zero).
-   stepr (inj_Q IR Zero); [| now apply (inj_Q_nring IR 0)].
+  assert (H2:(inj_Q IR (2#1))[#][0]).
+   stepr (inj_Q IR [0]); [| now apply (inj_Q_nring IR 0)].
    apply inj_Q_ap; discriminate.
   apply eq_transitive with ((inj_Q IR 1)[/]_[//]H2).
    apply div_wd.
@@ -126,14 +126,14 @@ Proof.
  stepl (Pi[/]FourNZ[+]ArcTan (inj_Q IR ((a - 1) / (a + 1)))).
   csetoid_rewrite_rev (ArcTan_one).
   set (y:= (inj_Q IR ((a - 1) / (a + 1)))).
-  assert (Y:Zero[<]One[-]One[*]y).
+  assert (Y:[0][<][1][-][1][*]y).
    apply shift_zero_less_minus.
    rstepl y.
    rstepr (nring 1:IR).
    stepr (inj_Q IR 1); [| now apply (inj_Q_nring IR 1)].
    apply inj_Q_less.
    now apply rational_arctan_mid_pos_prf.
-  apply eq_transitive with (ArcTan (One[+]y[/]_[//](Greater_imp_ap _ _ _ Y))).
+  apply eq_transitive with (ArcTan ([1][+]y[/]_[//](Greater_imp_ap _ _ _ Y))).
    apply ArcTan_plus_ArcTan.
       apply shift_zero_leEq_minus'.
       rstepr (Two:IR).
@@ -150,11 +150,11 @@ Proof.
    apply inj_Q_leEq.
    apply less_leEq. now apply rational_arctan_mid_pos_prf.
   apply ArcTan_wd.
-  apply mult_cancel_lft with (One[-]One[*]y).
+  apply mult_cancel_lft with ([1][-][1][*]y).
    apply Greater_imp_ap; assumption.
-  rstepl (One[+]y).
+  rstepl ([1][+]y).
   rstepr (inj_Q IR a[-]y[*]inj_Q IR a).
-  csetoid_replace (One:IR) (inj_Q IR 1).
+  csetoid_replace ([1]:IR) (inj_Q IR 1).
    unfold y.
    set (y' := ((a - 1) / (a + 1))).
    unfold cg_minus.
@@ -280,24 +280,24 @@ Proof.
   intros q [] _.
   apply rational_arctan_correct.
  intros x Hx _.
- assert (X:Zero[<]One[+]One[*]x[*]x).
+ assert (X:[0][<][1][+][1][*]x[*]x).
   apply plus_resp_pos_nonneg.
    apply pos_one.
   rstepr (x[^]2).
   apply sqr_nonneg.
- stepr (One:IR).
+ stepr ([1]:IR).
   simpl.
   apply AbsSmall_imp_AbsIR.
   apply leEq_imp_AbsSmall.
    apply shift_leEq_div.
     assumption.
-   rstepl (Zero:IR).
+   rstepl ([0]:IR).
    apply less_leEq; apply pos_one.
   apply shift_div_leEq.
    assumption.
-  rstepr (One[+]x[^]2).
+  rstepr ([1][+]x[^]2).
   apply shift_leEq_plus'.
-  rstepl (Zero:IR).
+  rstepl ([0]:IR).
   apply sqr_nonneg.
  rstepl (nring 1:IR).
  apply eq_symmetric; apply (inj_Q_nring IR 1).

@@ -7,23 +7,52 @@ PREREQUISITES
  This version of C-CoRN is known to compile with:
 
  - Coq version revision 14023 from the trunk branch
-   
+
+   svn co -r 14023 svn://scm.gforge.inria.fr/svn/coq/trunk coq-14023/
+
    One might also perform the following optimizations:
    * Revert commit 13997 to speed up instance resolution (dependent subgoals 
      are put first since 13997. This sometimes reduces the performance 
      badly). This commit can be reverted using the following command:
 
        svn diff -r 13997:13996 | patch -p0
-       
+
    * Change size = 6 to size = 12 in theories/Numbers/Natural/BigN/NMake_gen.ml
      to increase performance for big numbers.
-   
+
  - SCons 1.2
 
  - In order to build the dependency graph you need a Haskell compiler and the
    Graphviz library for Haskell. The latter can be obtained using the Cabal
    package manager.
-   
+
+GIT CHECKOUT & SUBMODULES
+-------------------------
+
+The corn repository contains the math-classes repository as a submodule.
+You can obtain it's contents automatically by giving the --recursive
+option when you clone this repository:
+
+  git clone --recursive https://github.com/c-corn/corn.git
+
+If you have already cloned this repository without --recursive, you can
+still get the submodules with
+
+  git submodule update --init --recursive
+
+If you don't do this, you will run into the following build error:
+
+  $ scons -k -j4
+
+  scons: Reading SConscript files ...
+  scons: warning: Ignoring missing SConscript
+  'math-classes/src/SConscript'
+  File "/home/wires/w/corn/SConstruct", line 31, in <module>
+  TypeError: 'NoneType' object is not iterable:
+    File "/home/wires/w/corn/SConstruct", line 31:
+        mc_vs, mc_vos, mc_globs = env.SConscript(dirs='math-classes/src')
+
+
 BUILDING C-CoRN
 ---------------
 

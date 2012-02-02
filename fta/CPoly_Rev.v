@@ -56,7 +56,7 @@ Let RX := cpoly_cring R.
 Fixpoint monom (a : R) (n : nat) {struct n} : cpoly_cring R :=
   match n with
   | O   => cpoly_linear _ a (cpoly_zero _)
-  | S m => cpoly_linear _ Zero (monom a m)
+  | S m => cpoly_linear _ [0] (monom a m)
   end.
 
 Lemma monom_coeff : forall (c : R) n, nth_coeff n (monom c n) [=] c.
@@ -66,7 +66,7 @@ Proof.
   simpl in |- *. algebra.
 Qed.
 
-Lemma monom_coeff' : forall (c : R) m n, m <> n -> nth_coeff n (monom c m) [=] Zero.
+Lemma monom_coeff' : forall (c : R) m n, m <> n -> nth_coeff n (monom c m) [=] [0].
 Proof.
  intros c m.
  induction  m as [| m Hrecm]; intros.
@@ -90,10 +90,10 @@ Qed.
 Lemma monom_S : forall (a : R) n, monom a (S n) [=] _X_[*]monom a n.
 Proof.
  intros.
- apply eq_transitive_unfolded with (cpoly_linear _ Zero (monom a n)).
+ apply eq_transitive_unfolded with (cpoly_linear _ [0] (monom a n)).
   simpl in |- *. split. algebra. cut (monom a n [=] monom a n). auto. algebra.
-  astepl (_X_[*]monom a n[+]_C_ Zero).
- Step_final (_X_[*]monom a n[+]Zero).
+  astepl (_X_[*]monom a n[+]_C_ [0]).
+ Step_final (_X_[*]monom a n[+][0]).
 Qed.
 
 Hint Resolve monom_S: algebra.
@@ -150,7 +150,7 @@ Proof.
      auto with arith. auto.
     intros. algebra.
    algebra.
- apply eq_transitive_unfolded with (Zero:R).
+ apply eq_transitive_unfolded with ([0]:R).
   apply Sum_zero. auto with arith.
    intros. cut (i0 <> i). intro. algebra. omega.
   algebra.
@@ -188,7 +188,7 @@ Proof.
    replace (n - (n - i)) with i. algebra. omega.
 Qed.
 
-Lemma Rev_coeff' : forall n p i, n < i -> nth_coeff i (Rev n p) [=] Zero.
+Lemma Rev_coeff' : forall n p i, n < i -> nth_coeff i (Rev n p) [=] [0].
 Proof.
  intros.
  unfold Rev in |- *.
@@ -209,7 +209,7 @@ Proof.
  elim (le_lt_dec i n); intros.
   astepl (nth_coeff (n - i) p).
   Step_final (nth_coeff (n - i) p').
- Step_final (Zero:R).
+ Step_final ([0]:R).
 Qed.
 
 Hint Resolve Rev_wd: algebra_c.
@@ -225,7 +225,7 @@ Proof.
    omega.
   omega.
  unfold degree_le in H.
- Step_final (Zero:R).
+ Step_final ([0]:R).
 Qed.
 
 Hint Resolve Rev_rev: algebra.
@@ -235,12 +235,12 @@ Proof.
  unfold degree_le in |- *. algebra.
 Qed.
 
-Lemma Rev_degree : forall n p, p ! Zero [#] Zero -> degree n (Rev n p).
+Lemma Rev_degree : forall n p, p ! [0] [#] [0] -> degree n (Rev n p).
 Proof.
  unfold degree_le in |- *. unfold degree in |- *. intros. split.
  astepl (nth_coeff (n - n) p).
   replace (n - n) with 0.
-   astepl p ! Zero. auto.
+   astepl p ! [0]. auto.
    auto with arith.
  apply Rev_degree_le.
 Qed.
@@ -256,23 +256,23 @@ Proof.
     rewrite <- y0. rewrite H0. Step_final c.
     omega.
   cut (n - m <> i). intro.
-   Step_final (Zero:R).
+   Step_final ([0]:R).
   omega.
  cut (n - m <> i). intro.
-  Step_final (Zero:R).
+  Step_final ([0]:R).
  omega.
 Qed.
 
 Hint Resolve Rev_monom: algebra.
 
-Lemma Rev_zero : forall n, Rev n Zero [=] (Zero:RX).
+Lemma Rev_zero : forall n, Rev n [0] [=] ([0]:RX).
 Proof.
  intros.
  apply all_nth_coeff_eq_imp. intros.
  elim (le_lt_dec i n); intros.
-  astepl (nth_coeff (n - i) Zero:R).
-  Step_final (Zero:R).
- Step_final (Zero:R).
+  astepl (nth_coeff (n - i) [0]:R).
+  Step_final ([0]:R).
+ Step_final ([0]:R).
 Qed.
 
 Hint Resolve Rev_zero: algebra.
@@ -286,8 +286,8 @@ Proof.
   unfold RX in |- *.
   astepl (nth_coeff (n - i) p1[+]nth_coeff (n - i) p2).
   Step_final (nth_coeff i (Rev n p1) [+]nth_coeff i (Rev n p2)).
- astepl (Zero:R).
- astepl (Zero[+] (Zero:R)).
+ astepl ([0]:R).
+ astepl ([0][+] ([0]:R)).
  Step_final (nth_coeff i (Rev n p1) [+]nth_coeff i (Rev n p2)).
 Qed.
 
@@ -302,8 +302,8 @@ Proof.
   unfold RX in |- *.
   astepl (nth_coeff (n - i) p1[-]nth_coeff (n - i) p2).
   Step_final (nth_coeff i (Rev n p1) [-]nth_coeff i (Rev n p2)).
- astepl (Zero:R).
- astepl (Zero[-] (Zero:R)).
+ astepl ([0]:R).
+ astepl ([0][-] ([0]:R)).
  Step_final (nth_coeff i (Rev n p1) [-]nth_coeff i (Rev n p2)).
 Qed.
 
@@ -313,8 +313,8 @@ Lemma Rev_sum0 : forall a_ l n, Rev n (Sum0 l a_) [=] Sum0 l (fun i => Rev n (a_
 Proof.
  intros.
  induction  l as [| l Hrecl].
-  replace (Sum0 0 a_) with (Zero:RX).
-   replace (Sum0 0 (fun i : nat => Rev n (a_ i))) with (Zero:RX).
+  replace (Sum0 0 a_) with ([0]:RX).
+   replace (Sum0 0 (fun i : nat => Rev n (a_ i))) with ([0]:RX).
     algebra. auto. auto.
    replace (Sum0 (S l) a_) with (Sum0 l a_[+]a_ l).
   replace (Sum0 (S l) (fun i : nat => Rev n (a_ i))) with

@@ -58,14 +58,14 @@ Variables x y : IR.
 Definition Max_seq : nat -> IR.
 Proof.
  intro i.
- elim (less_cotransitive_unfolded IR Zero (one_div_succ i)) with (x[-]y).
+ elim (less_cotransitive_unfolded IR [0] (one_div_succ i)) with (x[-]y).
    3: apply one_div_succ_pos.
   intro H; apply x.
  intro H; apply y.
 Defined.
 
 Lemma Max_seq_char : forall n,
- Zero [<] x[-]y and Max_seq n [=] x or x[-]y [<] one_div_succ n and Max_seq n [=] y.
+ [0] [<] x[-]y and Max_seq n [=] x or x[-]y [<] one_div_succ n and Max_seq n [=] y.
 Proof.
  intros.
  unfold Max_seq in |- *.
@@ -124,7 +124,7 @@ With strong extensionality, we can make the binary operation [Max].
 
 Lemma lft_leEq_MAX : x [<=] MAX.
 Proof.
- astepr (Zero[+]MAX); apply shift_leEq_plus.
+ astepr ([0][+]MAX); apply shift_leEq_plus.
  apply approach_zero_weak.
  intros e He.
  apply leEq_wdl with (Lim (Cauchy_const x) [-]MAX).
@@ -133,8 +133,8 @@ Proof.
  eapply leEq_wdl.
   2: apply Lim_minus.
  simpl in |- *.
- elim (Archimedes (One[/] e[//]pos_ap_zero _ _ He)); intros n Hn.
- cut (Zero [<] nring (R:=IR) n).
+ elim (Archimedes ([1][/] e[//]pos_ap_zero _ _ He)); intros n Hn.
+ cut ([0] [<] nring (R:=IR) n).
   intro posn.
   apply str_seq_leEq_so_Lim_leEq.
   exists n; intros i Hi.
@@ -164,7 +164,7 @@ Proof.
  unfold Max_seq in |- *.
  elim less_cotransitive_unfolded; intro H; simpl in |- *.
   2: apply leEq_reflexive.
- apply less_leEq; astepl (Zero[+]y).
+ apply less_leEq; astepl ([0][+]y).
  apply shift_plus_less; auto.
 Qed.
 
@@ -287,7 +287,7 @@ Proof.
      apply less_antisymmetric_unfolded.
      apply shift_minus_less. apply shift_less_plus'. auto.
      auto.
-   apply shift_minus_less. astepl (z[+]Zero).
+   apply shift_minus_less. astepl (z[+][0]).
    apply plus_resp_less_lft. apply pos_div_two. auto.
    apply shift_less_minus. astepl x. auto.
   apply shift_less_minus. astepl y. auto.
@@ -364,7 +364,7 @@ Proof.
 Qed.
 
 Lemma Max_minus_eps_leEq : forall x y e,
- Zero [<] e -> {Max x y[-]e [<=] x} + {Max x y[-]e [<=] y}.
+ [0] [<] e -> {Max x y[-]e [<=] x} + {Max x y[-]e [<=] y}.
 Proof.
  intros.
  cut (Max x y[-]e [<] x or Max x y[-]e [<] y).
@@ -377,7 +377,7 @@ Proof.
  astepl ZeroR; assumption.
 Qed.
 
-Lemma max_one_ap_zero : forall x : IR, Max x One [#] Zero.
+Lemma max_one_ap_zero : forall x : IR, Max x [1] [#] [0].
 Proof.
  intros.
  apply ap_symmetric_unfolded.
@@ -387,19 +387,19 @@ Proof.
  apply rht_leEq_Max.
 Qed.
 
-Lemma pos_max_one : forall x : IR, Zero [<] Max x One.
+Lemma pos_max_one : forall x : IR, [0] [<] Max x [1].
 Proof.
  intro.
  apply less_leEq_trans with OneR; [ apply pos_one | apply rht_leEq_Max ].
 Qed.
 
 Lemma x_div_Max_leEq_x :
- forall x y : IR, Zero [<] x -> (x[/] Max y One[//]max_one_ap_zero _) [<=] x.
+ forall x y : IR, [0] [<] x -> (x[/] Max y [1][//]max_one_ap_zero _) [<=] x.
 Proof.
  intros.
  apply shift_div_leEq'.
   apply pos_max_one.
- astepl (One[*]x).
+ astepl ([1][*]x).
  apply mult_resp_leEq_rht; [ apply rht_leEq_Max | apply less_leEq; assumption ].
 Qed.
 
@@ -418,7 +418,7 @@ Proof.
  apply rht_leEq_Max.
 Qed.
 
-Lemma max_mult : forall (a b c : IR), Zero [<=] c ->
+Lemma max_mult : forall (a b c : IR), [0] [<=] c ->
 (Max (c[*]a) (c[*]b)) [=] c[*](Max a b).
 Proof.
  intros a b c H.
@@ -430,7 +430,7 @@ Proof.
   assumption.
  rewrite -> leEq_def in *.
  intros Z.
- assert (Not (Not (Zero[<]c or Zero[=]c))).
+ assert (Not (Not ([0][<]c or [0][=]c))).
   intros X.
   apply X.
   right.
@@ -446,7 +446,7 @@ Proof.
  change (Not (Max (c[*]a) (c[*]b)[<]c[*]Max a b)).
  rewrite <- leEq_def.
  destruct X as [c0|c0].
-  assert (X:c[#]Zero).
+  assert (X:c[#][0]).
    apply ap_symmetric; apply less_imp_ap; assumption.
   apply shift_mult_leEq' with X.
    assumption.
@@ -638,7 +638,7 @@ Proof.
 Qed.
 
 Lemma leEq_Min_plus_eps : forall x y e,
- Zero [<] e -> {x [<=] Min x y[+]e} + {y [<=] Min x y[+]e}.
+ [0] [<] e -> {x [<=] Min x y[+]e} + {y [<=] Min x y[+]e}.
 Proof.
  intros.
  cut (x [<] Min x y[+]e or y [<] Min x y[+]e).
@@ -827,16 +827,16 @@ Proof.
  algebra.
 Qed.
 
-Lemma AbsIRz_isz : AbsIR Zero [=] Zero.
+Lemma AbsIRz_isz : AbsIR [0] [=] [0].
 Proof.
  intros. unfold AbsIR in |- *. simpl in |- *. unfold ABSIR in |- *.
- Step_final (Max Zero Zero).
+ Step_final (Max [0] [0]).
 Qed.
 
-Lemma AbsIR_nonneg : forall x : IR, Zero [<=] AbsIR x.
+Lemma AbsIR_nonneg : forall x : IR, [0] [<=] AbsIR x.
 Proof.
  intro x; rewrite -> leEq_def; intro H.
- cut (Zero [<] ZeroR).
+ cut ([0] [<] ZeroR).
   apply less_irreflexive.
  apply less_wdl with (AbsIR x); auto.
  eapply eq_transitive_unfolded.
@@ -853,10 +853,10 @@ Proof.
  astepr ZeroR; auto.
 Qed.
 
-Lemma AbsIR_pos : forall x : IR, x [#] Zero -> Zero [<] AbsIR x.
+Lemma AbsIR_pos : forall x : IR, x [#] [0] -> [0] [<] AbsIR x.
 Proof.
  intros.
- cut (x [<] Zero or Zero [<] x).
+ cut (x [<] [0] or [0] [<] x).
   2: apply ap_imp_less; assumption.
  intros H0.
  unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
@@ -873,7 +873,7 @@ Proof.
  apply lft_leEq_Max.
 Qed.
 
-Lemma AbsIR_cancel_ap_zero : forall x : IR, AbsIR x [#] Zero -> x [#] Zero.
+Lemma AbsIR_cancel_ap_zero : forall x : IR, AbsIR x [#] [0] -> x [#] [0].
 Proof.
  intros.
  apply un_op_strext_unfolded with AbsIR.
@@ -882,7 +882,7 @@ Proof.
  apply eq_symmetric_unfolded; apply AbsIRz_isz.
 Qed.
 
-Lemma AbsIR_resp_ap_zero : forall x : IR, x [#] Zero -> AbsIR x [#] Zero.
+Lemma AbsIR_resp_ap_zero : forall x : IR, x [#] [0] -> AbsIR x [#] [0].
 Proof.
  intros.
  apply ap_symmetric_unfolded; apply less_imp_ap.
@@ -901,7 +901,7 @@ Proof.
  unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *; apply rht_leEq_Max.
 Qed.
 
-Lemma AbsSmall_e : forall e x : IR, AbsSmall e x -> Zero [<=] e.
+Lemma AbsSmall_e : forall e x : IR, AbsSmall e x -> [0] [<=] e.
 Proof.
  intros.
  red in H.
@@ -964,10 +964,10 @@ Proof.
  apply AbsSmall_imp_AbsIR; assumption.
 Qed.
 
-Lemma zero_less_AbsIR_plus_one : forall q : IR, Zero [<] AbsIR q[+]One.
+Lemma zero_less_AbsIR_plus_one : forall q : IR, [0] [<] AbsIR q[+][1].
 Proof.
  intros.
- apply less_leEq_trans with (Zero[+]OneR).
+ apply less_leEq_trans with ([0][+]OneR).
   rstepr OneR; apply pos_one.
  apply plus_resp_leEq; apply AbsIR_nonneg.
 Qed.
@@ -989,7 +989,7 @@ Proof.
  apply AbsIR_wd; rational.
 Qed.
 
-Lemma AbsIR_mult : forall (x c: IR) (H : Zero [<=]c),
+Lemma AbsIR_mult : forall (x c: IR) (H : [0] [<=]c),
 c[*] AbsIR (x) [=] AbsIR (c[*]x).
 Proof.
  intros.
@@ -1002,7 +1002,7 @@ Proof.
 Qed.
 
 
-Lemma AbsIR_eq_x : forall x : IR, Zero [<=] x -> AbsIR x [=] x.
+Lemma AbsIR_eq_x : forall x : IR, [0] [<=] x -> AbsIR x [=] x.
 Proof.
  intros.
  unfold AbsIR in |- *; simpl in |- *; unfold ABSIR in |- *.
@@ -1016,7 +1016,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma AbsIR_eq_inv_x : forall x : IR, x [<=] Zero -> AbsIR x [=] [--]x.
+Lemma AbsIR_eq_inv_x : forall x : IR, x [<=] [0] -> AbsIR x [=] [--]x.
 Proof.
  intros.
  apply eq_transitive_unfolded with (AbsIR [--]x).
@@ -1027,7 +1027,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma less_AbsIR : forall x y, Zero [<] x -> x [<] AbsIR y -> x [<] y or y [<] [--]x.
+Lemma less_AbsIR : forall x y, [0] [<] x -> x [<] AbsIR y -> x [<] y or y [<] [--]x.
 Proof.
  intros x y H H0.
  simpl in H0.
@@ -1040,14 +1040,14 @@ Proof.
 Qed.
 
 Lemma leEq_distr_AbsIR : forall x y : IR,
- Zero [<] x -> x [<=] AbsIR y -> {x [<=] y} + {y [<=] [--]x}.
+ [0] [<] x -> x [<=] AbsIR y -> {x [<=] y} + {y [<=] [--]x}.
 Proof.
  intros.
  cut (x[*]Three [/]FourNZ [<] AbsIR y); intros.
   elim (less_AbsIR (x[*]Three [/]FourNZ) y); intros; [ left | right | idtac | auto ].
-    astepr (Zero[+]y); apply shift_leEq_plus.
+    astepr ([0][+]y); apply shift_leEq_plus.
     apply approach_zero.
-    cut (forall e : IR, Zero [<] e -> e [<] x [/]TwoNZ -> x[-]y [<] e); intros.
+    cut (forall e : IR, [0] [<] e -> e [<] x [/]TwoNZ -> x[-]y [<] e); intros.
      cut (x [/]FourNZ [<] x [/]TwoNZ); intros.
       2: rstepl ((x [/]TwoNZ) [/]TwoNZ); apply pos_div_two'; apply pos_div_two; auto.
      rename X3 into H4.
@@ -1068,14 +1068,14 @@ Proof.
       2: apply a.
      apply less_leEq; eapply less_transitive_unfolded.
       apply b.
-     astepl (Zero[-] (x[-]e)).
+     astepl ([0][-] (x[-]e)).
      apply shift_minus_less.
      astepr (x[*]Three [/]FourNZ[+]x[-]e).
      apply shift_less_minus; astepl e.
      eapply less_leEq_trans.
       rename X2 into H3. apply H3.
       apply less_leEq.
-     rstepl (x[*] (Zero[+]Zero[+]One [/]TwoNZ)); rstepr (x[*] (One[+]One [/]FourNZ[+]One [/]TwoNZ)).
+     rstepl (x[*] ([0][+][0][+][1] [/]TwoNZ)); rstepr (x[*] ([1][+][1] [/]FourNZ[+][1] [/]TwoNZ)).
      apply mult_resp_less_lft; auto.
      apply plus_resp_less_rht; apply plus_resp_less_leEq.
       apply pos_one.
@@ -1084,11 +1084,11 @@ Proof.
     eapply less_leEq_trans.
      rename X2 into H3. apply H3.
      apply less_leEq; apply pos_div_two'; auto.
-   astepr (Zero[+][--]x); apply shift_leEq_plus.
+   astepr ([0][+][--]x); apply shift_leEq_plus.
    apply leEq_wdl with (y[+]x).
     2: unfold cg_minus in |- *; algebra.
    apply approach_zero.
-   cut (forall e : IR, Zero [<] e -> e [<] x [/]TwoNZ -> y[+]x [<] e); intros.
+   cut (forall e : IR, [0] [<] e -> e [<] x [/]TwoNZ -> y[+]x [<] e); intros.
     cut (x [/]FourNZ [<] x [/]TwoNZ); intros.
      2: rstepl ((x [/]TwoNZ) [/]TwoNZ); apply pos_div_two'; apply pos_div_two; auto.
     rename X3 into H4.
@@ -1110,7 +1110,7 @@ Proof.
      apply shift_less_minus; apply shift_plus_less'.
      eapply less_transitive_unfolded.
       rename X2 into H3. apply H3.
-      rstepl (x[*] (Zero[+]Zero[+]One [/]TwoNZ)); rstepr (x[*] (One[+]One [/]FourNZ[+]One [/]TwoNZ)).
+      rstepl (x[*] ([0][+][0][+][1] [/]TwoNZ)); rstepr (x[*] ([1][+][1] [/]FourNZ[+][1] [/]TwoNZ)).
      apply mult_resp_less_lft; auto.
      apply plus_resp_less_rht; apply plus_resp_less_leEq.
       apply pos_one.
@@ -1127,7 +1127,7 @@ Proof.
   apply mult_resp_less; auto.
   apply pos_div_four; apply pos_three.
  apply less_leEq_trans with x; auto.
- astepr (x[*]One).
+ astepr (x[*][1]).
  astepr (x[*]Four [/]FourNZ).
  apply mult_resp_less_lft; auto.
  apply div_resp_less.
@@ -1135,7 +1135,7 @@ Proof.
  apply three_less_four.
 Qed.
 
-Lemma AbsIR_approach_zero : forall x, (forall e, Zero [<] e -> AbsIR x [<=] e) -> x [=] Zero.
+Lemma AbsIR_approach_zero : forall x, (forall e, [0] [<] e -> AbsIR x [<=] e) -> x [=] [0].
 Proof.
  intros.
  apply leEq_imp_eq.
@@ -1150,12 +1150,12 @@ Qed.
 
 Lemma AbsSmall_approach :
 forall (a b : IR),
-  (forall (e : IR), Zero[<]e -> AbsSmall (a[+]e) b) -> AbsSmall a b.
+  (forall (e : IR), [0][<]e -> AbsSmall (a[+]e) b) -> AbsSmall a b.
 Proof.
  unfold AbsSmall.
  intros a b H.
  split.
-  assert (forall e : IR, Zero[<]e -> [--]a[-]b[<=]e).
+  assert (forall e : IR, [0][<]e -> [--]a[-]b[<=]e).
    intros.
    assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
     apply H; auto. destruct H0.
@@ -1164,22 +1164,22 @@ Proof.
    astepl ([--]a[+][--]e).
    astepl ([--](a[+]e)).
    auto.
-  astepr (b[+]Zero).
+  astepr (b[+][0]).
   apply shift_leEq_plus'.
   apply approach_zero_weak; auto.
- assert (forall e : IR, Zero[<]e -> b[-]a[<=]e).
+ assert (forall e : IR, [0][<]e -> b[-]a[<=]e).
   intros.
   assert ([--](a[+]e)[<=]b /\ b[<=]a[+]e).
    apply H; auto. destruct H0.
   apply shift_minus_leEq.
   astepr (a[+]e).
   auto.
- astepr (a[+]Zero).
+ astepr (a[+][0]).
  apply shift_leEq_plus'.
  apply approach_zero_weak; auto.
 Qed.
 
-Lemma AbsIR_eq_zero : forall x : IR, AbsIR x [=] Zero -> x [=] Zero.
+Lemma AbsIR_eq_zero : forall x : IR, AbsIR x [=] [0] -> x [=] [0].
 Proof.
  intros.
  apply AbsIR_approach_zero; intros.
@@ -1200,7 +1200,7 @@ Proof.
   unfold cg_minus in |- *; apply plus_resp_leEq_both.
    apply rht_leEq_Max.
   apply inv_resp_leEq; apply Min_leEq_lft.
- astepr (Zero[+]AbsIR (a[-]b)).
+ astepr ([0][+]AbsIR (a[-]b)).
  apply shift_leEq_plus.
  apply approach_zero_weak.
  intros.
@@ -1270,13 +1270,13 @@ Proof.
  intros a.
  apply Qabs_case; intros H.
   apply AbsIR_eq_x.
-  stepl (inj_Q IR Zero).
+  stepl (inj_Q IR [0]).
    apply inj_Q_leEq.
    assumption.
   now apply (inj_Q_nring IR 0).
  stepr ([--](inj_Q IR a)).
   apply AbsIR_eq_inv_x.
-  stepr (inj_Q IR Zero).
+  stepr (inj_Q IR [0]).
    apply inj_Q_leEq.
    assumption.
   now apply (inj_Q_nring IR 0).
@@ -1296,7 +1296,7 @@ Variable seq : nat -> IR.
 
 Fixpoint SeqBound0 (n : nat) : IR :=
     match n with
-     | O => Zero
+     | O => [0]
      | S m => Max (AbsIR (seq m)) (SeqBound0 m)
     end.
 
@@ -1389,7 +1389,7 @@ Proof.
  apply AbsIR_nonneg.
 Qed.
 
-Lemma FAbs_nonneg : forall F x Hx, Zero [<=] FAbs F x Hx.
+Lemma FAbs_nonneg : forall F x Hx, [0] [<=] FAbs F x Hx.
 Proof.
  intros.
  eapply leEq_wdr.

@@ -128,10 +128,10 @@ Proof.
  apply plus_resp_less_leEq; auto.
 Qed.
 
-Lemma plus_resp_nonneg : forall x y : R, Zero [<=] x -> Zero [<=] y -> Zero [<=] x[+]y.
+Lemma plus_resp_nonneg : forall x y : R, [0] [<=] x -> [0] [<=] y -> [0] [<=] x[+]y.
 Proof.
  intros.
- astepl (Zero[+]Zero:R).
+ astepl ([0][+][0]:R).
  apply plus_resp_leEq_both; auto.
 Qed.
 
@@ -209,15 +209,15 @@ Proof.
  apply plus_resp_leEq_lft. auto.
 Qed.
 
-Lemma shift_leEq_rht : forall a b : R, Zero [<=] b[-]a -> a [<=] b.
+Lemma shift_leEq_rht : forall a b : R, [0] [<=] b[-]a -> a [<=] b.
 Proof.
  intros.
- astepl (Zero[+]a).
+ astepl ([0][+]a).
  rstepr (b[-]a[+]a).
  apply plus_resp_leEq. auto.
 Qed.
 
-Lemma shift_leEq_lft : forall a b : R, a [<=] b -> Zero [<=] b[-]a.
+Lemma shift_leEq_lft : forall a b : R, a [<=] b -> [0] [<=] b[-]a.
 Proof.
  intros.
  astepl (a[-]a).
@@ -248,7 +248,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma shift_zero_leEq_minus : forall x y : R, x [<=] y -> Zero [<=] y[-]x.
+Lemma shift_zero_leEq_minus : forall x y : R, x [<=] y -> [0] [<=] y[-]x.
 Proof.
  intros.
  rstepl (x[-]x).
@@ -256,11 +256,11 @@ Proof.
  assumption.
 Qed.
 
-Lemma shift_zero_leEq_minus' : forall x y : R, Zero [<=] y[-]x -> x [<=] y.
+Lemma shift_zero_leEq_minus' : forall x y : R, [0] [<=] y[-]x -> x [<=] y.
 Proof.
  intros.
  apply plus_cancel_leEq_rht with ([--]x).
- rstepl (Zero:R).
+ rstepl ([0]:R).
  assumption.
 Qed.
 
@@ -273,23 +273,23 @@ Section multiplication.
 Multiplication and division respect [[<=]]
 *)
 
-Lemma mult_resp_leEq_rht : forall x y z : R, x [<=] y -> Zero [<=] z -> x[*]z [<=] y[*]z.
+Lemma mult_resp_leEq_rht : forall x y z : R, x [<=] y -> [0] [<=] z -> x[*]z [<=] y[*]z.
 Proof.
  intros x y z .
  repeat rewrite -> leEq_def.
  intros H H0 H1.
  generalize (shift_zero_less_minus _ _ _ H1); intro H2.
- cut (Zero [<] (x[-]y) [*]z).
+ cut ([0] [<] (x[-]y) [*]z).
   intro H3.
   2: rstepr (x[*]z[-]y[*]z).
   2: assumption.
- cut (forall a b : R, Zero [<] a[*]b -> Zero [<] a and Zero [<] b or a [<] Zero and b [<] Zero).
+ cut (forall a b : R, [0] [<] a[*]b -> [0] [<] a and [0] [<] b or a [<] [0] and b [<] [0]).
   intro H4.
   generalize (H4 _ _ H3); intro H5.
   elim H5; intro H6.
    elim H6; intros.
    elim H.
-   astepl (Zero[+]y).
+   astepl ([0][+]y).
    apply shift_plus_less.
    assumption.
   elim H6; intros.
@@ -306,15 +306,15 @@ Proof.
   elim (ap_imp_less _ _ _ H7); intro H9.
    assumption.
   elimtype False.
-  elim (less_irreflexive_unfolded R Zero).
+  elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
   apply less_leEq.
   apply inv_cancel_less.
-  astepl (Zero:R).
+  astepl ([0]:R).
   astepr ([--]a[*]b).
   apply mult_resp_pos.
-   astepl ([--](Zero:R)).
+   astepl ([--]([0]:R)).
    apply inv_resp_less.
    assumption.
   assumption.
@@ -323,22 +323,22 @@ Proof.
   assumption.
  elim (ap_imp_less _ _ _ H7); intro H9.
   elimtype False.
-  elim (less_irreflexive_unfolded R Zero).
+  elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
   apply less_leEq.
   apply inv_cancel_less.
-  astepl (Zero:R).
+  astepl ([0]:R).
   astepr (a[*][--]b).
   apply mult_resp_pos.
    assumption.
-  astepl ([--](Zero:R)).
+  astepl ([--]([0]:R)).
   apply inv_resp_less.
   assumption.
  assumption.
 Qed.
 
-Lemma mult_resp_leEq_lft : forall x y z : R, x [<=] y -> Zero [<=] z -> z[*]x [<=] z[*]y.
+Lemma mult_resp_leEq_lft : forall x y z : R, x [<=] y -> [0] [<=] z -> z[*]x [<=] z[*]y.
 Proof.
  intros.
  astepl (x[*]z).
@@ -349,7 +349,7 @@ Proof.
 Qed.
 
 Lemma mult_resp_leEq_both : forall x x' y y' : R,
- Zero [<=] x -> Zero [<=] y -> x [<=] x' -> y [<=] y' -> x[*]y [<=] x'[*]y'.
+ [0] [<=] x -> [0] [<=] y -> x [<=] x' -> y [<=] y' -> x[*]y [<=] x'[*]y'.
 Proof.
  intros.
  apply leEq_transitive with (x[*]y').
@@ -359,15 +359,15 @@ Proof.
  apply leEq_transitive with y; assumption.
 Qed.
 
-Lemma recip_resp_leEq : forall (x y : R) x_ y_, Zero [<] y -> y [<=] x -> (One[/] x[//]x_) [<=] (One[/] y[//]y_).
+Lemma recip_resp_leEq : forall (x y : R) x_ y_, [0] [<] y -> y [<=] x -> ([1][/] x[//]x_) [<=] ([1][/] y[//]y_).
 Proof.
  intros x y x_ y_ H.
  do 2 rewrite -> leEq_def.
  intros H0 H1. apply H0.
- cut ((One[/] x[//]x_) [#] Zero). intro x'_.
-  cut ((One[/] y[//]y_) [#] Zero). intro y'_.
-   rstepl (One[/] One[/] x[//]x_[//]x'_).
-   rstepr (One[/] One[/] y[//]y_[//]y'_).
+ cut (([1][/] x[//]x_) [#] [0]). intro x'_.
+  cut (([1][/] y[//]y_) [#] [0]). intro y'_.
+   rstepl ([1][/] [1][/] x[//]x_[//]x'_).
+   rstepr ([1][/] [1][/] y[//]y_[//]y'_).
    apply recip_resp_less.
     apply recip_resp_pos; auto.
    auto.
@@ -375,11 +375,11 @@ Proof.
   apply div_resp_ap_zero_rev. apply ring_non_triv.
 Qed.
 
-Lemma div_resp_leEq : forall (x y z : R) z_, Zero [<] z -> x [<=] y -> (x[/] z[//]z_) [<=] (y[/] z[//]z_).
+Lemma div_resp_leEq : forall (x y z : R) z_, [0] [<] z -> x [<=] y -> (x[/] z[//]z_) [<=] (y[/] z[//]z_).
 Proof.
  intros.
- rstepl (x[*] (One[/] z[//]z_)).
- rstepr (y[*] (One[/] z[//]z_)).
+ rstepl (x[*] ([1][/] z[//]z_)).
+ rstepr (y[*] ([1][/] z[//]z_)).
  apply mult_resp_leEq_rht.
   assumption.
  apply less_leEq.
@@ -392,7 +392,7 @@ Hint Resolve recip_resp_leEq: algebra.
 (** Cancellation properties
 *)
 
-Lemma mult_cancel_leEq : forall x y z : R, Zero [<] z -> x[*]z [<=] y[*]z -> x [<=] y.
+Lemma mult_cancel_leEq : forall x y z : R, [0] [<] z -> x[*]z [<=] y[*]z -> x [<=] y.
 Proof.
  intros x y z H.
  do 2 rewrite -> leEq_def.
@@ -406,28 +406,28 @@ Qed.
 (** Laws for shifting
 *)
 
-Lemma shift_mult_leEq : forall (x y z : R) z_, Zero [<] z -> x [<=] (y[/] z[//]z_) -> x[*]z [<=] y.
+Lemma shift_mult_leEq : forall (x y z : R) z_, [0] [<] z -> x [<=] (y[/] z[//]z_) -> x[*]z [<=] y.
 Proof.
  intros.
  rstepr ((y[/] z[//]z_) [*]z).
  apply mult_resp_leEq_rht; [ assumption | apply less_leEq; assumption ].
 Qed.
 
-Lemma shift_mult_leEq' : forall (x y z : R) z_, Zero [<] z -> x [<=] (y[/] z[//]z_) -> z[*]x [<=] y.
+Lemma shift_mult_leEq' : forall (x y z : R) z_, [0] [<] z -> x [<=] (y[/] z[//]z_) -> z[*]x [<=] y.
 Proof.
  intros.
  rstepr (z[*] (y[/] z[//]z_)).
  apply mult_resp_leEq_lft; [ assumption | apply less_leEq; assumption ].
 Qed.
 
-Lemma shift_leEq_mult' : forall (x y z : R) y_, Zero [<] y -> (x[/] y[//]y_) [<=] z -> x [<=] y[*]z.
+Lemma shift_leEq_mult' : forall (x y z : R) y_, [0] [<] y -> (x[/] y[//]y_) [<=] z -> x [<=] y[*]z.
 Proof.
  intros x y z H H0. repeat rewrite -> leEq_def. intros H1 H2. apply H1.
  apply shift_less_div. auto.
   astepl (y[*]z). auto.
 Qed.
 
-Lemma shift_div_leEq : forall x y z : R, Zero [<] z -> forall z_ : z [#] Zero, x [<=] y[*]z -> (x[/] z[//]z_) [<=] y.
+Lemma shift_div_leEq : forall x y z : R, [0] [<] z -> forall z_ : z [#] [0], x [<=] y[*]z -> (x[/] z[//]z_) [<=] y.
 Proof.
  intros.
  rstepr (y[*]z[/] z[//]z_).
@@ -436,7 +436,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma shift_div_leEq' : forall (x y z : R) z_, Zero [<] z -> x [<=] z[*]y -> (x[/] z[//]z_) [<=] y.
+Lemma shift_div_leEq' : forall (x y z : R) z_, [0] [<] z -> x [<=] z[*]y -> (x[/] z[//]z_) [<=] y.
 Proof.
  intros.
  rstepr (z[*]y[/] z[//]z_).
@@ -445,7 +445,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma shift_leEq_div : forall (x y z : R) y_, Zero [<] y -> x[*]y [<=] z -> x [<=] (z[/] y[//]y_).
+Lemma shift_leEq_div : forall (x y z : R) y_, [0] [<] y -> x[*]y [<=] z -> x [<=] (z[/] y[//]y_).
 Proof.
  intros x y z H X. repeat rewrite -> leEq_def. intros H0 H1. apply H0.
  astepr (y[*]x).
@@ -454,64 +454,64 @@ Qed.
 
 Hint Resolve shift_leEq_div: algebra.
 
-Lemma eps_div_leEq_eps : forall (eps d : R) d_, Zero [<=] eps -> One [<=] d -> (eps[/] d[//]d_) [<=] eps.
+Lemma eps_div_leEq_eps : forall (eps d : R) d_, [0] [<=] eps -> [1] [<=] d -> (eps[/] d[//]d_) [<=] eps.
 Proof.
  intros.
  apply shift_div_leEq'.
-  apply less_leEq_trans with (One:R).
+  apply less_leEq_trans with ([1]:R).
    apply pos_one.
   assumption.
- astepl (One[*]eps).
+ astepl ([1][*]eps).
  apply mult_resp_leEq_rht.
   assumption.
  assumption.
 Qed.
 
-Lemma nonneg_div_two : forall eps : R, Zero [<=] eps -> Zero [<=] eps [/]TwoNZ.
+Lemma nonneg_div_two : forall eps : R, [0] [<=] eps -> [0] [<=] eps [/]TwoNZ.
 Proof.
  intros.
  apply shift_leEq_div.
   apply pos_two.
- astepl (Zero:R).
+ astepl ([0]:R).
  assumption.
 Qed.
 
-Lemma nonneg_div_two' : forall eps : R, Zero [<=] eps -> eps [/]TwoNZ [<=] eps.
+Lemma nonneg_div_two' : forall eps : R, [0] [<=] eps -> eps [/]TwoNZ [<=] eps.
 Proof.
  intros.
  apply shift_div_leEq.
   apply pos_two.
- astepl (eps[+]Zero); rstepr (eps[+]eps).
+ astepl (eps[+][0]); rstepr (eps[+]eps).
  apply plus_resp_leEq_lft; auto.
 Qed.
 
-Lemma nonneg_div_three : forall eps : R, Zero [<=] eps -> Zero [<=] eps [/]ThreeNZ.
+Lemma nonneg_div_three : forall eps : R, [0] [<=] eps -> [0] [<=] eps [/]ThreeNZ.
 Proof.
  intros.
  apply mult_cancel_leEq with (Three:R).
   apply pos_three.
- astepl (Zero:R); rstepr eps.
+ astepl ([0]:R); rstepr eps.
  assumption.
 Qed.
 
-Lemma nonneg_div_three' : forall eps : R, Zero [<=] eps -> eps [/]ThreeNZ [<=] eps.
+Lemma nonneg_div_three' : forall eps : R, [0] [<=] eps -> eps [/]ThreeNZ [<=] eps.
 Proof.
  intros.
  apply shift_div_leEq.
   apply pos_three.
- rstepl (eps[+]Zero[+]Zero); rstepr (eps[+]eps[+]eps).
+ rstepl (eps[+][0][+][0]); rstepr (eps[+]eps[+]eps).
  repeat apply plus_resp_leEq_both; auto.
  apply leEq_reflexive.
 Qed.
 
-Lemma nonneg_div_four : forall eps : R, Zero [<=] eps -> Zero [<=] eps [/]FourNZ.
+Lemma nonneg_div_four : forall eps : R, [0] [<=] eps -> [0] [<=] eps [/]FourNZ.
 Proof.
  intros.
  rstepr ((eps [/]TwoNZ) [/]TwoNZ).
  apply nonneg_div_two; apply nonneg_div_two; assumption.
 Qed.
 
-Lemma nonneg_div_four' : forall eps : R, Zero [<=] eps -> eps [/]FourNZ [<=] eps.
+Lemma nonneg_div_four' : forall eps : R, [0] [<=] eps -> eps [/]FourNZ [<=] eps.
 Proof.
  intros.
  rstepl ((eps [/]TwoNZ) [/]TwoNZ).
@@ -529,16 +529,16 @@ Section misc.
 *** Miscellaneous Properties
 *)
 
-Lemma sqr_nonneg : forall x : R, Zero [<=] x[^]2.
+Lemma sqr_nonneg : forall x : R, [0] [<=] x[^]2.
 Proof.
  intros. rewrite -> leEq_def in |- *. intro H.
- cut (Zero [<] x[^]2). intro H0.
+ cut ([0] [<] x[^]2). intro H0.
   elim (less_antisymmetric_unfolded _ _ _ H H0).
- cut (x [<] Zero or Zero [<] x). intro H0. elim H0; clear H0; intros H0.
+ cut (x [<] [0] or [0] [<] x). intro H0. elim H0; clear H0; intros H0.
   rstepr ([--]x[*][--]x).
-   cut (Zero [<] [--]x). intro H1.
+   cut ([0] [<] [--]x). intro H1.
     apply mult_resp_pos; auto.
-   astepl ([--](Zero:R)). apply inv_resp_less. auto.
+   astepl ([--]([0]:R)). apply inv_resp_less. auto.
    rstepr (x[*]x).
   apply mult_resp_pos; auto.
  apply ap_imp_less.
@@ -547,7 +547,7 @@ Proof.
  apply less_imp_ap. auto.
 Qed.
 
-Lemma nring_nonneg : forall n : nat, Zero [<=] nring (R:=R) n.
+Lemma nring_nonneg : forall n : nat, [0] [<=] nring (R:=R) n.
 Proof.
  intro; induction  n as [| n Hrecn].
   apply leEq_reflexive.
@@ -568,19 +568,19 @@ Proof.
    astepr ((Two:R) [*]nring (S n)).
    exact Hrecn.
   simpl in |- *.
-  astepr (((Zero:R) [+]One[+]One) [*] (nring n[+]One) [+] ((Zero:R) [+]One[+]One) [*]One).
+  astepr ((([0]:R) [+][1][+][1]) [*] (nring n[+][1]) [+] (([0]:R) [+][1][+][1]) [*][1]).
   apply plus_resp_leEq_lft.
-  astepr ((Zero:R) [+]One[+]One).
-  astepr ((Zero:R) [+] (One[+]One)).
+  astepr (([0]:R) [+][1][+][1]).
+  astepr (([0]:R) [+] ([1][+][1])).
   apply plus_resp_leEq_lft.
   astepr (Two:R).
   apply less_leEq.
   apply one_less_two.
  simpl in |- *.
- astepl (nring (R:=R) n[+]One[+] (One[+] (Zero[+]One))).
- astepl (nring (R:=R) n[+] (One[+] (One[+] (Zero[+]One)))).
- astepr (nring (R:=R) n[+]One[+] (One[+]One)).
- astepr (nring (R:=R) n[+] (One[+] (One[+]One))).
+ astepl (nring (R:=R) n[+][1][+] ([1][+] ([0][+][1]))).
+ astepl (nring (R:=R) n[+] ([1][+] ([1][+] ([0][+][1])))).
+ astepr (nring (R:=R) n[+][1][+] ([1][+][1])).
+ astepr (nring (R:=R) n[+] ([1][+] ([1][+][1]))).
  rational.
 Qed.
 
@@ -592,7 +592,7 @@ Proof.
  intros.
  induction  m as [| m Hrecm].
   elimtype False.
-  cut (nring (R:=R) n [<] Zero).
+  cut (nring (R:=R) n [<] [0]).
    change (Not (nring (R:=R) n[<](nring 0))).
    rewrite <- leEq_def.
    apply nring_leEq.
@@ -606,21 +606,21 @@ Proof.
  cut (n <= m).
   auto with arith.
  apply Hrecn.
- rstepr (nring (R:=R) m[+]One[-]One).
+ rstepr (nring (R:=R) m[+][1][-][1]).
  apply shift_leEq_minus.
  apply H.
 Qed.
 
-Lemma cc_abs_aid : forall x y : R, Zero [<=] x[^]2[+]y[^]2.
+Lemma cc_abs_aid : forall x y : R, [0] [<=] x[^]2[+]y[^]2.
 Proof.
  intros.
- astepl (Zero[+] (Zero:R)).
+ astepl ([0][+] ([0]:R)).
  apply plus_resp_leEq_both; apply sqr_nonneg.
 Qed.
 
 Load "Transparent_algebra".
 
-Lemma nexp_resp_pos : forall (x : R) k, Zero [<] x -> Zero [<] x[^]k.
+Lemma nexp_resp_pos : forall (x : R) k, [0] [<] x -> [0] [<] x[^]k.
 Proof.
  intros.
  elim k.
@@ -635,12 +635,12 @@ Qed.
 
 Load "Opaque_algebra".
 
-Lemma mult_resp_nonneg : forall x y : R, Zero [<=] x -> Zero [<=] y -> Zero [<=] x[*]y.
+Lemma mult_resp_nonneg : forall x y : R, [0] [<=] x -> [0] [<=] y -> [0] [<=] x[*]y.
 Proof.
  intros x y. repeat rewrite -> leEq_def. intros  H H0 H1. apply H0.
- cut (x[*]y [#] Zero). intro H2.
-  cut (x [#] Zero). intro H3.
-   cut (y [#] Zero). intro H4.
+ cut (x[*]y [#] [0]). intro H2.
+  cut (x [#] [0]). intro H3.
+   cut (y [#] [0]). intro H4.
     elim (ap_imp_less _ _ _ H4); intro H5. auto.
      elim (ap_imp_less _ _ _ H3); intro H6. elim (H H6).
      elim (less_antisymmetric_unfolded _ _ _ H1 (mult_resp_pos _ _ _ H6 H5)).
@@ -651,19 +651,19 @@ Qed.
 
 Load "Transparent_algebra".
 
-Lemma nexp_resp_nonneg : forall (x : R) (k : nat), Zero [<=] x -> Zero [<=] x[^]k.
+Lemma nexp_resp_nonneg : forall (x : R) (k : nat), [0] [<=] x -> [0] [<=] x[^]k.
 Proof.
  intros. induction  k as [| k Hreck]. intros.
- astepr (One:R). apply less_leEq. apply pos_one.
+ astepr ([1]:R). apply less_leEq. apply pos_one.
   astepr (x[^]k[*]x).
  apply mult_resp_nonneg; auto.
 Qed.
 
-Lemma power_resp_leEq : forall (x y : R) k, Zero [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
+Lemma power_resp_leEq : forall (x y : R) k, [0] [<=] x -> x [<=] y -> x[^]k [<=] y[^]k.
 Proof.
  intros. induction  k as [| k Hreck]; intros.
- astepl (One:R).
-  astepr (One:R).
+ astepl ([1]:R).
+  astepr ([1]:R).
   apply leEq_reflexive.
  astepl (x[^]k[*]x).
  astepr (y[^]k[*]y).
@@ -674,7 +674,7 @@ Proof.
   apply leEq_transitive with x; auto.
 Qed.
 
-Lemma nexp_resp_less : forall (x y : R) n, 1 <= n -> Zero [<=] x -> x [<] y -> x[^]n [<] y[^]n.
+Lemma nexp_resp_less : forall (x y : R) n, 1 <= n -> [0] [<=] x -> x [<] y -> x[^]n [<] y[^]n.
 Proof.
  intros.
  induction  n as [| n Hrecn].
@@ -695,18 +695,18 @@ Proof.
  assumption.
 Qed.
 
-Lemma power_cancel_leEq : forall (x y : R) k, 0 < k -> Zero [<=] y -> x[^]k [<=] y[^]k -> x [<=] y.
+Lemma power_cancel_leEq : forall (x y : R) k, 0 < k -> [0] [<=] y -> x[^]k [<=] y[^]k -> x [<=] y.
 Proof.
  intros x y k H. repeat rewrite -> leEq_def. intros H0 H1 H2. apply H1.
  apply nexp_resp_less; try rewrite -> leEq_def; auto.
 Qed.
 
-Lemma power_cancel_less : forall (x y : R) k, Zero [<=] y -> x[^]k [<] y[^]k -> x [<] y.
+Lemma power_cancel_less : forall (x y : R) k, [0] [<=] y -> x[^]k [<] y[^]k -> x [<] y.
 Proof.
  intros x y k H H0.
  elim (zerop k); intro y0.
   rewrite y0 in H0.
-  cut (One [<] (One:R)). intro H1.
+  cut ([1] [<] ([1]:R)). intro H1.
    elim (less_irreflexive_unfolded _ _ H1).
   astepl (x[^]0). astepr (y[^]0). auto.
   cut (x [<] y or y [<] x). intro H1.
@@ -724,19 +724,19 @@ Proof.
  unfold Snring in |- *.
  induction  n as [| n Hrecn].
   simpl in |- *.
-  astepl (One:R).
-  astepr ((Zero:R) [+]One[+]One).
-  astepr ((One:R) [+]One).
+  astepl ([1]:R).
+  astepr (([0]:R) [+][1][+][1]).
+  astepr (([1]:R) [+][1]).
   astepr (Two:R).
   apply one_less_two.
- astepl (nring (R:=R) (S n) [+]One).
+ astepl (nring (R:=R) (S n) [+][1]).
  astepr ((Two:R)[^]S n[*]Two).
- astepr ((Two:R)[^]S n[*]One[+]Two[^]S n[*]One).
+ astepr ((Two:R)[^]S n[*][1][+]Two[^]S n[*][1]).
   apply plus_resp_less_both.
    astepr ((Two:R)[^]S n).
    exact Hrecn.
   astepr ((Two:R)[^]S n).
-  astepl ((One:R)[^]S n).
+  astepl (([1]:R)[^]S n).
   apply nexp_resp_less.
     intuition.
    apply less_leEq.
@@ -752,8 +752,8 @@ Proof.
  unfold Sum in |- *. unfold Sum1 in |- *.
   generalize (toCle _ _ H); clear H; intro H.
   inversion H as [|m X H2].
-   astepl (Zero:R).
-   astepr (Zero:R).
+   astepl ([0]:R).
+   astepr ([0]:R).
    apply leEq_reflexive.
   inversion X.
   simpl in |- *.
@@ -771,8 +771,8 @@ Proof.
   unfold Sum in |- *. unfold Sum1 in |- *.
  rewrite H1.
  simpl in |- *.
- astepl (Zero:R).
- astepr (Zero:R).
+ astepl ([0]:R).
+ astepr ([0]:R).
  apply leEq_reflexive.
 Qed.
 
@@ -802,7 +802,7 @@ Proof.
  apply H0.
 Qed.
 
-Lemma approach_zero : forall x : R, (forall e, Zero [<] e -> x [<] e) -> x [<=] Zero.
+Lemma approach_zero : forall x : R, (forall e, [0] [<] e -> x [<] e) -> x [<=] [0].
 Proof.
  intros.
  rewrite -> leEq_def; intro.
@@ -812,7 +812,7 @@ Proof.
   apply plus_cancel_less with (z := [--](x [/]TwoNZ)).
   apply mult_cancel_less with (z := Two:R).
    apply pos_two.
-  rstepl (Zero:R).
+  rstepl ([0]:R).
   rstepr x.
   assumption.
  apply X.
@@ -820,7 +820,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma approach_zero_weak : forall x : R, (forall e, Zero [<] e -> x [<=] e) -> x [<=] Zero.
+Lemma approach_zero_weak : forall x : R, (forall e, [0] [<] e -> x [<=] e) -> x [<=] [0].
 Proof.
  intros.
  rewrite -> leEq_def; intro.
@@ -832,7 +832,7 @@ Proof.
   apply plus_cancel_less with (z := [--](x [/]TwoNZ)).
   apply mult_cancel_less with (z := Two:R).
    apply pos_two.
-  rstepl (Zero:R).
+  rstepl ([0]:R).
   rstepr x.
   assumption.
  apply H.
@@ -858,14 +858,14 @@ Proof.
  intro; auto.
 Qed.
 
-Lemma power_plus_leEq : forall n (x y:R), (0 < n) -> (Zero[<=]x) -> (Zero[<=]y) ->
+Lemma power_plus_leEq : forall n (x y:R), (0 < n) -> ([0][<=]x) -> ([0][<=]y) ->
 (x[^]n [+] y[^]n)[<=](x[+]y)[^]n.
 Proof.
  intros [|n] x y Hn Hx Hy.
   elimtype False; auto with *.
  induction n.
   simpl.
-  rstepl (One[*](x[+]y)).
+  rstepl ([1][*](x[+]y)).
   apply leEq_reflexive.
  rename n into m.
  set (n:=(S m)) in *.
@@ -898,11 +898,11 @@ Section PosP_properties.
 Variable R : COrdField.
 
 (* begin hide *)
-Notation ZeroR := (Zero:R).
-Notation OneR := (One:R).
+Notation ZeroR := ([0]:R).
+Notation OneR := ([1]:R).
 (* end hide *)
 
-Lemma mult_pos_imp : forall a b : R, Zero [<] a[*]b -> Zero [<] a and Zero [<] b or a [<] Zero and b [<] Zero.
+Lemma mult_pos_imp : forall a b : R, [0] [<] a[*]b -> [0] [<] a and [0] [<] b or a [<] [0] and b [<] [0].
 Proof.
  generalize I; intro.
  generalize I; intro.
@@ -920,7 +920,7 @@ Proof.
   elim (ap_imp_less _ _ _ H7); intro.
    assumption.
   elimtype False.
-  elim (less_irreflexive_unfolded R Zero).
+  elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
   apply less_leEq.
@@ -937,7 +937,7 @@ Proof.
   assumption.
  elim (ap_imp_less _ _ _ H7); intro.
   elimtype False.
-  elim (less_irreflexive_unfolded R Zero).
+  elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
   apply less_leEq.
@@ -952,27 +952,27 @@ Proof.
  assumption.
 Qed.
 
-Lemma plus_resp_pos_nonneg : forall x y : R, Zero [<] x -> Zero [<=] y -> Zero [<] x[+]y.
+Lemma plus_resp_pos_nonneg : forall x y : R, [0] [<] x -> [0] [<=] y -> [0] [<] x[+]y.
 Proof.
  intros.
  apply less_leEq_trans with x. auto.
-  astepl (x[+]Zero).
+  astepl (x[+][0]).
  apply plus_resp_leEq_lft. auto.
 Qed.
 
-Lemma plus_resp_nonneg_pos : forall x y : R, Zero [<=] x -> Zero [<] y -> Zero [<] x[+]y.
+Lemma plus_resp_nonneg_pos : forall x y : R, [0] [<=] x -> [0] [<] y -> [0] [<] x[+]y.
 Proof.
  intros.
  astepr (y[+]x).
  apply plus_resp_pos_nonneg; auto.
 Qed.
 
-Lemma pos_square : forall x : R, x [#] Zero -> Zero [<] x[^]2.
+Lemma pos_square : forall x : R, x [#] [0] -> [0] [<] x[^]2.
 Proof.
  intros x H.
  elim (ap_imp_less _ _ _ H); intro H1.
   rstepr ([--]x[*][--]x).
-  cut (Zero [<] [--]x). intro.
+  cut ([0] [<] [--]x). intro.
    apply mult_resp_pos; auto.
   astepl ([--]ZeroR).
   apply inv_resp_less. auto.
@@ -980,10 +980,10 @@ Proof.
  apply mult_resp_pos; auto.
 Qed.
 
-Lemma mult_cancel_pos_rht : forall x y : R, Zero [<] x[*]y -> Zero [<=] x -> Zero [<] y.
+Lemma mult_cancel_pos_rht : forall x y : R, [0] [<] x[*]y -> [0] [<=] x -> [0] [<] y.
 Proof.
  intros x y H.
- destruct (leEq_def _ Zero x) as [H0 _].
+ destruct (leEq_def _ [0] x) as [H0 _].
  intro H2. pose (H3:=(H0 H2)).
  elim (mult_pos_imp _ _ H); intro H1.
   elim H1; auto.
@@ -991,7 +991,7 @@ Proof.
  contradiction.
 Qed.
 
-Lemma mult_cancel_pos_lft : forall x y : R, Zero [<] x[*]y -> Zero [<=] y -> Zero [<] x.
+Lemma mult_cancel_pos_lft : forall x y : R, [0] [<] x[*]y -> [0] [<=] y -> [0] [<] x.
 Proof.
  intros.
  apply mult_cancel_pos_rht with y.
@@ -999,14 +999,14 @@ Proof.
   auto. auto.
 Qed.
 
-Lemma pos_wd : forall x y : R, x [=] y -> Zero [<] y -> Zero [<] x.
+Lemma pos_wd : forall x y : R, x [=] y -> [0] [<] y -> [0] [<] x.
 Proof.
  intros.
  astepr y.
  auto.
 Qed.
 
-Lemma even_power_pos : forall n, even n -> forall x : R, x [#] Zero -> Zero [<] x[^]n.
+Lemma even_power_pos : forall n, even n -> forall x : R, x [#] [0] -> [0] [<] x[^]n.
 Proof.
  intros.
  elim (even_2n n H). intros m y.
@@ -1018,7 +1018,7 @@ Proof.
 Qed.
 
 
-Lemma odd_power_cancel_pos : forall n, odd n -> forall x : R, Zero [<] x[^]n -> Zero [<] x.
+Lemma odd_power_cancel_pos : forall n, odd n -> forall x : R, [0] [<] x[^]n -> [0] [<] x.
 Proof.
  intros n H x H0.
  induction  n as [| n Hrecn].
@@ -1035,7 +1035,7 @@ Proof.
   auto with arith.
 Qed.
 
-Lemma plus_resp_pos : forall x y : R, Zero [<] x -> Zero [<] y -> Zero [<] x[+]y.
+Lemma plus_resp_pos : forall x y : R, [0] [<] x -> [0] [<] y -> [0] [<] x[+]y.
 Proof.
  intros.
  apply plus_resp_pos_nonneg.
@@ -1049,13 +1049,13 @@ Proof.
   (* base *)
   astepr OneR; apply pos_one.
  (* step *)
- apply less_leEq_trans with (nring (R:=R) n0[+]One).
+ apply less_leEq_trans with (nring (R:=R) n0[+][1]).
   assumption.
  apply less_leEq.
  apply less_plusOne.
 Qed.
 
-Lemma square_eq_pos : forall x a : R, Zero [<] a -> Zero [<] x -> x[^]2 [=] a[^]2 -> x [=] a.
+Lemma square_eq_pos : forall x a : R, [0] [<] a -> [0] [<] x -> x[^]2 [=] a[^]2 -> x [=] a.
 Proof.
  intros.
  elim (square_eq _ x a); intros; auto.
@@ -1069,7 +1069,7 @@ Proof.
  apply Greater_imp_ap; auto.
 Qed.
 
-Lemma square_eq_neg : forall x a : R, Zero [<] a -> x [<] Zero -> x[^]2 [=] a[^]2 -> x [=] [--]a.
+Lemma square_eq_neg : forall x a : R, [0] [<] a -> x [<] [0] -> x[^]2 [=] a[^]2 -> x [=] [--]a.
 Proof.
  intros.
  elim (square_eq _ x a); intros; auto.
@@ -1091,7 +1091,7 @@ Hint Resolve mult_resp_nonneg.
 %\end{convention}%
 *)
 
-Definition one_div_succ (R : COrdField) i : R := One[/] Snring R i[//]nringS_ap_zero _ i.
+Definition one_div_succ (R : COrdField) i : R := [1][/] Snring R i[//]nringS_ap_zero _ i.
 
 Implicit Arguments one_div_succ [R].
 
@@ -1108,7 +1108,7 @@ Proof.
  auto with arith.
 Qed.
 
-Lemma one_div_succ_pos : forall i, (Zero:R) [<] one_div_succ i.
+Lemma one_div_succ_pos : forall i, ([0]:R) [<] one_div_succ i.
 Proof.
  intro.
  unfold one_div_succ in |- *.
@@ -1134,7 +1134,7 @@ End One_div_succ_properties.
 ** Properties of [Half]
 *)
 
-Definition Half (R : COrdField) := (One:R) [/]TwoNZ.
+Definition Half (R : COrdField) := ([1]:R) [/]TwoNZ.
 
 Implicit Arguments Half [R].
 
@@ -1148,17 +1148,17 @@ Let [R] be an ordered field.
 
 Variable R : COrdField.
 
-Lemma half_1 : (Half:R) [*]Two [=] One.
+Lemma half_1 : (Half:R) [*]Two [=] [1].
 Proof.
  unfold Half in |- *.
  apply div_1.
 Qed.
 Hint Resolve half_1: algebra.
 
-Lemma pos_half : (Zero:R) [<] Half.
+Lemma pos_half : ([0]:R) [<] Half.
 Proof.
  apply mult_cancel_pos_lft with (Two:R).
-  apply (pos_wd R (Half[*]Two) One).
+  apply (pos_wd R (Half[*]Two) [1]).
    exact half_1.
   apply pos_one.
  apply less_leEq; apply pos_two.
@@ -1171,25 +1171,25 @@ Proof.
  rational.
 Qed.
 
-Lemma half_2 : (Half:R) [+]Half [=] One.
+Lemma half_2 : (Half:R) [+]Half [=] [1].
 Proof.
  unfold Half in |- *.
  rational.
 Qed.
 
-Lemma half_lt1 : (Half:R) [<] One.
+Lemma half_lt1 : (Half:R) [<] [1].
 Proof.
  astepr (Half[+] (Half:R)).
-  rstepl ((Half:R) [+]Zero).
+  rstepl ((Half:R) [+][0]).
   apply plus_resp_less_lft.
   exact pos_half.
  exact half_2.
 Qed.
 
-Lemma half_3 : forall x : R, Zero [<] x -> Half[*]x [<] x.
+Lemma half_3 : forall x : R, [0] [<] x -> Half[*]x [<] x.
 Proof.
  intros.
- astepr (One[*]x).
+ astepr ([1][*]x).
  apply mult_resp_less; auto.
  exact half_lt1.
 Qed.

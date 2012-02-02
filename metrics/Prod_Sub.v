@@ -133,7 +133,7 @@ Proof.
    case x.
    case y.
    intros.
-   astepl (ZeroR[+]Zero).
+   astepl (ZeroR[+][0]).
    apply plus_resp_leEq_both.
     apply ax_d_nneg.
     apply CPsMetricSpace_is_CPsMetricSpace.

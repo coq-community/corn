@@ -576,7 +576,7 @@ Proof.
  set (fa := Part _ _ (incf N x0 Hx0)) in *.
  apply leEq_wdl with (AbsIR (Fx[-]fx[+] (fx[-]fa) [+] (fa[-]Fa))).
   2: apply AbsIR_wd; rational.
- rstepr (e [/]TwoNZ[+]Zero[+]e [/]TwoNZ).
+ rstepr (e [/]TwoNZ[+][0][+]e [/]TwoNZ).
  eapply leEq_transitive.
   apply triangle_IR.
  apply plus_resp_leEq_both.
@@ -788,14 +788,14 @@ Proof.
  algebra.
 Qed.
 
-Lemma conv_zero_fun_series_IR : fun_series_convergent_IR J (fun n => [-C-]Zero).
+Lemma conv_zero_fun_series_IR : fun_series_convergent_IR J (fun n => [-C-][0]).
 Proof.
  apply conv_fun_const_series_IR with (x := fun n : nat => ZeroR).
  apply conv_zero_series.
 Qed.
 
-Lemma FSeries_Sum_zero_IR : forall (H : fun_series_convergent_IR J (fun n => [-C-]Zero))
-   x Hx, FSeries_Sum H x Hx [=] Zero.
+Lemma FSeries_Sum_zero_IR : forall (H : fun_series_convergent_IR J (fun n => [-C-][0]))
+   x Hx, FSeries_Sum H x Hx [=] [0].
 Proof.
  intros.
  simpl in |- *.
@@ -968,7 +968,7 @@ Proof.
  intros; apply eq_imp_leEq; apply eq_symmetric_unfolded; apply FAbs_char.
 Qed.
 
-Lemma fun_ratio_test_conv_IR : {N : nat | {c : IR | c [<] One | Zero [<=] c /\ (forall x,
+Lemma fun_ratio_test_conv_IR : {N : nat | {c : IR | c [<] [1] | [0] [<=] c /\ (forall x,
   J x -> forall n, N <= n -> forall Hx Hx', AbsIR (f (S n) x Hx') [<=] c[*]AbsIR (f n x Hx))}} ->
  fun_series_convergent_IR J f.
 Proof.
@@ -991,7 +991,7 @@ Section Power_Series.
 The geometric series converges on the open interval (-1, 1)
 *)
 
-Lemma fun_power_series_conv_IR : fun_series_convergent_IR (olor ([--]One) One) (fun (i:nat) => Fid IR{^}i).
+Lemma fun_power_series_conv_IR : fun_series_convergent_IR (olor ([--][1]) [1]) (fun (i:nat) => Fid IR{^}i).
 Proof.
  intros a b Hab H.
  apply fun_ratio_test_conv.
@@ -1049,7 +1049,7 @@ Hypothesis convF : fun_series_convergent_IR J f.
 
 Definition insert_series n : PartIR :=
   match n with
-  | O => [-C-]Zero
+  | O => [-C-][0]
   | S p => f p
   end.
 

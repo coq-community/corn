@@ -462,7 +462,7 @@ Qed.
 (** This version of multiply computes a bound on the second argument
 just in time.  It should be avoided in favour of the bounded version
 whenever possible. *)
-Instance CRmult: RingMult CR := λ x y, ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
+Instance CRmult: Mult CR := λ x y, ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
 
 Infix "*" := CRmult : CR_scope.
 

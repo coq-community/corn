@@ -55,7 +55,7 @@ Variables a b : nat -> IR.
 Hypothesis a_mon : forall i : nat, a i [<=] a (S i).
 Hypothesis b_mon : forall i : nat, b (S i) [<=] b i.
 Hypothesis a_b : forall i : nat, a i [<] b i.
-Hypothesis b_a : forall eps : IR, Zero [<] eps -> {i : nat | b i [<=] a i[+]eps}.
+Hypothesis b_a : forall eps : IR, [0] [<] eps -> {i : nat | b i [<=] a i[+]eps}.
 
 Lemma a_mon' : forall i j : nat, i <= j -> a i [<=] a j.
 Proof.
@@ -152,8 +152,8 @@ Qed.
 Variable f : CSetoid_un_op IR.
 Hypothesis f_contin : contin f.
 
-Lemma f_contin_pos : forall z : IR, Zero [<] f z ->
- {eps : IR | Zero [<] eps | forall x, x [<=] z[+]eps -> z [<=] x[+]eps -> Zero [<] f x}.
+Lemma f_contin_pos : forall z : IR, [0] [<] f z ->
+ {eps : IR | [0] [<] eps | forall x, x [<=] z[+]eps -> z [<=] x[+]eps -> [0] [<] f x}.
 Proof.
  intros z H.
  unfold contin in f_contin.
@@ -175,15 +175,15 @@ Proof.
   apply shift_minus_leEq. astepr (x[+]eps). auto.
 Qed.
 
-Lemma f_contin_neg : forall z : IR, f z [<] Zero ->
- {eps : IR | Zero [<] eps | forall x, x [<=] z[+]eps -> z [<=] x[+]eps -> f x [<] Zero}.
+Lemma f_contin_neg : forall z : IR, f z [<] [0] ->
+ {eps : IR | [0] [<] eps | forall x, x [<=] z[+]eps -> z [<=] x[+]eps -> f x [<] [0]}.
 Proof.
  intros.
  unfold contin in f_contin.
  unfold continAt in f_contin.
  unfold funLim in f_contin.
  unfold AbsSmall in f_contin.
- cut (Zero [<] [--] (f z)). intro H0.
+ cut ([0] [<] [--] (f z)). intro H0.
   elim (f_contin z ( [--] (f z) [/]TwoNZ) (pos_div_two _ _ H0)). intro eps. intros H2 H3.
   exists eps.
    auto. intros.
@@ -203,12 +203,12 @@ Proof.
  apply inv_resp_less. auto.
 Qed.
 
-(** Assume also that [forall i, f (a i) [<=] Zero [<=] f (b i)]. *)
+(** Assume also that [forall i, f (a i) [<=] [0] [<=] f (b i)]. *)
 
-Hypothesis f_a : forall i, f (a i) [<=] Zero.
-Hypothesis f_b : forall i, Zero [<=] f (b i).
+Hypothesis f_a : forall i, f (a i) [<=] [0].
+Hypothesis f_b : forall i, [0] [<=] f (b i).
 
-Lemma Cnested_intervals_zero : {z : IR | a 0 [<=] z /\ z [<=] b 0 /\ f z [=] Zero}.
+Lemma Cnested_intervals_zero : {z : IR | a 0 [<=] z /\ z [<=] b 0 /\ f z [=] [0]}.
 Proof.
  elim Cnested_intervals_limit. intro z. intros H0 H1. exists z.
  split. auto. split. auto.
@@ -222,7 +222,7 @@ Proof.
     cut (z [<=] b i[+]eps). intro.
      pose (c:= f_b i). rewrite -> leEq_def in c. apply c. apply H6. auto. auto.
      apply leEq_transitive with (b i). auto.
-     astepl (b i[+]Zero). apply plus_resp_leEq_lft. apply less_leEq. auto.
+     astepl (b i[+][0]). apply plus_resp_leEq_lft. apply less_leEq. auto.
     apply leEq_transitive with (a i[+]eps). auto.
     apply plus_resp_leEq. auto. auto.
    elim (f_contin_pos z H3). intro eps. intros H5 H6.
@@ -232,7 +232,7 @@ Proof.
     pose (c:= f_a i). rewrite -> leEq_def in c; apply c. apply H6. auto. auto.
     apply leEq_transitive with (b i). auto.
     auto. apply leEq_transitive with z. auto.
-  astepl (z[+]Zero). apply less_leEq. apply plus_resp_less_lft. auto.
+  astepl (z[+][0]). apply less_leEq. apply plus_resp_less_lft. auto.
   auto.
 Qed.
 
@@ -245,11 +245,11 @@ Section Bisection.
 
 Variable f : CSetoid_un_op IR.
 Hypothesis f_apzero_interval :
-  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] Zero}.
+  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] [0]}.
 Variables a b : IR.
 Hypothesis a_b : a [<] b.
-Hypothesis f_a : f a [<=] Zero.
-Hypothesis f_b : Zero [<=] f b.
+Hypothesis f_a : f a [<=] [0].
+Hypothesis f_b : [0] [<=] f b.
 
 (**
 %\begin{convention}% Let [Small] denote [Two[/]ThreeNZ], [lft] be [(Two[*]a[+]b) [/]ThreeNZ] and [rht] be [(a[+]Two[*]b) [/]ThreeNZ].
@@ -308,11 +308,11 @@ Qed.
 Hint Resolve smaller_lft smaller_rht: algebra.
 
 Lemma Cbisect' : {a' : IR | {b' : IR |
- a' [<] b' | a [<=] a' /\ b' [<=] b /\ b'[-]a' [<=] Small[*] (b[-]a) /\ f a' [<=] Zero /\ Zero [<=] f b'}}.
+ a' [<] b' | a [<=] a' /\ b' [<=] b /\ b'[-]a' [<=] Small[*] (b[-]a) /\ f a' [<=] [0] /\ [0] [<=] f b'}}.
 Proof.
  elim (f_apzero_interval lft rht lft_rht). intro c. intro H.
  elim H. intros H0 H2 H3.
- cut ({f c [<=] Zero} + {Zero [<=] f c}).
+ cut ({f c [<=] [0]} + {[0] [<=] f c}).
   intro H4; inversion_clear H4.
    exists c. exists b.
    apply leEq_less_trans with rht. auto. apply rht_b.
@@ -338,7 +338,7 @@ Section Bisect_Interval.
 
 Variable f : CSetoid_un_op IR.
 Hypothesis C_f_apzero_interval :
-  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] Zero}.
+  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] [0]}.
 
 (* begin hide *)
 Let Small : IR := Two [/]ThreeNZ.
@@ -348,8 +348,8 @@ Record bisect_interval : Type :=
   {interval_lft     : IR;
    interval_rht     : IR;
    interval_lft_rht : interval_lft [<] interval_rht;
-   interval_f_lft   : f interval_lft [<=] Zero;
-   interval_f_rht   : Zero [<=] f interval_rht}.
+   interval_f_lft   : f interval_lft [<=] [0];
+   interval_f_rht   : [0] [<=] f interval_rht}.
 
 Lemma Cbisect_exists : forall I : bisect_interval, {I' : bisect_interval |
  interval_rht I'[-]interval_lft I' [<=] Small[*] (interval_rht I[-]interval_lft I) /\
@@ -391,11 +391,11 @@ Same conventions as before.
 Variable f : CSetoid_un_op IR.
 Hypothesis f_contin : contin f.
 Hypothesis f_apzero_interval :
-  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] Zero}.
+  forall a b, a [<] b -> {c : IR | a [<=] c /\ c [<=] b | f c [#] [0]}.
 Variables a b : IR.
 Hypothesis a_b : a [<] b.
-Hypothesis f_a : f a [<=] Zero.
-Hypothesis f_b : Zero [<=] f b.
+Hypothesis f_a : f a [<=] [0].
+Hypothesis f_b : [0] [<=] f b.
 
 (* begin hide *)
 Let Small : IR := Two [/]ThreeNZ.
@@ -431,7 +431,7 @@ Proof.
  unfold Small in |- *. apply div_resp_pos. apply pos_three. apply pos_two.
 Qed.
 
-Lemma intervals_small'' : forall i : nat, Small[^]i[*]nring i [<=] One.
+Lemma intervals_small'' : forall i : nat, Small[^]i[*]nring i [<=] [1].
 Proof.
  intros.
  apply mult_cancel_leEq with (Three[^]i:IR).
@@ -477,12 +477,12 @@ Proof.
  apply nring_leEq. auto.
 Qed.
 
-Lemma intervals_small' : forall eps, Zero [<] eps -> {i : nat | Small[^]i[*] (b[-]a) [<=] eps}.
+Lemma intervals_small' : forall eps, [0] [<] eps -> {i : nat | Small[^]i[*] (b[-]a) [<=] eps}.
 Proof.
  intros.
- cut (eps [#] Zero). intro H0.
+ cut (eps [#] [0]). intro H0.
   elim (Archimedes (b[-]a[/] eps[//]H0)). intro i. intros H1. exists i.
-  astepr (eps[*]One).
+  astepr (eps[*][1]).
   apply shift_leEq_mult' with H0. auto.
    apply leEq_transitive with (Small[^]i[*]nring i).
    astepl (Small[^]i[*] (b[-]a[/] eps[//]H0)).
@@ -496,7 +496,7 @@ Proof.
  apply Greater_imp_ap. auto.
 Qed.
 
-Lemma intervals_small : forall eps, Zero [<] eps -> {i : nat | b_ i [<=] a_ i[+]eps}.
+Lemma intervals_small : forall eps, [0] [<] eps -> {i : nat | b_ i [<=] a_ i[+]eps}.
 Proof.
  intros eps H.
  elim (intervals_small' eps H). intro i. intros. exists i.
@@ -506,13 +506,13 @@ Proof.
  auto.
 Qed.
 
-Lemma Civt_op : {z : IR | a [<=] z /\ z [<=] b /\ f z [=] Zero}.
+Lemma Civt_op : {z : IR | a [<=] z /\ z [<=] b /\ f z [=] [0]}.
 Proof.
  cut (forall i : nat, a_ i [<=] a_ (S i)). intro H.
   cut (forall i : nat, b_ (S i) [<=] b_ i). intro H0.
    cut (forall i : nat, a_ i [<] b_ i). intro H1.
-    cut (forall i : nat, f (a_ i) [<=] Zero). intro H2.
-     cut (forall i : nat, Zero [<=] f (b_ i)). intro H3.
+    cut (forall i : nat, f (a_ i) [<=] [0]). intro H2.
+     cut (forall i : nat, [0] [<=] f (b_ i)). intro H3.
       elim (Cnested_intervals_zero a_ b_ H H0 H1 intervals_small f f_contin H2 H3).
       intro z. intro H4. exists z.
       exact H4.
@@ -535,16 +535,16 @@ Section IVT_Poly.
 (**
 ** IVT for polynomials *)
 
-Lemma Civt_poly : forall f : cpoly_cring IR, f [#] Zero ->
- forall a b, a [<] b -> f ! a [<=] Zero -> Zero [<=] f ! b -> {x : IR | a [<=] x /\ x [<=] b /\ f ! x [=] Zero}.
+Lemma Civt_poly : forall f : cpoly_cring IR, f [#] [0] ->
+ forall a b, a [<] b -> f ! a [<=] [0] -> [0] [<=] f ! b -> {x : IR | a [<=] x /\ x [<=] b /\ f ! x [=] [0]}.
 Proof.
  intros.
- cut ({x : IR | a [<=] x /\ x [<=] b /\ cpoly_csetoid_op _ f x [=] Zero}).
+ cut ({x : IR | a [<=] x /\ x [<=] b /\ cpoly_csetoid_op _ f x [=] [0]}).
   intro. auto.
   apply Civt_op; auto.
   apply cpoly_op_contin.
  intros.
- change {c : IR | a0 [<=] c /\ c [<=] b0 | f ! c [#] Zero} in |- *.
+ change {c : IR | a0 [<=] c /\ c [<=] b0 | f ! c [#] [0]} in |- *.
  apply Cpoly_apzero_interval. auto. auto.
 Qed.
 

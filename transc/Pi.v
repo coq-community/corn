@@ -50,27 +50,27 @@ Section Properties_of_Pi.
 
 Fixpoint pi_seq (n : nat) : IR :=
   match n with
-  | O => Zero
+  | O => [0]
   | S p => pi_seq p[+]Cos (pi_seq p)
   end.
 
 Opaque Cosine.
 
 (* begin hide *)
-Lemma pi_seq_lemma : forall n, Zero [<=] pi_seq n
-  and (forall t : IR, Zero [<=] t -> t [<=] pi_seq n -> Zero [<] Cos t).
+Lemma pi_seq_lemma : forall n, [0] [<=] pi_seq n
+  and (forall t : IR, [0] [<=] t -> t [<=] pi_seq n -> [0] [<] Cos t).
 Proof.
  intro; induction  n as [| n Hrecn].
   split; intros.
    simpl in |- *; apply leEq_reflexive.
   simpl in H0.
-  cut (t [=] Zero); [ intro | apply leEq_imp_eq; auto ].
-  astepr (Cos Zero).
+  cut (t [=] [0]); [ intro | apply leEq_imp_eq; auto ].
+  astepr (Cos [0]).
   astepr OneR.
   apply pos_one.
  inversion_clear Hrecn; split.
   astepr (pi_seq n[+]Cos (pi_seq n)).
-  astepl (ZeroR[+]Zero); apply plus_resp_leEq_both.
+  astepl (ZeroR[+][0]); apply plus_resp_leEq_both.
    auto.
   apply less_leEq; apply X; auto.
   apply leEq_reflexive.
@@ -116,7 +116,7 @@ Proof.
  eapply leEq_less_trans.
   apply leEq_AbsIR.
  eapply less_leEq_trans.
-  apply (ub_Integral _ _ _ _ H4 (less_imp_ap _ _ _ H1) One) with x I.
+  apply (ub_Integral _ _ _ _ H4 (less_imp_ap _ _ _ H1) [1]) with x I.
     intros.
     apply leEq_wdl with (AbsIR (Sin x0)).
      apply AbsIR_Sin_leEq_One.
@@ -138,16 +138,16 @@ Qed.
 
 (**
 This sequence is nonnegative and the cosine of any number between
-[Zero] and any of its values is strictly positive; therefore the
+[[0]] and any of its values is strictly positive; therefore the
 sequence is strictly increasing.
 *)
 
-Lemma pi_seq_nonneg : forall n : nat, Zero [<=] pi_seq n.
+Lemma pi_seq_nonneg : forall n : nat, [0] [<=] pi_seq n.
 Proof.
  intro; elim (pi_seq_lemma n); auto.
 Qed.
 
-Lemma cos_pi_seq_pos : forall n t, Zero [<=] t -> t [<=] pi_seq n -> Zero [<] Cos t.
+Lemma cos_pi_seq_pos : forall n t, [0] [<=] t -> t [<=] pi_seq n -> [0] [<] Cos t.
 Proof.
  intro; elim (pi_seq_lemma n); auto.
 Qed.
@@ -163,7 +163,7 @@ Qed.
 
 (** Trivial---but useful---consequences. *)
 
-Lemma sin_pi_seq_mon : forall x y n, Zero [<=] x -> x [<=] y -> y [<=] pi_seq n -> Sin x [<=] Sin y.
+Lemma sin_pi_seq_mon : forall x y n, [0] [<=] x -> x [<=] y -> y [<=] pi_seq n -> Sin x [<=] Sin y.
 Proof.
  intros; simpl in |- *.
  apply Derivative_imp_resp_leEq with realline I Cosine.
@@ -193,24 +193,24 @@ Proof.
  apply leEq_imp_Max_is_rht; auto.
 Qed.
 
-Lemma sin_pi_seq_nonneg : forall n : nat, Zero [<=] Sin (pi_seq n).
+Lemma sin_pi_seq_nonneg : forall n : nat, [0] [<=] Sin (pi_seq n).
 Proof.
  intro.
- astepl (Sin Zero).
+ astepl (Sin [0]).
  apply sin_pi_seq_mon with n.
    apply leEq_reflexive.
   apply pi_seq_nonneg.
  apply leEq_reflexive.
 Qed.
 
-Lemma sin_pi_seq_gt_one : forall t n, One [<=] t -> t [<=] pi_seq (S n) -> Sin One [<=] Sin t.
+Lemma sin_pi_seq_gt_one : forall t n, [1] [<=] t -> t [<=] pi_seq (S n) -> Sin [1] [<=] Sin t.
 Proof.
  intros.
  apply sin_pi_seq_mon with (S n); auto.
  apply less_leEq; apply pos_one.
 Qed.
 
-Lemma cos_pi_seq_mon : forall x y n, Zero [<=] x -> x [<=] y -> y [<=] pi_seq n -> Cos y [<=] Cos x.
+Lemma cos_pi_seq_mon : forall x y n, [0] [<=] x -> x [<=] y -> y [<=] pi_seq n -> Cos y [<=] Cos x.
 Proof.
  intros.
  apply power_cancel_leEq with 2.
@@ -219,13 +219,13 @@ Proof.
    auto.
   apply leEq_transitive with y; auto.
  apply inv_cancel_leEq.
- rstepl (One[-]Cos x[^]2[-]One).
- rstepr (One[-]Cos y[^]2[-]One).
+ rstepl ([1][-]Cos x[^]2[-][1]).
+ rstepr ([1][-]Cos y[^]2[-][1]).
  apply minus_resp_leEq.
  apply leEq_wdl with (Sin x[^]2).
   apply leEq_wdr with (Sin y[^]2).
    apply nexp_resp_leEq.
-    astepl (Sin Zero); apply sin_pi_seq_mon with n.
+    astepl (Sin [0]); apply sin_pi_seq_mon with n.
       apply leEq_reflexive.
      auto.
     apply leEq_transitive with y; auto.
@@ -241,12 +241,12 @@ Proof.
 Qed.
 
 (* begin hide *)
-Lemma pi_seq_gt_one : forall n : nat, One [<=] pi_seq (S n).
+Lemma pi_seq_gt_one : forall n : nat, [1] [<=] pi_seq (S n).
 Proof.
  intros.
  apply leEq_wdl with (pi_seq 1).
   2: simpl in |- *.
-  2: Step_final (Cos Zero).
+  2: Step_final (Cos [0]).
  apply local_mon_imp_mon'.
   intro; apply pi_seq_incr; auto.
  auto with arith.
@@ -255,12 +255,12 @@ Qed.
 Lemma pi_seq_bnd :
   forall n : nat,
   pi_seq (S (S (S n))) [-]pi_seq (S (S n)) [<=]
-  (One[-]Sin One) [*] (pi_seq (S (S n)) [-]pi_seq (S n)).
+  ([1][-]Sin [1]) [*] (pi_seq (S (S n)) [-]pi_seq (S n)).
 Proof.
  intros.
  set (F := FId{+}Cosine) in *.
- assert (H : Derivative realline I F ( [-C-]One{+}{--}Sine)). unfold F in |- *; Deriv.
-  astepr (Zero[+] (One[-]Sin One) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
+ assert (H : Derivative realline I F ( [-C-][1]{+}{--}Sine)). unfold F in |- *; Deriv.
+  astepr ([0][+] ([1][-]Sin [1]) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
  apply shift_leEq_plus.
  apply approach_zero_weak; intros e H0.
  elim (Law_of_the_Mean _ _ _ _ H (pi_seq (S n)) (pi_seq (S (S n)))) with e.
@@ -270,7 +270,7 @@ Proof.
  intros t H1 H2.
  unfold F in H2.
  apply leEq_transitive with (pi_seq (S (S (S n))) [-]pi_seq (S (S n)) [-]
-   (One[-]Sin t) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
+   ([1][-]Sin t) [*] (pi_seq (S (S n)) [-]pi_seq (S n))).
   unfold cg_minus at 1 5 in |- *; apply plus_resp_leEq_lft.
   apply inv_resp_leEq.
   apply mult_resp_leEq_rht.
@@ -300,7 +300,7 @@ Qed.
 Lemma pi_seq_bnd' :
   forall n : nat,
   pi_seq (S (S (S n))) [-]pi_seq (S (S n)) [<=]
-  (One[-]Sin One) [^]S n[*] (pi_seq 2[-]pi_seq 1).
+  ([1][-]Sin [1]) [^]S n[*] (pi_seq 2[-]pi_seq 1).
 Proof.
  intro; induction  n as [| n Hrecn].
   eapply leEq_wdr.
@@ -308,11 +308,11 @@ Proof.
   algebra.
  eapply leEq_transitive.
   apply pi_seq_bnd.
- apply leEq_wdr with ((One[-]Sin One) [*] ((One[-]Sin One) [^]S n[*] (pi_seq 2[-]pi_seq 1))).
+ apply leEq_wdr with (([1][-]Sin [1]) [*] (([1][-]Sin [1]) [^]S n[*] (pi_seq 2[-]pi_seq 1))).
   2: simpl in |- *; rational.
  apply mult_resp_leEq_lft.
   auto.
- apply shift_leEq_minus; astepl (Sin One).
+ apply shift_leEq_minus; astepl (Sin [1]).
  eapply leEq_transitive.
   apply leEq_AbsIR.
  apply AbsIR_Sin_leEq_One.
@@ -321,7 +321,7 @@ Qed.
 Lemma pi_seq_bnd'' :
   forall n : nat,
   2 <= n ->
-  pi_seq (S n) [-]pi_seq n [<=] (One[-]Sin One) [^]pred n[*] (pi_seq 2[-]pi_seq 1).
+  pi_seq (S n) [-]pi_seq n [<=] ([1][-]Sin [1]) [^]pred n[*] (pi_seq 2[-]pi_seq 1).
 Proof.
  intro; case n.
   intros; elimtype False; inversion H.
@@ -336,9 +336,9 @@ Qed.
 
 (** An auxiliary result. *)
 
-Lemma Sin_One_pos : Zero [<] Sin One.
+Lemma Sin_One_pos : [0] [<] Sin [1].
 Proof.
- astepl (Sin Zero).
+ astepl (Sin [0]).
  simpl in |- *.
  apply Derivative_imp_resp_less with realline I Cosine.
      Deriv.
@@ -346,12 +346,12 @@ Proof.
    simpl in |- *; auto.
   simpl in |- *; auto.
  intros.
- apply less_leEq_trans with (Cos One).
+ apply less_leEq_trans with (Cos [1]).
   apply less_wdr with (Cos (pi_seq 1)).
-   2: astepl (Cos (Zero[+]Cos Zero)); apply Cos_wd; Step_final (Cos Zero).
+   2: astepl (Cos ([0][+]Cos [0])); apply Cos_wd; Step_final (Cos [0]).
   apply cos_pi_seq_pos with 1.
    simpl in |- *.
-   astepr (Cos Zero); astepr OneR.
+   astepr (Cos [0]); astepr OneR.
    apply less_leEq; apply pos_one.
   apply leEq_reflexive.
  apply leEq_glb.
@@ -366,7 +366,7 @@ Proof.
    apply H1.
   apply leEq_imp_Max_is_rht; apply less_leEq; apply pos_one.
  apply eq_imp_leEq; simpl in |- *.
- Step_final (Cos Zero).
+ Step_final (Cos [0]).
 Qed.
 
 (** We can now prove that this is a Cauchy sequence.  We define [Pi] as
@@ -376,11 +376,11 @@ twice its limit.
 Lemma pi_seq_Cauchy : Cauchy_prop pi_seq.
 Proof.
  intros e H.
- cut (Zero [<] pi_seq 2[-]pi_seq 1). intro H0.
-  assert (H1 : pi_seq 2[-]pi_seq 1 [#] Zero). apply Greater_imp_ap; auto.
-   cut (Sin One [<] One).
+ cut ([0] [<] pi_seq 2[-]pi_seq 1). intro H0.
+  assert (H1 : pi_seq 2[-]pi_seq 1 [#] [0]). apply Greater_imp_ap; auto.
+   cut (Sin [1] [<] [1]).
    intro Sin_One_less_One.
-   elim qi_yields_zero with (e := Sin One[*]e[/] _[//]H1) (q := One[-]Sin One).
+   elim qi_yields_zero with (e := Sin [1][*]e[/] _[//]H1) (q := [1][-]Sin [1]).
       intros N HN.
       exists (S (S N)); intros.
       apply AbsIR_imp_AbsSmall.
@@ -397,7 +397,7 @@ Proof.
          2: algebra.
         2: auto with arith.
        2: rewrite <- H3; algebra.
-      set (z := One[-]Sin One) in *.
+      set (z := [1][-]Sin [1]) in *.
       apply leEq_transitive with (Sum (S (S N)) (pred m)
         (fun i : nat => z[^]pred i[*] (pi_seq 2[-]pi_seq 1))).
        apply Sum_resp_leEq.
@@ -413,14 +413,14 @@ Proof.
        2: cut (pred m = S (pred (pred m))); [ intro | apply S_pred with N; auto with arith ].
        2: pattern (pred m) at 2 in |- *; rewrite H4.
        2: apply Sum_shift; algebra.
-      cut (z[-]One [#] Zero). intro H4.
+      cut (z[-][1] [#] [0]). intro H4.
        eapply leEq_wdl.
         2: apply eq_symmetric_unfolded; apply Sum_c_exp with (H := H4).
        rstepl ((z[^]S (pred (pred m)) [/] _[//]H4) [-] (z[^]S N[/] _[//]H4)).
        apply leEq_transitive with ( [--] (z[^]S N) [/] _[//]H4).
         apply shift_minus_leEq; rstepr ZeroR; apply less_leEq.
         unfold z in |- *.
-        rstepl ( [--] ((One[-]Sin One) [^]S (pred (pred m))) [/] Sin One[//] pos_ap_zero _ _ Sin_One_pos).
+        rstepl ( [--] (([1][-]Sin [1]) [^]S (pred (pred m))) [/] Sin [1][//] pos_ap_zero _ _ Sin_One_pos).
         apply shift_div_less.
          apply Sin_One_pos.
         astepr ZeroR; astepr ( [--]ZeroR).
@@ -430,7 +430,7 @@ Proof.
         apply nexp_resp_less.
           auto with arith.
          apply leEq_reflexive.
-        apply shift_less_minus; astepl (Sin One).
+        apply shift_less_minus; astepl (Sin [1]).
         auto.
        unfold z at 2 in |- *.
        rstepl (z[^]S N[/] _[//]pos_ap_zero _ _ Sin_One_pos).
@@ -440,22 +440,22 @@ Proof.
         eapply leEq_transitive.
          2: apply HN.
         simpl in |- *.
-        astepr (nexp IR N z[*]One); apply mult_resp_leEq_lft.
+        astepr (nexp IR N z[*][1]); apply mult_resp_leEq_lft.
          unfold z in |- *.
          apply shift_minus_leEq; apply shift_leEq_plus'.
          astepl ZeroR; apply less_leEq; apply Sin_One_pos.
         astepr (z[^]N); apply nexp_resp_nonneg.
         unfold z in |- *.
-        apply shift_leEq_minus; astepl (Sin One).
+        apply shift_leEq_minus; astepl (Sin [1]).
         apply less_leEq; auto.
        apply eq_imp_leEq.
        rational.
       unfold z in |- *.
-      rstepl ( [--] (Sin One)).
+      rstepl ( [--] (Sin [1])).
       apply inv_resp_ap_zero.
       apply Greater_imp_ap; apply Sin_One_pos.
      apply shift_leEq_minus.
-     apply less_leEq; astepl (Sin One); auto.
+     apply less_leEq; astepl (Sin [1]); auto.
     apply shift_minus_less; apply shift_less_plus'.
     astepl ZeroR; apply Sin_One_pos.
    apply div_resp_pos.
@@ -466,7 +466,7 @@ Proof.
   apply cos_pi_seq_pos with 1.
    apply less_leEq; apply pos_one.
   simpl in |- *.
-  apply eq_imp_leEq; Step_final (Cos Zero).
+  apply eq_imp_leEq; Step_final (Cos [0]).
  apply shift_less_minus; astepl (pi_seq 1).
  apply pi_seq_incr; auto.
 Qed.
@@ -478,7 +478,7 @@ For $x\in[0,\frac{\pi}2)$#x&isin;[0,&pi;/2)#, [(Cos x) [>] 0];
 $\cos(\frac{pi}2)=0$#cos(&pi;/2)=0#.
 *)
 
-Lemma pos_cos : forall x, Zero [<=] x -> x [<] Pi [/]TwoNZ -> Zero [<] Cos x.
+Lemma pos_cos : forall x, [0] [<=] x -> x [<] Pi [/]TwoNZ -> [0] [<] Cos x.
 Proof.
  intros x H H0.
  assert (H1 : x [<] Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
@@ -489,7 +489,7 @@ Proof.
  apply less_leEq; auto.
 Qed.
 
-Lemma Cos_HalfPi : Cos (Pi [/]TwoNZ) [=] Zero.
+Lemma Cos_HalfPi : Cos (Pi [/]TwoNZ) [=] [0].
  apply eq_transitive_unfolded with (Cos (Lim (Build_CauchySeq _ _ pi_seq_Cauchy))).
 Proof.
   apply Cos_wd; unfold Pi in |- *; rational.
@@ -540,7 +540,7 @@ Proof.
  auto.
 Qed.
 
-Lemma pos_Pi : Zero [<] Pi.
+Lemma pos_Pi : [0] [<] Pi.
 Proof.
  astepr (Two[*]Pi [/]TwoNZ).
  apply mult_resp_pos.
@@ -565,18 +565,18 @@ lemmas, to make proof development easier.
 
 A summary of what is being proved is simply:
 [[
-[--]Pi [<] [--]Pi[/]Two [<] [--] Pi[/]Four [<] Zero [<] Pi[/]Four [<] Pi[/]Two [<] Pi
+[--]Pi [<] [--]Pi[/]Two [<] [--] Pi[/]Four [<] [0] [<] Pi[/]Four [<] Pi[/]Two [<] Pi
 ]]
 
 [PiSolve] will prove any of these inequalities.
 *)
 
-Lemma pos_HalfPi : Zero [<] Pi [/]TwoNZ.
+Lemma pos_HalfPi : [0] [<] Pi [/]TwoNZ.
 Proof.
  apply pos_div_two; apply pos_Pi.
 Qed.
 
-Lemma pos_QuarterPi : Zero [<] Pi [/]FourNZ.
+Lemma pos_QuarterPi : [0] [<] Pi [/]FourNZ.
 Proof.
  apply pos_div_four; apply pos_Pi.
 Qed.
@@ -597,17 +597,17 @@ Proof.
  apply pos_div_four'; apply pos_Pi.
 Qed.
 
-Lemma neg_invPi : [--]Pi [<] Zero.
+Lemma neg_invPi : [--]Pi [<] [0].
 Proof.
  astepr ( [--]ZeroR); apply inv_resp_less; apply pos_Pi.
 Qed.
 
-Lemma neg_invHalfPi : [--] (Pi [/]TwoNZ) [<] Zero.
+Lemma neg_invHalfPi : [--] (Pi [/]TwoNZ) [<] [0].
 Proof.
  astepr ( [--]ZeroR); apply inv_resp_less; apply pos_HalfPi.
 Qed.
 
-Lemma neg_invQuarterPi : [--] (Pi [/]FourNZ) [<] Zero.
+Lemma neg_invQuarterPi : [--] (Pi [/]FourNZ) [<] [0].
 Proof.
  astepr ( [--]ZeroR); apply inv_resp_less; apply pos_QuarterPi.
 Qed.
@@ -712,13 +712,13 @@ We now move back to trigonometric identities: sine, cosine and tangent of
 the double.
 *)
 
-Lemma Cos_double : forall x : IR, Cos (Two[*]x) [=] Two[*]Cos x[^]2[-]One.
+Lemma Cos_double : forall x : IR, Cos (Two[*]x) [=] Two[*]Cos x[^]2[-][1].
 Proof.
  intros.
  astepl (Cos (x[+]x)).
  astepl (Cos x[*]Cos x[-]Sin x[*]Sin x).
  astepl (Cos x[^]2[-]Sin x[^]2).
- rstepr (Cos x[^]2[-] (One[-]Cos x[^]2)).
+ rstepr (Cos x[^]2[-] ([1][-]Cos x[^]2)).
  apply cg_minus_wd; algebra.
  astepr (Cos x[^]2[+]Sin x[^]2[-]Cos x[^]2); rational.
 Qed.
@@ -732,30 +732,30 @@ Proof.
  rational.
 Qed.
 
-Lemma Tan_double : forall x Hx Hx' H, Tan (Two[*]x) Hx' [=] (Two[*]Tan x Hx[/] One[-]Tan x Hx[^]2[//]H).
+Lemma Tan_double : forall x Hx Hx' H, Tan (Two[*]x) Hx' [=] (Two[*]Tan x Hx[/] [1][-]Tan x Hx[^]2[//]H).
 Proof.
  intros.
  cut (Dom Tang (x[+]x)). intro H0.
   astepl (Tan (x[+]x) H0).
-  cut (One[-]Tan x Hx[*]Tan x Hx [#] Zero). intro H1.
+  cut ([1][-]Tan x Hx[*]Tan x Hx [#] [0]). intro H1.
    eapply eq_transitive_unfolded.
     apply Tan_plus with (Hx := Hx) (Hy := Hx) (H := H1).
    simpl in |- *; rational.
-  astepl (One[-]Tan x Hx[^]2). auto.
+  astepl ([1][-]Tan x Hx[^]2). auto.
   apply dom_wd with (Two[*]x); algebra.
 Qed.
 
 (* begin hide *)
-Lemma sqrt_lemma : forall Hpos H, One [/]TwoNZ [=] (One[/] sqrt Two Hpos[//]H) [^]2.
+Lemma sqrt_lemma : forall Hpos H, [1] [/]TwoNZ [=] ([1][/] sqrt Two Hpos[//]H) [^]2.
 Proof.
  intros.
- Step_final (One[^]2[/] _[//]nexp_resp_ap_zero 2 H).
+ Step_final ([1][^]2[/] _[//]nexp_resp_ap_zero 2 H).
 Qed.
 (* end hide *)
 
 (** Value of trigonometric functions at [Pi[/]Four]. *)
 
-Lemma Cos_QuarterPi : forall Hpos H, Cos (Pi [/]FourNZ) [=] (One[/] sqrt Two Hpos[//]H).
+Lemma Cos_QuarterPi : forall Hpos H, Cos (Pi [/]FourNZ) [=] ([1][/] sqrt Two Hpos[//]H).
 Proof.
  intros.
  apply square_eq_pos.
@@ -768,9 +768,9 @@ Proof.
   apply pos_cos; PiSolve.
  eapply eq_transitive_unfolded.
   2: apply sqrt_lemma.
- astepr ((ZeroR[+]One) [/]TwoNZ).
- astepr ((Cos (Pi [/]TwoNZ) [+]One) [/]TwoNZ).
- rstepl ((Two[*]Cos (Pi [/]FourNZ) [^]2[-]One[+]One) [/]TwoNZ).
+ astepr ((ZeroR[+][1]) [/]TwoNZ).
+ astepr ((Cos (Pi [/]TwoNZ) [+][1]) [/]TwoNZ).
+ rstepl ((Two[*]Cos (Pi [/]FourNZ) [^]2[-][1][+][1]) [/]TwoNZ).
  apply div_wd.
   2: algebra.
  apply bin_op_wd_unfolded.
@@ -780,7 +780,7 @@ Proof.
  apply Cos_wd; rational.
 Qed.
 
-Lemma Sin_QuarterPi : forall Hpos H, Sin (Pi [/]FourNZ) [=] (One[/] sqrt Two Hpos[//]H).
+Lemma Sin_QuarterPi : forall Hpos H, Sin (Pi [/]FourNZ) [=] ([1][/] sqrt Two Hpos[//]H).
 Proof.
  intros.
  apply square_eq_pos.
@@ -790,23 +790,23 @@ Proof.
    astepr (Two:IR).
    simpl in |- *; fold (Two:IR) in |- *; astepl ZeroR.
    apply pos_two.
-  apply less_leEq_trans with (Sin (One [/]TwoNZ)).
-   cut (Zero [<] Cos (One [/]TwoNZ)). intro H0.
-    apply less_wdr with ((Sin One[/] _[//]pos_ap_zero _ _ H0) [/]TwoNZ).
+  apply less_leEq_trans with (Sin ([1] [/]TwoNZ)).
+   cut ([0] [<] Cos ([1] [/]TwoNZ)). intro H0.
+    apply less_wdr with ((Sin [1][/] _[//]pos_ap_zero _ _ H0) [/]TwoNZ).
      apply pos_div_two.
      apply div_resp_pos.
       auto.
      apply Sin_One_pos.
-    rstepr ((Two[*]Sin (One [/]TwoNZ) [*]Cos (One [/]TwoNZ) [/] _[//]pos_ap_zero _ _ H0) [/]TwoNZ).
+    rstepr ((Two[*]Sin ([1] [/]TwoNZ) [*]Cos ([1] [/]TwoNZ) [/] _[//]pos_ap_zero _ _ H0) [/]TwoNZ).
     repeat apply div_wd.
-      astepl (Sin (Two[*]One [/]TwoNZ)).
+      astepl (Sin (Two[*][1] [/]TwoNZ)).
       apply Sin_double.
      algebra.
     algebra.
    apply pos_cos; PiSolve.
     apply pos_div_two; apply pos_one.
    apply less_transitive_unfolded with (pi_seq 1).
-    simpl in |- *; astepr (Cos Zero); astepr OneR.
+    simpl in |- *; astepr (Cos [0]); astepr OneR.
     astepl (OneR [/]TwoNZ); apply pos_div_two'; apply pos_one.
    apply HalfPi_gt_pi_seq.
   elim (less_Lim_so_less_seq (Build_CauchySeq _ _ pi_seq_Cauchy) (Pi [/]FourNZ)).
@@ -814,7 +814,7 @@ Proof.
      apply less_leEq; apply pos_div_two; apply pos_one.
     apply shift_div_leEq.
      apply pos_two.
-    astepl (Cos Zero); astepl (Zero[+]Cos Zero).
+    astepl (Cos [0]); astepl ([0][+]Cos [0]).
     rstepr (Pi [/]TwoNZ).
     apply less_leEq; apply (HalfPi_gt_pi_seq 1).
    apply less_leEq; auto.
@@ -823,9 +823,9 @@ Proof.
   unfold Pi in |- *; rational.
  eapply eq_transitive_unfolded.
   2: apply sqrt_lemma.
- rstepr (One[-]OneR [/]TwoNZ).
- astepr (Cos (Pi [/]FourNZ) [^]2[+]Sin (Pi [/]FourNZ) [^]2[-]One [/]TwoNZ).
- rstepl ((One[/] _[//]H) [^]2[+]Sin (Pi [/]FourNZ) [^]2[-] (One[/] _[//]H) [^]2).
+ rstepr ([1][-]OneR [/]TwoNZ).
+ astepr (Cos (Pi [/]FourNZ) [^]2[+]Sin (Pi [/]FourNZ) [^]2[-][1] [/]TwoNZ).
+ rstepl (([1][/] _[//]H) [^]2[+]Sin (Pi [/]FourNZ) [^]2[-] ([1][/] _[//]H) [^]2).
  apply cg_minus_wd.
   apply bin_op_wd_unfolded.
    apply nexp_wd.
@@ -838,11 +838,11 @@ Hint Resolve Sin_QuarterPi Cos_QuarterPi: algebra.
 
 Opaque Sine Cosine.
 
-Lemma Tan_QuarterPi : forall H, Tan (Pi [/]FourNZ) H [=] One.
+Lemma Tan_QuarterPi : forall H, Tan (Pi [/]FourNZ) H [=] [1].
 Proof.
  intros.
  set (pos2 := less_leEq _ _ _ (pos_two IR)) in *.
- cut (sqrt Two pos2 [#] Zero).
+ cut (sqrt Two pos2 [#] [0]).
   2: apply Greater_imp_ap.
   2: apply power_cancel_less with 2.
    2: apply sqrt_nonneg.
@@ -851,7 +851,7 @@ Proof.
   2: simpl in |- *; algebra.
  intro H0.
  unfold Tan in |- *; simpl in |- *.
- astepr ((One[/] _[//]H0) [/] _[//]recip_ap_zero _ _ H0).
+ astepr (([1][/] _[//]H0) [/] _[//]recip_ap_zero _ _ H0).
  apply div_wd.
   astepr (Sin (Pi [/]FourNZ)).
   simpl in |- *; algebra.
@@ -861,17 +861,17 @@ Qed.
 
 (** Shifting sine and cosine by [Pi[/]Two] and [Pi]. *)
 
-Lemma Sin_HalfPi : Sin (Pi [/]TwoNZ) [=] One.
+Lemma Sin_HalfPi : Sin (Pi [/]TwoNZ) [=] [1].
 Proof.
  apply eq_transitive_unfolded with (Sin (Two[*]Pi [/]FourNZ)).
   apply Sin_wd; rational.
  eapply eq_transitive_unfolded.
   apply Sin_double.
- astepr ((Two:IR) [*]One [/]TwoNZ).
+ astepr ((Two:IR) [*][1] [/]TwoNZ).
  eapply eq_transitive_unfolded.
   apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
  apply mult_wdr.
- cut (sqrt _ (less_leEq _ _ _ (pos_two IR)) [#] Zero). intro H.
+ cut (sqrt _ (less_leEq _ _ _ (pos_two IR)) [#] [0]). intro H.
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply (sqrt_lemma _ H).
   simpl in |- *.
@@ -894,8 +894,8 @@ Proof.
  intro.
  eapply eq_transitive_unfolded.
   apply Sin_plus.
- astepl (Sin x[*]Zero[+]Cos x[*]One).
- Step_final (Zero[+]Cos x).
+ astepl (Sin x[*][0][+]Cos x[*][1]).
+ Step_final ([0][+]Cos x).
 Qed.
 
 Lemma Sin_HalfPi_minus : forall x : IR, Sin (Pi [/]TwoNZ[-]x) [=] Cos x.
@@ -913,8 +913,8 @@ Proof.
  intro.
  eapply eq_transitive_unfolded.
   apply Cos_plus.
- astepl (Cos x[*]Zero[-]Sin x[*]One).
- Step_final (Zero[-]Sin x).
+ astepl (Cos x[*][0][-]Sin x[*][1]).
+ Step_final ([0][-]Sin x).
 Qed.
 
 Lemma Cos_HalfPi_minus : forall x : IR, Cos (Pi [/]TwoNZ[-]x) [=] Sin x.
@@ -927,7 +927,7 @@ Proof.
  Step_final (Sin [--][--]x).
 Qed.
 
-Lemma Sin_Pi : Sin Pi [=] Zero.
+Lemma Sin_Pi : Sin Pi [=] [0].
 Proof.
  apply eq_transitive_unfolded with (Sin (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Sin_wd; rational.
@@ -936,7 +936,7 @@ Proof.
  algebra.
 Qed.
 
-Lemma Cos_Pi : Cos Pi [=] [--]One.
+Lemma Cos_Pi : Cos Pi [=] [--][1].
 Proof.
  apply eq_transitive_unfolded with (Cos (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Cos_wd; rational.
@@ -965,20 +965,20 @@ Proof.
  apply un_op_wd_unfolded; apply Sin_plus_HalfPi.
 Qed.
 
-Lemma Tan_plus_HalfPi : forall x Hx Hx' H, Tan (x[+]Pi[/]TwoNZ) Hx[=]([--]One[/](Tan x Hx')[//]H).
+Lemma Tan_plus_HalfPi : forall x Hx Hx' H, Tan (x[+]Pi[/]TwoNZ) Hx[=]([--][1][/](Tan x Hx')[//]H).
 Proof.
  intros x Hy Hx H.
  set (y:=x[+]Pi [/]TwoNZ) in *.
- assert (H0:Cos y[#]Zero).
+ assert (H0:Cos y[#][0]).
   destruct Hy as [[] [[] Hy]].
   apply (Hy I).
- assert (H1:Cos x[#]Zero).
+ assert (H1:Cos x[#][0]).
   clear H.
   destruct Hx as [[] [[] Hx]].
   apply (Hx I).
  csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
  unfold y.
- assert (H2:([--](Sin x))[#]Zero).
+ assert (H2:([--](Sin x))[#][0]).
   csetoid_rewrite_rev (Cos_plus_HalfPi x).
   apply H0.
  stepr (Cos x[/]([--](Sin x))[//]H2).
@@ -1055,12 +1055,12 @@ Qed.
 Lemma Tan_periodic : forall (x : IR) Hx Hx', Tan (x[+]Pi) Hx' [=] Tan x Hx.
 Proof.
  intros.
- cut (Cos x [#] Zero). intro H.
-  assert (H0 : [--] (Cos x) [#] Zero). apply inv_resp_ap_zero; auto.
+ cut (Cos x [#] [0]). intro H.
+  assert (H0 : [--] (Cos x) [#] [0]). apply inv_resp_ap_zero; auto.
    apply eq_transitive_unfolded with (Sin x[/] _[//]H).
    2: unfold Tan, Tang in |- *; simpl in |- *; algebra.
   rstepr ( [--] (Sin x) [/] _[//]H0).
-  assert (H1 : Cos (x[+]Pi) [#] Zero). astepl ( [--] (Cos x)); auto.
+  assert (H1 : Cos (x[+]Pi) [#] [0]). astepl ( [--] (Cos x)); auto.
    astepr (Sin (x[+]Pi) [/] _[//]H1).
   unfold Tan, Tang in |- *; simpl in |- *; algebra.
  inversion_clear Hx.
@@ -1068,7 +1068,7 @@ Proof.
  simpl in |- *; auto.
 Qed.
 
-Lemma Cos_one_gt_0 : Zero [<] Cos One.
+Lemma Cos_one_gt_0 : [0] [<] Cos [1].
 Proof.
  apply cos_pi_seq_pos with (1%nat).
   apply less_leEq.
@@ -1082,10 +1082,10 @@ Qed.
 Lemma Pi_gt_2 : Two [<] Pi.
 Proof.
  unfold Pi.
- rstepl (Two [*] One:IR).
+ rstepl (Two [*] [1]:IR).
  apply mult_resp_less_lft.
-  apply less_leEq_trans with (One [+] (Cos One)).
-   rstepl (One [+] Zero:IR).
+  apply less_leEq_trans with ([1] [+] (Cos [1])).
+   rstepl ([1] [+] [0]:IR).
    apply plus_resp_leEq_less.
     apply eq_imp_leEq.
     reflexivity.
@@ -1093,7 +1093,7 @@ Proof.
   apply str_leEq_seq_so_leEq_Lim.
   exists (2%nat).
   intros i iH.
-  change (One [+] Cos One[<=] pi_seq i).
+  change ([1] [+] Cos [1][<=] pi_seq i).
   induction i.
    elimtype False.
    auto with *.
@@ -1106,7 +1106,7 @@ Proof.
   induction i.
    unfold pi_seq.
    rewrite -> Cos_zero.
-   setoid_replace (Zero [+] One:IR) with (One:IR); [|rational].
+   setoid_replace ([0] [+] [1]:IR) with ([1]:IR); [|rational].
    apply eq_imp_leEq.
    reflexivity.
   apply leEq_transitive with (pi_seq (S (S i))).

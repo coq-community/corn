@@ -154,16 +154,16 @@ Section Constants.
 Lemma Diffble_I_const : forall c : IR, Diffble_I Hab' [-C-]c.
 Proof.
  intros.
- exists (IConst (Hab:=Hab) Zero).
- apply Derivative_I_wdr with ( [-C-]Zero:PartIR).
+ exists (IConst (Hab:=Hab) [0]).
+ apply Derivative_I_wdr with ( [-C-][0]:PartIR).
   apply part_int_const.
  Deriv.
 Qed.
 
 Lemma Diffble_I_id : Diffble_I Hab' FId.
 Proof.
- exists (IConst (Hab:=Hab) One).
- apply Derivative_I_wdr with ( [-C-]One:PartIR).
+ exists (IConst (Hab:=Hab) [1]).
+ apply Derivative_I_wdr with ( [-C-][1]:PartIR).
   apply part_int_const.
  Deriv.
 Qed.
@@ -254,7 +254,7 @@ Proof.
  elim diffG; intros G' derG.
  cut (included I (Dom G)); [ intro Hg' | unfold I, Hab in |- *; Included ].
  unfold I in Hg';
-   cut (forall x : subset I, IMult (IntPartIR Hg') (IntPartIR Hg') x [#] Zero). intro H.
+   cut (forall x : subset I, IMult (IntPartIR Hg') (IntPartIR Hg') x [#] [0]). intro H.
   exists (IInv (IDiv G' _ H)).
   eapply Derivative_I_wdr.
    apply part_int_inv with (F := PartInt (IDiv G' _ H)).
@@ -365,7 +365,7 @@ Lemma Diffble_I_Sum0 : forall (f : nat -> PartIR),
 Proof.
  intros f diffF.
  induction  n as [| n Hrecn].
-  apply Diffble_I_wd with (Fconst (S:=IR) Zero).
+  apply Diffble_I_wd with (Fconst (S:=IR) [0]).
    apply Diffble_I_const.
   FEQ.
   red in |- *; simpl in |- *; intros.

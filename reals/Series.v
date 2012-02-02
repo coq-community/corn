@@ -94,7 +94,7 @@ obvious fact that no sequence can be both convergent and divergent, whether
  considered either as a sequence or as a series.
 *)
 
-Definition divergent_seq (a : nat -> IR) := {e : IR | Zero [<] e |
+Definition divergent_seq (a : nat -> IR) := {e : IR | [0] [<] e |
   forall k, {m : nat | {n : nat | k <= m /\ k <= n /\ e [<=] AbsIR (a m[-]a n)}}}.
 
 Definition divergent := divergent_seq seq_part_sum.
@@ -116,7 +116,7 @@ Proof.
   eapply leEq_wdl.
    apply triangle_IR.
   apply AbsIR_wd; rational.
- astepl (Zero[+]AbsIR (a m[-]a N) [+]AbsIR (a N[-]a n)).
+ astepl ([0][+]AbsIR (a m[-]a N) [+]AbsIR (a N[-]a n)).
  repeat apply plus_resp_less_leEq; try apply AbsSmall_imp_AbsIR; try exact (pos_div_three _ _ He).
   auto.
  apply AbsSmall_minus; auto.
@@ -152,7 +152,7 @@ Qed.
 to zero as a sequence.
 *)
 
-Lemma series_seq_Lim : convergent -> Cauchy_Lim_prop2 x Zero.
+Lemma series_seq_Lim : convergent -> Cauchy_Lim_prop2 x [0].
 Proof.
  intros H.
  red in |- *. intros eps H0.
@@ -176,7 +176,7 @@ Proof.
  simpl in |- *; astepr (x m); apply Sum_one.
 Qed.
 
-Lemma series_seq_Lim' : convergent -> forall H, Lim (Build_CauchySeq _ x H) [=] Zero.
+Lemma series_seq_Lim' : convergent -> forall H, Lim (Build_CauchySeq _ x H) [=] [0].
 Proof.
  intros.
  apply eq_symmetric_unfolded; apply Limits_unique.
@@ -215,9 +215,9 @@ we can also compute its sum.
 *)
 
 Variable c : IR.
-Hypothesis Hc : AbsIR c [<] One.
+Hypothesis Hc : AbsIR c [<] [1].
 
-Lemma c_exp_Lim : Cauchy_Lim_prop2 (power_series c) Zero.
+Lemma c_exp_Lim : Cauchy_Lim_prop2 (power_series c) [0].
 Proof.
  red in |- *; intros eps H.
  elim (qi_yields_zero (AbsIR c) (AbsIR_nonneg _) Hc eps H).
@@ -241,14 +241,14 @@ Proof.
  assumption.
 Qed.
 
-Lemma power_series_Lim1 : forall H : One[-]c [#] Zero,
- Cauchy_Lim_prop2 (seq_part_sum (power_series c)) (One[/] _[//]H).
+Lemma power_series_Lim1 : forall H : [1][-]c [#] [0],
+ Cauchy_Lim_prop2 (seq_part_sum (power_series c)) ([1][/] _[//]H).
 Proof.
  intro.
  red in |- *.
  intros.
  unfold power_series in |- *; unfold seq_part_sum in |- *.
- cut ({N : nat | (AbsIR c)[^]N [<=] eps[*]AbsIR (One[-]c)}).
+ cut ({N : nat | (AbsIR c)[^]N [<=] eps[*]AbsIR ([1][-]c)}).
   intro H1.
   elim H1; clear H1; intros N HN.
   exists N; intros.
@@ -257,7 +257,7 @@ Proof.
    apply AbsIR_imp_AbsSmall.
    eapply leEq_wdl.
     2: apply eq_symmetric_unfolded.
-    2: apply (AbsIR_division (c[^]m) (One[-]c) H (AbsIR_resp_ap_zero _ H)).
+    2: apply (AbsIR_division (c[^]m) ([1][-]c) H (AbsIR_resp_ap_zero _ H)).
    apply shift_div_leEq.
     apply AbsIR_pos; assumption.
    eapply leEq_wdl.
@@ -267,10 +267,10 @@ Proof.
    apply nexp_resp_le'; auto.
     apply AbsIR_nonneg.
    apply less_leEq; auto.
-  astepl ( [--] (c[^]m[/] _[//]H) [+] (One[/] _[//]H) [-] (One[/] _[//]H)).
+  astepl ( [--] (c[^]m[/] _[//]H) [+] ([1][/] _[//]H) [-] ([1][/] _[//]H)).
   apply cg_minus_wd.
    2: algebra.
-  cut (c[-]One [#] Zero). intros H2.
+  cut (c[-][1] [#] [0]). intros H2.
    apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
     apply Sum0_c_exp with (H := H2).
    rational.
@@ -281,7 +281,7 @@ Proof.
  apply qi_yields_zero.
    apply AbsIR_nonneg.
   assumption.
- apply less_wdl with (Zero[*]AbsIR (One[-]c)).
+ apply less_wdl with ([0][*]AbsIR ([1][-]c)).
   apply mult_resp_less.
    assumption.
   apply AbsIR_pos.
@@ -294,9 +294,9 @@ Proof.
  intros.
  red in |- *.
  apply Cauchy_prop2_prop.
- cut (One[-]c [#] Zero).
+ cut ([1][-]c [#] [0]).
   intro H.
-  exists (One[/] _[//]H).
+  exists ([1][/] _[//]H).
   apply power_series_Lim1.
  apply minus_ap_zero.
  apply Greater_imp_ap.
@@ -306,7 +306,7 @@ Proof.
 Qed.
 
 Lemma power_series_sum : forall H Hc,
- series_sum (power_series c) Hc [=] (One[/] One[-]c[//]H).
+ series_sum (power_series c) Hc [=] ([1][/] [1][-]c[//]H).
 Proof.
  intros.
  unfold series_sum in |- *.
@@ -325,7 +325,7 @@ Some operations with series preserve convergence.  We start by defining
 the series that is zero everywhere.
 *)
 
-Lemma conv_zero_series : convergent (fun n => Zero).
+Lemma conv_zero_series : convergent (fun n => [0]).
 Proof.
  exists 0.
  intros.
@@ -341,7 +341,7 @@ Proof.
  rational.
 Qed.
 
-Lemma series_sum_zero : forall H : convergent (fun n => Zero), series_sum _ H [=] Zero.
+Lemma series_sum_zero : forall H : convergent (fun n => [0]), series_sum _ H [=] [0].
 Proof.
  intro.
  unfold series_sum in |- *.
@@ -500,12 +500,12 @@ Proof.
  red in |- *.
  red in convX.
  eapply Cauchy_prop_wd.
-  apply Cauchy_minus with (seq1 := Cauchy_const Zero) (seq2 := Build_CauchySeq _ _ convX).
+  apply Cauchy_minus with (seq1 := Cauchy_const [0]) (seq2 := Build_CauchySeq _ _ convX).
  simpl in |- *.
  unfold seq_part_sum in |- *.
  intro.
  apply eq_symmetric_unfolded;
-   apply eq_transitive_unfolded with (Zero[+]Sum0 n (fun n : nat => [--] (x n))).
+   apply eq_transitive_unfolded with ([0][+]Sum0 n (fun n : nat => [--] (x n))).
   algebra.
  unfold cg_minus in |- *; apply bin_op_wd_unfolded.
   algebra.
@@ -516,13 +516,13 @@ Lemma series_sum_inv : forall H : convergent (fun n => [--] (x n)),
  series_sum _ H [=] [--] (series_sum _ convX).
 Proof.
  intros.
- set (y := Cauchy_const Zero) in *.
+ set (y := Cauchy_const [0]) in *.
  cut (convergent y). intros H0.
   eapply eq_transitive_unfolded.
    apply series_sum_wd with (y := fun n : nat => y n[-]x n) (convY := conv_series_minus _ _ H0 convX).
    intro; unfold y in |- *; simpl in |- *; algebra.
-  cut (series_sum y H0 [=] Zero); intros.
-   astepr (Zero[-]series_sum x convX).
+  cut (series_sum y H0 [=] [0]); intros.
+   astepr ([0][-]series_sum x convX).
    astepr (series_sum y H0[-]series_sum x convX).
    apply series_sum_minus.
   apply series_sum_zero.
@@ -723,7 +723,7 @@ Qed.
 
 (** Next we have the ratio test, both as a positive and negative result. *)
 
-Lemma divergent_crit : {r : IR | Zero [<] r | forall n, {m : nat | n <= m | r [<=] AbsIR (x m)}} ->
+Lemma divergent_crit : {r : IR | [0] [<] r | forall n, {m : nat | n <= m | r [<=] AbsIR (x m)}} ->
  divergent x.
 Proof.
  intro H.
@@ -847,7 +847,7 @@ Section More_CC.
 Variable x : nat -> IR.
 
 Lemma ratio_test_conv : {N : nat |
- {c : IR | c [<] One | Zero [<=] c /\ (forall n, N <= n -> AbsIR (x (S n)) [<=] c[*]AbsIR (x n))}} ->
+ {c : IR | c [<] [1] | [0] [<=] c /\ (forall n, N <= n -> AbsIR (x (S n)) [<=] c[*]AbsIR (x n))}} ->
  convergent x.
 Proof.
  intro H.
@@ -863,8 +863,8 @@ Proof.
    apply power_series_conv.
    apply AbsIR_less.
     assumption.
-   apply less_leEq_trans with Zero.
-    rstepr ([--]Zero:IR).
+   apply less_leEq_trans with [0].
+    rstepr ([--][0]:IR).
     apply inv_resp_less.
     apply pos_one.
    assumption.
@@ -899,7 +899,7 @@ Proof.
 Qed.
 
 Lemma ratio_test_div : {N : nat |
- {c : IR | One [<=] c | forall n, N <= n -> c[*]AbsIR (x n) [<] AbsIR (x (S n))}} ->
+ {c : IR | [1] [<=] c | forall n, N <= n -> c[*]AbsIR (x n) [<] AbsIR (x (S n))}} ->
  divergent x.
 Proof.
  intros H.
@@ -908,7 +908,7 @@ Proof.
  apply divergent_crit.
  exists (AbsIR (x (S N))).
   apply leEq_less_trans with (c[*]AbsIR (x N)).
-   astepl (c[*]Zero); apply mult_resp_leEq_lft.
+   astepl (c[*][0]); apply mult_resp_leEq_lft.
     apply AbsIR_nonneg.
    apply less_leEq; eapply less_leEq_trans; [ apply pos_one | assumption ].
   apply Hn; auto with arith.
@@ -933,7 +933,7 @@ Proof.
   apply leEq_transitive with (AbsIR (x (S n))).
    apply Hrecn; auto with arith.
   apply less_leEq; apply leEq_less_trans with (c[*]AbsIR (x (S n))).
-   astepl (One[*]AbsIR (x (S n))); apply mult_resp_leEq_rht.
+   astepl ([1][*]AbsIR (x (S n))); apply mult_resp_leEq_rht.
     assumption.
    apply AbsIR_nonneg.
   apply Hn; auto with arith.
@@ -953,37 +953,37 @@ decreasing convergent to 0.
 
 Variable x : nat -> IR.
 
-Hypothesis pos_x : forall n : nat, Zero [<=] x n.
-Hypothesis Lim_x : Cauchy_Lim_prop2 x Zero.
+Hypothesis pos_x : forall n : nat, [0] [<=] x n.
+Hypothesis Lim_x : Cauchy_Lim_prop2 x [0].
 Hypothesis mon_x : forall n : nat, x (S n) [<=] x n.
 
 (* begin hide *)
-Let y (n : nat) := [--]One[^]n[*]x n.
+Let y (n : nat) := [--][1][^]n[*]x n.
 
 Let alternate_lemma1 :
-  forall n m : nat, [--]One[^]n[*]Sum n (n + (m + m)) y [<=] x n.
+  forall n m : nat, [--][1][^]n[*]Sum n (n + (m + m)) y [<=] x n.
 Proof.
  intros; induction  m as [| m Hrecm].
   cut (n = n + (0 + 0)); [ intro | auto with arith ].
   rewrite <- H.
   apply eq_imp_leEq.
   cut (Sum n n y [=] y n); [ intro | apply Sum_one ].
-  astepl ( [--]One[^]n[*]y n).
+  astepl ( [--][1][^]n[*]y n).
   unfold y in |- *; simpl in |- *.
   apply eq_transitive_unfolded with ( [--]OneR[^] (n + n) [*]x n).
-   astepl ( [--]One[^]n[*][--]One[^]n[*]x n).
+   astepl ( [--][1][^]n[*][--][1][^]n[*]x n).
    apply mult_wdl.
    apply nexp_plus.
-  astepr (One[*]x n).
+  astepr ([1][*]x n).
   apply mult_wdl.
   apply inv_one_even_nexp.
   auto with arith.
  cut (n + (S m + S m) = S (S (n + (m + m))));
    [ intro | simpl in |- *; repeat rewrite plus_n_Sm; auto ].
  rewrite H.
- apply leEq_wdl with ( [--]One[^]n[*]Sum n (n + (m + m)) y[+]
-   [--]One[^]n[*] (y (S (n + (m + m))) [+]y (S (S (n + (m + m)))))).
-  apply leEq_transitive with (x n[+][--]One[^]n[*] (y (S (n + (m + m))) [+]y (S (S (n + (m + m)))))).
+ apply leEq_wdl with ( [--][1][^]n[*]Sum n (n + (m + m)) y[+]
+   [--][1][^]n[*] (y (S (n + (m + m))) [+]y (S (S (n + (m + m)))))).
+  apply leEq_transitive with (x n[+][--][1][^]n[*] (y (S (n + (m + m))) [+]y (S (S (n + (m + m)))))).
    apply plus_resp_leEq.
    apply Hrecm.
   apply shift_plus_leEq'; astepr ZeroR.
@@ -994,8 +994,8 @@ Proof.
    apply shift_plus_leEq'; rstepr (x (S (n + (m + m)))).
    apply mon_x.
   apply bin_op_wd_unfolded.
-   rstepl ( [--]One[*]x (S (n + (m + m)))).
-   rstepr ( [--]One[^]n[*][--]One[^]S (n + (m + m)) [*]x (S (n + (m + m)))).
+   rstepl ( [--][1][*]x (S (n + (m + m)))).
+   rstepr ( [--][1][^]n[*][--][1][^]S (n + (m + m)) [*]x (S (n + (m + m)))).
    apply mult_wdl.
    apply eq_symmetric_unfolded.
    eapply eq_transitive_unfolded.
@@ -1004,8 +1004,8 @@ Proof.
    cut (n + S (n + (m + m)) = S (n + n + (m + m))); [ intro | rewrite <- plus_n_Sm; auto with arith ].
    rewrite H0.
    auto with arith.
-  astepl (One[*]x (S (S (n + (m + m))))).
-  rstepr ( [--]One[^]n[*][--]One[^]S (S (n + (m + m))) [*]x (S (S (n + (m + m))))).
+  astepl ([1][*]x (S (S (n + (m + m))))).
+  rstepr ( [--][1][^]n[*][--][1][^]S (S (n + (m + m))) [*]x (S (S (n + (m + m))))).
   apply mult_wdl.
   apply eq_symmetric_unfolded.
   eapply eq_transitive_unfolded.
@@ -1020,18 +1020,18 @@ Proof.
 Qed.
 
 Let alternate_lemma2 :
-  forall n m : nat, [--]One[^]n[*]Sum n (n + S (m + m)) y [<=] x n.
+  forall n m : nat, [--][1][^]n[*]Sum n (n + S (m + m)) y [<=] x n.
 Proof.
  intros.
  cut (n + S (m + m) = S (n + (m + m))); [ intro | auto with arith ].
  rewrite H.
- apply leEq_wdl with ( [--]One[^]n[*]Sum n (n + (m + m)) y[+][--]One[^]n[*]y (S (n + (m + m)))).
-  apply leEq_transitive with (x n[+][--]One[^]n[*]y (S (n + (m + m)))).
+ apply leEq_wdl with ( [--][1][^]n[*]Sum n (n + (m + m)) y[+][--][1][^]n[*]y (S (n + (m + m)))).
+  apply leEq_transitive with (x n[+][--][1][^]n[*]y (S (n + (m + m)))).
    apply plus_resp_leEq.
    apply alternate_lemma1.
   apply shift_plus_leEq'; rstepr (ZeroR[*]x (S (n + (m + m)))).
   unfold y in |- *.
-  rstepl ( [--]One[^]n[*][--]One[^]S (n + (m + m)) [*]x (S (n + (m + m)))).
+  rstepl ( [--][1][^]n[*][--][1][^]S (n + (m + m)) [*]x (S (n + (m + m)))).
   apply mult_resp_leEq_rht.
    apply leEq_wdl with ( [--]OneR).
     astepr ( [--]ZeroR); apply less_leEq; apply inv_resp_less; apply pos_one.
@@ -1049,13 +1049,13 @@ Proof.
 Qed.
 
 Let alternate_lemma3 :
-  forall n m : nat, Zero [<=] [--]One[^]n[*]Sum n (n + S (m + m)) y.
+  forall n m : nat, [0] [<=] [--][1][^]n[*]Sum n (n + S (m + m)) y.
 Proof.
  intros; induction  m as [| m Hrecm].
   cut (S n = n + S (0 + 0)); [ intro | rewrite <- plus_n_Sm; auto ].
   rewrite <- H.
   cut (Sum n (S n) y [=] y n[+]y (S n)).
-   intro; astepr ( [--]One[^]n[*] (y n[+]y (S n))).
+   intro; astepr ( [--][1][^]n[*] (y n[+]y (S n))).
    unfold y in |- *.
    eapply leEq_wdr.
     2: apply eq_symmetric_unfolded; apply ring_dist_unfolded.
@@ -1063,16 +1063,16 @@ Proof.
     apply shift_leEq_minus; astepl (x (S n)).
     apply mon_x.
    unfold cg_minus in |- *; apply bin_op_wd_unfolded.
-    astepl (One[*]x n).
-    astepr ( [--]One[^]n[*][--]One[^]n[*]x n).
+    astepl ([1][*]x n).
+    astepr ( [--][1][^]n[*][--][1][^]n[*]x n).
     apply mult_wdl.
     apply eq_symmetric_unfolded.
     eapply eq_transitive_unfolded.
      apply nexp_plus.
     apply inv_one_even_nexp.
     auto with arith.
-   rstepl ( [--]One[*]x (S n)).
-   astepr ( [--]One[^]n[*][--]One[^]S n[*]x (S n)).
+   rstepl ( [--][1][*]x (S n)).
+   astepr ( [--][1][^]n[*][--][1][^]S n[*]x (S n)).
    apply mult_wdl.
    apply eq_symmetric_unfolded.
    eapply eq_transitive_unfolded.
@@ -1085,11 +1085,11 @@ Proof.
  cut (n + S (S m + S m) = S (S (n + S (m + m))));
    [ intro | simpl in |- *; repeat rewrite <- plus_n_Sm; auto with arith ].
  rewrite H.
- apply leEq_wdr with ( [--]One[^]n[*] (Sum n (n + S (m + m)) y[+]
+ apply leEq_wdr with ( [--][1][^]n[*] (Sum n (n + S (m + m)) y[+]
    (y (S (n + S (m + m))) [+]y (S (S (n + S (m + m))))))).
   eapply leEq_wdr.
    2: apply eq_symmetric_unfolded; apply ring_dist_unfolded.
-  astepl (ZeroR[+]Zero).
+  astepl (ZeroR[+][0]).
   apply plus_resp_leEq_both.
    apply Hrecm.
   unfold y in |- *.
@@ -1100,7 +1100,7 @@ Proof.
   unfold cg_minus in |- *; apply bin_op_wd_unfolded.
    eapply eq_transitive_unfolded.
     2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
-   astepl (One[*]x (S (n + S (m + m)))); apply mult_wdl.
+   astepl ([1][*]x (S (n + S (m + m)))); apply mult_wdl.
    apply eq_symmetric_unfolded.
    eapply eq_transitive_unfolded; [ apply nexp_plus | apply inv_one_even_nexp ].
    cut (n + S (n + S (m + m)) = S (S (n + n + (m + m))));
@@ -1109,7 +1109,7 @@ Proof.
    auto with arith.
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
-  rstepl ( [--]One[*]x (S (S (n + S (m + m))))); apply mult_wdl.
+  rstepl ( [--][1][*]x (S (S (n + S (m + m))))); apply mult_wdl.
   apply eq_symmetric_unfolded.
   eapply eq_transitive_unfolded; [ apply nexp_plus | apply inv_one_odd_nexp ].
   cut (n + S (S (n + S (m + m))) = S (S n + S n + (m + m))); [ intro
@@ -1121,18 +1121,18 @@ Proof.
 Qed.
 
 Let alternate_lemma4 :
-  forall n m : nat, Zero [<=] [--]One[^]n[*]Sum n (n + (m + m)) y.
+  forall n m : nat, [0] [<=] [--][1][^]n[*]Sum n (n + (m + m)) y.
 Proof.
  intros.
  case m.
   cut (n + (0 + 0) = n); [ intro | auto ].
   rewrite H.
   cut (Sum n n y [=] y n); [ intro | apply Sum_one ].
-  astepr ( [--]One[^]n[*]y n).
+  astepr ( [--][1][^]n[*]y n).
   unfold y in |- *.
   eapply leEq_wdr.
    2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
-  astepl (Zero[*]x n).
+  astepl ([0][*]x n).
   apply mult_resp_leEq_rht.
    apply leEq_wdr with OneR.
     apply less_leEq; apply pos_one.
@@ -1143,13 +1143,13 @@ Proof.
  clear m; intro m.
  cut (n + (S m + S m) = S (n + S (m + m))); [ intro | simpl in |- *; rewrite <- plus_n_Sm; auto ].
  rewrite H.
- apply leEq_wdr with ( [--]One[^]n[*]Sum n (n + S (m + m)) y[+] [--]One[^]n[*]y (S (n + S (m + m)))).
-  apply leEq_transitive with (Zero[+][--]One[^]n[*]y (S (n + S (m + m)))).
-   astepr ( [--]One[^]n[*]y (S (n + S (m + m)))).
+ apply leEq_wdr with ( [--][1][^]n[*]Sum n (n + S (m + m)) y[+] [--][1][^]n[*]y (S (n + S (m + m)))).
+  apply leEq_transitive with ([0][+][--][1][^]n[*]y (S (n + S (m + m)))).
+   astepr ( [--][1][^]n[*]y (S (n + S (m + m)))).
    unfold y in |- *.
    eapply leEq_wdr.
     2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
-   astepl (Zero[*]x (S (n + S (m + m)))).
+   astepl ([0][*]x (S (n + S (m + m)))).
    apply mult_resp_leEq_rht.
     apply leEq_wdr with OneR.
      apply less_leEq; apply pos_one.
@@ -1169,7 +1169,7 @@ Proof.
 Qed.
 (* end hide *)
 
-Lemma alternate_series_conv : convergent (fun n => [--]One[^]n[*]x n).
+Lemma alternate_series_conv : convergent (fun n => [--][1][^]n[*]x n).
 Proof.
  red in |- *.
  red in |- *.
@@ -1182,15 +1182,15 @@ Proof.
   exists N; intros.
   apply AbsSmall_transitive with (x N).
    apply HN; auto.
-  cut (AbsIR (seq_part_sum (fun n : nat => [--]One[^]n[*]x n) m[-]
-    seq_part_sum (fun n : nat => [--]One[^]n[*]x n) N) [=] AbsIR ( [--]One[^]N[*]Sum N (pred m) y)).
+  cut (AbsIR (seq_part_sum (fun n : nat => [--][1][^]n[*]x n) m[-]
+    seq_part_sum (fun n : nat => [--][1][^]n[*]x n) N) [=] AbsIR ( [--][1][^]N[*]Sum N (pred m) y)).
    intro.
-   apply leEq_wdl with (AbsIR ( [--]One[^]N[*]Sum N (pred m) y)).
+   apply leEq_wdl with (AbsIR ( [--][1][^]N[*]Sum N (pred m) y)).
     eapply leEq_wdr.
      2: apply eq_symmetric_unfolded; apply AbsIR_eq_x; apply pos_x.
     cut ({N < m} + {N = m}); intros.
      2: apply le_lt_eq_dec; assumption.
-    apply leEq_wdl with (Max ( [--]One[^]N[*]Sum N (pred m) y) [--] ( [--]One[^]N[*]Sum N (pred m) y)).
+    apply leEq_wdl with (Max ( [--][1][^]N[*]Sum N (pred m) y) [--] ( [--][1][^]N[*]Sum N (pred m) y)).
      apply Max_leEq.
       inversion_clear H2.
        cut {j : nat &  {pred m = N + (j + j)} + {pred m = N + S (j + j)}}.
@@ -1201,8 +1201,8 @@ Proof.
         rewrite H2; apply alternate_lemma1.
        rewrite H2; apply alternate_lemma2.
       rewrite <- H3.
-      cut (Sum N (pred N) y [=] Zero); [ intro | apply Sum_empty; auto ].
-      astepl ( [--]One[^]N[*]ZeroR).
+      cut (Sum N (pred N) y [=] [0]); [ intro | apply Sum_empty; auto ].
+      astepl ( [--][1][^]N[*]ZeroR).
       astepl ZeroR; apply pos_x.
      astepr ( [--][--] (x N)); apply inv_resp_leEq.
      apply leEq_transitive with ZeroR.
@@ -1216,8 +1216,8 @@ Proof.
        rewrite H2; apply alternate_lemma4.
       rewrite H2; apply alternate_lemma3.
      rewrite <- H3.
-     cut (Sum N (pred N) y [=] Zero); [ intro | apply Sum_empty; auto ].
-     astepr ( [--]One[^]N[*]ZeroR).
+     cut (Sum N (pred N) y [=] [0]); [ intro | apply Sum_empty; auto ].
+     astepr ( [--][1][^]N[*]ZeroR).
      astepr ZeroR; apply leEq_reflexive.
     simpl in |- *; unfold ABSIR in |- *; apply eq_reflexive_unfolded.
    apply eq_symmetric_unfolded; assumption.
@@ -1233,7 +1233,7 @@ Proof.
    eapply eq_transitive_unfolded.
     2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
    apply mult_wdl.
-   astepl (OneR[*][--]One[^]i).
+   astepl (OneR[*][--][1][^]i).
    apply mult_wdl.
    apply eq_symmetric_unfolded; apply inv_one_even_nexp; assumption.
   eapply eq_transitive_unfolded.
@@ -1241,7 +1241,7 @@ Proof.
   apply AbsIR_wd.
   eapply eq_transitive_unfolded.
    apply seq_part_sum_n; auto; apply lt_le_trans with N; auto.
-  rstepr ( [--] ( [--]One[^]N) [*]Sum N (pred m) y).
+  rstepr ( [--] ( [--][1][^]N) [*]Sum N (pred m) y).
   eapply eq_transitive_unfolded.
    2: apply Sum_comm_scal'.
   apply Sum_wd.
@@ -1250,10 +1250,10 @@ Proof.
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
   apply mult_wdl.
-  astepl (OneR[*][--]One[^]i).
+  astepl (OneR[*][--][1][^]i).
   apply mult_wdl.
   apply eq_symmetric_unfolded.
-  rstepl ( [--]OneR[^]1[*][--]One[^]N).
+  rstepl ( [--]OneR[^]1[*][--][1][^]N).
   eapply eq_transitive_unfolded.
    apply nexp_plus.
   apply inv_one_even_nexp.
@@ -1262,7 +1262,7 @@ Proof.
  exists (S N').
   auto with arith.
  intros.
- astepr (x m[-]Zero); apply HN'; auto with arith.
+ astepr (x m[-][0]); apply HN'; auto with arith.
 Qed.
 
 End Alternate_Series.
@@ -1276,7 +1276,7 @@ We end this chapter by defining two important numbers in mathematics: [pi]
 and $e$#e#, both as sums of convergent series.
 *)
 
-Definition e_series (n : nat) := One[/] _[//]nring_fac_ap_zero IR n.
+Definition e_series (n : nat) := [1][/] _[//]nring_fac_ap_zero IR n.
 
 Lemma e_series_conv : convergent e_series.
 Proof.
@@ -1297,10 +1297,10 @@ Proof.
   2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
   eapply leEq_wdr.
    2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-   rstepr (One[*]One[/] _[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (nring_fac_ap_zero _ n)).
-   rstepr (One[/] _[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (nring_fac_ap_zero _ n)).
+   rstepr ([1][*][1][/] _[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (nring_fac_ap_zero _ n)).
+   rstepr ([1][/] _[//] mult_resp_ap_zero _ _ _ (two_ap_zero IR) (nring_fac_ap_zero _ n)).
    apply recip_resp_leEq.
-    astepl ((Two:IR) [*]Zero); apply mult_resp_less_lft.
+    astepl ((Two:IR) [*][0]); apply mult_resp_less_lft.
      apply pos_nring_fac.
     apply pos_two.
    cut (fact (S n) = S n * fact n).
@@ -1321,13 +1321,13 @@ Qed.
 Definition E := series_sum _ e_series_conv.
 
 Definition pi_series n :=
- [--]One[^]n[*] (One[/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (n + n))).
+ [--][1][^]n[*] ([1][/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (n + n))).
 
 Lemma pi_series_conv : convergent pi_series.
 Proof.
  unfold pi_series in |- *.
  apply alternate_series_conv with (x := fun n : nat =>
-   One[/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (n + n))).
+   [1][/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (n + n))).
    intro; apply less_leEq.
    apply recip_resp_pos; apply pos_nring_S.
   apply Cauchy_Lim_prop3_prop2.
@@ -1335,14 +1335,14 @@ Proof.
   exists (S k); intros.
   apply AbsIR_imp_AbsSmall.
   apply less_leEq.
-  apply less_wdl with (One[/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (m + m))).
+  apply less_wdl with ([1][/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (m + m))).
    unfold one_div_succ, Snring in |- *.
    apply recip_resp_less.
     apply pos_nring_S.
    apply nring_less; auto with arith.
   apply eq_symmetric_unfolded.
   apply eq_transitive_unfolded
-    with (AbsIR (One[/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (m + m)))).
+    with (AbsIR ([1][/] _[//]Greater_imp_ap IR _ _ (pos_nring_S _ (m + m)))).
    apply AbsIR_wd; algebra.
   apply AbsIR_eq_x; apply less_leEq.
   apply recip_resp_pos; apply pos_nring_S.

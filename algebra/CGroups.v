@@ -52,7 +52,7 @@ Set Automatic Introduction.
 *)
 
 Definition is_CGroup (G : CMonoid) (inv : CSetoid_un_op G) :=
-  forall x, is_inverse csg_op Zero x (inv x).
+  forall x, is_inverse csg_op [0] x (inv x).
 
 Record CGroup : Type :=
   {cg_crr   :> CMonoid;
@@ -89,7 +89,7 @@ Infix "[-]" := cg_minus (at level 50, left associativity).
 Section CGroup_axioms.
 Variable G : CGroup.
 
-Lemma cg_inverse : forall x : G, is_inverse csg_op Zero x [--] x.
+Lemma cg_inverse : forall x : G, is_inverse csg_op [0] x [--] x.
 Proof cg_proof G.
 
 End CGroup_axioms.
@@ -103,17 +103,17 @@ General properties of groups.
 Section CGroup_basics.
 Variable G : CGroup.
 
-Lemma cg_rht_inv_unfolded : forall x : G, x[+] [--] x [=] Zero.
+Lemma cg_rht_inv_unfolded : forall x : G, x[+] [--] x [=] [0].
 Proof.
  intro x; elim (cg_inverse G x); auto.
 Qed.
 
-Lemma cg_lft_inv_unfolded : forall x : G, [--] x[+]x [=] Zero.
+Lemma cg_lft_inv_unfolded : forall x : G, [--] x[+]x [=] [0].
 Proof.
  intro x; elim (cg_inverse G x); auto.
 Qed.
 
-Lemma cg_minus_correct : forall x : G, x [-] x [=] Zero.
+Lemma cg_minus_correct : forall x : G, x [-] x [=] [0].
 Proof.
  intro x.
  unfold cg_minus in |- *.
@@ -122,7 +122,7 @@ Qed.
 Hint Resolve cg_rht_inv_unfolded cg_lft_inv_unfolded cg_minus_correct:
   algebra.
 
-Lemma cg_inverse' : forall x : G, is_inverse csg_op Zero [--] x x.
+Lemma cg_inverse' : forall x : G, is_inverse csg_op [0] [--] x x.
 Proof.
  intro x.
  split; algebra.
@@ -160,61 +160,61 @@ Lemma grp_inv_assoc : forall x y : G, x[+]y [-] y [=] x.
 Proof.
  intros x y; unfold cg_minus in |- *.
  astepl (x[+](y[+] [--] y)).
- Step_final (x[+]Zero).
+ Step_final (x[+][0]).
 Qed.
 Hint Resolve grp_inv_assoc: algebra.
 
-Lemma cg_inv_unique : forall x y : G, x[+]y [=] Zero -> y [=] [--] x.
+Lemma cg_inv_unique : forall x y : G, x[+]y [=] [0] -> y [=] [--] x.
 Proof.
  intros x y H.
- astepl (Zero[+]y).
+ astepl ([0][+]y).
  astepl ([--] x[+]x[+]y).
  astepl ([--] x[+](x[+]y)).
- Step_final ([--] x[+]Zero).
+ Step_final ([--] x[+][0]).
 Qed.
 
 Lemma cg_inv_inv : forall x : G, [--] [--] x [=] x.
 Proof.
  intro x.
- astepl (Zero[+] [--] [--] x).
+ astepl ([0][+] [--] [--] x).
  astepl (x[+] [--] x[+] [--] [--] x).
  astepl (x[+]([--] x[+] [--] [--] x)).
- Step_final (x[+]Zero).
+ Step_final (x[+][0]).
 Qed.
 Hint Resolve cg_inv_inv: algebra.
 
 Lemma cg_cancel_lft : forall x y z : G, x[+]y [=] x[+]z -> y [=] z.
 Proof.
  intros x y z H.
- astepl (Zero[+]y).
+ astepl ([0][+]y).
  astepl ([--] x[+]x[+]y).
  astepl ([--] x[+](x[+]y)).
  astepl ([--] x[+](x[+]z)).
  astepl ([--] x[+]x[+]z).
- Step_final (Zero[+]z).
+ Step_final ([0][+]z).
 Qed.
 
 Lemma cg_cancel_rht : forall x y z : G, y[+]x [=] z[+]x -> y [=] z.
 Proof.
  intros x y z H.
- astepl (y[+]Zero).
+ astepl (y[+][0]).
  astepl (y[+](x[+] [--] x)).
  astepl (y[+]x[+] [--] x).
  astepl (z[+]x[+] [--] x).
  astepl (z[+](x[+] [--] x)).
- Step_final (z[+]Zero).
+ Step_final (z[+][0]).
 Qed.
 
-Lemma cg_inv_unique' : forall x y : G, x[+]y [=] Zero -> x [=] [--] y.
+Lemma cg_inv_unique' : forall x y : G, x[+]y [=] [0] -> x [=] [--] y.
 Proof.
  intros x y H.
- astepl (x[+]Zero).
+ astepl (x[+][0]).
  astepl (x[+](y[+] [--] y)).
  astepl (x[+]y[+] [--] y).
- Step_final (Zero[+] [--] y).
+ Step_final ([0][+] [--] y).
 Qed.
 
-Lemma cg_inv_unique_2 : forall x y : G, x [-] y [=] Zero -> x [=] y.
+Lemma cg_inv_unique_2 : forall x y : G, x [-] y [=] [0] -> x [=] y.
 Proof.
  intros x y H.
  generalize (cg_inv_unique _ _ H); intro H0.
@@ -222,18 +222,18 @@ Proof.
  Step_final ([--] [--] y).
 Qed.
 
-Lemma cg_zero_inv : [--] (Zero:G) [=] Zero.
+Lemma cg_zero_inv : [--] ([0]:G) [=] [0].
 Proof.
  apply eq_symmetric_unfolded; apply cg_inv_unique; algebra.
 Qed.
 
 Hint Resolve cg_zero_inv: algebra.
 
-Lemma cg_inv_zero : forall x : G, x [-] Zero [=] x.
+Lemma cg_inv_zero : forall x : G, x [-] [0] [=] x.
 Proof.
  intro x.
  unfold cg_minus in |- *.
- Step_final (x[+]Zero).
+ Step_final (x[+][0]).
 Qed.
 
 Lemma cg_inv_op : forall x y : G, [--] (x[+]y) [=] [--] y[+] [--] x.
@@ -243,7 +243,7 @@ Proof.
  apply cg_inv_unique.
  astepl (x[+]y[+] [--] y[+] [--] x).
  astepl (x[+](y[+] [--] y)[+] [--] x).
- astepl (x[+]Zero[+] [--] x).
+ astepl (x[+][0][+] [--] x).
  Step_final (x[+] [--] x).
 Qed.
 
@@ -251,7 +251,7 @@ Qed.
 Useful for interactive proof development.
 *)
 
-Lemma x_minus_x : forall x y : G, x [=] y -> x [-] y [=] Zero.
+Lemma x_minus_x : forall x y : G, x [=] y -> x [-] y [=] [0].
 Proof.
  intros x y H; Step_final (x [-] x).
 Qed.
@@ -264,7 +264,7 @@ Qed.
 *)
 Section SubCGroups.
 Variable P : G -> CProp.
-Variable Punit : P Zero.
+Variable Punit : P [0].
 Variable op_pres_P : bin_op_pres_pred _ P csg_op.
 Variable inv_pres_P : un_op_pres_pred _ P cg_inv.
 
@@ -306,7 +306,7 @@ Proof.
  intros x y z; unfold cg_minus in |- *; algebra.
 Qed.
 
-Lemma zero_minus : forall x : G, Zero [-] x [=] [--] x.
+Lemma zero_minus : forall x : G, [0] [-] x [=] [--] x.
 Proof.
  intro x.
  unfold cg_minus in |- *.
@@ -318,7 +318,7 @@ Proof.
  intros x y.
  unfold cg_minus in |- *.
  astepr (x[+]([--] y[+]y)).
- Step_final (x[+]Zero).
+ Step_final (x[+][0]).
 Qed.
 
 Lemma plus_resp_eq : forall x y z : G, y [=] z -> x[+]y [=] x[+]z.
@@ -341,11 +341,11 @@ Specific properties of apartness.
 Section cgroups_apartness.
 Variable G : CGroup.
 
-Lemma cg_add_ap_zero : forall x y : G, x[+]y [#] Zero -> x [#] Zero or y [#] Zero.
+Lemma cg_add_ap_zero : forall x y : G, x[+]y [#] [0] -> x [#] [0] or y [#] [0].
 Proof.
  intros x y H.
- apply (cs_bin_op_strext _ csg_op x Zero y Zero).
- astepr (Zero:G).
+ apply (cs_bin_op_strext _ csg_op x [0] y [0]).
+ astepr ([0]:G).
  auto.
 Qed.
 
@@ -366,16 +366,16 @@ Proof.
  apply ap_wdr_unfolded with (y[+]z [-] z).
   apply ap_wdl_unfolded with (x[+]z [-] z).
    apply (op_rht_resp_ap _ _ [--] z H).
-  astepr (x[+]Zero).
+  astepr (x[+][0]).
   Step_final (x[+](z [-] z)).
- astepr (y[+]Zero).
+ astepr (y[+][0]).
  Step_final (y[+](z [-] z)).
 Qed.
 
 Lemma plus_cancel_ap_rht : forall x y z : G, x[+]z [#] y[+]z -> x [#] y.
 Proof cg_ap_cancel_rht.
 
-Lemma minus_ap_zero : forall x y : G, x [#] y -> x [-] y [#] Zero.
+Lemma minus_ap_zero : forall x y : G, x [#] y -> x [-] y [#] [0].
 Proof.
  intros x y H.
  astepr (y [-] y).
@@ -383,19 +383,19 @@ Proof.
  apply op_rht_resp_ap; assumption.
 Qed.
 
-Lemma zero_minus_apart : forall x y : G, x [-] y [#] Zero -> x [#] y.
+Lemma zero_minus_apart : forall x y : G, x [-] y [#] [0] -> x [#] y.
 Proof.
  unfold cg_minus in |- *. intros x y H.
  cut (x[+] [--] y [#] y[+] [--] y). intros h.
   apply (cg_ap_cancel_rht _ _ _ h).
- astepr (Zero:G). auto.
+ astepr ([0]:G). auto.
 Qed.
 
-Lemma inv_resp_ap_zero : forall x : G, x [#] Zero -> [--] x [#] Zero.
+Lemma inv_resp_ap_zero : forall x : G, x [#] [0] -> [--] x [#] [0].
 Proof.
  intros x H.
- astepl (Zero[+] [--] x).
- astepl (Zero [-] x).
+ astepl ([0][+] [--] x).
+ astepl ([0] [-] x).
  apply minus_ap_zero.
  apply (ap_symmetric G).
  auto.

@@ -51,7 +51,7 @@ Section Sums_over_Reals.
 
 Variable c : IR.
 
-Lemma Sum0_c_exp : forall H m, Sum0 m (fun i => c[^]i) [=] (c[^]m[-]One[/] c[-]One[//]H).
+Lemma Sum0_c_exp : forall H m, Sum0 m (fun i => c[^]i) [=] (c[^]m[-][1][/] c[-][1][//]H).
 Proof.
  intros.
  elim m.
@@ -59,19 +59,19 @@ Proof.
   rational.
  simpl in |- *.
  intros.
- astepl ((nexp IR n c[-]One[/] c[-]One[//]H) [+]nexp IR n c).
+ astepl ((nexp IR n c[-][1][/] c[-][1][//]H) [+]nexp IR n c).
  rational.
 Qed.
 
 Hint Resolve Sum0_c_exp.
 
 Lemma Sum_c_exp : forall H m n,
- Sum m n (fun i => c[^]i) [=] (c[^]S n[-]c[^]m[/] c[-]One[//]H).
+ Sum m n (fun i => c[^]i) [=] (c[^]S n[-]c[^]m[/] c[-][1][//]H).
 Proof.
  intros.
  unfold Sum in |- *.
  unfold Sum1 in |- *.
- astepl ((c[^]S n[-]One[/] c[-]One[//]H) [-] (c[^]m[-]One[/] c[-]One[//]H)).
+ astepl ((c[^]S n[-][1][/] c[-][1][//]H) [-] (c[^]m[-][1][/] c[-][1][//]H)).
  rational.
 Qed.
 Hint Resolve Sum_c_exp.
@@ -79,14 +79,14 @@ Hint Resolve Sum_c_exp.
 (** The following formulation is often more useful if [c [<] 1]. *)
 
 Lemma Sum_c_exp' : forall H m n,
- Sum m n (fun i => c[^]i) [=] (c[^]m[-]c[^]S n[/] One[-]c[//]H).
+ Sum m n (fun i => c[^]i) [=] (c[^]m[-]c[^]S n[/] [1][-]c[//]H).
 Proof.
  intros.
- cut (c[-]One [#] Zero).
+ cut (c[-][1] [#] [0]).
   intro H0.
-  astepl (c[^]S n[-]c[^]m[/] c[-]One[//]H0).
+  astepl (c[^]S n[-]c[^]m[/] c[-][1][//]H0).
   rational.
- rstepl ( [--] (One[-]c)).
+ rstepl ( [--] ([1][-]c)).
  apply inv_resp_ap_zero.
  assumption.
 Qed.

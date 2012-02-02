@@ -53,7 +53,7 @@ continuous function commutes with the limit of a numerical sequence
 (sometimes called Heine continuity).
 *)
 
-Lemma Continuous_imp_comm_Lim : forall F x e, Zero [<] e ->
+Lemma Continuous_imp_comm_Lim : forall F x e, [0] [<] e ->
  Continuous (clcr (Lim x[-]e) (Lim x[+]e)) F -> forall Hx Hxn H,
  F (Lim x) Hx [=] Lim (Build_CauchySeq IR (fun n => F (x n) (Hxn n)) H).
 Proof.
@@ -108,15 +108,15 @@ and [(b,c]], then it is positive in [[a,c]].
 *)
 
 Lemma Continuous_imp_pos : forall a b c (Hac : a [<=] c), a [<=] b -> b [<] c ->
- forall F, Continuous_I Hac F -> (forall t, a [<=] t -> t [<=] b -> forall Ht, Zero [<] F t Ht) ->
- (forall t, b [<] t -> t [<=] c -> forall Ht, Zero [<] F t Ht) -> forall t, a [<=] t -> t [<=] c -> forall Ht, Zero [<] F t Ht.
+ forall F, Continuous_I Hac F -> (forall t, a [<=] t -> t [<=] b -> forall Ht, [0] [<] F t Ht) ->
+ (forall t, b [<] t -> t [<=] c -> forall Ht, [0] [<] F t Ht) -> forall t, a [<=] t -> t [<=] c -> forall Ht, [0] [<] F t Ht.
 Proof.
  intros a b c Hac H H0 F H1 H2 H3 t H4 H5 Ht.
  elim H1; intros H6 H7; clear H1.
  cut (Compact Hac b); [ intro H1 | split; auto ].
   2: apply less_leEq; auto.
  set (e := F b (H6 _ H1) [/]TwoNZ) in *.
- cut (Zero [<] e); intros.
+ cut ([0] [<] e); intros.
   2: unfold e in |- *; apply pos_div_two; apply H2; auto.
   2: apply leEq_reflexive.
  elim H7 with e; auto.
@@ -129,7 +129,7 @@ Proof.
   clear H11.
   elim (less_cotransitive_unfolded _ _ _ H9 (t[-]b)); intro.
    apply H3.
-    astepl (Zero[+]b); apply shift_plus_less; auto.
+    astepl ([0][+]b); apply shift_plus_less; auto.
    auto.
   apply cont_no_sign_change_pos with (Hab := Hac) (e := e) (Hx := H6 _ H1); auto.
      split; auto.
@@ -460,8 +460,8 @@ Qed.
 (** More on glueing intervals. *)
 
 Lemma olor_pos_clor_nonneg : forall a b (F : PartIR),
- (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Ha,
- Zero [<=] F a Ha -> forall x, clor a b x -> forall Hx, Zero [<=] F x Hx.
+ (forall x, olor a b x -> forall Hx, [0] [<] F x Hx) -> forall Ha,
+ [0] [<=] F a Ha -> forall x, clor a b x -> forall Hx, [0] [<=] F x Hx.
 Proof.
  intros a b F H Ha H0 x H1 Hx.
  rewrite -> leEq_def; intros H2.
@@ -475,12 +475,12 @@ Proof.
   elim (ap_imp_less _ _ _ H4); intros.
    apply (less_irreflexive_unfolded _ a); apply leEq_less_trans with x; auto.
   apply H3; split; auto.
- apply (less_irreflexive_unfolded IR Zero); apply less_transitive_unfolded with (F x Hx); auto.
+ apply (less_irreflexive_unfolded IR [0]); apply less_transitive_unfolded with (F x Hx); auto.
 Qed.
 
 Lemma olor_pos_olcr_nonneg : forall a b (F : PartIR),
- (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Hb,
- Zero [<=] F b Hb -> forall x, olcr a b x -> forall Hx, Zero [<=] F x Hx.
+ (forall x, olor a b x -> forall Hx, [0] [<] F x Hx) -> forall Hb,
+ [0] [<=] F b Hb -> forall x, olcr a b x -> forall Hx, [0] [<=] F x Hx.
 Proof.
  intros a b F H Ha H0 x H1 Hx.
  rewrite -> leEq_def; intros H2.
@@ -494,12 +494,12 @@ Proof.
   elim (ap_imp_less _ _ _ H4); intros.
    apply H3; split; auto.
   apply (less_irreflexive_unfolded _ b); apply less_leEq_trans with x; auto.
- apply (less_irreflexive_unfolded IR Zero); apply less_transitive_unfolded with (F x Hx); auto.
+ apply (less_irreflexive_unfolded IR [0]); apply less_transitive_unfolded with (F x Hx); auto.
 Qed.
 
 Lemma olor_pos_clcr_nonneg : forall a b (F : PartIR), a [<] b ->
- (forall x, olor a b x -> forall Hx, Zero [<] F x Hx) -> forall Ha, Zero [<=] F a Ha -> forall Hb, Zero [<=] F b Hb ->
- forall x, clcr a b x -> forall Hx, Zero [<=] F x Hx.
+ (forall x, olor a b x -> forall Hx, [0] [<] F x Hx) -> forall Ha, [0] [<=] F a Ha -> forall Hb, [0] [<=] F b Hb ->
+ forall x, clcr a b x -> forall Hx, [0] [<=] F x Hx.
 Proof.
  intros a b F Hab H Ha H0 Hb H1 x H2 Hx.
  rewrite -> leEq_def; intros H3.
@@ -523,14 +523,14 @@ Proof.
   elim (ap_imp_less _ _ _ X); intros.
    apply (less_irreflexive_unfolded _ a); apply leEq_less_trans with x; auto.
   apply H4; split; auto.
- apply (less_irreflexive_unfolded IR Zero); apply less_transitive_unfolded with (F x Hx); auto.
+ apply (less_irreflexive_unfolded IR [0]); apply less_transitive_unfolded with (F x Hx); auto.
 Qed.
 
 (**
 Any function that has the null function as its derivative must be constant.
 *)
 
-Lemma FConst_prop : forall J pJ F', Derivative J pJ F' [-C-]Zero -> {c : IR | Feq J F' [-C-]c}.
+Lemma FConst_prop : forall J pJ F', Derivative J pJ F' [-C-][0] -> {c : IR | Feq J F' [-C-]c}.
 Proof.
  intros J pJ F' H.
  elim (nonvoid_point _ (proper_nonvoid _ pJ)); intros x0 Hx0.
@@ -570,7 +570,7 @@ Proof.
  elim (Feq_crit_with_const _ _ _ _ _ H0 H1); intros c Hc.
  apply Feq_transitive with (F{-}G{+}G).
   FEQ.
- apply Feq_transitive with ( [-C-]Zero{+}G).
+ apply Feq_transitive with ( [-C-][0]{+}G).
   2: FEQ.
  apply Feq_plus.
   2: apply Feq_reflexive; Included.
@@ -599,7 +599,7 @@ formalization and from the mathematical point of view.
 *)
 
 Lemma Derivative_imp_resp_less : forall J pJ a b F F', Derivative J pJ F F' ->
- a [<] b -> J a -> J b -> (forall contF', Zero [<] glb_funct _ _ (Min_leEq_Max a b) F' contF') ->
+ a [<] b -> J a -> J b -> (forall contF', [0] [<] glb_funct _ _ (Min_leEq_Max a b) F' contF') ->
  forall Ha Hb, F a Ha [<] F b Hb.
 Proof.
  intros J pJ a b F F' derF Hab HaJ HbJ Hglb Ha Hb.
@@ -609,7 +609,7 @@ Proof.
     [ apply Derivative_imp_Continuous' with pJ F | apply included_interval ]; auto.
  elim (glb_is_glb _ _ _ _ H).
  simpl in |- *; intros Hglb1 Hglb2.
- cut (Zero [<] glb_funct _ _ _ _ H); [ intro H0 | auto ].
+ cut ([0] [<] glb_funct _ _ _ _ H); [ intro H0 | auto ].
  elim (Law_of_the_Mean _ _ _ _ derF a b) with (e := (glb_funct _ _ _ _ H[*] (b[-]a)) [/]TwoNZ); auto.
   intros x H1 H2.
   apply less_leEq_trans with (F' x (contin_imp_inc _ _ _ _ H x H1) [*] (b[-]a) [-]
@@ -632,17 +632,17 @@ Proof.
 Qed.
 
 Lemma Derivative_imp_resp_leEq : forall J pJ a b F F', Derivative J pJ F F' ->
- a [<=] b -> J a -> J b -> (forall contF', Zero [<=] glb_funct _ _ (Min_leEq_Max b a) F' contF') ->
+ a [<=] b -> J a -> J b -> (forall contF', [0] [<=] glb_funct _ _ (Min_leEq_Max b a) F' contF') ->
  forall Ha Hb, F a Ha [<=] F b Hb.
 Proof.
  intros J pJ a b F F' derF Hab HaJ HbJ Hglb Ha Hb.
- astepr (Zero[+]Part _ _ Hb); apply shift_leEq_plus.
+ astepr ([0][+]Part _ _ Hb); apply shift_leEq_plus.
  cut (Continuous_I (Min_leEq_Max b a) F'). intro H.
   2: apply included_imp_Continuous with J;
     [ apply Derivative_imp_Continuous' with pJ F | apply included_interval ]; auto.
  elim (glb_is_glb _ _ _ _ H).
  simpl in |- *; intros Hglb1 Hglb2.
- cut (Zero [<=] glb_funct _ _ _ _ H); [ intro H0 | auto ].
+ cut ([0] [<=] glb_funct _ _ _ _ H); [ intro H0 | auto ].
  apply approach_zero_weak.
  intros.
  elim (Law_of_the_Mean _ _ _ _ derF b a) with (e := e); auto.
@@ -651,7 +651,7 @@ Proof.
   2: apply (H3 Hb Ha (contin_imp_inc _ _ _ _ H x H2)).
  eapply leEq_transitive.
   2: apply leEq_AbsIR.
- rstepl (Part _ _ Ha[-]Part _ _ Hb[-][--]Zero).
+ rstepl (Part _ _ Ha[-]Part _ _ Hb[-][--][0]).
  unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
  apply inv_resp_leEq.
  rstepl ( [--] (Part _ _ (contin_imp_inc _ _ _ _ H _ H2) [*] (b[-]a))).
@@ -666,7 +666,7 @@ Proof.
 Qed.
 
 Lemma Derivative_imp_resp_less' : forall J pJ a b F F', Derivative J pJ F F' ->
- a [<] b -> J a -> J b -> (forall contF', Zero [<=] glb_funct _ _ (Min_leEq_Max b a) F' contF') ->
+ a [<] b -> J a -> J b -> (forall contF', [0] [<=] glb_funct _ _ (Min_leEq_Max b a) F' contF') ->
  forall Ha Hb, F a Ha [#] F b Hb -> F a Ha [<] F b Hb.
 Proof.
  intros J pJ a b F F' H H0 H1 H2 H3 Ha Hb H4.

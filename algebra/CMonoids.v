@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-(** printing Zero %\ensuremath{\mathbf0}% #0# *)
+(** printing [0] %\ensuremath{\mathbf0}% #0# *)
 
 Require Export Euclid.
 Require Export Cmod.
@@ -61,8 +61,8 @@ Record CMonoid : Type :=
 
 (**
 %\begin{nameconvention}%
-In the names of lemmas, we will denote [Zero] with [zero].
-We denote [ [#] Zero] in the names of lemmas by [ap_zero]
+In the names of lemmas, we will denote [[0]] with [zero].
+We denote [ [#] [0]] in the names of lemmas by [ap_zero]
 (and not, e.g.%\% [nonzero]).
 %\end{nameconvention}%
 *)
@@ -71,14 +71,14 @@ We denote [ [#] Zero] in the names of lemmas by [ap_zero]
 
 (**
 The predicate "non-zero" is defined.
-In lemmas we will continue to write [x [#] Zero], rather than
+In lemmas we will continue to write [x [#] [0]], rather than
 [(nonZeroP x)], but the predicate is useful for some high-level definitions,
 e.g. for the setoid of non-zeros.
 *)
 
-Notation Zero := (cm_unit _).
+Notation "[0]" := (cm_unit _).
 
-Definition nonZeroP (M : CMonoid) (x : M) : CProp := x [#] Zero.
+Definition nonZeroP (M : CMonoid) (x : M) : CProp := x [#] [0].
 
 (* End_SpecReals *)
 
@@ -97,12 +97,12 @@ Proof.
  elim M; auto.
 Qed.
 
-Lemma cm_rht_unit : is_rht_unit csg_op (Zero:M).
+Lemma cm_rht_unit : is_rht_unit csg_op ([0]:M).
 Proof.
  elim CMonoid_is_CMonoid; auto.
 Qed.
 
-Lemma cm_lft_unit : is_lft_unit csg_op (Zero:M).
+Lemma cm_lft_unit : is_lft_unit csg_op ([0]:M).
 Proof.
  elim CMonoid_is_CMonoid; auto.
 Qed.
@@ -117,24 +117,24 @@ End CMonoid_axioms.
 Section CMonoid_basics.
 Variable M : CMonoid.
 
-Lemma cm_rht_unit_unfolded : forall x : M, x[+]Zero [=] x.
+Lemma cm_rht_unit_unfolded : forall x : M, x[+][0] [=] x.
 Proof cm_rht_unit M.
 
-Lemma cm_lft_unit_unfolded : forall x : M, Zero[+]x [=] x.
+Lemma cm_lft_unit_unfolded : forall x : M, [0][+]x [=] x.
 Proof cm_lft_unit M.
 
 Hint Resolve cm_rht_unit_unfolded cm_lft_unit_unfolded: algebra.
 
-Lemma cm_unit_unique_lft : forall x : M, is_lft_unit csg_op x -> x [=] Zero.
+Lemma cm_unit_unique_lft : forall x : M, is_lft_unit csg_op x -> x [=] [0].
 Proof.
  intros x h. red in h.
- Step_final (x[+]Zero).
+ Step_final (x[+][0]).
 Qed.
 
-Lemma cm_unit_unique_rht : forall x : M, is_rht_unit csg_op x -> x [=] Zero.
+Lemma cm_unit_unique_rht : forall x : M, is_rht_unit csg_op x -> x [=] [0].
 Proof.
  intros x h. red in h.
- Step_final (Zero[+]x).
+ Step_final ([0][+]x).
 Qed.
 
 (* Begin_SpecReals *)
@@ -159,13 +159,13 @@ Qed.
 (**
 ** Submonoids
 %\begin{convention}%
-Let [P] a predicate on [M] containing [Zero] and closed under [[+]].
+Let [P] a predicate on [M] containing [[0]] and closed under [[+]].
 %\end{convention}%
 *)
 
 Section SubCMonoids.
 Variable P : M -> CProp.
-Variable Punit : P Zero.
+Variable Punit : P [0].
 Variable op_pres_P : bin_op_pres_pred _ P csg_op.
 
 Let subcrr : CSemiGroup := Build_SubCSemiGroup _ _ op_pres_P.
@@ -198,7 +198,7 @@ Variable M1:CMonoid.
 Variable M2:CMonoid.
 
 Definition morphism (f:(CSetoid_fun M1 M2)):CProp:=
-(f (Zero)[=]Zero /\ forall (a b:M1), (f (a[+]b))[=] (f a)[+](f b)).
+(f ([0])[=][0] /\ forall (a b:M1), (f (a[+]b))[=] (f a)[+](f b)).
 
 Definition isomorphism (f:(CSetoid_fun M1 M2)):CProp:=
 (morphism f) and (bijective f).
@@ -243,7 +243,7 @@ Proof.
    elim H0.
    clear H0.
    intros H3 H4.
-   astepl ((Inv f iso_imp_bij) (f Zero)).
+   astepl ((Inv f iso_imp_bij) (f [0])).
    unfold Inv.
    simpl.
    apply inv2.
@@ -891,7 +891,7 @@ Section Th11.
 ** Intersection
 The intersection of a collection of monoids is again a monoid.
 %\begin{convention}%
-Let [M:CMonoid], [I:type], [C:I->(M->CProp)], [Cunit: (C i Zero)] and
+Let [M:CMonoid], [I:type], [C:I->(M->CProp)], [Cunit: (C i [0])] and
 [op_pres_C:forall (i:I), (bin_op_pres_pred _ (C i) csg_op)].
 %\end{convention}%
 *)
@@ -899,7 +899,7 @@ Let [M:CMonoid], [I:type], [C:I->(M->CProp)], [Cunit: (C i Zero)] and
 Variable M:CMonoid.
 Variable I:Type.
 Variable C:I->(M->CProp).
-Variable Cunit: forall (i:I), (C i Zero).
+Variable Cunit: forall (i:I), (C i [0]).
 Variable op_pres_C: forall (i:I),(bin_op_pres_pred _ (C i) csg_op).
 
 Definition K : M -> CProp :=
@@ -931,7 +931,7 @@ Context {M:CMonoid}.
 
 Fixpoint cm_Sum (l: list M) {struct l}: M :=
 match l with
-|nil => Zero
+|nil => [0]
 |cons a k => a [+] (cm_Sum k)
 end.
 
@@ -941,7 +941,7 @@ Definition Dbrack : M -> CProp :=
   fun m => {l: (list M)| (forall (a:M) , member a l -> (D a)) and
                                         (cm_Sum l)[=]m}.
 
-Lemma Dbrack_unit: (Dbrack Zero).
+Lemma Dbrack_unit: (Dbrack [0]).
 Proof.
  unfold Dbrack.
  exists (@nil M).
@@ -986,7 +986,7 @@ Proof with auto; try reflexivity.
  transitivity (cm_Sum l')...
 Qed.
 
-Lemma cm_Sum_units (a: list M): (forall x, In x a -> x [=] Zero) -> cm_Sum a [=] Zero.
+Lemma cm_Sum_units (a: list M): (forall x, In x a -> x [=] [0]) -> cm_Sum a [=] [0].
 Proof with intuition.
  clear D.
  induction a. intuition.

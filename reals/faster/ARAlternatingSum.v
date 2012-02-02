@@ -10,18 +10,20 @@ Context `{AppRationals AQ}.
 Add Ring Z : (rings.stdlib_ring_theory Z).
 Local Coercion Is_true : bool >-> Sortclass.
 
-(*
+(**
 The goal of this section is to compute the infinite alternating sum. Since 
 we do not have a precise division operation, we want to postpone divisions as 
 long as possible. Hence we parametrize our infinite sum by a stream [sN] 
 of numerators and a stream [sD] of denominators.
 *)
+
 Fixpoint ARAltSum (sN sD : Stream AQ) (l : nat) (k : Z) :=
   match l with 
   | O => 0
   | S l' => app_div (hd sN) (hd sD) k - ARAltSum (tl sN) (tl sD) l' k
   end.
-(* 
+
+(** 
 However, we have to determine both the length [l] and the required precision 
 [2^k] of dividing [sN] by [sQ].
 
@@ -29,6 +31,7 @@ Since Russell has already done a lot of work on this, we aim to reuse that.
 Hence we define the following predicate to describe that our streams [sN]
 and [sD] correspond to a stream [sQ] of Russell.
 *)
+
 CoInductive DivisionStream: Stream Q_as_MetricSpace → Stream AQ → Stream AQ → Prop :=
   division_stream_eq: ∀ sQ sN sD, 
       hd sQ = 'hd sN / 'hd sD → DivisionStream (tl sQ) (tl sN) (tl sD) → DivisionStream sQ sN sD.
@@ -61,17 +64,19 @@ Proof.
   now apply IHn, DivisionStream_tl. 
 Qed.
 
-(* 
+(** 
 Now, [ARInfAltSum_stream sN sD k 0] represents a stream of estimates [sN / sD] 
 with logarithmically increasing precision starting with precision [2^k]. We 
 compute the length by walking through the stream [ARInfAltSum_stream sN sD k 0] 
 until we have an element that has an upper estimate below the required precision.
 *)
+
 CoFixpoint ARInfAltSum_stream (sN sD : Stream AQ) (k l : Z) : Stream AQ := Cons 
   (app_div_above (hd sN) (hd sD) (k - Z.log2_up l))
   (ARInfAltSum_stream (tl sN) (tl sD) k (l + 1)).
 
-(* Before we prove that this stream has limit 0, we state some auxiliary stuff. *)
+(** Before we prove that this stream has limit 0, we state some auxiliary stuff. *)
+
 Definition ARInfAltSum_stream_tl sN sD k l :
   tl (ARInfAltSum_stream sN sD k l) = ARInfAltSum_stream (tl sN) (tl sD) k (l + 1).
 Proof.
@@ -91,10 +96,11 @@ Proof.
   rewrite rings.preserves_plus, rings.preserves_1. ring.
 Qed.
 
-(* 
+(** 
 If a certain coordinate of [ARInfAltSum_stream] is in the ball, then the 
 corresponding coordinate in [sQ] is in the ball too.
 *)
+
 Lemma ARInfAltSum_stream_preserves_ball `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} (ε : Qpos) (l : Z) :
   ForAllIf (λ s, AQball_bool (Qdlog2 ε) (hd s) 0) (λ s, Qball_ex_bool ε (hd s) 0) 
     (ARInfAltSum_stream sN sD (Qdlog2 ε) l) sQ.
@@ -128,7 +134,8 @@ Proof with auto.
   now apply _.
 Qed.
 
-(* Helper lemma for the inductive step of ARInfAltSum_length_ex *)
+(** Helper lemma for the inductive step of ARInfAltSum_length_ex *)
+
 Lemma ARInfAltSum_length_ball `(d : DivisionStream sQ sN sD) (k l : Z) `(Pl : 4 ≤ l) :
   NearBy 0 (Qpos2QposInf (2 ^ (k - 1))) sQ → AQball_bool k (hd (ARInfAltSum_stream sN sD k l)) 0.
 Proof.
@@ -140,7 +147,7 @@ Proof.
    simpl.
    assert (∀ n : Z, (2:Q) ^ n = 2 ^ (n - 1) + 2 ^ (n - 1)) as G.
     intros n.
-    ms_setoid_replace n with (1 + (n - 1)) at 1 by ring.
+    mc_setoid_replace n with (1 + (n - 1)) at 1 by ring.
     rewrite int_pow_S.
      now rewrite rings.plus_mult_distr_r, left_identity.
     apply (rings.is_ne_0 (2:Q)).
@@ -152,8 +159,8 @@ Proof.
      now apply semirings.le_1_2.
     rewrite <-associativity.
     apply (order_preserving (k +)).
-    rewrite <-rings.opp_distr.
-    apply rings.flip_le_opp.
+    rewrite <-rings.negate_plus_distr.
+    apply rings.flip_le_negate.
     replace (1 + 1:Z) with (Z.log2_up 4) by reflexivity.
     now apply Z.log2_up_le_mono.
    now apply semirings.plus_le_compat.
@@ -169,10 +176,11 @@ Proof.
   now apply Qball_0_r.
 Qed.
 
-(* 
+(** 
 So, as required, [ARInfAltSum_stream] has limit [0]. That is, for each [k], 
 there exists an [i] such that [ARInfAltSum_stream[i]] is smaller than [2^k]. 
 *)
+
 Lemma ARInfAltSum_length_ex `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k l : Z) (Pl : 4 ≤ l) :
   LazyExists (λ s, AQball_bool k (hd s) 0) (ARInfAltSum_stream sN sD k l).
 Proof.
@@ -188,7 +196,7 @@ Defined.
 Section main_part.
 Context `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0}.
 
-(* 
+(** 
 Now we can compute the required length of the stream that we have to sum
 (using [ARAltSum]).
 
@@ -196,6 +204,7 @@ Instead of using the proof of termination right away, we perform [big] steps fir
 pick [big] such that computation will suffer from the implementation limits of Coq 
 (e.g. a stack overflow) or runs out of memory, before we ever refer to the proof.
 *)
+
 Definition big := Eval vm_compute in (Z.nat_of_Z 50000).
 Obligation Tactic := idtac.
 Program Definition ARInfAltSum_length (k : Z) : nat := 4 + takeUntil_length 
@@ -212,10 +221,11 @@ Next Obligation.
   now vm_compute.
 Qed.
 
-(* 
+(**
 Since we are using approximate division, we obviously have to sum some extra
 terms so as to compensate for the loss of precision.
 *)
+
 Lemma ARInfAltSum_length_ge (ε : Qpos) :
   takeUntil_length _ (Limit_near sQ 0 ε) ≤ ARInfAltSum_length (Qdlog2 ε).
 Proof.
@@ -234,7 +244,7 @@ Lemma ARInfAltSum_length_pos (k : Z) :
 Proof.
   unfold ARInfAltSum_length.
   apply semirings.nonneg_plus_lt_compat_r.
-   apply naturals.naturals_nonneg.
+   apply naturals.nat_nonneg.
   apply: (semirings.lt_0_4 (R:=nat)).
 Qed.
 
@@ -244,7 +254,7 @@ Proof.
   revert sQ sN sD d dnn zl.
   induction l using Pind; intros.
    simpl. 
-   rewrite rings.opp_0, rings.plus_0_r.
+   rewrite rings.negate_0, rings.plus_0_r.
    rewrite Qminus'_correct. unfold Qminus. rewrite Qplus_0_r.
    setoid_replace (1%positive * 2 ^ k)%Qpos with (2 ^ k)%Qpos.
     (* ugly: make a duplicate of [d] to avoid Coq errors due to [d] being a section variable. *)
@@ -254,7 +264,7 @@ Proof.
    unfold QposEq. simpl. now apply rings.mult_1_l.
   rewrite Psucc_S.
   simpl.
-  rewrite rings.preserves_plus, rings.preserves_opp.
+  rewrite rings.preserves_plus, rings.preserves_negate.
   rewrite Qminus'_correct. unfold Qminus.
   setoid_replace (Psucc l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
    apply Qball_plus.
@@ -279,7 +289,7 @@ Proof.
    change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
    apply (order_reflecting ((2:Q) ^ Z.log2_up l' *.)).
-   ms_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
+   mc_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
     rewrite (commutativity _ ((2:Q) ^ k)).
     apply (order_preserving (2 ^ k *.)).
     replace (2:Q) with (inject_Z 2) by reflexivity.
@@ -290,17 +300,18 @@ Proof.
      apply Z.log2_up_spec. 
      auto with zarith.
     now apply Z.log2_up_nonneg.
-   rewrite int_pow_opp.
+   rewrite int_pow_negate.
    rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
    rewrite <-associativity.
-   rewrite associativity, dec_mult_inverse by solve_propholds.
+   rewrite associativity, dec_recip_inverse by solve_propholds.
    now apply left_identity.
   rewrite <-nat_of_P_of_succ_nat.
   rewrite convert_is_POS.
   now apply ARAltSum_correct_aux.
 Qed.
 
-(* Now we can finally compute the infinite alternating sum! *)
+(** Now we can finally compute the infinite alternating sum! *)
+
 Definition ARInfAltSum_raw (ε : Qpos) : AQ_as_MetricSpace := 
   let εk:= Qdlog2 ε - 1 in 
   let l:= ARInfAltSum_length εk
@@ -338,6 +349,7 @@ Proof.
 Qed.
 
 Definition ARInfAltSum := mkRegularFunction (0 : AQ_as_MetricSpace) ARInfAltSum_prf.
+
 
 Lemma ARInfAltSum_correct:
    'ARInfAltSum = InfiniteAlternatingSum sQ.

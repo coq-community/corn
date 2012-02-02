@@ -187,7 +187,7 @@ Section dense_prelength_embedding.
 
   Global Instance: Inverse Eembed_inverse := Eembed.
   Global Instance: Bijective Eembed_inverse.
-  Proof. apply jections.flip_bijection_pseudoinstance. Qed.
+  Proof. apply jections.flip_bijection. Qed.
 
   Let F := Eembed.
 

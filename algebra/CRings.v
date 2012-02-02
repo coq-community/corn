@@ -40,7 +40,7 @@
 (** printing {*} %\ensuremath\times% #&times;# *)
 (** printing {**} %\ensuremath\ast% #&lowast;# *)
 (** printing {^} %\ensuremath{\hat{\ }}% #^# *)
-(** printing One %\ensuremath{\mathbf1}% #1# *)
+(** printing [1] %\ensuremath{\mathbf1}% #1# *)
 (** printing Two %\ensuremath{\mathbf2}% #2# *)
 (** printing Three %\ensuremath{\mathbf3}% #3# *)
 (** printing Four %\ensuremath{\mathbf4}% #4# *)
@@ -79,7 +79,7 @@ Record is_CRing (G : CAbGroup) (One : G) (mult : CSetoid_bin_op G) : CProp :=
    ax_mult_mon   : is_CMonoid (Build_CSemiGroup G mult ax_mult_assoc) One;
    ax_mult_com   : commutes mult;
    ax_dist       : distributive mult csg_op;
-   ax_non_triv   : One [#] Zero}.
+   ax_non_triv   : One [#] [0]}.
 
 Record CRing : Type :=
   {cr_crr   :> CAbGroup;
@@ -92,7 +92,7 @@ Definition cr_inv := @cg_inv.
 Definition cr_minus := cg_minus.
 
 
-Notation One := (cr_one _).
+Notation "[1]" := (cr_one _).
 (* End_SpecReals *)
 
 (* Begin_SpecReals *)
@@ -115,7 +115,7 @@ Section CRing_axioms.
 *)
 Variable R : CRing.
 
-Lemma CRing_is_CRing : is_CRing R One cr_mult.
+Lemma CRing_is_CRing : is_CRing R [1] cr_mult.
 Proof.
  elim R; auto.
 Qed.
@@ -130,7 +130,7 @@ Proof.
  elim CRing_is_CRing; auto.
 Qed.
 
-Lemma mult_mon : is_CMonoid (Build_CSemiGroup R cr_mult mult_assoc) One.
+Lemma mult_mon : is_CMonoid (Build_CSemiGroup R cr_mult mult_assoc) [1].
 Proof.
  elim (cr_proof R).
  intros H1 H2 H3 H4 H5.
@@ -145,7 +145,7 @@ Proof.
  elim (cr_proof R); auto.
 Qed.
 
-Lemma ring_non_triv : (One:R) [#] Zero.
+Lemma ring_non_triv : ([1]:R) [#] [0].
 Proof.
  elim (cr_proof R); auto.
 Qed.
@@ -209,10 +209,10 @@ Lemma mult_commut_unfolded : forall x y : R, x[*]y [=] y[*]x.
 Proof mult_commutes R.
 Hint Resolve mult_commut_unfolded: algebra.
 
-Lemma mult_one : forall x : R, x[*]One [=] x.
+Lemma mult_one : forall x : R, x[*][1] [=] x.
 Proof cm_rht_unit mmR.
 
-Lemma one_mult : forall x : R, One[*]x [=] x.
+Lemma one_mult : forall x : R, [1][*]x [=] x.
 Proof cm_lft_unit mmR.
 
 Lemma ring_dist_unfolded : forall x y z : R, x[*] (y[+]z) [=] x[*]y[+]x[*]z.
@@ -242,7 +242,7 @@ Section Ring_basics.
 *)
 Variable R : CRing.
 
-Lemma one_ap_zero : (One:R) [#] Zero.
+Lemma one_ap_zero : ([1]:R) [#] [0].
 Proof ring_non_triv R.
 
 Definition is_zero_rht S (op : CSetoid_bin_op S) Zero : Prop := forall x, op x Zero [=] Zero.
@@ -252,23 +252,23 @@ Definition is_zero_lft S (op : CSetoid_bin_op S) Zero : Prop := forall x, op Zer
 Implicit Arguments is_zero_rht [S].
 Implicit Arguments is_zero_lft [S].
 
-Lemma cring_mult_zero : forall x : R, x[*]Zero [=] Zero.
+Lemma cring_mult_zero : forall x : R, x[*][0] [=] [0].
 Proof.
  intro x.
- apply cg_cancel_lft with (x[*]Zero).
- astepr (x[*]Zero).
- Step_final (x[*] (Zero[+]Zero)).
+ apply cg_cancel_lft with (x[*][0]).
+ astepr (x[*][0]).
+ Step_final (x[*] ([0][+][0])).
 Qed.
 Hint Resolve cring_mult_zero: algebra.
 
-Lemma x_mult_zero : forall x y : R, y [=] Zero -> x[*]y [=] Zero.
+Lemma x_mult_zero : forall x y : R, y [=] [0] -> x[*]y [=] [0].
 Proof.
- intros x y H; Step_final (x[*]Zero).
+ intros x y H; Step_final (x[*][0]).
 Qed.
 
-Lemma cring_mult_zero_op : forall x : R, Zero[*]x [=] Zero.
+Lemma cring_mult_zero_op : forall x : R, [0][*]x [=] [0].
 Proof.
- intro x; Step_final (x[*]Zero).
+ intro x; Step_final (x[*][0]).
 Qed.
 Hint Resolve cring_mult_zero_op: algebra.
 
@@ -277,7 +277,7 @@ Proof.
  intros x y.
  apply cg_inv_unique.
  astepl (x[*] (y[+] [--]y)).
- Step_final (x[*]Zero).
+ Step_final (x[*][0]).
 Qed.
 Hint Resolve cring_inv_mult_lft: algebra.
 
@@ -289,16 +289,16 @@ Proof.
 Qed.
 Hint Resolve cring_inv_mult_rht: algebra.
 
-Lemma cring_mult_ap_zero :(forall x y : R, x[*]y [#] Zero -> x [#] Zero):CProp.
+Lemma cring_mult_ap_zero :(forall x y : R, x[*]y [#] [0] -> x [#] [0]):CProp.
 Proof.
  intros x y H.
- elim (cs_bin_op_strext _ cr_mult x Zero y y).
+ elim (cs_bin_op_strext _ cr_mult x [0] y y).
    auto.
   intro contra; elim (ap_irreflexive _ _ contra).
- astepr (Zero:R). auto.
+ astepr ([0]:R). auto.
 Qed.
 
-Lemma cring_mult_ap_zero_op : (forall x y : R, x[*]y [#] Zero -> y [#] Zero)
+Lemma cring_mult_ap_zero_op : (forall x y : R, x[*]y [#] [0] -> y [#] [0])
   :CProp.
 Proof.
  intros x y H.
@@ -331,14 +331,14 @@ Qed.
 
 Hint Resolve ring_distl_minus: algebra.
 
-Lemma mult_minus1 : forall x:R, [--]One [*] x [=] [--]x.
+Lemma mult_minus1 : forall x:R, [--][1] [*] x [=] [--]x.
 Proof.
  intro x.
  apply (cg_cancel_lft R x).
- astepr (Zero:R).
- astepl ((One[*]x)[+]([--]One[*]x)).
- astepl ((One[+][--]One)[*]x).
- Step_final (Zero[*]x).
+ astepr ([0]:R).
+ astepl (([1][*]x)[+]([--][1][*]x)).
+ astepl (([1][+][--][1])[*]x).
+ Step_final ([0][*]x).
 Qed.
 
 Lemma ring_distr1 : forall a b1 b2:R,
@@ -388,7 +388,7 @@ Variable R : CRing.
 
 Fixpoint nexp (m : nat) : R -> R :=
   match m with
-  | O   => fun _ : R => One
+  | O   => fun _ : R => [1]
   | S n => fun x : R => nexp n x[*]x
   end.
 
@@ -432,10 +432,10 @@ to have characteristic [0].
 
 Fixpoint nring (m : nat) : R :=
   match m with
-  | O   => Zero
-  | S n => nring n[+]One
+  | O   => [0]
+  | S n => nring n[+][1]
   end.
-Definition Char0 := forall n : nat, 0 < n -> nring n [#] Zero.
+Definition Char0 := forall n : nat, 0 < n -> nring n [#] [0].
 
 (* End_SpecReals *)
 
@@ -443,9 +443,9 @@ Lemma nring_comm_plus : forall n m, nring (n + m) [=] nring n[+]nring m.
 Proof.
  intros n m; induction  n as [| n Hrecn]; simpl in |- *.
   algebra.
- astepr (nring n[+] (One[+]nring m)).
- astepr (nring n[+] (nring m[+]One)).
- Step_final (nring n[+]nring m[+]One).
+ astepr (nring n[+] ([1][+]nring m)).
+ astepr (nring n[+] (nring m[+][1])).
+ Step_final (nring n[+]nring m[+][1]).
 Qed.
 
 Lemma nring_comm_mult : forall n m, nring (n * m) [=] nring n[*]nring m.
@@ -453,7 +453,7 @@ Proof.
  intros n m; induction  n as [| n Hrecn]; simpl in |- *.
   algebra.
  apply eq_transitive_unfolded with (nring m[+]nring (n * m)). apply (nring_comm_plus m (n * m)).
-  astepr (nring n[*]nring m[+]One[*]nring m).
+  astepr (nring n[*]nring m[+][1][*]nring m).
  astepr (nring n[*]nring m[+]nring m).
  Step_final (nring m[+]nring n[*]nring m).
 Qed.
@@ -478,7 +478,7 @@ Notation Eighteen := (nring 18).
 Notation TwentyFour := (nring 24).
 Notation FortyEight := (nring 48).
 
-Lemma one_plus_one : forall R : CRing, One[+]One [=] (Two:R).
+Lemma one_plus_one : forall R : CRing, [1][+][1] [=] (Two:R).
 Proof.
  simpl in |- *; algebra.
 Qed.
@@ -486,8 +486,8 @@ Qed.
 Lemma x_plus_x : forall (R : CRing) (x : R), x[+]x [=] Two[*]x.
 Proof.
  intros R x.
- astepl (One[*]x[+]One[*]x).
- astepl ((One[+]One) [*]x).
+ astepl ([1][*]x[+][1][*]x).
+ astepl (([1][+][1]) [*]x).
  simpl in |- *; algebra.
 Qed.
 
@@ -503,7 +503,7 @@ Proof.
  elim (Cnat_total_order i j); intros.
    replace j with (i + (j - i)).
     astepr (nring i[+]nring (j - i):R).
-    astepl (nring i[+]Zero:R).
+    astepl (nring i[+][0]:R).
     apply op_lft_resp_ap.
     apply ap_symmetric_unfolded.
     apply H.
@@ -511,7 +511,7 @@ Proof.
    auto with arith.
   replace i with (j + (i - j)).
    astepl (nring j[+]nring (i - j):R).
-   astepr (nring j[+] (Zero:R)).
+   astepr (nring j[+] ([0]:R)).
    apply op_lft_resp_ap.
    apply H.
    omega.
@@ -540,7 +540,7 @@ one. It is kept to avoid having to redo all the proofs.
 
 Definition zring_old k : R := caseZ_diff k (fun m n => nring m[-]nring n).
 
-Lemma zring_old_zero : zring_old 0 [=] Zero.
+Lemma zring_old_zero : zring_old 0 [=] [0].
 Proof.
  simpl in |- *; algebra.
 Qed.
@@ -557,12 +557,12 @@ Proof.
  unfold cg_minus in |- *.
  astepl (nring (R:=R) n[+] ( [--] (nring n) [+]nring m)).
  astepl (nring (R:=R) n[+] [--] (nring n) [+]nring m).
- astepl (Zero[+]nring (R:=R) m).
+ astepl ([0][+]nring (R:=R) m).
  astepl (nring (R:=R) m).
  apply cg_cancel_rht with (nring q:R).
  astepr (nring (R:=R) n[+] (nring p[+] [--] (nring q) [+]nring q)).
  astepr (nring (R:=R) n[+] (nring p[+] ( [--] (nring q) [+]nring q))).
- astepr (nring (R:=R) n[+] (nring p[+]Zero)).
+ astepr (nring (R:=R) n[+] (nring p[+][0])).
  astepr (nring (R:=R) n[+]nring p).
  astepr (nring (R:=R) (n + p)).
  astepl (nring (R:=R) (m + q)).
@@ -690,10 +690,10 @@ Qed.
 
 Hint Resolve zring_old_mult: algebra.
 
-Lemma zring_old_one : zring_old 1 [=] One.
+Lemma zring_old_one : zring_old 1 [=] [1].
 Proof.
  simpl in |- *.
- Step_final (One[-]Zero:R).
+ Step_final ([1][-][0]:R).
 Qed.
 
 Hint Resolve zring_old_one: algebra.
@@ -702,9 +702,9 @@ Lemma zring_old_inv_one : forall x, zring_old (-1) [*]x [=] [--]x.
 Proof.
  intro x.
  simpl in |- *.
- astepl ( [--] (Zero[+]One) [*]x).
- astepl ( [--]One[*]x).
- Step_final ( [--] (One[*]x)).
+ astepl ( [--] ([0][+][1]) [*]x).
+ astepl ( [--][1][*]x).
+ Step_final ( [--] ([1][*]x)).
 Qed.
 
 (*---------------- new def of zring. --------------------*)
@@ -719,11 +719,11 @@ Fixpoint pring_aux (p : positive) (pow2 : R) {struct p} : R :=
   | xI p => pow2[+]pring_aux p (Two[*]pow2)
   end.
 
-Definition pring (p : positive) : R := pring_aux p One.
+Definition pring (p : positive) : R := pring_aux p [1].
 
 Definition zring (z : Z) : R :=
   match z with
-  | Z0     => Zero
+  | Z0     => [0]
   | Zpos p => pring p
   | Zneg p => [--] (pring p)
   end.
@@ -771,7 +771,7 @@ Qed.
 
 Hint Resolve zring_zring_old: algebra.
 
-Lemma zring_zero : zring 0 [=] Zero.
+Lemma zring_zero : zring 0 [=] [0].
 Proof.
  simpl in |- *; algebra.
 Qed.
@@ -819,7 +819,7 @@ Proof.
  Step_final (zring_old i[*]zring_old j).
 Qed.
 
-Lemma zring_one : zring 1 [=] One.
+Lemma zring_one : zring 1 [=] [1].
 Proof.
  simpl in |- *.
  unfold pring in |- *.
@@ -832,7 +832,7 @@ Proof.
  simpl in |- *.
  unfold pring in |- *.
  simpl in |- *.
- Step_final ( [--] (One[*]x)).
+ Step_final ( [--] ([1][*]x)).
 Qed.
 
 End int_injection.
@@ -860,11 +860,11 @@ Section infinite_ring_sums.
 
 Fixpoint Sum_upto (f : nat -> R) (n : nat) {struct n} : R :=
   match n with
-  | O   => Zero
+  | O   => [0]
   | S x => f x[+]Sum_upto f x
   end.
 
-Lemma sum_upto_O : forall f : nat -> R, Sum_upto f 0 [=] Zero.
+Lemma sum_upto_O : forall f : nat -> R, Sum_upto f 0 [=] [0].
 Proof.
  algebra.
 Qed.
@@ -889,18 +889,18 @@ Section ring_sums_over_lists.
 
 Fixpoint RList_Mem (l : list R) (n : nat) {struct n} : R :=
   match l, n with
-  | nil,      _   => Zero
+  | nil,      _   => [0]
   | cons a _, O   => a
   | cons _ k, S y => RList_Mem k y
   end.
 
 Fixpoint List_Sum_upto (l : list R) (n : nat) {struct n} : R :=
   match n with
-  | O   => Zero
+  | O   => [0]
   | S x => RList_Mem l x[+]List_Sum_upto l x
   end.
 
-Lemma list_sum_upto_O : forall l : list R, List_Sum_upto l 0 [=] Zero.
+Lemma list_sum_upto_O : forall l : list R, List_Sum_upto l 0 [=] [0].
 Proof.
  algebra.
 Qed.
@@ -978,7 +978,7 @@ Proof.
  intros n x; induction  n as [| n Hrecn].
   simpl in |- *; algebra.
  simpl in |- *.
- astepr (nring n[*]x[+]One[*]x).
+ astepr (nring n[*]x[+][1][*]x).
  Step_final (nring n[*]x[+]x).
 Qed.
 
@@ -1021,7 +1021,7 @@ Proof.
  intros x m n.
  induction  m as [| m Hrecm].
   rewrite plus_O_n.
-  Step_final (One[*]x[^]n).
+  Step_final ([1][*]x[^]n).
  rewrite plus_Sn_m.
  astepl (x[^]m[*]x[*]x[^]n).
  astepl (x[*]x[^]m[*]x[^]n).
@@ -1030,13 +1030,13 @@ Proof.
 Qed.
 Hint Resolve nexp_plus: algebra.
 
-Lemma one_nexp : forall n : nat, (One:R) [^]n [=] One.
+Lemma one_nexp : forall n : nat, ([1]:R) [^]n [=] [1].
 Proof.
  intro n.
  induction  n as [| n Hrecn].
   algebra.
- astepl ((One:R) [*]One[^]n).
- Step_final ((One:R) [*]One).
+ astepl (([1]:R) [*][1][^]n).
+ Step_final (([1]:R) [*][1]).
 Qed.
 Hint Resolve one_nexp: algebra.
 
@@ -1044,8 +1044,8 @@ Lemma mult_nexp : forall (x y : R) n, (x[*]y) [^]n [=] x[^]n[*]y[^]n.
 Proof.
  intros x y n.
  induction  n as [| n Hrecn].
-  astepl (One:R).
-  Step_final ((One:R) [*]One).
+  astepl ([1]:R).
+  Step_final (([1]:R) [*][1]).
  astepl (x[*]y[*] (x[*]y) [^]n).
  astepl (x[*]y[*] (x[^]n[*]y[^]n)).
  astepl (x[*] (y[*] (x[^]n[*]y[^]n))).
@@ -1061,7 +1061,7 @@ Proof.
  intros x m n.
  induction  m as [| m Hrecm].
   simpl in |- *.
-  Step_final ((One:R) [^]n).
+  Step_final (([1]:R) [^]n).
  astepl ((x[*]x[^]m) [^]n).
  astepl (x[^]n[*] (x[^]m) [^]n).
  astepl (x[^]n[*]x[^] (m * n)).
@@ -1070,12 +1070,12 @@ Proof.
 Qed.
 Hint Resolve nexp_mult: algebra.
 
-Lemma zero_nexp : forall n, 0 < n -> (Zero:R) [^]n [=] Zero.
+Lemma zero_nexp : forall n, 0 < n -> ([0]:R) [^]n [=] [0].
 Proof.
  intros n H.
  induction  n as [| n Hrecn].
   inversion H.
- Step_final ((Zero:R) [*]Zero[^]n).
+ Step_final (([0]:R) [*][0][^]n).
 Qed.
 Hint Resolve zero_nexp: algebra.
 
@@ -1113,7 +1113,7 @@ Hint Resolve inv_nexp_odd: algebra.
 Lemma nexp_one : forall x : R, x[^]1 [=] x.
 Proof.
  intro x.
- Step_final (One[*]x).
+ Step_final ([1][*]x).
 Qed.
 Hint Resolve nexp_one: algebra.
 
@@ -1126,17 +1126,17 @@ Proof.
 Qed.
 Hint Resolve nexp_two: algebra.
 
-Lemma inv_one_even_nexp : forall n : nat, even n -> [--]One[^]n [=] (One:R).
+Lemma inv_one_even_nexp : forall n : nat, even n -> [--][1][^]n [=] ([1]:R).
 Proof.
  intros n H.
- Step_final ((One:R) [^]n).
+ Step_final (([1]:R) [^]n).
 Qed.
 Hint Resolve inv_one_even_nexp: algebra.
 
-Lemma inv_one_odd_nexp : forall n : nat, odd n -> [--]One[^]n [=] [--] (One:R).
+Lemma inv_one_odd_nexp : forall n : nat, odd n -> [--][1][^]n [=] [--] ([1]:R).
 Proof.
  intros n H.
- Step_final ( [--] ((One:R) [^]n)).
+ Step_final ( [--] (([1]:R) [^]n)).
 Qed.
 Hint Resolve inv_one_odd_nexp: algebra.
 
@@ -1173,7 +1173,7 @@ Proof.
  astepl (x[*]x[+] [--] (x[*]y) [+]y[*]x[+] [--] (y[*]y)).
  astepl (x[*]x[+] ( [--] (x[*]y) [+]y[*]x) [+] [--] (y[*]y)).
  astepl (x[*]x[+] ( [--] (x[*]y) [+]x[*]y) [+] [--] (y[*]y)).
- astepl (x[*]x[+]Zero[+] [--] (y[*]y)).
+ astepl (x[*]x[+][0][+] [--] (y[*]y)).
  astepl (x[*]x[+] [--] (y[*]y)).
  Step_final (x[*]x[-]y[*]y).
 Qed.
@@ -1328,11 +1328,11 @@ Section cr_Product.
 
   Definition cr_Product: list R -> R := @cm_Sum (Build_multCAbMonoid R).
 
-  Lemma cr_Product_ones (l: list R): (forall x, In x l -> x [=] One) ->
-    cr_Product l [=] One.
+  Lemma cr_Product_ones (l: list R): (forall x, In x l -> x [=] [1]) ->
+    cr_Product l [=] [1].
   Proof. apply (@cm_Sum_units (Build_multCMonoid R)). Qed.
 
-  Lemma cr_Product_0 (z: R) (zE: z [=] Zero): forall l, In z l -> cr_Product l [=] Zero.
+  Lemma cr_Product_0 (z: R) (zE: z [=] [0]): forall l, In z l -> cr_Product l [=] [0].
   Proof with auto.
    induction l.
     simpl.

@@ -71,14 +71,14 @@ Proof.
      change (x*1==x)%CR.
      rewrite <- CR_eq_as_Cauchy_IR_eq.
      stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (inject_Q_CR 1))); [| now apply CR_mult_as_Cauchy_IR_mult].
-     stepl ((CRasCauchy_IR x)[*]One); [| now
+     stepl ((CRasCauchy_IR x)[*][1]); [| now
        apply bin_op_is_wd_un_op_rht; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
      rational.
     intros x.
     change ((inject_Q_CR 1%Q)*x==x)%CR.
     rewrite <- CR_eq_as_Cauchy_IR_eq.
     stepl ((CRasCauchy_IR (inject_Q_CR 1))[*](CRasCauchy_IR x)); [| now apply CR_mult_as_Cauchy_IR_mult].
-    stepl (One[*](CRasCauchy_IR x)); [| now
+    stepl ([1][*](CRasCauchy_IR x)); [| now
       apply bin_op_is_wd_un_op_lft; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
     rational.
    intros x y.

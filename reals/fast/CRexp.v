@@ -112,15 +112,15 @@ Proof.
   simpl.
   rational.
  intros H.
- stepl ((One[/](nring (S n))[//]nringS_ap_zero IR n)[*](inj_Q IR a)[*]Exp_ps n (inj_Q IR a) H).
+ stepl (([1][/](nring (S n))[//]nringS_ap_zero IR n)[*](inj_Q IR a)[*]Exp_ps n (inj_Q IR a) H).
   simpl.
-  change (nring (R:=IR) n[+]One) with (nring (R:=IR) (S n)).
-  rstepl (((One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]
-    (One[/]nring (R:=IR) (fact n)[//]nring_fac_ap_zero IR n))[*]
-      (nexp IR n (inj_Q IR a[-]Zero)[*]inj_Q IR a)).
+  change (nring (R:=IR) n[+][1]) with (nring (R:=IR) (S n)).
+  rstepl ((([1][/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]
+    ([1][/]nring (R:=IR) (fact n)[//]nring_fac_ap_zero IR n))[*]
+      (nexp IR n (inj_Q IR a[-][0])[*]inj_Q IR a)).
   apply mult_wd;[|rational].
   assert (X:=(mult_resp_ap_zero _ _ _ (nringS_ap_zero IR n) (nring_fac_ap_zero IR n))).
-  rstepl (One[/]((nring (R:=IR) (S n))[*]nring (R:=IR) (fact n))[//]X).
+  rstepl ([1][/]((nring (R:=IR) (S n))[*]nring (R:=IR) (fact n))[//]X).
   apply div_wd;[rational|].
   apply eq_symmetric.
   change (fact n + n * fact n)%nat with (S n*(fact n))%nat.
@@ -147,7 +147,7 @@ Proof.
     reflexivity.
    cut (0 < S n * fact n)%nat;[auto with *|apply (lt_O_fact (S n))].
   cut (0 < fact n)%nat;[auto with *|apply (lt_O_fact n)].
- stepl ((One[/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]inj_Q IR a[*]
+ stepl (([1][/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]inj_Q IR a[*]
    inj_Q IR ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)%Q); [apply mult_wdr; apply IHn|].
  apply eq_symmetric.
  eapply eq_transitive;[apply inj_Q_mult|].
@@ -170,14 +170,14 @@ Proof.
   rewrite Pplus_one_succ_r.
   repeat (rewrite Zpos_mult_morphism || rewrite Zpos_plus_distr).
   ring.
- assert (B:inj_Q IR (P_of_succ_nat n:Q)[#]Zero).
+ assert (B:inj_Q IR (P_of_succ_nat n:Q)[#][0]).
   stepl (nring (R:=IR) (S n)).
    apply nringS_ap_zero.
   apply eq_symmetric;assumption.
  eapply eq_transitive;[apply inj_Q_div|].
  instantiate (1:=B).
  apply div_wd.
-  rstepr (Zero[+]One:IR).
+  rstepr ([0][+][1]:IR).
   apply (inj_Q_nring IR 1).
  assumption.
 Qed.
@@ -304,7 +304,7 @@ Proof.
   change (a / (2#1) + a / (2#1) == a). field.
  apply leEq_imp_AbsSmall.
   apply less_leEq; apply Exp_pos.
- stepr (One:IR).
+ stepr ([1]:IR).
   apply Exp_leEq_One.
   stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
@@ -410,7 +410,7 @@ Proof.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
  stepl (inj_Q IR q[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
- assert (X:Zero[<]inj_Q IR q).
+ assert (X:[0][<]inj_Q IR q).
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   now destruct q.
@@ -418,7 +418,7 @@ Proof.
  unfold power.
  apply Exp_resp_leEq.
  destruct n.
-  rstepl (Zero:IR).
+  rstepl ([0]:IR).
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
@@ -454,7 +454,7 @@ Proof.
   apply Exp_resp_leEq.
   apply inj_Q_leEq.
   tauto.
- assert (X0:inj_Q IR (inject_Z (S n))[#]Zero).
+ assert (X0:inj_Q IR (inject_Z (S n))[#][0]).
   stepl (inj_Q IR (nring (S n))).
    stepl (nring (S n):IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR (S n)))].
    apply (nringS_ap_zero).
@@ -573,7 +573,7 @@ Proof.
  unfold CRe.
  rewrite -> rational_exp_correct.
  apply IRasCR_wd.
- csetoid_replace (inj_Q IR 1) (One:IR).
+ csetoid_replace (inj_Q IR 1) ([1]:IR).
   algebra.
  rstepr (nring 1:IR).
  apply (inj_Q_nring IR 1).
@@ -595,18 +595,18 @@ Lemma exp_bound_bound : forall (z:Z) x, closer (inj_Q IR (z:Q)) x -> AbsIR (Exp 
 Proof.
  intros [|z|z]; simpl; intros x Hx; apply AbsSmall_imp_AbsIR;
    (apply leEq_imp_AbsSmall;[apply less_leEq; apply Exp_pos|]).
-   stepr (One:IR).
+   stepr ([1]:IR).
     apply Exp_leEq_One.
     stepr (inj_Q IR (0%Z:Q)).
      assumption.
     apply (inj_Q_nring IR 0).
    rstepl (nring 1:IR).
    apply eq_symmetric; apply (inj_Q_nring IR 1).
-  apply leEq_transitive with (Exp (Max x Zero)).
+  apply leEq_transitive with (Exp (Max x [0])).
    apply Exp_resp_leEq.
    apply lft_leEq_Max.
   stepr (Three[!](inj_Q IR (z:Q))[//](pos_three IR):IR).
-   astepl (E[!](Max x Zero)[//]pos_E).
+   astepl (E[!](Max x [0])[//]pos_E).
    apply real_power_resp_leEq_both; try solve [IR_solve_ineq (1#1)%Qpos].
     apply rht_leEq_Max.
    apply Max_leEq; auto.
@@ -634,10 +634,10 @@ Proof.
   apply inj_Q_wd; apply nring_Q.
  stepr (Half[!](inj_Q IR (z:Q))[//](pos_half IR):IR).
   astepl (Exp [--][--]x).
-  astepl (One[/]_[//](Exp_ap_zero [--]x)).
+  astepl ([1][/]_[//](Exp_ap_zero [--]x)).
   unfold Half.
-  astepr ((One[!]inj_Q IR (z:Q)[//]pos_one _)[/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
-  astepr (One[/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
+  astepr (([1][!]inj_Q IR (z:Q)[//]pos_one _)[/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
+  astepr ([1][/]((Two[!]inj_Q IR (z:Q)[//]pos_two _))[//]power_ap_zero _ _ _).
   apply recip_resp_leEq.
    apply power_pos.
   astepr (E[!][--]x[//]pos_E).
@@ -663,7 +663,7 @@ Proof.
    rewrite <- (convert_is_POS z).
    apply inj_Q_power.
   apply nexp_wd.
-  assert (X:(inj_Q IR (2:Q))[#]Zero).
+  assert (X:(inj_Q IR (2:Q))[#][0]).
    stepr (inj_Q IR 0).
     apply inj_Q_ap; discriminate.
    apply (inj_Q_nring IR 0).

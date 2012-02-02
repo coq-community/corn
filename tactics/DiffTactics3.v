@@ -98,8 +98,8 @@ Fixpoint symbPF_deriv (r : symbPF) : PartIR :=
   match r with
   | shyp _ _ _ f' _ => f'
   | shyp' J pJ F H => Deriv J pJ F H
-  | sconst c => [-C-]Zero
-  | sid => [-C-]One
+  | sconst c => [-C-][0]
+  | sid => [-C-][1]
   | splus f g => symbPF_deriv f{+}symbPF_deriv g
   | sinv f => {--}(symbPF_deriv f)
   | sminus f g => symbPF_deriv f{-}symbPF_deriv g
@@ -108,7 +108,7 @@ Fixpoint symbPF_deriv (r : symbPF) : PartIR :=
   | sscalmult c f => c{**}symbPF_deriv f
   | snth f n =>
       match n with
-      | O => [-C-]Zero
+      | O => [-C-][0]
       | S p => nring (S p){**}(symbPF_deriv f{*}symb_to_PartIR (snth f p))
       end
   | srecip f => {--}(symbPF_deriv f{/}symb_to_PartIR f{*}symb_to_PartIR f)

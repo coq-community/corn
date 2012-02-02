@@ -70,7 +70,7 @@ End FTA_reg'.
 (**
 %\begin{convention}% Let [n:nat], [f] be a complex polynomial of degree
 less than or equal to [(S n)] and [c] be a complex number such that
-[f!c  [#]  Zero].
+[f!c  [#]  [0]].
 %\end{convention}%
 *)
 
@@ -80,7 +80,7 @@ Variable f : cpoly_cring CC.
 Variable n : nat.
 Hypothesis f_degree : degree_le (S n) f.
 Variable c : CC.
-Hypothesis f_c : f ! c [#] Zero.
+Hypothesis f_c : f ! c [#] [0].
 
 Lemma FTA_1a : degree_le (S n) (Shift c f).
 Proof.
@@ -95,7 +95,7 @@ Proof.
  unfold g in |- *.
  apply Rev_degree.
  astepl f ! c. auto.
-  Step_final f ! (Zero[+]c).
+  Step_final f ! ([0][+]c).
 Qed.
 
 Lemma FTA_1 : {f1 : CCX | {f2 : CCX | degree_le 1 f1 /\ degree_le n f2 /\ f [=] f1[*]f2}}.
@@ -143,7 +143,7 @@ End FTA_1.
 
 Section Fund_Thm_Alg.
 
-Lemma FTA' : forall n (f : CCX), degree_le n f -> nonConst _ f -> {z : CC | f ! z [=] Zero}.
+Lemma FTA' : forall n (f : CCX), degree_le n f -> nonConst _ f -> {z : CC | f ! z [=] [0]}.
 Proof.
  intro n. induction  n as [| n Hrecn].
  unfold nonConst in |- *. unfold degree_le in |- *. intros f H H0.
@@ -157,10 +157,10 @@ Proof.
   elim H3. clear H3. intro g. intros H3 H4.
   elim (O_or_S m'); intro y.
    elim y. clear y. intro m. intro y. rewrite <- y in H0. rewrite <- y in H1.
-   cut (a[*]nth_coeff m g [#] Zero or b[*]nth_coeff (S m) g [#] Zero).
+   cut (a[*]nth_coeff m g [#] [0] or b[*]nth_coeff (S m) g [#] [0]).
     intro H5.
     elim H5; clear H5; intros H5.
-     cut (a [#] Zero). intro H6.
+     cut (a [#] [0]). intro H6.
       exists ( [--]b[/] a[//]H6).
       astepl ((_C_ a[*]_X_[+]_C_ b) [*]g) ! ( [--]b[/] a[//]H6).
       astepl ((_C_ a[*]_X_[+]_C_ b) ! ( [--]b[/] a[//]H6) [*]g ! ( [--]b[/] a[//]H6)).
@@ -174,7 +174,7 @@ Proof.
      elim (Hrecn g); auto. intro z. intros. exists z.
      astepl ((_C_ a[*]_X_[+]_C_ b) [*]g) ! z.
      astepl ((_C_ a[*]_X_[+]_C_ b) ! z[*]g ! z).
-     Step_final ((_C_ a[*]_X_[+]_C_ b) ! z[*]Zero).
+     Step_final ((_C_ a[*]_X_[+]_C_ b) ! z[*][0]).
     unfold nonConst in |- *. exists (S m). auto.
     apply cring_mult_ap_zero_op with b. auto.
     apply cg_add_ap_zero.
@@ -184,7 +184,7 @@ Proof.
   apply nth_coeff_ap_zero_imp with m'. auto.
 Qed.
 
-Lemma FTA : forall f : CCX, nonConst _ f -> {z : CC | f ! z [=] Zero}.
+Lemma FTA : forall f : CCX, nonConst _ f -> {z : CC | f ! z [=] [0]}.
 Proof.
  intros.
  elim (Cpoly_ex_degree _ f). intro n. intros. (* Set_ not necessary *)
@@ -192,7 +192,7 @@ Proof.
 Qed.
 
 Lemma FTA_a_la_Henk : forall f : CCX,
- {x : CC | {y : CC | AbsCC (f ! x[-]f ! y) [>]Zero}} -> {z : CC | f ! z [=] Zero}.
+ {x : CC | {y : CC | AbsCC (f ! x[-]f ! y) [>][0]}} -> {z : CC | f ! z [=] [0]}.
 Proof.
  intros f H.
  elim H.
@@ -205,7 +205,7 @@ Proof.
  rename H1' into H1.
  generalize (less_imp_ap _ _ _ H1); intro H2.
  generalize (AbsCC_ap_zero _ H2); intro H3.
- cut (Sum 0 (lth_of_poly f) (fun i : nat => nth_coeff i f[*] (x[^]i[-]y[^]i)) [#] Zero).
+ cut (Sum 0 (lth_of_poly f) (fun i : nat => nth_coeff i f[*] (x[^]i[-]y[^]i)) [#] [0]).
   intro H4.
   cut (0 <= lth_of_poly f); try auto with arith.
   intro H5.
@@ -219,7 +219,7 @@ Proof.
    elim (zerop i).
     intro H13.
     elimtype False.
-    elim (ap_irreflexive_unfolded _ (Zero:CC)).
+    elim (ap_irreflexive_unfolded _ ([0]:CC)).
     rstepl (nth_coeff i f[*] (x[^]0[-]y[^]0)).
     rewrite <- H13.
     assumption.

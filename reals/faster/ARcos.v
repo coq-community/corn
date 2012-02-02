@@ -27,7 +27,7 @@ Next Obligation.
   rewrite AQcos_poly_fun_correct.
   change ('1) with (1:AQ).
   rewrite ?aq_preserves_max, ?aq_preserves_min.
-  now rewrite ?rings.preserves_opp, ?rings.preserves_1.
+  now rewrite ?rings.preserves_negate, ?rings.preserves_1.
 Qed.
 
 Definition ARcos_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQcos_poly_uc).

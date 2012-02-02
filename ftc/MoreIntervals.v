@@ -248,12 +248,12 @@ Proof.
  intro.
  destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; simpl in |- *; intros; try rename X into H.
          exists ZeroR; auto.
-        exists (c[+]One); apply less_plusOne.
-       exists (c[-]One); apply shift_minus_less; apply less_plusOne.
+        exists (c[+][1]); apply less_plusOne.
+       exists (c[-][1]); apply shift_minus_less; apply less_plusOne.
       exists c; apply leEq_reflexive.
      exists c; apply leEq_reflexive.
     exists (c[+] (c0[-]c) [/]TwoNZ); split.
-     astepl (c[+]Zero); apply plus_resp_less_lft.
+     astepl (c[+][0]); apply plus_resp_less_lft.
      apply div_resp_pos.
       apply pos_two.
      apply shift_less_minus; astepl c; auto.
@@ -454,7 +454,7 @@ Section Proper_Compact_with_One_or_Two_Points.
 Let cip1' : forall c x : IR, c [<=] x -> x[-] (x[-]c) [/]TwoNZ [<=] x.
 Proof.
  intros.
- astepr (x[-]Zero).
+ astepr (x[-][0]).
  unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
  apply inv_resp_leEq; apply shift_leEq_div.
   apply pos_two.
@@ -464,7 +464,7 @@ Qed.
 Let cip1'' : forall c x : IR, c [<] x -> x[-] (x[-]c) [/]TwoNZ [<] x.
 Proof.
  intros.
- astepr (x[-]Zero).
+ astepr (x[-][0]).
  unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
  apply inv_resp_less; apply shift_less_div.
   apply pos_two.
@@ -474,7 +474,7 @@ Qed.
 Let cip1''' : forall c0 x : IR, x [<=] c0 -> x [<=] x[+] (c0[-]x) [/]TwoNZ.
 Proof.
  intros.
- astepl (x[+]Zero).
+ astepl (x[+][0]).
  apply plus_resp_leEq_lft.
  apply shift_leEq_div.
   apply pos_two.
@@ -484,7 +484,7 @@ Qed.
 Let cip1'''' : forall c0 x : IR, x [<] c0 -> x [<] x[+] (c0[-]x) [/]TwoNZ.
 Proof.
  intros.
- astepl (x[+]Zero).
+ astepl (x[+][0]).
  apply plus_resp_less_lft.
  apply shift_less_div.
   apply pos_two.
@@ -496,7 +496,7 @@ Let cip2 :
 Proof.
  intros.
  apply leEq_transitive with (c[+] (x[-]c) [/]TwoNZ).
-  astepl (c[+]Zero); apply plus_resp_leEq_lft.
+  astepl (c[+][0]); apply plus_resp_leEq_lft.
   apply shift_leEq_div.
    apply pos_two.
   apply shift_leEq_minus; rstepl c; auto.
@@ -509,7 +509,7 @@ Let cip2' : forall c x x0 : IR, c [<] x -> x[-] (x[-]c) [/]TwoNZ [<=] x0 -> c [<
 Proof.
  intros c x x0 H H0.
  apply less_leEq_trans with (c[+] (x[-]c) [/]TwoNZ).
-  astepl (c[+]Zero); apply plus_resp_less_lft.
+  astepl (c[+][0]); apply plus_resp_less_lft.
   apply shift_less_div.
    apply pos_two.
   apply shift_less_minus; rstepl c; auto.
@@ -523,7 +523,7 @@ Let cip2'' :
 Proof.
  intros c x x0 H H0.
  apply leEq_less_trans with (c[+] (x[-]c) [/]TwoNZ).
-  astepl (c[+]Zero); apply plus_resp_leEq_lft.
+  astepl (c[+][0]); apply plus_resp_leEq_lft.
   apply shift_leEq_div.
    apply pos_two.
   apply shift_leEq_minus; rstepl c; auto.
@@ -548,7 +548,7 @@ Proof.
  eapply leEq_transitive.
   apply H0.
  rstepl (c0[-] (c0[-]x) [/]TwoNZ).
- astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
+ astepr (c0[-][0]); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
  apply inv_resp_leEq.
  apply shift_leEq_div.
   apply pos_two.
@@ -562,7 +562,7 @@ Proof.
  eapply leEq_less_trans.
   apply H0.
  rstepl (c0[-] (c0[-]x) [/]TwoNZ).
- astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
+ astepr (c0[-][0]); unfold cg_minus at 1 3 in |- *; apply plus_resp_less_lft.
  apply inv_resp_less.
  apply shift_less_div.
   apply pos_two.
@@ -576,7 +576,7 @@ Proof.
  eapply less_leEq_trans.
   apply H0.
  rstepl (c0[-] (c0[-]x) [/]TwoNZ).
- astepr (c0[-]Zero); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
+ astepr (c0[-][0]); unfold cg_minus at 1 3 in |- *; apply plus_resp_leEq_lft.
  apply inv_resp_leEq.
  apply shift_leEq_div.
   apply pos_two.
@@ -594,11 +594,11 @@ Qed.
 Definition compact_in_interval I (pI : proper I) x (Hx : I x) : interval.
 Proof.
  intros; destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
-         apply (clcr x (x[+]One)).
-        apply (clcr x (x[+]One)).
-       apply (clcr (x[-]One) x).
-      apply (clcr x (x[+]One)).
-     apply (clcr (x[-]One) x).
+         apply (clcr x (x[+][1])).
+        apply (clcr x (x[+][1])).
+       apply (clcr (x[-][1]) x).
+      apply (clcr x (x[+][1])).
+     apply (clcr (x[-][1]) x).
     apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
    apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
   apply (clcr (x[-] (x[-]c) [/]TwoNZ) (x[+] (c0[-]x) [/]TwoNZ)).
@@ -744,11 +744,11 @@ Proof.
  set (z1 := Min x y) in *.
  set (z2 := Max x y) in *.
  destruct  I as [| c| c| c| c| c c0| c c0| c c0| c c0]; intros.
-         apply (clcr z1 (z2[+]One)).
-        apply (clcr z1 (z2[+]One)).
-       apply (clcr (z1[-]One) z2).
-      apply (clcr z1 (z2[+]One)).
-     apply (clcr (z1[-]One) z2).
+         apply (clcr z1 (z2[+][1])).
+        apply (clcr z1 (z2[+][1])).
+       apply (clcr (z1[-][1]) z2).
+      apply (clcr z1 (z2[+][1])).
+     apply (clcr (z1[-][1]) z2).
     apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
    apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).
   apply (clcr (z1[-] (z1[-]c) [/]TwoNZ) (z2[+] (c0[-]z2) [/]TwoNZ)).

@@ -67,7 +67,7 @@ Qed.
 
 (* Multivariable polynomial application by a constant set of inputs is a ring homomorphism. *)
 
-Lemma zero_MVP_apply : forall F n v, MVP_apply F (Zero:MultivariatePolynomial F n) v[=]Zero.
+Lemma zero_MVP_apply : forall F n v, MVP_apply F ([0]:MultivariatePolynomial F n) v[=][0].
 Proof.
  induction v.
   reflexivity.
@@ -76,7 +76,7 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma one_MVP_apply : forall F n v, MVP_apply F (One:MultivariatePolynomial F n) v[=]One.
+Lemma one_MVP_apply : forall F n v, MVP_apply F ([1]:MultivariatePolynomial F n) v[=][1].
 Proof.
  induction v.
   reflexivity.
@@ -265,7 +265,7 @@ Proof.
   unfold evalBernsteinBasis.
   match goal with |- (?A <= ?B) => set (L:=A); set (R:=B) end.
   change (L[<=]R).
-  rstepr (R[*]One).
+  rstepr (R[*][1]).
   rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
   stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
    fold (MultivariatePolynomial Q_as_CRing n).
@@ -393,7 +393,7 @@ Proof.
  unfold evalBernsteinBasis.
  match goal with |- (?A <= ?B) => set (R:=A); set (L:=B) end.
  change (R[<=]L).
- rstepl (R[*]One).
+ rstepl (R[*][1]).
  rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
  stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
   fold (MultivariatePolynomial Q_as_CRing n).
@@ -542,9 +542,9 @@ Proof.
  assert (Hx: 0 <= x <= 1).
   split; apply (leEq_inj_Q IR).
    rewrite -> inj_Q_Zero.
-   rstepl (Zero[/]Zero[+]One[//]den_is_nonzero IR 0); auto.
+   rstepl ([0][/][0][+][1][//]den_is_nonzero IR 0); auto.
   rewrite -> inj_Q_One.
-  rstepr (One[/]Zero[+]One[//]den_is_nonzero IR 1); auto.
+  rstepr ([1][/][0][+][1][//]den_is_nonzero IR 1); auto.
  setoid_replace ((cpoly_map (MVP_apply_hom Q_as_CRing v) (_D_ p)) ! x)
    with (@MVP_apply Q_as_CRing (S n) (_D_ p) (Vector.cons _ x _ v)).
   apply Qabs_case; intros H.
@@ -1013,7 +1013,7 @@ Proof.
   change (AbsSmall (' e)%CR (c[*]q1[-]c[*]q2)).
   rstepr (c[*](q1[-]q2)).
   apply AbsSmall_leEq_trans with (c[*]'e)%CR.
-   rstepr (One[*]('e))%CR.
+   rstepr ([1][*]('e))%CR.
    apply mult_resp_leEq_rht; auto.
    change (0<='e)%CR.
    rewrite -> CRle_Qle.
@@ -1092,7 +1092,7 @@ Proof.
   simpl.
   change (st_car CR) in p.
   eapply AbsSmall_leEq_trans;[|apply mult_resp_AbsSmall;[|apply H]]; auto.
-  rstepr ((One:CR)[*]M).
+  rstepr (([1]:CR)[*]M).
   apply mult_resp_leEq_rht; auto.
   simpl in H.
   rewrite <- CRabs_AbsSmall in H.
@@ -1130,7 +1130,7 @@ Proof.
       discriminate Hq.
      simpl in Hq.
      injection Hq; clear Hq; intros Hq; rewrite <- Hq.
-     assert (Z: (' ((db # nb) * e)%Qpos)%CR[#]Zero).
+     assert (Z: (' ((db # nb) * e)%Qpos)%CR[#][0]).
       apply: Qap_CRap.
       apply Qpos_nonzero.
      apply shift_mult_leEq with Z.
@@ -1156,8 +1156,8 @@ Proof.
     unfold Not, AbsSmall.
     repeat rewrite -> leEq_def.
     unfold Not; tauto.
-   generalize (leEq_or_leEq CRasCOrdField Zero p).
-   cut (((Zero:CR)[<=]p or (p:CR)[<=]Zero) -> AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))).
+   generalize (leEq_or_leEq CRasCOrdField [0] p).
+   cut ((([0]:CR)[<=]p or (p:CR)[<=][0]) -> AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))).
     unfold Not; tauto.
    intros [Hp|Hp].
     rewrite -> CRabs_pos; auto.
@@ -1168,7 +1168,7 @@ Proof.
    rewrite -> CRabs_neg; auto.
    rstepr (([--]p)[*](y[-]x)).
    apply mult_resp_AbsSmall.
-    rstepl ([--]Zero:CR).
+    rstepl ([--][0]:CR).
     apply inv_resp_leEq.
     auto.
    rewrite Hq in Hxy.
@@ -1177,11 +1177,11 @@ Proof.
    apply Hxy.
   intros Hq.
   destruct b as [[|nb|nb] db]; try discriminate Hq.
-  stepr (Zero:CR).
+  stepr ([0]:CR).
    apply zero_AbsSmall.
    simpl.
    rewrite -> CRle_Qle; auto with *.
-  rstepl (Zero[*](x[-]y))%CR.
+  rstepl ([0][*](x[-]y))%CR.
   apply mult_wdl.
   destruct Hb as [Hb0 Hb1].
   apply: leEq_imp_eq.
@@ -1223,7 +1223,7 @@ match n return MultivariatePolynomial Q_as_CRing n -> Q with
           end
 end.
 
-Lemma MVP_poor_Bound01_zero : forall n, MVP_poor_Bound01 n (Zero)==0.
+Lemma MVP_poor_Bound01_zero : forall n, MVP_poor_Bound01 n ([0])==0.
 Proof.
  induction n.
   reflexivity.
@@ -1288,7 +1288,7 @@ Proof.
   apply Qle_Qabs.
  simpl.
  induction p; intros x Hx0 Hx1.
-  change (MVP_is_Bound01 n 0%CR (Zero)).
+  change (MVP_is_Bound01 n 0%CR ([0])).
   clear - n.
   induction n.
    apply AbsSmall_reflexive.
@@ -1318,8 +1318,8 @@ Proof.
  induction p; intros e.
   exists QposInfinity.
   intros x y _ _ _ _ _.
-  change (n_Function_ball01 n e (MVP_CR_apply n Zero) (MVP_CR_apply n Zero)).
-  generalize (MVP_CR_apply n Zero).
+  change (n_Function_ball01 n e (MVP_CR_apply n [0]) (MVP_CR_apply n [0])).
+  generalize (MVP_CR_apply n [0]).
   induction n.
    apply ball_refl.
   intros s a _ _.
@@ -1414,13 +1414,13 @@ Proof.
   split.
    apply Qmax_case.
     intros _.
-    apply leEq_transitive with (Zero:CR).
-     rstepr ([--](Zero:CR)).
+    apply leEq_transitive with ([0]:CR).
+     rstepr ([--]([0]:CR)).
      apply inv_resp_leEq.
      change (0<='d)%CR.
      rewrite -> CRle_Qle.
      auto with *.
-    change (Zero[<=]x[-]Zero)%CR.
+    change ([0][<=]x[-][0])%CR.
     rstepr x.
     auto.
    intros H.
@@ -1434,7 +1434,7 @@ Proof.
    eapply leEq_transitive with (1[-]1)%CR.
     apply minus_resp_leEq.
     auto.
-   rstepl (Zero:CR).
+   rstepl ([0]:CR).
    change (0<='d)%CR.
    rewrite -> CRle_Qle.
    auto with *.

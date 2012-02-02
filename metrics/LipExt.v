@@ -63,7 +63,7 @@ Variable f : CSetoid_fun (SubMetricSpace M P) IR_as_CMetricSpace.
 
 Hypothesis set_bounded : MStotally_bounded (SubMetricSpace M P).
 Hypothesis non_empty : {x : M | P x}.
-Hypothesis constant_positive : Zero[<]C.
+Hypothesis constant_positive : [0][<]C.
 
 Hypothesis f_lip : lipschitz_c f C.
 
@@ -115,12 +115,12 @@ Proof.
 Qed.
 
 
-Lemma exp_prop : forall (k : nat) (n : nat) (H : Two[#]Zero),
-Two[^]k[*]nexp IR (n + k) (One[/] (Two:IR)[//]H)[=]
-nexp IR n (One[/] (Two:IR)[//]H).
+Lemma exp_prop : forall (k : nat) (n : nat) (H : Two[#][0]),
+Two[^]k[*]nexp IR (n + k) ([1][/] (Two:IR)[//]H)[=]
+nexp IR n ([1][/] (Two:IR)[//]H).
 Proof.
  intros.
- astepl ((zexp Two H k)[*](nexp IR (n + k) (One[/] Two[//]H) )).
+ astepl ((zexp Two H k)[*](nexp IR (n + k) ([1][/] Two[//]H) )).
  astepl ((zexp Two H k)[*](zexp Two H (- (n + k)%nat))).
   astepr (zexp Two H (k + (- (n + k)%nat))).
    apply eq_symmetric.
@@ -153,23 +153,23 @@ Proof.
  astepl (C[*](dIR (dsub' M P y x) (dsub' M P y y0))).
   cut (C[*]dIR (dsub' M P y x) (dsub' M P y y0)[<=]C[*](dsub M P x y0)).
    intros.
-   cut (C[*](dsub M P x y0)[<] nexp IR n (One[/] Two[//]H)).
+   cut (C[*](dsub M P x y0)[<] nexp IR n ([1][/] Two[//]H)).
     intros.
     apply leEq_less_trans with (C[*](dsub M P x y0)); auto with algebra.
-   cut (Two[^]k[*](dsub M P x y0)[<] nexp IR n (One[/] Two[//]H)).
+   cut (Two[^]k[*](dsub M P x y0)[<] nexp IR n ([1][/] Two[//]H)).
     intros.
     cut (C[*](dsub M P x y0)[<=]Two[^]k[*](dsub M P x y0)).
      intros.
      apply leEq_less_trans with (Two[^]k[*](dsub M P x y0)); auto with algebra.
     apply mult_resp_leEq_rht; auto.
     apply dsub_nneg.
-   astepr (Two[^]k[*](nexp IR (n + k) (One[/] Two[//]H))).
+   astepr (Two[^]k[*](nexp IR (n + k) ([1][/] Two[//]H))).
     apply mult_resp_less_lft; auto.
     apply nexp_resp_pos.
-    cut ((One:IR)[<]Two).
-     cut (Zero[<](One:IR)).
+    cut (([1]:IR)[<]Two).
+     cut ([0][<]([1]:IR)).
       intros.
-      apply less_transitive_unfolded with (One:IR); auto.
+      apply less_transitive_unfolded with ([1]:IR); auto.
      apply pos_one.
     apply one_less_two.
    apply exp_prop.
@@ -334,7 +334,7 @@ Proof.
  apply leEq_imp_eq.
   apply l.
   exists x.
-  assert (dsub' M P (from_SubPsMetricSpace M P x) x[=]Zero).
+  assert (dsub' M P (from_SubPsMetricSpace M P x) x[=][0]).
    unfold dsub'.
    assert (diag_zero M (cms_d (c:=M))).
     apply pos_imp_ap_imp_diag_zero.
@@ -343,9 +343,9 @@ Proof.
     apply ax_d_nneg.
     apply (CPsMetricSpace_is_CPsMetricSpace M).
    apply H.
-  astepl (f x[+]C[*]Zero).
-  astepl (f x[+]Zero). algebra.
-  assert (forall e : IR, Zero [<]e -> f x [-] y [<] e).
+  astepl (f x[+]C[*][0]).
+  astepl (f x[+][0]). algebra.
+  assert (forall e : IR, [0] [<]e -> f x [-] y [<] e).
   intros.
   assert (sig2T IR (fun x0 : IR => sigT (fun x1 : subcsetoid_crr M P =>
     f x1[+]C[*]dsub' M P (from_SubPsMetricSpace M P x) x1[=]x0)) (fun x : IR => x[-]y[<]e)).
@@ -358,7 +358,7 @@ Proof.
    apply minus_resp_leEq; auto.
   astepl (x0 [-] y); auto.
  astepl (f x [-] y [+] y).
- astepr (Zero [+] y).
+ astepr ([0] [+] y).
  apply plus_resp_leEq.
  apply approach_zero; auto.
 Qed.
@@ -371,7 +371,7 @@ forall (y1 : M) (y2 : M) (fy2 : IR)
 (Hfy1 : set_glb_IR (fun v : IR =>
  sigT (fun x : subcsetoid_crr M P => f x[+]C[*]dsub' M P y1 x[=]v))  fy1)
 (e : IR)
-(X : Zero[<]e),
+(X : [0][<]e),
 fy2[-]fy1[<=]C[*](y1[-d]y2)[+]e.
 Proof.
  intros.
@@ -393,7 +393,7 @@ Proof.
  astepl (f x1[+]C[*]dsub' M P y2 x1[-](f x1[+]C[*]dsub' M P y1 x1)).
  astepl (f x1[+]C[*]dsub' M P y2 x1[-]f x1[-]C[*]dsub' M P y1 x1).
  astepl (f x1[-]f x1[+]C[*]dsub' M P y2 x1[-]C[*]dsub' M P y1 x1).
-  astepl (Zero[+]C[*]dsub' M P y2 x1[-]C[*]dsub' M P y1 x1).
+  astepl ([0][+]C[*]dsub' M P y2 x1[-]C[*]dsub' M P y1 x1).
   astepl (C[*]dsub' M P y2 x1[-]C[*]dsub' M P y1 x1).
   astepl (C[*](dsub' M P y2 x1[-]dsub' M P y1 x1)).
   apply mult_resp_leEq_lft.
@@ -424,7 +424,7 @@ Proof.
  simpl.
  intros fy2 Hfy2 fy1 Hfy1.
  apply AbsSmall_imp_AbsIR.
- assert (forall e : IR, Zero[<]e -> AbsSmall (C[*](y1[-d]y2)[+]e) (fy1[-]fy2)).
+ assert (forall e : IR, [0][<]e -> AbsSmall (C[*](y1[-d]y2)[+]e) (fy1[-]fy2)).
   intros.
   unfold AbsSmall. split.
   astepr ([--](fy2 [-] fy1)).

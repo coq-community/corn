@@ -31,10 +31,10 @@ Section SubCRings.
 
 Variable CR : CRing.
 Variable P : CR -> Type.
-Variable Punit : P Zero.
+Variable Punit : P [0].
 Variable op_pres_P : bin_op_pres_pred _ P csg_op.
 Variable inv_pres_P : un_op_pres_pred _ P cg_inv.
-Variable Pone : P One.
+Variable Pone : P [1].
 Variable mul_pres_P : bin_op_pres_pred _ P cr_mult.
 
 Let subcrr : CAbGroup := Build_SubCAbGroup _ _ Punit op_pres_P inv_pres_P.

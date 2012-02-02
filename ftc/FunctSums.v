@@ -264,7 +264,7 @@ to use the [FSumx] operator.
 
 Fixpoint FSumx (n : nat) : (forall i, i < n -> PartIR) -> PartIR :=
   match n return ((forall i, i < n -> PartIR) -> PartIR) with
-  | O   => fun _ => [-C-]Zero
+  | O   => fun _ => [-C-][0]
   | S p => fun f => FSumx p (fun i l => f i (lt_S i p l)) {+} f p (lt_n_Sn p)
   end.
 
@@ -380,7 +380,7 @@ Definition FSumx_to_FSum n : (forall i, i < n -> PartIR) -> nat -> PartIR.
 Proof.
  intros f i.
  elim (le_lt_dec n i); intro.
-  apply ( [-C-]Zero:PartIR).
+  apply ( [-C-][0]:PartIR).
  apply (f i b).
 Defined.
 
@@ -396,7 +396,7 @@ Proof.
 Qed.
 
 Lemma FSumx_le : forall n (f : forall i, i < n -> PartIR), ext_fun_seq f ->
- forall i x Hx, n <= i -> FSumx_to_FSum n f i x Hx [=] Zero.
+ forall i x Hx, n <= i -> FSumx_to_FSum n f i x Hx [=] [0].
 Proof.
  do 5 intro.
  unfold FSumx_to_FSum in |- *.
@@ -467,7 +467,7 @@ Qed.
 Some useful lemmas follow.
 *)
 
-Lemma FSum0_0 : forall P f, (forall n, included P (Dom (f n))) -> Feq P [-C-]Zero (FSum0 0 f).
+Lemma FSum0_0 : forall P f, (forall n, included P (Dom (f n))) -> Feq P [-C-][0] (FSum0 0 f).
 Proof.
  intros P f H.
  FEQ.

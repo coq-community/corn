@@ -308,3 +308,20 @@ Section completion_distributes.
   Qed.
 
 End completion_distributes.
+
+
+(** The diagonal function [x ⟼ (x,x)] is a uniformly continuous function
+  from a metric space X to the product space [X × X] *)
+Section diag.
+ Require Import Unicode.Utf8.
+ Variable X:MetricSpace.
+
+ Definition diag_raw : X → (ProductMS X X) := λ x, (x,x).
+
+ Lemma diag_uc : (is_UniformlyContinuousFunction diag_raw (λ ε, ε)%Qpos).
+ Proof.
+  repeat try red; intuition.
+ Qed.
+ 
+ Definition diag: X --> (ProductMS X X) := Build_UniformlyContinuousFunction diag_uc.
+End diag.

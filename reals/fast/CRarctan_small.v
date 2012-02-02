@@ -123,11 +123,11 @@ Proof.
  unfold rational_arctan_small_pos.
  rewrite -> InfiniteAlternatingSum_correct'.
  apply IRasCR_wd.
- assert (X:(olor ([--]One) One (inj_Q IR a))).
+ assert (X:(olor ([--][1]) [1] (inj_Q IR a))).
   split.
-   apply less_leEq_trans with Zero.
+   apply less_leEq_trans with [0].
     apply shift_zero_less_minus'.
-    rstepr (One:IR).
+    rstepr ([1]:IR).
     apply pos_one.
    stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
    apply inj_Q_leEq.
@@ -140,9 +140,9 @@ Proof.
  apply: series_sum_wd.
  intros n.
  change (inj_Q IR ((- (1)) ^ n * Str_nth n (arctanSequence a))[=]
-   (([--]One[^]n[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))[*]
+   (([--][1][^]n[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))[*]
      (inj_Q IR a)[^](2 * n + 1))).
- rstepr (([--]One[^]n)[*]((inj_Q IR a)[^](2*n+1)[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))).
+ rstepr (([--][1][^]n)[*]((inj_Q IR a)[^](2*n+1)[/]nring (R:=IR) (S (2 * n))[//]nringS_ap_zero IR (2 * n))).
  eapply eq_transitive_unfolded.
   apply inj_Q_mult.
  apply mult_wd.

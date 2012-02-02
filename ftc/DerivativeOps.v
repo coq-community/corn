@@ -73,7 +73,7 @@ Proof.
  split.
   Included.
  exists (x[*]x).
-  astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
+  astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
  intros y Hy H0.
  unfold I in H; apply leEq_wdr with (AbsIR (FRestr H y H0)[*]AbsIR (FRestr H y H0)).
   apply mult_resp_leEq_both; try (apply less_leEq; assumption); simpl in |- *;
@@ -103,7 +103,7 @@ Let Hab := less_leEq _ _ _ Hab'.
 Let I := Compact Hab.
 (* end hide *)
 
-Lemma Derivative_I_const : forall c : IR, Derivative_I Hab' [-C-]c [-C-]Zero.
+Lemma Derivative_I_const : forall c : IR, Derivative_I Hab' [-C-]c [-C-][0].
 Proof.
  intros.
  apply Derivative_I_char.
@@ -115,7 +115,7 @@ Proof.
  intros.
  simpl in |- *.
  apply leEq_wdl with ZeroR.
-  astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+  astepl (ZeroR[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
    apply less_leEq; assumption.
   apply AbsIR_nonneg.
  eapply eq_transitive_unfolded.
@@ -123,7 +123,7 @@ Proof.
  apply AbsIR_wd; rational.
 Qed.
 
-Lemma Derivative_I_id : Derivative_I Hab' FId [-C-]One.
+Lemma Derivative_I_id : Derivative_I Hab' FId [-C-][1].
 Proof.
  intros.
  apply Derivative_I_char.
@@ -134,7 +134,7 @@ Proof.
   assumption.
  intros.
  apply leEq_wdl with ZeroR.
-  astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+  astepl (ZeroR[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
    apply less_leEq; assumption.
   apply AbsIR_nonneg.
  eapply eq_transitive_unfolded.
@@ -224,16 +224,16 @@ Proof.
    Contin.
   Contin.
  intros e He.
- set (M := Max (Max nF nG) nG'[+]One) in *.
- cut (Zero [<] M).
+ set (M := Max (Max nF nG) nG'[+][1]) in *.
+ cut ([0] [<] M).
   intro HM'.
-  cut (M [#] Zero).
+  cut (M [#] [0]).
    intro HM.
    2: apply Greater_imp_ap; assumption.
-  cut (Three[*]M [#] Zero).
+  cut (Three[*]M [#] [0]).
    intro H3M.
    2: apply mult_resp_ap_zero; [ apply three_ap_zero | assumption ].
-  cut (Zero [<] (e[/] _[//]H3M)).
+  cut ([0] [<] (e[/] _[//]H3M)).
    intro HeM.
    elim (contin_prop _ _ _ _ contF _ HeM); intros dc H H0.
    elim (H2 _ HeM); intros df H1 H3.
@@ -339,8 +339,8 @@ Hypothesis Fbnd : bnd_away_zero I F.
 
 Lemma Derivative_I_recip : Derivative_I Hab' {1/}F {--} (F'{/}F{*}F).
 Proof.
- cut (forall (x : IR) (Hx : I x) Hx', F x Hx' [#] Zero).
-  cut (forall (x : IR) (Hx : I x) Hx', (F{*}F) x Hx' [#] Zero).
+ cut (forall (x : IR) (Hx : I x) Hx', F x Hx' [#] [0]).
+  cut (forall (x : IR) (Hx : I x) Hx', (F{*}F) x Hx' [#] [0]).
    intros Hff Hf.
    clear derG.
    elim derF; intros incF H1.
@@ -356,19 +356,19 @@ Proof.
    cut (Continuous_I Hab {1/}F); [ intro H | Contin ].
    set (nF1 := Norm_Funct H) in *.
    set (nF' := Norm_Funct contF') in *.
-   set (M := Max nF1 nF'[+]One) in *.
-   cut (Zero [<] M).
+   set (M := Max nF1 nF'[+][1]) in *.
+   cut ([0] [<] M).
     intro HM.
-    cut (M [#] Zero).
+    cut (M [#] [0]).
      intro H0.
      2: apply Greater_imp_ap; assumption.
-    cut (Two[*]M[*]M [#] Zero).
+    cut (Two[*]M[*]M [#] [0]).
      intro HM2.
-     cut (Two[*]M[*]M[*]M[*]M [#] Zero).
+     cut (Two[*]M[*]M[*]M[*]M [#] [0]).
       intro HM4.
-      cut (Zero [<] (e[/] _[//]HM2)).
+      cut ([0] [<] (e[/] _[//]HM2)).
        intro HeM2.
-       cut (Zero [<] (e[/] _[//]HM4)).
+       cut ([0] [<] (e[/] _[//]HM4)).
         intro HeM4.
         elim (contF_ _ HeM4).
         intros d1 H1 H3.
@@ -378,7 +378,7 @@ Proof.
         exists (Min d1 d2).
          apply less_Min; assumption.
         intros x y H2 H6 Hx Hy Hx' H7.
-        cut (forall (x : IR) (Hx : I x) Hx', AbsIR (One[/] _[//]Hf x Hx Hx') [<=] M).
+        cut (forall (x : IR) (Hx : I x) Hx', AbsIR ([1][/] _[//]Hf x Hx Hx') [<=] M).
          intro leEqM.
          2: intros z Hz Hz'.
          2: apply leEq_wdl with (AbsIR ( {1/}F z (contin_imp_inc _ _ _ _ H z Hz))).
@@ -391,9 +391,9 @@ Proof.
         cut (Dom F x); [ intro Hxx | simpl in Hx; unfold extend in Hx; inversion_clear Hx; assumption ].
         cut (Dom F y); [ intro Hyy | simpl in Hy; unfold extend in Hy; inversion_clear Hy; assumption ].
         cut (Dom F' x); [ intro Hxx' | simpl in Hx'; unfold extend in Hx'; inversion_clear Hx'; assumption ].
-        apply leEq_wdl with (AbsIR ((One[/] _[//]Hf y H6 Hyy)[-](One[/] _[//]Hf x H2 Hxx)[+]
+        apply leEq_wdl with (AbsIR (([1][/] _[//]Hf y H6 Hyy)[-]([1][/] _[//]Hf x H2 Hxx)[+]
           (F' x Hxx'[/] _[//] mult_resp_ap_zero _ _ _ (Hf x H2 Hxx) (Hf x H2 Hxx))[*]( y[-]x))).
-         apply leEq_wdl with (AbsIR ([--](One[/] _[//]mult_resp_ap_zero _ _ _ (Hf x H2 Hxx) (Hf y H6 Hyy))[*]
+         apply leEq_wdl with (AbsIR ([--]([1][/] _[//]mult_resp_ap_zero _ _ _ (Hf x H2 Hxx) (Hf y H6 Hyy))[*]
            (F y Hyy[-]F x Hxx[-]F' x Hxx'[*](y[-]x)[+]
              F' x Hxx'[*](F x Hxx[-]F y Hyy[/] _[//]Hf x H2 Hxx)[*](y[-]x)))).
           2: apply AbsIR_wd; rational.
@@ -403,7 +403,7 @@ Proof.
          apply mult_resp_leEq_both; try apply AbsIR_nonneg.
           eapply leEq_wdl.
            2: apply AbsIR_inv.
-          apply leEq_wdl with (AbsIR ((One[/] _[//]Hf x H2 Hxx)[*](One[/] _[//]Hf y H6 Hyy))).
+          apply leEq_wdl with (AbsIR (([1][/] _[//]Hf x H2 Hxx)[*]([1][/] _[//]Hf y H6 Hyy))).
            2: apply AbsIR_wd; rational.
           eapply leEq_wdl.
            2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -430,7 +430,7 @@ Proof.
           eapply leEq_transitive.
            apply H7.
           apply Min_leEq_lft.
-         apply leEq_wdl with (AbsIR (F' x Hxx'[*](One[/] _[//]Hf x H2 Hxx))).
+         apply leEq_wdl with (AbsIR (F' x Hxx'[*]([1][/] _[//]Hf x H2 Hxx))).
           2: apply AbsIR_wd; rational.
          eapply leEq_wdl.
           2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -444,11 +444,11 @@ Proof.
         apply AbsIR_wd.
         simpl in |- *; rational.
        apply div_resp_pos.
-        repeat (astepl (ZeroR[*]Zero); apply mult_resp_less_both); try apply leEq_reflexive; try assumption.
+        repeat (astepl (ZeroR[*][0]); apply mult_resp_less_both); try apply leEq_reflexive; try assumption.
         apply pos_two.
        assumption.
       apply div_resp_pos.
-       repeat (astepl (ZeroR[*]Zero); apply mult_resp_less_both); try apply leEq_reflexive; try assumption.
+       repeat (astepl (ZeroR[*][0]); apply mult_resp_less_both); try apply leEq_reflexive; try assumption.
        apply pos_two.
       assumption.
      repeat apply mult_resp_ap_zero; try assumption.
@@ -506,7 +506,7 @@ Lemma Derivative_I_scal : forall c : IR, Derivative_I Hab' (c{**}F) (c{**}F').
 Proof.
  intro.
  unfold Fscalmult in |- *.
- apply Derivative_I_wdr with ([-C-]c{*}F'{+}[-C-]Zero{*}F).
+ apply Derivative_I_wdr with ([-C-]c{*}F'{+}[-C-][0]{*}F).
   FEQ.
  Deriv.
 Qed.
@@ -536,12 +536,12 @@ Proof.
   set (fx'' := F x (ProjIR2 (ProjIR2 Hx))) in *; simpl in (value of fx''); fold fx'' in |- *.
   set (f'x'' := F' x (ProjIR1 (ProjIR2 Hx'))) in *; simpl in (value of f'x''); fold f'x'' in |- *.
   set (fx''' := F x (ProjIR2 (ProjIR2 Hx'))) in *; simpl in (value of fx'''); fold fx''' in |- *.
-  apply eq_transitive_unfolded with (fx[*]((nring n[+]One)[*](f'x[*]fx[^]n))[+]f'x[*](fx[^]n[*]fx)).
-   astepl (fx[*]((nring n[+]One)[*](f'x[*]fx'[^]n))[+]f'x'[*](fx''[^]n[*]fx'')).
+  apply eq_transitive_unfolded with (fx[*]((nring n[+][1])[*](f'x[*]fx[^]n))[+]f'x[*](fx[^]n[*]fx)).
+   astepl (fx[*]((nring n[+][1])[*](f'x[*]fx'[^]n))[+]f'x'[*](fx''[^]n[*]fx'')).
    repeat apply bin_op_wd_unfolded; try apply nexp_wd;
      unfold fx, f'x, fx', f'x', fx'' in |- *; rational.
-  rstepl ((nring n[+]One[+]One)[*](f'x[*](fx[^]n[*]fx))).
-  astepr ((nring n[+]One[+]One)[*](f'x''[*](fx'''[^]n[*]fx'''))).
+  rstepl ((nring n[+][1][+][1])[*](f'x[*](fx[^]n[*]fx))).
+  astepr ((nring n[+][1][+][1])[*](f'x''[*](fx'''[^]n[*]fx'''))).
   repeat apply bin_op_wd_unfolded; try apply nexp_wd; unfold fx, f'x, f'x'', fx''' in |- *; rational.
  Deriv.
 Qed.
@@ -549,23 +549,23 @@ Qed.
 Lemma Derivative_I_poly : forall p, Derivative_I Hab' (FPoly _ p) (FPoly _ (_D_ p)).
 Proof.
  induction p.
-  apply Derivative_I_wdl with ([-C-] Zero).
+  apply Derivative_I_wdl with ([-C-] [0]).
    FEQ.
-  apply Derivative_I_wdr with ([-C-] Zero).
+  apply Derivative_I_wdr with ([-C-] [0]).
    FEQ.
   Deriv.
  simpl.
  change (FPoly IR (cpoly_linear IR s p)) with (FPoly IR (s[+X*]p)).
- change (FPoly IR (cpoly_plus_cs IR p (cpoly_linear IR Zero (cpoly_diff IR p))))
-   with (FPoly IR (p[+](Zero[+X*](_D_ p)))).
+ change (FPoly IR (cpoly_plus_cs IR p (cpoly_linear IR [0] (cpoly_diff IR p))))
+   with (FPoly IR (p[+]([0][+X*](_D_ p)))).
  apply Derivative_I_wdl with ([-C-] s{+}FId{*}(FPoly IR p)).
   repeat constructor.
   reflexivity.
- apply Derivative_I_wdr with ([-C-]Zero{+}(FId{*}(FPoly IR (_D_ p)){+}[-C-]One{*}(FPoly IR p))).
+ apply Derivative_I_wdr with ([-C-][0]{+}(FId{*}(FPoly IR (_D_ p)){+}[-C-][1]{*}(FPoly IR p))).
   repeat constructor.
   simpl.
   intros x _ _ _.
-  change (Zero[+](x[*](_D_ p)!x[+]One[*]p!x)[=] (p[+](Zero[+X*](_D_ p)))!x).
+  change ([0][+](x[*](_D_ p)!x[+][1][*]p!x)[=] (p[+]([0][+X*](_D_ p)))!x).
   rewrite -> cpoly_lin.
   autorewrite with apply.
   rational.

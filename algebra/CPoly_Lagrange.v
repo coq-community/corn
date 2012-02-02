@@ -28,7 +28,7 @@ Section contents.
 
   Definition L: cpoly CRasCRing :=
     Σ (map (fun p => let '((x, y), rest) := p in
-      _C_ y [*] Π (map (fun xy' => (' (- fst xy')%Q [+X*] One) [*] _C_ (' (/ (x - fst xy')))) rest))
+      _C_ y [*] Π (map (fun xy' => (' (- fst xy')%Q [+X*] [1]) [*] _C_ (' (/ (x - fst xy')))) rest))
      (separates qpoints)).
 
   (** Its degree follows easily from its structure: *)
@@ -45,13 +45,13 @@ Section contents.
     exfalso...
    simpl length.
    replace (@length (prod Q (RegularFunction Q_as_MetricSpace)) l) 
-    with (length (map (fun xi => (' (- fst xi)%Q[+X*]One)[*]_C_ (' (/ (q - fst xi)))) v) * 1)%nat.
+    with (length (map (fun xi => (' (- fst xi)%Q[+X*][1])[*]_C_ (' (/ (q - fst xi)))) v) * 1)%nat.
     apply degree_le_Product.
     intros.
     destruct (proj1 (in_map_iff _ _ _) H) as [?[[]?]].
     apply degree_le_mult_constant_r.
     apply degree_le_cpoly_linear_inv.
-    apply (degree_le_c_ CRasCRing One).
+    apply (degree_le_c_ CRasCRing [1]).
    rewrite map_length.
    ring_simplify.
    apply eq_add_S.

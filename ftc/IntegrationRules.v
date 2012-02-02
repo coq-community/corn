@@ -140,13 +140,13 @@ Proof.
     destruct (HGF1 _ HGb (compact_Min_rht _ _ Hab)); assumption.
    stepl c0; [| assumption].
    destruct (HGF1 _ HGa (compact_Min_lft _ _ Hab)); assumption.
-  stepl (Zero:IR).
+  stepl ([0]:IR).
    apply eq_symmetric; apply Integral_empty.
    assumption.
-  assert (Z:(Continuous_I Hab [-C-]Zero)).
+  assert (Z:(Continuous_I Hab [-C-][0])).
    Contin.
   stepr (Integral Z).
-   rstepl (Zero[*](b[-]a)).
+   rstepl ([0][*](b[-]a)).
    apply eq_symmetric.
    apply Integral_const.
   apply Integral_wd.
@@ -155,7 +155,7 @@ Proof.
   simpl in Hx'.
   apply eq_symmetric.
   apply x_mult_zero.
-  change (Zero:IR) with ([-C-]Zero x I).
+  change ([0]:IR) with ([-C-][0] x I).
   apply Feq_imp_eq with (I:=Compact (less_leEq _ _ _ X1)); auto.
   apply Derivative_I_unique with G.
    eapply included_imp_deriv;[|apply HGG'].
@@ -184,7 +184,7 @@ Proof.
   apply less_imp_ap.
   apply ap_imp_Min_less_Max.
   assumption.
- apply eq_transitive with (Zero:IR).
+ apply eq_transitive with ([0]:IR).
   apply Integral_empty.
   assumption.
  apply eq_symmetric.
@@ -199,24 +199,24 @@ Qed.
 
 Lemma IntegrationSubs01 : forall a b
  (Hab: Min a b[<=]Max a b)
- (H01: Zero[<=]One)
+ (H01: [0][<=][1])
  F
  (HFG: Continuous_I H01 ((F[o]([-C-](b[-]a){*}(Fid IR){+}[-C-]a))))
  (HF: Continuous_I Hab F),
  (b[-]a)[*]integral _ _ _ _ HFG[=]Integral HF.
 Proof.
  intros.
- assert (HFG0:Continuous_I (a:=Zero) (b:=One) H01 ((b[-]a){**}(F[o][-C-](b[-]a){*}FId{+}[-C-]a))).
+ assert (HFG0:Continuous_I (a:=[0]) (b:=[1]) H01 ((b[-]a){**}(F[o][-C-](b[-]a){*}FId{+}[-C-]a))).
   Contin.
  stepr (integral _ _ _ _ HFG0).
   apply eq_symmetric.
   apply integral_comm_scal.
- assert (HFG1:Continuous_I (a:=Zero) (b:=One) H01 ((F[o][-C-](b[-]a){*}FId{+}[-C-]a){*}[-C-](b[-]a))).
+ assert (HFG1:Continuous_I (a:=[0]) (b:=[1]) H01 ((F[o][-C-](b[-]a){*}FId{+}[-C-]a){*}[-C-](b[-]a))).
   Contin.
  stepr (integral _ _ _ _ HFG1).
   apply integral_wd.
   FEQ.
- assert (H01':Min Zero One[<=]Max Zero One).
+ assert (H01':Min [0] [1][<=]Max [0] [1]).
   apply Min_leEq_Max.
  assert (HFG2:Continuous_I H01' ((F[o][-C-](b[-]a){*}FId{+}[-C-]a){*}[-C-](b[-]a))).
   apply (included_imp_contin _ _ H01).
@@ -229,11 +229,11 @@ Proof.
   apply Integral_integral.
  clear - H01.
  set (G:=[-C-](b[-]a){*}FId{+}[-C-]a) in *.
- assert (HG0 : Dom G Zero).
+ assert (HG0 : Dom G [0]).
   repeat constructor.
- assert (HG1 : Dom G One).
+ assert (HG1 : Dom G [1]).
   repeat constructor.
- assert (Hab':Min (G Zero HG0) (G One HG1)[<=]Max (G Zero HG0) (G One HG1)).
+ assert (Hab':Min (G [0] HG0) (G [1] HG1)[<=]Max (G [0] HG0) (G [1] HG1)).
   apply Min_leEq_Max.
  assert (HF':Continuous_I Hab' F).
   apply (included_imp_contin _ _ Hab).
@@ -261,19 +261,19 @@ Proof.
    New_Deriv.
     apply Feq_reflexive.
     repeat constructor.
-   apply (included_Feq (Compact (less_leEq IR Zero One (pos_one IR))) realline).
+   apply (included_Feq (Compact (less_leEq IR [0] [1] (pos_one IR))) realline).
     repeat constructor.
    FEQ.
   split.
    apply contin_imp_inc.
    apply HF'.
   intros x Hx [H0 H1].
-  assert (H0':Zero[<=]x).
-   stepl (Min Zero One);[assumption|].
+  assert (H0':[0][<=]x).
+   stepl (Min [0] [1]);[assumption|].
    apply leEq_imp_Min_is_lft.
    apply (less_leEq _ _ _ (pos_one IR)).
-  assert (H1':x[<=]One).
-   stepr (Max Zero One);[assumption|].
+  assert (H1':x[<=][1]).
+   stepr (Max [0] [1]);[assumption|].
    apply leEq_imp_Max_is_rht.
    apply (less_leEq _ _ _ (pos_one IR)).
   unfold G.
@@ -292,7 +292,7 @@ Proof.
    destruct Z.
     stepl a; [| apply eq_symmetric; apply leEq_imp_Min_is_lft; auto].
     apply shift_leEq_plus.
-    rstepl (Zero:IR).
+    rstepl ([0]:IR).
     apply mult_resp_nonneg; auto.
     apply shift_leEq_lft.
     assumption.
@@ -300,7 +300,7 @@ Proof.
    stepl b; [| apply eq_symmetric; apply leEq_imp_Min_is_lft; auto].
    apply shift_leEq_plus.
    apply shift_leEq_rht.
-   rstepr ((a[-]b)[*](One[-]x)).
+   rstepr ((a[-]b)[*]([1][-]x)).
    apply mult_resp_nonneg; apply shift_leEq_lft; assumption.
   stepr (Max a b); [| apply MAX_wd;rational].
   assert (Z:=leEq_or_leEq _ a b).
@@ -316,12 +316,12 @@ Proof.
    stepr b; [| apply eq_symmetric; apply leEq_imp_Max_is_rht; auto].
    apply shift_plus_leEq.
    apply shift_leEq_rht.
-   rstepr ((b[-]a)[*](One[-]x)).
+   rstepr ((b[-]a)[*]([1][-]x)).
    apply mult_resp_nonneg; apply shift_leEq_lft; assumption.
   stepr (Max b a); [| apply Max_comm].
   stepr a; [| apply eq_symmetric; apply leEq_imp_Max_is_rht; auto].
   apply shift_plus_leEq.
-  rstepr (Zero:IR).
+  rstepr ([0]:IR).
   apply shift_leEq_rht.
   rstepr ((a[-]b)[*]x).
   apply mult_resp_nonneg; auto.

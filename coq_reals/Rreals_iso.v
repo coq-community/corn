@@ -188,12 +188,12 @@ Qed.
 
 (** zero *)
 
-Lemma R_Zero_as_IR : (RasIR R0 [=] Zero).
+Lemma R_Zero_as_IR : (RasIR R0 [=] [0]).
 Proof.
  apply map_pres_zero_unfolded.
 Qed.
 
-Lemma IR_Zero_as_R : (IRasR Zero = 0).
+Lemma IR_Zero_as_R : (IRasR [0] = 0).
 Proof.
  apply: map_pres_zero_unfolded.
 Qed.
@@ -202,14 +202,14 @@ Hint Rewrite R_Zero_as_IR : RtoIR.
 
 (** one *)
 
-Lemma R_One_as_IR : (RasIR R1 [=] One).
+Lemma R_One_as_IR : (RasIR R1 [=] [1]).
 Proof.
  apply map_pres_one_unfolded.
 Qed.
 
 Hint Rewrite R_One_as_IR : RtoIR.
 
-Lemma IR_One_as_R : (IRasR One = R1).
+Lemma IR_One_as_R : (IRasR [1] = R1).
 Proof.
  apply: map_pres_one_unfolded.
 Qed.
@@ -260,16 +260,16 @@ Hint Rewrite R_mult_as_IR : RtoIR.
 
 (** reciprocal *)
 
-Lemma R_recip_as_IR : forall y Hy, (RasIR (1 / y) [=] (One [/] RasIR y [//] Hy)).
+Lemma R_recip_as_IR : forall y Hy, (RasIR (1 / y) [=] ([1] [/] RasIR y [//] Hy)).
 Proof.
  intros y Hy.
  simpl in Hy.
  assert (y [#] 0)%R.
   apply: R_ap_as_IR.
-  stepr (Zero:IR). assumption.
+  stepr ([0]:IR). assumption.
    symmetry.
   apply R_Zero_as_IR.
- change (1/y) with (One [/] y [//] X).
+ change (1/y) with ([1] [/] y [//] X).
  eapply eq_transitive.
   unfold RasIR.
   apply (map_pres_inv_unfolded RReals IR).
@@ -285,7 +285,7 @@ Proof.
  intros x y Hy.
  unfold Rdiv.
  rewrite -> R_mult_as_IR.
- rstepr ((RasIR x) [*] (One [/]RasIR y[//]Hy)).
+ rstepr ((RasIR x) [*] ([1] [/]RasIR y[//]Hy)).
  replace (/ y) with (1 / y).
   rewrite <- R_recip_as_IR; reflexivity.
  unfold Rdiv.
@@ -299,7 +299,7 @@ Proof.
  intro x.
  unfold Rabs.
  destruct (Rcase_abs x) as [Hx | Hx].
-  cut (RasIR x[<=]Zero).
+  cut (RasIR x[<=][0]).
    intro Hxn.
    rewrite -> (AbsIR_eq_inv_x (RasIR x) Hxn).
    autorewrite with RtoIR; reflexivity.
@@ -307,7 +307,7 @@ Proof.
   apply less_leEq.
   apply IR_lt_as_R.
   assumption.
- cut (Zero [<=] RasIR x).
+ cut ([0] [<=] RasIR x).
   intro Hxn.
   rewrite -> (AbsIR_eq_x _ Hxn).
   reflexivity.
@@ -416,7 +416,7 @@ Proof.
   apply (Hay).
   unfold Rgt.
   apply R_lt_as_IR.
-  stepl (Zero:IR); [| now symmetry;apply R_Zero_as_IR].
+  stepl ([0]:IR); [| now symmetry;apply R_Zero_as_IR].
   stepr (e); [| now symmetry; apply IRasRasIR_id].
   assumption.
  destruct H as [N HN].
@@ -537,13 +537,13 @@ Proof.
  simpl.
  rstepr ( seq_part_sum (fun n0 : nat =>
    (cos_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
-     nexp IR n0 (RasIR x[-]Zero)) (n + 0 + n)[+] (
+     nexp IR n0 (RasIR x[-][0])) (n + 0 + n)[+] (
        (cos_seq (n + 0 + n)[/]nring (R:=IR) (fact (n + 0 + n))[//]
-         nring_fac_ap_zero IR (n + 0 + n))[*]nexp IR (n + 0 + n) (RasIR x[-]Zero)[+]
+         nring_fac_ap_zero IR (n + 0 + n))[*]nexp IR (n + 0 + n) (RasIR x[-][0])[+]
            (cos_seq (S (n + 0 + n))[/]
              nring (R:=IR) (fact (n + 0 + n) + (n + 0 + n) * fact (n + 0 + n))[//]
                nring_fac_ap_zero IR (S (n + 0 + n)))[*]
-                 (nexp IR (n + 0 + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero))) ).
+                 (nexp IR (n + 0 + n) (RasIR x[-][0])[*](RasIR x[-][0]))) ).
  apply bin_op_wd_unfolded.
   rewrite plus_comm.
   reflexivity.
@@ -560,8 +560,8 @@ Proof.
  destruct s0; simpl.
   elimtype False; auto with *.
  autorewrite with RtoIR.
- stepr ( (nexp IR x0 [--]One[/]nring (R:=IR) (fact (n + n))[//]
-   nring_fac_ap_zero IR (n + n))[*]nexp IR (n + n) (RasIR x[-]Zero) ).
+ stepr ( (nexp IR x0 [--][1][/]nring (R:=IR) (fact (n + n))[//]
+   nring_fac_ap_zero IR (n + n))[*]nexp IR (n + n) (RasIR x[-][0]) ).
   apply bin_op_wd_unfolded.
    replace (n + 0)%nat with n by auto with *.
    assert (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (fact (n + n))))).
@@ -582,13 +582,13 @@ Proof.
   rewrite -> IHn.
   replace (n + S n)%nat with (S (n + n))%nat by auto with *.
   simpl.
-  rstepr ( nexp IR (n + n) (RasIR x[-]Zero)[*]((RasIR x[-]Zero)[*](RasIR x[-]Zero)) ).
+  rstepr ( nexp IR (n + n) (RasIR x[-][0])[*]((RasIR x[-][0])[*](RasIR x[-][0])) ).
   apply bin_op_wd_unfolded.
    reflexivity.
   rational.
- setoid_replace ((Zero[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
-   nring_fac_ap_zero IR (S (n + n)))[*] (nexp IR (n + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero)))
-     with (Zero:IR).
+ setoid_replace (([0][/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
+   nring_fac_ap_zero IR (S (n + n)))[*] (nexp IR (n + n) (RasIR x[-][0])[*](RasIR x[-][0])))
+     with ([0]:IR).
   rational.
  rational.
 Qed.
@@ -635,20 +635,20 @@ Proof.
   elimtype False; auto with *.
  rstepr ( seq_part_sum (fun n0 : nat =>
    (sin_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
-     nexp IR n0 (RasIR x[-]Zero)) (n + n)[+](
-       (Zero[/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
-         nexp IR (n + n) (RasIR x[-]Zero)[+]
-           (nexp IR x1 [--]One[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
+     nexp IR n0 (RasIR x[-][0])) (n + n)[+](
+       ([0][/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
+         nexp IR (n + n) (RasIR x[-][0])[+]
+           (nexp IR x1 [--][1][/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
              nring_fac_ap_zero IR (S (n + n)))[*]
-               (nexp IR (n + n) (RasIR x[-]Zero)[*](RasIR x[-]Zero))) ).
+               (nexp IR (n + n) (RasIR x[-][0])[*](RasIR x[-][0]))) ).
  apply bin_op_wd_unfolded.
   reflexivity.
- setoid_replace (RasIR x [-] Zero) with (RasIR x);[|rational].
+ setoid_replace (RasIR x [-] [0]) with (RasIR x);[|rational].
  replace x1 with n by omega.
  clear.
- setoid_replace ((Zero[/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
-   nexp IR (n + n) (RasIR x)) with (Zero:IR);[|rational].
- rstepr ( RasIR x [*] ( (nexp IR n [--]One[/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
+ setoid_replace (([0][/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
+   nexp IR (n + n) (RasIR x)) with ([0]:IR);[|rational].
+ rstepr ( RasIR x [*] ( (nexp IR n [--][1][/]nring (R:=IR) (fact (n + n) + (n + n) * fact (n + n))[//]
    nring_fac_ap_zero IR (S (n + n)))[*](nexp IR (n + n) (RasIR x))) ).
  apply bin_op_wd_unfolded.
   reflexivity.
@@ -728,7 +728,7 @@ Proof.
  apply R_as_IR_wd.
  apply exp_ln.
  apply R_lt_as_IR.
- stepl (Zero:IR); [| now symmetry; apply R_Zero_as_IR].
+ stepl ([0]:IR); [| now symmetry; apply R_Zero_as_IR].
  assumption.
 Qed.
 
@@ -800,7 +800,7 @@ Hint Rewrite R_IZR_as_IR : RtoIR.
 
 Lemma R_pi_as_IR : RasIR (PI) [=] Pi.
 Proof.
- assert (Sin (RasIR PI) [=] Zero).
+ assert (Sin (RasIR PI) [=] [0]).
   rewrite <- R_sin_as_IR.
   rewrite sin_PI.
   apply R_Zero_as_IR.
@@ -815,7 +815,7 @@ Proof.
  intro z.
  elim z.
    simpl.
-   rstepr (Zero:IR).
+   rstepr ([0]:IR).
    stepr (RasIR 0); [| now apply R_Zero_as_IR].
    apply R_ap_as_IR_back.
    apply PI_neq0.
@@ -824,7 +824,7 @@ Proof.
   stepr (nring (R := IR) (nat_of_P p) [*] Pi); [| now apply mult_wdl; symmetry; apply (zring_plus_nat IR)].
   case (nat_of_P p).
    simpl.
-   rstepr (Zero:IR).
+   rstepr ([0]:IR).
    stepr (RasIR 0); [| now apply R_Zero_as_IR].
    apply R_ap_as_IR_back.
    apply PI_neq0.
@@ -836,7 +836,7 @@ Proof.
   intro n0.
   apply less_imp_ap.
   apply leEq_less_trans with Four.
-   rstepr ((One [+] One) [*] (One [+] One):IR).
+   rstepr (([1] [+] [1]) [*] ([1] [+] [1]):IR).
    rewrite <- R_One_as_IR.
    rewrite <- R_plus_as_IR.
    rewrite <- R_mult_as_IR.
@@ -846,7 +846,7 @@ Proof.
    rstepl (Two [*] Two:IR).
    apply mult_resp_less_lft.
     apply Pi_gt_2.
-   rstepr ((Zero [+] One) [+] One : IR).
+   rstepr (([0] [+] [1]) [+] [1] : IR).
    apply plus_one_ext_less.
    apply zero_lt_posplus1.
    apply eq_imp_leEq.
@@ -862,11 +862,11 @@ Proof.
  intro p.
  apply Greater_imp_ap.
  simpl.
- apply leEq_less_trans with (Zero:IR).
+ apply leEq_less_trans with ([0]:IR).
   rewrite -> pring_convert.
   apply less_leEq.
   apply inv_cancel_less.
-  rstepl (Zero[*]Zero:IR).
+  rstepl ([0][*][0]:IR).
   rstepr ((nring (R:=IR) (nat_of_P p))[*]Pi).
   apply mult_resp_less_both.
      apply eq_imp_leEq.
@@ -925,7 +925,7 @@ Proof.
   apply Rgt_not_eq.
   rewrite DF.
   unfold Rgt.
-  change (Zero [<] nring (R:=RRing) (S (n + n))).
+  change ([0] [<] nring (R:=RRing) (S (n + n))).
   apply pos_nring_S.
  auto with *.
 Qed.

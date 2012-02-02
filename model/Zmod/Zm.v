@@ -511,8 +511,8 @@ Definition Zm := Zm_cring.
 Section zm_ring_basics.
 
 
-Definition Zm_mult_ord (a:Zm)(h:nat) := (a[^]h[=]One) /\
-  forall k:nat, (lt k h)->~(a[^]k[=]One).
+Definition Zm_mult_ord (a:Zm)(h:nat) := (a[^]h[=][1]) /\
+  forall k:nat, (lt k h)->~(a[^]k[=][1]).
 
 
 
@@ -560,16 +560,16 @@ Definition Zp := (Zm p_not_1).
 
 (**
 *** The inverse element in Zp
-Let x in Zp, such that x is apart from Zero.
+Let x in Zp, such that x is apart from [0].
 Then we will show that there is an inverse element y such that
-x[*]y [=] One in Zp.
+x[*]y [=] [1] in Zp.
 *)
 
 
 Section zp_nonzero.
 
 Variable x: Zp.
-Hypothesis Hx: x[#]Zero.
+Hypothesis Hx: x[#][0].
 
 Lemma Zp_nonz_mod: 0<(Zmod x m)<m.
 Proof.
@@ -610,7 +610,7 @@ End zp_nonzero.
 
 
 (* Begin_Tex_Verb *)
-Definition Zp_inv (x:Zp)(Hx:(x[#]Zero)) : Zp := (Zgcd_coeff_a x m).
+Definition Zp_inv (x:Zp)(Hx:(x[#][0])) : Zp := (Zgcd_coeff_a x m).
 (* End_Tex_Verb *)
 
 (* Begin_Tex_Verb *)
@@ -705,7 +705,7 @@ Qed.
 Definition Fp : CField := (Build_CField _ _ Zp_is_CField Zp_inv_strext).
 (* End_Tex_Verb *)
 
-Definition Fp_inv (x:Fp)(Hx:x[#]Zero) : Fp := (Zp_inv x Hx).
+Definition Fp_inv (x:Fp)(Hx:x[#][0]) : Fp := (Zp_inv x Hx).
 
 
 End zp_def.

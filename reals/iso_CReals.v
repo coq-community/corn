@@ -81,7 +81,7 @@ Proof.
        apply leEq_transitive with ((Lim h[-]Lim g) [/]ThreeNZ).
         apply mult_cancel_leEq with (Twelve:IR).
          astepl (nring (R:=IR) 0); apply nring_less; auto with arith.
-        rstepl (Zero[+]Three[*](Lim h[-]Lim g)).
+        rstepl ([0][+]Three[*](Lim h[-]Lim g)).
         rstepr (Lim h[-]Lim g[+]Three[*](Lim h[-]Lim g)).
         apply plus_resp_leEq.
         apply shift_zero_leEq_minus; apply less_leEq; auto.
@@ -120,7 +120,7 @@ Lemma Lim_pres_less :
 Proof.
  do 3 intro.  intro H.
  apply plus_cancel_less with (z := [--](Lim g)).
- astepl (Zero:IR).
+ astepl ([0]:IR).
  astepr (Lim h[-]Lim g).
  simpl in H.
  red in H.
@@ -208,7 +208,7 @@ Proof.
  set (H0 := True) in *. (* dummy *)
  exists N.
  exists (inj_Q IR e).
-  apply less_wdl with (x := inj_Q IR Zero).
+  apply less_wdl with (x := inj_Q IR [0]).
    apply inj_Q_less.
    assumption.
   simpl in |- *.
@@ -250,7 +250,7 @@ Proof.
  exists q.
   apply less_inj_Q with (R1 := IR).
   simpl in |- *.
-  rstepl (Zero:IR).
+  rstepl ([0]:IR).
   assumption.
  intros.
  apply leEq_inj_Q with (R1 := IR).
@@ -287,7 +287,7 @@ Proof.
      intro N2.
      intro H6.
      apply less_irreflexive_unfolded with (x := y[-]Lim g).
-     rstepr (Zero[+](CS_seq _ g (N1 + N2)[-]Lim g)[+](y[-]CS_seq _ g (N1 + N2))).
+     rstepr ([0][+](CS_seq _ g (N1 + N2)[-]Lim g)[+](y[-]CS_seq _ g (N1 + N2))).
      rstepl ((y[-]Lim g) [/]ThreeNZ[+](y[-]Lim g) [/]ThreeNZ[+](y[-]Lim g) [/]ThreeNZ).
      apply plus_resp_less_leEq.
       apply plus_resp_less_leEq.
@@ -326,7 +326,7 @@ Proof.
     intro N2.
     intros.
     apply less_irreflexive_unfolded with (x := Lim g[-]y).
-    rstepr (Zero[+](Lim g[-]CS_seq _ g (N1 + N2))[+](CS_seq _ g (N1 + N2)[-]y)).
+    rstepr ([0][+](Lim g[-]CS_seq _ g (N1 + N2))[+](CS_seq _ g (N1 + N2)[-]y)).
     rstepl ((Lim g[-]y) [/]ThreeNZ[+](Lim g[-]y) [/]ThreeNZ[+](Lim g[-]y) [/]ThreeNZ).
     apply plus_resp_less_leEq.
      apply plus_resp_less_leEq.
@@ -361,7 +361,7 @@ Proof.
  intros e H0.
  cut (Not (g[#]h)).
   intro.
-  cut (forall e : IR, Zero[<]e -> {N : nat |
+  cut (forall e : IR, [0][<]e -> {N : nat |
     forall m : nat, N <= m -> AbsSmall e (CS_seq IR g m[-]CS_seq IR h m)}).
    intro H2.
    cut {N : nat | forall m : nat, N <= m -> AbsSmall (e [/]TwoNZ) (CS_seq IR g m[-]CS_seq IR h m)}.
@@ -448,7 +448,7 @@ Proof.
       assumption.
      apply eq_transitive_unfolded with (y := CS_seq IR g m[-]CS_seq IR h m[+](Lim h[-]Lim g)).
       rational.
-     astepr (CS_seq IR g m[-]CS_seq IR h m[+]Zero).
+     astepr (CS_seq IR g m[-]CS_seq IR h m[+][0]).
      apply bin_op_wd_unfolded.
       apply eq_reflexive_unfolded.
      apply cg_cancel_rht with (x := Lim g).
@@ -514,7 +514,7 @@ Proof.
   apply eq_imp_not_ap.
   assumption.
  apply less_inj_Q with (R1 := IR).
- apply less_wdl with (Zero:IR).
+ apply less_wdl with ([0]:IR).
   assumption.
  simpl in |- *.
  rational.
@@ -565,7 +565,7 @@ Proof.
       (fun m : nat => inj_Q IR (CS_seq Q_as_COrdField h m)) (inj_Q_Cauchy IR h))) in |- *.
   apply eq_imp_not_ap.
   assumption.
- apply less_wdl with (inj_Q IR Zero).
+ apply less_wdl with (inj_Q IR [0]).
   apply inj_Q_less.
   assumption.
  simpl in |- *.
@@ -710,7 +710,7 @@ Proof.
        apply eq_symmetric_unfolded.
        apply inj_Q_minus.
       apply H6.
-      apply less_wdl with (x := inj_Q IR Zero).
+      apply less_wdl with (x := inj_Q IR [0]).
        apply inj_Q_less.
        apply div_resp_pos.
         apply pos_three.
@@ -719,7 +719,7 @@ Proof.
       rational.
      apply x_is_SeqLimit_G.
     apply H1.
-    apply less_wdl with (x := inj_Q IR Zero).
+    apply less_wdl with (x := inj_Q IR [0]).
      apply inj_Q_less.
      apply div_resp_pos.
       apply pos_three.
@@ -727,7 +727,7 @@ Proof.
     simpl in |- *.
     rational.
    apply H0.
-   apply less_wdl with (x := inj_Q IR Zero).
+   apply less_wdl with (x := inj_Q IR [0]).
     apply inj_Q_less.
     apply div_resp_pos.
      apply pos_three.
@@ -741,7 +741,7 @@ Qed.
 (* This theorem can be avoided but it is interesting *)
 Theorem nonarchemaedian_bound_for_Lim :
  forall (IR : CReals) (g : CauchySeq IR),
- {H : IR | Zero[<]H | AbsSmall H (Lim g)}.
+ {H : IR | [0][<]H | AbsSmall H (Lim g)}.
 Proof.
  intros.
  case (CS_seq_bounded IR (CS_seq IR g) (CS_proof IR g)).
@@ -751,7 +751,7 @@ Proof.
  case H1.
  intro M.
  intro H2.
- exists (One[+]K).
+ exists ([1][+]K).
   apply plus_resp_pos.
    apply pos_one.
   apply leEq_not_eq.
@@ -762,7 +762,7 @@ Proof.
  cut (SeqLimit g (Lim g)).
   intro H3.
   red in H3.
-  case (H3 One).
+  case (H3 [1]).
    apply pos_one.
   intro N.
   intros.
@@ -796,9 +796,9 @@ Proof.
  intro L.
  set (H6 := True) in *. (* dummy *)
  intros H7 H8.
- cut (Six[*]K[#]Zero).
+ cut (Six[*]K[#][0]).
   intro H9.
-  cut (Six[*]L[#]Zero).
+  cut (Six[*]L[#][0]).
    intro H10.
    case (ax_Lim _ _ (crl_proof IR) g (e[/] Six[*]L[//]H10)).
     apply div_resp_pos.
@@ -891,16 +891,16 @@ Proof.
     intro L.
     set (H7 := True) in *. (* dummy *)
     intros H8 H9.
-    cut (Twelve[*]inj_Q IR K[#]Zero).
+    cut (Twelve[*]inj_Q IR K[#][0]).
      intro H10.
-     cut (Twelve[*]L[#]Zero).
+     cut (Twelve[*]L[#][0]).
       intro H11.
       red in H0.
       case (H0 (inj_Q IR e[/] Twelve[*]inj_Q IR K[//]H10)).
        apply div_resp_pos.
         apply mult_resp_pos.
          apply pos_nring_S.
-        apply less_wdl with (x := inj_Q IR Zero).
+        apply less_wdl with (x := inj_Q IR [0]).
          apply inj_Q_less.
          apply leEq_not_eq.
           apply (AbsSmall_nonneg Q_as_COrdField K (G IR y M1)).
@@ -909,7 +909,7 @@ Proof.
          apply less_imp_ap; auto.
         simpl in |- *.
         rational.
-       apply less_wdl with (x := inj_Q IR Zero).
+       apply less_wdl with (x := inj_Q IR [0]).
         apply inj_Q_less.
         assumption.
        simpl in |- *.
@@ -922,7 +922,7 @@ Proof.
         apply mult_resp_pos.
          apply pos_nring_S.
         assumption.
-       apply less_wdl with (x := inj_Q IR Zero).
+       apply less_wdl with (x := inj_Q IR [0]).
         apply inj_Q_less.
         assumption.
        simpl in |- *.
@@ -933,7 +933,7 @@ Proof.
       case (H2 (inj_Q IR e [/]TwoNZ)).
        apply div_resp_pos.
         apply pos_two.
-       apply less_wdl with (x := inj_Q IR Zero).
+       apply less_wdl with (x := inj_Q IR [0]).
         apply inj_Q_less.
         assumption.
        simpl in |- *.
@@ -1003,7 +1003,7 @@ Proof.
     apply Greater_imp_ap.
     apply mult_resp_pos.
      apply pos_nring_S.
-    apply less_wdl with (x := inj_Q IR Zero).
+    apply less_wdl with (x := inj_Q IR [0]).
      apply inj_Q_less.
      apply leEq_not_eq.
       apply (AbsSmall_nonneg Q_as_COrdField K (G IR y M1)).
@@ -1219,9 +1219,9 @@ Proof.
   exists 0.
   intros.
   unfold CS_seq in |- *.
-  apply AbsSmall_wdr_unfolded with (y := Zero:R2).
+  apply AbsSmall_wdr_unfolded with (y := [0]:R2).
    split.
-    rstepr ([--](Zero:R2)).
+    rstepr ([--]([0]:R2)).
     apply inv_resp_leEq.
     apply less_leEq.
     assumption.
@@ -1283,9 +1283,9 @@ Proof.
   exists 0.
   intros.
   unfold CS_seq in |- *.
-  apply AbsSmall_wdr_unfolded with (y := Zero:R2).
+  apply AbsSmall_wdr_unfolded with (y := [0]:R2).
    split.
-    rstepr ([--](Zero:R2)).
+    rstepr ([--]([0]:R2)).
     apply inv_resp_leEq.
     apply less_leEq.
     assumption.
@@ -1465,9 +1465,9 @@ Proof.
   exists 0.
   intros.
   unfold CS_seq in |- *.
-  apply AbsSmall_wdr_unfolded with (y := Zero:R1).
+  apply AbsSmall_wdr_unfolded with (y := [0]:R1).
    split.
-    rstepr ([--](Zero:R1)).
+    rstepr ([--]([0]:R1)).
     apply inv_resp_leEq.
     apply less_leEq.
     assumption.
@@ -1530,9 +1530,9 @@ Proof.
   exists 0.
   intros.
   unfold CS_seq in |- *.
-  apply AbsSmall_wdr_unfolded with (y := Zero:R1).
+  apply AbsSmall_wdr_unfolded with (y := [0]:R1).
    split.
-    rstepr ([--](Zero:R1)).
+    rstepr ([--]([0]:R1)).
     apply inv_resp_leEq.
     apply less_leEq.
     assumption.

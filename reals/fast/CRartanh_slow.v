@@ -119,13 +119,13 @@ Proof.
  induction n.
   apply eq_reflexive.
  simpl.
- set (A:=nexp IR (n + S n) (inj_Q IR a[-]Zero)).
+ set (A:=nexp IR (n + S n) (inj_Q IR a[-][0])).
  rewrite plus_comm.
  simpl.
  fold (double n).
  csetoid_rewrite_rev IHn.
  clear IHn.
- csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[-]Zero)) (Zero:IR).
+ csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[-][0])) ([0]:IR).
   csetoid_replace (ArTanH_series_coef (S (double n))[*]A) (inj_Q IR (Str_nth n (arctanSequence a))).
    rational.
   unfold ArTanH_series_coef.
@@ -137,8 +137,8 @@ Proof.
   eapply eq_transitive; [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_arctanSequence].
   eapply eq_transitive; [|apply eq_symmetric; apply inj_Q_mult].
   apply mult_wd.
-   assert (X:(inj_Q IR (nring (S (double n))))[#]Zero).
-    stepr (inj_Q IR Zero).
+   assert (X:(inj_Q IR (nring (S (double n))))[#][0]).
+    stepr (inj_Q IR [0]).
      apply inj_Q_ap.
      apply nringS_ap_zero.
     apply (inj_Q_nring IR 0).
@@ -149,8 +149,8 @@ Proof.
      apply (inj_Q_nring IR 1).
     apply eq_symmetric.
     apply (inj_Q_nring).
-   assert (X0:inj_Q IR ((P_of_succ_nat (2 * n)):Q)[#]Zero).
-    stepr (inj_Q IR Zero).
+   assert (X0:inj_Q IR ((P_of_succ_nat (2 * n)):Q)[#][0]).
+    stepr (inj_Q IR [0]).
      apply inj_Q_ap.
      discriminate.
     apply (inj_Q_nring IR 0).
@@ -167,7 +167,7 @@ Proof.
    reflexivity.
   unfold A; clear A.
   eapply eq_transitive;[|apply eq_symmetric; apply inj_Q_power].
-  change ((inj_Q IR a[-]Zero)[^](n+S n)[=]inj_Q IR a[^](1 + 2 * n)).
+  change ((inj_Q IR a[-][0])[^](n+S n)[=]inj_Q IR a[^](1 + 2 * n)).
   replace (n + S n)%nat with (1 + 2*n)%nat by ring.
   apply nexp_wd.
   rational.

@@ -54,10 +54,10 @@ Variable n : nat.
 Variable P : Partition Hab n.
 
 Variable alpha : IR.
-Hypothesis Halpha : Zero[<]alpha.
+Hypothesis Halpha : [0][<]alpha.
 
 Variable csi : IR.
-Hypothesis Hcsi : Zero[<]csi.
+Hypothesis Hcsi : [0][<]csi.
 
 Let M := Norm_Funct contF.
 
@@ -79,7 +79,7 @@ Let delta :=
     (alpha[/] _[//]
      mult_resp_ap_zero _ _ _ (nring_ap_zero _ _ SPap_n) (max_one_ap_zero M)).
 
-Lemma RS'_delta_pos : Zero[<]delta.
+Lemma RS'_delta_pos : [0][<]delta.
 Proof.
  unfold delta in |- *; apply less_Min.
   assumption.
@@ -128,7 +128,7 @@ Proof.
  apply shift_div_less.
   apply pos_four.
  rstepr (delta[+]delta).
- astepl (Zero[+]delta).
+ astepl ([0][+]delta).
  apply plus_resp_less_leEq.
   apply RS'_delta_pos.
  apply leEq_reflexive.
@@ -688,7 +688,7 @@ Proof.
      eapply less_wdl.
       apply b2.
      apply cg_minus_wd; apply prf1; auto.
-    astepl (Zero[+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
+    astepl ([0][+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
    elimtype False.
    exact (le_not_lt _ _ (sep__part_h_bnd _) b2).
   rstepl (Mesh P[+]delta).
@@ -861,9 +861,9 @@ Proof.
             (incF (g i0 (RS'_Hsep_S i i0 Hi H0))
               (Pts_part_lemma a b Hab n P g gP i0 (RS'_Hsep_S i i0 Hi H0)))[*]
                 (P (S i0) (RS'_Hsep_S i i0 Hi H0)[-]P i0 (RS'_Hsep i i0 Hi H0)))
-                  (fun _ : pred (sep__part_fun (S i) Hi) < i0 => Zero)
+                  (fun _ : pred (sep__part_fun (S i) Hi) < i0 => [0])
                     (le_lt_dec i0 (pred (sep__part_fun (S i) Hi))))
-                      (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => Zero)
+                      (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => [0])
                         (le_lt_dec (sep__part_fun i (lt_le_weak i m Hi)) i0))
                           (h := part_tot_nat_fun _ _ (fun (i : nat) (H : i < n) =>
                             F (g i H) just1[*](P _ H[-]P _ (lt_le_weak _ _ H)))).
@@ -985,9 +985,9 @@ Proof.
           (fun _ : sep__part_fun i (lt_le_weak i m Hi) <= i0 => sumbool_rect (fun
             _ : {i0 <= pred (sep__part_fun (S i) Hi)} + {pred (sep__part_fun (S i) Hi) < i0} => IR)
               (fun _ : i0 <= pred (sep__part_fun (S i) Hi) => (M[+]M)[*]delta [/]TwoNZ)
-                (fun _ : pred (sep__part_fun (S i) Hi) < i0 => Zero)
+                (fun _ : pred (sep__part_fun (S i) Hi) < i0 => [0])
                   (le_lt_dec i0 (pred (sep__part_fun (S i) Hi))))
-                    (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => Zero)
+                    (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => [0])
                       (le_lt_dec (sep__part_fun i (lt_le_weak i m Hi)) i0)) (h := part_tot_nat_fun _ _
                         (fun (i : nat) (_ : i < n) => (M[+]M)[*]delta [/]TwoNZ)).
       apply leEq_wdr with (Sumx (fun (i : nat) (_ : i < n) => alpha[/] _[//]nring_ap_zero _ _ SPap_n)).
@@ -1003,14 +1003,14 @@ Proof.
         apply div_resp_leEq.
          apply pos_two.
         apply Min_leEq_rht.
-       astepl (ZeroR[+]Zero); apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
-      rstepl (alpha[*](M[/] _[//]max_one_ap_zero M)[*] (One[/] _[//]nring_ap_zero _ _ SPap_n)).
-      rstepr (alpha[*]One[*](One[/] _[//]nring_ap_zero _ _ SPap_n)).
+       astepl (ZeroR[+][0]); apply plus_resp_leEq_both; unfold M in |- *; apply positive_norm.
+      rstepl (alpha[*](M[/] _[//]max_one_ap_zero M)[*] ([1][/] _[//]nring_ap_zero _ _ SPap_n)).
+      rstepr (alpha[*][1][*]([1][/] _[//]nring_ap_zero _ _ SPap_n)).
       apply mult_resp_leEq_rht.
        apply mult_resp_leEq_lft.
         apply shift_div_leEq.
          apply pos_max_one.
-        astepr (Max M One); apply lft_leEq_Max.
+        astepr (Max M [1]); apply lft_leEq_Max.
        apply less_leEq; assumption.
       apply less_leEq; apply recip_resp_pos.
       astepl (nring (R:=IR) 0); apply nring_less; apply RS'_pos_n.
@@ -1093,7 +1093,7 @@ Proof.
    elim (le_lt_dec (pred (sep__part_h (S RS'_m1))) k); intro.
     cut (pred (sep__part_h (S RS'_m1)) = k); intros.
      apply leEq_wdl with ZeroR.
-      astepl ((Zero[+]Zero)[*]ZeroR).
+      astepl (([0][+][0])[*]ZeroR).
       apply mult_resp_leEq_both.
          apply eq_imp_leEq; algebra.
         apply leEq_reflexive.
@@ -1166,7 +1166,7 @@ Proof.
      2: apply a2.
     clear Hk Hk'; omega.
    apply leEq_wdl with ZeroR.
-    astepl ((Zero[+]Zero)[*]ZeroR).
+    astepl (([0][+][0])[*]ZeroR).
     apply mult_resp_leEq_both.
        apply eq_imp_leEq; algebra.
       apply leEq_reflexive.
@@ -1213,7 +1213,7 @@ Proof.
    auto with arith.
   apply sep__part_fun_bnd.
  apply leEq_wdl with ZeroR.
-  astepl ((Zero[+]Zero)[*]ZeroR).
+  astepl (([0][+][0])[*]ZeroR).
   apply mult_resp_leEq_both.
      apply eq_imp_leEq; algebra.
     apply leEq_reflexive.

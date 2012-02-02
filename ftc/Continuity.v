@@ -78,7 +78,7 @@ Variable F : PartIR.
 Let P := Dom F.
 (* end hide *)
 
-Definition Continuous_I := included I P and (forall e, Zero [<] e -> {d : IR | Zero [<] d |
+Definition Continuous_I := included I P and (forall e, [0] [<] e -> {d : IR | [0] [<] d |
  forall x y, I x -> I y -> forall Hx Hy, AbsIR (x[-]y) [<=] d -> AbsIR (F x Hx[-]F y Hy) [<=] e}).
 
 (**
@@ -90,7 +90,7 @@ Proof.
  intro H; elim H; intros; assumption.
 Qed.
 
-Lemma contin_prop : Continuous_I -> forall e, Zero [<] e -> {d : IR | Zero [<] d |
+Lemma contin_prop : Continuous_I -> forall e, [0] [<] e -> {d : IR | [0] [<] d |
  forall x y, I x -> I y -> forall Hx Hy, AbsIR (x[-]y) [<=] d -> AbsIR (F x Hx[-]F y Hy) [<=] e}.
 Proof.
  intro H; elim H; do 2 intro; assumption.
@@ -258,14 +258,14 @@ Qed.
 We now prove some basic properties of the norm---namely that it is positive, and that it provides a least upper bound for the absolute value of its argument.
 *)
 
-Lemma positive_norm : Zero [<=] Norm_Funct.
+Lemma positive_norm : [0] [<=] Norm_Funct.
 Proof.
  apply leEq_transitive with (AbsIR (FRestr Hinc' a (compact_inc_lft _ _ _))).
   apply AbsIR_nonneg.
  simpl in |- *; apply norm_bnd_AbsIR; unfold I in |- *; apply compact_inc_lft.
 Qed.
 
-Lemma norm_fun_lub : forall e, Zero [<] e -> {x : IR | I x and (forall Hx, Norm_Funct[-]e [<] AbsIR (F x Hx))}.
+Lemma norm_fun_lub : forall e, [0] [<] e -> {x : IR | I x and (forall Hx, Norm_Funct[-]e [<] AbsIR (F x Hx))}.
 Proof.
  intros e H.
  cut {x : IR | I x and (forall Hx' : P x, Norm_Funct [<] AbsIR (F x Hx') [+]e)}.
@@ -300,7 +300,7 @@ Proof.
       apply Hx'0 with (Hx' := Hx'1).
      apply plus_resp_less_lft.
      apply pos_div_two'; assumption.
-    astepl (Zero[+]lub_funct); apply less_leEq; apply shift_plus_less.
+    astepl ([0][+]lub_funct); apply less_leEq; apply shift_plus_less.
     assumption.
    exists x; split.
     auto.
@@ -336,7 +336,7 @@ Qed.
 Lemma leEq_Norm_Funct : forall e, (forall x, I x -> forall Hx, AbsIR (F x Hx) [<=] e) -> Norm_Funct [<=] e.
 Proof.
  intros e H.
- astepr (Zero[+]e); apply shift_leEq_plus.
+ astepr ([0][+]e); apply shift_leEq_plus.
  apply approach_zero_weak.
  intros d Hd.
  apply shift_minus_leEq.
@@ -347,7 +347,7 @@ Proof.
  apply less_leEq; apply less_leEq_trans with d.
   apply shift_minus_less; apply shift_less_plus'; apply Hx'.
  rstepr (d[+] (e[-]AbsIR (F x (Hinc' x Hx)))).
- astepl (d[+]Zero); apply plus_resp_leEq_lft.
+ astepl (d[+][0]); apply plus_resp_leEq_lft.
  apply shift_leEq_minus; astepl (AbsIR (F x (Hinc' x Hx))); apply H; assumption.
 Qed.
 
@@ -391,9 +391,9 @@ Hypothesis incG : included (Compact Hab) Q.
 The first result does not require the function to be continuous; however, its preconditions are easily verified by continuous functions, which justifies its inclusion in this section.
 *)
 
-Lemma cont_no_sign_change : forall e, Zero [<] e -> forall x y, I x -> I y ->
+Lemma cont_no_sign_change : forall e, [0] [<] e -> forall x y, I x -> I y ->
  forall Hx Hy, AbsIR (F x Hx[-]F y Hy) [<=] e -> e [<] AbsIR (F x Hx) ->
- (Zero [<] F x Hx -> Zero [<] F y Hy) and (F x Hx [<] Zero -> F y Hy [<] Zero).
+ ([0] [<] F x Hx -> [0] [<] F y Hy) and (F x Hx [<] [0] -> F y Hy [<] [0]).
 Proof.
  intros e H x y H0 H1 Hx Hy H2 H3.
  set (fx := F x Hx) in *.
@@ -409,8 +409,8 @@ Proof.
   elim (less_AbsIR _ _ H H3); intro H6.
    assumption.
   elimtype False.
-  cut (Zero [<] [--]e).
-   intro; cut (e [<] Zero).
+  cut ([0] [<] [--]e).
+   intro; cut (e [<] [0]).
     exact (less_antisymmetric_unfolded _ _ _ H).
    astepl ( [--][--]e); astepr ( [--]ZeroR); apply inv_resp_less; assumption.
   apply less_transitive_unfolded with fx; assumption.
@@ -428,8 +428,8 @@ Proof.
  astepl ( [--][--]e); apply inv_resp_less; assumption.
 Qed.
 
-Lemma cont_no_sign_change_pos : forall e, Zero [<] e -> forall x y, I x -> I y -> forall Hx Hy,
- AbsIR (F x Hx[-]F y Hy) [<=] e -> e [<] AbsIR (F x Hx) -> e [<] F x Hx -> Zero [<] F y Hy.
+Lemma cont_no_sign_change_pos : forall e, [0] [<] e -> forall x y, I x -> I y -> forall Hx Hy,
+ AbsIR (F x Hx[-]F y Hy) [<=] e -> e [<] AbsIR (F x Hx) -> e [<] F x Hx -> [0] [<] F y Hy.
 Proof.
  intros e H x y H0 H1 Hx Hy H2 H3 H4.
  elim (cont_no_sign_change e H x y H0 H1 Hx Hy H2 H3); intros H5 H6.
@@ -437,8 +437,8 @@ Proof.
  apply less_transitive_unfolded with e; auto.
 Qed.
 
-Lemma cont_no_sign_change_neg : forall e, Zero [<] e -> forall x y, I x -> I y -> forall Hx Hy,
- AbsIR (F x Hx[-]F y Hy) [<=] e -> e [<] AbsIR (F x Hx) -> F x Hx [<] [--]e -> F y Hy [<] Zero.
+Lemma cont_no_sign_change_neg : forall e, [0] [<] e -> forall x y, I x -> I y -> forall Hx Hy,
+ AbsIR (F x Hx[-]F y Hy) [<=] e -> e [<] AbsIR (F x Hx) -> F x Hx [<] [--]e -> F y Hy [<] [0].
 Proof.
  intros e H x y H0 H1 Hx Hy H2 H3 H4.
  elim (cont_no_sign_change e H x y H0 H1 Hx Hy H2 H3); intros H5 H6.
@@ -503,7 +503,7 @@ Proof.
  intros; exists OneR.
   apply pos_one.
  intros.
- apply leEq_wdl with (AbsIR Zero).
+ apply leEq_wdl with (AbsIR [0]).
   astepl ZeroR; apply less_leEq; assumption.
  algebra.
 Qed.
@@ -587,8 +587,8 @@ Proof.
  intros H0 H1.
  elim H0; clear H0; intros x H2.
  elim H1; clear H1; intros x0 H0.
- elim (contF' (e [/]TwoNZ[/] Max x One[//]max_one_ap_zero _)); clear contF.
-  elim (contG' (e [/]TwoNZ[/] Max x0 One[//]max_one_ap_zero _)); clear contG.
+ elim (contF' (e [/]TwoNZ[/] Max x [1][//]max_one_ap_zero _)); clear contF.
+  elim (contG' (e [/]TwoNZ[/] Max x0 [1][//]max_one_ap_zero _)); clear contG.
    intros dg H1 H3 df H4 H5.
    2: apply div_resp_pos.
     2: apply pos_max_one.
@@ -611,9 +611,9 @@ Proof.
     apply mult_resp_leEq_rht.
      apply H0; assumption.
     apply AbsIR_nonneg.
-   apply leEq_transitive with (Max x0 One[*]AbsIR (G x1 (ProjIR2 Hx) [-]G y (ProjIR2 Hy))).
+   apply leEq_transitive with (Max x0 [1][*]AbsIR (G x1 (ProjIR2 Hx) [-]G y (ProjIR2 Hy))).
     apply mult_resp_leEq_rht; [ apply lft_leEq_Max | apply AbsIR_nonneg ].
-   astepl (AbsIR (G x1 (ProjIR2 Hx) [-]G y (ProjIR2 Hy)) [*]Max x0 One).
+   astepl (AbsIR (G x1 (ProjIR2 Hx) [-]G y (ProjIR2 Hy)) [*]Max x0 [1]).
    apply shift_mult_leEq with (max_one_ap_zero x0);
      [ apply pos_max_one | simpl in |- *; apply H3 ]; try assumption.
    apply leEq_transitive with (Min df dg); [ assumption | apply Min_leEq_rht ].
@@ -621,7 +621,7 @@ Proof.
    2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
   apply leEq_transitive with (AbsIR (F x1 (ProjIR1 Hx) [-]F y (ProjIR1 Hy)) [*]x).
    apply mult_resp_leEq_lft; [ apply H2 | apply AbsIR_nonneg ]; assumption.
-  apply leEq_transitive with (AbsIR (F x1 (ProjIR1 Hx) [-]F y (ProjIR1 Hy)) [*]Max x One).
+  apply leEq_transitive with (AbsIR (F x1 (ProjIR1 Hx) [-]F y (ProjIR1 Hy)) [*]Max x [1]).
    apply mult_resp_leEq_lft; [ apply lft_leEq_Max with (y := OneR) | apply AbsIR_nonneg ].
   apply shift_mult_leEq with (max_one_ap_zero x);
     [ apply pos_max_one | simpl in |- *; apply H5 ]; try assumption.
@@ -704,7 +704,7 @@ Qed.
 
 (* begin show *)
 Hypothesis Hg' : bnd_away_zero I G.
-Hypothesis Hg'' : forall x Hx, I x -> G x Hx [#] Zero.
+Hypothesis Hg'' : forall x Hx, I x -> G x Hx [#] [0].
 (* end show *)
 
 Lemma Continuous_I_recip : Continuous_I Hab {1/}G.
@@ -730,13 +730,13 @@ Proof.
      (mult_resp_ap_zero _ _ _ (Hg'' x Hxx H4) (Hg'' y Hyy H5))).
     apply leEq_transitive with (AbsIR (G y Hyy[-]G x Hxx) [/] _[//]
       mult_resp_ap_zero _ _ _ (pos_ap_zero _ _ H) (pos_ap_zero _ _ H)).
-     rstepl (AbsIR (G y Hyy[-]G x Hxx) [*] (One[/] _[//] AbsIR_resp_ap_zero _
+     rstepl (AbsIR (G y Hyy[-]G x Hxx) [*] ([1][/] _[//] AbsIR_resp_ap_zero _
        (mult_resp_ap_zero _ _ _ (Hg'' x Hxx H4) (Hg'' y Hyy H5)))).
-     rstepr (AbsIR (G y Hyy[-]G x Hxx) [*] (One[/] _[//]
+     rstepr (AbsIR (G y Hyy[-]G x Hxx) [*] ([1][/] _[//]
        mult_resp_ap_zero _ _ _ (pos_ap_zero _ _ H) (pos_ap_zero _ _ H))).
      apply mult_resp_leEq_lft.
       apply recip_resp_leEq.
-       astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
+       astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
       eapply leEq_wdr.
        2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
       apply mult_resp_leEq_both; try (apply less_leEq; assumption).
@@ -744,19 +744,19 @@ Proof.
       eapply leEq_wdr; [ apply (H0 y Hyy H5) | algebra ].
      apply AbsIR_nonneg.
     apply shift_div_leEq'.
-     astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
+     astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
     eapply leEq_wdl.
      2: apply AbsIR_minus.
     apply H3; assumption.
    apply eq_symmetric_unfolded; apply AbsIR_division.
   apply AbsIR_wd.
   rational.
- astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
-  astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
+ astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive.
+  astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive; assumption.
  assumption.
 Qed.
 
-Lemma Continuous_I_NRoot : forall n Hn, (forall x Hx, I x -> Zero[<=]F x Hx) ->
+Lemma Continuous_I_NRoot : forall n Hn, (forall x Hx, I x -> [0][<=]F x Hx) ->
  Continuous_I Hab (FNRoot F n Hn).
 Proof.
  intros n Hn H.
@@ -779,8 +779,8 @@ Proof.
   apply leEq_Min; apply: NRoot_nonneg.
  apply leEq_transitive with (e[^]n[+]Min x' y'[^]n).
   apply shift_leEq_plus.
-  set (Hx':=(ProjT1 (ext2_a IR (Dom F) (fun (x0 : IR) (Hx1 : Dom F x0) => Zero[<=]F x0 Hx1) x Hx))).
-  set (Hy':=(ProjT1 (ext2_a IR (Dom F) (fun (x0 : IR) (Hx1 : Dom F x0) => Zero[<=]F x0 Hx1) y Hy))).
+  set (Hx':=(ProjT1 (ext2_a IR (Dom F) (fun (x0 : IR) (Hx1 : Dom F x0) => [0][<=]F x0 Hx1) x Hx))).
+  set (Hy':=(ProjT1 (ext2_a IR (Dom F) (fun (x0 : IR) (Hx1 : Dom F x0) => [0][<=]F x0 Hx1) y Hy))).
   stepl (AbsIR (F x Hx'[-]F y Hy')).
    apply H0; try assumption.
   stepr (AbsIR (x'[^]n[-]y'[^]n)).
@@ -877,7 +877,7 @@ Proof.
 Qed.
 
 Hypothesis Hg' : bnd_away_zero I G.
-Hypothesis Hg'' : forall x Hx, I x -> G x Hx [#] Zero.
+Hypothesis Hg'' : forall x Hx, I x -> G x Hx [#] [0].
 
 Lemma Continuous_I_div : Continuous_I Hab (F{/}G).
 Proof.
@@ -1013,7 +1013,7 @@ Lemma leEq_glb : forall a b Hab (F : PartIR) contF x,
 Proof.
  intros a b Hab F contF x H.
  elim (glb_is_glb _ _ _ _ contF); intros.
- astepr (glb_funct _ _ _ _ contF[+]Zero); apply shift_leEq_plus'.
+ astepr (glb_funct _ _ _ _ contF[+][0]); apply shift_leEq_plus'.
  apply approach_zero_weak.
  intros e H0.
  elim (b0 _ H0); intro y; intros.

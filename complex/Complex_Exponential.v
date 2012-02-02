@@ -136,21 +136,21 @@ Qed.
 
 Hint Resolve ExpCC_plus: algebra.
 
-Lemma ExpCC_Zero : ExpCC Zero [=] One.
+Lemma ExpCC_Zero : ExpCC [0] [=] [1].
 Proof.
  unfold ExpCC in |- *.
- astepl (cc_IR (Exp Zero) [*] (Cos Zero[+I*]Sin Zero)).
- astepl (cc_IR One[*] (Cos Zero[+I*]Sin Zero)).
- astepl (cc_IR One[*] (One[+I*]Zero)).
+ astepl (cc_IR (Exp [0]) [*] (Cos [0][+I*]Sin [0])).
+ astepl (cc_IR [1][*] (Cos [0][+I*]Sin [0])).
+ astepl (cc_IR [1][*] ([1][+I*][0])).
  simpl in |- *. split; simpl in |- *; rational.
 Qed.
 
 Hint Resolve ExpCC_Zero: algebra.
 
-Lemma ExpCC_inv_aid : forall z : CC, ExpCC z[*]ExpCC [--]z [=] One.
+Lemma ExpCC_inv_aid : forall z : CC, ExpCC z[*]ExpCC [--]z [=] [1].
 Proof.
  intro z.
- apply eq_transitive_unfolded with (S := cc_csetoid) (y := ExpCC Zero).
+ apply eq_transitive_unfolded with (S := cc_csetoid) (y := ExpCC [0]).
   astepl (ExpCC (z[+][--]z)).
   apply ExpCC_wd.
   rational.
@@ -159,17 +159,17 @@ Qed.
 
 Hint Resolve ExpCC_inv_aid: algebra.
 
-Lemma ExpCC_ap_zero : forall z : CC, ExpCC z [#] Zero.
+Lemma ExpCC_ap_zero : forall z : CC, ExpCC z [#] [0].
 Proof.
  intro z.
- cut (ExpCC z[*]ExpCC [--]z [#] Zero).
+ cut (ExpCC z[*]ExpCC [--]z [#] [0]).
   intro H.
   apply (mult_cancel_ap_zero_lft _ _ _ H).
- astepl (One:CC).
+ astepl ([1]:CC).
  apply cc_cr_non_triv.
 Qed.
 
-Lemma ExpCC_inv : forall z z_, (One[/] (ExpCC z) [//]z_) [=] ExpCC [--]z.
+Lemma ExpCC_inv : forall z z_, ([1][/] (ExpCC z) [//]z_) [=] ExpCC [--]z.
 Proof.
  intros z H.
  astepl (ExpCC z[*]ExpCC [--]z[/] ExpCC z[//]H). rational.
@@ -181,9 +181,9 @@ Lemma ExpCC_pow : forall z n, ExpCC z[^]n [=] ExpCC (nring n[*]z).
 Proof.
  intro z. simple induction n.
  unfold nexp in |- *.
-  astepl (One:CC).
-  astepr (ExpCC Zero).
-   astepr (One:CC).
+  astepl ([1]:CC).
+  astepr (ExpCC [0]).
+   astepr ([1]:CC).
    apply eq_reflexive.
   apply ExpCC_wd.
   rational.
@@ -193,7 +193,7 @@ Proof.
  astepl (ExpCC (nring n0[*]z[+]z)).
  apply ExpCC_wd.
  algebra.
- rstepl ((nring n0[+]One) [*]z). algebra.
+ rstepl ((nring n0[+][1]) [*]z). algebra.
 Qed.
 
 Hint Resolve ExpCC_pow: algebra.
@@ -202,7 +202,7 @@ Lemma AbsCC_ExpCC : forall z : CC, AbsCC (ExpCC z) [=] Exp (Re z).
 Proof.
  intro z. unfold ExpCC in |- *.
  astepl (AbsCC (cc_IR (Exp (Re z))) [*]AbsCC (Cos (Im z) [+I*]Sin (Im z))).
- astepr (Exp (Re z) [*]One).
+ astepr (Exp (Re z) [*][1]).
  apply bin_op_wd_unfolded.
   assert (H : AbsCC (cc_IR (Exp (Re z))) [=] Exp (Re z)).
    apply AbsCC_IR.
@@ -210,26 +210,26 @@ Proof.
    apply Exp_pos.
   astepl (Exp (Re z)).
   apply eq_reflexive.
- cut (AbsCC (Cos (Im z) [+I*]Sin (Im z)) [^]2 [=] One).
+ cut (AbsCC (Cos (Im z) [+I*]Sin (Im z)) [^]2 [=] [1]).
   set (x := AbsCC (Cos (Im z) [+I*]Sin (Im z))) in *.
   intro H0.
-  assert (H1 : x[+]One[~=]Zero).
+  assert (H1 : x[+][1][~=][0]).
    apply ap_imp_neq.
    apply Greater_imp_ap.
    apply leEq_less_trans with (y := x).
     unfold x in |- *. apply AbsCC_nonneg.
     apply less_plusOne.
-  assert (H2 : (x[+]One) [*] (x[-]One) [=] Zero).
-   cut (x[^]2[-]One[^]2 [=] Zero).
+  assert (H2 : (x[+][1]) [*] (x[-][1]) [=] [0]).
+   cut (x[^]2[-][1][^]2 [=] [0]).
     intro H'.
-    astepl (x[^]2[-]One[^]2).
+    astepl (x[^]2[-][1][^]2).
     assumption.
-   astepl (x[^]2[-]One).
+   astepl (x[^]2[-][1]).
    astepr (OneR[-]OneR).
    apply cg_minus_wd; [ assumption | apply eq_reflexive ].
-  assert (H3 : x[-]One [=] Zero).
+  assert (H3 : x[-][1] [=] [0]).
    apply (mult_eq_zero _ _ _ H1 H2).
-  rstepl (One[+] (x[-]One)).
+  rstepl ([1][+] (x[-][1])).
   astepr (OneR[+]ZeroR).
   apply plus_resp_eq. assumption.
   astepl (Cos (Im z) [^]2[+]Sin (Im z) [^]2).
@@ -262,24 +262,24 @@ Lemma ExpCC_Exp : forall x : IR, ExpCC (cc_IR x) [=] cc_IR (Exp x).
 Proof.
  intro x. unfold ExpCC in |- *.
  astepl (cc_IR (Exp x) [*] (Cos (Im (cc_IR x)) [+I*]Sin (Im (cc_IR x)))).
- astepr (cc_IR (Exp x) [*]One).
+ astepr (cc_IR (Exp x) [*][1]).
  apply bin_op_wd_unfolded.
   algebra.
- astepl (Cos Zero[+I*]Sin Zero).
- Step_final (One[+I*]Zero).
+ astepl (Cos [0][+I*]Sin [0]).
+ Step_final ([1][+I*][0]).
 Qed.
 
 Hint Resolve ExpCC_Exp: algebra.
 
-Theorem Euler : (ExpCC (II[*] (cc_IR Pi))) [+]One [=] Zero.
+Theorem Euler : (ExpCC (II[*] (cc_IR Pi))) [+][1] [=] [0].
 Proof.
  split.
   Opaque Sin Cos Exp.
   simpl.
-  rstepl ((Exp Zero) [*] (Cos Pi) [+]One).
-  astepl ((One:IR) [*][--]One[+]One).
+  rstepl ((Exp [0]) [*] (Cos Pi) [+][1]).
+  astepl (([1]:IR) [*][--][1][+][1]).
   rational.
  simpl.
- rstepl ((Exp Zero) [*] (Sin Pi)).
- Step_final ((One:IR) [*]Zero).
+ rstepl ((Exp [0]) [*] (Sin Pi)).
+ Step_final (([1]:IR) [*][0]).
 Qed.

@@ -46,7 +46,7 @@ Let Sumx_wd_weird :
   forall n m : nat,
   m = S n ->
   forall (f : forall i : nat, i < n -> IR) (g : forall i : nat, i < m -> IR),
-  (forall H, g 0 H [=] Zero) ->
+  (forall H, g 0 H [=] [0]) ->
   (forall (i : nat) H H', f i H [=] g (S i) H') -> Sumx f [=] Sumx g.
 Proof.
  intro; induction  n as [| n Hrecn].
@@ -69,13 +69,13 @@ Lemma Sumx_weird_lemma :
  nat_less_n_fun f3 ->
  (forall (i : nat) Hi Hi', f1 i Hi [=] f3 i Hi') ->
  (forall (i : nat) Hi Hi', f2 i Hi [=] f3 (S (n + i)) Hi') ->
- (forall Hi, f3 n Hi [=] Zero) -> Sumx f1[+]Sumx f2 [=] Sumx f3.
+ (forall Hi, f3 n Hi [=] [0]) -> Sumx f1[+]Sumx f2 [=] Sumx f3.
 Proof.
  intros n m.
  induction  m as [| m Hrecm].
   intros l Hl.
   simpl in Hl; rewrite Hl; intros f1 f2 f3 Hf1 Hf2 Hf3 Hf1_f3 Hf2_f3 Hf3_f3.
-  astepl (Sumx f1[+]Zero).
+  astepl (Sumx f1[+][0]).
   simpl in |- *; apply bin_op_wd_unfolded.
    apply Sumx_wd; intros; apply Hf1_f3.
   apply eq_symmetric_unfolded; apply Hf3_f3.
@@ -146,7 +146,7 @@ Lemma Cauchy_Darboux_Seq : Cauchy_prop integral_seq.
 Proof.
  red in |- *; intros e He.
  set (e' := e[/] _[//]mult_resp_ap_zero _ _ _ (two_ap_zero _) (max_one_ap_zero (b[-]a))) in *.
- cut (Zero [<] e').
+ cut ([0] [<] e').
   intro He'.
   set (d := proj1_sig2T _ _ _ (contF' e' He')) in *.
   generalize (proj2b_sig2T _ _ _ (contF' e' He'));
@@ -220,7 +220,7 @@ Variable n : nat.
 Variable P : Partition Hab n.
 
 Variable e : IR.
-Hypothesis He : Zero [<] e.
+Hypothesis He : [0] [<] e.
 
 (* begin hide *)
 Let d := proj1_sig2T _ _ _ (contF' e He).
@@ -246,11 +246,11 @@ Proof.
    2: apply AbsIR_wd; apply Lim_minus.
   eapply leEq_wdl.
    2: apply Lim_abs.
-  astepr (Zero[+]e[*] (b[-]a)); apply shift_leEq_plus; apply approach_zero_weak.
+  astepr ([0][+]e[*] (b[-]a)); apply shift_leEq_plus; apply approach_zero_weak.
   intros e' He'.
   set (ee := e'[/] _[//]max_one_ap_zero (b[-]a)) in *.
   apply leEq_transitive with (ee[*] (b[-]a)).
-   cut (Zero [<] ee).
+   cut ([0] [<] ee).
     intro Hee.
     set (d' := proj1_sig2T _ _ _ (contF' _ Hee)) in *.
     generalize (proj2b_sig2T _ _ _ (contF' _ Hee));
@@ -282,11 +282,11 @@ Proof.
    assumption.
   unfold ee in |- *.
   rstepl (e'[*] (b[-]a[/] _[//]max_one_ap_zero (b[-]a))).
-  rstepr (e'[*]One).
+  rstepr (e'[*][1]).
   apply mult_resp_leEq_lft.
    apply shift_div_leEq.
     apply pos_max_one.
-   astepr (Max (b[-]a) One); apply lft_leEq_Max.
+   astepr (Max (b[-]a) [1]); apply lft_leEq_Max.
   apply less_leEq; assumption.
  apply AbsIR_wd; apply cg_minus_wd.
   unfold Partition_Sum in |- *.
@@ -470,7 +470,7 @@ Opaque Even_Partition.
 The integral is a linear and monotonous function; in order to prove these facts we also need the important equalities $\int_a^bdx=b-a$#&int;<sub>a</sub><sup>b</sup>dx=b-a# and $\int_a^af(x)dx=0$#&int;<sub>a</sub><sup>a</sup>=0#.
 *)
 
-Lemma integral_one : forall H, Integral ( [-C-] One) H [=] b[-]a.
+Lemma integral_one : forall H, Integral ( [-C-] [1]) H [=] b[-]a.
 Proof.
  intro.
  unfold integral in |- *.
@@ -522,7 +522,7 @@ Qed.
 
 Transparent Even_Partition.
 
-Lemma integral_empty : a [=] b -> Integral F contF [=] Zero.
+Lemma integral_empty : a [=] b -> Integral F contF [=] [0].
 Proof.
  intros.
  unfold integral in |- *.
@@ -613,11 +613,11 @@ As corollaries we can calculate integrals of group operations applied to functio
 Lemma integral_const : forall c H, Integral ( [-C-]c)H [=] c[*] (b[-]a).
 Proof.
  intros.
- assert (H0 : Continuous_I Hab (c{**}[-C-]One)). Contin.
+ assert (H0 : Continuous_I Hab (c{**}[-C-][1])). Contin.
   apply eq_transitive_unfolded with (Integral _ H0).
   apply integral_wd; FEQ.
  eapply eq_transitive_unfolded.
-  apply integral_comm_scal with (contF := Continuous_I_const a b Hab One).
+  apply integral_comm_scal with (contF := Continuous_I_const a b Hab [1]).
  apply mult_wdr.
  apply integral_one.
 Qed.
@@ -625,7 +625,7 @@ Qed.
 Lemma integral_minus : forall H, Integral (F{-}G) H [=] Integral F contF[-]Integral G contG.
 Proof.
  intro.
- assert (H0 : Continuous_I Hab (One{**}F{+}[--]One{**}G)). Contin.
+ assert (H0 : Continuous_I Hab ([1]{**}F{+}[--][1]{**}G)). Contin.
   apply eq_transitive_unfolded with (Integral _ H0).
   apply integral_wd; FEQ.
  eapply eq_transitive_unfolded.
@@ -636,7 +636,7 @@ Qed.
 Lemma integral_inv : forall H, Integral ( {--}F) H [=] [--] (Integral F contF).
 Proof.
  intro.
- assert (H0 : Continuous_I Hab (Zero{**}F{+}[--]One{**}F)). Contin.
+ assert (H0 : Continuous_I Hab ([0]{**}F{+}[--][1]{**}F)). Contin.
   apply eq_transitive_unfolded with (Integral _ H0).
   apply integral_wd; FEQ.
  eapply eq_transitive_unfolded.
@@ -1107,7 +1107,7 @@ Proof.
  apply AbsIR_approach_zero.
  intros e' He'.
  set (e := e'[/] _[//]max_one_ap_zero (b[-]a)) in *.
- cut (Zero [<] e).
+ cut ([0] [<] e).
   intro He.
   set (d := proj1_sig2T _ _ _ (contin_prop _ _ _ _ Hab' e He)) in *.
   generalize (proj2b_sig2T _ _ _ (contin_prop _ _ _ _ Hab' e He));
@@ -1244,7 +1244,7 @@ Proof.
  (* begin hide *)
  intros a b Hab F contF N Hless x H Hx H0.
  set (e := (N[-]AbsIR (F x Hx)) [/]TwoNZ) in *.
- cut (Zero [<] e); intros.
+ cut ([0] [<] e); intros.
   2: unfold e in |- *; apply pos_div_two; apply shift_less_minus.
   2: astepl (AbsIR (F x Hx)); auto.
  elim (contin_prop _ _ _ _ contF e); auto.
@@ -1375,13 +1375,13 @@ Qed.
 (* end hide *)
 
 Lemma integral_gt_zero : forall a b Hab (F : PartIR) contF, let N := Norm_Funct contF in
- a [<] b -> forall x, Compact Hab x -> forall Hx, Zero [<] F x Hx ->
- (forall x, Compact Hab x -> forall Hx, Zero [<=] F x Hx) -> Zero [<] integral a b Hab F contF.
+ a [<] b -> forall x, Compact Hab x -> forall Hx, [0] [<] F x Hx ->
+ (forall x, Compact Hab x -> forall Hx, [0] [<=] F x Hx) -> [0] [<] integral a b Hab F contF.
 Proof.
  (* begin hide *)
  intros a b Hab F contF N Hless x H Hx H0.
  set (e := F x Hx [/]TwoNZ) in *.
- cut (Zero [<] e). intros H1 H2.
+ cut ([0] [<] e). intros H1 H2.
   2: unfold e in |- *; apply pos_div_two; auto.
  elim (contin_prop _ _ _ _ contF e); auto.
  intros d H3 H4.
@@ -1408,7 +1408,7 @@ Proof.
         2: apply integral_plus_integral.
        2: algebra.
       2: apply integral_plus_integral.
-     rstepl (Zero[*] (mid1[-]a) [+]Zero[*] (mid2[-]mid1) [+]Zero[*] (b[-]mid2)).
+     rstepl ([0][*] (mid1[-]a) [+][0][*] (mid2[-]mid1) [+][0][*] (b[-]mid2)).
      apply plus_resp_less_leEq.
       apply plus_resp_leEq_less.
        apply lb_integral.

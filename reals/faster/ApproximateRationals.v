@@ -34,6 +34,15 @@ Class AppRationals AQ {e plus mult zero one inv} `{Apart AQ} `{Le AQ} `{Lt AQ}
   aq_ints_mor :> SemiRing_Morphism ZtoAQ
 }.
 
+Lemma order_embedding_iff `{OrderEmbedding A B f} x y : 
+  x ≤ y ↔ f x ≤ f y.
+Proof. firstorder. Qed.
+
+
+Lemma strict_order_embedding_iff `{StrictOrderEmbedding A B f} x y : 
+  x < y ↔ f x < f y.
+Proof. firstorder. Qed.
+
 Section approximate_rationals_more.
   Context `{AppRationals AQ}.
 
@@ -62,7 +71,11 @@ Section approximate_rationals_more.
   Qed.
 
   Global Instance: FullPseudoSemiRingOrder (_ : Le AQ) (_ : Lt AQ).
-  Proof projected_full_pseudo_ring_order (cast AQ Q).
+  Proof. 
+    apply (projected_full_pseudo_ring_order (cast AQ Q)).
+     apply order_embedding_iff.
+    apply strict_order_embedding_iff.
+  Qed.
     
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.
@@ -147,16 +160,24 @@ Section approximate_rationals_more.
     apply Qopp_Qlt_0_r...
   Defined.
 
-  Lemma aq_preserves_min x y : 'min x y = Qmin ('x) ('y).
+  Instance: MeetSemiLattice_Morphism (cast AQ Q).
   Proof.
-    rewrite minmax.preserves_min.
-    symmetry. apply Qmin_coincides.
+    split; try apply _; apply lattices.order_preserving_meet_sl_mor.
   Qed.
 
-  Lemma aq_preserves_max x y : 'max x y = Qmax ('x) ('y).
+  Instance: JoinSemiLattice_Morphism (cast AQ Q).
+  Proof.
+    split; try apply _; apply lattices.order_preserving_join_sl_mor.
+  Qed.
+
+  Lemma aq_preserves_min x y : '(x ⊓ y) = Qmin ('x) ('y).
+  Proof.
+    rewrite lattices.preserves_meet; symmetry; apply Qmin_coincides.
+  Qed.
+
+  Lemma aq_preserves_max x y : '(x ⊔ y) = Qmax ('x) ('y).
   Proof. 
-    rewrite minmax.preserves_max.
-    symmetry. apply Qmax_coincides.
+    rewrite lattices.preserves_join; symmetry; apply Qmax_coincides.
   Qed.
 
   Global Program Instance AQposAsQ: Cast (AQ₊) Q := cast AQ Q ∘ cast (AQ₊) AQ.

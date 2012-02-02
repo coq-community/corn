@@ -298,7 +298,7 @@ Proof.
  constructor.
   exact H0.
  intros e H1.
- set (H2 := OneR[/] e[//]ap_symmetric_unfolded IR Zero e (less_imp_ap IR Zero e H1)) in *.
+ set (H2 := OneR[/] e[//]ap_symmetric_unfolded IR [0] e (less_imp_ap IR [0] e H1)) in *.
  unfold AbsSmall in |- *.
  set (H3 := Archimedes H2) in *.
  elim H3.
@@ -337,17 +337,17 @@ Proof.
       exact H1.
      exact H4.
     simpl in |- *.
-    astepl (nring (R:=IR) m[+]Zero).
+    astepl (nring (R:=IR) m[+][0]).
     apply plus_resp_less_lft.
     apply pos_one.
-   apply shift_leEq_mult' with (ap_symmetric_unfolded IR Zero e (less_imp_ap IR Zero e H1)).
+   apply shift_leEq_mult' with (ap_symmetric_unfolded IR [0] e (less_imp_ap IR [0] e H1)).
     exact H1.
    apply leEq_transitive with (nring (R:=IR) m).
     exact H4.
    unfold Snring in |- *.
    simpl in |- *.
    apply less_leEq.
-   astepl (nring (R:=IR) m[+]Zero).
+   astepl (nring (R:=IR) m[+][0]).
    apply plus_resp_less_lft.
    apply pos_one.
   apply inv_cancel_leEq.
@@ -384,17 +384,17 @@ Proof.
     exact H1.
    exact H4.
   simpl in |- *.
-  astepl (nring (R:=IR) m[+]Zero).
+  astepl (nring (R:=IR) m[+][0]).
   apply plus_resp_less_lft.
   apply pos_one.
- apply shift_leEq_mult' with (ap_symmetric_unfolded IR Zero e (less_imp_ap IR Zero e H1)).
+ apply shift_leEq_mult' with (ap_symmetric_unfolded IR [0] e (less_imp_ap IR [0] e H1)).
   exact H1.
  apply leEq_transitive with (nring (R:=IR) m).
   exact H4.
  unfold Snring in |- *.
  simpl in |- *.
  apply less_leEq.
- astepl (nring (R:=IR) m[+]Zero).
+ astepl (nring (R:=IR) m[+][0]).
  apply plus_resp_less_lft.
  apply pos_one.
 Qed.
@@ -676,7 +676,7 @@ Proof.
    apply ax_d_com.
    apply CPsMetricSpace_is_CPsMetricSpace.
   apply H3.
- astepr (One[*]one_div_succ (R:=IR) n).
+ astepr ([1][*]one_div_succ (R:=IR) n).
  astepr (((Three:IR)[/] Three:IR[//]three_ap_zero IR)[*]one_div_succ n).
  astepl (one_div_succ (n + (n + (n + 0)) + 2)[+] (Two:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
  astepl (OneR[*]one_div_succ (n + (n + (n + 0)) + 2)[+]
@@ -685,31 +685,31 @@ Proof.
  astepl ((Three:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
   2: apply mult_wdl.
   2: rational.
- astepr ((Three:IR)[*](One[/] Three[//]three_ap_zero IR)[*]one_div_succ n).
-  astepr ((Three:IR)[*]((One[/] Three[//]three_ap_zero IR)[*]one_div_succ n)).
+ astepr ((Three:IR)[*]([1][/] Three[//]three_ap_zero IR)[*]one_div_succ n).
+  astepr ((Three:IR)[*](([1][/] Three[//]three_ap_zero IR)[*]one_div_succ n)).
   apply mult_wdr.
   unfold one_div_succ in |- *.
   unfold Snring in |- *.
   simpl in |- *.
-  astepr (OneR[/] (Three:IR)[*](nring n[+]One)[//]
-    mult_resp_ap_zero IR Three (nring n[+]One) (three_ap_zero IR) (nringS_ap_zero IR n)).
+  astepr (OneR[/] (Three:IR)[*](nring n[+][1])[//]
+    mult_resp_ap_zero IR Three (nring n[+][1]) (three_ap_zero IR) (nringS_ap_zero IR n)).
    apply eq_div.
    apply mult_wdr.
-   astepl (Three[*]nring (R:=IR) n[+]Three[*]One).
+   astepl (Three[*]nring (R:=IR) n[+]Three[*][1]).
    simpl in |- *.
-   astepr (nring (R:=IR) (n + (n + (n + 0)))[+]Two[+]One).
-   astepr (nring (R:=IR) n[+]nring (n + (n + 0))[+]Two[+]One).
-   astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
+   astepr (nring (R:=IR) (n + (n + (n + 0)))[+]Two[+][1]).
+   astepr (nring (R:=IR) n[+]nring (n + (n + 0))[+]Two[+][1]).
+   astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+][1]).
    3: apply mult_wdl.
    3: rational.
   2: simpl in |- *.
   2: rational.
- astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+]One).
- astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+](Two[+]One)).
- astepl ((ZeroR[+]One[+]One[+]One)[*]nring n[+](Zero[+]One[+]One[+]One)).
+ astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+]Two[+][1]).
+ astepr (nring (R:=IR) n[+](nring n[+]nring (n + 0))[+](Two[+][1])).
+ astepl ((ZeroR[+][1][+][1][+][1])[*]nring n[+]([0][+][1][+][1][+][1])).
  simpl in |- *.
- astepl (ZeroR[+]One[+]One[+]One[+](Zero[+]One[+]One[+]One)[*]nring n).
- astepr (ZeroR[+]One[+]One[+]One[+](nring n[+](nring n[+]nring (n + 0)))).
+ astepl (ZeroR[+][1][+][1][+][1][+]([0][+][1][+][1][+][1])[*]nring n).
+ astepr (ZeroR[+][1][+][1][+][1][+](nring n[+](nring n[+]nring (n + 0)))).
  apply plus_resp_eq.
  astepr (nring (R:=IR) n[+](nring n[+](nring n[+]nring 0))).
  simpl in |- *.
@@ -746,7 +746,7 @@ with centre $x$#<I>x</I># that is contained in $P$#<I>P</I>#.
 
 Definition open (X : CPsMetricSpace) (P : X -> CProp) :=
   forall x : X,
-  P x -> {e : IR | Zero[<]e and (forall z : X, z[-d]x[<]e -> P z)}.
+  P x -> {e : IR | [0][<]e and (forall z : X, z[-d]x[<]e -> P z)}.
 
 Implicit Arguments open [X].
 
@@ -777,7 +777,7 @@ Definition well_contained (X : CPsMetricSpace) (P Q : X -> CProp)
   (a : SubPsMetricSpace P) :=
   open Q ->
   forall H : MStotally_bounded (SubPsMetricSpace P),
-  {r : IR | Zero[<]r |
+  {r : IR | [0][<]r |
   forall q : X,
   infima P (located_imp_located' X P (MStotally_bounded_imp_located X P H)) a
     q[<=]r -> Q q}.

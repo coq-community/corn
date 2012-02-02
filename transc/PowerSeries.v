@@ -74,8 +74,8 @@ is the Dirichlet criterium.
 *)
 
 (* begin show *)
-Hypothesis Ha : {r : IR | {H : Zero [<] r | {N : nat | forall n, N <= n ->
-  AbsIR (a (S n)) [<=] (One[/] r[//]pos_ap_zero _ _ H) [*]AbsIR (a n)}}}.
+Hypothesis Ha : {r : IR | {H : [0] [<] r | {N : nat | forall n, N <= n ->
+  AbsIR (a (S n)) [<=] ([1][/] r[//]pos_ap_zero _ _ H) [*]AbsIR (a n)}}}.
 
 Let r := ProjT1 Ha.
 Let Hr := ProjT1 (ProjT2 Ha).
@@ -91,12 +91,12 @@ Proof.
   unfold FPowerSeries in |- *; Contin.
  elim (ProjT2 (ProjT2 Ha)); intros N HN.
  exists N.
- cut {z : IR | Zero [<] z and z [<] r | forall x : IR, Compact Hab x -> AbsIR (x[-]x0) [<=] z}.
+ cut {z : IR | [0] [<] z and z [<] r | forall x : IR, Compact Hab x -> AbsIR (x[-]x0) [<=] z}.
   intro H.
   elim H; intros z Hz.
   elim Hz; clear Hz; intros H0z Hzr Hz.
   clear H.
-  exists ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z).
+  exists (([1][/] r[//]pos_ap_zero _ _ Hr) [*]z).
    apply shift_mult_less with (pos_ap_zero _ _ H0z).
     assumption.
    apply recip_resp_less; assumption.
@@ -107,14 +107,14 @@ Proof.
   intros.
   astepl (AbsIR (FPowerSeries (S n) x (ProjIR1 Hx'))).
   apply leEq_wdl with (AbsIR (a (S n)) [*]AbsIR (x[-]x0) [*]AbsIR ((x[-]x0) [^]n)).
-   apply leEq_wdr with ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z[*]AbsIR (a n) [*] AbsIR ((x[-]x0) [^]n)).
+   apply leEq_wdr with (([1][/] r[//]pos_ap_zero _ _ Hr) [*]z[*]AbsIR (a n) [*] AbsIR ((x[-]x0) [^]n)).
     apply mult_resp_leEq_rht.
      2: apply AbsIR_nonneg.
-    rstepr ((One[/] r[//]pos_ap_zero _ _ Hr) [*]AbsIR (a n) [*]z).
+    rstepr (([1][/] r[//]pos_ap_zero _ _ Hr) [*]AbsIR (a n) [*]z).
     apply mult_resp_leEq_both; try apply AbsIR_nonneg.
      apply HN; assumption.
     apply Hz; auto.
-   rstepl ((One[/] r[//]pos_ap_zero _ _ Hr) [*]z[*](AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n))).
+   rstepl (([1][/] r[//]pos_ap_zero _ _ Hr) [*]z[*](AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n))).
    apply mult_wdr.
    astepr (AbsIR (FPowerSeries n x (ProjIR1 Hx))).
    simpl in |- *; apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -176,7 +176,7 @@ Proof.
 Qed.
 
 (* begin show *)
-Hypothesis Ha' : {N : nat | {c : IR | Zero [<] c |
+Hypothesis Ha' : {N : nat | {c : IR | [0] [<] c |
   forall n, N <= n -> AbsIR (a (S n)) [<=] c[*]AbsIR (a n)}}.
 (* end show *)
 
@@ -191,7 +191,7 @@ Proof.
  elim Ha'; intros N HN.
  elim HN; intros c H H0.
  clear HN Ha'.
- elim (Archimedes (Max (Max b x0[-]Min a0 x0) One[*]Two[*]c)); intros y Hy.
+ elim (Archimedes (Max (Max b x0[-]Min a0 x0) [1][*]Two[*]c)); intros y Hy.
  exists (max N y); exists (Half:IR); repeat split.
    unfold Half in |- *.
    apply pos_div_two'; apply pos_one.
@@ -213,7 +213,7 @@ Proof.
   2: apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
    2: apply AbsIR_resp_mult.
   2: apply mult_wd; apply AbsIR_wd; simpl in |- *; algebra.
- apply leEq_wdr with (One [/]TwoNZ[*](AbsIR (a n) [/] _[//]nring_fac_ap_zero _ n) [*]
+ apply leEq_wdr with ([1] [/]TwoNZ[*](AbsIR (a n) [/] _[//]nring_fac_ap_zero _ n) [*]
    AbsIR ((x[-]x0) [^]n)).
   2: apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
    3: apply mult_assoc_unfolded.
@@ -230,15 +230,15 @@ Proof.
    nring_fac_ap_zero _ (S n)).
  apply shift_div_leEq.
   apply pos_nring_fac.
- rstepr (One [/]TwoNZ[*] (AbsIR (a n) [*]nring (fact (S n)) [/] _[//]nring_fac_ap_zero _ n) [*]
+ rstepr ([1] [/]TwoNZ[*] (AbsIR (a n) [*]nring (fact (S n)) [/] _[//]nring_fac_ap_zero _ n) [*]
    AbsIR ((x[-]x0) [^]n)).
- apply leEq_wdr with (One [/]TwoNZ[*](AbsIR (a n) [*]nring (S n)) [*]AbsIR ((x[-]x0) [^]n)).
+ apply leEq_wdr with ([1] [/]TwoNZ[*](AbsIR (a n) [*]nring (S n)) [*]AbsIR ((x[-]x0) [^]n)).
   2: apply mult_wdl; apply mult_wdr.
   2: rstepr (AbsIR (a n) [*](nring (fact (S n)) [/] _[//]nring_fac_ap_zero _ n)).
   2: apply mult_wdr.
   2: astepr (nring (S n * fact n) [/] _[//]nring_fac_ap_zero IR n).
   2: astepr (nring (S n) [*]nring (fact n) [/] _[//]nring_fac_ap_zero IR n); rational.
- rstepr (One [/]TwoNZ[*]nring (S n) [*]AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n)).
+ rstepr ([1] [/]TwoNZ[*]nring (S n) [*]AbsIR (a n) [*]AbsIR ((x[-]x0) [^]n)).
  apply mult_resp_leEq_rht.
   2: apply AbsIR_nonneg.
  apply leEq_transitive with (AbsIR (a (S n)) [*]AbsIR (Max b x0[-]Min a0 x0)).
@@ -255,7 +255,7 @@ Proof.
     apply Min_leEq_rht.
    apply rht_leEq_Max.
   apply AbsIR_nonneg.
- apply leEq_transitive with (AbsIR (a (S n)) [*]Max (Max b x0[-]Min a0 x0) One).
+ apply leEq_transitive with (AbsIR (a (S n)) [*]Max (Max b x0[-]Min a0 x0) [1]).
   apply mult_resp_leEq_lft.
    2: apply AbsIR_nonneg.
   eapply leEq_wdl.
@@ -272,7 +272,7 @@ Proof.
   apply le_trans with (max N y); auto; apply le_max_l.
  apply shift_leEq_div.
   apply pos_max_one.
- rstepl (c[*]Max (Max b x0[-]Min a0 x0) One[*]AbsIR (a n)).
+ rstepl (c[*]Max (Max b x0[-]Min a0 x0) [1][*]AbsIR (a n)).
  apply mult_resp_leEq_rht.
   2: apply AbsIR_nonneg.
  rstepr (nring (R:=IR) (S n) [/]TwoNZ); apply shift_leEq_div.
@@ -398,7 +398,7 @@ series, and prove their convergence.  Tangent is defined as the
 quotient of sine over cosine.
 *)
 
-Definition Exp_ps := FPowerSeries' Zero (fun n : nat => One).
+Definition Exp_ps := FPowerSeries' [0] (fun n : nat => [1]).
 
 Definition sin_seq : nat -> IR.
 Proof.
@@ -407,7 +407,7 @@ Proof.
  apply ([--]OneR[^]k).
 Defined.
 
-Definition sin_ps := FPowerSeries' Zero sin_seq.
+Definition sin_ps := FPowerSeries' [0] sin_seq.
 
 Definition cos_seq : nat -> IR.
 Proof.
@@ -416,7 +416,7 @@ Proof.
  apply ZeroR.
 Defined.
 
-Definition cos_ps := FPowerSeries' Zero cos_seq.
+Definition cos_ps := FPowerSeries' [0] cos_seq.
 
 Lemma Exp_conv' : fun_series_abs_convergent_IR realline Exp_ps.
 Proof.
@@ -446,10 +446,10 @@ Proof.
   eapply leEq_wdl; [ apply less_leEq; apply pos_one | apply eq_symmetric_unfolded; apply AbsIRz_isz ].
  apply eq_imp_leEq.
  elim (even_odd_dec k); intro.
-  apply eq_transitive_unfolded with (AbsIR One).
+  apply eq_transitive_unfolded with (AbsIR [1]).
    apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
   apply AbsIR_eq_x; apply less_leEq; apply pos_one.
- apply eq_transitive_unfolded with (AbsIR [--]One).
+ apply eq_transitive_unfolded with (AbsIR [--][1]).
   apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
  astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
  astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
@@ -464,10 +464,10 @@ Proof.
  elim Hk; simpl in |- *; intro.
   apply eq_imp_leEq.
   elim (even_odd_dec k); intro.
-   apply eq_transitive_unfolded with (AbsIR One).
+   apply eq_transitive_unfolded with (AbsIR [1]).
     apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
    apply AbsIR_eq_x; apply less_leEq; apply pos_one.
-  apply eq_transitive_unfolded with (AbsIR [--]One).
+  apply eq_transitive_unfolded with (AbsIR [--][1]).
    apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
   astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
   astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
@@ -520,14 +520,14 @@ Qed.
 Definition of the logarithm.
 *)
 
-Lemma log_defn_lemma : Continuous (openl Zero) {1/}FId.
+Lemma log_defn_lemma : Continuous (openl [0]) {1/}FId.
 Proof.
  apply Continuous_recip.
   apply Continuous_id.
  intros a b Hab H.
  split.
   Included.
- assert (H0 : Zero [<] a). apply H; apply compact_inc_lft.
+ assert (H0 : [0] [<] a). apply H; apply compact_inc_lft.
   exists a.
   auto.
  intros y Hy H1; inversion_clear H1.
@@ -536,7 +536,7 @@ Proof.
  apply leEq_AbsIR.
 Qed.
 
-Definition Logarithm := ( [-S-]log_defn_lemma) One (pos_one IR).
+Definition Logarithm := ( [-S-]log_defn_lemma) [1] (pos_one IR).
 
 End Definitions.
 
@@ -570,6 +570,6 @@ Proof.
  exact (pfstrx _ _ _ _ _ _ H).
 Defined.
 
-Definition Log x (Hx : Zero [<] x) := Logarithm x Hx.
+Definition Log x (Hx : [0] [<] x) := Logarithm x Hx.
 
 Definition Tan x Hx := Tang x Hx.

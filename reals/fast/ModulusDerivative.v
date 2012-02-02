@@ -136,8 +136,8 @@ Proof.
   change (ball y (clamp a) (clamp b)).
   apply ball_clamp.
   auto.
- assert (Z:Zero[<]inj_Q IR (y:Q)).
-  (stepl (inj_Q IR (Zero:Q)); [| now apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_prf.
+ assert (Z:[0][<]inj_Q IR (y:Q)).
+  (stepl (inj_Q IR ([0]:Q)); [| now apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_prf.
  apply: eq_transitive.
   apply mult_wdl.
   apply (inj_Q_div IR e _ (pos_ap_zero _ _ Z)).
@@ -167,7 +167,7 @@ Proof.
   apply Hg.
   assumption.
  intros x Hx HI.
- rstepr (Zero[+]inj_Q IR c).
+ rstepr ([0][+]inj_Q IR c).
  apply shift_leEq_plus.
  apply approach_zero_weak.
  intros e He.
@@ -213,22 +213,22 @@ Proof.
   destruct Z' as [Z'|Z'].
    apply less_leEq_trans with x.
     apply Max_less; auto.
-    rstepr (x[-]Zero).
+    rstepr (x[-][0]).
     apply minus_resp_less_rht.
     auto.
    apply leEq_Min; auto with *.
-   rstepl (x[+]Zero).
+   rstepl (x[+][0]).
    apply plus_resp_leEq_lft.
    apply less_leEq.
    auto with *.
   apply leEq_less_trans with x.
    apply Max_leEq; auto.
-   rstepr (x[-]Zero).
+   rstepr (x[-][0]).
    apply minus_resp_leEq_rht.
    apply less_leEq.
    auto.
   apply less_Min; auto with *.
-  rstepl (x[+]Zero).
+  rstepl (x[+][0]).
   apply plus_resp_less_lft.
   auto with *.
  destruct (Q_dense_in_CReals' _ _ _ J) as [q Hq0 Hq1].

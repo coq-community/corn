@@ -144,7 +144,7 @@ Proof.
    apply leEq_wdl with (AbsIR (Integral H4)).
     eapply leEq_transitive.
      apply Integral_leEq_norm.
-    apply leEq_transitive with (Max (Norm_Funct (included_imp_Continuous _ _ contF _ _ _ H)) One[*]
+    apply leEq_transitive with (Max (Norm_Funct (included_imp_Continuous _ _ contF _ _ _ H)) [1][*]
       AbsIR (x[-]y)).
      apply mult_resp_leEq_rht.
       apply leEq_transitive with (Norm_Funct (included_imp_Continuous _ _ contF _ _ _ H)).
@@ -623,7 +623,7 @@ Proof.
     apply Feq_symmetric; assumption.
    clear Hc H2 H1; clearbody H.
    FEQ.
-  apply Derivative_wdr with (G{+} [-C-]Zero).
+  apply Derivative_wdr with (G{+} [-C-][0]).
    FEQ.
   apply Derivative_plus; auto.
   apply Derivative_const.

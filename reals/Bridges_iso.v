@@ -93,9 +93,9 @@ Hypothesis is_Archimedes : forall x : OF, {n : nat | x[<=]nring n}.
 Lemma is_Archimedes' : forall x : OF, {n : nat | x[<]nring n}.
 Proof.
  intro x.
- elim (is_Archimedes (x[+]One)); intros n Hn.
+ elim (is_Archimedes (x[+][1])); intros n Hn.
  exists n.
- apply less_leEq_trans with (x[+]One).
+ apply less_leEq_trans with (x[+][1]).
   apply less_plusOne.
  auto.
 Qed.
@@ -113,7 +113,7 @@ Proof.
  apply shift_plus_less.
  apply plus_cancel_less with (z := [--]x).
  rstepr (z[-]y).
- astepl (Zero:OF).
+ astepl ([0]:OF).
  apply shift_zero_less_minus.
  assumption.
 Qed.
@@ -238,33 +238,33 @@ Lemma inequality1 : forall x : OF, x[<]x[^]2[-]x[+]Two.
 Proof.
  intros.
  apply plus_cancel_less with (z := [--]x).
- astepl (Zero:OF).
+ astepl ([0]:OF).
  simpl in |- *.
- rstepr ((x[-]One)[*](x[-]One)[+]One).
- apply less_wdr with (y := (x[-]One)[^]2[+](One:OF)).
-  apply less_leEq_trans with (y := One:OF).
+ rstepr ((x[-][1])[*](x[-][1])[+][1]).
+ apply less_wdr with (y := (x[-][1])[^]2[+]([1]:OF)).
+  apply less_leEq_trans with (y := [1]:OF).
    apply pos_one.
-  apply plus_cancel_leEq_rht with (z := [--](One:OF)).
-  astepl (Zero:OF).
-  rstepr ((x[-](One:OF))[^]2).
+  apply plus_cancel_leEq_rht with (z := [--]([1]:OF)).
+  astepl ([0]:OF).
+  rstepr ((x[-]([1]:OF))[^]2).
   apply sqr_nonneg.
  simpl in |- *.
  rational.
 Qed.
 
-Lemma inequality2 : forall x : OF, (Zero:OF)[<]x[^]2[-]x[+]Two.
+Lemma inequality2 : forall x : OF, ([0]:OF)[<]x[^]2[-]x[+]Two.
 Proof.
  intros.
- apply less_wdr with (y := (x[-]One [/]TwoNZ)[^]2[+](Three [/]FourNZ[+]One)).
-  apply less_leEq_trans with (y := Three [/]FourNZ[+](One:OF)).
+ apply less_wdr with (y := (x[-][1] [/]TwoNZ)[^]2[+](Three [/]FourNZ[+][1])).
+  apply less_leEq_trans with (y := Three [/]FourNZ[+]([1]:OF)).
    apply plus_resp_pos.
     apply div_resp_pos.
      apply pos_four.
     apply pos_three.
    apply pos_one.
-  apply plus_cancel_leEq_rht with (z := [--](Three [/]FourNZ[+](One:OF))).
-  astepl (Zero:OF).
-  rstepr ((x[-](One:OF) [/]TwoNZ)[^]2).
+  apply plus_cancel_leEq_rht with (z := [--](Three [/]FourNZ[+]([1]:OF))).
+  astepl ([0]:OF).
+  rstepr ((x[-]([1]:OF) [/]TwoNZ)[^]2).
   apply sqr_nonneg.
  simpl in |- *.
  rational.
@@ -276,34 +276,34 @@ Proof.
  apply inv_cancel_less.
  apply plus_cancel_less with (z := x).
  simpl in |- *.
- rstepr ((x[+]One)[*](x[+]One)[+]One).
- astepl (Zero:OF).
- apply less_wdr with (y := (x[+]One)[^]2[+](One:OF)).
-  apply less_leEq_trans with (y := One:OF).
+ rstepr ((x[+][1])[*](x[+][1])[+][1]).
+ astepl ([0]:OF).
+ apply less_wdr with (y := (x[+][1])[^]2[+]([1]:OF)).
+  apply less_leEq_trans with (y := [1]:OF).
    apply pos_one.
-  apply plus_cancel_leEq_rht with (z := [--](One:OF)).
-  astepl (Zero:OF).
-  rstepr ((x[+](One:OF))[^]2).
+  apply plus_cancel_leEq_rht with (z := [--]([1]:OF)).
+  astepl ([0]:OF).
+  rstepr ((x[+]([1]:OF))[^]2).
   apply sqr_nonneg.
  simpl in |- *.
  rational.
 Qed.
 
-Lemma inequality4 : forall x : OF, [--](x[^]2)[-]x[-]Two[<](Zero:OF).
+Lemma inequality4 : forall x : OF, [--](x[^]2)[-]x[-]Two[<]([0]:OF).
 Proof.
  intros.
  apply inv_cancel_less.
- astepl (Zero:OF).
- apply less_wdr with (y := (x[+]One [/]TwoNZ)[^]2[+](Three [/]FourNZ[+]One)).
-  apply less_leEq_trans with (y := Three [/]FourNZ[+](One:OF)).
+ astepl ([0]:OF).
+ apply less_wdr with (y := (x[+][1] [/]TwoNZ)[^]2[+](Three [/]FourNZ[+][1])).
+  apply less_leEq_trans with (y := Three [/]FourNZ[+]([1]:OF)).
    apply plus_resp_pos.
     apply div_resp_pos.
      apply pos_four.
     apply pos_three.
    apply pos_one.
-  apply plus_cancel_leEq_rht with (z := [--](Three [/]FourNZ[+](One:OF))).
-  astepl (Zero:OF).
-  rstepr ((x[+](One:OF) [/]TwoNZ)[^]2).
+  apply plus_cancel_leEq_rht with (z := [--](Three [/]FourNZ[+]([1]:OF))).
+  astepl ([0]:OF).
+  rstepr ((x[+]([1]:OF) [/]TwoNZ)[^]2).
   apply sqr_nonneg.
  simpl in |- *.
  rational.
@@ -318,7 +318,7 @@ Fixpoint Hum (r : nat -> OF) (n : nat) {struct n} : OF :=
 
 Lemma bound_tk1 :
  forall (n : nat) (g : nat -> OF),
- (forall m : nat, m <= n -> (Zero:OF)[<]g m) -> (Zero:OF)[<]Hum g n.
+ (forall m : nat, m <= n -> ([0]:OF)[<]g m) -> ([0]:OF)[<]Hum g n.
 Proof.
  intros n g H.
  induction  n as [| n Hrecn].
@@ -340,7 +340,7 @@ Qed.
 
 Lemma bound_tk2 :
  forall (n : nat) (g : nat -> OF),
- (forall m : nat, m <= n -> g m[<](Zero:OF)) -> Hum g n[<]Zero.
+ (forall m : nat, m <= n -> g m[<]([0]:OF)) -> Hum g n[<][0].
 Proof.
  intros n g H.
  induction  n as [| n Hrecn].
@@ -349,7 +349,7 @@ Proof.
   constructor.
  (* n=(S n0) *)
  simpl in |- *.
- astepr (Zero[+](Zero:OF)).
+ astepr ([0][+]([0]:OF)).
  apply plus_resp_less_both.
   apply H.
   apply le_n.
@@ -364,7 +364,7 @@ Qed.
 
 Lemma trick :
  forall (n : nat) (r g : nat -> OF),
- (forall m : nat, m <= n -> (Zero:OF)[<]g m) ->
+ (forall m : nat, m <= n -> ([0]:OF)[<]g m) ->
  (forall m : nat, m <= n -> r m[<]g m) ->
  forall m : nat, m <= n -> r m[<]Hum g n.
 Proof.
@@ -382,7 +382,7 @@ Proof.
   intro.
   cut (m <= n).
    intro.
-   astepl ((Zero:OF)[+]r m).
+   astepl (([0]:OF)[+]r m).
    apply plus_resp_less_both.
     apply H.
     apply le_n.
@@ -402,7 +402,7 @@ Proof.
   assumption.
  intros.
  rewrite e.
- astepl (r (S n)[+](Zero:OF)).
+ astepl (r (S n)[+]([0]:OF)).
  apply plus_resp_less_both.
   apply H0.
   apply le_n.
@@ -417,7 +417,7 @@ Qed.
 
 Lemma trick' :
  forall (n : nat) (r g : nat -> OF),
- (forall m : nat, m <= n -> g m[<]Zero) ->
+ (forall m : nat, m <= n -> g m[<][0]) ->
  (forall m : nat, m <= n -> g m[<]r m) ->
  forall m : nat, m <= n -> Hum g n[<]r m.
 Proof.
@@ -435,7 +435,7 @@ Proof.
   intro.
   cut (m <= n).
    intro.
-   astepr ((Zero:OF)[+]r m).
+   astepr (([0]:OF)[+]r m).
    apply plus_resp_less_both.
     apply H.
     apply le_n.
@@ -455,7 +455,7 @@ Proof.
   assumption.
  intro H2.
  rewrite H2.
- astepr (r (S n)[+](Zero:OF)).
+ astepr (r (S n)[+]([0]:OF)).
  apply plus_resp_less_both.
   apply H0.
   apply le_n.
@@ -842,8 +842,8 @@ Proof.
   apply less_wdl with (x := [--](r m)).
    apply (Psaghf (fun m : nat => [--](r m))).
    assumption.
-  rstepl ((Zero:OF)[-]r m).
-  rstepr ((Zero:OF)[-][--]x).
+  rstepl (([0]:OF)[-]r m).
+  rstepr (([0]:OF)[-][--]x).
   apply cg_minus_wd.
    apply eq_reflexive_unfolded.
   assumption.
@@ -863,8 +863,8 @@ Proof.
    apply less_wdl with (x := [--](seq (indeks [--]x0 H1))).
     apply c.
     assumption.
-   rstepl ((Zero:OF)[-]seq (indeks [--]x0 H1)).
-   rstepr ((Zero:OF)[-][--]x0).
+   rstepl (([0]:OF)[-]seq (indeks [--]x0 H1)).
+   rstepr (([0]:OF)[-][--]x0).
    apply cg_minus_wd.
     apply eq_reflexive_unfolded.
    assumption.
@@ -978,12 +978,12 @@ Proof.
    exists 0.
    apply eq_reflexive_unfolded.
   (* it is bounded above *)
-  cut {N : nat | forall m : nat, N <= m -> AbsSmall One (g_ m[-]g_ N)}.
+  cut {N : nat | forall m : nat, N <= m -> AbsSmall [1] (g_ m[-]g_ N)}.
    intro H.
    case H.
    intro N.
    intro.
-   exists (saghf g_ N[+]One).
+   exists (saghf g_ N[+][1]).
    red in |- *.
    intros x H0 y H1.
    red in H0.
@@ -995,9 +995,9 @@ Proof.
    apply less_wdl with (x := g_ n).
     case (le_ge_dec N n).
      intro H2.
-     apply leEq_less_trans with (y := g_ N[+]One).
+     apply leEq_less_trans with (y := g_ N[+][1]).
       apply shift_leEq_plus'.
-      cut (AbsSmall One (g_ n[-]g_ N)).
+      cut (AbsSmall [1] (g_ n[-]g_ N)).
        intro.
        elim H3.
        intros H4 H5.
@@ -1014,7 +1014,7 @@ Proof.
     apply less_plusOne.
    apply eq_symmetric_unfolded.
    exact c.
-  apply (pg One).
+  apply (pg [1]).
   apply pos_one.
  (* This is the proof of Proposition 1 of Bridges *)
  intros a b.
@@ -1099,7 +1099,7 @@ Proof.
      apply less_transitive_unfolded with (y := x).
       assumption.
      apply shift_less_plus'.
-     astepl (Zero:OF).
+     astepl ([0]:OF).
      apply pos_div_two.
      apply shift_zero_less_minus.
      assumption.
@@ -1107,7 +1107,7 @@ Proof.
     rstepr ((a[+]b) [/]TwoNZ).
     assumption.
    apply plus_cancel_less with (z := [--]a).
-   rstepl (Zero:OF).
+   rstepl ([0]:OF).
    rstepr ((b[-]a) [/]TwoNZ).
    apply pos_div_two.
    apply shift_zero_less_minus.
@@ -1166,12 +1166,12 @@ Proof.
     exists 0.
     apply eq_reflexive_unfolded.
    (* it is bounded below *)
-   cut {N : nat | forall m : nat, N <= m -> AbsSmall One (g_ m[-]g_ N)}.
+   cut {N : nat | forall m : nat, N <= m -> AbsSmall [1] (g_ m[-]g_ N)}.
     intro H.
     case H.
     intro N.
     intros.
-    exists (kaf g_ N[-]One).
+    exists (kaf g_ N[-][1]).
     red in |- *.
     intros x H0 z H1.
     case H0.
@@ -1180,16 +1180,16 @@ Proof.
     apply less_wdr with (y := g_ n).
      case (le_ge_dec N n).
       intro.
-      apply less_leEq_trans with (y := g_ N[-]One).
-       apply less_transitive_unfolded with (y := kaf g_ N[-]One).
+      apply less_leEq_trans with (y := g_ N[-][1]).
+       apply less_transitive_unfolded with (y := kaf g_ N[-][1]).
         assumption.
        apply minus_resp_less.
        apply Pkaf.
        apply le_n.
       apply plus_cancel_leEq_rht with (z := [--](g_ N)).
-      rstepl ([--](One:OF)).
+      rstepl ([--]([1]:OF)).
       astepr (g_ n[-]g_ N).
-      cut (AbsSmall One (g_ n[-]g_ N)).
+      cut (AbsSmall [1] (g_ n[-]g_ N)).
        intro.
        elim H2.
        intros.
@@ -1197,10 +1197,10 @@ Proof.
       apply a.
       assumption.
      intro.
-     apply less_transitive_unfolded with (y := kaf g_ N[-]One).
+     apply less_transitive_unfolded with (y := kaf g_ N[-][1]).
       assumption.
      apply less_transitive_unfolded with (y := kaf g_ N).
-      apply plus_cancel_less with (z := One:OF).
+      apply plus_cancel_less with (z := [1]:OF).
       astepl (kaf g_ N).
       apply less_plusOne.
      apply Pkaf.
@@ -1208,7 +1208,7 @@ Proof.
     apply eq_symmetric_unfolded.
     exact c.
    (* Here we are using ex_informative *)
-   apply (pg One).
+   apply (pg [1]).
    apply pos_one.
   (* it is strongly extensional *)
   intros x y H H0.
@@ -1280,7 +1280,7 @@ Proof.
      intro.
      apply less_transitive_unfolded with (y := z[+](b[-]a) [/]TwoNZ).
       apply plus_cancel_less with (z := [--]z).
-      rstepl (Zero:OF).
+      rstepl ([0]:OF).
       rstepr ((b[-]a) [/]TwoNZ).
       apply pos_div_two.
       apply shift_zero_less_minus.
@@ -1312,7 +1312,7 @@ Proof.
     intros.
     assumption.
    apply plus_cancel_less with (z := [--]((a[+]b) [/]TwoNZ)).
-   rstepl (Zero:OF).
+   rstepl ([0]:OF).
    rstepr ((b[-]a) [/]TwoNZ).
    apply pos_div_two.
    apply shift_zero_less_minus.
@@ -1618,7 +1618,7 @@ Proof.
  case (Pinf_unfolded2_informative sup_tail_as_Cauchy (L[+]one_div_succ k)).
   change (L[<]L[+]one_div_succ k) in |- *.
   apply shift_less_plus'.
-  rstepl (Zero:OF).
+  rstepl ([0]:OF).
   apply one_div_succ_pos.
  intro sN.
  intros.
@@ -1630,7 +1630,7 @@ Proof.
   apply less_leEq_trans with (y := L).
    apply shift_minus_less.
    apply shift_less_plus'.
-   rstepl (Zero:OF).
+   rstepl ([0]:OF).
    apply one_div_succ_pos.
   change (L[<=]sup_tail (k + N)) in |- *.
   apply L_less_sup_n.
@@ -1673,7 +1673,7 @@ Theorem lubp_gives_Cauchy : SeqLimit g L.
 Proof.
  red in |- *.
  intros e H.
- case (is_Archimedes' ((Two[/] e[//]Greater_imp_ap _ e Zero H)[-]One)).
+ case (is_Archimedes' ((Two[/] e[//]Greater_imp_ap _ e [0] H)[-][1])).
  intro k.
  intros.
  case (pg (e [/]FourNZ)).
@@ -1712,13 +1712,13 @@ Proof.
   unfold Snring in |- *.
   apply shift_div_leEq.
    apply pos_nring_S.
-  cut (e [/]TwoNZ[#]Zero).
+  cut (e [/]TwoNZ[#][0]).
    intro H3.
    apply shift_leEq_mult' with H3.
     apply pos_div_two.
     assumption.
-   rstepl (Two[/] e[//]Greater_imp_ap _ e Zero H).
-   change ((Two[/] e[//]Greater_imp_ap OF e Zero H)[<=]nring (N1 + k)[+]One) in |- *.
+   rstepl (Two[/] e[//]Greater_imp_ap _ e [0] H).
+   change ((Two[/] e[//]Greater_imp_ap OF e [0] H)[<=]nring (N1 + k)[+][1]) in |- *.
    apply shift_leEq_plus.
    apply leEq_transitive with (y := nring (R:=OF) k).
     apply less_leEq; assumption.

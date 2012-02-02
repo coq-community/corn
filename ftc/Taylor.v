@@ -57,7 +57,7 @@ Variable F : PartIR.
 
 (* begin show *)
 Let deriv_Sn b n Hf :=
- N_Deriv _ pI (S n) F Hf{*} [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
+ N_Deriv _ pI (S n) F Hf{*} [-C-] ([1][/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
 (* end show *)
 
 Variables a b : IR.
@@ -92,7 +92,7 @@ Lemma Taylor_Sumx_lemma : forall n x z y y', (forall H, y 0 H [=] z) ->
 Proof.
  intro; induction  n as [| n Hrecn].
   intros; simpl in |- *.
-  astepl (x[-] (Zero[+]z)).
+  astepl (x[-] ([0][+]z)).
   rational.
  intros.
  astepl (x[-] (Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [+] y (S n) (lt_n_Sn (S n)))).
@@ -103,11 +103,11 @@ Proof.
 Qed.
 
 Lemma Taylor_lemma_ap : forall n Hf Hf' Ha',
- Taylor_Rem n Hf'[-]deriv_Sn b n Hf a Ha'[*] (b[-]a) [#] Zero -> a [#] b.
+ Taylor_Rem n Hf'[-]deriv_Sn b n Hf a Ha'[*] (b[-]a) [#] [0] -> a [#] b.
 Proof.
  intros. rename X into H.
  set (Hpred := Diffble_n_imp_inc _ _ _ _ Hf') in *.
- cut (Taylor_Rem n Hf'[-]Part _ _ Ha'[*] (b[-]a) [#] Zero[-]Zero).
+ cut (Taylor_Rem n Hf'[-]Part _ _ Ha'[*] (b[-]a) [#] [0][-][0]).
   2: astepr ZeroR; auto.
  clear H; intros. rename X into H.
  elim (cg_minus_strext _ _ _ _ _ H); clear H; intro H.
@@ -116,7 +116,7 @@ Proof.
     nring_fac_ap_zero IR (S i)) {*} (FId{-} [-C-]a) {^}S i)) b).
    2: apply FSumx_pred'; repeat split.
   intro H0.
-  cut (F b (Hpred b Hb) [-]F a (Hpred a Ha) [#] Zero or Part _ _ H0 [#] Zero). intro H1.
+  cut (F b (Hpred b Hb) [-]F a (Hpred a Ha) [#] [0] or Part _ _ H0 [#] [0]). intro H1.
    elim H1; clear H H1; intro H.
     apply pfstrx with (Hx := Hpred a Ha) (Hy := Hpred b Hb).
     apply ap_symmetric_unfolded; apply zero_minus_apart; auto.
@@ -126,7 +126,7 @@ Proof.
     2: red in |- *; repeat split.
    intro H1.
    cut (Sumx (fun i (Hi : i < n) => Part _ _ (FSumx_pred n _ H1 _ H0 i Hi)) [#]
-     Sumx (fun i (Hi : i < n) => Zero)). intro H2.
+     Sumx (fun i (Hi : i < n) => [0])). intro H2.
     2: eapply ap_wdl_unfolded.
      2: eapply ap_wdr_unfolded.
       2: apply H.
@@ -136,10 +136,10 @@ Proof.
    cut (nat_less_n_fun (fun i (Hi : i < n) =>
      (fi n Hf' (S i) (lt_n_S _ _ Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) [*]
        (nexp IR i (b[+][--]a) [*] (b[+][--]a)))); intros.
-    cut (nat_less_n_fun (fun i (Hi : i < n) => (Zero:IR))); intros.
+    cut (nat_less_n_fun (fun i (Hi : i < n) => ([0]:IR))); intros.
      elim (Sumx_strext _ _ _ _ H3 H4 H2); clear H H0 H1 H2 H3 H4; intros N HN.
      elim HN; clear HN; intros HN H.
-     cut (b[+][--]a [#] Zero). intro H3.
+     cut (b[+][--]a [#] [0]). intro H3.
       2: eapply cring_mult_ap_zero_op; eapply cring_mult_ap_zero_op; apply H.
      apply ap_symmetric_unfolded; apply zero_minus_apart; auto.
     red in |- *; algebra.
@@ -173,7 +173,7 @@ Proof.
     apply Taylor_Sumx_lemma.
      intros; simpl in |- *.
      unfold fi in |- *.
-     rstepr ((Part _ _ (Hpred a Ha) [/] Zero[+]One[//]nring_fac_ap_zero IR 0) [*]One).
+     rstepr ((Part _ _ (Hpred a Ha) [/] [0][+][1][//]nring_fac_ap_zero IR 0) [*][1]).
      apply mult_wdl; apply div_wd.
       2: algebra.
      apply Feq_imp_eq with I.
@@ -198,7 +198,7 @@ Proof.
 Qed.
 (* end hide *)
 
-Theorem Taylor' : forall n Hf Hf' e, Zero [<] e -> {c : IR | Compact (Min_leEq_Max a b) c |
+Theorem Taylor' : forall n Hf Hf' e, [0] [<] e -> {c : IR | Compact (Min_leEq_Max a b) c |
  forall Hc, AbsIR (Taylor_Rem n Hf'[-]deriv_Sn b n Hf c Hc[*] (b[-]a)) [<=] e}.
 Proof.
  intros. rename X into H.
@@ -217,7 +217,7 @@ Proof.
     intros c H3 H4.
     exists c; auto.
     intro.
-    cut (Dom (n_deriv_I _ _ _ _ _ H0{*} [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*}
+    cut (Dom (n_deriv_I _ _ _ _ _ H0{*} [-C-] ([1][/] _[//]nring_fac_ap_zero _ n) {*}
       ( [-C-]b{-}FId) {^}n) c). intro H5.
      2: repeat split.
      2: apply n_deriv_inc; auto.
@@ -292,7 +292,7 @@ Proof.
     elim H6; clear H6; intros H5 H8.
     exact (n_deriv_inc' _ _ _ _ _ _ _ _ H5).
    Included.
-  cut (Taylor_Rem n Hf'[-]Part _ _ H0[*] (b[-]a) [#] Zero).
+  cut (Taylor_Rem n Hf'[-]Part _ _ H0[*] (b[-]a) [#] [0]).
    intro H1; exact (Taylor_lemma_ap _ _ _ _ H1).
   astepr ZeroR; apply AbsIR_cancel_ap_zero; apply Greater_imp_ap; auto.
  intro.
@@ -343,7 +343,7 @@ Let funct_i i Hi := let HX := (Derivative_n_imp_inc' _ _ _ _ _ (derF i Hi) a Ha)
 
 Definition Taylor_Seq := FSumx _ funct_i.
 
-Let deriv_Sn := F'{*} [-C-] (One[/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
+Let deriv_Sn := F'{*} [-C-] ([1][/] _[//]nring_fac_ap_zero _ n) {*} ( [-C-]b{-}FId) {^}n.
 (* end show *)
 
 Lemma Taylor_aux : Dom Taylor_Seq b.
@@ -352,7 +352,7 @@ Proof.
  apply FSumx_pred'; repeat split.
 Qed.
 
-Theorem Taylor : forall e, Zero [<] e -> forall Hb', {c : IR | Compact (Min_leEq_Max a b) c |
+Theorem Taylor : forall e, [0] [<] e -> forall Hb', {c : IR | Compact (Min_leEq_Max a b) c |
  forall Hc, AbsIR (F b Hb'[-]Part _ _ Taylor_aux[-]deriv_Sn c Hc[*] (b[-]a)) [<=] e}.
 Proof.
  intros e H Hb'.
@@ -364,7 +364,7 @@ Proof.
    exists c.
     auto.
    intros.
-   cut (Dom (N_Deriv _ _ _ _ Hf{*} [-C-] (One[/] _[//]nring_fac_ap_zero IR n) {*}
+   cut (Dom (N_Deriv _ _ _ _ Hf{*} [-C-] ([1][/] _[//]nring_fac_ap_zero IR n) {*}
      ( [-C-]b{-}FId) {^}n) c). intro H0.
     eapply leEq_wdl.
      apply (Hc H0).

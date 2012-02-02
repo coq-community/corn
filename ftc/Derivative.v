@@ -80,7 +80,7 @@ Let P := Dom F.
 (* end hide *)
 
 Definition Derivative_I F' (P':=Dom F') := included I (Dom F) and included I (Dom F') and
- (forall e, Zero [<] e -> {d : IR | Zero [<] d | forall x y, I x -> I y -> forall Hx Hy Hx',
+ (forall e, [0] [<] e -> {d : IR | [0] [<] d | forall x y, I x -> I y -> forall Hx Hy Hx',
  AbsIR (x[-]y) [<=] d -> AbsIR (F y Hy[-]F x Hx[-]F' x Hx'[*] (y[-]x)) [<=] e[*]AbsIR (y[-]x)}).
 
 End Definitions.
@@ -107,7 +107,7 @@ Like we did for equality, we begin by stating a lemma that makes proofs of deriv
 
 Lemma Derivative_I_char : forall F F' (P:=Dom F) (P':=Dom F'),
  included I (Dom F) -> included I (Dom F') ->
- (forall e,  Zero [<] e -> {d : IR | Zero [<] d | forall x y, I x -> I y -> forall Hx Hy Hx',
+ (forall e,  [0] [<] e -> {d : IR | [0] [<] d | forall x y, I x -> I y -> forall Hx Hy Hx',
  AbsIR (x[-]y) [<=] d -> AbsIR (F y Hy[-]F x Hx[-]F' x Hx'[*] (y[-]x)) [<=] e[*]AbsIR (y[-]x)}) ->
  Derivative_I Hab' F F'.
 Proof.
@@ -168,7 +168,7 @@ Let Derivative_I_unique_lemma :
   forall x : IR,
   Compact Hab x ->
   forall d : IR,
-  Zero [<] d -> {y : IR | AbsIR (x[-]y) [<=] d | Compact Hab y and y[-]x [#] Zero}.
+  [0] [<] d -> {y : IR | AbsIR (x[-]y) [<=] d | Compact Hab y and y[-]x [#] [0]}.
 Proof.
  intros x Hx d Hd.
  elim (less_cotransitive_unfolded _ _ _ Hab' x); intro.
@@ -185,7 +185,7 @@ Proof.
    simpl in |- *.
    astepl (Max a (x[-]d [/]TwoNZ)).
    apply less_leEq.
-   apply Max_less; [ assumption | astepr (x[-]Zero) ].
+   apply Max_less; [ assumption | astepr (x[-][0]) ].
    apply minus_resp_less_rht; apply pos_div_two; assumption.
   split.
    split.
@@ -213,7 +213,7 @@ Proof.
   eapply eq_transitive_unfolded; [ apply AbsIR_minus | apply AbsIR_eq_x ].
   apply less_leEq; apply shift_less_minus; astepl x; apply less_Min.
    assumption.
-  astepl (x[+]Zero); apply plus_resp_less_lft.
+  astepl (x[+][0]); apply plus_resp_less_lft.
   apply pos_div_two; assumption.
  split.
   split.
@@ -227,7 +227,7 @@ Proof.
  apply shift_less_minus; astepl x.
  astepr (Min b (x[+]d [/]TwoNZ)); apply less_Min.
   assumption.
- astepl (x[+]Zero); apply plus_resp_less_lft; apply pos_div_two; assumption.
+ astepl (x[+][0]); apply plus_resp_less_lft; apply pos_div_two; assumption.
 Qed.
 (* end hide *)
 
@@ -252,7 +252,7 @@ Proof.
  intros dg H6 H7.
  elim (H4 _ (pos_div_two _ _ H2)).
  clear H4 H3; intros dh H3 H4.
- set (d := Min (Min dg dh) One) in *.
+ set (d := Min (Min dg dh) [1]) in *.
  elim (Derivative_I_unique_lemma x H0 d).
   intros y Hy' Hy''.
   elim Hy''; clear Hy''; intros Hy'' Hy.
@@ -336,7 +336,7 @@ Proof.
   apply mult_wdr; apply AbsIR_minus.
  apply leEq_wdl with ZeroR.
   apply less_leEq; auto.
- astepl (AbsIR Zero).
+ astepl (AbsIR [0]).
  apply AbsIR_wd.
  apply eq_symmetric_unfolded; apply x_minus_x.
  apply pfwdef.
@@ -357,7 +357,7 @@ Proof.
  clear deriv; intros d posd Hd.
  set (contG := deriv_imp_contin'_I derF) in *.
  set (M := Norm_Funct contG) in *.
- set (D := Min d (Min (One [/]TwoNZ) (e[/] _[//]
+ set (D := Min d (Min ([1] [/]TwoNZ) (e[/] _[//]
    mult_resp_ap_zero _ _ _ (two_ap_zero IR) (max_one_ap_zero M)))) in *.
  exists D.
   unfold D in |- *; repeat apply less_Min.
@@ -383,14 +383,14 @@ Proof.
    apply leEq_transitive with D.
     eapply leEq_wdl; [ apply H2 | apply AbsIR_minus ].
    unfold D in |- *; apply Min_leEq_lft.
-  rstepr (e[*]One [/]TwoNZ).
+  rstepr (e[*][1] [/]TwoNZ).
   apply mult_resp_leEq_lft.
    apply leEq_transitive with D; auto.
    unfold D in |- *; eapply leEq_transitive; [ apply Min_leEq_rht | apply Min_leEq_lft ].
   apply less_leEq; auto.
  eapply leEq_wdl.
   2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
- apply leEq_transitive with (Max M One[*]AbsIR (x[-]y)).
+ apply leEq_transitive with (Max M [1][*]AbsIR (x[-]y)).
   apply mult_resp_leEq_rht.
    2: apply AbsIR_nonneg.
   eapply leEq_transitive.

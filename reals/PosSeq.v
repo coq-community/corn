@@ -37,23 +37,23 @@ Require Export Series.
 
 Section SeqProperties.
 
-Definition seq_pos (x : nat -> IR) := forall n : nat, Zero [<] x n.
+Definition seq_pos (x : nat -> IR) := forall n : nat, [0] [<] x n.
 Definition seq_inf_sum (x : nat -> IR) :=
 forall M : IR, {N : nat | forall m : nat, N <= m -> M [<] seq_part_sum x m}.
 
-Lemma One_part_sum : forall (m : nat),  seq_part_sum (fun n : nat => One) m [=] nring m.
+Lemma One_part_sum : forall (m : nat),  seq_part_sum (fun n : nat => [1]) m [=] nring m.
 Proof.
  intros.
  induction m; simpl; algebra.
 Qed.
 
-Lemma One_seq_is_pos : seq_pos (fun n : nat => One).
+Lemma One_seq_is_pos : seq_pos (fun n : nat => [1]).
 Proof.
  unfold seq_pos.
  intros. apply pos_one.
 Qed.
 
-Lemma One_seq_is_inf_sum : seq_inf_sum (fun n : nat => One).
+Lemma One_seq_is_inf_sum : seq_inf_sum (fun n : nat => [1]).
 Proof.
  unfold seq_inf_sum.
  intros.
@@ -62,19 +62,19 @@ Proof.
  destruct X as [N H].
  exists N. intros.
  apply less_leEq_trans with (nring (R:=IR) N); auto.
- assert (seq_part_sum (fun n : nat => One) m [=] nring m).
+ assert (seq_part_sum (fun n : nat => [1]) m [=] nring m).
   apply One_part_sum.
  astepr (nring (R:=IR) m).
  apply nring_leEq.
  auto.
 Qed.
 
-Lemma seq_pos_imp_sum_pos : forall (x : nat -> IR), seq_pos x -> forall n, Zero [<] seq_part_sum x (S n).
+Lemma seq_pos_imp_sum_pos : forall (x : nat -> IR), seq_pos x -> forall n, [0] [<] seq_part_sum x (S n).
 Proof.
  intros.
  induction n.
   simpl.
-  astepl (Zero[+]Zero:IR).
+  astepl ([0][+][0]:IR).
   apply plus_resp_less_lft. apply X.
   simpl.
  simpl in |- *.
@@ -85,7 +85,7 @@ Qed.
 
 Lemma seq_pos_imp_sum_pos' :
     forall (x : nat -> IR) (H1 : seq_pos x) (n m : nat) (H2 : m < n),
-    Zero [<] Sum m n x.
+    [0] [<] Sum m n x.
 Proof.
  unfold seq_pos.
  intros.
@@ -104,7 +104,7 @@ Proof.
  apply H1.
 Qed.
 
-Lemma seq_pos_imp_ap_zero : forall (x : nat -> IR), seq_pos x -> forall n, seq_part_sum x (S n) [#] Zero.
+Lemma seq_pos_imp_ap_zero : forall (x : nat -> IR), seq_pos x -> forall n, seq_part_sum x (S n) [#] [0].
 Proof.
  unfold seq_pos.
  intros.
@@ -115,7 +115,7 @@ Qed.
 
 Lemma seq_inf_sum_imp_div_small :
 forall (x : nat -> IR) (H1 :  seq_inf_sum x) (H2:  seq_pos x) (C e : IR)
-(H4 : Zero [<] e), { N : nat |
+(H4 : [0] [<] e), { N : nat |
   forall m : nat, N <= m -> AbsSmall e (C [/](seq_part_sum x (S m)) [//] (seq_pos_imp_ap_zero x H2 m))}.
 Proof.
  unfold seq_inf_sum. unfold seq_pos.
@@ -143,14 +143,14 @@ Qed.
 
 Lemma seq_inf_sum_ratio_bound :
 forall  (y : nat->IR) (H2 : seq_pos y) (m N1: nat) (H3: S N1 < m),
-AbsSmall One (Sum (G:=IR) (S N1) m (fun k : nat => y k)[/]
+AbsSmall [1] (Sum (G:=IR) (S N1) m (fun k : nat => y k)[/]
 	          seq_part_sum y (S m)[//]seq_pos_imp_ap_zero y H2 m).
 Proof.
  intros.
  apply leEq_imp_AbsSmall.
   apply shift_leEq_div.
    apply seq_pos_imp_sum_pos; auto.
-  astepl (Zero:IR).
+  astepl ([0]:IR).
   apply less_leEq.
   apply seq_pos_imp_sum_pos'; auto.
  apply shift_div_leEq.

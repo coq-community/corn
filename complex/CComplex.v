@@ -264,12 +264,12 @@ Qed.
 
 Definition cc_cring : CRing := Build_CRing _ _ _ cc_isCRing.
 
-Lemma cc_ap_zero : forall z : cc_cring, z [#] Zero -> Re z [#] Zero or Im z [#] Zero.
+Lemma cc_ap_zero : forall z : cc_cring, z [#] [0] -> Re z [#] [0] or Im z [#] [0].
 Proof.
  intro z. unfold cc_ap in |- *. intuition.
 Qed.
 
-Lemma cc_inv_aid : forall x y : IR, x [#] Zero or y [#] Zero -> x[^]2[+]y[^]2 [#] Zero.
+Lemma cc_inv_aid : forall x y : IR, x [#] [0] or y [#] [0] -> x[^]2[+]y[^]2 [#] [0].
 Proof.
  intros x y H.
  apply Greater_imp_ap.
@@ -279,12 +279,12 @@ Proof.
 Qed.
 
 (**
-If [x [~=] Zero] or [y [~=] Zero], then  [x [/] x[^]2 [+] y[^]2 [~=] Zero] or
-[[--]y[/]x[^]2[+]y[^]2 [~=] Zero].
+If [x [~=] [0]] or [y [~=] [0]], then  [x [/] x[^]2 [+] y[^]2 [~=] [0]] or
+[[--]y[/]x[^]2[+]y[^]2 [~=] [0]].
 *)
 
-Lemma cc_inv_aid2 : forall (x y : IR) (H : x [#] Zero or y [#] Zero),
- (x[/] _[//]cc_inv_aid _ _ H) [#] Zero or ( [--]y[/] _[//]cc_inv_aid _ _ H) [#] Zero.
+Lemma cc_inv_aid2 : forall (x y : IR) (H : x [#] [0] or y [#] [0]),
+ (x[/] _[//]cc_inv_aid _ _ H) [#] [0] or ( [--]y[/] _[//]cc_inv_aid _ _ H) [#] [0].
 Proof.
  intros x y H.
  elim H; intro H0.
@@ -302,7 +302,7 @@ input (Re or Im) is NonZero (a Prop), we manage to construct the
 actual function.
 *)
 
-Definition cc_recip : forall z : cc_cring, z [#] Zero -> cc_cring.
+Definition cc_recip : forall z : cc_cring, z [#] [0] -> cc_cring.
 Proof.
  intros z z_.
  apply (Build_CC_set (Re z[/] _[//]cc_inv_aid _ _ z_) ( [--] (Im z) [/] _[//]cc_inv_aid _ _ z_)).
@@ -355,7 +355,7 @@ absolute value and the imaginary unit [I] *)
 
 Definition cc_set_CC : IR -> IR -> CC := Build_CC_set.
 
-Definition cc_IR (x : IR) : CC := cc_set_CC x Zero.
+Definition cc_IR (x : IR) : CC := cc_set_CC x [0].
 
 Definition CC_conj : CC -> CC := fun z : CC_set =>
   match z with
@@ -368,7 +368,7 @@ Definition CC_conj' : CC->CC := [z:CC_set] (CC_set_rec [_:CC_set]CC_set [Re0,Im0
 
 Definition AbsCC (z : CC) : IR := sqrt (Re z[^]2[+]Im z[^]2) (cc_abs_aid _ (Re z) (Im z)).
 
-Lemma TwoCC_ap_zero : (Two:CC) [#] Zero.
+Lemma TwoCC_ap_zero : (Two:CC) [#] [0].
 Proof.
  simpl in |- *. unfold cc_ap in |- *.
  simpl in |- *. left.
@@ -391,7 +391,7 @@ Infix "[+I*]" := cc_set_CC (at level 48, no associativity).
 
 Section I_properties.
 
-Lemma I_square : II[*]II [=] [--]One.
+Lemma I_square : II[*]II [=] [--][1].
 Proof.
  simpl in |- *. unfold cc_mult in |- *. simpl in |- *. unfold cc_inv in |- *. simpl in |- *.
  split. simpl in |- *. rational. simpl in |- *. rational.
@@ -399,21 +399,21 @@ Qed.
 
 Hint Resolve I_square: algebra.
 
-Lemma I_square' : II[^]2 [=] [--]One.
+Lemma I_square' : II[^]2 [=] [--][1].
 Proof.
  Step_final (II[*]II).
 Qed.
 
-Lemma I_recip_lft : [--]II[*]II [=] One.
+Lemma I_recip_lft : [--]II[*]II [=] [1].
 Proof.
  astepl ( [--] (II[*]II)).
- Step_final ( [--][--] (One:CC)).
+ Step_final ( [--][--] ([1]:CC)).
 Qed.
 
-Lemma I_recip_rht : II[*][--]II [=] One.
+Lemma I_recip_rht : II[*][--]II [=] [1].
 Proof.
  astepl ( [--] (II[*]II)).
- Step_final ( [--][--] (One:CC)).
+ Step_final ( [--][--] ([1]:CC)).
 Qed.
 
 Lemma mult_I : forall x y : IR, (x[+I*]y) [*]II [=] [--]y[+I*]x.
@@ -526,12 +526,12 @@ Proof.
  intros. elim c. intros x y. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
-Lemma CC_conj_zero : CC_conj Zero [=] Zero.
+Lemma CC_conj_zero : CC_conj [0] [=] [0].
 Proof.
  simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
-Lemma CC_conj_one : CC_conj One [=] One.
+Lemma CC_conj_one : CC_conj [1] [=] [1].
 Proof.
  simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
@@ -541,8 +541,8 @@ Hint Resolve CC_conj_one: algebra.
 Lemma CC_conj_nexp : forall (c : CC) n, CC_conj (c[^]n) [=] CC_conj c[^]n.
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
- astepl (CC_conj One).
-  Step_final (One:CC).
+ astepl (CC_conj [1]).
+  Step_final ([1]:CC).
  astepl (CC_conj (c[^]n[*]c)).
  astepl (CC_conj (c[^]n) [*]CC_conj c).
  Step_final (CC_conj c[^]n[*]CC_conj c).
@@ -563,7 +563,7 @@ Proof.
  intro x. simpl in |- *. apply eq_reflexive.
 Qed.
 
-Lemma Im_cc_IR : forall x : IR, Im (cc_IR x) [=] Zero.
+Lemma Im_cc_IR : forall x : IR, Im (cc_IR x) [=] [0].
 Proof.
  intro x. simpl in |- *. apply eq_reflexive.
 Qed.
@@ -609,14 +609,14 @@ Proof.
  intros. simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
-Lemma cc_IR_zero : cc_IR Zero [=] Zero.
+Lemma cc_IR_zero : cc_IR [0] [=] [0].
 Proof.
  simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
 
 Hint Resolve cc_IR_zero: algebra.
 
-Lemma cc_IR_one : cc_IR One [=] One.
+Lemma cc_IR_one : cc_IR [1] [=] [1].
 Proof.
  simpl in |- *. unfold cc_eq in |- *. simpl in |- *. split; algebra.
 Qed.
@@ -626,18 +626,18 @@ Hint Resolve cc_IR_one: algebra.
 Lemma cc_IR_nring : forall n : nat, cc_IR (nring n) [=] nring n.
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
- astepl (cc_IR Zero).
-  Step_final (Zero:CC).
- astepl (cc_IR (nring n[+]One)).
- astepl (cc_IR (nring n) [+]cc_IR One).
- Step_final (nring n[+] (One:CC)).
+ astepl (cc_IR [0]).
+  Step_final ([0]:CC).
+ astepl (cc_IR (nring n[+][1])).
+ astepl (cc_IR (nring n) [+]cc_IR [1]).
+ Step_final (nring n[+] ([1]:CC)).
 Qed.
 
 Lemma cc_IR_nexp : forall (x : IR) (n : nat), cc_IR x[^]n [=] cc_IR (x[^]n).
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
- astepl (One:CC).
-  Step_final (cc_IR One).
+ astepl ([1]:CC).
+  Step_final (cc_IR [1]).
  astepl (cc_IR x[^]n[*]cc_IR x).
  astepl (cc_IR (x[^]n) [*]cc_IR x).
  Step_final (cc_IR (x[^]n[*]x)).
@@ -669,7 +669,7 @@ Proof.
 Qed.
 Load "Opaque_algebra".
 
-Lemma poly_apzero_CC : forall f : CCX, f [#] Zero -> {c : CC | f ! c [#] Zero}.
+Lemma poly_apzero_CC : forall f : CCX, f [#] [0] -> {c : CC | f ! c [#] [0]}.
 Proof.
  intros.
  apply poly_apzero.

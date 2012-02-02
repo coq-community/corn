@@ -80,7 +80,7 @@ Proof.
  intros.
  induction  f0 as [| s f0 Hrecf0]; intros.
   exists (cpoly_zero R).
-  exists (Zero:R).
+  exists ([0]:R).
   simpl in |- *.
   algebra.
  elim Hrecf0. intro g'. intros H.
@@ -97,19 +97,19 @@ Proof.
 Qed.
 Load "Opaque_algebra".
 
-Lemma poly_linear_factor : forall (f : RX) a, f ! a [=] Zero -> {f' : RX | f [=] (_X_[-]_C_ a) [*]f'}.
+Lemma poly_linear_factor : forall (f : RX) a, f ! a [=] [0] -> {f' : RX | f [=] (_X_[-]_C_ a) [*]f'}.
 Proof.
  intros.
  elim (poly_linear_shifted a f0). intro f'. intros H0.
  elim H0. intro f''. intros H1.
  exists f'.
- cut (_C_ f'' [=] Zero). intro.
+ cut (_C_ f'' [=] [0]). intro.
   astepl ((_X_[-]_C_ a) [*]f'[+]_C_ f'').
-  Step_final ((_X_[-]_C_ a) [*]f'[+]Zero).
- astepr (_C_ (Zero:R)).
+  Step_final ((_X_[-]_C_ a) [*]f'[+][0]).
+ astepr (_C_ ([0]:R)).
  apply cpoly_const_eq.
- astepl (Zero[+]f'').
- astepl (Zero[*]f' ! a[+]f'').
+ astepl ([0][+]f'').
+ astepl ([0][*]f' ! a[+]f'').
  astepl ((a[-]a) [*]f' ! a[+]f'').
  astepl ((_X_ ! a[-] (_C_ a) ! a) [*]f' ! a[+]f'').
  astepl ((_X_[-]_C_ a) ! a[*]f' ! a[+]f'').
@@ -122,7 +122,7 @@ Qed.
 Lemma zero_poly : forall n,
   (forall i j: nat, i <= n -> j <= n -> i <> j -> a_ i[#]a_ j) ->
   forall (f : RX),
- degree_le n f -> (forall i, i <= n -> f ! (a_ i) [=] Zero) -> f [=] Zero.
+ degree_le n f -> (forall i, i <= n -> f ! (a_ i) [=] [0]) -> f [=] [0].
 Proof with auto.
  intro.
  clear degree_f n distinct_a_.
@@ -130,16 +130,16 @@ Proof with auto.
  induction  n0 as [| n0 Hrecn0]; intros.
   elim (degree_le_zero _ _ H). intros.
   astepl (_C_ x).
-  astepr (_C_ (Zero:R)).
+  astepr (_C_ ([0]:R)).
   apply cpoly_const_eq.
   apply eq_transitive_unfolded with f0 ! (a_ 0).
    Step_final (_C_ x) ! (a_ 0).
   apply H0...
- cut (f0 ! (a_ (S n0)) [=] Zero)... intro.
+ cut (f0 ! (a_ (S n0)) [=] [0])... intro.
  elim (poly_linear_factor f0 (a_ (S n0)) H1). intro f'. intros.
  astepl ((_X_[-]_C_ (a_ (S n0))) [*]f').
- cut (f' [=] Zero). intro.
-  Step_final ((_X_[-]_C_ (a_ (S n0))) [*]Zero).
+ cut (f' [=] [0]). intro.
+  Step_final ((_X_[-]_C_ (a_ (S n0))) [*][0]).
  apply Hrecn0.
    intuition.
   apply degree_le_mult_imp with (_X_[-]_C_ (a_ (S n0))) 1.
@@ -152,7 +152,7 @@ Proof with auto.
   apply minus_ap_zero.
   apply distinct_a_...
   intro; rewrite H3 in H2; exact (le_Sn_n _ H2).
- astepr (Zero:R).
+ astepr ([0]:R).
  cut (a_ i[-]a_ (S n0) [=] (_X_[-]_C_ (a_ (S n0))) ! (a_ i)). intro.
   astepl ((_X_[-]_C_ (a_ (S n0))) ! (a_ i) [*]f' ! (a_ i)).
   astepl ((_X_[-]_C_ (a_ (S n0))) [*]f') ! (a_ i).
@@ -188,7 +188,7 @@ Proof.
  auto.
 Qed.
 
-Lemma poly_01_factor'_zero : forall n, (poly_01_factor' n) ! (a_ n) [=] Zero.
+Lemma poly_01_factor'_zero : forall n, (poly_01_factor' n) ! (a_ n) [=] [0].
 Proof.
  intros.
  unfold poly_01_factor' in |- *.
@@ -197,7 +197,7 @@ Proof.
 Qed.
 
 Lemma poly_01_factor'_apzero :
- forall n i, i <> n -> (poly_01_factor' n) ! (a_ i) [#] Zero.
+ forall n i, i <> n -> (poly_01_factor' n) ! (a_ i) [#] [0].
 Proof.
  intros.
  unfold poly_01_factor' in |- *.
@@ -209,7 +209,7 @@ Hint Resolve poly_01_factor'_zero.
 
 Definition poly_01_factor n i (H : i <> n) :=
  poly_01_factor' n[*]
-   _C_ (One[/] (poly_01_factor' n) ! (a_ i) [//]poly_01_factor'_apzero n i H).
+   _C_ ([1][/] (poly_01_factor' n) ! (a_ i) [//]poly_01_factor'_apzero n i H).
 
 Lemma poly_01_factor_degree : forall n i H, degree_le 1 (poly_01_factor n i H).
 Proof.
@@ -222,24 +222,24 @@ Proof.
  auto.
 Qed.
 
-Lemma poly_01_factor_zero : forall n i H, (poly_01_factor n i H) ! (a_ n) [=] Zero.
+Lemma poly_01_factor_zero : forall n i H, (poly_01_factor n i H) ! (a_ n) [=] [0].
 Proof.
  intros.
  unfold poly_01_factor in |- *.
  astepl ((poly_01_factor' n0) ! (a_ n0) [*] (_C_
-   (One[/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)) ! (a_ n0)).
- Step_final (Zero[*] (_C_ (One[/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H))
+   ([1][/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)) ! (a_ n0)).
+ Step_final ([0][*] (_C_ ([1][/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H))
    ! (a_ n0)).
 Qed.
 
-Lemma poly_01_factor_one : forall n i H, (poly_01_factor n i H) ! (a_ i) [=] One.
+Lemma poly_01_factor_one : forall n i H, (poly_01_factor n i H) ! (a_ i) [=] [1].
 Proof.
  intros.
  unfold poly_01_factor in |- *.
  astepl ((poly_01_factor' n0) ! (a_ i) [*] (_C_
-   (One[/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)) ! (a_ i)).
+   ([1][/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)) ! (a_ i)).
  astepl ((poly_01_factor' n0) ! (a_ i) [*]
-   (One[/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)).
+   ([1][/] (poly_01_factor' n0) ! (a_ i) [//]poly_01_factor'_apzero n0 i H)).
  apply div_1'.
 Qed.
 
@@ -247,12 +247,12 @@ Hint Resolve poly_01_factor_zero poly_01_factor_one: algebra.
 
 Fixpoint poly_01 (i n : nat) {struct n} : cpoly_cring R :=
   match eq_nat_dec i n with
-  | left  _  => One
+  | left  _  => [1]
   | right ne => poly_01_factor n i ne
   end
   [*]
   match n with
-  | O   => One
+  | O   => [1]
   | S m => poly_01 i m
   end.
 
@@ -262,8 +262,8 @@ Proof.
  induction  n0 as [| n0 Hrecn0]. intros.
   simpl in |- *.
   elim (eq_nat_dec i 0); intro y.
-   apply degree_le_wd with (_C_ (One:R)).
-    Step_final (One:cpoly_cring R).
+   apply degree_le_wd with (_C_ ([1]:R)).
+    Step_final ([1]:cpoly_cring R).
    apply degree_le_mon with 0.
     auto with arith.
    apply degree_le_c_.
@@ -290,8 +290,8 @@ Proof.
  induction  n0 as [| n0 Hrecn0]; intros.
   simpl in |- *.
   elim (eq_nat_dec i 0); intro y.
-   apply degree_le_wd with (_C_ (One:R)).
-    Step_final (One:cpoly_cring R).
+   apply degree_le_wd with (_C_ ([1]:R)).
+    Step_final ([1]:cpoly_cring R).
    apply degree_le_c_.
   cut (i = 0). intro.
    elim (y H0).
@@ -311,7 +311,7 @@ Proof.
  auto.
 Qed.
 
-Lemma poly_01_zero : forall n i j, j <= n -> j <> i -> (poly_01 i n) ! (a_ j) [=] Zero.
+Lemma poly_01_zero : forall n i j, j <= n -> j <> i -> (poly_01 i n) ! (a_ j) [=] [0].
 Proof.
  intros.
  induction  n0 as [| n0 Hrecn0]; intros.
@@ -321,8 +321,8 @@ Proof.
   elim (eq_nat_dec i 0); intro y.
    rewrite y in H0.
    elim (H0 (refl_equal 0)).
-  astepl ((poly_01_factor 0 i y) ! (a_ 0) [*]One ! (a_ 0)).
-  astepl ((poly_01_factor 0 i y) ! (a_ 0) [*]One).
+  astepl ((poly_01_factor 0 i y) ! (a_ 0) [*][1] ! (a_ 0)).
+  astepl ((poly_01_factor 0 i y) ! (a_ 0) [*][1]).
   astepl (poly_01_factor 0 i y) ! (a_ 0).
   apply poly_01_factor_zero.
  elim (eq_nat_dec j (S n0)); intro y.
@@ -332,37 +332,37 @@ Proof.
    rewrite y0 in H0.
    elim (H0 (refl_equal j)).
   astepl ((poly_01_factor j i y0) ! (a_ j) [*] (poly_01 i n0) ! (a_ j)).
-  Step_final (Zero[*] (poly_01 i n0) ! (a_ j)).
+  Step_final ([0][*] (poly_01 i n0) ! (a_ j)).
  cut (j <= n0). intro.
   simpl in |- *.
   elim (eq_nat_dec i (S n0)); intro y0.
-   astepl (One ! (a_ j) [*] (poly_01 i n0) ! (a_ j)).
-   Step_final (One ! (a_ j) [*]Zero).
+   astepl ([1] ! (a_ j) [*] (poly_01 i n0) ! (a_ j)).
+   Step_final ([1] ! (a_ j) [*][0]).
   astepl ((poly_01_factor (S n0) i y0) ! (a_ j) [*] (poly_01 i n0) ! (a_ j)).
-  Step_final ((poly_01_factor (S n0) i y0) ! (a_ j) [*]Zero).
+  Step_final ((poly_01_factor (S n0) i y0) ! (a_ j) [*][0]).
  elim (le_lt_eq_dec _ _ H); auto with arith.
  intro; elim (y b).
 Qed.
 
-Lemma poly_01_one : forall n i, (poly_01 i n) ! (a_ i) [=] One.
+Lemma poly_01_one : forall n i, (poly_01 i n) ! (a_ i) [=] [1].
 Proof.
  intros.
  induction  n0 as [| n0 Hrecn0]; intros.
   simpl in |- *.
   elim (eq_nat_dec i 0); intro y.
-   astepl (One ! (a_ i) [*]One ! (a_ i)).
-   Step_final (One[*] (One:R)).
-  astepl ((poly_01_factor 0 i y) ! (a_ i) [*]One ! (a_ i)).
-  astepl ((poly_01_factor 0 i y) ! (a_ i) [*]One).
+   astepl ([1] ! (a_ i) [*][1] ! (a_ i)).
+   Step_final ([1][*] ([1]:R)).
+  astepl ((poly_01_factor 0 i y) ! (a_ i) [*][1] ! (a_ i)).
+  astepl ((poly_01_factor 0 i y) ! (a_ i) [*][1]).
   astepl (poly_01_factor 0 i y) ! (a_ i).
   apply poly_01_factor_one.
  simpl in |- *.
  elim (eq_nat_dec i (S n0)); intro y.
-  astepl (One ! (a_ i) [*] (poly_01 i n0) ! (a_ i)).
-  astepl (One[*] (poly_01 i n0) ! (a_ i)).
-  Step_final (One[*] (One:R)).
+  astepl ([1] ! (a_ i) [*] (poly_01 i n0) ! (a_ i)).
+  astepl ([1][*] (poly_01 i n0) ! (a_ i)).
+  Step_final ([1][*] ([1]:R)).
  astepl ((poly_01_factor (S n0) i y) ! (a_ i) [*] (poly_01 i n0) ! (a_ i)).
- astepl ((poly_01_factor (S n0) i y) ! (a_ i) [*]One).
+ astepl ((poly_01_factor (S n0) i y) ! (a_ i) [*][1]).
  astepl (poly_01_factor (S n0) i y) ! (a_ i).
  apply poly_01_factor_one.
 Qed.
@@ -370,13 +370,13 @@ Qed.
 Hint Resolve poly_01_zero poly_01_one: algebra.
 
 Lemma poly_representation'' : forall (a : nat -> R) i,
- i <= n -> (forall j, j <> i -> a j [=] Zero) -> Sum 0 n a [=] a i.
+ i <= n -> (forall j, j <> i -> a j [=] [0]) -> Sum 0 n a [=] a i.
 Proof.
  intro. intro.
  elim i.
   intros.
   astepl (a 0[+]Sum 1 n a).
-  astepr (a 0[+]Zero).
+  astepr (a 0[+][0]).
   apply bin_op_wd_unfolded.
    algebra.
   apply Sum_zero.
@@ -387,7 +387,7 @@ Proof.
  intro i'.
  intros.
  astepl (Sum 0 i' a[+]Sum (S i') n a).
- astepr (Zero[+]a (S i')).
+ astepr ([0][+]a (S i')).
  apply bin_op_wd_unfolded.
   apply Sum_zero.
    auto with arith.
@@ -395,7 +395,7 @@ Proof.
   apply H1.
   intro; rewrite H4 in H3; exact (le_Sn_n _ H3).
  astepl (a (S i') [+]Sum (S (S i')) n a).
- astepr (a (S i') [+]Zero).
+ astepr (a (S i') [+][0]).
  apply bin_op_wd_unfolded.
   algebra.
  apply Sum_zero.
@@ -412,12 +412,12 @@ Proof.
  apply eq_transitive_unfolded with (Sum 0 n (fun i : nat => (f_ i[*]poly_01 i n) ! (a_ k))).
   apply Sum_cpoly_ap with (f := fun i : nat => f_ i[*]poly_01 i n).
  astepl (Sum 0 n (fun i : nat => (f_ i) ! (a_ k) [*] (poly_01 i n) ! (a_ k))).
- astepr ((f_ k) ! (a_ k) [*]One).
+ astepr ((f_ k) ! (a_ k) [*][1]).
  astepr ((f_ k) ! (a_ k) [*] (poly_01 k n) ! (a_ k)).
  apply poly_representation'' with (a := fun i : nat => (f_ i) ! (a_ k) [*] (poly_01 i n) ! (a_ k)).
   auto.
  intros.
- Step_final ((f_ j) ! (a_ k) [*]Zero).
+ Step_final ((f_ j) ! (a_ k) [*][0]).
 Qed.
 
 Lemma poly_representation : f [=] Sum 0 n (fun i => _C_ f ! (a_ i) [*]poly_01 i n).
@@ -439,10 +439,10 @@ Qed.
 
 Hint Resolve poly_representation: algebra.
 
-Lemma Cpoly_choose_apzero : f [#] Zero -> {i : nat | i <= n | f ! (a_ i) [#] Zero}.
+Lemma Cpoly_choose_apzero : f [#] [0] -> {i : nat | i <= n | f ! (a_ i) [#] [0]}.
 Proof.
  intros H.
- cut (Sum 0 n (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) [#] Zero). intros H0.
+ cut (Sum 0 n (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) [#] [0]). intros H0.
   elim (Sum_apzero _ (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) 0 n ( le_O_n n) H0).
   intro i. intro H1.
   elim H1. intros H2 H3. intro H4.
@@ -471,7 +471,7 @@ Hypothesis H : (Char0 R).
 Notation RX := (cpoly_cring R).
 (* end hide *)
 
-Lemma poly_apzero : forall f : RX, f [#] Zero -> {c : R | f ! c [#] Zero}.
+Lemma poly_apzero : forall f : RX, f [#] [0] -> {c : R | f ! c [#] [0]}.
 Proof.
  intros f H0.
  elim (Cpoly_ex_degree _ f). intro n. intro H1. (* Set_ not necessary *)
@@ -496,7 +496,7 @@ Proof.
  apply cg_inv_unique_2.
  apply not_ap_imp_eq. unfold Not in |- *. intros H1.
  elim (poly_apzero  (p[-]q)). intros x H2.
-  cut ((p[-]q) ! x [=] Zero). intro.
+  cut ((p[-]q) ! x [=] [0]). intro.
    elim (eq_imp_not_ap _ _ _ H3 H2).
   astepl (p ! x[-]q ! x).
   Step_final (p ! x[-]p ! x).
@@ -516,14 +516,14 @@ Variable R : COrdField.
 Notation RX := (cpoly_cring R).
 (* end hide *)
 
-Lemma Cpoly_apzero_interval : forall f : RX, f [#] Zero ->
- forall a b, a [<] b -> {c : R | a [<=] c /\ c [<=] b | f ! c [#] Zero}.
+Lemma Cpoly_apzero_interval : forall f : RX, f [#] [0] ->
+ forall a b, a [<] b -> {c : R | a [<=] c /\ c [<=] b | f ! c [#] [0]}.
 Proof.
  intros f H a b H0.
  assert (H1 := poly_degree_lth _ f).
  set (n := lth_of_poly f) in *.
- cut (Zero [<] (nring n:R)). intros H2.
-  cut (nring n [#] (Zero:R)). intros H3.
+ cut ([0] [<] (nring n:R)). intros H2.
+  cut (nring n [#] ([0]:R)). intros H3.
    cut (distinct1 (fun i : nat => nring i[*]a[+] (nring n[-]nring i) [*]b[/] nring n[//]H3)).
     intro H4.
     elim (Cpoly_choose_apzero _ (fun i : nat => nring i[*]a[+] (nring n[-]nring i) [*]b[/] nring n[//]H3)
@@ -614,7 +614,7 @@ Section interpolation.
         p [=] q.
   Proof with auto with arith.
    intros ??? [A ?] [B ?].
-   apply (identical_poly F (fun i => fst (nth i l (Zero, Zero))) (length (tl l)))...
+   apply (identical_poly F (fun i => fst (nth i l ([0], [0]))) (length (tl l)))...
     repeat intro.
     rewrite <- map_nth.
     rewrite <- (map_nth (@fst _ _) l).
@@ -624,7 +624,7 @@ Section interpolation.
      rewrite map_length. rewrite <- ne_list.tl_length...
     rewrite map_length. rewrite <- ne_list.tl_length...
    intros.
-   transitivity (snd (nth i l (Zero, Zero))).
+   transitivity (snd (nth i l ([0], [0]))).
     apply A, nth_In... rewrite <- ne_list.tl_length...
    symmetry.
    apply B, nth_In... rewrite <- ne_list.tl_length...

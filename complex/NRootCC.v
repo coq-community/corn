@@ -52,7 +52,7 @@ Properties of non-zero complex numbers
 Section CC_ap_zero.
 
 Lemma cc_ap_zero : forall P : CC -> Prop,
- (forall a b, a [#] Zero -> P (a[+I*]b)) -> (forall a b, b [#] Zero -> P (a[+I*]b)) -> forall c, c [#] Zero -> P c.
+ (forall a b, a [#] [0] -> P (a[+I*]b)) -> (forall a b, b [#] [0] -> P (a[+I*]b)) -> forall c, c [#] [0] -> P c.
 Proof.
  intro. intro. intro. intro.
  elim c. intros a b. intro H1.
@@ -66,7 +66,7 @@ Proof.
 Qed.
 
 Lemma C_cc_ap_zero : forall P : CC -> CProp,
- (forall a b, a [#] Zero -> P (a[+I*]b)) -> (forall a b, b [#] Zero -> P (a[+I*]b)) -> forall c, c [#] Zero -> P c.
+ (forall a b, a [#] [0] -> P (a[+I*]b)) -> (forall a b, b [#] [0] -> P (a[+I*]b)) -> forall c, c [#] [0] -> P c.
 Proof.
  intro. intro H. intro H0. intro.
  elim c. intros a b. intro H1.
@@ -85,7 +85,7 @@ End CC_ap_zero.
 
 Section Imag_to_Real.
 
-Lemma imag_to_real : forall a b a' b', a'[+I*]b' [=] (a[+I*]b) [*]II -> a [#] Zero -> b' [#] Zero.
+Lemma imag_to_real : forall a b a' b', a'[+I*]b' [=] (a[+I*]b) [*]II -> a [#] [0] -> b' [#] [0].
 Proof.
  do 5 intro. intro H0.
  cut (b' [=] a); intros.
@@ -127,12 +127,12 @@ Proof.
    (sqrt_Half[*]sqrt_Half[+]sqrt_Half[*]sqrt_Half)).
   apply eq_reflexive_unfolded.
  cut (sqrt_Half[*]sqrt_Half [=] Half); intros.
-  (* astepl Zero[+I*] (Half[+]Half). *)
-  apply eq_transitive_unfolded with (Zero[+I*] (Half[+]Half)).
+  (* astepl [0][+I*] (Half[+]Half). *)
+  apply eq_transitive_unfolded with ([0][+I*] (Half[+]Half)).
    apply I_wd. apply cg_minus_correct. apply bin_op_wd_unfolded. exact H.
     exact H.
-  (* Step_final Zero[+I*]One. *)
-  apply eq_transitive_unfolded with (Zero[+I*]One).
+  (* Step_final [0][+I*][1]. *)
+  apply eq_transitive_unfolded with ([0][+I*][1]).
    apply I_wd. apply eq_reflexive_unfolded. apply half_2.
     apply eq_reflexive_unfolded.
  (* astepl sqrt_Half[^] (2). *)
@@ -173,24 +173,24 @@ Proof.
   apply eq_transitive_unfolded with ((II[^]4) [^]m[*]II).
   apply bin_op_wd_unfolded. apply eq_symmetric_unfolded. apply nexp_mult.
    apply nexp_one.
- cut (II[^]4 [=] One); intros.
-  (* astepl One[^]m[*]II. *)
-  apply eq_transitive_unfolded with (One[^]m[*]II).
+ cut (II[^]4 [=] [1]); intros.
+  (* astepl [1][^]m[*]II. *)
+  apply eq_transitive_unfolded with ([1][^]m[*]II).
    apply bin_op_wd_unfolded. apply un_op_wd_unfolded. exact H0.
     apply eq_reflexive_unfolded.
-  (* Step_final One[*]II. *)
-  apply eq_transitive_unfolded with (One[*]II).
+  (* Step_final [1][*]II. *)
+  apply eq_transitive_unfolded with ([1][*]II).
    apply bin_op_wd_unfolded. apply one_nexp. apply eq_reflexive_unfolded.
     apply one_mult.
  replace 4 with (2 * 2).
   (* astepl (II[^] (2)) [^] (2). *)
   apply eq_transitive_unfolded with ((II[^]2) [^]2).
    apply eq_symmetric_unfolded. apply nexp_mult.
-   (* astepl ( [--] (One::CC)) [^] (2). *)
-   apply eq_transitive_unfolded with ( [--] (One:CC) [^]2).
+   (* astepl ( [--] ([1]::CC)) [^] (2). *)
+   apply eq_transitive_unfolded with ( [--] ([1]:CC) [^]2).
    apply un_op_wd_unfolded. exact I_square'.
-   (* Step_final (One::CC) [^] (2). *)
-   apply eq_transitive_unfolded with ((One:CC) [^]2).
+   (* Step_final ([1]::CC) [^] (2). *)
+   apply eq_transitive_unfolded with (([1]:CC) [^]2).
    apply inv_nexp_two.
   apply one_nexp.
  auto with arith.
@@ -222,19 +222,19 @@ Section NRootCC_1.
 Section NRootCC_1_ap_real.
 
 (**
-%\begin{convention}% Let [a,b : IR] and [b_ : (b [#] Zero)].
+%\begin{convention}% Let [a,b : IR] and [b_ : (b [#] [0])].
 Define [c2 := a[^]2[+]b[^]2], [c := sqrt c2], [a'2 := (c[+]a) [*]Half],
 [a' := sqrt a'2], [b'2 := (c[-]a) [*]Half] and [b' := sqrt b'2].
 %\end{convention}%
 *)
 Variables a b : IR.
-Hypothesis b_ : b [#] Zero.
+Hypothesis b_ : b [#] [0].
 
 (* begin hide *)
 Let c2 := a[^]2[+]b[^]2.
 (* end hide *)
 
-Lemma nrCC1_c2pos : Zero [<] c2.
+Lemma nrCC1_c2pos : [0] [<] c2.
 Proof.
  unfold c2 in |- *.
  apply plus_resp_nonneg_pos.
@@ -248,7 +248,7 @@ Let c := sqrt c2 (less_leEq _ _ _ nrCC1_c2pos).
 Let a'2 := (c[+]a) [*]Half.
 (* end hide *)
 
-Lemma nrCC1_a'2pos : Zero [<] a'2.
+Lemma nrCC1_a'2pos : [0] [<] a'2.
 Proof.
  unfold a'2 in |- *.
  apply (mult_resp_pos IR).
@@ -257,9 +257,9 @@ Proof.
   unfold c in |- *.
   apply sqrt_less'.
   unfold c2 in |- *.
-  apply (Ccsr_wdl _ (cof_less (c:=IR)) (a[^]2[+]Zero) (a[^]2[+]b[^]2)).
+  apply (Ccsr_wdl _ (cof_less (c:=IR)) (a[^]2[+][0]) (a[^]2[+]b[^]2)).
    apply plus_resp_less_lft.
-   change (Zero [<] b[^]2) in |- *.
+   change ([0] [<] b[^]2) in |- *.
    apply pos_square. assumption.
    (* algebra. *)
    apply cm_rht_unit_unfolded.
@@ -271,18 +271,18 @@ Let a' := sqrt a'2 (less_leEq _ _ _ nrCC1_a'2pos).
 Let b'2 := (c[-]a) [*]Half.
 (* end hide *)
 
-Lemma nrCC1_b'2pos : Zero [<] b'2.
+Lemma nrCC1_b'2pos : [0] [<] b'2.
 Proof.
  unfold b'2 in |- *.
  apply (mult_resp_pos IR).
-  change (Zero [<] c[-]a) in |- *.
+  change ([0] [<] c[-]a) in |- *.
   apply shift_zero_less_minus.
   unfold c in |- *.
   apply sqrt_less.
   unfold c2 in |- *.
-  rstepl (a[^]2[+]Zero).
+  rstepl (a[^]2[+][0]).
   apply plus_resp_less_lft.
-  change (Zero [<] b[^]2) in |- *.
+  change ([0] [<] b[^]2) in |- *.
   apply pos_square. assumption.
   apply pos_half.
 Qed.
@@ -322,8 +322,8 @@ Proof.
  (* astepl b[^] (2) [+] (a[^] (2) [+][--] (a[^] (2))). *)
  apply eq_transitive_unfolded with (b[^]2[+] (a[^]2[+][--] (a[^]2))).
   apply eq_symmetric_unfolded. apply plus_assoc_unfolded.
-  (* Step_final b[^] (2) [+]Zero. *)
-  apply eq_transitive_unfolded with (b[^]2[+]Zero).
+  (* Step_final b[^] (2) [+][0]. *)
+  apply eq_transitive_unfolded with (b[^]2[+][0]).
   apply bin_op_wd_unfolded. apply eq_reflexive_unfolded.
    apply cg_rht_inv_unfolded.
  apply cm_rht_unit_unfolded.
@@ -368,17 +368,17 @@ Proof.
   apply eq_symmetric_unfolded. apply nexp_two.
 Qed.
 
-Lemma nrCC1_a6 : Zero [<] a'2[*]b'2.
+Lemma nrCC1_a6 : [0] [<] a'2[*]b'2.
 Proof.
  apply (mult_resp_pos IR).
   apply nrCC1_a'2pos.
  apply nrCC1_b'2pos.
 Qed.
 
-Lemma nrCC1_a6' : Zero [<] (b[*]Half) [^]2.
+Lemma nrCC1_a6' : [0] [<] (b[*]Half) [^]2.
 Proof.
  apply pos_square.
- (* astepr Zero[*]Half. *)
+ (* astepr [0][*]Half. *)
  apply ap_wdr_unfolded with (ZeroR[*]Half).
   2: apply cring_mult_zero_op.
  apply mult_rht_resp_ap; try assumption.
@@ -387,7 +387,7 @@ Proof.
 Qed.
 Hint Resolve nrCC1_a5: algebra.
 
-Lemma nrCC1_a7_upper : Zero [<] b -> a'[*]b' [=] b[*]Half.
+Lemma nrCC1_a7_upper : [0] [<] b -> a'[*]b' [=] b[*]Half.
 Proof.
  intros.
  unfold a', b' in |- *.
@@ -404,7 +404,7 @@ Proof.
   apply pos_half.
 Qed.
 
-Lemma nrCC1_a7_lower : b [<] Zero -> a'[*][--]b' [=] b[*]Half.
+Lemma nrCC1_a7_lower : b [<] [0] -> a'[*][--]b' [=] b[*]Half.
 Proof.
  intros.
  (* astepl [--] (a'[*]b'). *)
@@ -430,7 +430,7 @@ Proof.
 Qed.
 Hint Resolve nrCC1_a3 nrCC1_a7_upper nrCC1_a7_lower: algebra.
 
-Lemma nrootCC_1_upper : Zero [<] b -> (a'[+I*]b') [^]2 [=] a[+I*]b.
+Lemma nrootCC_1_upper : [0] [<] b -> (a'[+I*]b') [^]2 [=] a[+I*]b.
 Proof.
  intros.
  (* astepl (a'[^] (2) [-]b'[^] (2)) [+I*] ((a'[*]b') [*]Two). *)
@@ -449,7 +449,7 @@ Proof.
  apply half_1'.
 Qed.
 
-Lemma nrootCC_1_lower : b [<] Zero -> (a'[+I*][--]b') [^]2 [=] a[+I*]b.
+Lemma nrootCC_1_lower : b [<] [0] -> (a'[+I*][--]b') [^]2 [=] a[+I*]b.
 Proof.
  intros.
  cut (a'[^]2[-][--]b'[^]2 [=] a); intros.
@@ -474,7 +474,7 @@ Qed.
 
 Lemma nrootCC_1_ap_real : {z : CC | z[^]2 [=] a[+I*]b}.
 Proof.
- elim (ap_imp_less _ b Zero).
+ elim (ap_imp_less _ b [0]).
    intro H.
    exists (a'[+I*][--]b'). apply nrootCC_1_lower. assumption.
    intro H.
@@ -490,12 +490,12 @@ End NRootCC_1_ap_real.
 Section NRootCC_1_ap_imag.
 
 (**
-%\begin{convention}% Let [a,b : IR] and [a_ : (a [#] Zero)] and define
+%\begin{convention}% Let [a,b : IR] and [a_ : (a [#] [0])] and define
 [c' := (a[+I*]b) [*][--]II := a'[+I*]b'].
 %\end{convention}%
 *)
 Variables a b : IR.
-Hypothesis a_ : a [#] Zero.
+Hypothesis a_ : a [#] [0].
 
 (* begin hide *)
 Let c' := (a[+I*]b) [*][--]II.
@@ -521,8 +521,8 @@ Proof.
   (* astepl (a[+I*]b) [*] ( [--]II[*]II). *)
   apply eq_transitive_unfolded with ((a[+I*]b) [*] ( [--]II[*]II)).
    apply eq_symmetric_unfolded. apply mult_assoc_unfolded.
-   (* Step_final (a[+I*]b) [*]One. *)
-   apply eq_transitive_unfolded with ((a[+I*]b) [*]One).
+   (* Step_final (a[+I*]b) [*][1]. *)
+   apply eq_transitive_unfolded with ((a[+I*]b) [*][1]).
    apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. exact I_recip_lft.
     apply mult_one.
  cut (b[+I*][--]a [=] c'); intros.
@@ -557,7 +557,7 @@ End NRootCC_1_ap_imag.
 
 (** We now define the roots of arbitrary non zero complex numbers. *)
 
-Lemma nrootCC_1 : forall c : CC, c [#] Zero -> {z : CC | z[^]2 [=] c}.
+Lemma nrootCC_1 : forall c : CC, c [#] [0] -> {z : CC | z[^]2 [=] c}.
 Proof.
  intros.
  pattern c in |- *.
@@ -571,15 +571,15 @@ End NRootCC_1.
 Section NRootCC_2.
 
 (**
-%\begin{convention}% Let [n : nat] and [c,z : CC] and [c_:(c [#] Zero)].
+%\begin{convention}% Let [n : nat] and [c,z : CC] and [c_:(c [#] [0])].
 %\end{convention}%
 *)
 Variable n : nat.
 Variables c z : CC.
-Hypothesis c_ : c [#] Zero.
+Hypothesis c_ : c [#] [0].
 
 Lemma nrootCC_2' : (z[*]CC_conj z) [^]n [=] c[*]CC_conj c ->
- z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] Zero -> (z[^]n) [^]2 [=] c[^]2.
+ z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] [0] -> (z[^]n) [^]2 [=] c[^]2.
 Proof.
  intros.
  cut (z[^]n[*]CC_conj c [=] CC_conj z[^]n[*]c); intros.
@@ -588,8 +588,8 @@ Proof.
    (* astepl c. *)
    apply ap_wdl_unfolded with c.
     2: apply eq_symmetric_unfolded. 2: apply CC_conj_conj.
-    (* astepr (Zero::CC). *)
-    apply ap_wdr_unfolded with (Zero:CC).
+    (* astepr ([0]::CC). *)
+    apply ap_wdr_unfolded with ([0]:CC).
     exact c_.
    apply eq_symmetric_unfolded. exact CC_conj_zero.
    (* astepl (z[^]n[*]z[^]n) [*] (CC_conj c). *)
@@ -619,10 +619,10 @@ Proof.
    apply mult_assoc_unfolded.
   apply bin_op_wd_unfolded. apply eq_symmetric_unfolded. apply nexp_two.
    apply eq_reflexive_unfolded.
- cut (forall (G : CGroup) (x y : G), x[-]y [=] Zero -> x [=] y); intros.
+ cut (forall (G : CGroup) (x y : G), x[-]y [=] [0] -> x [=] y); intros.
   apply H1. assumption.
-  (* astepl x[+]Zero. *)
-  apply eq_transitive_unfolded with (x[+]Zero).
+  (* astepl x[+][0]. *)
+  apply eq_transitive_unfolded with (x[+][0]).
   apply eq_symmetric_unfolded. apply cm_rht_unit_unfolded.
   (* astepl x[+] ( [--]y[+]y). *)
   apply eq_transitive_unfolded with (x[+] ( [--]y[+]y)).
@@ -631,14 +631,14 @@ Proof.
   (* astepl (x[+][--]y) [+]y. *)
   apply eq_transitive_unfolded with (x[+][--]y[+]y).
   apply plus_assoc_unfolded.
- (* Step_final Zero[+]y. *)
- apply eq_transitive_unfolded with (Zero[+]y).
+ (* Step_final [0][+]y. *)
+ apply eq_transitive_unfolded with ([0][+]y).
   apply bin_op_wd_unfolded. exact H1. apply eq_reflexive_unfolded.
    apply cm_lft_unit_unfolded.
 Qed.
 
 Lemma nrootCC_2 : (z[*]CC_conj z) [^]n [=] c[*]CC_conj c ->
- z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] Zero -> z[^]n [=] c or z[^]n [=] [--]c.
+ z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] [0] -> z[^]n [=] c or z[^]n [=] [--]c.
 Proof.
  intros.
  apply cond_square_eq; try assumption.
@@ -661,11 +661,11 @@ Proof.
  intros.
  elim p; intros.
   unfold Im_poly in |- *.
-  (* astepl (Zero::IR). *)
+  (* astepl ([0]::IR). *)
   apply eq_transitive_unfolded with ZeroR.
    apply eq_reflexive_unfolded.
-  (* Step_final (Im (Zero::CC)). *)
-  apply eq_transitive_unfolded with (Im (Zero:CC)); apply eq_reflexive_unfolded.
+  (* Step_final (Im ([0]::CC)). *)
+  apply eq_transitive_unfolded with (Im ([0]:CC)); apply eq_reflexive_unfolded.
  (* astepl (cpoly_linear ? (Im s) (Im_poly c))!r. *)
  apply eq_transitive_unfolded with (cpoly_linear _ (Im s) (Im_poly c)) ! r.
   apply eq_reflexive_unfolded.
@@ -684,15 +684,15 @@ Proof.
     apply eq_transitive_unfolded with (Im (s[+]cc_IR r[*]c ! (cc_IR r))).
    apply eq_reflexive_unfolded.
   apply eq_reflexive_unfolded.
- (* astepl r0[*] (Im c0) [+]Zero. *)
- apply eq_transitive_unfolded with (r0[*]Im c0[+]Zero).
+ (* astepl r0[*] (Im c0) [+][0]. *)
+ apply eq_transitive_unfolded with (r0[*]Im c0[+][0]).
   apply eq_symmetric_unfolded. apply cm_rht_unit_unfolded.
-  (* astepl r0[*] (Im c0) [+]Zero[*] (Re c0). *)
-  apply eq_transitive_unfolded with (r0[*]Im c0[+]Zero[*]Re c0).
+  (* astepl r0[*] (Im c0) [+][0][*] (Re c0). *)
+  apply eq_transitive_unfolded with (r0[*]Im c0[+][0][*]Re c0).
   apply bin_op_wd_unfolded. apply eq_reflexive_unfolded.
    apply eq_symmetric_unfolded. apply cring_mult_zero_op.
-  (* astepl (Im (r0[+I*]Zero) [*] ((Re c0) [+I*] (Im c0))). *)
-  apply eq_transitive_unfolded with (Im ((r0[+I*]Zero) [*] (Re c0[+I*]Im c0))).
+  (* astepl (Im (r0[+I*][0]) [*] ((Re c0) [+I*] (Im c0))). *)
+  apply eq_transitive_unfolded with (Im ((r0[+I*][0]) [*] (Re c0[+I*]Im c0))).
   apply eq_reflexive_unfolded.
  (* Step_final (Im (cc_IR r0) [*] ((Re c0) [+I*] (Im c0))). *)
  apply eq_transitive_unfolded with (Im (cc_IR r0[*] (Re c0[+I*]Im c0))).
@@ -705,11 +705,11 @@ Proof.
  intro.
  elim p; intros.
   unfold Im_poly in |- *.
-  (* astepl (Zero::IR). *)
+  (* astepl ([0]::IR). *)
   apply eq_transitive_unfolded with ZeroR.
    apply eq_reflexive_unfolded.
-  (* Step_final (Im (Zero::CC)). *)
-  apply eq_transitive_unfolded with (Im (Zero:CC)).
+  (* Step_final (Im ([0]::CC)). *)
+  apply eq_transitive_unfolded with (Im ([0]:CC)).
    apply eq_reflexive_unfolded.
   apply eq_reflexive_unfolded.
  elim n; intros.
@@ -727,17 +727,17 @@ Proof.
 Qed.
 
 (**
-%\begin{convention}% Let [a,b : IR], [b_ : (b [#] Zero)] and [n : nat].
+%\begin{convention}% Let [a,b : IR], [b_ : (b [#] [0])] and [n : nat].
 %\end{convention}%
 *)
 
 Variables a b : IR.
-Hypothesis b_ : b [#] Zero.
+Hypothesis b_ : b [#] [0].
 Variable n : nat.
 
 Definition nrCC3_poly'' := (_X_[+]_C_ II) [^]n.
 
-Lemma nrCC3_a3 : forall r : IR, nrCC3_poly'' ! (cc_IR r) [=] (r[+I*]One) [^]n.
+Lemma nrCC3_a3 : forall r : IR, nrCC3_poly'' ! (cc_IR r) [=] (r[+I*][1]) [^]n.
 Proof.
  intros.
  unfold nrCC3_poly'' in |- *.
@@ -751,11 +751,11 @@ Proof.
   (* astepl ((cc_IR r) [+]II) [^]n. *)
   apply eq_transitive_unfolded with ((cc_IR r[+]II) [^]n).
    apply un_op_wd_unfolded. apply H.
-   (* astepl ((r[+I*]Zero) [+] (Zero[+I*]One)) [^]n. *)
-   apply eq_transitive_unfolded with ((r[+I*]Zero[+]Zero[+I*]One) [^]n).
+   (* astepl ((r[+I*][0]) [+] ([0][+I*][1])) [^]n. *)
+   apply eq_transitive_unfolded with ((r[+I*][0][+][0][+I*][1]) [^]n).
    apply eq_reflexive_unfolded.
-  (* Step_final ((r[+]Zero) [+I*] (Zero[+]One)) [^]n. *)
-  apply eq_transitive_unfolded with (((r[+]Zero) [+I*] (Zero[+]One)) [^]n).
+  (* Step_final ((r[+][0]) [+I*] ([0][+][1])) [^]n. *)
+  apply eq_transitive_unfolded with (((r[+][0]) [+I*] ([0][+][1])) [^]n).
    apply eq_reflexive_unfolded.
   apply un_op_wd_unfolded. apply I_wd. apply cm_rht_unit_unfolded.
   apply cm_lft_unit_unfolded.
@@ -788,7 +788,7 @@ Proof.
  auto with arith.
 Qed.
 
-Lemma nrCC3_a6 : nth_coeff n nrCC3_poly'' [=] One.
+Lemma nrCC3_a6 : nth_coeff n nrCC3_poly'' [=] [1].
 Proof.
  cut (monic n nrCC3_poly''); intros.
   unfold monic in H.
@@ -806,7 +806,7 @@ Qed.
 
 Definition nrCC3_poly' := nrCC3_poly''[*]_C_ (a[+I*][--]b).
 
-Lemma nrCC3_a7 : forall r : IR, nrCC3_poly' ! (cc_IR r) [=] (r[+I*]One) [^]n[*] (a[+I*][--]b).
+Lemma nrCC3_a7 : forall r : IR, nrCC3_poly' ! (cc_IR r) [=] (r[+I*][1]) [^]n[*] (a[+I*][--]b).
 Proof.
  intros.
  unfold nrCC3_poly' in |- *.
@@ -838,15 +838,15 @@ Proof.
  apply eq_transitive_unfolded with (nth_coeff n nrCC3_poly''[*] (a[+I*][--]b)).
   apply nth_coeff_p_mult_c_.
  Hint Resolve nrCC3_a6: algebra.
- (* Step_final One[*] (a[+I*][--]b). *)
- apply eq_transitive_unfolded with (One[*] (a[+I*][--]b)).
+ (* Step_final [1][*] (a[+I*][--]b). *)
+ apply eq_transitive_unfolded with ([1][*] (a[+I*][--]b)).
   apply bin_op_wd_unfolded. exact nrCC3_a6. apply eq_reflexive_unfolded.
    apply one_mult.
 Qed.
 
 Definition nrootCC_3_poly := Im_poly nrCC3_poly'.
 
-Lemma nrootCC_3_ : forall r : IR, nrootCC_3_poly ! r [=] Im ((r[+I*]One) [^]n[*] (a[+I*][--]b)).
+Lemma nrootCC_3_ : forall r : IR, nrootCC_3_poly ! r [=] Im ((r[+I*][1]) [^]n[*] (a[+I*][--]b)).
 Proof.
  intros.
  unfold nrootCC_3_poly in |- *.
@@ -858,27 +858,27 @@ Proof.
 Qed.
 
 Lemma nrootCC_3 : forall r : IR,
- cc_IR nrootCC_3_poly ! r[*] (Two[*]II) [=] (r[+I*]One) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--]One) [^]n[*] (a[+I*]b).
+ cc_IR nrootCC_3_poly ! r[*] (Two[*]II) [=] (r[+I*][1]) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--][1]) [^]n[*] (a[+I*]b).
 Proof.
  intros.
- cut (CC_conj ((r[+I*]One) [^]n[*] (a[+I*][--]b)) [=] (r[+I*][--]One) [^]n[*] (a[+I*]b)); intros.
+ cut (CC_conj ((r[+I*][1]) [^]n[*] (a[+I*][--]b)) [=] (r[+I*][--][1]) [^]n[*] (a[+I*]b)); intros.
   Hint Resolve nrootCC_3_: algebra.
-  (* astepl (cc_IR (Im (r[+I*]One) [^]n[*] (a[+I*][--]b))) [*] (Two[*]II). *)
-  apply eq_transitive_unfolded with (cc_IR (Im ((r[+I*]One) [^]n[*] (a[+I*][--]b))) [*] (Two[*]II)).
+  (* astepl (cc_IR (Im (r[+I*][1]) [^]n[*] (a[+I*][--]b))) [*] (Two[*]II). *)
+  apply eq_transitive_unfolded with (cc_IR (Im ((r[+I*][1]) [^]n[*] (a[+I*][--]b))) [*] (Two[*]II)).
    apply bin_op_wd_unfolded. apply cc_IR_wd. apply nrootCC_3_.
     apply eq_reflexive_unfolded.
   Hint Resolve calculate_Im: algebra.
-  (* Step_final (r[+I*]One) [^]n[*] (a[+I*][--]b) [-] (CC_conj (r[+I*]One) [^]n[*] (a[+I*][--]b)).
+  (* Step_final (r[+I*][1]) [^]n[*] (a[+I*][--]b) [-] (CC_conj (r[+I*][1]) [^]n[*] (a[+I*][--]b)).
   *)
-  apply eq_transitive_unfolded with ((r[+I*]One) [^]n[*] (a[+I*][--]b) [-]
-    CC_conj ((r[+I*]One) [^]n[*] (a[+I*][--]b))).
+  apply eq_transitive_unfolded with ((r[+I*][1]) [^]n[*] (a[+I*][--]b) [-]
+    CC_conj ((r[+I*][1]) [^]n[*] (a[+I*][--]b))).
    apply calculate_Im.
   apply cg_minus_wd. apply eq_reflexive_unfolded. exact H.
-   (* astepl (CC_conj (r[+I*]One) [^]n) [*] (CC_conj a[+I*][--]b). *)
-   apply eq_transitive_unfolded with (CC_conj ((r[+I*]One) [^]n) [*]CC_conj (a[+I*][--]b)).
+   (* astepl (CC_conj (r[+I*][1]) [^]n) [*] (CC_conj a[+I*][--]b). *)
+   apply eq_transitive_unfolded with (CC_conj ((r[+I*][1]) [^]n) [*]CC_conj (a[+I*][--]b)).
   apply CC_conj_mult.
- (* Step_final (CC_conj r[+I*]One) [^]n[*]a[+I*][--][--]b. *)
- apply eq_transitive_unfolded with (CC_conj (r[+I*]One) [^]n[*] (a[+I*][--][--]b)).
+ (* Step_final (CC_conj r[+I*][1]) [^]n[*]a[+I*][--][--]b. *)
+ apply eq_transitive_unfolded with (CC_conj (r[+I*][1]) [^]n[*] (a[+I*][--][--]b)).
   apply bin_op_wd_unfolded. apply CC_conj_nexp. apply eq_reflexive_unfolded.
    apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. apply I_wd.
   apply eq_reflexive_unfolded. apply cg_inv_inv.
@@ -914,8 +914,8 @@ Proof.
  (* astepl (Im (nth_coeff m p)). *)
  apply eq_transitive_unfolded with (Im (nth_coeff m p)).
   apply nrCC3_a2.
- (* Step_final (Im (Zero::CC)). *)
- apply eq_transitive_unfolded with (Im (Zero:CC)).
+ (* Step_final (Im ([0]::CC)). *)
+ apply eq_transitive_unfolded with (Im ([0]:CC)).
   apply Im_wd. apply H. exact H0.
   apply eq_reflexive_unfolded.
 Qed.
@@ -972,13 +972,13 @@ Section NRootCC_4.
 Section NRootCC_4_ap_real.
 
 (**
-%\begin{convention}% Let [a,b : IR], [b_ : (b [#] Zero)], [n : nat] and
+%\begin{convention}% Let [a,b : IR], [b_ : (b [#] [0])], [n : nat] and
 [n_:(odd n)]; define [c := a[+I*]b].
 %\end{convention}%
 *)
 
 Variables a b : IR.
-Hypothesis b_ : b [#] Zero.
+Hypothesis b_ : b [#] [0].
 Variable n : nat.
 Hypothesis n_ : odd n.
 
@@ -988,24 +988,24 @@ Let c := a[+I*]b.
 
 Section NRootCC_4_solutions.
 
-Lemma nrCC4_a1 : {r : IR | (r[+I*]One) [^]n[*]CC_conj c[-] (r[+I*][--]One) [^]n[*]c [=] Zero}.
+Lemma nrCC4_a1 : {r : IR | (r[+I*][1]) [^]n[*]CC_conj c[-] (r[+I*][--][1]) [^]n[*]c [=] [0]}.
 Proof.
  elim (realpolyn_oddhaszero (nrootCC_3_poly a b n)).
   intro r. intro H.
   exists r.
-  (* astepl (r[+I*]One) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--]One) [^]n[*] (a[+I*]b). *)
+  (* astepl (r[+I*][1]) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--][1]) [^]n[*] (a[+I*]b). *)
   apply eq_transitive_unfolded
-    with ((r[+I*]One) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--]One) [^]n[*] (a[+I*]b)).
+    with ((r[+I*][1]) [^]n[*] (a[+I*][--]b) [-] (r[+I*][--][1]) [^]n[*] (a[+I*]b)).
    apply eq_reflexive_unfolded.
   Hint Resolve nrootCC_3: algebra.
   (* astepl (cc_IR ((nrootCC_3_poly a b n)!r)) [*] (Two[*]II). *)
   apply eq_transitive_unfolded with (cc_IR (nrootCC_3_poly a b n) ! r[*] (Two[*]II)).
    apply eq_symmetric_unfolded. apply nrootCC_3.
-   (* astepl (cc_IR Zero) [*] (Two[*]II). *)
-   apply eq_transitive_unfolded with (cc_IR Zero[*] (Two[*]II)).
+   (* astepl (cc_IR [0]) [*] (Two[*]II). *)
+   apply eq_transitive_unfolded with (cc_IR [0][*] (Two[*]II)).
    apply bin_op_wd_unfolded. apply cc_IR_wd. exact H. apply eq_reflexive_unfolded.
-    (* Step_final Zero[*] (Two[*]II). *)
-    apply eq_transitive_unfolded with (Zero[*] (Two[*]II)).
+    (* Step_final [0][*] (Two[*]II). *)
+    apply eq_transitive_unfolded with ([0][*] (Two[*]II)).
    apply eq_reflexive_unfolded.
   apply cring_mult_zero_op.
  unfold odd_cpoly in |- *.
@@ -1016,12 +1016,12 @@ Proof.
 Qed.
 
 (**
-%\begin{convention}% Let [r2',c2 : IR] and [r2'_ : (r2' [#] Zero)].
+%\begin{convention}% Let [r2',c2 : IR] and [r2'_ : (r2' [#] [0])].
 %\end{convention}%
 *)
 
 Variables r2' c2 : IR.
-Hypothesis r2'_ : r2' [#] Zero.
+Hypothesis r2'_ : r2' [#] [0].
 
 Lemma nrCC4_a1' : {y2 : IR | (y2[*]r2') [^]n [=] c2}.
 Proof.
@@ -1031,8 +1031,8 @@ Proof.
   (* astepl y2r2'[^]n. *)
   apply eq_transitive_unfolded with (y2r2'[^]n).
    apply un_op_wd_unfolded. apply div_1.
-   (* astepl y2r2'[^]n[+]Zero. *)
-   apply eq_transitive_unfolded with (y2r2'[^]n[+]Zero).
+   (* astepl y2r2'[^]n[+][0]. *)
+   apply eq_transitive_unfolded with (y2r2'[^]n[+][0]).
    apply eq_symmetric_unfolded. apply cm_rht_unit_unfolded.
    (* astepl y2r2'[^]n[+] ( [--]c2[+]c2). *)
    apply eq_transitive_unfolded with (y2r2'[^]n[+] ( [--]c2[+]c2)).
@@ -1049,8 +1049,8 @@ Proof.
   apply eq_transitive_unfolded with ((nrootCC_3'_poly c2 n) ! y2r2'[+]c2).
    apply bin_op_wd_unfolded. apply eq_symmetric_unfolded. apply nrootCC_3'.
     apply eq_reflexive_unfolded.
-  (* Step_final Zero[+]c2. *)
-  apply eq_transitive_unfolded with (Zero[+]c2).
+  (* Step_final [0][+]c2. *)
+  apply eq_transitive_unfolded with ([0][+]c2).
    apply bin_op_wd_unfolded. assumption. apply eq_reflexive_unfolded.
     apply cm_lft_unit_unfolded.
  unfold odd_cpoly in |- *.
@@ -1068,17 +1068,17 @@ Section NRootCC_4_equations.
 
 (**
 %\begin{convention}% Let [r,y2 : IR] be such that
-[(r[+I*]One) [^]n[*] (CC_conj c) [-] (r[+I*][--]One) [^]n[*]c [=] Zero]
-and [(y2[*] (r[^] (2) [+]One)) [^]n [=] a[^] (2) [+]b[^] (2)].
+[(r[+I*][1]) [^]n[*] (CC_conj c) [-] (r[+I*][--][1]) [^]n[*]c [=] [0]]
+and [(y2[*] (r[^] (2) [+][1])) [^]n [=] a[^] (2) [+]b[^] (2)].
 %\end{convention}%
 *)
 Variable r : IR.
-Hypothesis r_property : (r[+I*]One) [^]n[*]CC_conj c[-] (r[+I*][--]One) [^]n[*]c [=] Zero.
+Hypothesis r_property : (r[+I*][1]) [^]n[*]CC_conj c[-] (r[+I*][--][1]) [^]n[*]c [=] [0].
 
 Variable y2 : IR.
-Hypothesis y2_property : (y2[*] (r[^]2[+]One)) [^]n [=] a[^]2[+]b[^]2.
+Hypothesis y2_property : (y2[*] (r[^]2[+][1])) [^]n [=] a[^]2[+]b[^]2.
 
-Lemma nrCC4_a2 : Zero [<] a[^]2[+]b[^]2.
+Lemma nrCC4_a2 : [0] [<] a[^]2[+]b[^]2.
 Proof.
  apply plus_resp_nonneg_pos.
   apply sqr_nonneg.
@@ -1086,16 +1086,16 @@ Proof.
  assumption.
 Qed.
 
-Lemma nrCC4_a3 : Zero [<] r[^]2[+]One.
+Lemma nrCC4_a3 : [0] [<] r[^]2[+][1].
 Proof.
  apply plus_resp_nonneg_pos.
   apply sqr_nonneg.
  apply pos_one.
 Qed.
 
-Lemma nrCC4_a4 : Zero [<] y2.
+Lemma nrCC4_a4 : [0] [<] y2.
 Proof.
- apply mult_cancel_pos_lft with (r[^]2[+]One).
+ apply mult_cancel_pos_lft with (r[^]2[+][1]).
   apply odd_power_cancel_pos with n.
    assumption.
   apply (pos_wd _ _ _ y2_property).
@@ -1121,20 +1121,20 @@ Qed.
 Lemma nrCC4_a6 : (x[^]2[+]y[^]2) [^]n [=] a[^]2[+]b[^]2.
 Proof.
  unfold x in |- *. unfold nrCC4_x in |- *.
- cut ((y[*]r) [^]2[+]y[^]2 [=] y[^]2[*] (r[^]2[+]One)). intro.
-  (* astepl (y[^] (2) [*] (r[^] (2) [+]One)) [^]n. *)
-  apply eq_transitive_unfolded with ((y[^]2[*] (r[^]2[+]One)) [^]n).
+ cut ((y[*]r) [^]2[+]y[^]2 [=] y[^]2[*] (r[^]2[+][1])). intro.
+  (* astepl (y[^] (2) [*] (r[^] (2) [+][1])) [^]n. *)
+  apply eq_transitive_unfolded with ((y[^]2[*] (r[^]2[+][1])) [^]n).
    apply un_op_wd_unfolded. exact H.
    cut (y[^]2 [=] y2). intro.
-   (* Step_final (y2[*] (r[^] (2) [+]One)) [^]n. *)
-   apply eq_transitive_unfolded with ((y2[*] (r[^]2[+]One)) [^]n).
+   (* Step_final (y2[*] (r[^] (2) [+][1])) [^]n. *)
+   apply eq_transitive_unfolded with ((y2[*] (r[^]2[+][1])) [^]n).
     apply un_op_wd_unfolded. apply bin_op_wd_unfolded. exact H0.
     apply eq_reflexive_unfolded.
    exact y2_property.
   unfold y in |- *. unfold nrCC4_y in |- *.
   apply sqrt_sqr.
- (* Step_final y[^] (2) [*]r[^] (2) [+]y[^] (2) [*]One. *)
- apply eq_transitive_unfolded with (y[^]2[*]r[^]2[+]y[^]2[*]One).
+ (* Step_final y[^] (2) [*]r[^] (2) [+]y[^] (2) [*][1]. *)
+ apply eq_transitive_unfolded with (y[^]2[*]r[^]2[+]y[^]2[*][1]).
   apply bin_op_wd_unfolded. apply mult_nexp. apply eq_symmetric_unfolded.
    apply mult_one.
  apply eq_symmetric_unfolded. apply ring_dist_unfolded.
@@ -1144,59 +1144,59 @@ Definition nrCC4_z := x[+I*]y.
 
 Let z := nrCC4_z.
 
-Lemma nrCC4_a7 : z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] Zero.
+Lemma nrCC4_a7 : z[^]n[*]CC_conj c[-]CC_conj z[^]n[*]c [=] [0].
 Proof.
  unfold z in |- *. unfold nrCC4_z in |- *.
  (* astepl (x[+I*]y) [^]n[*] (CC_conj c) [-] (x[+I*][--]y) [^]n[*]c. *)
  apply eq_transitive_unfolded with ((x[+I*]y) [^]n[*]CC_conj c[-] (x[+I*][--]y) [^]n[*]c).
   apply eq_reflexive_unfolded.
  unfold x in |- *. unfold nrCC4_x in |- *.
- cut ((y[*]r[+I*]y) [^]n[*]CC_conj c [=] cc_IR y[^]n[*] ((r[+I*]One) [^]n[*]CC_conj c)). intro.
-  cut ((y[*]r[+I*][--]y) [^]n[*]c [=] cc_IR y[^]n[*] ((r[+I*][--]One) [^]n[*]c)). intro.
-   (* astepl (cc_IR y) [^]n[*] ((r[+I*]One) [^]n[*] (CC_conj c)) [-]
-     (cc_IR y) [^]n[*] ((r[+I*][--]One) [^]n[*]c). *)
-   apply eq_transitive_unfolded with (cc_IR y[^]n[*] ((r[+I*]One) [^]n[*]CC_conj c) [-]
-     cc_IR y[^]n[*] ((r[+I*][--]One) [^]n[*]c)).
+ cut ((y[*]r[+I*]y) [^]n[*]CC_conj c [=] cc_IR y[^]n[*] ((r[+I*][1]) [^]n[*]CC_conj c)). intro.
+  cut ((y[*]r[+I*][--]y) [^]n[*]c [=] cc_IR y[^]n[*] ((r[+I*][--][1]) [^]n[*]c)). intro.
+   (* astepl (cc_IR y) [^]n[*] ((r[+I*][1]) [^]n[*] (CC_conj c)) [-]
+     (cc_IR y) [^]n[*] ((r[+I*][--][1]) [^]n[*]c). *)
+   apply eq_transitive_unfolded with (cc_IR y[^]n[*] ((r[+I*][1]) [^]n[*]CC_conj c) [-]
+     cc_IR y[^]n[*] ((r[+I*][--][1]) [^]n[*]c)).
     apply cg_minus_wd. exact H. exact H0.
-     (* astepl (cc_IR y) [^]n[*] (((r[+I*]One) [^]n[*] (CC_conj c)) [-] ((r[+I*][--]One) [^]n[*]c)). *)
+     (* astepl (cc_IR y) [^]n[*] (((r[+I*][1]) [^]n[*] (CC_conj c)) [-] ((r[+I*][--][1]) [^]n[*]c)). *)
      apply eq_transitive_unfolded with
-       (cc_IR y[^]n[*] ((r[+I*]One) [^]n[*]CC_conj c[-] (r[+I*][--]One) [^]n[*]c)).
+       (cc_IR y[^]n[*] ((r[+I*][1]) [^]n[*]CC_conj c[-] (r[+I*][--][1]) [^]n[*]c)).
     apply eq_symmetric_unfolded. apply dist_2a.
-    (* Step_final (cc_IR y) [^]n[*]Zero. *)
-    apply eq_transitive_unfolded with (cc_IR y[^]n[*]Zero).
+    (* Step_final (cc_IR y) [^]n[*][0]. *)
+    apply eq_transitive_unfolded with (cc_IR y[^]n[*][0]).
     apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. exact r_property.
      apply cring_mult_zero.
-  cut ((y[*]r[+I*][--]y) [^]n [=] cc_IR y[^]n[*] (r[+I*][--]One) [^]n). intro.
-   (* Step_final ((cc_IR y) [^]n[*] (r[+I*][--]One) [^]n) [*]c. *)
-   apply eq_transitive_unfolded with (cc_IR y[^]n[*] (r[+I*][--]One) [^]n[*]c).
+  cut ((y[*]r[+I*][--]y) [^]n [=] cc_IR y[^]n[*] (r[+I*][--][1]) [^]n). intro.
+   (* Step_final ((cc_IR y) [^]n[*] (r[+I*][--][1]) [^]n) [*]c. *)
+   apply eq_transitive_unfolded with (cc_IR y[^]n[*] (r[+I*][--][1]) [^]n[*]c).
     apply bin_op_wd_unfolded. exact H0. apply eq_reflexive_unfolded.
      apply eq_symmetric_unfolded. apply mult_assoc_unfolded.
-   cut (y[*]r[+I*][--]y [=] cc_IR y[*] (r[+I*][--]One)). intro.
-   (* Step_final ((cc_IR y) [*] (r[+I*][--]One)) [^]n. *)
-   apply eq_transitive_unfolded with ((cc_IR y[*] (r[+I*][--]One)) [^]n).
+   cut (y[*]r[+I*][--]y [=] cc_IR y[*] (r[+I*][--][1])). intro.
+   (* Step_final ((cc_IR y) [*] (r[+I*][--][1])) [^]n. *)
+   apply eq_transitive_unfolded with ((cc_IR y[*] (r[+I*][--][1])) [^]n).
     apply un_op_wd_unfolded. exact H0.
     apply mult_nexp.
-  cut ( [--]y [=] y[*][--]One). intro.
-   (* Step_final (y[*]r) [+I*] (y[*][--]One). *)
-   apply eq_transitive_unfolded with (y[*]r[+I*]y[*][--]One).
+  cut ( [--]y [=] y[*][--][1]). intro.
+   (* Step_final (y[*]r) [+I*] (y[*][--][1]). *)
+   apply eq_transitive_unfolded with (y[*]r[+I*]y[*][--][1]).
     apply I_wd. apply eq_reflexive_unfolded. exact H0.
      apply eq_symmetric_unfolded. apply cc_IR_mult_rht.
-   (* Step_final [--] (y[*]One). *)
-   apply eq_transitive_unfolded with ( [--] (y[*]One)).
+   (* Step_final [--] (y[*][1]). *)
+   apply eq_transitive_unfolded with ( [--] (y[*][1])).
    apply un_op_wd_unfolded. apply eq_symmetric_unfolded. apply mult_one.
    apply eq_symmetric_unfolded. apply cring_inv_mult_lft.
-  cut ((y[*]r[+I*]y) [^]n [=] cc_IR y[^]n[*] (r[+I*]One) [^]n). intro.
-  (* Step_final ((cc_IR y) [^]n[*] (r[+I*]One) [^]n) [*] (CC_conj c). *)
-  apply eq_transitive_unfolded with (cc_IR y[^]n[*] (r[+I*]One) [^]n[*]CC_conj c).
+  cut ((y[*]r[+I*]y) [^]n [=] cc_IR y[^]n[*] (r[+I*][1]) [^]n). intro.
+  (* Step_final ((cc_IR y) [^]n[*] (r[+I*][1]) [^]n) [*] (CC_conj c). *)
+  apply eq_transitive_unfolded with (cc_IR y[^]n[*] (r[+I*][1]) [^]n[*]CC_conj c).
    apply bin_op_wd_unfolded. exact H. apply eq_reflexive_unfolded.
     apply eq_symmetric_unfolded. apply mult_assoc_unfolded.
-  cut (y[*]r[+I*]y [=] cc_IR y[*] (r[+I*]One)). intro.
-  (* Step_final ((cc_IR y) [*] (r[+I*]One)) [^]n. *)
-  apply eq_transitive_unfolded with ((cc_IR y[*] (r[+I*]One)) [^]n).
+  cut (y[*]r[+I*]y [=] cc_IR y[*] (r[+I*][1])). intro.
+  (* Step_final ((cc_IR y) [*] (r[+I*][1])) [^]n. *)
+  apply eq_transitive_unfolded with ((cc_IR y[*] (r[+I*][1])) [^]n).
    apply un_op_wd_unfolded. exact H.
    apply mult_nexp.
- (* Step_final (y[*]r) [+I*] (y[*]One). *)
- apply eq_transitive_unfolded with (y[*]r[+I*]y[*]One).
+ (* Step_final (y[*]r) [+I*] (y[*][1]). *)
+ apply eq_transitive_unfolded with (y[*]r[+I*]y[*][1]).
   apply I_wd. apply eq_reflexive_unfolded. apply eq_symmetric_unfolded.
    apply mult_one.
  apply eq_symmetric_unfolded. apply cc_IR_mult_rht.
@@ -1254,10 +1254,10 @@ Lemma nrootCC_4_ap_real : {z : CC | z[^]n [=] c}.
 Proof.
  apply nrCC4_a10.
  elim nrCC4_a1. intro r. intro H.
- elim (nrCC4_a1' (r[^]2[+]One) (a[^]2[+]b[^]2)). intro y2. intro H0.
+ elim (nrCC4_a1' (r[^]2[+][1]) (a[^]2[+]b[^]2)). intro y2. intro H0.
   exists (nrCC4_z r y2 H0).
   apply nrCC4_a9. assumption.
-  change (r[^]2[+]One [#] Zero) in |- *.
+  change (r[^]2[+][1] [#] [0]) in |- *.
  apply pos_ap_zero.
  apply nrCC4_a3.
 Qed.
@@ -1267,12 +1267,12 @@ End NRootCC_4_ap_real.
 Section NRootCC_4_ap_imag.
 
 (**
-%\begin{convention}% Let [a,b : IR] and [n : nat] with [a [#] Zero]
+%\begin{convention}% Let [a,b : IR] and [n : nat] with [a [#] [0]]
 and [(odd n)]; define [c' := (a[+I*]b) [*]II := a'[+I*]b'].
 %\end{convention}%
 *)
 Variables a b : IR.
-Hypothesis a_ : a [#] Zero.
+Hypothesis a_ : a [#] [0].
 Variable n : nat.
 Hypothesis n_ : odd n.
 
@@ -1311,15 +1311,15 @@ Proof.
  (* astepl (a[+I*]b) [*] (II[*][--]II). *)
  apply eq_transitive_unfolded with ((a[+I*]b) [*] (II[*][--]II)).
   apply eq_symmetric_unfolded. apply mult_assoc_unfolded.
-  (* Step_final (a[+I*]b) [*]One. *)
-  apply eq_transitive_unfolded with ((a[+I*]b) [*]One).
+  (* Step_final (a[+I*]b) [*][1]. *)
+  apply eq_transitive_unfolded with ((a[+I*]b) [*][1]).
   apply bin_op_wd_unfolded. apply eq_reflexive_unfolded. exact I_recip_rht.
    apply mult_one.
 Qed.
 
 End NRootCC_4_ap_imag.
 
-Lemma nrootCC_4 : forall c, c [#] Zero -> forall n, odd n -> {z : CC | z[^]n [=] c}.
+Lemma nrootCC_4 : forall c, c [#] [0] -> forall n, odd n -> {z : CC | z[^]n [=] c}.
 Proof.
  intros.
  pattern c in |- *.
@@ -1355,11 +1355,11 @@ Qed.
 Hint Resolve nrCC_5a3: algebra.
 
 (**
-%\begin{convention}% Let [c : CC] with [c [#] Zero].
+%\begin{convention}% Let [c : CC] with [c [#] [0]].
 %\end{convention}%
 *)
 Variable c : CC.
-Hypothesis c_ : c [#] Zero.
+Hypothesis c_ : c [#] [0].
 
 Lemma nrCC_5a4 : forall n, 0 < n -> {z : CC | z[^]n [=] c} -> {z : CC | z[^]double n [=] c}.
 Proof.
@@ -1378,8 +1378,8 @@ Proof.
  (* astepl c. *)
  apply ap_wdl_unfolded with c.
   2: apply eq_symmetric_unfolded. 2: exact H1.
-  (* astepr (Zero::CC). *)
-  apply ap_wdr_unfolded with (Zero:CC).
+  (* astepr ([0]::CC). *)
+  apply ap_wdr_unfolded with ([0]:CC).
   exact c_.
  apply eq_symmetric_unfolded. apply zero_nexp. exact H.
 Qed.
@@ -1398,4 +1398,4 @@ End NRootCC_5.
 
 (** Final definition *)
 
-Definition CnrootCC : forall c, c [#] Zero -> forall n, 0 < n -> {z : CC | z[^]n [=] c} := nrootCC_5.
+Definition CnrootCC : forall c, c [#] [0] -> forall n, 0 < n -> {z : CC | z[^]n [=] c} := nrootCC_5.

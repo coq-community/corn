@@ -52,10 +52,10 @@ We will look at some notions of continuous functions.
 *)
 
 Definition continuous (f : CSetoid_fun A B) : CProp :=
-  forall (x : A) (n : nat) (H : Two[#]Zero),
+  forall (x : A) (n : nat) (H : Two[#][0]),
   {m : nat |
   forall y : A,
-  x[-d]y[<](One[/] Two[//]H)[^]m -> f x[-d]f y[<](One[/] Two[//]H)[^]n}.
+  x[-d]y[<]([1][/] Two[//]H)[^]m -> f x[-d]f y[<]([1][/] Two[//]H)[^]n}.
 
 Definition continuous' (f : CSetoid_fun A B) : CProp :=
   forall (x : A) (n : nat),
@@ -63,10 +63,10 @@ Definition continuous' (f : CSetoid_fun A B) : CProp :=
   forall y : A, x[-d]y[<=]one_div_succ m -> f x[-d]f y[<=]one_div_succ n}.
 
 Definition uni_continuous (f : CSetoid_fun A B) : CProp :=
-  forall (n : nat) (H : Two[#]Zero),
+  forall (n : nat) (H : Two[#][0]),
   {m : nat |
   forall x y : A,
-  x[-d]y[<](One[/] Two:IR[//]H)[^]m -> f x[-d]f y[<](One[/] Two:IR[//]H)[^]n}.
+  x[-d]y[<]([1][/] Two:IR[//]H)[^]m -> f x[-d]f y[<]([1][/] Two:IR[//]H)[^]n}.
 
 Definition uni_continuous' (f : CSetoid_fun A B) : CProp :=
   forall n : nat,
@@ -142,7 +142,7 @@ Proof.
    apply nexp_resp_pos.
    apply pos_two.
   unfold Snring in |- *.
-  apply less_wdr with (nexp IR p Two[+]One).
+  apply less_wdr with (nexp IR p Two[+][1]).
    apply shift_less_plus.
    apply minusOne_less.
   astepl (OneR[+]nexp IR p Two).
@@ -175,7 +175,7 @@ Proof.
  apply leEq_less_trans with (one_div_succ (R:=IR) (power n 2)).
   apply H1.
   apply less_leEq.
-  apply less_transitive_unfolded with ((One[/] Two:IR[//]H0)[^]S p).
+  apply less_transitive_unfolded with (([1][/] Two:IR[//]H0)[^]S p).
    exact H2.
   unfold one_div_succ in |- *.
   astepl (OneR[^]S p[/] (Two:IR)[^]S p[//]nexp_resp_ap_zero (S p) H0).
@@ -192,8 +192,8 @@ Proof.
  apply recip_resp_less.
   apply nexp_resp_pos.
   apply pos_two.
- astepr (nring (R:=IR) (power n 2)[+]One).
- astepl (nexp IR n Two[+]Zero).
+ astepr (nring (R:=IR) (power n 2)[+][1]).
+ astepl (nexp IR n Two[+][0]).
  apply plus_resp_leEq_less.
   apply eq_imp_leEq.
   apply nexp_power.
@@ -226,8 +226,8 @@ Proof.
   apply recip_resp_less.
    apply nexp_resp_pos.
    apply pos_two.
-  astepr (nring (R:=IR) (power p 2)[+]One).
-  astepl (nexp IR p Two[+]Zero).
+  astepr (nring (R:=IR) (power p 2)[+][1]).
+  astepl (nexp IR p Two[+][0]).
   apply plus_resp_leEq_less.
    apply eq_imp_leEq.
    apply nexp_power.
@@ -269,8 +269,8 @@ Proof.
   apply nexp_resp_pos.
   apply pos_two.
  unfold Snring in |- *.
- astepr (nring (R:=IR) (power n 2)[+]One).
- astepl (nexp IR n Two[+]Zero).
+ astepr (nring (R:=IR) (power n 2)[+][1]).
+ astepl (nexp IR n Two[+][0]).
  apply plus_resp_leEq_less.
   apply eq_imp_leEq.
   apply nexp_power.
@@ -390,19 +390,19 @@ Proof.
  intros x0 y H1.
  apply leEq_less_trans with (Two[^]x[*](x0[-d]y)).
   apply p.
- apply mult_cancel_less with ((One[/] Two:IR[//]H0)[^]x).
+ apply mult_cancel_less with (([1][/] Two:IR[//]H0)[^]x).
   apply nexp_resp_pos.
   apply div_resp_pos.
    apply pos_two.
   apply pos_one.
- apply less_wdr with ((One[/] Two:IR[//]H0)[^](n + x)).
+ apply less_wdr with (([1][/] Two:IR[//]H0)[^](n + x)).
   apply less_wdl with (x0[-d]y).
    exact H1.
-  astepr (Two[^]x[*](x0[-d]y)[*](One[^]x[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
-  astepr (Two[^]x[*](x0[-d]y)[*](One[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
+  astepr (Two[^]x[*](x0[-d]y)[*]([1][^]x[/] Two[^]x[//]nexp_resp_ap_zero x H0)).
+  astepr (Two[^]x[*](x0[-d]y)[*]([1][/] Two[^]x[//]nexp_resp_ap_zero x H0)).
   rational.
  apply eq_symmetric_unfolded.
- astepr ((One[/] Two:IR[//]H0)[^](n + x)).
+ astepr (([1][/] Two:IR[//]H0)[^](n + x)).
  apply nexp_plus.
 
 Qed.
@@ -477,7 +477,7 @@ Proof.
  intros H.
  apply (ap_irreflexive_unfolded B b).
  apply (ax_d_pos_imp_ap B (cms_d (c:=B)) (CPsMetricSpace_is_CPsMetricSpace B)).
- apply leEq_less_trans with ((Zero[+]One[+]One)[*](x[-d]y)).
+ apply leEq_less_trans with (([0][+][1][+][1])[*](x[-d]y)).
   astepr ((Two:IR)[*](x[-d]y)).
   apply shift_leEq_mult' with (two_ap_zero IR).
    apply pos_two.
@@ -599,9 +599,9 @@ Section Limit.
 
 Definition MSseqLimit (X : CPsMetricSpace) (seq : nat -> X)
   (lim : X) : CProp :=
-  forall (n : nat) (H : Two[#]Zero),
+  forall (n : nat) (H : Two[#][0]),
   {N : nat |
-  forall m : nat, N <= m -> seq m[-d]lim[<](One[/] Two:IR[//]H)[^]n}.
+  forall m : nat, N <= m -> seq m[-d]lim[<]([1][/] Two:IR[//]H)[^]n}.
 
 Implicit Arguments MSseqLimit [X].
 
@@ -661,9 +661,9 @@ Proof.
   apply pos_two.
  unfold Snring in |- *.
  simpl in |- *.
- apply less_wdr with (nexp IR n Two[+]One).
+ apply less_wdr with (nexp IR n Two[+][1]).
   apply shift_less_plus.
-  astepl (nexp IR n Two[-]One).
+  astepl (nexp IR n Two[-][1]).
   apply minusOne_less.
  astepl (OneR[+]nexp IR n Two).
  astepr (OneR[+]nring (power n 2)).

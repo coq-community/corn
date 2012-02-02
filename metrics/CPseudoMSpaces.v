@@ -56,9 +56,9 @@ Unset Strict Implicit.
 
 Definition com : Prop := forall x y : A, d x y[=]d y x.
 
-Definition nneg : Prop := forall x y : A, Zero[<=]d x y.
+Definition nneg : Prop := forall x y : A, [0][<=]d x y.
 
-Definition pos_imp_ap : CProp := forall x y : A, Zero[<]d x y -> x[#]y.
+Definition pos_imp_ap : CProp := forall x y : A, [0][<]d x y -> x[#]y.
 
 Definition tri_ineq : Prop := forall x y z : A, d x z[<=]d x y[+]d y z.
 
@@ -66,10 +66,10 @@ Set Strict Implicit.
 Unset Implicit Arguments.
 
 Definition diag_zero (X : CSetoid) (d : CSetoid_bin_fun X X IR) : Prop :=
-  forall x : X, d x x[=]Zero.
+  forall x : X, d x x[=][0].
 
 Definition apdiag_imp_grzero (X : CSetoid) (d : CSetoid_bin_fun X X IR) :
-  CProp := forall x y : X, x[#]y -> Zero[<]d x y.
+  CProp := forall x y : X, x[#]y -> [0][<]d x y.
 
 End Relations.
 
@@ -220,7 +220,7 @@ Proof.
  apply not_ap_imp_eq.
  red in |- *.
  intro H0.
- set (H1 := less_conf_ap IR (d x x) Zero) in *.
+ set (H1 := less_conf_ap IR (d x x) [0]) in *.
  generalize H1.
  unfold Iff in |- *.
  intro H2.
@@ -275,7 +275,7 @@ Proof.
  unfold bin_fun_strext in |- *.
  unfold zero_fun in |- *.
  intros x1 x2 y1 y2 Z.
- set (H := ap_irreflexive_unfolded IR Zero Z) in *.
+ set (H := ap_irreflexive_unfolded IR [0] Z) in *.
  intuition.
 Qed.
 
@@ -314,7 +314,7 @@ Proof.
  simpl in |- *.
  unfold zero_fun in |- *.
  intro Z.
- set (H := less_irreflexive IR Zero Z) in *.
+ set (H := less_irreflexive IR [0] Z) in *.
  intuition.
 Qed.
 

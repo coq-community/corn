@@ -4,9 +4,9 @@ Require Export Qpossec.
 Require Import abstract_algebra additional_operations stdlib_rationals.
 
 Instance: Equiv Qpos := QposEq.
-Instance: RingOne Qpos := Qpos_one.
-Instance: RingPlus Qpos := Qpos_plus.
-Instance: RingMult Qpos := Qpos_mult.
+Instance: One Qpos := Qpos_one.
+Instance: Plus Qpos := Qpos_plus.
+Instance: Mult Qpos := Qpos_mult.
 
 Instance: Pow Qpos Z := Qpos_power.
 

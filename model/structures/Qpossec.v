@@ -375,7 +375,7 @@ Hint Rewrite Q_Qpos_power : QposElim.
 *** Summing lists
 *)
 Definition QposSum (l:list Qpos) : Q := fold_right
-(fun (x:Qpos) (y:Q) => x+y) (Zero:Q) l.
+(fun (x:Qpos) (y:Q) => x+y) ([0]:Q) l.
 
 Lemma QposSumNonNeg : forall l, 0 <= QposSum l.
 Proof.

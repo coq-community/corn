@@ -30,7 +30,7 @@ Require Import abstract_algebra theory.streams orders.naturals.
 A predicate saying there exists a point in the stream where a predicate
 is satsified.
 
-We take the unusual step of puting this inductive type in Prop even
+We take the unusual step of putting this inductive type in Prop even
 though it contains constructive information.  This is because we expect
 this proof to only be used in proofs of termination. *)
 Inductive LazyExists {A} (P : Stream A → Prop) (x : Stream A) : Prop :=
@@ -248,11 +248,11 @@ Lemma takeUntil_length_tl {A} (P : Stream A → bool) `(ex : !LazyExists P s) (P
 Proof.
   unfold takeUntil_length.
   destruct ex.
-   rewrite takeUntil_end. now apply naturals_nonneg. easy. 
+   rewrite takeUntil_end. now apply nat_nonneg. easy. 
   simpl.
   case_eq (P s); intros E.
    rewrite takeUntil_end. 
-    now apply naturals_nonneg. 
+    now apply nat_nonneg. 
    apply Ptl. auto with *.
   reflexivity.
 Qed.

@@ -719,7 +719,7 @@ Qed.
 
 Instance CRapart: Apart CR := λ x y, x < y ∨ y < x.
 
-Lemma CR_apart_apartT x y : x ⪥ y IFF CRapartT x y.
+Lemma CR_apart_apartT x y : x ≶ y IFF CRapartT x y.
 Proof.
   split.
    intros E.
@@ -791,7 +791,7 @@ Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
   apply CR_lt_ltT, (mult_resp_pos _ x y)...
 Qed.
 
-Program Instance CRinv: MultInv CR := λ x, CRinvT x _.
+Program Instance CRinv: Recip CR := λ x, CRinvT x _.
 Next Obligation. apply CR_apart_apartT. now destruct x. Qed.
 
 Instance: Field CR.

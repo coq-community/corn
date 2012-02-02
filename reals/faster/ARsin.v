@@ -25,7 +25,7 @@ Proof.
   unfold sinSequence, mult_Streams.
   rewrite ?Str_nth_zipWith.
   rewrite commutativity. 
-  rewrite rings.preserves_mult, dec_fields.dec_mult_inv_distr.
+  rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
   rewrite associativity.
   apply sg_op_proper.
    rewrite 2!preserves_powers_help.
@@ -34,10 +34,10 @@ Proof.
    rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
    rewrite 2!int_pow_mult. 
-   rewrite 2!int_pow_mult_inv.
+   rewrite 2!int_pow_recip.
    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, rings.mult_0_l, dec_mult_inv_0. ring.
+    rewrite ?Pden, rings.mult_0_l, dec_recip_0. ring.
    assert (PropHolds ('den ≠ (0:Q))) by assumption. 
    field_simplify. reflexivity.
     solve_propholds.
@@ -55,14 +55,14 @@ Proof.
   split.
    apply nonneg_mult_compat.
     now apply semirings.preserves_nonneg.
-   apply dec_fields.nonneg_dec_mult_inv_compat.
+   apply dec_fields.nonneg_dec_recip_compat.
    apply semirings.preserves_nonneg.
    red. now transitivity num.
   destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, dec_mult_inv_0. now ring_simplify.
-  rewrite <-(dec_mult_inverse ('den : Q)) by assumption.
+    rewrite ?Pden, dec_recip_0. now ring_simplify.
+  rewrite <-(dec_recip_inverse ('den : Q)) by assumption.
   apply (maps.order_preserving_flip_nonneg (.*.) (/'den)).
-   apply dec_fields.nonneg_dec_mult_inv_compat.
+   apply dec_fields.nonneg_dec_recip_compat.
    apply semirings.preserves_nonneg.
    red. now transitivity num.
   now apply (order_preserving _).
@@ -97,7 +97,7 @@ Next Obligation.
   rewrite AQsin_poly_fun_correct.
   change ('1) with (1:AQ).
   rewrite ?aq_preserves_max, ?aq_preserves_min.
-  now rewrite ?rings.preserves_opp, ?rings.preserves_1.
+  now rewrite ?rings.preserves_negate, ?rings.preserves_1.
 Qed.
 
 Definition ARsin_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc).
@@ -135,7 +135,7 @@ Proof.
   rewrite IHn.
   change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
   rewrite rings.preserves_mult, rings.preserves_3.
-  rewrite dec_fields.dec_mult_inv_distr, associativity.
+  rewrite dec_fields.dec_recip_distr, associativity.
   now apply rational_sin_poly.
 Qed.
 
@@ -171,7 +171,6 @@ Proof.
   apply semirings.ge_1_mult_le_compat_l.
     apply nat_pow_ge_1. 
      now apply semirings.le_1_3.
-    now apply naturals.naturals_nonneg.
    now apply nat_pow_nonneg; solve_propholds.
   now apply AQsin_pos_bound_correct.
 Qed.
@@ -179,15 +178,15 @@ Qed.
 Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 75).
 
 Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).
-Proof. 
-  ms_setoid_replace ('a : Q) with ('a / '1 : Q).
+Proof.
+  mc_setoid_replace ('a : Q) with ('a / '1 : Q).
    now apply AQsin_pos_bounded_correct.
-  rewrite rings.preserves_1, dec_fields.dec_mult_inv_1. ring.
+  rewrite rings.preserves_1, dec_fields.dec_recip_1. ring.
 Qed.
 End sin_pos.
 
 Lemma AQsin_prf {a : AQ} (pA : ¬0 ≤ a) : 0 ≤ -a.
-Proof. apply rings.flip_nonpos_opp. now apply orders.le_flip. Qed.
+Proof. apply rings.flip_nonpos_negate. now apply orders.le_flip. Qed.
 
 Definition AQsin (a : AQ) : AR := 
   match (decide_rel (≤) 0 a) with
@@ -200,8 +199,8 @@ Proof.
   unfold AQsin.
   case (decide_rel _); intros.
    now apply AQsin_pos_correct.
-  rewrite rings.preserves_opp, AQsin_pos_correct.
-  rewrite rings.preserves_opp.
+  rewrite rings.preserves_negate, AQsin_pos_correct.
+  rewrite rings.preserves_negate.
   now apply rational_sin_opp.
 Qed.
 

@@ -49,8 +49,8 @@ more useful properties about them.
 The sequence defined by $x_n=\frac2{n+1}$#x(n)=2/(n+1)#.
 *)
 
-Lemma twice_inv_seq_Lim : SeqLimit (R:=IR) (fun n => Two[*]one_div_succ n) Zero.
- red in |- *; fold (Cauchy_Lim_prop2 (fun n : nat => Two[*]one_div_succ n) Zero) in |- *.
+Lemma twice_inv_seq_Lim : SeqLimit (R:=IR) (fun n => Two[*]one_div_succ n) [0].
+ red in |- *; fold (Cauchy_Lim_prop2 (fun n : nat => Two[*]one_div_succ n) [0]) in |- *.
 Proof.
  apply Cauchy_Lim_prop3_prop2.
  red in |- *; intro.
@@ -64,10 +64,10 @@ Proof.
   apply shift_mult_leEq with (two_ap_zero IR).
    apply pos_two.
   unfold Snring in |- *.
-  rstepr (One[/] nring (S k) [*]Two[//]
+  rstepr ([1][/] nring (S k) [*]Two[//]
     mult_resp_ap_zero _ _ _ (nring_ap_zero _ (S k) (sym_not_eq (O_S k))) (two_ap_zero IR)).
   apply recip_resp_leEq.
-   astepl (ZeroR[*]Zero); apply mult_resp_less_both; try apply leEq_reflexive.
+   astepl (ZeroR[*][0]); apply mult_resp_less_both; try apply leEq_reflexive.
     apply pos_nring_S.
    apply pos_two.
   astepl ((Two:IR) [*]nring (S k)).
@@ -76,9 +76,9 @@ Proof.
     apply nring_leEq.
     assumption.
    apply nring_comm_mult.
-  simpl in |- *; astepl (nring (R:=IR) m[+]Zero); apply plus_resp_leEq_lft;
+  simpl in |- *; astepl (nring (R:=IR) m[+][0]); apply plus_resp_leEq_lft;
     apply less_leEq; apply pos_one.
- astepl (ZeroR[*]Zero); apply mult_resp_leEq_both; try apply leEq_reflexive.
+ astepl (ZeroR[*][0]); apply mult_resp_leEq_both; try apply leEq_reflexive.
   apply less_leEq; apply pos_two.
  apply less_leEq; apply one_div_succ_pos.
 Qed.
@@ -88,7 +88,7 @@ Proof.
  apply Build_CauchySeq with (fun n : nat => Two[*]one_div_succ (R:=IR) n).
  apply Cauchy_prop2_prop.
  red in |- *; exists ZeroR.
- red in |- *; fold (SeqLimit (fun n : nat => Two[*]one_div_succ (R:=IR) n) Zero) in |- *.
+ red in |- *; fold (SeqLimit (fun n : nat => Two[*]one_div_succ (R:=IR) n) [0]) in |- *.
  apply twice_inv_seq_Lim.
 Defined.
 
@@ -165,11 +165,11 @@ Proof.
 Qed.
 
 Lemma CS_seq_bounded' : forall seq : CauchySeqR,
- {K : IR | Zero [<] K | forall m : nat, AbsSmall K (seq m)}.
+ {K : IR | [0] [<] K | forall m : nat, AbsSmall K (seq m)}.
 Proof.
  unfold CauchySeqR in |- *.
  intros.
- assert (X0 : {K : IR | Zero [<] K | {N : nat | forall m, N <= m -> AbsSmall K (seq m)}}).
+ assert (X0 : {K : IR | [0] [<] K | {N : nat | forall m, N <= m -> AbsSmall K (seq m)}}).
   apply CS_seq_bounded; auto.
   apply (CS_proof _ seq).
  destruct X0 as [K1 K1_pos H1].
@@ -380,43 +380,43 @@ Section Properties_of_Exponentiation.
 (**
 *** More properties of Exponentiation
 
-Finally, we prove that [x[^]n] grows to infinity if [x [>] One].
+Finally, we prove that [x[^]n] grows to infinity if [x [>] [1]].
 *)
 
 Lemma power_big' : forall (R : COrdField) (x : R) n,
- Zero [<=] x -> One[+]nring n[*]x [<=] (One[+]x) [^]n.
+ [0] [<=] x -> [1][+]nring n[*]x [<=] ([1][+]x) [^]n.
 Proof.
  intros.
  induction  n as [| n Hrecn]; intros.
-  rstepl (One:R).
-  astepr (One:R).
+  rstepl ([1]:R).
+  astepr ([1]:R).
   apply leEq_reflexive.
  simpl in |- *.
- apply leEq_transitive with ((One[+]nring n[*]x) [*] (One[+]x)).
-  rstepr (One[+] (nring n[+]One) [*]x[+]nring n[*]x[^]2).
-  astepl (One[+] (nring n[+]One) [*]x[+]Zero).
+ apply leEq_transitive with (([1][+]nring n[*]x) [*] ([1][+]x)).
+  rstepr ([1][+] (nring n[+][1]) [*]x[+]nring n[*]x[^]2).
+  astepl ([1][+] (nring n[+][1]) [*]x[+][0]).
   apply plus_resp_leEq_lft.
   apply mult_resp_nonneg.
    astepl (nring 0:R). apply nring_leEq. auto with arith.
    apply sqr_nonneg.
  apply mult_resp_leEq_rht.
   auto.
- apply less_leEq. astepl ((Zero:R) [+]Zero).
+ apply less_leEq. astepl (([0]:R) [+][0]).
  apply plus_resp_less_leEq. apply pos_one. auto.
 Qed.
 
-Lemma power_big : forall x y : IR, Zero [<=] x -> One [<] y -> {N : nat | x [<=] y[^]N}.
+Lemma power_big : forall x y : IR, [0] [<=] x -> [1] [<] y -> {N : nat | x [<=] y[^]N}.
 Proof.
  intros.
- cut (Zero [<] y[-]One). intro.
-  cut (y[-]One [#] Zero). intro H2.
-   elim (Archimedes (x[-]One[/] y[-]One[//]H2)). intro N. intros. exists N.
-   apply leEq_transitive with (One[+]nring N[*] (y[-]One)).
+ cut ([0] [<] y[-][1]). intro.
+  cut (y[-][1] [#] [0]). intro H2.
+   elim (Archimedes (x[-][1][/] y[-][1][//]H2)). intro N. intros. exists N.
+   apply leEq_transitive with ([1][+]nring N[*] (y[-][1])).
     apply shift_leEq_plus'.
-    astepr ((y[-]One) [*]nring N).
+    astepr ((y[-][1]) [*]nring N).
     apply shift_leEq_mult' with H2. auto.
      auto.
-   apply leEq_wdr with ((One[+] (y[-]One)) [^]N).
+   apply leEq_wdr with (([1][+] (y[-][1])) [^]N).
     apply power_big'. apply less_leEq. auto.
     apply un_op_wd_unfolded. rational.
    apply Greater_imp_ap. auto.
@@ -424,46 +424,46 @@ Proof.
 Qed.
 
 Lemma qi_yields_zero : forall q : IR,
- Zero [<=] q -> q [<] One -> forall e, Zero [<] e -> {N : nat | q[^]N [<=] e}.
+ [0] [<=] q -> q [<] [1] -> forall e, [0] [<] e -> {N : nat | q[^]N [<=] e}.
 Proof.
  intros.
- cut (Zero [<] (One[+]q) [/]TwoNZ). intro Haux.
-  cut ((One[+]q) [/]TwoNZ [#] Zero). intro H2.
-   cut (e [#] Zero). intro H3.
-    elim (power_big (One[/] e[//]H3) (One[/] _[//]H2)). intro N. intros H4. exists N.
-      cut (Zero [<] ((One[+]q) [/]TwoNZ) [^]N). intro H5.
-       apply leEq_transitive with (((One[+]q) [/]TwoNZ) [^]N).
+ cut ([0] [<] ([1][+]q) [/]TwoNZ). intro Haux.
+  cut (([1][+]q) [/]TwoNZ [#] [0]). intro H2.
+   cut (e [#] [0]). intro H3.
+    elim (power_big ([1][/] e[//]H3) ([1][/] _[//]H2)). intro N. intros H4. exists N.
+      cut ([0] [<] (([1][+]q) [/]TwoNZ) [^]N). intro H5.
+       apply leEq_transitive with ((([1][+]q) [/]TwoNZ) [^]N).
         apply nexp_resp_leEq.
          auto.
         apply shift_leEq_div.
          apply pos_two.
         apply shift_leEq_plus.
         rstepl q. apply less_leEq. auto.
-        astepl (One[*] ((One[+]q) [/]TwoNZ) [^]N).
+        astepl ([1][*] (([1][+]q) [/]TwoNZ) [^]N).
        set (H6 := pos_ap_zero _ _ H5) in *.
        apply shift_mult_leEq with H6. auto.
-        rstepr (e[*] (One[/] _[//]H6)).
+        rstepr (e[*] ([1][/] _[//]H6)).
        apply shift_leEq_mult' with H3. auto.
-        astepr (One[^]N[/] _[//]H6).
-       astepr ((One[/] _[//]H2) [^]N). auto.
+        astepr ([1][^]N[/] _[//]H6).
+       astepr (([1][/] _[//]H2) [^]N). auto.
        apply nexp_resp_pos. apply pos_div_two.
-      astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+      astepl ([0][+]ZeroR). apply plus_resp_less_leEq.
       apply pos_one. auto.
       apply less_leEq. apply recip_resp_pos. auto.
      apply shift_less_div. apply pos_div_two.
-     astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+     astepl ([0][+]ZeroR). apply plus_resp_less_leEq.
      apply pos_one. auto.
-     astepl ((One[+]q) [/]TwoNZ). apply shift_div_less.
-    apply pos_two. rstepr (One[+]OneR).
+     astepl (([1][+]q) [/]TwoNZ). apply shift_div_less.
+    apply pos_two. rstepr ([1][+]OneR).
     apply plus_resp_less_lft. auto.
     apply Greater_imp_ap. auto.
    apply Greater_imp_ap. auto.
   apply pos_div_two.
- astepl (Zero[+]ZeroR). apply plus_resp_less_leEq.
+ astepl ([0][+]ZeroR). apply plus_resp_less_leEq.
  apply pos_one. auto.
 Qed.
 
-Lemma qi_lim_zero : forall q : IR, Zero [<=] q -> q [<] One -> SeqLimit (fun i => q[^]i) Zero.
+Lemma qi_lim_zero : forall q : IR, [0] [<=] q -> q [<] [1] -> SeqLimit (fun i => q[^]i) [0].
 Proof.
  intros q H H0.
  unfold SeqLimit in |- *. unfold AbsSmall in |- *. intros.
@@ -476,7 +476,7 @@ Proof.
   apply nexp_resp_nonneg. auto.
   astepl (q[^]m).
  replace m with (N + (m - N)).
-  astepl (q[^]N[*]q[^] (m - N)). astepr (e[*]One).
+  astepl (q[^]N[*]q[^] (m - N)). astepr (e[*][1]).
   apply mult_resp_leEq_both.
      apply nexp_resp_nonneg. auto.
      apply nexp_resp_nonneg. auto.
@@ -496,7 +496,7 @@ Proof.
  apply char0_OrdField.
 Qed.
 
-Lemma poly_apzero_IR : forall f : cpoly_cring IR, f [#] Zero -> {c : IR | f ! c [#] Zero}.
+Lemma poly_apzero_IR : forall f : cpoly_cring IR, f [#] [0] -> {c : IR | f ! c [#] [0]}.
 Proof.
  intros.
  apply poly_apzero.
