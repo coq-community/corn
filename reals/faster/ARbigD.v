@@ -25,7 +25,6 @@ Proof. unfold inject_N_bigZ. apply _. Qed.
 Instance: SemiRing_Morphism inject_bigD_Q.
 Proof. unfold inject_bigD_Q. apply _. Qed.
 
-
 Lemma inject_bigD_Q_correct x : cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
 Proof.
   unfold cast at 1, inject_bigD_Q.
@@ -55,7 +54,7 @@ Proof.
 Qed.
 
 Lemma Qpow_bounded_Zshiftl (x n : Z) : 
-  'Zshiftl x n ≤ cast Z Q x * 2 ^ n < 'Zshiftl x n + 1.
+  'Z.shiftl x n ≤ cast Z Q x * 2 ^ n < 'Z.shiftl x n + 1.
 Proof.
   destruct (total (≤) 0 n) as [En | En].
    rewrite Z.shiftl_mul_pow2 by trivial.
@@ -90,7 +89,7 @@ Proof.
    transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1)) : Q); [| ring].
    rewrite dec_recip_inverse by solve_propholds. ring.
   assert (∀ xm xe ym ye : Z, 
-      'Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
+      'Zdiv (Z.shiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) - 2 ^ k = ((z - 1) - 1) * 2 ^ (k - 1)) as E2.
     intros.
@@ -101,7 +100,7 @@ Proof.
    apply (order_preserving (.* _)).
    apply rings.flip_le_minus_l. 
    apply semirings.plus_le_compat_r; [easy |].
-   transitivity ('Zshiftl xm (-(k - 1) + xe - ye) / 'ym - 1 : Q).
+   transitivity ('Z.shiftl xm (-(k - 1) + xe - ye) / 'ym - 1 : Q).
     apply (order_preserving (+ -1)). now apply Qdiv_bounded_Zdiv.
    destruct (orders.le_or_lt 0 ym) as [E | E].
     apply rings.flip_le_minus_l. 
@@ -110,7 +109,7 @@ Proof.
      apply dec_fields.nonneg_dec_recip_compat.
      now apply semirings.preserves_nonneg.
     now apply Qpow_bounded_Zshiftl.
-   transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / 'ym : Q).
+   transitivity (('Z.shiftl xm (-(k - 1) + xe - ye) + 1) / 'ym : Q).
     rewrite rings.plus_mult_distr_r.
     apply semirings.plus_le_compat; [reflexivity |].
     rewrite rings.mult_1_l.
@@ -128,7 +127,7 @@ Proof.
     now apply orders.lt_le.
    now apply orders.lt_le, Qpow_bounded_Zshiftl.
   assert (∀ xm xe ym ye : Z, 
-      ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Zdiv (Zshiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
+      ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Zdiv (Z.shiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) + 2 ^ k = ((z + 1) + 1) * 2 ^ (k - 1)) as E2.
     intros.
@@ -137,7 +136,7 @@ Proof.
     ring_simplify. apply sm_proper. now apply commutativity.
    intros. rewrite E1, E2.
    apply (order_preserving (.* _)).
-   transitivity ('Zshiftl xm (-(k - 1) + xe - ye) / 'ym + 1 : Q).
+   transitivity ('Z.shiftl xm (-(k - 1) + xe - ye) / 'ym + 1 : Q).
     2: now apply (order_preserving (+1)); apply orders.lt_le, Qdiv_bounded_Zdiv.
    destruct (orders.le_or_lt ym 0) as [E3 | E3].
     apply semirings.plus_le_compat_r; [easy |].
@@ -145,7 +144,7 @@ Proof.
      apply dec_fields.nonpos_dec_recip_compat.
      now apply semirings.preserves_nonpos.
     now apply Qpow_bounded_Zshiftl.
-   transitivity (('Zshiftl xm (-(k - 1) + xe - ye) + 1) / ' ym : Q).
+   transitivity (('Z.shiftl xm (-(k - 1) + xe - ye) + 1) / ' ym : Q).
     apply (maps.order_preserving_flip_nonneg (.*.) (/ 'ym : Q)).
      apply dec_fields.nonneg_dec_recip_compat.
      apply semirings.preserves_nonneg.

@@ -1,5 +1,5 @@
 Require Import
-  Ring Setoid  stdlib_omissions.Z
+  Ring stdlib_omissions.Z
   Complete Qmetric ZArith Qdlog Qpossec
   CRroot
   abstract_algebra theory.shiftl theory.nat_pow theory.int_pow.
@@ -132,6 +132,9 @@ Qed.
 
 Definition AQsqrt_mid_bounded_raw (n : N) := snd (AQsqrt_loop ('n)) ≪ -(1 + 'n : Z).
 
+Instance AQsqrt_mid_bounded_raw_proper: Proper ((=) ==> (=)) AQsqrt_mid_bounded_raw.
+Proof. intros x y E. change (x ≡ y) in E. now subst. Qed.
+
 Lemma AQsqrt_mid_bounded_raw_lower_bound (n : N) :
   0 ≤ AQsqrt_mid_bounded_raw n.
 Proof. unfold AQsqrt_mid_bounded_raw. apply shiftl_nonneg, AQsqrt_loop_snd_nonneg. Qed.
@@ -226,7 +229,7 @@ Qed.
 Definition AQsqrt_mid_raw (ε : Qpos) := AQsqrt_mid_bounded_raw (plus (N_of_Z (-Qdlog2 ε)) 3).
 
 Instance: Proper ((=) ==> (=)) AQsqrt_mid_raw.
-Proof. unfold AQsqrt_mid_raw. intros ? ? E. now rewrite E. Qed.
+Proof. unfold AQsqrt_mid_raw. intros [x?] [y?] E. change (x = y) in E. simpl. now rewrite E. Qed.
 
 Lemma AQsqrt_mid_bounded_prf: is_RegularFunction_noInf _ (AQsqrt_mid_raw : Qpos → AQ_as_MetricSpace).
 Proof.

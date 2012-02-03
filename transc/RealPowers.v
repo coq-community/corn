@@ -492,8 +492,7 @@ Proof.
     apply eq_transitive_unfolded with (Exp (Part _ _ H7[*]Log _ H9) [*]
       (Part _ _ H7[*] (([1][/] _[//]H10) [*]Part _ _ H11) [+] Part _ _ H12[*]Log _ H9)).
     unfold A, Log in |- *; simpl in |- *.
-    repeat first [ apply mult_wd | apply bin_op_wd_unfolded | apply pfwdef | apply div_wd
-      | apply eq_reflexive_unfolded ].
+    repeat first  [apply mult_wd | apply pfwdef | apply bin_op_wd_unfolded]; try reflexivity.
    clear Hx21 Hx20 Hx19 Hx18 Hx17 Hx16 Hx15 Hx14 Hx13 Hx12 Hx11 Hx10 Hx9 Hx8 A
      Hx3 Hx7 Hx6 Hx5 Hx4 Hx1 Hx2.
    astepr (Part _ _ (ProjIR1 Hx') [+]Part _ _ (ProjIR2 Hx')).

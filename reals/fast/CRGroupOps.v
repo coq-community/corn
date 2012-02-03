@@ -27,7 +27,6 @@ Require Import Qmetric.
 Require Import CornTac.
 Require Import ProductMetric.
 Require Import stdlib_omissions.Pair.
-Require Import metric2.Classified.
 Require Import canonical_names.
 
 Set Implicit Arguments.
@@ -90,6 +89,7 @@ Qed.
 Definition Qplus_uc : Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qplus_uc_prf.
 
+(*
 (** Having Qplus_uc of this type does not show that it is uniformly continuous in both arguments, so
 we show that separately: *)
 
@@ -125,6 +125,7 @@ Notation QQ := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
 (*Goal UniformlyContinuous (uncurry (ucFun2 Qplus_uc)).
 Proof. apply _. Qed.*)
+*)
 
 (** Finally, CRplus: *)
 
@@ -144,6 +145,7 @@ Local Notation CRCR := (ProductMS CR CR).
 
 (** Uniform continuity of the uncurried original then follows from extentionality: *)
 
+(*
 Instance: UniformlyContinuous_mu (uncurry (ucFun2 CRplus_uc))
   := { uc_mu := fun e => ((1#2) * e)%Qpos }.
 
@@ -162,6 +164,7 @@ Qed.*)
 
 Definition CRplus_uc_example (y: CR): CR --> CR :=
  wrap_uc_fun' (fun x => (y + x) + (x + x) + (x + y))%CR.
+*)
 
 Lemma CRplus_translate : forall (a:Q) (y:CR), (' a + y == translate a y)%CR.
 Proof.

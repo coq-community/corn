@@ -67,7 +67,7 @@ Proof.
  rewrite Str_nth_plus.
  rewrite plus_comm.
  rewrite Str_nth_Qrecip_factorials.
- rewrite -> (Str_nth_powers_help_int_pow _ _).
+ rewrite -> (Str_nth_powers_help_int_pow _ (cast nat Z)).
  rewrite <- Qpower_mult.
  rewrite inj_plus.
  rewrite -> Qpower_plus';[|rewrite <- inj_plus; auto with *].

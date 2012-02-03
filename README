@@ -4,19 +4,11 @@ C-CoRN, the Coq Constructive Repository at Nijmegen
 PREREQUISITES
 -------------
 
- This version of C-CoRN is known to compile with:
+This version of C-CoRN is known to compile with:
 
- - Coq version revision 14023 from the trunk branch
-
-   svn co -r 14023 svn://scm.gforge.inria.fr/svn/coq/trunk coq-14023/
+ - Coq 8.4 beta
 
    One might also perform the following optimizations:
-   * Revert commit 13997 to speed up instance resolution (dependent subgoals 
-     are put first since 13997. This sometimes reduces the performance 
-     badly). This commit can be reverted using the following command:
-
-       svn diff -r 13997:13996 | patch -p0
-
    * Change size = 6 to size = 12 in theories/Numbers/Natural/BigN/NMake_gen.ml
      to increase performance for big numbers.
 
@@ -29,28 +21,18 @@ PREREQUISITES
 GIT CHECKOUT & SUBMODULES
 -------------------------
 
-The corn repository contains the math-classes repository as a submodule.
-You can obtain it's contents automatically by giving the --recursive
-option when you clone this repository:
+C-CoRN depends on Math Classes, which is a library of abstract interfaces for 
+mathematical structures that is heavily based on Coq's new type classes. 
+Math Classes is contained in the C-CoRN git repository as a submodule. You can 
+obtain math-classes automatically by giving the --recursive option when you 
+clone the git repository:
 
   git clone --recursive https://github.com/c-corn/corn.git
 
-If you have already cloned this repository without --recursive, you can
+If you have already cloned the CoRN repository without --recursive, you can
 still get the submodules with
 
   git submodule update --init --recursive
-
-If you don't do this, you will run into the following build error:
-
-  $ scons -k -j4
-
-  scons: Reading SConscript files ...
-  scons: warning: Ignoring missing SConscript
-  'math-classes/src/SConscript'
-  File "/home/wires/w/corn/SConstruct", line 31, in <module>
-  TypeError: 'NoneType' object is not iterable:
-    File "/home/wires/w/corn/SConstruct", line 31:
-        mc_vs, mc_vos, mc_globs = env.SConscript(dirs='math-classes/src')
 
 
 BUILDING C-CoRN
@@ -82,15 +64,7 @@ A dependency graph in DOT format can be created with "scons deps.dot".
 
 PLOTS
 -----
-If you want high resolution plots in examples/Circle.v,
-follow the instructions in dump/INSTALL
 
-OTHERS
-------
+If you want high resolution plots in examples/Circle.v, follow the instructions 
+in dump/INSTALL
 
-More information can be found at the C-CoRN page,
-http://c-corn.cs.ru.nl/
-For any questions, comments, bug reports or other feel free to contact
-us; contact information is in the doc/www/info.html file.
-
- LocalWords:  Nijmegen CoRN Coq VCS

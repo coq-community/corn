@@ -50,15 +50,14 @@ Variable a:Q.
 
 Definition arctanSequence := (mult_Streams (everyOther Qrecip_positives) (powers_help (a^2) a)).
 
-Lemma Str_nth_arctanSequence : forall n, (Str_nth n arctanSequence == (1#P_of_succ_nat (2*n))*a^(1+2*n)%nat)%Q.
+Lemma Str_nth_arctanSequence n : (Str_nth n arctanSequence == (1#P_of_succ_nat (2*n))*a^(1+2*n)%nat)%Q.
 Proof.
- intros n.
  unfold arctanSequence.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
  rewrite Str_nth_everyOther.
- rewrite Str_nth_Qrecip_positives.
- rewrite -> (Str_nth_powers_help_int_pow _ _).
+ rewrite Str_nth_Qrecip_positives. 
+ rewrite -> (Str_nth_powers_help_int_pow _ (cast nat Z)).
  rewrite <- Qpower_mult.
  rewrite inj_plus.
  rewrite -> (Qpower_plus' a 1 (2*n)%nat); auto with *.

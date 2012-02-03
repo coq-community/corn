@@ -41,6 +41,7 @@ Proof. compute. rewrite PointFree0, PointFree1, PointFree2. reflexivity. Qed.
 Instance uncur_pf {A B C} (f: A → B → C) `{!PointFree (λ p, f (fst p) (snd p)) f'}: PointFree (uncurry (λ x: A, f x)) f'.
 Proof. compute. rewrite <- PointFree0. reflexivity. Qed.
 
+(*
   (* In the following tests, the Print's should show that the second argument inferred for PointFree is actually point-free. *)
 Definition test0: PointFree (@fst (unit*unit) unit) _ := _.
 Check test0.
@@ -61,3 +62,4 @@ Check test7.
 
 (* Todo: The set of instances currently generates "uncurry const" (which is equivalent to "fst") sometimes (e.g. for test4 above).
  If this turns out to be annoying, we can probably get rid of it by adding more specialized and prioritized instances. *)
+*)
