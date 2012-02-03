@@ -36,6 +36,7 @@
 
 Require Export CPolynomials.
 Require Import Morphisms.
+Require Import CRings.
 
 (**
 * Polynomials: Nth Coefficient

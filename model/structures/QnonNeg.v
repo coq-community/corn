@@ -36,8 +36,6 @@ Section binop.
 
   Program Definition binop: T -> T -> T := o.
 
-  Next Obligation. apply o_ok; apply proj2_sig. Qed.
-
   Lemma binop_comm (x y: T): binop x y == binop y x.
   Proof. unfold eq. simpl. apply o_comm. Qed.
 

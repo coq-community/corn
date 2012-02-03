@@ -13,6 +13,13 @@ Context `{AppRationals AQ}.
 Section exp_small_neg.
 Context {a : AQ} (Pa : -1 ≤ a ≤ 0).
 
+(*
+Split the stream 
+  (-a)^i / i! 
+up into the streams
+  (-a)^i    and    i!
+because we do not have exact division
+*)
 Lemma ARexpSequence : DivisionStream (expSequence (-'a)) (powers (-a)) factorials.
 Proof.
   apply DivisionStream_Str_nth.
@@ -34,6 +41,13 @@ Proof.
   now apply semirings.preserves_nonpos.
 Qed.
 
+(*
+The ARInfAltSum function computes the infinite alternating sum 
+and takes care of:
+- Computing the length of the partial sum
+- Computing the precision of the approximate division
+- The trick to avoid evaluation of termination proofs
+*)
 Definition AQexp_small_neg : AR := ARInfAltSum ARexpSequence 
   (dnn:=expSequence_dnn (Qle_ZO_flip AQexp_small_neg_prf)) (zl:=expSequence_zl (Qle_ZO_flip AQexp_small_neg_prf)).
 
@@ -57,6 +71,10 @@ Proof.
   now rewrite right_absorb.
 Qed.
 
+(*
+Implement the range reduction
+  exp(x) = exp(x/2) ^ 2
+*)
 Fixpoint AQexp_neg_bounded {n : nat} {a : AQ} : -2^n ≤ a ≤ 0 → AR :=
   match n with
   | O => AQexp_small_neg
@@ -169,8 +187,11 @@ Proof. now apply rings.flip_nonneg_negate. Qed.
 Lemma AQexp_prf2 {a : AQ} (pA : ¬0 ≤ a) : a ≤ 0.
 Proof. now apply orders.le_flip. Qed.
 
+(*
+Extend it to the full domain.
+*)
 Definition AQexp (a : AQ) : AR := 
-  match (decide_rel (≤) 0 a) with
+  match decide_rel (≤) 0 a with
   | left Pa => ARinv_pos (AQexp_inv_pos_bound (a:=-a)) (AQexp_neg (AQexp_prf1 Pa))
   | right Pa => AQexp_neg (AQexp_prf2 Pa)
   end.
@@ -208,6 +229,5 @@ Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (('z) 
 Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
 
 Lemma ARtoCR_preserves_exp x : 'ARexp x = exp ('x).
-Proof. apply ARtoCR_preserves_exp_bounded. Qed.
-
+Proof. unfold ARexp. apply ARtoCR_preserves_exp_bounded. Qed.
 End ARexp.

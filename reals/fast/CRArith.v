@@ -477,7 +477,7 @@ Proof.
  intros. rewrite <- CRplus_Qplus.
  apply CRplus_le_r with (-'e)%CR.
  assert (' approximate x e + 'e - 'e == ' approximate x e)%CR as E by ring. rewrite E.
- apply in_CRball, ball_approx_r.
+ apply (in_CRball e x ('approximate x e)), ball_approx_r.
 Qed.
 
 Hint Immediate lower_CRapproximation upper_CRapproximation.
@@ -614,9 +614,9 @@ Qed.
 
 Lemma Qle_CRle (x y: CR): (forall x' y', ' x' <= x -> y <= ' y' -> (x' <= y')%Q) <-> x <= y.
 Proof with auto.
- split; intros.
-  apply Qle_CRle_l. intros.
-  apply Qle_CRle_r. intros.
+ split; intros. 
+  apply (proj1 (Qle_CRle_l _ _)). intros.
+  apply (proj1 (Qle_CRle_r _ _)). intros.
   apply CRle_Qle...
  apply CRle_Qle.
  apply CRle_trans with x...

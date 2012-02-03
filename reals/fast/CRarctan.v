@@ -166,7 +166,8 @@ Proof.
    simpl.
    unfold y'. 
    field.
-   auto with qarith.
+   intros E. destruct (Qlt_irrefl 0). transitivity a; auto.
+   rewrite <-E, Qlt_minus_iff. now ring_simplify.
   rstepl (nring 1:IR).
   apply eq_symmetric; apply (inj_Q_nring IR 1).
  apply bin_op_wd_unfolded;[|apply eq_reflexive].

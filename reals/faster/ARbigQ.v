@@ -27,10 +27,10 @@ Proof.
    rewrite Z.div_1_r, Qmake_Qdiv. simpl.
    now rewrite Q.Zmult_Qmult, Qdiv_mult_l by auto with zarith.
   unfold cast, BigQ_Rationals.inject_QType_Q, BigQ.to_Q.
-  case_eq (BigN.eq_bool (BigN.shiftl 1 (BigN.of_pos p)) BigN.zero); intros Ep.
+  case_eq (BigN.shiftl 1 (BigN.of_pos p) =? BigN.zero)%bigN; intros Ep.
    apply BigNeqb_correct, BigN.shiftl_eq_0_iff in Ep.
    discriminate.
-  case_eq (BigN.eq_bool d BigN.zero); intros Ed.
+  case_eq (d =? BigN.zero)%bigN; intros Ed.
    apply BigNeqb_correct in Ed.
    setoid_replace (BigZ.Pos d) with 0%bigZ by assumption.
    now rewrite BigZ.spec_div, Zdiv_0_r, Zmult_0_l.

@@ -67,7 +67,7 @@ Proof.
  unfold expSequence.
  unfold mult_Streams.
  rewrite Str_nth_zipWith.
- rewrite ->(Str_nth_powers_int_pow _ _). 
+ rewrite ->(Str_nth_powers_int_pow _ (cast nat Z)). 
  now rewrite Str_nth_Qrecip_factorials.
 Qed.
 

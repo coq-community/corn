@@ -1,6 +1,6 @@
 (* Discrete logarithm with base 2 and 4 on [Q] *)
 Require Import 
-  Program ZArith QArith Qround stdlib_omissions.Q
+  ZArith QArith Qround stdlib_omissions.Q
   abstract_algebra additional_operations interfaces.orders
   int_pow orders.rationals stdlib_rationals positive_semiring_elements.
 
@@ -58,7 +58,7 @@ Proof.
     change 2 with ('(2 : Z)).
     rewrite <-Qpower.Zpower_Qpower.
      apply (order_preserving _).
-     now apply Zlog2_spec, Qfloor_pos. 
+     now apply Z.log2_spec, Qfloor_pos. 
     now apply Z.log2_nonneg.
    now apply Qfloor_le.
   apply orders.lt_le_trans with ('Zsucc (Qfloor x)).
@@ -68,7 +68,7 @@ Proof.
   change 2 with ('(2 : Z)).
   rewrite <-Qpower.Zpower_Qpower.
    apply (order_preserving _).
-   now apply Zle_succ_l, Zlog2_spec, Qfloor_pos.
+   now apply Zle_succ_l, Z.log2_spec, Qfloor_pos.
   now apply Zle_le_succ, Z.log2_nonneg.
 Qed.
 
@@ -94,9 +94,8 @@ Qed.
 Lemma Qdlog2_0 (x : Q) :
   0 < x → Qdlog2 x = 0 → x < 2.
 Proof.
-  intros ? E.
-  change (x < 2 ^ (1 + 0)). rewrite <-E.
-  now apply Qdlog2_spec.
+  intros E1 E2. pose proof (Qdlog2_spec x E1) as E3.
+  now rewrite E2 in E3.
 Qed.
 
 Lemma Qpos_dlog2_spec (x : Q₊) : 
@@ -189,7 +188,7 @@ Proof.
   now apply (order_preserving (cast Z Q)) in En.
 Qed.
 
-Instance: Proper (=) Qdlog_bounded.
+Instance: Proper ((=) ==> (=)) Qdlog_bounded.
 Proof.
   intros b1 b2 Eb n1 n2 En x1 x2 Ex.
   change (b1 ≡ b2) in Eb. change (n1 ≡ n2) in En. subst.
@@ -202,7 +201,7 @@ Proof.
   rewrite IHb2; [reflexivity| now rewrite Ex].
 Qed.
 
-Instance: Proper (=) Qdlog.
+Instance: Proper ((=) ==> (=)) Qdlog.
 Proof. unfold Qdlog. intros ? ? E1 ? ? E2. now rewrite E1, E2. Qed.
 
 Lemma Qdlog_spec_bounded (b : nat) (n : Z) (x : Q) : 
@@ -210,7 +209,7 @@ Lemma Qdlog_spec_bounded (b : nat) (n : Z) (x : Q) :
 Proof.
   intros En Eb Ex.
   apply (order_preserving (cast Z Q)) in En.
-  assert (PropHolds (0 < ('n : Q)))
+  assert (0 < ('n : Q))
     by (apply orders.lt_le_trans with 2; [solve_propholds | assumption]).
   revert x Eb Ex.
   induction b; simpl.
@@ -232,8 +231,8 @@ Proof.
   assert (1 ≤ x / 'n).
    apply (order_reflecting (('n:Q) *.)).
    now rewrite <-Ex2, rings.mult_1_r.
-  destruct IHb with (x / 'n) as [IHb1 IHb2]; trivial.
-   transitivity (Qdlog2 (mult x (/2))).
+  destruct (IHb (x / 'n)); trivial.
+   transitivity (Qdlog2 (x /2)%mc).
     apply Qdlog2_preserving.
      apply orders.lt_le_trans with 1; [solve_propholds | assumption].
     apply (maps.order_preserving_nonneg (.*.) x).
@@ -267,7 +266,7 @@ Lemma Qdlog4_spec (x : Q) :
   0 < x → 4 ^ Qdlog4 x ≤ x ∧ x < 4 ^ (1 + Qdlog4 x).
 Proof.
   intros E1. unfold Qdlog4.
-  change (4:Q) with (2 ^ 2 : Q).
+  change (4:Q) with ((2:Q) ^ (2:Z))%mc.
   rewrite <-2!int_pow_exp_mult.
   split.
    etransitivity.

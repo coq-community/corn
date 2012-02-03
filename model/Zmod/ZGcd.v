@@ -54,7 +54,7 @@ Definition pp := (positive * positive)%type.
 
 Definition pp_lt (x y : pp) :=
   let (a, b) := x in
-  let (c, d) := y in (b ?= d)%positive Datatypes.Eq = Datatypes.Lt.
+  let (c, d) := y in (b ?= d)%positive = Datatypes.Lt.
 
 Lemma pp_lt_wf : Wf.well_founded pp_lt.
 Proof.

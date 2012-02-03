@@ -1018,13 +1018,11 @@ Lemma Sin_periodic_Z : forall (x : IR) z, Sin (x[+]zring z[*](Two[*]Pi)) [=] Sin
 Proof.
  intros x z; revert x; induction z using Zind; intros x.
    rational.
-  rewrite <- Zsucc_succ'.
   unfold Zsucc.
   rewrite -> zring_plus.
   rstepl (Sin (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
   rewrite -> Sin_periodic.
   auto.
- rewrite <- Zpred_pred'.
  unfold Zpred.
  rewrite -> zring_plus.
  rstepl (Sin (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).
@@ -1037,13 +1035,11 @@ Lemma Cos_periodic_Z : forall (x : IR) z, Cos (x[+]zring z[*](Two[*]Pi)) [=] Cos
 Proof.
  intros x z; revert x; induction z using Zind; intros x.
    rational.
-  rewrite <- Zsucc_succ'.
   unfold Zsucc.
   rewrite -> zring_plus.
   rstepl (Cos (x[+]zring z[*](Two[*]Pi)[+]Two[*]Pi)).
   rewrite -> Cos_periodic.
   auto.
- rewrite <- Zpred_pred'.
  unfold Zpred.
  rewrite -> zring_plus.
  rstepl (Cos (x[-]Two[*]Pi[+]zring z[*](Two[*]Pi))).

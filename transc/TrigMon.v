@@ -458,8 +458,8 @@ Proof.
  rstepl (Pi[/]TwoNZ[+][0]).
  apply plus_resp_leEq_lft.
  apply mult_resp_nonneg;[|apply less_leEq; auto with *].
- rewrite (Z_to_nat_correct z0).
- stepr (nring (Z_to_nat z0):IR); [| now auto with *].
+ rewrite (Z_to_nat_correct l).
+ stepr (nring (Z_to_nat l):IR); [| now auto with *].
  apply nring_nonneg.
 Qed.
 

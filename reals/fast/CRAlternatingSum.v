@@ -169,7 +169,7 @@ Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNega
 Proof.
   intros E.
   apply naturals.nat_le_plus in E.
-  destruct E as [z E]. rewrite E. clear E l.
+  destruct E as [z E]. do 2 red in E. rewrite E. clear E l.
   revert z s dnn ε.
   induction k; intros.
    destruct z; intros.
@@ -441,7 +441,7 @@ Proof.
  intros e He.
  generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
  intros C.
- destruct (C _ (pos_div_two _ _ He)) as [n Hn].
+ destruct (C _ (pos_div_two CRasCOrdField _ He)) as [n Hn].
  exists n.
  intros m Hm.
  unfold CS_seq in *.
@@ -450,7 +450,7 @@ Proof.
  rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
    ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum seq)))).
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
- assert (X:AbsSmall (R:=CRasCReals) (e [/]TwoNZ) (('(((-(1))^n)*(Str_nth n seq))%Q)%CR)).
+ assert (X:AbsSmall (@cf_div CRasCOrdField e _ (two_ap_zero CRasCOrdField)) (('(((-(1))^n)*(Str_nth n seq))%Q)%CR)).
   stepr (IRasCR (x n)).
    stepr (Sum n n (fun n => IRasCR (x n))); [| now apply: Sum_one].
    unfold Sum, Sum1.
@@ -466,8 +466,7 @@ Proof.
   clear - X.
   generalize seq dnn zl X.
   clear seq dnn zl X.
-  generalize (e[/]TwoNZ).
-  clear e.
+  generalize (@cf_div CRasCOrdField e _ (two_ap_zero CRasCOrdField)). clear e.
   induction n; intros e seq dnn zl X.
    simpl in *.
    apply AbsSmall_minus.

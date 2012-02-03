@@ -40,7 +40,6 @@
 (** printing RX %\ensuremath{R[x]}% #R[x]# *)
 (** printing FX %\ensuremath{F[x]}% #F[x]# *)
 
-Require Export CRingClass.
 Require Import CRing_Homomorphisms.
 Require Import Rational.
 

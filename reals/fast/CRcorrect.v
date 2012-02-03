@@ -62,12 +62,7 @@ Proof.
  apply Qle_trans with (((1 # P_of_succ_nat (pred (nat_of_P (2*ed)))) + (1 # 2 * ed)))%Q.
   apply: plus_resp_leEq.
   change (P_of_succ_nat (pred (nat_of_P (2*ed))) <= P_of_succ_nat m)%Z.
-  destruct (Z_lt_le_dec (P_of_succ_nat m)(P_of_succ_nat (pred (nat_of_P (2 * ed)))))%Z.
-   elim (le_not_lt _ _ Hm).
-   apply surj_lt.
-   repeat rewrite succ_nat in z.
-   omega.
-  assumption.
+  rewrite <-!POS_anti_convert. apply inj_le. omega.
  rewrite <- anti_convert_pred_convert.
  stepl ((2#1)*(1#(2*ed)))%Q; [|simpl; ring].
  change ((2#1)*((1/2)*(1/ed)) <= en#ed)%Q.
@@ -307,10 +302,11 @@ Proof.
  stepl (CRasCauchy_IR (Cauchy_IRasCR (f (CRasCauchy_IR x)))); [| apply Cauchy_IRasCauchy_IR].
  apply CRasCauchy_IR_wd.
  symmetry.
- transitivity (g (Cauchy_IRasCR (CRasCauchy_IR x))); try apply H.
- apply g_wd.
- symmetry.
- apply CRasCR.
+ transitivity (g (Cauchy_IRasCR (CRasCauchy_IR x))).
+  apply g_wd.
+  symmetry.
+  apply CRasCR.
+ apply H.
 Qed.
 
 Lemma reverse_iso_uc_fun : forall
