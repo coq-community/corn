@@ -45,7 +45,7 @@ Proof.
    induction 1 as [|? ? IH]; intros s2 E.
     left. now rewrite <-E.
    right. intros _. apply (IH tt). now rewrite E.
-  split; repeat intro; eapply prf; eauto. now symmetry.
+  split; repeat intro; eapply prf; eauto.
 Qed.
 
 Lemma LazyExists_tl `{P : Stream A → Prop} `(ex : LazyExists P s) (Ptl : EventuallyForAll P s) : 

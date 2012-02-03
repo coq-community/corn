@@ -65,15 +65,15 @@ Proof with auto.
    apply CRplus_le_l with (r - y).
    CRring_replace (r - y + (x - r)) (x - y).
    CRring_replace (r - y + y) r.
-   apply Qle_CRle_r.
+   apply (proj1 (Qle_CRle_r _ _)).
    intros.
    apply CRplus_le_l with (y - ' y').
    CRring_replace (y - 'y' + (x - y)) (x - 'y').
    CRring_replace (y - 'y' + 'y') y.
-   apply H...
+   now apply (H y').
   apply CRplus_le_r with (-x).
   CRring_replace (x + r - x) r.
-  apply Qle_CRle_r. intros.
+  apply (proj1 (Qle_CRle_r _ _)). intros.
   apply CRplus_le_l with x.
   CRring_replace (x + (y - x)) y...
   apply H...

@@ -366,9 +366,7 @@ Proof.
  apply nring_less.
  apply nat_of_P_lt_Lt_compare_morphism.
  red in H.
- simpl in H.
- rewrite <- ZC4 in H.
- assumption.
+ simpl in H. now rewrite ZC4.
 Qed.
 
 (** Using the above lemmata we prove the basic properties of [inj_Q], i.e.%\% it is a setoid function and preserves the ring operations and oreder operation. *)

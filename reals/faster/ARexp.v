@@ -229,6 +229,5 @@ Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (('z) 
 Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
 
 Lemma ARtoCR_preserves_exp x : 'ARexp x = exp ('x).
-Proof. apply ARtoCR_preserves_exp_bounded. Qed.
-
+Proof. unfold ARexp. apply ARtoCR_preserves_exp_bounded. Qed.
 End ARexp.

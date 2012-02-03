@@ -4,12 +4,12 @@
   it is still bound to stdlib Q rather than an abstract Rationals implementation. *)
 
 Require Import
- Setoid Arith List Program
+ Arith List
  CSetoids Qmetric Qring Qinf ProductMetric QposInf
  UniformContinuity stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
  interfaces.abstract_algebra
- MathClasses.theory.setoids theory.products.
+ theory.setoids theory.products.
 
 Import Qinf.notations.
 

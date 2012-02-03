@@ -185,7 +185,8 @@ Lemma ARInfAltSum_length_ex `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k 
   LazyExists (λ s, AQball_bool k (hd s) 0) (ARInfAltSum_stream sN sD k l).
 Proof.
   revert l Pl sN sD d.
-  induction (zl (2 ^ (k - 1)))%Qpos as [sQ' E | ? ? IH]; intros l El sN sD d.
+  pose proof (zl (2 ^ (k - 1)))%Qpos as help.
+  clear zl. induction help as [sQ' E | ? ? IH]; intros l El sN sD d.
    left. now apply (ARInfAltSum_length_ball d k l El).
   right. intros _.
   simpl. apply (IH tt).
@@ -350,7 +351,6 @@ Qed.
 
 Definition ARInfAltSum := mkRegularFunction (0 : AQ_as_MetricSpace) ARInfAltSum_prf.
 
-
 Lemma ARInfAltSum_correct:
    'ARInfAltSum = InfiniteAlternatingSum sQ.
 Proof.
@@ -359,5 +359,4 @@ Proof.
   now apply ARInfAltSum_raw_correct.
 Qed.
 End main_part.
-
 End alt_sum.

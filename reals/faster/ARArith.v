@@ -166,7 +166,7 @@ Definition ARmult_bounded (c : AQ₊) : AR --> AR --> AR
 
 Lemma ARtoCR_preserves_mult_bounded x y c : 
   'ARmult_bounded c x y = CRmult_bounded ('c) ('x) ('y).
-Proof. apply preserves_binary_fun. Qed.
+Proof. apply @preserves_binary_fun. Qed.
 Hint Rewrite ARtoCR_preserves_mult_bounded : ARtoCR.
 
 Lemma ARtoCR_approximate (x : AR) (ε : Qpos) : '(approximate x ε) = approximate ('x) ε.

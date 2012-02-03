@@ -5,9 +5,6 @@
 Require Import Limit.
 Require Import abstract_algebra orders additional_operations streams series.
 
-(** shorthand (Agda) notation for streams. *)
-Notation "∞ x" := (Stream x) (at level 50).
-
 (*
 Lemma forall_impl {A} (P Q: ∞ A → Prop) (H1:∀ t, P t → Q t) :
  ∀ t, ForAll P t → ForAll Q t.

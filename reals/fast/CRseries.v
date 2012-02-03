@@ -29,7 +29,7 @@ Require Import Arith.
 Require Import Qordfield.
 Require Import Qpower.
 Require Import LazyNat. 
-Require Import Morphisms Ring abstract_algebra theory.streams.
+Require Import Ring abstract_algebra theory.streams.
 Require Export theory.series.
 
 Opaque Qabs.
@@ -348,6 +348,7 @@ Proof.
   apply AbsSmall_reflexive.
   discriminate.
  apply: Qrecip_positives_help_nbz.
+ clear Qrecip_positives_help_nbz.
  rewrite Zpos_succ_morphism.
  auto with *.
 Qed.

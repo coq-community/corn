@@ -715,7 +715,7 @@ Proof.
  induction n; try apply rational_sqrt_mid_correct.
  intros a Ha H.
  simpl.
- destruct (Qle_total a 1); try apply rational_sqrt_mid_correct.
+ destruct (Qle_total a 1); [| apply rational_sqrt_mid_correct].
  change (scale (1#2) (rational_sqrt_small_bounded n (4%positive*a) (rational_sqrt_small_bounded_subproof n a Ha q)) ==
    IRasCR (sqrt (inj_Q IR a) H))%CR.
  assert (X:[0][<=]inj_Q IR (4%positive*a)).
