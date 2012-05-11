@@ -4,6 +4,7 @@ Require Import
   stdlib_rationals Qinf Qpossec QposInf QnonNeg abstract_algebra QType_rationals additional_operations.
 (*Import (*QnonNeg.notations*) QArith.*)
 Import Qinf.notations.
+Import peano_naturals.
 
 Notation "n .+1" := (S n) (at level 2, left associativity, format "n .+1") : nat_scope.
 
@@ -45,16 +46,23 @@ End Qinf.
 
 Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
+Ltac mc_simpl := unfold
+  equiv, zero, one, plus, negate, mult, dec_recip, le, lt.
+
 Ltac Qsimpl' := unfold
   Qnn_eq, Qnn_zero, Qnn_one, Qnn_plus, Qnn_mult, Qnn_inv,
   QnonNeg.eq, QnonNeg.zero, QnonNeg.one, QnonNeg.plus, QnonNeg.mult, QnonNeg.inv,
   Qpos_eq, Qpos_one, Qpos_plus, Qpos_mult, Qpos_inv,
   Qpossec.QposEq, Qpossec.Qpos_one, Qpossec.Qpos_plus, Qpossec.Qpos_mult, Qpossec.Qpos_inv,
   Qinf.eq, Qinf.lt, Qinf_lt, Qinf_one, Zero_instance_0 (* Zero Qinf *),
-  Q_eq, Q_lt, Q_le, Q_0, Q_1, Q_opp, Q_plus, Q_mult, Q_recip,
-  equiv, lt, le, zero, one, plus, mult, dec_recip,
-  to_Q, QposAsQ;
+  Q_eq, Q_lt, Q_le, Q_0, Q_1, Q_opp, Q_plus, Q_mult, Q_recip;
+  mc_simpl;
+  unfold to_Q, QposAsQ;
   simpl.
+
+Ltac nat_simpl := unfold
+  nat_equiv, nat_0, nat_1, nat_plus, nat_plus, nat_mult, nat_le, nat_lt;
+  mc_simpl.
 
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 
@@ -87,7 +95,7 @@ Class MetricSpaceBall (X : Type) : Type := mspc_ball: Q → relation X.
 
 Local Notation B := mspc_ball.
 
-Class MetricSpaceDistance `{MetricSpaceBall X} := msd : X -> X -> Q.
+Class MetricSpaceDistance (X : Type) := msd : X -> X -> Q.
 
 Class MetricSpace (X : Type) `{Equiv X} `{MetricSpaceBall X} `{MetricSpaceDistance X}: Prop :=
   { mspc_setoid :> Setoid X
@@ -114,7 +122,6 @@ Global Instance : ExtMetricSpace X.
 Admitted.
 
 End Coercion.
-
 
 Section ExtMetricSpaceClass.
 
@@ -266,25 +273,7 @@ End MetricSpaceDefs.
 
 Arguments complete X {_} : clear implicits.
 
-(*Section Contractions.*)
-
-(*Context (X Y : Type) `{Equiv X, Equiv Y, MetricSpaceBall X, MetricSpaceBall Y}.*)
-
-(*
-Definition contr_to_cont
-  (X Y : Type) `{Equiv X, Equiv Y, MetricSpaceBall X, MetricSpaceBall Y} (f : Contraction X Y) : UniformlyContinuous X Y.
-split with (uc_fun := f) (uc_mu := fun e => e / contr_mu f).
-(* uc_proper *)
-apply f.
-(* uc_prf *)
-apply contr_prf.
-Defined.
-
-(*End Contractions.*)
-
-Coercion contr_to_cont : Contraction >-> UniformlyContinuous.
-
-Section MetricSpaceLimits.
+(*Section MetricSpaceLimits.
 
 Context `{MetricSpaceClass X, MetricSpaceClass Y}.
 
@@ -314,19 +303,21 @@ Proof. intro f; apply (limit_cont f). Qed.
 End MetricSpaceLimits.
 *)
 
-(*
 Section BanachFixpoint.
 
-Context `{MetricSpace X} (f : (*Contraction*) X -> X) (x0 : X).
+Context `{MetricSpace X} (f : X -> X) `{!Contraction f q} (x0 : X).
 
-(*Let q : Q := f.(contr_mu).*)
 Let x n := nat_iter n f x0.
 
-Variable d : Q.
+Let d := msd (x 0) (x 1).
 
-Hypothesis dist_x0_x1 : B d (x 0) (x 1).
-
-Lemma dist_xn_xn' : forall n : nat, ball (d * q^n) (x n) (x n.+1).
-
-*)
+Lemma dist_xn_xn' : forall n : nat, B (d * q^n)%mc (x n) (x n.+1).
+Proof.
+induction n using nat_induction.
++ rewrite nat_pow_0, right_identity; subst d; apply mspc_distance.
++ rewrite nat_pow_S. setoid_replace (d * (q * q ^ n)) with (q * (d * q^n)) by (Qsimpl; lra).
+  nat_simpl. simpl. subst x. simpl.
+apply (@contr_prf X H (@ExtMetricSpaceBall_instance_0 X H0)
+X H (@ExtMetricSpaceBall_instance_0 X H0) f q). assumption. assumption.
+Qed.
 
