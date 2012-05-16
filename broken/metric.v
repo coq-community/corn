@@ -1,9 +1,17 @@
 Require Import
-  Psatz QArith
+  QArith
   theory.setoids (* Equiv Prop *) theory.products
   stdlib_rationals Qinf Qpossec QposInf QnonNeg abstract_algebra QType_rationals additional_operations.
 (*Import (*QnonNeg.notations*) QArith.*)
-Import Qinf.notations.
+Require Import Qauto QOrderedType.
+(*Require Import orders.*)
+Require Import theory.rings theory.dec_fields orders.rings nat_pow.
+Require Import interfaces.naturals interfaces.orders.
+
+Add Field Q : (stdlib_field_theory Q).
+
+(*Import Qinf.notations.*)
+Notation Qinf := Qinf.T.
 Import peano_naturals.
 
 Notation "n .+1" := (S n) (at level 2, left associativity, format "n .+1") : nat_scope.
@@ -62,15 +70,16 @@ Ltac Qsimpl' := unfold
 
 Ltac nat_simpl := unfold
   nat_equiv, nat_0, nat_1, nat_plus, nat_plus, nat_mult, nat_le, nat_lt;
-  mc_simpl.
+  mc_simpl;
+  simpl.
 
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 
 (*Open Scope Q_scope.*)
 
-Class ExtMetricSpaceBall (X : Type) : Type := ext_mspc_ball: Qinf → relation X.
+Class MetricSpaceBall (X : Type) : Type := mspc_ball: Qinf → relation X.
 
-Local Notation B' := ext_mspc_ball.
+Local Notation B := mspc_ball.
 
 (* In the proof of Banach fixpoint theorem we have to use arithmetic
 expressions such as q^n / (1 - q) when 0 <= q < 1 as the ball radius. If
@@ -78,37 +87,29 @@ the radius is in Qnn (ie., QnonNeg.T), then we have to prove that 1 - q :
 Qnn. It seems more convenient to have the radius live in Q and have the
 axiom that no points are separated by a negative distance. *)
 
-Class ExtMetricSpace (X : Type) `{Equiv X} `{ExtMetricSpaceBall X} : Prop :=
-  { ext_mspc_setoid :> Setoid X
-  ; ext_mspc_ball_proper:> Proper (=) ext_mspc_ball
-  ; ext_mspc_ball_inf: ∀ x y, B' Qinf.infinite x y
-  ; ext_mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ B' e x y
-  ; ext_mspc_ball_zero: ∀ x y, B' 0 x y ↔ x = y
-  ; ext_mspc_refl:> ∀ e : Q, (0 <= e)%Q → Reflexive (B' e)
-  ; ext_mspc_sym:> ∀ e, Symmetric (B' e)
-  ; ext_mspc_triangle: ∀ (e1 e2: Qinf) (a b c: X),
-       B' e1 a b → B' e2 b c → B' (e1 + e2)%Qinf a c
-  ; ext_mspc_closed: ∀ (e: Q) (a b: X),
-       (∀ d: Q, (0 < d)%Q -> B' (e + d) a b) → B' e a b }.
+Class ExtMetricSpace (X : Type) `{Equiv X} `{MetricSpaceBall X} : Prop :=
+  { mspc_setoid :> Setoid X
+  ; mspc_ball_proper:> Proper (=) B
+  ; mspc_ball_inf: ∀ x y, B Qinf.infinite x y
+  ; mspc_ball_negative: ∀ (e: Q), e < 0 → ∀ x y, ~ B e x y
+  ; mspc_ball_zero: ∀ x y, B 0 x y ↔ x = y
+  ; mspc_refl:> ∀ e : Q, 0 ≤ e → Reflexive (B e)
+  ; mspc_sym:> ∀ e, Symmetric (B e)
+  ; mspc_triangle: ∀ (e1 e2: Q) (a b c: X),
+       B e1 a b → B e2 b c → B (e1 + e2) a c
+  ; mspc_closed: ∀ (e: Q) (a b: X),
+       (∀ d: Q, 0 < d -> B (e + d) a b) → B e a b }.
 
-Class MetricSpaceBall (X : Type) : Type := mspc_ball: Q → relation X.
+(*Class MetricSpaceBall (X : Type) : Type := mspc_ball: Q → relation X.
 
-Local Notation B := mspc_ball.
+Local Notation B := mspc_ball.*)
 
 Class MetricSpaceDistance (X : Type) := msd : X -> X -> Q.
 
-Class MetricSpace (X : Type) `{Equiv X} `{MetricSpaceBall X} `{MetricSpaceDistance X}: Prop :=
-  { mspc_setoid :> Setoid X
-  ; mspc_ball_proper:> Proper (=) B
-  ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ B e x y
-  ; mspc_ball_zero: ∀ x y, B 0 x y ↔ x = y
-  ; mspc_refl:> ∀ e : Q, (0 <= e)%Q → Reflexive (B e)
-  ; mspc_sym:> ∀ e, Symmetric (B e)
-  ; mspc_triangle: ∀ (e1 e2: Q) (a b c: X), B e1 a b → B e2 b c → B (e1 + e2) a c
-  ; mspc_closed: ∀ (e: Q) (a b: X), (∀ d: Q, (0 < d)%Q -> B (e + d) a b) → B e a b
-  ; mspc_distance: forall x1 x2 : X, B (msd x1 x2) x1 x2 }.
+Class MetricSpace (X : Type) `{ExtMetricSpace X} `{MetricSpaceDistance X} : Prop :=
+  mspc_distance : forall x1 x2 : X, B (msd x1 x2) x1 x2.
 
-Section Coercion.
+(*Section Coercion.
 
 Context `{MetricSpace X}.
 
@@ -121,7 +122,7 @@ end.
 Global Instance : ExtMetricSpace X.
 Admitted.
 
-End Coercion.
+End Coercion.*)
 
 Section ExtMetricSpaceClass.
 
@@ -142,17 +143,17 @@ destruct (Qle_lt_or_eq _ _ A1) as [A2 | A2].
 setoid_replace (q ↾ A1) with (from_Qpos (q ↾ A2)) by reflexivity; apply A.
 setoid_replace (q ↾ A1) with 0 by (symmetry in A2; apply A2).
 apply mspc_zero, A.
-Qed.
-
-Lemma mspc_triangle' :
-  ∀ (q1 q2 : Qnn) (b a c : X) (q : Qnn),
-    q1 + q2 = q → mspc_ball q1 a b → mspc_ball q2 b c → mspc_ball q a c.
-Proof.
-intros q1 q2 b a c q A1 A2 A3. rewrite <- A1. eapply mspc_triangle; eauto.
 Qed.*)
 
+Lemma mspc_triangle' :
+  ∀ (q1 q2 : Q) (x2 x1 x3 : X) (q : Q),
+    q1 + q2 = q → B q1 x1 x2 → B q2 x2 x3 → B q x1 x3.
+Proof.
+intros q1 q2 x2 x1 x3 q A1 A2 A3. rewrite <- A1. eapply mspc_triangle; eauto.
+Qed.
+
 Lemma mspc_monotone :
-  ∀ q1 q2 : Q, q1 <= q2 -> ∀ x y : X, B' q1 x y → B' q2 x y.
+  ∀ q1 q2 : Q, q1 ≤ q2 -> ∀ x y : X, B q1 x y → B q2 x y.
 Admitted.
 (*Proof.
 intros q1 q2 A1 x y A2.
@@ -169,6 +170,20 @@ Qed.*)
 
 End ExtMetricSpaceClass.
 
+Section MetricSpaceClass.
+
+Context `{MetricSpace X}.
+
+Lemma msd_nonneg : forall x1 x2 : X, 0 ≤ msd x1 x2.
+Proof.
+intros x1 x2.
+assert (A := mspc_distance x1 x2).
+destruct (le_or_lt 0 (msd x1 x2)) as [A1 | A1]; trivial.
+contradict A; now apply mspc_ball_negative.
+Qed.
+
+End MetricSpaceClass.
+
 Section UniformContinuity.
 
 Context `{ExtMetricSpace X, ExtMetricSpace Y}.
@@ -176,18 +191,22 @@ Context `{ExtMetricSpace X, ExtMetricSpace Y}.
 Class UniformlyContinuous (f : X -> Y) (mu : Q -> Qinf) := {
   uc_proper :> Proper (=) f;
   uc_pos : forall e : Q, 0 < e -> (0 < mu e);
-  uc_prf : ∀ (e : Q) (x1 x2: X), 0 < e -> B' (mu e) x1 x2 → B' e (f x1) (f x2)
+  uc_prf : ∀ (e : Q) (x1 x2: X), 0 < e -> B (mu e) x1 x2 → B e (f x1) (f x2)
 }.
 
 Class Contraction (f : X -> Y) (q : Q) := {
   contr_proper :> Proper (=) f;
-  contr_nonneg_mu : 0 <= q;
+  contr_nonneg_mu : 0 ≤ q;
   contr_lt_mu_1 : q < 1;
-  contr_prf : forall (x1 x2 : X) (e : Q), B' e x1 x2 -> B' (q * e) (f x1) (f x2)
+  contr_prf : forall (x1 x2 : X) (e : Q), B e x1 x2 -> B (q * e) (f x1) (f x2)
 }.
 
+Global Arguments contr_nonneg_mu f q {_} _.
+Global Arguments contr_lt_mu_1 f q {_}.
+Global Arguments contr_prf f q {_} _ _ _ _.
+
 Definition contr_modulus (q e : Q) : Qinf :=
-  if (decide (q = 0)) then 1 else (e / q)%Q.
+  if (decide (q = 0)) then 1 else (e / q).
 
 Close Scope Qinf_scope.
 
@@ -198,12 +217,12 @@ apply fc.
 intros e A. unfold contr_modulus. destruct (decide (q = 0)) as [A1 | A1].
 Qsimpl; auto with qarith.
 destruct fc as [_ A2 _ _]. apply Q.Qmult_lt_0_compat; [apply A | apply Qinv_lt_0_compat].
-revert A A1; Qsimpl; lra.
+revert A1 A2; Qsimpl; q_order.
 intros e x1 x2 A1 A2. unfold contr_modulus in A2. destruct (decide (q = 0)) as [A | A].
-apply contr_prf in A2. rewrite A, Qmult_0_l in A2.
-apply mspc_monotone with (q1 := 0); trivial. apply Qlt_le_weak; trivial.
-apply contr_prf in A2. setoid_replace (q * (e / q)) with e in A2; trivial.
-Qsimpl A; field; trivial.
+apply (contr_prf f q) in A2. rewrite A, Qmult_0_l in A2.
+apply mspc_monotone with (q1 := 0); trivial. apply: Qlt_le_weak; trivial.
+apply (contr_prf f q) in A2. mc_setoid_replace (q * (e / q)) with e in A2; trivial.
+field; trivial.
 Qed.
 
 End UniformContinuity.
@@ -262,10 +281,10 @@ Section MetricSpaceDefs.
 Context `{ExtMetricSpace X}.
 
 Definition cauchy (x : sequence X) :=
-  ∀ q : Qpos, ∃ N : nat, ∀ m n : nat, (N < m)%nat -> (N < n)%nat -> B' q (x m) (x n).
+  ∀ q : Qpos, ∃ N : nat, ∀ m n : nat, (N < m)%nat -> (N < n)%nat -> B q (x m) (x n).
 
 Definition limit (x : sequence X) (a : X) :=
-  ∀ q : Qpos, ∃ N : nat, ∀ n : nat, (N < n)%nat -> B' q (x n) a.
+  ∀ q : Qpos, ∃ N : nat, ∀ n : nat, (N < n)%nat -> B q (x n) a.
 
 Definition complete := ∀ x : sequence X, cauchy x → ∃ a : X, limit x a.
 
@@ -309,15 +328,34 @@ Context `{MetricSpace X} (f : X -> X) `{!Contraction f q} (x0 : X).
 
 Let x n := nat_iter n f x0.
 
+Lemma x_Sn : forall n, x n.+1 = f (x n).
+Proof. reflexivity. Qed.
+
 Let d := msd (x 0) (x 1).
 
-Lemma dist_xn_xn' : forall n : nat, B (d * q^n)%mc (x n) (x n.+1).
+Lemma dist_xn_xSn : forall n : nat, B (d * q^n) (x n) (x n.+1).
 Proof.
 induction n using nat_induction.
 + rewrite nat_pow_0, right_identity; subst d; apply mspc_distance.
-+ rewrite nat_pow_S. setoid_replace (d * (q * q ^ n)) with (q * (d * q^n)) by (Qsimpl; lra).
-  nat_simpl. simpl. subst x. simpl.
-apply (@contr_prf X H (@ExtMetricSpaceBall_instance_0 X H0)
-X H (@ExtMetricSpaceBall_instance_0 X H0) f q). assumption. assumption.
++ rewrite nat_pow_S. mc_setoid_replace (d * (q * q ^ n)) with (q * (d * q^n)) by ring.
+  nat_simpl; rewrite 2!x_Sn; now apply contr_prf.
 Qed.
 
+Lemma ne_q_1 : 1 - q ≠ 0.
+Proof.
+assert (A := contr_lt_mu_1 f q).
+rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
+rewrite plus_negate_r in A. now apply lt_ne_flip.
+Qed.
+
+Lemma dist_xm_xn : forall m n : nat, B (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)%mc).
+Proof.
+intro m; induction n  as [| n IH] using nat_induction.
++ rewrite right_identity; apply mspc_refl.
+  now rewrite nat_pow_0, plus_negate_r, right_absorb, left_absorb.
++ apply (mspc_triangle' (d * q^m * (1 - q^n) / (1 - q))%mc (d * q^(m + n))%mc (x (m + n)%mc)); trivial.
+  - rewrite nat_pow_S, nat_pow_exp_plus; field; apply ne_q_1.
+  - mc_setoid_replace (m + (1 + n)) with (1 + (m + n)) by ring. apply dist_xn_xSn.
+Qed.
+
+End BanachFixpoint.
