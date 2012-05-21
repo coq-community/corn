@@ -10,6 +10,8 @@ Require Import interfaces.naturals interfaces.orders.
 
 Add Field Q : (stdlib_field_theory Q).
 
+Bind Scope mc_scope with Q.
+
 (*Import Qinf.notations.*)
 Notation Qinf := Qinf.T.
 Import peano_naturals.
@@ -328,12 +330,31 @@ Context `{MetricSpace X} (f : X -> X) `{!Contraction f q} (x0 : X).
 
 Let x n := nat_iter n f x0.
 
-Lemma x_Sn : forall n, x n.+1 = f (x n).
+Arguments x n%mc.
+
+Lemma x_Sn : forall n, x (1 + n) = f (x n).
 Proof. reflexivity. Qed.
 
 Let d := msd (x 0) (x 1).
 
-Lemma dist_xn_xSn : forall n : nat, B (d * q^n) (x n) (x n.+1).
+Instance : PropHolds (0 ≤ d).
+Proof. apply msd_nonneg. Qed.
+
+Instance : PropHolds (0 ≤ q).
+Proof. apply (contr_nonneg_mu f q). Qed.
+
+Instance : PropHolds (0 < 1 - q).
+Proof.
+assert (A := contr_lt_mu_1 f q).
+rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
+now rewrite plus_negate_r in A.
+Qed.
+
+Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
+  PropHolds (0 < x) -> PropHolds (x ≠ 0).
+Proof. intros; now apply lt_ne_flip. Qed.
+
+Lemma dist_xn_xSn : forall n : nat, B (d * q^n) (x n) (x (1 + n)).
 Proof.
 induction n using nat_induction.
 + rewrite nat_pow_0, right_identity; subst d; apply mspc_distance.
@@ -341,21 +362,27 @@ induction n using nat_induction.
   nat_simpl; rewrite 2!x_Sn; now apply contr_prf.
 Qed.
 
-Lemma ne_q_1 : 1 - q ≠ 0.
-Proof.
-assert (A := contr_lt_mu_1 f q).
-rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
-rewrite plus_negate_r in A. now apply lt_ne_flip.
-Qed.
+(*Lemma nonzero_1_minus_q : 1 - q ≠ 0.
+Proof. apply lt_ne_flip, pos_1_minus_q. Qed.*)
 
-Lemma dist_xm_xn : forall m n : nat, B (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)%mc).
+Lemma dist_xm_xn : forall m n : nat, B (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)).
 Proof.
 intro m; induction n  as [| n IH] using nat_induction.
 + rewrite right_identity; apply mspc_refl.
   now rewrite nat_pow_0, plus_negate_r, right_absorb, left_absorb.
-+ apply (mspc_triangle' (d * q^m * (1 - q^n) / (1 - q))%mc (d * q^(m + n))%mc (x (m + n)%mc)); trivial.
-  - rewrite nat_pow_S, nat_pow_exp_plus; field; apply ne_q_1.
++ apply (mspc_triangle' (d * q^m * (1 - q^n) / (1 - q)) (d * q^(m + n)) (x (m + n))); trivial.
+  - rewrite nat_pow_S, nat_pow_exp_plus. field; solve_propholds.
   - mc_setoid_replace (m + (1 + n)) with (1 + (m + n)) by ring. apply dist_xn_xSn.
+Qed.
+
+Lemma dist_xm_xn' : forall m n : nat, B (d * q^m / (1 - q)) (x m) (x (m + n)).
+Proof.
+intros m n. apply (mspc_monotone (d * q^m * (1 - q^n) / (1 - q))); [| apply dist_xm_xn].
+apply (order_preserving (.* /(1 - q))). rewrite <- associativity.
+apply (order_preserving (d *.)). rewrite <- (mult_1_r (q^m)) at 2.
+apply (order_preserving (q^m *.)). rewrite <- (plus_0_r 1) at 2.
+apply (order_preserving (1 +)). rewrite <- negate_0.
+apply <- flip_le_negate. solve_propholds.
 Qed.
 
 End BanachFixpoint.
