@@ -77,7 +77,8 @@ Ltac nat_simpl := unfold
 
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 
-(*Open Scope Q_scope.*)
+Lemma plus_comm `{SemiRing R} (x y : R) : x + y = y + x.
+Proof. rapply commonoid_commutative; apply _. Qed.
 
 Class MetricSpaceBall (X : Type) : Type := mspc_ball: Qinf → relation X.
 
@@ -276,23 +277,86 @@ Qed.
 End UCFMetricSpace.
 *)
 
-Definition sequence (X : Type) := nat -> X.
+Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
+  PropHolds (0 < x) -> PropHolds (x ≠ 0).
+Proof. intros; now apply lt_ne_flip. Qed.
 
-Section MetricSpaceDefs.
+Section Isometry.
+
+Context `{ExtMetricSpace X, ExtMetricSpace Y}.
+
+Class Isometry (f : X -> Y) :=
+  isometry : forall (e : Q) (x1 x2 : X), B e x1 x2 <-> B e (f x1) (f x2).
+
+Global Instance isometry_injective `{Isometry f} : Injective f.
+Proof.
+constructor; [| constructor]; try apply _; intros x y; rewrite <- !mspc_ball_zero;
+intros ?; [apply <- isometry | apply -> isometry]; trivial.
+Qed.
+
+Class IsometricIsomorphism (f : X -> Y) (g : Inverse f) := {
+  isometric_isomorphism_isometry :> Isometry f;
+  isometric_isomorphism_surjection :> Surjective f
+}.
+
+End Isometry.
+
+Section CompleteMetricSpace.
 
 Context `{ExtMetricSpace X}.
 
-Definition cauchy (x : sequence X) :=
-  ∀ q : Qpos, ∃ N : nat, ∀ m n : nat, (N < m)%nat -> (N < n)%nat -> B q (x m) (x n).
+Class IsRegularFunction (f : Q -> X) : Prop :=
+  cauchy : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e1 + e2) (f e1) (f e2).
 
-Definition limit (x : sequence X) (a : X) :=
-  ∀ q : Qpos, ∃ N : nat, ∀ n : nat, (N < n)%nat -> B q (x n) a.
+Record RegularFunction := {
+  rf_func :> Q -> X;
+  rf_proof : IsRegularFunction rf_func
+}.
 
-Definition complete := ∀ x : sequence X, cauchy x → ∃ a : X, limit x a.
+Arguments Build_RegularFunction {_} _.
 
-End MetricSpaceDefs.
+Global Existing Instance rf_proof.
 
-Arguments complete X {_} : clear implicits.
+Instance rf_eq : Equiv RegularFunction :=
+  λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e1 + e2) (f1 e1) (f2 e2).
+
+Instance rf_setoid : Setoid RegularFunction.
+Proof.
+constructor.
++ intros f e1 e2; apply cauchy.
++ intros f1 f2 A e1 e2 A1 A2. rewrite plus_comm. now apply mspc_sym, A.
++ intros f1 f2 f3 A1 A2 e1 e3 A3 A4. apply mspc_closed. intros d A5.
+  mc_setoid_replace (e1 + e3 + d) with ((e1 + d / 2) + (e3 + d / 2))
+  by (field; change ((2 : Q) ≠ 0); solve_propholds).
+  apply mspc_triangle with (b := f2 (d / 2));
+  [apply A1 | rewrite plus_comm; apply A2]; try solve_propholds.
+Qed.
+
+Instance rf_msb : MetricSpaceBall RegularFunction :=
+  λ e f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e + e1 + e2) (f1 e1) (f2 e2).
+
+Instance rf_mspc : ExtMetricSpace RegularFunction.
+Proof.
+constructor.
+apply _.
+Admitted.
+
+Lemma unit_reg (x : X) : IsRegularFunction (λ _, x).
+Proof. intros e1 e2 A1 A2; apply mspc_refl; solve_propholds. Qed.
+
+Definition reg_unit (x : X) := Build_RegularFunction (unit_reg x).
+
+Class Limit := lim : RegularFunction -> X.
+
+Class CompleteMetricSpace `{Limit} := cmspc : IsometricIsomorphism reg_unit lim.
+
+Lemma limit_def `{CompleteMetricSpace} (f : RegularFunction) :
+  forall e : Q, 0 < e -> B e (f e) (lim f).
+Proof.
+intros e A.
+Admitted.
+
+End CompleteMetricSpace.
 
 (*Section MetricSpaceLimits.
 
@@ -349,10 +413,6 @@ assert (A := contr_lt_mu_1 f q).
 rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
 now rewrite plus_negate_r in A.
 Qed.
-
-Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
-  PropHolds (0 < x) -> PropHolds (x ≠ 0).
-Proof. intros; now apply lt_ne_flip. Qed.
 
 Lemma dist_xn_xSn : forall n : nat, B (d * q^n) (x n) (x (1 + n)).
 Proof.
