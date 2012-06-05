@@ -230,14 +230,6 @@ Qed.
 
 End UniformContinuity.
 
-(*
-Why does
-SearchPattern (@Proper _ (@equiv (Q -> Qinf) _) _).
-work but
-SearchPattern (@Proper _ (@equiv _ _) _).
-does not?
-*)
-
 (*Section UCFMetricSpace.
 
 Context `{MetricSpaceClass X, MetricSpaceClass Y}.
@@ -281,6 +273,7 @@ Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
   PropHolds (0 < x) -> PropHolds (x ≠ 0).
 Proof. intros; now apply lt_ne_flip. Qed.
 
+(*
 Section Isometry.
 
 Context `{ExtMetricSpace X, ExtMetricSpace Y}.
@@ -300,6 +293,41 @@ Class IsometricIsomorphism (f : X -> Y) (g : Inverse f) := {
 }.
 
 End Isometry.
+*)
+
+Definition seq A := nat -> A.
+
+Section MetricSpaceLimits.
+
+Context `{ExtMetricSpace X, ExtMetricSpace Y}.
+
+(*Definition slim (x : seq X) (a : X) :=
+  forall 
+
+Theorem limit_unique : ∀ (x : seq X) (a b : X), limit x a → limit x b → a = b.
+Proof.
+intros x a b A1 A2; apply mspc_eq'; intro q.
+specialize (A1 (q / 2)); specialize (A2 (q / 2)).
+destruct A1 as [N1 A1]; destruct A2 as [N2 A2].
+set (N := S (Peano.max N1 N2)). specialize (A1 N); specialize (A2 N).
+apply (mspc_triangle' (q / 2) (q / 2) (x N));
+[Qsimpl; field | apply mspc_symm |];
+[apply A1 | apply A2]; subst N; lia.
+Qed.
+
+Theorem limit_cont : ∀ (f : UniformlyContinuous X Y) (x : seq X) (a : X),
+  limit x a → limit (f ∘ x) (f a).
+Proof.
+intros f x a A1 q.
+specialize (A1 (uc_mu f q)).
+destruct A1 as [N A1]. exists N; intros n A2. now apply uc_prf, A1.
+Qed.
+
+Theorem limit_contr : ∀ (f : Contraction X Y) (x : seq X) (a : X),
+  limit x a → limit (f ∘ x) (f a).
+Proof. intro f; apply (limit_cont f). Qed.*)
+
+End MetricSpaceLimits.
 
 Section CompleteMetricSpace.
 
@@ -348,45 +376,18 @@ Definition reg_unit (x : X) := Build_RegularFunction (unit_reg x).
 
 Class Limit := lim : RegularFunction -> X.
 
-Class CompleteMetricSpace `{Limit} := cmspc : IsometricIsomorphism reg_unit lim.
+Class CompleteMetricSpace `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
 
 Lemma limit_def `{CompleteMetricSpace} (f : RegularFunction) :
   forall e : Q, 0 < e -> B e (f e) (lim f).
 Proof.
-intros e A.
-Admitted.
+intros e2 A2. apply mspc_sym; apply mspc_closed.
+(* [apply mspc_sym, mspc_closed.] does not work *)
+intros e1 A1. change (lim f) with (reg_unit (lim f) e1). rewrite plus_comm.
+rapply (surjective reg_unit (inv := lim)); trivial; reflexivity.
+Qed.
 
 End CompleteMetricSpace.
-
-(*Section MetricSpaceLimits.
-
-Context `{MetricSpaceClass X, MetricSpaceClass Y}.
-
-Theorem limit_unique : ∀ (x : sequence X) (a b : X), limit x a → limit x b → a = b.
-Proof.
-intros x a b A1 A2; apply mspc_eq'; intro q.
-specialize (A1 (q / 2)); specialize (A2 (q / 2)).
-destruct A1 as [N1 A1]; destruct A2 as [N2 A2].
-set (N := S (Peano.max N1 N2)). specialize (A1 N); specialize (A2 N).
-apply (mspc_triangle' (q / 2) (q / 2) (x N));
-[Qsimpl; field | apply mspc_symm |];
-[apply A1 | apply A2]; subst N; lia.
-Qed.
-
-Theorem limit_cont : ∀ (f : UniformlyContinuous X Y) (x : sequence X) (a : X),
-  limit x a → limit (f ∘ x) (f a).
-Proof.
-intros f x a A1 q.
-specialize (A1 (uc_mu f q)).
-destruct A1 as [N A1]. exists N; intros n A2. now apply uc_prf, A1.
-Qed.
-
-Theorem limit_contr : ∀ (f : Contraction X Y) (x : sequence X) (a : X),
-  limit x a → limit (f ∘ x) (f a).
-Proof. intro f; apply (limit_cont f). Qed.
-
-End MetricSpaceLimits.
-*)
 
 Section BanachFixpoint.
 
