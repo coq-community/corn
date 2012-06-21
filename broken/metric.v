@@ -8,6 +8,93 @@ Require Import Qauto QOrderedType.
 Require Import theory.rings theory.dec_fields orders.rings orders.dec_fields nat_pow.
 Require Import interfaces.naturals interfaces.orders.
 
+Require Import CRGeometricSum.
+Import Qround Qpower.
+
+Set Printing Coercions.
+
+Lemma iff_not (P Q : Prop) : (P <-> Q) -> (not P <-> not Q).
+Proof. tauto. Qed.
+
+Notation "x ²" := (x * x) (at level 30) : mc_scope.
+
+(*Lemma expand_square `{SemiRing A} `{Naturals C} `{!NatPowSpec A C pw} :
+  forall x : A, x² = x * x.
+Proof. intro y; now rewrite nat_pow_S, <- (plus_0_r 1), nat_pow_S, nat_pow_0, mult_1_r. Qed.*)
+
+Lemma po_proper' `{PartialOrder A} {x1 x2 y1 y2 : A} :
+  x1 ≤ y1 -> x1 = x2 -> y1 = y2 -> x2 ≤ y2.
+Proof. intros A1 A2 A3; now apply (po_proper _ _ A2 _ _ A3). Qed.
+
+Lemma le_not_eq `{FullPartialOrder A} (x y : A) : x ≤ y -> x ≶ y -> x < y.
+Proof. intros ? ?; apply lt_iff_le_apart; now split. Qed.
+
+Lemma le_lt_eq `{@FullPartialOrder B Be Bap Ble Blt} `{@TrivialApart B Be Bap}
+  `{forall x y : B, Decision (x = y)} (x y : B) : x ≤ y ↔ x < y ∨ x = y.
+Proof.
+assert (Setoid B) by apply po_setoid.
+split; intro A.
++ destruct (decide (x = y)) as [A1 | A1]; [now right |].
+  apply trivial_apart in A1. left; apply lt_iff_le_apart; now split.
++ destruct A as [A | A].
+  - apply lt_iff_le_apart in A; now destruct A.
+  - now rewrite A.
+Qed.
+
+Lemma Zto_nat_nonpos (z : Z) : (z <= 0)%Z -> Z.to_nat z ≡ 0.
+Proof.
+intro A; destruct z as [| p | p]; trivial.
+unfold Z.le in A; now contradict A.
+Qed.
+
+Lemma le_Z_to_nat (n : nat) (z : Z) : (Z.to_nat z <= n)%nat <-> (z <= Z.of_nat n)%Z.
+Proof.
+pose proof (le_0_n n). pose proof (Zle_0_nat n).
+destruct (Z.neg_nonneg_cases z).
++ rewrite Zto_nat_nonpos by now apply Z.lt_le_incl. split; auto with zarith.
++ split; intro A.
+  - apply inj_le in A. rewrite Z2Nat.id in A; trivial.
+  - apply Z2Nat.inj_le in A; trivial. rewrite Nat2Z.id in A; trivial.
+Qed.
+
+Lemma lt_Z_to_nat (n : nat) (z : Z) : (n < Z.to_nat z)%nat <-> (Z.of_nat n < z)%Z.
+Proof.
+assert (A : forall (m n : nat), not (m <= n)%nat <-> (n < m)%nat).
++ intros; split; [apply not_le | apply gt_not_le].
++ assert (A1 := le_Z_to_nat n z). apply iff_not in A1.
+  now rewrite A, Z.nle_gt in A1.
+Qed.
+
+(* Qlt_Qceiling is not used below *)
+Lemma Qlt_Qceiling (q : Q) : (Qceiling q < q + 1)%Q.
+Proof.
+apply Qplus_lt_l with (z := -1). setoid_replace (q + 1 + -1)%Q with q.
++ assert (A := Qceiling_lt q). unfold Z.sub in A.
+  now rewrite inject_Z_plus, inject_Z_opp in A.
++ now rewrite <- Qplus_assoc, Qplus_opp_r, Qplus_0_r.
+Qed.
+
+Lemma Qle_Qceiling_Z (q : Q) (z : Z) : (Qceiling q <= z)%Z <-> (q <= z)%Q.
+Proof.
+split; intro A.
++ rewrite Zle_Qle in A. apply Qle_trans with (y := Qceiling q); [apply Qle_ceiling | trivial].
++ apply Z.lt_pred_le. rewrite Zlt_Qlt. now apply Qlt_le_trans with (y := q); [apply Qceiling_lt |].
+Qed.
+
+Lemma Qle_Qceiling_nat (q : Q) (n : nat) : (Z.to_nat (Qceiling q) <= n)%nat <-> (q <= n)%Q.
+Proof. rewrite le_Z_to_nat; apply Qle_Qceiling_Z. Qed.
+
+Lemma Qlt_Qceiling_Z (q : Q) (z : Z) : (z < q)%Q <-> (z < Qceiling q)%Z.
+Proof.
+assert (A : forall (x y : Q), not (x <= y)%Q <-> (y < x)%Q).
++ intros; split; [apply Qnot_le_lt | apply Qlt_not_le].
++ assert (A1 := Qle_Qceiling_Z q z). apply iff_not in A1.
+  now rewrite A, Z.nle_gt in A1.
+Qed.
+
+Lemma Qlt_Qceiling_nat (q : Q) (n : nat) : (n < q)%Q <-> (n < Z.to_nat (Qceiling q))%nat.
+Proof. rewrite (Qlt_Qceiling_Z q n); symmetry; apply lt_Z_to_nat. Qed.
+
 Lemma neq_symm `{Ae : Equiv X} `{!Symmetric Ae} (x y : X) : x ≠ y -> y ≠ x.
 Proof. intros A1 A2; apply A1; now symmetry. Qed.
 
@@ -171,9 +258,6 @@ Qed.
 
 End MetricSpace.
 
-Lemma le_not_eq `{FullPartialOrder A} (x y : A) : x ≤ y -> x ≶ y -> x < y.
-Proof. intros ? ?; apply lt_iff_le_apart; now split. Qed.
-
 Section UniformContinuity.
 
 Context `{ExtMetricSpace X, ExtMetricSpace Y}.
@@ -296,8 +380,6 @@ Context `{ExtMetricSpace X}.
 Class IsRegularFunction (f : Q -> X) : Prop :=
   rf_prf : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e1 + e2) (f e1) (f e2).
 
-Require Import interfaces.monads.
-
 Record RegularFunction := {
   rf_func :> Q -> X;
   rf_proof : IsRegularFunction rf_func
@@ -345,7 +427,15 @@ Qed.
 
 End CompleteMetricSpace.
 
+Arguments RegularFunction X {_}.
+Arguments Limit X {_}.
+Arguments CompleteMetricSpace X {_ _ _ _}.
+
 Definition seq A := nat -> A.
+
+(*Hint Unfold seq : typeclass_instances.*)
+(* This unfolds [seq X] as [nat -> X] and allows ext_equiv to find an
+instance of [Equiv (seq X)] *)
 
 Section SequenceLimits.
 
@@ -354,11 +444,7 @@ Context `{ExtMetricSpace X}.
 Definition seq_lim (x : seq X) (a : X) (N : Q -> nat) :=
   forall e : Q, 0 < e -> forall n : nat, N e ≤ n -> B e (x n) a.
 
-(*Hint Unfold seq : typeclass_instances.*)
-(* This unfolds [seq X] as [nat -> X] and allows ext_equiv to find an
-instance of [Equiv (seq X)] *)
-
-Instance : Proper (((=) ==> (=)) ==> (=) ==> (=) ==> iff) seq_lim.
+Global Instance : Proper (((=) ==> (=)) ==> (=) ==> (=) ==> iff) seq_lim.
 Proof.
 intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
 + mc_setoid_replace (x2 n) with (x1 n) by (symmetry; now apply A1).
@@ -367,6 +453,15 @@ intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
 + mc_setoid_replace (x1 n) with (x2 n) by now apply A1.
   rewrite A2. mc_setoid_replace (N1 e) with (N2 e) in A4 by now apply A3.
   now apply A.
+Qed.
+
+Global Instance : Proper (((=) ==> (=)) ==> (=) ==> (≡) ==> iff) seq_lim.
+Proof.
+intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
++ mc_setoid_replace (x2 n) with (x1 n) by (symmetry; now apply A1).
+  rewrite <- A2. rewrite <- A3 in A4. now apply A.
++ mc_setoid_replace (x1 n) with (x2 n) by now apply A1.
+  rewrite A2. rewrite A3 in A4. now apply A.
 Qed.
 
 Lemma seq_lim_unique : ∀ (x : seq X) (a1 a2 : X) N1 N2, seq_lim x a1 N1 → seq_lim x a2 N2 → a1 = a2.
@@ -402,11 +497,11 @@ match (f x) with
 | Qinf.infinite => inf
 end.
 
-Section ContinuousFunctionSequence.
+(*Section ContinuousFunctionSequence.*)
 
-Context `{ExtMetricSpace X, ExtMetricSpace Y} (f : X -> Y).
-
-Theorem seq_lim_cont `{!IsUniformlyContinuous f mu} (x : seq X) (a : X) (N : Q -> nat) :
+Theorem seq_lim_cont
+  `{ExtMetricSpace X, ExtMetricSpace Y} (f : X -> Y) `{!IsUniformlyContinuous f mu}
+  (x : seq X) (a : X) (N : Q -> nat) :
   seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N mu 0).
 Proof.
 intros A e e_pos n A1. apply (uc_prf f mu); trivial.
@@ -414,14 +509,21 @@ unfold comp_inf in A1; assert (A2 := uc_pos f mu e e_pos).
 now destruct (mu e); [apply A | apply mspc_inf].
 Qed.
 
-(* Now suppose that X is a regular metric space *)
-Context `{MetricSpaceDistance X} `{@MetricSpace X _ _ _ _}.
-
-Theorem seq_lim_contr  `{!IsContraction f q} (x : seq X) (a : X) (N : Q -> nat) :
+Theorem seq_lim_contr
+  `{MetricSpace X, ExtMetricSpace Y} (f : X -> Y) `{!IsContraction f q}
+  (x : seq X) (a : X) (N : Q -> nat) :
   seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N (contr_modulus q) 0).
-Proof. intro A; now apply seq_lim_cont. Qed.
+Proof. intro A; apply seq_lim_cont; [apply _ | apply A]. Qed.
 
-End ContinuousFunctionSequence.
+Lemma iter_fixpoint
+  `{ExtMetricSpace X, ExtMetricSpace Y}
+  (f : X -> X) `{!IsUniformlyContinuous f mu} (x : seq X) (a : X) (N : Q -> nat) :
+  (forall n : nat, x (S n) = f (x n)) -> seq_lim x a N -> f a = a.
+Proof.
+intros A1 A2; generalize A2; intro A3. apply seq_lim_S in A2. apply (seq_lim_cont f) in A3.
+mc_setoid_replace (x ∘ S) with (f ∘ x) in A2 by (intros ? ? eqmn; rewrite eqmn; apply A1).
+eapply seq_lim_unique; eauto.
+Qed.
 
 Section CompleteSpaceSequenceLimits.
 
@@ -430,7 +532,7 @@ Context `{CompleteMetricSpace X}.
 Definition cauchy (x : seq X) (N : Q -> nat) :=
   forall e : Q, 0 < e -> forall m n : nat, N e ≤ m -> N e ≤ n -> B e (x m) (x n).
 
-Definition reg_fun (x : seq X) (N : Q -> nat) (A : cauchy x N) : RegularFunction.
+Definition reg_fun (x : seq X) (N : Q -> nat) (A : cauchy x N) : RegularFunction X.
 refine (Build_RegularFunction (x ∘ N) _).
 (* without loss of generality, N e1 ≤ N e2 *)
 assert (A3 : forall e1 e2, 0 < e1 -> 0 < e2 -> N e1 ≤ N e2 -> B (e1 + e2) ((x ∘ N) e1) ((x ∘ N) e2)).
@@ -461,7 +563,9 @@ End CompleteSpaceSequenceLimits.
 
 Section BanachFixpoint.
 
-Context `{MetricSpace X} (f : X -> X) `{!IsContraction f q} (x0 : X).
+Context `{MetricSpace X} {Xlim : Limit X} {Xcms : CompleteMetricSpace X}.
+
+Context (f : X -> X) `{!IsContraction f q} (x0 : X).
 
 Let x n := nat_iter n f x0.
 
@@ -478,6 +582,9 @@ Proof. apply msd_nonneg. Qed.
 Instance : PropHolds (0 ≤ q).
 Proof. apply (contr_nonneg_mu f q). Qed.
 
+Instance : PropHolds (q < 1).
+Proof. apply (contr_lt_mu_1 f q). Qed.
+
 Instance : PropHolds (0 < 1 - q).
 Proof.
 assert (A := contr_lt_mu_1 f q).
@@ -492,9 +599,6 @@ induction n using nat_induction.
 + rewrite nat_pow_S. mc_setoid_replace (d * (q * q ^ n)) with (q * (d * q^n)) by ring.
   nat_simpl; rewrite 2!x_Sn; now apply contr_prf.
 Qed.
-
-(*Lemma nonzero_1_minus_q : 1 - q ≠ 0.
-Proof. apply lt_ne_flip, pos_1_minus_q. Qed.*)
 
 Lemma dist_xm_xn : forall m n : nat, B (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)).
 Proof.
@@ -514,6 +618,89 @@ apply (order_preserving (d *.)). rewrite <- (mult_1_r (q^m)) at 2.
 apply (order_preserving (q^m *.)). rewrite <- (plus_0_r 1) at 2.
 apply (order_preserving (1 +)). rewrite <- negate_0.
 apply <- flip_le_negate. solve_propholds.
+Qed.
+
+(*Let NQ (e : Q) : Q := (d / (e * (1 - q)^2)).
+
+Let N (e : Q) : nat := Z.to_nat (Qceiling (NQ e)).
+
+Lemma NQ_pos (e : Q) : 0 < d -> 0 < e -> 0 < NQ e.
+Proof. intros; subst NQ; solve_propholds. Qed.
+
+Lemma N_pos (e : Q) : 0 < d -> 0 < e -> 0 < N e.
+Proof. intros; now apply Qlt_Qceiling_nat, NQ_pos. Qed.*)
+
+Lemma Qpower_mc_power (e : Q) (n : nat) : (e ^ n)%Q = (e ^ n)%mc.
+Proof.
+induction n as [| n IH] using nat_induction.
++ now rewrite nat_pow_0.
++ rewrite Nat2Z.inj_add, Qpower_plus'.
+  - now rewrite nat_pow_S, IH.
+  - rewrite <- Nat2Z.inj_add; change 0%Z with (Z.of_nat 0); rewrite Nat2Z.inj_iff;
+    apply not_eq_sym, O_S.
+(*
+SearchPattern (?x ≢ ?y -> ?y ≢ ?x).
+Anomaly: Signature and its instance do not match. Please report.
+*)
+Qed.
+
+Lemma power_tends_to_zero (e : Q) (n : nat) :
+  0 < e -> Z.to_nat (Qceiling (/(e * (1 - q)))%mc) ≤ n -> q ^ n ≤ e.
+Proof.
+intros A1 A2.
+assert (A3 : 0 < n).
++ let T := type of A2 in match T with (?lhs ≤ _) => apply lt_le_trans with (y := lhs) end; [| trivial].
+  apply Qlt_Qceiling_nat; change (0 < / (e * (1 - q))); solve_propholds.
++ destruct n as [| n]; [elim (lt_irrefl _ A3) |].
+  rewrite <- Qpower_mc_power.
+  apply GeometricCovergenceLemma with (e := e ↾ A1); [solve_propholds .. |].
+  apply (Qle_Qceiling_nat _ (S n)), A2.
+Qed.
+
+Lemma const_x (N : Q -> nat) : d = 0 -> cauchy x N.
+Proof.
+intro eq_d_0.
+assert (A := mspc_distance (x 0) (x 1)).
+subst d; rewrite eq_d_0 in A; apply mspc_zero in A.
+assert (C : forall n, x n = x 0).
++ induction n as [| n IH] using nat_induction; [easy |].
+  change (x (1 + n)) with (f (x n)). rewrite IH. symmetry; apply A.
++ intros e e_pos m n _ _. rewrite (C m), (C n). (* second "rewrite C" does not work *)
+  apply mspc_refl. solve_propholds.
+Qed.
+
+Lemma cauchy_x : cauchy x (λ e, Z.to_nat (Qceiling (d / (e * (1 - q)²))%mc)).
+Proof.
+assert (d_nonneg : 0 ≤ d) by solve_propholds.
+assert (d_pos_0 : 0 < d \/ 0 = d) by now apply le_lt_eq.
+destruct d_pos_0 as [d_pos | d_0]; [| now apply const_x].
+intros e e_pos.
+(* without loss of generality, m ≤ n *)
+match goal with
+|- forall m n, @?G m n => intros m n; assert (A : forall m n, m ≤ n -> G m n)
+end.
++ clear m n; intros m n le_m_n A _.
+  rewrite <- (cut_minus_le n m); trivial. rewrite plus_comm.
+  apply (mspc_monotone (d * q^m / (1 - q))); [| apply dist_xm_xn'].
+  cut (q ^ m ≤ e * (1 - q) / d).
+  - intro A1. apply (order_preserving (d *.)), (order_preserving (.* /(1 - q))) in A1.
+    apply (po_proper' A1); [easy | field; split; solve_propholds].
+  - apply power_tends_to_zero; [solve_propholds |].
+    apply (po_proper' A); [| easy]. apply f_equal, Qceiling_comp.
+    match goal with |- (Qeq ?l ?r) => change (l = r) end.
+    field; repeat split; solve_propholds.
++ assert (A1 : TotalRelation (A := nat) (≤)) by apply _; destruct (A1 m n).
+  - now apply A.
+  - intros; apply mspc_sym; now apply A.
+Qed.
+
+Let a := lim (reg_fun x _ cauchy_x).
+
+Lemma banach_fixpoint : f a = a.
+Proof.
+assert (C := cauchy_x).
+(* [Check seq_lim_lim (A := C)] says "Wrong argument name: A", but [About seq_lim_lim] shows A *)
+eapply (iter_fixpoint f x); [easy | apply seq_lim_lim].
 Qed.
 
 End BanachFixpoint.
