@@ -7,6 +7,7 @@ Require Import Qauto QOrderedType.
 (*Require Import orders.*)
 Require Import theory.rings theory.dec_fields orders.rings orders.dec_fields nat_pow.
 Require Import interfaces.naturals interfaces.orders.
+Import peano_naturals.
 
 Require Import CRGeometricSum.
 Import Qround Qpower.
@@ -17,10 +18,6 @@ Lemma iff_not (P Q : Prop) : (P <-> Q) -> (not P <-> not Q).
 Proof. tauto. Qed.
 
 Notation "x ²" := (x * x) (at level 30) : mc_scope.
-
-(*Lemma expand_square `{SemiRing A} `{Naturals C} `{!NatPowSpec A C pw} :
-  forall x : A, x² = x * x.
-Proof. intro y; now rewrite nat_pow_S, <- (plus_0_r 1), nat_pow_S, nat_pow_0, mult_1_r. Qed.*)
 
 Lemma po_proper' `{PartialOrder A} {x1 x2 y1 y2 : A} :
   x1 ≤ y1 -> x1 = x2 -> y1 = y2 -> x2 ≤ y2.
@@ -109,12 +106,11 @@ Add Field Q : (stdlib_field_theory Q).
 
 Bind Scope mc_scope with Q.
 
-(*Import Qinf.notations.*)
 Notation Qinf := Qinf.T.
-Import peano_naturals.
 
 Notation "n .+1" := (S n) (at level 2, left associativity, format "n .+1") : nat_scope.
 
+(*
 Local Notation Qnn := QnonNeg.T.
 
 Instance Qnn_eq : Equiv Qnn := eq.
@@ -131,6 +127,7 @@ Instance Qpos_mult : Mult Qpos := Qpossec.Qpos_mult.
 Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 
 Instance Qinf_one : One Qinf := 1%Q.
+*)
 
 Module Qinf.
 
@@ -153,6 +150,7 @@ End Qinf.
 
 Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
+(*
 Ltac mc_simpl := unfold
   equiv, zero, one, plus, negate, mult, dec_recip, le, lt.
 
@@ -173,10 +171,11 @@ Ltac nat_simpl := unfold
   simpl.
 
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
+*)
 
 Class MetricSpaceBall (X : Type) : Type := mspc_ball: Qinf → relation X.
 
-Local Notation B := mspc_ball.
+Local Notation ball := mspc_ball.
 
 (* In the proof of Banach fixpoint theorem we have to use arithmetic
 expressions such as q^n / (1 - q) when 0 <= q < 1 as the ball radius. If
@@ -184,25 +183,24 @@ the radius is in Qnn (ie., QnonNeg.T), then we have to prove that 1 - q :
 Qnn. It seems more convenient to have the radius live in Q and have the
 axiom that no points are separated by a negative distance. *)
 
-Class ExtMetricSpace (X : Type) `{Equiv X} `{MetricSpaceBall X} : Prop :=
-  { mspc_setoid :> Setoid X
-  ; mspc_proper:> Proper (=) B
-  ; mspc_inf: ∀ x y, B Qinf.infinite x y
-  ; mspc_negative: ∀ (e: Q), e < 0 → ∀ x y, ~ B e x y
-  ; mspc_zero: ∀ x y, B 0 x y ↔ x = y
-  ; mspc_refl:> ∀ e : Q, 0 ≤ e → Reflexive (B e)
-  ; mspc_sym:> ∀ e, Symmetric (B e)
-  ; mspc_triangle: ∀ (e1 e2: Q) (a b c: X),
-       B e1 a b → B e2 b c → B (e1 + e2) a c
-  ; mspc_closed: ∀ (e: Q) (a b: X),
-       (∀ d: Q, 0 < d -> B (e + d) a b) → B e a b }.
+Class ExtMetricSpace (X : Type) `{MetricSpaceBall X} : Prop := {
+  mspc_radius_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball;
+  mspc_inf: ∀ x y, ball Qinf.infinite x y;
+  mspc_negative: ∀ (e: Q), e < 0 → ∀ x y, ~ ball e x y;
+  mspc_refl:> ∀ e : Q, 0 ≤ e → Reflexive (ball e);
+  mspc_symm:> ∀ e, Symmetric (ball e);
+  mspc_triangle: ∀ (e1 e2: Q) (a b c: X),
+     ball e1 a b → ball e2 b c → ball (e1 + e2) a c;
+  mspc_closed: ∀ (e: Q) (a b: X),
+     (∀ d: Q, 0 < d -> ball (e + d) a b) → ball e a b
+}.
 
 (*
 This shows that if axioms of metric space are formulated with Qinf instead of Q,
 the [apply] tactic won't be able to unify them with goals using Q
 
-Goal (forall (e1 e2 : Qinf) (x1 x2 : X), B (e1 + e2) x1 x2) ->
-  (forall (e1 e2 : Q) (x1 x2 : X), B (e1 + e2) x1 x2).
+Goal (forall (e1 e2 : Qinf) (x1 x2 : X), ball (e1 + e2) x1 x2) ->
+  (forall (e1 e2 : Q) (x1 x2 : X), ball (e1 + e2) x1 x2).
 intros A e1 e2 x1 x2.
 change (e1 + e2 : Qinf) with ((Qinf.finite e1) + (Qinf.finite e2)).
 apply A.
@@ -211,36 +209,58 @@ apply A.
 Class MetricSpaceDistance (X : Type) := msd : X -> X -> Q.
 
 Class MetricSpace (X : Type) `{ExtMetricSpace X} `{MetricSpaceDistance X} : Prop :=
-  mspc_distance : forall x1 x2 : X, B (msd x1 x2) x1 x2.
+  mspc_distance : forall x1 x2 : X, ball (msd x1 x2) x1 x2.
 
 Section ExtMetricSpace.
 
 Context `{ExtMetricSpace X}.
 
+Global Instance mspc_equiv : Equiv X := λ x1 x2, ball 0%Q x1 x2.
+
+Global Instance mspc_setoid : Setoid X.
+Proof.
+constructor.
++ now apply mspc_refl.
++ apply mspc_symm.
++ intros x1 x2 x3 eq12 eq23.
+  unfold mspc_equiv, equiv; change 0%Q with (0%Q + 0%Q); now apply mspc_triangle with (b := x2).
+Qed.
+
+Global Instance mspc_proper : Proper ((=) ==> (=) ==> (=) ==> iff) ball.
+Proof.
+assert (A := @mspc_radius_proper X _ _).
+intros e1 e2 Ee1e2 x1 x2 Ex1x2 y1 y2 Ey1y2;
+destruct e1 as [e1 |]; destruct e2 as [e2 |]; split; intro B; try apply mspc_inf;
+try (unfold Qinf.eq, equiv in *; contradiction).
++ mc_setoid_replace e2 with (0 + (e2 + 0)) by ring.
+  apply mspc_triangle with (b := x1); [apply mspc_symm, Ex1x2 |].
+  now apply mspc_triangle with (b := y1); [rewrite <- Ee1e2 |].
++ mc_setoid_replace e1 with (0 + (e1 + 0)) by ring.
+  apply mspc_triangle with (b := x2); [apply Ex1x2 |].
+  now apply mspc_triangle with (b := y2); [rewrite Ee1e2 | apply mspc_symm].
+Qed.
+
 Lemma mspc_triangle' :
   ∀ (q1 q2 : Q) (x2 x1 x3 : X) (q : Q),
-    q1 + q2 = q → B q1 x1 x2 → B q2 x2 x3 → B q x1 x3.
+    q1 + q2 = q → ball q1 x1 x2 → ball q2 x2 x3 → ball q x1 x3.
 Proof.
 intros q1 q2 x2 x1 x3 q A1 A2 A3. rewrite <- A1. eapply mspc_triangle; eauto.
 Qed.
 
 Lemma mspc_monotone :
-  ∀ q1 q2 : Q, q1 ≤ q2 -> ∀ x y : X, B q1 x y → B q2 x y.
+  ∀ q1 q2 : Q, q1 ≤ q2 -> ∀ x y : X, ball q1 x y → ball q2 x y.
 Proof.
 intros q1 q2 A1 x y A2.
 apply (mspc_triangle' q1 (q2 - q1) y); [ring | trivial |]. apply mspc_refl.
 apply (order_preserving (+ (-q1))) in A1. now rewrite plus_negate_r in A1.
 Qed.
 
-Lemma mspc_zero' : ∀ x y : X, (∀ e : Q, 0 < e -> B e x y) ↔ B 0 x y.
+Lemma mspc_eq : ∀ x y : X, (∀ e : Q, 0 < e -> ball e x y) ↔ x = y.
 Proof.
 intros x y; split; intro A.
 + apply mspc_closed; intro d. change 0%Q with (@zero Q _); rewrite plus_0_l; apply A.
 + intros e e_pos. apply (mspc_monotone 0); trivial; solve_propholds.
 Qed.
-
-Lemma mspc_eq : ∀ x y : X, (∀ e : Q, 0 < e -> B e x y) ↔ x = y.
-Proof. intros x y. rewrite <- mspc_zero. apply mspc_zero'. Qed.
 
 End ExtMetricSpace.
 
@@ -264,7 +284,7 @@ Context `{ExtMetricSpace X, ExtMetricSpace Y}.
 
 Class IsUniformlyContinuous (f : X -> Y) (mu : Q -> Qinf) := {
   uc_pos : forall e : Q, 0 < e -> (0 < mu e);
-  uc_prf : ∀ (e : Q) (x1 x2: X), 0 < e -> B (mu e) x1 x2 → B e (f x1) (f x2)
+  uc_prf : ∀ (e : Q) (x1 x2: X), 0 < e -> ball (mu e) x1 x2 → ball e (f x1) (f x2)
 }.
 
 Global Arguments uc_pos f mu {_} e _.
@@ -272,7 +292,7 @@ Global Arguments uc_prf f mu {_} e x1 x2 _ _.
 
 Global Instance uc_proper `{IsUniformlyContinuous f mu} : Proper ((=) ==> (=)) f.
 Proof.
-intros x1 x2 A. apply mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
+intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
 pose proof (uc_pos f mu e e_pos) as ?.
 destruct (mu e); [apply mspc_eq; trivial | apply mspc_inf].
 Qed.
@@ -286,7 +306,7 @@ Context `{MetricSpace X, ExtMetricSpace Y}.
 Class IsContraction (f : X -> Y) (q : Q) := {
   contr_nonneg_mu : 0 ≤ q;
   contr_lt_mu_1 : q < 1;
-  contr_prf : forall (x1 x2 : X) (e : Q), B e x1 x2 -> B (q * e) (f x1) (f x2)
+  contr_prf : forall (x1 x2 : X) (e : Q), ball e x1 x2 -> ball (q * e) (f x1) (f x2)
 }.
 
 Global Arguments contr_nonneg_mu f q {_} _.
@@ -305,7 +325,7 @@ constructor.
   pose proof (contr_nonneg_mu f q) as A2. pose proof (le_not_eq _ _ A2 A1). solve_propholds.
 + intros e x1 x2 A1 A2. unfold contr_modulus in A2. destruct (decide (0 = q)) as [A | A].
   - assert (A3 := contr_prf f q x1 x2 (msd x1 x2) (mspc_distance x1 x2)).
-    rewrite <- A, mult_0_l in A3; now apply mspc_zero'.
+    rewrite <- A, mult_0_l in A3; now apply mspc_eq.
   - mc_setoid_replace e with (q * (e / q)) by (field; now apply neq_symm).
     now apply contr_prf.
 Qed.
@@ -327,9 +347,9 @@ intros f g h A1 A2 x y A3; rewrite A3; now transitivity (g y); [apply A1 | apply
 Qed.
 
 Instance UCFSpaceBall : MetricSpaceBall (IsUniformlyContinuous X Y) :=
-  fun q f g => forall x, B q (f x) (g x).
+  fun q f g => forall x, ball q (f x) (g x).
 
-Lemma UCFBallProper : Proper equiv B.
+Lemma UCFBallProper : Proper equiv ball.
 Proof.
 intros q1 q2 A1 f1 f2 A2 g1 g2 A3; split; intros A4 x.
 + rewrite <- A1. rewrite <- (A2 x x); [| reflexivity]. rewrite <- (A3 x x); [| reflexivity]. apply A4.
@@ -357,11 +377,11 @@ Section Isometry.
 Context `{ExtMetricSpace X, ExtMetricSpace Y}.
 
 Class Isometry (f : X -> Y) :=
-  isometry : forall (e : Q) (x1 x2 : X), B e x1 x2 <-> B e (f x1) (f x2).
+  isometry : forall (e : Q) (x1 x2 : X), ball e x1 x2 <-> ball e (f x1) (f x2).
 
 Global Instance isometry_injective `{Isometry f} : Injective f.
 Proof.
-constructor; [| constructor]; try apply _; intros x y; rewrite <- !B_zero;
+constructor; [| constructor]; try apply _; intros x y; rewrite <- !ball_zero;
 intros ?; [apply <- isometry | apply -> isometry]; trivial.
 Qed.
 
@@ -378,7 +398,7 @@ Section CompleteMetricSpace.
 Context `{ExtMetricSpace X}.
 
 Class IsRegularFunction (f : Q -> X) : Prop :=
-  rf_prf : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e1 + e2) (f e1) (f e2).
+  rf_prf : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f e1) (f e2).
 
 Record RegularFunction := {
   rf_func :> Q -> X;
@@ -390,13 +410,13 @@ Arguments Build_RegularFunction {_} _.
 Global Existing Instance rf_proof.
 
 Instance rf_eq : Equiv RegularFunction :=
-  λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e1 + e2) (f1 e1) (f2 e2).
+  λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f1 e1) (f2 e2).
 
 Instance rf_setoid : Setoid RegularFunction.
 Proof.
 constructor.
 + intros f e1 e2; apply rf_prf.
-+ intros f1 f2 A e1 e2 A1 A2. rewrite plus_comm. now apply mspc_sym, A.
++ intros f1 f2 A e1 e2 A1 A2. rewrite plus_comm. now apply mspc_symm, A.
 + intros f1 f2 f3 A1 A2 e1 e3 A3 A4. apply mspc_closed. intros d A5.
   mc_setoid_replace (e1 + e3 + d) with ((e1 + d / 2) + (e3 + d / 2))
   by (field; change ((2 : Q) ≠ 0); solve_propholds).
@@ -405,7 +425,7 @@ constructor.
 Qed.
 
 Instance rf_msb : MetricSpaceBall RegularFunction :=
-  λ e f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> B (e + e1 + e2) (f1 e1) (f2 e2).
+  λ e f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e + e1 + e2) (f1 e1) (f2 e2).
 
 Lemma unit_reg (x : X) : IsRegularFunction (λ _, x).
 Proof. intros e1 e2 A1 A2; apply mspc_refl; solve_propholds. Qed.
@@ -417,10 +437,10 @@ Class Limit := lim : RegularFunction -> X.
 Class CompleteMetricSpace `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
 
 Lemma limit_def `{CompleteMetricSpace} (f : RegularFunction) :
-  forall e : Q, 0 < e -> B e (f e) (lim f).
+  forall e : Q, 0 < e -> ball e (f e) (lim f).
 Proof.
-intros e2 A2. apply mspc_sym; apply mspc_closed.
-(* [apply mspc_sym, mspc_closed.] does not work *)
+intros e2 A2. apply mspc_symm; apply mspc_closed.
+(* [apply mspc_symm, mspc_closed.] does not work *)
 intros e1 A1. change (lim f) with (reg_unit (lim f) e1). rewrite plus_comm.
 rapply (surjective reg_unit (inv := lim)); trivial; reflexivity.
 Qed.
@@ -429,7 +449,7 @@ End CompleteMetricSpace.
 
 Arguments RegularFunction X {_}.
 Arguments Limit X {_}.
-Arguments CompleteMetricSpace X {_ _ _ _}.
+Arguments CompleteMetricSpace X {_ _ _}.
 
 Definition seq A := nat -> A.
 
@@ -442,9 +462,9 @@ Section SequenceLimits.
 Context `{ExtMetricSpace X}.
 
 Definition seq_lim (x : seq X) (a : X) (N : Q -> nat) :=
-  forall e : Q, 0 < e -> forall n : nat, N e ≤ n -> B e (x n) a.
+  forall e : Q, 0 < e -> forall n : nat, N e ≤ n -> ball e (x n) a.
 
-Global Instance : Proper (((=) ==> (=)) ==> (=) ==> (=) ==> iff) seq_lim.
+Global Instance : Proper (((=) ==> (=)) ==> (=) ==> ((=) ==> (=)) ==> iff) seq_lim.
 Proof.
 intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
 + mc_setoid_replace (x2 n) with (x1 n) by (symmetry; now apply A1).
@@ -466,14 +486,14 @@ Qed.
 
 Lemma seq_lim_unique : ∀ (x : seq X) (a1 a2 : X) N1 N2, seq_lim x a1 N1 → seq_lim x a2 N2 → a1 = a2.
 Proof.
-intros x a1 a2 N1 N2 A1 A2. apply mspc_eq; intros q A.
+intros x a1 a2 N1 N2 A1 A2. apply -> mspc_eq; intros q A.
 assert (A3 : 0 < q / 2) by solve_propholds.
 specialize (A1 (q / 2) A3); specialize (A2 (q / 2) A3).
 set (M := Peano.max (N1 (q / 2)) (N2 (q / 2))).
 assert (A4 : N1 (q / 2) ≤ M) by apply le_max_l.
 assert (A5 : N2 (q / 2) ≤ M) by apply le_max_r.
 specialize (A1 M A4); specialize (A2 M A5).
-apply mspc_sym in A1.
+apply mspc_symm in A1.
 apply (mspc_triangle' (q / 2) (q / 2) (x M)); trivial.
 field; change ((2 : Q) ≠ 0); solve_propholds.
 Qed.
@@ -530,12 +550,12 @@ Section CompleteSpaceSequenceLimits.
 Context `{CompleteMetricSpace X}.
 
 Definition cauchy (x : seq X) (N : Q -> nat) :=
-  forall e : Q, 0 < e -> forall m n : nat, N e ≤ m -> N e ≤ n -> B e (x m) (x n).
+  forall e : Q, 0 < e -> forall m n : nat, N e ≤ m -> N e ≤ n -> ball e (x m) (x n).
 
 Definition reg_fun (x : seq X) (N : Q -> nat) (A : cauchy x N) : RegularFunction X.
 refine (Build_RegularFunction (x ∘ N) _).
 (* without loss of generality, N e1 ≤ N e2 *)
-assert (A3 : forall e1 e2, 0 < e1 -> 0 < e2 -> N e1 ≤ N e2 -> B (e1 + e2) ((x ∘ N) e1) ((x ∘ N) e2)).
+assert (A3 : forall e1 e2, 0 < e1 -> 0 < e2 -> N e1 ≤ N e2 -> ball (e1 + e2) ((x ∘ N) e1) ((x ∘ N) e2)).
 + intros e1 e2 A1 A2 A3.
   apply (mspc_monotone e1).
   - apply (strictly_order_preserving (e1 +)) in A2; rewrite plus_0_r in A2; solve_propholds.
@@ -543,7 +563,7 @@ assert (A3 : forall e1 e2, 0 < e1 -> 0 < e2 -> N e1 ≤ N e2 -> B (e1 + e2) ((x 
 + intros e1 e2 A1 A2.
   assert (A4 : TotalRelation (A := nat) (≤)) by apply _; destruct (A4 (N e1) (N e2)).
   - now apply A3.
-  - rewrite plus_comm; now apply mspc_sym, A3.
+  - rewrite plus_comm; now apply mspc_symm, A3.
 Defined.
 
 Arguments reg_fun {_} {_} _.
@@ -554,7 +574,7 @@ Proof.
 set (f := reg_fun A).
 intros e A1 n A2. apply (mspc_triangle' (e / 2) (e / 2) (x (N (e / 2)))).
 + field; change ((2 : Q) ≠ 0); solve_propholds.
-+ now apply mspc_sym, A; [solve_propholds | reflexivity |].
++ now apply mspc_symm, A; [solve_propholds | reflexivity |].
 + change (x (N (e / 2))) with (f (e / 2)).
   apply limit_def; solve_propholds.
 Qed.
@@ -592,15 +612,16 @@ rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
 now rewrite plus_negate_r in A.
 Qed.
 
-Lemma dist_xn_xSn : forall n : nat, B (d * q^n) (x n) (x (1 + n)).
+Lemma dist_xn_xSn : forall n : nat, ball (d * q^n) (x n) (x (1 + n)).
 Proof.
 induction n using nat_induction.
 + rewrite nat_pow_0, right_identity; subst d; apply mspc_distance.
 + rewrite nat_pow_S. mc_setoid_replace (d * (q * q ^ n)) with (q * (d * q^n)) by ring.
-  nat_simpl; rewrite 2!x_Sn; now apply contr_prf.
+  change (x (1 + n)) with (f (x n)); change (x (1 + (1 + n))) with (f (x (1 + n))).
+  now apply contr_prf.
 Qed.
 
-Lemma dist_xm_xn : forall m n : nat, B (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)).
+Lemma dist_xm_xn : forall m n : nat, ball (d * q^m * (1 - q^n) / (1 - q)) (x m) (x (m + n)).
 Proof.
 intro m; induction n  as [| n IH] using nat_induction.
 + rewrite right_identity; apply mspc_refl.
@@ -610,7 +631,7 @@ intro m; induction n  as [| n IH] using nat_induction.
   - mc_setoid_replace (m + (1 + n)) with (1 + (m + n)) by ring. apply dist_xn_xSn.
 Qed.
 
-Lemma dist_xm_xn' : forall m n : nat, B (d * q^m / (1 - q)) (x m) (x (m + n)).
+Lemma dist_xm_xn' : forall m n : nat, ball (d * q^m / (1 - q)) (x m) (x (m + n)).
 Proof.
 intros m n. apply (mspc_monotone (d * q^m * (1 - q^n) / (1 - q))); [| apply dist_xm_xn].
 apply (order_preserving (.* /(1 - q))). rewrite <- associativity.
@@ -661,7 +682,7 @@ Lemma const_x (N : Q -> nat) : d = 0 -> cauchy x N.
 Proof.
 intro eq_d_0.
 assert (A := mspc_distance (x 0) (x 1)).
-subst d; rewrite eq_d_0 in A; apply mspc_zero in A.
+subst d; rewrite eq_d_0 in A.
 assert (C : forall n, x n = x 0).
 + induction n as [| n IH] using nat_induction; [easy |].
   change (x (1 + n)) with (f (x n)). rewrite IH. symmetry; apply A.
@@ -691,7 +712,7 @@ end.
     field; repeat split; solve_propholds.
 + assert (A1 : TotalRelation (A := nat) (≤)) by apply _; destruct (A1 m n).
   - now apply A.
-  - intros; apply mspc_sym; now apply A.
+  - intros; apply mspc_symm; now apply A.
 Qed.
 
 Let a := lim (reg_fun x _ cauchy_x).
