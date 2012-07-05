@@ -26,6 +26,7 @@ Proof. intros A1 A2 A3; now apply (po_proper _ _ A2 _ _ A3). Qed.
 Lemma le_not_eq `{FullPartialOrder A} (x y : A) : x ≤ y -> x ≶ y -> x < y.
 Proof. intros ? ?; apply lt_iff_le_apart; now split. Qed.
 
+(* Use orders.orders.le_equiv_lt instead *)
 Lemma le_lt_eq `{@FullPartialOrder B Be Bap Ble Blt} `{@TrivialApart B Be Bap}
   `{forall x y : B, Decision (x = y)} (x y : B) : x ≤ y ↔ x < y ∨ x = y.
 Proof.
@@ -95,20 +96,36 @@ Proof. rewrite (Qlt_Qceiling_Z q n); symmetry; apply lt_Z_to_nat. Qed.
 Lemma neq_symm `{Ae : Equiv X} `{!Symmetric Ae} (x y : X) : x ≠ y -> y ≠ x.
 Proof. intros A1 A2; apply A1; now symmetry. Qed.
 
-Lemma plus_comm `{SemiRing R} (x y : R) : x + y = y + x.
-Proof. rapply commonoid_commutative; apply _. Qed.
+Lemma plus_comm `{SemiRing R} : Commutative (+).
+Proof. eapply commonoid_commutative; apply _. Qed.
+
+Lemma plus_assoc `{SemiRing R} : forall x y z : R, x + (y + z) = (x + y) + z.
+Proof. apply sg_ass, _. Qed.
 
 Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
   PropHolds (0 < x) -> PropHolds (x ≠ 0).
 Proof. intros; now apply lt_ne_flip. Qed.
+
+(*Ltac MCQconst t :=
+match t with
+(*| @zero Q _ _ => constr:(Qmake Z0 xH)
+| @one Q _ _ => constr:(Qmake (Zpos xH) xH)*)
+| _ => Qcst t
+end.
+
+Add Field Q : (stdlib_field_theory Q)
+  (decidable Qeq_bool_eq,
+   completeness Qeq_eq_bool,
+   constants [MCQconst]).
+
+Goal forall x y : Q, (1#1)%Q * x = x.
+intros x y. ring.*)
 
 Add Field Q : (stdlib_field_theory Q).
 
 Bind Scope mc_scope with Q.
 
 Notation Qinf := Qinf.T.
-
-Notation "n .+1" := (S n) (at level 2, left associativity, format "n .+1") : nat_scope.
 
 (*
 Local Notation Qnn := QnonNeg.T.
@@ -183,7 +200,7 @@ the radius is in Qnn (ie., QnonNeg.T), then we have to prove that 1 - q :
 Qnn. It seems more convenient to have the radius live in Q and have the
 axiom that no points are separated by a negative distance. *)
 
-Class ExtMetricSpace (X : Type) `{MetricSpaceBall X} : Prop := {
+Class ExtMetricSpaceClass (X : Type) `{MetricSpaceBall X} : Prop := {
   mspc_radius_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball;
   mspc_inf: ∀ x y, ball Qinf.infinite x y;
   mspc_negative: ∀ (e: Q), e < 0 → ∀ x y, ~ ball e x y;
@@ -208,12 +225,12 @@ apply A.
 
 Class MetricSpaceDistance (X : Type) := msd : X -> X -> Q.
 
-Class MetricSpace (X : Type) `{ExtMetricSpace X} `{MetricSpaceDistance X} : Prop :=
+Class MetricSpaceClass (X : Type) `{ExtMetricSpaceClass X} `{MetricSpaceDistance X} : Prop :=
   mspc_distance : forall x1 x2 : X, ball (msd x1 x2) x1 x2.
 
 Section ExtMetricSpace.
 
-Context `{ExtMetricSpace X}.
+Context `{ExtMetricSpaceClass X}.
 
 Global Instance mspc_equiv : Equiv X := λ x1 x2, ball 0%Q x1 x2.
 
@@ -266,7 +283,7 @@ End ExtMetricSpace.
 
 Section MetricSpace.
 
-Context `{MetricSpace X}.
+Context `{MetricSpaceClass X}.
 
 Lemma msd_nonneg : forall x1 x2 : X, 0 ≤ msd x1 x2.
 Proof.
@@ -280,7 +297,7 @@ End MetricSpace.
 
 Section UniformContinuity.
 
-Context `{ExtMetricSpace X, ExtMetricSpace Y}.
+Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
 
 Class IsUniformlyContinuous (f : X -> Y) (mu : Q -> Qinf) := {
   uc_pos : forall e : Q, 0 < e -> (0 < mu e);
@@ -301,7 +318,7 @@ End UniformContinuity.
 
 Section Contractions.
 
-Context `{MetricSpace X, ExtMetricSpace Y}.
+Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
 
 Class IsContraction (f : X -> Y) (q : Q) := {
   contr_nonneg_mu : 0 ≤ q;
@@ -374,7 +391,7 @@ End UCFMetricSpace.
 (*
 Section Isometry.
 
-Context `{ExtMetricSpace X, ExtMetricSpace Y}.
+Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
 
 Class Isometry (f : X -> Y) :=
   isometry : forall (e : Q) (x1 x2 : X), ball e x1 x2 <-> ball e (f x1) (f x2).
@@ -395,7 +412,7 @@ End Isometry.
 
 Section CompleteMetricSpace.
 
-Context `{ExtMetricSpace X}.
+Context `{ExtMetricSpaceClass X}.
 
 Class IsRegularFunction (f : Q -> X) : Prop :=
   rf_prf : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f e1) (f e2).
@@ -412,7 +429,7 @@ Global Existing Instance rf_proof.
 Instance rf_eq : Equiv RegularFunction :=
   λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f1 e1) (f2 e2).
 
-Instance rf_setoid : Setoid RegularFunction.
+Global Instance rf_setoid : Setoid RegularFunction.
 Proof.
 constructor.
 + intros f e1 e2; apply rf_prf.
@@ -434,9 +451,9 @@ Definition reg_unit (x : X) := Build_RegularFunction (unit_reg x).
 
 Class Limit := lim : RegularFunction -> X.
 
-Class CompleteMetricSpace `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
+Class CompleteMetricSpaceClass `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
 
-Lemma limit_def `{CompleteMetricSpace} (f : RegularFunction) :
+Lemma limit_def `{CompleteMetricSpaceClass} (f : RegularFunction) :
   forall e : Q, 0 < e -> ball e (f e) (lim f).
 Proof.
 intros e2 A2. apply mspc_symm; apply mspc_closed.
@@ -449,7 +466,7 @@ End CompleteMetricSpace.
 
 Arguments RegularFunction X {_}.
 Arguments Limit X {_}.
-Arguments CompleteMetricSpace X {_ _ _}.
+Arguments CompleteMetricSpaceClass X {_ _ _}.
 
 Definition seq A := nat -> A.
 
@@ -459,7 +476,7 @@ instance of [Equiv (seq X)] *)
 
 Section SequenceLimits.
 
-Context `{ExtMetricSpace X}.
+Context `{ExtMetricSpaceClass X}.
 
 Definition seq_lim (x : seq X) (a : X) (N : Q -> nat) :=
   forall e : Q, 0 < e -> forall n : nat, N e ≤ n -> ball e (x n) a.
@@ -517,10 +534,8 @@ match (f x) with
 | Qinf.infinite => inf
 end.
 
-(*Section ContinuousFunctionSequence.*)
-
 Theorem seq_lim_cont
-  `{ExtMetricSpace X, ExtMetricSpace Y} (f : X -> Y) `{!IsUniformlyContinuous f mu}
+  `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y) `{!IsUniformlyContinuous f mu}
   (x : seq X) (a : X) (N : Q -> nat) :
   seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N mu 0).
 Proof.
@@ -530,13 +545,13 @@ now destruct (mu e); [apply A | apply mspc_inf].
 Qed.
 
 Theorem seq_lim_contr
-  `{MetricSpace X, ExtMetricSpace Y} (f : X -> Y) `{!IsContraction f q}
+  `{MetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y) `{!IsContraction f q}
   (x : seq X) (a : X) (N : Q -> nat) :
   seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N (contr_modulus q) 0).
 Proof. intro A; apply seq_lim_cont; [apply _ | apply A]. Qed.
 
 Lemma iter_fixpoint
-  `{ExtMetricSpace X, ExtMetricSpace Y}
+  `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}
   (f : X -> X) `{!IsUniformlyContinuous f mu} (x : seq X) (a : X) (N : Q -> nat) :
   (forall n : nat, x (S n) = f (x n)) -> seq_lim x a N -> f a = a.
 Proof.
@@ -547,7 +562,7 @@ Qed.
 
 Section CompleteSpaceSequenceLimits.
 
-Context `{CompleteMetricSpace X}.
+Context `{CompleteMetricSpaceClass X}.
 
 Definition cauchy (x : seq X) (N : Q -> nat) :=
   forall e : Q, 0 < e -> forall m n : nat, N e ≤ m -> N e ≤ n -> ball e (x m) (x n).
@@ -583,7 +598,7 @@ End CompleteSpaceSequenceLimits.
 
 Section BanachFixpoint.
 
-Context `{MetricSpace X} {Xlim : Limit X} {Xcms : CompleteMetricSpace X}.
+Context `{MetricSpaceClass X} {Xlim : Limit X} {Xcms : CompleteMetricSpaceClass X}.
 
 Context (f : X -> X) `{!IsContraction f q} (x0 : X).
 
@@ -611,6 +626,14 @@ assert (A := contr_lt_mu_1 f q).
 rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
 now rewrite plus_negate_r in A.
 Qed.
+
+Instance : PropHolds (0 ≤ / q - 1).
+Proof. Admitted.
+(*(*apply (strictly_order_reflecting (+ (-1))).*)
+assert (A : q < 1) by solve_propholds. apply flip_lt_dec_recip in A.
+rewrite dec_recip_1 in A.
+apply (strictly_order_preserving (+ (-1))) in A. now rewrite plus_negate_r in A.
+Qed.*)
 
 Lemma dist_xn_xSn : forall n : nat, ball (d * q^n) (x n) (x (1 + n)).
 Proof.
@@ -641,16 +664,6 @@ apply (order_preserving (1 +)). rewrite <- negate_0.
 apply <- flip_le_negate. solve_propholds.
 Qed.
 
-(*Let NQ (e : Q) : Q := (d / (e * (1 - q)^2)).
-
-Let N (e : Q) : nat := Z.to_nat (Qceiling (NQ e)).
-
-Lemma NQ_pos (e : Q) : 0 < d -> 0 < e -> 0 < NQ e.
-Proof. intros; subst NQ; solve_propholds. Qed.
-
-Lemma N_pos (e : Q) : 0 < d -> 0 < e -> 0 < N e.
-Proof. intros; now apply Qlt_Qceiling_nat, NQ_pos. Qed.*)
-
 Lemma Qpower_mc_power (e : Q) (n : nat) : (e ^ n)%Q = (e ^ n)%mc.
 Proof.
 induction n as [| n IH] using nat_induction.
@@ -664,6 +677,64 @@ SearchPattern (?x ≢ ?y -> ?y ≢ ?x).
 Anomaly: Signature and its instance do not match. Please report.
 *)
 Qed.
+
+Lemma Qstepl : forall (x y z : Q), x ≤ y -> x = z -> z ≤ y.
+Proof. intros ? ? ? ? A2; now rewrite <- A2. Qed.
+
+Lemma Qstepr : forall (x y z : Q), x ≤ y -> y = z -> x ≤ z.
+Proof. intros ? ? ? ? A2; now rewrite <- A2. Qed.
+
+Declare Left Step Qstepl.
+Declare Right Step Qstepr.
+
+Lemma binom_ineq (a : Q) (n : nat) : -1 ≤ a -> 1 + (n : Q) * a ≤ (1 + a)^n.
+Proof.
+intro A.
+assert (A1 : 0 ≤ 1 + a) by (now apply (order_preserving (1 +)) in A; rewrite plus_negate_r in A).
+induction n as [| n IH] using nat_induction.
++ rewrite nat_pow_0; change (1 + 0 * a ≤ 1); now rewrite mult_0_l, plus_0_r.
++ rewrite nat_pow_S. transitivity ((1 + a) * (1 + (n : Q) * a)).
+  - rewrite Nat2Z.inj_add, inject_Z_plus.
+    stepr (1 + (1 + (n : Q)) * a + (n : Q) * a²) by ring.
+    apply nonneg_plus_le_compat_r, nonneg_mult_compat; [apply Qle_Qceiling_nat, le_0_n | apply square_nonneg].
+  - now apply (order_preserving ((1 + a) *.)) in IH.
+Qed.
+
+Lemma nat_pow_recip `{DecField A} `{Naturals B} `{!NatPowSpec A B pw} :
+  (∀ x y : A, Decision (x = y)) ->
+    forall (a : A) (n : B), (/a) ^ n = /(a ^ n).
+Proof.
+intros D a. apply naturals.induction.
++ intros n1 n2 E; now rewrite E.
++ rewrite !nat_pow_0; symmetry; apply dec_recip_1.
++ intros n IH. now rewrite !nat_pow_S, dec_recip_distr, IH.
+Qed.
+
+(*
+Lemma power_tends_to_zero (e : Q) (n : nat) :
+  0 < e -> Z.to_nat (Qceiling (q * (1 - e) / (e * (1 - q)))%mc) ≤ n -> q ^ n ≤ e.
+Proof.
+intros e_pos n_big.
+assert (A : /e ≤ (/q)^n).
++ mc_setoid_replace (/ q) with (1 + (/ q - 1)) by ring.
+  transitivity (1 + (n : Q) * (/ q - 1)).
+  - apply Qle_Qceiling_nat in n_big. set (m := (n : Q)) in *.
+    let T := type of n_big in match T with (Qle ?l ?r) => change (l ≤ r) in n_big end.
+    apply (order_reflecting (-1 +)). rewrite plus_assoc, plus_negate_l, plus_0_l.
+    apply (order_preserving (.* (/q - 1))) in n_big.
+    apply (po_proper' n_big); [| easy]. field.
+    (* When [plus_assoc : Associative (+)], the last rewrite does not work *)
+cut (forall x y z : Q, x + (y + z) = (x + y) + z). intro ass. rewrite ass.
+rewrite plus_assoc.
+  - apply binom_ineq. rewrite <- (plus_0_l (-1)) at 1.
+    apply (order_preserving (+ (-1))); solve_propholds.
++ rewrite nat_pow_recip in A; [| apply _]. apply flip_le_dec_recip in A; [| solve_propholds].
+  now rewrite !dec_recip_involutive in A.
+Qed.
+
+SearchAbout (/ (/ _) )%mc.
+flip_le_dec_recip
+*)
 
 Lemma power_tends_to_zero (e : Q) (n : nat) :
   0 < e -> Z.to_nat (Qceiling (/(e * (1 - q)))%mc) ≤ n -> q ^ n ≤ e.

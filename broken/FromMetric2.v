@@ -1,4 +1,4 @@
-Require Import Complete metric.
+Require Import metric2.Complete metric2.Metric metric.
 Require Import
   abstract_algebra stdlib_rationals
   orders.orders orders.semirings orders.rings theory.rings.
@@ -7,7 +7,7 @@ Section FromMetricSpace.
 
 Variable X : MetricSpace.
 
-Instance msp_mspc_ball : MetricSpaceBall X := λ (e : Qinf) (x y : X),
+Global Instance msp_mspc_ball : MetricSpaceBall X := λ (e : Qinf) (x y : X),
 match e with
 | Qinf.finite e' => gball e' x y
 | Qinf.infinite => True
@@ -51,7 +51,7 @@ destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos] | e_zero].
   setoid_replace d with (e + d); [now apply C | rewrite e_zero; symmetry; apply plus_0_l].
 Qed.
 
-Instance : ExtMetricSpaceClass X.
+Global Instance : ExtMetricSpaceClass X.
 Proof.
 constructor.
 + apply _.
@@ -63,7 +63,58 @@ constructor.
 + apply mspc_closed_help.
 Qed.
 
+Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction X.
+refine (@mkRegularFunction _ (f 0) (λ e : Qpos, let (e', _) := e in f e') _).
+intros [e1 e1_pos] [e2 e2_pos]. now apply gball_pos, (rf_proof f).
+Defined.
+
 End FromMetricSpace.
+
+Arguments conv_reg {X} _.
+
+Set Printing Coercions.
+
+Definition ext_equiv' `{Equiv A} `{Equiv B} : Equiv (A → B) :=
+  λ f g, ∀ x : A, f x = g x.
+
+Infix "=1" := ext_equiv' (at level 70, no associativity) : type_scope.
+
+Lemma ext_equiv_l `{Setoid A, Setoid B} (f g : A -> B) :
+  Proper ((=) ==> (=)) f -> f =1 g -> f = g.
+Proof. intros P eq1_f_g x y eq_x_y; rewrite eq_x_y; apply eq1_f_g. Qed.
+
+Lemma ext_equiv_r `{Setoid A, Setoid B} (f g : A -> B) :
+  Proper ((=) ==> (=)) g -> f =1 g -> f = g.
+Proof. intros P eq1_f_g x y eq_x_y; rewrite <- eq_x_y; apply eq1_f_g. Qed.
+
+Section FromCompleteMetricSpace.
+
+Variable X : MetricSpace.
+
+(*Definition conv_reg_help (f : Q -> X) : QposInf -> X := λ e,
+match e with
+| Qpos2QposInf (e' ↾ _) => f e'
+| QposInfinity => f 0
+end.
+
+Lemma conv_reg_help_correct (f : Q -> X) :
+  IsRegularFunction f -> is_RegularFunction (conv_reg_help f).
+Proof. intros A [e1 e1_pos] [e2 e2_pos]; now apply gball_pos, A. Qed.*)
+
+Global Instance limit_complete : Limit (Complete X) :=
+  λ f : RegularFunction (Complete X), Cjoin_fun (conv_reg f).
+
+Global Instance : CompleteMetricSpaceClass (Complete X).
+Proof.
+constructor.
++ apply ext_equiv_r; [intros x y E; apply E |].
+  intros f e1 e2 e1_pos e2_pos.
+  eapply gball_pos, (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
++ constructor; [apply _ .. |].
+  intros x y eq_x_y e1 e2 e1_pos e2_pos. apply mspc_eq; solve_propholds.
+Qed.
+
+End FromCompleteMetricSpace.
 
 
 
