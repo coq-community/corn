@@ -2,7 +2,7 @@ Require Import
   List NPeano
   QArith Qabs Qpossec Qsums Qround
   Qmetric ZArith
-  CRArith CRsum AbstractIntegration
+  CRArith CRsum (*AbstractIntegration*)
   util.Qgcd
   Program
   uneven_CRplus
@@ -124,20 +124,77 @@ Print mkRegularFunction.
 
 End definition.
 
-(*
-Open Scope Q_scope.
+Require Import ARtrans.
+Require Import Qdlog.
+Require Import ARbigD.
 
-Definition answer (n:positive) (r:CR) : Z :=
+Section ARInt.
+
+(*Open Scope Q_scope.*)
+
+Context
+  `{AppRationals AQ}
+  (f : AQ_as_MetricSpace --> AR)
+  (B : Q). (* bound for the absolute value of f's fourth derivative *)
+
+Definition ARsum_list_raw (l : list AR) (e : QposInf) : AQ :=
+fold_left (@plus AQ _)
+match l with
+| nil => nil
+| cons h t =>
+  let e' := QposInf_mult (1#(P_of_succ_nat (length t)))%Qpos e in
+   (map (fun x => approximate x e') l)
+end
+0.
+
+Lemma ARsum_list_prf : forall l, @is_RegularFunction AQ_as_MetricSpace (ARsum_list_raw l).
+Admitted.
+
+Definition ARsum_list (l : list AR) : AR := Build_RegularFunction (ARsum_list_prf l).
+
+Section ARapprox.
+
+  Context (a : AQ) (w : AQ) (eps : Qpos).
+
+  Definition N' : Z := 1 + Zdiv (Qdlog2 ('w^5 / 2880 * B / eps))%Q 4.
+
+  Definition iw' : AQ := w ≪ -N'.
+  (*Definition halfiw: Qpos := (w / ((2#1) * N))%Qpos.*)
+
+  Definition simpson' (a' : AQ) : AR :=
+    ('iw' * (f a' + f (a' + (iw' ≪ -1)) * '4 + f (a' + iw'))).
+
+  Definition approx' : AR :=
+    ARsum_list (map (fun i : nat => simpson' (a + '(i : Z) * iw')) (N.enum (2^(Z.to_nat N')))).
+
+End ARapprox.
+
+Lemma regular' a w : is_RegularFunction_noInf AR (approx' a w).
+Admitted.
+
+Definition simpson_integral' a w : AR := Cjoin (mkRegularFunction 0 (regular' a w)).
+
+End ARInt.
+
+(*Definition answer (n:positive) (r:CR) : Z :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
- Zdiv a b.
+ Zdiv a b.*)
 
+Eval compute in N.enum (S O).
 
-Require Import CRsin.
+Eval vm_compute in (N.enum ((2 : nat)^(Z.to_nat (N' (AQ := bigD) 1 1 (1#1000))))).
 
-Print simpson_integral.
+Eval compute in (*cast _ Q*) (iw' (AQ := bigD) 1 1 (1#10)).
 
-Time Eval compute in (answer 3 (simpson_integral sin_uc 1 0 1)).
+Eval compute in simpson' (AQ := bigD) ARsin_uc 1 1 (1#10)%Qpos 0
+
+Eval vm_compute in cast _ Q (approximate (approx' (AQ := bigD) ARsin_uc 1 0 1 (1#10)%Qpos) (1#10)%Qpos).
+
+Time Eval vm_compute in
+  cast _ Q (approximate (simpson_integral' (AQ := bigD) ARsin_uc 1 0 1) (1#5)%Qpos).
+
+Time Eval compute in (cast _ Q (approximate (simpson_integral' (AQ := bigD) ARsin_uc 1 0 1) (1#100)%Qpos)).
 (*
      = 459
      : Z
