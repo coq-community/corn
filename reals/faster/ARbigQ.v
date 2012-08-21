@@ -38,7 +38,7 @@ Proof.
   rewrite BigN.spec_shiftl, Z.shiftl_1_l.
   replace (BigZ.to_Z (BigZ.Pos (BigN.of_pos p))) with (Zpos p) by (symmetry; apply BigN.spec_of_pos).
   rewrite BigN.spec_of_pos.
-  replace (Z2P (2 ^ p)) with (2 ^ p)%positive by now rewrite Zpower_Ppow.
+  replace (Z2P (2 ^ p)) with (2 ^ p)%positive by now rewrite <- Zpower_Ppow.
   rewrite <-Zpower_Ppow.
   rewrite Z2P_correct.
    reflexivity.

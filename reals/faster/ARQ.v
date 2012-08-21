@@ -18,7 +18,7 @@ Proof.
    now apply ball_sym, approximateQ_correct.
   change (/ Qpower (2%Z) p == 1 # 2 ^ p).
   rewrite <-Qpower.Zpower_Qpower; auto with zarith.
-  now rewrite Zpower_Ppow.
+  now rewrite <- Zpower_Ppow.
 Qed.
 
 Instance Q_approx_div: AppDiv Q := λ x y k, app_approx (x / y) k.

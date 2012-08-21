@@ -238,9 +238,9 @@ Ltac CRring_pre := autorewrite with toCRring.
 Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus_uc) CRmult CRopp (@st_eq CR).
 Proof.
  split.
-   apply ucFun2_wd.
-  apply CRmult_wd.
- apply uc_wd.
+   rapply ucFun2_wd.
+  rapply CRmult_wd.
+ rapply uc_wd.
 Qed.
 
 Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@st_isSetoid (@msp_is_setoid CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
