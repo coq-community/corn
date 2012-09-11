@@ -134,7 +134,7 @@ End definition.
 
 Require Import ARtrans.
 Require Import Qdlog.
-Require Import ARbigD.
+Require Import BigQ ARbigQ ARQ ARbigD.
 
 Definition eps (n : positive) := (1 # (10^n))%Qpos.
 
@@ -234,18 +234,7 @@ Variable eps : Qpos.
 Definition num_intervals : nat := S (Z.to_nat (Q_4th_root_floor_plain ('w^5 / 2880 * B / eps))).
 (* To be optimized *)
 Definition num_intervals1 : positive :=
-  P_of_succ_nat (Zabs_nat (Q_4th_root_floor_plain (('w^5) / 2880 * B / eps))).
-
-(* The following Check workd, but Definition does not
-Check fun x y : Q =>
-let w : Q := 'approximate width 1 + (1#1) in w.
-Definition aa := fun x y : Q =>
-let w : Q := 'approximate width 1 + (1#1) in w.*)
-
-(* Says can't find instance of Cast QA Q
-Definition num_intervals2 : Q :=
-  let w : Q := (cast AQ Q (approximate width (1#1)%Qpos) + (1#1))%Q in
-    Pos.succ (Z.to_pos (Q_4th_root_floor_plain (('w^5) / 2880 * B / eps))).*)
+  P_of_succ_nat (Zabs_nat (Q_4th_root_floor_plain (('w^5) / 2880 * B / eps))). 
 
 Definition num_intervals2 : positive :=
   let w : Q := 'approximate width (1#1000)%Qpos + (1#1000) in
@@ -280,21 +269,18 @@ Definition ARsimpson2_raw : AR :=
 
 End ARIntEps1.
 
-(*Lemma ARsimson_regular : is_RegularFunction_noInf AR ARsimpson_raw.
+Lemma ARsimson_regular : is_RegularFunction_noInf AR ARsimpson_raw.
 Admitted.
 
 Lemma ARsimson1_regular : is_RegularFunction_noInf AR ARsimpson1_raw.
-Admitted.*)
+Admitted.
 
 Lemma ARsimson2_regular : is_RegularFunction_noInf AR ARsimpson2_raw.
 Admitted.
 
-(*Definition ARsimpson : AR := Cjoin (mkRegularFunction 0 ARsimson_regular).
-Definition ARsimpson1 : AR := Cjoin (mkRegularFunction 0 ARsimson1_regular).*)
+Definition ARsimpson : AR := Cjoin (mkRegularFunction 0 ARsimson_regular).
+Definition ARsimpson1 : AR := Cjoin (mkRegularFunction 0 ARsimson1_regular).
 Definition ARsimpson2 : AR := Cjoin (mkRegularFunction 0 ARsimson2_regular).
-
-(*Definition ARsimpson2 a b : AR :=
-  (ARsimpson_sum a b) * (width a b * AQinv ('(6 * (num_intervals2 a b : Z))%Z)).*)
 
 End ARInt.
 
@@ -333,11 +319,30 @@ Definition repeat {A : Type} (M : unit -> A) (n : positive) :=
   fun _ : unit =>
     approximate (ARexp_bounded (AQ := bigD) 2 1) (eps 12).*)
 
-Compute num_intervals2 (AQ := bigD) 3 0 1 (eps 15).
+(*Compute num_intervals2 (AQ := bigD) 3 0 1 (eps 15).*)
 
-(*Time Compute approximate (ARsimpson (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 3 0 1) (eps 14).*)
-Time Compute approximate (ARsimpson_sum (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 0 1 1012) (eps 14).
-Time Compute approximate (ARsimpson2 (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 3 0 1) (eps 14).
+(*Time Compute approximate (ARsimpson (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 3 0 1) (eps 14).
+Time Compute approximate (ARsimpson1 (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 3 0 1) (eps 14).*)
+(*Time Compute approximate (ARsimpson2 (AQ := Q) (ARexp_bounded 2) 3 0 1) (eps 9).
+Time Compute approximate (ARsimpson_sum (AQ := bigD) (ARexp_bounded (AQ := bigD) 2) 0 1 1012) (eps 14).*)
+
+Section Picard.
+
+Context `{AppRationals AQ} (F : AR -> AR) (a b : AR).
+
+Definition picard (f : AR -> AR) (x : AR) := b + ARsimpson2 (AQ := AQ) (λ t, F (f t)) 1 a x.
+
+Definition picard_iter (n : nat) : AR -> AR := nat_iter n picard (λ _, b).
+
+End Picard.
+
+Definition d := approximate (picard_iter (AQ := bigD) (λ y, y) 0 1 6 1) (eps 1).
+
+Extraction "simpson.ml" d.
+
+Time Compute approximate (picard_iter (AQ := bigD) (λ y, y) 0 1 6 1) (eps 1).
+
+
 
 
 (*Time Compute approximate (ARsimpson (AQ := bigD) ARexp 3 0 1) (eps 10).
