@@ -91,16 +91,6 @@ Section FromCompleteMetricSpace.
 
 Variable X : MetricSpace.
 
-(*Definition conv_reg_help (f : Q -> X) : QposInf -> X := λ e,
-match e with
-| Qpos2QposInf (e' ↾ _) => f e'
-| QposInfinity => f 0
-end.
-
-Lemma conv_reg_help_correct (f : Q -> X) :
-  IsRegularFunction f -> is_RegularFunction (conv_reg_help f).
-Proof. intros A [e1 e1_pos] [e2 e2_pos]; now apply gball_pos, A. Qed.*)
-
 Global Instance limit_complete : Limit (Complete X) :=
   λ f : RegularFunction (Complete X), Cjoin_fun (conv_reg f).
 
