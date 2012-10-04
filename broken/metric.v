@@ -121,12 +121,6 @@ Add Field Q : (stdlib_field_theory Q)
 Goal forall x y : Q, (1#1)%Q * x = x.
 intros x y. ring.*)
 
-Add Field Q : (stdlib_field_theory Q).
-
-Bind Scope mc_scope with Q.
-
-Notation Qinf := Qinf.T.
-
 (*
 Local Notation Qnn := QnonNeg.T.
 
@@ -145,6 +139,8 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 
 Instance Qinf_one : One Qinf := 1%Q.
 *)
+
+Notation Qinf := Qinf.T.
 
 Module Qinf.
 
@@ -189,6 +185,12 @@ Ltac nat_simpl := unfold
 
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 *)
+
+Section QField.
+
+Add Field Q : (stdlib_field_theory Q).
+
+Bind Scope mc_scope with Q.
 
 Class MetricSpaceBall (X : Type) : Type := mspc_ball: Qinf → relation X.
 
@@ -464,9 +466,9 @@ Qed.
 
 End CompleteMetricSpace.
 
-Arguments RegularFunction X {_}.
-Arguments Limit X {_}.
-Arguments CompleteMetricSpaceClass X {_ _ _}.
+Global Arguments RegularFunction X {_}.
+Global Arguments Limit X {_}.
+Global Arguments CompleteMetricSpaceClass X {_ _ _}.
 
 Definition seq A := nat -> A.
 
@@ -673,3 +675,6 @@ intro f.
 This generates one goal and one existential variable instead of two goals *)
 refine (lim (Build_RegularFunction (λ e, proj1_sig (f e)) (rf_proof f)) ↾ _).
 *)
+
+End QField.
+

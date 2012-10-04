@@ -3,6 +3,10 @@ Require Import
   abstract_algebra stdlib_rationals
   orders.orders orders.semirings orders.rings theory.rings.
 
+Section QField.
+
+Add Field Q : (dec_fields.stdlib_field_theory Q).
+
 Section FromMetricSpace.
 
 Variable X : MetricSpace.
@@ -106,5 +110,4 @@ Qed.
 
 End FromCompleteMetricSpace.
 
-
-
+End QField.

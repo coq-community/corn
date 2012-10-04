@@ -8,11 +8,38 @@ Require Import
  stdlib_omissions.P
  stdlib_omissions.Z
  stdlib_omissions.Q
- stdlib_omissions.N
- (*metric2.Classified*).
+ stdlib_omissions.N.
+ (*metric2.Classified*)
+Require Import metric FromMetric2.
 
 Require QnonNeg QnnInf CRball.
 Import QnonNeg.notations QnnInf.notations CRball.notations.
+
+(*Notation Qinf := Qinf.T.
+
+Module Qinf.
+
+Definition le (x y : Qinf) : Prop :=
+match y with
+| Qinf.finite b =>
+  match x with
+  | Qinf.finite a => Qle a b
+  | Qinf.infinite => False
+  end
+| Qinf.infinite => True
+end.
+
+Instance: Proper (Qinf.eq ==> Qinf.eq ==> iff) le.
+Proof.
+intros [x1 |] [x2 |] A1 [y1 |] [y2 |] A2; revert A1 A2;
+unfold Qinf.eq, canonical_names.equiv, stdlib_rationals.Q_eq; simpl; intros A1 A2;
+try contradiction; try reflexivity.
+rewrite A1, A2; reflexivity.
+Qed.
+
+End Qinf.
+
+Instance Qinf_le : canonical_names.Le Qinf := Qinf.le.*)
 
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
@@ -240,7 +267,7 @@ Section integral_interface.
       split...
       rewrite <- (Qplus_0_r from) at 1.
       apply Qplus_le_compat...
-     assert (lo <= hi) as lohi. (*apply CRle_trans with (f from); apply A...
+     assert (lo <= hi) as lohi by (destruct (A _ B); now apply CRle_trans with (f from)).
      set (r := ' (1#2) * (hi - lo)).
      set (mid := ' (1#2) * (lo + hi)).
      assert (mid - r == lo) as loE by (subst mid r; ring).
@@ -256,17 +283,16 @@ Section integral_interface.
       rewrite <- (CRplus_opp lo).
       apply (CRplus_le_r lo hi (-lo))...
      intros.
-     apply CRball.as_distance_bound, CRdistance_CRle.
+     apply CRball.as_distance_bound. apply -> CRdistance_CRle.
      rewrite loE, hiE...
-    Qed.*)
-    Admitted.
+    Qed.
 
     (** We now work towards unicity, for which we use that implementations must agree with Riemann
      approximations. But since those are only valid for locally uniformly continuous functions, our proof
      of unicity only works for such functions. Todo: There should really be a proof that does not depend
      on continuity. *)
 
-    Context `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
+    Context (*`{!LocallyUniformlyContinuous_mu f}*) `{!IsLocallyUniformlyContinuous f lmu}.
 
 (*
     Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
@@ -301,11 +327,12 @@ Section integral_interface.
     Qed.
 *)
     (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
-(*
-    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
-     (n * iw == w)%Qnn ->
-     (iw <= @luc_mu _ _ f _ a w e)%QnnInf ->
-     gball (e * w) (cmΣ n (fun i => ' ` iw * f (a + i * ` iw)%Q)) (∫ f a w).
+
+    Import Qinf.notations.
+    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: Q) (n: nat):
+     (n * iw == w)%Q ->
+     (iw <= lmu a w e)%Qinf ->
+     gball (e * w) (cmΣ n (fun i => ' iw * f (a + i * iw)%Q)) (∫ f a w).
     Proof with auto.
      intros A B.
      simpl.
