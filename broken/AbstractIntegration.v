@@ -13,7 +13,8 @@ Require Import
 Require Import metric FromMetric2.
 
 Require QnonNeg QnnInf CRball.
-Import QnonNeg.notations QnnInf.notations CRball.notations.
+Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
+(*Import canonical_names.*)
 
 (*Notation Qinf := Qinf.T.
 
@@ -47,6 +48,15 @@ Open Local Scope CR_scope.
 
 (** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)
+
+
+(*Lemma proj_exist {X : Type} (P : X -> Prop) (x : X) (Px : P x) : ` (exist _ x Px) = x.
+Proof. reflexivity. Qed.*)
+
+(*Lemma gball_abs (e a b : Q) : gball e a b ↔ (Qabs (a - b) <= e)%Q.
+Proof.
+unfold gball.
+SearchAbout Qdec_sign.*)
 
 Definition split (w: QnonNeg) (bound: QposInf):
   { x: nat * QnonNeg | (fst x * snd x == w)%Qnn /\ (snd x <= bound)%QnnInf }.
@@ -328,48 +338,123 @@ Section integral_interface.
 *)
     (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
 
-    Import Qinf.notations.
-    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: Q) (n: nat):
-     (n * iw == w)%Q ->
-     (iw <= lmu a w e)%Qinf ->
+
+    Lemma CRnonNegQpos : forall e : Qpos, CRnonNeg (' ` e).
+    Proof.
+    intros [e e_pos]; apply CRnonNeg_criterion; simpl.
+    intros q A; apply Qlt_le_weak, Qlt_le_trans with (y := e); trivial.
+    now apply CRle_Qle.
+    Qed.
+
+    Lemma luc_gball (a w delta eps x y : Q) : (delta <= lmu a w eps)%Qinf ->
+      gball w a x -> gball w a y -> gball delta x y -> gball eps (f x) (f y).
+    Proof.
+intros A1 A2 A3 A4.
+assert (B1 : mspc_ball w a x) by apply A2.
+assert (B2 : mspc_ball w a y) by apply A3.
+change (f x) with (restrict f a w (exist _ _ A2)).
+change (f y) with (restrict f a w (exist _ _ A3)).
+Admitted.
+(*Check _ : IsUniformlyContinuous (restrict f a w) _.
+apply (uc_prf (restrict f a w)).*)
+
+
+Lemma Qabs_le_nonneg (x y : Q) : 0 <= x -> (Qabs x <= y <-> x <= y).
+
+    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
+     (n * iw == w)%Qnn ->
+     (`iw <= lmu a w e)%Qinf ->
      gball (e * w) (cmΣ n (fun i => ' iw * f (a + i * iw)%Q)) (∫ f a w).
     Proof with auto.
      intros A B.
-     simpl.
      rewrite <- A.
-     rewrite <- integral_repeated_additive...
-     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw * e))%Qnn: Q).
-      apply (CRΣ_gball_ex _ _ (iw * e)%Qnn).
-      intros.
-      simpl.
-      apply (gball_integral e a (a+m*`iw) w iw)...
-      apply ball_gball.
-      apply in_Qball.
-      split.
-       apply Qle_trans with (a + 0)%Q.
-        apply Qplus_le_compat...
-        change (-w <= -0)%Q.
-        apply Qopp_le_compat...
+     rewrite <- integral_repeated_additive.
+     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw * e))%Qnn: Q) by
+       (simpl in *; unfold QnonNeg.eq in A; simpl in A;
+        unfold QposAsQ; rewrite Qmult_assoc; rewrite A; ring).
+     apply (CRΣ_gball_ex _ _ (iw * e)%Qnn).
+     intros. simpl.
+     rewrite CRmult_scale.
+     apply gball_sym. apply CRball.rational.
+     setoid_replace (' (` iw * ` e)%Q) with (scale iw (' (` e))) by now rewrite <- scale_Qmult.
+     apply integral_bounded; [apply CRnonNegQpos |].
+     intros x [A1 A2]. apply CRball.rational. apply (luc_gball a w (`iw)); trivial.
+apply ball_gball, Qball_Qabs.
+setoid_replace (a - (a + m * iw))%Q with (- (m * iw))%Q by ring.
+rewrite Qabs_opp. (*apply Qabs_Qle_condition. split.*)
+
+
+SearchAbout (Qabs _ <= _)%Q.
+SearchAbout AbsSmall.
+
+Qabs_Qle_condition: ∀ x y : Q, (Qabs x <= y)%Q ↔ - y <= x <= y
+Qabs_Qle: ∀ x y : Q, (Qabs x <= y)%Q ↔ - y <= x <= y
+AbsSmall_Qabs: ∀ x y : Q, (Qabs y <= x)%Q ↔ AbsSmall x y
+CRcorrect.AbsSmall_Qabs: ∀ x y : Q, (Qabs y <= x)%Q ↔ AbsSmall x y
+
+
+apply Qball_Qabs.
+SearchAbout "ball" "abs".
+
+Qball_Qabs: ∀ (e : Qpos) (a b : Q), Qball e a b ↔ (Qabs.Qabs (a - b) <= e)%Q
+
+
+
+assert (A3 : mspc_ball w a (a + m * iw)%Q). admit.
+assert (A4 : mspc_ball w a x). admit.
+change (f (a + m * iw)) with (restrict f a w (exist _ _ A3)).
+change (f x) with (restrict f a w (exist _ _ A4)).
+erewrite <- (proj_exist (ball w a) (a + m * iw)%Q).
+specialize (IsLocallyUniformlyContinuous0 a w).
+destruct IsLocallyUniformlyContinuous0 as [C1 C2].
+Import canonical_names.
+
+setoid_replace (f (a + m * iw)) with (restrict f a w (a + m * iw)%Q).
+assert (mspc_balla + m * iw
+
+
+unfold IsLocallyUniformlyContinuous in IsLocallyUniformlyContinuous0.
+SearchAbout CRnonNeg.
+
+CRball.rational:
+  ∀ (M : MetricSpace) (r : Q) (x y : M), gball r x y ↔ CRball (' r) x y
+
+
+rapply bounded_with_nonneg_radius.
+
+@gball CR (Qmult (QposAsQ width) (QnonNeg.to_Q r))
+  (@integrate f Integral0 from (QnonNeg.from_Qpos width))
+  (@ucFun CR CR (scale (QposAsQ width)) mid)
+
+
+
+SearchAbout gball "sym".
+
+
+
+
+
+     apply (gball_integral e a (a+m*`iw) w iw)...
+     apply ball_gball.
+     apply in_Qball.
+     split.
+      apply Qle_trans with (a + 0)%Q.
        apply Qplus_le_compat...
-       apply Qmult_le_0_compat...
-       apply Qle_nat.
+       change (-w <= -0)%Q.
+       apply Qopp_le_compat...
       apply Qplus_le_compat...
-      change (n * iw == w)%Q in A.
-      rewrite <- A.
-      unfold QnonNeg.to_Q.
-      apply Qmult_le_compat_r...
-      apply Qlt_le_weak.
-      rewrite <- Zlt_Qlt.
-      apply inj_lt...
-     simpl in *.
-     unfold QnonNeg.eq in A.
-     simpl in A.
-     unfold QposAsQ.
-     rewrite Qmult_assoc.
-     rewrite A.
-     ring.
+      apply Qmult_le_0_compat...
+      apply Qle_nat.
+     apply Qplus_le_compat...
+     change (n * iw == w)%Q in A.
+     rewrite <- A.
+     unfold QnonNeg.to_Q.
+     apply Qmult_le_compat_r...
+     apply Qlt_le_weak.
+     rewrite <- Zlt_Qlt.
+     apply inj_lt...*)
     Qed.
-*)
+
   End singular_props.
 
   (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)

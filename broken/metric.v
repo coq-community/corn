@@ -625,10 +625,8 @@ Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
 Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
   f ∘ @proj1_sig _ _.
 
-Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) := {
-  luc_pos : forall (x : X) (r e : Q), 0 < e -> (0 < lmu x r e);
-  luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r)
-}.
+Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
+  luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
 
 (*Global Arguments luc_pos f mu {_} e _.
 Global Arguments luc_prf f mu {_} e x1 x2 _ _.*)
@@ -636,10 +634,8 @@ Global Arguments luc_prf f mu {_} e x1 x2 _ _.*)
 Global Instance uc_ulc (f : X -> Y) `{!IsUniformlyContinuous f mu} :
   IsLocallyUniformlyContinuous f (λ _ _, mu).
 Proof.
-constructor.
-+ intros _ _; now apply (uc_pos f).
-+ intros x r. constructor; [now apply (uc_pos f) |].
-  intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
+intros x r. constructor; [now apply (uc_pos f) |].
+intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
 Qed.
 
 End LocalUniformContinuity.
