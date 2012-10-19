@@ -106,6 +106,19 @@ Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
   PropHolds (0 < x) -> PropHolds (x ≠ 0).
 Proof. intros; now apply lt_ne_flip. Qed.
 
+Definition ext_equiv' `{Equiv A} `{Equiv B} : Equiv (A → B) :=
+  λ f g, ∀ x : A, f x = g x.
+
+Infix "=1" := ext_equiv' (at level 70, no associativity) : type_scope.
+
+Lemma ext_equiv_l `{Setoid A, Setoid B} (f g : A -> B) :
+  Proper ((=) ==> (=)) f -> f =1 g -> f = g.
+Proof. intros P eq1_f_g x y eq_x_y; rewrite eq_x_y; apply eq1_f_g. Qed.
+
+Lemma ext_equiv_r `{Setoid A, Setoid B} (f g : A -> B) :
+  Proper ((=) ==> (=)) g -> f =1 g -> f = g.
+Proof. intros P eq1_f_g x y eq_x_y; rewrite <- eq_x_y; apply eq1_f_g. Qed.
+
 (*Ltac MCQconst t :=
 match t with
 (*| @zero Q _ _ => constr:(Qmake Z0 xH)
@@ -309,6 +322,18 @@ Class IsUniformlyContinuous (f : X -> Y) (mu : Q -> Qinf) := {
 Global Arguments uc_pos f mu {_} e _.
 Global Arguments uc_prf f mu {_} e x1 x2 _ _.
 
+Record UniformlyContinuous := {
+  uc_func :> X -> Y;
+  uc_mu : Q -> Qinf;
+  uc_proof : IsUniformlyContinuous uc_func uc_mu
+}.
+
+(* We will prove next that IsUniformlyContinuous is a subclass of Proper,
+i.e., uniformly continuous functions are morphisms. But if we have [f :
+UniformlyContinuous], in order for uc_func f to be considered a morphism,
+we need to declare uc_proof an instance. *)
+Global Existing Instance uc_proof.
+
 Global Instance uc_proper `{IsUniformlyContinuous f mu} : Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
@@ -317,6 +342,8 @@ destruct (mu e); [apply mspc_eq; trivial | apply mspc_inf].
 Qed.
 
 End UniformContinuity.
+
+Global Arguments UniformlyContinuous X {_} Y {_}.
 
 Section Contractions.
 
@@ -331,6 +358,12 @@ Class IsContraction (f : X -> Y) (q : Q) := {
 Global Arguments contr_nonneg_mu f q {_} _.
 Global Arguments contr_lt_mu_1 f q {_}.
 Global Arguments contr_prf f q {_} _ _ _ _.
+
+Record Contraction := {
+  contr_func : X -> Y;
+  contr_q : Q;
+  contr_proof : IsContraction contr_func contr_q
+}.
 
 Definition contr_modulus (q e : Q) : Qinf :=
   if (decide (0 = q)) then Qinf.infinite else (e / q).
@@ -351,44 +384,52 @@ Qed.
 
 End Contractions.
 
-(*Section UCFMetricSpace.
+Global Arguments Contraction X {_} Y {_}.
 
-Context `{MetricSpaceClass X, MetricSpaceClass Y}.
+Section UCFMetricSpace.
 
-Instance UCFEquiv : Equiv (IsUniformlyContinuous X Y) := @equiv (X -> Y) _.
+Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
 
-Lemma UCFSetoid : Setoid (IsUniformlyContinuous X Y).
+Instance UCFEquiv : Equiv (UniformlyContinuous X Y) := @equiv (X -> Y) _.
+
+Lemma UCFSetoid : Setoid (UniformlyContinuous X Y).
 Proof.
 constructor.
-intros f x y A; now rewrite A.
+intros f x y A. now rewrite A.
 intros f g A1 x y A2; rewrite A2; symmetry; now apply A1.
 intros f g h A1 A2 x y A3; rewrite A3; now transitivity (g y); [apply A1 | apply A2].
 Qed.
 
-Instance UCFSpaceBall : MetricSpaceBall (IsUniformlyContinuous X Y) :=
-  fun q f g => forall x, ball q (f x) (g x).
+Global Instance UCFSpaceBall : MetricSpaceBall (UniformlyContinuous X Y) :=
+  λ e f g, forall x, ball e (f x) (g x).
+(*    match e with
+    | Qinf.infinite => True
+    | Qinf.finite e' =>
+      if (decide_rel (<) e' 0)
+      then False
+      else (forall x, ball e' (f x) (g x))
+    end.*)
 
-Lemma UCFBallProper : Proper equiv ball.
+Lemma UCFBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
 Proof.
-intros q1 q2 A1 f1 f2 A2 g1 g2 A3; split; intros A4 x.
-+ rewrite <- A1. rewrite <- (A2 x x); [| reflexivity]. rewrite <- (A3 x x); [| reflexivity]. apply A4.
-+ rewrite A1. rewrite (A2 x x); [| reflexivity]. rewrite (A3 x x); [| reflexivity]. apply A4.
+intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
+split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
 Qed.
 
-Global Instance : MetricSpaceClass (IsUniformlyContinuous X Y).
+Global Instance : `{NonEmpty X} -> ExtMetricSpaceClass (UniformlyContinuous X Y).
 Proof.
-constructor.
-apply UCFSetoid.
-apply UCFBallProper.
-intros q f x; apply mspc_refl.
-intros q f g A x; apply mspc_symm; trivial.
-intros q1 q2 f g h A1 A2 x; apply mspc_triangle with (b := g x); trivial.
-intros q f g A x; apply mspc_closed; intro d; apply A.
-intros f g A1 x y A2. rewrite A2. eapply mspc_eq; trivial. intro q; apply A1.
+intros [x0]; constructor.
++ apply UCFBallProper.
++ intros f g x; apply mspc_inf.
++ intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
++ intros e e_nonneg f x; now apply mspc_refl.
++ intros e f g A x; now apply mspc_symm.
++ intros e1 e2 f g h A1 A2 x; now apply mspc_triangle with (b := g x).
++ intros e f g A x. apply mspc_closed; intros d A1. now apply A.
 Qed.
 
 End UCFMetricSpace.
-*)
+
 
 (*
 Section Isometry.
@@ -428,7 +469,7 @@ Arguments Build_RegularFunction {_} _.
 
 Global Existing Instance rf_proof.
 
-Instance rf_eq : Equiv RegularFunction :=
+Global Instance rf_eq : Equiv RegularFunction :=
   λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f1 e1) (f2 e2).
 
 Global Instance rf_setoid : Setoid RegularFunction.
@@ -451,9 +492,18 @@ Proof. intros e1 e2 A1 A2; apply mspc_refl; solve_propholds. Qed.
 
 Definition reg_unit (x : X) := Build_RegularFunction (unit_reg x).
 
+Global Instance : Setoid_Morphism reg_unit.
+Proof.
+constructor; [apply _ .. |].
+intros x y eq_x_y e1 e2 e1_pos e2_pos. apply mspc_eq; solve_propholds.
+Qed.
+
 Class Limit := lim : RegularFunction -> X.
 
 Class CompleteMetricSpaceClass `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
+
+Definition tends_to (f : RegularFunction) (l : X) :=
+  forall e : Q, 0 < e -> ball e (f e) l.
 
 Lemma limit_def `{CompleteMetricSpaceClass} (f : RegularFunction) :
   forall e : Q, 0 < e -> ball e (f e) (lim f).
@@ -469,6 +519,65 @@ End CompleteMetricSpace.
 Global Arguments RegularFunction X {_}.
 Global Arguments Limit X {_}.
 Global Arguments CompleteMetricSpaceClass X {_ _ _}.
+
+(* The exclamation mark before Limit avoids introducing a second assumption
+MetricSpaceBall X *)
+Lemma completeness_criterion `{ExtMetricSpaceClass X, !Limit X} :
+  CompleteMetricSpaceClass X <-> forall f : RegularFunction X, tends_to f (lim f).
+Proof.
+split; intro A.
++ intros f e2 A2. apply mspc_symm, mspc_closed.
+  intros e1 A1. change (lim f) with (reg_unit (lim f) e1). rewrite plus_comm.
+  rapply (surjective reg_unit (A := X) (inv := lim)); trivial; reflexivity.
++ constructor; [| apply _].
+  apply ext_equiv_r; [apply _|].
+  intros f e1 e2 e1_pos e2_pos.
+  apply (mspc_monotone e2); [apply nonneg_plus_le_compat_l; solve_propholds |].
+  now apply mspc_symm, A.
+Qed.
+
+Section UCFComplete.
+
+Context `{NonEmpty X, ExtMetricSpaceClass X, CompleteMetricSpaceClass Y}.
+
+Program Definition pointwise_regular
+  (F : RegularFunction (UniformlyContinuous X Y)) (x : X) : RegularFunction Y :=
+  Build_RegularFunction (λ e, F e x) _.
+Next Obligation.
+intros e1 e2 e1_pos e2_pos; now apply F.
+Qed.
+
+Global Program Instance ucf_limit : Limit (UniformlyContinuous X Y) :=
+  λ F, Build_UniformlyContinuous
+         (λ x, lim (pointwise_regular F x))
+         (λ e, uc_mu (F (e/3)) (e/3))
+         _.
+Next Obligation.
+constructor.
+* intros e e_pos.
+  destruct (F (e/3)) as [g ? ?]; simpl; apply uc_pos with (f := g); trivial.
+  apply Q.Qmult_lt_0_compat; auto with qarith.
+* intros e x1 x2 e_pos A.
+  apply (mspc_triangle' (e/3) (e/3 + e/3) (F (e/3) x1)); [field; discriminate | |].
+  + apply mspc_symm. change ((F (e / 3)) x1) with (pointwise_regular F x1 (e/3)).
+    (* without [change], neither [apply limit_def] nor [rapply limit_def] work *)
+    apply completeness_criterion, Q.Qmult_lt_0_compat; auto with qarith.
+  + apply mspc_triangle with (b := F (e / 3) x2).
+    - destruct (F (e/3)); eapply uc_prf; eauto.
+      apply Q.Qmult_lt_0_compat; auto with qarith.
+    - change ((F (e / 3)) x2) with (pointwise_regular F x2 (e/3)).
+      apply completeness_criterion, Q.Qmult_lt_0_compat; auto with qarith.
+Qed.
+
+Global Instance : CompleteMetricSpaceClass (UniformlyContinuous X Y).
+Proof.
+apply completeness_criterion. intros F e e_pos x.
+change (lim F x) with (lim (pointwise_regular F x)).
+change (F e x) with (pointwise_regular F x e).
+now apply completeness_criterion.
+Qed.
+
+End UCFComplete.
 
 Definition seq A := nat -> A.
 
@@ -593,7 +702,7 @@ intros e A1 n A2. apply (mspc_triangle' (e / 2) (e / 2) (x (N (e / 2)))).
 + field; change ((2 : Q) ≠ 0); solve_propholds.
 + now apply mspc_symm, A; [solve_propholds | reflexivity |].
 + change (x (N (e / 2))) with (f (e / 2)).
-  apply limit_def; solve_propholds.
+  apply completeness_criterion; solve_propholds.
 Qed.
 
 End CompleteSpaceSequenceLimits.
@@ -628,8 +737,7 @@ Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
 Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
   luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
 
-(*Global Arguments luc_pos f mu {_} e _.
-Global Arguments luc_prf f mu {_} e x1 x2 _ _.*)
+Global Arguments luc_prf f lmu {_} x r.
 
 Global Instance uc_ulc (f : X -> Y) `{!IsUniformlyContinuous f mu} :
   IsLocallyUniformlyContinuous f (λ _ _, mu).
