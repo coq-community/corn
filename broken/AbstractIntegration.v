@@ -12,7 +12,7 @@ Require Import
  (*metric2.Classified*)
 Require Import metric FromMetric2.
 
-Require QnonNeg QnnInf CRball.
+Require Qinf QnonNeg QnnInf CRball.
 Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
 (*Import canonical_names.*)
 
@@ -46,13 +46,6 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-(** Any nonnegative width can be split up into an integral number of
- equal-sized pieces no bigger than a given bound: *)
-
-
-(*Lemma proj_exist {X : Type} (P : X -> Prop) (x : X) (Px : P x) : ` (exist _ x Px) = x.
-Proof. reflexivity. Qed.*)
-
 Section QFacts.
 
 Open Scope Q_scope.
@@ -61,6 +54,35 @@ Lemma Qminus_less (x y : Q) : 0 <= y -> x - y <= x.
 Proof.
 intro H. rewrite <- (Qplus_0_r x) at 2. apply Qplus_le_r. change 0 with (-0).
 now apply Qopp_le_compat.
+Qed.
+
+(* The following two lemmas are obtained from the lemmas with the same name
+in Coq.QArith.QArith_base by replacing -> with <-> *)
+
+Lemma Qle_shift_div_l : forall a b c, 0 < c -> (a * c <= b <-> a <= b / c).
+Proof.
+intros a b c A; split; [now apply Qle_shift_div_l |].
+intro A1. apply (Qmult_le_r _ _ (/c)); [now apply Qinv_lt_0_compat |].
+rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
+Qed.
+
+Lemma Qle_shift_div_r : forall a b c, 0 < b -> (a <= c * b <-> a / b <= c).
+Proof.
+intros a b c A; split; [now apply Qle_shift_div_r |].
+intro A1. apply (Qmult_le_r _ _ (/b)); [now apply Qinv_lt_0_compat |].
+rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
+Qed.
+
+Lemma Qle_div_l : forall a b c, 0 < b -> 0 < c -> (a / b <= c <-> a / c <= b).
+Proof.
+intros a b c A1 A2.
+rewrite <- Qle_shift_div_r; [| easy]. rewrite (Qmult_comm c b). rewrite Qle_shift_div_r; easy.
+Qed.
+
+Lemma Qle_div_r : forall a b c, 0 < b -> 0 < c -> (b <= a / c <-> c <= a / b).
+Proof.
+intros a b c A1 A2.
+rewrite <- Qle_shift_div_l; [| easy]. rewrite (Qmult_comm b c). rewrite Qle_shift_div_l; easy.
 Qed.
 
 Lemma Qabs_zero (x : Q) : Qabs x == 0 <-> x == 0.
@@ -92,6 +114,9 @@ Qed.
 
 End QFacts.
 
+(** Any nonnegative width can be split up into an integral number of
+ equal-sized pieces no bigger than a given bound: *)
+
 Definition split (w: QnonNeg) (bound: QposInf):
   { x: nat * QnonNeg | (fst x * snd x == w)%Qnn /\ (snd x <= bound)%QnnInf }.
 Proof with simpl; auto with *.
@@ -118,6 +143,12 @@ Qed.
 define very simple summation and a key property thereof: *)
 
 Definition cmΣ {M: CMonoid} (n: nat) (f: nat -> M): M := cm_Sum (map f (enum n)).
+
+(*Lemma cmΣ_sum {M: CMonoid} (n : nat) (f g : nat -> M) : cmΣ n 
+
+M := cm_Sum (map f (enum n)).
+
+SearchAbout cm_Sum.*)
 
 (** If the elementwise distance between two summations over the same domain
  is bounded, then so is the distance between the summations: *)
@@ -405,6 +436,13 @@ Section integral_interface.
      apply (Qopp_le_compat 0); eapply Qle_trans; eauto.
     Qed.
 
+    Program Definition step (w : Qpos) (n : positive) : QnonNeg := exist _ (w * (1 # n)) _.
+    Next Obligation. Qauto_nonneg. Qed.
+
+    Definition Riemann_sum (a : Q) (w : Qpos) (n : positive) :=
+      let iw := step w n in
+        cmΣ (Pos.to_nat n) (fun i => 'iw * f (a + i * iw))%CR.
+
     Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
      (n * iw == w)%Qnn ->
      (`iw <= lmu a w e)%Qinf ->
@@ -460,12 +498,53 @@ Section integral_interface.
        apply Qminus_less. apply (proj2_sig iw).
     Qed.
 
-    Lemma Riemann_sums_approximate_integral' (a : Q) (w : Qpos) (e : Qpos) :
-      {iw: QnonNeg & {n: nat | 
-     (n * iw == w)%Qnn ->
-     (`iw <= lmu a w e)%Qinf ->
-     gball (e * w) (cmΣ n (fun i => 'iw * f (a + i * iw))%CR) (∫ f a w).
-    Proof with auto.
+    Lemma Riemann_sums_approximate_integral' (a : Q) (w : Qpos) (e : Qpos) (n : positive) :
+      (step w n <= lmu a w e)%Qinf ->
+      gball (e * w) (Riemann_sum a w n) (∫ f a w).
+    Proof.
+      intro A; unfold Riemann_sum. apply Riemann_sums_approximate_integral; [| easy].
+      unfold step. change (Pos.to_nat n * (w * (1 # n)) == w).
+      rewrite positive_nat_Z. unfold inject_Z. rewrite !Qmake_Qdiv; field; auto.
+    Qed.
+
+    Lemma le_Z_to_pos (z : Z) (p : positive) : (Z.to_pos z <= p)%positive <-> (z <= p)%Z.
+    Proof.
+      destruct z as [| q | q]; simpl.
+      + split; intros _; [apply Zle_0_pos | apply Pos.le_1_l].
+      + apply Ple_Zle.
+      + split; intros _; [apply Zle_neg_pos | apply Pos.le_1_l].
+    Qed.
+
+    Lemma Riemann_sums_approximate_integral'' (a : Q) (w : Qpos) (e : Qpos) :
+      exists N : positive, forall n : positive, (N <= n)%positive ->
+        gball e (Riemann_sum a w n) (∫ f a w).
+    Proof.
+      set (N := Z.to_pos (Qceiling (comp_inf (λ x, w / x) (lmu a w) 0 (e / w)))).
+      exists N; intros n A. setoid_replace (QposAsQ e) with ((e / w)%Qpos * w)
+        by (change (e == e / w * w); field; auto).
+      apply Riemann_sums_approximate_integral'.
+      unfold step, comp_inf in *. change ((w * (1 # n))%Q <= lmu a w (e / w))%Qinf.
+      assert (0 <= lmu a w (e / w))%Qinf.
+      unfold IsLocallyUniformlyContinuous in *.
+
+(*assert (IsUniformlyContinuous (restrict f a w) (lmu a w)).
+specialize (IsLocallyUniformlyContinuous0 a w).
+apply _.
+apply IsLocallyUniformlyContinuous0.
+
+
+
+      rapply (uc_pos (restrict f a w) (lmu a w)).
+      destruct (lmu a w (e / w)) as [mu |] eqn:A1; [| easy].
+      (*assert (0 < mu). rewrite <- A1.*)
+      rewrite Qmake_Qdiv, injZ_One. unfold Qdiv. rewrite Qmult_assoc, Qmult_1_r.
+      change (w / n <= mu). apply Qle_div_l.
+      apply Qle_shift_div_r; [easy |].
+      subst N. apply le_Z_to_pos, Qle_Qceiling_Z in A.*)
+    Admitted.
+
+
+
 
   End singular_props.
 
