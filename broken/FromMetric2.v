@@ -15,16 +15,16 @@ Qed.
 Lemma Qmult_pos_neg (x y : Q) : 0 < x -> y < 0 -> x * y < 0.
 Proof. intros H1 H2. rewrite Qmult_comm. now apply Qmult_neg_pos. Qed.
 
-Lemma Qmult_pos_r : forall x y : Q, 0 < x -> 0 < x * y -> 0 < y.
+Lemma Qmult_pos_r : forall x y : Q, 0 <= x -> 0 < x * y -> 0 < y.
 Proof.
 intros x y H1 H2.
 destruct (Qsec.Qdec_sign y) as [[? | ?] | H]; trivial.
-+ exfalso; apply (Qlt_irrefl 0), Qlt_trans with (y := x * y); trivial.
-  now apply Qmult_pos_neg.
++ exfalso. apply (Qlt_irrefl 0), Qlt_le_trans with (y := x * y); trivial.
+  now apply Q.Qmult_nonneg_nonpos; [| apply Qlt_le_weak].
 + rewrite H, Qmult_0_r in H2. exfalso; now apply (Qlt_irrefl 0).
 Qed.
 
-Lemma Qmult_pos_l : forall x y : Q, 0 < y -> 0 < x * y -> 0 < x.
+Lemma Qmult_pos_l : forall x y : Q, 0 <= y -> 0 < x * y -> 0 < x.
 Proof. intros x y H1 H2. rewrite Qmult_comm in H2. now apply (Qmult_pos_r y x). Qed.
 
 Require Import
@@ -69,10 +69,10 @@ intro e_neg. unfold gball. destruct (Qsec.Qdec_sign e) as [[E | E] | E]; [easy |
 + rewrite E in e_neg. intros _; apply (Qlt_irrefl _ e_neg).
 Qed.
 
-Lemma mspc_closed_help (e : Q) (x y : X) :
-   (∀ d : Q, 0 < d → mspc_ball (e + d) x y) → mspc_ball e x y.
+Lemma gball_closed (e : Q) (x y : X) :
+   (∀ d : Q, 0 < d → gball (e + d) x y) → gball e x y.
 Proof.
-intro C. change (gball e x y). unfold gball.
+intro C. (*change (gball e x y).*) unfold gball.
 destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos] | e_zero].
 + assert (e / 2 < 0) by now apply neg_pos_mult.
   apply (gball_neg (e/2) x y); [easy |].
@@ -81,6 +81,12 @@ destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos] | e_zero].
 + apply (msp_closed (msp X)). intros [d d_pos]. now apply gball_pos, C.
 + apply ball_eq. intros [d d_pos]. apply gball_pos.
   setoid_replace d with (e + d); [now apply C | rewrite e_zero; symmetry; apply plus_0_l].
+Qed.
+
+Lemma gball_closed_eq (x y : X) : (∀ d : Q, 0 < d -> gball d x y) -> x = y.
+Proof.
+intro C. change (gball 0 x y). apply gball_closed. intro d.
+setoid_replace (0 + d)%Q with d by apply plus_0_l. apply C.
 Qed.
 
 Global Instance : ExtMetricSpaceClass X.
@@ -92,7 +98,7 @@ constructor.
 + apply gball_refl.
 + intros [e |]; [apply gball_sym | easy].
 + apply gball_triangle.
-+ apply mspc_closed_help.
++ apply gball_closed.
 Qed.
 
 Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction X.
@@ -145,38 +151,34 @@ Require Import CRmetric.
 
 Section CompleteSegment.
 
-Context (r : Q) (a : CR).
+Context {X : MetricSpace} (r : Q) (a : Complete X).
 
-Global (*Program*) Instance : Limit (sig (mspc_ball r a)).
-(*:= λ f, exist _ (lim (Build_RegularFunction (@proj1_sig _ _ ∘ f) _))  _.*)
-(*Next Obligation.
+Global Program Instance : Limit (sig (mspc_ball r a)) :=
+  λ f, exist _ (lim (Build_RegularFunction (@proj1_sig _ _ ∘ f) _)) _.
+Next Obligation.
 apply f.
 Qed.
-Next Obligation.*)
-intros [f f_reg]. set (g := @proj1_sig CR _ ∘ f).
-assert (g_reg : IsRegularFunction g) by apply f_reg.
-exists (lim (Build_RegularFunction g g_reg)).
-unfold mspc_ball, msp_mspc_ball. apply gball_complete. intros e1 e2.
+Next Obligation.
+apply gball_complete; intros e1 e2.
 unfold lim, limit_complete, Cjoin_fun, Cjoin_raw; simpl.
-assert (H : mspc_ball r a (g ((1 # 2) * QposAsQ e2)%Q)) by apply (proj2_sig (f ((1 # 2) * e2))).
+assert (H : mspc_ball r a ((@proj1_sig _ _ ∘ f) ((1 # 2) * QposAsQ e2)%Q)) by
+  apply (proj2_sig (f ((1 # 2) * e2))).
 unfold mspc_ball, msp_mspc_ball in H.
 apply gball_weak_le with (q := QposAsQ e1 + r + (QposAsQ ((1 # 2) * e2)%Qpos)).
 + apply Qplus_le_r. apply Qle_half; auto.
 + apply gball_complete, H.
-Defined.
+Qed.
 
-(*Global Instance : CompleteMetricSpaceClass (sig (mspc_ball r a)).
+Global Instance : CompleteMetricSpaceClass (sig (mspc_ball r a)).
 Proof.
 constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
-intros [f f_reg] e1 e2 e1_pos e2_pos.
-set (g := @proj1_sig CR _ ∘ f).
-assert (g_reg : IsRegularFunction g) by apply f_reg.
-assert (H : CompleteMetricSpaceClass CR) by apply _.
-destruct H as [H _]. specialize (H (Build_RegularFunction g g_reg) (Build_RegularFunction g g_reg)).
-simpl in *.
-eapply H.
-*)
+intros f e1 e2 e1_pos e2_pos; unfold Datatypes.id.
+assert (C : CompleteMetricSpaceClass (Complete X)) by apply _.
+destruct C as [C _].
+assert (R : IsRegularFunction (@proj1_sig _ _ ∘ f)) by apply f.
+specialize (C (Build_RegularFunction _ R) (Build_RegularFunction _ R)). now apply C.
+Qed.
 
 End CompleteSegment.
 

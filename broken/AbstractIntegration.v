@@ -367,7 +367,7 @@ Section integral_interface.
      of unicity only works for such functions. Todo: There should really be a proof that does not depend
      on continuity. *)
 
-    Context (*`{!LocallyUniformlyContinuous_mu f}*) `{!IsLocallyUniformlyContinuous f lmu}.
+    Context `{L : !IsLocallyUniformlyContinuous f lmu}.
 
 (*
     Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
@@ -436,73 +436,78 @@ Section integral_interface.
      apply (Qopp_le_compat 0); eapply Qle_trans; eauto.
     Qed.
 
-    Program Definition step (w : Qpos) (n : positive) : QnonNeg := exist _ (w * (1 # n)) _.
-    Next Obligation. Qauto_nonneg. Qed.
-
-    Definition Riemann_sum (a : Q) (w : Qpos) (n : positive) :=
-      let iw := step w n in
-        cmΣ (Pos.to_nat n) (fun i => 'iw * f (a + i * iw))%CR.
-
-    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: QnonNeg) (n: nat):
-     (n * iw == w)%Qnn ->
-     (`iw <= lmu a w e)%Qinf ->
+    Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: Q) (n: nat):
+     (n * iw == w)%Q ->
+     (iw <= lmu a w e)%Qinf ->
      gball (e * w) (cmΣ n (fun i => 'iw * f (a + i * iw))%CR) (∫ f a w).
     Proof.
      intros A B.
+     assert (iw_nn : 0 <= iw) by (apply Qlt_le_weak, (Qmult_pos_r n); [| rewrite A]; Qauto_nonneg).
+     set (iw' := exist _ iw iw_nn : QnonNeg ).
+     change iw with (QnonNeg.to_Q iw').
+     change (n * iw' == w)%Qnn in A.
      rewrite <- A.
      rewrite <- integral_repeated_additive.
-     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw * e))%Qnn: Q) by
+     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw' * e))%Qnn: Q) by
        (simpl in *; unfold QnonNeg.eq in A; simpl in A;
         unfold QposAsQ; rewrite Qmult_assoc; rewrite A; ring).
-     apply (CRΣ_gball_ex _ _ (iw * e)%Qnn).
-     intros m H; simpl.
+     apply (CRΣ_gball_ex _ _ (iw' * e)%Qnn).
+     intros m H.
      rewrite CRmult_scale.
      apply gball_sym. apply CRball.rational.
-     setoid_replace (' (` iw * ` e)) with (scale iw (' (` e))) by now rewrite <- scale_Qmult.
+     setoid_replace (' (` iw' * ` e)) with (scale iw' (' (` e))) by now rewrite <- scale_Qmult.
      apply integral_bounded; [apply CRnonNegQpos |].
-     intros x [A1 A2]. apply CRball.rational. apply (luc_gball a w (`iw)); trivial.
+     intros x [A1 A2]. apply CRball.rational. apply (luc_gball a w (`iw')); trivial.
      + apply ball_gball, Qball_Qabs.
-       setoid_replace (a - (a + m * iw)) with (- (m * iw)) by ring.
-       rewrite Qabs_opp. apply Qabs_le_nonneg.
-       apply Qmult_le_0_compat; [apply Qle_nat | apply (proj2_sig iw)].
-       apply Qle_trans with (y := (n * iw)).
+       setoid_replace (a - (a + m * iw')) with (- (m * iw')) by ring.
+       rewrite Qabs_opp. apply Qabs_le_nonneg; [Qauto_nonneg |].
+       apply Qle_trans with (y := (n * iw')).
        apply Qmult_le_compat_r. apply Qlt_le_weak. rewrite <- Zlt_Qlt. now apply inj_lt.
-       apply (proj2_sig iw).
-       change (n * iw == w) in A. rewrite <- A; reflexivity.
+       apply (proj2_sig iw').
+       change (n * iw' == w) in A. rewrite <- A; reflexivity.
      + apply gball_abs, Qabs_Qle_condition.
        split.
        apply Qplus_le_l with (z := x), Qplus_le_l with (z := w).
        setoid_replace (- w + x + w) with x by ring. setoid_replace (a - x + x + w) with (a + w) by ring.
-       apply Qle_trans with (y := (a + m * ` iw + ` iw)); [easy |].
-       setoid_rewrite <- (Qmult_1_l (` iw)) at 2. change 1%Q with (inject_Z (Z.of_nat 1)).
+       apply Qle_trans with (y := (a + m * ` iw' + ` iw')); [easy |].
+       setoid_rewrite <- (Qmult_1_l (` iw')) at 2. change 1%Q with (inject_Z (Z.of_nat 1)).
        rewrite <- Qplus_assoc, <- Qmult_plus_distr_l, <- Zplus_Qplus, <- Nat2Z.inj_add.
-       apply Qplus_le_r. change (n * iw == w) in A. rewrite <- A.
+       apply Qplus_le_r. change (n * iw' == w) in A. rewrite <- A.
        apply Qmult_le_compat_r. rewrite <- Zle_Qle. apply inj_le. rewrite Plus.plus_comm.
        now apply lt_le_S.
-       apply (proj2_sig iw).
+       apply (proj2_sig iw').
        apply Qplus_le_l with (z := x), Qplus_le_l with (z := -w).
        setoid_replace (a - x + x + - w) with (a - w) by ring.
        setoid_replace (w + x + - w) with x by ring.
        apply Qle_trans with (y := a). rewrite <- (Qplus_0_r a) at 2.
        apply Qplus_le_r. change 0 with (-0). apply Qopp_le_compat, Qlt_le_weak, (proj2_sig w).
-       apply Qle_trans with (y := a + m * ` iw); [| easy].
-       rewrite <- (Qplus_0_r a) at 1. apply Qplus_le_r, Qmult_le_0_compat; [apply Qle_nat | apply (proj2_sig iw)].
+       apply Qle_trans with (y := a + m * ` iw'); [| easy].
+       rewrite <- (Qplus_0_r a) at 1. apply Qplus_le_r, Qmult_le_0_compat; [apply Qle_nat | apply (proj2_sig iw')].
      + apply gball_abs, Qabs_Qle_condition; split.
-       apply (Qplus_le_r (x + `iw)).
-       setoid_replace (x + `iw + - `iw) with x by ring.
-       setoid_replace (x + `iw + (a + m * iw - x)) with (a + m * iw + `iw) by ring. apply A2.
-       apply (Qplus_le_r (x - `iw)).
-       setoid_replace (x - `iw + (a + m * iw - x)) with (a + m * iw - `iw) by ring.
-       setoid_replace (x - `iw + `iw) with x by ring.
-       apply Qle_trans with (y := a + m * iw); [| easy].
-       apply Qminus_less. apply (proj2_sig iw).
+       apply (Qplus_le_r (x + `iw')).
+       setoid_replace (x + `iw' + - `iw') with x by ring.
+       setoid_replace (x + `iw' + (a + m * iw' - x)) with (a + m * iw' + `iw') by ring. apply A2.
+       apply (Qplus_le_r (x - `iw')).
+       setoid_replace (x - `iw' + (a + m * iw' - x)) with (a + m * iw' - `iw') by ring.
+       setoid_replace (x - `iw' + `iw') with x by ring.
+       apply Qle_trans with (y := a + m * iw'); [| easy].
+       apply Qminus_less. apply (proj2_sig iw').
     Qed.
+
+(*    Program Definition step (w : Qpos) (n : positive) : QnonNeg := exist _ (w * (1 # n)) _.
+    Next Obligation. Qauto_nonneg. Qed.*)
+
+    Definition step (w : Qpos) (n : positive) : Q := w * (1 # n).
+
+    Definition riemann_sum (a : Q) (w : Qpos) (n : positive) :=
+      let iw := step w n in
+        cmΣ (Pos.to_nat n) (fun i => 'iw * f (a + i * iw))%CR.
 
     Lemma Riemann_sums_approximate_integral' (a : Q) (w : Qpos) (e : Qpos) (n : positive) :
       (step w n <= lmu a w e)%Qinf ->
-      gball (e * w) (Riemann_sum a w n) (∫ f a w).
+      gball (e * w) (riemann_sum a w n) (∫ f a w).
     Proof.
-      intro A; unfold Riemann_sum. apply Riemann_sums_approximate_integral; [| easy].
+      intro A; unfold riemann_sum. apply Riemann_sums_approximate_integral; [| easy].
       unfold step. change (Pos.to_nat n * (w * (1 # n)) == w).
       rewrite positive_nat_Z. unfold inject_Z. rewrite !Qmake_Qdiv; field; auto.
     Qed.
@@ -517,34 +522,21 @@ Section integral_interface.
 
     Lemma Riemann_sums_approximate_integral'' (a : Q) (w : Qpos) (e : Qpos) :
       exists N : positive, forall n : positive, (N <= n)%positive ->
-        gball e (Riemann_sum a w n) (∫ f a w).
+        gball e (riemann_sum a w n) (∫ f a w).
     Proof.
       set (N := Z.to_pos (Qceiling (comp_inf (λ x, w / x) (lmu a w) 0 (e / w)))).
       exists N; intros n A. setoid_replace (QposAsQ e) with ((e / w)%Qpos * w)
         by (change (e == e / w * w); field; auto).
       apply Riemann_sums_approximate_integral'.
       unfold step, comp_inf in *. change ((w * (1 # n))%Q <= lmu a w (e / w))%Qinf.
-      assert (0 <= lmu a w (e / w))%Qinf.
-      unfold IsLocallyUniformlyContinuous in *.
-
-(*assert (IsUniformlyContinuous (restrict f a w) (lmu a w)).
-specialize (IsLocallyUniformlyContinuous0 a w).
-apply _.
-apply IsLocallyUniformlyContinuous0.
-
-
-
-      rapply (uc_pos (restrict f a w) (lmu a w)).
+      assert (A2 : 0 < e / w) by (apply Qmult_lt_0_compat; [| apply Qinv_lt_0_compat]; auto).
       destruct (lmu a w (e / w)) as [mu |] eqn:A1; [| easy].
-      (*assert (0 < mu). rewrite <- A1.*)
+      assert (A3 := @uc_pos _ _ _ _ _ _ (L a w) (e / w) A2). rewrite A1 in A3.
+      change (0 < mu) in A3.
       rewrite Qmake_Qdiv, injZ_One. unfold Qdiv. rewrite Qmult_assoc, Qmult_1_r.
-      change (w / n <= mu). apply Qle_div_l.
-      apply Qle_shift_div_r; [easy |].
-      subst N. apply le_Z_to_pos, Qle_Qceiling_Z in A.*)
-    Admitted.
-
-
-
+      change (w / n <= mu). apply Qle_div_l; auto.
+      subst N. now apply le_Z_to_pos, Qle_Qceiling_Z in A.
+    Qed.
 
   End singular_props.
 
@@ -596,6 +588,88 @@ Proof with auto.
  replace (@integrate g) with (@integrate f) by reflexivity.
  apply (integral_wd f)...
 Qed.
+
+Require Import ARtrans. (* This is almost all CoRN *)
+Import canonical_names.
+
+Program Instance CR_abs : Abs CR := λ x, CRabs x.
+Next Obligation. split; [apply CRabs_pos | apply CRabs_neg]. Qed.
+
+Lemma CRabs_nonneg (x : CR) : 0 ≤ CRabs x.
+Proof.
+apply -> CRabs_cases; [| apply _ | apply _].
+split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
+Qed.
+
+Lemma gball_CRabs (r : Q) (x y : CR) : gball r x y <-> CRabs (x - y) ≤ 'r.
+Proof. rewrite CRball.rational. apply CRball.as_distance_bound. Qed.
+
+Lemma minus_0_r `{Ring R} (x : R) : x - 0 = x.
+Proof. rewrite rings.negate_0; apply rings.plus_0_r. Qed.
+
+Section RiemannSumBounds.
+
+Context (f : Q -> CR).
+
+Lemma riemann_sum_const (a : Q) (w : Qpos) (m : CR) (n : positive) :
+  riemann_sum (λ _, m) a w n = scale w m.
+Proof.
+
+SearchAbout cm_Sum.
+
+
+Lemma riemann_sum_bounds (a : Q) (w : Qpos) (m : CR) (e : Q) (n : positive) :
+  (forall (x : Q), (a ≤ x ≤ a + w) -> gball e (f x) m) ->
+  gball (w * e) (riemann_sum f a w n) (scale w m).
+Proof.
+intro A.
+
+
+
+
+
+
+
+End RiemannSumBounds.
+
+Section IntegralBound.
+
+Context (f : Q -> CR) `{Integrable f}.
+
+Add Ring CR : (rings.stdlib_ring_theory CR).
+
+Lemma scale_0_r (x : Q) : scale x 0 = 0.
+Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
+
+Lemma integral_abs_bound (from : Q) (width : Qpos) (M : Q) :
+  (forall (x : Q), (from ≤ x ≤ from + width) -> CRabs (f x) ≤ 'M) ->
+  CRabs (∫ f from width) ≤ '(`width * M).
+Proof.
+intro A. rewrite <- (CRplus_0_r (∫ f from width)), <- CRopp_0.
+apply CRball.as_distance_bound, CRball.rational. rewrite <- (scale_0_r width).
+assert (A1 : 0 ≤ M).
++ apply CRle_Qle. apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
+  apply A. split; [reflexivity |].
+  apply semirings.nonneg_plus_le_compat_r. apply orders.lt_le; Qauto_nonneg.
++ change M with (QnonNeg.to_Q (exist _ M A1)).
+  apply bounded_with_nonneg_radius; [easy |].
+  intros x A2; apply gball_CRabs; rewrite minus_0_r; now apply A.
+Qed.
+
+
+Section IntegralOfSum.
+
+Context (f g : Q -> CR) `{Integral f, !Integrable f} `{Integral g, !Integrable g}.
+
+Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
+
+Theorem integral_sum (a : Q) (w : Qpos) : ∫ (f +1 g) a w = ∫ f a w + ∫ g a w.
+
+
+
+
+
+
 
 (*
 Lemma integrate_proper
