@@ -312,6 +312,12 @@ Proof.
  apply Qplus_le_compat; assumption.
 Qed.
 
+Lemma Qminus_less (x y : Q) : 0 <= y -> x - y <= x.
+Proof.
+intro H. rewrite <- (Qplus_0_r x) at 2. apply Qplus_le_r. change 0 with (-0).
+now apply Qopp_le_compat.
+Qed.
+
 Lemma Qabs_Qle x y: (Qabs x <= y) <-> (-y <= x <= y).
 Proof with intuition.
  split.
@@ -341,7 +347,31 @@ Proof with try ring.
  setoid_replace (y - r + r) with y...
  intuition.
 Qed.
- 
+
+Lemma Qabs_zero (x : Q) : Qabs x == 0 <-> x == 0.
+Proof.
+split; intro H; [| now rewrite H].
+destruct (Qdec_sign x) as [[x_neg | x_pos] | x_zero]; [| | trivial].
++ rewrite Qabs_neg in H; [| apply Qlt_le_weak; trivial].
+  now rewrite <- (Qopp_involutive x), H.
++ rewrite Qabs_pos in H; [| apply Qlt_le_weak]; trivial.
+Qed.
+
+Lemma Qabs_nonpos (x : Q) : Qabs x <= 0 -> x == 0.
+Proof.
+intro H. apply Qle_lteq in H. destruct H as [H | H].
++ elim (Qlt_not_le _ _ H (Qabs_nonneg x)).
++ now apply Qabs_zero.
+Qed.
+
+Lemma Qabs_le_nonneg (x y : Q) : 0 <= x -> (Qabs x <= y <-> x <= y).
+Proof.
+ intro A. rewrite Qabs_Qle_condition.
+ split; [intros [_ ?]; trivial | intro A1; split; [| trivial]].
+ apply Qle_trans with (y := 0); [| trivial].
+ apply (Qopp_le_compat 0); eapply Qle_trans; eauto.
+Qed.
+
 Lemma Qdiv_le_1 (x y: Q): 0 <= x <= y -> x / y <= 1.
 Proof with intuition.
  intros.
@@ -355,6 +385,35 @@ Proof with intuition.
    apply Qmult_le_compat_r...
   discriminate.
  exfalso. apply ynnP...
+Qed.
+
+(* The following two lemmas are obtained from the lemmas with the same name
+in Coq.QArith.QArith_base by replacing -> with <-> *)
+
+Lemma Qle_shift_div_l : forall a b c, 0 < c -> (a * c <= b <-> a <= b / c).
+Proof.
+intros a b c A; split; [now apply Qle_shift_div_l |].
+intro A1. apply (Qmult_le_r _ _ (/c)); [now apply Qinv_lt_0_compat |].
+rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
+Qed.
+
+Lemma Qle_shift_div_r : forall a b c, 0 < b -> (a <= c * b <-> a / b <= c).
+Proof.
+intros a b c A; split; [now apply Qle_shift_div_r |].
+intro A1. apply (Qmult_le_r _ _ (/b)); [now apply Qinv_lt_0_compat |].
+rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
+Qed.
+
+Lemma Qle_div_l : forall a b c, 0 < b -> 0 < c -> (a / b <= c <-> a / c <= b).
+Proof.
+intros a b c A1 A2.
+rewrite <- Qle_shift_div_r; [| easy]. rewrite (Qmult_comm c b). rewrite Qle_shift_div_r; easy.
+Qed.
+
+Lemma Qle_div_r : forall a b c, 0 < b -> 0 < c -> (b <= a / c <-> c <= a / b).
+Proof.
+intros a b c A1 A2.
+rewrite <- Qle_shift_div_l; [| easy]. rewrite (Qmult_comm b c). rewrite Qle_shift_div_l; easy.
 Qed.
 
 Lemma nat_lt_Qlt n m: (n < m)%nat -> (inject_Z (Z_of_nat n) + (1#2) < inject_Z (Z_of_nat m))%Q.

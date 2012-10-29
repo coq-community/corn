@@ -14,7 +14,10 @@ Require Import metric FromMetric2.
 
 Require Qinf QnonNeg QnnInf CRball.
 Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
-(*Import canonical_names.*)
+
+Require Import CRtrans ARtrans. (* This is almost all CoRN *)
+
+
 
 (*Notation Qinf := Qinf.T.
 
@@ -46,73 +49,7 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-Section QFacts.
-
-Open Scope Q_scope.
-
-Lemma Qminus_less (x y : Q) : 0 <= y -> x - y <= x.
-Proof.
-intro H. rewrite <- (Qplus_0_r x) at 2. apply Qplus_le_r. change 0 with (-0).
-now apply Qopp_le_compat.
-Qed.
-
-(* The following two lemmas are obtained from the lemmas with the same name
-in Coq.QArith.QArith_base by replacing -> with <-> *)
-
-Lemma Qle_shift_div_l : forall a b c, 0 < c -> (a * c <= b <-> a <= b / c).
-Proof.
-intros a b c A; split; [now apply Qle_shift_div_l |].
-intro A1. apply (Qmult_le_r _ _ (/c)); [now apply Qinv_lt_0_compat |].
-rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
-Qed.
-
-Lemma Qle_shift_div_r : forall a b c, 0 < b -> (a <= c * b <-> a / b <= c).
-Proof.
-intros a b c A; split; [now apply Qle_shift_div_r |].
-intro A1. apply (Qmult_le_r _ _ (/b)); [now apply Qinv_lt_0_compat |].
-rewrite <- Qmult_assoc, Qmult_inv_r; [now rewrite Qmult_1_r | auto with qarith].
-Qed.
-
-Lemma Qle_div_l : forall a b c, 0 < b -> 0 < c -> (a / b <= c <-> a / c <= b).
-Proof.
-intros a b c A1 A2.
-rewrite <- Qle_shift_div_r; [| easy]. rewrite (Qmult_comm c b). rewrite Qle_shift_div_r; easy.
-Qed.
-
-Lemma Qle_div_r : forall a b c, 0 < b -> 0 < c -> (b <= a / c <-> c <= a / b).
-Proof.
-intros a b c A1 A2.
-rewrite <- Qle_shift_div_l; [| easy]. rewrite (Qmult_comm b c). rewrite Qle_shift_div_l; easy.
-Qed.
-
-Lemma Qabs_zero (x : Q) : Qabs x == 0 <-> x == 0.
-Proof.
-split; intro H; [| now rewrite H].
-destruct (Qdec_sign x) as [[x_neg | x_pos] | x_zero]; [| | trivial].
-+ rewrite Qabs_neg in H; [| apply Qlt_le_weak; trivial].
-  now rewrite <- (Qopp_involutive x), H.
-+ rewrite Qabs_pos in H; [| apply Qlt_le_weak]; trivial.
-Qed.
-
-Lemma Qabs_nonpos (x : Q) : Qabs x <= 0 -> x == 0.
-Proof.
-intro H. apply Qle_lteq in H. destruct H as [H | H].
-+ elim (Qlt_not_le _ _ H (Qabs_nonneg x)).
-+ now apply Qabs_zero.
-Qed.
-
-Lemma gball_abs (e a b : Q) : gball e a b ↔ (Qabs (a - b) <= e).
-Proof.
-unfold gball. destruct (Qdec_sign e) as [[e_neg | e_pos] | e_zero].
-+ split; intros H; [easy |]. assert (H1 := Qle_lt_trans _ _ _ H e_neg).
-  eapply Qle_not_lt; [apply Qabs_nonneg | apply H1].
-+ apply Qball_Qabs.
-+ split; intro H.
-  - rewrite e_zero, H; setoid_replace (b - b) with 0 by ring; apply Qle_refl.
-  - rewrite e_zero in H. apply Qabs_nonpos in H; now apply Qminus_eq.
-Qed.
-
-End QFacts.
+SearchAbout CRnonNeg.
 
 (** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)
@@ -403,14 +340,6 @@ Section integral_interface.
 *)
     (** Iterating this result shows that Riemann sums are arbitrarily good approximations: *)
 
-
-    Lemma CRnonNegQpos : forall e : Qpos, CRnonNeg (' ` e).
-    Proof.
-    intros [e e_pos]; apply CRnonNeg_criterion; simpl.
-    intros q A; apply Qlt_le_weak, Qlt_le_trans with (y := e); trivial.
-    now apply CRle_Qle.
-    Qed.
-
     Open Scope Q_scope.
 
     Lemma luc_gball (a w delta eps x y : Q) :
@@ -425,15 +354,6 @@ Section integral_interface.
      apply H; [apply A |].
      destruct (lmu a w eps) as [q |] eqn:A5; [| easy].
      apply (mspc_monotone delta); [apply A1 | apply A4].
-    Qed.
-
-
-    Lemma Qabs_le_nonneg (x y : Q) : 0 <= x -> (Qabs x <= y <-> x <= y).
-    Proof.
-     intro A. rewrite Qabs_Qle_condition.
-     split; [intros [_ ?]; trivial | intro A1; split; [| trivial]].
-     apply Qle_trans with (y := 0); [| trivial].
-     apply (Qopp_le_compat 0); eapply Qle_trans; eauto.
     Qed.
 
     Lemma Riemann_sums_approximate_integral (a: Q) (w: Qpos) (e: Qpos) (iw: Q) (n: nat):
@@ -465,7 +385,7 @@ Section integral_interface.
        apply Qmult_le_compat_r. apply Qlt_le_weak. rewrite <- Zlt_Qlt. now apply inj_lt.
        apply (proj2_sig iw').
        change (n * iw' == w) in A. rewrite <- A; reflexivity.
-     + apply gball_abs, Qabs_Qle_condition.
+     + apply gball_Qabs, Qabs_Qle_condition.
        split.
        apply Qplus_le_l with (z := x), Qplus_le_l with (z := w).
        setoid_replace (- w + x + w) with x by ring. setoid_replace (a - x + x + w) with (a + w) by ring.
@@ -483,7 +403,7 @@ Section integral_interface.
        apply Qplus_le_r. change 0 with (-0). apply Qopp_le_compat, Qlt_le_weak, (proj2_sig w).
        apply Qle_trans with (y := a + m * ` iw'); [| easy].
        rewrite <- (Qplus_0_r a) at 1. apply Qplus_le_r, Qmult_le_0_compat; [apply Qle_nat | apply (proj2_sig iw')].
-     + apply gball_abs, Qabs_Qle_condition; split.
+     + apply gball_Qabs, Qabs_Qle_condition; split.
        apply (Qplus_le_r (x + `iw')).
        setoid_replace (x + `iw' + - `iw') with x by ring.
        setoid_replace (x + `iw' + (a + m * iw' - x)) with (a + m * iw' + `iw') by ring. apply A2.
@@ -512,14 +432,6 @@ Section integral_interface.
       rewrite positive_nat_Z. unfold inject_Z. rewrite !Qmake_Qdiv; field; auto.
     Qed.
 
-    Lemma le_Z_to_pos (z : Z) (p : positive) : (Z.to_pos z <= p)%positive <-> (z <= p)%Z.
-    Proof.
-      destruct z as [| q | q]; simpl.
-      + split; intros _; [apply Zle_0_pos | apply Pos.le_1_l].
-      + apply Ple_Zle.
-      + split; intros _; [apply Zle_neg_pos | apply Pos.le_1_l].
-    Qed.
-
     Lemma Riemann_sums_approximate_integral'' (a : Q) (w : Qpos) (e : Qpos) :
       exists N : positive, forall n : positive, (N <= n)%positive ->
         gball e (riemann_sum a w n) (∫ f a w).
@@ -535,7 +447,7 @@ Section integral_interface.
       change (0 < mu) in A3.
       rewrite Qmake_Qdiv, injZ_One. unfold Qdiv. rewrite Qmult_assoc, Qmult_1_r.
       change (w / n <= mu). apply Qle_div_l; auto.
-      subst N. now apply le_Z_to_pos, Qle_Qceiling_Z in A.
+      subst N. now apply Ple_Zle_to_pos_l, Qle_Qceiling_Z in A.
     Qed.
 
   End singular_props.
@@ -589,7 +501,6 @@ Proof with auto.
  apply (integral_wd f)...
 Qed.
 
-Require Import ARtrans. (* This is almost all CoRN *)
 Import canonical_names.
 
 Program Instance CR_abs : Abs CR := λ x, CRabs x.
@@ -607,7 +518,7 @@ Proof. rewrite CRball.rational. apply CRball.as_distance_bound. Qed.
 Lemma minus_0_r `{Ring R} (x : R) : x - 0 = x.
 Proof. rewrite rings.negate_0; apply rings.plus_0_r. Qed.
 
-Section RiemannSumBounds.
+(*Section RiemannSumBounds.
 
 Context (f : Q -> CR).
 
@@ -631,6 +542,7 @@ intro A.
 
 
 End RiemannSumBounds.
+*)
 
 Section IntegralBound.
 
@@ -657,6 +569,7 @@ assert (A1 : 0 ≤ M).
 Qed.
 
 
+(*
 Section IntegralOfSum.
 
 Context (f g : Q -> CR) `{Integral f, !Integrable f} `{Integral g, !Integrable g}.
@@ -664,7 +577,7 @@ Context (f g : Q -> CR) `{Integral f, !Integrable f} `{Integral g, !Integrable g
 Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
 
 Theorem integral_sum (a : Q) (w : Qpos) : ∫ (f +1 g) a w = ∫ f a w + ∫ g a w.
-
+*)
 
 
 

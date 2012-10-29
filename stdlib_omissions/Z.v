@@ -94,5 +94,13 @@ Proof.
  reflexivity.
 Qed.
 
+Lemma Ple_Zle_to_pos_l (z : Z) (p : positive) : (Z.to_pos z <= p)%positive <-> (z <= p)%Z.
+Proof.
+  destruct z as [| q | q]; simpl.
+  + split; intros _; [apply Zle_0_pos | apply Pos.le_1_l].
+  + apply Ple_Zle.
+  + split; intros _; [apply Zle_neg_pos | apply Pos.le_1_l].
+Qed.
+
 Lemma add_pos_nonneg (a b: Z): 0 < a -> 0 <= b -> 0 < a+b.
 Proof. intros. omega. Qed.

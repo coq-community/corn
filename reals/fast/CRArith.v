@@ -623,6 +623,13 @@ Proof with auto.
  apply CRle_trans with y...
 Qed.
 
+Lemma CRnonNegQpos : forall e : Qpos, CRnonNeg (' ` e).
+Proof.
+ intros [e e_pos]; apply CRnonNeg_criterion; simpl.
+ intros q A; apply Qlt_le_weak, Qlt_le_trans with (y := e); trivial.
+ now apply CRle_Qle.
+Qed.
+
 Lemma scale_0 x: scale 0 x == 0.
 Proof. rewrite <- CRmult_scale. ring. Qed.
 

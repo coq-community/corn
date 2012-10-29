@@ -45,7 +45,7 @@ intro A; destruct z as [| p | p]; trivial.
 unfold Z.le in A; now contradict A.
 Qed.
 
-Lemma le_Z_to_nat (n : nat) (z : Z) : (Z.to_nat z <= n)%nat <-> (z <= Z.of_nat n)%Z.
+Lemma le_Zle_to_nat_l (n : nat) (z : Z) : (Z.to_nat z <= n)%nat <-> (z <= Z.of_nat n)%Z.
 Proof.
 pose proof (le_0_n n). pose proof (Zle_0_nat n).
 destruct (Z.neg_nonneg_cases z).
@@ -55,11 +55,11 @@ destruct (Z.neg_nonneg_cases z).
   - apply Z2Nat.inj_le in A; trivial. rewrite Nat2Z.id in A; trivial.
 Qed.
 
-Lemma lt_Z_to_nat (n : nat) (z : Z) : (n < Z.to_nat z)%nat <-> (Z.of_nat n < z)%Z.
+Lemma lt_Zlt_to_nat_r (n : nat) (z : Z) : (n < Z.to_nat z)%nat <-> (Z.of_nat n < z)%Z.
 Proof.
 assert (A : forall (m n : nat), not (m <= n)%nat <-> (n < m)%nat).
 + intros; split; [apply not_le | apply gt_not_le].
-+ assert (A1 := le_Z_to_nat n z). apply iff_not in A1.
++ assert (A1 := le_Zle_to_nat_l n z). apply iff_not in A1.
   now rewrite A, Z.nle_gt in A1.
 Qed.
 
@@ -72,26 +72,26 @@ apply Qplus_lt_l with (z := -1). setoid_replace (q + 1 + -1)%Q with q.
 + now rewrite <- Qplus_assoc, Qplus_opp_r, Qplus_0_r.
 Qed.
 
-Lemma Qle_Qceiling_Z (q : Q) (z : Z) : (Qceiling q <= z)%Z <-> (q <= z)%Q.
+Lemma Zle_Qle_Qceiling_l (q : Q) (z : Z) : (Qceiling q <= z)%Z <-> (q <= z)%Q.
 Proof.
 split; intro A.
 + rewrite Zle_Qle in A. apply Qle_trans with (y := Qceiling q); [apply Qle_ceiling | trivial].
 + apply Z.lt_pred_le. rewrite Zlt_Qlt. now apply Qlt_le_trans with (y := q); [apply Qceiling_lt |].
 Qed.
 
-Lemma Qle_Qceiling_nat (q : Q) (n : nat) : (Z.to_nat (Qceiling q) <= n)%nat <-> (q <= n)%Q.
-Proof. rewrite le_Z_to_nat; apply Qle_Qceiling_Z. Qed.
+Lemma le_Qle_Qceiling_Qceiling_to_nat_l (q : Q) (n : nat) : (Z.to_nat (Qceiling q) <= n)%nat <-> (q <= n)%Q.
+Proof. rewrite le_Zle_to_nat_l; apply Zle_Qle_Qceiling_l. Qed.
 
-Lemma Qlt_Qceiling_Z (q : Q) (z : Z) : (z < q)%Q <-> (z < Qceiling q)%Z.
+Lemma Qlt_Zlt_inject_Z_l (q : Q) (z : Z) : (z < q)%Q <-> (z < Qceiling q)%Z.
 Proof.
 assert (A : forall (x y : Q), not (x <= y)%Q <-> (y < x)%Q).
 + intros; split; [apply Qnot_le_lt | apply Qlt_not_le].
-+ assert (A1 := Qle_Qceiling_Z q z). apply iff_not in A1.
++ assert (A1 := Zle_Qle_Qceiling_l q z). apply iff_not in A1.
   now rewrite A, Z.nle_gt in A1.
 Qed.
 
-Lemma Qlt_Qceiling_nat (q : Q) (n : nat) : (n < q)%Q <-> (n < Z.to_nat (Qceiling q))%nat.
-Proof. rewrite (Qlt_Qceiling_Z q n); symmetry; apply lt_Z_to_nat. Qed.
+Lemma Qlt_lt_of_nat_inject_Z_l (q : Q) (n : nat) : (n < q)%Q <-> (n < Z.to_nat (Qceiling q))%nat.
+Proof. rewrite (Qlt_Zlt_inject_Z_l q n); symmetry; apply lt_Zlt_to_nat_r. Qed.
 
 Lemma neq_symm `{Ae : Equiv X} `{!Symmetric Ae} (x y : X) : x ≠ y -> y ≠ x.
 Proof. intros A1 A2; apply A1; now symmetry. Qed.
