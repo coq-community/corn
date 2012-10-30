@@ -179,7 +179,6 @@ Proof.
   apply Qmult_le_compat_r; try assumption.
   apply Qabs_nonneg.
  apply: mult_Streams_Gs.
-  apply _.
  now destruct Hy.
 Qed.
 
@@ -533,6 +532,5 @@ Proof.
  right.
  intros _.
  apply: Stream_Bound_zl.
-  apply Qrecip_factorial_bounded.
- apply _.
+ apply Qrecip_factorial_bounded.
 Defined.

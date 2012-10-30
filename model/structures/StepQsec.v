@@ -246,9 +246,9 @@ Qed.
 Lemma StepQRing_Morphism : ring_eq_ext StepQplus StepQmult StepQopp (@StepF_eq QS).
 Proof.
  split.
-   apply StepQplus_wd.
-  apply StepQmult_wd.
- apply StepQopp_wd.
+   apply: StepQplus_wd.
+  apply: StepQmult_wd.
+ apply: StepQopp_wd.
 Qed.
 
 Ltac isStepQcst t :=

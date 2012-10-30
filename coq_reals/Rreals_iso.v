@@ -882,9 +882,9 @@ Proof.
  apply PI_RGT_0.
 Qed.
 
-Lemma R_pi_alt_as_IR : RasIR (PI) [=] pi.
+Lemma R_pi_alt_as_IR : RasIR (Alt_PI) [=] pi.
 Proof.
- unfold PI.
+ unfold Alt_PI.
  unfold pi.
  destruct (exist_PI) as [x prf].
  unfold pi_series.
