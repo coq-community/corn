@@ -75,17 +75,6 @@ Qed.
 Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= e.
 Proof. split; apply AbsSmall_Qabs. Qed.
 
-Lemma gball_Qabs (e a b : Q) : gball e a b ↔ (Qabs (a - b) <= e).
-Proof.
-unfold gball. destruct (Qdec_sign e) as [[e_neg | e_pos] | e_zero].
-+ split; intros H; [easy |]. assert (H1 := Qle_lt_trans _ _ _ H e_neg).
-  eapply Qle_not_lt; [apply Qabs_nonneg | apply H1].
-+ apply Qball_Qabs.
-+ split; intro H.
-  - rewrite e_zero, H; setoid_replace (b - b) with 0 by ring; apply Qle_refl.
-  - rewrite e_zero in H. apply Qabs_nonpos in H; now apply Qminus_eq.
-Qed.
-
 Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+d) -> x <= e).
 Proof.
  intros.
@@ -426,3 +415,15 @@ Proof.
   apply Is_true_eq_left.
   now apply sumbool_eq_true.
 Qed.
+
+Lemma gball_Qabs (e a b : Q) : gball e a b <-> (Qabs (a - b) <= e).
+Proof.
+unfold gball. destruct (Qdec_sign e) as [[e_neg | e_pos] | e_zero].
++ split; intros H; [easy |]. assert (H1 := Qle_lt_trans _ _ _ H e_neg).
+  eapply Qle_not_lt; [apply Qabs_nonneg | apply H1].
++ apply Qball_Qabs.
++ split; intro H.
+  - rewrite e_zero, H; setoid_replace (b - b) with 0 by ring; apply Qle_refl.
+  - rewrite e_zero in H. apply Q.Qabs_nonpos in H; now apply Q.Qminus_eq.
+Qed.
+

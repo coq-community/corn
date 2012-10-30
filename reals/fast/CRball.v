@@ -87,6 +87,9 @@ Proof with auto.
  apply CRplus_le_compat...
 Qed. (* todo: clean up *)
 
+Lemma gball_CRabs (r : Q) (x y : CR) : gball r x y <-> CRabs (x - y) <= ' r.
+Proof. rewrite rational. apply as_distance_bound. Qed.
+
 Module notations.
 
   Notation CRball := CRball.

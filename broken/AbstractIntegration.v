@@ -9,15 +9,12 @@ Require Import
  stdlib_omissions.Z
  stdlib_omissions.Q
  stdlib_omissions.N.
- (*metric2.Classified*)
 Require Import metric FromMetric2.
 
 Require Qinf QnonNeg QnnInf CRball.
 Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
 
-Require Import CRtrans ARtrans. (* This is almost all CoRN *)
-
-
+(*Require Import CRtrans ARtrans.*) (* This is almost all CoRN *)
 
 (*Notation Qinf := Qinf.T.
 
@@ -447,7 +444,7 @@ Section integral_interface.
       change (0 < mu) in A3.
       rewrite Qmake_Qdiv, injZ_One. unfold Qdiv. rewrite Qmult_assoc, Qmult_1_r.
       change (w / n <= mu). apply Qle_div_l; auto.
-      subst N. now apply Ple_Zle_to_pos_l, Qle_Qceiling_Z in A.
+      subst N. now apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A.
     Qed.
 
   End singular_props.
@@ -503,20 +500,14 @@ Qed.
 
 Import canonical_names.
 
-Program Instance CR_abs : Abs CR := λ x, CRabs x.
-Next Obligation. split; [apply CRabs_pos | apply CRabs_neg]. Qed.
+(* Should this lemma be used to CoRN.reals.fast.CRabs? That file does not use
+type class notations from canonical_names like ≤ *)
 
 Lemma CRabs_nonneg (x : CR) : 0 ≤ CRabs x.
 Proof.
 apply -> CRabs_cases; [| apply _ | apply _].
 split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
 Qed.
-
-Lemma gball_CRabs (r : Q) (x y : CR) : gball r x y <-> CRabs (x - y) ≤ 'r.
-Proof. rewrite CRball.rational. apply CRball.as_distance_bound. Qed.
-
-Lemma minus_0_r `{Ring R} (x : R) : x - 0 = x.
-Proof. rewrite rings.negate_0; apply rings.plus_0_r. Qed.
 
 (*Section RiemannSumBounds.
 
@@ -553,6 +544,8 @@ Add Ring CR : (rings.stdlib_ring_theory CR).
 Lemma scale_0_r (x : Q) : scale x 0 = 0.
 Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
 
+Require Import propholds.
+
 Lemma integral_abs_bound (from : Q) (width : Qpos) (M : Q) :
   (forall (x : Q), (from ≤ x ≤ from + width) -> CRabs (f x) ≤ 'M) ->
   CRabs (∫ f from width) ≤ '(`width * M).
@@ -562,10 +555,11 @@ apply CRball.as_distance_bound, CRball.rational. rewrite <- (scale_0_r width).
 assert (A1 : 0 ≤ M).
 + apply CRle_Qle. apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
   apply A. split; [reflexivity |].
-  apply semirings.nonneg_plus_le_compat_r. apply orders.lt_le; Qauto_nonneg.
+  apply semirings.nonneg_plus_le_compat_r; change (0 <= width)%Q; Qauto_nonneg.
 + change M with (QnonNeg.to_Q (exist _ M A1)).
   apply bounded_with_nonneg_radius; [easy |].
-  intros x A2; apply gball_CRabs; rewrite minus_0_r; now apply A.
+  intros x A2. apply CRball.gball_CRabs. change (f x - 0%mc)%CR with (f x - 0).
+  rewrite rings.minus_0_r; now apply A.
 Qed.
 
 

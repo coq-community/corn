@@ -223,3 +223,9 @@ Proof.
  CRring_replace (x - y) (-(y - x)).
  apply CRabs_opp.
 Qed.
+
+Import canonical_names.
+
+Program Instance CR_abs : Abs CR := fun x => CRabs x.
+Next Obligation. split; [apply CRabs_pos | apply CRabs_neg]. Qed.
+

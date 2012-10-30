@@ -288,6 +288,28 @@ Proof with auto.
  apply (Zmult_le_compat_l (Qnum y) 0 (Qnum x))...
 Qed.
 
+Lemma Qmult_neg_pos (x y : Q) : x < 0 -> 0 < y -> x * y < 0.
+Proof.
+intros H1 H2.
+apply Qopp_Qlt_0_l. setoid_replace (- (x * y)) with ((- x) * y) by ring.
+apply Qmult_lt_0_compat; trivial. now apply Qopp_Qlt_0_l.
+Qed.
+
+Lemma Qmult_pos_neg (x y : Q) : 0 < x -> y < 0 -> x * y < 0.
+Proof. intros H1 H2. rewrite Qmult_comm. now apply Qmult_neg_pos. Qed.
+
+Lemma Qmult_pos_r : forall x y : Q, 0 <= x -> 0 < x * y -> 0 < y.
+Proof.
+intros x y H1 H2.
+destruct (Q_dec y 0) as [[? | ?] | H]; trivial.
++ exfalso. apply (Qlt_irrefl 0), Qlt_le_trans with (y := x * y); trivial.
+  now apply Qmult_nonneg_nonpos; [| apply Qlt_le_weak].
++ rewrite H, Qmult_0_r in H2. exfalso; now apply (Qlt_irrefl 0).
+Qed.
+
+Lemma Qmult_pos_l : forall x y : Q, 0 <= y -> 0 < x * y -> 0 < x.
+Proof. intros x y H1 H2. rewrite Qmult_comm in H2. now apply (Qmult_pos_r y x). Qed.
+
 Lemma Qplus_lt_le_0_compat x y: 0 < x -> 0 <= y -> 0 < x + y.
 Proof with auto.
  unfold Qlt, Qle. simpl.
@@ -351,7 +373,7 @@ Qed.
 Lemma Qabs_zero (x : Q) : Qabs x == 0 <-> x == 0.
 Proof.
 split; intro H; [| now rewrite H].
-destruct (Qdec_sign x) as [[x_neg | x_pos] | x_zero]; [| | trivial].
+destruct (Q_dec x 0) as [[x_neg | x_pos] | x_zero]; [| | trivial].
 + rewrite Qabs_neg in H; [| apply Qlt_le_weak; trivial].
   now rewrite <- (Qopp_involutive x), H.
 + rewrite Qabs_pos in H; [| apply Qlt_le_weak]; trivial.
@@ -416,6 +438,11 @@ intros a b c A1 A2.
 rewrite <- Qle_shift_div_l; [| easy]. rewrite (Qmult_comm b c). rewrite Qle_shift_div_l; easy.
 Qed.
 
+Lemma Qle_half (x : Q) : 0 <= x -> (1 # 2) * x <= x.
+Proof.
+intro H. rewrite <- (Qmult_1_l x) at 2. apply Qmult_le_compat_r; auto with qarith.
+Qed.
+
 Lemma nat_lt_Qlt n m: (n < m)%nat -> (inject_Z (Z_of_nat n) + (1#2) < inject_Z (Z_of_nat m))%Q.
 Proof with intuition.
  unfold lt.
@@ -446,6 +473,39 @@ Proof.
 Qed.
 
 Hint Immediate positive_in_Q.
+
+SearchAbout (_ - ?x < _ - ?x)%Q.
+
+Lemma Qlt_Qceiling (q : Q) : inject_Z (Qceiling q) < q + 1.
+Proof.
+apply Qplus_lt_l with (z := (-1 # 1)). setoid_replace (q + 1 + (-1 # 1))%Q with q.
++ assert (A := Qceiling_lt q). unfold Z.sub in A.
+  now rewrite inject_Z_plus, inject_Z_opp in A.
++ now rewrite <- Qplus_assoc, Qplus_opp_r, Qplus_0_r.
+Qed.
+
+Lemma Zle_Qle_Qceiling (q : Q) (z : Z) : (Qceiling q <= z)%Z <-> q <= inject_Z z.
+Proof.
+split; intro A.
++ rewrite Zle_Qle in A. apply Qle_trans with (y := inject_Z (Qceiling q)); [apply Qle_ceiling | trivial].
++ apply Z.lt_pred_le. rewrite Zlt_Qlt. now apply Qlt_le_trans with (y := q); [apply Qceiling_lt |].
+Qed.
+
+Lemma le_Qle_Qceiling_to_nat (q : Q) (n : nat) :
+  (Z.to_nat (Qceiling q) <= n)%nat <-> q <= inject_Z (Z.of_nat n).
+Proof. rewrite Z.le_Zle_to_nat; apply Zle_Qle_Qceiling. Qed.
+
+Lemma Qlt_Zlt_inject_Z (q : Q) (z : Z) : inject_Z z < q <-> (z < Qceiling q)%Z.
+Proof.
+assert (A : forall (x y : Q), not (x <= y)%Q <-> (y < x)%Q).
++ intros; split; [apply Qnot_le_lt | apply Qlt_not_le].
++ assert (A1 := Zle_Qle_Qceiling q z). apply Z.iff_not in A1.
+  now rewrite A, Z.nle_gt in A1.
+Qed.
+
+Lemma Qlt_lt_of_nat_inject_Z (q : Q) (n : nat) :
+  inject_Z (Z.of_nat n) < q <-> (n < Z.to_nat (Qceiling q))%nat.
+Proof. rewrite (Qlt_Zlt_inject_Z q (Z.of_nat n)); apply Z.lt_Zlt_to_nat. Qed.
 
 (** NoDup isn't /directly/ useful for Q because Q does not use a canonical representation
  and NoDup doesn't support setoid equalities such as Qeq. However, since we have Qred,

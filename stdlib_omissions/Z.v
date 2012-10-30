@@ -3,6 +3,9 @@ Require Import ZArith NPeano stdlib_omissions.P.
 
 Open Scope Z_scope.
 
+Lemma iff_not (P Q : Prop) : (P <-> Q) -> (not P <-> not Q).
+Proof. tauto. Qed.
+
 Definition nat_of_Z (x : Z) : nat :=
   match x with
   | Z0 => O
@@ -87,6 +90,12 @@ Proof.
  reflexivity.
 Qed.
 
+Lemma Zto_nat_nonpos (z : Z) : z <= 0 -> Z.to_nat z = 0%nat.
+Proof.
+intro A; destruct z as [| p | p]; trivial.
+unfold Z.le in A; now contradict A.
+Qed.
+
 Lemma Ple_Zle (p q: positive): Ple p q <-> (Zpos p <= Zpos q).
 Proof.
  rewrite Ple_le, inj_le_iff.
@@ -94,7 +103,7 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Ple_Zle_to_pos_l (z : Z) (p : positive) : (Z.to_pos z <= p)%positive <-> (z <= p)%Z.
+Lemma Ple_Zle_to_pos (z : Z) (p : positive) : (Z.to_pos z <= p)%positive <-> z <= Zpos p.
 Proof.
   destruct z as [| q | q]; simpl.
   + split; intros _; [apply Zle_0_pos | apply Pos.le_1_l].
@@ -102,5 +111,24 @@ Proof.
   + split; intros _; [apply Zle_neg_pos | apply Pos.le_1_l].
 Qed.
 
+Lemma le_Zle_to_nat (n : nat) (z : Z) : (Z.to_nat z <= n)%nat <-> z <= Z.of_nat n.
+Proof.
+pose proof (le_0_n n). pose proof (Zle_0_nat n).
+destruct (Z.neg_nonneg_cases z).
++ rewrite Zto_nat_nonpos by now apply Z.lt_le_incl. split; auto with zarith.
++ split; intro A.
+  - apply inj_le in A. rewrite Z2Nat.id in A; trivial.
+  - apply Z2Nat.inj_le in A; trivial. rewrite Nat2Z.id in A; trivial.
+Qed.
+
+Lemma lt_Zlt_to_nat (n : nat) (z : Z) : Z.of_nat n < z <-> (n < Z.to_nat z)%nat.
+Proof.
+assert (A : forall (m n : nat), not (m <= n)%nat <-> (n < m)%nat).
++ intros; split; [apply not_le | apply gt_not_le].
++ assert (A1 := le_Zle_to_nat n z). apply iff_not in A1.
+  now rewrite A, Z.nle_gt in A1.
+Qed.
+
 Lemma add_pos_nonneg (a b: Z): 0 < a -> 0 <= b -> 0 < a+b.
 Proof. intros. omega. Qed.
+

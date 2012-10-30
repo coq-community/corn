@@ -302,4 +302,39 @@ Section gball.
    rewrite <- C...
   Qed.
 
+  Lemma gball_pos {e : Q} (e_pos : 0 < e) (x y : m) : ball (exist _ e e_pos) x y <-> gball e x y.
+  Proof.
+  unfold gball. destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos'] | e_zero].
+  + elim (Qlt_irrefl _ (Qlt_trans _ _ _ e_pos e_neg)).
+  + setoid_replace (exist _ e e_pos) with (exist _ e e_pos'); easy.
+  + exfalso; rewrite e_zero in e_pos; apply (Qlt_irrefl _ e_pos).
+  Qed.
+
+  Lemma gball_neg (e : Q) (x y : m) : e < 0 -> ~ gball e x y.
+  Proof.
+  intro e_neg. unfold gball. destruct (Qsec.Qdec_sign e) as [[E | E] | E]; [easy | |].
+  + intros _; apply (Qlt_irrefl _ (Qlt_trans _ _ _ e_neg E)).
+  + rewrite E in e_neg. intros _; apply (Qlt_irrefl _ e_neg).
+  Qed.
+
+  Lemma gball_closed (e : Q) (x y : m) :
+     (forall d : Q, 0 < d -> gball (e + d) x y) -> gball e x y.
+  Proof.
+  intro C. (*change (gball e x y).*) unfold gball.
+  destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos] | e_zero].
+  + assert (e / 2 < 0) by now apply Qmult_neg_pos.
+    apply (@gball_neg (e/2) x y); [easy |].
+    setoid_replace (e / 2) with (e - e / 2) by (field; discriminate).
+    apply C; now apply Qopp_Qlt_0_l.
+  + apply (msp_closed (msp m)). intros [d d_pos]. now apply gball_pos, C.
+  + apply ball_eq. intros [d d_pos]. apply gball_pos.
+    setoid_replace d with (e + d); [now apply C | rewrite e_zero; symmetry; apply Qplus_0_l].
+  Qed.
+
+  Lemma gball_closed_eq (x y : m) : (forall d : Q, 0 < d -> gball d x y) -> x [=] y.
+  Proof.
+  intro C. change (gball 0 x y). apply gball_closed. intro d.
+  setoid_replace (0 + d)%Q with d by apply Qplus_0_l. apply C.
+  Qed.
+
 End gball.
