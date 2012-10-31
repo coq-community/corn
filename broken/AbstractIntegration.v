@@ -87,6 +87,7 @@ SearchAbout cm_Sum.*)
 (** If the elementwise distance between two summations over the same domain
  is bounded, then so is the distance between the summations: *)
 
+(*
 Lemma CRΣ_gball_ex (f g: nat -> CR) (e: QnnInf) (n: nat):
    (forall m, (m < n)%nat -> gball_ex e (f m) (g m)) ->
    (gball_ex (n * e)%QnnInf (cmΣ n f) (cmΣ n g)).
@@ -100,6 +101,19 @@ Proof with simpl; auto.
  setoid_replace ((n+1) * q)%Q with (q + n * q)%Q by (simpl; ring).
  unfold cmΣ. simpl @cm_Sum.
  apply CRgball_plus...
+Qed.
+*)
+
+Lemma CRΣ_gball (f g: nat -> CR) (e : Q) (n : nat):
+   (forall m, (m < n)%nat -> gball e (f m) (g m)) ->
+   (gball (n * e) (cmΣ n f) (cmΣ n g)).
+Proof.
+ induction n; [reflexivity |].
+ intros.
+ rewrite Q.S_Qplus.
+ setoid_replace ((n+1) * e)%Q with (e + n * e)%Q by ring.
+ unfold cmΣ. simpl @cm_Sum.
+ apply CRgball_plus; auto.
 Qed.
 
 Hint Immediate ball_refl Qle_refl.
@@ -365,14 +379,14 @@ Section integral_interface.
      change (n * iw' == w)%Qnn in A.
      rewrite <- A.
      rewrite <- integral_repeated_additive.
-     setoid_replace ((e * w)%Qpos: Q) with ((n * (iw' * e))%Qnn: Q) by
-       (simpl in *; unfold QnonNeg.eq in A; simpl in A;
-        unfold QposAsQ; rewrite Qmult_assoc; rewrite A; ring).
-     apply (CRΣ_gball_ex _ _ (iw' * e)%Qnn).
+     setoid_replace (e * w)%Q with (n * (iw * e))%Q by
+       (unfold QnonNeg.eq in A; simpl in A;
+        rewrite Qmult_assoc; rewrite A; apply Qmult_comm).
+     apply CRΣ_gball.
      intros m H.
      rewrite CRmult_scale.
      apply gball_sym. apply CRball.rational.
-     setoid_replace (' (` iw' * ` e)) with (scale iw' (' (` e))) by now rewrite <- scale_Qmult.
+     setoid_replace (' (iw * e)) with (scale iw' (' ` e)) by now rewrite <- scale_Qmult.
      apply integral_bounded; [apply CRnonNegQpos |].
      intros x [A1 A2]. apply CRball.rational. apply (luc_gball a w (`iw')); trivial.
      + apply ball_gball, Qball_Qabs.
@@ -414,9 +428,16 @@ Section integral_interface.
 (*    Program Definition step (w : Qpos) (n : positive) : QnonNeg := exist _ (w * (1 # n)) _.
     Next Obligation. Qauto_nonneg. Qed.*)
 
-    Definition step (w : Qpos) (n : positive) : Q := w * (1 # n).
+    Definition step (w : Q) (n : positive) : Q := w * (1 # n).
 
-    Definition riemann_sum (a : Q) (w : Qpos) (n : positive) :=
+    Lemma step_mult (w : Q) (n : positive) : (n : Q) * step w n == w.
+    Proof.
+      unfold step.
+      rewrite Qmake_Qdiv. unfold Qdiv. rewrite Qmult_1_l, (Qmult_comm w), Qmult_assoc.
+      rewrite Qmult_inv_r, Qmult_1_l; [reflexivity | auto with qarith].
+    Qed.
+
+    Definition riemann_sum (a : Q) (w : Q) (n : positive) :=
       let iw := step w n in
         cmΣ (Pos.to_nat n) (fun i => 'iw * f (a + i * iw))%CR.
 
@@ -498,7 +519,7 @@ Proof with auto.
  apply (integral_wd f)...
 Qed.
 
-Import canonical_names.
+Import abstract_algebra.
 
 (* Should this lemma be used to CoRN.reals.fast.CRabs? That file does not use
 type class notations from canonical_names like ≤ *)
@@ -509,22 +530,80 @@ apply -> CRabs_cases; [| apply _ | apply _].
 split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
 Qed.
 
-(*Section RiemannSumBounds.
+Add Ring Q : (rings.stdlib_ring_theory CR).
+
+Section RiemannSumBounds.
+
+Lemma sum_empty (M : CMonoid) (f : nat -> M) : cmΣ 0 f = [0].
+Proof. reflexivity. Qed.
+
+Lemma sum_succ (M : CMonoid) (n : nat) (f : nat -> M) : cmΣ (S n) f = f n [+] cmΣ n f.
+Proof. reflexivity. Qed.
 
 Context (f : Q -> CR).
 
-Lemma riemann_sum_const (a : Q) (w : Qpos) (m : CR) (n : positive) :
-  riemann_sum (λ _, m) a w n = scale w m.
+Lemma sum_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
 Proof.
+induction n as [| n IH].
++ rewrite sum_empty. change (0 = m * 0). symmetry; apply rings.mult_0_r.
++ rewrite sum_succ, IH, S_Qplus, <- CRplus_Qplus.
+  change (m + m * '(n : Q) = m * ('(n : Q) + 1)). ring.
+Qed.
 
-SearchAbout cm_Sum.
+Lemma mult_comm `{SemiRing R} : Commutative (.*.).
+Proof. apply commonoid_commutative with (Aunit := one), _. Qed.
 
+Lemma mult_assoc `{SemiRing R} (x y z : R) : x * (y * z) = x * y * z.
+Proof. apply sg_ass, _. Qed.
 
-Lemma riemann_sum_bounds (a : Q) (w : Qpos) (m : CR) (e : Q) (n : positive) :
-  (forall (x : Q), (a ≤ x ≤ a + w) -> gball e (f x) m) ->
-  gball (w * e) (riemann_sum f a w n) (scale w m).
+Lemma riemann_sum_const (a : Q) (w : Q) (m : CR) (n : positive) :
+  riemann_sum (λ _, m) a w n = 'w * m.
 Proof.
-intro A.
+unfold riemann_sum. rewrite sum_const, positive_nat_Z.
+change ('step w n * m * '(n : Q) = 'w * m).
+rewrite (mult_comm _ ('(n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
+Qed.
+
+Require Import CRtrans ARtrans. (* This is almost all CoRN *)
+(*SearchAbout "ball" "mult".
+
+Qball_Qmult_Q_r:
+  ∀ (d : Qpos) (z x y : Q),
+  Qball (d / QabsQpos z) x y → Qball d (x * z) (y * z)
+Qball_Qmult_Q_l:
+  ∀ (d : Qpos) (z x y : Q),
+  Qball (d / QabsQpos z) x y → Qball d (z * x) (z * y)
+Qball_Qmult_r:
+  ∀ (d z : Qpos) (x y : Q), Qball (d / z) x y → Qball d (x * z) (y * z)
+Qball_Qmult_l:
+  ∀ (d z : Qpos) (x y : Q), Qball (d / z) x y → Qball d (z * x) (z * y)*)
+
+SearchAbout "stable".
+SearchAbout CRabs scale.
+
+Lemma gball_mult (e a : Q) (x y : CR) :
+  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
+Proof.
+SearchAbout gball.
+SearchAbout CRabs Qabs.
+SearchAbout (abs _ * abs _)%mc.
+
+CR_abs_obligation_1:
+  ∀ x : CR, (0 ≤ x → CRabs x = x) ∧ (x ≤ 0 → CRabs x = - x)
+CRball.gball_CRabs:
+  ∀ (r : Q) (x y : CR), gball r x y ↔ CRabs (x - y)%CR <= (' r)%CR
+in_CRgball:
+  ∀ (r : Q) (x y : CR), (x - ' r)%CR <= y ∧ y <= (x + ' r)%CR ↔ gball r x y
+
+
+Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
+  0 ≤ w -> (forall (x : Q), (a ≤ x ≤ a + w) -> gball e (f x) m) ->
+  gball (w * e) (riemann_sum f a w n) ('w * m).
+Proof.
+intros w_nn A. rewrite <- (riemann_sum_const a w m n). unfold riemann_sum.
+rewrite <- (step_mult w n), <- (Qmult_assoc n _ e), <- (positive_nat_Z n).
+apply CRΣ_gball. intros k A1.
+SearchAbout (ball (_ * _) _ _).
 
 
 
@@ -533,7 +612,7 @@ intro A.
 
 
 End RiemannSumBounds.
-*)
+
 
 Section IntegralBound.
 
