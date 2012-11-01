@@ -14,7 +14,7 @@ Require Import metric FromMetric2.
 Require Qinf QnonNeg QnnInf CRball.
 Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
 
-(*Require Import CRtrans ARtrans.*) (* This is almost all CoRN *)
+Require CRtrans ARtrans. (* This is almost all CoRN *)
 
 (*Notation Qinf := Qinf.T.
 
@@ -46,7 +46,51 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-SearchAbout CRnonNeg.
+Lemma lift_eq_complete (X Y : MetricSpace) (f g : Complete X --> Complete Y) :
+  (forall x : X, f (Cunit x) [=] g (Cunit x)) -> (forall x : Complete X, f x [=] g x).
+Proof.
+intros A x. apply ball_eq; intro e.
+set (e2 := ((1#2) * e)%Qpos).
+set (d := QposInf_min (mu f e2) (mu g e2)).
+setoid_replace e with (e2 + e2)%Qpos by (subst e2; QposRing).
+apply ball_triangle with (b := f (Cunit (approximate x d))).
++ apply (UniformContinuity.uc_prf f).
+  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_l | apply ball_ex_approx_r].
++ rewrite A. apply (UniformContinuity.uc_prf g).
+  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_r | apply ball_ex_approx_l].
+Qed.
+
+Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
+Proof.
+apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
+intros q e1 e2. change (ball (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
+apply <- ball_eq_iff. apply Qabs_Qmult.
+Qed.
+
+(*Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
+Proof.
+unfold CRabs, scale.
+setoid_rewrite <- fast_MonadLaw2.*)
+
+Corollary CRabs_CRmult_Q (a : Q) (x : CR) : CRabs ('a * x) == '(Qabs a) * (CRabs x).
+Proof. rewrite !CRmult_scale. apply CRabs_scale. Qed.
+
+Lemma gball_CRmult_Q (e a : Q) (x y : CR) :
+  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
+Proof.
+intro A. apply CRball.gball_CRabs.
+setoid_replace ('a * x - 'a * y) with ('a * (x - y)) by ring.
+rewrite CRabs_CRmult_Q, <- CRmult_Qmult.
+assert (0 <= 'Qabs a) by (apply CRle_Qle; auto).
+apply (orders.order_preserving (CRmult (' Qabs a))).
+now apply CRball.gball_CRabs.
+Qed.
+
+Corollary gball_CRmult_Q_nonneg (e a : Q) (x y : CR) :
+  (0 <= a)%Q -> gball e x y -> gball (a * e) ('a * x) ('a * y).
+Proof.
+intros A1 A2. rewrite <- (Qabs_pos a) at 1; [apply gball_CRmult_Q |]; easy.
+Qed.
 
 (** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)
@@ -430,6 +474,9 @@ Section integral_interface.
 
     Definition step (w : Q) (n : positive) : Q := w * (1 # n).
 
+    Lemma step_nonneg (w : Q) (n : positive) : 0 <= w -> 0 <= step w n.
+    Proof. intros w_nn; unfold step; Qauto_nonneg. Qed.
+
     Lemma step_mult (w : Q) (n : positive) : (n : Q) * step w n == w.
     Proof.
       unfold step.
@@ -564,45 +611,14 @@ change ('step w n * m * '(n : Q) = 'w * m).
 rewrite (mult_comm _ ('(n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
 Qed.
 
-Require Import CRtrans ARtrans. (* This is almost all CoRN *)
-(*SearchAbout "ball" "mult".
-
-Qball_Qmult_Q_r:
-  ∀ (d : Qpos) (z x y : Q),
-  Qball (d / QabsQpos z) x y → Qball d (x * z) (y * z)
-Qball_Qmult_Q_l:
-  ∀ (d : Qpos) (z x y : Q),
-  Qball (d / QabsQpos z) x y → Qball d (z * x) (z * y)
-Qball_Qmult_r:
-  ∀ (d z : Qpos) (x y : Q), Qball (d / z) x y → Qball d (x * z) (y * z)
-Qball_Qmult_l:
-  ∀ (d z : Qpos) (x y : Q), Qball (d / z) x y → Qball d (z * x) (z * y)*)
-
-SearchAbout "stable".
-SearchAbout CRabs scale.
-
-Lemma gball_mult (e a : Q) (x y : CR) :
-  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
-Proof.
-SearchAbout gball.
-SearchAbout CRabs Qabs.
-SearchAbout (abs _ * abs _)%mc.
-
-CR_abs_obligation_1:
-  ∀ x : CR, (0 ≤ x → CRabs x = x) ∧ (x ≤ 0 → CRabs x = - x)
-CRball.gball_CRabs:
-  ∀ (r : Q) (x y : CR), gball r x y ↔ CRabs (x - y)%CR <= (' r)%CR
-in_CRgball:
-  ∀ (r : Q) (x y : CR), (x - ' r)%CR <= y ∧ y <= (x + ' r)%CR ↔ gball r x y
-
-
 Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
   0 ≤ w -> (forall (x : Q), (a ≤ x ≤ a + w) -> gball e (f x) m) ->
   gball (w * e) (riemann_sum f a w n) ('w * m).
 Proof.
 intros w_nn A. rewrite <- (riemann_sum_const a w m n). unfold riemann_sum.
 rewrite <- (step_mult w n), <- (Qmult_assoc n _ e), <- (positive_nat_Z n).
-apply CRΣ_gball. intros k A1.
+apply CRΣ_gball. intros k A1. apply gball_CRmult_Q_nonneg; [now apply step_nonneg |].
+apply A.
 SearchAbout (ball (_ * _) _ _).
 
 
