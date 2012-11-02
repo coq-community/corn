@@ -16,6 +16,13 @@ Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
 
 Require CRtrans ARtrans. (* This is almost all CoRN *)
 
+Ltac done :=
+  trivial; hnf; intros; solve
+   [ repeat (first [solve [trivial | apply: sym_equal; trivial]
+         | discriminate | contradiction | split])
+(*   | case not_locked_false_eq_true; assumption*)
+   | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
+
 (*Notation Qinf := Qinf.T.
 
 Module Qinf.
@@ -46,7 +53,7 @@ Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-Lemma lift_eq_complete (X Y : MetricSpace) (f g : Complete X --> Complete Y) :
+Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Complete Y) :
   (forall x : X, f (Cunit x) [=] g (Cunit x)) -> (forall x : Complete X, f x [=] g x).
 Proof.
 intros A x. apply ball_eq; intro e.
@@ -60,6 +67,15 @@ apply ball_triangle with (b := f (Cunit (approximate x d))).
   apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_r | apply ball_ex_approx_l].
 Qed.
 
+(* [SearchAbout ((Cmap _ _) (Cunit _)).] does not find anything, but it
+should find metric2.Prelength.fast_MonadLaw3 *)
+
+Corollary map_eq_complete {X Y : MetricSpace} {plX : PrelengthSpace X} (f g : X --> Y) :
+  (forall x : X, f x [=] g x) -> (forall x : Complete X, Cmap plX f x [=] Cmap plX g x).
+Proof.
+intros A x. apply lift_eq_complete. intro y. rewrite !fast_MonadLaw3, A. reflexivity.
+Qed.
+
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
@@ -67,10 +83,13 @@ intros q e1 e2. change (ball (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
 apply <- ball_eq_iff. apply Qabs_Qmult.
 Qed.
 
-(*Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
+(* Another proof *)
+
+Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
-unfold CRabs, scale.
-setoid_rewrite <- fast_MonadLaw2.*)
+unfold CRabs, scale. setoid_rewrite <- fast_MonadLaw2.
+apply map_eq_complete. intro q. apply Qabs_Qmult.
+Qed.
 
 Corollary CRabs_CRmult_Q (a : Q) (x : CR) : CRabs ('a * x) == '(Qabs a) * (CRabs x).
 Proof. rewrite !CRmult_scale. apply CRabs_scale. Qed.
@@ -568,6 +587,12 @@ Qed.
 
 Import abstract_algebra.
 
+Lemma mult_comm `{SemiRing R} : Commutative (.*.).
+Proof. apply commonoid_commutative with (Aunit := one), _. Qed.
+
+Lemma mult_assoc `{SemiRing R} (x y z : R) : x * (y * z) = x * y * z.
+Proof. apply sg_ass, _. Qed.
+
 (* Should this lemma be used to CoRN.reals.fast.CRabs? That file does not use
 type class notations from canonical_names like ≤ *)
 
@@ -577,38 +602,78 @@ apply -> CRabs_cases; [| apply _ | apply _].
 split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
 Qed.
 
-Add Ring Q : (rings.stdlib_ring_theory CR).
+Add Ring CR_ring : (rings.stdlib_ring_theory CR).
 
-Section RiemannSumBounds.
+Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
 
-Lemma sum_empty (M : CMonoid) (f : nat -> M) : cmΣ 0 f = [0].
+Lemma cmΣ_empty {M : CMonoid} (f : nat -> M) : cmΣ 0 f = [0].
 Proof. reflexivity. Qed.
 
-Lemma sum_succ (M : CMonoid) (n : nat) (f : nat -> M) : cmΣ (S n) f = f n [+] cmΣ n f.
+Lemma cmΣ_succ {M : CMonoid} (n : nat) (f : nat -> M) : cmΣ (S n) f = f n [+] cmΣ n f.
 Proof. reflexivity. Qed.
 
-Context (f : Q -> CR).
-
-Lemma sum_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
+Lemma cmΣ_plus (n : nat) (f g : nat -> CR) : cmΣ n (f +1 g) = cmΣ n f + cmΣ n g.
 Proof.
 induction n as [| n IH].
-+ rewrite sum_empty. change (0 = m * 0). symmetry; apply rings.mult_0_r.
-+ rewrite sum_succ, IH, S_Qplus, <- CRplus_Qplus.
-  change (m + m * '(n : Q) = m * ('(n : Q) + 1)). ring.
++ symmetry; apply cm_rht_unit.
++ rewrite !cmΣ_succ. rewrite IH.
+  change (f n + g n + (cmΣ n f + cmΣ n g) = f n + cmΣ n f + (g n + cmΣ n g)).
+  change (CRasCMonoid : Type) with (CR : Type). ring.
 Qed.
 
-Lemma mult_comm `{SemiRing R} : Commutative (.*.).
-Proof. apply commonoid_commutative with (Aunit := one), _. Qed.
-
-Lemma mult_assoc `{SemiRing R} (x y z : R) : x * (y * z) = x * y * z.
-Proof. apply sg_ass, _. Qed.
+Lemma cmΣ_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
+Proof.
+induction n as [| n IH].
++ rewrite cmΣ_empty. change (0 = m * 0). symmetry; apply rings.mult_0_r.
++ rewrite cmΣ_succ, IH, S_Qplus, <- CRplus_Qplus.
+  change (m + m * '(n : Q) = m * ('(n : Q) + 1)). ring.
+Qed.
 
 Lemma riemann_sum_const (a : Q) (w : Q) (m : CR) (n : positive) :
   riemann_sum (λ _, m) a w n = 'w * m.
 Proof.
-unfold riemann_sum. rewrite sum_const, positive_nat_Z.
+unfold riemann_sum. rewrite cmΣ_const, positive_nat_Z.
 change ('step w n * m * '(n : Q) = 'w * m).
 rewrite (mult_comm _ ('(n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
+Qed.
+
+Lemma riemann_sum_plus (f g : Q -> CR) (a w : Q) (n : positive) :
+  riemann_sum (f +1 g) a w n = riemann_sum f a w n + riemann_sum g a w n.
+Proof.
+unfold riemann_sum. rewrite <- cmΣ_plus. apply cm_Sum_eq. intro k.
+rapply mult_assoc.
+SearchAbout "ass" CR.
+SearchAbout (?x * (_ + _) == ?x * _ + ?x * _)%CR.
+change (
+  cast Q CR (step w n) * (f (a + k * step w n) + g (a + k * step w n)) =
+  cast Q CR (step w n) * f (a + k * step w n) + cast Q CR (step w n) * g (a + k * step w n)).
+SearchAbout cm_Sum.
+
+
+
+SearchAbout cmΣ.
+
+Section RiemannSumBounds.
+
+Context (f : Q -> CR).
+
+Global Instance Qle_nat (n : nat) : PropHolds (0 ≤ (n : Q)).
+Proof. apply Qle_nat. Qed.
+
+Instance step_nonneg' (w : Q) (n : positive) : PropHolds (0 ≤ w) -> PropHolds (0 ≤ step w n).
+Proof. apply step_nonneg. Qed.
+
+Lemma index_inside_l (a w : Q) (k : nat) (n : positive) :
+  0 ≤ w -> k < Pos.to_nat n -> a ≤ a + (k : Q) * step w n.
+Proof. intros; apply semirings.nonneg_plus_le_compat_r; solve_propholds. Qed.
+
+Lemma index_inside_r (a w : Q) (k : nat) (n : positive) :
+  0 ≤ w -> k < Pos.to_nat n -> a + (k : Q) * step w n ≤ a + w.
+Proof.
+intros A1 A2. apply (orders.order_preserving (a +)).
+mc_setoid_replace w with ((n : Q) * (step w n)) at 2 by (symmetry; apply step_mult).
+apply (orders.order_preserving (.* step w n)).
+rewrite <- Zle_Qle, <- positive_nat_Z. apply inj_le. change (k ≤ Pos.to_nat n). solve_propholds.
 Qed.
 
 Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
@@ -618,16 +683,11 @@ Proof.
 intros w_nn A. rewrite <- (riemann_sum_const a w m n). unfold riemann_sum.
 rewrite <- (step_mult w n), <- (Qmult_assoc n _ e), <- (positive_nat_Z n).
 apply CRΣ_gball. intros k A1. apply gball_CRmult_Q_nonneg; [now apply step_nonneg |].
-apply A.
-SearchAbout (ball (_ * _) _ _).
-
-
-
-
-
-
+apply A. split; [apply index_inside_l | apply index_inside_r]; trivial.
+Qed.
 
 End RiemannSumBounds.
+
 
 
 Section IntegralBound.
