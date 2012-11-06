@@ -641,17 +641,11 @@ Lemma riemann_sum_plus (f g : Q -> CR) (a w : Q) (n : positive) :
   riemann_sum (f +1 g) a w n = riemann_sum f a w n + riemann_sum g a w n.
 Proof.
 unfold riemann_sum. rewrite <- cmΣ_plus. apply cm_Sum_eq. intro k.
-rapply mult_assoc.
-SearchAbout "ass" CR.
-SearchAbout (?x * (_ + _) == ?x * _ + ?x * _)%CR.
 change (
-  cast Q CR (step w n) * (f (a + k * step w n) + g (a + k * step w n)) =
-  cast Q CR (step w n) * f (a + k * step w n) + cast Q CR (step w n) * g (a + k * step w n)).
-SearchAbout cm_Sum.
-
-
-
-SearchAbout cmΣ.
+  cast Q CR (step w n) * (f (a + (k : Q) * step w n) + g (a + (k : Q) * step w n)) =
+  cast Q CR (step w n) * f (a + (k : Q) * step w n) + cast Q CR (step w n) * g (a + (k : Q) * step w n)).
+apply rings.plus_mult_distr_l.
+Qed.
 
 Section RiemannSumBounds.
 
@@ -688,8 +682,6 @@ Qed.
 
 End RiemannSumBounds.
 
-
-
 Section IntegralBound.
 
 Context (f : Q -> CR) `{Integrable f}.
@@ -717,20 +709,56 @@ assert (A1 : 0 ≤ M).
   rewrite rings.minus_0_r; now apply A.
 Qed.
 
+End IntegralBound.
 
-(*
 Section IntegralOfSum.
 
-Context (f g : Q -> CR) `{Integral f, !Integrable f} `{Integral g, !Integrable g}.
+Context (f g : Q -> CR)
+        `{!IsLocallyUniformlyContinuous f f_mu, !IsLocallyUniformlyContinuous g g_mu}
+        `{Integral f, !Integrable f, Integral g, !Integrable g}.
 
-Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
+Global Instance integrate_sum : Integral (f +1 g) := λ a w, integrate f a w + integrate g a w.
 
-Theorem integral_sum (a : Q) (w : Qpos) : ∫ (f +1 g) a w = ∫ f a w + ∫ g a w.
-*)
+Lemma integral_sum_additive (a : Q) (b c : QnonNeg) :
+   ∫ (f +1 g) a b + ∫ (f +1 g) (a + ` b) c = ∫ (f +1 g) a (b + c)%Qnn.
+Proof.
+unfold integrate, integrate_sum.
+rewrite <- !integral_additive; trivial.
+change (
+  ∫ f a b + ∫ g a b + (∫ f (a + ` b) c + ∫ g (a + ` b) c) =
+  (∫ f a b + ∫ f (a + ` b) c) + (∫ g a b + ∫ g (a + ` b) c)). ring.
+Qed.
 
+(* When the last argument of ball is ('(width * mid)), typechecking diverges *)
 
+Lemma integral_sum_integrable (from : Q) (width : Qpos) (mid : Q) (r : Qpos) :
+ (∀ x : Q, from ≤ x ≤ from + width → ball r (f x + g x) ('mid))
+ → ball (width * r) (∫ (f +1 g) from width) ('((width : Q) * mid)).
+Proof.
+intros A. apply ball_gball; simpl. apply gball_closed. intros e e_pos.
+setoid_replace (width * r + e)%Q with (e + width * r)%Q by apply Qplus_comm.
+destruct (Riemann_sums_approximate_integral'' f from width ((1#2) * mkQpos e_pos)%Qpos) as [Nf F].
+destruct (Riemann_sums_approximate_integral'' g from width ((1#2) * mkQpos e_pos)%Qpos) as [Ng G].
+set (n := Pos.max Nf Ng).
+assert (le_Nf_n : (Nf <= n)%positive) by apply Pos.le_max_l.
+assert (le_Ng_n : (Ng <= n)%positive) by apply Pos.le_max_r.
+specialize (F n le_Nf_n). specialize (G n le_Ng_n).
+apply gball_triangle with (b := riemann_sum (f +1 g) from width n).
++ rewrite riemann_sum_plus. setoid_replace e with ((1#2) * e + (1#2) * e)%Q by ring.
+  apply CRgball_plus; apply gball_sym; trivial.
++ (* apply riemann_sum_bounds. diverges *)
+  rewrite <- CRmult_Qmult. apply riemann_sum_bounds; [solve_propholds |].
+  intros. apply ball_gball. apply A; trivial.
+Qed.
 
+Global Instance : Integrable (f +1 g).
+constructor.
++ apply integral_sum_additive.
++ apply integral_sum_integrable.
++ intros a1 a2 A1 w1 w2 A2. unfold integrate, integrate_sum. rewrite A1, A2; reflexivity.
+Qed.
 
+End IntegralOfSum.
 
 
 (*
