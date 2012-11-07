@@ -1,5 +1,3 @@
-(*
-
 (** A straightforward implementation of the abstract integration interface
  in AbstractionIntegration using Riemann sums. The sole product of
  this module are the Integrate and Integrable type class instances.
@@ -11,7 +9,7 @@
 Require Import
   List NPeano Unicode.Utf8
   QArith Qabs Qpossec Qsums
-  Qmetric
+  Qmetric Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
   CRArith AbstractIntegration
   util.Qgcd
   Program
@@ -19,8 +17,30 @@ Require Import
   stdlib_omissions.P
   stdlib_omissions.Z
   stdlib_omissions.Q
-  metric2.Classified
+  metric FromMetric2
+  Qauto
   implementations.stdlib_rationals.
+
+Open Scope Q_scope.
+
+Lemma Qplus_pos_compat (x y : Q) : 0 < x -> 0 < y -> 0 < x + y.
+Proof. intros; apply Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
+
+Ltac Qauto_pos :=
+  repeat (first [ assumption
+                | constructor
+                | apply Qplus_pos_compat
+                | apply Qmult_lt_0_compat
+                | apply Qinv_lt_0_compat]);
+  auto with *.
+
+Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
+  gball r x y <-> mspc_ball r x y.
+Proof. reflexivity. Qed.
+
+Lemma ball_mspc_ball {X : MetricSpace} (r : Qpos) (x y : X) :
+  ball r x y <-> mspc_ball r x y.
+Proof. rewrite <- ball_gball; reflexivity. Qed.
 
 Open Scope uc_scope.
 
@@ -47,7 +67,7 @@ Definition plus_half_times (x y: Q): Q := x * y + (1#2)*y.
 
 Section definition.
 
-  Context (f: Q -> CR) `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
+  Context (f: Q -> CR) `{UC : !IsLocallyUniformlyContinuous f lmu}.
 
   (** Note that in what follows we don't specialize for [0,1] or [0,w] ranges first. While this
   would make the definition marginally cleaner, the resulting definition is harder to prove
@@ -55,13 +75,18 @@ Section definition.
   don't come with Proper proofs, which means that common sense reasoning about
   those operations with their arguments transformed doesn't work well. *)
 
-  Definition intervals (from: Q) (w: Qpos) (error: Qpos): positive :=
-    match luc_mu f from w (error / w) with
+  Program Definition intervals (from: Q) (w: Qpos) (error: Qpos): positive :=
+    match lmu from w (error / w) with
       (* Todo: This is nice and simple, but suboptimal. Better would be to take the luc_mu
        around the midpoint and with radius (w/2). *)
-    | QposInfinity => 1%positive
-    | Qpos2QposInf mue => QposCeiling ((1#2) * w / mue)%Qpos
+    | Qinf.infinite => 1%positive
+    | Qinf.finite mue => QposCeiling ((1#2) * w / mue)%Qpos
     end.
+  Next Obligation.
+  change (Qinf.lt 0 mue). rewrite Heq_anonymous.
+  (*unfold IsLocallyUniformlyContinuous in *.*)
+  apply (uc_pos (restrict f from w)); [apply UC | Qauto_pos].
+  Qed.
 
   Definition approx (from: Q) (w: Qpos) (e: Qpos): Q :=
     let halferror := (e * (1#2))%Qpos in
@@ -83,6 +108,8 @@ Section definition.
   Proof with auto.
    unfold plus_half_times.
    apply ball_sym.
+   unfold IsLocallyUniformlyContinuous in UC.
+apply ball_mspc_ball. admit. (*apply (uc_prf _ (lmu fr wb)).
    apply (locallyUniformlyContinuous f fr wb (he / wb)).
     unfold mspc_ball.
     unfold CRGroupOps.MetricSpaceBall_instance_0.
@@ -148,14 +175,14 @@ Section definition.
     rewrite inject_nat_convert.
     apply Qfloor_ball.
    unfold QposEq. simpl.
-   field. split; try discriminate...
+   field. split; try discriminate...*)
   Qed.
 
   (** To construct a CR, we'll need to prove that approx is a regular function.
    However, that property is essentially a specialization of a more general
    well-definedness property that we'll need anyway, so we prove that one first. *)
 
-  Let hint := luc_Proper f.
+  (*Let hint := luc_Proper f.*)
 
   Lemma wd
     (from1 from2: Q) (w: bool -> Qpos) (e: bool -> Qpos)
@@ -229,7 +256,7 @@ End definition.
 
 Section implements_abstract_interface.
 
-  Context (f: Q → CR) `{!LocallyUniformlyContinuous_mu f} `{!LocallyUniformlyContinuous f}.
+  Context (f: Q → CR) `{!IsLocallyUniformlyContinuous f lmu}.
 
   Section additivity.
 
@@ -251,7 +278,7 @@ Section implements_abstract_interface.
       Let approx01 (i: nat) :=
         approximate (f (a + plus_half_times i (totalw / w01ints))) (e * (1 # 2) / totalw)%Qpos.
 
-      Let hint := luc_Proper f.
+      (*Let hint := luc_Proper f.*)
 
       Lemma added_summations: Qball (e + e)
         (Σ (wbints true) approx0 * (ww true / wbints true) +
@@ -431,7 +458,7 @@ Section implements_abstract_interface.
 
   Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
     (forall x, from <= x <= from + width -> ball r (f x) ('mid)%CR) ->
-    ball (width * r) (pre_result f from width) (' (width * mid))%CR.
+    ball (width * r) (pre_result f from width) (' (width * mid)%Q)%CR.
   Proof with auto.
    intros. apply (@regFunBall_Cunit Q_as_MetricSpace).
    intro. unfold pre_result. simpl approximate.
@@ -463,4 +490,3 @@ Section implements_abstract_interface.
   Qed.
 
 End implements_abstract_interface.
-*)

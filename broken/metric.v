@@ -215,6 +215,10 @@ try (unfold Qinf.eq, equiv in *; contradiction).
   now apply mspc_triangle with (b := y2); [rewrite Ee1e2 | apply mspc_symm].
 Qed.
 
+(*Check _ : Le Qinf.T.
+Lemma   mspc_refl ∀ e : Q, 0 ≤ e → Reflexive (ball e);*)
+
+
 Lemma mspc_triangle' :
   ∀ (q1 q2 : Q) (x2 x1 x3 : X) (q : Q),
     q1 + q2 = q → ball q1 x1 x2 → ball q2 x2 x3 → ball q x1 x3.
@@ -287,6 +291,59 @@ Qed.
 End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
+
+Section SubMetricSpace.
+
+Context `{ExtMetricSpaceClass X} (P : X -> Prop).
+
+Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (` x) (` y).
+
+Global Instance sig_mspc : ExtMetricSpaceClass (sig P).
+Proof.
+constructor.
++ repeat intro; rapply mspc_radius_proper; congruence.
++ repeat intro; rapply mspc_inf.
++ intros; now rapply mspc_negative.
++ repeat intro; now rapply mspc_refl.
++ repeat intro; now rapply mspc_symm.
++ repeat intro; rapply mspc_triangle; eauto.
++ repeat intro; now rapply mspc_closed.
+Qed.
+
+End SubMetricSpace.
+
+Section LocalUniformContinuity.
+
+Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
+
+Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
+  f ∘ @proj1_sig _ _.
+
+Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
+  luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
+
+Global Arguments luc_prf f lmu {_} x r.
+
+Global Instance uc_ulc (f : X -> Y) `{!IsUniformlyContinuous f mu} :
+  IsLocallyUniformlyContinuous f (λ _ _, mu).
+Proof.
+intros x r. constructor; [now apply (uc_pos f) |].
+intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
+Qed.
+
+Global Instance luc_proper `{IsLocallyUniformlyContinuous f lmu} : Proper ((=) ==> (=)) f.
+Proof.
+intros x1 x2 A. apply -> mspc_eq. intros e e_pos.
+assert (A1 : ball 1%Q x1 x1) by (apply mspc_refl; Qauto_nonneg).
+assert (A2 : ball 1%Q x1 x2) by (rewrite A; apply mspc_refl; Qauto_nonneg).
+change (ball e (restrict f x1 1 (exist _ x1 A1)) (restrict f x1 1 (exist _ x2 A2))).
+unfold IsLocallyUniformlyContinuous in *. apply (uc_prf _ (lmu x1 1)); [easy |].
+change (ball (lmu x1 1 e) x1 x2).
+rewrite <- A. assert (0 < lmu x1 1 e) by now apply (uc_pos (restrict f x1 1)).
+destruct (lmu x1 1 e) as [q |]; [apply mspc_refl; solve_propholds | apply mspc_inf].
+Qed.
+
+End LocalUniformContinuity.
 
 Section Contractions.
 
@@ -649,48 +706,6 @@ intros e A1 n A2. apply (mspc_triangle' (e / 2) (e / 2) (x (N (e / 2)))).
 Qed.
 
 End CompleteSpaceSequenceLimits.
-
-Section SubMetricSpace.
-
-Context `{ExtMetricSpaceClass X} (P : X -> Prop).
-
-Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (` x) (` y).
-
-Global Instance sig_mspc : ExtMetricSpaceClass (sig P).
-Proof.
-constructor.
-+ repeat intro; rapply mspc_radius_proper; congruence.
-+ repeat intro; rapply mspc_inf.
-+ intros; now rapply mspc_negative.
-+ repeat intro; now rapply mspc_refl.
-+ repeat intro; now rapply mspc_symm.
-+ repeat intro; rapply mspc_triangle; eauto.
-+ repeat intro; now rapply mspc_closed.
-Qed.
-
-End SubMetricSpace.
-
-Section LocalUniformContinuity.
-
-Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
-
-Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
-  f ∘ @proj1_sig _ _.
-
-Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
-  luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
-
-Global Arguments luc_prf f lmu {_} x r.
-
-Global Instance uc_ulc (f : X -> Y) `{!IsUniformlyContinuous f mu} :
-  IsLocallyUniformlyContinuous f (λ _ _, mu).
-Proof.
-intros x r. constructor; [now apply (uc_pos f) |].
-intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
-Qed.
-
-End LocalUniformContinuity.
-
 
 (*Section ClosedSegmentComplete.
 

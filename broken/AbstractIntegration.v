@@ -585,6 +585,66 @@ Proof with auto.
  apply (integral_wd f)...
 Qed.
 
+(** Finally, we offer a smart constructor for implementations that would need to recognize and
+ treat the zero-width case specially anyway (which is the case for the implementation
+with Riemann sums, because there, a positive width is needed to divide the error by). *)
+
+Section extension_to_nn_width.
+
+  Context
+    (f: Q → CR)
+    (pre_integral: Q → Qpos → CR) (* Note the Qpos instead of QnonNeg. *)
+      (* The three properties limited to pre_integral: *)
+    (pre_additive: forall (a: Q) (b c: Qpos),
+      pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
+    (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
+      (forall x: Q, from <= x <= from + width -> ball r (f x) (' mid)) ->
+      ball (width * r) (pre_integral from width) (' (width * mid)%Q))
+    {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
+
+  Instance integral_extended_to_nn_width: Integral f :=
+    fun from => QnonNeg.rect (fun _ => CR)
+      (fun _ _ => '0%Q)
+      (fun n d _ => pre_integral from (QposMake n d)).
+
+  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) (∫ f).
+  Proof with auto.
+   intros ?????.
+   induction x0 using QnonNeg.rect;
+    induction y0 using QnonNeg.rect.
+       reflexivity.
+     discriminate.
+    discriminate.
+   intros. apply pre_wd...
+  Qed.
+
+  Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
+    (forall x, from <= x <= from + width -> ball r (f x) (' mid)) ->
+    ball (width * r) (∫ f from width) (' (width * mid)%Q).
+  Proof.
+   induction width using Qpos_positive_numerator_rect.
+   apply (pre_bounded from (a#b) mid r).
+  Qed.
+
+  Let additive (a: Q) (b c: QnonNeg): ∫ f a b + ∫ f (a + `b)%Q c  == ∫ f a (b + c)%Qnn.
+  Proof.
+   unfold integrate.
+   induction b using QnonNeg.rect;
+    induction c using QnonNeg.rect; simpl integral_extended_to_nn_width; intros.
+      ring.
+     rewrite CRplus_0_l.
+     apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+    rewrite CRplus_0_r.
+    apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+   rewrite (pre_additive a (QposMake n d) (QposMake n0 d0)).
+   apply pre_wd; reflexivity.
+  Qed.
+
+  Lemma integral_extended_to_nn_width_correct: Integrable f.
+  Proof. constructor; auto. Qed.
+
+End extension_to_nn_width.
+
 Import abstract_algebra.
 
 Lemma mult_comm `{SemiRing R} : Commutative (.*.).
@@ -779,64 +839,5 @@ Proof with try assumption.
  apply (unique g)...
  apply (Integrable_proper_l f)...
 Qed.
-
-(** Finally, we offer a smart constructor for implementations that would need to recognize and
- treat the zero-width case specially anyway (which is the case for the implementation
-with Riemann sums, because there, a positive width is needed to divide the error by). *)
-
-Section extension_to_nn_width.
-
-  Context
-    (f: Q → CR)
-    (pre_integral: Q → Qpos → CR) (* Note the Qpos instead of QnonNeg. *)
-      (* The three properties limited to pre_integral: *)
-    (pre_additive: forall (a: Q) (b c: Qpos),
-      pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
-    (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
-      (forall x: Q, from <= x <= from + width -> ball r (f x) (' mid)) ->
-      ball (width * r) (pre_integral from width) (' (width * mid)))
-    {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
-
-  Instance integral_extended_to_nn_width: Integral f :=
-    fun from => QnonNeg.rect (fun _ => CR)
-      (fun _ _ => '0)
-      (fun n d _ => pre_integral from (QposMake n d)).
-
-  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) (∫ f).
-  Proof with auto.
-   intros ?????.
-   induction x0 using QnonNeg.rect;
-    induction y0 using QnonNeg.rect.
-       reflexivity.
-     discriminate.
-    discriminate.
-   intros. apply pre_wd...
-  Qed.
-
-  Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
-    (forall x, from <= x <= from + width -> ball r (f x) (' mid)) ->
-    ball (width * r) (∫ f from width) (' (width * mid)).
-  Proof.
-   induction width using Qpos_positive_numerator_rect.
-   apply (pre_bounded from (a#b) mid r).
-  Qed.
-
-  Let additive (a: Q) (b c: QnonNeg): ∫ f a b + ∫ f (a + `b)%Q c  == ∫ f a (b + c)%Qnn.
-  Proof.
-   unfold integrate.
-   induction b using QnonNeg.rect;
-    induction c using QnonNeg.rect; simpl integral_extended_to_nn_width; intros.
-      ring.
-     rewrite CRplus_0_l.
-     apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
-    rewrite CRplus_0_r.
-    apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
-   rewrite (pre_additive a (QposMake n d) (QposMake n0 d0)).
-   apply pre_wd; reflexivity.
-  Qed.
-
-  Lemma integral_extended_to_nn_width_correct: Integrable f.
-  Proof. constructor; auto. Qed.
-
-End extension_to_nn_width.
 *)
+
