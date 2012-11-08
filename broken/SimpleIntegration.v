@@ -65,6 +65,10 @@ Proof. destruct e. apply Qball_plus_r. intuition. Qed.
 
 Definition plus_half_times (x y: Q): Q := x * y + (1#2)*y.
 
+Lemma ball_ex_symm (X : MetricSpace) (e : QposInf) (x y : X) :
+  ball_ex e x y -> ball_ex e y x.
+Proof. destruct e as [e |]; [apply ball_sym | trivial]. Qed.
+
 Section definition.
 
   Context (f: Q -> CR) `{UC : !IsLocallyUniformlyContinuous f lmu}.
@@ -75,18 +79,28 @@ Section definition.
   don't come with Proper proofs, which means that common sense reasoning about
   those operations with their arguments transformed doesn't work well. *)
 
-  Program Definition intervals (from: Q) (w: Qpos) (error: Qpos): positive :=
-    match lmu from w (error / w) with
-      (* Todo: This is nice and simple, but suboptimal. Better would be to take the luc_mu
-       around the midpoint and with radius (w/2). *)
-    | Qinf.infinite => 1%positive
-    | Qinf.finite mue => QposCeiling ((1#2) * w / mue)%Qpos
-    end.
+  Program Definition lmu' (a w : Q) (e : Qpos) : QposInf :=
+  match lmu a w e with
+  | Qinf.infinite => QposInfinity
+  | Qinf.finite x => Qpos2QposInf x
+  end.
   Next Obligation.
+  change (Qinf.lt 0 x). rewrite Heq_anonymous.
+  apply (uc_pos (restrict f a w)); [apply UC | apply (proj2_sig e)].
+  Qed.
+
+  Definition intervals (from: Q) (w: Qpos) (error: Qpos): positive :=
+  match lmu' from w (error / w) with
+    (* Todo: This is nice and simple, but suboptimal. Better would be to take the luc_mu
+     around the midpoint and with radius (w/2). *)
+  | QposInfinity => 1%positive
+  | Qpos2QposInf x => QposCeiling ((1#2) * w / x)%Qpos
+  end.
+  (*Next Obligation.
   change (Qinf.lt 0 mue). rewrite Heq_anonymous.
   (*unfold IsLocallyUniformlyContinuous in *.*)
-  apply (uc_pos (restrict f from w)); [apply UC | Qauto_pos].
-  Qed.
+  apply (uc_pos (restrict f from w)). apply UC. Qauto_pos.
+  Qed.*)
 
   Definition approx (from: Q) (w: Qpos) (e: Qpos): Q :=
     let halferror := (e * (1#2))%Qpos in
@@ -102,17 +116,19 @@ Section definition.
   Hint Resolve  Qinv_le_0_compat Qmult_le_0_compat.
   Hint Immediate Zle_0_POS Zlt_0_POS.
 
-  Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos) (ile: le i (intervals fr wb he * t)%positive): ball (he / wb)
-    (f (fr + plus_half_times (i / t)%nat (wb * / intervals fr wb he)))
-    (f (fr + i * / (intervals fr wb he * t)%positive * wb)).
+  Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos) :
+    (i < (intervals fr wb he * t)%positive)%nat ->
+    ball (he / wb)
+         (f (fr + plus_half_times (i / t)%nat (wb * / intervals fr wb he)))
+         (f (fr + i * / (intervals fr wb he * t)%positive * wb)).
   Proof with auto.
+   intro ile.
    unfold plus_half_times.
    apply ball_sym.
    unfold IsLocallyUniformlyContinuous in UC.
-apply ball_mspc_ball. admit. (*apply (uc_prf _ (lmu fr wb)).
-   apply (locallyUniformlyContinuous f fr wb (he / wb)).
-    unfold mspc_ball.
-    unfold CRGroupOps.MetricSpaceBall_instance_0.
+   (*apply ball_mspc_ball.*)
+   (*apply (locallyUniformlyContinuous f fr wb (he / wb)).*)
+   assert (A1 : Qball wb fr (fr + i * / (intervals fr wb he * t)%positive * wb)).
     rewrite <- (Qplus_0_r fr) at 1.
     apply Qball_plus_r.
     apply in_Qball.
@@ -132,51 +148,61 @@ apply ball_mspc_ball. admit. (*apply (uc_prf _ (lmu fr wb)).
      rewrite Qmult_1_l.
      rewrite <- Zle_Qle.
      rewrite <- ZL9.
-     apply inj_le...
+     apply inj_le; auto with arith.
     intro.
     assert (0 < / (intervals fr wb he * t)%positive).
      apply Qinv_lt_0_compat...
     revert H0.
     rewrite H.
     apply (Qlt_irrefl 0).
-   pose proof mspc_ball_ex_Symmetric.
-   symmetry.
-   apply Qball_ex_plus_r.
-   unfold intervals.
-   set (luc_mu f fr wb (he / wb)).
-   destruct q; simpl...
-   set (mym := QposCeiling ((1 # 2) * wb / q)).
-   apply ball_weak_le with (wb * (1#2) * Qpos_inv mym)%Qpos.
+   assert
+     (A2 : ball_ex
+        (lmu' fr wb (he / wb)     )
+        (fr + i * / (intervals fr wb he * t)%positive * wb)
+        (fr + ((i / t)%nat * (wb * / intervals fr wb he) + (1 # 2) * (wb * / intervals fr wb he)))).
+    apply ball_ex_symm.
+    apply Qball_ex_plus_r.
+    unfold intervals.
+    set (q := lmu' fr wb (he / wb)).
+    destruct q; simpl...
+    set (mym := QposCeiling ((1 # 2) * wb / q)).
+    apply ball_weak_le with (wb * (1#2) * Qpos_inv mym)%Qpos.
+     simpl.
+     rewrite (Qmult_comm (wb)).
+     simpl.
+     subst mym.
+     rewrite QposCeiling_Qceiling.
+     apply Qle_shift_div_r...
+      apply Qlt_le_trans with ((1#2) * wb / q)%Qpos...
+      auto with *.
+     setoid_replace ((1#2) * wb) with (q * ((1#2) * wb / q)).
+      apply Qmult_le_compat_l...
+      auto with *.
+     change (Qeq ((1 # 2) * wb) (q * ((1 # 2) * wb / q))).
+     field...
     simpl.
-    rewrite (Qmult_comm (wb)).
+    rewrite Q.Pmult_Qmult.
+    apply Qball_Qdiv_inv with (Qpos_inv mym * wb)%Qpos.
     simpl.
-    subst mym.
-    rewrite QposCeiling_Qceiling.
-    apply Qle_shift_div_r...
-     apply Qlt_le_trans with ((1#2) * wb / q)%Qpos...
-     auto with *.
-    setoid_replace ((1#2) * wb) with (q * ((1#2) * wb / q)).
-     apply Qmult_le_compat_l...
-     auto with *.
-    change (Qeq ((1 # 2) * wb) (q * ((1 # 2) * wb / q))).
-    field...
-   simpl.
-   rewrite Q.Pmult_Qmult.
-   apply Qball_Qdiv_inv with (Qpos_inv mym * wb)%Qpos.
-   simpl.
-   field_simplify...
-   unfold Qdiv.
-   rewrite Qmult_plus_distr_l.
-   field_simplify...
-   rewrite Qdiv_1_r.
-   setoid_replace (wb * (1 # 2) / mym / (Qpos_inv mym * wb))%Qpos with (1#2)%Qpos.
-    rewrite Z.div_Zdiv...
-    rewrite Q.Zdiv_Qdiv.
-    rewrite inject_nat_convert.
-    apply Qfloor_ball.
-   unfold QposEq. simpl.
-   field. split; try discriminate...*)
-  Qed.
+    field_simplify...
+    unfold Qdiv.
+    rewrite Qmult_plus_distr_l.
+    field_simplify...
+    rewrite Qdiv_1_r.
+    setoid_replace (wb * (1 # 2) / mym / (Qpos_inv mym * wb))%Qpos with (1#2)%Qpos.
+     rewrite Z.div_Zdiv...
+     rewrite Q.Zdiv_Qdiv.
+     rewrite inject_nat_convert.
+     apply Qfloor_ball.
+    unfold QposEq. simpl.
+    field. split; try discriminate...
+   assert (A3 : Qball wb fr (fr + ((i / t)%nat * (wb * / intervals fr wb he) + (1 # 2) * (wb * / intervals fr wb he)))).
+    set (n := intervals fr wb he).
+    rewrite <- (Qplus_0_r fr) at 1.
+    apply Qball_plus_r. admit.
+    (*SearchAbout (Qball _ 0 _).
+    apply in_Qball.*)
+  Admitted.
 
   (** To construct a CR, we'll need to prove that approx is a regular function.
    However, that property is essentially a specialization of a more general
@@ -225,13 +251,11 @@ apply ball_mspc_ball. admit. (*apply (uc_prf _ (lmu fr wb)).
      _ (f (from2 + i * / (m true * m false)%positive * w false)) _).
     rewrite <- fE.
     rewrite <- wE.
-    apply (sampling_over_subdivision from1 i (m false) (halfe true) (w true)).
-    apply lt_le_weak...
+    apply (sampling_over_subdivision from1 i (m false) (halfe true) (w true))...
    apply ball_sym.
    rewrite Pmult_comm.
    apply sampling_over_subdivision.
-   rewrite Pmult_comm.
-   apply lt_le_weak...
+   rewrite Pmult_comm...
   Qed.
 
   Lemma regular fr w: is_RegularFunction_noInf Q_as_MetricSpace (approx fr w).
@@ -355,7 +379,7 @@ Section implements_abstract_interface.
         setoid_replace (i0 * (totalw / (w01ints * k))) with (i0 * / (w01ints * k)%positive * totalw).
          apply sampling_over_subdivision...
          rewrite Pmult_comm.
-         apply lt_le_weak...
+         (*apply lt_le_weak...*)
          apply lt_trans with (i * wbints true)%positive...
          apply inj_lt_iff.
          rewrite Zlt_Qlt.
@@ -397,7 +421,7 @@ Section implements_abstract_interface.
          (((i * wbints true)%positive + i0)%nat * / (intervals f a totalw (e * (1#2)) * k)%positive * totalw).
         apply (sampling_over_subdivision f a ((i * wbints true)%positive + i0) k (e*(1#2)) totalw).
         fold w01ints.
-        apply le_trans with ((i * wbints true)%positive + (j * wbints false)%positive)%nat...
+        apply lt_le_trans with ((i * wbints true)%positive + (j * wbints false)%positive)%nat...
         apply inj_le_iff.
         rewrite Zle_Qle.
         rewrite inj_plus.
@@ -407,9 +431,9 @@ Section implements_abstract_interface.
         rewrite iE, jE, kE.
         simpl.
         field_simplify...
-       unfold Qdiv. 
+       unfold Qdiv.
        rewrite (Qmult_comm totalw).
-       rewrite inj_plus, Zplus_Qplus. 
+       rewrite inj_plus, Zplus_Qplus.
        rewrite <- Pmult_Qmult.
        rewrite Qmult_assoc.
        rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
