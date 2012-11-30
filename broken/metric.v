@@ -16,6 +16,31 @@ Set Printing Coercions.
 
 Notation "x ²" := (x * x) (at level 30) : mc_scope.
 
+Import Qinf.notations.
+
+Definition Qinf_recip (a : Q) : Qinf := if (decide (a = 0)) then Qinf.infinite else /a.
+
+Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
+match (f x) with
+| Qinf.finite y => g y
+| Qinf.infinite => inf
+end.
+
+Definition Qinf_div (a b : Q) := comp_inf (a *.) Qinf_recip 0 b.
+
+Infix "/" := Qinf_div : Qinf_scope.
+
+Lemma Qplus_pos_compat (x y : Q) : (0 < x -> 0 < y -> 0 < x + y)%Q.
+Proof. intros; apply Q.Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
+
+Ltac Qauto_pos :=
+  repeat (first [ assumption
+                | constructor
+                | apply Qplus_pos_compat
+                | apply Q.Qmult_lt_0_compat
+                | apply Qinv_lt_0_compat]);
+  auto with *.
+
 Lemma po_proper' `{PartialOrder A} {x1 x2 y1 y2 : A} :
   x1 ≤ y1 -> x1 = x2 -> y1 = y2 -> x2 ≤ y2.
 Proof. intros A1 A2 A3; now apply (po_proper _ _ A2 _ _ A3). Qed.
@@ -95,8 +120,6 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 
 Instance Qinf_one : One Qinf := 1%Q.
 *)
-
-Notation Qinf := Qinf.T.
 
 Module Qinf.
 
@@ -257,6 +280,26 @@ Qed.
 
 End MetricSpace.
 
+Section SubMetricSpace.
+
+Context `{ExtMetricSpaceClass X} (P : X -> Prop).
+
+Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (` x) (` y).
+
+Global Instance sig_mspc : ExtMetricSpaceClass (sig P).
+Proof.
+constructor.
++ repeat intro; rapply mspc_radius_proper; congruence.
++ repeat intro; rapply mspc_inf.
++ intros; now rapply mspc_negative.
++ repeat intro; now rapply mspc_refl.
++ repeat intro; now rapply mspc_symm.
++ repeat intro; rapply mspc_triangle; eauto.
++ repeat intro; now rapply mspc_closed.
+Qed.
+
+End SubMetricSpace.
+
 Section UniformContinuity.
 
 Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
@@ -292,26 +335,6 @@ End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
 
-Section SubMetricSpace.
-
-Context `{ExtMetricSpaceClass X} (P : X -> Prop).
-
-Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (` x) (` y).
-
-Global Instance sig_mspc : ExtMetricSpaceClass (sig P).
-Proof.
-constructor.
-+ repeat intro; rapply mspc_radius_proper; congruence.
-+ repeat intro; rapply mspc_inf.
-+ intros; now rapply mspc_negative.
-+ repeat intro; now rapply mspc_refl.
-+ repeat intro; now rapply mspc_symm.
-+ repeat intro; rapply mspc_triangle; eauto.
-+ repeat intro; now rapply mspc_closed.
-Qed.
-
-End SubMetricSpace.
-
 Section LocalUniformContinuity.
 
 Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
@@ -331,7 +354,7 @@ intros x r. constructor; [now apply (uc_pos f) |].
 intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
 Qed.
 
-Global Instance luc_proper `{IsLocallyUniformlyContinuous f lmu} : Proper ((=) ==> (=)) f.
+Global Instance luc_proper (f : X -> Y) `{!IsLocallyUniformlyContinuous f lmu} : Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos.
 assert (A1 : ball 1%Q x1 x1) by (apply mspc_refl; Qauto_nonneg).
@@ -343,44 +366,97 @@ rewrite <- A. assert (0 < lmu x1 1 e) by now apply (uc_pos (restrict f x1 1)).
 destruct (lmu x1 1 e) as [q |]; [apply mspc_refl; solve_propholds | apply mspc_inf].
 Qed.
 
+Lemma luc (f : X -> Y) `{IsLocallyUniformlyContinuous f lmu} (r e : Q) (a x y : X) :
+  0 < e -> ball r a x -> ball r a y -> ball (lmu a r e) x y -> ball e (f x) (f y).
+Proof.
+intros e_pos A1 A2 A3.
+change (f x) with (restrict f a r (exist _ x A1)).
+change (f y) with (restrict f a r (exist _ y A2)).
+apply uc_prf with (mu := lmu a r); trivial.
+(* The predicate symbol of the goal is IsUniformlyContinuous, which is a
+type class. Yet, without [trivial] above, instead of solving it by [apply
+H3], Coq gives it as a subgoal. *)
+Qed.
+
 End LocalUniformContinuity.
+
+Section Lipschitz.
+
+Context `{MetricSpaceClass X, MetricSpaceClass Y}.
+
+Class IsLipschitz (f : X -> Y) (L : Q) := {
+  lip_nonneg : 0 ≤ L;
+  lip_prf : forall (x1 x2 : X) (e : Q), ball e x1 x2 -> ball (L * e) (f x1) (f x2)
+}.
+
+Global Arguments lip_nonneg f L {_} _.
+Global Arguments lip_prf f L {_} _ _ _ _.
+
+Record Lipschitz := {
+  lip_func : X -> Y;
+  lip_const : Q;
+  lip_proof : IsLipschitz lip_func lip_const
+}.
+
+Global Instance lip_uc `(IsLipschitz f L) : IsUniformlyContinuous f (λ e, (e / L)%Qinf).
+Proof.
+constructor.
++ intros e A.
+  unfold Qinf_div, comp_inf, Qinf_recip.
+  destruct (decide (L = 0)) as [A1 | A1]. [apply I |].
+  apply neq_symm in A1.
+  change (0 < e / L). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
+  assert (0 ≤ L) by apply (lip_nonneg f L).
+  assert (0 < L) by now apply QOrder.le_neq_lt. Qauto_pos.
++ intros e x1 x2 A1 A2. destruct (decide (L = 0)) as [A | A].
+  - apply mspc_eq; [| easy]. unfold equiv, mspc_equiv. rewrite <- (Qmult_0_l (msd x1 x2)), <- A.
+    now apply lip_prf; [| apply mspc_distance].
+  - mc_setoid_replace e with (L * (e / L)) by now field.
+    now apply lip_prf.
+Qed.
+
+End Lipschitz.
+
+Section LocallyLipschitz.
+
+Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
+
+Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
+  llip_prf : forall (x : X) (r : Q), IsLipschitz (restrict f x r) (L x r).
+
+Global Arguments llip_prf f L {_} x r.
+
+Global Instance lip_llip (f : X -> Y) `{!IsLipschitz f L} : IsLocallyLipschitz f (λ _ _, L).
+Proof.
+intros x r. constructor; [now apply (lip_nonneg f) |].
+intros [x1 x1b] [x2 x2b] e A. change (ball (L * e) (f x1) (f x2)). now apply lip_prf.
+Qed.
+
+End LocallyLipschitz.
 
 Section Contractions.
 
 Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
 
 Class IsContraction (f : X -> Y) (q : Q) := {
-  contr_nonneg_mu : 0 ≤ q;
-  contr_lt_mu_1 : q < 1;
-  contr_prf : forall (x1 x2 : X) (e : Q), ball e x1 x2 -> ball (q * e) (f x1) (f x2)
+  contr_prf :> IsLipschitz f q;
+  contr_lt_1 : q < 1
 }.
 
-Global Arguments contr_nonneg_mu f q {_} _.
-Global Arguments contr_lt_mu_1 f q {_}.
-Global Arguments contr_prf f q {_} _ _ _ _.
+Global Arguments contr_lt_1 f q {_}.
+Global Arguments contr_prf f q {_}.
 
 Record Contraction := {
   contr_func : X -> Y;
-  contr_q : Q;
-  contr_proof : IsContraction contr_func contr_q
+  contr_const : Q;
+  contr_proof : IsContraction contr_func contr_const
 }.
 
-Definition contr_modulus (q e : Q) : Qinf :=
-  if (decide (0 = q)) then Qinf.infinite else (e / q).
+(* Do we need the following?
 
 Global Instance contr_to_uc `(IsContraction f q) :
-  IsUniformlyContinuous f (contr_modulus q).
-Proof.
-constructor.
-+ intros e A. unfold contr_modulus. destruct (decide (0 = q)) as [A1 | A1]; [apply I |].
-  change (0 < e / q). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
-  pose proof (contr_nonneg_mu f q) as A2. pose proof (le_not_eq _ _ A2 A1). solve_propholds.
-+ intros e x1 x2 A1 A2. unfold contr_modulus in A2. destruct (decide (0 = q)) as [A | A].
-  - assert (A3 := contr_prf f q x1 x2 (msd x1 x2) (mspc_distance x1 x2)).
-    rewrite <- A, mult_0_l in A3; now apply mspc_eq.
-  - mc_setoid_replace e with (q * (e / q)) by (field; now apply neq_symm).
-    now apply contr_prf.
-Qed.
+  IsUniformlyContinuous f (λ e, if (decide (q = 0)) then Qinf.infinite else (e / q)).
+Proof. apply _. Qed.*)
 
 End Contractions.
 
@@ -429,29 +505,6 @@ intros [x0]; constructor.
 Qed.
 
 End UCFMetricSpace.
-
-
-(*
-Section Isometry.
-
-Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
-
-Class Isometry (f : X -> Y) :=
-  isometry : forall (e : Q) (x1 x2 : X), ball e x1 x2 <-> ball e (f x1) (f x2).
-
-Global Instance isometry_injective `{Isometry f} : Injective f.
-Proof.
-constructor; [| constructor]; try apply _; intros x y; rewrite <- !ball_zero;
-intros ?; [apply <- isometry | apply -> isometry]; trivial.
-Qed.
-
-Class IsometricIsomorphism (f : X -> Y) (g : Inverse f) := {
-  isometric_isomorphism_isometry :> Isometry f;
-  isometric_isomorphism_surjection :> Surjective f
-}.
-
-End Isometry.
-*)
 
 Section CompleteMetricSpace.
 
@@ -639,12 +692,6 @@ Qed.
 
 End SequenceLimits.
 
-Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
-match (f x) with
-| Qinf.finite y => g y
-| Qinf.infinite => inf
-end.
-
 Theorem seq_lim_cont
   `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y) `{!IsUniformlyContinuous f mu}
   (x : seq X) (a : X) (N : Q -> nat) :
@@ -706,37 +753,6 @@ intros e A1 n A2. apply (mspc_triangle' (e / 2) (e / 2) (x (N (e / 2)))).
 Qed.
 
 End CompleteSpaceSequenceLimits.
-
-(*Section ClosedSegmentComplete.
-
-Context `{CompleteMetricSpaceClass X, Le X, @PartialOrder X _ _}.
-
-Variables a b : X.
-
-Definition segment := sig (λ x, a ≤ x ≤ b).
-
-Typeclasses Transparent segment.
-
-(*Program Instance segment_limit : Limit segment :=
-  λ f, lim (Build_RegularFunction (λ e, proj1_sig (f e)) _).
-generates an infinite number of obligation [MetricSpaceBall segment] *)
-
-(* In the context (f : RegularFunction segment), (proj1_sig ∘ f) does not typecheck,
-but (λ e, proj1_sig (f e)) does *)
-
-Lemma lim_inside_r (f : RegularFunction X) :
-  (forall e, f e ≤ b) -> lim f ≤ b.
-Proof.
-intro A.
-
-
-Global Instance segment_limit : Limit segment.
-intro f.
-(* Check (λ (e : Q), `(f e)) : Q -> X. does not work *)
-(* refine (lim (Build_RegularFunction (λ e, proj1_sig (f e)) _) ↾ _).
-This generates one goal and one existential variable instead of two goals *)
-refine (lim (Build_RegularFunction (λ e, proj1_sig (f e)) (rf_proof f)) ↾ _).
-*)
 
 End QField.
 

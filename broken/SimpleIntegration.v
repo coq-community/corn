@@ -23,17 +23,6 @@ Require Import
 
 Open Scope Q_scope.
 
-Lemma Qplus_pos_compat (x y : Q) : 0 < x -> 0 < y -> 0 < x + y.
-Proof. intros; apply Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
-
-Ltac Qauto_pos :=
-  repeat (first [ assumption
-                | constructor
-                | apply Qplus_pos_compat
-                | apply Qmult_lt_0_compat
-                | apply Qinv_lt_0_compat]);
-  auto with *.
-
 Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
   gball r x y <-> mspc_ball r x y.
 Proof. reflexivity. Qed.
