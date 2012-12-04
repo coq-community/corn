@@ -17,8 +17,8 @@ Require Import
   stdlib_omissions.P
   stdlib_omissions.Z
   stdlib_omissions.Q
-  metric FromMetric2
   Qauto
+  metric FromMetric2
   implementations.stdlib_rationals.
 
 Open Scope Q_scope.
@@ -154,8 +154,8 @@ Section definition.
     destruct (lmu fr wb (he / wb)) as [q |] eqn:L; [| apply mspc_inf].
     (* apply gball_mspc_ball. does not change the goal *)
     unfold mspc_ball, msp_mspc_ball.
-    assert (q_pos : 0 < q).
-     change (Qinf.lt 0 q). rewrite <- L. apply (uc_pos (restrict f fr wb)); [apply UC | Qauto_pos].
+    assert (q_pos : 0 < q) by
+     (change (Qinf.lt 0 q); rewrite <- L; apply (uc_pos (restrict f fr wb)); [apply UC | Qauto_pos]).
     set (q' := exist _ q q_pos : Qpos).
     change q with (QposAsQ q').
     apply ball_gball, ball_sym, Qball_plus_r.

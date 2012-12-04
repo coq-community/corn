@@ -10,25 +10,17 @@ Require Import interfaces.naturals interfaces.orders.
 Import peano_naturals.
 
 Require Import CRGeometricSum.
-Import Qround Qpower.
+Import Qround Qpower Qinf.notations.
 
 Set Printing Coercions.
 
 Notation "x ²" := (x * x) (at level 30) : mc_scope.
-
-Import Qinf.notations.
-
-Definition Qinf_recip (a : Q) : Qinf := if (decide (a = 0)) then Qinf.infinite else /a.
 
 Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
 match (f x) with
 | Qinf.finite y => g y
 | Qinf.infinite => inf
 end.
-
-Definition Qinf_div (a b : Q) := comp_inf (a *.) Qinf_recip 0 b.
-
-Infix "/" := Qinf_div : Qinf_scope.
 
 Lemma Qplus_pos_compat (x y : Q) : (0 < x -> 0 < y -> 0 < x + y)%Q.
 Proof. intros; apply Q.Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
@@ -393,22 +385,25 @@ Global Arguments lip_nonneg f L {_} _.
 Global Arguments lip_prf f L {_} _ _ _ _.
 
 Record Lipschitz := {
-  lip_func : X -> Y;
+  lip_func :> X -> Y;
   lip_const : Q;
   lip_proof : IsLipschitz lip_func lip_const
 }.
 
-Global Instance lip_uc `(IsLipschitz f L) : IsUniformlyContinuous f (λ e, (e / L)%Qinf).
+Definition lip_modulus (L e : Q) : Qinf :=
+  if (decide (L = 0)) then Qinf.infinite else e / L.
+
+Global Instance lip_uc `(IsLipschitz f L) : IsUniformlyContinuous f (lip_modulus L).
 Proof.
 constructor.
 + intros e A.
-  unfold Qinf_div, comp_inf, Qinf_recip.
-  destruct (decide (L = 0)) as [A1 | A1]. [apply I |].
+  unfold lip_modulus.
+  destruct (decide (L = 0)) as [A1 | A1]; [apply I |].
   apply neq_symm in A1.
   change (0 < e / L). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
   assert (0 ≤ L) by apply (lip_nonneg f L).
   assert (0 < L) by now apply QOrder.le_neq_lt. Qauto_pos.
-+ intros e x1 x2 A1 A2. destruct (decide (L = 0)) as [A | A].
++ unfold lip_modulus. intros e x1 x2 A1 A2. destruct (decide (L = 0)) as [A | A].
   - apply mspc_eq; [| easy]. unfold equiv, mspc_equiv. rewrite <- (Qmult_0_l (msd x1 x2)), <- A.
     now apply lip_prf; [| apply mspc_distance].
   - mc_setoid_replace e with (L * (e / L)) by now field.
@@ -478,13 +473,6 @@ Qed.
 
 Global Instance UCFSpaceBall : MetricSpaceBall (UniformlyContinuous X Y) :=
   λ e f g, forall x, ball e (f x) (g x).
-(*    match e with
-    | Qinf.infinite => True
-    | Qinf.finite e' =>
-      if (decide_rel (<) e' 0)
-      then False
-      else (forall x, ball e' (f x) (g x))
-    end.*)
 
 Lemma UCFBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
 Proof.
@@ -705,7 +693,7 @@ Qed.
 Theorem seq_lim_contr
   `{MetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y) `{!IsContraction f q}
   (x : seq X) (a : X) (N : Q -> nat) :
-  seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N (contr_modulus q) 0).
+  seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N (lip_modulus q) 0).
 Proof. intro A; apply seq_lim_cont; [apply _ | apply A]. Qed.
 
 Lemma iter_fixpoint

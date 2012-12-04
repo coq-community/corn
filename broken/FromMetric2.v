@@ -4,6 +4,8 @@ Require Import
   abstract_algebra stdlib_rationals
   orders.orders orders.semirings orders.rings theory.rings.
 
+Import Qinf.notations.
+
 Section QField.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
