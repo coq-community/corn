@@ -14,6 +14,8 @@ Local Notation ball := mspc_ball.
 
 Section BanachFixpoint.
 
+Add Field Q : (stdlib_field_theory Q).
+
 Context `{MetricSpaceClass X} {Xlim : Limit X} {Xcms : CompleteMetricSpaceClass X}.
 
 Context (f : X -> X) `{!IsContraction f q} (x0 : X).
@@ -31,14 +33,16 @@ Instance : PropHolds (0 ≤ d).
 Proof. apply msd_nonneg. Qed.
 
 Instance : PropHolds (0 ≤ q).
-Proof. apply (contr_nonneg_mu f q). Qed.
+Proof. apply (lip_nonneg f q).
+(* [apply (lip_nonneg f)] leaves a goal [IsLipschitz f q], which [apply _] solves *)
+Qed.
 
 Instance : PropHolds (q < 1).
-Proof. apply (contr_lt_mu_1 f q). Qed.
+Proof. apply (contr_lt_1 f q). Qed.
 
 Instance : PropHolds (0 < 1 - q).
 Proof.
-assert (A := contr_lt_mu_1 f q).
+assert (A := contr_lt_1 f q).
 rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
 now rewrite plus_negate_r in A.
 Qed.
@@ -57,19 +61,19 @@ Proof.
 intro m; induction n  as [| n IH] using nat_induction.
 + rewrite right_identity; apply mspc_refl.
   now rewrite nat_pow_0, plus_negate_r, right_absorb, left_absorb.
-+ apply (mspc_triangle' (d * q^m * (1 - q^n) / (1 - q)) (d * q^(m + n)) (x (m + n))); trivial.
++ apply (mspc_triangle' (d * q^m * (1 - q^n) / (1 - q))%mc (d * q^(m + n))%mc (x (m + n))); trivial.
   - rewrite nat_pow_S, nat_pow_exp_plus. field; solve_propholds.
   - mc_setoid_replace (m + (1 + n)) with (1 + (m + n)) by ring. apply dist_xn_xSn.
 Qed.
 
 Lemma dist_xm_xn' : forall m n : nat, ball (d * q^m / (1 - q)) (x m) (x (m + n)).
 Proof.
-intros m n. apply (mspc_monotone (d * q^m * (1 - q^n) / (1 - q))); [| apply dist_xm_xn].
+intros m n. apply (mspc_monotone (d * q^m * (1 - q^n) / (1 - q))%mc); [| apply dist_xm_xn].
 apply (order_preserving (.* /(1 - q))). rewrite <- associativity.
 apply (order_preserving (d *.)). rewrite <- (mult_1_r (q^m)) at 2.
 apply (order_preserving (q^m *.)). rewrite <- (plus_0_r 1) at 2.
 apply (order_preserving (1 +)). rewrite <- negate_0.
-apply <- flip_le_negate. solve_propholds.
+apply flip_le_negate. solve_propholds.
 Qed.
 
 Lemma Qpower_mc_power (e : Q) (n : nat) : (e ^ n)%Q = (e ^ n)%mc.
@@ -104,7 +108,8 @@ induction n as [| n IH] using nat_induction.
 + rewrite nat_pow_S. transitivity ((1 + a) * (1 + (n : Q) * a)).
   - rewrite Nat2Z.inj_add, inject_Z_plus.
     stepr (1 + (1 + (n : Q)) * a + (n : Q) * a²) by ring.
-    apply nonneg_plus_le_compat_r, nonneg_mult_compat; [apply Qle_Qceiling_nat, le_0_n | apply square_nonneg].
+    (* [apply nonneg_plus_le_compat_r, nonneg_mult_compat.] does not work *)
+    apply nonneg_plus_le_compat_r. apply nonneg_mult_compat; [solve_propholds | apply square_nonneg].
   - now apply (order_preserving ((1 + a) *.)) in IH.
 Qed.
 
@@ -150,11 +155,11 @@ Proof.
 intros A1 A2.
 assert (A3 : 0 < n).
 + let T := type of A2 in match T with (?lhs ≤ _) => apply lt_le_trans with (y := lhs) end; [| trivial].
-  apply Qlt_Qceiling_nat; change (0 < / (e * (1 - q))); solve_propholds.
+  apply Q.Qlt_lt_of_nat_inject_Z; change (0 < / (e * (1 - q))); solve_propholds.
 + destruct n as [| n]; [elim (lt_irrefl _ A3) |].
   rewrite <- Qpower_mc_power.
   apply GeometricCovergenceLemma with (e := e ↾ A1); [solve_propholds .. |].
-  apply (Qle_Qceiling_nat _ (S n)), A2.
+  apply (Q.le_Qle_Qceiling_to_nat _ (S n)), A2.
 Qed.
 
 Lemma const_x (N : Q -> nat) : d = 0 -> cauchy x N.
@@ -181,7 +186,7 @@ match goal with
 end.
 + clear m n; intros m n le_m_n A _.
   rewrite <- (cut_minus_le n m); trivial. rewrite plus_comm.
-  apply (mspc_monotone (d * q^m / (1 - q))); [| apply dist_xm_xn'].
+  apply (mspc_monotone (d * q^m / (1 - q))%mc); [| apply dist_xm_xn'].
   cut (q ^ m ≤ e * (1 - q) / d).
   - intro A1. apply (order_preserving (d *.)), (order_preserving (.* /(1 - q))) in A1.
     apply (po_proper' A1); [easy | field; split; solve_propholds].

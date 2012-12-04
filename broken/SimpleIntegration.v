@@ -335,7 +335,7 @@ Section implements_abstract_interface.
         simpl. field.
         repeat split; discriminate.
        do 2 rewrite <- nat_of_P_mult_morphism.
-       rewrite plus_comm.
+       rewrite Plus.plus_comm.
        rewrite Σ_plus_bound.
        setoid_replace ((e + e) / x)%Qpos with ((ec true + ec true) / x + (ec false + ec false) / x)%Qpos.
         Focus 2.
