@@ -820,6 +820,46 @@ Qed.
 
 End IntegralOfSum.
 
+Program Definition int (f : Q -> CR) `{Integral f} (from to : Q) :=
+  if (decide (from ≤ to))
+  then integrate f from (to - from)
+  else -integrate f to (from - to).
+Next Obligation.
+change (0 ≤ to - from). (* without [change], the following [apply] does not work *)
+now apply rings.flip_nonneg_minus.
+Qed.
+Next Obligation.
+change (0 ≤ from - to).
+(* [apply rings.flip_nonneg_minus, orders.le_flip] does not work *)
+apply rings.flip_nonneg_minus; now apply orders.le_flip.
+Qed.
+
+Section IntegralLipschitz.
+
+Notation ball := mspc_ball.
+
+Context (f : Q -> CR) `{!IsLocallyLipschitz f L} `{Integral f, !Integrable f}.
+
+Variables (a r x0 x1 x2 : Q).
+Hypotheses (I1 : ball r a x1) (I2 : ball r a x2).
+
+Let F (x : Q) := int f x0 x.
+
+Let La := L a r.
+
+Lemma int_lip (e M : Q) :
+  (∀ x, ball r a x -> abs (f x) ≤ 'M) ->
+  ball e x1 x2 -> ball (e * (M + La * e)) (F x1) (F x2).
+Proof.
+intros A1 A2.
+apply CRball.gball_CRabs.
+
+
+
+Lemma integral_lipschitz (e : Q) : IsLocallyLipschitz F (* to insert a constant later *).
+
+
+
 
 (*
 Lemma integrate_proper
