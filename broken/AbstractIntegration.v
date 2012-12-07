@@ -820,7 +820,13 @@ Qed.
 
 End IntegralOfSum.
 
-Program Definition int (f : Q -> CR) `{Integral f} (from to : Q) :=
+Add Field Q : (dec_fields.stdlib_field_theory Q).
+
+Section IntegralTotal.
+
+Context (f : Q -> CR) `{Integrable f}.
+
+Program Definition int (from to : Q) :=
   if (decide (from ≤ to))
   then integrate f from (to - from)
   else -integrate f to (from - to).
@@ -833,6 +839,26 @@ change (0 ≤ from - to).
 (* [apply rings.flip_nonneg_minus, orders.le_flip] does not work *)
 apply rings.flip_nonneg_minus; now apply orders.le_flip.
 Qed.
+
+Lemma integral_additive' (a b : Q) (u v w : QnonNeg) :
+  a + `u = b -> `u + `v = `w -> ∫ f a u + ∫ f b v = ∫ f a w.
+Proof.
+intros A1 A2. change (u + v = w)%Qnn in A2.
+rewrite <- A1, <- A2. now apply integral_additive.
+Qed.
+
+Lemma int_add (a b c : Q) : int a b + int b c = int a c.
+Proof.
+unfold int.
+destruct (decide (a ≤ b)) as [AB | AB];
+destruct (decide (b ≤ c)) as [BC | BC];
+destruct (decide (a ≤ c)) as [AC | AC].
++ apply integral_additive'; simpl; ring.
++ 
+
+
+
+End IntegralTotal.
 
 Section IntegralLipschitz.
 
@@ -851,8 +877,7 @@ Lemma int_lip (e M : Q) :
   (∀ x, ball r a x -> abs (f x) ≤ 'M) ->
   ball e x1 x2 -> ball (e * (M + La * e)) (F x1) (F x2).
 Proof.
-intros A1 A2.
-apply CRball.gball_CRabs.
+intros A1 A2. apply CRball.gball_CRabs.
 
 
 
