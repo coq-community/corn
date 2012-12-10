@@ -822,6 +822,43 @@ End IntegralOfSum.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
+Section RingFacts.
+
+Context `{Ring R}.
+
+Lemma plus_left_cancel (z x y : R) : z + x = z + y <-> x = y.
+Proof.
+split.
+(* [apply (left_cancellation (+)).] leaves the goal [LeftCancellation plus z],
+which is solved by [apply _]. Why is it left? *)
++ apply (left_cancellation (+) z).
++ intro A; now rewrite A.
+Qed.
+
+Lemma plus_right_cancel (z x y : R) : x + z = y + z <-> x = y.
+Proof. rewrite (plus_comm x z), (plus_comm y z); apply plus_left_cancel. Qed.
+
+Lemma plus_eq_minus (x y z : R) : x + y = z <-> x = z - y.
+Proof.
+split; intro A.
++ apply (right_cancellation (+) y).
+  now rewrite <- plus_assoc, rings.plus_negate_l, rings.plus_0_r.
++ apply (right_cancellation (+) (-y)).
+  now rewrite <- plus_assoc, rings.plus_negate_r, rings.plus_0_r.
+Qed.
+
+Lemma minus_eq_plus (x y z : R) : x - y = z <-> x = z + y.
+Proof. now rewrite plus_eq_minus, rings.negate_involutive. Qed.
+
+Lemma negate_inj (x y : R) : -x = -y <-> x = y.
+Proof. now rewrite rings.flip_negate, rings.negate_involutive. Qed.
+
+End RingFacts.
+
+Definition Segment (T : Type) := prod T T.
+
+Instance contains_Q : Contains Q (Segment Q) := λ x s, (fst s ⊓ snd s ≤ x ≤ fst s ⊔ snd s).
+
 Section IntegralTotal.
 
 Context (f : Q -> CR) `{Integrable f}.
@@ -848,15 +885,40 @@ rewrite <- A1, <- A2. now apply integral_additive.
 Qed.
 
 Lemma int_add (a b c : Q) : int a b + int b c = int a c.
-Proof.
+Proof with apply integral_additive'; simpl; ring.
 unfold int.
 destruct (decide (a ≤ b)) as [AB | AB];
 destruct (decide (b ≤ c)) as [BC | BC];
 destruct (decide (a ≤ c)) as [AC | AC].
-+ apply integral_additive'; simpl; ring.
-+ 
++ idtac...
++ assert (A : a ≤ c) by (now transitivity b); elim (AC A).
++ apply minus_eq_plus; symmetry...
++ rewrite minus_eq_plus, (plus_comm (-integrate _ _ _)), <- plus_eq_minus, (plus_comm (integrate _ _ _))...
++ rewrite (plus_comm (-integrate _ _ _)), minus_eq_plus, (plus_comm (integrate _ _ _)); symmetry...
++ rewrite (plus_comm (-integrate _ _ _)), minus_eq_plus, (plus_comm (-integrate _ _ _)), <- plus_eq_minus...
++ assert (b ≤ a) by (now apply orders.le_flip); assert (B : b ≤ c) by (now transitivity a); elim (BC B).
++ rewrite <- rings.negate_plus_distr, negate_inj, (plus_comm (integrate _ _ _))...
+Qed.
 
+Lemma int_diff (a b c : Q) : int a b - int a c = int c b.
+Proof. apply minus_eq_plus. rewrite plus_comm. symmetry; apply int_add. Qed.
 
+Lemma int_zero_width (a : Q) : int a a = 0.
+Proof. apply (plus_right_cancel (int a a)); rewrite rings.plus_0_l; apply int_add. Qed.
+
+Lemma int_negate (a b : Q) : int a b = - int b a.
+Proof.
+apply rings.equal_by_zero_sum. rewrite rings.negate_involutive, int_add. apply int_zero_width.
+Qed.
+
+Lemma int_abs_bound (a b M : Q) :
+  (forall x : Q, x ∈ (a, b) -> abs (f x) ≤ 'M) -> abs (int a b) ≤ '(abs (b - a) * M).
+Proof.
+intros A. unfold int. destruct (decide (a ≤ b)) as [AB | AB].
+rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
+rapply integral_abs_bound.
+
+SearchAbout (0 ≤ _ - _).
 
 End IntegralTotal.
 
@@ -874,10 +936,12 @@ Let F (x : Q) := int f x0 x.
 Let La := L a r.
 
 Lemma int_lip (e M : Q) :
-  (∀ x, ball r a x -> abs (f x) ≤ 'M) ->
-  ball e x1 x2 -> ball (e * (M + La * e)) (F x1) (F x2).
+  (∀ x, ball r a x -> abs (f x) ≤ 'M) -> ball e x1 x2 -> ball (e * M) (F x1) (F x2).
 Proof.
-intros A1 A2. apply CRball.gball_CRabs.
+intros A1 A2. apply CRball.gball_CRabs. subst F; cbv beta.
+change (int f x0 x1 - int f x0 x2)%CR with (int f x0 x1 - int f x0 x2).
+rewrite int_diff; [| trivial]. (* Why does it leave the second subgoal [Integrable f]? *)
+
 
 
 

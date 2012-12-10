@@ -12,8 +12,8 @@ Instance in_CRRange: Container CR (Range CR)
 Instance in_sig_Range `{Container A (Range A)} (P: A → Prop): Container (sig P) (Range (sig P))
   := λ r x, In (` (fst r), ` (snd r)) (` x).
 
-Lemma alt_in_QRange (q: Q) (r: Range Q): q ∈ r <->
+(*Lemma alt_in_QRange (q: Q) (r: Range Q): q ∈ r <->
   (∃ e, 0 <= e <= 1 ∧ fst r + e * (snd r - fst r) == q)%Q.
 Proof with auto.
-Admitted.
+Admitted.*)
   (* also: ∃ e, 0 <= e <= 1 ∧ q == fst r * e + snd r * (1 - e) *)
