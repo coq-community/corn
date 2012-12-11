@@ -656,7 +656,7 @@ Proof. apply sg_ass, _. Qed.
 (* Should this lemma be used to CoRN.reals.fast.CRabs? That file does not use
 type class notations from canonical_names like ≤ *)
 
-Lemma CRabs_nonneg (x : CR) : 0 ≤ CRabs x.
+Lemma CRabs_nonneg (x : CR) : 0 ≤ abs x.
 Proof.
 apply -> CRabs_cases; [| apply _ | apply _].
 split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
@@ -753,12 +753,24 @@ Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
 
 Require Import propholds.
 
-Lemma integral_abs_bound (from : Q) (width : Qpos) (M : Q) :
+Lemma integral_abs_bound (from : Q) (width : QnonNeg) (M : Q) :
   (forall (x : Q), (from ≤ x ≤ from + width) -> CRabs (f x) ≤ 'M) ->
   CRabs (∫ f from width) ≤ '(`width * M).
 Proof.
 intro A. rewrite <- (CRplus_0_r (∫ f from width)), <- CRopp_0.
-apply CRball.as_distance_bound, CRball.rational. rewrite <- (scale_0_r width).
+apply CRball.as_distance_bound. rewrite <- (scale_0_r width).
+rewrite <- CRmult_Qmult, CRmult_scale.
+apply integral_bounded; trivial.
++ apply CRnonNeg_le_0.
+  apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
+  apply A. split; [reflexivity |].
+  apply semirings.nonneg_plus_le_compat_r; change (0 <= width)%Q; Qauto_nonneg.
++ intros x A2. apply CRball.as_distance_bound. rewrite CRdistance_comm.
+  change (CRabs (f x - 0) ≤ 'M).
+  rewrite rings.minus_0_r; now apply A.
+Qed.
+
+(*apply CRball.as_distance_bound, CRball.rational. rewrite <- (scale_0_r width).
 assert (A1 : 0 ≤ M).
 + apply CRle_Qle. apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
   apply A. split; [reflexivity |].
@@ -767,7 +779,7 @@ assert (A1 : 0 ≤ M).
   apply bounded_with_nonneg_radius; [easy |].
   intros x A2. apply CRball.gball_CRabs. change (f x - 0%mc)%CR with (f x - 0).
   rewrite rings.minus_0_r; now apply A.
-Qed.
+Qed.*)
 
 End IntegralBound.
 
@@ -855,9 +867,25 @@ Proof. now rewrite rings.flip_negate, rings.negate_involutive. Qed.
 
 End RingFacts.
 
-Definition Segment (T : Type) := prod T T.
+Definition Range (T : Type) := prod T T.
 
-Instance contains_Q : Contains Q (Segment Q) := λ x s, (fst s ⊓ snd s ≤ x ≤ fst s ⊔ snd s).
+Instance contains_Q : Contains Q (Range Q) := λ x s, (fst s ⊓ snd s ≤ x ≤ fst s ⊔ snd s).
+
+Lemma Qrange_comm (a b x : Q) : x ∈ (a, b) <-> x ∈ (b, a).
+Admitted.
+
+Lemma range_le (a b : Q) : a ≤ b -> forall x, a ≤ x ≤ b <-> x ∈ (a, b).
+Admitted.
+
+Lemma CRabs_negate (x : CR) : abs (-x) = abs x.
+Proof.
+change (abs (-x)) with (CRabs (-x)).
+rewrite CRabs_opp; reflexivity.
+Qed.
+
+Lemma mspc_ball_convex (x1 x2 r a x : Q) :
+  mspc_ball r a x1 -> mspc_ball r a x2 -> x ∈ (x1, x2) -> mspc_ball r a x.
+Admitted.
 
 Section IntegralTotal.
 
@@ -914,41 +942,99 @@ Qed.
 Lemma int_abs_bound (a b M : Q) :
   (forall x : Q, x ∈ (a, b) -> abs (f x) ≤ 'M) -> abs (int a b) ≤ '(abs (b - a) * M).
 Proof.
-intros A. unfold int. destruct (decide (a ≤ b)) as [AB | AB].
-rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
-rapply integral_abs_bound.
+intros A. unfold int. destruct (decide (a ≤ b)) as [AB | AB];
+[| pose proof (orders.le_flip _ _ AB); mc_setoid_replace (b - a) with (-(a - b)) by ring;
+   rewrite CRabs_negate, abs.abs_negate];
+rewrite abs.abs_nonneg by (now apply rings.flip_nonneg_minus);
+apply integral_abs_bound; trivial; (* [Integrable f] is not discharged *)
+intros x A1; apply A.
++ apply -> range_le; [| easy].
+  now mc_setoid_replace b with (a + (b - a)) by ring.
++ apply Qrange_comm. apply -> range_le; [| easy].
+  now mc_setoid_replace a with (b + (a - b)) by ring.
+Qed.
 
-SearchAbout (0 ≤ _ - _).
+(* [SearchAbout (CRabs (- ?x)%CR)] does not find [CRabs_opp] *)
 
 End IntegralTotal.
+
+Import interfaces.orders orders.semirings.
+
+Definition Qupper_bound (x : CR) := approximate x 1%Qpos + 1.
+
+Lemma Qupper_bound_ge (x : CR) : x ≤ 'Qupper_bound x.
+Admitted.
+(* Similar to
+upper_CRapproximation:
+  ∀ (x : CR) (e : Qpos), x <= (' (approximate x e + e)%Q)%CR
+CRexp.exp_bound_lemma:
+  ∀ x : CR, x <= (' (approximate x (1 # 1)%Qpos + 1)%Q)%CR *)
+
+Lemma CRabs_triang (x y z : CR) : x = y + z -> abs x ≤ abs y + abs z.
+Admitted.
 
 Section IntegralLipschitz.
 
 Notation ball := mspc_ball.
 
-Context (f : Q -> CR) `{!IsLocallyLipschitz f L} `{Integral f, !Integrable f}.
-
-Variables (a r x0 x1 x2 : Q).
-Hypotheses (I1 : ball r a x1) (I2 : ball r a x2).
+Context (f : Q -> CR) (x0 : Q) `{!IsLocallyLipschitz f L} `{Integral f, !Integrable f}.
 
 Let F (x : Q) := int f x0 x.
+
+Section IntegralLipschitzBall.
+
+Variables (a r x1 x2 : Q).
+
+Hypotheses (I1 : ball r a x1) (I2 : ball r a x2) (r_nonneg : 0 ≤ r).
 
 Let La := L a r.
 
 Lemma int_lip (e M : Q) :
-  (∀ x, ball r a x -> abs (f x) ≤ 'M) -> ball e x1 x2 -> ball (e * M) (F x1) (F x2).
+  (∀ x, ball r a x -> abs (f x) ≤ 'M) -> ball e x1 x2 -> ball (M * e) (F x1) (F x2).
 Proof.
 intros A1 A2. apply CRball.gball_CRabs. subst F; cbv beta.
 change (int f x0 x1 - int f x0 x2)%CR with (int f x0 x1 - int f x0 x2).
 rewrite int_diff; [| trivial]. (* Why does it leave the second subgoal [Integrable f]? *)
+change (abs (int f x2 x1) ≤ '(M * e)).
+transitivity ('(M * abs (x1 - x2))).
++ rewrite mult_comm. apply int_abs_bound; trivial. intros x A3; apply A1, (mspc_ball_convex x2 x1); easy.
++ apply CRle_Qle. assert (0 ≤ M).
+  - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply A1, mspc_refl]; easy.
+  - change (M * abs (x1 - x2) ≤ M * e). apply (orders.order_preserving (M *.)).
+    apply gball_Qabs, A2.
+Qed.
 
+End IntegralLipschitzBall.
 
+Lemma integral_lipschitz (e : Q) :
+  IsLocallyLipschitz F (λ a r, Qupper_bound (abs (f a)) + L a r * r).
+Proof.
+intros a r r_nonneg. constructor.
++ apply nonneg_plus_compat.
+  - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply Qupper_bound_ge].
+  - apply nonneg_mult_compat; [apply (lip_nonneg (restrict f a r)) |]; auto.
+    (* Not good to provide [(restrict f a r)]. [IsLipschitz (restrict f a r) (L a r)] is generated *)
++ (* PG ignores the following tactic *) idtac. intros x1 x2 d A.
+  destruct x1 as [x1 A1]; destruct x2 as [x2 A2].
+  change (ball ((Qupper_bound (abs (f a)) + L a r * r) * d) (F x1) (F x2)).
+  apply (int_lip a r); trivial.
+  intros x B. transitivity (abs (f a) + '(L a r * r)).
+  - transitivity (abs (f a) + abs (f x - f a)); [apply CRabs_triang; ring |].
+    apply (order_preserving (abs (f a) +)).
+    apply CRball.gball_CRabs. apply gball_sym.
+    (* There should be a lemma similar to metric.luc for locally Lipschitz:
+       the following invocation of lip_prf is too complex *)
+    assert (B1 : ball r a a) by now apply mspc_refl.
+    change (ball (L a r * r) (restrict f a r (a ↾ B1)) (restrict f a r (x ↾ B))).
+    specialize (IsLocallyLipschitz0 a r r_nonneg).
+    now apply lip_prf.
+  - rewrite <- CRplus_Qplus.
+    change (abs (f a) + ' (L a r * r) ≤ ' Qupper_bound (abs (f a)) + ' (L a r * r)).
+    apply plus_le_compat; (* does not work wothout [change] *)
+    [apply Qupper_bound_ge | reflexivity].
+Qed.
 
-
-Lemma integral_lipschitz (e : Q) : IsLocallyLipschitz F (* to insert a constant later *).
-
-
-
+End IntegralLipschitz.
 
 (*
 Lemma integrate_proper

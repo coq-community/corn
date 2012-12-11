@@ -417,9 +417,9 @@ Section LocallyLipschitz.
 Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
 
 Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
-  llip_prf : forall (x : X) (r : Q), IsLipschitz (restrict f x r) (L x r).
+  llip_prf : forall (x : X) (r : Q), 0 ≤ r -> IsLipschitz (restrict f x r) (L x r).
 
-Global Arguments llip_prf f L {_} x r.
+Global Arguments llip_prf f L {_} x r _.
 
 Global Instance lip_llip (f : X -> Y) `{!IsLipschitz f L} : IsLocallyLipschitz f (λ _ _, L).
 Proof.
