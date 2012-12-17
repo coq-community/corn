@@ -201,6 +201,27 @@ Proof with auto.
  apply -> CRle_opp...
 Qed.
 
+Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
+Proof.
+apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
+intros q e1 e2. change (ball (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
+apply <- ball_eq_iff. apply Qabs_Qmult.
+Qed.
+
+(* begin hide *)
+(* Another proof *)
+
+Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
+Proof.
+unfold CRabs, scale. setoid_rewrite <- fast_MonadLaw2.
+apply map_eq_complete. intro q. apply Qabs_Qmult.
+Qed.
+
+(* end hide *)
+
+Lemma CRabs_CRmult_Q (a : Q) (x : CR) : CRabs ('a * x) == '(Qabs a) * (CRabs x).
+Proof. rewrite !CRmult_scale. apply CRabs_scale. Qed.
+
 Definition CRdistance (x y: CR): CR := CRabs (x - y).
 
 Lemma CRdistance_CRle (r x y: CR): x - r <= y /\ y <= x + r <-> CRdistance x y <= r.

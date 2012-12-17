@@ -26,10 +26,11 @@ Require Import Qabs.
 Require Import CornTac.
 
 Ltac Qauto_pos :=
-  repeat (first [assumption
-               |constructor
-               |apply: plus_resp_pos;simpl
-               |apply: mult_resp_pos;simpl]);
+  repeat (first [ assumption
+                | constructor
+                | apply Q.Qplus_pos_compat
+                | apply Q.Qmult_lt_0_compat
+                | apply Qinv_lt_0_compat]);
   auto with *.
 
 Ltac Qauto_nonneg :=

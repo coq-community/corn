@@ -23,93 +23,12 @@ Ltac done :=
 (*   | case not_locked_false_eq_true; assumption*)
    | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
 
-(*Notation Qinf := Qinf.T.
-
-Module Qinf.
-
-Definition le (x y : Qinf) : Prop :=
-match y with
-| Qinf.finite b =>
-  match x with
-  | Qinf.finite a => Qle a b
-  | Qinf.infinite => False
-  end
-| Qinf.infinite => True
-end.
-
-Instance: Proper (Qinf.eq ==> Qinf.eq ==> iff) le.
-Proof.
-intros [x1 |] [x2 |] A1 [y1 |] [y2 |] A2; revert A1 A2;
-unfold Qinf.eq, canonical_names.equiv, stdlib_rationals.Q_eq; simpl; intros A1 A2;
-try contradiction; try reflexivity.
-rewrite A1, A2; reflexivity.
-Qed.
-
-End Qinf.
-
-Instance Qinf_le : canonical_names.Le Qinf := Qinf.le.*)
-
 Open Local Scope Q_scope.
 Open Local Scope uc_scope.
 Open Local Scope CR_scope.
 
-Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Complete Y) :
-  (forall x : X, f (Cunit x) [=] g (Cunit x)) -> (forall x : Complete X, f x [=] g x).
-Proof.
-intros A x. apply ball_eq; intro e.
-set (e2 := ((1#2) * e)%Qpos).
-set (d := QposInf_min (mu f e2) (mu g e2)).
-setoid_replace e with (e2 + e2)%Qpos by (subst e2; QposRing).
-apply ball_triangle with (b := f (Cunit (approximate x d))).
-+ apply (UniformContinuity.uc_prf f).
-  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_l | apply ball_ex_approx_r].
-+ rewrite A. apply (UniformContinuity.uc_prf g).
-  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_r | apply ball_ex_approx_l].
-Qed.
-
 (* [SearchAbout ((Cmap _ _) (Cunit _)).] does not find anything, but it
 should find metric2.Prelength.fast_MonadLaw3 *)
-
-Corollary map_eq_complete {X Y : MetricSpace} {plX : PrelengthSpace X} (f g : X --> Y) :
-  (forall x : X, f x [=] g x) -> (forall x : Complete X, Cmap plX f x [=] Cmap plX g x).
-Proof.
-intros A x. apply lift_eq_complete. intro y. rewrite !fast_MonadLaw3, A. reflexivity.
-Qed.
-
-Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
-Proof.
-apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
-intros q e1 e2. change (ball (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
-apply <- ball_eq_iff. apply Qabs_Qmult.
-Qed.
-
-(* Another proof *)
-
-Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
-Proof.
-unfold CRabs, scale. setoid_rewrite <- fast_MonadLaw2.
-apply map_eq_complete. intro q. apply Qabs_Qmult.
-Qed.
-
-Corollary CRabs_CRmult_Q (a : Q) (x : CR) : CRabs ('a * x) == '(Qabs a) * (CRabs x).
-Proof. rewrite !CRmult_scale. apply CRabs_scale. Qed.
-
-Lemma gball_CRmult_Q (e a : Q) (x y : CR) :
-  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
-Proof.
-intro A. apply CRball.gball_CRabs.
-setoid_replace ('a * x - 'a * y) with ('a * (x - y)) by ring.
-rewrite CRabs_CRmult_Q, <- CRmult_Qmult.
-assert (0 <= 'Qabs a) by (apply CRle_Qle; auto).
-apply (orders.order_preserving (CRmult (' Qabs a))).
-now apply CRball.gball_CRabs.
-Qed.
-
-Corollary gball_CRmult_Q_nonneg (e a : Q) (x y : CR) :
-  (0 <= a)%Q -> gball e x y -> gball (a * e) ('a * x) ('a * y).
-Proof.
-intros A1 A2. rewrite <- (Qabs_pos a) at 1; [apply gball_CRmult_Q |]; easy.
-Qed.
 
 (** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)

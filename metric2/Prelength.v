@@ -347,6 +347,14 @@ Proof.
  apply Cmap_correct.
 Qed.
 
+(** [Cmap] preserves extensional equality *)
+
+Lemma map_eq_complete {X Y : MetricSpace} {plX : PrelengthSpace X} (f g : X --> Y) :
+  (forall x : X, f x [=] g x) -> (forall x : Complete X, Cmap plX f x [=] Cmap plX g x).
+Proof.
+intros A x. apply lift_eq_complete. intro y. rewrite !fast_MonadLaw3, A. reflexivity.
+Qed.
+
 End Map.
 
 Section fast_Monad_Laws.

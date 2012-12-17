@@ -90,6 +90,23 @@ Qed. (* todo: clean up *)
 Lemma gball_CRabs (r : Q) (x y : CR) : gball r x y <-> CRabs (x - y) <= ' r.
 Proof. rewrite rational. apply as_distance_bound. Qed.
 
+Lemma gball_CRmult_Q (e a : Q) (x y : CR) :
+  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
+Proof.
+intro A. apply CRball.gball_CRabs.
+setoid_replace ('a * x - 'a * y) with ('a * (x - y)) by ring.
+rewrite CRabs_CRmult_Q, <- CRmult_Qmult.
+assert (0 <= 'Qabs a) by (apply CRle_Qle; auto).
+apply (orders.order_preserving (CRmult (' Qabs a))).
+now apply CRball.gball_CRabs.
+Qed.
+
+Lemma gball_CRmult_Q_nonneg (e a : Q) (x y : CR) :
+  (0 <= a)%Q -> gball e x y -> gball (a * e) ('a * x) ('a * y).
+Proof.
+intros A1 A2. rewrite <- (Qabs_pos a) at 1; [apply gball_CRmult_Q |]; easy.
+Qed.
+
 Module notations.
 
   Notation CRball := CRball.

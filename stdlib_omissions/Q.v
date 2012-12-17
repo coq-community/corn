@@ -334,6 +334,9 @@ Proof.
  apply Qplus_le_compat; assumption.
 Qed.
 
+Lemma Qplus_pos_compat (x y : Q) : 0 < x -> 0 < y -> 0 < x + y.
+Proof. intros; apply Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
+
 Lemma Qminus_less (x y : Q) : 0 <= y -> x - y <= x.
 Proof.
 intro H. rewrite <- (Qplus_0_r x) at 2. apply Qplus_le_r. change 0 with (-0).

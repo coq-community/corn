@@ -177,8 +177,8 @@ Qed.
 Lemma cauchy_x : cauchy x (λ e, Z.to_nat (Qceiling (d / (e * (1 - q)²))%mc)).
 Proof.
 assert (d_nonneg : 0 ≤ d) by solve_propholds.
-assert (d_pos_0 : 0 < d \/ 0 = d) by now apply le_lt_eq.
-destruct d_pos_0 as [d_pos | d_0]; [| now apply const_x].
+assert (d_pos_0 : 0 = d \/ 0 < d) by now apply le_equiv_lt.
+destruct d_pos_0 as [d_0 | d_pos]; [now apply const_x |].
 intros e e_pos.
 (* without loss of generality, m ≤ n *)
 match goal with
@@ -198,6 +198,8 @@ end.
   - now apply A.
   - intros; apply mspc_symm; now apply A.
 Qed.
+
+SearchAbout (?x = ?y ∨ ?x < ?y).
 
 Let a := lim (reg_fun x _ cauchy_x).
 

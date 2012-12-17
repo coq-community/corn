@@ -14,7 +14,7 @@ Import Qround Qpower Qinf.notations.
 
 Set Printing Coercions.
 
-Notation "x ²" := (x * x) (at level 30) : mc_scope.
+(*Notation "x ²" := (x * x) (at level 30) : mc_scope.*)
 
 Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
 match (f x) with
@@ -22,49 +22,17 @@ match (f x) with
 | Qinf.infinite => inf
 end.
 
-Lemma Qplus_pos_compat (x y : Q) : (0 < x -> 0 < y -> 0 < x + y)%Q.
-Proof. intros; apply Q.Qplus_lt_le_0_compat; [| apply Qlt_le_weak]; trivial. Qed.
-
-Ltac Qauto_pos :=
-  repeat (first [ assumption
-                | constructor
-                | apply Qplus_pos_compat
-                | apply Q.Qmult_lt_0_compat
-                | apply Qinv_lt_0_compat]);
-  auto with *.
-
+(* [po_proper'] is useful for proving [a2 ≤ b2] from [H : a1 ≤ b1] when
+[a1 = a2] and [b1 = b2]. Then [apply (po_proper' H)] generates [a1 = a2]
+and [b1 = b2]. Should it be moved to MathClasses? *)
 Lemma po_proper' `{PartialOrder A} {x1 x2 y1 y2 : A} :
   x1 ≤ y1 -> x1 = x2 -> y1 = y2 -> x2 ≤ y2.
 Proof. intros A1 A2 A3; now apply (po_proper _ _ A2 _ _ A3). Qed.
 
-Lemma le_not_eq `{FullPartialOrder A} (x y : A) : x ≤ y -> x ≶ y -> x < y.
-Proof. intros ? ?; apply lt_iff_le_apart; now split. Qed.
-
-(* Use orders.orders.le_equiv_lt instead *)
-Lemma le_lt_eq `{@FullPartialOrder B Be Bap Ble Blt} `{@TrivialApart B Be Bap}
-  `{forall x y : B, Decision (x = y)} (x y : B) : x ≤ y ↔ x < y ∨ x = y.
-Proof.
-assert (Setoid B) by apply po_setoid.
-split; intro A.
-+ destruct (decide (x = y)) as [A1 | A1]; [now right |].
-  apply trivial_apart in A1. left; apply lt_iff_le_apart; now split.
-+ destruct A as [A | A].
-  - apply lt_iff_le_apart in A; now destruct A.
-  - now rewrite A.
-Qed.
-
-Lemma neq_symm `{Ae : Equiv X} `{!Symmetric Ae} (x y : X) : x ≠ y -> y ≠ x.
-Proof. intros A1 A2; apply A1; now symmetry. Qed.
-
-Lemma plus_comm `{SemiRing R} : Commutative (+).
-Proof. eapply commonoid_commutative; apply _. Qed.
-
-Lemma plus_assoc `{SemiRing R} : forall x y z : R, x + (y + z) = (x + y) + z.
-Proof. apply sg_ass, _. Qed.
-
-Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
+(* This is a special case of lt_ne_flip. Do we need it? *)
+(*Instance pos_ne_0 : forall `{StrictSetoidOrder A} `{Zero A} (x : A),
   PropHolds (0 < x) -> PropHolds (x ≠ 0).
-Proof. intros; now apply lt_ne_flip. Qed.
+Proof. intros; now apply lt_ne_flip. Qed.*)
 
 Definition ext_equiv' `{Equiv A} `{Equiv B} : Equiv (A → B) :=
   λ f g, ∀ x : A, f x = g x.
@@ -112,25 +80,6 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 
 Instance Qinf_one : One Qinf := 1%Q.
 *)
-
-Module Qinf.
-
-Definition lt (x y : Qinf) : Prop :=
-match x, y with
-| Qinf.finite a, Qinf.finite b => Qlt a b
-| Qinf.finite _, Qinf.infinite => True
-| Qinf.infinite, _ => False
-end.
-
-Instance: Proper (=) lt.
-Proof.
-intros [x1 |] [x2 |] A1 [y1 |] [y2 |] A2; revert A1 A2;
-unfold Qinf.eq, Q_eq, equiv; simpl; intros A1 A2;
-try contradiction; try reflexivity.
-rewrite A1, A2; reflexivity.
-Qed.
-
-End Qinf.
 
 Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
@@ -230,10 +179,6 @@ try (unfold Qinf.eq, equiv in *; contradiction).
   now apply mspc_triangle with (b := y2); [rewrite Ee1e2 | apply mspc_symm].
 Qed.
 
-(*Check _ : Le Qinf.T.
-Lemma   mspc_refl ∀ e : Q, 0 ≤ e → Reflexive (ball e);*)
-
-
 Lemma mspc_triangle' :
   ∀ (q1 q2 : Q) (x2 x1 x3 : X) (q : Q),
     q1 + q2 = q → ball q1 x1 x2 → ball q2 x2 x3 → ball q x1 x3.
@@ -326,6 +271,10 @@ Qed.
 End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
+
+Class Map (A : Type -> Type -> Type) := map : forall X Y, A X Y -> X -> Y.
+
+Instance : Map UniformlyContinuous.
 
 Section LocalUniformContinuity.
 

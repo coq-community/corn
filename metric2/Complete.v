@@ -369,6 +369,23 @@ Proof.
 Qed.
 (* end hide *)
 
+(** If two functions between complete metric spaces are equal on the images
+of [Cunit], then they are equal everywhere *)
+
+Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Complete Y) :
+  (forall x : X, f (Cunit x) [=] g (Cunit x)) -> (forall x : Complete X, f x [=] g x).
+Proof.
+intros A x. apply ball_eq; intro e.
+set (e2 := ((1#2) * e)%Qpos).
+set (d := QposInf_min (mu f e2) (mu g e2)).
+setoid_replace e with (e2 + e2)%Qpos by (subst e2; QposRing).
+apply ball_triangle with (b := f (Cunit (approximate x d))).
++ apply (UniformContinuity.uc_prf f).
+  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_l | apply ball_ex_approx_r].
++ rewrite A. apply (UniformContinuity.uc_prf g).
+  apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_r | apply ball_ex_approx_l].
+Qed.
+
 Section Faster.
 
 Variable X : MetricSpace.
