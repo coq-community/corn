@@ -1,7 +1,7 @@
 Require Import
   QArith
   theory.setoids (* Equiv Prop *) theory.products
-  stdlib_rationals Qinf Qpossec QposInf QnonNeg abstract_algebra QType_rationals additional_operations.
+  stdlib_rationals (*Qinf*) Qpossec (*QposInf*) (*QnonNeg*) abstract_algebra QType_rationals additional_operations.
 (*Import (*QnonNeg.notations*) QArith.*)
 Require Import Qauto QOrderedType.
 (*Require Import orders.*)
@@ -81,7 +81,9 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 Instance Qinf_one : One Qinf := 1%Q.
 *)
 
-Instance Qinf_lt : Lt Qinf := Qinf.lt.
+Instance Qinf_lt : Lt Qinf.
+Admitted.
+(* := Qinf.lt.*)
 
 (*
 Ltac mc_simpl := unfold
@@ -266,15 +268,58 @@ Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
 pose proof (uc_pos f mu e e_pos) as ?.
 destruct (mu e); [apply mspc_eq; trivial | apply mspc_inf].
+admit.
 Qed.
 
 End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
 
-Class Map (A : Type -> Type -> Type) := map : forall X Y, A X Y -> X -> Y.
+Class Map (A X Y : Type) := map : A -> X -> Y.
 
-Instance : Map UniformlyContinuous.
+Instance uniformly_continuous_map `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
+  Map (UniformlyContinuous X Y) X Y := λ f, f.
+
+Section FunctionMetricSpace.
+
+Context `{NonEmpty X, ExtMetricSpaceClass Y, Map T X Y}.
+
+Global Instance func_space_ball : MetricSpaceBall T :=
+  λ e f g, forall x, ball e (map f x) (map g x).
+
+Lemma FuncBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
+Proof.
+intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
+split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
+Qed.
+
+Global Instance : ExtMetricSpaceClass T.
+Proof.
+match goal with | H : NonEmpty X |- _ => destruct H as [x0] end.
+constructor.
++ apply FuncBallProper.
++ intros f g x; apply mspc_inf.
++ intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
++ intros e e_nonneg f x; now apply mspc_refl.
++ intros e f g A x; now apply mspc_symm.
++ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := g x).
++ intros e f g A x. apply mspc_closed; intros d A1. now apply A.
+Qed.
+
+End FunctionMetricSpace.
+
+(*Section Test.
+
+Context `{ExtMetricSpaceClass X} `{ExtMetricSpaceClass Y}.
+Context `{NonEmpty X}.
+
+Check _ : MetricSpaceBall (UniformlyContinuous X Y).
+Require Import CRtrans.
+SearchAbout CR "min".
+Check _ : MetricSpaceBall (X -> Y).
+
+Goal forall `{ExtMetricSpaceClass X} `{ExtMetricSpaceClass Y},
+  ExtMetricSpaceClass (UniformlyContinuous X Y).*)
 
 Section LocalUniformContinuity.
 
