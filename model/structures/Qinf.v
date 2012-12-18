@@ -45,17 +45,17 @@ Proof.
  now rewrite E, F.
 Qed.
 
-Definition lt (x y : Qinf) : Prop :=
+Definition lt (x y : T) : Prop :=
 match x, y with
-| Qinf.finite a, Qinf.finite b => Qlt a b
-| Qinf.finite _, Qinf.infinite => True
-| Qinf.infinite, _ => False
+| finite a, finite b => Qlt a b
+| finite _, infinite => True
+| infinite, _ => False
 end.
 
 Instance: Proper (=) lt.
 Proof.
 intros [x1 |] [x2 |] A1 [y1 |] [y2 |] A2; revert A1 A2;
-unfold Qinf.eq, Q_eq, equiv; simpl; intros A1 A2;
+unfold eq, Q_eq, equiv; simpl; intros A1 A2;
 try contradiction; try reflexivity.
 rewrite A1, A2; reflexivity.
 Qed.

@@ -181,7 +181,7 @@ Proof.
  induction s; induction t; induction u; try contradiction; simpl; auto with *.
   intros; transitivity x0; assumption.
  intros [H0 [H1 H2]] [H3 [H4 H5]].
- repeat split; eauto with *.
+ repeat split; [rewrite H0 | |]; eauto.
 Qed.
 (* begin hide *)
 Hint Resolve StepF_Qeq_refl StepF_Qeq_sym StepF_Qeq_trans.
