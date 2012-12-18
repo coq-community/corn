@@ -1,7 +1,7 @@
 Require Import
   QArith
   theory.setoids (* Equiv Prop *) theory.products
-  stdlib_rationals (*Qinf*) Qpossec (*QposInf*) (*QnonNeg*) abstract_algebra QType_rationals additional_operations.
+  stdlib_rationals Qinf (*Qpossec QposInf QnonNeg*) abstract_algebra QType_rationals additional_operations.
 (*Import (*QnonNeg.notations*) QArith.*)
 Require Import Qauto QOrderedType.
 (*Require Import orders.*)
@@ -302,7 +302,7 @@ constructor.
 + intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
 + intros e e_nonneg f x; now apply mspc_refl.
 + intros e f g A x; now apply mspc_symm.
-+ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := g x).
++ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := map g x).
 + intros e f g A x. apply mspc_closed; intros d A1. now apply A.
 Qed.
 
