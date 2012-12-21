@@ -1,6 +1,6 @@
 Require Import CRArith CRtrans CRconst Qmetric Utf8.
-Require Import ProductMetric CompleteProduct CPoly_Newton.
-Require Import metric2.Classified.
+Require Import ProductMetric CompleteProduct (*CPoly_Newton*).
+Require Import (*metric2.*)Classified.
 
 Notation "X × Y" := (ProductMS X Y) (at level 40).
 Notation "f >> g" := (Cbind_slow f ∘ g) (at level 50).

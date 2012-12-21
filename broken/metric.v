@@ -1,7 +1,8 @@
 Require Import
   QArith
   theory.setoids (* Equiv Prop *) theory.products
-  stdlib_rationals Qinf (*Qpossec QposInf QnonNeg*) abstract_algebra QType_rationals additional_operations.
+  stdlib_rationals (*Qinf*) (*Qpossec QposInf QnonNeg*) abstract_algebra QType_rationals additional_operations.
+Require Qinf.
 (*Import (*QnonNeg.notations*) QArith.*)
 Require Import Qauto QOrderedType.
 (*Require Import orders.*)
@@ -81,9 +82,7 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 Instance Qinf_one : One Qinf := 1%Q.
 *)
 
-Instance Qinf_lt : Lt Qinf.
-Admitted.
-(* := Qinf.lt.*)
+Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
 (*
 Ltac mc_simpl := unfold
@@ -239,6 +238,44 @@ Qed.
 
 End SubMetricSpace.
 
+(** We define [Map T X Y] if there is a coercion map from T to (X -> Y),
+i.e., T is a type of functions. It can be instatiated with (locally)
+uniformly continuous function, (locally) Lipschitz functions, contractions
+and so on. For instances T of [Map] we can define supremum metric ball
+(i.e., L∞ metric) and prove that T is a metric space. [Map T X Y] is
+similar to [Cast T (X -> Y)], but [cast] has types as explicit arguments,
+so for [f : T] one would have to write [cast _ _ f x] instead of [map f x]. *)
+
+Class Map (T X Y : Type) := map : T -> X -> Y.
+
+Section FunctionMetricSpace.
+
+Context `{NonEmpty X, ExtMetricSpaceClass Y, Map T X Y}.
+
+Global Instance Linf_metric_space_ball : MetricSpaceBall T :=
+  λ e f g, forall x, ball e (map f x) (map g x).
+
+Lemma FuncBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
+Proof.
+intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
+split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
+Qed.
+
+Global Instance Linf_metric_space_class : ExtMetricSpaceClass T.
+Proof.
+match goal with | H : NonEmpty X |- _ => destruct H as [x0] end.
+constructor.
++ apply FuncBallProper.
++ intros f g x; apply mspc_inf.
++ intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
++ intros e e_nonneg f x; now apply mspc_refl.
++ intros e f g A x; now apply mspc_symm.
++ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := map g x).
++ intros e f g A x. apply mspc_closed; intros d A1. now apply A.
+Qed.
+
+End FunctionMetricSpace.
+
 Section UniformContinuity.
 
 Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
@@ -268,58 +305,14 @@ Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
 pose proof (uc_pos f mu e e_pos) as ?.
 destruct (mu e); [apply mspc_eq; trivial | apply mspc_inf].
-admit.
 Qed.
 
 End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
 
-Class Map (A X Y : Type) := map : A -> X -> Y.
-
 Instance uniformly_continuous_map `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
   Map (UniformlyContinuous X Y) X Y := λ f, f.
-
-Section FunctionMetricSpace.
-
-Context `{NonEmpty X, ExtMetricSpaceClass Y, Map T X Y}.
-
-Global Instance func_space_ball : MetricSpaceBall T :=
-  λ e f g, forall x, ball e (map f x) (map g x).
-
-Lemma FuncBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
-Proof.
-intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
-split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
-Qed.
-
-Global Instance : ExtMetricSpaceClass T.
-Proof.
-match goal with | H : NonEmpty X |- _ => destruct H as [x0] end.
-constructor.
-+ apply FuncBallProper.
-+ intros f g x; apply mspc_inf.
-+ intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
-+ intros e e_nonneg f x; now apply mspc_refl.
-+ intros e f g A x; now apply mspc_symm.
-+ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := map g x).
-+ intros e f g A x. apply mspc_closed; intros d A1. now apply A.
-Qed.
-
-End FunctionMetricSpace.
-
-(*Section Test.
-
-Context `{ExtMetricSpaceClass X} `{ExtMetricSpaceClass Y}.
-Context `{NonEmpty X}.
-
-Check _ : MetricSpaceBall (UniformlyContinuous X Y).
-Require Import CRtrans.
-SearchAbout CR "min".
-Check _ : MetricSpaceBall (X -> Y).
-
-Goal forall `{ExtMetricSpaceClass X} `{ExtMetricSpaceClass Y},
-  ExtMetricSpaceClass (UniformlyContinuous X Y).*)
 
 Section LocalUniformContinuity.
 
@@ -421,7 +414,20 @@ intros x r. constructor; [now apply (lip_nonneg f) |].
 intros [x1 x1b] [x2 x2b] e A. change (ball (L * e) (f x1) (f x2)). now apply lip_prf.
 Qed.
 
+Record LocallyLipschitz := {
+  llip_func :> X -> Y;
+  llip_const : X -> Q -> Q;
+  llip_proof : IsLocallyLipschitz llip_func llip_const
+}.
+
 End LocallyLipschitz.
+
+Global Arguments LocallyLipschitz X {_} Y {_}.
+
+Instance locally_lipschitz_map `{MetricSpaceClass X, ExtMetricSpaceClass Y} :
+  Map (LocallyLipschitz X Y) X Y := λ f, f.
+
+Notation "X LL-> Y" := (LocallyLipschitz X Y) (at level 55, right associativity).
 
 Section Contractions.
 
@@ -450,43 +456,6 @@ Proof. apply _. Qed.*)
 End Contractions.
 
 Global Arguments Contraction X {_} Y {_}.
-
-Section UCFMetricSpace.
-
-Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
-
-Instance UCFEquiv : Equiv (UniformlyContinuous X Y) := @equiv (X -> Y) _.
-
-Lemma UCFSetoid : Setoid (UniformlyContinuous X Y).
-Proof.
-constructor.
-intros f x y A. now rewrite A.
-intros f g A1 x y A2; rewrite A2; symmetry; now apply A1.
-intros f g h A1 A2 x y A3; rewrite A3; now transitivity (g y); [apply A1 | apply A2].
-Qed.
-
-Global Instance UCFSpaceBall : MetricSpaceBall (UniformlyContinuous X Y) :=
-  λ e f g, forall x, ball e (f x) (g x).
-
-Lemma UCFBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
-Proof.
-intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
-split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
-Qed.
-
-Global Instance : `{NonEmpty X} -> ExtMetricSpaceClass (UniformlyContinuous X Y).
-Proof.
-intros [x0]; constructor.
-+ apply UCFBallProper.
-+ intros f g x; apply mspc_inf.
-+ intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
-+ intros e e_nonneg f x; now apply mspc_refl.
-+ intros e f g A x; now apply mspc_symm.
-+ intros e1 e2 f g h A1 A2 x; now apply mspc_triangle with (b := g x).
-+ intros e f g A x. apply mspc_closed; intros d A1. now apply A.
-Qed.
-
-End UCFMetricSpace.
 
 Section CompleteMetricSpace.
 
