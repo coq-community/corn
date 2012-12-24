@@ -238,6 +238,34 @@ Qed.
 
 End SubMetricSpace.
 
+Section ProductMetricSpace.
+
+Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
+
+Global Instance Linf_product_metric_space_ball : MetricSpaceBall (X * Y) :=
+  λ e a b, ball e (fst a) (fst b) /\ ball e (snd a) (snd b).
+
+Lemma product_ball_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
+Proof.
+intros e1 e2 A1 a1 a2 A2 b1 b2 A3.
+unfold mspc_ball, Linf_product_metric_space_ball.
+rewrite A1, A2, A3; reflexivity.
+Qed.
+
+Global Instance Linf_product_metric_space_class : ExtMetricSpaceClass (X * Y).
+Proof.
+constructor.
++ apply product_ball_proper.
++ intros x y; split; apply mspc_inf.
++ intros e e_neg x y [A _]. eapply (@mspc_negative X); eauto.
++ intros e e_nonneg x; split; apply mspc_refl; trivial.
++ intros e a b [A1 A2]; split; apply mspc_symm; trivial.
++ intros e1 e2 a b c [A1 A2] [B1 B2]; split; eapply mspc_triangle; eauto.
++ intros e a b A; split; apply mspc_closed; firstorder.
+Qed.
+
+End ProductMetricSpace.
+
 (** We define [Map T X Y] if there is a coercion map from T to (X -> Y),
 i.e., T is a type of functions. It can be instatiated with (locally)
 uniformly continuous function, (locally) Lipschitz functions, contractions
@@ -252,20 +280,20 @@ Section FunctionMetricSpace.
 
 Context `{NonEmpty X, ExtMetricSpaceClass Y, Map T X Y}.
 
-Global Instance Linf_metric_space_ball : MetricSpaceBall T :=
+Global Instance Linf_func_metric_space_ball : MetricSpaceBall T :=
   λ e f g, forall x, ball e (map f x) (map g x).
 
-Lemma FuncBallProper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
+Lemma func_ball_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
 Proof.
 intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
 split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
 Qed.
 
-Global Instance Linf_metric_space_class : ExtMetricSpaceClass T.
+Global Instance Linf_func_metric_space_class : ExtMetricSpaceClass T.
 Proof.
 match goal with | H : NonEmpty X |- _ => destruct H as [x0] end.
 constructor.
-+ apply FuncBallProper.
++ apply func_ball_proper.
 + intros f g x; apply mspc_inf.
 + intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
 + intros e e_nonneg f x; now apply mspc_refl.
@@ -456,6 +484,21 @@ Proof. apply _. Qed.*)
 End Contractions.
 
 Global Arguments Contraction X {_} Y {_}.
+
+Section ProductSpaces.
+
+Context `{ExtMetricSpaceClass X}.
+
+Definition diag (x : X) : X * X := (x, x).
+
+Global Instance diag_lipschitz : IsUniformlyContinuous diag (λ e, e).
+Proof.
+constructor.
++ auto.
++ intros e x1 x2 e_pos A; now split.
+Qed.
+
+End ProductSpaces.
 
 Section CompleteMetricSpace.
 
