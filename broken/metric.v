@@ -82,6 +82,7 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 Instance Qinf_one : One Qinf := 1%Q.
 *)
 
+Instance Qinf_le : Le Qinf := Qinf.le.
 Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
 (*
@@ -193,6 +194,14 @@ Proof.
 intros q1 q2 A1 x y A2.
 apply (mspc_triangle' q1 (q2 - q1) y); [ring | trivial |]. apply mspc_refl.
 apply (order_preserving (+ (-q1))) in A1. now rewrite plus_negate_r in A1.
+Qed.
+
+Lemma mspc_monotone' :
+  ∀ q1 q2 : Qinf, q1 ≤ q2 -> ∀ x y : X, ball q1 x y → ball q2 x y.
+Proof.
+intros [q1 |] [q2 |] A1 x y A2; try apply mspc_inf.
++ apply (mspc_monotone q1); trivial.
++ elim A1.
 Qed.
 
 Lemma mspc_eq : ∀ x y : X, (∀ e : Q, 0 < e -> ball e x y) ↔ x = y.
@@ -339,7 +348,25 @@ End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
 
-Instance uniformly_continuous_map `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
+Global Instance compose_uc {X Y Z : Type}
+  `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y, ExtMetricSpaceClass Z}
+  (f : X -> Y) (g : Y -> Z) (f_mu g_mu : Q -> Qinf)
+  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} :
+    IsUniformlyContinuous (g ∘ f) (comp_inf f_mu g_mu Qinf.infinite).
+Proof.
+constructor.
++ intros e e_pos. assert (0 < g_mu e) by (apply (uc_pos g); trivial).
+  unfold comp_inf. destruct (g_mu e); [apply (uc_pos f) |]; trivial.
++ intros e x1 x2 e_pos A. unfold compose. apply (uc_prf g g_mu); trivial.
+  assert (0 < g_mu e) by (apply (uc_pos g); trivial).
+  unfold comp_inf in A. destruct (g_mu e) as [e' |]; [| apply mspc_inf].
+  apply (uc_prf f f_mu); trivial.
+Qed.
+
+Global Instance id_uc `{ExtMetricSpaceClass X} : IsUniformlyContinuous id id.
+Proof. constructor; trivial. Qed.
+
+Global Instance uniformly_continuous_map `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
   Map (UniformlyContinuous X Y) X Y := λ f, f.
 
 Section LocalUniformContinuity.
@@ -485,20 +512,95 @@ End Contractions.
 
 Global Arguments Contraction X {_} Y {_}.
 
+Global Instance : PreOrder Qinf.le.
+Proof.
+constructor.
++ intros [x |]; [apply Qle_refl | easy].
++ intros [x |] [y |] [z |]; solve [intros [] | intros _ [] | easy | apply Qle_trans].
+Qed.
+
+Global Instance : AntiSymmetric Qinf.le.
+Proof.
+intros [x |] [y |] A B; [apply Qle_antisym | elim B | elim A |]; easy.
+Qed.
+
+Global Instance : PartialOrder Qinf.le.
+Proof. constructor; apply _. Qed.
+
+Global Instance : TotalRelation Qinf.le.
+Proof.
+intros [x |] [y |]; [change (x ≤ y \/ y ≤ x); apply total, _ | left | right | left]; easy.
+Qed.
+
+Global Instance : TotalOrder Qinf.le.
+Proof. constructor; apply _. Qed.
+
+Global Instance : ∀ x y : Qinf, Decision (x ≤ y).
+intros [x |] [y |]; [change (Decision (x ≤ y)); apply _ | left | right | left]; easy.
+Defined.
+
+Import minmax.
+
+(* Instances above allow using min and max for Qinf *)
+
+Section TotalOrderLattice.
+
+Context `{TotalOrder A} `{Lt A} `{∀ x y: A, Decision (x ≤ y)}.
+
+Lemma min_ind (R : relation A) (x y z : A) : R z x → R z y → R z (min x y).
+Proof. unfold min, sort. destruct (decide_rel le x y); auto. Qed.
+
+End TotalOrderLattice.
+
 Section ProductSpaces.
 
-Context `{ExtMetricSpaceClass X}.
+Definition diag `{ExtMetricSpaceClass X} (x : X) : X * X := (x, x).
 
-Definition diag (x : X) : X * X := (x, x).
-
-Global Instance diag_lipschitz : IsUniformlyContinuous diag (λ e, e).
+Global Instance diag_uc `{ExtMetricSpaceClass X} : IsUniformlyContinuous diag (λ e, e).
 Proof.
 constructor.
 + auto.
 + intros e x1 x2 e_pos A; now split.
 Qed.
 
+Lemma t : forall x y : Q, meet x x = x.
+intros x y.
+apply idempotency. apply binary_idempotent.
+Qed.
+
+Definition together {X1 Y1 X2 Y2 : Type} (f1 : X1 -> Y1) (f2 : X2 -> Y2) : X1 * X2 -> Y1 * Y2 :=
+  λ p, (f1 (fst p), f2 (snd p)).
+
+Global Instance together_uc
+  `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
+   (f1 : X1 -> Y1) (f2 : X2 -> Y2)
+  `{!IsUniformlyContinuous f1 mu1, !IsUniformlyContinuous f2 mu2} :
+     IsUniformlyContinuous (together f1 f2) (λ e, min (mu1 e) (mu2 e)).
+Proof.
+constructor.
++ intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
+  (* [trivial] solves, in particular, [IsUniformlyContinuous f1 mu1], which should
+     have been solved automatically *)
++ intros e z z' e_pos [A1 A2]. split; simpl.
+  - apply (uc_prf f1 mu1); trivial.
+    apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_l | trivial].
+  - apply (uc_prf f2 mu2); trivial.
+    apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_r | trivial].
+Qed.
+
 End ProductSpaces.
+
+(*
+Section Test.
+
+Context `{ExtMetricSpaceClass A, ExtMetricSpaceClass B, ExtMetricSpaceClass C}
+  (f : A -> B) `{!IsUniformlyContinuous f f_mu}
+  (v : A * B -> C) `{!IsUniformlyContinuous v v_mu}.
+
+Check _ : IsUniformlyContinuous (v ∘ (together id f) ∘ diag) _.
+
+End Test.
+*)
 
 Section CompleteMetricSpace.
 
