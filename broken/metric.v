@@ -275,22 +275,22 @@ Qed.
 
 End ProductMetricSpace.
 
-(** We define [Map T X Y] if there is a coercion map from T to (X -> Y),
+(** We define [Func T X Y] if there is a coercion func from T to (X -> Y),
 i.e., T is a type of functions. It can be instatiated with (locally)
 uniformly continuous function, (locally) Lipschitz functions, contractions
-and so on. For instances T of [Map] we can define supremum metric ball
-(i.e., L∞ metric) and prove that T is a metric space. [Map T X Y] is
+and so on. For instances T of [Func] we can define supremum metric ball
+(i.e., L∞ metric) and prove that T is a metric space. [Func T X Y] is
 similar to [Cast T (X -> Y)], but [cast] has types as explicit arguments,
-so for [f : T] one would have to write [cast _ _ f x] instead of [map f x]. *)
+so for [f : T] one would have to write [cast _ _ f x] instead of [func f x]. *)
 
-Class Map (T X Y : Type) := map : T -> X -> Y.
+Class Func (T X Y : Type) := func : T -> X -> Y.
 
 Section FunctionMetricSpace.
 
-Context `{NonEmpty X, ExtMetricSpaceClass Y, Map T X Y}.
+Context `{NonEmpty X, ExtMetricSpaceClass Y, Func T X Y}.
 
 Global Instance Linf_func_metric_space_ball : MetricSpaceBall T :=
-  λ e f g, forall x, ball e (map f x) (map g x).
+  λ e f g, forall x, ball e (func f x) (func g x).
 
 Lemma func_ball_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
 Proof.
@@ -307,7 +307,7 @@ constructor.
 + intros e e_neg f g A. specialize (A x0). eapply mspc_negative; eauto.
 + intros e e_nonneg f x; now apply mspc_refl.
 + intros e f g A x; now apply mspc_symm.
-+ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := map g x).
++ intros e1 e2 f g h A1 A2 x. now apply mspc_triangle with (b := func g x).
 + intros e f g A x. apply mspc_closed; intros d A1. now apply A.
 Qed.
 
@@ -366,8 +366,8 @@ Qed.
 Global Instance id_uc `{ExtMetricSpaceClass X} : IsUniformlyContinuous id id.
 Proof. constructor; trivial. Qed.
 
-Global Instance uniformly_continuous_map `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
-  Map (UniformlyContinuous X Y) X Y := λ f, f.
+Global Instance uniformly_continuous_func `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
+  Func (UniformlyContinuous X Y) X Y := λ f, f.
 
 Section LocalUniformContinuity.
 
@@ -479,8 +479,8 @@ End LocallyLipschitz.
 
 Global Arguments LocallyLipschitz X {_} Y {_}.
 
-Instance locally_lipschitz_map `{MetricSpaceClass X, ExtMetricSpaceClass Y} :
-  Map (LocallyLipschitz X Y) X Y := λ f, f.
+Instance locally_lipschitz_func `{MetricSpaceClass X, ExtMetricSpaceClass Y} :
+  Func (LocallyLipschitz X Y) X Y := λ f, f.
 
 Notation "X LL-> Y" := (LocallyLipschitz X Y) (at level 55, right associativity).
 
@@ -692,9 +692,7 @@ Context `{NonEmpty X, ExtMetricSpaceClass X, CompleteMetricSpaceClass Y}.
 Program Definition pointwise_regular
   (F : RegularFunction (UniformlyContinuous X Y)) (x : X) : RegularFunction Y :=
   Build_RegularFunction (λ e, F e x) _.
-Next Obligation.
-intros e1 e2 e1_pos e2_pos; now apply F.
-Qed.
+Next Obligation. intros e1 e2 e1_pos e2_pos; now apply F. Qed.
 
 Global Program Instance ucf_limit : Limit (UniformlyContinuous X Y) :=
   λ F, Build_UniformlyContinuous
@@ -721,8 +719,8 @@ Qed.
 Global Instance : CompleteMetricSpaceClass (UniformlyContinuous X Y).
 Proof.
 apply completeness_criterion. intros F e e_pos x.
-change (lim F x) with (lim (pointwise_regular F x)).
-change (F e x) with (pointwise_regular F x e).
+change (func (lim F) x) with (lim (pointwise_regular F x)).
+change (func (F e) x) with (pointwise_regular F x e).
 now apply completeness_criterion.
 Qed.
 
@@ -810,7 +808,7 @@ Lemma iter_fixpoint
   (forall n : nat, x (S n) = f (x n)) -> seq_lim x a N -> f a = a.
 Proof.
 intros A1 A2; generalize A2; intro A3. apply seq_lim_S in A2. apply (seq_lim_cont f) in A3.
-mc_setoid_replace (x ∘ S) with (f ∘ x) in A2 by (intros ? ? eqmn; rewrite eqmn; apply A1).
+setoid_replace (@compose nat nat X x S) with (@compose nat X X f x) in A2. by (intros ? ? eqmn; rewrite eqmn; apply A1).
 eapply seq_lim_unique; eauto.
 Qed.
 
