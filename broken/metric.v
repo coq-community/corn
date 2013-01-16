@@ -287,12 +287,18 @@ Class Func (T X Y : Type) := func : T -> X -> Y.
 
 Section FunctionMetricSpace.
 
-Context `{NonEmpty X, ExtMetricSpaceClass Y, Func T X Y}.
+Context {X Y T : Type} `{Func T X Y, NonEmpty X, ExtMetricSpaceClass Y}.
+
+(* For any type that is convertible to functions we want to define the
+supremum metric. This would give rise to an equality and a setoid
+([mspc_equiv] and [mspc_setoid]).However, a type of functions also gets an
+equality using [ext_equiv]. We want the second method to have a priority
+for some type (X -> Y). Therefore *)
 
 Global Instance Linf_func_metric_space_ball : MetricSpaceBall T :=
   λ e f g, forall x, ball e (func f x) (func g x).
 
-Lemma func_ball_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball.
+Lemma func_ball_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) (ball (X := T)).
 Proof.
 intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
 split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
@@ -728,7 +734,7 @@ End UCFComplete.
 
 Definition seq A := nat -> A.
 
-(*Hint Unfold seq : typeclass_instances.*)
+Hint Unfold seq : typeclass_instances.
 (* This unfolds [seq X] as [nat -> X] and allows ext_equiv to find an
 instance of [Equiv (seq X)] *)
 
@@ -739,7 +745,7 @@ Context `{ExtMetricSpaceClass X}.
 Definition seq_lim (x : seq X) (a : X) (N : Q -> nat) :=
   forall e : Q, 0 < e -> forall n : nat, N e ≤ n -> ball e (x n) a.
 
-Global Instance : Proper (((=) ==> (=)) ==> (=) ==> ((=) ==> (=)) ==> iff) seq_lim.
+(*Global Instance : Proper (((=) ==> (=)) ==> (=) ==> ((=) ==> (=)) ==> iff) seq_lim.
 Proof.
 intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
 + mc_setoid_replace (x2 n) with (x1 n) by (symmetry; now apply A1).
@@ -748,7 +754,14 @@ intros x1 x2 A1 a1 a2 A2 N1 N2 A3; split; intros A e e_pos n A4.
 + mc_setoid_replace (x1 n) with (x2 n) by now apply A1.
   rewrite A2. mc_setoid_replace (N1 e) with (N2 e) in A4 by now apply A3.
   now apply A.
-Qed.
+Qed.*)
+
+(* The following instance uses Leibniz equality for the third argument of
+seq_lim, i.e., the modulus of type [Q -> nat]. This is because extensional
+equality = is not reflexive on functions: [f = f] iff [f] is a morphism.
+And we need reflexivity when we replace the first argument of seq_lim and
+leave the third one unchanged. Do we need the previous instance with
+extensional equality for the third argument? *)
 
 Global Instance : Proper (((=) ==> (=)) ==> (=) ==> (≡) ==> iff) seq_lim.
 Proof.
@@ -808,7 +821,7 @@ Lemma iter_fixpoint
   (forall n : nat, x (S n) = f (x n)) -> seq_lim x a N -> f a = a.
 Proof.
 intros A1 A2; generalize A2; intro A3. apply seq_lim_S in A2. apply (seq_lim_cont f) in A3.
-setoid_replace (@compose nat nat X x S) with (@compose nat X X f x) in A2. by (intros ? ? eqmn; rewrite eqmn; apply A1).
+setoid_replace (x ∘ S) with (f ∘ x) in A2 by (intros ? ? eqmn; rewrite eqmn; apply A1).
 eapply seq_lim_unique; eauto.
 Qed.
 

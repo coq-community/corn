@@ -655,7 +655,7 @@ Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
 Proof.
 intros w_nn A. rewrite <- (riemann_sum_const a w m n). unfold riemann_sum.
 rewrite <- (step_mult w n), <- (Qmult_assoc n _ e), <- (positive_nat_Z n).
-apply CRΣ_gball. intros k A1. apply gball_CRmult_Q_nonneg; [now apply step_nonneg |].
+apply CRΣ_gball. intros k A1. apply CRball.gball_CRmult_Q_nonneg; [now apply step_nonneg |].
 apply A. split; [apply index_inside_l | apply index_inside_r]; trivial.
 Qed.
 
@@ -753,6 +753,28 @@ End IntegralOfSum.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
+(* In theory.rings, we have
+
+[rings.plus_assoc : ... Associative plus]
+
+and
+
+[rings.plus_comm : ... Commutative plus].
+
+One difference is that [Commutative] is defined directly while
+[Associative] is defined through [HeteroAssociative]. For this or some
+other reason, rewriting [rings.plus_comm] works while rewriting
+[rings.plus_assoc] does not. Interestingly, all arguments before x y z in
+[rings.plus_assoc] are implicit, and when we make [R] explicit, rewriting
+works. However, in this case [rewrite] leaves a goal [SemiRing R], which is
+not solved by [trivial], [auto] or [easy], but only by [apply _]. If
+[rings.plus_assoc] is formulated as [x + (y + z) = (x + y) + z] instead of
+[Associative plus], then rewriting works; however, then it cannot be an
+instance (of [Associative]). Make this change in theory.rings? *)
+
+Lemma plus_assoc `{SemiRing R} : forall (x y z : R), x + (y + z) = (x + y) + z.
+Proof. exact simple_associativity. Qed.
+
 Section RingFacts.
 
 Context `{Ring R}.
@@ -767,7 +789,7 @@ which is solved by [apply _]. Why is it left? *)
 Qed.
 
 Lemma plus_right_cancel (z x y : R) : x + z = y + z <-> x = y.
-Proof. rewrite (plus_comm x z), (plus_comm y z); apply plus_left_cancel. Qed.
+Proof. rewrite (rings.plus_comm x z), (rings.plus_comm y z); apply plus_left_cancel. Qed.
 
 Lemma plus_eq_minus (x y z : R) : x + y = z <-> x = z - y.
 Proof.
@@ -840,15 +862,15 @@ destruct (decide (a ≤ c)) as [AC | AC].
 + idtac...
 + assert (A : a ≤ c) by (now transitivity b); elim (AC A).
 + apply minus_eq_plus; symmetry...
-+ rewrite minus_eq_plus, (plus_comm (-integrate _ _ _)), <- plus_eq_minus, (plus_comm (integrate _ _ _))...
-+ rewrite (plus_comm (-integrate _ _ _)), minus_eq_plus, (plus_comm (integrate _ _ _)); symmetry...
-+ rewrite (plus_comm (-integrate _ _ _)), minus_eq_plus, (plus_comm (-integrate _ _ _)), <- plus_eq_minus...
++ rewrite minus_eq_plus, (rings.plus_comm (-integrate _ _ _)), <- plus_eq_minus, (rings.plus_comm (integrate _ _ _))...
++ rewrite (rings.plus_comm (-integrate _ _ _)), minus_eq_plus, (rings.plus_comm (integrate _ _ _)); symmetry...
++ rewrite (rings.plus_comm (-integrate _ _ _)), minus_eq_plus, (rings.plus_comm (-integrate _ _ _)), <- plus_eq_minus...
 + assert (b ≤ a) by (now apply orders.le_flip); assert (B : b ≤ c) by (now transitivity a); elim (BC B).
-+ rewrite <- rings.negate_plus_distr, negate_inj, (plus_comm (integrate _ _ _))...
++ rewrite <- rings.negate_plus_distr, negate_inj, (rings.plus_comm (integrate _ _ _))...
 Qed.
 
 Lemma int_diff (a b c : Q) : int a b - int a c = int c b.
-Proof. apply minus_eq_plus. rewrite plus_comm. symmetry; apply int_add. Qed.
+Proof. apply minus_eq_plus. rewrite rings.plus_comm. symmetry; apply int_add. Qed.
 
 Lemma int_zero_width (a : Q) : int a a = 0.
 Proof. apply (plus_right_cancel (int a a)); rewrite rings.plus_0_l; apply int_add. Qed.
@@ -954,6 +976,91 @@ intros a r r_nonneg. constructor.
 Qed.
 
 End IntegralLipschitz.
+
+Import minmax.
+
+(*Global Instance Qball_decidable (r : Qinf) (a x : Q) : Decision (mspc_ball r a x).
+destruct r as [r |]; [| now left].
+apply (decision_proper (Qabs (a - x) <= r)%Q); [symmetry; apply gball_Qabs | apply _].
+Defined.*)
+
+Section AbsFacts.
+
+Context `{Ring R} `{!FullPseudoSemiRingOrder Rle Rlt} `{!Abs R}.
+
+(* Should this be made a Class? It seems particular and complicated *)
+Definition abs_cases_statement (P : R -> Prop) :=
+  Proper (equiv ==> iff) P -> (forall x, Stable (P x)) ->
+    forall x : R, (0 ≤ x -> P x) /\ (x ≤ 0 -> P (- x)) -> P (abs x).
+
+Context `(abs_cases : forall P : R -> Prop, abs_cases_statement P)
+        `{le_stable : forall x y : R, Stable (x ≤ y)}.
+
+Lemma abs_nonneg' (x : R) : 0 ≤ abs x.
+Proof.
+apply abs_cases.
++ intros y1 y2 E; now rewrite E.
++ apply _.
++ split; [trivial |]. intros ?; now apply rings.flip_nonpos_negate.
+Qed.
+
+End AbsFacts.
+
+Lemma Qabs_cases : forall P : Q -> Prop, abs_cases_statement P.
+Proof.
+intros P Pp Ps x [? ?].
+destruct (decide (0 ≤ x)) as [A | A];
+  [rewrite abs.abs_nonneg | apply le_flip in A; rewrite abs.abs_nonpos]; auto.
+(* [easy] instead of [auto] does not work *)
+Qed.
+
+Lemma Qabs_nonneg (x : Q) : 0 ≤ abs x.
+Proof. apply abs_nonneg'; [apply Qabs_cases | apply _]. Qed.
+
+Section Extend.
+
+Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg) (f : sig (mspc_ball r a) -> Y).
+
+Program Definition extend : Q -> Y :=
+  λ x, if (decide (x ≤ a - r))
+       then f (a - r)
+       else if (decide (a + r ≤ x))
+            then f (a + r)
+            else f x.
+Next Obligation.
+destruct r as [e ?]; simpl.
+apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
+change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
+Qed.
+
+Next Obligation.
+destruct r as [e ?]; simpl.
+apply gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
+change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
+Qed.
+
+Next Obligation.
+apply gball_Qabs, Qabs_diff_Qle. apply le_flip in H1; apply le_flip in H2.
+split; trivial.
+Qed.
+
+Global Instance extend_uc `{!IsUniformlyContinuous f f_mu} :
+  IsUniformlyContinuous extend f_mu.
+Admitted.
+
+End Extend.
+
+Section Picard.
+
+Context (x0 y0 : Q) (rx ry : QnonNeg).
+
+Notation sx := (sig (mspc_ball rx x0)).
+Notation sy := (sig (mspc_ball ry y0)).
+
+Context (v : sx * sy -> CR) `{!IsUniformlyContinuous v v_mu}.
+
+Definition picard' (f : sx -> sy) : sx -> CR :=
+  λ x, y0 + int (extend x0 rx (v ∘ (together id f) ∘ diag)) x0 x.
 
 (*
 Lemma integrate_proper
