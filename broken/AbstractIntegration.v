@@ -24,7 +24,7 @@ Ltac done :=
    | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
 
 Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+(*Open Local Scope uc_scope.*)
 Open Local Scope CR_scope.
 
 (* [SearchAbout ((Cmap _ _) (Cunit _)).] does not find anything, but it
@@ -977,7 +977,7 @@ Qed.
 
 End IntegralLipschitz.
 
-Import minmax.
+Import minmax (*Coq.Program.*)Basics.
 
 (*Global Instance Qball_decidable (r : Qinf) (a x : Q) : Decision (mspc_ball r a x).
 destruct r as [r |]; [| now left].
@@ -1016,51 +1016,6 @@ Qed.
 
 Lemma Qabs_nonneg (x : Q) : 0 ≤ abs x.
 Proof. apply abs_nonneg'; [apply Qabs_cases | apply _]. Qed.
-
-Section Extend.
-
-Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg) (f : sig (mspc_ball r a) -> Y).
-
-Program Definition extend : Q -> Y :=
-  λ x, if (decide (x ≤ a - r))
-       then f (a - r)
-       else if (decide (a + r ≤ x))
-            then f (a + r)
-            else f x.
-Next Obligation.
-destruct r as [e ?]; simpl.
-apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
-change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
-Qed.
-
-Next Obligation.
-destruct r as [e ?]; simpl.
-apply gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
-change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
-Qed.
-
-Next Obligation.
-apply gball_Qabs, Qabs_diff_Qle. apply le_flip in H1; apply le_flip in H2.
-split; trivial.
-Qed.
-
-Global Instance extend_uc `{!IsUniformlyContinuous f f_mu} :
-  IsUniformlyContinuous extend f_mu.
-Admitted.
-
-End Extend.
-
-Section Picard.
-
-Context (x0 y0 : Q) (rx ry : QnonNeg).
-
-Notation sx := (sig (mspc_ball rx x0)).
-Notation sy := (sig (mspc_ball ry y0)).
-
-Context (v : sx * sy -> CR) `{!IsUniformlyContinuous v v_mu}.
-
-Definition picard' (f : sx -> sy) : sx -> CR :=
-  λ x, y0 + int (extend x0 rx (v ∘ (together id f) ∘ diag)) x0 x.
 
 (*
 Lemma integrate_proper

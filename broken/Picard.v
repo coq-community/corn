@@ -1,3 +1,69 @@
+Require Import
+  QArith
+  metric FromMetric2 AbstractIntegration SimpleIntegration.
+
+Section Extend.
+
+Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg) (f : sig (mspc_ball r a) -> Y).
+
+Program Definition extend : Q -> Y :=
+  λ x, if (decide (x ≤ a - r))
+       then f (a - r)
+       else if (decide (a + r ≤ x))
+            then f (a + r)
+            else f x.
+Next Obligation.
+destruct r as [e ?]; simpl.
+apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
+change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
+Qed.
+
+Next Obligation.
+destruct r as [e ?]; simpl.
+apply gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
+change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
+Qed.
+
+Next Obligation.
+apply gball_Qabs, Qabs_diff_Qle. apply le_flip in H1; apply le_flip in H2.
+split; trivial.
+Qed.
+
+Global Instance extend_uc `{!IsUniformlyContinuous f f_mu} :
+  IsUniformlyContinuous extend f_mu.
+Admitted.
+
+End Extend.
+
+Section Picard.
+
+Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
+
+Notation sx := (sig (mspc_ball rx x0)).
+Notation sy := (sig (mspc_ball ry y0)).
+
+Context (v : sx * sy -> CR) `{!IsUniformlyContinuous v v_mu}
+(f : sx -> sy) `{!IsUniformlyContinuous f f_mu}.
+
+(*Check _ : MetricSpaceBall
+                                  (@sig Q
+                                     (@mspc_ball Q
+                                        (msp_mspc_ball Q_as_MetricSpace)
+                                        (Qinf.finite (QnonNeg.to_Q rx)) x0)).
+Check _ : MetricSpaceBall sx.
+
+Check (@diag sx _ _).*)
+
+Variable x : sx.
+
+Check _ : Integral (v ∘ (together Datatypes.id f) ∘ diag) _.
+
+Definition picard' (f : sx -> sy) (*: sx -> CR*) :=
+  λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 (`x).
+
+
+
+(*
 Require Import CRArith CRtrans CRconst Qmetric Utf8.
 Require Import ProductMetric CompleteProduct (*CPoly_Newton*).
 Require Import (*metric2.*)Classified.
@@ -70,3 +136,4 @@ Time Eval vm_compute in (eval 3 (picard 1 1)).
 Time Eval vm_compute in (eval 2 (picard 2 1)).
 
 End example.
+*)
