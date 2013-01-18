@@ -158,9 +158,9 @@ Qed.
 (* end hide *)
 Definition Q_as_MetricSpace : MetricSpace :=
 @Build_MetricSpace QS _ Qball_wd Q_is_MetricSpace.
-(* begin hide *)
+
 Canonical Structure Q_as_MetricSpace.
-(* end hide *)
+
 Lemma QPrelengthSpace_help : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:QS), ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
 Proof with auto with *.
  intros e d1 d2 He a b c Hab Hc.

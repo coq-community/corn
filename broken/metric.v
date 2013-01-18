@@ -369,9 +369,6 @@ constructor.
   apply (uc_prf f f_mu); trivial.
 Qed.
 
-Global Instance id_uc `{ExtMetricSpaceClass X} : IsUniformlyContinuous id id.
-Proof. constructor; trivial. Qed.
-
 Global Instance uniformly_continuous_func `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
   Func (UniformlyContinuous X Y) X Y := λ f, f.
 
@@ -422,6 +419,7 @@ End LocalUniformContinuity.
 
 Section Lipschitz.
 
+(* Should the codomain be EXtMetricSpaceClass? *)
 Context `{MetricSpaceClass X, MetricSpaceClass Y}.
 
 Class IsLipschitz (f : X -> Y) (L : Q) := {
@@ -459,6 +457,25 @@ constructor.
 Qed.
 
 End Lipschitz.
+
+Global Instance compose_lip {X Y Z : Type}
+  `{MetricSpaceClass X, MetricSpaceClass Y, MetricSpaceClass Z}
+  (f : X -> Y) (g : Y -> Z) (Lf Lg : Q)
+  `{!IsLipschitz f Lf, !IsLipschitz g Lg} :
+    IsLipschitz (g ∘ f) (Lg * Lf).
+Proof.
+constructor.
++ apply nonneg_mult_compat; [apply (lip_nonneg g), _ | apply (lip_nonneg f), _].
++ intros x1 x2 e A.
+  (* [rewrite <- mult_assoc] does not work *)
+  mc_setoid_replace (Lg * Lf * e) with (Lg * (Lf * e)) by (symmetry; apply simple_associativity).
+  now apply (lip_prf g Lg), (lip_prf f Lf).
+Qed.
+
+Global Instance id_lip `{MetricSpaceClass X} : IsLipschitz id 1.
+Proof.
+constructor; [solve_propholds |]. intros; now rewrite mult_1_l.
+Qed.
 
 Section LocallyLipschitz.
 

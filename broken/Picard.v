@@ -1,6 +1,19 @@
 Require Import
-  QArith
-  metric FromMetric2 AbstractIntegration SimpleIntegration.
+ Unicode.Utf8 Program
+ CRArith CRabs
+ Qauto Qround Qmetric
+ (*stdlib_omissions.P
+ stdlib_omissions.Z
+ stdlib_omissions.Q
+ stdlib_omissions.N*).
+
+Require Qinf QnonNeg QnnInf CRball.
+Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
+
+Require Import metric FromMetric2 AbstractIntegration SimpleIntegration.
+Require Import canonical_names decision setoid_tactics.
+
+Close Scope uc_scope. (* There is a leak in some module *)
 
 Section Extend.
 
@@ -14,18 +27,18 @@ Program Definition extend : Q -> Y :=
             else f x.
 Next Obligation.
 destruct r as [e ?]; simpl.
-apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
+apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
 change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
 Next Obligation.
 destruct r as [e ?]; simpl.
-apply gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
+apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
 change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
 Next Obligation.
-apply gball_Qabs, Qabs_diff_Qle. apply le_flip in H1; apply le_flip in H2.
+apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle. apply orders.le_flip in H1; apply orders.le_flip in H2.
 split; trivial.
 Qed.
 
@@ -56,9 +69,9 @@ Check (@diag sx _ _).*)
 
 Variable x : sx.
 
-Check _ : Integral (v ∘ (together Datatypes.id f) ∘ diag) _.
+Check _ : Integral (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
 
-Definition picard' (f : sx -> sy) (*: sx -> CR*) :=
+Definition picard' (*f : sx -> sy*) : sx -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 (`x).
 
 
