@@ -575,30 +575,24 @@ Proof. unfold min, sort. destruct (decide_rel le x y); auto. Qed.
 
 End TotalOrderLattice.
 
-Section ProductSpaces.
+Section ProductSpaceFunctions.
 
-Definition diag `{ExtMetricSpaceClass X} (x : X) : X * X := (x, x).
+Definition diag {X : Type} (x : X) : X * X := (x, x).
 
-Global Instance diag_uc `{ExtMetricSpaceClass X} : IsUniformlyContinuous diag (λ e, e).
+Global Instance diag_lip `{MetricSpaceClass X} : IsLipschitz (@diag X) 1.
 Proof.
 constructor.
-+ auto.
-+ intros e x1 x2 e_pos A; now split.
-Qed.
-
-Lemma t : forall x y : Q, meet x x = x.
-intros x y.
-apply idempotency. apply binary_idempotent.
++ solve_propholds.
++ intros x1 x2 e A. rewrite mult_1_l. now split.
 Qed.
 
 Definition together {X1 Y1 X2 Y2 : Type} (f1 : X1 -> Y1) (f2 : X2 -> Y2) : X1 * X2 -> Y1 * Y2 :=
   λ p, (f1 (fst p), f2 (snd p)).
 
-Global Instance together_uc
-  `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
+Global Instance together_lip
+  `{MetricSpaceClass X1, MetricSpaceClass Y1, MetricSpaceClass X2, MetricSpaceClass Y2}
    (f1 : X1 -> Y1) (f2 : X2 -> Y2)
-  `{!IsUniformlyContinuous f1 mu1, !IsUniformlyContinuous f2 mu2} :
-     IsUniformlyContinuous (together f1 f2) (λ e, min (mu1 e) (mu2 e)).
+  `{!IsLipschitz f1 L1, !IsLipschitz f2 L2} : IsLipschitz (together f1 f2) (max L1 L2).
 Proof.
 constructor.
 + intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
@@ -611,7 +605,7 @@ constructor.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_r | trivial].
 Qed.
 
-End ProductSpaces.
+End ProductSpaceFunctions.
 
 (*
 Section Test.
