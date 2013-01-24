@@ -211,19 +211,20 @@ intros x y; split; intro A.
 + intros e e_pos. apply (mspc_monotone 0); trivial; solve_propholds.
 Qed.
 
+Lemma radius_nonneg (x y : X) (e : Q) : ball e x y -> 0 ≤ e.
+Proof.
+intro A. destruct (le_or_lt 0 e) as [A1 | A1]; [trivial |].
+contradict A; now apply mspc_negative.
+Qed.
+
 End ExtMetricSpace.
 
 Section MetricSpace.
 
 Context `{MetricSpaceClass X}.
 
-Lemma msd_nonneg : forall x1 x2 : X, 0 ≤ msd x1 x2.
-Proof.
-intros x1 x2.
-assert (A := mspc_distance x1 x2).
-destruct (le_or_lt 0 (msd x1 x2)) as [A1 | A1]; trivial.
-contradict A; now apply mspc_negative.
-Qed.
+Lemma msd_nonneg (x1 x2 : X) : 0 ≤ msd x1 x2.
+Proof. apply (radius_nonneg x1 x2), mspc_distance. Qed.
 
 End MetricSpace.
 
@@ -592,9 +593,31 @@ Definition together {X1 Y1 X2 Y2 : Type} (f1 : X1 -> Y1) (f2 : X2 -> Y2) : X1 * 
 Global Instance together_lip
   `{MetricSpaceClass X1, MetricSpaceClass Y1, MetricSpaceClass X2, MetricSpaceClass Y2}
    (f1 : X1 -> Y1) (f2 : X2 -> Y2)
-  `{!IsLipschitz f1 L1, !IsLipschitz f2 L2} : IsLipschitz (together f1 f2) (max L1 L2).
+  `{!IsLipschitz f1 L1, !IsLipschitz f2 L2} : IsLipschitz (together f1 f2) (join L1 L2).
+(* What if we define the Lipschitz constant for [together f1 f2] to be [max
+L1 L2], where [max] is the name of an instance of [Join A] in
+orders.minmax? In fact, [Check _ : Join Q] returns [max]. I.e., [join x y]
+for [x y : Q] reduces to [max x y]. However, it is difficult to apply
+[lattices.join_le_compat_r] to the goal [0 ≤ max L1 L2]. Simple [apply]
+does not work (probably because the theorem has to be reduced to match the
+goal). As for [apply:] and [rapply], they invoke [refine (@join_le_compat_r
+_ _ ...)]. Some of the _ are implicit arguments and type classes (e.g.,
+[Equiv] [Le]), and they are instantiated with the instances found first,
+which happen to be for [Qinf]. Apparently, unification does not try other
+instances. So, [apply:] with type classes is problematic.
+[apply: (@lattices.join_le_compat_r Q)] gives "Anomaly: Evd.define: cannot define an evar twice" *)
 Proof.
 constructor.
++ apply lattices.join_le_compat_r, (lip_nonneg f1 L1).
++ intros x1 x2 e [A1 A2].
+  assert (0 ≤ e) by now apply (radius_nonneg (fst x1) (fst x2)).
+  split; simpl.
+  - apply (mspc_monotone (L1 * e)); [apply (order_preserving (.* e)); apply join_ub_l |].
+    (* [apply (order_preserving (.* e)), join_ub_l.] does not work *)
+    apply lip_prf; trivial.
+  - apply (mspc_monotone (L2 * e)); [apply (order_preserving (.* e)); apply join_ub_r |].
+    apply lip_prf; trivial.
+(* Proof of [IsUniformlyContinuous (together f1 f2) _].
 + intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
   (* [trivial] solves, in particular, [IsUniformlyContinuous f1 mu1], which should
      have been solved automatically *)
@@ -603,6 +626,7 @@ constructor.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_l | trivial].
   - apply (uc_prf f2 mu2); trivial.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_r | trivial].
+*)
 Qed.
 
 End ProductSpaceFunctions.
