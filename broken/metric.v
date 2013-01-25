@@ -322,7 +322,7 @@ End FunctionMetricSpace.
 
 Section UniformContinuity.
 
-Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Class IsUniformlyContinuous (f : X -> Y) (mu : Q -> Qinf) := {
   uc_pos : forall e : Q, 0 < e -> (0 < mu e);
@@ -344,7 +344,8 @@ UniformlyContinuous], in order for uc_func f to be considered a morphism,
 we need to declare uc_proof an instance. *)
 Global Existing Instance uc_proof.
 
-Global Instance uc_proper `{IsUniformlyContinuous f mu} : Proper ((=) ==> (=)) f.
+Global Instance uc_proper {_ : ExtMetricSpaceClass X} {_ : ExtMetricSpaceClass Y}
+  `{IsUniformlyContinuous f mu} :  Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
 pose proof (uc_pos f mu e e_pos) as ?.
@@ -355,8 +356,11 @@ End UniformContinuity.
 
 Global Arguments UniformlyContinuous X {_} Y {_}.
 
+(* In [compose_uc] below, if we don't explicitly specify [Z] as an
+argument, then [`{MetricSpaceBall Z}] does not generalize [Z] but rather
+interprets it as integers. For symmetry we specify [X] and [Y] as well. *)
 Global Instance compose_uc {X Y Z : Type}
-  `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y, ExtMetricSpaceClass Z}
+  `{MetricSpaceBall X, ExtMetricSpaceClass Y, MetricSpaceBall Z}
   (f : X -> Y) (g : Y -> Z) (f_mu g_mu : Q -> Qinf)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} :
     IsUniformlyContinuous (g ∘ f) (comp_inf f_mu g_mu Qinf.infinite).
@@ -370,12 +374,12 @@ constructor.
   apply (uc_prf f f_mu); trivial.
 Qed.
 
-Global Instance uniformly_continuous_func `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} :
+Global Instance uniformly_continuous_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (UniformlyContinuous X Y) X Y := λ f, f.
 
 Section LocalUniformContinuity.
 
-Context `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}.
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
   f ∘ @proj1_sig _ _.
@@ -392,7 +396,9 @@ intros x r. constructor; [now apply (uc_pos f) |].
 intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
 Qed.
 
-Global Instance luc_proper (f : X -> Y) `{!IsLocallyUniformlyContinuous f lmu} : Proper ((=) ==> (=)) f.
+Global Instance luc_proper
+  {_ : ExtMetricSpaceClass X} {_ : ExtMetricSpaceClass Y}
+  (f : X -> Y) `{!IsLocallyUniformlyContinuous f lmu} : Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos.
 assert (A1 : ball 1%Q x1 x1) by (apply mspc_refl; Qauto_nonneg).
@@ -420,8 +426,7 @@ End LocalUniformContinuity.
 
 Section Lipschitz.
 
-(* Should the codomain be EXtMetricSpaceClass? *)
-Context `{MetricSpaceClass X, MetricSpaceClass Y}.
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Class IsLipschitz (f : X -> Y) (L : Q) := {
   lip_nonneg : 0 ≤ L;
@@ -440,7 +445,16 @@ Record Lipschitz := {
 Definition lip_modulus (L e : Q) : Qinf :=
   if (decide (L = 0)) then Qinf.infinite else e / L.
 
-Global Instance lip_uc `(IsLipschitz f L) : IsUniformlyContinuous f (lip_modulus L).
+(* It is nice to declare only [MetricSpaceBall X] above because this is all
+we need to know about X to define [IsLipschitz]. But for the following
+theorem we also need [ExtMetricSpaceClass X], [MetricSpaceDistance X] and
+[MetricSpaceClass X]. How to add these assumptions? Saying [`{MetricSpaceClass X}]
+would add a second copy of [MetricSpaceBall X]. *)
+
+Context {EM : ExtMetricSpaceClass X} {m : MetricSpaceDistance X}.
+
+Global Instance lip_uc {_ : MetricSpaceClass X} {_ : ExtMetricSpaceClass Y} `(IsLipschitz f L) :
+  IsUniformlyContinuous f (lip_modulus L).
 Proof.
 constructor.
 + intros e A.
@@ -459,8 +473,11 @@ Qed.
 
 End Lipschitz.
 
+(* We need [ExtMetricSpaceClass Z] because we rewrite the ball radius, so
+[mspc_radius_proper] is required. See comment before [compose_uc] for why
+[{X Y Z : Type}] is necessary. *)
 Global Instance compose_lip {X Y Z : Type}
-  `{MetricSpaceClass X, MetricSpaceClass Y, MetricSpaceClass Z}
+  `{MetricSpaceBall X, MetricSpaceBall Y, ExtMetricSpaceClass Z}
   (f : X -> Y) (g : Y -> Z) (Lf Lg : Q)
   `{!IsLipschitz f Lf, !IsLipschitz g Lg} :
     IsLipschitz (g ∘ f) (Lg * Lf).
@@ -473,14 +490,15 @@ constructor.
   now apply (lip_prf g Lg), (lip_prf f Lf).
 Qed.
 
-Global Instance id_lip `{MetricSpaceClass X} : IsLipschitz id 1.
+(* [ExtMetricSpaceClass X] is needed for rewriting *)
+Global Instance id_lip `{ExtMetricSpaceClass X} : IsLipschitz id 1.
 Proof.
 constructor; [solve_propholds |]. intros; now rewrite mult_1_l.
 Qed.
 
 Section LocallyLipschitz.
 
-Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
   llip_prf : forall (x : X) (r : Q), 0 ≤ r -> IsLipschitz (restrict f x r) (L x r).
@@ -503,14 +521,14 @@ End LocallyLipschitz.
 
 Global Arguments LocallyLipschitz X {_} Y {_}.
 
-Instance locally_lipschitz_func `{MetricSpaceClass X, ExtMetricSpaceClass Y} :
+Instance locally_lipschitz_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (LocallyLipschitz X Y) X Y := λ f, f.
 
 Notation "X LL-> Y" := (LocallyLipschitz X Y) (at level 55, right associativity).
 
 Section Contractions.
 
-Context `{MetricSpaceClass X, ExtMetricSpaceClass Y}.
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Class IsContraction (f : X -> Y) (q : Q) := {
   contr_prf :> IsLipschitz f q;
@@ -580,7 +598,7 @@ Section ProductSpaceFunctions.
 
 Definition diag {X : Type} (x : X) : X * X := (x, x).
 
-Global Instance diag_lip `{MetricSpaceClass X} : IsLipschitz (@diag X) 1.
+Global Instance diag_lip `{ExtMetricSpaceClass X} : IsLipschitz (@diag X) 1.
 Proof.
 constructor.
 + solve_propholds.
@@ -591,7 +609,7 @@ Definition together {X1 Y1 X2 Y2 : Type} (f1 : X1 -> Y1) (f2 : X2 -> Y2) : X1 * 
   λ p, (f1 (fst p), f2 (snd p)).
 
 Global Instance together_lip
-  `{MetricSpaceClass X1, MetricSpaceClass Y1, MetricSpaceClass X2, MetricSpaceClass Y2}
+  `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
    (f1 : X1 -> Y1) (f2 : X2 -> Y2)
   `{!IsLipschitz f1 L1, !IsLipschitz f2 L2} : IsLipschitz (together f1 f2) (join L1 L2).
 (* What if we define the Lipschitz constant for [together f1 f2] to be [max
@@ -609,8 +627,11 @@ instances. So, [apply:] with type classes is problematic.
 Proof.
 constructor.
 + apply lattices.join_le_compat_r, (lip_nonneg f1 L1).
-+ intros x1 x2 e [A1 A2].
-  assert (0 ≤ e) by now apply (radius_nonneg (fst x1) (fst x2)).
++ intros z1 z2 e [A1 A2].
+  (* Below we prove [0 ≤ e] using [radius_nonneg], which requires
+  [ExtMetricSpaceClass]. Another way is to add the assymption [0 ≤ e] to
+  [lip_prf], sinilar to [uc_prf]. *)
+  assert (0 ≤ e) by now apply (radius_nonneg (fst z1) (fst z2)).
   split; simpl.
   - apply (mspc_monotone (L1 * e)); [apply (order_preserving (.* e)); apply join_ub_l |].
     (* [apply (order_preserving (.* e)), join_ub_l.] does not work *)
@@ -645,7 +666,7 @@ End Test.
 
 Section CompleteMetricSpace.
 
-Context `{ExtMetricSpaceClass X}.
+Context `{MetricSpaceBall X}.
 
 Class IsRegularFunction (f : Q -> X) : Prop :=
   rf_prf : forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f e1) (f e2).
@@ -661,6 +682,8 @@ Global Existing Instance rf_proof.
 
 Global Instance rf_eq : Equiv RegularFunction :=
   λ f1 f2, forall e1 e2 : Q, 0 < e1 -> 0 < e2 -> ball (e1 + e2) (f1 e1) (f2 e2).
+
+Context {EM : ExtMetricSpaceClass X}.
 
 Global Instance rf_setoid : Setoid RegularFunction.
 Proof.

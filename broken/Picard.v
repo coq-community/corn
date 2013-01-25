@@ -15,6 +15,11 @@ Require Import canonical_names decision setoid_tactics.
 
 Close Scope uc_scope. (* There is a leak in some module *)
 
+Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
+
+Global Instance Qmsc : MetricSpaceClass Q.
+Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
+
 Section Extend.
 
 Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg) (f : sig (mspc_ball r a) -> Y).
@@ -42,8 +47,7 @@ apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle. apply orders.le_flip in H1; apply ord
 split; trivial.
 Qed.
 
-Global Instance extend_uc `{!IsUniformlyContinuous f f_mu} :
-  IsUniformlyContinuous extend f_mu.
+Global Instance extend_lip `{!IsLipschitz f L} : IsLipschitz extend L.
 Admitted.
 
 End Extend.
@@ -55,23 +59,9 @@ Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
 Notation sx := (sig (mspc_ball rx x0)).
 Notation sy := (sig (mspc_ball ry y0)).
 
-Context (v : sx * sy -> CR) `{!IsUniformlyContinuous v v_mu}
-(f : sx -> sy) `{!IsUniformlyContinuous f f_mu}.
+Context (v : sx * sy -> CR) `{!IsLipschitz v Lv}.
 
-(*Check _ : MetricSpaceBall
-                                  (@sig Q
-                                     (@mspc_ball Q
-                                        (msp_mspc_ball Q_as_MetricSpace)
-                                        (Qinf.finite (QnonNeg.to_Q rx)) x0)).
-Check _ : MetricSpaceBall sx.
-
-Check (@diag sx _ _).*)
-
-Variable x : sx.
-
-Check _ : Integral (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
-
-Definition picard' (*f : sx -> sy*) : sx -> CR :=
+Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : sx -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 (`x).
 
 
