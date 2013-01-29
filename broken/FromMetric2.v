@@ -122,4 +122,16 @@ Qed.
 
 End CompleteSegment.
 
+(* The following has to be generalized from CR to a metric space where
+[ball r x y] is defined as [abs (x - y) ≤ r], probably a normed vector
+space *)
+Global Instance sum_lip `{MetricSpaceBall X}
+  (f g : X -> CR) `{!IsLipschitz f Lf} `{!IsLipschitz g Lg} :
+  IsLipschitz (f +1 g) (Lf + Lg).
+Proof.
+constructor.
++ pose proof (lip_nonneg f Lf); pose proof (lip_nonneg g Lg); change (0 ≤ Lf + Lg);
+  solve_propholds.
++ intros x1 x2 e A.
+
 End QField.
