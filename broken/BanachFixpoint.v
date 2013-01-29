@@ -199,8 +199,6 @@ end.
   - intros; apply mspc_symm; now apply A.
 Qed.
 
-SearchAbout (?x = ?y ∨ ?x < ?y).
-
 Let a := lim (reg_fun x _ cauchy_x).
 
 Lemma banach_fixpoint : f a = a.

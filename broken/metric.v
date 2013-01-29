@@ -630,7 +630,7 @@ constructor.
 + intros z1 z2 e [A1 A2].
   (* Below we prove [0 ≤ e] using [radius_nonneg], which requires
   [ExtMetricSpaceClass]. Another way is to add the assymption [0 ≤ e] to
-  [lip_prf], sinilar to [uc_prf]. *)
+  [lip_prf], similar to [uc_prf]. *)
   assert (0 ≤ e) by now apply (radius_nonneg (fst z1) (fst z2)).
   split; simpl.
   - apply (mspc_monotone (L1 * e)); [apply (order_preserving (.* e)); apply join_ub_l |].
