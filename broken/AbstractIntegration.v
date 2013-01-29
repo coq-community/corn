@@ -583,8 +583,6 @@ Qed.
 
 Add Ring CR_ring : (rings.stdlib_ring_theory CR).
 
-Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
-
 Lemma cmΣ_empty {M : CMonoid} (f : nat -> M) : cmΣ 0 f = [0].
 Proof. reflexivity. Qed.
 
