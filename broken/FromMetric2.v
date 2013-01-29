@@ -122,6 +122,13 @@ Qed.
 
 End CompleteSegment.
 
+Require Import CRArith CRball CRabs.
+
+Add Ring CR : (stdlib_ring_theory CR).
+
+Close Scope CR_scope.
+Unset Printing Coercions.
+
 (* The following has to be generalized from CR to a metric space where
 [ball r x y] is defined as [abs (x - y) ≤ r], probably a normed vector
 space *)
@@ -132,6 +139,9 @@ Proof.
 constructor.
 + pose proof (lip_nonneg f Lf); pose proof (lip_nonneg g Lg); change (0 ≤ Lf + Lg);
   solve_propholds.
-+ intros x1 x2 e A.
++ intros x1 x2 e A. change (Lf + Lg)%Q with (Lf + Lg). rewrite plus_mult_distr_r.
+  apply CRgball_plus; [now apply: (lip_prf f Lf) | now apply: (lip_prf g Lg)].
+Qed.
 
 End QField.
+

@@ -93,7 +93,7 @@ Proof.
  induction n; [reflexivity |].
  intros.
  rewrite Q.S_Qplus.
- setoid_replace ((n+1) * e)%Q with (e + n * e)%Q by ring.
+ setoid_replace ((n + 1) * e)%Q with (e + n * e)%Q by ring.
  unfold cmΣ. simpl @cm_Sum.
  apply CRgball_plus; auto.
 Qed.

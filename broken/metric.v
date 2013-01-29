@@ -546,6 +546,16 @@ Record Contraction := {
   contr_proof : IsContraction contr_func contr_const
 }.
 
+Global Instance const_contr `{!ExtMetricSpaceClass Y} (c : Y) : IsContraction (λ x : X, c) 0.
+Proof.
+constructor.
++ constructor.
+  - reflexivity.
+  - intros; apply mspc_refl.
+    rewrite mult_0_l; reflexivity.
++ solve_propholds.
+Qed.
+
 (* Do we need the following?
 
 Global Instance contr_to_uc `(IsContraction f q) :

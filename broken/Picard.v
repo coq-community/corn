@@ -52,6 +52,9 @@ Admitted.
 
 End Extend.
 
+(* To be moved to metric.v *)
+Global Arguments Lipschitz X {_} Y {_}.
+
 Section Picard.
 
 Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
@@ -63,6 +66,12 @@ Context (v : sx * sy -> CR) `{!IsLipschitz v Lv}.
 
 Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : sx -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 (`x).
+
+(*Set Printing Coercions.
+Variable f : Lipschitz sx sy. Check f : sx -> sy. Check _ : IsLipschitz f _.*)
+
+(*Program Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR :=
+  Build_Lipschitz (picard' f) _ _.*)
 
 
 
