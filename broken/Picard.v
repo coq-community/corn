@@ -8,12 +8,15 @@ Require Import
  stdlib_omissions.N*).
 
 Require Qinf QnonNeg QnnInf CRball.
-Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
+Import
+  QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
+  Qabs propholds.
 
 Require Import metric FromMetric2 AbstractIntegration SimpleIntegration.
 Require Import canonical_names decision setoid_tactics.
 
 Close Scope uc_scope. (* There is a leak in some module *)
+Open Scope signature_scope. (* To interpret "==>" *)
 
 Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
 
@@ -22,25 +25,57 @@ Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
 
 Section Extend.
 
-Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg) (f : sig (mspc_ball r a) -> Y).
+Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg).
+
+(* Sould [r] be [Q] or [QnonNeg]? If [r : Q], then [extend] below is not
+necessarily continuous. This may be OK because we could add the premise [0
+≤ r] to the lemma that says that [extend] is Lipschitz. However, the
+definition below is not well-typed because if [r < 0], then [ball r a (a -
+r)] is false, so we can't apply [f] to [a - r]. So we assume [r : QnonNeg]. *)
+
+Lemma mspc_ball_edge_l : mspc_ball r a (a - to_Q r).
+Admitted.
+
+Lemma mspc_ball_edge_r : mspc_ball r a (a + to_Q r).
+Admitted.
+
+Notation S := (sig (mspc_ball r a)).
+
+(* We need to know that [f : S -> Y] is a morphism in the sense that [f x]
+depends only on [`x = proj1_sig x] and not on [proj2_sig x]. There are two options.
+
+There are at least two equalities on S: [canonical_names.sig_equiv] and
+[metric.mspc_equiv]. *)
+
+Context (f : S -> Y) (*`{!Proper ((@equiv _ (sig_equiv _))  ==> (=)) f}*).
+
+(* Since the following is a Program Definition, we could write [f (a - r)]
+and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
+would depend on x and [H1 : x ≤ a - r] even though they are not used in the
+proof. So, if [x1 ≤ a - r] and [x2 ≤ a - r], then [extend x1] would reduce
+to [f ((a - r) ↾ extend_obligation_1 x1 H1)] and [extend x2] would reduce
+to [f ((a - r) ↾ extend_obligation_1 x2 H2)]. To apply mspc_refl, we would
+need to prove that these applications of f are equal, i.e., f is a morphism
+that does not depend on the second component of the pair. So instead we
+prove mspc_ball_edge_l and mspc_ball_edge_r, which don't depend on x. *)
 
 Program Definition extend : Q -> Y :=
   λ x, if (decide (x ≤ a - r))
-       then f (a - r)
+       then f ((a - r) ↾ mspc_ball_edge_l)
        else if (decide (a + r ≤ x))
-            then f (a + r)
-            else f x.
-Next Obligation.
-destruct r as [e ?]; simpl.
+            then f ((a + r) ↾ mspc_ball_edge_r)
+            else f (x ↾ _).
+(*Next Obligation. exact ball_edge_l. Qed.
+(*destruct r as [e ?]; simpl.
 apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
 change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
-Qed.
+Qed.*)
 
-Next Obligation.
-destruct r as [e ?]; simpl.
+Next Obligation. exact ball_edge_r. Qed.
+(*destruct r as [e ?]; simpl.
 apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
 change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
-Qed.
+Qed.*)*)
 
 Next Obligation.
 apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle. apply orders.le_flip in H1; apply orders.le_flip in H2.
@@ -48,7 +83,16 @@ split; trivial.
 Qed.
 
 Global Instance extend_lip `{!IsLipschitz f L} : IsLipschitz extend L.
-Admitted.
+Proof.
+constructor; [apply (lip_nonneg f L) |].
+intros x1 x2 e A; unfold extend.
+assert (0 ≤ e) by now apply (radius_nonneg x1 x2).
+assert (0 ≤ L) by apply (lip_nonneg f L).
+destruct (decide (x1 ≤ a - to_Q r)) as [L1 | L1];
+destruct (decide (x2 ≤ a - to_Q r)) as [L2 | L2].
+* apply mspc_refl; solve_propholds.
+* destruct (decide (a + to_Q r ≤ x2)) as [R2 | R2].
+  + apply (lip_prf f L).
 
 End Extend.
 
