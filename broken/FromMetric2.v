@@ -132,6 +132,29 @@ Unset Printing Coercions.
 (* The following has to be generalized from CR to a metric space where
 [ball r x y] is defined as [abs (x - y) ≤ r], probably a normed vector
 space *)
+
+(*Section LocallyLipschitz'.
+
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
+
+Class IsLocallyLipschitz' (f : X -> Y) (L : X -> Q -> Q) :=
+  llip_prf' :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
+
+End LocallyLipschitz'.*)
+
+Global Instance sum_llip `{MetricSpaceBall X}
+  (f g : X -> CR) `{!IsLocallyLipschitz f Lf} `{!IsLocallyLipschitz g Lg} :
+  IsLocallyLipschitz (f +1 g) (λ x r, Lf x r + Lg x r).
+Proof.
+constructor.
++ pose proof (lip_nonneg (restrict f x r) (Lf x r)).
+  pose proof (lip_nonneg (restrict g x r) (Lg x r)). solve_propholds.
++ intros x1 x2 e A. rewrite plus_mult_distr_r.
+  apply CRgball_plus;
+  [now apply: (lip_prf (restrict f x r) _) | now apply: (lip_prf (restrict g x r) _)].
+Qed.
+
+(*
 Global Instance sum_lip `{MetricSpaceBall X}
   (f g : X -> CR) `{!IsLipschitz f Lf} `{!IsLipschitz g Lg} :
   IsLipschitz (f +1 g) (Lf + Lg).
@@ -142,6 +165,7 @@ constructor.
 + intros x1 x2 e A. change (Lf + Lg)%Q with (Lf + Lg). rewrite plus_mult_distr_r.
   apply CRgball_plus; [now apply: (lip_prf f Lf) | now apply: (lip_prf g Lg)].
 Qed.
+*)
 
 End QField.
 

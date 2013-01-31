@@ -18,10 +18,35 @@ Require Import canonical_names decision setoid_tactics.
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
 
+(* The following instances are needed to show that Lipschitz functions are
+uniformly continuous: metric.lip_uc *)
 Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
 
 Global Instance Qmsc : MetricSpaceClass Q.
 Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
+
+(* Should be generalized from Q *)
+Lemma mspc_ball_abs (r x y : Q) : mspc_ball r x y ↔ abs (x - y) ≤ r.
+Proof. apply gball_Qabs. Qed.
+
+Lemma mspc_ball_abs_flip (r x y : Q) : mspc_ball r x y ↔ abs (y - x) ≤ r.
+Proof.
+rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
+Qed.
+
+Lemma nested_balls {x1 x2 y1 y2 e : Q} :
+  mspc_ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> mspc_ball e y1 y2.
+Proof.
+intros B A1 A2 A3. apply mspc_ball_abs_flip in B. apply mspc_ball_abs_flip.
+assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
+rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
+rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
+apply rings.flip_le_minus_l. apply rings.flip_le_minus_l in B.
+transitivity x2; [easy |]. transitivity (e + x1); [easy |].
+apply (orders.order_preserving (e +)); easy.
+Qed. (* Too long? *)
+
+SearchAbout abs Q.
 
 Section Extend.
 
@@ -33,21 +58,21 @@ necessarily continuous. This may be OK because we could add the premise [0
 definition below is not well-typed because if [r < 0], then [ball r a (a -
 r)] is false, so we can't apply [f] to [a - r]. So we assume [r : QnonNeg]. *)
 
-Lemma mspc_ball_edge_l : mspc_ball r a (a - to_Q r).
-Admitted.
+Lemma mspc_ball_edge_l : mspc_ball r a (a - `r).
+Proof.
+destruct r as [e ?]; simpl.
+apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
+change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
+Qed.
 
-Lemma mspc_ball_edge_r : mspc_ball r a (a + to_Q r).
-Admitted.
+Lemma mspc_ball_edge_r : mspc_ball r a (a + `r).
+Proof.
+destruct r as [e ?]; simpl.
+apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
+change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
+Qed.
 
-Notation S := (sig (mspc_ball r a)).
-
-(* We need to know that [f : S -> Y] is a morphism in the sense that [f x]
-depends only on [`x = proj1_sig x] and not on [proj2_sig x]. There are two options.
-
-There are at least two equalities on S: [canonical_names.sig_equiv] and
-[metric.mspc_equiv]. *)
-
-Context (f : S -> Y) (*`{!Proper ((@equiv _ (sig_equiv _))  ==> (=)) f}*).
+Context (f : sig (mspc_ball r a) -> Y).
 
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
@@ -65,39 +90,48 @@ Program Definition extend : Q -> Y :=
        else if (decide (a + r ≤ x))
             then f ((a + r) ↾ mspc_ball_edge_r)
             else f (x ↾ _).
-(*Next Obligation. exact ball_edge_l. Qed.
-(*destruct r as [e ?]; simpl.
-apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
-change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
-Qed.*)
-
-Next Obligation. exact ball_edge_r. Qed.
-(*destruct r as [e ?]; simpl.
-apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
-change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
-Qed.*)*)
-
 Next Obligation.
-apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle. apply orders.le_flip in H1; apply orders.le_flip in H2.
+apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle.
+apply orders.le_flip in H1; apply orders.le_flip in H2.
 split; trivial.
 Qed.
 
 Global Instance extend_lip `{!IsLipschitz f L} : IsLipschitz extend L.
-Proof.
+Proof with (assumption || (apply orders.le_flip; assumption) || reflexivity).
 constructor; [apply (lip_nonneg f L) |].
-intros x1 x2 e A; unfold extend.
+intros x1 x2 e A.
 assert (0 ≤ e) by now apply (radius_nonneg x1 x2).
 assert (0 ≤ L) by apply (lip_nonneg f L).
-destruct (decide (x1 ≤ a - to_Q r)) as [L1 | L1];
-destruct (decide (x2 ≤ a - to_Q r)) as [L2 | L2].
+assert (a - to_Q r ≤ a + to_Q r) by
+  (destruct r; simpl; transitivity a;
+    [apply rings.nonneg_minus_compat | apply semirings.plus_le_compat_r]; (easy || reflexivity)).
+unfold extend.
+destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
 * apply mspc_refl; solve_propholds.
-* destruct (decide (a + to_Q r ≤ x2)) as [R2 | R2].
-  + apply (lip_prf f L).
+* destruct (decide (a + to_Q r ≤ x2));  apply (lip_prf f L).
+  + apply (nested_balls A)...
+  + apply (nested_balls A)...
+* destruct (decide (a + to_Q r ≤ x1)); apply (lip_prf f L).
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
+* destruct (decide (a + to_Q r ≤ x1)); destruct (decide (a + to_Q r ≤ x2));
+  apply (lip_prf f L).
+  + apply mspc_refl; solve_propholds.
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
+  + apply (nested_balls A)...
+  + apply A.
+Qed.
 
 End Extend.
 
-(* To be moved to metric.v *)
-Global Arguments Lipschitz X {_} Y {_}.
+(*Section LocallyLipschitz'.
+
+Context `{MetricSpaceBall X, MetricSpaceBall Y}.
+
+Class IsLocallyLipschitz' (f : X -> Y) (L : X -> Q -> Q) :=
+  llip_prf' :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
+
+End LocallyLipschitz'.*)
 
 Section Picard.
 
@@ -108,14 +142,23 @@ Notation sy := (sig (mspc_ball ry y0)).
 
 Context (v : sx * sy -> CR) `{!IsLipschitz v Lv}.
 
-Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : sx -> CR :=
-  λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 (`x).
+(*Context (f : sx -> sy) `{!IsLipschitz f Lf}.
 
-(*Set Printing Coercions.
-Variable f : Lipschitz sx sy. Check f : sx -> sy. Check _ : IsLipschitz f _.*)
+Check _ : IsLocallyUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.*)
 
-(*Program Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR :=
-  Build_Lipschitz (picard' f) _ _.*)
+Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : Q -> CR :=
+  λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x.
+
+(*
+Variable f : Lipschitz sx sy. Check _ : IsLipschitz f _.
+*)
+
+Program Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR :=
+  Build_Lipschitz (restrict (picard' f) x0 rx) _ _.
+Next Obligation.
+Check _ : IsLipschitz f _. (* does not work, though exactly the same thing above does *)
+Check _ : IsLipschitz (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
+Check _ : IsLipschitz (λ x, int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x) _.
 
 
 

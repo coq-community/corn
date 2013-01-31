@@ -475,6 +475,12 @@ Qed.
 
 End Lipschitz.
 
+(* To be able to say [Lipschitz X Y] instead of [@Lipschitz X _ Y _] *)
+Global Arguments Lipschitz X {_} Y {_}.
+
+(* Allows concluding [IsLipschitz f _] from [f : Lipschitz] *)
+Global Existing Instance lip_proof.
+
 (* We need [ExtMetricSpaceClass Z] because we rewrite the ball radius, so
 [mspc_radius_proper] is required. See comment before [compose_uc] for why
 [{X Y Z : Type}] is necessary. *)
@@ -502,8 +508,14 @@ Section LocallyLipschitz.
 
 Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
+(* Delaring llip_prf below an instance introduces a loop between
+[IsLipschitz] and [IsLocallyLipschitz]. But if we are searching for a proof
+of [IsLipschitz f _] for a specific term [f], then Coq should not enter an
+infinite loop because that would require unifying [f] with [restrict _ _ _].
+We need this instance to apply [lip_nonneg (restrict f x r) _] in order
+to prove [0 ≤ Lf x r] when [IsLocallyLipschitz f Lf]. *)
 Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
-  llip_prf : forall (x : X) (r : Q), 0 ≤ r -> IsLipschitz (restrict f x r) (L x r).
+  llip_prf :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
 
 Global Arguments llip_prf f L {_} x r _.
 
