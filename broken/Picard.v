@@ -150,15 +150,45 @@ Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : Q -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x.
 
 (*
-Variable f : Lipschitz sx sy. Check _ : IsLipschitz f _.
+Variable f : Lipschitz sx sy.
+(*Check _ : IsLipschitz f _.*)
+Check _ : IsLocallyLipschitz (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
+Check _ : Integral (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
+Check _ : Integrable (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
+Check _ : IsLocallyLipschitz (λ x : Q, int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x) _.
+Check _ : IsLocallyLipschitz (picard' f) _. Goal True.
+assert (0 ≤ to_Q rx). apply (proj2_sig rx).
+Check _ : PropHolds (0 ≤ to_Q rx).
+Check _ : IsLipschitz (restrict (picard' f) x0 rx) _.
 *)
 
-Program Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR :=
-  Build_Lipschitz (restrict (picard' f) x0 rx) _ _.
-Next Obligation.
-Check _ : IsLipschitz f _. (* does not work, though exactly the same thing above does *)
-Check _ : IsLipschitz (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
-Check _ : IsLipschitz (λ x, int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x) _.
+Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR.
+assert (0 ≤ to_Q rx) by apply (proj2_sig rx). (* Add this to typeclass_instances? *)
+refine (Build_Lipschitz (restrict (picard' f) x0 rx) _ _).
+Defined.
+
+Variable M : Q.
+
+Hypothesis v_bounded : forall z : sx * sy, v z ≤ 'M.
+
+Hypothesis rx_ry : M * rx ≤ ry.
+
+Lemma picard_sy (f : Lipschitz sx sy) (x : sx) : mspc_ball ry y0 (restrict (picard' f) x0 rx x).
+Proof.
+destruct x as [x x_sx]. change (restrict (picard' f) x0 rx (x ↾ x_sx)) with (picard' f x).
+unfold picard'. apply CRball.gball_CRabs.
+match goal with
+| |- context [int ?g ?x1 ?x2] => change (abs (y0 - (y0 + int g x1 x2)) ≤ '`ry)
+end.
+mc_setoid_replace (y0 -
+      (y0 + int (extend x0 rx (v ∘ together Datatypes.id f ∘ diag)) x0 x))
+with (- int (extend x0 rx (v ∘ together Datatypes.id f ∘ diag)) x0 x).
+
+
+rewrite rings.negate_plus_distr.
+
+
+SearchAbout (- (_ + _)).
 
 
 

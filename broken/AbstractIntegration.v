@@ -945,7 +945,7 @@ Qed.
 
 End IntegralLipschitzBall.
 
-Lemma integral_lipschitz (e : Q) :
+Global Instance integral_lipschitz :
   IsLocallyLipschitz F (λ a r, Qupper_bound (abs (f a)) + L a r * r).
 Proof.
 intros a r r_nonneg. constructor.
