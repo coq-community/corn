@@ -122,16 +122,13 @@ destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
   + apply A.
 Qed.
 
+Lemma extend_inside (x : Q) (A : mspc_ball r a x) : extend x = f (x ↾ A).
+Admitted.
+
 End Extend.
 
-(*Section LocallyLipschitz'.
-
-Context `{MetricSpaceBall X, MetricSpaceBall Y}.
-
-Class IsLocallyLipschitz' (f : X -> Y) (L : X -> Q -> Q) :=
-  llip_prf' :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
-
-End LocallyLipschitz'.*)
+Global Instance : Proper (equiv ==> equiv) (abs (A := CR)).
+Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
 
 Section Picard.
 
@@ -169,9 +166,16 @@ Defined.
 
 Variable M : Q.
 
-Hypothesis v_bounded : forall z : sx * sy, v z ≤ 'M.
+Hypothesis v_bounded : forall z : sx * sy, abs (v z) ≤ 'M.
 
-Hypothesis rx_ry : M * rx ≤ ry.
+Hypothesis rx_ry : `rx * M ≤ ry.
+
+Instance M_nonneg : PropHolds (0 ≤ M).
+Proof.
+assert (Ax : mspc_ball rx x0 x0) by apply mspc_refl, (proj2_sig rx).
+assert (Ay : mspc_ball ry y0 y0) by apply mspc_refl, (proj2_sig ry).
+apply CRle_Qle. transitivity (abs (v (x0 ↾ Ax , y0 ↾ Ay))); [apply CRabs_nonneg | apply v_bounded].
+Qed.
 
 Lemma picard_sy (f : Lipschitz sx sy) (x : sx) : mspc_ball ry y0 (restrict (picard' f) x0 rx x).
 Proof.
@@ -180,16 +184,21 @@ unfold picard'. apply CRball.gball_CRabs.
 match goal with
 | |- context [int ?g ?x1 ?x2] => change (abs (y0 - (y0 + int g x1 x2)) ≤ '`ry)
 end.
-mc_setoid_replace (y0 -
-      (y0 + int (extend x0 rx (v ∘ together Datatypes.id f ∘ diag)) x0 x))
-with (- int (extend x0 rx (v ∘ together Datatypes.id f ∘ diag)) x0 x).
+rewrite rings.negate_plus_distr, plus_assoc, rings.plus_negate_r, rings.plus_0_l, CRabs_negate.
+transitivity ('(abs (x - x0) * M)).
++ apply int_abs_bound. apply _. (* Should not be required *)
+  intros t A.
+  assert (A1 : mspc_ball rx x0 t) by
+    (apply (mspc_ball_convex x0 x); [apply mspc_refl, (proj2_sig rx) | |]; trivial).
+  (* [(extend_inside (A:= A1))]: "Wrong argument name: A" *)
+  rewrite (extend_inside _ _ _ _ A1). apply v_bounded.
++ apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
+  - now apply (orders.order_preserving (.* M)), mspc_ball_abs_flip.
+  - apply rx_ry.
+Qed.
 
 
-rewrite rings.negate_plus_distr.
-
-
-SearchAbout (- (_ + _)).
-
+End Picard.
 
 
 (*
