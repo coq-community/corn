@@ -161,7 +161,7 @@ Check _ : IsLipschitz (restrict (picard' f) x0 rx) _.
 
 Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR.
 assert (0 ≤ to_Q rx) by apply (proj2_sig rx). (* Add this to typeclass_instances? *)
-refine (Build_Lipschitz (restrict (picard' f) x0 rx) _ _).
+apply (Build_Lipschitz (restrict (picard' f) x0 rx) _ _).
 Defined.
 
 Variable M : Q.
@@ -196,6 +196,14 @@ transitivity ('(abs (x - x0) * M)).
   - now apply (orders.order_preserving (.* M)), mspc_ball_abs_flip.
   - apply rx_ry.
 Qed.
+
+Require Import Integration.
+
+(*Program*) Definition picard (f : Lipschitz sx sy) : Lipschitz sx sy.
+let K := (Build_Lipschitz (restrict (picard' f) x0 rx) _ _) in idtac.
+
+assert (IsLipschitz (restrict (picard' f) x0 rx) _).
+  Build_Lipschitz (restrict (picard' f) x0 rx) _ _.
 
 
 End Picard.

@@ -293,9 +293,18 @@ Context {X Y T : Type} `{Func T X Y, NonEmpty X, ExtMetricSpaceClass Y}.
 
 (* For any type that is convertible to functions we want to define the
 supremum metric. This would give rise to an equality and a setoid
-([mspc_equiv] and [mspc_setoid]).However, a type of functions also gets an
-equality using [ext_equiv]. We want the second method to have a priority
-for some type (X -> Y). Therefore *)
+([mspc_equiv] and [mspc_setoid]). Thus, when Coq needs equality on any type
+T at all, it may try to prove that T is a metric space by showing that T is
+convertible to functions, i.e., there is an in instance of [Func T X Y] for
+some types X, Y. This is why we make [Func T X Y] the first assumption
+above. This way, if there is no instance of this class, the search for
+[MetricSpaceBall T] fails quickly and Coq starts looking for an equality on
+T using other means. If we make, for example, [ExtMetricSpaceClass Y] the
+first assumption, Coq may eneter in an infinite loop: To find
+[MetricSpaceBall T] it will look for [ExtMetricSpaceClass Y] for some
+uninstantiated Y, for this in needs [MetricSpaceBall Y] and so on. This is
+all because Coq proves assumptions (i.e., searches instances of classes) in
+the order of the assumptions. *)
 
 Global Instance Linf_func_metric_space_ball : MetricSpaceBall T :=
   λ e f g, forall x, ball e (func f x) (func g x).
