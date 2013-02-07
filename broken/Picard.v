@@ -281,7 +281,7 @@ Definition answer (n : positive) (r : CR) : Z :=
 Program Definition half : sx := 1 # 2.
 Next Obligation. admit. Qed.
 
-Time Compute answer 2 (proj1_sig (picard_iter 3 half)).
+Time Compute answer 2 (proj1_sig (picard_iter 2 half)).
 
 
 
