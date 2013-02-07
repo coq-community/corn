@@ -46,8 +46,6 @@ transitivity x2; [easy |]. transitivity (e + x1); [easy |].
 apply (orders.order_preserving (e +)); easy.
 Qed. (* Too long? *)
 
-SearchAbout abs Q.
-
 Section Extend.
 
 Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg).
@@ -96,6 +94,7 @@ apply orders.le_flip in H1; apply orders.le_flip in H2.
 split; trivial.
 Qed.
 
+(*
 Global Instance extend_lip `{!IsLipschitz f L} : IsLipschitz extend L.
 Proof with (assumption || (apply orders.le_flip; assumption) || reflexivity).
 constructor; [apply (lip_nonneg f L) |].
@@ -121,14 +120,46 @@ destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
   + apply (nested_balls A)...
   + apply A.
 Qed.
+*)
+
+Global Instance extend_uc `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous extend mu_f.
+Admitted.
 
 Lemma extend_inside (x : Q) (A : mspc_ball r a x) : extend x = f (x ↾ A).
 Admitted.
 
 End Extend.
 
+Section Bounded.
+
+Class Bounded {X : Type} (f : X -> CR) (M : Q) := bounded : forall x, abs (f x) ≤ 'M.
+
+Global Instance comp_bounded {X Y : Type} (f : X -> Y) (g : Y -> CR)
+  `{!Bounded g M} : Bounded (g ∘ f) M.
+Proof.
+Admitted.
+
+Global Instance extend_bounded {a : Q} {r : QnonNeg} (f : {x | mspc_ball r a x} -> CR)
+  `{!Bounded f M} : Bounded (extend a r f) M.
+Admitted.
+
+End Bounded.
+
+Global Instance bounded_int_uc
+  `{!Bounded f M} `{!IsLocallyUniformlyContinuous f mu_f} (x0 : Q) :
+  IsUniformlyContinuous (λ x, int f x0 x) (λ e, e / M).
+Admitted.
+
 Global Instance : Proper (equiv ==> equiv) (abs (A := CR)).
 Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
+
+Global Existing Instance luc_prf.
+
+Global Instance sum_luc `{MetricSpaceBall X}
+  (f g : X -> CR) `{!IsUniformlyContinuous f mu_f} `{!IsUniformlyContinuous g mu_g} :
+  IsUniformlyContinuous (f +1 g) (λ e, meet (mu_f (e * (1 # 2))) (mu_g (e * (1 # 2)))).
+Proof.
+Admitted.
 
 Section Picard.
 
@@ -137,18 +168,28 @@ Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
 Notation sx := (sig (mspc_ball rx x0)).
 Notation sy := (sig (mspc_ball ry y0)).
 
-Context (v : sx * sy -> CR) `{!IsLipschitz v Lv}.
+Context (v : sx * sy -> CR) `{!Bounded v M} `{!IsUniformlyContinuous v mu_v} (L : Q).
 
-(*Context (f : sx -> sy) `{!IsLipschitz f Lf}.
+Hypothesis v_lip : forall x : sx, IsLipschitz (λ y, v (x, y)) L.
+
+Hypothesis rx_ry : `rx * M ≤ ry.
+
+(*Check _ : MetricSpaceClass sx.
+Check _ : IsUniformlyContinuous v _.
+
+Context (f : sx -> sy) `{!IsUniformlyContinuous f mu_f}.
+
+Check _ : IsUniformlyContinuous ((@Datatypes.id sx) ∘ (@Datatypes.id sx)) _.
+Check _ : IsUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
 
 Check _ : IsLocallyUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.*)
 
-Definition picard' (f : sx -> sy) `{!IsLipschitz f Lf} : Q -> CR :=
+Definition picard' (f : sx -> sy) `{!IsUniformlyContinuous f mu_f} : Q -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x.
 
 (*
-Variable f : Lipschitz sx sy.
-(*Check _ : IsLipschitz f _.*)
+Variable f : UniformlyContinuous sx sy.
+Check _ : IsUniformlyContinuous f _.
 Check _ : IsLocallyLipschitz (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
 Check _ : Integral (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
 Check _ : Integrable (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
@@ -159,27 +200,23 @@ Check _ : PropHolds (0 ≤ to_Q rx).
 Check _ : IsLipschitz (restrict (picard' f) x0 rx) _.
 *)
 
-Definition picard'' (f : Lipschitz sx sy) : Lipschitz sx CR.
+Definition picard'' (f : UniformlyContinuous sx sy) : UniformlyContinuous sx CR.
 assert (0 ≤ to_Q rx) by apply (proj2_sig rx). (* Add this to typeclass_instances? *)
-apply (Build_Lipschitz (restrict (picard' f) x0 rx) _ _).
+apply (Build_UniformlyContinuous (restrict (picard' f) x0 rx) _ _).
 Defined.
-
-Variable M : Q.
-
-Hypothesis v_bounded : forall z : sx * sy, abs (v z) ≤ 'M.
-
-Hypothesis rx_ry : `rx * M ≤ ry.
 
 Instance M_nonneg : PropHolds (0 ≤ M).
 Proof.
-assert (Ax : mspc_ball rx x0 x0) by apply mspc_refl, (proj2_sig rx).
+Admitted.
+(*assert (Ax : mspc_ball rx x0 x0) by apply mspc_refl, (proj2_sig rx).
 assert (Ay : mspc_ball ry y0 y0) by apply mspc_refl, (proj2_sig ry).
 apply CRle_Qle. transitivity (abs (v (x0 ↾ Ax , y0 ↾ Ay))); [apply CRabs_nonneg | apply v_bounded].
-Qed.
+Qed.*)
 
-Lemma picard_sy (f : Lipschitz sx sy) (x : sx) : mspc_ball ry y0 (restrict (picard' f) x0 rx x).
+Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : mspc_ball ry y0 (picard'' f x).
 Proof.
-destruct x as [x x_sx]. change (restrict (picard' f) x0 rx (x ↾ x_sx)) with (picard' f x).
+Admitted.
+(*destruct x as [x x_sx]. change (restrict (picard' f) x0 rx (x ↾ x_sx)) with (picard' f x).
 unfold picard'. apply CRball.gball_CRabs.
 match goal with
 | |- context [int ?g ?x1 ?x2] => change (abs (y0 - (y0 + int g x1 x2)) ≤ '`ry)
@@ -195,18 +232,61 @@ transitivity ('(abs (x - x0) * M)).
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_abs_flip.
   - apply rx_ry.
-Qed.
+Qed.*)
 
-Require Import Integration.
+(*Require Import Integration.*)
 
-(*Program*) Definition picard (f : Lipschitz sx sy) : Lipschitz sx sy.
-let K := (Build_Lipschitz (restrict (picard' f) x0 rx) _ _) in idtac.
-
-assert (IsLipschitz (restrict (picard' f) x0 rx) _).
-  Build_Lipschitz (restrict (picard' f) x0 rx) _ _.
-
+Definition picard (f : UniformlyContinuous sx sy) : UniformlyContinuous sx sy.
+set (g := picard'' f).
+set (h x := exist _ (g x) (picard_sy f x)).
+assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
+exact (Build_UniformlyContinuous _ _ C).
+Defined.
 
 End Picard.
+
+Section Computation.
+
+Definition x0 : Q := 0.
+Definition y0 : CR := 1.
+Definition rx : QnonNeg := (1 # 2)%Qnn.
+Definition ry : QnonNeg := 2.
+
+Notation sx := (sig (mspc_ball rx x0)).
+Notation sy := (sig (mspc_ball ry y0)).
+
+Definition v (z : sx * sy) : CR := proj1_sig (snd z).
+Definition M : Q := 2.
+Definition mu_v (e : Q) : Qinf := e.
+
+Instance : Bounded v M.
+Admitted.
+
+Instance : IsUniformlyContinuous v mu_v.
+Admitted.
+
+Program Definition f0 : UniformlyContinuous sx sy :=
+  Build_UniformlyContinuous (λ x, y0) _ _.
+Next Obligation. apply mspc_refl; Qauto_nonneg. Qed.
+Next Obligation. exact Qinf.infinite. Defined.
+Next Obligation. admit. Qed.
+
+Definition picard_iter (n : nat) := nat_iter n (picard x0 y0 rx ry v) f0.
+
+Definition answer (n : positive) (r : CR) : Z :=
+ let m := (iter_pos n _ (Pmult 10) 1%positive) in
+ let (a,b) := (approximate r (1#m)%Qpos)*m in
+ Zdiv a b.
+
+Program Definition half : sx := 1 # 2.
+Next Obligation. admit. Qed.
+
+Time Compute answer 2 (proj1_sig (picard_iter 3 half)).
+
+
+
+
+
 
 
 (*

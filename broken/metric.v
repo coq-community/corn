@@ -233,7 +233,7 @@ Section SubMetricSpace.
 
 Context `{ExtMetricSpaceClass X} (P : X -> Prop).
 
-Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (` x) (` y).
+Global Instance sig_mspc_ball : MetricSpaceBall (sig P) := λ e x y, ball e (`x) (`y).
 
 Global Instance sig_mspc : ExtMetricSpaceClass (sig P).
 Proof.
@@ -246,6 +246,13 @@ constructor.
 + repeat intro; rapply mspc_triangle; eauto.
 + repeat intro; now rapply mspc_closed.
 Qed.
+
+Context {d : MetricSpaceDistance X} {MSC : MetricSpaceClass X}.
+
+Global Instance sig_msd : MetricSpaceDistance (sig P) := λ x y, msd (`x) (`y).
+
+Global Instance sig_mspc_distance : MetricSpaceClass (sig P).
+Proof. intros x1 x2; apply: mspc_distance. Qed.
 
 End SubMetricSpace.
 
@@ -274,6 +281,17 @@ constructor.
 + intros e1 e2 a b c [A1 A2] [B1 B2]; split; eapply mspc_triangle; eauto.
 + intros e a b A; split; apply mspc_closed; firstorder.
 Qed.
+
+Context {dx : MetricSpaceDistance X} {dy : MetricSpaceDistance Y}
+  {MSCx : MetricSpaceClass X} {MSCy : MetricSpaceClass Y}.
+
+(* Need consistent names of instances for sig, product and func *)
+
+Global Instance Linf_product_msd : MetricSpaceDistance (X * Y) :=
+  λ a b, join (msd (fst a) (fst b)) (msd (snd a) (snd b)).
+
+Global Instance Linf_product_mspc_distance : MetricSpaceClass (X * Y).
+Admitted.
 
 End ProductMetricSpace.
 
@@ -458,8 +476,10 @@ Definition lip_modulus (L e : Q) : Qinf :=
 (* It is nice to declare only [MetricSpaceBall X] above because this is all
 we need to know about X to define [IsLipschitz]. But for the following
 theorem we also need [ExtMetricSpaceClass X], [MetricSpaceDistance X] and
-[MetricSpaceClass X]. How to add these assumptions? Saying [`{MetricSpaceClass X}]
-would add a second copy of [MetricSpaceBall X]. *)
+[MetricSpaceClass X]. How to add these assumptions? Saying
+[`{MetricSpaceClass X}] would add a second copy of [MetricSpaceBall X]. We
+write the names EM and m below because "Anonymous variables not allowed in
+contexts" *)
 
 Context {EM : ExtMetricSpaceClass X} {m : MetricSpaceDistance X}.
 
@@ -641,7 +661,7 @@ Qed.
 Definition together {X1 Y1 X2 Y2 : Type} (f1 : X1 -> Y1) (f2 : X2 -> Y2) : X1 * X2 -> Y1 * Y2 :=
   λ p, (f1 (fst p), f2 (snd p)).
 
-Global Instance together_lip
+(*Global Instance together_lip
   `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
    (f1 : X1 -> Y1) (f2 : X2 -> Y2)
   `{!IsLipschitz f1 L1, !IsLipschitz f2 L2} : IsLipschitz (together f1 f2) (join L1 L2).
@@ -670,8 +690,17 @@ constructor.
     (* [apply (order_preserving (.* e)), join_ub_l.] does not work *)
     apply lip_prf; trivial.
   - apply (mspc_monotone (L2 * e)); [apply (order_preserving (.* e)); apply join_ub_r |].
-    apply lip_prf; trivial.
-(* Proof of [IsUniformlyContinuous (together f1 f2) _].
+    apply lip_prf; trivial.*)
+
+Global Instance together_uc
+  `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
+   (f1 : X1 -> Y1) (f2 : X2 -> Y2)
+  `{!IsUniformlyContinuous f1 mu1, !IsUniformlyContinuous f2 mu2} :
+  IsUniformlyContinuous (together f1 f2) (λ e, meet (mu1 e) (mu2 e)).
+Proof.
+Admitted.
+(*
+constructor.
 + intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
   (* [trivial] solves, in particular, [IsUniformlyContinuous f1 mu1], which should
      have been solved automatically *)
@@ -680,8 +709,8 @@ constructor.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_l | trivial].
   - apply (uc_prf f2 mu2); trivial.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_r | trivial].
-*)
 Qed.
+*)
 
 End ProductSpaceFunctions.
 
