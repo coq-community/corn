@@ -16,7 +16,6 @@ Import Qround Qpower Qinf.notations.
 Set Printing Coercions.
 
 Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
-(*Notation "x ²" := (x * x) (at level 30) : mc_scope.*)
 
 Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
 match (f x) with

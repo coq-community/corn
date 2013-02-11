@@ -245,6 +245,12 @@ Defined.
 
 End Picard.
 
+Require Import BanachFixpoint.
+
+
+
+
+
 Section Computation.
 
 Definition x0 : Q := 0.
@@ -285,6 +291,7 @@ Time Compute answer 2 (proj1_sig (picard_iter 2 half)).
 
 
 
+End Computation.
 
 
 
