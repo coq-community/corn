@@ -18,6 +18,13 @@ Require Import canonical_names decision setoid_tactics.
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
 
+Bind Scope mc_scope with Q.
+
+Local Notation ball := mspc_ball.
+
+Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 rx).
+Proof. apply (proj2_sig rx). Qed.
+
 (* The following instances are needed to show that Lipschitz functions are
 uniformly continuous: metric.lip_uc *)
 Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
@@ -26,16 +33,24 @@ Global Instance Qmsc : MetricSpaceClass Q.
 Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
 
 (* Should be generalized from Q *)
-Lemma mspc_ball_abs (r x y : Q) : mspc_ball r x y ↔ abs (x - y) ≤ r.
+Lemma mspc_ball_plus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
+Proof.
+intro A. assert (A1 := radius_nonneg _ _ _ A).
+destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
++ rewrite <- e_zero in A |- *. now rewrite A.
++ apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
+Qed.
+
+Lemma mspc_ball_abs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
 Proof. apply gball_Qabs. Qed.
 
-Lemma mspc_ball_abs_flip (r x y : Q) : mspc_ball r x y ↔ abs (y - x) ≤ r.
+Lemma mspc_ball_abs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
 Proof.
 rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
 Qed.
 
 Lemma nested_balls {x1 x2 y1 y2 e : Q} :
-  mspc_ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> mspc_ball e y1 y2.
+  ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
 Proof.
 intros B A1 A2 A3. apply mspc_ball_abs_flip in B. apply mspc_ball_abs_flip.
 assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
@@ -56,21 +71,21 @@ necessarily continuous. This may be OK because we could add the premise [0
 definition below is not well-typed because if [r < 0], then [ball r a (a -
 r)] is false, so we can't apply [f] to [a - r]. So we assume [r : QnonNeg]. *)
 
-Lemma mspc_ball_edge_l : mspc_ball r a (a - `r).
+Lemma mspc_ball_edge_l : ball r a (a - `r).
 Proof.
 destruct r as [e ?]; simpl.
 apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
 change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
-Lemma mspc_ball_edge_r : mspc_ball r a (a + `r).
+Lemma mspc_ball_edge_r : ball r a (a + `r).
 Proof.
 destruct r as [e ?]; simpl.
 apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
 change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
-Context (f : sig (mspc_ball r a) -> Y).
+Context (f : sig (ball r a) -> Y).
 
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
@@ -125,7 +140,7 @@ Qed.
 Global Instance extend_uc `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous extend mu_f.
 Admitted.
 
-Lemma extend_inside (x : Q) (A : mspc_ball r a x) : extend x = f (x ↾ A).
+Lemma extend_inside (x : Q) (A : ball r a x) : extend x = f (x ↾ A).
 Admitted.
 
 End Extend.
@@ -139,7 +154,7 @@ Global Instance comp_bounded {X Y : Type} (f : X -> Y) (g : Y -> CR)
 Proof.
 Admitted.
 
-Global Instance extend_bounded {a : Q} {r : QnonNeg} (f : {x | mspc_ball r a x} -> CR)
+Global Instance extend_bounded {a : Q} {r : QnonNeg} (f : {x | ball r a x} -> CR)
   `{!Bounded f M} : Bounded (extend a r f) M.
 Admitted.
 
@@ -165,14 +180,22 @@ Section Picard.
 
 Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
 
-Notation sx := (sig (mspc_ball rx x0)).
-Notation sy := (sig (mspc_ball ry y0)).
+Notation sx := (sig (ball rx x0)).
+Notation sy := (sig (ball ry y0)).
 
 Context (v : sx * sy -> CR) `{!Bounded v M} `{!IsUniformlyContinuous v mu_v} (L : Q).
 
 Hypothesis v_lip : forall x : sx, IsLipschitz (λ y, v (x, y)) L.
 
+Hypothesis L_rx : L * rx < 1.
+
 Hypothesis rx_ry : `rx * M ≤ ry.
+
+Instance L_nonneg : PropHolds (0 ≤ L).
+Proof.
+assert (B : ball rx x0 x0) by (apply mspc_refl; solve_propholds).
+apply (lip_nonneg (λ y, v ((x0 ↾ B), y)) L).
+Qed.
 
 (*Check _ : MetricSpaceClass sx.
 Check _ : IsUniformlyContinuous v _.
@@ -201,7 +224,6 @@ Check _ : IsLipschitz (restrict (picard' f) x0 rx) _.
 *)
 
 Definition picard'' (f : UniformlyContinuous sx sy) : UniformlyContinuous sx CR.
-assert (0 ≤ to_Q rx) by apply (proj2_sig rx). (* Add this to typeclass_instances? *)
 apply (Build_UniformlyContinuous (restrict (picard' f) x0 rx) _ _).
 Defined.
 
@@ -213,7 +235,7 @@ assert (Ay : mspc_ball ry y0 y0) by apply mspc_refl, (proj2_sig ry).
 apply CRle_Qle. transitivity (abs (v (x0 ↾ Ax , y0 ↾ Ay))); [apply CRabs_nonneg | apply v_bounded].
 Qed.*)
 
-Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : mspc_ball ry y0 (picard'' f x).
+Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : ball ry y0 (picard'' f x).
 Proof.
 Admitted.
 (*destruct x as [x x_sx]. change (restrict (picard' f) x0 rx (x ↾ x_sx)) with (picard' f x).
@@ -243,6 +265,22 @@ assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
 exact (Build_UniformlyContinuous _ _ C).
 Defined.
 
+Lemma picard_contraction : IsContraction picard (L * rx).
+Proof.
+constructor; [| exact L_rx].
+constructor; [solve_propholds |].
+intros f1 f2 e A [x ?].
+change (ball (L * rx * e) (picard' f1 x) (picard' f2 x)).
+unfold picard'.
+SearchAbout (gball _ (?x + _)%CR (?y + _)%CR).
+apply mspc_ball_plus_l.
+SearchAbout "ball" "plus".
+
+
+
+
+
+
 End Picard.
 
 Require Import BanachFixpoint.
@@ -258,8 +296,8 @@ Definition y0 : CR := 1.
 Definition rx : QnonNeg := (1 # 2)%Qnn.
 Definition ry : QnonNeg := 2.
 
-Notation sx := (sig (mspc_ball rx x0)).
-Notation sy := (sig (mspc_ball ry y0)).
+Notation sx := (sig (ball rx x0)).
+Notation sy := (sig (ball ry y0)).
 
 Definition v (z : sx * sy) : CR := proj1_sig (snd z).
 Definition M : Q := 2.

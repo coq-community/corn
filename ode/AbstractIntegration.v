@@ -102,6 +102,8 @@ Hint Immediate ball_refl Qle_refl.
 
 (** Next up, the actual interface for integrable functions. *)
 
+Bind Scope Q_scope with Q.
+
 Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
 Implicit Arguments integrate [[Integral]].

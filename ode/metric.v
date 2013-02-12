@@ -108,11 +108,11 @@ Ltac nat_simpl := unfold
 Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 *)
 
+Bind Scope mc_scope with Q.
+
 Section QField.
 
 Add Field Q : (stdlib_field_theory Q).
-
-Bind Scope mc_scope with Q.
 
 Class MetricSpaceBall (X : Type) : Type := mspc_ball: Qinf → relation X.
 
@@ -135,17 +135,6 @@ Class ExtMetricSpaceClass (X : Type) `{MetricSpaceBall X} : Prop := {
   mspc_closed: ∀ (e: Q) (a b: X),
      (∀ d: Q, 0 < d -> ball (e + d) a b) → ball e a b
 }.
-
-(*
-This shows that if axioms of metric space are formulated with Qinf instead of Q,
-the [apply] tactic won't be able to unify them with goals using Q
-
-Goal (forall (e1 e2 : Qinf) (x1 x2 : X), ball (e1 + e2) x1 x2) ->
-  (forall (e1 e2 : Q) (x1 x2 : X), ball (e1 + e2) x1 x2).
-intros A e1 e2 x1 x2.
-change (e1 + e2 : Qinf) with ((Qinf.finite e1) + (Qinf.finite e2)).
-apply A.
-*)
 
 Class MetricSpaceDistance (X : Type) := msd : X -> X -> Q.
 

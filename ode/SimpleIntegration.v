@@ -21,6 +21,8 @@ Require Import
   metric FromMetric2
   implementations.stdlib_rationals.
 
+Bind Scope Q_scope with Q.
+
 Open Scope Q_scope.
 
 Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
