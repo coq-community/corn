@@ -32,8 +32,9 @@ Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
 Global Instance Qmsc : MetricSpaceClass Q.
 Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
 
-(* Should be generalized from Q *)
-Lemma mspc_ball_plus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
+
+(* Should be generalized from Q and CR *)
+Lemma mspc_ball_Qplus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
 Proof.
 intro A. assert (A1 := radius_nonneg _ _ _ A).
 destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
@@ -41,18 +42,33 @@ destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
 + apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
 Qed.
 
-Lemma mspc_ball_abs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
+Lemma mspc_ball_CRplus_l (e : Q) (x y y' : CR) : ball e y y' -> ball e (x + y) (x + y').
+Proof.
+intro A. rewrite <- (rings.plus_0_l e). apply CRgball_plus; [| easy].
+(*[ apply mspc_refl] does not work *)
+change (ball 0 x x); now apply mspc_refl.
+Qed.
+
+Lemma mspc_ball_Qabs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
 Proof. apply gball_Qabs. Qed.
 
-Lemma mspc_ball_abs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
+Lemma mspc_ball_Qabs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
 Proof.
 rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
 Qed.
 
+Lemma mspc_ball_CRabs (r : Q) (x y : CR) : ball r x y ↔ abs (x - y) ≤ 'r.
+Proof. apply CRball.gball_CRabs. Qed.
+
+(*Lemma mspc_ball_CRabs_flip (r : Q) (x y : CR) : ball r x y ↔ abs (y - x) ≤ 'r.
+Proof.
+rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
+Qed.*)
+
 Lemma nested_balls {x1 x2 y1 y2 e : Q} :
   ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
 Proof.
-intros B A1 A2 A3. apply mspc_ball_abs_flip in B. apply mspc_ball_abs_flip.
+intros B A1 A2 A3. apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
 assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
 rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
 rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
@@ -252,7 +268,7 @@ transitivity ('(abs (x - x0) * M)).
   (* [(extend_inside (A:= A1))]: "Wrong argument name: A" *)
   rewrite (extend_inside _ _ _ _ A1). apply v_bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
-  - now apply (orders.order_preserving (.* M)), mspc_ball_abs_flip.
+  - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_ry.
 Qed.*)
 
@@ -271,7 +287,9 @@ constructor; [| exact L_rx].
 constructor; [solve_propholds |].
 intros f1 f2 e A [x ?].
 change (ball (L * rx * e) (picard' f1 x) (picard' f2 x)).
-unfold picard'.
+unfold picard'. apply mspc_ball_CRplus_l, mspc_ball_CRabs.
+
+
 SearchAbout (gball _ (?x + _)%CR (?y + _)%CR).
 apply mspc_ball_plus_l.
 SearchAbout "ball" "plus".

@@ -899,6 +899,13 @@ Qed.
 
 End IntegralTotal.
 
+Lemma int_plus (f g : Q -> CR) `{Integrable f, Integrable g}
+  `{!IsLocallyUniformlyContinuous f f_mu, !IsLocallyUniformlyContinuous f f_mu} (a b : Q) :
+  int f a b + int g a b = int (f +1 g) a b.
+Proof.
+Admitted.
+
+
 Import interfaces.orders orders.semirings.
 
 Definition Qupper_bound (x : CR) := approximate x 1%Qpos + 1.
