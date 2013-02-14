@@ -591,7 +591,7 @@ Proof. reflexivity. Qed.
 Lemma cmΣ_succ {M : CMonoid} (n : nat) (f : nat -> M) : cmΣ (S n) f = f n [+] cmΣ n f.
 Proof. reflexivity. Qed.
 
-Lemma cmΣ_plus (n : nat) (f g : nat -> CR) : cmΣ n (f +1 g) = cmΣ n f + cmΣ n g.
+Lemma cmΣ_plus (n : nat) (f g : nat -> CR) : cmΣ n (f + g) = cmΣ n f + cmΣ n g.
 Proof.
 induction n as [| n IH].
 + symmetry; apply cm_rht_unit.
@@ -617,7 +617,7 @@ rewrite (mult_comm _ ('(n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivi
 Qed.
 
 Lemma riemann_sum_plus (f g : Q -> CR) (a w : Q) (n : positive) :
-  riemann_sum (f +1 g) a w n = riemann_sum f a w n + riemann_sum g a w n.
+  riemann_sum (f + g) a w n = riemann_sum f a w n + riemann_sum g a w n.
 Proof.
 unfold riemann_sum. rewrite <- cmΣ_plus. apply cm_Sum_eq. intro k.
 change (
@@ -708,10 +708,11 @@ Context (f g : Q -> CR)
         `{!IsLocallyUniformlyContinuous f f_mu, !IsLocallyUniformlyContinuous g g_mu}
         `{Integral f, !Integrable f, Integral g, !Integrable g}.
 
-Global Instance integrate_sum : Integral (f +1 g) := λ a w, integrate f a w + integrate g a w.
+Global Instance integrate_sum : Integral (f + g) := λ a w, integrate f a w + integrate g a w.
+Global Instance integrate_negate : Integral (- f) := λ a w, - integrate f a w.
 
 Lemma integral_sum_additive (a : Q) (b c : QnonNeg) :
-   ∫ (f +1 g) a b + ∫ (f +1 g) (a + ` b) c = ∫ (f +1 g) a (b + c)%Qnn.
+   ∫ (f + g) a b + ∫ (f + g) (a + ` b) c = ∫ (f + g) a (b + c)%Qnn.
 Proof.
 unfold integrate, integrate_sum.
 rewrite <- !integral_additive; trivial.
@@ -720,11 +721,20 @@ change (
   (∫ f a b + ∫ f (a + ` b) c) + (∫ g a b + ∫ g (a + ` b) c)). ring.
 Qed.
 
+Lemma integral_negate_additive (a : Q) (b c : QnonNeg) :
+   ∫ (- f) a b + ∫ (- f) (a + ` b) c = ∫ (- f) a (b + c)%Qnn.
+Proof.
+unfold integrate, integrate_negate.
+rewrite <- rings.negate_plus_distr. apply CRopp_wd_Proper. (* Where is it defined? *)
+now apply integral_additive.
+Qed.
+
+
 (* When the last argument of ball is ('(width * mid)), typechecking diverges *)
 
 Lemma integral_sum_integrable (from : Q) (width : Qpos) (mid : Q) (r : Qpos) :
  (∀ x : Q, from ≤ x ≤ from + width → ball r (f x + g x) ('mid))
- → ball (width * r) (∫ (f +1 g) from width) ('((width : Q) * mid)).
+ → ball (width * r) (∫ (f + g) from width) ('((width : Q) * mid)).
 Proof.
 intros A. apply ball_gball; simpl. apply gball_closed. intros e e_pos.
 setoid_replace (width * r + e)%Q with (e + width * r)%Q by apply Qplus_comm.
@@ -734,7 +744,7 @@ set (n := Pos.max Nf Ng).
 assert (le_Nf_n : (Nf <= n)%positive) by apply Pos.le_max_l.
 assert (le_Ng_n : (Ng <= n)%positive) by apply Pos.le_max_r.
 specialize (F n le_Nf_n). specialize (G n le_Ng_n).
-apply gball_triangle with (b := riemann_sum (f +1 g) from width n).
+apply gball_triangle with (b := riemann_sum (f + g) from width n).
 + rewrite riemann_sum_plus. setoid_replace e with ((1#2) * e + (1#2) * e)%Q by ring.
   apply CRgball_plus; apply gball_sym; trivial.
 + (* apply riemann_sum_bounds. diverges *)
@@ -742,7 +752,15 @@ apply gball_triangle with (b := riemann_sum (f +1 g) from width n).
   intros. apply ball_gball. apply A; trivial.
 Qed.
 
-Global Instance : Integrable (f +1 g).
+Lemma integral_negate_integrable (from : Q) (width : Qpos) (mid : Q) (r : Qpos) :
+ (∀ x : Q, from ≤ x ≤ from + width → ball r ((- f) x) ('mid))
+ → ball (width * r) (∫ (- f) from width) ('((width : Q) * mid)).
+Proof.
+intros A. unfold integrate, integrate_negate.
+SearchAbout gball CRopp.
+SearchAbout (gball _ (CRopp _) (CRopp _)).
+
+Global Instance : Integrable (f + g).
 constructor.
 + apply integral_sum_additive.
 + apply integral_sum_integrable.
@@ -901,9 +919,19 @@ End IntegralTotal.
 
 Lemma int_plus (f g : Q -> CR) `{Integrable f, Integrable g}
   `{!IsLocallyUniformlyContinuous f f_mu, !IsLocallyUniformlyContinuous f f_mu} (a b : Q) :
-  int f a b + int g a b = int (f +1 g) a b.
+  int f a b + int g a b = int (f + g) a b.
 Proof.
-Admitted.
+unfold int. destruct (decide (a ≤ b)); [reflexivity |].
+symmetry; unfold integrate at 1, integrate_sum.
+apply rings.negate_plus_distr. (* does not work without unfold *)
+Qed.
+SearchAbout (- (_ + _)).
+
+
+
+
+
+
 
 
 Import interfaces.orders orders.semirings.

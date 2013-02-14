@@ -15,7 +15,14 @@ Import Qround Qpower Qinf.notations.
 
 Set Printing Coercions.
 
-Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).
+Definition ext_plus {A} `{Plus B} : Plus (A -> B) := λ f g x, f x + g x.
+Hint Extern 10 (Plus (_ -> _)) => apply @ext_plus : typeclass_instances.
+
+Definition ext_negate {A} `{Negate B} : Negate (A -> B) := λ f x, - (f x).
+Hint Extern 10 (Negate (_ -> _)) => apply @ext_negate : typeclass_instances.
+
+(* The definitions above replace the following.
+Notation "f +1 g" := (λ x, f x + g x) (at level 50, left associativity).*)
 
 Definition comp_inf {X Z : Type} (g : Q -> Z) (f : X -> Qinf) (inf : Z) (x : X) :=
 match (f x) with

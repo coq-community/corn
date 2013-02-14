@@ -144,7 +144,7 @@ End LocallyLipschitz'.*)
 
 Global Instance sum_llip `{MetricSpaceBall X}
   (f g : X -> CR) `{!IsLocallyLipschitz f Lf} `{!IsLocallyLipschitz g Lg} :
-  IsLocallyLipschitz (f +1 g) (λ x r, Lf x r + Lg x r).
+  IsLocallyLipschitz (f + g) (λ x r, Lf x r + Lg x r).
 Proof.
 constructor.
 + pose proof (lip_nonneg (restrict f x r) (Lf x r)).
