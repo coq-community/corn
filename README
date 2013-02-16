@@ -6,17 +6,9 @@ PREREQUISITES
 
 This version of C-CoRN is known to compile with:
 
- - Coq 8.4 beta
-
-   One might also perform the following optimizations:
-   * Change size = 6 to size = 12 in theories/Numbers/Natural/BigN/NMake_gen.ml
-     to increase performance for big numbers.
+ - Coq 8.4pl1
 
  - SCons 1.2
-
- - In order to build the dependency graph you need a Haskell compiler and the
-   Graphviz library for Haskell. The latter can be obtained using the Cabal
-   package manager.
 
 GIT CHECKOUT & SUBMODULES
 -------------------------
@@ -27,7 +19,7 @@ Math Classes is contained in the C-CoRN git repository as a submodule. You can
 obtain math-classes automatically by giving the --recursive option when you 
 clone the git repository:
 
-  git clone --recursive https://github.com/c-corn/corn.git
+  git clone --recursive https://github.com/EvgenyMakarov/corn.git
 
 If you have already cloned the CoRN repository without --recursive, you can
 still get the submodules with
@@ -59,13 +51,3 @@ BUILDING DOCUMENTATION
 ----------------------
 
 To build CoqDoc documentation, say "scons coqdoc".
-
-A dependency graph in DOT format can be created with "scons deps.dot".
-
-PLOTS
------
-
-If you want high resolution plots in examples/Circle.v, follow the instructions 
-in dump/INSTALL
-
-
