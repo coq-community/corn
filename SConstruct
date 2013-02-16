@@ -1,7 +1,7 @@
 import os, glob, string
 
 # Removing examples directory since we do not need it every time.
-dirs_to_compile = ['algebra', 'complex', 'coq_reals', 'fta', 'ftc', 'logic', 'metrics', 'model', 'raster', 'reals', 'tactics', 'transc', 'order', 'metric2', 'Liouville', 'stdlib_omissions', 'util', 'classes']
+dirs_to_compile = ['algebra', 'complex', 'coq_reals', 'fta', 'ftc', 'logic', 'metrics', 'model', 'raster', 'reals', 'tactics', 'transc', 'order', 'metric2', 'Liouville', 'stdlib_omissions', 'util', 'classes', 'ode']
 
 nodes = map(lambda x: './' + x, dirs_to_compile)
 dirs = []
