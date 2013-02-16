@@ -188,7 +188,7 @@ Global Existing Instance luc_prf.
 
 Global Instance sum_luc `{MetricSpaceBall X}
   (f g : X -> CR) `{!IsUniformlyContinuous f mu_f} `{!IsUniformlyContinuous g mu_g} :
-  IsUniformlyContinuous (f +1 g) (λ e, meet (mu_f (e * (1 # 2))) (mu_g (e * (1 # 2)))).
+  IsUniformlyContinuous (f + g) (λ e, meet (mu_f (e * (1 # 2))) (mu_g (e * (1 # 2)))).
 Proof.
 Admitted.
 
@@ -281,7 +281,7 @@ assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
 exact (Build_UniformlyContinuous _ _ C).
 Defined.
 
-Lemma picard_contraction : IsContraction picard (L * rx).
+(*Lemma picard_contraction : IsContraction picard (L * rx).
 Proof.
 constructor; [| exact L_rx].
 constructor; [solve_propholds |].
@@ -292,7 +292,7 @@ unfold picard'. apply mspc_ball_CRplus_l, mspc_ball_CRabs.
 
 SearchAbout (gball _ (?x + _)%CR (?y + _)%CR).
 apply mspc_ball_plus_l.
-SearchAbout "ball" "plus".
+SearchAbout "ball" "plus".*)
 
 
 

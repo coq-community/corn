@@ -752,13 +752,13 @@ apply gball_triangle with (b := riemann_sum (f + g) from width n).
   intros. apply ball_gball. apply A; trivial.
 Qed.
 
-Lemma integral_negate_integrable (from : Q) (width : Qpos) (mid : Q) (r : Qpos) :
+(*Lemma integral_negate_integrable (from : Q) (width : Qpos) (mid : Q) (r : Qpos) :
  (∀ x : Q, from ≤ x ≤ from + width → ball r ((- f) x) ('mid))
  → ball (width * r) (∫ (- f) from width) ('((width : Q) * mid)).
 Proof.
 intros A. unfold integrate, integrate_negate.
 SearchAbout gball CRopp.
-SearchAbout (gball _ (CRopp _) (CRopp _)).
+SearchAbout (gball _ (CRopp _) (CRopp _)).*)
 
 Global Instance : Integrable (f + g).
 constructor.
@@ -925,13 +925,6 @@ unfold int. destruct (decide (a ≤ b)); [reflexivity |].
 symmetry; unfold integrate at 1, integrate_sum.
 apply rings.negate_plus_distr. (* does not work without unfold *)
 Qed.
-SearchAbout (- (_ + _)).
-
-
-
-
-
-
 
 
 Import interfaces.orders orders.semirings.
