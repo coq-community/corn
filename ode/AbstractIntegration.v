@@ -33,6 +33,12 @@ should find metric2.Prelength.fast_MonadLaw3 *)
 (** Any nonnegative width can be split up into an integral number of
  equal-sized pieces no bigger than a given bound: *)
 
+Add Field Qfield : Qsft
+ (decidable Qeq_bool_eq,
+  completeness Qeq_eq_bool,
+  constants [Qcst],
+  power_tac Qpower_theory [Qpow_tac]).
+
 Definition split (w: QnonNeg) (bound: QposInf):
   { x: nat * QnonNeg | (fst x * snd x == w)%Qnn /\ (snd x <= bound)%QnnInf }.
 Proof with simpl; auto with *.
@@ -702,6 +708,7 @@ Qed.*)
 
 End IntegralBound.
 
+(*
 Section IntegralOfSum.
 
 Context (f g : Q -> CR)
@@ -768,6 +775,7 @@ constructor.
 Qed.
 
 End IntegralOfSum.
+*)
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
@@ -917,14 +925,14 @@ Qed.
 
 End IntegralTotal.
 
-Lemma int_plus (f g : Q -> CR) `{Integrable f, Integrable g}
+(*Lemma int_plus (f g : Q -> CR) `{Integrable f, Integrable g}
   `{!IsLocallyUniformlyContinuous f f_mu, !IsLocallyUniformlyContinuous f f_mu} (a b : Q) :
   int f a b + int g a b = int (f + g) a b.
 Proof.
 unfold int. destruct (decide (a ≤ b)); [reflexivity |].
 symmetry; unfold integrate at 1, integrate_sum.
 apply rings.negate_plus_distr. (* does not work without unfold *)
-Qed.
+Qed.*)
 
 
 Import interfaces.orders orders.semirings.

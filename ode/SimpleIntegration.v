@@ -22,7 +22,6 @@ Require Import
   implementations.stdlib_rationals.
 
 Bind Scope Q_scope with Q.
-
 Open Scope Q_scope.
 
 Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
@@ -61,6 +60,12 @@ Lemma ball_ex_symm (X : MetricSpace) (e : QposInf) (x y : X) :
 Proof. destruct e as [e |]; [apply ball_sym | trivial]. Qed.
 
 Section definition.
+
+  Add Field Qfield : Qsft
+   (decidable Qeq_bool_eq,
+    completeness Qeq_eq_bool,
+    constants [Qcst],
+    power_tac Qpower_theory [Qpow_tac]).
 
   Context (f: Q -> CR) `{UC : !IsLocallyUniformlyContinuous f lmu}.
 
@@ -284,6 +289,12 @@ Arguments intervals lmu from w error : clear implicits.
 (** Next, we prove that this implements the abstract interface. *)
 
 Section implements_abstract_interface.
+
+  Add Field Qfield' : Qsft
+   (decidable Qeq_bool_eq,
+    completeness Qeq_eq_bool,
+    constants [Qcst],
+    power_tac Qpower_theory [Qpow_tac]).
 
   Context (f: Q → CR) `{!IsLocallyUniformlyContinuous f lmu}.
 

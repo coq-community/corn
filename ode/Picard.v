@@ -13,7 +13,7 @@ Import
   Qabs propholds.
 
 Require Import metric FromMetric2 AbstractIntegration SimpleIntegration.
-Require Import canonical_names decision setoid_tactics.
+Require Import canonical_names decision setoid_tactics util.
 
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
@@ -22,8 +22,15 @@ Bind Scope mc_scope with Q.
 
 Local Notation ball := mspc_ball.
 
+(*Hint Extern 10 (ExtMetricSpaceClass (UniformlyContinuous _ _)) =>
+  apply @Linf_func_metric_space_class : typeclass_instances.*)
+
 Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 rx).
 Proof. apply (proj2_sig rx). Qed.
+
+Program Instance sig_nonempty `{ExtMetricSpaceClass X}
+  (r : QnonNeg) (x : X) : NonEmpty (sig (ball r x)) := inhabits x.
+Next Obligation. apply mspc_refl; solve_propholds. Qed.
 
 (* The following instances are needed to show that Lipschitz functions are
 uniformly continuous: metric.lip_uc *)
@@ -32,6 +39,7 @@ Global Instance Qmsd : MetricSpaceDistance Q := λ x y, abs (x - y).
 Global Instance Qmsc : MetricSpaceClass Q.
 Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
 
+(*Instance Q_nonempty : NonEmpty Q := inhabits 0%Q.*)
 
 (* Should be generalized from Q and CR *)
 Lemma mspc_ball_Qplus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
@@ -192,6 +200,25 @@ Global Instance sum_luc `{MetricSpaceBall X}
 Proof.
 Admitted.
 
+Global Instance negate_luc `{MetricSpaceBall X} (f : X -> CR)
+  `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous (- f) mu_f.
+Proof.
+Admitted.
+
+Lemma int_plus (f g : Q -> CR)
+  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
+  int (f + g) a b = int f a b + int g a b.
+Admitted.
+
+Lemma int_negate (f : Q -> CR) `{!IsUniformlyContinuous f f_mu} (a b : Q) :
+  int (- f) a b = - int f a b.
+Admitted.
+
+Lemma int_minus (f g : Q -> CR)
+  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
+  int (f - g) a b = int f a b - int g a b.
+Proof. rewrite int_plus, int_negate; reflexivity. Qed.
+
 Section Picard.
 
 Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
@@ -281,23 +308,27 @@ assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
 exact (Build_UniformlyContinuous _ _ C).
 Defined.
 
-(*Lemma picard_contraction : IsContraction picard (L * rx).
+Lemma picard_contraction : IsContraction picard (L * rx).
 Proof.
 constructor; [| exact L_rx].
 constructor; [solve_propholds |].
 intros f1 f2 e A [x ?].
 change (ball (L * rx * e) (picard' f1 x) (picard' f2 x)).
 unfold picard'. apply mspc_ball_CRplus_l, mspc_ball_CRabs.
-
-
-SearchAbout (gball _ (?x + _)%CR (?y + _)%CR).
-apply mspc_ball_plus_l.
-SearchAbout "ball" "plus".*)
-
-
-
-
-
+rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
++ apply int_abs_bound; [apply _ |]. (* remove [apply _] *)
+  intros x' B. assert (B1 : ball rx x0 x') by
+    (apply (mspc_ball_convex x0 x); [apply mspc_refl | |]; solve_propholds).
+  unfold plus, negate, ext_plus, ext_negate.
+  rewrite !(extend_inside x0 rx _ x' B1).
+  apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
+  apply (lip_prf (λ y, v (_, y)) L), A.
++ apply CRle_Qle. mc_setoid_replace (L * rx * e) with ((to_Q rx) * (L * e)) by ring.
+  assert (0 ≤ e) by apply (radius_nonneg f1 f2 e A).
+  change ((abs (x - x0) * (L * e)) ≤ ((to_Q rx) * (L * e))).
+  apply (orders.order_preserving (.* (L * e))).
+  now apply mspc_ball_Qabs_flip.
+Qed.
 
 End Picard.
 

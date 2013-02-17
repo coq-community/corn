@@ -117,7 +117,7 @@ Tactic Notation "Qsimpl" hyp_list(A) := revert A; Qsimpl'; intros A.
 
 Bind Scope mc_scope with Q.
 
-Section QField.
+(*Section QField.*)
 
 Add Field Q : (stdlib_field_theory Q).
 
@@ -328,7 +328,7 @@ intros q1 q2 A1 f1 f2 A2 g1 g2 A3; rewrite A2, A3.
 split; intros A4 x; [rewrite <- A1 | rewrite A1]; apply A4.
 Qed.
 
-Global Instance Linf_func_metric_space_class : ExtMetricSpaceClass T.
+Lemma Linf_func_metric_space_class : ExtMetricSpaceClass T.
 Proof.
 match goal with | H : NonEmpty X |- _ => destruct H as [x0] end.
 constructor.
@@ -399,6 +399,9 @@ Qed.
 
 Global Instance uniformly_continuous_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (UniformlyContinuous X Y) X Y := λ f, f.
+
+Hint Extern 10 (ExtMetricSpaceClass (UniformlyContinuous _ _)) =>
+  apply @Linf_func_metric_space_class : typeclass_instances.
 
 Section LocalUniformContinuity.
 
@@ -561,6 +564,9 @@ Global Arguments LocallyLipschitz X {_} Y {_}.
 
 Instance locally_lipschitz_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (LocallyLipschitz X Y) X Y := λ f, f.
+
+Hint Extern 10 (ExtMetricSpaceClass (LocallyLipschitz _ _)) =>
+  apply @Linf_func_metric_space_class : typeclass_instances.
 
 Notation "X LL-> Y" := (LocallyLipschitz X Y) (at level 55, right associativity).
 
@@ -976,5 +982,4 @@ Qed.
 
 End CompleteSpaceSequenceLimits.
 
-End QField.
-
+(*End QField.*)
