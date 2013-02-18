@@ -12,7 +12,7 @@ Import
   QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
   Qabs propholds.
 
-Require Import metric FromMetric2 AbstractIntegration SimpleIntegration.
+Require Import metric FromMetric2 AbstractIntegration SimpleIntegration BanachFixpoint.
 Require Import canonical_names decision setoid_tactics util.
 
 Close Scope uc_scope. (* There is a leak in some module *)
@@ -21,9 +21,6 @@ Open Scope signature_scope. (* To interpret "==>" *)
 Bind Scope mc_scope with Q.
 
 Local Notation ball := mspc_ball.
-
-(*Hint Extern 10 (ExtMetricSpaceClass (UniformlyContinuous _ _)) =>
-  apply @Linf_func_metric_space_class : typeclass_instances.*)
 
 Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 rx).
 Proof. apply (proj2_sig rx). Qed.
@@ -240,6 +237,13 @@ assert (B : ball rx x0 x0) by (apply mspc_refl; solve_propholds).
 apply (lip_nonneg (λ y, v ((x0 ↾ B), y)) L).
 Qed.
 
+Instance uc_msd : MetricSpaceDistance (UniformlyContinuous sx sy) := λ f1 f2, 2 * ry.
+
+Instance uc_msc : MetricSpaceClass (UniformlyContinuous sx sy).
+Proof.
+intros f1 f2. admit.
+Qed.
+
 (*Check _ : MetricSpaceClass sx.
 Check _ : IsUniformlyContinuous v _.
 
@@ -308,7 +312,7 @@ assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
 exact (Build_UniformlyContinuous _ _ C).
 Defined.
 
-Lemma picard_contraction : IsContraction picard (L * rx).
+Instance picard_contraction : IsContraction picard (L * rx).
 Proof.
 constructor; [| exact L_rx].
 constructor; [solve_propholds |].
@@ -330,9 +334,25 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
   now apply mspc_ball_Qabs_flip.
 Qed.
 
+Program Definition f0 : UniformlyContinuous sx sy :=
+  Build_UniformlyContinuous (λ x, y0) (λ e, Qinf.infinite) _.
+Next Obligation. apply mspc_refl; solve_propholds. Qed.
+
+Next Obligation.
+constructor.
++ intros; easy.
++ intros e x1 x2 e_pos B. change (ball e y0 y0). apply mspc_refl; solve_propholds.
+Qed.
+
+(*Let emsc := _ : ExtMetricSpaceClass (UniformlyContinuous sx sy).
+Check _ : MetricSpaceClass (UniformlyContinuous sx sy).*)
+
+Lemma ode_solution : let f := fp picard f0 in picard f = f.
+Proof. apply banach_fixpoint. Qed.
+
 End Picard.
 
-Require Import BanachFixpoint.
+
 
 
 

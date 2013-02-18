@@ -203,9 +203,9 @@ end.
   - intros; apply mspc_symm; now apply A.
 Qed.
 
-Let a := lim (reg_fun x _ cauchy_x).
+Definition fp := lim (reg_fun x _ cauchy_x).
 
-Lemma banach_fixpoint : f a = a.
+Lemma banach_fixpoint : f fp = fp.
 Proof.
 assert (C := cauchy_x).
 (* [Check seq_lim_lim (A := C)] says "Wrong argument name: A", but [About seq_lim_lim] shows A *)
