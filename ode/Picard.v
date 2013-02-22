@@ -22,12 +22,28 @@ Bind Scope mc_scope with Q.
 
 Local Notation ball := mspc_ball.
 
+Lemma Qinf_lt_le (x y : Qinf) : x < y → x ≤ y.
+Proof.
+destruct x as [x |]; destruct y as [y |]; [| easy..].
+change (x < y -> x ≤ y). intros; solve_propholds.
+Qed.
+
 Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 rx).
 Proof. apply (proj2_sig rx). Qed.
+
+Instance Q_nonempty : NonEmpty Q := inhabits 0.
 
 Program Instance sig_nonempty `{ExtMetricSpaceClass X}
   (r : QnonNeg) (x : X) : NonEmpty (sig (ball r x)) := inhabits x.
 Next Obligation. apply mspc_refl; solve_propholds. Qed.
+
+Instance prod_nonempty `{NonEmpty X, NonEmpty Y} : NonEmpty (X * Y).
+Proof.
+(* In order not to refer to the name of the variable that has type NonEmpty X *)
+match goal with H : NonEmpty X |- _ => destruct H as [x] end.
+match goal with H : NonEmpty Y |- _ => destruct H as [y] end.
+exact (inhabits (x, y)).
+Qed.
 
 (* The following instances are needed to show that Lipschitz functions are
 uniformly continuous: metric.lip_uc *)
@@ -70,10 +86,11 @@ Proof.
 rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
 Qed.*)
 
-Lemma nested_balls {x1 x2 y1 y2 e : Q} :
+Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :
   ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
 Proof.
-intros B A1 A2 A3. apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
+intros B A1 A2 A3. destruct e as [e |]; [| apply mspc_inf].
+apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
 assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
 rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
 rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
@@ -111,7 +128,7 @@ Context (f : sig (ball r a) -> Y).
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
 would depend on x and [H1 : x ≤ a - r] even though they are not used in the
-proof. So, if [x1 ≤ a - r] and [x2 ≤ a - r], then [extend x1] would reduce
+proof. So, if [H1 : x1 ≤ a - r] and [H2 : x2 ≤ a - r], then [extend x1] would reduce
 to [f ((a - r) ↾ extend_obligation_1 x1 H1)] and [extend x2] would reduce
 to [f ((a - r) ↾ extend_obligation_1 x2 H2)]. To apply mspc_refl, we would
 need to prove that these applications of f are equal, i.e., f is a morphism
@@ -159,10 +176,33 @@ Qed.
 *)
 
 Global Instance extend_uc `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous extend mu_f.
-Admitted.
+Proof with (assumption || (apply orders.le_flip; assumption) || reflexivity).
+constructor; [apply (uc_pos f mu_f) |].
+intros e x1 x2 e_pos A.
+assert (a - to_Q r ≤ a + to_Q r) by
+  (destruct r; simpl; transitivity a;
+    [apply rings.nonneg_minus_compat | apply semirings.plus_le_compat_r]; (easy || reflexivity)).
+unfold extend.
+destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
+* apply mspc_refl; solve_propholds.
+* destruct (decide (a + to_Q r ≤ x2)); apply (uc_prf f mu_f); trivial.
+  + apply (nested_balls _ _ A)...
+  + apply (nested_balls _ _ A)...
+* destruct (decide (a + to_Q r ≤ x1)); apply (uc_prf f mu_f); trivial.
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
+* destruct (decide (a + to_Q r ≤ x1)); destruct (decide (a + to_Q r ≤ x2));
+  apply (uc_prf f mu_f); trivial.
+  + apply mspc_refl'. now apply Qinf_lt_le, (uc_pos f mu_f).
+  + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
+  + apply (nested_balls _ _ A)...
+Qed.
 
 Lemma extend_inside (x : Q) (A : ball r a x) : extend x = f (x ↾ A).
+Proof.
 Admitted.
+(*apply mspc_ball_Qabs in A.*)
+
 
 End Extend.
 
@@ -172,32 +212,38 @@ Class Bounded {X : Type} (f : X -> CR) (M : Q) := bounded : forall x, abs (f x) 
 
 Global Instance comp_bounded {X Y : Type} (f : X -> Y) (g : Y -> CR)
   `{!Bounded g M} : Bounded (g ∘ f) M.
-Proof.
-Admitted.
+Proof. intro x; unfold Basics.compose; apply bounded. Qed.
 
 Global Instance extend_bounded {a : Q} {r : QnonNeg} (f : {x | ball r a x} -> CR)
   `{!Bounded f M} : Bounded (extend a r f) M.
-Admitted.
+Proof.
+intro x. unfold extend.
+destruct (decide (x ≤ a - to_Q r)); [| destruct (decide (a + to_Q r ≤ x))]; apply bounded.
+Qed.
+
+Global Instance bounded_nonneg {X : Type} (f : X -> CR) `{!Bounded f M} `{NonEmpty X} :
+  PropHolds (0 ≤ M).
+Proof.
+match goal with H : NonEmpty X |- _ => destruct H as [x] end.
+apply CRle_Qle. change (@zero CR _  ≤ 'M). transitivity (abs (f x)).
++ apply CRabs_nonneg.
++ apply bounded.
+Qed.
 
 End Bounded.
-
-Global Instance bounded_int_uc
-  `{!Bounded f M} `{!IsLocallyUniformlyContinuous f mu_f} (x0 : Q) :
-  IsUniformlyContinuous (λ x, int f x0 x) (λ e, e / M).
-Admitted.
 
 Global Instance : Proper (equiv ==> equiv) (abs (A := CR)).
 Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
 
 Global Existing Instance luc_prf.
 
-Global Instance sum_luc `{MetricSpaceBall X}
+Global Instance sum_uc `{MetricSpaceBall X}
   (f g : X -> CR) `{!IsUniformlyContinuous f mu_f} `{!IsUniformlyContinuous g mu_g} :
   IsUniformlyContinuous (f + g) (λ e, meet (mu_f (e * (1 # 2))) (mu_g (e * (1 # 2)))).
 Proof.
 Admitted.
 
-Global Instance negate_luc `{MetricSpaceBall X} (f : X -> CR)
+Global Instance negate_uc `{MetricSpaceBall X} (f : X -> CR)
   `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous (- f) mu_f.
 Proof.
 Admitted.
@@ -215,6 +261,21 @@ Lemma int_minus (f g : Q -> CR)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
   int (f - g) a b = int f a b - int g a b.
 Proof. rewrite int_plus, int_negate; reflexivity. Qed.
+
+Global Instance bounded_int_uc {f : Q -> CR} {M : Q} `{PropHolds (0 < M)}
+  `{!Bounded f M} `{!IsUniformlyContinuous f mu_f} (x0 : Q) :
+  IsUniformlyContinuous (λ x, int f x0 x) (λ e, e / M).
+Proof.
+constructor.
++ intros. apply orders.pos_mult_compat. apply _.
+apply dec_fields.pos_dec_recip_compat. apply _. (* why does solve_propholds not work? *)
++ intros e x1 x2 e_pos A. apply mspc_ball_CRabs. rewrite int_diff; [| apply _].
+  transitivity ('(abs (x1 - x2) * M)).
+  - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
+  - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
+    apply mspc_ball_Qabs in A. apply (orders.order_preserving (.* M)) in A.
+    now mc_setoid_replace (e / M * M) with e in A by (field; solve_propholds).
+Qed.
 
 Section Picard.
 
@@ -284,24 +345,21 @@ Qed.*)
 
 Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : ball ry y0 (picard'' f x).
 Proof.
-Admitted.
-(*destruct x as [x x_sx]. change (restrict (picard' f) x0 rx (x ↾ x_sx)) with (picard' f x).
-unfold picard'. apply CRball.gball_CRabs.
-match goal with
-| |- context [int ?g ?x1 ?x2] => change (abs (y0 - (y0 + int g x1 x2)) ≤ '`ry)
-end.
+destruct x as [x x_sx]. unfold picard''; simpl.
+unfold restrict, Basics.compose; simpl.
+unfold picard'. apply mspc_ball_CRabs.
 rewrite rings.negate_plus_distr, plus_assoc, rings.plus_negate_r, rings.plus_0_l, CRabs_negate.
 transitivity ('(abs (x - x0) * M)).
-+ apply int_abs_bound. apply _. (* Should not be required *)
++ apply int_abs_bound; [apply _ |]. (* Should not be required *)
   intros t A.
   assert (A1 : mspc_ball rx x0 t) by
     (apply (mspc_ball_convex x0 x); [apply mspc_refl, (proj2_sig rx) | |]; trivial).
   (* [(extend_inside (A:= A1))]: "Wrong argument name: A" *)
-  rewrite (extend_inside _ _ _ _ A1). apply v_bounded.
+  rewrite (extend_inside _ _ _ _ A1). apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_ry.
-Qed.*)
+Qed.
 
 (*Require Import Integration.*)
 
@@ -351,12 +409,6 @@ Lemma ode_solution : let f := fp picard f0 in picard f = f.
 Proof. apply banach_fixpoint. Qed.
 
 End Picard.
-
-
-
-
-
-
 
 Section Computation.
 

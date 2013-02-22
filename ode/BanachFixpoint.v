@@ -48,7 +48,7 @@ rewrite <- flip_lt_negate in A. apply (strictly_order_preserving (1 +)) in A.
 now rewrite plus_negate_r in A.
 Qed.
 
-Instance : forall q : Q, PropHolds (0 < q) -> PropHolds (q ≠ 0).
+Global Instance : forall q : Q, PropHolds (0 < q) -> PropHolds (q ≠ 0).
 Proof. apply lt_ne_flip. Qed.
 
 Lemma dist_xn_xSn : forall n : nat, ball (d * q^n) (x n) (x (1 + n)).

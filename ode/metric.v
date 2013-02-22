@@ -177,6 +177,13 @@ try (unfold Qinf.eq, equiv in *; contradiction).
   now apply mspc_triangle with (b := y2); [rewrite Ee1e2 | apply mspc_symm].
 Qed.
 
+Lemma mspc_refl' (e : Qinf) : 0 ≤ e → Reflexive (ball e).
+Proof.
+intros E. destruct e as [e |].
++ apply mspc_refl, E.
++ intro x; apply mspc_inf.
+Qed.
+
 Lemma mspc_triangle' :
   ∀ (q1 q2 : Q) (x2 x1 x3 : X) (q : Q),
     q1 + q2 = q → ball q1 x1 x2 → ball q2 x2 x3 → ball q x1 x3.
