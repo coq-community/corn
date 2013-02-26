@@ -262,18 +262,20 @@ Lemma int_minus (f g : Q -> CR)
   int (f - g) a b = int f a b - int g a b.
 Proof. rewrite int_plus, int_negate; reflexivity. Qed.
 
-Global Instance bounded_int_uc {f : Q -> CR} {M : Q} `{PropHolds (0 < M)}
+Global Instance bounded_int_uc {f : Q -> CR} {M : Q}
   `{!Bounded f M} `{!IsUniformlyContinuous f mu_f} (x0 : Q) :
-  IsUniformlyContinuous (λ x, int f x0 x) (λ e, e / M).
+  IsUniformlyContinuous (λ x, int f x0 x) (lip_modulus M).
 Proof.
 constructor.
-+ intros. apply orders.pos_mult_compat. apply _.
-apply dec_fields.pos_dec_recip_compat. apply _. (* why does solve_propholds not work? *)
++ intros. apply lip_modulus_pos; solve_propholds.
 + intros e x1 x2 e_pos A. apply mspc_ball_CRabs. rewrite int_diff; [| apply _].
   transitivity ('(abs (x1 - x2) * M)).
   - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
   - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
-    apply mspc_ball_Qabs in A. apply (orders.order_preserving (.* M)) in A.
+    unfold lip_modulus in A. destruct (decide (M = 0)) as [E | E].
+    rewrite E, rings.mult_0_r. now apply orders.lt_le. (* why does [solve_propholds] not work? *)
+    apply mspc_ball_Qabs in A. assert (0 ≤ M) by solve_propholds.
+    apply (orders.order_preserving (.* M)) in A.
     now mc_setoid_replace (e / M * M) with e in A by (field; solve_propholds).
 Qed.
 

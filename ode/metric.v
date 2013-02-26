@@ -478,6 +478,15 @@ Record Lipschitz := {
 Definition lip_modulus (L e : Q) : Qinf :=
   if (decide (L = 0)) then Qinf.infinite else e / L.
 
+Lemma lip_modulus_pos (L e : Q) : 0 ≤ L -> 0 < e -> 0 < lip_modulus L e.
+Proof.
+intros L_nonneg e_pos. unfold lip_modulus.
+destruct (decide (L = 0)) as [A1 | A1]; [apply I |].
+apply neq_symm in A1.
+change (0 < e / L). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
+assert (0 < L) by now apply QOrder.le_neq_lt. Qauto_pos.
+Qed.
+
 (* It is nice to declare only [MetricSpaceBall X] above because this is all
 we need to know about X to define [IsLipschitz]. But for the following
 theorem we also need [ExtMetricSpaceClass X], [MetricSpaceDistance X] and
@@ -493,13 +502,7 @@ Global Instance lip_uc {_ : MetricSpaceClass X} {_ : ExtMetricSpaceClass Y}
   IsUniformlyContinuous f (lip_modulus L).
 Proof.
 constructor.
-+ intros e A.
-  unfold lip_modulus.
-  destruct (decide (L = 0)) as [A1 | A1]; [apply I |].
-  apply neq_symm in A1.
-  change (0 < e / L). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
-  assert (0 ≤ L) by apply (lip_nonneg f L).
-  assert (0 < L) by now apply QOrder.le_neq_lt. Qauto_pos.
++ intros. apply lip_modulus_pos; [| assumption]. now apply (lip_nonneg f L).
 + unfold lip_modulus. intros e x1 x2 A1 A2. destruct (decide (L = 0)) as [A | A].
   - apply mspc_eq; [| easy]. unfold equiv, mspc_equiv. rewrite <- (Qmult_0_l (msd x1 x2)), <- A.
     now apply lip_prf; [| apply mspc_distance].
