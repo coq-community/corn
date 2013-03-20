@@ -54,51 +54,6 @@ Proof. intros x1 x2; apply gball_Qabs; reflexivity. Qed.
 
 (*Instance Q_nonempty : NonEmpty Q := inhabits 0%Q.*)
 
-(* Should be generalized from Q and CR *)
-Lemma mspc_ball_Qplus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
-Proof.
-intro A. assert (A1 := radius_nonneg _ _ _ A).
-destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
-+ rewrite <- e_zero in A |- *. now rewrite A.
-+ apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
-Qed.
-
-Lemma mspc_ball_CRplus_l (e : Q) (x y y' : CR) : ball e y y' -> ball e (x + y) (x + y').
-Proof.
-intro A. rewrite <- (rings.plus_0_l e). apply CRgball_plus; [| easy].
-(*[ apply mspc_refl] does not work *)
-change (ball 0 x x); now apply mspc_refl.
-Qed.
-
-Lemma mspc_ball_Qabs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
-Proof. apply gball_Qabs. Qed.
-
-Lemma mspc_ball_Qabs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
-Proof.
-rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
-Qed.
-
-Lemma mspc_ball_CRabs (r : Q) (x y : CR) : ball r x y ↔ abs (x - y) ≤ 'r.
-Proof. apply CRball.gball_CRabs. Qed.
-
-(*Lemma mspc_ball_CRabs_flip (r : Q) (x y : CR) : ball r x y ↔ abs (y - x) ≤ 'r.
-Proof.
-rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
-Qed.*)
-
-Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :
-  ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
-Proof.
-intros B A1 A2 A3. destruct e as [e |]; [| apply mspc_inf].
-apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
-assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
-rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
-rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
-apply rings.flip_le_minus_l. apply rings.flip_le_minus_l in B.
-transitivity x2; [easy |]. transitivity (e + x1); [easy |].
-apply (orders.order_preserving (e +)); easy.
-Qed. (* Too long? *)
-
 Section Extend.
 
 Context `{ExtMetricSpaceClass Y} (a : Q) (r : QnonNeg).
@@ -221,8 +176,8 @@ intro x. unfold extend.
 destruct (decide (x ≤ a - to_Q r)); [| destruct (decide (a + to_Q r ≤ x))]; apply bounded.
 Qed.
 
-Global Instance bounded_nonneg {X : Type} (f : X -> CR) `{!Bounded f M} `{NonEmpty X} :
-  PropHolds (0 ≤ M).
+Lemma bounded_nonneg {X : Type} (f : X -> CR) `{!Bounded f M} `{NonEmpty X} :
+  (*PropHolds*) (0 ≤ M).
 Proof.
 match goal with H : NonEmpty X |- _ => destruct H as [x] end.
 apply CRle_Qle. change (@zero CR _  ≤ 'M). transitivity (abs (f x)).
@@ -232,21 +187,7 @@ Qed.
 
 End Bounded.
 
-Global Instance : Proper (equiv ==> equiv) (abs (A := CR)).
-Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
-
 Global Existing Instance luc_prf.
-
-Global Instance sum_uc `{MetricSpaceBall X}
-  (f g : X -> CR) `{!IsUniformlyContinuous f mu_f} `{!IsUniformlyContinuous g mu_g} :
-  IsUniformlyContinuous (f + g) (λ e, meet (mu_f (e * (1 # 2))) (mu_g (e * (1 # 2)))).
-Proof.
-Admitted.
-
-Global Instance negate_uc `{MetricSpaceBall X} (f : X -> CR)
-  `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous (- f) mu_f.
-Proof.
-Admitted.
 
 Lemma int_plus (f g : Q -> CR)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
@@ -267,14 +208,14 @@ Global Instance bounded_int_uc {f : Q -> CR} {M : Q}
   IsUniformlyContinuous (λ x, int f x0 x) (lip_modulus M).
 Proof.
 constructor.
-+ intros. apply lip_modulus_pos; solve_propholds.
++ intros. apply lip_modulus_pos; [apply (bounded_nonneg f) | easy].
 + intros e x1 x2 e_pos A. apply mspc_ball_CRabs. rewrite int_diff; [| apply _].
   transitivity ('(abs (x1 - x2) * M)).
   - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
   - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
     unfold lip_modulus in A. destruct (decide (M = 0)) as [E | E].
     rewrite E, rings.mult_0_r. now apply orders.lt_le. (* why does [solve_propholds] not work? *)
-    apply mspc_ball_Qabs in A. assert (0 ≤ M) by solve_propholds.
+    apply mspc_ball_Qabs in A. assert (0 ≤ M) by apply (bounded_nonneg f).
     apply (orders.order_preserving (.* M)) in A.
     now mc_setoid_replace (e / M * M) with e in A by (field; solve_propholds).
 Qed.
@@ -434,7 +375,8 @@ Admitted.
 
 Program Definition f0 : UniformlyContinuous sx sy :=
   Build_UniformlyContinuous (λ x, y0) _ _.
-Next Obligation. apply mspc_refl; Qauto_nonneg. Qed.
+(* [Admit Obligations] causes uncaught exception *)
+Next Obligation. (*apply mspc_refl; Qauto_nonneg. Qed.*)
 Next Obligation. exact Qinf.infinite. Defined.
 Next Obligation. admit. Qed.
 

@@ -122,16 +122,75 @@ Qed.
 
 End CompleteSegment.
 
-Require Import CRArith CRball CRabs.
+Require Import Qsetoid Qmetric CRArith CRball CRabs abs minmax.
 
 Add Ring CR : (stdlib_ring_theory CR).
 
 Close Scope CR_scope.
 Unset Printing Coercions.
 
-(* The following has to be generalized from CR to a metric space where
-[ball r x y] is defined as [abs (x - y) ≤ r], probably a normed vector
-space *)
+Global Instance CRabs_proper : Proper (equiv ==> equiv) (abs (A := CR)).
+Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
+
+Section CRQBallProperties.
+
+Local Notation ball := mspc_ball.
+
+(* The following has to be generalized from Q and CR to a metric space
+where [ball r x y] is defined as [abs (x - y) ≤ r], probably a normed
+vector space *)
+
+Lemma mspc_ball_Qabs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
+Proof. apply gball_Qabs. Qed.
+
+Lemma mspc_ball_Qabs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
+Proof.
+rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
+Qed.
+
+Lemma mspc_ball_CRabs (r : Q) (x y : CR) : ball r x y ↔ abs (x - y) ≤ 'r.
+Proof. apply CRball.gball_CRabs. Qed.
+
+(*Lemma mspc_ball_CRabs_flip (r : Q) (x y : CR) : ball r x y ↔ abs (y - x) ≤ 'r.
+Proof.
+rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
+Qed.*)
+
+Lemma mspc_ball_Qplus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
+Proof.
+intro A. assert (A1 := radius_nonneg _ _ _ A).
+destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
++ rewrite <- e_zero in A |- *. now rewrite A.
++ apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
+Qed.
+
+Lemma mspc_ball_CRplus_l (e : Q) (x y y' : CR) : ball e y y' -> ball e (x + y) (x + y').
+Proof.
+intro A. rewrite <- (rings.plus_0_l e). apply CRgball_plus; [| easy].
+(*[ apply mspc_refl] does not work *)
+change (ball 0 x x); now apply mspc_refl.
+Qed.
+
+Lemma mspc_ball_CRnegate (e : Q) (x y : CR) : mspc_ball e x y -> mspc_ball e (-x) (-y).
+Proof.
+intro A. apply mspc_ball_CRabs. mc_setoid_replace (-x - -y) with (y - x) by ring.
+now apply mspc_ball_CRabs, mspc_symm.
+Qed.
+
+Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :
+  ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
+Proof.
+intros B A1 A2 A3. destruct e as [e |]; [| apply mspc_inf].
+apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
+assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
+rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
+rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
+apply rings.flip_le_minus_l. apply rings.flip_le_minus_l in B.
+transitivity x2; [easy |]. transitivity (e + x1); [easy |].
+apply (orders.order_preserving (e +)); easy.
+Qed. (* Too long? *)
+
+End CRQBallProperties.
 
 (*Section LocallyLipschitz'.
 
@@ -166,6 +225,35 @@ constructor.
   apply CRgball_plus; [now apply: (lip_prf f Lf) | now apply: (lip_prf g Lg)].
 Qed.
 *)
+
+(* Needed to be able to state the property that the integral of the sum is
+the sum of integrals *)
+Global Instance sum_uc `{ExtMetricSpaceClass X}
+  (f g : X -> CR) `{!IsUniformlyContinuous f mu_f} `{!IsUniformlyContinuous g mu_g} :
+  IsUniformlyContinuous (f + g) (λ e, min (mu_f (e / 2)) (mu_g (e / 2))).
+Proof.
+constructor.
+* intros e e_pos. apply lt_min; [apply (uc_pos f mu_f) | apply (uc_pos g mu_g)]; solve_propholds.
+* intros e x1 x2 e_pos A. mc_setoid_replace e with (e / 2 + e / 2) by (field; discriminate).
+  apply CRgball_plus.
+  + apply: (uc_prf f mu_f); [solve_propholds |].
+    apply (mspc_monotone' (min (mu_f (e / 2)) (mu_g (e / 2)))); [| assumption].
+    change ((mu_f (e / 2)) ⊓ (mu_g (e / 2)) ≤ mu_f (e / 2)).
+    apply orders.meet_lb_l. (* does not work without [change] *)
+  + apply: (uc_prf g mu_g); [solve_propholds |].
+    apply (mspc_monotone' (min (mu_f (e / 2)) (mu_g (e / 2)))); [| assumption].
+    change ((mu_f (e / 2)) ⊓ (mu_g (e / 2)) ≤ mu_g (e / 2)).
+    apply orders.meet_lb_r.
+Qed.
+
+
+Global Instance negate_uc `{MetricSpaceBall X} (f : X -> CR)
+  `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous (- f) mu_f.
+Proof.
+constructor.
+* apply (uc_pos f _).
+* intros e x1 x2 e_pos A. apply mspc_ball_CRnegate, (uc_prf f mu_f); easy.
+Qed.
 
 End QField.
 

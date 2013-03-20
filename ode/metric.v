@@ -653,8 +653,11 @@ Section TotalOrderLattice.
 
 Context `{TotalOrder A} `{Lt A} `{∀ x y: A, Decision (x ≤ y)}.
 
-Lemma min_ind (R : relation A) (x y z : A) : R z x → R z y → R z (min x y).
+Lemma min_ind (P : A -> Prop) (x y : A) : P x → P y → P (min x y).
 Proof. unfold min, sort. destruct (decide_rel le x y); auto. Qed.
+
+Lemma lt_min (x y z : A) : z < x -> z < y -> z < min x y.
+Proof. apply min_ind. Qed.
 
 End TotalOrderLattice.
 
@@ -712,7 +715,7 @@ Proof.
 Admitted.
 (*
 constructor.
-+ intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
++ intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial. (* or use lt_min *)
   (* [trivial] solves, in particular, [IsUniformlyContinuous f1 mu1], which should
      have been solved automatically *)
 + intros e z z' e_pos [A1 A2]. split; simpl.
