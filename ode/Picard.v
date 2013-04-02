@@ -241,11 +241,16 @@ assert (B : ball rx x0 x0) by (apply mspc_refl; solve_propholds).
 apply (lip_nonneg (λ y, v ((x0 ↾ B), y)) L).
 Qed.
 
+(* Needed to apply Banach fixpoint theorem, which requires a finite
+distance between any two points *)
 Instance uc_msd : MetricSpaceDistance (UniformlyContinuous sx sy) := λ f1 f2, 2 * ry.
 
 Instance uc_msc : MetricSpaceClass (UniformlyContinuous sx sy).
 Proof.
-intros f1 f2. admit.
+intros f1 f2. unfold msd, uc_msd. intro x. apply (mspc_triangle' ry ry y0).
++ change (to_Q ry + to_Q ry = 2 * (to_Q ry)). ring.
++ apply mspc_symm; apply (proj2_sig (func f1 x)).
++ apply (proj2_sig (func f2 x)).
 Qed.
 
 (*Check _ : MetricSpaceClass sx.
@@ -278,13 +283,9 @@ Definition picard'' (f : UniformlyContinuous sx sy) : UniformlyContinuous sx CR.
 apply (Build_UniformlyContinuous (restrict (picard' f) x0 rx) _ _).
 Defined.
 
+(* Needed below to be able to apply (order_preserving (.* M)) *)
 Instance M_nonneg : PropHolds (0 ≤ M).
-Proof.
-Admitted.
-(*assert (Ax : mspc_ball rx x0 x0) by apply mspc_refl, (proj2_sig rx).
-assert (Ay : mspc_ball ry y0 y0) by apply mspc_refl, (proj2_sig ry).
-apply CRle_Qle. transitivity (abs (v (x0 ↾ Ax , y0 ↾ Ay))); [apply CRabs_nonneg | apply v_bounded].
-Qed.*)
+Proof. apply (bounded_nonneg v). Qed.
 
 Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : ball ry y0 (picard'' f x).
 Proof.

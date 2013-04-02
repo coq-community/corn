@@ -293,7 +293,14 @@ Global Instance Linf_product_msd : MetricSpaceDistance (X * Y) :=
   λ a b, join (msd (fst a) (fst b)) (msd (snd a) (snd b)).
 
 Global Instance Linf_product_mspc_distance : MetricSpaceClass (X * Y).
-Admitted.
+Proof.
+intros z1 z2; split.
+(* Without unfolding Linf_product_msd, the following [apply join_ub_l] fails *)
++ apply (mspc_monotone (msd (fst z1) (fst z2)));
+  [unfold msd, Linf_product_msd; apply join_ub_l | apply mspc_distance].
++ apply (mspc_monotone (msd (snd z1) (snd z2)));
+  [unfold msd, Linf_product_msd; apply join_ub_r | apply mspc_distance].
+Qed.
 
 End ProductMetricSpace.
 
@@ -710,12 +717,11 @@ Global Instance together_uc
   `{ExtMetricSpaceClass X1, ExtMetricSpaceClass Y1, ExtMetricSpaceClass X2, ExtMetricSpaceClass Y2}
    (f1 : X1 -> Y1) (f2 : X2 -> Y2)
   `{!IsUniformlyContinuous f1 mu1, !IsUniformlyContinuous f2 mu2} :
-  IsUniformlyContinuous (together f1 f2) (λ e, meet (mu1 e) (mu2 e)).
+  IsUniformlyContinuous (together f1 f2) (λ e, min (mu1 e) (mu2 e)).
 Proof.
-Admitted.
-(*
 constructor.
-+ intros e e_pos. apply min_ind; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial. (* or use lt_min *)
++ intros e e_pos. (* [apply min_ind] does not work if the goal has [meet] instead of [min] *)
+  apply lt_min; [apply (uc_pos f1) | apply (uc_pos f2)]; trivial.
   (* [trivial] solves, in particular, [IsUniformlyContinuous f1 mu1], which should
      have been solved automatically *)
 + intros e z z' e_pos [A1 A2]. split; simpl.
@@ -724,21 +730,8 @@ constructor.
   - apply (uc_prf f2 mu2); trivial.
     apply (mspc_monotone' (min (mu1 e) (mu2 e))); [apply: meet_lb_r | trivial].
 Qed.
-*)
 
 End ProductSpaceFunctions.
-
-(*
-Section Test.
-
-Context `{ExtMetricSpaceClass A, ExtMetricSpaceClass B, ExtMetricSpaceClass C}
-  (f : A -> B) `{!IsUniformlyContinuous f f_mu}
-  (v : A * B -> C) `{!IsUniformlyContinuous v v_mu}.
-
-Check _ : IsUniformlyContinuous (v ∘ (together id f) ∘ diag) _.
-
-End Test.
-*)
 
 Section CompleteMetricSpace.
 

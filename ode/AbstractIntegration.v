@@ -834,15 +834,37 @@ Proof. now rewrite rings.flip_negate, rings.negate_involutive. Qed.
 
 End RingFacts.
 
+Import interfaces.orders.
+
+Lemma join_comm `{JoinSemiLatticeOrder L} : Commutative join.
+Proof.
+intros x y. apply antisymmetry with (R := (≤)); [apply _ | |];
+(apply join_lub; [apply join_ub_r | apply join_ub_l]).
+(* why is [apply _] needed? *)
+Qed.
+
+Lemma meet_comm `{MeetSemiLatticeOrder L} : Commutative meet.
+Proof.
+intros x y. apply antisymmetry with (R := (≤)); [apply _ | |];
+(apply meet_glb; [apply meet_lb_r | apply meet_lb_l]).
+Qed.
+
 Definition Range (T : Type) := prod T T.
 
 Instance contains_Q : Contains Q (Range Q) := λ x s, (fst s ⊓ snd s ≤ x ≤ fst s ⊔ snd s).
 
 Lemma Qrange_comm (a b x : Q) : x ∈ (a, b) <-> x ∈ (b, a).
-Admitted.
+Proof.
+unfold contains, contains_Q; simpl.
+rewrite join_comm, meet_comm; reflexivity.
+Qed.
 
 Lemma range_le (a b : Q) : a ≤ b -> forall x, a ≤ x ≤ b <-> x ∈ (a, b).
-Admitted.
+Proof.
+intros A x; unfold contains, contains_Q; simpl.
+mc_setoid_replace (meet a b) with a by now apply lattices.meet_l.
+mc_setoid_replace (join a b) with b by now apply lattices.join_r. reflexivity.
+Qed.
 
 Lemma CRabs_negate (x : CR) : abs (-x) = abs x.
 Proof.
@@ -850,9 +872,18 @@ change (abs (-x)) with (CRabs (-x)).
 rewrite CRabs_opp; reflexivity.
 Qed.
 
+Lemma mspc_ball_Qle (r a x : Q) : mspc_ball r a x <-> a - r ≤ x ≤ a + r.
+Proof. rewrite mspc_ball_Qabs; apply Qabs_diff_Qle. Qed.
+
 Lemma mspc_ball_convex (x1 x2 r a x : Q) :
   mspc_ball r a x1 -> mspc_ball r a x2 -> x ∈ (x1, x2) -> mspc_ball r a x.
-Admitted.
+Proof.
+intros A1 A2 A3.
+rewrite mspc_ball_Qle in A1, A2. apply mspc_ball_Qle.
+destruct A1 as [A1' A1'']; destruct A2 as [A2' A2'']; destruct A3 as [A3' A3'']. split.
++ now transitivity (meet x1 x2); [apply meet_glb |].
++ now transitivity (join x1 x2); [| apply join_lub].
+Qed.
 
 Section IntegralTotal.
 
