@@ -970,16 +970,16 @@ Import interfaces.orders orders.semirings.
 
 Definition Qupper_bound (x : CR) := approximate x 1%Qpos + 1.
 
-Lemma Qupper_bound_ge (x : CR) : x ≤ 'Qupper_bound x.
-Admitted.
-(* Similar to
-upper_CRapproximation:
-  ∀ (x : CR) (e : Qpos), x <= (' (approximate x e + e)%Q)%CR
-CRexp.exp_bound_lemma:
-  ∀ x : CR, x <= (' (approximate x (1 # 1)%Qpos + 1)%Q)%CR *)
-
+(* To be proved by lifting from Q.
 Lemma CRabs_triang (x y z : CR) : x = y + z -> abs x ≤ abs y + abs z.
 Admitted.
+*)
+
+(* The section IntegralLipschitz is not used in the ODE solver through
+Picard iterations. Instead of assuming the function that is being
+integrated to be Lipschitz, the development assumes that it is uniformly
+continuous and bounded. Then integral is Lispchitz, but it is only proved
+that it is uniformly continuous. *)
 
 Section IntegralLipschitz.
 
@@ -1014,32 +1014,31 @@ Qed.
 
 End IntegralLipschitzBall.
 
+Lemma lipschitz_bounded (a r M x : Q) :
+  abs (f a) ≤ 'M -> ball r a x -> abs (f x) ≤ '(M + L a r * r).
+Proof.
+intros A1 A2. mc_setoid_replace (f x) with (f x - 0) by ring.
+apply mspc_ball_CRabs, mspc_symm.
+(* [apply mspc_triangle with (c := f a)] does not work *)
+apply (mspc_triangle _ _ _ (f a)).
++ apply mspc_ball_CRabs. mc_setoid_replace (0 - f a) with (- f a) by ring.
+  now rewrite CRabs_negate.
++ apply llip; trivial. now apply mspc_refl, (radius_nonneg a x).
+Qed.
+
 Global Instance integral_lipschitz :
   IsLocallyLipschitz F (λ a r, Qupper_bound (abs (f a)) + L a r * r).
 Proof.
 intros a r r_nonneg. constructor.
 + apply nonneg_plus_compat.
-  - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply Qupper_bound_ge].
+  - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply upper_CRapproximation].
   - apply nonneg_mult_compat; [apply (lip_nonneg (restrict f a r)) |]; auto.
     (* Not good to provide [(restrict f a r)]. [IsLipschitz (restrict f a r) (L a r)] is generated *)
-+ (* PG ignores the following tactic *) idtac. intros x1 x2 d A.
++ intros x1 x2 d A.
   destruct x1 as [x1 A1]; destruct x2 as [x2 A2].
   change (ball ((Qupper_bound (abs (f a)) + L a r * r) * d) (F x1) (F x2)).
   apply (int_lip a r); trivial.
-  intros x B. transitivity (abs (f a) + '(L a r * r)).
-  - transitivity (abs (f a) + abs (f x - f a)); [apply CRabs_triang; ring |].
-    apply (order_preserving (abs (f a) +)).
-    apply CRball.gball_CRabs. apply gball_sym.
-    (* There should be a lemma similar to metric.luc for locally Lipschitz:
-       the following invocation of lip_prf is too complex *)
-    assert (B1 : ball r a a) by now apply mspc_refl.
-    change (ball (L a r * r) (restrict f a r (a ↾ B1)) (restrict f a r (x ↾ B))).
-    specialize (IsLocallyLipschitz0 a r r_nonneg).
-    now apply lip_prf.
-  - rewrite <- CRplus_Qplus.
-    change (abs (f a) + ' (L a r * r) ≤ ' Qupper_bound (abs (f a)) + ' (L a r * r)).
-    apply plus_le_compat; (* does not work wothout [change] *)
-    [apply Qupper_bound_ge | reflexivity].
+  intros x B. now apply lipschitz_bounded; [apply upper_CRapproximation |].
 Qed.
 
 End IntegralLipschitz.

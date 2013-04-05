@@ -192,15 +192,6 @@ Qed. (* Too long? *)
 
 End CRQBallProperties.
 
-(*Section LocallyLipschitz'.
-
-Context `{MetricSpaceBall X, MetricSpaceBall Y}.
-
-Class IsLocallyLipschitz' (f : X -> Y) (L : X -> Q -> Q) :=
-  llip_prf' :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
-
-End LocallyLipschitz'.*)
-
 Global Instance sum_llip `{MetricSpaceBall X}
   (f g : X -> CR) `{!IsLocallyLipschitz f Lf} `{!IsLocallyLipschitz g Lg} :
   IsLocallyLipschitz (f + g) (λ x r, Lf x r + Lg x r).

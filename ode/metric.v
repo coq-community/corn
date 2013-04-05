@@ -558,6 +558,14 @@ of [IsLipschitz f _] for a specific term [f], then Coq should not enter an
 infinite loop because that would require unifying [f] with [restrict _ _ _].
 We need this instance to apply [lip_nonneg (restrict f x r) _] in order
 to prove [0 ≤ Lf x r] when [IsLocallyLipschitz f Lf]. *)
+
+(* We make an assumption [0 ≤ r] in llip_prf below to make proving that
+functions are locally Lipschitz easier. As a part of such proof, one needs
+to show that [0 ≤ L x r] ([lip_nonneg]). Proving this under the assumption
+[0 ≤ r] may allow having simpler definitions of the uniform [L]. In
+particular, integral_lipschitz in AbstractIntegration.v defines [L] as
+[λ a r, abs (f a) + L' a r * r]. *)
+
 Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
   llip_prf :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
 
@@ -567,6 +575,16 @@ Global Instance lip_llip (f : X -> Y) `{!IsLipschitz f L} : IsLocallyLipschitz f
 Proof.
 intros x r. constructor; [now apply (lip_nonneg f) |].
 intros [x1 x1b] [x2 x2b] e A. change (ball (L * e) (f x1) (f x2)). now apply lip_prf.
+Qed.
+
+Lemma llip `{!ExtMetricSpaceClass X} (f : X -> Y) `{IsLocallyLipschitz f L} (r e : Q) (a x y : X) :
+  ball r a x -> ball r a y -> ball e x y -> ball (L a r * e) (f x) (f y).
+Proof.
+intros A1 A2 A3.
+change (f x) with (restrict f a r (exist _ x A1)).
+change (f y) with (restrict f a r (exist _ y A2)).
+assert (0 ≤ r) by now apply (radius_nonneg a x).
+apply (lip_prf _ (L a r)); trivial.
 Qed.
 
 Record LocallyLipschitz := {
