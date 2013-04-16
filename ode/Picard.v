@@ -187,22 +187,6 @@ Qed.
 
 End Bounded.
 
-Global Existing Instance luc_prf.
-
-Lemma int_plus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
-  int (f + g) a b = int f a b + int g a b.
-Admitted.
-
-Lemma int_negate (f : Q -> CR) `{!IsUniformlyContinuous f f_mu} (a b : Q) :
-  int (- f) a b = - int f a b.
-Admitted.
-
-Lemma int_minus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
-  int (f - g) a b = int f a b - int g a b.
-Proof. rewrite int_plus, int_negate; reflexivity. Qed.
-
 Global Instance bounded_int_uc {f : Q -> CR} {M : Q}
   `{!Bounded f M} `{!IsUniformlyContinuous f mu_f} (x0 : Q) :
   IsUniformlyContinuous (λ x, int f x0 x) (lip_modulus M).

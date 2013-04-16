@@ -424,8 +424,11 @@ Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
   f ∘ @proj1_sig _ _.
 
+(* See the remark about llip_prf below about the loop between
+IsUniformlyContinuous and IsLocallyUniformlyContinuous *)
+
 Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
-  luc_prf : forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
+  luc_prf :> forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
 
 Global Arguments luc_prf f lmu {_} x r.
 

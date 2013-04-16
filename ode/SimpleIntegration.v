@@ -8,9 +8,9 @@
 
 Require Import
   List NPeano Unicode.Utf8
-  QArith Qabs Qpossec Qsums
+  QArith Qabs Qpossec QnonNeg Qsums
   Qmetric Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
-  CRArith AbstractIntegration
+  CRArith (*AbstractIntegration*)
   util.Qgcd
   Program
   uneven_CRplus
@@ -21,8 +21,10 @@ Require Import
   metric FromMetric2
   implementations.stdlib_rationals.
 
+Import QnonNeg.notations.
+
 Bind Scope Q_scope with Q.
-Open Scope Q_scope.
+Local Open Scope Q_scope.
 
 Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
   gball r x y <-> mspc_ball r x y.
@@ -31,6 +33,108 @@ Proof. reflexivity. Qed.
 Lemma ball_mspc_ball {X : MetricSpace} (r : Qpos) (x y : X) :
   ball r x y <-> mspc_ball r x y.
 Proof. rewrite <- ball_gball; reflexivity. Qed.
+
+Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
+
+Implicit Arguments integrate [[Integral]].
+
+Notation "∫" := integrate.
+
+Section integral_interface.
+
+  Open Scope CR_scope.
+
+  (*Context (f: Q → CR).*)
+
+  Class Integrable `{!Integral f}: Prop :=
+    { integral_additive:
+      forall (a: Q) b c, ∫ f a b + ∫ f (a+` b) c == ∫ f a (b+c)%Qnn
+
+    ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
+      (forall x, from <= x <= from+width -> ball r (f x) ('mid)) ->
+      ball (width * r) (∫ f from width) (' (width * mid)%Q)
+
+    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f) }.
+
+  (* Todo: Show that the sign function is integrable while not locally uniformly continuous. *)
+
+  (** This closely resembles the axiomatization given in
+   Bridger's "Real Analysis: A Constructive Approach", Ch. 5. *)
+
+  (** The boundedness property is stated very primitively here, in that r is a Qpos instead of a CR,
+   w is a Qpos instead of a QnonNeg, and mid is a Q instead of a CR. This means that it's easy to
+   show that particular implementations satisfy this interface, but hard to use this property directly.
+   Hence, we will show in a moment that the property as stated actually implies its generalization
+   with r and mid in CR and w in QnonNeg. *)
+
+  (** Note: Another way to state the property still more primitively (and thus more easily provable) might
+   be to make the inequalities in "from <= x <= from+width" strict. *)
+
+End integral_interface.
+
+Arguments Integrable f {_}.
+
+(** We offer a smart constructor for implementations that would need to recognize and
+ treat the zero-width case specially anyway (which is the case for the implementation
+with Riemann sums, because there, a positive width is needed to divide the error by). *)
+
+Section extension_to_nn_width.
+
+  Open Scope CR_scope.
+
+  Context
+    (f: Q → CR)
+    (pre_integral: Q → Qpos → CR) (* Note the Qpos instead of QnonNeg. *)
+      (* The three properties limited to pre_integral: *)
+    (pre_additive: forall (a: Q) (b c: Qpos),
+      pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
+    (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
+      (forall x: Q, from <= x <= from + width -> ball r (f x) (' mid)) ->
+      ball (width * r) (pre_integral from width) (' (width * mid)%Q))
+    {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
+
+  Instance integral_extended_to_nn_width: Integral f :=
+    fun from => QnonNeg.rect (fun _ => CR)
+      (fun _ _ => '0%Q)
+      (fun n d _ => pre_integral from (QposMake n d)).
+
+  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) (∫ f).
+  Proof with auto.
+   intros ?????.
+   induction x0 using QnonNeg.rect;
+    induction y0 using QnonNeg.rect.
+       reflexivity.
+     discriminate.
+    discriminate.
+   intros. apply pre_wd...
+  Qed.
+
+  Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
+    (forall x, from <= x <= from + width -> ball r (f x) (' mid)) ->
+    ball (width * r) (∫ f from width) (' (width * mid)%Q).
+  Proof.
+   induction width using Qpos_positive_numerator_rect.
+   apply (pre_bounded from (a#b) mid r).
+  Qed.
+
+  Let additive (a: Q) (b c: QnonNeg): ∫ f a b + ∫ f (a + `b)%Q c  == ∫ f a (b + c)%Qnn.
+  Proof.
+   unfold integrate.
+   induction b using QnonNeg.rect;
+    induction c using QnonNeg.rect; simpl integral_extended_to_nn_width; intros.
+      ring.
+     rewrite CRplus_0_l.
+     apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+    rewrite CRplus_0_r.
+    apply pre_wd; unfold QposEq, Qeq; simpl; repeat rewrite Zpos_mult_morphism; ring.
+   rewrite (pre_additive a (QposMake n d) (QposMake n0 d0)).
+   apply pre_wd; reflexivity.
+  Qed.
+
+  Lemma integral_extended_to_nn_width_correct: Integrable f.
+  Proof. constructor; auto. Qed.
+
+End extension_to_nn_width.
 
 Open Scope uc_scope.
 
@@ -274,7 +378,7 @@ Section definition.
 
   Definition pre_result fr w: CR := mkRegularFunction (0:Q_as_MetricSpace) (regular fr w).
 
-  Global Instance integrate: Integral f := @integral_extended_to_nn_width f pre_result.
+  Global Instance (*integrate*): Integral f := @integral_extended_to_nn_width f pre_result.
 
   Global Instance: Proper (Qeq ==> QposEq ==> @st_eq _) pre_result.
   Proof.
@@ -477,7 +581,7 @@ Section implements_abstract_interface.
 
   Lemma data_points_in_range (from: Q) (width: Qpos) (ints: positive) (i : nat) (Ilt: (i < ints)%nat):
     from <= (from + (i * (`width / ints) + (1 # 2) * (`width / ints))) <= from + `width.
-  Proof with auto.
+  Proof with auto with qarith.
    split.
     rewrite <- (Qplus_0_r from) at 1.
     apply Qplus_le_compat...
@@ -498,7 +602,7 @@ Section implements_abstract_interface.
   Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
     (forall x, from <= x <= from + width -> ball r (f x) ('mid)%CR) ->
     ball (width * r) (pre_result f from width) (' (width * mid)%Q)%CR.
-  Proof with auto.
+  Proof with auto with qarith.
    intros. apply (@regFunBall_Cunit Q_as_MetricSpace).
    intro. unfold pre_result. simpl approximate.
    unfold approx.

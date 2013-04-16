@@ -164,11 +164,18 @@ destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
 + apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
 Qed.
 
+(* This is a copy of [CRgball_plus] formulated in terms of [mspc_ball]
+instead of [gball]. Applying [CRgball_plus] introduces [gball] into the
+goal, and then applying some theorems about [mspc_ball] may not work. This
+is because [mspc_ball] reduces to [gball] but not the other way around. *)
+Lemma mspc_ball_CRplus (e1 e2 : Q) (x x' y y' : CR) :
+  ball e1 x x' -> ball e2 y y' -> ball (e1 + e2) (x + y) (x' + y').
+Proof. apply CRgball_plus. Qed.
+
 Lemma mspc_ball_CRplus_l (e : Q) (x y y' : CR) : ball e y y' -> ball e (x + y) (x + y').
 Proof.
-intro A. rewrite <- (rings.plus_0_l e). apply CRgball_plus; [| easy].
-(*[ apply mspc_refl] does not work *)
-change (ball 0 x x); now apply mspc_refl.
+intro A. rewrite <- (rings.plus_0_l e). apply mspc_ball_CRplus; [| easy].
+now apply mspc_refl.
 Qed.
 
 Lemma mspc_ball_CRnegate (e : Q) (x y : CR) : mspc_ball e x y -> mspc_ball e (-x) (-y).
