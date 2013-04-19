@@ -12,7 +12,7 @@ Require Import
 Require Import metric FromMetric2 SimpleIntegration.
 
 Require Qinf QnonNeg QnnInf CRball.
-Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs.
+Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs (*canonical_names*).
 
 Require CRtrans ARtrans. (* This is almost all CoRN *)
 
@@ -23,9 +23,8 @@ Ltac done :=
 (*   | case not_locked_false_eq_true; assumption*)
    | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
 
-Open Local Scope Q_scope.
-(*Open Local Scope uc_scope.*)
-Open Local Scope CR_scope.
+Local Open Scope Q_scope.
+Local Open Scope CR_scope.
 
 (* [SearchAbout ((Cmap _ _) (Cunit _)).] does not find anything, but it
 should find metric2.Prelength.fast_MonadLaw3 *)
@@ -128,6 +127,15 @@ Proof with simpl; auto.
 Qed.
 *)
 
+Lemma cmΣ_0 (f : nat -> CR) (n : nat) :
+  (forall m, (m < n)%nat -> f m [=] 0) -> cmΣ n f [=] 0.
+Proof.
+induction n as [| n IH]; intro H; [reflexivity |].
+unfold cmΣ. simpl @cm_Sum. rewrite H by apply lt_n_Sn.
+rewrite IH; [apply CRplus_0_l |].
+intros m H1; apply H. now apply lt_S.
+Qed.
+
 Lemma CRΣ_gball (f g: nat -> CR) (e : Q) (n : nat):
    (forall m, (m < n)%nat -> gball e (f m) (g m)) ->
    (gball (n * e) (cmΣ n f) (cmΣ n g)).
@@ -139,6 +147,14 @@ Proof.
  unfold cmΣ. simpl @cm_Sum.
  apply CRgball_plus; auto.
 Qed.
+
+(*Instance cmΣ_proper : Proper (eq ==> @ext_equiv nat _ CR _ ==> @st_eq CR) cmΣ.
+Proof.
+intros n1 n2 E1 f1 f2 E2. rewrite E1.
+change (gball 0 (cmΣ n2 f1) (cmΣ n2 f2)).
+setoid_replace 0%Q with (n2 * 0)%Q by ring.
+apply CRΣ_gball. now intros m _; apply E2.
+Qed.*)
 
 Hint Immediate ball_refl Qle_refl.
 
@@ -428,6 +444,9 @@ Section integral_approximation.
     Lemma step_nonneg (w : Q) (n : positive) : 0 <= w -> 0 <= step w n.
     Proof. intros w_nn; unfold step; Qauto_nonneg. Qed.
 
+    Lemma step_0 (n : positive) : step 0 n == 0.
+    Proof. unfold step; now rewrite Qmult_0_l. Qed.
+
     Lemma step_mult (w : Q) (n : positive) : (n : Q) * step w n == w.
     Proof.
       unfold step.
@@ -435,15 +454,21 @@ Section integral_approximation.
       rewrite Qmult_inv_r, Qmult_1_l; [reflexivity | auto with qarith].
     Qed.
 
-    Definition riemann_sum (a : Q) (w : Q) (n : positive) :=
+    Definition riemann_sum (a w : Q) (n : positive) :=
       let iw := step w n in
         cmΣ (Pos.to_nat n) (fun i => 'iw * f (a + i * iw))%CR.
 
-(*Set Printing Coercions.
-SearchAbout Pos.to_nat.
-ZL4': ∀ y : positive, {h : nat | Pos.to_nat y = S h}
-nat_of_P_nonzero: ∀ p : positive, Pos.to_nat p ≠ 0%nat
-Pos2Nat.is_succ: ∀ p : positive, ∃ n : nat, Pos.to_nat p = S n*)
+    (*Instance : Proper (Qeq ==> Qeq ==> eq ==> @st_eq CR) riemann_sum.
+    Proof.
+      intros a1 a2 Ea w1 w2 Ew n1 n2 En. apply cmΣ_proper; [now rewrite En |].
+      intros i1 i2 Ei.*)
+
+    Lemma riemann_sum_0 (a : Q) (n : positive) : riemann_sum a 0 n [=] 0%CR.
+    Proof.
+      unfold riemann_sum. apply cmΣ_0.
+      intros m _. rewrite step_0.
+      now setoid_replace (0 * f (a + m * 0))%CR with 0%CR by ring.
+    Qed.
 
     Lemma Riemann_sums_approximate_integral' (a : Q) (w : QnonNeg) (e : Qpos) (n : positive) :
       (step w n <= lmu a w e)%Qinf ->
@@ -456,22 +481,45 @@ Pos2Nat.is_succ: ∀ p : positive, ∃ n : nat, Pos.to_nat p = S n*)
       rewrite positive_nat_Z. unfold inject_Z. rewrite !Qmake_Qdiv; field; auto.
     Qed.
 
-    Lemma Riemann_sums_approximate_integral'' (a : Q) (w : QnonNeg) (e : Qpos) :
+    Lemma integral_approximation (a : Q) (w : QnonNeg) (e : Qpos) :
       exists N : positive, forall n : positive, (N <= n)%positive ->
-        gball e (riemann_sum a w n) (∫ f a w).
+        mspc_ball e (riemann_sum a w n) (∫ f a w).
     Proof.
+    destruct (Qlt_le_dec 1 w) as [A1 | A1].
+    * assert (0 < w) by (apply (Qlt_trans _ 1); auto with qarith).
       set (N := Z.to_pos (Qceiling (comp_inf (λ x, w / x) (lmu a w) 0 (e / w)))).
-      exists N; intros n A. setoid_replace (QposAsQ e) with ((e / w)%Qpos * w)
-        by (change (e == e / w * w); field; auto).
+      exists N; intros n A2.
+      setoid_replace (QposAsQ e) with (e / w * w) by (field; auto with qarith).
+      (* [apply Riemann_sums_approximate_integral'] does not unify because in
+      this lemma, the radius is [(QposAsQ e) * (QnonNeg.to_Q w)], and in the
+      goal the radius is [(QposAsQ e) / (QnonNeg.to_Q w) * (QnonNeg.to_Q w)]. *)
+      assert (P : 0 < e / w) by (apply Qmult_lt_0_compat; [| apply Qinv_lt_0_compat]; auto).
+      change (e / w) with (QposAsQ (mkQpos P)).
       apply Riemann_sums_approximate_integral'.
-      unfold step, comp_inf in *. change ((w * (1 # n))%Q <= lmu a w (e / w))%Qinf.
-      assert (A2 : 0 < e / w) by (apply Qmult_lt_0_compat; [| apply Qinv_lt_0_compat]; auto).
-      destruct (lmu a w (e / w)) as [mu |] eqn:A1; [| easy].
-      assert (A3 := @uc_pos _ _ _ _ _ _ (L a w) (e / w) A2). rewrite A1 in A3.
-      change (0 < mu) in A3.
-      rewrite Qmake_Qdiv, injZ_One. unfold Qdiv. rewrite Qmult_assoc, Qmult_1_r.
-      change (w / n <= mu). apply Qle_div_l; auto.
-      subst N. now apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A.
+      change (QposAsQ (mkQpos P)) with (e / w).
+      destruct (lmu a w (e / w)) as [mu |] eqn:A3; [| easy].
+      subst N; unfold comp_inf in A2; rewrite A3 in A2.
+      change (step w n <= mu); unfold step.
+      rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
+      assert (A4 : 0 < mu) by (change (Qinf.lt 0 mu); rewrite <- A3;
+        apply (uc_pos (restrict f a w) (lmu a w)); trivial).
+      apply Qle_div_l; auto.
+      now apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
+    * set (N := Z.to_pos (Qceiling (comp_inf (λ x, 1 / x) (lmu a w) 0 e))).
+      exists N; intros n A2.
+      apply (mspc_monotone (e * w)).
+      + change (e * w <= e). rewrite <- (Qmult_1_r e) at 2. apply Qmult_le_compat_l; auto.
+      + apply Riemann_sums_approximate_integral'.
+        destruct (lmu a w e) as [mu |] eqn:A3; [| easy].
+        subst N; unfold comp_inf in A2; rewrite A3 in A2.
+        change (step w n <= mu); unfold step.
+        rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
+        assert (A4 : 0 < mu) by (change (Qinf.lt 0 mu); rewrite <- A3;
+          apply (uc_pos (restrict f a w) (lmu a w)), (proj2_sig e)).
+        apply Qle_div_l; auto.
+        apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
+        apply (Qle_trans _ (1 / mu)); trivial. apply Qmult_le_compat_r; trivial.
+        now apply Qinv_le_0_compat, Qlt_le_weak.
     Qed.
 
   (** Unicity itself will of course have to be stated w.r.t. *two* integrals: *)
@@ -503,6 +551,7 @@ Pos2Nat.is_succ: ∀ p : positive, ∃ n : nat, Pos.to_nat p = S n*)
    apply (Riemann_sums_approximate_integral a x ((1 # 2) * e / x)%Qpos t n H H0).
   Qed.
 *)
+
 End integral_approximation.
 
 (** If f==g, then an integral for f is an integral for g. *)
@@ -523,7 +572,11 @@ Proof with auto.
  apply integral_wd...
 Qed.
 
-Import abstract_algebra.
+Import canonical_names abstract_algebra.
+
+Local Open Scope mc_scope.
+
+Add Ring CR : (rings.stdlib_ring_theory CR).
 
 Lemma mult_comm `{SemiRing R} : Commutative (.*.).
 Proof. apply commonoid_commutative with (Aunit := one), _. Qed.
@@ -540,8 +593,6 @@ apply -> CRabs_cases; [| apply _ | apply _].
 split; [trivial | apply (proj1 (rings.flip_nonpos_negate x))].
 Qed.
 
-Add Ring CR_ring : (rings.stdlib_ring_theory CR).
-
 Lemma cmΣ_empty {M : CMonoid} (f : nat -> M) : cmΣ 0 f = [0].
 Proof. reflexivity. Qed.
 
@@ -555,6 +606,15 @@ induction n as [| n IH].
 + rewrite !cmΣ_succ. rewrite IH.
   change (f n + g n + (cmΣ n f + cmΣ n g) = f n + cmΣ n f + (g n + cmΣ n g)).
   change (CRasCMonoid : Type) with (CR : Type). ring.
+Qed.
+
+Lemma cmΣ_negate (n : nat) (f : nat -> CR) : cmΣ n (- f) = - cmΣ n f.
+Proof.
+induction n as [| n IH].
++ change ((0 : CR) = - 0). (* [change (0 = - 0)] loops *) ring.
++ rewrite !cmΣ_succ. rewrite IH.
+  change (- f n - cmΣ n f = - (f n + cmΣ n f)).
+  change (CRasCMonoid : Type) with (CR : Type). (* Why the last command? *) ring.
 Qed.
 
 Lemma cmΣ_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
@@ -580,7 +640,15 @@ unfold riemann_sum. rewrite <- cmΣ_plus. apply cm_Sum_eq. intro k.
 change (
   cast Q CR (step w n) * (f (a + (k : Q) * step w n) + g (a + (k : Q) * step w n)) =
   cast Q CR (step w n) * f (a + (k : Q) * step w n) + cast Q CR (step w n) * g (a + (k : Q) * step w n)).
-apply rings.plus_mult_distr_l.
+apply rings.plus_mult_distr_l. (* Without [change] unification fails, [apply:] loops *)
+Qed.
+
+Lemma riemann_sum_negate (f : Q -> CR) (a w : Q) (n : positive) :
+  riemann_sum (- f) a w n = - riemann_sum f a w n.
+Proof.
+unfold riemann_sum. rewrite <- cmΣ_negate. apply cm_Sum_eq. intro k.
+change ('step w n * (- f (a + (k : Q) * step w n)) = -('step w n * f (a + (k : Q) * step w n))).
+ring.
 Qed.
 
 Section RiemannSumBounds.
@@ -621,8 +689,6 @@ End RiemannSumBounds.
 Section IntegralBound.
 
 Context (f : Q -> CR) `{Integrable f}.
-
-Add Ring CR : (rings.stdlib_ring_theory CR).
 
 Lemma scale_0_r (x : Q) : scale x 0 = 0.
 Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
@@ -785,7 +851,7 @@ Proof. now rewrite rings.flip_negate, rings.negate_involutive. Qed.
 
 End RingFacts.
 
-Import interfaces.orders orders.minmax.
+Import interfaces.orders orders.minmax theory.rings.
 
 Lemma join_comm `{JoinSemiLatticeOrder L} : Commutative join.
 Proof.
@@ -883,7 +949,7 @@ Proof. apply minus_eq_plus. rewrite rings.plus_comm. symmetry; apply int_add. Qe
 Lemma int_zero_width (a : Q) : int a a = 0.
 Proof. apply (plus_right_cancel (int a a)); rewrite rings.plus_0_l; apply int_add. Qed.
 
-Lemma int_negate (a b : Q) : int a b = - int b a.
+Lemma int_opposite (a b : Q) : int a b = - int b a.
 Proof.
 apply rings.equal_by_zero_sum. rewrite rings.negate_involutive, int_add. apply int_zero_width.
 Qed.
@@ -917,16 +983,16 @@ apply rings.negate_plus_distr. (* does not work without unfold *)
 Qed.*)
 
 Lemma integrate_plus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a : Q) (w : Qpos) :
+  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a : Q) (w : QnonNeg) :
   ∫ (f + g) a w = ∫ f a w + ∫ g a w.
 Proof.
 apply mspc_closed. intros e e_pos. (* Why is 0%Q? *)
 mc_setoid_replace (0 + e) with e by ring.
 assert (he_pos : 0 < e / 2) by solve_propholds.
 assert (qe_pos : 0 < e / 4) by solve_propholds.
-destruct (Riemann_sums_approximate_integral'' f a w (mkQpos qe_pos)) as [Nf F].
-destruct (Riemann_sums_approximate_integral'' g a w (mkQpos qe_pos)) as [Ng G].
-destruct (Riemann_sums_approximate_integral'' (f + g) a w (mkQpos he_pos)) as [Ns S].
+destruct (integral_approximation f a w (mkQpos qe_pos)) as [Nf F].
+destruct (integral_approximation g a w (mkQpos qe_pos)) as [Ng G].
+destruct (integral_approximation (f + g) a w (mkQpos he_pos)) as [Ns S].
 (* [Le positive] is not yet defined *)
 set (n := Pos.max (Pos.max Nf Ng) Ns).
 assert (Nf <= n)%positive by (transitivity (Pos.max Nf Ng); apply Pos.le_max_l).
@@ -939,40 +1005,34 @@ apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (f + g) a w n)); [field; disc
   now apply mspc_ball_CRplus; [apply F | apply G].
 Qed.
 
+Lemma integrate_negate (f : Q -> CR)
+  `{!IsUniformlyContinuous f f_mu} (a : Q) (w : QnonNeg) : ∫ (- f) a w = - ∫ f a w.
+Proof.
+apply mspc_closed. intros e e_pos.
+mc_setoid_replace (0 + e) with e by ring.
+assert (he_pos : 0 < e / 2) by solve_propholds.
+destruct (integral_approximation (- f) a w (mkQpos he_pos)) as [N1 F1].
+destruct (integral_approximation f a w (mkQpos he_pos)) as [N2 F2].
+set (n := Pos.max N1 N2).
+assert (N1 <= n)%positive by apply Pos.le_max_l.
+assert (N2 <= n)%positive by apply Pos.le_max_r.
+apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a w n)); [field; discriminate | |].
+* now apply mspc_symm, F1.
+* rewrite riemann_sum_negate. now apply mspc_ball_CRnegate, F2.
+Qed.
+
 Lemma int_plus (f g : Q -> CR)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
   int (f + g) a b = int f a b + int g a b.
 Proof.
-destruct (trichotomy (<) a b) as [A | [A | A]].
-+ assert (L : a ≤ b) by solve_propholds.
-  assert (P : 0 < b - a) by now apply rings.flip_pos_minus.
-  unfold int; destruct (decide (a ≤ b)) as [B | B]; [clear L | elim (B L)].
-  (* Bad because it mentions [int_obligation_1] *)
-  setoid_replace ((b - a) ↾ int_obligation_1 a b B) with
-    (QnonNeg.from_Qpos (mkQpos P)) using relation QnonNeg.eq by reflexivity.
-  apply integrate_plus.
-+ change (Qeq a b) in A. rewrite A.
-
-
-
-intros A. apply ball_gball; simpl. apply gball_closed. intros e e_pos.
-setoid_replace (width * r + e)%Q with (e + width * r)%Q by apply Qplus_comm.
-destruct (Riemann_sums_approximate_integral'' f from width ((1#2) * mkQpos e_pos)%Qpos) as [Nf F].
-destruct (Riemann_sums_approximate_integral'' g from width ((1#2) * mkQpos e_pos)%Qpos) as [Ng G].
-set (n := Pos.max Nf Ng).
-assert (le_Nf_n : (Nf <= n)%positive) by apply Pos.le_max_l.
-assert (le_Ng_n : (Ng <= n)%positive) by apply Pos.le_max_r.
-specialize (F n le_Nf_n). specialize (G n le_Ng_n).
-apply gball_triangle with (b := riemann_sum (f + g) from width n).
-+ rewrite riemann_sum_plus. setoid_replace e with ((1#2) * e + (1#2) * e)%Q by ring.
-  apply CRgball_plus; apply gball_sym; trivial.
-+ (* apply riemann_sum_bounds. diverges *)
-  rewrite <- CRmult_Qmult. apply riemann_sum_bounds; [solve_propholds |].
-  intros. apply ball_gball. apply A; trivial.
+unfold int; destruct (decide (a ≤ b)); rewrite integrate_plus; ring.
+Qed.
 
 Lemma int_negate (f : Q -> CR) `{!IsUniformlyContinuous f f_mu} (a b : Q) :
   int (- f) a b = - int f a b.
-Admitted.
+Proof.
+unfold int; destruct (decide (a ≤ b)); rewrite integrate_negate; reflexivity.
+Qed.
 
 Lemma int_minus (f g : Q -> CR)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
