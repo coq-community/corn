@@ -330,40 +330,77 @@ constructor.
 + intros e x1 x2 e_pos B. change (ball e y0 y0). apply mspc_refl; solve_propholds.
 Qed.
 
-(*Let emsc := _ : ExtMetricSpaceClass (UniformlyContinuous sx sy).
-Check _ : MetricSpaceClass (UniformlyContinuous sx sy).*)
-
 Lemma ode_solution : let f := fp picard f0 in picard f = f.
 Proof. apply banach_fixpoint. Qed.
 
 End Picard.
+
+Import theory.rings orders.rings.
 
 Section Computation.
 
 Definition x0 : Q := 0.
 Definition y0 : CR := 1.
 Definition rx : QnonNeg := (1 # 2)%Qnn.
-Definition ry : QnonNeg := 2.
+Definition ry : QnonNeg := 1.
 
 Notation sx := (sig (ball rx x0)).
 Notation sy := (sig (ball ry y0)).
 
-Definition v (z : sx * sy) : CR := proj1_sig (snd z).
+Definition v (z : sx * sy) : CR := ` (snd z).
 Definition M : Q := 2.
 Definition mu_v (e : Q) : Qinf := e.
+Definition L : Q := 1.
 
 Instance : Bounded v M.
-Admitted.
+Proof.
+intros [x [y H]]. unfold v; simpl. unfold M, ry, y0 in *.
+apply mspc_ball_CRabs, CRdistance_CRle in H. destruct H as [H1 H2].
+change (1 - 1 ≤ y) in H1. change (y ≤ 1 + 1) in H2. change (abs y ≤ 2).
+rewrite plus_negate_r in H1. apply CRabs_AbsSmall. split; [| assumption].
+change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.
+apply flip_le_negate; solve_propholds.
+Qed.
 
 Instance : IsUniformlyContinuous v mu_v.
-Admitted.
+Proof.
+constructor.
+* now intros.
+* unfold mu_v. intros e z1 z2 e_pos H. now destruct H.
+Qed.
 
-Program Definition f0 : UniformlyContinuous sx sy :=
+Instance v_lip (x : sx) : IsLipschitz (λ y : sy, v (x, y)) L.
+Proof.
+constructor.
+* unfold L. solve_propholds.
+* intros y1 y2 e H. unfold L; rewrite mult_1_l. apply H.
+Qed.
+
+Lemma L_rx : L * rx < 1.
+Proof.
+unfold L, rx; simpl. rewrite mult_1_l. change (1 # 2 < 1)%Q. auto with qarith.
+Qed.
+
+Lemma rx_M : `rx * M ≤ ry.
+Proof.
+unfold rx, ry, M; simpl. rewrite Qmake_Qdiv. change (1 * / 2 * 2 <= 1)%Q.
+rewrite <- Qmult_assoc, Qmult_inv_l; [auto with qarith | discriminate].
+Qed.
+
+(*Program Definition f0' : UniformlyContinuous sx sy :=
   Build_UniformlyContinuous (λ x, y0) _ _.
 (* [Admit Obligations] causes uncaught exception *)
-Next Obligation. (*apply mspc_refl; Qauto_nonneg. Qed.*)
+Next Obligation. apply mspc_refl; Qauto_nonneg. Qed.
 Next Obligation. exact Qinf.infinite. Defined.
-Next Obligation. admit. Qed.
+Next Obligation.
+constructor.
+* now intros.
+* intros e x1 x2 e_pos _. change (ball e y0 y0). apply mspc_refl. solve_propholds.
+Qed.*)
+
+Let f := fp (picard x0 y0 rx ry v rx_M) (f0 x0 y0 rx ry). ode_solution x0 y0 rx ry v L v_lip L_rx rx_M
+
+Let f0 := f0 x0 y0 rx ry.
 
 Definition picard_iter (n : nat) := nat_iter n (picard x0 y0 rx ry v) f0.
 
