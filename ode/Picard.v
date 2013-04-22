@@ -217,7 +217,7 @@ Hypothesis v_lip : forall x : sx, IsLipschitz (λ y, v (x, y)) L.
 
 Hypothesis L_rx : L * rx < 1.
 
-Hypothesis rx_ry : `rx * M ≤ ry.
+Context {rx_M : PropHolds (`rx * M ≤ ry)}.
 
 Instance L_nonneg : PropHolds (0 ≤ L).
 Proof.
@@ -227,9 +227,9 @@ Qed.
 
 (* Needed to apply Banach fixpoint theorem, which requires a finite
 distance between any two points *)
-Instance uc_msd : MetricSpaceDistance (UniformlyContinuous sx sy) := λ f1 f2, 2 * ry.
+Global Instance uc_msd : MetricSpaceDistance (UniformlyContinuous sx sy) := λ f1 f2, 2 * ry.
 
-Instance uc_msc : MetricSpaceClass (UniformlyContinuous sx sy).
+Global Instance uc_msc : MetricSpaceClass (UniformlyContinuous sx sy).
 Proof.
 intros f1 f2. unfold msd, uc_msd. intro x. apply (mspc_triangle' ry ry y0).
 + change (to_Q ry + to_Q ry = 2 * (to_Q ry)). ring.
@@ -286,7 +286,7 @@ transitivity ('(abs (x - x0) * M)).
   rewrite (extend_inside _ _ _ _ A1). apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
-  - apply rx_ry.
+  - apply rx_M.
 Qed.
 
 (*Require Import Integration.*)
@@ -294,11 +294,13 @@ Qed.
 Definition picard (f : UniformlyContinuous sx sy) : UniformlyContinuous sx sy.
 set (g := picard'' f).
 set (h x := exist _ (g x) (picard_sy f x)).
-assert (C : IsUniformlyContinuous h (uc_mu g)) by admit.
-exact (Build_UniformlyContinuous _ _ C).
+assert (C : IsUniformlyContinuous h (uc_mu g)); [| exact (Build_UniformlyContinuous _ _ C)].
+constructor.
++ apply (uc_pos g), (uc_proof g).
++ intros e x1 x2 e_pos A. change (ball e (g x1) (g x2)). apply (uc_prf g (uc_mu g)); assumption.
 Defined.
 
-Instance picard_contraction : IsContraction picard (L * rx).
+Global Instance picard_contraction : IsContraction picard (L * rx).
 Proof.
 constructor; [| exact L_rx].
 constructor; [solve_propholds |].
@@ -344,7 +346,7 @@ Definition y0 : CR := 1.
 Definition rx : QnonNeg := (1 # 2)%Qnn.
 Definition ry : QnonNeg := 1.
 
-Notation sx := (sig (ball rx x0)).
+Notation sx := (sig (ball rx x0)). (* Why does Coq still print {x | ball rx x0 x} in full? *)
 Notation sy := (sig (ball ry y0)).
 
 Definition v (z : sx * sy) : CR := ` (snd z).
@@ -381,28 +383,47 @@ Proof.
 unfold L, rx; simpl. rewrite mult_1_l. change (1 # 2 < 1)%Q. auto with qarith.
 Qed.
 
-Lemma rx_M : `rx * M ≤ ry.
+Instance rx_M : PropHolds (`rx * M ≤ ry).
 Proof.
 unfold rx, ry, M; simpl. rewrite Qmake_Qdiv. change (1 * / 2 * 2 <= 1)%Q.
 rewrite <- Qmult_assoc, Qmult_inv_l; [auto with qarith | discriminate].
 Qed.
 
-(*Program Definition f0' : UniformlyContinuous sx sy :=
-  Build_UniformlyContinuous (λ x, y0) _ _.
-(* [Admit Obligations] causes uncaught exception *)
-Next Obligation. apply mspc_refl; Qauto_nonneg. Qed.
-Next Obligation. exact Qinf.infinite. Defined.
-Next Obligation.
-constructor.
-* now intros.
-* intros e x1 x2 e_pos _. change (ball e y0 y0). apply mspc_refl. solve_propholds.
-Qed.*)
+(*Notation ucf := (UniformlyContinuous sx sy).
 
-Let f := fp (picard x0 y0 rx ry v rx_M) (f0 x0 y0 rx ry). ode_solution x0 y0 rx ry v L v_lip L_rx rx_M
+Check _ : MetricSpaceBall ucf.
+Check _ : ExtMetricSpaceClass ucf. (* Why two colons? *)
+Check _ : MetricSpaceDistance ucf.
+Check _ : MetricSpaceClass ucf.
+Check _ : Limit ucf.*)
+(* [Check _ : IsContraction (picard x0 y0 rx ry v rx_M) (L * rx)] At this point this does not work *)
+(* The following is bad because it creates a proof different from
+picard_contraction. Therefore, ode_solution cannot be applied. *)
+(*
+Instance : IsContraction (picard x0 y0 rx ry v rx_M) (L * rx).
+Proof.
+apply picard_contraction.
+apply v_lip. (* Is this needed because there is an explicit argument before IsLipschitz in picard_contraction? *)
+apply L_rx.
+Qed.
 
-Let f0 := f0 x0 y0 rx ry.
+Check _ : IsContraction (picard x0 y0 rx ry v rx_M) (L * rx).*)
 
-Definition picard_iter (n : nat) := nat_iter n (picard x0 y0 rx ry v) f0.
+Let f := @fp _ _ _ _ _ _ (picard x0 y0 rx ry v) _ (picard_contraction x0 y0 rx ry v L v_lip L_rx) (f0 x0 y0 rx ry).
+
+(* L_rx should also be declared implicit using Context and omitted from the list of arguments *)
+
+(* When [IsContraction (picard x0 y0 rx ry v rx_M) (L * rx)] did not work,
+the error message was 'Error: Cannot infer the implicit parameter H of
+fp. Could not find an instance for [MetricSpaceBall (UniformlyContinuous sx sy)]'.
+In fact, [MetricSpaceBall (UniformlyContinuous sx sy)] worked fine. *)
+
+(* f is indeed the fixpoint *)
+
+Theorem f_fixpoint : picard x0 y0 rx ry v f = f.
+Proof. apply ode_solution. Qed.
+
+Definition picard_iter (n : nat) := nat_iter n (picard x0 y0 rx ry v) (f0 x0 y0 rx ry).
 
 Definition answer (n : positive) (r : CR) : Z :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in
@@ -410,11 +431,14 @@ Definition answer (n : positive) (r : CR) : Z :=
  Zdiv a b.
 
 Program Definition half : sx := 1 # 2.
-Next Obligation. admit. Qed.
+Next Obligation.
+apply mspc_ball_Qabs_flip. unfold x0. rewrite negate_0, plus_0_r.
+rewrite abs.abs_nonneg; [reflexivity |].
+change (0 <= 1 # 2)%Q. auto with qarith.
+Qed.
 
-Time Compute answer 2 (proj1_sig (picard_iter 2 half)).
-
-
+Time Compute answer 2 (` (picard_iter 3 half)). (* 10 minutes *)
+Time Compute answer 1 (` (f half)). (* Too long *)
 
 End Computation.
 
