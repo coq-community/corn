@@ -1045,7 +1045,6 @@ Definition Qupper_bound (x : CR) := approximate x 1%Qpos + 1.
 
 (* To be proved by lifting from Q.
 Lemma CRabs_triang (x y z : CR) : x = y + z -> abs x ≤ abs y + abs z.
-Admitted.
 *)
 
 (* The section IntegralLipschitz is not used in the ODE solver through

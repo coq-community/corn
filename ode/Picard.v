@@ -83,23 +83,23 @@ Context (f : sig (ball r a) -> Y).
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
 would depend on x and [H1 : x ≤ a - r] even though they are not used in the
-proof. So, if [H1 : x1 ≤ a - r] and [H2 : x2 ≤ a - r], then [extend x1] would reduce
-to [f ((a - r) ↾ extend_obligation_1 x1 H1)] and [extend x2] would reduce
-to [f ((a - r) ↾ extend_obligation_1 x2 H2)]. To apply mspc_refl, we would
-need to prove that these applications of f are equal, i.e., f is a morphism
-that does not depend on the second component of the pair. So instead we
-prove mspc_ball_edge_l and mspc_ball_edge_r, which don't depend on x. *)
+proof. So, if [H1 : x1 ≤ a - r] and [H2 : x2 ≤ a - r], then [extend x1]
+would reduce to [f ((a - r) ↾ extend_obligation_1 x1 H1)] and [extend x2]
+would reduce to [f ((a - r) ↾ extend_obligation_1 x2 H2)]. To apply
+mspc_refl (see [extend_uc] below), we would need to prove that these
+applications of f are equal, i.e., f is a morphism that does not depend on
+the second component of the pair. So instead we prove mspc_ball_edge_l and
+mspc_ball_edge_r, which don't depend on x. *)
 
 Program Definition extend : Q -> Y :=
-  λ x, if (decide (x ≤ a - r))
+  λ x, if (decide (x < a - r))
        then f ((a - r) ↾ mspc_ball_edge_l)
-       else if (decide (a + r ≤ x))
+       else if (decide (a + r < x))
             then f ((a + r) ↾ mspc_ball_edge_r)
             else f (x ↾ _).
 Next Obligation.
-apply Qmetric.gball_Qabs, Q.Qabs_diff_Qle.
-apply orders.le_flip in H1; apply orders.le_flip in H2.
-split; trivial.
+apply mspc_ball_Qle.
+apply orders.not_lt_le_flip in H1. apply orders.not_lt_le_flip in H2. now split.
 Qed.
 
 (*
@@ -131,35 +131,43 @@ Qed.
 *)
 
 Global Instance extend_uc `{!IsUniformlyContinuous f mu_f} : IsUniformlyContinuous extend mu_f.
-Proof with (assumption || (apply orders.le_flip; assumption) || reflexivity).
+Proof with (solve_propholds || (apply orders.not_lt_le_flip; assumption) || reflexivity).
 constructor; [apply (uc_pos f mu_f) |].
 intros e x1 x2 e_pos A.
 assert (a - to_Q r ≤ a + to_Q r) by
   (destruct r; simpl; transitivity a;
     [apply rings.nonneg_minus_compat | apply semirings.plus_le_compat_r]; (easy || reflexivity)).
 unfold extend.
-destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
-* apply mspc_refl; solve_propholds.
-* destruct (decide (a + to_Q r ≤ x2)); apply (uc_prf f mu_f); trivial.
+destruct (decide (x1 < a - to_Q r)); destruct (decide (x2 < a - to_Q r)).
+* apply mspc_refl...
+* destruct (decide (a + to_Q r < x2)); apply (uc_prf f mu_f); trivial.
   + apply (nested_balls _ _ A)...
   + apply (nested_balls _ _ A)...
-* destruct (decide (a + to_Q r ≤ x1)); apply (uc_prf f mu_f); trivial.
+* destruct (decide (a + to_Q r < x1)); apply (uc_prf f mu_f); trivial.
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
-* destruct (decide (a + to_Q r ≤ x1)); destruct (decide (a + to_Q r ≤ x2));
+* destruct (decide (a + to_Q r < x1)); destruct (decide (a + to_Q r < x2));
   apply (uc_prf f mu_f); trivial.
-  + apply mspc_refl'. now apply Qinf_lt_le, (uc_pos f mu_f).
+  + apply mspc_refl'; now apply Qinf_lt_le, (uc_pos f mu_f).
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
   + apply (nested_balls _ _ A)...
 Qed.
 
-Lemma extend_inside (x : Q) (A : ball r a x) : extend x = f (x ↾ A).
-Proof.
-Admitted.
-(*apply mspc_ball_Qabs in A.*)
-
-
 End Extend.
+
+Lemma extend_inside `{ExtMetricSpaceClass Y} (a x : Q) (r : QnonNeg) :
+  ball r a x -> exists p : ball r a x, forall f : sig (ball r a) -> Y,
+    extend a r f x = f (x ↾ p).
+Proof.
+intros A. apply mspc_ball_Qle in A. destruct A as [A1 A2]. unfold extend.
+destruct (decide (x < a - to_Q r)) as [H1 | H1].
+(* [to_Q] is needed because otherwise [Negate QnonNeg] is unsatisfied.
+Backtick [`] is not enough because the goal is not simplified. *)
+* apply orders.lt_not_le_flip in H1; elim (H1 A1).
+* destruct (decide (a + to_Q r < x)) as [H2 | H2].
+  + apply orders.lt_not_le_flip in H2; elim (H2 A2).
+  + eexists; intro f; reflexivity.
+Qed.
 
 Section Bounded.
 
@@ -173,7 +181,7 @@ Global Instance extend_bounded {a : Q} {r : QnonNeg} (f : {x | ball r a x} -> CR
   `{!Bounded f M} : Bounded (extend a r f) M.
 Proof.
 intro x. unfold extend.
-destruct (decide (x ≤ a - to_Q r)); [| destruct (decide (a + to_Q r ≤ x))]; apply bounded.
+destruct (decide (x < a - to_Q r)); [| destruct (decide (a + to_Q r < x))]; apply bounded.
 Qed.
 
 Lemma bounded_nonneg {X : Type} (f : X -> CR) `{!Bounded f M} `{NonEmpty X} :
@@ -282,8 +290,7 @@ transitivity ('(abs (x - x0) * M)).
   intros t A.
   assert (A1 : mspc_ball rx x0 t) by
     (apply (mspc_ball_convex x0 x); [apply mspc_refl, (proj2_sig rx) | |]; trivial).
-  (* [(extend_inside (A:= A1))]: "Wrong argument name: A" *)
-  rewrite (extend_inside _ _ _ _ A1). apply bounded.
+  apply extend_inside in A1. destruct A1 as [p A1]. rewrite A1. apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_M.
@@ -312,7 +319,7 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
   intros x' B. assert (B1 : ball rx x0 x') by
     (apply (mspc_ball_convex x0 x); [apply mspc_refl | |]; solve_propholds).
   unfold plus, negate, ext_plus, ext_negate.
-  rewrite !(extend_inside x0 rx _ x' B1).
+  apply extend_inside in B1. destruct B1 as [p B1]. rewrite !B1.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
   apply (lip_prf (λ y, v (_, y)) L), A.
 + apply CRle_Qle. mc_setoid_replace (L * rx * e) with ((to_Q rx) * (L * e)) by ring.
@@ -442,80 +449,3 @@ Time Compute answer 1 (` (f half)). (* Too long *)
 
 End Computation.
 
-
-
-
-(*
-Require Import CRArith CRtrans CRconst Qmetric Utf8.
-Require Import ProductMetric CompleteProduct (*CPoly_Newton*).
-Require Import (*metric2.*)Classified.
-
-Notation "X × Y" := (ProductMS X Y) (at level 40).
-Notation "f >> g" := (Cbind_slow f ∘ g) (at level 50).
-Notation "x >>= f" := (Cbind_slow f x) (at level 50).
-Notation "( f , g )" := (together f g).
-
-Section ODE.
- Open Scope uc_scope.
-
- Variable v: (Q_as_MetricSpace × Q_as_MetricSpace) --> CR.
- Variable f: Q_as_MetricSpace --> CR.
-
- Definition vxfx := (v >> Couple ∘ (Cunit, f) ∘ diag _).
-End ODE.
-
-Section Picard_op.
- Definition k := (1#2).
- Variable f: Q_as_MetricSpace --> CR.
- Require SimpsonIntegration Qpossec.
-
- (* Picard operator, ∫ f, from 0 to t *)
- Definition Picard_raw (t:Q_as_MetricSpace) : CR :=
-   let f' := uc_compose (scale k) f in
-   (1 + (SimpsonIntegration.simpson_integral f' 1 0 (QabsQpos t)))%CR.
-
- Lemma Picard_uc: (is_UniformlyContinuousFunction Picard_raw (λ (ε:Qpos), ε)).
- admit.
- Qed.
-
- (* locally lipschitz *)
- Definition Picard := (Cbind QPrelengthSpace (Build_UniformlyContinuousFunction Picard_uc)).
-
-End Picard_op.
-
-Section Banach_iter.
- (* Iterate operator L, n times *)
- Variable L:CR-->CR.
- Fixpoint Picard_seq (n : nat) : Q_as_MetricSpace --> CR :=
-   match n with
-   | O => L ∘ Cunit
-   | S m => (Picard (Picard_seq m) ) ∘ Cunit
-   end.
-End Banach_iter.
-
-Section example.
-
-Definition g : CR --> CR := Cbind QPrelengthSpace (const_uc (1:Q_as_MetricSpace)).
-
-Definition picard (n:nat) := (Picard_seq g n).
-
-Definition eval (n:positive) (r:CR) : Z :=
- let m := (iter_pos n _ (Pmult 10) 1%positive) in
- let (a,b) := (approximate r (1#m)%Qpos)*m in
- Zdiv a b.
-
-Definition h := const_uc (5#7:Q_as_MetricSpace).
-Definition h' := uc_compose (scale (11#13)) h.
-
-Require Import Integration.
-Require Import SimpsonIntegration.
-
-Time Eval vm_compute in (eval 3 (1 + (Integrate h' 0 (1#2)))%CR).
-Time Eval vm_compute in (eval 3 (1 + (simpson_integral h' 1 0 (1#2)))%CR).
-
-Time Eval vm_compute in (eval 3 (Picard_raw (@const_uc Q_as_MetricSpace (1#1)) 1)).
-Time Eval vm_compute in (eval 3 (picard 1 1)).
-Time Eval vm_compute in (eval 2 (picard 2 1)).
-
-End example.
-*)
