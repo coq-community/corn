@@ -129,6 +129,7 @@ Add Ring CR : (stdlib_ring_theory CR).
 Close Scope CR_scope.
 Unset Printing Coercions.
 
+(* Uniformly continuous functions respect equality (see metric2.UniformContinuity.v) *)
 Global Instance CRabs_proper : Proper (equiv ==> equiv) (abs (A := CR)).
 Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
 

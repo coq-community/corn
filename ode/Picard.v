@@ -444,8 +444,10 @@ rewrite abs.abs_nonneg; [reflexivity |].
 change (0 <= 1 # 2)%Q. auto with qarith.
 Qed.
 
+(*
 Time Compute answer 2 (` (picard_iter 3 half)). (* 10 minutes *)
 Time Compute answer 1 (` (f half)). (* Too long *)
+*)
 
 End Computation.
 
