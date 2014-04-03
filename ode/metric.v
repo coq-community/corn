@@ -13,7 +13,7 @@ Import peano_naturals.
 Require Import CRGeometricSum.
 Import Qround Qpower Qinf.notations.
 
-Set Printing Coercions.
+(* Set Printing Coercions.*)
 
 Definition ext_plus {A} `{Plus B} : Plus (A -> B) := λ f g x, f x + g x.
 Hint Extern 10 (Plus (_ -> _)) => apply @ext_plus : typeclass_instances.
@@ -492,7 +492,7 @@ Lemma lip_modulus_pos (L e : Q) : 0 ≤ L -> 0 < e -> 0 < lip_modulus L e.
 Proof.
 intros L_nonneg e_pos. unfold lip_modulus.
 destruct (decide (L = 0)) as [A1 | A1]; [apply I |].
-apply neq_symm in A1.
+apply not_symmetry in A1.
 change (0 < e / L). (* Changes from Qinf, which is not declared as ordered ring, to Q *)
 assert (0 < L) by now apply QOrder.le_neq_lt. Qauto_pos.
 Qed.
