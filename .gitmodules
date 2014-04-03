@@ -1,3 +1,4 @@
 [submodule "math-classes"]
 	path = math-classes
-	url = git://github.com/EvgenyMakarov/math-classes.git
+#	url = git://github.com/EvgenyMakarov/math-classes.git
+	url = git://github.com/math-classes/math-classes.git

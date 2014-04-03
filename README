@@ -6,7 +6,7 @@ PREREQUISITES
 
 This version of C-CoRN is known to compile with:
 
- - Coq 8.4pl1
+ - Coq 8.4pl4
 
  - SCons 1.2
 
@@ -19,7 +19,7 @@ Math Classes is contained in the C-CoRN git repository as a submodule. You can
 obtain math-classes automatically by giving the --recursive option when you 
 clone the git repository:
 
-  git clone --recursive https://github.com/EvgenyMakarov/corn.git
+  git clone --recursive https://github.com/c-corn/corn.git
 
 If you have already cloned the CoRN repository without --recursive, you can
 still get the submodules with
