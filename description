@@ -1,39 +1,35 @@
 Name: CoRN
-Title: Constructive Coq Repository at Nijmegen
-Author: Herman Geuvers
-Institution: Radboud University Nijmegen
+Title: Coq Repository at Nijmegen
+
+Author: Evgeny Makarov
+Author: Robbert Krebbers
+Author: Eelis van der Weegen
+Author: Bas Spitters
+Author: Jelle Herold
+Author: Russell O'Connor
+Author: Cezary Kaliszyk
+Author: Dan Synek
 Author: Luís Cruz-Filipe
-Institution: Radboud University Nijmegen
 Author: Milad Niqui
-Institution: Radboud University Nijmegen
-Author: Freek Wiedijk
-Institution: Radboud University Nijmegen
-Author: Jan Zwanenburg
-Institution: Radboud University Nijmegen
+Author: Iris Loeb
+Author: Herman Geuvers
 Author: Randy Pollack
+Author: Freek Wiedijk
+Author: Jan Zwanenburg
+Author: Dimitri Hendriks
 Author: Henk Barendregt
-Institution: Radboud University Nijmegen
 Author: Mariusz Giero
 Author: Rik van Ginneken
-Institution: Radboud University Nijmegen
 Author: Dimitri Hendriks
 Author: Sébastien Hinderer
 Author: Bart Kirkels
 Author: Pierre Letouzey
-Author: Iris Loeb
-Institution: Radboud University Nijmegen
 Author: Lionel Mamane
-Author: Russell O'Connor
+Author: Nickolay Shmyrev
 Institution: Radboud University Nijmegen
-Author: Nickolay V. Shmyrev
-Author: Bas Spitters
-Institution: Radboud University Nijmegen
-Author: Dan Synek
-Institution: Radboud University Nijmegen
+
 Description:
- The Constructive Coq Repository at Nijmegen, C-CoRN, aims at building
- a computer based library of constructive mathematics, formalized in
- the theorem prover Coq. It includes the following parts:
+ The Coq Repository at Nijmegen, CoRN, includes the following parts:
 
 *  Algebraic Hierarchy
 
@@ -58,8 +54,17 @@ Description:
      including continuity, differentiability, integration,
      Taylor's theorem and the Fundamental Theorem of Calculus
 
+* Exact Real Computation
+   o Fast verified computation inside Coq. This includes: real numbers, functions,
+     integrals, graphs of functions, differential equations.
+
+CoRN depends on the math-classes contribution. This mostly replaces the old algebraic hierarchy.
+
+The author list is roughly in anti-chronological order.
+
 URL: http://c-corn.cs.ru.nl
 Keywords: constructive mathematics, algebra, real calculus, real numbers,
 Fundamental Theorem of Algebra 
 Category: Mathematics/Algebra
 Category: Mathematics/Real Calculus and Topology
+Category: Mathematics/Exact Real computation
