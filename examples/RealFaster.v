@@ -14,21 +14,32 @@ Definition answer (n : positive) (r : ARQ) : Z :=
  let m := (iter_pos n _ (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
  Zdiv a b.
-
+*)
 Definition answer (n : positive) (r : ARbigD) : bigZ :=
  let m := iter_pos n _ (Pmult 10) 1%positive in 
  let (a, b) := (approximate r (1#m)%Qpos : bigD) * 'Zpos m in 
  BigZ.shiftl a b.
-*)
 
-Definition answer (n : positive) (r : myAR) :=
- let m := iter_pos n _ (Pmult 10) 1%positive in let _ := approximate r (1#m)%Qpos in tt.
+(* To avoid timing the printing mechanism *)
+Definition no_answer (n : positive) (r : myAR) :=
+ let m := iter_pos n _ (Pmult 10) 1%positive in let _ := 
+    approximate r (1#m)%Qpos in tt.
+
+(* xkcd.org/217 *)
+Definition xkcd : myAR := (ARexp ARpi)-ARpi.
+
+Time Eval vm_compute in (answer 10 xkcd).
+
+Example xkcd217A : ARltT xkcd ('20%Z).
+Proof. Time AR_solve_ltT (-8)%Z. Defined.
 
 (* Many of the following expressions are taken from the "Many Digits friendly competition" problem set *)
 
-Definition P01 : myAR := ARsin (ARsin (AQsin 1)).
-Time Eval vm_compute in (answer 500 P01).
+(* Instance resolution takes 3s *)
+Time Definition P01 : myAR := ARsin (ARsin (AQsin 1)).
 
+Time Eval vm_compute in (answer 500 P01).
+Time Eval vm_compute in (no_answer 500 P01).
 Definition P02 : myAR := ARsqrt (ARcompress ARpi).
 Time Eval vm_compute in (answer 500 P02).
 
@@ -77,6 +88,3 @@ Time Eval vm_compute in (answer 1000 ARtest3).
 
 Definition ARtest4 : myAR := ARsin ARpi.
 Time Eval vm_compute in (answer 500 ARtest4).
-
-Example xkcd217A : ARltT ARtest4 ('20%Z).
-Proof. Time AR_solve_ltT (-8)%Z. Defined.
