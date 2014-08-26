@@ -6,7 +6,7 @@ PREREQUISITES
 
 This version of C-CoRN is known to compile with:
 
- - Coq 8.4pl4
+ - Coq trunk
 
  - SCons 1.2
 
