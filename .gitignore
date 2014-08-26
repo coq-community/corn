@@ -18,6 +18,8 @@ coqidescript
 *#
 deps.dot
 deps.pdf
+*.native
+*.aux
 *.crashcoqide
 *.cmi
 *.cmo
