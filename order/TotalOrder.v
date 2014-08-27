@@ -62,14 +62,15 @@ Qed.
 (** meet distributes over any monotone function. *)
 Lemma monotone_meet_distr : forall x y : X, f (meet x y) == meet (f x) (f y).
 Proof.
- revert Hf; rewrite -> monotone_def. intro Hf.
+ set (Hf':=Hf). (* The section hypothesis is used in monotone_compat and hence cannot be changed. *)
+ rewrite -> monotone_def in Hf'.
  assert (forall x y : X, x <= y -> f (meet x y) == meet (f x) (f y)).
   intros x y Hxy.
-  assert (Hfxfy:=Hf _ _ Hxy).
-  rewrite -> le_meet_l in Hxy.
-  rewrite -> Hxy.
-  rewrite -> le_meet_l in Hfxfy.
-  rewrite -> Hfxfy.
+  assert (Hfxfy:=Hf' _ _ Hxy).
+   rewrite -> le_meet_l in Hxy.
+   rewrite -> le_meet_l in Hfxfy.
+   rewrite -> Hfxfy. 
+   rewrite -> Hxy.
   reflexivity.
  intros.
  destruct (le_total _ x y).
@@ -83,7 +84,7 @@ End Monotone.
 
 (** join distributes over meet *)
 Lemma join_meet_distr_r : forall x y z:X, (join x (meet y z))==(meet (join x y) (join x z)).
-Proof (fun a => monotone_meet_distr _ (join_monotone_r X a)).
+Proof (fun a => monotone_meet_distr _ (join_monotone_r X a)). 
 
 Lemma join_meet_distr_l : forall x y z:X, (join (meet y z) x)==(meet (join y x) (join z x)).
 Proof (fun a => monotone_meet_distr _ (join_monotone_l X a)).
@@ -94,7 +95,7 @@ Variable f : X -> X.
 Hypothesis Hf : antitone X f.
 
 (* begin hide *)
-Add Morphism f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat.
+Add Parametric Morphism: f with signature (@st_eq X) ==> (@st_eq X) as antitone_compat.
 Proof.
  revert Hf; rewrite -> antitone_def; intros.
  rewrite -> equiv_le_def in *.
@@ -105,15 +106,15 @@ Qed.
 (* meet transforms into join for antitone functions *)
 Lemma antitone_meet_join_distr : forall x y : X, f (meet x y) == join (f x) (f y).
 Proof.
- revert Hf;rewrite -> antitone_def; intro Hf.
+ pose (Hf':=Hf).
+ rewrite antitone_def in Hf'. 
  assert (forall x y : X, x <= y -> f (meet x y) == join (f x) (f y)).
   intros x y Hxy.
-  assert (Hfxfy:=Hf _ _ Hxy).
+  assert (Hfxfy:=Hf' _ _ Hxy).
   rewrite -> le_meet_l in Hxy.
-  rewrite -> Hxy.
   rewrite -> le_join_l in Hfxfy.
-  rewrite -> Hfxfy.
-  reflexivity.
+  rewrite -> Hfxfy. clear Hfxfy.
+  apply antitone_compat. rewrite -> Hxy. reflexivity.
  intros.
  destruct (le_total _ x y).
   auto.
@@ -283,13 +284,13 @@ end.
 Lemma min_def1 : forall x y, le x y -> equiv (min x y) x.
 Proof.
  intros.
- apply min_case; firstorder.
+ apply min_case; firstorder auto.
 Qed.
 
 Lemma min_def2 : forall x y, le y x -> equiv (min x y) y.
 Proof.
  intros.
- apply min_case; firstorder.
+ apply min_case; firstorder auto.
 Qed.
 
 End MinDefault.
@@ -314,13 +315,13 @@ Definition max_case :
 Lemma max_def1 : forall x y, le y x -> equiv (max x y) x.
 Proof.
  refine (min_def1 A equiv flip_le _ flip_le_total).
- firstorder.
+ firstorder auto.
 Qed.
 
 Lemma max_def2 : forall x y, le x y -> equiv (max x y) y.
 Proof.
  refine (min_def2 A equiv flip_le _ flip_le_total).
- firstorder.
+ firstorder auto.
 Qed.
 
 End MaxDefault.

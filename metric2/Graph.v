@@ -247,10 +247,10 @@ Proof.
   symmetry.
   rewrite <- (CoupleCorrect2 p q1).
   apply: CompactGraph_correct3.
-  apply Hq1.
+  3:apply Hq1.
  rewrite <- (CoupleCorrect2 p q2).
  apply: CompactGraph_correct3.
- apply Hq2.
+ 3:apply Hq2.
 Qed.
 
 Lemma CompactGraph_correct : forall plX plFEX x y s,
@@ -265,7 +265,7 @@ Proof.
   symmetry.
   transitivity (Csnd (Couple (x,y))).
    apply: CompactGraph_correct3.
-   apply H.
+   3:apply H.
   apply CoupleCorrect3.
  destruct H as [H0 H1].
  change (x, y) with (PairMS x y).
@@ -552,10 +552,10 @@ Proof.
   symmetry.
   rewrite <- (CoupleCorrect2 p q1).
   apply: CompactGraph_b_correct3.
-  apply Hq1.
+  3:apply Hq1.
  rewrite <- (CoupleCorrect2 p q2).
  apply: CompactGraph_b_correct3.
- apply Hq2.
+ 3:apply Hq2.
 Qed.
 
 Lemma CompactGraph_b_correct : forall plX plFEX x y s,
@@ -570,7 +570,7 @@ Proof.
   symmetry.
   transitivity (Csnd (Couple (x,y))).
    apply: CompactGraph_b_correct3.
-   apply H.
+   3:apply H.
   apply CoupleCorrect3.
  destruct H as [H0 H1].
  change (x, y) with (PairMS x y).

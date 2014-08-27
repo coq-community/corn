@@ -472,7 +472,7 @@ Proof.
    apply AbsSmall_minus.
    stepr (InfiniteAlternatingSum seq); [| now (unfold cg_minus;simpl;ring)].
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
-   apply: leEq_transitive;simpl.
+   eapply leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.
    assert ((hd seq)%CR == (1*hd seq)%Q). ring. rewrite -> H. clear H.
    destruct X; assumption.
@@ -503,7 +503,7 @@ Proof.
       with (-(Sum0 (G:=Q_as_CAbGroup) n
         (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 (tl seq)))))%Q.
    simpl. ring.
-  apply: eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
+  eapply eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
   apply: Sum0_wd.
   intros i; simpl.
   change (Qpower_positive (- (1)) (P_of_succ_nat i)) with ((-(1))^ S i).

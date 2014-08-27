@@ -127,7 +127,7 @@ Proof.
  clear IHn.
  csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[-][0])) ([0]:IR).
   csetoid_replace (ArTanH_series_coef (S (double n))[*]A) (inj_Q IR (Str_nth n (arctanSequence a))).
-   rational.
+   ring. (* rational.*)
   unfold ArTanH_series_coef.
   case_eq (even_odd_dec (S (double n))); intros H.
    elim (not_even_and_odd _ H).

@@ -426,7 +426,7 @@ Proof.
    apply orders.eq_le.
    rewrite (commutativity _ k), shiftl.shiftl_exp_plus, shiftl.shiftl_1. 
    rewrite rings.plus_mult_distr_r, rings.mult_1_l.
-   rewrite rings.negate_plus_distr, associativity, rings.plus_negate_r. ring.
+   rewrite rings.negate_plus_distr, associativity, rings.plus_negate_r.  ring.
   apply (order_reflecting (cast AQ Q)).
   rewrite rings.preserves_negate.
   exact (E ('Pos_shiftl (1 : AQ₊) k)).

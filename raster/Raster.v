@@ -70,8 +70,8 @@ Qed.
 pixel. *)
 Fixpoint updateVector A n (v : Vector.t A n) (f : A->A) : nat -> Vector.t A n := 
   match v with
-  | Vector.nil => fun _ => Vector.nil A
-  | Vector.cons a' n' v' => fun i =>
+  | Vector.nil _ => fun _ => Vector.nil A
+  | Vector.cons _ a' n' v' => fun i =>
     match i with
     | 0 => Vector.cons A (f a') n' v'
     | S i' => Vector.cons A a' n' (updateVector v' f i')

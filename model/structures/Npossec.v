@@ -37,7 +37,7 @@
 (** printing Npos $\mathbb{N}^{+}$ #N<SUP>+</SUP># *)
 
 Require Export Nsec.
-Require Import Arith.
+Require Import Arith Omega.
 
 (**
 ** [Npos]

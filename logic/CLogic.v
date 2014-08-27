@@ -110,12 +110,12 @@ Definition Iff (A B : CProp) : CProp := prod (A -> B) (B -> A).
 
 Definition proj1_sigT (A : Type) (P : A -> CProp) (e : sigT P) :=
   match e with
-  | existT a b => a
+  | existT _ a b => a
   end.
 
 Definition proj2_sigT (A : Type) (P : A -> CProp) (e : sigT P) :=
   match e return (P (proj1_sigT A P e)) with
-  | existT a b => b
+  | existT _ a b => b
   end.
 
 Inductive sig2T (A : Type) (P Q : A -> CProp) : CProp :=
@@ -123,17 +123,17 @@ Inductive sig2T (A : Type) (P Q : A -> CProp) : CProp :=
 
 Definition proj1_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
   match e with
-  | exist2T a b c => a
+  | exist2T _ _ _ a b c => a
   end.
 
 Definition proj2a_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
   match e return (P (proj1_sig2T A P Q e)) with
-  | exist2T a b c => b
+  | exist2T _ _ _ a b c => b
   end.
 
 Definition proj2b_sig2T (A : Type) (P Q : A -> CProp) (e : sig2T A P Q) :=
   match e return (Q (proj1_sig2T A P Q e)) with
-  | exist2T a b c => c
+  | exist2T _ _ _ a b c => c
   end.
 
 End Basics.

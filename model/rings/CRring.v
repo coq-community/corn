@@ -99,7 +99,7 @@ Proof.
   apply cs_bin_op_wd; apply CR_mult_as_Cauchy_IR_mult.
  change (CRapartT 1 0)%CR.
  apply CR_ap_as_Cauchy_IR_ap_2.
- apply: ap_wd.
+ eapply ap_wd.
    apply one_ap_zero.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
  apply: CR_inject_Q_as_Cauchy_IR_inject_Q.

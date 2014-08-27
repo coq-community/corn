@@ -194,8 +194,8 @@ Open Local Scope Q_scope.
 (** Definition of the unit hyperinterval of n dimensions *)
 Fixpoint UnitHyperInterval (n:nat) (v:Vector.t Q n) : Prop :=
 match v with
-| Vector.nil => True
-| Vector.cons a _ v' => 0 <= a <= 1 /\ UnitHyperInterval v'
+| Vector.nil _ => True
+| Vector.cons _ a _ v' => 0 <= a <= 1 /\ UnitHyperInterval v'
 end.
 
 (* begin hide *)
@@ -229,8 +229,8 @@ Qed.
 (** Return the ith entry of a vector *)
 Fixpoint Vector_ix A (n i:nat) (H:(i < n)%nat) (v:Vector.t A n) : A :=
 match v in Vector.t _ m return (i < m)%nat -> A with
-| Vector.nil => fun p => False_rect _ (lt_n_O _ p)
-| Vector.cons c n' v' => fun _ => match lt_le_dec i n' with
+| Vector.nil _ => fun p => False_rect _ (lt_n_O _ p)
+| Vector.cons _ c n' v' => fun _ => match lt_le_dec i n' with
                             | left p => Vector_ix p v'
                             | right _ => c
                             end
@@ -884,11 +884,11 @@ Lemma MVP_uc_fun_close_weaken : forall n (e1 e2:Qpos) f g, (e1 <= e2) ->
  MVP_uc_fun_close_sig n e2 f g.
 Proof.
  induction n; intros e1 e2 f g He H.
-  apply: ball_weak_le.
+  eapply ball_weak_le.
    apply He.
   apply H.
  intros x Hx0 Hx1.
- apply: IHn.
+ eapply IHn.
   apply He.
  apply H; auto.
 Qed.
@@ -925,7 +925,7 @@ Proof.
    apply H0.
   apply H1.
  intros x Hx0 Hx1.
- apply: IHn.
+ eapply IHn.
   apply H0; auto.
  apply H1; auto.
 Qed.
@@ -940,7 +940,7 @@ Proof.
    apply H0.
   apply H1.
  intros x Hx0 Hx1.
- apply: IHn.
+ eapply IHn.
   apply H0; auto.
  apply H1; auto.
 Qed.
@@ -964,7 +964,7 @@ Proof.
  induction n.
   apply ball_triangle.
  intros e1 e2 f g h H0 H1 x Hx0 Hx1.
- apply: IHn.
+ eapply IHn.
   apply H0; auto.
  apply H1; auto.
 Qed.
@@ -1150,7 +1150,7 @@ Proof.
      apply Qpos_nonzero.
     elim (Qle_not_lt 0 (Zneg nb # db)); auto with *.
     rewrite <- CRle_Qle.
-    apply: AbsSmall_nonneg.
+    eapply AbsSmall_nonneg.
     apply Hb.
    cut (Not (Not (AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))))).
     unfold Not, AbsSmall.
@@ -1218,8 +1218,8 @@ match n return MultivariatePolynomial Q_as_CRing n -> Q with
 | O => Qabs
 | S n' => fix MVP_poor_Bound01_H p : Q :=
           match p with
-          | cpoly_zero => 0
-          | cpoly_linear s p' => MVP_poor_Bound01 n' s + MVP_poor_Bound01_H p'
+          | cpoly_zero _ => 0
+          | cpoly_linear _ s p' => MVP_poor_Bound01 n' s + MVP_poor_Bound01_H p'
           end
 end.
 
@@ -1296,8 +1296,8 @@ Proof.
   intros y _ _.
   apply IHn.
  change (MVP_is_Bound01 n (' (MVP_poor_Bound01 n s + (fix MVP_poor_Bound01_H (p0 : cpoly
-   (MultivariatePolynomial Q_as_CRing n)) : Q := match p0 with | cpoly_zero => 0
-     | cpoly_linear s0 p' => (MVP_poor_Bound01 n s0 + MVP_poor_Bound01_H p')%Q end) p)%Q)%CR
+   (MultivariatePolynomial Q_as_CRing n)) : Q := match p0 with | cpoly_zero _ => 0
+     | cpoly_linear _ s0 p' => (MVP_poor_Bound01 n s0 + MVP_poor_Bound01_H p')%Q end) p)%Q)%CR
        (MVP_map inject_Q_hom n s[+]MVP_C_ CRasCRing n x[*](cpoly_map (MVP_map inject_Q_hom n) p) ! (MVP_C_ CRasCRing n x))).
  rewrite <- CRplus_Qplus.
  apply MVP_is_Bound01_plus.

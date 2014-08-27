@@ -270,6 +270,8 @@ Qed.
 Opaque Bernstein.
 
 (** Given a vector of coefficents for a polynomial in the Bernstein basis, return the polynomial *)
+Implicit Arguments Vector.nil [A].
+Implicit Arguments Vector.cons [A].
 
 Fixpoint evalBernsteinBasisH (n i:nat) (v:Vector.t R i) : i <= n -> cpoly_cring R :=
 match v in Vector.t _ i return i <= n -> cpoly_cring R with
@@ -296,13 +298,13 @@ Proof.
   apply Vector.nil.
 
   inversion v as [| a n0 H0 H1]; inversion v0 as [| a0 n1 H2 H3].
-  exact (Vector.cons A (g a a0) n (h H0 H2)).
+  exact (Vector.cons (g a a0) n (h H0 H2)).
 Defined.
 
 Definition Vid n : Vector.t A n -> Vector.t A n :=
   match n with
-  | O => fun _ => Vector.nil A
-  | S n' => fun v : Vector.t A (S n') => Vector.cons A (Vector.hd v) _ (Vector.tl v)
+  | O => fun _ => Vector.nil
+  | S n' => fun v : Vector.t A (S n') => Vector.cons (Vector.hd v) _ (Vector.tl v)
   end.
 
 Lemma Vid_eq : forall (n:nat) (v:Vector.t A n), v = Vid v.
@@ -311,13 +313,13 @@ Proof.
 Qed.
 
 Lemma VSn_eq :
-  forall (n : nat) (v : Vector.t A (S n)), v = Vector.cons A (Vector.hd v) _ (Vector.tl v).
+  forall (n : nat) (v : Vector.t A (S n)), v = Vector.cons (Vector.hd v) _ (Vector.tl v).
 Proof.
   intros.
   exact (Vid_eq v).
 Qed.
 
-Lemma V0_eq : forall (v : Vector.t A 0), v = Vector.nil A.
+Lemma V0_eq : forall (v : Vector.t A 0), v = Vector.nil.
 Proof.
   intros.
   exact (Vid_eq v).
@@ -394,10 +396,10 @@ ring homomorphism from [Q] to R *)
 
 Fixpoint BernsteinBasisTimesXH (n i:nat) (v:Vector.t R i) : i <= n -> Vector.t R (S i) :=
 match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
-| Vector.nil => fun _ => Vector.cons _ [0] _ (Vector.nil _)
+| Vector.nil => fun _ => Vector.cons [0] _ Vector.nil
 | Vector.cons a i' v' => match n as n return S i' <= n -> Vector.t R (S (S i')) with
   | O => fun p => False_rect _ (le_Sn_O _ p)
-  | S n' => fun p => Vector.cons _ (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
+  | S n' => fun p => Vector.cons (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
   end
 end.
 
@@ -470,8 +472,8 @@ Qed.
 (** Convert a polynomial to the Bernstein basis *)
 Fixpoint BernsteinCoefficents (p:cpoly_cring R) : sigT (Vector.t R) :=
 match p with
-| cpoly_zero => existT _ _ (Vector.nil R)
-| cpoly_linear c p' =>
+| cpoly_zero _ => existT _ _ Vector.nil
+| cpoly_linear _ c p' =>
   let (n', b') := (BernsteinCoefficents p') in
   existT _ _  (Vbinary (fun (x y:R)=>x[+]y) (Vector.const c _) (BernsteinBasisTimesX b'))
 end.
