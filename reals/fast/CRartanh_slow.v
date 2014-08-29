@@ -125,9 +125,9 @@ Proof.
  fold (double n).
  csetoid_rewrite_rev IHn.
  clear IHn.
- csetoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[-][0])) ([0]:IR).
-  csetoid_replace (ArTanH_series_coef (S (double n))[*]A) (inj_Q IR (Str_nth n (arctanSequence a))).
-   ring. (* rational.*)
+ setoid_replace (ArTanH_series_coef (double n)[*]nexp IR (double n) (inj_Q IR a[-][0])) with ([0]:IR).
+  setoid_replace (ArTanH_series_coef (S (double n))[*](nexp IR (Nat.double n)(inj_Q IR a [-] [0]) [*] (inj_Q IR a [-] [0])))
+    with (inj_Q IR (Str_nth n (arctanSequence a))). rational.
   unfold ArTanH_series_coef.
   case_eq (even_odd_dec (S (double n))); intros H.
    elim (not_even_and_odd _ H).
@@ -167,8 +167,8 @@ Proof.
    reflexivity.
   unfold A; clear A.
   eapply eq_transitive;[|apply eq_symmetric; apply inj_Q_power].
-  change ((inj_Q IR a[-][0])[^](n+S n)[=]inj_Q IR a[^](1 + 2 * n)).
-  replace (n + S n)%nat with (1 + 2*n)%nat by ring.
+  change ((inj_Q IR a[-][0])[^](S( n+ n))[=]inj_Q IR a[^](1 + 2 * n)).
+  replace (S (n + n))%nat with (1 + 2*n)%nat by ring.
   apply nexp_wd.
   rational.
  unfold ArTanH_series_coef.

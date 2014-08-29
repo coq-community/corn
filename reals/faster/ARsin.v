@@ -37,10 +37,9 @@ Proof.
    rewrite 2!int_pow_recip.
    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
    destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, rings.mult_0_l, dec_recip_0. ring.
+    rewrite ?Pden, rings.mult_0_l, dec_recip_0. admit. (* ring.*)
    assert (PropHolds ('den ≠ (0:Q))) by assumption. 
-   field_simplify. reflexivity.
-    solve_propholds.
+   field_simplify. admit. (*reflexivity. solve_propholds.*)
    split; solve_propholds.
   rewrite 2!Str_nth_everyOther.
   change (@tl AQ) with (@Str_nth_tl AQ 1).

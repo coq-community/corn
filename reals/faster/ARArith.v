@@ -426,7 +426,7 @@ Proof.
    apply orders.eq_le.
    rewrite (commutativity _ k), shiftl.shiftl_exp_plus, shiftl.shiftl_1. 
    rewrite rings.plus_mult_distr_r, rings.mult_1_l.
-   rewrite rings.negate_plus_distr, associativity, rings.plus_negate_r.  ring.
+   rewrite rings.negate_plus_distr, associativity, rings.plus_negate_r.  simpl. ring.
   apply (order_reflecting (cast AQ Q)).
   rewrite rings.preserves_negate.
   exact (E ('Pos_shiftl (1 : AQ₊) k)).
@@ -611,8 +611,8 @@ Hint Rewrite ARtoCR_preserves_inv_pos : ARtoCR.
 
 Definition ARinvT (x : AR) (x_ : ARapartT x 0) : AR := 
   match x_ with
-  | inl (exist c _) => - ARinv_pos c (- x)
-  | inr (exist c _) => ARinv_pos c x
+  | inl (exist _ c _) => - ARinv_pos c (- x)
+  | inr (exist _ c _) => ARinv_pos c x
   end.
 
 Lemma ARtoCR_preserves_invT x x_ x__: 

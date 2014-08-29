@@ -61,7 +61,8 @@ Extract Inlined Constant Pminus => "\n m -> max 1 (n - m)".
 Extract Inlined Constant Pmult => "(*)".
 Extract Inlined Constant Pmin => "min".
 Extract Inlined Constant Pmax => "max".
-Extract Inlined Constant Pcompare => "compare".
+(* Probably a change in the way Coq handles numbers, ask PL.
+Extract Inlined Constant Pcompare => "compare".*)
 Extract Inlined Constant positive_eq_dec => "(==)".
 Extraction Inline positive_rec.
 
