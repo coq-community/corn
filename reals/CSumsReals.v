@@ -43,7 +43,7 @@ Require Export CReals1.
 %\end{convention}%
 
 Here we prove that
-$\Sigma_{m\leq i \leq n}~c^k = \frac{c^{n+1}-c^m}{c-1}.$
+$\Sigma_{m\leq i \leq n}~c^i = \frac{c^{n+1}-c^m}{c-1}.$
 #sum_(m&le; i &le; n) c^k = frac (c^(n+1) -c^m) (c-1)#
 *)
 
