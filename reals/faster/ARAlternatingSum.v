@@ -233,12 +233,13 @@ Proof.
   transitivity (4 + takeUntil_length _ (LazyExists_Str_nth_tl (Limit_near sQ 0 ε) (dnn_in_Qball_0_EventuallyForall sQ ε) 4)).
    apply takeUntil_length_Str_nth_tl.
   unfold ARInfAltSum_length. 
- (* replace (Init.Nat.add (S (S (S (S O))))) with (plus (plus one (plus one (plus one one)))).
+  (* Regression, the following line was not necessary before. *)
+  change (Init.Nat.add (S (S (S (S O))))) with (plus (plus one (plus one (plus one (S 0))))). 
   apply (order_preserving (4 +)).
   apply takeUntil_length_ForAllIf.
   apply ARInfAltSum_stream_preserves_ball.
    now apply DivisionStream_Str_nth_tl.
-  now apply _.*) admit.
+  now apply _. 
 Qed.
 
 Lemma ARInfAltSum_length_pos (k : Z) :
