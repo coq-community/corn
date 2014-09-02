@@ -976,7 +976,7 @@ Proof.
   clear H.
   destruct Hx as [[] [[] Hx]].
   apply (Hx I).
- csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
+ rewrite (Tan_Sin_over_Cos y Hy H0).
  unfold y.
  assert (H2:([--](Sin x))[#][0]).
   csetoid_rewrite_rev (Cos_plus_HalfPi x).
@@ -988,7 +988,7 @@ Proof.
  clear H0.
  rstepl (((Cos x[/][--](Sin x)[//]H2)[*](Tan x Hx))[/](Tan x Hx)[//]H).
  apply div_wd;[|apply eq_reflexive].
- csetoid_rewrite (Tan_Sin_over_Cos x Hx H1).
+ rewrite (Tan_Sin_over_Cos x Hx H1).
  rational.
 Qed.
 
