@@ -138,7 +138,7 @@ Proof.
   auto.
  assert (Z:[0][<]inj_Q IR (y:Q)).
   (stepl (inj_Q IR ([0]:Q)); [| now apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_prf.
- apply: eq_transitive.
+ eapply eq_transitive.
   apply mult_wdl.
   apply (inj_Q_div IR e _ (pos_ap_zero _ _ Z)).
  apply div_1.

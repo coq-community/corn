@@ -175,7 +175,7 @@ Lemma IR_div_as_CR : forall x y y_ y__,
  (IRasCR (x[/]y[//]y_)==(IRasCR x[/]IRasCR y[//]y__))%CR.
 Proof.
  intros x y y_ y__.
- apply: mult_cancel_lft.
+ eapply mult_cancel_lft.
   apply (map_pres_ap_zero _ _ (iso_map_rht _ _ CRIR_iso) y y_).
  change ((IRasCR y[*]IRasCR (x[/]y[//]y_):CR)==IRasCR y*((IRasCR x[/]IRasCR y[//]y__):CR))%CR.
  rewrite <- IR_mult_as_CR.

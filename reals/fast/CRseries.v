@@ -131,7 +131,7 @@ Proof.
    ring_simplify.
    assumption.
   assumption.
- apply: Stream_Bound_nbz.
+ eapply Stream_Bound_nbz.
   destruct Hb as [_ Hb].
   change (StreamBounds (tl a) (tl b)) in Hb.
   apply Hb.

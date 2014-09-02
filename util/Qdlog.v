@@ -29,8 +29,7 @@ Proof.
      apply dec_fields.flip_lt_dec_recip_r; trivial.
      apply orders.lt_iff_le_ne. tauto.
     now apply Qle_ceiling.
-   split.
-    rewrite int_pow_negate.
+   split. setoid_rewrite int_pow_negate.
     apply dec_fields.flip_le_dec_recip_l; trivial.
     transitivity ('Qceiling (/x)).
      now apply Qle_ceiling.
@@ -169,9 +168,9 @@ Definition Qdlog (n : Z) (x : Q) : Z := Qdlog_bounded (Zabs_nat (Qdlog2 x)) n x.
 Lemma Qdlog_bounded_nonneg (b : nat) (n : Z) (x : Q) :
   0 ≤ Qdlog_bounded b n x.
 Proof.
-  revert x. induction b; simpl; [reflexivity |].
+  revert x. induction b; unfold Qdlog_bounded; [reflexivity |].
   intros. case (decide_rel _); intros; [reflexivity |].
-  apply semirings.nonneg_plus_compat; [easy | apply IHb].
+  apply  semirings.nonneg_plus_compat ; [easy | apply IHb].
 Qed.
 
 Lemma Qdlog2_le1 (n : Z) (x : Q) : 
@@ -212,7 +211,7 @@ Proof.
   assert (0 < ('n : Q))
     by (apply orders.lt_le_trans with 2; [solve_propholds | assumption]).
   revert x Eb Ex.
-  induction b; simpl.
+  induction b.
    intros x Eb Ex.
    split; [assumption|].
    apply orders.lt_le_trans with 2; try assumption.
@@ -221,7 +220,7 @@ Proof.
    apply (antisymmetry (≤)); try assumption.
    now apply Qdlog2_nonneg.
   intros x Eb Ex.
-  case (decide_rel _); [intuition |]; intros E.
+  unfold Qdlog_bounded. case (decide_rel _); [intuition |]; intros E.
   apply orders.not_lt_le_flip in E.
   assert (x = 'n * (x / 'n)) as Ex2.
    rewrite (commutativity x), associativity.
@@ -241,8 +240,8 @@ Proof.
    rewrite <-Qdlog2_half.
     now apply rings.flip_le_minus_l.
    now apply orders.lt_le_trans with 1; [solve_propholds | assumption].
-  rewrite int_pow_S_nonneg by (now apply Qdlog_bounded_nonneg).
-  rewrite int_pow_S_nonneg by (apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg]).
+  fold Qdlog_bounded. setoid_rewrite int_pow_S_nonneg at 1.  2: apply Qdlog_bounded_nonneg.
+  setoid_rewrite int_pow_S_nonneg.  2: (apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg]).
   setoid_rewrite Ex2 at 2 3.
   split.
    now apply (order_preserving (('n:Q) *.)).

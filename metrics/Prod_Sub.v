@@ -202,7 +202,7 @@ the pseudo metric on $X$ #X# restricted to $Y$ #Y#.
 Definition restr_bin_fun (X : CPsMetricSpace) (P : cms_crr X -> CProp)
   (f : CSetoid_bin_fun X X IR) (a b : Build_SubCSetoid X P) : IR :=
   match a, b with
-  | Build_subcsetoid_crr x p, Build_subcsetoid_crr y q => f x y
+  | Build_subcsetoid_crr _ _ x p, Build_subcsetoid_crr _ _ y q => f x y
   end.
 
 
@@ -211,7 +211,7 @@ Implicit Arguments restr_bin_fun [X].
 Definition restr_bin_fun' (X : CPsMetricSpace) (P : cms_crr X -> CProp)
   (f : CSetoid_bin_fun X X IR) (a : X) (b : Build_SubCSetoid X P) : IR :=
   match b with
-  | Build_subcsetoid_crr y q => f a y
+  | Build_subcsetoid_crr _ _ y q => f a y
   end.
 
 Implicit Arguments restr_bin_fun' [X].

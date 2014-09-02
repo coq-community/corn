@@ -65,9 +65,9 @@ Proof.
      change (0 < x*y)%CR.
      apply CR_lt_as_Cauchy_IR_lt_2.
      stepr ((CRasCauchy_IR x)[*](CRasCauchy_IR y)); [| now apply CR_mult_as_Cauchy_IR_mult].
-     apply: less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
+     eapply less_wdl;[|apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)].
      apply mult_resp_pos;(
-       apply: less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
+       eapply less_wdl;[|apply eq_symmetric;apply (CR_inject_Q_as_Cauchy_IR_inject_Q 0)];
          apply CR_lt_as_Cauchy_IR_lt_1;assumption).
     intros x y.
     split.

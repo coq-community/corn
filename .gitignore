@@ -30,3 +30,6 @@ deps.pdf
 *.o
 plot.pgm
 coqdoc
+*.native
+*.aux
+

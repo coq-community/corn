@@ -1,5 +1,4 @@
-
-Require Import ZArith NPeano stdlib_omissions.P.
+Require Import ZArith NPeano NSigNAxioms stdlib_omissions.P.
 
 Open Scope Z_scope.
 
@@ -60,7 +59,7 @@ Proof.
  rewrite <- inj_mult.
  rewrite <- inj_plus.
  apply inj_eq.
- apply div_mod.
+ apply Nat.div_mod.
  assumption.
 Qed.
 
@@ -73,7 +72,7 @@ Proof with auto with *.
   apply Nat.mod_upper_bound...
  rewrite <- div_Zdiv...
  rewrite <- inj_mult, <- inj_plus.
- apply inj_eq, div_mod...
+ apply inj_eq, Nat.div_mod...
 Qed.
 
 Lemma P_of_succ_nat_Zplus (m: nat): Zpos (P_of_succ_nat m) = Z_of_nat m + 1.

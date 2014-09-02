@@ -23,7 +23,6 @@ Require Export Qordfield.
 Require Import COrdFields2.
 Require Import Qpower.
 Require Import Qabs.
-Require Import CornTac.
 
 Ltac Qauto_pos :=
   repeat (first [ assumption

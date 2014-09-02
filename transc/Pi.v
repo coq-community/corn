@@ -102,7 +102,7 @@ Proof.
   2: unfold cg_minus at 1 in |- *; apply bin_op_wd_unfolded.
    2: algebra.
   2: rstepr ( [--] ( {--}Cosine t Ht[-] {--}Cosine x I)).
-  2: apply un_op_wd_unfolded; eapply eq_transitive_unfolded.
+  2: apply un_op_wd_unfolded; eapply eq_transitive.
    2: apply B'.
   2: algebra.
  clear B' B H3.
@@ -182,13 +182,13 @@ Proof.
   apply leEq_transitive with x; auto.
   eapply leEq_wdl.
    apply H3.
-  eapply eq_transitive_unfolded.
+  eapply eq_transitive.
    apply Min_comm.
   apply leEq_imp_Min_is_lft; auto.
  apply leEq_transitive with y; auto.
  eapply leEq_wdr.
   apply H4.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Max_comm.
  apply leEq_imp_Max_is_rht; auto.
 Qed.
@@ -385,14 +385,14 @@ Proof.
       exists (S (S N)); intros.
       apply AbsIR_imp_AbsSmall.
       apply leEq_wdl with (pi_seq m[-]pi_seq (S (S N))).
-       2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
+       2: apply eq_symmetric; apply AbsIR_eq_x.
        2: apply shift_leEq_minus; astepl (pi_seq (S (S N))).
        2: apply local_mon_imp_mon'.
         2: intro; apply pi_seq_incr; auto.
        2: auto.
       cut (m = S (pred m)); [ intro | apply S_pred with (S N); auto ].
       apply leEq_wdl with (Sum (S (S N)) (pred m) (fun i : nat => pi_seq (S i) [-]pi_seq i)).
-       2: eapply eq_transitive_unfolded.
+       2: eapply eq_transitive.
         2: apply Mengolli_Sum_gen with (f := pi_seq).
          2: algebra.
         2: auto with arith.
@@ -405,7 +405,7 @@ Proof.
        intros; apply pi_seq_bnd''.
        apply le_trans with (S (S N)); auto with arith.
       eapply leEq_wdl.
-       2: apply eq_symmetric_unfolded; apply Sum_comm_scal with (s := fun i : nat => z[^]pred i).
+       2: apply eq_symmetric; apply Sum_comm_scal with (s := fun i : nat => z[^]pred i).
       rstepl (Sum (S (S N)) (pred m) (fun i : nat => z[^]pred i) [*] (pi_seq 2[-]pi_seq 1)).
       apply shift_mult_leEq with H1.
        auto.
@@ -415,7 +415,7 @@ Proof.
        2: apply Sum_shift; algebra.
       cut (z[-][1] [#] [0]). intro H4.
        eapply leEq_wdl.
-        2: apply eq_symmetric_unfolded; apply Sum_c_exp with (H := H4).
+        2: apply eq_symmetric; apply Sum_c_exp with (H := H4).
        rstepl ((z[^]S (pred (pred m)) [/] _[//]H4) [-] (z[^]S N[/] _[//]H4)).
        apply leEq_transitive with ( [--] (z[^]S N) [/] _[//]H4).
         apply shift_minus_leEq; rstepr ZeroR; apply less_leEq.
@@ -490,8 +490,8 @@ Proof.
 Qed.
 
 Lemma Cos_HalfPi : Cos (Pi [/]TwoNZ) [=] [0].
- apply eq_transitive_unfolded with (Cos (Lim (Build_CauchySeq _ _ pi_seq_Cauchy))).
 Proof.
+ transitivity (Cos (Lim (Build_CauchySeq _ _ pi_seq_Cauchy))).
   apply Cos_wd; unfold Pi in |- *; rational.
  astepr (Lim (Build_CauchySeq _ _ pi_seq_Cauchy) [-] Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
  assert (H : Cauchy_prop (fun n : nat => pi_seq (S n))).
@@ -500,7 +500,7 @@ Proof.
    simpl in |- *; auto.
    algebra.
   apply pi_seq_Cauchy.
- apply eq_transitive_unfolded with
+ transitivity
    (Lim (Build_CauchySeq _ _ H) [-]Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
   2: apply cg_minus_wd; algebra.
   2: apply Lim_subseq_eq_Lim_seq with S; auto with arith.
@@ -509,13 +509,13 @@ Proof.
    2: algebra.
   2: left; intros; simpl in |- *.
   2: apply local_mon_imp_mon'; auto; apply pi_seq_incr.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   2: apply Lim_minus.
  assert (H0 : Cauchy_prop (fun n : nat => Cosine (pi_seq n) (cos_domain _))).
   apply Cauchy_prop_wd with (fun n : nat => pi_seq (S n) [-]pi_seq n).
    2: intros; simpl in |- *; rational.
   exact (Cauchy_minus (Build_CauchySeq _ _ H) (Build_CauchySeq _ _ pi_seq_Cauchy)).
- apply eq_transitive_unfolded with (Lim (Build_CauchySeq _ _ H0)).
+ transitivity (Lim (Build_CauchySeq _ _ H0)).
   2: apply Lim_wd'; intros; simpl in |- *; rational.
  simpl in |- *.
  apply Continuous_imp_comm_Lim with (e := OneR) (x := Build_CauchySeq _ _ pi_seq_Cauchy)
@@ -775,7 +775,7 @@ Proof.
   2: algebra.
  apply bin_op_wd_unfolded.
   2: algebra.
- apply eq_transitive_unfolded with (Cos (Two[*]Pi [/]FourNZ)).
+ transitivity (Cos (Two[*]Pi [/]FourNZ)).
   apply eq_symmetric_unfolded; apply Cos_double.
  apply Cos_wd; rational.
 Qed.
@@ -829,9 +829,9 @@ Proof.
  apply cg_minus_wd.
   apply bin_op_wd_unfolded.
    apply nexp_wd.
-   apply eq_symmetric_unfolded; apply Cos_QuarterPi.
+   apply eq_symmetric; apply Cos_QuarterPi.
   algebra.
- apply eq_symmetric_unfolded; apply sqrt_lemma.
+ apply eq_symmetric; apply sqrt_lemma.
 Qed.
 
 Hint Resolve Sin_QuarterPi Cos_QuarterPi: algebra.
@@ -863,22 +863,22 @@ Qed.
 
 Lemma Sin_HalfPi : Sin (Pi [/]TwoNZ) [=] [1].
 Proof.
- apply eq_transitive_unfolded with (Sin (Two[*]Pi [/]FourNZ)).
+ transitivity  (Sin (Two[*]Pi [/]FourNZ)).
   apply Sin_wd; rational.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Sin_double.
  astepr ((Two:IR) [*][1] [/]TwoNZ).
- eapply eq_transitive_unfolded.
-  apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
+ eapply eq_transitive.
+  apply eq_symmetric; apply mult_assoc.
  apply mult_wdr.
  cut (sqrt _ (less_leEq _ _ _ (pos_two IR)) [#] [0]). intro H.
-  eapply eq_transitive_unfolded.
-   2: apply eq_symmetric_unfolded; apply (sqrt_lemma _ H).
+  eapply eq_transitive.
+   2: symmetry; apply (sqrt_lemma _ H).
   simpl in |- *.
-  eapply eq_transitive_unfolded.
-   2: apply mult_assoc_unfolded.
-  eapply eq_transitive_unfolded.
-   apply eq_symmetric_unfolded; apply one_mult.
+  eapply eq_transitive.
+   2: apply mult_assoc.
+  eapply eq_transitive.
+   apply eq_symmetric; apply one_mult.
   apply mult_wdr.
   apply mult_wd.
    apply Sin_QuarterPi.
@@ -892,7 +892,7 @@ Hint Resolve Sin_HalfPi: algebra.
 Lemma Sin_plus_HalfPi : forall x : IR, Sin (x[+]Pi [/]TwoNZ) [=] Cos x.
 Proof.
  intro.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Sin_plus.
  astepl (Sin x[*][0][+]Cos x[*][1]).
  Step_final ([0][+]Cos x).
@@ -903,7 +903,7 @@ Proof.
  intros.
  unfold cg_minus in |- *.
  astepl (Sin ( [--]x[+]Pi [/]TwoNZ)).
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Sin_plus_HalfPi.
  algebra.
 Qed.
@@ -911,7 +911,7 @@ Qed.
 Lemma Cos_plus_HalfPi : forall x : IR, Cos (x[+]Pi [/]TwoNZ) [=] [--] (Sin x).
 Proof.
  intro.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Cos_plus.
  astepl (Cos x[*][0][-]Sin x[*][1]).
  Step_final ([0][-]Sin x).
@@ -922,14 +922,14 @@ Proof.
  intros.
  unfold cg_minus in |- *.
  astepl (Cos ( [--]x[+]Pi [/]TwoNZ)).
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Cos_plus_HalfPi.
  Step_final (Sin [--][--]x).
 Qed.
 
 Lemma Sin_Pi : Sin Pi [=] [0].
 Proof.
- apply eq_transitive_unfolded with (Sin (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
+ transitivity (Sin (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Sin_wd; rational.
  eapply eq_transitive_unfolded.
   apply Sin_plus_HalfPi.
@@ -938,9 +938,9 @@ Qed.
 
 Lemma Cos_Pi : Cos Pi [=] [--][1].
 Proof.
- apply eq_transitive_unfolded with (Cos (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
+ transitivity (Cos (Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Cos_wd; rational.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Cos_plus_HalfPi.
  algebra.
 Qed.
@@ -948,9 +948,9 @@ Qed.
 Lemma Sin_plus_Pi : forall x : IR, Sin (x[+]Pi) [=] [--] (Sin x).
 Proof.
  intros.
- apply eq_transitive_unfolded with (Sin (x[+]Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
+ transitivity (Sin (x[+]Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Sin_wd; rational.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Sin_plus_HalfPi.
  apply Cos_plus_HalfPi.
 Qed.
@@ -958,9 +958,9 @@ Qed.
 Lemma Cos_plus_Pi : forall x : IR, Cos (x[+]Pi) [=] [--] (Cos x).
 Proof.
  intros.
- apply eq_transitive_unfolded with (Cos (x[+]Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
+ transitivity (Cos (x[+]Pi [/]TwoNZ[+]Pi [/]TwoNZ)).
   apply Cos_wd; rational.
- eapply eq_transitive_unfolded.
+ eapply eq_transitive.
   apply Cos_plus_HalfPi.
  apply un_op_wd_unfolded; apply Sin_plus_HalfPi.
 Qed.
@@ -976,11 +976,9 @@ Proof.
   clear H.
   destruct Hx as [[] [[] Hx]].
   apply (Hx I).
- csetoid_rewrite (Tan_Sin_over_Cos y Hy H0).
+ rewrite (Tan_Sin_over_Cos y Hy H0).
  unfold y.
- assert (H2:([--](Sin x))[#][0]).
-  csetoid_rewrite_rev (Cos_plus_HalfPi x).
-  apply H0.
+ assert (H2:([--](Sin x))[#][0]) by (now csetoid_rewrite_rev (Cos_plus_HalfPi x)).
  stepr (Cos x[/]([--](Sin x))[//]H2).
   apply div_wd.
    apply Sin_plus_HalfPi.
@@ -988,7 +986,7 @@ Proof.
  clear H0.
  rstepl (((Cos x[/][--](Sin x)[//]H2)[*](Tan x Hx))[/](Tan x Hx)[//]H).
  apply div_wd;[|apply eq_reflexive].
- csetoid_rewrite (Tan_Sin_over_Cos x Hx H1).
+ rewrite (Tan_Sin_over_Cos x Hx H1). 
  rational.
 Qed.
 
@@ -999,7 +997,7 @@ Hint Resolve Sin_plus_Pi Cos_plus_Pi: algebra.
 Lemma Sin_periodic : forall x : IR, Sin (x[+]Two[*]Pi) [=] Sin x.
 Proof.
  intro.
- apply eq_transitive_unfolded with (Sin (x[+]Pi[+]Pi)).
+ transitivity (Sin (x[+]Pi[+]Pi)).
   apply Sin_wd; rational.
  astepl ( [--] (Sin (x[+]Pi))).
  Step_final ( [--][--] (Sin x)).
@@ -1008,7 +1006,7 @@ Qed.
 Lemma Cos_periodic : forall x : IR, Cos (x[+]Two[*]Pi) [=] Cos x.
 Proof.
  intro.
- apply eq_transitive_unfolded with (Cos (x[+]Pi[+]Pi)).
+ transitivity (Cos (x[+]Pi[+]Pi)).
   apply Cos_wd; rational.
  astepl ( [--] (Cos (x[+]Pi))).
  Step_final ( [--][--] (Cos x)).
@@ -1053,7 +1051,7 @@ Proof.
  intros.
  cut (Cos x [#] [0]). intro H.
   assert (H0 : [--] (Cos x) [#] [0]). apply inv_resp_ap_zero; auto.
-   apply eq_transitive_unfolded with (Sin x[/] _[//]H).
+   transitivity (Sin x[/] _[//]H).
    2: unfold Tan, Tang in |- *; simpl in |- *; algebra.
   rstepr ( [--] (Sin x) [/] _[//]H0).
   assert (H1 : Cos (x[+]Pi) [#] [0]). astepl ( [--] (Cos x)); auto.

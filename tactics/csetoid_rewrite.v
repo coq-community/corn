@@ -174,10 +174,10 @@ Inductive tot_set_exp (S:CSetoid) : CSetoid -> Type :=
 
 Fixpoint tse_int (S T:CSetoid) (r:S) (e:tot_set_exp S T) {struct e} : T :=
   match e with
-  | tse_var => r
-  | tse_fun T1 T2 f e0 => f (tse_int S T1 r e0)
-  | tse_bfun T1 T2 T3 f e1 e2 => f (tse_int S T1 r e1) (tse_int S T2 r e2)
-  | tse_con T t => t
+  | tse_var _ => r
+  | tse_fun _ T1 T2 f e0 => f (tse_int S T1 r e0)
+  | tse_bfun _ T1 T2 T3 f e1 e2 => f (tse_int S T1 r e1) (tse_int S T2 r e2)
+  | tse_con _ T t => t
   end.
 
 (** [tse_int] is well-defined. *)
@@ -645,12 +645,12 @@ Inductive my_sigT (A:Type) (P:A -> Type) : Type :=
 
 Definition proj1_my_sigT (A:Type) (P:A -> Type) (e:my_sigT A P) :=
   match e with
-  | my_existT a b => a
+  | my_existT _ _ a b => a
   end.
 
 Definition proj2_my_sigT (A:Type) (P:A -> Type) (e:my_sigT A P) :=
   match e return P (proj1_my_sigT A P e) with
-  | my_existT a b => b
+  | my_existT _ _ a b => b
   end.
 
 Set Implicit Arguments.
@@ -715,9 +715,9 @@ extracts the syntactical component from heavy expressions. *)
 Fixpoint forget (t:T) (e:part_set_xexp t) {struct e} : part_set_exp :=
   match e with
   | psxe_var => pse_var
-  | psxe_uop F t0 e0 => pse_uop F (forget e0)
-  | psxe_bop F t1 t2 e1 e2 => pse_bop F (forget e1) (forget e2)
-  | psxe_pop F t0 H e0 => pse_pop F (forget e0)
+  | psxe_uop F e0 => pse_uop F (forget e0)
+  | psxe_bop F e1 e2 => pse_bop F (forget e1) (forget e2)
+  | @psxe_pop F _ _ e0 => pse_pop F (forget e0)
   | psxe_con t => pse_con t
   end.
 

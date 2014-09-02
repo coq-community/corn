@@ -40,7 +40,7 @@ Proof.
   stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (CRinvT x x_))); [| now apply CR_mult_as_Cauchy_IR_mult].
   stepl ((CRasCauchy_IR x)[*](f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))); [| now
     apply bin_op_is_wd_un_op_rht; apply CR_inv_as_Cauchy_IR_inv].
-  apply: eq_transitive.
+  eapply eq_transitive.
    apply field_mult_inv.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
  change ((CRinvT x x_)*x==1)%CR.
@@ -48,7 +48,7 @@ Proof.
  stepl ((CRasCauchy_IR (CRinvT x x_))[*](CRasCauchy_IR x)); [| now apply CR_mult_as_Cauchy_IR_mult].
  stepl ((f_rcpcl (CRasCauchy_IR x) (CR_nonZero_as_Cauchy_IR_nonZero_1 _ x_))[*](CRasCauchy_IR x)); [| now
    apply bin_op_is_wd_un_op_lft; apply CR_inv_as_Cauchy_IR_inv].
- apply: eq_transitive.
+ eapply eq_transitive.
   apply field_mult_inv_op.
  apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Qed.

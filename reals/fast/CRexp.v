@@ -372,7 +372,7 @@ Qed.
 Definition rational_exp_neg (a:Q) : a <= 0 -> CR.
 Proof.
  intros Ha.
- refine (@rational_exp_neg_bounded _ a _).
+ eapply (rational_exp_neg_bounded). 
  split.
   apply (rational_exp_bound_power_2 Ha).
  apply Ha.

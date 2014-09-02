@@ -126,7 +126,7 @@ Definition pp_gcd_ind (ab : pp) :
        (Hind : forall cd : pp, pp_lt cd (a, b) -> positive * (Z * Z)) =>
      match rem_dec a b with
      | inl _ => (b, (0%Z, 1%Z))
-     | inr (existT r' Hr') =>
+     | inr (existT _ r' Hr') =>
          let (d, uv) := Hind (b, r') (rem_lt a b r' Hr') in
          let (u, v) := uv in (d, (v, (u - Zpos a / Zpos b * v)%Z))
      end) ab.

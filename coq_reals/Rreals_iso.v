@@ -39,6 +39,12 @@ Require Import MoreArcTan.
 Require Import PropDecid.
 Require Import Exponential.
 
+(* This changed in RLogic and should probably be moved there: *)
+Lemma forall_dec : forall P:nat->Prop, (forall n, {P n} + {~ P n}) -> {forall n, P n} + {~forall n, P n}.
+intros. 
+case (sig_forall_dec _ H) as [[n H1] | H1];intuition.
+Qed.
+
 (** * Coq Real Numbers and IR isomorphisms
 
  Warning: The Coq real numbers depend on classical logic.  Importing this
@@ -353,7 +359,7 @@ Proof.
   apply constructive_indefinite_description_nat.
    intros N.
    apply forall_dec.
-   intros n0.
+    intros n0.
    apply forall_dec.
    intros n1.
    apply imp_dec.
@@ -366,13 +372,11 @@ Proof.
      left; auto with *.
     right; auto with *.
    apply Rlt_dec.
-  apply cauchy.
-  auto with *.
+  apply cauchy; auto with *.
  destruct H as [N HN].
  exists (S N).
  intros m Hm.
- assert (N <= pred m)%nat.
-  auto with *.
+ assert (N <= pred m)%nat by  auto with *.
  assert (HH := HN (pred m) N H (le_refl N)).
  clear - HH Hm.
  destruct m.

@@ -105,5 +105,5 @@ Proof with simpl; auto; try reflexivity.
  apply s_perm_trans with (map y l')...
  apply s_perm_trans with (map x l')...
  clear IHX1 IHX2 X1 X2.
- induction l'... intuition.
+ induction l'... constructor. now symmetry; apply H1. easy.
 Qed.

@@ -95,7 +95,7 @@ Proof.
  assert ((Qmax 0 (e-x))<Sigma).
   apply Qmax_case.
    intros.
-   apply: less_leEq_trans.
+   eapply less_leEq_trans.
     instantiate (1:=(q:Q)).
     apply Qpos_prf.
    unfold Sigma.
@@ -109,7 +109,7 @@ Proof.
   assumption.
  assert (Hg1:=Smallest_less_Average _ _ _ H).
  assert (0<g).
-  apply: leEq_less_trans.
+  eapply leEq_less_trans.
    apply Qmax_ub_l.
   apply Hg1.
  set (g' := (mkQpos H0):Qpos).
@@ -117,7 +117,7 @@ Proof.
   apply QposAsmkQpos.
  assert (e<x+g').
   apply: shift_less_plus'.
-  apply: leEq_less_trans.
+  eapply leEq_less_trans.
    apply Qmax_ub_r.
   rewrite Hg.
   apply Hg1.
@@ -572,7 +572,7 @@ Proof.
  destruct (Qpos_lt_plus Hd1) as [d1' Hd1'].
  destruct (Qpos_lt_plus Hd2) as [d2' Hd2'].
  assert (He':(g + e + g)%Qpos < d1' + d2').
-  apply: plus_cancel_less;simpl.
+  eapply plus_cancel_less;simpl.
   instantiate (1:= (g+g)).
   assert (d1' + d2' + (g + g) == ((g+d1')%Qpos+(g+d2')%Qpos)).
    QposRing.

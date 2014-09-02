@@ -661,7 +661,7 @@ Lemma MonadLaw1 : forall a, Cmap_slow_fun (uc_id X) a =m a.
 Proof.
  intros x e1 e2.
  simpl.
- apply: ball_weak_le;[|apply regFun_prf].
+ eapply ball_weak_le; [|apply regFun_prf].
  autorewrite with QposElim.
  Qauto_le.
 Qed.
@@ -997,8 +997,7 @@ Proof.
  transitivity (Cmap_slow_fun x1 y2).
   apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
  generalize y2.
- apply:(@uc_wd _ _ (Cmap_strong_slow X Y)).
- assumption.
+ now apply (@uc_wd _ _ (Cmap_strong_slow X Y)).
 Qed.
 
 Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_slow_wd.
@@ -1013,7 +1012,7 @@ Proof.
  transitivity (Cap_slow_fun x1 y2).
   apply (@uc_wd _ _ (Cap_weak_slow x1) _ _ Hy).
  generalize y2.
- apply:(@uc_wd _ _ (Cap_slow X Y));assumption.
+ apply (@uc_wd _ _ (Cap_slow X Y));assumption.
 Qed.
 Transparent Complete.
 (* end hide *)
