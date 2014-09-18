@@ -243,7 +243,7 @@ Proof.
   apply Qle_refl.
  revert p H.
  dependent inversion v as [|a n0 v0].
- clear H0.
+ clear H.
  intros p [[Ha0 Ha1] Hv].
  stepl (@MVP_apply Q_as_CRing (S n) (let (n0, b) := BernsteinCoefficents (MVP_C_ Q_as_CRing n) p in
    evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (@Vector.cons Q a n v0));
@@ -365,7 +365,7 @@ Proof.
   apply Qle_refl.
  revert p H.
  dependent inversion v as [| a n0 v0 ].
- clear H0.
+ clear H.
  intros p [[Ha0 Ha1] Hv].
  stepr (@MVP_apply Q_as_CRing (S n) (let (n0, b) := BernsteinCoefficents (MVP_C_ Q_as_CRing n) p in
    evalBernsteinBasis (MultivariatePolynomial Q_as_CRing n) b) (Vector.cons _ a _ v0));
