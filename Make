@@ -42,13 +42,13 @@ coq_reals/Rreals_iso.v
 coq_reals/Rreals.v
 coq_reals/Rsign.v
 
-examples/Calculemus2011.v
-examples/Circle.v
-examples/IntegrationExamples.v
-examples/LMCS2011.v
-examples/PlotExamples.v
-examples/RealFaster.v
-examples/RealFast.v
+# examples/Calculemus2011.v
+# examples/Circle.v
+# examples/IntegrationExamples.v
+# examples/LMCS2011.v
+# examples/PlotExamples.v
+# examples/RealFaster.v
+# examples/RealFast.v
 
 fta/CC_Props.v
 fta/CPoly_Contin1.v
@@ -330,7 +330,7 @@ tactics/DiffTactics1.v
 tactics/DiffTactics2.v
 tactics/DiffTactics3.v
 tactics/FieldReflection.v
-#tactics/Opaque_algebra.v
+# tactics/Opaque_algebra.v
 tactics/Qauto.v
 tactics/rational.ml
 tactics/Rational.v
