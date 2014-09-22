@@ -226,22 +226,6 @@ ode/metric.v
 ode/Picard.v
 ode/SimpleIntegration.v
 
-old/CHomomorphism_Theorems.v
-old/CIdeals.v
-old/CModule_Homomorphisms.v
-old/CModules.v
-old/CMonoidCyc.v
-old/CQuotient_Modules.v
-old/CQuotient_Rings.v
-old/CVectorSpace.v
-old/N_no_group.v
-old/Npos_no_group.v
-old/Npos_no_monoid.v
-old/Transparent_algebra.v
-old/twoelemmonoid.v
-old/twoelemsemigroup.v
-old/twoelemsetoid.v
-
 order/Lattice.v
 order/PartialOrder.v
 order/SemiLattice.v
@@ -346,7 +330,7 @@ tactics/DiffTactics1.v
 tactics/DiffTactics2.v
 tactics/DiffTactics3.v
 tactics/FieldReflection.v
-tactics/Opaque_algebra.v
+#tactics/Opaque_algebra.v
 tactics/Qauto.v
 tactics/rational.ml
 tactics/Rational.v
