@@ -30,7 +30,7 @@ Require Import CRcorrect.
 Require Import CRIR.
 Require Import iso_CReals.
 Require Import Q_in_CReals.
-Require Import Series.
+Require Import CoRN.reals.Series.
 Require Import Zdiv.
 Require Import CornTac.
 

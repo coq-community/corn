@@ -1,4 +1,4 @@
-Require Import Utf8 Streams UniformContinuity abstract_algebra.
+Require Import Utf8 Coq.Lists.Streams UniformContinuity abstract_algebra.
 
 
 (** Uniform continuous maps from a metric space to itself (endomaps)

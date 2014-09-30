@@ -1,6 +1,6 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import Program Qpossec QposInf Qminmax.
+Require Import Program Qpossec QposInf QArith.Qminmax.
 
 Set Automatic Introduction.
 

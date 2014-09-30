@@ -32,7 +32,7 @@ Require Import LazyNat.
 Require Export Limit.
 Require Import QposMinMax.
 Require Import Qpower.
-Require Export Streams.
+Require Export Coq.Lists.Streams.
 Require Import PowerSeries.
 Require Import CornTac.
 Require Import Qclasses.
