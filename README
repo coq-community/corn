@@ -46,6 +46,10 @@ For more information, see the SCons documentation at
 
   http://www.scons.org/
 
+On Windows, try building under Cygwin. To do so, install python and scons packages in Cygwin and then
+run scons in the Cygwin terminal. Cygwin can be downloaded from
+https://www.cygwin.com/
+
 
 BUILDING DOCUMENTATION
 ----------------------
