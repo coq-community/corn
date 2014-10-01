@@ -1,7 +1,7 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
 Require Import
-  Qabs Qordfield Qpossec Qminmax Ring Program.
+  Qabs Qordfield Qpossec QArith.Qminmax Ring Program.
 
 Require QnonNeg.
 Import QnonNeg.notations.

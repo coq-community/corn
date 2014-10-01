@@ -206,7 +206,7 @@ pick [big] such that computation will suffer from the implementation limits of C
 (e.g. a stack overflow) or runs out of memory, before we ever refer to the proof.
 *)
 
-Definition big := Eval vm_compute in (Z.nat_of_Z 50000).
+Definition big := Eval vm_compute in (Z.nat_of_Z 50).
 Obligation Tactic := idtac.
 Program Definition ARInfAltSum_length (k : Z) : nat := 4 + takeUntil_length 
   (λ s, AQball_bool k (hd s) 0) 
