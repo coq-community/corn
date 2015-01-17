@@ -397,3 +397,33 @@ Proof.
  rewrite -> IR_opp_as_CR.
  reflexivity.
 Qed.
+
+Require Import MathClasses.interfaces.abstract_algebra.
+
+Instance Injective_instance_CRasIR : Injective  CRasIR.
+  constructor.
+- intros ? ? Heq. apply (fun_strext_imp_wd _ _ IRasCR) in Heq;
+    [ | apply R_morphism.map_strext].
+  repeat( rewrite CRasIRasCR_id in Heq).
+  exact Heq.
+- constructor;eauto 2 with *.
+  exact CRasIR_wd.
+Qed.
+
+Instance Injective_instance_IRasCR : Injective  IRasCR.
+  constructor.
+- intros ? ? Heq. apply (fun_strext_imp_wd _ _ CRasIR) in Heq;
+    [ | apply R_morphism.map_strext].
+  repeat (rewrite IRasCRasIR_id in Heq).
+  exact Heq.
+- constructor; try apply st_isSetoid.
+  exact IRasCR_wd.
+Qed.
+
+Lemma CRasIR_inv :  forall x, (CRasIR (- x) = [--] (CRasIR x))%CR.
+Proof.
+  intros. apply (injective IRasCR).
+  rewrite IR_opp_as_CR.
+  rewrite CRasIRasCR_id, CRasIRasCR_id.
+  reflexivity.
+Qed.
