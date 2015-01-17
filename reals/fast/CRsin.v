@@ -552,7 +552,7 @@ Definition sin (x:CR) := sin_slow (x - (compress (scale (2*Qceiling (approximate
 
 Lemma  sin_sin_slow : forall x, sin x = sin_slow x.
 Proof.
-  intros.
+  intros x.
   unfold sin.
   generalize (Qround.Qceiling (approximate (x * CRinv_pos (6 # 1) (scale 2 CRpi))
    (1 # 2)%Qpos - (1 # 2)))%CR.

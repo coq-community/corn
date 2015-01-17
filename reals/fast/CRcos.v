@@ -247,7 +247,7 @@ Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate
 
 Lemma  cos_cos_slow : forall x, cos x = cos_slow x.
 Proof.
-  intros.
+  intros x.
   unfold cos.
   generalize (Qround.Qceiling (approximate (x * CRinv_pos (6 # 1) (scale 2 CRpi))
    (1 # 2)%Qpos - (1 # 2)))%CR.
