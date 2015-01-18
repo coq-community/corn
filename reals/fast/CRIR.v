@@ -445,3 +445,30 @@ Proof.
   rewrite IRasCRasIR_id in HH.
   symmetry. exact HH.
 Qed.
+
+Lemma CR_plus_asIR :
+∀ x y : CR , CRasIR (x+y) = (CRasIR x [+] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_plus_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  apply CRasIR_wd in HH.
+  rewrite <- HH.
+  rewrite IRasCRasIR_id.
+  reflexivity.
+Qed.
+
+Lemma CR_mult_asIR :
+∀ x y : CR , CRasIR (x*y) = (CRasIR x [*] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_mult_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  apply CRasIR_wd in HH.
+  rewrite <- HH.
+  rewrite IRasCRasIR_id.
+  reflexivity.
+Qed.
+

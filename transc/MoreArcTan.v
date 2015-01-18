@@ -142,6 +142,38 @@ Proof.
   rational.
 Qed.
 
+Lemma plus_resp_nonnegR_pos
+   : ∀ (R : COrdField) (x y : R), 
+      [0][<=]x → [0][<]y → [0][<]y[+]x.
+Proof.
+  intros.
+  eapply less_wdr;[| apply cag_commutes_unfolded].
+  apply plus_resp_nonneg_pos; trivial.
+Qed.
+
+Lemma  OneplusRSqrApart0 : 
+   ∀ (R : COrdField) (r:R), ([1][+]r[^]2)[#][0].
+Proof.
+  intros R r.
+  apply Greater_imp_ap.
+  apply plus_resp_nonnegR_pos;[|apply pos_one].
+  apply sqr_nonneg.
+Qed.
+
+Lemma CosOfArcTan2 : forall r,
+  Cos (ArcTan r)[^]2 
+  [=] ([1][/] ([1][+]r[^]2)[//] (OneplusRSqrApart0 _ _)).
+Proof.
+  intros. apply  CosOfArcTan.
+Qed.
+
+Lemma SinOfArcTan2 : forall r,
+  Sin (ArcTan r)[^]2 
+  [=] (r[^]2[/] ([1][+]r[^]2)[//] (OneplusRSqrApart0 _ _)).
+Proof.
+  intros. apply SinOfArcTan.
+Qed.
+
 Lemma ArcTan_zero : ArcTan [0][=][0].
 Proof.
  assert (Z:Dom Tang [0]).
