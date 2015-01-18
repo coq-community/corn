@@ -427,3 +427,21 @@ Proof.
   rewrite CRasIRasCR_id, CRasIRasCR_id.
   reflexivity.
 Qed.
+
+Lemma CR_leEq_as_IR :
+∀ x y : CR , x ≤ y ↔ (CRasIR x [<=] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_leEq_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  symmetry. exact HH.
+Qed.
+
+Lemma CRasIR0 : CRasIR 0 = [0].
+Proof.
+  pose proof IR_Zero_as_CR as HH.
+  apply CRasIR_wd in HH.
+  rewrite IRasCRasIR_id in HH.
+  symmetry. exact HH.
+Qed.

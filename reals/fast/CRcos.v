@@ -301,3 +301,13 @@ Qed.
 (* begin hide *)
 Hint Rewrite cos_correct : IRtoCR.
 (* end hide *)
+
+
+Lemma CRCos_plus_Pi: ∀ x : CR, (cos (x + CRpi) = - (cos x))%CR.
+  intros x.
+  pose proof (Pi.Cos_plus_Pi (CRasIR x)) as Hc.
+  apply IRasCR_wd in Hc.
+  autorewrite with IRtoCR in Hc.
+  rewrite CRasIRasCR_id in Hc.
+  exact Hc.
+Qed.

@@ -606,3 +606,13 @@ Qed.
 (* begin hide *)
 Hint Rewrite sin_correct : IRtoCR.
 (* end hide *)
+
+
+Lemma CRSin_plus_Pi: ∀ x : CR, (sin (x + CRpi) = (- sin x))%CR.
+  intros x.
+  pose proof (Pi.Sin_plus_Pi (CRasIR x)) as Hc.
+  apply IRasCR_wd in Hc.
+  autorewrite with IRtoCR in Hc.
+  rewrite CRasIRasCR_id in Hc.
+  exact Hc.
+Qed.
