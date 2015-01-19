@@ -472,3 +472,13 @@ Proof.
   reflexivity.
 Qed.
 
+Lemma IRasCR_preserves_less : 
+  forall x y, (x[<]y -> IRasCR x < IRasCR y)%CR.
+Proof.
+ intros x y H.
+  pose proof (iso_map_rht _ _ CRIR_iso).
+  simpl. 
+  apply (map_pres_less _ _  (iso_map_rht _ _ CRIR_iso)) in H.
+  simpl in H.
+  exact H.
+Qed.
