@@ -312,6 +312,43 @@ Proof.
  split; [ apply leEq_transitive with a | apply leEq_transitive with b ]; auto.
 Qed.
 
+(** This lemma is almost same as [compact_included] above, except
+    that it gets rid of the hypothesis [Hab : a [<=] b] *)
+Lemma interval_convex:
+  forall (a b : IR) (I : interval),
+    I a -> I b -> included (clcr a b) I.
+Proof.
+  intros ? ? ? Ha Hb. unfold included. intros x Hab.
+  simpl in Hab. destruct Hab as [Hab Habr].
+  destruct I; simpl in Ha, Hb; simpl; try (split; destruct Ha, Hb); 
+    eauto using leEq_less_trans, leEq_reflexive, 
+                less_leEq_trans, leEq_transitive.
+Qed.
+
+(** Classically, this is a trivial consequence of [interval_convex].
+    However, a constructive proof seems to require a little more work*)
+Lemma interval_Min:
+  forall {a b : IR} {I : interval},
+    I a -> I b -> I (Min a b).
+Proof.
+  intros ? ? ? Ha Hb.
+  destruct I; simpl in Ha, Hb; simpl; try (split; destruct Ha, Hb);
+    eauto using leEq_less_trans, leEq_reflexive, 
+                 leEq_transitive,
+                Min_leEq_lft, less_Min, leEq_Min.
+Qed.
+
+Lemma interval_Max:
+  forall {a b : IR} {I : interval},
+    I a -> I b -> I (Max a b).
+Proof.
+  intros ? ? ? Ha Hb.
+  destruct I; simpl in Ha, Hb; simpl; try (split; destruct Ha, Hb);
+  eauto using less_leEq_trans, leEq_reflexive, 
+                leEq_transitive,
+                lft_leEq_Max, Max_less, Max_leEq.
+Qed.
+
 Lemma included_interval' : forall (I : interval) x y z w, I x -> I y -> I z -> I w ->
  forall H, included (compact (Min x z) (Max y w) H) I.
 Proof.
