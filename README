@@ -8,24 +8,19 @@ This version of C-CoRN is known to compile with:
 
  - Coq 8.4pl4
 
- - SCons 1.2
+ - SCons 1.2 or make
 
 GIT CHECKOUT & SUBMODULES
 -------------------------
 
 C-CoRN depends on Math Classes, which is a library of abstract interfaces for 
 mathematical structures that is heavily based on Coq's new type classes. 
-Math Classes is contained in the C-CoRN git repository as a submodule. You can 
-obtain math-classes automatically by giving the --recursive option when you 
-clone the git repository:
 
-  git clone --recursive https://github.com/c-corn/corn.git
+MathClasses can be installed using OPAM.
+http://coq-blog.clarus.me/use-opam-for-coq.html
 
-If you have already cloned the CoRN repository without --recursive, you can
-still get the submodules with
-
-  git submodule update --init --recursive
-
+Or directly using from git:
+https://github.com/math-classes/math-classes
 
 BUILDING C-CoRN
 ---------------
@@ -45,6 +40,9 @@ scons -c replaces Make clean
 For more information, see the SCons documentation at
 
   http://www.scons.org/
+
+
+Make is still supported.
 
 
 BUILDING DOCUMENTATION
