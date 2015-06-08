@@ -20,9 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import ZBasics.
 Require Import Classic.
-Require Export Metric.
+Require Export CoRN.metric2.Metric.
 Require Import Classification.
-Require Import List.
+Require Import Coq.Lists.List.
 Require Import ZArith.
 Require Import QMinMax.
 Require Import QposMinMax.

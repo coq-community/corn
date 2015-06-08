@@ -20,9 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import QArith.
-Require Import Bool.
+Require Import Coq.Bool.Bool.
 Require Export Complete.
-Require Export Streams.
+Require Export Coq.Lists.Streams.
 Require Import abstract_algebra theory.streams orders.naturals.
 
 (**

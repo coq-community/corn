@@ -2,7 +2,7 @@ Require Import Qmetric.
 Require Export QArith.
 Require Export StepFunctionSetoid.
 Require Import Qabs.
-Require Import Bool.
+Require Import Coq.Bool.Bool.
 Require Import CornTac.
 Require Import CornBasics.
 Require Import RSetoid.

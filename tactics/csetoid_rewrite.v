@@ -1305,7 +1305,7 @@ Ltac partial_setoid_replace_cxt x y h :=
 
 (*End partial_csetoid_rewrite.*)
 
-Require Export Bool.
+Require Export Coq.Bool.Bool.
 
 Ltac term_cont_part t :=
   match constr:t with

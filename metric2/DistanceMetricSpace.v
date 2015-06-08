@@ -3,7 +3,7 @@ Require NNUpperR.
 Import NNUpperR.notations.
 Import QnonNeg.notations.
 
-Require Import Metric.
+Require Import CoRN.metric2.Metric.
 
 Open Scope NNUpperR_scope.
 

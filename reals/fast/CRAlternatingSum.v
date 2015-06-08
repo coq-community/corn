@@ -24,7 +24,7 @@ Require Import Q_in_CReals.
 Require Import ArithRing.
 Require Export CRArith.
 Require Import CRIR.
-Require Import Bool.
+Require Import Coq.Bool.Bool.
 Require Import COrdAbs.
 Require Import Qordfield.
 Require Export Qmetric.
@@ -32,7 +32,7 @@ Require Import LazyNat.
 Require Export Limit.
 Require Import QposMinMax.
 Require Import Qpower.
-Require Export Streams.
+Require Export Coq.Lists.Streams.
 Require Import PowerSeries.
 Require Import CornTac.
 Require Import Qclasses.
