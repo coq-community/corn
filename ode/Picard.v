@@ -444,6 +444,7 @@ rewrite abs.abs_nonneg; [reflexivity |].
 change (0 <= 1 # 2)%Q. auto with qarith.
 Qed.
 
+(*
 (* native_compute needs 8.5 *)
 Time Eval vm_compute in (answer 2 (` (picard_iter 2 half))). (* 10 minutes *)
 Time Compute answer 1 (` (f half)). (* Too long *)
