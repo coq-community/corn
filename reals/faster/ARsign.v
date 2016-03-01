@@ -1,4 +1,4 @@
-Require Import ZArith ARArith.
+Require Import Coq.ZArith.ZArith CoRN.reals.faster.ARArith.
 
 Ltac AR_solve_pos_loop k :=
  (apply AR_epsilon_sign_dec_pos with k;

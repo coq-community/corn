@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Setoid.
-Require Export SemiLattice.
+Require Import Coq.Setoids.Setoid.
+Require Export CoRN.order.SemiLattice.
 
 Open Local Scope po_scope.
 

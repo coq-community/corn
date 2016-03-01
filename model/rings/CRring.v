@@ -19,12 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRFieldOps.
-Require Export CRabgroup.
-Require Export CRings.
-Require Import CRcorrect.
-Require Import Rational.
-Require Import CornTac.
+Require Export CoRN.reals.fast.CRFieldOps.
+Require Export CoRN.model.abgroups.CRabgroup.
+Require Export CoRN.algebra.CRings.
+Require Import CoRN.reals.fast.CRcorrect.
+Require Import CoRN.tactics.Rational.
+Require Import CoRN.tactics.CornTac.
 
 (**
 ** Example of a ring: $\langle$#&lang;#[CR],[+],[*]$\rangle$#&rang;#

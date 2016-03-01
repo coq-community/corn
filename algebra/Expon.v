@@ -36,8 +36,8 @@
 
 (** printing [^^] %\ensuremath{\hat{\ }}% #^# *)
 
-Require Export Arith.
-Require Export COrdCauchy.
+Require Export Coq.Arith.Arith.
+Require Export CoRN.algebra.COrdCauchy.
 
 Load "Transparent_algebra".
 

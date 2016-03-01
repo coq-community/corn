@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Zabgroup.
-Require Import CRings.
+Require Export CoRN.model.abgroups.Zabgroup.
+Require Import CoRN.algebra.CRings.
 
 (**
 ** Example of a ring: $\langle$#&lang;#[Z],[[+]],[[*]]$\rangle$#&rang;#

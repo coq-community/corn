@@ -7,7 +7,7 @@ Definition Q2R  (q: Q) : IR := (inj_Q IR q).
 Coercion  Q2R : Q >-> st_car.
 
 
-Require Import Ring. 
+Require Import Coq.setoid_ring.Ring. 
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.algebra.CRing_as_Ring.
 

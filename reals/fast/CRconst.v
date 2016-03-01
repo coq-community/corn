@@ -1,4 +1,4 @@
-Require Import Unicode.Utf8 Qmetric CRmetric UniformContinuity.
+Require Import Coq.Unicode.Utf8 CoRN.model.metric2.Qmetric CoRN.model.metric2.CRmetric CoRN.metric2.UniformContinuity.
 
 
 Section const_fun_uc.

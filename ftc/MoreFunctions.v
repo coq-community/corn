@@ -36,7 +36,7 @@
 
 (** printing FNorm %\ensuremath{\|\cdot\|_{\infty}}% *)
 
-Require Export MoreIntervals.
+Require Export CoRN.ftc.MoreIntervals.
 
 Opaque Min Max.
 

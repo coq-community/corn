@@ -36,8 +36,8 @@
 
 (** printing Npos $\mathbb{N}^{+}$ #N<SUP>+</SUP># *)
 
-Require Export Nsec.
-Require Import Arith.
+Require Export CoRN.model.structures.Nsec.
+Require Import Coq.Arith.Arith.
 
 (**
 ** [Npos]

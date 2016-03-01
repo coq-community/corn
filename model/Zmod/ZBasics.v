@@ -35,8 +35,8 @@
  *)
 (* ZBasics.v, by Vince Barany *)
 
-Require Export ZArith.
-Require Export CLogic.
+Require Export Coq.ZArith.ZArith.
+Require Export CoRN.logic.CLogic.
 
 (**
 * Basic facts on Z

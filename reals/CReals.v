@@ -36,7 +36,7 @@
 
 (** printing Lim %\ensuremath{\lim}% *)
 
-Require Export COrdCauchy.
+Require Export CoRN.algebra.COrdCauchy.
 
 (**
 * Definition of the notion of reals

@@ -43,7 +43,7 @@
 (* description : Bridges' proof of Cauchy completeness in TCS-219  *)
 
 
-Require Import Bridges_LUB.
+Require Import CoRN.reals.Bridges_LUB.
 
 
 (* This lemma comes from lemmas.v of Martijn Oostdijk *)

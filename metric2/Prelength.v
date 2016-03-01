@@ -19,16 +19,16 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Metric.
-Require Import UniformContinuity.
-Require Import Complete.
-Require Import COrdFields2.
-Require Import Qordfield.
-Require Import QMinMax.
-Require Import QposMinMax.
-Require Import List.
-Require Import CornTac.
-Require Import Qauto.
+Require Export CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.metric2.Complete.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import CoRN.stdlib_omissions.List.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.tactics.Qauto.
 
 Set Implicit Arguments.
 Set Automatic Introduction.

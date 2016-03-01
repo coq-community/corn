@@ -1,7 +1,7 @@
 Require Import
-  stdlib_omissions.Q
-  CRpi_fast CRarctan_small
-  abstract_algebra ARarctan_small.
+  CoRN.stdlib_omissions.Q
+  CoRN.reals.fast.CRpi_fast CoRN.reals.fast.CRarctan_small
+  MathClasses.interfaces.abstract_algebra CoRN.reals.faster.ARarctan_small.
 
 Section ARpi.
 Context `{AppRationals AQ}.

@@ -40,7 +40,7 @@
 Infix "**" := prodT (at level 20).
 (* end hide *)
 
-Require Export Continuity.
+Require Export CoRN.ftc.Continuity.
 
 (**
 * IVT for Partial Functions

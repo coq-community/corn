@@ -35,8 +35,8 @@
  *)
 
 (* begin hide *)
-Require Export CRings.
-Require Export AlgReflection.
+Require Export CoRN.algebra.CRings.
+Require Export CoRN.tactics.AlgReflection.
 
 Section Ring_Interpretation_Function.
 

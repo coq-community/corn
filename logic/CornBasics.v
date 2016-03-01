@@ -45,13 +45,13 @@
 (** printing nat %\ensuremath{\mathbb N}% #<b>N</b># *)
 (** printing Z %\ensuremath{\mathbb Z}% #<b>Z</b># *)
 
-Require Export Omega.
-Require Export Even.
-Require Export Max.
-Require Export Min.
-Require Export List.
-Require Import Eqdep_dec.
-Require Import Setoid.
+Require Export Coq.omega.Omega.
+Require Export Coq.Arith.Even.
+Require Export Coq.Arith.Max.
+Require Export Coq.Arith.Min.
+Require Export CoRN.stdlib_omissions.List.
+Require Import Coq.Logic.Eqdep_dec.
+Require Import Coq.Setoids.Setoid.
 
 Tactic Notation "apply" ":" constr(x) := pose proof x as HHH; first [
   refine HHH | 

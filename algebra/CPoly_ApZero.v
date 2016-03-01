@@ -34,10 +34,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CPoly_Degree.
-Require Export COrdFields2.
-Require Import Morphisms Permutation.
-Require ne_list.
+Require Export CoRN.algebra.CPoly_Degree.
+Require Export CoRN.algebra.COrdFields2.
+Require Import Coq.Classes.Morphisms Coq.Sorting.Permutation.
+Require MathClasses.implementations.ne_list.
 Import ne_list.notations.
 
 Set Automatic Introduction.

@@ -19,29 +19,29 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export IntegrableFunction.
-Require Export BoundedFunction.
-Require Export CRmetric.
-Require Export CRArith.
-Require Import LinfDistMonad.
-Require Import CRIR.
-Require Import Integral.
-Require Import StepQsec.
-Require Import OpenUnit.
-Require Import QMinMax.
-Require Import QposMinMax.
-Require Import Qabs.
-Require Import Qauto.
-Require Import Qround.
-Require Import L1metric.
-Require Import LinfMetric.
-Require Import Qordfield.
-Require Import COrdFields2.
-Require Import Qmetric.
-Require Import ContinuousCorrect.
-Require Import IntegrationRules.
-Require Import MoreIntegrals.
-Require Import CornTac.
+Require Export CoRN.model.metric2.IntegrableFunction.
+Require Export CoRN.model.metric2.BoundedFunction.
+Require Export CoRN.model.metric2.CRmetric.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.model.metric2.LinfDistMonad.
+Require Import CoRN.reals.fast.CRIR.
+Require Import CoRN.ftc.Integral.
+Require Import CoRN.model.structures.StepQsec.
+Require Import CoRN.model.structures.OpenUnit.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.tactics.Qauto.
+Require Import Coq.QArith.Qround.
+Require Import CoRN.model.metric2.L1metric.
+Require Import CoRN.model.metric2.LinfMetric.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.reals.fast.ContinuousCorrect.
+Require Import CoRN.ftc.IntegrationRules.
+Require Import CoRN.ftc.MoreIntegrals.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

@@ -1,5 +1,5 @@
 
-Require Import ZArith NPeano stdlib_omissions.P.
+Require Import Coq.ZArith.ZArith Coq.Numbers.Natural.Peano.NPeano CoRN.stdlib_omissions.P.
 
 Open Scope Z_scope.
 

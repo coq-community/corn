@@ -1,6 +1,6 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import Program Qpossec QposInf Coq.QArith.Qminmax.
+Require Import Coq.Program.Program CoRN.model.structures.Qpossec CoRN.model.structures.QposInf Coq.QArith.Qminmax.
 
 Set Automatic Introduction.
 

@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CSetoidInc.
-Require Export RealLists.
+Require Export CoRN.algebra.CSetoidInc.
+Require Export CoRN.reals.RealLists.
 Set Automatic Introduction.
 
 Section Intervals.

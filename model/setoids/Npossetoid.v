@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Nsetoid.
-Require Export Npossec.
-Require Import CSetoidFun.
+Require Export CoRN.model.setoids.Nsetoid.
+Require Export CoRN.model.structures.Npossec.
+Require Import CoRN.algebra.CSetoidFun.
 
 (**
 ** Example of a setoid: [Npos]

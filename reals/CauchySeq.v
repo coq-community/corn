@@ -40,8 +40,8 @@
 (** printing OneR %\ensuremath{\mathbf1}% #1# *)
 (** printing AbsIR %\ensuremath{|\cdot|_{\mathbb R}}% *)
 
-Require Export CReals.
-Require Cauchy_IR.
+Require Export CoRN.reals.CReals.
+Require CoRN.model.reals.Cauchy_IR.
 
 (**
 * Real Number Structures

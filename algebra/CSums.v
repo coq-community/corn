@@ -40,8 +40,8 @@
 (** printing Sum %\ensuremath{\sum}% #&sum;# *)
 (** printing Sumx %\ensuremath{\sum'}% #&sum;'&*)
 
-Require Export CAbGroups.
-Require Export Peano_dec.
+Require Export CoRN.algebra.CAbGroups.
+Require Export Coq.Arith.Peano_dec.
 
 (**
 * Sums

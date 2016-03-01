@@ -1,11 +1,11 @@
 Require 
-  theory.jections.
+  MathClasses.theory.jections.
 Require Import 
-  Setoid CornTac
-  stdlib_omissions.Q QMinMax QposMinMax Qposclasses
-  RSetoid CSetoids
-  Complete Prelength
-  abstract_algebra.
+  Coq.Setoids.Setoid CoRN.tactics.CornTac
+  CoRN.stdlib_omissions.Q CoRN.model.totalorder.QMinMax CoRN.model.totalorder.QposMinMax CoRN.classes.Qposclasses
+  CoRN.algebra.RSetoid CoRN.algebra.CSetoids
+  CoRN.metric2.Complete CoRN.metric2.Prelength
+  MathClasses.interfaces.abstract_algebra.
 
 Open Local Scope uc_scope.
 

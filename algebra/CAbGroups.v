@@ -33,7 +33,7 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
-Require Export CGroups.
+Require Export CoRN.algebra.CGroups.
 
 Section Abelian_Groups.
 

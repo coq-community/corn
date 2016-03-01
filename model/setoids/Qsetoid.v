@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Qsec.
-Require Import CSetoidFun.
+Require Export CoRN.model.structures.Qsec.
+Require Import CoRN.algebra.CSetoidFun.
 
 (**
 ** Example of a setoid: [Q]

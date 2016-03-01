@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import FTC.
-Require Export Composition.
+Require Import CoRN.ftc.FTC.
+Require Export CoRN.ftc.Composition.
 
 (**
 ** Integration by substitution

@@ -19,7 +19,7 @@
 (** Generic Tacticals used by the CoRN project *)
 (* begin hide *)
 
-Require Import SetoidTactics.
+Require Import Coq.Classes.SetoidTactics.
 
 (* Implements an apply-like tactic that uses refine's strong unifcation algorithm
 REPLACED by ssr apply

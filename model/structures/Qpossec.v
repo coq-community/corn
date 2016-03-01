@@ -36,15 +36,15 @@
 
 (** printing Qpos $\mathbb{Q}^{+}$ #Q<SUP>+</SUP># *)
 
-Require Export QArith.
-Require Import Qpower.
-Require Import Qordfield.
-Require Import COrdFields2.
-Require Import Eqdep_dec.
-Require Import CornTac.
-Require Import Qround.
-Require Import Qabs.
-Require Import stdlib_omissions.Q.
+Require Export Coq.QArith.QArith.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.algebra.COrdFields2.
+Require Import Coq.Logic.Eqdep_dec.
+Require Import CoRN.tactics.CornTac.
+Require Import Coq.QArith.Qround.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.stdlib_omissions.Q.
 
 Open Local Scope Q_scope.
 
@@ -129,7 +129,7 @@ Lemma positive_Z (z: Z): Zlt 0 z -> sig (fun p: positive => Zpos p = z).
  auto with *.
 Defined.
 
-Require Eqdep_dec. (* todo: move this Qlt_uniq stuff elsewhere *)
+Require Coq.Logic.Eqdep_dec. (* todo: move this Qlt_uniq stuff elsewhere *)
 
 Definition comparison_eq_dec (a b: comparison): { a = b } + { a <> b}.
  destruct a, b; try (left; reflexivity); try (right; discriminate).

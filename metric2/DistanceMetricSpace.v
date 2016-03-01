@@ -1,5 +1,5 @@
 
-Require NNUpperR.
+Require CoRN.model.structures.NNUpperR.
 Import NNUpperR.notations.
 Import QnonNeg.notations.
 

@@ -18,12 +18,12 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Q_in_CReals.
-Require Export MoreIntervals.
-Require Export CRIR.
-Require Import CornTac.
-Require Export Qmetric.
-Require Export QposMinMax.
+Require Export CoRN.reals.Q_in_CReals.
+Require Export CoRN.ftc.MoreIntervals.
+Require Export CoRN.reals.fast.CRIR.
+Require Import CoRN.tactics.CornTac.
+Require Export CoRN.model.metric2.Qmetric.
+Require Export CoRN.model.totalorder.QposMinMax.
 
 Opaque CR inj_Q.
 

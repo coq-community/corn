@@ -1,4 +1,4 @@
-Require Import Unicode.Utf8 Setoid Lists.List.
+Require Import Coq.Unicode.Utf8 Coq.Setoids.Setoid Coq.Lists.List.
 
 Section pair_rel.
 

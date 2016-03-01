@@ -1,4 +1,4 @@
-Require Import CRtrans.
+Require Import CoRN.reals.fast.CRtrans.
 
 Extraction Language Haskell.
 

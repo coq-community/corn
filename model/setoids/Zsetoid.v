@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Zsec.
-Require Export CSetoidFun.
+Require Export CoRN.model.structures.Zsec.
+Require Export CoRN.algebra.CSetoidFun.
 
 (**
 ** Example of a setoid: [Z]

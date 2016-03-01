@@ -1,13 +1,13 @@
 Require
-  implementations.stdlib_rationals positive_semiring_elements.
+  MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
 Require Import 
-  Program
-  CornTac workaround_tactics
-  stdlib_omissions.Q Qdlog Qmetric Qabs Qclasses QMinMax
-  RSetoid CSetoids MetricMorphisms
-  orders.minmax orders.dec_fields theory.abs theory.shiftl theory.int_pow.
+  Coq.Program.Program
+  CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
+  CoRN.stdlib_omissions.Q CoRN.util.Qdlog CoRN.model.metric2.Qmetric Coq.QArith.Qabs CoRN.classes.Qclasses CoRN.model.totalorder.QMinMax
+  CoRN.algebra.RSetoid CoRN.algebra.CSetoids CoRN.metric2.MetricMorphisms
+  MathClasses.orders.minmax MathClasses.orders.dec_fields MathClasses.theory.abs MathClasses.theory.shiftl MathClasses.theory.int_pow.
 Require Export
-  abstract_algebra interfaces.additional_operations interfaces.orders.
+  MathClasses.interfaces.abstract_algebra MathClasses.interfaces.additional_operations MathClasses.interfaces.orders.
 
 (* We describe the approximate rationals as a ring that is dense in the rationals *)
 

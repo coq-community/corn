@@ -37,7 +37,7 @@
 (** printing [!] %\ensuremath{\hat{\ }}% #^# *)
 (** printing {!} %\ensuremath{\hat{\ }}% #^# *)
 
-Require Export Exponential.
+Require Export CoRN.transc.Exponential.
 
 Opaque Expon.
 

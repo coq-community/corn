@@ -18,16 +18,16 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import ZBasics.
-Require Import Classic.
+Require Import CoRN.model.Zmod.ZBasics.
+Require Import CoRN.logic.Classic.
 Require Export CoRN.metric2.Metric.
-Require Import Classification.
+Require Import CoRN.metric2.Classification.
 Require Import Coq.Lists.List.
-Require Import ZArith.
-Require Import QMinMax.
-Require Import QposMinMax.
-Require Import Qauto.
-Require Import CornTac.
+Require Import Coq.ZArith.ZArith.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Open Local Scope Q_scope.
 

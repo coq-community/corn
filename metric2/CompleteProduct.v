@@ -18,9 +18,9 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export ProductMetric.
-Require Export Complete.
-Require Import Qauto.
+Require Export CoRN.metric2.ProductMetric.
+Require Export CoRN.metric2.Complete.
+Require Import CoRN.tactics.Qauto.
 
 Set Implicit Arguments.
 

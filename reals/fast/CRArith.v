@@ -19,23 +19,23 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Ring_theory.
-Require Import Setoid.
-Require Import QArith.
-Require Import Qabs.
-Require Import Qround.
-Require Export CRreal.
-Require Import Complete.
-Require Export CRFieldOps.
-Require Import Qring.
-Require Import CRing_Homomorphisms.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import Stability.
-Require Import ConstructiveEpsilon.
-Require Import Qdlog.
-Require Import abstract_algebra.
-Require Import interfaces.orders.
+Require Import Coq.setoid_ring.Ring_theory.
+Require Import Coq.Setoids.Setoid.
+Require Import Coq.QArith.QArith.
+Require Import Coq.QArith.Qabs.
+Require Import Coq.QArith.Qround.
+Require Export CoRN.model.reals.CRreal.
+Require Import CoRN.metric2.Complete.
+Require Export CoRN.reals.fast.CRFieldOps.
+Require Import CoRN.model.rings.Qring.
+Require Import CoRN.algebra.CRing_Homomorphisms.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.logic.Stability.
+Require Import Coq.Logic.ConstructiveEpsilon.
+Require Import CoRN.util.Qdlog.
+Require Import MathClasses.interfaces.abstract_algebra.
+Require Import MathClasses.interfaces.orders.
 
 Open Local Scope CR_scope.
 

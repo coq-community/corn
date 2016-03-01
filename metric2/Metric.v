@@ -19,17 +19,17 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export RSetoid.
-Require Import Relation_Definitions.
-Require Export Qpossec.
-Require Import COrdFields2.
-Require Import Qordfield.
-Require Import QMinMax.
-Require Import List.
-Require Import CornTac.
-Require Import stdlib_omissions.Q.
+Require Export CoRN.algebra.RSetoid.
+Require Import Coq.Relations.Relation_Definitions.
+Require Export CoRN.model.structures.Qpossec.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.stdlib_omissions.List.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.stdlib_omissions.Q.
 
-Require QnnInf.
+Require CoRN.model.structures.QnnInf.
 Import QnnInf.notations.
 
 Open Local Scope Q_scope.

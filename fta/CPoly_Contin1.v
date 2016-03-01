@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CC_Props.
+Require Export CoRN.fta.CC_Props.
 
 (**
 * Continuity of complex polynomials

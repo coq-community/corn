@@ -1,7 +1,7 @@
-Require Export Lists.List.
+Require Export Coq.Lists.List.
 
 Require Import
-  Unicode.Utf8 Setoid Permutation Setoid Morphisms stdlib_omissions.Pair.
+  Coq.Unicode.Utf8 Coq.Setoids.Setoid Coq.Sorting.Permutation Coq.Setoids.Setoid Coq.Classes.Morphisms CoRN.stdlib_omissions.Pair.
 
 Fixpoint zip {A B} (a: list A) (b: list B): list (A * B) :=
   match a, b with

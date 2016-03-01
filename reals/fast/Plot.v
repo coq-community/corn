@@ -18,12 +18,12 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export RasterizeQ.
-Require Import Interval.
-Require Export Graph.
-Require Import QMinMax.
-Require Export QposMinMax.
-Require Import CornTac.
+Require Export CoRN.reals.fast.RasterizeQ.
+Require Import CoRN.reals.fast.Interval.
+Require Export CoRN.metric2.Graph.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Export CoRN.model.totalorder.QposMinMax.
+Require Import CoRN.tactics.CornTac.
 
 Section Plot.
 (**

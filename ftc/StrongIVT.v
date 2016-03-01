@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export WeakIVT.
-Require Export CalculusTheorems.
+Require Export CoRN.ftc.WeakIVT.
+Require Export CoRN.ftc.CalculusTheorems.
 
 Section IVT'.
 

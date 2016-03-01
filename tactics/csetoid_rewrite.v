@@ -45,7 +45,7 @@ in Coq's initial environment.
 Ltac typeof x := type of x.
   (* Quickly secure "type of" before the following Require brings in ssreflect which destroys it. *)
 
-Require Export CSetoidFun.
+Require Export CoRN.algebra.CSetoidFun.
 
 Section move_us.
 

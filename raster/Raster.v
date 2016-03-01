@@ -1,7 +1,7 @@
-Require Vector.
+Require Coq.Vectors.Vector.
 Export Vector.VectorNotations.
-Require Export List.
-Require Import Arith.
+Require Export CoRN.stdlib_omissions.List.
+Require Import Coq.Arith.Arith.
 
 Set Implicit Arguments.
 

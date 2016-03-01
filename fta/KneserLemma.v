@@ -37,9 +37,9 @@
 (** printing Smallest %\ensuremath{\frac13^{2n^2+n}}% *)
 (** printing eta_0 %\ensuremath{\eta_0}% #&eta;<SUB>0</SUB># *)
 
-Require Export NRootCC.
-Require Export AbsCC.
-Require Export MainLemma.
+Require Export CoRN.complex.NRootCC.
+Require Export CoRN.complex.AbsCC.
+Require Export CoRN.fta.MainLemma.
 
 (**
 ** Kneser Lemma *)
