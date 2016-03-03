@@ -18,15 +18,15 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Hausdorff.
-Require Import Classic.
-Require Export List.
-Require Export Classification.
-Require Import Complete.
-Require Import Prelength.
-Require Import CornBasics.
-Require Import Qauto.
-Require Import CornTac.
+Require Export CoRN.metric2.Hausdorff.
+Require Import CoRN.logic.Classic.
+Require Export CoRN.stdlib_omissions.List.
+Require Export CoRN.metric2.Classification.
+Require Import CoRN.metric2.Complete.
+Require Import CoRN.metric2.Prelength.
+Require Import CoRN.logic.CornBasics.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

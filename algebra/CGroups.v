@@ -40,8 +40,8 @@
 (** printing {-} %\ensuremath-% #&minus;# *)
 (** printing {--} %\ensuremath-% #&minus;# *)
 
-Require Import CornTac.
-Require Export CMonoids.
+Require Import CoRN.tactics.CornTac.
+Require Export CoRN.algebra.CMonoids.
 Set Automatic Introduction.
 
 (* Begin_SpecReals *)

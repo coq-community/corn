@@ -19,12 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Complete.
-Require Export Prelength.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import canonical_names.
-Require Import stdlib_rationals.
+Require Export CoRN.metric2.Complete.
+Require Export CoRN.metric2.Prelength.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.interfaces.canonical_names.
+Require Import MathClasses.implementations.stdlib_rationals.
 
 Set Implicit Arguments.
 

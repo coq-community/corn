@@ -21,9 +21,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Set Implicit Arguments.
 
-Require Export Setoid.
-Require Import CornBasics.
-Require Import abstract_algebra.
+Require Export Coq.Setoids.Setoid.
+Require Import CoRN.logic.CornBasics.
+Require Import MathClasses.interfaces.abstract_algebra.
 
 (* Require Import CornTac.*)
 

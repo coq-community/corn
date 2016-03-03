@@ -38,8 +38,8 @@
 (** printing FSum %\ensuremath{\sum}% #&sum;# *)
 (** printing FSumx %\ensuremath{\sum'}% #&sum;'&*)
 
-Require Export CSumsReals.
-Require Export PartFunEquality.
+Require Export CoRN.reals.CSumsReals.
+Require Export CoRN.ftc.PartFunEquality.
 Set Automatic Introduction.
 
 (**

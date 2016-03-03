@@ -35,9 +35,9 @@
  *)
 
 (* begin hide *)
-Require Export MoreFunSeries.
-Require Export Composition.
-Require Export DiffTactics2.
+Require Export CoRN.ftc.MoreFunSeries.
+Require Export CoRN.ftc.Composition.
+Require Export CoRN.tactics.DiffTactics2.
 
 Ltac Deriv_substR :=
   match goal with

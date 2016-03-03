@@ -36,9 +36,9 @@
 
 (** printing Norm_Funct %\ensuremath{\|\cdot\|}% *)
 
-Require Export NRootIR.
-Require Export FunctSums.
-Require Import CornTac.
+Require Export CoRN.reals.NRootIR.
+Require Export CoRN.ftc.FunctSums.
+Require Import CoRN.tactics.CornTac.
 
 Section Definitions_and_Basic_Results.
 

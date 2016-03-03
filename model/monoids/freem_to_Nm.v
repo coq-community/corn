@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CMonoids.
-Require Export Nmonoid.
+Require Export CoRN.algebra.CMonoids.
+Require Export CoRN.model.monoids.Nmonoid.
 
 Section p71E2.
 

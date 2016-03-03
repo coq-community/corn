@@ -19,24 +19,24 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import iso_CReals.
-Require Import Q_in_CReals.
-Require Import ArithRing.
-Require Export CRArith.
-Require Import CRIR.
-Require Import Bool.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Export Qmetric.
-Require Import LazyNat.
-Require Export Limit.
-Require Import QposMinMax.
-Require Import Qpower.
-Require Export Streams.
-Require Import PowerSeries.
-Require Import CornTac.
-Require Import Qclasses.
-Require Import abstract_algebra interfaces.orders theory.series theory.streams.
+Require Import CoRN.reals.iso_CReals.
+Require Import CoRN.reals.Q_in_CReals.
+Require Import Coq.setoid_ring.ArithRing.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRIR.
+Require Import Coq.Bool.Bool.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Export CoRN.model.metric2.Qmetric.
+Require Import CoRN.reals.fast.LazyNat.
+Require Export CoRN.metric2.Limit.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import Coq.QArith.Qpower.
+Require Export Coq.Lists.Streams.
+Require Import CoRN.transc.PowerSeries.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.classes.Qclasses.
+Require Import MathClasses.interfaces.abstract_algebra MathClasses.interfaces.orders MathClasses.theory.series MathClasses.theory.streams.
 
 Opaque CR.
 

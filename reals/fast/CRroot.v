@@ -19,24 +19,24 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Q_in_CReals.
-Require Import CRpower.
-Require Export CRArith.
-Require Import CRIR.
-Require Import NRootIR.
-Require Import QMinMax.
-Require Import QposMinMax.
-Require Import Qmetric.
-Require Import Qpower.
-Require Import Qordfield.
-Require Import Compress.
-Require Import Ndigits.
-Require Import PowerBound.
-Require Import RealPowers.
-Require Import ContinuousCorrect.
-Require Import Qauto.
-Require Import CornTac.
-Require Import abstract_algebra.
+Require Import CoRN.reals.Q_in_CReals.
+Require Import CoRN.reals.fast.CRpower.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRIR.
+Require Import CoRN.reals.NRootIR.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.reals.fast.Compress.
+Require Import Coq.NArith.Ndigits.
+Require Import CoRN.reals.fast.PowerBound.
+Require Import CoRN.transc.RealPowers.
+Require Import CoRN.reals.fast.ContinuousCorrect.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.interfaces.abstract_algebra.
 
 Open Local Scope Q_scope.
 

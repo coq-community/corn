@@ -19,11 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRmetric.
-Require Import Qmetric.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Import CornTac.
+Require Export CoRN.model.metric2.CRmetric.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.tactics.CornTac.
 
 Opaque CR.
 

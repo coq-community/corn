@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRArith.
-Require Import CRIR.
-Require Import Q_in_CReals.
-Require Import QMinMax.
-Require Import CRarctan_small.
-Require Import MoreArcTan.
-Require Import CornTac.
-Require Import abstract_algebra.
-Require Import stdlib_omissions.Q.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRIR.
+Require Import CoRN.reals.Q_in_CReals.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.reals.fast.CRarctan_small.
+Require Import CoRN.transc.MoreArcTan.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.interfaces.abstract_algebra.
+Require Import CoRN.stdlib_omissions.Q.
 
 Set Implicit Arguments.
 

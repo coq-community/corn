@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export IVT.
+Require Export CoRN.reals.IVT.
 
 (**
 * Roots of polynomials of odd degree *)

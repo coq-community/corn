@@ -36,12 +36,12 @@
 
 (** printing [0] %\ensuremath{\mathbf0}% #0# *)
 
-Require Export Euclid.
-Require Export Cmod.
-Require Export CSemiGroups.
-Require Export csetoid_rewrite.
-Require Export Nsec.
-Require Import SetoidPermutation Setoid Morphisms.
+Require Export Coq.Arith.Euclid.
+Require Export CoRN.model.Zmod.Cmod.
+Require Export CoRN.algebra.CSemiGroups.
+Require Export CoRN.tactics.csetoid_rewrite.
+Require Export CoRN.model.structures.Nsec.
+Require Import CoRN.util.SetoidPermutation Coq.Setoids.Setoid Coq.Classes.Morphisms.
 
 (* Begin_SpecReals *)
 

@@ -38,9 +38,9 @@
 (** printing Small %\ensuremath{\frac13^n}% *)
 (** printing Smaller %\ensuremath{\frac13^{2n^2}}% *)
 
-Require Export CSumsReals.
-Require Export KeyLemma.
-Require Import CRing_as_Ring.
+Require Export CoRN.reals.CSumsReals.
+Require Export CoRN.fta.KeyLemma.
+Require Import CoRN.algebra.CRing_as_Ring.
 
 (**
 ** Main Lemma

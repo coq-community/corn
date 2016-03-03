@@ -1,19 +1,19 @@
 Require Import
- Unicode.Utf8 Program
- CRArith CRabs
- Qauto Qround Qmetric
+ Coq.Unicode.Utf8 Coq.Program.Program
+ CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
+ CoRN.tactics.Qauto Coq.QArith.Qround CoRN.model.metric2.Qmetric
  (*stdlib_omissions.P
  stdlib_omissions.Z
  stdlib_omissions.Q
  stdlib_omissions.N*).
 
-Require Qinf QnonNeg QnnInf CRball.
+Require CoRN.model.structures.Qinf CoRN.model.structures.QnonNeg CoRN.model.structures.QnnInf CoRN.reals.fast.CRball.
 Import
   QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
   Qabs propholds.
 
-Require Import metric FromMetric2 AbstractIntegration SimpleIntegration BanachFixpoint.
-Require Import canonical_names decision setoid_tactics util.
+Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.AbstractIntegration CoRN.ode.SimpleIntegration CoRN.ode.BanachFixpoint.
+Require Import MathClasses.interfaces.canonical_names MathClasses.misc.decision MathClasses.misc.setoid_tactics MathClasses.misc.util.
 
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
@@ -444,6 +444,7 @@ rewrite abs.abs_nonneg; [reflexivity |].
 change (0 <= 1 # 2)%Q. auto with qarith.
 Qed.
 
+(*
 (* native_compute needs 8.5 *)
 Time Eval vm_compute in (answer 2 (` (picard_iter 2 half))). (* 10 minutes *)
 Time Compute answer 1 (` (f half)). (* Too long *)

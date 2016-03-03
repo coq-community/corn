@@ -50,10 +50,10 @@ Definition of a constructive setoid with apartness,
 i.e.%\% a set with an equivalence relation and an apartness relation compatible with it.
 *)
 
-Require Import CornTac.
-Require Export CLogic.
-Require Export Step.
-Require Export RSetoid.
+Require Import CoRN.tactics.CornTac.
+Require Export CoRN.logic.CLogic.
+Require Export CoRN.tactics.Step.
+Require Export CoRN.algebra.RSetoid.
 
 Delimit Scope corn_scope with corn.
 Open Scope corn_scope.

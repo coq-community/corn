@@ -42,7 +42,7 @@
 (** printing AbsCC %\ensuremath{|\cdot|_{\mathbb C}}% *)
 (** printing CCX %\ensuremath{\mathbb C[X]}% #<b>C</b>[X]# *)
 
-Require Export NRootIR.
+Require Export CoRN.reals.NRootIR.
 
 (**
 * Complex Numbers

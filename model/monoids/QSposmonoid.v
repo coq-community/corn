@@ -35,8 +35,8 @@
  *)
 
 
-Require Export QSpossemigroup.
-Require Import CMonoids.
+Require Export CoRN.model.semigroups.QSpossemigroup.
+Require Import CoRN.algebra.CMonoids.
 
 (**
 ** Example of a monoid: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#

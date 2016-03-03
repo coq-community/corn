@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import QArith_base.
-Require Import TotalOrder.
+Require Import Coq.QArith.QArith_base.
+Require Import CoRN.order.TotalOrder.
 Set Automatic Introduction.
 
 (**

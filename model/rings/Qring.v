@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qabgroup.
-Require Import CRings.
-Require Import Zring.
+Require Export CoRN.model.abgroups.Qabgroup.
+Require Import CoRN.algebra.CRings.
+Require Import CoRN.model.rings.Zring.
 
 Open Local Scope Q_scope.
 

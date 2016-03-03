@@ -33,9 +33,9 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
-Require Export FieldReflection.
-Require Export RingReflection.
-Require Export CRing_as_Ring.
+Require Export CoRN.tactics.FieldReflection.
+Require Export CoRN.tactics.RingReflection.
+Require Export CoRN.algebra.CRing_as_Ring.
 
 Inductive AlgebraName : Type :=
 |cfield : CField -> AlgebraName

@@ -1,16 +1,16 @@
 Require Import
-  QArith
-  theory.setoids (* Equiv Prop *) theory.products
-  stdlib_rationals (*Qinf*) (*Qpossec QposInf QnonNeg*) abstract_algebra QType_rationals additional_operations.
-Require Qinf.
+  Coq.QArith.QArith
+  MathClasses.theory.setoids (* Equiv Prop *) MathClasses.theory.products
+  MathClasses.implementations.stdlib_rationals (*Qinf*) (*Qpossec QposInf QnonNeg*) MathClasses.interfaces.abstract_algebra MathClasses.implementations.QType_rationals MathClasses.interfaces.additional_operations.
+Require CoRN.model.structures.Qinf.
 (*Import (*QnonNeg.notations*) QArith.*)
-Require Import Qauto QOrderedType.
+Require Import CoRN.tactics.Qauto Coq.QArith.QOrderedType.
 (*Require Import orders.*)
-Require Import theory.rings theory.dec_fields orders.rings orders.dec_fields nat_pow.
-Require Import interfaces.naturals interfaces.orders.
+Require Import MathClasses.theory.rings MathClasses.theory.dec_fields MathClasses.orders.rings MathClasses.orders.dec_fields MathClasses.theory.nat_pow.
+Require Import MathClasses.interfaces.naturals MathClasses.interfaces.orders.
 Import peano_naturals.
 
-Require Import CRGeometricSum.
+Require Import CoRN.reals.fast.CRGeometricSum.
 Import Qround Qpower Qinf.notations.
 
 (* Set Printing Coercions.*)

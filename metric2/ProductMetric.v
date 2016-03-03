@@ -18,12 +18,12 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Metric.
-Require Import Classification.
-Require Import UniformContinuity.
-Require Import Prelength.
-Require Import Complete.
-Require Import CornTac.
+Require Export CoRN.metric2.Metric.
+Require Import CoRN.metric2.Classification.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.metric2.Prelength.
+Require Import CoRN.metric2.Complete.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -313,7 +313,7 @@ End completion_distributes.
 (** The diagonal function [x ⟼ (x,x)] is a uniformly continuous function
   from a metric space X to the product space [X × X] *)
 Section diag.
- Require Import Unicode.Utf8.
+ Require Import Coq.Unicode.Utf8.
  Variable X:MetricSpace.
 
  Definition diag_raw : X → (ProductMS X X) := λ x, (x,x).

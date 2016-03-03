@@ -20,7 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Set Firstorder Depth 5.
 
-Require Export PartialOrder.
+Require Export CoRN.order.PartialOrder.
 
 Open Local Scope po_scope.
 

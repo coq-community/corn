@@ -1,4 +1,4 @@
-Require Import canonical_names.
+Require Import MathClasses.interfaces.canonical_names.
 
 Class Container (Elem C: Type) := In: C → Elem → Prop.
 Hint Unfold In.

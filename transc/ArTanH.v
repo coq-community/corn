@@ -16,8 +16,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Exponential.
-Require Import CornTac.
+Require Export CoRN.transc.Exponential.
+Require Import CoRN.tactics.CornTac.
 
 (**
 * Inverse Hyperbolic Tangent Function

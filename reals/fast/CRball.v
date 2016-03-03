@@ -1,5 +1,5 @@
 Require Import
- Qabs CRArith CRabs.
+ Coq.QArith.Qabs CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
 
 Hint Immediate CRle_refl. (* todo: move *)
 

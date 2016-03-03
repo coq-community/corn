@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CPoly_Rev.
-Require Export FTAreg.
+Require Export CoRN.fta.CPoly_Rev.
+Require Export CoRN.fta.FTAreg.
 
 (**
 * Fundamental Theorem of Algebra

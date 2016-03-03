@@ -1,7 +1,7 @@
-Require Export ARArith.
-Require Export ARroot.
-Require Export ARexp.
-Require Export ARsin.
-Require Export ARcos.
-Require Export ARpi.
-Require Export ARarctan.
+Require Export CoRN.reals.faster.ARArith.
+Require Export CoRN.reals.faster.ARroot.
+Require Export CoRN.reals.faster.ARexp.
+Require Export CoRN.reals.faster.ARsin.
+Require Export CoRN.reals.faster.ARcos.
+Require Export CoRN.reals.faster.ARpi.
+Require Export CoRN.reals.faster.ARarctan.

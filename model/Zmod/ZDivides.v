@@ -35,7 +35,7 @@
  *)
 (* ZDivides.v, by Vince Barany *)
 
-Require Export ZBasics.
+Require Export CoRN.model.Zmod.ZBasics.
 
 (**
 * The Divides-function over Z

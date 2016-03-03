@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Integral.
-Require Export MoreFunctions.
+Require Export CoRN.ftc.Integral.
+Require Export CoRN.ftc.MoreFunctions.
 
 Section Lemmas.
 

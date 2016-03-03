@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qmonoid.
-Require Import CGroups.
+Require Export CoRN.model.monoids.Qmonoid.
+Require Import CoRN.algebra.CGroups.
 
 (**
 ** Example of a group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#

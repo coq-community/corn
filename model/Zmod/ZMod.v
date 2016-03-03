@@ -35,7 +35,7 @@
  *)
 (* ZMod.v, by Vince Barany *)
 
-Require Export ZGcd.
+Require Export CoRN.model.Zmod.ZGcd.
 
 
 (**

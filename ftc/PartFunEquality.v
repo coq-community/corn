@@ -36,8 +36,8 @@
 
 (** printing Feq %\ensuremath{\approx}% #&asymp;# *)
 
-Require Export Intervals.
-Require Export DiffTactics1.
+Require Export CoRN.reals.Intervals.
+Require Export CoRN.tactics.DiffTactics1.
 
 Section Definitions.
 

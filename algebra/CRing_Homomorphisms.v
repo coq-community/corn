@@ -46,7 +46,7 @@
 (** printing [1] %\ensuremath{\mathbf1}% #1# *)
 (** printing phi %\ensuremath{\phi}%  *)
 
-Require Export CRings.
+Require Export CoRN.algebra.CRings.
 Set Automatic Introduction.
 
 (**

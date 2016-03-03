@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Max_AbsIR.
-Require Export CRArith.
-Require Import Qmetric.
-Require Import Qabs.
-Require Import QMinMax.
-Require Import CRcorrect.
-Require Import CRIR.
-Require Import CornTac.
-Require Import Stability.
+Require Import CoRN.reals.Max_AbsIR.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.reals.fast.CRcorrect.
+Require Import CoRN.reals.fast.CRIR.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.logic.Stability.
 
 Open Local Scope Q_scope.
 (**

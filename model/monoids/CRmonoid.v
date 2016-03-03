@@ -19,10 +19,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRGroupOps.
-Require Export CRsemigroup.
-Require Import CRcorrect.
-Require Import CornTac.
+Require Export CoRN.reals.fast.CRGroupOps.
+Require Export CoRN.model.semigroups.CRsemigroup.
+Require Import CoRN.reals.fast.CRcorrect.
+Require Import CoRN.tactics.CornTac.
 
 Open Local Scope uc_scope.
 

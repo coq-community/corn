@@ -1,8 +1,8 @@
 Require Import 
-  Program CornTac workaround_tactics
-  Qmetric CRAlternatingSum Qdlog
-  ApproximateRationals ARArith
-  abstract_algebra int_pow theory.streams theory.series.
+  Coq.Program.Program CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
+  CoRN.model.metric2.Qmetric CoRN.reals.fast.CRAlternatingSum CoRN.util.Qdlog
+  CoRN.reals.faster.ApproximateRationals CoRN.reals.faster.ARArith
+  MathClasses.interfaces.abstract_algebra MathClasses.theory.int_pow MathClasses.theory.streams MathClasses.theory.series.
 
 Section alt_sum.
 Context `{AppRationals AQ}.
@@ -206,7 +206,7 @@ pick [big] such that computation will suffer from the implementation limits of C
 (e.g. a stack overflow) or runs out of memory, before we ever refer to the proof.
 *)
 
-Definition big := Eval vm_compute in (Z.nat_of_Z 50000).
+Definition big := Eval vm_compute in (Z.nat_of_Z 5000).
 Obligation Tactic := idtac.
 Program Definition ARInfAltSum_length (k : Z) : nat := 4 + takeUntil_length 
   (λ s, AQball_bool k (hd s) 0) 

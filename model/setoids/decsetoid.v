@@ -5,10 +5,10 @@
 Set Implicit Arguments.
 
 Require Import
- CSetoids
- SetoidDec
- Morphisms
- SetoidClass.
+ CoRN.algebra.CSetoids
+ Coq.Classes.SetoidDec
+ Coq.Classes.Morphisms
+ Coq.Classes.SetoidClass.
 
 Set Automatic Introduction.
 

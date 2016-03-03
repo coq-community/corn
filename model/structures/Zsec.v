@@ -36,9 +36,9 @@
 
 (** printing {#Z} %\ensuremath{\mathrel\#_{\mathbb Z}}% *)
 
-Require Export ZArith.
-Require Import CLogic.
-Require Import Setoid.
+Require Export Coq.ZArith.ZArith.
+Require Import CoRN.logic.CLogic.
+Require Import Coq.Setoids.Setoid.
 
 Instance Z_default : @DefaultRelation Z (@eq Z) | 2.
 

@@ -1,7 +1,7 @@
 (* todo: remove *)
 
-Require Export Qpossec.
-Require Import abstract_algebra additional_operations stdlib_rationals.
+Require Export CoRN.model.structures.Qpossec.
+Require Import MathClasses.interfaces.abstract_algebra MathClasses.interfaces.additional_operations MathClasses.implementations.stdlib_rationals.
 
 Instance: Equiv Qpos := QposEq.
 Instance: One Qpos := Qpos_one.

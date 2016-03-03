@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qring.
-Require Import CFields.
+Require Export CoRN.model.rings.Qring.
+Require Import CoRN.algebra.CFields.
 
 (**
 ** Example of a field: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#

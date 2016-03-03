@@ -44,12 +44,12 @@
 (** printing or %\ensuremath{\mathrel\vee}% *)
 (** printing and %\ensuremath{\mathrel\wedge}% *)
 
-Require Export Compare_dec.
-Require Export CornBasics.
-Require Export ZArith.
-Require Export ZArithRing.
-Require Export Div2.
-Require Export Wf_nat.
+Require Export Coq.Arith.Compare_dec.
+Require Export CoRN.logic.CornBasics.
+Require Export Coq.ZArith.ZArith.
+Require Export Coq.setoid_ring.ZArithRing.
+Require Export Coq.Arith.Div2.
+Require Export Coq.Arith.Wf_nat.
 
 Set Automatic Introduction.
 

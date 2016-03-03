@@ -40,9 +40,9 @@
 (** printing [+X*] %\ensuremath{+ X*}% #&+ X*;# *)
 
 
-Require Export Zm.
-Require Export Zring.
-Require Export CPoly_Degree.
+Require Export CoRN.model.Zmod.Zm.
+Require Export CoRN.model.rings.Zring.
+Require Export CoRN.algebra.CPoly_Degree.
 
 (**
 * An irreducibility criterion

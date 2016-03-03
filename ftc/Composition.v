@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export MoreFunctions.
-Require Export MoreFunSeries.
+Require Export CoRN.ftc.MoreFunctions.
+Require Export CoRN.ftc.MoreFunSeries.
 
 Section Maps_into_Compacts.
 

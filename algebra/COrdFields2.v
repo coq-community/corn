@@ -33,7 +33,7 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
-Require Export COrdFields.
+Require Export CoRN.algebra.COrdFields.
 
 (** printing one_div_succ %\ensuremath{\frac1{\cdot+1}}% *)
 (** printing Half %\ensuremath{\frac12}% #&frac12;# *)

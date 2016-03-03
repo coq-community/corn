@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export KneserLemma.
-Require Export CPoly_Shift.
-Require Export CPoly_Contin1.
+Require Export CoRN.fta.KneserLemma.
+Require Export CoRN.fta.CPoly_Shift.
+Require Export CoRN.fta.CPoly_Contin1.
 
 (**
 * FTA for regular polynomials

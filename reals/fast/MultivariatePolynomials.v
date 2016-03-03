@@ -1,15 +1,15 @@
-Require Import Bernstein.
-Require Import CRing_Homomorphisms.
-Require Import COrdFields2.
-Require Export Qordfield.
-Require Import QMinMax.
-Require Import CornTac.
-Require Import Qauto.
-Require Import Qmetric.
-Require Import Qabs.
-Require Import CRabs.
-Require Import ModulusDerivative.
-Require Import CRArith.
+Require Import CoRN.algebra.Bernstein.
+Require Import CoRN.algebra.CRing_Homomorphisms.
+Require Import CoRN.algebra.COrdFields2.
+Require Export CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.reals.fast.CRabs.
+Require Import CoRN.reals.fast.ModulusDerivative.
+Require Import CoRN.reals.fast.CRArith.
 
 Set Implicit Arguments.
 
@@ -647,7 +647,7 @@ Proof.
  auto.
 Qed.
 
-Require Import RSetoid.
+Require Import CoRN.algebra.RSetoid.
 
 (** Definition of a setoid function type of n parameters *)
 Fixpoint n_Function X Y (n:nat) :=

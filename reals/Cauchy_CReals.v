@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Cauchy_COF.
-Require Export CReals.
+Require Export CoRN.algebra.Cauchy_COF.
+Require Export CoRN.reals.CReals.
 
 Section R_CReals.
 

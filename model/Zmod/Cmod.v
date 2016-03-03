@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export ZMod.
-Require Export CLogic.
+Require Export CoRN.model.Zmod.ZMod.
+Require Export CoRN.logic.CLogic.
 
 (**
 * CProp-valued lemmas about 'mod'

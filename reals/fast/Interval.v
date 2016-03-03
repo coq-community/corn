@@ -18,17 +18,17 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Compact.
-Require Export CRArith.
-Require Export Qmetric.
-Require Import Qordfield.
-Require Import COrdFields2.
-Require Import Qround.
-Require Import Qauto.
-Require Import Qabs.
-Require Import QMinMax.
-Require Import Classic.
-Require Import CornTac.
+Require Export CoRN.metric2.Compact.
+Require Export CoRN.reals.fast.CRArith.
+Require Export CoRN.model.metric2.Qmetric.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.algebra.COrdFields2.
+Require Import Coq.QArith.Qround.
+Require Import CoRN.tactics.Qauto.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.logic.Classic.
+Require Import CoRN.tactics.CornTac.
 
 Open Local Scope Q_scope.
 

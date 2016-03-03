@@ -18,17 +18,17 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export StepQsec.
-Require Export UniformContinuity.
-Require Import Prelength.
-Require Import OpenUnit.
-Require Import QArith.
-Require Import QMinMax.
-Require Import Qabs.
-Require Import Qordfield.
-Require Import Qmetric.
-Require Import COrdFields2.
-Require Import CornTac.
+Require Export CoRN.model.structures.StepQsec.
+Require Export CoRN.metric2.UniformContinuity.
+Require Import CoRN.metric2.Prelength.
+Require Import CoRN.model.structures.OpenUnit.
+Require Import Coq.QArith.QArith.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

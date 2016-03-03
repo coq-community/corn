@@ -38,8 +38,8 @@
 (** printing series_sum %\ensuremath{\sum_0^{\infty}}% #&sum;<sub>0</sub><sup>&infin;</sup># *)
 (** printing pi %\ensuremath{\pi}% #&pi; *)
 
-Require Export CSumsReals.
-Require Export NRootIR.
+Require Export CoRN.reals.CSumsReals.
+Require Export CoRN.reals.NRootIR.
 
 Section Definitions.
 

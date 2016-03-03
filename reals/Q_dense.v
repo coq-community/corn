@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 (* begin hide *)
-Require Export Q_in_CReals.
+Require Export CoRN.reals.Q_in_CReals.
 
 
 (*----- Opaque_algebra.v will be loaded in line 151 -----*)

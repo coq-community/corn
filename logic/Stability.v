@@ -1,5 +1,5 @@
 
-Require Import Morphisms.
+Require Import Coq.Classes.Morphisms.
 
 (* Doubly-negated types as a monad: *)
 
@@ -89,7 +89,7 @@ Class decision (P: Prop): Set := decide: { P } + { ~ P }.
 Lemma decision_stable P: decision P -> Stable P.
 Proof. firstorder. Qed.
 
-Require Import CRreal Classic.
+Require Import CoRN.model.reals.CRreal CoRN.logic.Classic.
 
 Lemma Qle_dec x y: decision (Qle x y).
   intros.

@@ -35,7 +35,7 @@
  *)
 
 (* begin hide *)
-Require Export Differentiability.
+Require Export CoRN.ftc.Differentiability.
 
 Section Automatizing_Continuity.
 

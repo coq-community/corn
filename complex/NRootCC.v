@@ -39,9 +39,9 @@
 (** printing nroot_I %\ensuremath{\sqrt[n]{\imath}}% *)
 (** printing nroot_minus_I %\ensuremath{\sqrt[n]{-\imath}}% *)
 
-Require Export CComplex.
-Require Export Wf_nat.
-Require Export ArithRing.
+Require Export CoRN.complex.CComplex.
+Require Export Coq.Arith.Wf_nat.
+Require Export Coq.setoid_ring.ArithRing.
 
 (**
 * Roots of Complex Numbers

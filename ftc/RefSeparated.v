@@ -36,8 +36,8 @@
 
 (* begin hide *)
 
-Require Export COrdLemmas.
-Require Export Partitions.
+Require Export CoRN.ftc.COrdLemmas.
+Require Export CoRN.ftc.Partitions.
 
 Section Separating__Separated.
 

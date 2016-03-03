@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export PowerSeries.
-Require Export Taylor.
+Require Export CoRN.transc.PowerSeries.
+Require Export CoRN.ftc.Taylor.
 
 (**
 * Taylor Series

@@ -1,4 +1,4 @@
-Require Import List.
+Require Import CoRN.stdlib_omissions.List.
 
 Fixpoint enum (n: nat): list nat :=
   match n with

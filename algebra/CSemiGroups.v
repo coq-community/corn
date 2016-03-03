@@ -37,7 +37,7 @@
 (** printing [+] %\ensuremath+% #+# *)
 (** printing {+} %\ensuremath+% #+# *)
 
-Require Export CSetoidInc.
+Require Export CoRN.algebra.CSetoidInc.
 
 (* Begin_SpecReals *)
 
