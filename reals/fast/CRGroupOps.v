@@ -530,7 +530,7 @@ Proof.
  apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
    (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
- apply: ball_weak_le. 3:apply regFun_prf.
+ apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
@@ -669,7 +669,7 @@ Proof.
  apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
    (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].
- apply: ball_weak_le. 3:apply regFun_prf.
+ apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.

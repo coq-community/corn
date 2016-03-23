@@ -111,7 +111,7 @@ Infix "<" := CRltT : CR_scope.
 Lemma CRltT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
 Proof.
  intros x1 x2 Hx y1 y2 Hy H.
- apply: CRpos_wd. 3:apply H.
+ apply: CRpos_wd. 2:apply H.
  abstract ( rewrite <- Hx; rewrite <- Hy; reflexivity ).
 Defined.
 
