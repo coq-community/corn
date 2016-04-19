@@ -1,4 +1,5 @@
 # Library name
 -R . CoRN
+-R /home/me/git/math-classes MathClasses
 
 # Coq files
