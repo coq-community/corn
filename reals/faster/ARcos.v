@@ -1,8 +1,8 @@
 Require Import
-  workaround_tactics
-  CRsin CRcos MetricMorphisms Complete ARsin abstract_algebra.
+  MathClasses.misc.workaround_tactics
+  CoRN.reals.fast.CRsin CoRN.reals.fast.CRcos CoRN.metric2.MetricMorphisms CoRN.metric2.Complete CoRN.reals.faster.ARsin MathClasses.interfaces.abstract_algebra.
 Require Export
-  ARArith.
+  CoRN.reals.faster.ARArith.
 
 Section ARcos.
 Context `{AppRationals AQ}.

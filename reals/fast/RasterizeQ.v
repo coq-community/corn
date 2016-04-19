@@ -18,14 +18,14 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export RasterQ.
-Require Import Interval.
-Require Import Classic.
-Require Import QposMinMax.
-Require Import Qabs.
-Require Import Qauto.
-Require Import Qround.
-Require Import CornTac.
+Require Export CoRN.reals.fast.RasterQ.
+Require Import CoRN.reals.fast.Interval.
+Require Import CoRN.logic.Classic.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.tactics.Qauto.
+Require Import Coq.QArith.Qround.
+Require Import CoRN.tactics.CornTac.
 
 Open Local Scope Q_scope.
 

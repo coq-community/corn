@@ -35,8 +35,8 @@
  *)
 
 (* begin hide *)
-Require Export CFields.
-Require Export AlgReflection.
+Require Export CoRN.algebra.CFields.
+Require Export CoRN.tactics.AlgReflection.
 
 Section Field_Interpretation_Function.
 

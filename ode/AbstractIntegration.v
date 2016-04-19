@@ -2,19 +2,19 @@
  with a proof that integrals satisfying this interface are unique. *)
 
 Require Import
- Unicode.Utf8 Program
- CRArith CRabs
- Qauto Qround Qmetric
- stdlib_omissions.P
- stdlib_omissions.Z
- stdlib_omissions.Q
- stdlib_omissions.N.
-Require Import metric FromMetric2 SimpleIntegration.
+ Coq.Unicode.Utf8 Coq.Program.Program
+ CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
+ CoRN.tactics.Qauto Coq.QArith.Qround CoRN.model.metric2.Qmetric
+ CoRN.stdlib_omissions.P
+ CoRN.stdlib_omissions.Z
+ CoRN.stdlib_omissions.Q
+ CoRN.stdlib_omissions.N.
+Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.SimpleIntegration.
 
-Require Qinf QnonNeg QnnInf CRball.
+Require CoRN.model.structures.Qinf CoRN.model.structures.QnonNeg CoRN.model.structures.QnnInf CoRN.reals.fast.CRball.
 Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs (*canonical_names*).
 
-Require CRtrans ARtrans. (* This is almost all CoRN *)
+Require CoRN.reals.fast.CRtrans CoRN.reals.faster.ARtrans. (* This is almost all CoRN *)
 
 Ltac done :=
   trivial; hnf; intros; solve
@@ -693,7 +693,7 @@ Context (f : Q -> CR) `{Integrable f}.
 Lemma scale_0_r (x : Q) : scale x 0 = 0.
 Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
 
-Require Import propholds.
+Require Import MathClasses.misc.propholds.
 
 Lemma integral_abs_bound (from : Q) (width : QnonNeg) (M : Q) :
   (forall (x : Q), (from ≤ x ≤ from + width) -> CRabs (f x) ≤ 'M) ->

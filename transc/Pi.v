@@ -35,8 +35,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Import CornTac.
-Require Export SinCos.
+Require Import CoRN.tactics.CornTac.
+Require Export CoRN.transc.SinCos.
 
 Section Properties_of_Pi.
 

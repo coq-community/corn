@@ -1,21 +1,20 @@
 Require Import
- Unicode.Utf8 Program
- CRArith CRabs
- Qauto Qround Qmetric.
- (* stdlib_omissions.P
+ Coq.Unicode.Utf8 Coq.Program.Program
+ CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
+ CoRN.tactics.Qauto Coq.QArith.Qround CoRN.model.metric2.Qmetric
+ (*stdlib_omissions.P
  stdlib_omissions.Z
  stdlib_omissions.Q
- stdlib_omissions.N. *)
+ stdlib_omissions.N*).
 
 Require Qinf QnonNeg QnnInf CRball.
 Import
   QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
   Qabs propholds.
 
+Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.AbstractIntegration CoRN.ode.SimpleIntegration CoRN.ode.BanachFixpoint.
+Require Import MathClasses.interfaces.canonical_names MathClasses.misc.decision MathClasses.misc.setoid_tactics MathClasses.misc.util.
 Require Import stdlib_rationals theory.rationals.
-Require Import metric FromMetric2 AbstractIntegration SimpleIntegration BanachFixpoint.
-Require Import canonical_names decision setoid_tactics util.
-
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
 
@@ -80,6 +79,7 @@ change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | 
 Qed.
 
 Context (f : sig (ball r a) -> Y).
+
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
 would depend on x and [H1 : x ≤ a - r] even though they are not used in the
@@ -90,14 +90,9 @@ mspc_refl (see [extend_uc] below), we would need to prove that these
 applications of f are equal, i.e., f is a morphism that does not depend on
 the second component of the pair. So instead we prove mspc_ball_edge_l and
 mspc_ball_edge_r, which don't depend on x. *)
-Global Existing Instance Q_lt.
 
-(* Goal True.
-Admitted.
-regression: numbers interacting with type classes ?
-Was; (decide x<(a-r)) 
 Program Definition extend : Q -> Y :=
-  λ x:Q, if (@decide rationals.slow_rat_dec (@lt Q Q_lt x (@plus Q Q_plus a (to_Q (@negate T _ r)))))
+  λ x, if (decide (x < a - r))
        then f ((a - r) ↾ mspc_ball_edge_l)
        else if (decide (a + r < x))
             then f ((a + r) ↾ mspc_ball_edge_r)
@@ -157,9 +152,9 @@ destruct (decide (x1 < a - to_Q r)); destruct (decide (x2 < a - to_Q r)).
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls _ _ A)...
   + apply (nested_balls _ _ A)...
 Qed.
-*)
+
 End Extend.
-(*
+
 Lemma extend_inside `{ExtMetricSpaceClass Y} (a x : Q) (r : QnonNeg) :
   ball r a x -> exists p : ball r a x, forall f : sig (ball r a) -> Y,
     extend a r f x = f (x ↾ p).
@@ -453,4 +448,6 @@ Qed.
 Time Compute answer 2 (` (picard_iter 3 half)). (* 10 minutes *)
 Time Compute answer 1 (` (f half)). (* Too long *)
 *)
-End Computation. *)
+
+End Computation.
+

@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export RefLemma.
+Require Export CoRN.ftc.RefLemma.
 
 (** printing integral %\ensuremath{\int_I}% #&int;<sub>I</sub># *)
 (** printing Integral %\ensuremath{\int_I}% #&int;<sub>I</sub># *)

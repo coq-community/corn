@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Max_AbsIR.
-Require Export Expon.
-Require Export CPoly_ApZero.
+Require Export CoRN.reals.Max_AbsIR.
+Require Export CoRN.algebra.Expon.
+Require Export CoRN.algebra.CPoly_ApZero.
 
 Section More_Cauchy_Props.
 

@@ -35,8 +35,8 @@
  *)
 
 (* begin hide *)
-Require Export CLogic.
-Require Export Bool.
+Require Export CoRN.logic.CLogic.
+Require Export Coq.Bool.Bool.
 
 Section Syntactic_Expressions.
 

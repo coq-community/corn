@@ -21,14 +21,14 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 (* This file rexports all the transcendental functions defined on CR *)
 
-Require Export CRArith.
-Require Export Compress.
-Require Export CRpower.
-Require Export CRroot.
-Require Export CRexp.
-Require Export CRln.
-Require Export CRsin.
-Require Export CRcos.
-Require Export CRpi.
-Require Export CRarctan.
-Require Export CRabs.
+Require Export CoRN.reals.fast.CRArith.
+Require Export CoRN.reals.fast.Compress.
+Require Export CoRN.reals.fast.CRpower.
+Require Export CoRN.reals.fast.CRroot.
+Require Export CoRN.reals.fast.CRexp.
+Require Export CoRN.reals.fast.CRln.
+Require Export CoRN.reals.fast.CRsin.
+Require Export CoRN.reals.fast.CRcos.
+Require Export CoRN.reals.fast.CRpi.
+Require Export CoRN.reals.fast.CRarctan.
+Require Export CoRN.reals.fast.CRabs.

@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export ZArith.
-Require Export Compare.
-Require Export NRootIR.
+Require Export Coq.ZArith.ZArith.
+Require Export Coq.Arith.Compare.
+Require Export CoRN.reals.NRootIR.
 
 (** printing p3m %\ensuremath{\frac13\hat{\ }}% *)
 (** printing Halfeps %\ensuremath{\frac\varepsilon2}% *)

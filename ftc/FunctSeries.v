@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export FunctSequence.
-Require Export Series.
+Require Export CoRN.ftc.FunctSequence.
+Require Export CoRN.reals.Series.
 
 (** printing fun_seq_part_sum %\ensuremath{\sum^n}% #&sum;<sup>n</sup># *)
 (** printing Fun_Series_Sum %\ensuremath{\sum_0^{\infty}}% #&sum;<sub>0</sub><sup>&infin;</sup># *)

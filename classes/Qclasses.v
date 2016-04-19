@@ -1,9 +1,9 @@
 Require Import 
-  QMinMax
-  abstract_algebra
-  minmax.
+  CoRN.model.totalorder.QMinMax
+  MathClasses.interfaces.abstract_algebra
+  MathClasses.orders.minmax.
 Require Export 
-  stdlib_rationals.
+  MathClasses.implementations.stdlib_rationals.
 
 Lemma Qmin_coincides x y : Qmin x y = x ⊓ y.
 Proof.

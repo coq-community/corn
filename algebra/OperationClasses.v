@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Setoid Morphisms.
+Require Import Coq.Setoids.Setoid Coq.Classes.Morphisms.
 Notation " x === y " := (Equivalence.equiv x y) (at level 70, no associativity).
 
 Set Implicit Arguments.

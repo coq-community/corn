@@ -19,11 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRFieldOps.
-Require Export CRring.
-Require Export CFields.
-Require Import CRcorrect.
-Require Import CornTac.
+Require Export CoRN.reals.fast.CRFieldOps.
+Require Export CoRN.model.rings.CRring.
+Require Export CoRN.algebra.CFields.
+Require Import CoRN.reals.fast.CRcorrect.
+Require Import CoRN.tactics.CornTac.
 
 (**
 ** Example of a field: $\langle$#&lang;#[CR],[+],[*]$\rangle$#&rang;#

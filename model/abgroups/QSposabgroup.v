@@ -35,8 +35,8 @@
  *)
 
 
-Require Export QSposgroup.
-Require Import CAbGroups.
+Require Export CoRN.model.groups.QSposgroup.
+Require Import CoRN.algebra.CAbGroups.
 
 (**
 ** Example of an abelian group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#

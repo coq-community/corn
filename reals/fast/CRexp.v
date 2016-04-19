@@ -19,29 +19,29 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import QMinMax.
-Require Import CRAlternatingSum.
-Require Import CRseries.
-Require Export CRArith.
-Require Import CRIR.
-Require Import iso_CReals.
-Require Import Qpower.
-Require Import COrdFields2.
-Require Import Qordfield.
-Require Import PowerSeries.
-Require Import CRpower.
-Require Import Exponential.
-Require Import RealPowers.
-Require Import Compress.
-Require Import Ndigits.
-Require Import ModulusDerivative.
-Require Import ContinuousCorrect.
-Require Import CRsign.
-Require Import Q_in_CReals.
-Require Import Qround.
-Require Import CornTac.
-Require Import theory.int_pow.
-Require Import abstract_algebra.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.reals.fast.CRAlternatingSum.
+Require Import CoRN.reals.fast.CRseries.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRIR.
+Require Import CoRN.reals.iso_CReals.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.transc.PowerSeries.
+Require Import CoRN.reals.fast.CRpower.
+Require Import CoRN.transc.Exponential.
+Require Import CoRN.transc.RealPowers.
+Require Import CoRN.reals.fast.Compress.
+Require Import Coq.NArith.Ndigits.
+Require Import CoRN.reals.fast.ModulusDerivative.
+Require Import CoRN.reals.fast.ContinuousCorrect.
+Require Import CoRN.reals.fast.CRsign.
+Require Import CoRN.reals.Q_in_CReals.
+Require Import Coq.QArith.Qround.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.theory.int_pow.
+Require Import MathClasses.interfaces.abstract_algebra.
 
 Set Implicit Arguments.
 

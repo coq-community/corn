@@ -7,19 +7,19 @@
  makes it relatively generic, but it also means that it is fairly inefficient. *)
 
 Require Import
-  List NPeano Unicode.Utf8
-  QArith Qabs Qpossec QnonNeg Qsums
-  Qmetric Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
-  CRArith (*AbstractIntegration*)
-  util.Qgcd
-  Program
-  uneven_CRplus
-  stdlib_omissions.P
-  stdlib_omissions.Z
-  stdlib_omissions.Q
-  Qauto
-  metric FromMetric2
-  implementations.stdlib_rationals.
+  CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano Coq.Unicode.Utf8
+  Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.model.structures.QnonNeg CoRN.util.Qsums
+  CoRN.model.metric2.Qmetric CoRN.model.setoids.Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
+  CoRN.reals.fast.CRArith (*AbstractIntegration*)
+  CoRN.util.Qgcd
+  Coq.Program.Program
+  CoRN.reals.fast.uneven_CRplus
+  CoRN.stdlib_omissions.P
+  CoRN.stdlib_omissions.Z
+  CoRN.stdlib_omissions.Q
+  CoRN.tactics.Qauto
+  CoRN.ode.metric CoRN.ode.FromMetric2
+  MathClasses.implementations.stdlib_rationals.
 
 Import QnonNeg.notations.
 

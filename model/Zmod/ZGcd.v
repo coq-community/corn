@@ -35,7 +35,7 @@
  *)
 (* ZGcd.v, by Vince Barany *)
 
-Require Export ZDivides.
+Require Export CoRN.model.Zmod.ZDivides.
 Require Export Coq.Init.Wf.
 
 (**

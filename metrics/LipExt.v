@@ -50,9 +50,9 @@ subset X.
 
 *)
 
-Require Import ContFunctions.
-Require Import CMetricSpaces.
-Require Import CPMSTheory.
+Require Import CoRN.metrics.ContFunctions.
+Require Import CoRN.metrics.CMetricSpaces.
+Require Import CoRN.metrics.CPMSTheory.
 
 Section LipschitzExtension.
 

@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CPolynomials.
-Require Import Morphisms.
-Require Import CRings.
+Require Export CoRN.algebra.CPolynomials.
+Require Import Coq.Classes.Morphisms.
+Require Import CoRN.algebra.CRings.
 
 (**
 * Polynomials: Nth Coefficient

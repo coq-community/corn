@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Rolle.
-Require Export DiffTactics3.
+Require Export CoRN.ftc.Rolle.
+Require Export CoRN.tactics.DiffTactics3.
 
 Opaque Min Max.
 

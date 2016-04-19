@@ -20,8 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Set Firstorder Depth 5.
 
-Require Import Setoid.
-Require Export Lattice.
+Require Import Coq.Setoids.Setoid.
+Require Export CoRN.order.Lattice.
 
 Open Local Scope po_scope.
 (**

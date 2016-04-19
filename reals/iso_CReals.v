@@ -37,8 +37,8 @@
 (* in this file the  concrete canonical isomorphism -in te sense of
    R_morphisms.v - between two arbitrary model of real numbers is built *)
 
-Require Export Q_dense.
-Require Export R_morphism.
+Require Export CoRN.reals.Q_dense.
+Require Export CoRN.reals.R_morphism.
 
 Lemma less_pres_Lim :
  forall (IR : CReals) (g h : R_COrdField IR), Lim g[<]Lim h -> g[<]h.

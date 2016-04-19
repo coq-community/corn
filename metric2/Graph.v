@@ -18,15 +18,15 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export UniformContinuity.
-Require Export Compact.
-Require Export Prelength.
-Require Export CompleteProduct.
-Require Import QposMinMax.
-Require Import QMinMax.
-Require Import Classic.
-Require Import Qauto.
-Require Import CornTac.
+Require Export CoRN.metric2.UniformContinuity.
+Require Export CoRN.metric2.Compact.
+Require Export CoRN.metric2.Prelength.
+Require Export CoRN.metric2.CompleteProduct.
+Require Import CoRN.model.totalorder.QposMinMax.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.logic.Classic.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -336,7 +336,7 @@ Hypothesis stableXY : stableMetric XY.
 Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
 CompactImage_b (1#1) _ plFEX graphPoint_b.
 
-Require Import Qordfield.
+Require Import CoRN.model.ordfields.Qordfield.
 Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Couple (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 Proof.

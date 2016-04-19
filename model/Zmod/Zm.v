@@ -35,8 +35,8 @@
  *)
 (* Zm.v, by Vince Barany *)
 
-Require Export ZMod.
-Require Export CFields.
+Require Export CoRN.model.Zmod.ZMod.
+Require Export CoRN.algebra.CFields.
 
 (**
 * Zm

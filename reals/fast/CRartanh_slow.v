@@ -19,20 +19,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CRAlternatingSum.
-Require Import CRGeometricSum.
-Require Import CRseries.
-Require Export CRArith.
-Require Import CRIR.
-Require Import Qpower.
-Require Import Qordfield.
-Require Import Q_in_CReals.
-Require Import Qmetric.
-Require Import QMinMax.
-Require Import ArTanH.
-Require Import CRarctan_small.
-Require Import Qauto.
-Require Import CornTac.
+Require Import CoRN.reals.fast.CRAlternatingSum.
+Require Import CoRN.reals.fast.CRGeometricSum.
+Require Import CoRN.reals.fast.CRseries.
+Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRIR.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.reals.Q_in_CReals.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.transc.ArTanH.
+Require Import CoRN.reals.fast.CRarctan_small.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

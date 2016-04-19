@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CPoly_Contin.
+Require Export CoRN.reals.CPoly_Contin.
 
 Section Nested_Intervals.
 (**

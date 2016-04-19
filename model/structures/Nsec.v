@@ -36,9 +36,9 @@
 
 (** printing {#N} $\ensuremath{\mathrel\#_{\mathbb N}}$ *)
 
-Require Export Peano_dec.
-Require Export Relations.
-Require Import CLogic.
+Require Export Coq.Arith.Peano_dec.
+Require Export Coq.Relations.Relations.
+Require Import CoRN.logic.CLogic.
 
 (**
 * [nat]

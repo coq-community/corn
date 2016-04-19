@@ -43,13 +43,13 @@ rational numbers for which the real number lies betwen image of them;
 in other words we will prove that the image of rational numbers in
 dense in any real number structure. *)
 
-Require Export Cauchy_IR.
-Require Export Nmonoid.
-Require Export Zring.
-Require Import CRing_Homomorphisms.
-Require Import Expon.
-Require Import Qpower.
-Require Import CornTac.
+Require Export CoRN.model.reals.Cauchy_IR.
+Require Export CoRN.model.monoids.Nmonoid.
+Require Export CoRN.model.rings.Zring.
+Require Import CoRN.algebra.CRing_Homomorphisms.
+Require Import CoRN.algebra.Expon.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.tactics.CornTac.
 
 Section Rational_sequence_prelogue.
 

@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Qsemigroup.
-Require Import CMonoids.
+Require Export CoRN.model.semigroups.Qsemigroup.
+Require Import CoRN.algebra.CMonoids.
 
 Open Local Scope Q_scope.
 

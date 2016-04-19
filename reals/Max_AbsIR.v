@@ -37,9 +37,9 @@
 (** printing Max %\ensuremath{\max}% *)
 (** printing Min %\ensuremath{\min}% *)
 
-Require Export Q_in_CReals.
-Require Import Qabs.
-Require Export CauchySeq.
+Require Export CoRN.reals.Q_in_CReals.
+Require Import Coq.QArith.Qabs.
+Require Export CoRN.reals.CauchySeq.
 
 Section Maximum.
 

@@ -40,7 +40,7 @@
 (** printing {1/} %\ensuremath{\frac1\cdot}% #1/# *)
 (** printing [/]?[//] %\ensuremath{/?\ddagger}% #/?&Dagger;# *)
 
-Require Export CRings.
+Require Export CoRN.algebra.CRings.
 Set Automatic Introduction.
 
 Transparent sym_eq.

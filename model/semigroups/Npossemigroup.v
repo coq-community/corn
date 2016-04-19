@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CSemiGroups.
-Require Import Nsemigroup.
-Require Export Npossetoid.
+Require Export CoRN.algebra.CSemiGroups.
+Require Import CoRN.model.semigroups.Nsemigroup.
+Require Export CoRN.model.setoids.Npossetoid.
 
 (**
 ** Examples of semi-groups:  $\langle$#&lang;#[Npos],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Npos],[[*]]$\rangle$#&rang;#

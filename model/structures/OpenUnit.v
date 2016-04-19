@@ -18,11 +18,11 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export QArith.
-Require Import Qordfield.
-Require Import COrdFields.
-Require Import Qauto.
-Require Import CornTac.
+Require Export Coq.QArith.QArith.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.algebra.COrdFields.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

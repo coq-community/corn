@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Zgroup.
-Require Import CAbGroups.
+Require Export CoRN.model.groups.Zgroup.
+Require Import CoRN.algebra.CAbGroups.
 
 (**
 ** Example of an abelian group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#

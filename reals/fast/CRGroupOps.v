@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRmetric.
-Require Import QMinMax.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import ProductMetric.
-Require Import stdlib_omissions.Pair.
-Require Import canonical_names.
+Require Export CoRN.model.metric2.CRmetric.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.metric2.ProductMetric.
+Require Import CoRN.stdlib_omissions.Pair.
+Require Import MathClasses.interfaces.canonical_names.
 
 Set Implicit Arguments.
 Set Automatic Introduction.

@@ -40,8 +40,8 @@
 (** printing RX %\ensuremath{R[x]}% #R[x]# *)
 (** printing FX %\ensuremath{F[x]}% #F[x]# *)
 
-Require Import CRing_Homomorphisms.
-Require Import Rational.
+Require Import CoRN.algebra.CRing_Homomorphisms.
+Require Import CoRN.tactics.Rational.
 
 (**
 * Polynomials

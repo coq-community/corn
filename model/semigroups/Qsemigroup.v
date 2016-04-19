@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qsetoid.
-Require Import CSemiGroups.
+Require Export CoRN.model.setoids.Qsetoid.
+Require Import CoRN.algebra.CSemiGroups.
 
 (**
 ** Examples of semi-groups: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#

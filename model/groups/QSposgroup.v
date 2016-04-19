@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export QSposmonoid.
-Require Import CGroups.
+Require Export CoRN.model.monoids.QSposmonoid.
+Require Import CoRN.algebra.CGroups.
 
 (**
 ** Example of a group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$ #(x,y) &#x21A6; xy/2#$\rangle$#&rang;#

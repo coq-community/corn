@@ -18,15 +18,15 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Metric.
-Require Import Prelength.
-Require Import Classification.
-Require Import QMinMax.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Import Qabs.
-Require Import CornTac.
-Require Import UniformContinuity.
+Require Export CoRN.metric2.Metric.
+Require Import CoRN.metric2.Prelength.
+Require Import CoRN.metric2.Classification.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.metric2.UniformContinuity.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -368,7 +368,7 @@ Proof with auto.
  apply ball_sym...
 Qed.
 
-Require Import Qround.
+Require Import Coq.QArith.Qround.
 
 Lemma Qfloor_ball q:
   Qball (1#2) (Qfloor q + (1#2)) q.

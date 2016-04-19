@@ -36,8 +36,8 @@
 
 (** printing [-S-] %\ensuremath{\int}% #&int;# *)
 
-Require Export MoreIntegrals.
-Require Export CalculusTheorems.
+Require Export CoRN.ftc.MoreIntegrals.
+Require Export CoRN.ftc.CalculusTheorems.
 
 Opaque Min.
 

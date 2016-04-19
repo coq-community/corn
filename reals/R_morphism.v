@@ -38,7 +38,7 @@
    structures, is introduced together with te proofs that this notion of
    morphism preserves the basic algebraic structure. *)
 
-Require Import CReals.
+Require Import CoRN.reals.CReals.
 
 (* This comes from CReals1.v *)
 Definition Cauchy_Lim_prop2 (IR : CReals) (seq : nat -> IR)
