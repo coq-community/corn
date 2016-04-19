@@ -48,6 +48,7 @@ Qed.
 
 (* Injection from nat preserves various operations: *)
 
+(*
 Lemma div_Zdiv (n m: nat): m <> 0%nat -> Z_of_nat (n / m) = Z_of_nat n / Z_of_nat m.
 Proof.
  intros.
@@ -75,6 +76,7 @@ Proof with auto with *.
  rewrite <- inj_mult, <- inj_plus.
  apply inj_eq, div_mod...
 Qed.
+*)
 
 Lemma P_of_succ_nat_Zplus (m: nat): Zpos (P_of_succ_nat m) = Z_of_nat m + 1.
 Proof with intuition.
