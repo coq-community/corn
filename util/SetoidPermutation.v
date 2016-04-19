@@ -87,6 +87,7 @@ Proof with auto.
  apply _.
 Qed.
 
+(*
 Instance map_perm_proper {A B} (Ra: relation A) (Rb: relation B):
   Equivalence Ra →
   Equivalence Rb →
@@ -107,3 +108,4 @@ Proof with simpl; auto; try reflexivity.
  clear IHX1 IHX2 X1 X2.
  induction l'... intuition.
 Qed.
+*)
