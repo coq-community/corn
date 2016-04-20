@@ -5,7 +5,7 @@ Require Import
  CRArith Qmetric Qring CReals Ranges
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation.
-Require ne_list.
+Require MathClasses.implementations.ne_list.
 Import ne_list.notations.
 
 Set Automatic Introduction.

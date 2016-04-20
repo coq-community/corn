@@ -14,7 +14,7 @@ Import
 
 Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.AbstractIntegration CoRN.ode.SimpleIntegration CoRN.ode.BanachFixpoint.
 Require Import MathClasses.interfaces.canonical_names MathClasses.misc.decision MathClasses.misc.setoid_tactics MathClasses.misc.util.
-Require Import stdlib_rationals theory.rationals.
+Require Import MathClasses.implementations.stdlib_rationals MathClasses.theory.rationals.
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
 

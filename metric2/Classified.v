@@ -6,10 +6,10 @@
 Require Import
  Arith List
  CSetoids Qmetric Qring Qinf ProductMetric QposInf Qposclasses (* defines Equiv on Qpos *)
- UniformContinuity stdlib_rationals
+ UniformContinuity MathClasses.implementations.stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
- interfaces.abstract_algebra
- theory.setoids theory.products.
+ MathClasses.interfaces.abstract_algebra
+ MathClasses.theory.setoids MathClasses.theory.products.
 
 Import Qinf.notations.
 
