@@ -45,7 +45,7 @@ Proof.
   rewrite 2!Str_nth_everyOther.
   rewrite Str_nth_Qrecip_positives'.
   now rewrite preserves_positives.
-Qed.
+Admitted.
 
 Lemma AQarctan_small_pos_Qprf : 0 ≤ ('num / 'den : Q) < 1.
 Proof.

@@ -47,7 +47,7 @@ Proof.
   rewrite ?Str_nth_plus.
   rewrite Str_nth_Qrecip_factorials'.
   now rewrite preserves_factorials.
-Qed.
+Admitted.
 
 Lemma AQsin_small_pos_Qprf : 0 ≤ ('num / 'den : Q) ≤ 1.
 Proof.
