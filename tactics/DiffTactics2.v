@@ -102,7 +102,7 @@ Qed.
 End Automatizing_Continuity.
 
 Ltac pfunct_to_cont a b f :=
-  match constr:f with
+  match constr:(f) with
   | ([-C-]?X3) => constr:(cconst a b X3)
   | FId => constr:(cid a b)
   | (?X3{+}?X4) =>
@@ -126,7 +126,7 @@ Ltac pfunct_to_cont a b f :=
   | (FAbs ?X3) => let t1 := pfunct_to_cont a b X3 in
                   constr:(cabs a b t1)
   | ?X3 =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       match goal with
       | Hab:_,H:(Continuous_I (a:=a) (b:=b) ?X1 t) |- _ =>
           constr:(hyp_c a b X1 t H)
@@ -143,8 +143,8 @@ Ltac New_Contin :=
   match goal with
   |  |- (Continuous_I (a:=?X1) (b:=?X2) ?X4 ?X3) =>
       let r := pfunct_to_cont X1 X2 X3 in
-      let a := constr:X1 in
-      let b := constr:X2 in
+      let a := constr:(X1) in
+      let b := constr:(X2) in
       (apply Continuous_I_wd with (cont_to_pfunct a b r);
         [ unfold cont_to_pfunct in |- * | apply continuous_cont ])
   end.
@@ -250,7 +250,7 @@ Qed.
 End Automatizing_Derivatives.
 
 Ltac pfunct_to_restr a b f :=
-  match constr:f with
+  match constr:(f) with
   | ([-C-]?X3) => constr:(const a b X3)
   | FId => constr:(id a b)
   | (?X3{+}?X4) =>
@@ -272,7 +272,7 @@ Ltac pfunct_to_restr a b f :=
       let t1 := pfunct_to_restr a b X3 in
       constr:(rnth a b t1 X4)
   | ?X3 =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       match goal with
       | H:(Derivative_I (a:=a) (b:=b) ?X1 t ?X4) |- _ =>
           constr:(hyp a b X1 t X4 H)
@@ -301,7 +301,7 @@ Ltac Differentiate :=
   end.
 
 Ltac derivative_of f :=
-  match constr:f with
+  match constr:(f) with
   | ([-C-]?X3) => constr:([-C-]ZeroR)
   | FId => constr:([-C-]OneR)
   | (?X3{+}?X4) =>
@@ -315,36 +315,36 @@ Ltac derivative_of f :=
   | (?X3{*}?X4) =>
       let t1 := derivative_of X3
       with t2 := derivative_of X4
-      with t3 := constr:X3
-      with t4 := constr:X4 in
+      with t3 := constr:(X3)
+      with t4 := constr:(X4) in
       constr:(t3{*}t2{+}t1{*}t4)
   | (?X3{**}?X4) =>
-      let t1 := derivative_of X4 with t2 := constr:X3 in
+      let t1 := derivative_of X4 with t2 := constr:(X3) in
       constr:(t2{**}t1)
   | (?X3{^}0) => constr:([-C-]ZeroR)
   | (?X3{^}S ?X4) =>
-      let t1 := derivative_of X3 with t2 := constr:X3 with t3 := constr:X4 in
+      let t1 := derivative_of X3 with t2 := constr:(X3) with t3 := constr:(X4) in
       constr:(nring _ (S t3){**}(t1{*}t2{^}t3))
   | ({1/}?X3) =>
-      let t1 := derivative_of X3 with t2 := constr:X3 in
+      let t1 := derivative_of X3 with t2 := constr:(X3) in
       constr:({--}(t1{/}t2{*}t2))
   | (?X3{/}?X4) =>
       let t1 := derivative_of X3
       with t2 := derivative_of X4
-      with t3 := constr:X3
-      with t4 := constr:X4 in
+      with t3 := constr:(X3)
+      with t4 := constr:(X4) in
       constr:((t1{*}t4{-}t3{*}t2){/}t4{*}t4)
   | (?X3[o]?X4) =>
       let t1 := derivative_of X3
       with t2 := derivative_of X4
-      with t3 := constr:X3 in
+      with t3 := constr:(X3) in
       constr:((t3[o]t2){*}t1)
   | ?X3 =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       match goal with
       | H:(Derivative_I (b:=t) ?X4) |- _ =>
-          let t1 := constr:X4 in
-          constr:t1
+          let t1 := constr:(X4) in
+          constr:(t1)
       end
   end.
 

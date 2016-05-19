@@ -126,9 +126,9 @@ Fixpoint symbPF_deriv (r : symbPF) : PartIR :=
   end.
 
 Ltac PartIR_to_symbPF f :=
-  match constr:f with
+  match constr:(f) with
   | ([-C-]?X3) => constr:(sconst X3)
-  | FId => constr:sid
+  | FId => constr:(sid)
   | (?X3{+}?X4) =>
       let t1 := PartIR_to_symbPF X3 with t2 := PartIR_to_symbPF X4 in
       constr:(splus t1 t2)
@@ -157,7 +157,7 @@ Ltac PartIR_to_symbPF f :=
       let t1 := PartIR_to_symbPF X3 with t2 := PartIR_to_symbPF X4 in
       constr:(scomp t1 t2)
   | ?X3 =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       match goal with
       | H:(Derivative ?X1 ?X2 t ?X4) |- _ =>
           constr:(shyp X1 X2 t X4 H)

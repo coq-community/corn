@@ -272,7 +272,7 @@ Section binop. (* used for addition and multiplication *)
 
   Lemma binop_le_compat_l (x y z: T): x <= y -> binop x z <= binop y z.
   Proof with auto.
-   unfold le. simpl. intros H q [v w yv zw r E s rs].
+   unfold le. simpl. intros H q [v w yv zw r E] s rs.
    specialize (H _ yv).
    assert (o (`v) (`w) < `s) as os. apply Qle_lt_trans with (`r)...
    destruct (o_sneaky _ _ _ (proj2_sig _) (proj2_sig _) os).

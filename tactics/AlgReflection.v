@@ -457,25 +457,25 @@ End Correctness_Results.
 
 Ltac ClosedNat t :=
 match t with
-| O => constr:true
+| O => constr:(true)
 | (S ?n) => ClosedNat n
-| _ => constr:false
+| _ => constr:(false)
 end.
 
 Ltac ClosedPositive t :=
 match t with
-| xH => constr:true
+| xH => constr:(true)
 | (xI ?n) => ClosedPositive n
 | (xO ?n) => ClosedPositive n
-| _ => constr:false
+| _ => constr:(false)
 end.
 
 Ltac ClosedZ t :=
 match t with
-| Z0 => constr:true
+| Z0 => constr:(true)
 | (Zpos ?n) => ClosedPositive n
 | (Zneg ?n) => ClosedPositive n
-| _ => constr:false
+| _ => constr:(false)
 end.
 
 (*To prevent universe inconsitencies, we need lists at a higher
@@ -505,7 +505,7 @@ Ltac FindIndex t l :=
 match l with
 | (Mcons ?x ?xs) =>
   match x with
-  | t => constr:O
+  | t => constr:(O)
   | _ => let n := FindIndex t xs in constr:(S n)
   end
 end.

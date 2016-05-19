@@ -1313,135 +1313,135 @@ Ltac term_cont_part t :=
   | (csf_fun _ _ _ ?X4) =>
       let t0 := constr:(X4) in
       let b := term_cont_part t0 in
-      constr:b
+      constr:(b)
   | (csbf_fun _ _ _ _ ?X5 ?X6) =>
       let t1 := constr:(X5) with t2 := constr:(X6) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
-  | _ => constr:false
+  | _ => constr:(false)
   end.
 
 Ltac form_cont_part A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred _ _ ?X3) =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       let b := term_cont_part t in
-      constr:b
+      constr:(b)
   | (csr_rel _ _ ?X3 ?X4) =>
-      let t1 := constr:X3 with t2 := constr:X4 in
+      let t1 := constr:(X3) with t2 := constr:(X4) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
   | (Ccsr_rel _ _ ?X3 ?X4) =>
-      let t1 := constr:X3 with t2 := constr:X4 in
+      let t1 := constr:(X3) with t2 := constr:(X4) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
   | (?X2[=]?X3) =>
-      let t1 := constr:X2 with t2 := constr:X3 in
+      let t1 := constr:(X2) with t2 := constr:(X3) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
   | (?X2[#]?X3) =>
-      let t1 := constr:X2 with t2 := constr:X3 in
+      let t1 := constr:(X2) with t2 := constr:(X3) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let b1 := form_cont_part A1 with b2 := form_cont_part A2 in
       constr:(orb b1 b2)
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let b := form_cont_part A0 in
-      constr:b
+      constr:(b)
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let b := form_cont_part A0 in
-      constr:b
+      constr:(b)
 (*   | (CNot ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let b := form_cont_part A0 in
-      constr:b *)
-  | _ => constr:false
+      constr:(b) *)
+  | _ => constr:(false)
   end.
 
 Ltac fold_cspf_dom_in_term t :=
-  match constr:t with
+  match constr:(t) with
   | (Part _ ?X3 ?X4) =>
-      let t0 := constr:X3 with h := constr:X4 in
+      let t0 := constr:(X3) with h := constr:(X4) in
       let H := fresh in
       (set (H := h) in *; fold_cspf_dom_in_term t0; clearbody H)
   | (csf_fun _ _ _ ?X4) =>
-      let t0 := constr:X4 in
+      let t0 := constr:(X4) in
       fold_cspf_dom_in_term t0
   | (csbf_fun _ _ _ _ ?X5 ?X6) =>
-      let t1 := constr:X5 with t2 := constr:X6 in
+      let t1 := constr:(X5) with t2 := constr:(X6) in
       (fold_cspf_dom_in_term t1; fold_cspf_dom_in_term t2)
   | _ => idtac
   end.
 
 Ltac fold_cspf_dom_in_form A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred _ _ ?X3) =>
-      let t := constr:X3 in
+      let t := constr:(X3) in
       fold_cspf_dom_in_term t
   | (csr_rel _ _ ?X3 ?X4) =>
-      let t1 := constr:X3 with t2 := constr:X4 in
+      let t1 := constr:(X3) with t2 := constr:(X4) in
       (fold_cspf_dom_in_term t1; fold_cspf_dom_in_term t2)
   | (Ccsr_rel _ _ ?X3 ?X4) =>
-      let t1 := constr:X3 with t2 := constr:X4 in
+      let t1 := constr:(X3) with t2 := constr:(X4) in
       (fold_cspf_dom_in_term t1; fold_cspf_dom_in_term t2)
   | (?X2[=]?X3) =>
-      let t1 := constr:X2 with t2 := constr:X3 in
+      let t1 := constr:(X2) with t2 := constr:(X3) in
       (fold_cspf_dom_in_term t1; fold_cspf_dom_in_term t2)
   | (?X2[#]?X3) =>
-      let t1 := constr:X2 with t2 := constr:X3 in
+      let t1 := constr:(X2) with t2 := constr:(X3) in
       (fold_cspf_dom_in_term t1; fold_cspf_dom_in_term t2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       (fold_cspf_dom_in_form A1; fold_cspf_dom_in_form A2)
-  | (~ ?X1) => let A0 := constr:X1 in
+  | (~ ?X1) => let A0 := constr:(X1) in
                fold_cspf_dom_in_form A0
-  | (Not ?X1) => let A0 := constr:X1 in
+  | (Not ?X1) => let A0 := constr:(X1) in
                  fold_cspf_dom_in_form A0
 (*   | (CNot ?X1) => let A0 := constr:X1 in
                   fold_cspf_dom_in_form A0 *)
@@ -1450,17 +1450,17 @@ Ltac fold_cspf_dom_in_form A :=
 
 Ltac fold_cspf_dom :=
   match goal with
-  |  |- ?X1 => let A := constr:X1 in
+  |  |- ?X1 => let A := constr:(X1) in
                fold_cspf_dom_in_form A
   end.
 
 Ltac csetoid_rewrite h :=
   match goal with
   |  |- ?X1 =>
-      let A := constr:X1 in
+      let A := constr:(X1) in
       let b := form_cont_part A in
       let c := eval compute in b in
-      match constr:c with
+      match constr:(c) with
       | true => partial_csetoid_rewrite h; fold_cspf_dom
       | false => total_csetoid_rewrite h
       end
@@ -1469,10 +1469,10 @@ Ltac csetoid_rewrite h :=
 Ltac csetoid_rewrite_rev h :=
   match goal with
   |  |- ?X1 =>
-      let A := constr:X1 in
+      let A := constr:(X1) in
       let b := form_cont_part A in
       let c := eval compute in b in
-      match constr:c with
+      match constr:(c) with
       | true => partial_csetoid_rewrite_rev h; fold_cspf_dom
       | false => total_csetoid_rewrite_rev h
       end
@@ -1482,7 +1482,7 @@ Ltac csetoid_rewrite_cxt h h0 :=
   let A := typeof h0 in
       let b := form_cont_part A in
       let c := eval compute in b in
-      match constr:c with
+      match constr:(c) with
       | true => partial_csetoid_rewrite_cxt h h0; fold_cspf_dom_in_form A
       | false => total_csetoid_rewrite_cxt h h0
       end.
@@ -1491,7 +1491,7 @@ Ltac csetoid_rewrite_cxt_rev h h0 :=
   let A := typeof h0 in
       let b := form_cont_part A in
       let c := eval compute in b in
-      match constr:c with
+      match constr:(c) with
       | true => partial_csetoid_rewrite_cxt_rev h h0; fold_cspf_dom_in_form A
       | false => total_csetoid_rewrite_cxt_rev h h0
       end.
