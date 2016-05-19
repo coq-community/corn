@@ -16,7 +16,7 @@ extent parsed) in Coq *)
 Notation "'⎥' a b" := (Vector.cons _ a _ b)
   (format "'[v' '⎥' a '/' b ']'", at level 0, a, b at level 0) : raster.
 Notation "'⎥' a" := (Vector.cons _ a _ Vector.nil)
-  (format "'⎥' a", at level 0, a, b at level 0) : raster.
+  (format "'⎥' a", at level 0, a at level 0) : raster.
 (*
 Notation "☙" := (Vnil (vector bool _)) (at level 0, right associativity) : raster.
 *)

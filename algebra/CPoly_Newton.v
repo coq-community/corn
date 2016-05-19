@@ -477,8 +477,7 @@ Section contents.
 (*   assert (ne_list.Permutation (map fst x) (map fst y)).
    assert (QNoDup (map fst y)).
    rewrite <- E...*)
-admit.
-  Qed.
+  Admitted.
 
   Lemma divdiff_Permutation (x y: ne_list QPoint): QNoDup (map fst x) →
    ne_list.Permutation x y →
@@ -493,9 +492,9 @@ admit.
     rewrite (N_Permutation x y)...
     reflexivity.
    unfold QNoDup.
-   admit. (* too slow
-   rewrite <- P...*)
-  Qed.
+   Admitted. (* too slow
+   rewrite <- P...
+  Qed.*)
 
 Fixpoint ne_list_zip {X Y} (xs: ne_list X) (ys: ne_list Y): ne_list (X * Y) :=
   match xs, ys with

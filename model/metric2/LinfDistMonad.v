@@ -104,6 +104,7 @@ Proof.
  apply: StepF_ind2.
    simpl (ball_ex).
    intros s s0 t t0 Hs Ht H.
+   unfold ball_ex.
    rewrite <- Hs, <- Ht.
    assumption.
   intros.

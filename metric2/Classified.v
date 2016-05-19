@@ -261,11 +261,11 @@ Proof. intros; now apply genball_Proper. Qed.
    apply Req.
    intros.
    apply ball_genball.
-   admit.
+   Admitted.
    (*rewrite <- (Qplus_0_l d).
    rewrite <- q0.
-   apply H2.*)
-  Qed.
+   apply H2.
+  Qed.*)
 
   Instance genball_MetricSpace: @MetricSpaceClass X _ genball.
   Proof with auto.
@@ -387,15 +387,7 @@ Section vectors.
    pose proof (mspc_setoid X).
    split.
            apply _.
-          admit.
-         admit.
-        admit.
-       admit.
-      admit.
-     admit.
-    admit.
-   admit.
-  Qed.
+  Admitted.
 
 End vectors.
 
@@ -705,7 +697,7 @@ Section delegated_mspc.
    unfold mspc_ball, delegated_ball.
    intros.
    apply (mspc_closed Y)...
-  Qed.
+  Admitted.
 
 End delegated_mspc.
 

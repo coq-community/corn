@@ -957,7 +957,7 @@ Qed.
 Lemma int_abs_bound (a b M : Q) :
   (forall x : Q, x ∈ (a, b) -> abs (f x) ≤ 'M) -> abs (int a b) ≤ '(abs (b - a) * M).
 Proof.
-intros A. unfold int. admit.
+intros A. unfold int. Admitted. (*
 (* Looks like a type class regression, unfolded the tactic soup a bit. *)
 (* destruct (decide (a ≤ b)) as [AB | AB];
 [| pose proof (orders.le_flip _ _ AB); mc_setoid_replace (b - a) with (-(a - b)) by ring;
@@ -973,7 +973,7 @@ intros x A1; apply A.
   now mc_setoid_replace b with (a + (b - a)) by ring.
 + apply Qrange_comm. apply -> range_le; [| easy].
   now mc_setoid_replace a with (b + (a - b)) by ring.*)
-Qed.
+Qed. *)
 
 (* [SearchAbout (CRabs (- ?x)%CR)] does not find [CRabs_opp] *)
 
@@ -1006,12 +1006,12 @@ assert (Ng <= n)%positive by (transitivity (Pos.max Nf Ng); [apply Pos.le_max_r 
 assert (Ns <= n)%positive by apply Pos.le_max_r.
 apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (f + g) a w n)). 
   change (Qeq ((e / (2#1)) + (e / (2#1)))  e)%Q. 
- (* regression connected in field numbers ? [field; discriminate | |].*) admit.
+ (* regression connected in field numbers ? [field; discriminate | |].*) Admitted. (*
 * apply mspc_symm, S; assumption.
 * rewrite riemann_sum_plus.
   mc_setoid_replace (e / 2) with (e / 4 + e / 4) by (field; split; discriminate).
   now apply mspc_ball_CRplus; [apply F | apply G].
-Qed.
+Qed. *)
 
 Lemma integrate_negate (f : Q -> CR)
   `{!IsUniformlyContinuous f f_mu} (a : Q) (w : QnonNeg) : ∫ (- f) a w = - ∫ f a w.
@@ -1025,10 +1025,10 @@ set (n := Pos.max N1 N2).
 assert (N1 <= n)%positive by apply Pos.le_max_l.
 assert (N2 <= n)%positive by apply Pos.le_max_r.
 apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a w n)).
-(* regression connected to numbers ? [field; discriminate | |].*) admit.
+(* regression connected to numbers ? [field; discriminate | |].*) Admitted. (*
 * now apply mspc_symm, F1.
 * rewrite riemann_sum_negate. now apply mspc_ball_CRnegate, F2.
-Qed.
+Qed. *)
 
 Lemma int_plus (f g : Q -> CR)
   `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
