@@ -105,7 +105,7 @@ Proof.
    | Qpos2QposInf e => let (n,_) := Hf (inject_Q_CR e) (CRlt_Qlt _ _ (Qpos_prf e)) in f n end).
  abstract ( intros e1 e2; destruct (Hf (inject_Q_CR e1) (CRlt_Qlt _ _ (Qpos_prf e1))) as [n1 Hn1];
    destruct (Hf (inject_Q_CR e2) (CRlt_Qlt _ _ (Qpos_prf e2))) as [n2 Hn2];
-     apply: ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball; [apply Hn1;apply le_max_l|
+     eapply ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball; [apply Hn1;apply le_max_l|
        apply Hn2;apply le_max_r]) using Rlim_subproof0.
 Defined.
 
@@ -131,7 +131,7 @@ Proof.
   change (ball (e1+d+e2) (f m) (f a)).
   destruct (le_ge_dec a m).
    rewrite <- CRAbsSmall_ball.
-   apply: AbsSmall_leEq_trans;[|apply Ha;assumption].
+   eapply AbsSmall_leEq_trans;[|apply Ha;assumption].
    intros x.
    autorewrite with QposElim.
    change (-x <= e1 + d + e2 - e2).
@@ -157,7 +157,7 @@ Proof.
  intros n d X.
  rewrite (anti_convert_pred_convert n) in X.
  exists (nat_of_P n)%nat.
- apply: leEq_transitive.
+ eapply leEq_transitive.
   apply X.
  clear X.
  intros z.
@@ -190,7 +190,7 @@ Proof.
  replace RHS with
    ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by (simpl; ring).
  rewrite<- Qle_minus_iff.
- apply: Qle_trans;[|apply IHa].
+ eapply Qle_trans;[|apply IHa].
  generalize (P_of_succ_nat a).
  intros p.
  rewrite -> Qle_minus_iff.

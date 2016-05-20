@@ -150,7 +150,7 @@ Proof with intuition.
 Qed.
 
 Lemma Qmult_Σ (f: nat -> Q) n (k: nat):
-  Σ n f * k == Σ (k * n) (f ∘ flip div k).
+  Σ n f * k == Σ (k * n) (f ∘ flip Nat.div k).
 Proof with auto with *.
  unfold Basics.compose.
  rewrite mult_comm.
@@ -168,7 +168,7 @@ Proof with auto with *.
 Qed.
 
 Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):
-  Σ n f == Σ (k * n) (f ∘ flip div k) / k.
+  Σ n f == Σ (k * n) (f ∘ flip Nat.div k) / k.
 Proof.
  rewrite <- Qmult_Σ.
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.

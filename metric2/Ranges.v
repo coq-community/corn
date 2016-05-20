@@ -1,5 +1,5 @@
 
-Require Import Program canonical_names util.Container QArith QMinMax CRlattice.
+Require Import Program MathClasses.interfaces.canonical_names util.Container QArith QMinMax CRlattice.
 
 Definition Range (T: Type) := prod T T.
 

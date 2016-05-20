@@ -54,29 +54,17 @@ Section CC_ap_zero.
 Lemma cc_ap_zero : forall P : CC -> Prop,
  (forall a b, a [#] [0] -> P (a[+I*]b)) -> (forall a b, b [#] [0] -> P (a[+I*]b)) -> forall c, c [#] [0] -> P c.
 Proof.
- intro. intro. intro. intro.
- elim c. intros a b. intro H1.
- elim H1; intros H2.
-  apply H.
-  (* algebra. *)
-  exact H2.
- apply H0.
- (* algebra. *)
- exact H2.
+ intros ????.
+ elim c. intros a b H1.
+ elim H1; intros H2; auto.
 Qed.
 
 Lemma C_cc_ap_zero : forall P : CC -> CProp,
  (forall a b, a [#] [0] -> P (a[+I*]b)) -> (forall a b, b [#] [0] -> P (a[+I*]b)) -> forall c, c [#] [0] -> P c.
 Proof.
- intro. intro H. intro H0. intro.
+ intro. intros H H0 c.
  elim c. intros a b. intro H1.
- elim H1; intros H2.
-  apply H.
-  (* algebra. *)
-  exact H2.
- apply H0.
- (* algebra. *)
- exact H2.
+ elim H1; intros H2;auto.
 Qed.
 
 End CC_ap_zero.
@@ -87,22 +75,19 @@ Section Imag_to_Real.
 
 Lemma imag_to_real : forall a b a' b', a'[+I*]b' [=] (a[+I*]b) [*]II -> a [#] [0] -> b' [#] [0].
 Proof.
- do 5 intro. intro H0.
+ intros ????? H0.
  cut (b' [=] a); intros.
   (* astepl a. *)
-  apply ap_wdl_unfolded with a.
-   exact H0.
-  apply eq_symmetric_unfolded. exact H1.
-  (* astepl (Im a'[+I*]b'). *)
-  apply eq_transitive_unfolded with (Im (a'[+I*]b')).
-  apply eq_reflexive_unfolded.
+  now apply ap_wdl with a.
+  apply eq_transitive with (Im (a'[+I*]b')).
+  apply eq_reflexive.
  (* astepl (Im a[+I*]b[*]II). *)
- apply eq_transitive_unfolded with (Im ((a[+I*]b) [*]II)).
-  apply Im_wd. exact H.
+ apply eq_transitive with (Im ((a[+I*]b) [*]II)).
+  now apply Im_wd. 
   (* Step_final (Im ( [--]b) [+I*]a). *)
-  apply eq_transitive_unfolded with (Im ( [--]b[+I*]a)).
+  apply eq_transitive with (Im ( [--]b[+I*]a)).
   apply Im_wd. apply mult_I.
-  apply eq_reflexive_unfolded.
+  apply eq_reflexive.
 Qed.
 
 End Imag_to_Real.
@@ -118,28 +103,26 @@ Definition sqrt_I := sqrt_Half[+I*]sqrt_Half.
 Lemma sqrt_I_nexp : sqrt_I[^]2 [=] II.
 Proof.
  (* astepl sqrt_I[*]sqrt_I. *)
- apply eq_transitive_unfolded with (sqrt_I[*]sqrt_I).
+ apply eq_transitive with (sqrt_I[*]sqrt_I).
   apply nexp_two.
  unfold sqrt_I in |- *.
  (* astepl (sqrt_Half[*]sqrt_Half[-]sqrt_Half[*]sqrt_Half) [+I*]
    (sqrt_Half[*]sqrt_Half[+]sqrt_Half[*]sqrt_Half). *)
- apply eq_transitive_unfolded with ((sqrt_Half[*]sqrt_Half[-]sqrt_Half[*]sqrt_Half) [+I*]
+ apply eq_transitive with ((sqrt_Half[*]sqrt_Half[-]sqrt_Half[*]sqrt_Half) [+I*]
    (sqrt_Half[*]sqrt_Half[+]sqrt_Half[*]sqrt_Half)).
   apply eq_reflexive_unfolded.
  cut (sqrt_Half[*]sqrt_Half [=] Half); intros.
   (* astepl [0][+I*] (Half[+]Half). *)
-  apply eq_transitive_unfolded with ([0][+I*] (Half[+]Half)).
+  apply eq_transitive with ([0][+I*] (Half[+]Half)).
    apply I_wd. apply cg_minus_correct. apply bin_op_wd_unfolded. exact H.
     exact H.
   (* Step_final [0][+I*][1]. *)
-  apply eq_transitive_unfolded with ([0][+I*][1]).
-   apply I_wd. apply eq_reflexive_unfolded. apply half_2.
-    apply eq_reflexive_unfolded.
+  apply eq_transitive with ([0][+I*][1]).
+   apply I_wd. apply eq_reflexive. apply half_2.
+    apply eq_reflexive.
  (* astepl sqrt_Half[^] (2). *)
- apply eq_transitive_unfolded with (sqrt_Half[^]2).
-  apply eq_symmetric_unfolded. apply nexp_two.
-  unfold sqrt_Half in |- *.
- (* algebra. *)
+ apply eq_transitive with (sqrt_Half[^]2).
+  apply eq_symmetric. apply nexp_two.
  apply sqrt_sqr.
 Qed.
 
@@ -161,17 +144,17 @@ Proof.
  intros n on.
  unfold nroot_I in |- *.
  (* astepl II[^] (mult n n). *)
- apply eq_transitive_unfolded with (II[^] (n * n)).
+ apply eq_transitive with (II[^] (n * n)).
   apply nexp_mult.
  elim (nroot_I_nexp_aux n); try assumption.
  intros m H.
  rewrite H.
  (* astepl II[^] (mult (4) m) [*]II[^] (1). *)
- apply eq_transitive_unfolded with (II[^] (4 * m) [*]II[^]1).
-  apply eq_symmetric_unfolded. apply nexp_plus.
+ apply eq_transitive with (II[^] (4 * m) [*]II[^]1).
+  apply eq_symmetric. apply nexp_plus.
   (* astepl (II[^] (4)) [^]m[*]II. *)
-  apply eq_transitive_unfolded with ((II[^]4) [^]m[*]II).
-  apply bin_op_wd_unfolded. apply eq_symmetric_unfolded. apply nexp_mult.
+  apply eq_transitive with ((II[^]4) [^]m[*]II).
+  apply bin_op_wd_unfolded. apply eq_symmetric. apply nexp_mult.
    apply nexp_one.
  cut (II[^]4 [=] [1]); intros.
   (* astepl [1][^]m[*]II. *)
@@ -652,8 +635,8 @@ Section NRootCC_3.
 
 Fixpoint Im_poly (p : cpoly CC) : cpoly IR :=
   match p with
-  | cpoly_zero        => cpoly_zero IR
-  | cpoly_linear c p1 => cpoly_linear IR (Im c) (Im_poly p1)
+  | cpoly_zero _       => cpoly_zero IR
+  | cpoly_linear _ c p1 => cpoly_linear IR (Im c) (Im_poly p1)
   end.
 
 Lemma nrCC3_a1 : forall p r, (Im_poly p) ! r [=] Im p ! (cc_IR r).

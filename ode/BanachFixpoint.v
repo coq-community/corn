@@ -21,7 +21,7 @@ Context `{MetricSpaceClass X} {Xlim : Limit X} {Xcms : CompleteMetricSpaceClass 
 
 Context (f : X -> X) `{!IsContraction f q} (x0 : X).
 
-Let x n := nat_iter n f x0.
+Let x n := Nat.iter n f x0.
 
 Arguments x n%mc.
 
@@ -112,7 +112,7 @@ induction n as [| n IH] using nat_induction.
 + rewrite nat_pow_S. transitivity ((1 + a) * (1 + (n : Q) * a)).
   - rewrite Nat2Z.inj_add, inject_Z_plus.
     stepr (1 + (1 + (n : Q)) * a + (n : Q) * a²) by ring.
-    (* [apply nonneg_plus_le_compat_r, nonneg_mult_compat.] does not work *)
+    (* [apply nonneg_plus_le_compat_r, nonneg_mult_compat.  does not work *)
     apply nonneg_plus_le_compat_r. apply nonneg_mult_compat; [solve_propholds | apply square_nonneg].
   - now apply (order_preserving ((1 + a) *.)) in IH.
 Qed.

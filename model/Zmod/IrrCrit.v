@@ -82,8 +82,8 @@ Definition fpx := (cpoly_cring fp).
 
 Fixpoint zxfpx (p:zx) : fpx :=
   match p with
-  | cpoly_zero => (cpoly_zero fp : fpx)
-  | cpoly_linear c p1 => (zfp c)[+X*](zxfpx p1)
+  | cpoly_zero _ => (cpoly_zero fp : fpx)
+  | cpoly_linear _ c p1 => (zfp c)[+X*](zxfpx p1)
   end.
 
 Definition P (f g:zx):= f[=]g -> (zxfpx f)[=](zxfpx g).

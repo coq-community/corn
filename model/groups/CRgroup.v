@@ -35,8 +35,8 @@ Proof.
  intros x y H.
  change (CRapartT x y)%CR.
  apply CR_ap_as_Cauchy_IR_ap_2.
- apply: un_op_strext_unfolded.
- stepl (CRasCauchy_IR (-x)%CR); [| now apply eq_symmetric; apply CR_opp_as_Cauchy_IR_opp].
+ apply: un_op_strext_unfolded. 
+ 1:stepl (CRasCauchy_IR (-x)%CR); [| now apply eq_symmetric; apply CR_opp_as_Cauchy_IR_opp].
  stepr (CRasCauchy_IR (-y)%CR); [| now apply eq_symmetric; apply CR_opp_as_Cauchy_IR_opp].
  apply CR_ap_as_Cauchy_IR_ap_1.
  apply H.
@@ -54,14 +54,14 @@ Proof.
   stepl ((CRasCauchy_IR x)[+][--](CRasCauchy_IR x)); [| now
     apply plus_resp_eq; apply CR_opp_as_Cauchy_IR_opp].
   apply: eq_transitive.
-   apply cg_rht_inv_unfolded.
+   1:apply cg_rht_inv_unfolded.
   apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
  change (-x + x==0)%CR.
  rewrite <- CR_eq_as_Cauchy_IR_eq.
  stepl ((CRasCauchy_IR (-x)%CR)[+](CRasCauchy_IR x)); [| now apply CR_plus_as_Cauchy_IR_plus].
  stepl ([--](CRasCauchy_IR x)[+](CRasCauchy_IR x)); [| now
    apply bin_op_is_wd_un_op_lft; apply CR_opp_as_Cauchy_IR_opp].
- apply: eq_transitive.
+ eapply eq_transitive.
   apply cg_lft_inv_unfolded.
  apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
 Qed.

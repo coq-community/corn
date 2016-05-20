@@ -23,7 +23,10 @@ Require Export CoRN.model.ordfields.Qordfield.
 Require Import CoRN.algebra.COrdFields2.
 Require Import Coq.QArith.Qpower.
 Require Import Coq.QArith.Qabs.
-Require Import CoRN.tactics.CornTac.
+
+(*Require Import CoRN.tactics.CornTac. 
+was removed in the trunk branch
+*)
 
 Ltac Qauto_pos :=
   repeat (first [ assumption

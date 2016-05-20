@@ -146,7 +146,7 @@ Proof.
  exists Hcd.
  split.
   intros y [Hy _].
-  apply: less_leEq_trans;[|apply Hy].
+  eapply less_leEq_trans ;[|apply Hy].
   apply div_resp_pos.
    assumption.
   destruct (H _ (compact_inc_lft _ _ Hab)) as [A _].

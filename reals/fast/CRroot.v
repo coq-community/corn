@@ -734,11 +734,11 @@ Qed.
 Definition rational_sqrt_pos a (Ha:0<a) : CR.
 Proof.
  destruct (Qle_total 1 a).
-  refine (@rational_sqrt_big_bounded _ a _).
+  eapply (rational_sqrt_big_bounded _ a).
   split.
    assumption.
   apply (power4bound a).
- refine (@rational_sqrt_small_bounded _ a _).
+ eapply (rational_sqrt_small_bounded _ a).
  split.
   apply (power4bound' a).
   assumption.

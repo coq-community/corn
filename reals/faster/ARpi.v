@@ -14,7 +14,8 @@ Program Definition AQpi (x : AQ) : AR :=
     ARscale ('28%Z * x) (AQarctan_small_pos (AQpi_prf (239%Z) _))) +
   (ARscale ('(-48)%Z * x) (AQarctan_small_pos (AQpi_prf (682%Z) _)) +
     ARscale ('96%Z * x) (AQarctan_small_pos (AQpi_prf (12943%Z) _))).
-Solve Obligations using compute; now split.
+Obligation Tactic := compute; now split.
+Solve Obligations. 
 
 Lemma ARtoCR_preserves_AQpi x : 'AQpi x = r_pi ('x).
 Proof.

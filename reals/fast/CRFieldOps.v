@@ -111,7 +111,7 @@ Infix "<" := CRltT : CR_scope.
 Lemma CRltT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
 Proof.
  intros x1 x2 Hx y1 y2 Hy H.
- apply: CRpos_wd;[|apply H].
+ apply: CRpos_wd. 2:apply H.
  abstract ( rewrite <- Hx; rewrite <- Hy; reflexivity ).
 Defined.
 
@@ -603,7 +603,7 @@ Proof.
  intros e a0 a1 Ha.
  simpl in *.
  unfold Qball in *.
- apply: AbsSmall_cancel_mult.
+ eapply AbsSmall_cancel_mult.
   instantiate (1:=(Qmax c a0)*(Qmax c a1)).
   rewrite <- (QposAsmkQpos (Qpos_Qmax c a0)).
   rewrite <- (QposAsmkQpos (Qpos_Qmax c a1)).
@@ -614,7 +614,7 @@ Proof.
   rewrite <- (QposAsmkQpos (Qpos_Qmax a b)).
   apply Qpos_nonzero.
  stepr (Qmax c a1 - Qmax c a0); [| simpl; field; repeat split; apply H].
- apply: AbsSmall_leEq_trans.
+ eapply AbsSmall_leEq_trans.
   instantiate (1:=(c*c*e)).
   rewrite -> Qmult_comm.
   apply mult_resp_leEq_lft;[|apply Qpos_nonneg].

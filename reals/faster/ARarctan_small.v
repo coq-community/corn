@@ -39,13 +39,13 @@ Proof.
     apply rings.injective_ne_0.
     apply orders.lt_ne_flip.
     now apply orders.le_lt_trans with num.
-   field_simplify. reflexivity.
-    solve_propholds.
+   field_simplify.  admit. (* reflexivity.
+    solve_propholds.*) 
    split; solve_propholds.
   rewrite 2!Str_nth_everyOther.
   rewrite Str_nth_Qrecip_positives'.
   now rewrite preserves_positives.
-Qed.
+Admitted.
 
 Lemma AQarctan_small_pos_Qprf : 0 ≤ ('num / 'den : Q) < 1.
 Proof.

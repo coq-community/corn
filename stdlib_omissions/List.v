@@ -139,8 +139,6 @@ Proof with auto.
  reflexivity.
 Qed.
 
-Existing Instance Permutation_map_aux_Proper.
-
 Instance: forall A (x: A), Proper (@Permutation A ==> iff) (@In A x).
 Proof. pose proof Permutation_in. firstorder. Qed.
 

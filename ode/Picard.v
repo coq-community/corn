@@ -7,14 +7,14 @@ Require Import
  stdlib_omissions.Q
  stdlib_omissions.N*).
 
-Require CoRN.model.structures.Qinf CoRN.model.structures.QnonNeg CoRN.model.structures.QnnInf CoRN.reals.fast.CRball.
+Require Qinf QnonNeg QnnInf CRball.
 Import
   QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
   Qabs propholds.
 
 Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.AbstractIntegration CoRN.ode.SimpleIntegration CoRN.ode.BanachFixpoint.
 Require Import MathClasses.interfaces.canonical_names MathClasses.misc.decision MathClasses.misc.setoid_tactics MathClasses.misc.util.
-
+Require Import MathClasses.implementations.stdlib_rationals MathClasses.theory.rationals.
 Close Scope uc_scope. (* There is a leak in some module *)
 Open Scope signature_scope. (* To interpret "==>" *)
 
@@ -92,8 +92,8 @@ the second component of the pair. So instead we prove mspc_ball_edge_l and
 mspc_ball_edge_r, which don't depend on x. *)
 
 Program Definition extend : Q -> Y :=
-  λ x, if (decide (x < a - r))
-       then f ((a - r) ↾ mspc_ball_edge_l)
+  λ x, if (decide (x < a - (r : Q)))
+       then f ((a - (r : Q)) ↾ mspc_ball_edge_l)
        else if (decide (a + r < x))
             then f ((a + r) ↾ mspc_ball_edge_r)
             else f (x ↾ _).
@@ -251,10 +251,10 @@ Check _ : IsUniformlyContinuous v _.
 Context (f : sx -> sy) `{!IsUniformlyContinuous f mu_f}.
 
 Check _ : IsUniformlyContinuous ((@Datatypes.id sx) ∘ (@Datatypes.id sx)) _.
+
 Check _ : IsUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.
 
-Check _ : IsLocallyUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _.*)
-
+Check _ : IsLocallyUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _*)
 Definition picard' (f : sx -> sy) `{!IsUniformlyContinuous f mu_f} : Q -> CR :=
   λ x, y0 + int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x.
 
@@ -331,7 +331,9 @@ Qed.
 
 Program Definition f0 : UniformlyContinuous sx sy :=
   Build_UniformlyContinuous (λ x, y0) (λ e, Qinf.infinite) _.
-Next Obligation. apply mspc_refl; solve_propholds. Qed.
+Next Obligation.
+ eapply (mspc_refl (X:=CR)).
+ solve_propholds. Qed.
 
 Next Obligation.
 constructor.
@@ -430,10 +432,12 @@ In fact, [MetricSpaceBall (UniformlyContinuous sx sy)] worked fine. *)
 Theorem f_fixpoint : picard x0 y0 rx ry v f = f.
 Proof. apply ode_solution. Qed.
 
-Definition picard_iter (n : nat) := nat_iter n (picard x0 y0 rx ry v) (f0 x0 y0 rx ry).
+Definition picard_iter (n : nat) :=
+ iter_nat n _ (picard x0 y0 rx ry v) (f0 x0 y0 rx ry).
 
+(* (* This takes too long co compile. *)
 Definition answer (n : positive) (r : CR) : Z :=
- let m := (iter_pos n _ (Pmult 10) 1%positive) in
+ let m := (iter_pos n (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
  Zdiv a b.
 
@@ -445,10 +449,9 @@ change (0 <= 1 # 2)%Q. auto with qarith.
 Qed.
 
 (*
-(* native_compute needs 8.5 *)
-Time Eval vm_compute in (answer 2 (` (picard_iter 2 half))). (* 10 minutes *)
+Time Compute answer 2 (` (picard_iter 3 half)). (* 10 minutes *)
 Time Compute answer 1 (` (f half)). (* Too long *)
 *)
-
+*)
 End Computation.
 

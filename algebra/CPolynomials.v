@@ -1922,8 +1922,8 @@ Transparent cpoly_csetoid.
 
 Fixpoint cpoly_apply (p : RX) (x : CR) {struct p} : CR :=
   match p with
-  | cpoly_zero        => [0]
-  | cpoly_linear c p1 => c[+]x[*]cpoly_apply p1 x
+  | cpoly_zero _ => [0]
+  | cpoly_linear _ c p1 => c[+]x[*]cpoly_apply p1 x
   end.
 
 Lemma cpoly_apply_strext : bin_fun_strext _ _ _ cpoly_apply.
@@ -2443,8 +2443,8 @@ Notation RX:= (cpoly_cring R).
 
 Fixpoint cpoly_diff (p : RX) : RX :=
 match p with
-| cpoly_zero => [0]
-| cpoly_linear c p1 => p1[+]([0][+X*](cpoly_diff p1))
+| cpoly_zero _ => [0]
+| cpoly_linear _ c p1 => p1[+]([0][+X*](cpoly_diff p1))
 end.
 
 Lemma cpoly_diff_strext : un_op_strext _ cpoly_diff.
@@ -2514,8 +2514,7 @@ Proof.
   reflexivity.
  intros [|a q].
   rewrite -> cm_rht_unit_unfolded.
-  change (cpoly_zero R) with ([0]:cpoly_cring R).
-  rewrite -> diff_zero; algebra.
+  change (cpoly_zero R) with ([0]:cpoly_cring R); algebra.
  change ((p[+]q)[+]cpoly_linear _ [0] (_D_ (p[+]q))[=]
    (p[+]cpoly_linear _ [0] (_D_ p))[+](q[+]cpoly_linear _ [0] (_D_ q))).
  do 3 rewrite -> poly_linear.
@@ -2605,8 +2604,8 @@ Notation SX := (cpoly_cring S).
 
 Fixpoint cpoly_map_fun (p:RX) : SX :=
 match p with
-| cpoly_zero => cpoly_zero _
-| cpoly_linear c p1 => cpoly_linear _ (f c) (cpoly_map_fun p1)
+| cpoly_zero _ => cpoly_zero _
+| cpoly_linear _ c p1 => cpoly_linear _ (f c) (cpoly_map_fun p1)
 end.
 
 Lemma cpoly_map_strext : fun_strext cpoly_map_fun.

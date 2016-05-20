@@ -38,6 +38,7 @@
 
 Require Export CoRN.model.structures.Nsec.
 Require Import Coq.Arith.Arith.
+Require Import Coq.omega.Omega.
 
 (**
 ** [Npos]

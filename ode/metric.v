@@ -546,7 +546,7 @@ constructor.
 Qed.
 
 (* [ExtMetricSpaceClass X] is needed for rewriting *)
-Global Instance id_lip `{ExtMetricSpaceClass X} : IsLipschitz id 1.
+Global Instance id_lip `{ExtMetricSpaceClass X} : IsLipschitz Datatypes.id 1.
 Proof.
 constructor; [solve_propholds |]. intros; now rewrite mult_1_l.
 Qed.

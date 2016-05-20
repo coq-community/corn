@@ -1723,7 +1723,7 @@ Proof.
  unfold FinEnum_map_modulus.
  case_eq (mu f ((1#4)*d1)).
   intros d Hd.
-  apply: almostIn_map2;[|apply H].
+  apply: almostIn_map2; [|apply H].
   rewrite Hd.
   apply: Qle_refl.
  intros H0.

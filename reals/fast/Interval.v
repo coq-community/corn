@@ -494,7 +494,7 @@ Lemma CompactIntervalQ_bonus_correct : forall e x,
 Proof.
  intros [e|] x H.
   simpl in H.
-  apply: UniformPartition_inside.
+  eapply UniformPartition_inside.
   apply H.
  elim H.
 Qed.

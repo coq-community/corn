@@ -140,8 +140,8 @@ Let RX := (cpoly R).
 
 Fixpoint flip (p : RX) : RX :=
   match p with
-  | cpoly_zero       => cpoly_zero _
-  | cpoly_linear c q => cpoly_inv _ (cpoly_linear _ c (flip q))
+  | cpoly_zero _     => cpoly_zero _
+  | cpoly_linear _ c q => cpoly_inv _ (cpoly_linear _ c (flip q))
   end.
 
 Lemma flip_poly : forall (p : RX) x, (flip p) ! x [=] [--]p ! ( [--]x).

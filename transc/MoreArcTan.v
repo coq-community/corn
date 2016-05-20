@@ -297,7 +297,7 @@ Proof.
    rational.
   elimtype False.
   refine (eq_imp_not_ap _ [--][1] [1] _ _).
-   now stepr x.
+  1: now stepr x.
   apply ap_symmetric.
   apply zero_minus_apart.
   rstepl (Two:IR).

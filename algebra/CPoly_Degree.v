@@ -64,6 +64,9 @@ is always [1] higher than the `degree' (assuming that the highest
 coefficient is [[#][0]])!
 *)
 
+Implicit Arguments cpoly_zero [CR].
+Implicit Arguments cpoly_linear [CR].
+
 Fixpoint lth_of_poly (p : RX) : nat :=
   match p with
   | cpoly_zero       => 0
@@ -215,14 +218,14 @@ Lemma Sum_degree_le : forall (f : nat -> RX) (n k l : nat), k <= S l ->
 Proof.
  unfold degree_le in |- *. intros. induction  l as [| l Hrecl]; intros.
  generalize (toCle _ _ H); clear H; intro H.
-  inversion H as [|m0 X].
+  inversion H as [|m0 X]. 
    unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
-   apply eq_transitive_unfolded with (nth_coeff m ([0]:RX)).
+   apply eq_transitive with (nth_coeff m ([0]:RX)).
     apply nth_coeff_wd. algebra. algebra.
-    inversion X. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
-  apply eq_transitive_unfolded with (nth_coeff m (f 0)).
+    inversion X. rename H3 into kis0. unfold Sum in |- *. unfold Sum1 in |- *. simpl in |- *.
+  apply eq_transitive with (nth_coeff m (f 0)).
    apply nth_coeff_wd. cut (f 0[-][0] [=] f 0). auto. algebra.
-   apply H0; try auto. rewrite H2. auto.
+   apply H0; try auto. rewrite kis0; auto.
   elim (le_lt_eq_dec _ _ H); intro y.
   apply eq_transitive_unfolded with (nth_coeff m (Sum k l f[+]f (S l))).
    apply nth_coeff_wd. algebra.

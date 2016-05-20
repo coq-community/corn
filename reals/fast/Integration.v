@@ -364,10 +364,10 @@ Proof.
  do 2 rewrite -> X.
  rewrite -> StepFSupBallGlueGlue.
  split.
-  apply: ball_weak_le;[|simpl; apply H0].
+  eapply ball_weak_le;[|simpl; apply H0].
   autorewrite with QposElim.
   apply Qplus_le_compat; apply Qmax_ub_l.
- apply: ball_weak_le;[|simpl; apply H1].
+ eapply ball_weak_le;[|simpl; apply H1].
  autorewrite with QposElim.
  apply Qplus_le_compat; apply Qmax_ub_r.
 Qed.

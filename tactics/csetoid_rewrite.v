@@ -174,10 +174,10 @@ Inductive tot_set_exp (S:CSetoid) : CSetoid -> Type :=
 
 Fixpoint tse_int (S T:CSetoid) (r:S) (e:tot_set_exp S T) {struct e} : T :=
   match e with
-  | tse_var => r
-  | tse_fun T1 T2 f e0 => f (tse_int S T1 r e0)
-  | tse_bfun T1 T2 T3 f e1 e2 => f (tse_int S T1 r e1) (tse_int S T2 r e2)
-  | tse_con T t => t
+  | tse_var _ => r
+  | tse_fun _ T1 T2 f e0 => f (tse_int S T1 r e0)
+  | tse_bfun _ T1 T2 T3 f e1 e2 => f (tse_int S T1 r e1) (tse_int S T2 r e2)
+  | tse_con _ T t => t
   end.
 
 (** [tse_int] is well-defined. *)
@@ -202,25 +202,25 @@ replaced later on) is mapped to [(tse_var r)]. Other `leafs' [t0:T'] of [t]
 are mapped to [(tse_con S T' t0)]. *)
 
 Ltac tse_quote S T r t :=
-  match constr:t with
+  match constr:(t) with
   | r => constr:(tse_var S)
   | (csf_fun ?X1 ?X2 ?X3 ?X4) =>
-      let T1 := constr:X1
-      with T2 := constr:X2
-      with f := constr:X3
-      with t0 := constr:X4 in
+      let T1 := constr:(X1)
+      with T2 := constr:(X2)
+      with f := constr:(X3)
+      with t0 := constr:(X4) in
       let e := tse_quote S T1 r t0 in
       constr:(tse_fun S T1 T2 f e)
   | (csbf_fun ?X1 ?X2 ?X3 ?X4 ?X5 ?X6) =>
-      let T1 := constr:X1
-      with T2 := constr:X2
-      with T3 := constr:X3
-      with f := constr:X4
-      with t1 := constr:X5
-      with t2 := constr:X6 in
+      let T1 := constr:(X1)
+      with T2 := constr:(X2)
+      with T3 := constr:(X3)
+      with f := constr:(X4)
+      with t1 := constr:(X5)
+      with t2 := constr:(X6) in
       let e1 := tse_quote S T1 r t1 with e2 := tse_quote S T2 r t2 in
       constr:(tse_bfun S T1 T2 T3 f e1 e2)
-  | ?X1 => let t0 := constr:X1 in
+  | ?X1 => let t0 := constr:(X1) in
            constr:(tse_con S T t0)
   end.
 
@@ -229,91 +229,91 @@ Ltac tse_quote S T r t :=
 replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 
 Ltac tot_repl_in_form S r1 r2 A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred ?X1 ?X2 ?X3) =>
-      let T := constr:X1 with P := constr:X2 with t := constr:X3 in
+      let T := constr:(X1) with P := constr:(X2) with t := constr:(X3) in
       let e := tse_quote S T r1 t in
       let r := constr:(tse_int S T r2 e) in
       constr:(P r)
   | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
       constr:(R r1 r2)
   | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
       constr:(R r1 r2)
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
       constr:(cs_eq (r:=T) r1 r2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let r1 := constr:(tse_int S T r2 e1)
       with r2 := constr:(tse_int S T r2 e2) in
       constr:(cs_ap (c:=T) r1 r2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 -> B2)
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 /\ B2)
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 and B2)
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 \/ B2)
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 or B2)
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(B1 <-> B2)
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let B1 := tot_repl_in_form S r1 r2 A1
       with B2 := tot_repl_in_form S r1 r2 A2 in
       constr:(Iff B1 B2)
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let B0 := tot_repl_in_form S r1 r2 A0 in
       constr:(~ B0)
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let B0 := tot_repl_in_form S r1 r2 A0 in
       constr:(Not B0)
 (*  | (CNot ?X1) =>
       let A0 := constr:X1 in
       let B0 := tot_repl_in_form S r1 r2 A0 in
       constr:(CNot B0)*)
-  | ?X1 => let A0 := constr:X1 in
-           constr:A0
+  | ?X1 => let A0 := constr:(X1) in
+           constr:(A0)
   end.
 
 (**
@@ -325,19 +325,19 @@ iterated application of [eq_symmetric].
 *)
 
 Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred ?X1 ?X2 ?X3) =>
-      let T := constr:X1 with P := constr:X2 with t := constr:X3 in
+      let T := constr:(X1) with P := constr:(X2) with t := constr:(X3) in
       let e := tse_quote S T r1 t in
       let s := constr:(tse_int S T r1 e)
       with r := constr:(tse_int S T r2 e)
       with d := constr:(tse_int_wd S T r1 r2 h e) in
       constr:(fun a:P s => csp_wd T P s r a d)
   | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -347,10 +347,10 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
       constr:(fun a:R s1 s2 => csr_wd T R s1 s2 r1 r2 a d1 d2)
   | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -360,7 +360,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
       constr:(fun a:R s1 s2 => Ccsr_wd T R s1 s2 r1 r2 a d1 d2)
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -370,7 +370,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
       constr:(fun a:cs_eq (r:=T) s1 s2 => eq_wd T s1 s2 r1 r2 a d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -380,36 +380,36 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r1 r2 h e2) in
       constr:(fun a:cs_ap (c:=T) s1 s2 => ap_wd T s1 s2 r1 r2 a d1 d2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A2
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A1 in
       constr:(fun (p:A1 -> A2) b => d1 (p (d2 b)))
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
       constr:(fun p:A1 /\ A2 => conj (d1 (fst p)) (d2 (snd p)))
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
       constr:(fun p:A1 and A2 =>
                 pair _ _ (d1 (CAnd_proj1 _ _ p))
                   (d2 (CAnd_proj2 _ _ p)))
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
       constr:(or_ind (fun a => or_introl _ (d1 a))
                 (fun a => or_intror _ (d2 a)))
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf1 S r1 r2 h h0 A2 in
       constr:(COr_elim A1 A2 _ (fun a => inl _ _ (d1 a))
                 (fun a => inr _ _ (d2 a)))
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with ab2 := tot_set_rewr_prf1 S r1 r2 h h0 A2
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
@@ -418,7 +418,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
                 conj (fun b1 => ab2 (fst p (ba1 b1)))
                   (fun b2 => ab1 (snd p (ba2 b2))))
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with ab2 := tot_set_rewr_prf1 S r1 r2 h h0 A2
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
@@ -427,34 +427,34 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
                 pair (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
                   (fun b2 => ab1 (CAnd_proj2 _ _ p (ba2 b2))))
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := tot_set_rewr_prf2 S r1 r2 h h0 A0 in
       constr:(fun (p:~ A0) b => p (d b))
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := tot_set_rewr_prf2 S r1 r2 h h0 A0 in
       constr:(fun (p:Not A0) b => p (d b))
 (*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf2 S r1 r2 h h0 A0 in
       constr:(fun (p:CNot A0) b => p (d b)) *)
-  | ?X1 => let A0 := constr:X1 in
+  | ?X1 => let A0 := constr:(X1) in
            constr:(fun a:A0 => a)
   end
  with tot_set_rewr_prf2 S r1 r2 h h0 A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred ?X1 ?X2 ?X3) =>
-      let T := constr:X1 with P := constr:X2 with t := constr:X3 in
+      let T := constr:(X1) with P := constr:(X2) with t := constr:(X3) in
       let e := tse_quote S T r1 t in
       let s := constr:(tse_int S T r1 e)
       with r := constr:(tse_int S T r2 e)
       with d := constr:(tse_int_wd S T r2 r1 h0 e) in
       constr:(fun b:P r => csp_wd T P r s b d)
   | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -464,10 +464,10 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
       constr:(fun b:R r1 r2 => csr_wd T R r1 r2 s1 s2 b d1 d2)
   | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -477,7 +477,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
       constr:(fun b:R r1 r2 => Ccsr_wd T R r1 r2 s1 s2 b d1 d2)
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -487,7 +487,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
       constr:(fun b:cs_eq (r:=T) r1 r2 => eq_wd T r1 r2 s1 s2 b d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := tse_quote S T r1 t1 with e2 := tse_quote S T r1 t2 in
       let s1 := constr:(tse_int S T r1 e1)
       with s2 := constr:(tse_int S T r1 e2)
@@ -497,36 +497,36 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
       with d2 := constr:(tse_int_wd S T r2 r1 h0 e2) in
       constr:(fun b:cs_ap (c:=T) r1 r2 => ap_wd T r1 r2 s1 s2 b d1 d2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q (a:A1) => d2 (q (d1 a)))
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q:_ /\ _ => conj (d1 (fst q)) (d2 (snd q)))
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(fun q:_ and _ =>
                 @pair A1 A2 (d1 (CAnd_proj1 _ _ q))
                   (d2 (CAnd_proj2 _ _ q)))
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(or_ind (fun b => or_introl A2 (d1 b))
                 (fun b => or_intror A1 (d2 b)))
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
       with d2 := tot_set_rewr_prf2 S r1 r2 h h0 A2 in
       constr:(COr_elim _ _ (A1 or A2) (fun b => inl A1 A2 (d1 b))
                 (fun b => inr A1 A2 (d2 b)))
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with ab2 := tot_set_rewr_prf1 S r1 r2 h h0 A2
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
@@ -535,7 +535,7 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
                 conj (fun a1:A1 => ba2 (fst q (ab1 a1)))
                   (fun a2:A2 => ba1 (snd q (ab2 a2))))
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := tot_set_rewr_prf1 S r1 r2 h h0 A1
       with ab2 := tot_set_rewr_prf1 S r1 r2 h h0 A2
       with ba1 := tot_set_rewr_prf2 S r1 r2 h h0 A1
@@ -544,31 +544,31 @@ Ltac tot_set_rewr_prf1 S r1 r2 h h0 A :=
                 pair (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
                   (fun a2:A2 => ba1 (CAnd_proj2 _ _ q (ab2 a2))))
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := tot_set_rewr_prf1 S r1 r2 h h0 A0 in
       constr:(fun (q:~ _) (a:A0) => q (d a))
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := tot_set_rewr_prf1 S r1 r2 h h0 A0 in
       constr:(fun (q:Not _) (a:A0) => q (d a))
 (*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := tot_set_rewr_prf1 S r1 r2 h h0 A0 in
       constr:(fun (q:CNot _) (a:A0) => q (d a))*)
-  | ?X1 => let A0 := constr:X1 in
+  | ?X1 => let A0 := constr:(X1) in
            constr:(fun a:A0 => a)
   end.
 
 (* rewrite -> h *)
 Ltac total_csetoid_rewrite h :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
+      let S := constr:(X1) with r1 := constr:(X2) with r2 := constr:(X3) in
       let h0 := constr:(eq_symmetric S r1 r2 h) in
       match goal with
       |  |- ?X1 =>
-          let A := constr:X1 in
+          let A := constr:(X1) in
           let B := tot_repl_in_form S r1 r2 A
           with d := tot_set_rewr_prf2 S r1 r2 h h0 A in
           ((*:B->A*) cut B; [ exact d | unfold tse_int in |- * ])
@@ -578,13 +578,13 @@ Ltac total_csetoid_rewrite h :=
 (* rewrite <- h *)
 Ltac total_csetoid_rewrite_rev h :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
+      let S := constr:(X1) with r2 := constr:(X2) with r1 := constr:(X3) in
       let h0 := constr:(eq_symmetric S r2 r1 h) in
       match goal with
       |  |- ?X1 =>
-          let A := constr:X1 in
+          let A := constr:(X1) in
           let B := tot_repl_in_form S r1 r2 A
           with d := tot_set_rewr_prf2 S r1 r2 h0 h A in
           ((*:B->A*) cut B; [ exact d | unfold tse_int in |- * ])
@@ -594,9 +594,9 @@ Ltac total_csetoid_rewrite_rev h :=
 (* rewrite -> h in h0 *)
 Ltac total_csetoid_rewrite_cxt h h0 :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let S := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
+      let S := constr:(X1) with r1 := constr:(X2) with r2 := constr:(X3) in
       let h1 := constr:(eq_symmetric S r1 r2 h) with A := typeof h0 in
       let B := tot_repl_in_form S r1 r2 A
       with d := tot_set_rewr_prf1 S r1 r2 h h1 A in
@@ -607,9 +607,9 @@ Ltac total_csetoid_rewrite_cxt h h0 :=
 (* rewrite <- h in h0 *)
 Ltac total_csetoid_rewrite_cxt_rev h h0 :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let S := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
+      let S := constr:(X1) with r2 := constr:(X2) with r1 := constr:(X3) in
       let h1 := constr:(eq_symmetric S r2 r1 h) with A := typeof h0 in
       let B := tot_repl_in_form S r1 r2 A
       with d := tot_set_rewr_prf1 S r1 r2 h1 h A in
@@ -645,12 +645,12 @@ Inductive my_sigT (A:Type) (P:A -> Type) : Type :=
 
 Definition proj1_my_sigT (A:Type) (P:A -> Type) (e:my_sigT A P) :=
   match e with
-  | my_existT a b => a
+  | my_existT _ _ a b => a
   end.
 
 Definition proj2_my_sigT (A:Type) (P:A -> Type) (e:my_sigT A P) :=
   match e return P (proj1_my_sigT A P e) with
-  | my_existT a b => b
+  | my_existT _ _ a b => b
   end.
 
 Set Implicit Arguments.
@@ -715,10 +715,10 @@ extracts the syntactical component from heavy expressions. *)
 Fixpoint forget (t:T) (e:part_set_xexp t) {struct e} : part_set_exp :=
   match e with
   | psxe_var => pse_var
-  | psxe_uop F t0 e0 => pse_uop F (forget e0)
-  | psxe_bop F t1 t2 e1 e2 => pse_bop F (forget e1) (forget e2)
-  | psxe_pop F t0 H e0 => pse_pop F (forget e0)
-  | psxe_con t => pse_con t
+  | @psxe_uop F t0 e0 => pse_uop F (forget e0)
+  | @psxe_bop F t1 t2 e1 e2 => pse_bop F (forget e1) (forget e2)
+  | @psxe_pop F t0 H e0 => pse_pop F (forget e0)
+  | @psxe_con t => pse_con t
   end.
 
 (** The second extraction of an heavy expression is an interpretation
@@ -854,24 +854,24 @@ replaced later on) is mapped to [(psxe_var r)]. Other `leafs' [t0] of [t] are
 mapped to [(psxe_con r t0)]. *)
 
 Ltac psxe_quote r t :=
-  match constr:t with
+  match constr:(t) with
   | r => constr:(psxe_var r)
   | (csf_fun ?X1 ?X1 ?X2 ?X3) =>
-      let F := constr:X2 with t0 := constr:X3 in
+      let F := constr:(X2) with t0 := constr:(X3) in
       let e := psxe_quote r t0 in
       constr:(psxe_uop F e)
   | (csbf_fun ?X1 ?X1 ?X1 ?X2 ?X3 ?X4) =>
-      let F := constr:X2 with t1 := constr:X3 with t2 := constr:X4 in
+      let F := constr:(X2) with t1 := constr:(X3) with t2 := constr:(X4) in
       let e1 := psxe_quote r t1 with e2 := psxe_quote r t2 in
       constr:(psxe_bop F e1 e2)
       (*
         | [(cspf_fun ?1 ?1 ?2 ?3 ?4)] ->
       *)
   | (Part ?X2 ?X3 ?X4) =>
-      let F := constr: (*1*) X2 with t0 := constr:X3 with Ht0 := constr:X4 in
+      let F := constr: (*1*) (X2) with t0 := constr:(X3) with Ht0 := constr:(X4) in
       let e := psxe_quote r t0 in
       constr:(psxe_pop (F:=F) Ht0 e)
-  | ?X1 => let t0 := constr:X1 in
+  | ?X1 => let t0 := constr:(X1) in
            constr:(psxe_con r t0)
   end.
 
@@ -880,18 +880,18 @@ replaces all occurrences of subterm [r1] in [A] by [r2]. *)
 
 Ltac part_repl_in_form H A :=
   let type_of_H := typeof H in
-  match constr:type_of_H with
+  match constr:(type_of_H) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let r1 := constr:X2 with r2 := constr:X3 in
-      match constr:A with
+      let r1 := constr:(X2) with r2 := constr:(X3) in
+      match constr:(A) with
       | (csp_pred ?X1 ?X2 ?X3) =>
-          let P := constr:X2 with t := constr:X3 in
+          let P := constr:(X2) with t := constr:(X3) in
           let e := psxe_quote r1 t in
           let Ht := constr:(extract_correct e) in
           let s := constr:(replace_in_term H Ht) in
           constr:(P s)
       | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-          let R := constr:X2 with t1 := constr:X3 with t2 := constr:X4 in
+          let R := constr:(X2) with t1 := constr:(X3) with t2 := constr:(X4) in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
           let Ht1 := constr:(extract_correct e1)
           with Ht2 := constr:(extract_correct e2) in
@@ -899,7 +899,7 @@ Ltac part_repl_in_form H A :=
           with s2 := constr:(replace_in_term H Ht2) in
           constr:(R s1 s2)
       | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-          let R := constr:X2 with t1 := constr:X3 with t2 := constr:X4 in
+          let R := constr:(X2) with t1 := constr:(X3) with t2 := constr:(X4) in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
           let Ht1 := constr:(extract_correct e1)
           with Ht2 := constr:(extract_correct e2) in
@@ -907,7 +907,7 @@ Ltac part_repl_in_form H A :=
           with s2 := constr:(replace_in_term H Ht2) in
           constr:(R s1 s2)
       | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-          let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+          let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
           let Ht1 := constr:(extract_correct e1)
           with Ht2 := constr:(extract_correct e2) in
@@ -915,7 +915,7 @@ Ltac part_repl_in_form H A :=
           with s2 := constr:(replace_in_term H Ht2) in
           constr:(cs_eq (r:=T) s1 s2)
       | (cs_ap (c:=?X1) ?X2 ?X3) =>
-          let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+          let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
           let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
           let Ht1 := constr:(extract_correct e1)
           with Ht2 := constr:(extract_correct e2) in
@@ -923,47 +923,47 @@ Ltac part_repl_in_form H A :=
           with s2 := constr:(replace_in_term H Ht2) in
           constr:(cs_ap (c:=T) s1 s2)
       | (?X1 -> ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 -> B2)
       | (?X1 /\ ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 /\ B2)
       | (?X1 and ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 and B2)
       | (?X1 \/ ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 \/ B2)
       | (?X1 or ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 or B2)
       | (?X1 <-> ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(B1 <-> B2)
       | (Iff ?X1 ?X2) =>
-          let A1 := constr:X1 with A2 := constr:X2 in
+          let A1 := constr:(X1) with A2 := constr:(X2) in
           let B1 := part_repl_in_form H A1 with B2 := part_repl_in_form H A2 in
           constr:(Iff B1 B2)
       | (~ ?X1) =>
-          let A0 := constr:X1 in
+          let A0 := constr:(X1) in
           let B0 := part_repl_in_form H A0 in
           constr:(~ B0)
       | (Not ?X1) =>
-          let A0 := constr:X1 in
+          let A0 := constr:(X1) in
           let B0 := part_repl_in_form H A0 in
           constr:(Not B0)
 (*      | (CNot ?X1) =>
           let A0 := constr:X1 in
           let B0 := part_repl_in_form H A0 in
           constr:(CNot B0)*)
-      | ?X1 => let A0 := constr:X1 in
-               constr:A0
+      | ?X1 => let A0 := constr:(X1) in
+               constr:(A0)
       end
   end.
 
@@ -976,9 +976,9 @@ iterated application of [eq_symmetric].
 *)
 
 Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred ?X1 ?X2 ?X3) =>
-      let T := constr:X1 with P := constr:X2 with t := constr:X3 in
+      let T := constr:(X1) with P := constr:(X2) with t := constr:(X3) in
       let e := psxe_quote r1 t in
       let Ht := constr:(extract_correct e) in
       let s := constr:(replace_in_term H Ht)
@@ -986,10 +986,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d := constr:(pse_int_wd H Ht Hs) in
       constr:(fun a:P t => csp_wd T P t s a d)
   | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1001,10 +1001,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
       constr:(fun a:R t1 t2 => csr_wd T R t1 t2 s1 s2 a d1 d2)
   | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1016,7 +1016,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
       constr:(fun a:R t1 t2 => Ccsr_wd T R t1 t2 s1 s2 a d1 d2)
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1028,7 +1028,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
       constr:(fun a:cs_eq (r:=T) t1 t2 => eq_wd T t1 t2 s1 s2 a d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1040,36 +1040,36 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H Ht2 Hs2) in
       constr:(fun a:cs_ap (c:=T) t1 t2 => ap_wd T t1 t2 s1 s2 a d1 d2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A2
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A1 in
       constr:(fun (p:A1 -> A2) b => d1 (p (d2 b)))
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
       constr:(fun p:A1 /\ A2 => conj (d1 (fst p)) (d2 (snd p)))
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
       constr:(fun p:A1 and A2 =>
                 pair (d1 (CAnd_proj1 _ _ p))
                   (d2 (CAnd_proj2 _ _ p)))
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
       constr:(or_ind (fun a => or_introl _ (d1 a))
                 (fun a => or_intror _ (d2 a)))
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf1 r1 r2 H H0 A2 in
       constr:(COr_elim A1 A2 _ (fun a => inl _ _ (d1 a))
                 (fun a => inr _ _ (d2 a)))
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with ab2 := part_set_rewr_prf1 r1 r2 H H0 A2
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
@@ -1078,7 +1078,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
                 conj (fun b1 => ab2 (fst p (ba1 b1)))
                   (fun b2 => ab1 (snd p (ba2 b2))))
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with ab2 := part_set_rewr_prf1 r1 r2 H H0 A2
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
@@ -1087,24 +1087,24 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
                 pair (fun b1 => ab2 (CAnd_proj1 _ _ p (ba1 b1)))
                   (fun b2 => ab1 (CAnd_proj2 _ _ p (ba2 b2))))
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := part_set_rewr_prf2 r1 r2 H H0 A0 in
       constr:(fun (p:~ A0) b => p (d b))
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := part_set_rewr_prf2 r1 r2 H H0 A0 in
       constr:(fun (p:Not A0) b => p (d b))
 (*   | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := part_set_rewr_prf2 r1 r2 H H0 A0 in
       constr:(fun (p:CNot A0) b => p (d b))*)
-  | ?X1 => let A0 := constr:X1 in
+  | ?X1 => let A0 := constr:(X1) in
            constr:(fun a:A0 => a)
   end
  with part_set_rewr_prf2 r1 r2 H H0 A :=
-  match constr:A with
+  match constr:(A) with
   | (csp_pred ?X1 ?X2 ?X3) =>
-      let T := constr:X1 with P := constr:X2 with t := constr:X3 in
+      let T := constr:(X1) with P := constr:(X2) with t := constr:(X3) in
       let e := psxe_quote r1 t in
       let Ht := constr:(extract_correct e) in
       let s := constr:(replace_in_term H Ht)
@@ -1112,10 +1112,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       let d := constr:(pse_int_wd H0 Hs Ht) in
       constr:(fun b:P s => csp_wd T P s t b d)
   | (csr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1127,10 +1127,10 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
       constr:(fun b:R s1 s2 => csr_wd T R s1 s2 t1 t2 b d1 d2)
   | (Ccsr_rel ?X1 ?X2 ?X3 ?X4) =>
-      let T := constr:X1
-      with R := constr:X2
-      with t1 := constr:X3
-      with t2 := constr:X4 in
+      let T := constr:(X1)
+      with R := constr:(X2)
+      with t1 := constr:(X3)
+      with t2 := constr:(X4) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1142,7 +1142,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
       constr:(fun b:R s1 s2 => Ccsr_wd T R s1 s2 t1 t2 b d1 d2)
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1154,7 +1154,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
       constr:(fun b:cs_eq (r:=T) s1 s2 => eq_wd T s1 s2 t1 t2 b d1 d2)
   | (cs_ap (c:=?X1) ?X2 ?X3) =>
-      let T := constr:X1 with t1 := constr:X2 with t2 := constr:X3 in
+      let T := constr:(X1) with t1 := constr:(X2) with t2 := constr:(X3) in
       let e1 := psxe_quote r1 t1 with e2 := psxe_quote r1 t2 in
       let Ht1 := constr:(extract_correct e1)
       with Ht2 := constr:(extract_correct e2) in
@@ -1166,36 +1166,36 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
       with d2 := constr:(pse_int_wd H0 Hs2 Ht2) in
       constr:(fun b:cs_ap (c:=T) s1 s2 => ap_wd T s1 s2 t1 t2 b d1 d2)
   | (?X1 -> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q (a:A1) => d2 (q (d1 a)))
   | (?X1 /\ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q:_ /\ _ => conj (d1 (fst q)) (d2 (snd q)))
   | (?X1 and ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(fun q:_ and _ =>
                 @pair A1 A2 (d1 (CAnd_proj1 _ _ q))
                   (d2 (CAnd_proj2 _ _ q)))
   | (?X1 \/ ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(or_ind (fun b => or_introl A2 (d1 b))
                 (fun b => or_intror A1 (d2 b)))
   | (?X1 or ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let d1 := part_set_rewr_prf2 r1 r2 H H0 A1
       with d2 := part_set_rewr_prf2 r1 r2 H H0 A2 in
       constr:(COr_elim _ _ (A1 or A2) (fun b => inl A1 A2 (d1 b))
                 (fun b => inr A1 A2 (d2 b)))
   | (?X1 <-> ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with ab2 := part_set_rewr_prf1 r1 r2 H H0 A2
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
@@ -1204,7 +1204,7 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
                 conj (fun a1:A1 => ba2 (fst q (ab1 a1)))
                   (fun a2:A2 => ba1 (snd q (ab2 a2))))
   | (Iff ?X1 ?X2) =>
-      let A1 := constr:X1 with A2 := constr:X2 in
+      let A1 := constr:(X1) with A2 := constr:(X2) in
       let ab1 := part_set_rewr_prf1 r1 r2 H H0 A1
       with ab2 := part_set_rewr_prf1 r1 r2 H H0 A2
       with ba1 := part_set_rewr_prf2 r1 r2 H H0 A1
@@ -1213,18 +1213,18 @@ Ltac part_set_rewr_prf1 r1 r2 H H0 A :=
                 pair (fun a1:A1 => ba2 (CAnd_proj1 _ _ q (ab1 a1)))
                   (fun a2:A2 => ba1 (CAnd_proj2 _ _ q (ab2 a2))))
   | (~ ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := part_set_rewr_prf1 r1 r2 H H0 A0 in
       constr:(fun (q:~ _) (a:A0) => q (d a))
   | (Not ?X1) =>
-      let A0 := constr:X1 in
+      let A0 := constr:(X1) in
       let d := part_set_rewr_prf1 r1 r2 H H0 A0 in
       constr:(fun (q:Not _) (a:A0) => q (d a))
 (*  | (CNot ?X1) =>
       let A0 := constr:X1 in
       let d := part_set_rewr_prf1 r1 r2 H H0 A0 in
       constr:(fun (q:CNot _) (a:A0) => q (d a)) *)
-  | ?X1 => let A0 := constr:X1 in
+  | ?X1 => let A0 := constr:(X1) in
            constr:(fun a:A0 => a)
   end.
 
@@ -1235,13 +1235,13 @@ Ltac Unfold_partial_csetoid_rewrite_stuff :=
 (* rewrite -> h *)
 Ltac partial_csetoid_rewrite h :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
+      let T := constr:(X1) with r1 := constr:(X2) with r2 := constr:(X3) in
       let h0 := constr:(eq_symmetric T r1 r2 h) in
       match goal with
       |  |- ?X1 =>
-          let A := constr:X1 in
+          let A := constr:(X1) in
           let B := part_repl_in_form h A
           with d := part_set_rewr_prf2 r1 r2 h h0 A in
           ((*:B->A*) cut B; [ exact d | Unfold_partial_csetoid_rewrite_stuff ])
@@ -1251,13 +1251,13 @@ Ltac partial_csetoid_rewrite h :=
 (* rewrite <- h *)
 Ltac partial_csetoid_rewrite_rev h :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
+      let T := constr:(X1) with r2 := constr:(X2) with r1 := constr:(X3) in
       let h0 := constr:(eq_symmetric T r2 r1 h) in
       match goal with
       |  |- ?X1 =>
-          let A := constr:X1 in
+          let A := constr:(X1) in
           let B := part_repl_in_form h A
           with d := part_set_rewr_prf2 r1 r2 h0 h A in
           ((*:B->A*) cut B; [ exact d | Unfold_partial_csetoid_rewrite_stuff ])
@@ -1267,9 +1267,9 @@ Ltac partial_csetoid_rewrite_rev h :=
 (* rewrite -> h in h0 *)
 Ltac partial_csetoid_rewrite_cxt h h0 :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with r1 := constr:X2 with r2 := constr:X3 in
+      let T := constr:(X1) with r1 := constr:(X2) with r2 := constr:(X3) in
       let h1 := constr:(eq_symmetric T r1 r2 h) with A := typeof h0 in
       let B := part_repl_in_form h A
       with d := part_set_rewr_prf1 r1 r2 h h1 A in
@@ -1281,9 +1281,9 @@ Ltac partial_csetoid_rewrite_cxt h h0 :=
 (* rewrite <- h in h0 *)
 Ltac partial_csetoid_rewrite_cxt_rev h h0 :=
   let type_of_h := typeof h in
-  match constr:type_of_h with
+  match constr:(type_of_h) with
   | (cs_eq (r:=(cs_crr ?X1)) ?X2 ?X3) =>
-      let T := constr:X1 with r2 := constr:X2 with r1 := constr:X3 in
+      let T := constr:(X1) with r2 := constr:(X2) with r1 := constr:(X3) in
       let h1 := constr:(eq_symmetric T r2 r1 h) with A := typeof h0 in
       let B := part_repl_in_form h A
       with d := part_set_rewr_prf1 r1 r2 h1 h A in
@@ -1308,14 +1308,14 @@ Ltac partial_setoid_replace_cxt x y h :=
 Require Export Coq.Bool.Bool.
 
 Ltac term_cont_part t :=
-  match constr:t with
-  | (Part _ _ _) => constr:true
+  match constr:(t) with
+  | (Part _ _ _) => constr:(true)
   | (csf_fun _ _ _ ?X4) =>
-      let t0 := constr:X4 in
+      let t0 := constr:(X4) in
       let b := term_cont_part t0 in
       constr:b
   | (csbf_fun _ _ _ _ ?X5 ?X6) =>
-      let t1 := constr:X5 with t2 := constr:X6 in
+      let t1 := constr:(X5) with t2 := constr:(X6) in
       let b1 := term_cont_part t1 with b2 := term_cont_part t2 in
       constr:(orb b1 b2)
   | _ => constr:false
