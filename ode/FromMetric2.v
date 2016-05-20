@@ -1,8 +1,8 @@
-Require Import metric2.Complete metric2.Metric metric.
+Require Import CoRN.metric2.Complete CoRN.metric2.Metric CoRN.ode.metric.
 
 Require Import
-  abstract_algebra stdlib_rationals
-  orders.orders orders.semirings orders.rings theory.rings.
+  MathClasses.interfaces.abstract_algebra MathClasses.implementations.stdlib_rationals
+  MathClasses.orders.orders MathClasses.orders.semirings MathClasses.orders.rings MathClasses.theory.rings.
 
 Import Qinf.notations.
 
@@ -87,7 +87,7 @@ Qed.
 
 End FromCompleteMetricSpace.
 
-Require Import CRmetric.
+Require Import CoRN.model.metric2.CRmetric.
 
 Section CompleteSegment.
 
@@ -122,7 +122,7 @@ Qed.
 
 End CompleteSegment.
 
-Require Import Qsetoid Qmetric CRArith CRball CRabs abs minmax.
+Require Import CoRN.model.setoids.Qsetoid CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith CoRN.reals.fast.CRball CoRN.reals.fast.CRabs MathClasses.theory.abs MathClasses.orders.minmax.
 
 Add Ring CR : (stdlib_ring_theory CR).
 

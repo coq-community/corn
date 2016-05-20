@@ -37,7 +37,7 @@
 (** printing NRoot %\ensuremath{\sqrt[n]{\cdot}}% *)
 (** printing sqrt %\ensuremath{\sqrt{\cdot}}% *)
 
-Require Export OddPolyRootIR.
+Require Export CoRN.reals.OddPolyRootIR.
 
 (**
 * Roots of Real Numbers *)

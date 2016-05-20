@@ -1,8 +1,8 @@
 Require Import 
-  Program Ring Qdlog
-  Complete Prelength Qmetric CRmetric MetricMorphisms.
+  Coq.Program.Program Coq.setoid_ring.Ring CoRN.util.Qdlog
+  CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.model.metric2.CRmetric CoRN.metric2.MetricMorphisms.
 Require Export
-  ApproximateRationals.
+  CoRN.reals.faster.ApproximateRationals.
 
 Section AQmetric.
 Context `{AppRationals AQ}.

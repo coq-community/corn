@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Zmonoid.
-Require Import CGroups.
+Require Export CoRN.model.monoids.Zmonoid.
+Require Import CoRN.algebra.CGroups.
 
 (**
 ** Example of a group: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;#

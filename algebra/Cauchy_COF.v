@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export COrdCauchy.
-Require Export RingReflection.
+Require Export CoRN.algebra.COrdCauchy.
+Require Export CoRN.tactics.RingReflection.
 
 (**
 * The Field of Cauchy Sequences

@@ -1,10 +1,10 @@
 Require Import
-  List NPeano
-  QArith Qabs Qpossec Qmetric
-  Program
-  stdlib_omissions.N
-  stdlib_omissions.Z
-  stdlib_omissions.Q.
+  CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano
+  Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.model.metric2.Qmetric
+  Coq.Program.Program
+  CoRN.stdlib_omissions.N
+  CoRN.stdlib_omissions.Z
+  CoRN.stdlib_omissions.Q.
 
 Set Automatic Introduction.
 Set Automatic Introduction.

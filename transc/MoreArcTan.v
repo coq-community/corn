@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export InvTrigonom.
-Require Import CornTac.
+Require Export CoRN.transc.InvTrigonom.
+Require Import CoRN.tactics.CornTac.
 
 (** Various properties of ArcTangent.*)
 
@@ -297,7 +297,7 @@ Proof.
    rational.
   elimtype False.
   refine (eq_imp_not_ap _ [--][1] [1] _ _).
-  2: now stepr x.
+  1: now stepr x.
   apply ap_symmetric.
   apply zero_minus_apart.
   rstepl (Two:IR).

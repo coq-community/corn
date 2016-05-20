@@ -33,9 +33,9 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
-Require Export CMonoids.
+Require Export CoRN.algebra.CMonoids.
 
-Require Import SetoidPermutation Setoid Morphisms.
+Require Import CoRN.util.SetoidPermutation Coq.Setoids.Setoid Coq.Classes.Morphisms.
 
 Section Abelian_Monoids.
 

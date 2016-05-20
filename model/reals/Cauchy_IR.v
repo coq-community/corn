@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qordfield.
-Require Export Cauchy_CReals.
+Require Export CoRN.model.ordfields.Qordfield.
+Require Export CoRN.reals.Cauchy_CReals.
 
 (**
 * Cauchy Real Numbers

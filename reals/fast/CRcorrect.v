@@ -19,13 +19,13 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Cauchy_IR.
-Require Import CornTac.
-Require Import Omega.
-Require Import Qmetric.
-Require Import QMinMax.
-Require Import Qabs.
-Require Export CRFieldOps.
+Require Import CoRN.model.reals.Cauchy_IR.
+Require Import CoRN.tactics.CornTac.
+Require Import Coq.omega.Omega.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import Coq.QArith.Qabs.
+Require Export CoRN.reals.fast.CRFieldOps.
 
 Set Automatic Introduction.
 

@@ -40,12 +40,12 @@
 (** printing QTWO %\ensuremath{2_\mathbb{Q}}% #2<sub>Q</sub># *)
 (** printing QFOUR %\ensuremath{4_\mathbb{Q}}% #4<sub>Q</sub># *)
 
-Require Export CLogic.
-Require Import Arith.
-Require Import Peano_dec.
-Require Import Zsec.
-Require Export QArith.
-Require Import stdlib_omissions.Q.
+Require Export CoRN.logic.CLogic.
+Require Import Coq.Arith.Arith.
+Require Import Coq.Arith.Peano_dec.
+Require Import CoRN.model.structures.Zsec.
+Require Export Coq.QArith.QArith.
+Require Import CoRN.stdlib_omissions.Q.
 
 Close Scope Q_scope.
 Open Local Scope Q_scope.

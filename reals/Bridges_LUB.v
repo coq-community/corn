@@ -44,8 +44,8 @@
 
 
 
-Require Export iso_CReals.
-Require Import Expon.
+Require Export CoRN.reals.iso_CReals.
+Require Import CoRN.algebra.Expon.
 
 Section LUBP.
 

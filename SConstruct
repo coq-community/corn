@@ -21,21 +21,21 @@ while nodes:
     nodes += glob.glob(node + '/*')
 
 includes = ' '.join(map(lambda x: '-I ' + x, dirs[1:]))
-Rs = '-R . CoRN -R math-classes/src MathClasses'
+Rs = '-R . CoRN'
 coqcmd = 'coqc ${str(SOURCE)[:-2]} ' + Rs
 
 env['COQFLAGS'] = Rs
 
 for node in vs: env.Coq(node, COQCMD=coqcmd)
+#mc_vs, mc_vos, mc_globs = env.SConscript(dirs='math-classes/src')
 
-mc_vs, mc_vos, mc_globs = env.SConscript(dirs='math-classes/src')
-
-os.system('coqdep ' + ' '.join(map(str, vs+mc_vs)) + ' ' + includes + ' ' + Rs + ' > deps')
+os.system('coqdep ' + ' '.join(map(str, vs)) + ' ' + includes + ' ' + Rs + ' > deps')
 ParseDepends('deps')
 
 open('coqidescript', 'w').write('#!/bin/sh\ncoqide ' + Rs + ' $@ \n')
 os.chmod('coqidescript', 0755)
+#env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name --coqlib http://coq.inria.fr/library')
 
-env.CoqDoc(env.Dir('coqdoc'), vs+mc_vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name --coqlib http://coq.inria.fr/library')
+env.CoqDoc(env.Dir('coqdoc'), vs, COQDOCFLAGS='-utf8 --toc -g --no-lib-name --coqlib http://coq.inria.fr/library')
 
 #env.Command('deps.dot', [], 'tools/DepsToDot.hs < deps > $TARGET')

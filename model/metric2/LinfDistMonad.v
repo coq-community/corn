@@ -20,13 +20,13 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export StepFunctionMonad.
-Require Import OpenUnit.
-Require Import CornTac.
-Require Import Complete.
-Require Export LinfMetricMonad.
-Require Export StepFunctionSetoid.
-Require Import Qauto.
+Require Export CoRN.metric2.StepFunctionMonad.
+Require Import CoRN.model.structures.OpenUnit.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.metric2.Complete.
+Require Export CoRN.model.metric2.LinfMetricMonad.
+Require Export CoRN.metric2.StepFunctionSetoid.
+Require Import CoRN.tactics.Qauto.
 
 (** ** Completion distributes over Step Functions
 We prove the that StepF distributes over Complete using the function
@@ -104,6 +104,7 @@ Proof.
  apply: StepF_ind2.
    simpl (ball_ex).
    intros s s0 t t0 Hs Ht H.
+   unfold ball_ex.
    rewrite <- Hs, <- Ht.
    assumption.
   intros.

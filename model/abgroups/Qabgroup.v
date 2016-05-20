@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qgroup.
-Require Import CAbGroups.
+Require Export CoRN.model.groups.Qgroup.
+Require Import CoRN.algebra.CAbGroups.
 
 (**
 ** Example of an abelian group: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;#

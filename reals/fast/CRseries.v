@@ -19,18 +19,18 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Program.
-Require Import CRAlternatingSum.
-Require Import CRGeometricSum.
-Require Import Limit.
-Require Import Qabs. 
-Require Import CornTac.
-Require Import Arith.
-Require Import Qordfield.
-Require Import Qpower.
-Require Import LazyNat. 
-Require Import Ring abstract_algebra theory.streams.
-Require Export theory.series.
+Require Import Coq.Program.Program.
+Require Import CoRN.reals.fast.CRAlternatingSum.
+Require Import CoRN.reals.fast.CRGeometricSum.
+Require Import CoRN.metric2.Limit.
+Require Import Coq.QArith.Qabs. 
+Require Import CoRN.tactics.CornTac.
+Require Import Coq.Arith.Arith.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.reals.fast.LazyNat. 
+Require Import Coq.setoid_ring.Ring MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
+Require Export MathClasses.theory.series.
 
 Opaque Qabs.
 Open Local Scope Q_scope.

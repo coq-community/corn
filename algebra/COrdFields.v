@@ -51,9 +51,9 @@
 (** printing TwentyFourNZ %\ensuremath{\mathbf{24}}% #24# *)
 (** printing FortyEightNZ %\ensuremath{\mathbf{48}}% #48# *)
 
-Require Export FieldReflection.
-Require Export CSetoids.
-Require Export Rational.
+Require Export CoRN.tactics.FieldReflection.
+Require Export CoRN.algebra.CSetoids.
+Require Export CoRN.tactics.Rational.
 
 (* ORDERED FIELDS *)
 

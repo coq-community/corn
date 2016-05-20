@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Pi.
-Require Import CornTac.
+Require Export CoRN.transc.Pi.
+Require Import CoRN.tactics.CornTac.
 
 Opaque Sine Cosine.
 

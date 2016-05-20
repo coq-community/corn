@@ -37,7 +37,7 @@
 (**
 * Continuity of polynomials *)
 
-Require Export RealFuncts.
+Require Export CoRN.reals.RealFuncts.
 
 Lemma plus_op_contin : forall f g h : CSetoid_un_op IR,
  contin f -> contin g -> (forall x, f x[+]g x [=] h x) -> contin h.

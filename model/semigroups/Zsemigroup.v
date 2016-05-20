@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Zsetoid.
-Require Export CSemiGroups.
+Require Export CoRN.model.setoids.Zsetoid.
+Require Export CoRN.algebra.CSemiGroups.
 
 (**
 ** Examples of semi-groups: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#

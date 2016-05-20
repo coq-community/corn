@@ -36,9 +36,9 @@
 
 (** printing ExpCC %\ensuremath{\exp_{\mathbb C}}% *)
 
-Require Export AbsCC.
-Require Export Exponential.
-Require Export Pi.
+Require Export CoRN.complex.AbsCC.
+Require Export CoRN.transc.Exponential.
+Require Export CoRN.transc.Pi.
 
 (**
 ** The Complex Exponential *)

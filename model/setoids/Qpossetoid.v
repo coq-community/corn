@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qsetoid.
-Require Import CSetoidFun.
-Require Export Qpossec.
+Require Export CoRN.model.setoids.Qsetoid.
+Require Import CoRN.algebra.CSetoidFun.
+Require Export CoRN.model.structures.Qpossec.
 
 (**
 ** Example of a setoid: [Qpos]

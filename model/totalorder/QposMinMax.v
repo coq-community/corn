@@ -19,10 +19,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Qpossec.
-Require Import QArith.
-Require Import QMinMax.
-Require Import TotalOrder.
+Require Import CoRN.model.structures.Qpossec.
+Require Import Coq.QArith.QArith.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.order.TotalOrder.
 
 (**
 ** Example of a Total Order: <Qpos, Qpos_le, Qpos_min, Qpos_max>

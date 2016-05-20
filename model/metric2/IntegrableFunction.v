@@ -19,13 +19,13 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Complete.
-Require Import CRmetric.
-Require Import L1metric.
-Require Import LinfMetric.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import BoundedFunction.
+Require Export CoRN.metric2.Complete.
+Require Import CoRN.model.metric2.CRmetric.
+Require Import CoRN.model.metric2.L1metric.
+Require Import CoRN.model.metric2.LinfMetric.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.model.metric2.BoundedFunction.
 
 Set Implicit Arguments.
 

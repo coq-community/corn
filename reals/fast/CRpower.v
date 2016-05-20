@@ -18,15 +18,15 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export CRIR.
-Require Import CRArith.
-Require Import Qpower.
-Require Import ModulusDerivative.
-Require Import ContinuousCorrect.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import canonical_names.
-Require Import additional_operations.
+Require Export CoRN.reals.fast.CRIR.
+Require Import CoRN.reals.fast.CRArith.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.reals.fast.ModulusDerivative.
+Require Import CoRN.reals.fast.ContinuousCorrect.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.interfaces.canonical_names.
+Require Import MathClasses.interfaces.additional_operations.
 
 Opaque CR inj_Q.
 

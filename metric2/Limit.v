@@ -19,11 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import QArith.
-Require Import Bool.
-Require Export Complete.
-Require Export Streams.
-Require Import abstract_algebra theory.streams orders.naturals.
+Require Import Coq.QArith.QArith.
+Require Import Coq.Bool.Bool.
+Require Export CoRN.metric2.Complete.
+Require Export Coq.Lists.Streams.
+Require Import MathClasses.interfaces.abstract_algebra MathClasses.theory.streams MathClasses.orders.naturals.
 
 (**
 ** Limits

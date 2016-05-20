@@ -19,12 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CauchySeq.
-Require Import iso_CReals.
-Require Import R_morphism.
-Require Import CRArith.
-Require Export CRreal.
-Require Import CornTac.
+Require Export CoRN.reals.CauchySeq.
+Require Import CoRN.reals.iso_CReals.
+Require Import CoRN.reals.R_morphism.
+Require Import CoRN.reals.fast.CRArith.
+Require Export CoRN.model.reals.CRreal.
+Require Import CoRN.tactics.CornTac.
 
 Opaque CR inject_Q.
 (**

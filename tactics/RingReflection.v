@@ -35,8 +35,8 @@
  *)
 
 (* begin hide *)
-Require Export CRings.
-Require Export AlgReflection.
+Require Export CoRN.algebra.CRings.
+Require Export CoRN.tactics.AlgReflection.
 
 Section Ring_Interpretation_Function.
 
@@ -826,33 +826,33 @@ Ltac FindTermVariablesR t l :=
 match t with
 | (zring ?k) =>
     match (ClosedZ k) with
-    | true => constr:l
+    | true => constr:(l)
     end
 | (csbf_fun _ _ _ csg_op ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
-    constr:l2
+    constr:(l2)
 | (csbf_fun _ _ _ cr_mult ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
-    constr:l2
-| ([0]) => constr:l
-| ([1]) => constr:l
+    constr:(l2)
+| ([0]) => constr:(l)
+| ([1]) => constr:(l)
 | (nring ?n) =>
     match (ClosedNat n) with
-    | true => constr:l
+    | true => constr:(l)
     end
 | (csf_fun _ _ cg_inv ?x) =>
     let l1 := FindTermVariablesR x l in
-    constr:l1
+    constr:(l1)
 | (cg_minus ?x ?y) =>
     let l1 := FindTermVariablesR x l in
     let l2 := FindTermVariablesR y l1 in
-    constr:l2
+    constr:(l2)
 | (csf_fun _ _ (@nexp_op _ ?n) ?x) =>
     match (ClosedNat n) with
     | true => let l1 := FindTermVariablesR x l in
-              constr:l1
+              constr:(l1)
     end
 | (pfpfun ?f ?x ?h) =>
     let l1 := FindTermVariablesR x l in
@@ -878,7 +878,7 @@ end.
 Ltac FindTermsVariablesR fn t1 t2 :=
     let l1 := FindTermVariablesR t1 (Quad (Mnil fn) (Mnil (CSetoid_un_op fn)) (Mnil (CSetoid_bin_op fn)) (Mnil (PartFunct fn))) in
     let l2 := FindTermVariablesR t2 l1 in
-    constr:l2.
+    constr:(l2).
 
 Ltac rationalR R x y :=
                  let l:=FindTermsVariablesR R x y in

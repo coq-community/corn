@@ -1,6 +1,6 @@
 
 Require Import
-  QArith ZGcd Qpossec stdlib_omissions.Q.
+  Coq.QArith.QArith CoRN.model.Zmod.ZGcd CoRN.model.structures.Qpossec CoRN.stdlib_omissions.Q.
 Set Automatic Introduction.
 
 Open Scope Q_scope.

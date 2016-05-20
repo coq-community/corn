@@ -1,5 +1,5 @@
 Require Import
-  QArith Qpossec Qmetric CRArith.
+  Coq.QArith.QArith CoRN.model.structures.Qpossec CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith.
 
 (** The approximation function for CRplus results distributes a given error evenly
 among its two operands. This is a perfectly reasonable implementation choice,

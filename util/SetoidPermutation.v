@@ -1,5 +1,5 @@
 Require Import
-  Unicode.Utf8 Setoid List Permutation Setoid Morphisms.
+  Coq.Unicode.Utf8 Coq.Setoids.Setoid CoRN.stdlib_omissions.List Coq.Sorting.Permutation Coq.Setoids.Setoid Coq.Classes.Morphisms.
 
 (** The standard Permutation property is not setoid-aware, so we
  introduce a variant that is. *)

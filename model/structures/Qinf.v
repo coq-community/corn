@@ -1,9 +1,9 @@
 Require Import
- Setoid Arith
- Qring QposInf
- stdlib_omissions.Q
- interfaces.abstract_algebra
- stdlib_rationals
+ Coq.Setoids.Setoid Coq.Arith.Arith
+ CoRN.model.rings.Qring CoRN.model.structures.QposInf
+ CoRN.stdlib_omissions.Q
+ MathClasses.interfaces.abstract_algebra
+ MathClasses.implementations.stdlib_rationals
  MathClasses.theory.setoids.
 
 Inductive T: Set := finite (q: Q) | infinite.

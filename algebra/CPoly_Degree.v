@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export CPoly_NthCoeff.
-Require Export CFields.
-Require Export Rational.
+Require Export CoRN.algebra.CPoly_NthCoeff.
+Require Export CoRN.algebra.CFields.
+Require Export CoRN.tactics.Rational.
 Set Automatic Introduction.
 
 (**

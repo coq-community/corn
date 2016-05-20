@@ -19,7 +19,7 @@
 (** Generic Tacticals used by the CoRN project *)
 (* begin hide *)
 
-Require Import SetoidTactics.
+Require Import Coq.Classes.SetoidTactics.
 
 (* Replace the LHS or RHS of an expression with another expression
   This tactic along with the setiod functionality, basically replaces the step

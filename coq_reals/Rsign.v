@@ -1,5 +1,5 @@
-Require Import Rreals_iso.
-Require Import CRsign.
+Require Import CoRN.coq_reals.Rreals_iso.
+Require Import CoRN.reals.fast.CRsign.
 
 Ltac R_dec_precompute :=
  try apply Rlt_le;

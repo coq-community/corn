@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Continuity.
+Require Export CoRN.ftc.Continuity.
 
 (** printing Partition_Sum %\ensuremath{\sum_P}% #&sum;<sub>P</sub># *)
 

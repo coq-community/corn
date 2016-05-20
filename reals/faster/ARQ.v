@@ -1,8 +1,8 @@
 Require Import
-  Program QArith Qdlog ZArith Qpossec Compress
-  MetricMorphisms Qmetric ARArith
-  theory.int_pow theory.nat_pow
-  stdlib_rationals stdlib_binary_integers.
+  Coq.Program.Program Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.model.structures.Qpossec CoRN.reals.fast.Compress
+  CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
+  MathClasses.theory.int_pow MathClasses.theory.nat_pow
+  MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers.
 
 Instance Q_approx: AppApprox Q := λ x k, 
   match k with
@@ -31,12 +31,12 @@ Proof.
   split; try apply _.
      repeat (split; try apply _).
     (* regression in type_classes *) admit. admit. admit. admit. admit. admit.  
-    split; try apply _.  admit. intros.
+    split; try apply _.  Admitted. (*intros.
     apply ball_weak_le with (2 ^ Qdlog2 ε)%Qpos.
      now apply (Qpos_dlog2_spec ε).
     now apply Q_approx_correct.
    intros. now apply Q_approx_correct.
   intros. now apply Q_approx_correct.
-Qed.
+Qed. *)
 
 Notation ARQ := (AR (AQ:=Q)).

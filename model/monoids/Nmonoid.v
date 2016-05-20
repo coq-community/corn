@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Nsemigroup.
-Require Import CMonoids.
+Require Export CoRN.model.semigroups.Nsemigroup.
+Require Import CoRN.algebra.CMonoids.
 
 (**
 ** Example of a monoid: $\langle$#&lang;#[nat],[[+]]$\rangle$#&rang;#

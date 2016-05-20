@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Nsec.
-Require Import CSetoidFun.
+Require Export CoRN.model.structures.Nsec.
+Require Import CoRN.algebra.CSetoidFun.
 
 Set Automatic Introduction.
 

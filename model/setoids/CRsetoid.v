@@ -19,10 +19,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CRcorrect.
-Require Export CRmetric.
-Require Export CSetoids.
-Require Import CornTac.
+Require Import CoRN.reals.fast.CRcorrect.
+Require Export CoRN.model.metric2.CRmetric.
+Require Export CoRN.algebra.CSetoids.
+Require Import CoRN.tactics.CornTac.
 
 Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2.
 

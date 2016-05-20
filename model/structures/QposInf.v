@@ -19,9 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export QArith.
-Require Export Qpossec.
-Require Import QposMinMax.
+Require Export Coq.QArith.QArith.
+Require Export CoRN.model.structures.Qpossec.
+Require Import CoRN.model.totalorder.QposMinMax.
 
 (** printing QposInf $\mathbb{Q}^{+}_{\infty}$ #Q<SUP>+</SUP><SUB>&infin;</SUB># *)
 (** printing QposInfinity $\infty$ #&infin;# *)

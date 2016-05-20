@@ -36,7 +36,7 @@
 
 (** printing included %\ensuremath{\subseteq}% #&sube;# *)
 
-Require Export CSetoidFun.
+Require Export CoRN.algebra.CSetoidFun.
 
 Section inclusion.
 

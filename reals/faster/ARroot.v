@@ -1,10 +1,10 @@
 Require Import
-  Ring stdlib_omissions.Z
-  Complete Qmetric ZArith Qdlog Qpossec
-  CRroot
-  abstract_algebra theory.shiftl theory.nat_pow theory.int_pow.
+  Coq.setoid_ring.Ring CoRN.stdlib_omissions.Z
+  CoRN.metric2.Complete CoRN.model.metric2.Qmetric Coq.ZArith.ZArith CoRN.util.Qdlog CoRN.model.structures.Qpossec
+  CoRN.reals.fast.CRroot
+  MathClasses.interfaces.abstract_algebra MathClasses.theory.shiftl MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export 
-  ARArith.
+  CoRN.reals.faster.ARArith.
 
 Section ARsqrt.
 Context `{AppRationals AQ}.
@@ -430,7 +430,7 @@ Proof.
 Qed.
 
 Local Obligation Tactic := idtac.
-Require Import MetricMorphisms.
+Require Import CoRN.metric2.MetricMorphisms.
 
 Program Definition ARsqrt_uc := unary_complete_uc 
   QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsqrt sqrt_uc _.

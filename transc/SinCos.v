@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Trigonometric.
+Require Export CoRN.transc.Trigonometric.
 
 Section Sum_and_so_on.
 

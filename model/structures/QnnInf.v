@@ -1,8 +1,8 @@
 
-Require QnonNeg.
+Require CoRN.model.structures.QnonNeg.
 Import QnonNeg.notations.
 
-Require Import QposInf.
+Require Import CoRN.model.structures.QposInf.
 
 Inductive T: Set := Infinite | Finite (q: QnonNeg).
 

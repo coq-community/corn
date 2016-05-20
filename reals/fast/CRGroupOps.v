@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export CRmetric.
-Require Import QMinMax.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import ProductMetric.
-Require Import stdlib_omissions.Pair.
-Require Import canonical_names.
+Require Export CoRN.model.metric2.CRmetric.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.metric2.ProductMetric.
+Require Import CoRN.stdlib_omissions.Pair.
+Require Import MathClasses.interfaces.canonical_names.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -530,7 +530,7 @@ Proof.
  apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
    (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
- apply: ball_weak_le. 3:apply regFun_prf.
+ apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.
@@ -669,7 +669,7 @@ Proof.
  apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
  cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
    (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].
- apply: ball_weak_le. 3:apply regFun_prf.
+ apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
  ring_simplify.

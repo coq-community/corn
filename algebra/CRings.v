@@ -53,9 +53,9 @@
 (** printing TwentyFour %\ensuremath{\mathbf{24}}% #24# *)
 (** printing FortyEight %\ensuremath{\mathbf{48}}% #48# *)
 
-Require Import CornTac.
-Require Export CSums.
-Require Import CAbMonoids Permutation SetoidPermutation Setoid Morphisms.
+Require Import CoRN.tactics.CornTac.
+Require Export CoRN.algebra.CSums.
+Require Import CoRN.algebra.CAbMonoids Coq.Sorting.Permutation CoRN.util.SetoidPermutation Coq.Setoids.Setoid Coq.Classes.Morphisms.
 
 Transparent sym_eq.
 Transparent f_equal.

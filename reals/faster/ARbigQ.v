@@ -1,9 +1,9 @@
 Require Import
-  Program QArith ZArith BigZ BigQ Qpossec
-  Compress ARQ
-  MetricMorphisms Qmetric ARArith
-  stdlib_rationals stdlib_binary_integers field_of_fractions
-  fast_rationals fast_integers.
+  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Coq.Numbers.Integer.BigZ.BigZ Coq.Numbers.Rational.BigQ.BigQ CoRN.model.structures.Qpossec
+  CoRN.reals.fast.Compress CoRN.reals.faster.ARQ
+  CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
+  MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.field_of_fractions
+  MathClasses.implementations.fast_rationals MathClasses.implementations.fast_integers.
 
 Instance inject_Z_bigQ: Cast Z bigQ := cast bigZ bigQ ∘ cast Z bigZ.
 

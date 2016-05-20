@@ -35,8 +35,8 @@
  *)
 
 
-Require Export Zsemigroup.
-Require Export CMonoids.
+Require Export CoRN.model.semigroups.Zsemigroup.
+Require Export CoRN.algebra.CMonoids.
 
 (**
 ** Examples of monoids: $\langle$#&lang;#[Z],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Z],[[*]]$\rangle$#&rang;#

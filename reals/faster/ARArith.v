@@ -1,13 +1,13 @@
 Require Import 
-  Program Ring CLogic
-  Qabs stdlib_omissions.Q workaround_tactics
-  QMinMax QposMinMax Qdlog
-  Complete Prelength Qmetric MetricMorphisms 
-  CRArith CRpower Qposclasses
-  stdlib_binary_naturals minmax positive_semiring_elements.
+  Coq.Program.Program Coq.setoid_ring.Ring CoRN.logic.CLogic
+  Coq.QArith.Qabs CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics
+  CoRN.model.totalorder.QMinMax CoRN.model.totalorder.QposMinMax CoRN.util.Qdlog
+  CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.metric2.MetricMorphisms 
+  CoRN.reals.fast.CRArith CoRN.reals.fast.CRpower CoRN.classes.Qposclasses
+  MathClasses.implementations.stdlib_binary_naturals MathClasses.orders.minmax MathClasses.implementations.positive_semiring_elements.
 Require Export
-  ApproximateRationals
-  AQmetric.
+  CoRN.reals.faster.ApproximateRationals
+  CoRN.reals.faster.AQmetric.
 
 Section ARarith.
 Context `{AppRationals AQ}.

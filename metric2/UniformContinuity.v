@@ -19,10 +19,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Metric.
-Require Export QposInf.
-Require Import List.
-Require Import CornTac.
+Require Export CoRN.metric2.Metric.
+Require Export CoRN.model.structures.QposInf.
+Require Import CoRN.stdlib_omissions.List.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 

@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export RealPowers.
-Require Export TrigMon.
-Require Export StrongIVT.
+Require Export CoRN.transc.RealPowers.
+Require Export CoRN.transc.TrigMon.
+Require Export CoRN.ftc.StrongIVT.
 
 (** printing ArcSin %\ensuremath{\arcsin}% *)
 (** printing ArcCos %\ensuremath{\arccos}% *)

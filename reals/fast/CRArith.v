@@ -19,23 +19,23 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Ring_theory.
-Require Import Setoid.
-Require Import QArith.
-Require Import Qabs.
-Require Import Qround.
-Require Export CRreal.
-Require Import Complete.
-Require Export CRFieldOps.
-Require Import Qring.
-Require Import CRing_Homomorphisms.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import Stability.
-Require Import ConstructiveEpsilon.
-Require Import Qdlog.
-Require Import abstract_algebra.
-Require Import interfaces.orders.
+Require Import Coq.setoid_ring.Ring_theory.
+Require Import Coq.Setoids.Setoid.
+Require Import Coq.QArith.QArith.
+Require Import Coq.QArith.Qabs.
+Require Import Coq.QArith.Qround.
+Require Export CoRN.model.reals.CRreal.
+Require Import CoRN.metric2.Complete.
+Require Export CoRN.reals.fast.CRFieldOps.
+Require Import CoRN.model.rings.Qring.
+Require Import CoRN.algebra.CRing_Homomorphisms.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.logic.Stability.
+Require Import Coq.Logic.ConstructiveEpsilon.
+Require Import CoRN.util.Qdlog.
+Require Import MathClasses.interfaces.abstract_algebra.
+Require Import MathClasses.interfaces.orders.
 
 Open Local Scope CR_scope.
 
@@ -440,7 +440,8 @@ Lemma CRlt_trans (x y z: CR): x < y -> y < z -> x < z.
 Proof.
  destruct CRisCOrdField.
  destruct ax_less_strorder.
- apply so_trans.
+specialize (so_trans x y z). (* Coq hangs here*)
+  apply so_trans.
 Qed.
 
 Lemma CRle_lt_trans (x y z: CR): x <= y -> y < z -> x < z.
@@ -778,7 +779,10 @@ Proof with eauto; try solve [eapply CR_lt_ltT; eauto].
      intros x y [E1 E2].
      destruct (less_antisymmetric_unfolded _ x y)...
     intros x y E z.
-    edestruct (less_cotransitive _ x y); [| left | right]...
+    pose proof E as Ed.
+    apply CR_lt_ltT in Ed.
+    destruct (less_cotransitive _ x y Ed z);
+     [ left | right]...
    reflexivity.
   intros x y; split.
    intros E1 E2.

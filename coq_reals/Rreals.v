@@ -17,21 +17,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Import CSetoids.
-Require Import CSemiGroups.
-Require Import CMonoids.
-Require Import CGroups.
-Require Import CornTac.
-Require Import CAbGroups.
-Require Import CRings.
-Require Import CFields.
-Require Import COrdFields.
-Require Import CReals.
-Require Import RIneq.
-Require Import Rcomplete.
-Require Import Rlimit.
-Require Import Rbasic_fun.
-Require Import Fourier.
+Require Import CoRN.algebra.CSetoids.
+Require Import CoRN.algebra.CSemiGroups.
+Require Import CoRN.algebra.CMonoids.
+Require Import CoRN.algebra.CGroups.
+Require Import CoRN.tactics.CornTac.
+Require Import CoRN.algebra.CAbGroups.
+Require Import CoRN.algebra.CRings.
+Require Import CoRN.algebra.CFields.
+Require Import CoRN.algebra.COrdFields.
+Require Import CoRN.reals.CReals.
+Require Import Coq.Reals.RIneq.
+Require Import Coq.Reals.Rcomplete.
+Require Import Coq.Reals.Rlimit.
+Require Import Coq.Reals.Rbasic_fun.
+Require Import Coq.fourier.Fourier.
 
 (** * Coq Real Numbers
 

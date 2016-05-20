@@ -40,7 +40,7 @@
 (** printing Log %\ensuremath{\log}% *)
 (** printing Tan %\ensuremath{\tan}% *)
 
-Require Export FTC.
+Require Export CoRN.ftc.FTC.
 
 (**
 * More on Power Series

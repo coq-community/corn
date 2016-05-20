@@ -18,15 +18,15 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Export Hausdorff.
-Require Import Classic.
-Require Export List.
-Require Export Classification.
-Require Import Complete.
-Require Import Prelength.
-Require Import CornBasics.
-Require Import Qauto.
-Require Import CornTac.
+Require Export CoRN.metric2.Hausdorff.
+Require Import CoRN.logic.Classic.
+Require Export CoRN.stdlib_omissions.List.
+Require Export CoRN.metric2.Classification.
+Require Import CoRN.metric2.Complete.
+Require Import CoRN.metric2.Prelength.
+Require Import CoRN.logic.CornBasics.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -209,14 +209,14 @@ Proof.
   clear - Hy0 Hy1.
   induction b.
    contradiction.
-  destruct (Hy0) as [HG | Hy0 | Hy0] using orC_ind.
+  destruct (Hy0) as [HG | Hy2 | Hy2] using orC_ind.
     apply existsC_stable; auto.
    apply existsWeaken.
    exists a.
    split; auto 7 with *.
-   rewrite <- Hy0.
+   rewrite <- Hy2.
    assumption.
-  destruct (IHb Hy0) as [HG | z [Hz0 Hz1]] using existsC_ind.
+  destruct (IHb Hy2) as [HG | z [Hz0 Hz1]] using existsC_ind.
    apply existsC_stable; auto.
   apply existsWeaken.
   exists z.
@@ -281,14 +281,14 @@ Proof.
    clear - Hz1 Hz0.
    induction b.
     contradiction.
-   destruct (Hz0) as [Hg | Hz0 | Hz0] using orC_ind.
+   destruct (Hz0) as [Hg | Hz2 | Hz2] using orC_ind.
      auto using existsC_stable.
     apply existsWeaken.
     exists a.
     split; auto with *.
-    rewrite <- Hz0.
+    rewrite <- Hz2.
     assumption.
-   destruct (IHb Hz0) as [HG | y [Hy0 Hy1]] using existsC_ind.
+   destruct (IHb Hz2) as [HG | y [Hy0 Hy1]] using existsC_ind.
     auto using existsC_stable.
    apply existsWeaken.
    exists y.
@@ -444,7 +444,7 @@ Proof.
  right.
  abstract ( intros H0; assert (Haa:st_eq a a) by reflexivity;
    destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind; [tauto|];
-     destruct (Hz0) as [HG | Hz0 | Hz0] using orC_ind; [tauto |rewrite -> Hz0 in Hz1; contradiction
+     destruct (Hz0) as [HG | Hz2 | Hz2] using orC_ind; [tauto |rewrite -> Hz2 in Hz1; contradiction
        |]; apply H; intros x Hx; apply existsWeaken; exists z; rewrite -> Hx; auto).
 Defined.
 
@@ -463,7 +463,7 @@ Proof.
  destruct (IHa b Hed) as [I|I].
   destruct (HemiMetricStrongAlmostDecidableBody _ _ a b Hed) as [J|J].
    left.
-   abstract ( intros x Hx; destruct (Hx) as [HG | Hx | Hx] using orC_ind; [auto using existsC_stable
+   abstract ( intros x Hx; destruct (Hx) as [HG | ? | ?] using orC_ind; [auto using existsC_stable
      |apply J; assumption |apply I; assumption]).
   right.
   abstract ( intros H; apply J; intros x Hx; apply H; apply orWeaken; left; assumption).

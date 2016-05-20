@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export MoreFunctions.
-Require Export MoreFunSeries.
+Require Export CoRN.ftc.MoreFunctions.
+Require Export CoRN.ftc.MoreFunSeries.
 
 Section Maps_into_Compacts.
 
@@ -833,7 +833,7 @@ Proof.
  assert (Y:forall n : nat, Dom (f n) x).
   intros n.
   refine (Continuous_imp_inc _ _ _ _ _).
-   2:apply contf.
+   1:apply contf.
   Included.
  rename H0 into X1. 
  assert (Z:=fun_conv_imp_seq_conv _ _ _ _ _ _ _  (X a b Hab Hinc) x X1 Y Hx).

@@ -1,8 +1,8 @@
 (* Discrete logarithm with base 2 and 4 on [Q] *)
 Require Import 
-  ZArith QArith Qround stdlib_omissions.Q
-  abstract_algebra additional_operations interfaces.orders
-  int_pow orders.rationals stdlib_rationals positive_semiring_elements.
+  Coq.ZArith.ZArith Coq.QArith.QArith Coq.QArith.Qround CoRN.stdlib_omissions.Q
+  MathClasses.interfaces.abstract_algebra MathClasses.interfaces.additional_operations MathClasses.interfaces.orders
+  MathClasses.theory.int_pow MathClasses.orders.rationals MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
 
 Definition Qdlog2 (x : Q) : Z :=
   match decide_rel (≤) x 1 with

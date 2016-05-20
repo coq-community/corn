@@ -34,7 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Prod_Sub.
+Require Export CoRN.metrics.Prod_Sub.
 Set Automatic Introduction.
 
 Section lists.

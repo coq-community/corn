@@ -34,9 +34,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qfield.
-Require Import COrdFields.
-Require Import stdlib_omissions.Q.
+Require Export CoRN.model.fields.Qfield.
+Require Import CoRN.algebra.COrdFields.
+Require Import CoRN.stdlib_omissions.Q.
 (**
 ** Example of an ordered field: $\langle$#&lang;#[Q],[[+]],[[*]],[[<]]$\rangle$#&rang;#
  [Q] is an archemaedian ordered field.

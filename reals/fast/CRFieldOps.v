@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CLogic.
-Require Export CRlattice.
-Require Import QMinMax.
-Require Import Qabs.
-Require Import COrdAbs.
-Require Import Qordfield.
-Require Import Qmetric.
-Require Import CornTac.
-Require Import canonical_names.
+Require Import CoRN.logic.CLogic.
+Require Export CoRN.model.lattice.CRlattice.
+Require Import CoRN.model.totalorder.QMinMax.
+Require Import Coq.QArith.Qabs.
+Require Import CoRN.algebra.COrdAbs.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.tactics.CornTac.
+Require Import MathClasses.interfaces.canonical_names.
 
 Set Implicit Arguments.
 
@@ -111,7 +111,7 @@ Infix "<" := CRltT : CR_scope.
 Lemma CRltT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
 Proof.
  intros x1 x2 Hx y1 y2 Hy H.
- apply: CRpos_wd. 3:apply H.
+ apply: CRpos_wd. 2:apply H.
  abstract ( rewrite <- Hx; rewrite <- Hy; reflexivity ).
 Defined.
 

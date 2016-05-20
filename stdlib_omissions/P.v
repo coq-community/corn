@@ -1,5 +1,5 @@
 
-Require Import Setoid BinPos Pnat.
+Require Import Coq.Setoids.Setoid Coq.PArith.BinPos Coq.PArith.Pnat.
 
 Set Automatic Introduction.
 

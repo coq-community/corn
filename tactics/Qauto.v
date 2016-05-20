@@ -19,10 +19,14 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Qordfield.
-Require Import COrdFields2.
-Require Import Qpower.
-Require Import Qabs.
+Require Export CoRN.model.ordfields.Qordfield.
+Require Import CoRN.algebra.COrdFields2.
+Require Import Coq.QArith.Qpower.
+Require Import Coq.QArith.Qabs.
+
+(*Require Import CoRN.tactics.CornTac. 
+was removed in the trunk branch
+*)
 
 Ltac Qauto_pos :=
   repeat (first [ assumption

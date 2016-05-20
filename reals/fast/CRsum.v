@@ -18,12 +18,12 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CRArith.
-Require Import List.
-Require Import Qmetric.
-Require Import Qring.
-Require Import Qauto.
-Require Import CornTac.
+Require Import CoRN.reals.fast.CRArith.
+Require Import CoRN.stdlib_omissions.List.
+Require Import CoRN.model.metric2.Qmetric.
+Require Import CoRN.model.rings.Qring.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Open Local Scope Q_scope.
 

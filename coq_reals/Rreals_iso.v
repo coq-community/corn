@@ -17,27 +17,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Import QArith.
-Require Import Qreals.
-Require Import QArith_base.
-Require Import CornTac.
-Require Import RIneq.
-Require Import Rcomplete.
-Require Import Rlimit.
-Require Import Rbasic_fun.
-Require Import Fourier.
-Require Import Rreals.
-Require Import iso_CReals.
-Require Import CauchySeq.
-Require Import Rtrigo_def.
-Require Import PowerSeries.
-Require Import ConstructiveEpsilon.
-Require Import Rlogic.
-Require Export Reals.
-Require Import Pi.
-Require Import MoreArcTan.
-Require Import PropDecid.
-Require Import Exponential.
+Require Import Coq.QArith.QArith.
+Require Import Coq.QArith.Qreals.
+Require Import Coq.QArith.QArith_base.
+Require Import CoRN.tactics.CornTac.
+Require Import Coq.Reals.RIneq.
+Require Import Coq.Reals.Rcomplete.
+Require Import Coq.Reals.Rlimit.
+Require Import Coq.Reals.Rbasic_fun.
+Require Import Coq.fourier.Fourier.
+Require Import CoRN.coq_reals.Rreals.
+Require Import CoRN.reals.iso_CReals.
+Require Import CoRN.reals.CauchySeq.
+Require Import Coq.Reals.Rtrigo_def.
+Require Import CoRN.transc.PowerSeries.
+Require Import Coq.Logic.ConstructiveEpsilon.
+Require Import Coq.Reals.Rlogic.
+Require Export Coq.Reals.Reals.
+Require Import CoRN.transc.Pi.
+Require Import CoRN.transc.MoreArcTan.
+Require Import CoRN.logic.PropDecid.
+Require Import CoRN.transc.Exponential.
 
 (* This changed in RLogic and should probably be moved there: *)
 Lemma forall_dec : forall P:nat->Prop, (forall n, {P n} + {~ P n}) -> {forall n, P n} + {~forall n, P n}.

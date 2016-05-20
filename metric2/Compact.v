@@ -18,16 +18,16 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import Limit.
-Require Export FinEnum.
-Require Import Zpow_facts.
-Require Export Complete.
-Require Import Classic.
-Require Import COrdFields2.
-Require Import Qordfield.
-Require Import Qpower.
-Require Import Qauto.
-Require Import CornTac.
+Require Import CoRN.metric2.Limit.
+Require Export CoRN.metric2.FinEnum.
+Require Import Coq.ZArith.Zpow_facts.
+Require Export CoRN.metric2.Complete.
+Require Import CoRN.logic.Classic.
+Require Import CoRN.algebra.COrdFields2.
+Require Import CoRN.model.ordfields.Qordfield.
+Require Import Coq.QArith.Qpower.
+Require Import CoRN.tactics.Qauto.
+Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
@@ -1340,7 +1340,7 @@ End Isomorphism.
 
 End Compact.
 
-Require Import Prelength.
+Require Import CoRN.metric2.Prelength.
 
 Section CompactDistr.
 
@@ -1723,7 +1723,7 @@ Proof.
  unfold FinEnum_map_modulus.
  case_eq (mu f ((1#4)*d1)).
   intros d Hd.
-  apply: almostIn_map2. 3:apply H.
+  apply: almostIn_map2; [|apply H].
   rewrite Hd.
   apply: Qle_refl.
  intros H0.

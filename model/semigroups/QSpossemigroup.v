@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Qpossetoid.
-Require Import CSemiGroups.
+Require Export CoRN.model.setoids.Qpossetoid.
+Require Import CoRN.algebra.CSemiGroups.
 
 (**
 ** Example of a semi-group: $\langle$#&lang;#[Qpos],$(x,y) \mapsto xy/2$#(x,y) &#x21A6; xy/2#$\rangle$#&rang;#
