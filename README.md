@@ -14,7 +14,7 @@ and run:
 ### Prerequisites
 This version of C-CoRN is known to compile with:
 
-* Coq 8.4pl4
+* Coq 8.5
 * SCons 1.2 or make
 
 ### Git checkout and submodules
