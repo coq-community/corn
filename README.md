@@ -12,9 +12,7 @@ and run:
 
 ## Install from source
 ### Prerequisites
-This version of C-CoRN is known to compile with:
-
-* Coq 8.4pl4
+This version of C-CoRN should follow Coq trunk and requires
 * SCons 1.2 or make
 
 ### Git checkout and submodules
