@@ -31,7 +31,7 @@ Proof.
    now rewrite rings.preserves_1, AQtoQ_ZtoAQ.
   rewrite !rings.preserves_plus.
   rewrite !P.
-  f_equiv; f_equiv. (* no idea why reflexivity doesn't work *)
+  apply reflexivity.
 Qed.
 
 Definition ARpi := AQpi 1.
