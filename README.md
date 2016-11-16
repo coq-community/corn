@@ -17,9 +17,9 @@ This version of C-CoRN is known to compile with:
 * Coq 8.5
 * SCons 1.2 or make
 
-### Git checkout and submodules
+### Dependencies
 C-CoRN depends on [Math Classes](https://github.com/math-classes/math-classes), which is a library of abstract interfaces for
-mathematical structures that is heavily based on Coq's new type classes.
+mathematical structures that is heavily based on Coq's new type classes. It will be automatically installed by opam.
 
 ### Building C-CoRN
 C-CoRN uses [SCons](http://www.scons.org/) for its build infrastructure. SCons is a modern
@@ -34,7 +34,9 @@ displays the time spent executing individual build commands.
 
     scons -c replaces Make clean
 
-For more information, see the [SCons documentation](http://www.scons.org/). Make is still supported.
+For more information, see the [SCons documentation](http://www.scons.org/). 
+
+Make is still supported.
 
 ### Building documentation
 To build CoqDoc documentation, say `scons coqdoc`.
