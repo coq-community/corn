@@ -468,6 +468,85 @@ Proof.
 Qed.
 Hint Rewrite R_nring_as_IR : RtoIR.
 
+Add Morphism RasIR with signature (@cs_eq _) ==> (@cs_eq _) as R_as_IR_wd.
+Proof.
+ intros.
+ rewrite H.
+ reflexivity.
+Qed.
+
+(** integers *)
+
+Lemma R_pring_as_IR : forall x, RasIR (pring _ x) [=] pring _ x.
+Proof.
+ intro x.
+ (*rewrite pring_convert.*)
+ stepr (nring (R := IR) (nat_of_P x)).
+  stepl (RasIR (nring (R := RReals) (nat_of_P x))).
+   apply R_nring_as_IR.
+  apply R_as_IR_wd.
+  symmetry.
+  apply (pring_convert RReals x).
+ symmetry.
+ apply (pring_convert IR x).
+Qed.
+
+Lemma R_zring_as_IR : forall x, RasIR (zring x) [=] zring x.
+Proof.
+ induction x; simpl.
+   apply R_Zero_as_IR.
+  apply R_pring_as_IR.
+ rewrite -> R_opp_as_IR.
+ rewrite -> R_pring_as_IR.
+ reflexivity.
+Qed.
+
+Lemma INR_as_nring : forall x, INR x = nring (R:=RRing) x.
+Proof.
+ induction x.
+  reflexivity.
+ simpl nring.
+ rewrite <- IHx.
+ apply S_INR.
+Qed.
+
+Lemma IZR_as_zring : forall x, IZR x = zring (R:=RRing) x.
+Proof.
+ induction x.
+   reflexivity.
+  rewrite <- positive_nat_Z, <- INR_IZR_INZ.
+  rewrite INR_as_nring.
+  (* rewrite pring_convert *)
+  symmetry.
+  rewrite positive_nat_Z.
+  apply (pring_convert RRing p).
+ change (IZR (Zneg p)) with (Ropp (IZR (Zpos p))).
+ rewrite <- positive_nat_Z, <- INR_IZR_INZ.
+ rewrite INR_as_nring.
+ apply Ropp_eq_compat.
+ symmetry.
+ apply (pring_convert RRing p).
+Qed.
+
+Lemma R_IZR_as_IR : forall x, RasIR (IZR x) [=] zring x.
+Proof.
+ induction x.
+   apply R_Zero_as_IR.
+  rewrite <- positive_nat_Z, <- INR_IZR_INZ.
+  rewrite R_INR_as_IR.
+  rewrite -> R_nring_as_IR.
+  auto with *.
+ change (IZR (Zneg p)) with (Ropp (IZR (Zpos p))).
+ rewrite <- positive_nat_Z, <- INR_IZR_INZ.
+ rewrite -> R_opp_as_IR.
+ rewrite R_INR_as_IR.
+ rewrite -> R_nring_as_IR.
+ simpl zring.
+ auto with *.
+Qed.
+
+Hint Rewrite R_IZR_as_IR : RtoIR.
+
 (** exponents *)
 
 Lemma R_pow_as_IR : forall x i,
@@ -714,13 +793,6 @@ Proof.
  apply: c.
 Qed.
 
-Add Morphism RasIR with signature (@cs_eq _) ==> (@cs_eq _) as R_as_IR_wd.
-Proof.
- intros.
- rewrite H.
- reflexivity.
-Qed.
-
 (** logarithm *)
 
 Lemma R_ln_as_IR : forall x prf, RasIR (ln x) [=] Log (RasIR x) prf.
@@ -735,70 +807,6 @@ Proof.
  stepl ([0]:IR); [| now symmetry; apply R_Zero_as_IR].
  assumption.
 Qed.
-
-(** integers *)
-
-Lemma R_pring_as_IR : forall x, RasIR (pring _ x) [=] pring _ x.
-Proof.
- intro x.
- (*rewrite pring_convert.*)
- stepr (nring (R := IR) (nat_of_P x)).
-  stepl (RasIR (nring (R := RReals) (nat_of_P x))).
-   apply R_nring_as_IR.
-  apply R_as_IR_wd.
-  symmetry.
-  apply (pring_convert RReals x).
- symmetry.
- apply (pring_convert IR x).
-Qed.
-
-Lemma R_zring_as_IR : forall x, RasIR (zring x) [=] zring x.
-Proof.
- induction x; simpl.
-   apply R_Zero_as_IR.
-  apply R_pring_as_IR.
- rewrite -> R_opp_as_IR.
- rewrite -> R_pring_as_IR.
- reflexivity.
-Qed.
-
-Lemma INR_as_nring : forall x, INR x = nring (R:=RRing) x.
-Proof.
- induction x.
-  reflexivity.
- simpl nring.
- rewrite <- IHx.
- apply S_INR.
-Qed.
-
-Lemma IZR_as_zring : forall x, IZR x = zring (R:=RRing) x.
-Proof.
- induction x; simpl.
-   reflexivity.
-  rewrite INR_as_nring.
-  (* rewrite pring_convert *)
-  symmetry.
-  apply (pring_convert RRing p).
- rewrite INR_as_nring.
- apply Ropp_eq_compat.
- symmetry.
- apply (pring_convert RRing p).
-Qed.
-
-Lemma R_IZR_as_IR : forall x, RasIR (IZR x) [=] zring x.
-Proof.
- induction x; simpl.
-   apply R_Zero_as_IR.
-  rewrite R_INR_as_IR.
-  rewrite -> R_nring_as_IR.
-  auto with *.
- rewrite -> R_opp_as_IR.
- rewrite R_INR_as_IR.
- rewrite -> R_nring_as_IR.
- auto with *.
-Qed.
-
-Hint Rewrite R_IZR_as_IR : RtoIR.
 
 (** pi *)
 
@@ -896,6 +904,7 @@ Proof.
  unfold PI_tg in prf.
  rewrite -> R_mult_as_IR.
  apply mult_wd.
+  change 4%R with ((1 + 1) * (1 + 1))%R.
   rewrite -> R_mult_as_IR.
   rewrite -> R_plus_as_IR.
   rewrite -> R_One_as_IR.
@@ -943,7 +952,6 @@ Proof.
  intro q.
  destruct q.
  unfold Q2R.
- simpl.
  cut (Dom (f_rcpcl' IR) (RasIR (nring (R:=RRing) (nat_of_P Qden)))).
   intro Hy.
   stepr (RasIR (zring (R:=RRing) Qnum)[/]RasIR (nring (R:=RRing) (nat_of_P Qden))[//]Hy).
@@ -953,7 +961,7 @@ Proof.
    unfold Rdiv.
    replace (nring (R:=RRing) (nat_of_P Qden)) with (INR (nat_of_P Qden)).
     replace (zring (R:=RRing) Qnum) with (IZR Qnum).
-     simpl; reflexivity.
+     now rewrite <- positive_nat_Z, INR_IZR_INZ.
     apply IZR_as_zring.
    apply INR_as_nring.
   apply div_wd.
