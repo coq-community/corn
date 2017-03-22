@@ -245,30 +245,69 @@ Qed.
 
 Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.
 
+Lemma  cos_cos_slow : forall x, cos x = cos_slow x.
+Proof.
+  intros x.
+  unfold cos.
+  generalize (Qround.Qceiling (approximate (x * CRinv_pos (6 # 1) (scale 2 CRpi))
+   (1 # 2)%Qpos - (1 # 2)))%CR.
+  intros z.
+  rewrite -> compress_correct.
+  rewrite <- (CRasIRasCR_id x).
+  rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
+   <- IR_minus_as_CR, <- cos_slow_correct, <- cos_slow_correct.
+  remember (CRasIR x) as y.
+  clear dependent x. rename y into x.
+  apply IRasCR_wd.
+  rewrite -> inj_Q_mult.
+  change (2:Q) with (Two:Q).
+  rewrite -> inj_Q_nring.
+  symmetry.
+  rstepr (Cos (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
+  setoid_replace (inj_Q IR z) with (zring z:IR).
+  rewrite <- zring_inv.
+  symmetry; apply Cos_periodic_Z.
+  rewrite <- inj_Q_zring.
+  apply inj_Q_wd.
+  symmetry; apply zring_Q.
+Qed.
+
 Lemma cos_correct : forall x,
   (IRasCR (Cos x) == cos (IRasCR x))%CR.
 Proof.
- intros x.
- unfold cos.
- generalize (Qceiling (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
-   (1 # 2)%Qpos - (1 # 2)))%CR.
- intros z.
- rewrite -> compress_correct.
- rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
-   <- IR_minus_as_CR, <- cos_slow_correct.
- apply IRasCR_wd.
- rewrite -> inj_Q_mult.
- change (2:Q) with (Two:Q).
- rewrite -> inj_Q_nring.
- rstepr (Cos (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
- setoid_replace (inj_Q IR z) with (zring z:IR).
-  rewrite <- zring_inv.
-  symmetry; apply Cos_periodic_Z.
- rewrite <- inj_Q_zring.
- apply inj_Q_wd.
- symmetry; apply zring_Q.
+  intros x.
+  rewrite cos_cos_slow.
+  apply cos_slow_correct.
+Qed.
+
+Instance Setoid_Morphism_cos : Setoid_Morphism cos.
+Proof.
+  constructor; try apply st_isSetoid.
+  intros a b Heq.
+  rewrite cos_cos_slow, cos_cos_slow.
+  rewrite Heq.
+  reflexivity.
+Qed.
+
+
+Lemma cos_correct_CR : forall x,
+  (IRasCR (Cos (CRasIR x)) = cos x).
+Proof.
+  intros x. rewrite cos_correct.
+  apply sm_proper.
+  apply CRasIRasCR_id.
 Qed.
 
 (* begin hide *)
 Hint Rewrite cos_correct : IRtoCR.
 (* end hide *)
+
+
+Lemma CRCos_plus_Pi: ∀ x : CR, (cos (x + CRpi) = - (cos x))%CR.
+  intros x.
+  pose proof (Pi.Cos_plus_Pi (CRasIR x)) as Hc.
+  apply IRasCR_wd in Hc.
+  autorewrite with IRtoCR in Hc.
+  rewrite CRasIRasCR_id in Hc.
+  exact Hc.
+Qed.

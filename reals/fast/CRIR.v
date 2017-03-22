@@ -397,3 +397,88 @@ Proof.
  rewrite -> IR_opp_as_CR.
  reflexivity.
 Qed.
+
+Require Import MathClasses.interfaces.abstract_algebra.
+
+Instance Injective_instance_CRasIR : Injective  CRasIR.
+  constructor.
+- intros ? ? Heq. apply (fun_strext_imp_wd _ _ IRasCR) in Heq;
+    [ | apply R_morphism.map_strext].
+  repeat( rewrite CRasIRasCR_id in Heq).
+  exact Heq.
+- constructor;eauto 2 with *.
+  exact CRasIR_wd.
+Qed.
+
+Instance Injective_instance_IRasCR : Injective  IRasCR.
+  constructor.
+- intros ? ? Heq. apply (fun_strext_imp_wd _ _ CRasIR) in Heq;
+    [ | apply R_morphism.map_strext].
+  repeat (rewrite IRasCRasIR_id in Heq).
+  exact Heq.
+- constructor; try apply st_isSetoid.
+  exact IRasCR_wd.
+Qed.
+
+Lemma CRasIR_inv :  forall x, (CRasIR (- x) = [--] (CRasIR x))%CR.
+Proof.
+  intros. apply (injective IRasCR).
+  rewrite IR_opp_as_CR.
+  rewrite CRasIRasCR_id, CRasIRasCR_id.
+  reflexivity.
+Qed.
+
+Lemma CR_leEq_as_IR :
+∀ x y : CR , x ≤ y ↔ (CRasIR x [<=] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_leEq_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  symmetry. exact HH.
+Qed.
+
+Lemma CRasIR0 : CRasIR 0 = [0].
+Proof.
+  pose proof IR_Zero_as_CR as HH.
+  apply CRasIR_wd in HH.
+  rewrite IRasCRasIR_id in HH.
+  symmetry. exact HH.
+Qed.
+
+Lemma CR_plus_asIR :
+∀ x y : CR , CRasIR (x+y) = (CRasIR x [+] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_plus_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  apply CRasIR_wd in HH.
+  rewrite <- HH.
+  rewrite IRasCRasIR_id.
+  reflexivity.
+Qed.
+
+Lemma CR_mult_asIR :
+∀ x y : CR , CRasIR (x*y) = (CRasIR x [*] CRasIR y).
+Proof.
+  intros x y.
+  pose proof (IR_mult_as_CR (CRasIR x) (CRasIR y)) as HH.
+  rewrite CRasIRasCR_id in HH.
+  rewrite CRasIRasCR_id in HH.
+  apply CRasIR_wd in HH.
+  rewrite <- HH.
+  rewrite IRasCRasIR_id.
+  reflexivity.
+Qed.
+
+Lemma IRasCR_preserves_less : 
+  forall x y, (x[<]y -> IRasCR x < IRasCR y)%CR.
+Proof.
+ intros x y H.
+  pose proof (iso_map_rht _ _ CRIR_iso).
+  simpl. 
+  apply (map_pres_less _ _  (iso_map_rht _ _ CRIR_iso)) in H.
+  simpl in H.
+  exact H.
+Qed.

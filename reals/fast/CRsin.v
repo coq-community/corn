@@ -550,30 +550,69 @@ Qed.
 
 Definition sin (x:CR) := sin_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.
 
+Lemma  sin_sin_slow : forall x, sin x = sin_slow x.
+Proof.
+  intros x.
+  unfold sin.
+  generalize (Qround.Qceiling (approximate (x * CRinv_pos (6 # 1) (scale 2 CRpi))
+   (1 # 2)%Qpos - (1 # 2)))%CR.
+  intros z.
+  rewrite -> compress_correct.
+  rewrite <- (CRasIRasCR_id x).
+  rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
+   <- IR_minus_as_CR, <- sin_slow_correct, <- sin_slow_correct.
+  remember (CRasIR x) as y.
+  clear dependent x. rename y into x.
+  apply IRasCR_wd.
+  rewrite -> inj_Q_mult.
+  change (2:Q) with (Two:Q).
+  rewrite -> inj_Q_nring.
+  symmetry.
+  rstepr (Sin (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
+  setoid_replace (inj_Q IR z) with (zring z:IR).
+  rewrite <- zring_inv.
+  symmetry; apply Sin_periodic_Z.
+  rewrite <- inj_Q_zring.
+  apply inj_Q_wd.
+  symmetry; apply zring_Q.
+Qed.
+
 Lemma sin_correct : forall x,
   (IRasCR (Sin x) == sin (IRasCR x))%CR.
 Proof.
- intros x.
- unfold sin.
- generalize (Qceiling (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
-   (1 # 2)%Qpos - (1 # 2)))%CR.
- intros z.
- rewrite -> compress_correct.
- rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,
-   <- IR_minus_as_CR, <- sin_slow_correct.
- apply IRasCR_wd.
- rewrite -> inj_Q_mult.
- change (2:Q) with (Two:Q).
- rewrite -> inj_Q_nring.
- rstepr (Sin (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
- setoid_replace (inj_Q IR z) with (zring z:IR).
-  rewrite <- zring_inv.
-  symmetry; apply Sin_periodic_Z.
- rewrite <- inj_Q_zring.
- apply inj_Q_wd.
- symmetry; apply zring_Q.
+  intros x.
+  rewrite sin_sin_slow.
+  apply sin_slow_correct.
+Qed.
+
+
+Instance Setoid_Morphism_sin : Setoid_Morphism sin.
+Proof.
+  constructor; try apply st_isSetoid.
+  intros a b Heq.
+  rewrite sin_sin_slow, sin_sin_slow.
+  rewrite Heq.
+  reflexivity.
+Qed.
+
+Lemma sin_correct_CR : forall x,
+  (IRasCR (Sin (CRasIR x)) = sin x).
+Proof.
+  intros x. rewrite sin_correct.
+  apply sm_proper.
+  apply CRasIRasCR_id.
 Qed.
 
 (* begin hide *)
 Hint Rewrite sin_correct : IRtoCR.
 (* end hide *)
+
+
+Lemma CRSin_plus_Pi: ∀ x : CR, (sin (x + CRpi) = (- sin x))%CR.
+  intros x.
+  pose proof (Pi.Sin_plus_Pi (CRasIR x)) as Hc.
+  apply IRasCR_wd in Hc.
+  autorewrite with IRtoCR in Hc.
+  rewrite CRasIRasCR_id in Hc.
+  exact Hc.
+Qed.
