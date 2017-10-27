@@ -290,7 +290,8 @@ transitivity ('(abs (x - x0) * M)).
   intros t A.
   assert (A1 : mspc_ball rx x0 t) by
     (apply (mspc_ball_convex x0 x); [apply mspc_refl, (proj2_sig rx) | |]; trivial).
-  apply extend_inside in A1. destruct A1 as [p A1]. rewrite A1. apply bounded.
+  apply (extend_inside (Y:=CR)) in A1.
+  destruct A1 as [p A1]. rewrite A1. apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_M.
@@ -319,7 +320,7 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
   intros x' B. assert (B1 : ball rx x0 x') by
     (apply (mspc_ball_convex x0 x); [apply mspc_refl | |]; solve_propholds).
   unfold plus, negate, ext_plus, ext_negate.
-  apply extend_inside in B1. destruct B1 as [p B1]. rewrite !B1.
+  apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1]. rewrite !B1.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
   apply (lip_prf (λ y, v (_, y)) L), A.
 + apply CRle_Qle. mc_setoid_replace (L * rx * e) with ((to_Q rx) * (L * e)) by ring.
@@ -366,7 +367,9 @@ Definition L : Q := 1.
 Instance : Bounded v M.
 Proof.
 intros [x [y H]]. unfold v; simpl. unfold M, ry, y0 in *.
-apply mspc_ball_CRabs, CRdistance_CRle in H. destruct H as [H1 H2].
+apply mspc_ball_CRabs in H.
+(* MS: why is this taking ages? *)
+apply <- (CRdistance_CRle 1) in H. destruct H as [H1 H2].
 change (1 - 1 ≤ y) in H1. change (y ≤ 1 + 1) in H2. change (abs y ≤ 2).
 rewrite plus_negate_r in H1. apply CRabs_AbsSmall. split; [| assumption].
 change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.

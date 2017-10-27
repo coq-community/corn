@@ -1,5 +1,5 @@
 Require Import
-  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Coq.Numbers.Integer.BigZ.BigZ CoRN.model.structures.Qpossec
+  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ CoRN.model.structures.Qpossec
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.util.Qdlog CoRN.reals.faster.ARArith
   MathClasses.theory.int_pow MathClasses.theory.nat_pow
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.fast_integers MathClasses.implementations.dyadics.

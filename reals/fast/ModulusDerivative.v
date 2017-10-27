@@ -55,7 +55,7 @@ end.
 
 Let properI : proper I.
 Proof.
- destruct l as [|l];destruct r as [|r]; try constructor.
+ destruct l; destruct r; try constructor.
  simpl.
  apply inj_Q_less.
  assumption.
@@ -71,7 +71,7 @@ end.
 
 Lemma ball_clamp : forall e a b, ball e a b -> ball e (clamp a) (clamp b).
 Proof.
- destruct l as [|l]; destruct r as [|r]; unfold clamp; intros e a b Hab; try apply uc_prf; apply Hab.
+ destruct l; destruct r; unfold clamp; intros e a b Hab; try apply uc_prf; apply Hab.
 Qed.
 
 Variable f f' : PartFunct IR.
@@ -91,7 +91,7 @@ Proof.
  assert (X:forall x, I (inj_Q _ (clamp x))).
   clear -I Hlr.
   intros x.
-  destruct l as [|l];destruct r as [|r]; try split; unfold clamp; apply: inj_Q_leEq; simpl;
+  destruct l; destruct r; try split; unfold clamp; apply: inj_Q_leEq; simpl;
     auto with *.
   assert (Y:=(fun a=> (Hg _ (Derivative_imp_inc _ _ _ _ Hf _ (X a)) (X a)))).
  do 2 rewrite -> Y.

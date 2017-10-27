@@ -452,23 +452,27 @@ Proof.
  exists (Zabs_nat (up x)).
  unfold Zabs_nat.
  elim (archimed x).
- destruct (up x); simpl.
-   intros; fourier.
-  unfold nat_of_P.
+ destruct (up x).
+   simpl; intros; fourier.
+  rewrite <- positive_nat_Z.
   intros H _.
   apply Rlt_le.
   rewrite <- R_INR_as_IR.
-  auto.
+  now rewrite INR_IZR_INZ.
  intros I _.
  cut (x < 0%R).
   intro H; clear I.
   rewrite <- R_INR_as_IR.
   cut (0 <= INR (nat_of_P p)).
    intro.
+   apply Rlt_le.
    fourier.
   apply pos_INR.
  cut (0 <= INR (nat_of_P p)).
+  rewrite INR_IZR_INZ.
   intro.
+  change (IZR (Zneg p)) with (Ropp (IZR (Zpos p))) in I.
+  rewrite <- positive_nat_Z in I.
   fourier.
  apply pos_INR.
 Qed.
