@@ -186,7 +186,7 @@ Proof.
  apply Qplus_le_compat. assumption. apply Qle_refl.
 Qed.
 
-Open Local Scope Qpos_scope.
+Local Open Scope Qpos_scope.
 
 Definition Qpos_min_plus_distr_r : (forall x y z : Qpos, Qpos_plus x (Qpos_min y z) == Qpos_min (Qpos_plus x y) (Qpos_plus x z))  :=
  fun a => @monotone_meet_distr Qto _ (Qplus_monotone_r a).

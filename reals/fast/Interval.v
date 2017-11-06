@@ -30,7 +30,7 @@ Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.logic.Classic.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Opaque Qabs.
 
@@ -330,7 +330,7 @@ Qed.
 Definition CompactIntervalQ : Compact stableQ :=
 Build_RegularFunction CompactIntervalQ_prf.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Opaque max.
 

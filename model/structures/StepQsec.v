@@ -9,8 +9,8 @@ Require Import CoRN.algebra.RSetoid.
 
 Set Implicit Arguments.
 
-Open Local Scope setoid_scope.
-Open Local Scope sfstscope.
+Local Open Scope setoid_scope.
+Local Open Scope sfstscope.
 
 Section QS.
 
@@ -86,7 +86,7 @@ Instance StepQ_default : @DefaultRelation (StepF QS) (@StepF_eq QS) | 2.
 Delimit Scope StepQ_scope with SQ.
 Bind Scope StepQ_scope with StepF.
 
-Open Local Scope StepQ_scope.
+Local Open Scope StepQ_scope.
 
 Definition StepQplus (s t:StepQ) : StepQ := QplusS ^@> s <@> t.
 Definition StepQopp (s:StepQ) : StepQ := QoppS ^@> s.

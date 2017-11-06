@@ -27,7 +27,7 @@ Require Import CoRN.algebra.COrdFields2.
 Require Import Coq.QArith.Qpower.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (** These functions effiecently find bounds on rational numbers of the
 form 3^z or 4^z. *)

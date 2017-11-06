@@ -9,7 +9,7 @@ Context `{AppRationals AQ}.
 
 Add Ring AQ : (rings.stdlib_ring_theory AQ).
 
-Open Local Scope uc_scope. 
+Local Open Scope uc_scope. 
 
 Definition AQ_as_MetricSpace := Emetric (cast AQ Q_as_MetricSpace).
 Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (cast AQ Q_as_MetricSpace).

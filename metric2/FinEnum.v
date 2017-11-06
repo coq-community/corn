@@ -30,7 +30,7 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section Finite.
 
@@ -596,7 +596,7 @@ Proof.
  contradiction.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (** [map] is compatable with classical in *)
 Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l, InFinEnumC a l -> InFinEnumC (f a) (map f l).

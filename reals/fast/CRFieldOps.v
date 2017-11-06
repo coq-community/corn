@@ -31,8 +31,8 @@ Require Import MathClasses.interfaces.canonical_names.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 Opaque CR Qmin Qmax Qred.
 
 (**

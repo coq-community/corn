@@ -60,7 +60,7 @@ Reserved Notation "\adj A"  (at level 10, A at level 8, format "\adj  A").
 
 Delimit Scope matrix_scope with M.
 
-Open Local Scope matrix_scope.
+Local Open Scope matrix_scope.
 
 Definition setoid_cancel {A : Type} {B : Type} `{Equivalence A aeq} (f : A -> B) g :=
     forall x, g (f x) === x.

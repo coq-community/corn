@@ -33,7 +33,7 @@ Require Import CoRN.tactics.Qauto.
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section Prelength_Space.
 (**
@@ -275,7 +275,7 @@ End Prelength_Space.
 
 Section Map.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 Variable X Y : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
 Variable f : X --> Y.
@@ -350,7 +350,7 @@ Qed.
 End Map.
 
 Section fast_Monad_Laws.
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Variable X Y Z : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
@@ -371,7 +371,7 @@ Proof. rewrite Cmap_correct. simpl. apply MonadLaw3. Qed.
 
 End fast_Monad_Laws.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (** [Cmap] preserves extensional equality *)
 

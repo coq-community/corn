@@ -15,9 +15,9 @@ Import QnonNeg.notations QnnInf.notations CRball.notations.
 
 Implicit Arguments proj1_sig [[A] [P]].
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
-Open Local Scope CR_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
+Local Open Scope CR_scope.
 
 Hint Immediate ball_refl Qle_refl.
 

@@ -48,8 +48,8 @@ Set Implicit Arguments.
 Opaque CR.
 Opaque Exp.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 (**
 ** Exponential

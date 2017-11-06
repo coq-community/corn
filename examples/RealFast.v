@@ -20,7 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CRtrans.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (* This file illustrates how to use the computational reals CR *)
 

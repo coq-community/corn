@@ -38,7 +38,7 @@ Require Export CoRN.model.abgroups.Qabgroup.
 Require Import CoRN.algebra.CRings.
 Require Import CoRN.model.rings.Zring.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 ** Example of a ring: $\langle$#&lang;#[Q],[[+]],[[*]]$\rangle$#&rang;#

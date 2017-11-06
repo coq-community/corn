@@ -29,7 +29,7 @@ Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.logic.Stability.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 (**
 ** Absolute Value
 *)
@@ -52,7 +52,7 @@ Proof.
  apply Qabs_triangle_reverse.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition Qabs_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qabs_uc_prf.
@@ -128,7 +128,7 @@ Proof.
  apply AbsSmall_imp_AbsIR.
 Qed.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Lemma CRabs_pos : forall x:CR, 0 <= x -> CRabs x == x.
 Proof.

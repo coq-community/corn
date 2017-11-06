@@ -8,7 +8,7 @@ Import QnonNeg.notations.
 
 Local Hint Resolve Qle_refl.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (* Some generic utilities: *)
 

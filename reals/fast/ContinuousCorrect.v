@@ -29,7 +29,7 @@ Opaque CR inj_Q.
 
 Set Implicit Arguments.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 (**
 ** Correctness of continuous functions.
 We show that if two functions, one on IR and one on CR, agree on the

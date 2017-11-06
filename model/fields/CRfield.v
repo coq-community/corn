@@ -29,7 +29,7 @@ Require Import CoRN.tactics.CornTac.
 ** Example of a field: $\langle$#&lang;#[CR],[+],[*]$\rangle$#&rang;#
 *)
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Lemma CRisCField : is_CField CRasCRing CRinvT.
 Proof.

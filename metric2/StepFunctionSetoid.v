@@ -29,7 +29,7 @@ Require Import CoRN.algebra.COrdFields.
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section StepF_Functions.
 
@@ -70,7 +70,7 @@ End StepF_Functions.
 (* begin hide *)
 Implicit Arguments constStepF [X].
 (* end hide *)
-Open Local Scope setoid_scope.
+Local Open Scope setoid_scope.
 
 (** We lift ap to the setoid version.  Map is a notation calling ap so
 that all lemmas about ap automatically apply to ap *)
@@ -79,7 +79,7 @@ Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfstscope.
 Notation "f ^@> x" := (Ap (constStepF f) x) (at level 15, left associativity) : sfstscope.
 Notation "f <@^ x" := (Ap f (constStepF x)) (at level 15, left associativity) : sfstscope.
 
-Open Local Scope sfstscope.
+Local Open Scope sfstscope.
 
 (** We lift lemmas about map, ap, mirror, and glue *)
 Lemma MirrorGlue : forall (X : RSetoid) (o : OpenUnit) (al ar : StepF X),

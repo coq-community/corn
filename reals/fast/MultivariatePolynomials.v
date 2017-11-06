@@ -189,7 +189,7 @@ match n return MultivariatePolynomial Q_as_CRing n -> Q with
                          (fun c _ _ rec => Qmin (MVP_lowerBound n' c) rec) m b
 end.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (** Definition of the unit hyperinterval of n dimensions *)
 Fixpoint UnitHyperInterval (n:nat) (v:Vector.t Q n) : Prop :=
@@ -481,7 +481,7 @@ Proof.
  reflexivity.
 Qed.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (** Use the upper and lower bounds of the derivative of a polynomial to
 define its modulus of continuity. *)
@@ -566,7 +566,7 @@ Proof.
  reflexivity.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (** Clamp a value to the unit interval *)
 Definition Qclamp01 := QboundBelow_uc (0) ∘ QboundAbove_uc 1.

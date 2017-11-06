@@ -30,8 +30,8 @@ Require Import MathClasses.interfaces.additional_operations.
 
 Opaque CR inj_Q.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 (**
 ** Natural Integer Powers

@@ -37,7 +37,7 @@ Require Import CoRN.util.Qdlog.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import MathClasses.interfaces.orders.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 (** Operations on rational numbers over CR are the same as the operations
 on rational numbers. *)

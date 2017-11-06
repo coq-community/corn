@@ -201,7 +201,7 @@ Proof.
  split; assumption.
 Qed.
 (* end hide *)
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (** [together] forms the tensor of two functions operating between
 metric spaces *)

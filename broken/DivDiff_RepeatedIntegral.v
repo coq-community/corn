@@ -157,7 +157,7 @@ Proof. induction xs; simpl; congruence. Qed.
 
     Definition G (n: nat): Type := UCFunction (SomeWeights n) (sig ((∈ nth_deriv_bound))).
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
     Section reduce.
 

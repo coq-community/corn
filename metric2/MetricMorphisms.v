@@ -7,7 +7,7 @@ Require Import
   CoRN.metric2.Complete CoRN.metric2.Prelength
   MathClasses.interfaces.abstract_algebra.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (* Given an embedding of a setoid [X] into a metric space [Y] then [X] is also a 
    metric space. Moreover this embedding is uniformly continuous. *)

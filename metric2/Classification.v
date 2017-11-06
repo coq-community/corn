@@ -21,7 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.tactics.Qauto.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 ** Classification of metric spaces

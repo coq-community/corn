@@ -435,9 +435,9 @@ Context {op_assoc : associative op}.
 Context {op_left_id : left_unit op idm}.
 Context {op_right_id : right_unit op idm}.
 
-Notation Local "*%M" := op (at level 0).
-Notation Local "x * y" := (op x y).
-Notation Local "1" := idm.
+Local Notation "*%M" := op (at level 0).
+Local Notation "x * y" := (op x y).
+Local Notation "1" := idm.
 
 Lemma eq_big_idx_seq : forall idx' I r (P : pred I) F,
      right_unit *%M idx' -> has P r ->
@@ -581,9 +581,9 @@ Context {op_left_id : left_unit op idm}.
 Context {op_right_id : right_unit op idm}.
 Context {op_comm : commutative op}.
 
-Notation Local "'*%M'" := op (at level 0).
-Notation Local "x * y" := (op x y).
-Notation Local "1" := idm.
+Local Notation "'*%M'" := op (at level 0).
+Local Notation "x * y" := (op x y).
+Local Notation "1" := idm.
 
 (* sinon ca marche pas... *)
 Existing Instance mulAC_comm_l.
@@ -874,11 +874,11 @@ End Morphism.
 Section Distributivity.
 
 Context `{Equivalence} {add mul : binop A} {zero : A}.
-Notation Local "*%M" := mul (at level 0).
-Notation Local "x * y" := (mul x y).
-Notation Local "0" := zero.
-Notation Local "+%M" := add (at level 0).
-Notation Local "x + y" := (add x y).
+Local Notation "*%M" := mul (at level 0).
+Local Notation "x * y" := (mul x y).
+Local Notation "0" := zero.
+Local Notation "+%M" := add (at level 0).
+Local Notation "x + y" := (add x y).
 
 Context {op_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) add}.
 Context {mul_morph : Proper (Equivalence.equiv==>Equivalence.equiv==>Equivalence.equiv) mul}.
@@ -907,7 +907,7 @@ by apply op_right_zero.
 Qed.
 
 Context {one : R}.
-Notation Local "1" := one.
+Local Notation "1" := one.
 
 (* sinon ça marche pas...*)
 Existing Instance mulC_id_l.

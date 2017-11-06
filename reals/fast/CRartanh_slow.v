@@ -36,8 +36,8 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 Opaque inj_Q CR.
 

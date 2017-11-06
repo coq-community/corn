@@ -38,7 +38,7 @@ Set Implicit Arguments.
 
 Opaque CR Qabs.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 ** Geometric Series
@@ -67,7 +67,7 @@ match ((err_bound s) ?= err) with
 end.
 
 (* begin hide *)
-Coercion Local Is_true : bool >-> Sortclass.
+Local Coercion Is_true : bool >-> Sortclass.
 (* end hide *)
 
 Lemma err_prop_prop : forall e s, err_prop e s <-> err_bound s <= e.

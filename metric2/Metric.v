@@ -32,7 +32,7 @@ Require Import CoRN.stdlib_omissions.Q.
 Require CoRN.model.structures.QnnInf.
 Import QnnInf.notations.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Set Implicit Arguments.
 

@@ -46,7 +46,7 @@ Admitted.
   (** Todo: Prove and move. Only added here temporarily to make definition of repeated integral compile. *)
 
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Local Notation Σ := cm_Sum.
 Local Notation Π := cr_Product.

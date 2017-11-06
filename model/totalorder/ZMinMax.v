@@ -30,7 +30,7 @@ Opaque Z_lt_le_dec.
 *)
 Section ZTotalOrder.
 
-Open Local Scope Z_scope.
+Local Open Scope Z_scope.
 
 Definition Zle_total x y : {x <= y} + {y <= x} :=
 match Z_lt_le_dec x y with

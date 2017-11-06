@@ -205,7 +205,7 @@ Build_MetricSpace (@ucBall_wd X Y) (@uc_is_MetricSpace X Y).
 
 Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 55, right associativity) : uc_scope.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 (* begin hide *)
 Add Parametric Morphism (X Y:MetricSpace) f : (@ucFun X Y f) with signature (@st_eq X) ==> (@st_eq Y) as uc_wd.
 Proof.

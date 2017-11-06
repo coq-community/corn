@@ -42,7 +42,7 @@ Hypothesis Hlr : l < r.
 Variable (b t:Q).
 Hypothesis Hbt : b < t.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Let clip := uc_compose (boundBelow b) (boundAbove t).
 
@@ -97,7 +97,7 @@ Let err := Qpos_max ((1 # 4 * P_of_succ_nat (pred n)) * w)
 (** [PlotQ] is the function that does all the work. *)
 Definition PlotQ := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
 
-Open Local Scope raster.
+Local Open Scope raster.
 
 (** The resulting plot is close to the graph of [f] *)
 Theorem Plot_correct :

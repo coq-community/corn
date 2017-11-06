@@ -55,7 +55,7 @@ Record PartialOrder : Type :=
 Notation "x == y" := (st_eq x y) (at level 70, no associativity) : po_scope.
 Notation "x <= y" := (le _ x y) : po_scope.
 
-Open Local Scope po_scope.
+Local Open Scope po_scope.
 
 Lemma po_st : forall X eq le mnt ant, @is_PartialOrder X eq le mnt ant -> Setoid_Theory X eq.
 Proof with trivial.

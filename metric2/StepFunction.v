@@ -26,7 +26,7 @@ Require Import CoRN.algebra.COrdFields.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section StepFunction.
 
@@ -602,7 +602,7 @@ Defined.
 
 Notation "f ^@> x" := (Map f x) (at level 15, left associativity) : sfscope.
 
-Open Local Scope sfscope.
+Local Open Scope sfscope.
 (** Step functions are an applicative functor *)
 Fixpoint Ap (X Y:Type) (f:StepF (X->Y)) (a:StepF X) : StepF Y :=
 match f with

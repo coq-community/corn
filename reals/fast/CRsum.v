@@ -25,7 +25,7 @@ Require Import CoRN.model.rings.Qring.
 Require Import CoRN.tactics.Qauto.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Definition CRsum_list_raw (l:list CR) (e:QposInf) : Q :=
 fold_left Qplus

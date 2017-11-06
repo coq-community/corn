@@ -23,7 +23,7 @@ Set Firstorder Depth 5.
 Require Import Coq.Setoids.Setoid.
 Require Export CoRN.order.Lattice.
 
-Open Local Scope po_scope.
+Local Open Scope po_scope.
 (**
 * Total Order
 A total order is a lattice were x <= y or y <= x.

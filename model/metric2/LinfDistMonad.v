@@ -34,13 +34,13 @@ swap (which we call dist) as in Jones, Duponcheel - composing monads
 *)
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
-Open Local Scope sfstscope.
+Local Open Scope Q_scope.
+Local Open Scope sfstscope.
 
 Section Dist.
 (* M= Complete, N= StepF
 dist = distribComplete*)
-Open Local Scope sfstscope.
+Local Open Scope sfstscope.
 Variable X: MetricSpace.
 (** The dist function exchanges StepF (under the infinity metric) and Complete monads *)
 
@@ -122,9 +122,9 @@ Proof.
  split; revert d1 d2; tauto.
 Qed.
 
-Open Local Scope uc_scope.
-Open Local Scope sfstscope.
-Open Local Scope sfscope.
+Local Open Scope uc_scope.
+Local Open Scope sfstscope.
+Local Open Scope sfscope.
 
 Definition dist: (StepFSup (Complete X))-->(Complete (StepFSup X)).
 Proof.

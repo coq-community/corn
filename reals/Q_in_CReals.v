@@ -92,7 +92,7 @@ Proof.
 Qed.
 (*--------------------------------------*)
 
-Coercion Local nat_of_P : positive >-> nat.
+Local Coercion nat_of_P : positive >-> nat.
 (* end hide *)
 
 (**

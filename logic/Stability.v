@@ -130,7 +130,7 @@ Proof.
   auto using decision_stable, Qle_dec.
 Qed.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Lemma DN_or P Q: Not ((Not P) /\ (Not Q)) -> DN (P + Q).
 Proof. firstorder. Qed.

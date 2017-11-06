@@ -40,7 +40,7 @@ Proof.
  assumption.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition pi1 : XY --> X :=
 Build_UniformlyContinuousFunction fst_uc.

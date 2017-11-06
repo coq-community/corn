@@ -34,8 +34,8 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope sfstscope.
-Open Local Scope StepQ_scope.
+Local Open Scope sfstscope.
+Local Open Scope StepQ_scope.
 
 Opaque Qmax Qabs.
 
@@ -160,7 +160,7 @@ Proof.
        apply: plus_resp_leEq_lft; simpl; auto with * ).
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition StepQSup_uc : LinfStepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction sup_uc_prf.
