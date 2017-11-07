@@ -30,7 +30,7 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section Graph.
 (**
@@ -47,7 +47,7 @@ Let XY := ProductMS X Y.
 various ways to produce a graph *)
 Definition graphPoint_raw (f:X -> Y) (x:X) : XY := (x,f x).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Variable f : X --> Y.
 
@@ -296,7 +296,7 @@ Let XY := ProductMS X Y.
 
 Definition graphPoint_b_raw (f:X -> Complete Y) (x:X) : Complete XY := Couple (Cunit x,f x).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Variable f : X --> Complete Y.
 

@@ -29,7 +29,7 @@ Require Import CoRN.model.metric2.BoundedFunction.
 
 Set Implicit Arguments.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 (**
 ** Example of a Complete Metric Space: IntegrableFunction
 *)

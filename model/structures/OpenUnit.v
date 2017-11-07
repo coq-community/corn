@@ -26,7 +26,7 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 * [OpenUnit]

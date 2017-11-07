@@ -47,7 +47,7 @@ Set Implicit Arguments.
 
 Opaque Qmax Qabs inj_Q.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 * Effective Integration
@@ -78,9 +78,9 @@ Proof.
  auto with *.
 Qed.
 
-Open Local Scope setoid_scope.
-Open Local Scope sfstscope.
-Open Local Scope StepQ_scope.
+Local Open Scope setoid_scope.
+Local Open Scope sfstscope.
+Local Open Scope StepQ_scope.
 
 Definition stepSample : positive -> StepQ := positive_rect2
  (fun _ => StepQ)
@@ -531,7 +531,7 @@ Qed.
 Definition distribComplete (x:StepF CR) : BoundedFunction :=
 Build_RegularFunction (distribComplete_prf x).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (** Given a uniformly continuous function f, and a step function g,
 the composition f o g is a bounded function.  The map from g to f o g

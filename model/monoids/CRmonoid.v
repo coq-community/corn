@@ -24,7 +24,7 @@ Require Export CoRN.model.semigroups.CRsemigroup.
 Require Import CoRN.reals.fast.CRcorrect.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (**
 ** Examples of monoids: $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#

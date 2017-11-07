@@ -38,7 +38,7 @@ Require Import CoRN.tactics.Qauto.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Opaque CR.
 Opaque Qmin Qmax.
@@ -925,7 +925,7 @@ Proof.
  apply sqrt_nonneg.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition sqrt_uc : Q_as_MetricSpace --> CR :=
 Build_UniformlyContinuousFunction sqrt_uc_prf.

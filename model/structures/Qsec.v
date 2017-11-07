@@ -48,7 +48,7 @@ Require Export Coq.QArith.QArith.
 Require Import CoRN.stdlib_omissions.Q.
 
 Close Scope Q_scope.
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 * [Q]

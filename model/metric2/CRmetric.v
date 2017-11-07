@@ -28,7 +28,7 @@ Require Import MathClasses.implementations.stdlib_rationals.
 
 Set Implicit Arguments.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (**
 * Complete Metric Space: Computable Reals (CR)

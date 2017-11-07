@@ -26,9 +26,9 @@ Require Import CRtrans.
 Notation star := (@refl_equal _ Lt).
 Notation "∗" := star.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
-Open Local Scope raster.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
+Local Open Scope raster.
 
 (* This file illustrates how to plot funcitons *)
 (* PlotQ requires that we plot uniformly continuous functions.

@@ -79,7 +79,7 @@ Defined.
 
 Notation "x --> y" := (extSetoid x y) (at level 55, right associativity) : setoid_scope.
 
-Open Local Scope setoid_scope.
+Local Open Scope setoid_scope.
 (**
 ** Basic Combinators for Setoids
 *)

@@ -32,9 +32,9 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
-Open Local Scope sfstscope.
-Open Local Scope StepQ_scope.
+Local Open Scope Q_scope.
+Local Open Scope sfstscope.
+Local Open Scope StepQ_scope.
 
 Opaque Qred.
 
@@ -532,7 +532,7 @@ Proof.
  assumption.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition IntegralQ_uc : L1StepQ --> Q_as_MetricSpace
 := Build_UniformlyContinuousFunction integral_uc_prf.

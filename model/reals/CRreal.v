@@ -28,7 +28,7 @@ Require Import CoRN.tactics.CornTac.
 
 Opaque CR.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 (**
 ** Example of a real number structure: $\langle$#&lang;#[CR]$\rangle$#&rang;#

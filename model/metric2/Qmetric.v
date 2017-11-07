@@ -31,7 +31,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Opaque Qabs.
 

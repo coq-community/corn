@@ -46,7 +46,7 @@ Require Import Coq.QArith.Qround.
 Require Import Coq.QArith.Qabs.
 Require Import CoRN.stdlib_omissions.Q.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 * [Qpos]

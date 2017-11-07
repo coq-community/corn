@@ -285,7 +285,7 @@ Proof.
  apply Cauchy_IR_eq_as_CR_eq.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 (**
 *** Functions preserved by isomorphism.
 *)

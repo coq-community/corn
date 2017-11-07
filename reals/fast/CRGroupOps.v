@@ -34,8 +34,8 @@ Set Automatic Introduction.
 
 Opaque CR Qmin Qmax.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 Instance CR0: Zero CR := cast Q CR 0.
 Notation "0" := (inject_Q_CR 0) : CR_scope.

@@ -28,8 +28,8 @@ Require Import CoRN.model.totalorder.QposMinMax.
 
 Set Implicit Arguments.
 
-Open Local Scope Q_scope.
-Open Local Scope Qpos_scope.
+Local Open Scope Q_scope.
+Local Open Scope Qpos_scope.
 
 (**
 * [Qpos]

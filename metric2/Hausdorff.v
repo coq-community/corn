@@ -29,7 +29,7 @@ Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.tactics.Qauto.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Section HausdorffMetric.
 

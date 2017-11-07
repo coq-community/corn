@@ -32,7 +32,7 @@ Require Import CoRN.tactics.CornTac.
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 * Compact sets
@@ -1445,7 +1445,7 @@ Proof.
  apply: orWeaken; right; auto.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Definition FinCompact : FinEnum stableCX --> Compact stableX :=
  Build_UniformlyContinuousFunction FinCompact_uc.
@@ -1662,7 +1662,7 @@ Hypothesis stableY : stableMetric Y.
 Hypothesis plX : PrelengthSpace X.
 Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Variable f : X --> Y.
 
@@ -1760,7 +1760,7 @@ Hypothesis stableY : stableMetric Y.
 Hypothesis plX : PrelengthSpace X.
 Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Variable f : X --> Complete Y.
 

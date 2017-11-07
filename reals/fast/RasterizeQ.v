@@ -27,7 +27,7 @@ Require Import CoRN.tactics.Qauto.
 Require Import Coq.QArith.Qround.
 Require Import CoRN.tactics.CornTac.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Set Implicit Arguments.
 

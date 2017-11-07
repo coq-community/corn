@@ -37,8 +37,8 @@ Require Import CoRN.tactics.CornTac.
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Open Local Scope sfstscope.
-Open Local Scope setoid_scope.
+Local Open Scope sfstscope.
+Local Open Scope setoid_scope.
 
 (**
 ** Linf metric for Step Functions
@@ -292,7 +292,7 @@ Proof.
   assumption. rewrite SplitRGlue;reflexivity.
 Qed.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Section UniformlyContinuousFunctions.
 

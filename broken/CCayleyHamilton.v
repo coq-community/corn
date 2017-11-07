@@ -147,9 +147,9 @@ Open Scope matrix_scope.
 Section char_poly.
 
 Variable n : nat.
-Notation Local "R [ 'X' ]" := (cpoly_cring R)
+Local Notation "R [ 'X' ]" := (cpoly_cring R)
   (at level 0, format "R [ 'X' ]").
-Notation Local "'M' ( R )" := (matrix R n n)
+Local Notation "'M' ( R )" := (matrix R n n)
   (at level 0, format "'M' ( R )").
 
 Variable A : M(CR).

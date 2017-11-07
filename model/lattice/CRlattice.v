@@ -34,7 +34,7 @@ Section CRLattice.
 
 Let CRlat := CRLattice.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Definition CRmin_comm : forall x y : CR, CRmin x y == CRmin y x := @meet_comm CRlat.
 Definition CRmin_assoc : forall x y z : CR, CRmin x (CRmin y z) == CRmin (CRmin x y) z:=

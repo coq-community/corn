@@ -38,7 +38,7 @@
 Require Export CoRN.model.semigroups.Qsemigroup.
 Require Import CoRN.algebra.CMonoids.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 ** Examples of a monoid: $\langle$#&lang;#[Q],[[+]]$\rangle$#&rang;# and $\langle$#&lang;#[Q],[[*]]$\rangle$#&rang;#

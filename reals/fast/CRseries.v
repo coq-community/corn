@@ -33,7 +33,7 @@ Require Import Coq.setoid_ring.Ring MathClasses.interfaces.abstract_algebra Math
 Require Export MathClasses.theory.series.
 
 Opaque Qabs.
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 (**
 ** Specific results for series on [Q]

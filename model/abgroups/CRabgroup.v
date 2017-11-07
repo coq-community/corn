@@ -28,7 +28,7 @@ Require Import CoRN.tactics.CornTac.
 ** Example of a abelian group: $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
 *)
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Lemma CRisCAbGroup : is_CAbGroup CRasCGroup.
 Proof.

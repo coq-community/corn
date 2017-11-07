@@ -30,7 +30,7 @@ Require Import CoRN.tactics.CornTac.
 *** $\langle$#&lang;#[CR],[+]$\rangle$#&rang;#
 *)
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Lemma CRplus_strext : bin_op_strext CRasCSetoid (ucFun2 CRplus_uc).
 Proof.

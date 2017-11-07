@@ -48,7 +48,7 @@ a bound on the error of the partial sum.
 
 Section InfiniteAlternatingSum.
 (* begin hide *)
-Coercion Local Is_true : bool >-> Sortclass.
+Local Coercion Is_true : bool >-> Sortclass.
 (* end hide *)
 (** Given a stream, we can compute its alternating partial sum up to
 an point satifying a predicate, so long as that predicate eventually
@@ -258,7 +258,7 @@ Proof.
   now rewrite (InfiniteAlternatingSum_raw_wd s1 s2).
 Qed.
 
-Open Local Scope Q_scope.
+Local Open Scope Q_scope.
 
 Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : 
  (InfiniteAlternatingSum seq == '(hd seq) - InfiniteAlternatingSum (tl seq))%CR.

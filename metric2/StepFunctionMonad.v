@@ -40,8 +40,8 @@ Proof.
  apply StepF_Sth.
 Defined.
 
-Open Local Scope setoid_scope.
-Open Local Scope sfstscope.
+Local Open Scope setoid_scope.
+Local Open Scope sfstscope.
 
 (** We redefine several functions to return a setoid type. *)
 

@@ -22,7 +22,7 @@ Set Firstorder Depth 5.
 
 Require Export CoRN.order.PartialOrder.
 
-Open Local Scope po_scope.
+Local Open Scope po_scope.
 
 (**
 * SemiLattice

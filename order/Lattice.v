@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import Coq.Setoids.Setoid.
 Require Export CoRN.order.SemiLattice.
 
-Open Local Scope po_scope.
+Local Open Scope po_scope.
 
 (**
 * Lattice

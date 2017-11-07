@@ -27,7 +27,7 @@ Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 (**
 ** Example of a Complete Metric Space: BoundedFunction
 *)

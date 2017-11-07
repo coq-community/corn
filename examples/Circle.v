@@ -15,7 +15,7 @@ Qed.
 
 Definition stableR2:=(stableComplete Q2 stableQ2).
 
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Require Import metric2.Classified.
 
@@ -32,7 +32,7 @@ Definition diag:X-->(ProductMS X X):=Build_UniformlyContinuousFunction diag_uc.
 End diag.
 
 Require Import Interval.
-Open Local Scope uc_scope.
+Local Open Scope uc_scope.
 
 Section PathImage.
 Variable path:Q-->R2.

@@ -78,8 +78,8 @@ Notation "a ⇱ b ⇲ c" := (InterpRaster b a c) (at level 1,
  format "a ⇱ '[v' '/' b ']' '[v' '/' ⇲ c ']'") : raster.
 
 (*
-Open Local Scope raster.
-Open Local Scope raster_parsing.
+Local Open Scope raster.
+Local Open Scope raster_parsing.
 
 Example ex5 :=
 (0, 1)⇱

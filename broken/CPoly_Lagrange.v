@@ -8,7 +8,7 @@ Require Import
 Require ne_list.
 Import ne_list.notations.
 
-Open Local Scope CR_scope.
+Local Open Scope CR_scope.
 
 Local Notation Σ := cm_Sum.
 Local Notation Π := cr_Product.

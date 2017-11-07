@@ -15,7 +15,7 @@ Context `{AppRationals AQ}.
 Add Ring AQ : (rings.stdlib_ring_theory AQ).
 Add Ring Z : (rings.stdlib_ring_theory Z).
 
-Open Local Scope uc_scope. 
+Local Open Scope uc_scope. 
 Local Opaque regFunEq.
 
 Hint Rewrite (rings.preserves_0 (f:=cast AQ Q)) : aq_preservation.

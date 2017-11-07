@@ -27,8 +27,8 @@ Require Import CoRN.tactics.CornTac.
 
 Opaque CR.
 
-Open Local Scope Q_scope.
-Open Local Scope uc_scope.
+Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 (**
 ** Compression
