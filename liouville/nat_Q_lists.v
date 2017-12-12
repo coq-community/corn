@@ -69,7 +69,7 @@ Lemma list_Q_spec_pos : forall a b c d, Zabs_nat c <= Zabs_nat a ->
   Zabs_nat (Zpos d) <= Zabs_nat b -> In (Qmake c d) (list_Q a b).
 Proof.
  intros a b c d Hca Hdb.
- case (dec_Qeq (c#d)%Q Zero).
+ case (Qeq_dec (c#d)%Q [0]).
   unfold Qeq; simpl; rewrite Zmult_1_r.
   intro Heq; rewrite Heq.
   clear c Hca Heq.
@@ -163,7 +163,7 @@ Proof.
 Qed.
 
 Lemma div_imp_leq : forall a b : Z_as_CRing,
-  b [#] Zero -> Zdivides a b -> Zabs_nat a <= Zabs_nat b.
+  b [#] [0] -> Zdivides a b -> Zabs_nat a <= Zabs_nat b.
 Proof.
  intros a b Hap Hdiv.
  destruct Hdiv.
@@ -189,7 +189,7 @@ Proof.
  apply le_O_n.
 Qed.
 
-Lemma list_Q_spec : forall (a b : Z_as_CRing) q, a [#] Zero -> b [#] Zero ->
+Lemma list_Q_spec : forall (a b : Z_as_CRing) q, a [#] [0] -> b [#] [0] ->
   Zdivides (Q_can_num q) a -> Zdivides (Zabs_nat (Q_can_den_pos_val q)) b ->
   In (Q_can q) (list_Q a b).
 Proof.

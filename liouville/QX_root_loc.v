@@ -23,6 +23,7 @@ Require Import CRing_Homomorphisms.
 Require Import Qring.
 Require Import Zring.
 Require Import Qordfield.
+Require Import ssreflect.
 
 Require Import RingClass CRingClass.
 Require Import Zlcm Q_can nat_Q_lists RX_deg QX_ZX.
@@ -92,8 +93,8 @@ Lemma Q_Z_poly_apply : forall (P : ZX) (p : Z_as_CRing) (q : positive), let n :=
 Proof.
  intros P p q n.
  assert (degree_le n (zx2qx P)).
-  case (ZX_dec P Zero).
-   intro H; apply (degree_le_wd _ (_C_ Zero)).
+  case (ZX_dec P [0]).
+   intro H; apply (degree_le_wd _ (_C_ [0])).
     rewrite -> H; split; [reflexivity|apply I].
    apply (degree_le_mon _ _ 0).
     apply le_O_n.
@@ -127,20 +128,20 @@ Proof.
  apply (nexp_ring_hom _ _ injZ_rh).
 Qed.
 
-Lemma RX_deg_cmult_p : forall P a, a [#] Zero -> QX_deg (_C_ a [*] P) = QX_deg P.
+Lemma RX_deg_cmult_p : forall P a, a [#] [0] -> QX_deg (_C_ a [*] P) = QX_deg P.
 Proof.
  intros P a Hap.
- case (QX_dec P Zero).
+ case (QX_dec P [0]).
   intro; apply RX_deg_wd.
   rewrite -> s; ring.
  intro HapP.
  apply (degree_inj _ (_C_ a [*] P)).
-  case (QX_dec (_C_ a[*]P) Zero).
+  case (QX_dec (_C_ a[*]P) [0]).
    intro Heq; destruct (ap_imp_neq _ _ _ HapP); clear HapP.
    apply all_nth_coeff_eq_imp.
    intro i; generalize (nth_coeff_wd _ i _ _ Heq).
    rewrite -> nth_coeff_c_mult_p.
-   fold QX; simpl (nth_coeff i (Zero:QX)).
+   fold QX; simpl (nth_coeff i ([0]:QX)).
    intro Heq2; apply (mult_eq_zero _ a); [apply Hap|assumption].
   apply RX_deg_spec.
  destruct (RX_deg_spec _ Q_dec _ HapP).
@@ -155,7 +156,7 @@ Proof.
 Qed.
 
 Lemma den_div_Pn0 : forall (Q : ZX) (n : nat) (p q : Z_as_CRing),
-      Sum 0 n (fun i : nat => nth_coeff i Q[*]p[^]i[*]q[^](n - i))[=]Zero ->
+      Sum 0 n (fun i : nat => nth_coeff i Q[*]p[^]i[*]q[^](n - i))[=][0] ->
       Zdivides q (nth_coeff n Q[*]p[^]n).
 Proof.
  clear QX QX_dec QX_deg.
@@ -202,12 +203,12 @@ Qed.
 
 Let Pn (P : QX) := nth_coeff (QX_deg P) (qx2zx P).
 
-Lemma den_div_Pn1 : forall (P : QX) (a : Q_as_CRing), P ! a [=] Zero ->
+Lemma den_div_Pn1 : forall (P : QX) (a : Q_as_CRing), P ! a [=] [0] ->
                    Zdivides (Qden a) (Pn P[*](Qnum a:Z_as_CRing)[^]QX_deg P).
 Proof.
  intros P a Hval.
  set (P0 := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
- assert (H : P0 ! a [=] Zero).
+ assert (H : P0 ! a [=] [0]).
   unfold P0; rewrite -> mult_apply, c_apply, Hval; ring.
  clear Hval; revert H.
  rewrite -> (zx2qx_spec P0); [|apply Zlcm_den_poly_spec].
@@ -215,10 +216,10 @@ Proof.
  destruct a as [p q]; unfold Qnum, Qden.
  set (Q := qx2zx P).
  intro Hval.
- assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] Zero).
+ assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] [0]).
   unfold Q.
   rewrite -> Hval; ring.
- assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] Zero).
+ assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] [0]).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
   rewrite Zgcd_one_rht Zdiv_0_l; reflexivity.
@@ -247,7 +248,7 @@ Proof.
  apply Zrelprime_symm; assumption.
 Qed.
 
-Lemma den_div_Pn : forall (P : QX) (a : Q_as_CRing), P ! a [=] Zero ->
+Lemma den_div_Pn : forall (P : QX) (a : Q_as_CRing), P ! a [=] [0] ->
                    Zdivides (Q_can_den a) (Pn P).
 Proof.
  intros P a Hval.
@@ -272,7 +273,7 @@ Proof.
 Qed.
 
 Lemma den_div_P00 : forall (Q : ZX) (n : nat) (p q : Z_as_CRing),
-      Sum 0 n (fun i : nat => nth_coeff i Q[*]p[^]i[*]q[^](n - i))[=]Zero ->
+      Sum 0 n (fun i : nat => nth_coeff i Q[*]p[^]i[*]q[^](n - i))[=][0] ->
       Zdivides p (nth_coeff 0 Q[*]q[^]n).
 Proof.
  clear Pn QX QX_dec QX_deg.
@@ -305,12 +306,12 @@ Qed.
 
 Let P0 (P : QX) := nth_coeff 0 (qx2zx P).
 
-Lemma den_div_P01 : forall (P : QX) (a : Q_as_CRing), P ! a [=] Zero ->
+Lemma den_div_P01 : forall (P : QX) (a : Q_as_CRing), P ! a [=] [0] ->
                    Zdivides (Qnum a) (P0 P[*](Qden a:Z_as_CRing)[^]QX_deg P).
 Proof.
  intros P a Hval.
  set (Q := _C_ (Zlcm_den_poly P:Q_as_CRing)[*]P).
- assert (H : Q ! a [=] Zero).
+ assert (H : Q ! a [=] [0]).
   unfold Q; rewrite -> mult_apply, c_apply, Hval; ring.
  clear Hval; revert H.
  rewrite -> (zx2qx_spec Q); [|apply Zlcm_den_poly_spec].
@@ -318,10 +319,10 @@ Proof.
  destruct a as [p q]; unfold Qnum, Qden.
  set (Q := qx2zx P).
  intro Hval.
- assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] Zero).
+ assert ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q [=] [0]).
   unfold Q.
   rewrite -> Hval; ring.
- assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] Zero).
+ assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] [0]).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
   rewrite Zgcd_one_rht Zdiv_0_l; reflexivity.
@@ -338,7 +339,7 @@ Proof.
  apply den_div_P00.
 Qed.
 
-Lemma den_div_P0 : forall (P : QX) (a : Q_as_CRing), P ! a [=] Zero ->
+Lemma den_div_P0 : forall (P : QX) (a : Q_as_CRing), P ! a [=] [0] ->
                    Zdivides (Q_can_num a) (P0 P).
 Proof.
  intros P a Hval.
@@ -354,37 +355,37 @@ Proof.
  symmetry; apply Q_can_spec.
 Qed.
 
-Lemma QX_root_loc : forall (P : QX) (a : Q_as_CRing), P ! Zero [#] Zero -> P ! a [=] Zero ->
+Lemma QX_root_loc : forall (P : QX) (a : Q_as_CRing), P ! [0] [#] [0] -> P ! a [=] [0] ->
       In (Q_can a) (list_Q (P0 P) (Pn P)).
 Proof.
  intros P a Hap Hval.
  apply list_Q_spec.
     intro; apply Hap; clear Hap.
     unfold P0 in H.
-    cut ((_C_ (Zlcm_den_poly P:Q_as_CRing) [*] P) ! Zero [=] Zero).
+    cut ((_C_ (Zlcm_den_poly P:Q_as_CRing) [*] P) ! [0] [=] [0]).
      rewrite -> mult_apply, c_apply.
-     intro H0; apply (Qmult_eq (Zlcm_den_poly P)); [|assumption].
+     intro H0; apply (Qmult_integral_l (Zlcm_den_poly P)); [|assumption].
      intro H1; destruct (Zlcm_den_poly_nz P).
      unfold Qeq in H1; simpl in H1.
      rewrite Zmult_1_r in H1; assumption.
-    cut ((zx2qx (qx2zx P)) ! Zero [=] Zero).
+    cut ((zx2qx (qx2zx P)) ! [0] [=] [0]).
      rewrite -> qx2zx_spec; tauto.
     unfold zx2qx.
     rewrite <- (rh_pres_zero _ _ injZ_rh) at 1.
     rewrite <- cpoly_map_apply.
-    cut ((qx2zx P) ! Zero [=] Zero).
+    cut ((qx2zx P) ! [0] [=] [0]).
      intro H0; rewrite H0; reflexivity.
     rewrite -> poly_at_zero; assumption.
-   case (QX_dec P Zero).
+   case (QX_dec P [0]).
     intro H; destruct Hap; rewrite -> H; reflexivity.
    intros Hap2 Heq; apply (ap_imp_neq _ _ _ Hap2); clear Hap Hval; revert Heq.
    unfold Pn.
    destruct (RX_deg_spec _ Z_dec (qx2zx P)); [|].
-    case (ZX_dec (qx2zx P) Zero); [|tauto].
+    case (ZX_dec (qx2zx P) [0]); [|tauto].
     intro Heq; destruct (ap_imp_neq _ _ _ Hap2); clear Hap2.
-    cut (_C_(Zlcm_den_poly P:Q_as_CRing) [*] P [=] Zero).
+    cut (_C_(Zlcm_den_poly P:Q_as_CRing) [*] P [=] [0]).
      intro Heq2; apply all_nth_coeff_eq_imp; intro i.
-     apply (Qmult_eq (Zlcm_den_poly P)).
+     apply (Qmult_integral_l (Zlcm_den_poly P)).
       intro H1; destruct (Zlcm_den_poly_nz P).
       unfold Qeq in H1; simpl in H1.
       rewrite Zmult_1_r in H1; assumption.

@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CRings Zring.
+Require Import ssreflect.
 
 Section Zgcd_lin.
 
@@ -96,14 +97,14 @@ Lemma Zlcm_specl : forall a b : Z_as_CRing, Zdivides a (Zlcm a b).
 Proof.
  intros a b.
  unfold Zlcm.
- case (Z_eq_dec (Zgcd a b) (Zero:Z_as_CRing)).
+ case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
  intro H; rewrite -> (Zgcd_div_mult_rht a b) at 1; [|assumption].
  simpl.
  rewrite Zmult_assoc.
- rewrite Z_div_mult_full; [|assumption].
+ rewrite Z_div_mult_full; [assumption|].
  apply Zdivides_mult_rht.
 Qed.
 
@@ -111,7 +112,7 @@ Lemma Zlcm_specr : forall a b : Z_as_CRing, Zdivides b (Zlcm a b).
 Proof.
  intros a b.
  unfold Zlcm.
- case (Z_eq_dec (Zgcd a b) (Zero:Z_as_CRing)).
+ case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
@@ -119,19 +120,19 @@ Proof.
  simpl.
  rewrite Zmult_comm.
  rewrite Zmult_assoc.
- rewrite Z_div_mult_full; [|assumption].
+ rewrite Z_div_mult_full; [assumption|].
  apply Zdivides_mult_rht.
 Qed.
 
 Lemma Zlcm_spec : forall a b c : Z_as_CRing, Zdivides a c -> Zdivides b c -> Zdivides (Zlcm a b) c.
 Proof.
  intros a b c Hac Hbc; unfold Zlcm; simpl.
- case (Z_eq_dec (Zgcd a b) (Zero:Z_as_CRing)).
+ case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   destruct (Zgcd_zero _ _ H).
   rewrite H0 in Hac; clear H H0 H1.
   rewrite Zdiv_0_r; assumption.
- case (Z_eq_dec c (Zero:Z_as_CRing)).
+ case (Z_eq_dec c ([0]:Z_as_CRing)).
   intro Hc; rewrite Hc.
   intro Hap; apply Zdivides_zero_rht.
  intros Hc Hap.
@@ -171,10 +172,10 @@ Proof.
  apply Zgcd_is_divisor_rht.
 Qed.
 
-Lemma Zlcm_zero : forall p q, Zlcm p q [=] Zero -> p [=] Zero or q [=] Zero.
+Lemma Zlcm_zero : forall p q, Zlcm p q [=] [0] -> p [=] [0] or q [=] [0].
 Proof.
  intros p q; unfold Zlcm; intro Heq.
- case (Z_eq_dec p (Zero:Z_as_CRing)).
+ case (Z_eq_dec p ([0]:Z_as_CRing)).
   left; assumption.
  intro Happ; right.
  simpl in *.
@@ -187,16 +188,16 @@ Proof.
  rewrite -> (Zgcd_div_mult_lft p q) at 1; [|assumption].
  rewrite (Zmult_comm (p / Zgcd p q)).
  rewrite <- Zmult_assoc.
- rewrite Zdiv_mult_cancel_lft; [|assumption].
+ rewrite Zdiv_mult_cancel_lft; [assumption|].
  intro Heq.
- rewrite (Zgcd_div_mult_lft p q); [|assumption].
+ rewrite (Zgcd_div_mult_lft p q); [assumption|].
  rewrite <- Zmult_assoc, (Zmult_comm _ q), Zmult_assoc.
  rewrite Heq Zmult_0_l; reflexivity.
 Qed.
 
 Fixpoint Zlcm_gen (l : list Z_as_CRing) : Z_as_CRing :=
   match l with
-    | nil => One
+    | nil => [1]
     | h::q => Zlcm h (Zlcm_gen q)
   end.
 
@@ -241,7 +242,7 @@ Proof.
  apply Zmod0_Zdivides; assumption.
 Qed.
 
-Lemma Zlcm_gen_nz : forall l, (forall x, In x l -> x [#] Zero) -> Zlcm_gen l [#] Zero.
+Lemma Zlcm_gen_nz : forall l, (forall x, In x l -> x [#] [0]) -> Zlcm_gen l [#] [0].
 Proof.
  induction l.
   intro; intro; discriminate.

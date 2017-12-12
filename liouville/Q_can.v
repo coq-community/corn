@@ -20,12 +20,13 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CRings Qring Zring.
+Require Import ssreflect.
 Require Import Zlcm.
 
 Section Q_can.
 
 Lemma Q_dec : forall x y : Q_as_CRing, (x [=] y) or (x [#] y).
-Proof. intros x y; case (dec_Qeq x y); [left|right]; assumption. Qed.
+Proof. intros x y; case (Qeq_dec x y); [left|right]; assumption. Qed.
 Definition Q_can_num (q : Q_as_CRing) : Z_as_CRing := Zdiv (Qnum q) (Zgcd (Qnum q) (Qden q)).
 
 Lemma Q_can_num_spec : forall q q', q [=] q' -> Q_can_num q = Q_can_num q'.
@@ -90,11 +91,11 @@ Proof.
  set (Zdiv_le_lower_bound qd (Zgcd qn qd) 1).
  assert (0 <= qd)%Z by  discriminate.
  assert (0 < Zgcd qn qd)%Z.
-  apply Zgcd_pos; right;  discriminate.
- assert (1 * Zgcd qn qd <= qd)%Z.
-  rewrite Zmult_1_l.
+  apply Zgcd_pos; right; discriminate.
+ assert (Zgcd qn qd <= qd)%Z.
   by apply Zgcd_le_rht.
- omega.
+ apply Z.div_str_pos.
+ split; assumption.
 Qed.
 
 Definition Q_can_den_pos_val (q : Q_as_CRing) : positive :=
@@ -105,7 +106,7 @@ Definition Q_can_den_pos_val (q : Q_as_CRing) : positive :=
 
 Lemma Q_can_den_pos_val_spec : forall q : Q_as_CRing, Q_can_den q = Q_can_den_pos_val q.
 Proof.
- intro q; set (Q_can_den_pos q).
+ intro q; set (Q_can_den_pos q) as z.
  unfold Q_can_den_pos_val.
  clearbody z.
  revert z.
