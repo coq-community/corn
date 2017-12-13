@@ -23,6 +23,7 @@ Require Import CoRN.model.rings.Qring.
 Require Import Zring.
 Require Import Qordfield.
 Require Import CRing_Homomorphisms.
+Require Import ssreflect.
 
 Require Import RingClass CRingClass.
 Require Import Zlcm Q_can RX_deg.
@@ -45,19 +46,19 @@ Let QX_deg := RX_deg Q_as_CRing Q_dec.
 Definition in_ZX (P : QX) := forall n, in_Z (nth_coeff n P).
 
 Definition QX_normalize (p : QX) : Q_as_CRing :=
-  match (dec_Qeq (nth_coeff (QX_deg p) p) Zero) with
-    | left _ => Zero
-    | right H => One [/] (nth_coeff (QX_deg p) p) [//] H
+  match (Qeq_dec (nth_coeff (QX_deg p) p) [0]) with
+    | left _ => [0]
+    | right H => [1] [/] (nth_coeff (QX_deg p) p) [//] H
   end.
 
-Lemma QX_normalize_spec : forall p : QX, p [#] Zero -> monic (QX_deg p) ((_C_ (QX_normalize p)) [*] p).
+Lemma QX_normalize_spec : forall p : QX, p [#] [0] -> monic (QX_deg p) ((_C_ (QX_normalize p)) [*] p).
 Proof.
  intros p H.
  destruct (RX_deg_spec _ Q_dec _ H) as [Hcoeff Hdeg].
  split.
   rewrite -> nth_coeff_c_mult_p.
   unfold QX_normalize.
-  case (dec_Qeq (nth_coeff (QX_deg p) p) Zero).
+  case (Qeq_dec (nth_coeff (QX_deg p) p) [0]).
    intro; destruct Hcoeff; assumption.
   intro Hap.
   apply (div_1 Q_as_CField).
@@ -68,15 +69,15 @@ Qed.
 
 Definition QX_to_monic (p : QX) : QX := (_C_ (QX_normalize p)) [*] p.
 
-Lemma QX_to_monic_spec : forall p : QX, p [#] Zero -> monic (QX_deg p) (QX_to_monic p).
+Lemma QX_to_monic_spec : forall p : QX, p [#] [0] -> monic (QX_deg p) (QX_to_monic p).
 Proof.
  intros p H.
  apply QX_normalize_spec.
  assumption.
 Qed.
 
-Lemma QX_to_monic_apply : forall (p : QX) (a : Q), p ! a [=] Zero ->
-  (QX_to_monic p) ! a [=] Zero.
+Lemma QX_to_monic_apply : forall (p : QX) (a : Q), p ! a [=] [0] ->
+  (QX_to_monic p) ! a [=] [0].
 Proof.
  intros p a Heq.
  unfold QX_to_monic; rewrite -> mult_apply; rewrite -> Heq; ring.
@@ -84,11 +85,11 @@ Qed.
 
 Fixpoint den_list (P : QX) : list Z_as_CRing :=
   match P with
-    | cpoly_zero => One::nil
-    | cpoly_linear c P => Q_can_den c::den_list P
+    | cpoly_zero _ => [1]::nil
+    | cpoly_linear _ c P => Q_can_den c::den_list P
   end.
 
-Lemma den_list_zero : den_list Zero = One::nil.
+Lemma den_list_zero : den_list [0] = [1]::nil.
 Proof. reflexivity. Qed.
 
 Lemma den_list_linear : forall c P, den_list (c[+X*]P) = Q_can_den c::den_list P.
@@ -103,7 +104,7 @@ Proof.
   unfold Q_can_den_pos_val; reflexivity.
  intros P c Hrec n.
  unfold QX_deg; rewrite RX_deg_linear; fold QX_deg; fold QX_dec.
- case (QX_dec P Zero).
+ case (QX_dec P [0]).
   simpl.
   case n.
    left; reflexivity.
@@ -119,7 +120,7 @@ Qed.
 Definition Zlcm_den_poly (P : QX) :=
     Zlcm_gen (den_list P).
 
-Lemma Zlcm_den_poly_nz : forall P, Zlcm_den_poly P [#] Zero.
+Lemma Zlcm_den_poly_nz : forall P, Zlcm_den_poly P [#] [0].
 Proof.
  intro P; apply Zlcm_gen_nz.
  intro a; pattern P; apply Ccpoly_induc; clear P.
@@ -146,15 +147,15 @@ Proof.
    intro H0; rewrite H0.
    apply Zgcd_is_divisor_lft.
   rewrite {1} (Zgcd_div_mult_rht Qnum Qden).
-   rewrite H.
-   apply Zmult_1_l.
-  intro.
-  destruct (Zgcd_zero _ _ H0).
-  rewrite H1 in H.
-  rewrite H2 in H.
-  rewrite Zgcd_zero_rht in H.
-  rewrite Zdiv_0_r in H.
-  discriminate.
+   intro.
+   destruct (Zgcd_zero _ _ H0).
+   rewrite H1 in H.
+   rewrite H2 in H.
+   rewrite Zgcd_zero_rht in H.
+   rewrite Zdiv_0_r in H.
+   discriminate.
+  rewrite H.
+  apply Zmult_1_l.
  unfold Q_can_den.
  destruct q; simpl in *.
  case (Z_dec Qnum 0).
@@ -174,11 +175,11 @@ Qed.
 
 Fixpoint Q_can_num_poly (P : QX) : ZX :=
   match P with
-    | cpoly_zero => cpoly_zero Z_as_CRing
-    | cpoly_linear c Q => cpoly_linear Z_as_CRing (Q_can_num c) (Q_can_num_poly Q)
+    | cpoly_zero _ => cpoly_zero Z_as_CRing
+    | cpoly_linear _ c Q => cpoly_linear Z_as_CRing (Q_can_num c) (Q_can_num_poly Q)
   end.
 
-Lemma Q_can_num_poly_zero : Q_can_num_poly Zero = Zero.
+Lemma Q_can_num_poly_zero : Q_can_num_poly [0] = [0].
 Proof. reflexivity. Qed.
 
 Lemma Q_can_num_poly_linear : forall c P, Q_can_num_poly (c[+X*]P) = Q_can_num c[+X*]Q_can_num_poly P.
@@ -195,10 +196,10 @@ Proof.
   intros P c Hrec Heq.
   destruct (zero_eq_linear_ _ _ _ Heq).
   split.
-   rewrite (Q_can_num_spec _ Zero).
-    reflexivity.
-   assumption.
-  change (Zero [=] Q_can_num_poly P).
+   rewrite (Q_can_num_spec _ [0]).
+    assumption.
+   reflexivity.
+  change ([0] [=] Q_can_num_poly P).
   symmetry; apply Hrec; symmetry; assumption.
  intros P Q c d Hrec Heq.
  destruct (linear_eq_linear_ _ _ _ _ _ Heq).
@@ -221,8 +222,8 @@ Proof.
  rewrite RX_deg_linear; fold ZX_dec.
  fold QX_deg; fold ZX_deg.
  rewrite <- Heq.
- case (QX_dec P Zero).
-  case (ZX_dec (Q_can_num_poly P) Zero).
+ case (QX_dec P [0]).
+  case (ZX_dec (Q_can_num_poly P) [0]).
    reflexivity.
   intros Hap Heq2; destruct (ap_imp_neq _ _ _ Hap); revert Heq2; clear.
   pattern P; apply Ccpoly_induc; clear P.
@@ -232,7 +233,7 @@ Proof.
   apply _linear_eq_zero; split.
    rewrite (Q_can_num_spec _ _ H); reflexivity.
   apply Hrec; assumption.
- intro Hap; case (ZX_dec (Q_can_num_poly P) Zero).
+ intro Hap; case (ZX_dec (Q_can_num_poly P) [0]).
   intro Heq2; destruct (ap_imp_neq _ _ _ Hap); revert Heq2; clear.
   pattern P; apply Ccpoly_induc; clear P.
    reflexivity.
@@ -244,9 +245,9 @@ Proof.
   unfold Q_can_num; simpl; unfold Qeq; simpl.
   rewrite Zmult_1_r.
   intro H; rewrite (Zgcd_div_mult_lft qn qd).
-   rewrite H.
-   apply Zmult_0_l.
-  intro H0; destruct (Zgcd_zero _ _ H0); discriminate.
+   intro H0; destruct (Zgcd_zero _ _ H0); discriminate.
+  rewrite H.
+  apply Zmult_0_l.
  reflexivity.
 Qed.
 
@@ -287,8 +288,8 @@ Proof.
   symmetry; apply Zdivides_spec.
   apply Zgcd_is_divisor_lft.
  rewrite {1} (Zgcd_div_mult_rht qn qd).
-  rewrite Hin; rewrite Zmult_1_l; reflexivity.
- intro H; destruct (Zgcd_zero _ _ H); discriminate.
+  intro H; destruct (Zgcd_zero _ _ H); discriminate.
+ rewrite Hin; rewrite Zmult_1_l; reflexivity.
 Qed.
 Lemma injZ_spec2 : forall p : Z_as_CRing, p = Q_can_num p.
 Proof.
@@ -318,7 +319,7 @@ Qed.
 Definition injZ_rh := Build_RingHom _ _ _ injZ_pres_plus injZ_pres_mult injZ_pres_unit.
 Definition zx2qx := cpoly_map injZ_rh.
 
-Lemma zx2qx_zero : zx2qx Zero = Zero.
+Lemma zx2qx_zero : zx2qx [0] = [0].
 Proof. reflexivity. Qed.
 Lemma zx2qx_linear : forall c P, zx2qx (c[+X*]P) = (c:Q_as_CRing)[+X*]zx2qx P.
 Proof. reflexivity. Qed.
@@ -379,21 +380,21 @@ Proof.
   apply Zlcm_gen_spec.
   apply den_list_spec; assumption.
  intros Hgt.
- cut (nth_coeff n (_C_ (Zlcm_den_poly P:Q_as_CRing)[*]P) [=] Zero).
+ cut (nth_coeff n (_C_ (Zlcm_den_poly P:Q_as_CRing)[*]P) [=] [0]).
   intro Heq.
-  transitivity (Q_can_den Zero).
+  transitivity (Q_can_den [0]).
    apply Q_can_den_spec; assumption.
   rewrite Q_can_den_pos_val_spec; reflexivity.
- case (RX_dec _ Q_dec P Zero).
+ case (RX_dec _ Q_dec P [0]).
   intro H.
-  transitivity (nth_coeff n (Zero:QX)).
+  transitivity (nth_coeff n ([0]:QX)).
    apply nth_coeff_wd.
    rewrite -> H at 2.
    apply I.
   reflexivity.
  intro Hap.
  rewrite -> nth_coeff_c_mult_p.
- cut (nth_coeff n P [=] Zero).
+ cut (nth_coeff n P [=] [0]).
   intro H; rewrite -> H; ring.
  cut (degree_le (QX_deg P) P).
   intro H; apply H; assumption.

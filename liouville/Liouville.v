@@ -32,11 +32,11 @@ Hypothesis I_fin : finite I.
 
 Fixpoint AbsPoly (P : cpoly_cring IR) : cpoly_cring IR :=
   match P with
-    | cpoly_zero => cpoly_zero IR
-    | cpoly_linear c P => cpoly_linear IR (AbsIR c) (AbsPoly P)
+    | cpoly_zero _ => cpoly_zero IR
+    | cpoly_linear _ c P => cpoly_linear IR (AbsIR c) (AbsPoly P)
   end.
 
-Lemma AbsPoly_zero : AbsPoly Zero = Zero.
+Lemma AbsPoly_zero : AbsPoly [0] = [0].
 Proof. reflexivity. Qed.
 Lemma AbsPoly_linear : forall c P, AbsPoly (c[+X*]P) = AbsIR c[+X*]AbsPoly P.
 Proof. reflexivity. Qed.
@@ -156,7 +156,7 @@ Lemma Ia_proper : proper Ia.
 Proof.
  simpl.
  apply shift_minus_less.
- apply (less_wdl _ (a[+]((Zero[+]Zero[+]Zero)[+](Zero[+]Zero[+]Zero)))); [|rational].
+ apply (less_wdl _ (a[+](([0][+][0][+][0])[+]([0][+][0][+][0])))); [|rational].
  apply (less_wdr _ _ (a[+](Two[+]Two))); [|rational].
  apply plus_resp_less_lft.
  apply plus_resp_less_both.
@@ -169,12 +169,12 @@ Lemma a_in_Ia : Ia a.
 Proof.
  split.
   apply less_leEq.
-  apply (less_wdr _ _ (a[-](Zero[+]Zero[+]Zero))); [|rational].
+  apply (less_wdr _ _ (a[-]([0][+][0][+][0]))); [|rational].
   apply minus_resp_less_rht.
   apply plus_resp_less_both; [|apply pos_one].
   apply plus_resp_less_lft; apply pos_one.
  apply less_leEq.
- apply (less_wdl _ (a[+](Zero[+]Zero[+]Zero))); [|rational].
+ apply (less_wdl _ (a[+]([0][+][0][+][0]))); [|rational].
  apply plus_resp_less_lft.
  apply plus_resp_less_both; [|apply pos_one].
  apply plus_resp_less_lft; apply pos_one.
@@ -209,11 +209,11 @@ Proof.
  apply (poly_law_of_mean Ia Ia_fin Ia_proper P a x a_in_Ia (Liouville_lemma1 x Hle)).
 Qed.
 
-Lemma Liouville_lemma3 : forall x : IR, One [<] x or x [<] Two.
+Lemma Liouville_lemma3 : forall x : IR, [1] [<] x or x [<] Two.
 Proof.
  intro x.
  apply less_cotransitive_unfolded.
- apply (less_wdl _ (Zero[+]Zero[+]One)); [|rational].
+ apply (less_wdl _ ([0][+][0][+][1])); [|rational].
  apply plus_resp_less_rht.
  apply plus_resp_less_lft.
  apply pos_one.
@@ -227,10 +227,10 @@ Let ZX_deg := RX_deg Z_as_CRing Z_dec.
 Variable P : cpoly_cring Z_as_CRing.
 
 Lemma Liouville_lemma4 : forall p : Z_as_CRing,
-            p [#] Zero -> One [<=] AbsIR (inj_Q_rh p).
+            p [#] [0] -> [1] [<=] AbsIR (inj_Q_rh p).
 Proof.
  intros p Hap.
- change (One[<=]AbsIR(inj_Q IR p)).
+ change ([1][<=]AbsIR(inj_Q IR p)).
  rewrite -> AbsIR_Qabs.
  unfold Qabs.Qabs.
  unfold inject_Z.
@@ -243,8 +243,8 @@ Proof.
  simpl; unfold Qle; simpl; intuition.
 Qed.
 
-Lemma Liouville_lemma5 : forall (p : Z_as_CRing) (q : positive), (zx2qx P) ! (p#q)%Q [#] Zero ->
-      One [<=] (inj_Q_rh q)[^](ZX_deg P) [*] AbsIR (inj_Q_rh ((zx2qx P) ! (p#q)%Q)).
+Lemma Liouville_lemma5 : forall (p : Z_as_CRing) (q : positive), (zx2qx P) ! (p#q)%Q [#] [0] ->
+      [1] [<=] (inj_Q_rh q)[^](ZX_deg P) [*] AbsIR (inj_Q_rh ((zx2qx P) ! (p#q)%Q)).
 Proof.
  intros p q Hap.
  set (n := ZX_deg P).
@@ -278,7 +278,7 @@ Proof.
  apply Liouville_lemma4.
  intro.
  destruct (ap_imp_neq _ _ _ Hap); clear Hap.
- assert ((inject_Z (Zpos q))[^]n [#] Zero).
+ assert ((inject_Z (Zpos q))[^]n [#] [0]).
   generalize n; clear; induction n; [discriminate|].
   intro; destruct IHn.
   rewrite <- nexp_Sn in H.
@@ -295,19 +295,21 @@ Let ZX_deg := RX_deg Z_as_CRing Z_dec.
 Let QX_deg := RX_deg Q_as_CRing Q_dec.
 Variable P : cpoly_cring Q_as_CRing.
 
-Lemma Liouville_lemma6 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] Zero ->
-      One [<=] (inj_Q_rh q)[^](QX_deg P) [*] AbsIR (inj_Q_rh ((Zlcm_den_poly P:Q_as_CRing)[*]P ! (p#q)%Q)).
+Lemma Liouville_lemma6 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] [0] ->
+      [1] [<=] (inj_Q_rh q)[^](QX_deg P) [*] AbsIR (inj_Q_rh ((Zlcm_den_poly P:Q_as_CRing)[*]P ! (p#q)%Q)).
 Proof.
  intros p q Hap.
- assert ((zx2qx (qx2zx P)) ! (p#q)%Q[#]Zero).
-  case (Q_dec ((zx2qx (qx2zx P)) ! (p#q)%Q) Zero); [|tauto].
+ assert ((zx2qx (qx2zx P)) ! (p#q)%Q[#][0]).
+  case (Q_dec ((zx2qx (qx2zx P)) ! (p#q)%Q) [0]); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); revert Heq.
   rewrite -> qx2zx_spec.
   rewrite -> mult_apply, c_apply.
   intro Heq.
   apply (mult_eq_zero _ (Zlcm_den_poly P:Q_as_CField)).
-   intro Heq2; injection Heq2.
-   rewrite Zmult_1_r.
+   replace (cm_unit Q_as_CField) with (inject_Z (cm_unit Z_as_CRing)) by reflexivity.
+   intro Heq2; rewrite Q.Qeq_Zeq in Heq2.
+   apply (eq_imp_not_ap _ (Zlcm_den_poly P) [0]).
+    assumption.
    apply Zlcm_den_poly_nz.
   assumption.
  rewrite -> qx2zx_deg; fold ZX_deg.
@@ -319,8 +321,8 @@ Proof.
  rewrite -> mult_apply, c_apply; reflexivity.
 Qed.
 
-Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] Zero ->
-      One [<=] (inj_Q_rh q)[^](QX_deg P) [*] AbsIR (inj_Q_rh (Zlcm_den_poly P:Q_as_CRing)) [*] AbsIR (inj_Q_rh (P ! (p#q)%Q)).
+Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#] [0] ->
+      [1] [<=] (inj_Q_rh q)[^](QX_deg P) [*] AbsIR (inj_Q_rh (Zlcm_den_poly P:Q_as_CRing)) [*] AbsIR (inj_Q_rh (P ! (p#q)%Q)).
 Proof.
  intros p q Hap.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma6 _ _ Hap)).
@@ -332,14 +334,14 @@ Qed.
 
 Variable a : IR.
 Let C := AbsIR (inj_Q_rh (Zlcm_den_poly P:Q_as_CRing)) [*] CPoly_bound (Ia a) (Ia_fin a) (_D_ (inj_QX_rh P)).
-Hypothesis Ha : (inj_QX_rh P) ! a [=] Zero.
+Hypothesis Ha : (inj_QX_rh P) ! a [=] [0].
 
-Lemma Liouville_lemma8 : forall (n : nat) (q : positive), One [<=] (inj_Q_rh q)[^]n.
+Lemma Liouville_lemma8 : forall (n : nat) (q : positive), [1] [<=] (inj_Q_rh q)[^]n.
 Proof.
  intros n q; induction n.
   apply leEq_reflexive.
  rewrite <- nexp_Sn.
- apply (leEq_wdl _ (One[*]One)); [|rational].
+ apply (leEq_wdl _ ([1][*][1])); [|rational].
  apply mult_resp_leEq_both; [apply less_leEq; apply pos_one|apply less_leEq; apply pos_one| |apply IHn].
  rewrite <- (rh_pres_unit _ _ inj_Q_rh).
  apply inj_Q_leEq.
@@ -349,8 +351,8 @@ Proof.
 Qed.
 
 Lemma Liouville_lemma9 : forall (p : Z_as_CRing) (q : positive),
-      P ! (p#q)%Q [#] Zero -> AbsIR ((inj_Q_rh (p#q)%Q) [-] a) [<=] Two ->
-      One [<=] (inj_Q_rh q)[^](QX_deg P) [*] C [*] AbsIR ((inj_Q_rh (p#q)%Q) [-] a).
+      P ! (p#q)%Q [#] [0] -> AbsIR ((inj_Q_rh (p#q)%Q) [-] a) [<=] Two ->
+      [1] [<=] (inj_Q_rh q)[^](QX_deg P) [*] C [*] AbsIR ((inj_Q_rh (p#q)%Q) [-] a).
 Proof.
  intros p q Hap Hle.
  apply (leEq_transitive _ _ _ _ (Liouville_lemma7 _ _ Hap)).
@@ -366,29 +368,29 @@ Proof.
   unfold inj_QX_rh.
   rewrite -> cpoly_map_apply; reflexivity.
  set (Liouville_lemma8 (QX_deg P) q).
- apply (leEq_transitive _ _ One); [apply less_leEq; apply pos_one|].
+ apply (leEq_transitive _ _ [1]); [apply less_leEq; apply pos_one|].
  apply Liouville_lemma8.
 Qed.
 
-Let C' := Max One C.
+Let C' := Max [1] C.
 
 Lemma Liouville_lemma10 : forall (p : Z_as_CRing) (q : positive),
-      P ! (p#q)%Q [#] Zero ->
-      One [<=] (inj_Q_rh q)[^](QX_deg P) [*] C' [*] AbsIR ((inj_Q_rh (p#q)%Q) [-] a).
+      P ! (p#q)%Q [#] [0] ->
+      [1] [<=] (inj_Q_rh q)[^](QX_deg P) [*] C' [*] AbsIR ((inj_Q_rh (p#q)%Q) [-] a).
 Proof.
  intros p q Hap.
  destruct (Liouville_lemma3 (AbsIR (inj_Q_rh (p # q)%Q[-]a))).
   apply (leEq_transitive _ _ _ _ (less_leEq _ _ _ c)).
-  apply (leEq_wdl _ (One [*] AbsIR (inj_Q_rh (p#q)%Q [-] a))); [|rational].
+  apply (leEq_wdl _ ([1] [*] AbsIR (inj_Q_rh (p#q)%Q [-] a))); [|rational].
   apply mult_resp_leEq_rht; [|apply AbsIR_nonneg].
-  apply (leEq_wdl _ (One [*] One)); [|rational].
+  apply (leEq_wdl _ ([1] [*] [1])); [|rational].
   apply mult_resp_leEq_both; [apply less_leEq; apply pos_one|apply less_leEq; apply pos_one| |apply lft_leEq_Max].
   apply Liouville_lemma8.
  apply (leEq_transitive _ _ _ _ (Liouville_lemma9 _ _ Hap (less_leEq _ _ _ c))).
  apply mult_resp_leEq_rht; [|apply AbsIR_nonneg].
  apply mult_resp_leEq_lft; [|].
   unfold C'; apply rht_leEq_Max.
- apply (leEq_transitive _ _ One); [apply less_leEq; apply pos_one|].
+ apply (leEq_transitive _ _ [1]); [apply less_leEq; apply pos_one|].
  apply Liouville_lemma8.
 Qed.
 
@@ -399,22 +401,22 @@ Section liouville_theorem.
 Variable a : IR.
 Hypothesis a_irrat : forall x : Q, a [~=] inj_Q _ x.
 Variable P : cpoly_cring Q_as_CRing.
-Hypothesis P_nz : P [#] Zero.
-Hypothesis a_alg : (inj_QX_rh P) ! a [=] Zero.
+Hypothesis P_nz : P [#] [0].
+Hypothesis a_alg : (inj_QX_rh P) ! a [=] [0].
 
-Let C : IR := Max One (AbsIR (inj_Q_rh (Zlcm_den_poly (QX_extract_roots P):Q_as_CRing)) [*] CPoly_bound (Ia a) (Ia_fin a) (_D_ (inj_QX_rh (QX_extract_roots P)))).
-Lemma constant_pos : Zero [<] C.
+Let C : IR := Max [1] (AbsIR (inj_Q_rh (Zlcm_den_poly (QX_extract_roots P):Q_as_CRing)) [*] CPoly_bound (Ia a) (Ia_fin a) (_D_ (inj_QX_rh (QX_extract_roots P)))).
+Lemma constant_pos : [0] [<] C.
 Proof.
  unfold C.
- apply (less_leEq_trans _ _ One).
+ apply (less_leEq_trans _ _ [1]).
   apply pos_one.
  apply lft_leEq_Max.
 Qed.
 
-Lemma constant_nz : C [#] Zero.
+Lemma constant_nz : C [#] [0].
 Proof. apply pos_ap_zero; apply constant_pos. Qed.
 
-Definition Liouville_constant : IR := One [/] C [//] constant_nz.
+Definition Liouville_constant : IR := [1] [/] C [//] constant_nz.
 
 Definition Liouville_degree := RX_deg _ Q_dec (QX_extract_roots P).
 
@@ -425,7 +427,7 @@ Proof.
  intro x.
  destruct x as [p q]; unfold Qden.
  apply (mult_cancel_leEq _ _ _ (inj_Q_rh q[^]Liouville_degree)).
-  apply (less_leEq_trans _ _ One); [apply pos_one|].
+  apply (less_leEq_trans _ _ [1]); [apply pos_one|].
   apply Liouville_lemma8.
  assert (H : inj_Q IR (1#q)%Q = inj_Q_rh (1#q)%Q).
   reflexivity.
@@ -434,7 +436,7 @@ Proof.
  rewrite <- mult_assoc.
  rewrite <- nexp_ring_hom.
  rewrite <- rh_pres_mult.
- assert (H : (1 # q)%Q[^]Liouville_degree[*](inject_Z q)[^]Liouville_degree [=] One).
+ assert (H : (1 # q)%Q[^]Liouville_degree[*](inject_Z q)[^]Liouville_degree [=] [1]).
   rewrite <- mult_nexp.
   rewrite <- (one_nexp _ Liouville_degree).
   apply nexp_wd; reflexivity.
@@ -444,9 +446,9 @@ Proof.
  unfold Liouville_constant.
  apply shift_div_leEq'.
   apply constant_pos.
- assert (H : (inj_QX_rh (QX_extract_roots P)) ! a[=]Zero).
+ assert (H : (inj_QX_rh (QX_extract_roots P)) ! a[=][0]).
   apply QX_extract_roots_spec_nrat; assumption.
- assert (H1 : (QX_extract_roots P) ! ((p # q)%Q)[#]Zero).
+ assert (H1 : (QX_extract_roots P) ! ((p # q)%Q)[#][0]).
   apply QX_extract_roots_spec_rat; assumption.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma10 _ _ H _ _ H1)).
  fold C.
@@ -460,7 +462,7 @@ Proof.
 Qed.
 
 Theorem Liouville_theorem2 :
-    {n : nat | {C : IR | Zero [<] C | forall (x : Q),
+    {n : nat | {C : IR | [0] [<] C | forall (x : Q),
          (C[*]inj_Q IR (1#Qden x)%Q[^]n) [<=] AbsIR (inj_Q _ x [-] a)}}.
 Proof.
  exists Liouville_degree.

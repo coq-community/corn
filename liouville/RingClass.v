@@ -84,8 +84,8 @@ Global Instance rmul_right_unit : right_unit rmul rI := mulC_id_l.
 Global Instance radd_rmul_left_distr : left_distributive radd rmul.
 Proof. reduce; apply (Rdistr_l r_rt). Qed.
 Global Instance radd_rmul_right_distr : right_distributive radd rmul := mulC_distr_l.
-Global Instance rmul_left_zero : left_absorbing rmul rO := opA_zero_l.
-Global Instance rmul_right_zero : right_absorbing rmul rO := mulC_zero_l.
+Global Instance rmul_left_zero : left_absorbing rmul rO := @opA_zero_l R req r_st radd rmul ropp rO radd_morph rmul_morph radd_assoc radd_comm ropp_left_inverse radd_left_unit radd_rmul_left_distr.
+Global Instance rmul_right_zero : right_absorbing rmul rO := @mulC_zero_l R req r_st rmul rmul_comm rO rmul_left_zero.
 End Properties.
 
 Section SubRing_is_Ring.

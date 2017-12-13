@@ -23,6 +23,7 @@ Require Import CRing_Homomorphisms.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CauchySeq.
 Require Import Q_in_CReals.
+Require Import ssreflect.
 
 Require Import CPoly_Euclid RingClass CRingClass.
 Require Import Q_can nat_Q_lists RX_deg RX_div QX_root_loc.
@@ -39,16 +40,16 @@ Let QX_deg := RX_deg Q_as_CRing Q_dec.
 Fixpoint QX_test_list (P : QX) (l : list Q_as_CRing) : option Q_as_CRing :=
   match l with
     | nil => None
-    | cons q l => match Q_dec (P ! q) Zero with inl _ => Some q | inr _ => QX_test_list P l end
+    | cons q l => match Q_dec (P ! q) [0] with inl _ => Some q | inr _ => QX_test_list P l end
   end.
 
 Lemma QX_test_list_spec_none : forall P l, QX_test_list P l = None ->
-        forall q : Q_as_CRing, In q l -> P ! q [#] Zero.
+        forall q : Q_as_CRing, In q l -> P ! q [#] [0].
 Proof.
  induction l.
   intros; contradiction.
  unfold QX_test_list.
- case (Q_dec P ! a Zero).
+ case (Q_dec P ! a [0]).
   intros; discriminate.
  fold (QX_test_list P l).
  intros Hap Hnone q.
@@ -66,13 +67,13 @@ Proof.
 Qed.
 
 Lemma QX_test_list_spec_some : forall P l x, QX_test_list P l = Some x ->
-        P ! x [=] Zero.
+        P ! x [=] [0].
 Proof.
  induction l.
   intros; discriminate.
  unfold QX_test_list.
  fold (QX_test_list P l).
- case (Q_dec P ! a Zero); [|intro; assumption].
+ case (Q_dec P ! a [0]); [|intro; assumption].
  intros.
  injection H; intro.
  rewrite <- H0; assumption.
@@ -82,12 +83,12 @@ Let P0 (P : QX) := nth_coeff 0 (QX_ZX.qx2zx P).
 Let Pn (P : QX) := nth_coeff (QX_deg P) (QX_ZX.qx2zx P).
 
 Definition QX_find_root (P : QX) : option Q_as_CRing :=
-    match Q_dec (P ! Zero) Zero with inl _ => Some Zero | inr _ => QX_test_list P (list_Q (P0 P) (Pn P)) end.
+    match Q_dec (P ! [0]) [0] with inl _ => Some [0] | inr _ => QX_test_list P (list_Q (P0 P) (Pn P)) end.
 
-Lemma QX_find_root_spec_none : forall P, QX_find_root P = None -> forall q : Q_as_CRing, P ! q [#] Zero.
+Lemma QX_find_root_spec_none : forall P, QX_find_root P = None -> forall q : Q_as_CRing, P ! q [#] [0].
 Proof.
  intro P; unfold QX_find_root.
- case (Q_dec P ! Zero Zero).
+ case (Q_dec P ! [0] [0]).
   intros; discriminate.
  intros Hap Hnone q.
  assert (forall x y : Q_as_CRing, {x = y} + {x <> y}).
@@ -105,19 +106,19 @@ Proof.
  apply QX_root_loc; assumption.
 Qed.
 
-Lemma QX_find_root_spec_some : forall P x, QX_find_root P = Some x -> P ! x [=] Zero.
+Lemma QX_find_root_spec_some : forall P x, QX_find_root P = Some x -> P ! x [=] [0].
 Proof.
  intros P x; unfold QX_find_root.
- case (Q_dec P ! Zero Zero).
+ case (Q_dec P ! [0] [0]).
   intros H1 H2; injection H2; intro H3; rewrite <- H3; assumption.
  intro Hap; apply QX_test_list_spec_some.
 Qed.
 
-Lemma QX_integral : forall p q : QX, p [#] Zero -> q [#] Zero -> p[*]q [#] Zero.
+Lemma QX_integral : forall p q : QX, p [#] [0] -> q [#] [0] -> p[*]q [#] [0].
 Proof.
  intros p q Hp Hq.
  apply (nth_coeff_strext _ (QX_deg p + QX_deg q)).
- simpl (nth_coeff (QX_deg p + QX_deg q) (Zero:QX)).
+ simpl (nth_coeff (QX_deg p + QX_deg q) ([0]:QX)).
  cut (degree (QX_deg p + QX_deg q) (p[*]q)).
   intro H; apply H.
  apply (degree_mult Q_as_CField).
@@ -125,7 +126,7 @@ Proof.
  apply RX_deg_spec; assumption.
 Qed.
 
-Lemma QX_deg_mult : forall p q, p [#] Zero -> q [#] Zero ->
+Lemma QX_deg_mult : forall p q, p [#] [0] -> q [#] [0] ->
            QX_deg (p[*]q) = QX_deg p + QX_deg q.
 Proof.
  intros p q Hp Hq.
@@ -139,10 +140,10 @@ Proof.
 Qed.
 
 Lemma QX_div_deg0 : forall (p : QX) (a : Q_as_CRing),
-              QX_deg p <> 0 -> RX_div _ p a [#] Zero.
+              QX_deg p <> 0 -> RX_div _ p a [#] [0].
 Proof.
  intros p a Hdeg.
- case (QX_dec (RX_div _ p a) Zero); [|tauto].
+ case (QX_dec (RX_div _ p a) [0]); [|tauto].
  intro Heq; destruct Hdeg; revert Heq.
  unfold RX_div.
  destruct (cpoly_div p (_X_monic _ a)) as [[q r] _ [s [d s0]]].
@@ -169,20 +170,20 @@ Proof.
  unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ (RX_div_spec _ p a)).
  rewrite RX_deg_sum.
   rewrite RX_deg_c_.
-  rewrite max_comm; unfold max.
   rewrite -> QX_deg_mult.
     unfold QX_deg; rewrite RX_deg_minus.
-     rewrite RX_deg_c_ RX_deg_x_; fold QX_deg.
-     simpl; rewrite plus_comm; simpl.
-     intro H; injection H; symmetry; assumption.
-    rewrite RX_deg_x_ RX_deg_c_; discriminate.
+     rewrite RX_deg_x_ RX_deg_c_; discriminate.
+    rewrite RX_deg_x_ RX_deg_c_.
+    rewrite plus_comm; discriminate.
    apply QX_div_deg0; assumption.
   right; left; discriminate.
+ rewrite max_comm.
  rewrite -> QX_deg_mult.
    unfold QX_deg; rewrite RX_deg_minus.
-    rewrite RX_deg_x_ RX_deg_c_ RX_deg_c_.
-    rewrite plus_comm; discriminate.
-   rewrite RX_deg_x_ RX_deg_c_; discriminate.
+    rewrite RX_deg_x_ RX_deg_c_; discriminate.
+   rewrite RX_deg_c_ RX_deg_x_ RX_deg_c_; fold QX_deg.
+   simpl; rewrite plus_comm; simpl.
+   intro H; injection H; symmetry; assumption.
   apply QX_div_deg0; assumption.
  right; left; discriminate.
 Qed.
@@ -200,7 +201,7 @@ Fixpoint QX_extract_roots_rec (n : nat) (P : QX) :=
 Definition QX_extract_roots (P : QX) := QX_extract_roots_rec (QX_deg P) P.
 
 Lemma QX_extract_roots_spec_rat : forall P a,
-       P [#] Zero -> (QX_extract_roots P) ! a [#] Zero.
+       P [#] [0] -> (QX_extract_roots P) ! a [#] [0].
 Proof.
  unfold QX_extract_roots.
  intros P a; remember (QX_deg P) as n; revert P Heqn.
@@ -209,7 +210,7 @@ Proof.
   destruct (RX_deg_spec _ Q_dec _ Hap).
   fold QX_deg in d; rewrite <- Hdeg in d.
   destruct (degree_le_zero _ _ d).
-  case (Q_dec P ! a Zero); [|tauto].
+  case (Q_dec P ! a [0]); [|tauto].
   intro Heq; destruct (ap_imp_neq _ _ _ Hap); clear Hap; revert Heq.
   rewrite -> s, c_apply; intro H; rewrite -> H; split; [reflexivity|apply I].
  unfold QX_extract_roots_rec.
@@ -220,7 +221,7 @@ Proof.
    apply eq_add_S.
    rewrite <- QX_div_deg; [assumption|].
    rewrite <- Hdeg; discriminate.
-  case (QX_dec (RX_div _ P x) Zero); [|tauto].
+  case (QX_dec (RX_div _ P x) [0]); [|tauto].
   intro Heq; apply QX_div_deg0.
   rewrite <- Hdeg; discriminate.
  intro; apply QX_find_root_spec_none; assumption.
@@ -238,7 +239,7 @@ Definition inj_QX_rh := cpoly_map inj_Q_rh.
 
 Lemma QX_extract_roots_spec_nrat : forall (P : QX) (x : IR),
       (forall y : Q_as_CRing, x [~=] (inj_Q_rh y)) ->
-         (inj_QX_rh P) ! x [=] Zero -> (inj_QX_rh (QX_extract_roots P)) ! x [=] Zero.
+         (inj_QX_rh P) ! x [=] [0] -> (inj_QX_rh (QX_extract_roots P)) ! x [=] [0].
 Proof.
  intros P x Hx; unfold QX_extract_roots.
  remember (QX_deg P) as n; revert P Heqn; induction n.
