@@ -20,7 +20,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CRings Qring Zring.
-Require Import ssreflect.
 Require Import Zlcm.
 
 Section Q_can.
@@ -44,11 +43,11 @@ Proof.
  rewrite -> (Zmult_comm (Zgcd q'n q'd) (q'n / Zgcd q'n q'd)).
  rewrite <- Zgcd_div_mult_lft, <- Zgcd_div_mult_lft;
    try (intro H; destruct (Zgcd_zero _ _ H); discriminate).
- rewrite Zmult_comm (Zmult_comm _ q'n).
+ rewrite Zmult_comm, (Zmult_comm _ q'n).
  rewrite <- (Zabs_Zsgn qn) at 1; rewrite <- (Zabs_Zsgn q'n) at 2.
- rewrite (Zmult_comm (Zabs qn)) (Zmult_comm (Zabs q'n)).
+ rewrite (Zmult_comm (Zabs qn)), (Zmult_comm (Zabs q'n)).
  rewrite <- Zmult_assoc, <- Zmult_assoc.
- rewrite Zgcd_lin Zgcd_lin.
+ rewrite Zgcd_lin, Zgcd_lin.
  rewrite Heq.
  rewrite (Zmult_comm qn q'n).
  cut (Zsgn qn = Zsgn q'n).
@@ -73,12 +72,12 @@ Proof.
  rewrite (Zmult_comm (Zgcd q'n q'd) (q'd / Zgcd q'n q'd)).
  rewrite <- Zgcd_div_mult_rht, <- Zgcd_div_mult_rht;
    try (intro H; destruct (Zgcd_zero _ _ H); discriminate).
- rewrite Zmult_comm (Zmult_comm _ q'd).
+ rewrite Zmult_comm, (Zmult_comm _ q'd).
  rewrite <- (Zabs_Zsgn qd) at 1; rewrite <- (Zabs_Zsgn q'd) at 2.
- rewrite (Zmult_comm (Zabs qd)) (Zmult_comm (Zabs q'd)).
+ rewrite (Zmult_comm (Zabs qd)), (Zmult_comm (Zabs q'd)).
  rewrite <- Zmult_assoc, <- Zmult_assoc.
- rewrite Zgcd_lin Zgcd_lin.
- rewrite (Zmult_comm qd q'n) (Zmult_comm q'd qn).
+ rewrite Zgcd_lin, Zgcd_lin.
+ rewrite (Zmult_comm qd q'n), (Zmult_comm q'd qn).
  rewrite Heq.
  rewrite (Zmult_comm qd q'd).
  reflexivity.
@@ -93,7 +92,7 @@ Proof.
  assert (0 < Zgcd qn qd)%Z.
   apply Zgcd_pos; right; discriminate.
  assert (Zgcd qn qd <= qd)%Z.
-  by apply Zgcd_le_rht.
+  apply Zgcd_le_rht; apply Zgt_pos_0.
  apply Z.div_str_pos.
  split; assumption.
 Qed.
