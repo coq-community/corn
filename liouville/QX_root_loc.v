@@ -23,7 +23,6 @@ Require Import CRing_Homomorphisms.
 Require Import Qring.
 Require Import Zring.
 Require Import Qordfield.
-Require Import ssreflect.
 
 Require Import RingClass CRingClass.
 Require Import Zlcm Q_can nat_Q_lists RX_deg QX_ZX.
@@ -83,7 +82,7 @@ Proof.
  apply (mult_wdr _ (inject_Z ((p:Z_as_CRing)[^]i)) ((q:Q_as_CRing)[*](p # q)%Q) p).
  simpl; unfold Qeq; simpl.
  case p.
-   rewrite Zmult_0_l Zmult_0_l; reflexivity.
+   rewrite Zmult_0_l, Zmult_0_l; reflexivity.
   intro r; rewrite Zmult_1_r; rewrite Zmult_comm; reflexivity.
  intro r; rewrite Zmult_1_r; rewrite Zmult_comm; reflexivity.
 Qed.
@@ -118,7 +117,7 @@ Proof.
  rewrite -> nexp_ring_hom, nexp_ring_hom.
  rewrite <- CRings.mult_assoc, <- CRings.mult_assoc.
  apply mult_wdr.
- rewrite {1} (le_plus_minus _ _ Hn).
+ rewrite (le_plus_minus _ _ Hn) at 1.
  clear H0 Hn.
  rewrite <- nexp_plus.
  rewrite -> CRings.mult_assoc.
@@ -222,7 +221,7 @@ Proof.
  assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] [0]).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
-  rewrite Zgcd_one_rht Zdiv_0_l; reflexivity.
+  rewrite Zgcd_one_rht, Zdiv_0_l; reflexivity.
  clear Hval H; revert H0.
  rewrite (Q_can_num_spec _ _ (Q_Z_poly_apply _ _ _)).
  rewrite <- injZ_spec2.
@@ -325,7 +324,7 @@ Proof.
  assert (Q_can_num ((q:Q_as_CRing)[^](ZX_deg Q) [*] (zx2qx Q) ! (p # q)%Q) [=] [0]).
   rewrite (Q_can_num_spec _ _ H).
   unfold Q_can_num; simpl.
-  rewrite Zgcd_one_rht Zdiv_0_l; reflexivity.
+  rewrite Zgcd_one_rht, Zdiv_0_l; reflexivity.
  clear Hval H; revert H0.
  rewrite (Q_can_num_spec _ _ (Q_Z_poly_apply _ _ _)).
  rewrite <- injZ_spec2.

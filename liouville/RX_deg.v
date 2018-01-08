@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CPoly_Degree RingClass CRingClass.
-Require Import ssreflect.
 
 Section RX_deg.
 
@@ -151,7 +150,7 @@ Lemma RX_deg_inv : forall p, RX_deg p = RX_deg ([--]p).
 Proof.
  intro p.
  case (RX_dec p [0]).
-  intro H; rewrite (RX_deg_wd _ _ H) RX_deg_zero.
+  intro H; rewrite (RX_deg_wd _ _ H), RX_deg_zero.
   rewrite <- RX_deg_zero; apply RX_deg_wd; rewrite -> H; unfold RX; ring.
  intro Hp.
  apply (degree_inj p).
@@ -177,7 +176,7 @@ Proof.
  set (RX_deg_spec _ Hp).
  set (RX_deg_spec _ Hq).
  case (le_lt_dec (RX_deg p) (RX_deg q)); intro.
-  rewrite max_r; [assumption|].
+  rewrite max_r; [|assumption].
   inversion l.
    destruct (Hneq H0).
   apply (degree_inj (p[+]q)).
@@ -185,19 +184,19 @@ Proof.
    case (RX_dec (p[+]q) [0]); [|tauto].
    intro; destruct Hneq.
    rewrite (RX_deg_wd p ([--]q)).
-    apply cg_inv_unique'; assumption.
-   symmetry; apply RX_deg_inv.
+    symmetry; apply RX_deg_inv.
+   apply cg_inv_unique'; assumption.
   apply (degree_plus_rht _ _ _ m); [| |apply le_n].
    apply (degree_le_mon _ _ (RX_deg p)); [assumption|apply d].
   rewrite H; apply RX_deg_spec; assumption.
- rewrite max_l; [apply lt_le_weak; assumption|].
+ rewrite max_l; [|apply lt_le_weak; assumption].
  apply (degree_inj (p[+]q)).
   apply RX_deg_spec.
   case (RX_dec (p[+]q) [0]); [|tauto].
   intro; destruct Hneq.
   rewrite (RX_deg_wd p ([--]q)).
-   apply cg_inv_unique'; assumption.
-  symmetry; apply RX_deg_inv.
+   symmetry; apply RX_deg_inv.
+  apply cg_inv_unique'; assumption.
  apply (degree_wd _ _ _ _ (cag_commutes _ _ _)).
  apply (degree_plus_rht _ _ _ (RX_deg q)); [| |assumption].
   apply degree_imp_degree_le.

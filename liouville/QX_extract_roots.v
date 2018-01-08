@@ -23,7 +23,6 @@ Require Import CRing_Homomorphisms.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CauchySeq.
 Require Import Q_in_CReals.
-Require Import ssreflect.
 
 Require Import CPoly_Euclid RingClass CRingClass.
 Require Import Q_can nat_Q_lists RX_deg RX_div QX_root_loc.
@@ -169,21 +168,21 @@ Proof.
  revert Heq.
  unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ (RX_div_spec _ p a)).
  rewrite RX_deg_sum.
-  rewrite RX_deg_c_.
+  rewrite max_comm.
   rewrite -> QX_deg_mult.
     unfold QX_deg; rewrite RX_deg_minus.
-     rewrite RX_deg_x_ RX_deg_c_; discriminate.
-    rewrite RX_deg_x_ RX_deg_c_.
-    rewrite plus_comm; discriminate.
+     rewrite RX_deg_c_, RX_deg_x_, RX_deg_c_; fold QX_deg.
+     simpl; rewrite plus_comm; simpl.
+     intro H; injection H; symmetry; assumption.
+    rewrite RX_deg_x_, RX_deg_c_; discriminate.
    apply QX_div_deg0; assumption.
   right; left; discriminate.
- rewrite max_comm.
+ rewrite RX_deg_c_.
  rewrite -> QX_deg_mult.
    unfold QX_deg; rewrite RX_deg_minus.
-    rewrite RX_deg_x_ RX_deg_c_; discriminate.
-   rewrite RX_deg_c_ RX_deg_x_ RX_deg_c_; fold QX_deg.
-   simpl; rewrite plus_comm; simpl.
-   intro H; injection H; symmetry; assumption.
+    rewrite RX_deg_x_, RX_deg_c_.
+    rewrite plus_comm; discriminate.
+   rewrite RX_deg_x_, RX_deg_c_; discriminate.
   apply QX_div_deg0; assumption.
  right; left; discriminate.
 Qed.

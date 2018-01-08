@@ -52,8 +52,7 @@ Theorem cpoly_div1 : forall (m n : nat) (f g : cpoly_cring CR),
     let (q,r):=qr in f [*] _C_ ((nth_coeff (S n) g) [^] (m - n)) [=] q [*] g [+] r &
     let (q,r):=qr in degree_le n r}.
 Proof.
-Admitted. (*
- intros m n; set (H := refl_equal (m - n)); revert H.
+ intros m n; generalize (refl_equal (m - n)).
  generalize (m - n) at 1 as p; intro p; revert m n; induction p; intros.
   exists (([0] : cpoly_cring CR),f).
    rewrite <- H.
@@ -72,28 +71,26 @@ Admitted. (*
  replace (m - 1 - n) with (m - S n) by omega.
  rewrite <- nexp_Sn.
  generalize (nth_coeff (S n) g) (nth_coeff m f) (m - S n).
- intros. rewrite c_mult c_mult. unfold cg_minus. ring.
+ intros. rewrite c_mult, c_mult. unfold cg_minus. ring.
 Qed.
-*)
 
 Definition degree_lt_pair (p q : cpoly_cring CR) := (forall n : nat, degree_le (S n) q -> degree_le n p) and (degree_le O q -> p [=] [0]).
 Lemma cpoly_div2 : forall (n m : nat) (a b c : cpoly_cring CR),
   degree_le n a -> monic m b -> degree_lt_pair c b -> a [*] b [=] c ->
     a [=] [0].
 Proof.
-Admitted. (*
  induction n.
   intros m a b c H X H1 H2; destruct (degree_le_zero _ _ H) as [x s].
-  move: H1. rewrite -> s; destruct X as [H0 H1]; rewrite -> c_zero. rewrite -> s in H2. intro. apply cpoly_const_eq.
+  revert H1. rewrite -> s; destruct X as [H0 H1]; rewrite -> c_zero. rewrite -> s in H2. intro. apply cpoly_const_eq.
   destruct m.
-   set (tmp := nth_coeff_wd _ 0 _ _ H2); destruct H3 as [d s0].
-   move: tmp. rewrite -> nth_coeff_c_mult_p, H0, mult_one, (nth_coeff_wd _ _ _ _ (s0 H1)). intro tmp; apply tmp.
-   set (tmp := nth_coeff_wd _ (S m) _ _ H2); destruct H3 as [d s0].
-  move: tmp. rewrite -> nth_coeff_c_mult_p, H0, mult_one, (d m H1 (S m)).  apply. apply le_n.
+   generalize (nth_coeff_wd _ 0 _ _ H2); destruct H3 as [d s0].
+   rewrite -> nth_coeff_c_mult_p, H0, mult_one, (nth_coeff_wd _ _ _ _ (s0 H1)). intro tmp; apply tmp.
+   generalize (nth_coeff_wd _ (S m) _ _ H2); destruct H3 as [d s0].
+  rewrite -> nth_coeff_c_mult_p, H0, mult_one, (d m H1 (S m)).  intro; assumption. apply le_n.
   intros.
  induction a as [ | a s ] using cpoly_induc; [ reflexivity | ].
  apply _linear_eq_zero.
- move: H2. rewrite -> cpoly_lin, ring_distl_unfolded. intro H2.
+ revert H2. rewrite -> cpoly_lin, ring_distl_unfolded. intro H2.
  cut (a [=] [0]); [ intro aeqz; split; [ | apply aeqz ] | ].
   assert (s [=] nth_coeff m (_C_ s[*]b[+]_X_[*]a[*]b)).
    destruct H0; rewrite -> nth_coeff_plus, nth_coeff_c_mult_p, H0.
@@ -118,11 +115,10 @@ Admitted. (*
   destruct m; [ destruct H0; apply (nth_coeff_wd _ _ _ _ (s0 H1)) | ].
   apply (d n0); [ | apply H4 ].
   apply (degree_le_mon _ _ n0); [ apply le_S; apply le_n | apply (degree_le_cpoly_linear _ _ _ _ H3) ].
- destruct (degree_le_zero _ _ H3) as [x s0]. move: s0. rewrite -> cpoly_C_. intro s0.
+ destruct (degree_le_zero _ _ H3) as [x s0]. revert s0. rewrite -> cpoly_C_. intro s0.
  destruct (linear_eq_linear_ _ _ _ _ _ s0) as [H4 H5].
  rewrite <- H2, -> H5. unfold cg_minus. ring.
 Qed.
-*)
 
 Lemma cpoly_div : forall (f g : cpoly_cring CR) (n : nat), monic n g ->
   ex_unq (fun (qr : ProdCSetoid (cpoly_cring CR) (cpoly_cring CR)) => f[=](fst qr)[*]g[+](snd qr) and degree_lt_pair (snd qr) g).
