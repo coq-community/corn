@@ -1800,7 +1800,7 @@ Notation "'_X_'" := (@cpoly_var _).
 Definition cpoly_linear_fun' (CR : CRing) :
  CSetoid_bin_fun CR (cpoly_cring CR) (cpoly_cring CR) := cpoly_linear_fun CR.
 
-Implicit Arguments cpoly_linear_fun' [CR].
+Arguments cpoly_linear_fun' [CR].
 Infix "[+X*]" := cpoly_linear_fun' (at level 50, left associativity).
 
 
@@ -2001,7 +2001,7 @@ In the names of lemmas, we write [apply].
 %\end{convention}%
 *)
 
-Implicit Arguments cpoly_apply_fun [CR].
+Arguments cpoly_apply_fun [CR].
 Infix "!" := cpoly_apply_fun (at level 1, no associativity).
 
 (**
@@ -2759,7 +2759,7 @@ Proof.
 Qed.
 
 End Map.
-Implicit Arguments cpoly_map [R S].
+Arguments cpoly_map [R S].
 
 Lemma cpoly_map_compose : forall R S T (g:RingHom S T) (f:RingHom R S) p,
  (cpoly_map (RHcompose _ _ _ g f) p)[=]cpoly_map g (cpoly_map f p).

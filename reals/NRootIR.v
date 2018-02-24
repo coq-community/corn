@@ -222,7 +222,7 @@ Qed.
 
 End Nth_Root.
 
-Implicit Arguments NRoot [x n].
+Arguments NRoot [x n].
 
 Hint Resolve NRoot_power NRoot_power': algebra.
 

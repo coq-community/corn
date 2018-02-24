@@ -379,7 +379,7 @@ Qed.
 Definition CRln (x:CR) (Hx:(0 < x)%CR) : CR :=
 let (c,_) := Hx in CRln_pos c x.
 (* begin hide *)
-Implicit Arguments CRln [].
+Arguments CRln : clear implicits.
 (* end hide *)
 Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==CRln (IRasCR x) Hx0)%CR.
 Proof.

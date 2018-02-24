@@ -68,7 +68,7 @@ Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
 End StepF_Functions.
 
 (* begin hide *)
-Implicit Arguments constStepF [X].
+Arguments constStepF [X].
 (* end hide *)
 Local Open Scope setoid_scope.
 

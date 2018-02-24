@@ -679,7 +679,7 @@ Qed.
 
 End Series_Definitions.
 
-Implicit Arguments FSeries_Sum [J f].
+Arguments FSeries_Sum [J f].
 
 Section More_Series_Definitions.
 

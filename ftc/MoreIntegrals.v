@@ -132,7 +132,7 @@ Qed.
 
 End Definitions.
 
-Implicit Arguments Integral [a b Hab F].
+Arguments Integral [a b Hab F].
 
 Section Properties_of_Integral.
 

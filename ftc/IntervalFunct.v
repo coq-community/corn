@@ -249,14 +249,14 @@ Definition IComp := Build_CSetoid_fun _ _
 
 End Composition.
 
-Implicit Arguments IConst [a b Hab].
-Implicit Arguments IId [a b Hab].
-Implicit Arguments IPlus [a b Hab].
-Implicit Arguments IInv [a b Hab].
-Implicit Arguments IMinus [a b Hab].
-Implicit Arguments IMult [a b Hab].
-Implicit Arguments INth [a b Hab].
-Implicit Arguments IRecip [a b Hab].
-Implicit Arguments IDiv [a b Hab].
-Implicit Arguments IAbs [a b Hab].
-Implicit Arguments IComp [a b Hab a' b' Hab'].
+Arguments IConst [a b Hab].
+Arguments IId [a b Hab].
+Arguments IPlus [a b Hab].
+Arguments IInv [a b Hab].
+Arguments IMinus [a b Hab].
+Arguments IMult [a b Hab].
+Arguments INth [a b Hab].
+Arguments IRecip [a b Hab].
+Arguments IDiv [a b Hab].
+Arguments IAbs [a b Hab].
+Arguments IComp [a b Hab a' b' Hab'].

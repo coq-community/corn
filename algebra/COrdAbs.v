@@ -44,7 +44,7 @@ Require Export CoRN.algebra.COrdFields2.
 
 Definition AbsSmall (R : COrdField) (e x : R) : Prop := [--]e [<=] x /\ x [<=] e.
 
-Implicit Arguments AbsSmall [R].
+Arguments AbsSmall [R].
 
 (* End_SpecReals *)
 

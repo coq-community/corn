@@ -64,7 +64,7 @@ Record CGroup : Type :=
 (* Begin_SpecReals *)
 
 
-Implicit Arguments cg_inv [c].
+Arguments cg_inv [c].
 Notation "[--] x" := (cg_inv x) (at level 4, right associativity).
 
 Definition cg_minus (G : CGroup) (x y : G) := x[+] [--]y.
@@ -76,7 +76,7 @@ and [ [-] ] with [minus].
 %\end{nameconvention}%
 *)
 
-Implicit Arguments cg_minus [G].
+Arguments cg_minus [G].
 Infix "[-]" := cg_minus (at level 50, left associativity).
 
 (* End_SpecReals *)
@@ -607,10 +607,10 @@ Qed.
 
 End CGroup_Ops.
 
-Implicit Arguments Finv [G].
+Arguments Finv [G].
 Notation "{--} x" := (Finv x) (at level 4, right associativity).
 
-Implicit Arguments Fminus [G].
+Arguments Fminus [G].
 Infix "{-}" := Fminus (at level 50, left associativity).
 
 Hint Resolve included_FInv included_FMinus : included.

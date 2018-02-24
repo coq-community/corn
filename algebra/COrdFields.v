@@ -68,10 +68,10 @@ Record strictorder (A : Type)(R : A -> A -> CProp) : CProp :=
  {so_trans : Ctransitive R;
   so_asym  : antisymmetric R}.
 
-Implicit Arguments strictorder [A].
-Implicit Arguments Build_strictorder [A R].
-Implicit Arguments so_trans [A R].
-Implicit Arguments so_asym [A R].
+Arguments strictorder [A].
+Arguments Build_strictorder [A R].
+Arguments so_trans [A R].
+Arguments so_asym [A R].
 
 Record is_COrdField (F : CField)
   (less : CCSetoid_relation F) (leEq : Relation F)
@@ -99,16 +99,16 @@ is written as [pos].
 %\end{nameconvention}%
 *)
 
-Implicit Arguments cof_less [c].
+Arguments cof_less [c].
 Infix "[<]" := cof_less (at level 70, no associativity).
 
-Implicit Arguments cof_greater [c].
+Arguments cof_greater [c].
 Infix "[>]" := cof_greater (at level 70, no associativity).
 
-Implicit Arguments cof_leEq [c].
+Arguments cof_leEq [c].
 Infix "[<=]" := cof_leEq (at level 70, no associativity).
 
-Implicit Arguments cof_grEq [c].
+Arguments cof_grEq [c].
 Infix "[>=]" := cof_grEq (at level 70, no associativity).
 
 Definition default_greater (X:CField) (lt:CCSetoid_relation X) : CCSetoid_relation X.

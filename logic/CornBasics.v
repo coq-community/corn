@@ -812,7 +812,7 @@ Section AccT.
 Variable A : Type.
 Definition well_founded (P : A -> A -> Prop) := forall a : A, Acc _ P a.
 End AccT.
-Implicit Arguments Acc [A].
+Arguments Acc [A].
 
 Section IndT.
 Variable A : Type.
@@ -950,7 +950,7 @@ match n with
 |S m => z :: (iterateN A f (f z) m)
 end.
 (* begin hide *)
-Implicit Arguments iterateN [A].
+Arguments iterateN [A].
 (* end hide *)
 Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
 Proof.

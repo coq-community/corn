@@ -141,7 +141,7 @@ Defined.
 
 End Definitions.
 
-Implicit Arguments Fun_Series_Sum [a b Hab f].
+Arguments Fun_Series_Sum [a b Hab f].
 
 Hint Resolve fun_seq_part_sum_cont: continuous.
 

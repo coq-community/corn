@@ -96,7 +96,7 @@ Defined.
 
 Definition f_rcpcl F x x_ := f_rcpcl' F x x_.
 
-Implicit Arguments f_rcpcl [F].
+Arguments f_rcpcl [F].
 
 (**
 [cf_div] is the division in a field. It is defined in terms of
@@ -106,7 +106,7 @@ we have a proof of [y [#] [0]].
 
 Definition cf_div (F : CField) (x y : F) y_ : F := x[*]f_rcpcl y y_.
 
-Implicit Arguments cf_div [F].
+Arguments cf_div [F].
 Notation "x [/] y [//] Hy" := (cf_div x y Hy) (at level 80).
 
 (**
@@ -905,10 +905,10 @@ Qed.
 
 End CField_Ops.
 
-Implicit Arguments Frecip [X].
+Arguments Frecip [X].
 Notation "{1/} x" := (Frecip x) (at level 4, right associativity).
 
-Implicit Arguments Fdiv [X].
+Arguments Fdiv [X].
 Infix "{/}" := Fdiv (at level 41, no associativity).
 
 Hint Resolve included_FRecip included_FDiv : included.

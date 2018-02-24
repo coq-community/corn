@@ -64,8 +64,8 @@ is always [1] higher than the `degree' (assuming that the highest
 coefficient is [[#][0]])!
 *)
 
-Implicit Arguments cpoly_zero [CR].
-Implicit Arguments cpoly_linear [CR].
+Arguments cpoly_zero [CR].
+Arguments cpoly_linear [CR].
 
 Fixpoint lth_of_poly (p : RX) : nat :=
   match p with
@@ -102,10 +102,10 @@ Definition regular (p : RX) : CProp := {n : nat | degree n p}.
 
 End Degree_def.
 
-Implicit Arguments degree_le [R].
-Implicit Arguments degree [R].
-Implicit Arguments monic [R].
-Implicit Arguments lth_of_poly [R].
+Arguments degree_le [R].
+Arguments degree [R].
+Arguments monic [R].
+Arguments lth_of_poly [R].
 
 Section Degree_props.
 

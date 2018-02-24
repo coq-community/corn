@@ -136,7 +136,7 @@ Definition Prod0CMetricSpace (X Y : CMetricSpace) :=
 (**
 A subspace of a metric space is again a metric space.
 *)
-Implicit Arguments SubPsMetricSpace [X].
+Arguments SubPsMetricSpace [X].
 
 Lemma SubMetricSpace_apdiag_grzero :
  forall (X : CMetricSpace) (P : X -> CProp),
@@ -157,7 +157,7 @@ Qed.
 Definition SubMetricSpace (X : CMetricSpace) (P : X -> CProp) :=
   Build_CMetricSpace (SubPsMetricSpace P) (SubMetricSpace_apdiag_grzero X P).
 
-Implicit Arguments SubMetricSpace [X].
+Arguments SubMetricSpace [X].
 
 End prodandsub.
 Section Zeroff.
@@ -572,7 +572,7 @@ Section Limitt.
 (**
 A sequence in a metric space has at most one limit.
 *)
-Implicit Arguments MSseqLimit [X].
+Arguments MSseqLimit [X].
 
 (* begin hide *)
 Lemma nz : forall n m : nat, n <= max n m.

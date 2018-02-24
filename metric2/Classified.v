@@ -403,7 +403,7 @@ Class MetricSpaceComponents X `{Equiv X} `{MetricSpaceBall X}: Prop.
  we will use these to automatically derive uniform continuity for various forms of function
  composition). *)
 
-Implicit Arguments mspc_ball [[X] [MetricSpaceBall]].
+Arguments mspc_ball {X MetricSpaceBall}.
 
 Class Canonical (T: Type): Type := canonical: T.
   (* Todo: Move. *)
@@ -539,7 +539,7 @@ Section uniform_continuity.
 
 End uniform_continuity.
 
-Implicit Arguments uc_mu [[X] [Y] [UniformlyContinuous_mu]].
+Arguments uc_mu {X Y} f {UniformlyContinuous_mu}.
 
 (** Local uniform continuity just means that the function restricted to any finite balls
  is uniformly continuous: *)
@@ -657,8 +657,8 @@ End shallowly_wrapped_ucfuns.
 Existing Instance ucFun_mu.
 Existing Instance ucFun_uc.
 
-Implicit Arguments UCFunction [[Xe] [Xb] [Yb] [Ye]].
-Implicit Arguments ucFunction [[X] [Xe] [Xb] [Y] [Yb] [Ye] [ucFun_mu] [ucFun_uc]].
+Arguments UCFunction X {Xe Xb} Y {Ye Yb}.
+Arguments ucFunction {X Xe Xb Y Ye Yb} _ {ucFun_mu ucFun_uc}.
 
 
 Section delegated_mspc.

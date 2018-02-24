@@ -95,7 +95,7 @@ Defined.
 
 End Indefinite_Integral.
 
-Implicit Arguments Fprim [I F].
+Arguments Fprim [I F].
 
 Notation "[-S-] F" := (Fprim F) (at level 20).
 

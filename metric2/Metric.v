@@ -63,12 +63,12 @@ Record MetricSpace : Type :=
 }.
 
 (* begin hide *)
-Implicit Arguments ball [m].
+Arguments ball [m].
 
 (*This is intended to be used as a ``type cast'' that Coq won't randomly make disappear.
   It is useful when defining setoid rewrite lemmas for st_eq.*)
 Definition ms_id (m:MetricSpace) (x:m) : m := x.
-Implicit Arguments ms_id [m].
+Arguments ms_id [m].
 
 Add Parametric Morphism (m:MetricSpace) : (@ball m) with signature QposEq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
 Proof.

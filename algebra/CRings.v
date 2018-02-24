@@ -72,7 +72,7 @@ We actually define commutative rings with identity.
 Definition distributive S (mult plus : CSetoid_bin_op S) :=
   forall x y z, mult x (plus y z) [=] plus (mult x y) (mult x z).
 
-Implicit Arguments distributive [S].
+Arguments distributive [S].
 
 Record is_CRing (G : CAbGroup) (One : G) (mult : CSetoid_bin_op G) : CProp :=
   {ax_mult_assoc : associative mult;
@@ -104,7 +104,7 @@ and [[*]] with [mult].
 %\end{nameconvention}%
 *)
 
-Implicit Arguments cr_mult [c].
+Arguments cr_mult [c].
 Infix "[*]" := cr_mult (at level 40, left associativity).
 
 Section CRing_axioms.
@@ -249,8 +249,8 @@ Definition is_zero_rht S (op : CSetoid_bin_op S) Zero : Prop := forall x, op x Z
 
 Definition is_zero_lft S (op : CSetoid_bin_op S) Zero : Prop := forall x, op Zero x [=] Zero.
 
-Implicit Arguments is_zero_rht [S].
-Implicit Arguments is_zero_lft [S].
+Arguments is_zero_rht [S].
+Arguments is_zero_lft [S].
 
 Lemma cring_mult_zero : forall x : R, x[*][0] [=] [0].
 Proof.
@@ -412,7 +412,7 @@ End exponentiation.
 (* End_SpecReals *)
 
 Notation "x [^] n" := (nexp_op _ n x) (at level 20).
-Implicit Arguments nexp_op [R].
+Arguments nexp_op [R].
 
 (* Begin_SpecReals *)
 
@@ -462,7 +462,7 @@ End nat_injection.
 
 Hint Resolve nring_comm_plus nring_comm_mult: algebra.
 
-Implicit Arguments nring [R].
+Arguments nring [R].
 
 Notation Two := (nring 2).
 Notation Three := (nring 3).
@@ -837,7 +837,7 @@ Qed.
 
 End int_injection.
 
-Implicit Arguments zring [R].
+Arguments zring [R].
 
 Hint Resolve pring_convert zring_zero zring_diff zring_plus_nat zring_inv_nat
   zring_plus zring_inv zring_minus zring_mult zring_one zring_inv_one:
@@ -1287,13 +1287,13 @@ End CRing_Ops.
 
 Definition Fscalmult (R:CRing) alpha F := Fmult R [-C-]alpha F.
 
-Implicit Arguments Fmult [R].
+Arguments Fmult [R].
 Infix "{*}" := Fmult (at level 40, left associativity).
 
-Implicit Arguments Fscalmult [R].
+Arguments Fscalmult [R].
 Infix "{**}" := Fscalmult (at level 40, left associativity).
 
-Implicit Arguments Fnth [R].
+Arguments Fnth [R].
 Infix "{^}" := Fnth (at level 30, right associativity).
 
 Section ScalarMultiplication.

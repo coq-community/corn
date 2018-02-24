@@ -146,7 +146,7 @@ Qed.
 
 End inclusion.
 
-Implicit Arguments included [S].
+Arguments included [S].
 
 Hint Resolve included_refl included_FComp : included.
 

@@ -162,7 +162,7 @@ Qed.
 End CompleteProduct.
 
 (* begin hide *)
-Implicit Arguments Couple [X Y].
-Implicit Arguments Cfst [X Y].
-Implicit Arguments Csnd [X Y].
+Arguments Couple [X Y].
+Arguments Cfst [X Y].
+Arguments Csnd [X Y].
 (* end hide *)

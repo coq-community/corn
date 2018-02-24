@@ -22,4 +22,4 @@ Section const_fun_uc.
    Build_UniformlyContinuousFunction (const_uc_prf).
 End const_fun_uc.
 
-Implicit Arguments const_uc [[X]].
+Arguments const_uc {X}.

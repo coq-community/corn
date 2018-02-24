@@ -36,7 +36,7 @@ Definition ball_ex (X: MetricSpace) (e: QposInf): X -> X -> Prop :=
   | QposInfinity => fun a b => True
  end.
 (* begin hide *)
-Implicit Arguments ball_ex [X].
+Arguments ball_ex [X].
 (* end hide *)
 Lemma ball_ex_weak_le : forall (X:MetricSpace) (e d:QposInf) (a b:X), QposInf_le e d ->  ball_ex e a b -> ball_ex d a b.
 Proof.
@@ -193,7 +193,7 @@ Qed.
 End UniformlyContinuousFunction.
 
 (* begin hide *)
-Implicit Arguments is_UniformlyContinuousFunction [X Y].
+Arguments is_UniformlyContinuousFunction [X Y].
 
 (*
 Add Setoid UniformlyContinuousFunction ucEq uc_setoid as uc_Setoid.

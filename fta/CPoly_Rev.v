@@ -160,7 +160,7 @@ End Monomials.
 
 Hint Resolve monom_coeff monom_coeff' monom_mult monom_sum: algebra.
 
-Implicit Arguments monom [R].
+Arguments monom [R].
 
 Section Poly_Reverse.
 
@@ -405,4 +405,4 @@ End Poly_Reverse.
 Hint Resolve Rev_wd: algebra_c.
 Hint Resolve Rev_rev Rev_mult: algebra.
 
-Implicit Arguments Rev [R].
+Arguments Rev [R].

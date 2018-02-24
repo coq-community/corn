@@ -565,7 +565,7 @@ End Strong.
 
 End Finite.
 (* begin hide *)
-Implicit Arguments InFinEnumC [X].
+Arguments InFinEnumC [X].
 (* end hide *)
 (** A list is equivalent to it's reverse as finite enumerations *)
 Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
@@ -671,7 +671,7 @@ Proof.
  right; assumption.
 Qed.
 (* begin hide *)
-Implicit Arguments FinEnum_map_uc [X Y].
+Arguments FinEnum_map_uc z [X Y].
 (* end hide *)
 Definition FinEnum_map z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y) :=
  Build_UniformlyContinuousFunction (FinEnum_map_uc z SX SY f).

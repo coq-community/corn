@@ -193,7 +193,7 @@ Definition PairMS (x:X) (y:Y) : ProductMS := (x,y).
 
 End ProductMetric.
 (* begin hide *)
-Implicit Arguments PairMS [X Y].
+Arguments PairMS [X Y].
 
 Add Parametric Morphism X Y : (@PairMS X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as PairMS_wd.
 Proof.

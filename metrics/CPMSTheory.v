@@ -56,7 +56,7 @@ Fixpoint MSmember (X : CSetoid) (x : X) (l : list X) {struct l} : CProp :=
   | cons y m => MSmember X x m or x = y
   end.
 
-Implicit Arguments MSmember [X].
+Arguments MSmember [X].
 
 Definition to_IR (P : IR -> CProp) : subcsetoid_crr IR P -> IR.
 Proof.
@@ -209,7 +209,7 @@ Proof.
  exact H3.
 Qed.
 
-Implicit Arguments MSmember [X].
+Arguments MSmember [X].
 (**
 Again we see that the image under a certain mapping of an element of a list $l$
 #<I>l</I># is member of the list of images of elements of $l$ #<I>l</I>#.
@@ -251,7 +251,7 @@ Definition MStotally_bounded (X : CPsMetricSpace) : CProp :=
 Total boundedness is preserved under uniformly continuous mappings.
 *)
 
-Implicit Arguments SubPsMetricSpace [X].
+Arguments SubPsMetricSpace [X].
 Lemma unicon_resp_totallybounded :
  forall (X Z : CPsMetricSpace) (f : CSetoid_fun X Z) (H : uni_continuous'' f),
  MStotally_bounded X ->
@@ -452,7 +452,7 @@ elements $x$#<I>x</I># of $X$#<I>X</I># there exists an infimum for the distance
 between $x$#<I>x</I># and the elements of $P$#<I>P</I>#.
 *)
 
-Implicit Arguments dsub'_as_cs_fun [X].
+Arguments dsub'_as_cs_fun [X].
 
 Definition located (X : CPsMetricSpace) (P : X -> CProp) :=
   forall (x : X) (r : SubPsMetricSpace P),
@@ -460,7 +460,7 @@ Definition located (X : CPsMetricSpace) (P : X -> CProp) :=
   set_glb_IR
     (fun v : IR => {y : SubPsMetricSpace P | dsub'_as_cs_fun P x y[=]v}) z}.
 
-Implicit Arguments located [X].
+Arguments located [X].
 
 Definition located' (X : CPsMetricSpace) (P : X -> CProp) :=
   forall (x : X) (y : SubPsMetricSpace P),
@@ -469,7 +469,7 @@ Definition located' (X : CPsMetricSpace) (P : X -> CProp) :=
     (fun v : IR =>
      {y : SubPsMetricSpace P | x[-d]from_SubPsMetricSpace X P y[=]v}) z}.
 
-Implicit Arguments located' [X].
+Arguments located' [X].
 
 Lemma located_imp_located' :
  forall (X : CPsMetricSpace) (P : X -> CProp), located P -> located' P.
@@ -725,7 +725,7 @@ Definition MSCauchy_seq (X : CPsMetricSpace) (seq : nat -> X) : CProp :=
   {m : nat |
   forall i j : nat, m <= i -> m <= j -> seq i[-d]seq j[<=]one_div_succ n}.
 
-Implicit Arguments MSseqLimit' [X].
+Arguments MSseqLimit' [X].
 
 Definition MSComplete (X : CPsMetricSpace) : CProp :=
   forall seq : nat -> X,
@@ -748,7 +748,7 @@ Definition open (X : CPsMetricSpace) (P : X -> CProp) :=
   forall x : X,
   P x -> {e : IR | [0][<]e and (forall z : X, z[-d]x[<]e -> P z)}.
 
-Implicit Arguments open [X].
+Arguments open [X].
 
 (**
 The operator [infima] gives the infimum for the distance between an
@@ -766,7 +766,7 @@ Proof.
  exact x.
 Defined.
 
-Implicit Arguments infima [X].
+Arguments infima [X].
 (**
 A non-empty totally bounded sub-pseudo-metric-space $P$#<I>P</I># is said to be
 %\emph{well contained}% #<I>well contained</I># in an open sub-pseudo-metric-space $Q$#<I>Q</I># if $Q$#<I>Q</I># contains

@@ -105,7 +105,7 @@ Hint Immediate Qopp_Qpos_neg.
 Definition mkQpos: forall (a:Q) (p:0 < a), Qpos := @exist Q (Qlt 0).
 
 (* begin hide *)
-Implicit Arguments mkQpos [a].
+Arguments mkQpos [a].
 (* end hide *)
 Lemma QposAsmkQpos : forall (a:Q) (p:0<a), (QposAsQ (mkQpos p))=a.
 Proof.
@@ -115,7 +115,7 @@ Proof.
  discriminate.
 Qed.
 (* begin hide *)
-Implicit Arguments QposAsmkQpos [a].
+Arguments QposAsmkQpos [a].
 (* end hide *)
 
 Lemma positive_Z (z: Z): Zlt 0 z -> sig (fun p: positive => Zpos p = z).
@@ -322,7 +322,7 @@ Proof.
  QposRing.
 Defined.
 (* begin hide *)
-Implicit Arguments Qpos_lt_plus [a b].
+Arguments Qpos_lt_plus [a b].
 (* end hide *)
 (**
 *** Power

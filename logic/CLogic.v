@@ -325,7 +325,7 @@ Fixpoint member (A : Type) (n : A) (l : list A) {struct l} : CProp :=
   | cons y m => member A n m or y = n
   end.
 
-Implicit Arguments member [A].
+Arguments member [A].
 
 Section TRelation_Definition.
 (**
@@ -678,8 +678,8 @@ Definition nat_less_n_pred (n : nat) (P : forall i : nat, i < n -> CProp) :=
 Definition nat_less_n_pred' (n : nat) (P : forall i : nat, i <= n -> CProp) :=
   forall i j : nat, i = j -> forall (H : i <= n) (H' : j <= n), P i H -> P j H'.
 
-Implicit Arguments nat_less_n_pred [n].
-Implicit Arguments nat_less_n_pred' [n].
+Arguments nat_less_n_pred [n].
+Arguments nat_less_n_pred' [n].
 
 Section Odd_and_Even.
 

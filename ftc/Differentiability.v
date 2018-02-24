@@ -76,7 +76,7 @@ Definition Diffble_I (a b : IR) (Hab : a [<] b) (F : PartIR) :=
 
 End Definitions.
 
-Implicit Arguments Diffble_I [a b].
+Arguments Diffble_I [a b].
 
 Section Local_Properties.
 

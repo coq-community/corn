@@ -85,7 +85,7 @@ Definition Derivative_I F' (P':=Dom F') := included I (Dom F) and included I (Do
 
 End Definitions.
 
-Implicit Arguments Derivative_I [a b].
+Arguments Derivative_I [a b].
 
 Section Basic_Properties.
 
