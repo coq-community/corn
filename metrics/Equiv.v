@@ -56,7 +56,7 @@ Definition isopsmetry (X Y : CPsMetricSpace) (f : CSetoid_fun X Y) :=
   and equivalent_psmetric X (cms_d (c:=X))
         (compose_CSetoid_bin_un_fun X Y IR (cms_d (c:=Y)) f).
 
-Implicit Arguments isopsmetry [X Y].
+Arguments isopsmetry [X Y].
 
 Lemma isopsmetry_imp_bij :
  forall (X Y : CPsMetricSpace) (f : CSetoid_fun X Y),

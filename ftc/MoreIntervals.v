@@ -419,8 +419,8 @@ Qed.
 
 End Intervals.
 
-Implicit Arguments Lend [I].
-Implicit Arguments Rend [I].
+Arguments Lend [I].
+Arguments Rend [I].
 
 Section Compact_Constructions.
 

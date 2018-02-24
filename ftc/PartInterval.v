@@ -84,7 +84,7 @@ Defined.
 
 End Conversion.
 
-Implicit Arguments IntPartIR [F a b Hab].
+Arguments IntPartIR [F a b Hab].
 
 Section AntiConversion.
 
@@ -117,7 +117,7 @@ Defined.
 
 End AntiConversion.
 
-Implicit Arguments PartInt [a b Hab].
+Arguments PartInt [a b Hab].
 
 Section Inverses.
 

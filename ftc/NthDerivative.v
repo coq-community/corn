@@ -86,8 +86,8 @@ Fixpoint Diffble_I_n (n : nat) (F : PartIR) {struct n} : CProp :=
 
 End Nth_Derivative.
 
-Implicit Arguments Derivative_I_n [a b].
-Implicit Arguments Diffble_I_n [a b].
+Arguments Derivative_I_n [a b].
+Arguments Diffble_I_n [a b].
 
 Section Trivia.
 

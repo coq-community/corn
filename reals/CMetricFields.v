@@ -169,4 +169,4 @@ Definition is_MCauchyCompl (lim : MCauchySeq -> F) : CProp :=
 
 End CMetric_Field_Cauchy.
 
-Implicit Arguments MseqLimit [F].
+Arguments MseqLimit [F].

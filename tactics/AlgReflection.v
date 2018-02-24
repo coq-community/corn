@@ -498,8 +498,8 @@ Fixpoint Mnth (n:nat) (l:metalist) (default:A) {struct l} : A :=
   end.
 
 End MetaList.
-Implicit Arguments Mcons [A].
-Implicit Arguments Mnth [A].
+Arguments Mcons [A].
+Arguments Mnth [A].
 
 Ltac FindIndex t l :=
 match l with
@@ -519,6 +519,6 @@ Variable A B C D: Type.
 Inductive quadruple : Type :=
  Quad : A -> B -> C -> D -> quadruple.
 End Quadruple.
-Implicit Arguments Quad [A B C D].
+Arguments Quad [A B C D].
 
 (* end hide *)

@@ -287,8 +287,8 @@ Definition Partition_Sum g F (H : Points_in_Partition g) (incF : included (Compa
 
 End Refinements.
 
-Implicit Arguments Points_in_Partition [a b Hab n].
-Implicit Arguments Partition_Sum [a b Hab n P g F].
+Arguments Points_in_Partition [a b Hab n].
+Arguments Partition_Sum [a b Hab n P g F].
 
 (**
 ** Constructions
@@ -360,17 +360,17 @@ Defined.
 
 End Definitions.
 
-Implicit Arguments Partition [a b].
-Implicit Arguments Partition_Dom [a b Hab n].
-Implicit Arguments Mesh [a b Hab n].
-Implicit Arguments AntiMesh [a b Hab n].
-Implicit Arguments Pts [a b Hab lng].
-Implicit Arguments Part_Mesh_List [n a b Hab].
-Implicit Arguments Points_in_Partition [a b Hab n].
-Implicit Arguments Partition_Sum [a b Hab n P g F].
-Implicit Arguments Even_Partition [a b].
-Implicit Arguments Even_Partition_Sum [a b].
-Implicit Arguments Refinement [a b Hab n m].
+Arguments Partition [a b].
+Arguments Partition_Dom [a b Hab n].
+Arguments Mesh [a b Hab n].
+Arguments AntiMesh [a b Hab n].
+Arguments Pts [a b Hab lng].
+Arguments Part_Mesh_List [n a b Hab].
+Arguments Points_in_Partition [a b Hab n].
+Arguments Partition_Sum [a b Hab n P g F].
+Arguments Even_Partition [a b].
+Arguments Even_Partition_Sum [a b].
+Arguments Refinement [a b Hab m n].
 
 Hint Resolve start finish: algebra.
 
@@ -803,8 +803,8 @@ Definition Separated := _Separated _ P and _Separated _ Q and
 
 End More_Definitions.
 
-Implicit Arguments _Separated [a b Hab n].
-Implicit Arguments Separated [a b Hab n m].
+Arguments _Separated [a b Hab n].
+Arguments Separated [a b Hab n m].
 
 Section Sep_Partitions.
 

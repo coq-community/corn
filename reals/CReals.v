@@ -63,4 +63,4 @@ Record CReals : Type :=
 
 Definition Lim : forall IR : CReals, CauchySeq IR -> IR := crl_lim.
 
-Implicit Arguments Lim [IR].
+Arguments Lim [IR].

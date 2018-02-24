@@ -1093,7 +1093,7 @@ Hint Resolve mult_resp_nonneg.
 
 Definition one_div_succ (R : COrdField) i : R := [1][/] Snring R i[//]nringS_ap_zero _ i.
 
-Implicit Arguments one_div_succ [R].
+Arguments one_div_succ [R].
 
 Section One_div_succ_properties.
 
@@ -1136,7 +1136,7 @@ End One_div_succ_properties.
 
 Definition Half (R : COrdField) := ([1]:R) [/]TwoNZ.
 
-Implicit Arguments Half [R].
+Arguments Half [R].
 
 Section Half_properties.
 

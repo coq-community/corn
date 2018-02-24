@@ -313,8 +313,8 @@ Definition ext_fun_seq n (f : forall i, i < n -> PartIR) := forall i j, i = j ->
 Definition ext_fun_seq' n (f : forall i, i < n -> PartIR) := forall i j, i = j ->
   forall Hi Hj x y, x [=] y -> Dom (f i Hi) x -> Dom (f j Hj) y.
 
-Implicit Arguments ext_fun_seq [n].
-Implicit Arguments ext_fun_seq' [n].
+Arguments ext_fun_seq [n].
+Arguments ext_fun_seq' [n].
 
 (**
 Under these assumptions, we can characterize the domain and the value of the sum function from the domains and values of the summands:

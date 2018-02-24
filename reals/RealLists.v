@@ -78,7 +78,7 @@ Definition length_leEq (A : Type) (l : list A) (n : nat) := length l <= n.
 
 (** Length is preserved by mapping. *)
 
-Implicit Arguments map [A B].
+Arguments map [A B].
 
 Lemma map_pres_length : forall (A B : Set) (l : list A) (f : A -> B),
  length l = length (map f l).
@@ -92,7 +92,7 @@ Qed.
 (**
 Often we want to map partial functions through a list; this next operator provides a way to do that, and is proved to be correct. *)
 
-Implicit Arguments cons [A].
+Arguments cons [A].
 
 Definition map2 (F : PartIR) (l : list IR) :
  (forall y, member y l -> Dom F y) -> list IR.

@@ -88,14 +88,14 @@ Definition lipschitz_c (f : CSetoid_fun A B) (C : IR) : CProp :=
     forall x1 x2 : A, f x1 [-d] f x2 [<=] C [*] (x1 [-d] x2).
 
 End Continuous_functions.
-Implicit Arguments continuous [A B].
-Implicit Arguments uni_continuous [A B].
-Implicit Arguments lipschitz [A B].
-Implicit Arguments continuous' [A B].
-Implicit Arguments uni_continuous' [A B].
-Implicit Arguments uni_continuous'' [A B].
-Implicit Arguments lipschitz' [A B].
-Implicit Arguments lipschitz_c [A B].
+Arguments continuous [A B].
+Arguments uni_continuous [A B].
+Arguments lipschitz [A B].
+Arguments continuous' [A B].
+Arguments uni_continuous' [A B].
+Arguments uni_continuous'' [A B].
+Arguments lipschitz' [A B].
+Arguments lipschitz_c [A B].
 
 Section Lemmas.
 
@@ -603,14 +603,14 @@ Definition MSseqLimit (X : CPsMetricSpace) (seq : nat -> X)
   {N : nat |
   forall m : nat, N <= m -> seq m[-d]lim[<]([1][/] Two:IR[//]H)[^]n}.
 
-Implicit Arguments MSseqLimit [X].
+Arguments MSseqLimit [X].
 
 Definition MSseqLimit' (X : CPsMetricSpace) (seq : nat -> X)
   (lim : X) : CProp :=
   forall n : nat,
   {N : nat | forall m : nat, N <= m -> seq m[-d]lim[<=]one_div_succ n}.
 
-Implicit Arguments MSseqLimit' [X].
+Arguments MSseqLimit' [X].
 
 Lemma MSseqLimit_imp_MSseqLimit' :
  forall (X : CPsMetricSpace) (seq : nat -> X) (lim : X),
@@ -677,7 +677,7 @@ Definition seqcontinuous' (A B : CPsMetricSpace) (f : CSetoid_fun A B) :
   forall (seq : nat -> A) (lim : A),
   MSseqLimit' seq lim -> MSseqLimit' (fun m : nat => f (seq m)) (f lim).
 
-Implicit Arguments seqcontinuous' [A B].
+Arguments seqcontinuous' [A B].
 
 Lemma continuous'_imp_seqcontinuous' :
  forall (A B : CPsMetricSpace) (f : CSetoid_fun A B),

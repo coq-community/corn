@@ -132,7 +132,7 @@ Defined.
 End Intervals.
 
 Notation Compact := (compact _ _).
-Implicit Arguments Frestr [F P].
+Arguments Frestr [F P].
 Notation FRestr := (Frestr (compact_wd _ _ _)).
 
 Section More_Intervals.

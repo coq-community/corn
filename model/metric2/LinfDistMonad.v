@@ -133,7 +133,7 @@ Proof.
 Defined.
 End Dist.
 
-Implicit Arguments dist [X].
+Arguments dist [X].
 
 Definition distconst(X : MetricSpace):(Complete X)->Complete (StepFSup X).
 Proof.

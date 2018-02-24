@@ -36,7 +36,7 @@ Proof. rewrite <- ball_gball; reflexivity. Qed.
 
 Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
-Implicit Arguments integrate [[Integral]].
+Arguments integrate f {Integral}.
 
 Notation "∫" := integrate.
 

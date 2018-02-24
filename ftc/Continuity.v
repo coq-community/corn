@@ -360,8 +360,8 @@ Qed.
 
 End Definitions_and_Basic_Results.
 
-Implicit Arguments Continuous_I [a b].
-Implicit Arguments Norm_Funct [a b Hab F].
+Arguments Continuous_I [a b].
+Arguments Norm_Funct [a b Hab F].
 
 Section Local_Results.
 

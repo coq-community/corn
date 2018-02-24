@@ -53,7 +53,7 @@ Section metric_embedding.
 End metric_embedding.
 
 Class AppInverse `(f : X → Y) := app_inverse : Y → Qpos → X.
-Implicit Arguments app_inverse [[X] [Y] [AppInverse]].
+Arguments app_inverse {X Y} f {AppInverse}.
 
 Class DenseEmbedding `{Equiv X} {Y : MetricSpace} (f : X → Y) `{!AppInverse f} := {
   dense_embed_setoid : Setoid X ;

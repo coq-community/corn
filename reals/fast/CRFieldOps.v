@@ -368,7 +368,7 @@ Proof with simpl in *; auto with *.
 Qed.
 
 (* begin hide *)
-Implicit Arguments Qmult_uc_prf [].
+Arguments Qmult_uc_prf : clear implicits.
 (* end hide *)
 Definition Qmult_uc (c:Qpos) :  Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace:=
 Build_UniformlyContinuousFunction (Qmult_uc_prf c).
@@ -625,7 +625,7 @@ Proof.
  apply Ha.
 Qed.
 
-Implicit Arguments Qinv_pos_uc_prf [].
+Arguments Qinv_pos_uc_prf : clear implicits.
 
 Definition Qinv_pos_uc (c:Qpos) : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction (Qinv_pos_uc_prf c).
@@ -718,7 +718,7 @@ Proof.
  exact (CRinv_pos c x).
 Defined.
 
-Implicit Arguments CRinvT [].
+Arguments CRinvT : clear implicits.
 
 Lemma CRinvT_pos_inv : forall (c:Qpos) (x:CR) x_,
  ('c <= x ->

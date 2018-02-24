@@ -270,8 +270,8 @@ Qed.
 Opaque Bernstein.
 
 (** Given a vector of coefficents for a polynomial in the Bernstein basis, return the polynomial *)
-Implicit Arguments Vector.nil [A].
-Implicit Arguments Vector.cons [A].
+Arguments Vector.nil [A].
+Arguments Vector.cons [A].
 
 Fixpoint evalBernsteinBasisH (n i:nat) (v:Vector.t R i) : i <= n -> cpoly_cring R :=
 match v in Vector.t _ i return i <= n -> cpoly_cring R with

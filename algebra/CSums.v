@@ -631,10 +631,10 @@ Qed.
 
 End Sums.
 
-Implicit Arguments Sum [G].
-Implicit Arguments Sum0 [G].
-Implicit Arguments Sumx [G n].
-Implicit Arguments Sum2 [G m n].
+Arguments Sum [G].
+Arguments Sum0 [G].
+Arguments Sumx [G n].
+Arguments Sum2 [G m n].
 
 (**
 The next results are useful for calculating some special sums,

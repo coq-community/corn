@@ -20,7 +20,7 @@ Record DistanceMetricSpace: Type := Build_alt_MetricSpace
     distance_wd: Proper (@st_eq _ ==> @st_eq _ ==> NNUpperR.eq) distance;
     dmsp : is_DistanceMetricSpace dmsp_is_setoid distance }.
 
-Implicit Arguments distance [d].
+Arguments distance [d].
 Existing Instance distance_wd.
 
 Section DistanceMetricSpace. (* Just mimicking Russell's code for MetricSpace here. *)

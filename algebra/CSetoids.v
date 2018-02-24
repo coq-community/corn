@@ -60,13 +60,13 @@ Open Scope corn_scope.
 
 Definition Relation := Trelation.
 
-Implicit Arguments Treflexive [A].
-Implicit Arguments Creflexive [A].
+Arguments Treflexive [A].
+Arguments Creflexive [A].
 
-Implicit Arguments Tsymmetric [A].
-Implicit Arguments Csymmetric [A].
-Implicit Arguments Ttransitive [A].
-Implicit Arguments Ctransitive [A].
+Arguments Tsymmetric [A].
+Arguments Csymmetric [A].
+Arguments Ttransitive [A].
+Arguments Ctransitive [A].
 
 (* begin hide *)
 Set Implicit Arguments.
@@ -119,7 +119,7 @@ Record CSetoid : Type := makeCSetoid
    cs_proof :  is_CSetoid cs_crr (@st_eq cs_crr) cs_ap}.
 
 Notation cs_eq := st_eq (only parsing).
-Implicit Arguments cs_ap [c].
+Arguments cs_ap [c].
 
 Infix "[=]" := cs_eq (at level 70, no associativity).
 Infix "[#]" := cs_ap (at level 70, no associativity).
@@ -128,7 +128,7 @@ Infix "[#]" := cs_ap (at level 70, no associativity).
 
 Definition cs_neq (S : CSetoid) : Relation S := fun x y : S => ~ x [=] y.
 
-Implicit Arguments cs_neq [S].
+Arguments cs_neq [S].
 
 Infix "[~=]" := cs_neq (at level 70, no associativity).
 
@@ -407,7 +407,7 @@ Definition ProdCSetoid (A B : CSetoid) : CSetoid := Build_CSetoid
  (prodT A B) (prod_eq A B) (prod_ap A B) (prodcsetoid_is_CSetoid A B).
 
 End product_csetoid.
-Implicit Arguments ex_unq [S].
+Arguments ex_unq [S].
 
 Hint Resolve eq_reflexive_unfolded ap_irreflexive_unfolded: algebra_r.
 Hint Resolve eq_symmetric_unfolded ap_symmetric_unfolded: algebra_s.
@@ -810,8 +810,8 @@ Definition bin_fun2fun_lft (S1 S2 S3:CSetoid) (f : CSetoid_bin_fun S1 S2 S3) (c 
 
 Hint Resolve csf_wd_unfolded csbf_wd_unfolded csf_strext_unfolded: algebra_c.
 
-Implicit Arguments fun_wd [S1 S2].
-Implicit Arguments fun_strext [S1 S2].
+Arguments fun_wd [S1 S2].
+Arguments fun_strext [S1 S2].
 
 (**
 ** The unary and binary (inner) operations on a csetoid
@@ -920,8 +920,8 @@ Proof cs_bin_op_strext.
 
 End csetoid_inner_ops.
 
-Implicit Arguments commutes [S].
-Implicit Arguments associative [S].
+Arguments commutes [S].
+Arguments associative [S].
 
 (* Needs to be unfolded to be used as a Hint *)
 Hint Resolve ap_wdr_unfolded ap_wdl_unfolded  bin_op_wd_unfolded un_op_wd_unfolded : algebra_c.
@@ -1165,8 +1165,8 @@ Definition nat_less_n_fun (S : CSetoid) (n : nat) (f : forall i : nat, i < n -> 
 Definition nat_less_n_fun' (S : CSetoid) (n : nat) (f : forall i : nat, i <= n -> S) :=
   forall i j : nat, i = j -> forall (H : i <= n) (H' : j <= n), f i H [=] f j H'.
 
-Implicit Arguments nat_less_n_fun [S n].
-Implicit Arguments nat_less_n_fun' [S n].
+Arguments nat_less_n_fun [S n].
+Arguments nat_less_n_fun' [S n].
 
 Add Parametric Relation c : (cs_crr c) (@cs_eq c)
   reflexivity proved by (eq_reflexive c)

@@ -287,7 +287,7 @@ Qed.
 
 End OrdField_Cauchy.
 
-Implicit Arguments SeqLimit [R].
+Arguments SeqLimit [R].
 
 (**
 The following lemma does not require the sequence to be Cauchy, but it fits

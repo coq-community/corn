@@ -44,10 +44,10 @@ Typeclasses Transparent Equiv.
 Hint Extern 10 (Equiv _) => apply @st_eq : typeclass_instances.
 Hint Extern 10 (Setoid _) => apply @st_isSetoid  : typeclass_instances.
 
-Implicit Arguments st_eq [r].
+Arguments st_eq [r].
 
 Definition mcSetoid_as_RSetoid X {e : Equiv X} {setoid : Setoid X} : RSetoid := Build_RSetoid setoid.
-Implicit Arguments mcSetoid_as_RSetoid [[e] [setoid]].
+Arguments mcSetoid_as_RSetoid X {e setoid}.
 
 (* Canonical Structure mcSetoid_as_RSetoid. *)
 (* If we make this a canonical structure StepQsec will break: investigate *)
@@ -90,7 +90,7 @@ Proof.
  abstract (auto).
 Defined.
 (* begin hide *)
-Implicit Arguments id [X].
+Arguments id [X].
 (* end hide *)
 Definition compose0 X Y Z (x : Y ->Z) (y:X -> Y) z := x (y z).
 
@@ -115,7 +115,7 @@ Proof.
  abstract ( intros x1 x2 H y z; apply: H).
 Defined.
 (* begin hide *)
-Implicit Arguments compose [X Y Z].
+Arguments compose [X Y Z].
 (* end hide *)
 Definition const0 (X Y : RSetoid) : X->Y-->X.
 Proof.
@@ -130,7 +130,7 @@ Proof.
  abstract ( intros x1 x2 Hx y; assumption).
 Defined.
 (* begin hide *)
-Implicit Arguments const [X Y].
+Arguments const [X Y].
 (* end hide *)
 Definition flip0 (X Y Z : RSetoid) : (X-->Y-->Z)->Y->X-->Z.
 Proof.
@@ -152,7 +152,7 @@ Proof.
  abstract ( intros x1 x2 H y z; apply: H).
 Defined.
 (* begin hide *)
-Implicit Arguments flip [X Y Z].
+Arguments flip [X Y Z].
 (* end hide *)
 Definition join0 (X Y : RSetoid) : (X-->X-->Y)->X-->Y.
 Proof.
@@ -168,12 +168,12 @@ Proof.
  abstract ( intros x1 x2 H y; apply: H).
 Defined.
 (* begin hide *)
-Implicit Arguments join [X Y].
+Arguments join [X Y].
 (* end hide *)
 Definition ap (X Y Z : RSetoid) : (X --> Y --> Z) --> (X --> Y) --> (X --> Z)
 := compose (compose (compose (@join _ _)) (@flip _ _ _)) (compose (@compose _ _ _)).
 (* begin hide *)
-Implicit Arguments ap [X Y Z].
+Arguments ap [X Y Z].
 (* end hide *)
 
 Definition bind (X Y Z : RSetoid) : (X--> Y) --> (Y --> X--> Z) --> (X--> Z):=
@@ -183,6 +183,6 @@ Definition bind_compose (X Y Z W : RSetoid) :
  (W--> X--> Y) --> (Y --> X--> Z) --> (W--> X--> Z):=
  (flip (compose (@compose W _ _) ((flip (@bind X Y Z))))).
 (* begin hide *)
-Implicit Arguments bind [X Y Z].
-Implicit Arguments bind_compose [X Y Z W].
+Arguments bind [X Y Z].
+Arguments bind_compose [X Y Z W].
 (* end hide *)

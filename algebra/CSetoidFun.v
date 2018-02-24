@@ -727,11 +727,11 @@ End Extension.
 End SubSets_of_G.
 
 Notation Conj := (conjP _).
-Implicit Arguments disj [S].
+Arguments disj [S].
 
-Implicit Arguments extend [S].
-Implicit Arguments ext1 [S P R x].
-Implicit Arguments ext2 [S P R x].
+Arguments extend [S].
+Arguments ext1 [S P R x].
+Arguments ext2 [S P R x].
 
 (**
 *** Operations
@@ -747,7 +747,7 @@ Record BinPartFunct (S1 S2 : CSetoid) : Type :=
 
 
 Notation BDom := (bpfdom _ _).
-Implicit Arguments bpfpfun [S1 S2].
+Arguments bpfpfun [S1 S2].
 
 (**
 The next lemma states that every partial function is well defined.
@@ -772,7 +772,7 @@ Record PartFunct (S : CSetoid) : Type :=
 
 Notation Dom := (pfdom _).
 Notation Part := (pfpfun _).
-Implicit Arguments pfpfun [S].
+Arguments pfpfun [S].
 
 (**
 The next lemma states that every partial function is well defined.
@@ -957,12 +957,12 @@ End BinPart_Function_Composition.
 
 (* Different tokens for compatibility with coqdoc *)
 
-Implicit Arguments Fconst [S].
+Arguments Fconst [S].
 Notation "[-C-] x" := (Fconst x) (at level 4, right associativity).
 
 Notation FId := (Fid _).
 
-Implicit Arguments Fcomp [S].
+Arguments Fcomp [S].
 Infix "[o]" := Fcomp (at level 65, no associativity).
 
 Hint Resolve pfwdef bpfwdef: algebra.
@@ -979,9 +979,9 @@ Definition injective_weak A B (f : CSetoid_fun A B) := forall a0 a1 : A,
 
 Definition surjective A B (f : CSetoid_fun A B) := (forall b : B, {a : A | f a [=] b}):CProp.
 
-Implicit Arguments injective [A B].
-Implicit Arguments injective_weak [A B].
-Implicit Arguments surjective [A B].
+Arguments injective [A B].
+Arguments injective_weak [A B].
+Arguments surjective [A B].
 
 Lemma injective_imp_injective_weak : forall A B (f : CSetoid_fun A B),
  injective f -> injective_weak f.
@@ -1003,7 +1003,7 @@ Qed.
 
 Definition bijective A B (f:CSetoid_fun A B) := injective f and surjective f.
 
-Implicit Arguments bijective [A B].
+Arguments bijective [A B].
 
 Lemma id_is_bij : forall A, bijective (id_un_op A).
 Proof.
@@ -1038,7 +1038,7 @@ Proof.
  intuition.
 Qed.
 
-Implicit Arguments inv [A B].
+Arguments inv [A B].
 
 Definition invfun A B (f : CSetoid_fun A B) (H : bijective f) : B -> A.
 Proof.
@@ -1047,7 +1047,7 @@ Proof.
  apply a.
 Defined.
 
-Implicit Arguments invfun [A B].
+Arguments invfun [A B].
 
 Lemma inv1 : forall A B (f : CSetoid_fun A B) (H : bijective f) (b : B),
  f (invfun f H b) [=] b.
@@ -1091,7 +1091,7 @@ Qed.
 Definition Inv A B f (H : bijective f) :=
   Build_CSetoid_fun B A (invfun f H) (inv_strext A B f H).
 
-Implicit Arguments Inv [A B].
+Arguments Inv [A B].
 
 Definition Inv_bij : forall A B (f : CSetoid_fun A B) (H : bijective f),
   bijective (Inv f H).
@@ -1128,15 +1128,15 @@ Qed.
 
 
 End bijections.
-Implicit Arguments bijective [A B].
-Implicit Arguments injective [A B].
-Implicit Arguments injective_weak [A B].
-Implicit Arguments surjective [A B].
-Implicit Arguments inv [A B].
-Implicit Arguments invfun [A B].
-Implicit Arguments Inv [A B].
+Arguments bijective [A B].
+Arguments injective [A B].
+Arguments injective_weak [A B].
+Arguments surjective [A B].
+Arguments inv [A B].
+Arguments invfun [A B].
+Arguments Inv [A B].
 
-Implicit Arguments conj_wd [S P Q].
+Arguments conj_wd [S P Q].
 
 Notation Prj1 := (prj1 _ _ _ _).
 Notation Prj2 := (prj2 _ _ _ _).

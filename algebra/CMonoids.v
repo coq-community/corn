@@ -82,7 +82,7 @@ Definition nonZeroP (M : CMonoid) (x : M) : CProp := x [#] [0].
 
 (* End_SpecReals *)
 
-Implicit Arguments nonZeroP [M].
+Arguments nonZeroP [M].
 
 (**
 ** Monoid axioms
@@ -291,7 +291,7 @@ end.
 
 End p71E1.
 
-Implicit Arguments power_CMonoid [M].
+Arguments power_CMonoid [M].
 
 Lemma power_plus:forall (M:CMonoid)(a:M)(m n:nat),
   (power_CMonoid a (m+n))[=]
@@ -626,7 +626,7 @@ End gen_cyc.
 Definition is_inverse S (op : CSetoid_bin_op S) Zero x x_inv : Prop :=
  op x x_inv [=] Zero /\ op x_inv x [=] Zero.
 
-Implicit Arguments is_inverse [S].
+Arguments is_inverse [S].
 
 Definition invertible (M:CMonoid): M -> CProp :=
 fun m =>{inv: (CSetoid_un_op M) | (is_inverse csg_op (@cm_unit M) m (inv m))}.

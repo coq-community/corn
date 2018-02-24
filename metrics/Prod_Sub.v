@@ -206,7 +206,7 @@ Definition restr_bin_fun (X : CPsMetricSpace) (P : cms_crr X -> CProp)
   end.
 
 
-Implicit Arguments restr_bin_fun [X].
+Arguments restr_bin_fun [X].
 
 Definition restr_bin_fun' (X : CPsMetricSpace) (P : cms_crr X -> CProp)
   (f : CSetoid_bin_fun X X IR) (a : X) (b : Build_SubCSetoid X P) : IR :=
@@ -214,7 +214,7 @@ Definition restr_bin_fun' (X : CPsMetricSpace) (P : cms_crr X -> CProp)
   | Build_subcsetoid_crr _ _ y q => f a y
   end.
 
-Implicit Arguments restr_bin_fun' [X].
+Arguments restr_bin_fun' [X].
 
 Lemma restr_bin_fun_strext :
  forall (X : CPsMetricSpace) (P : cms_crr X -> CProp)
@@ -242,7 +242,7 @@ Definition Build_SubCSetoid_bin_fun (X : CPsMetricSpace)
 Definition dsub (X : CPsMetricSpace) (P : cms_crr X -> CProp) :=
   Build_SubCSetoid_bin_fun X P (cms_d (c:=X)).
 
-Implicit Arguments dsub [X].
+Arguments dsub [X].
 
 Lemma dsub_com :
  forall (X : CPsMetricSpace) (P : cms_crr X -> CProp), com (dsub P).
@@ -317,7 +317,7 @@ Definition SubPsMetricSpace (X : CPsMetricSpace) (P : cms_crr X -> CProp) :
   Build_CPsMetricSpace (Build_SubCSetoid X P) (dsub P)
     (is_SubPsMetricSpace X P).
 
-Implicit Arguments SubPsMetricSpace [X].
+Arguments SubPsMetricSpace [X].
 
 Definition from_SubPsMetricSpace (X : CPsMetricSpace)
   (P : X -> CProp) : SubPsMetricSpace P -> X.
@@ -339,7 +339,7 @@ pseudo metric space and a certain subspace.
 Definition dsub' (X : CPsMetricSpace) (P : X -> CProp)
   (x : X) (y : SubPsMetricSpace P) := from_SubPsMetricSpace X P y[-d]x.
 
-Implicit Arguments dsub' [X].
+Arguments dsub' [X].
 
 Lemma dsub'_strext :
  forall (X : CPsMetricSpace) (P : X -> CProp) (x : X),
@@ -367,7 +367,7 @@ Definition dsub'_as_cs_fun (X : CPsMetricSpace) (P : X -> CProp)
   Build_CSetoid_fun (SubPsMetricSpace P) IR_as_CPsMetricSpace (
     dsub' P x) (dsub'_strext X P x).
 
-Implicit Arguments dsub'_as_cs_fun [X].
+Arguments dsub'_as_cs_fun [X].
 
 Lemma dsub'_uni_continuous'' :
  forall (X : CPsMetricSpace) (P : X -> CProp) (x : X),

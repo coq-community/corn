@@ -47,7 +47,7 @@ Set Automatic Introduction.
 
 Definition distinct1 (A : CSetoid) (f : nat -> A) := forall i j, i <> j -> f i [#] f j.
 
-Implicit Arguments distinct1 [A].
+Arguments distinct1 [A].
 
 Section Poly_Representation.
 (**

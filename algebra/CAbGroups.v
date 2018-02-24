@@ -520,5 +520,5 @@ Hint Resolve nmult_wd nmult_one nmult_Zero nmult_plus nmult_inv nmult_mult
   nmult_plus' zmult_wd zmult_one zmult_min_one zmult_zero zmult_Zero
   zmult_plus zmult_mult zmult_plus': algebra.
 
-Implicit Arguments nmult [G].
-Implicit Arguments zmult [G].
+Arguments nmult [G].
+Arguments zmult [G].

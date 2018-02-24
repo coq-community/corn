@@ -36,8 +36,8 @@ this proof to only be used in proofs of termination. *)
 Inductive LazyExists {A} (P : Stream A → Prop) (x : Stream A) : Prop :=
   | LazyHere : P x → LazyExists P x
   | LazyFurther : (unit → LazyExists P (tl x)) → LazyExists P x.
-Implicit Arguments LazyHere [[A] [P] [x]].
-Implicit Arguments LazyFurther [[A] [P] [x]].
+Arguments LazyHere {A P x}.
+Arguments LazyFurther {A P x}.
 
 Instance LazyExists_proper `{Setoid A} `{!Proper ((=) ==> iff) (P : Stream A → Prop)} : Proper ((=) ==> iff) (LazyExists P).
 Proof.
@@ -403,6 +403,6 @@ Defined.
 
 End Limit.
 (* begin hide *)
-Implicit Arguments NearBy [X].
-Implicit Arguments Limit [X].
+Arguments NearBy [X].
+Arguments Limit [X].
 (* end hide *)

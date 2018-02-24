@@ -81,7 +81,7 @@ Qed.
 
 End StepFSupBall.
 
-Implicit Arguments StepFSupBall [X].
+Arguments StepFSupBall [X].
 
 Add Parametric Morphism X : (@StepFSupBall X)
   with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
@@ -379,4 +379,4 @@ Definition constStepF_uc : X --> StepFSup X
 
 End UniformlyContinuousFunctions.
 
-Implicit Arguments constStepF_uc [X].
+Arguments constStepF_uc [X].

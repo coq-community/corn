@@ -59,7 +59,7 @@ In the %{\em %names%}% of lemmas, we will denote [[+]] with [plus].
 %\end{nameconvention}%
 *)
 
-Implicit Arguments csg_op [c].
+Arguments csg_op [c].
 Infix "[+]" := csg_op (at level 50, left associativity).
 (* End_SpecReals *)
 
@@ -133,11 +133,11 @@ Definition is_rht_unit S (op : CSetoid_bin_op S) Zero : Prop := forall x, op x Z
 
 Definition is_lft_unit S (op : CSetoid_bin_op S) Zero : Prop := forall x, op Zero x [=] x.
 
-Implicit Arguments is_lft_unit [S].
+Arguments is_lft_unit [S].
 
 (* Begin_SpecReals *)
 
-Implicit Arguments is_rht_unit [S].
+Arguments is_rht_unit [S].
 
 (** An alternative definition:
 *)
@@ -227,7 +227,7 @@ Qed.
 
 End Part_Function_Plus.
 
-Implicit Arguments Fplus [G].
+Arguments Fplus [G].
 Infix "{+}" := Fplus (at level 50, left associativity).
 
 Hint Resolve included_FPlus : included.

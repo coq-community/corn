@@ -35,7 +35,7 @@ Record Lattice : Type :=
 ; l_proof : is_SemiLattice (Dual sl) join
 }.
 (* begin hide *)
-Implicit Arguments join [l].
+Arguments join [l].
 (* end hide*)
 Section Join.
 

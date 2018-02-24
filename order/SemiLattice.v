@@ -44,7 +44,7 @@ Record SemiLattice : Type :=
 }.
 
 (* begin hide *)
-Implicit Arguments meet [s].
+Arguments meet [s].
 
 Add Parametric Morphism (X:SemiLattice) : (@meet X) with signature (@st_eq X) ==> (@st_eq X) ==> (@st_eq X)  as meet_compat.
 Proof.

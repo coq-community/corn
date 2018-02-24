@@ -736,7 +736,7 @@ Qed.
 is known to be bounded by some intenger. *)
 Definition exp (x:CR) : CR := exp_bounded (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
 (* begin hide *)
-Implicit Arguments exp [].
+Arguments exp : clear implicits.
 (* end hide *)
 Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1)%Q)%CR.
 Proof.

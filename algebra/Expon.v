@@ -352,7 +352,7 @@ End More_Nexp.
 
 Hint Resolve nexp_distr_div nexp_distr_recip: algebra.
 
-Implicit Arguments nexp_resp_ap_zero [R x].
+Arguments nexp_resp_ap_zero [R x].
 
 (**
 ** Definition of [zexp]: integer exponentiation
@@ -378,7 +378,7 @@ Definition zexp (x : R) x_ (n : Z) : R :=
 
 End Zexp_def.
 
-Implicit Arguments zexp [R].
+Arguments zexp [R].
 Notation "( x [//] Hx ) [^^] n" := (zexp x Hx n) (at level 0).
 
 (**
