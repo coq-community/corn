@@ -80,8 +80,8 @@ Proof.
   autorewrite with QposElim.
   apply Qplus_le_compat; auto.
  simpl in *.
- change ('P_of_succ_nat (length t))%Z with (Z_of_nat (1+(length t))) in H1.
- change ('P_of_succ_nat (length t))%Z with (Z_of_nat (1+(length t))) in H2.
+ change (Zpos (P_of_succ_nat (length t))) with (Z_of_nat (1+(length t))) in H1.
+ change (Zpos (P_of_succ_nat (length t))) with (Z_of_nat (1+(length t))) in H2.
  rewrite ->  inj_plus in *.
  rewrite ->  injz_plus in *.
  ring_simplify in H1.

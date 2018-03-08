@@ -44,7 +44,7 @@ Proof.
  apply Zle_trans with (two_p (Zsucc (log_inf n))-1)%Z.
   rewrite <- Zle_plus_swap.
   apply Zlt_succ_le.
-  change (' n+1) with (Zsucc ('n)).
+  change (Zpos n+1) with (Zsucc (Zpos n)).
   apply Zsucc_lt_compat.
   destruct (log_inf_correct2 n).
   assumption.
@@ -71,7 +71,7 @@ Proof.
  intros q.
  eapply Qle_trans.
   apply power3bound.
- generalize (let (n, _) := q in match n with | 0 => 0%nat | ' p => Psize p | Zneg _ => 0%nat end)%Z.
+ generalize (let (n, _) := q in match n with | 0 => 0%nat | Zpos p => Psize p | Zneg _ => 0%nat end)%Z.
  intros n.
  unfold Qle.
  simpl.

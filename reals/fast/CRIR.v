@@ -319,7 +319,7 @@ Proof.
    ' (n # 1)%Q * ' (/ (d # 1))%Q)%CR).
  rewrite <- (CRinv_Qinv d d__).
  unfold cf_div.
- assert (X:(forall (n:positive), IRasCR (nring (R:=IR) (nat_of_P n)) == ' ('n)%Z)%CR).
+ assert (X:(forall (n:positive), IRasCR (nring (R:=IR) (nat_of_P n)) == ' Zpos n)%CR).
   intros x.
   clear -x.
   rewrite <- convert_is_POS.
