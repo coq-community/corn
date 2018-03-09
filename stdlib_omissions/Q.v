@@ -48,7 +48,7 @@ Proof. reflexivity. Qed.
 Lemma S_Qplus (n: nat): inject_Z (Z_of_nat (S n)) = inject_Z (Z_of_nat n) + 1.
 Proof. rewrite inj_S. apply Zplus_Qplus. Qed.
 
-Lemma Pmult_Qmult (x y: positive): inject_Z (' (Pmult x y)) = inject_Z (' x) * inject_Z (' y).
+Lemma Pmult_Qmult (x y: positive): inject_Z (Zpos (Pmult x y)) = inject_Z (Zpos x) * inject_Z (Zpos y).
 Proof. rewrite Zpos_mult_morphism. apply Zmult_Qmult. Qed.
 
 Lemma Zle_Qle (x y: Z): (x <= y)%Z = (inject_Z x <= inject_Z y).
@@ -405,7 +405,7 @@ Proof with intuition.
  destruct Qnum.
    change (x * 0 <= 1).
    rewrite Qmult_0_r...
-  rewrite <- (Qmult_inv_r ('p # Qden)).
+  rewrite <- (Qmult_inv_r (Zpos p # Qden)).
    unfold Qdiv.
    apply Qmult_le_compat_r...
   discriminate.
@@ -470,7 +470,7 @@ Hint Resolve inject_Z_nonneg.
 
 Lemma positive_in_Q (p: positive): 0 < inject_Z (Zpos p).
 Proof.
- change (inject_Z 0 < inject_Z (' p)).
+ change (inject_Z 0 < inject_Z (Zpos p)).
  rewrite <- Zlt_Qlt.
  reflexivity.
 Qed.
