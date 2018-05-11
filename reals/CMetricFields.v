@@ -36,6 +36,8 @@
 
 Require Export CoRN.reals.CReals1.
 
+Set Nested Proofs Allowed.
+
 Section CMetric_Fields.
 
 (**
