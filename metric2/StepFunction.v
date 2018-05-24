@@ -68,7 +68,7 @@ StepFfold constStepF (fun a l r => glue (OpenUnitDual a) r l).
 It is essentially an inverse operation of glue *)
 Definition Split : StepF -> OpenUnit -> StepF*StepF.
 Proof.
- fix 1.
+ fix Split 1.
  intros s a.
  destruct s as [x | b t1 t2].
   exact (constStepF x , constStepF x).
@@ -595,7 +595,7 @@ Add Parametric Relation X : (StepF X) (@StepF_Qeq X)
 Definition Map(X Y:Type):(X->Y)->(StepF X)->(StepF Y).
 Proof.
  revert X Y.
- fix 4. intros X Y f [x| a t1 t2].
+ fix Map 4. intros X Y f [x| a t1 t2].
  exact (constStepF (f x)).
  exact (glue a (Map _ _ f t1) (Map _ _ f t2)).
 Defined.

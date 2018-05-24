@@ -327,7 +327,7 @@ Proof.
   assumption.
  unfold NearBy; simpl.
  intros l1 l2 Hl ε1 ε2 Hε.
- cofix.
+ cofix F.
  intros s [H0 H].
  constructor.
   simpl.
@@ -341,7 +341,7 @@ Lemma NearBy_weak l (ε1 ε2 : Qpos) :
   ε1 <= ε2 → ∀ s, NearBy l ε1 s → NearBy l ε2 s.
 Proof.
  unfold NearBy; simpl.
- cofix.
+ cofix F.
  intros Hε s [H0 H].
  constructor.
   eapply ball_weak_le.
@@ -354,7 +354,7 @@ Lemma NearBy_Infinity (s : Stream X) (x : X) : NearBy x QposInfinity s.
 Proof with trivial.
   unfold NearBy. simpl.
   revert s.
-  cofix.
+  cofix F.
   constructor...
 Qed.
 

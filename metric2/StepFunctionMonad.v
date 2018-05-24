@@ -83,7 +83,7 @@ Defined.
 Definition StFBind00(X Y : RSetoid) :
   (StepFS X) -> (X --> (StepFS Y)) -> (StepFS Y).
 Proof.
- fix 1. intro m. case m.
+ fix StFBind00 1. intro m. case m.
  intros x f.
   exact (f x).
  intros o m1 m2 f.
