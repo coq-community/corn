@@ -42,7 +42,7 @@ Local Open Scope Q_scope.
 (** [everyOther] preserves limits. *)
 Lemma everyOther_nbz : forall (s : Stream Q) x, (NearBy 0 x s) -> NearBy 0 x (everyOther s).
 Proof.
- cofix.
+ cofix everyOther_nbz.
  intros [s [b r]] x [H [_ Hs]].
  constructor;[|apply: everyOther_nbz];assumption.
 Qed.
@@ -52,7 +52,7 @@ Proof.
  intros e.
  assert (H:=Hx e). clear Hx.
  revert s H.
- fix 2.
+ fix everyOther_zl 2.
  intros x [H|H].
   left.
   apply everyOther_nbz.
@@ -72,7 +72,7 @@ Lemma mult_Streams_nbz : forall {s1 s2 : Stream Q} {x}, (NearBy 0 x s1) -> foral
  NearBy 0 (x*y) (mult_Streams s1 s2).
 Proof.
  unfold NearBy.
- cofix.
+ cofix mult_Streams_nbz.
  intros s1 s2 x [Ha0 Hs1] y [Hb0 Hs2].
  constructor;[|apply (mult_Streams_nbz (tl s1) (tl s2)); assumption].
  destruct x as [x|];[|constructor].
@@ -114,7 +114,7 @@ Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let 
 (** If the bounding stream goes to 0, so does the bounded stream. *)
 Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.
 Proof.
- cofix.
+ cofix Stream_Bound_nbz.
  intros a b e Hb Ha.
  constructor.
   destruct Hb as [[Hb1 Hb2] _].
@@ -161,7 +161,7 @@ Lemma mult_Streams_Gs : forall a (x y  : Stream Q),
  (GeometricSeries a y) ->
  (GeometricSeries a (mult_Streams x y)).
 Proof.
- cofix.
+ cofix mult_Streams_Gs.
  intros a x y Hx Hy.
  constructor.
   destruct Hy as [Hy _].
@@ -190,7 +190,7 @@ Lemma powers_help_Gs : (0 <= a) -> forall c,
  (GeometricSeries a (powers_help a c)).
 Proof.
  intros Ha.
- cofix.
+ cofix powers_help_Gs.
  intros c.
  constructor.
   simpl.
@@ -215,7 +215,7 @@ Proof.
  intros x Hx.
  destruct Ha as [Ha0 Ha1].
  generalize x Hx; clear x Hx.
- cofix.
+ cofix powers_help_dnn.
  intros b Hb.
  constructor.
   simpl.
@@ -236,7 +236,7 @@ Qed.
 
 Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (1#1)%Qpos (powers_help a x).
 Proof.
- cofix.
+ cofix powers_help_nbz.
  intros b [Hb0 Hb1].
  destruct Ha as [Ha0 Ha1].
  constructor.
@@ -335,7 +335,7 @@ Proof.
  destruct (Qpos_as_positive_ratio x) as [[n d] U].
  subst.
  simpl.
- cofix.
+ cofix Qrecip_positives_help_nbz.
  intros q Hpq.
  constructor.
   simpl.
@@ -384,7 +384,7 @@ Proof.
  unfold Qrecip_positives.
  unfold ppositives.
  generalize (1%positive) at 2.
- cofix.
+ cofix Qrecip_positives_dnn.
  intros p.
  constructor.
   simpl.
@@ -494,7 +494,7 @@ Proof.
  unfold Qrecip_factorials.
  unfold pfactorials.
  generalize (1%positive) at 3. generalize (1%positive) at 2.
- cofix.
+ cofix Qrecip_factorials_dnn.
  intros a b.
  constructor.
   simpl.
@@ -515,7 +515,7 @@ Proof.
   intros H.
   apply (H 1%positive 1%positive).
  auto with *.
- cofix.
+ cofix Qrecip_factorial_bounded.
  constructor.
   simpl.
   split.
