@@ -32,7 +32,7 @@ Require Import CoRN.reals.fast.LazyNat.
 Require Export CoRN.metric2.Limit.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.Qpower.
-Require Export Coq.Lists.Streams.
+Require Export MathClasses.theory.Streams.
 Require Import CoRN.transc.PowerSeries.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.classes.Qclasses.
