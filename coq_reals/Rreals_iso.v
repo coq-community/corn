@@ -25,7 +25,6 @@ Require Import Coq.Reals.RIneq.
 Require Import Coq.Reals.Rcomplete.
 Require Import Coq.Reals.Rlimit.
 Require Import Coq.Reals.Rbasic_fun.
-Require Import Coq.fourier.Fourier.
 Require Import CoRN.coq_reals.Rreals.
 Require Import CoRN.reals.iso_CReals.
 Require Import CoRN.reals.CauchySeq.
@@ -38,6 +37,7 @@ Require Import CoRN.transc.Pi.
 Require Import CoRN.transc.MoreArcTan.
 Require Import CoRN.logic.PropDecid.
 Require Import CoRN.transc.Exponential.
+From Coq Require Import Lra.
 
 (* This changed in RLogic and should probably be moved there: *)
 Lemma forall_dec : forall P:nat->Prop, (forall n, {P n} + {~ P n}) -> {forall n, P n} + {~forall n, P n}.
@@ -319,7 +319,7 @@ Proof.
   reflexivity.
  stepl (RasIR 0); [| now apply R_Zero_as_IR].
  apply IR_le_as_R.
- fourier.
+ lra.
 Qed.
 Hint Rewrite R_abs_as_IR : RtoIR.
 
