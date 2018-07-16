@@ -10,6 +10,8 @@ and run:
 
     opam install coq-corn
 
+Corn depends on math-classes from opam.
+
 ## Install from source
 ### Prerequisites
 This version of C-CoRN should compile with 8.6 and later. It requires
