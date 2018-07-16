@@ -11,6 +11,6 @@ install:
   - opam init -y && eval $(opam config env) && opam config var root
   - travis_wait opam install -y coq
   - opam repo -y add coq-released https://coq.inria.fr/opam/released || true
-  - travis_wait opam install -y coq-bignums coq-math-classes
+  - travis_wait opam pin add coq-math-classes https://github.com/math-classes/math-classes.git#master
 script: scons
 
