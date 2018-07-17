@@ -46,7 +46,6 @@ COQSRCLIBS:=-I $(COQLIB)/kernel -I $(COQLIB)/lib \
   -I $(COQLIB)/plugins/extraction \
   -I $(COQLIB)/plugins/field \
   -I $(COQLIB)/plugins/firstorder \
-  -I $(COQLIB)/plugins/fourier \
   -I $(COQLIB)/plugins/funind \
   -I $(COQLIB)/plugins/groebner \
   -I $(COQLIB)/plugins/interface \

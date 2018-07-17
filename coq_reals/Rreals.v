@@ -31,7 +31,9 @@ Require Import Coq.Reals.RIneq.
 Require Import Coq.Reals.Rcomplete.
 Require Import Coq.Reals.Rlimit.
 Require Import Coq.Reals.Rbasic_fun.
-Require Import Coq.fourier.Fourier.
+From Coq Require Import Lra.
+
+Open Scope R_scope.
 
 (** * Coq Real Numbers
 
@@ -334,7 +336,7 @@ Proof.
    intros x y.
    simpl in *.
    unfold Not; split.
-    intros; fourier.
+    intros; lra.
    intro.
    apply Rnot_lt_le.
    assumption.
@@ -372,10 +374,10 @@ Proof.
  apply Rabs_def1.
   clear - H0 epsgt.
   simpl in *.
-  fourier.
+  lra.
  clear - H epsgt.
  simpl in *.
- fourier.
+ lra.
 Qed.
 
 (** limit *)
@@ -422,11 +424,11 @@ Proof.
   simpl in *.
   destruct (hs (e/4)) as [N HN].
    simpl.
-   fourier.
+   lra.
   exists N.
   intros m Hm.
   destruct (u (e/2)).
-   fourier.
+   lra.
   set (z:=max x0 m).
   rstepr (((s m[-]s N)[+](s N[-]s z))[+](s z[-]x)).
   apply AbsSmall_eps_div_two.
@@ -453,7 +455,7 @@ Proof.
  unfold Zabs_nat.
  elim (archimed x).
  destruct (up x).
-   simpl; intros; fourier.
+   simpl; intros; lra.
   rewrite <- positive_nat_Z.
   intros H _.
   apply Rlt_le.
@@ -466,14 +468,14 @@ Proof.
   cut (0 <= INR (nat_of_P p)).
    intro.
    apply Rlt_le.
-   fourier.
+   lra.
   apply pos_INR.
  cut (0 <= INR (nat_of_P p)).
   rewrite INR_IZR_INZ.
   intro.
   change (IZR (Zneg p)) with (Ropp (IZR (Zpos p))) in I.
   rewrite <- positive_nat_Z in I.
-  fourier.
+  lra.
  apply pos_INR.
 Qed.
 
