@@ -152,9 +152,9 @@ Variable x:X.
 Definition DiffSeries:=fun n => d (@Banach_seq _ F n x) (@Banach_seq _ F (S n) x).
 Require Import StreamMemo.
 Definition DiffStream:=(memo_list _ DiffSeries).
-Require Import Streams.
+Require Import CoqStreams.
 
-(* ForAll_map in Streams ?? *)
+(* ForAll_map in CoqStreams ?? *)
 Definition GeometricSeriesCR (c:CR):= 
   (ForAll (fun s:Stream CR => (CRabs ((hd (tl s))) <= c*(CRabs(hd s)))%CR)).
 

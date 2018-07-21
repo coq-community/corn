@@ -1,4 +1,4 @@
-Require Import Coq.Unicode.Utf8 MathClasses.theory.Streams CoRN.metric2.UniformContinuity MathClasses.interfaces.abstract_algebra.
+Require Import Coq.Unicode.Utf8 MathClasses.theory.CoqStreams CoRN.metric2.UniformContinuity MathClasses.interfaces.abstract_algebra.
 
 
 (** Uniform continuous maps from a metric space to itself (endomaps)

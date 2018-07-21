@@ -22,7 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import Coq.QArith.QArith.
 Require Import Coq.Bool.Bool.
 Require Export CoRN.metric2.Complete.
-Require Export MathClasses.theory.Streams.
+Require Export MathClasses.theory.CoqStreams.
 Require Import MathClasses.interfaces.abstract_algebra MathClasses.theory.streams MathClasses.orders.naturals.
 
 (**
