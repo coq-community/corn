@@ -32,7 +32,7 @@ Require Import CoRN.reals.fast.LazyNat.
 Require Export CoRN.metric2.Limit.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.Qpower.
-Require Export MathClasses.theory.Streams.
+Require Export MathClasses.theory.CoqStreams.
 Require Import CoRN.transc.PowerSeries.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.classes.Qclasses.
@@ -272,7 +272,7 @@ Proof.
  unfold InfiniteAlternatingSum_raw.
  unfold PartialAlternatingSumUntil.
  simpl.
- set (P:=(fun s : Stream Q => Qball_ex_bool e (Streams.hd s) 0)).
+ set (P:=(fun s : Stream Q => Qball_ex_bool e (CoqStreams.hd s) 0)).
  case_eq (P (Cons hd seq)); intros H.
   rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
   case_eq (P seq); intros H0.
@@ -284,13 +284,13 @@ Proof.
    apply: ball_weak;simpl.
    apply: ball_sym;simpl.
    unfold Qball_ex_bool in H.
-   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd (Cons hd seq))) as [X|X];
+   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd (Cons hd seq))) as [X|X];
      [apply X|discriminate H].
   unfold P in *.
   unfold Qball_ex_bool in *.
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd (Cons hd seq))) as [X|X];
+  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd (Cons hd seq))) as [X|X];
     [|discriminate H].
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (Streams.hd seq)) as [Y|Y]; [discriminate H0|].
+  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd seq)) as [Y|Y]; [discriminate H0|].
   elim Y.
   simpl in dnn_hd.
   destruct dnn_hd as [Z0 Z1].
@@ -298,10 +298,10 @@ Proof.
    apply Qle_trans with 0.
    change (- e <= 0)%Q.
     rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
-   change (0 <= Streams.hd seq - 0)%Q.
+   change (0 <= CoqStreams.hd seq - 0)%Q.
    ring_simplify.
    apply Z0.
-  change (Streams.hd seq - 0 <= e)%Q.
+  change (CoqStreams.hd seq - 0 <= e)%Q.
   ring_simplify.
   eapply Qle_trans.
    apply Z1.

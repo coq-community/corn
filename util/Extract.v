@@ -10,11 +10,11 @@ Extract Inlined Constant tl => "tail".
 Extract Inlined Constant hd => "head".
 Extract Inlined Constant map => "map".
 
-Extract Inductive Streams.Stream => "([])" ["( : )"].
-Extract Inlined Constant Streams.tl => "tail".
-Extract Inlined Constant Streams.hd => "head".
-Extract Inlined Constant Streams.map => "map".
-Extract Inlined Constant Streams.zipWith => "zipWith".
+Extract Inductive CoqStreams.Stream => "([])" ["( : )"].
+Extract Inlined Constant CoqStreams.tl => "tail".
+Extract Inlined Constant CoqStreams.hd => "head".
+Extract Inlined Constant CoqStreams.map => "map".
+Extract Inlined Constant CoqStreams.zipWith => "zipWith".
 
 Extract Inductive sum => "( :+: )" [ "Inl" "Inr" ].
 
