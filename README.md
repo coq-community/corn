@@ -14,11 +14,11 @@ Corn depends on math-classes from opam.
 
 ## Install from source
 ### Prerequisites
-This version of C-CoRN should compile with 8.6 and later. It requires
+This version of C-CoRN has been tested with 8.6 through 8.8.1 and later. It requires
 * SCons 1.2 or make
 
 ### Git checkout and submodules
-C-CoRN depends on [Math Classes](https://github.com/math-classes/math-classes), which is a library of abstract interfaces for
+C-CoRN depends on [Math Classes](https://github.com/math-classes/math-classes) version 8.8.1, which is a library of abstract interfaces for
 mathematical structures that is heavily based on Coq's new type classes.
 
 ### Building C-CoRN
