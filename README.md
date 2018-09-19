@@ -14,7 +14,7 @@ Corn depends on math-classes from opam.
 
 ## Install from source
 ### Prerequisites
-This version of C-CoRN should compile with 8.8.1 and later. It requires
+This version of C-CoRN has been tested with 8.6 through 8.8.1 and later. It requires
 * SCons 1.2 or make
 
 ### Git checkout and submodules
