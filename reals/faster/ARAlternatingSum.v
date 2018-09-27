@@ -269,7 +269,7 @@ Proof.
   simpl.
   rewrite rings.preserves_plus, rings.preserves_negate.
   rewrite Qminus'_correct. unfold Qminus.
-  setoid_replace (Psucc l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
+  setoid_replace (Pos.succ l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
    apply Qball_plus.
     generalize d. intros d'. destruct d' as [? ? ? E]. (* ugly *)
     rewrite E.

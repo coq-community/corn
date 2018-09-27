@@ -188,14 +188,14 @@ Proof.
  simpl.
  rewrite -> Qle_minus_iff.
  replace RHS with
-   ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Psucc (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by (simpl; ring).
+   ((approximate (nring (R:=CRasCRing) a) ((1 # 2) * q)%Qpos + 1) + - ((Pos.succ (P_of_succ_nat a) # d)%Qpos- 1%Q))%Q by (simpl; ring).
  rewrite<- Qle_minus_iff.
  eapply Qle_trans;[|apply IHa].
  generalize (P_of_succ_nat a).
  intros p.
  rewrite -> Qle_minus_iff.
  autorewrite with QposElim.
- replace RHS with (((p#d) + 1) + - (Psucc p # d)) by ring.
+ replace RHS with (((p#d) + 1) + - (Pos.succ p # d)) by ring.
  rewrite <- Qle_minus_iff.
  unfold Qle.
  simpl.

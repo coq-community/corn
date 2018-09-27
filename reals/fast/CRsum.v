@@ -124,18 +124,18 @@ Proof.
      (map (fun x : RegularFunction Q_as_MetricSpace => approximate x e1) l) z3) (approximate a e4 +
        fold_left Qplus (map (fun x : RegularFunction Q_as_MetricSpace => approximate x e2) l) z2)).
   intros H.
-  apply (H (approximate s ((1 # Psucc (P_of_succ_nat n)) * e)%Qpos)
-    ((1 # Psucc (P_of_succ_nat n)) * e)%Qpos ((1 # Psucc (P_of_succ_nat n)) * e +
+  apply (H (approximate s ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos)
+    ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos ((1 # Pos.succ (P_of_succ_nat n)) * e +
       (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos).
     simpl.
     rewrite -> Qplus_0_l.
     apply: regFun_prf.
    ring.
   autorewrite with QposElim.
-  replace LHS with ((1 # Psucc (P_of_succ_nat n)) * (2+n) *e +
+  replace LHS with ((1 # Pos.succ (P_of_succ_nat n)) * (2+n) *e +
     ((1 # P_of_succ_nat n) * (1 + n) * ((1 # 2) * e)  + (1 # 2) * e)) by simpl; ring.
   repeat rewrite -> Qmake_Qdiv.
-  change (Zpos (Psucc (P_of_succ_nat n))) with (Z_of_nat (1+1+n)).
+  change (Zpos (Pos.succ (P_of_succ_nat n))) with (Z_of_nat (1+1+n)).
   change (Zpos (P_of_succ_nat n)) with (Z_of_nat (1+n)).
   repeat rewrite -> inj_plus.
   repeat rewrite -> injz_plus.

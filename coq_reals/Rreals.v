@@ -451,8 +451,8 @@ Proof.
   change (e / 2 = e * / (0 + 1 + 1)).
   field.
  intro x.
- exists (Zabs_nat (up x)).
- unfold Zabs_nat.
+ exists (Z.abs_nat (up x)).
+ unfold Z.abs_nat.
  elim (archimed x).
  destruct (up x).
    simpl; intros; lra.

@@ -330,7 +330,7 @@ Proof.
    reflexivity.
   intros n H1.
   simpl in |- *.
-  rewrite Ppred_succ.
+  rewrite Pos.pred_succ.
   reflexivity.
  exists (pred (nat_of_P p)).
  apply S_pred with 0.
@@ -501,7 +501,7 @@ Proof.
   apply H1.
   assumption.
  rewrite Znat.inj_S.
- unfold Zsucc in |- *.
+ unfold Z.succ in |- *.
  rewrite Zopp_plus_distr.
  reflexivity.
 Qed.
@@ -631,14 +631,14 @@ Lemma Zlt_reg_mult_l : forall x y z : Z,
 Proof.
  intros x y z H H0.
  case (Zcompare_Gt_spec x 0).
-  unfold Zgt in H.
+  unfold Z.gt in H.
   assumption.
  intros x0 H1.
  cut (x = Zpos x0).
   intro H2.
   rewrite H2.
-  unfold Zlt in H0.
-  unfold Zlt in |- *.
+  unfold Z.lt in H0.
+  unfold Z.lt in |- *.
   cut ((Zpos x0 * y ?= Zpos x0 * z)%Z = (y ?= z)%Z).
    intro H3.
    exact (trans_eq H3 H0).
@@ -663,7 +663,7 @@ Proof.
    exact (trans_eq H0 H1).
   exact (Zcompare_opp y x).
  apply sym_eq.
- exact (Zlt_gt x y H).
+ exact (Z.lt_gt x y H).
 Qed.
 
 Lemma Zlt_conv_mult_l : forall x y z : Z,
@@ -685,8 +685,8 @@ Proof.
        intro H6.
        rewrite H6 in H4.
        assumption.
-      exact (Zopp_involutive (x * z)).
-     exact (Zopp_involutive (x * y)).
+      exact (Z.opp_involutive (x * z)).
+     exact (Z.opp_involutive (x * y)).
     cut ((- (- x * y))%Z = (- - (x * y))%Z).
      intro H4.
      rewrite H4 in H3.
@@ -696,11 +696,11 @@ Proof.
       assumption.
      cut ((- x * z)%Z = (- (x * z))%Z).
       intro H5.
-      exact (f_equal Zopp H5).
+      exact (f_equal Z.opp H5).
      exact (Zopp_mult_distr_l_reverse x z).
     cut ((- x * y)%Z = (- (x * y))%Z).
      intro H4.
-     exact (f_equal Zopp H4).
+     exact (f_equal Z.opp H4).
     exact (Zopp_mult_distr_l_reverse x y).
    exact (Zlt_opp (- x * y) (- x * z) H2).
   exact (Zlt_reg_mult_l (- x) y z H1 H0).
@@ -722,7 +722,7 @@ Proof.
     assumption.
    exact (sym_eq H2).
   exact (Zorder.Zlt_not_eq y x H0).
- exact (Zgt_lt x y H).
+ exact (Z.gt_lt x y H).
 Qed.
 
 Lemma Zmult_absorb : forall x y z : Z,
@@ -758,7 +758,7 @@ Proof.
     assumption.
    exact (Zorder.Zlt_not_eq (x * y) (x * z) H4).
   apply Zlt_reg_mult_l.
-   exact (Zlt_gt 0 x H3).
+   exact (Z.lt_gt 0 x H3).
   assumption.
  intro H2.
  apply False_ind.
@@ -793,7 +793,7 @@ Proof.
    assumption.
   exact (Zorder.Zlt_not_eq (x * z) (x * y) H4).
  apply Zlt_reg_mult_l.
-  exact (Zlt_gt 0 x H3).
+  exact (Z.lt_gt 0 x H3).
  auto.
 Qed.
 
@@ -884,10 +884,10 @@ both n and n+1 for the 2n+1 case, while still maintaining efficency.
 
 Fixpoint positive_rect2_helper
  (P : positive -> Type)
- (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
+ (c1 : forall p : positive, P (Pos.succ p) -> P p -> P (xI p))
  (c2 : forall p : positive, P p -> P (xO p))
  (c3 : P 1%positive)
- (b : bool) (p : positive) {struct p} : P (if b then Psucc p else p) :=
+ (b : bool) (p : positive) {struct p} : P (if b then Pos.succ p else p) :=
  match p with
  | xH    => match b with true => c2 _ c3 | false => c3 end
  | xO p' => match b with
@@ -902,14 +902,14 @@ Fixpoint positive_rect2_helper
 
 Definition positive_rect2
  (P : positive -> Type)
- (c1 : forall p : positive, P (Psucc p) -> P p -> P (xI p))
+ (c1 : forall p : positive, P (Pos.succ p) -> P p -> P (xI p))
  (c2 : forall p : positive, P p -> P (xO p))
  (c3 : P 1%positive) (p : positive) : P p :=
 positive_rect2_helper P c1 c2 c3 false p.
 
 Lemma positive_rect2_helper_bool : forall P c1 c2 c3 p,
 positive_rect2_helper P c1 c2 c3 true p =
-positive_rect2_helper P c1 c2 c3 false (Psucc p).
+positive_rect2_helper P c1 c2 c3 false (Pos.succ p).
 Proof.
  intros P c1 c2 c3.
  induction p; try reflexivity.
@@ -920,7 +920,7 @@ Qed.
 
 Lemma positive_rect2_red1 : forall P c1 c2 c3 p,
 positive_rect2 P c1 c2 c3 (xI p) =
-c1 p (positive_rect2 P c1 c2 c3 (Psucc p)) (positive_rect2 P c1 c2 c3 p).
+c1 p (positive_rect2 P c1 c2 c3 (Pos.succ p)) (positive_rect2 P c1 c2 c3 p).
 Proof.
  intros P c1 c2 c3 p.
  unfold positive_rect2.

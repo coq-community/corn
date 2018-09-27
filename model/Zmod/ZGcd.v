@@ -359,7 +359,7 @@ Proof.
     assert (Heq : Zpos a = Zpos b).
      apply Zle_antisymm.
       intro H; rewrite H in Hegal; discriminate.
-     apply Zle_ge; intro H; rewrite H in Hegal; discriminate.
+     apply Z.le_ge; intro H; rewrite H in Hegal; discriminate.
     inversion Heq.
     tauto.
    intro Hlt.
@@ -383,8 +383,8 @@ Proof.
     unfold Zminus in |- *; simpl in |- *.
     rewrite Zplus_0_r.
     reflexivity.
-   apply (Zdiv_lt_POS b a); apply Zgt_lt; assumption.
-  apply (Zmod_lt_POS b a); apply Zgt_lt; assumption.
+   apply (Zdiv_lt_POS b a); apply Z.gt_lt; assumption.
+  apply (Zmod_lt_POS b a); apply Z.gt_lt; assumption.
  auto.
 Qed.
 
@@ -515,13 +515,13 @@ Definition Zgcd_coeff_b (a b : Z) :=
 
 
 Lemma Zgcd_duv_zero_rht :
- forall a : Z, Zgcd_duv a 0 = (Zabs a, (Zsgn a, 0%Z)).
+ forall a : Z, Zgcd_duv a 0 = (Z.abs a, (Z.sgn a, 0%Z)).
 Proof.
  intro a.
  case a; auto with zarith.
 Qed.
 
-Lemma Zgcd_zero_rht : forall a : Z, Zgcd a 0 = Zabs a.
+Lemma Zgcd_zero_rht : forall a : Z, Zgcd a 0 = Z.abs a.
 Proof.
  intro a.
  unfold Zgcd in |- *.
@@ -529,7 +529,7 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Zgcd_coeff_a_zero_rht : forall a : Z, Zgcd_coeff_a a 0 = Zsgn a.
+Lemma Zgcd_coeff_a_zero_rht : forall a : Z, Zgcd_coeff_a a 0 = Z.sgn a.
 Proof.
  intro a.
  unfold Zgcd_coeff_a in |- *.
@@ -551,7 +551,7 @@ Lemma Zgcd_duv_Zopp_l :
  (let (d, uv) := Zgcd_duv a b in let (u, v) := uv in (d, ((- u)%Z, v))).
 Proof.
  intros a b.
- case a; case b; intros; simpl in |- *; repeat rewrite Zopp_involutive; reflexivity.
+ case a; case b; intros; simpl in |- *; repeat rewrite Z.opp_involutive; reflexivity.
 Qed.
 
 Lemma Zgcd_Zopp_l : forall a b : Z, Zgcd (- a) b = Zgcd a b.
@@ -586,7 +586,7 @@ Lemma Zgcd_duv_Zopp_r :
  (let (d, uv) := Zgcd_duv a b in let (u, v) := uv in (d, (u, (- v)%Z))).
 Proof.
  intros a b.
- case a; case b; intros; simpl in |- *; repeat rewrite Zopp_involutive; reflexivity.
+ case a; case b; intros; simpl in |- *; repeat rewrite Z.opp_involutive; reflexivity.
 Qed.
 
 Lemma Zgcd_Zopp_r : forall a b : Z, Zgcd a (- b) = Zgcd a b.
@@ -618,16 +618,16 @@ Qed.
 Lemma Zgcd_duv_abs :
  forall a b : Z,
  Zgcd_duv a b =
- (let (d, uv) := Zgcd_duv (Zabs a) (Zabs b) in
-  let (u, v) := uv in (d, ((Zsgn a * u)%Z, (Zsgn b * v)%Z))).
+ (let (d, uv) := Zgcd_duv (Z.abs a) (Z.abs b) in
+  let (u, v) := uv in (d, ((Z.sgn a * u)%Z, (Z.sgn b * v)%Z))).
 Proof.
  intros a b.
- case a; case b; intros; unfold Zabs, Zsgn, Zgcd_duv in |- *;
+ case a; case b; intros; unfold Z.abs, Z.sgn, Zgcd_duv in |- *;
    repeat (fold (- (1))%Z in |- *; rewrite <- Zopp_mult_distr_l);
      repeat rewrite Zmult_1_l; reflexivity.
 Qed.
 
-Lemma Zgcd_abs : forall a b : Z, Zgcd a b = Zgcd (Zabs a) (Zabs b).
+Lemma Zgcd_abs : forall a b : Z, Zgcd a b = Zgcd (Z.abs a) (Z.abs b).
 Proof.
  intros a b.
  case a; case b; auto with zarith.
@@ -635,23 +635,23 @@ Qed.
 
 Lemma Zgcd_coeff_a_abs :
  forall a b : Z,
- Zgcd_coeff_a a b = (Zsgn a * Zgcd_coeff_a (Zabs a) (Zabs b))%Z.
+ Zgcd_coeff_a a b = (Z.sgn a * Zgcd_coeff_a (Z.abs a) (Z.abs b))%Z.
 Proof.
  intros.
  unfold Zgcd_coeff_a in |- *.
  rewrite Zgcd_duv_abs.
- elim (Zgcd_duv (Zabs a) (Zabs b)); intros d uv; elim uv; intros u v.
+ elim (Zgcd_duv (Z.abs a) (Z.abs b)); intros d uv; elim uv; intros u v.
  reflexivity.
 Qed.
 
 Lemma Zgcd_coeff_b_abs :
  forall a b : Z,
- Zgcd_coeff_b a b = (Zsgn b * Zgcd_coeff_b (Zabs a) (Zabs b))%Z.
+ Zgcd_coeff_b a b = (Z.sgn b * Zgcd_coeff_b (Z.abs a) (Z.abs b))%Z.
 Proof.
  intros.
  unfold Zgcd_coeff_b in |- *.
  rewrite Zgcd_duv_abs.
- elim (Zgcd_duv (Zabs a) (Zabs b)); intros d uv; elim uv; intros u v.
+ elim (Zgcd_duv (Z.abs a) (Z.abs b)); intros d uv; elim uv; intros u v.
  reflexivity.
 Qed.
 
@@ -680,21 +680,21 @@ Qed.
 Let Zgcd_duv_rec_subcase :
   forall (a : Z) (pb : positive),
   Zgcd_duv a (Zpos pb) =
-  (let (d, uv) := Zgcd_duv (Zpos pb) (Zabs a mod Zpos pb) in
-   let (u, v) := uv in (d, ((Zsgn a * v)%Z, (u - Zabs a / Zpos pb * v)%Z))).
+  (let (d, uv) := Zgcd_duv (Zpos pb) (Z.abs a mod Zpos pb) in
+   let (u, v) := uv in (d, ((Z.sgn a * v)%Z, (u - Z.abs a / Zpos pb * v)%Z))).
 Proof.
  intros a pb.
  case a.
    unfold Zgcd_duv in |- *; simpl in |- *; reflexivity.
   intro pa.
-  unfold Zabs, Zsgn in |- *.
+  unfold Z.abs, Z.sgn in |- *.
   rewrite Zgcd_duv_rec_subsubcase.
   elim (Zgcd_duv (Zpos pb) (Zpos pa mod Zpos pb)); intros d uv; elim uv; intros u v.
   rewrite Zmult_1_l.
   reflexivity.
  intro pa.
  rewrite (Zgcd_duv_abs (Zneg pa) (Zpos pb)).
- unfold Zabs, Zsgn in |- *.
+ unfold Z.abs, Z.sgn in |- *.
  rewrite Zgcd_duv_rec_subsubcase.
  elim (Zgcd_duv (Zpos pb) (Zpos pa mod Zpos pb)); intros d uv; elim uv; intros u v.
  rewrite Zmult_1_l.
@@ -705,9 +705,9 @@ Lemma Zgcd_duv_rec :
  forall a b : Z,
  b <> 0%Z ->
  Zgcd_duv a b =
- (let (d, uv) := Zgcd_duv b (Zabs a mod Zabs b) in
+ (let (d, uv) := Zgcd_duv b (Z.abs a mod Z.abs b) in
   let (u, v) := uv in
-  (d, ((Zsgn a * v)%Z, (u - Zsgn b * (Zabs a / Zabs b) * v)%Z))).
+  (d, ((Z.sgn a * v)%Z, (u - Z.sgn b * (Z.abs a / Z.abs b) * v)%Z))).
 Proof.
  intros a b Hb.
  set (B := b) in *.
@@ -720,8 +720,8 @@ Proof.
    intros pb HB'.
    rewrite HB'.
    rewrite Zgcd_duv_rec_subcase.
-   unfold Zabs, Zsgn in |- *. fold (Zabs a) in |- *. fold (Zsgn a) in |- *.
-   elim (Zgcd_duv (Zpos pb) (Zabs a mod Zpos pb)); intros d uv; elim uv; intros u v.
+   unfold Z.abs, Z.sgn in |- *. fold (Z.abs a) in |- *. fold (Z.sgn a) in |- *.
+   elim (Zgcd_duv (Zpos pb) (Z.abs a mod Zpos pb)); intros d uv; elim uv; intros u v.
    rewrite Zmult_1_l.
    reflexivity.
   intros pb HB'.
@@ -730,8 +730,8 @@ Proof.
   rewrite Zgcd_duv_Zopp_r.
   rewrite Zgcd_duv_Zopp_l.
   rewrite Zgcd_duv_rec_subcase.
-  unfold Zopp, Zabs, Zsgn in |- *. fold (Zabs a) in |- *. fold (Zsgn a) in |- *.
-  elim (Zgcd_duv (Zpos pb) (Zabs a mod Zpos pb)); intros d uv; elim uv; intros u v.
+  unfold Z.opp, Z.abs, Z.sgn in |- *. fold (Z.abs a) in |- *. fold (Z.sgn a) in |- *.
+  elim (Zgcd_duv (Zpos pb) (Z.abs a mod Zpos pb)); intros d uv; elim uv; intros u v.
   fold (- u)%Z in |- *.
   rewrite Zopp_mult_distr_l_reverse.
   unfold Zminus in |- *.
@@ -741,12 +741,12 @@ Proof.
 Qed.
 
 Lemma Zgcd_rec :
- forall a b : Z, b <> 0%Z -> Zgcd a b = Zgcd b (Zabs a mod Zabs b).
+ forall a b : Z, b <> 0%Z -> Zgcd a b = Zgcd b (Z.abs a mod Z.abs b).
 Proof.
  intros a b Hb.
  unfold Zgcd in |- *.
  rewrite Zgcd_duv_rec.
-  elim (Zgcd_duv b (Zabs a mod Zabs b)); intros d uv; elim uv; intros u v.
+  elim (Zgcd_duv b (Z.abs a mod Z.abs b)); intros d uv; elim uv; intros u v.
   reflexivity.
  exact Hb.
 Qed.
@@ -754,13 +754,13 @@ Qed.
 Lemma Zgcd_coeff_a_rec :
  forall a b : Z,
  b <> 0%Z ->
- Zgcd_coeff_a a b = (Zsgn a * Zgcd_coeff_b b (Zabs a mod Zabs b))%Z.
+ Zgcd_coeff_a a b = (Z.sgn a * Zgcd_coeff_b b (Z.abs a mod Z.abs b))%Z.
 Proof.
  intros a b Hb.
  unfold Zgcd_coeff_a in |- *.
  unfold Zgcd_coeff_b in |- *.
  rewrite Zgcd_duv_rec.
-  elim (Zgcd_duv b (Zabs a mod Zabs b)); intros d uv; elim uv; intros u v.
+  elim (Zgcd_duv b (Z.abs a mod Z.abs b)); intros d uv; elim uv; intros u v.
   reflexivity.
  exact Hb.
 Qed.
@@ -769,21 +769,21 @@ Lemma Zgcd_coeff_b_rec :
  forall a b : Z,
  b <> 0%Z ->
  Zgcd_coeff_b a b =
- (Zgcd_coeff_a b (Zabs a mod Zabs b) -
-  Zsgn b * (Zabs a / Zabs b) * Zgcd_coeff_b b (Zabs a mod Zabs b))%Z.
+ (Zgcd_coeff_a b (Z.abs a mod Z.abs b) -
+  Z.sgn b * (Z.abs a / Z.abs b) * Zgcd_coeff_b b (Z.abs a mod Z.abs b))%Z.
 Proof.
  intros a b Hb.
  unfold Zgcd_coeff_a in |- *.
  unfold Zgcd_coeff_b in |- *.
  rewrite Zgcd_duv_rec.
-  elim (Zgcd_duv b (Zabs a mod Zabs b)); intros d uv; elim uv; intros u v.
+  elim (Zgcd_duv b (Z.abs a mod Z.abs b)); intros d uv; elim uv; intros u v.
   reflexivity.
  exact Hb.
 Qed.
 
 Lemma Zgcd_duv_divisor :
  forall a b : Z,
- a <> 0%Z -> Zdivides b a -> Zgcd_duv a b = (Zabs b, (0%Z, Zsgn b)).
+ a <> 0%Z -> Zdivides b a -> Zgcd_duv a b = (Z.abs b, (0%Z, Z.sgn b)).
 Proof.
  intros a b Ha.
  case b.
@@ -794,7 +794,7 @@ Proof.
   intros pb Hdiv.
   simpl in |- *.
   rewrite Zgcd_duv_rec_subcase.
-  replace (Zabs a mod Zpos pb)%Z with 0%Z.
+  replace (Z.abs a mod Zpos pb)%Z with 0%Z.
    rewrite Zgcd_duv_zero_rht.
    rewrite Zmult_0_r.
    rewrite Zmult_0_r.
@@ -807,7 +807,7 @@ Proof.
  fold (- Zpos pb)%Z in |- *.
  rewrite Zgcd_duv_Zopp_r.
  rewrite Zgcd_duv_rec_subcase.
- replace (Zabs a mod Zpos pb)%Z with 0%Z.
+ replace (Z.abs a mod Zpos pb)%Z with 0%Z.
   rewrite Zgcd_duv_zero_rht.
   rewrite Zmult_0_r.
   rewrite Zmult_0_r.
@@ -818,7 +818,7 @@ Proof.
 Qed.
 
 Lemma Zgcd_divisor :
- forall a b : Z, a <> 0%Z -> Zdivides b a -> Zgcd a b = Zabs b.
+ forall a b : Z, a <> 0%Z -> Zdivides b a -> Zgcd a b = Z.abs b.
 Proof.
  intros.
  unfold Zgcd in |- *.
@@ -834,7 +834,7 @@ Proof.
 Qed.
 
 Lemma Zgcd_coeff_b_divisor :
- forall a b : Z, a <> 0%Z -> Zdivides b a -> Zgcd_coeff_b a b = Zsgn b.
+ forall a b : Z, a <> 0%Z -> Zdivides b a -> Zgcd_coeff_b a b = Z.sgn b.
 Proof.
  intros.
  unfold Zgcd_coeff_b in |- *.
@@ -843,7 +843,7 @@ Qed.
 
 Lemma Zgcd_duv_symm :
  forall a b : Z,
- Zabs a <> Zabs b ->
+ Z.abs a <> Z.abs b ->
  Zgcd_duv a b = (Zgcd b a, (Zgcd_coeff_b b a, Zgcd_coeff_a b a)).
 Proof.
  intros a b.
@@ -862,7 +862,7 @@ Proof.
 Qed.
 
 Lemma Zgcd_coeff_a_symm :
- forall a b : Z, Zabs a <> Zabs b -> Zgcd_coeff_a a b = Zgcd_coeff_b b a.
+ forall a b : Z, Z.abs a <> Z.abs b -> Zgcd_coeff_a a b = Zgcd_coeff_b b a.
 Proof.
  intros a b Hneq.
  unfold Zgcd_coeff_a, Zgcd_coeff_b in |- *.
@@ -871,7 +871,7 @@ Proof.
 Qed.
 
 Lemma Zgcd_coeff_b_symm :
- forall a b : Z, Zabs a <> Zabs b -> Zgcd_coeff_b a b = Zgcd_coeff_a b a.
+ forall a b : Z, Z.abs a <> Z.abs b -> Zgcd_coeff_b a b = Zgcd_coeff_a b a.
 Proof.
  intros a b Hneq.
  unfold Zgcd_coeff_a, Zgcd_coeff_b in |- *.
@@ -1080,13 +1080,13 @@ Proof.
   rewrite Z_mod_same.
    rewrite Zgcd_zero_rht.
    auto with zarith.
-  replace (Zabs a) with a.
+  replace (Z.abs a) with a.
    assumption.
   symmetry  in |- *; auto with zarith.
  auto with zarith.
 Qed.
 
-Lemma Zgcd_zero_lft : forall a : Z, Zgcd 0 a = Zabs a.
+Lemma Zgcd_zero_lft : forall a : Z, Zgcd 0 a = Z.abs a.
 Proof.
  intro a.
  rewrite Zgcd_symm.
@@ -1131,9 +1131,9 @@ Proof.
  case (Zdec a).
   intro H0; rewrite H0; repeat rewrite Zgcd_zero_lft; auto with zarith.
  intro H0.
- replace (Zgcd a b) with (Zabs (Zgcd a b)).
+ replace (Zgcd a b) with (Z.abs (Zgcd a b)).
   rewrite Zgcd_abs.
-  replace (Zabs (Zabs (Zgcd a b))) with (Zgcd a b).
+  replace (Z.abs (Z.abs (Zgcd a b))) with (Zgcd a b).
    apply Zgcd_divisor.
     auto with zarith.
    apply Zdivides_abs_elim_rht.
@@ -1156,7 +1156,7 @@ Lemma Zgcd_gcd_lr : forall a b : Z, Zgcd (Zgcd a b) b = Zgcd a b.
  intros a b; rewrite (Zgcd_symm a b); rewrite (Zgcd_symm (Zgcd b a) b); apply Zgcd_gcd_rl.
 Qed.
 
-Lemma Zgcd_mult_elim_ll : forall a b : Z, Zgcd (b * a) a = Zabs a.
+Lemma Zgcd_mult_elim_ll : forall a b : Z, Zgcd (b * a) a = Z.abs a.
 Proof.
  intros a b.
  elim (Zdec (b * a)).
@@ -1164,21 +1164,21 @@ Proof.
  intro Hab; apply Zgcd_divisor; auto with zarith.
 Qed.
 
-Lemma Zgcd_mult_elim_lr : forall a b : Z, Zgcd (a * b) a = Zabs a.
+Lemma Zgcd_mult_elim_lr : forall a b : Z, Zgcd (a * b) a = Z.abs a.
 Proof.
  intros.
  rewrite Zmult_comm.
  apply Zgcd_mult_elim_ll.
 Qed.
 
-Lemma Zgcd_mult_elim_rl : forall a b : Z, Zgcd a (b * a) = Zabs a.
+Lemma Zgcd_mult_elim_rl : forall a b : Z, Zgcd a (b * a) = Z.abs a.
 Proof.
  intros.
  rewrite Zgcd_symm.
  apply Zgcd_mult_elim_ll.
 Qed.
 
-Lemma Zgcd_mult_elim_rr : forall a b : Z, Zgcd a (a * b) = Zabs a.
+Lemma Zgcd_mult_elim_rr : forall a b : Z, Zgcd a (a * b) = Z.abs a.
 Proof.
  intros.
  rewrite Zmult_comm.
@@ -1310,7 +1310,7 @@ Lemma Zgcd_div_gcd_1 :
 Proof.
  intros a b Hab.
  apply Zdivides_antisymm; auto with zarith.
-  apply Zlt_gt.
+  apply Z.lt_gt.
   apply Zgcd_pos.
   generalize (Zgcd_nonzero a b); intro Hnz; elim Hnz; auto.
    intro Ha; left; intro Hfalse; generalize (Zgcd_div_mult_lft a b);
@@ -1469,7 +1469,7 @@ Proof.
 Qed.
 
 Lemma Zrelprime_nonzero_rht :
- forall a b : Z, Zrelprime a b -> Zabs a <> 1%Z -> b <> 0%Z.
+ forall a b : Z, Zrelprime a b -> Z.abs a <> 1%Z -> b <> 0%Z.
 Proof.
  intros a b H Ha.
  intro Hfalse.
@@ -1480,7 +1480,7 @@ Proof.
 Qed.
 
 Lemma Zrelprime_nonzero_lft :
- forall a b : Z, Zrelprime a b -> Zabs b <> 1%Z -> a <> 0%Z.
+ forall a b : Z, Zrelprime a b -> Z.abs b <> 1%Z -> a <> 0%Z.
 Proof.
  intros.
  apply (Zrelprime_nonzero_rht b a).
@@ -1515,12 +1515,12 @@ Lemma Zrelprime_div_mult_intro :
  forall a b c : Z, Zrelprime a b -> Zdivides a (b * c) -> Zdivides a c.
 Proof.
  intros a b c Hab Hdiv.
- case (Zdec (Zabs a - 1)).
+ case (Zdec (Z.abs a - 1)).
   intro H1.
-  exists (c * Zsgn a)%Z.
+  exists (c * Z.sgn a)%Z.
   rewrite <- Zmult_assoc.
-  replace (Zsgn a * a)%Z with (Zabs a); auto with zarith.
-  replace (Zabs a) with 1%Z; auto with zarith.
+  replace (Z.sgn a * a)%Z with (Z.abs a); auto with zarith.
+  replace (Z.abs a) with 1%Z; auto with zarith.
  intro Hn1.
  unfold Zrelprime in Hab.
  generalize (Zgcd_lin_comb a b).
@@ -1548,8 +1548,8 @@ Proof.
  intros a b x y Hab Heq.
  case (Zdec a).
   intro Ha; rewrite Ha in Hab; unfold Zrelprime in Hab; rewrite Zgcd_zero_lft in Hab.
-  exists (Zsgn b * x)%Z; rewrite Zmult_comm; rewrite Zmult_assoc;
-    rewrite (Zmult_comm b (Zsgn b)); rewrite <- Zmult_sgn_eq_abs; rewrite Hab; apply Zmult_1_l.
+  exists (Z.sgn b * x)%Z; rewrite Zmult_comm; rewrite Zmult_assoc;
+    rewrite (Zmult_comm b (Z.sgn b)); rewrite <- Zmult_sgn_eq_abs; rewrite Hab; apply Zmult_1_l.
  intro Ha.
  apply (Zmult_div_simpl_3 a x y b Heq Ha).
  apply (Zrelprime_div_mult_intro a b y Hab).
@@ -1584,11 +1584,11 @@ Proof.
       rewrite H2; rewrite Zgcd_one_lft; auto with zarith.
  intros Hab0 Hrelprime.
  apply Zdivides_antisymm.
-    apply Zlt_gt; apply Zgcd_pos; auto.
+    apply Z.lt_gt; apply Zgcd_pos; auto.
    rewrite <- (Zmult_0_r (Zgcd a c)).
    apply Zmult_pos_mon_lt_lft.
-    apply Zlt_gt; apply Zgcd_pos; left; rewrite Zmult_comm in Hab0; auto with zarith.
-   apply Zlt_gt; apply Zgcd_pos; left; auto with zarith.
+    apply Z.lt_gt; apply Zgcd_pos; left; rewrite Zmult_comm in Hab0; auto with zarith.
+   apply Z.lt_gt; apply Zgcd_pos; left; auto with zarith.
   rewrite (Zgcd_lin_comb a c); rewrite (Zgcd_lin_comb b c).
   repeat rewrite Zmult_plus_distr_r; repeat rewrite Zmult_plus_distr_l.
   apply Zdivides_plus_elim; apply Zdivides_plus_elim; auto with zarith.
@@ -1617,7 +1617,7 @@ Proof.
    set (s := Zgcd_coeff_b b c) in *.
  intros Hla Hlb.
  apply Zdivides_antisymm.
-    apply Zlt_gt; apply Zgcd_pos.
+    apply Z.lt_gt; apply Zgcd_pos.
     case (Zdec c); auto.
     intro Hc0.
     left.
@@ -1691,7 +1691,7 @@ Proof.
      intro HDp; rewrite HDp in HDlt; elim (Zlt_irref _ HDlt).
     auto with zarith.
    unfold d in |- *; auto with zarith.
-  apply (Zle_lt_trans d (Zpos x) (Zpos p)); unfold d in |- *; auto with zarith.
+  apply (Z.le_lt_trans d (Zpos x) (Zpos p)); unfold d in |- *; auto with zarith.
  unfold d in |- *; apply Zgcd_pos; auto with zarith.
 Qed.
 

@@ -650,7 +650,7 @@ Proof.
   apply Hq.
  change (q==k^(P_of_succ_nat n)*d1).
  rewrite Zpos_P_of_succ_nat.
- unfold Zsucc.
+ unfold Z.succ.
  rewrite -> Qpower_plus;[|apply Qpos_nonzero].
  autorewrite with QposElim in Hq0.
  ring [Hq0].
@@ -658,7 +658,7 @@ Qed.
 
 Definition CompactTotallyBoundedIndex (e d1 d2:Qpos) : nat :=
 let (n,d):=((1+(1#4))*d1 + d2)/e/(1-(1#4)) in
- match Zsucc (Zdiv n d) with
+ match Z.succ (Z.div n d) with
 | Zpos p => div2 (S (Z_to_nat (log_sup_correct1 p)))
 | _ => O
 end.
@@ -682,7 +682,7 @@ Proof.
  rewrite <- Qmult_assoc.
  rewrite -> Qmult_comm.
  apply Qle_shift_div_r.
-  induction (let (n, d) := a * / e * / b in match Zsucc (n / d) with | Z0 => 0%nat
+  induction (let (n, d) := a * / e * / b in match Z.succ (n / d) with | Z0 => 0%nat
     | Zpos p => div2 (S (Z_to_nat (z:=log_sup p) (log_sup_correct1 p))) | Zneg _ => 0%nat end).
    constructor.
   change (S n) with (1+n)%nat.
@@ -709,10 +709,10 @@ Proof.
  destruct z as [[|n|n] d].
    elim (Qlt_not_le _ _ Hz).
    discriminate.
-  apply Qle_trans with (Zsucc (n/d)).
+  apply Qle_trans with (Z.succ (n/d)).
    rewrite -> Qmake_Qdiv.
    apply Qle_shift_div_r; auto with *.
-   unfold Zsucc, Qle.
+   unfold Z.succ, Qle.
    simpl.
    rewrite Zpos_mult_morphism.
    ring_simplify.
@@ -720,7 +720,7 @@ Proof.
    replace LHS with (d * (n / d) + n mod d)%Z by (apply Z_div_mod_eq; auto with * ).
    apply Zplus_le_compat_l.
    destruct (Z_mod_lt n d); auto with *.
-  generalize (Zsucc (n/d)).
+  generalize (Z.succ (n/d)).
   intros z.
   clear -z.
   destruct z.
@@ -752,7 +752,7 @@ Proof.
       assert (H:(0 <= y - z)%Z) by auto with *.
       destruct (y -z)%Z; try discriminate.
        simpl.
-       change 1%Z with (Zsucc 0)%Z.
+       change 1%Z with (Z.succ 0)%Z.
        apply Zlt_le_succ.
        apply Zpower_pos_pos; constructor.
       elim H; reflexivity.
@@ -1509,7 +1509,7 @@ Proof.
    rewrite He.
    unfold Qle; simpl.
    rewrite Zpos_mult_morphism.
-   apply Zle_trans with (en * ed)%Z; auto with *.
+   apply Z.le_trans with (en * ed)%Z; auto with *.
    apply Zmult_le_compat_l; auto with *.
    rewrite (anti_convert_pred_convert ed).
    do 2 rewrite <- POS_anti_convert.
@@ -1547,7 +1547,7 @@ Proof.
   rewrite Hd.
   unfold Qle; simpl.
   rewrite Zpos_mult_morphism.
-  apply Zle_trans with (dn * dd)%Z; auto with *.
+  apply Z.le_trans with (dn * dd)%Z; auto with *.
   apply Zmult_le_compat_l; auto with *.
   rewrite (anti_convert_pred_convert dd).
   do 2 rewrite <- POS_anti_convert.

@@ -501,13 +501,13 @@ Proof.
   simpl in |- *.
   rational.
  rewrite Znat.inj_S.
- replace (Zsucc (Z_of_nat n)) with (1 + Z_of_nat n)%Z.
+ replace (Z.succ (Z_of_nat n)) with (1 + Z_of_nat n)%Z.
   rewrite Zopp_plus_distr.
   rewrite Zplus_comm.
-  unfold Zopp at 2 in |- *.
+  unfold Z.opp at 2 in |- *.
   rewrite Zplus_assoc.
   reflexivity.
- unfold Zsucc in |- *.
+ unfold Z.succ in |- *.
  apply Zplus_comm.
 Qed.
 
@@ -544,7 +544,7 @@ Proof.
    algebra.
   algebra.
  intros.
- rewrite Zopp_involutive.
+ rewrite Z.opp_involutive.
  astepl (x[^]n).
  astepl ((x[^]n) [/]OneNZ).
  apply eq_div.
@@ -569,7 +569,7 @@ Proof.
   astepr ((x[//]Hx) [^^] (m) [*] (([1][/] (x[//]Hx) [^^] (m) [//]zexp_resp_ap_zero x m Hx) [*]x)).
   rational.
  rewrite Zopp_plus_distr.
- rewrite Zopp_involutive.
+ rewrite Z.opp_involutive.
  reflexivity.
 Qed.
 
@@ -700,10 +700,10 @@ Proof.
  intros x m H Hx Hneg.
  pattern m in |- *.
  rewrite ->  Zeven.Zeven_div2.
-  astepl (([--]x[//]Hneg) [^^] (2) [//]zexp_resp_ap_zero [--]x 2 Hneg) [^^] (Zeven.Zdiv2 m).
-  astepl ([--]x[*][--]x[//]mult_resp_ap_zero _ _ _ Hneg Hneg) [^^] (Zeven.Zdiv2 m).
-  astepl (x[*]x[//]mult_resp_ap_zero _ _ _ Hx Hx) [^^] (Zeven.Zdiv2 m).
-  astepl ((x[//]Hx) [^^] (2) [//]zexp_resp_ap_zero x 2 Hx) [^^] (Zeven.Zdiv2 m).
+  astepl (([--]x[//]Hneg) [^^] (2) [//]zexp_resp_ap_zero [--]x 2 Hneg) [^^] (Z.div2 m).
+  astepl ([--]x[*][--]x[//]mult_resp_ap_zero _ _ _ Hneg Hneg) [^^] (Z.div2 m).
+  astepl (x[*]x[//]mult_resp_ap_zero _ _ _ Hx Hx) [^^] (Z.div2 m).
+  astepl ((x[//]Hx) [^^] (2) [//]zexp_resp_ap_zero x 2 Hx) [^^] (Z.div2 m).
   algebra.
  assumption.
 Qed.

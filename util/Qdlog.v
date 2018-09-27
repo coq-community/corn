@@ -37,11 +37,11 @@ Proof.
      apply (order_preserving _).
      now apply Z.log2_up_spec.
     now apply Z.log2_up_nonneg.
-   mc_setoid_replace (1 - Z.log2_up (Qceiling (/x))) with (-Zpred (Z.log2_up (Qceiling (/x)))).
+   mc_setoid_replace (1 - Z.log2_up (Qceiling (/x))) with (-Z.pred (Z.log2_up (Qceiling (/x)))).
     rewrite int_pow_negate.
     apply dec_fields.flip_lt_dec_recip_r.
      solve_propholds.
-    apply orders.le_lt_trans with ('Zpred (Qceiling (/x))).
+    apply orders.le_lt_trans with ('Z.pred (Qceiling (/x))).
      change 2 with ('(2 : Z)). rewrite <-Qpower.Zpower_Qpower.
       apply (order_preserving _).
       now apply Z.lt_le_pred, Z.log2_up_spec.
@@ -60,14 +60,14 @@ Proof.
      now apply Z.log2_spec, Qfloor_pos. 
     now apply Z.log2_nonneg.
    now apply Qfloor_le.
-  apply orders.lt_le_trans with ('Zsucc (Qfloor x)).
+  apply orders.lt_le_trans with ('Z.succ (Qfloor x)).
    rewrite <-Z.add_1_r.
    now apply Qlt_floor.
   rewrite Z.add_1_l.
   change 2 with ('(2 : Z)).
   rewrite <-Qpower.Zpower_Qpower.
    apply (order_preserving _).
-   now apply Zle_succ_l, Z.log2_spec, Qfloor_pos.
+   now apply Z.le_succ_l, Z.log2_spec, Qfloor_pos.
   now apply Zle_le_succ, Z.log2_nonneg.
 Qed.
 
@@ -163,7 +163,7 @@ Fixpoint Qdlog_bounded (b : nat) (n : Z) (x : Q) : Z :=
     else 1 + Qdlog_bounded c n (x / ('n:Q))
   end.
 
-Definition Qdlog (n : Z) (x : Q) : Z := Qdlog_bounded (Zabs_nat (Qdlog2 x)) n x.
+Definition Qdlog (n : Z) (x : Q) : Z := Qdlog_bounded (Z.abs_nat (Qdlog2 x)) n x.
 
 Lemma Qdlog_bounded_nonneg (b : nat) (n : Z) (x : Q) :
   0 ≤ Qdlog_bounded b n x.
@@ -177,7 +177,7 @@ Lemma Qdlog2_le1 (n : Z) (x : Q) :
   2 ≤ n → x ≤ 1 → Qdlog n x = 0.
 Proof.
   intros En Ex. unfold Qdlog.
-  generalize (Zabs_nat (Qdlog2 x)). 
+  generalize (Z.abs_nat (Qdlog2 x)). 
   intros b. induction b; simpl; [reflexivity |].
   case (decide_rel _); intros E; [reflexivity |].
   destruct E.
@@ -252,11 +252,11 @@ Lemma Qdlog_spec (n : Z) (x : Q) :
   2 ≤ n → 1 ≤ x → 'n ^ Qdlog n x ≤ x ∧ x < 'n ^ (1 + Qdlog n x).
 Proof. 
   intros. apply Qdlog_spec_bounded; trivial.
-  rewrite inj_Zabs_nat, Zabs_eq; [reflexivity |].
+  rewrite inj_Zabs_nat, Z.abs_eq; [reflexivity |].
   now apply Qdlog2_nonneg.
 Qed.
 
-Definition Qdlog4 (x : Q) : Z := Zdiv (Qdlog2 x) 2.
+Definition Qdlog4 (x : Q) : Z := Z.div (Qdlog2 x) 2.
 
 Instance: Proper (=) Qdlog4.
 Proof. unfold Qdlog4. intros ? ? E. now rewrite E. Qed.
@@ -278,7 +278,7 @@ Proof.
   apply nat_int.le_iff_lt_plus_1.
   rewrite commutativity.
   apply (strictly_order_preserving (+1)).
-  change (1 + (Qdlog2 x / 2)%Z) with (1 + Zdiv (Qdlog2 x) 2)%Z.
-  rewrite (Z.add_1_l (Zdiv (Qdlog2 x) 2)).
+  change (1 + (Qdlog2 x / 2)%Z) with (1 + Z.div (Qdlog2 x) 2)%Z.
+  rewrite (Z.add_1_l (Z.div (Qdlog2 x) 2)).
   now apply Z.mul_succ_div_gt.
 Qed.

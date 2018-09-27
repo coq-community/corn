@@ -51,9 +51,9 @@ Let f n (i:Z) := l + ((r-l)*(2*i+1#1))/(2*Z_of_nat n#1).
 (** [UniformPartition] produces a set of n points uniformly distributed
 inside the interval [[l, r]]. *)
 Definition UniformPartition (n:nat) :=
-map (f n) (iterateN Zsucc 0%Z n).
+map (f n) (iterateN Z.succ 0%Z n).
 
-Lemma UniformPartitionZ : forall n z, In z (iterateN Zsucc 0%Z n) <-> (0 <= z < n)%Z.
+Lemma UniformPartitionZ : forall n z, In z (iterateN Z.succ 0%Z n) <-> (0 <= z < n)%Z.
 Proof.
  intros n z.
  change (0 <= z < n)%Z with (0 <= z < 0 + n)%Z.
@@ -64,13 +64,13 @@ Proof.
   apply (Zle_not_lt a a); auto with *.
   rewrite Zplus_comm in H.
   simpl in H.
-  apply Zle_lt_trans with z; auto with *.
+  apply Z.le_lt_trans with z; auto with *.
  split.
   intros [H | H].
    rewrite H.
    rewrite inj_S.
    auto with *.
-  change (In z (iterateN Zsucc (Zsucc a) n)) in H.
+  change (In z (iterateN Z.succ (Z.succ a) n)) in H.
   rewrite -> IHn in H.
   rewrite inj_S.
   auto with *.
@@ -90,10 +90,10 @@ Lemma UniformPartition_inside : forall n x, In x (UniformPartition n) -> l <= x 
 Proof.
  intros n x.
  unfold UniformPartition.
- cut (forall z, In z (iterateN Zsucc 0%Z n) -> (0 <= z < n)%Z).
+ cut (forall z, In z (iterateN Z.succ 0%Z n) -> (0 <= z < n)%Z).
   destruct n.
    contradiction.
-  generalize (iterateN Zsucc 0%Z (S n)).
+  generalize (iterateN Z.succ 0%Z (S n)).
   intros s Hs H.
   induction s.
    contradiction.
@@ -130,7 +130,7 @@ Proof.
  intros z x Hx.
  destruct Hx as [Hx | Hx].
   rewrite <- Hx; split; simpl; auto with *.
- destruct (IHn (Zsucc z) x Hx).
+ destruct (IHn (Z.succ z) x Hx).
  rewrite inj_S.
  auto with *.
 Qed.
@@ -234,7 +234,7 @@ Proof.
  abstract ( split; [apply: in_map; rewrite -> UniformPartitionZ; rewrite inj_S; auto with *|];
    destruct Hx as [_ Hx]; (setoid_replace x with r; [| now apply Qle_antisym; auto with *]); unfold f;
      change (2*S n #1) with (2*S n); change (2*n + 1#1) with ((2*n + 1)%Z:Q); rewrite (inj_S n);
-       unfold Zsucc; do 2 rewrite -> injz_plus; (setoid_replace ((2%positive * n)%Z:Q) with (2*n)
+       unfold Z.succ; do 2 rewrite -> injz_plus; (setoid_replace ((2%positive * n)%Z:Q) with (2*n)
          ; [| now unfold Qeq; simpl; auto with *]);
            (setoid_replace (r - (l + (r - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
              with (((r-l) / (2 * (n + 1%positive)))); [| now simpl; field; unfold Qeq; simpl; auto with *]);
@@ -320,7 +320,7 @@ Proof.
   unfold Qle.
   simpl.
   ring_simplify.
-  eapply Zle_trans;[|apply Zle_max_r].
+  eapply Z.le_trans;[|apply Z.le_max_r].
   rewrite <- Z_to_nat_correct.
   auto with *.
  autorewrite with QposElim.
@@ -477,7 +477,7 @@ Proof.
    unfold Qle.
    simpl.
    ring_simplify.
-   eapply Zle_trans;[|apply Zle_max_r].
+   eapply Z.le_trans;[|apply Z.le_max_r].
    rewrite <- Z_to_nat_correct.
    auto with *.
   right.

@@ -133,7 +133,7 @@ Proof.
     (P_of_succ_nat (pred (S n)) * P_of_succ_nat (pred (fact n)))%positive.
    rewrite <- pred_Sn.
    rewrite inj_S.
-   unfold Zsucc.
+   unfold Z.succ.
    rewrite -> Qpower_plus'; auto with *.
    change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fact n))%positive))%Q
      with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fact n))))%Q.
@@ -234,7 +234,7 @@ Proof.
   replace LHS with (-(2%positive^n*2^1)) by simpl; ring.
   rewrite <- Qpower_plus;[|discriminate].
   replace RHS with a by (simpl; field; discriminate).
-  change (- (2 ^ Zsucc n)%Z <= a) in H0.
+  change (- (2 ^ Z.succ n)%Z <= a) in H0.
   rewrite ->  Zpower_Qpower in H0.
    assumption.
   auto with *.
@@ -350,7 +350,7 @@ Proof.
  change (n * 1 <= 2 ^ Psize n * d)%Z.
  apply Zmult_le_compat; try auto with *.
  clear - n.
- apply Zle_trans with (n+1)%Z.
+ apply Z.le_trans with (n+1)%Z.
   auto with *.
  induction n.
    change (Psize (xI n)) with (1 + (Psize n))%nat.
@@ -363,7 +363,7 @@ Proof.
   rewrite inj_plus.
   rewrite Zpower_exp; try auto with *.
   rewrite Zpos_xO.
-  apply Zle_trans with (2*(n+1))%Z.
+  apply Z.le_trans with (2*(n+1))%Z.
    auto with *.
   apply Zmult_le_compat; auto with *.
  discriminate.

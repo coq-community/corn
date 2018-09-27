@@ -42,13 +42,13 @@ But for speed we simply do division to quickly find a good rational
 approximation.
 *)
 Definition approximateQ (x:Q) (p:positive) :=
-let (n,d) := x in (Zdiv (n*p) d#p).
+let (n,d) := x in (Z.div (n*p) d#p).
 
 Lemma approximateQ_correct : forall x p, ball (1#p) x (approximateQ x p).
 Proof.
  intros [n d] p.
  split; simpl; unfold Qle; simpl.
-  apply Zle_trans with 0%Z.
+  apply Z.le_trans with 0%Z.
    discriminate.
   apply Zmult_le_0_compat; auto with *.
   replace RHS with (n * p - ((n * p / d) * d))%Z by ring.
@@ -75,12 +75,12 @@ Proof.
  unfold Qle in *.
  simpl in *.
  apply Zlt_succ_le.
- unfold Zsucc.
+ unfold Z.succ.
  apply Zmult_gt_0_lt_reg_r with d.
   auto with *.
  replace RHS with (d* (n*p/d) + (Zmod (n*p) d) - (Zmod (n*p) d) + d)%Z by ring.
  rewrite <- (Z_div_mod_eq (n*p) d); try auto with *.
- apply Zle_lt_trans with (n*1*p)%Z.
+ apply Z.le_lt_trans with (n*1*p)%Z.
   replace LHS with (z*d*p)%Z by ring.
   apply Zmult_lt_0_le_compat_r; auto with *.
  apply Zlt_0_minus_lt.
@@ -99,7 +99,7 @@ match e with
 | QposInfinity => approximate x e
 | Qpos2QposInf e =>
  let (n,d) := e: Q in
- match (Zsucc (Zdiv (2*d) n)) with
+ match (Z.succ (Z.div (2*d) n)) with
   Zpos p => approximateQ (approximate x (Qpos2QposInf (1#p))) p
  |_ => approximate x e
  end
@@ -111,14 +111,14 @@ Proof.
  apply Qpos_positive_numerator_rect.
  intros n d.
  simpl.
- case_eq (Zsucc (xO d / n));try (intros; apply: ball_approx_r).
+ case_eq (Z.succ (xO d / n));try (intros; apply: ball_approx_r).
  intros p Hp.
  apply ball_weak_le with (2#p)%Qpos.
   unfold Qle.
   simpl.
   rewrite Zpos_mult_morphism.
   rewrite <- Hp.
-  unfold Zsucc.
+  unfold Z.succ.
   rewrite Zmult_plus_distr_r.
   apply Zle_0_minus_le.
   replace RHS with (n - (xO d - n * (xO d / n)))%Z by ring.

@@ -482,7 +482,7 @@ Proof.
    rewrite inj_S in X.
    rstepr ([--][--]('(((- (1)) ^ n * Str_nth n (tl seq))%Q))%CR).
    apply inv_resp_AbsSmall.
-   stepr (' ((- (1)) ^ Zsucc n * Str_nth (S n) seq)%Q)%CR;[assumption|].
+   stepr (' ((- (1)) ^ Z.succ n * Str_nth (S n) seq)%Q)%CR;[assumption|].
    simpl.
    change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq))%Q == - ' ((- (1)) ^ n * Str_nth n (tl seq))%Q)%CR).
    rewrite -> Qpower_plus;[|discriminate].
@@ -508,7 +508,7 @@ Proof.
   intros i; simpl.
   change (Qpower_positive (- (1)) (P_of_succ_nat i)) with ((-(1))^ S i).
   rewrite inj_S.
-  unfold Zsucc.
+  unfold Z.succ.
   rewrite -> Qpower_plus;[|discriminate].
   ring.
  apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].

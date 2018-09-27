@@ -211,7 +211,7 @@ Proof.
   rewrite <- Zplus_assoc.
   rewrite <- Zpos_plus_distr.
   rewrite <- Pplus_one_succ_l.
-  change (dd+0 <=  dd + Psucc (P_of_succ_nat n))%Z.
+  change (dd+0 <=  dd + Pos.succ (P_of_succ_nat n))%Z.
   auto with *.
  change (dd <= dn*dd)%Z.
  auto with *.
@@ -242,7 +242,7 @@ Proof.
  destruct (le_lt_dec n' m) as [H|H].
   eapply AbsSmall_trans;[|apply Hn';assumption].
   change (ed < en*(P_of_succ_nat m))%Z.
-  apply Zlt_le_trans with (P_of_succ_nat m).
+  apply Z.lt_le_trans with (P_of_succ_nat m).
    rewrite <- POS_anti_convert.
    rewrite Zpos_eq_Z_of_nat_o_nat_of_P.
    apply inj_lt.

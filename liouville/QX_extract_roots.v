@@ -93,7 +93,7 @@ Proof.
  assert (forall x y : Q_as_CRing, {x = y} + {x <> y}).
   clear; intros x y.
   destruct x; destruct y; simpl.
-  case (Z_eq_dec Qnum Qnum0); case (Z_eq_dec Qden Qden0); intros H1 H2.
+  case (Z.eq_dec Qnum Qnum0); case (Z.eq_dec Qden Qden0); intros H1 H2.
      left; f_equal; [assumption|injection H1; tauto].
     right; intro H3; injection H3; intros; destruct H1; f_equal; assumption.
    right; intro H3; injection H3; intros; destruct H2; assumption.

@@ -118,10 +118,10 @@ Qed.
 Arguments QposAsmkQpos [a].
 (* end hide *)
 
-Lemma positive_Z (z: Z): Zlt 0 z -> sig (fun p: positive => Zpos p = z).
+Lemma positive_Z (z: Z): Z.lt 0 z -> sig (fun p: positive => Zpos p = z).
  destruct z; intros.
    intros.
-   elim (Zlt_irrefl _ H).
+   elim (Z.lt_irrefl _ H).
   exists p.
   reflexivity.
  exfalso.
@@ -137,7 +137,7 @@ Defined.
 
 Lemma Zlt_uniq (a b: Z) (p q: (a < b)%Z): p = q.
 Proof.
- unfold Zlt in *. destruct p. intros.
+ unfold Z.lt in *. destruct p. intros.
  apply (Eqdep_dec.K_dec_set comparison_eq_dec).
  reflexivity.
 Qed.
@@ -405,7 +405,7 @@ Proof.
  generalize (QposRed_prf p (Qpos_prf p)).
  generalize (QposRed_prf q (Qpos_prf q)).
  rewrite (Qred_complete p q H).
- unfold Qlt, Zlt.
+ unfold Qlt, Z.lt.
  intros A B.
  assert (X:forall x y : comparison, x = y \/ x <> y).
   decide equality.

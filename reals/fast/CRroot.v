@@ -330,12 +330,12 @@ Proof.
   induction d; split; try discriminate; destruct IHd as [A B];
     set (t:=iter_nat (S (Psize d)) positive (fun x : positive => (x * x)%positive) 2%positive) in *.
      rewrite Zpos_xI.
-     apply Zle_trans with (4*d)%Z; auto with *.
+     apply Z.le_trans with (4*d)%Z; auto with *.
      apply (Zmult_le_compat 4 d t t); auto with *.
     change (4%Z) with (2*2)%Z.
     apply (Zmult_le_compat 2 2 t t); auto with *.
    rewrite Zpos_xO.
-   apply Zle_trans with (4*d)%Z; auto with *.
+   apply Z.le_trans with (4*d)%Z; auto with *.
    apply (Zmult_le_compat 4 d t t); auto with *.
   change (4%Z) with (2*2)%Z.
   apply (Zmult_le_compat 2 2 t t); auto with *.
@@ -574,7 +574,7 @@ Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) : CR.
  clear rational_sqrt_big_bounded.
  abstract ( destruct H; split;[apply Qle_shift_div_l;[constructor|assumption]|];
    apply Qle_shift_div_r;[constructor|]; rewrite -> Zpower_Qpower in *; try auto with *;
-     change (a <= ((4#1) ^ n) * (4#1)^1); rewrite <- Qpower_plus; try discriminate; change (n+1)%Z with (Zsucc n);
+     change (a <= ((4#1) ^ n) * (4#1)^1); rewrite <- Qpower_plus; try discriminate; change (n+1)%Z with (Z.succ n);
        rewrite <- inj_S; assumption).
 Defined.
 

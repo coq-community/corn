@@ -161,7 +161,7 @@ Proof.
 Qed.
 
 Lemma nonZero : forall x : Q, ~(x==0) ->
-  ~(Qmake (Zsgn (Qnum x) * Qden x)%Z (posZ (Qnum x))==0).
+  ~(Qmake (Z.sgn (Qnum x) * Qden x)%Z (posZ (Qnum x))==0).
 Proof.
  intro x.
  unfold Qeq in |- *.
@@ -172,13 +172,13 @@ Proof.
  repeat rewrite Zmult_1_r.
  simpl in |- *.
  intro H.
- cut (Zsgn (Qnum x) <> 0%Z).
+ cut (Z.sgn (Qnum x) <> 0%Z).
   intro H0.
   cut (Zpos (Qden x) <> 0%Z).
    intro H1.
    intro H2.
    elim H0.
-   exact (Zmult_integral_l (Qden x) (Zsgn (Qnum x)) H1 H2).
+   exact (Zmult_integral_l (Qden x) (Z.sgn (Qnum x)) H1 H2).
   apply Zgt_not_eq.
   auto with zarith.
  apply Zsgn_3.
@@ -300,23 +300,23 @@ Proof.
  intro x.
  case x.
  intros p q.
- exists (P_of_succ_nat (Zabs_nat p)).
+ exists (P_of_succ_nat (Z.abs_nat p)).
  red in |- *.
  unfold Qnum at 1 in |- *.
  unfold Qden in |- *.
  apply toCProp_Zlt.
  simpl in |- *.
  rewrite Zmult_1_r.
- apply Zlt_le_trans with (P_of_succ_nat (Zabs_nat p) * 1)%Z.
+ apply Z.lt_le_trans with (P_of_succ_nat (Z.abs_nat p) * 1)%Z.
   rewrite Zmult_1_r.
   case p; simpl in |- *; auto with zarith.
    intros; rewrite P_of_succ_nat_o_nat_of_P_eq_succ; rewrite Pplus_one_succ_r.
    change (p0 < p0 + 1)%Z in |- *.
    auto with zarith.
-  intros; unfold Zlt in |- *; auto.
- change (P_of_succ_nat (Zabs_nat p) * 1%positive <= P_of_succ_nat (Zabs_nat p) * q)%Z in |- *.
+  intros; unfold Z.lt in |- *; auto.
+ change (P_of_succ_nat (Z.abs_nat p) * 1%positive <= P_of_succ_nat (Z.abs_nat p) * q)%Z in |- *.
  apply Zmult_le_compat_l.
-  change (Zsucc 0 <= q)%Z in |- *.
+  change (Z.succ 0 <= q)%Z in |- *.
   apply Zgt_le_succ.
   auto with zarith.
  auto with zarith.

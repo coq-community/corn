@@ -26,7 +26,7 @@ Section Q_can.
 
 Lemma Q_dec : forall x y : Q_as_CRing, (x [=] y) or (x [#] y).
 Proof. intros x y; case (Qeq_dec x y); [left|right]; assumption. Qed.
-Definition Q_can_num (q : Q_as_CRing) : Z_as_CRing := Zdiv (Qnum q) (Zgcd (Qnum q) (Qden q)).
+Definition Q_can_num (q : Q_as_CRing) : Z_as_CRing := Z.div (Qnum q) (Zgcd (Qnum q) (Qden q)).
 
 Lemma Q_can_num_spec : forall q q', q [=] q' -> Q_can_num q = Q_can_num q'.
 Proof.
@@ -45,17 +45,17 @@ Proof.
    try (intro H; destruct (Zgcd_zero _ _ H); discriminate).
  rewrite Zmult_comm, (Zmult_comm _ q'n).
  rewrite <- (Zabs_Zsgn qn) at 1; rewrite <- (Zabs_Zsgn q'n) at 2.
- rewrite (Zmult_comm (Zabs qn)), (Zmult_comm (Zabs q'n)).
+ rewrite (Zmult_comm (Z.abs qn)), (Zmult_comm (Z.abs q'n)).
  rewrite <- Zmult_assoc, <- Zmult_assoc.
  rewrite Zgcd_lin, Zgcd_lin.
  rewrite Heq.
  rewrite (Zmult_comm qn q'n).
- cut (Zsgn qn = Zsgn q'n).
+ cut (Z.sgn qn = Z.sgn q'n).
   intro H; rewrite H; reflexivity.
  destruct qn; destruct q'n; reflexivity||discriminate.
 Qed.
 
-Definition Q_can_den (q : Q_as_CRing) : Z_as_CRing := Zdiv (Qden q) (Zgcd (Qnum q) (Qden q)).
+Definition Q_can_den (q : Q_as_CRing) : Z_as_CRing := Z.div (Qden q) (Zgcd (Qnum q) (Qden q)).
 
 Lemma Q_can_den_spec : forall q q', q [=] q' -> Q_can_den q = Q_can_den q'.
 Proof.
@@ -74,7 +74,7 @@ Proof.
    try (intro H; destruct (Zgcd_zero _ _ H); discriminate).
  rewrite Zmult_comm, (Zmult_comm _ q'd).
  rewrite <- (Zabs_Zsgn qd) at 1; rewrite <- (Zabs_Zsgn q'd) at 2.
- rewrite (Zmult_comm (Zabs qd)), (Zmult_comm (Zabs q'd)).
+ rewrite (Zmult_comm (Z.abs qd)), (Zmult_comm (Z.abs q'd)).
  rewrite <- Zmult_assoc, <- Zmult_assoc.
  rewrite Zgcd_lin, Zgcd_lin.
  rewrite (Zmult_comm qd q'n), (Zmult_comm q'd qn).

@@ -46,8 +46,8 @@ is chosen that contains all the points, so that this doesn't matter.
 
 [Rasterize Point] adds a single point [p] into a raster. *)
 Definition RasterizePoint n m (bm:raster n m) (t l b r:Q) (p:Q*Q) : raster n m :=
-let i := min (pred n) (Z_to_nat (Zle_max_l 0 (rasterize1 l r n (fst p)))) in
-let j := min (pred m) (Z_to_nat (Zle_max_l 0 (rasterize1 b t m (snd p)))) in
+let i := min (pred n) (Z_to_nat (Z.le_max_l 0 (rasterize1 l r n (fst p)))) in
+let j := min (pred m) (Z_to_nat (Z.le_max_l 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
 (* begin hide *)
 Add Parametric Morphism n m bm : (@RasterizePoint n m bm) with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> (@eq _) ==> (@eq _) as RasterizePoint_wd.
@@ -72,10 +72,10 @@ Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
 Proof.
  intros t l b r m n bm p i j H.
  unfold RasterizePoint.
- set (j0:=(min (pred m) (Z_to_nat (z:=Zmax 0 (rasterize1 l r m (fst p)))
-   (Zle_max_l 0 (rasterize1 l r m (fst p)))))).
+ set (j0:=(min (pred m) (Z_to_nat (z:=Z.max 0 (rasterize1 l r m (fst p)))
+   (Z.le_max_l 0 (rasterize1 l r m (fst p)))))).
  set (i0:=(pred n - min (pred n)
-   (Z_to_nat (z:=Zmax 0 (rasterize1 b t n (snd p))) (Zle_max_l 0 (rasterize1 b t n (snd p)))))%nat).
+   (Z_to_nat (z:=Z.max 0 (rasterize1 b t n (snd p))) (Z.le_max_l 0 (rasterize1 b t n (snd p)))))%nat).
  destruct (le_lt_dec n i0).
   rewrite setRaster_overflow; auto.
  destruct (le_lt_dec m j0).
@@ -115,13 +115,13 @@ Lemma rasterization_error : forall l (w:Qpos) n x,
 (l <= x <= l + w) ->
 ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * w) (C l (l + w) (S n) (min n
              (Z_to_nat
-                (Zle_max_l 0 (rasterize1 l (l+w) (S n) x))))) x.
+                (Z.le_max_l 0 (rasterize1 l (l+w) (S n) x))))) x.
 Proof.
  clear - C.
  intros l w n x H0.
  destruct (Qlt_le_dec x (l+w)).
-  replace (Z_of_nat (min n (Z_to_nat (z:=Zmax 0 (rasterize1 l (l + w) (S n) x))
-    (Zle_max_l 0 (rasterize1 l (l + w) (S n) x))))) with (rasterize1 l (l + w) (S n) x).
+  replace (Z_of_nat (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + w) (S n) x))
+    (Z.le_max_l 0 (rasterize1 l (l + w) (S n) x))))) with (rasterize1 l (l + w) (S n) x).
    apply ball_sym.
    simpl.
    rewrite -> Qball_Qabs.
@@ -140,7 +140,7 @@ Proof.
   rewrite inj_min.
   rewrite <- Z_to_nat_correct.
   rewrite Zmax_right.
-   apply Zmin_case_strong.
+   apply Z.min_case_strong.
     intros H.
     apply Zle_antisym; auto.
     apply Zlt_succ_le.
@@ -154,8 +154,8 @@ Proof.
   apply rasterize1_boundL; auto.
   apply Qle_trans with x; auto.
  simpl.
- replace (min n (Z_to_nat (z:=Zmax 0 (rasterize1 l (l + w) (S n) x))
-   (Zle_max_l 0 (rasterize1 l (l + w) (S n) x)))) with n.
+ replace (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + w) (S n) x))
+   (Z.le_max_l 0 (rasterize1 l (l + w) (S n) x)))) with n.
   setoid_replace x with (l + w).
    apply: ball_sym.
    rewrite ->  Qball_Qabs.
@@ -166,7 +166,7 @@ Proof.
    change (2*S n #1) with (2*S n).
    change (2*n + 1#1) with ((2*n + 1)%Z:Q).
    rewrite (inj_S n).
-   unfold Zsucc.
+   unfold Z.succ.
    do 2 rewrite -> injz_plus.
    setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| now (unfold Qeq; simpl; auto with * )].
    setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
@@ -181,7 +181,7 @@ Proof.
  apply min_l.
  apply surj_le.
  rewrite <- Z_to_nat_correct.
- eapply Zle_trans;[|apply Zle_max_r].
+ eapply Z.le_trans;[|apply Z.le_max_r].
  unfold rasterize1.
  rewrite <- (Qfloor_Z n).
  apply Qfloor_resp_le.
@@ -212,7 +212,7 @@ Proof.
  unfold Zminus.
  rewrite -> injz_plus.
  rewrite (inj_S m).
- unfold Zsucc.
+ unfold Z.succ.
  rewrite -> injz_plus.
  change ((-j)%Z:Q) with (-j).
  field.
@@ -267,8 +267,8 @@ Proof.
   unfold RasterizePoint at 1.
   simpl (pred (S n)).
   simpl (pred (S m)).
-  set (i:=min n (Z_to_nat (Zle_max_l 0 (rasterize1 l r (S n) (fst a))))).
-  set (j:=min m (Z_to_nat (Zle_max_l 0 (rasterize1 b t (S m) (snd a))))).
+  set (i:=min n (Z_to_nat (Z.le_max_l 0 (rasterize1 l r (S n) (fst a))))).
+  set (j:=min m (Z_to_nat (Z.le_max_l 0 (rasterize1 b t (S m) (snd a))))).
   cbv zeta.
   apply existsWeaken.
   exists (C l r (S n) i,C t b (S m) (m -j)%nat).
@@ -363,10 +363,10 @@ Proof.
  simpl (fold_right (fun (y : Q * Q) (x : raster (S n) (S m)) =>
    RasterizePoint x t l b r y) (emptyRaster (S n) (S m)) (a :: l0)) in Hij.
  unfold RasterizePoint at 1 in Hij.
- set (i0:=min (pred (S n)) (Z_to_nat (z:=Zmax 0 (rasterize1 l r (S n) (fst a)))
-   (Zle_max_l 0 (rasterize1 l r (S n) (fst a))))) in *.
- set (j0:=min (pred (S m)) (Z_to_nat (z:=Zmax 0 (rasterize1 b t (S m) (snd a)))
-   (Zle_max_l 0 (rasterize1 b t (S m) (snd a))))) in *.
+ set (i0:=min (pred (S n)) (Z_to_nat (z:=Z.max 0 (rasterize1 l r (S n) (fst a)))
+   (Z.le_max_l 0 (rasterize1 l r (S n) (fst a))))) in *.
+ set (j0:=min (pred (S m)) (Z_to_nat (z:=Z.max 0 (rasterize1 b t (S m) (snd a)))
+   (Z.le_max_l 0 (rasterize1 b t (S m) (snd a))))) in *.
  cbv zeta in Hij.
  assert (L:((i=i0)/\(j=m-j0) \/ ((j<>(m-j0)) \/ (i<>i0)))%nat) by omega.
  destruct L as [[Hi Hj] | L].

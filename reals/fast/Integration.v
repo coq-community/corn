@@ -64,7 +64,7 @@ function to be as balanced as possible.
 First we create a step function with n steps that appoximates the
 identity function, [stepSample]. *)
 
-Lemma oddGluePoint (p:positive) : 0 < Psucc p # xI p /\ Psucc p # xI p < 1.
+Lemma oddGluePoint (p:positive) : 0 < Pos.succ p # xI p /\ Pos.succ p # xI p < 1.
 Proof.
  split; unfold Qlt.
   constructor.
@@ -73,7 +73,7 @@ Proof.
  simpl.
  apply Zlt_left_rev.
  rewrite Zpos_succ_morphism, Zpos_xI.
- unfold Zsucc.
+ unfold Z.succ.
  ring_simplify.
  auto with *.
 Qed.
@@ -84,7 +84,7 @@ Local Open Scope StepQ_scope.
 
 Definition stepSample : positive -> StepQ := positive_rect2
  (fun _ => StepQ)
- (fun p rec1 rec2 => glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * rec1) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*rec2)))
+ (fun p rec1 rec2 => glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Pos.succ p#xI p:QS) * rec1) ((constStepF (1#(xI p):QS))*(constStepF (Pos.succ p:QS) + constStepF (p:QS)*rec2)))
  (fun p rec => glue (ou (1#2)) (constStepF (1#2:QS) * rec) (constStepF (1#2:QS) * (constStepF (1:QS) + rec)))
  (constStepF (1#2:QS)).
 
@@ -379,7 +379,7 @@ Proof.
  unfold QposEq.
  induction p using positive_rect2.
    replace (stepSample (xI p))
-     with (glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Psucc p#xI p:QS) * (stepSample (Psucc p))) ((constStepF (1#(xI p):QS))*(constStepF (Psucc p:QS) + constStepF (p:QS)*(stepSample p))))
+     with (glue (Build_OpenUnit (oddGluePoint p)) (constStepF (Pos.succ p#xI p:QS) * (stepSample (Pos.succ p))) ((constStepF (1#(xI p):QS))*(constStepF (Pos.succ p:QS) + constStepF (p:QS)*(stepSample p))))
        by (symmetry;apply: positive_rect2_red1).
    rewrite -> SupDistanceToLinear_glue.
    generalize (@affineCombo_gt (OpenUnitDual (Build_OpenUnit (oddGluePoint p))) 0 1 (pos_one Q_as_COrdField))
@@ -388,35 +388,35 @@ Proof.
    set (C:=(pos_one Q_as_COrdField)) in *.
    transitivity (Qmax (1#2*xI p) (1#2*xI p))%Q;[|apply Qmax_idem].
    apply Qmax_compat.
-    set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (Psucc p # xI p) * stepSample (Psucc p)) A)).
-    transitivity ((Psucc p#xI p)*(SupDistanceToLinear (stepSample (Psucc p)) C))%Q; [|rewrite -> IHp;
-      change ((Psucc p * 1 * (2 * (2* p + 1)) = 2* (Psucc p + p * (2* (Psucc p))))%Z);
+    set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (Pos.succ p # xI p) * stepSample (Pos.succ p)) A)).
+    transitivity ((Pos.succ p#xI p)*(SupDistanceToLinear (stepSample (Pos.succ p)) C))%Q; [|rewrite -> IHp;
+      change ((Pos.succ p * 1 * (2 * (2* p + 1)) = 2* (Pos.succ p + p * (2* (Pos.succ p))))%Z);
         repeat rewrite Zpos_succ_morphism; ring].
-    assert (X:(Psucc p # xI p) *0 < (Psucc p # xI p) *1).
+    assert (X:(Pos.succ p # xI p) *0 < (Pos.succ p # xI p) *1).
      constructor.
     rewrite -> (fun a => SupDistanceToLinear_scale a C X).
     apply SupDistanceToLinear_wd1.
      simpl; ring.
     unfold affineCombo; simpl; ring.
    set (LHS := (SupDistanceToLinear (constStepF (X:=QS) (1 # xI p) *
-     (constStepF (X:=QS) (Psucc p) + constStepF (X:=QS) p * stepSample p)) B)%Q).
+     (constStepF (X:=QS) (Pos.succ p) + constStepF (X:=QS) p * stepSample p)) B)%Q).
    transitivity ((1#xI p)*(p*(SupDistanceToLinear (stepSample (p)) C)))%Q; [|rewrite -> IHp0;
      change ((p * 1 * (2 * (2* p + 1)) = 2* (p + p * (2* p)))%Z); ring].
    assert (X0:(p *0 < p *1)).
     constructor.
    rewrite -> (fun a => SupDistanceToLinear_scale a C X0).
-   assert (X1:(p*0 + Psucc p < p*1 + Psucc p)).
+   assert (X1:(p*0 + Pos.succ p < p*1 + Pos.succ p)).
     apply: plus_resp_less_rht.
     assumption.
    rewrite -> (fun a => SupDistanceToLinear_translate a X0 X1).
-   assert (X2:((1# xI p)*(p*0 + Psucc p) < (1#xI p)*(p*1 + Psucc p))).
+   assert (X2:((1# xI p)*(p*0 + Pos.succ p) < (1#xI p)*(p*1 + Pos.succ p))).
     apply: mult_resp_less_lft;simpl; auto with *.
    rewrite -> (fun a => SupDistanceToLinear_scale a X1 X2).
    apply SupDistanceToLinear_wd1.
     unfold affineCombo; simpl.
     repeat rewrite -> Zpos_succ_morphism; repeat rewrite -> Qmake_Qdiv; repeat rewrite -> Zpos_xI;
       field; auto with *.
-   change (2*(p*1) + 1 = ((p*1*1 + Psucc p*1)*1))%Z.
+   change (2*(p*1) + 1 = ((p*1*1 + Pos.succ p*1)*1))%Z.
    rewrite Zpos_succ_morphism; ring.
   change (1#2*xO p)%Q with ((1#2)*(1#(2*p)))%Q.
   replace (stepSample (xO p)) with (glue (ou (1#2)) (constStepF (1#2:QS) * (stepSample p))

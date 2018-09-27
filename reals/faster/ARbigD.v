@@ -43,7 +43,7 @@ Program Instance bigD_div: AppDiv bigD := λ x y k,
   BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) ▼ ('k - 1).
 
 Lemma Qdiv_bounded_Zdiv (x y : Z) :
-  'Zdiv x y ≤ ('x / 'y : Q) < 'Zdiv x y + 1.
+  'Z.div x y ≤ ('x / 'y : Q) < 'Z.div x y + 1.
 Proof.
   rewrite Qround.Zdiv_Qdiv.
   split.
@@ -66,7 +66,7 @@ Proof.
   rewrite Z.shiftl_div_pow2 by trivial.
   assert (('x * 2 ^ n : Q) = 'x / 'Zpower 2 (-n)).
    rewrite Qpower.Zpower_Qpower.
-    rewrite <-Qpower.Qpower_opp, Zopp_involutive.
+    rewrite <-Qpower.Qpower_opp, Z.opp_involutive.
     reflexivity.
    now apply rings.flip_nonpos_negate in En.
   split.
@@ -89,7 +89,7 @@ Proof.
    transitivity ('xm / 'ym * 2 ^ xe / 2 ^ ye * (2 ^ (k - 1) / 2 ^ (k - 1)) : Q); [| ring].
    rewrite dec_recip_inverse by solve_propholds. ring.
   assert (∀ xm xe ym ye : Z, 
-      'Zdiv (Z.shiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
+      'Z.div (Z.shiftl xm (-(k - 1) + xe - ye)) ym * 2 ^ (k - 1) - 2 ^ k  ≤ ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q)) as Pleft.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) - 2 ^ k = ((z - 1) - 1) * 2 ^ (k - 1)) as E2.
     intros.
@@ -127,7 +127,7 @@ Proof.
     now apply orders.lt_le.
    now apply orders.lt_le, Qpow_bounded_Zshiftl.
   assert (∀ xm xe ym ye : Z, 
-      ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Zdiv (Z.shiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
+      ('xm * 2 ^ xe) / ('ym * 2 ^ ye : Q) ≤ '(Z.div (Z.shiftl xm (-(k - 1) + xe - ye)) ym) * 2 ^ (k - 1) + 2 ^ k) as Pright.
    clear x y.
    assert (∀ z : Q, z * 2 ^ (k - 1) + 2 ^ k = ((z + 1) + 1) * 2 ^ (k - 1)) as E2.
     intros.

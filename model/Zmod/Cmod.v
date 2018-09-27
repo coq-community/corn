@@ -64,7 +64,7 @@ Proof.
   intuition.
  cut (Zneg p < 0)%Z.
   intuition.
- unfold Zlt.
+ unfold Z.lt.
  intuition.
 Qed.
 

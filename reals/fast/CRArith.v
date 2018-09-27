@@ -713,7 +713,7 @@ Proof.
   apply CRle_Qle. simpl.
   destruct (decide ((ε : Q) ≤ 1)).
    rewrite Z.nat_of_Z_nonneg.
-    rewrite Zopp_involutive.
+    rewrite Z.opp_involutive.
     apply Qdlog2_spec.
     now destruct ε.
    apply Z.opp_nonneg_nonpos.

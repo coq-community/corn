@@ -55,28 +55,28 @@ Extract Inductive Z => Integer [ "0" "" "negate" ]
 "(\f0 fp fn z -> if z == 0 then f0 () else if z > 0 then fp z else fn (negate z))".
 
 Extract Inlined Constant Pplus => "(+)".
-Extract Inlined Constant Psucc => "succ".
-Extract Inlined Constant Ppred => "pred".
+Extract Inlined Constant Pos.succ => "succ".
+Extract Inlined Constant Pos.pred => "pred".
 Extract Inlined Constant Pminus => "\n m -> max 1 (n - m)".
 Extract Inlined Constant Pmult => "(*)".
-Extract Inlined Constant Pmin => "min".
-Extract Inlined Constant Pmax => "max".
+Extract Inlined Constant Pos.min => "min".
+Extract Inlined Constant Pos.max => "max".
 (* Probably a change in the way Coq handles numbers, ask PL.
 Extract Inlined Constant Pcompare => "compare".*)
 Extract Inlined Constant positive_eq_dec => "(==)".
 Extraction Inline positive_rec.
 
 Extract Inlined Constant Zplus => "(+)".
-Extract Inlined Constant Zsucc => "succ".
-Extract Inlined Constant Zpred => "pred".
+Extract Inlined Constant Z.succ => "succ".
+Extract Inlined Constant Z.pred => "pred".
 Extract Inlined Constant Zminus => "(-)".
 Extract Inlined Constant Zmult => "(*)".
-Extract Inlined Constant Zopp => "negate".
-Extract Inlined Constant Zabs => "abs".
-Extract Inlined Constant Zmin => "min".
-Extract Inlined Constant Zmax => "max".
-Extract Inlined Constant Zcompare => "compare".
-Extract Inlined Constant Z_eq_dec => "(==)".
+Extract Inlined Constant Z.opp => "negate".
+Extract Inlined Constant Z.abs => "abs".
+Extract Inlined Constant Z.min => "min".
+Extract Inlined Constant Z.max => "max".
+Extract Inlined Constant Z.compare => "compare".
+Extract Inlined Constant Z.eq_dec => "(==)".
 Extraction Inline Z_rec.
 Extract Inlined Constant Z_of_nat => "id".
 

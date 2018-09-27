@@ -340,7 +340,7 @@ Hypothesis Hnontriv: ~(m=xH).
 
 Lemma m_gt_1: m>1.
 Proof.
- unfold Zgt.
+ unfold Z.gt.
  generalize Hnontriv.
  case m; simpl; intros; auto.
  elim Hnontriv0; auto.
@@ -548,7 +548,7 @@ Qed.
 
 Lemma p_gt_1: m>1.
 Proof.
- unfold Zgt.
+ unfold Z.gt.
  generalize p_not_1.
  case m; simpl; intro H; auto.
  elim H; auto.
@@ -577,9 +577,9 @@ Proof.
   split.
    elim (Zlt_asymmetric (Zmod x m) 0).
     intro Hfalse; elim Hx; elim Hfalse; clear Hfalse; intro Hfalse.
-     elim H; apply Zlt_gt; auto.
+     elim H; apply Z.lt_gt; auto.
     simpl; rewrite <-Hfalse; auto with zarith.
-   apply Zgt_lt.
+   apply Z.gt_lt.
   assumption.
  exact p_gt_0.
 Qed.

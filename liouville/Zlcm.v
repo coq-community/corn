@@ -24,28 +24,28 @@ Section Zgcd_lin.
 
 Lemma Z_dec : forall x y : Z_as_CRing, x [=] y or x [#] y.
 Proof.
- intros x y; case (Z_eq_dec x y).
+ intros x y; case (Z.eq_dec x y).
   left; assumption.
  right; assumption.
 Qed.
 
-Lemma Zgcd_lin : forall a b c, (Zabs c * Zgcd a b = Zgcd (c * a) (c * b))%Z.
+Lemma Zgcd_lin : forall a b c, (Z.abs c * Zgcd a b = Zgcd (c * a) (c * b))%Z.
 Proof.
  intros a b c.
- case (Z_eq_dec a 0).
+ case (Z.eq_dec a 0).
   intro H; rewrite H; rewrite Zmult_0_r, Zgcd_zero_lft, Zgcd_zero_lft; apply Zabs_mult_compat.
- intro Ha; case (Z_eq_dec b 0).
+ intro Ha; case (Z.eq_dec b 0).
   intro H; rewrite H; rewrite Zmult_0_r, Zgcd_zero_rht, Zgcd_zero_rht; apply Zabs_mult_compat.
- intro Hb; case (Z_eq_dec c 0).
+ intro Hb; case (Z.eq_dec c 0).
   intro H; rewrite H; rewrite Zmult_0_l, Zmult_0_l, Zmult_0_l, Zgcd_zero_lft; reflexivity.
  intro Hc; apply Zdivides_antisymm.
-    rewrite <- (Zmult_0_r (Zabs c)).
+    rewrite <- (Zmult_0_r (Z.abs c)).
     apply Zmult_pos_mon_lt_lft.
-     apply Zlt_gt.
+     apply Z.lt_gt.
      apply Zgcd_pos.
      left; assumption.
     destruct c; [destruct Hc| |]; reflexivity.
-   apply Zlt_gt.
+   apply Z.lt_gt.
    apply Zgcd_pos.
    left.
    intro H0; destruct (Zmult_zero_div _ _ H0).
@@ -60,14 +60,14 @@ Proof.
    apply Zdivides_abs_elim_lft.
    apply Zdivides_ref.
   apply Zgcd_is_divisor_rht.
- cut (forall c : positive, Zdivides (Zgcd (c * a) (c * b)) (Zabs c * Zgcd a b)).
+ cut (forall c : positive, Zdivides (Zgcd (c * a) (c * b)) (Z.abs c * Zgcd a b)).
   intro H; case c.
     simpl; rewrite Zgcd_zero_lft; apply Zdivides_ref.
    apply H.
   intro p; rewrite Zgcd_abs.
   rewrite <- Zabs_mult_compat, <- Zabs_mult_compat.
-  simpl (Zabs (Zneg p)).
-  assert ((p:Z) = Zabs p).
+  simpl (Z.abs (Zneg p)).
+  assert ((p:Z) = Z.abs p).
    reflexivity.
   rewrite H0; clear H0.
   rewrite Zabs_mult_compat, Zabs_mult_compat.
@@ -76,7 +76,7 @@ Proof.
  clear c Hc; intro c.
  rewrite (Zgcd_lin_comb a b).
  rewrite Zmult_plus_distr_r.
- simpl (Zabs c).
+ simpl (Z.abs c).
  rewrite Zmult_assoc, Zmult_assoc.
  rewrite (Zmult_comm c (Zgcd_coeff_a a b)).
  rewrite (Zmult_comm c (Zgcd_coeff_b a b)).
@@ -90,13 +90,13 @@ Qed.
 
 End Zgcd_lin.
 
-Definition Zlcm (a b : Z_as_CRing) : Z_as_CRing := Zdiv (a [*] b) (Zgcd a b).
+Definition Zlcm (a b : Z_as_CRing) : Z_as_CRing := Z.div (a [*] b) (Zgcd a b).
 
 Lemma Zlcm_specl : forall a b : Z_as_CRing, Zdivides a (Zlcm a b).
 Proof.
  intros a b.
  unfold Zlcm.
- case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
+ case (Z.eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
@@ -111,7 +111,7 @@ Lemma Zlcm_specr : forall a b : Z_as_CRing, Zdivides b (Zlcm a b).
 Proof.
  intros a b.
  unfold Zlcm.
- case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
+ case (Z.eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   rewrite Zdiv_0_r.
   apply Zdivides_zero_rht.
@@ -126,17 +126,17 @@ Qed.
 Lemma Zlcm_spec : forall a b c : Z_as_CRing, Zdivides a c -> Zdivides b c -> Zdivides (Zlcm a b) c.
 Proof.
  intros a b c Hac Hbc; unfold Zlcm; simpl.
- case (Z_eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
+ case (Z.eq_dec (Zgcd a b) ([0]:Z_as_CRing)).
   intro H; rewrite H; simpl.
   destruct (Zgcd_zero _ _ H).
   rewrite H0 in Hac; clear H H0 H1.
   rewrite Zdiv_0_r; assumption.
- case (Z_eq_dec c ([0]:Z_as_CRing)).
+ case (Z.eq_dec c ([0]:Z_as_CRing)).
   intro Hc; rewrite Hc.
   intro Hap; apply Zdivides_zero_rht.
  intros Hc Hap.
  apply Zdivides_abs_intro_rht.
- rewrite <- (Zmult_1_r (Zabs c)).
+ rewrite <- (Zmult_1_r (Z.abs c)).
  rewrite <- (Zgcd_div_gcd_1 a b); [|assumption].
  rewrite Zgcd_lin.
  apply Zdiv_gcd_elim.
@@ -174,7 +174,7 @@ Qed.
 Lemma Zlcm_zero : forall p q, Zlcm p q [=] [0] -> p [=] [0] or q [=] [0].
 Proof.
  intros p q; unfold Zlcm; intro Heq.
- case (Z_eq_dec p ([0]:Z_as_CRing)).
+ case (Z.eq_dec p ([0]:Z_as_CRing)).
   left; assumption.
  intro Happ; right.
  simpl in *.
@@ -228,14 +228,14 @@ Qed.
 Lemma Zdivides_spec : forall (a b : Z), Zdivides a b -> (a * (b / a) = b)%Z.
 Proof.
  intros a b Hdiv.
- case (Z_eq_dec a 0).
+ case (Z.eq_dec a 0).
   intro H; rewrite H; simpl.
   symmetry; apply Zdivides_zero_lft; rewrite <- H; assumption.
  intro  Hap.
  rewrite <- Z_div_exact_full_2.
    reflexivity.
   assumption.
- case (Z_eq_dec a 0).
+ case (Z.eq_dec a 0).
   intro H; rewrite H; simpl; apply Zmod_0_r.
  intro H; clear H.
  apply Zmod0_Zdivides; assumption.

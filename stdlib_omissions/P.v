@@ -37,17 +37,17 @@ Qed.
 
 Hint Immediate nat_of_P_nonzero.
 
-Lemma Plt_lt (p q: positive): Plt p q <-> (nat_of_P p < nat_of_P q).
+Lemma Plt_lt (p q: positive): Pos.lt p q <-> (nat_of_P p < nat_of_P q).
 Proof.
  split. apply nat_of_P_lt_Lt_compare_morphism.
  apply nat_of_P_lt_Lt_compare_complement_morphism.
 Qed.
 
-Lemma Ple_le (p q: positive): Ple p q <-> le (nat_of_P p) (nat_of_P q).
+Lemma Ple_le (p q: positive): Pos.le p q <-> le (nat_of_P p) (nat_of_P q).
 Proof.
- rewrite Ple_lteq, Plt_lt, Lt.le_lt_or_eq_iff, nat_of_P_inj_iff.
+ rewrite Pos.le_lteq, Plt_lt, Lt.le_lt_or_eq_iff, nat_of_P_inj_iff.
  reflexivity.
 Qed.
 
-Lemma Ple_refl p: Ple p p.
-Proof. intros. apply Ple_lteq. firstorder. Qed.
+Lemma Ple_refl p: Pos.le p p.
+Proof. intros. apply Pos.le_lteq. firstorder. Qed.

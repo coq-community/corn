@@ -623,7 +623,7 @@ Proof.
   apply H1.
   assumption.
  rewrite Znat.inj_S.
- unfold Zsucc in |- *.
+ unfold Z.succ in |- *.
  rewrite Zopp_plus_distr.
  reflexivity.
 Qed.
@@ -1278,25 +1278,25 @@ Lemma toCProp_Zlt : forall x y : Z, (x < y)%Z -> Zlts x y.
 Proof.
  intros x y H.
  unfold Zlts in |- *.
- unfold Zlt in H.
+ unfold Z.lt in H.
  auto.
 Qed.
 
 Lemma CZlt_to : forall x y : Z, Zlts x y -> (x < y)%Z.
 Proof.
  intros x y H.
- unfold Zlt in |- *.
+ unfold Z.lt in |- *.
  inversion H.
  auto.
 Qed.
 
-Lemma Zsgn_1 : forall x : Z, {Zsgn x = 0%Z} + {Zsgn x = 1%Z} + {Zsgn x = (-1)%Z}.
+Lemma Zsgn_1 : forall x : Z, {Z.sgn x = 0%Z} + {Z.sgn x = 1%Z} + {Z.sgn x = (-1)%Z}.
 Proof.
  intro x.
  case x.
    left.
    left.
-   unfold Zsgn in |- *.
+   unfold Z.sgn in |- *.
    reflexivity.
   intro p.
   simpl in |- *.
@@ -1309,7 +1309,7 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Zsgn_2 : forall x : Z, Zsgn x = 0%Z -> x = 0%Z.
+Lemma Zsgn_2 : forall x : Z, Z.sgn x = 0%Z -> x = 0%Z.
 Proof.
  intro x.
  case x.
@@ -1321,7 +1321,7 @@ Proof.
  inversion H.
 Qed.
 
-Lemma Zsgn_3 : forall x : Z, x <> 0%Z -> Zsgn x <> 0%Z.
+Lemma Zsgn_3 : forall x : Z, x <> 0%Z -> Z.sgn x <> 0%Z.
 Proof.
  intro x.
  case x.
@@ -1362,39 +1362,39 @@ Proof.
  cut (P_of_succ_nat (nat_of_P p) = P_of_succ_nat (S x)).
   intro H1.
   rewrite P_of_succ_nat_o_nat_of_P_eq_succ in H1.
-  cut (Ppred (Psucc p) = Ppred (P_of_succ_nat (S x))).
+  cut (Pos.pred (Pos.succ p) = Pos.pred (P_of_succ_nat (S x))).
    intro H2.
-   rewrite Ppred_succ in H2.
+   rewrite Pos.pred_succ in H2.
    simpl in H2.
-   rewrite Ppred_succ in H2.
+   rewrite Pos.pred_succ in H2.
    auto.
-  apply f_equal with (A := positive) (B := positive) (f := Ppred).
+  apply f_equal with (A := positive) (B := positive) (f := Pos.pred).
   assumption.
  apply f_equal with (f := P_of_succ_nat).
  assumption.
 Qed.
 
-Theorem Zsgn_4 : forall a : Z, a = (Zsgn a * Zabs_nat a)%Z.
+Theorem Zsgn_4 : forall a : Z, a = (Z.sgn a * Z.abs_nat a)%Z.
 Proof.
  intro a.
  case a.
    simpl in |- *.
    reflexivity.
   intro p.
-  unfold Zsgn in |- *.
-  unfold Zabs_nat in |- *.
+  unfold Z.sgn in |- *.
+  unfold Z.abs_nat in |- *.
   rewrite Zmult_1_l.
   symmetry  in |- *.
   apply ZL9.
  intro p.
- unfold Zsgn in |- *.
- unfold Zabs_nat in |- *.
+ unfold Z.sgn in |- *.
+ unfold Z.abs_nat in |- *.
  rewrite ZL9.
  constructor.
 Qed.
 
 Theorem Zsgn_5 : forall a b x y : Z, x <> 0%Z -> y <> 0%Z ->
- (Zsgn a * x)%Z = (Zsgn b * y)%Z -> (Zsgn a * y)%Z = (Zsgn b * x)%Z.
+ (Z.sgn a * x)%Z = (Z.sgn b * y)%Z -> (Z.sgn a * y)%Z = (Z.sgn b * x)%Z.
 Proof.
  intros a b x y H H0.
  case a.
@@ -1402,27 +1402,27 @@ Proof.
      simpl in |- *.
      trivial.
     intro p.
-    unfold Zsgn in |- *.
+    unfold Z.sgn in |- *.
     intro H1.
     rewrite Zmult_1_l in H1.
     simpl in H1.
     elim H0.
     auto.
    intro p.
-   unfold Zsgn in |- *.
+   unfold Z.sgn in |- *.
    intro H1.
    elim H0.
-   apply Zopp_inj.
+   apply Z.opp_inj.
    simpl in |- *.
    transitivity (-1 * y)%Z; auto.
   intro p.
-  unfold Zsgn at 1 in |- *.
-  unfold Zsgn at 2 in |- *.
+  unfold Z.sgn at 1 in |- *.
+  unfold Z.sgn at 2 in |- *.
   intro H1.
   transitivity y.
    rewrite Zmult_1_l.
    reflexivity.
-  transitivity (Zsgn b * (Zsgn b * y))%Z.
+  transitivity (Z.sgn b * (Z.sgn b * y))%Z.
    case (Zsgn_1 b).
     intro H2.
     case H2.
@@ -1444,19 +1444,19 @@ Proof.
   rewrite H1.
   reflexivity.
  intro p.
- unfold Zsgn at 1 in |- *.
- unfold Zsgn at 2 in |- *.
+ unfold Z.sgn at 1 in |- *.
+ unfold Z.sgn at 2 in |- *.
  intro H1.
- transitivity (Zsgn b * (-1 * (Zsgn b * y)))%Z.
+ transitivity (Z.sgn b * (-1 * (Z.sgn b * y)))%Z.
   case (Zsgn_1 b).
    intro H2.
    case H2.
     intro H3.
     elim H.
-    apply Zopp_inj.
+    apply Z.opp_inj.
     transitivity (-1 * x)%Z.
      ring.
-    unfold Zopp in |- *.
+    unfold Z.opp in |- *.
     rewrite H3 in H1.
     transitivity (0 * y)%Z; auto.
    intro H3.
@@ -1473,7 +1473,7 @@ Qed.
 Lemma nat_nat_pos : forall m n : nat, ((m + 1) * (n + 1) > 0)%Z.
 Proof.
  intros m n.
- apply Zlt_gt.
+ apply Z.lt_gt.
  cut (Z_of_nat m + 1 > 0)%Z.
   intro H.
   cut (0 < Z_of_nat n + 1)%Z.
@@ -1482,13 +1482,13 @@ Proof.
     rewrite Zmult_0_r.
     auto.
    apply Zlt_reg_mult_l; auto.
-  change (0 < Zsucc (Z_of_nat n))%Z in |- *.
+  change (0 < Z.succ (Z_of_nat n))%Z in |- *.
   apply Zle_lt_succ.
   change (Z_of_nat 0 <= Z_of_nat n)%Z in |- *.
   apply Znat.inj_le.
   apply le_O_n.
- apply Zlt_gt.
- change (0 < Zsucc (Z_of_nat m))%Z in |- *.
+ apply Z.lt_gt.
+ change (0 < Z.succ (Z_of_nat m))%Z in |- *.
  apply Zle_lt_succ.
  change (Z_of_nat 0 <= Z_of_nat m)%Z in |- *.
  apply Znat.inj_le.
@@ -1503,7 +1503,7 @@ Proof.
  omega.
 Qed.
 
-Lemma absolu_1 : forall x : Z, Zabs_nat x = 0 -> x = 0%Z.
+Lemma absolu_1 : forall x : Z, Z.abs_nat x = 0 -> x = 0%Z.
 Proof.
  intros x H.
  case (dec_eq x 0).
@@ -1517,13 +1517,13 @@ Proof.
    intros H3 H4.
    auto.
   intro H2.
-  cut (exists h : nat, Zabs_nat x = S h).
+  cut (exists h : nat, Z.abs_nat x = S h).
    intro H3.
    case H3.
    rewrite H.
    exact O_S.
   change (x < 0)%Z in H2.
-  set (H3 := Zlt_gt _ _ H2) in *.
+  set (H3 := Z.lt_gt _ _ H2) in *.
   elim (Zcompare_Gt_spec _ _ H3).
   intros x0 H5.
   cut (exists q : positive, x = Zneg q).
@@ -1531,7 +1531,7 @@ Proof.
    case H6.
    intros x1 H7.
    rewrite H7.
-   unfold Zabs_nat in |- *.
+   unfold Z.abs_nat in |- *.
    generalize x1.
    exact ZL4.
   cut (x = (- Zpos x0)%Z).
@@ -1539,10 +1539,10 @@ Proof.
    intro H6.
    exists x0.
    assumption.
-  rewrite <- (Zopp_involutive x).
-  exact (f_equal Zopp H5).
+  rewrite <- (Z.opp_involutive x).
+  exact (f_equal Z.opp H5).
  intro H2.
- cut (exists h : nat, Zabs_nat x = S h).
+ cut (exists h : nat, Z.abs_nat x = S h).
   intro H3.
   case H3.
   rewrite H.
@@ -1552,12 +1552,12 @@ Proof.
  rewrite Zplus_0_r.
  intros x0 H4.
  rewrite H4.
- unfold Zabs_nat in |- *.
+ unfold Z.abs_nat in |- *.
  generalize x0.
  exact ZL4.
 Qed.
 
-Lemma absolu_2 : forall x : Z, x <> 0%Z -> Zabs_nat x <> 0.
+Lemma absolu_2 : forall x : Z, x <> 0%Z -> Z.abs_nat x <> 0.
 Proof.
  intros x H.
  intro H0.
@@ -1597,12 +1597,12 @@ Lemma Zgt_mult_reg_absorb_l : forall a x y : Z,
 Proof.
  intros a x y H H0.
  cut (- a < - (0))%Z.
-  rewrite <- (Zopp_involutive a) in H.
-  rewrite <- (Zopp_involutive 0) in H.
+  rewrite <- (Z.opp_involutive a) in H.
+  rewrite <- (Z.opp_involutive 0) in H.
   simpl in |- *.
   intro H1.
-  rewrite <- (Zopp_involutive x).
-  rewrite <- (Zopp_involutive y).
+  rewrite <- (Z.opp_involutive x).
+  rewrite <- (Z.opp_involutive y).
   apply Zlt_opp.
   apply Zgt_mult_conv_absorb_l with (a := (- a)%Z) (x := (- x)%Z).
    assumption.
@@ -1611,9 +1611,9 @@ Proof.
   apply Zlt_opp.
   rewrite <- Zopp_mult_distr_r.
   rewrite <- Zopp_mult_distr_r.
-  apply Zgt_lt.
+  apply Z.gt_lt.
   apply Zlt_opp.
-  apply Zgt_lt.
+  apply Z.gt_lt.
   assumption.
  omega.
 Qed.
