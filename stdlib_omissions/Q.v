@@ -39,7 +39,7 @@ Proof.
  do 2 rewrite Zmult_1_r. reflexivity.
 Qed.
 
-Lemma Zsucc_Qplus (z: Z): inject_Z (Zsucc z) = inject_Z z + 1.
+Lemma Zsucc_Qplus (z: Z): inject_Z (Z.succ z) = inject_Z z + 1.
 Proof. apply Zplus_Qplus. Qed.
 
 Lemma Zmult_Qmult (x y: Z): inject_Z (x * y) = inject_Z x * inject_Z y.
@@ -71,7 +71,7 @@ Proof with simpl; try reflexivity.
    rewrite Zmult_0_r...
   rewrite Zmult_1_r...
  rewrite <- Zopp_eq_mult_neg_1.
- rewrite <- (Zopp_involutive (Zpos p)).
+ rewrite <- (Z.opp_involutive (Zpos p)).
  rewrite Zdiv_opp_opp...
 Qed.
 

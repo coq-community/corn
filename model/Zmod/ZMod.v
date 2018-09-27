@@ -115,7 +115,7 @@ Proof.
   replace (b mod m)%Z with (b - m * (b / m))%Z.
    replace ((a + b) mod m)%Z with (a + b - m * ((a + b) / m))%Z.
     unfold Zminus in |- *; repeat rewrite Zplus_assoc.
-    repeat rewrite Zopp_plus_distr; repeat rewrite Zopp_involutive.
+    repeat rewrite Zopp_plus_distr; repeat rewrite Z.opp_involutive.
     rewrite (Zplus_comm (a + b) (- (m * ((a + b) / m)))).
     repeat rewrite <- Zplus_assoc.
     apply Zdivides_plus_elim.
@@ -215,7 +215,7 @@ Proof.
     unfold Zminus in |- *; repeat rewrite Zplus_assoc.
     repeat rewrite Zmult_plus_distr_l.
     repeat rewrite Zmult_plus_distr_r.
-    repeat rewrite Zopp_plus_distr; repeat rewrite Zopp_involutive.
+    repeat rewrite Zopp_plus_distr; repeat rewrite Z.opp_involutive.
     rewrite (Zplus_comm (a * b)).
     repeat rewrite <- Zplus_assoc.
     apply Zdivides_plus_elim.
@@ -223,7 +223,7 @@ Proof.
     repeat rewrite Zplus_assoc.
     rewrite Zplus_opp_r.
     repeat rewrite Zopp_mult_distr_l_reverse; repeat rewrite Zopp_mult_distr_r;
-      repeat rewrite Zopp_involutive.
+      repeat rewrite Z.opp_involutive.
     simpl in |- *.
     apply Zdivides_plus_elim; auto with zarith.
    generalize (Z_div_mod_eq (a * b) m Hm); auto with zarith.
@@ -581,8 +581,8 @@ Qed.
 Lemma Zmodeq_opp_intro : forall a b : Z, Zmodeq (- a) (- b) -> Zmodeq a b.
 Proof.
  intros a b H.
- rewrite <- (Zopp_involutive a).
- rewrite <- (Zopp_involutive b).
+ rewrite <- (Z.opp_involutive a).
+ rewrite <- (Z.opp_involutive b).
  apply (Zmodeq_opp_elim _ _ H).
 Qed.
 

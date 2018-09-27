@@ -103,7 +103,7 @@ Context {a : AQ} (Pa : a ≤ 0).
 Definition AQexp_neg_bound : nat := 
   match decide_rel (≤) (-1) a with
   | left _ => 0
-  | right _ => Zabs_nat (1 + Qdlog2 (-'a))
+  | right _ => Z.abs_nat (1 + Qdlog2 (-'a))
   end.
 
 Lemma AQexp_neg_bound_correct : -2 ^ AQexp_neg_bound ≤ a ≤ 0.
@@ -157,13 +157,13 @@ Proof. apply AQexp_neg_bounded_correct. Qed.
 
 (* We could use a number closer to 1/exp 1, for example 11 $ -5, but in practice this seems
     to make it slower. *)
-Program Definition AQexp_inv_pos_bound : AQ₊ := ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))↾_.
+Program Definition AQexp_inv_pos_bound : AQ₊ := ((1 ≪ (-2)) ^ Z.abs_N (Qfloor ('a)))↾_.
 Next Obligation. solve_propholds. Qed.
 
 Lemma AQexp_inv_pos_bound_correct :
   '(cast (AQ₊) Q AQexp_inv_pos_bound) ≤ rational_exp ('a). 
 Proof.
-  change (cast Q CR (cast AQ Q ((1 ≪ (-2)) ^ Zabs_N (Qfloor ('a)))) ≤ rational_exp ('a)).
+  change (cast Q CR (cast AQ Q ((1 ≪ (-2)) ^ Z.abs_N (Qfloor ('a)))) ≤ rational_exp ('a)).
   rewrite preserves_nat_pow.
   rewrite aq_shift_opp_2.
   rewrite rings.preserves_1, rings.mult_1_l.

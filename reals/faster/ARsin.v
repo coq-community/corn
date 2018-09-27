@@ -141,7 +141,7 @@ Qed.
 Section sin_pos.
 Context {a : AQ} (Pa : 0 ≤ a).
 
-Definition AQsin_pos_bound : nat := Zabs_nat (1 + Qdlog 3 ('a)).
+Definition AQsin_pos_bound : nat := Z.abs_nat (1 + Qdlog 3 ('a)).
 
 Lemma AQsin_pos_bound_correct : 0 ≤ a ≤ 3 ^ AQsin_pos_bound.
 Proof.

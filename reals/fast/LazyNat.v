@@ -108,5 +108,5 @@ Hint Rewrite <- LazifyNat_of_P LazifyPmult_LazyNat LazifyPlus LazifyPred : UnLaz
 Fixpoint Pplus_LazyNat (p:positive)(n:LazyNat) {struct n} : positive :=
 match n with
 | LazyO => p
-| (LazyS n') => (Pplus_LazyNat (Psucc p) (n' tt))
+| (LazyS n') => (Pplus_LazyNat (Pos.succ p) (n' tt))
 end.

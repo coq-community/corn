@@ -81,7 +81,7 @@ Proof.
  intros [x y] [w z].
  unfold f.
  rewrite -> Qred_correct.
- destruct (Z_eq_dec (y*z) (x*w)) as [H|H].
+ destruct (Z.eq_dec (y*z) (x*w)) as [H|H].
   unfold Qmult.
   simpl ((Qnum (x # y) * Qnum (w # z) # Qden (x # y) * Qden (w # z))).
   repeat rewrite <- H.

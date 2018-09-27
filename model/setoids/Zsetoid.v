@@ -123,16 +123,16 @@ Qed.
 Taking the opposite of an integer is a setoid function.
 *)
 
-Lemma Zopp_wd : fun_wd (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
+Lemma Zopp_wd : fun_wd (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Z.opp.
 Proof.
  red in |- *.
  simpl in |- *.
  intros x y H.
- apply (f_equal Zopp H).
+ apply (f_equal Z.opp H).
 Qed.
 
 Lemma Zopp_strext :
- fun_strext (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Zopp.
+ fun_strext (S1:=Z_as_CSetoid) (S2:=Z_as_CSetoid) Z.opp.
 Proof.
  red in |- *.
  simpl in |- *.
@@ -140,11 +140,11 @@ Proof.
  intros x y H.
  intro H0.
  apply H.
- exact (f_equal Zopp H0).
+ exact (f_equal Z.opp H0).
 Qed.
 
 Definition Zopp_is_fun :=
-  Build_CSetoid_fun Z_as_CSetoid Z_as_CSetoid Zopp Zopp_strext.
+  Build_CSetoid_fun Z_as_CSetoid Z_as_CSetoid Z.opp Zopp_strext.
 Canonical Structure Zopp_is_fun.
 
 (**

@@ -132,22 +132,22 @@ Proof.
    simpl.
    left; reflexivity.
   rewrite inj_S.
-  cut (In ((f0 (Zsucc j)), (f1 0%Z)) (map (fun x : Q => (x, (f1 0%Z)))
-    (map (@fst _ _) (filter (@snd _ _) (combine (map f0 (iterateN Zsucc 1%Z n)) a0))))).
+  cut (In ((f0 (Z.succ j)), (f1 0%Z)) (map (fun x : Q => (x, (f1 0%Z)))
+    (map (@fst _ _) (filter (@snd _ _) (combine (map f0 (iterateN Z.succ 1%Z n)) a0))))).
    intros L.
    destruct a; try right; auto.
-  change (1%Z) with (Zsucc 0).
+  change (1%Z) with (Z.succ 0).
   rewrite iterateN_f.
-  rewrite (map_map Zsucc f0).
-  apply (IHa (fun x:Z => f0 (Zsucc x))).
+  rewrite (map_map Z.succ f0).
+  apply (IHa (fun x:Z => f0 (Z.succ x))).
   apply H.
  rewrite inj_S.
- set (f1':= fun (x:Z) =>(f1 (Zsucc x))).
+ set (f1':= fun (x:Z) =>(f1 (Z.succ x))).
  fold (f1' i).
  simpl.
  apply in_or_app.
  right.
- change (1%Z) with (Zsucc 0).
+ change (1%Z) with (Z.succ 0).
  rewrite iterateN_f.
  rewrite map_map.
  fold f1'.
@@ -187,21 +187,21 @@ Proof.
     inversion_clear H0.
     auto.
    edestruct IHa as [z Hz].
-    change 1%Z with (Zsucc 0) in H0.
+    change 1%Z with (Z.succ 0) in H0.
     rewrite iterateN_f in H0.
-    rewrite (map_map Zsucc f0) in H0.
+    rewrite (map_map Z.succ f0) in H0.
     apply H0.
    exists (S z).
    rewrite inj_S; auto.
   edestruct IHa as [z Hz].
    simpl in H0.
-   change 1%Z with (Zsucc 0) in H0.
+   change 1%Z with (Z.succ 0) in H0.
    rewrite iterateN_f in H0.
-   rewrite (map_map Zsucc f0) in H0.
+   rewrite (map_map Z.succ f0) in H0.
    apply H0.
   exists (S z).
   rewrite inj_S; auto.
- change 1%Z with (Zsucc 0) in H0.
+ change 1%Z with (Z.succ 0) in H0.
  rewrite iterateN_f in H0.
  rewrite (map_map) in H0.
  edestruct IHbitmap as [z Hz].

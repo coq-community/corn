@@ -41,20 +41,20 @@ Proof.
  rewrite Zpos_mult_morphism.
  apply Zmult_le_compat; auto with *.
  clear - n.
- apply Zle_trans with (two_p (Zsucc (log_inf n))-1)%Z.
+ apply Z.le_trans with (two_p (Z.succ (log_inf n))-1)%Z.
   rewrite <- Zle_plus_swap.
   apply Zlt_succ_le.
-  change (Zpos n+1) with (Zsucc (Zpos n)).
+  change (Zpos n+1) with (Z.succ (Zpos n)).
   apply Zsucc_lt_compat.
   destruct (log_inf_correct2 n).
   assumption.
- replace (Zsucc (log_inf n)) with (Z_of_nat (Psize n)).
-  apply Zle_trans with (two_p (Z_of_nat (Psize n))).
+ replace (Z.succ (log_inf n)) with (Z_of_nat (Psize n)).
+  apply Z.le_trans with (two_p (Z_of_nat (Psize n))).
    auto with *.
   induction (Psize n); auto with *.
   rewrite inj_S.
   simpl.
-  unfold Zsucc.
+  unfold Z.succ.
   rewrite two_p_is_exp; auto with *.
   change (two_p 1) with 2.
   rewrite Zpower_exp; auto with *.
@@ -77,9 +77,9 @@ Proof.
  simpl.
  ring_simplify.
  induction n.
-  apply Zle_refl.
+  apply Z.le_refl.
  rewrite inj_S.
- unfold Zsucc.
+ unfold Z.succ.
  do 2 (rewrite Zpower_exp;try auto with * ).
  ring_simplify.
  apply Zmult_le_compat; try discriminate.
@@ -88,7 +88,7 @@ Proof.
  induction n.
   discriminate.
  rewrite inj_S.
- unfold Zsucc.
+ unfold Z.succ.
  rewrite Zpower_exp;try auto with *.
 Qed.
 
@@ -105,7 +105,7 @@ Proof.
    induction (Psize d).
     constructor.
    rewrite inj_S.
-   unfold Zsucc.
+   unfold Z.succ.
    rewrite -> Qpower_plus;[|discriminate].
    apply: mult_resp_pos;[assumption|constructor].
   rewrite <- Zpower_Qpower; try auto with *.

@@ -46,7 +46,7 @@ Variable n : N.
 Definition Qpower_N_modulus (c:Qpos) (e:Qpos) : QposInf :=
   match n with 
   | N0 => QposInfinity
-  | Npos p => Qpos2QposInf (e/((p#1)*c^(Zpred p)))
+  | Npos p => Qpos2QposInf (e/((p#1)*c^(Z.pred p)))
   end.
 
 Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}(nat_of_P p)) (inj_Q IR q) I)).
@@ -61,7 +61,7 @@ Proof.
   algebra.
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ in IHm.
- change (P_of_succ_nat (S m)) with (Psucc (P_of_succ_nat m)).
+ change (P_of_succ_nat (S m)) with (Pos.succ (P_of_succ_nat m)).
  simpl in *.
  rewrite Pplus_one_succ_r.
  stepl (inj_Q IR (Qpower_positive q (P_of_succ_nat m))[*](inj_Q IR q)).
@@ -90,10 +90,10 @@ Proof.
   ring_simplify.
   change (0 < ((2#1)*c)%Qpos).
   apply Qpos_prf.
- apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Zpred p))%Qpos)).
+ apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Z.pred p))%Qpos)).
    reflexivity.
   intros x.
-  generalize ((p # 1) * c ^ Zpred p)%Qpos.
+  generalize ((p # 1) * c ^ Z.pred p)%Qpos.
   apply Qpos_positive_numerator_rect.
   intros qn qd.
   simpl.
@@ -112,8 +112,8 @@ Proof.
  simpl.
  intros x _ Hx.
  change (AbsIR ((nring (R:=IR) (S m))[*]([1][*]nexp IR m (inj_Q IR x)))[<=]
-   inj_Q IR (((p # 1)[*]((c ^ Zpred p)%Qpos:Q)))).
- stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Zpred p)%Qpos:Q)))); [| now
+   inj_Q IR (((p # 1)[*]((c ^ Z.pred p)%Qpos:Q)))).
+ stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Z.pred p)%Qpos:Q)))); [| now
    (apply eq_symmetric; apply inj_Q_mult)].
  stepl ((nring (R:=IR) (S m)[*]AbsIR ([1][*]nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult;apply nring_nonneg; auto with *].
  apply mult_resp_leEq_both.
@@ -128,7 +128,7 @@ Proof.
  stepl ([1][*](AbsIR (nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult; apply less_leEq; apply pos_one].
  stepl (AbsIR (nexp IR m (inj_Q _ x))); [| now apply eq_symmetric; apply one_mult].
  stepl (nexp IR m (AbsIR (inj_Q _ x))); [| now apply eq_symmetric; apply AbsIR_nexp].
- stepr (inj_Q IR (c ^ Zpred p)); [| now apply inj_Q_wd; reflexivity].
+ stepr (inj_Q IR (c ^ Z.pred p)); [| now apply inj_Q_wd; reflexivity].
  rewrite Hm.
  rewrite <- POS_anti_convert.
  rewrite inj_S.

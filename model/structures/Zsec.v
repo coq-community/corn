@@ -84,7 +84,7 @@ Lemma ap_Z_cotransitive0 : forall x y : Z,
 Proof.
  intros x y X z.
  unfold ap_Z in |- *.
- case (Z_eq_dec x z).
+ case (Z.eq_dec x z).
   intro e.
   right.
   rewrite <- e.
@@ -101,7 +101,7 @@ Proof.
  split.
   unfold ap_Z in |- *.
   intro H.
-  case (Z_eq_dec x y).
+  case (Z.eq_dec x y).
    intro e.
    assumption.
   contradiction.
@@ -113,7 +113,7 @@ Proof.
  apply ap_Z_symmetric0.
  red in |- *.
  apply Zorder.Zlt_not_eq.
- apply Zgt_lt.
+ apply Z.gt_lt.
  exact (Zorder.Zgt_pos_0 1).
 Qed.
 
@@ -138,7 +138,7 @@ Proof.
  intros x1 x2 y1 y2 H.
  unfold ap_Z in |- *.
  unfold ap_Z in H.
- case (Z_eq_dec x1 x2).
+ case (Z.eq_dec x1 x2).
   intro e.
   right.
   red in |- *.
@@ -158,7 +158,7 @@ Lemma Zmult_strext0 : forall x1 x2 y1 y2 : Z,
 Proof.
  unfold ap_Z in |- *.
  intros x1 x2 y1 y2 H.
- case (Z_eq_dec x1 x2).
+ case (Z.eq_dec x1 x2).
   intro e.
   right.
   red in |- *.
@@ -275,12 +275,12 @@ Proof.
  simple induction x; intros; reflexivity || inversion H.
 Qed.
 
-Lemma posZ_Zsgn : forall x : Z, x <> 0%Z -> (Zsgn x * posZ x)%Z = x.
+Lemma posZ_Zsgn : forall x : Z, x <> 0%Z -> (Z.sgn x * posZ x)%Z = x.
 Proof.
  simple induction x; intros; reflexivity.
 Qed.
 
-Lemma posZ_Zsgn2 : forall x : Z, x <> 0%Z -> (Zsgn x * x)%Z = posZ x.
+Lemma posZ_Zsgn2 : forall x : Z, x <> 0%Z -> (Z.sgn x * x)%Z = posZ x.
 Proof.
  simple induction x; intros; [ elim H | simpl in |- * | simpl in |- * ]; reflexivity.
 Qed.
@@ -299,16 +299,16 @@ Proof.
    rewrite H1 in H.
    simpl in H.
    simpl in |- *.
-   apply Zgt_lt.
+   apply Z.gt_lt.
    cut (a * 0 > a * p)%Z.
     intro.
     rewrite Zmult_0_r in H3.
     assumption.
    apply Zlt_conv_mult_l.
-    apply Zgt_lt.
+    apply Z.gt_lt.
     cut (- (0) > - - a)%Z.
      simpl in |- *.
-     rewrite Zopp_involutive.
+     rewrite Z.opp_involutive.
      trivial.
     apply Zlt_opp.
     apply Zmult_gt_0_lt_0_reg_r with (n := n).
@@ -317,11 +317,11 @@ Proof.
     cut (- (a * n) > - (0))%Z.
      simpl in |- *.
      intro.
-     apply Zgt_lt.
+     apply Z.gt_lt.
      trivial.
     apply Zlt_opp.
     assumption.
-   apply Zgt_lt.
+   apply Z.gt_lt.
    auto with zarith.
   apply Zmult_integral_l with (n := n).
    apply Zgt_not_eq.
@@ -338,10 +338,10 @@ Proof.
     intro.
     cut (b * p * (a * n) > c * n * (b * m))%Z.
      intro.
-     apply Zgt_lt.
+     apply Z.gt_lt.
      apply Zgt_mult_reg_absorb_l with (a := n).
       auto with zarith.
-     apply Zlt_gt.
+     apply Z.lt_gt.
      apply Zgt_mult_conv_absorb_l with (a := b).
       assumption.
      replace (b * (n * (a * p)))%Z with (b * p * (a * n))%Z by  ring.
@@ -349,10 +349,10 @@ Proof.
     rewrite <- H0.
     auto.
    apply Zlt_conv_mult_l;trivial.
-  apply Zgt_lt.
+  apply Z.gt_lt.
   replace 0%Z with (b * 0)%Z by  ring.
   apply Zlt_conv_mult_l; trivial.
-  apply Zgt_lt.
+  apply Z.gt_lt.
   auto with zarith.
  (* y>0 *)
  intro.
@@ -362,13 +362,13 @@ Proof.
    intro.
    cut (b * p * (a * n) < c * n * (b * m))%Z.
     intro.
-    apply Zgt_lt.
+    apply Z.gt_lt.
     apply Zgt_mult_reg_absorb_l with (a := n).
      auto with zarith.
     apply Zgt_mult_reg_absorb_l with (a := b).
-     apply Zlt_gt.
+     apply Z.lt_gt.
      assumption.
-    apply Zlt_gt.
+    apply Z.lt_gt.
     replace (b * (n * (a * p)))%Z with (b * p * (a * n))%Z by  ring.
     replace (b * (n * (c * m)))%Z with (c * n * (b * m))%Z by  ring; auto.
    rewrite <- H0.

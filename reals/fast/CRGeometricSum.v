@@ -73,7 +73,7 @@ Local Coercion Is_true : bool >-> Sortclass.
 Lemma err_prop_prop : forall e s, err_prop e s <-> err_bound s <= e.
 Proof.
  intros e s.
- unfold err_prop, err_bound, Qcompare, Qle, Zle.
+ unfold err_prop, err_bound, Qcompare, Qle, Z.le.
  destruct (Qnum (Qabs (hd s) / (1 - a))%Q * Qden e ?= Qnum e * Qden (Qabs (hd s) / (1 - a))%Q)%Z;
    split; auto with *.
 Qed.
@@ -174,7 +174,7 @@ Proof.
 Qed.
 
 Lemma InfiniteSum_raw_N_Psucc : forall p c,
- InfiniteSum_raw_N (Psucc p) c =
+ InfiniteSum_raw_N (Pos.succ p) c =
  InfiniteSum_raw_F (fun err s => InfiniteSum_raw_N p c err s).
 Proof.
  intros p.
@@ -202,13 +202,13 @@ Proof.
     destruct (err (tl s));[reflexivity|contradiction]).
  intros q s err H H0.
  destruct q using Pind.
-  elim (Psucc_discr p).
+  elim (Pos.succ_discr p).
   apply Zpos_eq_rev.
   apply Zle_antisym.
    rewrite Pplus_one_succ_r.
    rewrite Zpos_plus_distr.
    auto with *.
-  eapply Zle_trans.
+  eapply Z.le_trans.
    apply H0.
   auto with *.
  do 2 rewrite InfiniteSum_raw_N_Psucc.
@@ -222,7 +222,7 @@ Qed.
 
 Lemma InfiniteSum_raw_N_extend : forall (p:positive) s (err : Stream Q -> bool),
  (err (Str_nth_tl (nat_of_P p) s)) ->
- InfiniteSum_raw_N p (fun _ _ => 0) err s = InfiniteSum_raw_N (Psucc p) (fun _ _ => 0) err s.
+ InfiniteSum_raw_N p (fun _ _ => 0) err s = InfiniteSum_raw_N (Pos.succ p) (fun _ _ => 0) err s.
 Proof.
  intros.
  apply InfiniteSum_raw_N_extend'; auto with *.
@@ -312,7 +312,7 @@ Proof.
    stepl (/a); [| simpl; ring].
    apply Qle_refl.
   rewrite Zpos_succ_morphism.
-  unfold Zsucc.
+  unfold Z.succ.
   rewrite -> Qpower_plus;[|auto with *].
   rewrite -> Qinv_mult_distr.
   rewrite -> injz_plus.
@@ -331,7 +331,7 @@ Qed.
 Definition InfiniteGeometricSum_maxIter series (err:Qpos) : positive :=
 let x := (1-a) in
 let (n,d) := (Qabs (hd series))/(err*x*x) in
-match Zsucc (Zdiv n d) with
+match Z.succ (Z.div n d) with
 | Zpos p => p
 | _ => 1%positive
 end.
@@ -347,8 +347,8 @@ Proof.
   generalize (Qabs (hd (tl series)) / (err * (1 - a) * (1 - a)))
     (Qabs (hd series) / (err * (1 - a) * (1 - a))).
   intros [na da] [nb db] H.
-  cut (Zsucc (na/da) <= Zsucc (nb/db))%Z.
-   generalize (Zsucc (na / da)) (Zsucc (nb/db)).
+  cut (Z.succ (na/da) <= Z.succ (nb/db))%Z.
+   generalize (Z.succ (na / da)) (Z.succ (nb/db)).
    intros [|x|x] [|y|y] Hxy; try solve [apply Hxy | apply Qle_refl | elim Hxy; constructor
      | unfold Qle; simpl; repeat rewrite Pmult_1_r; auto with *].
   apply Zsucc_le_compat.
@@ -398,17 +398,17 @@ Proof.
    cut (0 < (Qabs (hd series) / (err * (1 - a) * (1 - a)))).
     generalize (Qabs (hd series) / (err * (1 - a) * (1 - a))).
     intros [n d] Hnd.
-    apply Qle_trans with (Zsucc (n/d)).
+    apply Qle_trans with (Z.succ (n/d)).
      unfold Qle.
      simpl.
-     unfold Zsucc.
+     unfold Z.succ.
      apply Zle_0_minus_le.
      replace RHS with (d*(n/d) + n mod d - n mod d - n + d)%Z by ring.
      rewrite <- Z_div_mod_eq; auto with *.
      replace RHS with (d - n mod d)%Z by ring.
      apply Zle_minus_le_0.
      destruct (Z_mod_lt n d); auto with *.
-    generalize (Zsucc (n/d)).
+    generalize (Z.succ (n/d)).
     intros [|z|z].
       discriminate.
      apply Qle_refl.
@@ -434,7 +434,7 @@ Proof.
   assumption.
  rewrite nat_of_P_succ_morphism.
  rewrite Zpos_succ_morphism.
- unfold Zsucc.
+ unfold Z.succ.
  rewrite -> Qpower_plus';[|discriminate].
  stepr ((Qabs (hd series) * a ^ p)*a); [| simpl; ring].
  apply Qle_trans with (Qabs (hd (Str_nth_tl (nat_of_P p) series))*a).

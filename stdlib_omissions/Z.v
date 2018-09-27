@@ -98,7 +98,7 @@ intro A; destruct z as [| p | p]; trivial.
 unfold Z.le in A; now contradict A.
 Qed.
 
-Lemma Ple_Zle (p q: positive): Ple p q <-> (Zpos p <= Zpos q).
+Lemma Ple_Zle (p q: positive): Pos.le p q <-> (Zpos p <= Zpos q).
 Proof.
  rewrite Ple_le, inj_le_iff.
  do 2 rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.

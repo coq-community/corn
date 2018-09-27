@@ -251,24 +251,24 @@ Proof.
  auto with zarith.
 Qed.
 
-Definition Zlt_irref : forall a : Z, ~ (a < a)%Z := Zlt_irrefl.
+Definition Zlt_irref : forall a : Z, ~ (a < a)%Z := Z.lt_irrefl.
 
 Lemma Zgt_irref : forall a : Z, ~ (a > a)%Z.
 Proof.
  intro a.
  intro Hlt.
- generalize (Zgt_lt a a Hlt).
+ generalize (Z.gt_lt a a Hlt).
  apply Zlt_irref.
 Qed.
 
 Lemma Zlt_NEG_0 : forall p : positive, (Zneg p < 0)%Z.
 Proof.
- intro p; unfold Zlt in |- *; simpl in |- *; reflexivity.
+ intro p; unfold Z.lt in |- *; simpl in |- *; reflexivity.
 Qed.
 
 Lemma Zgt_0_NEG : forall p : positive, (0 > Zneg p)%Z.
 Proof.
- intro p; unfold Zgt in |- *; simpl in |- *; reflexivity.
+ intro p; unfold Z.gt in |- *; simpl in |- *; reflexivity.
 Qed.
 
 Lemma Zle_NEG_0 : forall p : positive, (Zneg p <= 0)%Z.
@@ -295,12 +295,12 @@ Qed.
 
 Lemma Zlt_0_POS : forall p : positive, (0 < Zpos p)%Z.
 Proof.
- intro p; unfold Zlt in |- *; simpl in |- *; reflexivity.
+ intro p; unfold Z.lt in |- *; simpl in |- *; reflexivity.
 Qed.
 
 Lemma Zgt_POS_0 : forall p : positive, (Zpos p > 0)%Z.
 Proof.
- intro p; unfold Zgt in |- *; simpl in |- *; reflexivity.
+ intro p; unfold Z.gt in |- *; simpl in |- *; reflexivity.
 Qed.
 
 Lemma Zle_0_POS : forall p : positive, (0 <= Zpos p)%Z.
@@ -327,7 +327,7 @@ Qed.
 
 Lemma Zle_neg_pos : forall p q : positive, (Zneg p <= Zpos q)%Z.
 Proof.
- intros; unfold Zle in |- *; simpl in |- *; discriminate.
+ intros; unfold Z.le in |- *; simpl in |- *; discriminate.
 Qed.
 
 Lemma ZPOS_neq_ZERO : forall p : positive, Zpos p <> 0%Z.
@@ -445,7 +445,7 @@ Qed.
 Lemma Zdiv_pos_pos : forall a b : Z, (a * b > 0)%Z -> (a > 0)%Z -> (b > 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt in |- *;
      simpl in |- *; intros; try discriminate; auto.
 Qed.
 
@@ -453,14 +453,14 @@ Lemma Zdiv_pos_nonneg :
  forall a b : Z, (a * b > 0)%Z -> (a >= 0)%Z -> (b > 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt, Zle, Zge in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt, Z.le, Z.ge in |- *;
      simpl in |- *; intros H0 H1; (try discriminate; auto); ( try elim H1; auto).
 Qed.
 
 Lemma Zdiv_pos_neg : forall a b : Z, (a * b > 0)%Z -> (a < 0)%Z -> (b < 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt in |- *;
      simpl in |- *; intros; try discriminate; auto.
 Qed.
 
@@ -468,14 +468,14 @@ Lemma Zdiv_pos_nonpos :
  forall a b : Z, (a * b > 0)%Z -> (a <= 0)%Z -> (b < 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt, Zle, Zge in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt, Z.le, Z.ge in |- *;
      simpl in |- *; intros H0 H1; (try discriminate; auto); ( try elim H1; auto).
 Qed.
 
 Lemma Zdiv_neg_pos : forall a b : Z, (a * b < 0)%Z -> (a > 0)%Z -> (b < 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt in |- *;
      simpl in |- *; intros; try discriminate; auto.
 Qed.
 
@@ -483,14 +483,14 @@ Lemma Zdiv_neg_nonneg :
  forall a b : Z, (a * b < 0)%Z -> (a >= 0)%Z -> (b < 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt, Zle, Zge in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt, Z.le, Z.ge in |- *;
      simpl in |- *; intros H0 H1; (try discriminate; auto); ( try elim H1; auto).
 Qed.
 
 Lemma Zdiv_neg_neg : forall a b : Z, (a * b < 0)%Z -> (a < 0)%Z -> (b > 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt in |- *;
      simpl in |- *; intros; try discriminate; auto.
 Qed.
 
@@ -498,7 +498,7 @@ Lemma Zdiv_neg_nonpos :
  forall a b : Z, (a * b < 0)%Z -> (a <= 0)%Z -> (b > 0)%Z.
 Proof.
  intros a b; induction  a as [| p| p]; [ induction  b as [| p| p] | induction  b as [| p0| p0]
-   | induction  b as [| p0| p0] ]; unfold Zlt, Zgt, Zle, Zge in |- *;
+   | induction  b as [| p0| p0] ]; unfold Z.lt, Z.gt, Z.le, Z.ge in |- *;
      simpl in |- *; intros H0 H1; (try discriminate; auto); ( try elim H1; auto).
 Qed.
 
@@ -525,11 +525,11 @@ Opaque Zplus.
 End zineq.
 
 
-Hint Resolve Zlt_gt: zarith.
-Hint Resolve Zgt_lt: zarith.
-Hint Resolve Zle_ge: zarith.
-Hint Resolve Zge_le: zarith.
-Hint Resolve Zlt_irrefl: zarith.
+Hint Resolve Z.lt_gt: zarith.
+Hint Resolve Z.gt_lt: zarith.
+Hint Resolve Z.le_ge: zarith.
+Hint Resolve Z.ge_le: zarith.
+Hint Resolve Z.lt_irrefl: zarith.
 
 Hint Resolve Zle_antisymm: zarith.
 Hint Resolve Zlt_irref: zarith.
@@ -577,24 +577,24 @@ Hint Resolve Zdiv_neg_nonneg: zarith.
 Section zabs.
 
 
-Lemma Zabs_idemp : forall a : Z, Zabs (Zabs a) = Zabs a.
+Lemma Zabs_idemp : forall a : Z, Z.abs (Z.abs a) = Z.abs a.
 Proof.
  intro a; case a; auto.
 Qed.
 
-Lemma Zabs_nonneg : forall (a : Z) (p : positive), Zabs a <> Zneg p.
+Lemma Zabs_nonneg : forall (a : Z) (p : positive), Z.abs a <> Zneg p.
 Proof.
  intros; case a; intros; discriminate.
 Qed.
 
-Lemma Zabs_geq_zero : forall a : Z, (0 <= Zabs a)%Z.
+Lemma Zabs_geq_zero : forall a : Z, (0 <= Z.abs a)%Z.
 Proof.
  intro a.
- case a; unfold Zabs in |- *; auto with zarith.
+ case a; unfold Z.abs in |- *; auto with zarith.
 Qed.
 
 
-Lemma Zabs_elim_nonneg : forall a : Z, (0 <= a)%Z -> Zabs a = a.
+Lemma Zabs_elim_nonneg : forall a : Z, (0 <= a)%Z -> Z.abs a = a.
 Proof.
  intro a.
  case a; auto.
@@ -602,7 +602,7 @@ Proof.
  apply Zgt_0_NEG.
 Qed.
 
-Lemma Zabs_zero : forall a : Z, Zabs a = 0%Z -> a = 0%Z.
+Lemma Zabs_zero : forall a : Z, Z.abs a = 0%Z -> a = 0%Z.
 Proof.
  intro a.
  case a.
@@ -611,63 +611,63 @@ Proof.
  intros; discriminate.
 Qed.
 
-Lemma Zabs_Zopp : forall a : Z, Zabs (- a) = Zabs a.
+Lemma Zabs_Zopp : forall a : Z, Z.abs (- a) = Z.abs a.
 Proof.
  intro a.
  case a; auto with zarith.
 Qed.
 
-Lemma Zabs_geq : forall a : Z, (a <= Zabs a)%Z.
+Lemma Zabs_geq : forall a : Z, (a <= Z.abs a)%Z.
 Proof.
  intro a.
- unfold Zabs in |- *.
+ unfold Z.abs in |- *.
  case a; auto with zarith.
  Qed.
- Lemma Zabs_Zopp_geq : forall a : Z, (- a <= Zabs a)%Z.
+ Lemma Zabs_Zopp_geq : forall a : Z, (- a <= Z.abs a)%Z.
  intro a.
  rewrite <- Zabs_Zopp.
  apply Zabs_geq.
  Qed.
- Lemma Zabs_Zminus_symm : forall a b : Z, Zabs (a - b) = Zabs (b - a).
+ Lemma Zabs_Zminus_symm : forall a b : Z, Z.abs (a - b) = Z.abs (b - a).
  intros a b.
  replace (a - b)%Z with (- (b - a))%Z; auto with zarith.
  apply Zabs_Zopp.
 Qed.
 
-Lemma Zabs_lt_pos : forall a b : Z, (Zabs a < b)%Z -> (0 < b)%Z.
+Lemma Zabs_lt_pos : forall a b : Z, (Z.abs a < b)%Z -> (0 < b)%Z.
 Proof.
  intros a b Hab.
- unfold Zlt in |- *.
+ unfold Z.lt in |- *.
  elim (Zcompare_Gt_Lt_antisym b 0).
  intros H1 H2.
  apply H1.
  fold (b > 0)%Z in |- *.
- apply (Zgt_le_trans b (Zabs a) 0); auto with zarith.
+ apply (Zgt_le_trans b (Z.abs a) 0); auto with zarith.
 Qed.
 
-Lemma Zabs_le_pos : forall a b : Z, (Zabs a <= b)%Z -> (0 <= b)%Z.
+Lemma Zabs_le_pos : forall a b : Z, (Z.abs a <= b)%Z -> (0 <= b)%Z.
 Proof.
  intros a b Hab.
- apply (Zle_trans 0 (Zabs a) b).
+ apply (Z.le_trans 0 (Z.abs a) b).
   auto with zarith.
  assumption.
 Qed.
 
 Lemma Zabs_lt_elim :
- forall a b : Z, (a < b)%Z -> (- a < b)%Z -> (Zabs a < b)%Z.
+ forall a b : Z, (a < b)%Z -> (- a < b)%Z -> (Z.abs a < b)%Z.
 Proof.
  intros a b.
  case a; auto with zarith.
 Qed.
 
 Lemma Zabs_le_elim :
- forall a b : Z, (a <= b)%Z -> (- a <= b)%Z -> (Zabs a <= b)%Z.
+ forall a b : Z, (a <= b)%Z -> (- a <= b)%Z -> (Z.abs a <= b)%Z.
 Proof.
  intros a b.
  case a; auto with zarith.
 Qed.
 
-Lemma Zabs_mult_compat : forall a b : Z, (Zabs a * Zabs b)%Z = Zabs (a * b).
+Lemma Zabs_mult_compat : forall a b : Z, (Z.abs a * Z.abs b)%Z = Z.abs (a * b).
 Proof.
  intros a b.
  case a; case b; intros; auto with zarith.
@@ -679,33 +679,33 @@ Qed.
 Let case_POS :
   forall p q r : positive,
   (Zpos q + Zneg p)%Z = Zpos r ->
-  (Zabs (Zpos q + Zneg p) <= Zabs (Zpos q) + Zabs (Zneg p))%Z.
+  (Z.abs (Zpos q + Zneg p) <= Z.abs (Zpos q) + Z.abs (Zneg p))%Z.
 Proof.
  intros p q r Hr.
  rewrite Hr.
  simpl in |- *.
  rewrite <- Hr.
  fold (Zpos q + Zpos p)%Z in |- *.
- unfold Zle in |- *.
+ unfold Z.le in |- *.
  rewrite (Zcompare_plus_compat (Zneg p) (Zpos p) (Zpos q)).
  apply (ZBasics.Zle_neg_pos p).
  Defined.
  Let case_NEG : forall p q r : positive, (Zpos q + Zneg p)%Z = Zneg r ->
-   (Zabs (Zpos q + Zneg p) <= Zabs (Zpos q) + Zabs (Zneg p))%Z.
+   (Z.abs (Zpos q + Zneg p) <= Z.abs (Zpos q) + Z.abs (Zneg p))%Z.
  intros p q r Hr.
- rewrite <- (Zopp_involutive (Zpos q + Zneg p)) in Hr.
- rewrite <- (Zopp_involutive (Zneg r)) in Hr.
- generalize (Zopp_inj (- (Zpos q + Zneg p)) (- Zneg r) Hr).
- intro Hr'. rewrite Zopp_plus_distr in Hr'. unfold Zopp in Hr'.
- rewrite <- (Zabs_Zopp (Zpos q + Zneg p)). rewrite Zopp_plus_distr. unfold Zopp in |- *.
- rewrite <- (Zabs_Zopp (Zpos q)). unfold Zopp in |- *.
- rewrite <- (Zabs_Zopp (Zneg p)). unfold Zopp in |- *.
+ rewrite <- (Z.opp_involutive (Zpos q + Zneg p)) in Hr.
+ rewrite <- (Z.opp_involutive (Zneg r)) in Hr.
+ generalize (Z.opp_inj (- (Zpos q + Zneg p)) (- Zneg r) Hr).
+ intro Hr'. rewrite Zopp_plus_distr in Hr'. unfold Z.opp in Hr'.
+ rewrite <- (Zabs_Zopp (Zpos q + Zneg p)). rewrite Zopp_plus_distr. unfold Z.opp in |- *.
+ rewrite <- (Zabs_Zopp (Zpos q)). unfold Z.opp in |- *.
+ rewrite <- (Zabs_Zopp (Zneg p)). unfold Z.opp in |- *.
  rewrite (Zplus_comm (Zneg q) (Zpos p)).
- rewrite (Zplus_comm (Zabs (Zneg q)) (Zabs (Zpos p))).
+ rewrite (Zplus_comm (Z.abs (Zneg q)) (Z.abs (Zpos p))).
  rewrite Zplus_comm in Hr'.
  apply (case_POS _ _ _ Hr').
  Defined.
- Lemma Zabs_triangle : forall a b : Z, (Zabs (a + b) <= Zabs a + Zabs b)%Z.
+ Lemma Zabs_triangle : forall a b : Z, (Z.abs (a + b) <= Z.abs a + Z.abs b)%Z.
  intros a b.
  case a; case b; auto with zarith.
   intros p q.
@@ -716,7 +716,7 @@ Proof.
    intros p0 case_POS0 case_NEG0. apply (case_NEG0 p0). reflexivity.
    intros p q.
    rewrite (Zplus_comm (Zneg q) (Zpos p)).
-   rewrite (Zplus_comm (Zabs (Zneg q)) (Zabs (Zpos p))).
+   rewrite (Zplus_comm (Z.abs (Zneg q)) (Z.abs (Zpos p))).
    generalize (case_POS q p) (case_NEG q p).
    case (Zpos p + Zneg q)%Z.
      auto with zarith.
@@ -724,15 +724,15 @@ Proof.
      intros p0 case_POS0 case_NEG0. apply (case_NEG0 p0). reflexivity.
      Qed.
      (* triangle inequality with Zminus *)
-     Lemma Zabs_Zminus_triangle : forall a b : Z, (Zabs (Zabs a - Zabs b) <= Zabs (a - b))%Z.
- assert (case : forall a b : Z, (Zabs a - Zabs b <= Zabs (a - b))%Z).
+     Lemma Zabs_Zminus_triangle : forall a b : Z, (Z.abs (Z.abs a - Z.abs b) <= Z.abs (a - b))%Z.
+ assert (case : forall a b : Z, (Z.abs a - Z.abs b <= Z.abs (a - b))%Z).
   intros a b.
-  unfold Zle in |- *.
+  unfold Z.le in |- *.
   unfold Zminus in |- *.
-  rewrite <- (Zcompare_plus_compat (Zabs a + - Zabs b) (Zabs (a + - b)) (Zabs b)) .
-  rewrite (Zplus_comm (Zabs a) (- Zabs b)).
+  rewrite <- (Zcompare_plus_compat (Z.abs a + - Z.abs b) (Z.abs (a + - b)) (Z.abs b)) .
+  rewrite (Zplus_comm (Z.abs a) (- Z.abs b)).
   rewrite Zplus_assoc.
-  rewrite (Zplus_comm (Zabs b) (- Zabs b)).
+  rewrite (Zplus_comm (Z.abs b) (- Z.abs b)).
   rewrite Zplus_opp_l.
   rewrite Zplus_0_l.
   assert (l : forall a b : Z, a = (b + (a - b))%Z).
@@ -745,7 +745,7 @@ Proof.
  intros a b.
  apply Zabs_le_elim.
   apply case.
- replace (- (Zabs a - Zabs b))%Z with (Zabs b - Zabs a)%Z; auto with zarith.
+ replace (- (Z.abs a - Z.abs b))%Z with (Z.abs b - Z.abs a)%Z; auto with zarith.
  rewrite Zabs_Zminus_symm.
  apply case.
 Qed.
@@ -779,31 +779,31 @@ Hint Resolve Zabs_Zminus_triangle: zarith.
 
 Section zsign.
 
-Lemma Zsgn_mult_compat : forall a b : Z, (Zsgn a * Zsgn b)%Z = Zsgn (a * b).
+Lemma Zsgn_mult_compat : forall a b : Z, (Z.sgn a * Z.sgn b)%Z = Z.sgn (a * b).
 Proof.
  intros a b.
  case a; case b; intros; auto with zarith.
 Qed.
 
-Lemma Zmult_sgn_abs : forall a : Z, (Zsgn a * Zabs a)%Z = a.
+Lemma Zmult_sgn_abs : forall a : Z, (Z.sgn a * Z.abs a)%Z = a.
 Proof.
  intro a.
  case a; intros; auto with zarith.
 Qed.
 
-Lemma Zmult_sgn_eq_abs : forall a : Z, Zabs a = (Zsgn a * a)%Z.
+Lemma Zmult_sgn_eq_abs : forall a : Z, Z.abs a = (Z.sgn a * a)%Z.
 Proof.
  intro a.
  case a; intros; auto with zarith.
 Qed.
 
-Lemma Zsgn_plus_l : forall a b : Z, Zsgn a = Zsgn b -> Zsgn (a + b) = Zsgn a.
+Lemma Zsgn_plus_l : forall a b : Z, Z.sgn a = Z.sgn b -> Z.sgn (a + b) = Z.sgn a.
 Proof.
  intros a b.
  case a; case b; simpl in |- *; auto; intros; try discriminate.
 Qed.
 
-Lemma Zsgn_plus_r : forall a b : Z, Zsgn a = Zsgn b -> Zsgn (a + b) = Zsgn b.
+Lemma Zsgn_plus_r : forall a b : Z, Z.sgn a = Z.sgn b -> Z.sgn (a + b) = Z.sgn b.
 Proof.
  intros.
  rewrite Zplus_comm.
@@ -811,25 +811,25 @@ Proof.
  auto.
 Qed.
 
-Lemma Zsgn_opp : forall z : Z, Zsgn (- z) = (- Zsgn z)%Z.
+Lemma Zsgn_opp : forall z : Z, Z.sgn (- z) = (- Z.sgn z)%Z.
 Proof.
  intro z.
  case z; simpl in |- *; auto.
 Qed.
 
-Lemma Zsgn_ZERO : forall z : Z, Zsgn z = 0%Z -> z = 0%Z.
+Lemma Zsgn_ZERO : forall z : Z, Z.sgn z = 0%Z -> z = 0%Z.
 Proof.
  intros z.
  case z; simpl in |- *; intros; auto; try discriminate.
 Qed.
 
-Lemma Zsgn_pos : forall z : Z, Zsgn z = 1%Z -> (z > 0)%Z.
+Lemma Zsgn_pos : forall z : Z, Z.sgn z = 1%Z -> (z > 0)%Z.
 Proof.
  intros z.
  case z; simpl in |- *; intros; auto with zarith; try discriminate.
 Qed.
 
-Lemma Zsgn_neg : forall z : Z, Zsgn z = (-1)%Z -> (z < 0)%Z.
+Lemma Zsgn_neg : forall z : Z, Z.sgn z = (-1)%Z -> (z < 0)%Z.
 Proof.
  intros z.
  case z; simpl in |- *; intros; auto with zarith; try discriminate.

@@ -268,7 +268,7 @@ The stream of postive numbers (as positive).
 We do not use [positives] because [positive] does not form a semiring.
 *)
 CoFixpoint ppositives_help (n:positive) : Stream positive :=
-Cons n (ppositives_help (Psucc n)).
+Cons n (ppositives_help (Pos.succ n)).
 
 Definition ppositives := ppositives_help 1.
 
@@ -372,9 +372,9 @@ Instance Qrecip_positives_zl : Limit Qrecip_positives 0.
  abstract ( apply Qrecip_positives_help_nbz; induction d using Pind;[simpl;auto with *|];
    autorewrite with UnLazyNat in *; rewrite nat_of_P_succ_morphism; assert (H:=lt_O_nat_of_P d);
      destruct (nat_of_P d);[elimtype False;auto with *|]; simpl in *;
-       replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Psucc (Pplus_LazyNat 1 (LazifyNat n0)));[
+       replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Pos.succ (Pplus_LazyNat 1 (LazifyNat n0)));[
          repeat rewrite Zpos_succ_morphism; auto with * |]; clear -n0;
-           change 2%positive with (Psucc 1); generalize 1%positive;
+           change 2%positive with (Pos.succ 1); generalize 1%positive;
              induction n0;intros p;[reflexivity|]; simpl in *; rewrite IHn0; reflexivity ).
 Defined.
 
@@ -390,7 +390,7 @@ Proof.
   simpl.
   split.
    discriminate.
-  change (p <= Psucc p)%Z.
+  change (p <= Pos.succ p)%Z.
   repeat rewrite Zpos_succ_morphism.
   auto with *.
  simpl.
@@ -404,7 +404,7 @@ The stream of factorials as positives.
 Again, we do not use [factorials] because [positive] does not form a semiring.
 *)
 CoFixpoint pfactorials_help (n c:positive) : Stream positive :=
-Cons c (pfactorials_help (Psucc n) (n*c)).
+Cons c (pfactorials_help (Pos.succ n) (n*c)).
 
 Definition pfactorials := pfactorials_help 1 1.
 
@@ -429,7 +429,7 @@ Proof.
  intros a b.
  unfold Str_nth in *.
  simpl.
- assert (X:=IHn (b*a)%positive (Psucc b)).
+ assert (X:=IHn (b*a)%positive (Pos.succ b)).
  clear IHn.
  rewrite nat_of_P_succ_morphism in X.
  rewrite <- plus_n_Sm.

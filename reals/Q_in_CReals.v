@@ -285,7 +285,7 @@ Proof.
      apply False_rect.
      generalize H.
      change (~ (0 < 0)%Z) in |- *.
-     apply Zlt_irrefl.
+     apply Z.lt_irrefl.
     intros.
     simpl in |- *.
     astepl (nring (R:=R1) 0).
@@ -799,7 +799,7 @@ Proof.
  induction n.
   apply inj_Q_One.
  rewrite inj_S.
- unfold Zsucc.
+ unfold Z.succ.
  stepr (inj_Q (q^n*q)%Q).
   apply inj_Q_wd.
   simpl.

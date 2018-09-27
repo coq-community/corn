@@ -228,7 +228,7 @@ Proof.
    induction (fact (S n')).
     simpl; reflexivity.
    rewrite inj_S.
-   unfold Zsucc.
+   unfold Z.succ.
    simpl in *.
    rewrite -> IHn0.
    rewrite -> injz_plus.

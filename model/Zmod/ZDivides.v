@@ -260,7 +260,7 @@ Lemma Zdivides_opp_intro_lft :
  forall a b : Z, Zdivides (- a) b -> Zdivides a b.
 Proof.
  intros a b H.
- rewrite <- (Zopp_involutive a).
+ rewrite <- (Z.opp_involutive a).
  apply (Zdivides_opp_elim_lft _ _ H).
 Qed.
 
@@ -268,7 +268,7 @@ Lemma Zdivides_opp_intro_rht :
  forall a b : Z, Zdivides a (- b) -> Zdivides a b.
 Proof.
  intros a b H.
- rewrite <- (Zopp_involutive b).
+ rewrite <- (Z.opp_involutive b).
  apply (Zdivides_opp_elim_rht _ _ H).
 Qed.
 
@@ -346,7 +346,7 @@ Lemma Zdivides_mult_rr :
 Qed.
 
 Lemma Zdivides_abs_elim_lft :
- forall a b : Z, Zdivides a b -> Zdivides (Zabs a) b.
+ forall a b : Z, Zdivides a b -> Zdivides (Z.abs a) b.
 Proof.
  intros a b.
  case a; simpl in |- *; auto.
@@ -356,7 +356,7 @@ Proof.
 Qed.
 
 Lemma Zdivides_abs_elim_rht :
- forall a b : Z, Zdivides a b -> Zdivides a (Zabs b).
+ forall a b : Z, Zdivides a b -> Zdivides a (Z.abs b).
 Proof.
  intros a b.
  case b; simpl in |- *; auto.
@@ -366,7 +366,7 @@ Proof.
 Qed.
 
 Lemma Zdivides_abs_elim :
- forall a b : Z, Zdivides a b -> Zdivides (Zabs a) (Zabs b).
+ forall a b : Z, Zdivides a b -> Zdivides (Z.abs a) (Z.abs b).
 Proof.
  intros.
  apply Zdivides_abs_elim_lft.
@@ -375,7 +375,7 @@ Proof.
 Qed.
 
 Lemma Zdivides_abs_intro_lft :
- forall a b : Z, Zdivides (Zabs a) b -> Zdivides a b.
+ forall a b : Z, Zdivides (Z.abs a) b -> Zdivides a b.
 Proof.
  intros a b.
  case a; simpl in |- *; auto.
@@ -383,7 +383,7 @@ Proof.
 Qed.
 
 Lemma Zdivides_abs_intro_rht :
- forall a b : Z, Zdivides a (Zabs b) -> Zdivides a b.
+ forall a b : Z, Zdivides a (Z.abs b) -> Zdivides a b.
 Proof.
  intros a b.
  case b; simpl in |- *; auto.
@@ -391,7 +391,7 @@ Proof.
 Qed.
 
 Lemma Zdivides_abs_intro :
- forall a b : Z, Zdivides (Zabs a) (Zabs b) -> Zdivides a b.
+ forall a b : Z, Zdivides (Z.abs a) (Z.abs b) -> Zdivides a b.
 Proof.
  intros.
  apply Zdivides_abs_intro_lft.
@@ -415,7 +415,7 @@ Proof.
 Qed.
 
 Lemma Zdivisor_small :
- forall a b : Z, Zdivides b a -> (Zabs a < b)%Z -> a = 0%Z.
+ forall a b : Z, Zdivides b a -> (Z.abs a < b)%Z -> a = 0%Z.
 Proof.
  intros a b Hdiv Hlt.
  generalize (Zdivides_abs_elim_rht _ _ Hdiv); intro Hdivabs.
@@ -424,23 +424,23 @@ Proof.
    auto.
   intros p Hp.
   assert (Hfalse : (b < b)%Z).
-   apply (Zle_lt_trans b (Zabs a) b).
-    apply Zge_le.
-    apply (Zdivisor_pos_le (Zabs a) b).
+   apply (Z.le_lt_trans b (Z.abs a) b).
+    apply Z.ge_le.
+    apply (Zdivisor_pos_le (Z.abs a) b).
      rewrite <- Hp; simpl in |- *; auto with zarith.
     assumption.
    assumption.
-  elim (Zlt_irrefl b Hfalse).
+  elim (Z.lt_irrefl b Hfalse).
  intros p Hp.
  assert (Hfalse : (b < b)%Z).
-  apply (Zle_lt_trans b (Zabs a) b).
-   apply Zge_le.
-   apply (Zdivisor_pos_le (Zabs a) b).
+  apply (Z.le_lt_trans b (Z.abs a) b).
+   apply Z.ge_le.
+   apply (Zdivisor_pos_le (Z.abs a) b).
     rewrite <- Hp; simpl in |- *.
     auto with zarith.
    assumption.
   assumption.
- elim (Zlt_irrefl b Hfalse).
+ elim (Z.lt_irrefl b Hfalse).
 Qed.
 
 Lemma Zmodeq_small :
@@ -484,7 +484,7 @@ Proof.
  rewrite Hq1 in Hq2.
  assert (Hb0 : b <> 0%Z).
   assert (Hbpos : (0 < b)%Z).
-   apply (Zle_lt_trans 0 r1 b).
+   apply (Z.le_lt_trans 0 r1 b).
     tauto.
    tauto.
   auto with zarith.
@@ -497,10 +497,10 @@ Lemma Zmod0_Zopp :
  forall a b : Z, b <> 0%Z -> (a mod b)%Z = 0%Z -> (a mod - b)%Z = 0%Z.
 Proof.
  intros a b.
- generalize (Z_mod_lt (Zabs a) (Zabs b)).
+ generalize (Z_mod_lt (Z.abs a) (Z.abs b)).
  case a.
-   case b; unfold Zabs, Zopp, Zmod, Zdiv_eucl in |- *; auto with zarith.
-  case b; unfold Zabs, Zopp, Zmod, Zdiv_eucl in |- *.
+   case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *; auto with zarith.
+  case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *.
     auto with zarith.
    intros p q.
    elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
@@ -515,7 +515,7 @@ Proof.
    auto with zarith.
   intro r'; intros H0 H1 H2.
   elim H0; auto with zarith.
- case b; unfold Zabs, Zopp, Zmod, Zdiv_eucl in |- *.
+ case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *.
    auto with zarith.
   intros p q.
   elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
@@ -529,21 +529,21 @@ Lemma Zdiv_Zopp :
  forall a b : Z, (a mod b)%Z = 0%Z -> (a / - b)%Z = (- (a / b))%Z.
 Proof.
  intros a b.
- unfold Zmod, Zdiv, Zdiv_eucl in |- *.
+ unfold Zmod, Z.div, Z.div_eucl in |- *.
  case a.
    auto.
   intro A.
-  case b; unfold Zopp in |- *.
+  case b; unfold Z.opp in |- *.
     auto.
    intro B.
    elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
    intro Hr; rewrite Hr; auto.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
-  unfold Zmod, Zdiv_eucl in |- *.
+  unfold Zmod, Z.div_eucl in |- *.
   elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
   case r.
-    intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Zopp_involutive; auto.
+    intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
    intros R Hlt HR.
    assert (H : Zpos R = Zpos B).
     rewrite <- (Zplus_0_r (Zpos B)); rewrite <- HR; rewrite Zplus_assoc; fold (- Zpos B)%Z in |- *.
@@ -553,14 +553,14 @@ Proof.
   intros R Hlt HR.
   elim Hlt; auto with zarith; intro Hfalse; elim Hfalse; auto with zarith.
  intro A.
- case b; unfold Zopp in |- *.
+ case b; unfold Z.opp in |- *.
    auto.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
-  unfold Zmod, Zdiv_eucl in |- *.
+  unfold Zmod, Z.div_eucl in |- *.
   elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
   case r.
-    intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Zopp_involutive; auto.
+    intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
    intros R Hlt HR.
    assert (H : Zpos R = Zpos B).
     rewrite <- (Zplus_0_r (Zpos R)); rewrite <- HR; unfold Zminus in |- *;
@@ -571,7 +571,7 @@ Proof.
   elim Hlt; auto with zarith; intro Hfalse; elim Hfalse; auto with zarith.
  intro B.
  generalize (Z_mod_lt (Zpos A) (Zpos B)).
- unfold Zmod, Zdiv_eucl in |- *.
+ unfold Zmod, Z.div_eucl in |- *.
  elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
  case r.
    intros _ HR; fold (- q)%Z in |- *; auto.
@@ -621,7 +621,7 @@ Proof.
   intro; discriminate.
  apply H.
   auto with zarith.
- rewrite <- (Zopp_involutive (Zpos p)).
+ rewrite <- (Z.opp_involutive (Zpos p)).
  apply Zdivides_opp_elim_lft.
  assumption.
 Qed.
@@ -640,7 +640,7 @@ Proof.
  apply Zdivides_opp_elim_lft.
  apply H.
   auto with zarith.
- rewrite <- (Zopp_involutive (Zpos p)).
+ rewrite <- (Z.opp_involutive (Zpos p)).
  apply Zmod0_Zopp.
   simpl in |- *; intros; discriminate.
  assumption.
@@ -687,7 +687,7 @@ Proof.
  fold (- Zpos p)%Z in |- *.
  rewrite Zdiv_Zopp.
   cut ((- Zpos p * b / Zpos p)%Z = (- b)%Z); auto with zarith.
-  unfold Zopp in |- *; fold (- b)%Z in |- *.
+  unfold Z.opp in |- *; fold (- b)%Z in |- *.
   apply (Zdiv_quotient_unique (Zneg p * b) (Zpos p) (Zneg p * b / Zpos p)
     ((Zneg p * b) mod Zpos p) (- b) 0).
      rewrite (Zmult_comm (Zneg p * b / Zpos p) (Zpos p)).
@@ -731,7 +731,7 @@ Proof.
  intro Hxy; rewrite Hxy; auto.
 Qed.
 
-Lemma Zabs_div_lft : forall a : Z, (Zabs a / a)%Z = Zsgn a.
+Lemma Zabs_div_lft : forall a : Z, (Z.abs a / a)%Z = Z.sgn a.
 Proof.
  intro a.
  rewrite Zmult_sgn_eq_abs.
@@ -740,12 +740,12 @@ Proof.
   apply Zdiv_mult_cancel_rht.
 Qed.
 
-Lemma Zabs_div_rht : forall a : Z, (a / Zabs a)%Z = Zsgn a.
+Lemma Zabs_div_rht : forall a : Z, (a / Z.abs a)%Z = Z.sgn a.
 Proof.
  intro a.
- set (A := Zabs a).
- set (sa := Zsgn a).
- replace a with (Zabs a * Zsgn a)%Z.
+ set (A := Z.abs a).
+ set (sa := Z.sgn a).
+ replace a with (Z.abs a * Z.sgn a)%Z.
   unfold sa in |- *; clear sa.
   case (Zdec A).
    unfold A in |- *; intro HA.
@@ -766,7 +766,7 @@ Proof.
  fold (- Zpos A)%Z in |- *.
  rewrite Zdiv_Zopp.
   simpl in |- *.
-  replace (Zpos A) with (Zabs (Zneg A)); auto.
+  replace (Zpos A) with (Z.abs (Zneg A)); auto.
   rewrite Zabs_div_rht.
   auto.
  replace (- Zpos A)%Z with (-1 * Zpos A)%Z; auto with zarith.

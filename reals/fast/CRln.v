@@ -122,12 +122,12 @@ Proof.
   apply (Zlt_not_le _ _ Ha).
   ring_simplify in H.
   ring_simplify.
-  apply Zle_trans with (-(d*1))%Z; auto with *.
+  apply Z.le_trans with (-(d*1))%Z; auto with *.
   apply Zle_left_rev.
   replace RHS with (-(n + (d*1)))%Z by ring.
   simpl.
   rewrite H.
-  apply Zle_refl.
+  apply Z.le_refl.
  clear - Y.
  assert (X:inj_Q IR (a + 1)[#][0]).
   stepl (inj_Q IR a [+]inj_Q IR (nring 1)); [| now apply eq_symmetric; apply inj_Q_plus].
@@ -230,7 +230,7 @@ Definition ln_scale_power_factor q (Hq:0 < q) : Z.
 Proof.
  revert q Hq.
  intros [[|n|n] d] Hq; try abstract discriminate Hq.
- exact (Zpred (log_inf d - (log_sup n)))%Z.
+ exact (Z.pred (log_inf d - (log_sup n)))%Z.
 Defined.
 
 Definition rational_ln (a:Q) (p: 0 < a) : CR :=

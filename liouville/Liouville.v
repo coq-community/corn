@@ -236,7 +236,7 @@ Proof.
  unfold inject_Z.
  rewrite <- inj_Q_One.
  apply inj_Q_leEq.
- unfold Zabs.
+ unfold Z.abs.
  destruct p.
    destruct Hap; reflexivity.
   simpl; unfold Qle; simpl; intuition.
@@ -248,10 +248,10 @@ Lemma Liouville_lemma5 : forall (p : Z_as_CRing) (q : positive), (zx2qx P) ! (p#
 Proof.
  intros p q Hap.
  set (n := ZX_deg P).
- assert (Zpos q=Zabs q); [reflexivity|].
+ assert (Zpos q=Z.abs q); [reflexivity|].
  rewrite H; clear H.
  rewrite <- nexp_ring_hom.
- assert (((Zabs q):Q_as_CRing)[^]n [=] Zabs ((q:Z_as_CRing)[^]n)).
+ assert (((Z.abs q):Q_as_CRing)[^]n [=] Z.abs ((q:Z_as_CRing)[^]n)).
   generalize n; clear; induction n; [reflexivity|].
   rewrite <- nexp_Sn.
   rewrite <- nexp_Sn.
@@ -346,7 +346,7 @@ Proof.
  rewrite <- (rh_pres_unit _ _ inj_Q_rh).
  apply inj_Q_leEq.
  simpl; unfold Qle; simpl; rewrite Pmult_1_r.
- unfold Zle; simpl.
+ unfold Z.le; simpl.
  case q; intros; discriminate.
 Qed.
 

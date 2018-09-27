@@ -43,8 +43,8 @@ Set Automatic Introduction.
 
 Record ZF (n:Z):Set:=
 {ZF_crr:> Z ;
-ZF_prf0: (Zlt  ZF_crr n);
-ZF_prf1: (Zle 0 ZF_crr)
+ZF_prf0: (Z.lt  ZF_crr n);
+ZF_prf1: (Z.le 0 ZF_crr)
 }.
 
 Definition ZFeq (n : Z) : ZF n -> ZF n -> Prop.
@@ -98,7 +98,7 @@ Proof.
  intros x0 H0 H0' x1 H1 H1' H2 z.
  case z.
  intros x2 H H'.
- set (H5 := Z_eq_dec x2 x1) in *.
+ set (H5 := Z.eq_dec x2 x1) in *.
  elim H5.
   clear H5.
   intro H5.
