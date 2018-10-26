@@ -381,7 +381,7 @@ UniformlyContinuous], in order for uc_func f to be considered a morphism,
 we need to declare uc_proof an instance. *)
 Global Existing Instance uc_proof.
 
-Global Instance uc_proper {_ : ExtMetricSpaceClass X} {_ : ExtMetricSpaceClass Y}
+Global Instance uc_proper {H1 : ExtMetricSpaceClass X} {H2 : ExtMetricSpaceClass Y}
   `{IsUniformlyContinuous f mu} :  Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
