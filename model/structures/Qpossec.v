@@ -182,7 +182,7 @@ Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 *** Equality
 *)
 Definition QposEq (a b:Qpos) := Qeq a b.
-Instance Qpos_default : @DefaultRelation Qpos QposEq | 2.
+Instance Qpos_default : @DefaultRelation Qpos QposEq | 2 := {}.
 
 Add Relation Qpos QposEq
  reflexivity proved by (fun (x:Qpos) => Qeq_refl x)
