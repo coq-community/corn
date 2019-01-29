@@ -104,7 +104,7 @@ Local Existing Instance mspc_setoid.
 
 End MetricSpaceClass.
 
-Instance: Params (@mspc_ball) 2.
+Instance: Params (@mspc_ball) 2 := {}.
 
 Hint Resolve Qlt_le_weak Qplus_lt_le_0_compat.
   (* Todo: Move. *)
@@ -1164,9 +1164,9 @@ End curried_uc.
 
 Class HasLambda `{X: Type} (x: X): Prop.
 
-Instance lambda_has_lambda `(f: A → B): HasLambda (λ x, f x).
-Instance application_has_lambda_left: ∀ `(f: A → B) (x: A), HasLambda f → HasLambda (f x).
-Instance application_has_lambda_right: ∀ `(f: A → B) (x: A), HasLambda x → HasLambda (f x).
+Instance lambda_has_lambda `(f: A → B): HasLambda (λ x, f x) := {}.
+Instance application_has_lambda_left: ∀ `(f: A → B) (x: A), HasLambda f → HasLambda (f x) := {}.
+Instance application_has_lambda_right: ∀ `(f: A → B) (x: A), HasLambda x → HasLambda (f x) := {}.
 
 
 Section lambda_uc.

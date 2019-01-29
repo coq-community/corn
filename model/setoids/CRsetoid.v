@@ -24,7 +24,7 @@ Require Export CoRN.model.metric2.CRmetric.
 Require Export CoRN.algebra.CSetoids.
 Require Import CoRN.tactics.CornTac.
 
-Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2.
+Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2 := {}.
 
 (**
 ** Example of a setoid: [CR]
