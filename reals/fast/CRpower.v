@@ -233,6 +233,7 @@ End CRpower_N.
 (** [CRpower_positive_bounded] is should be used when a known bound
 on the absolute value of x is available. *)
 Instance CRpower_N: Pow CR N := λ x n, ucFun (CRpower_N_bounded n (CR_b (1#1) x)) x.
+Arguments CRpower_N x%type n%N.
 
 Lemma CRpower_N_bounded_N_power : forall (n : N) (c:Qpos) (x:CR),
 ((AbsSmall ('c) x) ->

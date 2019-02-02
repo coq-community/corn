@@ -616,8 +616,8 @@ Proof.
    apply (inj_Q_nring IR 0).
   stepl (Three[!]nring (nat_of_P z)[//]pos_three IR).
    astepl (Three[^](nat_of_P z):IR).
-   stepl ((inj_Q IR (3:Q))[^](nat_of_P z)).
-    stepl (inj_Q IR (3^z)).
+   stepl ((inj_Q IR (3%mc:Q))[^](nat_of_P z)).
+    stepl (inj_Q IR (3%mc^z)).
      apply inj_Q_wd.
      apply eq_symmetric.
      reflexivity.

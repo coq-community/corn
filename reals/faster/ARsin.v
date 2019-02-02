@@ -87,7 +87,7 @@ Proof.
   rewrite nat_pow_2.
   rewrite rings.preserves_mult, rings.preserves_minus, ?rings.preserves_mult.
   rewrite rings.preserves_3, rings.preserves_4.
-  now rewrite <-(associativity 4 ('x) ('x : Q)).
+  now rewrite <-(associativity _ ('x) ('x : Q)).
 Qed.
 
 Program Definition AQsin_poly_uc := unary_uc (cast AQ Q_as_MetricSpace)
