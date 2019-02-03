@@ -1,0 +1,137 @@
+---
+fullname: C-CoRN
+shortname: corn
+
+description: The Coq Constructive Repository at Nijmegen.
+
+
+authors:
+- name: Evgeny Makarov
+- name: Robbert Krebbers
+- name: Eelis van der Weegen
+- name: Bas Spitters
+- name: Jelle Herold
+- name: Russell O'Connor
+- name: Cezary Kaliszyk
+- name: Dan Synek
+- name: Luís Cruz-Filipe
+- name: Milad Niqui
+- name: Iris Loeb
+- name: Herman Geuvers
+- name: Randy Pollack
+- name: Freek Wiedijk
+- name: Jan Zwanenburg
+- name: Dimitri Hendriks
+- name: Henk Barendregt
+- name: Mariusz Giero
+- name: Rik van Ginneken
+- name: Dimitri Hendriks
+- name: Sébastien Hinderer
+- name: Bart Kirkels
+- name: Pierre Letouzey
+- name: Lionel Mamane
+- name: Nickolay Shmyrev
+
+maintainers:
+- name: Bas Spitters
+  nickname: spitters
+
+opam-file-maintainer: b.a.w.spitters@gmail.com
+
+license:
+  fullname: GNU General Public License v2
+  shortname: GPL2
+
+supported_coq_versions:
+  text: Coq 8.6 or greater
+  opam: '{(>= "8.6" & < "8.10~") | (= "dev")}'
+
+tested_coq_versions:
+- version_or_url: 8.9
+- version_or_url: 8.8
+- version_or_url: 8.7
+- version_or_url: 8.6
+
+tested_coq_opam_version: dev
+
+dependencies:
+- opam:
+    name: coq-math-classes
+    version: '{(>= "8.8.1") | (= "dev")}'
+  nix: math-classes
+  description: |
+    [Math-Classes](https://github.com/coq-community/math-classes) 8.8.1 or
+    greater, which is a library of abstract interfaces for mathematical
+    structures that is heavily based on Coq's type classes.
+- opam:
+    name: coq-bignums
+  nix: bignums
+  description: "[Bignums](https://github/com/coq/bignums)"
+
+namespace: CoRN
+
+keywords:
+- name: constructive mathematics
+- name: algebra
+- name: real calculus
+- name: real numbers
+- name: Fundamental Theorem of Algebra
+
+categories:
+- name: Mathematics/Algebra
+- name: Mathematics/Real Calculus and Topology
+- name: Mathematics/Exact Real computation
+
+documentation: |
+  ### Building C-CoRN with SCons
+
+  C-CoRN supports building with [SCons](http://www.scons.org/). SCons is a modern
+  Python-based Make-replacement.
+
+  To build C-CoRN with SCons run `scons` to build the whole library, or
+  `scons some/module.vo` to just build `some/module.vo` (and its dependencies).
+
+  In addition to common Make options like `-j N` and `-k`, SCons
+  supports some useful options of its own, such as `--debug=time`, which
+  displays the time spent executing individual build commands.
+
+  `scons -c` replaces Make clean
+
+  For more information, see the [SCons documentation](http://www.scons.org/).
+
+  ### Building documentation
+
+  To build CoqDoc documentation, say `scons coqdoc`.
+
+  ## Description of the repository
+
+  CoRN includes the following parts:
+
+  - Algebraic Hierarchy
+
+    An axiomatic formalization of the most common algebraic
+    structures, including setoids, monoids, groups, rings,
+    fields, ordered fields, rings of polynomials, real and
+    complex numbers
+
+  - Model of the Real Numbers
+
+    Construction of a concrete real number structure
+    satisfying the previously defined axioms
+
+  - Fundamental Theorem of Algebra
+
+    A proof that every non-constant polynomial on the complex
+    plane has at least one root
+
+  - Real Calculus
+
+    A collection of elementary results on real analysis,
+    including continuity, differentiability, integration,
+    Taylor's theorem and the Fundamental Theorem of Calculus
+
+  - Exact Real Computation
+
+    Fast verified computation inside Coq. This includes: real numbers, functions,
+    integrals, graphs of functions, differential equations.
+---

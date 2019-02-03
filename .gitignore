@@ -33,4 +33,5 @@ plot.pgm
 coqdoc
 *.native
 *.aux
-
+*~
+result
