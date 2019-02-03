@@ -23,5 +23,7 @@ pkgs.stdenv.mkDerivation {
 
   src = if shell then null else ./.;
 
+  configurePhase = "./configure.sh";
+
   installFlags = "COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }

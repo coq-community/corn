@@ -6,7 +6,10 @@ dev-repo: "https://github.com/coq-community/corn.git"
 bug-reports: "https://github.com/coq-community/corn/issues"
 license: "GPL2"
 
-build: [make "-j%{jobs}%"]
+build: [
+  ["./configure.sh"]
+  [make "-j%{jobs}%"]
+]
 install: [make "install"]
 remove: ["rm" "-R" "%{lib}%/coq/user-contrib/CoRN"]
 depends: [
