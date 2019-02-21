@@ -79,7 +79,7 @@ Section contents.
 
   (** Definition of the Newton polynomial: *)
 
-  Fixpoint divdiff_l (a: QPoint) (xs: list QPoint): CR :=
+  Fixpoint divdiff_l (a: QPoint) (xs: list QPoint) {struct xs} : CR :=
     match xs with
     | nil => snd a
     | cons b l => (divdiff_l a l - divdiff_l b l) * ' / (fst a - fst b)
