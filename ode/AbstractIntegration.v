@@ -16,6 +16,8 @@ Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs (
 
 Require CoRN.reals.fast.CRtrans CoRN.reals.faster.ARtrans. (* This is almost all CoRN *)
 
+Import Qinf.coercions QnonNeg.coercions QnnInf.coercions.
+
 Ltac done :=
   trivial; hnf; intros; solve
    [ repeat (first [solve [trivial | apply: sym_equal; trivial]
@@ -184,7 +186,7 @@ Section integral_approximation.
     Proof with try ring.
      unfold cmΣ.
      induction n; simpl @cm_Sum.
-      setoid_replace (QnonNeg.from_nat 0) with 0%Qnn by reflexivity.
+      setoid_replace (QnonNeg.coercions.from_nat 0) with 0%Qnn by reflexivity.
       rewrite QnonNeg.mult_0_l, zero_width_integral...
      rewrite IHn.
      rewrite CRplus_comm.
@@ -389,7 +391,7 @@ Section integral_approximation.
        (apply Qdiv_l in A; [| assumption]; rewrite A; apply Qmult_le_0_compat; [now auto|];
         apply Qinv_le_0_compat, Qle_nat). (* This should be automated *)
      set (iw' := exist _ iw iw_nn : QnonNeg ).
-     change iw with (QnonNeg.to_Q iw').
+     change iw with (QnonNeg.coercions.to_Q iw').
      change (S n * iw' == w)%Qnn in A.
      rewrite <- A at 2.
      rewrite <- integral_repeated_additive.

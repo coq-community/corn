@@ -37,6 +37,7 @@
 Require Export CoRN.algebra.CPoly_NthCoeff.
 Require Export CoRN.algebra.CFields.
 Require Export CoRN.tactics.Rational.
+Import CRing_Homomorphisms.coercions.
 Set Automatic Introduction.
 
 (**

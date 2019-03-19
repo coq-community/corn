@@ -152,7 +152,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
     apply (inj_Q_nring IR 1).
    apply eq_symmetric.
    apply (inj_Q_nring).
-  assert (X0:inj_Q IR ((P_of_succ_nat (2 * n)):Q)[#][0]).
+  assert (X0:inj_Q IR (inject_Z (P_of_succ_nat (2 * n)))[#][0]).
    stepr (inj_Q IR [0]).
     apply inj_Q_ap.
     discriminate.

@@ -98,6 +98,8 @@ Proof. unfold eq. repeat intro. simpl. apply Qinv_comp. assumption. Qed.
 
 (* Coercions: *)
 
+Module Export coercions.
+
 Program Coercion from_Qpos (q: Qpos): T := q.
 
 Lemma from_Qpos_plus_homo (x y: Qpos): (x + y)%Qpos == x + y.
@@ -106,7 +108,7 @@ Proof. reflexivity. Qed.
 Global Instance from_Qpos_Proper: Proper (QposEq ==> eq) from_Qpos.
 Proof. repeat intro. assumption. Qed.
 
-Global Program Coercion from_nat (n: nat): T := n#1.
+Global Program Coercion from_nat (n: nat): T := Z.of_nat n#1.
 
 Next Obligation. unfold Qle. simpl. auto with zarith. Qed.
 
@@ -116,6 +118,8 @@ Global Coercion to_Q: T >-> Q.
 
 Global Instance: Proper (eq ==> Qeq) to_Q.
 Proof. repeat intro. assumption. Qed.
+
+End coercions.
 
 (* Misc: *)
 
@@ -148,7 +152,7 @@ Hint Immediate proj1_sig_nonNeg.
 
 Lemma rect (P: T -> Type)
   (P0: forall (d: positive) H, P (exist (Qle 0) (0#d) H))
-  (Pp: forall (n d: positive) H, P (exist (Qle 0) (n#d) H)): forall q, P q.
+  (Pp: forall (n d: positive) H, P (exist (Qle 0) (Zpos n#d) H)): forall q, P q.
 Proof.
  intros [[qn qd] E].
  destruct qn.

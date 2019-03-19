@@ -32,7 +32,7 @@ Proof.
  intros. simpl. rewrite <- IHn. ring.
 Qed.
 
-Lemma Σ_constant x n f: (forall i, (i < n)%nat -> f i == x) -> Σ n f == n * x.
+Lemma Σ_constant x n f: (forall i, (i < n)%nat -> f i == x) -> Σ n f == inject_Z (Z.of_nat n) * x.
 Proof with auto.
  unfold Σ. induction n. reflexivity.
  simpl. intro E.
@@ -43,7 +43,7 @@ Proof with auto.
  ring.
 Qed.
 
-Lemma Σ_const x n: Σ n (fun _ => x) == n * x.
+Lemma Σ_const x n: Σ n (fun _ => x) == inject_Z (Z.of_nat n) * x.
 Proof. apply Σ_constant. reflexivity. Qed.
 
 Lemma Σ_S_bound_back f n: Σ (S n) f == Σ n f + f n.
@@ -60,27 +60,27 @@ Lemma Σ_S_bound_rev n f: Σ n (f ∘ S) == Σ (S n) f - f O.
 Proof. rewrite Σ_S_bound_front. ring. Qed.
 
 Lemma Σ_le f n (b: Q):
-  (forall x, (x < n)%nat -> f x <= b) -> Σ n f <= n * b.
+  (forall x, (x < n)%nat -> f x <= b) -> Σ n f <= inject_Z (Z.of_nat n) * b.
 Proof.
  induction n. discriminate.
  intro.
  rewrite Q.S_Qplus.
- change (f n + Σ n f <= (n + 1) * b)%Q.
- assert ((n + 1) * b == b + n * b)%Q as E. ring.
+ change (f n + Σ n f <= (inject_Z (Z.of_nat n) + 1) * b)%Q.
+ assert ((inject_Z (Z.of_nat n) + 1) * b == b + inject_Z (Z.of_nat n) * b)%Q as E. ring.
  rewrite E.
  apply Qplus_le_compat; auto.
 Qed.
 
 Lemma Σ_abs_le f n (b: Q):
-  (forall x, (x < n)%nat -> Qabs (f x) <= b) -> Qabs (Σ n f) <= n * b.
+  (forall x, (x < n)%nat -> Qabs (f x) <= b) -> Qabs (Σ n f) <= inject_Z (Z.of_nat n) * b.
 Proof.
  induction n.
   discriminate.
  intros.
  rewrite S_Zplus.
  rewrite Q.Zplus_Qplus.
- change (Qabs (f n + Σ n f) <= (n + 1) * b)%Q.
- assert ((n + 1) * b == b + n * b)%Q. ring.
+ change (Qabs (f n + Σ n f) <= (inject_Z (Z.of_nat n) + 1) * b)%Q.
+ assert ((inject_Z (Z.of_nat n) + 1) * b == b + inject_Z (Z.of_nat n) * b)%Q. ring.
  rewrite H0. clear H0.
  apply Qle_trans with (Qabs (f n) + Qabs (Σ n f))%Q.
   apply Qabs_triangle.
@@ -121,21 +121,20 @@ Proof.
 Qed.
 
 Lemma Σ_Qball (f g: nat -> Q) (e: Qpos) (n: nat):
-  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= e / n) ->
+  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= e / inject_Z (Z.of_nat n)) ->
   Qball e (Σ n f) (Σ n g).
 Proof with auto.
  intro H.
  apply Qball_Qabs.
  destruct n. simpl. auto.
  rewrite Σ_sub.
- setoid_replace (QposAsQ e) with (S n * (/S n*e)).
+ setoid_replace (QposAsQ e) with (inject_Z (Z.of_nat (S n)) * (/ inject_Z (Z.of_nat (S n)) * e)).
   apply Σ_abs_le.
   intros ? E.
   specialize (H x E).
   simpl QposAsQ in *.
   rewrite Qmult_comm.
   assumption.
- change (e == S n * (/ S n * e)).
  field. discriminate.
 Qed.
 
@@ -144,13 +143,13 @@ Lemma Σ_Qball_pos_bounds (f g: nat -> Q) (e: Qpos) (n: positive):
   Qball e (Σ n f) (Σ n g).
 Proof with intuition.
  intros. apply Σ_Qball. intros.
- setoid_replace (e / nat_of_P n) with (e / n)%Qpos.
+ setoid_replace (e / inject_Z (Z.of_nat (nat_of_P n))) with (e / n)%Qpos.
   apply Qball_Qabs...
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P...
 Qed.
 
 Lemma Qmult_Σ (f: nat -> Q) n (k: nat):
-  Σ n f * k == Σ (k * n) (f ∘ flip Nat.div k).
+  Σ n f * inject_Z (Z.of_nat k) == Σ (k * n) (f ∘ flip Nat.div k).
 Proof with auto with *.
  unfold Basics.compose.
  rewrite mult_comm.
@@ -168,7 +167,7 @@ Proof with auto with *.
 Qed.
 
 Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):
-  Σ n f == Σ (k * n) (f ∘ flip Nat.div k) / k.
+  Σ n f == Σ (k * n) (f ∘ flip Nat.div k) / inject_Z (Zpos k).
 Proof.
  rewrite <- Qmult_Σ.
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
@@ -178,8 +177,8 @@ Qed.
 Lemma Qball_hetero_Σ (n m: positive) f g e:
  (forall i: nat, (i < (n * m)%positive)%nat ->
    Qball (e / (n * m)%positive)
-     (/ m * f (i / m)%nat)
-     (/ n * g (i / n)%nat)) ->
+     (/ inject_Z (Zpos m) * f (i / m)%nat)
+     (/ inject_Z (Zpos n) * g (i / n)%nat)) ->
    Qball e (Σ n f) (Σ m g).
 Proof.
  intros.

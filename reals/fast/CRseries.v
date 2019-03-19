@@ -292,7 +292,7 @@ Proof.
  apply plus_n_Sm.
 Qed.
 
-Lemma Str_nth_ppositives' n : (Str_nth n ppositives : Q) = Str_nth n positives.
+Lemma Str_nth_ppositives' n : inject_Z (Str_nth n ppositives) = Str_nth n positives.
 Proof.
   rewrite Str_nth_ppositives, Str_nth_positives.
   rewrite Z.P_of_succ_nat_Zplus.
@@ -455,7 +455,7 @@ Proof.
  ring.
 Qed.
 
-Lemma Str_nth_pfactorials' n : (Str_nth n pfactorials : Q) = Str_nth n factorials.
+Lemma Str_nth_pfactorials' n : inject_Z (Str_nth n pfactorials) = Str_nth n factorials.
 Proof.
   rewrite Str_nth_factorials.
   rewrite <-Str_nth_pfactorials.

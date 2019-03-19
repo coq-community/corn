@@ -4,7 +4,7 @@ Require Import
   Coq.QArith.Qabs CoRN.model.ordfields.Qordfield CoRN.model.structures.Qpossec Coq.QArith.Qminmax Coq.setoid_ring.Ring Coq.Program.Program.
 
 Require CoRN.model.structures.QnonNeg.
-Import QnonNeg.notations.
+Import QnonNeg.notations QnonNeg.coercions.
 
 Local Hint Resolve Qle_refl.
 
@@ -161,6 +161,8 @@ Proof with intuition.
  apply le_trans with y...
 Qed.
 
+Module Export coercions.
+
 Global Program Coercion inject_Qnn (q: QnonNeg): T := make (Qle q) q _ _.
 
 Next Obligation. apply Qle_trans with (q0); assumption. Qed.
@@ -173,6 +175,8 @@ Proof with auto.
   rewrite H. apply Qle_trans with (`q)...
  rewrite <- H. apply Qle_trans with (`q)...
 Qed.
+
+End coercions.
 
 Definition bound_doesnt_matter (q: QnonNeg) b H H' U U':
   make (Qle q) b H U == make (Qlt q) b H' U'.

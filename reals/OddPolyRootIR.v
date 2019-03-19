@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.reals.IVT.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Roots of polynomials of odd degree *)

@@ -289,10 +289,10 @@ Proof.
    now destruct (irreflexivity (<) (0 : nat)).
   apply ball_weak_le with (P_of_succ_nat l * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
    set (l':=P_of_succ_nat l).
-   change ((l':Q) * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
+   change ((inject_Z l') * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
    apply (order_reflecting ((2:Q) ^ Z.log2_up l' *.)).
-   mc_setoid_replace (2 ^ Z.log2_up l' * ((l':Q) * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (l':Q)).
+   mc_setoid_replace (2 ^ Z.log2_up l' * ((inject_Z l') * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (inject_Z l')).
     rewrite (commutativity _ ((2:Q) ^ k)).
     apply (order_preserving (2 ^ k *.)).
     replace (2:Q) with (inject_Z 2) by reflexivity.
@@ -304,7 +304,7 @@ Proof.
      auto with zarith.
     now apply Z.log2_up_nonneg.
    rewrite int_pow_negate.
-   rewrite (commutativity (l' : Q)), (commutativity (2 ^ k)).
+   rewrite (commutativity (inject_Z l')), (commutativity (2 ^ k)).
    rewrite <-associativity.
    rewrite associativity, dec_recip_inverse by solve_propholds.
    now apply left_identity.

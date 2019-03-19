@@ -55,9 +55,13 @@ Definition is_CGroup (G : CMonoid) (inv : CSetoid_un_op G) :=
   forall x, is_inverse csg_op [0] x (inv x).
 
 Record CGroup : Type :=
-  {cg_crr   :> CMonoid;
+  {cg_crr   : CMonoid;
    cg_inv   :  CSetoid_un_op cg_crr;
    cg_proof :  is_CGroup cg_crr cg_inv}.
+
+Module Export coercions.
+  Coercion cg_crr : CGroup >-> CMonoid.
+End coercions.
 
 (* End_SpecReals *)
 

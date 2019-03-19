@@ -36,6 +36,7 @@
 
 Require Export CoRN.fta.CPoly_Rev.
 Require Export CoRN.fta.FTAreg.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Fundamental Theorem of Algebra

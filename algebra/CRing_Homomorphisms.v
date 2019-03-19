@@ -71,12 +71,16 @@ End RingHom_Preliminary.
 
 
 Record RingHom : Type :=
-  {rhmap :> CSetoid_fun R S;
+  {rhmap : CSetoid_fun R S;
    rh1 : fun_pres_plus rhmap;
    rh2 : fun_pres_mult rhmap;
    rh3 : fun_pres_unit rhmap}.
 
 End RingHom_Definition.
+
+Module Export coercions.
+  Coercion rhmap : RingHom >-> CSetoid_fun.
+End coercions.
 
 (**
 ** Lemmas on Ring Homomorphisms

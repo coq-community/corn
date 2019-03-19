@@ -199,7 +199,7 @@ Proof.
  rstepr ((nring 1[/]nring (R:=IR) (fact (S n'))[//]
    nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-][0]))).
  change (1+2*n)%nat with (S n').
- stepr ((inj_Q IR (1 / P_of_succ_nat (pred (fact (S n'))))[*](inj_Q IR (a^S n')))).
+ stepr ((inj_Q IR (1 / Zpos (P_of_succ_nat (pred (fact (S n')))))[*](inj_Q IR (a^S n')))).
   apply inj_Q_mult.
  apply mult_wd.
   rewrite <- POS_anti_convert.

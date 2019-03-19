@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.complex.CComplex.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Shifting polynomials

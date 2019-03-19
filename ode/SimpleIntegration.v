@@ -21,7 +21,7 @@ Require Import
   CoRN.ode.metric CoRN.ode.FromMetric2
   MathClasses.implementations.stdlib_rationals.
 
-Import QnonNeg.notations.
+Import QnonNeg.notations Qinf.coercions.
 
 Bind Scope Q_scope with Q.
 Local Open Scope Q_scope.

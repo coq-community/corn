@@ -103,15 +103,15 @@ Proof. intros ? ? ? ? A2; now rewrite <- A2. Qed.
 Declare Left Step Qstepl.
 Declare Right Step Qstepr.
 
-Lemma binom_ineq (a : Q) (n : nat) : -1 ≤ a -> 1 + (n : Q) * a ≤ (1 + a)^n.
+Lemma binom_ineq (a : Q) (n : nat) : -1 ≤ a -> 1 + (inject_Z n) * a ≤ (1 + a)^n.
 Proof.
 intro A.
 assert (A1 : 0 ≤ 1 + a) by (now apply (order_preserving (1 +)) in A; rewrite plus_negate_r in A).
 induction n as [| n IH] using nat_induction.
 + rewrite nat_pow_0; change (1 + 0 * a ≤ 1); now rewrite mult_0_l, plus_0_r.
-+ rewrite nat_pow_S. transitivity ((1 + a) * (1 + (n : Q) * a)).
++ rewrite nat_pow_S. transitivity ((1 + a) * (1 + (inject_Z n) * a)).
   - rewrite Nat2Z.inj_add, inject_Z_plus.
-    stepr (1 + (1 + (n : Q)) * a + (n : Q) * a²) by ring.
+    stepr (1 + (1 + (inject_Z n)) * a + (inject_Z n) * a²) by ring.
     (* [apply nonneg_plus_le_compat_r, nonneg_mult_compat.  does not work *)
     apply nonneg_plus_le_compat_r. apply nonneg_mult_compat; [solve_propholds | apply square_nonneg].
   - now apply (order_preserving ((1 + a) *.)) in IH.

@@ -38,6 +38,7 @@
 (** printing sqrt %\ensuremath{\sqrt{\cdot}}% *)
 
 Require Export CoRN.reals.OddPolyRootIR.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Roots of Real Numbers *)

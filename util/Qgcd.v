@@ -47,7 +47,7 @@ Next Obligation. Proof with auto.
 Qed.
 
 Lemma Qgcd_pos_divides (a b: Qpos):
-  exists c: positive, c * Qcd_pos a b == a.
+  exists c: positive, inject_Z c * Qcd_pos a b == a.
 Proof with auto with *.
  revert a b.
  intros [a ap] [b bp].
@@ -61,16 +61,16 @@ Proof with auto with *.
  exfalso.
  rewrite <- E in ap.
  apply (Qlt_irrefl 0).
- apply Qlt_le_trans with (Zneg p * Qgcd a b)...
+ apply Qlt_le_trans with (inject_Z (Zneg p) * Qgcd a b)...
  rewrite Qmult_comm.
  apply Qmult_nonneg_nonpos...
 Qed.
 
 Lemma Qpos_gcd3 (a b c: Qpos):
   exists g: Qpos,
-  exists i: positive, i * g == a /\
-  exists j: positive, j * g == b /\
-  exists k: positive, k * g == c.
+  exists i: positive, inject_Z i * g == a /\
+  exists j: positive, inject_Z j * g == b /\
+  exists k: positive, inject_Z k * g == c.
 Proof with auto.
  intros.
  exists (Qcd_pos a (Qcd_pos b c)).
@@ -78,7 +78,7 @@ Proof with auto.
  destruct (Qgcd_pos_divides c b) as [x0 F].
  simpl in F.
  rewrite Qgcd_sym in F.
- change (x0 * Qcd_pos b c == c) in F.
+ change (inject_Z x0 * Qcd_pos b c == c) in F.
  revert E F.
  generalize (Qcd_pos b c).
  intros.
@@ -86,7 +86,7 @@ Proof with auto.
  destruct (Qgcd_pos_divides q a) as [x2 H].
  simpl in H.
  rewrite Qgcd_sym in H.
- change (x2 * Qcd_pos a q == q) in H.
+ change (inject_Z x2 * Qcd_pos a q == q) in H.
  exists x1.
  revert G H.
  generalize (Qcd_pos a q).

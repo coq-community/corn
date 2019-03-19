@@ -9,8 +9,6 @@ Require Import
 Inductive T: Set := finite (q: Q) | infinite.
   (* (This is positive infinity.) *)
 
-Coercion finite: Q >-> T.
-
 Instance eq: Equiv T := λ x y,
   match x, y with
   | infinite, infinite => True
@@ -64,15 +62,21 @@ Instance: Zero T := finite 0%Q.
 
 Instance plus: Plus T := λ x y,
   match x, y with
-  | finite a, finite b => (a + b)%Q
+  | finite a, finite b => finite (a + b)
   | _, _ => infinite
   end.
+
+Module Export coercions.
+
+Coercion finite: Q >-> T.
 
 Coercion from_QposInf (q: QposInf): T :=
   match q with
   | QposInfinity => infinite
   | Qpos2QposInf u => u
   end.
+
+End coercions.
 
 Lemma QposInf_le_QinfLe (x y: QposInf): QposInf_le x y → le x y.
 Proof. destruct x, y; auto. Qed.

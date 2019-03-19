@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.algebra.CPoly_Degree.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Reverse of polynomials

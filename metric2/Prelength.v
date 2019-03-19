@@ -591,7 +591,7 @@ Proof.
   rewrite -> q.
   assert (e + x0 == e+1*x0). QposRing. rewrite -> H. clear H.
   apply: plus_resp_less_lft;simpl.
-  assert (4%positive * ((1 # 5) * x0) == (4#5)*x0). unfold inject_Z, gA. QposRing.
+  assert (Zpos 4 * ((1 # 5) * x0) == (4#5)*x0). unfold inject_Z, gA. QposRing.
   rewrite -> H. clear H.
   apply: mult_resp_less.
    constructor.

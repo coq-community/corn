@@ -275,7 +275,7 @@ Proof.
  intros e1 e2 a Ha.
  assert (l <= a <= r).
   unfold CompactIntervalQ_raw in Ha.
-  set (e1':=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e1)))
+  set (e1':=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (Zpos 2 * e1)))
     (CompactIntervalQ_nat e1)))) in *.
   assert (L:=UniformPartition_inside e1').
   induction (UniformPartition e1').
@@ -290,7 +290,7 @@ Proof.
    assumption.
   assumption.
  unfold CompactIntervalQ_raw.
- set (e2':=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e2))) (CompactIntervalQ_nat e2)))).
+ set (e2':=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (Zpos 2 * e2))) (CompactIntervalQ_nat e2)))).
  assert (L:=UniformPartition_fine (pred e2') H).
  rewrite S_predn in L; [|intros Z; symmetry in Z;revert Z; apply lt_O_neq; unfold e2';
    apply lt_le_trans with 1%nat; auto with *].
@@ -310,10 +310,10 @@ Proof.
   apply Qle_shift_div_l.
    apply Qinv_lt_0_compat.
    auto with *.
-  change ( (r - l) / (2%positive * e2) <= e2').
+  change ( (r - l) / (2%Z * e2) <= e2').
   unfold e2'.
   generalize (CompactIntervalQ_nat e2).
-  generalize ((r - l) / (2%positive * e2)).
+  generalize ((r - l) / (2%Z * e2)).
   intros q He.
   apply Qle_trans with (Qceiling q); auto with *.
   rewrite inj_max.
@@ -352,7 +352,7 @@ Proof.
   intros e2.
   assert (L:=Hx e e2).
   simpl in L.
-  set (a:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e2)))
+  set (a:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%Z * e2)))
     (CompactIntervalQ_nat e2)))) in *.
   assert (L0:=UniformPartition_inside a).
   induction (UniformPartition a).
@@ -379,7 +379,7 @@ Proof.
  intros e2.
  assert (L:=Hx e e2).
  simpl in L.
- set (a:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e2)))
+ set (a:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%Z * e2)))
    (CompactIntervalQ_nat e2)))) in *.
  assert (L0:=UniformPartition_inside a).
  induction (UniformPartition a).
@@ -444,12 +444,12 @@ Proof.
  assert (L: l <= y <= r).
   unfold y.
   auto with *.
- set (n:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e2))) (CompactIntervalQ_nat e2)))).
+ set (n:=(max 1 (Z_to_nat (z:=Qceiling ((r - l) / (2%Z * e2))) (CompactIntervalQ_nat e2)))).
  destruct (UniformPartition_fine (pred n) L) as [z Hz].
  assert (L0:(0 < 2*n)%Q).
   Transparent max.
   simpl.
-  destruct ( Z_to_nat (z:=Qceiling ((r - l) / (2%positive * e2)))
+  destruct ( Z_to_nat (z:=Qceiling ((r - l) / (2%Z * e2)))
     (CompactIntervalQ_nat e2)); auto with *.
  rewrite S_predn in Hz.
   clear - Hz L0.
@@ -463,14 +463,14 @@ Proof.
    rewrite -> Qball_Qabs.
    eapply Qle_trans;[apply Hz1|].
    apply Qle_shift_div_r;auto.
-   replace RHS with (n*(2%positive*e2))%Q by simpl; ring.
-   rewrite <- (Qinv_involutive (2%positive*e2)).
+   replace RHS with (n*(2%Z*e2))%Q by simpl; ring.
+   rewrite <- (Qinv_involutive (2%Z*e2)).
    apply Qle_shift_div_l.
     apply Qinv_lt_0_compat. auto with *.
    unfold n.
-   fold ((r - l) / (2%positive * e2)).
+   fold ((r - l) / (2%Z * e2)).
    generalize (CompactIntervalQ_nat e2).
-   generalize ((r - l) / (2%positive * e2)).
+   generalize ((r - l) / (2%Z * e2)).
    intros q He.
    apply Qle_trans with (Qceiling q); auto with *.
    rewrite inj_max.

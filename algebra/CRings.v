@@ -82,7 +82,7 @@ Record is_CRing (G : CAbGroup) (One : G) (mult : CSetoid_bin_op G) : CProp :=
    ax_non_triv   : One [#] [0]}.
 
 Record CRing : Type :=
-  {cr_crr   :> CAbGroup;
+  {cr_crr   : CAbGroup;
    cr_one   :  cr_crr;
    cr_mult  :  CSetoid_bin_op cr_crr;
    cr_proof :  is_CRing cr_crr cr_one cr_mult}.
@@ -93,6 +93,12 @@ Definition cr_minus := cg_minus.
 
 
 Notation "[1]" := (cr_one _).
+
+Module Export coercions.
+  Export CAbGroups.coercions.
+  Coercion cr_crr : CRing >-> CAbGroup.
+End coercions.
+
 (* End_SpecReals *)
 
 (* Begin_SpecReals *)
