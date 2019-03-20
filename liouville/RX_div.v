@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CPoly_Degree CPoly_Euclid RingClass CRingClass.
+Import CRing_Homomorphisms.coercions.
 
 Section RX_div.
 

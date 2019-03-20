@@ -37,6 +37,7 @@
 Require Export CoRN.algebra.CPolynomials.
 Require Import Coq.Classes.Morphisms.
 Require Import CoRN.algebra.CRings.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Polynomials: Nth Coefficient

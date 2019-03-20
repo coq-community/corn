@@ -605,7 +605,7 @@ Proof.
   apply leEq_transitive with (Exp (Max x [0])).
    apply Exp_resp_leEq.
    apply lft_leEq_Max.
-  stepr (Three[!](inj_Q IR (z:Q))[//](pos_three IR):IR).
+  stepr (Three[!](inj_Q IR (inject_Z z))[//](pos_three IR):IR).
    astepl (E[!](Max x [0])[//]pos_E).
    apply real_power_resp_leEq_both; try solve [IR_solve_ineq (1#1)%Qpos].
     apply rht_leEq_Max.
@@ -632,7 +632,7 @@ Proof.
   stepl (inj_Q IR (nring (nat_of_P z))).
    apply (inj_Q_nring).
   apply inj_Q_wd; apply nring_Q.
- stepr (Half[!](inj_Q IR (z:Q))[//](pos_half IR):IR).
+ stepr (Half[!](inj_Q IR (inject_Z z))[//](pos_half IR):IR).
   astepl (Exp [--][--]x).
   astepl ([1][/]_[//](Exp_ap_zero [--]x)).
   unfold Half.

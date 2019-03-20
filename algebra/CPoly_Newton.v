@@ -6,7 +6,8 @@ Require Import
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation.
 Require MathClasses.implementations.ne_list.
-Import ne_list.notations.
+Import CRing_Homomorphisms.coercions.
+Import ne_list.notations ne_list.coercions.
 
 Set Automatic Introduction.
 

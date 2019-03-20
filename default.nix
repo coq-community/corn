@@ -9,7 +9,11 @@ let
       pkgs."coqPackages_${builtins.concatStringsSep "_" coq-version-parts}";
 in
 
-with coqPackages;
+let math-classes = coqPackages.math-classes.overrideAttrs (o: {
+    src = fetchTarball "https://github.com/coq-community/math-classes/archive/master.tar.gz";
+  }); in
+
+let inherit (coqPackages) coq bignums; in
 
 pkgs.stdenv.mkDerivation {
 
@@ -23,7 +27,7 @@ pkgs.stdenv.mkDerivation {
 
   src = if shell then null else ./.;
 
-  configurePhase = "./configure.sh";
+  configurePhase = "sh ./configure.sh";
 
   installFlags = "COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }

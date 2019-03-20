@@ -54,7 +54,7 @@ Proof.
   autorewrite with QposElim.
   replace LHS with (((1#p)*(length t) + (1#p))*e) by simpl; ring.
   rewrite -> Qmake_Qdiv.
-  field_simplify (1%positive / p * length t + 1%positive / p);[|unfold Qeq; auto with *].
+  field_simplify (Zpos 1 / p * length t + 1%positive / p);[|unfold Qeq; auto with *].
   setoid_replace ((length t + 1) / p) with 1.
    rewrite Qmult_1_l.
    auto with *.

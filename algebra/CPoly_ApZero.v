@@ -38,7 +38,8 @@ Require Export CoRN.algebra.CPoly_Degree.
 Require Export CoRN.algebra.COrdFields2.
 Require Import Coq.Classes.Morphisms Coq.Sorting.Permutation.
 Require MathClasses.implementations.ne_list.
-Import ne_list.notations.
+Import CRing_Homomorphisms.coercions.
+Import ne_list.notations ne_list.coercions.
 
 Set Automatic Introduction.
 

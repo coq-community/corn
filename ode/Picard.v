@@ -10,6 +10,7 @@ Require Import
 Require Qinf QnonNeg QnnInf CRball.
 Import
   QnonNeg Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations
+  Qinf.coercions
   Qabs propholds.
 
 Require Import CoRN.ode.metric CoRN.ode.FromMetric2 CoRN.ode.AbstractIntegration CoRN.ode.SimpleIntegration CoRN.ode.BanachFixpoint.

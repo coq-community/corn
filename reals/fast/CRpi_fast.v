@@ -94,7 +94,7 @@ Proof.
   field; discriminate.
  unfold Zminus.
  repeat rewrite -> injz_plus.
- change (((x * z) + (y * w)) / (y * z - x * w) == ((x # y) + (w # z)) / (1 - (x #y)*(w # z))).
+ change (((x * Zpos z) + (Zpos y * w)) / (Zpos y * Zpos z - x * w) == ((x # y) + (w # z)) / (1 - (x #y)*(w # z))).
  repeat rewrite -> Qmake_Qdiv.
  field.
  repeat split; try discriminate.
@@ -217,17 +217,17 @@ Proof.
  set (y1:=(iter_nat 7 _ (f (1/239%Z)) 0)).
  set (y2:=(iter_nat 12 _ (f (1/682%Z)) 0)).
  set (y3:=(iter_nat 24 _ (f (1/12943%Z)) 0)).
- rstepl (nring 44[*]ArcTan (inj_Q IR (1 / 57%positive))[+]
-   [--](nring 12[*]ArcTan (inj_Q IR (1 / 682%positive)))[+]
-     (nring 7[*]ArcTan (inj_Q IR (1 / 239%positive))[+]
-       nring 24[*]ArcTan (inj_Q IR (1 / 12943%positive)))).
- csetoid_replace ((nring 44)[*]ArcTan (inj_Q IR (1 / 57%positive)))
+ rstepl (nring 44[*]ArcTan (inj_Q IR (1 / 57%Z))[+]
+   [--](nring 12[*]ArcTan (inj_Q IR (1 / 682%Z)))[+]
+     (nring 7[*]ArcTan (inj_Q IR (1 / 239%Z))[+]
+       nring 24[*]ArcTan (inj_Q IR (1 / 12943%Z)))).
+ csetoid_replace ((nring 44)[*]ArcTan (inj_Q IR (1 / 57%Z)))
    (ArcTan (inj_Q IR y0)); [|apply: (reflect_right (ArcTan_multiple H0 44)); now vm_compute].
- csetoid_replace ((nring 7)[*]ArcTan (inj_Q IR (1 / 239%positive))) (ArcTan (inj_Q IR y1));
+ csetoid_replace ((nring 7)[*]ArcTan (inj_Q IR (1 / 239%Z))) (ArcTan (inj_Q IR y1));
    [|apply: (reflect_right (ArcTan_multiple H1 7)); now vm_compute].
- csetoid_replace ((nring 12)[*]ArcTan (inj_Q IR (1 / 682%positive))) (ArcTan (inj_Q IR y2));
+ csetoid_replace ((nring 12)[*]ArcTan (inj_Q IR (1 / 682%Z))) (ArcTan (inj_Q IR y2));
    [|apply: (reflect_right (ArcTan_multiple H2 12)); now vm_compute].
- csetoid_replace ((nring 24)[*]ArcTan (inj_Q IR (1 / 12943%positive))) (ArcTan (inj_Q IR y3));
+ csetoid_replace ((nring 24)[*]ArcTan (inj_Q IR (1 / 12943%Z))) (ArcTan (inj_Q IR y3));
    [|apply: (reflect_right (ArcTan_multiple H3 24)); now vm_compute].
  vm_compute in y0.
  vm_compute in y1.
@@ -278,10 +278,10 @@ Proof.
   apply mult_wdl.
   apply (inj_Q_nring IR 4).
  eapply eq_transitive;[|apply Pi_Formula].
- rstepr (nring 44[*]ArcTan (inj_Q IR (1 / 57%positive))[+]
-   nring 7[*]ArcTan (inj_Q IR (1 / 239%positive))[+]
-     (([--](nring 12))[*]ArcTan (inj_Q IR (1 / 682%positive))[+]
-       nring 24[*]ArcTan (inj_Q IR (1 / 12943%positive)))).
+ rstepr (nring 44[*]ArcTan (inj_Q IR (1 / 57%Z))[+]
+   nring 7[*]ArcTan (inj_Q IR (1 / 239%Z))[+]
+     (([--](nring 12))[*]ArcTan (inj_Q IR (1 / 682%Z))[+]
+       nring 24[*]ArcTan (inj_Q IR (1 / 12943%Z)))).
  repeat apply bin_op_wd_unfolded; try apply eq_reflexive.
     apply (inj_Q_nring IR 44).
    apply (inj_Q_nring IR 7).

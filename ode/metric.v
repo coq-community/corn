@@ -11,7 +11,7 @@ Require Import MathClasses.interfaces.naturals MathClasses.interfaces.orders.
 Import peano_naturals.
 
 Require Import CoRN.reals.fast.CRGeometricSum.
-Import Qround Qpower Qinf.notations.
+Import Qround Qpower Qinf.notations Qinf.coercions.
 
 (* Set Printing Coercions.*)
 

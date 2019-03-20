@@ -16,7 +16,7 @@ Proof.
   unfold app_approx, Q_approx.
   setoid_replace (2 ^ Zneg p)%Qpos with (1 # (2 ^ p))%Qpos.
    now apply ball_sym, approximateQ_correct.
-  change (/ Qpower (2%Z) p == 1 # 2 ^ p).
+  change (/ Qpower (inject_Z 2%Z) (Zpos p) == 1 # 2 ^ p).
   rewrite <-Qpower.Zpower_Qpower; auto with zarith.
   now rewrite <- Zpower_Ppow.
 Qed.

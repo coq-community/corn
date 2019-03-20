@@ -280,7 +280,7 @@ terms we will need to compute.  It is okay for this error to be loose
 because the partial sums will bail out early when it sees that its
 estimate of the error is small enough. *)
 Lemma GeometricCovergenceLemma : forall (n:positive) (e:Qpos),
- /(e*(1 - a)) <= n -> a^n <= e.
+ /(e*(1 - a)) <= Zpos n -> a^n <= e.
 Proof.
  destruct (Qle_lt_or_eq _ _ Ha0) as [Ha0'|Ha0'].
   intros n e H.
@@ -299,7 +299,7 @@ Proof.
   rewrite -> Qlt_minus_iff in Ha1.
   change (0<1-a) in Ha1.
   rewrite -> Qle_minus_iff in H.
-  apply Qle_trans with (1 + n*(/a -1)).
+  apply Qle_trans with (1 + Zpos n * (/a -1)).
    rewrite -> Qle_minus_iff.
    stepr (1+(1 - a)*((n*(1-a)*/a + (n +-(/(e*(1 - a))))))); [| simpl; field; split; auto with *].
    apply: plus_resp_nonneg; try discriminate.

@@ -42,6 +42,7 @@
 Require Export CoRN.complex.CComplex.
 Require Export Coq.Arith.Wf_nat.
 Require Export Coq.setoid_ring.ArithRing.
+Import CRing_Homomorphisms.coercions.
 
 (**
 * Roots of Complex Numbers

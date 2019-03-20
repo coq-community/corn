@@ -11,7 +11,7 @@ Require Import
  MathClasses.interfaces.abstract_algebra
  MathClasses.theory.setoids MathClasses.theory.products.
 
-Import Qinf.notations.
+Import Qinf.notations QnonNeg.coercions.
 
 Require Vector.
 

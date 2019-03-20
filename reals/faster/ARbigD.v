@@ -163,7 +163,7 @@ Proof.
 Qed.
 
 Instance inverse_Q_bigD: AppInverse inject_bigD_Q := λ x ε, 
-  app_div ('Qnum x) ('(Qden x : Z)) (Qdlog2 ε).
+  app_div ('Qnum x) ('(Zpos (Qden x))) (Qdlog2 ε).
 
 Instance bigD_approx : AppApprox bigD := λ x k,
   BigZ.shiftl (mant x) (-('k - 1) + expo x) ▼ ('k - 1).

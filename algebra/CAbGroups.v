@@ -45,8 +45,10 @@ Now we introduce commutativity and add some results.
 Definition is_CAbGroup (G : CGroup) := commutes (csg_op (c:=G)).
 
 Record CAbGroup : Type :=
- {cag_crr   :> CGroup;
+ {cag_crr   : CGroup;
   cag_proof :  is_CAbGroup cag_crr}.
+
+Local Coercion cag_crr : CAbGroup >-> CGroup.
 
 Section AbGroup_Axioms.
 
@@ -167,6 +169,11 @@ End Abelian_Groups.
 
 Hint Resolve cag_commutes_unfolded: algebra.
 Hint Resolve cag_op_inv assoc_1 zero_minus minus_plus op_lft_resp_ap: algebra.
+
+Module Export coercions.
+  Export CGroups.coercions.
+  Coercion cag_crr : CAbGroup >-> CGroup.
+End coercions.
 
 Section Nice_Char.
 

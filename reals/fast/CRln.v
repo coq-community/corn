@@ -45,7 +45,7 @@ Logarithm is defined in terms of artanh. [ln (n/d) = 2*artan((n-d)/(n+d))]
 *)
 
 Lemma lnDomainAdaptor : forall a, (0 < a) ->
-(let (n,d) := a in (n - d)/(n + d))^2 < 1.
+(let (n,d) := a in (n - Zpos d)/(n + Zpos d))^2 < 1.
 Proof.
  intros [[|n|n] d] Ha; try solve [elim (Qlt_not_le _ _ Ha); auto with *].
  simpl.
@@ -88,7 +88,7 @@ Proof.
  unfold Log.
  simpl.
  apply cspf_wd.
- set (b:=let (n, d) := a in (n - d) / (n + d)).
+ set (b:=let (n, d) := a in (n - Zpos d) / (n + Zpos d)).
  assert (Y:inj_Q IR a[+][1][#][0]).
   apply Greater_imp_ap.
   apply plus_resp_pos; try assumption.

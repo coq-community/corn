@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CPoly_Degree Omega.
+Import CRing_Homomorphisms.coercions.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

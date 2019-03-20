@@ -1,6 +1,6 @@
 
 Require CoRN.model.structures.QnonNeg.
-Import QnonNeg.notations.
+Import QnonNeg.notations QnonNeg.coercions.
 
 Require Import CoRN.model.structures.QposInf.
 
@@ -92,10 +92,12 @@ Proof with intuition.
  destruct x0, y0, y, x...
   rewrite <- H.
   rewrite <- H0...
- unfold QnonNeg.to_Q.
+ unfold QnonNeg.coercions.to_Q.
  rewrite H.
  rewrite H0...
 Qed.
+
+Module Export coercions.
 
 Global Program Coercion from_QposInf (q: QposInf): T :=
   match q with
@@ -107,6 +109,8 @@ Global Coercion Finite: QnonNeg >-> T.
 
 Global Instance Finite_Proper: Proper (QnonNeg.eq ==> eq) Finite.
 Proof. repeat intro. assumption. Qed.
+
+End coercions.
 
 Module notations.
 

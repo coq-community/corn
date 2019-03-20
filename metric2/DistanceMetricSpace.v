@@ -1,7 +1,7 @@
 
 Require CoRN.model.structures.NNUpperR.
 Import NNUpperR.notations.
-Import QnonNeg.notations.
+Import QnonNeg.notations QnonNeg.coercions NNUpperR.coercions.
 
 Require Import CoRN.metric2.Metric.
 
@@ -72,7 +72,7 @@ Section from_alt.
    unfold ball. intros.
    apply NNUpperR.le_closed. intros.
    rewrite <- NNUpperR.plus_homo.
-   rewrite <- QnonNeg.from_Qpos_plus_homo...
+   rewrite <- QnonNeg.coercions.from_Qpos_plus_homo...
   Qed.
 
   Lemma ball_triangle e1 e2 a b c: ball e1 a b -> ball e2 b c -> ball (e1 + e2) a c.
@@ -81,7 +81,7 @@ Section from_alt.
    intros.
    apply NNUpperR.le_trans with (distance a b + distance b c).
     apply distance_triangle.
-   rewrite QnonNeg.from_Qpos_plus_homo.
+   rewrite QnonNeg.coercions.from_Qpos_plus_homo.
    rewrite NNUpperR.plus_homo.
    apply NNUpperR.plus_le_compat...
   Qed.

@@ -4,7 +4,7 @@ Require Import
   MathClasses.interfaces.abstract_algebra MathClasses.implementations.stdlib_rationals
   MathClasses.orders.orders MathClasses.orders.semirings MathClasses.orders.rings MathClasses.theory.rings.
 
-Import Qinf.notations.
+Import Qinf.notations Qinf.coercions.
 
 Section QField.
 
