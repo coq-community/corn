@@ -659,7 +659,7 @@ Qed.
 Definition CompactTotallyBoundedIndex (e d1 d2:Qpos) : nat :=
 let (n,d):=((1+(1#4))*d1 + d2)/e/(1-(1#4)) in
  match Z.succ (Z.div n d) with
-| Zpos p => div2 (S (Z_to_nat (log_sup_correct1 p)))
+| Zpos p => div2 (S (Z_to_nat (Z.log2_up_nonneg (Zpos p))))
 | _ => O
 end.
 
@@ -683,7 +683,7 @@ Proof.
  rewrite -> Qmult_comm.
  apply Qle_shift_div_r.
   induction (let (n, d) := a * / e * / b in match Z.succ (n / d) with | Z0 => 0%nat
-    | Zpos p => div2 (S (Z_to_nat (z:=log_sup p) (log_sup_correct1 p))) | Zneg _ => 0%nat end).
+    | Zpos p => div2 (S (Z_to_nat (Z.log2_up_nonneg (Zpos p)))) | Zneg _ => 0%nat end).
    constructor.
   change (S n) with (1+n)%nat.
   rewrite inj_plus.
@@ -728,13 +728,13 @@ Proof.
    change (4%positive:Z) with (2^2)%Z.
    rewrite -> Zpower_Qpower;[|discriminate].
    rewrite <- Qpower_mult.
-   apply Qle_trans with (two_p (log_sup p)).
+   apply Qle_trans with (2 ^ Z.log2_up (Zpos p))%Z.
     unfold Qle; simpl.
     rewrite Pmult_comm;simpl.
     ring_simplify.
-    destruct (log_sup_correct2 p).
-    auto.
-   generalize  (log_sup p) (log_sup_correct1 p).
+    destruct (Z.log2_log2_up_spec p); [ reflexivity | ].
+    assumption.
+   generalize  (Z.log2_up (Zpos p)) (Z.log2_up_nonneg (Zpos p)).
    intros z Hz.
    clear p.
    cut (z <=  (2 * div2 (S (Z_to_nat (z:=z) Hz))))%Z.

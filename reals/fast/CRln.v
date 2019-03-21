@@ -230,7 +230,7 @@ Definition ln_scale_power_factor q (Hq:0 < q) : Z.
 Proof.
  revert q Hq.
  intros [[|n|n] d] Hq; try abstract discriminate Hq.
- exact (Z.pred (log_inf d - (log_sup n)))%Z.
+ exact (Z.pred (Z.log2 d - Z.log2_up n))%Z.
 Defined.
 
 Definition rational_ln (a:Q) (p: 0 < a) : CR :=

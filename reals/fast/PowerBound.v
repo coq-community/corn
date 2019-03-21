@@ -27,6 +27,12 @@ Require Import CoRN.algebra.COrdFields2.
 Require Import Coq.QArith.Qpower.
 Require Import CoRN.tactics.CornTac.
 
+Lemma Psize_Zlog2 (p: positive) :
+  Zpos (Pos.size p) = Z.succ (Z.log2 (Zpos p)).
+Proof.
+  destruct p; simpl; rewrite ?Pos.add_1_r; reflexivity.
+Qed.
+
 Local Open Scope Q_scope.
 
 (** These functions effiecently find bounds on rational numbers of the
@@ -41,14 +47,15 @@ Proof.
  rewrite Zpos_mult_morphism.
  apply Zmult_le_compat; auto with *.
  clear - n.
- apply Z.le_trans with (two_p (Z.succ (log_inf n))-1)%Z.
+ apply Z.le_trans with (two_p (Z.succ (Z.log2 (Zpos n)))-1)%Z.
   rewrite <- Zle_plus_swap.
   apply Zlt_succ_le.
   change (Zpos n+1) with (Z.succ (Zpos n)).
   apply Zsucc_lt_compat.
-  destruct (log_inf_correct2 n).
+  destruct (Z.log2_spec (Zpos n)); auto with zarith.
+  rewrite two_p_correct.
   assumption.
- replace (Z.succ (log_inf n)) with (Z_of_nat (Psize n)).
+ replace (Z.succ (Z.log2 (Zpos n))) with (Z_of_nat (Psize n)).
   apply Z.le_trans with (two_p (Z_of_nat (Psize n))).
    auto with *.
   induction (Psize n); auto with *.
@@ -61,8 +68,10 @@ Proof.
   change (3^1) with 3.
   apply Zmult_le_compat; auto with *.
   induction (Z_of_nat n0); auto with *.
- induction n; auto with *; simpl; rewrite <- IHn;
-   rewrite <- POS_anti_convert; rewrite inj_S; reflexivity.
+  rewrite <- Psize_Zlog2.
+  induction n as [ p ih | p ih | ]; auto; simpl;
+  rewrite Pos2Z.inj_succ, <- ih;
+  apply Z.P_of_succ_nat_Zplus.
 Close Scope Z_scope.
 Qed.
 
