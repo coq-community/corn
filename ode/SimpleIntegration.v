@@ -8,7 +8,7 @@
 
 Require Import
   CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano Coq.Unicode.Utf8
-  Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.model.structures.QnonNeg CoRN.util.Qsums
+  Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.util.Qsums
   CoRN.model.metric2.Qmetric CoRN.model.setoids.Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
   CoRN.reals.fast.CRArith (*AbstractIntegration*)
   CoRN.util.Qgcd
@@ -21,7 +21,7 @@ Require Import
   CoRN.ode.metric CoRN.ode.FromMetric2
   MathClasses.implementations.stdlib_rationals.
 
-Import QnonNeg.notations Qinf.coercions.
+Import QnonNeg.notations QnonNeg.coercions Qinf.coercions.
 
 Bind Scope Q_scope with Q.
 Local Open Scope Q_scope.
@@ -223,13 +223,13 @@ Section definition.
   Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos) :
     (i < (intervals fr wb he * t)%positive)%nat ->
     ball (he / wb)
-         (f (fr + plus_half_times (i / t)%nat (wb * / intervals fr wb he)))
-         (f (fr + i * / (intervals fr wb he * t)%positive * wb)).
+         (f (fr + plus_half_times (i / t)%nat (wb * / Zpos (intervals fr wb he))))
+         (f (fr + i * / Zpos (intervals fr wb he * t) * wb)).
   Proof with auto.
    intro ile.
    unfold plus_half_times.
    apply ball_sym.
-   assert (A1 : Qball wb fr (fr + i * / (intervals fr wb he * t)%positive * wb)).
+   assert (A1 : Qball wb fr (fr + i * / Zpos (intervals fr wb he * t) * wb)).
     rewrite <- (Qplus_0_r fr) at 1.
     apply Qball_plus_r.
     apply in_Qball.
@@ -242,7 +242,7 @@ Section definition.
     rewrite Qplus_0_l.
     rewrite <- (Qmult_1_l wb) at 2.
     apply Qmult_le_compat_r...
-    apply Qmult_le_r with (intervals fr wb he * t)%positive...
+    apply Qmult_le_r with (Zpos (intervals fr wb he * t))...
     rewrite <- Qmult_assoc.
     rewrite Qmult_inv_r.
      rewrite Qmult_1_r.
@@ -259,8 +259,8 @@ Section definition.
    assert
      (A2 : mspc_ball
         (lmu fr wb (he / wb))
-        (fr + i * / (intervals fr wb he * t)%positive * wb)
-        (fr + ((i / t)%nat * (wb * / intervals fr wb he) + (1 # 2) * (wb * / intervals fr wb he)))).
+        (fr + i * / Zpos (intervals fr wb he * t) * wb)
+        (fr + ((i / t)%nat * (wb * / Zpos (intervals fr wb he)) + (1 # 2) * (wb * / Zpos (intervals fr wb he))))).
     unfold intervals.
     destruct (lmu fr wb (he / wb)) as [q |] eqn:L; [| apply mspc_inf].
     (* apply gball_mspc_ball. does not change the goal *)
@@ -273,7 +273,7 @@ Section definition.
     change ((1 # 2) * wb / q')%Q with (QposAsQ ((1 # 2) * wb / q')%Qpos).
     set (mym := QposCeiling ((1 # 2) * wb / q')%Qpos).
     apply ball_weak_le with (wb * (1#2) * Qpos_inv mym)%Qpos.
-     change (wb * (1 # 2) / mym <= q').
+     change (wb * (1 # 2) / Zpos mym <= q').
      rewrite (Qmult_comm (wb)).
      subst mym.
      rewrite QposCeiling_Qceiling.
@@ -300,7 +300,7 @@ Section definition.
      apply Qfloor_ball.
     unfold QposEq. simpl.
     field. split; try discriminate...
-   assert (A3 : Qball wb fr (fr + ((i / t)%nat * (wb * / intervals fr wb he) + (1 # 2) * (wb * / intervals fr wb he)))).
+   assert (A3 : Qball wb fr (fr + ((i / t)%nat * (wb * / Zpos (intervals fr wb he)) + (1 # 2) * (wb * / Zpos (intervals fr wb he))))).
     set (n := intervals fr wb he).
     rewrite <- (Qplus_0_r fr) at 1.
     apply Qball_plus_r.
@@ -416,18 +416,18 @@ Section implements_abstract_interface.
       Let wbints (b : bool) := intervals lmu (if b then a else a+ww true) (ww b) (ec b * (1 # 2)).
       Let w01ints := intervals lmu a totalw (e * (1 # 2)).
       Let approx0 (i: nat) :=
-        approximate (f (a + plus_half_times i (ww true / wbints true))) (ec true * (1 # 2) / ww true)%Qpos.
+        approximate (f (a + plus_half_times i (ww true / Zpos (wbints true)))) (ec true * (1 # 2) / ww true)%Qpos.
       Let approx1 (i: nat) :=
-        approximate (f (a + ww true + plus_half_times i (ww false / wbints false))) (ec false * (1 # 2) / ww false)%Qpos.
+        approximate (f (a + ww true + plus_half_times i (ww false / Zpos (wbints false)))) (ec false * (1 # 2) / ww false)%Qpos.
       Let approx01 (i: nat) :=
-        approximate (f (a + plus_half_times i (totalw / w01ints))) (e * (1 # 2) / totalw)%Qpos.
+        approximate (f (a + plus_half_times i (totalw / Zpos w01ints))) (e * (1 # 2) / totalw)%Qpos.
 
       (*Let hint := luc_Proper f.*)
 
       Lemma added_summations: Qball (e + e)
-        (Σ (wbints true) approx0 * (ww true / wbints true) +
-         Σ (wbints false) approx1 * (ww false / wbints false))
-        (Σ w01ints approx01 * (totalw / w01ints)).
+        (Σ (wbints true) approx0 * (ww true / Zpos (wbints true)) +
+         Σ (wbints false) approx1 * (ww false / Zpos (wbints false)))
+        (Σ w01ints approx01 * (totalw / Zpos w01ints)).
       Proof with auto with *.
        destruct (Qpos_gcd3 (ww true / wbints true) (ww false / wbints false) (totalw / w01ints)) as [x [i [E [j [F [k G]]]]]].
        rewrite <- E, <- F, <- G.
@@ -461,11 +461,11 @@ Section implements_abstract_interface.
        subst approx0 approx1 approx01.
        unfold flip, Basics.compose.
        assert (~ ww true + ww false == 0). change (~ (ww true + ww false)%Qpos == 0)...
-       assert (i == (ww true / wbints true / x)%Qpos) as iE.
+       assert (Zpos i == (ww true / wbints true / x)%Qpos) as iE.
         apply Qmult_injective_l with x... rewrite E. simpl. field...
-       assert (j == (ww false / wbints false / x)%Qpos) as jE.
+       assert (Zpos j == (ww false / wbints false / x)%Qpos) as jE.
         apply Qmult_injective_l with x... rewrite F. simpl. field...
-       assert (k == (totalw / w01ints / x)%Qpos) as kE.
+       assert (Zpos k == (totalw / w01ints / x)%Qpos) as kE.
         apply Qmult_injective_l with x... rewrite G. simpl. field...
        apply Qball_plus.
         (* left case: *)
@@ -476,17 +476,17 @@ Section implements_abstract_interface.
         with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
          Focus 2.
          unfold QposEq. simpl.
-         assert (x == (ww true / wbints true / i)) as xE.
+         assert (x == (ww true / Zpos (wbints true) / Zpos i)) as xE.
           apply Q.Qmult_injective_r with i...
           rewrite <- E. field...
          rewrite xE.
          rewrite Q.Pmult_Qmult.
          field...
         subst ec. simpl in ebit.
-        apply (ball_triangle CR (ebit true) (ebit false) (f _) (f (a + i0 * (totalw / (w01ints * k)))) (f _))...
+        apply (ball_triangle CR (ebit true) (ebit false) (f _) (f (a + i0 * (totalw / (Zpos w01ints * Zpos k)))) (f _))...
          setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
          unfold ebit.
-         setoid_replace (totalw / (w01ints * k)) with ((/ (wbints true * i) * ww true))
+         setoid_replace (totalw / (w01ints * k)) with ((/ (Zpos (wbints true) * Zpos i) * ww true))
          by (unfold Q_eq; rewrite kE, iE; simpl; field; auto).
          setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww true / totalw) * (1 # 2) / ww true)%Qpos
           by (unfold QposEq; simpl; field; auto).
@@ -496,7 +496,7 @@ Section implements_abstract_interface.
          rewrite Pmult_comm...
         apply ball_sym.
         unfold ebit.
-        setoid_replace (i0 * (totalw / (w01ints * k))) with (i0 * / (w01ints * k)%positive * totalw).
+        setoid_replace (i0 * (totalw / (Zpos w01ints * Zpos k))) with (i0 * / Zpos (w01ints * k) * totalw).
          apply sampling_over_subdivision...
          rewrite Pmult_comm.
          apply lt_trans with (i * wbints true)%positive...
@@ -523,21 +523,21 @@ Section implements_abstract_interface.
        with (ebit true + (ebit true + ebit false) + ebit false)%Qpos.
         Focus 2.
         unfold QposEq. simpl. rewrite Pmult_Qmult, jE. simpl. field...
-       apply (ball_triangle CR (ebit true) (ebit false) _ (f (a + ww true + i0 * (totalw / (w01ints * k)))) _)...
+       apply (ball_triangle CR (ebit true) (ebit false) _ (f (a + ww true + i0 * (totalw / (Zpos w01ints * Zpos k)))) _)...
         setoid_replace (ebit true) with (ebit false) by (unfold QposEq; simpl; field; auto).
         unfold ebit.
-        setoid_replace (totalw / (w01ints * k)) with ((/ (wbints false * j) * ww false)) by (rewrite kE, jE; unfold Q_eq; simpl; field; auto).
+        setoid_replace (totalw / (Zpos w01ints * Zpos k)) with ((/ (Zpos (wbints false) * Zpos j) * ww false)) by (rewrite kE, jE; unfold Q_eq; simpl; field; auto).
         setoid_replace (e * (1 # 2) / totalw)%Qpos with (e * (ww false / totalw) * (1 # 2) / ww false)%Qpos by (unfold QposEq; simpl; field; auto).
         rewrite <- Pmult_Qmult.
         rewrite Qmult_assoc.
         apply sampling_over_subdivision...
         rewrite Pmult_comm...
        apply ball_sym.
-       setoid_replace (a + ww true + i0 * (totalw / (w01ints * k))) with (a + (i * wbints true + i0) * (totalw / (w01ints * k)))
+       setoid_replace (a + ww true + i0 * (totalw / (Zpos w01ints * Zpos k))) with (a + (i * wbints true + i0) * (totalw / (Zpos w01ints * Zpos k)))
         by (rewrite iE, kE; unfold Q_eq; simpl; field; auto).
        rewrite <- Pmult_Qmult.
-       setoid_replace (((i * wbints true)%positive + i0) * (totalw / (w01ints * k))) with
-         (((i * wbints true)%positive + i0)%nat * / (intervals lmu a totalw (e * (1#2)) * k)%positive * totalw).
+       setoid_replace ((Zpos (i * wbints true) + i0) * (totalw / (Zpos w01ints * Zpos k))) with
+         (((i * wbints true)%positive + i0)%nat * / Zpos (intervals lmu a totalw (e * (1#2)) * k) * totalw).
         apply (sampling_over_subdivision f a ((i * wbints true)%positive + i0) k (e*(1#2)) totalw).
         fold w01ints.
         apply lt_le_trans with ((i * wbints true)%positive + (j * wbints false)%positive)%nat...
@@ -580,7 +580,7 @@ Section implements_abstract_interface.
   End additivity.
 
   Lemma data_points_in_range (from: Q) (width: Qpos) (ints: positive) (i : nat) (Ilt: (i < ints)%nat):
-    from <= (from + (i * (`width / ints) + (1 # 2) * (`width / ints))) <= from + `width.
+    from <= (from + (i * (`width / Zpos ints) + (1 # 2) * (`width / Zpos ints))) <= from + `width.
   Proof with auto with qarith.
    split.
     rewrite <- (Qplus_0_r from) at 1.
@@ -588,8 +588,8 @@ Section implements_abstract_interface.
     change (0 <= i * ` (width / ints)%Qpos + (1#2) * ` (width / ints)%Qpos)...
    apply Qplus_le_compat...
    unfold Qdiv.
-   setoid_replace (i * (`width * / ints) + (1 # 2) * (`width * / ints))
-     with (((i+(1#2)) * / ints) * `width) by (unfold Q_eq; ring).
+   setoid_replace (i * (`width * / Zpos ints) + (1 # 2) * (`width * / Zpos ints))
+     with (((i+(1#2)) * / Zpos ints) * `width) by (unfold Q_eq; ring).
    rewrite <- (Qmult_1_l (`width)) at 2.
    apply Qmult_le_compat_r...
    apply Qdiv_le_1.
