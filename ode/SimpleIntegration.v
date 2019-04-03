@@ -292,7 +292,7 @@ Section definition.
     unfold Qdiv.
     rewrite Qmult_plus_distr_l.
     field_simplify...
-    rewrite Qdiv_1_r.
+    try rewrite Qdiv_1_r.
     setoid_replace (wb * (1 # 2) / mym / (Qpos_inv mym * wb))%Qpos with (1#2)%Qpos.
      rewrite Zdiv.div_Zdiv...
      rewrite Q.Zdiv_Qdiv.

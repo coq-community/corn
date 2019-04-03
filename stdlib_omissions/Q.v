@@ -216,7 +216,7 @@ Proof.
   apply Qmult_le_l with x; try assumption.
   apply Qmult_le_l with y; try assumption.
   field_simplify. 
-    unfold Qdiv. now rewrite 2!Qmult_1_r.
+    now try (unfold Qdiv; rewrite 2!Qmult_1_r).
    now apply Qneq_symmetry, Qlt_not_eq.
   now apply Qneq_symmetry, Qlt_not_eq.
 Qed.
@@ -229,7 +229,7 @@ Proof.
   apply Qmult_lt_l with x; try assumption.
   apply Qmult_lt_l with y; try assumption.
   field_simplify. 
-    unfold Qdiv. now rewrite 2!Qmult_1_r.
+    now try (unfold Qdiv; rewrite 2!Qmult_1_r).
    now apply Qneq_symmetry, Qlt_not_eq.
   now apply Qneq_symmetry, Qlt_not_eq.
 Qed.

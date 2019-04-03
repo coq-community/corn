@@ -190,7 +190,7 @@ Proof.
   field_simplify;[|apply Qpos_nonzero].
   unfold Qle.
   simpl.
-  change (n * 1* 1 <= (S n)*1*1)%Z.
+  change (n * 1 * 1 <= (S n)*1*1)%Z || change (n * 1 <= (S n)*1)%Z.
   ring_simplify.
   apply inj_le.
   auto with *.
