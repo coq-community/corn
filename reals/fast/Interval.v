@@ -244,7 +244,7 @@ Proof.
 Defined.
 
 (** Construct the compact set. *)
-Lemma CompactIntervalQ_nat : forall (e:Qpos), (0 <= Qceiling ((r-l)/(2*e)))%Z.
+Lemma CompactIntervalQ_nat : forall (e:Qpos), (0 <= Qceiling ((r-l)/(2%Z*e)))%Z.
 Proof.
  intros e.
  change (0%Z) with (Qceiling 0).
