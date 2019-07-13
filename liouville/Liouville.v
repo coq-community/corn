@@ -326,7 +326,7 @@ Lemma Liouville_lemma7 : forall (p : Z_as_CRing) (q : positive), P ! (p#q)%Q [#]
 Proof.
  intros p q Hap.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma6 _ _ Hap)).
- rewrite <- mult_assoc.
+ rewrite <- CRings.mult_assoc.
  apply mult_wdr.
  rewrite -> rh_pres_mult.
  apply AbsIR_resp_mult.
@@ -356,10 +356,10 @@ Lemma Liouville_lemma9 : forall (p : Z_as_CRing) (q : positive),
 Proof.
  intros p q Hap Hle.
  apply (leEq_transitive _ _ _ _ (Liouville_lemma7 _ _ Hap)).
- rewrite <- mult_assoc, <- mult_assoc.
+ rewrite <- CRings.mult_assoc, <- CRings.mult_assoc.
  apply mult_resp_leEq_lft.
   unfold C.
-  rewrite <- mult_assoc.
+  rewrite <- CRings.mult_assoc.
   apply mult_resp_leEq_lft; [|apply AbsIR_nonneg].
   apply (leEq_wdl _ _ _ _ (Liouville_lemma2 _ _ _ Hle)).
   apply AbsIR_wd.
@@ -433,7 +433,7 @@ Proof.
   reflexivity.
  rewrite H; clear H.
  rewrite <- nexp_ring_hom.
- rewrite <- mult_assoc.
+ rewrite <- CRings.mult_assoc.
  rewrite <- nexp_ring_hom.
  rewrite <- rh_pres_mult.
  assert (H : (1 # q)%Q[^]Liouville_degree[*](inject_Z q)[^]Liouville_degree [=] [1]).
@@ -453,7 +453,7 @@ Proof.
  apply (leEq_wdr _ _ _ _ (Liouville_lemma10 _ _ H _ _ H1)).
  fold C.
  rewrite -> (mult_commutes _ _ C).
- rewrite <- mult_assoc.
+ rewrite <- CRings.mult_assoc.
  apply mult_wdr.
  rewrite -> mult_commutes.
  apply mult_wdr.

@@ -514,7 +514,7 @@ Proof.
 constructor.
 + intros. apply lip_modulus_pos; [| assumption]. now apply (lip_nonneg f L).
 + unfold lip_modulus. intros e x1 x2 A1 A2. destruct (decide (L = 0)) as [A | A].
-  - apply mspc_eq; [| easy]. unfold equiv, mspc_equiv. rewrite <- (Qmult_0_l (msd x1 x2)), <- A.
+  - apply mspc_eq; [| easy]. unfold canonical_names.equiv, mspc_equiv. rewrite <- (Qmult_0_l (msd x1 x2)), <- A.
     now apply lip_prf; [| apply mspc_distance].
   - mc_setoid_replace e with (L * (e / L)) by now field.
     now apply lip_prf.

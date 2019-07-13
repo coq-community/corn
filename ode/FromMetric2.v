@@ -89,6 +89,8 @@ End FromCompleteMetricSpace.
 
 Require Import CoRN.model.metric2.CRmetric.
 
+Import metric.
+
 Section CompleteSegment.
 
 Context {X : MetricSpace} (r : Q) (a : Complete X).
@@ -123,6 +125,8 @@ Qed.
 End CompleteSegment.
 
 Require Import CoRN.model.setoids.Qsetoid CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith CoRN.reals.fast.CRball CoRN.reals.fast.CRabs MathClasses.theory.abs MathClasses.orders.minmax.
+
+Import canonical_names.
 
 Add Ring CR : (stdlib_ring_theory CR).
 
@@ -224,6 +228,8 @@ constructor.
   apply CRgball_plus; [now apply: (lip_prf f Lf) | now apply: (lip_prf g Lg)].
 Qed.
 *)
+
+Import metric.
 
 (* Needed to be able to state the property that the integral of the sum is
 the sum of integrals *)

@@ -1,10 +1,10 @@
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
- CSetoids CPoly_ApZero CRings CPoly_Degree
+ CSetoids CPoly_ApZero CPoly_Degree
  CRArith Qmetric Qring CReals Ranges
  stdlib_omissions.Pair stdlib_omissions.Q
- list_separates SetoidPermutation.
+ list_separates SetoidPermutation CRings.
 Require MathClasses.implementations.ne_list.
 Import CRing_Homomorphisms.coercions.
 Import ne_list.notations ne_list.coercions.

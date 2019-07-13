@@ -23,7 +23,6 @@ Require Export CoRN.model.metric2.IntegrableFunction.
 Require Export CoRN.model.metric2.BoundedFunction.
 Require Export CoRN.model.metric2.CRmetric.
 Require Export CoRN.reals.fast.CRArith.
-Require Import CoRN.model.metric2.LinfDistMonad.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.ftc.Integral.
 Require Import CoRN.model.structures.StepQsec.
@@ -42,6 +41,7 @@ Require Import CoRN.reals.fast.ContinuousCorrect.
 Require Import CoRN.ftc.IntegrationRules.
 Require Import CoRN.ftc.MoreIntegrals.
 Require Import CoRN.tactics.CornTac.
+Require Import CoRN.model.metric2.LinfDistMonad.
 
 Set Implicit Arguments.
 

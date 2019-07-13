@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -39,6 +38,8 @@ Set Implicit Arguments.
 Opaque CR Qabs.
 
 Local Open Scope Q_scope.
+
+Import CoqStreams.
 
 (**
 ** Geometric Series
@@ -160,6 +161,7 @@ match n with
 | xI n' => InfiniteSum_raw_F (fun err s =>
  (InfiniteSum_raw_N n' (fun err s => InfiniteSum_raw_N n' cont err s)) err s)
 end.
+
 (*
 Remark : the eta expension here is important, else the virtual machine will
 compute the value of (InfiniteGeometricSum_raw_N n') before
@@ -167,7 +169,7 @@ reducing the call of InfiniteGeometricSum_raw_F.*)
 
 (** Lemmas for reasoning about InfiniteSum_raw_N. *)
 Lemma InfiniteSum_raw_N_F : forall p c,
- InfiniteSum_raw_N p (fun err s => InfiniteSum_raw_F c err s)=
+ InfiniteSum_raw_N p (fun err s => InfiniteSum_raw_F c err s) =
  InfiniteSum_raw_F (fun err s => InfiniteSum_raw_N p c err s).
 Proof.
  induction p; intro c; try reflexivity; simpl; repeat rewrite IHp; reflexivity.

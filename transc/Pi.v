@@ -869,14 +869,14 @@ Proof.
   apply Sin_double.
  astepr ((Two:IR) [*][1] [/]TwoNZ).
  eapply eq_transitive.
-  apply eq_symmetric; apply mult_assoc.
+  apply eq_symmetric; apply CRings.mult_assoc.
  apply mult_wdr.
  cut (sqrt _ (less_leEq _ _ _ (pos_two IR)) [#] [0]). intro H.
   eapply eq_transitive.
    2: symmetry; apply (sqrt_lemma _ H).
   simpl in |- *.
   eapply eq_transitive.
-   2: apply mult_assoc.
+   2: apply CRings.mult_assoc.
   eapply eq_transitive.
    apply eq_symmetric; apply one_mult.
   apply mult_wdr.

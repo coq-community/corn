@@ -1301,7 +1301,7 @@ Fixpoint SeqBound0 (n : nat) : IR :=
     end.
 
 Lemma SeqBound0_greater : forall (m n : nat),
-m < n -> AbsIR (seq m) [<=] SeqBound0 n.
+  (m < n)%nat -> AbsIR (seq m) [<=] SeqBound0 n.
 Proof.
  intros.
  elim H.
