@@ -111,7 +111,7 @@ apply gball_weak_le with (q := QposAsQ e1 + r + (QposAsQ ((1 # 2) * e2)%Qpos)).
 + apply gball_complete, H.
 Qed.
 
-Global Instance : CompleteMetricSpaceClass (sig (mspc_ball r a)).
+Global Instance CompleteMetricSpaceClass_instance_1: CompleteMetricSpaceClass (sig (mspc_ball r a)).
 Proof.
 constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
