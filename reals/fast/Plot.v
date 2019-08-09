@@ -23,7 +23,7 @@ Require Import CoRN.reals.fast.Interval.
 Require Export CoRN.metric2.Graph.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Export CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.tactics.CornTac.
+Require Import CoRN.tactics.CornTac CoRN.tactics.AlgReflection.
 
 Section Plot.
 (**

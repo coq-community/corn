@@ -337,6 +337,9 @@ Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact sta
 CompactImage_b (1#1) _ plFEX graphPoint_b.
 
 Require Import CoRN.model.ordfields.Qordfield.
+
+Local Open Scope Q_scope.
+
 Lemma CompactGraph_b_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Couple (x,(Cbind plX f x))) (CompactGraph_b plFEX s).
 Proof.

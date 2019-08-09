@@ -40,6 +40,8 @@ Require Import CoRN.reals.fast.PowerBound.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 
+Import MathClasses.theory.CoqStreams.
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.

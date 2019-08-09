@@ -16,7 +16,8 @@ Import Qinf.notations QnonNeg.notations QnnInf.notations CRball.notations Qabs (
 
 Require CoRN.reals.fast.CRtrans CoRN.reals.faster.ARtrans. (* This is almost all CoRN *)
 
-Import Qinf.coercions QnonNeg.coercions QnnInf.coercions.
+Import Qinf.coercions QnonNeg.coercions QnnInf.coercions CoRN.stdlib_omissions.Q.
+
 
 Ltac done :=
   trivial; hnf; intros; solve
@@ -449,7 +450,7 @@ Section integral_approximation.
     Lemma step_0 (n : positive) : step 0 n == 0.
     Proof. unfold step; now rewrite Qmult_0_l. Qed.
 
-    Lemma step_mult (w : Q) (n : positive) : (n : Q) * step w n == w.
+    Lemma step_mult (w : Q) (n : positive) : (inject_Z n : Q) * step w n == w.
     Proof.
       unfold step.
       rewrite Qmake_Qdiv. unfold Qdiv. rewrite Qmult_1_l, (Qmult_comm w), Qmult_assoc.
@@ -632,7 +633,7 @@ Lemma riemann_sum_const (a : Q) (w : Q) (m : CR) (n : positive) :
 Proof.
 unfold riemann_sum. rewrite cmΣ_const, positive_nat_Z.
 change ('step w n * m * '(n : Q) = 'w * m).
-rewrite (mult_comm _ ('(n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
+rewrite (mult_comm _ ('(inject_Z n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
 Qed.
 
 Lemma riemann_sum_plus (f g : Q -> CR) (a w : Q) (n : positive) :
@@ -671,7 +672,7 @@ Lemma index_inside_r (a w : Q) (k : nat) (n : positive) :
   0 ≤ w -> k < Pos.to_nat n -> a + (k : Q) * step w n ≤ a + w.
 Proof.
 intros A1 A2. apply (orders.order_preserving (a +)).
-mc_setoid_replace w with ((n : Q) * (step w n)) at 2 by (symmetry; apply step_mult).
+mc_setoid_replace w with ((inject_Z n : Q) * (step w n)) at 2 by (symmetry; apply step_mult).
 apply (orders.order_preserving (.* step w n)).
 rewrite <- Zle_Qle, <- positive_nat_Z. apply inj_le. change (k ≤ Pos.to_nat n). solve_propholds.
 Qed.
@@ -681,7 +682,7 @@ Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
   gball (w * e) (riemann_sum f a w n) ('w * m).
 Proof.
 intros w_nn A. rewrite <- (riemann_sum_const a w m n). unfold riemann_sum.
-rewrite <- (step_mult w n), <- (Qmult_assoc n _ e), <- (positive_nat_Z n).
+rewrite <- (step_mult w n), <- (Qmult_assoc (inject_Z n) _ e), <- (positive_nat_Z n).
 apply CRΣ_gball. intros k A1. apply CRball.gball_CRmult_Q_nonneg; [now apply step_nonneg |].
 apply A. split; [apply index_inside_l | apply index_inside_r]; trivial.
 Qed.

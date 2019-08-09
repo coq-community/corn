@@ -89,6 +89,8 @@ End FromCompleteMetricSpace.
 
 Require Import CoRN.model.metric2.CRmetric.
 
+Import metric.
+
 Section CompleteSegment.
 
 Context {X : MetricSpace} (r : Q) (a : Complete X).
@@ -109,7 +111,7 @@ apply gball_weak_le with (q := QposAsQ e1 + r + (QposAsQ ((1 # 2) * e2)%Qpos)).
 + apply gball_complete, H.
 Qed.
 
-Global Instance : CompleteMetricSpaceClass (sig (mspc_ball r a)).
+Global Instance CompleteMetricSpaceClass_instance_1: CompleteMetricSpaceClass (sig (mspc_ball r a)).
 Proof.
 constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
@@ -123,6 +125,8 @@ Qed.
 End CompleteSegment.
 
 Require Import CoRN.model.setoids.Qsetoid CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith CoRN.reals.fast.CRball CoRN.reals.fast.CRabs MathClasses.theory.abs MathClasses.orders.minmax.
+
+Import canonical_names.
 
 Add Ring CR : (stdlib_ring_theory CR).
 
@@ -224,6 +228,8 @@ constructor.
   apply CRgball_plus; [now apply: (lip_prf f Lf) | now apply: (lip_prf g Lg)].
 Qed.
 *)
+
+Import metric.
 
 (* Needed to be able to state the property that the integral of the sum is
 the sum of integrals *)

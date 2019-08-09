@@ -31,6 +31,7 @@ Require Import Coq.QArith.Qpower.
 Require Import CoRN.reals.fast.LazyNat. 
 Require Import Coq.setoid_ring.Ring MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
 Require Export MathClasses.theory.series.
+Require Import MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
 
 Opaque Qabs.
 Local Open Scope Q_scope.

@@ -360,7 +360,7 @@ Proof.
       apply cg_minus_wd.
        algebra.
       simpl in |- *; algebra.
-     unfold power in |- *.
+     unfold RealPowers.power in |- *.
      astepl (Exp [--] ([1] [/]TwoNZ[*]Log _ H4) [*]Cos x).
      astepl (([1][/] _[//]Exp_ap_zero ([1] [/]TwoNZ[*]Log _ H4)) [*]Cos x).
      astepr (Exp ([1] [/]TwoNZ[*]Log _ H4) [/] _[//]Exp_ap_zero ([1] [/]TwoNZ[*]Log _ H4)).
@@ -380,7 +380,7 @@ Proof.
      apply Log_wd.
      astepr (Cos x[^]2[+]Sin x[^]2[-]Sin x[^]2); rational.
     astepl (OneR[-][1]).
-    unfold cg_minus in |- *; apply plus_resp_less_lft.
+    unfold cg_minus in |- *.  apply plus_resp_less_lft.
     apply inv_resp_less.
     astepr (OneR[^]2); apply AbsIR_less_square.
     inversion_clear H3; apply Abs_Sin_less_One; auto.

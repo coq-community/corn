@@ -134,7 +134,5 @@ Proof.
   2:intuition.
  set (H8:= (Zmod_cancel_multiple c0 r' b' H5)).
  rewrite H8.
- apply Zmod_small.
-  intuition.
- intuition.
+ apply Zmod_small; intuition.
 Qed.

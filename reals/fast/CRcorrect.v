@@ -29,6 +29,8 @@ Require Export CoRN.reals.fast.CRFieldOps.
 
 Set Automatic Introduction.
 
+Local Open Scope nat_scope.
+
 Opaque Qmin Qmax.
 
 (**
