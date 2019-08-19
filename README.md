@@ -58,7 +58,7 @@ greater, which is a library of abstract interfaces for mathematical
 structures that is heavily based on Coq&#39;s type classes.
 
 
-  - [Bignums](https://github/com/coq/bignums)
+  - [Bignums](https://github.com/coq/bignums)
 
 
 ## Building and installation instructions
