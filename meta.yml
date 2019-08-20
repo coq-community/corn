@@ -1,9 +1,41 @@
 ---
 fullname: C-CoRN
 shortname: corn
+organization: coq-community
+community: true
 
-description: The Coq Constructive Repository at Nijmegen.
+synopsis: The Coq Constructive Repository at Nijmegen.
 
+description: |
+  CoRN includes the following parts:
+
+  - Algebraic Hierarchy
+
+    An axiomatic formalization of the most common algebraic
+    structures, including setoids, monoids, groups, rings,
+    fields, ordered fields, rings of polynomials, real and
+    complex numbers
+
+  - Model of the Real Numbers
+
+    Construction of a concrete real number structure
+    satisfying the previously defined axioms
+
+  - Fundamental Theorem of Algebra
+
+    A proof that every non-constant polynomial on the complex
+    plane has at least one root
+
+  - Real Calculus
+
+    A collection of elementary results on real analysis,
+    including continuity, differentiability, integration,
+    Taylor's theorem and the Fundamental Theorem of Calculus
+
+  - Exact Real Computation
+
+    Fast verified computation inside Coq. This includes: real numbers, functions,
+    integrals, graphs of functions, differential equations.
 
 authors:
 - name: Evgeny Makarov
@@ -40,19 +72,21 @@ opam-file-maintainer: b.a.w.spitters@gmail.com
 
 license:
   fullname: GNU General Public License v2
-  shortname: GPL2
+  identifier: GPL-2.0
 
 supported_coq_versions:
   text: Coq 8.6 or greater
-  opam: '{(>= "8.6" & < "8.10~") | (= "dev")}'
+  opam: '{(>= "8.6" & < "8.11~") | (= "dev")}'
 
-tested_coq_versions:
-- version_or_url: 8.9
-- version_or_url: 8.8
-- version_or_url: 8.7
-- version_or_url: 8.6
+tested_coq_nix_versions:
+- version_or_url: "8.10"
+- version_or_url: "8.9"
+- version_or_url: "8.8"
+- version_or_url: "8.7"
+- version_or_url: "8.6"
 
-tested_coq_opam_version: dev
+tested_coq_opam_versions:
+- version: dev
 
 dependencies:
 - opam:
@@ -103,35 +137,4 @@ documentation: |
 
   To build CoqDoc documentation, say `scons coqdoc`.
 
-  ## Description of the repository
-
-  CoRN includes the following parts:
-
-  - Algebraic Hierarchy
-
-    An axiomatic formalization of the most common algebraic
-    structures, including setoids, monoids, groups, rings,
-    fields, ordered fields, rings of polynomials, real and
-    complex numbers
-
-  - Model of the Real Numbers
-
-    Construction of a concrete real number structure
-    satisfying the previously defined axioms
-
-  - Fundamental Theorem of Algebra
-
-    A proof that every non-constant polynomial on the complex
-    plane has at least one root
-
-  - Real Calculus
-
-    A collection of elementary results on real analysis,
-    including continuity, differentiability, integration,
-    Taylor's theorem and the Fundamental Theorem of Calculus
-
-  - Exact Real Computation
-
-    Fast verified computation inside Coq. This includes: real numbers, functions,
-    integrals, graphs of functions, differential equations.
 ---
