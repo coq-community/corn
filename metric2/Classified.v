@@ -133,7 +133,7 @@ Section genball.
 
   Definition ball_genball (q: Qpos) (a b: X): genball q a b ↔ R q a b.
   Proof.
-   unfold genball.
+   unfold genball; simpl.
    destruct Qdec_sign as [[|]|U].
      exfalso.
      destruct q.
