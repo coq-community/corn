@@ -80,6 +80,7 @@ CoRN includes the following parts:
   - Nickolay Shmyrev
 - Coq-community maintainer(s):
   - Bas Spitters ([**@spitters**](https://github.com/spitters))
+  - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
 - License: [GNU General Public License v2](LICENSE)
 - Compatible Coq versions: Coq 8.6 or greater
 - Additional Coq dependencies:
