@@ -100,7 +100,20 @@ opam repo add coq-released https://coq.inria.fr/opam/released
 opam install coq-corn
 ```
 
-To instead build and install manually, do:
+To instead build and install manually, you have to start with
+the `bignums` dependency:
+
+``` shell
+git clone https://github.com/coq/bignums
+cd bignums
+make   # or make -j <number-of-cores-on-your-machine>
+make install
+```
+
+The last `make install` is necessary, it copies `bignums` to
+a common folder, which is usually `coq/user-contrib`. Afterwards
+the similar commands for `math-classes` will find `bignums` there.
+Finally build `corn` itself:
 
 ``` shell
 git clone https://github.com/coq-community/corn
