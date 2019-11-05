@@ -510,7 +510,7 @@ Proof.
   case R.
     auto with zarith.
    intro r'; intros H0 H1 H2.
-   cut (Zpos r' = Zpos p); auto with zarith.
+   enough (Zpos r' = Zpos p) by auto with zarith.
    fold (- Zpos p)%Z in H2.
    auto with zarith.
   intro r'; intros H0 H1 H2.

@@ -374,8 +374,8 @@ Proof.
  intro p.
  left; left.
  rewrite <- (Zplus_0_r b).
- replace (b + 0 + Zneg p)%Z with (b + Zneg p)%Z; auto with zarith.
- cut (Zneg p < 0)%Z; auto with zarith.
+ replace (b + 0 + Zneg p)%Z with (b + Zneg p)%Z by auto with zarith.
+ cut (Zneg p < 0)%Z. auto with zarith.
  apply Zlt_NEG_0.
 Qed.
 
@@ -400,15 +400,15 @@ Lemma Zmult_pos_mon_lt_lft :
  forall a b c : Z, (a > b)%Z -> (c > 0)%Z -> (c * a > c * b)%Z.
 Proof.
  intros a b c.
- induction  c as [| p| p]; auto with zarith.
+ induction  c as [| p| p]. auto with zarith.
   intros Hab H0.
-  induction  p as [p Hrecp| p Hrecp| ]; auto with zarith.
-   replace (Zpos (xI p)) with (2 * Zpos p + 1)%Z; auto with zarith.
+  induction  p as [p Hrecp| p Hrecp| ]. 3: auto with zarith.
+   replace (Zpos (xI p)) with (2 * Zpos p + 1)%Z by auto with zarith.
    repeat rewrite Zmult_plus_distr_l.
-   cut (2 * Zpos p * a > 2 * Zpos p * b)%Z; auto with zarith.
+   cut (2 * Zpos p * a > 2 * Zpos p * b)%Z. auto with zarith.
    repeat rewrite <- Zmult_assoc.
    cut (Zpos p * a > Zpos p * b)%Z; auto with zarith.
-  replace (Zpos (xO p)) with (2 * Zpos p)%Z; auto with zarith.
+  replace (Zpos (xO p)) with (2 * Zpos p)%Z by auto with zarith.
   repeat rewrite <- Zmult_assoc.
   cut (Zpos p * a > Zpos p * b)%Z; auto with zarith.
  intros Hab H0.
@@ -630,7 +630,7 @@ Proof.
  Qed.
  Lemma Zabs_Zminus_symm : forall a b : Z, Z.abs (a - b) = Z.abs (b - a).
  intros a b.
- replace (a - b)%Z with (- (b - a))%Z; auto with zarith.
+ replace (a - b)%Z with (- (b - a))%Z by auto with zarith.
  apply Zabs_Zopp.
 Qed.
 
@@ -707,7 +707,7 @@ Proof.
  Defined.
  Lemma Zabs_triangle : forall a b : Z, (Z.abs (a + b) <= Z.abs a + Z.abs b)%Z.
  intros a b.
- case a; case b; auto with zarith.
+ case a; case b. 1-5, 7, 9: auto with zarith.
   intros p q.
   generalize (case_POS p q) (case_NEG p q).
   case (Zpos q + Zneg p)%Z.
@@ -745,7 +745,7 @@ Proof.
  intros a b.
  apply Zabs_le_elim.
   apply case.
- replace (- (Z.abs a - Z.abs b))%Z with (Z.abs b - Z.abs a)%Z; auto with zarith.
+ replace (- (Z.abs a - Z.abs b))%Z with (Z.abs b - Z.abs a)%Z by auto with zarith.
  rewrite Zabs_Zminus_symm.
  apply case.
 Qed.

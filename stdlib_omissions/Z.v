@@ -79,10 +79,10 @@ Proof with auto with *.
 Qed.
 
 Lemma P_of_succ_nat_Zplus (m: nat): Zpos (P_of_succ_nat m) = Z_of_nat m + 1.
-Proof with intuition.
- induction m...
+Proof.
+ destruct m. reflexivity.
  simpl.
- destruct (P_of_succ_nat m)...
+ destruct (P_of_succ_nat m); reflexivity.
 Qed.
 
 Lemma S_Zplus (n: nat): (Z_of_nat (S n) = Z_of_nat n + 1)%Z.
