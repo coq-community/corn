@@ -1519,7 +1519,7 @@ Proof.
   intro H1.
   exists (c * Z.sgn a)%Z.
   rewrite <- Zmult_assoc.
-  replace (Z.sgn a * a)%Z with (Z.abs a); auto with zarith.
+  replace (Z.sgn a * a)%Z with (Z.abs a) by auto with zarith.
   replace (Z.abs a) with 1%Z; auto with zarith.
  intro Hn1.
  unfold Zrelprime in Hab.

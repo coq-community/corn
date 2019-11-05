@@ -309,7 +309,7 @@ Proof.
  rewrite Zmult_1_r.
  apply Z.lt_le_trans with (P_of_succ_nat (Z.abs_nat p) * 1)%Z.
   rewrite Zmult_1_r.
-  case p; simpl in |- *; auto with zarith.
+  case p; simpl in |- *. auto with zarith.
    intros; rewrite P_of_succ_nat_o_nat_of_P_eq_succ; rewrite Pplus_one_succ_r.
    change (p0 < p0 + 1)%Z in |- *.
    auto with zarith.

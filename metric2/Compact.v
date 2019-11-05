@@ -1509,8 +1509,8 @@ Proof.
    rewrite He.
    unfold Qle; simpl.
    rewrite Zpos_mult_morphism.
-   apply Z.le_trans with (en * ed)%Z; auto with *.
-   apply Zmult_le_compat_l; auto with *.
+   apply Z.le_trans with (en * ed)%Z. auto with *.
+   apply Zmult_le_compat_l. 2: auto with *.
    rewrite (anti_convert_pred_convert ed).
    do 2 rewrite <- POS_anti_convert.
    do 2 rewrite inj_S.
@@ -1547,8 +1547,8 @@ Proof.
   rewrite Hd.
   unfold Qle; simpl.
   rewrite Zpos_mult_morphism.
-  apply Z.le_trans with (dn * dd)%Z; auto with *.
-  apply Zmult_le_compat_l; auto with *.
+  apply Z.le_trans with (dn * dd)%Z. auto with *.
+  apply Zmult_le_compat_l. 2: auto with *.
   rewrite (anti_convert_pred_convert dd).
   do 2 rewrite <- POS_anti_convert.
   do 2 rewrite inj_S.

@@ -227,7 +227,7 @@ Lemma InfiniteSum_raw_N_extend : forall (p:positive) s (err : Stream Q -> bool),
  InfiniteSum_raw_N p (fun _ _ => 0) err s = InfiniteSum_raw_N (Pos.succ p) (fun _ _ => 0) err s.
 Proof.
  intros.
- apply InfiniteSum_raw_N_extend'; auto with *.
+ apply InfiniteSum_raw_N_extend'. assumption.
  rewrite Zpos_succ_morphism.
  auto with *.
 Qed.

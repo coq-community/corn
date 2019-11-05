@@ -51,11 +51,9 @@ Definition Zmonotone : (Z -> Z) -> Prop := Default.monotone Z.le.
 Definition Zantitone : (Z -> Z) -> Prop := Default.antitone Z.le.
 
 Definition ZTotalOrder : TotalOrder.
- apply makeTotalOrder with Z (@eq Z) Z.le Zmonotone Zantitone Z.min Z.max; try solve [auto with *].
+ apply makeTotalOrder with Z (@eq Z) Z.le Zmonotone Zantitone Z.min Z.max. 1-3, 5-6: solve [auto with *].
 Proof.
      apply Zle_total.
-    firstorder using PartialOrder.Default.monotone_def.
-    firstorder using PartialOrder.Default.antitone_def.
     intros. apply Z.min_case_strong; auto with *.
     intros. apply Z.min_case_strong; auto with *.
    intros. apply Z.max_case_strong; auto with *.

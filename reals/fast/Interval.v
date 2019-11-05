@@ -61,7 +61,7 @@ Proof.
  induction n; intros a.
   split; intros H.
    contradiction.
-  apply (Zle_not_lt a a); auto with *.
+  apply (Zle_not_lt a a). auto with *.
   rewrite Zplus_comm in H.
   simpl in H.
   apply Z.le_lt_trans with z; auto with *.

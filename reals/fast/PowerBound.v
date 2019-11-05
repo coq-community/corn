@@ -89,16 +89,16 @@ Proof.
   apply Z.le_refl.
  rewrite inj_S.
  unfold Z.succ.
- do 2 (rewrite Zpower_exp;try auto with * ).
+ do 2 rewrite Zpower_exp by auto with zarith.
  ring_simplify.
- apply Zmult_le_compat; try discriminate.
+ apply Zmult_le_compat. 1, 3: discriminate.
   assumption.
  clear -n.
  induction n.
   discriminate.
  rewrite inj_S.
  unfold Z.succ.
- rewrite Zpower_exp;try auto with *.
+ rewrite Zpower_exp; auto with *.
 Qed.
 
 Lemma power4bound' : forall (q:Q), (0 < q) -> ((/(4^(Z_of_nat (let (_,d):= q in Psize d)))%Z) <= q).

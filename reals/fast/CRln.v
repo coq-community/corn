@@ -122,7 +122,7 @@ Proof.
   apply (Zlt_not_le _ _ Ha).
   ring_simplify in H.
   ring_simplify.
-  apply Z.le_trans with (-(d*1))%Z; auto with *.
+  apply Z.le_trans with (-(d*1))%Z. 2: auto with *.
   apply Zle_left_rev.
   replace RHS with (-(n + (d*1)))%Z by ring.
   simpl.
