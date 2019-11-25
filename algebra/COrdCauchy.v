@@ -303,7 +303,7 @@ Proof.
  clear Hrecn Hn.
  induction  n as [| n Hrecn].
   exists 1.
-  repeat split; try auto with arith.
+  repeat split. 1-2: reflexivity.
   intros.
   rewrite <- (le_antisym _ _ H H0).
   astepr (a 1[+][0]).

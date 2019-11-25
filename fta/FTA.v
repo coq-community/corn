@@ -208,8 +208,7 @@ Proof.
  generalize (AbsCC_ap_zero _ H2); intro H3.
  cut (Sum 0 (lth_of_poly f) (fun i : nat => nth_coeff i f[*] (x[^]i[-]y[^]i)) [#] [0]).
   intro H4.
-  cut (0 <= lth_of_poly f); try auto with arith.
-  intro H5.
+  assert (0 <= lth_of_poly f) as H5 by auto with zarith.
   generalize (Sum_apzero _ _ _ _ H5 H4); intro H6.
   elim H6; intros i H8 H9.
   elim H8; intros H10 H11.

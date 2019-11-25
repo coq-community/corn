@@ -348,20 +348,20 @@ Proof.
  unfold Qle.
  simpl.
  change (n * 1 <= 2 ^ Psize n * d)%Z.
- apply Zmult_le_compat; try auto with *.
+ apply Zmult_le_compat. 2-4: auto with zarith.
  clear - n.
  apply Z.le_trans with (n+1)%Z.
   auto with *.
  induction n.
    change (Psize (xI n)) with (1 + (Psize n))%nat.
    rewrite inj_plus.
-   rewrite Zpower_exp; try auto with *.
+   rewrite Zpower_exp. 2-3: auto with *.
    rewrite Zpos_xI.
    replace LHS with (2*(n+1))%Z by ring.
    apply Zmult_le_compat; auto with *.
   change (Psize (xO n)) with (1 + (Psize n))%nat.
   rewrite inj_plus.
-  rewrite Zpower_exp; try auto with *.
+  rewrite Zpower_exp. 2-3: auto with *.
   rewrite Zpos_xO.
   apply Z.le_trans with (2*(n+1))%Z.
    auto with *.

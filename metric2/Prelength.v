@@ -215,7 +215,7 @@ Proof.
      rewrite <- Ha.
      simpl; apply (H 0%nat g0).
      simpl; auto with *.
-    apply (IHes _ (x 1%nat) H3 (fun i => x (S i))); try auto with *.
+    apply (IHes _ (x 1%nat) H3 (fun i => x (S i))). auto with *.
     intros.
     apply (H (S i) z).
     simpl; auto with *.
