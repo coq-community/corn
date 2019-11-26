@@ -79,7 +79,7 @@ Proof.
  apply Zmult_gt_0_lt_reg_r with d.
   auto with *.
  replace RHS with (d* (n*p/d) + (Zmod (n*p) d) - (Zmod (n*p) d) + d)%Z by ring.
- rewrite <- (Z_div_mod_eq (n*p) d); try auto with *.
+ rewrite <- (Z_div_mod_eq (n*p) d) by auto with zarith.
  apply Z.le_lt_trans with (n*1*p)%Z.
   replace LHS with (z*d*p)%Z by ring.
   apply Zmult_lt_0_le_compat_r; auto with *.

@@ -108,7 +108,7 @@ Proof.
    constructor.
   assert (X:=power4bound (d#n)).
   simpl in X.
-  rewrite -> Zpower_Qpower; try auto with *.
+  rewrite -> Zpower_Qpower by auto with zarith.
   apply Qle_shift_inv_r.
    clear - d.
    induction (Psize d).
@@ -117,7 +117,7 @@ Proof.
    unfold Z.succ.
    rewrite -> Qpower_plus;[|discriminate].
    apply: mult_resp_pos;[assumption|constructor].
-  rewrite <- Zpower_Qpower; try auto with *.
+  rewrite <- Zpower_Qpower by auto with zarith.
   destruct (inject_Z (4%positive ^ Psize d)%Z).
   change ((1 * (d * Qden)%positive <= n * Qnum * 1)%Z).
   ring_simplify.

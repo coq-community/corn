@@ -573,7 +573,7 @@ Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) : CR.
  refine (@rational_sqrt_big_bounded n (a / (4#1)) _).
  clear rational_sqrt_big_bounded.
  abstract ( destruct H; split;[apply Qle_shift_div_l;[constructor|assumption]|];
-   apply Qle_shift_div_r;[constructor|]; rewrite -> Zpower_Qpower in *; try auto with *;
+   apply Qle_shift_div_r;[constructor|]; rewrite -> Zpower_Qpower in * by auto with zarith;
      change (a <= ((4#1) ^ n) * (4#1)^1); rewrite <- Qpower_plus; try discriminate; change (n+1)%Z with (Z.succ n);
        rewrite <- inj_S; assumption).
 Defined.
