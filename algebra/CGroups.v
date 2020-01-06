@@ -68,7 +68,7 @@ End coercions.
 (* Begin_SpecReals *)
 
 
-Arguments cg_inv [c].
+Arguments cg_inv {c}.
 Notation "[--] x" := (cg_inv x) (at level 4, right associativity).
 
 Definition cg_minus (G : CGroup) (x y : G) := x[+] [--]y.

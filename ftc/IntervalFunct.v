@@ -250,7 +250,7 @@ Definition IComp := Build_CSetoid_fun _ _
 End Composition.
 
 Arguments IConst [a b Hab].
-Arguments IId [a b Hab].
+Arguments IId {a b Hab}.
 Arguments IPlus [a b Hab].
 Arguments IInv [a b Hab].
 Arguments IMinus [a b Hab].

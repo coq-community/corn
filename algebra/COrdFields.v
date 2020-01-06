@@ -99,16 +99,16 @@ is written as [pos].
 %\end{nameconvention}%
 *)
 
-Arguments cof_less [c].
+Arguments cof_less {c}.
 Infix "[<]" := cof_less (at level 70, no associativity).
 
-Arguments cof_greater [c].
+Arguments cof_greater {c}.
 Infix "[>]" := cof_greater (at level 70, no associativity).
 
-Arguments cof_leEq [c].
+Arguments cof_leEq {c}.
 Infix "[<=]" := cof_leEq (at level 70, no associativity).
 
-Arguments cof_grEq [c].
+Arguments cof_grEq {c}.
 Infix "[>=]" := cof_grEq (at level 70, no associativity).
 
 Definition default_greater (X:CField) (lt:CCSetoid_relation X) : CCSetoid_relation X.

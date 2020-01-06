@@ -110,7 +110,7 @@ and [[*]] with [mult].
 %\end{nameconvention}%
 *)
 
-Arguments cr_mult [c].
+Arguments cr_mult {c}.
 Infix "[*]" := cr_mult (at level 40, left associativity).
 
 Section CRing_axioms.

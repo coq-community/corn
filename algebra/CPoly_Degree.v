@@ -65,7 +65,7 @@ is always [1] higher than the `degree' (assuming that the highest
 coefficient is [[#][0]])!
 *)
 
-Arguments cpoly_zero [CR].
+Arguments cpoly_zero {CR}.
 Arguments cpoly_linear [CR].
 
 Fixpoint lth_of_poly (p : RX) : nat :=

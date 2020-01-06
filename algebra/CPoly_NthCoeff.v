@@ -62,7 +62,7 @@ The [n]-th coefficient of a polynomial. The default value is
 polynomial $a_0 +a_1 X +a_2 X^2 + \cdots + a_n X^n$ #a0 +a1 X +a2 X^2
 + ... + an X^n#, the [Zero]-th coefficient is $a_0$#a0#, the first
 is $a_1$#a1# etcetera.  *)
-Arguments cpoly_zero [CR].
+Arguments cpoly_zero {CR}.
 Arguments cpoly_linear [CR].
 
 Fixpoint nth_coeff (n : nat) (p : RX) {struct p} : R :=

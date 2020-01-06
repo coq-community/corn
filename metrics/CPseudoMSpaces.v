@@ -96,7 +96,7 @@ Record CPsMetricSpace : Type :=
 
 End Definition_PsMS0.
 
-Arguments cms_d [c].
+Arguments cms_d {c}.
 Infix "[-d]" := cms_d (at level 68, left associativity).
 
 

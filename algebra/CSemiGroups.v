@@ -59,7 +59,7 @@ In the %{\em %names%}% of lemmas, we will denote [[+]] with [plus].
 %\end{nameconvention}%
 *)
 
-Arguments csg_op [c].
+Arguments csg_op {c}.
 Infix "[+]" := csg_op (at level 50, left associativity).
 (* End_SpecReals *)
 
