@@ -1800,7 +1800,7 @@ Notation "'_X_'" := (@cpoly_var _).
 Definition cpoly_linear_fun' (CR : CRing) :
  CSetoid_bin_fun CR (cpoly_cring CR) (cpoly_cring CR) := cpoly_linear_fun CR.
 
-Arguments cpoly_linear_fun' [CR].
+Arguments cpoly_linear_fun' {CR}.
 Infix "[+X*]" := cpoly_linear_fun' (at level 50, left associativity).
 
 
@@ -2001,7 +2001,7 @@ In the names of lemmas, we write [apply].
 %\end{convention}%
 *)
 
-Arguments cpoly_apply_fun [CR].
+Arguments cpoly_apply_fun {CR}.
 Infix "!" := cpoly_apply_fun (at level 1, no associativity).
 
 (**

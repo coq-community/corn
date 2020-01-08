@@ -1136,7 +1136,7 @@ End One_div_succ_properties.
 
 Definition Half (R : COrdField) := ([1]:R) [/]TwoNZ.
 
-Arguments Half [R].
+Arguments Half {R}.
 
 Section Half_properties.
 

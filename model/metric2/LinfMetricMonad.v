@@ -379,4 +379,4 @@ Definition constStepF_uc : X --> StepFSup X
 
 End UniformlyContinuousFunctions.
 
-Arguments constStepF_uc [X].
+Arguments constStepF_uc {X}.

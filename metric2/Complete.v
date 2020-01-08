@@ -361,7 +361,7 @@ End RegularFunction.
 Arguments regFunEq_e_small [X].
 Arguments is_RegularFunction [X].
 
-Arguments Cunit [X].
+Arguments Cunit {X}.
 
 Add Parametric Morphism X : (@Cunit_fun X) with signature (@st_eq _) ==> (@st_eq _) as Cunit_wd.
 Proof.
@@ -509,7 +509,7 @@ Build_UniformlyContinuousFunction Cjoin_prf.
 
 End Cjoin.
 
-Arguments Cjoin [X].
+Arguments Cjoin {X}.
 
 Section Cmap.
 
