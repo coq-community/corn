@@ -182,8 +182,8 @@ Proof.
  rewrite <- H1_.
  rewrite <- (Zmult_1_l (0 + a)).
  rewrite (Zplus_0_l a).
- apply (Zmult_pos_mon_le_rht q 1 a); auto with zarith.
- cut (q > 0)%Z; auto with zarith.
+ apply (Zmult_pos_mon_le_rht q 1 a). 2: auto with zarith.
+ cut (q > 0)%Z. auto with zarith.
  rewrite Zmult_comm in H1_.
  apply (Zdiv_pos_pos a); auto with zarith.
 Defined.
