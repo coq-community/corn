@@ -75,13 +75,13 @@ Definition Qinv_dep (x : Q) (x_ : Qap x 0) := Qinv x.
 *)
 
 Lemma Q_non_zero : forall x : Q, (x/=0) -> Qnum x <> 0%Z.
-Proof. firstorder. Qed.
+Proof. firstorder auto with qarith zarith. Qed.
 
 Lemma ap_Q_irreflexive0 : forall x : Q, Not (x/=x).
 Proof. firstorder. Qed.
 
 Lemma ap_Q_symmetric0 : forall x y : Q, (x/=y) -> y/=x.
-Proof. firstorder. Qed.
+Proof. firstorder auto with crelations. Qed.
 
 Lemma ap_Q_cotransitive0 : forall x y : Q, (x/=y) ->
  forall z : Q, (x/=z) or (z/=y).

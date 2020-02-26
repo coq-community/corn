@@ -206,7 +206,7 @@ Qed.
 
 Lemma Qneq_symmetry (x y : Q) :
   ~x == y -> ~y == x.
-Proof. firstorder. Qed.
+Proof. firstorder auto with crelations. Qed.
 
 Lemma Qdiv_flip_le (x y : Q) :
   0 < x -> x <= y -> /y <= /x.

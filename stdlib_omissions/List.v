@@ -140,7 +140,7 @@ Proof with auto.
 Qed.
 
 Instance: forall A (x: A), Proper (@Permutation A ==> iff) (@In A x).
-Proof. pose proof Permutation_in. firstorder. Qed.
+Proof. pose proof Permutation_in. firstorder auto with crelations. Qed.
 
 Lemma tl_map {A B} (l: list A) (f: A → B): tl (map f l) = map f (tl l).
 Proof. destruct l; reflexivity. Qed.
