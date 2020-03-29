@@ -477,8 +477,6 @@ Qed.
 
 Hint Immediate positive_in_Q.
 
-SearchAbout (_ - ?x < _ - ?x)%Q.
-
 Lemma Qlt_Qceiling (q : Q) : inject_Z (Qceiling q) < q + 1.
 Proof.
 apply Qplus_lt_l with (z := (-1 # 1)). setoid_replace (q + 1 + (-1 # 1))%Q with q.
