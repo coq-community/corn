@@ -22,7 +22,7 @@ Check dy_pow.
 
 Check (Z⁺).
 Check NonNeg.
-SearchAbout NonNeg.
+Search NonNeg.
 Check ((1 _):(Z⁺)).
 
 (* Time Eval vm_compute in (test (dy_pow x (((40%Z) _)))).*)
