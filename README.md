@@ -78,6 +78,7 @@ CoRN includes the following parts:
   - Pierre Letouzey
   - Lionel Mamane
   - Nickolay Shmyrev
+  - Vincent Semeria
 - Coq-community maintainer(s):
   - Bas Spitters ([**@spitters**](https://github.com/spitters))
   - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
