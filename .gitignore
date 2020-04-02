@@ -1,5 +1,10 @@
 Makefile.bak
+Make
+Makefile
+Makefile.conf
 *.vo
+*.vok
+*.vos
 *.d
 *.glob
 *.pyc
@@ -14,6 +19,7 @@ coqdoc.css
 .doclist
 deps
 .sconsign.dblite
+.lia.cache
 coqidescript
 *.new
 *#
