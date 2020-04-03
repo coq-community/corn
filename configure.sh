@@ -11,9 +11,9 @@ DIRECTORIES="algebra complex coq_reals fta ftc liouville logic metrics model ras
 # Include constructive measure theory on version 8.12 and after
 if [ $COQ_VERSION -gt 11 ] ;
 then
-    find $DIRECTORIES -name "*.v" |grep -v tactics/Opaque_algebra.v >>Make
+    find $DIRECTORIES -name "*.v" >>Make
 else
-    find $DIRECTORIES -name "*.v" |grep -v tactics/Opaque_algebra.v | grep -v "stdlib/" >>Make
+    find $DIRECTORIES -name "*.v" | grep -v "stdlib/" >>Make
 fi
 
 ${COQBIN}coq_makefile -f Make -o Makefile
