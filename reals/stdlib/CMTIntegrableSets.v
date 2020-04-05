@@ -20,36 +20,28 @@ along with this program;  If not, see <https://www.gnu.org/licenses/>.
    We now move from functions to integrable sets, ie measures. We will
    prove the properties of measures up to monotonous continuity.
 
-   Given an integration space IS on a base type X, the measure of a
-   subset A : X -> Prop is the integral of its characteristic function,
-   which is defined on the decidable subset
-   { x : X  &  { A x } + { ~A x } }.
-   In other words characteristic functions are partial functions and
-   we can apply to them the constructive theory of integration developped
-   so far. The subset A will be defined integrable when its characteristic
-   function is.
+   Given an integration space IS on a base type X, a subset
+   A : X -> Prop is declared integrable when it is almost everywhere
+   decidable, i.e. when there is an integrable function
+   f : X -> {0, 1} such as A x when f x == 1 and ~A x when f x == 0.
+   The integral of f will be called the measure of A. Because integrable
+   functions are stable under extensions, this definition is
+   equivalent to requiring that the biggest characteristic function
+   with domain { x : X  &  { A x } + { ~A x } } is integrable.
 
-   This diverges slightly from Bishop and Cheng, which introduce the
-   notion of complemented sets instead. We believe that this concept is
-   unnecessary becasue we arrive at characteristic functions directly.
-
-   When the characteristic functions are integrable, it does not matter
-   that they restrict to the decidable points of their subsets, because
-   integrable functions are always defined on sets of full measure.
-   This amounts to erasing the frontiers of the subsets, which does not
-   change their measures.
+   This simplifies the theory of Bishop and Cheng, by avoiding the
+   unnecessary concept of complemented set.
  *)
 
 Require Import Logic.ConstructiveEpsilon.
 Require Import QArith.
-Require Import Ensembles.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
 Require Import ConstructiveSum.
 Require Import ConstructiveLimits.
-
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
+
 Require Import CMTbase.
 Require Import CMTIntegrableFunctions.
 Require Import CMTFullSets.
@@ -68,10 +60,6 @@ Proof.
   reflexivity. contradiction. contradiction. reflexivity.
 Defined.
 
-(* A subset A is integrable when its characteristic function is.
-   Then A's integral is only affected by A's first (true) part, because
-   the characteristic function equals zero on the other part.
-   We call this integral the measure of A. *)
 Definition IntegrableSet {IS : IntegrationSpace}
            (A : (X (ElemFunc IS)) -> Prop) : Type
   := IntegrableFunction (CharacFunc A).
@@ -86,34 +74,87 @@ Definition MeasureSet {IS : IntegrationSpace}
 (** * Integration of complemented sets                   *)
 (*********************************************************)
 
+Definition PartialFunctionBoolR
+           {X : Set} {R : ConstructiveReals}
+           (f : @PartialFunctionXY X bool eq)
+  : @PartialFunction R X.
+Proof.
+  apply (Build_PartialFunctionXY
+           X (CRcarrier R) (CReq R) (Domain f)
+           (fun x dec => if partialApply f x dec then CRone R else CRzero R)).
+  intros. rewrite (DomainProp f x p q). reflexivity.
+Defined. 
+
+(* As announced, we prove that Definition IntegrableSet is equivalent
+   to the more general formulation that the subset is almost everywhere decidable. *)
+Lemma IntegrableSetAEdecidable
+  : forall {IS : IntegrationSpace}
+      (A : (X (ElemFunc IS)) -> Prop)
+      (f : @PartialFunctionXY (X (ElemFunc IS)) bool eq),
+    IntegrableFunction (PartialFunctionBoolR f)
+    -> (forall (x : X (ElemFunc IS)) (dec : Domain f x),
+          if partialApply f x dec then A x else ~A x)
+    -> IntegrableSet A.
+Proof.
+  intros IS A f fInt. destruct fInt.
+  exists x. apply (PartialRestriction_trans _ _ (PartialFunctionBoolR f) _ p).
+  split.
+  - intros y yD. simpl in yD. specialize (H y yD).
+    destruct (partialApply f y yD).
+    left. exact H. right. exact H.
+  - intros. simpl. specialize (H x0 xD).
+    destruct (partialApply f x0 xD), xG. reflexivity. 3: reflexivity.
+    contradiction. contradiction.
+Qed.
+
 Definition IntegrableSetExtensional
            {IS : IntegrationSpace}
            (A B : (X (ElemFunc IS)) -> Prop)
-  : (forall x:X (ElemFunc IS), A x <-> B x)
+  : (forall x:X (ElemFunc IS), { A x } + { ~A x } -> (A x <-> B x))
     -> IntegrableSet A
     -> IntegrableSet B.
 Proof.
-  intros.
+  intros H Aint.
   apply (IntegrableFunctionExtensional (CharacFunc A)).
-  2: exact X.
+  2: exact Aint.
   split.
-  - intros x xdf. destruct xdf. left. apply H, a.
+  - intros x xdf. destruct xdf. left. apply H.
+    left. exact a. exact a.
     right. intro abs. apply H in abs. contradiction.
+    right. exact n.
   - intros. simpl. destruct xD, xG. reflexivity.
-    apply H in a. contradiction. apply H in b. contradiction. reflexivity.
+    apply H in a. contradiction. left. exact a.
+    apply H in b. contradiction. right. exact n. reflexivity.
+Qed.
+
+(* ~~A can constructively be bigger than A, but when A is integrable
+   then so is ~~A, with same measure. *)
+Definition IntegrableSetNotNot
+           {IS : IntegrationSpace}
+           (A : (X (ElemFunc IS)) -> Prop)
+  : IntegrableSet A -> IntegrableSet (fun x => ~~A x).
+Proof.
+  intro Aint. 
+  apply (IntegrableSetExtensional A).
+  split. intros H0 abs. contradiction.
+  intro abs. destruct H. exact a. contradiction. exact Aint.
 Qed.
 
 Lemma MeasureExtensional
   : forall {IS : IntegrationSpace}
       (A B : (X (ElemFunc IS)) -> Prop)
       (Aint : IntegrableSet A) (Bint : IntegrableSet B),
-    (forall x:X (ElemFunc IS), A x <-> B x)
+    (forall x:X (ElemFunc IS),
+        { A x } + { ~A x } -> { B x } + { ~B x }
+        -> (A x <-> B x))
     -> MeasureSet Aint == MeasureSet Bint.
 Proof.
   intros. apply IntegralExtensional.
   intros. simpl. destruct xdf, xdg. reflexivity. 3: reflexivity.
   exfalso. rewrite H in a. contradiction.
+  left. exact a. right. exact n.
   exfalso. rewrite <- H in b. contradiction.
+  right. exact n. left. exact b.
 Qed.
 
 Lemma MeasureEmptyZero
@@ -155,6 +196,46 @@ Proof.
   intros x xdf xdg. simpl. destruct xdf, xdg.
   apply CRle_refl. exfalso. specialize (H x a). contradiction.
   apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
+Qed.
+
+Lemma MeasureZeroAE
+  : forall {IS : IntegrationSpace}
+      (Z : X (ElemFunc IS) -> Prop)
+      (zInt : IntegrableSet Z),
+    MeasureSet zInt == 0
+    -> almost_everywhere (fun x => ~Z x).
+Proof.
+  intros.
+  destruct (IntegrableFunctionsComplete
+              IS (fun _:nat => CharacFunc Z) (fun _ => zInt) 0) as [rep [p s]].
+  - apply (CR_cv_eq _ (fun _:nat => 0)). 2: apply CR_cv_const.
+    intro n. rewrite sum_const. unfold MeasureSet in H.
+    rewrite <- (CRmult_0_l (INR (S n))).
+    apply CRmult_morph. 2: reflexivity. rewrite <- H.
+    apply IntegralExtensional. intros. rewrite applyXabs.
+    rewrite (DomainProp _ x xdf xdg). rewrite CRabs_right.
+    reflexivity. simpl. destruct xdg. apply CRlt_asym, CRzero_lt_one.
+    apply CRle_refl.
+  - exists (XinfiniteSumAbs (IntFn rep)). split.
+    + exists rep. apply PartialRestriction_refl.
+    + intros x H0 abs. destruct p. specialize (d x H0) as [xn xncv].
+      apply CR_complete in xncv. destruct xncv as [l lcv].
+      apply (CR_cv_eq (fun n:nat => CR_of_Q _ (Z.of_nat (S n) # 1))) in lcv.
+      specialize (lcv 1%positive) as [n ncv].
+      destruct (CRup_nat (1+l)) as [k kup].
+      specialize (ncv (max n k) (Nat.le_max_l _ _)).
+      rewrite CR_of_Q_one in ncv.
+      apply (CRle_trans _ _ _ (CRle_abs _)) in ncv.
+      apply (CRplus_le_compat_r l) in ncv.
+      unfold CRminus in ncv. rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r in ncv.
+      apply ncv. apply (CRlt_le_trans _ _ _ kup).
+      apply CR_of_Q_le. unfold Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_r.
+      apply Nat2Z.inj_le, le_S, Nat.le_max_r.
+      intro n. rewrite <- (CRsum_eq (fun _ => 1)).
+      rewrite sum_const, CRmult_1_l. reflexivity.
+      intros. simpl. destruct (xn i).
+      rewrite CRabs_right. reflexivity. apply CRlt_asym, CRzero_lt_one.
+      contradiction.
 Qed.
 
 Lemma domainXinfinitePosNeg
@@ -540,7 +621,7 @@ Proof.
       destruct d. exfalso. apply n. split.
       exact a. intro abs. apply n0. split; assumption.
       unfold CRminus. rewrite CRplus_opp_r. reflexivity.
-  - apply (IntegrableMinus _ _ aInt (IntegrableSetIntersect A B aInt bInt)).
+  - apply (IntegrableMinus aInt (IntegrableSetIntersect A B aInt bInt)).
 Defined.
 
 Lemma MeasureDifference
@@ -848,18 +929,18 @@ Lemma SliceNonNegFunc
         (XinfiniteSumAbs (fun k : nat =>
                            Xmin (Xscale (INR (nk (S k) - nk k)) (CharacFunc A))
                                 (Xminus f (XminConst f (INR (nk k))))))
-        (Xmult f (CharacFunc A)).
+        (Xmult (CharacFunc A) f).
 Proof.
   split.
   - intros x [xn _]. specialize (xn O).
-    destruct f, xn, d0, d0; split. apply d. exact d0.
+    destruct f, xn, d0, d0; split. exact d0. apply d.
   - intros. apply applyInfiniteSumAbs.
     assert (forall n:nat, Domain (Xscale (INR (nk (S n) - nk n)) (@CharacFunc R _ A)) x)
       as H2.
     { intro n. apply (domainInfiniteSumAbsIncReverse _ _ xD n). }
     assert (forall n:nat, Domain (Xminus f (XminConst f (INR (nk n)))) x) as H3.
     { intro n. apply (domainInfiniteSumAbsIncReverse _ _ xD n). }
-    destruct xG. destruct d0 as [inA | notInA].
+    destruct xG. destruct d as [inA | notInA].
     + (* Inside of A, prove convergence towards f x *)
       assert (Domain f x) as H4.
       { specialize (H3 O). apply H3. }
@@ -875,10 +956,10 @@ Proof.
       rewrite (applyXminus f (XminConst f (INR (nk n)))). apply CRplus_morph.
       apply DomainProp. apply CRopp_morph. rewrite applyXminConst.
       apply CRmin_morph. apply DomainProp. reflexivity.
-      setoid_replace (partialApply (Xmult f (CharacFunc A)) x (d, left inA))
+      setoid_replace (partialApply (Xmult (CharacFunc A) f) x (left inA, d0))
         with (partialApply f x H4).
       apply (@SliceBar R X). exact H. exact H0. apply H1.
-      destruct f; simpl. rewrite CRmult_1_r.
+      destruct f; simpl. rewrite CRmult_1_l.
       apply DomainProp.
     + (* Outside of A we have 0 == 0 *)
       apply (series_cv_eq (fun _ => 0)).
@@ -892,18 +973,16 @@ Proof.
       unfold CharacFunc, partialApply. rewrite CRmult_0_r.
       apply CRle_refl. destruct (H3 n).
       rewrite (applyXminus f (XminConst f (INR (nk n)))).
-      apply (CRle_minus (partialApply (XminConst f (INR (nk n))) x d1)
-                        (partialApply f x d0)).
-      rewrite applyXminConst.
-      rewrite (DomainProp f x d1 d0).
+      apply CRle_minus.
+      rewrite applyXminConst. rewrite (DomainProp f x d1 d).
       apply CRmin_l.
-      setoid_replace (partialApply (Xmult f (CharacFunc A)) x (d, right notInA))
+      setoid_replace (partialApply (Xmult (CharacFunc A) f) x (right notInA, d0))
         with (CRzero R).
       intro p. exists O. intros. rewrite sum_const, CRmult_0_l.
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
       rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
       clear xD. destruct f; simpl.
-      rewrite CRmult_0_r. reflexivity.
+      apply CRmult_0_l.
 Qed.
 
 (* Add zero before sequence un, if it does not already start with zero. *)
@@ -931,7 +1010,7 @@ Definition RestrictedIntegralNonneg
   : IntegrableFunction f
     -> nonNegFunc f
     -> IntegrableSet A
-    -> IntegrableFunction (Xmult f (CharacFunc A)).
+    -> IntegrableFunction (Xmult (CharacFunc A) f).
 Proof.
   intros fInt fNonNeg AInt.
   assert (forall k : nat, 0 < CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) k) as boundPos.
@@ -942,7 +1021,7 @@ Proof.
   (* Cut f's non-negative graph horizontally, according to the nk *)
   pose (fun k:nat => Xmin (Xscale (INR (nk (S k) - nk k)) (CharacFunc A))
                      (Xminus f (XminConst f (INR (nk k))))) as fk.
-  pose (fun k:nat => IntegrableMinus f _ fInt (IntegrableMinInt _ (nk k) fInt))
+  pose (fun k:nat => IntegrableMinus fInt (IntegrableMinInt _ (nk k) fInt))
     as fTopkInt.
   assert (forall k, IntegrableFunction (fk k)) as fkInt.
   { intro k. apply IntegrableMin. apply IntegrableScale, AInt.
@@ -950,7 +1029,7 @@ Proof.
   (* Majorate the series by the right-hand term of the minimum,
      which is itself lower than 2^k, a convergent series. *)
   destruct (series_cv_maj
-              (fun n => Integral (IntegrableAbs _ (fkInt (S O + n)%nat)))
+              (fun n => Integral (IntegrableAbs (fkInt (S O + n)%nat)))
               (CRpow (CR_of_Q _ (1#2))) (CR_of_Q _ 2)) as [l llim].
   2: exact GeoHalfTwo.
   - intro n.
@@ -1008,10 +1087,10 @@ Proof.
     apply IntegralNonNeg. intros x xdf. rewrite applyXabs.
     apply CRabs_pos.
   - destruct (IntegrableFunctionsComplete
-                IS fk fkInt (l+Integral (IntegrableAbs _ (fkInt O)))).
+                IS fk fkInt (l+Integral (IntegrableAbs (fkInt O)))).
     destruct llim.
     apply (series_cv_shift (fun n : nat =>
-         Integral (IntegrableAbs _ (fkInt n))) O) in s.
+         Integral (IntegrableAbs (fkInt n))) O) in s.
     exact s. exists x.
     apply (PartialRestriction_trans _ _ (XinfiniteSumAbs fk)).
     apply p. clear p x llim l.
@@ -1019,32 +1098,31 @@ Proof.
     apply ControlSubSeqCvInc. reflexivity. exact fNonNeg.
 Qed.
 
-Definition RestrictedIntegral
+Definition RestrictedIntegrable
            {IS : IntegrationSpace}
-           (f : PartialFunction (X (ElemFunc IS)))
-           (A : (X (ElemFunc IS)) -> Prop)
+           {f : PartialFunction (X (ElemFunc IS))}
+           {A : (X (ElemFunc IS)) -> Prop}
   : IntegrableFunction f
     -> IntegrableSet A
-    -> IntegrableFunction (Xmult f (CharacFunc A)).
+    -> IntegrableFunction (Xmult (CharacFunc A) f).
 Proof.
   intros.
   apply (IntegrableFunctionExtensional
-           (Xminus (Xmult (XposPart f) (CharacFunc A))
-                   (Xmult (XnegPart f) (CharacFunc A)))).
+           (Xminus (Xmult (CharacFunc A) (XposPart f))
+                   (Xmult (CharacFunc A) (XnegPart f)))).
   split.
   - intros x xdf. destruct f; split; apply xdf.
   - intros. destruct xG, xD.
-    rewrite (applyXmult f (CharacFunc A)).
-    rewrite (applyXminus (Xmult (XposPart f) (CharacFunc A))
-                         (Xmult (XnegPart f) (CharacFunc A))).
+    rewrite (applyXmult (CharacFunc A) f).
+    rewrite (applyXminus (Xmult (CharacFunc A) (XposPart f))
+                         (Xmult (CharacFunc A) (XnegPart f))).
     unfold CRminus.
     destruct d1, d2.
-    rewrite (applyXmult (XposPart f) (CharacFunc A)).
-    rewrite (applyXmult (XnegPart f) (CharacFunc A)).
+    rewrite (applyXmult (CharacFunc A) (XposPart f)).
+    rewrite (applyXmult (CharacFunc A) (XnegPart f)).
     rewrite (DomainProp _ x d2 d1), (DomainProp _ x d4 d3).
-    rewrite CRopp_mult_distr_l, <- CRmult_plus_distr_r.
-    apply CRmult_morph. apply SplitPosNegParts.
-    rewrite (DomainProp _ x d3 d0). reflexivity.
+    rewrite CRopp_mult_distr_r, <- CRmult_plus_distr_l.
+    apply CRmult_morph. apply DomainProp. apply SplitPosNegParts.
   - apply IntegrableMinus.
     apply RestrictedIntegralNonneg. apply IntegrablePosPart, X.
     apply applyXposPartNonNeg. exact X0.
@@ -1052,218 +1130,15 @@ Proof.
     apply XnegPartNonNeg. exact X0.
 Qed.
 
+Definition RestrictedIntegral
+           {IS : IntegrationSpace}
+           {f : PartialFunction (X (ElemFunc IS))}
+           {A : (X (ElemFunc IS)) -> Prop}
+           (fInt : IntegrableFunction f)
+           (aInt : IntegrableSet A)
+  := Integral (RestrictedIntegrable fInt aInt).
+           
 
-(** Now we show how to recover the classical Lebesgue measure theory,
-    via measurable sets. Given the axiom of excluded middle they form
-    a sigma-algebra and the classical Lebesgue measure is given
-    whether they are integrable or not (infinite measure). *)
-
-(* A set is measurable when its intersection with any integrable set is
-   integrable. Its measure can be infinite. *)
-Definition MeasurableSet {IS : IntegrationSpace}
-           (A : (X (ElemFunc IS)) -> Prop) : Type
-  := forall (B : (X (ElemFunc IS)) -> Prop),
-    IntegrableSet B -> IntegrableSet (fun x => A x /\ B x).
-
-Lemma MeasurableSetCompl
-  : forall {IS : IntegrationSpace}
-      (A : (X (ElemFunc IS)) -> Prop),
-    MeasurableSet A -> MeasurableSet (fun x => ~A x).
-Proof.
-  intros IS A Ameas B Bint.
-  apply (IntegrableFunctionExtensional
-           (CharacFunc (fun x => B x /\ ~(A x /\ B x)))).
-  - split.
-    + intros x. simpl. intros [H|H].
-      left. destruct H. split. intro abs. apply H0.
-      split; assumption. exact H.
-      right. intros [H0 H1]. apply H. split.
-      exact H1. intro abs. apply H0. apply abs.
-    + intros. simpl. destruct xD, xG. reflexivity.
-      exfalso. destruct a. apply n. split. 2: exact H.
-      intro abs. apply H0. split; assumption.
-      exfalso. destruct a. apply n. split.
-      exact H0. intro abs. destruct abs. contradiction.
-      reflexivity.
-  - exact (IntegrableSetDifference _ _ Bint (Ameas _ Bint)).
-Qed.
-
-Lemma MeasurableSetUnion
-  : forall {IS : IntegrationSpace}
-      (A B : (X (ElemFunc IS)) -> Prop),
-    MeasurableSet A
-    -> MeasurableSet B
-    -> MeasurableSet (fun x => A x \/ B x).
-Proof.
-  intros IS A B Ameas Bmeas C Cint.
-  apply (IntegrableFunctionExtensional
-           (CharacFunc (fun x => (A x /\ C x) \/ (B x /\ C x)))).
-  - split.
-    + intros x. simpl. intros [H|H].
-      left. split. destruct H. left. apply H. right. apply H.
-      destruct H; apply H.
-      right. intros [H0 H1]. apply H. destruct H0.
-      left. split; assumption. right. split; assumption.
-    + intros. simpl. destruct xD, xG. reflexivity.
-      exfalso. apply n. split. destruct o.
-      left. apply H. right. apply H. destruct o; apply H.
-      exfalso. destruct a. apply n. destruct H.
-      left. split; assumption. right. split; assumption. reflexivity.
-  - apply IntegrableSetUnion. apply Ameas, Cint. apply Bmeas, Cint.
-Qed.
-
-Lemma MeasurableSetIntersection
-  : forall {IS : IntegrationSpace}
-      (A B : (X (ElemFunc IS)) -> Prop),
-    MeasurableSet A
-    -> MeasurableSet B
-    -> MeasurableSet (fun x => A x /\ B x).
-Proof.
-  intros IS A B Ameas Bmeas C Cint.
-  apply (IntegrableFunctionExtensional
-           (CharacFunc (fun x => (A x /\ C x) /\ (B x /\ C x)))).
-  - split.
-    + intros x. simpl. intros [H|H].
-      left. destruct H. split. split. apply H. apply H0. apply H.
-      right. intros [H0 H1]. apply H. destruct H0.
-      split. split; assumption. split; assumption.
-    + intros. simpl. destruct xD, xG. reflexivity.
-      exfalso. apply n. destruct a. split. split.
-      apply H. apply H0. apply H.
-      exfalso. destruct a. apply n. destruct H.
-      split. split; assumption. split; assumption. reflexivity.
-  - apply IntegrableSetIntersect. apply Ameas, Cint. apply Bmeas, Cint.
-Qed.
-
-Lemma Rcauchy_complete_cv
-  : forall {R : ConstructiveReals } (un : nat -> CRcarrier R)
-      (cau : CR_cauchy R un) (a : CRcarrier R),
-    CR_cv R un a
-    -> ((let (x,_) := CR_complete R un cau in x) == a)%ConstructiveReals.
-Proof.
-  intros. destruct (CR_complete R un cau).
-  exact (CR_cv_unique un _ _ c H).
-Qed.
-
-Lemma SigmaFiniteLimit
-  : forall {R : ConstructiveReals} (A : CRcarrier R -> Prop),
-    @PartialRestriction R _
-      (XpointwiseLimit (fun n => CharacFunc (fun x => -CR_of_Q R (Z.of_nat n # 1) <= x
-                                                /\ x <= CR_of_Q R (Z.of_nat n # 1)
-                                                /\ A x)))
-      (CharacFunc A).
-Proof.
-  split.
-  - intros x [xnD H]. destruct (CRup_nat (CRabs _ x)) as [n H0].
-    apply CRabs_lt in H0. destruct H0.
-    destruct (xnD n) as [isin|isout].
-    + left. apply isin.
-    + right. intro abs. apply isout. repeat split. 3: exact abs.
-      2: apply CRlt_asym, c.
-      rewrite <- (CRopp_involutive x).
-      apply CRopp_ge_le_contravar. apply CRlt_asym, c0.
-  - intros. simpl.
-    destruct (CRup_nat (CRabs _ x)) as [n nup].
-    apply CRabs_lt in nup. destruct nup.
-    destruct xD as [xnD H], xG.
-    + (* in A *)
-      unfold CharacFunc, Domain, inject_Z in xnD.
-      unfold CharacFunc, partialApply in H.
-      apply Rcauchy_complete_cv.
-      intro p. exists n. intros. destruct (xnD i).
-      unfold CRminus. rewrite CRplus_opp_r.
-      rewrite CRabs_right, <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
-      apply CRle_refl. exfalso. apply n0. repeat split.
-      3: exact a.
-      rewrite <- (CRopp_involutive x).
-      apply CRopp_ge_le_contravar.
-      apply (CRle_trans _ (CR_of_Q R (Z.of_nat n # 1))).
-      apply CRlt_asym, c0. apply CR_of_Q_le. unfold Qle, Qnum, Qden.
-      do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, H0.
-      apply (CRle_trans _ (CR_of_Q R (Z.of_nat n # 1))).
-      apply CRlt_asym, c. apply CR_of_Q_le. unfold Qle, Qnum, Qden.
-      do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, H0.
-    + (* not in A, constant sequence at 0. *)
-      unfold CharacFunc, partialApply in H.
-      apply Rcauchy_complete_cv. intro p. exists O.
-      intros. destruct (xnD i). exfalso.
-      destruct a, H2. contradiction.
-      unfold CRminus. rewrite CRopp_0, CRplus_0_r.
-      rewrite CRabs_right. rewrite <- CR_of_Q_zero.
-      apply CR_of_Q_le. discriminate. apply CRle_refl.
-Qed.
-
-Lemma SigmaFiniteMonotone
-  : forall {R : ConstructiveReals} (A : CRcarrier R -> Prop),
-    let fn := fun n => @CharacFunc R _ (fun x => -CR_of_Q R (Z.of_nat n # 1) <= x
-                                      /\ x <= CR_of_Q R (Z.of_nat n # 1)
-                                      /\ A x) in
-    forall n:nat, partialFuncLe (fn n) (fn (S n)).
-Proof.
-  intros R A fn n x xdf xdg. simpl.
-  destruct xdf.
-  - destruct xdg. apply CRle_refl. exfalso.
-    apply n0. destruct a, H0. repeat split. 3: exact H1.
-    apply (CRle_trans _ (- CR_of_Q R (Z.of_nat n # 1))).
-    apply CRopp_ge_le_contravar. apply CR_of_Q_le.
-    unfold Qle, Qnum, Qden.
-    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, le_refl. exact H.
-    apply (CRle_trans _ (CR_of_Q R (Z.of_nat n # 1)) _ H0).
-    apply CR_of_Q_le. unfold Qle, Qnum, Qden.
-    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, le_refl.
-  - destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
-Qed.
-
-(* A classical hypothesis, to explain the relation with the
-   classical Lebesgue measure. *)
-Definition IncrSeqCvT : Type
-  := forall (R : ConstructiveReals) (un : nat -> CRcarrier R) (a : CRcarrier R),
-    (forall n:nat, un n <= un (S n))
-    -> (forall n:nat, un n <= a)
-    -> CR_cauchy R un.
-
-Lemma MeasurableSetUnionCountable
-  : forall {IS : IntegrationSpace}
-      (An : nat -> ((X (ElemFunc IS)) -> Prop)),
-    (forall n:nat, MeasurableSet (An n))
-    -> IncrSeqCvT (* Maybe we can weaken this classical hypothesis *)
-    -> MeasurableSet (fun x => exists n:nat, An n x).
-Proof.
-  intros IS An AnMeas IncrSeqCv B Bint.
-  apply (IntegrableFunctionExtensional
-           (CharacFunc (fun x => exists n:nat, An n x /\ B x))).
-  - split.
-    + intros x [H|H]. simpl. left. destruct H. split.
-      exists x0. apply H. apply H. right. intros [[n H0] H1].
-      apply H. exists n. split; assumption.
-    + intros. simpl. destruct xD, xG. reflexivity.
-      exfalso. apply n. destruct e. split. exists x0.
-      apply H. apply H.
-      exfalso. apply n. destruct a, H. exists x0. split; assumption.
-      reflexivity.
-  - assert (forall n:nat, IntegrableSet (fun x => An n x /\ B x)) as AnInt.
-    { intro n. apply AnMeas, Bint. }
-    specialize (IncrSeqCv _ (fun n : nat =>
-     MeasureSet
-       (IntegrableSetUnionIterate
-          (fun (n0 : nat) (x : X (ElemFunc IS)) => An n0 x /\ B x) AnInt n))
-                          (MeasureSet Bint)).
-    apply CR_complete in IncrSeqCv.
-    destruct IncrSeqCv as [l lim].
-    + apply (IntegrableSetCountableUnion _ AnInt l lim).
-    + intros. apply IntegralNonDecreasing. intros x xdf xdg.
-      simpl. destruct xdf. destruct xdg. apply CRle_refl.
-      exfalso. apply n0. apply applyUnionIterate.
-      apply applyUnionIterate in u. destruct u. exists x0.
-      destruct H, H0. repeat split; try assumption.
-      apply (le_trans _ _ _ H), le_S, le_refl.
-      destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
-    + intros. apply IntegralNonDecreasing. intros x xdf xdg.
-      simpl. destruct xdf. destruct xdg. apply CRle_refl.
-      exfalso. apply applyUnionIterate in u. destruct u, H, H0.
-      contradiction.
-      destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
-Qed.
 
 (* A variant for the countable union, that allows redundancies in the sum. *)
 Definition IntegrableSetCountableUnionLe

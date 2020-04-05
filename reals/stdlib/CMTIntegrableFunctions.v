@@ -985,8 +985,8 @@ Qed.
 
 Definition IntegrableMinus
            {IS : IntegrationSpace}
-           (f : PartialFunction (X (ElemFunc IS)))
-           (g : PartialFunction (X (ElemFunc IS)))
+           {f : PartialFunction (X (ElemFunc IS))}
+           {g : PartialFunction (X (ElemFunc IS))}
   : IntegrableFunction f
     -> IntegrableFunction g
     -> IntegrableFunction (Xminus f g).
@@ -1637,7 +1637,7 @@ Lemma IntegralMinus
       (f g : PartialFunction (X (ElemFunc IS)))
       (fInt : IntegrableFunction f)
       (gInt : IntegrableFunction g),
-    Integral (IntegrableMinus f g fInt gInt)
+    Integral (IntegrableMinus fInt gInt)
     == Integral fInt - Integral gInt.
 Proof.
   intros. unfold Xminus. unfold IntegrableMinus.
@@ -1669,7 +1669,7 @@ Proof.
     apply CRplus_opp_r. }
   pose proof (IntegralRepresentationInvariantZero
                 (Xminus f f)
-                (IntegrableMinus f f fnInt gnInt)
+                (IntegrableMinus fnInt gnInt)
                 H)
     as invZero.
   rewrite IntegralMinus in invZero.
@@ -1683,7 +1683,8 @@ Lemma IntegrableMinusMaj
       (fInt : IntegrableFunction f)
       (g : PartialFunction (X (ElemFunc IS)))
       (gInt : IntegrableFunction g),
-    PartialRestriction (XinfiniteSumAbs (IntFn (let (i,_) := IntegrableMinus f g fInt gInt in i)))
+    PartialRestriction (XinfiniteSumAbs
+                          (IntFn (let (i,_) := IntegrableMinus fInt gInt in i)))
                        (Xminus f g).
 Proof.
   intros. apply IntegrablePlusMaj.
@@ -1990,7 +1991,7 @@ Defined.
 (* Like the Lebesgue integral, a function f is integrable
    when its absolute value is. *)
 Definition IntegrableAbs {IS : IntegrationSpace}
-           (f : PartialFunction (X (ElemFunc IS)))
+           {f : PartialFunction (X (ElemFunc IS))}
   : IntegrableFunction f
     -> IntegrableFunction (Xabs f)
   := fun fInt => IntegrableOpContract
@@ -2005,7 +2006,7 @@ Lemma IntegralTriangle
       (f : PartialFunction (X (ElemFunc IS)))
       (fInt : IntegrableFunction f),
     CRabs _ (Integral fInt)
-    <= Integral (IntegrableAbs f fInt).
+    <= Integral (IntegrableAbs fInt).
 Proof.
   intros. apply CRabs_le. split.
   - rewrite <- IntegralOpp. apply IntegralNonDecreasing.
@@ -2029,17 +2030,17 @@ Qed.
    When the integral distance between f and g is 0, then f and g
    are equal almost-everywhere, as defined in CMTFullSets. *)
 Definition IntegralDistance {IS : IntegrationSpace}
-           (f g : PartialFunction (X (ElemFunc IS)))
+           {f g : PartialFunction (X (ElemFunc IS))}
            (fInt : IntegrableFunction f)
            (gInt : IntegrableFunction g) : CRcarrier _
-  := Integral (IntegrableAbs (Xminus f g) (IntegrableMinus _ _ fInt gInt)).
+  := Integral (IntegrableAbs (IntegrableMinus fInt gInt)).
 
 Lemma IntegralDistance_sym
   : forall { IS : IntegrationSpace }
       (f g : PartialFunction (X (ElemFunc IS)))
       (fInt : IntegrableFunction f)
       (gInt : IntegrableFunction g),
-    IntegralDistance f g fInt gInt == IntegralDistance g f gInt fInt.
+    IntegralDistance fInt gInt == IntegralDistance gInt fInt.
 Proof.
   intros. apply IntegralExtensional. intros.
   do 2 rewrite applyXabs.
@@ -2049,6 +2050,35 @@ Proof.
   apply DomainProp. apply CRopp_morph. apply DomainProp.
 Qed.
 
+Lemma IntegralDistance_triang
+  : forall { IS : IntegrationSpace }
+      (f g h : PartialFunction (X (ElemFunc IS)))
+      (fInt : IntegrableFunction f)
+      (gInt : IntegrableFunction g)
+      (hInt : IntegrableFunction h),
+    IntegralDistance fInt hInt
+    <= IntegralDistance gInt fInt + IntegralDistance gInt hInt.
+Proof.
+  intros. unfold IntegralDistance.
+  rewrite <- IntegralPlus. apply IntegralNonDecreasing.
+  intros x xdf xdg. destruct xdf, xdg.
+  rewrite applyXabs, (applyXplus _ _ x d1 d2).
+  rewrite (applyXminus f h x d d0).
+  setoid_replace (partialApply f x d - partialApply h x d0)
+    with (partialApply f x d - partialApply g x (fst d2)
+          + (partialApply g x (fst d2) - partialApply h x d0)).
+  apply (CRle_trans _ _ _ (CRabs_triang _ _)).
+  apply CRplus_le_compat. rewrite CRabs_minus_sym.
+  rewrite applyXabs. destruct d1.
+  rewrite (applyXminus g f x d1 d3), (DomainProp g x (fst d2) d1).
+  rewrite (DomainProp f x d3 d). apply CRle_refl.
+  rewrite applyXabs. destruct d2.
+  rewrite (applyXminus g h x d2 d3), (DomainProp h x d3 d0).
+  apply CRle_refl. unfold CRminus. rewrite CRplus_assoc.
+  apply CRplus_morph. reflexivity.
+  rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l. reflexivity.
+Qed.
+
 Definition Un_integral_cv { IS : IntegrationSpace }
            (fn : nat -> PartialFunction (X (ElemFunc IS)))
            (f : PartialFunction (X (ElemFunc IS)))
@@ -2056,7 +2086,7 @@ Definition Un_integral_cv { IS : IntegrationSpace }
            (fInt : IntegrableFunction f)
   := forall p : positive,
     { n : nat
-    | forall i:nat, le n i -> IntegralDistance (fn n) f (fnInt n) fInt <= CR_of_Q _ (1#p) }.
+    | forall i:nat, le n i -> IntegralDistance (fnInt i) fInt <= CR_of_Q _ (1#p) }.
 
 Definition IntegrableMinOne {IS : IntegrationSpace}
            (f : PartialFunction (X (ElemFunc IS)))
@@ -2078,7 +2108,7 @@ Proof.
   - intros f g H fInt. apply (IntegrableFunctionExtensional f g).
     destruct H. split. apply p. apply c. exact fInt.
   - exact IntegrablePlus.
-  - exact IntegrableAbs.
+  - intros f fInt. apply (IntegrableAbs fInt).
   - intros. exact (IntegrableMinOne f X).
   - intros a f fInt. exact (IntegrableScale f a fInt).
 Defined.
@@ -2124,7 +2154,7 @@ Proof.
               (Xplus f (Xabs f))
               (CR_of_Q _ (1#2))
               (IntegrablePlus f (Xabs f) fInt
-                              (IntegrableAbs f fInt))).
+                              (IntegrableAbs fInt))).
 Defined.
 
 Definition IntegrableNegPart {IS : IntegrationSpace}
@@ -2136,8 +2166,7 @@ Proof.
   exact (IntegrableScale
               (Xminus (Xabs f) f)
               (CR_of_Q _ (1#2))
-              (IntegrableMinus (Xabs f) f
-                               (IntegrableAbs f fInt) fInt)).
+              (IntegrableMinus (IntegrableAbs fInt) fInt)).
 Defined.
 
 Definition IntegrableMinInt {IS : IntegrationSpace}
@@ -2203,7 +2232,7 @@ Lemma IntegralAbsLimit : forall {IS : IntegrationSpace}
       (fun n : nat =>
          (Iabs _ (LsumStable (IntFn (let (i,_) := fInt in i))
                              (IntFnL (let (i,_) := fInt in i)) n)))
-      (Integral (IntegrableAbs f fInt)).
+      (Integral (IntegrableAbs fInt)).
 Proof.
   intros IS. assert (CRabs (RealT (ElemFunc IS)) 0 == 0) as CReal_abs_R0.
   { rewrite CRabs_right. reflexivity. apply CRle_refl. }
