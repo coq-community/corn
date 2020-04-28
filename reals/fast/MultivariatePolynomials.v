@@ -302,7 +302,7 @@ Proof.
       rewrite <- (MVP_mult_apply Q_as_CRing).
       apply: MVP_apply_wd; try reflexivity.
       replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
-        with (le_S_n n1 m l) by apply le_irrelevent.
+        with (Le.le_S_n n1 m l) by apply le_irrelevent.
       apply c_mult_apply.
      apply MVP_BernsteinNonNeg; auto.
     eapply Qle_trans;[|apply Qmax_ub_r].
@@ -430,7 +430,7 @@ Proof.
      rewrite <- (MVP_mult_apply Q_as_CRing).
      apply: MVP_apply_wd; try reflexivity.
      replace (lt_n_Sm_le n1 m (lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
-       with (le_S_n n1 m l) by apply le_irrelevent.
+       with (Le.le_S_n n1 m l) by apply le_irrelevent.
      apply c_mult_apply.
     apply MVP_BernsteinNonNeg; auto.
    eapply Qle_trans;[apply Qmin_lb_r|].

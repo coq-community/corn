@@ -682,7 +682,7 @@ Section TotalOrderLattice.
 Context `{TotalOrder A} `{Lt A} `{∀ x y: A, Decision (x ≤ y)}.
 
 Lemma min_ind (P : A -> Prop) (x y : A) : P x → P y → P (min x y).
-Proof. unfold min, sort. destruct (decide_rel le x y); auto. Qed.
+Proof. unfold min, sort. destruct (decide_rel _ x y); auto. Qed.
 
 Lemma lt_min (x y z : A) : z < x -> z < y -> z < min x y.
 Proof. apply min_ind. Qed.
