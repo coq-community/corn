@@ -342,8 +342,10 @@ Lemma CSUC_bound_ext
     -> CSUC f c d cont_mod.
 Proof.
   intros. destruct H1. split. exact u.
-  intros. destruct H1. rewrite <- H in c1. apply c0.
-  left. exact c1. rewrite <- H0 in c1. apply c0. right. exact c1.
+  intros. destruct H1. apply c0. left.
+  apply (CRlt_le_trans _ _ _ c1). apply H.
+  apply c0. right. apply (CRle_lt_trans _ d).
+  apply H0. exact c1.
 Qed.
 
 Definition CSUCTrapeze_IS_CSUC
@@ -697,13 +699,9 @@ Proof.
   { apply (CRlt_trans _ (CRinv R eta (inr etaPos))).
     apply CRinv_0_lt_compat. exact etaPos. exact pmaj. }
   assert (0 < p)%nat.
-  { unfold INR in qpPos. destruct (Q_dec 0 (Z.of_nat p # 1)). destruct s.
-    unfold Qlt,Qnum,Qden in q.
-    simpl in q. rewrite Z.mul_1_r in q. apply Nat2Z.inj_lt.
-    exact q. exfalso. rewrite <- CR_of_Q_zero in qpPos.
-    apply (CR_of_Q_lt R) in q. exact (CRlt_asym _ _ q qpPos).
-    exfalso. rewrite <- q, CR_of_Q_zero in qpPos.
-    exact (CRlt_asym _ _ qpPos qpPos). }
+  { unfold INR in qpPos. destruct p. 2: apply le_n_S, le_0_n.
+    exfalso. contradict qpPos. apply (CRle_trans _ (CR_of_Q R 0)).
+    apply CR_of_Q_le. discriminate. rewrite CR_of_Q_zero. apply CRle_refl. }
   destruct (CSUCposPointApproxSequenceCvZero (Pos.of_nat p)) as [i imaj].
   specialize (imaj i (le_refl i)). specialize (H i).
   destruct (CSUCposPointApproxSequence i); unfold x,y in imaj.
@@ -1016,7 +1014,8 @@ Proof.
                                                (LabsStable ElemCSUC f fL))))).
     + apply IntegralCSUC_bounded.
       intro x0. apply CRmin_r.
-    + apply (CRmult_lt_compat_r (CR_of_Q R (1 # p))) in kmaj.
+    + apply CRlt_asym in kmaj.
+      apply (CRmult_le_compat_r (CR_of_Q R (1 # p))) in kmaj.
       rewrite CRmult_assoc, <- CR_of_Q_mult in kmaj.
       setoid_replace ((Z.pos p # 1) * (1 # p))%Q with 1%Q in kmaj.
       rewrite CR_of_Q_one, CRmult_1_r in kmaj.
@@ -1027,7 +1026,7 @@ Proof.
       rewrite CR_of_Q_one, CRmult_1_l.
       apply (CRle_trans _ (INR k * CR_of_Q R (1#p))).
       apply (CRle_trans _ (CSUC_high f fL - CSUC_low f fL)).
-      2: apply CRlt_asym, kmaj.
+      2: apply kmaj.
       unfold LminConstStable. rewrite <- CSUC_transport_low.
       rewrite <- CSUC_transport_high. destruct f, fL; apply CRle_refl.
       apply CRmult_le_compat_r.
@@ -1039,7 +1038,7 @@ Proof.
       rewrite <- positive_nat_Z, Nat2Pos.id. reflexivity. discriminate.
       unfold Qmult, Qeq, Qnum, Qden.
       rewrite Z.mul_1_r, Z.mul_1_r, Z.mul_1_l, Pos.mul_1_l. reflexivity.
-      apply CR_of_Q_pos; reflexivity.
+      rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
     + unfold IntegralCSUC.
       apply (UC_integral_pos
                (TotalizeFunc (CRcarrier R)
@@ -1071,11 +1070,17 @@ Proof.
            (-(1)) 1 H (fun eps epsPos => eps *CR_of_Q R (1#2))).
   pose proof (CSUCTrapeze_CSUC 0 0 1 (CRzero_lt_one R) (CRle_refl 0)).
   destruct H0. destruct u. split. split.
-  intros. specialize (c0 x0 xPos). rewrite CRmult_1_r in c0. exact c0.
-  intros. apply (c1 eps x0 y0 epsPos). rewrite CRmult_1_r. exact H0.
+  intros. specialize (c0 x0 xPos).
+  apply (CRlt_le_trans _ _ _ c0).
+  rewrite CRmult_1_r. apply CRle_refl.
+  intros. apply (c1 eps x0 y0 epsPos).
+  apply (CRlt_le_trans _ _ _ H0).
+  rewrite CRmult_1_r. apply CRle_refl.
   intros. apply c. destruct H0.
-  left. unfold CRminus. rewrite CRplus_0_l. exact c2.
-  right. unfold CRminus. rewrite CRplus_0_l. exact c2.
+  left. apply (CRlt_le_trans _ _ _ c2).
+  unfold CRminus. rewrite CRplus_0_l. apply CRle_refl.
+  right. apply (CRle_lt_trans _ 1). rewrite CRplus_0_l.
+  apply CRle_refl. exact c2.
 Defined.
 
 Lemma IntegralOneCSUC
@@ -1234,15 +1239,16 @@ Proof.
                  (etaPos n)) in nmaj.
         destruct nmaj. split.
         apply CRltForget.
-        unfold CRminus in c0.
-        rewrite CRplus_assoc, CRplus_opp_r, CRplus_0_r in c0.
-        exact c0.
-        unfold CRminus in c1.
-        rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r in c1.
-        apply CRltForget. exact c1.
+        apply (CRle_lt_trans _ (a + (b - a) * CR_of_Q R (1 # Pos.of_nat (n + 2)) -
+                                    (b - a) * CR_of_Q R (1 # Pos.of_nat (n + 2)))).
+        unfold CRminus. rewrite CRplus_assoc, CRplus_opp_r, CRplus_0_r.
+        apply CRle_refl. exact c0.
+        unfold CRminus in c1. apply CRltForget.
+        apply (CRlt_le_trans _ _ _ c1).
+        rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r. apply CRle_refl.
       + right. intro abs. specialize (inPlateau x xdn abs).
-        rewrite (CR_cv_unique _ _ _ inPlateau lcv) in c.
-        exact (CRlt_asym l l c c).
+        contradict c. fold (CRle _ 1 l).
+        rewrite (CR_cv_unique _ _ _ inPlateau lcv). apply CRle_refl.
     - intros. simpl in xG. destruct xG.
       + (* one *)
         apply applyPointwiseLimit.
@@ -1441,7 +1447,7 @@ Proof.
   - assert (forall x, (forall n : nat,
           CRltProp R (a - CR_of_Q R (1 # Pos.of_nat n)) x /\
           CRltProp R x (b + CR_of_Q R (1 # Pos.of_nat n)))
-                 <-> a <= x <= b).
+                 <-> a <= x <= b) as H0.
     { split. intros. split.
       apply (CR_cv_bound_up (fun n => (a - CR_of_Q R (1 # Pos.of_nat n))) _ _ O).
       intros. specialize (H0 n) as [H0 _]. apply CRlt_asym, CRltEpsilon, H0.
@@ -1464,6 +1470,7 @@ Proof.
          (fun x : X (ElemFunc IntSpaceCSUCFunctions) =>
           forall n : nat,
           CRltProp R (a - CR_of_Q R (1 # Pos.of_nat n)) x /\
-          CRltProp R x (b + CR_of_Q R (1 # Pos.of_nat n))) _ H0 x0).
-    rewrite <- (MeasureExtensional _ _ x0 _ H0). exact c.
+          CRltProp R x (b + CR_of_Q R (1 # Pos.of_nat n))) _
+         (fun x _ => H0 x) x0).
+    rewrite <- (MeasureExtensional _ _ x0 _ (fun x _ _ => H0 x)). exact c.
 Qed.

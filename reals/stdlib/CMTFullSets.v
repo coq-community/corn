@@ -350,9 +350,9 @@ Proof.
                 (Xplus f (Xminus h h))
                 (Xplus g (Xminus h h))
                 (IntegrablePlus f (Xminus h h) fInt
-                                (IntegrableMinus h h hInt hInt))
+                                (IntegrableMinus hInt hInt))
                 (IntegrablePlus g (Xminus h h) gInt
-                                (IntegrableMinus h h hInt hInt))).
+                                (IntegrableMinus hInt hInt))).
   rewrite IntegralPlus in H. rewrite IntegralPlus in H.
   rewrite IntegralMinus in H. unfold CRminus in H.
   rewrite CRplus_opp_r, CRplus_0_r, CRplus_0_r in H. apply H.
@@ -365,6 +365,28 @@ Proof.
   unfold CRminus. rewrite CRplus_opp_r, CRplus_0_r, CRplus_0_r.
   apply inc. apply d2.
 Qed.
+
+Lemma IntegrableExtensionalAE
+  : forall {IS : IntegrationSpace}
+      (f g : PartialFunction (X (ElemFunc IS))),
+    almost_everywhere (Domain g)
+    -> almost_everywhere
+        (fun x : X (ElemFunc IS) => forall (dF : Domain f x) (dG : Domain g x),
+             partialApply _ _ dF == partialApply _ _ dG)
+    -> IntegrableFunction f
+    -> IntegrableFunction g.
+Proof.
+  intros. destruct X as [h [i c]]. destruct X0 as [k [H H0]].
+  apply (IntegrableFunctionExtensional
+           (Xplus f (Xplus (Xscale 0 h) (Xscale 0 k)))).
+  - split.
+    + intros x xD. apply c. apply xD.
+    + intros. simpl. destruct xD, d0.
+      rewrite CRmult_0_l, CRmult_0_l, CRplus_0_l, CRplus_0_r.
+      exact (H0 x d1 d xG).
+  - apply (IntegrablePlus _ _ X1). apply IntegrablePlus.
+    apply IntegrableScale, i. apply IntegrableScale, H.
+Qed. 
 
 Lemma IntegralExtensionalAE
   : forall {IS : IntegrationSpace}
@@ -588,7 +610,7 @@ Lemma AbsRepresentation : forall (IS : IntegrationSpace)
     -> { intRepres : IntegralRepresentation
         & prod (PartialRestriction (XinfiniteSumAbs (IntFn intRepres)) f)
                (IntAbsSum intRepres
-                <= Integral (IntegrableAbs f fInt) + eps) }.
+                <= Integral (IntegrableAbs fInt) + eps) }.
 Proof.
   intros.
   pose proof (IntegralAbsLimit f fInt) as IabsLimit.
@@ -753,7 +775,7 @@ Definition CompleteRepresentation
       & forall n:nat, prod (PartialRestriction
                        (XinfiniteSumAbs (IntFn (intRepresN n))) (fn n))
                     (IntAbsSum (intRepresN n)
-                     <= Integral (IntegrableAbs (fn n) (fnInt n))
+                     <= Integral (IntegrableAbs (fnInt n))
                        + CRpow (CR_of_Q _ (1#2)) n) }.
 Proof.
   assert (0 < CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) as halfPos.
@@ -889,7 +911,7 @@ Lemma IntegrableFunctionsComplete
       (fnInt : forall n:nat, IntegrableFunction (fn n))
       (sumIAbsFn : CRcarrier (RealT (ElemFunc IS))),
     (series_cv
-       (fun k:nat => Integral (IntegrableAbs (fn k) (fnInt k)))
+       (fun k:nat => Integral (IntegrableAbs (fnInt k)))
        sumIAbsFn)
     -> { represInt : IntegralRepresentation
             & prod (PartialRestriction (XinfiniteSumAbs (IntFn represInt))
@@ -900,7 +922,7 @@ Proof.
   intros. pose proof (CompleteRepresentationRestrict IS fn fnInt) as complRestrict.
   destruct (CompleteRepresentation IS fn fnInt) as [intRepresN restrN].
   destruct (series_cv_maj (fun n => IntAbsSum (intRepresN n))
-                          (fun n => Integral (IntegrableAbs (fn n) (fnInt n))
+                          (fun n => Integral (IntegrableAbs (fnInt n))
                                   + CRpow (CR_of_Q _ (1#2)) n)
                           (sumIAbsFn + CR_of_Q _ 2)) as [s [cvs majS]].
   - intro n. rewrite CRabs_right. apply (restrN n).
@@ -992,16 +1014,6 @@ Definition DiscrDeriv {R : ConstructiveReals} (X : Set)
      | S p => Xminus (fn n) (fn p)
      end.
 
-Lemma DiscrDerivDomainInc : forall {R : ConstructiveReals} (X : Set)
-                                   (fn : nat -> @PartialFunction R X)
-                              (x : X)
-                              (xn : forall n : nat, Domain (fn n) x) (n : nat),
-    Domain (DiscrDeriv X fn n) x.
-Proof.
-  intros. unfold DiscrDeriv. destruct n. exact (xn O). split.
-  apply xn. apply xn.
-Qed.
-
 Lemma DiscrDerivDomainIncReverse
   : forall {R : ConstructiveReals} (X : Set) (fn : nat -> @PartialFunction R X)
       (x : X)
@@ -1042,88 +1054,13 @@ Proof.
 Qed.
 
 Definition IntegrableDiscrDeriv (IS : IntegrationSpace)
-                              (fn : nat -> PartialFunction (X (ElemFunc IS)))
-                              (fnInt : forall n:nat, IntegrableFunction (fn n))
-                              (n : nat)
+           (fn : nat -> PartialFunction (X (ElemFunc IS)))
+           (fnInt : forall n:nat, IntegrableFunction (fn n))
+           (n : nat)
   : IntegrableFunction (DiscrDeriv (X (ElemFunc IS)) fn n).
 Proof.
   intros. destruct n. apply fnInt. apply IntegrableMinus; apply fnInt.
 Defined.
-
-Lemma SumDiscrDeriv
-  : forall (IS : IntegrationSpace)
-      (fn : nat -> PartialFunction (X (ElemFunc IS)))
-      (fnInt : forall n:nat, IntegrableFunction (fn n))
-      (n : nat),
-    CRsum
-      (fun k : nat => Integral (IntegrableDiscrDeriv IS fn fnInt k)) n
-    == Integral (fnInt n).
-Proof.
-  induction n.
-  - reflexivity.
-  - replace (CRsum (fun k : nat => Integral (IntegrableDiscrDeriv IS fn fnInt k)) (S n))
-      with (CRsum (fun k : nat => Integral (IntegrableDiscrDeriv IS fn fnInt k)) n
-            + Integral (IntegrableDiscrDeriv IS fn fnInt (S n))).
-    2: reflexivity.
-    rewrite IHn. clear IHn.
-    pose proof (IntegralMinus (fn (S n)) (fn n)).
-    unfold IntegrableDiscrDeriv. rewrite H.
-    unfold CRminus. rewrite CRplus_comm, CRplus_assoc, CRplus_opp_l.
-    rewrite CRplus_0_r. reflexivity.
-Qed.
-
-Lemma SumDiscrDerivIncrAbs
-  : forall (IS : IntegrationSpace)
-      (fn : nat -> PartialFunction (X (ElemFunc IS)))
-      (fnInt : forall n:nat, IntegrableFunction (fn n))
-      (n : nat),
-    (forall n:nat, partialFuncLe (fn n) (fn (S n)))
-    -> CRsum (fun k : nat =>
-      Integral (IntegrableAbs
-                  (DiscrDeriv (X (ElemFunc IS)) fn k)
-                  (IntegrableDiscrDeriv IS fn fnInt k))) n
-      == match n with
-        | O => Integral (IntegrableAbs (fn O) (fnInt O))
-        | S p => (Integral (fnInt n)
-                + Integral (IntegrableAbs (fn O) (fnInt O))
-                  - Integral (fnInt O))
-        end.
-Proof.
-  induction n.
-  - reflexivity.
-  - intros. specialize (IHn H). destruct n.
-    + clear IHn. unfold CRsum, IntegrableDiscrDeriv, DiscrDeriv.
-      unfold CRminus.
-      rewrite <- (CRplus_comm (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat)))).
-      rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
-      pose proof (@IntegralMinus IS). unfold CRminus in H0.
-      rewrite <- H0. clear H0. apply IntegralExtensional.
-      intros.
-      rewrite applyXabs. rewrite CRabs_right.
-      apply DomainProp. destruct xdf.
-      rewrite (applyXminus (fn 1%nat) (fn O)).
-      apply CRle_minus. apply H.
-    + assert (forall f n, @CRsum (RealT (ElemFunc IS)) f (S (S n)) = CRsum f (S n) + (f (S (S n)))).
-      { intros. simpl. reflexivity. }
-      rewrite H0. rewrite IHn. clear IHn. clear H0.
-      setoid_replace (Integral
-        (IntegrableAbs (DiscrDeriv (X (ElemFunc IS)) fn (S (S n)))
-                       (IntegrableDiscrDeriv IS fn fnInt (S (S n)))))
-        with (Integral (fnInt (S (S n))) - Integral (fnInt (S n))).
-      unfold CRminus.
-      rewrite <- (CRplus_comm (Integral (fnInt (S (S n))) + - Integral (fnInt (S n)))).
-      do 3 rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
-      rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l. reflexivity.
-      pose proof (@IntegralMinus IS).
-      rewrite <- H0. clear H0.
-      apply IntegralExtensional. intros.
-      intros.
-      rewrite applyXabs. rewrite CRabs_right.
-      apply DomainProp.
-      unfold DiscrDeriv. destruct xdf.
-      rewrite (applyXminus (fn (S (S n))) (fn (S n))).
-      apply CRle_minus. apply H.
-Qed.
 
 (* The converse is not true : it is harder for series to converge absolutely. *)
 Lemma DiscrDerivInfiniteSum
@@ -1154,6 +1091,53 @@ Proof.
     exact c.
 Qed.
 
+Lemma IntegrableXpointwiseLimit
+  : forall {IS : IntegrationSpace}
+      (fn : nat -> PartialFunction (X (ElemFunc IS)))
+      (fnInt : forall n:nat, IntegrableFunction (fn n))
+      (sumAbsInt : CRcarrier (RealT (ElemFunc IS))),
+    series_cv (fun n:nat => Integral (IntegrableAbs (IntegrableMinus (fnInt (S n)) (fnInt n))))
+              sumAbsInt
+    -> { i : IntegrableFunction (XpointwiseLimit fn)
+            & CR_cv _ (fun n => Integral (fnInt n)) (Integral i) }.
+Proof.
+  intros. 
+  destruct (IntegrableFunctionsComplete
+              IS _ (IntegrableDiscrDeriv IS fn fnInt)
+              (sumAbsInt + Integral (IntegrableAbs (IntegrableDiscrDeriv IS fn fnInt O))))
+    as [rep repcv].
+  - apply (series_cv_shift
+             (fun k : nat => Integral (IntegrableAbs (IntegrableDiscrDeriv IS fn fnInt k)))
+             O sumAbsInt).
+    simpl.
+    apply (series_cv_eq
+             (fun n : nat => Integral
+                          (IntegrableAbs
+                             (IntegrableMinus (fnInt (S n)) (fnInt n))))).
+    2: exact H. intro n. apply IntegralExtensional. intros.
+    apply DomainProp.
+  - destruct repcv.
+    assert (PartialRestriction (XinfiniteSumAbs (IntFn rep)) (XpointwiseLimit fn))
+      as res.
+    { apply (PartialRestriction_trans _ _ _ _ p).
+      apply DiscrDerivInfiniteSum. }
+    exists (IntegrableFunctionExtensional
+         _ _ res
+         (existT _ rep (PartialRestriction_refl _ _))).
+    apply (CR_cv_eq (fun n : nat => Integral (fnInt n))) in s.
+    + apply (CR_cv_proper _ _ _ s). clear s.
+      rewrite IntegralRestrict. reflexivity.
+    + induction n. apply IntegralExtensional.
+      intros. apply DomainProp. simpl. rewrite IHn. clear IHn.
+      rewrite <- (CRplus_0_l (Integral (fnInt (S n)))).
+      rewrite <- (CRplus_opp_r (Integral (fnInt n))), CRplus_assoc.
+      apply CRplus_morph. reflexivity. rewrite CRplus_comm.
+      pose proof (IntegralMinus (fn (S n))). unfold CRminus in H0.
+      rewrite <- H0. clear H0. apply IntegralExtensional.
+      intros. apply DomainProp. 
+Qed.
+
+
 (* Now the famous monotone convergence theorem for integrals.
    Unlike the classical Beppo Levi's formulation, this theorem
    requires a convergence, to avoid infinite integrals. Also,
@@ -1170,153 +1154,76 @@ Definition IntegralMonotoneConvergence
     -> { limInt : IntegrableFunction (XpointwiseLimit fn)
       | Integral limInt == a }.
 Proof.
-  intros.
-  destruct (IntegrableFunctionsComplete
-              IS (DiscrDeriv (X (ElemFunc IS)) fn)
-              (IntegrableDiscrDeriv IS fn fnInt)
-              (a + (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat))
-                    - Integral (fnInt 0%nat)))).
-  apply (CR_cv_eq _ (fun n => match n with
-        | O => Integral (IntegrableAbs (fn O) (fnInt O))
-        | S p => (Integral (fnInt n)
-                 + Integral (IntegrableAbs (fn O) (fnInt O))
-                 - Integral (fnInt O))
-        end)).
-  - intro n. symmetry. apply SumDiscrDerivIncrAbs. assumption.
-  - apply (CR_cv_shift _ 1).
-    apply (CR_cv_eq _ (fun n => (Integral (fnInt (n + 1)%nat)
-          + (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat))
-             - Integral (fnInt 0%nat))))).
-    intro n. rewrite plus_comm. simpl.
-    unfold CRminus. rewrite CRplus_assoc. reflexivity.
-    apply CR_cv_plus.
-    apply (CR_cv_shift' (fun i : nat => Integral (fnInt i)) 1).
-    apply H0. intros n. exists O. intros. unfold CRminus.
-    simpl. rewrite CRplus_opp_r. rewrite CRabs_right.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
-  - destruct p.
-    assert (PartialRestriction (XinfiniteSumAbs (IntFn x))
-                               (XpointwiseLimit fn)) as H1.
-    { apply (PartialRestriction_trans _ _ _ _ p).
-      apply DiscrDerivInfiniteSum. }
-    exists (existT _ x H1).
-    pose proof (IntegralCv x); simpl.
-    apply (CR_cv_unique (fun n : nat => Integral (fnInt n))).
-    2: apply H0. clear H0.
-    apply (CR_cv_eq
-             _ (CRsum (fun n : nat =>
-                 Integral (IntegrableDiscrDeriv IS fn fnInt n)))).
-    intro n. apply SumDiscrDeriv. apply s.
+  intros. 
+  destruct (IntegrableXpointwiseLimit fn fnInt (a - Integral (fnInt O))).
+  - apply (CR_cv_eq _ (fun n => Integral (fnInt (S n)) - Integral (fnInt O))).
+    induction n. simpl. rewrite <- IntegralMinus.
+    apply IntegralExtensional. intros. 
+    rewrite applyXabs, CRabs_right. apply DomainProp.
+    destruct xdg. rewrite (applyXminus (fn 1%nat) (fn O)).
+    rewrite <- (CRplus_opp_r (partialApply (fn O) x d0)).
+    apply CRplus_le_compat_r. apply H.
+    simpl. rewrite <- IHn. unfold CRminus. rewrite CRplus_comm.
+    rewrite (CRplus_comm (Integral (fnInt (S n)))), CRplus_assoc.
+    apply CRplus_morph. reflexivity.
+    rewrite <- CRplus_0_l, <- (CRplus_opp_r (Integral (fnInt (S n)))).
+    rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
+    rewrite CRplus_comm.
+    pose proof (IntegralMinus (fn (S (S n)))). unfold CRminus in H1.
+    rewrite <- H1. apply IntegralExtensional. intros.
+    rewrite applyXabs, CRabs_right. apply DomainProp.
+    destruct xdg. rewrite (applyXminus (fn (S (S n))) (fn (S n))).
+    rewrite <- (CRplus_opp_r (partialApply (fn (S n)) x d0)).
+    apply CRplus_le_compat_r. apply H.
+    apply CR_cv_minus. 2: apply CR_cv_const.
+    apply (CR_cv_shift' _ 1) in H0.
+    apply (CR_cv_eq _ (fun n : nat => Integral (fnInt (n + 1)%nat))).
+    2: exact H0. intro n. rewrite Nat.add_comm. reflexivity.
+  - exists x. exact (CR_cv_unique _ _ _ c H0).
 Qed.
-
-Lemma SumDiscrDerivDecrAbs
-  : forall (IS : IntegrationSpace)
+ 
+Lemma IntegralMonotoneConvergenceDecr
+      (IS : IntegrationSpace)
       (fn : nat -> PartialFunction (X (ElemFunc IS)))
       (fnInt : forall n:nat, IntegrableFunction (fn n))
-      (n : nat),
-    (forall n:nat, partialFuncLe (fn (S n)) (fn n))
-    -> CRsum (fun k : nat => Integral (IntegrableAbs _ (IntegrableDiscrDeriv IS fn fnInt k))) n
-      == match n with
-        | O => Integral (IntegrableAbs (fn O) (fnInt O))
-        | S p => (- Integral (fnInt n)
-                 + Integral (IntegrableAbs (fn O) (fnInt O))
-                 + Integral (fnInt O))
-        end.
-Proof.
-  induction n.
-  - reflexivity.
-  - intros. specialize (IHn H). destruct n.
-    + clear IHn. unfold CRsum, IntegrableDiscrDeriv, DiscrDeriv, CRminus.
-      rewrite <- (CRplus_comm (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat)))).
-      rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
-      pose proof (@IntegralMinus IS). unfold CRminus in H0.
-      rewrite CRplus_comm.
-      rewrite <- H0. clear H0. apply IntegralExtensional.
-      intros.
-      rewrite applyXabs. specialize (H O).
-      destruct xdf, xdg.
-      rewrite (applyXminus (fn 1%nat) (fn O)).
-      rewrite (applyXminus (fn O) (fn 1%nat)).
-      destruct (fn 1%nat), (fn O).
-      rewrite (DomainProp x d2 d), (DomainProp0 x d1 d0).
-      rewrite CRabs_minus_sym. simpl.
-      rewrite CRabs_right. reflexivity.
-      specialize (H x d d0); simpl in H.
-      rewrite <- (CRplus_opp_r (partialApply x d)).
-      apply CRplus_le_compat. exact H. apply CRle_refl.
-    + assert (forall f n, @CRsum (RealT (ElemFunc IS)) f (S (S n)) = CRsum f (S n) + (f (S (S n)))).
-      intros. simpl. reflexivity.
-      rewrite H0. rewrite IHn. clear IHn. clear H0.
-      setoid_replace (Integral
-        (IntegrableAbs (DiscrDeriv (X (ElemFunc IS)) fn (S (S n)))
-             (IntegrableDiscrDeriv IS fn fnInt (S (S n)))))
-        with (Integral (fnInt (S n)) - Integral (fnInt (S (S n)))).
-      rewrite <- (CRplus_comm (Integral (fnInt (S n)) - Integral (fnInt (S (S n))))).
-      do 2 rewrite <- CRplus_assoc. apply CRplus_morph. 2: reflexivity.
-      apply CRplus_morph. 2: reflexivity. rewrite CRplus_comm.
-      unfold CRminus. rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l.
-      reflexivity. pose proof (@IntegralMinus IS).
-      rewrite <- H0. clear H0.
-      apply IntegralExtensional.
-      intros. specialize (H (S n)).
-      rewrite applyXabs. simpl in xdg.
-      unfold DiscrDeriv. destruct xdf, xdg.
-      rewrite (applyXminus (fn (S (S n))) (fn (S n))).
-      rewrite (applyXminus (fn (S n)) (fn (S (S n)))).
-      destruct (fn (S n)), (fn (S (S n))).
-      rewrite (DomainProp0 x d2 d), (DomainProp x d1 d0).
-      rewrite CRabs_minus_sym.
-      rewrite CRabs_right. simpl. reflexivity.
-      rewrite <- (CRplus_opp_r (partialApply0 x d)).
-      apply CRplus_le_compat. apply H. apply CRle_refl.
-Qed.
-
-Definition IntegralMonotoneConvergenceDecr
-           (IS : IntegrationSpace)
-           (fn : nat -> PartialFunction (X (ElemFunc IS)))
-           (fnInt : forall n:nat, IntegrableFunction (fn n))
-           (a : CRcarrier (RealT (ElemFunc IS)))
+      (a : CRcarrier (RealT (ElemFunc IS)))
   : (forall n:nat, partialFuncLe (fn (S n)) (fn n))
     -> CR_cv _ (fun n:nat => Integral (fnInt n)) a
     -> { limInt : IntegrableFunction (XpointwiseLimit fn)
       | Integral limInt == a }.
 Proof.
-  intros.
-  destruct (IntegrableFunctionsComplete
-              IS (DiscrDeriv (X (ElemFunc IS)) fn)
-              (IntegrableDiscrDeriv IS fn fnInt)
-              (- a + (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat))
-                      + Integral (fnInt 0%nat)))).
-  apply (CR_cv_eq _ (fun n => match n with
-        | O => Integral (IntegrableAbs (fn O) (fnInt O))
-        | S _ => (- Integral (fnInt n)
-                 + Integral (IntegrableAbs (fn O) (fnInt O))
-                 + Integral (fnInt O))
-        end)).
-  - intro n. symmetry. apply SumDiscrDerivDecrAbs. assumption.
-  - apply (CR_cv_shift _ 1).
-    apply (CR_cv_eq _ (fun n => (- Integral (fnInt (n + 1)%nat)
-                              + (Integral (IntegrableAbs (fn 0%nat) (fnInt 0%nat))
-                                 + Integral (fnInt 0%nat))))).
-    intro n. rewrite plus_comm. simpl.
-    rewrite CRplus_assoc. reflexivity.
-    apply CR_cv_plus. apply CR_cv_opp.
-    apply (CR_cv_shift' (fun i : nat => Integral (fnInt i)) 1).
-    apply H0. intros n. exists O. intros. unfold CRminus.
-    simpl. rewrite CRplus_opp_r. rewrite CRabs_right.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
-  - destruct p.
-    assert (PartialRestriction (XinfiniteSumAbs (IntFn x))
-                               (XpointwiseLimit fn)) as H1.
-    { apply (PartialRestriction_trans _ _ _ _ p).
-      apply DiscrDerivInfiniteSum. }
-    exists (existT _ x H1).
-    pose proof (IntegralCv x); simpl.
-    apply (CR_cv_unique (fun n : nat => Integral (fnInt n))).
-    2: apply H0. clear H0.
-    apply (CR_cv_eq _ (CRsum (fun n : nat =>
-           Integral (IntegrableDiscrDeriv IS fn fnInt n)))).
-    intro n. apply SumDiscrDeriv. apply s.
+  intros. 
+  destruct (IntegrableXpointwiseLimit fn fnInt (Integral (fnInt O) - a)).
+  - apply (CR_cv_eq _ (fun n => Integral (fnInt O) - Integral (fnInt (S n)))).
+    induction n. simpl. rewrite <- IntegralMinus.
+    apply IntegralExtensional. intros. 
+    rewrite applyXabs, CRabs_left. simpl.
+    destruct xdf, xdg. rewrite CRopp_plus_distr.
+    rewrite <- CRopp_mult_distr_l, <- CRopp_mult_distr_l.
+    rewrite CRmult_1_l, CRmult_1_l, CRopp_involutive, CRplus_comm.
+    rewrite (DomainProp _ x d1 d0), (DomainProp _ x d d2). reflexivity.
+    destruct xdg. rewrite (applyXminus (fn 1%nat) (fn O)).
+    rewrite <- (CRplus_opp_r (partialApply (fn O) x d0)).
+    apply CRplus_le_compat_r. apply H.
+    simpl. rewrite <- IHn. unfold CRminus. rewrite CRplus_assoc.
+    apply CRplus_morph. reflexivity.
+    rewrite <- CRplus_0_l, <- (CRplus_opp_l (Integral (fnInt (S n)))).
+    rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
+    pose proof (IntegralMinus (fn (S n))). unfold CRminus in H1.
+    rewrite <- H1. apply IntegralExtensional. intros.
+    rewrite applyXabs, CRabs_left.
+    simpl. destruct xdf, xdg. rewrite CRopp_plus_distr.
+    rewrite <- CRopp_mult_distr_l, <- CRopp_mult_distr_l.
+    rewrite CRmult_1_l, CRmult_1_l, CRopp_involutive, CRplus_comm.
+    rewrite (DomainProp _ x d1 d0), (DomainProp _ x d d2). reflexivity.
+    destruct xdg. rewrite (applyXminus (fn (S (S n))) (fn (S n))).
+    rewrite <- (CRplus_opp_r (partialApply (fn (S n)) x d0)).
+    apply CRplus_le_compat_r. apply H.
+    apply CR_cv_minus. apply CR_cv_const.
+    apply (CR_cv_shift' _ 1) in H0.
+    apply (CR_cv_eq _ (fun n : nat => Integral (fnInt (n + 1)%nat))).
+    2: exact H0. intro n. rewrite Nat.add_comm. reflexivity.
+  - exists x. exact (CR_cv_unique _ _ _ c H0).
 Qed.
 
 Definition IntegralRepresentationShift
@@ -1380,31 +1287,32 @@ Lemma IntegralDense : forall {IS : IntegrationSpace}
 Proof.
   intros. destruct fInt as [intRepres lim]. intro p.
   pose proof (IntAbsSumCv intRepres p) as [n nmaj]. exists n.
-  intros.
+  intros i H.
   apply (CRle_trans
            _ (Integral (IntegrableSelf (IntegralRepresentationShift
-                                          (IntegralRepresentationAbs intRepres) n)))).
+                                          (IntegralRepresentationAbs intRepres) i)))).
   - apply IntegralNonDecreasing.
     intros x xdf [xnlim cau]. destruct xdf.
-    rewrite applyXabs, (applyXminus (Xsum (IntFn intRepres) n) f).
+    rewrite applyXabs, (applyXminus (Xsum (IntFn intRepres) i) f).
     simpl.
-    assert (forall n0:nat, Domain (IntFn intRepres  n0) x) as xdn.
-    { intro j. destruct (le_lt_dec j n).
-      apply (domainXsumIncReverse (IntFn intRepres) j n).
-      exact d. exact l. unfold lt in l. simpl in xnlim.
-      pose proof (xnlim (j - S n)%nat) as H0.
-      replace (S (n + (j - S n)))%nat with j in H0. exact H0.
-      symmetry. exact (le_plus_minus_r (S n) j l). }
-    destruct (series_cv_abs (fun n0 : nat => CRabs _ (partialApply (IntFn intRepres (S (n + n0))) x (xnlim n0)))
-                            cau) as [x0 s].
+    assert (forall n0:nat, Domain (IntFn intRepres n0) x) as xdn.
+    { intro j. destruct (le_lt_dec j i).
+      exact (domainXsumIncReverse (IntFn intRepres) j i _ d l).
+      unfold lt in l. simpl in xnlim.
+      pose proof (xnlim (j - S i)%nat) as H0.
+      replace (S (i + (j - S i)))%nat with j in H0. exact H0.
+      symmetry. exact (le_plus_minus_r (S i) j l). }
+    destruct (series_cv_abs
+                (fun n0 : nat => CRabs _ (partialApply (IntFn intRepres (S (i + n0))) x (xnlim n0)))
+                cau) as [x0 s].
     apply (series_cv_eq
-             _ (fun n0 => CRabs _ (partialApply (IntFn intRepres (S (n + n0))) x (xdn (S n + n0)%nat)))) in s.
+             _ (fun n0 => CRabs _ (partialApply (IntFn intRepres (S (i + n0))) x (xdn (S i + n0)%nat)))) in s.
     apply (series_cv_shift (fun n0 : nat =>
-                              CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) n x0) in s.
+                              CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) i x0) in s.
     rewrite (applyXsum _ _ x _ xdn).
     rewrite <- (CRplus_0_r x0),
     <- (CRplus_opp_r
-          (CRsum (fun n0 : nat => CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) n)),
+          (CRsum (fun n0 : nat => CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) i)),
     <- CRplus_assoc.
     apply (series_cv_abs_remainder
              (fun n0 : nat => (partialApply (IntFn intRepres n0) x (xdn n0)))
@@ -1412,7 +1320,7 @@ Proof.
              (x0 +
               CRsum
                 (fun n0 : nat =>
-                   CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) n) n).
+                   CRabs _ (partialApply (IntFn intRepres n0) x (xdn n0))) i) i).
     2: exact s.
     destruct lim.
     assert (Domain (XinfiniteSumAbs (IntFn intRepres)) x) as H0.
@@ -1427,7 +1335,7 @@ Proof.
   - unfold Integral, IntegrableSelf.
     rewrite IntegralRepresentationShiftVal.
     rewrite IntegralRepresentationAbsVal. simpl.
-    specialize (nmaj n (le_refl n)). rewrite CRabs_minus_sym in nmaj.
+    specialize (nmaj i H). rewrite CRabs_minus_sym in nmaj.
     apply (CRle_trans _ _ _ (CRle_abs _) nmaj).
 Qed.
 
@@ -1476,13 +1384,13 @@ Proof.
   - intro p.
     assert ({ g : PartialFunction (X (ElemFunc IS))
                   & { gL : L (ElemFunc IS) g
-                    | IntegralDistance f g fInt (IntegrableL g gL) <= CR_of_Q _ (1#3*p) } }).
+                    | IntegralDistance fInt (IntegrableL g gL) <= CR_of_Q _ (1#3*p) } }).
     { pose proof (IntegralDense f fInt (3*p)%positive) as [n nmaj].
       specialize (nmaj n (le_refl n)).
       exists (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n).
       exists (LsumStable _ (IntFnL (let (intRepres, _) := fInt in intRepres)) n).
       rewrite IntegralDistance_sym.
-      apply (CRle_trans _ (IntegralDistance (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n) f
+      apply (CRle_trans _ (IntegralDistance 
            (IntegrableSum (IntFn (let (intRepres, _) := fInt in intRepres))
               (fun n : nat =>
                IntegrableL (IntFn (let (intRepres, _) := fInt in intRepres) n)
@@ -1516,7 +1424,7 @@ Proof.
     rewrite <- IntegralLstable, <- IntegralMinus.
     apply (CRle_trans _ _ _ (CRle_abs _)).
     apply (CRle_trans _ _ _ (IntegralTriangle _ _)).
-    apply (CRle_trans _ (IntegralDistance f g fInt (IntegrableL g gL))).
+    apply (CRle_trans _ (IntegralDistance fInt (IntegrableL g gL))).
     2: exact gdist. rewrite IntegralDistance_sym.
     apply IntegralNonDecreasing. intros x xdf xdg. destruct xdf, xdg.
     rewrite applyXabs, applyXabs,
@@ -1751,7 +1659,7 @@ Proof.
                                 (hnL n) (H0 n)).
     exists (IntAbsSum x0). split. exact (IntAbsSumCv x0). destruct p.
     setoid_replace (Integral (hnL n))
-      with (Integral (IntegrableAbs (hn n) (hnL n))). exact c0.
+      with (Integral (IntegrableAbs (hnL n))). exact c0.
     apply IntegralExtensional. intros. simpl.
     rewrite CRabs_right. apply DomainProp. apply H. }
   assert (forall n:nat, PartialRestriction (XinfiniteSumAbs (phink n)) (hn n)) as phinkRes.
@@ -1979,7 +1887,7 @@ Lemma IntegralTruncateLimitZero
      Integral
        (IntegrableMinConst
           (Xabs f) (CR_of_Q _ (1 # Pos.of_nat (S n)))
-          (IntegrableAbs f fInt) (invSuccRealPositive n))) 0.
+          (IntegrableAbs fInt) (invSuccRealPositive n))) 0.
 Proof.
   intros. intro p. destruct (IntegralDense f fInt (2*p)%positive) as [n nmaj].
   destruct (Ilimit IS (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n)
@@ -1993,7 +1901,7 @@ Proof.
   apply (CRle_trans _ (Integral
     (IntegrableMinConst (Xabs f)
        (CR_of_Q (RealT (ElemFunc IS)) (1 # Pos.of_nat (S (max n k))))
-       (IntegrableAbs f fInt) (invSuccRealPositive (max n k))))).
+       (IntegrableAbs fInt) (invSuccRealPositive (max n k))))).
   - apply IntegralNonDecreasing. intros y ydf ydg.
     apply CRmin_glb. rewrite applyXminConst, (DomainProp _ y ydf ydg).
     apply CRmin_l.
@@ -2003,7 +1911,7 @@ Proof.
     apply Pos2Nat.inj_le. rewrite Nat2Pos.id, Nat2Pos.id.
     apply le_n_S, H. discriminate. discriminate.
   - clear H i.
-    specialize (nmaj (max n k) (Nat.le_max_l _ _)).
+    specialize (nmaj n (le_refl n)). 
     specialize (kmaj (max n k) (Nat.le_max_r _ _)).
     unfold IntegralDistance in nmaj.
     rewrite <- CRplus_0_r.
@@ -2026,15 +1934,8 @@ Proof.
     unfold CRminus. rewrite CRopp_0, CRplus_0_r, CRabs_right.
     rewrite <- IntegralLstable. pose proof (@IntegralMinus IS).
     unfold CRminus in H. rewrite <- H. clear H.
-    apply (CRle_trans _ (Integral (IntegrableAbs
-              (Xminus (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n) f)
-              (IntegrableMinus
-                 (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n) f
-                 (IntegrableSum (IntFn (let (intRepres, _) := fInt in intRepres))
-                    (fun n : nat =>
-                     IntegrableL (IntFn (let (intRepres, _) := fInt in intRepres) n)
-                       (IntFnL (let (intRepres, _) := fInt in intRepres) n)) n) fInt)))).
-    2: exact nmaj. clear nmaj. apply IntegralNonDecreasing.
+    refine (CRle_trans _ _ _ _ nmaj). clear nmaj.
+    apply IntegralNonDecreasing.
     intros y ydf ydg. destruct ydf, ydg.
     rewrite applyXabs. rewrite (applyXminus _ f y d1 d2), CRabs_minus_sym.
     rewrite (applyXminus _ (XminConst (Xabs (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n))

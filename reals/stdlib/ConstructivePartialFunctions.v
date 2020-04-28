@@ -385,6 +385,16 @@ Definition XmaxConst {R : ConstructiveReals} {X : Set}
   := Xop X f (fun x => CRmax x a)
          (fun x y Hxy => CRmax_morph _ x y Hxy a a (CReq_refl a)).
 
+Lemma applyXmaxConst : forall {R : ConstructiveReals} {X : Set}
+                         (f : PartialFunction X)
+                         (a : CRcarrier R)
+                         (x : X)
+                         (xD : Domain f x),
+    partialApply (XmaxConst f a) x xD
+    = CRmax (partialApply f x xD) a.
+Proof.
+  reflexivity.
+Qed.
 
 (* This definition is biased in favor of integrable functions,
    ie functions defined almost everywhere.
