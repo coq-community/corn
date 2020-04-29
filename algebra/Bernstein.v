@@ -504,7 +504,7 @@ Opaque cpoly_cring.
 are all non-negative on the unit interval. *)
 
 Lemma BernsteinNonNeg : forall x:F, [0] [<=] x -> x [<=] [1] ->
-forall n i (p:le i n), [0][<=](Bernstein F p)!x.
+forall n i (p:Nat.le i n), [0][<=](Bernstein F p)!x.
 Proof.
  intros x Hx0 Hx1.
  induction n.

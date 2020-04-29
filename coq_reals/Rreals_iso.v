@@ -119,6 +119,8 @@ Qed.
 
 (** less-than *)
 
+Open Scope R_scope.
+
 Lemma R_lt_as_IR : forall x y, (RasIR x [<] RasIR y -> x < y).
 Proof.
  intros x y H.
@@ -170,7 +172,7 @@ Proof.
  rewrite -> leEq_def.
  intro xy.
  assert (~ (y < x)).
-  apply RIneq.Rle_not_lt; assumption .
+  apply RIneq.Rle_not_lt; assumption.
  apply H0.
  apply R_lt_as_IR.
  assumption.
@@ -270,7 +272,7 @@ Lemma R_recip_as_IR : forall y Hy, (RasIR (1 / y) [=] ([1] [/] RasIR y [//] Hy))
 Proof.
  intros y Hy.
  simpl in Hy.
- assert (y [#] 0)%R.
+ assert (y [#] 0).
   apply: R_ap_as_IR.
   stepr ([0]:IR). assumption.
    symmetry.
@@ -904,7 +906,7 @@ Proof.
  unfold PI_tg in prf.
  rewrite -> R_mult_as_IR.
  apply mult_wd.
-  change 4%R with ((1 + 1) * (1 + 1))%R.
+  change 4 with ((1 + 1) * (1 + 1)).
   rewrite -> R_mult_as_IR.
   rewrite -> R_plus_as_IR.
   rewrite -> R_One_as_IR.
@@ -972,7 +974,7 @@ Proof.
  apply IR_ap_as_R.
  apply Rgt_not_eq.
  unfold Rgt.
- replace 0%R with (nring (R:=RRing) 0).
+ replace 0 with (nring (R:=RRing) 0).
   change ((nring (R:=RRing) 0 [<] nring (R:=RRing) (nat_of_P Qden))).
   apply nring_less.
   auto with *.
@@ -980,3 +982,5 @@ Proof.
 Qed.
 
 Hint Rewrite R_Q2R_as_IR : RtoIR.
+
+Close Scope R_scope.
