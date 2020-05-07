@@ -512,7 +512,7 @@ Section zm_ring_basics.
 
 
 Definition Zm_mult_ord (a:Zm)(h:nat) := (a[^]h[=][1]) /\
-  forall k:nat, (lt k h)->~(a[^]k[=][1]).
+  forall k:nat, (Peano.lt k h)->~(a[^]k[=][1]).
 
 
 
