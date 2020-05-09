@@ -9,7 +9,7 @@ COQ_VERSION=`echo $COQ_VERSION_LINE | sed 's/The Coq Proof Assistant, version 8\
 DIRECTORIES="algebra complex coq_reals fta ftc liouville logic metrics model raster reals tactics transc order metric2 stdlib_omissions util classes ode"
 
 # Include constructive measure theory on version 8.12 and after
-if [ $COQ_VERSION -gt 11 ] ;
+if [ $COQ_VERSION -gt 12 ] ;
 then
     find $DIRECTORIES -name "*.v" >>Make
 else

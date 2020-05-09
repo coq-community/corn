@@ -2102,8 +2102,8 @@ Proof.
   unfold Qeq, Qnum, Qden. rewrite Z.mul_1_l.
   rewrite Pos2Z.inj_mul, Z.mul_comm.
   unfold Z.of_nat. simpl. destruct n. exfalso.
-  simpl in nup. rewrite CR_of_Q_zero in nup. exact (CRabs_pos a nup).
-  rewrite Pos.of_nat_succ. reflexivity. rewrite <- CR_of_Q_zero.
+  simpl in nup. exact (CRabs_pos a nup).
+  rewrite Pos.of_nat_succ. reflexivity. 
   apply CR_of_Q_le. unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
   apply Zle_0_nat.
 Qed.
@@ -2152,7 +2152,7 @@ Proof.
     intros x0 xdf. simpl. apply (@IntegralNonNeg (IntegrationSpaceCast J)).
     intros x1 xdf0. simpl. destruct p.
     rewrite (c _ xdf0 (d _ xdf0)).
-    apply CRmin_glb. apply H. rewrite <- CR_of_Q_zero.
+    apply CRmin_glb. apply H. 
     apply CR_of_Q_le. discriminate.
   - intro n. generalize (ProdIntegrableSimplify l).
     induction l0. simpl (fold_right (CRplus _) 0
@@ -2180,8 +2180,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos, Pos2Nat.inj_le.
     rewrite Nat2Pos.id. 2: discriminate. apply (le_trans _ _ _ H1).
-    apply le_S, le_refl. rewrite <- CR_of_Q_zero.
-    apply CR_of_Q_le. discriminate.
+    apply le_S, le_refl. apply CR_of_Q_le. discriminate.
 Qed.
 
 Lemma ProductMinLimits
@@ -2208,8 +2207,8 @@ Proof.
        (LminIntStable i f
           (existT (fun l0 : list ProdIntegrable => PartialRestriction (ProdLFunc l0) f) l fL)) -
                     IElemProduct f (existT (fun l0 : list ProdIntegrable => PartialRestriction (ProdLFunc l0) f) l fL))
-      with (CRzero (RealT (ElemFunc I))).
-    rewrite CRabs_right. rewrite <- CR_of_Q_zero.
+      with (CR_of_Q (RealT (ElemFunc I)) 0).
+    rewrite CRabs_right. 
     apply CR_of_Q_le. discriminate. apply CRle_refl.
     rewrite <- (CRplus_opp_r (IElemProduct f (existT (fun l0 : list ProdIntegrable => PartialRestriction (ProdLFunc l0) f) l fL))).
     apply CRplus_morph. 2: reflexivity.

@@ -224,15 +224,15 @@ Proof.
       rewrite (DomainProp (XnegPart f) x _ (xG, xG)).
       rewrite (applyXnegPartMin f x xG), <- CRopp_mult_distr_l.
       rewrite CRmult_1_l, CRopp_involutive, CRmin_sym.
-      apply CRmin_morph. reflexivity. rewrite <- CR_of_Q_zero. reflexivity.
-  - apply LminConstStable. rewrite <- CR_of_Q_zero.
+      apply CRmin_morph. reflexivity. reflexivity.
+  - apply LminConstStable. 
     apply CR_of_Q_lt. reflexivity. exact H.
 Qed.
 
 Lemma invSuccRealPositive : forall {R : ConstructiveReals} (n : nat),
     0 < CR_of_Q R (1# Pos.of_nat (S n)).
 Proof.
-  intros R n. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+  intros R n. apply CR_of_Q_lt. reflexivity.
 Qed.
 
 Definition ElemIntegralContinuous
@@ -403,7 +403,7 @@ Proof.
     + intros n. exists O. intros.
       rewrite CRabs_right.
       rewrite sum_eq_R0. unfold CRminus.
-      rewrite CRplus_opp_r, <- CR_of_Q_zero.
+      rewrite CRplus_opp_r.
       apply CR_of_Q_le. discriminate.
       intro k. apply Izero_is_zero. unfold CRminus.
       rewrite CRopp_0, CRplus_0_r.
@@ -492,7 +492,7 @@ Proof.
     destruct f; simpl. apply CRmult_morph. reflexivity. apply DomainProp. }
   apply (Build_IntegrationSpace
            ElemSub Isub H0 H1 (Ione IS) H).
-  - unfold Isub. transitivity (CRone (RealT (ElemFunc IS))).
+  - unfold Isub. transitivity (CR_of_Q (RealT (ElemFunc IS)) 1).
     rewrite <- (IoneInt IS).
     apply IExtensional. intros.
     destruct (Ione IS); simpl. apply DomainProp. reflexivity.

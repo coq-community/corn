@@ -70,7 +70,7 @@ Proof.
       exists n. intros. unfold XminConst, Xop, partialApply.
       rewrite (DomainProp _ _ _ fL), CRmin_left.
       rewrite CRabs_right. unfold CRminus. rewrite CRplus_opp_r.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply CR_of_Q_le. discriminate.
       unfold CRminus. rewrite CRplus_opp_r. apply CRle_refl.
       apply (CRle_trans _ (CR_of_Q R (Z.of_nat n # 1))).
       apply CRlt_asym, H. apply CR_of_Q_le.
@@ -86,5 +86,5 @@ Proof.
       rewrite Nat2Pos.id. apply (Nat.le_trans _ _ _ H).
       apply le_S, le_refl. discriminate.
       apply CRmin_glb. apply CRabs_pos.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply CR_of_Q_le. discriminate.
 Defined.

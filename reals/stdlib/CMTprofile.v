@@ -81,12 +81,12 @@ Proof.
     rewrite pow_plus_distr, Nat.add_comm. simpl.
     rewrite <- CRmult_plus_distr_r, <- CR_of_Q_plus, Qinv_plus_distr.
     setoid_replace (1 + 1 # 2)%Q with 1%Q. 2: reflexivity.
-    rewrite CR_of_Q_one, CRmult_1_l. reflexivity.
+    rewrite CRmult_1_l. reflexivity.
     apply (CR_cv_proper _ (CR_of_Q R 2 * CRpow (CR_of_Q R (1 # 2)) (S N))).
     apply series_cv_scale. apply GeoHalfTwo. simpl.
     rewrite <- CRmult_assoc, <- CR_of_Q_mult.
     setoid_replace (2 * (1 # 2))%Q with 1%Q. 2: reflexivity.
-    rewrite CR_of_Q_one, CRmult_1_l. reflexivity.
+    rewrite CRmult_1_l. reflexivity.
   - exists x. exact c.
 Qed.
 
@@ -198,7 +198,7 @@ Proof.
     simpl. apply le_n_S. rewrite Nat.add_comm. apply le_n_S, le_0_n.
     discriminate.
   - apply (CRlt_le_trans _ (t* CR_of_Q _ 1)).
-    2: rewrite CR_of_Q_one, CRmult_1_r; apply CRle_refl.
+    2: rewrite CRmult_1_r; apply CRle_refl.
     apply CRmult_lt_compat_l. exact tPos. apply CR_of_Q_lt.
     apply (Qplus_lt_l _ _ ((1 # Pos.of_nat (2 * S n))-1)).
     ring_simplify. reflexivity.
@@ -221,8 +221,8 @@ Proof.
     apply le_S. apply (le_trans _ (i+0)).
     rewrite Nat.add_comm. apply le_refl.
     apply Nat.add_le_mono_l, le_0_n.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
-  - unfold Qminus. rewrite CR_of_Q_plus, CR_of_Q_opp, CR_of_Q_one.
+    apply CR_of_Q_le. discriminate.
+  - unfold Qminus. rewrite CR_of_Q_plus, CR_of_Q_opp.
     unfold CRminus. rewrite CRplus_comm, <- CRplus_assoc, CRplus_opp_l.
     rewrite CRplus_0_l. reflexivity.
 Qed.
@@ -252,9 +252,9 @@ Proof.
   rewrite applyXscale.
   setoid_replace (partialApply
        (Xminus (XminConst f t) (XminConst f (t * CR_of_Q R (1 - (1 # Pos.of_nat (2 * S i)))))) x
-       (xnD i)) with (CRzero R).
+       (xnD i)) with (CR_of_Q R 0).
   rewrite CRmult_0_r. unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-  rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
+  apply CR_of_Q_le. discriminate. apply CRle_refl.
   destruct (xnD i).
   rewrite (applyXminus (XminConst f t)
                        (XminConst f (t * CR_of_Q R (1 - (1 # Pos.of_nat (2 * S i))))) x).
@@ -602,15 +602,15 @@ Proof.
        (StepApprox f
           (t * CR_of_Q (RealT (ElemFunc IS)) (1 - (1 # Pos.of_nat (2 * S i0)))) t
           (snd (StepApproxBetween t tPos i0))) x (xnD i0))
-          with (CRzero (RealT (ElemFunc IS))).
+          with (CR_of_Q (RealT (ElemFunc IS)) 0).
         simpl. unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-        rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+        apply CR_of_Q_le. discriminate.
         apply CRle_refl. unfold StepApprox. rewrite applyXscale.
         setoid_replace (partialApply
     (Xminus (XminConst f t)
        (XminConst f
           (t * CR_of_Q (RealT (ElemFunc IS)) (1 - (1 # Pos.of_nat (2 * S i0)))))) x
-    (xnD i0) ) with (CRzero (RealT (ElemFunc IS))).
+    (xnD i0) ) with (CR_of_Q (RealT (ElemFunc IS)) 0).
         rewrite CRmult_0_r. reflexivity. destruct (xnD i0).
         rewrite (applyXminus (XminConst f t)
                              (XminConst f (t * CR_of_Q (RealT (ElemFunc IS)) (1 - (1 # Pos.of_nat (2 * S i0))))) ).
@@ -820,7 +820,7 @@ Proof.
     rewrite CRplus_0_r. exact (fst H).
     apply CRplus_le_compat_l. rewrite CRmult_assoc.
     apply CRmult_le_0_compat.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. unfold Qle, Qnum, Qden.
+    apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_r. apply Zle_0_nat. apply CRlt_asym, H0.
   - apply CRplus_lt_compat_l.
     apply CRmult_lt_compat_r. apply pow_lt, CR_of_Q_pos. reflexivity.
@@ -842,7 +842,7 @@ Proof.
   2: apply CR_of_Q_morph; reflexivity.
   rewrite <- CRmult_plus_distr_r.
   rewrite CRmult_assoc. apply CRmult_morph. 2: reflexivity.
-  rewrite <- CR_of_Q_one, <- CR_of_Q_plus.
+  rewrite <- CR_of_Q_plus.
   apply CR_of_Q_morph. rewrite Qinv_plus_distr.
   unfold Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r.
   replace 1%Z with (Z.of_nat 1).
@@ -853,7 +853,7 @@ Lemma pow_nat : forall {R : ConstructiveReals} (a n : nat),
   CR_of_Q R (Z.of_nat (a ^ n) # 1) == CRpow (CR_of_Q R (Z.of_nat a # 1)) n.
 Proof.
   induction n.
-  - simpl. rewrite CR_of_Q_one. reflexivity.
+  - reflexivity.
   - simpl.
     setoid_replace (Z.of_nat (a * a ^ n) # 1)
       with ((Z.of_nat a # 1) * (Z.of_nat (a ^ n) # 1))%Q.
@@ -870,10 +870,10 @@ Proof.
   split.
   - apply (CRle_trans _ (a+0)). rewrite CRplus_0_r. apply CRle_refl.
     apply CRplus_le_compat_l. apply CRmult_le_0_compat.
-    apply CRmult_le_0_compat. rewrite <- CR_of_Q_zero.
+    apply CRmult_le_0_compat. 
     apply CR_of_Q_le. destruct i; discriminate.
     rewrite <- (CRplus_opp_r a). apply CRplus_le_compat_r, H.
-    apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+    apply pow_le. apply CR_of_Q_le. discriminate.
   - unfold BinarySubdiv. apply (CRplus_le_reg_l (-a)).
     rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l.
     rewrite (CRplus_comm (-a)), <- (CRmult_comm (b-a)), <- (CRmult_1_r (b+-a)).
@@ -888,7 +888,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     rewrite Z.mul_1_r, Z.mul_1_r. apply Nat2Z.inj_le, H0.
     rewrite <- (pow_nat 2). apply CRle_refl.
-    rewrite <- CR_of_Q_mult, <- CR_of_Q_one. apply CR_of_Q_morph. reflexivity.
+    rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
 Qed.
 
 Lemma BinarySubdivRight
@@ -907,7 +907,7 @@ Proof.
   rewrite (pow_proper (CR_of_Q R (/ 2) * CR_of_Q R 2) 1).
   rewrite pow_one, CRmult_1_r.
   apply (pow_nat 2).
-  rewrite <- CR_of_Q_mult, <- CR_of_Q_one. apply CR_of_Q_morph. reflexivity.
+  rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
 Qed.
 
 Fixpoint FindCrossingPoint {R : ConstructiveReals}
@@ -1042,7 +1042,7 @@ Proof.
       apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
       simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
       rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-      apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply pow_le. apply CR_of_Q_le. discriminate.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_le.
       apply Qle_shift_div_l. reflexivity.
       unfold Qmult, Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
@@ -1056,7 +1056,7 @@ Proof.
       apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
       simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
       rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-      apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply pow_le. apply CR_of_Q_le. discriminate.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_le.
       apply Qle_shift_div_l. reflexivity.
       unfold Qmult, Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
@@ -1116,7 +1116,7 @@ Proof.
       apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
       simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
       rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-      apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply pow_le. apply CR_of_Q_le. discriminate.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_le.
       apply Qle_shift_div_r. reflexivity.
       unfold Qmult, Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_r.
@@ -1128,7 +1128,7 @@ Proof.
       apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
       simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
       rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-      apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+      apply pow_le. apply CR_of_Q_le. discriminate.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_le.
       apply Qle_shift_div_r. reflexivity.
       unfold Qmult, Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_r.
@@ -1168,7 +1168,7 @@ Proof.
     apply BinarySubdivInside. apply CRlt_asym, ltab. exact l.
     apply CRplus_le_compat_l. apply CRmult_le_0_compat.
     apply CRlt_asym, CRlt_minus, ltab. apply pow_le.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+    apply CR_of_Q_le. discriminate.
     apply CRlt_asym, ltab.
   - destruct s. subst i. rewrite BinarySubdivRight. 2: apply CRlt_asym, ltab.
     destruct (le_lt_dec (2^S n) (S j)).
@@ -1187,14 +1187,12 @@ Proof.
       rewrite (pow_proper (CR_of_Q (RealT (ElemFunc IS)) (/ 2) *
                            CR_of_Q (RealT (ElemFunc IS)) (Z.of_nat 2 # 1)) 1).
       rewrite pow_one, <- pow_nat, CRmult_1_r.
-      rewrite <- CR_of_Q_one, <- CR_of_Q_plus.
-      apply CR_of_Q_le.
+      rewrite <- CR_of_Q_plus. apply CR_of_Q_le.
       unfold Qplus, Qle, Qnum, Qden. do 4 rewrite Z.mul_1_r.
       replace 1%Z with (Z.of_nat 1). rewrite <- Nat2Z.inj_add.
       apply Nat2Z.inj_le. rewrite Nat.add_comm. exact l1.
       reflexivity.
-      rewrite <- CR_of_Q_mult, <- CR_of_Q_one. apply CR_of_Q_morph.
-      reflexivity.
+      rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
     + exfalso. pose proof (CRlt_trans _ _ _ c1 c).
       apply (StepApproxDiscretizeRefineIncr
                f fInt a b eta aPos ltab aeta beta n (S j) (2^n)).
@@ -1218,8 +1216,8 @@ Proof.
         simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
         apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
         rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-        apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
-        rewrite <- CR_of_Q_one, <- CR_of_Q_plus, <- CR_of_Q_mult. apply CR_of_Q_le.
+        apply pow_le. apply CR_of_Q_le. discriminate.
+        rewrite <- CR_of_Q_plus, <- CR_of_Q_mult. apply CR_of_Q_le.
         apply Qle_shift_div_l. reflexivity.
         unfold Qplus, Qmult, Qle, Qnum, Qden.
         do 4 rewrite Z.mul_1_r.
@@ -1255,8 +1253,7 @@ Proof.
     apply BinarySubdivInside. apply CRlt_asym, ltab. exact l0.
     apply CRplus_le_compat_l. apply CRmult_le_0_compat.
     apply CRlt_asym, CRlt_minus, ltab. apply pow_le.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
-    apply CRlt_asym, ltab.
+    apply CR_of_Q_le. discriminate. apply CRlt_asym, ltab.
   - destruct s0.
     subst j. rewrite BinarySubdivRight. 2: apply CRlt_asym, ltab.
     destruct (le_lt_dec (2^n) i).
@@ -1275,15 +1272,13 @@ Proof.
       rewrite (pow_proper (CR_of_Q (RealT (ElemFunc IS)) (/ 2) *
                            CR_of_Q (RealT (ElemFunc IS)) (Z.of_nat 2 # 1)) 1).
       rewrite pow_one, <- pow_nat, CRmult_1_r.
-      rewrite <- CR_of_Q_one, <- CR_of_Q_plus.
-      apply CR_of_Q_le.
+      rewrite <- CR_of_Q_plus. apply CR_of_Q_le.
       unfold Qplus, Qle, Qnum, Qden. do 4 rewrite Z.mul_1_r.
       replace 1%Z with (Z.of_nat 1). rewrite <- Nat2Z.inj_add.
       apply Nat2Z.inj_le. apply (le_trans _ i _ l1).
       rewrite Nat.add_comm. apply le_S, le_refl.
       reflexivity.
-      rewrite <- CR_of_Q_mult, <- CR_of_Q_one. apply CR_of_Q_morph.
-      reflexivity.
+      rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
     + exfalso. pose proof (CRlt_trans _ _ _ c1 c0).
       apply (StepApproxDiscretizeRefineDecr
                f fInt a b eta aPos ltab aeta beta n (2^S n) (S i)).
@@ -1306,8 +1301,8 @@ Proof.
         simpl (CRpow (CR_of_Q (RealT (ElemFunc IS)) (/ 2)) (S n)).
         apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
         rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-        apply pow_le. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
-        rewrite <- CR_of_Q_one, <- CR_of_Q_plus, <- CR_of_Q_mult. apply CR_of_Q_le.
+        apply pow_le. apply CR_of_Q_le. discriminate.
+        rewrite <- CR_of_Q_plus, <- CR_of_Q_mult. apply CR_of_Q_le.
         apply Qle_shift_div_r. reflexivity.
         unfold Qplus, Qmult, Qle, Qnum, Qden.
         do 4 rewrite Z.mul_1_r.
@@ -1529,7 +1524,7 @@ Proof.
     setoid_replace
       ((Z.of_nat q # Pos.of_nat (S k)) * (Z.of_nat (S k) # Pos.of_nat q))%Q
       with 1%Q.
-    rewrite CR_of_Q_one, CRmult_1_l. reflexivity.
+    rewrite CRmult_1_l. reflexivity.
     unfold Qmult, Qeq, Qnum, Qden.
     rewrite Z.mul_1_l, Z.mul_1_r, Z.mul_comm.
     rewrite Pos2Z.inj_mul. apply f_equal2.
@@ -1572,7 +1567,7 @@ Proof.
       apply CRmult_le_compat_l. apply CRlt_asym, CRlt_minus, ltab.
       rewrite <- (CRmult_1_l (CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) n)).
       simpl. apply CRmult_le_compat_r. apply pow_le, CRlt_asym, CR_of_Q_pos.
-      reflexivity. rewrite <- CR_of_Q_one. apply CR_of_Q_le. discriminate.
+      reflexivity. apply CR_of_Q_le. discriminate.
     - pose proof (FindCrossingPointDecr
              f fInt a b (ext_eta ext)
              (Fni n O - CR_of_Q _ (Z.of_nat (S k) # Pos.of_nat q) * epsilonPrime)
@@ -1617,7 +1612,7 @@ Proof.
       apply (CRle_trans _ ( Fni n 0%nat - 1 * epsilonPrime)).
       apply CRplus_le_compat_l, CRopp_ge_le_contravar.
       apply CRmult_le_compat_r. apply CRlt_asym, epsilonPrimePos.
-      rewrite <- CR_of_Q_one. apply CR_of_Q_le.
+      apply CR_of_Q_le.
       unfold Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_l.
       simpl (Z.of_nat (S k)). apply Pos2Z.pos_le_pos.
       rewrite Pos.of_nat_succ. apply Pos2Nat.inj_le.
@@ -1687,7 +1682,7 @@ Proof.
       apply (CRle_lt_trans _ epsilonPrime). 2: exact (snd p).
       rewrite <- CRmult_assoc, <- CR_of_Q_mult.
       setoid_replace ((Z.of_nat q # 1) * (Z.of_nat 1 # Pos.of_nat q))%Q with 1%Q.
-      rewrite CR_of_Q_one, CRmult_1_l. apply CRle_refl.
+      rewrite CRmult_1_l. apply CRle_refl.
       unfold Qmult, Qeq, Qnum, Qden. simpl. do 2 rewrite Z.mul_1_r.
       destruct q. exfalso; exact (qnz (eq_refl _)). simpl (Z.of_nat (S q)).
       apply f_equal. apply (Pos.of_nat_succ). }
@@ -1712,7 +1707,7 @@ Proof.
       destruct (H2 m O), p0, p0. unfold StepApproxDiscretize. destruct x0.
       exfalso. contradict mcv. apply (CRle_trans _ (a+0)).
       unfold BinarySubdiv.
-      rewrite CR_of_Q_zero, CRmult_0_l, CRmult_0_l, CRplus_assoc.
+      rewrite CRmult_0_l, CRmult_0_l, CRplus_assoc.
       apply CRplus_le_compat_l.
       rewrite CRplus_0_l, <- CRopp_mult_distr_r, <- CRopp_0.
       apply CRopp_ge_le_contravar, CRmult_le_0_compat.
@@ -1802,7 +1797,7 @@ Proof.
         clear l c1. contradict mcv.
         apply (CRle_trans _ (a-0)). unfold BinarySubdiv, CRminus.
         rewrite CRplus_assoc. apply CRplus_le_compat_l.
-        rewrite CR_of_Q_zero, CRmult_0_l, CRmult_0_l, CRplus_0_l.
+        rewrite CRmult_0_l, CRmult_0_l, CRplus_0_l.
         apply CRopp_ge_le_contravar.
         apply CRlt_asym, CRmult_lt_0_compat.
         apply pow_lt, CR_of_Q_pos. reflexivity.
@@ -1890,7 +1885,7 @@ Proof.
   2: rewrite CRmult_1_r, CRplus_comm; apply CRmin_l.
   apply CRmult_lt_compat_l. apply CRmin_lt. apply CRlt_minus, (fst H).
   apply CRlt_minus, (snd H).
-  rewrite <- CR_of_Q_one. apply CR_of_Q_lt. reflexivity.
+  apply CR_of_Q_lt. reflexivity.
   apply (CRlt_le_trans _ (x+0)). apply CRplus_lt_compat_l.
   rewrite <- CRopp_0. apply CRopp_gt_lt_contravar.
   apply CRmult_lt_0_compat. apply CRmin_lt.
@@ -1904,13 +1899,13 @@ Proof.
   apply (CRle_lt_trans _ (CRmin (x - a) (b - x) * CR_of_Q R (1 # 2))).
   rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l. apply CRle_refl.
   apply (CRle_lt_trans _ ((b - x) * CR_of_Q R (1 # 2))).
-  apply CRmult_le_compat_r. rewrite <- CR_of_Q_zero.
+  apply CRmult_le_compat_r. 
   apply CR_of_Q_le. discriminate. apply CRmin_r.
   apply (CRlt_le_trans _ ((b-x)*CR_of_Q _ 1)).
   apply CRmult_lt_compat_l. apply CRlt_minus. exact (snd H).
   apply CR_of_Q_lt. reflexivity.
   rewrite CRplus_comm, <- (CRmult_1_r (b + - x)).
-  rewrite CR_of_Q_one. apply CRle_refl. 
+  apply CRle_refl. 
 Qed.
 
 Lemma FindJumpPointsCountable
@@ -1943,16 +1938,16 @@ Proof.
     unfold CRminus. rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r.
     rewrite <- CRmult_plus_distr_l, <- CR_of_Q_plus.
     setoid_replace ((1 # 2) + (1 # 2))%Q with 1%Q.
-    rewrite CR_of_Q_one, CRmult_1_r. apply CRle_refl. reflexivity.
+    rewrite CRmult_1_r. apply CRle_refl. reflexivity.
     apply (CRle_lt_trans _ (an n * CR_of_Q _ (1#2))).
     apply (CRplus_le_reg_r (an n * CR_of_Q (RealT (ElemFunc IS)) (1 # 2))).
     unfold CRminus. rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r.
     rewrite <- CRmult_plus_distr_l, <- CR_of_Q_plus.
     setoid_replace ((1 # 2) + (1 # 2))%Q with 1%Q.
-    rewrite CR_of_Q_one, CRmult_1_r. apply CRle_refl. reflexivity.
+    rewrite CRmult_1_r. apply CRle_refl. reflexivity.
     rewrite <- (CRmult_1_r (an n)), CRmult_assoc.
     apply CRmult_lt_compat_l. exact (anPos n).
-    rewrite CRmult_1_l, <- CR_of_Q_one. apply CR_of_Q_lt. reflexivity. }
+    rewrite CRmult_1_l. apply CR_of_Q_lt. reflexivity. }
   assert (forall n:nat, 0 < bn n < bn n + an n*CR_of_Q _ (1#2)) as orderAfter.
   { split. exact (CRlt_trans _ (an n) _ (anPos n) (ltabn n)).
     apply (CRle_lt_trans _ (bn n + 0)).
@@ -1982,7 +1977,7 @@ Proof.
     apply CRlt_asym in c.
     apply (CRmult_le_compat_r (CR_of_Q _ (1 # Pos.of_nat n))) in c.
     rewrite CRmult_assoc, CRinv_l, CRmult_1_r in c. exact c.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. }
+    apply CR_of_Q_le. discriminate. }
   assert (forall n:nat, intAfter n <= intBefore n) as orderInt.
   { intro n.
     apply (StepApproxIntegralIncr
@@ -2002,7 +1997,7 @@ Proof.
           (CR_of_Q (RealT (ElemFunc IS)) (1 # Pos.of_nat n))
           (inr (CR_of_Q_pos (1 # Pos.of_nat n) eq_refl)))).
     apply CRlt_asym in c.
-    intro abs. rewrite abs, CR_of_Q_zero in c.
+    intro abs. rewrite abs in c.
     apply (CRmult_le_compat_r (CR_of_Q (RealT (ElemFunc IS)) (1 # Pos.of_nat n))) in c.
     rewrite CRmult_assoc, CRinv_l, CRmult_1_r, CRmult_0_l in c.
     apply (CRplus_le_compat _ _ _ _ (orderInt n)) in c.
@@ -2010,7 +2005,7 @@ Proof.
     rewrite CRplus_assoc, CRplus_assoc, CRplus_opp_l, CRplus_comm in c.
     rewrite CRplus_assoc in c. apply CRplus_le_reg_l in c.
     rewrite CRplus_0_l in c. apply c. apply CRzero_lt_one.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. }
+    apply CR_of_Q_le. discriminate. }
   assert (forall n:nat, bn n < bn n + an n*CR_of_Q _ (1#2)).
   { intro n. apply (CRle_lt_trans _ (bn n + 0)). rewrite CRplus_0_r.
     apply CRle_refl. apply CRplus_lt_compat_l. apply CRmult_lt_0_compat.
@@ -2049,7 +2044,7 @@ Proof.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
     rewrite Nat2Pos.id. apply (le_trans _ _ _ H3).
     apply le_S, le_refl. discriminate.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. }
+    apply CR_of_Q_le. discriminate. }
   destruct (CR_cv_open_above an x 0 stepCv H2) as [i imaj].
   destruct (CRup_nat x) as [j jmaj].
   specialize (imaj (max n (max i j))
@@ -2082,13 +2077,12 @@ Proof.
   do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos.
   rewrite Nat2Pos.inj_max. apply Pos.le_max_l.
   apply (CRmult_lt_compat_l eps) in nmaj. rewrite CRinv_r in nmaj.
-  destruct n. exfalso. rewrite CR_of_Q_zero, CRmult_0_r in nmaj.
+  destruct n. exfalso. rewrite CRmult_0_r in nmaj.
   contradict nmaj. apply CRlt_asym, CRzero_lt_one.
   apply (CRmult_lt_reg_r (CR_of_Q (RealT (ElemFunc IS)) (Z.of_nat (S n) # 1))).
   apply CR_of_Q_pos. reflexivity. rewrite <- CR_of_Q_mult.
   setoid_replace ((1 # Pos.of_nat (S n)) * (Z.of_nat (S n) # 1))%Q with 1%Q.
-  rewrite CR_of_Q_one. exact nmaj.
-  unfold Qmult, Qeq, Qnum, Qden.
+  exact nmaj. unfold Qmult, Qeq, Qnum, Qden.
   rewrite Z.mul_1_l, Z.mul_1_l, Z.mul_1_r, Pos.mul_1_r.
   simpl (Z.of_nat (S n)). apply f_equal. rewrite Pos.of_nat_succ.
   reflexivity. exact H4.
