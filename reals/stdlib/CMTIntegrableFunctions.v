@@ -377,11 +377,11 @@ Proof.
     exists N. intros. specialize (cv (i*2)%nat).
     rewrite weaveSequencesSum in cv. rewrite Nat.div_mul in cv.
     setoid_replace (match (i * 2)%nat with
-           | 0%nat => CRzero R
+           | 0%nat => CR_of_Q R 0
            | S _ =>
                CRsum (fun _ : nat => 0)
                  (if Nat.even (i * 2) then Init.Nat.pred i else i)
-           end) with (CRzero R) in cv.
+           end) with (CR_of_Q R 0) in cv.
     rewrite CRplus_0_r in cv. apply cv. apply (le_trans _ i).
     assumption. rewrite mult_comm. simpl. rewrite <- (plus_0_r i).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply le_0_n.
@@ -517,7 +517,7 @@ Proof.
   rewrite <- CRopp_plus_distr.
   rewrite CRabs_opp. rewrite CRmult_1_l.
   rewrite CRplus_opp_r. rewrite CRabs_right.
-  rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
+  apply CR_of_Q_le. discriminate. apply CRle_refl.
   intros. rewrite <- CRopp_mult_distr_r, CRmult_1_r.
   reflexivity. assumption.
 Qed.
@@ -577,7 +577,7 @@ Proof.
   intros n. exists O. intros.
   rewrite sum_const. rewrite CRmult_0_l. unfold CRminus.
   rewrite CRplus_0_l, CRopp_0.
-  rewrite CRabs_right. rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate.
+  rewrite CRabs_right. apply CR_of_Q_le. discriminate.
   apply CRle_refl.
 Defined.
 
@@ -587,7 +587,7 @@ Lemma IntegrableZeroMaj : forall {IS : IntegrationSpace},
 Proof.
   split.
   - intros x [xn cv]. simpl. trivial.
-  - intros. destruct xD as [xn cv]. transitivity (CRzero (RealT (ElemFunc IS))).
+  - intros. destruct xD as [xn cv]. transitivity (CR_of_Q (RealT (ElemFunc IS)) 0).
     apply applyInfiniteSumAbs.
     apply (series_cv_eq (fun _ => 0)).
     intro n. unfold IntegralRepresentationZero, IntFn.
@@ -595,7 +595,7 @@ Proof.
     intros p. exists O. intros. rewrite sum_const.
     rewrite CRmult_0_l. unfold CRminus.
     rewrite CRplus_opp_r, CRabs_right.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_le.
+    apply CR_of_Q_le.
     discriminate. apply CRle_refl. reflexivity.
 Qed.
 
@@ -1007,7 +1007,7 @@ Proof.
   destruct (Un_cv_nat_real _ s H ((s - a) * CR_of_Q R (1 # 2))) as [N H1].
   + apply CRmult_lt_0_compat. rewrite <- (CRplus_opp_r a).
     apply CRplus_lt_compat_r. exact H0.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+    apply CR_of_Q_lt. reflexivity.
   + exists N. specialize (H1 N (le_refl N)).
     rewrite CRabs_minus_sym in H1.
     apply (CRle_lt_trans (s - CRsum u N)) in H1.
@@ -1015,9 +1015,9 @@ Proof.
     rewrite CRmult_assoc in H1.
     rewrite <- CR_of_Q_mult in H1.
     setoid_replace ((1 # 2) * 2)%Q with 1%Q in H1. 2: reflexivity.
-    rewrite CR_of_Q_one, CRmult_1_r in H1.
+    rewrite CRmult_1_r in H1.
     assert ((s - CRsum u N) * CR_of_Q R 2 == s + s - CRsum u N -CRsum u N).
-    { rewrite (CR_of_Q_plus R 1 1), CR_of_Q_one, CRmult_plus_distr_l.
+    { rewrite (CR_of_Q_plus R 1 1), CRmult_plus_distr_l.
       rewrite CRmult_1_r. unfold CRminus. do 3 rewrite CRplus_assoc.
       apply CRplus_morph. reflexivity. rewrite CRplus_comm, CRplus_assoc.
       reflexivity. }
@@ -1029,7 +1029,7 @@ Proof.
     apply (CRplus_lt_compat_r (CRsum u N)) in H1. rewrite CRplus_assoc in H1.
     rewrite CRplus_assoc in H1. rewrite CRplus_opp_l in H1. rewrite CRplus_0_r in H1.
     rewrite CRplus_0_l in H1. rewrite <- CRplus_assoc in H1.
-    apply CRltForget. assumption. rewrite <- CR_of_Q_zero.
+    apply CRltForget. assumption. 
     apply CR_of_Q_lt. reflexivity. apply CRle_abs.
 Qed.
 
@@ -1204,8 +1204,8 @@ Proof.
     with (CR_of_Q _ 2 * c).
   rewrite <- CRmult_assoc, <- CR_of_Q_mult.
   setoid_replace ((1 # 2) * 2)%Q with 1%Q.
-  rewrite CR_of_Q_one, CRmult_1_l. reflexivity. reflexivity.
-  rewrite (CR_of_Q_plus _ 1 1), CR_of_Q_one, CRmult_plus_distr_r.
+  rewrite CRmult_1_l. reflexivity. reflexivity.
+  rewrite (CR_of_Q_plus _ 1 1), CRmult_plus_distr_r.
   rewrite CRmult_1_l, CRplus_assoc. apply CRplus_morph. reflexivity.
   rewrite CRopp_plus_distr, <- CRplus_assoc, CRplus_opp_r.
   rewrite CRplus_0_l, CRopp_involutive. reflexivity.
@@ -1419,7 +1419,7 @@ Proof.
                          (CRsum (fun k => CRmax 0 (- partialApply (fn k) x (pxn k))) M)).
     { intros eps. exists M. intros. rewrite sum_truncate_above.
       unfold CRminus. rewrite CRplus_opp_r.
-      rewrite CRabs_right. rewrite <- CR_of_Q_zero. apply CR_of_Q_le.
+      rewrite CRabs_right. apply CR_of_Q_le.
       discriminate. apply CRle_refl. exact H4. }
     apply (series_cv_plus (fun n : nat =>
           (CRmax 0 (partialApply (fn n) x (pxn n)) +

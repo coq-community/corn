@@ -55,7 +55,7 @@ Definition CharacFunc {R : ConstructiveReals} {X : Set} (A : X -> Prop)
 Proof.
   apply (Build_PartialFunctionXY
            X (CRcarrier R) (CReq R) (fun x:X => { A x } + { ~A x })
-           (fun x dec => if dec then CRone R else CRzero R) ).
+           (fun x dec => if dec then CR_of_Q R 1 else CR_of_Q R 0) ).
   intros. destruct p,q.
   reflexivity. contradiction. contradiction. reflexivity.
 Defined.
@@ -81,7 +81,7 @@ Definition PartialFunctionBoolR
 Proof.
   apply (Build_PartialFunctionXY
            X (CRcarrier R) (CReq R) (Domain f)
-           (fun x dec => if partialApply f x dec then CRone R else CRzero R)).
+           (fun x dec => if partialApply f x dec then CR_of_Q R 1 else CR_of_Q R 0)).
   intros. rewrite (DomainProp f x p q). reflexivity.
 Defined. 
 
@@ -224,7 +224,6 @@ Proof.
       specialize (lcv 1%positive) as [n ncv].
       destruct (CRup_nat (1+l)) as [k kup].
       specialize (ncv (max n k) (Nat.le_max_l _ _)).
-      rewrite CR_of_Q_one in ncv.
       apply (CRle_trans _ _ _ (CRle_abs _)) in ncv.
       apply (CRplus_le_compat_r l) in ncv.
       unfold CRminus in ncv. rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r in ncv.
@@ -261,7 +260,7 @@ Proof.
   apply (CRmult_eq_reg_l (CR_of_Q R 2)). right. apply CR_of_Q_pos. reflexivity.
   rewrite <- CRmult_assoc, <- CR_of_Q_mult.
   setoid_replace (2 * (1 # 2))%Q with 1%Q. 2: reflexivity.
-  rewrite (CR_of_Q_plus R 1 1), CR_of_Q_one, CRmult_1_l.
+  rewrite (CR_of_Q_plus R 1 1), CRmult_1_l.
   rewrite CRmult_plus_distr_r, CRmult_1_l.
   rewrite (DomainProp (fn n) x (fst (d,d0)) d0), (DomainProp (fn n) x d1 d0).
   reflexivity. apply applyXnegPartNonNeg. apply applyXposPartNonNeg.
@@ -693,7 +692,7 @@ Proof.
   intros. simpl. simpl in pcv.
   specialize (pcv p n (le_refl _) H0).
   assert (CR_of_Q R (1 # 2) < 1).
-  { rewrite <- CR_of_Q_one. apply CR_of_Q_lt. reflexivity. }
+  { apply CR_of_Q_lt. reflexivity. }
   destruct (xn p), (xn n). reflexivity. 3: reflexivity.
   - exfalso. unfold CRminus in pcv.
     rewrite CRopp_0, CRplus_0_r, CRabs_right in pcv.
@@ -744,7 +743,8 @@ Proof.
       destruct xD as [xn xcv]. destruct xG.
       simpl in xn.
       destruct (constructive_indefinite_ground_description_nat
-                    (fun n => (if xn n then 1 else 0) == CRone (RealT (ElemFunc IS)))) as [n ncv].
+                  (fun n => (if xn n then 1 else 0) == CR_of_Q (RealT (ElemFunc IS)) 1))
+        as [n ncv].
       intro n. destruct (xn n). left. reflexivity. right.
       intros [abs _]. apply abs, CRzero_lt_one.
       destruct e as [n ncv]. exists n.
@@ -752,7 +752,7 @@ Proof.
       destruct n. contradiction. apply n0. right. exact ncv.
       exists n. intros. destruct (xn i).
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-      2: apply CRle_refl. rewrite <- CR_of_Q_zero.
+      2: apply CRle_refl. 
       apply CR_of_Q_le; discriminate.
       exfalso. apply n0. apply applyUnionIterate. exists n.
       split. exact H0. destruct (xn n).
@@ -763,8 +763,7 @@ Proof.
       exists O. intros n0 _. destruct (xn n0). exfalso.
       apply n. apply applyUnionIterate in u. destruct u. exists x0. apply H0.
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le; discriminate.
-      apply CRle_refl.
+      apply CR_of_Q_le; discriminate. apply CRle_refl.
     + exists (existT _ i H0). exact cv.
 Defined.
 
@@ -811,7 +810,7 @@ Proof.
       destruct xG. exists O. intros n H0.
       destruct (xn n).
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le; discriminate. apply CRle_refl.
+      apply CR_of_Q_le; discriminate. apply CRle_refl.
       exfalso. apply n0. rewrite applyIntersectIterate. intros. apply a0.
 
       apply CharacFuncStationary in xcv. destruct xcv as [p pcv].
@@ -831,7 +830,7 @@ Proof.
       specialize (X (RealT (ElemFunc IS))).
       rewrite pcv in X. exact (CRlt_asym _ _ X X).
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le; discriminate. apply CRle_refl.
+      apply CR_of_Q_le; discriminate. apply CRle_refl.
     + exists (existT _ i H0). exact cv.
 Defined.
 
@@ -884,8 +883,8 @@ Proof.
       rewrite Nat.sub_0_r.
       setoid_replace (x - INR 0) with x. reflexivity.
       unfold INR. simpl. unfold CRminus.
-      rewrite CR_of_Q_zero, CRopp_0, CRplus_0_r.
-      reflexivity. rewrite H0. unfold INR. rewrite CR_of_Q_zero. apply H1.
+      rewrite CRopp_0, CRplus_0_r.
+      reflexivity. rewrite H0. unfold INR. apply H1.
     - intros. simpl. rewrite IHk. clear IHk.
       rewrite CRmin_plus.
       setoid_replace (CRmin x (INR (nk (S k))) + (x - CRmin x (INR (nk (S k)))))
@@ -896,7 +895,7 @@ Proof.
       rewrite CRmin_assoc.
       rewrite (CRmin_left x). reflexivity.
       apply (CRle_trans _ (0+x)). rewrite CRplus_0_l.
-      apply CRle_refl. apply CRplus_le_compat. rewrite <- CR_of_Q_zero.
+      apply CRle_refl. apply CRplus_le_compat. 
       apply CR_of_Q_le. unfold Qle; simpl. rewrite Z.mul_1_r.
       apply Nat2Z.is_nonneg. apply CRle_refl.
       unfold INR. rewrite <- CR_of_Q_plus. apply CR_of_Q_morph.
@@ -909,7 +908,7 @@ Proof.
   destruct (CRup_nat x) as [n nmaj]. exists n.
   intros. rewrite H2. rewrite CRmin_left.
   unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-  rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
+  apply CR_of_Q_le. discriminate. apply CRle_refl.
   apply (CRle_trans _ (INR n)). apply CRlt_asym, nmaj.
   apply CR_of_Q_le. unfold Qle; simpl.
   do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le.
@@ -977,12 +976,11 @@ Proof.
       rewrite applyXminConst. rewrite (DomainProp f x d1 d).
       apply CRmin_l.
       setoid_replace (partialApply (Xmult (CharacFunc A) f) x (right notInA, d0))
-        with (CRzero R).
+        with (CR_of_Q R 0).
       intro p. exists O. intros. rewrite sum_const, CRmult_0_l.
       unfold CRminus. rewrite CRplus_opp_r, CRabs_right.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_le. discriminate. apply CRle_refl.
-      clear xD. destruct f; simpl.
-      apply CRmult_0_l.
+      apply CR_of_Q_le. discriminate. apply CRle_refl.
+      clear xD. destruct f; simpl. apply CRmult_0_l.
 Qed.
 
 (* Add zero before sequence un, if it does not already start with zero. *)
@@ -1015,7 +1013,7 @@ Proof.
   intros fInt fNonNeg AInt.
   assert (forall k : nat, 0 < CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) k) as boundPos.
   { intro k. apply pow_lt. simpl.
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity. }
+    apply CR_of_Q_lt. reflexivity. }
   pose (StartZero (fun n => let (p,_) := ControlSubSeqCv _ _ (CRpow (CR_of_Q _ (1#2)))
              (IntegralTruncateLimit f fInt) boundPos n in p)) as nk.
   (* Cut f's non-negative graph horizontally, according to the nk *)
@@ -1045,7 +1043,7 @@ Proof.
     unfold fk.
     rewrite (applyXmin _ _ x H xdg). apply CRmin_glb.
     rewrite applyXscale. rewrite <- (CRmult_0_r (INR (nk (S (S n)) - nk (S n)))).
-    apply CRmult_le_compat_l. rewrite <- CR_of_Q_zero. apply CR_of_Q_le.
+    apply CRmult_le_compat_l. apply CR_of_Q_le.
     unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r. apply Nat2Z.is_nonneg.
     simpl. destruct H. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
     destruct xdg.
@@ -1067,16 +1065,16 @@ Proof.
     apply (CRle_trans _ (CRpow (CR_of_Q _ (1 # 2)) (S n))).
     apply CRlt_asym, c0.
     apply (CRmult_le_reg_l (CRpow (CR_of_Q _ 2) (S n))).
-    apply pow_lt. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+    apply pow_lt. apply CR_of_Q_lt. reflexivity.
     rewrite pow_mult. rewrite (pow_proper _ 1), pow_one.
     replace (CRpow (CR_of_Q _ 2) (S n))
       with (CR_of_Q (RealT (ElemFunc IS)) 2 * CRpow (CR_of_Q _ 2) n). 2: reflexivity.
     rewrite CRmult_assoc, pow_mult.
     rewrite (pow_proper _ 1), pow_one. rewrite CRmult_1_r.
-    rewrite <- CR_of_Q_one. apply CR_of_Q_le. discriminate. rewrite <- CR_of_Q_mult.
-    setoid_replace (2 * (1 # 2))%Q with 1%Q. apply CR_of_Q_one. reflexivity.
+    apply CR_of_Q_le. discriminate. rewrite <- CR_of_Q_mult.
+    setoid_replace (2 * (1 # 2))%Q with 1%Q. reflexivity. reflexivity.
     rewrite <- CR_of_Q_mult.
-    setoid_replace (2 * (1 # 2))%Q with 1%Q. apply CR_of_Q_one. reflexivity.
+    setoid_replace (2 * (1 # 2))%Q with 1%Q. reflexivity. reflexivity.
     destruct (ControlSubSeqCv
               (fun n0 : nat => Integral (IntegrableMinInt f n0 fInt))
               (Integral fInt) (CRpow (CR_of_Q _ (1 # 2)))

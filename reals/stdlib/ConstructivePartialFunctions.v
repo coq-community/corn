@@ -690,10 +690,10 @@ Proof.
                   (partialApply f x xdf + partialApply (Xabs f) x xdf))
     with (partialApply f x xdf + partialApply f x xdf).
   rewrite <- (CRmult_1_l (partialApply f x xdf)), <- CRmult_plus_distr_r.
-  rewrite <- CRmult_assoc, CRmult_1_l, <- CR_of_Q_one, <- CR_of_Q_plus.
+  rewrite <- CRmult_assoc, CRmult_1_l, <- CR_of_Q_plus.
   rewrite <- CR_of_Q_mult.
   setoid_replace ((1 # 2) * (1+1))%Q with 1%Q.
-  rewrite CR_of_Q_one. apply CRmult_1_l.
+  apply CRmult_1_l.
   reflexivity. rewrite CRplus_comm, CRplus_assoc.
   apply CRplus_morph. reflexivity.
   rewrite CRopp_plus_distr. rewrite CRopp_involutive.

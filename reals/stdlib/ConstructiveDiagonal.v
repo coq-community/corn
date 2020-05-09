@@ -423,7 +423,7 @@ Qed.
 Lemma powerPositive : forall {R : ConstructiveReals} (n:nat),
     (0 < CRpow (CR_of_Q R 2) n).
 Proof.
-  intros. apply pow_lt. simpl. rewrite <- CR_of_Q_zero.
+  intros. apply pow_lt. simpl. 
   apply CR_of_Q_lt. reflexivity.
 Qed.
 
@@ -464,10 +464,10 @@ Proof.
     apply (CRmult_lt_compat_l eps) in maj. 2: exact H.
     rewrite CRinv_r in maj.
     apply (CRmult_lt_reg_l (CR_of_Q R (Z.pos (Pos.of_nat epsN) # 1))).
-    rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+    apply CR_of_Q_lt. reflexivity.
     rewrite <- CR_of_Q_mult.
     setoid_replace ((Z.pos (Pos.of_nat epsN) # 1) * (1 # Pos.of_nat epsN))%Q with 1%Q.
-    rewrite CRmult_comm. rewrite CR_of_Q_one.
+    rewrite CRmult_comm. 
     apply (CRlt_le_trans _ _ _ maj).
     apply CRmult_le_compat_l_half. exact H.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
@@ -477,7 +477,7 @@ Proof.
     unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
   - destruct (DiagTruncateRect _ u sumCol eps n H H0) as [pp geo].
     assert (0 < CRpow (CR_of_Q R (1#2)) (S n)).
-    { apply pow_lt. simpl. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity. }
+    { apply pow_lt. simpl. apply CR_of_Q_lt. reflexivity. }
     destruct (CRup_nat (CRinv R eps (inr H) * (CRinv R (CRpow (CR_of_Q R (1#2)) (S n))) (inr H1)))
       as [epsN maj].
     specialize (H0 (S n) (Pos.of_nat epsN)) as [p lim].
@@ -494,16 +494,17 @@ Proof.
       apply (CRmult_lt_compat_l eps) in maj. 2: exact H.
       rewrite <- CRmult_assoc, CRinv_r, CRmult_1_l in maj.
       apply (CRmult_lt_compat_l (CRpow (CR_of_Q R (1 # 2)) (S n))) in maj.
-      2: apply pow_lt; rewrite <- CR_of_Q_zero; apply CR_of_Q_lt; reflexivity.
+      2: apply pow_lt; apply CR_of_Q_lt; reflexivity.
       rewrite CRinv_r in maj.
       apply (CRmult_lt_reg_l (CR_of_Q R (Z.pos (Pos.of_nat epsN) # 1))).
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+      apply CR_of_Q_lt. reflexivity.
       rewrite <- CR_of_Q_mult.
-      setoid_replace ((Z.pos (Pos.of_nat epsN) # 1) * (1 # Pos.of_nat epsN))%Q with 1%Q.
-      rewrite CR_of_Q_one. apply (CRlt_le_trans _ _ _ maj).
+      setoid_replace ((Z.pos (Pos.of_nat epsN) # 1) * (1 # Pos.of_nat epsN))%Q
+        with 1%Q.
+      apply (CRlt_le_trans _ _ _ maj).
       rewrite CRmult_comm. rewrite <- CRmult_assoc.
       apply CRmult_le_compat_r. apply CRlt_asym, pow_lt.
-      simpl. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt.
+      simpl. apply CR_of_Q_lt.
       reflexivity. rewrite CRmult_comm. apply CRmult_le_compat_r.
       apply CRlt_asym, H.
       apply CR_of_Q_le. unfold Qle, Qnum, Qden.
@@ -556,7 +557,7 @@ Proof.
       (CRsum (diagSeq (fun i j : nat => CRabs _ (u i j))) (diagPlane 0 (S n + p)) - sAbs
        + (sAbs - CRsum (diagSeq (fun i j : nat => CRabs _ (u i j))) (diagPlane 0 n))).
   apply (CRle_lt_trans _ _ _ (CRabs_triang _ _)).
-  rewrite (CR_of_Q_plus R 1 1), CR_of_Q_one, CRmult_plus_distr_l, CRmult_1_r.
+  rewrite (CR_of_Q_plus R 1 1), CRmult_plus_distr_l, CRmult_1_r.
   apply CRplus_le_lt_compat. apply CRlt_asym.
   apply (H (diagPlane 0 (S n + p))).
   unfold diagPlane. rewrite plus_0_l. rewrite plus_0_l.
@@ -596,7 +597,7 @@ Proof.
   { intro n. unfold diagSeq. destruct (diagPlaneInv n). apply CRabs_pos. }
   assert (0 < eps * CRpow (CR_of_Q R (1#2)) 3) as eighthEpsPos.
   { apply CRmult_lt_0_compat. assumption. apply pow_lt.
-    simpl. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity. }
+    simpl. apply CR_of_Q_lt. reflexivity. }
   destruct (H0 (eps * CRpow (CR_of_Q R (1#2)) 3) eighthEpsPos) as [Nabs H2].
   pose proof (DiagTriangleShift Nabs) as tShift.
   destruct (diagPlaneInv Nabs) as [i j] eqn:desNabs.
@@ -611,7 +612,7 @@ Proof.
     apply CRlt_asym.
     destruct (DiagTruncateRect u sumCol (eps * CRpow (CR_of_Q R (1#2)) 4) n) as [p geo].
     apply CRmult_lt_0_compat. assumption. apply pow_lt.
-    simpl. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+    simpl. apply CR_of_Q_lt. reflexivity.
     intros. apply H1.
     setoid_replace (CRsum sumCol n - CRsum (diagSeq u) (diagPlane 0 n))
       with (CRsum sumCol n - CRsum (fun k => (CRsum (u k) (p+(n-k)))) n
@@ -641,12 +642,12 @@ Proof.
       setoid_replace (CRpow (CR_of_Q R (1 # 2)) 3)
         with (CRpow (CR_of_Q R (1 # 2)) 4 * CR_of_Q R 2).
       apply CRmult_lt_compat_l. apply pow_lt. simpl.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+      apply CR_of_Q_lt. reflexivity.
       apply GeoHalfBelowTwo.
       setoid_replace (CRpow (CR_of_Q R (1 # 2)) 4)
         with (CR_of_Q R (1#2) * CRpow (CR_of_Q R (1 # 2)) 3). 2: reflexivity.
       rewrite CRmult_comm, <- CRmult_assoc, <- (CR_of_Q_mult _ 2).
-      setoid_replace (2 * (1 # 2))%Q with 1%Q. rewrite CR_of_Q_one, CRmult_1_l.
+      setoid_replace (2 * (1 # 2))%Q with 1%Q. rewrite CRmult_1_l.
       reflexivity. reflexivity.
       intros. apply CRmult_comm.
     + destruct p.
@@ -655,8 +656,8 @@ Proof.
       unfold CRminus.
       rewrite CRplus_opp_r. rewrite CRabs_right. 2: apply CRle_refl.
       apply CRmult_lt_0_compat. apply CRmult_lt_0_compat.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
-      assumption. apply pow_lt. simpl. rewrite <- CR_of_Q_zero.
+      apply CR_of_Q_lt. reflexivity.
+      assumption. apply pow_lt. simpl. 
       apply CR_of_Q_lt. reflexivity.
       simpl. rewrite diagSumTriangle. reflexivity.
       setoid_replace (CRsum (fun k : nat => CRsum (u k) (S p + (n - k))) n)
@@ -680,7 +681,7 @@ Proof.
               + (s - CRsum (diagSeq u) (diagPlane 0 n))).
       apply (CRle_trans _ _ _ (CRabs_triang _ _)).
       unfold INR. simpl (Z.of_nat 2 # 1).
-      rewrite (CR_of_Q_plus R 1 1), CR_of_Q_one, CRmult_plus_distr_r, CRmult_1_l.
+      rewrite (CR_of_Q_plus R 1 1), CRmult_plus_distr_r, CRmult_1_l.
       rewrite CRmult_plus_distr_r.
       apply CRplus_le_compat.
       apply (CRle_trans _ (sAbs - CRsum (fun n0 : nat => CRabs _ (diagSeq u n0))
@@ -721,7 +722,7 @@ Proof.
       apply (le_trans _ (diagPlane 0 n)); assumption. rewrite <- (CRmult_comm (CR_of_Q R 2)).
       rewrite CRmult_assoc. apply CRmult_lt_compat_r. apply CRmult_lt_0_compat.
       assumption. apply pow_lt. simpl.
-      rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+      apply CR_of_Q_lt. reflexivity.
       apply CR_of_Q_lt. reflexivity.
       setoid_replace (@INR R 6) with (@INR R 2 + @INR R 4).
       do 2 rewrite CRmult_plus_distr_r. reflexivity.
@@ -743,7 +744,7 @@ Proof.
       reflexivity.
     + setoid_replace (@INR R 7) with (1 + @INR R 6).
       do 2 rewrite CRmult_plus_distr_r. rewrite CRmult_1_l. reflexivity.
-      unfold INR. rewrite <- CR_of_Q_one, <- CR_of_Q_plus. apply CR_of_Q_morph.
+      unfold INR. rewrite <- CR_of_Q_plus. apply CR_of_Q_morph.
       rewrite Qinv_plus_distr. reflexivity.
     + unfold CRminus. rewrite CRplus_assoc. apply CRplus_morph.
       reflexivity. rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l. reflexivity.
@@ -767,10 +768,10 @@ Proof.
     setoid_replace (INR 7 * eps + eps) with (eps * INR 8).
     rewrite CRmult_assoc. unfold INR. rewrite <- CR_of_Q_mult.
     setoid_replace ((Z.of_nat 8 # 1) * (1 # 8))%Q with 1%Q.
-    rewrite CR_of_Q_one, CRmult_1_r. reflexivity. reflexivity.
+    rewrite CRmult_1_r. reflexivity. reflexivity.
     setoid_replace (@INR R 8) with (1 + @INR R 7).
     rewrite CRmult_plus_distr_l, CRmult_1_r, CRplus_comm, CRmult_comm. reflexivity.
-    unfold INR. rewrite <- CR_of_Q_one, <- CR_of_Q_plus.
+    unfold INR. rewrite <- CR_of_Q_plus.
     apply CR_of_Q_morph. reflexivity.
     unfold CRpow. rewrite CRmult_1_r.
     do 2 rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
@@ -814,7 +815,7 @@ Proof.
   intros n.
   destruct (cvSumCol (2*n)%positive) as [N H1].
   assert (0 < CR_of_Q R (1 # 4*n)) as quarterEpsPos.
-  { rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity. }
+  { apply CR_of_Q_lt. reflexivity. }
   destruct (DiagTruncateRect u sumCol (CR_of_Q R (1 # 4*n)) N quarterEpsPos cvCol)
     as [p H2].
   exists (diagPlane 0 (N+p)). intros.
@@ -880,7 +881,7 @@ Qed.
 
 Lemma Rlt_0_half : forall {R : ConstructiveReals}, 0 < CR_of_Q R (1#2).
 Proof.
-  intro R. rewrite <- CR_of_Q_zero. apply CR_of_Q_lt. reflexivity.
+  intro R. apply CR_of_Q_lt. reflexivity.
 Qed.
 
 Fixpoint FindPointInSubdivision (Pn : nat -> nat) (n : nat)
