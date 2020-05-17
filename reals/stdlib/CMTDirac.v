@@ -22,6 +22,7 @@ Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveLimits.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.
 

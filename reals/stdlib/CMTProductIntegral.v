@@ -31,6 +31,8 @@ Require Import List.
 Require Import ConstructiveReals.
 Require Import ConstructiveRealsMorphisms.
 Require Import ConstructiveAbs.
+Require Import ConstructiveSum.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveLimits.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.
@@ -2188,7 +2190,7 @@ Lemma ProductMinLimits
       (f : PartialFunction (X (ProductFunctionRieszSpace I J)))
       (fL : L (ProductFunctionRieszSpace I J) f),
     CR_cv _
-      (fun n : nat => IElemProduct (XminConst f (ConstructiveSum.INR n)) (LminIntStable n f fL))
+      (fun n : nat => IElemProduct (XminConst f (INR n)) (LminIntStable n f fL))
       (IElemProduct f fL) *
     CR_cv _
       (fun n : nat =>
@@ -2203,7 +2205,7 @@ Proof.
     destruct (CRup_nat (fold_right (CRplus _) 0 (map (fun a => CRabs _ (prodint_factor a)) l)))
       as [n nup].
     exists n. intros.
-    setoid_replace (IElemProduct (XminConst f (ConstructiveSum.INR i))
+    setoid_replace (IElemProduct (XminConst f (INR i))
        (LminIntStable i f
           (existT (fun l0 : list ProdIntegrable => PartialRestriction (ProdLFunc l0) f) l fL)) -
                     IElemProduct f (existT (fun l0 : list ProdIntegrable => PartialRestriction (ProdLFunc l0) f) l fL))

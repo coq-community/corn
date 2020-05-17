@@ -25,7 +25,9 @@ Require Import List Permutation Orders Sorted Mergesort.
 Require Import QArith Qpower.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 

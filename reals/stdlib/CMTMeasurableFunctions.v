@@ -19,7 +19,9 @@ along with this program;  If not, see <https://www.gnu.org/licenses/>.
 Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.
@@ -872,7 +874,7 @@ Proof.
   intros fInt Ames fPos. 
   (* Make a sequence of supports converging to f's integral. *)
   assert (forall n:nat, 0 < CRpow (CR_of_Q (RealT (ElemFunc IS)) (1#2)) n).
-  { intro n. apply pow_lt, CR_of_Q_pos. reflexivity. }
+  { intro n. apply CRpow_gt_zero, CR_of_Q_pos. reflexivity. }
   pose proof (fun n:nat => IntegralSupportExists
                         f fInt _ (H n)) as Bn.
   assert (forall n:nat, IntegrableFunction
@@ -945,7 +947,7 @@ Proof.
       rewrite (DomainProp _ y ydf ydg). apply CRle_refl.
       apply (CRlt_le_trans _ (CR_of_Q _ 1
                               * CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) n)).
-      apply CRmult_lt_compat_r. apply pow_lt, CR_of_Q_pos. reflexivity.
+      apply CRmult_lt_compat_r. apply CRpow_gt_zero, CR_of_Q_pos. reflexivity.
       apply CR_of_Q_lt. reflexivity.
       rewrite CRmult_1_l. apply CRle_refl.
       generalize (gnInt n).
@@ -1063,10 +1065,10 @@ Proof.
   - destruct (IntegrableApproxSequence IS gen A Aint p) as [U Uint].
     exists (fun x => U x \/ (sa_approx _ _ _ (gen _ (IntegrableSetDifference A U Aint Uint)
                   (CRpow (CR_of_Q _ (1#2)) (S p))
-                  (pow_lt _ (S p) (CR_of_Q_pos (1#2) eq_refl))) x)).
+                  (CRpow_gt_zero _ (S p) (CR_of_Q_pos (1#2) eq_refl))) x)).
     exact (IntegrableSetUnion _ _ Uint (sa_bint _ _ _ (gen _ (IntegrableSetDifference A U Aint Uint)
                   (CRpow (CR_of_Q _ (1#2)) (S p))
-                  (pow_lt _ (S p) (CR_of_Q_pos (1#2) eq_refl))))).
+                  (CRpow_gt_zero _ (S p) (CR_of_Q_pos (1#2) eq_refl))))).
 Defined.
 
 Lemma IntegrableApproxSequenceInc
@@ -1130,7 +1132,7 @@ Proof.
                  (IntegrableSetDifference A U Aint Vint)
                  (CR_of_Q (RealT (ElemFunc IS)) (1 # 2) *
                   CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) n)
-                 (pow_lt (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
+                 (CRpow_gt_zero (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
                     (S n) (CR_of_Q_pos (1 # 2) eq_refl)))))).
     2: apply sa_mes.
     rewrite <- MeasureDifferenceIncluded, <- MeasureDifferenceIncluded.
@@ -1173,7 +1175,7 @@ Proof.
     destruct (IntegrableApproxSequence gen A Aint i).
     apply CRlt_asym, X.
     unfold CRminus in ncv. rewrite CRopp_0, CRplus_0_r, CRabs_right in ncv.
-    exact ncv. apply pow_le. apply CR_of_Q_le. discriminate.
+    exact ncv. apply CRpow_ge_zero. apply CR_of_Q_le. discriminate.
   - rewrite <- (CRplus_opp_r (MeasureSet Aint)).
     apply CRplus_le_compat_l, CRopp_ge_le_contravar.
     apply MeasureNonDecreasing. intros. apply applyUnionIterate in H0.
@@ -1208,7 +1210,7 @@ Proof.
                         sa_approx _ _ _
                                   (gen _ (IntegrableSetDifference A U Aint Uint)
                                        (CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) k)
-                                       (pow_lt (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
+                                       (CRpow_gt_zero (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
                                                k (CR_of_Q_pos (1 # 2) eq_refl)))
                 end) as Bk.
   assert (forall k:nat, IntegrableSet (Bk k)) as BkInt.
@@ -1241,7 +1243,7 @@ Proof.
       destruct (fMes (fun x : X (ElemFunc IS) => A x /\ ~ U x)
                      (IntegrableSetDifference A U Aint Uint) n
                      (CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) (S k))
-                     (pow_lt (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
+                     (CRpow_gt_zero (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) 
                              (S k) (CR_of_Q_pos (1 # 2) eq_refl)))
         as [B Bint].
       refine (IntegrableFunctionExtensional _ _ _ Bint). split.
@@ -1457,7 +1459,7 @@ Proof.
   (* We define another family of generator sets and call the previous lemma on it. *)
   assert (forall (i:nat), 0 < eps * CRpow (CR_of_Q _ (1 # 2)) i) as H0.
   { intros. apply (CRmult_lt_0_compat _ _ _ epsPos).
-    apply pow_lt, CR_of_Q_pos. reflexivity. }
+    apply CRpow_gt_zero, CR_of_Q_pos. reflexivity. }
   pose (fun (i:nat) => sa_approx
                     _ _ _ (let (fB,_) := H (eps * CRpow (CR_of_Q _ (1#2)) (S i))
                                            (H0 (S i)) in
@@ -1587,7 +1589,7 @@ Proof.
       apply c. exact bSn.
       simpl. rewrite <- CRmult_assoc.
       rewrite <- CRmult_assoc. apply CRmult_le_compat_r.
-      apply pow_le. apply CR_of_Q_le. discriminate.
+      apply CRpow_ge_zero. apply CR_of_Q_le. discriminate.
       rewrite <- (CRmult_1_r eps), CRmult_assoc, CRmult_assoc.
       apply CRmult_le_compat_l. apply CRlt_asym, epsPos.
       rewrite CRmult_1_l, <- CR_of_Q_mult.
@@ -1600,7 +1602,7 @@ Proof.
       exact bn. apply CRmult_le_compat_l. apply CRlt_asym, epsPos.
       rewrite <- (CRmult_1_l (CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) n)).
       apply CRmult_le_compat_r.
-      apply pow_le. apply CR_of_Q_le. discriminate.
+      apply CRpow_ge_zero. apply CR_of_Q_le. discriminate.
       apply CR_of_Q_le. discriminate. contradiction.
       unfold CRminus. rewrite CRplus_assoc. 
       destruct xdf.
@@ -1670,15 +1672,15 @@ Proof.
       apply Nat.le_exists_sub in H3. destruct H3, H3. subst i.
       rewrite <- (CRmult_1_l (CRpow (CR_of_Q _ (1 # 2)) j)).
       replace (S (x2 + j)) with (S x2 + j)%nat. 2: reflexivity.
-      rewrite <- pow_plus_distr. apply CRmult_le_compat_r.
-      apply pow_le. apply CR_of_Q_le. discriminate.
+      rewrite <- CRpow_plus_distr. apply CRmult_le_compat_r.
+      apply CRpow_ge_zero. apply CR_of_Q_le. discriminate.
       apply (CRmult_le_reg_l (CRpow (CR_of_Q _ 2) (S x2))).
-      apply pow_lt, CR_of_Q_pos. reflexivity. rewrite pow_mult.
-      rewrite <- (pow_proper 1). rewrite pow_one, CRmult_1_r.
-      apply pow_R1_Rle. apply CR_of_Q_le. discriminate.
+      apply CRpow_gt_zero, CR_of_Q_pos. reflexivity. rewrite CRpow_mult.
+      rewrite <- (CRpow_proper 1). rewrite CRpow_one, CRmult_1_r.
+      apply CRpow_ge_one. apply CR_of_Q_le. discriminate.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
       apply CRmult_le_0_compat. 
-      apply pow_le. apply CR_of_Q_le. discriminate.
+      apply CRpow_ge_zero. apply CR_of_Q_le. discriminate.
       apply CRlt_asym, epsPos.
       (* Outside the intersection, 0 == 0. *)
       unfold sa_approx in n. apply (CR_cv_eq _ (fun _ => 0)).

@@ -25,6 +25,7 @@ Require Import ArithRing.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 
 Local Open Scope ConstructiveReals.
@@ -423,7 +424,7 @@ Qed.
 Lemma powerPositive : forall {R : ConstructiveReals} (n:nat),
     (0 < CRpow (CR_of_Q R 2) n).
 Proof.
-  intros. apply pow_lt. simpl. 
+  intros. apply CRpow_gt_zero. simpl. 
   apply CR_of_Q_lt. reflexivity.
 Qed.
 
@@ -477,7 +478,7 @@ Proof.
     unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
   - destruct (DiagTruncateRect _ u sumCol eps n H H0) as [pp geo].
     assert (0 < CRpow (CR_of_Q R (1#2)) (S n)).
-    { apply pow_lt. simpl. apply CR_of_Q_lt. reflexivity. }
+    { apply CRpow_gt_zero. simpl. apply CR_of_Q_lt. reflexivity. }
     destruct (CRup_nat (CRinv R eps (inr H) * (CRinv R (CRpow (CR_of_Q R (1#2)) (S n))) (inr H1)))
       as [epsN maj].
     specialize (H0 (S n) (Pos.of_nat epsN)) as [p lim].
@@ -494,7 +495,7 @@ Proof.
       apply (CRmult_lt_compat_l eps) in maj. 2: exact H.
       rewrite <- CRmult_assoc, CRinv_r, CRmult_1_l in maj.
       apply (CRmult_lt_compat_l (CRpow (CR_of_Q R (1 # 2)) (S n))) in maj.
-      2: apply pow_lt; apply CR_of_Q_lt; reflexivity.
+      2: apply CRpow_gt_zero; apply CR_of_Q_lt; reflexivity.
       rewrite CRinv_r in maj.
       apply (CRmult_lt_reg_l (CR_of_Q R (Z.pos (Pos.of_nat epsN) # 1))).
       apply CR_of_Q_lt. reflexivity.
@@ -503,7 +504,7 @@ Proof.
         with 1%Q.
       apply (CRlt_le_trans _ _ _ maj).
       rewrite CRmult_comm. rewrite <- CRmult_assoc.
-      apply CRmult_le_compat_r. apply CRlt_asym, pow_lt.
+      apply CRmult_le_compat_r. apply CRlt_asym, CRpow_gt_zero.
       simpl. apply CR_of_Q_lt.
       reflexivity. rewrite CRmult_comm. apply CRmult_le_compat_r.
       apply CRlt_asym, H.
@@ -596,7 +597,7 @@ Proof.
   assert (forall n : nat, (0 <= diagSeq (fun i j : nat => CRabs _ (u i j)) n)) as diagPos.
   { intro n. unfold diagSeq. destruct (diagPlaneInv n). apply CRabs_pos. }
   assert (0 < eps * CRpow (CR_of_Q R (1#2)) 3) as eighthEpsPos.
-  { apply CRmult_lt_0_compat. assumption. apply pow_lt.
+  { apply CRmult_lt_0_compat. assumption. apply CRpow_gt_zero.
     simpl. apply CR_of_Q_lt. reflexivity. }
   destruct (H0 (eps * CRpow (CR_of_Q R (1#2)) 3) eighthEpsPos) as [Nabs H2].
   pose proof (DiagTriangleShift Nabs) as tShift.
@@ -611,7 +612,7 @@ Proof.
   - (* Replace infinite rectangle by finite trapeze, which contains the main triangle. *)
     apply CRlt_asym.
     destruct (DiagTruncateRect u sumCol (eps * CRpow (CR_of_Q R (1#2)) 4) n) as [p geo].
-    apply CRmult_lt_0_compat. assumption. apply pow_lt.
+    apply CRmult_lt_0_compat. assumption. apply CRpow_gt_zero.
     simpl. apply CR_of_Q_lt. reflexivity.
     intros. apply H1.
     setoid_replace (CRsum sumCol n - CRsum (diagSeq u) (diagPlane 0 n))
@@ -641,7 +642,7 @@ Proof.
       apply CRmult_lt_compat_l. assumption.
       setoid_replace (CRpow (CR_of_Q R (1 # 2)) 3)
         with (CRpow (CR_of_Q R (1 # 2)) 4 * CR_of_Q R 2).
-      apply CRmult_lt_compat_l. apply pow_lt. simpl.
+      apply CRmult_lt_compat_l. apply CRpow_gt_zero. simpl.
       apply CR_of_Q_lt. reflexivity.
       apply GeoHalfBelowTwo.
       setoid_replace (CRpow (CR_of_Q R (1 # 2)) 4)
@@ -657,7 +658,7 @@ Proof.
       rewrite CRplus_opp_r. rewrite CRabs_right. 2: apply CRle_refl.
       apply CRmult_lt_0_compat. apply CRmult_lt_0_compat.
       apply CR_of_Q_lt. reflexivity.
-      assumption. apply pow_lt. simpl. 
+      assumption. apply CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt. reflexivity.
       simpl. rewrite diagSumTriangle. reflexivity.
       setoid_replace (CRsum (fun k : nat => CRsum (u k) (S p + (n - k))) n)
@@ -721,7 +722,7 @@ Proof.
       apply (DiagSeqNegTriangle _ _ _ _ sAbs). intros. apply H2.
       apply (le_trans _ (diagPlane 0 n)); assumption. rewrite <- (CRmult_comm (CR_of_Q R 2)).
       rewrite CRmult_assoc. apply CRmult_lt_compat_r. apply CRmult_lt_0_compat.
-      assumption. apply pow_lt. simpl.
+      assumption. apply CRpow_gt_zero. simpl.
       apply CR_of_Q_lt. reflexivity.
       apply CR_of_Q_lt. reflexivity.
       setoid_replace (@INR R 6) with (@INR R 2 + @INR R 4).

@@ -37,7 +37,9 @@ Require Import Logic.ConstructiveEpsilon.
 Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
@@ -1012,7 +1014,7 @@ Definition RestrictedIntegralNonneg
 Proof.
   intros fInt fNonNeg AInt.
   assert (forall k : nat, 0 < CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) k) as boundPos.
-  { intro k. apply pow_lt. simpl.
+  { intro k. apply CRpow_gt_zero. simpl.
     apply CR_of_Q_lt. reflexivity. }
   pose (StartZero (fun n => let (p,_) := ControlSubSeqCv _ _ (CRpow (CR_of_Q _ (1#2)))
              (IntegralTruncateLimit f fInt) boundPos n in p)) as nk.
@@ -1065,12 +1067,12 @@ Proof.
     apply (CRle_trans _ (CRpow (CR_of_Q _ (1 # 2)) (S n))).
     apply CRlt_asym, c0.
     apply (CRmult_le_reg_l (CRpow (CR_of_Q _ 2) (S n))).
-    apply pow_lt. apply CR_of_Q_lt. reflexivity.
-    rewrite pow_mult. rewrite (pow_proper _ 1), pow_one.
+    apply CRpow_gt_zero. apply CR_of_Q_lt. reflexivity.
+    rewrite CRpow_mult. rewrite (CRpow_proper _ 1), CRpow_one.
     replace (CRpow (CR_of_Q _ 2) (S n))
       with (CR_of_Q (RealT (ElemFunc IS)) 2 * CRpow (CR_of_Q _ 2) n). 2: reflexivity.
-    rewrite CRmult_assoc, pow_mult.
-    rewrite (pow_proper _ 1), pow_one. rewrite CRmult_1_r.
+    rewrite CRmult_assoc, CRpow_mult.
+    rewrite (CRpow_proper _ 1), CRpow_one. rewrite CRmult_1_r.
     apply CR_of_Q_le. discriminate. rewrite <- CR_of_Q_mult.
     setoid_replace (2 * (1 # 2))%Q with 1%Q. reflexivity. reflexivity.
     rewrite <- CR_of_Q_mult.

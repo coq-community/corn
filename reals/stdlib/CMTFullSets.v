@@ -23,8 +23,10 @@ along with this program;  If not, see <https://www.gnu.org/licenses/>.
 Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveCauchyAbs.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
@@ -106,7 +108,7 @@ Proof.
     intro k. rewrite IabsHomogeneous. rewrite CRmult_comm.
     apply CRmult_morph. 2: reflexivity.
     rewrite CRabs_right. reflexivity. apply CRlt_asym.
-    apply CRmult_lt_0_compat. apply pow_lt.
+    apply CRmult_lt_0_compat. apply CRpow_gt_zero.
     simpl. apply CR_of_Q_lt. reflexivity.
     apply CRinv_0_lt_compat. exact denomPos.
     apply series_cv_scale. assumption. }
@@ -124,7 +126,7 @@ Proof.
     assert (CRapart _ (CRpow (CR_of_Q _ (1#2)) n * CRinv _ (1 + sumAbsIFnk) (inr denomPos)) 0)
       as ddenomNonZero.
     { right. apply CRmult_lt_0_compat.
-      apply pow_lt. simpl. apply CR_of_Q_lt. reflexivity.
+      apply CRpow_gt_zero. simpl. apply CR_of_Q_lt. reflexivity.
       apply CRinv_0_lt_compat. exact denomPos. }
     destruct (domainInfiniteSumAbsScaleIncReverse _ _ _ x xdf ddenomNonZero) as [y _].
     exact (injF x y).
@@ -132,7 +134,7 @@ Proof.
     unfold IntAbsSum.
     rewrite CRmult_comm. rewrite <- (CRmult_1_r (CRpow (CR_of_Q _ (1 # 2)) n)).
     do 2 rewrite CRmult_assoc.
-    apply CRmult_le_compat_l. apply CRlt_asym, pow_lt.
+    apply CRmult_le_compat_l. apply CRlt_asym, CRpow_gt_zero.
     simpl. apply CR_of_Q_lt. reflexivity.
     rewrite CRmult_1_l. apply CRlt_asym.
     apply (CRmult_lt_reg_l (1+sumAbsIFnk)). assumption.
@@ -781,10 +783,10 @@ Proof.
   { apply CR_of_Q_lt. reflexivity. }
   exists (fun n:nat => let (df,_) := AbsRepresentation
        IS (fn n) (CRpow (CR_of_Q _ (1#2)) n) (fnInt n)
-       (pow_lt (CR_of_Q _ (1 # 2)) n halfPos) in df).
+       (CRpow_gt_zero (CR_of_Q _ (1 # 2)) n halfPos) in df).
   intro n. destruct (AbsRepresentation
        IS (fn n) _ (fnInt n)
-       (pow_lt (CR_of_Q _ (1 # 2)) n halfPos)).
+       (CRpow_gt_zero (CR_of_Q _ (1 # 2)) n halfPos)).
   simpl. split; apply p.
 Qed.
 
@@ -1635,7 +1637,7 @@ Proof.
     apply CRmult_lt_compat_l. exact epsPos.
     rewrite <- (CRmult_0_r (CR_of_Q _ (1#2))).
     apply CRmult_lt_compat_l. apply CR_of_Q_lt. reflexivity.
-    apply pow_lt. apply CR_of_Q_lt. reflexivity. }
+    apply CRpow_gt_zero. apply CR_of_Q_lt. reflexivity. }
   pose (fun n => IntFn (let (r,_)
                          := AbsRepresentation
                               IS (hn n) (eps*CR_of_Q _ (1#2)*CRpow (CR_of_Q _ (1#2)) n)
