@@ -23,6 +23,7 @@ Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
@@ -152,9 +153,9 @@ Lemma pow2inv : forall {R : ConstructiveReals} (n p:nat),
     == CRpow (CR_of_Q R (1 # 2)) p.
 Proof.
   induction p.
-  - simpl. rewrite Nat.add_0_r, pow_mult.
-    rewrite (pow_proper (CR_of_Q R 2 * CR_of_Q R (1 # 2)) 1).
-    apply pow_one. rewrite <- CR_of_Q_mult.
+  - simpl. rewrite Nat.add_0_r, CRpow_mult.
+    rewrite (CRpow_proper (CR_of_Q R 2 * CR_of_Q R (1 # 2)) 1).
+    apply CRpow_one. rewrite <- CR_of_Q_mult.
     setoid_replace (2 * (1 # 2))%Q with 1%Q. reflexivity. reflexivity.
   - rewrite Nat.add_succ_r.
     transitivity (CRpow (CR_of_Q R 2) n * (CR_of_Q R (1 # 2) * CRpow (CR_of_Q R (1 # 2)) (n + p))).
@@ -211,7 +212,7 @@ Proof.
   assert (forall k : nat, (0 < (fun k0 : nat => CRpow (CR_of_Q _ (1#2)) (2 * k0 + 2)%nat * alpha) k))
     as boundPos.
   { intro k. apply CRmult_lt_0_compat.
-    apply pow_lt. exact Rlt_0_half. exact alphapos. }
+    apply CRpow_gt_zero. exact Rlt_0_half. exact alphapos. }
   pose (PrependSeq O (fun i => S ( let (k,_) := ControlSubSeqCv
                    (CRsum (fun n : nat => I (fn n) (fnL n))) l
                    (fun k => (CRpow (CR_of_Q _ (1#2)) (2*k + 2) * alpha )) lcv boundPos i
@@ -248,7 +249,7 @@ Proof.
     destruct (Nat.even k). apply nonneg.
     rewrite applyXscale. rewrite <- (CRmult_0_r (CRpow (CR_of_Q _ 2) (k/2))).
     apply CRmult_le_compat_l.
-    apply CRlt_asym, pow_lt. simpl.
+    apply CRlt_asym, CRpow_gt_zero. simpl.
     apply CR_of_Q_lt. reflexivity.
     apply nonNegSumFunc. intros. apply nonneg. }
   destruct (cont seq seqL seqPos) as [x xgood].
@@ -277,7 +278,7 @@ Proof.
                             + CRabs _ (CRsum (fun k : nat => I (fn k) (fnL k))
                                                 (pred (n (S (S n0)))) - l)))).
       apply CRmult_le_compat_l.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt. reflexivity.
       apply CRabs_triang. rewrite CRmult_plus_distr_l.
       apply (CRle_trans
@@ -285,7 +286,7 @@ Proof.
                   + (CRpow (CR_of_Q _ 2) n0) * CRpow (CR_of_Q _ (1#2)) (2 * (S n0) + 2) * alpha)).
       apply CRplus_le_compat.
       rewrite CRmult_assoc. apply CRmult_le_compat_l.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt. reflexivity.
       replace n1 with (pred (n (S n0))). 2: rewrite des; reflexivity.
       unfold n, PrependSeq, proj1_sig, pred.
@@ -294,7 +295,7 @@ Proof.
                                 lcv boundPos n0).
       apply CRlt_asym. rewrite CRabs_minus_sym. exact c.
       rewrite CRmult_assoc. apply CRmult_le_compat_l.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt. reflexivity.
       unfold n, PrependSeq, proj1_sig, pred.
       destruct (ControlSubSeqCv (CRsum (fun n2 : nat => I (fn n2) (fnL n2))) l
@@ -314,7 +315,7 @@ Proof.
       apply CRle_refl.
       do 2 rewrite <- CRmult_assoc.
       rewrite <- CRmult_plus_distr_r. apply CRmult_le_compat_r.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt. reflexivity.
       rewrite <- CR_of_Q_mult, <- CR_of_Q_mult, <- CR_of_Q_plus.
       apply CR_of_Q_le. discriminate.
@@ -332,7 +333,7 @@ Proof.
       rewrite <- des. apply (le_trans _ (S (n (S n0)))).
       apply le_S, le_refl. exact (ninc (S n0)).
       rewrite <- des. apply Nat.le_add_le_sub_r. apply ninc.
-      apply CRlt_asym, pow_lt. simpl.
+      apply CRlt_asym, CRpow_gt_zero. simpl.
       apply CR_of_Q_lt. reflexivity.
     + apply (CR_cv_proper _ (1*alpha)).
       apply series_cv_scale.
@@ -398,11 +399,11 @@ Proof.
       apply (CRle_lt_trans _ (CRpow (CR_of_Q _ (1 # 2)) 0 * partialApply f x xf)).
       unfold CRpow. rewrite CRmult_1_l. apply CRle_refl.
       apply (CRlt_le_trans _ _ _ abs). apply CRmult_le_compat_l.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt; reflexivity.
       rewrite <- Nat.sub_1_r. rewrite Nat.add_0_r. apply sum_Rle. intros.
       rewrite Nat.add_comm. apply CRle_refl.
-      apply pow_lt. apply CR_of_Q_lt. reflexivity.
+      apply CRpow_gt_zero. apply CR_of_Q_lt. reflexivity.
     + apply PrependSeqSeries, series_cv_scale, GeoHalfTwo.
     + clear seqL. destruct p as [i _].
       pose proof (infinite_sum_assoc
@@ -443,7 +444,7 @@ Proof.
       simpl in H2. simpl. rewrite H2. apply CRle_refl. auto.
       apply cond_pos_sum. intros.
       rewrite <- (CRmult_0_r (CRpow (CR_of_Q _ 2) k)). apply CRmult_le_compat_l.
-      apply CRlt_asym, pow_lt. simpl. 
+      apply CRlt_asym, CRpow_gt_zero. simpl. 
       apply CR_of_Q_lt; reflexivity. apply cond_pos_sum.
       intros. apply nonneg.
       intros.

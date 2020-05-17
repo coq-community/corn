@@ -25,6 +25,7 @@ Require Import List.
 Require Import ConstructiveReals.
 Require Import ConstructiveRealsMorphisms.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
 Require Import ConstructiveLimits.
 Require Import ConstructivePartialFunctions.

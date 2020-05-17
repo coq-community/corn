@@ -40,7 +40,9 @@ Require Import QArith Qminmax Qpower Qabs.
 
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
+Require Import ConstructivePower.
 Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
@@ -613,7 +615,7 @@ Proof.
     apply CRmult_lt_compat_r. 2: exact imaj.
     apply CR_of_Q_pos. apply Qpower_positive. reflexivity.
     rewrite CRabs_right in pmaj.
-    2: apply CRlt_asym, pow_lt; exact Rlt_0_half.
+    2: apply CRlt_asym, CRpow_gt_zero; exact Rlt_0_half.
     apply CR_of_Q_le.
     setoid_replace (CRpow (CR_of_Q R (1 # 2)) p)
       with (CR_of_Q R ((/ 2) ^ Z.of_nat p )) in pmaj.

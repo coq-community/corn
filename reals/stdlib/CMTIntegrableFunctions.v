@@ -28,6 +28,7 @@ along with this program;  If not, see <https://www.gnu.org/licenses/>.
 Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
 Require Import ConstructiveLimits.
 Require Import ConstructivePartialFunctions.

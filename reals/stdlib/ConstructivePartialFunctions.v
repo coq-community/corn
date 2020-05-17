@@ -26,6 +26,7 @@ Require Import List.
 Require Import QArith.
 Require Import ConstructiveReals.
 Require Import ConstructiveAbs.
+Require Import ConstructiveMinMax.
 Require Import ConstructiveSum.
 Require Import ConstructiveLimits.
 Require Import ConstructiveRcomplete.
@@ -854,3 +855,14 @@ Definition Xproj2 {R : ConstructiveReals} {X Y : Set}
        X (CRcarrier R) (CReq R) (fun x:X => Domain f (x,y))
        (fun x xD => partialApply f (x,y) xD)
        (fun x p q => DomainProp f (x,y) p q).
+
+Definition Xdiv {R : ConstructiveReals} {X : Set} (f : @PartialFunction R X)
+  : @PartialFunction R X.
+Proof.
+  apply (Build_PartialFunctionXY
+           X (CRcarrier R) (CReq R)
+           (fun x:X => {xD : Domain f x & partialApply f x xD ≶ 0})
+           (fun x y => let (xD,xnz) := y in CRinv R (partialApply f x xD) xnz)).
+  intros. destruct p,q. apply CRinv_morph, DomainProp.
+Defined.
+
