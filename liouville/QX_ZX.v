@@ -33,7 +33,6 @@ Let QX := cpoly_cring Q_as_CRing.
 Add Ring q_r : (r_rt (Ring:=CRing_is_Ring Q_as_CRing)).
 Add Ring qx_r : (r_rt (Ring:=CRing_is_Ring (cpoly_cring Q_as_CRing))).
 Let ZX := cpoly_cring Z_as_CRing.
-Add Ring z_r : (r_rt (Ring:=CRing_is_Ring Z_as_CRing)).
 Add Ring zx_r : (r_rt (Ring:=CRing_is_Ring (cpoly_cring Z_as_CRing))).
 
 Let ZX_deg := RX_deg Z_as_CRing Z_dec.
@@ -311,9 +310,7 @@ Proof.
 Qed.
 Lemma injZ_pres_mult : fun_pres_mult _ _ injZ_fun.
 Proof.
- intros x y.
- simpl; unfold inject_Z, Qeq; simpl.
- ring.
+ intros x y. reflexivity.
 Qed.
 Definition injZ_rh := Build_RingHom _ _ _ injZ_pres_plus injZ_pres_mult injZ_pres_unit.
 Definition zx2qx := cpoly_map injZ_rh.
