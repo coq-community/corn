@@ -3,7 +3,7 @@
 [![Travis][travis-shield]][travis-link]
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
-[![Gitter][gitter-shield]][gitter-link]
+[![Zulip][zulip-shield]][zulip-link]
 
 [travis-shield]: https://travis-ci.com/coq-community/corn.svg?branch=master
 [travis-link]: https://travis-ci.com/coq-community/corn/builds
@@ -14,8 +14,9 @@
 [conduct-shield]: https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-%23f15a24.svg
 [conduct-link]: https://github.com/coq-community/manifesto/blob/master/CODE_OF_CONDUCT.md
 
-[gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
-[gitter-link]: https://gitter.im/coq-community/Lobby
+[zulip-shield]: https://img.shields.io/badge/chat-on%20zulip-%23c1272d.svg
+[zulip-link]: https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users
+
 
 
 CoRN includes the following parts:
@@ -47,7 +48,6 @@ CoRN includes the following parts:
 
   Fast verified computation inside Coq. This includes: real numbers, functions,
   integrals, graphs of functions, differential equations.
-
 
 
 ## Meta
@@ -84,12 +84,14 @@ CoRN includes the following parts:
   - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
 - License: [GNU General Public License v2](LICENSE)
 - Compatible Coq versions: Coq 8.6 or greater
-- Additional Coq dependencies:
+- Additional dependencies:
   - [Math-Classes](https://github.com/coq-community/math-classes) 8.8.1 or
 greater, which is a library of abstract interfaces for mathematical
 structures that is heavily based on Coq's type classes.
 
-  - [Bignums](https://github.com/coq/bignums)
+  - [Bignums](https://github/com/coq/bignums)
+- Coq namespace: `CoRN`
+- Related publication(s): none
 
 ## Building and installation instructions
 
@@ -124,10 +126,6 @@ make   # or make -j <number-of-cores-on-your-machine>
 make install
 ```
 
-After installation, the included modules are available under
-the `CoRN` namespace.
-
-
 ### Building C-CoRN with SCons
 
 C-CoRN supports building with [SCons](http://www.scons.org/). SCons is a modern
@@ -147,4 +145,6 @@ For more information, see the [SCons documentation](http://www.scons.org/).
 ### Building documentation
 
 To build CoqDoc documentation, say `scons coqdoc`.
+
+
 

@@ -1,5 +1,6 @@
 opam-version: "2.0"
 maintainer: "b.a.w.spitters@gmail.com"
+version: "dev"
 
 homepage: "https://github.com/coq-community/corn"
 dev-repo: "git+https://github.com/coq-community/corn.git"
@@ -45,7 +46,6 @@ build: [
 ]
 install: [make "install"]
 depends: [
-  "ocaml"
   "coq" {(>= "8.6" & < "8.11~") | (= "dev")}
   "coq-math-classes" {(>= "8.8.1") | (= "dev")}
   "coq-bignums" 
@@ -88,4 +88,5 @@ authors: [
   "Pierre Letouzey"
   "Lionel Mamane"
   "Nickolay Shmyrev"
+  "Vincent Semeria"
 ]

@@ -29,5 +29,5 @@ pkgs.stdenv.mkDerivation {
 
   configurePhase = "sh ./configure.sh";
 
-  installFlags = "COQLIB=$(out)/lib/coq/${coq.coq-version}/";
+  installFlags = "COQMF_COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }

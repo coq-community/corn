@@ -3,6 +3,7 @@ fullname: C-CoRN
 shortname: corn
 organization: coq-community
 community: true
+travis: true
 
 synopsis: The Coq Constructive Repository at Nijmegen.
 
@@ -63,6 +64,7 @@ authors:
 - name: Pierre Letouzey
 - name: Lionel Mamane
 - name: Nickolay Shmyrev
+- name: Vincent Semeria
 
 maintainers:
 - name: Bas Spitters
@@ -118,7 +120,40 @@ categories:
 - name: Mathematics/Real Calculus and Topology
 - name: Mathematics/Exact Real computation
 
-documentation: |
+build: |
+  ## Building and installation instructions
+
+  The easiest way to install the latest released version of C-CoRN
+  is via [OPAM](https://opam.ocaml.org/doc/Install.html):
+
+  ```shell
+  opam repo add coq-released https://coq.inria.fr/opam/released
+  opam install coq-corn
+  ```
+
+  To instead build and install manually, you have to start with
+  the `bignums` dependency:
+
+  ``` shell
+  git clone https://github.com/coq/bignums
+  cd bignums
+  make   # or make -j <number-of-cores-on-your-machine>
+  make install
+  ```
+
+  The last `make install` is necessary, it copies `bignums` to
+  a common folder, which is usually `coq/user-contrib`. Afterwards
+  the similar commands for `math-classes` will find `bignums` there.
+  Finally build `corn` itself:
+
+  ``` shell
+  git clone https://github.com/coq-community/corn
+  cd corn
+  ./configure.sh
+  make   # or make -j <number-of-cores-on-your-machine>
+  make install
+  ```
+
   ### Building C-CoRN with SCons
 
   C-CoRN supports building with [SCons](http://www.scons.org/). SCons is a modern
@@ -138,5 +173,4 @@ documentation: |
   ### Building documentation
 
   To build CoqDoc documentation, say `scons coqdoc`.
-
 ---
