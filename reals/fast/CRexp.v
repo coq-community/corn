@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRseries.
@@ -238,7 +239,7 @@ Proof.
   rewrite ->  Zpower_Qpower in H0.
    assumption.
   auto with *.
- apply: (fun a b => mult_cancel_leEq _ a b (2:Q));simpl.
+ apply (fun a b => mult_cancel_leEq Q_as_COrdField a b (2:Q));simpl.
   constructor.
  replace LHS with a by (simpl; field; discriminate).
  replace RHS with 0 by simpl; ring.
@@ -650,7 +651,7 @@ Proof.
   apply inv_resp_leEq.
   stepr (inj_Q IR ((Zneg z):Q)).
    assumption.
-  astepr (inj_Q IR ([--](z:Q))).
+  astepr (inj_Q IR (-(z:Q))).
   apply inj_Q_wd.
   simpl; reflexivity.
  stepl (Half[!]nring (nat_of_P z)[//]pos_half IR).

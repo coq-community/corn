@@ -3,6 +3,7 @@
   We don't put this in MathClasses because for reasons of interoperability with the existing MetricSpace 
   it is still bound to stdlib Q rather than an abstract Rationals implementation. *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import
  Arith List
  CSetoids Qmetric Qring Qinf ProductMetric QposInf Qposclasses (* defines Equiv on Qpos *)

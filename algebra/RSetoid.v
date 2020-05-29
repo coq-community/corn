@@ -22,10 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Set Implicit Arguments.
 
 Require Export Coq.Setoids.Setoid.
-Require Import CoRN.logic.CornBasics.
 Require Import MathClasses.interfaces.abstract_algebra.
-
-(* Require Import CornTac.*)
 
 (**
 * Classic Setoids presented in a bundled way. 
@@ -106,13 +103,13 @@ Definition compose2 (X Y Z : RSetoid) : (Y-->Z) -> (X --> Y) --> X --> Z.
 Proof.
  intros f0.
  eexists (compose1 f0).
- abstract ( destruct f0 as [f0 Hf0]; intros x1 x2 H y; apply: Hf0; apply H).
+ abstract ( destruct f0 as [f0 Hf0]; intros x1 x2 H y; apply Hf0; apply H).
 Defined.
 
 Definition compose (X Y Z : RSetoid) : (Y-->Z) --> (X --> Y) --> X --> Z.
 Proof.
  exists (@compose2 X Y Z).
- abstract ( intros x1 x2 H y z; apply: H).
+ abstract ( intros x1 x2 H y z; apply H).
 Defined.
 (* begin hide *)
 Arguments compose {X Y Z}.
@@ -149,7 +146,7 @@ Defined.
 Definition flip (X Y Z : RSetoid) : (X-->Y-->Z)-->Y-->X-->Z.
 Proof.
  exists (@flip1 X Y Z).
- abstract ( intros x1 x2 H y z; apply: H).
+ abstract ( intros x1 x2 H y z; apply H).
 Defined.
 (* begin hide *)
 Arguments flip {X Y Z}.
@@ -165,7 +162,7 @@ Defined.
 Definition join (X Y : RSetoid) : (X-->X-->Y)-->X-->Y.
 Proof.
  exists (@join0 X Y).
- abstract ( intros x1 x2 H y; apply: H).
+ abstract ( intros x1 x2 H y; apply H).
 Defined.
 (* begin hide *)
 Arguments join {X Y}.

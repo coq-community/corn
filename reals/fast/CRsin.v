@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRseries.
@@ -84,7 +85,7 @@ Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
  split.
   replace RHS with ((1*a)*a) by simpl; ring.
-  apply (sqr_nonneg _ a).
+  apply (sqr_nonneg Q_as_COrdField a).
  rewrite -> Qle_minus_iff.
  replace RHS with ((1-a)*(1+a)) by simpl; ring.
  destruct Ha as [Ha0 Ha1].
@@ -207,7 +208,7 @@ Proof.
   rewrite <- POS_anti_convert.
   assert (X:inj_Q IR (inject_Z (Z_of_nat (S (pred (fact (S n'))))))[#][0]).
    stepr (inj_Q IR [0]).
-    assert (inject_Z (Z_of_nat (S (pred (fact (S n')))))[#][0]).
+    assert (@cs_ap Q_as_CSetoid (inject_Z (Z_of_nat (S (pred (fact (S n')))))) 0).
      discriminate.
     destruct (ap_imp_less _ _ _ X).
      apply less_imp_ap.
@@ -262,8 +263,7 @@ Proof.
  stepr (inj_Q IR (3*q-4*q^3)).
   apply inj_Q_wd.
   simpl; ring.
- stepr (inj_Q IR (Three[*]q)[-]inj_Q IR (Four[*]q ^ 3))%Q.
-  apply inj_Q_minus.
+  rewrite inj_Q_minus.
  apply cg_minus_wd.
   stepr (inj_Q IR Three[*]inj_Q IR q).
    apply inj_Q_mult.
@@ -565,7 +565,7 @@ Proof.
    <- IR_minus_as_CR, <- sin_slow_correct.
  apply IRasCR_wd.
  rewrite -> inj_Q_mult.
- change (2:Q) with (Two:Q).
+ change (2:Q) with (@nring Q_as_CRing 2).
  rewrite -> inj_Q_nring.
  rstepr (Sin (x[+]([--](inj_Q IR z))[*](Two[*]Pi))).
  setoid_replace (inj_Q IR z) with (zring z:IR).

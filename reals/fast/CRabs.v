@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.Max_AbsIR.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.model.metric2.Qmetric.
@@ -204,7 +205,7 @@ Qed.
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
-intros q e1 e2. change (ball (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
+intros q e1 e2. change (@ball Q_as_MetricSpace (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
 apply <- ball_eq_iff. apply Qabs_Qmult.
 Qed.
 

@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Coq.setoid_ring.Ring CoRN.stdlib_omissions.Z
   CoRN.metric2.Complete CoRN.model.metric2.Qmetric Coq.ZArith.ZArith CoRN.util.Qdlog CoRN.model.structures.Qpossec

@@ -18,6 +18,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.fast.CRArith.
 Require Import CoRN.stdlib_omissions.List.
 Require Import CoRN.model.metric2.Qmetric.
@@ -90,8 +91,12 @@ Proof.
    try (autorewrite with QposElim; ring_simplify; assumption).
  unfold Qball.
  autorewrite with QposElim.
- replace RHS with ((x - y) + (approximate a e1'' - approximate a e2'')) by simpl; ring.
- replace LHS with ((e1' + e2') + (e1'' + e2'')) by simpl; ring.
+ unfold QAbsSmall.
+ setoid_replace (x + approximate a e1'' - (y + approximate a e2''))%Q
+   with ((x - y) + (approximate a e1'' - approximate a e2'')).
+ 2: ring.
+ setoid_replace (e1'' + e1' + (e2'' + e2'))%Q
+   with ((e1' + e2') + (e1'' + e2''))%Q. 2: ring.
  apply AbsSmall_plus.
   auto.
  apply: (regFun_prf a).
@@ -157,7 +162,9 @@ Proof.
   ring_simplify.
   rewrite -> H0.
   unfold Qball.
-  replace RHS with ((approximate a e3 - approximate a e4) + (z1 - z2)) by simpl; ring.
+  unfold QAbsSmall.
+  setoid_replace (approximate a e3 + z1 - (approximate a e4 + z2))
+    with ((approximate a e3 - approximate a e4) + (z1 - z2)). 2: ring.
   apply AbsSmall_leEq_trans with (e3 + e4 + e5); auto.
   apply AbsSmall_plus; auto.
   apply: (regFun_prf a).
@@ -165,7 +172,9 @@ Proof.
  apply (IHl (z1 + approximate a0 e1) e3 (e5 + (e1 + e2))%Qpos).
    simpl.
    unfold Qball.
-   replace RHS with ((z1 - z2) + (approximate a0 e1 - approximate a0 e2)) by simpl; ring.
+   unfold QAbsSmall.
+   setoid_replace (z1 + approximate a0 e1 - (z2 + approximate a0 e2))
+     with ((z1 - z2) + (approximate a0 e1 - approximate a0 e2)). 2: ring.
    rewrite Q_Qpos_plus.
    apply AbsSmall_plus.
     auto.

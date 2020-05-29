@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
 Require Import CoRN.reals.fast.CRseries.
@@ -67,7 +68,7 @@ Lemma artanh_DomArTanH : forall a, (a^2 < 1) -> DomArTanH (inj_Q IR a).
 Proof.
  intros a Ha.
  split.
-  stepl (inj_Q IR ([--](1))%Q).
+  stepl (inj_Q IR (-(1))%Q).
    apply inj_Q_less; simpl.
    apply Qnot_le_lt.
    intros H.

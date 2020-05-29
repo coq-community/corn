@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRGroupOps.
 Require Export CoRN.model.semigroups.CRsemigroup.
 Require Import CoRN.reals.fast.CRcorrect.

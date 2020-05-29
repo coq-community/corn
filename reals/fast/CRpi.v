@@ -1,6 +1,7 @@
 (* CRpi_fast is better for computation, but CRpi_slow is faster to compile,
 and may be prefered for development. *)
 (* Require Export CRpi_slow. *)
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRpi_fast.
 Require Import CoRN.reals.fast.CRsign.
 

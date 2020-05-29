@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import CoRN.reals.fast.CRpower.
 Require Export CoRN.reals.fast.CRArith.
@@ -351,7 +352,7 @@ match e with
 | Qpos2QposInf e' => root_loop e' (S (Psize (Qden e'))) initial_root 2
 end.
 
-Lemma sqrt_regular : is_RegularFunction sqrt_raw.
+Lemma sqrt_regular : @is_RegularFunction Q_as_MetricSpace sqrt_raw.
 Proof.
  intros e1 e2.
  apply ball_weak_le with (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos.
@@ -790,7 +791,8 @@ Qed.
 (** Square root is uniformly continuous everywhere. *)
 Definition sqrt_modulus (e:Qpos) : QposInf := Qpos2QposInf (e*e).
 
-Lemma sqrt_uc_prf : is_UniformlyContinuousFunction rational_sqrt sqrt_modulus.
+Lemma sqrt_uc_prf : @is_UniformlyContinuousFunction
+                      Q_as_MetricSpace CR rational_sqrt sqrt_modulus.
 Proof.
  intros e a.
  cut (forall a b, (0 <= a) -> (0 <= b) -> ball_ex (X:=Q_as_MetricSpace) (sqrt_modulus e) a b ->

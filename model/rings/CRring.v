@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRFieldOps.
 Require Export CoRN.model.abgroups.CRabgroup.
 Require Export CoRN.algebra.CRings.
@@ -71,10 +72,10 @@ Proof.
      change (x*1==x)%CR.
      rewrite <- CR_eq_as_Cauchy_IR_eq.
      stepl ((CRasCauchy_IR x)[*](CRasCauchy_IR (inject_Q_CR 1))); [| now apply CR_mult_as_Cauchy_IR_mult].
-     stepl ((CRasCauchy_IR x)[*][1]); [| now
-       apply bin_op_is_wd_un_op_rht; apply: CR_inject_Q_as_Cauchy_IR_inject_Q].
+     stepl ((CRasCauchy_IR x)[*][1]).
      rational.
-    intros x.
+     apply bin_op_is_wd_un_op_rht; apply: CR_inject_Q_as_Cauchy_IR_inject_Q.
+    (* is_lft_unit csg_op 1%CR*) intros x.
     change ((inject_Q_CR 1%Q)*x==x)%CR.
     rewrite <- CR_eq_as_Cauchy_IR_eq.
     stepl ((CRasCauchy_IR (inject_Q_CR 1))[*](CRasCauchy_IR x)); [| now apply CR_mult_as_Cauchy_IR_mult].

@@ -1,6 +1,7 @@
 (** An abstract interface for integrable uniformly continuous functions from Q to CR,
  with a proof that integrals satisfying this interface are unique. *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import
  Coq.Unicode.Utf8 Coq.Program.Program
  CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
@@ -328,7 +329,9 @@ Section integral_approximation.
      of unicity only works for such functions. Todo: There should really be a proof that does not depend
      on continuity. *)
 
-    Context `{L : !IsLocallyUniformlyContinuous f lmu}.
+    Context `{L : @IsLocallyUniformlyContinuous
+                    Q (msp_mspc_ball Q_as_MetricSpace)
+                    CR (msp_mspc_ball CR) f lmu}.
 
 (*
     Lemma gball_integral (e: Qpos) (a a': Q) (ww: Qpos) (w: QnonNeg):
@@ -369,15 +372,28 @@ Section integral_approximation.
     Lemma luc_gball (a w delta eps x y : Q) :
       0 < eps ->
       (delta <= lmu a w eps)%Qinf ->
-      gball w a x -> gball w a y -> gball delta x y -> gball eps (f x) (f y).
+      @gball Q_as_MetricSpace w a x
+      -> @gball Q_as_MetricSpace w a y
+      -> @gball Q_as_MetricSpace delta x y
+      -> gball eps (f x) (f y).
     Proof.
      intros A A1 A2 A3 A4.
-     destruct (luc_prf f lmu a w) as [_ H].
-     change (f x) with (restrict f a w (exist _ _ A2)).
-     change (f y) with (restrict f a w (exist _ _ A3)).
+     destruct (@luc_prf
+                 Q (msp_mspc_ball Q_as_MetricSpace)
+                 CR (msp_mspc_ball CR)
+                 f lmu L a w) as [_ H].
+     change (f x) with (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR
+                                  f a w (exist _ _ A2)).
+     change (f y) with (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR
+                                  f a w (exist _ _ A3)).
      apply H; [apply A |].
      destruct (lmu a w eps) as [q |] eqn:A5; [| easy].
-     apply (mspc_monotone delta); [apply A1 | apply A4].
+     apply (@mspc_monotone _ _
+              (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
+                         (msp_mspc_ball_ext Q_as_MetricSpace)
+                         (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) w a) )
+              delta).
+     apply A1. apply A4.
     Qed.
 
     Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: Qpos) (iw: Q) (n: nat):
@@ -469,8 +485,9 @@ Section integral_approximation.
     Lemma riemann_sum_0 (a : Q) (n : positive) : riemann_sum a 0 n [=] 0%CR.
     Proof.
       unfold riemann_sum. apply cmΣ_0.
-      intros m _. rewrite step_0.
-      now setoid_replace (0 * f (a + m * 0))%CR with 0%CR by ring.
+      intros m _.
+      generalize (f(a+m*step 0 n)). intros.
+      rewrite (step_0 n). ring.
     Qed.
 
     Lemma Riemann_sums_approximate_integral' (a : Q) (w : QnonNeg) (e : Qpos) (n : positive) :
@@ -504,8 +521,14 @@ Section integral_approximation.
       subst N; unfold comp_inf in A2; rewrite A3 in A2.
       change (step w n <= mu); unfold step.
       rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
-      assert (A4 : 0 < mu) by (change (Qinf.lt 0 mu); rewrite <- A3;
-        apply (uc_pos (restrict f a w) (lmu a w)); trivial).
+
+      assert (0 < mu) as A4. change (Qinf.lt 0 mu). rewrite <- A3.
+      apply (@uc_pos
+               _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
+                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) w a))
+               CR (msp_mspc_ball CR)
+               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a w) (lmu a w)).
+      trivial. trivial.
       apply Qle_div_l; auto.
       now apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
     * set (N := Z.to_pos (Qceiling (comp_inf (λ x, 1 / x) (lmu a w) 0 e))).
@@ -517,8 +540,12 @@ Section integral_approximation.
         subst N; unfold comp_inf in A2; rewrite A3 in A2.
         change (step w n <= mu); unfold step.
         rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
-        assert (A4 : 0 < mu) by (change (Qinf.lt 0 mu); rewrite <- A3;
-          apply (uc_pos (restrict f a w) (lmu a w)), (proj2_sig e)).
+        assert (0 < mu) as A4. change (Qinf.lt 0 mu). rewrite <- A3.
+        apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
+                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) w a))
+               CR (msp_mspc_ball CR)
+               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a w) (lmu a w)).
+        trivial. apply (proj2_sig e).
         apply Qle_div_l; auto.
         apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
         apply (Qle_trans _ (1 / mu)); trivial. apply Qmult_le_compat_r; trivial.
@@ -892,11 +919,15 @@ change (abs (-x)) with (CRabs (-x)).
 rewrite CRabs_opp; reflexivity.
 Qed.
 
-Lemma mspc_ball_Qle (r a x : Q) : mspc_ball r a x <-> a - r ≤ x ≤ a + r.
+Lemma mspc_ball_Qle (r a x : Q)
+  : @mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) r a x <-> a - r ≤ x ≤ a + r.
 Proof. rewrite mspc_ball_Qabs; apply Qabs_diff_Qle. Qed.
 
 Lemma mspc_ball_convex (x1 x2 r a x : Q) :
-  mspc_ball r a x1 -> mspc_ball r a x2 -> x ∈ (x1, x2) -> mspc_ball r a x.
+  @mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) r a x1
+  -> @mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) r a x2
+  -> x ∈ (x1, x2)
+  -> @mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) r a x.
 Proof.
 intros A1 A2 A3.
 rewrite mspc_ball_Qle in A1, A2. apply mspc_ball_Qle.
@@ -926,8 +957,12 @@ Qed.
 Lemma integral_additive' (a b : Q) (u v w : QnonNeg) :
   a + `u = b -> `u + `v = `w -> ∫ f a u + ∫ f b v = ∫ f a w.
 Proof.
-intros A1 A2. change (u + v = w)%Qnn in A2.
-rewrite <- A1, <- A2. now apply integral_additive.
+  intros A1 A2.
+  Print QnonNeg.eq.
+  assert (QnonNeg.eq (u+v)%Qnn w) as H0. { apply A2. }
+  assert (Qeq (a+`u) b). { apply A1. }
+  rewrite <- H1. rewrite <- H0.
+  apply integral_additive.
 Qed.
 
 Lemma int_add (a b c : Q) : int a b + int b c = int a c.
@@ -992,8 +1027,22 @@ apply rings.negate_plus_distr. (* does not work without unfold *)
 Qed.*)
 
 Lemma integrate_plus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a : Q) (w : QnonNeg) :
-  ∫ (f + g) a w = ∫ f a w + ∫ g a w.
+      `{@IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          f f_mu,
+        @IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          g g_mu} 
+      (a : Q) (w : QnonNeg) :
+  @integrate (f + g) (@Integral_instance_0
+                        (f+g) _ (@uc_ulc _ _ _ _ _ _
+                                         (@sum_uc
+                                            Q (msp_mspc_ball Q_as_MetricSpace)
+                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                            f g _ _ _ _))) a w
+  = ∫ f a w + ∫ g a w.
 Proof.
 apply mspc_closed. intros e e_pos. (* Why is 0%Q? *)
 mc_setoid_replace (0 + e) with e by ring.
@@ -1001,7 +1050,20 @@ assert (he_pos : 0 < e / 2) by solve_propholds.
 assert (qe_pos : 0 < e / 4) by solve_propholds.
 destruct (integral_approximation f a w (mkQpos qe_pos)) as [Nf F].
 destruct (integral_approximation g a w (mkQpos qe_pos)) as [Ng G].
-destruct (integral_approximation (f + g) a w (mkQpos he_pos)) as [Ns S].
+destruct (@integral_approximation
+            (f + g)
+            (@Integral_instance_0
+                        (f+g) _ (@uc_ulc _ _ _ _ _ _
+                                         (@sum_uc
+                                            Q (msp_mspc_ball Q_as_MetricSpace)
+                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                            f g _ _ _ _)))
+            _ _ (@uc_ulc _ _ _ _ _ _
+                                         (@sum_uc
+                                            Q (msp_mspc_ball Q_as_MetricSpace)
+                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                            f g _ _ _ _))
+            a w (mkQpos he_pos)) as [Ns S].
 (* [Le positive] is not yet defined *)
 set (n := Pos.max (Pos.max Nf Ng) Ns).
 assert (Nf <= n)%positive by (transitivity (Pos.max Nf Ng); apply Pos.le_max_l).
@@ -1034,8 +1096,24 @@ apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a w n)).
 Qed. *)
 
 Lemma int_plus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
-  int (f + g) a b = int f a b + int g a b.
+      `{@IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          f f_mu,
+        @IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          g g_mu} 
+      (a b : Q) :
+  @int (f + g)
+       (@Integral_instance_0
+                        (f+g) _ (@uc_ulc _ _ _ _ _ _
+                                         (@sum_uc
+                                            Q (msp_mspc_ball Q_as_MetricSpace)
+                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                            f g _ _ _ _)))
+       a b
+  = int f a b + int g a b.
 Proof.
 unfold int; destruct (decide (a ≤ b)); rewrite integrate_plus; ring.
 Qed.
@@ -1047,8 +1125,24 @@ unfold int; destruct (decide (a ≤ b)); rewrite integrate_negate; reflexivity.
 Qed.
 
 Lemma int_minus (f g : Q -> CR)
-  `{!IsUniformlyContinuous f f_mu, !IsUniformlyContinuous g g_mu} (a b : Q) :
-  int (f - g) a b = int f a b - int g a b.
+      `{@IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          f f_mu,
+        @IsUniformlyContinuous
+           Q (msp_mspc_ball Q_as_MetricSpace) 
+           CR (msp_mspc_ball CR) 
+          g g_mu} 
+      (a b : Q) :
+  @int (f - g)
+       (@Integral_instance_0
+                        (f-g) _ (@uc_ulc _ _ _ _ _ _
+                                         (@sum_uc
+                                            Q (msp_mspc_ball Q_as_MetricSpace)
+                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                            f (-g) _ _ _ _)))
+       a b
+  = int f a b - int g a b.
 Proof. rewrite int_plus, int_negate; reflexivity. Qed.
 
 Import interfaces.orders orders.semirings.
@@ -1069,7 +1163,12 @@ Section IntegralLipschitz.
 
 Notation ball := mspc_ball.
 
-Context (f : Q -> CR) (x0 : Q) `{!IsLocallyLipschitz f L} `{Integral f, !Integrable f}.
+Context (f : Q -> CR) (x0 : Q)
+        `{!@IsLocallyLipschitz
+           Q (msp_mspc_ball Q_as_MetricSpace)
+           CR (msp_mspc_ball CR) 
+           f L}
+        `{Integral f, !Integrable f}.
 
 Let F (x : Q) := int f x0 x.
 
@@ -1077,12 +1176,16 @@ Section IntegralLipschitzBall.
 
 Variables (a r x1 x2 : Q).
 
-Hypotheses (I1 : ball r a x1) (I2 : ball r a x2) (r_nonneg : 0 ≤ r).
+Hypotheses (I1 : @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x1)
+           (I2 : @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x2)
+           (r_nonneg : 0 ≤ r).
 
 Let La := L a r.
 
 Lemma int_lip (e M : Q) :
-  (∀ x, ball r a x -> abs (f x) ≤ 'M) -> ball e x1 x2 -> ball (M * e) (F x1) (F x2).
+  (∀ x, @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x -> abs (f x) ≤ 'M)
+  -> @ball Q (msp_mspc_ball Q_as_MetricSpace) e x1 x2
+  -> @ball CR (msp_mspc_ball CR) (M * e) (F x1) (F x2).
 Proof.
 intros A1 A2. apply CRball.gball_CRabs. subst F; cbv beta.
 change (int f x0 x1 - int f x0 x2)%CR with (int f x0 x1 - int f x0 x2).
@@ -1091,15 +1194,20 @@ change (abs (int f x2 x1) ≤ '(M * e)).
 transitivity ('(M * abs (x1 - x2))).
 + rewrite mult_comm. apply int_abs_bound; trivial. intros x A3; apply A1, (mspc_ball_convex x2 x1); easy.
 + apply CRle_Qle. assert (0 ≤ M).
-  - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply A1, mspc_refl]; easy.
-  - change (M * abs (x1 - x2) ≤ M * e). apply (orders.order_preserving (M *.)).
+- apply CRle_Qle.
+  transitivity (abs (f a)); [apply CRabs_nonneg | apply A1, @mspc_refl].
+  exact (msp_mspc_ball_ext Q_as_MetricSpace).
+  easy.
+- change (M * abs (x1 - x2) ≤ M * e). apply (orders.order_preserving (M *.)).
     apply gball_Qabs, A2.
 Qed.
 
 End IntegralLipschitzBall.
 
 Lemma lipschitz_bounded (a r M x : Q) :
-  abs (f a) ≤ 'M -> ball r a x -> abs (f x) ≤ '(M + L a r * r).
+  abs (f a) ≤ 'M
+  -> @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x
+  -> abs (f x) ≤ '(M + L a r * r).
 Proof.
 intros A1 A2. mc_setoid_replace (f x) with (f x - 0) by ring.
 apply mspc_ball_CRabs, mspc_symm.
@@ -1107,16 +1215,29 @@ apply mspc_ball_CRabs, mspc_symm.
 apply (mspc_triangle _ _ _ (f a)).
 + apply mspc_ball_CRabs. mc_setoid_replace (0 - f a) with (- f a) by ring.
   now rewrite CRabs_negate.
-+ apply llip; trivial. now apply mspc_refl, (radius_nonneg a x).
++ apply (@llip _ _ _ _
+              (msp_mspc_ball_ext Q_as_MetricSpace) f _ H).
+  2: exact A2. 2: exact A2.
+  apply mspc_refl.
+  apply (@radius_nonneg _ _ (msp_mspc_ball_ext Q_as_MetricSpace) a x).
+  exact A2.
 Qed.
 
 Global Instance integral_lipschitz :
-  IsLocallyLipschitz F (λ a r, Qupper_bound (abs (f a)) + L a r * r).
+  @IsLocallyLipschitz
+    Q (msp_mspc_ball Q_as_MetricSpace)
+    CR (msp_mspc_ball CR) 
+    F (λ a r, Qupper_bound (abs (f a)) + L a r * r).
 Proof.
 intros a r r_nonneg. constructor.
 + apply nonneg_plus_compat.
   - apply CRle_Qle. transitivity (abs (f a)); [apply CRabs_nonneg | apply upper_CRapproximation].
-  - apply nonneg_mult_compat; [apply (lip_nonneg (restrict f a r)) |]; auto.
+  - apply nonneg_mult_compat. 2: exact r_nonneg.
+    apply (@lip_nonneg
+             _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a))
+             CR _ (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR 
+                     f a r)).
+    apply llip_prf. exact H. exact r_nonneg.
     (* Not good to provide [(restrict f a r)]. [IsLipschitz (restrict f a r) (L a r)] is generated *)
 + intros x1 x2 d A.
   destruct x1 as [x1 A1]; destruct x2 as [x2 A2].

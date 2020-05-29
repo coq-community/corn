@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRseries.
 Require Export CoRN.reals.fast.CRArith.
@@ -71,7 +72,7 @@ Lemma square_zero_one : 0 <= a^2 <= 1.
 Proof.
  split.
   replace RHS with ((1*a)*a) by simpl; ring.
-  apply (sqr_nonneg _ a).
+  apply (sqr_nonneg Q_as_COrdField a).
  rewrite -> Qle_minus_iff.
  replace RHS with ((1-a)*(1+a)) by simpl; ring.
  destruct Ha as [Ha0 Ha1].
@@ -159,9 +160,9 @@ Proof.
  stepr (inj_Q IR (a^(2*n+1)%nat)); [| now apply inj_Q_power].
  stepl ((inj_Q IR (nring (S (2*n))))[*]inj_Q IR (Str_nth n (arctanSequence a))); [| now
    apply mult_wdl; apply inj_Q_nring].
- stepl (inj_Q IR (nring (S (2*n))[*]Str_nth n (arctanSequence a))); [| now apply inj_Q_mult].
+ rewrite <- inj_Q_mult.
  apply inj_Q_wd.
- csetoid_rewrite (nring_Q (S (2*n))).
+ setoid_rewrite (nring_Q (S (2*n))).
  change (S (2 * n)*Str_nth n (arctanSequence a)==a ^ (2 * n + 1)%nat).
  rewrite -> Str_nth_arctanSequence.
  rewrite -> (Qmake_Qdiv).

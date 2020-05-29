@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.metric2.Qmetric.
 Require Export Coq.QArith.QArith.
 Require Export CoRN.metric2.StepFunctionSetoid.

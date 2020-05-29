@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
@@ -248,7 +249,8 @@ Section contents.
 
     (** Applying this polynomial gives what you'd expect: *)
 
-    Definition an_applied (x: Q) (txs: ne_list QPoint) := divdiff txs [*] ' Π (map (Qminus x ∘ fst)%prg (tail txs)).
+    Definition an_applied (x: Q) (txs: ne_list QPoint)
+      := divdiff txs [*] ' @cr_Product Q_as_CRing (map (Qminus x ∘ fst)%prg (tail txs)).
 
     Definition applied (x: Q) := Σ (map (an_applied x) (ne_list.tails qpoints)).
 
@@ -289,7 +291,7 @@ Section contents.
   Proof with auto.
    intros. unfold an_applied.
    simpl @tl.
-   rewrite (cr_Product_0 (x - x))%Q.
+   rewrite (@cr_Product_0 Q_as_CRing (x - x))%Q.
      change (divdiff (t ::: xs) [*] 0 [=] 0).
      apply cring_mult_zero.
     change (x - x == 0)%Q. ring.
@@ -310,10 +312,10 @@ Section contents.
       an_applied (fst x) (x ::: y ::: xs)+an_applied (fst x) (y ::: xs) + applied xs (fst x))%CR.
     ring.
    change ((divdiff_l x xs - divdiff_l y xs) * ' (/ (fst x - fst y))[*]
-     ' (Qminus (fst x) (fst y) * Π (map (Qminus (fst x) ∘ fst)%prg xs))%Q+
-     divdiff_l y xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)[=]
-     divdiff_l x xs[*]' Π (map (Qminus (fst x) ∘ fst)%prg xs)).
-   generalize (Π (map (Qminus (fst x) ∘ fst)%prg xs)).
+     ' (Qminus (fst x) (fst y) * @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs))%Q+
+     divdiff_l y xs[*]' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)[=]
+     divdiff_l x xs[*]' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)).
+   generalize (@cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)).
    intros.
    rewrite <- mult_assoc.
    change ((((divdiff_l x xs - divdiff_l y xs)*(' (/ (fst x - fst y))%Q*' ((fst x - fst y)*s)%Q) + divdiff_l y xs * ' s)) == divdiff_l x xs*' s)%CR.
@@ -618,7 +620,7 @@ Definition ZeroRangeToBall (q: QnonNeg.T): Ball Q QnonNeg.T := (0, ((1#2) * q)%Q
     (** apply_weights: *)
 
     Program Definition apply_weights (w: Weights): Qbp :=
-      cm_Sum (map (λ p, Qmult (fst p) (` (snd p))) (zip points (Vector.to_list w))).
+      @cm_Sum Q_as_CMonoid (map (λ p, Qmult (fst p) (` (snd p))) (zip points (Vector.to_list w))).
 
     Next Obligation.
     Admitted.

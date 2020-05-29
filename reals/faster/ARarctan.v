@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   CoRN.reals.fast.CRarctan_small CoRN.reals.fast.CRarctan CoRN.reals.fast.CRpi_fast
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARpi CoRN.reals.faster.ARarctan_small.

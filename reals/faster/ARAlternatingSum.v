@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import 
   Coq.Program.Program CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
   CoRN.model.metric2.Qmetric CoRN.reals.fast.CRAlternatingSum CoRN.util.Qdlog
@@ -109,10 +110,12 @@ Proof with auto.
   cofix FIX; intros l sQ sN sD d dnn.
   constructor.
    intros E. 
-   apply Is_true_eq_left. apply sumbool_eq_true.
+   unfold Qball_ex_bool.
+   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (hd sQ) 0).
+   constructor.
    apply Is_true_eq_true in E. apply AQball_bool_true in E. 
    simpl in *.
-   destruct d as [sQ sN sD E2]. rewrite E2. 
+   destruct d as [sQ sN sD E2]. contradict n. rewrite E2. 
    apply Qball_Qabs. apply Qball_Qabs in E.
    unfold Qminus. rewrite Qplus_0_r.
    assert ((0:Q) ≤  'hd sN / 'hd sD).

@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.algebra.Bernstein.
 Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.algebra.COrdFields2.
@@ -489,10 +490,12 @@ Definition MVP_apply_modulus n (p:MultivariatePolynomial Q_as_CRing (S n)) :=
 let p' := (_D_ p) in
 Qscale_modulus (Qmax (MVP_upperBound (S n) p') (-(MVP_lowerBound (S n) p'))).
 
-Lemma MVP_apply_modulus_correct : forall n (p:MultivariatePolynomial Q_as_CRing (S n)) x y e,
+Lemma MVP_apply_modulus_correct
+  : forall n (p:MultivariatePolynomial Q_as_CRing (S n)) x y e,
  (0 <= x) -> (x <= 1) -> (0 <= y) -> (y <= 1) ->
- ball_ex (MVP_apply_modulus p e) x y ->
- forall (v:Vector.t Q n), UnitHyperInterval v -> ball e (MVP_apply _ p (Vector.cons _ x _ v):Q) (MVP_apply _ p (Vector.cons _ y _ v)).
+ @ball_ex Q_as_MetricSpace (MVP_apply_modulus p e) x y ->
+ forall (v:Vector.t Q n), UnitHyperInterval v ->
+                     @ball Q_as_MetricSpace e (MVP_apply _ p (Vector.cons _ x _ v):Q) (MVP_apply _ p (Vector.cons _ y _ v)).
 Proof.
  intros n p x y e Hx0 Hx1 Hy0 Hy1 Hxy v Hv.
  assert (Hx : (Qmax 0 (Qmin 1 x))==x).
@@ -682,7 +685,9 @@ Proof.
   simpl.
   reflexivity.
  intros p.
- assert (is_UniformlyContinuousFunction (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 x))))) (MVP_apply_modulus p)) by abstract
+ assert (@is_UniformlyContinuousFunction
+           Q_as_MetricSpace (n_UniformlyContinuousFunction Q_as_MetricSpace Q_as_MetricSpace n)
+           (fun (x:Q_as_CRing) => ProjT1 (IHn (p ! (MVP_C_ Q_as_CRing _ (Qclamp01 x))))) (MVP_apply_modulus p)) by abstract
    (intros e x y Hxy; assert (Hxy' : ball_ex (MVP_apply_modulus p e) (Qclamp01 x) (Qclamp01 y)) by
      (destruct (MVP_apply_modulus p e); auto; simpl; rewrite -> Qball_Qabs; apply: Qclamp01_close;
        rewrite <- Qball_Qabs; auto); destruct (Qclamp01_clamped x) as [Hx0 Hx1];

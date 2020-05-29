@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import Coq.setoid_ring.Ring_theory.
 Require Import Coq.Setoids.Setoid.
 Require Import Coq.QArith.QArith.
@@ -391,7 +392,7 @@ Qed.
 Lemma in_CRgball (r: Q) (x y: CR): x - ' r <= y /\ y <= x + ' r <-> gball r x y.
 Proof with intuition.
  unfold gball.
- destruct Qdec_sign as [[?|?]|?].
+ destruct Q_dec as [[?|?]|?].
    intuition.
    generalize (CRle_trans H0 H1).
    rewrite <- CRplus_le_l.

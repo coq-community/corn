@@ -1,4 +1,5 @@
 
+Require Import CoRN.algebra.RSetoid.
 Require Import Coq.Classes.Morphisms.
 
 (* Doubly-negated types as a monad: *)
@@ -124,10 +125,14 @@ Hint Resolve CRle_stable.
 
 Instance CReq_stable (x y: CR): Stable (x == y)%CR.
 Proof.
-  unfold st_eq. simpl.
+  simpl.
   unfold regFunEq, ball. simpl.
-  unfold Qmetric.Qball, AbsSmall.
-  auto using decision_stable, Qle_dec.
+  apply forall_stable. intros. 
+  apply forall_stable. intros. 
+  unfold Qmetric.Qball, Qmetric.QAbsSmall.
+  simpl. apply stable_conjunction.
+  apply decision_stable. apply Qle_dec.
+  apply decision_stable. apply Qle_dec.
 Qed.
 
 Local Open Scope CR_scope.

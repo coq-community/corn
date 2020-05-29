@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Coq.QArith.QArith
   MathClasses.implementations.stdlib_rationals CoRN.model.structures.Qinf CoRN.model.structures.Qpossec CoRN.model.structures.QposInf CoRN.model.structures.QnonNeg MathClasses.interfaces.abstract_algebra MathClasses.implementations.QType_rationals MathClasses.interfaces.additional_operations.

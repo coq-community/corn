@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import Coq.Program.Program.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
@@ -80,9 +81,12 @@ Proof.
  destruct y as [y|];[|constructor].
  simpl.
  unfold Qball.
- stepr ((hd s1 - 0) * (hd s2 - 0)); [| now (simpl;ring_simplify; reflexivity)].
+ unfold QAbsSmall.
+ setoid_replace ((hd s1 * hd s2)%mc - 0)%Q
+   with ((hd s1 - 0) * (hd s2 - 0)). 
  autorewrite with QposElim.
  apply mult_AbsSmall; assumption.
+ ring_simplify. reflexivity.
 Qed.
 
 Lemma mult_Streams_zl : forall (a b : Stream Q), (Limit a 0) -> forall (x:Qpos), NearBy 0 x b ->
@@ -110,7 +114,7 @@ Defined.
 *** [StreamBounds]
 [StreamBounds] says that one stream pointwise bounds the absolute value
 of the other. *)
-Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in AbsSmall a b) (zipWith (@pair _ _) a b).
+Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in QAbsSmall a b) (zipWith (@pair _ _) a b).
 
 (** If the bounding stream goes to 0, so does the bounded stream. *)
 Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.
@@ -243,7 +247,8 @@ Proof.
  constructor.
   simpl.
   unfold Qball.
-  stepr b; [| now (simpl;ring)].
+  unfold QAbsSmall. setoid_replace (b-0)%Q with b.
+  2: ring.
   split;simpl.
    apply Qle_trans with 0;[discriminate|assumption].
   assumption.
@@ -340,13 +345,11 @@ Proof.
  intros q Hpq.
  constructor.
   simpl.
-  unfold Qball.
-  stepr (1#q); [| now (simpl;ring)].
-  apply (AbsSmall_leEq_trans _ (1#q)).
-   change (1*d <= n*q)%Z.
+  unfold Qball, QAbsSmall.
+  setoid_replace ((1#q)-0)%Q with (1#q). 2: ring.
+  split. discriminate.
+  change (1*d <= n*q)%Z.
    apply Zmult_le_compat; auto with *.
-  apply AbsSmall_reflexive.
-  discriminate.
  apply: Qrecip_positives_help_nbz.
  clear Qrecip_positives_help_nbz.
  rewrite Zpos_succ_morphism.

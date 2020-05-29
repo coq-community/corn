@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
  Coq.QArith.Qabs CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
 

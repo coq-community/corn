@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.model.metric2.CRmetric.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.algebra.COrdAbs.
@@ -47,14 +48,15 @@ Notation "1" := (inject_Q_CR 1) : CR_scope.
 ** Addition
 Lifting addition over [Q] by one parameter yields a rational translation
 function. *)
-Lemma Qtranslate_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (a[+]b):QS) Qpos2QposInf.
+Lemma Qtranslate_uc_prf (a:Q)
+  : is_UniformlyContinuousFunction (fun b:QS => (a[+]b):QS) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
  unfold Qball in *.
- stepr (b0-b1).
-  assumption.
- simpl; ring.
+ unfold QAbsSmall.
+ setoid_replace (a + b0 - (a + b1)) with (b0 - b1).
+ apply H. ring.
 Qed.
 
 Definition Qtranslate_uc (a:Q_as_MetricSpace) : Q_as_MetricSpace --> Q_as_MetricSpace :=
@@ -71,12 +73,10 @@ Proof.
   simpl.
   ring.
  simpl.
-Admitted. 
-(* 
- rewrite -> H.
- rewrite -> Cmap_fun_correct.
- apply: MonadLaw1.
-Qed.*)
+ intros e1 e2. destruct x; simpl.
+ unfold Qball, QAbsSmall.
+ rewrite Qplus_0_l. apply regFun_prf.
+Qed. 
 
 (** Lifting translate yields binary addition over CR. *)
 Lemma Qplus_uc_prf :  is_UniformlyContinuousFunction Qtranslate_uc Qpos2QposInf.
@@ -100,20 +100,6 @@ Instance uncurried_Qplus_mu: UniformlyContinuous_mu (uncurry Qplus)
 
 Instance: MetricSpaceBall Q := genball Qball.
 Instance: MetricSpaceClass Q := class_from_MetricSpace Q_as_MetricSpace.
-
-Instance wtf: UniformlyContinuous (uncurry Qplus).
-Proof with auto.
- constructor; try apply _.
- intros e a b [P Q].
- simpl in *.
- apply ball_genball.
-  apply _.
- (* apply <- ball_genball in P. *)
-Admitted. (*
- setoid_replace e with ((1 # 2) * e + (1 # 2) * e)%Qpos.
-  apply Qball_plus...
- unfold QposEq. simpl. field.
-Qed. *) (* Getting weird anomalies again. Going to try again with more recent Coq. *)
 
 Notation QQ := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
@@ -147,26 +133,8 @@ Local Notation CRCR := (ProductMS CR CR).
 
 (** Uniform continuity of the uncurried original then follows from extentionality: *)
 
-(*
-Instance: UniformlyContinuous_mu (uncurry (ucFun2 CRplus_uc))
-  := { uc_mu := fun e => ((1#2) * e)%Qpos }.
-
-Instance: UniformlyContinuous (uncurry (ucFun2 CRplus_uc)).
-Proof with intuition.
-Admitted.
-(*
- apply UniformlyContinuous_proper with (ucFun uncurried_CRplus) (unwrap_mu uncurried_CRplus)...
-  apply (@regFunEq_e Q_as_MetricSpace).
-  intros. apply ball_refl.
- apply _.
-Qed.*)
-
 (** To show that this actually works, we can now write lambdas that use CRplus
  and automatically have them be proven to be uniformly continuous: *)
-
-Definition CRplus_uc_example (y: CR): CR --> CR :=
- wrap_uc_fun' (fun x => (y + x) + (x + x) + (x + y))%CR.
-*)
 
 Lemma CRplus_translate : forall (a:Q) (y:CR), (' a + y == translate a y)%CR.
 Proof.
@@ -198,15 +166,16 @@ Hint Rewrite translate_Qplus : CRfast_compute.
 ** Negation
 Lifting negation on [Q] yields negation on CR.
 *)
-Lemma Qopp_uc_prf : is_UniformlyContinuousFunction Qopp Qpos2QposInf.
+Lemma Qopp_uc_prf : @is_UniformlyContinuousFunction
+                      Q_as_MetricSpace Q_as_MetricSpace Qopp Qpos2QposInf.
 Proof.
  intros e a b H.
  simpl in *.
  unfold Qball in *.
- stepr (b - a).
-  apply AbsSmall_minus.
-  assumption.
- simpl. ring.
+ apply QAbsSmall_opp in H.
+ unfold QAbsSmall.
+ setoid_replace (-a - - b) with (-(a-b)).
+ apply H. ring.
 Qed.
 
 Definition Qopp_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
@@ -391,7 +360,8 @@ Qed.
 [QboundBelow] ensures that a real number is at least some fixed
 rational number.  It is the lifting of the first parameter of [Qmax].
 *)
-Lemma QboundBelow_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
+Lemma QboundBelow_uc_prf (a:Q)
+  : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
@@ -402,7 +372,7 @@ Proof.
   unfold AbsSmall in *.
   split.
    apply Qle_trans with (b0-b1).
-    tauto.
+   apply H.
    apply (minus_resp_leEq _ b0).
    assumption.
   apply Qle_trans with 0.
@@ -543,12 +513,15 @@ Qed.
 [QboundAbove] ensures that a real number is at most some fixed
 rational number.  It is the lifting of the first parameter of [Qmin].
 *)
-Lemma QboundAbove_uc_prf (a:Q) : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
+Lemma QboundAbove_uc_prf (a:Q)
+  : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
  unfold Qball.
- stepr ((Qmax (- a) (-b1)) - (Qmax (-a) (-b0))).
+ unfold QAbsSmall.
+ setoid_replace (Qmin a b0 - Qmin a b1)
+   with ((Qmax (- a) (-b1)) - (Qmax (-a) (-b0))).
   apply QboundBelow_uc_prf.
   apply Qopp_uc_prf.
   apply ball_sym.

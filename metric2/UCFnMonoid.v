@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import Coq.Unicode.Utf8 MathClasses.theory.CoqStreams CoRN.metric2.UniformContinuity MathClasses.interfaces.abstract_algebra.
 
 

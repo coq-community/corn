@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Coq.QArith.QArith
   MathClasses.theory.setoids (* Equiv Prop *) MathClasses.theory.products

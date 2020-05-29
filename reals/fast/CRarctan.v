@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.Q_in_CReals.
@@ -267,7 +268,8 @@ Proof.
 Qed.
 
 (** Lift arctangent on the rationals to the reals. *)
-Lemma arctan_uc_prf : is_UniformlyContinuousFunction rational_arctan Qpos2QposInf.
+Lemma arctan_uc_prf : @is_UniformlyContinuousFunction
+                        Q_as_MetricSpace CR rational_arctan Qpos2QposInf.
 Proof.
  apply (is_UniformlyContinuousFunction_wd) with rational_arctan (Qscale_modulus (1#1)).
    reflexivity.

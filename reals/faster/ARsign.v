@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import Coq.ZArith.ZArith CoRN.reals.faster.ARArith.
 
 Ltac AR_solve_pos_loop k :=

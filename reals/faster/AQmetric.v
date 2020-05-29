@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import 
   Coq.Program.Program Coq.setoid_ring.Ring CoRN.util.Qdlog
   CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.model.metric2.CRmetric CoRN.metric2.MetricMorphisms.
