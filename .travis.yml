@@ -55,9 +55,6 @@ jobs:
   - env:
     - COQ=8.7
     <<: *NIX
-  - env:
-    - COQ=8.6
-    <<: *NIX
 
   # Test supported versions of Coq via OPAM
   - env:
