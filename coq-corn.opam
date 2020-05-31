@@ -5,7 +5,7 @@ version: "dev"
 homepage: "https://github.com/coq-community/corn"
 dev-repo: "git+https://github.com/coq-community/corn.git"
 bug-reports: "https://github.com/coq-community/corn/issues"
-license: "GPL-2.0"
+license: "LGPL-2.1-or-later"
 
 synopsis: "The Coq Constructive Repository at Nijmegen."
 description: """

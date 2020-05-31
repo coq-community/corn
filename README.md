@@ -82,7 +82,7 @@ CoRN includes the following parts:
 - Coq-community maintainer(s):
   - Bas Spitters ([**@spitters**](https://github.com/spitters))
   - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
-- License: [GNU General Public License v2](LICENSE)
+- License: [GNU Lesser General Public License v2.1](LICENSE)
 - Compatible Coq versions: Coq 8.7 or greater
 - Additional dependencies:
   - [Math-Classes](https://github.com/coq-community/math-classes) 8.8.1 or
