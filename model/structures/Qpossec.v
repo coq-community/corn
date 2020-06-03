@@ -129,7 +129,8 @@ Lemma positive_Z (z: Z): Z.lt 0 z -> sig (fun p: positive => Zpos p = z).
  auto with *.
 Defined.
 
-Require Coq.Logic.Eqdep_dec. (* todo: move this Qlt_uniq stuff elsewhere *)
+(* todo: move this Qlt_uniq stuff elsewhere *)
+Require Coq.Logic.Eqdep_dec.
 
 Definition comparison_eq_dec (a b: comparison): { a = b } + { a <> b}.
  destruct a, b; try (left; reflexivity); try (right; discriminate).

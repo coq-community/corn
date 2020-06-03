@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import 
   Coq.Program.Program Coq.setoid_ring.Ring CoRN.logic.CLogic
   Coq.QArith.Qabs CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics

@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
 Require Import 

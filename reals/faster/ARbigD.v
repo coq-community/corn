@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ CoRN.model.structures.Qpossec
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.util.Qdlog CoRN.reals.faster.ARArith

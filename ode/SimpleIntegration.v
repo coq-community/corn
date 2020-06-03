@@ -6,6 +6,7 @@
  This implementation works for any uniformly continuous function, which
  makes it relatively generic, but it also means that it is fairly inefficient. *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import
   CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano Coq.Unicode.Utf8
   Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.util.Qsums

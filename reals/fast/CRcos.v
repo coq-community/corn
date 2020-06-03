@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRsin.
 Require Import CoRN.reals.fast.CRpi.
@@ -90,7 +91,10 @@ Proof.
  apply Derivative_id.
 Qed.
 
-Lemma cos_poly_prf : is_UniformlyContinuousFunction (fun x => cos_poly_fun (QboundAbs (1#1) x)) cos_poly_modulus.
+Lemma cos_poly_prf
+  : @is_UniformlyContinuousFunction
+      Q_as_MetricSpace Q_as_MetricSpace
+      (fun x => cos_poly_fun (QboundAbs (1#1) x)) cos_poly_modulus.
 Proof.
  apply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun a (4#1)).
   simpl; intros q _ _.
@@ -129,7 +133,7 @@ Proof.
   intros q Hq Hq0.
   transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; apply cos_poly_fun_correct].
   simpl.
-  change (' q)%CR with (Cunit_fun _ q).
+  change (' q)%CR with (Cunit_fun Q_as_MetricSpace q).
   rewrite -> Cmap_fun_correct.
   rewrite -> MonadLaw3.
   rewrite -> IR_inj_Q_as_CR.
@@ -203,7 +207,8 @@ Proof.
  now apply rational_cos_correct_aux.
 Qed.
 
-Definition cos_uc_prf : is_UniformlyContinuousFunction rational_cos Qpos2QposInf.
+Definition cos_uc_prf : @is_UniformlyContinuousFunction
+                          Q_as_MetricSpace CR rational_cos Qpos2QposInf.
 Proof.
  apply (is_UniformlyContinuousFunction_wd) with (fun x => rational_cos x) (Qscale_modulus (1#1)).
    reflexivity.

@@ -21,6 +21,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.StepFunctionSetoid.
 Require Import CoRN.metric2.StepFunctionMonad.
 Require Import CoRN.metric2.UniformContinuity.

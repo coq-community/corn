@@ -18,6 +18,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -620,7 +621,10 @@ Proof.
   apply ball_sym.
   simpl.
   unfold Qball.
-  stepr 0.
+  unfold QAbsSmall.
+  setoid_replace ( InfiniteSum_raw_N (InfiniteGeometricSum_maxIter series e)
+                                     (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) (err_prop e) series - 0)
+    with 0.
    apply zero_AbsSmall.
    apply Qpos_nonneg.
   simpl.
@@ -718,7 +722,7 @@ Proof.
  stepr (inj_Q IR a[*](inj_Q IR (Qabs (Str_nth n series)))); [| now
    apply mult_wdr; apply eq_symmetric; apply AbsIR_Qabs].
  stepl (inj_Q IR (Qabs (Str_nth (S n) series))); [| now apply eq_symmetric; apply AbsIR_Qabs].
- stepr (inj_Q IR (a[*]Qabs (Str_nth n series))); [| now apply inj_Q_mult].
+ rewrite <- inj_Q_mult.
  apply inj_Q_leEq.
  replace (S n) with (1+n)%nat by auto with *.
  rewrite <- Str_nth_plus.
@@ -749,7 +753,7 @@ Proof.
    ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteGeometricSum Gs)))).
  apply AbsSmall_eps_div_two;[apply Hn; assumption|].
  clear m Hm.
- stepr (('(Sum0 n (fun n => (Str_nth n seq))%Q))%CR[-]InfiniteGeometricSum Gs).
+ stepr (('(@Sum0 Q_as_CAbGroup n (fun n => (Str_nth n seq))%Q))%CR[-]InfiniteGeometricSum Gs).
   revert seq x H Hx Gs Hn.
   induction n.
    intros seq x H Hx Gs Hn.
@@ -870,7 +874,7 @@ Proof.
    simpl.
    ring.
   symmetry.
-  apply: Sum0_shift.
+  apply (@Sum0_shift Q_as_CAbGroup).
   intros i.
   reflexivity.
  apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].

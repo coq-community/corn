@@ -18,6 +18,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.fast.CRArith.
 Require Import Coq.QArith.Qpower.
@@ -78,7 +79,9 @@ Qed.
 Let IRpower_p : PartFunct IR := FId{^}(nat_of_N n).
 
 Lemma Qpower_N_uc_prf (c:Qpos) : 
-  is_UniformlyContinuousFunction (fun x => Qpower (QboundAbs c x) (Z_of_N n)) (Qpower_N_modulus c).
+  @is_UniformlyContinuousFunction
+    Q_as_MetricSpace Q_as_MetricSpace
+    (fun x => Qpower (QboundAbs c x) (Z_of_N n)) (Qpower_N_modulus c).
 Proof.
  unfold Qpower_N_modulus.
  destruct n as [|p].
@@ -90,8 +93,9 @@ Proof.
   ring_simplify.
   change (0 < ((2#1)*c)%Qpos).
   apply Qpos_prf.
- apply (fun x => @is_UniformlyContinuousFunction_wd _ _ (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Z.pred p))%Qpos)).
-   reflexivity.
+  apply (fun x => @is_UniformlyContinuousFunction_wd
+                 Q_as_MetricSpace Q_as_MetricSpace (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Z.pred p))%Qpos)).
+  reflexivity.
   intros x.
   generalize ((p # 1) * c ^ Z.pred p)%Qpos.
   apply Qpos_positive_numerator_rect.
@@ -184,7 +188,7 @@ Proof.
  transitivity (IRasCR (inj_Q IR (Qpower q (Z_of_N n)))).
   rewrite -> IR_inj_Q_as_CR.
   simpl.
-  change (' q)%CR with (Cunit_fun _ q).
+  change (' q)%CR with (Cunit_fun Q_as_MetricSpace q).
   rewrite -> Cmap_fun_correct.
   rewrite -> MonadLaw3.
   rewrite -> CReq_Qeq.

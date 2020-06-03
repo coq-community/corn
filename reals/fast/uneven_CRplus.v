@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Coq.QArith.QArith CoRN.model.structures.Qpossec CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith.
 

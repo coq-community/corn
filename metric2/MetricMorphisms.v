@@ -1,3 +1,5 @@
+Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
 Require 
   MathClasses.theory.jections.
 Require Import 

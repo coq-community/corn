@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import
   Unicode.Utf8 Setoid List Permutation Setoid Morphisms SetoidPermutation
   stdlib_omissions.Pair.

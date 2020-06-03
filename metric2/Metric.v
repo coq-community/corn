@@ -22,8 +22,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Export CoRN.algebra.RSetoid.
 Require Import Coq.Relations.Relation_Definitions.
 Require Export CoRN.model.structures.Qpossec.
-Require Import CoRN.algebra.COrdFields2.
-Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.stdlib_omissions.List.
 Require Import CoRN.tactics.CornTac.
@@ -161,12 +159,11 @@ Section gball.
   Context {m: MetricSpace}.
 
   Definition gball (q: Q) (x y: m): Prop :=
-    match Qdec_sign q with
-    | inl (inl _) => False (* q < 0, silly *)
-    | inl (inr p) => ball (exist (Qlt 0) q p) x y (* 0 < q, normal *)
-    | inr _ => x[=]y (* q == 0 *)
+    match Q_dec q 0 with
+    | inleft (left _) => False (* q < 0, silly *)
+    | inleft (right p) => ball (exist (Qlt 0) q p) x y (* 0 < q, normal *)
+    | inright _ => st_eq x y (* q == 0 *)
     end.
-      (* Program can make this definition slightly cleaner, but the resulting term is much nastier... *)
 
   Definition gball_ex (e: QnnInf): relation m :=
     match e with
@@ -179,9 +176,9 @@ Section gball.
    unfold gball.
    revert q x y.
    intros [q p] ??. simpl.
-   destruct Qdec_sign as [[A | A] | A].
+   destruct Q_dec as [[A | A] | A].
      exfalso.
-     apply (Qlt_is_antisymmetric_unfolded q 0)...
+     apply Qlt_not_le in A; apply Qlt_le_weak in p; contradiction.
     apply ball_wd; reflexivity.
    exfalso.
    apply (Qlt_irrefl 0).
@@ -192,8 +189,8 @@ Section gball.
   Proof with auto.
    intros x y E a b F v w G.
    unfold gball.
-   destruct Qdec_sign as [[A | B] | C];
-    destruct Qdec_sign as [[P | Q] | R].
+   destruct Q_dec as [[A | B] | C];
+    destruct Q_dec as [[P | Q] | R].
            reflexivity.
           exfalso. apply (Qlt_irrefl 0). apply Qlt_trans with x... rewrite E...
          exfalso. apply (Qlt_irrefl 0). rewrite <- R at 1. rewrite <- E...
@@ -216,7 +213,7 @@ Section gball.
   Proof with auto.
    repeat intro.
    unfold gball.
-   destruct Qdec_sign as [[?|?]|?].
+   destruct Q_dec as [[?|?]|?].
      apply (Qlt_not_le e 0)...
     apply ball_refl.
    reflexivity.
@@ -231,7 +228,7 @@ Section gball.
   Global Instance gball_sym (e: Q): Symmetric (gball e).
   Proof with auto.
    unfold gball. repeat intro.
-   destruct Qdec_sign as [[?|?]|?]...
+   destruct Q_dec as [[?|?]|?]...
     apply ball_sym...
    symmetry...
   Qed.
@@ -244,11 +241,11 @@ Section gball.
   Proof with auto with *.
    unfold gball.
    intros.
-   destruct (Qdec_sign e1) as [[A|B]|C].
+   destruct (Q_dec e1) as [[A|B]|C].
      exfalso...
-    destruct (Qdec_sign e2) as [[?|?]|?].
+    destruct (Q_dec e2) as [[?|?]|?].
       intuition.
-     destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
+     destruct (Q_dec (e1 + e2)) as [[?|?]|?].
        assert (0 < e1 + e2).
         apply Qplus_lt_le_0_compat...
        revert H1. apply Qle_not_lt...
@@ -260,21 +257,21 @@ Section gball.
       apply Qplus_lt_le_0_compat...
      revert H1. rewrite q0.
      apply Qlt_irrefl.
-    destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
+    destruct (Q_dec (e1 + e2)) as [[?|?]|?].
       revert q0. rewrite q. rewrite Qplus_0_r. apply Qle_not_lt...
      apply ball_gball. simpl. rewrite q, Qplus_0_r. rewrite <- H0. apply ball_gball in H. assumption.
     exfalso.
     revert q0. rewrite q. rewrite Qplus_0_r. intro. clear H. revert B. rewrite H1. apply Qlt_irrefl.
-   destruct (Qdec_sign e2) as [[?|?]|?].
+   destruct (Q_dec e2) as [[?|?]|?].
      intuition.
     apply ball_gball in H0.
     simpl in H0.
-    destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
+    destruct (Q_dec (e1 + e2)) as [[?|?]|?].
       revert q0. rewrite C. rewrite Qplus_0_l. apply Qle_not_lt...
      apply ball_gball. simpl.
      rewrite C, Qplus_0_l, H...
     exfalso. revert q0. rewrite C, Qplus_0_l. intro. clear H0. revert q. rewrite H1. apply Qlt_irrefl.
-   destruct (Qdec_sign (e1 + e2)) as [[?|?]|?].
+   destruct (Q_dec (e1 + e2)) as [[?|?]|?].
      revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
     exfalso. revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
    transitivity b...
@@ -284,7 +281,7 @@ Section gball.
     gball_ex e1 a b -> gball_ex e2 b c -> gball_ex (e1 + e2)%QnnInf a c.
   Proof. destruct e1, e2; auto. simpl. apply gball_triangle. Qed.
 
-  Lemma gball_0 (x y: m): gball 0 x y <-> x [=] y.
+  Lemma gball_0 (x y: m): gball 0 x y <-> st_eq x y.
   Proof. reflexivity. Qed.
 
   Lemma gball_weak_le (q q': Q): q <= q' -> forall x y, gball q x y -> gball q' x y.
@@ -292,7 +289,7 @@ Section gball.
    revert q q'.
    intros ?? E ?? F.
    unfold gball in F.
-   destruct Qdec_sign as [[A | B] | C].
+   destruct Q_dec as [[A | B] | C].
      intuition.
     assert (0 < q') as q'p. apply Qlt_le_trans with q...
     apply (ball_gball (exist _ q' q'p)).
@@ -304,7 +301,7 @@ Section gball.
 
   Lemma gball_pos {e : Q} (e_pos : 0 < e) (x y : m) : ball (exist _ e e_pos) x y <-> gball e x y.
   Proof.
-  unfold gball. destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos'] | e_zero].
+  unfold gball. destruct (Q_dec e) as [[e_neg | e_pos'] | e_zero].
   + elim (Qlt_irrefl _ (Qlt_trans _ _ _ e_pos e_neg)).
   + setoid_replace (exist _ e e_pos) with (exist _ e e_pos'); easy.
   + exfalso; rewrite e_zero in e_pos; apply (Qlt_irrefl _ e_pos).
@@ -312,7 +309,7 @@ Section gball.
 
   Lemma gball_neg (e : Q) (x y : m) : e < 0 -> ~ gball e x y.
   Proof.
-  intro e_neg. unfold gball. destruct (Qsec.Qdec_sign e) as [[E | E] | E]; [easy | |].
+  intro e_neg. unfold gball. destruct (Q_dec e) as [[E | E] | E]; [easy | |].
   + intros _; apply (Qlt_irrefl _ (Qlt_trans _ _ _ e_neg E)).
   + rewrite E in e_neg. intros _; apply (Qlt_irrefl _ e_neg).
   Qed.
@@ -321,7 +318,7 @@ Section gball.
      (forall d : Q, 0 < d -> gball (e + d) x y) -> gball e x y.
   Proof.
   intro C. (*change (gball e x y).*) unfold gball.
-  destruct (Qsec.Qdec_sign e) as [[e_neg | e_pos] | e_zero].
+  destruct (Q_dec e) as [[e_neg | e_pos] | e_zero].
   + assert (e / 2 < 0) by now apply Qmult_neg_pos.
     apply (@gball_neg (e/2) x y); [easy |].
     setoid_replace (e / 2) with (e - e / 2) by (field; discriminate).
@@ -331,7 +328,7 @@ Section gball.
     setoid_replace d with (e + d); [now apply C | rewrite e_zero; symmetry; apply Qplus_0_l].
   Qed.
 
-  Lemma gball_closed_eq (x y : m) : (forall d : Q, 0 < d -> gball d x y) -> x [=] y.
+  Lemma gball_closed_eq (x y : m) : (forall d : Q, 0 < d -> gball d x y) -> st_eq x y.
   Proof.
   intro C. change (gball 0 x y). apply gball_closed. intro d.
   setoid_replace (0 + d)%Q with d by apply Qplus_0_l. apply C.

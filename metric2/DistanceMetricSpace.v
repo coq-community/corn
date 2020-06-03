@@ -1,4 +1,5 @@
 
+Require Import CoRN.algebra.RSetoid.
 Require CoRN.model.structures.NNUpperR.
 Import NNUpperR.notations.
 Import QnonNeg.notations QnonNeg.coercions NNUpperR.coercions.

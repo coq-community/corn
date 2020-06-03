@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.reals.Cauchy_IR.
 Require Import CoRN.tactics.CornTac.
 Require Import Coq.omega.Omega.
@@ -126,7 +127,7 @@ Proof.
 Defined.
 
 Lemma Cauchy_IRasCR_is_Regular : forall (x:Cauchy_IR),
-is_RegularFunction (Cauchy_IRasCR_raw x).
+    @is_RegularFunction Q_as_MetricSpace (Cauchy_IRasCR_raw x).
 Proof.
  intros [f Hf] e1 e2.
  simpl.
@@ -153,7 +154,8 @@ Qed.
 Definition Cauchy_IRasCR (x:Cauchy_IR) : CR :=
 Build_RegularFunction (Cauchy_IRasCR_is_Regular x).
 
-Lemma Cauchy_IRasCR_wd : forall (x y:Cauchy_IR), x[=]y -> (Cauchy_IRasCR x==Cauchy_IRasCR y)%CR.
+Lemma Cauchy_IRasCR_wd
+  : forall (x y:Cauchy_IR), x[=]y -> (Cauchy_IRasCR x==Cauchy_IRasCR y)%CR.
 Proof.
  intros [x Hx] [y Hy] Hxy.
  eapply regFunEq_e.
@@ -167,7 +169,10 @@ Proof.
  simpl in Hc.
  unfold Qball.
  set (n:=max (max a b) c).
- stepr ((x a - x n) + (y n - y b) + (x n - y n))%Q; [| simpl; ring].
+ unfold QAbsSmall.
+ setoid_replace (x a - y b)%Q
+   with ((x a - x n) + (y n - y b) + (x n - y n))%Q.
+ 2: ring.
  autorewrite with QposElim.
  repeat (eapply AbsSmall_plus).
    apply AbsSmall_minus.
@@ -401,17 +406,21 @@ Proof.
  destruct (Hy (((1 # 2) * e)%Qpos:Q)) as [n2 Hn2].
  destruct (CS_seq_plus) as [n3 Hn3].
  set (n:= max n3 (max n1 n2)).
- change (ball (e+e) (x n1 + y n2) (x n3 + y n3))%Q.
+ change (@ball Q_as_MetricSpace (e+e) (x n1 + y n2) (x n3 + y n3))%Q.
  apply ball_triangle with (x n + y n)%Q.
   setoid_replace e with (((1 # 2) * e +(1 # 2) * e)%Qpos ) by QposRing.
   apply ball_triangle with (x n1 + y n)%Q; simpl; unfold Qball.
-   stepr (y n2 - y n)%Q; [| simpl; ring].
+  unfold QAbsSmall.
+  setoid_replace (x n1 + y n2 - (x n1 + y n))%Q with (y n2 - y n)%Q.
+  2: ring.
    apply AbsSmall_minus.
    apply Hn2.
    unfold n.
    rewrite max_assoc.
    auto with *.
-  stepr (x n1 - x n)%Q; [| simpl; ring].
+   unfold QAbsSmall.
+   setoid_replace (x n1 + y n - (x n + y n))%Q with (x n1 - x n)%Q.
+   2: ring.
   apply AbsSmall_minus.
   apply Hn1.
   unfold n.
@@ -441,9 +450,12 @@ Proof.
  destruct (Hx (e:Q) (Qpos_prf e)) as [n1 Hn1].
  destruct (CS_seq_inv Q_as_COrdField x Hx (e:Q) (Qpos_prf e)) as [n2 Hn2].
  set (n:=(max n1 n2)).
- change (ball (e+e) (- x n1) (- x n2))%Q.
- apply ball_triangle with (- x n)%Q; simpl; unfold Qball;
-   [stepr (x n - x n1)%Q; [| simpl; ring];apply Hn1| apply Hn2]; unfold n; auto with*.
+ change (@ball Q_as_MetricSpace (e+e) (- x n1) (- x n2))%Q.
+ apply (@ball_triangle Q_as_MetricSpace _ _ _ (- x n)%Q). simpl; unfold Qball.
+ unfold QAbsSmall.
+ setoid_replace (- x n1 - - x n)%Q with (x n - x n1)%Q.
+ 2: ring. apply (Hn1 n). apply Nat.le_max_l.
+ apply Hn2. apply Nat.le_max_r.
 Qed.
 
 Hint Rewrite Cauchy_IR_opp_as_CR_opp : CRtoCauchy_IR.
@@ -552,13 +564,15 @@ Proof.
     (Cauchy_IRasCR_raw (Build_CauchySeq Q_as_COrdField y Hy)(QposInf_bind (fun e0 : Qpos => e0) QposInfinity))))%Q (0 * y n)%Q).
    ring.
   rewrite -> H. clear H.
-  change (ball (e+e) (0 * y n) (x n3 * y n3))%Q.
+  change (@ball Q_as_MetricSpace (e+e) (0 * y n) (x n3 * y n3))%Q.
   apply ball_triangle with (x n*y n)%Q;[|eapply Hn3; unfold n; auto with *].
   apply ball_sym.
   simpl.
   rewrite <- Hxn1.
   unfold Qball.
-  stepr ((x n - x n1)*y n)%Q; [| simpl; ring].
+  unfold QAbsSmall.
+  setoid_replace (x n * y n - x n1 * y n)%Q with ((x n - x n1)*y n)%Q.
+  2: ring.
   apply AbsSmall_trans with ((1#2)*e)%Q.
    apply half_3.
    apply Qpos_prf.
@@ -577,7 +591,9 @@ Proof.
  clear Hn3.
  setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
  apply ball_triangle with (x n1 * y n)%Q; apply ball_sym; simpl; unfold Qball.
-  stepr (x n1*(y n - Qmax (- z) (Qmin z (y n2))))%Q; [| simpl;ring].
+ unfold QAbsSmall.
+ setoid_replace (x n1 * y n - x n1 * Qmax (- z) (Qmin z (y n2)))%Q
+   with (x n1*(y n - Qmax (- z) (Qmin z (y n2))))%Q. 2: ring.
   autorewrite with QposElim.
   stepl (((1#2)*e/w)*w)%Q; [| simpl;field;apply Qpos_nonzero].
   apply mult_AbsSmall;[apply Hw|].
@@ -610,7 +626,8 @@ Proof.
   rewrite -> Qle_minus_iff.
   stepr ((w + (-1 # 1) * y n + y n2)+(- z + - y n2))%Q; [| simpl; ring].
   eapply plus_resp_nonneg; assumption.
- stepr ((x n - x n1)*y n)%Q; [| simpl; ring].
+  unfold QAbsSmall.
+  setoid_replace (x n * y n - x n1 * y n)%Q with ((x n - x n1)*y n)%Q. 2: ring.
  autorewrite with QposElim.
  stepl (((1#2)*e/z)*z)%Q; [| simpl; field; apply Qpos_nonzero].
  apply mult_AbsSmall;[apply Hn1;assumption|apply Hz;assumption].
@@ -786,7 +803,7 @@ Proof.
  set (m:=max (max a n) (max b c)).
  assert (Hm1: c<=m).
   unfold m; apply le_trans with (max b c); auto with *.
- change (ball (e+e) (/ Qmax z (x b))%Q (y c)).
+ change (@ball Q_as_MetricSpace (e+e) (/ Qmax z (x b))%Q (y c)).
  apply ball_triangle with (y m);[|eapply Hc;assumption].
  clear Hc.
  unfold y.

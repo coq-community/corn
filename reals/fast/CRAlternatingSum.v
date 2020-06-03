@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.iso_CReals.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import Coq.setoid_ring.ArithRing.
@@ -119,7 +120,8 @@ Proof.
 Qed.
 
 (** If a sequence has a limit of [l], then there is a point that gets arbitrarily close to [l]. *)
-Lemma Limit_near (s : Stream Q) (l:Q) {zl : Limit s l} ε : LazyExists (λ s, Qball_ex_bool ε (hd s) l) s.
+Lemma Limit_near (s : Stream Q) (l:Q) {zl : @Limit Q_as_MetricSpace s l} ε
+  : LazyExists (λ s, Qball_ex_bool ε (hd s) l) s.
 Proof.
  assert (zl':=zl ε).
  induction zl' as [s nb | ? ? IH].
@@ -136,9 +138,10 @@ Proof.
 Defined.
 
 (** The infinte sum of an alternating series is the limit of the partial sums. *)
-Definition InfiniteAlternatingSum_raw (s : Stream Q) `{zl : !Limit s 0} (ε : QposInf) := PartialAlternatingSumUntil (Limit_near s 0 ε).
+Definition InfiniteAlternatingSum_raw (s : Stream Q) `{zl : !@Limit Q_as_MetricSpace s 0} (ε : QposInf)
+  := PartialAlternatingSumUntil (Limit_near s 0 ε).
 
-Lemma InfiniteAlternatingSum_raw_wd (s1 s2 : Stream Q) {zl1 : Limit s1 0} {zl2 : Limit s2 0} (ε : QposInf) : 
+Lemma InfiniteAlternatingSum_raw_wd (s1 s2 : Stream Q) {zl1 : @Limit Q_as_MetricSpace s1 0} {zl2 : @Limit Q_as_MetricSpace s2 0} (ε : QposInf) : 
   s1 = s2 → InfiniteAlternatingSum_raw s1 ε = InfiniteAlternatingSum_raw s2 ε.
 Proof. 
   assert (Proper ((=) ==> eq) (λ s, Qball_ex_bool ε (hd s) 0)).
@@ -149,9 +152,9 @@ Proof.
   easy.
 Qed.
 
-Definition InfiniteAlternatingSum_length (s : Stream Q) `{zl : !Limit s 0} (e:QposInf) := takeUntil_length _ (Limit_near s 0 e).
+Definition InfiniteAlternatingSum_length (s : Stream Q) `{zl : !@Limit Q_as_MetricSpace s 0} (e:QposInf) := takeUntil_length _ (Limit_near s 0 e).
 
-Lemma InfiniteAlternatingSum_length_weak (s : Stream Q) {dnn:DecreasingNonNegative s} {zl : Limit s 0} (ε1 ε2 : Qpos) :
+Lemma InfiniteAlternatingSum_length_weak (s : Stream Q) {dnn:DecreasingNonNegative s} {zl : @Limit Q_as_MetricSpace s 0} (ε1 ε2 : Qpos) :
   (ε1:Q) ≤ (ε2:Q) → InfiniteAlternatingSum_length s ε2 ≤ InfiniteAlternatingSum_length s ε1.
 Proof.
   intros E.
@@ -165,7 +168,7 @@ Proof.
 Qed.
 
 Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNegative s} (k l : nat) (ε : Qpos) :
-  k ≤ l → Str_nth k s ≤ ε → ball ε (take s l Qminus' 0) (take s k Qminus' 0).
+  k ≤ l → Str_nth k s ≤ ε → @ball Q_as_MetricSpace ε (take s l Qminus' 0) (take s k Qminus' 0).
 Proof.
   intros E.
   apply naturals.nat_le_plus in E.
@@ -189,8 +192,10 @@ Proof.
   now apply (IHk _ _ _).
 Qed.
 
-Lemma InfiniteAlternatingSum_further (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} (l : nat) (ε : Qpos) :
-  InfiniteAlternatingSum_length s ε ≤ l → ball ε (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε).
+Lemma InfiniteAlternatingSum_further (s : Stream Q) {dnn : DecreasingNonNegative s}
+      {zl : @Limit Q_as_MetricSpace s 0} (l : nat) (ε : Qpos) :
+  InfiniteAlternatingSum_length s ε ≤ l
+  → @ball Q_as_MetricSpace ε (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε).
 Proof.
   intros E.
   unfold InfiniteAlternatingSum_raw, PartialAlternatingSumUntil.
@@ -203,8 +208,10 @@ Proof.
   now apply (takeUntil_length_correct (λ s, Qball_ex_bool ε (hd s) 0)).
 Qed.
 
-Lemma InfiniteAlternatingSum_further_alt (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} (l : nat) (ε1 ε2 : Qpos) :
-  InfiniteAlternatingSum_length s ε1 ≤ l → ball (ε1 + ε2) (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε2).
+Lemma InfiniteAlternatingSum_further_alt (s : Stream Q) {dnn : DecreasingNonNegative s}
+      {zl : @Limit Q_as_MetricSpace s 0} (l : nat) (ε1 ε2 : Qpos) :
+  InfiniteAlternatingSum_length s ε1 ≤ l
+  → @ball Q_as_MetricSpace (ε1 + ε2) (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε2).
 Proof.
   intros E1.
   unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
@@ -229,10 +236,12 @@ Proof.
   apply (takeUntil_length_correct (λ s, Qball_ex_bool ε2 (hd s) 0)).
 Qed.
 
-Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s} {zl : Limit s 0} :
-  is_RegularFunction (InfiniteAlternatingSum_raw s).
+Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s}
+      {zl : @Limit Q_as_MetricSpace s 0} :
+  @is_RegularFunction Q_as_MetricSpace (InfiniteAlternatingSum_raw s).
 Proof.
-  assert (∀ (ε1 ε2 : Qpos), (ε1:Q) ≤ (ε2:Q) → ball (ε1 + ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
+  assert (∀ (ε1 ε2 : Qpos),
+             (ε1:Q) ≤ (ε2:Q) → @ball Q_as_MetricSpace (ε1 + ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
    intros ε1 ε2 E.
    unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
    rewrite takeUntil_correct.
@@ -247,10 +256,11 @@ Proof.
   apply ball_sym. now auto.
 Qed.
 
-Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : CR :=
+Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq}
+           {zl: @Limit Q_as_MetricSpace seq 0} : CR :=
   Build_RegularFunction (InfiniteAlternatingSum_prf seq).
 
-Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!Limit s1 0} `{!Limit s2 0} : 
+Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!@Limit Q_as_MetricSpace s1 0} `{!@Limit Q_as_MetricSpace s2 0} : 
   s1 = s2 → InfiniteAlternatingSum s1 = InfiniteAlternatingSum s2.
 Proof.
   intros E. apply: regFunEq_e. intros ε.
@@ -260,7 +270,8 @@ Qed.
 
 Local Open Scope Q_scope.
 
-Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} : 
+Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq}
+      {zl: @Limit Q_as_MetricSpace seq 0} : 
  (InfiniteAlternatingSum seq == '(hd seq) - InfiniteAlternatingSum (tl seq))%CR.
 Proof.
  destruct seq as [hd seq], dnn as [dnn_hd dnn].
@@ -318,7 +329,8 @@ Proof.
 Qed.
 
 (** The infinite alternating series is always nonnegative. *)
-Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative seq}
+      {zl:@Limit Q_as_MetricSpace seq 0} :
  (0 <= InfiniteAlternatingSum seq)%CR.
 Proof.
  intros e.
@@ -338,7 +350,8 @@ Qed.
 
 (** The infinite alternating series is always bounded by the first term
 in the series. *)
-Lemma InfiniteAlternatingSum_bound (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+Lemma InfiniteAlternatingSum_bound (seq : Stream Q) {dnn:DecreasingNonNegative seq}
+      {zl:@Limit Q_as_MetricSpace seq 0} :
  (InfiniteAlternatingSum seq <= inject_Q_CR (hd seq))%CR.
 Proof.
  rewrite -> InfiniteAlternatingSum_step.
@@ -351,7 +364,8 @@ Proof.
 Qed.
 
 (** [InfiniteAlternatingSum] is correct. *)
-Lemma dnn_zl_convergent (seq : Stream Q) {dnn:DecreasingNonNegative seq} {zl:Limit seq 0} :
+Lemma dnn_zl_convergent (seq : Stream Q) {dnn:DecreasingNonNegative seq}
+      {zl: @Limit Q_as_MetricSpace seq 0} :
  convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq))%Q.
 Proof.
  cut (convergent (fun n : nat => [--][1][^]n[*]inj_Q IR (Str_nth n seq))).
@@ -432,7 +446,7 @@ Qed.
 
 Lemma InfiniteAlternatingSum_correct (seq:Stream Q) (x:nat -> IR)
  (Hx : forall n:nat, inj_Q IR (((-(1))^n)*Str_nth n seq)%Q[=]x n)
- {dnn : DecreasingNonNegative seq} {zl : Limit seq 0} H :
+ {dnn : DecreasingNonNegative seq} {zl : @Limit Q_as_MetricSpace seq 0} H :
  (InfiniteAlternatingSum seq ==IRasCR (series_sum x H))%CR.
 Proof.
  unfold series_sum.
@@ -526,7 +540,7 @@ Proof.
 Qed.
 
 Lemma InfiniteAlternatingSum_correct' (seq:Stream Q)
- {dnn:DecreasingNonNegative seq} {zl : Limit seq 0} :
+ {dnn:DecreasingNonNegative seq} {zl : @Limit Q_as_MetricSpace seq 0} :
  (InfiniteAlternatingSum seq == IRasCR (series_sum _ (dnn_zl_convergent seq)))%CR.
 Proof.
  apply InfiniteAlternatingSum_correct.

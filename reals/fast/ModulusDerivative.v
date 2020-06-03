@@ -18,6 +18,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.reals.Q_in_CReals.
 Require Export CoRN.reals.fast.CRIR.
 Require Export CoRN.ftc.Rolle.
@@ -69,7 +70,8 @@ match l,r with
  | Some l', Some r' => (uc_compose (QboundBelow_uc l') (QboundAbove_uc r') q)
 end.
 
-Lemma ball_clamp : forall e a b, ball e a b -> ball e (clamp a) (clamp b).
+Lemma ball_clamp : forall e (a b : Q),
+    @ball Q_as_MetricSpace e a b -> ball e (clamp a) (clamp b).
 Proof.
  destruct l; destruct r; unfold clamp; intros e a b Hab; try apply uc_prf; apply Hab.
 Qed.
@@ -85,7 +87,9 @@ Hypothesis Hg : forall (q:Q) Hq, I (inj_Q _ q) -> (g q == IRasCR (f (inj_Q _ q) 
 Variable c : Q.
 Hypothesis Hc : forall x Hx, I x -> (AbsIR (f' x Hx)[<=](inj_Q _ (c:Q))).
 
-Lemma is_UniformlyContinuousD : is_UniformlyContinuousFunction (fun x => g (clamp x)) (Qscale_modulus c).
+Lemma is_UniformlyContinuousD
+  : @is_UniformlyContinuousFunction
+      Q_as_MetricSpace CR (fun x => g (clamp x)) (Qscale_modulus c).
 Proof.
  intros e a b Hab.
  assert (X:forall x, I (inj_Q _ (clamp x))).
@@ -152,7 +156,9 @@ Lemma is_UniformlyContinuousD_Q
         I (inj_Q IR q) -> (inj_Q IR (g q) [=] (f (inj_Q IR q) Hq))) ->
        forall c : Q,
        (forall (x : Q) (Hx : Dom f' (inj_Q IR x)), I (inj_Q IR x) -> AbsIR (f' (inj_Q IR x) Hx)[<=]inj_Q IR (c:Q)) ->
-       is_UniformlyContinuousFunction (fun x : Q_as_MetricSpace => g (clamp x)) (Qscale_modulus c).
+       @is_UniformlyContinuousFunction
+         Q_as_MetricSpace Q_as_MetricSpace
+         (fun x : Q_as_MetricSpace => g (clamp x)) (Qscale_modulus c).
 Proof.
  intros g Hg c Hc.
  intros e a b Hab.

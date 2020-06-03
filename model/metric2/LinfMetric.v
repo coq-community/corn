@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.model.structures.StepQsec.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.model.metric2.L1metric.
@@ -131,7 +132,9 @@ Definition LinfStepQ : MetricSpace := StepFSup Q_as_MetricSpace.
 Definition LinfStepQPrelengthSpace := StepFSupPrelengthSpace QPrelengthSpace.
 
 (** Sup is uniformly continuous. *)
-Lemma sup_uc_prf : is_UniformlyContinuousFunction (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
+Lemma sup_uc_prf :
+  @is_UniformlyContinuousFunction
+    LinfStepQ Q_as_MetricSpace (StepQSup:LinfStepQ -> Q) Qpos2QposInf.
 Proof.
  intros e x y.
  simpl.

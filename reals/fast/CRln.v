@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.reals.fast.CRartanh_slow.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
@@ -268,7 +269,10 @@ Qed.
 Definition rational_ln_modulus (c:Qpos) (e:Qpos) : QposInf :=
 Qpos2QposInf (c*e).
 
-Lemma ln_pos_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
+Lemma ln_pos_uc_prf (c:Qpos)
+  : @is_UniformlyContinuousFunction
+      Q_as_MetricSpace CR
+      (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
 Proof.
  set (lnf := fun x => match (Qlt_le_dec 0 x) with | left p => rational_ln p | right _ => 0%CR end).
  apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (Qscale_modulus (Qpos_inv c)).
@@ -362,7 +366,7 @@ Proof.
  change (CRln_pos c (' q) == IRasCR (Log (inj_Q IR q) Hq))%CR.
  transitivity (ln_pos_uc c q);[|].
   unfold CRln_pos.
-  change (' q)%CR with (Cunit_fun _ q).
+  change (' q)%CR with (Cunit_fun Q_as_MetricSpace q).
   rewrite -> (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
   apply: BindLaw1.
  simpl.

@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.logic.CLogic.
 Require Export CoRN.model.lattice.CRlattice.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -202,21 +203,26 @@ Lemma Qscale_modulus_neg : forall (a e:Qpos), Qscale_modulus (- a) e = (e / a)%Q
 Proof Qscale_modulus_pos.
 *)
 
-Lemma Qscale_uc_prf (a:Q) :  is_UniformlyContinuousFunction (fun b:Q => a*b) (Qscale_modulus a).
+Lemma Qscale_uc_prf (a:Q) :
+  @is_UniformlyContinuousFunction
+   Q_as_MetricSpace Q_as_MetricSpace (fun b:Q => a*b) (Qscale_modulus a).
 Proof.
  revert a.
  intros [[|an|an] ad] e b0 b1 H.
    simpl in *.
    setoid_replace ((0 # ad)) with 0 by constructor.
    unfold Qball.
-   stepr 0; [| simpl; ring].
+   unfold QAbsSmall. setoid_replace (0 * b0 - 0 * b1) with 0.
+   2: ring.
    apply zero_AbsSmall.
    simpl.
    auto with *.
   simpl in *.
   unfold Qball in *.
   autorewrite with QposElim.
-  stepr ((an#ad)*(b0-b1)); [| simpl; ring].
+  unfold QAbsSmall.
+  setoid_replace ((an # ad) * b0 - (an # ad) * b1) with ((an#ad)*(b0-b1)).
+  2: ring.
   apply (fun x y => (AbsSmall_cancel_mult _ x y (ad#an))).
    constructor.
   stepl (((ad # an) * e)%Qpos:Q); [| simpl; QposRing].
@@ -235,7 +241,9 @@ Proof.
  simpl in *.
  unfold Qball in *.
  autorewrite with QposElim.
- stepr ((Zneg an#ad)*(b0-b1)); [| simpl; ring].
+ unfold QAbsSmall.
+ setoid_replace ((Z.neg an # ad) * b0 - (Z.neg an # ad) * b1)
+   with ((Zneg an#ad)*(b0-b1)). 2: ring.
  apply (fun x y => (AbsSmall_cancel_mult _ x y (ad#an))).
   constructor.
  stepl (((ad # an) * e)%Qpos:Q); [| simpl;QposRing].
@@ -598,7 +606,9 @@ Proof.
  assumption.
 Qed.
 
-Lemma Qinv_pos_uc_prf (c:Qpos) :  is_UniformlyContinuousFunction (fun a:Q => /(Qmax c a) ) (Qinv_modulus c).
+Lemma Qinv_pos_uc_prf (c:Qpos) :
+  @is_UniformlyContinuousFunction
+    Q_as_MetricSpace Q_as_MetricSpace (fun a:Q => /(Qmax c a) ) (Qinv_modulus c).
 Proof.
  intros e a0 a1 Ha.
  simpl in *.
@@ -619,7 +629,7 @@ Proof.
   rewrite -> Qmult_comm.
   apply mult_resp_leEq_lft;[|apply Qpos_nonneg].
   apply mult_resp_leEq_both; (apply Qpos_nonneg || apply Qmax_ub_l).
- change (ball (c*c*e) (Qmax c a1) (Qmax c a0)).
+ change (@ball Q_as_MetricSpace (c*c*e) (Qmax c a1) (Qmax c a0)).
  apply ball_sym.
  apply QboundBelow_uc_prf.
  apply Ha.

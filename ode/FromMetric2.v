@@ -1,3 +1,4 @@
+Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Complete CoRN.metric2.Metric CoRN.ode.metric.
 
 Require Import
@@ -29,7 +30,7 @@ unfold mspc_ball, msp_mspc_ball.
 change (e1 = e2) in E1. now rewrite E1, E2, E3.
 Qed.
 
-Global Instance : ExtMetricSpaceClass X.
+Global Instance msp_mspc_ball_ext : ExtMetricSpaceClass X.
 Proof.
 constructor.
 + apply _.
@@ -145,10 +146,12 @@ Local Notation ball := mspc_ball.
 where [ball r x y] is defined as [abs (x - y) ≤ r], probably a normed
 vector space *)
 
-Lemma mspc_ball_Qabs (r x y : Q) : ball r x y ↔ abs (x - y) ≤ r.
+Lemma mspc_ball_Qabs (r x y : Q)
+  : @ball _ (msp_mspc_ball Q_as_MetricSpace) r x y ↔ abs (x - y) ≤ r.
 Proof. apply gball_Qabs. Qed.
 
-Lemma mspc_ball_Qabs_flip (r x y : Q) : ball r x y ↔ abs (y - x) ≤ r.
+Lemma mspc_ball_Qabs_flip (r x y : Q)
+  : @ball _ (msp_mspc_ball Q_as_MetricSpace) r x y ↔ abs (y - x) ≤ r.
 Proof.
 rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
 Qed.
@@ -161,7 +164,9 @@ Proof.
 rewrite <- abs.abs_negate, <- rings.negate_swap_r. apply gball_Qabs.
 Qed.*)
 
-Lemma mspc_ball_Qplus_l (e x y y' : Q) : ball e y y' -> ball e (x + y) (x + y').
+Lemma mspc_ball_Qplus_l (e x y y' : Q)
+  : @ball _ (msp_mspc_ball Q_as_MetricSpace) e y y'
+    -> @ball _ (msp_mspc_ball Q_as_MetricSpace) e (x + y) (x + y').
 Proof.
 intro A. assert (A1 := radius_nonneg _ _ _ A).
 destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
@@ -190,7 +195,9 @@ now apply mspc_ball_CRabs, mspc_symm.
 Qed.
 
 Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :
-  ball e x1 x2 -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2 -> ball e y1 y2.
+  @ball _ (msp_mspc_ball Q_as_MetricSpace) e x1 x2
+  -> x1 ≤ y1 -> y1 ≤ y2 -> y2 ≤ x2
+  -> @ball _ (msp_mspc_ball Q_as_MetricSpace) e y1 y2.
 Proof.
 intros B A1 A2 A3. destruct e as [e |]; [| apply mspc_inf].
 apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
