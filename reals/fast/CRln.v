@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRartanh_slow.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
@@ -173,11 +175,9 @@ Qed.
 Lemma ln_scale_by_two_power_adapt : forall (n:Z) q, 0 < q -> 0 < (2^n*q).
 Proof.
  intros n q H.
- apply: mult_resp_pos; simpl; try assumption.
- assert (H2:0 < 2) by constructor.
- pose (twopos := mkQpos H2).
- setoid_replace (2%positive:Q) with (twopos:Q) by reflexivity.
- apply Qpos_power_pos.
+ apply (Qlt_le_trans _ (proj1_sig (Qpos_power (2#1) n * exist _ _ H)%Qpos)).
+ apply Qpos_ispos.
+ apply Qle_refl.
 Qed.
 
 Lemma ln_scale_by_two_power : forall (n:Z) q (Hq:0 < q), (rational_ln_slow Hq + scale n ln2 == rational_ln_slow (ln_scale_by_two_power_adapt n Hq))%CR.
@@ -259,11 +259,11 @@ Proof.
 Qed.
 
 (** [ln] is uniformly continuous on any close strictly positive interval. *)
-Lemma ln_uc_prf_pos : forall (c:Qpos) (x:Q), (0 < Qmax c x).
+Lemma ln_uc_prf_pos : forall (c:Qpos) (x:Q), (0 < Qmax (proj1_sig c) x).
 Proof.
  intros c x.
  simpl.
- apply Qlt_le_trans with c; auto with *.
+ apply Qlt_le_trans with (proj1_sig c); auto with *.
 Qed.
 
 Definition rational_ln_modulus (c:Qpos) (e:Qpos) : QposInf :=
@@ -275,45 +275,45 @@ Lemma ln_pos_uc_prf (c:Qpos)
       (fun x => rational_ln (ln_uc_prf_pos c x)) (rational_ln_modulus c).
 Proof.
  set (lnf := fun x => match (Qlt_le_dec 0 x) with | left p => rational_ln p | right _ => 0%CR end).
- apply (is_UniformlyContinuousFunction_wd) with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc c x)) (Qscale_modulus (Qpos_inv c)).
+ apply (is_UniformlyContinuousFunction_wd)
+   with (fun x : Q_as_MetricSpace => lnf (QboundBelow_uc (proj1_sig c) x)) (Qscale_modulus (proj1_sig (Qpos_inv c))).
    intros x.
    unfold lnf.
-   destruct (Qlt_le_dec 0 (QboundBelow_uc c x)).
+   destruct (Qlt_le_dec 0 (QboundBelow_uc (proj1_sig c) x)).
     do 2 rewrite -> rational_ln_correct'.
     apply IRasCR_wd.
     algebra.
    elim (Qle_not_lt _ _ q).
    apply: ln_uc_prf_pos.
-  apply Qpos_positive_numerator_rect.
-  intros xn xd.
-  revert c.
-  apply Qpos_positive_numerator_rect.
-  intros.
+   intros [[xn xd] xpos].
+   destruct xn as [|xn|xn]. inversion xpos. 2: inversion xpos.
+   destruct c as [[a b] cpos].
+   destruct a as [|a|a]. inversion cpos. 2: inversion cpos.
   apply: Qle_refl.
- assert (Z:Derivative (closel (inj_Q IR (c:Q))) I Logarithm {1/}FId).
+ assert (Z:Derivative (closel (inj_Q IR (proj1_sig c))) I Logarithm {1/}FId).
   apply (Included_imp_Derivative (openl [0]) I).
    Deriv.
   intros x Hx.
   simpl.
-  apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+  apply less_leEq_trans with (inj_Q IR (proj1_sig c)); try assumption.
   stepl (inj_Q IR 0).
    apply inj_Q_less.
    simpl; auto with *.
   apply (inj_Q_nring IR 0).
- apply (is_UniformlyContinuousD (Some (c:Q)) None I _ _ Z lnf).
+ apply (is_UniformlyContinuousD (Some (proj1_sig c)) None I _ _ Z lnf).
   intros q Hq Hc.
   unfold lnf.
   destruct (Qlt_le_dec 0 q).
    apply rational_ln_correct.
   elim (Qle_not_lt _ _ q0).
-  apply Qlt_le_trans with c; auto with *.
+  apply Qlt_le_trans with (proj1_sig c); auto with *.
   apply leEq_inj_Q with IR.
   assumption.
  intros x Hx Hc.
  apply AbsSmall_imp_AbsIR.
  apply leEq_imp_AbsSmall.
   apply: shift_leEq_div.
-   apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+   apply less_leEq_trans with (inj_Q IR (proj1_sig c)); try assumption.
    stepl (inj_Q IR 0).
     apply inj_Q_less.
     simpl; auto with *.
@@ -321,18 +321,18 @@ Proof.
   rstepl ([0]:IR).
   apply less_leEq.
   apply pos_one.
- stepr ([1][/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_prf c)))).
+ stepr ([1][/]_[//](Greater_imp_ap _ _ _ (Qpos_adaptor (Qpos_ispos c)))).
   apply: recip_resp_leEq; try assumption.
   stepl (inj_Q IR 0).
    apply inj_Q_less.
    simpl; auto with *.
   apply (inj_Q_nring IR 0).
- stepl (((inj_Q IR 1)[/]_[//] Greater_imp_ap IR (inj_Q IR (c:Q)) [0] (Qpos_adaptor (Qpos_prf c)))).
+ stepl (((inj_Q IR 1)[/]_[//] Greater_imp_ap IR (inj_Q IR (proj1_sig c)) [0] (Qpos_adaptor (Qpos_ispos c)))).
   clear.
-  revert c.
-  apply Qpos_positive_numerator_rect.
-  intros.
-  change (inj_Q IR ((Qpos_inv (a#b)):Q)) with (inj_Q IR (1/(a#b))).
+  destruct c as [[a b] cpos].
+  destruct a as [|a|a]. inversion cpos. 2: inversion cpos.
+  unfold Qpos_inv, proj1_sig.
+  change (inj_Q IR (/ (a#b))) with (inj_Q IR (1/(a#b))).
   apply eq_symmetric.
   apply inj_Q_div.
  apply div_wd.
@@ -346,16 +346,16 @@ Build_UniformlyContinuousFunction (@ln_pos_uc_prf c).
 
 Definition CRln_pos (c:Qpos) : CR --> CR := (Cbind QPrelengthSpace (ln_pos_uc c)).
 
-Lemma CRln_pos_correct : forall (c:Qpos) x Hx, closel (inj_Q _ (c:Q)) x -> (IRasCR (Log x Hx)==CRln_pos c (IRasCR x))%CR.
+Lemma CRln_pos_correct : forall (c:Qpos) x Hx, closel (inj_Q _ (proj1_sig c)) x -> (IRasCR (Log x Hx)==CRln_pos c (IRasCR x))%CR.
 Proof.
  intros c x Hx Hx0.
- assert (Z:Continuous (closel (inj_Q IR (c:Q))) Logarithm).
+ assert (Z:Continuous (closel (inj_Q IR (proj1_sig c))) Logarithm).
   apply (Included_imp_Continuous (openl [0])).
    Contin.
   clear - c.
   intros x Hx.
   simpl.
-  apply less_leEq_trans with (inj_Q IR (c:Q)); try assumption.
+  apply less_leEq_trans with (inj_Q IR (proj1_sig c)); try assumption.
   stepl (inj_Q IR 0).
    apply inj_Q_less.
    simpl; auto with *.
@@ -389,7 +389,7 @@ Lemma CRln_correct : forall x Hx Hx0, (IRasCR (Log x Hx)==CRln (IRasCR x) Hx0)%C
 Proof.
  intros x Hx [c Hc].
  apply CRln_pos_correct.
- change ((inj_Q IR (c:Q))[<=]x).
+ change ((inj_Q IR (proj1_sig c))[<=]x).
  rewrite -> IR_leEq_as_CR.
  rewrite -> IR_inj_Q_as_CR.
  setoid_replace (IRasCR x) with (IRasCR x - 0)%CR by (simpl; ring).
@@ -397,7 +397,7 @@ Proof.
 Qed.
 
 Lemma CRln_pos_ln : forall (c:Qpos) (x:CR) Hx,
- ('c <= x ->
+ ('proj1_sig c <= x ->
   CRln_pos c x == CRln x Hx)%CR.
 Proof.
  intros c x Hx Hc.
@@ -414,13 +414,13 @@ Proof.
  rewrite <- (CRln_pos_correct c _ X).
   rewrite <- (CRln_pos_correct d _ X).
    reflexivity.
-  change (inj_Q IR (d:Q)[<=](CRasIR x)).
+  change (inj_Q IR (proj1_sig d)[<=](CRasIR x)).
   rewrite -> IR_leEq_as_CR.
   autorewrite with IRtoCR.
   rewrite -> CRasIRasCR_id.
   ring_simplify in Hd.
   assumption.
- change (inj_Q IR (c:Q)[<=](CRasIR x)).
+ change (inj_Q IR (proj1_sig c)[<=](CRasIR x)).
  rewrite -> IR_leEq_as_CR.
  autorewrite with IRtoCR.
  rewrite -> CRasIRasCR_id.

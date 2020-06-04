@@ -19,6 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.RasterizeQ.
 Require Import CoRN.reals.fast.Interval.
 Require Export CoRN.metric2.Graph.
@@ -86,8 +88,8 @@ Variable n m : nat.
 Hypothesis Hn : eq_nat n 0 = false.
 Hypothesis Hm : eq_nat m 0 = false.
 
-Let w := proj1_sigT _ _ (Qpos_lt_plus Hlr).
-Let h := proj1_sigT _ _ (Qpos_lt_plus Hbt).
+Let w := proj1_sig (Qpos_sub _ _ Hlr).
+Let h := proj1_sig (Qpos_sub _ _ Hbt).
 
 (*
 Variable err : Qpos.
@@ -107,30 +109,30 @@ ball (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
  (graphQ (uc_compose clip f))
  (Cunit (InterpRaster PlotQ (l,t) (r,b))).
 Proof.
- assert (Hw:=(ProjT2 (Qpos_lt_plus Hlr))).
- assert (Hh:=(ProjT2 (Qpos_lt_plus Hbt))).
+ assert (Hw:=(proj2_sig (Qpos_sub _ _ Hlr))).
+ assert (Hh:=(proj2_sig (Qpos_sub _ _ Hbt))).
  fold w in Hw.
  fold h in Hh.
- change (r == l + w) in Hw.
- change (t == b + h) in Hh.
+ change (r == l + proj1_sig w) in Hw.
+ change (t == b + proj1_sig h) in Hh.
  apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
   apply ball_approx_r.
  unfold Compact.
  rewrite -> ball_Cunit.
  apply ball_sym.
- assert (L:st_eq ((l,t):Q2) (l,b + h)).
+ assert (L:st_eq ((l,t):Q2) (l,b + proj1_sig h)).
   split; simpl.
    reflexivity.
   auto.
  set (Z0:=(l, t):Q2) in *.
  set (Z1:=(r, b):Q2) in *.
- set (Z:=(l, (b + h)):Q2) in *.
+ set (Z:=(l, (b + proj1_sig h)):Q2) in *.
  rewrite -> L.
- setoid_replace Z1 with (l+w,b).
+ setoid_replace Z1 with (l+proj1_sig w,b).
   unfold Z, PlotQ.
   (* TODO: figure out why rewrite Hw, Hh hangs *)
   replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r) with
-   (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + h) l b (l + w)) by now rewrite Hw, Hh.
+   (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
   destruct n; try discriminate.
   destruct m; try discriminate.
   apply (RasterizeQ2_correct).

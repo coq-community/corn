@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.QArith.QArith
   MathClasses.theory.setoids (* Equiv Prop *) MathClasses.theory.products
@@ -383,7 +385,8 @@ we need to declare uc_proof an instance. *)
 Global Existing Instance uc_proof.
 
 Global Instance uc_proper {H1 : ExtMetricSpaceClass X} {H2 : ExtMetricSpaceClass Y}
-  `{IsUniformlyContinuous f mu} :  Proper ((=) ==> (=)) f.
+       {f : X → Y} {mu : Q → Qinf} {_ : IsUniformlyContinuous f mu}
+  :  Proper ((=) ==> (=)) f.
 Proof.
 intros x1 x2 A. apply -> mspc_eq. intros e e_pos. apply (uc_prf f mu); trivial.
 pose proof (uc_pos f mu e e_pos) as ?.
@@ -433,8 +436,9 @@ Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
 
 Global Arguments luc_prf f lmu {_} x r.
 
-Global Instance uc_ulc (f : X -> Y) `{!IsUniformlyContinuous f mu} :
-  IsLocallyUniformlyContinuous f (λ _ _, mu).
+Global Instance uc_ulc (f : X -> Y)
+       {mu : Q → Qinf}  {_ : IsUniformlyContinuous f mu}
+  : IsLocallyUniformlyContinuous f (λ _ _, mu).
 Proof.
 intros x r. constructor; [now apply (uc_pos f) |].
 intros e [x1 A1] [x2 A2] e_pos A. now apply (uc_prf f mu).
@@ -949,7 +953,8 @@ Qed.
 End SequenceLimits.
 
 Theorem seq_lim_cont
-  `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y) `{!IsUniformlyContinuous f mu}
+        `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y} (f : X -> Y)
+        {mu : Q -> Qinf} {_ : IsUniformlyContinuous f mu}
   (x : seq X) (a : X) (N : Q -> nat) :
   seq_lim x a N → seq_lim (f ∘ x) (f a) (comp_inf N mu 0).
 Proof.
@@ -966,7 +971,8 @@ Proof. intro A; apply seq_lim_cont; [apply _ | apply A]. Qed.
 
 Lemma iter_fixpoint
   `{ExtMetricSpaceClass X, ExtMetricSpaceClass Y}
-  (f : X -> X) `{!IsUniformlyContinuous f mu} (x : seq X) (a : X) (N : Q -> nat) :
+  (f : X -> X) {mu : Q -> Qinf} {_ : IsUniformlyContinuous f mu}
+  (x : seq X) (a : X) (N : Q -> nat) :
   (forall n : nat, x (S n) = f (x n)) -> seq_lim x a N -> f a = a.
 Proof.
 intros A1 A2; generalize A2; intro A3. apply seq_lim_S in A2. apply (seq_lim_cont f) in A3.

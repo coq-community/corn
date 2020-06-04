@@ -97,10 +97,10 @@ Proof.
  split;simpl.
   unfold graphPoint_modulus.
   eapply ball_weak_le;[|apply regFun_prf].
-  destruct (mu f e2); autorewrite with QposElim.
-   assert (Qmin e2 q <= e2) by auto with *.
+  destruct (mu f e2); simpl.
+   assert (Qmin (proj1_sig e2) (proj1_sig q) <= proj1_sig e2) by auto with *.
    rewrite -> Qle_minus_iff in *.
-   Qauto_le.
+   rewrite Q_Qpos_min. Qauto_le.
   apply Qle_refl.
  apply (mu_sum plX e2 (e1::nil) f).
  simpl.
@@ -108,9 +108,8 @@ Proof.
  eapply ball_ex_weak_le;[|apply regFun_prf_ex].
  destruct (mu f e1) as [d0|]; try constructor.
  destruct (mu f e2) as [d|]; try constructor.
- simpl.
- autorewrite with QposElim.
- assert (Qmin e2 d <= d) by auto with *.
+ simpl. rewrite Q_Qpos_min.
+ assert (Qmin (proj1_sig e2) (proj1_sig d) <= proj1_sig d) by auto with *.
  rewrite -> Qle_minus_iff in *.
  Qauto_le.
 Qed.
@@ -124,7 +123,9 @@ Proof.
  apply almostIn_closed.
  intros d.
  set (d':=((1#2)*d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos; [| unfold d'; QposRing].
+ assert (QposEq (e1 + e2 + d) ((e1 + d') + (d'+ e2)))
+   by (unfold QposEq; simpl; ring).
+ rewrite H0. clear H0.
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -148,8 +149,8 @@ Proof.
  eapply ball_weak_le;[|apply regFun_prf].
  unfold d2.
  destruct (mu f d') as [d0|]; auto with *.
- autorewrite with QposElim.
- assert (Qmin d' d0 <= d') by auto with *.
+ simpl. rewrite Q_Qpos_min.
+ assert (Qmin (proj1_sig d') (proj1_sig d0) <= proj1_sig d') by auto with *.
  rewrite -> Qle_minus_iff in *.
  Qauto_le.
 Qed.
@@ -163,9 +164,11 @@ Proof.
  apply regFunBall_e.
  intros e2.
  set (e':=((1#6)*e1)%Qpos).
- setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos; [| unfold e';QposRing].
+ assert (QposEq (e2 + e1 + e2) ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e')))
+   by (unfold e'; unfold QposEq; simpl; ring).
+ rewrite H0. clear H0. 
  set (d' := graphPoint_modulus e').
- assert (Hd'1 : d' <= e').
+ assert (Hd'1 : proj1_sig d' <= proj1_sig e').
   unfold d', graphPoint_modulus.
   destruct (mu f e'); auto with *.
   apply Qpos_min_lb_l.
@@ -208,7 +211,7 @@ Proof.
   clear - L Hd'1 Hd'2 plX stableXY.
   destruct L as [G | a [Hl Hr]] using existsC_ind.
    apply (@ProductMS_stableY X).
-     apply (approximate (Cfst p) (1#1)%Qpos).
+     apply (approximate (Cfst p) (Qpos2QposInf (1#1))).
     apply stableXY.
    auto.
   apply ball_triangle with (f a).
@@ -222,18 +225,20 @@ Proof.
     simpl in *.
     autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((q + - d') + (q + - d')) by simpl; ring.
+    replace RHS with ((proj1_sig q + - proj1_sig d') + (proj1_sig q + - proj1_sig d'))
+      by simpl; ring.
     Qauto_nonneg.
    apply Hl.
   apply ball_sym.
   eapply ball_weak_le;[|apply Hr].
-  autorewrite with QposElim.
+  simpl.
   clear - Hd'1.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((e' + - d') + (e' + - d')) by simpl; ring.
+  replace RHS with ((proj1_sig e' + - proj1_sig d') + (proj1_sig e' + - proj1_sig d'))
+    by simpl; ring.
   Qauto_nonneg.
  eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff in *.
  Qauto_le.
 Qed.
@@ -310,7 +315,7 @@ Proof.
   unfold graphPoint_modulus.
   destruct (mu f e) as [d|].
    simpl.
-   apply Qle_trans with e.
+   apply Qle_trans with (proj1_sig e).
     apply: Qpos_min_lb_l.
    autorewrite with QposElim.
    Qauto_le.
@@ -349,34 +354,45 @@ Proof.
  setoid_replace (Couple (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x).
   auto using CompactImage_b_correct1.
  intros e1 e2.
- split;simpl.
-  eapply ball_weak_le;[|apply regFun_prf].
+ split. 
+ apply ball_weak_le with (e:= (e1 + (graphPoint_modulus f ((1 # 2) * e2)))%Qpos)
+ ;[|apply regFun_prf].
   unfold graphPoint_modulus.
-  destruct (mu f ((1#2)*e2)); autorewrite with QposElim.
-   assert (Qmin ((1#2)*e2) q <= ((1#2)*e2)) by auto with *.
+  destruct (mu f ((1#2)*e2)). simpl. 
+   rewrite Q_Qpos_min.
+  assert (Qmin ((1#2)*proj1_sig e2) (proj1_sig q)
+          <= ((1#2)*proj1_sig e2)) by auto with *.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with ((1 # 2) * e2 + ((1 # 2) * e2 + - Qmin ((1 # 2) * e2) q)) by simpl; ring.
+   replace RHS with ((1 # 2) * proj1_sig e2
+                     + ((1 # 2) * proj1_sig e2 + - Qmin ((1 # 2) * proj1_sig e2) (proj1_sig q)))
+     by simpl; ring.
    Qauto_nonneg.
-  Qauto_le.
- unfold Cjoin_raw.
+   simpl. Qauto_le. 
+ simpl. unfold Cjoin_raw. 
  rewrite <- ball_Cunit.
- setoid_replace (e1 + e2)%Qpos with ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2)%Qpos; [| QposRing].
+ assert (QposEq (e1 + e2) ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2))
+   by (unfold QposEq; simpl; ring).
+ rewrite H. clear H.
  eapply ball_triangle;[|apply ball_approx_r].
  eapply ball_triangle.
-  apply (ball_approx_l (approximate (Cmap_fun plX f x) ((1 # 2)%Qpos * e1)) ((1#2)*e1)).
+ apply (ball_approx_l (approximate (Cmap_fun plX f x) (Qpos2QposInf ((1 # 2)%Qpos * e1)))
+                      ((1#2)*e1)).
  set (e1':=((1 # 2) * e1)%Qpos).
  set (e2':=((1 # 2) * e2)%Qpos).
  simpl.
  apply (mu_sum plX e2' (e1'::nil) f).
- simpl.
- eapply ball_ex_weak_le;[|apply regFun_prf_ex].
+ apply ball_ex_weak_le
+   with (e:= (mu f e1' + graphPoint_modulus f ((1 # 2) * e2))%QposInf).
+ 2: apply regFun_prf_ex.
  unfold e1'.
  unfold graphPoint_modulus.
+ replace (fold_right QposInf_plus (mu f e2') (map (mu f) (((1 # 2) * e1)%Qpos :: nil)))
+   with (mu f ((1 # 2) * e1) + mu f e2')%QposInf by reflexivity.
  destruct (mu f ((1#2)*e1)) as [d0|]; try constructor.
- destruct (mu f e2') as [d|]; try constructor.
- simpl.
- autorewrite with QposElim.
- assert (Qmin e2' d <= d) by auto with *.
+ unfold e2'.
+ destruct (mu f ((1 # 2) * e2)) as [d|]; try constructor.
+ simpl. rewrite Q_Qpos_min.
+ assert (Qmin (proj1_sig e2') (proj1_sig d) <= proj1_sig d) by auto with *.
  rewrite -> Qle_minus_iff in *. Qauto_le.
 Qed.
 
@@ -389,7 +405,9 @@ Proof.
  apply almostIn_closed.
  intros d.
  set (d':=((1#2)*d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos with ((e1 + d') + (d'+ e2))%Qpos; [| unfold d';QposRing].
+ assert (QposEq (e1 + e2 + d) ((e1 + d') + (d'+ e2)))
+   by (unfold QposEq; simpl; ring).
+ rewrite H0. clear H0.
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -398,8 +416,10 @@ Proof.
  unfold Cjoin_raw in H'.
  simpl in *.
  unfold FinEnum_map_modulus, graphPoint_modulus in H'.
- set (d2:=match mu f ((1#2)*d') with | Qpos2QposInf d => Qpos_min ((1#2)*d') d
-   | QposInfinity => ((1#2)*d')%Qpos end) in *.
+ remember (match mu f ((1#2)*d') with
+           | Qpos2QposInf d => Qpos_min ((1#2)*d') d
+           | QposInfinity => ((1#2)*d')%Qpos end) as d2.
+ simpl in Heqd2. rewrite <- Heqd2 in H'.
  eapply almostIn_triangle_r with (approximate s d2).
   clear - H'.
   induction (approximate s d2).
@@ -414,16 +434,25 @@ Proof.
   apply IHs0.
   assumption.
  eapply ball_weak_le;[|apply regFun_prf].
- unfold d2.
- destruct (mu f ((1#2)*d')) as [d0|].
-  autorewrite with QposElim.
-  assert (Qmin ((1#2)*d') d0 <= ((1#2)*d')) by auto with *.
+ rewrite Heqd2.
+ destruct (@mu X (Complete Y) f
+              (Qpos_mult
+                 (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
+                         {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) d'))
+   as [d0|].
+ simpl.
+ assert (Qmin ((1#2)* proj1_sig d') (proj1_sig d0) <= ((1#2)*proj1_sig d'))
+   by auto with *.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((1 # 2) * d' + - Qmin ((1 # 2) * d') d0 + (1#2)*d') by simpl; ring.
+  rewrite Q_Qpos_min.
+  replace RHS with ((1 # 2) * proj1_sig d'
+                    + - Qmin ((1 # 2) * proj1_sig d') (proj1_sig d0) + (1#2)*proj1_sig d')
+    by simpl; ring.
   Qauto_nonneg.
- autorewrite with QposElim.
- replace RHS with ((1 # 2) * d' + e2 + (1#2)*d') by simpl; ring.
- Qauto_le.
+  simpl.
+  replace RHS with ((1 # 2) * proj1_sig d' + proj1_sig e2 + (1#2)*proj1_sig d')
+    by simpl; ring.
+ simpl. Qauto_le.
 Qed.
 
 Lemma CompactGraph_b_correct3 : forall plX plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
@@ -435,17 +464,20 @@ Proof.
  apply regFunBall_e.
  intros e2.
  set (e':=((1#6)*e1)%Qpos).
- setoid_replace (e2 + e1 + e2)%Qpos with ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos; [| unfold e'; QposRing].
+ assert (QposEq (e2 + e1 + e2)
+                ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e')))
+   by (unfold e', QposEq; simpl; ring).
+ rewrite H0. clear H0. 
  set (d' := graphPoint_modulus f ((1#2)*e')).
- assert (Hd'1 : d' <= e').
+ assert (Hd'1 : proj1_sig d' <= proj1_sig e').
   unfold d', graphPoint_modulus.
   destruct (mu f ((1#2)*e')); autorewrite with QposElim.
-   apply Qle_trans with ((1#2)*e'); auto with *.
+   apply Qle_trans with ((1#2)*proj1_sig e'); auto with *.
    rewrite -> Qle_minus_iff.
    ring_simplify.
    Qauto_nonneg.
   rewrite -> Qle_minus_iff.
-  ring_simplify.
+  simpl. ring_simplify.
   Qauto_nonneg.
  assert (Hd'2 : QposInf_le (d') (mu f ((1#2)*e'))).
   unfold d', graphPoint_modulus.
@@ -453,47 +485,62 @@ Proof.
    apply Qpos_min_lb_r.
   constructor.
  assert (H':= H ((1#2)*d')%Qpos d').
- apply ball_triangle with (approximate (Csnd p) ((1#2)%Qpos*d')).
+ apply ball_triangle with (approximate (Csnd p) (Qpos2QposInf ((1#2)%Qpos*d'))).
   simpl (approximate (Cbind plX f (Cfst (X:=X) (Y:=Y) p)) e2).
-  apply ball_triangle with (approximate (f (Cfst_raw p ((1#2)*d'))) ((1#2)*d'))%Qpos.
+  apply ball_triangle
+    with (approximate (f (Cfst_raw p (Qpos2QposInf (1#2)*d')))
+                      (Qpos2QposInf (1#2)*d'))%Qpos.
    unfold Cjoin_raw.
    simpl.
    apply ball_weak_le with ((1#2)*e2 + ((1#2)*e2 + (1#2)*e') + (1#2)*d')%Qpos.
-    autorewrite with QposElim.
+   simpl.
     clear - Hd'1.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((1 # 2) * (e' + - d')) by simpl; ring.
+    replace RHS with ((1 # 2) * (proj1_sig e' + - proj1_sig d'))
+      by simpl; ring.
     Qauto_nonneg.
    cut (ball ((1 # 2) * e2 + (1 # 2) * e') (f (Cfst_raw p (mu f ((1 # 2) * e2))))
      (f (Cfst_raw p ((1 # 2) * d')%Qpos))).
     intros L.
     apply L.
    apply (mu_sum plX ((1#2)*e') (((1#2)*e2)::nil) f)%Qpos.
+   apply ball_ex_weak_le
+     with (QposInf_plus (mu f ((1#2)*e2)) (Qpos2QposInf (1#2)*d'))%Qpos.
    simpl.
-   apply ball_ex_weak_le with (QposInf_plus (mu f ((1#2)*e2)) ((1#2)*d'))%Qpos.
-    destruct (mu f ((1#2)*e2)); try constructor.
-    destruct (mu f ((1#2)*e')); try constructor.
+   destruct (@mu X (Complete Y) f
+          (Qpos_mult
+             (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
+                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e2))
+   ; try constructor.
+   simpl in Hd'2.
+   destruct (@mu X (Complete Y) f
+          (Qpos_mult
+             (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
+                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
+   ; try constructor.
     clear - Hd'2.
     simpl in *.
-    autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with (q0 + - d' + (1#2)*d') by simpl; ring.
+    replace RHS with (proj1_sig q0 + - proj1_sig d' + (1#2)*proj1_sig d')
+      by simpl; ring.
     Qauto_nonneg.
    unfold Cfst_raw.
-   simpl.
-   assert (Z:=regFun_prf_ex p (mu f ((1#2)*e2)) ((1#2)%Qpos*d')).
+   assert (Z:=regFun_prf_ex p (mu f ((1#2)*e2)) (Qpos2QposInf (1#2)%Qpos*d')).
    destruct (mu f ((1#2)*e2)); try constructor.
    destruct Z; auto.
-  assert (L:existsC X (fun x => ball (((1#2)*d') + d') (approximate p ((1#2)%Qpos*d')) (Couple_raw ((Cunit x), (f x)) ((1#2)*d')%Qpos))).
+   assert (L:existsC X (fun x => ball (((1#2)*d') + d')
+                                   (approximate p (Qpos2QposInf (1#2)%Qpos*d')) (Couple_raw ((Cunit x), (f x)) (Qpos2QposInf ((1#2)*d')%Qpos)))).
    clear -H'.
    simpl in H'.
    unfold Cjoin_raw in H'.
    simpl in H'.
    unfold FinEnum_map_modulus, graphPoint_modulus in H'.
-   induction (@approximate (@FinEnum X stableX) s (Qpos2QposInf
-     match @mu X _ f ((1#2)*d') return Qpos with | Qpos2QposInf d => Qpos_min ((1#2)*d') d
-       | QposInfinity => ((1#2)*d')%Qpos end)).
-    contradiction.
+   remember (match mu f ((1 # 2) * d') with
+                  | Qpos2QposInf d => Qpos_min ((1 # 2) * d') d
+                  | QposInfinity => ((1 # 2) * d')%Qpos
+                  end) as mm.
+   simpl in Heqmm. rewrite <- Heqmm in H'.
+   induction (approximate s mm). contradiction.
    destruct H' as [G | H | H] using orC_ind.
      auto using existsC_stable.
     apply existsWeaken.
@@ -503,16 +550,16 @@ Proof.
   clear - L Hd'1 Hd'2 plX stableXY.
   destruct L as [G | a [Hl Hr]] using existsC_ind.
    apply (@ProductMS_stableY X).
-     apply (approximate (Cfst p) (1#1)%Qpos).
+     apply (approximate (Cfst p) (Qpos2QposInf (1#1))).
     apply stableXY.
    auto.
-  apply ball_triangle with (approximate (f a) ((1#2)%Qpos*d')).
+  apply ball_triangle with (approximate (f a) (Qpos2QposInf ((1#2)%Qpos*d'))).
    apply ball_weak_le with ((1#2)*d' + ((1#2)*e' + (1#2)*e') + (1#2)*d')%Qpos.
     clear - Hd'1.
-    autorewrite with QposElim.
+    simpl.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with (e' + - d') by simpl; ring.
-    auto.
+    replace RHS with (proj1_sig e' + - proj1_sig d') by simpl; ring.
+    exact Hd'1.
    simpl.
    rewrite <- ball_Cunit.
    eapply ball_triangle;[|apply ball_approx_r].
@@ -522,27 +569,35 @@ Proof.
    unfold graphPoint_modulus in d'.
    apply ball_ex_weak_le with (d' + d')%Qpos.
     clear - Hd'2.
-    destruct (mu f ((1#2)*e')); try constructor.
+    simpl in Hd'2.
+    destruct (@mu X (Complete Y) f
+          (Qpos_mult
+             (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
+                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
+    ; try constructor.
     simpl in *.
-    autorewrite with QposElim.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((q + - d') + (q + - d')) by simpl; ring.
+    replace RHS with ((proj1_sig q + - proj1_sig d') + (proj1_sig q + - proj1_sig d'))
+      by simpl; ring.
     Qauto_nonneg.
    simpl.
    eapply ball_weak_le;[|apply Hl].
-   autorewrite with QposElim.
+   simpl.
    Qauto_le.
   apply ball_sym.
   eapply ball_weak_le;[|apply Hr].
   autorewrite with QposElim.
   clear - Hd'1.
   rewrite -> Qle_minus_iff in *.
-  replace RHS with ((e' + - d') + (e' + - d') + (1#2)*d') by simpl; ring.
+  replace RHS with ((proj1_sig e' + - proj1_sig d')
+                    + (proj1_sig e' + - proj1_sig d') + (1#2)*proj1_sig d')
+    by simpl; ring.
   Qauto_nonneg.
  eapply ball_weak_le;[|apply (regFun_prf (Csnd p) ((1#2)*d')%Qpos)].
  autorewrite with QposElim.
  rewrite -> Qle_minus_iff in *.
- replace RHS with ((e' + - d') + (1#2)*d') by simpl; ring.
+ replace RHS with ((proj1_sig e' + - proj1_sig d') + (1#2)*proj1_sig d')
+   by simpl; ring.
  Qauto_nonneg.
 Qed.
 

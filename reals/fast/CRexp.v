@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRseries.
@@ -405,17 +407,19 @@ Qed.
 (* We parametrize the following lemmas by a lowerbound of [CRe_inv] so that
     we can easily swap lowerbounds. *)
 Lemma rational_exp_neg_posH (q : Qpos) (n:nat) (a:Q) :
- -n ≤ a → a ≤ 0 → '(q : Q) ≤ CRe_inv → '(q^n) ≤ IRasCR (Exp (inj_Q IR a)).
+  -n ≤ a → a ≤ 0 → '(proj1_sig q) ≤ CRe_inv
+  → '(proj1_sig q^n) ≤ IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Hn Ha small.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- IR_leEq_as_CR.
- stepl (inj_Q IR q[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
- assert (X:[0][<]inj_Q IR q).
+ stepl (inj_Q IR (proj1_sig q) [^]n)
+   by (now (apply eq_symmetric; apply inj_Q_power)).
+ assert (X:[0][<]inj_Q IR (`q)).
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   now destruct q.
- astepl (inj_Q IR q[!](nring n)[//]X).
+ astepl (inj_Q IR (`q)[!](nring n)[//]X).
  unfold power.
  apply Exp_resp_leEq.
  destruct n.
@@ -427,7 +431,7 @@ Proof.
   apply nring_pos; auto with *.
  stepr (inj_Q IR (a/(S n))).
   apply Exp_cancel_leEq.
-  astepl (inj_Q IR q).
+  astepl (inj_Q IR (`q)).
   rewrite -> IR_leEq_as_CR.
   rewrite -> IR_inj_Q_as_CR.
   assert (Ha0 : -(1)<=(a/S n)<=0).
@@ -473,7 +477,8 @@ Proof.
 Qed.
 
 Lemma rational_exp_neg_posH' (c : Qpos) (a : Q) : 
-  a ≤ 0 → '(c : Q) ≤ CRe_inv → '(c ^ (-Qfloor a) : Q) ≤ IRasCR (Exp (inj_Q IR a)).
+  a ≤ 0 → '(proj1_sig c) ≤ CRe_inv
+  → '(proj1_sig (Qpos_power c (-Qfloor a))) ≤ IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ha small.
  assert (X0:(0 <= -Qfloor a)%Z).
@@ -481,7 +486,8 @@ Proof.
   rewrite Q.Zle_Qle.
   apply Qle_trans with a; [| assumption].
   now apply Qfloor_le.
- setoid_replace (c ^ (-Qfloor a)) with (c ^ Z_to_nat X0).
+  setoid_replace (proj1_sig (Qpos_power c (-Qfloor a)))
+    with (proj1_sig c ^ Z_to_nat X0).
   apply rational_exp_neg_posH; trivial.
   rewrite <- (Z_to_nat_correct X0).
   rewrite inject_Z_opp, Qopp_involutive.
@@ -493,7 +499,7 @@ Lemma rational_exp_neg_pos : forall (a:Q) Ha,
  CRpos (@rational_exp_neg a Ha).
 Proof.
  intros a Ha.
- exists ((1#3)^(-Qfloor a))%Qpos. simpl.
+ exists (Qpos_power (1#3) (-Qfloor a))%Qpos. simpl.
  rewrite rational_exp_neg_correct.
  apply (rational_exp_neg_posH' (1#3)); trivial.
  apply CRe_inv_posH.
@@ -504,13 +510,13 @@ is positive. *)
 Definition rational_exp (a:Q) : CR.
 Proof.
  destruct (Qle_total 0 a).
-  refine (CRinv_pos ((1#3)^(Qceiling a))%Qpos (@rational_exp_neg (-a) _)).
+  refine (CRinv_pos (Qpos_power (1#3) (Qceiling a))%Qpos (@rational_exp_neg (-a) _)).
   apply (Qopp_le_compat 0); assumption.
  apply (rational_exp_neg q).
 Defined.
 
 Lemma rational_exp_pos_correct (a : Q) (Pa : 0 ≤ a) (c : Qpos) :
-  ('c <= IRasCR (Exp (inj_Q IR (-a)%Q)))%CR → 
+  ('proj1_sig c <= IRasCR (Exp (inj_Q IR (-a)%Q)))%CR → 
   CRinv_pos c (IRasCR (Exp (inj_Q IR (-a)))) = IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ec.
@@ -551,14 +557,15 @@ Proof.
 Qed.
 
 Lemma rational_exp_opp (c : Qpos) (a : Q) :
-  0 ≤ a → '(c : Q) ≤ rational_exp (-a) → CRinv_pos c (rational_exp (-a)) = rational_exp a.
+  0 ≤ a → '(proj1_sig c) ≤ rational_exp (-a) → CRinv_pos c (rational_exp (-a)) = rational_exp a.
 Proof.
   rewrite ?rational_exp_correct.
   intros. now apply rational_exp_pos_correct.
 Qed.
 
 Lemma rational_exp_lower_bound (c : Qpos) (a : Q) : 
-  a ≤ 0 → '(c : Q) ≤ CRe_inv → '(c ^ (-Qfloor a) : Q) ≤ rational_exp a.
+  a ≤ 0 → '(proj1_sig c) ≤ CRe_inv
+  → '(proj1_sig (Qpos_power c (-Qfloor a))) ≤ rational_exp a.
 Proof.
  rewrite rational_exp_correct.
  now apply rational_exp_neg_posH'.
@@ -588,11 +595,11 @@ Opaque inj_Q.
 Definition exp_bound (z:Z) : Qpos :=
 (match z with
  |Z0 => 1#1
- |Zpos p => (3#1)^p
- |Zneg p => (1#2)^p
+ |Zpos p => Qpos_power (3#1) p
+ |Zneg p => Qpos_power (1#2) p
  end)%Qpos.
 
-Lemma exp_bound_bound : forall (z:Z) x, closer (inj_Q IR (z:Q)) x -> AbsIR (Exp x)[<=]inj_Q IR (exp_bound z:Q).
+Lemma exp_bound_bound : forall (z:Z) x, closer (inj_Q IR (z:Q)) x -> AbsIR (Exp x)[<=]inj_Q IR (proj1_sig (exp_bound z)).
 Proof.
  intros [|z|z]; simpl; intros x Hx; apply AbsSmall_imp_AbsIR;
    (apply leEq_imp_AbsSmall;[apply less_leEq; apply Exp_pos|]).
@@ -686,7 +693,7 @@ Proof.
  apply inj_Q_wd; apply nring_Q.
 Qed.
 
-Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (Qscale_modulus (exp_bound z)).
+Lemma exp_bound_uc_prf : forall z:Z, is_UniformlyContinuousFunction (fun a => rational_exp (Qmin z a)) (Qscale_modulus (proj1_sig (exp_bound z))).
 Proof.
  intros z.
  assert (Z:Derivative (closer (inj_Q IR (z:Q))) I Expon Expon).
@@ -735,11 +742,12 @@ Qed.
 
 (** exp on all real numbers.  [exp_bounded] should be used instead when [x]
 is known to be bounded by some intenger. *)
-Definition exp (x:CR) : CR := exp_bounded (Qceiling (approximate x ((1#1)%Qpos) + (1#1))) x.
+Definition exp (x:CR) : CR
+  := exp_bounded (Qceiling (approximate x (Qpos2QposInf (1#1)) + (1#1))) x.
 (* begin hide *)
 Arguments exp : clear implicits.
 (* end hide *)
-Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (1 # 1)%Qpos + 1)%Q)%CR.
+Lemma exp_bound_lemma : forall x : CR, (x <= ' (approximate x (Qpos2QposInf (1 # 1)) + 1)%Q)%CR.
 Proof.
  intros x.
  assert (X:=ball_approx_l x (1#1)).
@@ -753,9 +761,8 @@ Proof.
  assert (Y:=X e).
  simpl in *.
  do 2 (unfold Cap_raw in *; simpl in * ).
- replace RHS with (approximate x (1 # 1)%Qpos +
-   - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos + - - (1 # 1)%Qpos) by simpl; QposRing.
- assumption.
+ apply (Qle_trans _ _ _ Y).
+ ring_simplify. apply Qle_refl.
 Qed.
 
 Lemma exp_correct : forall x, (IRasCR (Exp x) = exp (IRasCR x))%CR.
@@ -764,7 +771,7 @@ Proof.
  unfold exp.
  apply exp_bounded_correct.
  simpl.
- apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (1 # 1)%Qpos + 1)));
+ apply leEq_transitive with (inj_Q IR ((approximate (IRasCR x) (Qpos2QposInf (1 # 1)) + 1)));
    [|apply inj_Q_leEq; simpl;auto with *].
  rewrite -> IR_leEq_as_CR.
  rewrite -> IR_inj_Q_as_CR.
@@ -779,7 +786,7 @@ Lemma exp_bound_exp : forall (z:Z) (x:CR),
 Proof.
  intros z x H.
  unfold exp.
- set (a:=(approximate x (1 # 1)%Qpos + 1)).
+ set (a:=(approximate x (Qpos2QposInf (1 # 1)) + 1)).
  rewrite <- (CRasIRasCR_id x).
  rewrite <- exp_bounded_correct.
   rewrite <- exp_bounded_correct.
@@ -803,7 +810,7 @@ Add Morphism exp with signature (@st_eq _) ==> (@st_eq _) as exp_wd.
 Proof.
  intros x y Hxy.
  unfold exp at 1.
- set (a :=  (approximate x (1 # 1)%Qpos + 1)).
+ set (a :=  (approximate x (Qpos2QposInf (1 # 1)) + 1)).
  rewrite -> Hxy.
  apply exp_bound_exp.
  rewrite <- Hxy.

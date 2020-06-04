@@ -81,7 +81,7 @@ Definition le (x y: T): Prop :=
   | Finite y' =>
     match x with
     | Infinite => False
-    | Finite x' => (x' <= y')
+    | Finite x' => (proj1_sig x' <= proj1_sig y')
     end
   end.
 
@@ -92,20 +92,17 @@ Proof with intuition.
  destruct x0, y0, y, x...
   rewrite <- H.
   rewrite <- H0...
- unfold QnonNeg.coercions.to_Q.
  rewrite H.
  rewrite H0...
 Qed.
 
 Module Export coercions.
 
-Global Program Coercion from_QposInf (q: QposInf): T :=
+Definition from_QposInf (q: QposInf): T :=
   match q with
-  | Qpos2QposInf q' => Finite q'
+  | Qpos2QposInf q' => Finite (from_Qpos q')
   | QposInfinity => Infinite
   end.
-
-Global Coercion Finite: QnonNeg >-> T.
 
 Global Instance Finite_Proper: Proper (QnonNeg.eq ==> eq) Finite.
 Proof. repeat intro. assumption. Qed.

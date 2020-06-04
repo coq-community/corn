@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.Program.Program Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.model.structures.Qpossec CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
@@ -25,7 +27,7 @@ Qed.
 Instance Q_approx_div: AppDiv Q := λ x y k, app_approx (x / y) k.
 
 Instance inject_Q_Q: Cast Q Q_as_MetricSpace := Datatypes.id.
-Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 ε).
+Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 (proj1_sig ε)).
 
 Instance: AppRationals Q.
 Proof.

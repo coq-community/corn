@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRsin.
 Require Import CoRN.reals.fast.CRpi.
@@ -140,9 +142,9 @@ Proof.
   rewrite -> CReq_Qeq.
   simpl.
   unfold cos_poly_fun.
-  setoid_replace (Qmax (- (1 # 1)%Qpos) (Qmin (1 # 1)%Qpos q)) with q.
+  setoid_replace (Qmax (- (1)) (Qmin (1 # 1) q)) with q.
    reflexivity.
-  setoid_replace (Qmin (1 # 1)%Qpos q) with q.
+  setoid_replace (Qmin (1 # 1) q) with q.
    rewrite <- Qle_max_r.
    apply leEq_inj_Q with IR.
    destruct Hq0; assumption.
@@ -216,7 +218,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   change (/1) with 1.
-  replace RHS with (x:Q) by simpl; ring.
+  replace RHS with (proj1_sig x) by simpl; ring.
   apply Qle_refl.
  apply (is_UniformlyContinuousD None None I _ _ (Derivative_Cos I) rational_cos).
   intros q [] _.
@@ -248,7 +250,7 @@ Proof.
  apply: BindLaw1.
 Qed.
 
-Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (1#2)%Qpos -(1#2))) CRpi)))%CR.
+Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (Qpos2QposInf (1#2)) -(1#2))) CRpi)))%CR.
 
 Lemma cos_correct : forall x,
   (IRasCR (Cos x) == cos (IRasCR x))%CR.
@@ -256,7 +258,7 @@ Proof.
  intros x.
  unfold cos.
  generalize (Qceiling (approximate (IRasCR x * CRinv_pos (6 # 1) (scale 2 CRpi))
-   (1 # 2)%Qpos - (1 # 2)))%CR.
+   (Qpos2QposInf (1 # 2)) - (1 # 2)))%CR.
  intros z.
  rewrite -> compress_correct.
  rewrite <- CRpi_correct, <- CRmult_scale, <- IR_inj_Q_as_CR, <- IR_mult_as_CR,

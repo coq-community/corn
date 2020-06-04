@@ -171,6 +171,7 @@ Global Instance: Proper (QnonNeg.eq ==> eq) inject_Qnn.
 Proof with auto.
  unfold eq, le.
  intros ?? H.
+ unfold QnonNeg.eq in H.
  split; simpl; intros.
   rewrite H. apply Qle_trans with (`q)...
  rewrite <- H. apply Qle_trans with (`q)...
@@ -179,7 +180,8 @@ Qed.
 End coercions.
 
 Definition bound_doesnt_matter (q: QnonNeg) b H H' U U':
-  make (Qle q) b H U == make (Qlt q) b H' U'.
+  make (fun x => Qle (proj1_sig q) (proj1_sig x)) b H U
+  == make (fun x => Qlt (proj1_sig q) (proj1_sig x)) b H' U'.
 Proof with auto.
  unfold eq, le in *. simpl.
  split; intros e ???.
@@ -280,7 +282,7 @@ Section binop. (* used for addition and multiplication *)
    specialize (H _ yv).
    assert (o (`v) (`w) < `s) as os. apply Qle_lt_trans with (`r)...
    destruct (o_sneaky _ _ _ (proj2_sig _) (proj2_sig _) os).
-   apply (is_binop_bound (is_bound x) (is_bound z)) with (v + x0)%Qnn w...
+   apply (is_binop_bound (is_bound x) (is_bound z)) with (v + from_Qpos x0)%Qnn w...
    apply H. simpl.
    rewrite Qplus_comm. rewrite <- Qplus_0_l at 1. apply Qplus_lt_l...
   Qed.
@@ -397,12 +399,12 @@ Proof with auto; simpl.
  simpl. ring_simplify...
 Qed.
 
-Lemma le_closed (e x: T): (forall d: Qpos, x <= e + d) -> x <= e.
+Lemma le_closed (e x: T): (forall d: Qpos, x <= e + from_Qpos d) -> x <= e.
 Proof with auto.
  unfold le. simpl. intros H q H0 r qr.
  destruct (Qpos_lt_plus qr) as [d E].
- apply (H ((1#2)*d)%Qpos (q + (2#3)*d)%Qnn).
-  apply (is_binop_bound Qplus) with q ((1#2)*d)%Qnn...
+ apply (H ((1#2)*d)%Qpos (q + (2#3)*from_Qpos d)%Qnn).
+  apply (is_binop_bound Qplus) with q ((1#2)*from_Qpos d)%Qnn...
   simpl.
   apply Qplus_le_compat...
   apply Qmult_le_compat_r...

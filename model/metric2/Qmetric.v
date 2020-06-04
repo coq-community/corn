@@ -24,8 +24,8 @@ Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.metric2.Classification.
 Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.Qabs.
-Require Import CoRN.tactics.CornTac.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import MathClasses.implementations.stdlib_rationals.
 
@@ -50,7 +50,7 @@ Qed.
 ** Example of a Metric: <Q, Qball>
 *) 
 
-Definition Qball (e : Qpos) (a b : Q) := QAbsSmall (e:Q) (a - b).
+Definition Qball (e : Qpos) (a b : Q) := QAbsSmall (proj1_sig e) (a - b).
 
 Lemma AbsSmall_Qabs : forall x y, (Qabs y <= x)%Q <-> QAbsSmall x y.
 Proof.
@@ -86,10 +86,10 @@ Proof.
  assumption.
 Qed.
 
-Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= e.
+Lemma Qball_Qabs : forall e a b, Qball e a b <-> Qabs (a - b) <= proj1_sig e.
 Proof. split; apply AbsSmall_Qabs. Qed.
 
-Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+d) -> x <= e).
+Lemma Qle_closed : (forall e x, (forall d : Qpos, x <= e+ proj1_sig d) -> x <= e).
 Proof.
  intros. 
  apply Qnot_lt_le. intro abs.
@@ -111,7 +111,7 @@ Proof.
  intros x.
  unfold Qball. unfold QAbsSmall, Qminus.
  rewrite Qplus_opp_r. split.
- apply (Qopp_le_compat 0 e).
+ apply (Qopp_le_compat 0 (proj1_sig e)).
  destruct e. apply Qlt_le_weak, q.
  destruct e. apply Qlt_le_weak, q.
 Qed.
@@ -132,22 +132,23 @@ Proof.
  - (* triangle inequality *)
    intros [e1  He1] [e2 He2] a b c H1 H2.
    unfold Qball. unfold QAbsSmall. simpl.
-   setoid_replace (a-c) with ((a-b)+(b-c)).
-   2: ring. split. apply (Qle_trans _ (-e1 + -e2)).
+   assert (Qeq (a-c) ((a-b)+(b-c))) by ring.
+   rewrite H. clear H.
+   split. apply (Qle_trans _ (-e1 + -e2)).
    ring_simplify. apply Qle_refl.
    apply Qplus_le_compat. apply H1. apply H2.
    apply Qplus_le_compat. apply H1. apply H2.
  - (* distance closed *)
    intros e a b H. split.
    apply Qle_closed. intros. specialize (H d). destruct H.
-   apply (Qplus_le_l _ _ (-d)). ring_simplify.
+   apply (Qplus_le_l _ _ (-proj1_sig d)). ring_simplify.
    simpl in H. ring_simplify in H. exact H.
    apply Qle_closed. intros. apply H.
  - intros. apply Qle_antisym. apply Qle_closed.
    intros. specialize (H d). destruct H.
    apply (Qplus_le_l _ _ b) in H0. ring_simplify in H0. exact H0.
    apply Qle_closed. intros. specialize (H d). destruct H.
-   apply (Qplus_le_l _ _ (b+d)) in H. ring_simplify in H.
+   apply (Qplus_le_l _ _ (b+proj1_sig d)) in H. ring_simplify in H.
    rewrite Qplus_comm. exact H.
 Qed.
 
@@ -172,43 +173,45 @@ Definition Q_as_MetricSpace : MetricSpace :=
 Canonical Structure Q_as_MetricSpace.
 
 Lemma QPrelengthSpace_help
-  : forall (e d1 d2:Qpos), e < d1+d2 -> forall (a b c:QS),
-      ball e a b -> (c == (a*d2 + b*d1)/(d1+d2)%Qpos) -> ball d1 a c.
+  : forall (e d1 d2:Qpos), proj1_sig e < proj1_sig d1+ proj1_sig d2 -> forall (a b c:QS),
+      ball e a b -> (c == (a*proj1_sig d2 + b*proj1_sig d1)/proj1_sig (d1+d2)%Qpos) -> ball d1 a c.
 Proof with auto with *.
  intros e d1 d2 He a b c Hab Hc.
  simpl.
  unfold Qball.
  unfold QAbsSmall. rewrite Hc. clear Hc c.
- assert (0 < d1 + d2).
- { apply (Qlt_trans _ e). destruct e. exact q. exact He. }
+ assert (0 < proj1_sig (d1 + d2)%Qpos).
+ { apply (Qlt_trans _ (proj1_sig e)). destruct e. exact q. exact He. }
  split.
- - apply (Qmult_le_r _ _ (d1+d2)). exact H. 
+ - apply (Qmult_le_r _ _ (proj1_sig (d1+d2)%Qpos)). exact H. 
    simpl. field_simplify.
-   2: apply (@Qpos_nonzero (d1+d2)%Qpos).
-   apply (Qle_trans _ (d1 * (-(d1 + d2)))).
-   field_simplify. apply Qle_refl.
-   apply (Qle_trans _ (d1 * (a - b))).
+   apply (Qle_trans _ (proj1_sig d1 * (-proj1_sig (d1 + d2)%Qpos))).
+   simpl. field_simplify. apply Qle_refl.
+   apply (Qle_trans _ (proj1_sig d1 * (a - b))).
    apply Qmult_le_l. destruct d1. exact q.
-   destruct Hab. apply (Qle_trans _ (-e)).
+   destruct Hab. apply (Qle_trans _ (-proj1_sig e)).
    apply Qopp_le_compat, Qlt_le_weak, He. exact H0.
    field_simplify. apply Qle_refl.
- - apply (Qmult_le_r _ _ (d1+d2)). exact H.
+   intro abs. destruct d1, d2. simpl in abs.
+   simpl in H. rewrite abs in H. exact (Qlt_irrefl _ H).
+ - apply (Qmult_le_r _ _ (proj1_sig (d1+d2)%Qpos)). exact H.
    simpl. field_simplify.
-   2: apply (@Qpos_nonzero (d1+d2)%Qpos).
-   apply (Qle_trans _ (d1 * (a-b))).
+   apply (Qle_trans _ (proj1_sig d1 * (a-b))).
    field_simplify. apply Qle_refl.
-   apply (Qle_trans _ (d1 * (d1 + d2))).
+   apply (Qle_trans _ (proj1_sig (d1 * (d1 + d2))%Qpos)).
    apply Qmult_le_l. destruct d1. exact q.
-   destruct Hab. apply (Qle_trans _ e). exact H1.
+   destruct Hab. apply (Qle_trans _ (proj1_sig e)). exact H1.
    apply Qlt_le_weak, He.
-   field_simplify. apply Qle_refl.
+   simpl. field_simplify. apply Qle_refl.
+   intro abs. destruct d1,d2. simpl in H, abs.
+   rewrite abs in H. exact (Qlt_irrefl _ H).
 Qed.
 
 (** Q is a prelength space *)
 Lemma QPrelengthSpace : PrelengthSpace Q_as_MetricSpace.
 Proof.
  intros a b e d1 d2 He Hab.
- pose (c:= (a * d2 + b * d1) / (d1 + d2)%Qpos).
+ pose ((a * proj1_sig d2 + b * proj1_sig d1) / proj1_sig (d1 + d2)%Qpos) as c.
  exists c.
   apply (@QPrelengthSpace_help e d1 d2 He a b c); try assumption.
   reflexivity.
@@ -223,7 +226,7 @@ Proof.
  apply Qmult_comp.
   ring.
  apply Qinv_comp.
- QposRing.
+ simpl. ring.
 Qed.
 
 (** Q is a decideable metric, and hence located and stable. *)
@@ -233,12 +236,12 @@ Proof.
  simpl.
  unfold Qball, QAbsSmall.
  simpl.
- set (c:=-e).
+ set (c:=- proj1_sig e).
  set (d:=(a-b)).
  destruct (Qlt_le_dec_fast d c) as [Hdc|Hdc].
   right.
   abstract( intros [H1 H2]; apply (Qlt_not_le _ _ Hdc H1) ).
- destruct (Qlt_le_dec_fast e d) as [Hed|Hed].
+ destruct (Qlt_le_dec_fast (proj1_sig e) d) as [Hed|Hed].
   right.
   abstract( intros [H1 H2]; apply (Qlt_not_le _ _ Hed H2) ).
  left.
@@ -263,14 +266,15 @@ Qed.
 
 Hint Resolve stableQ : metricQ.
 
-Lemma in_Qball (r: Qpos) (x y: Q): (x - r <= y <= x + r) <-> Qball r x y.
+Lemma in_Qball (r: Qpos) (x y: Q)
+  : (x - proj1_sig r <= y <= x + proj1_sig r) <-> Qball r x y.
 Proof.
  now rewrite Qball_Qabs, Q.Qabs_diff_Qle.
 Qed.
 
 Lemma in_centered_Qball (w: Qpos) (m x: Q):
-  m <= x <= m + w ->
-  Qball ((1#2) * w) (m + (1#2) * w) x.
+  m <= x <= m + proj1_sig w ->
+  Qball (exist (Qlt 0) (1#2) eq_refl * w) (m + (1#2) * proj1_sig w) x.
 Proof.
  intros [??].
  apply in_Qball.
@@ -278,35 +282,46 @@ Proof.
 Qed. 
 
 Lemma nonneg_in_Qball_0 (x : Q) (Eq : 0 <= x) (ε : Qpos) : 
-  x <= ε <-> ball ε x 0.
+  x <= proj1_sig ε <-> ball ε x 0.
 Proof.
   rewrite <-in_Qball.
   split.
    intros ?. split.
-    apply (Q.Qplus_le_r ε). now ring_simplify.
+    apply (Q.Qplus_le_r (proj1_sig ε)). now ring_simplify.
    now apply Q.Qplus_nonneg; auto with *.
   intros [? ?].
-  apply (Q.Qplus_le_r (-ε)). 
+  apply (Q.Qplus_le_r (-proj1_sig ε)). 
   rewrite Qplus_comm. now ring_simplify.
 Qed.
 
 Section Qball_Qmult.
 
-  Variables (d : Qpos) (z x y: Q) (B: Qball (d / QabsQpos z) x y).
+  Variables (d : Qpos) (z x y: Q) (B: Qball (d * Qpos_inv (QabsQpos z)) x y).
 
   Lemma Qball_Qmult_Q_r : Qball d (x * z) (y * z).
-  Proof with auto.
+  Proof.
    destruct (Qeq_dec z 0) as [E|E].
     rewrite E. do 2 rewrite Qmult_0_r. apply ball_refl.
    apply Qball_Qabs.
    apply Qball_Qabs in B.
-   setoid_replace (x * z - y * z) with ((x - y) * z)%Q by (simpl; ring).
+   assert (Qeq (x * z - y * z) ((x - y) * z)) by (simpl; ring).
+   rewrite H. clear H.
    rewrite Qabs_Qmult.
-   setoid_replace (Qabs z) with (QabsQpos z).
-    setoid_replace (QposAsQ d) with  (d * Qpos_inv (QabsQpos z) * QabsQpos z).
-     apply Qmult_le_compat_r...
-    simpl. field. apply Qpos_nonzero.
-   symmetry. apply QabsQpos_correct...
+   assert (0 < Qabs z).
+   { apply Qabs_case.
+     intros. apply Qle_lteq in H. destruct H. exact H.
+     contradict E. symmetry. exact H. 
+     intros. apply Qle_lteq in H. destruct H.
+     apply (Qplus_lt_l _ _ z). ring_simplify. exact H.
+     contradict E. exact H. }
+   simpl in B. apply (Qmult_le_l _ _ (/(Qabs z))).
+   apply Qinv_lt_0_compat, H.
+   rewrite Qmult_comm, <- Qmult_assoc, Qmult_inv_r, Qmult_1_r.
+   rewrite Qmult_comm. 
+   setoid_replace (proj1_sig (QabsQpos z)) with (Qabs z) in B.
+   exact B. destruct z, Qnum; simpl.
+   contradict E. reflexivity. reflexivity. reflexivity.
+   intro abs. rewrite abs in H. exact (Qlt_irrefl _ H).
   Qed.
 
   Lemma Qball_Qmult_Q_l : Qball d (z * x) (z * y).
@@ -320,16 +335,20 @@ End Qball_Qmult.
 
 Section more_Qball_Qmult.
 
-  Variables (d z : Qpos) (x y: Q) (B: Qball (d / z) x y).
+  Variables (d z : Qpos) (x y: Q) (B: Qball (d * Qpos_inv z) x y).
 
-  Lemma Qball_Qmult_r: Qball d (x * z) (y * z).
-  Proof with auto.
-   apply Qball_Qmult_Q_r. rewrite QabsQpos_Qpos...
+  Lemma Qball_Qmult_r: Qball d (x * proj1_sig z) (y * proj1_sig z).
+  Proof.
+    apply Qball_Qmult_Q_r. destruct z, x0, Qnum; simpl.
+    exfalso. apply (Qlt_not_le _ _ q). simpl. apply (Qle_refl 0).
+    exact B. exfalso. inversion q.
   Qed.
 
-  Lemma Qball_Qmult_l: Qball d (z * x) (z * y).
-  Proof with auto.
-   apply Qball_Qmult_Q_l. rewrite QabsQpos_Qpos...
+  Lemma Qball_Qmult_l: Qball d (proj1_sig z * x) (proj1_sig z * y).
+  Proof.
+    apply Qball_Qmult_Q_l. destruct z, x0, Qnum; simpl.
+    exfalso. apply (Qlt_not_le _ _ q). simpl. apply (Qle_refl 0).
+    exact B. exfalso. inversion q.
   Qed.
 
 End more_Qball_Qmult.
@@ -339,10 +358,10 @@ Lemma Qball_plus (e d: Qpos) (x x' y y': Q):
 Proof with auto.
  intros.
  apply ball_triangle with (x' + y); apply Qball_Qabs.
-  setoid_replace (x + y - (x' + y))%Q with (x - x') by (simpl; ring).
-  apply Qball_Qabs...
- setoid_replace (x' + y - (x' + y')) with (y - y') by (simpl; ring).
- apply Qball_Qabs...
+ assert (Qeq (x + y - (x' + y)) (x - x')) by (simpl; ring).
+ rewrite H1. clear H1. apply Qball_Qabs...
+ assert (Qeq (x' + y - (x' + y')) (y - y')) by (simpl; ring).
+ rewrite H1. apply Qball_Qabs...
 Qed.
 
 Lemma Qball_plus_r (e: Qpos) (x y y': Q):
@@ -351,30 +370,34 @@ Proof with auto.
  intros B.
  apply Qball_Qabs.
  apply Qball_Qabs in B.
- setoid_replace (x + y - (x + y')) with (y - y') by (simpl; ring)...
+ assert (Qeq (x + y - (x + y')) (y - y')) by (simpl; ring).
+ rewrite H. exact B.
 Qed.
 
-Lemma Qball_0_r (e: Qpos) : Qball e e 0.
+Lemma Qball_0_r (e: Qpos) : Qball e (proj1_sig e) 0.
 Proof with auto with qarith.
  apply Qball_Qabs. 
- setoid_replace (e - 0) with e by ring.
+ unfold Qminus. rewrite Qplus_0_r.
  rewrite Qabs_pos...
 Qed.
 
-Lemma Qball_0_l (e: Qpos) : Qball e 0 e.
+Lemma Qball_0_l (e: Qpos) : Qball e 0 (proj1_sig e).
 Proof with auto with qarith.
  apply ball_sym. apply Qball_0_r.
 Qed.
 
 Lemma Qball_Qdiv_inv (d z: Qpos) (x y: Q):
-  Qball (d / z) (x / z) (y / z) -> Qball d x y.
-Proof with auto.
- intros.
+  Qball (d * Qpos_inv z) (x / proj1_sig z) (y / proj1_sig z)
+  -> Qball d x y.
+Proof.
+ intros. 
  rewrite
    <- (Qmult_1_r x), <- (Qmult_1_r y),
-   <- (Qmult_inv_r z), (Qmult_comm z),
+   <- (Qmult_inv_r (proj1_sig z)), (Qmult_comm (proj1_sig z)),
    Qmult_assoc, Qmult_assoc...
- apply Qball_Qmult_r...
+ apply Qball_Qmult_r... auto.
+ intro abs. destruct z. simpl in abs.
+ clear H. rewrite abs in q. exact (Qlt_irrefl _ q).
 Qed.
 
 Lemma Qball_opp (e : Qpos) (x x' : Q):
@@ -392,11 +415,11 @@ Qed.
 Require Import Coq.QArith.Qround.
 
 Lemma Qfloor_ball q:
-  Qball (1#2) ((Qfloor q # 1) + (1#2)) q.
+  Qball (exist (Qlt 0) (1#2) eq_refl) ((Qfloor q # 1) + (1#2)) q.
 Proof with auto with *.
  intros.
  apply Qball_Qabs.
- simpl QposAsQ.
+ simpl.
  apply Qabs_case; intros.
  apply Q.Qplus_le_l with ((-1#2)%Q + q).
  ring_simplify. apply Qfloor_le.
@@ -433,11 +456,12 @@ Qed.
 Lemma gball_Qabs (e a b : Q) : gball e a b <-> (Qabs (a - b) <= e).
 Proof.
 unfold gball. destruct (Q_dec e) as [[e_neg | e_pos] | e_zero].
-+ split; intros H; [easy |]. assert (H1 := Qle_lt_trans _ _ _ H e_neg).
+- split; intros H; [easy |]. assert (H1 := Qle_lt_trans _ _ _ H e_neg).
   eapply Qle_not_lt; [apply Qabs_nonneg | apply H1].
-+ apply Qball_Qabs.
-+ split; intro H.
-  - rewrite e_zero, H; setoid_replace (b - b) with 0 by ring; apply Qle_refl.
-  - rewrite e_zero in H. apply Q.Qabs_nonpos in H; now apply Q.Qminus_eq.
+- apply Qball_Qabs.
+- split; intro H.
+  + rewrite e_zero, H. unfold Qminus.
+    rewrite Qplus_opp_r. apply Qle_refl.
+  + rewrite e_zero in H. apply Q.Qabs_nonpos in H; now apply Q.Qminus_eq.
 Qed.
 

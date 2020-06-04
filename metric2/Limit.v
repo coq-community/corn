@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.QArith.
 Require Import Coq.Bool.Bool.
 Require Export CoRN.metric2.Complete.
@@ -331,15 +332,13 @@ Proof.
  cofix F.
  intros s [H0 H].
  constructor.
-  simpl.
-  rewrite <- Hl.
-  rewrite <- Hε.
+ apply (ball_wd X Hε _ _ (reflexivity _) _ _ Hl).
   assumption.
  auto.
 Qed.
 
 Lemma NearBy_weak l (ε1 ε2 : Qpos) : 
-  ε1 <= ε2 → ∀ s, NearBy l ε1 s → NearBy l ε2 s.
+  proj1_sig ε1 <= proj1_sig ε2 → ∀ s, NearBy l ε1 s → NearBy l ε2 s.
 Proof.
  unfold NearBy; simpl.
  cofix F.

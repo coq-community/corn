@@ -20,10 +20,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax. 
 Require Export CoRN.metric2.Metric.
 Require Export CoRN.model.structures.QposInf.
 Require Import CoRN.stdlib_omissions.List.
-Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -83,7 +83,8 @@ Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -
  (is_UniformlyContinuousFunction f2 mu2).
 Proof.
  intros f1 f2 mu1 mu2 Hf Hmu H e a b Hab.
- do 2 rewrite <- Hf.
+ assert (QposEq e e) by reflexivity.
+ apply (ball_wd Y H0 _ _ (Hf a) _ _ (Hf b)).
  apply H.
  eapply ball_ex_weak_le.
   apply Hmu.
@@ -162,14 +163,10 @@ Proof.
  unfold ucEq in H0, H1.
  split.
   intros.
-  rewrite <- H.
-  rewrite <- H0.
-  rewrite <- H1.
+  apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
   auto.
  intros.
- rewrite -> H.
- rewrite -> H0.
- rewrite -> H1.
+  apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
  auto.
 Qed.
 
@@ -216,7 +213,8 @@ Proof.
  apply uc_prf.
  destruct (mu f e);[|constructor].
  simpl.
- rewrite -> Hx.
+ assert (QposEq q q) by reflexivity.
+ apply (ball_wd X H _ _ Hx x1 x1 (reflexivity _)).
  apply ball_refl.
 Qed.
 

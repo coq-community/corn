@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.Q_in_CReals.
@@ -277,7 +279,7 @@ Proof.
   simpl.
   autorewrite with QposElim.
   change (/1) with 1.
-  replace RHS with (x:Q) by simpl; ring.
+  replace RHS with (proj1_sig x) by simpl; ring.
   apply Qle_refl.
  apply (is_UniformlyContinuousD None None I _ _ (Derivative_ArcTan I) rational_arctan).
   intros q [] _.

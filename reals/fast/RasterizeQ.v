@@ -19,6 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.RasterQ.
 Require Import CoRN.reals.fast.Interval.
 Require Import CoRN.logic.Classic.
@@ -113,30 +115,32 @@ Section RasterizeCorrect.
 Let C := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
 
 Lemma rasterization_error : forall l (w:Qpos) n x,
-(l <= x <= l + w) ->
-ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * w) (C l (l + w) (S n) (min n
+(l <= x <= l + proj1_sig w) ->
+ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * w) (C l (l + proj1_sig w) (S n) (min n
              (Z_to_nat
-                (Z.le_max_l 0 (rasterize1 l (l+w) (S n) x))))) x.
+                (Z.le_max_l 0 (rasterize1 l (l+proj1_sig w) (S n) x))))) x.
 Proof.
  clear - C.
  intros l w n x H0.
- destruct (Qlt_le_dec x (l+w)).
-  replace (Z_of_nat (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + w) (S n) x))
-    (Z.le_max_l 0 (rasterize1 l (l + w) (S n) x))))) with (rasterize1 l (l + w) (S n) x).
+ destruct (Qlt_le_dec x (l+proj1_sig w)).
+  replace (Z_of_nat (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x))
+                                     (Z.le_max_l 0 (rasterize1 l (l + proj1_sig w) (S n) x)))))
+    with (rasterize1 l (l + proj1_sig w) (S n) x).
    apply ball_sym.
    simpl.
    rewrite -> Qball_Qabs.
-   assert (l < l + w).
+   assert (l < l + proj1_sig w).
     rewrite -> Qlt_minus_iff.
     ring_simplify.
     auto with *.
    eapply Qle_trans.
     unfold C.
     apply (rasterize1_close H).
-   change ((l + w - l) / (2 * S n) <=(/ 2%positive) * (/ P_of_succ_nat n) * w).
+    change ((l + proj1_sig w - l) / (2 * S n)
+            <=(/ 2%positive) * (/ P_of_succ_nat n) * proj1_sig w).
    unfold Qdiv.
    rewrite -> Qinv_mult_distr.
-   replace LHS with (((/ 2) * (/ S n) * w)) by simpl; ring.
+   replace LHS with (((/ 2) * (/ S n) * proj1_sig w)) by simpl; ring.
    apply Qle_refl.
   rewrite inj_min.
   rewrite <- Z_to_nat_correct.
@@ -155,14 +159,14 @@ Proof.
   apply rasterize1_boundL; auto.
   apply Qle_trans with x; auto.
  simpl.
- replace (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + w) (S n) x))
-   (Z.le_max_l 0 (rasterize1 l (l + w) (S n) x)))) with n.
-  setoid_replace x with (l + w).
+ replace (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x))
+   (Z.le_max_l 0 (rasterize1 l (l + proj1_sig w) (S n) x)))) with n.
+  setoid_replace x with (l + proj1_sig w).
    apply: ball_sym.
    rewrite ->  Qball_Qabs.
    unfold C.
    autorewrite with QposElim.
-   replace RHS with (w*(1#xO (P_of_succ_nat n))) by simpl; ring.
+   replace RHS with (proj1_sig w*(1#xO (P_of_succ_nat n))) by simpl; ring.
    change (1 # xO (P_of_succ_nat n)) with (/(2*(S n))).
    change (2*S n #1) with (2*S n).
    change (2*n + 1#1) with ((2*n + 1)%Z:Q).
@@ -170,8 +174,8 @@ Proof.
    unfold Z.succ.
    do 2 rewrite -> injz_plus.
    setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| now (unfold Qeq; simpl; auto with * )].
-   setoid_replace (l + w - (l + (l + w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-     with ((w / (2 * (n + 1%positive)))); [| now (simpl; field; unfold Qeq; simpl; auto with * )].
+   setoid_replace (l + proj1_sig w - (l + (l + proj1_sig w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
+     with ((proj1_sig w / (2 * (n + 1%positive)))); [| now (simpl; field; unfold Qeq; simpl; auto with * )].
    rewrite -> Qabs_pos;[apply Qle_refl|].
    apply Qle_shift_div_l; [apply: mult_resp_pos; simpl; auto with *; unfold Qlt; simpl; auto with *|].
    replace LHS with 0 by simpl; ring.
@@ -186,8 +190,8 @@ Proof.
  unfold rasterize1.
  rewrite <- (Qfloor_Z n).
  apply Qfloor_resp_le.
- setoid_replace x with (l+w).
-  setoid_replace (l + w - l) with (w:Q); [| now simpl; ring].
+ setoid_replace x with (l+proj1_sig w).
+  setoid_replace (l + proj1_sig w - l) with (proj1_sig w); [| now simpl; ring].
   field_simplify;[|apply Qpos_nonzero].
   unfold Qle.
   simpl.
@@ -225,8 +229,8 @@ Qed.
 Variable b l:Q.
 Variable w h:Qpos.
 
-Let r:=l+w.
-Let t:=b+h.
+Let r:=l+proj1_sig w.
+Let t:=b+proj1_sig h.
 
 Variable f:FinEnum stableQ2.
 

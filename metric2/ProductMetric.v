@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Classification.
 Require Import CoRN.metric2.UniformContinuity.
@@ -102,9 +103,10 @@ Qed.
 Definition ProductMS : MetricSpace.
 Proof.
  exists (prodS X Y) prod_ball.
-  abstract ( intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1]; unfold prod_ball;
-    change (QposEq e1 e2) in He; rewrite -> He, Ha0, Ha1, Hb0, Hb1; reflexivity) using prod_ball_wd.
- apply prod_is_MetricSpace.
+ 2: apply prod_is_MetricSpace.
+ intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1]; unfold prod_ball.
+ rewrite (ball_wd X He _ _ Ha0 _ _ Hb0).
+ rewrite (ball_wd Y He _ _ Ha1 _ _ Hb1). reflexivity.
 Defined.
 
 (** Product metrics preserve properties of metric spaces such as

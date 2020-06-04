@@ -1,5 +1,6 @@
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require CoRN.model.structures.NNUpperR.
 Import NNUpperR.notations.
 Import QnonNeg.notations QnonNeg.coercions NNUpperR.coercions.
@@ -46,7 +47,7 @@ Section from_alt.
 
   Variable (X: DistanceMetricSpace).
 
-  Definition ball (q: Qpos) (x y: X): Prop := distance x y <= q.
+  Definition ball (q: Qpos) (x y: X): Prop := distance x y <= from_Qpos q.
 
   Instance ball_wd: Proper (QposEq ==> @st_eq X ==> @st_eq X ==> iff) ball.
   Proof.
@@ -68,7 +69,7 @@ Section from_alt.
    rewrite distance_sym...
   Qed.
 
-  Lemma ball_closed e x y: (forall d, ball (e + d) x y) -> ball e x y.
+  Lemma ball_closed e x y: (forall d, ball (Qpos_plus e d) x y) -> ball e x y.
   Proof with auto.
    unfold ball. intros.
    apply NNUpperR.le_closed. intros.
@@ -76,14 +77,15 @@ Section from_alt.
    rewrite <- QnonNeg.coercions.from_Qpos_plus_homo...
   Qed.
 
-  Lemma ball_triangle e1 e2 a b c: ball e1 a b -> ball e2 b c -> ball (e1 + e2) a c.
+  Lemma ball_triangle e1 e2 a b c
+    : ball e1 a b -> ball e2 b c -> ball (Qpos_plus e1 e2) a c.
   Proof with auto.
    unfold ball.
    intros.
    apply NNUpperR.le_trans with (distance a b + distance b c).
     apply distance_triangle.
-   rewrite QnonNeg.coercions.from_Qpos_plus_homo.
-   rewrite NNUpperR.plus_homo.
+    rewrite QnonNeg.coercions.from_Qpos_plus_homo.
+    rewrite NNUpperR.plus_homo.
    apply NNUpperR.plus_le_compat...
   Qed.
 

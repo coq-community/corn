@@ -2,6 +2,8 @@
  with a proof that integrals satisfying this interface are unique. *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
  Coq.Unicode.Utf8 Coq.Program.Program
  CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
@@ -79,25 +81,27 @@ Qed.
 End QFacts.
 
 Definition split (w: QnonNeg) (bound: QposInf):
-  { x: nat * QnonNeg | (fst x * snd x == w)%Qnn /\ (snd x <= bound)%QnnInf }.
+  { x: nat * QnonNeg | (from_nat (fst x) * snd x == w)%Qnn
+                     /\ (QnnInf.Finite (snd x) <= from_QposInf bound)%QnnInf }.
 Proof with simpl; auto with *.
  unfold QnonNeg.eq. simpl.
  destruct bound; simpl.
   Focus 2. exists (1%nat, w). simpl. split... ring.
  induction w using QnonNeg.rect.
   exists (0%nat, 0%Qnn)...
- set (p := Qpossec.QposCeiling (QposMake n d / q)%Qpos).
- exists (nat_of_P p, ((QposMake n d / p)%Qpos):QnonNeg)...
+ set (p := SimpleIntegration.QposCeiling (proj1_sig ((n#d) * Qpos_inv q)%Qpos)).
+ exists (nat_of_P p, from_Qpos (((n#d) * Qpos_inv (p#1))%Qpos))...
  split.
   rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
   change (p * ((n#d) * / p) == (n#d))%Q.
   field. discriminate.
  subst p.
- apply Qle_shift_div_r...
- rewrite Qpossec.QposCeiling_Qceiling. simpl.
- setoid_replace (n#d:Q) with (q * ((n#d) * / q))%Q at 1 by (simpl; field)...
- do 2 rewrite (Qmult_comm q).
- apply Qmult_le_compat_r...
+ apply Qle_shift_div_r. reflexivity.
+ rewrite SimpleIntegration.QposCeiling_Qceiling. simpl.
+ setoid_replace (n#d:Q)
+   with (proj1_sig q * ((n#d) * / proj1_sig q))%Q at 1 by (simpl; field)...
+ apply Qmult_le_l. apply Qpos_ispos.
+ apply Qle_ceiling.
 Qed.
 
 (** Riemann sums will play an important role in the theory about integrals, so let's
@@ -184,7 +188,8 @@ Section integral_approximation.
     (** Iterating the additive property yields: *)
 
     Lemma integral_repeated_additive (a: Q) (b: QnonNeg) (n: nat):
-        cmΣ n (fun i: nat => ∫ f (a + i * ` b) b) == ∫ f a (n * b)%Qnn.
+      cmΣ n (fun i: nat => ∫ f (a + i * ` b) b)
+      == ∫ f a (from_nat n * b)%Qnn.
     Proof with try ring.
      unfold cmΣ.
      induction n; simpl @cm_Sum.
@@ -192,9 +197,9 @@ Section integral_approximation.
       rewrite QnonNeg.mult_0_l, zero_width_integral...
      rewrite IHn.
      rewrite CRplus_comm.
-     setoid_replace (S n * b)%Qnn with (n * b + b)%Qnn.
+     setoid_replace (from_nat (S n) * b)%Qnn with (from_nat n * b + b)%Qnn.
       rewrite integral_additive...
-     change (S n * b == n * b + b)%Q.
+     change (S n * proj1_sig b == n * proj1_sig b + proj1_sig b)%Q.
      rewrite S_Qplus...
     Qed.
 
@@ -202,16 +207,17 @@ Section integral_approximation.
     boundedness property. We start by generalizing mid to CR: *)
 
     Lemma bounded_with_real_mid (from: Q) (width: Qpos) (mid: CR) (r: Qpos):
-      (forall x, from <= x <= from+width -> ball r (f x) mid) ->
-      ball (width * r) (∫ f from width) (scale width mid).
+      (forall x, from <= x <= from+proj1_sig width -> ball r (f x) mid) ->
+      ball (width * r) (∫ f from (from_Qpos width)) (scale (proj1_sig width) mid).
     Proof with auto.
      intros H d1 d2.
      simpl approximate.
      destruct (Qscale_modulus_pos width d2) as [P E].
      rewrite E. simpl.
-     set (v := (exist (Qlt 0) (/ width * d2)%Q P)).
-     setoid_replace (d1 + width * r + d2)%Qpos with (d1 + width * (r + v))%Qpos by
-       (unfold QposEq; simpl; field)...
+     set (v := (exist (Qlt 0) (/ (proj1_sig width) * proj1_sig d2)%Q P)).
+     assert (QposEq (d1 + width * r + d2)%Qpos (d1 + width * (r + v))%Qpos).
+     { unfold QposEq; simpl; field. apply Qpos_nonzero. }
+     rewrite H0. clear H0.
      apply regFunBall_Cunit.
      apply integral_bounded_prim.
      intros.
@@ -222,8 +228,8 @@ Section integral_approximation.
     (** Next, we generalize r to QnonNeg: *)
 
     Lemma bounded_with_nonneg_radius (from: Q) (width: Qpos) (mid: CR) (r: QnonNeg):
-      (forall (x: Q), (from <= x <= from+width) -> gball r (f x) mid) ->
-      gball (width * r) (∫ f from width) (scale width mid).
+      (forall (x: Q), (from <= x <= from+ proj1_sig width) -> gball (proj1_sig r) (f x) mid) ->
+      gball (proj1_sig width * proj1_sig r) (∫ f from (from_Qpos width)) (scale (proj1_sig width) mid).
     Proof with auto.
      pattern r.
      apply QnonNeg.Qpos_ind.
@@ -233,7 +239,9 @@ Section integral_approximation.
       rewrite Qmult_0_r, gball_0.
       intros.
       apply ball_eq. intro .
-      setoid_replace e with (width * (e * Qpos_inv width))%Qpos by (unfold QposEq; simpl; field)...
+      assert (QposEq e (width * (e * Qpos_inv width))%Qpos).
+      { unfold QposEq; simpl; field. apply Qpos_nonzero. }
+      rewrite H0. clear H0.
       apply bounded_with_real_mid.
       intros q ?.
       setoid_replace (f q) with mid...
@@ -247,26 +255,27 @@ Section integral_approximation.
 
     Lemma bounded_with_real_radius (from: Q) (width: Qpos) (mid: CR) (r: CR) (rnn: CRnonNeg r):
       (forall (x: Q), from <= x <= from+` width -> CRball r mid (f x)) ->
-      CRball (scale width r) (∫ f from width) (scale width mid).
+      CRball (scale (proj1_sig width) r) (∫ f from (from_Qpos width)) (scale (proj1_sig width) mid).
     Proof with auto.
      intro A.
      unfold CRball.
      intros.
      unfold CRball in A.
-     setoid_replace q with (width * (q / width))%Q by (simpl; field; auto).
-     assert (r <= ' (q / width)).
-      apply (mult_cancel_leEq CRasCOrdField) with (' width).
+     setoid_replace q with (proj1_sig width * (q / proj1_sig width))%Q
+       by (simpl; field; auto).
+     assert (r <= ' (q / proj1_sig width)).
+     { apply (mult_cancel_leEq CRasCOrdField) with (' (proj1_sig width)).
        simpl. apply CRlt_Qlt...
       rewrite mult_commutes.
-      change (' width * r <= ' (q / width) * ' width).
+      change (' (proj1_sig width) * r <= ' (q / proj1_sig width) * ' (proj1_sig width)).
       rewrite CRmult_Qmult.
       unfold Qdiv.
       rewrite <- Qmult_assoc.
-      rewrite (Qmult_comm (/width)).
+      rewrite (Qmult_comm (/ proj1_sig width)).
       rewrite Qmult_inv_r...
       rewrite Qmult_1_r.
-      rewrite CRmult_scale...
-     assert (0 <= (q / width))%Q as E.
+      rewrite CRmult_scale... }
+     assert (0 <= (q / proj1_sig width))%Q as E.
       apply CRle_Qle.
       apply CRle_trans with r...
       apply -> CRnonNeg_le_0...
@@ -278,7 +287,7 @@ Section integral_approximation.
 
     Lemma integral_bounded (from: Q) (width: QnonNeg) (mid: CR) (r: CR) (rnn: CRnonNeg r)
       (A: forall (x: Q), (from <= x <= from+` width) -> CRball r mid (f x)):
-      CRball (scale width r) (∫ f from width) (scale width mid).
+      CRball (scale (proj1_sig width) r) (∫ f from width) (scale (proj1_sig width) mid).
     Proof with auto.
      revert A.
      pattern width.
@@ -397,9 +406,10 @@ Section integral_approximation.
     Qed.
 
     Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: Qpos) (iw: Q) (n: nat):
-     (S n * iw == w)%Q ->
-     (iw <= lmu a w e)%Qinf ->
-     gball (e * w) (cmΣ (S n) (fun i => 'iw * f (a + i * iw))%CR) (∫ f a w).
+     (S n * iw == proj1_sig w)%Q ->
+     (iw <= lmu a (proj1_sig w) (proj1_sig e))%Qinf ->
+     gball (proj1_sig e * proj1_sig w)
+           (cmΣ (S n) (fun i => 'iw * f (a + i * iw))%CR) (∫ f a w).
     Proof.
      intros A B.
      assert (ne_sn_0 : ~ S n == 0) by
@@ -408,41 +418,45 @@ Section integral_approximation.
        (apply Qdiv_l in A; [| assumption]; rewrite A; apply Qmult_le_0_compat; [now auto|];
         apply Qinv_le_0_compat, Qle_nat). (* This should be automated *)
      set (iw' := exist _ iw iw_nn : QnonNeg ).
-     change iw with (QnonNeg.coercions.to_Q iw').
-     change (S n * iw' == w)%Qnn in A.
+     change iw with (proj1_sig iw').
+     change (from_nat (S n) * iw' == w)%Qnn in A.
      rewrite <- A at 2.
      rewrite <- integral_repeated_additive.
-     setoid_replace (e * w)%Q with (S n * (iw * e))%Q by
+     setoid_replace (proj1_sig e * proj1_sig w)%Q with (S n * (iw * proj1_sig e))%Q by
        (unfold QnonNeg.eq in A; simpl in A;
         rewrite Qmult_assoc; rewrite A; apply Qmult_comm).
      apply CRΣ_gball.
      intros m H.
      rewrite CRmult_scale.
      apply gball_sym. apply CRball.rational.
-     setoid_replace (' (iw * e)) with (scale iw' (' ` e)) by now rewrite <- scale_Qmult.
+     setoid_replace (' (iw * proj1_sig e)) with (scale (proj1_sig iw') (' ` e))
+       by now rewrite <- scale_Qmult.
      apply integral_bounded; [apply CRnonNegQpos |].
-     intros x [A1 A2]. apply CRball.rational. apply (luc_gball a w (`iw')); trivial.
+     intros x [A1 A2]. apply CRball.rational.
+     apply (luc_gball a (proj1_sig w) (`iw')); trivial.
      + apply gball_Qabs.
-       setoid_replace (a - (a + m * iw')) with (- (m * iw')) by ring.
+       setoid_replace (a - (a + m * proj1_sig iw')) with (- (m * proj1_sig iw')) by ring.
        rewrite Qabs_opp. apply Qabs_le_nonneg; [Qauto_nonneg |].
-       apply Qle_trans with (y := (S n * iw')).
-       apply Qmult_le_compat_r. apply Qlt_le_weak. rewrite <- Zlt_Qlt. now apply inj_lt.
+       apply Qle_trans with (y := (S n * proj1_sig iw')).
+       apply Qmult_le_compat_r. apply Qlt_le_weak.
+       rewrite <- Zlt_Qlt. now apply inj_lt.
        apply (proj2_sig iw').
-       change (S n * iw' == w) in A. rewrite <- A; reflexivity.
+       change (S n * proj1_sig iw' == proj1_sig w) in A. rewrite <- A; reflexivity.
      + apply gball_Qabs, Qabs_Qle_condition.
        split.
-       apply Qplus_le_l with (z := x), Qplus_le_l with (z := w).
-       setoid_replace (- w + x + w) with x by ring. setoid_replace (a - x + x + w) with (a + w) by ring.
+       apply Qplus_le_l with (z := x), Qplus_le_l with (z := proj1_sig w).
+       setoid_replace (- proj1_sig w + x + proj1_sig w) with x by ring.
+       setoid_replace (a - x + x + proj1_sig w) with (a + proj1_sig w) by ring.
        apply Qle_trans with (y := (a + m * ` iw' + ` iw')); [easy |].
        setoid_rewrite <- (Qmult_1_l (` iw')) at 2. change 1%Q with (inject_Z (Z.of_nat 1)).
        rewrite <- Qplus_assoc, <- Qmult_plus_distr_l, <- Zplus_Qplus, <- Nat2Z.inj_add.
-       apply Qplus_le_r. change (S n * iw' == w) in A. rewrite <- A.
+       apply Qplus_le_r. change (S n * proj1_sig iw' == proj1_sig w) in A. rewrite <- A.
        apply Qmult_le_compat_r. rewrite <- Zle_Qle. apply inj_le. rewrite Plus.plus_comm.
        now apply lt_le_S.
        apply (proj2_sig iw').
-       apply Qplus_le_l with (z := x), Qplus_le_l with (z := -w).
-       setoid_replace (a - x + x + - w) with (a - w) by ring.
-       setoid_replace (w + x + - w) with x by ring.
+       apply Qplus_le_l with (z := x), Qplus_le_l with (z := - proj1_sig w).
+       setoid_replace (a - x + x + - proj1_sig w) with (a - proj1_sig w) by ring.
+       setoid_replace (proj1_sig w + x + - proj1_sig w) with x by ring.
        apply Qle_trans with (y := a). rewrite <- (Qplus_0_r a) at 2.
        apply Qplus_le_r. change 0 with (-0). apply Qopp_le_compat, (proj2_sig w).
        apply Qle_trans with (y := a + m * ` iw'); [| easy].
@@ -450,11 +464,13 @@ Section integral_approximation.
      + apply gball_Qabs, Qabs_Qle_condition; split.
        apply (Qplus_le_r (x + `iw')).
        setoid_replace (x + `iw' + - `iw') with x by ring.
-       setoid_replace (x + `iw' + (a + m * iw' - x)) with (a + m * iw' + `iw') by ring. apply A2.
+       setoid_replace (x + (proj1_sig iw') + (a + m * proj1_sig iw' - x))
+         with (a + m * proj1_sig iw' + proj1_sig iw') by ring. apply A2.
        apply (Qplus_le_r (x - `iw')).
-       setoid_replace (x - `iw' + (a + m * iw' - x)) with (a + m * iw' - `iw') by ring.
+       setoid_replace (x - proj1_sig iw' + (a + m * proj1_sig iw' - x))
+         with (a + m * proj1_sig iw' - proj1_sig iw') by ring.
        setoid_replace (x - `iw' + `iw') with x by ring.
-       apply Qle_trans with (y := a + m * iw'); [| easy].
+       apply Qle_trans with (y := a + m * proj1_sig iw'); [| easy].
        apply Qminus_less. apply (proj2_sig iw').
     Qed.
 
@@ -491,62 +507,74 @@ Section integral_approximation.
     Qed.
 
     Lemma Riemann_sums_approximate_integral' (a : Q) (w : QnonNeg) (e : Qpos) (n : positive) :
-      (step w n <= lmu a w e)%Qinf ->
-      gball (e * w) (riemann_sum a w n) (∫ f a w).
+      (step (proj1_sig w) n <= lmu a (proj1_sig w) (proj1_sig e))%Qinf ->
+      gball (proj1_sig e * proj1_sig w) (riemann_sum a (proj1_sig w) n) (∫ f a w).
     Proof.
       intro A; unfold riemann_sum.
       destruct (Pos2Nat.is_succ n) as [m M]. rewrite M.
       apply Riemann_sums_approximate_integral; [rewrite <- M | easy].
-      unfold step. change (Pos.to_nat n * (w * (1 # n)) == w).
-      rewrite positive_nat_Z. unfold inject_Z. rewrite !Qmake_Qdiv; field; auto.
+      unfold step. change (Pos.to_nat n * (proj1_sig w * (1 # n)) == proj1_sig w).
+      rewrite positive_nat_Z. unfold inject_Z.
+      rewrite Qmult_comm, <- Qmult_assoc.
+      setoid_replace ((1 # n) * (n # 1)) with (1#1) by reflexivity.
+      ring.
     Qed.
 
     Lemma integral_approximation (a : Q) (w : QnonNeg) (e : Qpos) :
       exists N : positive, forall n : positive, (N <= n)%positive ->
-        mspc_ball e (riemann_sum a w n) (∫ f a w).
+        mspc_ball e (riemann_sum a (proj1_sig w) n) (∫ f a w).
     Proof.
-    destruct (Qlt_le_dec 1 w) as [A1 | A1].
-    * assert (0 < w) by (apply (Qlt_trans _ 1); auto with qarith).
-      set (N := Z.to_pos (Qceiling (comp_inf (λ x, w / x) (lmu a w) 0 (e / w)))).
+    destruct (Qlt_le_dec 1 (proj1_sig w)) as [A1 | A1].
+    * assert (0 < proj1_sig w) by (apply (Qlt_trans _ 1); auto with qarith).
+      set (N := Z.to_pos (Qceiling (comp_inf (λ x, proj1_sig w / x) (lmu a (proj1_sig w)) 0 (proj1_sig e / proj1_sig w)))).
       exists N; intros n A2.
-      setoid_replace (QposAsQ e) with (e / w * w) by (field; auto with qarith).
+      assert (Qinf.eq (proj1_sig e) (proj1_sig e / proj1_sig w * proj1_sig w)).
+      { simpl. unfold canonical_names.equiv.
+        unfold stdlib_rationals.Q_eq. field. intro abs.
+        rewrite abs in H. exact (Qlt_irrefl 0 H). }
+      rewrite H0. clear H0.
       (* [apply Riemann_sums_approximate_integral'] does not unify because in
-      this lemma, the radius is [(QposAsQ e) * (QnonNeg.to_Q w)], and in the
-      goal the radius is [(QposAsQ e) / (QnonNeg.to_Q w) * (QnonNeg.to_Q w)]. *)
-      assert (P : 0 < e / w) by (apply Qmult_lt_0_compat; [| apply Qinv_lt_0_compat]; auto).
-      change (e / w) with (QposAsQ (mkQpos P)).
-      apply Riemann_sums_approximate_integral'.
-      change (QposAsQ (mkQpos P)) with (e / w).
-      destruct (lmu a w (e / w)) as [mu |] eqn:A3; [| easy].
+      this lemma, the radius is [(QposAsQ e) * (QnonNeg.proj1_sig w)], and in the
+      goal the radius is [(QposAsQ e) / (QnonNeg.proj1_sig w) * (QnonNeg.proj1_sig w)]. *)
+      assert (P : 0 < proj1_sig e / proj1_sig w).
+      { (apply Qmult_lt_0_compat; [| apply Qinv_lt_0_compat]; auto). }
+      change (proj1_sig e / proj1_sig w) with (proj1_sig (exist _ _ P)).
+      apply (Riemann_sums_approximate_integral'
+               a w ((exist (Qlt 0) (proj1_sig e / proj1_sig w) P))).
+      change (` (exist (Qlt 0) (` e / proj1_sig w) P)) with (proj1_sig e / proj1_sig w).
+      destruct (lmu a (proj1_sig w) (proj1_sig e / proj1_sig w)) as [mu |] eqn:A3; [| easy].
       subst N; unfold comp_inf in A2; rewrite A3 in A2.
-      change (step w n <= mu); unfold step.
-      rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
+      change (step (proj1_sig w) n <= mu); unfold step.
+      setoid_replace (1#n) with (/(n#1)) by reflexivity.
 
       assert (0 < mu) as A4. change (Qinf.lt 0 mu). rewrite <- A3.
       apply (@uc_pos
                _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) w a))
+                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig w) a))
                CR (msp_mspc_ball CR)
-               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a w) (lmu a w)).
+               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a (proj1_sig w))
+               (lmu a (proj1_sig w))).
       trivial. trivial.
-      apply Qle_div_l; auto.
+      apply Qle_div_l; auto. reflexivity.
       now apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
-    * set (N := Z.to_pos (Qceiling (comp_inf (λ x, 1 / x) (lmu a w) 0 e))).
+    * set (N := Z.to_pos (Qceiling (comp_inf (λ x, 1 / x) (lmu a (proj1_sig w)) 0 (proj1_sig e)))).
       exists N; intros n A2.
-      apply (mspc_monotone (e * w)).
-      + change (e * w <= e). rewrite <- (Qmult_1_r e) at 2. apply Qmult_le_compat_l; auto.
+      apply (mspc_monotone (proj1_sig e * proj1_sig w)).
+    + change (proj1_sig e * proj1_sig w <= proj1_sig e).
+      rewrite <- (Qmult_1_r (proj1_sig e)) at 2. apply Qmult_le_compat_l; auto.
+      apply Qpos_nonneg.
       + apply Riemann_sums_approximate_integral'.
-        destruct (lmu a w e) as [mu |] eqn:A3; [| easy].
+        destruct (lmu a (proj1_sig w) (proj1_sig e)) as [mu |] eqn:A3; [| easy].
         subst N; unfold comp_inf in A2; rewrite A3 in A2.
-        change (step w n <= mu); unfold step.
-        rewrite Qmake_Qdiv, injZ_One; unfold Qdiv; rewrite Qmult_assoc, Qmult_1_r.
+        change (step (proj1_sig w) n <= mu); unfold step.
+        setoid_replace (1#n) with (/(n#1)) by reflexivity.
         assert (0 < mu) as A4. change (Qinf.lt 0 mu). rewrite <- A3.
         apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) w a))
+                              (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig w) a))
                CR (msp_mspc_ball CR)
-               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a w) (lmu a w)).
+               (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR f a (proj1_sig w)) (lmu a (proj1_sig w))).
         trivial. apply (proj2_sig e).
-        apply Qle_div_l; auto.
+        apply Qle_div_l; auto. reflexivity.
         apply Z.Ple_Zle_to_pos, Q.Zle_Qle_Qceiling in A2.
         apply (Qle_trans _ (1 / mu)); trivial. apply Qmult_le_compat_r; trivial.
         now apply Qinv_le_0_compat, Qlt_le_weak.
@@ -726,17 +754,17 @@ Proof. rewrite <- CRmult_scale; change (cast Q CR x * 0 = 0); ring. Qed.
 Require Import MathClasses.misc.propholds.
 
 Lemma integral_abs_bound (from : Q) (width : QnonNeg) (M : Q) :
-  (forall (x : Q), (from ≤ x ≤ from + width) -> CRabs (f x) ≤ 'M) ->
+  (forall (x : Q), (from ≤ x ≤ from + proj1_sig width) -> CRabs (f x) ≤ 'M) ->
   CRabs (∫ f from width) ≤ '(`width * M).
 Proof.
 intro A. rewrite <- (CRplus_0_r (∫ f from width)), <- CRopp_0.
-apply CRball.as_distance_bound. rewrite <- (scale_0_r width).
+apply CRball.as_distance_bound. rewrite <- (scale_0_r (proj1_sig width)).
 rewrite <- CRmult_Qmult, CRmult_scale.
 apply integral_bounded; trivial.
 + apply CRnonNeg_le_0.
   apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
   apply A. split; [reflexivity |].
-  apply semirings.nonneg_plus_le_compat_r; change (0 <= width)%Q; Qauto_nonneg.
+  apply semirings.nonneg_plus_le_compat_r; change (0 <= proj1_sig width)%Q; Qauto_nonneg.
 + intros x A2. apply CRball.as_distance_bound. rewrite CRdistance_comm.
   change (CRabs (f x - 0) ≤ 'M).
   rewrite rings.minus_0_r; now apply A.
@@ -747,7 +775,7 @@ assert (A1 : 0 ≤ M).
 + apply CRle_Qle. apply CRle_trans with (y := CRabs (f from)); [apply CRabs_nonneg |].
   apply A. split; [reflexivity |].
   apply semirings.nonneg_plus_le_compat_r; change (0 <= width)%Q; Qauto_nonneg.
-+ change M with (QnonNeg.to_Q (exist _ M A1)).
++ change M with (QnonNeg.proj1_sig (exist _ M A1)).
   apply bounded_with_nonneg_radius; [easy |].
   intros x A2. apply CRball.gball_CRabs. change (f x - 0%mc)%CR with (f x - 0).
   rewrite rings.minus_0_r; now apply A.
@@ -1048,28 +1076,28 @@ apply mspc_closed. intros e e_pos. (* Why is 0%Q? *)
 mc_setoid_replace (0 + e) with e by ring.
 assert (he_pos : 0 < e / 2) by solve_propholds.
 assert (qe_pos : 0 < e / 4) by solve_propholds.
-destruct (integral_approximation f a w (mkQpos qe_pos)) as [Nf F].
-destruct (integral_approximation g a w (mkQpos qe_pos)) as [Ng G].
+destruct (integral_approximation f a w (exist _ _ qe_pos)) as [Nf F].
+destruct (integral_approximation g a w (exist _ _ qe_pos)) as [Ng G].
 destruct (@integral_approximation
             (f + g)
             (@Integral_instance_0
-                        (f+g) _ (@uc_ulc _ _ _ _ _ _
-                                         (@sum_uc
-                                            Q (msp_mspc_ball Q_as_MetricSpace)
-                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
-                                            f g _ _ _ _)))
+               (f+g) _ (@uc_ulc _ _ _ _ _ _
+                                (@sum_uc
+                                   Q (msp_mspc_ball Q_as_MetricSpace)
+                                   (msp_mspc_ball_ext Q_as_MetricSpace) 
+                                   f g _ _ _ _)))
             _ _ (@uc_ulc _ _ _ _ _ _
-                                         (@sum_uc
-                                            Q (msp_mspc_ball Q_as_MetricSpace)
-                                            (msp_mspc_ball_ext Q_as_MetricSpace) 
-                                            f g _ _ _ _))
-            a w (mkQpos he_pos)) as [Ns S].
+                         (@sum_uc
+                            Q (msp_mspc_ball Q_as_MetricSpace)
+                            (msp_mspc_ball_ext Q_as_MetricSpace) 
+                            f g _ _ _ _))
+            a w (exist _ _ he_pos)) as [Ns S].
 (* [Le positive] is not yet defined *)
 set (n := Pos.max (Pos.max Nf Ng) Ns).
 assert (Nf <= n)%positive by (transitivity (Pos.max Nf Ng); apply Pos.le_max_l).
 assert (Ng <= n)%positive by (transitivity (Pos.max Nf Ng); [apply Pos.le_max_r | apply Pos.le_max_l]).
 assert (Ns <= n)%positive by apply Pos.le_max_r.
-apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (f + g) a w n)). 
+apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (f + g) a (proj1_sig w) n)). 
   change (Qeq ((e / (2#1)) + (e / (2#1)))  e)%Q. 
  (* regression connected in field numbers ? [field; discriminate | |].*) Admitted. (*
 * apply mspc_symm, S; assumption.
@@ -1084,12 +1112,12 @@ Proof.
 apply mspc_closed. intros e e_pos.
 mc_setoid_replace (0 + e) with e by ring.
 assert (he_pos : 0 < e / 2) by solve_propholds.
-destruct (integral_approximation (- f) a w (mkQpos he_pos)) as [N1 F1].
-destruct (integral_approximation f a w (mkQpos he_pos)) as [N2 F2].
+destruct (integral_approximation (- f) a w (exist _ _ he_pos)) as [N1 F1].
+destruct (integral_approximation f a w (exist _ _ he_pos)) as [N2 F2].
 set (n := Pos.max N1 N2).
 assert (N1 <= n)%positive by apply Pos.le_max_l.
 assert (N2 <= n)%positive by apply Pos.le_max_r.
-apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a w n)).
+apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a (proj1_sig w) n)).
 (* regression connected to numbers ? [field; discriminate | |].*) Admitted. (*
 * now apply mspc_symm, F1.
 * rewrite riemann_sum_negate. now apply mspc_ball_CRnegate, F2.
@@ -1147,7 +1175,8 @@ Proof. rewrite int_plus, int_negate; reflexivity. Qed.
 
 Import interfaces.orders orders.semirings.
 
-Definition Qupper_bound (x : CR) := approximate x 1%Qpos + 1.
+Definition Qupper_bound (x : CR)
+  := approximate x (Qpos2QposInf (1#1)) + 1.
 
 (* To be proved by lifting from Q.
 Lemma CRabs_triang (x y z : CR) : x = y + z -> abs x ≤ abs y + abs z.

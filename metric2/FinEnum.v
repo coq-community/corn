@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.Hausdorff.
 Require Import CoRN.logic.Classic.
 Require Export CoRN.stdlib_omissions.List.
@@ -185,7 +186,7 @@ any stable metric space X.
 Definition FinEnum_ball (e:Qpos) (x y:list X) :=
  hausdorffBall X e (fun a => InFinEnumC a x) (fun a => InFinEnumC a y).
 
-Lemma FinEnum_ball_wd : forall (e1 e2:Qpos), (e1==e2) ->
+Lemma FinEnum_ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
  forall (a1 a2 : FinEnumS), st_eq a1 a2 ->
  forall (b1 b2 : FinEnumS), st_eq b1 b2 ->
  (FinEnum_ball e1 a1 b1 <-> FinEnum_ball e2 a2 b2).
@@ -201,11 +202,12 @@ Lemma hemiMetric_closed : forall e A b,
   hemiMetric X e A (fun a => InFinEnumC a b).
 Proof.
  intros e A b H x Hx.
- set (P:=fun n y => ball (e+(1#(P_of_succ_nat n)))%Qpos x y).
+ set (P:=fun n y => ball (e + (1#(P_of_succ_nat n)))%Qpos x y).
  assert (HP:(forall n, existsC X (fun x => ~~In x b /\ P n x))).
   intros n.
   unfold P.
-  destruct (H (1#(P_of_succ_nat n))%Qpos x Hx) as [HG | y [Hy0 Hy1]] using existsC_ind.
+  destruct (H (1#(P_of_succ_nat n))%Qpos x Hx)
+    as [HG | y [Hy0 Hy1]] using existsC_ind.
    apply existsC_stable; auto.
   clear - Hy0 Hy1.
   induction b.
@@ -215,7 +217,7 @@ Proof.
    apply existsWeaken.
    exists a.
    split; auto 7 with *.
-   rewrite <- Hy2.
+   apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ Hy2).
    assumption.
   destruct (IHb Hy2) as [HG | z [Hz0 Hz1]] using existsC_ind.
    apply existsC_stable; auto.
@@ -228,12 +230,12 @@ Proof.
  exists y.
  split; auto using InFinEnumC_weaken.
  apply ball_closed.
- apply Qpos_positive_numerator_rect.
- intros n d.
+ intros [[n d] dpos].
+ destruct n. inversion dpos. 2: inversion dpos.
  destruct (Hy1 (nat_of_P d)) as [HG | m [Hmd Hm]] using existsC_ind.
   apply Xstable; assumption.
  eapply ball_weak_le;[|apply Hm].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  rewrite <- Qle_minus_iff.
@@ -269,13 +271,15 @@ Proof.
  destruct Hx as [HG | Hx | Hx] using orC_ind.
    auto using InFinEnumC_stable.
   assert (H':forall n :nat ,
-    existsC X (fun y : X => InFinEnumC y b /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
+             existsC X (fun y : X => InFinEnumC y b
+                                  /\ ball (m:=X) (exist (Qlt 0) (1#(P_of_succ_nat n)) eq_refl) x y)).
    intros e.
    apply H.
    apply: orWeaken.
    left;  assumption.
   assert (H'':forall n :nat ,
-    existsC X (fun y : X => ~~In y b /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
+             existsC X (fun y : X => ~~In y b
+                                  /\ ball (m:=X) (exist (Qlt 0) (1#(P_of_succ_nat n)) eq_refl) x y)).
    intros n.
    destruct (H' n) as [HG | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
@@ -287,7 +291,7 @@ Proof.
     apply existsWeaken.
     exists a.
     split; auto with *.
-    rewrite <- Hz2.
+    apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ Hz2).
     assumption.
    destruct (IHb Hz2) as [HG | y [Hy0 Hy1]] using existsC_ind.
     auto using existsC_stable.
@@ -299,12 +303,13 @@ Proof.
   rewrite -> (InFinEnumC_wd1 x y).
    auto using InFinEnumC_weaken.
   apply ball_eq.
-  apply Qpos_positive_numerator_rect.
-  intros n d.
+  intros [[n d] dpos].
+  destruct n. inversion dpos. 2: inversion dpos.
   rewrite (anti_convert_pred_convert d).
   destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
    auto using Xstable.
-  apply ball_weak_le with (1 # P_of_succ_nat z)%Qpos; auto.
+  apply ball_weak_le with (exist (Qlt 0) (1 # P_of_succ_nat z) eq_refl); auto.
+  simpl.
   apply Zmult_le_compat; auto with *.
   simpl.
   repeat rewrite <- POS_anti_convert.
@@ -354,7 +359,7 @@ Proof.
    |apply existsWeaken |]).
     exists (f a);split.
      apply: orWeaken; left; reflexivity.
-    rewrite -> y; apply H.
+     apply (ball_wd _ eq_refl _ _ y _ _ (reflexivity _)); apply H.
    destruct (IHs0 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
    apply existsWeaken.
@@ -366,8 +371,7 @@ Proof.
   split.
    apply orWeaken; left; reflexivity.
   apply ball_sym.
-  rewrite -> y.
-  apply H.
+  apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ y); apply H.
  destruct (IHs1 x y) as [G | z [Hz0 Hz1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
@@ -398,15 +402,19 @@ Proof.
   abstract ( generalize H; apply existsC_ind;[tauto|]; intros y [Hy0 Hy1]; apply Hy0).
  destruct (@almostDecideX e (e+d)%Qpos x a).
    clear - e d.
-   abstract ( autorewrite with QposElim; rewrite -> Qlt_minus_iff; ring_simplify; auto with * ).
+   abstract ( simpl; rewrite -> Qlt_minus_iff; ring_simplify; auto with * ).
   exists a.
   clear - b0.
   abstract (auto using InFinEnumC_weaken with * ).
  assert (Z:existsC X (fun y : X => InFinEnumC y b /\ ball (m:=X) e x y)).
-  clear - H n.
-  abstract ( destruct (H) as [HG | y [Hy0 Hy1]] using existsC_ind; [auto using existsC_stable|];
-    apply existsWeaken; exists y; split; auto; destruct Hy0 as [HG | Hy | Hy] using orC_ind;
-      [auto using InFinEnumC_stable |rewrite -> Hy in Hy1; contradiction |assumption]).
+ { clear - H n.
+   destruct (H) as [HG | y [Hy0 Hy1]] using existsC_ind.
+   auto using existsC_stable.
+   apply existsWeaken. exists y.
+   split. 2: exact Hy1. destruct Hy0 as [HG | Hy | Hy] using orC_ind.
+   auto using InFinEnumC_stable. 2: assumption.
+   apply (ball_wd _ (QposEq_refl e) _ _ (reflexivity _) _ _ Hy) in Hy1. 
+   contradiction. }
  exists (let (y,_) := (IHb x Hx Z d) in y).
  clear - IHb.
  abstract ( destruct (IHb x Hx Z d) as [y [Hy0 Hy1]]; split; auto; apply orWeaken; auto).
@@ -422,7 +430,7 @@ Defined.
 
 Lemma HemiMetricStrongAlmostDecidableBody :
  forall (e d:Qpos) a (b : FinEnum),
- e < d ->
+ proj1_sig e < proj1_sig d ->
  {hemiMetric X d (fun x => st_eq x a) (fun x => InFinEnumC x b)} +
  {~hemiMetric X e (fun x => st_eq x a) (fun x => InFinEnumC x b)}.
 Proof.
@@ -439,19 +447,26 @@ Proof.
     [apply existsC_stable; auto|]; apply existsWeaken; exists z; split; try assumption; apply orWeaken;
       auto).
  destruct (almostDecideX _ _ a a0 Hed).
-  left.
-  abstract ( intros x Hx; apply existsWeaken; exists a0; rewrite -> Hx;
-    auto using InFinEnumC_weaken with * ).
- right.
- abstract ( intros H0; assert (Haa:st_eq a a) by reflexivity;
+ - left.
+  intros x Hx; apply existsWeaken; exists a0.
+  split. auto using InFinEnumC_weaken with *.
+  apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)).
+  auto using InFinEnumC_weaken with *.
+ - right.
+ intros H0; assert (Haa:st_eq a a) by reflexivity;
    destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind; [tauto|];
-     destruct (Hz0) as [HG | Hz2 | Hz2] using orC_ind; [tauto |rewrite -> Hz2 in Hz1; contradiction
-       |]; apply H; intros x Hx; apply existsWeaken; exists z; rewrite -> Hx; auto).
+     destruct (Hz0) as [HG | Hz2 | Hz2] using orC_ind.
+ tauto.
+ apply (ball_wd _ (QposEq_refl e) _ _ (reflexivity _) _ _ Hz2) in Hz1. 
+ contradiction.
+ apply H; intros x Hx; apply existsWeaken; exists z.
+ split. exact Hz2.
+ apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)). auto.
 Defined.
 
 Lemma HemiMetricStrongAlmostDecidable :
  forall (e d:Qpos) (a b : FinEnum),
- e < d ->
+ proj1_sig e < proj1_sig d ->
  {hemiMetric X d (fun x => InFinEnumC x a) (fun x => InFinEnumC x b)} +
  {~hemiMetric X e (fun x => InFinEnumC x a) (fun x => InFinEnumC x b)}.
 Proof.
@@ -499,7 +514,7 @@ Lemma FinEnum_prelength : PrelengthSpace FinEnum.
 Proof.
  intros a b e.
  revert a b.
- cut (forall d1 d2 : Qpos, e < d1 + d2 ->
+ cut (forall d1 d2 : Qpos, proj1_sig e < proj1_sig (d1 + d2)%Qpos ->
    forall (a b:FinEnum), hemiMetricStrong X e (fun x : X => InFinEnumC x a)
      (fun x : X => InFinEnumC x b) ->
        exists2 c : FinEnum, ball d1 a c &  hemiMetric X d2 (fun x : X => InFinEnumC x c) (fun x : X => InFinEnumC x b)).
@@ -507,9 +522,9 @@ Proof.
   destruct (HausdorffBallHausdorffBallStrong H) as [Hl Hr].
   clear H.
   destruct (Z _ _ He _ _ Hl) as [c0 Hc0 Hc0c].
-  assert (He0:e < d2 + d1).
+  assert (He0: proj1_sig e < proj1_sig (d2 + d1)%Qpos).
    clear - He.
-   abstract (rewrite -> Qplus_comm; assumption).
+   abstract (simpl; rewrite -> Qplus_comm; assumption).
   destruct (Z _ _ He0 _ _ Hr) as [c1 Hc1 Hc1c].
   clear Z Hl Hr.
   exists (c0 ++ c1).
@@ -536,29 +551,38 @@ Proof.
   intros x Hx; elim Hx.
  destruct IHa as [c1 Hc1a Hc1b].
   abstract ( intros x Hx d; apply (H x); apply orWeaken; right; auto).
- destruct (Qpos_lt_plus He) as [g Hg].
- destruct (fun z => H a z ((1#2)*g)%Qpos) as [b0 Hb0].
+ destruct (Qpos_sub _ _ He) as [g Hg].
+ pose (exist (Qlt 0) (1#2) eq_refl) as half.
+ destruct (fun z => H a z (half*g)%Qpos) as [b0 Hb0].
   abstract (apply orWeaken; left; reflexivity).
  clear H.
- destruct (@preLengthX a b0 (e + (1 # 2) * g)%Qpos d1 d2) as [c Hc0 Hc1].
-   abstract ( clear - Hg; rewrite -> Hg; autorewrite with QposElim; rewrite -> Qlt_minus_iff; ring_simplify;
+ destruct (@preLengthX a b0 (e + half * g)%Qpos d1 d2) as [c Hc0 Hc1].
+   abstract ( clear - Hg; unfold QposEq in Hg; rewrite -> Hg; simpl; rewrite -> Qlt_minus_iff; ring_simplify;
      Qauto_pos).
   abstract (clear - Hb0; destruct Hb0; auto).
  exists (c :: c1).
-  abstract ( split; intros x Hx; [destruct Hx as [ G | Hx | Hx ] using orC_ind;
-    [auto using existsC_stable |apply existsWeaken; exists c; split; [apply orWeaken;left; reflexivity
-      |rewrite -> Hx; auto] |destruct Hc1a as [Hc1a _];
-        destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind; [auto using existsC_stable|];
-          apply existsWeaken; exists y; split; auto; apply orWeaken; right; auto]
-            |destruct Hx as [ G | Hx | Hx ] using orC_ind; [auto using existsC_stable
-              |apply existsWeaken; exists a; split; [apply orWeaken;left; reflexivity
-                |rewrite -> Hx; auto with *] |destruct Hc1a as [_ Hc1a];
-                  destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
-                    [auto using existsC_stable|]; apply existsWeaken; exists y; split; auto;
-                      apply orWeaken; right; auto]]).
- abstract ( destruct Hb0 as [Hb0a Hb0b]; intros x Hx; destruct Hx as [ G | Hx | Hx ] using orC_ind;
-   [auto using existsC_stable |apply existsWeaken; exists b0; split; auto; rewrite -> Hx; auto
-     |apply Hc1b; auto]).
+ - split; intros x Hx.
+   + destruct Hx as [ G | Hx | Hx ] using orC_ind.
+ auto using existsC_stable.
+ apply existsWeaken. exists c. split. apply orWeaken. left. reflexivity.
+ apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)). assumption.
+ destruct Hc1a as [Hc1a _].
+ destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind; [auto using existsC_stable|].
+ apply existsWeaken; exists y; split; auto; apply orWeaken; right; auto.
+   + destruct Hx as [ G | Hx | Hx ] using orC_ind.
+     auto using existsC_stable.
+     apply existsWeaken; exists a; split. apply orWeaken;left; reflexivity.
+     apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)); auto with *.
+     destruct Hc1a as [_ Hc1a];
+       destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
+       [auto using existsC_stable|]; apply existsWeaken; exists y; split; auto;
+         apply orWeaken; right; auto.
+ - destruct Hb0 as [Hb0a Hb0b]; intros x Hx.
+   destruct Hx as [ G | Hx | Hx ] using orC_ind.
+   auto using existsC_stable.
+   apply existsWeaken; exists b0; split; auto.
+   apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)); auto.
+   apply Hc1b; auto.
 Defined.
 
 
@@ -662,7 +686,7 @@ Proof.
   exists (f y).
   split.
    apply InFinEnumC_map; assumption.
-  rewrite -> Ha.
+   apply (ball_wd _ eq_refl _ _ Ha _ _ (reflexivity _)).
   apply (uc_prf f).
   apply ball_ex_weak_le with d; auto.
  apply IHs1; auto.
@@ -684,7 +708,7 @@ Proof.
  intros X SX SCX s1 s2 e.
  split.
   intros H.
-  apply (@FinEnum_map_uc (1#1) _ _ SX SCX).
+  apply (@FinEnum_map_uc (exist (Qlt 0) (1#1) eq_refl) _ _ SX SCX).
   assumption.
  revert s1 s2.
  cut (forall (s1 s2 : FinEnum SX) ,
@@ -715,9 +739,9 @@ Proof.
    split.
     apply orWeaken.
     left; reflexivity.
-   rewrite -> Ha.
+    apply (ball_wd _ eq_refl _ _ Ha _ _ (reflexivity _)). 
    rewrite <- ball_Cunit.
-   rewrite <- Hy0.
+   apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ Hy0). 
    assumption.
   destruct (IHs2 Hy0) as [G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.

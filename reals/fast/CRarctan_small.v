@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRseries.
 Require Export CoRN.reals.fast.CRArith.
@@ -29,6 +31,7 @@ Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.transc.MoreArcTan.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.

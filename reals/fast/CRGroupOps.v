@@ -20,6 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.metric2.CRmetric.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.algebra.COrdAbs.
@@ -142,14 +145,22 @@ Proof.
  unfold ucFun2, CRplus.
  unfold Cmap2.
  unfold inject_Q_CR.
-Admitted.
-(*
- simpl. do 2 rewrite -> Cmap_fun_correct. 
- rewrite -> Cap_fun_correct.
- rewrite -> MonadLaw3.
- rewrite -> StrongMonadLaw1.
- reflexivity.
-Qed.*)
+ simpl. intros e1 e2. simpl.
+ unfold Cap_raw. simpl. destruct y; simpl.
+ unfold Qball, QAbsSmall.
+ simpl. split.
+ - ring_simplify.
+   destruct (regFun_prf ((1#2)*e1)%Qpos e2) as [H _].
+   simpl in H.
+   refine (Qle_trans _ _ _ _ H).
+   ring_simplify. apply Qplus_le_l.
+   apply Qmult_le_r. apply Qpos_ispos. discriminate.
+ - ring_simplify.
+   destruct (regFun_prf ((1#2)*e1)%Qpos e2) as [_ H].
+   apply (Qle_trans _ _ _ H). 
+   apply Qplus_le_l. simpl. rewrite <- (Qmult_1_l (` e1)) at 2.
+   apply Qmult_le_r. apply Qpos_ispos. discriminate.
+Qed.
 
 Hint Rewrite CRplus_translate : CRfast_compute.
 
@@ -201,7 +212,7 @@ Qed.
 (**
 ** Inequality
 First a predicate for nonnegative numbers is defined. *)
-Definition CRnonNeg (x:CR) := forall e:Qpos, (-e) <= (approximate x e).
+Definition CRnonNeg (x:CR) := forall e:Qpos, (-proj1_sig e) <= (approximate x e).
 (* begin hide *)
 Add Morphism CRnonNeg with signature (@st_eq _) ==> iff as CRnonNeg_wd.
 Proof.
@@ -211,29 +222,31 @@ Proof.
   apply Qnot_lt_le.
   intros He.
   rewrite ->  Qlt_minus_iff in He.
-  pose (e' := mkQpos He).
+  pose (e' := exist _ _ He).
   pose (H1:=(Hx ((1#3)*e')%Qpos)).
   pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
   destruct H2 as [_ H2].
-  change (approximate x ((1 # 3) * e')%Qpos - approximate y e <= ((1 # 3) * e' + e)%Qpos) in H2.
+  change (approximate x ((1 # 3) * e')%Qpos - approximate y e
+          <= proj1_sig ((1 # 3) * e' + e)%Qpos) in H2.
   rewrite -> Qle_minus_iff in H1.
   rewrite -> Qle_minus_iff in H2.
   autorewrite with QposElim in *.
   ring_simplify in H1.
   ring_simplify in H2.
-  assert (H3: 0+0<=(approximate x ((1 # 3) * e')%Qpos + (1 # 3) * e') + ((1 # 3) * e' + e + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos + approximate y e)).
+  assert (0+0<=(approximate x ((1 # 3) * e')%Qpos + (1 # 3) * proj1_sig e')
+              + ((1 # 3) * proj1_sig e' + proj1_sig e + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos + approximate y e)) as H3.
    apply: plus_resp_leEq_both; assumption.
   ring_simplify in H3.
-  setoid_replace ((6 # 9) * e' + e + approximate y e) with ((6#9)*e'-e') in H3.
+  setoid_replace ((6 # 9) * proj1_sig e' + proj1_sig e + approximate y e)
+    with ((6#9)* proj1_sig e' - proj1_sig e') in H3.
    ring_simplify in H3.
    apply (Qle_not_lt _ _ H3).
    rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply: mult_resp_pos.
     constructor.
-   apply Qpos_prf.
+    destruct e'; exact q.
   unfold e'.
-  rewrite QposAsmkQpos.
   simpl; ring.
  intros.
  split.
@@ -245,7 +258,7 @@ Proof.
 Qed.
 (* end hide *)
 (** And similarly for nonpositive. *)
-Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= e.
+Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= proj1_sig e.
 (* begin hide *)
 Add Morphism CRnonPos with signature (@st_eq _) ==> iff as CRnonPos_wd.
 Proof.
@@ -255,29 +268,32 @@ Proof.
   apply Qnot_lt_le.
   intros He.
   rewrite -> Qlt_minus_iff in He.
-  pose (e' := mkQpos He).
+  pose (e' := exist _ _ He).
   pose (H1:=(Hx ((1#3)*e')%Qpos)).
   pose (H2:=(Hxy ((1#3)*e')%Qpos e)).
   destruct H2 as [H2 _].
-  change (-((1 # 3) * e' + e)%Qpos <= approximate x ((1 # 3) * e')%Qpos - approximate y e) in H2.
+  change (-proj1_sig ((1 # 3) * e' + e)%Qpos
+          <= approximate x ((1 # 3) * e')%Qpos - approximate y e) in H2.
   rewrite -> Qle_minus_iff in H1.
   rewrite -> Qle_minus_iff in H2.
-  autorewrite with QposElim in *.
+  simpl in *.
   ring_simplify in H1.
   ring_simplify in H2.
-  assert (H3: 0+0<=((1 # 3) * e' + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos)+(approximate x ((1 # 3) * e')%Qpos + (-1 # 1) * approximate y e + (1 # 3) * e' + e)).
-   apply: plus_resp_leEq_both; assumption.
+  assert (H3: 0+0<=((1 # 3) * proj1_sig e' + (-1 # 1) * approximate x ((1 # 3) * e')%Qpos)
+                  +(approximate x ((1 # 3) * e')%Qpos + (-1 # 1) * approximate y e + (1 # 3) * proj1_sig e' + proj1_sig e)).
+  apply Qplus_le_compat. simpl. ring_simplify. assumption.
+  simpl. ring_simplify. assumption.
   ring_simplify in H3.
-  setoid_replace ((6 # 9) * e' + (-1 # 1) * approximate y e + e) with ((6#9)*e'-e') in H3.
+  setoid_replace ((6 # 9) * proj1_sig e' + (-1 # 1) * approximate y e + proj1_sig e)
+    with ((6#9)*proj1_sig e'-proj1_sig e') in H3.
    ring_simplify in H3.
    apply (Qle_not_lt _ _ H3).
    rewrite -> Qlt_minus_iff.
    ring_simplify.
    apply: mult_resp_pos.
     constructor.
-   apply Qpos_prf.
+    destruct e'; exact q.
   unfold e'.
-  rewrite QposAsmkQpos.
   simpl; ring.
  intros.
  split.
@@ -315,7 +331,7 @@ Proof.
  simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
- apply Qpos_nonneg.
+ apply Qlt_le_weak. destruct e; exact q.
 Qed.
 
 Lemma CRle_def : forall x y, (x==y <-> (x <= y /\ y <= x))%CR.
@@ -349,10 +365,10 @@ Proof.
  stepr ((approximate z ((1 # 2) * ((1 # 2) * e))%Qpos
    - approximate y ((1 # 2) * ((1 # 2) * e))%Qpos + (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos
      - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos))); [| simpl; ring].
- stepl (-(1#2)*e + - (1#2)*e); [| simpl; ring].
- destruct (Qpos_as_positive_ratio e).
- subst.
- apply Qplus_le_compat; assumption.
+ stepl (-(1#2)*proj1_sig e + - (1#2)* proj1_sig e); [| simpl; ring].
+ apply Qplus_le_compat; apply (Qle_trans _ (- ((1 # 2) * ` e))).
+ destruct e. simpl. ring_simplify. apply Qle_refl. assumption.
+ destruct e. simpl. ring_simplify. apply Qle_refl. assumption.
 Qed.
 
 (**
@@ -380,7 +396,7 @@ Proof.
    stepr b1.
     assumption.
    simpl; ring.
-  apply Qpos_nonneg.
+   apply Qlt_le_weak. destruct e. exact q.
  do 2 apply Qmax_case; intros H1 H2.
     apply: ball_refl.
    eapply X.
@@ -420,14 +436,40 @@ Proof.
  unfold ucFun2, CRmax.
  unfold Cmap2.
  unfold inject_Q_CR.
- simpl. (*
- do 2 rewrite -> Cmap_fun_correct.
- rewrite -> Cap_fun_correct.
- rewrite -> MonadLaw3.
- rewrite -> StrongMonadLaw1.
- reflexivity.
-Qed.*)
-Admitted.
+ intros e1 e2.
+ destruct y; simpl; unfold Cmap_fun, Cap_fun, Cap_raw; simpl.
+ specialize (regFun_prf ((1 # 2) * e1)%Qpos e2).
+ split.
+ - apply Qmax_case. intros. apply Qmax_case. intros.
+   unfold Qminus. rewrite Qplus_opp_r. apply (Qopp_le_compat 0).
+   apply Qpos_nonneg. intros.
+   apply (Qle_trans _ (approximate ((1 # 2)%Q ↾ eq_refl * e1)%Qpos - approximate e2)).
+   destruct regFun_prf as [H1 _].
+   refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
+   apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
+   apply Qplus_le_l. exact H. intros. apply Qmax_case.
+   intros. apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
+   unfold Qminus. rewrite <- Qle_minus_iff. exact H. intros.
+   destruct regFun_prf as [H1 _].
+   refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
+   apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
+ - apply Qmax_case. apply Qmax_case. intros.
+   unfold Qminus. rewrite Qplus_opp_r. apply Qpos_nonneg.
+   intros. apply (Qle_trans _ 0).
+   apply (Qplus_le_l _ _ (approximate e2)). ring_simplify. exact H.
+   apply Qpos_nonneg. intros.
+   apply Qmax_case. intros. apply Qopp_le_compat in H0.
+   apply (Qle_trans _ (approximate ((1 # 2) * e1)%Qpos - approximate e2)).
+   apply Qplus_le_r, H0. destruct regFun_prf as [_ H1].
+   apply (Qle_trans _ _ _ H1). apply Qplus_le_l. simpl.
+   rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
+   apply Qmult_le_r. apply Qpos_ispos. discriminate.
+   intros. destruct regFun_prf as [_ H1].
+   apply (Qle_trans _ _ _ H1). apply Qplus_le_l. simpl.
+   rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
+   apply Qmult_le_r. apply Qpos_ispos. discriminate.
+Qed.
+
 (** Basic properties of CRmax. *)
 Lemma CRmax_ub_l : forall x y, (x <= CRmax x y)%CR.
 Proof.
@@ -439,16 +481,16 @@ Proof.
  simpl.
  rewrite -> Qmax_plus_distr_l.
  eapply Qle_trans;[|apply Qmax_ub_l].
- cut (AbsSmall (e:Q) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
+ cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
- apply Qpos_nonneg.
+ apply Qlt_le_weak. destruct e. exact q.
 Qed.
 
 Lemma CRmax_ub_r : forall x y, (y <= CRmax x y)%CR.
@@ -461,16 +503,16 @@ Proof.
  simpl.
  rewrite -> Qmax_plus_distr_l.
  eapply Qle_trans;[|apply Qmax_ub_r].
- cut (AbsSmall (e:Q) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
+ cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
- apply Qpos_nonneg.
+ apply Qlt_le_weak. destruct e. exact q.
 Qed.
 
 Lemma CRmax_lub: forall x y z : CR, (x <= z -> y <= z -> CRmax x y <= z)%CR.
@@ -486,27 +528,26 @@ Proof.
  simpl in *.
  unfold Cap_raw.
  simpl.
- stepl ((-(1#2)*e) + (- (1#2)*e)); [| simpl; ring].
+ stepl ((-(1#2)*proj1_sig e) + (- (1#2)*proj1_sig e)); [| simpl; ring].
  stepr ((approximate z ((1#2)*((1 # 2) * e))%Qpos +
    - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos) +
      (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos
        - Qmax (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
          (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos))); [|simpl; ring].
- destruct (Qpos_as_positive_ratio e) as [[n d] E].
- simpl in E.
- set (n # d)%Qpos in E.
- subst.
- rename q into e.
- apply Qplus_le_compat;[|apply Qmax_case;intro;assumption].
- cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
-   (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos));[intros [A B]; assumption|].
+ apply Qplus_le_compat.
+ - apply (Qle_trans _ (- ((1 # 2) * ` e))).
+   destruct e; simpl; ring_simplify; apply Qle_refl.
+   cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
+             (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)).
+   intros [A B]. assumption.
  apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
- autorewrite with QposElim.
- ring_simplify.
+ simpl. ring_simplify.
  apply: mult_resp_nonneg.
-  discriminate.
- apply Qpos_nonneg.
+ discriminate. destruct e. apply Qlt_le_weak. exact q.
+ - apply (Qle_trans _ (- ((1 # 2) * ` e))). 
+   destruct e; simpl; ring_simplify; apply Qle_refl.
+   apply Qmax_case; intros; assumption. 
 Qed.
 (**
 ** Minimum
@@ -581,16 +622,16 @@ Proof.
  rewrite -> Qmin_max_de_morgan.
  rewrite -> Qmax_plus_distr_r.
  eapply Qle_trans;[|apply Qmax_ub_l].
- cut (AbsSmall (e:Q) (approximate x ((1 # 2) * e)%Qpos +
+ cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
- apply Qpos_nonneg.
+ apply Qlt_le_weak. destruct e; exact q.
 Qed.
 
 Lemma CRmin_lb_r : forall x y, (CRmin x y <= y)%CR.
@@ -604,16 +645,16 @@ Proof.
  rewrite -> Qmin_max_de_morgan.
  rewrite -> Qmax_plus_distr_r.
  eapply Qle_trans;[|apply Qmax_ub_r].
- cut (AbsSmall (e:Q) (approximate x ((1 # 2) * e)%Qpos +
+ cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
  change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
- apply Qpos_nonneg.
+ apply Qlt_le_weak. destruct e; exact q.
 Qed.
 
 Lemma CRmin_glb: forall x y z : CR, (z <= x -> z <= y -> z <= CRmin x y)%CR.
@@ -629,24 +670,24 @@ Proof.
  simpl in *.
  unfold Cap_raw.
  simpl.
- stepl ((-(1#2)*e) + (- (1#2)*e)); [| simpl; ring].
+ stepl ((-(1#2)*proj1_sig e) + (- (1#2)*proj1_sig e)); [| simpl; ring].
  stepr ((approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos +
    - approximate z ((1#2)*((1 # 2) * e))%Qpos) + (Qmin (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)
      (approximate y ((1 # 2) * ((1 # 2) * e))%Qpos) +
        - approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)); [| simpl; ring].
- destruct (Qpos_as_positive_ratio e) as [[n d] E].
- simpl in E.
- set (n # d)%Qpos in E.
- subst.
- rename q into e.
- apply Qplus_le_compat;[|apply Qmin_case;intro;assumption].
- cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
-   (approximate z ((1#2)*((1 # 2) * e))%Qpos));[intros [A B]; assumption|].
+ apply Qplus_le_compat.
+ - apply (Qle_trans _ (- ((1 # 2) * ` e))).
+   destruct e; simpl; ring_simplify; apply Qle_refl.
+   cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
+             (approximate z ((1#2)*((1 # 2) * e))%Qpos)) ;[intros [A B]; assumption|].
  apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
- autorewrite with QposElim.
+ simpl.
  ring_simplify.
  apply: mult_resp_nonneg.
   discriminate.
- apply Qpos_nonneg.
+  apply Qlt_le_weak. destruct e. exact q.
+ - apply (Qle_trans _ (- ((1 # 2) * ` e))).
+   destruct e; simpl; ring_simplify; apply Qle_refl.
+   apply Qmin_case;intro;assumption.
 Qed.

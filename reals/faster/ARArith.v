@@ -1,10 +1,12 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import 
   Coq.Program.Program Coq.setoid_ring.Ring CoRN.logic.CLogic
   Coq.QArith.Qabs CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QMinMax CoRN.model.totalorder.QposMinMax CoRN.util.Qdlog
   CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.metric2.MetricMorphisms 
-  CoRN.reals.fast.CRArith CoRN.reals.fast.CRpower CoRN.classes.Qposclasses
+  CoRN.reals.fast.CRArith CoRN.reals.fast.CRpower
   MathClasses.implementations.stdlib_binary_naturals MathClasses.orders.minmax MathClasses.implementations.positive_semiring_elements.
 Require Export
   CoRN.reals.faster.ApproximateRationals
@@ -32,7 +34,8 @@ Local Obligation Tactic := program_simpl; aq_preservation.
 
 (* Compress *)
 Lemma aq_approx_regular_prf (x : AQ) : 
-  is_RegularFunction_noInf _ (λ ε : Qpos, app_approx x (Qdlog2 ε) : AQ_as_MetricSpace).
+  is_RegularFunction_noInf _ (λ ε : Qpos, app_approx x (Qdlog2 (proj1_sig ε))
+                              : AQ_as_MetricSpace).
 Proof.
   intros ε1 ε2. simpl.
   eapply ball_triangle. 
@@ -59,7 +62,9 @@ Definition ARcompress : AR --> AR := Cbind AQPrelengthSpace AQcompress_uc.
 Lemma ARcompress_correct (x : AR) : ARcompress x = x.
 Proof.
   apply: regFunEq_e. intros ε.
-  setoid_replace (ε + ε) with ((1#2) * ε + ((1#2) * ε + ε))%Qpos by QposRing.
+  assert (QposEq (ε + ε) ((1#2) * ε + ((1#2) * ε + ε)))
+    by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H5 _ _ (reflexivity _) _ _ (reflexivity _)). clear H5.
   eapply ball_triangle.
    apply_simplified (aq_approx_dlog2 (approximate x ((1 # 2) * ε)%Qpos) ((1#2) * ε)%Qpos).
   apply regFun_prf.
@@ -174,10 +179,11 @@ Lemma ARtoCR_approximate (x : AR) (ε : Qpos) : '(approximate x ε) = approximat
 Proof. reflexivity. Qed.
 
 Lemma AR_b_correct (x : AR) :
-  cast AQ Q (abs (approximate x (1#1)%Qpos) + 1) = Qabs (approximate (cast AR CR x) (1#1)%Qpos) + (1#1)%Qpos.
+  cast AQ Q (abs (approximate x (Qpos2QposInf (1#1))) + 1) = Qabs (approximate (cast AR CR x) (Qpos2QposInf (1#1))) + (1#1).
 Proof. aq_preservation. Qed.
 
-Program Definition AR_b (x : AR) : AQ₊ := exist _ (abs (approximate x (1#1)%Qpos) + 1) _.
+Program Definition AR_b (x : AR) : AQ₊
+  := exist _ (abs (approximate x (Qpos2QposInf (1#1))) + 1) _.
 Next Obligation.
   apply (strictly_order_reflecting (cast AQ Q)). 
   rewrite AR_b_correct. aq_preservation.
@@ -189,10 +195,10 @@ Global Instance ARmult: Mult AR := λ x y, ARmult_bounded (AR_b y) x y.
 Lemma ARtoCR_preserves_mult x y : cast AR CR (x * y) = 'x * 'y.
 Proof.
   unfold "*", ARmult at 1. rewrite ARtoCR_preserves_mult_bounded.
-  setoid_replace ('AR_b y : Qpos) with (CR_b (1 # 1) ('y)). 
-   reflexivity.
-  unfold QposEq. simpl.
-  now rewrite ARtoCR_approximate, <-AR_b_correct.
+  assert (QposEq ('AR_b y : Qpos) (CR_b (1 # 1) ('y))).
+  { unfold QposEq. simpl.
+    now rewrite ARtoCR_approximate, <-AR_b_correct. }
+  rewrite H5. reflexivity.
 Qed.
 
 Lemma ARmult_scale (x : AQ) (y : AR) :
@@ -293,21 +299,23 @@ Next Obligation.
   change (-('δ : Q) ≤ '(approximate x ((1 # 2) * δ)%Qpos - ('ε : AQ) ≪ (-1))).
   transitivity (-'((1 # 2) * δ)%Qpos).
    apply rings.flip_le_negate.
-   change ((1 # 2) * δ ≤ δ).
-   rewrite <-(rings.mult_1_l (δ:Q)) at 2.
-   now apply (order_preserving (.* (δ:Q))).
+   change ((1 # 2) * proj1_sig δ ≤ proj1_sig δ).
+   rewrite <-(rings.mult_1_l (proj1_sig δ)) at 2.
+   now apply (order_preserving (.* (proj1_sig δ))).
   apply rings.flip_nonneg_minus.
   transitivity ('approximate x ((1#2) * 'ε)%Qpos - 'ε : Q).
    apply (order_preserving (cast AQ Q)) in Pε.
    now apply rings.flip_nonneg_minus.
   apply rings.flip_le_minus_l.
-  transitivity (((1 # 2) * 'ε + (1 # 2) * δ) + 'approximate x ((1 # 2) * δ)%Qpos).
+  transitivity (((1 # 2) * 'ε + (1 # 2) * proj1_sig δ)
+                + 'approximate x ((1 # 2) * δ)%Qpos).
    apply rings.flip_le_minus_l.
    now destruct (regFun_prf x ((1#2) * 'ε)%Qpos ((1#2) * δ)%Qpos).
   rewrite rings.preserves_minus, aq_shift_opp_1.
   apply orders.eq_le.
-  change ((1 # 2) * 'ε + (1 # 2) * δ + 'approximate x ((1 # 2) * δ)%Qpos ==
-    'approximate x ((1 # 2) * δ)%Qpos - 'ε * (1#2) - - ((1 # 2) * δ) + 'ε)%Q. ring.
+  change ((1 # 2) * 'ε + (1 # 2) * proj1_sig δ + 'approximate x ((1 # 2) * δ)%Qpos ==
+          'approximate x ((1 # 2) * δ)%Qpos - 'ε * (1#2) - - ((1 # 2) * proj1_sig δ) + 'ε)%Q.
+  ring.
 Qed.
 
 Lemma ARtoCR_preserves_pos x : ARpos x IFF CRpos ('x).
@@ -317,7 +325,7 @@ Proof with auto with qarith.
    change (cast Q CR (cast AQ Q (cast (AQ₊) AQ y)) ≤ cast AR CR x). 
    rewrite <-ARtoCR_inject.
    now apply (order_preserving _).
-  destruct (aq_lt_mid 0 y) as [z [Ez1 Ez2]]...
+  destruct (aq_lt_mid 0 (proj1_sig y)) as [z [Ez1 Ez2]]...
   assert (0 < z) as F. 
    apply (strictly_order_reflecting (cast AQ Q)). now aq_preservation...
   exists (exist _ z F). simpl.
@@ -557,7 +565,7 @@ Proof. repeat (split; try apply _); apply ARtoCR_preserves_lt. Qed.
 
 (* Division *)
 Lemma aq_mult_inv_regular_prf (x : AQ) : 
-  is_RegularFunction_noInf _ (λ ε : Qpos, app_div 1 x (Qdlog2 ε) : AQ_as_MetricSpace).
+  is_RegularFunction_noInf _ (λ ε : Qpos, app_div 1 x (Qdlog2 (proj1_sig ε)) : AQ_as_MetricSpace).
 Proof.
   intros ε1 ε2. simpl.
   eapply ball_triangle. 
@@ -592,20 +600,24 @@ Proof.
   intros ε1 ε2.
   apply_simplified (Qinv_pos_uc_prf ('c)).
   apply AQball_fold. 
-  setoid_replace (Qinv_modulus ('c) (ε1 + ε2)) with (Qinv_modulus ('c) ε1 + Qinv_modulus ('c) ε2).
-   now apply regFun_prf.
-  unfold QposEq. simpl. ring.
+  assert (QposEq (Qinv_modulus ('c) (ε1 + ε2))
+                 (Qinv_modulus ('c) ε1 + Qinv_modulus ('c) ε2))
+    by (unfold QposEq; simpl; ring).
+  rewrite H5. now apply regFun_prf.
 Qed.
 
 Lemma ARtoCR_preserves_inv_pos x c : 'ARinv_pos c x = CRinv_pos ('c) ('x).
 Proof.
   apply: regFunEq_e. intros ε. 
   simpl. unfold Cjoin_raw. simpl.
-  setoid_replace (ε + ε) with ((1#2) * ε + ((1#2) * ε + ε))%Qpos by QposRing.
+  assert (QposEq (ε + ε) ((1#2) * ε + ((1#2) * ε + ε)))
+    by (unfold QposEq; simpl; ring).
+  rewrite H5. clear H5.
   eapply ball_triangle.
    now apply aq_div_dlog2.
   rewrite aq_preserves_max. 
-  rewrite rings.preserves_1. rewrite left_identity.
+  rewrite rings.preserves_1.
+  rewrite Qmult_1_l.
   now apply ARtoCR_preserves_inv_pos_aux.
 Qed.
 Hint Rewrite ARtoCR_preserves_inv_pos : ARtoCR.
@@ -630,7 +642,7 @@ Proof with auto with qarith; try reflexivity.
    unfold CRinvT.
    destruct Ec as [c Ec], Px as [d Ed].
    autorewrite with ARtoCR.
-   destruct (Qlt_le_dec d ('c : Qpos)).
+   destruct (Qlt_le_dec (proj1_sig d) (proj1_sig ('c : Qpos))).
     rewrite (CRinv_pos_weaken d ('c))...
     change (cast Q CR (cast AQ Q (cast (AQ₊) AQ c)) ≤ -cast AR CR x).
     rewrite <-ARtoCR_inject, <-rings.preserves_negate.
@@ -647,7 +659,7 @@ Proof with auto with qarith; try reflexivity.
   unfold CRinvT.
   destruct Ec as [c Ec], Px as [d Ed].
   autorewrite with ARtoCR.
-  destruct (Qlt_le_dec d ('c : Qpos)).
+  destruct (Qlt_le_dec (proj1_sig d) (proj1_sig ('c : Qpos))).
    rewrite (CRinv_pos_weaken d ('c))...
    change (cast Q CR (cast AQ Q (cast (AQ₊) AQ c)) ≤ cast AR CR x).
    rewrite <-ARtoCR_inject. 
@@ -731,10 +743,10 @@ Lemma ARtoCR_preserves_power_N (x : AR) (n : N) :
 Proof.
   unfold pow, CRpower_N, ARpower_N.
   rewrite ARtoCR_preserves_power_N_bounded.
-  setoid_replace (cast (AQ₊) (Q₊) (AR_b x)) with (CR_b (1#1) ('x)). 
-   reflexivity.
-  unfold QposEq. simpl.
-  now rewrite ARtoCR_approximate, <-AR_b_correct.
+  assert (QposEq (cast (AQ₊) (Q₊) (AR_b x)) (CR_b (1#1) ('x))).
+  { unfold QposEq. simpl.
+    now rewrite ARtoCR_approximate, <-AR_b_correct. }
+   rewrite H5. reflexivity.
 Qed. 
 
 Hint Rewrite ARtoCR_preserves_power_N : ARtoCR.

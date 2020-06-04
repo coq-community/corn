@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.iso_CReals.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import Coq.setoid_ring.ArithRing.
@@ -155,7 +157,8 @@ Qed.
 Definition InfiniteAlternatingSum_length (s : Stream Q) `{zl : !@Limit Q_as_MetricSpace s 0} (e:QposInf) := takeUntil_length _ (Limit_near s 0 e).
 
 Lemma InfiniteAlternatingSum_length_weak (s : Stream Q) {dnn:DecreasingNonNegative s} {zl : @Limit Q_as_MetricSpace s 0} (ε1 ε2 : Qpos) :
-  (ε1:Q) ≤ (ε2:Q) → InfiniteAlternatingSum_length s ε2 ≤ InfiniteAlternatingSum_length s ε1.
+  (proj1_sig ε1:Q) ≤ (proj1_sig ε2:Q)
+  → InfiniteAlternatingSum_length s ε2 ≤ InfiniteAlternatingSum_length s ε1.
 Proof.
   intros E.
   apply takeUntil_length_ForAllIf.
@@ -168,7 +171,7 @@ Proof.
 Qed.
 
 Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNegative s} (k l : nat) (ε : Qpos) :
-  k ≤ l → Str_nth k s ≤ ε → @ball Q_as_MetricSpace ε (take s l Qminus' 0) (take s k Qminus' 0).
+  k ≤ l → Str_nth k s ≤ proj1_sig ε → @ball Q_as_MetricSpace ε (take s l Qminus' 0) (take s k Qminus' 0).
 Proof.
   intros E.
   apply naturals.nat_le_plus in E.
@@ -227,7 +230,8 @@ Proof.
    apply ball_weak, Qball_ex_bool_correct.
    apply (dnn_in_Qball_bool_0_Str_nth_tl _).
    apply (takeUntil_length_correct (λ s, Qball_ex_bool ε1 (hd s) 0)).
-  setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+  assert (QposEq (ε1 + ε2) (ε2+ε1)) by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
   apply ball_weak.
   apply (InfiniteAlternatingSum_further_aux _).
    easy.
@@ -241,18 +245,20 @@ Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s}
   @is_RegularFunction Q_as_MetricSpace (InfiniteAlternatingSum_raw s).
 Proof.
   assert (∀ (ε1 ε2 : Qpos),
-             (ε1:Q) ≤ (ε2:Q) → @ball Q_as_MetricSpace (ε1 + ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
+             (proj1_sig ε1) ≤ (proj1_sig ε2) → @ball Q_as_MetricSpace (ε1 + ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
    intros ε1 ε2 E.
    unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
    rewrite takeUntil_correct.
-   setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+  assert (QposEq (ε1 + ε2) (ε2+ε1)) by (unfold QposEq; simpl; ring).
+  apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
    apply ball_weak.
    apply (InfiniteAlternatingSum_further _).
    now apply (InfiniteAlternatingSum_length_weak _).
   intros ε1 ε2.
-  destruct (total (≤) (ε1:Q) (ε2:Q)).
+  destruct (total (≤) (proj1_sig ε1) (proj1_sig ε2)).
    now auto.
-  setoid_replace (ε1 + ε2)%Qpos with (ε2+ε1)%Qpos by QposRing.
+  assert (QposEq (ε1 + ε2) (ε2+ε1)) by (unfold QposEq; simpl; ring).
+  apply (ball_wd _ H1 _ _ (reflexivity _) _ _ (reflexivity _)). clear H1.
   apply ball_sym. now auto.
 Qed.
 
@@ -307,12 +313,12 @@ Proof.
   destruct dnn_hd as [Z0 Z1].
   split;simpl.
    apply Qle_trans with 0.
-   change (- e <= 0)%Q.
+   change (- proj1_sig e <= 0)%Q.
     rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
    change (0 <= CoqStreams.hd seq - 0)%Q.
    ring_simplify.
    apply Z0.
-  change (CoqStreams.hd seq - 0 <= e)%Q.
+  change (CoqStreams.hd seq - 0 <= proj1_sig e)%Q.
   ring_simplify.
   eapply Qle_trans.
    apply Z1.
@@ -335,7 +341,7 @@ Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative 
 Proof.
  intros e.
  apply Qle_trans with 0.
-  change (-e ≤ 0)%Q.
+  change (-proj1_sig e ≤ 0)%Q.
   rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
  unfold InfiniteAlternatingSum.
  simpl.
@@ -407,18 +413,18 @@ Proof.
    stepl (nring 0:IR).
     assumption.
    apply eq_symmetric; apply inj_Q_nring.
-  assert (L:=(Limit_near seq 0 (mkQpos Hc'))).
+  assert (L:=(Limit_near seq 0 (Qpos2QposInf (exist _ _ Hc')))).
   exists (takeUntil _ L (fun _ => S) O).
   generalize dnn; clear dnn.
   set (Q:= (fun seq b => DecreasingNonNegative seq -> forall m : nat, (b <= m)%nat ->
     AbsSmall (R:=Q_as_COrdField) c (Str_nth m seq))).
   change (Q seq (takeUntil (fun s : Stream Q_as_MetricSpace =>
-    Qball_ex_bool (mkQpos (a:=c) Hc') (hd s) 0) L (fun _ : Q_as_MetricSpace => S) 0%nat)).
+    Qball_ex_bool (Qpos2QposInf (exist _ _ Hc')) (hd s) 0) L (fun _ : Q_as_MetricSpace => S) 0%nat)).
   apply takeUntil_elim; unfold Q; clear seq zl L Q.
    intros seq H dnn m _.
    unfold Str_nth.
    unfold Qball_ex_bool in H.
-   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (mkQpos (a:=c) Hc') (hd seq) 0) as [b|b]; try contradiction.
+   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (Qpos2QposInf (exist _ _ Hc')) (hd seq) 0) as [b|b]; try contradiction.
    simpl in b.
    apply leEq_imp_AbsSmall.
     pose proof (_ : DecreasingNonNegative (Str_nth_tl m seq)) as dnn_tl.

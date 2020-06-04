@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.setoid_ring.Field CoRN.stdlib_omissions.Q
   CoRN.reals.fast.CRarctan_small CoRN.reals.fast.CRarctan CoRN.reals.fast.CRseries CoRN.reals.fast.CRAlternatingSum

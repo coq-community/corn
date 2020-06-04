@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.Program.Program MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 

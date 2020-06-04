@@ -19,6 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.structures.StepQsec.
 Require Export CoRN.metric2.UniformContinuity.
 Require Import CoRN.metric2.Prelength.
@@ -49,7 +52,7 @@ difference between step functions.
 Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (Qred (affineCombo b x y:QS))))%Q.
 Definition L1Norm(f:StepF QS):Q:=(IntegralQ (StepQabs f)).
 Definition L1Distance(f g:StepF QS):Q:=(L1Norm (f - g)).
-Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=((L1Distance f g)<=e)%Q.
+Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=((L1Distance f g)<= proj1_sig e)%Q.
 
 (*
 Definition test1:=(constStepF (1:QS)).
@@ -67,7 +70,7 @@ Proof.
  intros e a b.
  unfold L1Ball.
  set (d:=L1Distance a b).
- destruct (Qlt_le_dec_fast e d) as [Hdc|Hdc].
+ destruct (Qlt_le_dec_fast (proj1_sig e) d) as [Hdc|Hdc].
   right. abstract auto with *.
   left. exact Hdc.
 Defined.
@@ -367,7 +370,7 @@ Proof.
  intros e x.
  unfold L1Ball, L1Distance.
  setoid_replace (x-x) with (constStepF (0:QS)); [| ring].
- change (0 <= e)%Q.
+ change (0 <= proj1_sig e)%Q.
  auto with *.
 Qed.
 
@@ -399,13 +402,14 @@ Qed.
 Lemma L1ball_closed : forall e x y, (forall d, (L1Ball (e+d) x y)) -> (L1Ball e x y).
 Proof.
  unfold L1Ball. intros e a b H.
- assert (forall x, (forall d : Qpos, x <= e+d) -> x <= e)%Q.
-  intros. apply: shift_zero_leEq_minus'.
+ assert (forall x, (forall d : Qpos, x <= proj1_sig e+ proj1_sig d) -> x <= proj1_sig e)%Q.
+ { intros. apply: shift_zero_leEq_minus'.
   apply inv_cancel_leEq. apply approach_zero_weak.
-  intros. replace LHS with (x[-](e:Q)).
-  apply: shift_minus_leEq;simpl. replace RHS with (e+e0)%Q by simpl; ring. rewrite <- (QposAsmkQpos X).
-   apply (H0 (mkQpos X)).
-  unfold cg_minus; simpl; ring.
+  intros. replace LHS with (x[-](proj1_sig e)).
+  apply: shift_minus_leEq;simpl.
+  replace RHS with (proj1_sig e+ e0)%Q by simpl; ring.
+  exact (H0 (exist _ _ X)).
+  unfold cg_minus; simpl; ring. }
  apply H0. exact H.
 Qed.
 
@@ -423,8 +427,8 @@ Proof.
  intro H0.
  assert (H1:0<(1#2)*( L1Norm (QminusS ^@> x <@> y))).
   apply: mult_resp_pos; simpl; auto with *.
- apply: (Qle_not_lt _ _ (H (mkQpos H1))).
- autorewrite with QposElim.
+ apply: (Qle_not_lt _ _ (H (exist _ _ H1))).
+ simpl.
  rewrite -> Qlt_minus_iff.
  unfold L1Distance.
  unfold StepQminus.
@@ -454,7 +458,7 @@ Add Morphism L1Ball with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==
 Proof.
  intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
  unfold L1Ball.
- change (x1 == x2)%Q in Hx.
+ unfold QposEq in Hx.
  rewrite -> Hx.
  rewrite -> Hy.
  rewrite -> Hz.
@@ -470,46 +474,51 @@ Canonical Structure L1StepQ.
 Lemma L1StepQPrelengthSpace : PrelengthSpace L1StepQ.
 Proof.
  intros x y e d1 d2 He Hxy.
- change (e < (d1+d2)%Qpos) in He.
  set (d:=(d1+d2)%Qpos) in *.
  simpl in *.
  unfold L1Ball in *.
  unfold L1Distance in *.
- pose (d1':=constStepF (d1:QS)).
- pose (d2':=constStepF (d2:QS)).
- pose (d':=constStepF ((/d):QS)).
+ pose (d1':=constStepF (proj1_sig d1)).
+ pose (d2':=constStepF (proj1_sig d2)).
+ pose (d':=constStepF ((/proj1_sig d))).
  set (f:=(d'*(x*d2' + y*d1'))%SQ).
  assert (X:(((d1' + d2')*d')==constStepF (1:QS))%SQ).
-  change (constStepF ((d1 + d2)%Qpos/(d1 + d2)%Qpos:QS)==constStepF (X:=QS) 1).
+ { change (constStepF (proj1_sig (d1 + d2)%Qpos/proj1_sig (d1 + d2)%Qpos:QS)==constStepF (X:=QS) 1).
   apply constStepF_wd.
   simpl.
-  field.
-  intro.
-  apply (Qpos_nonzero (d1 + d2)).
-  assumption.
+  field. 
+  intro. destruct d1, d2, e. simpl in H.
+  simpl in He. rewrite H in He.
+  exact (Qlt_irrefl 0 (Qlt_trans _ _ _ q1 He)). }
  exists (f).
   setoid_replace (x - f)%SQ with (d1' * d' * (x - y))%SQ.
-   change ((d1' * d')%SQ * (x - y)%SQ) with (QscaleS (d1/d)%Qpos ^@> (x-y)%SQ).
+  change ((d1' * d')%SQ * (x - y)%SQ)
+    with (QscaleS (proj1_sig d1/ proj1_sig d)%Qpos ^@> (x-y)%SQ).
    rewrite -> L1Norm_scale.
    rewrite -> Qabs_pos; auto with *.
-   autorewrite with QposElim.
-   replace LHS with ((d1*L1Norm (x - y))/d) by (simpl; field; apply (Qpos_nonzero (d1 + d2))).
+   unfold Qdiv.
+   rewrite <- Qmult_assoc, <- (Qmult_comm (L1Norm (x-y))), Qmult_assoc.
    apply Qle_shift_div_r; auto with *.
    apply: mult_resp_leEq_lft; simpl; auto with *.
-   apply Qle_trans with e; auto with *.
+   apply Qle_trans with (proj1_sig e); auto with *.
+   destruct d1,d. simpl. apply Qle_shift_div_l.
+   exact q0. rewrite Qmult_0_l. apply Qlt_le_weak, q.
   setoid_replace (x - f) with (constStepF (1:QS)*x - f); [| simpl; ring].
   rewrite <- X.
   unfold f.
   simpl; ring.
  setoid_replace (f -y) with (d2' * d' * (x - y))%SQ.
-  change ((d2' * d')%SQ * (x - y)%SQ) with (QscaleS (d2/d)%Qpos ^@> (x-y)%SQ).
+ change ((d2' * d')%SQ * (x - y)%SQ)
+   with (QscaleS (proj1_sig d2/proj1_sig d)%Qpos ^@> (x-y)%SQ).
   rewrite -> L1Norm_scale.
   rewrite -> Qabs_pos; auto with *.
-  autorewrite with QposElim.
-  replace LHS with ((d2*L1Norm (x - y))/d) by (simpl; field; apply (Qpos_nonzero (d1 + d2))).
+  unfold Qdiv.
+  rewrite <- Qmult_assoc, <- (Qmult_comm (L1Norm (x-y))), Qmult_assoc.
   apply Qle_shift_div_r; auto with *.
   apply: mult_resp_leEq_lft; simpl;auto with *.
-  apply Qle_trans with e; auto with *.
+  apply Qle_trans with (proj1_sig e); auto with *.
+   destruct d2,d. simpl. apply Qle_shift_div_l.
+   exact q0. rewrite Qmult_0_l. apply Qlt_le_weak, q.
  setoid_replace (f- y) with (f - constStepF (1:QS)*y); [| simpl; ring].
  rewrite <- X.
  unfold f.

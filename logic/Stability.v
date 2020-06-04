@@ -1,5 +1,8 @@
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.Classes.Morphisms.
 
 (* Doubly-negated types as a monad: *)
@@ -112,18 +115,14 @@ Proof with auto.
   intros.
   intro.
   intros.
-  destruct (Qle_dec (-e) (approximate x e))...
+  destruct (Qle_dec (-proj1_sig e) (approximate x (Qpos2QposInf e))).
+  exact q.
   elimtype False...
 Qed.
 
 Hint Resolve CRnonNeg_stable.
 
-Instance CRle_stable (x y: CR): Stable (CRle x y).
-Proof. unfold CRle. auto. Qed.
-
-Hint Resolve CRle_stable.
-
-Instance CReq_stable (x y: CR): Stable (x == y)%CR.
+Instance CReq_stable (x y: st_car (msp_is_setoid CR)): Stable (x == y)%CR.
 Proof.
   simpl.
   unfold regFunEq, ball. simpl.

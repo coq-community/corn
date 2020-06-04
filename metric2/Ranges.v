@@ -7,8 +7,11 @@ Definition Range (T: Type) := prod T T.
 Instance in_QRange: Container Q (Range Q)
   := λ r x, (Qmin (fst r) (snd r) <= x <= Qmax (fst r) (snd r))%Q.
 
-Instance in_CRRange: Container CR (Range CR)
-  := λ r x, (CRmin (fst r) (snd r) <= x ∧ x <= CRmax (fst r) (snd r))%CR.
+Instance in_CRRange: Container (st_car (msp_is_setoid CR))
+                               (Range (st_car (msp_is_setoid CR)))
+  := λ r x,
+     (ucFun (ucFun CRmin (fst r)) (snd r) <= x)%CR
+     ∧ (x <= ucFun (ucFun CRmax (fst r)) (snd r))%CR.
 
 Instance in_sig_Range `{Container A (Range A)} (P: A → Prop): Container (sig P) (Range (sig P))
   := λ r x, In (` (fst r), ` (snd r)) (` x).
