@@ -42,18 +42,19 @@ x and y are within e of each other ( d(x,y)<=e ).  This is characterized
 by the axioms given in the record structure below.
 *)
 
-Record is_MetricSpace (X : RSetoid) (B: Qpos -> relation X) : Prop :=
-{ msp_refl: forall e, Reflexive (B e)
+Record is_MetricSpace (X : RSetoid) (B: Q -> relation X) : Prop :=
+{ msp_refl: forall e, 0 <= e -> Reflexive (B e)
 ; msp_sym: forall e, Symmetric (B e)
-; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (Qpos_plus e1 e2) a c
-; msp_closed: forall e a b, (forall d, B (Qpos_plus e d) a b) -> B e a b
-; msp_eq: forall a b, (forall e, B e a b) -> st_eq a b
+; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2) a c
+; msp_closed: forall e a b, (forall d, 0 < d -> B (e + d) a b) -> B e a b
+; msp_eq: forall a b, (forall e, 0 < e -> B e a b) -> st_eq a b
+; msp_nonneg : forall e a b, B e a b -> 0 <= e
 }.
 
 Record MetricSpace : Type :=
 { msp_is_setoid :> RSetoid
-; ball : Qpos -> msp_is_setoid -> msp_is_setoid -> Prop
-; ball_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
+; ball : Q -> msp_is_setoid -> msp_is_setoid -> Prop
+; ball_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall x1 x2, (st_eq x1 x2) ->
             forall y1 y2, (st_eq y1 y2) ->
             (ball e1 x1 y1 <-> ball e2 x2 y2)
@@ -69,7 +70,7 @@ Definition ms_id (m:MetricSpace) (x:m) : m := x.
 Arguments ms_id [m].
 
 Add Parametric Morphism (m:MetricSpace) : (@ball m)
-    with signature QposEq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
+    with signature Qeq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
 Proof.
  exact (@ball_wd m).
 Qed.
@@ -86,9 +87,9 @@ Variable X : MetricSpace.
 (** These lemmas give direct access to the ball axioms of a metric space
 *)
 
-Lemma ball_refl : forall e (a:X), ball e a a.
+Lemma ball_refl : forall e (a:X), 0 <= e -> ball e a a.
 Proof.
- apply (msp_refl (msp X)).
+ intros. apply (msp_refl (msp X) H).
 Qed.
 
 Lemma ball_sym : forall e (a b:X), ball e a b -> ball e b a.
@@ -97,30 +98,30 @@ Proof.
 Qed.
 
 Lemma ball_triangle : forall e1 e2 (a b c:X),
-    ball e1 a b -> ball e2 b c -> ball (Qpos_plus e1 e2) a c.
+    ball e1 a b -> ball e2 b c -> ball (e1 + e2) a c.
 Proof.
  apply (msp_triangle (msp X)).
 Qed.
 
 Lemma ball_closed :  forall e (a b:X),
-    (forall d, ball (Qpos_plus e d) a b) -> ball e a b.
+    (forall d, 0 < d -> ball (e + d) a b) -> ball e a b.
 Proof.
  apply (msp_closed (msp X)).
 Qed.
 
-Lemma ball_eq : forall (a b:X), (forall e, ball e a b) -> st_eq a b.
+Lemma ball_eq : forall (a b:X), (forall e, 0 < e -> ball e a b) -> st_eq a b.
 Proof.
  apply (msp_eq (msp X)).
 Qed.
 
-Lemma ball_eq_iff : forall (a b:X), (forall e, ball e a b) <-> st_eq a b.
+Lemma ball_eq_iff : forall (a b:X),
+    (forall e, 0 < e -> ball e a b) <-> st_eq a b.
 Proof.
  split.
   apply ball_eq.
- intros H e.
- assert (QposEq e e). reflexivity.
- apply (ball_wd X H0 a b H b b (reflexivity _)).
- apply ball_refl.
+ intros H e epos.
+ apply (ball_wd X eq_refl a b H b b (reflexivity _)).
+ apply ball_refl. apply Qlt_le_weak, epos.
 Qed.
 
 (** The ball constraint on a and b can always be weakened.  Here are
@@ -128,25 +129,24 @@ two forms of the weakening lemma.
 *)
 
 Lemma ball_weak : forall e d (a b:X),
-    ball e a b -> ball (Qpos_plus e d) a b.
+    0 <= d -> ball e a b -> ball (e + d) a b.
 Proof.
- intros e d a b B1.
+ intros e d a b dpos B1.
  eapply ball_triangle.
   apply B1.
- apply ball_refl.
+ apply ball_refl. exact dpos.
 Qed.
 
 Hint Resolve ball_refl ball_triangle ball_weak : metric.
 
-Lemma ball_weak_le : forall (e d:Qpos) (a b:X),
-    proj1_sig e <= proj1_sig d ->  ball e a b -> ball d a b.
+Lemma ball_weak_le : forall (e d:Q) (a b:X),
+    e <= d ->  ball e a b -> ball d a b.
 Proof.
  intros e d a b Hed B1.
- destruct (Qle_lt_or_eq _ _ Hed).
- 2: change (QposEq e d) in H; rewrite <- H; assumption.
- destruct (Qpos_sub _ _ H) as [c Hc].
- assert (QposEq d (e+c)) by (apply Hc).
- rewrite H0. auto with *.
+ setoid_replace d with (e + (d-e)) by ring.
+ apply (ball_triangle _ _ _ b). exact B1.
+ apply ball_refl.
+ unfold Qminus. rewrite <- Qle_minus_iff. exact Hed.
 Qed.
 
 End Metric_Space.
@@ -156,16 +156,13 @@ Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
 
 (** We can easily generalize ball to take the ratio from Q or QnnInf: *)
 
+(* TODO remove *)
 Section gball.
 
   Context {m: MetricSpace}.
 
   Definition gball (q: Q) (x y: m): Prop :=
-    match Q_dec q 0 with
-    | inleft (left _) => False (* q < 0, silly *)
-    | inleft (right p) => ball (exist (Qlt 0) q p) x y (* 0 < q, normal *)
-    | inright _ => st_eq x y (* q == 0 *)
-    end.
+    ball q x y.
 
   Definition gball_ex (e: QnnInf): relation m :=
     match e with
@@ -173,35 +170,16 @@ Section gball.
     | QnnInf.Infinite => fun _ _ => True
     end.
 
-  Lemma ball_gball (q: Qpos) (x y: m): gball (proj1_sig q) x y <-> ball q x y.
-  Proof with auto.
-   unfold gball.
-   revert q x y.
-   intros [q p] ??. simpl.
-   destruct Q_dec as [[A | A] | A].
-     exfalso.
-     apply Qlt_not_le in A; apply Qlt_le_weak in p; contradiction.
-    apply ball_wd; reflexivity.
-   exfalso.
-   apply (Qlt_irrefl 0).
-   rewrite <- A at 2...
+  Lemma ball_gball (q: Q) (x y: m): gball q x y <-> ball q x y.
+  Proof.
+    reflexivity.
   Qed.
 
   Global Instance gball_Proper: Proper (Qeq ==> @st_eq m ==> @st_eq m ==> iff) gball.
   Proof with auto.
    intros x y E a b F v w G.
    unfold gball.
-   destruct Q_dec as [[A | B] | C];
-    destruct Q_dec as [[P | Q] | R].
-           reflexivity.
-          exfalso. apply (Qlt_irrefl 0). apply Qlt_trans with x... rewrite E...
-         exfalso. apply (Qlt_irrefl 0). rewrite <- R at 1. rewrite <- E...
-        exfalso. apply (Qlt_irrefl 0). apply Qlt_trans with x... rewrite E...
-       apply ball_wd...
-      exfalso. apply (Qlt_irrefl 0). rewrite <- R at 2. rewrite <- E...
-     exfalso. apply (Qlt_irrefl 0). rewrite <- C at 1. rewrite E...
-    exfalso. apply (Qlt_irrefl 0). rewrite <- C at 2. rewrite E...
-   rewrite F, G. reflexivity.
+   rewrite E. rewrite F. rewrite G. reflexivity.
   Qed.
 
   Global Instance gball_ex_Proper: Proper (QnnInf.eq ==> @st_eq m ==> @st_eq m ==> iff) gball_ex.
@@ -214,11 +192,7 @@ Section gball.
   Global Instance gball_refl (e: Q): 0 <= e -> Reflexive (gball e).
   Proof with auto.
    repeat intro.
-   unfold gball.
-   destruct Q_dec as [[?|?]|?].
-     apply (Qlt_not_le e 0)...
-    apply ball_refl.
-   reflexivity.
+   unfold gball. apply ball_refl, H.
   Qed.
 
   Global Instance gball_ex_refl (e: QnnInf): Reflexive (gball_ex e).
@@ -228,11 +202,9 @@ Section gball.
   Qed.
 
   Global Instance gball_sym (e: Q): Symmetric (gball e).
-  Proof with auto.
-   unfold gball. repeat intro.
-   destruct Q_dec as [[?|?]|?]...
-    apply ball_sym...
-   symmetry...
+  Proof.
+    unfold gball. intros x y.
+    apply ball_sym.
   Qed.
 
   Lemma gball_ex_sym (e: QnnInf): Symmetric (gball_ex e).
@@ -242,102 +214,51 @@ Section gball.
     gball e1 a b -> gball e2 b c -> gball (e1 + e2) a c.
   Proof with auto with *.
    unfold gball.
-   intros.
-   destruct (Q_dec e1) as [[A|B]|C].
-     exfalso...
-    destruct (Q_dec e2) as [[?|?]|?].
-      intuition.
-     destruct (Q_dec (e1 + e2)) as [[?|?]|?].
-       assert (0 < e1 + e2).
-        apply Qplus_lt_le_0_compat...
-       revert H1. apply Qle_not_lt...
-      simpl.
-      assert (QposEq (exist (Qlt 0) (e1 + e2) q0)
-                     (Qpos_plus (exist (Qlt 0) e1 B) (exist (Qlt 0) e2 q)))
-        by reflexivity.
-      rewrite H1. clear H1. 
-      apply ball_triangle with b...
-     exfalso.
-     assert (0 < e1 + e2).
-      apply Qplus_lt_le_0_compat...
-     revert H1. rewrite q0.
-     apply Qlt_irrefl.
-    destruct (Q_dec (e1 + e2)) as [[?|?]|?].
-      revert q0. rewrite q. rewrite Qplus_0_r. apply Qle_not_lt...
-     apply ball_gball. simpl. rewrite q, Qplus_0_r. rewrite <- H0. apply ball_gball in H. assumption.
-    exfalso.
-    revert q0. rewrite q. rewrite Qplus_0_r. intro. clear H. revert B. rewrite H1. apply Qlt_irrefl.
-   destruct (Q_dec e2) as [[?|?]|?].
-     intuition.
-    apply ball_gball in H0.
-    simpl in H0.
-    destruct (Q_dec (e1 + e2)) as [[?|?]|?].
-      revert q0. rewrite C. rewrite Qplus_0_l. apply Qle_not_lt...
-     apply ball_gball. simpl.
-     rewrite C, Qplus_0_l, H...
-    exfalso. revert q0. rewrite C, Qplus_0_l. intro. clear H0. revert q. rewrite H1. apply Qlt_irrefl.
-   destruct (Q_dec (e1 + e2)) as [[?|?]|?].
-     revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
-    exfalso. revert q0. rewrite C, q, Qplus_0_l. apply Qlt_irrefl.
-   transitivity b...
-  Qed. (* TODO: THE HORROR!! *)
+   intros. apply (ball_triangle _ _ _ _ b); assumption.
+  Qed. 
 
   Lemma gball_ex_triangle (e1 e2: QnnInf) (a b c: m):
     gball_ex e1 a b -> gball_ex e2 b c -> gball_ex (e1 + e2)%QnnInf a c.
   Proof. destruct e1, e2; auto. simpl. apply gball_triangle. Qed.
 
   Lemma gball_0 (x y: m): gball 0 x y <-> st_eq x y.
-  Proof. reflexivity. Qed.
-
-  Lemma gball_weak_le (q q': Q): q <= q' -> forall x y, gball q x y -> gball q' x y.
-  Proof with auto.
-   revert q q'.
-   intros ?? E ?? F.
-   unfold gball in F.
-   destruct Q_dec as [[A | B] | C].
-     intuition.
-    assert (0 < q') as q'p. apply Qlt_le_trans with q...
-    apply (ball_gball (exist _ q' q'p)).
-    apply ball_weak_le with (exist _ q B)...
-   rewrite F.
-   apply gball_refl.
-   rewrite <- C...
+  Proof.
+    split.
+    - intro H. apply ball_eq. intros. unfold gball in H.
+      apply (@ball_weak_le m 0 e).
+      apply Qlt_le_weak, H0. exact H.
+    - intros. unfold gball. rewrite H.
+      apply ball_refl. apply Qle_refl.
   Qed.
 
-  Lemma gball_pos {e : Q} (e_pos : 0 < e) (x y : m) : ball (exist _ e e_pos) x y <-> gball e x y.
+  Lemma gball_weak_le (q q': Q): q <= q' -> forall x y, gball q x y -> gball q' x y.
   Proof.
-  unfold gball. destruct (Q_dec e) as [[e_neg | e_pos'] | e_zero].
-  + elim (Qlt_irrefl _ (Qlt_trans _ _ _ e_pos e_neg)).
-  + assert (QposEq (exist _ e e_pos) (exist _ e e_pos')) by easy.
-    apply (ball_wd m H _ _ (reflexivity _) _ _ (reflexivity _)).
-  + exfalso; rewrite e_zero in e_pos; apply (Qlt_irrefl _ e_pos).
+    intros. exact (ball_weak_le m x y H H0).
+  Qed.
+
+  Lemma gball_pos {e : Q} (e_pos : 0 < e) (x y : m)
+    : ball e x y <-> gball e x y.
+  Proof.
+  unfold gball. reflexivity.
   Qed.
 
   Lemma gball_neg (e : Q) (x y : m) : e < 0 -> ~ gball e x y.
   Proof.
-  intro e_neg. unfold gball. destruct (Q_dec e) as [[E | E] | E]; [easy | |].
-  + intros _; apply (Qlt_irrefl _ (Qlt_trans _ _ _ e_neg E)).
-  + rewrite E in e_neg. intros _; apply (Qlt_irrefl _ e_neg).
+    intros e_neg abs. unfold gball in abs. 
+    apply (Qlt_not_le _ _ e_neg).
+    exact (msp_nonneg (msp m) _ _ _ abs).
   Qed.
 
   Lemma gball_closed (e : Q) (x y : m) :
      (forall d : Q, 0 < d -> gball (e + d) x y) -> gball e x y.
   Proof.
   intro C. (*change (gball e x y).*) unfold gball.
-  destruct (Q_dec e) as [[e_neg | e_pos] | e_zero].
-  + assert (e * (1#2) < 0) by now apply Qmult_neg_pos.
-    apply (@gball_neg (e * (1#2)) x y); [easy |].
-    setoid_replace (e * (1#2)) with (e - e * (1#2)) by (field; discriminate).
-    apply C; now apply Qopp_Qlt_0_l.
-  + apply (msp_closed (msp m)). intros [d d_pos]. now apply gball_pos, C.
-  + apply ball_eq. intros [d d_pos]. apply gball_pos.
-    setoid_replace d with (e + d); [now apply C | rewrite e_zero; symmetry; apply Qplus_0_l].
+  apply ball_closed. exact C.
   Qed.
 
   Lemma gball_closed_eq (x y : m) : (forall d : Q, 0 < d -> gball d x y) -> st_eq x y.
   Proof.
-  intro C. change (gball 0 x y). apply gball_closed. intro d.
-  setoid_replace (0 + d)%Q with d by apply Qplus_0_l. apply C.
+    intro C. apply ball_eq. exact C.
   Qed.
 
 End gball.

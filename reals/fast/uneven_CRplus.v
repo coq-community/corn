@@ -61,13 +61,12 @@ Section uneven_CRplus.
    apply regFunEq_e. intro e.
    rewrite approximate_CRplus...
    unfold uneven_CRplus_approx.
-   assert (QposEq (e + e) ((e * ll + (1#2) * e) + (e * rr + (1#2) * e))).
-   { unfold QposEq. unfold QposEq in llrr.
+   setoid_replace (proj1_sig e + proj1_sig e)
+     with (proj1_sig ((e * ll + (1#2) * e) + (e * rr + (1#2) * e)))%Qpos.
+    apply Qball_plus; apply regFun_prf.
      simpl in llrr.
    transitivity (proj1_sig e + proj1_sig e * proj1_sig (ll + rr)%Qpos)...
-   rewrite llrr. ring. }
-   rewrite H. clear H.
-    apply Qball_plus; apply regFun_prf.
+   unfold QposEq in llrr. simpl in llrr. rewrite llrr. ring.
   Qed.
 
 End uneven_CRplus.

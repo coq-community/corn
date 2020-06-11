@@ -38,8 +38,8 @@ Local Open Scope uc_scope.
 ** Example of a real number structure: $\langle$#&lang;#[CR]$\rangle$#&rang;#
 *)
 
-Lemma CRAbsSmall_ball : forall (x y:CR) (e:Qpos),
-    AbsSmall (R:=CRasCOrdField) (inject_Q_CR (proj1_sig e)) ((x:CRasCOrdField)[-]y) <->
+Lemma CRAbsSmall_ball : forall (x y:CR) (e:Q),
+    AbsSmall (R:=CRasCOrdField) (inject_Q_CR e) ((x:CRasCOrdField)[-]y) <->
  ball e x y.
 Proof.
  intros x y e.
@@ -57,10 +57,10 @@ Proof.
   simpl.
   set (x':=approximate x ((1#2)*((1#2)*d))%Qpos).
   set (y':=approximate y ((1#2)*((1#2)*d))%Qpos).
-  change (-proj1_sig d <= x' - y' + - - proj1_sig e) in H1'.
-  change (-proj1_sig d <= proj1_sig e + - (x' - y')) in H2'.
+  change (-proj1_sig d <= x' - y' + - - e) in H1'.
+  change (-proj1_sig d <= e + - (x' - y')) in H2'.
   rewrite -> Qle_minus_iff in *.
-  apply: ball_weak.
+  apply: ball_weak. apply Qpos_nonneg.
   split; simpl; rewrite -> Qle_minus_iff.
   rewrite Qopp_involutive. do 2 rewrite Qopp_involutive in H1'.
   rewrite (Qplus_comm (proj1_sig d)).
@@ -74,18 +74,18 @@ Proof.
    set (x':=(approximate (doubleSpeed x) ((1 # 2) * d)%Qpos)) in *;
      set (y':=(approximate (doubleSpeed y) ((1 # 2) * d)%Qpos)) in *.
   autorewrite with QposElim in H1.
-  change (- ((1 # 2) * proj1_sig d + proj1_sig e + (1 # 2) * proj1_sig d)<=x' - y') in H1.
-  change (-proj1_sig d <= x' - y' + - - proj1_sig e).
+  change (- ((1 # 2) * proj1_sig d + e + (1 # 2) * proj1_sig d)<=x' - y') in H1.
+  change (-proj1_sig d <= x' - y' + - - e).
   rewrite -> Qle_minus_iff.
   rewrite -> Qle_minus_iff in H1.
-  replace RHS with (x' - y' + - - ((1 # 2) * proj1_sig d + proj1_sig e + (1 # 2) * proj1_sig d)) by ring.
+  replace RHS with (x' - y' + - - ((1 # 2) * proj1_sig d + e + (1 # 2) * proj1_sig d)) by ring.
   assumption.
  autorewrite with QposElim in H2.
- change (x' - y'<=((1 # 2) * proj1_sig d + proj1_sig e + (1 # 2) * proj1_sig d)) in H2.
- change (-proj1_sig d <= proj1_sig e + - (x' - y')).
+ change (x' - y'<=((1 # 2) * proj1_sig d + e + (1 # 2) * proj1_sig d)) in H2.
+ change (-proj1_sig d <= e + - (x' - y')).
  rewrite -> Qle_minus_iff.
  rewrite -> Qle_minus_iff in H2.
- replace RHS with ((1 # 2) * proj1_sig d + proj1_sig e + (1 # 2) * proj1_sig d + - (x' - y'))
+ replace RHS with ((1 # 2) * proj1_sig d + e + (1 # 2) * proj1_sig d + - (x' - y'))
    by ring.
  assumption.
 Qed.
@@ -127,16 +127,16 @@ Proof.
     [rstepr (e[-][0]);assumption|].
   rewrite -> CRAbsSmall_ball.
   change (nat -> Complete Q_as_MetricSpace) in f.
-  change (ball d (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
+  change (ball (proj1_sig d) (f m) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
   rewrite <- (MonadLaw5 (f m)).
-  change (ball d (Cjoin (Cunit (f m))) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
+  change (ball (proj1_sig d) (Cjoin (Cunit (f m))) (CRlim (Build_CauchySeq CRasCOrdField f Hf))).
   unfold CRlim.
   apply uc_prf.
-  change (ball d (Cunit (f m)) (Build_RegularFunction (Rlim_subproof0 f Hf))).
+  change (ball (proj1_sig d) (Cunit (f m)) (Build_RegularFunction (Rlim_subproof0 f Hf))).
   intros e1 e2.
   simpl.
   destruct (Hf (' proj1_sig e2)%CR (CRlt_Qlt _ _ (Qpos_ispos e2))) as [a Ha].
-  change (ball (e1+d+e2) (f m) (f a)).
+  change (ball (proj1_sig (e1+d+e2)%Qpos) (f m) (f a)).
   destruct (le_ge_dec a m).
    rewrite <- CRAbsSmall_ball.
    eapply AbsSmall_leEq_trans;[|apply Ha;assumption].
@@ -147,7 +147,7 @@ Proof.
    ring_simplify.
    change (0<= proj1_sig (e1+d+x)%Qpos).
    apply Qpos_nonneg.
-  apply ball_weak_le with ((1#2)*d+(1#2)*d)%Qpos.
+  apply ball_weak_le with (proj1_sig ((1#2)*d+(1#2)*d)%Qpos).
    rewrite -> Qle_minus_iff.
    simpl. ring_simplify.
    change (0<= proj1_sig (e1+e2)%Qpos).

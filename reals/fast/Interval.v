@@ -268,11 +268,11 @@ end.
 
 Lemma CompactIntervalQ_prf : is_RegularFunction CompactIntervalQ_raw.
 Proof.
- cut (forall e1 e2, hemiMetric Q_as_MetricSpace (e1 + e2) (fun a : Q_as_MetricSpace =>
+ cut (forall (e1 e2:Qpos), hemiMetric Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (fun a : Q_as_MetricSpace =>
    InFinEnumC a (CompactIntervalQ_raw e1)) (fun a : Q_as_MetricSpace =>
      InFinEnumC a (CompactIntervalQ_raw e2))).
   intros Z e1 e2.
-  split.
+  split. apply (Qpos_nonneg (e1+e2)). split.
    apply Z.
   eapply hemiMetric_wd1;[|apply Z].
   unfold QposEq; simpl; ring.
@@ -406,7 +406,7 @@ Proof.
  intros x [Hlx Hxr] e1 e2.
  simpl.
  set (y:= (Qmax (Qmin (approximate x e1) r) l)).
- apply (@almostIn_triangle_l _ stableQ e1 e2 (approximate x e1) y).
+ apply (@almostIn_triangle_l _ stableQ (proj1_sig e1) (proj1_sig e2) (approximate x e1) y).
   unfold y.
   apply Qmin_case.
    apply Qmax_case.

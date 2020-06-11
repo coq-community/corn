@@ -75,7 +75,10 @@ Global Instance inject_PosAQ_AR: Cast (AQ₊) AR := (cast AQ AR ∘ cast (AQ₊)
 Global Instance inject_Z_AR: Cast Z AR := (cast AQ AR ∘ cast Z AQ)%prg.
 
 Lemma ARtoCR_inject (x : AQ) : cast AR CR (cast AQ AR x) = cast Q CR (cast AQ Q x).
-Proof. apply: regFunEq_e. intros ε. apply ball_refl. Qed.
+Proof.
+  apply: regFunEq_e. intros ε. apply ball_refl.
+  apply (Qpos_nonneg (ε + ε)). 
+Qed.
 
 Global Instance AR0: Zero AR := cast AQ AR 0.
 Lemma ARtoCR_preserves_0 : cast AR CR 0 = 0.
@@ -237,8 +240,11 @@ Proof. change (SemiRing_Morphism (inverse (cast AR CR))). split; apply _. Qed.
 Instance: SemiRing_Morphism (cast AQ AR).
 Proof.
   repeat (split; try apply _); intros; try reflexivity.
-   apply: regFunEq_e. intros ε. now apply ball_refl. 
-  rewrite ARmult_scale. apply: regFunEq_e. intros ε. now apply ball_refl.
+   apply: regFunEq_e. intros ε. apply ball_refl. 
+   apply (Qpos_nonneg (ε + ε)).
+   rewrite ARmult_scale. apply: regFunEq_e. intros ε.
+   apply ball_refl.
+   apply (Qpos_nonneg (ε + ε)).
 Qed.
 
 Add Ring CR : (rings.stdlib_ring_theory CR).
@@ -585,9 +591,9 @@ Proof.
    2: now eapply ball_sym, aq_div_dlog2.
   eapply ball_triangle.
    now eapply aq_div_dlog2.
-  simpl. aq_preservation. apply Qinv_pos_uc_prf in E.
+   simpl. aq_preservation.
   rewrite 2!left_identity.
-  apply E.
+   exact (Qinv_pos_uc_prf (' c) ε (' x) (' y) E).
 Qed.
 
 Definition AQinv_pos_uc (c : AQ₊) := Build_UniformlyContinuousFunction (AQinv_pos_uc_prf c).
@@ -598,21 +604,21 @@ Lemma ARtoCR_preserves_inv_pos_aux c (x : AR) : is_RegularFunction_noInf _
    (λ γ, / Qmax (''c) ('approximate x (Qinv_modulus ('c) γ)) : Q_as_MetricSpace).
 Proof.
   intros ε1 ε2.
-  apply_simplified (Qinv_pos_uc_prf ('c)).
+  apply_simplified (Qinv_pos_uc_prf ('c) (ε1 + ε2)%Qpos).
   apply AQball_fold. 
-  assert (QposEq (Qinv_modulus ('c) (ε1 + ε2))
-                 (Qinv_modulus ('c) ε1 + Qinv_modulus ('c) ε2))
-    by (unfold QposEq; simpl; ring).
-  rewrite H5. now apply regFun_prf.
+  setoid_replace (' c * ' c * (` ε1 + ` ε2))%Q
+    with (proj1_sig (Qinv_modulus ('c) ε1 + Qinv_modulus ('c) ε2)%Qpos)
+    by (simpl; ring).
+  apply regFun_prf.
 Qed.
 
 Lemma ARtoCR_preserves_inv_pos x c : 'ARinv_pos c x = CRinv_pos ('c) ('x).
 Proof.
   apply: regFunEq_e. intros ε. 
   simpl. unfold Cjoin_raw. simpl.
-  assert (QposEq (ε + ε) ((1#2) * ε + ((1#2) * ε + ε)))
-    by (unfold QposEq; simpl; ring).
-  rewrite H5. clear H5.
+  setoid_replace (proj1_sig ε + proj1_sig ε)%Q
+    with (proj1_sig ((1#2) * ε + ((1#2) * ε + ε)))%Qpos
+    by (simpl; ring).
   eapply ball_triangle.
    now apply aq_div_dlog2.
   rewrite aq_preserves_max. 

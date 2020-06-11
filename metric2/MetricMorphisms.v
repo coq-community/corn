@@ -17,10 +17,10 @@ Section metric_embedding.
   Context `{Setoid X'} {Y : MetricSpace}.
   Context (f : X' -> Y) {inj : Injective f}.
 
-  Definition Eball (q: Qpos) (x y: X'): Prop := ball q (f x) (f y).
+  Definition Eball (q: Q) (x y: X'): Prop := ball q (f x) (f y).
   Local Existing Instance injective_mor.
 
-  Global Instance Eball_wd : Proper (QposEq ==> (=) ==> (=) ==> iff) Eball.
+  Global Instance Eball_wd : Proper (Qeq ==> (=) ==> (=) ==> iff) Eball.
   Proof.
     intros ?? E ?? F ?? G. unfold Eball.
     destruct inj.
@@ -31,12 +31,14 @@ Section metric_embedding.
 
   Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
   Proof.
-    constructor; unfold ball; repeat intro.
-        now apply ball_refl.
-       now apply ball_sym.
-      now eapply ball_triangle; eauto.
-     now apply ball_closed.
-    apply (injective f). now apply ball_eq.
+    constructor; unfold ball.
+    - intros e H0 x. apply ball_refl, H0.
+    - intros e x y. apply ball_sym.
+    - intros. now eapply ball_triangle; eauto.
+    - intros. now apply ball_closed.
+    - intros. apply (injective f). now apply ball_eq.
+    - intros. 
+      apply (msp_nonneg (msp Y)) in H0. exact H0.
   Qed.
 
   Program Definition Emetric: MetricSpace := Build_MetricSpace _ is_MetricSpace.
@@ -63,7 +65,7 @@ Arguments app_inverse {X Y} f {AppInverse}.
 Class DenseEmbedding `{Equiv X} {Y : MetricSpace} (f : X → Y) `{!AppInverse f} := {
   dense_embed_setoid : Setoid X ;
   dense_injective :> Injective f ;
-  dense_inverse : ∀ x ε, ball ε (f (app_inverse f x ε)) x
+  dense_inverse : ∀ x (ε:Qpos), ball (proj1_sig ε) (f (app_inverse f x ε)) x
 }.
 
 (* Given a dense embedding of a setoid [X] into a prelength space [Y] then [X] 
@@ -200,9 +202,9 @@ Section dense_prelength_embedding.
     intros x y E. rewrite <-E. 
     intros ε1 ε2.
     simpl. unfold Cjoin_raw. simpl.
-    assert (QposEq (ε1 + ε2) (half * ε1 + (half * ε1 + ε2)))
-      by (unfold QposEq; simpl; ring).
-    rewrite H0. clear H0.
+    setoid_replace (proj1_sig ε1 + proj1_sig ε2)%Q
+      with (proj1_sig (half * ε1 + (half * ε1 + ε2))%Qpos)
+      by (simpl; ring).
     eapply ball_triangle.
      now eapply dense_inverse.
     now apply regFun_prf.
@@ -236,8 +238,9 @@ Section dense_prelength_embedding.
     Proof.
       intros e1 e2. apply regFunEq_e. intros ε. 
       simpl. rewrite QposInf_bind_id.
-      apply (ball_wd _ (QposEq_refl _) _ _ (g_eq_h _) _ _ (reflexivity _)). 
+      apply (ball_wd _ eq_refl _ _ (g_eq_h _) _ _ (reflexivity _)). 
       apply ball_refl.
+      apply (Qpos_nonneg (ε + ε)).
     Qed.
   End unary_functions.
 
@@ -249,7 +252,7 @@ Section dense_prelength_embedding.
 
     Lemma binary_uc_prf : is_UniformlyContinuousFunction (g'' : X → (X --> X)) (mu h).
     Proof.
-      intros ε x y E z.
+      intros ε x y E. split. apply Qpos_nonneg. intro z.
       apply Eball_spec. simpl.
       apply (ball_wd _ (QposEq_refl ε) _ _ (g_eq_h _ _) _ _ (g_eq_h _ _)). 
       apply (uc_prf h).
@@ -263,9 +266,10 @@ Section dense_prelength_embedding.
     Proof.
       intros e1 e2. apply regFunEq_e. intros ε. 
       simpl. unfold Cap_raw. simpl. 
-      apply (ball_wd _ (QposEq_refl _) _ _ (g_eq_h _ _) _ _ (reflexivity _)). 
+      apply (ball_wd _ eq_refl _ _ (g_eq_h _ _) _ _ (reflexivity _)). 
       rewrite 2!QposInf_bind_id. 
       apply ball_refl.
+      apply (Qpos_nonneg (ε + ε)).
     Qed.
   End binary_functions.
 
@@ -279,12 +283,13 @@ Section dense_prelength_embedding.
     Proof.
       pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
       intros ε x y E δ1 δ2. apply Eball_spec.
-      apply ball_closed. intros δ3.
-      assert (QposEq (δ1 + ε + δ2 + δ3)
-                     ((δ1 + quarter * δ3)
-                      + (quarter * δ3 + ε + quarter * δ3) + (δ2 + quarter * δ3)))
-        by (unfold QposEq; simpl; ring).
-      rewrite H0. clear H0. 
+      apply ball_closed. intros δ3 dpos.
+      setoid_replace (proj1_sig δ1 + proj1_sig ε + proj1_sig δ2 + δ3)%Q
+        with (proj1_sig
+                ((δ1 + quarter * exist _ _ dpos)
+                 + (quarter * exist _ _ dpos + ε + quarter * exist _ _ dpos)
+                 + (δ2 + quarter * exist _ _ dpos))%Qpos)
+        by (simpl; ring).
       eapply ball_triangle.
       2: apply ball_sym, (g_eq_h y).
       eapply ball_triangle.
@@ -302,7 +307,7 @@ Section dense_prelength_embedding.
       intros ? ?. apply regFunEq_e. intros ε.
       simpl. unfold Cjoin_raw. simpl.
       rewrite QposInf_bind_id.
-      apply ball_weak.
+      apply ball_weak. apply Qpos_nonneg.
       assert (QposEq ε (half * ε + half * ε)) by (unfold QposEq; simpl; ring).
       apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0. 
       now apply (g_eq_h (approximate x (mu h (half * ε)))).

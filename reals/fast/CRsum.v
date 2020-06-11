@@ -44,7 +44,7 @@ end
 Lemma CRsum_list_prf : forall l, is_RegularFunction (CRsum_list_raw l).
 Proof.
  intros [|a t] e1 e2.
-  apply ball_refl.
+  apply ball_refl. apply (Qpos_nonneg (e1 + e2)).
  unfold CRsum_list_raw.
  simpl.
  set (p:=P_of_succ_nat (@length (RegularFunction Q_as_MetricSpace) t)).
@@ -52,7 +52,7 @@ Proof.
  set (e2':=((1 # p) * e2)%Qpos).
  simpl in e1'. fold e1'.
  simpl in e2'. fold e2'.
- assert (Qball (e1' + e2') (0 + approximate a e1') (0 + approximate a e2')).
+ assert (Qball (proj1_sig e1' + proj1_sig e2') (0 + approximate a e1') (0 + approximate a e2')).
  { ring_simplify. apply (regFun_prf a). }
   assert (X:forall e:Qpos, proj1_sig ((1 # p) * e)%Qpos*(length t)
                       + proj1_sig ((1 # p) * e)%Qpos <= proj1_sig e).
@@ -90,8 +90,7 @@ Proof.
   simpl in *.
   ring_simplify in H1.
   ring_simplify in H2.
-  apply (@ball_weak_le Q_as_MetricSpace (e1' + e2')); auto.
-  autorewrite with QposElim.
+  apply (@ball_weak_le Q_as_MetricSpace (proj1_sig e1' + proj1_sig e2')); auto.
   apply Qplus_le_compat; auto.
  simpl in *.
  change (Zpos (P_of_succ_nat (length t))) with (Z_of_nat (1+(length t))) in H1.
@@ -125,7 +124,7 @@ Lemma CRsum_correct : forall l, (CRsum_list l == fold_right (fun x y => x + y) 0
 Proof.
  induction l.
   apply: regFunEq_e; intros e.
-  apply ball_refl.
+  apply ball_refl. apply (Qpos_nonneg (e+e)).
  simpl (fold_right (fun x y : CR => (x + y)%CR) 0%CR (a :: l)).
  rewrite <- IHl.
  clear -l.
@@ -137,24 +136,25 @@ Proof.
  simpl.
  destruct l; simpl.
   ring_simplify.
-  assert (QposEq (e+e) ((1 # 1) *e + (1 # 2) * e + (1 # 2) * e))
-    by (unfold QposEq; simpl; ring).
- apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
-  apply: ball_weak.
+  setoid_replace (proj1_sig e+proj1_sig e)
+    with (proj1_sig ((1 # 1) *e + (1 # 2) * e + (1 # 2) * e))%Qpos
+         by (simpl; ring).
+  apply: ball_weak. apply Qpos_nonneg.
   apply regFun_prf.
  set (n:=  (@length (RegularFunction Q_as_MetricSpace) l)).
  cut (forall (z1:Q) (e3 e5 e1 e2 e4 e6:Qpos) (z2 z3:Q),
-         ball e5 z1 z2 ->
+         ball (proj1_sig e5) z1 z2 ->
          (z3 == approximate a e3 + z1)
          -> (proj1_sig e1*n + proj1_sig e2*n +proj1_sig e3 + proj1_sig e4 + proj1_sig e5  <= proj1_sig e6)
-         -> Qball e6 (fold_left Qplus
+         -> Qball (proj1_sig e6) (fold_left Qplus
      (map (fun x : RegularFunction Q_as_MetricSpace => approximate x e1) l) z3) (approximate a e4 +
        fold_left Qplus (map (fun x : RegularFunction Q_as_MetricSpace => approximate x e2) l) z2)).
  { intros H.
   apply (H (approximate s ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos)
-    ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos ((1 # Pos.succ (P_of_succ_nat n)) * e +
-      (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos).
-    simpl.
+           ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos
+           ((1 # Pos.succ (P_of_succ_nat n)) * e +
+            (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos
+           _ _ _ (e+e)%Qpos).
     rewrite -> Qplus_0_l.
     apply: regFun_prf.
     rewrite Qplus_0_l. reflexivity.

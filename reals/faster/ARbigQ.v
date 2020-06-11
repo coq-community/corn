@@ -74,7 +74,8 @@ Instance: DenseEmbedding (cast bigQ Q_as_MetricSpace).
 Proof.
   split; try apply _.
   intros. unfold app_inverse, inverse_Q_bigQ.
-  now rewrite (rationals.morphisms_involutive _ _).
+  rewrite (rationals.morphisms_involutive _ _).
+  apply ball_refl. apply QposMinMax.Qpos_nonneg.
 Qed.
 
 Instance: AppRationals bigQ.

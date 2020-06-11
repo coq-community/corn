@@ -33,7 +33,7 @@ one to say, ball Infinity a b, holds for all a and b.
 
 Definition ball_ex (X: MetricSpace) (e: QposInf): X -> X -> Prop :=
  match e with
-  | Qpos2QposInf e' => ball e'
+  | Qpos2QposInf e' => ball (proj1_sig e')
   | QposInfinity => fun a b => True
  end.
 (* begin hide *)
@@ -55,7 +55,7 @@ Lemma ball_ex_dec : forall (X:MetricSpace), (forall e (a b:X), {ball e a b}+{~ba
 Proof.
  intros X ball_dec e a b.
  destruct e as [e|].
-  apply (ball_dec e a b).
+  apply (ball_dec (proj1_sig e) a b).
  simpl.
  auto.
 Defined.
@@ -73,7 +73,7 @@ an explicitly given modulus of continuity
 *)
 Definition is_UniformlyContinuousFunction
  (f: X -> Y) (mu: Qpos -> QposInf) :=
- forall e a b, ball_ex (mu e) a b -> ball e (f a) (f b).
+ forall e a b, ball_ex (mu e) a b -> ball (proj1_sig e) (f a) (f b).
 
 (** Every uniformly continuous function is automatically well defined *)
 Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -> QposInf),
@@ -134,40 +134,52 @@ Qed.
 
 Definition uc_Setoid : RSetoid := (Build_RSetoid uc_setoid).
 
-Definition ucBall e (f g : UniformlyContinuousFunction) := forall a, ball e (f a) (g a).
+Definition ucBall e (f g : UniformlyContinuousFunction)
+  := 0 <= e /\ forall a:X, ball e (f a) (g a).
 
 Lemma uc_is_MetricSpace : is_MetricSpace uc_Setoid ucBall.
 Proof.
  constructor.
-     firstorder using ball_refl.
-    firstorder using ball_sym.
-   intros e1 e2 f g h H1 H2 a.
+ - firstorder using ball_refl.
+ - firstorder using ball_sym.
+ - intros e1 e2 f g h H1 H2. 
+   destruct H1, H2. split. apply (Qle_trans _ (e1+0)).
+   rewrite Qplus_0_r. exact H.
+   apply Qplus_le_r, H1. intro a.
    apply ball_triangle with (g a); auto.
-  intros e f g H a.
-  apply ball_closed.
-  firstorder.
- intros f g H a.
- apply ball_eq.
- firstorder.
+ - intros e f g H. split.
+   + apply Qnot_lt_le. intro abs.
+     specialize (H (-e *(1#2))). destruct H.
+     rewrite <- (Qmult_0_l (1#2)). apply Qmult_lt_r.
+     reflexivity. apply (Qplus_lt_r _ _ e).
+     ring_simplify. exact abs.
+     ring_simplify in H. apply (Qlt_not_le _ _ abs).
+     rewrite <- (Qmult_le_l _ _ (1#2)).
+     rewrite Qmult_0_r. exact H. reflexivity.
+   + intro a. apply ball_closed. firstorder.
+ - intros f g H a.
+   apply ball_eq.
+   firstorder.
+ - intros e a b H. apply H. 
 Qed.
 
-Lemma ucBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
+Lemma ucBall_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall (x1 x2 : uc_Setoid), (st_eq x1 x2) ->
             forall (y1 y2 : uc_Setoid), (st_eq y1 y2) ->
             (ucBall e1 x1 y1 <-> ucBall e2 x2 y2).
 Proof.
  intros.
- unfold ucEq in *.
  unfold ucBall in *.
  simpl in H0, H1.
  unfold ucEq in H0, H1.
  split.
-  intros.
-  apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
-  auto.
- intros.
-  apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
- auto.
+ - intros. destruct H2. split. rewrite <- H. exact H2.
+   intro a. apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
+   apply H3.
+ - intros. destruct H2. split.
+   rewrite H. exact H2. intro a.
+   apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
+   auto.
 Qed.
 
 (** mu_ex generalizes mu analogous to how ball_ex generalizes ball: *)
@@ -205,17 +217,18 @@ Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 55, right associa
 
 Local Open Scope uc_scope.
 (* begin hide *)
-Add Parametric Morphism (X Y:MetricSpace) f : (@ucFun X Y f) with signature (@st_eq X) ==> (@st_eq Y) as uc_wd.
+Add Parametric Morphism (X Y:MetricSpace) f : (@ucFun X Y f)
+    with signature (@st_eq X) ==> (@st_eq Y) as uc_wd.
 Proof.
  intros x0 x1 Hx.
  apply ball_eq.
- intros e.
- apply uc_prf.
- destruct (mu f e);[|constructor].
+ intros e epos.
+ apply (uc_prf f (exist _ _ epos)).
+ destruct (mu f (exist _ _ epos));[|constructor].
  simpl.
  assert (QposEq q q) by reflexivity.
  apply (ball_wd X H _ _ Hx x1 x1 (reflexivity _)).
- apply ball_refl.
+ apply ball_refl. apply Qpos_nonneg.
 Qed.
 
 Instance uc_wd_more_Proper (X Y : MetricSpace):
@@ -285,7 +298,8 @@ Notation "f ∘ g" := (uc_compose f g) (at level 40, left associativity) : uc_sc
 Lemma is_uc_uc_compose0 : forall X Y Z (f:Y-->Z),
  is_UniformlyContinuousFunction (@uc_compose X Y Z f) (mu f).
 Proof.
- intros X Y Z f e x y Hxy z.
+  intros X Y Z f e x y Hxy. split.
+  apply Qpos_nonneg. intro z.
  simpl.
  simpl in Hxy.
  apply uc_prf.
@@ -299,9 +313,12 @@ Definition uc_compose_uc0 X Y Z (f:Y-->Z) : (X-->Y) --> X --> Z :=
 Lemma is_uc_uc_compose : forall X Y Z,
  is_UniformlyContinuousFunction (@uc_compose_uc0 X Y Z) Qpos2QposInf.
 Proof.
- intros X Y Z e x y Hxy z z0.
- simpl.
- apply Hxy.
+  intros X Y Z e x y Hxy. split.
+  apply Qpos_nonneg.
+  intro z. split. apply Qpos_nonneg.
+  intro z0. 
+  simpl.
+  apply Hxy.
 Qed.
 
 Definition uc_compose_uc X Y Z : (Y-->Z)-->(X-->Y)-->X-->Z :=

@@ -361,7 +361,7 @@ Definition Qmult_modulus (c:Qpos)(e:Qpos) : QposInf
 
 Lemma Qmult_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun a => uc_compose (Qscale_uc a) (QboundAbs c)) (Qmult_modulus c).
 Proof with simpl in *; auto with *.
- intros e a0 a1 H b.
+ intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
  set (b' := Qmax (- proj1_sig c) (Qmin (proj1_sig c) b)).
  repeat rewrite -> (fun x => Qmult_comm x b').
@@ -406,8 +406,9 @@ Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc c).
 Instance: Proper (QposEq ==> @st_eq _) Qmult_uc.
 Proof.
  intros e1 e2 E x1 x2.
- apply ball_eq_iff. intro e.
- simpl. unfold QposEq in E. rewrite E. reflexivity.
+ apply ball_eq_iff. intros e epos.
+ simpl. unfold QposEq in E. rewrite E.
+ apply Qball_Reflexive. apply Qlt_le_weak, epos.
 Qed.
 
 Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
@@ -538,6 +539,7 @@ Proof.
    apply (Qlt_not_le _ _ q). rewrite abs. apply Qle_refl. }
  simpl. simpl in H0. rewrite H0. 
  do 2 rewrite QposInf_bind_id. apply ball_refl.
+ apply (Qpos_nonneg (e+e)).
 Qed.
 
 Lemma CRmult_bounded_mult : forall (c:Qpos) (x y:CR),
@@ -654,7 +656,8 @@ Proof.
   rewrite -> Qmult_comm.
   apply mult_resp_leEq_lft;[|apply Qpos_nonneg].
   apply mult_resp_leEq_both; (apply Qpos_nonneg || apply Qmax_ub_l).
- change (@ball Q_as_MetricSpace (c*c*e) (Qmax (proj1_sig c) a1) (Qmax (proj1_sig c) a0)).
+  change (@ball Q_as_MetricSpace (proj1_sig (c*c*e)%Qpos)
+                (Qmax (proj1_sig c) a1) (Qmax (proj1_sig c) a0)).
  apply ball_sym.
  apply QboundBelow_uc_prf.
  apply Ha.
@@ -712,6 +715,7 @@ Proof.
   rewrite -> Z;[|apply Qmax_ub_l].
   unfold Qinv_modulus.
   replace (Qpos_red (c1 * c1 * e)) with (Qpos_red (f (c2 * c2 * e)%Qpos)); [apply: ball_refl|].
+  apply (Qpos_nonneg (e+e)).
   apply Qpos_red_eq.
   unfold f.
   unfold QposEq.
@@ -745,6 +749,7 @@ Proof.
  simpl.
  setoid_replace (Qmax (proj1_sig c) x) with x.
   apply: ball_refl.
+  apply (Qpos_nonneg (e+e)).
  rewrite <- Qle_max_r.
  assumption.
 Qed.
@@ -818,7 +823,7 @@ Proof.
   simpl.
   unfold Cap_raw; simpl.
   ring_simplify.
-  apply: ball_refl.
+  apply: ball_refl. apply (Qpos_nonneg (e+e)).
  assert (Y:forall x, (x + - 0 == x)%CR).
   intros x.
   transitivity (doubleSpeed x);[|apply: doubleSpeed_Eq].
@@ -827,7 +832,7 @@ Proof.
   simpl.
   unfold Cap_raw; simpl.
   ring_simplify.
-  apply: ball_refl.
+  apply: ball_refl. apply (Qpos_nonneg (e+e)).
  intros x y [[c x_]|[c x_]] [[d y_]|[d y_]] H.
     change (-(CRinv_pos c (-x))== (-(CRinv_pos d (-y))))%CR.
     rewrite -> H in *.

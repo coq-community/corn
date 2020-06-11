@@ -180,7 +180,7 @@ Proof.
    rewrite <- Hs , <- Ht.
    assumption.
   intros x y Hxy.
-  change (Qball e x y) in Hxy.
+  change (Qball (proj1_sig e) x y) in Hxy.
   rewrite ->  Qball_Qabs in Hxy.
   apply Hxy.
  intros o s s0 t t0 Hst Hst0 H.

@@ -31,28 +31,29 @@ At the lowest level a metric space is stable if its ball relation is
 double negation stable.  Arguablely this could be made a requirement
 of metric spaces. *)
 Definition stableMetric (ms:MetricSpace) :=
- forall e (x y:ms), ~~(ball e x y) -> ball e x y.
+ forall (e:Q) (x y:ms), ~~(ball e x y) -> ball e x y.
 
 Lemma stableEq : forall (ms:MetricSpace) (stable:stableMetric ms) (x y:ms),
  ~~(st_eq x y) -> st_eq x y.
 Proof.
  intros ms stable x y Hxy.
  apply ball_eq.
- intros e.
- apply stable.
+ intros e epos.
+ apply (stable e).
  revert Hxy.
  cut (st_eq x y -> ball (m:=ms) e x y).
   tauto.
  intros H.
  apply (ball_wd ms eq_refl _ _ H y y (reflexivity y)).
- apply ball_refl.
+ apply ball_refl. apply Qlt_le_weak, epos.
 Qed.
 
 (** At the next level up a metric space is located if you can choose
 between ball d x y and ~ball e x y for e < d.  Every located metric
 is a stable metric. *)
 Definition locatedMetric (ms:MetricSpace) :=
- forall (e d:Qpos) (x y:ms), proj1_sig e < proj1_sig d -> {ball d x y}+{~ball e x y}.
+  forall (e d:Q) (x y:ms),
+    e < d -> {ball d x y}+{~ball e x y}.
 
 (** At the top level a metric space is decidable if its ball relation
 is decidable.  Every decidable metric is a located metric. *)
@@ -65,7 +66,8 @@ Proof.
  intros ms H e d x y Hed.
  destruct (H e x y).
   left.
-  abstract ( apply ball_weak_le with e; try assumption; apply Qlt_le_weak; assumption).
+  abstract ( apply ball_weak_le with e;
+             try assumption; apply Qlt_le_weak; assumption).
  right; assumption.
 Defined.
 
@@ -74,10 +76,9 @@ Lemma located_stable : forall ms,
 Proof.
  intros ms H e x y Hxy.
  apply ball_closed.
- intros d.
- destruct (H e (Qpos_plus e d) x y); try (assumption || contradiction).
- destruct e,d; simpl.
- apply (Qplus_lt_l _ _ (-x0)). ring_simplify. exact q0.
+ intros d dpos.
+ destruct (H e (e+d) x y); try (assumption || contradiction).
+ apply (Qplus_lt_l _ _ (-e)). ring_simplify. exact dpos.
 Qed.
 (* begin hide *)
 Hint Resolve decidable_located located_stable : classification.

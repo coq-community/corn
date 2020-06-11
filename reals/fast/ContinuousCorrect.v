@@ -100,7 +100,7 @@ Proof.
  intros x Hx H.
  set (J:=compact_in_interval I HI x H).
  apply ball_eq.
- intros e.
+ intros e epos.
  assert (HJ:compact_ J) by apply compact_compact_in_interval.
  destruct Hf as [Hf1 Hf0].
  clear Hf.
@@ -110,13 +110,13 @@ Proof.
   unfold J;  apply iprop_compact_in_interval_inc1.
  clear Hf0.
  destruct X as [_ X].
- assert (He : [0][<](inj_Q IR (proj1_sig ((1#2)*e)%Qpos))).
+ assert (He : [0][<](inj_Q IR (proj1_sig ((1#2)*exist _ _ epos)%Qpos))).
   stepl (inj_Q IR (nring 0)); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
   apply Qpos_ispos.
  destruct (X _ He) as [d0 Hd0 Hf].
  clear X.
- set (d1:=mu g ((1#2)*e)).
+ set (d1:=mu g ((1#2)*exist _ _ epos)).
  set (Hab := (Lend_leEq_Rend J HJ)) in *.
  set (a:= (@Lend J HJ)) in *.
  set (b:= (@Rend J HJ)) in *.
@@ -139,8 +139,9 @@ Proof.
    apply Qpos_ispos.
   apply (inj_Q_nring IR 0).
  destruct (Q_dense_in_compact Hab0 HJx _ H0d) as [q Hq0 Hq1].
- assert (QposEq e ((1#2)*e+(1#2)*e)) by (unfold QposEq; simpl; ring).
- apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0.
+ setoid_replace e
+   with (proj1_sig ((1#2)*exist _ _ epos+(1#2)*exist _ _ epos))%Qpos
+   by (simpl; ring).
  assert (Hfq : Dom f (inj_Q IR q)).
   apply Hf1.
   apply HJ'.
@@ -148,7 +149,7 @@ Proof.
  apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
   rewrite <- CRAbsSmall_ball.
   stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)); [| now (simpl; apply IR_minus_as_CR)].
-  stepl (IRasCR (inj_Q IR (proj1_sig ((1 # 2) * e)%Qpos))); [| now (simpl; apply IR_inj_Q_as_CR)].
+  stepl (IRasCR (inj_Q IR (proj1_sig ((1 # 2) * exist _ _ epos)%Qpos))); [| now (simpl; apply IR_inj_Q_as_CR)].
   rewrite <- IR_AbsSmall_as_CR.
   apply AbsIR_imp_AbsSmall.
   apply Hf; try assumption.

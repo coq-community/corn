@@ -1,5 +1,6 @@
 (*
 Copyright © 2006-2008 Russell O’Connor
+Copyright © 2020 Vincent Semeria
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -48,7 +49,7 @@ property.
 *)
 
 Definition is_RegularFunction (x:QposInf -> X) : Prop :=
- forall (e1 e2:Qpos), ball (m:=X) (e1 + e2) (x e1) (x e2).
+ forall (e1 e2:Qpos), ball (m:=X) (proj1_sig e1 + proj1_sig e2) (x e1) (x e2).
 
 (** A regular function consists of an approximation function, and
 a proof that the approximations are coherent. *)
@@ -61,7 +62,7 @@ Record RegularFunction : Type :=
  so we make a smart constructor that just takes a Qpos->X. *)
 
 Definition is_RegularFunction_noInf (x: Qpos -> X): Prop :=
-  forall e1 e2 : Qpos, ball (e1 + e2) (x e1) (x e2).
+  forall e1 e2 : Qpos, ball (proj1_sig e1 + proj1_sig e2) (x e1) (x e2).
 
 Section mkRegularFunction.
 
@@ -84,46 +85,44 @@ End mkRegularFunction.
 (** Regular functions form a metric space *)
 Definition regFunEq (f g : RegularFunction) :=
   forall (e1 e2 : Qpos),
-    ball (m:=X) (e1 + e2) (approximate f e1) (approximate g e2).
+    ball (m:=X) (proj1_sig e1 + proj1_sig e2) (approximate f e1) (approximate g e2).
 
 Lemma regFunEq_e : forall (f g : RegularFunction),
-    (forall e : Qpos, ball (m:=X) (e + e) (approximate f e) (approximate g e)) -> (regFunEq f g).
+    (forall e : Qpos, ball (m:=X) (proj1_sig e + proj1_sig e) (approximate f e) (approximate g e)) -> (regFunEq f g).
 Proof.
  unfold regFunEq.
  intros f g H e1 e2.
  apply ball_closed.
- intros d.
- assert (0 < (1#4)) as quarterPos. reflexivity.
- assert (QposEq (e1 + e2 + d)%Qpos
-                ((e1 + (exist _ _ quarterPos *d)
-                  + ((exist _ _ quarterPos*d) + (exist _ _ quarterPos*d))
-                  +((exist _ _ quarterPos*d)+e2)))%Qpos).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
+ intros d dpos.
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+   with ((proj1_sig e1 + ((1#4) *d)
+          + (((1#4)*d) + ((1#4)*d))
+          +(((1#4)*d)+proj1_sig e2)))
+   by (simpl; ring).
   eapply ball_triangle.
    eapply ball_triangle.
-    apply regFun_prf.
-   apply H.
-  apply regFun_prf.
+    apply (regFun_prf _ e1 ((1#4)*exist _ _ dpos)%Qpos).
+   apply (H ((1 # 4) * exist (Qlt 0) d dpos)%Qpos).
+  apply (regFun_prf _ ((1 # 4) * exist (Qlt 0) d dpos)%Qpos e2).
 Qed.
 
 Lemma regFunEq_e_small : forall (f g : RegularFunction) (E:Qpos),
-    (forall (e:Qpos), proj1_sig e <= proj1_sig E -> ball (m:=X) (e+e) (approximate f e) (approximate g e)) -> (regFunEq f g).
+    (forall (e:Qpos), proj1_sig e <= proj1_sig E -> ball (m:=X) (proj1_sig e+ proj1_sig e) (approximate f e) (approximate g e)) -> (regFunEq f g).
 Proof.
  intros f g E H.
  apply regFunEq_e.
  intros e.
  apply ball_closed.
- intros d.
+ intros d dpos.
  assert (0 < (1#4)) as quarterPos. reflexivity. 
- set (e':=Qpos_min (exist _ _ quarterPos*d) E).
- apply ball_weak_le with ((e+e')+(e'+e')+(e'+e))%Qpos.
+ set (e':=Qpos_min (exist _ _ quarterPos*exist _ _ dpos) E).
+ apply ball_weak_le with (proj1_sig ((e+e')+(e'+e')+(e'+e))%Qpos).
  apply (Qle_trans _
-                  (proj1_sig ((e+exist _ _ quarterPos*d)
-                   +(exist _ _ quarterPos*d+exist _ _ quarterPos*d)
-                   +(exist _ _ quarterPos*d+e))%Qpos)).
+                  (proj1_sig ((e+exist _ _ quarterPos*exist _ _ dpos)
+                   +(exist _ _ quarterPos*exist _ _ dpos+exist _ _ quarterPos*exist _ _ dpos)
+                   +(exist _ _ quarterPos*exist _ _ dpos+e))%Qpos)).
  - simpl. ring_simplify. apply Qplus_le_r.
-   apply (Qle_trans _ ((4#1) * proj1_sig (Qpos_mult (exist (Qlt 0) (1 # 4) quarterPos) d))).
+   apply (Qle_trans _ ((4#1) * ((1 # 4) * d))).
    2: simpl; ring_simplify; apply Qle_refl.
    apply Qmult_le_l. reflexivity. apply Qpos_min_lb_l. 
  - simpl. ring_simplify. apply Qle_refl.
@@ -140,59 +139,56 @@ Proof.
  split.
  - unfold Reflexive.
    intros; apply regFunEq_e; intros; apply ball_refl.
+   apply (Qpos_nonneg (e+e)).
  - unfold Symmetric, regFunEq.
   intros.
   apply ball_sym.
-  assert (QposEq (e1+e2)%Qpos (e2+e1)%Qpos).
-  { unfold QposEq; simpl; ring. }
-  rewrite H0. apply H.
+  rewrite Qplus_comm. apply H.
  - unfold Transitive, regFunEq.
  intros.
  apply ball_closed.
  intros.
- pose (exist (Qlt 0) (1#2) eq_refl) as half.
- assert (QposEq (e1+e2+d)%Qpos ((e1 + half*d) + (half*d+e2))%Qpos).
- { unfold QposEq; simpl; ring. }
- rewrite H1. clear H1.
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+   with ((proj1_sig e1 + (1#2)*d) + ((1#2)*d+proj1_sig e2))
+   by (simpl; ring).
   eapply ball_triangle.
-   apply H.
-  apply H0.
+   apply (H e1 ((1#2)*exist _ _ H1)%Qpos).
+  apply (H0 ((1#2)*exist _ _ H1)%Qpos e2).
 Qed.
 
 Definition regFun_Setoid := Build_RSetoid regFun_is_setoid.
 
-Definition regFunBall e (f g : RegularFunction) :=
-forall d1 d2, ball (m:=X) (d1+e+d2)%Qpos (approximate f d1) (approximate g d2).
+Definition regFunBall (e:Q) (f g : RegularFunction) :=
+  forall d1 d2, ball (m:=X) (proj1_sig d1+e+ proj1_sig d2)
+                (approximate f (Qpos2QposInf d1)) (approximate g (Qpos2QposInf d2)).
 
-Lemma regFunBall_wd : forall (e1 e2:Qpos), (QposEq e1 e2) ->
+Lemma regFunBall_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall (x1 x2 : regFun_Setoid), (st_eq x1 x2) ->
             forall (y1 y2 : regFun_Setoid), (st_eq y1 y2) ->
             (regFunBall e1 x1 y1 <-> regFunBall e2 x2 y2).
 Proof.
- assert (forall x1 x2 : Qpos, QposEq x1 x2 -> forall x3 x4 : RegularFunction , regFunEq x3 x4 ->
+ assert (forall x1 x2 : Q, x1 == x2 -> forall x3 x4 : RegularFunction , regFunEq x3 x4 ->
    forall x5 x6 : RegularFunction , regFunEq x5 x6 -> (regFunBall x1 x3 x5 -> regFunBall x2 x4 x6)).
   unfold regFunBall.
   unfold regFunEq.
   intros a1 a2 Ha f1 f2 Hf g1 g2 Hg H d1 d2.
-  assert (QposEq (d1 + a2 + d2) (d1 + a1 + d2)).
-  { unfold QposEq in Ha; unfold QposEq; simpl; rewrite Ha; reflexivity. }
-  rewrite H0. 
-  clear H0 a2 Ha.
+  setoid_replace (proj1_sig d1 + a2 + proj1_sig d2)
+    with (proj1_sig d1 + a1 + proj1_sig d2)
+    by (unfold QposEq in Ha; simpl; rewrite Ha; reflexivity).
+  clear a2 Ha.
   apply ball_closed.
-  intros d.
-  assert (0 < (1#4)) as quarterPos. reflexivity. 
-  assert (QposEq (d1 + a1 + d2 + d)
-                 ((exist _ _ quarterPos*d+d1)
-          +(exist _ _ quarterPos*d + a1 + exist _ _ quarterPos*d)
-          +(exist _ _ quarterPos*d+d2))).
-  { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
+  intros d dpos.
+  setoid_replace (proj1_sig d1 + a1 + proj1_sig d2 + d)
+    with (((1#4)*d+ proj1_sig d1)
+          +((1#4)*d + a1 + (1#4)*d)
+          +((1#4)*d+ proj1_sig d2))
+    by (simpl; ring).
   eapply ball_triangle.
    eapply ball_triangle.
     apply ball_sym.
-    apply Hf.
-   apply H.
-  apply Hg.
+    apply (Hf ((1#4)*exist _ _ dpos)%Qpos).
+   apply (H ((1#4)*exist _ _ dpos)%Qpos ((1#4)*exist _ _ dpos)%Qpos).
+  apply (Hg ((1#4)*exist _ _ dpos)%Qpos d2).
  intros; split.
   intros; eapply H.
      apply H0.
@@ -216,44 +212,45 @@ Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid regFunBall.
 Proof.
  unfold regFunBall.
  split.
-     intros e f d1 d2.
-     assert (QposEq (d1 + e + d2) (d1+d2+e)).
-     { unfold QposEq; simpl; ring. }
-     rewrite H. clear H.
-     apply ball_weak.
-     apply regFun_prf.
-    intros e f g H d1 d2.
+ - intros e epos f d1 d2.
+   rewrite <- Qplus_assoc, (Qplus_comm e), Qplus_assoc.
+   apply ball_weak. exact epos.
+   apply regFun_prf.
+ - intros e f g H d1 d2.
     apply ball_sym.
-    assert (QposEq (d1 + e + d2) (d2+e+d1)).
-    { unfold QposEq; simpl; ring. }
-    rewrite H0. clear H0.
+    rewrite Qplus_comm, <- (Qplus_comm e), Qplus_assoc.
     apply H.
-   intros e1 e2 a b c Hab Hbc d1 d2.
+ - intros e1 e2 a b c Hab Hbc d1 d2.
    apply ball_closed.
-   intros d3.
-   assert (0 < (1#2)) as halfPos. reflexivity. 
-   assert (QposEq (d1+(e1+e2)+d2+d3)
-                  ((d1 + e1 + exist _ _ halfPos*d3)+(exist _ _ halfPos*d3 + e2 + d2))).
-    { unfold QposEq; simpl; ring. }
-    rewrite H. clear H.
+   intros d3 dpos.
+   setoid_replace (proj1_sig d1+(e1+e2)+proj1_sig d2+d3)
+     with ((proj1_sig d1 + e1 + (1#2)*d3)+((1#2)*d3 + e2 + proj1_sig d2))
+     by (simpl; ring).
    eapply ball_triangle.
-    apply Hab.
-   apply Hbc.
-  intros e a b H d1 d2.
+    apply (Hab d1 ((1#2)*exist _ _ dpos)%Qpos).
+   apply (Hbc ((1#2)*exist _ _ dpos)%Qpos).
+ - intros e a b H d1 d2.
   apply ball_closed.
-  intros d.
-  assert (QposEq (d1+e+d2+d) (d1 + (e+d) + d2)).
-  { unfold QposEq; simpl; ring. }
-  rewrite H0. clear H0.
+  intros d dpos.
+  setoid_replace (proj1_sig d1+e+ proj1_sig d2+d)
+    with (proj1_sig d1 + (e+d) + proj1_sig d2)
+    by (simpl; ring).
   auto.
- unfold regFunEq.
- intros a b H e1 e2.
- apply ball_closed.
- intros d.
- assert (QposEq (e1+e2+d) (e1+d+e2)).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0. 
- auto.
+ - intros a b H e1 e2.
+   apply ball_closed.
+   intros d dpos.
+   rewrite <- Qplus_assoc, <- (Qplus_comm d), Qplus_assoc. apply H, dpos.
+ - intros. apply Qnot_lt_le. intro abs.
+   assert (0 < -e * (1#3)).
+   { apply (Qmult_lt_l _ _ (3#1)). reflexivity.
+     apply (Qplus_lt_l _ _ e).
+     ring_simplify. apply (Qlt_le_trans _ _ _ abs).
+     discriminate. }
+   specialize (H (exist _ _ H0) (exist _ _ H0)). simpl in H.
+   apply msp_nonneg in H. 2: apply X.
+   ring_simplify in H. apply (Qlt_not_le _ _ abs).
+   apply (Qmult_le_l _ _ (3#9)). reflexivity.
+   rewrite Qmult_0_r. exact H.
 Qed.
 
 (** We define the completion of a metric space to be the space of
@@ -263,12 +260,14 @@ Build_MetricSpace regFunBall_wd regFun_is_MetricSpace.
 
 (** The ball of regular functions is related to the underlying ball
 in ways that you would expect. *)
-Lemma regFunBall_ball : forall (x y:Complete) (e0 e1 e2:Qpos), ball e0 (approximate x e1) (approximate y e2) -> ball (e1 + e0 + e2) x y.
+Lemma regFunBall_ball : forall (x y:Complete) (e0 : Q) (e1 e2:Qpos),
+    ball e0 (approximate x e1) (approximate y e2)
+    -> ball (proj1_sig e1 + e0 + proj1_sig e2) x y.
 Proof.
  intros x y e0 e1 e2 H d1 d2.
- assert (QposEq (d1+(e1+e0+e2)+d2) ((d1+e1)+e0+(e2+d2))).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
+ setoid_replace (proj1_sig d1+(proj1_sig e1+e0+proj1_sig e2)+proj1_sig d2)%Q
+   with ((proj1_sig d1+proj1_sig e1)+e0+(proj1_sig e2+proj1_sig d2))
+   by (simpl; ring).
   eapply ball_triangle.
    eapply ball_triangle.
     apply regFun_prf.
@@ -276,20 +275,23 @@ Proof.
   apply regFun_prf.
 Qed.
 
-Lemma regFunBall_e : forall (x y:Complete) e, (forall d, ball (d + e + d) (approximate x d) (approximate y d)) -> ball e x y.
+Lemma regFunBall_e : forall (x y:Complete) (e:Q),
+    (forall d:Qpos, ball (proj1_sig d + e + proj1_sig d)
+                    (approximate x d) (approximate y d))
+    -> ball e x y.
 Proof.
  intros x y e H.
  apply ball_closed.
- intros d.
- assert (0 < (1#4)) as quarterPos. reflexivity. 
- assert (QposEq (e + d)
-                (exist _ _ quarterPos*d
-         + (exist _ _ quarterPos*d+e+exist _ _ quarterPos*d)
-         + exist _ _ quarterPos*d)).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
- apply regFunBall_ball.
- apply H.
+ intros d dpos.
+ setoid_replace (e + d)
+   with ((1#4)*d + ((1#4)*d+ e+(1#4)*d) + (1#4)*d)
+   by (simpl; ring).
+ apply (regFunBall_ball
+          x y 
+          ((1 # 4) * d + e + (1 # 4) * d)%Q
+          ((1#4)*exist _ _ dpos)%Qpos
+          ((1#4)*exist _ _ dpos)%Qpos ).
+ apply (H ((1#4)*(exist _ _ dpos))%Qpos).
 Qed.
 
 (**
@@ -300,6 +302,7 @@ Lemma Cunit_fun_prf (x:X) : is_RegularFunction (fun _ => x).
 Proof.
  intros d1 d2.
  apply ball_refl.
+ apply (Qpos_nonneg (d1+d2)).
 Qed.
 
 Definition Cunit_fun (x:X) : Complete :=
@@ -311,8 +314,8 @@ Proof.
  simpl in *.
  assert (QposEq (d1+e+d2) (e+(d1+d2))).
  { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
- apply ball_weak.
+ unfold QposEq in H. rewrite H. clear H.
+ apply ball_weak. apply Qpos_nonneg.
  assumption.
 Qed.
 
@@ -320,40 +323,43 @@ Definition Cunit : X --> Complete :=
 Build_UniformlyContinuousFunction Cunit_prf.
 
 (** This injection preserves the metric *)
-Lemma ball_Cunit : forall e a b, ball e (Cunit a) (Cunit b) <-> ball e a b.
+Lemma ball_Cunit : forall (e:Q) a b,
+    ball e (Cunit a) (Cunit b) <-> ball e a b.
 Proof.
- intros e a b.
- simpl.
- unfold regFunBall.
- simpl.
- split.
-  intros H.
-  do 2 (apply ball_closed; intro).
-  assert (QposEq (e+d+d0) (d+e+d0)).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
- apply H.
- intros H d1 d2.
- apply Cunit_prf.
- assumption.
+  intros e a b. split.
+  - intros. simpl in H.
+    do 2 (apply ball_closed; intros).
+    rewrite <- (Qplus_comm d).
+    apply (H (exist _ _ H0) (exist _ _ H1)).
+  - intros H d1 d2.
+    pose proof (msp_nonneg (msp X) _ _ _ H).
+    apply Qle_lteq in H0. destruct H0.
+    apply (Cunit_prf (exist _ _ H0)). exact H.
+    rewrite <- H0, Qplus_0_r.
+    rewrite <- H0 in H. apply gball_0 in H.
+    simpl. rewrite H. apply ball_refl.
+    apply (Qpos_nonneg (d1+d2)).
 Qed.
 
 Lemma Cunit_eq : forall a b, st_eq (Cunit a) (Cunit b) <-> st_eq a b.
 Proof.
  intros a b.
  do 2 rewrite <- ball_eq_iff.
- split; intros H e; [rewrite <- ball_Cunit | rewrite -> ball_Cunit]; apply H.
+ split; intros H e epos; [rewrite <- (ball_Cunit e) | rewrite -> (ball_Cunit e)];
+ apply H; assumption.
 Qed.
 
-Lemma ball_approx_r : forall (x:Complete) e, ball e x (Cunit (approximate x e)).
+Lemma ball_approx_r : forall (x:Complete) (e:Qpos),
+    ball (proj1_sig e) x (Cunit (approximate x e)).
 Proof.
  intros x e d1 d2.
  simpl.
- apply ball_weak.
+ apply ball_weak. apply Qpos_nonneg.
  apply regFun_prf.
 Qed.
 
-Lemma ball_approx_l : forall (x:Complete) e, ball e (Cunit (approximate x e)) x.
+Lemma ball_approx_l : forall (x:Complete) (e:Qpos),
+    ball (proj1_sig e) (Cunit (approximate x e)) x.
 Proof.
  (* Set Firstorder Depth 6.
  firstorder fail with ball_sym ball_approx_r.
@@ -378,13 +384,15 @@ Proof.
 Qed.
 
 Lemma regFunBall_Cunit (e: Qpos) (x: Complete) (y: X):
-  regFunBall e x (Cunit y) <-> (forall d: Qpos, ball (d + e) (approximate x d) y).
+  regFunBall (proj1_sig e) x (Cunit y)
+  <-> (forall d: Qpos, ball (proj1_sig d + proj1_sig e) (approximate x d) y).
 Proof with auto.
  unfold regFunBall.
   split; intros.
   apply ball_closed.
   simpl in *...
- apply ball_weak...
+  intros. apply (H d (exist _ _ H0)).
+  apply ball_weak... apply Qpos_nonneg.
 Qed.
 
 Lemma regFun_prf_ex :
@@ -403,7 +411,8 @@ Arguments is_RegularFunction [X].
 
 Arguments Cunit {X}.
 
-Add Parametric Morphism X : (@Cunit_fun X) with signature (@st_eq _) ==> (@st_eq _) as Cunit_wd.
+Add Parametric Morphism X : (@Cunit_fun X)
+    with signature (@st_eq _) ==> (@st_eq _) as Cunit_wd.
 Proof.
  exact (@uc_wd _ _ Cunit).
 Qed.
@@ -416,13 +425,11 @@ Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Complete Y) :
   (forall x : X, st_eq (f (Cunit x)) (g (Cunit x)))
   -> (forall x : Complete X, st_eq (f x) (g x)).
 Proof.
-intros A x. apply ball_eq; intro e.
+intros A x. apply ball_eq; intros e epos.
 pose (exist (Qlt 0) (1#2) eq_refl) as half.
-set (e2 := (half * e)%Qpos).
+set (e2 := (half * exist _ _ epos)%Qpos).
 set (d := QposInf_min (mu f e2) (mu g e2)).
-assert (QposEq e (e2 + e2)).
-{ unfold QposEq; simpl; ring. }
-rewrite H. clear H.
+setoid_replace e with (proj1_sig (e2+e2)%Qpos) by (simpl; ring).
 apply ball_triangle with (b := f (Cunit (approximate x d))).
 + apply (UniformContinuity.uc_prf f).
   apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_l | apply ball_ex_approx_r].
@@ -450,7 +457,7 @@ Lemma fasterIsRegular : is_RegularFunction (fun e => (approximate x (QposInf_bin
 Proof.
  intros e1 e2.
  simpl.
- apply ball_weak_le with (f e1 + f e2)%Qpos.
+ apply ball_weak_le with (proj1_sig (f e1 + f e2)%Qpos).
  simpl. apply Qplus_le_compat. apply Hf. apply Hf.
  apply regFun_prf.
 Qed.
@@ -462,7 +469,7 @@ Proof.
  apply regFunEq_e.
  intros e.
  simpl.
- apply ball_weak_le with (f e + e)%Qpos.
+ apply ball_weak_le with (proj1_sig (f e + e)%Qpos).
  simpl. apply Qplus_le_l. apply Hf.
  apply regFun_prf.
 Qed.
@@ -480,7 +487,9 @@ Qed.
 Definition QreduceApprox := faster Qpos_red QreduceApprox_prf.
 
 Lemma QreduceApprox_Eq : st_eq QreduceApprox x.
-Proof (fasterIsEq _ _).
+Proof.
+  apply (fasterIsEq _ _).
+Qed.
 (** In particular, halving the error of the approximation is a common
 case. *)
 Lemma doubleSpeed_prf : forall (e:Qpos),
@@ -499,7 +508,9 @@ Definition doubleSpeed
   := faster (Qpos_mult (exist (Qlt 0) (1#2) eq_refl)) doubleSpeed_prf.
 
 Lemma doubleSpeed_Eq : st_eq doubleSpeed x.
-Proof (fasterIsEq _ _).
+Proof.
+  apply (fasterIsEq _ _).
+Qed.
 
 End Faster.
 
@@ -521,12 +532,9 @@ Lemma Cjoin_fun_prf (x:Complete (Complete X)) : is_RegularFunction (Cjoin_raw x)
 Proof.
  intros d1 d2.
  rewrite <- ball_Cunit.
- assert (QposEq (d1 + d2)
-                ((1#2)*d1
-         + (exist (Qlt 0) (1#2) eq_refl*d1+exist (Qlt 0) (1#2) eq_refl*d2)
-         + exist (Qlt 0) (1#2) eq_refl*d2)).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
+ setoid_replace (proj1_sig d1 + proj1_sig d2)
+   with (proj1_sig ((1#2)*d1 + ((1#2)*d1+(1#2)*d2) + (1#2)*d2)%Qpos)
+   by (simpl; ring).
  apply ball_triangle with (approximate x (Qpos_mult (exist (Qlt 0) (1#2) eq_refl) d2)).
   apply ball_triangle with (approximate x (Qpos_mult (exist (Qlt 0) (1#2) eq_refl) d1)).
    apply ball_approx_l.
@@ -541,11 +549,10 @@ Lemma Cjoin_prf : is_UniformlyContinuousFunction Cjoin_fun Qpos2QposInf.
 Proof.
  intros e x y Hab d1 d2.
  do 2 rewrite <- ball_Cunit.
- assert (QposEq (d1 + e + d2)
-                ((exist (Qlt 0) (1#2) eq_refl*d1 + exist (Qlt 0) (1#2) eq_refl*d1)
-         + e + ((exist (Qlt 0) (1#2) eq_refl*d2) + exist (Qlt 0) (1#2) eq_refl*d2))).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
+ setoid_replace (proj1_sig d1 + proj1_sig e + proj1_sig d2)
+   with (proj1_sig (((1#2)*d1 + (1#2)*d1)
+                    + e + (((1#2)*d2) + (1#2)*d2)))%Qpos
+   by (simpl; ring).
  apply ball_triangle with y.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x ((1#2) * d1)%Qpos)).
@@ -608,7 +615,7 @@ Qed.
 
 Lemma Cmap_slow_raw_strong : forall (x:Complete X) (d:QposInf) (e:Qpos),
     QposInf_le d (QposInf_mult (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl)) (mu f e)) ->
-ball e (f (approximate x d)) (Cmap_slow_raw x e).
+ball (proj1_sig e) (f (approximate x d)) (Cmap_slow_raw x e).
 Proof.
  intros.
  apply (Cmap_slow_raw_strongInf x d e).
@@ -619,9 +626,9 @@ Lemma Cmap_slow_fun_prf (x:Complete X) : is_RegularFunction (Cmap_slow_raw x).
 Proof.
  intros e1 e2.
  unfold Cmap_slow_raw.
- cut (forall (e1 e2:Qpos), (QposInf_le (mu f e2) (mu f e1)) -> ball (m:=Y) (e1 + e2)
-   (f (approximate x (QposInf_mult (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl)) (QposInf_bind (mu f) e1))))
-     (f (approximate x (QposInf_mult (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl)) (QposInf_bind (mu f) e2))))).
+ cut (forall (e1 e2:Qpos), (QposInf_le (mu f e2) (mu f e1)) -> ball (m:=Y) (proj1_sig e1 + proj1_sig e2)
+   (f (approximate x (QposInf_mult (Qpos2QposInf (1#2)) (QposInf_bind (mu f) e1))))
+     (f (approximate x (QposInf_mult (Qpos2QposInf (1#2)) (QposInf_bind (mu f) e2))))).
   intros H.
   (* move this out *)
   assert (forall a b, {QposInf_le a b}+{QposInf_le b a}).
@@ -630,13 +637,11 @@ Proof.
   destruct (H0 (mu f e2) (mu f e1)).
    auto.
   apply ball_sym.
-  assert (QposEq (e1+e2) (e2+e1)).
- { unfold QposEq; simpl; ring. }
- rewrite H1. clear H1.
+  rewrite Qplus_comm.
    auto.
  clear e1 e2.
  intros e1 e2 H.
- apply ball_weak.
+ apply ball_weak. apply Qpos_nonneg.
  apply ball_sym.
  simpl.
  apply Cmap_slow_raw_strong.
@@ -679,13 +684,12 @@ Proof.
   destruct (mu f e0); try constructor.
   cut (forall z0 z1:Qpos, (proj1_sig z0 <= proj1_sig ((1#4)*q)%Qpos)
                      -> (proj1_sig z1 <= proj1_sig ((1#4)*q)%Qpos)
-                     -> ball q (approximate x z0) (approximate y z1)).
+                     -> ball (proj1_sig q) (approximate x z0) (approximate y z1)).
    intros H.
    destruct d1; destruct d2; simpl; apply H; autorewrite with  QposElim; auto with *.
   intros z0 z1 Hz0 Hz1.
   eapply ball_weak_le.
    2:apply Hxy.
-  autorewrite with QposElim.
   rewrite -> Qle_minus_iff in *.
   simpl. simpl in Hz0, Hz1.
   apply (Qplus_le_compat _ _ _ _ Hz0) in Hz1.
@@ -747,9 +751,9 @@ Proof.
  simpl.
  destruct (mu f e2) as [q|]; try constructor.
  simpl.
- apply ball_weak_le with ((1#2)*q)%Qpos.
+ apply ball_weak_le with (proj1_sig ((1#2)*q)%Qpos).
  simpl. 
- rewrite <- (Qmult_1_l (proj1_sig q)), Qmult_assoc.
+ rewrite <- (Qmult_1_l (proj1_sig q)) at 2.
  apply Qmult_le_r. apply Qpos_ispos. discriminate. 
  apply (Cmap_slow_raw_strong g x d0).
  apply QposInf_min_lb_r.
@@ -789,9 +793,9 @@ Proof.
   apply ball_triangle with x.
    apply ball_triangle with (Cunit (approximate x (half * (half * q))%Qpos)).
     rewrite -> ball_Cunit.
-    rewrite halfhalf.
+    unfold QposEq in halfhalf. rewrite halfhalf.
     apply ball_approx_l.
-   rewrite halfhalf.
+   unfold QposEq in halfhalf. rewrite halfhalf.
    apply ball_approx_l.
   apply ball_triangle with (Cunit (approximate x d0)).
    change (ball_ex (quarter * q)%Qpos x (Cunit (approximate x d0))).
@@ -806,7 +810,7 @@ Proof.
   destruct d0 as [d0|]; try constructor.
   apply ball_approx_r.
  apply ball_sym.
- apply ball_weak_le with (half*e2)%Qpos.
+ apply ball_weak_le with (proj1_sig (half*e2)%Qpos).
  simpl.
  rewrite <- (Qmult_1_l (proj1_sig e2)), Qmult_assoc.
  apply Qmult_le_r. apply Qpos_ispos. discriminate.
@@ -823,7 +827,7 @@ Proof.
  apply ball_triangle with x.
  apply ball_triangle with (Cunit (approximate x (half * (half * q))%Qpos)).
  - rewrite -> ball_Cunit. apply ball_approx_l.
- - rewrite halfhalf. apply ball_approx_l.
+ - unfold QposEq in halfhalf. rewrite halfhalf. apply ball_approx_l.
  - apply ball_triangle with (Cunit (approximate x d0)).
   change (ball_ex (eightth * q)%Qpos x (Cunit (approximate x d0))).
   apply ball_ex_weak_le with (d0)%QposInf.
@@ -842,11 +846,10 @@ Lemma MonadLaw5 : forall a, (Cjoin_fun (X:=X) (Cunit_fun _ a)) =m a.
 Proof.
  intros x e1 e2.
  simpl.
- pose (exist (Qlt 0) (1#2) eq_refl) as half. 
- assert (QposEq (e1+e2) (half*e1 + e2 + half*e1)).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
- apply ball_weak.
+ setoid_replace (proj1_sig e1+proj1_sig e2)
+   with (proj1_sig ((1#2)*e1 + e2 + (1#2)*e1)%Qpos)
+   by (simpl; ring).
+ apply ball_weak. apply Qpos_nonneg.
  apply regFun_prf.
 Qed.
 
@@ -854,26 +857,22 @@ Lemma MonadLaw6 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=X) Cunit) a) =m a.
 Proof.
  intros a e1 e2.
  simpl.
- pose (exist (Qlt 0) (1#2) eq_refl) as half. 
- assert (QposEq (e1+e2)
-                (half*(half*e1) + e2 + exist (Qlt 0) (3#4) eq_refl*e1)).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
- apply ball_weak.
+ setoid_replace (proj1_sig e1 + proj1_sig e2)
+   with (proj1_sig ((1#2)*((1#2)*e1) + e2 + (3#4)*e1)%Qpos)
+   by (simpl; ring).
+ apply ball_weak. apply Qpos_nonneg.
  apply regFun_prf.
 Qed.
 
 Lemma MonadLaw7 : forall a, Cjoin_fun ((Cmap_slow_fun (X:=Complete (Complete X)) Cjoin) a) =m Cjoin_fun (Cjoin_fun a).
 Proof.
  intros x e1 e2.
- pose (exist (Qlt 0) (1#2) eq_refl) as halff. 
- pose (half := fun e:Qpos => (halff*e)%Qpos).
- apply ball_weak_le with  ((half (half e1)) + ((half (half e1)) + (half (half e1) + (half (half e2))) + (half (half e2))) + (half e2))%Qpos.
+ pose (half := fun e:Qpos => ((1#2)*e)%Qpos).
+ apply ball_weak_le with (proj1_sig ((half (half e1)) + ((half (half e1)) + (half (half e1) + (half (half e2))) + (half (half e2))) + (half e2))%Qpos).
   unfold half.
-  autorewrite with QposElim.
   simpl. ring_simplify.
   apply Qplus_le_l.
-  rewrite <- (Qmult_1_l (proj1_sig e1)), Qmult_assoc.
+  rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
   apply Qmult_le_r. apply Qpos_ispos. discriminate.
  apply (regFun_prf x).
 Qed.
@@ -883,12 +882,10 @@ between a twice completed metric space and a one completed metric space. *)
 Lemma CunitCjoin : forall a, (Cunit_fun _ (Cjoin_fun (X:=X) a)) =m a.
 Proof.
  intros x e1 e2 d1 d2.
- pose (exist (Qlt 0) (1#2) eq_refl) as half. 
- change (ball (d1 + (e1 + e2) + d2)
-   (approximate (approximate x (half * d1)%Qpos) (half * d1)%Qpos)
-     (approximate (approximate x e2) d2)).
- apply ball_weak_le with ((half * d1 + (half * d1 + e2) + d2))%Qpos.
-  autorewrite with QposElim.
+ change (ball (proj1_sig d1 + (proj1_sig e1 + proj1_sig e2) + proj1_sig d2)
+   (approximate (approximate x ((1#2) * d1)%Qpos) ((1#2) * d1)%Qpos)
+     (approximate (approximate x e2) (Qpos2QposInf d2))).
+ apply ball_weak_le with (proj1_sig (((1#2) * d1 + ((1#2) * d1 + e2) + d2))%Qpos).
   rewrite -> Qle_minus_iff. simpl.
   ring_simplify.
   auto with *.
@@ -936,16 +933,15 @@ Let CX_CY := UniformlyContinuousSpace (Complete X) (Complete Y).
 
 Lemma Cmap_strong_slow_prf : is_UniformlyContinuousFunction ((Cmap_slow (Y:=Y)):(X_Y -> CX_CY)) Qpos2QposInf.
 Proof.
- intros e f g H x.
+  intros e f g H. split. apply Qpos_nonneg.
+  intro x.
  apply ball_closed.
- intros e0.
- pose (exist (Qlt 0) (1#2) eq_refl) as half. 
- set (he0 := (half*e0)%Qpos).
- set (d0 := QposInf_min (Qpos2QposInf half*(mu f he0)) (Qpos2QposInf half*(mu g he0))).
+ intros e0 epos.
+ set (he0 := ((1#2)*exist _ _ epos)%Qpos).
+ set (d0 := QposInf_min (Qpos2QposInf (1#2)*(mu f he0)) (Qpos2QposInf (1#2)*(mu g he0))).
  set (a0 := approximate x d0).
- assert (QposEq (e+e0) (he0 + e + he0)).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
+ setoid_replace (proj1_sig e+e0) with (proj1_sig (he0 + e + he0)%Qpos)
+   by (simpl; ring).
  apply ball_triangle with (Cunit (g a0)).
   apply ball_triangle with (Cunit (f a0)).
   assert (QposEq he0 he0) by reflexivity.
@@ -997,9 +993,9 @@ Proof.
  change (Cmap_slow (Y:=Y) f2) with (Cmap_strong_slow f2).
  set (y1 :=(Cmap_strong_slow f1 x)).
  set (y2 :=(Cmap_strong_slow f2 x)).
- assert (QposEq (e1 + e2) (he1 + (he1 + he2) + he2)).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
+ setoid_replace (proj1_sig e1 + proj1_sig e2)
+   with (proj1_sig (he1 + (he1 + he2) + he2)%Qpos)
+   by (simpl; ring).
  rewrite <- ball_Cunit.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
@@ -1011,7 +1007,7 @@ Definition Cap_slow_fun (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
 Build_RegularFunction (Cap_slow_fun_prf f x).
 
 Lemma Cap_slow_help (f:Complete (X --> Y)) (x:Complete X) (e:Qpos) :
- ball e (Cap_slow_fun f x) (Cmap_slow (approximate f e) x).
+ ball (proj1_sig e) (Cap_slow_fun f x) (Cmap_slow (approximate f e) x).
 Proof.
  intros d1 d2.
  pose (exist (Qlt 0) (1#2) eq_refl) as half. 
@@ -1020,10 +1016,10 @@ Proof.
  set (f2 := (approximate f e)).
  set (y1 := (Cmap_slow f1 x)).
  set (y2 := (Cmap_slow f2 x)).
- change (ball (d1 + e + d2) (approximate y1 d1') (approximate y2 d2)).
- assert (QposEq (d1 + e + d2) (d1' + (d1' + e) + d2)).
- { unfold QposEq; simpl; ring. }
- rewrite H. clear H.
+ change (ball (proj1_sig d1 + proj1_sig e + proj1_sig d2) (approximate y1 d1') (approximate y2 (Qpos2QposInf d2))).
+ setoid_replace (proj1_sig d1 + proj1_sig e + proj1_sig d2)
+   with (proj1_sig (d1' + (d1' + e) + d2)%Qpos)
+   by (simpl; ring).
  rewrite <- ball_Cunit.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
@@ -1039,11 +1035,9 @@ Definition Cap_slow_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf
 Lemma Cap_weak_slow_prf (f:Complete (X --> Y)) : is_UniformlyContinuousFunction (Cap_slow_fun f) (Cap_slow_modulus f).
 Proof.
  intros e x y H.
- pose (exist (Qlt 0) (1#3) eq_refl) as third.
- set (e' := (third*e)%Qpos).
- assert (QposEq e (e'+e'+e')).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
+ set (e' := ((1#3)*e)%Qpos).
+ setoid_replace (proj1_sig e) with (proj1_sig (e'+e'+e')%Qpos)
+   by (simpl; ring).
  apply ball_triangle with (Cmap_slow (approximate f e') y).
   apply ball_triangle with (Cmap_slow (approximate f e') x).
    apply Cap_slow_help.
@@ -1058,16 +1052,17 @@ Build_UniformlyContinuousFunction (Cap_weak_slow_prf f).
 
 Lemma Cap_slow_prf : is_UniformlyContinuousFunction Cap_weak_slow Qpos2QposInf.
 Proof.
- intros e f1 f2 H x.
+  intros e f1 f2 H. split. apply Qpos_nonneg.
+  intro x.
  apply ball_closed.
- intros d.
- pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
- assert (QposEq (e+d)
-                (quarter*d + (quarter*d + e + quarter*d) + quarter*d)).
- { unfold QposEq; simpl; ring. }
- rewrite H0. clear H0.
- apply ball_triangle with (Cmap_strong_slow (approximate f2 (quarter*d)%Qpos) x).
-  apply ball_triangle with (Cmap_strong_slow (approximate f1 (quarter*d)%Qpos) x).
+ intros d dpos.
+ setoid_replace (proj1_sig e + d)
+   with (proj1_sig ((1#4)*exist _ _ dpos
+                    + ((1#4)*exist _ _ dpos + e + (1#4)*exist _ _ dpos)
+                    + (1#4)*exist _ _ dpos)%Qpos)
+   by (simpl; ring).
+ apply ball_triangle with (Cmap_strong_slow (approximate f2 ((1#4)*exist _ _ dpos)%Qpos) x).
+  apply ball_triangle with (Cmap_strong_slow (approximate f1 ((1#4)*exist _ _ dpos)%Qpos) x).
    apply Cap_slow_help.
   apply (uc_prf Cmap_strong_slow).
   apply H.
@@ -1078,17 +1073,15 @@ Qed.
 Definition Cap_slow : Complete (X --> Y) --> Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction Cap_slow_prf.
 
-Lemma StrongMonadLaw1 : forall a b, st_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
+Lemma StrongMonadLaw1 : forall a b,
+    st_eq (Cap_slow_fun (Cunit_fun _ a) b) (Cmap_strong_slow a b).
 Proof.
  intros f x.
  apply regFunEq_e.
  intros e.
- pose (exist (Qlt 0) (1#2) eq_refl) as half.
- apply ball_weak_le with (half*e+e)%Qpos.
+ apply ball_weak_le with (proj1_sig ((1#2)*e+e)%Qpos).
  simpl. rewrite -> Qle_minus_iff; ring_simplify.
- apply (Qle_trans _ ((1#2)*0)). rewrite Qmult_0_r.
- apply Qle_refl. apply Qmult_le_l. reflexivity.
- destruct e. apply Qlt_le_weak, q.
+ apply Qmult_le_0_compat. discriminate. apply Qpos_nonneg.
  refine (regFun_prf _ _ _).
 Qed.
 
@@ -1134,7 +1127,7 @@ it does not preserve the decidability.
 Lemma Complete_stable : forall X, stableMetric X -> stableMetric (Complete X).
 Proof.
  intros X HX e x y Hb e1 e2.
- apply HX.
+ apply (HX (proj1_sig e1+e+proj1_sig e2)%Q).
  intros H.
  apply Hb.
  intros H0.
@@ -1145,24 +1138,22 @@ Qed.
 Lemma Complete_located : forall X, locatedMetric X -> locatedMetric (Complete X).
 Proof.
  intros X Hx e d x y Hed.
- assert (0 < proj1_sig d - proj1_sig e).
- { apply (Qplus_lt_l _ _ (proj1_sig e)). ring_simplify. exact Hed. } 
- assert ({c:Qpos | QposEq d (Qpos_plus e c)}) as H0.
+ assert (0 < d - e).
+ { apply (Qplus_lt_l _ _ e). ring_simplify. exact Hed. } 
+ assert ({c:Qpos | d == e + proj1_sig c}) as H0.
  { exists (exist _ _ H).
    unfold Qpos_plus, QposEq; destruct d,e; simpl.
    ring_simplify. reflexivity. }
  destruct H0 as [c Hc]. 
- pose (exist (Qlt 0) (1#5) eq_refl) as fifth. 
- pose (exist (Qlt 0) (3#1) eq_refl) as three. 
- set (c':=(fifth*c)%Qpos). clear H. 
- assert (proj1_sig (c'+e+c')%Qpos < proj1_sig (e+three*c')%Qpos) as H.
+ set (c':=((1#5)*c)%Qpos). clear H. 
+ assert (proj1_sig c'+e+ proj1_sig c' < e+(3#1)*proj1_sig c') as H.
  { rewrite -> Qlt_minus_iff. simpl. ring_simplify. auto with *. }
  destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
- - left.
+ - left. 
   rewrite -> Hc. rewrite <- ball_Cunit in H0.
-  assert (QposEq (e+c) (c' + (e + three * c') + c')).
- { unfold QposEq; simpl; ring. }
- rewrite H1. clear H1.
+  setoid_replace (e+proj1_sig c)
+    with (proj1_sig c' + (e + (3#1) * proj1_sig c') + proj1_sig c')%Q
+    by (simpl; ring).
   eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
     [apply ball_approx_r|apply ball_approx_l].
  - right.

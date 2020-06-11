@@ -35,7 +35,7 @@ Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
 Proof. reflexivity. Qed.
 
 Lemma ball_mspc_ball {X : MetricSpace} (r : Qpos) (x y : X) :
-  ball r x y <-> mspc_ball r x y.
+  ball (proj1_sig r) x y <-> mspc_ball r x y.
 Proof. rewrite <- ball_gball; reflexivity. Qed.
 
 Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
@@ -55,8 +55,8 @@ Section integral_interface.
       forall (a: Q) b c, ∫ f a b + ∫ f (a+` b) c == ∫ f a (b+c)%Qnn
 
     ; integral_bounded_prim: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
-      (forall x, from <= x <= from+ proj1_sig width -> ball r (f x) ('mid)) ->
-      ball (width * r) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q)
+      (forall x, from <= x <= from+ proj1_sig width -> ball (proj1_sig r) (f x) ('mid)) ->
+      ball (proj1_sig (width * r)%Qpos) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q)
 
     ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f) }.
 
@@ -93,8 +93,8 @@ Section extension_to_nn_width.
     (pre_additive: forall (a: Q) (b c: Qpos),
       pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
     (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
-      (forall x: Q, from <= x <= from + proj1_sig width -> ball r (f x) (' mid)) ->
-      ball (width * r) (pre_integral from width) (' (proj1_sig width * mid)%Q))
+      (forall x: Q, from <= x <= from + proj1_sig width -> ball (proj1_sig r) (f x) (' mid)) ->
+      ball (proj1_sig (width * r)%Qpos) (pre_integral from width) (' (proj1_sig width * mid)%Q))
     {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
 
   Instance integral_extended_to_nn_width: Integral f :=
@@ -114,8 +114,8 @@ Section extension_to_nn_width.
   Qed.
 
   Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
-    (forall x, from <= x <= from + proj1_sig width -> ball r (f x) (' mid)) ->
-    ball (width * r) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q).
+    (forall x, from <= x <= from + proj1_sig width -> ball (proj1_sig r) (f x) (' mid)) ->
+    ball (proj1_sig (width * r)%Qpos) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q).
   Proof.
     destruct width as [[n d] wpos].
     destruct n as [|n|n]. inversion wpos. 2: inversion wpos.
@@ -179,6 +179,13 @@ Section definition.
 
   Context (f: Q -> CR) `{UC : !IsLocallyUniformlyContinuous f lmu}.
 
+  Instance luc_proper_st_eq : Proper (Qeq ==> @st_eq CR) f.
+  Proof.
+    intros x y exy a b. apply gball_0 in exy.
+    pose proof (luc_proper f x y exy a b).
+    rewrite Qplus_0_r in H. exact H.
+  Qed.
+
   (** Note that in what follows we don't specialize for [0,1] or [0,w] ranges first. While this
   would make the definition marginally cleaner, the resulting definition is harder to prove
   correct. Part of the reason for this is that key primitives (such as mu and approximate)
@@ -230,14 +237,14 @@ Section definition.
 
   Lemma sampling_over_subdivision (fr: Q) (i: nat) (t: positive) (he wb: Qpos) :
     (i < Pos.to_nat (intervals fr wb he * t))%nat ->
-    ball (he * Qpos_inv wb)
+    ball (proj1_sig (he * Qpos_inv wb)%Qpos)
          (f (fr + plus_half_times (i / Pos.to_nat t)%nat (proj1_sig wb * / Zpos (intervals fr wb he))))
          (f (fr + i * / Zpos (intervals fr wb he * t) * proj1_sig wb)).
   Proof with auto.
    intro ile.
    unfold plus_half_times.
    apply ball_sym.
-   assert (A1 : Qball wb fr (fr + i * / Zpos (intervals fr wb he * t) * proj1_sig wb)).
+   assert (A1 : Qball (proj1_sig wb) fr (fr + i * / Zpos (intervals fr wb he * t) * proj1_sig wb)).
    { rewrite <- (Qplus_0_r fr) at 1.
     apply Qball_plus_r.
     apply in_Qball.
@@ -286,7 +293,7 @@ Section definition.
     change ((1 # 2) * proj1_sig wb / proj1_sig q')%Q
       with (proj1_sig ((1 # 2) * wb * Qpos_inv q')%Qpos).
     set (mym := QposCeiling (proj1_sig ((1 # 2) * wb * Qpos_inv q')%Qpos)).
-    apply ball_weak_le with (wb * (1#2) * Qpos_inv (mym#1))%Qpos.
+    apply ball_weak_le with (proj1_sig (wb * (1#2) * Qpos_inv (mym#1))%Qpos).
     simpl.
     rewrite (Qmult_comm (proj1_sig wb)).
      subst mym.
@@ -307,11 +314,10 @@ Section definition.
     rewrite Qmult_plus_distr_l.
     field_simplify...
     try rewrite Qdiv_1_r.
-    assert (QposEq (wb * (1 # 2) * Qpos_inv (mym#1) * Qpos_inv (Qpos_inv (mym#1) * wb))
-                   (1#2)).
-    {  unfold QposEq. simpl.
-    field. split; try discriminate... }
-    rewrite H. clear H.
+    setoid_replace (proj1_sig wb * (1 # 2) * / (mym#1) * / (/ (mym#1) * proj1_sig wb))%Q
+      with (1#2).
+    Focus 2.
+    simpl. field. split; try discriminate... 
      rewrite Zdiv.div_Zdiv...
      rewrite Q.Zdiv_Qdiv.
      setoid_replace ((mym # 1) * i / ((mym * t)%positive # 1))
@@ -325,7 +331,7 @@ Section definition.
      split. 2: apply Qpos_nonzero.
      unfold Qeq; discriminate.
      split. discriminate. apply Qpos_nonzero.
-   assert (A3 : Qball wb fr (fr + ((i / Pos.to_nat t)%nat * (proj1_sig wb * / Zpos (intervals fr wb he)) + (1 # 2) * (proj1_sig wb * / Zpos (intervals fr wb he))))).
+   assert (A3 : Qball (proj1_sig wb) fr (fr + ((i / Pos.to_nat t)%nat * (proj1_sig wb * / Zpos (intervals fr wb he)) + (1 # 2) * (proj1_sig wb * / Zpos (intervals fr wb he))))).
    { set (n := intervals fr wb he).
     rewrite <- (Qplus_0_r fr) at 1.
     apply Qball_plus_r.
@@ -355,7 +361,7 @@ Section definition.
   Lemma wd
     (from1 from2: Q) (w: bool -> Qpos) (e: bool -> Qpos)
     (fE: from1 == from2) (wE: QposEq (w true) (w false)):
-      @ball Q_as_MetricSpace (e true + e false)
+      @ball Q_as_MetricSpace (proj1_sig (e true + e false)%Qpos)
         (approx from1 (w true) (e true))
         (approx from2 (w false) (e false)).
   Proof with auto.
@@ -386,7 +392,7 @@ Section definition.
    replace ((/ m true * (proj1_sig (w false) * / m false))%Q)
      with (proj1_sig (Qpos_inv (m true #1) * (w false * Qpos_inv (m false #1)))%Qpos)
      by reflexivity.
-   apply Qball_Qmult_l.
+   apply (Qball_Qmult_l (((e true) + (e false)) * (1 # m true * m false))%Qpos).
    assert (QposEq (((e true + e false) * (1 # m true * m false) * Qpos_inv (Qpos_inv (m true #1) * (w false * Qpos_inv (m false #1))))%Qpos)
                   (halfe true * Qpos_inv (w true) + (halfe true * Qpos_inv (w true) + halfe false * Qpos_inv (w false)) + halfe false * Qpos_inv (w false))%Qpos).
    { unfold QposEq, Qpos_inv; simpl.
@@ -396,11 +402,11 @@ Section definition.
      setoid_replace (/ (m false#1)) with (1# m false) by reflexivity.
      unfold QposEq in wE. rewrite wE. field.
      split. apply Qpos_nonzero. split; discriminate. }
-   rewrite H0. clear H0.
+   unfold QposEq in H0. rewrite H0. clear H0.
     repeat split; try discriminate...
    unfold intervals in m.
-   apply (ball_triangle CR (halfe true * Qpos_inv (w true))
-                        (halfe false * Qpos_inv (w false))
+   apply (ball_triangle CR (proj1_sig (halfe true * Qpos_inv (w true))%Qpos)
+                        (proj1_sig (halfe false * Qpos_inv (w false))%Qpos)
      _ (f (from2 + i * / (m true * m false)%positive * proj1_sig (w false))) _).
     rewrite <- fE.
     unfold QposEq in wE. rewrite <- wE.
@@ -411,8 +417,8 @@ Section definition.
    rewrite Pmult_comm...
    
    unfold intervals in m.
-   apply (ball_triangle CR (halfe true * Qpos_inv (w true))
-                        (halfe false * Qpos_inv (w false))
+   apply (ball_triangle CR (proj1_sig (halfe true * Qpos_inv (w true))%Qpos)
+                        (proj1_sig (halfe false * Qpos_inv (w false))%Qpos)
      _ (f (from2 + i * / (m true * m false)%positive * proj1_sig (w false))) _).
     rewrite <- fE.
     unfold QposEq in wE. rewrite <- wE.
@@ -455,6 +461,13 @@ Section implements_abstract_interface.
 
   Context (f: Q → CR) `{!IsLocallyUniformlyContinuous f lmu}.
 
+  Instance luc_proper_st_eq_2 : Proper (Qeq ==> @st_eq CR) f.
+  Proof.
+    intros x y exy a b. apply gball_0 in exy.
+    pose proof (luc_proper f x y exy a b).
+    rewrite Qplus_0_r in H. exact H.
+  Qed.
+
   Section additivity.
 
     Variables (a: Q) (ww: bool -> Qpos).
@@ -481,7 +494,7 @@ Section implements_abstract_interface.
 
       (*Let hint := luc_Proper f.*)
 
-      Lemma added_summations: Qball (e + e)
+      Lemma added_summations: Qball (proj1_sig e + proj1_sig e)
         (Σ (Pos.to_nat (wbints true)) approx0 * (proj1_sig (ww true) / Zpos (wbints true)) +
          Σ (Pos.to_nat (wbints false)) approx1 * (proj1_sig (ww false) / Zpos (wbints false)))
         (Σ (Pos.to_nat w01ints) approx01 * (proj1_sig totalw / Zpos w01ints)).
@@ -492,7 +505,7 @@ Section implements_abstract_interface.
        rewrite <- E, <- F, <- G.
        repeat rewrite Qmult_assoc.
        rewrite <- Qmult_plus_distr_l.
-       apply Qball_Qmult_r.
+       apply (Qball_Qmult_r (e+e)).
        rewrite <- (inject_nat_convert i), <- (inject_nat_convert j), <- (inject_nat_convert k).
        do 3 rewrite Qmult_Σ.
        replace (Pos.to_nat k * Pos.to_nat w01ints)%nat
@@ -520,12 +533,12 @@ Section implements_abstract_interface.
        do 2 rewrite <- nat_of_P_mult_morphism.
        rewrite Plus.plus_comm.
        rewrite Σ_plus_bound.
-       assert (QposEq ((e + e) * Qpos_inv x)
-                      ((ec true + ec true) * Qpos_inv x + (ec false + ec false) * Qpos_inv x)).
-       { unfold ec, QposEq. simpl. field.
-         split... 
-         apply (Qpos_nonzero (ww true + ww false)). }
-       rewrite H. clear H.
+       setoid_replace (proj1_sig (e + e)%Qpos / proj1_sig x)
+         with (proj1_sig ((ec true + ec true) * Qpos_inv x + (ec false + ec false) * Qpos_inv x)%Qpos).
+       Focus 2.
+       unfold ec, QposEq. simpl. field.
+       split... 
+       apply (Qpos_nonzero (ww true + ww false)).
        subst approx0 approx1 approx01.
        unfold flip, Basics.compose.
        assert (~ proj1_sig (ww true) + proj1_sig (ww false) == 0).
@@ -552,9 +565,11 @@ Section implements_abstract_interface.
         intros i0 i0E.
         set (ebit (b : bool) := if b then (ec true * (1 # 2) * Qpos_inv (ww true))%Qpos
                              else (e * (1 # 2) * Qpos_inv totalw)%Qpos).
-        assert (QposEq ((ec true + ec true) * Qpos_inv x * (1# i * wbints true)%positive)%Qpos
-                       (ebit true + (ebit true + ebit false) + ebit false)).
-        { unfold QposEq. simpl.
+        setoid_replace (proj1_sig ((ec true + ec true) * Qpos_inv x)%Qpos
+                        * (1# i * wbints true)%positive)
+          with (proj1_sig (ebit true + (ebit true + ebit false) + ebit false)%Qpos).
+        Focus 2.
+        unfold QposEq. simpl.
          assert (proj1_sig x == (proj1_sig (ww true) / Zpos (wbints true) / Zpos i)) as xE.
           apply Q.Qmult_injective_r with i...
           rewrite <- E. simpl. field...
@@ -562,22 +577,22 @@ Section implements_abstract_interface.
           setoid_replace (1 # i * wbints true)
             with ((/i) * / wbints true) by reflexivity.
           field. split. apply (Qpos_nonzero (ww true + ww false)).
-          split. apply Qpos_nonzero. split; discriminate. }
-        rewrite H0. clear H0.
+          split. apply Qpos_nonzero. split; discriminate.
+        (* end Focus 2 *)
         subst ec. simpl in ebit.
-        apply (ball_triangle CR (ebit true) (ebit false) (f _) (f (a + i0 * (proj1_sig totalw / (Zpos w01ints * Zpos k)))) (f _))...
-        assert (QposEq (ebit true) (ebit false))
-          by (unfold QposEq; simpl; field; auto).
-        rewrite H0. clear H0.
+        apply (ball_triangle CR (proj1_sig (ebit true))
+                             (proj1_sig (ebit false)) (f _) (f (a + i0 * (proj1_sig totalw / (Zpos w01ints * Zpos k)))) (f _))...
+        setoid_replace (proj1_sig (ebit true))
+          with (proj1_sig (ebit false))
+          by (simpl; field; auto).
          unfold ebit.
-         setoid_replace (proj1_sig totalw / (w01ints * k))
+         setoid_replace (proj1_sig totalw / (w01ints * k))%Q
            with ((/ (Zpos (wbints true) * Zpos i) * proj1_sig (ww true)))
-         by (unfold Q_eq; rewrite kE, iE; simpl; field; auto).
-         assert (QposEq (e * (1 # 2) * Qpos_inv totalw)%Qpos
-                        (e * (ww true * Qpos_inv totalw)
-                         * (1 # 2) * Qpos_inv (ww true))%Qpos)
-          by (unfold QposEq; simpl; field; auto).
-         rewrite H0. clear H0.
+           by (unfold Q_eq; rewrite kE, iE; simpl; field; auto).
+         setoid_replace (proj1_sig (e * (1 # 2) * Qpos_inv totalw)%Qpos)
+           with (proj1_sig (e * (ww true * Qpos_inv totalw)
+                            * (1 # 2) * Qpos_inv (ww true))%Qpos)
+          by (simpl; field; auto).
          rewrite <- Pmult_Qmult.
          rewrite Qmult_assoc.
          apply sampling_over_subdivision...
@@ -618,11 +633,11 @@ Section implements_abstract_interface.
           split. apply (Qpos_nonzero (ww true + ww false)).
           split. apply Qpos_nonzero. split. discriminate.
           apply Qpos_nonzero. }
-       rewrite H0. clear H0.
-       apply (ball_triangle CR (ebit true) (ebit false) _ (f (a + proj1_sig (ww true) + i0 * (proj1_sig totalw / (Zpos w01ints * Zpos k)))) _)...
-       assert (QposEq (ebit true) (ebit false))
-         by (unfold QposEq; simpl; field; auto).
-       rewrite H0. clear H0.
+       unfold QposEq in H0. rewrite H0. clear H0.
+       apply (ball_triangle CR (proj1_sig (ebit true)) (proj1_sig (ebit false))
+                            _ (f (a + proj1_sig (ww true) + i0 * (proj1_sig totalw / (Zpos w01ints * Zpos k)))) _)...
+       setoid_replace (proj1_sig (ebit true)) with (proj1_sig (ebit false))
+         by (simpl; field; auto).
         unfold ebit.
         setoid_replace (proj1_sig totalw / (Zpos w01ints * Zpos k))
           with ((/ (Zpos (wbints false) * Zpos j) * proj1_sig (ww false)))
@@ -630,7 +645,7 @@ Section implements_abstract_interface.
         assert (QposEq (e * (1 # 2) * Qpos_inv totalw)%Qpos
                        (e * (ww false * Qpos_inv totalw) * (1 # 2) * Qpos_inv (ww false))%Qpos)
           by (unfold QposEq; simpl; field; auto).
-        rewrite H0. clear H0.
+        unfold QposEq in H0. rewrite H0. clear H0.
         rewrite <- Pmult_Qmult.
         rewrite Qmult_assoc.
         apply sampling_over_subdivision...
@@ -705,15 +720,18 @@ Section implements_abstract_interface.
   Qed.
 
   Let bounded (from: Q) (width: Qpos) (mid: Q) (r: Qpos):
-    (forall x, from <= x <= from + proj1_sig width -> ball r (f x) ('mid)%CR) ->
-    ball (width * r) (pre_result f from width) (' (proj1_sig width * mid)%Q)%CR.
+    (forall x, from <= x <= from + proj1_sig width -> ball (proj1_sig r) (f x) ('mid)%CR) ->
+    ball (proj1_sig (width * r)%Qpos)
+         (pre_result f from width) (' (proj1_sig width * mid)%Q)%CR.
   Proof with auto with qarith.
    intros. apply (@regFunBall_Cunit Q_as_MetricSpace).
    intro. unfold pre_result. simpl approximate.
    unfold approx.
    rewrite fastΣ_correct.
    set (ints := intervals lmu from width (d * (1 # 2))).
-   apply (ball_weak_le Q_as_MetricSpace (d*(1#2) + width * r) (d + width * r)).
+   apply (@ball_weak_le Q_as_MetricSpace
+                       (proj1_sig (d*(1#2) + width * r)%Qpos)
+                       (` d + ` (width * r)%Qpos)).
     simpl. apply Qplus_le_compat...
    rewrite Σ_mult.
    setoid_replace (`width * mid) with (Pos.to_nat ints * (`width / ints * mid)).
@@ -727,7 +745,7 @@ Section implements_abstract_interface.
                   (d*(1#2) * Qpos_inv width + r)%Qpos).
    { unfold QposEq. simpl. field.
      split. apply Qpos_nonzero. discriminate. }
-   rewrite H1. clear H1.
+   unfold QposEq in H1. rewrite H1. clear H1.
    apply regFunBall_Cunit, H, data_points_in_range...
   Qed.
 

@@ -87,7 +87,7 @@ Lemma Qpower_N_uc_prf (c:Qpos) :
 Proof.
  unfold Qpower_N_modulus.
  destruct n as [|p].
-  simpl. intros e x y E. now apply ball_refl.
+  simpl. intros e x y E. apply ball_refl, Qpos_nonneg. 
  destruct (p_is_some_anti_convert p) as [m Hm].
  assert (X:=(fun I pI => Derivative_nth I pI _ _ (Derivative_id I pI) m)).
  assert (- proj1_sig c < proj1_sig c)%Q.
@@ -283,8 +283,9 @@ Hint Rewrite CRpower_N_correct' : IRtoCR.
 Instance: Proper (eq ==> QposEq ==> @st_eq _) Qpower_N_uc.
 Proof.
  intros p1 p2 Ep e1 e2 Ee x.
- apply ball_eq_iff. intro e.
- simpl. unfold QposEq in Ee. rewrite Ep, Ee. reflexivity.
+ apply ball_eq_iff. intros e epos.
+ simpl. unfold QposEq in Ee. rewrite Ep, Ee.
+ apply ball_refl. apply Qlt_le_weak, epos.
 Qed.
 
 Instance: Proper (eq ==> QposEq ==> @st_eq _) CRpower_N_bounded. 

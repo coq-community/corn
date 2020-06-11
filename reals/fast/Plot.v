@@ -104,8 +104,8 @@ Local Open Scope raster.
 
 (** The resulting plot is close to the graph of [f] *)
 Theorem Plot_correct :
-ball (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
-        ((1 # 2 * P_of_succ_nat (pred m)) * h))
+ball (proj1_sig (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
+        ((1 # 2 * P_of_succ_nat (pred m)) * h))%Qpos)
  (graphQ (uc_compose clip f))
  (Cunit (InterpRaster PlotQ (l,t) (r,b))).
 Proof.
@@ -131,10 +131,11 @@ Proof.
  setoid_replace Z1 with (l+proj1_sig w,b).
   unfold Z, PlotQ.
   (* TODO: figure out why rewrite Hw, Hh hangs *)
-  replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r) with
-   (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
+  replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r)
+    with (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
   destruct n; try discriminate.
   destruct m; try discriminate.
+  split. apply Qpos_nonneg.
   apply (RasterizeQ2_correct).
   intros.
   rewrite <- Hw.

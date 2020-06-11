@@ -107,6 +107,7 @@ Proof.
  intros y e a b H.
  split; auto.
  apply ball_refl.
+ apply QposMinMax.Qpos_nonneg.
 Qed.
 
 Lemma pair_uc_r : forall x:X, @is_UniformlyContinuousFunction Y XY (fun y => (x,y)) Qpos2QposInf.
@@ -114,6 +115,7 @@ Proof.
  intros x e a b H.
  split; auto.
  apply ball_refl.
+ apply QposMinMax.Qpos_nonneg.
 Qed.
 
 (** C(X*Y) is isomorphic to (C X)*(C Y) *)

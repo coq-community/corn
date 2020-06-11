@@ -94,7 +94,7 @@ Section approximate_rationals_more.
   Proof. now rewrite aq_shift_correct. Qed.
 
   Lemma aq_div_dlog2 (x y : AQ) (ε : Q₊) : 
-    ball ε ('app_div x y (Qdlog2 ('ε))) ('x / 'y).
+    ball (proj1_sig ε) ('app_div x y (Qdlog2 ('ε))) ('x / 'y).
   Proof.
     eapply ball_weak_le.
      now apply Qpos_dlog2_spec.
@@ -102,7 +102,7 @@ Section approximate_rationals_more.
   Qed.
 
   Lemma aq_approx_dlog2 (x : AQ) (ε : Q₊) : 
-    ball ε ('app_approx x (Qdlog2 ('ε))) ('x).
+    ball (proj1_sig ε) ('app_approx x (Qdlog2 ('ε))) ('x).
   Proof.
     eapply ball_weak_le.
      now apply Qpos_dlog2_spec.
@@ -155,13 +155,13 @@ Section approximate_rationals_more.
       { rewrite Eγ. simpl. ring. }
       rewrite H5. clear H5.
      simpl.
-      apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
+      apply (in_Qball (proj1_sig ((1#3)*γ)%Qpos)), ball_sym, dense_inverse.
     apply Qle_lt_trans with (y - (1#6) * proj1_sig γ)%Q.
     assert (Qeq (y - (1 # 6) * ` γ)
                 ((1 # 2) * (x + y) + proj1_sig ((1 # 3) * γ)%Qpos)).
     { rewrite Eγ. simpl. ring. }
     rewrite H5. clear H5. simpl.
-      apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
+      apply (in_Qball (proj1_sig ((1#3)*γ)%Qpos)), ball_sym, dense_inverse.
       apply (Qlt_le_trans _ (y-0)).
     apply Qplus_lt_r.
     apply Qopp_Qlt_0_r...

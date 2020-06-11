@@ -102,7 +102,8 @@ Proof.
 Qed.
 
 Lemma root_has_error_ball : forall (e1 e2:Qpos) (b1 b2:Q), 
-  (proj1_sig e1 + proj1_sig e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1 -> Qball e2 b1 b2 -> root_has_error (e1+e2) b2.
+    (proj1_sig e1 + proj1_sig e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1
+    -> Qball (proj1_sig e2) b1 b2 -> root_has_error (e1+e2) b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  simpl in H2, H3.
@@ -118,7 +119,8 @@ Proof.
 Qed.
 
 Lemma ball_root_has_error : forall (e1 e2:Qpos) (b1 b2:Q), 
-  ((proj1_sig e1 + proj1_sig e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1 -> root_has_error e2 b2 -> Qball (e1+e2) b1 b2.
+    ((proj1_sig e1 + proj1_sig e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1
+    -> root_has_error e2 b2 -> Qball (proj1_sig e1+proj1_sig e2) b1 b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  clear Ha.
@@ -358,7 +360,7 @@ end.
 Lemma sqrt_regular : @is_RegularFunction Q_as_MetricSpace sqrt_raw.
 Proof.
  intros e1 e2.
- apply ball_weak_le with (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos.
+ apply ball_weak_le with (proj1_sig (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos).
  - simpl. do 2 rewrite Q_Qpos_min.
   apply: plus_resp_leEq_both; simpl; auto with *.
  - apply ball_root_has_error.
@@ -472,7 +474,7 @@ Proof.
  intro He.
  set (d:= (e * Qpos_inv (6#1))%Qpos).
  simpl (approximate (' a)%CR (Qpos2QposInf ((en # ed) ↾ epos))).
- change (Qball (e + e)
+ change (Qball (proj1_sig e + proj1_sig e)
                (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid)
                             (Qpos2QposInf e)) a).
  assert (
@@ -797,8 +799,8 @@ Lemma sqrt_uc_prf : @is_UniformlyContinuousFunction
                       Q_as_MetricSpace CR rational_sqrt sqrt_modulus.
 Proof.
  intros e a.
- cut (forall a b, (0 <= a) -> (0 <= b) -> ball_ex (X:=Q_as_MetricSpace) (sqrt_modulus e) a b ->
-   ball (m:=CR) e (rational_sqrt a) (rational_sqrt b)).
+ cut (forall a b, (0 <= a) -> (0 <= b) -> ball_ex (X:=Q_as_MetricSpace) (sqrt_modulus e) a b
+             -> ball (m:=CR) (proj1_sig e) (rational_sqrt a) (rational_sqrt b)).
   intros X b Hab.
   destruct (Qle_total 0 a) as [Ha|Ha].
    destruct (Qle_total 0 b) as [Hb|Hb].
@@ -836,7 +838,7 @@ Proof.
   destruct (Qlt_le_dec_fast 0 b) as [Z0|_].
    elim (Qle_not_lt _ _ Hb Z0).
   change 0%CR with (rational_sqrt 0).
-  apply ball_refl.
+  apply ball_refl. apply Qpos_nonneg.
  clear a.
  intros a b Ha Hb Hab.
  assert (Z:[0][<=]inj_Q IR a).

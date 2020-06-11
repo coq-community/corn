@@ -254,7 +254,9 @@ Global Instance bounded_int_uc {f : Q -> CR} {M : Q}
 Proof.
 constructor.
 + intros. apply lip_modulus_pos; [apply (bounded_nonneg f) | easy].
-+ intros e x1 x2 e_pos A. apply mspc_ball_CRabs. rewrite int_diff; [| apply _].
++ intros e x1 x2 e_pos A. apply mspc_ball_CRabs.
+  pose proof (CRabs_proper _ _ (int_diff f x0 x1 x2)).
+  apply gball_0 in H0. rewrite H0. clear H0.
   transitivity ('(abs (x1 - x2) * M)).
   - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
   - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
@@ -523,7 +525,14 @@ Proof.
 destruct x as [x x_sx]. unfold picard''; simpl.
 unfold restrict, Basics.compose; simpl.
 unfold picard'. apply mspc_ball_CRabs.
-rewrite rings.negate_plus_distr, plus_assoc, rings.plus_negate_r, rings.plus_0_l, CRabs_negate.
+assert (forall b, abs (y0 - (y0 + b)) [=] abs b).
+{ intro b. pose proof (CRabs_negate b).
+  apply gball_0 in H0. rewrite <- H0.
+  rewrite <- gball_0. 
+  apply CRabs_proper. apply gball_0.
+  rewrite rings.negate_plus_distr, plus_assoc.
+  rewrite rings.plus_negate_r, rings.plus_0_l. reflexivity. } 
+rewrite H0. clear H0.
 transitivity ('(abs (x - x0) * M)).
 + apply int_abs_bound; [apply _ |]. (* Should not be required *)
   intros t A.
@@ -532,7 +541,10 @@ transitivity ('(abs (x - x0) * M)).
   apply (@mspc_refl Q). exact (msp_mspc_ball_ext Q_as_MetricSpace).
   apply (proj2_sig rx). trivial. trivial.
   apply (extend_inside (Y:=CR)) in A1.
-  destruct A1 as [p A1]. rewrite A1. apply bounded.
+  destruct A1 as [p A1].
+  specialize (A1 (v ∘ together Datatypes.id f ∘ diag)).
+  pose proof (CRabs_proper _ _ A1). apply gball_0 in H0.
+  rewrite H0. clear H0. apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ proj1_sig ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_M.
@@ -577,7 +589,7 @@ constructor; [solve_propholds |].
 intros f1 f2 e A [x ?].
 change (ball (L * proj1_sig rx * e) (picard' f1 x) (picard' f2 x)).
 unfold picard'. apply mspc_ball_CRplus_l, mspc_ball_CRabs.
-rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
+rewrite <- abs_int_minus. transitivity ('(abs (x - x0) * (L * e))).
 + apply int_abs_bound; [apply _ |]. (* remove [apply _] *)
   intros x' B.
   assert (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0 x') as B1.
@@ -585,7 +597,12 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
     exact (msp_mspc_ball_ext Q_as_MetricSpace). 
     solve_propholds. trivial. trivial. }
   unfold plus, negate, ext_plus, ext_negate.
-  apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1]. rewrite !B1.
+  apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1].
+  assert (forall i j k l : CR, i = j -> k = l -> abs (i-k) [=] abs (j-l)).
+  { intros. apply gball_0. apply CRabs_proper.
+    apply gball_0. apply gball_0 in H0. apply gball_0 in H1.
+    rewrite H0, H1. reflexivity. }
+  rewrite (H0 _ _ _ _ (B1 _) (B1 _)). clear H0.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
   apply (lip_prf (λ y, v (_, y)) L), A.
 + apply CRle_Qle.
@@ -655,7 +672,7 @@ specialize (H1 H). destruct H1 as [H1 H2].
 change (1 - 1 ≤ y) in H1. change (y ≤ 1 + 1) in H2. change (abs y ≤ 2).
 rewrite plus_negate_r in H1. apply CRabs_AbsSmall. split; [| assumption].
 change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.
-apply flip_le_negate; solve_propholds.
+apply flip_le_negate. apply (CRle_trans H1 H2).
 Qed.
 
 Instance : @IsUniformlyContinuous

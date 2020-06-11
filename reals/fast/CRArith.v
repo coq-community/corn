@@ -80,6 +80,7 @@ Qed.
 Lemma CRplus_Qplus : forall (x y:Q), inject_Q_CR x + inject_Q_CR y == inject_Q_CR (x + y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
+ apply (Qpos_nonneg (e1+e2)).
 Qed.
 
 Hint Rewrite <- CRplus_Qplus : toCRring.
@@ -87,6 +88,7 @@ Hint Rewrite <- CRplus_Qplus : toCRring.
 Lemma CRopp_Qopp : forall (x:Q), - inject_Q_CR x == inject_Q_CR (- x)%Q.
 Proof.
  intros x e1 e2; apply ball_refl.
+ apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
 Hint Rewrite CRopp_Qopp : CRfast_compute.
@@ -95,6 +97,7 @@ Hint Rewrite <- CRopp_Qopp : toCRring.
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q_CR x - inject_Q_CR y == inject_Q_CR (x - y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
+ apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRminus_Qminus : toCRring.
@@ -104,6 +107,7 @@ Proof.
  intros x y.
  rewrite -> CRmult_scale.
  intros e1 e2; apply ball_refl.
+ apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
 Hint Rewrite <- CRmult_Qmult : toCRring.
@@ -374,45 +378,30 @@ Proof with auto.
  apply Qlt_le_trans with x0...
 Qed.
 
-Lemma in_CRball (r: Qpos) (x y : CR)
-  : x - ' proj1_sig r <= y /\ y <= x + ' proj1_sig r <-> ball r x y.
+Lemma in_CRball (r: Q) (x y : CR)
+  : x - ' r <= y /\ y <= x + ' r <-> ball r x y.
   (* A characterization of ball in terms of <=, similar to CRAbsSmall. *)
 Proof with intuition.
  intros.
- cut (AbsSmall (' proj1_sig r) (x - y) <-> (x - ' proj1_sig r <= y /\ y <= x + ' proj1_sig r)).
-  pose proof (CRAbsSmall_ball x y r)...
- unfold AbsSmall.
+ cut (AbsSmall (' r) (x - y) <-> (x - ' r <= y /\ y <= x + ' r)).
+ - pose proof (CRAbsSmall_ball x y r)...
+ - unfold AbsSmall.
  simpl.
- setoid_replace (x - y <= ' proj1_sig r) with (x - ' proj1_sig r <= y).
-  setoid_replace (- ' proj1_sig r <= x - y) with (y <= x + ' proj1_sig r).
+ setoid_replace (x - y <= ' r) with (x - ' r <= y).
+  setoid_replace (- ' r <= x - y) with (y <= x + ' r).
    intuition.
-  rewrite (CRplus_le_r (- ' proj1_sig r) (x - y) ('proj1_sig r + y)).
-  assert (- ' proj1_sig r + (' proj1_sig r + y) == y) as E by ring. rewrite E.
-  assert (x - y + (' proj1_sig r + y) == x + ' proj1_sig r)%CR as F by ring. rewrite F...
- rewrite (CRplus_le_r (x - y) (' proj1_sig r) (y - 'proj1_sig r)).
- assert (x - y + (y - ' proj1_sig r) == x - ' proj1_sig r) as E by ring. rewrite E.
- assert (' proj1_sig r + (y - ' proj1_sig r) == y) as F by ring. rewrite F...
+  rewrite (CRplus_le_r (- ' r) (x - y) ('r + y)).
+  assert (- ' r + (' r + y) == y) as E by ring. rewrite E.
+  assert (x - y + (' r + y) == x + ' r)%CR as F by ring. rewrite F...
+ rewrite (CRplus_le_r (x - y) (' r) (y - 'r)).
+ assert (x - y + (y - ' r) == x - ' r) as E by ring. rewrite E.
+ assert (' r + (y - ' r) == y) as F by ring. rewrite F...
 Qed.
 
   (* And the same for gball: *)
 Lemma in_CRgball (r: Q) (x y: CR): x - ' r <= y /\ y <= x + ' r <-> gball r x y.
 Proof with intuition.
- unfold gball.
- destruct Q_dec as [[?|?]|?].
-   intuition.
-   generalize (CRle_trans H0 H1).
-   rewrite <- CRplus_le_l.
-   rewrite CRopp_Qopp.
-   rewrite CRle_Qle.
-   clear H0 H1.
-   intros.
-   apply Qlt_irrefl with 0%Q.
-   apply Qlt_le_trans with (-r)%Q.
-    change (- 0 < - r)%Q.
-    apply Qopp_lt_compat...
-   apply Qle_trans with r...
-  rewrite <- in_CRball...
- rewrite q, CRopp_Qopp, ?CRplus_0_r, CRle_def... 
+  unfold gball. apply in_CRball.
 Qed.  
 
 Lemma CRgball_plus (x x' y y': CR) e1 e2:
@@ -485,7 +474,7 @@ Proof.
  intros. rewrite <- CRplus_Qplus.
  apply CRplus_le_r with (-'proj1_sig e)%CR.
  assert (' approximate x e + 'proj1_sig e - 'proj1_sig e == ' approximate x e)%CR as E by ring. rewrite E.
- apply (in_CRball e x ('approximate x e)), ball_approx_r.
+ apply (in_CRball (proj1_sig e) x ('approximate x e)), ball_approx_r.
 Qed.
 
 Hint Immediate lower_CRapproximation upper_CRapproximation.

@@ -121,11 +121,11 @@ Proof.
  simpl.
  unfold Cfst_raw.
  apply almostIn_closed.
- intros d.
- set (d':=((1#2)*d)%Qpos).
- assert (QposEq (e1 + e2 + d) ((e1 + d') + (d'+ e2)))
-   by (unfold QposEq; simpl; ring).
- rewrite H0. clear H0.
+ intros d dpos.
+ set (d':=((1#2)*exist _ _ dpos)%Qpos).
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+   with (proj1_sig ((e1 + d') + (d'+ e2))%Qpos)
+   by (simpl; ring).
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -160,13 +160,13 @@ st_eq (Cmap plX f (Cfst p)) (Csnd p).
 Proof.
  intros plX plFEX p s H.
  apply ball_eq.
- intros e1.
+ intros e1 epos.
  apply regFunBall_e.
  intros e2.
- set (e':=((1#6)*e1)%Qpos).
- assert (QposEq (e2 + e1 + e2) ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e')))
-   by (unfold e'; unfold QposEq; simpl; ring).
- rewrite H0. clear H0. 
+ set (e':=((1#6)*exist _ _ epos)%Qpos).
+ setoid_replace (proj1_sig e2 + e1 + proj1_sig e2)
+   with (proj1_sig ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos)
+   by (unfold e'; simpl; ring).
  set (d' := graphPoint_modulus e').
  assert (Hd'1 : proj1_sig d' <= proj1_sig e').
   unfold d', graphPoint_modulus.
@@ -195,7 +195,7 @@ Proof.
    assert (Z:=regFun_prf_ex p (mu f e2) d').
    destruct (mu f e2); try constructor.
    destruct Z; auto.
-  assert (L:existsC X (fun x => ball (d' + d') (approximate p d') (x, (f x)))).
+  assert (L:existsC X (fun x => ball (proj1_sig d' + proj1_sig d') (approximate p d') (x, (f x)))).
    clear -H'.
    simpl in H'.
    unfold FinEnum_map_modulus, graphPoint_modulus in H'.
@@ -310,7 +310,7 @@ Lemma graphPoint_b_uc : is_UniformlyContinuousFunction (graphPoint_b_raw f) (gra
 Proof.
  intros e a b H d1 d2.
  split.
-  change (ball_ex (d1 + e + d2) a b).
+  change (ball_ex (Qpos2QposInf d1 + e + Qpos2QposInf d2) a b).
   eapply ball_ex_weak_le;[|apply H].
   unfold graphPoint_modulus.
   destruct (mu f e) as [d|].
@@ -324,7 +324,7 @@ Proof.
   Qauto_le.
  simpl.
  revert d1 d2.
- change (ball e (f a) (f b)).
+ change (ball (proj1_sig e) (f a) (f b)).
  apply: uc_prf.
  eapply ball_ex_weak_le;[|apply H].
  unfold graphPoint_modulus.
@@ -355,7 +355,7 @@ Proof.
   auto using CompactImage_b_correct1.
  intros e1 e2.
  split. 
- apply ball_weak_le with (e:= (e1 + (graphPoint_modulus f ((1 # 2) * e2)))%Qpos)
+ apply ball_weak_le with (proj1_sig (e1 + (graphPoint_modulus f ((1 # 2) * e2)))%Qpos)
  ;[|apply regFun_prf].
   unfold graphPoint_modulus.
   destruct (mu f ((1#2)*e2)). simpl. 
@@ -370,9 +370,9 @@ Proof.
    simpl. Qauto_le. 
  simpl. unfold Cjoin_raw. 
  rewrite <- ball_Cunit.
- assert (QposEq (e1 + e2) ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2))
-   by (unfold QposEq; simpl; ring).
- rewrite H. clear H.
+ setoid_replace (proj1_sig e1 + proj1_sig e2)
+   with (proj1_sig ((1#2)*e1 + ((1#2)*e1 + (1#2)*e2) + (1#2)*e2)%Qpos)
+   by (simpl; ring).
  eapply ball_triangle;[|apply ball_approx_r].
  eapply ball_triangle.
  apply (ball_approx_l (approximate (Cmap_fun plX f x) (Qpos2QposInf ((1 # 2)%Qpos * e1)))
@@ -403,11 +403,11 @@ Proof.
  simpl.
  unfold Cfst_raw.
  apply almostIn_closed.
- intros d.
- set (d':=((1#2)*d)%Qpos).
- assert (QposEq (e1 + e2 + d) ((e1 + d') + (d'+ e2)))
-   by (unfold QposEq; simpl; ring).
- rewrite H0. clear H0.
+ intros d dpos.
+ set (d':=((1#2)*exist _ _ dpos)%Qpos).
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+   with (proj1_sig ((e1 + d') + (d'+ e2))%Qpos)
+   by (simpl; ring).
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -460,14 +460,13 @@ st_eq (Cbind plX f (Cfst p)) (Csnd p).
 Proof.
  intros plX plFEX p s H.
  apply ball_eq.
- intros e1.
+ intros e1 epos.
  apply regFunBall_e.
  intros e2.
- set (e':=((1#6)*e1)%Qpos).
- assert (QposEq (e2 + e1 + e2)
-                ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e')))
-   by (unfold e', QposEq; simpl; ring).
- rewrite H0. clear H0. 
+ set (e':=((1#6)*exist _ _ epos)%Qpos).
+ setoid_replace (proj1_sig e2 + e1 + proj1_sig e2)
+   with (proj1_sig ((e2 + e') + ((e' + e') + (e' + e')) + (e2 + e'))%Qpos)
+   by (unfold e'; simpl; ring).
  set (d' := graphPoint_modulus f ((1#2)*e')).
  assert (Hd'1 : proj1_sig d' <= proj1_sig e').
   unfold d', graphPoint_modulus.
@@ -492,14 +491,14 @@ Proof.
                       (Qpos2QposInf (1#2)*d'))%Qpos.
    unfold Cjoin_raw.
    simpl.
-   apply ball_weak_le with ((1#2)*e2 + ((1#2)*e2 + (1#2)*e') + (1#2)*d')%Qpos.
+   apply ball_weak_le with (proj1_sig ((1#2)*e2 + ((1#2)*e2 + (1#2)*e') + (1#2)*d')%Qpos).
    simpl.
     clear - Hd'1.
     rewrite -> Qle_minus_iff in *.
     replace RHS with ((1 # 2) * (proj1_sig e' + - proj1_sig d'))
       by simpl; ring.
     Qauto_nonneg.
-   cut (ball ((1 # 2) * e2 + (1 # 2) * e') (f (Cfst_raw p (mu f ((1 # 2) * e2))))
+   cut (ball ((1 # 2) * proj1_sig e2 + (1 # 2) * proj1_sig e') (f (Cfst_raw p (mu f ((1 # 2) * e2))))
      (f (Cfst_raw p ((1 # 2) * d')%Qpos))).
     intros L.
     apply L.
@@ -528,7 +527,7 @@ Proof.
    assert (Z:=regFun_prf_ex p (mu f ((1#2)*e2)) (Qpos2QposInf (1#2)%Qpos*d')).
    destruct (mu f ((1#2)*e2)); try constructor.
    destruct Z; auto.
-   assert (L:existsC X (fun x => ball (((1#2)*d') + d')
+   assert (L:existsC X (fun x => ball (proj1_sig (((1#2)*d') + d')%Qpos)
                                    (approximate p (Qpos2QposInf (1#2)%Qpos*d')) (Couple_raw ((Cunit x), (f x)) (Qpos2QposInf ((1#2)*d')%Qpos)))).
    clear -H'.
    simpl in H'.
@@ -554,7 +553,7 @@ Proof.
     apply stableXY.
    auto.
   apply ball_triangle with (approximate (f a) (Qpos2QposInf ((1#2)%Qpos*d'))).
-   apply ball_weak_le with ((1#2)*d' + ((1#2)*e' + (1#2)*e') + (1#2)*d')%Qpos.
+   apply ball_weak_le with (proj1_sig ((1#2)*d' + ((1#2)*e' + (1#2)*e') + (1#2)*d')%Qpos).
     clear - Hd'1.
     simpl.
     rewrite -> Qle_minus_iff in *.
@@ -562,8 +561,8 @@ Proof.
     exact Hd'1.
    simpl.
    rewrite <- ball_Cunit.
-   eapply ball_triangle;[|apply ball_approx_r].
-   eapply ball_triangle;[apply ball_approx_l|].
+   eapply ball_triangle;[|apply (ball_approx_r _ ((1#2)*d')%Qpos)].
+   eapply ball_triangle;[apply (ball_approx_l _ ((1#2)*d'))|].
    apply (mu_sum plX ((1#2)*e') (((1#2)*e')::nil) f)%Qpos.
    simpl.
    unfold graphPoint_modulus in d'.

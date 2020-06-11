@@ -58,10 +58,10 @@ Variable X Y : MetricSpace.
 Definition prod_ball e (a b:X*Y) :=
 ball e (fst a) (fst b) /\ ball e (snd a) (snd b).
 
-Lemma prod_ball_refl : forall e a, prod_ball e a a.
+Lemma prod_ball_refl : forall (e:Q) a,
+    0 <= e -> prod_ball e a a.
 Proof.
- intros e a.
- split; auto with *.
+ intros e a. split; apply ball_refl; exact H.
 Qed.
 
 Lemma prod_ball_sym : forall e a b, prod_ball e a b -> prod_ball e b a.
@@ -76,14 +76,15 @@ Proof.
  split; eauto with metric.
 Qed.
 
-Lemma prod_ball_closed : forall e a b, (forall d, prod_ball (e + d) a b) -> prod_ball e a b.
+Lemma prod_ball_closed : forall e a b,
+    (forall d, 0 < d -> prod_ball (e + d) a b) -> prod_ball e a b.
 Proof.
  intros e a b H.
  unfold prod_ball in *.
  split; apply ball_closed; firstorder.
 Qed.
 
-Lemma prod_ball_eq : forall a b, (forall e, prod_ball e a b) -> prod_st_eq _ _ a b.
+Lemma prod_ball_eq : forall a b, (forall e, 0 < e -> prod_ball e a b) -> prod_st_eq _ _ a b.
 Proof.
  intros a b H.
  unfold prod_ball in *.
@@ -93,11 +94,12 @@ Qed.
 Lemma prod_is_MetricSpace : is_MetricSpace (prodS X Y) prod_ball.
 Proof.
  split.
-     exact prod_ball_refl.
-    exact prod_ball_sym.
-   exact prod_ball_triangle.
-  exact prod_ball_closed.
- exact prod_ball_eq.
+ - intros. intros a. apply prod_ball_refl, H.
+ - exact prod_ball_sym.
+ - exact prod_ball_triangle.
+ - exact prod_ball_closed.
+ - exact prod_ball_eq.
+ - intros. destruct H. apply (msp_nonneg (msp X)) in H. exact H.
 Qed.
 
 Definition ProductMS : MetricSpace.
@@ -143,7 +145,8 @@ Proof.
    tauto.
   intros H.
   split; auto.
-  apply ball_refl.
+  apply ball_refl. 
+  apply (msp_nonneg (msp X) e x y H).
  destruct (H0 _ _ _ Z).
  assumption.
 Qed.
@@ -157,8 +160,9 @@ Proof.
   cut (ball (m:=Y) e x y -> ball (m:=ProductMS) e (a,x) (a, y)).
    tauto.
   intros H.
-  split; auto.
-  apply ball_refl.
+  split; auto. 
+  apply ball_refl. 
+  apply (msp_nonneg (msp Y) e x y H).
  destruct (H0 _ _ _ Z).
  assumption.
 Qed.
@@ -237,17 +241,19 @@ Section uc_curry.
    apply uc_prf.
    destruct (mu e)...
    split... apply ball_refl.
+   apply Qpos_nonneg.
   Qed.
 
   Definition uc_curry_help (a: A): B --> C := Build_UniformlyContinuousFunction (uc_curry_help_prf a).
 
   Definition uc_curry_prf: is_UniformlyContinuousFunction uc_curry_help (mu f).
   Proof with auto.
-   repeat intro. simpl.
+   repeat intro. split. apply Qpos_nonneg. intro. simpl.
    destruct f. clear f. simpl in *.
    apply uc_prf.
    destruct (mu e)...
    split... apply ball_refl.
+   apply Qpos_nonneg.
   Qed.
 
   Definition uc_curry: A --> B --> C := Build_UniformlyContinuousFunction uc_curry_prf.
@@ -301,6 +307,8 @@ Section completion_distributes.
    intros. unfold distrib_Complete, undistrib_Complete. simpl.
    unfold prod_st_eq. simpl.
    split; apply regFunEq_e; simpl; intros; apply ball_refl.
+   apply (Qpos_nonneg (e+e)).
+   apply (Qpos_nonneg (e+e)).
   Qed.
 
   Lemma undistrib_after_distrib_Complete xy: st_eq (undistrib_Complete (distrib_Complete xy)) xy.
@@ -308,6 +316,8 @@ Section completion_distributes.
    intros. unfold undistrib_Complete. simpl.
    apply regFunEq_e.
    split; simpl; apply ball_refl.
+   apply (Qpos_nonneg (e+e)).
+   apply (Qpos_nonneg (e+e)).
   Qed.
 
 End completion_distributes.

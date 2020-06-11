@@ -94,7 +94,7 @@ Proof.
    simpl.
    rewrite -> Qabs_neg; auto with *.
    rewrite -> Qopp_involutive.
-   apply: ball_refl.
+   apply: ball_refl. apply (Qpos_nonneg (e+e)).
   cut (CRabs m== - - CRabs m)%CR.
    intros. assumption.
   ring.
@@ -112,7 +112,9 @@ Proof.
  apply: regFunEq_e.
  intros e.
  simpl.
- rewrite -> Qabs_pos; auto with *.
+ rewrite -> Qabs_pos. apply ball_refl.
+ apply (Qpos_nonneg (e+e)).
+ auto with *.
 Qed.
 
 Lemma approximate_CRabs (x: CR) (e: Qpos):
@@ -208,8 +210,9 @@ Qed.
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
-intros q e1 e2. change (@ball Q_as_MetricSpace (e1 + e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
+intros q e1 e2. change (@ball Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
 apply <- ball_eq_iff. apply Qabs_Qmult.
+apply (Qpos_ispos (e1+e2)).
 Qed.
 
 (* begin hide *)

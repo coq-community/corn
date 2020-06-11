@@ -54,14 +54,14 @@ Set Implicit Arguments.
 Variable X:MetricSpace.
 
 (** A setoid verion of the ball predicate *)
-Definition ballS0 (m : MetricSpace): Qpos ->  m  -> m --> iffSetoid.
-Proof.
- intros e x.
- exists (ball e x).
- intros. apply ball_wd;auto with *.
-Defined.
+Definition ballS0 (m : MetricSpace): Q ->  m  -> m --> iffSetoid
+  := fun (e : Q) (x : m) =>
+       Build_Morphism
+         m iffSetoid (ball e x)
+         (fun (x1 x2 : m) (H : x1 [=] x2) =>
+            ball_wd m (reflexivity e) x x (reflexivity x) x1 x2 H).
 
-Definition ballS (m : MetricSpace): Qpos ->  m --> m --> iffSetoid.
+Definition ballS (m : MetricSpace): Q ->  m --> m --> iffSetoid.
 Proof.
  intros e.
  exists (ballS0  m e).
@@ -69,8 +69,8 @@ Proof.
 Defined.
 
 (** The definition of the usp metric *)
-Definition StepFSupBall(e:Qpos)(f:StepF X)(g:StepF X):=
-StepFfoldProp ((@ballS X e)^@> f <@> g).
+Definition StepFSupBall (e:Q) (f:StepF X) (g:StepF X)
+  := StepFfoldProp (((@ballS X e)^@> f) <@> g).
 
 Lemma StepFSupBallGlueGlue : forall e o fl fr gl gr,
 StepFSupBall e (glue o fl fr) (glue o gl gr) <->
@@ -88,7 +88,7 @@ End StepFSupBall.
 Arguments StepFSupBall [X].
 
 Add Parametric Morphism X : (@StepFSupBall X)
-  with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
+  with signature Qeq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff
  as StepFSupBall_wd.
 Proof.
  unfold StepFSupBall.
@@ -108,9 +108,10 @@ Section SupMetric.
 (** The StepFSupBall satifies the requirements of a metric. *)
 Variable X : MetricSpace.
 
-Lemma StepFSupBall_refl : forall e (x:StepF X), (StepFSupBall e x x).
+Lemma StepFSupBall_refl : forall (e:Q) (x:StepF X),
+    Qle (0#1) e -> StepFSupBall e x x.
 Proof.
- intros e x.
+ intros e x epos.
  unfold StepFSupBall.
  set (b:=(@ballS X e)).
  set (f:=(@join _ _) ^@> (constStepF b)).
@@ -160,35 +161,37 @@ Proof.
  apply: (ball_triangle X e d).
 Qed.
 
-Lemma StepFSupBall_closed : forall e (x y:StepF X), (forall d, (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
+Lemma StepFSupBall_closed : forall e (x y:StepF X),
+    (forall d, Qlt (0#1) d -> (StepFSupBall (e+d) x y)) -> (StepFSupBall e x y).
 Proof.
  intros e.
  apply: (StepF_ind2).
-   intros. rewrite -> H, H0 in H1. apply H1.
+ - intros. rewrite -> H, H0 in H1. apply H1.
    intro. rewrite -> H, H0. apply H2.
-   apply: ball_closed.
- intros o s s0 t t0 IH0 IH1 H.
+ - apply: ball_closed.
+ - intros o s s0 t t0 IH0 IH1 H.
  unfold StepFSupBall in *.
  rewrite MapGlue. rewrite ApGlue. simpl.
  split.
   rewrite SplitLGlue. apply IH0. clear IH0.
-  intro d. pose (H2:=H d).
+  intros d dpos. pose (H2:=H d).
   rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
-  destruct H2. auto.
+  destruct H2. exact dpos. auto.
   rewrite SplitRGlue. apply IH1. clear IH1.
- intro d. pose (H2:=H d).
+ intros d dpos. pose (H2:=H d).
  rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
- destruct H2. auto.
+ destruct H2. exact dpos. auto.
 Qed.
 
 Lemma StepFSupBall_eq : forall (x y : StepF X),
-(forall e : Qpos, StepFSupBall e x y) -> StepF_eq x y.
+(forall e : Qpos, StepFSupBall (proj1_sig e) x y) -> StepF_eq x y.
 Proof.
  apply: (StepF_ind2).
-   intros s s0 t t0 H H0 H1 H2. rewrite -> H, H0 in H1. apply H1.
+ - intros s s0 t t0 H H0 H1 H2. rewrite -> H, H0 in H1. apply H1.
    intro. rewrite -> H, H0. apply H2.
-   apply ball_eq.
- intros o s s0 t t0 H H0 H1.
+ - intros. apply ball_eq. intros.
+   specialize (H (exist _ _ H0)). exact H.
+ - intros o s s0 t t0 H H0 H1.
  unfold StepFSupBall in *. apply glue_resp_StepF_eq.
  apply H. clear H.
   intro e. pose (H2:=H1 e).
@@ -199,6 +202,23 @@ Proof.
  rewrite -> MapGlue in H2. rewrite ApGlue in H2. rewrite SplitRGlue in H2. rewrite SplitLGlue in H2.
  destruct H2; auto.
 Qed.
+
+Lemma StepFSupBall_nonneg : forall (e : Q) (a b : StepFS X),
+  StepFSupBall e a b -> Qle (0#1) e.
+Proof.
+  induction a.
+  - (* a is the constant function x *)
+    induction b. intro H0.
+    unfold StepFSupBall, StepFfoldProp in H0. simpl in H0.
+    exact (msp_nonneg (msp X) e x x0 H0).
+    intros [H0 _]. exact (IHb1 H0).
+  - intros b H.
+    unfold StepFSupBall, StepFfoldProp in H. simpl in H.
+    unfold Ap in H. simpl in H.
+    destruct (Split b o). destruct H.
+    apply (IHa1 _ H).
+Qed.
+  
 (**
 *** Example of a Metric Space <Step, StepFSupBall>
 *)
@@ -206,11 +226,13 @@ Lemma StepFSupBall_is_MetricSpace :
  (is_MetricSpace (@StepFS X) (@StepFSupBall X)).
 Proof.
  split.
-     apply: StepFSupBall_refl.
-    apply: StepFSupBall_sym.
-   apply: StepFSupBall_triangle.
-  apply: StepFSupBall_closed.
- apply: StepFSupBall_eq.
+ - intros. intro x. apply StepFSupBall_refl, H.
+ - apply: StepFSupBall_sym.
+ - apply: StepFSupBall_triangle.
+ - apply: StepFSupBall_closed.
+ - intros. apply: StepFSupBall_eq.
+   intros. destruct e as [e epos]. apply H, epos.
+ - exact StepFSupBall_nonneg.
 Qed.
 
 Definition StepFSup : MetricSpace :=
@@ -247,9 +269,9 @@ Canonical Structure StepFSup.
 
 Lemma StepFSupBallBind(X:MetricSpace): ((forall (e : Qpos) (a b : StepF (StepFS X)) ,
 forall f:(StepFS X) -->(StepFS X),
-(forall c d, (StepFSupBall e c d) -> (StepFSupBall e (f c) (f d)))->
-StepFSupBall (X:=StepFSup X) e a b ->
-StepFSupBall (X:=X) e (StFBind00 a f) (StFBind00 b f))).
+(forall c d, (StepFSupBall (proj1_sig e) c d) -> (StepFSupBall (proj1_sig e) (f c) (f d)))->
+StepFSupBall (X:=StepFSup X) (proj1_sig e) a b ->
+StepFSupBall (X:=X) (proj1_sig e) (StFBind00 a f) (StFBind00 b f))).
 Proof.
  intros e a. unfold ball_ex.
  induction a using StepF_ind. simpl. induction b using StepF_ind.
@@ -261,16 +283,18 @@ Proof.
   rewrite -> StepFfoldPropglue_rew. split.
   pose (HH:=IHb1  (compose1 (SplitLS X o) f)). simpl in HH.
    simpl in HH. unfold StepFSupBall in HH. unfold compose0 in HH.
-   assert (rew:(ballS X e ^@> SplitLS0 o (f x)) ==
-     (SplitL (ballS X e ^@> f x) o)). unfold SplitLS0. rewrite SplitLMap;reflexivity.
+   assert (rew:(ballS X (proj1_sig e) ^@> SplitLS0 o (f x)) ==
+               (SplitL (ballS X (proj1_sig e) ^@> f x) o)).
+   unfold SplitLS0. rewrite SplitLMap;reflexivity.
     rewrite <-rew. clear rew. apply HH; auto with *.
    intros. unfold SplitLS0. rewrite <- SplitLMap. rewrite <- SplitLAp.
    apply StepFfoldPropSplitL. apply (Hf c d H0).
    (* right *)
    pose (HH:=IHb2  (compose1 (SplitRS X o) f)). simpl in HH.
   unfold StepFSupBall in HH. unfold compose0 in HH.
-  assert (rew:(ballS X e ^@> SplitRS0 o (f x)) ==
-    (SplitR (ballS X e ^@> f x) o)). unfold SplitRS0. rewrite SplitRMap;reflexivity.
+  assert (rew:(ballS X (proj1_sig e) ^@> SplitRS0 o (f x)) ==
+              (SplitR (ballS X (proj1_sig e) ^@> f x) o)).
+  unfold SplitRS0. rewrite SplitRMap;reflexivity.
    rewrite <-rew. clear rew. apply HH; auto with *.
   intros. unfold SplitRS0. rewrite <- SplitRMap. rewrite <- SplitRAp.
   apply StepFfoldPropSplitR. apply (Hf c d H0).
@@ -334,7 +358,7 @@ Proof.
  simpl. unfold StepFSupBall.
  case_eq (mu f e).
   Focus 2. intros.
- set (bal:=(ballS Y e)).
+ set (bal:=(ballS Y (proj1_sig e))).
  unfold ball_ex in H.
  cut (StepFfoldProp ((flip (compose (flip (compose bal (uc_stdFun f))) (uc_stdFun f))) ^@> a <@> b)).
   evalStepF. auto with *.
@@ -343,9 +367,9 @@ Proof.
  rewrite H. simpl. auto.
  intros q eq. apply: StepF_imp_imp.
  unfold StepF_imp.
- set (bal:=(ballS Y e)).
+ set (bal:=(ballS Y (proj1_sig e))).
  set (F:=(((flip (compose (flip (compose bal (uc_stdFun f))) (uc_stdFun f)))))).
- set (IMP:=(ap (compose (@ap _ _ _) (compose (compose imp) (ballS X q))) F)).
+ set (IMP:=(ap (compose (@ap _ _ _) (compose (compose imp) (ballS X (proj1_sig q)))) F)).
  cut (StepFfoldProp (IMP ^@> a <@> b)).
   unfold IMP, F; evalStepF. tauto.
   apply StepFfoldPropForall_Map2.
@@ -358,15 +382,17 @@ Definition glue_uc0 (o:OpenUnit):
 Proof.
  intros x.
  exists (fun y=>(glue o x y)) (fun x:Qpos=> x).
- abstract( intros e a b;  simpl; rewrite -> StepFSupBallGlueGlue; intuition; apply StepFSupBall_refl).
+ abstract( intros e a b;  simpl; rewrite -> StepFSupBallGlueGlue; intuition; apply StepFSupBall_refl; apply Qpos_nonneg).
 Defined.
 
 Definition glue_uc (o:OpenUnit):
  StepFSup X --> StepFSup X --> StepFSup X.
 Proof.
  exists (fun y=>(glue_uc0 o y)) (fun x:Qpos=> x).
- abstract (intros e a b; simpl; unfold ucBall; simpl; intros; rewrite -> StepFSupBallGlueGlue; intuition;
-   apply StepFSupBall_refl).
+ intros e a b H.
+ split. apply Qpos_nonneg. 
+ intros. simpl. rewrite -> StepFSupBallGlueGlue. intuition.
+ apply StepFSupBall_refl. apply Qpos_nonneg.
 Defined.
 
 (** There is an injection from X to StepFSup X. *)
