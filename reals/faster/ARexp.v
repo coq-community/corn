@@ -1,6 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.Program.Program MathClasses.misc.workaround_tactics
+  CoRN.model.totalorder.QposMinMax 
   CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
   CoRN.reals.fast.CRexp CoRN.reals.fast.CRseries CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
@@ -227,7 +230,8 @@ Definition ARexp_bounded (z : Z) := Cbind AQPrelengthSpace (ARexp_bounded_uc z).
 Lemma ARtoCR_preserves_exp_bounded z x : 'ARexp_bounded z x = exp_bounded z ('x).
 Proof. apply (preserves_unary_complete_fun QPrelengthSpace _ (λ x, AQexp (('z) ⊓ x))). Qed.
 
-Definition ARexp (x : AR) : AR := ARexp_bounded (Qceiling ('approximate x (1#1)%Qpos + (1#1))) x.
+Definition ARexp (x : AR) : AR
+  := ARexp_bounded (Qceiling ('approximate x (Qpos2QposInf (1#1)) + (1#1))) x.
 
 Lemma ARtoCR_preserves_exp x : 'ARexp x = exp ('x).
 Proof. unfold ARexp. apply ARtoCR_preserves_exp_bounded. Qed.

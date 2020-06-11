@@ -1,4 +1,7 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.Unicode.Utf8 CoRN.model.metric2.Qmetric CoRN.model.metric2.CRmetric CoRN.metric2.UniformContinuity.
 
 

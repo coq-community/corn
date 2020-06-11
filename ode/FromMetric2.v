@@ -1,7 +1,10 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.metric2.Complete CoRN.metric2.Metric CoRN.ode.metric.
 
 Require Import
+  CoRN.model.totalorder.QposMinMax
   MathClasses.interfaces.abstract_algebra MathClasses.implementations.stdlib_rationals
   MathClasses.orders.orders MathClasses.orders.semirings MathClasses.orders.rings MathClasses.theory.rings.
 
@@ -70,7 +73,7 @@ Qed.
 
 Lemma gball_complete (r : Q) (x y : Complete X) :
   gball r x y <->
-  forall e1 e2 : Qpos, gball (QposAsQ e1 + r + QposAsQ e2)%mc (approximate x e1) (approximate y e2).
+  forall e1 e2 : Qpos, gball (proj1_sig e1 + r + proj1_sig e2)%mc (approximate x e1) (approximate y e2).
 Proof.
 destruct (Qsec.Qdec_sign r) as [[r_neg | r_pos] | r_zero].
 + split; intro H; [elim (gball_neg _ _ r_neg H) |].
@@ -104,11 +107,11 @@ Qed.
 Next Obligation.
 apply gball_complete; intros e1 e2.
 unfold lim, limit_complete, Cjoin_fun, Cjoin_raw; simpl.
-assert (H : mspc_ball r a ((@proj1_sig _ _ ∘ f) ((1 # 2) * QposAsQ e2)%Q)) by
-  apply (proj2_sig (f ((1 # 2) * e2))).
+assert (H : mspc_ball r a ((@proj1_sig _ _ ∘ f) ((1 # 2) * proj1_sig e2)%Q)) by
+  apply (proj2_sig (f ((1 # 2) * proj1_sig e2))).
 unfold mspc_ball, msp_mspc_ball in H.
-apply gball_weak_le with (q := QposAsQ e1 + r + (QposAsQ ((1 # 2) * e2)%Qpos)).
-+ apply Qplus_le_r. apply Q.Qle_half; auto.
+apply gball_weak_le with (q := proj1_sig e1 + r + (proj1_sig ((1 # 2) * e2)%Qpos)).
++ apply Qplus_le_r. apply Q.Qle_half. apply Qpos_nonneg.
 + apply gball_complete, H.
 Qed.
 

@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
  Coq.Unicode.Utf8 Coq.Program.Program
  CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
@@ -30,13 +32,13 @@ destruct x as [x |]; destruct y as [y |]; [| easy..].
 change (x < y -> x ≤ y). intros; solve_propholds.
 Qed.
 
-Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 rx).
-Proof. apply (proj2_sig rx). Qed.
+Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 (proj1_sig rx)).
+Proof. intros. apply (proj2_sig rx). Qed.
 
 Instance Q_nonempty : NonEmpty Q := inhabits 0.
 
 Program Instance sig_nonempty `{ExtMetricSpaceClass X}
-  (r : QnonNeg) (x : X) : NonEmpty (sig (ball r x)) := inhabits x.
+  (r : QnonNeg) (x : X) : NonEmpty (sig (ball (proj1_sig r) x)) := inhabits x.
 Next Obligation. apply mspc_refl; solve_propholds. Qed.
 
 Instance prod_nonempty `{NonEmpty X, NonEmpty Y} : NonEmpty (X * Y).
@@ -71,7 +73,7 @@ definition below is not well-typed because if [r < 0], then [ball r a (a -
 r)] is false, so we can't apply [f] to [a - r]. So we assume [r : QnonNeg]. *)
 
 Lemma mspc_ball_edge_l
-  : @ball Q (msp_mspc_ball Q_as_MetricSpace) r a (a - `r).
+  : @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a (a - `r).
 Proof.
 destruct r as [e ?]; simpl.
 apply gball_Qabs. mc_setoid_replace (a - (a - e)) with e by ring.
@@ -79,14 +81,14 @@ change (abs e ≤ e). rewrite abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
 Lemma mspc_ball_edge_r
-  : @ball Q (msp_mspc_ball Q_as_MetricSpace) r a (a + `r).
+  : @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a (a + `r).
 Proof.
 destruct r as [e ?]; simpl.
 apply Qmetric.gball_Qabs. mc_setoid_replace (a - (a + e)) with (-e) by ring.
 change (abs (-e) ≤ e). rewrite abs.abs_negate, abs.abs_nonneg; [reflexivity | trivial].
 Qed.
 
-Context (f : sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) r a) -> Y).
+Context (f : sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a) -> Y).
 
 (* Since the following is a Program Definition, we could write [f (a - r)]
 and prove the obligation [mspc_ball r a (a - r)]. However, this obligation
@@ -100,7 +102,7 @@ the second component of the pair. So instead we prove mspc_ball_edge_l and
 mspc_ball_edge_r, which don't depend on x. *)
 
 Program Definition extend : Q -> Y :=
-  λ x, if (decide (x < a - (r : Q)))
+  λ x, if (decide (x < a - (proj1_sig r)))
        then f ((a - (r : Q)) ↾ mspc_ball_edge_l)
        else if (decide (a + r < x))
             then f ((a + r) ↾ mspc_ball_edge_r)
@@ -117,19 +119,19 @@ constructor; [apply (lip_nonneg f L) |].
 intros x1 x2 e A.
 assert (0 ≤ e) by now apply (radius_nonneg x1 x2).
 assert (0 ≤ L) by apply (lip_nonneg f L).
-assert (a - to_Q r ≤ a + to_Q r) by
+assert (a - proj1_sig r ≤ a + proj1_sig r) by
   (destruct r; simpl; transitivity a;
     [apply rings.nonneg_minus_compat | apply semirings.plus_le_compat_r]; (easy || reflexivity)).
 unfold extend.
-destruct (decide (x1 ≤ a - to_Q r)); destruct (decide (x2 ≤ a - to_Q r)).
+destruct (decide (x1 ≤ a - proj1_sig r)); destruct (decide (x2 ≤ a - proj1_sig r)).
 * apply mspc_refl; solve_propholds.
-* destruct (decide (a + to_Q r ≤ x2));  apply (lip_prf f L).
+* destruct (decide (a + proj1_sig r ≤ x2));  apply (lip_prf f L).
   + apply (nested_balls A)...
   + apply (nested_balls A)...
-* destruct (decide (a + to_Q r ≤ x1)); apply (lip_prf f L).
+* destruct (decide (a + proj1_sig r ≤ x1)); apply (lip_prf f L).
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
-* destruct (decide (a + to_Q r ≤ x1)); destruct (decide (a + to_Q r ≤ x2));
+* destruct (decide (a + proj1_sig r ≤ x1)); destruct (decide (a + proj1_sig r ≤ x2));
   apply (lip_prf f L).
   + apply mspc_refl; solve_propholds.
   + apply mspc_symm; apply mspc_symm in A. apply (nested_balls A)...
@@ -140,50 +142,50 @@ Qed.
 
 Global Instance extend_uc : ∀ mu_f : Q → Qinf,
          @IsUniformlyContinuous _
-           (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f
+           (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f
          → @IsUniformlyContinuous Q (msp_mspc_ball Q_as_MetricSpace) Y H extend mu_f.
 Proof with (solve_propholds || (apply orders.not_lt_le_flip; assumption) || reflexivity).
   intros. constructor.
-  apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f). exact H1.
+  apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f). exact H1.
 intros e x1 x2 e_pos A.
-assert (a - to_Q r ≤ a + to_Q r) by
+assert (a - proj1_sig r ≤ a + proj1_sig r) by
   (destruct r; simpl; transitivity a;
     [apply rings.nonneg_minus_compat | apply semirings.plus_le_compat_r]; (easy || reflexivity)).
 unfold extend.
-destruct (decide (x1 < a - to_Q r)); destruct (decide (x2 < a - to_Q r)).
+destruct (decide (x1 < a - proj1_sig r)); destruct (decide (x2 < a - proj1_sig r)).
 * apply mspc_refl...
-* destruct (decide (a + to_Q r < x2));
-  apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f); trivial.
+* destruct (decide (a + proj1_sig r < x2));
+  apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f); trivial.
   + apply (nested_balls _ _ A)...
   + apply (nested_balls _ _ A)...
-* destruct (decide (a + to_Q r < x1));
-    apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f); trivial.
+* destruct (decide (a + proj1_sig r < x1));
+    apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f); trivial.
   + apply @mspc_symm.
     exact (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball r a)).
+                         (ball (proj1_sig r) a)).
     apply @mspc_symm in A.
     apply (nested_balls _ _ A)...
     exact (msp_mspc_ball_ext Q_as_MetricSpace).
   + apply @mspc_symm.
     exact (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball r a)).
+                         (ball (proj1_sig r) a)).
     apply @mspc_symm in A.
     apply (nested_balls _ _ A)...
     exact (msp_mspc_ball_ext Q_as_MetricSpace).
-* destruct (decide (a + to_Q r < x1)); destruct (decide (a + to_Q r < x2));
-  apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f); trivial.
+* destruct (decide (a + proj1_sig r < x1)); destruct (decide (a + proj1_sig r < x2));
+  apply (@uc_prf _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f); trivial.
   + apply @mspc_refl'.
     exact (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball r a)).
+                         (ball (proj1_sig r) a)).
     apply Qinf_lt_le.
-    apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a)) Y H f mu_f). assumption. assumption. 
+    apply (@uc_pos _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig r) a)) Y H f mu_f). assumption. assumption. 
   + apply @mspc_symm.
     exact (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball r a)).
+                         (ball (proj1_sig r) a)).
     apply @mspc_symm in A.
     apply (nested_balls _ _ A)...
     exact (msp_mspc_ball_ext Q_as_MetricSpace).
@@ -195,18 +197,18 @@ End Extend.
 Lemma extend_inside
 : ∀ {Y : CProp} {H : MetricSpaceBall Y} { _ : @ExtMetricSpaceClass Y H },
   ∀ (a x : Q) (r : QnonNeg),
-    @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x
-    → ∃ p : @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x,
-    ∀ f : sig (fun x : Q => @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x) → Y,
+    @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a x
+    → ∃ p : @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a x,
+    ∀ f : sig (fun x : Q => @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a x) → Y,
       @extend Y a r f x = f (x ↾ p).
 Proof.
   intros Y H H0 a x r A. 
   apply mspc_ball_Qle in A. destruct A as [A1 A2]. unfold extend.
-destruct (decide (x < a - to_Q r)) as [H1 | H1].
-(* [to_Q] is needed because otherwise [Negate QnonNeg] is unsatisfied.
+destruct (decide (x < a - proj1_sig r)) as [H1 | H1].
+(* [proj1_sig] is needed because otherwise [Negate QnonNeg] is unsatisfied.
 Backtick [`] is not enough because the goal is not simplified. *)
 * apply orders.lt_not_le_flip in H1; elim (H1 A1).
-* destruct (decide (a + to_Q r < x)) as [H2 | H2].
+* destruct (decide (a + proj1_sig r < x)) as [H2 | H2].
   + apply orders.lt_not_le_flip in H2; elim (H2 A2).
   + eexists; intro f; reflexivity.
 Qed.
@@ -220,11 +222,12 @@ Global Instance comp_bounded {X Y : Type} (f : X -> Y) (g : Y -> CR)
 Proof. intro x; unfold Basics.compose; apply bounded. Qed.
 
 Global Instance extend_bounded {a : Q} {r : QnonNeg}
-       (f : {x | @ball Q (msp_mspc_ball Q_as_MetricSpace) r a x} -> CR)
+       (f : {x | @ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig r) a x} -> CR)
   `{!Bounded f M} : Bounded (extend a r f) M.
 Proof.
 intro x. unfold extend.
-destruct (decide (x < a - to_Q r)); [| destruct (decide (a + to_Q r < x))]; apply bounded.
+destruct (decide (x < a - proj1_sig r));
+  [| destruct (decide (a + proj1_sig r < x))]; apply bounded.
 Qed.
 
 Lemma bounded_nonneg {X : Type} (f : X -> CR) `{!Bounded f M} `{NonEmpty X} :
@@ -266,26 +269,26 @@ Section Picard.
 
 Context (x0 : Q) (y0 : CR) (rx ry : QnonNeg).
 
-Notation sx := (sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) rx x0)).
-Notation sy := (sig (@ball CR (msp_mspc_ball CR) ry y0)).
+Notation sx := (sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0)).
+Notation sy := (sig (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)).
 
 Context (v : sx * sy -> CR) `{!Bounded v M}
         `{!@IsUniformlyContinuous
            _ (@Linf_product_metric_space_ball
                 _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a))
-                _ (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) ry y0)) )
+                _ (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)) )
            CR (msp_mspc_ball CR) 
            v mu_v} (L : Q).
 
 Hypothesis v_lip : forall x : sx, IsLipschitz (λ y, v (x, y)) L.
 
-Hypothesis L_rx : L * rx < 1.
+Hypothesis L_rx : L * (proj1_sig rx) < 1.
 
-Context {rx_M : PropHolds (`rx * M ≤ ry)}.
+Context {rx_M : PropHolds (`rx * M ≤ proj1_sig ry)}.
 
 Instance L_nonneg : PropHolds (0 ≤ L).
 Proof.
-  assert (@ball Q (msp_mspc_ball Q_as_MetricSpace) rx x0 x0) as B.
+  assert (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0 x0) as B.
   { apply @mspc_refl.
     exact (msp_mspc_ball_ext Q_as_MetricSpace).
     solve_propholds. }
@@ -298,10 +301,10 @@ Global Instance uc_msd
      : MetricSpaceDistance
          (@UniformlyContinuous
             sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                              (@ball Q (msp_mspc_ball Q_as_MetricSpace) rx x0))
+                              (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0))
             sy
-            (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) ry y0)))
-  := λ f1 f2, 2 * ry.
+            (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)))
+  := λ f1 f2, 2 * proj1_sig ry.
 
 Global Instance uc_msc
   : @MetricSpaceClass
@@ -315,8 +318,8 @@ Global Instance uc_msc
 Proof.
   intros f1 f2. unfold msd, uc_msd. intro x.
   apply (@mspc_triangle' CR (msp_mspc_ball CR)
-                         (msp_mspc_ball_ext CR) ry ry y0).
-+ change (to_Q ry + to_Q ry = 2 * (to_Q ry)). ring.
+                         (msp_mspc_ball_ext CR) (proj1_sig ry) (proj1_sig ry) y0).
++ change (proj1_sig ry + proj1_sig ry = 2 * (proj1_sig ry)). ring.
 + apply mspc_symm; apply (proj2_sig (func f1 x)).
 + apply (proj2_sig (func f2 x)).
 Qed.
@@ -333,8 +336,8 @@ Check _ : IsUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) �
 Check _ : IsLocallyUniformlyContinuous (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) _*)
 Definition picard' (f : sx -> sy)
            `{!@IsUniformlyContinuous
-              sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-              sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+              sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+              sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
               f mu_f} : Q -> CR :=
   λ x, y0 +
        @int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag))
@@ -348,20 +351,20 @@ Definition picard' (f : sx -> sy)
              _ _
              (@compose_uc sx 
                 (sx and sx) CR
-                (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                 (@Linf_product_metric_space_ball sx 
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                    sx
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0)))
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0)))
                 (@Linf_product_metric_space_class sx
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                    (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                       (msp_mspc_ball_ext Q_as_MetricSpace) 
-                      (ball rx x0)) sx
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (ball (proj1_sig rx) x0)) sx
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                    (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                       (msp_mspc_ball_ext Q_as_MetricSpace) 
-                      (ball rx x0))) (msp_mspc_ball CR)
+                      (ball (proj1_sig rx) x0))) (msp_mspc_ball CR)
                 (@diag sx)
                 (v
                  ∘ @together sx sx sx sy
@@ -372,52 +375,52 @@ Definition picard' (f : sx -> sy)
                       @minmax.min Qinf Qinf_le metric.Decision_instance_0
                         (lip_modulus 1 e) (mu_f e)) mu_v Qinf.infinite)
                 (@lip_uc sx
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                    (sx and sx)
                    (@Linf_product_metric_space_ball sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0)))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0)))
                    (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                       (msp_mspc_ball_ext Q_as_MetricSpace) 
-                      (ball rx x0)) (@sig_msd Q (ball rx x0) Qmsd)
+                      (ball (proj1_sig rx) x0)) (@sig_msd Q (ball (proj1_sig rx) x0) Qmsd)
                    (@sig_mspc_distance Q_as_MetricSpace
                       (msp_mspc_ball Q_as_MetricSpace)
                       (msp_mspc_ball_ext Q_as_MetricSpace) 
-                      (ball rx x0) Qmsd Qmsc)
+                      (ball (proj1_sig rx) x0) Qmsd Qmsc)
                    (@Linf_product_metric_space_class sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0)) sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                         (ball (proj1_sig rx) x0)) sx
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0))) (@diag sx) 1
+                         (ball (proj1_sig rx) x0))) (@diag sx) 1
                    (@diag_lip sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0))))
+                         (ball (proj1_sig rx) x0))))
                 (@compose_uc (sx and sx)
                    (sx and sy) CR
                    (@Linf_product_metric_space_ball sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0)))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0)))
                    (@Linf_product_metric_space_ball sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       sy
-                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)))
+                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)))
                    (@Linf_product_metric_space_class sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0)) sy
-                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+                         (ball (proj1_sig rx) x0)) sy
+                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
                       (@sig_mspc CR (msp_mspc_ball CR)
                          (msp_mspc_ball_ext CR) 
-                         (ball ry y0))) (msp_mspc_ball CR)
+                         (ball (proj1_sig ry) y0))) (msp_mspc_ball CR)
                    (@together sx sx
                       sx sy
                       (@Datatypes.id sx) f) v
@@ -425,44 +428,44 @@ Definition picard' (f : sx -> sy)
                       @minmax.min Qinf Qinf_le metric.Decision_instance_0
                         (lip_modulus 1 e) (mu_f e)) mu_v
                    (@together_uc sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0)) sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                         (ball (proj1_sig rx) x0)) sx
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0)) sx
-                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                         (ball (proj1_sig rx) x0)) sx
+                      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                       (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                          (msp_mspc_ball_ext Q_as_MetricSpace)
-                         (ball rx x0)) sy
-                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+                         (ball (proj1_sig rx) x0)) sy
+                      (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
                       (@sig_mspc CR (msp_mspc_ball CR)
                          (msp_mspc_ball_ext CR) 
-                         (ball ry y0)) (@Datatypes.id sx) f
+                         (ball (proj1_sig ry) y0)) (@Datatypes.id sx) f
                       (lip_modulus 1)
                       (@lip_uc sx
                          (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                            (ball rx x0)) sx
+                            (ball (proj1_sig rx) x0)) sx
                          (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                            (ball rx x0))
+                            (ball (proj1_sig rx) x0))
                          (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                             (msp_mspc_ball_ext Q_as_MetricSpace)
-                            (ball rx x0)) (@sig_msd Q (ball rx x0) Qmsd)
+                            (ball (proj1_sig rx) x0)) (@sig_msd Q (ball (proj1_sig rx) x0) Qmsd)
                          (@sig_mspc_distance Q_as_MetricSpace
                             (msp_mspc_ball Q_as_MetricSpace)
                             (msp_mspc_ball_ext Q_as_MetricSpace)
-                            (ball rx x0) Qmsd Qmsc)
+                            (ball (proj1_sig rx) x0) Qmsd Qmsc)
                          (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                             (msp_mspc_ball_ext Q_as_MetricSpace)
-                            (ball rx x0)) (@Datatypes.id sx) 1
+                            (ball (proj1_sig rx) x0)) (@Datatypes.id sx) 1
                          (@id_lip sx
                             (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace)
-                               (ball rx x0))
+                               (ball (proj1_sig rx) x0))
                             (@sig_mspc Q (msp_mspc_ball Q_as_MetricSpace)
                                (msp_mspc_ball_ext Q_as_MetricSpace)
-                               (ball rx x0)))) mu_f _)
+                               (ball (proj1_sig rx) x0)))) mu_f _)
                    _)))))
 
             x0 x.
@@ -475,25 +478,25 @@ Check _ : Integral (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
 Check _ : Integrable (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)).
 Check _ : IsLocallyLipschitz (λ x : Q, int (extend x0 rx (v ∘ (together Datatypes.id f) ∘ diag)) x0 x) _.
 Check _ : IsLocallyLipschitz (picard' f) _. Goal True.
-assert (0 ≤ to_Q rx). apply (proj2_sig rx).
-Check _ : PropHolds (0 ≤ to_Q rx).
+assert (0 ≤ proj1_sig rx). apply (proj2_sig rx).
+Check _ : PropHolds (0 ≤ proj1_sig rx).
 Check _ : IsLipschitz (restrict (picard' f) x0 rx) _.
 *)
 
 Definition picard'' (f : @UniformlyContinuous sx
-         (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-         sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)) )
+         (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+         sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)) )
 : @UniformlyContinuous sx
-                       (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0)) CR
+                       (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0)) CR
                        (msp_mspc_ball CR).
 Proof.
   apply (@Build_UniformlyContinuous
-           sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+           sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
            CR (msp_mspc_ball CR) 
-           (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR (picard' f) x0 rx)
+           (@restrict Q (msp_mspc_ball Q_as_MetricSpace) CR (picard' f) x0 (proj1_sig rx))
            ((λ _ _ e : Q,
               @minmax.min Qinf Qinf_le metric.Decision_instance_0
-                          (lip_modulus 0 (e / 2)) (lip_modulus M (e / 2))) x0 rx)
+                          (lip_modulus 0 (e / 2)) (lip_modulus M (e / 2))) x0 (proj1_sig rx))
            (@luc_prf Q (msp_mspc_ball Q_as_MetricSpace) CR 
                      (msp_mspc_ball CR)
                      _ _
@@ -504,7 +507,7 @@ Proof.
                               (@sum_uc Q (msp_mspc_ball Q_as_MetricSpace)
                                        (msp_mspc_ball_ext Q_as_MetricSpace) 
                                        (λ _ : Q, y0) _ _ _ _ _))
-                     x0 rx)).
+                     x0 (proj1_sig rx))).
 Defined.
 
 (* Needed below to be able to apply (order_preserving (.* M)) *)
@@ -515,7 +518,7 @@ Instance M_nonneg : PropHolds (0 ≤ M)
         (msp_mspc_ball_ext Q_as_MetricSpace) rx x0)
      sy (@sig_nonempty CR (msp_mspc_ball CR) (msp_mspc_ball_ext CR) ry y0)).
 
-Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : ball ry y0 (picard'' f x).
+Lemma picard_sy (f : UniformlyContinuous sx sy) (x : sx) : ball (proj1_sig ry) y0 (picard'' f x).
 Proof.
 destruct x as [x x_sx]. unfold picard''; simpl.
 unfold restrict, Basics.compose; simpl.
@@ -524,13 +527,13 @@ rewrite rings.negate_plus_distr, plus_assoc, rings.plus_negate_r, rings.plus_0_l
 transitivity ('(abs (x - x0) * M)).
 + apply int_abs_bound; [apply _ |]. (* Should not be required *)
   intros t A.
-  assert (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) rx x0 t) as A1.
+  assert (@mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0 t) as A1.
   apply (mspc_ball_convex x0 x).
   apply (@mspc_refl Q). exact (msp_mspc_ball_ext Q_as_MetricSpace).
   apply (proj2_sig rx). trivial. trivial.
   apply (extend_inside (Y:=CR)) in A1.
   destruct A1 as [p A1]. rewrite A1. apply bounded.
-+ apply CRle_Qle. change (abs (x - x0) * M ≤ ry). transitivity (`rx * M).
++ apply CRle_Qle. change (abs (x - x0) * M ≤ proj1_sig ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
   - apply rx_M.
 Qed.
@@ -538,46 +541,46 @@ Qed.
 (*Require Import Integration.*)
 
 Definition picard (f : @UniformlyContinuous sx
-        (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-        sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)))
+        (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+        sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)))
   : @UniformlyContinuous sx
-           (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+           (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
            sy
-           (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)).
+           (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)).
 Proof.
 set (g := picard'' f).
 set (h x := exist _ (g x) (picard_sy f x)).
 assert (@IsUniformlyContinuous sx
-      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-      sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)) h
+      (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+      sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)) h
       (@uc_mu sx
-         (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0)) CR
+         (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0)) CR
          (msp_mspc_ball CR) g)) as C.
 { constructor.
   + exact (@uc_pos sx
                 _ CR (msp_mspc_ball CR) g _
                 (@uc_proof sx
-                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                   (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                    CR (msp_mspc_ball CR) g)).
   + intros e x1 x2 e_pos A.
     exact (@uc_prf sx _ CR (msp_mspc_ball CR) g _
                   (@uc_proof sx
-                     (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
+                     (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
                      CR (msp_mspc_ball CR) g) e x1 x2 e_pos A). }
 exact (Build_UniformlyContinuous _ _ C).
 Defined.
 
-Global Instance picard_contraction : IsContraction picard (L * rx).
+Global Instance picard_contraction : IsContraction picard (L * proj1_sig rx).
 Proof.
 constructor; [| exact L_rx].
 constructor; [solve_propholds |].
 intros f1 f2 e A [x ?].
-change (ball (L * rx * e) (picard' f1 x) (picard' f2 x)).
+change (ball (L * proj1_sig rx * e) (picard' f1 x) (picard' f2 x)).
 unfold picard'. apply mspc_ball_CRplus_l, mspc_ball_CRabs.
 rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
 + apply int_abs_bound; [apply _ |]. (* remove [apply _] *)
   intros x' B.
-  assert (@ball Q (msp_mspc_ball Q_as_MetricSpace)  rx x0 x') as B1.
+  assert (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0 x') as B1.
   { apply (mspc_ball_convex x0 x). apply (@mspc_refl Q).
     exact (msp_mspc_ball_ext Q_as_MetricSpace). 
     solve_propholds. trivial. trivial. }
@@ -585,7 +588,8 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
   apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1]. rewrite !B1.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
   apply (lip_prf (λ y, v (_, y)) L), A.
-+ apply CRle_Qle. mc_setoid_replace (L * rx * e) with ((to_Q rx) * (L * e)) by ring.
++ apply CRle_Qle.
+  mc_setoid_replace (L * proj1_sig rx * e) with ((proj1_sig rx) * (L * e)) by ring.
   assert (0 ≤ e).
   { apply (@radius_nonneg
              _ _
@@ -597,15 +601,15 @@ rewrite <- int_minus. transitivity ('(abs (x - x0) * (L * e))).
                                (msp_mspc_ball_ext Q_as_MetricSpace) rx x0)
                 _ _ ) 
              f1 f2 e A). } 
-  change ((abs (x - x0) * (L * e)) ≤ ((to_Q rx) * (L * e))).
+  change ((abs (x - x0) * (L * e)) ≤ ((proj1_sig rx) * (L * e))).
   apply (orders.order_preserving (.* (L * e))).
   now apply mspc_ball_Qabs_flip.
 Qed.
 
 Program Definition f0 :
  @UniformlyContinuous sx
-        (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-        sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+        (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+        sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
   :=
   Build_UniformlyContinuous (λ x, y0) (λ e, Qinf.infinite) _.
 Next Obligation.
@@ -619,7 +623,7 @@ constructor.
 Qed.
 
 Lemma ode_solution
-  : let f := @fp _ _ _ uc_msd uc_msc _ picard (L * rx) picard_contraction f0 in
+  : let f := @fp _ _ _ uc_msd uc_msc _ picard (L * proj1_sig rx) picard_contraction f0 in
     picard f = f.
 Proof. apply banach_fixpoint. Qed.
 
@@ -634,8 +638,8 @@ Definition y0 : CR := 1.
 Definition rx : QnonNeg := (1 # 2)%Qnn.
 Definition ry : QnonNeg := 1.
 
-Notation sx := (sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) rx x0)). (* Why does Coq still print {x | ball rx x0 x} in full? *)
-Notation sy := (sig (@ball CR (msp_mspc_ball CR) ry y0)).
+Notation sx := (sig (@ball Q (msp_mspc_ball Q_as_MetricSpace) (proj1_sig rx) x0)). (* Why does Coq still print {x | ball rx x0 x} in full? *)
+Notation sy := (sig (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)).
 
 Definition v (z : sx * sy) : CR := ` (snd z).
 Definition M : Q := 2.
@@ -646,8 +650,8 @@ Instance : Bounded v M.
 Proof.
 intros [x [y H]]. unfold v; simpl. unfold M, ry, y0 in *.
 apply mspc_ball_CRabs in H.
-(* MS: why is this taking ages? *)
-apply <- (CRdistance_CRle 1) in H. destruct H as [H1 H2].
+pose proof (CRdistance_CRle 1 1 y) as [_ H1].
+specialize (H1 H). destruct H1 as [H1 H2].
 change (1 - 1 ≤ y) in H1. change (y ≤ 1 + 1) in H2. change (abs y ≤ 2).
 rewrite plus_negate_r in H1. apply CRabs_AbsSmall. split; [| assumption].
 change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.
@@ -657,7 +661,7 @@ Qed.
 Instance : @IsUniformlyContinuous
              _ (@Linf_product_metric_space_ball
                   _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a))
-                  _ (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) ry y0)) )
+                  _ (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)) )
            CR (msp_mspc_ball CR) 
            v mu_v.
 Proof.
@@ -673,14 +677,15 @@ constructor.
 * intros y1 y2 e H. unfold L; rewrite mult_1_l. apply H.
 Qed.
 
-Lemma L_rx : L * rx < 1.
+Lemma L_rx : L * proj1_sig rx < 1.
 Proof.
 unfold L, rx; simpl. rewrite mult_1_l. change (1 # 2 < 1)%Q. auto with qarith.
 Qed.
 
-Instance rx_M : PropHolds (`rx * M ≤ ry).
+Instance rx_M : PropHolds (proj1_sig rx * M ≤ proj1_sig ry).
 Proof.
-unfold rx, ry, M; simpl. rewrite Qmake_Qdiv. change (1 * / 2 * 2 <= 1)%Q.
+  unfold rx, ry, M; simpl.
+  rewrite Qmake_Qdiv. change (1 * / 2 * 2 <= 1)%Q.
 rewrite <- Qmult_assoc, Qmult_inv_l; [auto with qarith | discriminate].
 Qed.
 
@@ -706,22 +711,22 @@ Check _ : IsContraction (picard x0 y0 rx ry v rx_M) (L * rx).*)
 
 Let f
   : @UniformlyContinuous
-      sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-      sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+      sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+      sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
   := @fp _ _
          (@Linf_func_metric_space_class
             sx sy
             (@UniformlyContinuous
-               sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-               sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)))
+               sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+               sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)))
             (@uniformly_continuous_func
-               sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball rx x0))
-               sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0)))
+               sx (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball (proj1_sig rx) x0))
+               sy (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0)))
             (@sig_nonempty Q (msp_mspc_ball Q_as_MetricSpace)
                            (msp_mspc_ball_ext Q_as_MetricSpace) rx x0)
-            (@sig_mspc_ball CR (msp_mspc_ball CR) (ball ry y0))
+            (@sig_mspc_ball CR (msp_mspc_ball CR) (ball (proj1_sig ry) y0))
             (@sig_mspc CR (msp_mspc_ball CR) (msp_mspc_ball_ext CR)
-                       (ball ry y0)))
+                       (ball (proj1_sig ry) y0)))
          (uc_msd x0 y0 rx ry) (uc_msc x0 y0 rx ry)
          _
          (@picard x0 y0 rx ry v M Bounded_instance_0 0 0 mu_v

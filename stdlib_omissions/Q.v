@@ -1,5 +1,6 @@
 Require Import
-  Coq.QArith.QArith Coq.ZArith.ZArith Coq.NArith.NArith Coq.QArith.Qpower Coq.QArith.Qround
+  Coq.QArith.QArith Coq.ZArith.ZArith Coq.NArith.NArith
+  Coq.QArith.Qpower Coq.QArith.Qround
   Coq.QArith.Qround Coq.QArith.Qabs CoRN.stdlib_omissions.List.
 
 Require CoRN.stdlib_omissions.Z.
@@ -516,3 +517,21 @@ Definition QNoDup (l: list Q): Prop := NoDup (map Qred l).
 
 Instance: Proper (Qeq ==> eq) Qred.
 Proof. repeat intro. apply Qred_complete. assumption. Qed.
+
+Lemma Qsmallest_less_average : forall a b : Q, a < b -> a < (a + b) * (1#2).
+Proof.
+  intros. apply (Qmult_lt_r _ _ (2#1)).
+  reflexivity. 
+  rewrite <- Qmult_assoc, (Qmult_comm (1#2)), Qmult_inv_r .
+  apply (Qplus_lt_l _ _ (-a)).
+  ring_simplify. exact H. discriminate.
+Qed.
+
+Lemma Qaverage_less_greatest : forall a b : Q, a < b -> (a + b) * (1#2) < b.
+Proof.
+  intros. apply (Qmult_lt_r _ _ (2#1)).
+  reflexivity. 
+  rewrite <- Qmult_assoc, (Qmult_comm (1#2)), Qmult_inv_r .
+  apply (Qplus_lt_l _ _ (-b)).
+  ring_simplify. exact H. discriminate.
+Qed.

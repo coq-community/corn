@@ -19,6 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.fast.CRArith.
 Require Import Coq.QArith.Qpower.
@@ -47,7 +49,7 @@ Variable n : N.
 Definition Qpower_N_modulus (c:Qpos) (e:Qpos) : QposInf :=
   match n with 
   | N0 => QposInfinity
-  | Npos p => Qpos2QposInf (e/((p#1)*c^(Z.pred p)))
+  | Npos p => Qpos2QposInf (e* Qpos_inv ((p#1)*Qpos_power c (Z.pred p)))
   end.
 
 Lemma Qpower_positive_correct : forall p q, (inj_Q IR (Qpower_positive q p)[=]((FId{^}(nat_of_P p)) (inj_Q IR q) I)).
@@ -88,23 +90,23 @@ Proof.
   simpl. intros e x y E. now apply ball_refl.
  destruct (p_is_some_anti_convert p) as [m Hm].
  assert (X:=(fun I pI => Derivative_nth I pI _ _ (Derivative_id I pI) m)).
- assert (-c < c)%Q.
+ assert (- proj1_sig c < proj1_sig c)%Q.
   rewrite -> Qlt_minus_iff.
   ring_simplify.
-  change (0 < ((2#1)*c)%Qpos).
-  apply Qpos_prf.
+  change (0 < proj1_sig ((2#1)*c)%Qpos).
+  apply Qpos_ispos.
   apply (fun x => @is_UniformlyContinuousFunction_wd
-                 Q_as_MetricSpace Q_as_MetricSpace (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus ((p#1)*c^(Z.pred p))%Qpos)).
+                 Q_as_MetricSpace Q_as_MetricSpace (fun x : Q_as_MetricSpace => Qpower_positive (QboundAbs c x) p) x (Qscale_modulus (proj1_sig ((p#1)*Qpos_power c (Z.pred p))%Qpos))).
   reflexivity.
   intros x.
-  generalize ((p # 1) * c ^ Z.pred p)%Qpos.
-  apply Qpos_positive_numerator_rect.
-  intros qn qd.
+  generalize ((p # 1) * Qpos_power c (Z.pred p))%Qpos.
+  intros [[qn qd] qpos].
+  destruct qn as [|qn|qn]. inversion qpos. 2: inversion qpos.
   simpl.
-  autorewrite with QposElim.
   rewrite -> Qmult_comm.
   apply Qle_refl.
- apply (is_UniformlyContinuousD_Q (Some (-c)) (Some (c:Q)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
+  apply (is_UniformlyContinuousD_Q
+           (Some (-proj1_sig c)) (Some (proj1_sig c)) H _ _ (X _ _) (fun x => Qpower_positive x p)).
   simpl.
   intros q _ Hq.
   csetoid_rewrite (Qpower_positive_correct p q).
@@ -116,8 +118,8 @@ Proof.
  simpl.
  intros x _ Hx.
  change (AbsIR ((nring (R:=IR) (S m))[*]([1][*]nexp IR m (inj_Q IR x)))[<=]
-   inj_Q IR (((p # 1)[*]((c ^ Z.pred p)%Qpos:Q)))).
- stepr ((inj_Q IR ((p # 1))[*](inj_Q IR ((c ^ Z.pred p)%Qpos:Q)))); [| now
+   inj_Q IR (((p # 1)[*](proj1_sig (Qpos_power c (Z.pred p)))))).
+ stepr ((inj_Q IR ((p # 1))[*](inj_Q IR (proj1_sig (Qpos_power c (Z.pred p)))))); [| now
    (apply eq_symmetric; apply inj_Q_mult)].
  stepl ((nring (R:=IR) (S m)[*]AbsIR ([1][*]nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult;apply nring_nonneg; auto with *].
  apply mult_resp_leEq_both.
@@ -132,7 +134,7 @@ Proof.
  stepl ([1][*](AbsIR (nexp IR m (inj_Q IR x)))); [| now apply AbsIR_mult; apply less_leEq; apply pos_one].
  stepl (AbsIR (nexp IR m (inj_Q _ x))); [| now apply eq_symmetric; apply one_mult].
  stepl (nexp IR m (AbsIR (inj_Q _ x))); [| now apply eq_symmetric; apply AbsIR_nexp].
- stepr (inj_Q IR (c ^ Z.pred p)); [| now apply inj_Q_wd; reflexivity].
+ stepr (inj_Q IR (proj1_sig (Qpos_power c (Z.pred p)))); [| now apply inj_Q_wd; reflexivity].
  rewrite Hm.
  rewrite <- POS_anti_convert.
  rewrite inj_S.
@@ -146,13 +148,13 @@ Proof.
  rewrite  <- (nat_of_P_o_P_of_succ_nat_eq_succ m).
  rewrite convert_is_POS.
  simpl.
- stepr ((FId{^}(nat_of_P (P_of_succ_nat m))) (inj_Q IR (c:Q)) I); [| now apply eq_symmetric; apply Qpower_positive_correct].
+ stepr ((FId{^}(nat_of_P (P_of_succ_nat m))) (inj_Q IR (proj1_sig c)) I); [| now apply eq_symmetric; apply Qpower_positive_correct].
  simpl.
  apply: power_resp_leEq.
   apply AbsIR_nonneg.
  apply AbsSmall_imp_AbsIR.
  destruct Hx; split; try assumption.
- stepl (inj_Q IR (-c)).
+ stepl (inj_Q IR (-proj1_sig c)).
   assumption.
  apply inj_Q_inv.
 Qed.
@@ -165,19 +167,19 @@ Definition CRpower_N_bounded (c:Qpos) : CR --> CR :=
 Cmap QPrelengthSpace (Qpower_N_uc c).
 
 Lemma CRpower_N_bounded_correct : forall (c:Qpos) x, 
-  AbsSmall (inj_Q _ (c:Q)) x -> (IRasCR (x[^](nat_of_N n))==CRpower_N_bounded c (IRasCR x))%CR.
+  AbsSmall (inj_Q _ (proj1_sig c)) x -> (IRasCR (x[^](nat_of_N n))==CRpower_N_bounded c (IRasCR x))%CR.
 Proof.
  intros c x Hx.
- pose (I:=(clcr [--](inj_Q IR (c:Q)) (inj_Q IR (c:Q)))).
- assert (Hc: [0][<]inj_Q IR (c:Q)).
+ pose (I:=(clcr [--](inj_Q IR (proj1_sig c)) (inj_Q IR (proj1_sig c)))).
+ assert (Hc: [0][<]inj_Q IR (proj1_sig c)).
   stepl (inj_Q IR [0]).
    apply inj_Q_less.
-   apply Qpos_prf.
+   apply Qpos_ispos.
   apply (inj_Q_nring IR 0).
  assert (HI:proper I).
   simpl.
   apply shift_zero_less_minus'.
-  rstepr (inj_Q IR (c:Q)[+]inj_Q IR (c:Q)).
+  rstepr (inj_Q IR (proj1_sig c)[+]inj_Q IR (proj1_sig c)).
   apply plus_resp_pos; assumption.
  rename I into temp.
  change (x[^](nat_of_N n)) with ((FId{^}(nat_of_N n)) x True_constr).
@@ -193,12 +195,12 @@ Proof.
   rewrite -> MonadLaw3.
   rewrite -> CReq_Qeq.
   simpl.
-  setoid_replace (Qmin c q) with q.
-   setoid_replace (Qmax (- c) q) with q.
+  setoid_replace (Qmin (proj1_sig c) q) with q.
+   setoid_replace (Qmax (- proj1_sig c) q) with q.
     reflexivity.
    rewrite <- Qle_max_r.
    apply leEq_inj_Q with IR.
-   stepl [--](inj_Q IR (c:Q)); [| now apply eq_symmetric; apply inj_Q_inv].
+   stepl [--](inj_Q IR (proj1_sig c)); [| now apply eq_symmetric; apply inj_Q_inv].
    destruct Hq; assumption.
   rewrite <- Qle_min_r.
   apply leEq_inj_Q with IR.
@@ -210,7 +212,7 @@ Proof.
 Qed.
 
 Lemma CRpower_N_bounded_weaken : forall (c1 c2:Qpos) x,
-((AbsSmall ('c1) x) -> (c1 <= c2)%Q ->
+((AbsSmall ('proj1_sig c1) x) -> (proj1_sig c1 <= proj1_sig c2)%Q ->
 CRpower_N_bounded c1 x == CRpower_N_bounded c2 x)%CR.
 Proof.
  intros c1 c2 x Hx Hc.
@@ -220,15 +222,15 @@ Proof.
   symmetry.
   apply CRpower_N_bounded_correct.
   rewrite -> IR_AbsSmall_as_CR.
-  stepl ('c1)%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
+  stepl ('proj1_sig c1)%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
   stepr x; [| now simpl; symmetry; apply CRasIRasCR_id].
   assumption.
  apply CRpower_N_bounded_correct.
- apply AbsSmall_leEq_trans with (inj_Q IR (c1:Q)).
+ apply AbsSmall_leEq_trans with (inj_Q IR (proj1_sig c1)).
   apply inj_Q_leEq.
   assumption.
  rewrite -> IR_AbsSmall_as_CR.
- stepl ('c1)%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
+ stepl (' proj1_sig c1)%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
  stepr x; [| now simpl; symmetry; apply CRasIRasCR_id].
  assumption.
 Qed.
@@ -240,11 +242,11 @@ Instance CRpower_N: Pow CR N := λ x n, ucFun (CRpower_N_bounded n (CR_b (1#1) x
 Arguments CRpower_N x%type n%N.
 
 Lemma CRpower_N_bounded_N_power : forall (n : N) (c:Qpos) (x:CR),
-((AbsSmall ('c) x) ->
+((AbsSmall ('proj1_sig c) x) ->
 CRpower_N_bounded n c x == CRpower_N x n)%CR.
 Proof.
  intros n c x Hc.
- assert (Hx:(AbsSmall ('(CR_b (1#1) x)) x)%CR).
+ assert (Hx:(AbsSmall ('proj1_sig (CR_b (1#1) x)) x)%CR).
   split.
    rewrite -> CRopp_Qopp.
    apply CR_b_lowerBound.
@@ -253,7 +255,7 @@ Proof.
  generalize (CR_b (1#1) x) Hx.
  clear Hx.
  intros d Hd.
- destruct (Qle_total c d);[|symmetry]; apply CRpower_N_bounded_weaken; assumption.
+ destruct (Qle_total (proj1_sig c) (proj1_sig d));[|symmetry]; apply CRpower_N_bounded_weaken; assumption.
 Qed.
 
 Lemma CRpower_N_correct : forall n x, (IRasCR (x[^](nat_of_N n))==CRpower_N (IRasCR x) n)%CR.
@@ -261,7 +263,7 @@ Proof.
  intros n x.
  apply CRpower_N_bounded_correct.
  rewrite -> IR_AbsSmall_as_CR.
- stepl ('(CR_b (1#1) (IRasCR x)))%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
+ stepl ('proj1_sig (CR_b (1#1) (IRasCR x)))%CR; [| now simpl; symmetry; apply IR_inj_Q_as_CR].
  split.
   rewrite -> CRopp_Qopp.
   apply CR_b_lowerBound.

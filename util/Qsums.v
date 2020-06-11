@@ -1,6 +1,8 @@
 Require Import
   CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano
-  Coq.QArith.QArith Coq.QArith.Qabs CoRN.model.structures.Qpossec CoRN.model.metric2.Qmetric
+  Coq.QArith.QArith Coq.QArith.Qabs
+  CoRN.model.totalorder.QposMinMax 
+  CoRN.model.metric2.Qmetric
   Coq.Program.Program
   CoRN.stdlib_omissions.N
   CoRN.stdlib_omissions.Z
@@ -10,8 +12,6 @@ Set Automatic Introduction.
 Set Automatic Introduction.
 
 Open Scope Q_scope.
-
-Coercion nat_of_P: positive >-> nat.
 
 Definition Qsum := fold_right Qplus 0.
 
@@ -121,30 +121,33 @@ Proof.
 Qed.
 
 Lemma Σ_Qball (f g: nat -> Q) (e: Qpos) (n: nat):
-  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= e / inject_Z (Z.of_nat n)) ->
+  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= proj1_sig e / inject_Z (Z.of_nat n)) ->
   Qball e (Σ n f) (Σ n g).
 Proof with auto.
  intro H.
  apply Qball_Qabs.
- destruct n. simpl. auto.
+ destruct n. simpl. apply Qpos_nonneg.
  rewrite Σ_sub.
- setoid_replace (QposAsQ e) with (inject_Z (Z.of_nat (S n)) * (/ inject_Z (Z.of_nat (S n)) * e)).
+ setoid_replace (proj1_sig e)
+   with (inject_Z (Z.of_nat (S n)) * (/ inject_Z (Z.of_nat (S n)) * proj1_sig e)).
   apply Σ_abs_le.
   intros ? E.
   specialize (H x E).
-  simpl QposAsQ in *.
   rewrite Qmult_comm.
   assumption.
+  unfold canonical_names.equiv, stdlib_rationals.Q_eq.
  field. discriminate.
 Qed.
 
 Lemma Σ_Qball_pos_bounds (f g: nat -> Q) (e: Qpos) (n: positive):
-  (forall i: nat, (i < n)%nat -> Qball (e / n) (f i) (g i)) ->
-  Qball e (Σ n f) (Σ n g).
+  (forall i: nat, (i < Pos.to_nat n)%nat -> Qball (e * (1#n)) (f i) (g i)) ->
+  Qball e (Σ (Pos.to_nat n) f) (Σ (Pos.to_nat n) g).
 Proof with intuition.
  intros. apply Σ_Qball. intros.
- setoid_replace (e / inject_Z (Z.of_nat (nat_of_P n))) with (e / n)%Qpos.
+ setoid_replace (proj1_sig e / inject_Z (Z.of_nat (nat_of_P n)))
+   with (proj1_sig (e * (1#n))%Qpos).
   apply Qball_Qabs...
+  unfold canonical_names.equiv, stdlib_rationals.Q_eq.
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P...
 Qed.
 
@@ -167,7 +170,7 @@ Proof with auto with *.
 Qed.
 
 Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):
-  Σ n f == Σ (k * n) (f ∘ flip Nat.div k) / inject_Z (Zpos k).
+  Σ n f == Σ (Pos.to_nat k * n) (f ∘ flip Nat.div (Pos.to_nat k)) / inject_Z (Zpos k).
 Proof.
  rewrite <- Qmult_Σ.
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P.
@@ -175,11 +178,11 @@ Proof.
 Qed.
 
 Lemma Qball_hetero_Σ (n m: positive) f g e:
- (forall i: nat, (i < (n * m)%positive)%nat ->
-   Qball (e / (n * m)%positive)
-     (/ inject_Z (Zpos m) * f (i / m)%nat)
-     (/ inject_Z (Zpos n) * g (i / n)%nat)) ->
-   Qball e (Σ n f) (Σ m g).
+ (forall i: nat, (i < Pos.to_nat (n * m)%positive)%nat ->
+   Qball (e * (1# (n * m)%positive))
+     (/ inject_Z (Zpos m) * f (i / Pos.to_nat m)%nat)
+     (/ inject_Z (Zpos n) * g (i / Pos.to_nat n)%nat)) ->
+   Qball e (Σ (Pos.to_nat n) f) (Σ (Pos.to_nat m) g).
 Proof.
  intros.
  rewrite (Σ_multiply_bound (nat_of_P n) m).

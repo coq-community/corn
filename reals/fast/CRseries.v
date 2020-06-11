@@ -20,6 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.Program.Program.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
@@ -98,8 +101,9 @@ Proof.
  clear b Hb.
  induction H; intros b Hb.
   left.
-  abstract ( destruct e as [e|];[|apply ForAll_True]; assert (Heq:e==((e*Qpos_inv x)*x)%Qpos);[
-    autorewrite with QposElim; field; apply Qpos_nonzero
+  abstract ( destruct e as [e|];[|apply ForAll_True];
+             assert (Heq:proj1_sig e== proj1_sig ((e*Qpos_inv x)*x)%Qpos);[
+    simpl; field; apply Qpos_nonzero
       |rewrite -> (NearBy_comp _ _ (Qeq_refl 0) _ _ Heq ); apply (mult_Streams_nbz H Hb)] ).
  right.
  simpl.
@@ -239,7 +243,7 @@ Proof.
  discriminate.
 Qed.
 
-Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (1#1)%Qpos (powers_help a x).
+Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (Qpos2QposInf (1#1)) (powers_help a x).
 Proof.
  cofix powers_help_nbz.
  intros b [Hb0 Hb1].
@@ -260,7 +264,7 @@ Proof.
  apply: mult_resp_leEq_both; assumption.
 Qed.
 
-Lemma powers_nbz : NearBy 0 (1#1)%Qpos (powers a).
+Lemma powers_nbz : NearBy 0 (Qpos2QposInf (1#1)) (powers a).
 Proof.
  apply powers_help_nbz.
  split; discriminate.
@@ -335,25 +339,27 @@ Qed.
 
 (** The limit of [recip_positives] is 0. *)
 Lemma Qrecip_positives_help_nbz : forall (x: Qpos) (q:positive),
- (Qden x <= q)%Z -> NearBy 0 x (map (fun x => 1#x) (ppositives_help q)).
+ (Qden (proj1_sig x) <= q)%Z -> NearBy 0 (Qpos2QposInf x) (map (fun x => 1#x) (ppositives_help q)).
 Proof.
- intro x.
- destruct (Qpos_as_positive_ratio x) as [[n d] U].
- subst.
- simpl.
- cofix Qrecip_positives_help_nbz.
- intros q Hpq.
+  assert (∀ (q n d : positive),
+    (d <= q)%Z
+    → NearBy 0 (Qpos2QposInf (n # d)) (map (λ x : positive, 1 # x) (ppositives_help q))).
+ { cofix Qrecip_positives_help_nbz.
+ intros q n d Hpq.
  constructor.
-  simpl.
+ - simpl.
   unfold Qball, QAbsSmall.
   setoid_replace ((1#q)-0)%Q with (1#q). 2: ring.
   split. discriminate.
   change (1*d <= n*q)%Z.
    apply Zmult_le_compat; auto with *.
- apply: Qrecip_positives_help_nbz.
+ - apply: Qrecip_positives_help_nbz.
  clear Qrecip_positives_help_nbz.
  rewrite Zpos_succ_morphism.
- auto with *.
+ auto with *. }
+ intros. destruct x as [[n d] xpos].
+ destruct n as [|n|n]. inversion xpos. 2: inversion xpos.
+ apply H. exact H0.
 Qed.
 
 Lemma Qrecip_positives_help_Exists : forall P n p, 
@@ -441,8 +447,8 @@ Proof.
  apply Zmult_reg_l with (nat_of_P b:Z); [rewrite inject_nat_convert; auto with *|].
  do 2 rewrite <- (inj_mult (nat_of_P b)).
  apply inj_eq.
- rewrite (mult_assoc (nat_of_P b) (nat_of_P a)).
- rewrite <- nat_of_P_mult_morphism.
+ rewrite (Nat.mul_assoc (nat_of_P b) (nat_of_P a)).
+ rewrite <- Pos2Nat.inj_mul.
  rewrite <- pred_Sn in X.
  change (S (pred (nat_of_P b) + n))%nat with (S (pred (nat_of_P b)) + n)%nat.
  assert (Z:S (pred (nat_of_P b)) = nat_of_P b).

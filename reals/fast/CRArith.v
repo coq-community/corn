@@ -20,6 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.setoid_ring.Ring_theory.
 Require Import Coq.Setoids.Setoid.
 Require Import Coq.QArith.QArith.
@@ -53,7 +56,7 @@ Proof.
  split.
   intros H.
   destruct (Qlt_le_dec y x) as [X|X];[|assumption].
-  destruct (Qpos_lt_plus X) as [c Hc].
+  destruct (Qpos_sub _ _ X) as [c Hc].
   assert (Y:=(H ((1#2)*c)%Qpos)).
   simpl in Y.
   unfold Cap_raw in Y; simpl in Y.
@@ -109,14 +112,14 @@ Lemma Qap_CRap : forall (x y:Q), (~(x==y))%Q -> (' x)><(' y).
 Proof.
  intros x y Hxy.
  destruct (Q_dec x y) as [[H|H]|H]; try contradiction;
-   destruct (Qpos_lt_plus H) as [c Hc];[left|right]; exists c; abstract (rewrite -> CRminus_Qminus;
+   destruct (Qpos_sub _ _ H) as [c Hc];[left|right]; exists c; abstract (rewrite -> CRminus_Qminus;
      rewrite -> CRle_Qle; rewrite -> Hc; ring_simplify; apply Qle_refl).
 Defined.
 
 Lemma CRinv_Qinv : forall (x:Q) x_, CRinvT (inject_Q_CR x) x_ == inject_Q_CR (/x)%Q.
 Proof.
  intros x [[c x_]|[c x_]];
-   [change (' c <= 0 + - 'x)%CR in x_|change (' c <= ' x + - 0)%CR in x_]; unfold CRinvT;
+   [change (' proj1_sig c <= 0 + - 'x)%CR in x_|change (' proj1_sig c <= ' x + - 0)%CR in x_]; unfold CRinvT;
      rewrite -> CRopp_Qopp, CRplus_Qplus, CRle_Qle in x_; try rewrite -> CRopp_Qopp;
        rewrite -> (@CRinv_pos_Qinv c).
     rewrite -> CRopp_Qopp.
@@ -125,7 +128,7 @@ Proof.
      intros H.
      rewrite -> H in x_.
      apply (Qle_not_lt _ _ x_).
-     apply Qpos_prf.
+     apply Qpos_ispos.
     field.
     intros X; apply H.
     assumption.
@@ -255,7 +258,7 @@ Proof.
   intros H.
   assert (x == x - 0)%CR. ring. rewrite -> H0.
   assumption.
- apply CRle_trans with (' c)%CR; auto with *.
+ apply CRle_trans with (' proj1_sig c)%CR; auto with *.
  rewrite -> CRle_Qle; auto with *.
 Qed.
 
@@ -267,12 +270,13 @@ Proof.
   intros H.
   assert (0 - x == -x)%CR. ring. rewrite -> H0 in H.
   intros e.
-  rewrite <- (Qopp_involutive e).
+  rewrite <- (Qopp_involutive (proj1_sig e)).
   rewrite <- (Qopp_involutive (approximate x e)).
   apply Qopp_le_compat.
   apply H.
- apply CRle_trans with ('(-c)%Q)%CR; auto with *.
- rewrite -> CRle_Qle; auto with *.
+ apply CRle_trans with ('(-proj1_sig c)%Q)%CR; auto with *.
+ rewrite -> CRle_Qle. 
+ apply (Qopp_le_compat 0). apply Qpos_nonneg.
 Qed.
 
 (** Now that we have ring-ness, we can easily prove some auxiliary utility lemmas about operations on CR. *)
@@ -313,7 +317,8 @@ Proof. reflexivity. Qed.
 Lemma CRnonNeg_CRplus (x y: CR): CRnonNeg x -> CRnonNeg y -> CRnonNeg (x + y)%CR.
 Proof.
  unfold CRnonNeg. intros. rewrite approximate_CRplus.
- setoid_replace (- e)%Q with (- ((1#2)*e)%Qpos + - ((1#2)*e)%Qpos)%Q by (simpl; ring).
+ setoid_replace (- proj1_sig e)%Q
+   with (- proj1_sig ((1#2)*e)%Qpos + - proj1_sig ((1#2)*e)%Qpos)%Q by (simpl; ring).
  apply Qplus_le_compat; auto.
 Qed.
 
@@ -369,23 +374,24 @@ Proof with auto.
  apply Qlt_le_trans with x0...
 Qed.
 
-Lemma in_CRball (r: Qpos) (x y : CR): x - ' r <= y /\ y <= x + ' r <-> ball r x y.
+Lemma in_CRball (r: Qpos) (x y : CR)
+  : x - ' proj1_sig r <= y /\ y <= x + ' proj1_sig r <-> ball r x y.
   (* A characterization of ball in terms of <=, similar to CRAbsSmall. *)
 Proof with intuition.
  intros.
- cut (AbsSmall (' r) (x - y) <-> (x - ' r <= y /\ y <= x + ' r)).
+ cut (AbsSmall (' proj1_sig r) (x - y) <-> (x - ' proj1_sig r <= y /\ y <= x + ' proj1_sig r)).
   pose proof (CRAbsSmall_ball x y r)...
  unfold AbsSmall.
  simpl.
- setoid_replace (x - y <= ' r) with (x - ' r <= y).
-  setoid_replace (- ' r <= x - y) with (y <= x + ' r).
+ setoid_replace (x - y <= ' proj1_sig r) with (x - ' proj1_sig r <= y).
+  setoid_replace (- ' proj1_sig r <= x - y) with (y <= x + ' proj1_sig r).
    intuition.
-  rewrite (CRplus_le_r (- ' r) (x - y) ('r + y)).
-  assert (- ' r + (' r + y) == y) as E by ring. rewrite E.
-  assert (x - y + (' r + y) == x + ' r)%CR as F by ring. rewrite F...
- rewrite (CRplus_le_r (x - y) (' r) (y - 'r)).
- assert (x - y + (y - ' r) == x - ' r) as E by ring. rewrite E.
- assert (' r + (y - ' r) == y) as F by ring. rewrite F...
+  rewrite (CRplus_le_r (- ' proj1_sig r) (x - y) ('proj1_sig r + y)).
+  assert (- ' proj1_sig r + (' proj1_sig r + y) == y) as E by ring. rewrite E.
+  assert (x - y + (' proj1_sig r + y) == x + ' proj1_sig r)%CR as F by ring. rewrite F...
+ rewrite (CRplus_le_r (x - y) (' proj1_sig r) (y - 'proj1_sig r)).
+ assert (x - y + (y - ' proj1_sig r) == x - ' proj1_sig r) as E by ring. rewrite E.
+ assert (' proj1_sig r + (y - ' proj1_sig r) == y) as F by ring. rewrite F...
 Qed.
 
   (* And the same for gball: *)
@@ -466,19 +472,19 @@ Qed.
 Lemma CRlt_le_weak (x y: CR): (x < y -> x <= y)%CR.
 Proof. intros. apply CRpos_nonNeg. assumption. Qed.
 
-Lemma lower_CRapproximation (x: CR) (e: Qpos): ' (approximate x e - e)%Q <= x.
+Lemma lower_CRapproximation (x: CR) (e: Qpos): ' (approximate x e - proj1_sig e)%Q <= x.
 Proof.
  intros. rewrite <- CRminus_Qminus.
- apply CRplus_le_r with ('e)%CR.
+ apply CRplus_le_r with ('proj1_sig e)%CR.
  ring_simplify. rewrite CRplus_comm.
  apply in_CRball, ball_approx_r.
 Qed.
 
-Lemma upper_CRapproximation (x: CR) (e: Qpos): x <= ' (approximate x e + e)%Q.
+Lemma upper_CRapproximation (x: CR) (e: Qpos): x <= ' (approximate x e + proj1_sig e)%Q.
 Proof.
  intros. rewrite <- CRplus_Qplus.
- apply CRplus_le_r with (-'e)%CR.
- assert (' approximate x e + 'e - 'e == ' approximate x e)%CR as E by ring. rewrite E.
+ apply CRplus_le_r with (-'proj1_sig e)%CR.
+ assert (' approximate x e + 'proj1_sig e - 'proj1_sig e == ' approximate x e)%CR as E by ring. rewrite E.
  apply (in_CRball e x ('approximate x e)), ball_approx_r.
 Qed.
 
@@ -488,16 +494,17 @@ Lemma CRlt_Qmid (x y: CR): x < y -> sigT (λ q: Q, x < 'q and 'q < y).
 Proof with auto.
  intros [q E].
  set (quarter := ((1#4)*q)%Qpos).
- exists (quarter + (approximate x quarter + quarter))%Q.
+ exists (proj1_sig quarter + (approximate x quarter + proj1_sig quarter))%Q.
  split.
-  apply CRle_lt_trans with (' (0 + (approximate x quarter + quarter))%Q)%CR...
+  apply CRle_lt_trans with (' (0 + (approximate x quarter + proj1_sig quarter))%Q)%CR...
    rewrite Qplus_0_l...
   apply CRlt_Qlt.
   apply Qplus_lt_l...
- apply CRlt_le_trans with (x + 'q)%CR.
-  apply CRlt_le_trans with (' (approximate x quarter - quarter + q)%Q)%CR.
+ apply CRlt_le_trans with (x + 'proj1_sig q)%CR.
+  apply CRlt_le_trans with (' (approximate x quarter - proj1_sig quarter + proj1_sig q)%Q)%CR.
    apply CRlt_Qlt.
-   setoid_replace (QposAsQ q) with (quarter + quarter + quarter + quarter)%Q.
+   setoid_replace (proj1_sig q)
+     with (proj1_sig quarter + proj1_sig quarter + proj1_sig quarter + proj1_sig quarter)%Q.
     ring_simplify.
     apply Qplus_lt_l.
     apply Qmult_lt_compat_r...
@@ -507,7 +514,7 @@ Proof with auto.
   apply CRplus_le_compat...
   apply CRle_refl.
  apply CRplus_le_r with (-x)%CR.
- CRring_replace (x + 'q - x) ('q)...
+ CRring_replace (x + 'proj1_sig q - x) ('proj1_sig q)...
 Qed.
 
 Lemma CRle_not_lt (x y: CR): (x <= y)%CR <-> Not (y < x)%CR.
@@ -528,9 +535,7 @@ Qed.
 Lemma CRnonNeg_0: CRnonNeg (0)%CR.
 Proof.
  unfold CRnonNeg. simpl. intros.
- rewrite <- (Qopp_opp 0).
- apply Qopp_le_compat.
- change (0 <= e)%Q. auto.
+ apply (Qopp_le_compat 0). apply Qpos_nonneg.
 Qed.
 
 Hint Immediate CRnonNeg_0.
@@ -557,30 +562,31 @@ Lemma approximate_CRminus (x y: CR) (e: QposInf):
   (approximate x (Qpos2QposInf (1 # 2) * e)%QposInf - approximate y (Qpos2QposInf (1 # 2) * e)%QposInf)%Q.
 Proof. destruct e; reflexivity. Qed.
 
+
 Lemma CRnonNeg_criterion (x: CR): (forall q, (x <= ' q)%CR -> 0 <= q)%Q -> CRnonNeg x.
 Proof with auto with qarith.
  unfold CRle.
  unfold CRnonNeg.
  intros.
- apply Q.Qplus_le_l with e.
+ apply Q.Qplus_le_l with (proj1_sig e).
  ring_simplify.
  apply H.
  intros.
  rewrite approximate_CRminus.
  simpl.
- cut (approximate x ((1 # 2) * e0)%Qpos - approximate x e <= e0 + e)%Q.
-  intros.
-  apply Q.Qplus_le_l with (e0 + approximate x ((1#2)*e0)%Qpos - approximate x e)%Q.
-  ring_simplify...
- apply Qle_trans with (Qabs (approximate x ((1 # 2) * e0)%Qpos - approximate x e))%Q.
-  apply Qle_Qabs.
- apply Qle_trans with (((1#2)*e0)%Qpos + e)%Q...
+ cut (approximate x ((1 # 2) * e0)%Qpos - approximate x e <= proj1_sig e0 + proj1_sig e)%Q.
+ - intros.
+  apply Q.Qplus_le_l with (proj1_sig e0 + approximate x ((1#2)*e0)%Qpos - approximate x e)%Q.
+  simpl. ring_simplify... 
+ - apply Qle_trans with (Qabs (approximate x ((1 # 2) * e0)%Qpos - approximate x e))%Q.
+   apply Qle_Qabs.
+   apply Qle_trans with (proj1_sig ((1#2)*e0)%Qpos + proj1_sig e)%Q...
   pose proof (regFun_prf x ((1#2)*e0)%Qpos e).
   apply Qball_Qabs in H0...
  apply Qplus_le_compat.
   simpl.
-  rewrite <- (Qmult_1_r e0) at 2.
-  rewrite (Qmult_comm e0).
+  rewrite <- (Qmult_1_r (proj1_sig e0)) at 2.
+  rewrite (Qmult_comm (proj1_sig e0)).
   apply Qmult_le_compat_r...
  apply Qle_refl.
 Qed.
@@ -645,10 +651,10 @@ Proof. intros. do 2 rewrite <- CRmult_scale. ring. Qed.
 is clearly less than (-e), and returns Eq otherwise. *)
 Definition CR_epsilon_sign_dec (e:Qpos) (x:CR) : comparison :=
 let z := approximate x e in
- match Q.Qle_dec ((2#1) * e) z with
+ match Q.Qle_dec ((2#1) * proj1_sig e) z with
  | left p => Gt
  | right _ =>
-  match Q.Qle_dec z (-(2#1) * e)%Q with
+  match Q.Qle_dec z (-(2#1) * proj1_sig e)%Q with
   | left p => Datatypes.Lt
   | right _ => Eq
   end
@@ -661,12 +667,12 @@ Lemma CR_epsilon_sign_dec_pos : forall x,
 Proof.
  intros x [e H].
  apply (@CRpos_char e).
- abstract (unfold CR_epsilon_sign_dec in H; destruct (Q.Qle_dec ((2#1) * e) (approximate x e)) as [A|A];
-  [assumption | destruct (Q.Qle_dec (approximate x e) (- (2#1) * e)) as [B|B]; discriminate H]).
+ abstract (unfold CR_epsilon_sign_dec in H; destruct (Q.Qle_dec ((2#1) * proj1_sig e) (approximate x e)) as [A|A];
+  [assumption | destruct (Q.Qle_dec (approximate x e) (- (2#1) * proj1_sig e)) as [B|B]; discriminate H]).
 Defined.
 
 Lemma CR_epsilon_sign_dec_Gt (e:Qpos) (x:CR) : 
-  ((2#1) * e <= approximate x e)%Q -> CR_epsilon_sign_dec e x ≡ Gt.
+  ((2#1) * proj1_sig e <= approximate x e)%Q -> CR_epsilon_sign_dec e x ≡ Gt.
 Proof.
   intros.
   unfold CR_epsilon_sign_dec.
@@ -675,15 +681,18 @@ Qed.
 
 (* nasty because approximate is not Proper *)
 Lemma CR_epsilon_sign_dec_pos_rev (x : CR) (e : Qpos) :
-  ('e <= x)%CR -> CR_epsilon_sign_dec ((1#4) * e) x ≡ Gt.
+  ('proj1_sig e <= x)%CR -> CR_epsilon_sign_dec ((1#4) * e) x ≡ Gt.
 Proof.
   intros E.
   apply CR_epsilon_sign_dec_Gt.
-  apply Qplus_le_l with (-e)%Q.
-  simpl. setoid_replace ((2#1) * ((1 # 4) * e) + - e)%Q with (-((1#2) * e))%Q by QposRing.
+  apply Qplus_le_l with (-proj1_sig e)%Q.
+  simpl (2 * ` ((1 # 4)%Q ↾ eq_refl * e)%Qpos + - ` e)%Q.
+  setoid_replace ((2#1) * ((1 # 4) * proj1_sig e) + - proj1_sig e)%Q
+           with (-((1#2) * proj1_sig e))%Q
+    by ring.
   replace ((1#4) * e)%Qpos with ((1#2) * ((1#2) * e))%Qpos.
    now apply (E ((1#2) * e))%Qpos.
-  apply Qpos_PI.
+  apply Qpos_hprop.
   now destruct e as [[[ | | ] ?] ?].
 Qed.
 
@@ -696,7 +705,7 @@ Proof. apply (rings.from_stdlib_ring_theory CR_ring_theory). Qed.
 
 (* We need the (1#4) because CR_epsilon_sign_dec_pos_rev is nasty *)
 Instance CRlt: Lt CR := λ x y, 
-  ∃ n : nat, CR_epsilon_sign_dec ((1#4) * (2#1) ^ -cast nat Z n) (y - x) ≡ Gt.
+  ∃ n : nat, CR_epsilon_sign_dec ((1#4) * Qpos_power (2#1) (-cast nat Z n)) (y - x) ≡ Gt.
 
 Lemma CR_lt_ltT x y : x < y IFF CRltT x y.
 Proof.
@@ -705,14 +714,14 @@ Proof.
    apply CR_epsilon_sign_dec_pos.
    apply constructive_indefinite_description_nat in E. 
     destruct E as [n En].
-    now exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
+    now exists ((1#4) * Qpos_power (2#1) (-cast nat Z n))%Qpos.
    intros. now apply comparison_eq_dec.
   intros [ε Eε].
   exists (Z.nat_of_Z (-Qdlog2 ('ε))).
   apply CR_epsilon_sign_dec_pos_rev.
-  apply CRle_trans with ('(ε : Q)); auto.
+  apply CRle_trans with ('proj1_sig ε); auto.
   apply CRle_Qle. simpl.
-  destruct (decide ((ε : Q) ≤ 1)).
+  destruct (decide (proj1_sig ε ≤ 1)).
    rewrite Z.nat_of_Z_nonneg.
     rewrite Z.opp_involutive.
     apply Qdlog2_spec.
@@ -732,16 +741,16 @@ Lemma CR_apart_apartT x y : x ≶ y IFF CRapartT x y.
 Proof.
   split.
    intros E.
-   set (f (n : nat) := CR_epsilon_sign_dec ((1#4) * (2#1) ^ -cast nat Z n)).
+   set (f (n : nat) := CR_epsilon_sign_dec ((1#4) * Qpos_power (2#1) (-cast nat Z n))).
    assert (∃ n, f n (y - x) ≡ Gt ∨ f n (x - y) ≡ Gt) as E2.
     now destruct E as [[n En] | [n En]]; exists n; [left | right].
    apply constructive_indefinite_description_nat in E2.
     destruct E2 as [n E2].
     destruct (comparison_eq_dec (f n (y - x)) Gt) as [En|En].
      left. apply CR_epsilon_sign_dec_pos. 
-     now exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
+     now exists ((1#4) * Qpos_power (2#1) (-cast nat Z n))%Qpos.
     right. apply CR_epsilon_sign_dec_pos. 
-    exists ((1#4) * (2#1) ^ -cast nat Z n)%Qpos.
+    exists ((1#4) * Qpos_power (2#1) (-cast nat Z n))%Qpos.
     destruct E2; tauto.
    intros n. 
    destruct (comparison_eq_dec (f n (y - x)) Gt); auto.

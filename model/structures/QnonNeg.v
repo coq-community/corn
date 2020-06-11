@@ -1,6 +1,7 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import Coq.Program.Program CoRN.model.structures.Qpossec CoRN.model.structures.QposInf Coq.QArith.Qminmax.
+Require Import CoRN.model.totalorder.QposMinMax 
+        Coq.Program.Program CoRN.model.structures.QposInf Coq.QArith.Qminmax.
 
 Set Automatic Introduction.
 
@@ -66,9 +67,12 @@ Definition max := binop Qmax Qmax_nonneg.
 Local Infix "+" := plus.
 Local Infix "*" := mult.
 
-Lemma plus_comm: forall x y, x + y == y + x. Proof binop_comm _ _ Qplus_comm.
-Lemma mult_comm: forall x y, x * y == y * x. Proof binop_comm _ _ Qmult_comm.
-Lemma min_comm: forall x y, min x y == min y x. Proof binop_comm _ _ Q.min_comm.
+Lemma plus_comm: forall x y, x + y == y + x.
+Proof. intros. destruct x,y. unfold eq. simpl. ring. Qed.
+Lemma mult_comm: forall x y, x * y == y * x. 
+Proof. intros. destruct x,y. unfold eq. simpl. ring. Qed.
+Lemma min_comm: forall x y, min x y == min y x.
+Proof. intros. destruct x,y. unfold eq. simpl. apply Q.min_comm. Qed.
 Lemma max_comm: forall x y, max x y == max y x. Proof binop_comm _ _ Q.max_comm.
 Lemma plus_assoc: forall x y z, x + (y + z) == (x + y) + z. Proof binop_assoc _ _ Qplus_assoc.
 Lemma mult_assoc: forall x y z, x * (y * z) == (x * y) * z. Proof binop_assoc _ _ Qmult_assoc.
@@ -100,24 +104,30 @@ Proof. unfold eq. repeat intro. simpl. apply Qinv_comp. assumption. Qed.
 
 Module Export coercions.
 
-Program Coercion from_Qpos (q: Qpos): T := q.
+Definition from_Qpos (q: Qpos): T
+  := exist _ (proj1_sig q) (Qpos_nonneg q).
 
-Lemma from_Qpos_plus_homo (x y: Qpos): (x + y)%Qpos == x + y.
+Lemma from_Qpos_plus_homo (x y: Qpos)
+  : from_Qpos (Qpos_plus x y) == from_Qpos x + from_Qpos y.
 Proof. reflexivity. Qed.
 
 Global Instance from_Qpos_Proper: Proper (QposEq ==> eq) from_Qpos.
 Proof. repeat intro. assumption. Qed.
 
-Global Program Coercion from_nat (n: nat): T := Z.of_nat n#1.
+Definition from_nat (n: nat): T.
+Proof.
+  exists (Z.of_nat n#1).
+  unfold Qle; simpl. rewrite Z.mul_1_r. apply Nat2Z.is_nonneg.
+Defined.
 
-Next Obligation. unfold Qle. simpl. auto with zarith. Qed.
-
+(*
 Definition to_Q: T -> Q := @proj1_sig Q (Qle 0).
 
 Global Coercion to_Q: T >-> Q.
 
 Global Instance: Proper (eq ==> Qeq) to_Q.
 Proof. repeat intro. assumption. Qed.
+*)
 
 End coercions.
 
@@ -163,14 +173,16 @@ Proof.
  reflexivity.
 Defined.
 
-Lemma Qpos_ind (P: T -> Prop) (Pwd: Proper (eq ==> iff) P) (P0: P 0) (Pp: forall q: Qpos, P q): forall q, P q.
+Lemma Qpos_ind (P: T -> Prop) (Pwd: Proper (eq ==> iff) P) (P0: P 0)
+      (Pp: forall q: Qpos, P (from_Qpos q)) : forall q, P q.
 Proof with auto.
  intro.
  apply rect; intros.
   apply (Pwd 0)...
   reflexivity.
- apply (Pwd (QposMake n d))...
- reflexivity.
+  assert (0 < (Z.pos n # d)). reflexivity.
+  apply (Pwd (from_Qpos (exist _ _ H0))). reflexivity.
+  apply Pp.
 Qed.
 
 (* Note: We can't make something as nice as Qpos_positive_numerator_rect for QnonNeg because

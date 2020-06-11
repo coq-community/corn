@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.model.structures.StepQsec.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.model.metric2.L1metric.
@@ -192,7 +194,8 @@ Proof.
  unfold StepQabs.
  rewrite MapGlue.
  rewrite -> Integral_glue.
- setoid_replace (e:Q) with (o*e + (1-o)*e)%Q; [| simpl; ring].
+ setoid_replace (proj1_sig e)
+   with (o*proj1_sig e + (1-o)*proj1_sig e)%Q; [| simpl; ring].
  simpl in H.
  unfold StepFSupBall, StepFfoldProp in H.
  simpl in H.

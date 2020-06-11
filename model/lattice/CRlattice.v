@@ -20,7 +20,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.model.partialorder.CRpartialorder.
+Require Import CoRN.order.SemiLattice.
 Require Import CoRN.order.Lattice.
 
 (**
@@ -37,19 +40,19 @@ Let CRlat := CRLattice.
 
 Local Open Scope CR_scope.
 
-Definition CRmin_comm : forall x y : CR, CRmin x y == CRmin y x := @meet_comm CRlat.
+Definition CRmin_comm : forall x y : CR, CRmin x y == CRmin y x := @meet_comm (sl CRlat).
 Definition CRmin_assoc : forall x y z : CR, CRmin x (CRmin y z) == CRmin (CRmin x y) z:=
- @meet_assoc CRlat.
-Definition CRmin_idem : forall x : CR, CRmin x x == x := @meet_idem CRlat.
-Definition CRle_min_l : forall x y : CR, x <= y <-> CRmin x y == x := @le_meet_l CRlat.
-Definition CRle_min_r : forall x y : CR, y <= x <-> CRmin x y == y := @le_meet_r CRlat.
+ @meet_assoc (sl CRlat).
+Definition CRmin_idem : forall x : CR, CRmin x x == x := @meet_idem (sl CRlat).
+Definition CRle_min_l : forall x y : CR, x <= y <-> CRmin x y == x := @le_meet_l (sl CRlat).
+Definition CRle_min_r : forall x y : CR, y <= x <-> CRmin x y == y := @le_meet_r (sl CRlat).
 Definition CRmin_monotone_r : forall a : CR, CRmonotone (CRmin a) :=
- @meet_monotone_r CRlat.
+ @meet_monotone_r (sl CRlat).
 Definition CRmin_monotone_l : forall a : CR, CRmonotone (fun x => CRmin x a) :=
- @meet_monotone_l CRlat.
+ @meet_monotone_l (sl CRlat).
 Definition CRmin_le_compat :
  forall w x y z : CR, w <= y -> x <= z -> CRmin w x <= CRmin y z :=
- @meet_le_compat CRlat.
+ @meet_le_compat (sl CRlat).
 
 Definition CRmax_comm : forall x y : CR, CRmax x y == CRmax y x := @join_comm CRlat.
 Definition CRmax_assoc : forall x y z : CR, CRmax x (CRmax y z) == CRmax (CRmax x y) z:=
@@ -89,33 +92,33 @@ Definition CRmin_max_eq : forall x y : CR, CRmin x y == CRmax x y -> x == y :=
 (*
 Definition CRmax_min_distr_r : forall x y z : CR,
  CRmax x (CRmin y z) == CRmin (CRmax x y) (CRmax x z) :=
- @join_meet_distr_r CRlat.
+ @join_meet_distr_r (sl CRlat).
 Definition CRmax_min_distr_l : forall x y z : CR,
  CRmax (CRmin y z) x == CRmin (CRmax y x) (CRmax z x) :=
- @join_meet_distr_l CRlat.
+ @join_meet_distr_l (sl CRlat).
 Definition CRmin_max_distr_r : forall x y z : CR,
  CRmin x (CRmax y z) == CRmax (CRmin x y) (CRmin x z) :=
- @meet_join_distr_r CRlat.
+ @meet_join_distr_r (sl CRlat).
 Definition CRmin_max_distr_l : forall x y z : CR,
  CRmin (CRmax y z) x == CRmax (CRmin y x) (CRmin z x) :=
- @meet_join_distr_l CRlat.
+ @meet_join_distr_l (sl CRlat).
 
 (*I don't know who wants modularity laws, but here they are *)
 Definition CRmax_min_modular_r : forall x y z : CR,
  CRmax x (CRmin y (CRmax x z)) == CRmin (CRmax x y) (CRmax x z) :=
- @join_meet_modular_r CRlat.
+ @join_meet_modular_r (sl CRlat).
 Definition CRmax_min_modular_l : forall x y z : CR,
  CRmax (CRmin (CRmax x z) y) z == CRmin (CRmax x z) (CRmax y z) :=
- @join_meet_modular_l CRlat.
+ @join_meet_modular_l (sl CRlat).
 Definition CRmin_max_modular_r : forall x y z : CR,
  CRmin x (CRmax y (CRmin x z)) == CRmax (CRmin x y) (CRmin x z) :=
- @meet_join_modular_r CRlat.
+ @meet_join_modular_r (sl CRlat).
 Definition CRmin_max_modular_l : forall x y z : CR,
  CRmin (CRmax (CRmin x z) y) z == CRmax (CRmin x z) (CRmin y z) :=
- @meet_join_modular_l CRlat.
+ @meet_join_modular_l (sl CRlat).
 
 Definition CRmin_max_disassoc : forall x y z : CR, CRmin (CRmax x y) z <= CRmax x (CRmin y z) :=
- @meet_join_disassoc CRlat.
+ @meet_join_disassoc (sl CRlat).
 
 Lemma CRplus_monotone_r : forall a, CRmonotone (CRplus a).
 Proof.
@@ -148,22 +151,22 @@ rapply Qpos_nonneg.
 Qed.
 
 Definition CRmin_plus_distr_r : forall x y z : CR, x + CRmin y z == CRmin (x+y) (x+z)  :=
- fun a => @monotone_meet_distr CRlat _ (CRplus_monotone_r a).
+ fun a => @monotone_meet_distr (sl CRlat) _ (CRplus_monotone_r a).
 Definition CRmin_plus_distr_l : forall x y z : CR, CRmin y z + x == CRmin (y+x) (z+x) :=
- fun a => @monotone_meet_distr CRlat _ (CRplus_monotone_l a).
+ fun a => @monotone_meet_distr (sl CRlat) _ (CRplus_monotone_l a).
 Definition CRmax_plus_distr_r : forall x y z : CR, x + CRmax y z == CRmax (x+y) (x+z)  :=
- fun a => @monotone_join_distr CRlat _ (CRplus_monotone_r a).
+ fun a => @monotone_join_distr (sl CRlat) _ (CRplus_monotone_r a).
 Definition CRmax_plus_distr_l : forall x y z : CR, CRmax y z + x == CRmax (y+x) (z+x) :=
- fun a => @monotone_join_distr CRlat _ (CRplus_monotone_l a).
+ fun a => @monotone_join_distr (sl CRlat) _ (CRplus_monotone_l a).
 Definition CRmin_minus_distr_l : forall x y z : CR, CRmin y z - x == CRmin (y-x) (z-x) :=
  (fun x => CRmin_plus_distr_l (-x)).
 Definition CRmax_minus_distr_l : forall x y z : CR, CRmax y z - x == CRmax (y-x) (z-x) :=
  (fun x => CRmax_plus_distr_l (-x)).
 
 Definition CRmin_max_de_morgan : forall x y : CR, -(CRmin x y) == CRmax (-x) (-y) :=
- @antitone_meet_join_distr CRlat _ CRopp_le_compat.
+ @antitone_meet_join_distr (sl CRlat) _ CRopp_le_compat.
 Definition CRmax_min_de_morgan : forall x y : CR, -(CRmax x y) == CRmin (-x) (-y) :=
- @antitone_join_meet_distr CRlat _ CRopp_le_compat.
+ @antitone_join_meet_distr (sl CRlat) _ CRopp_le_compat.
 *)
 
 End CRLattice.

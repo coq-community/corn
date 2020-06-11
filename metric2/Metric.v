@@ -21,10 +21,10 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export CoRN.algebra.RSetoid.
 Require Import Coq.Relations.Relation_Definitions.
-Require Export CoRN.model.structures.Qpossec.
+Require Export CoRN.model.structures.QposInf.
 Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.stdlib_omissions.List.
-Require Import CoRN.tactics.CornTac.
 Require Import CoRN.stdlib_omissions.Q.
 
 Require CoRN.model.structures.QnnInf.
@@ -45,8 +45,8 @@ by the axioms given in the record structure below.
 Record is_MetricSpace (X : RSetoid) (B: Qpos -> relation X) : Prop :=
 { msp_refl: forall e, Reflexive (B e)
 ; msp_sym: forall e, Symmetric (B e)
-; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2)%Qpos a c
-; msp_closed: forall e a b, (forall d, B (e+d)%Qpos a b) -> B e a b
+; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (Qpos_plus e1 e2) a c
+; msp_closed: forall e a b, (forall d, B (Qpos_plus e d) a b) -> B e a b
 ; msp_eq: forall a b, (forall e, B e a b) -> st_eq a b
 }.
 
@@ -68,7 +68,8 @@ Arguments ball [m].
 Definition ms_id (m:MetricSpace) (x:m) : m := x.
 Arguments ms_id [m].
 
-Add Parametric Morphism (m:MetricSpace) : (@ball m) with signature QposEq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
+Add Parametric Morphism (m:MetricSpace) : (@ball m)
+    with signature QposEq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
 Proof.
  exact (@ball_wd m).
 Qed.
@@ -95,12 +96,14 @@ Proof.
  apply (msp_sym (msp X)).
 Qed.
 
-Lemma ball_triangle : forall e1 e2 (a b c:X), ball e1 a b -> ball e2 b c -> ball (e1+e2) a c.
+Lemma ball_triangle : forall e1 e2 (a b c:X),
+    ball e1 a b -> ball e2 b c -> ball (Qpos_plus e1 e2) a c.
 Proof.
  apply (msp_triangle (msp X)).
 Qed.
 
-Lemma ball_closed :  forall e (a b:X), (forall d, ball (e+d) a b) -> ball e a b.
+Lemma ball_closed :  forall e (a b:X),
+    (forall d, ball (Qpos_plus e d) a b) -> ball e a b.
 Proof.
  apply (msp_closed (msp X)).
 Qed.
@@ -115,7 +118,8 @@ Proof.
  split.
   apply ball_eq.
  intros H e.
- rewrite -> H.
+ assert (QposEq e e). reflexivity.
+ apply (ball_wd X H0 a b H b b (reflexivity _)).
  apply ball_refl.
 Qed.
 
@@ -123,7 +127,8 @@ Qed.
 two forms of the weakening lemma.
 *)
 
-Lemma ball_weak : forall e d (a b:X), ball e a b -> ball (e+d) a b.
+Lemma ball_weak : forall e d (a b:X),
+    ball e a b -> ball (Qpos_plus e d) a b.
 Proof.
  intros e d a b B1.
  eapply ball_triangle.
@@ -133,18 +138,15 @@ Qed.
 
 Hint Resolve ball_refl ball_triangle ball_weak : metric.
 
-Lemma ball_weak_le : forall (e d:Qpos) (a b:X), e<=d ->  ball e a b -> ball d a b.
+Lemma ball_weak_le : forall (e d:Qpos) (a b:X),
+    proj1_sig e <= proj1_sig d ->  ball e a b -> ball d a b.
 Proof.
  intros e d a b Hed B1.
  destruct (Qle_lt_or_eq _ _ Hed).
-  destruct (Qpos_lt_plus H) as [c Hc].
-  rewrite <- Q_Qpos_plus in Hc.
-  change (QposEq d (e+c)) in Hc.
-  rewrite -> Hc; clear - B1.
-  auto with *.
- change (QposEq e d) in H.
- rewrite <- H.
- assumption.
+ 2: change (QposEq e d) in H; rewrite <- H; assumption.
+ destruct (Qpos_sub _ _ H) as [c Hc].
+ assert (QposEq d (e+c)) by (apply Hc).
+ rewrite H0. auto with *.
 Qed.
 
 End Metric_Space.
@@ -171,7 +173,7 @@ Section gball.
     | QnnInf.Infinite => fun _ _ => True
     end.
 
-  Lemma ball_gball (q: Qpos) (x y: m): gball q x y <-> ball q x y.
+  Lemma ball_gball (q: Qpos) (x y: m): gball (proj1_sig q) x y <-> ball q x y.
   Proof with auto.
    unfold gball.
    revert q x y.
@@ -250,7 +252,10 @@ Section gball.
         apply Qplus_lt_le_0_compat...
        revert H1. apply Qle_not_lt...
       simpl.
-      setoid_replace (exist (Qlt 0) (e1 + e2) q0) with (exist (Qlt 0) e1 B + exist (Qlt 0) e2 q)%Qpos by reflexivity.
+      assert (QposEq (exist (Qlt 0) (e1 + e2) q0)
+                     (Qpos_plus (exist (Qlt 0) e1 B) (exist (Qlt 0) e2 q)))
+        by reflexivity.
+      rewrite H1. clear H1. 
       apply ball_triangle with b...
      exfalso.
      assert (0 < e1 + e2).
@@ -303,7 +308,8 @@ Section gball.
   Proof.
   unfold gball. destruct (Q_dec e) as [[e_neg | e_pos'] | e_zero].
   + elim (Qlt_irrefl _ (Qlt_trans _ _ _ e_pos e_neg)).
-  + setoid_replace (exist _ e e_pos) with (exist _ e e_pos'); easy.
+  + assert (QposEq (exist _ e e_pos) (exist _ e e_pos')) by easy.
+    apply (ball_wd m H _ _ (reflexivity _) _ _ (reflexivity _)).
   + exfalso; rewrite e_zero in e_pos; apply (Qlt_irrefl _ e_pos).
   Qed.
 
@@ -319,9 +325,9 @@ Section gball.
   Proof.
   intro C. (*change (gball e x y).*) unfold gball.
   destruct (Q_dec e) as [[e_neg | e_pos] | e_zero].
-  + assert (e / 2 < 0) by now apply Qmult_neg_pos.
-    apply (@gball_neg (e/2) x y); [easy |].
-    setoid_replace (e / 2) with (e - e / 2) by (field; discriminate).
+  + assert (e * (1#2) < 0) by now apply Qmult_neg_pos.
+    apply (@gball_neg (e * (1#2)) x y); [easy |].
+    setoid_replace (e * (1#2)) with (e - e * (1#2)) by (field; discriminate).
     apply C; now apply Qopp_Qlt_0_l.
   + apply (msp_closed (msp m)). intros [d d_pos]. now apply gball_pos, C.
   + apply ball_eq. intros [d d_pos]. apply gball_pos.

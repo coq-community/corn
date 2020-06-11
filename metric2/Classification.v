@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax. 
 Require Export CoRN.metric2.Metric.
-Require Import CoRN.tactics.Qauto.
 
 Local Open Scope Q_scope.
 
@@ -44,7 +44,7 @@ Proof.
  cut (st_eq x y -> ball (m:=ms) e x y).
   tauto.
  intros H.
- rewrite -> H.
+ apply (ball_wd ms eq_refl _ _ H y y (reflexivity y)).
  apply ball_refl.
 Qed.
 
@@ -52,7 +52,7 @@ Qed.
 between ball d x y and ~ball e x y for e < d.  Every located metric
 is a stable metric. *)
 Definition locatedMetric (ms:MetricSpace) :=
- forall (e d:Qpos) (x y:ms), e < d -> {ball d x y}+{~ball e x y}.
+ forall (e d:Qpos) (x y:ms), proj1_sig e < proj1_sig d -> {ball d x y}+{~ball e x y}.
 
 (** At the top level a metric space is decidable if its ball relation
 is decidable.  Every decidable metric is a located metric. *)
@@ -75,9 +75,9 @@ Proof.
  intros ms H e x y Hxy.
  apply ball_closed.
  intros d.
- destruct (H e (e+d)%Qpos x y); try (assumption || contradiction).
- autorewrite with QposElim.
- rewrite -> Qlt_minus_iff; ring_simplify; auto with *.
+ destruct (H e (Qpos_plus e d) x y); try (assumption || contradiction).
+ destruct e,d; simpl.
+ apply (Qplus_lt_l _ _ (-x0)). ring_simplify. exact q0.
 Qed.
 (* begin hide *)
 Hint Resolve decidable_located located_stable : classification.

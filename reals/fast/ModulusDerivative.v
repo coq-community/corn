@@ -19,11 +19,14 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.Q_in_CReals.
 Require Export CoRN.reals.fast.CRIR.
 Require Export CoRN.ftc.Rolle.
 Require Import CoRN.tactics.CornTac.
 Require Export CoRN.model.metric2.Qmetric.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.totalorder.QMinMax.
 
 Opaque Qmin Qmax.
@@ -102,7 +105,7 @@ Proof.
  rewrite <- CRAbsSmall_ball.
  unfold cg_minus.
  simpl.
- stepl (IRasCR (inj_Q IR (e:Q))); [| now simpl; apply IR_inj_Q_as_CR].
+ stepl (IRasCR (inj_Q IR (proj1_sig e))); [| now simpl; apply IR_inj_Q_as_CR].
  stepr (IRasCR ((f (inj_Q IR (clamp a))
    (Derivative_imp_inc I properI f f' Hf (inj_Q IR (clamp a)) (X a)))[-] (f (inj_Q IR (clamp b))
      (Derivative_imp_inc I properI f f' Hf (inj_Q IR (clamp b)) (X b)))))
@@ -125,7 +128,7 @@ Proof.
   apply inj_Q_wd.
   auto.
  intros y Hyc Hab.
- stepr ((inj_Q IR (e/y)%Q[*](inj_Q _ (y:Q)))).
+ stepr ((inj_Q IR (proj1_sig e/proj1_sig y)%Q[*](inj_Q _ (proj1_sig y)))).
   apply mult_resp_leEq_both.
      eapply leEq_transitive.
       apply AbsIR_nonneg.
@@ -140,11 +143,11 @@ Proof.
   change (ball y (clamp a) (clamp b)).
   apply ball_clamp.
   auto.
- assert (Z:[0][<]inj_Q IR (y:Q)).
-  (stepl (inj_Q IR ([0]:Q)); [| now apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_prf.
+ assert (Z:[0][<]inj_Q IR (proj1_sig y)).
+  (stepl (inj_Q IR ([0]:Q)); [| now apply (inj_Q_nring IR 0)]); apply inj_Q_less; apply Qpos_ispos.
  eapply eq_transitive.
   apply mult_wdl.
-  apply (inj_Q_div IR e _ (pos_ap_zero _ _ Z)).
+  apply (inj_Q_div IR (proj1_sig e) _ (pos_ap_zero _ _ Z)).
  apply div_1.
 Qed.
 

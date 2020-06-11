@@ -20,11 +20,12 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export Coq.QArith.QArith.
-Require Export CoRN.model.structures.Qpossec.
 Require Import CoRN.model.totalorder.QposMinMax.
 
 (** printing QposInf $\mathbb{Q}^{+}_{\infty}$ #Q<SUP>+</SUP><SUB>&infin;</SUB># *)
 (** printing QposInfinity $\infty$ #&infin;# *)
+
+(** The type of positive rational numbers, including positive infinity. *)
 
 Set Implicit Arguments.
 
@@ -65,7 +66,7 @@ Qed.
 (** Equality *)
 Definition QposInfEq (a b:QposInf) := 
  match a, b with 
- | Qpos2QposInf x, Qpos2QposInf y => Qeq x y
+ | Qpos2QposInf x, Qpos2QposInf y => Qeq (proj1_sig x) (proj1_sig y)
  | QposInfinity, QposInfinity => True
  | _, _ => False
  end.
@@ -92,7 +93,9 @@ Add Relation QposInf QposInfEq
  transitivity proved by QposInfEq_trans as QposInfSetoid.
 
 Instance: Proper (QposEq ==> QposInfEq) Qpos2QposInf.
-Proof. firstorder. Qed.
+Proof.
+  intros x y H. exact H.
+Qed.
 
 Instance QposInf_bind_wd (f : Qpos -> QposInf) {f_wd : Proper (QposEq ==> QposInfEq) f} : 
   Proper (QposInfEq ==> QposInfEq) (QposInf_bind f).
@@ -104,7 +107,7 @@ Qed.
 
 (** Addition *)
 Definition QposInf_plus (x y : QposInf) : QposInf :=
-QposInf_bind (fun x' => QposInf_bind (fun y' => x'+y') y) x.
+QposInf_bind (fun x' => QposInf_bind (fun y' => Qpos_plus x' y') y) x.
 
 Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_plus.
 Proof with auto.
@@ -114,7 +117,7 @@ Qed.
 
 (** Multiplication *)
 Definition QposInf_mult (x y : QposInf) : QposInf :=
-QposInf_bind (fun x' => QposInf_bind (fun y' => x'*y') y) x.
+QposInf_bind (fun x' => QposInf_bind (fun y' => Qpos_mult x' y') y) x.
 
 Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_mult.
 Proof with auto.
@@ -129,7 +132,7 @@ match y with
 | Qpos2QposInf y' =>
  match x with
  | QposInfinity => False
- | Qpos2QposInf x' => x' <= y'
+ | Qpos2QposInf x' => proj1_sig x' <= proj1_sig y'
  end
 end.
 

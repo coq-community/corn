@@ -114,7 +114,7 @@ Proof.
  split.
   apply hemiMetric_triangle with B; assumption.
  apply hemiMetric_wd1 with (e1 + e0)%Qpos.
-  QposRing.
+ unfold QposEq. simpl. ring.
  apply hemiMetric_triangle with B; assumption.
 Qed.
 
@@ -136,12 +136,12 @@ Proof.
  firstorder using hemiMetric_stable.
 Qed.
 
-Lemma hemiMetric_wd :forall (e1 e2:Qpos), (e1==e2) ->
+Lemma hemiMetric_wd :forall (e1 e2:Qpos), (QposEq e1 e2) ->
  forall A1 A2, (forall x, A1 x <-> A2 x) ->
  forall B1 B2, (forall x, B1 x <-> B2 x) ->
  (hemiMetric e1 A1 B1 <-> hemiMetric e2 A2 B2).
 Proof.
- cut (forall e1 e2 : Qpos, e1 == e2 -> forall A1 A2 : X -> Prop, (forall x : X, A1 x <-> A2 x) ->
+ cut (forall e1 e2 : Qpos, QposEq e1 e2 -> forall A1 A2 : X -> Prop, (forall x : X, A1 x <-> A2 x) ->
    forall B1 B2 : X -> Prop, (forall x : X, B1 x <-> B2 x) ->
      (hemiMetric e1 A1 B1 -> hemiMetric e2 A2 B2)).
   intros; split.
@@ -158,11 +158,12 @@ Proof.
  exists y.
  change (QposEq e1 e2) in He.
  rewrite <- HB.
+ split. exact Hy0.
  rewrite <- He.
- auto.
+ assumption.
 Qed.
 
-Lemma hausdorffBall_wd :forall (e1 e2:Qpos), (e1==e2) ->
+Lemma hausdorffBall_wd :forall (e1 e2:Qpos), (QposEq e1 e2) ->
  forall A1 A2, (forall x, A1 x <-> A2 x) ->
  forall B1 B2, (forall x, B1 x <-> B2 x) ->
  (hausdorffBall e1 A1 B1 <-> hausdorffBall e2 A2 B2).
@@ -199,8 +200,11 @@ Lemma hemiMetricStrong_wd1 : forall (e0 e1:Qpos) A B,
 Proof.
  intros e0 e1 A B He H x Hx d.
  destruct (H x Hx d) as [y [Hy Hxy]].
- exists y.
- rewrite -> He in Hxy; auto.
+ exists y. split. exact Hy.
+ assert (QposEq (e1+d) (e0+d)).
+ { unfold QposEq. simpl. unfold QposEq in He.
+   rewrite He. reflexivity. }
+ rewrite H0. exact Hxy.
 Qed.
 
 Lemma hausdorffBallStrong_wd1 : forall (e0 e1:Qpos) A B,
@@ -235,11 +239,15 @@ Lemma hemiMetricStrong_triangle : forall e0 e1 A B C,
  hemiMetricStrong e0 A B -> hemiMetricStrong e1 B C -> hemiMetricStrong (e0 + e1) A C.
 Proof.
  intros e0 e1 A B C H0 H1 x Hx d.
- destruct (H0 x Hx ((1#2)*d)%Qpos) as [y [Hy Hxy]].
- destruct (H1 y Hy ((1#2)*d)%Qpos) as [z [Hz Hyz]].
+ assert (0 < (1#2)) as halfPos. reflexivity.
+ destruct (H0 x Hx (exist _ _ halfPos*d)%Qpos) as [y [Hy Hxy]].
+ destruct (H1 y Hy (exist _ _ halfPos*d)%Qpos) as [z [Hz Hyz]].
  exists z.
  split; try assumption.
- setoid_replace (e0 + e1 + d)%Qpos with ((e0 + (1 # 2) * d) +(e1 + (1 # 2) * d))%Qpos by QposRing.
+ assert (QposEq (e0 + e1 + d)
+                ((e0 + exist _ _ halfPos * d) +(e1 + exist _ _ halfPos * d))).
+ { unfold QposEq; simpl; ring. }
+ rewrite H. clear H.
  apply ball_triangle with y; assumption.
 Qed.
 
@@ -250,7 +258,7 @@ Proof.
  split.
   apply hemiMetricStrong_triangle with B; assumption.
  apply hemiMetricStrong_wd1 with (e1 + e0)%Qpos.
-  QposRing.
+ unfold QposEq. simpl. ring.
  apply hemiMetricStrong_triangle with B; assumption.
 Qed.
 

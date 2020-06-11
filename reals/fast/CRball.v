@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
  Coq.QArith.Qabs CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
 

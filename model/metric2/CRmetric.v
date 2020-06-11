@@ -20,12 +20,12 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.metric2.Complete.
 Require Export CoRN.metric2.Prelength.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.canonical_names.
-Require Import MathClasses.implementations.stdlib_rationals.
 
 Set Implicit Arguments.
 
@@ -35,12 +35,14 @@ Local Open Scope uc_scope.
 * Complete Metric Space: Computable Reals (CR)
 *)
 
-Definition CR := Complete Q_as_MetricSpace.
+Definition CR : MetricSpace
+  := Complete Q_as_MetricSpace.
 
 Delimit Scope CR_scope with CR.
 Bind Scope CR_scope with CR.
 
-Instance inject_Q_CR: Cast Q CR := (@Cunit Q_as_MetricSpace).
+Instance inject_Q_CR: Cast Q (st_car CR)
+  := ucFun (@Cunit Q_as_MetricSpace).
 
 (* 
 Since (@Cunit Q_as_MetricSpace) is a bundled function with a modulus 

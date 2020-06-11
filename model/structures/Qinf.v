@@ -1,4 +1,5 @@
 Require Import
+ CoRN.model.totalorder.QposMinMax
  Coq.Setoids.Setoid Coq.Arith.Arith
  CoRN.model.rings.Qring CoRN.model.structures.QposInf
  CoRN.stdlib_omissions.Q
@@ -73,7 +74,7 @@ Coercion finite: Q >-> T.
 Coercion from_QposInf (q: QposInf): T :=
   match q with
   | QposInfinity => infinite
-  | Qpos2QposInf u => u
+  | Qpos2QposInf u => proj1_sig u
   end.
 
 End coercions.
@@ -90,7 +91,9 @@ Qed.
 Hint Resolve le_0_plus_compat.
 
 Lemma le_0_Qpos (x: Qpos): le 0 x.
-Proof. simpl. auto. Qed.
+Proof.
+  destruct x. simpl. apply Qlt_le_weak, q.
+Qed.
 
 Hint Immediate le_0_Qpos.
 

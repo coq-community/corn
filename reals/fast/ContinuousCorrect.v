@@ -19,6 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.Q_in_CReals.
 Require Export CoRN.ftc.MoreIntervals.
 Require Export CoRN.reals.fast.CRIR.
@@ -108,10 +110,10 @@ Proof.
   unfold J;  apply iprop_compact_in_interval_inc1.
  clear Hf0.
  destruct X as [_ X].
- assert (He : [0][<](inj_Q IR (((1#2)*e)%Qpos:Q))).
+ assert (He : [0][<](inj_Q IR (proj1_sig ((1#2)*e)%Qpos))).
   stepl (inj_Q IR (nring 0)); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_less.
-  apply Qpos_prf.
+  apply Qpos_ispos.
  destruct (X _ He) as [d0 Hd0 Hf].
  clear X.
  set (d1:=mu g ((1#2)*e)).
@@ -128,16 +130,17 @@ Proof.
   apply iprop_compact_in_interval'.
  clearbody Hab a b.
  clear J HJ.
- pose (d:=match d1 with | Qpos2QposInf q => Min (inj_Q IR (q:Q)) d0 | QposInfinity => d0 end).
+ pose (d:=match d1 with | Qpos2QposInf q => Min (inj_Q IR (proj1_sig q)) d0 | QposInfinity => d0 end).
  assert (H0d : [0][<]d).
   destruct d1; try assumption.
   apply less_Min; try assumption.
   stepl (inj_Q IR [0]).
    apply inj_Q_less.
-   apply Qpos_prf.
+   apply Qpos_ispos.
   apply (inj_Q_nring IR 0).
  destruct (Q_dense_in_compact Hab0 HJx _ H0d) as [q Hq0 Hq1].
- setoid_replace e with ((1#2)*e+(1#2)*e)%Qpos by QposRing.
+ assert (QposEq e ((1#2)*e+(1#2)*e)) by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0.
  assert (Hfq : Dom f (inj_Q IR q)).
   apply Hf1.
   apply HJ'.
@@ -145,7 +148,7 @@ Proof.
  apply ball_triangle with (IRasCR (f (inj_Q IR q) Hfq)).
   rewrite <- CRAbsSmall_ball.
   stepr (IRasCR (f x Hx[-]f (inj_Q IR q) Hfq)); [| now (simpl; apply IR_minus_as_CR)].
-  stepl (IRasCR (inj_Q IR (((1 # 2) * e)%Qpos:Q))); [| now (simpl; apply IR_inj_Q_as_CR)].
+  stepl (IRasCR (inj_Q IR (proj1_sig ((1 # 2) * e)%Qpos))); [| now (simpl; apply IR_inj_Q_as_CR)].
   rewrite <- IR_AbsSmall_as_CR.
   apply AbsIR_imp_AbsSmall.
   apply Hf; try assumption.
@@ -163,7 +166,7 @@ Proof.
  rewrite <- IR_inj_Q_as_CR.
  rewrite <- CRAbsSmall_ball.
  stepr (IRasCR (inj_Q IR q[-]x)); [| now (simpl; apply IR_minus_as_CR)].
- stepl (IRasCR (inj_Q IR (q0:Q))); [| now (simpl; apply IR_inj_Q_as_CR)].
+ stepl (IRasCR (inj_Q IR (proj1_sig q0))); [| now (simpl; apply IR_inj_Q_as_CR)].
  rewrite <- IR_AbsSmall_as_CR.
  apply AbsSmall_minus.
  eapply AbsSmall_leEq_trans;[|apply Hq1].

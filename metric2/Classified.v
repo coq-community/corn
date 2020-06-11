@@ -6,6 +6,7 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import
  Arith List
+ CoRN.model.totalorder.QposMinMax
  CSetoids Qmetric Qring Qinf ProductMetric QposInf Qposclasses (* defines Equiv on Qpos *)
  UniformContinuity MathClasses.implementations.stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
@@ -92,7 +93,8 @@ Local Existing Instance mspc_setoid.
 
   Next Obligation. Proof with auto.
    constructor; try apply _.
-      intro e. apply mspc_refl...
+      intro e. apply mspc_refl.
+      simpl. destruct e. simpl. apply Qlt_le_weak, q.
      intros. apply (mspc_triangle e1 e2 a b c)...
     intros. apply mspc_closed...
    apply mspc_eq.
@@ -497,7 +499,7 @@ Instance Qpos_mspc: MetricSpaceClass Qpos := @sig_mspc Q_as_MetricSpace _ _ _ (Q
 Instance: Cast QnnInf.T Qinf :=
   λ x, match x with
     | QnnInf.Infinite => Qinf.infinite
-    | QnnInf.Finite q => Qinf.finite q
+    | QnnInf.Finite q => Qinf.finite (proj1_sig q)
     end.
 
 Section uniform_continuity.

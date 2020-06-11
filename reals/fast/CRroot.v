@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import CoRN.reals.fast.CRpower.
 Require Export CoRN.reals.fast.CRArith.
@@ -58,7 +60,7 @@ Hypothesis Ha : 1 <= a <= 4.
 converge to the square root of [a]. *)
 Definition root_step (b:Q) : Q := b / (2#1) + a / ((2#1) * b).
 
-Definition root_has_error (e:Qpos) (b:Q) := a <= (b+e)^2 /\ (b-e)^2 <= a.
+Definition root_has_error (e:Qpos) (b:Q) := a <= (b+proj1_sig e)^2 /\ (b-proj1_sig e)^2 <= a.
 (* begin hide *)
 Add Morphism root_has_error with signature QposEq ==> Qeq ==> iff as root_has_error_wd.
 Proof.
@@ -70,29 +72,29 @@ Proof.
  reflexivity.
 Qed.
 (* end hide *)
-Lemma root_has_error_le : forall (e1 e2:Qpos) (b:Q), e2 <= b -> e1 <= e2 -> root_has_error e1 b -> root_has_error e2 b.
+Lemma root_has_error_le : forall (e1 e2:Qpos) (b:Q), proj1_sig e2 <= b -> proj1_sig e1 <= proj1_sig e2 -> root_has_error e1 b -> root_has_error e2 b.
 Proof.
  intros e1 e2 b Hb He [H0 H1].
  rewrite -> Qle_minus_iff in *.
  split; rewrite -> Qle_minus_iff.
-  replace RHS with (((b + e1) ^ 2 + - a) + (e2 + - e1)*((2#1) * (b + - e2 + e2) + e2 + e1)) by ring.
+  replace RHS with (((b + proj1_sig e1) ^ 2 + - a) + (proj1_sig e2 + - proj1_sig e1)*((2#1) * (b + - proj1_sig e2 + proj1_sig e2) + proj1_sig e2 + proj1_sig e1)) by ring.
   Qauto_nonneg.
- replace RHS with ((a + - (b-e1)^2) + (e2 + -e1)*((e2 + - e1) + (2#1) * (b + - e2))) by ring.
+ replace RHS with ((a + - (b-proj1_sig e1)^2) + (proj1_sig e2 + -proj1_sig e1)*((proj1_sig e2 + - proj1_sig e1) + (2#1) * (b + - proj1_sig e2))) by ring.
  Qauto_nonneg.
 Qed.
 
-Lemma root_error_bnd : forall (e:Qpos) b, e <= 1 -> 1 <= b -> (root_has_error e b) -> b <= (2#1) + e.
+Lemma root_error_bnd : forall (e:Qpos) b, proj1_sig e <= 1 -> 1 <= b -> (root_has_error e b) -> b <= (2#1) + proj1_sig e.
 Proof.
  intros e b He Hb [H0 H1].
  destruct Ha as [Ha0 Ha1].
  rewrite -> Qle_minus_iff in *.
- assert (X:0 < 2 + b - e).
+ assert (X:0 < 2 + b - proj1_sig e).
   apply Qlt_le_trans with 2.
    constructor.
   rewrite -> Qle_minus_iff.
-  replace RHS with ((b + -(1)) + (1 + - e)) by (simpl; ring).
+  replace RHS with ((b + -(1)) + (1 + - proj1_sig e)) by (simpl; ring).
   Qauto_nonneg.
- replace RHS with ((((4#1)  + - a) + (a + - (b - e)^2))/((2#1) + b - e)) by simpl; field; auto with *.
+ replace RHS with ((((4#1)  + - a) + (a + - (b - proj1_sig e)^2))/((2#1) + b - proj1_sig e)) by simpl; field; auto with *.
  apply Qle_shift_div_l.
   assumption.
  replace LHS with 0 by simpl; ring.
@@ -100,7 +102,7 @@ Proof.
 Qed.
 
 Lemma root_has_error_ball : forall (e1 e2:Qpos) (b1 b2:Q), 
-  (e1 + e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1 -> Qball e2 b1 b2 -> root_has_error (e1+e2) b2.
+  (proj1_sig e1 + proj1_sig e2<=1) ->  (1 <= b1) -> (1 <= b2) -> root_has_error e1 b1 -> Qball e2 b1 b2 -> root_has_error (e1+e2) b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  simpl in H2, H3.
@@ -109,53 +111,53 @@ Proof.
  unfold root_has_error.
  autorewrite with QposElim.
  split; rewrite -> Qle_minus_iff.
-  replace RHS with (((b1 + e1)^2 + - a) + (b2 + - (1)  + e1 + e2 + (b1 + -(1)) + (2#1) + e1)*(e2 - (b1 - b2))) by simpl; ring.
+  replace RHS with (((b1 + proj1_sig e1)^2 + - a) + (b2 + - (1)  + proj1_sig e1 + proj1_sig e2 + (b1 + -(1)) + (2#1) + proj1_sig e1)*(proj1_sig e2 - (b1 - b2))) by simpl; ring.
   Qauto_nonneg.
- replace RHS with ((a + - (b1 - e1)^2) +  (b1 - b2 + - - e2)*((b1 + -(1)) + (1 + - (e1 + e2)) + e2 + (b2 + -(1)) + (1 + - (e1 + e2)))) by simpl; ring.
+ replace RHS with ((a + - (b1 - proj1_sig e1)^2) +  (b1 - b2 + - - proj1_sig e2)*((b1 + -(1)) + (1 + - (proj1_sig e1 + proj1_sig e2)) + proj1_sig e2 + (b2 + -(1)) + (1 + - (proj1_sig e1 + proj1_sig e2)))) by simpl; ring.
  Qauto_nonneg.
 Qed.
 
 Lemma ball_root_has_error : forall (e1 e2:Qpos) (b1 b2:Q), 
-  ((e1 + e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1 -> root_has_error e2 b2 -> Qball (e1+e2) b1 b2.
+  ((proj1_sig e1 + proj1_sig e2)<=1) -> (1<=b1) -> (1<=b2) -> root_has_error e1 b1 -> root_has_error e2 b2 -> Qball (e1+e2) b1 b2.
 Proof.
  intros e1 e2 b1 b2 He Hb1 Hb2 [H0 H1] [H2 H3].
  clear Ha.
  rewrite -> Qle_minus_iff in *.
- split; simpl; autorewrite with QposElim; rewrite -> Qle_minus_iff.
-  assert (A0:0 < (b1 + e1 + b2 - e2)).
+ split; simpl; rewrite -> Qle_minus_iff.
+  assert (A0:0 < (b1 + proj1_sig e1 + b2 - proj1_sig e2)).
    apply Qlt_le_trans with 1;[constructor|].
    rewrite -> Qle_minus_iff.
-   replace RHS with (b1 + - (1) + (b2 + - (1)) + (2#1) * e1 + (1 - (e1 + e2))) by simpl; ring.
+   replace RHS with (b1 + - (1) + (b2 + - (1)) + (2#1) * proj1_sig e1 + (1 - (proj1_sig e1 + proj1_sig e2))) by simpl; ring.
    Qauto_nonneg.
-  replace RHS with ((((b1 + e1)^2 + - a) + (a + - (b2 - e2)^2))/(b1 + e1 +b2 - e2)) by (simpl; field; auto with * ).
+  replace RHS with ((((b1 + proj1_sig e1)^2 + - a) + (a + - (b2 - proj1_sig e2)^2))/(b1 + proj1_sig e1 +b2 - proj1_sig e2)) by (simpl; field; auto with * ).
   Qauto_nonneg.
- assert (A0:0 < (b2 + e2 + b1 - e1)).
+ assert (A0:0 < (b2 + proj1_sig e2 + b1 - proj1_sig e1)).
   apply Qlt_le_trans with 1;[constructor|].
   rewrite -> Qle_minus_iff.
-  replace RHS with (b2 + - (1) + (b1 + - (1)) + (2#1) * e2 + (1 - (e1 + e2))) by simpl; ring.
+  replace RHS with (b2 + - (1) + (b1 + - (1)) + (2#1) * proj1_sig e2 + (1 - (proj1_sig e1 + proj1_sig e2))) by simpl; ring.
   Qauto_nonneg.
- replace RHS with (((a + -(b1 - e1)^2) + ((b2 + e2)^2 + - a))/(b2 + e2 + b1 - e1)) by (simpl; field;auto with * ).
+ replace RHS with (((a + -(b1 - proj1_sig e1)^2) + ((b2 + proj1_sig e2)^2 + - a))/(b2 + proj1_sig e2 + b1 - proj1_sig e1)) by (simpl; field;auto with * ).
  Qauto_nonneg.
 Qed.
 
 Lemma root_step_error : forall b (e:Qpos), 
-  (1 <= b) ->  (e <= 1) -> root_has_error e b -> root_has_error ((1#2)*(e*e)) (root_step b).
+  (1 <= b) ->  (proj1_sig e <= 1) -> root_has_error e b -> root_has_error ((1#2)*(e*e)) (root_step b).
 Proof.
  intros b e Hb He [H0 H1].
  unfold root_step.
  assert (A0:0 < b).
   apply Qlt_le_trans with 1; try assumption.
   Qauto_pos.
- assert (A1:(0 <= b - e^2)).
-  replace RHS with (b + - e^2) by simpl; ring.
+ assert (A1:(0 <= b - proj1_sig e^2)).
+  replace RHS with (b + - proj1_sig e^2) by simpl; ring.
   rewrite <- Qle_minus_iff.
   apply Qle_trans with ((1:Q)[^]2); try assumption.
-  replace LHS with ((e:Q)[^]2) by (simpl; ring).
+  replace LHS with ((proj1_sig e)[^]2) by (simpl; ring).
   apply: (power_resp_leEq);simpl; try assumption.
   apply Qpos_nonneg.
  assert (A2:(0 <= a)).
   eapply Qle_trans;[|apply H1].
-  replace RHS with ((b-e)[^]2) by (simpl; ring).
+  replace RHS with ((b-proj1_sig e)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
  split.
   apply Qle_trans with ((b / (2#1) + a / ((2#1) * b))^2); [|Qauto_le].
@@ -166,23 +168,23 @@ Proof.
   rewrite -> Qle_minus_iff.
   replace RHS with ((b^2 - a)[^]2) by (simpl; ring).
   apply: sqr_nonneg.
- field_simplify (b / (2#1) + a / ((2#1) * b) - ((1#2)*(e * e)%Qpos)); auto with *.
+ field_simplify (b / (2#1) + a / ((2#1) * b) - ((1#2)*proj1_sig (e * e)%Qpos)); auto with *.
  rewrite -> Qdiv_power.
  apply Qle_shift_div_r.
   Qauto_pos.
- replace LHS with ((a + b^2 - b*e^2)^2) by simpl; ring.
- apply Qle_trans with ((a + b^2 - e^2)^2).
-  replace RHS with ((a + b ^ 2 - e ^ 2)[^]2) by (simpl; ring).
-  replace LHS with ((a + b ^ 2 - b * e ^ 2)[^]2) by (simpl; ring).
+ replace LHS with ((a + b^2 - b*proj1_sig e^2)^2) by simpl; ring.
+ apply Qle_trans with ((a + b^2 - proj1_sig e^2)^2).
+  replace RHS with ((a + b ^ 2 - proj1_sig e ^ 2)[^]2) by (simpl; ring).
+  replace LHS with ((a + b ^ 2 - b * proj1_sig e ^ 2)[^]2) by (simpl; ring).
   apply: (power_resp_leEq).
-   replace RHS with (a + b*(b-e^2)) by simpl; ring.
+   replace RHS with (a + b*(b-proj1_sig e^2)) by simpl; ring.
    Qauto_nonneg.
   rewrite -> Qle_minus_iff;ring_simplify.
-  replace RHS with ((b-1)*((e:Q)[^]2)) by (simpl; ring).
+  replace RHS with ((b-1)*((proj1_sig e)[^]2)) by (simpl; ring).
   rewrite -> Qle_minus_iff in Hb.
   Qauto_nonneg.
  rewrite -> Qle_minus_iff.
- replace RHS with ((a-(b-e)^2)*((b+e)^2-a)) by simpl; ring.
+ replace RHS with ((a-(b-proj1_sig e)^2)*((b+proj1_sig e)^2-a)) by simpl; ring.
  rewrite -> Qle_minus_iff in *|-.
  apply: mult_resp_nonneg; assumption.
 Qed.
@@ -194,7 +196,7 @@ Lemma initial_root_error : root_has_error (1#2) initial_root.
 Proof.
  destruct Ha as [Ha0 Ha1].
  unfold initial_root, root_has_error.
- autorewrite with QposElim.
+ simpl.
  split.
   Qauto_le.
  rewrite -> Qle_minus_iff.
@@ -237,7 +239,7 @@ Qed.
 Fixpoint root_loop (e:Qpos) (n:nat) (b:Q) (err:positive) {struct n} : Q :=
 match n with
 | O => b
-| S n' => match Qlt_le_dec_fast e (1#err) with
+| S n' => match Qlt_le_dec_fast (proj1_sig e) (1#err) with
           | left _ => let err':= (err*err)%positive in root_loop e n' (approximateQ (root_step b) (2*err')) err'
           | right _ => b
           end
@@ -251,14 +253,14 @@ Proof.
  induction n; auto with *.
  simpl.
  intros b err Hb.
- destruct (Qlt_le_dec_fast e (1 # err)) as [A|A]; try assumption.
+ destruct (Qlt_le_dec_fast (proj1_sig e) (1 # err)) as [A|A]; try assumption.
  apply IHn.
  apply approximateQ_big.
  apply root_step_one_le.
  assumption.
 Qed.
 
-Lemma root_loop_error : forall (e:Qpos) n b err, (1 <= b) -> root_has_error (1#err) b -> (1#(iter_nat n _ (fun x => (x * x)%positive) err))<=e ->
+Lemma root_loop_error : forall (e:Qpos) n b err, (1 <= b) -> root_has_error (1#err) b -> (1#(iter_nat n _ (fun x => (x * x)%positive) err))<=proj1_sig e ->
  root_has_error (Qpos_min (1 # err) e) (root_loop e n b err).
 Proof.
  induction n.
@@ -270,7 +272,7 @@ Proof.
   assumption.
  intros b err Hb0 Hb1 He.
  simpl in *.
- destruct (Qlt_le_dec_fast e (1 # err)) as [A|A].
+ destruct (Qlt_le_dec_fast (proj1_sig e) (1 # err)) as [A|A].
   apply root_has_error_le with (Qpos_min (1#(err*err)) e).
     apply Qle_trans with 1.
      apply Qle_trans with (1#err); auto with *.
@@ -286,9 +288,14 @@ Proof.
   apply IHn; try assumption.
     apply approximateQ_big.
     apply root_step_one_le; assumption.
-   setoid_replace (1#err*err)%Qpos with ((1#(2*(err * err)))+(1#(2*(err * err))))%Qpos.
+   assert (QposEq (1#err*err) ((1#(2*(err * err)))+(1#(2*(err * err))))).
+   { unfold QposEq.
+   simpl.
+   ring_simplify.
+   constructor. }
+   rewrite H. clear H.
     apply root_has_error_ball with (root_step b).
-        autorewrite with QposElim.
+    simpl.
         ring_simplify.
         unfold Qmult, Qle; simpl.
         auto with *.
@@ -298,10 +305,6 @@ Proof.
      apply (root_step_error b (1#err)); try assumption.
      unfold Qle; simpl; auto with *.
     apply approximateQ_correct.
-   unfold QposEq.
-   autorewrite with QposElim.
-   ring_simplify.
-   constructor.
   replace (iter_nat n positive (fun x : positive => (x * x)%positive) (err * err)%positive)
     with (iter_nat n positive (fun x : positive => (x * x)%positive) err *
       iter_nat n positive (fun x : positive => (x * x)%positive) err)%positive.
@@ -318,7 +321,7 @@ Proof.
 Qed.
 
 (** Find a bound on the number of iterations we need to take. *)
-Lemma root_max_steps : forall (n d:positive), (1#(iter_nat (S (Psize d)) _ (fun x => (x * x)%positive) 2%positive))<=(n#d)%Qpos.
+Lemma root_max_steps : forall (n d:positive), (1#(iter_nat (S (Psize d)) _ (fun x => (x * x)%positive) 2%positive))<= proj1_sig (n#d)%Qpos.
 Proof.
  intros n d.
  apply Qle_trans with (1#d).
@@ -349,17 +352,18 @@ Qed.
 Definition sqrt_raw (e:QposInf) : Q :=
 match e with
 | QposInfinity => 1
-| Qpos2QposInf e' => root_loop e' (S (Psize (Qden e'))) initial_root 2
+| Qpos2QposInf e' => root_loop e' (S (Psize (Qden (proj1_sig e')))) initial_root 2
 end.
 
 Lemma sqrt_regular : @is_RegularFunction Q_as_MetricSpace sqrt_raw.
 Proof.
  intros e1 e2.
  apply ball_weak_le with (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos.
-  autorewrite with QposElim.
+ - simpl. do 2 rewrite Q_Qpos_min.
   apply: plus_resp_leEq_both; simpl; auto with *.
- apply ball_root_has_error.
-     setoid_replace (1:Q) with ((1#2)%Qpos + (1#2)%Qpos) by (simpl; QposRing).
+ - apply ball_root_has_error.
+   apply (Qle_trans _ (proj1_sig ((1#2) + (1#2))%Qpos)).
+   2: simpl; ring_simplify; apply Qle_refl.
      apply: plus_resp_leEq_both; apply Qpos_min_lb_l.
     apply root_loop_one_le.
     apply initial_root_one_le.
@@ -369,19 +373,21 @@ Proof.
     apply initial_root_one_le.
    apply initial_root_error.
   revert e1.
-  apply Qpos_positive_numerator_rect.
+  intros [[n d] epos].
+  destruct n as [|n|n]. inversion epos. 2: inversion epos.
   apply root_max_steps.
  apply root_loop_error.
    apply initial_root_one_le.
   apply initial_root_error.
  revert e2.
- apply Qpos_positive_numerator_rect.
+  intros [[n d] epos].
+  destruct n as [|n|n]. inversion epos. 2: inversion epos.
  apply root_max_steps.
 Qed.
 
 Definition rational_sqrt_mid : CR := Build_RegularFunction sqrt_regular.
 
-Lemma rational_sqrt_mid_err : forall (e:Qpos), (e <= 1) -> root_has_error e (approximate rational_sqrt_mid e).
+Lemma rational_sqrt_mid_err : forall (e:Qpos), (proj1_sig e <= 1) -> root_has_error e (approximate rational_sqrt_mid e).
 Proof.
  intros e He.
  change (root_has_error e (sqrt_raw e)).
@@ -394,7 +400,8 @@ Proof.
   apply initial_root_error.
  clear.
  revert e.
- apply Qpos_positive_numerator_rect.
+  intros [[n d] epos].
+  destruct n as [|n|n]. inversion epos. 2: inversion epos.
  apply root_max_steps.
 Qed.
 
@@ -410,14 +417,15 @@ Proof.
  intros [e|];[|discriminate].
  change (sqrt_raw e <= (3#1)).
  unfold sqrt_raw.
- set (n:= (S (Psize (Qden e)))).
+ set (n:= (S (Psize (Qden (proj1_sig e))))).
  assert (root_has_error (Qpos_min (1 # 2) e) (root_loop e n initial_root 2)).
   apply root_loop_error.
     apply initial_root_one_le.
    apply initial_root_error.
   subst n.
   clear. revert e.
-  apply Qpos_positive_numerator_rect.
+  intros [[n d] epos].
+  destruct n as [|n|n]. inversion epos. 2: inversion epos.
   apply root_max_steps.
  eapply Qle_trans.
   apply root_error_bnd;[| |apply H].
@@ -426,22 +434,19 @@ Proof.
    discriminate.
   apply root_loop_one_le.
   apply initial_root_one_le.
- assert (X:=Qpos_min_lb_l (1#2) e).
- rewrite ->  Qle_minus_iff in *.
- replace RHS with ((1#2)%Qpos + - Qpos_min (1 # 2) e + (1#2)).
-  Qauto_nonneg.
- autorewrite with QposElim.
- simpl. ring.
+  rewrite Q_Qpos_min. simpl.
+  apply (Qle_trans _ (2 + (1#2))).
+  apply Qplus_le_r, Qmin_lb_l. discriminate.
 Qed.
 
 Opaque root_loop.
 
 Lemma rational_sqrt_mid_correct0 : (CRpower_N rational_sqrt_mid 2 == ' a)%CR.
 Proof.
- assert (H:AbsSmall (R:=CRasCOrdField) (' (3 # 1)%Qpos)%CR rational_sqrt_mid).
+ assert (H:AbsSmall (R:=CRasCOrdField) (' (3 # 1))%CR rational_sqrt_mid).
   split; simpl.
    intros e.
-   change (-e <= sqrt_raw (Qpos2QposInf ((1#2)*e)) + - - (3#1)).
+   change (-proj1_sig e <= sqrt_raw (Qpos2QposInf ((1#2)*e)) + - - (3#1)).
    apply Qle_trans with 0.
     rewrite -> Qle_minus_iff.
     ring_simplify.
@@ -451,7 +456,7 @@ Proof.
     discriminate.
    apply rational_sqrt_mid_one_le.
   intros e.
-  change (-e <= 3 + - sqrt_raw (Qpos2QposInf ((1#2)*e))).
+  change (-proj1_sig e <= 3 + - sqrt_raw (Qpos2QposInf ((1#2)*e))).
   apply Qle_trans with 0.
    rewrite -> Qle_minus_iff.
    ring_simplify.
@@ -461,28 +466,25 @@ Proof.
  rewrite <- (CRpower_N_bounded_N_power 2 (3#1));[|assumption].
  apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_N_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
  intros e.
- destruct (Qpos_as_positive_ratio e) as [[en ed] E].
- subst e.
- simpl fst.
- simpl snd.
- set (e := (en # ed)%Qpos).
+ destruct e as [[en ed] epos].
+ destruct en as [|en|en]. inversion epos. 2: inversion epos.
+ set (e := exist (Qlt 0) (en # ed) epos).
  intro He.
- set (d:=(e / (6#1))%Qpos).
+ set (d:= (e * Qpos_inv (6#1))%Qpos).
+ simpl (approximate (' a)%CR (Qpos2QposInf ((en # ed) ↾ epos))).
  change (Qball (e + e)
-  (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid) e)
-  a).
+               (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid)
+                            (Qpos2QposInf e)) a).
  assert (
-   (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid) e) =
+   (approximate ((CRpower_N_bounded 2 (3 # 1)) rational_sqrt_mid) (Qpos2QposInf e)) =
    ((Qmax (- (3#1)) (Qmin (3#1) (approximate rational_sqrt_mid d)))^2)
-   ).
-  simpl.
-  replace d with (Qpos_mult e (Qpos_inv ((2 # 1) * ((3 # 1) ^ (2 - 1)%positive)))).
+   ) as H0.
+ { simpl.
+  replace d with (Qpos_mult e (Qpos_inv ((2 # 1) * (Qpos_power (3 # 1) (2 - 1)%positive)))).
    reflexivity.
   subst e d.
-  f_equal.
-  unfold Qpos_mult, mkQpos, Qmult, QposMake. simpl.
-  f_equal. f_equal. apply Qlt_uniq.
- rewrite H0.
+  apply Qpos_hprop. reflexivity. }
+ rewrite H0. 
  clear H0.
  setoid_replace (Qmin (3#1) (approximate rational_sqrt_mid d))
    with ((approximate rational_sqrt_mid d)) by
@@ -494,7 +496,7 @@ Proof.
   apply rational_sqrt_mid_err.
   unfold d.
   autorewrite with QposElim.
-  change ((e/(6#1)) <= 1).
+  change ((proj1_sig e/(6#1)) <= 1).
   apply Qle_shift_div_r.
    constructor.
   eapply Qle_trans.
@@ -503,18 +505,18 @@ Proof.
  set (z:=approximate rational_sqrt_mid d) in *.
  assert (X:z <= 3).
   apply rational_sqrt_mid_le_3.
- assert (X0:d^2 <= e).
+ assert (X0:proj1_sig d^2 <= proj1_sig e).
   unfold d.
   autorewrite with QposElim in *.
-  change ((e*(1#6))^2 <= e).
+  change ((proj1_sig e*(1#6))^2 <= proj1_sig e).
   rewrite ->  Qle_minus_iff in *.
-  replace RHS with (e*(1 + -e + (35#36)* e)) by simpl; ring.
+  replace RHS with (proj1_sig e*(1 + -proj1_sig e + (35#36)* proj1_sig e)) by simpl; ring.
   Qauto_nonneg.
  destruct Z; split; simpl; rewrite ->  Qle_minus_iff in *; autorewrite with QposElim in *.
-  replace RHS with (((z+d)^2 + - a) + (2#1) * ((3#1) + -z) * d + (e + - d^2))
-    by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
+  replace RHS with (((z+proj1_sig d)^2 + - a) + (2#1) * ((3#1) + -z) * proj1_sig d + (proj1_sig e + - proj1_sig d^2))
+    by (simpl; unfold d;field;discriminate).
   Qauto_nonneg.
- replace RHS with (a + - (z-d)^2 + (2#1) * ((3#1) + - z)*d + d^2 + e)
+ replace RHS with (a + - (z-proj1_sig d)^2 + (2#1) * ((3#1) + - z)*proj1_sig d + proj1_sig d^2 + proj1_sig e)
    by (simpl; unfold d; autorewrite with QposElim;field;discriminate).
  Qauto_nonneg.
 Qed. (* todo: clean up *)
@@ -524,7 +526,7 @@ Proof.
  intros e.
  apply Qle_trans with 1.
   Qauto_le.
- change (1 <= sqrt_raw ((1#2)%Qpos*e) - 0).
+ change (1 <= sqrt_raw (Qpos2QposInf ((1#2)%Qpos*e)) - 0).
  ring_simplify.
  apply rational_sqrt_mid_one_le.
 Qed.
@@ -810,10 +812,10 @@ Proof.
    destruct Hab.
    split; simpl in *.
     rewrite ->  Qle_minus_iff in *.
-    replace RHS with ((a + - 0) + (e*e)%Qpos) by simpl; ring.
+    replace RHS with ((a + - 0) + proj1_sig (e*e)%Qpos) by simpl; ring.
     Qauto_nonneg.
    rewrite ->  Qle_minus_iff in *.
-   replace RHS with ((e*e)%Qpos + - (a - b) + (0 + - b)) by simpl; ring.
+   replace RHS with (proj1_sig (e*e)%Qpos + - (a - b) + (0 + - b)) by simpl; ring.
    Qauto_nonneg.
   unfold rational_sqrt at 1.
   destruct (Qlt_le_dec_fast 0 a) as [Z0|_].
@@ -825,10 +827,10 @@ Proof.
    destruct Hab.
    split; simpl in *.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((a - b) + - - (e*e)%Qpos + (0 + - a)) by simpl; ring.
+    replace RHS with ((a - b) + - - proj1_sig (e*e)%Qpos + (0 + - a)) by simpl; ring.
     Qauto_nonneg.
    rewrite -> Qle_minus_iff in *.
-   replace RHS with ((e*e)%Qpos + (b + - 0)) by simpl; ring.
+   replace RHS with (proj1_sig (e*e)%Qpos + (b + - 0)) by simpl; ring.
    Qauto_nonneg.
   unfold rational_sqrt at 2.
   destruct (Qlt_le_dec_fast 0 b) as [Z0|_].
@@ -848,17 +850,17 @@ Proof.
   assumption.
  rewrite -> (rational_sqrt_correct _ Z0).
  rewrite <- CRAbsSmall_ball.
- cut (AbsSmall (R:=CRasCOrdField) (IRasCR (inj_Q IR (e:Q)))%CR
+ cut (AbsSmall (R:=CRasCOrdField) (IRasCR (inj_Q IR (proj1_sig e)))%CR
    (IRasCR (sqrt (inj_Q IR a) Z[-](sqrt (inj_Q IR b) Z0)))).
   intros [A B].
   unfold cg_minus.
-  split; (simpl; rewrite <- (IR_inj_Q_as_CR e); rewrite <- (IR_opp_as_CR (sqrt _ Z0));
+  split; (simpl; rewrite <- (IR_inj_Q_as_CR (proj1_sig e)); rewrite <- (IR_opp_as_CR (sqrt _ Z0));
     rewrite <- (IR_plus_as_CR); assumption).
  rewrite <- IR_AbsSmall_as_CR.
- assert (Z1:AbsSmall (inj_Q IR (e*e)) ((inj_Q IR a)[-](inj_Q IR b))).
+ assert (Z1:AbsSmall (inj_Q IR (proj1_sig e*proj1_sig e)) ((inj_Q IR a)[-](inj_Q IR b))).
   destruct Hab.
   split.
-   stepl (inj_Q IR (-(e*e))); [| now apply (inj_Q_inv IR)].
+   stepl (inj_Q IR (-(proj1_sig e*proj1_sig e))); [| now apply (inj_Q_inv IR)].
    stepr (inj_Q IR (a - b)); [| now apply (inj_Q_minus IR)].
    apply inj_Q_leEq.
    assumption.
@@ -866,7 +868,7 @@ Proof.
   apply inj_Q_leEq.
   assumption.
  clear Hab.
- set (e':=(inj_Q IR (e:Q))).
+ set (e':=(inj_Q IR (proj1_sig e))).
  set (a':=(sqrt (inj_Q IR a) Z)).
  set (b':=(sqrt (inj_Q IR b) Z0)).
  assert (He:[0][<]e').
@@ -882,10 +884,10 @@ Proof.
   rstepr ((a'[^]2[-]b'[^]2)[+](e')[*](a'[-]b')).
   apply plus_resp_leEq_both.
    stepr (inj_Q IR a[-]inj_Q IR b).
-    stepl ([--](inj_Q IR (e*e))).
+    stepl ([--](inj_Q IR (proj1_sig e*proj1_sig e))).
      destruct Z1; assumption.
     unfold e'.
-    csetoid_rewrite_rev (inj_Q_mult IR (e:Q) (e:Q)).
+    csetoid_rewrite_rev (inj_Q_mult IR (proj1_sig e) (proj1_sig e)).
     apply eq_reflexive.
    unfold a', b'.
    unfold cg_minus.
@@ -907,10 +909,10 @@ Proof.
  rstepl ((a'[^]2[-]b'[^]2)[+](e')[*](a'[-]b')).
  apply plus_resp_leEq_both.
   stepl (inj_Q IR a[-]inj_Q IR b).
-   stepr (inj_Q IR (e*e)).
+   stepr (inj_Q IR (proj1_sig e*proj1_sig e)).
     destruct Z1; assumption.
    unfold e'.
-   csetoid_rewrite_rev (inj_Q_mult IR (e:Q) (e:Q)).
+   csetoid_rewrite_rev (inj_Q_mult IR (proj1_sig e) (proj1_sig e)).
    apply eq_reflexive.
   unfold a', b'.
   unfold cg_minus.

@@ -22,6 +22,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.StepFunctionSetoid.
 Require Import CoRN.metric2.StepFunctionMonad.
 Require Import CoRN.metric2.UniformContinuity.

@@ -20,6 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.reals.Cauchy_IR.
 Require Import CoRN.tactics.CornTac.
 Require Import Coq.omega.Omega.
@@ -44,24 +47,23 @@ Then we can leverage the proofs that Cauchy_IR is a real number structure.
 *** CR to Cauchy_IR
 *)
 
-Definition CRasCauchy_IR_raw (x:CR) (n:nat) := approximate x (1 # P_of_succ_nat n)%Qpos.
+Definition CRasCauchy_IR_raw (x:CR) (n:nat)
+  := approximate x (Qpos2QposInf (1 # P_of_succ_nat n)).
 
 Lemma CRasCauchy_IR_raw_is_Cauchy : forall (x:CR),
 Cauchy_prop (R:=Q_as_COrdField) (CRasCauchy_IR_raw x).
 Proof.
  intros x e He.
- rewrite <- (QposAsmkQpos He).
- generalize (mkQpos He).
- clear e He.
- apply Qpos_positive_numerator_rect.
- intros en ed.
+ destruct e as [en ed].
+ destruct en as [|en|en]. inversion He. 2: inversion He.
  unfold CRasCauchy_IR_raw.
  exists (pred (nat_of_P (2*ed))).
  rewrite <- anti_convert_pred_convert.
  intros m Hm.
- change (ball (en#ed) (approximate x (1 # P_of_succ_nat m)%Qpos) (approximate x (1#(2*ed)))%Qpos).
+ change (ball (en#ed) (approximate x (Qpos2QposInf (1 # P_of_succ_nat m)))
+              (approximate x (Qpos2QposInf (1#(2*ed))))).
  eapply ball_weak_le ;[|apply regFun_prf].
- autorewrite with QposElim.
+ simpl.
  apply Qle_trans with (((1 # P_of_succ_nat (pred (nat_of_P (2*ed)))) + (1 # 2 * ed)))%Q.
   eapply plus_resp_leEq.
   change (P_of_succ_nat (pred (nat_of_P (2*ed))) <= P_of_succ_nat m)%Z.
@@ -84,20 +86,16 @@ Proof.
  intros x y Hxy.
  eapply Eq_alt_2_2.
  intros e He.
- rewrite <- (QposAsmkQpos He).
- generalize (mkQpos He).
- clear He e.
- apply Qpos_positive_numerator_rect.
- intros en ed.
+ destruct e as [en ed].
+ destruct en as [|en|en]. inversion He. 2: inversion He.
  exists (pred(nat_of_P (2*ed))).
  intros m Hm.
  simpl.
  unfold CRasCauchy_IR_raw.
  set (d:=(1 # P_of_succ_nat m)%Qpos).
- change (ball (en#ed)%Qpos (approximate x d) (approximate y d)).
+ change (ball (en#ed)%Qpos (approximate x (Qpos2QposInf d)) (approximate y (Qpos2QposInf d))).
  eapply ball_weak_le;[|apply Hxy].
- unfold d.
- autorewrite with QposElim.
+ unfold d. simpl.
  ring_simplify.
  apply Qle_trans with ((2#1)*(1#(2 * ed)))%Q.
   eapply mult_resp_leEq_lft;try discriminate.
@@ -122,7 +120,7 @@ Proof.
  intros [e|];[|exact 0%Q].
  destruct x as [f Hf].
  unfold Cauchy_prop in Hf.
- destruct (Hf (e:Q) (Qpos_prf e)) as [n Hn].
+ destruct (Hf (proj1_sig e) (Qpos_ispos e)) as [n Hn].
  exact (f n).
 Defined.
 
@@ -131,21 +129,23 @@ Lemma Cauchy_IRasCR_is_Regular : forall (x:Cauchy_IR),
 Proof.
  intros [f Hf] e1 e2.
  simpl.
- destruct (Hf (e1:Q) (Qpos_prf e1)) as [n1 Hn1].
- destruct (Hf (e2:Q) (Qpos_prf e2)) as [n2 Hn2].
+ destruct (Hf (proj1_sig e1) (Qpos_ispos e1)) as [n1 Hn1].
+ destruct (Hf (proj1_sig e2) (Qpos_ispos e2)) as [n2 Hn2].
  cut (forall (e1 e2:Qpos) n1 n2, n2 <= n1 ->
-   (forall m : nat, n1 <= m -> AbsSmall (R:=Q_as_COrdField) (e1:Q) (f m[-]f n1)) ->
-     (forall m : nat, n2 <= m -> AbsSmall (R:=Q_as_COrdField) (e2:Q) (f m[-]f n2)) ->
+   (forall m : nat, n1 <= m -> AbsSmall (R:=Q_as_COrdField) (proj1_sig e1) (f m[-]f n1)) ->
+     (forall m : nat, n2 <= m -> AbsSmall (R:=Q_as_COrdField) (proj1_sig e2) (f m[-]f n2)) ->
        Qball (e1 + e2) (f n1) (f n2)).
   intros H.
   destruct (le_ge_dec n1 n2).
    eapply ball_sym;simpl.
-   setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
+   assert (QposEq (e1+e2) (e2+e1)) by (unfold QposEq; simpl; ring).
+   apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0. 
    apply H; assumption.
   auto.
  clear - Hf.
  intros e1 e2 n1 n2 H Hn1 Hn2.
- setoid_replace (e1+e2)%Qpos with (e2+e1)%Qpos by QposRing.
+ assert (QposEq (e1+e2) (e2+e1)) by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0. 
  eapply ball_weak.
  eapply Hn2.
  assumption.
@@ -163,9 +163,9 @@ Proof.
  apply ball_closed.
  intros d.
  simpl.
- destruct (Hx (e:Q) (Qpos_prf e)) as [a Ha].
- destruct (Hy (e:Q) (Qpos_prf e)) as [b Hb].
- destruct (Eq_alt_2_1 _ _ _ Hxy _ (Qpos_prf d)) as [c Hc].
+ destruct (Hx (proj1_sig e) (Qpos_ispos e)) as [a Ha].
+ destruct (Hy (proj1_sig e) (Qpos_ispos e)) as [b Hb].
+ destruct (Eq_alt_2_1 _ _ _ Hxy _ (Qpos_ispos d)) as [c Hc].
  simpl in Hc.
  unfold Qball.
  set (n:=max (max a b) c).
@@ -188,17 +188,20 @@ Proof.
  eapply regFunEq_e.
  intros e.
  simpl.
- destruct (CRasCauchy_IR_raw_is_Cauchy x (e:Q) (Qpos_prf e)) as [n Hn].
+ destruct (CRasCauchy_IR_raw_is_Cauchy x (proj1_sig e) (Qpos_ispos e)) as [n Hn].
  unfold CRasCauchy_IR_raw in *.
- eapply ball_closed.
- apply Qpos_positive_numerator_rect.
- intros dn dd.
- setoid_replace (e+e+(dn#dd))%Qpos with (e+((dn#dd)+e))%Qpos by QposRing.
- apply ball_triangle with (approximate x (1#P_of_succ_nat (n+(nat_of_P dd))))%Qpos.
-  apply ball_sym.
+ apply ball_closed.
+ intro d.
+ assert (QposEq (e+e+d) (e+(d+e))%Qpos)
+   by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
+ destruct d as [[dn dd] dpos].
+ destruct dn as [|dn|dn]. inversion dpos. 2: inversion dpos.
+ apply ball_triangle with (approximate x (Qpos2QposInf (1#P_of_succ_nat (n+(nat_of_P dd)))))%Qpos.
+ - apply ball_sym.
   eapply Hn;auto with *.
- eapply ball_weak_le;[|apply regFun_prf].
- autorewrite with QposElim.
+ - eapply ball_weak_le;[|apply regFun_prf].
+ simpl.
  eapply plus_resp_leEq;simpl.
  apply Qle_trans with (1#dd)%Q.
   change (dd <= P_of_succ_nat (n + nat_of_P dd))%Z.
@@ -229,18 +232,14 @@ Proof.
  intros [x Hx].
  eapply Eq_alt_2_2.
  intros e He.
- rewrite <- (QposAsmkQpos He).
- set (e':=(mkQpos He)).
- clearbody e'.
- clear e He.
- assert (Z:(0<(1#2)*e')%Q).
+ assert (Z:(0<(1#2)*e)%Q).
   rewrite <- (Qmult_0_r (1#2)).
   eapply mult_resp_less_lft.
-   apply Qpos_prf.
+   exact He.
   constructor.
  destruct (Hx _ Z) as [n Hn].
- destruct (Qpos_as_positive_ratio e') as [[en ed] E].
- subst.
+ destruct e as [en ed].
+ destruct en as [|en|en]. inversion He. 2: inversion He.
  exists (max n (nat_of_P ed)).
  intros m Hm.
  simpl.
@@ -257,7 +256,7 @@ Proof.
    apply le_trans with (max n (nat_of_P ed));auto with *.
   change (1*P_of_succ_nat m <= en * P_of_succ_nat m)%Z.
   apply Zmult_lt_0_le_compat_r;auto with *.
- stepl ((1#2)*(en#ed)%Qpos+(1#2)*(en#ed)%Qpos)%Q; [| simpl; ring].
+ stepl ((1#2)*(Z.pos en#ed)+(1#2)*(Z.pos en#ed))%Q; [| simpl; ring].
  rstepr ((x m[-]x n)[+](x n[-]x n')).
  assert (Y:n <= m).
   apply le_trans with (max n (nat_of_P ed));auto with *.
@@ -370,7 +369,7 @@ Proof.
  eapply regFunEq_e.
  intros e.
  simpl.
- destruct (CS_seq_const Q_as_COrdField x (e:Q) (Qpos_prf e)).
+ destruct (CS_seq_const Q_as_COrdField x (proj1_sig e) (Qpos_ispos e)).
  eapply ball_refl.
 Qed.
 
@@ -402,13 +401,14 @@ Proof.
  simpl.
  unfold Cap_raw.
  simpl.
- destruct (Hx (((1 # 2) * e)%Qpos:Q)) as [n1 Hn1].
- destruct (Hy (((1 # 2) * e)%Qpos:Q)) as [n2 Hn2].
+ destruct (Hx (proj1_sig ((1 # 2) * e)%Qpos)) as [n1 Hn1].
+ destruct (Hy (proj1_sig ((1 # 2) * e)%Qpos)) as [n2 Hn2].
  destruct (CS_seq_plus) as [n3 Hn3].
  set (n:= max n3 (max n1 n2)).
  change (@ball Q_as_MetricSpace (e+e) (x n1 + y n2) (x n3 + y n3))%Q.
  apply ball_triangle with (x n + y n)%Q.
-  setoid_replace e with (((1 # 2) * e +(1 # 2) * e)%Qpos ) by QposRing.
+  assert (QposEq e (((1 # 2) * e +(1 # 2) * e))) by (unfold QposEq; simpl; ring).
+  apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
   apply ball_triangle with (x n1 + y n)%Q; simpl; unfold Qball.
   unfold QAbsSmall.
   setoid_replace (x n1 + y n2 - (x n1 + y n))%Q with (y n2 - y n)%Q.
@@ -447,8 +447,8 @@ Proof.
  eapply regFunEq_e.
  intros e.
  simpl.
- destruct (Hx (e:Q) (Qpos_prf e)) as [n1 Hn1].
- destruct (CS_seq_inv Q_as_COrdField x Hx (e:Q) (Qpos_prf e)) as [n2 Hn2].
+ destruct (Hx (proj1_sig e) (Qpos_ispos e)) as [n1 Hn1].
+ destruct (CS_seq_inv Q_as_COrdField x Hx (proj1_sig e) (Qpos_ispos e)) as [n2 Hn2].
  set (n:=(max n1 n2)).
  change (@ball Q_as_MetricSpace (e+e) (- x n1) (- x n2))%Q.
  apply (@ball_triangle Q_as_MetricSpace _ _ _ (- x n)%Q). simpl; unfold Qball.
@@ -474,12 +474,12 @@ Proof.
  intros [x Hx] [y Hy].
  split.
   intros H1 [n [e He H2]].
-  assert (H1':=H1 ((1#3)*(mkQpos He))%Qpos).
+  assert (H1':=H1 ((1#3)*(exist _ _ He))%Qpos).
   clear H1.
   simpl in H1'.
   unfold Cap_raw in H1'; simpl in H1'.
-  destruct (Hy (((1 # 2) * ((1#3)*  mkQpos He))%Qpos:Q)) as [n1 Hn1] in H1'.
-  destruct (Hx (((1 # 2) * ((1#3)* mkQpos He))%Qpos:Q)) as [n2 Hn2] in H1'.
+  destruct (Hy (proj1_sig ((1 # 2) * ((1#3)* exist _ _ He))%Qpos)) as [n1 Hn1] in H1'.
+  destruct (Hx (proj1_sig ((1 # 2) * ((1#3)* exist _ _ He))%Qpos)) as [n2 Hn2] in H1'.
   simpl in H2.
   set (m:=max n (max n1 n2)).
   assert (m1:n<=m);[unfold m; auto with *|].
@@ -506,15 +506,15 @@ Proof.
  intros H e.
  simpl.
  unfold Cap_raw; simpl.
- destruct (Hy (((1 # 2) * e)%Qpos:Q)) as [n1 Hn1].
- destruct (Hx (((1 # 2) * e)%Qpos:Q)) as [n2 Hn2].
+ destruct (Hy (proj1_sig ((1 # 2) * e)%Qpos)) as [n1 Hn1].
+ destruct (Hx (proj1_sig ((1 # 2) * e)%Qpos)) as [n2 Hn2].
  apply Qnot_lt_le.
  intros A.
  apply H; clear H.
  exists (max n1 n2).
  simpl.
  set (n:=max n1 n2).
- exists (- e + - (y n1 + - x n2))%Q.
+ exists (- proj1_sig e + - (y n1 + - x n2))%Q.
   rewrite <- Qlt_minus_iff.
   assumption.
  intros m Hm.
@@ -522,7 +522,7 @@ Proof.
  simpl.
  stepr ((x m - x n2) + -(y m - y n1) + -(y n1 + - x n2))%Q; [| simpl; ring].
  eapply plus_resp_leEq.
- stepl (-((1 # 2) * e) + - ((1 # 2) * e))%Q; [| simpl; ring].
+ stepl (-((1 # 2) * proj1_sig e) + - ((1 # 2) * proj1_sig e))%Q; [| simpl; ring].
  apply plus_resp_leEq_both.
   refine (proj1 (Hn2 _ _)).
   apply le_trans with n; [unfold n;auto with *|assumption].
@@ -544,7 +544,7 @@ Qed.
 
 (** mult is preserved. *)
 Lemma Cauchy_IR_mult_as_CRmult_bounded : forall x y:Cauchy_IR,
-forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> AbsSmall (z:Q) (CS_seq _ y i)) ->
+forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> AbsSmall (proj1_sig z) (CS_seq _ y i)) ->
 (ucFun2 (CRmult_bounded z) (Cauchy_IRasCR x) (Cauchy_IRasCR y) == Cauchy_IRasCR (x[*]y))%CR.
 Proof.
  intros [x Hx] y z N Hz.
@@ -560,7 +560,7 @@ Proof.
   intros Hxn1.
   pose (n:=(max n3 (max n1 N))).
   rewrite -> Hxn1.
-  assert (Qeq (0 * Qmax (- z) (Qmin z
+  assert (Qeq (0 * Qmax (- proj1_sig z) (Qmin (proj1_sig z)
     (Cauchy_IRasCR_raw (Build_CauchySeq Q_as_COrdField y Hy)(QposInf_bind (fun e0 : Qpos => e0) QposInfinity))))%Q (0 * y n)%Q).
    ring.
   rewrite -> H. clear H.
@@ -573,14 +573,15 @@ Proof.
   unfold QAbsSmall.
   setoid_replace (x n * y n - x n1 * y n)%Q with ((x n - x n1)*y n)%Q.
   2: ring.
-  apply AbsSmall_trans with ((1#2)*e)%Q.
+  apply AbsSmall_trans with ((1#2)*proj1_sig e)%Q.
    apply half_3.
-   apply Qpos_prf.
-  stepl (((1#2)*e/z)*z)%Q; [| simpl;field;apply Qpos_nonzero].
+   apply Qpos_ispos.
+   stepl (((1#2)*proj1_sig e/ proj1_sig z)* proj1_sig z)%Q;
+     [| simpl;field;apply Qpos_nonzero].
   apply mult_AbsSmall;[apply Hn1|apply Hz]; unfold n; apply le_trans with (max n1 N); auto with *.
  intros w Hw.
  simpl.
- destruct (Hy (w:Q) (Qpos_prf w)) as [n2 Hn2].
+ destruct (Hy (proj1_sig w) (Qpos_ispos w)) as [n2 Hn2].
  pose (n:=(max (max n1 n2) (max n3 N))).
  assert (n1 <= n);[unfold n; apply le_trans with (max n1 n2); auto with *|].
  assert (n2 <= n);[unfold n; apply le_trans with (max n1 n2); auto with *|].
@@ -589,20 +590,22 @@ Proof.
  change (Qball (e+e)) with (@ball Q_as_MetricSpace (e + e)).
  apply ball_triangle with (x n * y n)%Q;[|eapply Hn3; assumption].
  clear Hn3.
- setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
+ assert (QposEq e ((1#2)*e + (1#2)*e)) by (unfold QposEq; simpl; ring).
+ apply (ball_wd _ H3 _ _ (reflexivity _) _ _ (reflexivity _)). clear H3.
  apply ball_triangle with (x n1 * y n)%Q; apply ball_sym; simpl; unfold Qball.
  unfold QAbsSmall.
- setoid_replace (x n1 * y n - x n1 * Qmax (- z) (Qmin z (y n2)))%Q
-   with (x n1*(y n - Qmax (- z) (Qmin z (y n2))))%Q. 2: ring.
-  autorewrite with QposElim.
-  stepl (((1#2)*e/w)*w)%Q; [| simpl;field;apply Qpos_nonzero].
+ setoid_replace (x n1 * y n - x n1 * Qmax (- proj1_sig z) (Qmin (proj1_sig z) (y n2)))%Q
+   with (x n1*(y n - Qmax (- proj1_sig z) (Qmin (proj1_sig z) (y n2))))%Q. 2: ring.
+ simpl.
+  stepl (((1#2)*proj1_sig e/proj1_sig w)*proj1_sig w)%Q; [| simpl;field;apply Qpos_nonzero].
   apply mult_AbsSmall;[apply Hw|].
   destruct (Hz n H2) as [X0 X1].
   destruct (Hn2 _ H0) as [X2 X3].
   unfold cg_minus in *.
   simpl in *.
-  change (Qmax (- z) (Qmin z (y n2)))%Q with (QboundAbs z (y n2))%Q.
-  assert (A0:(-w<=0)%Q).
+  change (Qmax (- proj1_sig z) (Qmin (proj1_sig z) (y n2)))%Q
+    with (QboundAbs z (y n2))%Q.
+  assert (A0:(- proj1_sig w<=0)%Q).
    rewrite -> Qle_minus_iff.
    ring_simplify.
    apply Qpos_nonneg.
@@ -619,17 +622,17 @@ Proof.
    apply leEq_imp_AbsSmall.
     apply X1.
    rewrite -> Qle_minus_iff.
-   stepr ((y n + (-1 # 1) * y n2 + w)+(y n2 + - z))%Q; [| simpl; ring].
+   stepr ((y n + (-1 # 1) * y n2 + proj1_sig w)+(y n2 + - proj1_sig z))%Q; [| simpl; ring].
    eapply plus_resp_nonneg; assumption.
   eapply leEq_imp_AbsSmall; simpl; ring_simplify.
    apply X0.
   rewrite -> Qle_minus_iff.
-  stepr ((w + (-1 # 1) * y n + y n2)+(- z + - y n2))%Q; [| simpl; ring].
+  stepr ((proj1_sig w + (-1 # 1) * y n + y n2)+(- proj1_sig z + - y n2))%Q; [| simpl; ring].
   eapply plus_resp_nonneg; assumption.
   unfold QAbsSmall.
   setoid_replace (x n * y n - x n1 * y n)%Q with ((x n - x n1)*y n)%Q. 2: ring.
  autorewrite with QposElim.
- stepl (((1#2)*e/z)*z)%Q; [| simpl; field; apply Qpos_nonzero].
+ stepl (((1#2)*proj1_sig e/proj1_sig z)*proj1_sig z)%Q; [| simpl; field; apply Qpos_nonzero].
  apply mult_AbsSmall;[apply Hn1;assumption|apply Hz;assumption].
 Qed.
 
@@ -670,13 +673,13 @@ Proof.
  intros x [y Hy].
  destruct (CS_seq_bounded _ y Hy) as [k Hk [n Hn]].
  set (y':=Build_CauchySeq Q_as_COrdField y Hy).
- set (k':=(mkQpos Hk)).
+ set (k':=(exist _ _ Hk)).
  transitivity ((ucFun2 (CRmult_bounded (CR_b (1 # 1) (Cauchy_IRasCR y')+k')%Qpos) (Cauchy_IRasCR x)
    (Cauchy_IRasCR y'))).
   apply CRmult_bounded_weaken.
     apply CR_b_lowerBound.
    apply CR_b_upperBound.
-  autorewrite with QposElim.
+   simpl.
   rewrite -> Qle_minus_iff.
   ring_simplify.
   auto with *.
@@ -709,7 +712,7 @@ Lemma Cauchy_IR_lt_as_CR_lt_1 : forall (x y:Cauchy_IR),
 x[<]y -> (Cauchy_IRasCR x < Cauchy_IRasCR y)%CR.
 Proof.
  intros x y [n [e He Hn]].
- exists (mkQpos He).
+ exists (exist _ _ He).
  abstract ( autorewrite with CRtoCauchy_IR; intros [m [d Hd Hm]];
    refine (Qle_not_lt _ _ (Hn (max n m) _) _);[auto with *|]; rewrite -> Qlt_minus_iff;
      apply Qlt_le_trans with d;[assumption|]; autorewrite with QposElim in Hm; eapply Hm; auto with *
@@ -721,12 +724,12 @@ Lemma CR_lt_as_Cauchy_IR_lt_1 : forall (x y:CR),
 Proof.
  intros x y [e He].
  apply shift_zero_less_minus'.
- apply (less_leEq_trans _ [0] (Cauchy_CReals.inject_Q _ (e:Q))).
+ apply (less_leEq_trans _ [0] (Cauchy_CReals.inject_Q _ (proj1_sig e))).
   eapply ing_lt.
-  apply Qpos_prf.
+  apply Qpos_ispos.
  unfold cg_minus.
  stepr (CRasCauchy_IR (y-x))%CR.
-  stepl (CRasCauchy_IR (' e)%CR).
+  stepl (CRasCauchy_IR (' proj1_sig e)%CR).
    rewrite <- Cauchy_IR_le_as_CR_le.
    do 2 rewrite -> CRasCR.
    assumption.
@@ -783,7 +786,7 @@ Defined.
 
 (** inv is preserved. *)
 Lemma Cauchy_IR_inv_as_CRinv_pos : forall (x:Cauchy_IR) x_,
-forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> (z <= (CS_seq _ x i))%Q) ->
+forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> (proj1_sig z <= (CS_seq _ x i))%Q) ->
 (CRinv_pos z (Cauchy_IRasCR x) == Cauchy_IRasCR (f_rcpcl x (@inr _ _ x_)))%CR.
 Proof.
  intros [x Hx] [a [d d_ x_]] z n Hn.
@@ -791,7 +794,7 @@ Proof.
  intros e.
  simpl.
  unfold Qinv_modulus.
- destruct (Hx (z * z * e)%Q) as [b Hb].
+ destruct (Hx (proj1_sig z * proj1_sig z * proj1_sig e)%Q) as [b Hb].
  destruct (CS_seq_recip) as [c Hc].
  set (y := (CS_seq_recip_seq Q_as_COrdField x d d_ a
              (fun (n : nat) (H : le a n) =>
@@ -803,7 +806,7 @@ Proof.
  set (m:=max (max a n) (max b c)).
  assert (Hm1: c<=m).
   unfold m; apply le_trans with (max b c); auto with *.
- change (@ball Q_as_MetricSpace (e+e) (/ Qmax z (x b))%Q (y c)).
+ change (@ball Q_as_MetricSpace (e+e) (/ Qmax (proj1_sig z) (x b))%Q (y c)).
  apply ball_triangle with (y m);[|eapply Hc;assumption].
  clear Hc.
  unfold y.
@@ -811,39 +814,41 @@ Proof.
   elim (le_not_lt _ _ Z).
   unfold m.
   apply lt_le_trans with (S (max a n)); auto with *.
- change (AbsSmall (e:Q) (/ Qmax z (x b)-1 * / x m))%Q.
+ change (AbsSmall (proj1_sig e) (/ Qmax (proj1_sig z) (x b)-1 * / x m))%Q.
  clear y.
- assert (T:(~ (x m == 0)%Q /\ ~ (Qmax z (x b) == 0)%Q)).
+ assert (T:(~ (x m == 0)%Q /\ ~ (Qmax (proj1_sig z) (x b) == 0)%Q)).
   split; apply (ap_symmetric_unfolded Q_as_CSetoid); eapply Qlt_not_eq.
-   apply Qlt_le_trans with z.
-    apply Qpos_prf.
+   apply Qlt_le_trans with (proj1_sig z).
+    apply Qpos_ispos.
    apply Hn.
    apply le_trans with (max a n).
     auto with *.
    unfold m; auto with *.
-  apply Qlt_le_trans with z; auto with *.
- stepr ((/(Qmax z (x b))*/(x m))*(x m - (Qmax z (x b))))%Q; [| simpl; field; assumption].
- stepl ((/ Qmax z (x b) * / x m)*((Qmax z (x b))*(x m)*e))%Q; [| simpl;field; assumption].
+  apply Qlt_le_trans with (proj1_sig z); auto with *.
+  stepr ((/(Qmax (proj1_sig z) (x b))*/(x m))*(x m - (Qmax (proj1_sig z) (x b))))%Q;
+    [| simpl; field; assumption].
+  stepl ((/ Qmax (proj1_sig z) (x b) * / x m)*((Qmax (proj1_sig z) (x b))*(x m)* proj1_sig e))%Q;
+    [| simpl;field; assumption].
  apply mult_resp_AbsSmall.
   assert (foo:forall q:Q, (0<=q -> 0<=/q)%Q).
    intros [[|p|p] q] qH; apply qH.
   apply mult_resp_nonneg.
    apply foo.
-   apply Qle_trans with z.
+   apply Qle_trans with (proj1_sig z).
     apply Qpos_nonneg.
    apply Qmax_ub_l.
   apply foo.
-  apply Qle_trans with z.
+  apply Qle_trans with (proj1_sig z).
    apply Qpos_nonneg.
   apply Hn.
   apply le_trans with (max a n); unfold m; auto with *.
  simpl in x_.
- apply (AbsSmall_leEq_trans _ (z*z*e)%Q).
+ apply (AbsSmall_leEq_trans _ (proj1_sig z*proj1_sig z*proj1_sig e)%Q).
   apply mult_resp_leEq_rht;[apply mult_resp_leEq_both|]; try apply Qpos_nonneg.
    apply Qmax_ub_l.
   apply Hn.
   apply le_trans with (max a n); unfold m; auto with *.
- assert (W:AbsSmall (R:=Q_as_COrdField) (z * z * e)%Q (x m - x b)%Q).
+ assert (W:AbsSmall (R:=Q_as_COrdField) (proj1_sig z * proj1_sig z * proj1_sig e)%Q (x m - x b)%Q).
   apply Hb.
   apply le_trans with (max b c); unfold m; auto with *.
  apply Qmax_case;intros C;[|assumption].
@@ -854,7 +859,7 @@ Proof.
   apply le_trans with (max a n); unfold m; auto with *.
  apply Qle_trans with (x m - x b)%Q.
   rewrite -> Qle_minus_iff.
-  stepr (z + - x b)%Q; [| simpl; ring].
+  stepr (proj1_sig z + - x b)%Q; [| simpl; ring].
   rewrite <- Qle_minus_iff.
   assumption.
  destruct W; assumption.
@@ -895,7 +900,7 @@ Proof.
   set (y:= (Cauchy_IRasCR [--](f_rcpcl (F:=Cauchy_IR) ([--](x':Cauchy_IR)) (@inr _ _ H')))%CR).
   transitivity y.
    destruct H as [n [e He H]].
-   change (-(CRinv_pos (mkQpos He) (- Cauchy_IRasCR (Build_CauchySeq Q_as_COrdField x Hx)))==y)%CR.
+   change (-(CRinv_pos (exist _ _ He) (- Cauchy_IRasCR (Build_CauchySeq Q_as_COrdField x Hx)))==y)%CR.
    unfold y.
    rewrite <- Cauchy_IR_opp_as_CR_opp.
    apply CRopp_wd.

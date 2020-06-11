@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.algebra.Bernstein.
 Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.algebra.COrdFields2.
@@ -884,7 +886,7 @@ Proof.
  auto.
 Qed.
 
-Lemma MVP_uc_fun_close_weaken : forall n (e1 e2:Qpos) f g, (e1 <= e2) ->
+Lemma MVP_uc_fun_close_weaken : forall n (e1 e2:Qpos) f g, (proj1_sig e1 <= proj1_sig e2) ->
  MVP_uc_fun_close_sig n e1 f g ->
  MVP_uc_fun_close_sig n e2 f g.
 Proof.
@@ -986,7 +988,8 @@ Proof.
   simpl.
   replace RHS with ((approximate p1 ((1 # 2) * d1)%Qpos - approximate p1 ((1 # 2) * d2)%Qpos)
     +(approximate p2 ((1 # 2) * d1)%Qpos - approximate p3 ((1 # 2) * d2)%Qpos)) by simpl; ring.
-  replace LHS with (((1 # 2) * d1 + (1 # 2) * d2)%Qpos+((1 # 2) * d1 + e + (1 # 2) * d2)%Qpos) by simpl; QposRing.
+  replace LHS with (proj1_sig ((1 # 2) * d1 + (1 # 2) * d2)%Qpos
+                    +proj1_sig ((1 # 2) * d1 + e + (1 # 2) * d2)%Qpos) by simpl; ring.
   apply AbsSmall_plus.
    change (ball ((1 # 2) * d1 + (1 # 2) * d2) (approximate p1 ((1 # 2) * d1)%Qpos) (approximate p1 ((1 # 2) * d2)%Qpos)).
    generalize ((1#2)*d1)%Qpos ((1#2)*d2)%Qpos.
@@ -1015,12 +1018,12 @@ Proof.
  induction n; intros e c q1 q2 Hc0 Hc1 H.
   change (ball e (c * q1)%CR (c * q2)%CR).
   rewrite <- CRAbsSmall_ball.
-  change (AbsSmall (' e)%CR (c[*]q1[-]c[*]q2)).
+  change (AbsSmall (' proj1_sig e)%CR (c[*]q1[-]c[*]q2)).
   rstepr (c[*](q1[-]q2)).
-  apply AbsSmall_leEq_trans with (c[*]'e)%CR.
-   rstepr ([1][*]('e))%CR.
+  apply AbsSmall_leEq_trans with (c[*]'proj1_sig e)%CR.
+   rstepr ([1][*]('proj1_sig e))%CR.
    apply mult_resp_leEq_rht; auto.
-   change (0<='e)%CR.
+   change (0<='proj1_sig e)%CR.
    rewrite -> CRle_Qle.
    auto with *.
   apply mult_resp_AbsSmall; auto.
@@ -1125,31 +1128,31 @@ Proof.
  induction n; intros e x y p b Hb Hxy.
   change (ball e (x*p) (y*p))%CR.
   rewrite <- CRAbsSmall_ball.
-  change (AbsSmall (' e)%CR (x[*]p[-]y[*]p)).
+  change (AbsSmall (' proj1_sig e)%CR (x[*]p[-]y[*]p)).
   rstepr (p[*](x[-]y)).
   simpl in Hb.
   case_eq (Qscale_modulus b e).
    intros q Hq.
-   apply AbsSmall_leEq_trans with (CRabs p[*]'q)%CR.
+   apply AbsSmall_leEq_trans with (CRabs p[*]'proj1_sig q)%CR.
     destruct b as [[|nb|nb] db].
       discriminate Hq.
      simpl in Hq.
      injection Hq; clear Hq; intros Hq; rewrite <- Hq.
-     assert (Z: (' ((db # nb) * e)%Qpos)%CR[#][0]).
+     assert (Z: (' proj1_sig ((db # nb) * e)%Qpos)%CR[#][0]).
       apply: Qap_CRap.
       apply Qpos_nonzero.
      apply shift_mult_leEq with Z.
       apply: CRlt_Qlt; auto with *.
      rewrite <- CRabs_AbsSmall in Hb.
      stepr ('(nb#db))%CR; auto.
-     change ((' (nb # db))%CR[=](' e)%CR[*]CRinvT (' ((db # nb) * e)%Qpos)%CR Z).
+     change ((' (nb # db))%CR[=](' proj1_sig e)%CR[*]CRinvT (' proj1_sig ((db # nb) * e)%Qpos)%CR Z).
      rewrite -> CRinv_Qinv.
      rewrite -> CRmult_Qmult.
      rewrite -> CReq_Qeq.
-     autorewrite with QposElim.
+     simpl.
      rewrite -> Qinv_mult_distr.
-     replace RHS with ((/(db#nb) * e) * /e) by simpl; ring.
-     change (nb#db == ((nb#db)*e/e)).
+     replace RHS with ((/(db#nb) * proj1_sig e) * /proj1_sig e) by simpl; ring.
+     change (nb#db == ((nb#db)*proj1_sig e/proj1_sig e)).
      rewrite -> Qdiv_mult_l.
       reflexivity.
      apply Qpos_nonzero.
@@ -1157,12 +1160,12 @@ Proof.
     rewrite <- CRle_Qle.
     eapply AbsSmall_nonneg.
     apply Hb.
-   cut (Not (Not (AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))))).
+   cut (Not (Not (AbsSmall (CRabs p[*](' proj1_sig q)%CR) (p[*](x[-]y))))).
     unfold Not, AbsSmall.
     repeat rewrite -> leEq_def.
     unfold Not; tauto.
    generalize (leEq_or_leEq CRasCOrdField [0] p).
-   cut ((([0]:CR)[<=]p or (p:CR)[<=][0]) -> AbsSmall (CRabs p[*](' q)%CR) (p[*](x[-]y))).
+   cut ((([0]:CR)[<=]p or (p:CR)[<=][0]) -> AbsSmall (CRabs p[*](' proj1_sig q)%CR) (p[*](x[-]y))).
     unfold Not; tauto.
    intros [Hp|Hp].
     rewrite -> CRabs_pos; auto.
@@ -1341,7 +1344,8 @@ Proof.
        ((MVP_map inject_Q_hom n s)[+](MVP_C_ CRasCRing n ('y)%CR)[*]((cpoly_map (MVP_map inject_Q_hom n) p))
          ! (MVP_C_ CRasCRing n (inject_Q_hom y)%CR)))).
  apply n_Function_ball01_plus.
- setoid_replace e with ((1#2)*e + (1#2)*e)%Qpos by QposRing.
+ assert (QposEq e ((1#2)*e + (1#2)*e)) by (unfold QposEq; simpl; ring).
+ rewrite H. clear H.
  apply n_Function_ball01_triangle with (MVP_CR_apply n (MVP_C_ CRasCRing n x[*]
    (cpoly_map (MVP_map inject_Q_hom n) p) ! (MVP_C_ CRasCRing n (inject_Q_hom y)%CR))).
   apply n_Function_ball01_mult_C; auto.
@@ -1393,7 +1397,8 @@ Proof.
  intros x Hx0 Hx1.
  change (MVP_uc_fun_close_sig n e (MVP_uc_fun (S n) p x)
    (MVP_CR_apply (S n) (MVP_map inject_Q_hom (S n) p) x)).
- setoid_replace e with ((((1#3)*e)+(1#3)*e)+(1#3)*e)%Qpos by QposRing.
+ assert (QposEq e ((((1#3)*e)+(1#3)*e)+(1#3)*e)) by (unfold QposEq; simpl; ring).
+ rewrite H. clear H.
  set (e3:=((1#3)*e)%Qpos).
  destruct (MVP_CR_apply_cont e3 p) as [d0 Hd].
  set (d1:=mu (MVP_uc_fun (S n) p) e3).
@@ -1410,7 +1415,7 @@ Proof.
   rewrite <- CRAbsSmall_ball.
   assert (Z:=ball_approx_r x d).
   rewrite <- CRAbsSmall_ball in Z.
-  change (AbsSmall (' d)%CR (x[-]'(approximate x d)))%CR in Z.
+  change (AbsSmall (' proj1_sig d)%CR (x[-]'(approximate x d)))%CR in Z.
   revert Z.
   generalize (approximate x d).
   clear - Hx0 Hx1.
@@ -1422,7 +1427,7 @@ Proof.
     apply leEq_transitive with ([0]:CR).
      rstepr ([--]([0]:CR)).
      apply inv_resp_leEq.
-     change (0<='d)%CR.
+     change (0<='proj1_sig d)%CR.
      rewrite -> CRle_Qle.
      auto with *.
     change ([0][<=]x[-][0])%CR.
@@ -1440,7 +1445,7 @@ Proof.
     apply minus_resp_leEq.
     auto.
    rstepl ([0]:CR).
-   change (0<='d)%CR.
+   change (0<='proj1_sig d)%CR.
    rewrite -> CRle_Qle.
    auto with *.
   intros H.

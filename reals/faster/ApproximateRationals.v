@@ -1,8 +1,11 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
 Require Import 
   Coq.Program.Program
+  CoRN.model.totalorder.QposMinMax
   CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
   CoRN.stdlib_omissions.Q CoRN.util.Qdlog CoRN.model.metric2.Qmetric Coq.QArith.Qabs CoRN.classes.Qclasses CoRN.model.totalorder.QMinMax
   CoRN.algebra.RSetoid CoRN.algebra.CSetoids CoRN.metric2.MetricMorphisms
@@ -138,27 +141,31 @@ Section approximate_rationals_more.
   Lemma aq_lt_mid (x y : Q) : (x < y)%Q → { z : AQ | (x < 'z ∧ 'z < y)%Q }.
   Proof with auto with qarith.
     intros E.
-    destruct (Qpos_lt_plus E) as [γ Eγ].
+    destruct (Qpos_sub _ _ E) as [γ Eγ].
     (* We need to pick a rational [x] such that [x < 1#2]. Since we do not
         use this lemma for computations yet, we just pick [1#3]. However,
         whenever we will it might be worth to reconsider. *)
     exists (app_inverse (cast AQ Q) ((1#2) * (x + y)) ((1#3) * γ)%Qpos)%Q.
     split.
-     apply Qlt_le_trans with (x + (1#6) * γ)%Q.
+     apply Qlt_le_trans with (x + (1#6) * proj1_sig γ)%Q.
       rewrite <-(rings.plus_0_r x) at 1.
       apply Qplus_lt_r...
-     replace LHS with ((1 # 2) * (x + y) - ((1 # 3) * γ)%Qpos)%Q...
-      autorewrite with QposElim.
+      assert (Qeq (x + (1 # 6) * ` γ)
+                  ((1 # 2) * (x + y) - proj1_sig ((1 # 3) * γ)%Qpos)%Q).
+      { rewrite Eγ. simpl. ring. }
+      rewrite H5. clear H5.
+     simpl.
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. simpl. ring.
-    apply Qle_lt_trans with (y - (1#6) * γ)%Q.
-     replace RHS with ((1 # 2) * (x + y) + ((1 # 3) * γ)%Qpos)%Q...
-      autorewrite with QposElim. 
+    apply Qle_lt_trans with (y - (1#6) * proj1_sig γ)%Q.
+    assert (Qeq (y - (1 # 6) * ` γ)
+                ((1 # 2) * (x + y) + proj1_sig ((1 # 3) * γ)%Qpos)).
+    { rewrite Eγ. simpl. ring. }
+    rewrite H5. clear H5. simpl.
       apply (in_Qball ((1#3)*γ)), ball_sym, dense_inverse.
-     rewrite Eγ. simpl. ring.
-    setoid_replace y with (y - 0)%Q at 2 by ring.
-    apply Qplus_lt_r. 
+      apply (Qlt_le_trans _ (y-0)).
+    apply Qplus_lt_r.
     apply Qopp_Qlt_0_r...
+    unfold Qminus. rewrite Qplus_0_r. apply Qle_refl.
   Defined.
 
   Instance: MeetSemiLattice_Morphism (cast AQ Q).

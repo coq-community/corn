@@ -20,8 +20,11 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.CRIR.
 Require Import CoRN.model.totalorder.QMinMax.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.reals.fast.CRArith.
 
 (**

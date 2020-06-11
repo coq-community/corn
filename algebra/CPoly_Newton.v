@@ -1,4 +1,5 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified

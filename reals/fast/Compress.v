@@ -20,6 +20,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.metric2.CRmetric.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.algebra.COrdAbs.
@@ -45,7 +48,8 @@ approximation.
 Definition approximateQ (x:Q) (p:positive) :=
 let (n,d) := x in (Z.div (n*p) d#p).
 
-Lemma approximateQ_correct : forall x p, ball (1#p) x (approximateQ x p).
+Lemma approximateQ_correct : forall x p,
+    ball (exist (Qlt 0) (1#p) eq_refl) x (approximateQ x p).
 Proof.
  intros [n d] p.
  split; simpl; unfold Qle; simpl.
@@ -99,22 +103,21 @@ Definition compress_raw (x:CR) (e:QposInf) : Q :=
 match e with
 | QposInfinity => approximate x e
 | Qpos2QposInf e =>
- let (n,d) := e: Q in
+ let (n,d) := proj1_sig e in
  match (Z.succ (Z.div (2*d) n)) with
-  Zpos p => approximateQ (approximate x (Qpos2QposInf (1#p))) p
+  Zpos p => approximateQ (approximate x (Qpos2QposInf (exist (Qlt 0) (1#p) eq_refl))) p
  |_ => approximate x e
  end
 end.
 
 Lemma compress_raw_prop : forall x e, ball e x (Cunit (compress_raw x e)).
 Proof.
- intros x.
- apply Qpos_positive_numerator_rect.
- intros n d.
+ intros x. intros [[n d] dpos].
+ destruct n as [|n|n]. inversion dpos. 2: inversion dpos.
  simpl.
  case_eq (Z.succ (xO d / n));try (intros; apply: ball_approx_r).
  intros p Hp.
- apply ball_weak_le with (2#p)%Qpos.
+ apply ball_weak_le with (exist (Qlt 0) (2#p) eq_refl).
   unfold Qle.
   simpl.
   rewrite Zpos_mult_morphism.
@@ -132,19 +135,20 @@ Proof.
   symmetry.
   apply Z_div_mod_eq.
   auto with *.
- setoid_replace (2#p)%Qpos with ((1#p)+(1#p))%Qpos.
-  eapply ball_triangle with (Cunit (approximate x (1#p)%Qpos)).
+  assert (QposEq (2#p) ((1#p)+(1#p))).
+  { unfold QposEq. simpl. 
+    repeat rewrite -> Qmake_Qdiv.
+    unfold Qdiv.
+    ring. }
+ apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H. 
+  eapply ball_triangle with (Cunit (approximate x (Qpos2QposInf (1#p)))).
    apply: ball_approx_r.
   Transparent CR.
-  change (ball (m:=Complete Q_as_MetricSpace) (1 # p) (Cunit (approximate x (1 # p)%Qpos))
-    (Cunit (approximateQ (approximate x (1 # p)%Qpos) p))).
+  change (ball (m:=Complete Q_as_MetricSpace)
+               (1 # p) (Cunit (approximate x (Qpos2QposInf (1 # p))))
+               (Cunit (approximateQ (approximate x (Qpos2QposInf (1 # p))) p))).
   rewrite -> ball_Cunit.
   apply approximateQ_correct.
- unfold QposEq.
- autorewrite with QposElim.
- repeat rewrite -> Qmake_Qdiv.
- unfold Qdiv.
- ring.
 Qed.
 
 Lemma compress_raw_prf : forall x, is_RegularFunction (compress_raw x).

@@ -21,6 +21,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.StepFunctionMonad.
 Require Import CoRN.model.structures.OpenUnit.
 Require Import CoRN.tactics.CornTac.
@@ -152,6 +155,7 @@ Qed.
 Lemma dist_glue(X:MetricSpace)(o:OpenUnit): forall (x y:(StepFSup (Complete X))),
 (st_eq (dist (glue o x y))  (Cmap2_slow (glue_uc _ o) (dist x) (dist y))).
 Proof.
+  pose (exist (Qlt 0) (1#2) eq_refl) as half.
  intros. simpl. intros e e1. simpl.
  unfold dist_raw. simpl.
  unfold Cmap_slow_fun. simpl.
@@ -162,24 +166,23 @@ Proof.
  rewrite -> StepFSupBallGlueGlue.
  assert (forall w:StepF (Complete X), StepFSupBall (X:=X) (e + e1)
    (Map (fun z : RegularFunction X => approximate z e) w) (Map (fun z : RegularFunction X =>
-     approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w)).
+     approximate z (half * (half * e1))%Qpos) w)).
   induction w using StepF_ind.
    unfold StepFSupBall. unfold StepFfoldProp. simpl.
    rewrite <- ball_Cunit.
    apply ball_triangle with x0.
     apply ball_approx_l.
-   apply ball_weak_le  with  ((1 # 2) * ((1 # 2) * e1))%Qpos.
+   apply ball_weak_le  with  (half * (half * e1))%Qpos.
     rewrite -> Qle_minus_iff.
-    replace RHS with (e1 - (1#2)*(1#2)*e1).
-     replace RHS with ((3#4)*e1); [| simpl; ring].
+    simpl.
+     replace RHS with ((3#4)*proj1_sig e1); [| simpl; ring].
      Qauto_nonneg.
-    simpl. ring.
    apply ball_approx_r.
   simpl.
   change (StepFSupBall (X:=X) (e + e1) (glue o0 (Map (fun z : RegularFunction X => approximate z e) w1)
     (Map (fun z : RegularFunction X => approximate z e) w2)) (glue o0 (Map
-      (fun z : RegularFunction X => approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w1) (Map
-        (fun z : RegularFunction X => approximate z ((1 # 2) * ((1 # 2) * e1))%Qpos) w2))).
+      (fun z : RegularFunction X => approximate z (half * (half * e1))%Qpos) w1) (Map
+        (fun z : RegularFunction X => approximate z (half * (half * e1))%Qpos) w2))).
   rewrite -> StepFSupBallGlueGlue.
   intuition.
  split;auto.
@@ -212,16 +215,17 @@ NM->NM->MN    =    NM -> MN ->MN*)
 (uc_compose (dist) (Map_uc (@Cmap_slow _ _ f)))
 (uc_compose (Cmap_slow (Map_uc f)) (dist))).
 Proof.
+  pose (exist (Qlt 0) (1#2) eq_refl) as half.
  intros.
  intro x.
  induction x using StepF_ind.
   intros e e1. simpl.
   unfold dist_raw. simpl.
   change (ballS Y (e + e1) (Cmap_slow_raw f x e) (f (approximate x
-    (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e1))))).
+    (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e1))))).
   unfold Cmap_slow_raw. simpl.
-  set (ee:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e))).
-  set (ee1:=(QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e1))).
+  set (ee:=(QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e))).
+  set (ee1:=(QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e1))).
   rewrite <-  ball_Cunit.
   assert (H:ball (m:=(Complete Y)) (e + e1)
     ((Cmap_slow f) (Cunit (approximate x ee))) ((Cmap_slow f) (Cunit (approximate x ee1)))).
@@ -232,9 +236,9 @@ Proof.
  change (StepFSupBall (X:=Y) (e1 + e2) (glue o (Map (fun z : RegularFunction Y => approximate z e1)
    (Map (Cmap_slow_fun f) x1)) (Map (fun z : RegularFunction Y => approximate z e1)
      (Map (Cmap_slow_fun f) x2))) (glue o (Map f (Map (fun z : RegularFunction X => approximate z
-       (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x1)) (Map f (Map
+       (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x1)) (Map f (Map
          (fun z : RegularFunction X => approximate z
-           (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x2)))).
+           (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x2)))).
  rewrite -> (@StepFSupBallGlueGlue Y (e1+e2) o).
  split; [apply IHx1|apply IHx2].
 Qed.
@@ -245,20 +249,19 @@ Lemma distreturn: forall X,
 (uc_compose dist (StFReturn_uc _))
 (@Cmap_slow _ _ (StFReturn_uc X))).
 Proof.
+  pose (exist (Qlt 0) (1#2) eq_refl) as half.
  intros X x. simpl.
  unfold StFReturn_uc.
  intros e e1. simpl. unfold dist_raw. simpl.
  unfold StepFSupBall.
  (* From here onwards the proof is too difficult *)
- change (ballS X (e + e1) (approximate x e) (approximate x ((1 # 2) * e1)%Qpos)).
+ change (ballS X (e + e1) (approximate x e) (approximate x (half * e1)%Qpos)).
  simpl.
- apply ball_weak_le with (Qpos_plus e ((1 # 2) * e1)%Qpos).
-  2: apply (regFun_prf_ex x e ((1 # 2) * e1)%Qpos).
- rewrite -> Qle_minus_iff.
- replace RHS with (e1 - (1#2)*e1).
-  replace RHS with ((1#2)*e1); [| simpl; ring].
-  Qauto_nonneg. replace LHS with ((e + e1)+ - (e + (1 # 2) * e1)).
- simpl. ring. reflexivity.
+ apply ball_weak_le with (Qpos_plus e (half * e1)%Qpos).
+  2: apply (regFun_prf_ex x e (half * e1)%Qpos).
+ rewrite -> Qle_minus_iff. simpl.
+  replace RHS with ((1#2)* proj1_sig e1); [| simpl; ring].
+  Qauto_nonneg.
 Qed.
 
 (*dist . mapN returnM≍returnM*)

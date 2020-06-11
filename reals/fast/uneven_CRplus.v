@@ -1,6 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.QArith.QArith CoRN.model.structures.Qpossec CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith.
+        Coq.QArith.QArith CoRN.model.totalorder.QposMinMax
+        CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith.
 
 (** The approximation function for CRplus results distributes a given error evenly
 among its two operands. This is a perfectly reasonable implementation choice,
@@ -24,28 +27,30 @@ Section uneven_CRplus.
   Let ll: Qpos := (l * Qpos_inv (l + r))%Qpos.
   Let rr: Qpos := (r * Qpos_inv (l + r))%Qpos.
 
-  Let llrr: ll + rr == 1.
+  Let llrr: QposEq (ll + rr) (1#1).
   Proof.
    unfold ll, rr. simpl.
-   field. intro.
+   unfold QposEq; simpl; field. intro.
    apply (Qpos_nonzero (l+r)%Qpos).
    assumption.
   Qed.
 
-  Definition uneven_CRplus_approx (e: Qpos): Q_as_MetricSpace := approximate x (e * ll) + approximate y (e * rr).
+  Definition uneven_CRplus_approx (e: Qpos): Q_as_MetricSpace
+    := approximate x (Qpos2QposInf (e * ll)) + approximate y (Qpos2QposInf (e * rr)).
 
   Lemma uneven_CRplus_is_RegularFunction: is_RegularFunction_noInf _ uneven_CRplus_approx.
   Proof with auto.
    intros e1 e2.
    unfold uneven_CRplus_approx. simpl.
-   setoid_replace (e1 + e2)%Qpos with ((e1 * ll + e2 * ll) + (e1 * rr + e2 * rr))%Qpos.
+   assert (QposEq (e1 + e2) ((e1 * ll + e2 * ll) + (e1 * rr + e2 * rr))).
+   { unfold QposEq.
+     transitivity (proj1_sig (e1 + e2)%Qpos * proj1_sig (ll + rr)%Qpos).
+     unfold QposEq in llrr. rewrite llrr. simpl. ring.
+     simpl. ring. }
+   apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H. 
     apply Qball_plus.
      apply (regFun_prf x (e1*ll)%Qpos (e2*ll)%Qpos).
     apply (regFun_prf y (e1*rr)%Qpos (e2*rr)%Qpos).
-   unfold QposEq.
-   transitivity ((e1 + e2) * (ll + rr))%Qpos; simpl.
-    simpl in llrr. rewrite llrr. ring.
-   ring.
   Qed.
 
   Definition uneven_CRplus: CR := @mkRegularFunction Q_as_MetricSpace 0 _ uneven_CRplus_is_RegularFunction.
@@ -56,11 +61,13 @@ Section uneven_CRplus.
    apply regFunEq_e. intro e.
    rewrite approximate_CRplus...
    unfold uneven_CRplus_approx.
-   setoid_replace (e + e)%Qpos with ((e * ll + (1#2) * e) + (e * rr + (1#2) * e))%Qpos.
+   assert (QposEq (e + e) ((e * ll + (1#2) * e) + (e * rr + (1#2) * e))).
+   { unfold QposEq. unfold QposEq in llrr.
+     simpl in llrr.
+   transitivity (proj1_sig e + proj1_sig e * proj1_sig (ll + rr)%Qpos)...
+   rewrite llrr. ring. }
+   rewrite H. clear H.
     apply Qball_plus; apply regFun_prf.
-   unfold QposEq.
-   transitivity (e + e * (ll + rr))%Qpos...
-   simpl in llrr. rewrite llrr...
   Qed.
 
 End uneven_CRplus.

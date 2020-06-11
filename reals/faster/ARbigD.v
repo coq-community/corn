@@ -1,6 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ CoRN.model.structures.Qpossec
+  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ 
+  CoRN.model.totalorder.QposMinMax 
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.util.Qdlog CoRN.reals.faster.ARArith
   MathClasses.theory.int_pow MathClasses.theory.nat_pow
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.fast_integers MathClasses.implementations.dyadics.
@@ -164,7 +167,7 @@ Proof.
 Qed.
 
 Instance inverse_Q_bigD: AppInverse inject_bigD_Q := λ x ε, 
-  app_div ('Qnum x) ('(Zpos (Qden x))) (Qdlog2 ε).
+  app_div ('Qnum x) ('(Zpos (Qden x))) (Qdlog2 (proj1_sig ε)).
 
 Instance bigD_approx : AppApprox bigD := λ x k,
   BigZ.shiftl (mant x) (-('k - 1) + expo x) ▼ ('k - 1).
@@ -187,9 +190,10 @@ Proof.
   split; try apply _.
   intros [n d] ε.
   unfold app_inverse, inverse_Q_bigD.
-  apply ball_weak_le with (2 ^ Qdlog2 ε)%Qpos.
+  apply ball_weak_le with (Qpos_power 2 (Qdlog2 (proj1_sig ε))).
    now apply (Qpos_dlog2_spec ε).
-  simpl. rewrite Qmake_Qdiv.
+   simpl.
+   rewrite (Qmake_Qdiv n d).
   rewrite 2!(integers.to_ring_unique_alt inject_Z (inject_bigD_Q ∘ dy_inject ∘ BigZ.of_Z)).
   apply bigD_div_correct.
 Qed.

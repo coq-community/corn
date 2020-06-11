@@ -20,6 +20,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
 Require Import CoRN.reals.fast.CRseries.

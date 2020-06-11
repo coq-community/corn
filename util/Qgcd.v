@@ -1,6 +1,8 @@
 
 Require Import
-  Coq.QArith.QArith CoRN.model.Zmod.ZGcd CoRN.model.structures.Qpossec CoRN.stdlib_omissions.Q.
+        Coq.QArith.QArith CoRN.model.Zmod.ZGcd
+        CoRN.model.totalorder.QposMinMax
+        CoRN.stdlib_omissions.Q.
 Set Automatic Introduction.
 
 Open Scope Q_scope.
@@ -37,17 +39,17 @@ Program Definition Qcd_pos: Qpos -> Qpos -> Qpos := Qgcd.
 
 Next Obligation. Proof with auto.
  simpl.
- destruct (Qle_lt_or_eq 0 _ (Qgcd_nonneg x x0)) as [| B]...
+ destruct (Qle_lt_or_eq 0 _ (Qgcd_nonneg (proj1_sig x) (proj1_sig x0))) as [| B]...
  exfalso.
  destruct x.
- destruct (Qgcd_divides x x0) as [? E]. simpl in *.
+ destruct (Qgcd_divides x (proj1_sig x0)) as [? E]. simpl in *.
  revert q.
  rewrite <- E, <- B, Qmult_0_r.
  apply Qlt_irrefl.
 Qed.
 
 Lemma Qgcd_pos_divides (a b: Qpos):
-  exists c: positive, inject_Z c * Qcd_pos a b == a.
+  exists c: positive, inject_Z c * proj1_sig (Qcd_pos a b) == proj1_sig a.
 Proof with auto with *.
  revert a b.
  intros [a ap] [b bp].
@@ -68,9 +70,9 @@ Qed.
 
 Lemma Qpos_gcd3 (a b c: Qpos):
   exists g: Qpos,
-  exists i: positive, inject_Z i * g == a /\
-  exists j: positive, inject_Z j * g == b /\
-  exists k: positive, inject_Z k * g == c.
+  exists i: positive, inject_Z i * proj1_sig g == proj1_sig a /\
+  exists j: positive, inject_Z j * proj1_sig g == proj1_sig b /\
+  exists k: positive, inject_Z k * proj1_sig g == proj1_sig c.
 Proof with auto.
  intros.
  exists (Qcd_pos a (Qcd_pos b c)).
@@ -78,7 +80,7 @@ Proof with auto.
  destruct (Qgcd_pos_divides c b) as [x0 F].
  simpl in F.
  rewrite Qgcd_sym in F.
- change (inject_Z x0 * Qcd_pos b c == c) in F.
+ change (inject_Z x0 * proj1_sig (Qcd_pos b c) == proj1_sig c) in F.
  revert E F.
  generalize (Qcd_pos b c).
  intros.
@@ -86,7 +88,7 @@ Proof with auto.
  destruct (Qgcd_pos_divides q a) as [x2 H].
  simpl in H.
  rewrite Qgcd_sym in H.
- change (inject_Z x2 * Qcd_pos a q == q) in H.
+ change (inject_Z x2 * proj1_sig (Qcd_pos a q) == proj1_sig q) in H.
  exists x1.
  revert G H.
  generalize (Qcd_pos a q).

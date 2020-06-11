@@ -1,4 +1,6 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import
   CoRN.stdlib_omissions.Q
   CoRN.reals.fast.CRpi_fast CoRN.reals.fast.CRarctan_small

@@ -1,6 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import 
   Coq.Program.Program CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
+  CoRN.model.totalorder.QposMinMax
   CoRN.model.metric2.Qmetric CoRN.reals.fast.CRAlternatingSum CoRN.util.Qdlog
   CoRN.reals.faster.ApproximateRationals CoRN.reals.faster.ARArith
   MathClasses.interfaces.abstract_algebra MathClasses.theory.int_pow MathClasses.theory.streams MathClasses.theory.series.
@@ -103,8 +106,8 @@ corresponding coordinate in [sQ] is in the ball too.
 *)
 
 Lemma ARInfAltSum_stream_preserves_ball `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} (ε : Qpos) (l : Z) :
-  ForAllIf (λ s, AQball_bool (Qdlog2 ε) (hd s) 0) (λ s, Qball_ex_bool ε (hd s) 0) 
-    (ARInfAltSum_stream sN sD (Qdlog2 ε) l) sQ.
+  ForAllIf (λ s, AQball_bool (Qdlog2 (proj1_sig ε)) (hd s) 0) (λ s, Qball_ex_bool ε (hd s) 0) 
+    (ARInfAltSum_stream sN sD (Qdlog2 (proj1_sig ε)) l) sQ.
 Proof with auto.
   revert l sQ sN sD d dnn.
   cofix FIX; intros l sQ sN sD d dnn.
@@ -123,8 +126,8 @@ Proof with auto.
     transitivity (hd (tl sQ))...
     now rewrite <-E2.
    rewrite Qabs.Qabs_pos...
-   apply Qle_trans with (2 ^ Qdlog2 ε)%Qpos.
-    apply Qle_trans with (Qabs.Qabs ('app_div_above (hd sN) (hd sD) (Qdlog2 ε - Z.log2_up l) - '0))...
+   apply Qle_trans with (2 ^ Qdlog2 (proj1_sig ε))%Qpos.
+    apply Qle_trans with (Qabs.Qabs ('app_div_above (hd sN) (hd sD) (Qdlog2 (proj1_sig ε) - Z.log2_up l) - '0))...
     rewrite rings.preserves_0. unfold Qminus. rewrite Qplus_0_r.
     rewrite Qabs.Qabs_pos.
      now apply aq_div_above.
@@ -188,7 +191,7 @@ Lemma ARInfAltSum_length_ex `(d : DivisionStream sQ sN sD) {zl : Limit sQ 0} (k 
   LazyExists (λ s, AQball_bool k (hd s) 0) (ARInfAltSum_stream sN sD k l).
 Proof.
   revert l Pl sN sD d.
-  pose proof (zl (2 ^ (k - 1)))%Qpos as help.
+  pose proof (zl (Qpos_power 2 (k - 1)))%Qpos as help.
   clear zl. induction help as [sQ' E | ? ? IH]; intros l El sN sD d.
    left. now apply (ARInfAltSum_length_ball d k l El).
   right. intros _.
@@ -231,7 +234,7 @@ terms so as to compensate for the loss of precision.
 *)
 
 Lemma ARInfAltSum_length_ge (ε : Qpos) :
-  takeUntil_length _ (Limit_near sQ 0 ε) ≤ ARInfAltSum_length (Qdlog2 ε).
+  takeUntil_length _ (Limit_near sQ 0 ε) ≤ ARInfAltSum_length (Qdlog2 (proj1_sig ε)).
 Proof.
   transitivity (4 + takeUntil_length _ (LazyExists_Str_nth_tl (Limit_near sQ 0 ε) (dnn_in_Qball_0_EventuallyForall sQ ε) 4)).
    apply takeUntil_length_Str_nth_tl.
@@ -255,24 +258,33 @@ Proof.
 Qed.
 
 Lemma ARAltSum_correct_aux (l : positive) (k : Z) :
-  ball (l * 2 ^ k) ('ARAltSum sN sD (nat_of_P l) k) (take sQ (nat_of_P l) Qminus' 0).
+  ball ((l#1) * Qpos_power 2 k) ('ARAltSum sN sD (nat_of_P l) k) (take sQ (nat_of_P l) Qminus' 0).
 Proof.
   revert sQ sN sD d dnn zl.
   induction l using Pind; intros.
    simpl. 
    rewrite rings.negate_0, rings.plus_0_r.
    rewrite Qminus'_correct. unfold Qminus. rewrite Qplus_0_r.
-   setoid_replace (1%positive * 2 ^ k)%Qpos with (2 ^ k)%Qpos.
+   assert (QposEq ((1%positive#1) * Qpos_power 2 k) (Qpos_power 2 k)).
+   { unfold QposEq. simpl. now apply rings.mult_1_l. }
     (* ugly: make a duplicate of [d] to avoid Coq errors due to [d] being a section variable. *)
+   rewrite H5. clear H5.
     generalize d. intros d'. destruct d' as [? ? ? E].
     rewrite E.
     now apply aq_div.
-   unfold QposEq. simpl. now apply rings.mult_1_l.
   rewrite Psucc_S.
   simpl.
   rewrite rings.preserves_plus, rings.preserves_negate.
   rewrite Qminus'_correct. unfold Qminus.
-  setoid_replace (Pos.succ l * 2 ^ k)%Qpos with (2 ^ k + l * 2 ^ k)%Qpos.
+  assert (QposEq ((Pos.succ l #1) * Qpos_power 2 k)
+                 (Qpos_power 2 k + (l#1) * Qpos_power 2 k)).
+  { unfold QposEq. simpl. 
+    rewrite <- Pos.add_1_l. 
+    rewrite Zpos_plus_distr.
+    setoid_replace (1 + l # 1) with (1 + (l # 1))%Q. ring.
+    unfold Qplus, Qeq, Qnum, Qden. rewrite Pos.mul_1_l.
+    do 4 rewrite Z.mul_1_r. reflexivity. }
+  rewrite H5. clear H5.
    apply Qball_plus.
     generalize d. intros d'. destruct d' as [? ? ? E]. (* ugly *)
     rewrite E.
@@ -280,9 +292,6 @@ Proof.
    apply Qball_opp. 
    apply IHl; try apply _.
    now apply DivisionStream_tl.
-  unfold QposEq. simpl. 
-  rewrite Pplus_one_succ_l, Zpos_plus_distr, Q.Zplus_Qplus.
-  now ring.
 Qed.
 
 Lemma ARAltSum_correct {l : nat} `(Pl : 0 < l) (k : Z) :
@@ -290,7 +299,8 @@ Lemma ARAltSum_correct {l : nat} `(Pl : 0 < l) (k : Z) :
 Proof.
   destruct l.
    now destruct (irreflexivity (<) (0 : nat)).
-  apply ball_weak_le with (P_of_succ_nat l * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
+   apply ball_weak_le
+     with ((P_of_succ_nat l#1) * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
    set (l':=P_of_succ_nat l).
    change ((inject_Z l') * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
@@ -319,25 +329,27 @@ Qed.
 (** Now we can finally compute the infinite alternating sum! *)
 
 Definition ARInfAltSum_raw (ε : Qpos) : AQ_as_MetricSpace := 
-  let εk:= Qdlog2 ε - 1 in 
+  let εk:= Qdlog2 (proj1_sig ε) - 1 in 
   let l:= ARInfAltSum_length εk
   in ARAltSum sN sD l (εk - Z.log2_up (Z_of_nat l)).
 
 Lemma ARInfAltSum_raw_correct (ε1 ε2 : Qpos) :
   ball (ε1 + ε2) ('ARInfAltSum_raw ε1) (InfiniteAlternatingSum_raw sQ ε2).
 Proof.
-  setoid_replace (ε1 + ε2)%Qpos with (ε1 * (1#2) + (ε1 * (1#2) + ε2))%Qpos by QposRing.
+  assert (QposEq (ε1 + ε2) (ε1 * (1#2) + (ε1 * (1#2) + ε2)))
+    by (unfold QposEq; simpl; ring).
+  rewrite H5. clear H5.
   eapply ball_triangle.
-   apply ball_weak_le with (2 ^ (Qdlog2 ε1 - 1))%Qpos.
-    change (2 ^ (Qdlog2 ε1 - 1) ≤ (ε1:Q) * (1 # 2)).
-    rewrite Qdlog2_half by apply Qpos_prf.
+   apply ball_weak_le with (2 ^ (Qdlog2 (proj1_sig ε1) - 1))%Qpos.
+    change (2 ^ (Qdlog2 (proj1_sig ε1) - 1) ≤ (proj1_sig ε1) * (1 # 2)).
+    rewrite Qdlog2_half by apply Qpos_ispos.
     apply Qdlog2_spec. 
-    apply pos_mult_compat. apply Qpos_prf. easy.
+    apply pos_mult_compat. apply Qpos_ispos. easy.
    unfold ARInfAltSum_raw.
    apply ARAltSum_correct.
    now apply ARInfAltSum_length_pos.
   apply (InfiniteAlternatingSum_further_alt _).
-  rewrite (Qdlog2_half ε1) by apply Qpos_prf.
+  rewrite (Qdlog2_half (proj1_sig ε1)) by apply Qpos_ispos.
   apply (ARInfAltSum_length_ge (ε1 * (1 # 2))).
 Qed.
 
@@ -345,7 +357,10 @@ Lemma ARInfAltSum_prf: is_RegularFunction_noInf _ ARInfAltSum_raw.
 Proof.
   intros ε1 ε2. simpl.
   apply ball_closed. intros δ.
-  setoid_replace (ε1 + ε2 + δ)%Qpos with (ε1 + (1#4) * δ + ((1#4) * δ + (1#4) * δ + (ε2 + (1#4) * δ)))%Qpos by QposRing.
+  assert (QposEq (ε1 + ε2 + δ)
+                 (ε1 + (1#4) * δ + ((1#4) * δ + (1#4) * δ + (ε2 + (1#4) * δ))))
+    by (unfold QposEq; simpl; ring).
+  rewrite H5. clear H5.
   eapply ball_triangle.
    now apply ARInfAltSum_raw_correct.
   eapply ball_triangle.

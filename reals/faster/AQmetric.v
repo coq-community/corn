@@ -1,6 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
+Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.UniformContinuity.
 Require Import 
   Coq.Program.Program Coq.setoid_ring.Ring CoRN.util.Qdlog
+  CoRN.model.totalorder.QposMinMax
   CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.model.metric2.CRmetric CoRN.metric2.MetricMorphisms.
 Require Export
   CoRN.reals.faster.ApproximateRationals.
@@ -60,11 +63,11 @@ Proof.
 Qed.
 
 Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ_as_MetricSpace) : 
-  AQball_bool (Qdlog2 ε) x y ≡ true → ball ε x y.
+  AQball_bool (Qdlog2 (proj1_sig ε)) x y ≡ true → ball ε x y.
 Proof.
   intros E.
   apply AQball_abs.
-  transitivity (2 ^ (Qdlog2 ε) : Q).
+  transitivity (2 ^ (Qdlog2 (proj1_sig ε)) : Q).
    apply AQball_bool_true in E.
    now apply AQball_abs in E.
   now apply (Qpos_dlog2_spec ε).
