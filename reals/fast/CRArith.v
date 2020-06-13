@@ -399,13 +399,13 @@ Proof with intuition.
 Qed.
 
   (* And the same for gball: *)
-Lemma in_CRgball (r: Q) (x y: CR): x - ' r <= y /\ y <= x + ' r <-> gball r x y.
+Lemma in_CRgball (r: Q) (x y: CR): x - ' r <= y /\ y <= x + ' r <-> ball r x y.
 Proof with intuition.
-  unfold gball. apply in_CRball.
+  apply in_CRball.
 Qed.  
 
 Lemma CRgball_plus (x x' y y': CR) e1 e2:
-  gball e1 x x' -> gball e2 y y' -> gball (e1 + e2) (x + y)%CR (x' + y')%CR.
+  ball e1 x x' -> ball e2 y y' -> ball (e1 + e2) (x + y)%CR (x' + y')%CR.
 Proof with auto.
  do 3 rewrite <- in_CRgball.
  intros [A B] [C D].

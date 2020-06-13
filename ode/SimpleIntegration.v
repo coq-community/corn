@@ -31,12 +31,12 @@ Bind Scope Q_scope with Q.
 Local Open Scope Q_scope.
 
 Lemma gball_mspc_ball {X : MetricSpace} (r : Q) (x y : X) :
-  gball r x y <-> mspc_ball r x y.
+  ball r x y <-> mspc_ball r x y.
 Proof. reflexivity. Qed.
 
 Lemma ball_mspc_ball {X : MetricSpace} (r : Qpos) (x y : X) :
   ball (proj1_sig r) x y <-> mspc_ball r x y.
-Proof. rewrite <- ball_gball; reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Class Integral (f: Q → CR) := integrate: forall (from: Q) (w: QnonNeg), CR.
 
@@ -181,7 +181,7 @@ Section definition.
 
   Instance luc_proper_st_eq : Proper (Qeq ==> @st_eq CR) f.
   Proof.
-    intros x y exy a b. apply gball_0 in exy.
+    intros x y exy a b. apply ball_0 in exy.
     pose proof (luc_proper f x y exy a b).
     rewrite Qplus_0_r in H. exact H.
   Qed.
@@ -289,7 +289,7 @@ Section definition.
       apply (Qpos_ispos (he * Qpos_inv wb)). }
     set (q' := exist _ q q_pos : Qpos).
     change q with (proj1_sig q').
-    apply ball_gball, ball_sym, Qball_plus_r.
+    apply ball_sym, Qball_plus_r.
     change ((1 # 2) * proj1_sig wb / proj1_sig q')%Q
       with (proj1_sig ((1 # 2) * wb * Qpos_inv q')%Qpos).
     set (mym := QposCeiling (proj1_sig ((1 # 2) * wb * Qpos_inv q')%Qpos)).
@@ -349,8 +349,8 @@ Section definition.
    apply ball_mspc_ball.
    eapply luc with (a := fr) (r := proj1_sig wb); [apply UC | | | |]. (* Why is [apply UC] not done automatically? *)
    apply Qpos_ispos.
-     apply ball_gball, A1.
-    apply ball_gball, A3.
+     apply A1.
+    apply A3.
    apply A2.
   Qed.
 
@@ -463,7 +463,7 @@ Section implements_abstract_interface.
 
   Instance luc_proper_st_eq_2 : Proper (Qeq ==> @st_eq CR) f.
   Proof.
-    intros x y exy a b. apply gball_0 in exy.
+    intros x y exy a b. apply ball_0 in exy.
     pose proof (luc_proper f x y exy a b).
     rewrite Qplus_0_r in H. exact H.
   Qed.

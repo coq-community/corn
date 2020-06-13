@@ -256,7 +256,7 @@ constructor.
 + intros. apply lip_modulus_pos; [apply (bounded_nonneg f) | easy].
 + intros e x1 x2 e_pos A. apply mspc_ball_CRabs.
   pose proof (CRabs_proper _ _ (int_diff f x0 x1 x2)).
-  apply gball_0 in H0. rewrite H0. clear H0.
+  apply ball_0 in H0. rewrite H0. clear H0.
   transitivity ('(abs (x1 - x2) * M)).
   - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
   - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
@@ -527,9 +527,9 @@ unfold restrict, Basics.compose; simpl.
 unfold picard'. apply mspc_ball_CRabs.
 assert (forall b, abs (y0 - (y0 + b)) [=] abs b).
 { intro b. pose proof (CRabs_negate b).
-  apply gball_0 in H0. rewrite <- H0.
-  rewrite <- gball_0. 
-  apply CRabs_proper. apply gball_0.
+  apply ball_0 in H0. rewrite <- H0.
+  rewrite <- ball_0. 
+  apply CRabs_proper. apply ball_0.
   rewrite rings.negate_plus_distr, plus_assoc.
   rewrite rings.plus_negate_r, rings.plus_0_l. reflexivity. } 
 rewrite H0. clear H0.
@@ -543,7 +543,7 @@ transitivity ('(abs (x - x0) * M)).
   apply (extend_inside (Y:=CR)) in A1.
   destruct A1 as [p A1].
   specialize (A1 (v ∘ together Datatypes.id f ∘ diag)).
-  pose proof (CRabs_proper _ _ A1). apply gball_0 in H0.
+  pose proof (CRabs_proper _ _ A1). apply ball_0 in H0.
   rewrite H0. clear H0. apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ proj1_sig ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
@@ -599,8 +599,8 @@ rewrite <- abs_int_minus. transitivity ('(abs (x - x0) * (L * e))).
   unfold plus, negate, ext_plus, ext_negate.
   apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1].
   assert (forall i j k l : CR, i = j -> k = l -> abs (i-k) [=] abs (j-l)).
-  { intros. apply gball_0. apply CRabs_proper.
-    apply gball_0. apply gball_0 in H0. apply gball_0 in H1.
+  { intros. apply ball_0. apply CRabs_proper.
+    apply ball_0. apply ball_0 in H0. apply ball_0 in H1.
     rewrite H0, H1. reflexivity. }
   rewrite (H0 _ _ _ _ (B1 _) (B1 _)). clear H0.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.

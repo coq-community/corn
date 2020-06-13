@@ -4,7 +4,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import
  Coq.QArith.Qabs CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
 
-Hint Immediate CRle_refl. (* todo: move *)
+(** Balls with real radii instead of rational radii. *)
 
 Open Scope CR_scope.
 
@@ -12,7 +12,8 @@ Section contents.
 
   Context {M: MetricSpace}.
 
-  Definition CRball (r: CR) (x y: M): Prop := forall q, r <= ' q -> gball q x y.
+  Definition CRball (r: CR) (x y: M): Prop
+    := forall (q:Q), r <= ' q -> ball q x y.
 
   Global Instance proper: Proper (@st_eq _ ==> @st_eq _ ==> @st_eq _ ==> iff) CRball.
   Proof.
@@ -26,7 +27,7 @@ Section contents.
   Proof with auto.
    unfold CRball, Reflexive.
    intros.
-   apply gball_refl.
+   apply ball_refl.
    apply CRle_Qle.
    apply CRle_trans with r...
    apply -> CRnonNeg_le_0...
@@ -34,21 +35,22 @@ Section contents.
 
   Lemma zero (x y: M): x [=] y <-> CRball 0 x y.
   Proof with auto.
-   rewrite <- gball_0.
-   split; repeat intro...
-   apply gball_weak_le with 0%Q...
-   apply CRle_Qle...
+   rewrite <- ball_0.
+   split. intros H z zpos.
+   apply (@ball_weak_le _ 0). apply CRle_Qle, zpos.
+   exact H. intros. apply H. apply CRle_refl.
   Qed.
 
   Lemma weak_le (r r': CR): r <= r' -> forall x y, CRball r x y -> CRball r' x y.
   Proof. intros ??? E ??. apply E. apply CRle_trans with r'; assumption. Qed.
 
-  Lemma rational (r: Q) (x y: M): gball r x y <-> CRball ('r) x y.
+  Lemma rational (r: Q) (x y: M): ball r x y <-> CRball ('r) x y.
   Proof with auto.
    split...
    repeat intro.
    apply CRle_Qle in H0.
-   apply gball_weak_le with r...
+   apply ball_weak_le with r...
+   intros. apply H, CRle_refl.
   Qed.
 
 End contents.
@@ -61,7 +63,7 @@ Proof with auto.
  rewrite <- CRdistance_CRle.
  rewrite <- (@iff_under_forall Q
    (fun q: Q => (r <= 'q) -> (x - ' q <= y) /\ (y <= x + ' q))
-   (fun q: Q => (r <= 'q) -> gball q x y)).
+   (fun q: Q => (r <= 'q) -> ball q x y)).
   2: intros; rewrite in_CRgball; intuition.
  split; intros.
   split.
@@ -82,19 +84,21 @@ Proof with auto.
   apply H...
  split.
   apply CRle_trans with (x - r).
-   apply CRplus_le_compat...
+  apply CRplus_le_compat...
+  apply CRle_refl.
    apply -> CRle_opp...
   apply H.
  apply CRle_trans with (x + r).
   apply H.
  apply CRplus_le_compat...
+ apply CRle_refl.
 Qed. (* todo: clean up *)
 
-Lemma gball_CRabs (r : Q) (x y : CR) : gball r x y <-> CRabs (x - y) <= ' r.
+Lemma gball_CRabs (r : Q) (x y : CR) : ball r x y <-> CRabs (x - y) <= ' r.
 Proof. rewrite rational. apply as_distance_bound. Qed.
 
 Lemma gball_CRmult_Q (e a : Q) (x y : CR) :
-  gball e x y -> gball (Qabs a * e) ('a * x) ('a * y).
+  ball e x y -> ball (Qabs a * e) ('a * x) ('a * y).
 Proof.
 intro A. apply gball_CRabs.
 setoid_replace ('a * x - 'a * y) with ('a * (x - y)) by ring.
@@ -105,7 +109,7 @@ now apply gball_CRabs.
 Qed.
 
 Lemma gball_CRmult_Q_nonneg (e a : Q) (x y : CR) :
-  (0 <= a)%Q -> gball e x y -> gball (a * e) ('a * x) ('a * y).
+  (0 <= a)%Q -> ball e x y -> ball (a * e) ('a * x) ('a * y).
 Proof.
 intros A1 A2. rewrite <- (Qabs_pos a) at 1; [apply gball_CRmult_Q |]; easy.
 Qed.

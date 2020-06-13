@@ -336,7 +336,7 @@ Proof.
     apply Qle_lteq in H0. destruct H0.
     apply (Cunit_prf (exist _ _ H0)). exact H.
     rewrite <- H0, Qplus_0_r.
-    rewrite <- H0 in H. apply gball_0 in H.
+    rewrite <- H0 in H. apply ball_0 in H.
     simpl. rewrite H. apply ball_refl.
     apply (Qpos_nonneg (d1+d2)).
 Qed.
