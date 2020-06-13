@@ -32,14 +32,15 @@ Global Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_Metric
 Lemma AQball_fold ε (x y : AQ_as_MetricSpace) : ball ε x y → Qball ε ('x) ('y).
 Proof. easy. Qed.
 
-Lemma AQball_abs (ε : Qpos) (x y : AQ_as_MetricSpace) : 
-  ball ε x y ↔ 'abs (x - y) ≤ ('ε : Q).
+Lemma AQball_abs (ε : Q) (x y : AQ_as_MetricSpace) : 
+  ball ε x y ↔ 'abs (x - y) ≤ ε.
 Proof.
   simpl. rewrite Qball_Qabs.
   now rewrite abs.preserves_abs, rings.preserves_minus.
 Qed.
 
-Definition AQball_bool (k : Z) (x y : AQ) := bool_decide_rel (≤) (abs (x - y)) (1 ≪ k).
+Definition AQball_bool (k : Z) (x y : AQ) : bool
+  := bool_decide_rel (≤) (abs (x - y)) (1 ≪ k).
 
 Lemma AQball_bool_true (k : Z) (x y : AQ_as_MetricSpace) : 
   AQball_bool k x y ≡ true ↔ ball (2 ^ k) x y.
@@ -63,7 +64,8 @@ Proof.
 Qed.
 
 Lemma AQball_bool_true_eps (ε : Qpos) (x y : AQ_as_MetricSpace) : 
-  AQball_bool (Qdlog2 (proj1_sig ε)) x y ≡ true → ball ε x y.
+  AQball_bool (Qdlog2 (proj1_sig ε)) x y ≡ true
+  → ball (proj1_sig ε) x y.
 Proof.
   intros E.
   apply AQball_abs.
@@ -74,7 +76,8 @@ Proof.
 Qed.
 
 Lemma AQball_plus (ε1 ε2 : Qpos) (x1 x2 y1 y2 : AQ_as_MetricSpace) : 
-  ball ε1 x1 y1 → ball ε2 x2 y2 → ball (ε1 + ε2) (x1 + x2) (y1 + y2).
+  ball (proj1_sig ε1) x1 y1
+  → ball (proj1_sig ε2) x2 y2 → ball (proj1_sig ε1 + proj1_sig ε2) (x1 + x2) (y1 + y2).
 Proof.
   intros.
   apply ball_triangle with (x2 + y1); apply AQball_abs.
@@ -85,7 +88,7 @@ Proof.
 Qed.
 
 Lemma AQball_plus_l (ε : Qpos) (x y z : AQ_as_MetricSpace) :
-  ball ε x y → ball ε (z + x) (z + y).
+  ball (proj1_sig ε) x y → ball (proj1_sig ε) (z + x) (z + y).
 Proof.
   intros E.
   apply AQball_abs.
@@ -94,7 +97,7 @@ Proof.
 Qed.
 
 Lemma AQball_plus_r (ε : Qpos) (x y z : AQ_as_MetricSpace) :
-  ball ε x y → ball ε (x + z) (y + z).
+  ball (proj1_sig ε) x y → ball (proj1_sig ε) (x + z) (y + z).
 Proof.
   intros E.
   apply AQball_abs.
@@ -103,7 +106,7 @@ Proof.
 Qed.
 
 Lemma AQball_opp (ε : Qpos) (x y : AQ_as_MetricSpace) :
-  ball ε x y → ball ε (-x) (-y).
+  ball (proj1_sig ε) x y → ball (proj1_sig ε) (-x) (-y).
 Proof.
   intros.
   apply AQball_abs.

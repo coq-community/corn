@@ -73,8 +73,9 @@ match l,r with
  | Some l', Some r' => (uc_compose (QboundBelow_uc l') (QboundAbove_uc r') q)
 end.
 
-Lemma ball_clamp : forall e (a b : Q),
-    @ball Q_as_MetricSpace e a b -> ball e (clamp a) (clamp b).
+Lemma ball_clamp : forall (e:Qpos) (a b : Q),
+    @ball Q_as_MetricSpace (proj1_sig e) a b
+    -> ball (proj1_sig e) (clamp a) (clamp b).
 Proof.
  destruct l; destruct r; unfold clamp; intros e a b Hab; try apply uc_prf; apply Hab.
 Qed.
@@ -140,7 +141,7 @@ Proof.
   apply AbsSmall_imp_AbsIR.
   stepr (inj_Q IR (clamp a - clamp b)%Q); [| now apply inj_Q_minus].
   apply inj_Q_AbsSmall.
-  change (ball y (clamp a) (clamp b)).
+  change (ball (proj1_sig y) (clamp a) (clamp b)).
   apply ball_clamp.
   auto.
  assert (Z:[0][<]inj_Q IR (proj1_sig y)).

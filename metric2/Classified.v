@@ -93,11 +93,13 @@ Local Existing Instance mspc_setoid.
 
   Next Obligation. Proof with auto.
    constructor; try apply _.
-      intro e. apply mspc_refl.
-      simpl. destruct e. simpl. apply Qlt_le_weak, q.
-     intros. apply (mspc_triangle e1 e2 a b c)...
-    intros. apply mspc_closed...
-   apply mspc_eq.
+   - intros e epos. apply mspc_refl, epos.
+   - intros. apply (mspc_triangle e1 e2 a b c)...
+   - intros. apply mspc_closed...
+     intros. apply H1. apply Qpos_ispos.
+   - intros. apply mspc_eq. intro e. apply H1. apply Qpos_ispos.
+   - intros. apply Qnot_lt_le. intro abs.
+     destruct H0. exact (mspc_ball_negative0 e abs a b H1).
   Qed.
 
   (** .. which obviously have the same carrier: *)
@@ -290,9 +292,9 @@ Instance: ∀ X: MetricSpace, MetricSpaceBall X := λ X, @genball X _ (@ball X).
 Instance class_from_MetricSpace (X: MetricSpace): MetricSpaceClass X.
 Proof.
  apply genball_MetricSpace; try apply _.
-     apply msp_refl, X.
+     (* apply msp_refl, X.
     apply msp_sym, X.
-(*   apply msp_triangle, X.
+   apply msp_triangle, X.
   apply msp_eq, X.
  apply msp_closed, X.
 Qed.*)
@@ -959,8 +961,12 @@ Next Obligation. Proof with auto.
   destruct q...
   apply <- (ball_genball (@ball X) q)...
  pose proof (uniformlyContinuous f e a b H1).
- apply ball_genball...
- apply _.
+ apply (@ball_genball Y (@st_eq Y) _
+                      (fun q => ball (proj1_sig q))).
+ 2: auto.
+ intros x y H4 z t H5 u v H6.
+ unfold QposEq in H4. rewrite H4. 
+ rewrite H5, H6. reflexivity.
 Qed.
 
 (** Conversely, if we have a UniformlyContinuousFunction (between bundled metric spaces) and project
@@ -988,8 +994,12 @@ Section unwrap_uc.
    set (mu e) in *.
    destruct q...
    simpl.
-   apply ball_genball...
-   apply _.
+   apply (@ball_genball X (@st_eq X) _
+                      (fun q => ball (proj1_sig q))).
+   2: auto.
+   intros x y H4 z t H5 u v H6.
+   unfold QposEq in H4. rewrite H4. 
+   rewrite H5, H6. reflexivity.
   Qed.
 
 End unwrap_uc.

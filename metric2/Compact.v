@@ -61,7 +61,8 @@ Definition ExtSubset :=
  forall x y, (st_eq x y) -> (P x <-> P y).
 
 Definition TotallyBoundedSubset :=
- forall e, {l : list X | forall y, In y l -> P y & forall x, P x -> exists y, In y l /\ ball e x y }.
+  forall (e:Qpos),
+    {l : list X | forall y, In y l -> P y & forall x, P x -> exists y, In y l /\ ball (proj1_sig e) x y }.
 
 (** A Bishop compact set is an (extensional) predicate that is complete
  and totally bounded. *)
@@ -81,7 +82,7 @@ Hypothesis stableX : stableMetric X.
 (** [almostIn] is a useful predicate that says when a point is within e
 of (classically) some member of a finite enumeration. We won't know which
 point it is close to. *)
-Fixpoint almostIn (e:Qpos) (x:X) (l:FinEnum stableX) : Prop :=
+Fixpoint almostIn (e:Q) (x:X) (l:FinEnum stableX) : Prop :=
 match l with
 | nil => False
 | y::ys => orC (ball e x y) (almostIn e x ys)
@@ -98,8 +99,9 @@ Proof.
  tauto.
 Qed.
 
-Lemma almostIn_weak_le : forall (e1 e2:Qpos) x l,
-    (proj1_sig e1 <= proj1_sig e2) -> almostIn e1 x l -> almostIn e2 x l.
+Lemma almostIn_weak_le : forall (e1 e2:Q) x l,
+    e1 <= e2 -> almostIn e1 x l
+    -> almostIn e2 x l.
 Proof.
  induction l; intros He H.
   apply H.
@@ -117,22 +119,22 @@ Qed.
 
 (** If you are almost in for every e, then you are infact in the finite
 enumeration *)
-Lemma InAlmostIn : forall x l, (forall e, almostIn e x l)<->(InFinEnumC x l).
+Lemma InAlmostIn : forall x l, (forall e:Qpos, almostIn (proj1_sig e) x l)<->(InFinEnumC x l).
 Proof.
  induction l.
   split.
    intros H.
-   apply (H (exist (Qlt 0) (1#1) eq_refl)).
+   apply (H (1#1)%Qpos).
   contradiction.
  split.
   intros H [A B].
-  assert (existsC Qpos (fun e => ~ball e x a)).
+  assert (existsC Qpos (fun e => ~ball (proj1_sig e) x a)).
    intros C.
    apply A.
    apply ball_eq.
-   intros d.
+   intros d dpos.
    apply stableX.
-   apply C.
+   apply (C (exist _ _ dpos)).
   destruct H0 as [ G | z Hz] using existsC_ind.
    tauto.
   apply B.
@@ -163,62 +165,72 @@ Proof.
   apply orWeaken.
   left.
   rewrite -> H.
-  apply ball_refl.
+  apply ball_refl. apply Qpos_nonneg.
  rewrite <- IHl in H.
  apply orWeaken.
  right.
  apply H.
 Qed.
 
-Lemma almostIn_closed : forall e x l, (forall d, almostIn (e+d) x l) -> almostIn e x l.
+Lemma almostIn_nonneg : forall (e:Q) x l,
+    almostIn e x l -> 0 <= e.
+Proof.
+  induction l.
+  - intros. inversion H.
+  - intros. simpl in H. unfold orC in H.
+    apply Qnot_lt_le. intro abs. contradict H.
+    split. intro H. apply (Qlt_not_le _ _ abs).
+    apply (msp_nonneg (msp X) e x a H).
+    intro H. apply (Qlt_not_le _ _ abs). apply (IHl H).
+Qed.
+
+Lemma almostIn_closed : forall (e:Q) x l,
+    (forall d:Q, 0 < d -> almostIn (e+d) x l) -> almostIn e x l.
 Proof.
  induction l.
-  intros H.
-  apply (H (exist (Qlt 0) (1#1) eq_refl)).
- intros H.
- intros [A B].
- apply B.
- clear B.
- apply IHl.
- intros d.
- assert (existsC Qpos (fun d => ~ball (e+d) x a)).
-  intros Y.
+ - intros H. apply (H (1#1)). reflexivity.
+ - intros H [A B].
+   contradict B.
+ apply IHl. clear IHl.
+ intros d dpos.
+ assert (existsC Qpos (fun d => ~ball (e+proj1_sig d) x a)).
+ { intros Y.
   apply A.
   apply ball_closed.
-  intros d0.
+  intros d0 d0pos.
   apply stableX.
-  apply Y.
+  apply (Y (exist _ _ d0pos)). }
  destruct H0 as [G | d0 Hd0] using existsC_ind.
   auto using almostIn_stable.
  apply almostIn_stable.
  intros Z.
- destruct (Qlt_le_dec (proj1_sig d0) (proj1_sig d)).
-  apply Z.
-  apply (@almostIn_weak_le (e + d0)%Qpos).
-   autorewrite with QposElim.
+ destruct (Qlt_le_dec (proj1_sig d0) d).
+ + apply Z.
+  apply (@almostIn_weak_le (e + proj1_sig d0)).
    apply Qlt_le_weak.
    rewrite -> Qlt_minus_iff in *.
-   replace RHS with (proj1_sig d + - proj1_sig d0) by simpl; ring.
+   replace RHS with (d + - proj1_sig d0) by simpl; ring.
    assumption.
   apply almostIn_stable.
   intros Y.
-  apply (H d0).
+  destruct d0 as [d0 d0pos].
+  apply (H d0 d0pos).
   split; try assumption.
- apply (H d).
+ + apply (H d). exact dpos.
  split.
   intros Y.
   apply Hd0.
-  apply (@ball_weak_le X (e + d)%Qpos).
-   autorewrite with QposElim.
+  apply (@ball_weak_le X (e + d)).
    rewrite -> Qle_minus_iff in *.
-   replace RHS with (proj1_sig d0 + - proj1_sig d) by simpl; ring.
+   replace RHS with (proj1_sig d0 + - d) by simpl; ring.
    assumption.
   assumption.
  assumption.
 Qed.
 
 (** Left and right triangle laws for balls and [almostIn]. *)
-Lemma almostIn_triangle_l : forall e1 e2 x1 x2 l, (ball e1 x1 x2) -> almostIn e2 x2 l -> almostIn (e1 + e2) x1 l.
+Lemma almostIn_triangle_l : forall e1 e2 x1 x2 l,
+    (ball e1 x1 x2) -> almostIn e2 x2 l -> almostIn (e1 + e2) x1 l.
 Proof.
  induction l; intros H1 H2.
   apply H2.
@@ -234,9 +246,10 @@ Proof.
  apply IHl; assumption.
 Qed.
 
-Lemma almostIn_triangle_r : forall e1 e2 x l1 l2, almostIn e1 x l1 -> (ball e2 l1 l2) -> almostIn (e1 + e2) x l2.
+Lemma almostIn_triangle_r : forall e1 e2 x l1 l2,
+    almostIn e1 x l1 -> (ball e2 l1 l2) -> almostIn (e1 + e2) x l2.
 Proof.
- intros e1 e2 x l1 l2 H1 [H2 _].
+ intros e1 e2 x l1 l2 H1 [epos [H2 _]].
  revert l2 H1 H2.
  induction l1; intros l2 H1 H2.
   contradiction.
@@ -250,11 +263,11 @@ Proof.
    auto using almostIn_stable.
   clear - H1 Hz0 Hz1.
   apply almostIn_closed.
-  intros d.
+  intros d dpos.
   rewrite <- InAlmostIn in Hz0.
   apply almostIn_triangle_l with z.
    apply ball_triangle with a; assumption.
-  apply Hz0.
+  apply (Hz0 (exist _ _ dpos)).
  apply IHl1.
   assumption.
  intros y Hy.
@@ -311,12 +324,15 @@ Qed.
 
 End AlmostIn.
 (* begin hide *)
-Add Parametric Morphism X stableX : (@almostIn X stableX) with signature QposEq ==> (@st_eq _) ==> (@st_eq _) ==> iff as almostIn_wd.
+Add Parametric Morphism X stableX : (@almostIn X stableX)
+    with signature Qeq ==> (@st_eq _) ==> (@st_eq _) ==> iff as almostIn_wd.
 Proof.
  unfold FinEnum_eq.
- assert (Y:forall x1 x2 : Qpos, QposEq x1 x2 -> forall y1 y2 : X,
-   st_eq y1 y2 ->forall z : FinEnum stableX, (almostIn x1 y1 z -> almostIn x2 y2 z)).
-  intros x1 x2 Hx y1 y2 Hy.
+ assert (Y:forall x1 x2 : Q, x1 == x2 -> forall y1 y2 : X,
+              st_eq y1 y2 ->forall z : FinEnum stableX,
+                (almostIn x1 y1 z
+                 -> almostIn x2 y2 z)).
+  { intros x1 x2 Hx y1 y2 Hy.
   induction z.
    auto.
   intros H.
@@ -324,11 +340,11 @@ Proof.
     auto using almostIn_stable.
    apply orWeaken.
    left.
-   rewrite <- Hx, <- Hy.
+   unfold QposEq in Hx. rewrite <- Hx, <- Hy.
    assumption.
   apply orWeaken.
   right.
-  apply IHz; assumption.
+  apply IHz; assumption. }
  intros x1 x2 Hx y1 y2 Hy.
  cut (forall z1 x3 : FinEnum stableX, (forall x : X, InFinEnumC x z1 -> InFinEnumC x x3) ->
    (almostIn x1 y1 z1 -> almostIn x2 y2 x3)).
@@ -396,7 +412,7 @@ Definition Compact X (stableX : stableMetric X) := Complete (FinEnum stableX).
 (** A point is in a compact set if all the approximations are almost in
 the approximations of the compact set. *)
 Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
- forall e1 e2, almostIn (e1 + e2) (approximate x e1) (approximate s e2).
+ forall (e1 e2:Qpos), almostIn (proj1_sig e1 + proj1_sig e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
 Add Parametric Morphism X stableX : (@inCompact X stableX) with signature (@st_eq _) ==> (@st_eq _) ==> iff as inCompact_wd.
 Proof.
@@ -408,10 +424,10 @@ Proof.
   apply Z; symmetry; assumption.
  intros x1 x2 Hx y1 y2 Hy H e1 e2.
  apply almostIn_closed.
- intros d.
- set (d':=((1#4) * d)%Qpos).
- setoid_replace (e1 + e2 + d)%Qpos
-   with ((e1 + d') + (d' + d') +  (d' + e2))%Qpos.
+ intros d dpos.
+ set (d':=((1#4) * exist _ _ dpos)%Qpos).
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)%Q
+   with (proj1_sig ((e1 + d') + (d' + d') +  (d' + e2))%Qpos).
  apply almostIn_triangle_r with (approximate y1 d');[|apply Hy].
  symmetry in Hx.
  apply almostIn_triangle_l with (approximate x1 d');[apply Hx|].
@@ -469,13 +485,14 @@ Hypothesis locatedX : locatedMetric X.
 (** If a point is almost in an enumeration, then there it is close to
 a point in the enumeration in a constructive sense. *)
 Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum stableX),
-    proj1_sig e < proj1_sig d -> almostIn e x s -> {y | In y s /\ ball d x y}.
+    proj1_sig e < proj1_sig d -> almostIn (proj1_sig e) x s
+    -> {y | In y s /\ ball (proj1_sig d) x y}.
 Proof.
  intros e d x s Hed.
  induction s.
   contradiction.
  intros H.
- destruct (locatedX _ _ x a Hed).
+ destruct (@locatedX _ _ x a Hed).
   exists a.
   abstract (auto with * ).
  destruct IHs as [y Hy].
@@ -573,10 +590,11 @@ Lemma CompactTotallyBoundedStreamCauchy1
       (Hd:0 < ((((1#1)+proj1_sig k)*proj1_sig d1+ proj1_sig d2)
                * (1-proj1_sig k^(S n))/(1-proj1_sig k))),
     proj1_sig k < 1 ->
-    ball (exist _ _ Hd) pt (Str_nth n (CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
+    ball (proj1_sig (exist _ _ Hd)) pt
+         (Str_nth n (CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
 Proof.
  induction n; intros s k d1 d2 pt Hpt Hd Hk.
-  apply ball_refl.
+  apply ball_refl. apply Qpos_nonneg.
  unfold Str_nth.
  set (e:=(((1#1) + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
          * (1 - proj1_sig k ^ S (S n)) / (1 - proj1_sig k)) in *.
@@ -584,17 +602,24 @@ Proof.
  set (e0:=((d1 + k * d1 + d2)
            + exist _ _ (CompactTotallyBoundedStreamCauchyLemma
                           n _ (((1#1) + k)*(k*d1) + (k*d2)) Hk))%Qpos).
- setoid_replace e' with e0.
- - simpl.
-  destruct (HausdorffBallHausdorffBallStrong locatedX (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
+ setoid_replace (proj1_sig e') with (proj1_sig e0).
+ - 
+   simpl.
+   destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
+               (@proj1_sig Q (Qlt 0) d1 +
+                @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
+               (@approximate (@FinEnum X stableX) s (Qpos2QposInf d1))
+               (@approximate (@FinEnum X stableX) s (Qpos2QposInf (k * d1)))
+               (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+     as [f _].
   destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
   unfold e0.
   apply ball_triangle with pt'.
-   assumption.
-  apply IHn; assumption.
- - unfold canonical_names.equiv, canonical_names.sig_equiv,
-   canonical_names.equiv.
-   unfold e', e0, e.
+  assumption.
+  apply (IHn s k (k * d1)%Qpos (k * d2)%Qpos pt' Hpt' 
+                 (CompactTotallyBoundedStreamCauchyLemma n k
+                    (((1 # 1) + k) * (k * d1) + k * d2) Hk) Hk).
+ - unfold e', e0, e.
  simpl. 
  assert (~proj1_sig k==0).
  { destruct k. simpl. intro abs. apply (Qlt_not_le _ _ q).
@@ -614,13 +639,13 @@ Lemma CompactTotallyBoundedStreamCauchy2
   : forall (m n:nat) s (k d1 d2:Qpos) pt Hpt
       (Hd:0 < ((((1#1)+proj1_sig k)*proj1_sig d1+proj1_sig d2)
                *(1-proj1_sig k^(S n))/(1-proj1_sig k))), proj1_sig k < 1 ->
- ball (Qpos_power k m*(exist _ _ Hd))
+ ball (proj1_sig (Qpos_power k m*(exist _ _ Hd))%Qpos)
   (Str_nth m (CompactTotallyBoundedStream s k d1 d2 pt Hpt))
   (Str_nth (m + n) (CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
 Proof.
  induction m; intros n s k d1 d2 pt Hpt Hd Hk.
- setoid_replace (Qpos_power k 0 * (exist _ _ Hd))%Qpos
-   with (exist _ _ Hd).
+ setoid_replace (proj1_sig (Qpos_power k 0 * (exist _ _ Hd))%Qpos)
+   with (proj1_sig (exist _ _ Hd)).
  2: unfold canonical_names.equiv, canonical_names.sig_equiv,
     canonical_names.equiv; simpl; ring.
   apply CompactTotallyBoundedStreamCauchy1; assumption.
@@ -640,12 +665,17 @@ Proof.
     rewrite -> H0.
     discriminate. exact knz.
     rewrite <- Z.add_1_l. reflexivity. }
-  rewrite H. clear H.
+  unfold QposEq in H. rewrite H. clear H.
   replace (S m + n)%nat with (S (m + n))%nat by omega.
   unfold Str_nth.
   simpl.
-  destruct (HausdorffBallHausdorffBallStrong
-              locatedX (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
+  destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
+               (@proj1_sig Q (Qlt 0) d1 +
+                @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
+               (@approximate (@FinEnum X stableX) s d1)
+               (@approximate (@FinEnum X stableX) s (k * d1)%Qpos)
+               (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+    as [f _].
   destruct (f pt Hpt d2) as [pt' [Hpt' _]].
   simpl.
   apply (IHm n s k (k*d1)%Qpos (k*d2)%Qpos pt' Hpt' e'); assumption.
@@ -662,7 +692,14 @@ Proof.
  intros.
  unfold Str_nth.
  simpl.
- destruct (HausdorffBallHausdorffBallStrong locatedX (regFun_prf s d1 (k * d1)%Qpos)) as [f _].
+ destruct (@HausdorffBallHausdorffBallStrong
+             X stableX locatedX
+             (@proj1_sig Q (Qlt 0) d1 +
+              @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
+             (@approximate (@FinEnum X stableX) s d1)
+             (@approximate (@FinEnum X stableX) s (k * d1)%Qpos)
+             (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+   as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' _]].
  destruct (IHn s k (k*d1) (k*d2) pt' Hpt')%Qpos as [q Hq Hq0].
  exists q.
@@ -842,15 +879,14 @@ Proof.
  cut (forall (s : Compact) (d1 d2 : Qpos) (pt : X)
    (Hpt : InFinEnumC pt (approximate s d1)) (e1 e2 : Qpos),
      ((CompactTotallyBoundedIndex e1 d1 d2) <= (CompactTotallyBoundedIndex e2 d1 d2))%nat ->
-       ball (m:=X) (e1 + e2) (Str_nth (CompactTotallyBoundedIndex e1 d1 d2)
+       ball (m:=X) (proj1_sig e1 + proj1_sig e2) (Str_nth (CompactTotallyBoundedIndex e1 d1 d2)
          (CompactTotallyBoundedStream s quarter d1 d2 pt Hpt))
            (Str_nth (CompactTotallyBoundedIndex e2 d1 d2)
              (CompactTotallyBoundedStream s quarter d1 d2 pt Hpt))).
   intros Z s d1 d2 pt Hpt e1 e2.
   destruct (le_lt_dec (CompactTotallyBoundedIndex e1 d1 d2) (CompactTotallyBoundedIndex e2 d1 d2)).
    apply Z; auto.
-  assert (QposEq (e1 + e2) (e2 + e1)) by (unfold QposEq; simpl; ring).
-  rewrite H. clear H. 
+   rewrite Qplus_comm.
   apply ball_sym.
   apply Z; auto with *.
  intros s d1 d2 pt Hpt e1 e2 H.
@@ -861,7 +897,7 @@ Proof.
   constructor.
   assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma
                   (B-A) quarter (((1#1)+quarter)*d1 + d2) Y)%Qpos).
-  apply (ball_weak_le _ (Qpos_power quarter A*(exist _ _ Y0))%Qpos).
+  apply ball_weak_le with (proj1_sig (Qpos_power quarter A*(exist _ _ Y0))%Qpos).
   2: apply CompactTotallyBoundedStreamCauchy2;constructor.
   simpl.
  unfold Qdiv.
@@ -899,8 +935,8 @@ Proof.
              (CompactTotallyBoundedIndex e1 d1 d2) s quarter d1 d2 pt Hpt)
    as [q Hq Hq0].
  apply almostIn_closed.
- intros d.
- apply almostIn_weak_le with (d + (q + e2))%Qpos.
+ intros d dpos.
+ apply almostIn_weak_le with (d + (proj1_sig q + proj1_sig e2)).
   simpl.
   rewrite -> Qle_minus_iff.
   replace RHS with (proj1_sig e1 + - proj1_sig q) by simpl; ring.
@@ -919,13 +955,13 @@ Proof.
   apply Qpower_pos.
   discriminate.
  eapply almostIn_triangle_r;[|apply regFun_prf].
- apply <- InAlmostIn.
- assumption.
+ replace d with (proj1_sig (exist _ _ dpos)) by reflexivity.
+ apply <- InAlmostIn. assumption.
 Qed.
 
 (** The limit is close to the initial starting point *)
 Lemma CompactTotallyBoundedNotFar : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
-    ball (exist (Qlt 0)(5#3) eq_refl*d1 + exist (Qlt 0) (4#3) eq_refl*d2)
+    ball ((5#3)*proj1_sig d1 + (4#3)*proj1_sig d2)
          (Cunit pt) (CompactTotallyBounded_fun s d1 d2 pt Hpt).
 Proof.
  intros s d1 d2 pt Hpt e1 e2.
@@ -936,7 +972,7 @@ Proof.
  assert (Z0:=(CompactTotallyBoundedStreamCauchyLemma
                 (CompactTotallyBoundedIndex e2 d1 d2)
                 _ ((one+quarter)*(d1) + (d2)) Z)%Qpos).
- apply (ball_weak_le _ (exist _ _ Z0)).
+ apply ball_weak_le with (proj1_sig (exist _ _ Z0)).
  2: apply CompactTotallyBoundedStreamCauchy1; constructor.
  simpl.
  apply Qle_trans with (((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2) / (1 - (1 # 4))).
@@ -980,7 +1016,7 @@ Proof.
 Defined.
 
 Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
-    ball ((3#5)*e)
+    ball ((3#5)*proj1_sig e)
          (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum SCX) (CompactTotalBound s e).
 Proof.
  intros SCX s e.
@@ -988,7 +1024,8 @@ Proof.
  generalize (CompactTotallyBoundedNotFar s ((1#5)*e) ((1#5)*e)).
  generalize (CompactTotallyBounded_fun s ((1 # 5) * e) ((1 # 5) * e)).
  induction (approximate s ((1 # 5) * e)%Qpos); intros H L.
-  apply ball_refl.
+  apply ball_refl. apply (Qpos_nonneg ((3#5)*e)).
+  split. apply (Qpos_nonneg ((3#5)*e)).
  split; intros x Hx.
   destruct Hx as [G | Hx | Hx] using orC_ind.
     auto using existsC_stable.
@@ -1002,14 +1039,14 @@ Proof.
    assert (QposEq ((3 # 5) * e)
                   ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))).
    { unfold QposEq; simpl; ring. }
-   rewrite H0. clear H0.
+   unfold QposEq in H0. rewrite H0. clear H0.
    apply L.
   set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right Hpt)))).
   assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
-    ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)) (Cunit pt) (H' pt Hpt)).
+    ball (m:=Complete X) (proj1_sig ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos) (Cunit pt) (H' pt Hpt)).
    intros pt Hpt.
    apply L.
-  destruct (IHs0 H' L') as [A _].
+  destruct (IHs0 H' L') as [_ [A _]].
   destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
   apply existsWeaken.
@@ -1029,15 +1066,15 @@ Proof.
   assert (QposEq ((3 # 5) * e)
                  ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)))
     by (unfold QposEq; simpl; ring).
-  rewrite H0. clear H0.
+  unfold QposEq in H0. rewrite H0. clear H0.
   apply ball_sym.
   apply L.
  set (H':=(fun pt (Hpt : InFinEnumC pt s0) => H pt (orWeaken _ _ (right Hpt)))).
  assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
-   ball (m:=Complete X) ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)) (Cunit pt) (H' pt Hpt)).
+   ball (m:=Complete X) (proj1_sig ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos) (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.
   apply L.
- destruct (IHs0 H' L') as [_ A].
+ destruct (IHs0 H' L') as [_ [_ A]].
  destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
@@ -1066,7 +1103,8 @@ Proof.
  apply L.
 Qed.
 
-Lemma CompactTotallyBoundedB : forall s e x, (inCompact x s) -> exists y, In y (CompactTotalBound s e) /\ ball e x y.
+Lemma CompactTotallyBoundedB : forall s e x,
+    (inCompact x s) -> exists y, In y (CompactTotalBound s e) /\ ball (proj1_sig e) x y.
 Proof.
  intros s e x Hx.
  assert (Z:proj1_sig ((1 # 20) * e + (1 # 5) * e)%Qpos < proj1_sig ((7 # 20) * e)%Qpos).
@@ -1079,7 +1117,7 @@ Proof.
  clear Z.
  unfold CompactTotalBound.
  revert Hy0.
- cut (forall pt Hpt, ball ((3#5)*e) (Cunit pt) (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e) pt Hpt)).
+ cut (forall pt Hpt, ball ((3#5)*proj1_sig e) (Cunit pt) (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e) pt Hpt)).
   generalize (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e)).
   generalize (approximate s ((1 # 5) * e)%Qpos).
   intros l.
@@ -1094,7 +1132,7 @@ Proof.
    clear - Hy1 HF.
    assert (QposEq e ((1#20)*e + (7#20)*e + (3#5)*e))
      by (unfold QposEq; simpl; ring).
-   rewrite H. clear H.
+   unfold QposEq in H. rewrite H. clear H.
    apply ball_triangle with (Cunit a);[|apply HF].
    apply ball_triangle with (Cunit (approximate x ((1#20)*e)%Qpos)).
     apply ball_approx_r.
@@ -1107,7 +1145,7 @@ Proof.
  intros pt Hpt.
  assert (QposEq ((3#5)*e) ((5#3)*((1#5)*e) + (4#3)*((1#5)*e)))
    by (unfold QposEq; simpl; ring).
- rewrite H. clear H.
+ unfold QposEq in H. rewrite H. clear H.
  apply CompactTotallyBoundedNotFar.
 Qed.
 
@@ -1154,16 +1192,16 @@ Lemma BishopCompactAsCompact_prf :
  forall P (HP:CompactSubset _ P), is_RegularFunction (BishopCompactAsCompact_raw HP).
 Proof.
  cut (forall (P : RegularFunction X -> Prop) (HP : CompactSubset (Complete X) P) (e1 e2 : Qpos),
-   hemiMetric X (e1 + e2) (fun a : X => InFinEnumC a
+   hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a
      (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e1)%Qpos in
        map (fun x : RegularFunction X => approximate x ((1 # 2) * e1)%Qpos) l)) (fun a : X =>
          InFinEnumC a (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e2)%Qpos in
            map (fun x : RegularFunction X => approximate x ((1 # 2) * e2)%Qpos) l))).
   intros Z P [HP0 HP HP1] e1 e2.
-  split.
+  split. apply (Qpos_nonneg (e1+e2)). split.
    apply Z.
-  apply (hemiMetric_wd1 X (e2+e1)%Qpos).
-   unfold QposEq; simpl; ring.
+  apply (hemiMetric_wd1 X (proj1_sig (e2+e1)%Qpos)).
+   simpl; ring.
   apply Z.
  intros P [HP0 HP HP1] e1 e2 x Hx.
  unfold totallyBoundedSubset in Hx.
@@ -1171,7 +1209,7 @@ Proof.
  unfold totallyBoundedSubset.
  destruct (HP ((1 # 2) * e2)%Qpos) as [r Hr0 Hr1].
  simpl in *.
- assert (Z0:existsC (Complete X) (fun x' => In x' l /\ ball ((1#2)*e1) (Cunit x) x')).
+ assert (Z0:existsC (Complete X) (fun x' => In x' l /\ ball ((1#2)*proj1_sig e1) (Cunit x) x')).
   clear - Hx HP1.
   induction l.
    elim Hx.
@@ -1181,7 +1219,7 @@ Proof.
    exists a.
    split; auto with *.
    rewrite -> Hx.
-   apply ball_approx_l.
+   apply (@ball_approx_l _ _ ((1#2)*e1)%Qpos).
   destruct (IHl Hx) as [G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.
   apply existsWeaken.
@@ -1204,15 +1242,14 @@ Proof.
   apply: orWeaken.
   right.
   apply IHr; auto.
-  assert (QposEq (e1+e2)
-                 ((1#2)*e1 + (1#2)*e2 + (1#2)*e2 + (1#2)*e1))
-    by (unfold QposEq; simpl; ring).
-  rewrite H. clear H.
- apply ball_weak.
+  setoid_replace (proj1_sig e1+proj1_sig e2)
+    with (proj1_sig ((1#2)*e1 + (1#2)*e2 + (1#2)*e2 + (1#2)*e1))%Qpos
+    by (simpl; ring).
+ apply ball_weak. apply Qpos_nonneg.
  rewrite <- ball_Cunit.
  repeat eapply ball_triangle.
    apply Hz1.
-  change (ball ((1 # 2) * e2) z y) in Hy1.
+  change (ball (proj1_sig ((1 # 2) * e2)%Qpos) z y) in Hy1.
   apply Hy1.
  apply ball_approx_r.
 Qed.
@@ -1251,7 +1288,7 @@ Proof.
   rewrite <- ball_Cunit.
   assert (QposEq (e1+e2) (e1 + ((1 # 2) * e2 + (1 # 2) * e2)))
     by (unfold QposEq; simpl; ring).
-  rewrite H. clear H.
+  unfold QposEq in H. rewrite H. clear H.
   apply ball_triangle with x.
    apply ball_approx_l.
   apply ball_triangle with y.
@@ -1274,7 +1311,7 @@ Proof.
   simpl.
   ring_simplify.
   Qauto_pos.
- assert (A:forall e, {y | P y /\ ball (m:=Complete X) e x y}).
+ assert (A:forall (e:Qpos), {y | P y /\ ball (m:=Complete X) (proj1_sig e) x y}).
   intros e.
   assert (Hx':=Hx ((1#16)*e)%Qpos ((1#2)*e)%Qpos).
   unfold BishopCompactAsCompact, approximate, BishopCompactAsCompact_raw,
@@ -1284,7 +1321,7 @@ Proof.
   clear Hl1.
   induction l.
    contradiction.
-  destruct (Complete_located locatedX _ _ x a (Y e)) as [A|A].
+  destruct (@Complete_located _ locatedX _ _ x a (Y e)) as [A|A].
    exists a.
    split; auto.
   apply IHl.
@@ -1298,7 +1335,7 @@ Proof.
    assert (QposEq ((7 # 8) * e)
                   ((1#16)*e + ((1 # 16) * e + (1 # 2) * e) + (((1 # 2) * ((1 # 2) * e)))))
      by (unfold QposEq; simpl; ring).
-   rewrite H. clear H.
+   unfold QposEq in H. rewrite H. clear H.
    eapply ball_triangle.
     eapply ball_triangle.
      apply ball_approx_r.
@@ -1306,7 +1343,7 @@ Proof.
    apply ball_approx_l.
   assumption.
  set (f:=fun e => (let (y,_):= (A e) in y)).
- assert (Hf0:forall e, ball (m:=Complete X) (e) (f e) x).
+ assert (Hf0:forall e:Qpos, ball (m:=Complete X) (proj1_sig e) (f e) x).
   intros e.
   unfold f.
   destruct (A e) as [y [_ Hy]].
@@ -1332,9 +1369,8 @@ Proof.
  rewrite -> s.
  intros e1 e2.
  apply ball_sym.
- assert (QposEq (e1+e2) (e2+e1)) by (unfold QposEq; simpl; ring).
- rewrite H. clear H.
- apply ball_weak.
+ rewrite Qplus_comm.
+ apply ball_weak. apply Qpos_nonneg.
  apply Hf0.
 Qed.
 
@@ -1355,8 +1391,8 @@ Proof.
  assert (QposEq (e1 + e2)
                 (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2))
    by (unfold QposEq; simpl; ring).
- rewrite H. clear H. 
- apply ball_weak.
+ unfold QposEq in H. rewrite H. clear H. 
+ apply ball_weak. apply Qpos_nonneg.
  apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
   apply regFun_prf.
  clear e1.
@@ -1368,8 +1404,9 @@ Proof.
   unfold totallyBoundedSubset, CompactAsBishopCompact, CompactTotallyBounded.
  change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete_stable stableX))).
  induction (CompactTotalBound locatedX s ((1 # 2) * e2)). 
-  apply ball_refl.
- destruct IHl as [IHlA IHlB].
+  apply ball_refl. apply Qpos_nonneg.
+ destruct IHl as [_ [IHlA IHlB]].
+ split. apply Qpos_nonneg.
  split; intros x Hx; (destruct Hx as [G | Hx | Hx] using orC_ind; [auto using existsC_stable
    |apply existsWeaken |]).
     exists (Cunit (approximate a ((1 # 2) * e2)%Qpos)).
@@ -1426,15 +1463,16 @@ map (fun x => approximate x e) x.
 Lemma FinCompact_prf : forall x, is_RegularFunction (FinCompact_raw x).
 Proof.
  intros x.
- cut (forall e1 e2, hemiMetric X (e1 + e2) (fun a : X => InFinEnumC a (FinCompact_raw x e1))
+ cut (forall (e1 e2:Qpos), hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a (FinCompact_raw x e1))
    (fun a : X => InFinEnumC a (FinCompact_raw x e2))).
   intros L e1 e2.
+  split. apply (Qpos_nonneg (e1+e2)).
   split; auto.
   eapply hemiMetric_wd1;[|apply L].
   unfold QposEq; simpl; ring.
  intros e1 e2.
  induction x.
-  apply hemiMetric_refl.
+  apply hemiMetric_refl. apply (Qpos_nonneg (e1+e2)).
  intros b Hb.
  destruct Hb as [G | Hb | Hb] using orC_ind.
    auto using existsC_stable.
@@ -1459,15 +1497,16 @@ Definition FinCompact_fun (x: FinEnum stableCX) : Compact stableX :=
 
 Lemma FinCompact_uc : is_UniformlyContinuousFunction FinCompact_fun Qpos2QposInf.
 Proof.
- cut (forall e d1 d2 (a b : FinEnum stableCX), (hemiMetric (Complete X) e
+ cut (forall e (d1 d2:Qpos) (a b : FinEnum stableCX), (hemiMetric (Complete X) e
    (fun a0 : Complete X => InFinEnumC a0 a) (fun a : Complete X => InFinEnumC a b)) ->
-     (hemiMetric X (d1 + e + d2) (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun a) d1))
+     (hemiMetric X (proj1_sig d1 + e + proj1_sig d2) (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun a) d1))
        (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun b) d2)))).
-  intros L e a b [Hab0 Hab1] d1 d2.
+ - intros L e a b [_ [Hab0 Hab1]] d1 d2.
+  split. apply (Qpos_nonneg (d1+e+d2)).
   split; auto.
   eapply hemiMetric_wd1;[|apply L;apply Hab1].
   unfold QposEq; simpl; ring.
- intros e d1 d2 a b Hab c Hc.
+ - intros e d1 d2 a b Hab c Hc.
  simpl in Hc.
  unfold FinCompact_raw in Hc.
  assert (existsC (Complete X) (fun d => InFinEnumC d a /\ st_eq c (approximate d d1))).
@@ -1539,8 +1578,8 @@ Proof.
  unfold inCompact in H.
  simpl in H.
  set (P:= fun n (b:bool) => if b
-   then (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (ball (m:=X) (e1 + e2) (approximate x (Qpos2QposInf e1)) (approximate a (Qpos2QposInf e2))))
-     else (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (almostIn (e1 + e2) (approximate x (Qpos2QposInf e1)) (FinCompact_raw s (Qpos2QposInf e2))))).
+   then (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (ball (m:=X) (proj1_sig e1 + proj1_sig e2) (approximate x (Qpos2QposInf e1)) (approximate a (Qpos2QposInf e2))))
+     else (let e1 := (1#P_of_succ_nat n)%Qpos in let e2 := e1 in (almostIn (proj1_sig e1 + proj1_sig e2) (approximate x (Qpos2QposInf e1)) (FinCompact_raw s (Qpos2QposInf e2))))).
  assert (L: (forall n : nat, existsC bool (fun x => ~ ~ In x (true :: false :: nil) /\ P n x))).
   intros n.
   destruct (H  (1#P_of_succ_nat n)%Qpos (1#P_of_succ_nat n)%Qpos) as [ G | L | L] using orC_ind.
@@ -1558,21 +1597,21 @@ Proof.
   left.
   unfold P in Hc.
   apply ball_eq.
-  intros e.
-  destruct (((1#4)*e)%Qpos) as [[en ed] He] eqn:des.
+  intros e epos.
+  destruct (((1#4)*exist _ _ epos)%Qpos) as [[en ed] He] eqn:des.
   destruct en as [|en|en]. inversion He. 2: inversion He.
   simpl in He.
   destruct (Hc (pred (nat_of_P ed))) as [G | m [Hm0 Hm1]] using existsC_ind.
    auto using stableCX.
   set (m' := (1#P_of_succ_nat m)%Qpos).
-  apply ball_weak_le with (m' + (m' + m') + m')%Qpos.
+  apply ball_weak_le with (proj1_sig (m' + (m' + m') + m')%Qpos).
    unfold m'.
    simpl.
    replace LHS with ((1#P_of_succ_nat m)/(1#4)) by simpl; field.
    apply Qle_shift_div_r.
     reflexivity.
    rewrite -> Qmult_comm. 
-   setoid_replace ((1#4)*proj1_sig e) with (proj1_sig ((1#4)*e)%Qpos)
+   setoid_replace ((1#4)*e) with (proj1_sig ((1#4)*exist _ _ epos)%Qpos)
      by reflexivity.
    rewrite des.
    unfold Qle; simpl.
@@ -1594,16 +1633,16 @@ Proof.
  unfold P in Hc.
  intros e1 e2.
  apply almostIn_closed.
- intros d.
- destruct (((1#4)*d)%Qpos) as [[dn dd] Hd] eqn:des.
+ intros d dpos.
+ destruct (((1#4)*exist _ _ dpos)%Qpos) as [[dn dd] Hd] eqn:des.
  destruct dn as [|dn|dn]. inversion Hd. 2: inversion Hd. 
  destruct (Hc (pred (nat_of_P dd))) as [G | m [Hm0 Hm1]] using existsC_ind.
   auto using almostIn_stable.
  set (m' := (1#P_of_succ_nat m)%Qpos).
- apply almostIn_weak_le with ((e1 + m') + (m' + m') + (m' + e2))%Qpos.
+ apply almostIn_weak_le with (proj1_sig ((e1 + m') + (m' + m') + (m' + e2))%Qpos).
  simpl.
   rewrite -> Qle_minus_iff.
-  replace RHS with (proj1_sig d + - (proj1_sig m' + (proj1_sig m' + proj1_sig m') + proj1_sig m'))
+  replace RHS with (d + - (proj1_sig m' + (proj1_sig m' + proj1_sig m') + proj1_sig m'))
     by simpl; ring.
   rewrite <- Qle_minus_iff.
   unfold m'.
@@ -1612,7 +1651,7 @@ Proof.
   apply Qle_shift_div_r.
    constructor.
   rewrite -> Qmult_comm.
-  setoid_replace ((1#4)*proj1_sig d) with (proj1_sig ((1#4)*d)%Qpos) by reflexivity.
+  setoid_replace ((1#4)*d) with (proj1_sig ((1#4)*exist _ _ dpos)%Qpos) by reflexivity.
   rewrite des.
   unfold Qle; simpl.
   rewrite Zpos_mult_morphism.
@@ -1634,7 +1673,7 @@ Proof.
  intros x e1 e2.
  unfold Cmap_raw.
  simpl.
- apply FinCompact_uc.
+ apply (@FinCompact_uc (e1+e2)%Qpos).
  unfold ball_ex.
  apply regFun_prf.
 Qed.
@@ -1647,7 +1686,7 @@ Lemma CompactCompleteCompact_uc :
 Proof.
  intros e a b H d1 d2.
  simpl in *.
- apply FinCompact_uc.
+ apply (@FinCompact_uc (d1+e+d2)%Qpos).
  apply H.
 Qed.
 
@@ -1669,26 +1708,25 @@ Proof.
    auto using almostIn_stable.
   rewrite -> FinCompact_correct in Hz1.
   apply almostIn_closed.
-  intros d.
-  assert (Z0:=(Hz0  ((1#2)*e1) ((1#2)*d))%Qpos).
-  assert (Z1:=(Hz1 ((1#2)*d) ((1#2)*e2))%Qpos).
+  intros d dpos.
+  assert (Z0:=(Hz0  ((1#2)*e1) ((1#2)*exist _ _ dpos))%Qpos).
+  assert (Z1:=(Hz1 ((1#2)*exist _ _ dpos) ((1#2)*e2))%Qpos).
   simpl in Z1.
-  set (w0:=((1 # 2) * e1 + ((1 # 2) * e1 + (1 # 2) * e2) + (1 # 2) * d)%Qpos) in *.
-  set (w1:= ((1 # 2) * d + (1 # 2) * e2)%Qpos) in *.
-  assert (QposEq (e1 + e2 + d) (w0 + w1))
-    by (unfold w0, w1; unfold QposEq; simpl; ring).
-  rewrite H0. clear H0.
+  set (w0:=((1 # 2) * e1 + ((1 # 2) * e1 + (1 # 2) * e2) + (1 # 2) * exist _ _ dpos)%Qpos) in *.
+  set (w1:= ((1 # 2) * exist _ _ dpos + (1 # 2) * e2)%Qpos) in *.
+  setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+    with (proj1_sig (w0 + w1)%Qpos)
+    by (unfold w0, w1; simpl; ring).
   eapply almostIn_triangle_l.
    apply Z0.
   apply Z1.
  intros H e1 e2.
  apply almostIn_closed.
- intros d.
- set (d':=((1#4)*d)%Qpos).
- assert (QposEq (e1 + e2 + d)
-                ((e1 + (1#2)*d' + (1#2)*d') + (((d' + d') + (1#2)*d') + ((1#2)*d' + e2))))
-   by (unfold d'; unfold QposEq; simpl; ring).
- rewrite H0. clear H0.
+ intros d dpos.
+ set (d':=((1#4)*exist _ _ dpos)%Qpos).
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
+   with (proj1_sig ((e1 + (1#2)*d' + (1#2)*d') + (((d' + d') + (1#2)*d') + ((1#2)*d' + e2)))%Qpos)
+   by (unfold d'; simpl; ring).
  eapply almostIn_triangle_l.
   eapply ball_triangle.
    apply regFun_prf.
@@ -1740,8 +1778,9 @@ Local Open Scope uc_scope.
 
 Variable f : X --> Y.
 
-Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum stableX), (QposInf_le d (mu f e)) -> almostIn d a b ->
- almostIn e (f a) (FinEnum_map z stableX stableY f b).
+Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum stableX),
+    (QposInf_le d (mu f e)) -> almostIn (proj1_sig d) a b ->
+    almostIn (proj1_sig e) (f a) (FinEnum_map z stableX stableY f b).
 Proof.
  intros e d a b Hd Hab.
  induction b.
@@ -1760,8 +1799,9 @@ Proof.
  auto.
 Qed.
 
-Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum stableX), (QposInf_le d ((mu f e1) + (mu f e2))) -> almostIn d a b ->
- almostIn (e1 + e2) (f a) (FinEnum_map z stableX stableY f b).
+Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum stableX),
+    (QposInf_le d ((mu f e1) + (mu f e2))) -> almostIn (proj1_sig d) a b ->
+ almostIn (proj1_sig e1 + proj1_sig e2) (f a) (FinEnum_map z stableX stableY f b).
 Proof.
  intros e1 e2 d a b Hd Hab.
  induction b.
@@ -1788,25 +1828,27 @@ Lemma CompactImage_correct1 : forall x s,
 Proof.
  intros x s H e1 e2.
  apply almostIn_closed.
- intros d1.
- assert (QposEq (e1 + e2 + d1)
-                ((e1 + (1#4)*d1) + ((1#4)*d1 + ((1#4)*d1)) + ((1#4)*d1 + e2)))
-   by (unfold QposEq; simpl; ring).
- rewrite H0. clear H0.
- apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*d1)%Qpos); [|apply regFun_prf].
- apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*d1)%Qpos); [apply regFun_prf|].
- remember (mu f ((1 # 4) * d1)) as dum.
+ intros d1 d1pos.
+ setoid_replace (proj1_sig e1 + proj1_sig e2 + d1)
+   with (proj1_sig ((e1 + (1#4)*exist _ _ d1pos)
+                    + ((1#4)*exist _ _ d1pos
+                       + ((1#4)*exist _ _ d1pos)) + ((1#4)*exist _ _ d1pos + e2))%Qpos)
+   by (simpl; ring).
+ apply almostIn_triangle_r with (approximate (CompactImage s) ((1#4)*exist _ _ d1pos)%Qpos); [|apply regFun_prf].
+ apply almostIn_triangle_l with (approximate (Cmap plX f x) ((1#4)*exist _ _ d1pos)%Qpos); [apply regFun_prf|].
+ remember (mu f ((1 # 4) * exist _ _ d1pos)) as dum.
  simpl.
  unfold FinEnum_map_modulus. simpl in Heqdum. rewrite <- Heqdum.
  destruct dum.
- - apply (almostIn_map2 _ _ (q+q)). 2: apply H.
-   rewrite <- Heqdum. apply: Qle_refl.
+ - apply (almostIn_map2 ((1 # 4) * exist _ _ d1pos)
+                        ((1 # 4) * exist _ _ d1pos) (q+q)%Qpos). 2: apply H.
+   simpl. simpl in Heqdum. rewrite <- Heqdum. apply: Qle_refl.
  - assert (Z:=H z z).
  destruct (approximate s z).
   contradiction.
  apply: orWeaken.
  left.
- set (d:=((1 # 4) * d1)%Qpos).
+ set (d:=((1 # 4) * exist _ _ d1pos)%Qpos).
  apply (mu_sum plX d (d::nil) f).
  simpl.
  unfold d.

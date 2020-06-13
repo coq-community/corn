@@ -116,7 +116,7 @@ Let C := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
 
 Lemma rasterization_error : forall l (w:Qpos) n x,
 (l <= x <= l + proj1_sig w) ->
-ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * w) (C l (l + proj1_sig w) (S n) (min n
+ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * proj1_sig w) (C l (l + proj1_sig w) (S n) (min n
              (Z_to_nat
                 (Z.le_max_l 0 (rasterize1 l (l+proj1_sig w) (S n) x))))) x.
 Proof.
@@ -248,7 +248,7 @@ Lemma RasterizeQ2_correct1 : forall x y,
  InFinEnumC ((x,y):ProductMS _ _) f ->
  existsC (ProductMS _ _)
   (fun p => InFinEnumC p (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
-            /\ ball err p (x,y)).
+            /\ ball (proj1_sig err) p (x,y)).
 Proof.
  intros x y.
  unfold RasterizeQ2.
@@ -282,7 +282,7 @@ Proof.
    apply InterpRaster_correct1.
    rewrite setRaster_correct1; unfold i, j; auto with *.
   split.
-   change (ball err (C l r (S n) i) x).
+   change (ball (proj1_sig err) (C l r (S n) i) x).
    change (st_eq x (fst a)) in Hl.
    rewrite -> Hl.
    eapply ball_weak_le.
@@ -292,7 +292,7 @@ Proof.
    simpl in Hl.
    rewrite ->  Hl in Hfl.
    auto.
-  change (ball err (C t b (S m) (m-j)%nat) y).
+  change (ball (proj1_sig err) (C t b (S m) (m-j)%nat) y).
   change (st_eq y (snd a)) in Hr.
   rewrite -> Hr.
   eapply ball_weak_le.
@@ -327,7 +327,7 @@ Qed.
 Lemma RasterizeQ2_correct2 : forall x y,
  InFinEnumC ((x,y):ProductMS _ _) (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
  -> (existsC (ProductMS _ _)
-  (fun p => InFinEnumC p f/\ ball err p (x,y))).
+  (fun p => InFinEnumC p f/\ ball (proj1_sig err) p (x,y))).
 Proof.
  intros x y H.
  destruct (InStrengthen _ _ H) as [[x' y'] [H' Hxy]].
@@ -346,7 +346,7 @@ Proof.
  cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
    (fun p : ProductMS Q_as_MetricSpace Q_as_MetricSpace =>
      InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p (rev f) /\
-       ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p (x, y))).
+       ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) (proj1_sig err) p (x, y))).
   intros L.
   clear -L.
   destruct L as [G | z [Hz0 Hz]] using existsC_ind.
@@ -412,7 +412,7 @@ Proof.
   auto.
  assert (L0:existsC (Q * Q) (fun p : Q * Q =>
    InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p l0 /\
-     ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) err p (x, y))).
+     ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) (proj1_sig err) p (x, y))).
   apply IHl0.
    simpl in Hij.
    rewrite setRaster_correct2 in Hij; auto.
@@ -429,10 +429,11 @@ Proof.
 Qed.
 
 Lemma RasterizeQ2_correct :
- ball err
+ ball (proj1_sig err)
   (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
   f.
 Proof.
+  split. apply Qpos_nonneg.
  split; intros [x y] Hx.
   destruct (RasterizeQ2_correct2 Hx) as [ G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.

@@ -257,7 +257,7 @@ Proof.
    apply AQsqrt_mid_bounded_regular_aux2.
    now apply: (order_preserving (+ (3:N))).
   assert (∀ ε1 ε2 : Qpos, N_of_Z (-Qdlog2 (proj1_sig ε2)) ≤ N_of_Z (-Qdlog2 (proj1_sig ε1)) → 
-     ball (ε1 + ε2) (AQsqrt_mid_raw ε1 : AQ_as_MetricSpace) (AQsqrt_mid_raw ε2)).
+     ball (proj1_sig ε1 + proj1_sig ε2) (AQsqrt_mid_raw ε1 : AQ_as_MetricSpace) (AQsqrt_mid_raw ε2)).
   { intros ε1 ε2 E.
    unfold AQsqrt_mid_raw.
    eapply ball_weak_le; auto.
@@ -284,9 +284,7 @@ Proof.
   destruct (total (≤) (N_of_Z (-Qdlog2 (proj1_sig ε1)))
                   (N_of_Z (-Qdlog2 (proj1_sig ε2)))); auto.
   apply ball_sym. 
-  assert (QposEq (ε1 + ε2) (ε2 + ε1))
-    by (unfold QposEq; simpl; apply commutativity).
-  rewrite H8. auto.
+  rewrite Qplus_comm. auto.
 Qed.
 
 Definition AQsqrt_mid : AR := mkRegularFunction (0 : AQ_as_MetricSpace) AQsqrt_mid_bounded_prf.
@@ -315,7 +313,7 @@ Qed.
 
 Lemma AQsqrt_mid_spec : AQsqrt_mid ^ (2:N)= 'a.
 Proof.
-  assert (∀ ε, Qball ε ('(AQsqrt_mid_raw ε ^ (2:N))) ('a)) as P.
+  assert (∀ ε, Qball (proj1_sig ε) ('(AQsqrt_mid_raw ε ^ (2:N))) ('a)) as P.
   { intros ε. apply Qball_Qabs. rewrite Qabs.Qabs_neg.
     eapply Qle_trans.
      2: now apply Qpos_dlog2_spec.
@@ -352,7 +350,8 @@ Proof.
   rewrite <-(ARpower_N_bounded_N_power _ _ 4). 
   - intros ε1 ε2. simpl.
    rewrite lattices.meet_r, lattices.join_r.
-    + apply ball_weak. apply ball_weak_le with (ε1 * Qpos_inv (8 # 1))%Qpos.
+    + apply ball_weak. apply Qpos_nonneg.
+      apply ball_weak_le with (proj1_sig (ε1 * Qpos_inv (8 # 1))%Qpos).
       change ('ε1 / (8#1) ≤ 'ε1). 
       rewrite <-(rings.mult_1_r ('ε1)) at 2.
       apply Qmult_le_l. apply Qpos_ispos. discriminate.

@@ -325,16 +325,15 @@ Qed.
 
 (** This is the "transitivity" of the [SupDistanceToLinear] function. *)
 Lemma SupDistanceToLinear_trans :
- forall x y a b (H:a < b), StepFSupBall (SupDistanceToLinear x H + SupDistanceToLinear y H) x y.
+ forall x y a b (H:a < b), StepFSupBall (proj1_sig (SupDistanceToLinear x H + SupDistanceToLinear y H)%Qpos) x y.
 Proof.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht H a b Hab.
    rewrite  <- Hs, <- Ht at 2.
-   setoid_replace (SupDistanceToLinear s0 Hab + SupDistanceToLinear t0 Hab)%Qpos
-     with (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Qpos.
+   setoid_replace (proj1_sig (SupDistanceToLinear s0 Hab + SupDistanceToLinear t0 Hab)%Qpos)
+     with (proj1_sig (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Qpos).
     apply H.
    unfold QposEq.
-   autorewrite with QposElim.
    apply Qplus_wd; apply SupDistanceToLinear_wd2; auto.
   intros x x0 a b H.
   unfold StepFSupBall, StepFfoldProp.
@@ -342,7 +341,6 @@ Proof.
   rewrite -> Qball_Qabs.
   unfold SupDistanceToLinear.
   simpl.
-  autorewrite with QposElim.
   apply Qabs_case; intros  H0.
    setoid_replace (x - x0)%Q with ((x - a) + (a - b) + (b - x0))%Q; [| now simpl; ring].
    apply: plus_resp_leEq_both; simpl; auto with *.
@@ -511,7 +509,7 @@ Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> LinfStepQ).
 Proof.
  intros a b.
  unfold id01_raw.
- apply ball_weak_le with ((1#2*(id01_raw_help a)) + (1#2*(id01_raw_help b)))%Qpos.
+ apply ball_weak_le with (proj1_sig ((1#2*(id01_raw_help a)) + (1#2*(id01_raw_help b)))%Qpos).
   apply: plus_resp_leEq_both; apply id01_raw_help_le.
  simpl (ball (m:=LinfStepQ)).
  pose proof stepSampleDistanceToId.
@@ -520,7 +518,7 @@ Proof.
                  + (SupDistanceToLinear (stepSample (id01_raw_help b)) (pos_one Q_as_COrdField)))).
  { unfold QposEq. simpl. unfold QposEq in H. simpl in H.
    do 2 rewrite H. reflexivity. }
- rewrite H0.
+ unfold QposEq in H0. rewrite H0.
  apply SupDistanceToLinear_trans.
 Qed.
 
@@ -589,11 +587,11 @@ Proof.
    rewrite <- Hs, <- Ht.
    apply H.
    destruct (mu f e); try constructor.
-   change (ball q s t).
+   change (ball (proj1_sig q) s t).
    rewrite -> Hs, Ht.
    assumption.
   intros x y e H.
-  change (ball e (f x) (f y)).
+  change (ball (proj1_sig e) (f x) (f y)).
   apply uc_prf.
   destruct (mu f e); try solve [constructor].
   simpl.
@@ -602,15 +600,28 @@ Proof.
  unfold ComposeContinuous_raw in *.
  repeat rewrite -> MapGlue, dist_glue.
  intros d1 d2.
- apply ball_weak_le with (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos.
+ apply ball_weak_le with (proj1_sig (((1#2)*((1#2)*d1)) + e + ((1#2)*((1#2)*d2)))%Qpos).
  simpl.
   Qauto_le.
  simpl.
  unfold Cap_slow_raw.
  simpl.
  rewrite -> StepFSupBallGlueGlue.
- split; [apply H0 | apply H1]; destruct (mu f e); try constructor; simpl in *;
-   rewrite -> StepFSupBallGlueGlue in H; tauto.
+ split.
+ setoid_replace ((1 # 2) * ((1 # 2) * proj1_sig d1) + proj1_sig e +
+                 (1 # 2) * ((1 # 2) * proj1_sig d2))%Q
+   with (proj1_sig ((1 # 2) * ((1 # 2) * d1) + e + (1 # 2) * ((1 # 2) * d2))%Qpos)
+   by (simpl; ring).
+ apply (H0 e).
+ destruct (mu f e); try constructor. simpl in H.
+ rewrite -> StepFSupBallGlueGlue in H; tauto.
+ setoid_replace ((1 # 2) * ((1 # 2) * proj1_sig d1) + proj1_sig e +
+                 (1 # 2) * ((1 # 2) * proj1_sig d2))%Q
+   with (proj1_sig ((1 # 2) * ((1 # 2) * d1) + e + (1 # 2) * ((1 # 2) * d2))%Qpos)
+   by (simpl; ring).
+ apply (H1 e).
+ destruct (mu f e); try constructor. simpl in H.
+ rewrite -> StepFSupBallGlueGlue in H; tauto.
 Qed.
 
 Definition ComposeContinuous (f:Q_as_MetricSpace --> CR) : LinfStepQ --> BoundedFunction :=
@@ -696,8 +707,8 @@ Proof.
      (Cbind QPrelengthSpace f) X0 y Hyf Hy).
    set (z:=(' approximate (f x) ((1 # 2) * e)%Qpos)%CR).
    rewrite -> X.
-   assert (QposEq e ((1#2)*e + (1#2)*e)) by (unfold QposEq; simpl; ring).
-   rewrite H. clear H.
+   setoid_replace (proj1_sig e)
+     with (proj1_sig ((1#2)*e + (1#2)*e)%Qpos) by (simpl; ring).
    apply ball_triangle with (f x); [|apply ball_approx_r].
    rewrite <- (BindLaw1 f).
    rewrite <- (Cbind_correct QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x)).
@@ -834,10 +845,10 @@ Proof.
   assert (QposEq (ba*e) ((ca+bc)*e)).
   { unfold QposEq. simpl. unfold QposEq in Z.
     rewrite Z. reflexivity. }
- clear Z. rewrite H. clear H.
+ clear Z. unfold QposEq in H. rewrite H. clear H.
   assert (QposEq ((ca + bc)*e) (ca*e + bc*e))
     by (unfold QposEq; simpl; ring).
-  rewrite H. clear H.
+  unfold QposEq in H. rewrite H. clear H.
  rewrite <- CRAbsSmall_ball.
  stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl))%Q)+
    ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr))))%Q)%CR.
@@ -906,11 +917,12 @@ Proof.
   apply eq_symmetric; apply (inj_Q_nring IR 1).
  clear H01' HF'.
  apply ball_eq.
- intros e.
- assert (QposEq e ((1#2)*e + (1#2)*e)) by (unfold QposEq; simpl; ring).
- apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
- generalize ((1#2)*e)%Qpos.
- clear e.
+ intros e epos.
+ setoid_replace e with (proj1_sig ((1#2)*exist _ _ epos
+                                   + (1#2)*exist _ _ epos)%Qpos)
+   by (simpl; ring).
+ generalize ((1#2)*exist _ _ epos)%Qpos.
+ clear epos e.
  intros e.
  eapply ball_triangle; [|apply (@ball_approx_l Q_as_MetricSpace)].
  change (Cunit (approximate (Integrate01 f) e)) with ('(approximate (Integrate01 f) e))%CR.

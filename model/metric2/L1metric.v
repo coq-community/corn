@@ -52,7 +52,7 @@ difference between step functions.
 Definition IntegralQ:(StepQ)->Q:=(StepFfold (fun x => x) (fun b (x y:QS) => (Qred (affineCombo b x y:QS))))%Q.
 Definition L1Norm(f:StepF QS):Q:=(IntegralQ (StepQabs f)).
 Definition L1Distance(f g:StepF QS):Q:=(L1Norm (f - g)).
-Definition L1Ball (e:Qpos)(f g:StepF QS):Prop:=((L1Distance f g)<= proj1_sig e)%Q.
+Definition L1Ball (e:Q)(f g:StepF QS):Prop:=((L1Distance f g)<= e)%Q.
 
 (*
 Definition test1:=(constStepF (1:QS)).
@@ -70,7 +70,7 @@ Proof.
  intros e a b.
  unfold L1Ball.
  set (d:=L1Distance a b).
- destruct (Qlt_le_dec_fast (proj1_sig e) d) as [Hdc|Hdc].
+ destruct (Qlt_le_dec_fast e d) as [Hdc|Hdc].
   right. abstract auto with *.
   left. exact Hdc.
 Defined.
@@ -365,12 +365,12 @@ Proof.
 Qed.
 
 (** L1 ball has all the required properties. *)
-Lemma L1ball_refl : forall e x, (L1Ball e x x).
+Lemma L1ball_refl : forall e x, Qle 0 e -> (L1Ball e x x).
 Proof.
- intros e x.
+ intros e x epos.
  unfold L1Ball, L1Distance.
  setoid_replace (x-x) with (constStepF (0:QS)); [| ring].
- change (0 <= proj1_sig e)%Q.
+ change (0 <= e)%Q.
  auto with *.
 Qed.
 
@@ -399,21 +399,21 @@ Proof.
  apply: plus_resp_leEq_both; assumption.
 Qed.
 
-Lemma L1ball_closed : forall e x y, (forall d, (L1Ball (e+d) x y)) -> (L1Ball e x y).
+Lemma L1ball_closed : forall e x y, (forall d, Qlt 0 d -> (L1Ball (e+d) x y)) -> (L1Ball e x y).
 Proof.
  unfold L1Ball. intros e a b H.
- assert (forall x, (forall d : Qpos, x <= proj1_sig e+ proj1_sig d) -> x <= proj1_sig e)%Q.
+ assert (forall x, (forall d : Qpos, x <= e+ proj1_sig d) -> x <= e)%Q.
  { intros. apply: shift_zero_leEq_minus'.
   apply inv_cancel_leEq. apply approach_zero_weak.
-  intros. replace LHS with (x[-](proj1_sig e)).
+  intros. replace LHS with (x[-]e).
   apply: shift_minus_leEq;simpl.
-  replace RHS with (proj1_sig e+ e0)%Q by simpl; ring.
+  replace RHS with (e+ e0)%Q by simpl; ring.
   exact (H0 (exist _ _ X)).
   unfold cg_minus; simpl; ring. }
- apply H0. exact H.
+ apply H0. intros [d dpos]. apply H, dpos.
 Qed.
 
-Lemma L1ball_eq : forall x y, (forall e : Qpos, L1Ball e x y) -> StepF_eq x y.
+Lemma L1ball_eq : forall x y, (forall e : Q, Qlt 0 e -> L1Ball e x y) -> StepF_eq x y.
 Proof.
  intros x y H.
  unfold L1Ball in H.
@@ -427,7 +427,7 @@ Proof.
  intro H0.
  assert (H1:0<(1#2)*( L1Norm (QminusS ^@> x <@> y))).
   apply: mult_resp_pos; simpl; auto with *.
- apply: (Qle_not_lt _ _ (H (exist _ _ H1))).
+ apply: (Qle_not_lt _ _ (H _ H1)).
  simpl.
  rewrite -> Qlt_minus_iff.
  unfold L1Distance.
@@ -447,14 +447,17 @@ Lemma L1_is_MetricSpace :
  (is_MetricSpace L1S L1Ball).
 Proof.
  split.
-     apply: L1ball_refl.
-    apply: L1ball_sym.
-   apply: L1ball_triangle.
-  apply: L1ball_closed.
- apply: L1ball_eq.
+ - intros e H x. apply L1ball_refl, H.
+ - apply: L1ball_sym.
+ - apply: L1ball_triangle.
+ - apply: L1ball_closed.
+ - apply L1ball_eq.
+ - intros. unfold L1Ball, L1Distance in H.
+   apply (Qle_trans _ (L1Norm (a-b))).
+   apply L1Norm_nonneg. exact H.
 Qed.
 (* begin hide *)
-Add Morphism L1Ball with signature QposEq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
+Add Morphism L1Ball with signature Qeq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
  unfold L1Ball.

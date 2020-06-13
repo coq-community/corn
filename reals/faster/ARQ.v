@@ -15,9 +15,11 @@ Instance Q_approx: AppApprox Q := λ x k,
 
 Lemma Q_approx_correct (x : Q) (k : Z) : Qball (2 ^ k) (app_approx x k) x.
 Proof.
-  destruct k as [|p|]; try reflexivity.
-  unfold app_approx, Q_approx.
-  setoid_replace (2 ^ Zneg p)%Qpos with (1 # (2 ^ p))%Qpos.
+  destruct k as [|p|].
+  - apply ball_refl. discriminate.
+  - apply ball_refl. apply Qpower.Qpower_pos_positive. discriminate.
+  - unfold app_approx, Q_approx.
+  setoid_replace (2 ^ Zneg p)%Q with (1 # (2 ^ p))%Q.
    now apply ball_sym, approximateQ_correct.
   change (/ Qpower (inject_Z 2%Z) (Zpos p) == 1 # 2 ^ p).
   rewrite <-Qpower.Zpower_Qpower; auto with zarith.

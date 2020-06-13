@@ -482,23 +482,23 @@ Proof.
  revert e0 e1.
  cut (forall (e0 e1:Qpos), (proj1_sig e1 <= proj1_sig e0) -> forall (p p0 : positive),
    err_prop (proj1_sig e0) (Str_nth_tl (nat_of_P p) series) -> err_prop (proj1_sig e1) (Str_nth_tl (nat_of_P p0) series) ->
-     Qball (e0) (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
+     Qball (proj1_sig e0) (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
        (err_prop (proj1_sig e0)) series) (InfiniteSum_raw_N p0 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
          (err_prop (proj1_sig e1)) series)).
   intros X e0 e1 p0 p1.
   destruct (Qle_total (proj1_sig e1) (proj1_sig e0)).
    intros H0 H1.
-   apply: ball_weak;simpl;auto.
+   apply: ball_weak;simpl;auto. apply Qpos_nonneg.
   intros H0 H1.
   assert (QposEq (e0 + e1) (e1+e0)) by (unfold QposEq; simpl; ring).
   apply (ball_wd _ H2 _ _ (reflexivity _) _ _ (reflexivity _)). clear H2.
-  apply: ball_weak.
+  apply: ball_weak. apply Qpos_nonneg.
   apply ball_sym.
   apply X; auto with *.
  intros e0 e1 He p0 p1 H0.
  revert H.
  set (P0:=fun s q => GeometricSeries s ->
-   err_prop (proj1_sig e1) (Str_nth_tl (nat_of_P p1) s) -> Qball e0 q (InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
+   err_prop (proj1_sig e1) (Str_nth_tl (nat_of_P p1) s) -> Qball (proj1_sig e0) q (InfiniteSum_raw_N p1 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
      (err_prop (proj1_sig e1)) s)).
  change (P0 series (InfiniteSum_raw_N p0 (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0)
    (err_prop (proj1_sig e0)) series)).
@@ -599,7 +599,7 @@ Proof.
  rewrite -> Qplus'_correct.
  rewrite (@InfiniteSum_raw_N_extend' (InfiniteGeometricSum_maxIter (tl series) e)
    (InfiniteGeometricSum_maxIter series e)).
-   apply: ball_refl.
+   apply: ball_refl. apply (Qpos_nonneg (e+e)).
   apply InfiniteGeometricSum_maxIter_correct.
   destruct Gs; assumption.
  apply (@InfiniteGeometricSum_maxIter_monotone series e).
@@ -629,8 +629,8 @@ Proof.
   setoid_replace (InfiniteSum_raw_N (InfiniteGeometricSum_maxIter series e)
                                     (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) (err_prop (proj1_sig e)) series - 0)
     with 0.
-   apply zero_AbsSmall.
-   apply Qpos_nonneg.
+   apply zero_AbsSmall. 
+   apply (Qpos_nonneg (e+e)).
   simpl.
   ring_simplify.
   assert (X:err_prop (proj1_sig e) series).
@@ -660,7 +660,6 @@ Proof.
  cut (AbsSmall (R:=CRasCOrdField) (' proj1_sig e)%CR (InfiniteGeometricSum Gs)).
   intros [H0 H1].
   unfold e in *.
-  autorewrite with QposElim in *.
   split; assumption.
  stepr (InfiniteGeometricSum Gs[-]0)%CR; [| now (unfold cg_minus; simpl; ring)].
  rewrite -> CRAbsSmall_ball.
@@ -674,7 +673,7 @@ Proof.
  setoid_replace (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) e'
    series - 0) with (InfiniteSum_raw_N p (fun (_ : Stream Q -> bool) (_ : Stream Q) => 0) e'
      series) by (simpl; ring).
- apply err_prop_correct; try assumption.
+ apply (err_prop_correct (d+e+d)%Qpos); try assumption.
   apply err_prop_monotone with (proj1_sig e).
   simpl.
    Qauto_le.

@@ -120,16 +120,17 @@ Proof.
  ring.
 Qed.
 
-Lemma Σ_Qball (f g: nat -> Q) (e: Qpos) (n: nat):
-  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= proj1_sig e / inject_Z (Z.of_nat n)) ->
+Lemma Σ_Qball (f g: nat -> Q) (e: Q) (n: nat):
+  0 <= e ->
+  (forall i: nat, (i < n)%nat -> Qabs (f i - g i) <= e / inject_Z (Z.of_nat n)) ->
   Qball e (Σ n f) (Σ n g).
 Proof with auto.
- intro H.
+ intros epos H.
  apply Qball_Qabs.
- destruct n. simpl. apply Qpos_nonneg.
+ destruct n. simpl. exact epos.
  rewrite Σ_sub.
- setoid_replace (proj1_sig e)
-   with (inject_Z (Z.of_nat (S n)) * (/ inject_Z (Z.of_nat (S n)) * proj1_sig e)).
+ setoid_replace e
+   with (inject_Z (Z.of_nat (S n)) * (/ inject_Z (Z.of_nat (S n)) * e)).
   apply Σ_abs_le.
   intros ? E.
   specialize (H x E).
@@ -139,13 +140,19 @@ Proof with auto.
  field. discriminate.
 Qed.
 
-Lemma Σ_Qball_pos_bounds (f g: nat -> Q) (e: Qpos) (n: positive):
+Lemma Σ_Qball_pos_bounds (f g: nat -> Q) (e: Q) (n: positive):
   (forall i: nat, (i < Pos.to_nat n)%nat -> Qball (e * (1#n)) (f i) (g i)) ->
   Qball e (Σ (Pos.to_nat n) f) (Σ (Pos.to_nat n) g).
 Proof with intuition.
- intros. apply Σ_Qball. intros.
- setoid_replace (proj1_sig e / inject_Z (Z.of_nat (nat_of_P n)))
-   with (proj1_sig (e * (1#n))%Qpos).
+  intros.
+  assert (0 <= e).
+  { specialize (H O (Pos2Nat.is_pos n)).
+    apply (msp_nonneg (msp (Q_as_MetricSpace))) in H.
+    rewrite <- (Qmult_0_l (1#n)) in H.
+    apply Qmult_le_r in H. exact H. reflexivity. }
+  apply Σ_Qball. exact H0. intros.
+ setoid_replace (e / inject_Z (Z.of_nat (nat_of_P n)))
+   with (e * (1#n)).
   apply Qball_Qabs...
   unfold canonical_names.equiv, stdlib_rationals.Q_eq.
  rewrite <- Zpos_eq_Z_of_nat_o_nat_of_P...
@@ -177,7 +184,7 @@ Proof.
  field. discriminate.
 Qed.
 
-Lemma Qball_hetero_Σ (n m: positive) f g e:
+Lemma Qball_hetero_Σ (n m: positive) f g (e:Q):
  (forall i: nat, (i < Pos.to_nat (n * m)%positive)%nat ->
    Qball (e * (1# (n * m)%positive))
      (/ inject_Z (Zpos m) * f (i / Pos.to_nat m)%nat)

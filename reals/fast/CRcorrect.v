@@ -93,7 +93,7 @@ Proof.
  simpl.
  unfold CRasCauchy_IR_raw.
  set (d:=(1 # P_of_succ_nat m)%Qpos).
- change (ball (en#ed)%Qpos (approximate x (Qpos2QposInf d)) (approximate y (Qpos2QposInf d))).
+ change (ball (en#ed) (approximate x (Qpos2QposInf d)) (approximate y (Qpos2QposInf d))).
  eapply ball_weak_le;[|apply Hxy].
  unfold d. simpl.
  ring_simplify.
@@ -134,7 +134,7 @@ Proof.
  cut (forall (e1 e2:Qpos) n1 n2, n2 <= n1 ->
    (forall m : nat, n1 <= m -> AbsSmall (R:=Q_as_COrdField) (proj1_sig e1) (f m[-]f n1)) ->
      (forall m : nat, n2 <= m -> AbsSmall (R:=Q_as_COrdField) (proj1_sig e2) (f m[-]f n2)) ->
-       Qball (e1 + e2) (f n1) (f n2)).
+       Qball (proj1_sig e1 + proj1_sig e2) (f n1) (f n2)).
   intros H.
   destruct (le_ge_dec n1 n2).
    eapply ball_sym;simpl.
@@ -146,7 +146,7 @@ Proof.
  intros e1 e2 n1 n2 H Hn1 Hn2.
  assert (QposEq (e1+e2) (e2+e1)) by (unfold QposEq; simpl; ring).
  apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0. 
- eapply ball_weak.
+ eapply ball_weak. apply Qpos_nonneg.
  eapply Hn2.
  assumption.
 Qed.
@@ -161,11 +161,11 @@ Proof.
  eapply regFunEq_e.
  intros e.
  apply ball_closed.
- intros d.
+ intros d dpos.
  simpl.
  destruct (Hx (proj1_sig e) (Qpos_ispos e)) as [a Ha].
  destruct (Hy (proj1_sig e) (Qpos_ispos e)) as [b Hb].
- destruct (Eq_alt_2_1 _ _ _ Hxy _ (Qpos_ispos d)) as [c Hc].
+ destruct (Eq_alt_2_1 _ _ _ Hxy _ dpos) as [c Hc].
  simpl in Hc.
  unfold Qball.
  set (n:=max (max a b) c).
@@ -191,11 +191,11 @@ Proof.
  destruct (CRasCauchy_IR_raw_is_Cauchy x (proj1_sig e) (Qpos_ispos e)) as [n Hn].
  unfold CRasCauchy_IR_raw in *.
  apply ball_closed.
- intro d.
- assert (QposEq (e+e+d) (e+(d+e))%Qpos)
-   by (unfold QposEq; simpl; ring).
- apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
- destruct d as [[dn dd] dpos].
+ intros d dpos.
+ setoid_replace (proj1_sig e+proj1_sig e+d)%Q
+   with (proj1_sig (e+(exist _ _ dpos+e))%Qpos)
+   by (simpl; ring).
+ destruct d as [dn dd].
  destruct dn as [|dn|dn]. inversion dpos. 2: inversion dpos.
  apply ball_triangle with (approximate x (Qpos2QposInf (1#P_of_succ_nat (n+(nat_of_P dd)))))%Qpos.
  - apply ball_sym.
@@ -371,6 +371,7 @@ Proof.
  simpl.
  destruct (CS_seq_const Q_as_COrdField x (proj1_sig e) (Qpos_ispos e)).
  eapply ball_refl.
+ apply (Qpos_nonneg (e + e)).
 Qed.
 
 Hint Rewrite Cauchy_IR_inject_Q_as_CR_inject_Q : CRtoCauchy_IR.
@@ -405,7 +406,7 @@ Proof.
  destruct (Hy (proj1_sig ((1 # 2) * e)%Qpos)) as [n2 Hn2].
  destruct (CS_seq_plus) as [n3 Hn3].
  set (n:= max n3 (max n1 n2)).
- change (@ball Q_as_MetricSpace (e+e) (x n1 + y n2) (x n3 + y n3))%Q.
+ change (@ball Q_as_MetricSpace (proj1_sig e+proj1_sig e) (x n1 + y n2) (x n3 + y n3))%Q.
  apply ball_triangle with (x n + y n)%Q.
   assert (QposEq e (((1 # 2) * e +(1 # 2) * e))) by (unfold QposEq; simpl; ring).
   apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
@@ -450,7 +451,7 @@ Proof.
  destruct (Hx (proj1_sig e) (Qpos_ispos e)) as [n1 Hn1].
  destruct (CS_seq_inv Q_as_COrdField x Hx (proj1_sig e) (Qpos_ispos e)) as [n2 Hn2].
  set (n:=(max n1 n2)).
- change (@ball Q_as_MetricSpace (e+e) (- x n1) (- x n2))%Q.
+ change (@ball Q_as_MetricSpace (proj1_sig e+proj1_sig e) (- x n1) (- x n2))%Q.
  apply (@ball_triangle Q_as_MetricSpace _ _ _ (- x n)%Q). simpl; unfold Qball.
  unfold QAbsSmall.
  setoid_replace (- x n1 - - x n)%Q with (x n - x n1)%Q.
@@ -564,11 +565,12 @@ Proof.
     (Cauchy_IRasCR_raw (Build_CauchySeq Q_as_COrdField y Hy)(QposInf_bind (fun e0 : Qpos => e0) QposInfinity))))%Q (0 * y n)%Q).
    ring.
   rewrite -> H. clear H.
-  change (@ball Q_as_MetricSpace (e+e) (0 * y n) (x n3 * y n3))%Q.
+  change (@ball Q_as_MetricSpace (proj1_sig e+proj1_sig e) (0 * y n) (x n3 * y n3))%Q.
   apply ball_triangle with (x n*y n)%Q;[|eapply Hn3; unfold n; auto with *].
   apply ball_sym.
   simpl.
-  rewrite <- Hxn1.
+  setoid_replace (0 * y n)%Q with (x n1 * y n)%Q.
+  2: rewrite Hxn1; reflexivity.
   unfold Qball.
   unfold QAbsSmall.
   setoid_replace (x n * y n - x n1 * y n)%Q with ((x n - x n1)*y n)%Q.
@@ -587,7 +589,8 @@ Proof.
  assert (n2 <= n);[unfold n; apply le_trans with (max n1 n2); auto with *|].
  assert (n3 <= n);[unfold n; apply le_trans with (max n3 N); auto with *|].
  assert (N <= n);[unfold n; apply le_trans with (max n3 N); auto with *|].
- change (Qball (e+e)) with (@ball Q_as_MetricSpace (e + e)).
+ change (Qball (proj1_sig e+proj1_sig e))
+   with (@ball Q_as_MetricSpace (proj1_sig e + proj1_sig e)).
  apply ball_triangle with (x n * y n)%Q;[|eapply Hn3; assumption].
  clear Hn3.
  assert (QposEq e ((1#2)*e + (1#2)*e)) by (unfold QposEq; simpl; ring).
@@ -806,7 +809,7 @@ Proof.
  set (m:=max (max a n) (max b c)).
  assert (Hm1: c<=m).
   unfold m; apply le_trans with (max b c); auto with *.
- change (@ball Q_as_MetricSpace (e+e) (/ Qmax (proj1_sig z) (x b))%Q (y c)).
+ change (@ball Q_as_MetricSpace (proj1_sig e+proj1_sig e) (/ Qmax (proj1_sig z) (x b))%Q (y c)).
  apply ball_triangle with (y m);[|eapply Hc;assumption].
  clear Hc.
  unfold y.

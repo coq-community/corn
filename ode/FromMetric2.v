@@ -47,7 +47,9 @@ Qed.
 
 Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction X.
 refine (@mkRegularFunction _ (f 0) (λ e : Qpos, let (e', _) := e in f e') _).
-intros [e1 e1_pos] [e2 e2_pos]. now apply gball_pos, (rf_proof f).
+intros [e1 e1_pos] [e2 e2_pos]. apply gball_pos, (rf_proof f).
+apply (Qpos_ispos ((e1 ↾ e1_pos) + (e2 ↾ e2_pos))%Qpos).
+assumption. assumption.
 Defined.
 
 End FromMetricSpace.
@@ -69,6 +71,7 @@ constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
 intros f e1 e2 e1_pos e2_pos.
 eapply gball_pos, (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
+apply (Qpos_ispos ((e1 ↾ e1_pos) + (e2 ↾ e2_pos))%Qpos).
 Qed.
 
 Lemma gball_complete (r : Q) (x y : Complete X) :
@@ -83,10 +86,18 @@ destruct (Qsec.Qdec_sign r) as [[r_neg | r_pos] | r_zero].
   exfalso; eapply gball_neg; [| apply H]; now eapply Q.Qopp_Qlt_0_l.
 + rewrite <- (gball_pos r_pos). simpl; unfold regFunBall. split; intros H e1 e2.
   - specialize (H e1 e2). apply gball_pos in H. apply H.
+    apply (Qpos_ispos (e1 + exist _ _ r_pos + e2)%Qpos).
   - apply gball_pos, H.
+    apply (Qpos_ispos (e1 + exist _ _ r_pos + e2)%Qpos).
 + rewrite r_zero. unfold gball at 1; simpl; unfold regFunEq. split; intros H e1 e2; specialize (H e1 e2).
-  - apply gball_pos in H. now rewrite r_zero, Qplus_0_r.
-  - apply gball_pos. now rewrite r_zero, Qplus_0_r in H.
+  - apply gball_pos in H. rewrite r_zero, Qplus_0_r.
+    rewrite Qplus_0_r in H. exact H. 
+    rewrite Qplus_0_r.
+    apply (Qpos_ispos (e1 + e2)%Qpos).
+  - apply gball_pos.
+    rewrite Qplus_0_r.
+    apply (Qpos_ispos (e1 + e2)%Qpos).
+    rewrite r_zero, Qplus_0_r in H. rewrite Qplus_0_r. exact H.
 Qed.
 
 End FromCompleteMetricSpace.
@@ -139,7 +150,13 @@ Unset Printing Coercions.
 
 (* Uniformly continuous functions respect equality (see metric2.UniformContinuity.v) *)
 Global Instance CRabs_proper : Proper (equiv ==> equiv) (abs (A := CR)).
-Proof. change abs with (@ucFun CR CR CRabs); apply _. Qed.
+Proof.
+  pose proof (@uc_wd_Proper CR CR CRabs).
+  intros x y Hxy e1 e2. specialize (H x y).
+  rewrite Qplus_0_r. apply H. simpl.
+  intros e3 e4. specialize (Hxy e3 e4).
+  rewrite Qplus_0_r in Hxy. exact Hxy.
+Qed.
 
 Section CRQBallProperties.
 
@@ -173,8 +190,11 @@ Lemma mspc_ball_Qplus_l (e x y y' : Q)
 Proof.
 intro A. assert (A1 := radius_nonneg _ _ _ A).
 destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
-+ rewrite <- e_zero in A |- *. now rewrite A.
-+ apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
+- unfold ball. simpl.
+  rewrite <- e_zero. unfold ball in A. simpl in A.
+  rewrite <- e_zero in A.
+  apply Qball_plus_r. apply A.
+- apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
 Qed.
 
 (* This is a copy of [CRgball_plus] formulated in terms of [mspc_ball]
@@ -191,10 +211,10 @@ intro A. rewrite <- (rings.plus_0_l e). apply mspc_ball_CRplus; [| easy].
 now apply mspc_refl.
 Qed.
 
-Lemma mspc_ball_CRnegate (e : Q) (x y : CR) : mspc_ball e x y -> mspc_ball e (-x) (-y).
+Lemma mspc_ball_CRnegate (e : Q) (x y : CR)
+  : mspc_ball e x y -> mspc_ball e (-x) (-y).
 Proof.
-intro A. apply mspc_ball_CRabs. mc_setoid_replace (-x - -y) with (y - x) by ring.
-now apply mspc_ball_CRabs, mspc_symm.
+  intro A. intros a b. apply Qball_opp. apply A.
 Qed.
 
 Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :

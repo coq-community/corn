@@ -47,17 +47,26 @@ Section from_alt.
 
   Variable (X: DistanceMetricSpace).
 
-  Definition ball (q: Qpos) (x y: X): Prop := distance x y <= from_Qpos q.
+  Definition ball (q: Q) (x y: X): Prop
+    := exists qpos : Qle 0 q, distance x y <= inject_Qnn (exist _ _ qpos).
 
-  Instance ball_wd: Proper (QposEq ==> @st_eq X ==> @st_eq X ==> iff) ball.
+  Instance ball_wd: Proper (Qeq ==> @st_eq X ==> @st_eq X ==> iff) ball.
   Proof.
    intros ?? E ?? F ?? G. unfold ball.
-   rewrite E, F, G. reflexivity.
+   split.
+   - intros [qpos H]. assert (Qle 0 y). rewrite <- E. exact qpos.
+     exists H0. rewrite <- F, <- G.
+     assert (QnonNeg.eq (exist (Qle 0) x qpos) (exist (Qle 0) y H0)).
+     apply E. rewrite <- H1. exact H.
+   - intros [qpos H]. assert (Qle 0 x). rewrite E. exact qpos.
+     exists H0. rewrite F, G.
+     assert (QnonNeg.eq (exist (Qle 0) x H0) (exist (Qle 0) y qpos)).
+     apply E. rewrite H1. exact H.
   Qed.
 
-  Lemma ball_refl e: Reflexive (ball e).
+  Lemma ball_refl e: Qle 0 e -> Reflexive (ball e).
   Proof.
-   unfold Reflexive, ball. intros.
+   unfold Reflexive, ball. intros. exists H.
    rewrite (proj1 (distance_refl x x)).
     apply NNUpperR.le_0.
    reflexivity.
@@ -66,30 +75,51 @@ Section from_alt.
   Lemma ball_sym e: Symmetric (ball e).
   Proof with auto.
    unfold Symmetric, ball. intros.
+   destruct H as [qpos H]. exists qpos.
    rewrite distance_sym...
   Qed.
 
-  Lemma ball_closed e x y: (forall d, ball (Qpos_plus e d) x y) -> ball e x y.
+  Lemma ball_closed (e:Q) x y: (forall d, 0 < d -> ball (e+d) x y) -> ball e x y.
   Proof with auto.
    unfold ball. intros.
-   apply NNUpperR.le_closed. intros.
+   assert (Qle 0 e).
+   { apply Qnot_lt_le. intro abs.
+     destruct (H (-e*(1#2))%Q). rewrite <- (Qmult_0_l (1#2)).
+     apply Qmult_lt_r. reflexivity.
+     apply (Qplus_lt_l _ _ e). ring_simplify. exact abs.
+     clear H0. ring_simplify in x0.
+     rewrite <- (Qmult_0_r (1#2)) in x0.
+     apply Qmult_le_l in x0. exact (Qlt_not_le _ _ abs x0). reflexivity. }
+   exists H0.
+   apply NNUpperR.le_closed. intros [d dpos].
    rewrite <- NNUpperR.plus_homo.
-   rewrite <- QnonNeg.coercions.from_Qpos_plus_homo...
+   specialize (H d dpos) as [qpos H].
+   assert (QnonNeg.eq (exist (Qle 0) e H0 + from_Qpos (exist (Qlt 0) d dpos))%Qnn
+                      (exist (Qle 0) (e + d)%Q qpos))
+     by reflexivity.
+   rewrite H1. exact H.
   Qed.
 
-  Lemma ball_triangle e1 e2 a b c
-    : ball e1 a b -> ball e2 b c -> ball (Qpos_plus e1 e2) a c.
+  Lemma ball_triangle (e1 e2 : Q) a b c
+    : ball e1 a b -> ball e2 b c -> ball (e1+e2) a c.
   Proof with auto.
    unfold ball.
-   intros.
+   intros. destruct H, H0.
+   assert (Qle 0 (e1+e2)).
+   { apply (Qle_trans _ (e1+0)). rewrite Qplus_0_r.
+     exact x. apply Qplus_le_r. exact x0. }
+   exists H1.
    apply NNUpperR.le_trans with (distance a b + distance b c).
     apply distance_triangle.
-    rewrite QnonNeg.coercions.from_Qpos_plus_homo.
+    assert (QnonNeg.eq (exist (Qle 0) (e1 + e2)%Q H1)
+                       (exist (Qle 0) e1 x + exist (Qle 0) e2 x0)%Qnn)
+      by reflexivity.
+    rewrite H2.
     rewrite NNUpperR.plus_homo.
    apply NNUpperR.plus_le_compat...
   Qed.
 
-  Lemma ball_eq x y: (forall e, ball e x y) -> st_eq x y.
+  Lemma ball_eq x y: (forall e, Qlt 0 e -> ball e x y) -> st_eq x y.
   Proof with auto.
    unfold ball.
    intros.
@@ -97,17 +127,23 @@ Section from_alt.
    apply NNUpperR.le_0_eq.
    apply NNUpperR.le_closed.
    intros.
-   rewrite NNUpperR.plus_0_l...
+   rewrite NNUpperR.plus_0_l.
+   destruct d as [d dpos].
+   specialize (H d dpos) as [qpos H].
+   assert (QnonNeg.eq (from_Qpos (exist (Qlt 0) d dpos))
+                      (exist (Qle 0) d qpos)) by reflexivity.
+   rewrite H0. exact H.
   Qed.
 
   Lemma is_MetricSpace: is_MetricSpace X ball.
   Proof with auto.
    constructor.
-       apply ball_refl.
-      apply ball_sym.
-     apply ball_triangle.
-    apply ball_closed.
-   apply ball_eq.
+   - apply ball_refl.
+   - apply ball_sym.
+   - apply ball_triangle.
+   - apply ball_closed.
+   - apply ball_eq.
+   - intros. destruct H. exact x.
   Qed.
 
   Definition ballSpace: MetricSpace.

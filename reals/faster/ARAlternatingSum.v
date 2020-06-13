@@ -149,7 +149,8 @@ Proof.
   apply Is_true_eq_left.
   apply_simplified AQball_bool_true.
   rewrite rings.preserves_0.
-  apply ball_weak_le with ((2 ^ (k - Z.log2_up l)) + (2 ^ (k - Z.log2_up l)) + 2 ^ (k - 1))%Qpos.
+  apply ball_weak_le
+    with (proj1_sig ((2 ^ (k - Z.log2_up l)) + (2 ^ (k - Z.log2_up l)) + 2 ^ (k - 1))%Qpos).
    simpl.
    assert (∀ n : Z, (2:Q) ^ n = 2 ^ (n - 1) + 2 ^ (n - 1)) as G.
     intros n.
@@ -179,7 +180,9 @@ Proof.
   apply Qball_plus.
    now apply aq_div.
   rewrite aq_shift_1_correct.
-  now apply Qball_0_r.
+  assert (0 < (2 ^ (k - Z.log2_up l)))%Q.
+  { apply Q.Qpower_0_lt. reflexivity. }
+  apply (Qball_0_r (exist _ _ H5)).
 Qed.
 
 (** 
@@ -258,17 +261,16 @@ Proof.
 Qed.
 
 Lemma ARAltSum_correct_aux (l : positive) (k : Z) :
-  ball ((l#1) * Qpos_power 2 k) ('ARAltSum sN sD (nat_of_P l) k) (take sQ (nat_of_P l) Qminus' 0).
+  ball (proj1_sig ((l#1) * Qpos_power 2 k)%Qpos)
+       ('ARAltSum sN sD (nat_of_P l) k) (take sQ (nat_of_P l) Qminus' 0).
 Proof.
   revert sQ sN sD d dnn zl.
   induction l using Pind; intros.
    simpl. 
    rewrite rings.negate_0, rings.plus_0_r.
    rewrite Qminus'_correct. unfold Qminus. rewrite Qplus_0_r.
-   assert (QposEq ((1%positive#1) * Qpos_power 2 k) (Qpos_power 2 k)).
-   { unfold QposEq. simpl. now apply rings.mult_1_l. }
+   rewrite Qmult_1_l.
     (* ugly: make a duplicate of [d] to avoid Coq errors due to [d] being a section variable. *)
-   rewrite H5. clear H5.
     generalize d. intros d'. destruct d' as [? ? ? E].
     rewrite E.
     now apply aq_div.
@@ -284,7 +286,7 @@ Proof.
     setoid_replace (1 + l # 1) with (1 + (l # 1))%Q. ring.
     unfold Qplus, Qeq, Qnum, Qden. rewrite Pos.mul_1_l.
     do 4 rewrite Z.mul_1_r. reflexivity. }
-  rewrite H5. clear H5.
+  unfold QposEq in H5. rewrite H5. clear H5.
    apply Qball_plus.
     generalize d. intros d'. destruct d' as [? ? ? E]. (* ugly *)
     rewrite E.
@@ -300,7 +302,7 @@ Proof.
   destruct l.
    now destruct (irreflexivity (<) (0 : nat)).
    apply ball_weak_le
-     with ((P_of_succ_nat l#1) * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos.
+     with (proj1_sig ((P_of_succ_nat l#1) * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos).
    set (l':=P_of_succ_nat l).
    change ((inject_Z l') * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
@@ -334,11 +336,11 @@ Definition ARInfAltSum_raw (ε : Qpos) : AQ_as_MetricSpace :=
   in ARAltSum sN sD l (εk - Z.log2_up (Z_of_nat l)).
 
 Lemma ARInfAltSum_raw_correct (ε1 ε2 : Qpos) :
-  ball (ε1 + ε2) ('ARInfAltSum_raw ε1) (InfiniteAlternatingSum_raw sQ ε2).
+  ball (proj1_sig ε1 + proj1_sig ε2) ('ARInfAltSum_raw ε1) (InfiniteAlternatingSum_raw sQ ε2).
 Proof.
-  assert (QposEq (ε1 + ε2) (ε1 * (1#2) + (ε1 * (1#2) + ε2)))
-    by (unfold QposEq; simpl; ring).
-  rewrite H5. clear H5.
+  setoid_replace (proj1_sig ε1 + proj1_sig ε2)%Q
+    with (proj1_sig (ε1 * (1#2) + (ε1 * (1#2) + ε2))%Qpos)
+    by (simpl; ring).
   eapply ball_triangle.
    apply ball_weak_le with (2 ^ (Qdlog2 (proj1_sig ε1) - 1))%Qpos.
     change (2 ^ (Qdlog2 (proj1_sig ε1) - 1) ≤ (proj1_sig ε1) * (1 # 2)).
@@ -356,11 +358,12 @@ Qed.
 Lemma ARInfAltSum_prf: is_RegularFunction_noInf _ ARInfAltSum_raw.
 Proof.
   intros ε1 ε2. simpl.
-  apply ball_closed. intros δ.
-  assert (QposEq (ε1 + ε2 + δ)
-                 (ε1 + (1#4) * δ + ((1#4) * δ + (1#4) * δ + (ε2 + (1#4) * δ))))
-    by (unfold QposEq; simpl; ring).
-  rewrite H5. clear H5.
+  apply ball_closed. intros δ dpos.
+  setoid_replace (proj1_sig ε1 + proj1_sig ε2 + δ)%Q
+    with (proj1_sig (ε1 + (1#4) * exist _ _ dpos
+                     + ((1#4) * exist _ _ dpos + (1#4) * exist _ _ dpos
+                        + (ε2 + (1#4) * exist _ _ dpos)))%Qpos)
+    by (simpl; ring).
   eapply ball_triangle.
    now apply ARInfAltSum_raw_correct.
   eapply ball_triangle.

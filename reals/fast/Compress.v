@@ -49,7 +49,7 @@ Definition approximateQ (x:Q) (p:positive) :=
 let (n,d) := x in (Z.div (n*p) d#p).
 
 Lemma approximateQ_correct : forall x p,
-    ball (exist (Qlt 0) (1#p) eq_refl) x (approximateQ x p).
+    ball (1#p) x (approximateQ x p).
 Proof.
  intros [n d] p.
  split; simpl; unfold Qle; simpl.
@@ -110,14 +110,20 @@ match e with
  end
 end.
 
-Lemma compress_raw_prop : forall x e, ball e x (Cunit (compress_raw x e)).
+Lemma compress_raw_prop : forall x (e:Qpos),
+    ball (proj1_sig e) x (Cunit (compress_raw x e)).
 Proof.
  intros x. intros [[n d] dpos].
  destruct n as [|n|n]. inversion dpos. 2: inversion dpos.
  simpl.
- case_eq (Z.succ (xO d / n));try (intros; apply: ball_approx_r).
- intros p Hp.
- apply ball_weak_le with (exist (Qlt 0) (2#p) eq_refl).
+ assert (0 < Z.succ ((d~0)%positive / n))%Z as zpos.
+ { unfold Z.succ. 
+   apply (Z.lt_le_trans _ (0+1)). reflexivity.
+   apply Z.add_le_mono_r. apply Z_div_pos.
+   reflexivity. discriminate. }
+ destruct (Z.succ (xO d / n)) eqn:Hp.
+ - exfalso. discriminate.
+ - apply ball_weak_le with (2#p).
   unfold Qle.
   simpl.
   rewrite Zpos_mult_morphism.
@@ -149,6 +155,7 @@ Proof.
                (Cunit (approximateQ (approximate x (Qpos2QposInf (1 # p))) p))).
   rewrite -> ball_Cunit.
   apply approximateQ_correct.
+ - exfalso. discriminate.
 Qed.
 
 Lemma compress_raw_prf : forall x, is_RegularFunction (compress_raw x).

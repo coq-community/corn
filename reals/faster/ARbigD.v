@@ -190,7 +190,7 @@ Proof.
   split; try apply _.
   intros [n d] ε.
   unfold app_inverse, inverse_Q_bigD.
-  apply ball_weak_le with (Qpos_power 2 (Qdlog2 (proj1_sig ε))).
+  apply ball_weak_le with (proj1_sig (Qpos_power 2 (Qdlog2 (proj1_sig ε)))).
    now apply (Qpos_dlog2_spec ε).
    simpl.
    rewrite (Qmake_Qdiv n d).

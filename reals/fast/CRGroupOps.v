@@ -84,7 +84,7 @@ Qed.
 (** Lifting translate yields binary addition over CR. *)
 Lemma Qplus_uc_prf :  is_UniformlyContinuousFunction Qtranslate_uc Qpos2QposInf.
 Proof.
- intros e a0 a1 H b.
+ intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
  repeat rewrite -> (fun x => Qplus_comm x b).
  apply Qtranslate_uc_prf.
@@ -343,7 +343,7 @@ Proof.
  rewrite <- (doubleSpeed_Eq y).
  apply: regFunEq_e.
  intros e.
- apply ball_weak.
+ apply ball_weak. apply Qpos_nonneg.
  split;[apply H2|].
  apply: inv_cancel_leEq;simpl.
  stepr (approximate y ((1 # 2) * e)%Qpos - approximate x ((1 # 2) * e)%Qpos); [| simpl; ring].
@@ -381,7 +381,8 @@ Lemma QboundBelow_uc_prf (a:Q)
 Proof.
  intros e b0 b1 H.
  simpl in *.
- assert (X:forall a b0 b1, Qball e b0 b1 -> b0 <= a <= b1 -> Qball e a b1).
+ assert (X:forall a b0 b1, Qball (proj1_sig e) b0 b1
+                      -> b0 <= a <= b1 -> Qball (proj1_sig e) a b1).
   clear a b0 b1 H.
   intros a b0 b1 H [H1 H2].
   unfold Qball in *.
@@ -398,7 +399,7 @@ Proof.
    simpl; ring.
    apply Qlt_le_weak. destruct e. exact q.
  do 2 apply Qmax_case; intros H1 H2.
-    apply: ball_refl.
+    apply: ball_refl. apply Qpos_nonneg.
    eapply X.
     apply H.
    tauto.
@@ -418,7 +419,7 @@ Definition boundBelow (a:Q) : CR --> CR := Cmap QPrelengthSpace (QboundBelow_uc 
 (** CRmax is the lifting of [QboundBelow]. *)
 Lemma Qmax_uc_prf :  is_UniformlyContinuousFunction QboundBelow_uc Qpos2QposInf.
 Proof.
- intros e a0 a1 H b.
+ intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
  repeat rewrite -> (fun x => Qmax_comm x b).
  apply QboundBelow_uc_prf.
@@ -442,22 +443,22 @@ Proof.
  split.
  - apply Qmax_case. intros. apply Qmax_case. intros.
    unfold Qminus. rewrite Qplus_opp_r. apply (Qopp_le_compat 0).
-   apply Qpos_nonneg. intros.
+   apply (Qpos_nonneg (e1+e2)). intros.
    apply (Qle_trans _ (approximate ((1 # 2)%Q ↾ eq_refl * e1)%Qpos - approximate e2)).
    destruct regFun_prf as [H1 _].
    refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
    apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
    apply Qplus_le_l. exact H. intros. apply Qmax_case.
-   intros. apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
+   intros. apply (Qle_trans _ 0). apply (Qopp_le_compat 0), (Qpos_nonneg (e1+e2)).
    unfold Qminus. rewrite <- Qle_minus_iff. exact H. intros.
    destruct regFun_prf as [H1 _].
    refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
    apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
  - apply Qmax_case. apply Qmax_case. intros.
-   unfold Qminus. rewrite Qplus_opp_r. apply Qpos_nonneg.
+   unfold Qminus. rewrite Qplus_opp_r. apply (Qpos_nonneg (e1+e2)).
    intros. apply (Qle_trans _ 0).
    apply (Qplus_le_l _ _ (approximate e2)). ring_simplify. exact H.
-   apply Qpos_nonneg. intros.
+   apply (Qpos_nonneg (e1+e2)). intros.
    apply Qmax_case. intros. apply Qopp_le_compat in H0.
    apply (Qle_trans _ (approximate ((1 # 2) * e1)%Qpos - approximate e2)).
    apply Qplus_le_r, H0. destruct regFun_prf as [_ H1].
@@ -483,7 +484,7 @@ Proof.
  eapply Qle_trans;[|apply Qmax_ub_l].
  cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
- change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
+ change (ball (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  simpl.
  rewrite -> Qle_minus_iff.
@@ -505,7 +506,7 @@ Proof.
  eapply Qle_trans;[|apply Qmax_ub_r].
  cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos +
    - approximate x ((1 # 2) * e)%Qpos));[unfold AbsSmall;tauto|].
- change (ball e (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
+ change (ball (proj1_sig e) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos) (approximate x ((1 # 2) * e)%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  simpl.
  rewrite -> Qle_minus_iff.
@@ -537,7 +538,7 @@ Proof.
  apply Qplus_le_compat.
  - apply (Qle_trans _ (- ((1 # 2) * ` e))).
    destruct e; simpl; ring_simplify; apply Qle_refl.
-   cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * e))%Qpos)
+   cut (ball ((1#2)*proj1_sig e) (approximate z ((1#2)*((1 # 2) * e))%Qpos)
              (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)).
    intros [A B]. assumption.
  apply: ball_weak_le. 2:apply regFun_prf.
@@ -583,7 +584,7 @@ Definition boundAbove (a:Q) : CR --> CR := Cmap QPrelengthSpace (QboundAbove_uc 
 (** CRmin is the lifting of [QboundAbove]. *)
 Lemma Qmin_uc_prf :  is_UniformlyContinuousFunction QboundAbove_uc Qpos2QposInf.
 Proof.
- intros e a0 a1 H b.
+ intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
  repeat rewrite -> (fun x => Qmin_comm x b).
  apply QboundAbove_uc_prf.
@@ -624,7 +625,7 @@ Proof.
  eapply Qle_trans;[|apply Qmax_ub_l].
  cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
- change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
+ change (ball (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  simpl.
  rewrite -> Qle_minus_iff.
@@ -647,7 +648,7 @@ Proof.
  eapply Qle_trans;[|apply Qmax_ub_r].
  cut (AbsSmall (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos +
    - approximate x ((1 # 2) * ((1 # 2) * e))%Qpos));[unfold AbsSmall;tauto|].
- change (ball e (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
+ change (ball (proj1_sig e) (approximate x ((1 # 2) * e)%Qpos) (approximate x ((1 # 2) * ((1 # 2) * e))%Qpos)).
  eapply ball_weak_le;[|apply regFun_prf].
  simpl.
  rewrite -> Qle_minus_iff.
@@ -678,7 +679,7 @@ Proof.
  apply Qplus_le_compat.
  - apply (Qle_trans _ (- ((1 # 2) * ` e))).
    destruct e; simpl; ring_simplify; apply Qle_refl.
-   cut (ball ((1#2)*e)%Qpos (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
+   cut (ball ((1#2)*proj1_sig e) (approximate z ((1#2)*((1 # 2) * ((1 # 2) * e)))%Qpos)
              (approximate z ((1#2)*((1 # 2) * e))%Qpos)) ;[intros [A B]; assumption|].
  apply: ball_weak_le. 2:apply regFun_prf.
  rewrite -> Qle_minus_iff.
