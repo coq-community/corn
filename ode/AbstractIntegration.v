@@ -145,8 +145,8 @@ intros m H1; apply H. now apply lt_S.
 Qed.
 
 Lemma CRΣ_gball (f g: nat -> CR) (e : Q) (n : nat):
-   (forall m, (m < n)%nat -> gball e (f m) (g m)) ->
-   (gball (n * e) (cmΣ n f) (cmΣ n g)).
+   (forall m, (m < n)%nat -> ball e (f m) (g m)) ->
+   (ball (n * e) (cmΣ n f) (cmΣ n g)).
 Proof.
   induction n.
   - intros. apply ball_refl. rewrite Qmult_0_l. apply Qle_refl.
@@ -229,15 +229,15 @@ Section integral_approximation.
     (** Next, we generalize r to QnonNeg: *)
 
     Lemma bounded_with_nonneg_radius (from: Q) (width: Qpos) (mid: CR) (r: QnonNeg):
-      (forall (x: Q), (from <= x <= from+ proj1_sig width) -> gball (proj1_sig r) (f x) mid) ->
-      gball (proj1_sig width * proj1_sig r) (∫ f from (from_Qpos width)) (scale (proj1_sig width) mid).
+      (forall (x: Q), (from <= x <= from+ proj1_sig width) -> ball (proj1_sig r) (f x) mid) ->
+      ball (proj1_sig width * proj1_sig r) (∫ f from (from_Qpos width)) (scale (proj1_sig width) mid).
     Proof with auto.
      pattern r.
      apply QnonNeg.Qpos_ind.
      - intros ?? E.
        split. intros H ?. rewrite <- E. apply H. intros. rewrite E...
        intros H ?. rewrite E. apply H. intros. rewrite <- E...
-     - rewrite Qmult_0_r, gball_0.
+     - rewrite Qmult_0_r, ball_0.
       intros.
       apply ball_eq. intros e epos.
       setoid_replace e with (proj1_sig (width * (exist _ _ epos * Qpos_inv width))%Qpos)
@@ -246,9 +246,9 @@ Section integral_approximation.
       intros q ?.
       setoid_replace (f q) with mid...
       apply ball_refl. apply Qpos_nonneg.
-      apply -> (@gball_0 CR)...
+      apply -> (@ball_0 CR)...
      - intros.
-       apply (ball_gball (proj1_sig (width * q)%Qpos)), bounded_with_real_mid.
+       apply bounded_with_real_mid.
        intros. apply H, H0.
     Qed.
 
@@ -281,7 +281,7 @@ Section integral_approximation.
       apply CRle_trans with r...
       apply -> CRnonNeg_le_0...
      apply (bounded_with_nonneg_radius from width mid (exist _ _ E)).
-     intros. apply gball_sym...
+     intros. apply ball_sym...
     Qed.
 
     (** Finally, we generalize to nonnegative width: *)
@@ -382,10 +382,10 @@ Section integral_approximation.
     Lemma luc_gball (a w delta eps x y : Q) :
       0 < eps ->
       (delta <= lmu a w eps)%Qinf ->
-      @gball Q_as_MetricSpace w a x
-      -> @gball Q_as_MetricSpace w a y
-      -> @gball Q_as_MetricSpace delta x y
-      -> gball eps (f x) (f y).
+      @ball Q_as_MetricSpace w a x
+      -> @ball Q_as_MetricSpace w a y
+      -> @ball Q_as_MetricSpace delta x y
+      -> ball eps (f x) (f y).
     Proof.
      intros A A1 A2 A3 A4.
      destruct (@luc_prf
@@ -409,7 +409,7 @@ Section integral_approximation.
     Lemma Riemann_sums_approximate_integral (a: Q) (w: QnonNeg) (e: Qpos) (iw: Q) (n: nat):
      (S n * iw == proj1_sig w)%Q ->
      (iw <= lmu a (proj1_sig w) (proj1_sig e))%Qinf ->
-     gball (proj1_sig e * proj1_sig w)
+     ball (proj1_sig e * proj1_sig w)
            (cmΣ (S n) (fun i => 'iw * f (a + i * iw))%CR) (∫ f a w).
     Proof.
      intros A B.
@@ -429,7 +429,7 @@ Section integral_approximation.
      apply CRΣ_gball.
      intros m H.
      rewrite CRmult_scale.
-     apply gball_sym. apply CRball.rational.
+     apply ball_sym. apply CRball.rational.
      setoid_replace (' (iw * proj1_sig e)) with (scale (proj1_sig iw') (' ` e))
        by now rewrite <- scale_Qmult.
      apply integral_bounded; [apply CRnonNegQpos |].
@@ -509,7 +509,7 @@ Section integral_approximation.
 
     Lemma Riemann_sums_approximate_integral' (a : Q) (w : QnonNeg) (e : Qpos) (n : positive) :
       (step (proj1_sig w) n <= lmu a (proj1_sig w) (proj1_sig e))%Qinf ->
-      gball (proj1_sig e * proj1_sig w) (riemann_sum a (proj1_sig w) n) (∫ f a w).
+      ball (proj1_sig e * proj1_sig w) (riemann_sum a (proj1_sig w) n) (∫ f a w).
     Proof.
       intro A; unfold riemann_sum.
       destruct (Pos2Nat.is_succ n) as [m M]. rewrite M.
@@ -627,7 +627,7 @@ Proof with auto.
   apply integral_bounded_prim...
   intros.
   assert (st_eq (f x) (g x)).
-  { apply (@gball_0 CR). apply H. reflexivity. }
+  { apply (@ball_0 CR). apply H. reflexivity. }
   rewrite H3...
  replace (@integrate g) with (@integrate f) by reflexivity.
  apply integral_wd...
@@ -663,10 +663,10 @@ Proof. reflexivity. Qed.
 Lemma cmΣ_plus (n : nat) (f g : nat -> CR) : cmΣ n (f + g) = cmΣ n f + cmΣ n g.
 Proof.
 induction n as [| n IH].
-+ symmetry. apply gball_0. 
++ symmetry. apply ball_0. 
   apply (@cm_rht_unit CRasCMonoid (cmΣ 0 (f + g))).
-+ apply gball_0. rewrite !cmΣ_succ.
-  apply gball_0 in IH. rewrite IH. clear IH.
++ apply ball_0. rewrite !cmΣ_succ.
+  apply ball_0 in IH. rewrite IH. clear IH.
   change (f n + g n + (cmΣ n f + cmΣ n g) [=] f n + cmΣ n f + (g n + cmΣ n g))%CR.
   do 2 rewrite <- CRplus_assoc.
   apply CRplus_eq_r.
@@ -677,10 +677,10 @@ Qed.
 Lemma cmΣ_negate (n : nat) (f : nat -> CR) : cmΣ n (- f) = - cmΣ n f.
 Proof.
 induction n as [| n IH].
-+ apply gball_0. change ((0 : CR) [=] - 0)%CR.
++ apply ball_0. change ((0 : CR) [=] - 0)%CR.
   apply CRopp_0. 
-+ apply gball_0. rewrite !cmΣ_succ.
-  apply gball_0 in IH. rewrite IH. clear IH.
++ apply ball_0. rewrite !cmΣ_succ.
+  apply ball_0 in IH. rewrite IH. clear IH.
   change (- f n - cmΣ n f [=] - (f n + cmΣ n f))%CR.
   apply (CRplus_eq_r (f n + cmΣ n f)%CR).
   rewrite CRplus_opp.
@@ -692,10 +692,10 @@ Qed.
 Lemma cmΣ_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
 Proof.
 induction n as [| n IH].
-+ apply gball_0. rewrite cmΣ_empty.
++ apply ball_0. rewrite cmΣ_empty.
   change (0 [=] m * 0). symmetry; apply rings.mult_0_r.
-+ apply gball_0. rewrite cmΣ_succ.
-  apply gball_0 in IH. rewrite IH, S_Qplus, <- CRplus_Qplus.
++ apply ball_0. rewrite cmΣ_succ.
+  apply ball_0 in IH. rewrite IH, S_Qplus, <- CRplus_Qplus.
   change (m + m * '(n : Q) [=] m * ('(n : Q) + 1)).
   rewrite rings.plus_mult_distr_l.
   rewrite rings.mult_1_r.
@@ -707,7 +707,7 @@ Lemma riemann_sum_const (a : Q) (w : Q) (m : CR) (n : positive) :
 Proof.
 unfold riemann_sum. rewrite cmΣ_const, positive_nat_Z.
 change ('step w n * m * '(n : Q) = 'w * m).
-apply gball_0.
+apply ball_0.
 rewrite (mult_comm _ ('(inject_Z n : Q))), mult_assoc, CRmult_Qmult, step_mult; reflexivity.
 Qed.
 
@@ -715,7 +715,7 @@ Lemma riemann_sum_plus (f g : Q -> CR) (a w : Q) (n : positive) :
   riemann_sum (f + g) a w n = riemann_sum f a w n + riemann_sum g a w n.
 Proof.
   unfold riemann_sum. rewrite <- cmΣ_plus.
-  apply gball_0. apply cm_Sum_eq. intro k.
+  apply ball_0. apply cm_Sum_eq. intro k.
 change (
   cast Q CR (step w n) * (f (a + (k : Q) * step w n) + g (a + (k : Q) * step w n)) [=]
   cast Q CR (step w n) * f (a + (k : Q) * step w n) + cast Q CR (step w n) * g (a + (k : Q) * step w n)).
@@ -726,7 +726,7 @@ Lemma riemann_sum_negate (f : Q -> CR) (a w : Q) (n : positive) :
   riemann_sum (- f) a w n = - riemann_sum f a w n.
 Proof.
   unfold riemann_sum. rewrite <- cmΣ_negate.
-  apply gball_0. apply cm_Sum_eq. intro k.
+  apply ball_0. apply cm_Sum_eq. intro k.
 change ('step w n * (- f (a + (k : Q) * step w n)) [=] -('step w n * f (a + (k : Q) * step w n))).
   rewrite rings.negate_mult_distr_r. reflexivity.
 Qed.
@@ -755,12 +755,12 @@ rewrite <- Zle_Qle, <- positive_nat_Z. apply inj_le. change (k ≤ Pos.to_nat n)
 Qed.
 
 Lemma riemann_sum_bounds (a w : Q) (m : CR) (e : Q) (n : positive) :
-  0 ≤ w -> (forall (x : Q), (a ≤ x ≤ a + w) -> gball e (f x) m) ->
-  gball (w * e) (riemann_sum f a w n) ('w * m).
+  0 ≤ w -> (forall (x : Q), (a ≤ x ≤ a + w) -> ball e (f x) m) ->
+  ball (w * e) (riemann_sum f a w n) ('w * m).
 Proof.
   intros w_nn A.
   pose proof (riemann_sum_const a w m n).
-  apply gball_0 in H. rewrite <- H. clear H.
+  apply ball_0 in H. rewrite <- H. clear H.
   unfold riemann_sum.
 rewrite <- (step_mult w n), <- (Qmult_assoc (inject_Z n) _ e), <- (positive_nat_Z n).
 apply CRΣ_gball. intros k A1. apply CRball.gball_CRmult_Q_nonneg; [now apply step_nonneg |].
@@ -973,7 +973,7 @@ Qed.
 Lemma CRabs_negate (x : CR) : abs (-x) = abs x.
 Proof.
 change (abs (-x)) with (CRabs (-x)).
-apply gball_0. rewrite CRabs_opp; reflexivity.
+apply ball_0. rewrite CRabs_opp; reflexivity.
 Qed.
 
 Lemma mspc_ball_Qle (r a x : Q)
@@ -1018,7 +1018,7 @@ Proof.
   Print QnonNeg.eq.
   assert (QnonNeg.eq (u+v)%Qnn w) as H0. { apply A2. }
   assert (Qeq (a+`u) b) as H1. { apply A1. }
-  apply gball_0. rewrite <- A1. rewrite <- H0.
+  apply ball_0. rewrite <- A1. rewrite <- H0.
   apply integral_additive.
 Qed.
 
@@ -1030,69 +1030,69 @@ destruct (decide (b ≤ c)) as [BC | BC];
 destruct (decide (a ≤ c)) as [AC | AC].
 + apply integral_additive'; simpl; ring.
 + assert (A : a ≤ c) by (now transitivity b); elim (AC A).
-+ apply gball_0. apply minus_eq_plus. symmetry.
++ apply ball_0. apply minus_eq_plus. symmetry.
   pose proof (integral_additive' a c ((c - a) ↾ int_obligation_1 a c AC)
                                  ((b - c) ↾ int_obligation_2 b c BC)
                                  ((b - a) ↾ int_obligation_1 a b AB) ).
-  apply gball_0 in H0. apply H0. clear H0.
+  apply ball_0 in H0. apply H0. clear H0.
   simpl. ring. simpl. ring.
-+ apply gball_0. apply minus_eq_plus.
++ apply ball_0. apply minus_eq_plus.
   rewrite (rings.plus_comm (-integrate _ _ _)), <- plus_eq_minus, (rings.plus_comm (integrate _ _ _)).
   pose proof (integral_additive' c a ((a - c) ↾ int_obligation_2 a c AC)
                                  ((b - a) ↾ int_obligation_1 a b AB)
                                  ((b - c) ↾ int_obligation_2 b c BC) ).
-  apply gball_0 in H0. apply H0. clear H0.
+  apply ball_0 in H0. apply H0. clear H0.
   simpl. ring. simpl. ring. 
-+ apply gball_0.
++ apply ball_0.
   rewrite (rings.plus_comm (-integrate _ _ _)).
   apply minus_eq_plus. rewrite (rings.plus_comm (integrate _ _ _)).
   symmetry.
   pose proof (integral_additive' b a ((a - b) ↾ int_obligation_2 a b AB)
                                  ((c - a) ↾ int_obligation_1 a c AC)
                                  ((c - b) ↾ int_obligation_1 b c BC) ).
-  apply gball_0 in H0. apply H0. clear H0.
+  apply ball_0 in H0. apply H0. clear H0.
   simpl. ring. simpl. ring. 
-+ apply gball_0. rewrite (rings.plus_comm (-integrate _ _ _)).
++ apply ball_0. rewrite (rings.plus_comm (-integrate _ _ _)).
   apply minus_eq_plus. rewrite (rings.plus_comm (-integrate _ _ _)), <- plus_eq_minus.
   pose proof (integral_additive' b c ((c - b) ↾ int_obligation_1 b c BC)
                                  ((a - c) ↾ int_obligation_2 a c AC)
                                  ((a - b) ↾ int_obligation_2 a b AB) ).
-  apply gball_0 in H0. apply H0. clear H0.
+  apply ball_0 in H0. apply H0. clear H0.
   simpl. ring. simpl. ring. 
 + assert (b ≤ a) by (now apply orders.le_flip); assert (B : b ≤ c) by (now transitivity a); elim (BC B).
-+ apply gball_0.
++ apply ball_0.
   rewrite <- rings.negate_plus_distr. apply negate_inj.
   rewrite (rings.plus_comm (integrate _ _ _)).
   pose proof (integral_additive' c b ((b - c) ↾ int_obligation_2 b c BC)
                                  ((a - b) ↾ int_obligation_2 a b AB)
                                  ((a - c) ↾ int_obligation_2 a c AC) ).
-  apply gball_0 in H0. apply H0. clear H0.
+  apply ball_0 in H0. apply H0. clear H0.
   simpl. ring. simpl. ring. 
 Qed.
 
 Lemma int_diff (a b c : Q) : int a b - int a c = int c b.
 Proof.
-  apply gball_0. apply minus_eq_plus. symmetry.
+  apply ball_0. apply minus_eq_plus. symmetry.
   rewrite (rings.plus_comm (int c b) (int a c)).
-  pose proof (int_add a c b). apply gball_0 in H0.
+  pose proof (int_add a c b). apply ball_0 in H0.
   apply H0.
 Qed.
 
 Lemma int_zero_width (a : Q) : int a a = 0.
 Proof.
-  apply gball_0.
+  apply ball_0.
   apply (plus_right_cancel (int a a)).
   rewrite rings.plus_0_l.
-  pose proof (int_add a a a). apply gball_0 in H0. exact H0.
+  pose proof (int_add a a a). apply ball_0 in H0. exact H0.
 Qed.
 
 Lemma int_opposite (a b : Q) : int a b = - int b a.
 Proof.
-  apply gball_0.
+  apply ball_0.
   apply (CRplus_eq_r (int b a)). rewrite CRplus_opp.
-  pose proof (int_add b a b). apply gball_0 in H0. rewrite H0.
+  pose proof (int_add b a b). apply ball_0 in H0. rewrite H0.
   pose proof (int_zero_width b).
-  apply gball_0 in H1. exact H1.
+  apply ball_0 in H1. exact H1.
 Qed.
 
 Lemma int_abs_bound (a b M : Q) :
@@ -1220,9 +1220,9 @@ Lemma int_plus (f g : Q -> CR)
 Proof.
   unfold int; destruct (decide (a ≤ b)).
   rewrite integrate_plus. reflexivity.
-  apply gball_0.
+  apply ball_0.
   pose proof (integrate_plus f g b ((a - b) ↾ int_obligation_2 a b n)).
-  apply gball_0 in H1. rewrite H1. clear H1.
+  apply ball_0 in H1. rewrite H1. clear H1.
   apply rings.negate_plus_distr.
 Qed.
 
@@ -1231,9 +1231,9 @@ Lemma int_negate (f : Q -> CR) `{!IsUniformlyContinuous f f_mu} (a b : Q) :
 Proof.
   unfold int; destruct (decide (a ≤ b)).
   rewrite integrate_negate. reflexivity.
-  apply gball_0.
+  apply ball_0.
   pose proof (integrate_negate f b ((a - b) ↾ int_obligation_2 a b n)).
-  apply gball_0 in H. rewrite H. reflexivity.
+  apply ball_0 in H. rewrite H. reflexivity.
 Qed.
 
 Lemma int_minus (f g : Q -> CR)
@@ -1258,7 +1258,7 @@ Lemma int_minus (f g : Q -> CR)
 Proof.
   rewrite int_plus.
   pose proof (int_negate g a b).
-  apply gball_0. apply gball_0 in H1. rewrite H1. reflexivity.
+  apply ball_0. apply ball_0 in H1. rewrite H1. reflexivity.
 Qed.
 
 Lemma abs_int_minus (f g : Q -> CR)
@@ -1281,7 +1281,7 @@ Lemma abs_int_minus (f g : Q -> CR)
        a b)
   [=] abs (int f a b - int g a b).
 Proof.
-  rewrite <- gball_0. apply CRabs_proper.
+  rewrite <- ball_0. apply CRabs_proper.
   apply int_minus.
 Qed.
 
@@ -1330,7 +1330,7 @@ Lemma int_lip (e M : Q) :
 Proof.
 intros A1 A2. apply CRball.gball_CRabs. subst F; cbv beta.
 change (int f x0 x1 - int f x0 x2)%CR with (int f x0 x1 - int f x0 x2).
-pose proof (int_diff f x0 x1 x2). apply gball_0 in H1.
+pose proof (int_diff f x0 x1 x2). apply ball_0 in H1.
 rewrite H1.
 change (abs (int f x2 x1) ≤ '(M * e)).
 transitivity ('(M * abs (x1 - x2))).
@@ -1353,18 +1353,18 @@ Lemma lipschitz_bounded (a r M x : Q) :
 Proof.
   intros A1 A2.
   assert (f x = f x - 0) as H1.
-  { apply gball_0. rewrite rings.minus_0_r. reflexivity. }
+  { apply ball_0. rewrite rings.minus_0_r. reflexivity. }
   pose proof (CRabs_proper _ _ H1).
-  apply gball_0 in H2. rewrite H2. clear H2 H1.
+  apply ball_0 in H2. rewrite H2. clear H2 H1.
   apply mspc_ball_CRabs, mspc_symm.
   apply (mspc_triangle _ _ _ (f a)).
   - apply mspc_ball_CRabs.
     assert (0 - f a = - f a) as H1.
-    { apply gball_0. rewrite rings.plus_0_l. reflexivity. }
+    { apply ball_0. rewrite rings.plus_0_l. reflexivity. }
     pose proof (CRabs_proper _ _ H1).
-    apply gball_0 in H2. rewrite H2. clear H2 H1.
+    apply ball_0 in H2. rewrite H2. clear H2 H1.
     pose proof (CRabs_negate (f a)).
-    apply gball_0 in H1. now rewrite H1.
+    apply ball_0 in H1. now rewrite H1.
   - apply (@llip _ _ _ _
               (msp_mspc_ball_ext Q_as_MetricSpace) f _ H).
   2: exact A2. 2: exact A2.

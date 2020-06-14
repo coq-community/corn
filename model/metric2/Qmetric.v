@@ -455,7 +455,7 @@ Proof.
   reflexivity. contradiction.
 Qed.
 
-Lemma gball_Qabs (e a b : Q) : gball e a b <-> (Qabs (a - b) <= e).
+Lemma gball_Qabs (e a b : Q) : ball e a b <-> (Qabs (a - b) <= e).
 Proof.
   simpl. unfold Qball.
   rewrite <- AbsSmall_Qabs. reflexivity.

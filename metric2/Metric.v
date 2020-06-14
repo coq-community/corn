@@ -149,6 +149,16 @@ Proof.
  unfold Qminus. rewrite <- Qle_minus_iff. exact Hed.
 Qed.
 
+Lemma ball_0 (x y: X): ball 0 x y <-> st_eq x y.
+Proof.
+  split.
+  - intro H. apply ball_eq. intros.
+    apply (@ball_weak_le 0 e).
+    apply Qlt_le_weak, H0. exact H.
+  - intros. rewrite H.
+    apply ball_refl. apply Qle_refl.
+Qed.
+
 End Metric_Space.
 (* begin hide *)
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
@@ -156,109 +166,40 @@ Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
 
 (** We can easily generalize ball to take the ratio from Q or QnnInf: *)
 
-(* TODO remove *)
 Section gball.
 
   Context {m: MetricSpace}.
 
-  Definition gball (q: Q) (x y: m): Prop :=
-    ball q x y.
-
   Definition gball_ex (e: QnnInf): relation m :=
     match e with
-    | QnnInf.Finite e' => gball (proj1_sig e')
+    | QnnInf.Finite e' => ball (proj1_sig e')
     | QnnInf.Infinite => fun _ _ => True
     end.
-
-  Lemma ball_gball (q: Q) (x y: m): gball q x y <-> ball q x y.
-  Proof.
-    reflexivity.
-  Qed.
-
-  Global Instance gball_Proper: Proper (Qeq ==> @st_eq m ==> @st_eq m ==> iff) gball.
-  Proof with auto.
-   intros x y E a b F v w G.
-   unfold gball.
-   rewrite E. rewrite F. rewrite G. reflexivity.
-  Qed.
 
   Global Instance gball_ex_Proper: Proper (QnnInf.eq ==> @st_eq m ==> @st_eq m ==> iff) gball_ex.
   Proof.
    repeat intro.
    destruct x, y. intuition. intuition. intuition.
-   apply gball_Proper; assumption.
-  Qed.
-
-  Global Instance gball_refl (e: Q): 0 <= e -> Reflexive (gball e).
-  Proof with auto.
-   repeat intro.
-   unfold gball. apply ball_refl, H.
+   apply ball_compat; assumption.
   Qed.
 
   Global Instance gball_ex_refl (e: QnnInf): Reflexive (gball_ex e).
   Proof.
    destruct e. intuition.
-   apply gball_refl, proj2_sig.
-  Qed.
-
-  Global Instance gball_sym (e: Q): Symmetric (gball e).
-  Proof.
-    unfold gball. intros x y.
-    apply ball_sym.
+   intro x. apply ball_refl, proj2_sig.
   Qed.
 
   Lemma gball_ex_sym (e: QnnInf): Symmetric (gball_ex e).
-  Proof. destruct e. auto. simpl. apply gball_sym. Qed.
-
-  Lemma gball_triangle (e1 e2: Q) (a b c: m):
-    gball e1 a b -> gball e2 b c -> gball (e1 + e2) a c.
-  Proof with auto with *.
-   unfold gball.
-   intros. apply (ball_triangle _ _ _ _ b); assumption.
-  Qed. 
+  Proof.
+    destruct e. auto. simpl.
+    intros x y. apply ball_sym.
+  Qed.
 
   Lemma gball_ex_triangle (e1 e2: QnnInf) (a b c: m):
     gball_ex e1 a b -> gball_ex e2 b c -> gball_ex (e1 + e2)%QnnInf a c.
-  Proof. destruct e1, e2; auto. simpl. apply gball_triangle. Qed.
-
-  Lemma gball_0 (x y: m): gball 0 x y <-> st_eq x y.
   Proof.
-    split.
-    - intro H. apply ball_eq. intros. unfold gball in H.
-      apply (@ball_weak_le m 0 e).
-      apply Qlt_le_weak, H0. exact H.
-    - intros. unfold gball. rewrite H.
-      apply ball_refl. apply Qle_refl.
-  Qed.
-
-  Lemma gball_weak_le (q q': Q): q <= q' -> forall x y, gball q x y -> gball q' x y.
-  Proof.
-    intros. exact (ball_weak_le m x y H H0).
-  Qed.
-
-  Lemma gball_pos {e : Q} (e_pos : 0 < e) (x y : m)
-    : ball e x y <-> gball e x y.
-  Proof.
-  unfold gball. reflexivity.
-  Qed.
-
-  Lemma gball_neg (e : Q) (x y : m) : e < 0 -> ~ gball e x y.
-  Proof.
-    intros e_neg abs. unfold gball in abs. 
-    apply (Qlt_not_le _ _ e_neg).
-    exact (msp_nonneg (msp m) _ _ _ abs).
-  Qed.
-
-  Lemma gball_closed (e : Q) (x y : m) :
-     (forall d : Q, 0 < d -> gball (e + d) x y) -> gball e x y.
-  Proof.
-  intro C. (*change (gball e x y).*) unfold gball.
-  apply ball_closed. exact C.
-  Qed.
-
-  Lemma gball_closed_eq (x y : m) : (forall d : Q, 0 < d -> gball d x y) -> st_eq x y.
-  Proof.
-    intro C. apply ball_eq. exact C.
+    destruct e1, e2; auto. simpl.
+    intros. apply ball_triangle with (b:=b); assumption.
   Qed.
 
 End gball.

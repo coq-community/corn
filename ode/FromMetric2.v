@@ -20,7 +20,7 @@ Variable X : MetricSpace.
 
 Global Instance msp_mspc_ball : MetricSpaceBall X := λ (e : Qinf) (x y : X),
 match e with
-| Qinf.finite e' => gball e' x y
+| Qinf.finite e' => ball e' x y
 | Qinf.infinite => True
 end.
 
@@ -38,18 +38,17 @@ Proof.
 constructor.
 + apply _.
 + intros; apply I.
-+ intros; now apply gball_neg.
-+ apply gball_refl.
-+ intros [e |]; [apply gball_sym | easy].
-+ apply gball_triangle.
-+ apply gball_closed.
++ intros. intro abs. apply (Qlt_not_le _ _ H).
+  apply (msp_nonneg (msp X) e x y abs).
++ intros. intro x. apply ball_refl, H.
++ intros [e |]. intros x y H. apply ball_sym. exact H. easy.
++ apply ball_triangle.
++ apply ball_closed.
 Qed.
 
 Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction X.
 refine (@mkRegularFunction _ (f 0) (λ e : Qpos, let (e', _) := e in f e') _).
-intros [e1 e1_pos] [e2 e2_pos]. apply gball_pos, (rf_proof f).
-apply (Qpos_ispos ((e1 ↾ e1_pos) + (e2 ↾ e2_pos))%Qpos).
-assumption. assumption.
+intros [e1 e1_pos] [e2 e2_pos]. apply (rf_proof f); assumption.
 Defined.
 
 End FromMetricSpace.
@@ -70,34 +69,31 @@ Proof.
 constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
 intros f e1 e2 e1_pos e2_pos.
-eapply gball_pos, (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
-apply (Qpos_ispos ((e1 ↾ e1_pos) + (e2 ↾ e2_pos))%Qpos).
+eapply (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
 Qed.
 
 Lemma gball_complete (r : Q) (x y : Complete X) :
-  gball r x y <->
-  forall e1 e2 : Qpos, gball (proj1_sig e1 + r + proj1_sig e2)%mc (approximate x e1) (approximate y e2).
+  ball r x y <->
+  forall e1 e2 : Qpos, ball (proj1_sig e1 + r + proj1_sig e2)%mc (approximate x e1) (approximate y e2).
 Proof.
 destruct (Qsec.Qdec_sign r) as [[r_neg | r_pos] | r_zero].
-+ split; intro H; [elim (gball_neg _ _ r_neg H) |].
-  assert (H1 : 0 < -(r / 3)) by (apply Q.Qopp_Qlt_0_l, Q.Qmult_neg_pos; auto with qarith).
++ split; intro H; [exfalso | exact H].
+  apply (Qlt_not_le _ _ r_neg).
+  assert (H1 : 0 < -(r / 3))
+    by (apply Q.Qopp_Qlt_0_l, Q.Qmult_neg_pos; auto with qarith).
   specialize (H (exist _ _ H1) (exist _ _ H1)); simpl in H.
   mc_setoid_replace (- (r / 3) + r + - (r / 3)) with (r / 3) in H by (field; discriminate).
-  exfalso; eapply gball_neg; [| apply H]; now eapply Q.Qopp_Qlt_0_l.
-+ rewrite <- (gball_pos r_pos). simpl; unfold regFunBall. split; intros H e1 e2.
-  - specialize (H e1 e2). apply gball_pos in H. apply H.
-    apply (Qpos_ispos (e1 + exist _ _ r_pos + e2)%Qpos).
-  - apply gball_pos, H.
-    apply (Qpos_ispos (e1 + exist _ _ r_pos + e2)%Qpos).
-+ rewrite r_zero. unfold gball at 1; simpl; unfold regFunEq. split; intros H e1 e2; specialize (H e1 e2).
-  - apply gball_pos in H. rewrite r_zero, Qplus_0_r.
+  apply (msp_nonneg (msp X)) in H.
+  apply (Qmult_le_r _ _ (1#3)). reflexivity.
+  rewrite Qmult_0_l. exact H.
++ simpl; unfold regFunBall. split; intros H e1 e2.
+  - specialize (H e1 e2). apply H.
+  - apply H.
++ rewrite r_zero. simpl; unfold regFunEq. split; intros H e1 e2; specialize (H e1 e2).
+  - rewrite r_zero, Qplus_0_r.
     rewrite Qplus_0_r in H. exact H. 
-    rewrite Qplus_0_r.
-    apply (Qpos_ispos (e1 + e2)%Qpos).
-  - apply gball_pos.
-    rewrite Qplus_0_r.
-    apply (Qpos_ispos (e1 + e2)%Qpos).
-    rewrite r_zero, Qplus_0_r in H. rewrite Qplus_0_r. exact H.
+  - rewrite Qplus_0_r.
+    rewrite r_zero, Qplus_0_r in H. exact H.
 Qed.
 
 End FromCompleteMetricSpace.
@@ -121,7 +117,7 @@ unfold lim, limit_complete, Cjoin_fun, Cjoin_raw; simpl.
 assert (H : mspc_ball r a ((@proj1_sig _ _ ∘ f) ((1 # 2) * proj1_sig e2)%Q)) by
   apply (proj2_sig (f ((1 # 2) * proj1_sig e2))).
 unfold mspc_ball, msp_mspc_ball in H.
-apply gball_weak_le with (q := proj1_sig e1 + r + (proj1_sig ((1 # 2) * e2)%Qpos)).
+apply ball_weak_le with (proj1_sig e1 + r + (proj1_sig ((1 # 2) * e2)%Qpos)).
 + apply Qplus_le_r. apply Q.Qle_half. apply Qpos_nonneg.
 + apply gball_complete, H.
 Qed.
@@ -194,7 +190,7 @@ destruct (orders.le_equiv_lt _ _ A1) as [e_zero | e_pos].
   rewrite <- e_zero. unfold ball in A. simpl in A.
   rewrite <- e_zero in A.
   apply Qball_plus_r. apply A.
-- apply (gball_pos e_pos _ _) in A. now apply (gball_pos e_pos _ _), Qball_plus_r.
+- now apply Qball_plus_r.
 Qed.
 
 (* This is a copy of [CRgball_plus] formulated in terms of [mspc_ball]
