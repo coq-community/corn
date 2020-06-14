@@ -25,7 +25,6 @@ Require Import CoRN.metric2.Classification.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.metric2.Complete.
-Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
