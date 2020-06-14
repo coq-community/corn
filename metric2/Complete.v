@@ -1147,7 +1147,8 @@ Proof.
  destruct H0 as [c Hc]. 
  set (c':=((1#5)*c)%Qpos). clear H. 
  assert (proj1_sig c'+e+ proj1_sig c' < e+(3#1)*proj1_sig c') as H.
- { rewrite -> Qlt_minus_iff. simpl. ring_simplify. auto with *. }
+ { rewrite -> Qlt_minus_iff. simpl. ring_simplify.
+   apply (Qpos_ispos ((25#125)*c)). }
  destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
  - left. 
   rewrite -> Hc. rewrite <- ball_Cunit in H0.
