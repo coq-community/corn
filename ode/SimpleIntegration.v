@@ -15,6 +15,7 @@ Require Import
   CoRN.model.totalorder.QposMinMax CoRN.util.Qsums
   CoRN.model.metric2.Qmetric CoRN.model.setoids.Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
   CoRN.reals.fast.CRArith (*AbstractIntegration*)
+  QnonNeg
   CoRN.util.Qgcd
   Coq.Program.Program
   CoRN.reals.fast.uneven_CRplus
@@ -168,6 +169,13 @@ Definition plus_half_times (x y: Q): Q := x * y + (1#2)*y.
 Lemma ball_ex_symm (X : MetricSpace) (e : QposInf) (x y : X) :
   ball_ex e x y -> ball_ex e y x.
 Proof. destruct e as [e |]; [apply ball_sym | trivial]. Qed.
+
+Lemma Pos2Nat_nonneg : forall p:positive,
+    Pos.to_nat p <> O.
+Proof.
+  intros p abs. pose proof (Pos2Nat.is_pos p).
+  rewrite abs in H. inversion H.
+Qed.
 
 Section definition.
 
@@ -344,8 +352,12 @@ Section definition.
      2: simpl; rewrite Qmult_1_l; apply Qle_refl.
     apply Qmult_le_compat_r; [| auto].
     apply Qdiv_le_1. split. Qauto_nonneg. rewrite <- (positive_nat_Z n).
-    apply Qlt_le_weak, nat_lt_Qlt, Nat.div_lt_upper_bound; [auto |].
-    rewrite mult_comm, <- Pos2Nat.inj_mul; apply ile. apply Qpos_nonneg. }
+    apply Qlt_le_weak. apply Q.nat_lt_Qlt.
+    apply Nat.div_lt_upper_bound.
+    apply Pos2Nat_nonneg.
+    rewrite <- (Pos2Nat.inj_mul t n).
+    rewrite (Pos.mul_comm t n).
+    apply ile. apply Qpos_nonneg. }
    apply ball_mspc_ball.
    eapply luc with (a := fr) (r := proj1_sig wb); [apply UC | | | |]. (* Why is [apply UC] not done automatically? *)
    apply Qpos_ispos.

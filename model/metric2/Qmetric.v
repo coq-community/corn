@@ -430,7 +430,7 @@ Proof with auto with *.
 Qed.
 
 (** A boolean version of Qball. *)
-Definition Qball_ex_bool e a b : bool := 
+Definition Qball_ex_bool (e:QposInf) (a b:Q) : bool := 
  match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
 
 Instance: Proper (QposInfEq ==> @st_eq _ ==> @st_eq _ ==> eq) Qball_ex_bool.

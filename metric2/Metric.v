@@ -1,5 +1,6 @@
 (*
 Copyright © 2006-2008 Russell O’Connor
+Copyright © 2020 Vincent Semeria
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -19,16 +20,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Export Coq.QArith.QArith.
 Require Export CoRN.algebra.RSetoid.
-Require Import Coq.Relations.Relation_Definitions.
-Require Export CoRN.model.structures.QposInf.
-Require Import CoRN.model.totalorder.QMinMax.
-Require Import CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.stdlib_omissions.List.
-Require Import CoRN.stdlib_omissions.Q.
 
-Require CoRN.model.structures.QnnInf.
-Import QnnInf.notations.
 
 Local Open Scope Q_scope.
 
@@ -164,42 +158,3 @@ End Metric_Space.
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
 (* end hide *)
 
-(** We can easily generalize ball to take the ratio from Q or QnnInf: *)
-
-Section gball.
-
-  Context {m: MetricSpace}.
-
-  Definition gball_ex (e: QnnInf): relation m :=
-    match e with
-    | QnnInf.Finite e' => ball (proj1_sig e')
-    | QnnInf.Infinite => fun _ _ => True
-    end.
-
-  Global Instance gball_ex_Proper: Proper (QnnInf.eq ==> @st_eq m ==> @st_eq m ==> iff) gball_ex.
-  Proof.
-   repeat intro.
-   destruct x, y. intuition. intuition. intuition.
-   apply ball_compat; assumption.
-  Qed.
-
-  Global Instance gball_ex_refl (e: QnnInf): Reflexive (gball_ex e).
-  Proof.
-   destruct e. intuition.
-   intro x. apply ball_refl, proj2_sig.
-  Qed.
-
-  Lemma gball_ex_sym (e: QnnInf): Symmetric (gball_ex e).
-  Proof.
-    destruct e. auto. simpl.
-    intros x y. apply ball_sym.
-  Qed.
-
-  Lemma gball_ex_triangle (e1 e2: QnnInf) (a b c: m):
-    gball_ex e1 a b -> gball_ex e2 b c -> gball_ex (e1 + e2)%QnnInf a c.
-  Proof.
-    destruct e1, e2; auto. simpl.
-    intros. apply ball_triangle with (b:=b); assumption.
-  Qed.
-
-End gball.

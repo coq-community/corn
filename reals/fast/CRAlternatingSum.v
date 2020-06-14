@@ -122,7 +122,7 @@ Proof.
 Qed.
 
 (** If a sequence has a limit of [l], then there is a point that gets arbitrarily close to [l]. *)
-Lemma Limit_near (s : Stream Q) (l:Q) {zl : @Limit Q_as_MetricSpace s l} ε
+Lemma Limit_near (s : Stream Q) (l:Q) {zl : @Limit Q_as_MetricSpace s l} (ε:QposInf)
   : LazyExists (λ s, Qball_ex_bool ε (hd s) l) s.
 Proof.
  assert (zl':=zl ε).
@@ -130,7 +130,7 @@ Proof.
   left.
   destruct nb as [nb _].
   unfold Qball_ex_bool.
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (hd s) l) as [|n].
+  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (@hd Q s) l) as [|n].
    constructor.
   apply n; clear n.
   apply nb.

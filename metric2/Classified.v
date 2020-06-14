@@ -7,7 +7,8 @@ Require Import CoRN.algebra.RSetoid.
 Require Import
  Arith List
  CoRN.model.totalorder.QposMinMax
- CSetoids Qmetric Qring Qinf ProductMetric QposInf Qposclasses (* defines Equiv on Qpos *)
+ CSetoids Qmetric Qring Qinf QnnInf QnonNeg
+ ProductMetric QposInf Qposclasses (* defines Equiv on Qpos *)
  UniformContinuity MathClasses.implementations.stdlib_rationals
  stdlib_omissions.Pair stdlib_omissions.Q PointFree
  MathClasses.interfaces.abstract_algebra

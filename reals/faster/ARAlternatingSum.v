@@ -114,7 +114,7 @@ Proof with auto.
   constructor.
    intros E. 
    unfold Qball_ex_bool.
-   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (hd sQ) 0).
+   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec (Qpos2QposInf ε) (@hd Q sQ) (0#1)).
    constructor.
    apply Is_true_eq_true in E. apply AQball_bool_true in E. 
    simpl in *.
