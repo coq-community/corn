@@ -22,6 +22,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.setoid_ring.Ring_theory.
 Require Import Coq.Setoids.Setoid.
@@ -32,7 +33,6 @@ Require Export CoRN.model.reals.CRreal.
 Require Import CoRN.metric2.Complete.
 Require Export CoRN.reals.fast.CRFieldOps.
 Require Import CoRN.model.rings.Qring.
-Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.logic.Stability.
@@ -143,25 +143,6 @@ Proof.
  assumption.
 Qed.
 
-Lemma inject_Q_product (l: list Q): (' cr_Product l) [=] cr_Product (map inject_Q_CR l).
-Proof.
- induction l.
-  reflexivity.
- change (' (a * cr_Product l)%Q[=]cr_Product (map inject_Q_CR (a :: l))).
- rewrite <- CRmult_Qmult.
- rewrite IHl.
- reflexivity.
-Qed.
-
-Lemma inject_Qred_ap (x y: Q): Qred x <> Qred y -> ' x [#] ' y.
-Proof with auto.
- intro.
- apply Qap_CRap.
- intro.
- apply H.
- apply Qred_complete...
-Qed.
-
 (* begin hide *)
 Hint Rewrite <- CRinv_Qinv : toCRring.
 (* end hide *)
@@ -169,55 +150,101 @@ Hint Rewrite <- CRinv_Qinv : toCRring.
 ** Ring
 CR forms a ring for the ring tactic.
 *)
+
+Lemma CRplus_0_l (x: CR): (0 + x == x)%CR.
+Proof.
+  intros e1 e2. destruct x; simpl. 
+  unfold Cap_raw; simpl.
+  rewrite Qplus_0_l.
+  assert ((1#2)*`e1 + `e2 <= `e1 + `e2)%Q.
+  { apply Qplus_le_l. rewrite <- (Qmult_1_l (`e1)) at 2.
+    apply Qmult_le_r. apply Qpos_ispos. discriminate. }
+  apply (ball_weak_le Q_as_MetricSpace _ _ H),
+  (regFun_prf ((1#2)*e1)%Qpos e2).
+Qed. 
+
+Lemma CRplus_comm (x y: CR): x + y == y + x.
+Proof.
+  intros e1 e2. destruct x,y; simpl; unfold Cap_raw; simpl.
+  apply AbsSmall_Qabs. 
+  setoid_replace (approximate ((1 # 2)%Q ↾ eq_refl * e1)%Qpos +
+      approximate0 ((1 # 2) * e1)%Qpos -
+      (approximate0 ((1 # 2) * e2)%Qpos +
+       approximate ((1 # 2) * e2)%Qpos))%Q
+    with (approximate ((1 # 2) * e1)%Qpos -
+      approximate ((1 # 2) * e2)%Qpos +
+      (approximate0 ((1 # 2) * e1)%Qpos -
+       approximate0 ((1 # 2) * e2)%Qpos))%Q
+    by ring.
+  apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+  setoid_replace (` e1 + ` e2)%Q
+    with ((1#2)* ` e1 + (1#2)* `e2 + ((1#2)*`e1 + (1#2)* ` e2))%Q by ring.
+  apply Qplus_le_compat.
+  specialize (regFun_prf ((1#2)*e1)%Qpos ((1#2)*e2)%Qpos).
+  apply AbsSmall_Qabs in regFun_prf. exact regFun_prf.
+  specialize (regFun_prf0 ((1#2)*e1)%Qpos ((1#2)*e2)%Qpos).
+  apply AbsSmall_Qabs in regFun_prf0. exact regFun_prf0.
+Qed.
+
+Lemma CRplus_assoc (x y z: CR): x + (y + z) == (x + y) + z.
+Proof.
+  intros. 
+  intros e1 e2. destruct x,y,z; simpl; unfold Cap_raw; simpl.
+  unfold Cap_raw; simpl.
+  apply AbsSmall_Qabs. 
+  setoid_replace (approximate ((1 # 2) * e1)%Qpos +
+      (approximate0 ((1 # 2) * ((1 # 2) * e1))%Qpos +
+       approximate1 ((1 # 2) * ((1 # 2) * e1))%Qpos) -
+      (approximate ((1 # 2) * ((1 # 2) * e2))%Qpos +
+       approximate0 ((1 # 2) * ((1 # 2) * e2))%Qpos +
+       approximate1 ((1 # 2) * e2)%Qpos))%Q
+    with ((approximate ((1 # 2) * e1)%Qpos
+           - approximate ((1 # 2) * ((1 # 2) * e2))%Qpos)
+          + (approximate0 ((1 # 2) * ((1 # 2) * e1))%Qpos
+             - approximate0 ((1 # 2) * ((1 # 2) * e2))%Qpos)
+          + (approximate1 ((1 # 2) * ((1 # 2) * e1))%Qpos
+             - approximate1 ((1 # 2) * e2)%Qpos))%Q
+    by ring.
+  setoid_replace (` e1 + ` e2)%Q
+    with (((1#2)* ` e1 + (1#2)*((1#2) * `e2))
+          + ((1#2)*((1#2)* `e1) + (1#2)*((1#2)*`e2))
+          + ((1#2)*((1#2)* `e1) + (1#2)* ` e2))%Q by ring.
+  apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+  apply Qplus_le_compat.
+  apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+  apply Qplus_le_compat.
+  - apply AbsSmall_Qabs.
+    apply (regFun_prf ((1#2)*e1)%Qpos ((1#2)*((1#2)*e2))%Qpos).
+  - apply AbsSmall_Qabs.
+    apply (regFun_prf0 ((1#2)*((1#2)*e1))%Qpos ((1#2)*((1#2)*e2))%Qpos).
+  - apply AbsSmall_Qabs.
+    apply (regFun_prf1 ((1#2)*((1#2)*e1))%Qpos ((1#2)*e2)%Qpos). 
+Qed. 
+
+Lemma CRmult_1_l : forall (x: CR), 1 * x == x.
+Proof.
+  intro x. rewrite CRmult_scale. 
+  intros e1 e2. destruct x; simpl.
+  rewrite Qmult_1_l.
+  rewrite <- (Qmult_1_l (`e1)).
+  apply (regFun_prf ((1#1)*e1)%Qpos e2).
+Qed.
+
 Lemma CR_ring_theory :
  @ring_theory CR 0 1 (ucFun2 CRplus_uc) CRmult
  (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
 Proof.
  split.
-         apply: cm_lft_unit_unfolded.
-        apply: cag_commutes_unfolded.
-       apply: plus_assoc_unfolded.
-      apply: one_mult.
-     apply: mult_commut_unfolded.
-    apply: mult_assoc_unfolded.
-   intros x y z;generalize z x y;apply: ring_distl_unfolded.
-  reflexivity.
- apply: cg_minus_correct.
+ - exact CRplus_0_l.
+ - exact CRplus_comm.
+ - exact CRplus_assoc.
+ - exact CRmult_1_l.
+ - apply: mult_commut_unfolded.
+ - apply: mult_assoc_unfolded.
+ - intros x y z;generalize z x y;apply: ring_distl_unfolded.
+ - reflexivity.
+ - apply: cg_minus_correct.
 Qed.
-
-Lemma inject_Q_strext : fun_strext inject_Q_CR.
-Proof.
- intros x y [Hxy|Hxy].
-  apply: Qlt_not_eq.
-  apply Qnot_le_lt.
-  intros H.
-  absurd ('y[<=]'x).
-   rewrite -> leEq_def.
-   auto with *.
-  rewrite -> CRle_Qle.
-  auto.
- apply ap_symmetric.
- apply: Qlt_not_eq.
- apply Qnot_le_lt.
- intros H.
- absurd ('x[<=]'y).
-  rewrite -> leEq_def.
-  auto with *.
- rewrite -> CRle_Qle.
- auto.
-Qed.
-
-Definition inject_Q_csf := Build_CSetoid_fun _ _ _ inject_Q_strext.
-
-Lemma inject_Q_hom : RingHom Q_as_CRing CRasCRing.
-Proof.
- exists (inject_Q_csf).
-   apply: CRplus_Qplus.
-  intros x y.
-  apply eq_symmetric.
-  apply CRmult_Qmult.
- apply eq_reflexive.
-Defined.
 
 Lemma CR_Q_ring_morphism :
  ring_morph 0%CR 1%CR (ucFun2 CRplus_uc) CRmult
@@ -308,9 +335,6 @@ Proof. intros. ring. Qed.
 Lemma CRopp_0: (-0 == 0)%CR.
 Proof. intros. ring. Qed.
 
-Lemma CRplus_0_l (x: CR): (0 + x == x)%CR.
-Proof. intros. ring. Qed.
-
 Lemma CRplus_0_r (x: CR): (x + 0 == x)%CR.
 Proof. intros. ring. Qed.
 
@@ -325,12 +349,6 @@ Proof.
    with (- proj1_sig ((1#2)*e)%Qpos + - proj1_sig ((1#2)*e)%Qpos)%Q by (simpl; ring).
  apply Qplus_le_compat; auto.
 Qed.
-
-Lemma CRplus_comm (x y: CR): x + y == y + x.
-Proof. intros. ring. Qed.
-
-Lemma CRplus_assoc (x y z: CR): x + (y + z) == (x + y) + z.
-Proof. intros. ring. Qed.
 
 Lemma CRplus_eq_l (z x y: CR): x == y <-> x + z == y + z.
 Proof with ring.
@@ -841,3 +859,4 @@ Proof. repeat (split; try apply _); now apply CRle_Qle. Qed.
 
 Instance: StrictOrderEmbedding inject_Q_CR.
 Proof. split; apply _. Qed.
+

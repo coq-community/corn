@@ -4,7 +4,7 @@ Require Import
  Unicode.Utf8
  Setoid Arith List Program Permutation metric2.Classified
  CSetoids CPoly_ApZero CPoly_Degree
- CRArith Qmetric Qring CReals Ranges
+ CRArith CRArith_alg Qmetric Qring CReals Ranges
  stdlib_omissions.Pair stdlib_omissions.Q
  list_separates SetoidPermutation CRings.
 Require MathClasses.implementations.ne_list.
