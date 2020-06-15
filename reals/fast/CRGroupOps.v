@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import QArith.
+Require Import QArith Qabs.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
@@ -425,6 +425,37 @@ Build_UniformlyContinuousFunction Qmax_uc_prf.
 
 Definition CRmax : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qmax_uc.
 
+Lemma Qmax_contract : forall (a b c : Q),
+    Qabs (Qmax a b - Qmax a c) <= Qabs (b - c).
+Proof.
+  intros. apply Qabs_Qle_condition. split.
+  - apply Qmax_case.
+    + intros. apply Qmax_case. intros.
+      unfold Qminus. rewrite Qplus_opp_r. apply (Qopp_le_compat 0).
+      apply Qabs_nonneg. intros. rewrite Qabs_neg, Qopp_involutive.
+      apply Qplus_le_l, H. apply (Qplus_le_l _ _ c).
+      ring_simplify. exact (Qle_trans _ _ _ H H0).
+    + intros. apply Qmax_case. intros.
+      apply (Qle_trans _ 0). apply (Qopp_le_compat 0).
+      apply Qabs_nonneg.
+      unfold Qminus. rewrite <- Qle_minus_iff. exact H.
+      intros. setoid_replace (b-c)%Q with (-(c-b)).
+      apply Qopp_le_compat. rewrite Qabs_opp. apply Qle_Qabs.
+      unfold equiv, stdlib_rationals.Q_eq. ring.
+  - apply Qmax_case.
+    + intros. apply Qmax_case. intros.
+      unfold Qminus. rewrite Qplus_opp_r. 
+      apply Qabs_nonneg. intros.
+      apply (Qle_trans _ 0).
+      apply (Qplus_le_l _ _ c). ring_simplify. exact H0.
+      apply Qabs_nonneg.
+    + intros. apply Qmax_case. intros.
+      rewrite Qabs_pos. apply Qplus_le_r, Qopp_le_compat, H0.
+      unfold Qminus. rewrite <- Qle_minus_iff.
+      exact (Qle_trans _ _ _ H0 H). 
+      intros. apply Qle_Qabs.
+Qed.
+
 Lemma CRmax_boundBelow : forall (a:Q) (y:CR), (CRmax (' a) y == boundBelow a y)%CR.
 Proof.
  intros a y.
@@ -434,35 +465,13 @@ Proof.
  intros e1 e2.
  destruct y; simpl; unfold Cmap_fun, Cap_fun, Cap_raw; simpl.
  specialize (regFun_prf ((1 # 2) * e1)%Qpos e2).
- split.
- - apply Qmax_case. intros. apply Qmax_case. intros.
-   unfold Qminus. rewrite Qplus_opp_r. apply (Qopp_le_compat 0).
-   apply (Qpos_nonneg (e1+e2)). intros.
-   apply (Qle_trans _ (approximate ((1 # 2)%Q ↾ eq_refl * e1)%Qpos - approximate e2)).
-   destruct regFun_prf as [H1 _].
-   refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
-   apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
-   apply Qplus_le_l. exact H. intros. apply Qmax_case.
-   intros. apply (Qle_trans _ 0). apply (Qopp_le_compat 0), (Qpos_nonneg (e1+e2)).
-   unfold Qminus. rewrite <- Qle_minus_iff. exact H. intros.
-   destruct regFun_prf as [H1 _].
-   refine (Qle_trans _ _ _ _ H1). simpl. ring_simplify.
-   apply Qplus_le_l. apply Qmult_le_r. apply Qpos_ispos. discriminate.
- - apply Qmax_case. apply Qmax_case. intros.
-   unfold Qminus. rewrite Qplus_opp_r. apply (Qpos_nonneg (e1+e2)).
-   intros. apply (Qle_trans _ 0).
-   apply (Qplus_le_l _ _ (approximate e2)). ring_simplify. exact H.
-   apply (Qpos_nonneg (e1+e2)). intros.
-   apply Qmax_case. intros. apply Qopp_le_compat in H0.
-   apply (Qle_trans _ (approximate ((1 # 2) * e1)%Qpos - approximate e2)).
-   apply Qplus_le_r, H0. destruct regFun_prf as [_ H1].
-   apply (Qle_trans _ _ _ H1). apply Qplus_le_l. simpl.
-   rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
-   apply Qmult_le_r. apply Qpos_ispos. discriminate.
-   intros. destruct regFun_prf as [_ H1].
-   apply (Qle_trans _ _ _ H1). apply Qplus_le_l. simpl.
-   rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
-   apply Qmult_le_r. apply Qpos_ispos. discriminate.
+ apply AbsSmall_Qabs.
+ apply (Qle_trans _ _ _ (Qmax_contract _ _ _)).
+ apply AbsSmall_Qabs in regFun_prf.
+ apply (Qle_trans _ _ _ regFun_prf).
+ apply Qplus_le_l. simpl.
+ rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
+ apply Qmult_le_r. apply Qpos_ispos. discriminate.
 Qed.
 
 (** Basic properties of CRmax. *)

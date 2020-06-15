@@ -374,7 +374,8 @@ Proof.
  eapply Qle_trans.
   apply H.
  stepr (1*Qabs (hd series)); [| simpl; ring].
- apply: mult_resp_leEq_rht;simpl; auto with *.
+ apply mult_resp_leEq_rht.
+ apply Qlt_le_weak, Ha1. apply Qabs_nonneg.
 Qed.
 
 Lemma InfiniteGeometricSum_maxIter_correct : forall series (err:Qpos), GeometricSeries series ->

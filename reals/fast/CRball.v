@@ -103,7 +103,7 @@ Proof.
 intro A. apply gball_CRabs.
 setoid_replace ('a * x - 'a * y) with ('a * (x - y)) by ring.
 rewrite CRabs_CRmult_Q, <- CRmult_Qmult.
-assert (0 <= 'Qabs a) by (apply CRle_Qle; auto).
+assert (0 <= 'Qabs a) by (apply CRle_Qle, Qabs_nonneg).
 apply (orders.order_preserving (CRmult (' Qabs a))).
 now apply gball_CRabs.
 Qed.

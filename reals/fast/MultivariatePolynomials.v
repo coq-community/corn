@@ -13,6 +13,7 @@ Require Import Coq.QArith.Qabs.
 Require Import CoRN.reals.fast.CRabs.
 Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRArith_alg.
 
 Set Implicit Arguments.
 

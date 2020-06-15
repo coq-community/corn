@@ -697,7 +697,8 @@ Proof.
  clear.
  destruct Hy.
  rewrite Qplus_comm.
- apply Q.Qplus_lt_le_0_compat; auto with *.
+ apply Q.Qplus_lt_le_0_compat.
+ reflexivity. apply Qabs_nonneg.
 Qed.
 
 Hint Rewrite Cauchy_IR_mult_as_CR_mult : CRtoCauchy_IR.
