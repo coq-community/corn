@@ -44,7 +44,7 @@ Lemma CRAbsSmall_ball : forall (x y:CR) (e:Q),
 Proof.
  intros x y e.
  split.
-  intros [H1 H2].
+ - intros [H1 H2].
   rewrite <- (doubleSpeed_Eq x).
   rewrite <- (doubleSpeed_Eq (doubleSpeed x)).
   rewrite <- (doubleSpeed_Eq y).
@@ -67,7 +67,7 @@ Proof.
   rewrite Qplus_assoc. exact H1'.
   rewrite <- Qplus_assoc, Qplus_comm. rewrite Qopp_involutive in H2'.
   exact H2'.
- intros H.
+ - intros H.
  rewrite <- (doubleSpeed_Eq x) in H.
  rewrite <- (doubleSpeed_Eq y) in H.
  split; intros d; destruct (H ((1#2)*d)%Qpos ((1#2)*d)%Qpos) as [H1 H2]; clear H;

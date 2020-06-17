@@ -1,5 +1,6 @@
 (*
 Copyright © 2006-2008 Russell O’Connor
+Copyright © 2020 Vincent Semeria
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -23,20 +24,18 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.logic.CLogic.
 Require Export CoRN.model.lattice.CRlattice.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import Coq.QArith.Qabs.
-Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import CoRN.tactics.CornTac.
+Require Import CoRN.metric2.ProductMetric.
 Require Import MathClasses.interfaces.canonical_names.
 
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
 Local Open Scope uc_scope.
-Opaque CR Qmin Qmax Qred.
+Opaque Qmin Qmax Qred.
 
 (**
 ** Strict Inequality
@@ -122,14 +121,14 @@ Infix "<" := CRltT : CR_scope.
 Lemma CRltT_wd : forall x1 x2, (x1==x2 -> forall y1 y2, y1==y2 -> x1 < y1 -> x2 < y2)%CR.
 Proof.
  intros x1 x2 Hx y1 y2 Hy H.
- apply: CRpos_wd. 2:apply H.
+ refine (CRpos_wd _ _). 2:apply H.
  abstract ( rewrite <- Hx; rewrite <- Hy; reflexivity ).
 Defined.
 
 (**
 ** Apartness
 *)
-Definition CRapartT (x y:CR) := (x < y or y < x)%CR.
+Definition CRapartT (x y:CR) := (sum (x < y) (y < x))%CR.
 
 Notation "x >< y" := (CRapartT x y) (at level 70, no associativity) : CR_scope.
 
@@ -154,8 +153,8 @@ Lemma Qscale_modulus_elim : forall (P:QposInf -> Type) (x:Q) (e:Qpos),
 P (Qscale_modulus x e).
 Proof.
  intros P [xn xd] e H1.
- cut (forall xn:positive, (forall y : Qpos, QAbsSmall (proj1_sig e/proj1_sig y)%Q (xn#xd)%Q -> P y) ->
-   P (Qscale_modulus (xn # xd) e)).
+ cut (forall xn:positive, (forall y : Qpos, QAbsSmall (proj1_sig e/proj1_sig y)%Q (Z.pos xn#xd)%Q -> P y) ->
+   P (Qscale_modulus (Z.pos xn # xd) e)).
   intros H H2.
   destruct xn as [|xn|xn].
     apply H1.
@@ -165,7 +164,7 @@ Proof.
   apply H.
   intros y Hy.
   apply H2.
-  change (Zneg xn # xd)%Q with (-(xn # xd))%Q.
+  change (Zneg xn # xd)%Q with (-(Zpos xn # xd))%Q.
   apply QAbsSmall_opp, Hy.
  clear xn H1.
  intros xn H2.
@@ -173,9 +172,9 @@ Proof.
  apply H2.
  simpl.
  unfold QAbsSmall.
- setoid_replace (` e / ((xd # xn) * ` e)) with (xn # xd).
+ setoid_replace (` e / ((Zpos xd # xn) * ` e)) with (Zpos xn # xd).
  split. 2: apply Qle_refl.
- apply (Qplus_le_l _ _ (xn # xd)). ring_simplify.
+ apply (Qplus_le_l _ _ (Zpos xn # xd)). ring_simplify.
  apply (Qpos_nonneg ((2#1)*(xn#xd))).
  unfold Qdiv. rewrite Qinv_mult_distr.
  rewrite <- (Qmult_comm (/ `e)), Qmult_assoc.
@@ -203,18 +202,19 @@ Proof.
    setoid_replace ((0 # ad)) with 0 by constructor.
    unfold Qball.
    unfold QAbsSmall. setoid_replace (0 * b0 - 0 * b1) with 0.
-   2: ring.
+   2: unfold equiv, stdlib_rationals.Q_eq; ring.
    split. apply (Qopp_le_compat 0).
    apply Qpos_nonneg. apply Qpos_nonneg.
  - simpl.
   simpl in *.
   unfold Qball in *.
   unfold QAbsSmall.
-  setoid_replace ((an # ad) * b0 - (an # ad) * b1)
-    with (b0 * (an # ad) - b1 * (an # ad)) by ring.
+  setoid_replace ((Zpos an # ad) * b0 - (Zpos an # ad) * b1)
+    with (b0 * (Zpos an # ad) - b1 * (Zpos an # ad))
+    by (unfold equiv, stdlib_rationals.Q_eq; ring).
   unfold QAbsSmall in H.
-  setoid_replace ((ad # an) * ` e)
-    with (` e / (an # ad)) in H.
+  setoid_replace ((Zpos ad # an) * ` e)
+    with (` e / (Zpos an # ad)) in H.
   apply (Qball_Qmult_r e (an#ad)) in H.
   exact H.
   rewrite Qmult_comm. apply Qmult_comp; reflexivity.
@@ -226,10 +226,11 @@ Proof.
    apply Qball_opp. 
    unfold Qball, QAbsSmall.
    simpl in H.
-  setoid_replace ((an # ad) * b0 - (an # ad) * b1)
-   with (b0*(an#ad)-b1*(an#ad)) by ring.
-  setoid_replace ((ad # an) * ` e)
-    with (` e / (an # ad)) in H.
+  setoid_replace ((Zpos an # ad) * b0 - (Zpos an # ad) * b1)
+    with (b0*(Zpos an#ad)-b1*(Zpos an#ad))
+     by (unfold equiv, stdlib_rationals.Q_eq; ring).
+  setoid_replace ((Zpos ad # an) * ` e)
+    with (` e / (Zpos an # ad)) in H.
   apply (Qball_Qmult_r e (an#ad)) in H. simpl in H.
   apply H.
   rewrite Qmult_comm. apply Qmult_comp; reflexivity.
@@ -251,10 +252,11 @@ Proof. intros ?? E ?. simpl ucFun. rewrite E. reflexivity. Qed.
 
 (** [CRboundAbs] clamps a real number between -c and c where c is
 rational. *)
-Definition QboundAbs (c:Qpos)
+Definition QboundAbs (c:Qpos) : Q_as_MetricSpace --> Q_as_MetricSpace
   := uc_compose (QboundBelow_uc (-proj1_sig c)) (QboundAbove_uc (proj1_sig c)).
 
-Definition CRboundAbs (c:Qpos) := Cmap QPrelengthSpace (QboundAbs c).
+Definition CRboundAbs (c:Qpos) : CR -> CR
+  := Cmap QPrelengthSpace (QboundAbs c).
 
 Lemma QboundAbs_absorb: forall (a b:Qpos) (c:Q),
  proj1_sig a <= proj1_sig b ->
@@ -286,10 +288,13 @@ Proof.
  intros a x Ha Hb.
  unfold CRboundAbs.
  transitivity (uc_compose (Cmap QPrelengthSpace (QboundBelow_uc (-proj1_sig a))) (Cmap QPrelengthSpace (QboundAbove_uc (proj1_sig a))) x).
-  simpl.
+ simpl (Cmap QPrelengthSpace (QboundAbs a) x).
+ simpl ((Cmap QPrelengthSpace (QboundBelow_uc (- ` a))
+      ∘ Cmap QPrelengthSpace (QboundAbove_uc (` a))) x).
   repeat rewrite -> Cmap_fun_correct.
-  apply: MonadLaw2.
- simpl.
+  apply MonadLaw2.
+ simpl ((Cmap QPrelengthSpace (QboundBelow_uc (- ` a))
+      ∘ Cmap QPrelengthSpace (QboundAbove_uc (` a))) x).
  change (boundBelow (-proj1_sig a) (boundAbove (proj1_sig a) x) == x)%CR.
  assert (X:(boundAbove (proj1_sig a) x==x)%CR).
   rewrite <- CRmin_boundAbove.
@@ -318,12 +323,33 @@ Proof.
  split;assumption.
 Qed.
 
+Lemma QboundAbs_abs : forall (z:Qpos) (a:Q),
+    Qabs (QboundAbs z a) == Qmin (Qabs a) (proj1_sig z).
+Proof.
+  intros. apply QboundAbs_elim.
+  - intros. symmetry. rewrite Qabs_pos, Qabs_pos.
+    apply Qle_min_r, H. apply Qpos_nonneg.
+    apply (Qle_trans _ (`z)). apply Qpos_nonneg. exact H.
+  - intros. symmetry. rewrite Qabs_opp.
+    rewrite (Qabs_pos (`z)). apply Qle_min_r.
+    rewrite Qabs_neg, <- Qopp_involutive.
+    apply Qopp_le_compat, H.
+    apply (Qle_trans _ _ _ H). apply (Qopp_le_compat 0), Qpos_nonneg.
+    apply Qpos_nonneg.
+  - intros. symmetry. apply Qle_min_l.
+    apply AbsSmall_Qabs in H. exact H.
+Qed.
+  
+
 (** The modulus of continuity for multiplication depends on the
 bound, c, on the second argument. *)
 Definition Qmult_modulus (c:Qpos)(e:Qpos) : QposInf
   := Qpos2QposInf (e * Qpos_inv c).
 
-Lemma Qmult_uc_prf (c:Qpos) : is_UniformlyContinuousFunction (fun a => uc_compose (Qscale_uc a) (QboundAbs c)) (Qmult_modulus c).
+Lemma Qmult_uc_prf (c:Qpos)
+  : @is_UniformlyContinuousFunction
+      Q_as_MetricSpace (Q_as_MetricSpace --> Q_as_MetricSpace) 
+      (fun a:Q => uc_compose (Qscale_uc a) (QboundAbs c)) (Qmult_modulus c).
 Proof with simpl in *; auto with *.
  intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
@@ -359,8 +385,9 @@ Qed.
 (* begin hide *)
 Arguments Qmult_uc_prf : clear implicits.
 (* end hide *)
-Definition Qmult_uc (c:Qpos) :  Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace:=
-Build_UniformlyContinuousFunction (Qmult_uc_prf c).
+Definition Qmult_uc (c:Qpos)
+  : Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace
+  := Build_UniformlyContinuousFunction (Qmult_uc_prf c).
 
 (** This multiplication function is correct when yBound is a bound
     on the absolute value of the second CR argument. *)
@@ -377,7 +404,10 @@ Qed.
 
 Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
 Proof.
- intros e1 e2 E x1 x2. simpl. rewrite E. reflexivity.
+  intros e1 e2 E x1 x2.
+  simpl (CRmult_bounded e1 x1 x2).
+  simpl (CRmult_bounded e2 x1 x2).
+  rewrite E. reflexivity.
 Qed.
 
 (** CR_b computes a rational bound on the absolute value of x *)
@@ -477,7 +507,7 @@ Proof.
   unfold x'.
   rewrite -> fasterIsEq.
   reflexivity.
- apply: regFunEq_e; intros e.
+ apply regFunEq_e; intros e.
  intros.
  simpl.
  do 3 (unfold Cap_raw; simpl).
@@ -535,24 +565,31 @@ Proof.
  unfold ucFun2.
  unfold Cmap2.
  unfold inject_Q_CR.
- simpl.
+ change (st_eq
+    (Cap_fun QPrelengthSpace
+       (Cmap_fun QPrelengthSpace (Qmult_uc (CR_b (1 ↾ eq_refl) y))
+          (Cunit_fun Q_as_MetricSpace a)) y)
+    (Cmap_fun QPrelengthSpace (Qscale_uc a) y)).
  rewrite -> Cap_fun_correct.
  repeat rewrite -> Cmap_fun_correct.
  rewrite -> MonadLaw3.
  rewrite -> StrongMonadLaw1.
- simpl.
+ change (st_eq (Cmap_slow_fun (Qscale_uc a ∘ QboundAbs (CR_b (1 ↾ eq_refl) y)) y)
+    (Cmap_slow_fun (Qscale_uc a) y)).
  transitivity (uc_compose (Cmap QPrelengthSpace (Qscale_uc a))
    (Cmap QPrelengthSpace (QboundAbs (CR_b (1#1) y))) y).
-  simpl.
+ simpl ((Cmap QPrelengthSpace (Qscale_uc a)
+      ∘ Cmap QPrelengthSpace (QboundAbs (CR_b (1 ↾ eq_refl) y))) y).
   repeat rewrite -> Cmap_fun_correct.
-  apply: MonadLaw2.
- simpl.
+  apply MonadLaw2.
+ simpl ((Cmap QPrelengthSpace (Qscale_uc a)
+      ∘ Cmap QPrelengthSpace (QboundAbs (CR_b (1 ↾ eq_refl) y))) y).
  repeat rewrite -> Cmap_fun_correct.
  change (Cmap_slow (Qscale_uc a) (Cmap_slow_fun (QboundAbs (CR_b (1 # 1) y)) y) ==
    Cmap_slow (Qscale_uc a) y)%CR.
  apply uc_wd.
  rewrite <- (Cmap_fun_correct (Y:=Q_as_MetricSpace) QPrelengthSpace).
- apply: CRboundAbs_Eq.
+ apply CRboundAbs_Eq.
   apply CR_b_lowerBound.
  apply CR_b_upperBound.
 Qed.
@@ -563,9 +600,9 @@ Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
 Proof.
  intros a b.
  unfold scale.
- simpl.
+ change (st_eq (Cmap_fun QPrelengthSpace (Qscale_uc a) (' b)%CR) (' (a * b)%Q)%CR).
  rewrite -> Cmap_fun_correct.
- apply: MonadLaw3.
+ apply MonadLaw3.
 Qed.
 (* begin hide *)
 Hint Rewrite scale_Qmult : CRfast_compute.
@@ -604,7 +641,7 @@ Proof.
  apply AbsSmall_Qabs.
  setoid_replace (/ Qmax (` c) a0 - / Qmax (` c) a1)
    with ((Qmax (` c) a1 - Qmax (` c) a0) / (Qmax (` c) a0 * Qmax (` c) a1)).
- 2: field.
+ 2: unfold equiv, stdlib_rationals.Q_eq; field.
  unfold Qdiv. rewrite Qabs_Qmult.
  rewrite (Qabs_pos (/ ( Qmax (` c) a0 * Qmax (` c) a1))).
  2: apply Qlt_le_weak, Qinv_lt_0_compat, H.
@@ -667,14 +704,14 @@ Proof.
    apply Qmult_le_l. apply Qpos_ispos. exact Hc.
    apply Qmult_le_r. apply Qpos_ispos. exact Hc. }
  transitivity (CRinv_pos c2 (boundBelow (proj1_sig c2) (faster (QreduceApprox x) f Y))).
-  apply: regFunEq_e.
+  apply regFunEq_e.
   intros e.
   assert (Z:=Qinv_pos_uc_wd _ _ Hc).
   simpl in Z.
   simpl.
   rewrite -> Z;[|apply Qmax_ub_l].
   unfold Qinv_modulus.
-  replace (Qpos_red (c1 * c1 * e)) with (Qpos_red (f (c2 * c2 * e)%Qpos)); [apply: ball_refl|].
+  replace (Qpos_red (c1 * c1 * e)) with (Qpos_red (f (c2 * c2 * e)%Qpos)); [apply ball_refl|].
   apply (Qpos_nonneg (e+e)).
   apply Qpos_red_eq.
   unfold f.
@@ -694,7 +731,9 @@ Qed.
 
 Instance: Proper (QposEq ==> @st_eq _) CRinv_pos.
 Proof.
-  intros c1 c2 E x. simpl.
+  intros c1 c2 E x.
+  simpl (CRinv_pos c1 x).
+  simpl (CRinv_pos c2 x).
   setoid_replace (Qinv_pos_uc c1) with (Qinv_pos_uc c2).
    easy.
   intros y. now apply CRinv_pos_uc_Proper.
@@ -704,11 +743,11 @@ Lemma CRinv_pos_Qinv : forall (c:Qpos) x,
     (proj1_sig c <= x)%Q -> (CRinv_pos c (' x) == (' (/x)))%CR.
 Proof.
  intros c x H.
- apply: regFunEq_e.
+ apply regFunEq_e.
  intros e.
  simpl.
  setoid_replace (Qmax (proj1_sig c) x) with x.
-  apply: ball_refl.
+  apply ball_refl.
   apply (Qpos_nonneg (e+e)).
  rewrite <- Qle_max_r.
  assumption.
@@ -770,34 +809,34 @@ Proof.
   ring_simplify.
   apply Qle_refl.
   destruct (Qle_total (proj1_sig c) (proj1_sig e));
-    [|symmetry]; apply: CRinv_pos_weaken; assumption.
+    [|symmetry]; apply CRinv_pos_weaken; assumption.
 Qed.
 
 Lemma CRinvT_wd : forall (x y:CR) x_ y_, (x == y -> CRinvT x x_ == CRinvT y y_)%CR.
 Proof.
  assert (X:forall x, (0 + x == x)%CR).
   intros x.
-  transitivity (doubleSpeed x);[|apply: doubleSpeed_Eq].
-  apply: regFunEq_e.
+  transitivity (doubleSpeed x);[|apply doubleSpeed_Eq].
+  apply regFunEq_e.
   intros e.
   simpl.
   unfold Cap_raw; simpl.
   ring_simplify.
-  apply: ball_refl. apply (Qpos_nonneg (e+e)).
+  apply ball_refl. apply (Qpos_nonneg (e+e)).
  assert (Y:forall x, (x + - 0 == x)%CR).
   intros x.
-  transitivity (doubleSpeed x);[|apply: doubleSpeed_Eq].
-  apply: regFunEq_e.
+  transitivity (doubleSpeed x);[|apply doubleSpeed_Eq].
+  apply regFunEq_e.
   intros e.
   simpl.
   unfold Cap_raw; simpl.
   ring_simplify.
-  apply: ball_refl. apply (Qpos_nonneg (e+e)).
+  apply ball_refl. apply (Qpos_nonneg (e+e)).
  intros x y [[c x_]|[c x_]] [[d y_]|[d y_]] H.
     change (-(CRinv_pos c (-x))== (-(CRinv_pos d (-y))))%CR.
     rewrite -> H in *.
     rewrite -> X in *. intros.
-    apply: CRopp_wd.
+    apply CRopp_wd.
     destruct (Qle_total (proj1_sig c) (proj1_sig d));
       [|symmetry]; apply CRinv_pos_weaken; try assumption.
     assert (0 < proj1_sig c) as cpos.
@@ -843,3 +882,784 @@ Proof.
  apply CRinvT_wd.
  reflexivity.
 Qed.
+
+(* Non-curried equivalent version of multiplication. *)
+
+Lemma QboundAbs_contract : forall (c : Qpos) (j k : Q),
+    Qabs (QboundAbs c j - QboundAbs c k) <= Qabs (j-k).
+Proof.
+  intros. apply QboundAbs_elim.
+  - intros. apply QboundAbs_elim.
+    + intros. unfold Qminus. rewrite Qplus_opp_r. apply Qabs_nonneg.
+    + intros. unfold Qminus. rewrite Qopp_involutive.
+      rewrite Qabs_pos, Qabs_pos.
+      apply Qplus_le_compat. exact H.
+      rewrite <- Qopp_involutive. apply Qopp_le_compat. exact H0.
+      apply (Qle_trans _ (`c + `c)).
+      apply (Qpos_nonneg (c+c)).
+      apply Qplus_le_compat. exact H.
+      rewrite <- Qopp_involutive. apply Qopp_le_compat. exact H0.
+      apply (Qpos_nonneg (c+c)).
+    + intros [H0 H1]. rewrite Qabs_pos.
+      2: unfold Qminus; rewrite <- Qle_minus_iff; exact H1.
+      apply (Qle_trans _ (j-k)).
+      apply Qplus_le_l. exact H. apply Qle_Qabs.
+  - intros. apply QboundAbs_elim.
+    + intros.
+      setoid_replace (- `c - `c) with (-(`c+`c))
+        by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      rewrite Qabs_opp.
+      rewrite Qabs_pos. 2: apply (Qpos_nonneg (c+c)).
+      rewrite Qabs_Qminus. rewrite Qabs_pos.
+      apply Qplus_le_compat. exact H0.
+      rewrite <- Qopp_involutive. apply Qopp_le_compat. exact H.
+      apply (Qle_trans _ (`c + `c)).
+      apply (Qpos_nonneg (c+c)).
+      apply Qplus_le_compat. exact H0.
+      rewrite <- Qopp_involutive. apply Qopp_le_compat. exact H.
+    + intros. unfold Qminus.
+      rewrite Qopp_involutive, Qplus_comm, Qplus_opp_r.
+      apply Qabs_nonneg.
+    + intros [H0 H1].
+      setoid_replace (- `c - k) with (-(`c+k))
+        by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      rewrite Qabs_opp. rewrite Qabs_pos, Qabs_Qminus.
+      apply (Qle_trans _ (k-j)).
+      rewrite Qplus_comm.
+      apply Qplus_le_r. rewrite <- Qopp_involutive.
+      apply Qopp_le_compat. exact H. apply Qle_Qabs.
+      apply (Qplus_le_l _ _ (-`c)). ring_simplify.
+      ring_simplify in H0. exact H0.
+  - intros [H0 H1]. apply QboundAbs_elim.
+    + intros. rewrite Qabs_Qminus, Qabs_pos.
+      rewrite Qabs_Qminus, Qabs_pos. apply Qplus_le_l, H.
+      unfold Qminus. rewrite <- Qle_minus_iff.
+      exact (Qle_trans _ _ _ H1 H). unfold Qminus.
+      rewrite <- Qle_minus_iff. exact H1.
+    + intros. unfold Qminus. rewrite Qopp_involutive, Qabs_pos.
+      apply (Qle_trans _ (j-k)). apply Qplus_le_r.
+      rewrite <- Qopp_involutive. apply Qopp_le_compat. exact H.
+      apply Qle_Qabs. apply (Qplus_le_l _ _ (`c)) in H0.
+      ring_simplify in H0. rewrite Qplus_comm. exact H0.
+    + intros [H2 H3]. apply Qle_refl.
+Qed.
+
+Lemma Qmult_uc_uncurry (c:Qpos)
+  : @is_UniformlyContinuousFunction
+      (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
+      Q_as_MetricSpace 
+      (fun ab => QboundAbs c (fst ab) * QboundAbs c (snd ab))
+      (fun e => Qmult_modulus c ((1#2)*e)).
+Proof.
+  assert (forall i j k l : Q, Qabs (i*j-k*l) <= Qabs j * Qabs(i-k) + Qabs(j-l)*Qabs k)%Q
+    as multMaj.
+  { intros.
+    setoid_replace (i*j-k*l)%Q with (j*(i-k)+ (j-l)*k)%Q
+      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+    apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+    rewrite Qabs_Qmult, Qabs_Qmult. apply Qle_refl. } 
+  assert (forall i:Q, Qabs (QboundAbs c i) <= ` c) as bound.
+  { intro i. apply Qabs_Qle_condition. split.
+    apply Qmax_ub_l. apply Qmax_lub.
+    apply (Qle_trans _ 0). apply (Qopp_le_compat 0).
+    apply Qpos_nonneg. apply Qpos_nonneg. apply Qmin_lb_l. }
+  simpl. unfold Qmult_modulus.
+  intros e1 [i j] [k l] [H H0]. simpl.
+  simpl in H, H0.
+  apply AbsSmall_Qabs.
+  apply AbsSmall_Qabs in H.
+  apply AbsSmall_Qabs in H0.
+  apply (Qle_trans _ _ _ (multMaj _ _ _ _)).
+  apply (Qle_trans _ (`c * (Qabs (QboundAbs c i - QboundAbs c k))
+                      + `c * (Qabs (QboundAbs c j - QboundAbs c l)))).
+  - apply Qplus_le_compat.
+    apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+    apply bound.
+    rewrite Qmult_comm. apply Qmult_le_compat_r.
+    2: apply Qabs_nonneg. apply bound.
+  - apply (Qle_trans _ ((1#2)*`e1+(1#2)*`e1)).
+    apply Qplus_le_compat.
+    apply (Qle_trans _ (`c * Qabs (i-k))).
+    apply Qmult_le_l. apply Qpos_ispos. apply QboundAbs_contract.
+    rewrite Qmult_comm.
+    apply (Qmult_le_r _ _ (/ `c)).
+    apply Qinv_lt_0_compat, Qpos_ispos.
+    rewrite <- Qmult_assoc, Qmult_inv_r, Qmult_1_r.
+    exact H. apply Qpos_nonzero.
+    apply (Qle_trans _ (`c * Qabs (j-l))).
+    apply Qmult_le_l. apply Qpos_ispos. apply QboundAbs_contract.
+    rewrite Qmult_comm.
+    apply (Qmult_le_r _ _ (/ `c)).
+    apply Qinv_lt_0_compat, Qpos_ispos.
+    rewrite <- Qmult_assoc, Qmult_inv_r, Qmult_1_r.
+    exact H0. apply Qpos_nonzero.
+    ring_simplify. apply Qle_refl.
+Qed.
+
+Definition Qmult_uncurry (c : Qpos)
+  : (ProductMS Q_as_MetricSpace Q_as_MetricSpace) --> Q_as_MetricSpace
+  := Build_UniformlyContinuousFunction (@Qmult_uc_uncurry c).
+
+Lemma CRmult_uncurry_eq : forall (c:Qpos) (x y : CR),
+    (' (-proj1_sig c)%Q <= x)%CR 
+    -> (x <= ' (proj1_sig c)%Q)%CR
+    -> @st_eq CR (CRmult_bounded c x y)
+            (Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                  (Qmult_uncurry c) (undistrib_Complete (x,y))).
+Proof.
+  (* Cannot use Cmap2_curry, because CRmult_bounded is not
+     exactly Qmult_uc_uncurry, the first factor is not bounded. *)
+  intros.
+  rewrite <- (CRboundAbs_Eq c H H0) at 1.
+  intros e1 e2. simpl.
+  unfold Cap_raw; simpl.
+  assert (forall i, eq (QposInf_bind (λ e : Qpos, e) i) i) as bind_id.
+  { intro i. destruct i; reflexivity. }
+  rewrite bind_id. clear bind_id. 
+  assert (forall i j k l : Q, Qabs (i*j-k*l) <= Qabs i * Qabs(j-l) + Qabs(i-k)*Qabs l)%Q
+    as multMaj.
+  { intros.
+    setoid_replace (i*j-k*l)%Q with (i*(j-l)+ (i-k)*l)%Q
+      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+    apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+    rewrite Qabs_Qmult, Qabs_Qmult. apply Qle_refl. } 
+  apply AbsSmall_Qabs.
+  apply (Qle_trans _ _ _ (multMaj _ _ _ _)).
+  apply (Qle_trans _ ((1#2)*`e1 + (1#2)*`e2 +((1#2)*`e1 +(1#2)*`e2))).
+  2: ring_simplify; apply Qle_refl.
+  apply Qplus_le_compat.
+  - apply (Qle_trans
+             _ ( Qabs
+          (approximate y
+             (Qscale_modulus
+                (QboundAbs c (approximate x (Qmult_modulus c ((1 # 2) * e1))))
+                ((1 # 2) * e1)) -
+           (approximate y (Qmult_modulus c ((1 # 2) * e2))))
+          * Qabs (QboundAbs c (approximate x (Qmult_modulus c ((1 # 2) * e1)))))).
+    rewrite Qmult_comm.
+    apply Qmult_le_compat_r.
+    apply QboundAbs_contract. apply Qabs_nonneg. 
+    unfold Qscale_modulus. 
+    simpl (Qmult_modulus c ((1 # 2) * e1)).
+    destruct (QboundAbs c (approximate x (Qmult_modulus c ((1 # 2) ↾ @eq_refl comparison Datatypes.Lt * e1)))) eqn:des.
+    destruct Qnum.
+    + setoid_replace (0#Qden) with (0#1) by reflexivity.
+      rewrite Qmult_0_r. apply (Qpos_nonneg ((1#2)*e1+(1#2)*e2)).
+    + rewrite Qmult_comm, Qabs_pos. 2: discriminate.
+      apply (Qle_trans _ ((Zpos p#Qden) *
+                          ((Zpos Qden # p)%Q * ((1 # 2)%Q * `e1)
+                           + (1 # 2) * `e2 / `c))).
+      apply Qmult_le_l. reflexivity.
+      pose proof (regFun_prf y ((Zpos Qden # p)%Q ↾ eq_refl * ((1 # 2)%Q ↾ eq_refl * e1))%Qpos
+                             ((1 # 2) * e2 * Qpos_inv c)%Qpos) as H3.
+      apply AbsSmall_Qabs in H3. exact H3.
+      rewrite Qmult_plus_distr_r.
+      rewrite Qmult_assoc.
+      setoid_replace ((Zpos p # Qden) * (Zpos Qden # p))%Q with (1#1)%Q
+        by (unfold equiv, stdlib_rationals.Q_eq; unfold Qeq; simpl; rewrite Pos.mul_1_r, Pos.mul_comm; reflexivity).
+      rewrite Qmult_1_l. apply Qplus_le_r.
+      unfold Qdiv. rewrite Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qmult_le_l.
+      apply (Qpos_ispos ((1#2)*e2)).
+      rewrite <- des. apply Qmax_lub.
+      apply (Qle_trans _ 0). apply (Qopp_le_compat 0).
+      apply Qpos_nonneg. apply Qpos_nonneg. apply Qmin_lb_l.
+    + rewrite Qmult_comm, Qabs_neg. 2: discriminate.
+      setoid_replace (- (Z.neg p # Qden)) with (Zpos p # Qden) by reflexivity.
+      apply (Qle_trans _ ((Zpos p#Qden) *
+                          ((Zpos Qden # p)%Q * ((1 # 2)%Q * `e1)
+                           + (1 # 2) * `e2 / `c))).
+      apply Qmult_le_l. reflexivity.
+      pose proof (regFun_prf y ((Zpos Qden # p)%Q ↾ eq_refl * ((1 # 2)%Q ↾ eq_refl * e1))%Qpos
+                             ((1 # 2) * e2 * Qpos_inv c)%Qpos) as H3.
+      apply AbsSmall_Qabs in H3. exact H3.
+      rewrite Qmult_plus_distr_r.
+      rewrite Qmult_assoc.
+      setoid_replace ((Zpos p # Qden) * (Zpos Qden # p))%Q with (1#1)%Q
+        by (unfold equiv, stdlib_rationals.Q_eq; unfold Qeq; simpl; rewrite Pos.mul_1_r, Pos.mul_comm; reflexivity).
+      rewrite Qmult_1_l. apply Qplus_le_r.
+      unfold Qdiv. rewrite Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qmult_le_l.
+      apply (Qpos_ispos ((1#2)*e2)).
+      rewrite <- (Qopp_involutive (`c)).
+      setoid_replace (Zpos p # Qden) with (-(Z.neg p # Qden)) by reflexivity.
+      apply Qopp_le_compat.
+      rewrite <- des. apply Qmax_ub_l.
+  - apply (Qle_trans _ (Qabs
+    (approximate x (Qmult_modulus c ((1 # 2) * e1)) -
+     approximate x (Qmult_modulus c ((1 # 2) * e2)))
+          * Qabs (QboundAbs c (approximate y (Qmult_modulus c ((1 # 2) ↾ eq_refl * e2)))))).
+    apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+    apply QboundAbs_contract.
+    rewrite QboundAbs_abs.
+    apply (Qle_trans _ (`c * Qabs
+    (approximate x (Qmult_modulus c ((1 # 2) * e1)) -
+     approximate x (Qmult_modulus c ((1 # 2) * e2))))).
+    rewrite Qmult_comm.
+    apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+    apply Qmin_lb_r.
+    apply (Qle_trans _ (`c * ((1#2)*`e1 / `c + (1#2)*`e2 / `c))).
+    apply Qmult_le_l. apply Qpos_ispos.
+    unfold Qmult_modulus.
+    pose proof (regFun_prf x ((1 # 2) * e1 * Qpos_inv c)%Qpos
+                           ((1 # 2) * e2 * Qpos_inv c)%Qpos) as H3.
+    apply AbsSmall_Qabs in H3. exact H3.
+    rewrite Qmult_plus_distr_r.
+    apply Qplus_le_compat.
+    unfold Qdiv. rewrite Qmult_assoc.
+    apply Qle_shift_div_r. apply Qpos_ispos.
+    rewrite Qmult_comm. apply Qle_refl.
+    unfold Qdiv. rewrite Qmult_assoc.
+    apply Qle_shift_div_r. apply Qpos_ispos.
+    rewrite Qmult_comm. apply Qle_refl.
+Qed.
+
+(* Request bounds on all left factors : x and CRmult_bounded c x y. *)
+Lemma CRmult_uncurry_eq_3 : forall (c:Qpos) (x y z : CR),
+    (' (- ` c)%Q <= x)%CR 
+    -> (x <= 'proj1_sig c)%CR
+    -> (' (- ` c)%Q <= CRmult_bounded c x y)%CR 
+    -> (CRmult_bounded c x y <= 'proj1_sig c)%CR
+    -> @st_eq CR (CRmult_bounded c (CRmult_bounded c x y) z)
+             (Cmap (ProductMS_prelength
+                      (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                      QPrelengthSpace)
+                   (uc_compose (Qmult_uncurry c) (uc_pair (Qmult_uncurry c) (uc_id Q_as_MetricSpace)))
+                   (undistrib_Complete (undistrib_Complete (x,y), z))).
+Proof.
+  intros. 
+  assert (forall a, Qabs (QboundAbs c a) <= `c) as qbound_bound.
+  { intros a. rewrite QboundAbs_abs. apply Qmin_lb_r. }
+  rewrite (@CRmult_uncurry_eq c (CRmult_bounded c x y) z); try assumption. 
+  assert (st_eq (undistrib_Complete (CRmult_bounded c x y, z))
+                (undistrib_Complete ((Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                  (Qmult_uncurry c) (undistrib_Complete (x,y))), z))) as H4.
+  { intros e1 e2. split. 
+    apply (@CRmult_uncurry_eq c x y H H0).
+    apply regFun_prf. }
+  rewrite H4. clear H4.
+  rewrite fast_MonadLaw2.
+  apply Cmap_wd. apply uc_setoid.
+  intros e1 e2. split.
+  - simpl. apply AbsSmall_Qabs. 
+    assert (forall i j k l : Q, Qabs (i*j-k*l) <= Qabs i * Qabs(j-l) + Qabs(i-k)*Qabs l)%Q
+      as multMaj.
+    { intros.
+      setoid_replace (i*j-k*l)%Q with (i*(j-l)+ (i-k)*l)%Q
+        by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+      rewrite Qabs_Qmult, Qabs_Qmult. apply Qle_refl. } 
+    apply (Qle_trans _ ((1#2)*`e1 + (1#2)*`e2 +((1#2)*`e1 +(1#2)*`e2))).
+    2: ring_simplify; apply Qle_refl. 
+    apply (Qle_trans _ _ _ (multMaj _ _ _ _)). clear multMaj.
+    apply Qplus_le_compat.
+    + apply (Qle_trans _ (`c *
+                        (Qabs
+    (Qmax (- ` c)
+       (Qmin (` c) (approximate y (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)))) -
+     Qmax (- ` c)
+       (Qmin (` c)
+             (approximate y (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2))))))).
+      apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+      apply qbound_bound.
+      rewrite Qmult_comm.
+      apply (Qle_trans _ (Qabs (approximate y (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)) - approximate y (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2)) * `c)).
+      apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+      apply QboundAbs_contract.
+      apply (Qle_trans _ (((1#2)*`e1 / `c + (1#2)*`e2 / `c) * `c)).
+      apply Qmult_le_r. apply Qpos_ispos.
+      unfold Qmult_modulus.
+      pose proof (regFun_prf y ((1 # 2) * e1 * Qpos_inv c)%Qpos
+                             (Qpos_min ((1 # 2) * e2 * Qpos_inv c)%Qpos e2)) as H4.
+      apply AbsSmall_Qabs in H4.
+      apply (Qle_trans _ _ _ H4). clear H4. apply Qplus_le_r.
+      rewrite Q_Qpos_min. simpl. apply Qmin_lb_l.
+      rewrite Qmult_plus_distr_l.
+      apply Qplus_le_compat.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+    + rewrite Qmult_comm. apply (Qle_trans _ (`c *
+                        (Qabs
+    (Qmax (- ` c)
+       (Qmin (` c) (approximate x (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)))) -
+     Qmax (- ` c)
+       (Qmin (` c)
+             (approximate x (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2))))))).
+      apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+      apply qbound_bound.
+      rewrite Qmult_comm.
+      apply (Qle_trans _ (Qabs (approximate x (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)) - approximate x (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2)) * `c)).
+      apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+      apply QboundAbs_contract.
+      apply (Qle_trans _ (((1#2)*`e1 / `c + (1#2)*`e2 / `c) * `c)).
+      apply Qmult_le_r. apply Qpos_ispos.
+      unfold Qmult_modulus.
+      pose proof (regFun_prf x ((1 # 2) * e1 * Qpos_inv c)%Qpos
+                             (Qpos_min ((1 # 2) * e2 * Qpos_inv c)%Qpos e2)) as H4.
+      apply AbsSmall_Qabs in H4.
+      apply (Qle_trans _ _ _ H4). clear H4. apply Qplus_le_r.
+      rewrite Q_Qpos_min. simpl. apply Qmin_lb_l.
+      rewrite Qmult_plus_distr_l.
+      apply Qplus_le_compat.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+  - simpl.
+    assert (`e1 + proj1_sig (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2)
+            <= `e1 + `e2) as H4.
+    { apply Qplus_le_r. apply Qpos_min_lb_r. }
+    apply (ball_weak_le _ _ _ H4). apply regFun_prf.
+Qed.
+
+(* Request bounds on all left factors : x and y. *)
+Lemma CRmult_uncurry_eq_3r : forall (c:Qpos) (x y z : CR),
+    (' (- ` c)%Q <= x)%CR 
+    -> (x <= 'proj1_sig c)%CR
+    -> (' (- ` c)%Q <= y)%CR 
+    -> (y <= 'proj1_sig c)%CR
+    -> @st_eq CR (CRmult_bounded c x (CRmult_bounded c y z))
+             (Cmap (ProductMS_prelength
+                      (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                      QPrelengthSpace)
+                   (uc_compose (Qmult_uncurry c)
+                               (uc_compose (uc_pair (uc_id Q_as_MetricSpace) (Qmult_uncurry c)) (uc_assoc _ _ _)))
+                   (undistrib_Complete (undistrib_Complete (x,y), z))).
+Proof.
+  intros. 
+  assert (forall a, Qabs (QboundAbs c a) <= `c) as qbound_bound.
+  { intros a. rewrite QboundAbs_abs. apply Qmin_lb_r. }
+  rewrite (@CRmult_uncurry_eq c x (CRmult_bounded c y z)); try assumption. 
+  assert (st_eq (undistrib_Complete (x, CRmult_bounded c y z))
+                (undistrib_Complete
+                   (x, Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                            (Qmult_uncurry c) (undistrib_Complete (y,z))))) as H4.
+  { intros e1 e2. split. 
+    apply regFun_prf.
+    apply (@CRmult_uncurry_eq c y z H1 H2). }
+  rewrite H4. clear H4.
+  rewrite fast_MonadLaw2.
+  apply Cmap_wd. apply uc_setoid.
+  intros e1 e2. split.
+  - simpl.
+    assert (`e1 + proj1_sig (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c))
+            <= `e1 + `e2) as H4.
+    { apply Qplus_le_r. apply Qpos_min_lb_l. }
+    apply (ball_weak_le _ _ _ H4). apply regFun_prf. 
+  - simpl. apply AbsSmall_Qabs. 
+    assert (forall i j k l : Q, Qabs (i*j-k*l) <= Qabs i * Qabs(j-l) + Qabs(i-k)*Qabs l)%Q
+      as multMaj.
+    { intros.
+      setoid_replace (i*j-k*l)%Q with (i*(j-l)+ (i-k)*l)%Q
+        by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+      rewrite Qabs_Qmult, Qabs_Qmult. apply Qle_refl. } 
+    apply (Qle_trans _ ((1#2)*`e1 + (1#2)*`e2 +((1#2)*`e1 +(1#2)*`e2))).
+    2: ring_simplify; apply Qle_refl. 
+    apply (Qle_trans _ _ _ (multMaj _ _ _ _)). clear multMaj.
+    apply Qplus_le_compat.
+    + apply (Qle_trans _ (`c *
+                        (Qabs
+    (Qmax (- ` c)
+       (Qmin (` c) (approximate z (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)))) -
+     Qmax (- ` c)
+       (Qmin (` c)
+             (approximate z (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c)))))))).
+      apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+      apply qbound_bound.
+      rewrite Qmult_comm.
+      apply (Qle_trans _ (Qabs (approximate z (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)) - approximate z (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c))) * `c)).
+      apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+      apply QboundAbs_contract.
+      apply (Qle_trans _ (((1#2)*`e1 / `c + (1#2)*`e2 / `c) * `c)).
+      apply Qmult_le_r. apply Qpos_ispos.
+      unfold Qmult_modulus.
+      pose proof (regFun_prf z ((1 # 2) * e1 * Qpos_inv c)%Qpos
+                             (Qpos_min e2 ((1 # 2) * e2 * Qpos_inv c)%Qpos)) as H4.
+      apply AbsSmall_Qabs in H4.
+      apply (Qle_trans _ _ _ H4). clear H4. apply Qplus_le_r.
+      rewrite Q_Qpos_min. simpl. apply Qmin_lb_r.
+      rewrite Qmult_plus_distr_l.
+      apply Qplus_le_compat.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+    + rewrite Qmult_comm. apply (Qle_trans _ (`c *
+                        (Qabs
+    (Qmax (- ` c)
+       (Qmin (` c) (approximate y (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)))) -
+     Qmax (- ` c)
+       (Qmin (` c)
+             (approximate y (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c)))))))).
+      apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+      apply qbound_bound.
+      rewrite Qmult_comm.
+      apply (Qle_trans _ (Qabs (approximate y (Qmult_modulus c ((1 # 2) ↾ eq_refl * e1)) - approximate y (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c))) * `c)).
+      apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+      apply QboundAbs_contract.
+      apply (Qle_trans _ (((1#2)*`e1 / `c + (1#2)*`e2 / `c) * `c)).
+      apply Qmult_le_r. apply Qpos_ispos.
+      unfold Qmult_modulus.
+      pose proof (regFun_prf y ((1 # 2) * e1 * Qpos_inv c)%Qpos
+                             (Qpos_min e2 ((1 # 2) * e2 * Qpos_inv c)%Qpos)) as H4.
+      apply AbsSmall_Qabs in H4.
+      apply (Qle_trans _ _ _ H4). clear H4. apply Qplus_le_r.
+      rewrite Q_Qpos_min. simpl. apply Qmin_lb_r.
+      rewrite Qmult_plus_distr_l.
+      apply Qplus_le_compat.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+      unfold Qdiv. rewrite Qmult_comm, Qmult_assoc.
+      apply Qle_shift_div_r. apply Qpos_ispos.
+      rewrite Qmult_comm. apply Qle_refl.
+Qed.
+
+Lemma Qmult_uncurry_assoc : forall (i j k:Q) (b : Qpos),
+    Qabs i <= `b
+    -> Qabs j <= `b
+    -> Qabs k <= `b
+    -> Qabs (j*k) <= `b
+    -> Qabs (i*j) <= `b
+    -> Qmult_uncurry b (Qmult_uncurry b (i, j), k)
+      == Qmult_uncurry b (i, Qmult_uncurry b (j,k)).
+Proof.
+  intros. simpl.
+  apply Qabs_Qle_condition in H.
+  destruct H as [ilower iupper].
+  apply Qabs_Qle_condition in H0.
+  destruct H0 as [jlower jupper].
+  apply Qabs_Qle_condition in H1.
+  destruct H1 as [klower kupper].
+  apply Qabs_Qle_condition in H2.
+  destruct H2 as [jklower jkupper].
+  apply Qabs_Qle_condition in H3.
+  destruct H3 as [ijlower ijupper].
+  assert (forall a:Q, a <= `b -> Qmin (`b) a == a)%Q as elim_min.
+  { apply Qle_min_r. }
+  assert (forall a:Q, -(`b) <= a -> Qmax (-(`b)) a == a)%Q as elim_max.
+  { intros. apply Qle_max_r, H. }
+  rewrite (elim_min j jupper).
+  rewrite (elim_min i iupper).
+  rewrite (elim_min k kupper). 
+  rewrite (elim_max j jlower).
+  rewrite (elim_max i ilower).
+  rewrite (elim_max k klower).
+  rewrite (elim_min (j*k) jkupper).
+  rewrite (elim_min (i*j) ijupper).
+  rewrite (elim_max (j*k) jklower).
+  rewrite (elim_max (i*j) ijlower).
+  rewrite Qmult_assoc. reflexivity. 
+Qed.
+
+Lemma quarter_approx_le_abs_1 :
+  forall (x : CR) (q : Q),
+    Qabs (q - approximate x (Qpos2QposInf (1 # 4))) <= (3#4)
+    -> Qabs q <= ` (CR_b (1 ↾ eq_refl) x + 1 ↾ eq_refl)%Qpos.
+Proof.
+  intros. simpl.
+  apply (Qle_trans _ _ _ (Qabs_triangle_reverse _ _)) in H. 
+  apply (Qplus_le_l _ _ (-Qabs (approximate x (Qpos2QposInf (1#4))))).
+  apply (Qle_trans _ _ _ H). clear H q.
+  pose proof (regFun_prf x (1#4)%Qpos (1#1)%Qpos).
+  apply AbsSmall_Qabs in H. 
+  apply Qopp_le_compat in H. apply (Qplus_le_r _ _ (2#1)) in H.
+  setoid_replace (2 + - (` ((1 # 4) ↾ eq_refl) + ` (1 ↾ eq_refl)))
+    with (3#4) in H by reflexivity.
+  rewrite <- Qplus_assoc, <- Qplus_assoc, Qplus_comm, Qplus_assoc.
+  setoid_replace ((1#1)+(1#1)) with (2#1) by reflexivity.
+  apply (Qle_trans _ _ _ H). clear H.
+  rewrite <- Qplus_assoc. apply Qplus_le_r.
+  setoid_replace (- Qabs (approximate x (Qpos2QposInf (1 # 4)))
+                  + Qabs (approximate x (Qpos2QposInf (1#1))))%Q
+    with (- (Qabs (approximate x (Qpos2QposInf (1 # 4)))
+                  - Qabs (approximate x (Qpos2QposInf (1#1)))))
+    by (unfold equiv, stdlib_rationals.Q_eq; ring).
+  apply Qopp_le_compat, Qabs_triangle_reverse.
+Qed.
+
+Lemma QboundAbs_lowerBound_2 : forall (a b : Qpos) (c d : Q),
+    (- (`a * `b) <= QboundAbs a c * QboundAbs b d)%Q.
+Proof.
+  intros. apply (Qle_trans _ (-Qabs (QboundAbs a c * QboundAbs b d))).
+  apply Qopp_le_compat.
+  rewrite Qabs_Qmult. rewrite QboundAbs_abs, QboundAbs_abs.
+  apply (Qle_trans _ (`a * Qmin (Qabs d) (`b))).
+  apply Qmult_le_compat_r. apply Qmin_lb_r.
+  apply Qmin_glb. apply Qabs_nonneg. apply Qpos_nonneg.
+  apply Qmult_le_l. apply Qpos_ispos. apply Qmin_lb_r.
+  rewrite <- (Qopp_involutive (QboundAbs a c * QboundAbs b d)) at 2.
+  apply Qopp_le_compat. rewrite <- Qabs_opp.
+  apply Qle_Qabs.
+Qed.
+
+Lemma QboundAbs_upperBound_2 : forall (a b : Qpos) (c d : Q),
+    (QboundAbs a c * QboundAbs b d <= `a * `b)%Q.
+Proof.
+  intros. apply (Qle_trans _ _ _ (Qle_Qabs _)).
+  rewrite Qabs_Qmult. rewrite QboundAbs_abs, QboundAbs_abs.
+  apply (Qle_trans _ (`a * Qmin (Qabs d) (`b))).
+  apply Qmult_le_compat_r. apply Qmin_lb_r.
+  apply Qmin_glb. apply Qabs_nonneg. apply Qpos_nonneg.
+  apply Qmult_le_l. apply Qpos_ispos. apply Qmin_lb_r.
+Qed. 
+
+Lemma CR_b_lowerBound_2 : forall x y : CR,
+    ('(-proj1_sig ((CR_b (1#1) x) * CR_b (1#1) y)%Qpos)%Q <= x * y)%CR.
+Proof.
+  intros.
+  rewrite <- (CRboundAbs_Eq (CR_b (1#1) x)
+                           (CR_b_lowerBound (1#1) x) (CR_b_upperBound (1#1) x)) at 2.
+  unfold CRmult, ucFun2.
+  intros e. simpl. unfold Cap_raw; simpl.
+  unfold Cap_raw; simpl.
+  apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
+  unfold Qminus. rewrite <- Qle_minus_iff.
+  apply (QboundAbs_lowerBound_2 (CR_b (1#1) x) (CR_b (1#1) y)).
+Qed.
+
+Lemma CR_b_upperBound_2 : forall x y : CR,
+    (x * y <= 'proj1_sig ((CR_b (1#1) x) * CR_b (1#1) y)%Qpos)%CR.
+Proof.
+  intros.
+  rewrite <- (CRboundAbs_Eq (CR_b (1#1) x)
+                           (CR_b_lowerBound (1#1) x) (CR_b_upperBound (1#1) x)) at 1.
+  unfold CRmult, ucFun2.
+  intros e. simpl. unfold Cap_raw; simpl.
+  unfold Cap_raw; simpl.
+  apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
+  unfold Qminus. rewrite <- Qle_minus_iff.
+  apply (QboundAbs_upperBound_2 (CR_b (1#1) x) (CR_b (1#1) y)).
+Qed.
+
+Lemma CRle_Qle : forall (x y:Q), (inject_Q_CR x <= inject_Q_CR y)%CR <-> (x <= y)%Q.
+Proof.
+ split.
+  intros H.
+  destruct (Qlt_le_dec y x) as [X|X];[|assumption].
+  destruct (Qpos_sub _ _ X) as [c Hc].
+  assert (Y:=(H ((1#2)*c)%Qpos)).
+  simpl in Y.
+  unfold Cap_raw in Y; simpl in Y.
+  rewrite -> Qle_minus_iff in Y.
+  rewrite -> Hc in Y.
+  autorewrite with QposElim in Y.
+  ring_simplify in Y.
+  elim (Qle_not_lt _ _ Y).
+  rewrite -> Qlt_minus_iff.
+  ring_simplify.
+  apply Q.Qmult_lt_0_compat; auto with *.
+ intros H e.
+ simpl.
+ unfold Cap_raw; simpl.
+ rewrite -> Qle_minus_iff in H.
+ apply Qle_trans with (0%Q);[|assumption].
+ rewrite -> Qle_minus_iff; ring_simplify.
+ apply Qpos_nonneg.
+Qed.
+
+Lemma CRmult_assoc_yfactor_le
+  : forall (x y z : CR),
+    let b := ((CR_b (1#1) x + (1#1))
+            * (CR_b (1#1) y + (1#1)) * (CR_b (1#1) z + (1#1)))%Qpos in
+    (` (CR_b (1 ↾ eq_refl) y) + 1 <= ` b)%Q.
+Proof.
+  intros. unfold b. simpl.
+  rewrite <- Qmult_assoc, (Qmult_comm (Qabs (approximate y (Qpos2QposInf (1#1))) + 1 + 1)).
+  rewrite Qmult_assoc.
+  rewrite <- Qmult_1_l, <- Qmult_1_l.
+  rewrite Qmult_assoc.
+  apply Qmult_le_compat_r. 
+  apply (Qpos_mult_le_compat (1#1) (1#1)
+                             (CR_b (1#1) x + (1#1))
+                             (CR_b (1#1) z + (1#1))).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  rewrite <- Qplus_assoc. apply (Qle_trans _ (0+2)).
+  discriminate. apply Qplus_le_l. apply Qabs_nonneg.
+Qed.
+
+Lemma CRmult_assoc_xfactor_le
+  : forall (x y z : CR),
+    let b := ((CR_b (1#1) x + (1#1))
+            * (CR_b (1#1) y + (1#1)) * (CR_b (1#1) z + (1#1)))%Qpos in
+    (` (CR_b (1 ↾ eq_refl) x) + 1 <= ` b)%Q.
+Proof.
+  intros. unfold b. simpl.
+  rewrite <- Qmult_assoc, Qmult_comm.
+  rewrite <- Qmult_1_l, <- Qmult_1_l at 1.
+  rewrite Qmult_assoc.
+  apply Qmult_le_compat_r. 
+  apply (Qpos_mult_le_compat (1#1) (1#1)
+                             (CR_b (1#1) y + (1#1))
+                             (CR_b (1#1) z + (1#1))).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  rewrite <- Qplus_assoc. apply (Qle_trans _ (0+2)).
+  discriminate. apply Qplus_le_l. apply Qabs_nonneg.
+Qed.
+
+Lemma CRmult_assoc_zfactor_le
+  : forall (x y z : CR),
+    let b := ((CR_b (1#1) x + (1#1))
+            * (CR_b (1#1) y + (1#1)) * (CR_b (1#1) z + (1#1)))%Qpos in
+    (` (CR_b (1 ↾ eq_refl) z) + 1 <= ` b)%Q.
+Proof.
+  intros. rewrite <- Qmult_1_l, <- Qmult_1_l, Qmult_assoc.
+  apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+  apply (Qpos_mult_le_compat (1#1) (1#1)).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+Qed.
+
+(* Request bounds on all left factors : x, CRmult_bounded b x y, and y. *)
+Lemma CRmult_assoc_bounded (x y z : CR) :
+  let b := ((CR_b (1#1) x + (1#1))
+            * (CR_b (1#1) y + (1#1)) * (CR_b (1#1) z + (1#1)))%Qpos in
+  st_eq (CRmult_bounded b (CRmult_bounded b x y) z)
+        (CRmult_bounded b x (CRmult_bounded b y z)).
+Proof.
+  intros.
+  assert (' (- ` b)%Q <= x)%CR as xlower.
+  { apply (@CRle_trans _ (' (-proj1_sig (CR_b (1#1) x))%Q)).
+    2: apply (CR_b_lowerBound _ _).
+    apply CRle_Qle. apply Qopp_le_compat.
+    apply (Qle_trans _ ((` (CR_b (1#1)%Qpos x) + (1#1)))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    apply CRmult_assoc_xfactor_le. }
+  assert (x <= ' (` b)%Q)%CR as xupper. 
+  { apply (@CRle_trans _ (' (proj1_sig (CR_b (1#1) x))%Q)).
+    apply CR_b_upperBound.
+    apply CRle_Qle.
+    apply (Qle_trans _ ((` (CR_b (1#1)%Qpos x) + (1#1)))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    apply CRmult_assoc_xfactor_le. }
+  assert (' (- ` b)%Q <= y)%CR as ylower.
+  { apply (@CRle_trans _ (' (-proj1_sig (CR_b (1#1) y))%Q)).
+    2: apply (CR_b_lowerBound _ _).
+    apply CRle_Qle. apply Qopp_le_compat.
+    apply (Qle_trans _ ((` (CR_b (1#1)%Qpos y) + (1#1)))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    apply CRmult_assoc_yfactor_le. }
+  assert (y <= ' (` b)%Q)%CR as yupper. 
+  { apply (@CRle_trans _ (' (proj1_sig (CR_b (1#1) y))%Q)).
+    apply CR_b_upperBound.
+    apply CRle_Qle.
+    apply (Qle_trans _ ((` (CR_b (1#1)%Qpos y) + (1#1)))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    apply CRmult_assoc_yfactor_le. }
+  assert (` (CR_b (1 ↾ eq_refl) x + 1 ↾ eq_refl)%Qpos *
+          ` (CR_b (1 ↾ eq_refl) y + 1 ↾ eq_refl)%Qpos <= ` b) as xyfactor_le.
+  { rewrite <- Qmult_1_l.
+    unfold b. simpl.
+    rewrite (Qmult_comm ((Qabs (approximate x (Qpos2QposInf (1 ↾ eq_refl))) + 1 + 1) *
+                         (Qabs (approximate y (Qpos2QposInf (1 ↾ eq_refl))) + 1 + 1))).
+    apply Qmult_le_compat_r.
+    apply (Qle_trans _ (0+2)). discriminate.
+    rewrite <- Qplus_assoc.
+    apply Qplus_le_l, Qabs_nonneg.
+    apply Qmult_le_0_compat.
+    apply (Qle_trans _ (0+2)). discriminate.
+    rewrite <- Qplus_assoc.
+    apply Qplus_le_l, Qabs_nonneg.
+    apply (Qle_trans _ (0+2)). discriminate.
+    rewrite <- Qplus_assoc.
+    apply Qplus_le_l, Qabs_nonneg. }
+  rewrite CRmult_uncurry_eq_3r.
+  rewrite CRmult_uncurry_eq_3.
+  2: exact xlower. 2: exact xupper.
+  4: exact xlower. 4: exact xupper.
+  4: exact ylower. 4: exact yupper.
+  (* Qmult_uncurry is not associative everywhere,
+     so use Cmap_wd_loc. *)
+  apply Cmap_wd_loc with (e:=(1#4)%Qpos). intros [[i j] k].
+  intros H.
+  specialize (H (1#4)%Qpos (1#4)%Qpos).
+  destruct H,H. 
+  simpl in H1. simpl in H0.
+  apply (@Qmult_uncurry_assoc i j k b).
+  - clear H0 H1. simpl in H. apply AbsSmall_Qabs in H.
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos)).
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H by reflexivity.
+    apply quarter_approx_le_abs_1, H. clear H. 
+    apply CRmult_assoc_xfactor_le.
+  - clear H H0. 
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) y + (1#1))%Qpos)).
+    apply AbsSmall_Qabs in H1.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H1 by reflexivity.
+    apply quarter_approx_le_abs_1, H1. apply CRmult_assoc_yfactor_le.
+  - clear H H1. 
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) z + (1#1))%Qpos)).
+    apply AbsSmall_Qabs in H0.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H0 by reflexivity.
+    apply quarter_approx_le_abs_1, H0.
+    apply CRmult_assoc_zfactor_le.
+  - apply (Qle_trans _ (proj1_sig (CR_b (1#1) y + (1#1))%Qpos
+                        * proj1_sig (CR_b (1#1) z + (1#1))%Qpos)).
+    rewrite Qabs_Qmult.
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) y + (1#1))%Qpos * Qabs k)).
+    apply Qmult_le_compat_r.
+    apply AbsSmall_Qabs in H1.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H1 by reflexivity.
+    apply quarter_approx_le_abs_1, H1. apply Qabs_nonneg.
+    apply Qmult_le_l. apply Qpos_ispos.
+    apply AbsSmall_Qabs in H0.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H0 by reflexivity.
+    apply quarter_approx_le_abs_1, H0.
+    rewrite <- Qmult_1_l, Qmult_assoc.
+    apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+    apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+    simpl. rewrite <- Qplus_assoc.
+    apply (Qle_trans _ (0+2)). discriminate.
+    apply Qplus_le_l, Qabs_nonneg.
+  - apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos
+                        * proj1_sig (CR_b (1#1) y + (1#1))%Qpos)).
+    rewrite Qabs_Qmult.
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos * Qabs j)).
+    apply Qmult_le_compat_r.
+    simpl in H.
+    apply AbsSmall_Qabs in H.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H by reflexivity.
+    apply quarter_approx_le_abs_1, H. apply Qabs_nonneg.
+    apply Qmult_le_l. apply Qpos_ispos.
+    apply AbsSmall_Qabs in H1.
+    setoid_replace ((1#4)+(1#4)+(1#4)) with (3#4) in H1 by reflexivity.
+    apply quarter_approx_le_abs_1, H1.
+    exact xyfactor_le.
+  - rewrite (@CRmult_bounded_mult b).
+    2: exact ylower. 2: exact yupper.
+    apply (@CRle_trans _ ('(-proj1_sig ((CR_b (1#1) x) * CR_b (1#1) y)%Qpos)%Q)).
+    2: apply CR_b_lowerBound_2.
+    apply CRle_Qle, Qopp_le_compat.
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos
+                        * proj1_sig ((CR_b (1#1) y) + (1#1))%Qpos)).
+    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)
+                               (CR_b (1#1) x + (1#1)) (CR_b (1#1) y + (1#1))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    exact xyfactor_le.
+  - rewrite (@CRmult_bounded_mult b).
+    2: exact ylower. 2: exact yupper.
+    apply (@CRle_trans _ ('(proj1_sig ((CR_b (1#1) x) * CR_b (1#1) y)%Qpos)%Q)).
+    apply CR_b_upperBound_2.
+    apply CRle_Qle.
+    apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos
+                        * proj1_sig ((CR_b (1#1) y) + (1#1))%Qpos)).
+    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)
+                               (CR_b (1#1) x + (1#1)) (CR_b (1#1) y + (1#1))).
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
+    exact xyfactor_le.
+Qed.
+

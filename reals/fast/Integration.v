@@ -669,12 +669,9 @@ Proof.
      rewrite <- Qplus_assoc, Qplus_opp_r, Qplus_0_r; reflexivity. 
  revert a b Hab0 ba Hba F Hab HF Hf Hs.
  induction s using StepF_ind; intros a b Hab0 ba Hba F Hab HF Hf Hs.
- change (AbsSmall (R:=CRasCOrdField) (' proj1_sig (ba*e)%Qpos)%CR
-                  (IRasCR (integral _ _ Hab F HF)[-]
-    ('((b-a)*(approximate (f x) ((1 # 2) * e)%Qpos))%Q)%CR)).
-  rewrite -> CRAbsSmall_ball.
-  rewrite <- IR_inj_Q_as_CR.
-  rewrite <- CRAbsSmall_ball.
+ - change (IntegralQ (dist_raw (constStepF (uc_stdFun f) <@^ x) ((1 # 2) * e)%Qpos))
+   with (approximate (f x) ((1 # 2) * e)%Qpos).
+  rewrite <- (IR_inj_Q_as_CR ((b - a) * approximate (f x) ((1 # 2) * e)%Qpos)).
   unfold cg_minus.
   simpl.
   eapply AbsSmall_wdr;[|apply IR_minus_as_CR].
@@ -689,8 +686,8 @@ Proof.
    rewrite -> IR_AbsSmall_as_CR.
    unfold e'.
    apply AbsSmall_wdr with (IRasCR (F y Hyf)[-]IRasCR a0)%CR;[|apply eq_symmetric; apply IR_minus_as_CR].
-   eapply AbsSmall_wdl;[|apply eq_symmetric; apply IR_inj_Q_as_CR].
-   rewrite -> CRAbsSmall_ball.
+   rewrite IR_inj_Q_as_CR.
+   apply CRAbsSmall_ball.
    unfold a0; rewrite -> IR_inj_Q_as_CR.
    assert (X0:(forall (q : Q) (Hq : Dom F (inj_Q IR q)), clcr (inj_Q IR a) (inj_Q IR b) (inj_Q IR q) ->
      (Cbind QPrelengthSpace f (' q) == IRasCR (F (inj_Q IR q) Hq))%CR)).
@@ -791,12 +788,12 @@ Proof.
    apply: inj_Q_wd;simpl.
    rewrite Hba. ring.
   apply eq_symmetric; apply inj_Q_mult.
- set (z:=(IntegralQ (glue o (Map (fun z : RegularFunction Q_as_MetricSpace =>
+ - set (z:=(IntegralQ (glue o (Map (fun z : RegularFunction Q_as_MetricSpace =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s1):StepQ) (Map
      (fun z : RegularFunction Q_as_MetricSpace => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
- change (AbsSmall (R:=CRasCOrdField) ('proj1_sig (ba* e)%Qpos)%CR
-   (IRasCR (integral _ _ Hab F HF)[-]'((b-a)*z)%Q)%CR).
- rewrite -> CRAbsSmall_ball.
+   change (IntegralQ (dist_raw (uc_stdFun f ^@> glue o s1 s2) ((1 # 2) * e)%Qpos))
+     with z.
+   apply CRAbsSmall_ball.
  set (c:=(affineCombo (OpenUnitDual o) a b:Q)).
  assert (Hac:inj_Q IR a[<=]inj_Q IR c).
   unfold c.

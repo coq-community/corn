@@ -609,15 +609,16 @@ Qed.
 
 Lemma InfiniteGeometricSum_bound : forall series
  (Gs:GeometricSeries series),
- AbsSmall (R:=CRasCOrdField) ('(err_bound series))%CR (InfiniteGeometricSum Gs).
+    (-'(err_bound series) <= InfiniteGeometricSum Gs
+     /\ InfiniteGeometricSum Gs <= '(err_bound series))%CR.
 Proof.
  intros series Gs.
  assert (Y:0 < 1 - a).
-  change (0 < 1 + - a).
+ { change (0 < 1 + - a).
   rewrite <- Qlt_minus_iff.
-  assumption.
+  assumption. }
  destruct (Qeq_dec (err_bound series) 0) as [Hq|Hq].
-  stepr 0%CR.
+ - stepr 0%CR.
    split; simpl; rewrite -> Hq; try apply CRle_refl.
    setoid_replace (-0)%CR with 0%CR by (simpl; ring).
    apply CRle_refl.
@@ -645,8 +646,8 @@ Proof.
   rewrite InfiniteSum_raw_N_Psucc.
   unfold InfiniteSum_raw_F.
   destruct (err_prop (proj1_sig e) series); try contradiction; reflexivity.
- assert (Herr:0 < err_bound series).
-  unfold err_bound.
+ - assert (Herr:0 < err_bound series).
+   { unfold err_bound.
   apply Qlt_shift_div_l.
    assumption.
   ring_simplify.
@@ -656,15 +657,18 @@ Proof.
   elim Hq.
   unfold err_bound.
   rewrite <- H.
-  field; auto with *.
+  unfold Qdiv. apply Qmult_0_l. }
  set (e:=exist _ _ Herr).
- cut (AbsSmall (R:=CRasCOrdField) (' proj1_sig e)%CR (InfiniteGeometricSum Gs)).
-  intros [H0 H1].
+   cut (-(' proj1_sig e) <= InfiniteGeometricSum Gs
+       /\ InfiniteGeometricSum Gs <= 'proj1_sig e)%CR.
+  + intros [H0 H1].
   unfold e in *.
   split; assumption.
- stepr (InfiniteGeometricSum Gs[-]0)%CR; [| now (unfold cg_minus; simpl; ring)].
- rewrite -> CRAbsSmall_ball.
- apply: regFunBall_e.
+  + setoid_replace (InfiniteGeometricSum Gs)
+      with (InfiniteGeometricSum Gs[-]0)%CR
+      by (unfold cg_minus; simpl; ring).
+ apply CRAbsSmall_ball.
+ apply regFunBall_e.
  intros d.
  simpl.
  set (p:=(InfiniteGeometricSum_maxIter series d)).

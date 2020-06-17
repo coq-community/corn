@@ -157,6 +157,16 @@ Definition Qpos_ceiling (q: Qpos): positive :=
   | Zpos p => p
   | _ => 1%positive (* impossible *)
   end.
+Lemma Qpos_mult_le_compat : forall (a b c d : Qpos),
+    proj1_sig a <= proj1_sig c
+    -> proj1_sig b <= proj1_sig d
+    -> proj1_sig a * proj1_sig b <= proj1_sig c * proj1_sig d.
+Proof.
+  intros. apply (Qle_trans _ (proj1_sig c * proj1_sig b)).
+  apply Qmult_le_compat_r. exact H. apply Qpos_nonneg.
+  rewrite Qmult_comm. rewrite (Qmult_comm (proj1_sig c)).
+  apply Qmult_le_compat_r. exact H0. apply Qpos_nonneg.
+Qed.
 
 
 (**

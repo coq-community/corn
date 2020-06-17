@@ -243,7 +243,8 @@ Section uc_curry.
    apply Qpos_nonneg.
   Qed.
 
-  Definition uc_curry_help (a: A): B --> C := Build_UniformlyContinuousFunction (uc_curry_help_prf a).
+  Definition uc_curry_help (a: A): B --> C
+    := Build_UniformlyContinuousFunction (uc_curry_help_prf a).
 
   Definition uc_curry_prf: is_UniformlyContinuousFunction uc_curry_help (mu f).
   Proof with auto.
@@ -255,7 +256,8 @@ Section uc_curry.
    apply Qpos_nonneg.
   Qed.
 
-  Definition uc_curry: A --> B --> C := Build_UniformlyContinuousFunction uc_curry_prf.
+  Definition uc_curry: A --> B --> C
+    := Build_UniformlyContinuousFunction uc_curry_prf.
 
 End uc_curry.
 
@@ -272,11 +274,14 @@ Section completion_distributes.
 
   Context {X Y: MetricSpace}.
 
-  Program Definition distrib_Complete (xy: Complete (ProductMS X Y)): ProductMS (Complete X) (Complete Y) :=
-   (@Build_RegularFunction _ (fun e => fst (approximate xy e)) _, @Build_RegularFunction _ (fun e => snd (approximate xy e)) _).
-
-  Next Obligation. repeat intro. apply xy. Qed.
-  Next Obligation. repeat intro. apply xy. Qed.
+  Definition distrib_Complete (xy: Complete (ProductMS X Y))
+    : ProductMS (Complete X) (Complete Y).
+  Proof.
+    refine (@Build_RegularFunction _ (fun e => fst (approximate xy e)) _,
+            @Build_RegularFunction _ (fun e => snd (approximate xy e)) _).
+    intros e1 e2. apply xy.
+    intros e1 e2. apply xy.
+  Defined.
 
   Lemma distrib_Complete_uc_prf: is_UniformlyContinuousFunction distrib_Complete (fun e => e).
   Proof.
@@ -287,10 +292,15 @@ Section completion_distributes.
   Definition distrib_Complete_uc: Complete (ProductMS X Y) --> ProductMS (Complete X) (Complete Y) :=
     Build_UniformlyContinuousFunction distrib_Complete_uc_prf.
 
-  Program Definition undistrib_Complete (xy: ProductMS (Complete X) (Complete Y)): Complete (ProductMS X Y) :=
-   @Build_RegularFunction _ (fun e => (approximate (fst xy) e, approximate (snd xy) e)) _.
-
-  Next Obligation. split. apply r. apply r0. Qed.
+  Definition undistrib_Complete (xy: ProductMS (Complete X) (Complete Y))
+    : Complete (ProductMS X Y).
+  Proof.
+    refine (@Build_RegularFunction
+             (ProductMS X Y)
+             (fun e => (approximate (fst xy) e, approximate (snd xy) e)) _).
+    intros e1 e2.
+    split. apply (regFun_prf (fst (xy))). apply (regFun_prf (snd (xy))).
+  Defined. 
 
   Lemma undistrib_Complete_uc_prf: is_UniformlyContinuousFunction undistrib_Complete (fun e => e).
   Proof.
@@ -337,3 +347,103 @@ Section diag.
  
  Definition diag: X --> (ProductMS X X) := Build_UniformlyContinuousFunction diag_uc.
 End diag.
+
+(* The curried and non-curried ways of lifting a function of 2 variables
+   into the completed spaces are equal. *)
+Lemma Cmap2_curry
+  : forall (A B C: MetricSpace)
+      (Apl : PrelengthSpace A) (Bpl : PrelengthSpace B)
+      (f : ProductMS A B --> C) (a : Complete A) (b : Complete B),
+    @st_eq (Complete C)
+           (Cmap2 Apl Bpl (uc_curry f) a b)
+           (uc_compose (Cmap (ProductMS_prelength Apl Bpl) f)
+                       undistrib_Complete_uc (a,b)).
+Proof.
+  intros. intros e1 e2. 
+  assert ((1#2)*proj1_sig e1 + proj1_sig e2 <= proj1_sig e1 + proj1_sig e2).
+  { apply Qplus_le_l.
+    rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
+    apply Qmult_le_r. apply Qpos_ispos. discriminate. }
+  apply (ball_weak_le _ _ _ H).
+  apply (mu_sum (ProductMS_prelength Apl Bpl) e2 (((1#2)*e1)%Qpos :: nil) f).
+  simpl. clear H.
+  destruct (mu f (exist (Qlt 0) (1#2) (@eq_refl comparison Lt) * e1)).
+  2: reflexivity.
+  destruct (mu f e2). 2: reflexivity. split; apply regFun_prf.
+Qed.
+
+Definition uc_flip (X Y : MetricSpace) : ProductMS X Y --> ProductMS Y X.
+Proof.
+  apply (@Build_UniformlyContinuousFunction
+            (ProductMS X Y) (ProductMS Y X)
+            (fun xy => pair (snd xy) (fst xy)) (fun e => e)).
+  intros e a b H. simpl. split; apply H.
+Defined.
+
+Definition uc_assoc (X Y Z : MetricSpace)
+  : ProductMS (ProductMS X Y) Z --> ProductMS X (ProductMS Y Z).
+Proof.
+  apply (@Build_UniformlyContinuousFunction
+            (ProductMS (ProductMS X Y) Z) (ProductMS X (ProductMS Y Z))
+            (fun xyz => pair (fst (fst xyz)) (pair (snd (fst xyz)) (snd xyz)))
+            (fun e => e)).
+  intros e a b H. simpl. split.
+  - simpl. destruct H, H. exact H.
+  - simpl. destruct H, H. split; assumption.
+Defined.
+
+Lemma uc_pair_prf : 
+  forall (A B C D : MetricSpace)
+    (f : A --> B) (g : C --> D), 
+    @is_UniformlyContinuousFunction
+      (ProductMS A C) (ProductMS B D)
+      (λ ac : ProductMS A C, (f (fst ac), g (snd ac)))
+      (λ e : Qpos, QposInf_min (mu f e) (mu g e)).
+Proof.
+  intros. intros e x y H. split.
+  - simpl. apply (uc_prf f).
+    destruct (mu f e). 2: reflexivity. 
+    apply (ball_ex_weak_le _ (QposInf_min q (mu g e))).
+    simpl. destruct (mu g e). apply Qpos_min_lb_l.
+    apply Qle_refl. simpl. destruct (mu g e).
+    apply H. apply H.
+  - simpl. apply (uc_prf g).
+    destruct (mu g e). 2: reflexivity. 
+    apply (ball_ex_weak_le _ (QposInf_min (mu f e) q)).
+    destruct (mu f e). simpl. apply Qpos_min_lb_r.
+    apply Qle_refl. destruct (mu f e).
+    apply H. apply H.
+Qed.
+
+Definition uc_pair (A B C D : MetricSpace)
+           (f : A --> B) (g : C --> D) : ProductMS A C --> ProductMS B D
+  := Build_UniformlyContinuousFunction (uc_pair_prf f g).
+  
+Definition uc_complete_curry {X Y Z : MetricSpace}
+           (f : Complete (ProductMS X Y) --> Z)
+  : Complete X --> Complete Y --> Z
+  := uc_curry (uc_compose f undistrib_Complete_uc).
+
+Lemma Cmap2_comm
+  : forall (X Y : MetricSpace) (Xpl : PrelengthSpace X)
+      (f : ProductMS X X --> Y),
+    (forall a b :X, st_eq (f (a,b)) (f (b,a)))
+    -> forall (a b:Complete X),
+      @st_eq (Complete Y)
+             (uc_complete_curry (Cmap (ProductMS_prelength Xpl Xpl) f) a b)
+             (uc_complete_curry (Cmap (ProductMS_prelength Xpl Xpl) f) b a).
+Proof.
+  intros.
+  assert (ucEq (Cmap (ProductMS_prelength Xpl Xpl) f)
+               (Cmap (ProductMS_prelength Xpl Xpl)
+                     (uc_compose f (uc_flip X X)))).
+  { intro x. apply Cmap_wd.
+    intros xy. simpl. rewrite H. destruct xy. reflexivity. reflexivity. }
+  specialize (H0 (undistrib_Complete (a,b))).
+  simpl in H0. simpl. intros e1 e2. specialize (H0 e1 e2).
+  simpl. simpl in H0.
+  assert (forall x, eq (QposInf_bind (λ e : Qpos, e) x) x).
+  { intro x. destruct x;reflexivity. }
+  rewrite H1 in H0. apply H0.
+Qed.
+

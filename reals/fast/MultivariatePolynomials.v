@@ -1050,7 +1050,7 @@ Proof.
    apply mult_resp_leEq_rht; auto.
    simpl. apply CRle_Qle, Qpos_nonneg.
   apply mult_resp_AbsSmall; auto.
-  rewrite -> CRAbsSmall_ball.
+  apply CRAbsSmall_ball.
   auto.
  intros x Hx0 Hx1.
  change (n_Function_ball01 n (proj1_sig e) (MVP_CR_apply _ (MVP_C_ _ _ c[*]q1) ! (MVP_C_ _ _ x))
@@ -1194,7 +1194,7 @@ Proof.
     rewrite -> CRabs_pos; auto.
     apply mult_resp_AbsSmall;auto.
     rewrite Hq in Hxy.
-    rewrite -> CRAbsSmall_ball.
+    apply CRAbsSmall_ball.
     auto.
    rewrite -> CRabs_neg; auto.
    rstepr (([--]p)[*](y[-]x)).
@@ -1203,7 +1203,7 @@ Proof.
     apply inv_resp_leEq.
     auto.
    rewrite Hq in Hxy.
-   rewrite -> CRAbsSmall_ball.
+   apply CRAbsSmall_ball.
    apply ball_sym.
    apply Hxy.
   intros Hq.
@@ -1464,13 +1464,12 @@ Proof.
   rewrite -> Qmax_min_distr_r.
   apply Qmin_case.
    intros _.
-   eapply leEq_transitive with (1[-]1)%CR.
-    apply minus_resp_leEq.
-    auto.
-   rstepl ([0]:CR).
-   change (0<='proj1_sig d)%CR.
+   apply (@CRle_trans _ (1-1)%CR).
+   apply (CRplus_le_r x 1%CR (CRopp 1%CR)).
+    assumption.
+    rewrite CRplus_opp.
    rewrite -> CRle_Qle.
-   auto with *.
+   exact (Qpos_nonneg d).
   intros H.
   eapply leEq_transitive;[|apply Z1].
   apply minus_resp_leEq_rht.

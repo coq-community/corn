@@ -421,7 +421,7 @@ Qed.
 (** If two functions between complete metric spaces are equal on the images
 of [Cunit], then they are equal everywhere *)
 
-Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Complete Y) :
+Lemma lift_eq_complete {X Y : MetricSpace} (f g : Complete X --> Y) :
   (forall x : X, st_eq (f (Cunit x)) (g (Cunit x)))
   -> (forall x : Complete X, st_eq (f x) (g x)).
 Proof.
@@ -437,6 +437,33 @@ apply ball_triangle with (b := f (Cunit (approximate x d))).
   apply (UniformContinuity.uc_prf g).
   apply (ball_ex_weak_le _ d); [apply QposInf_min_lb_r | apply ball_ex_approx_l].
 Qed.
+
+Lemma lift_eq_complete_2
+  : forall (A B C: MetricSpace)
+      (f g : Complete A --> Complete B --> C),
+    (forall a b, st_eq (f (Cunit a) (Cunit b)) (g (Cunit a) (Cunit b)))
+    -> (forall a b, st_eq (f a b) (g a b)).
+Proof.
+  intros A B C f g H a.
+  apply lift_eq_complete.
+  intro b.
+  revert a.
+  assert (@is_UniformlyContinuousFunction
+            (Complete A) C
+            (fun a => f a (Cunit b)) (mu f)).
+  { intros e x y H0.
+    apply (uc_prf f e x y H0). }
+  assert (@is_UniformlyContinuousFunction
+            (Complete A) C
+            (fun a => g a (Cunit b)) (mu g)).
+  { intros e x y H1.
+    apply (uc_prf g e x y H1). }
+  apply (@lift_eq_complete
+           A C (Build_UniformlyContinuousFunction H0)
+           (Build_UniformlyContinuousFunction H1)).
+  simpl. intro a. apply H.
+Qed.
+
 
 Section Faster.
 
@@ -586,7 +613,7 @@ given later.  But first the most generic version that we call
 [Cmap_slow]. *)
 
 Definition Cmap_slow_raw (x:Complete X) (e:QposInf) :=
-  f (approximate x (QposInf_mult (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl))
+  f (approximate x (QposInf_mult (Qpos2QposInf (1#2)%Qpos)
                                  (QposInf_bind (mu f) e))).
 
 Lemma Cmap_slow_raw_strongInf
@@ -1087,16 +1114,74 @@ Qed.
 
 End Strong_Monad.
 
+Lemma Cmap_slow_wd_loc
+  : forall (X Y : MetricSpace) 
+      (f g : X --> Y) (x : Complete X) (e : Qpos),
+    (forall a : X, ball (proj1_sig e) (Cunit a) x -> st_eq (f a) (g a)) ->
+    @st_eq _ (Cmap_slow_fun f x) (Cmap_slow_fun g x).
+Proof.
+  intros. intros e1 e2. simpl.
+  unfold Cmap_slow_raw; simpl.
+  pose (QposInf_min (Qpos2QposInf (1#2)*(mu g e2))
+                    (QposInf_min (Qpos2QposInf (1#2)*(mu f e1)) e)) as d.
+  apply (ball_triangle _ (proj1_sig e1) (proj1_sig e2) _
+           (f (approximate x d))).
+  - apply (uc_prf f).
+    destruct (mu f e1). 2: reflexivity.
+    simpl.
+    destruct d eqn:des.
+    assert (Qle (proj1_sig q0) ((1 # 2) * proj1_sig q)).
+    { pose proof (QposInf_min_lb_r (Qpos2QposInf (1 # 2) * mu g e2)
+                                   (QposInf_min (Qpos2QposInf (1 # 2) * q) e)).
+      subst d. rewrite des in H0. simpl in H0.
+      apply (Qle_trans _ _ _ H0), Qpos_min_lb_l. }
+    apply (Qplus_le_l _ _ ((1#2)*proj1_sig q)) in H0.
+    ring_simplify in H0. rewrite Qplus_comm in H0.
+    apply (ball_weak_le _ _ _ H0).
+    apply (regFun_prf x ((1#2)*q)%Qpos q0).
+    exfalso. subst d.
+    destruct (mu g e2); discriminate.
+  - rewrite H.
+    + apply (uc_prf g).
+      destruct (mu g e2). 2: reflexivity.
+      simpl. destruct d eqn:des.
+      assert (Qle (proj1_sig q0) ((1 # 2) * proj1_sig q)).
+      { pose proof (QposInf_min_lb_l (Qpos2QposInf (1 # 2) * q)
+                                     (QposInf_min (Qpos2QposInf (1 # 2) * mu f e1) e)).
+        subst d. rewrite des in H0. exact H0. } 
+      apply (Qplus_le_l _ _ ((1#2)*proj1_sig q)) in H0.
+      ring_simplify in H0.
+      apply (ball_weak_le _ _ _ H0).
+      apply (regFun_prf x q0 ((1#2)*q)%Qpos).
+      exfalso. subst d.
+      destruct (mu f e1); discriminate.
+    + destruct d eqn:des.
+      assert (proj1_sig q <= proj1_sig e).
+      { destruct (Qpos2QposInf (1 # 2) * mu g e2)%QposInf.
+        destruct (Qpos2QposInf (1 # 2) * mu f e1)%QposInf.
+        simpl in d. subst d. inversion des. 
+        apply (Qle_trans _ (proj1_sig (Qpos_min q1 e))).
+        apply Qpos_min_lb_r. apply Qpos_min_lb_r.
+        subst d. simpl in des. inversion des.
+        apply Qpos_min_lb_r.
+        simpl in d. subst d. destruct (mu f e1).
+        simpl in des. inversion des. apply Qpos_min_lb_r.
+        simpl in des. inversion des. apply Qle_refl. }
+      apply (ball_weak_le _ _ _ H0). apply ball_approx_l.
+      exfalso. destruct (mu g e2), (mu f e1); discriminate.
+Qed.
+
 (* begin hide *)
 Opaque Complete.
 
-Add Parametric Morphism X Y : (@Cmap_slow_fun X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cmap_slow_wd.
+Add Parametric Morphism X Y : (@Cmap_slow_fun X Y)
+    with signature (@ucEq _ _) ==> (@st_eq _) ==> (@st_eq _) as Cmap_slow_wd.
 Proof.
- intros x1 x2 Hx y1 y2 Hy.
- transitivity (Cmap_slow_fun x1 y2).
-  apply (@uc_wd _ _ (Cmap_slow x1) _ _ Hy).
- generalize y2.
- now apply (@uc_wd _ _ (Cmap_strong_slow X Y)).
+ intros f g Hfg x1 x2 Hy.
+ transitivity (Cmap_slow_fun f x2).
+  apply (@uc_wd _ _ (Cmap_slow f) _ _ Hy).
+ generalize x2.
+ apply (@uc_wd (X --> Y) (Complete X --> Complete Y) (Cmap_strong_slow X Y) _ _ Hfg).
 Qed.
 
 Add Parametric Morphism X Y : (@Cap_weak_slow X Y) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_slow_wd.
