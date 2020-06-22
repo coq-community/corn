@@ -339,7 +339,7 @@ Proof with auto with qarith.
   apply (order_reflecting (cast AR CR)).
   rewrite ARtoCR_inject.
   transitivity (cast Q CR (cast Qpos Q y)); trivial.
-  apply CRArith.CRle_Qle...
+  apply CRle_Qle...
 Defined.
 
 Lemma ARpos_wd : ∀ x1 x2, x1 = x2 → ARpos x1 → ARpos x2.

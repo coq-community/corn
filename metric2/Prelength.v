@@ -133,9 +133,9 @@ Qed.
 
 Variable Y:MetricSpace.
 
-(** The major applicaiton of prelength spaces is that it allows one to
+(** The major application of prelength spaces is that it allows one to
 reduce the problem of [ball (e1 + e2) (f a) (f b)] to
-[ball (mu f e1 + mu f e2) a b] instead of reduceing it to
+[ball (mu f e1 + mu f e2) a b] instead of reducing it to
 [ball (mu f (e1 + e2)) a b].  This new reduction allows one to continue
 reasoning by making use of the triangle law.
 
@@ -520,7 +520,9 @@ Proof.
 Qed.
 
 (* begin hide *)
-Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cmap_wd.
+Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX)
+    with signature (@ucEq _ _) ==> (@st_eq (Complete X)) ==> (@st_eq (Complete Y))
+      as Cmap_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
  change (st_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
@@ -529,6 +531,17 @@ Proof.
  rewrite -> Cmap_fun_correct.
  apply Cmap_slow_wd; auto.
 Qed.
+
+Lemma Cmap_wd_loc
+  : forall (X Y : MetricSpace) (plX : PrelengthSpace X)
+      (f g : X --> Y) (x : Complete X) (e : Qpos),
+    (forall a : X, ball (proj1_sig e) (Cunit a) x -> st_eq (f a) (g a)) ->
+    st_eq (Cmap_fun plX f x) (Cmap_fun plX g x).
+Proof.
+  intros. rewrite Cmap_fun_correct.
+  rewrite Cmap_fun_correct.
+  apply Cmap_slow_wd_loc with (e:=e). exact H.
+Qed. 
 
 Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_wd.
 Proof.
@@ -548,7 +561,10 @@ Qed.
 (* end hide *)
 
 (** Similarly we define a new [Cmap2]. *)
-Definition Cmap2 (X Y Z:MetricSpace) (Xpl : PrelengthSpace X) (Ypl : PrelengthSpace Y) f := uc_compose (@Cap Y Z Ypl) (Cmap Xpl f).
+Definition Cmap2 (X Y Z:MetricSpace)
+           (Xpl : PrelengthSpace X) (Ypl : PrelengthSpace Y)
+           (f : X --> Y --> Z) : Complete X --> Complete Y --> Complete Z
+  := uc_compose (@Cap Y Z Ypl) (Cmap Xpl f).
 
 (** Completion of a metric space preserves the prelength property.
 In fact the completion of a prelenght space is a length space, but

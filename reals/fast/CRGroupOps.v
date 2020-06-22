@@ -92,50 +92,12 @@ Qed.
 Definition Qplus_uc : Q_as_MetricSpace --> Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qplus_uc_prf.
 
-(*
-(** Having Qplus_uc of this type does not show that it is uniformly continuous in both arguments, so
-we show that separately: *)
-
-Instance uncurried_Qplus_mu: UniformlyContinuous_mu (uncurry Qplus)
-  := { uc_mu := fun e => ((1#2) * e)%Qpos }.
-
-Instance: MetricSpaceBall Q := genball Qball.
-Instance: MetricSpaceClass Q := class_from_MetricSpace Q_as_MetricSpace.
-
-Notation QQ := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
-
-(*Definition uncurried_Qplus_uc: QQ --> Q_as_MetricSpace
-  := @wrap_uc_fun' QQ Q_as_MetricSpace (uncurry Qplus) _ _.*)
-    (* The curried version could easily be derived from this one, but that would
-     probably break lots of code. *)
-
-(* Because [ucFun2 Qplus_uc] reduces to [Qplus], we immediately get continuity
- of [uncurry (ucFun2 Qplus_uc)] as well: *)
-
-(*Goal UniformlyContinuous (uncurry (ucFun2 Qplus_uc)).
-Proof. apply _. Qed.*)
-*)
 
 (** Finally, CRplus: *)
 
 Definition CRplus_uc : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qplus_uc.
 Instance CRplus: Plus CR := ucFun2 CRplus_uc.
 Notation "x + y" := (ucFun2 CRplus_uc x y) : CR_scope.
-
-(** But here, too having CRplus as a CR-->CR-->CR does not show that it is uniformly continuous
- in both arguments. This time we can get the uncurried version just by lifting the uncurried uniformly
- continuous Qplus: *)
-
-Local Notation CRCR := (ProductMS CR CR).
-
-(*Definition uncurried_CRplus: CRCR --> CR :=
-  Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace) uncurried_Qplus_uc
-  ∘ undistrib_Complete_uc.*)
-
-(** Uniform continuity of the uncurried original then follows from extentionality: *)
-
-(** To show that this actually works, we can now write lambdas that use CRplus
- and automatically have them be proven to be uniformly continuous: *)
 
 Lemma CRplus_translate : forall (a:Q) (y:CR), (' a + y == translate a y)%CR.
 Proof.
@@ -710,4 +672,41 @@ Proof.
  - apply (Qle_trans _ (- ((1 # 2) * ` e))).
    destruct e; simpl; ring_simplify; apply Qle_refl.
    apply Qmin_case;intro;assumption.
+Qed.
+
+(* Non-curried equivalent version of addition. *)
+
+Lemma Qplus_uc_uncurry : is_UniformlyContinuousFunction
+                           (fun ab : ProductMS Q_as_MetricSpace
+                                             Q_as_MetricSpace
+                            => fst ab + snd ab)
+                           (fun e => (1#2)*e)%Qpos.
+Proof.
+  intros e1 [a b] [c d] [H H0]. simpl.
+  simpl in H, H0. apply AbsSmall_Qabs.
+  setoid_replace (a + b - (c + d))%Q
+    with (a - c + (b - d))
+    by (unfold equiv, stdlib_rationals.Q_eq; ring).
+  apply (Qle_trans _ _ _ (Qabs_triangle _ _)).
+  apply (Qle_trans _ ((1#2)*`e1 + (1#2)*`e1)).
+  apply Qplus_le_compat.
+  - apply AbsSmall_Qabs in H. apply H.
+  - apply AbsSmall_Qabs in H0. apply H0.
+  - ring_simplify. apply Qle_refl.
+Qed.
+
+Definition Qplus_uncurry
+  : ProductMS Q_as_MetricSpace Q_as_MetricSpace --> Q_as_MetricSpace
+  := Build_UniformlyContinuousFunction Qplus_uc_uncurry.
+
+Lemma CRplus_uncurry_eq : forall x y : CR,
+    st_eq (CRplus x y)
+          (Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                Qplus_uncurry (undistrib_Complete (x,y))).
+Proof.
+  intros x y. unfold CRplus, ucFun2, CRplus_uc. 
+  transitivity (Cmap2 QPrelengthSpace QPrelengthSpace (uc_curry Qplus_uncurry) x y).
+  2: apply Cmap2_curry.
+  apply Cap_wd. 2: reflexivity.
+  apply Cmap_wd. 2: reflexivity. intros a b. reflexivity.
 Qed.
