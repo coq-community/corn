@@ -23,12 +23,10 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.Program.Program.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
 Require Import CoRN.metric2.Limit.
 Require Import Coq.QArith.Qabs. 
-Require Import CoRN.tactics.CornTac.
 Require Import Coq.Arith.Arith.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import Coq.QArith.Qpower.
@@ -73,22 +71,24 @@ Proof.
 Defined.
 
 (** [mult_Streams] preserves convergeing to 0. *)
-Lemma mult_Streams_nbz : forall {s1 s2 : Stream Q} {x}, (NearBy 0 x s1) -> forall {y}, NearBy 0 y s2 ->
- NearBy 0 (x*y) (mult_Streams s1 s2).
+Lemma mult_Streams_nbz : forall {s1 s2 : Stream Q} {x},
+    (NearBy 0 x s1)
+    -> forall {y}, NearBy 0 y s2
+             -> NearBy 0 (x*y) (mult_Streams s1 s2).
 Proof.
  unfold NearBy.
  cofix mult_Streams_nbz.
  intros s1 s2 x [Ha0 Hs1] y [Hb0 Hs2].
- constructor;[|apply (mult_Streams_nbz (tl s1) (tl s2)); assumption].
+ constructor.
+ 2: apply (mult_Streams_nbz (CoqStreams.tl s1) (CoqStreams.tl s2)); assumption.
  destruct x as [x|];[|constructor].
  destruct y as [y|];[|constructor].
  simpl.
  unfold Qball.
  unfold QAbsSmall.
- setoid_replace ((hd s1 * hd s2)%mc - 0)%Q
-   with ((hd s1 - 0) * (hd s2 - 0)). 
- autorewrite with QposElim.
- apply mult_AbsSmall; assumption.
+ setoid_replace ((CoqStreams.hd s1 * CoqStreams.hd s2)%mc - 0)%Q
+   with ((CoqStreams.hd s1 - 0) * (CoqStreams.hd s2 - 0)). 
+ apply Qmult_AbsSmall; assumption.
  ring_simplify. reflexivity.
 Qed.
 
@@ -118,7 +118,8 @@ Defined.
 *** [StreamBounds]
 [StreamBounds] says that one stream pointwise bounds the absolute value
 of the other. *)
-Definition StreamBounds (a b : Stream Q) := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(hd x) in QAbsSmall a b) (zipWith (@pair _ _) a b).
+Definition StreamBounds (a b : Stream Q)
+  := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(CoqStreams.hd x) in QAbsSmall a b) (zipWith (@pair _ _) a b).
 
 (** If the bounding stream goes to 0, so does the bounded stream. *)
 Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.
@@ -131,18 +132,18 @@ Proof.
   destruct Ha as [[Ha1 Ha2] _].
   simpl in *.
   split.
-   apply Qle_trans with (-(hd a -0)).
+   apply Qle_trans with (-(CoqStreams.hd a -0)).
     apply Qopp_le_compat.
     assumption.
    ring_simplify.
    assumption.
-  apply Qle_trans with (hd a - 0).
+  apply Qle_trans with (CoqStreams.hd a - 0).
    ring_simplify.
    assumption.
   assumption.
  eapply Stream_Bound_nbz.
   destruct Hb as [_ Hb].
-  change (StreamBounds (tl a) (tl b)) in Hb.
+  change (StreamBounds (CoqStreams.tl a) (CoqStreams.tl b)) in Hb.
   apply Hb.
  destruct Ha as [_ Ha].
  assumption.
@@ -178,13 +179,14 @@ Proof.
   destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
   simpl.
   rewrite -> Qabs_Qmult.
-  apply Qle_trans with (Qabs (hd x) * Qabs (hd (tl y))).
+  apply Qle_trans
+    with (Qabs (CoqStreams.hd x) * Qabs (CoqStreams.hd (CoqStreams.tl y))).
    apply Qmult_le_compat_r.
     do 2 (rewrite -> Qabs_pos; try assumption).
    apply Qabs_nonneg.
   rewrite -> Qabs_Qmult.
-  replace LHS with (Qabs (hd (tl y))*Qabs (hd x)) by simpl; ring.
-  replace RHS with (a * (Qabs (hd y)) * Qabs (hd x)) by simpl; ring.
+  rewrite Qmult_comm.
+  rewrite (Qmult_comm (Qabs (CoqStreams.hd x))), Qmult_assoc.
   apply Qmult_le_compat_r; try assumption.
   apply Qabs_nonneg.
  apply: mult_Streams_Gs.
@@ -229,12 +231,12 @@ Proof.
  constructor.
   simpl.
   split.
-   apply: mult_resp_nonneg; assumption.
-  replace RHS with (b*1) by simpl; ring.
-  apply: mult_resp_leEq_lft; assumption.
- simpl.
+  rewrite <- (Qmult_0_l a). apply Qmult_le_compat_r; assumption.
+  rewrite Qmult_comm.
+  rewrite <- (Qmult_1_l b) at 2.
+  apply Qmult_le_compat_r. exact Ha1. exact Hb.
  apply powers_help_dnn.
- apply: mult_resp_nonneg; assumption.
+ rewrite <- (Qmult_0_l a). apply Qmult_le_compat_r; assumption.
 Qed.
 
 Lemma powers_dnn : DecreasingNonNegative (powers a).
@@ -259,9 +261,10 @@ Proof.
  simpl.
  apply powers_help_nbz.
  split.
-  apply: mult_resp_nonneg; assumption.
- replace RHS with (1*1) by simpl; ring.
- apply: mult_resp_leEq_both; assumption.
+ rewrite <- (Qmult_0_l a). apply Qmult_le_compat_r; assumption.
+ apply (Qle_trans _ (1*a)).
+ apply Qmult_le_compat_r; assumption.
+ rewrite Qmult_1_l. exact Ha1.
 Qed.
 
 Lemma powers_nbz : NearBy 0 (Qpos2QposInf (1#1)) (powers a).
@@ -317,7 +320,7 @@ Qed.
 *** [Qrecip_positives]
 The stream of 1/n.
 *)
-Definition Qrecip_positives := map (fun x => 1#x) ppositives.
+Definition Qrecip_positives := CoqStreams.map (fun x => 1#x) ppositives.
 
 Lemma Str_nth_Qrecip_positives : forall n, Str_nth n Qrecip_positives = 1#(P_of_succ_nat n).
 Proof.
@@ -339,11 +342,11 @@ Qed.
 
 (** The limit of [recip_positives] is 0. *)
 Lemma Qrecip_positives_help_nbz : forall (x: Qpos) (q:positive),
- (Qden (proj1_sig x) <= q)%Z -> NearBy 0 (Qpos2QposInf x) (map (fun x => 1#x) (ppositives_help q)).
+ (Qden (proj1_sig x) <= q)%Z -> NearBy 0 (Qpos2QposInf x) (CoqStreams.map (fun x => 1#x) (ppositives_help q)).
 Proof.
   assert (∀ (q n d : positive),
     (d <= q)%Z
-    → NearBy 0 (Qpos2QposInf (n # d)) (map (λ x : positive, 1 # x) (ppositives_help q))).
+    → NearBy 0 (Qpos2QposInf (n # d)) (CoqStreams.map (λ x : positive, 1 # x) (ppositives_help q))).
  { cofix Qrecip_positives_help_nbz.
  intros q n d Hpq.
  constructor.
@@ -363,7 +366,8 @@ Proof.
 Qed.
 
 Lemma Qrecip_positives_help_Exists : forall P n p, 
-  LazyExists P (map (fun x => (1#x)) (ppositives_help (Pplus_LazyNat p n))) -> LazyExists P (map (fun x => (1#x)) (ppositives_help p)).
+    LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help (Pplus_LazyNat p n)))
+    -> LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help p)).
 Proof.
  induction n; intros p H0.
   exact H0.
@@ -478,7 +482,7 @@ Qed.
 *** [Qrecip_factorials]
 The stream of 1/n!.
 **)
-Definition Qrecip_factorials := map (fun x => 1#x) pfactorials.
+Definition Qrecip_factorials := CoqStreams.map (fun x => 1#x) pfactorials.
 
 Lemma Str_nth_Qrecip_factorials : forall n, (Str_nth n Qrecip_factorials) = 1#(P_of_succ_nat (pred (fact n))).
 Proof.
@@ -517,11 +521,12 @@ Proof.
 Qed.
 
 (** The limit of [Qrecip_factorial] is 0. *)
-Lemma Qrecip_factorial_bounded : StreamBounds Qrecip_positives (tl Qrecip_factorials).
+Lemma Qrecip_factorial_bounded
+  : StreamBounds Qrecip_positives (CoqStreams.tl Qrecip_factorials).
 Proof.
  unfold Qrecip_positives, Qrecip_factorials, ppositives, pfactorials.
- cut (forall (p q:positive), StreamBounds (map (fun x : positive => 1 # x) (ppositives_help p))
-   (tl (map (fun x : positive => 1 # x) (pfactorials_help p q)))).
+ cut (forall (p q:positive), StreamBounds (CoqStreams.map (fun x : positive => 1 # x) (ppositives_help p))
+   (CoqStreams.tl (CoqStreams.map (fun x : positive => 1 # x) (pfactorials_help p q)))).
   intros H.
   apply (H 1%positive 1%positive).
  auto with *.

@@ -23,8 +23,9 @@ Solve Obligations.
 Lemma ARtoCR_preserves_AQpi x : 'AQpi x = r_pi ('x).
 Proof.
   unfold AQpi, r_pi.
-  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < cast Z AQ d) (Pa : (0 <= 1#d < 1)%Q),
-    'ARscale ('k * x) (AQarctan_small_pos Pnd) = scale (inject_Z k * 'x) (rational_arctan_small_pos Pa)) as P.
+  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < cast Z AQ (Zpos d)) (Pa : (0 <= 1#d < 1)%Q),
+             'ARscale ('k * x) (AQarctan_small_pos Pnd)
+             = scale (inject_Z k * 'x) (rational_arctan_small_pos Pa)) as P.
    intros.
    rewrite ARtoCR_preserves_scale.
    rewrite rings.preserves_mult, AQtoQ_ZtoAQ.

@@ -177,7 +177,9 @@ Proof.
    setoid_replace (l + proj1_sig w - (l + (l + proj1_sig w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
      with ((proj1_sig w / (2 * (n + 1%positive)))); [| now (simpl; field; unfold Qeq; simpl; auto with * )].
    rewrite -> Qabs_pos;[apply Qle_refl|].
-   apply Qle_shift_div_l; [apply: mult_resp_pos; simpl; auto with *; unfold Qlt; simpl; auto with *|].
+   apply Qle_shift_div_l.
+   rewrite <- (Qmult_0_r (2#1)). apply Qmult_lt_l. reflexivity.
+   simpl; auto with *; unfold Qlt; simpl; auto with *.
    replace LHS with 0 by simpl; ring.
    auto with *.
   destruct H0.

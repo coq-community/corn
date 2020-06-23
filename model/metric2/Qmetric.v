@@ -365,6 +365,34 @@ Proof with auto.
  rewrite H1. apply Qball_Qabs...
 Qed.
 
+Lemma Qmult_AbsSmall : forall x y X Y : Q,
+    QAbsSmall X x -> QAbsSmall Y y -> QAbsSmall (X*Y) (x*y).
+Proof.
+  intros. apply AbsSmall_Qabs.
+  rewrite Qabs_Qmult.
+  apply (Qle_trans _ (X * Qabs y)).
+  apply Qmult_le_compat_r.
+  apply AbsSmall_Qabs in H. exact H.
+  apply Qabs_nonneg.
+  rewrite Qmult_comm, (Qmult_comm X).
+  apply Qmult_le_compat_r.
+  apply AbsSmall_Qabs in H0. exact H0.
+  destruct H. apply (Qle_trans _ _ _ H) in H1.
+  apply (Qplus_le_l _ _ X) in H1.
+  ring_simplify in H1.
+  apply (Qmult_le_l _ _ (2#1)). reflexivity.
+  rewrite Qmult_0_r. exact H1.
+Qed. 
+
+Lemma QAbsSmall_plus : forall e1 e2 x1 x2 : Q,
+ QAbsSmall e1 x1 -> QAbsSmall e2 x2 -> QAbsSmall (e1+e2) (x1+x2).
+Proof.
+  intros. pose proof (@Qball_plus e1 e2 x1 0 x2 0).
+  unfold Qball, QAbsSmall in H1.
+  unfold Qminus in H1. repeat rewrite Qplus_0_r in H1.
+  apply H1. exact H. exact H0.
+Qed.
+
 Lemma Qball_plus_r (e: Q) (x y y': Q):
  Qball e y y' -> Qball e (x + y) (x + y').
 Proof with auto.

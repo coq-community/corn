@@ -94,13 +94,32 @@ Example ex5 :=
 Eval compute in (ex5).
 *)
 
+Fixpoint iterateN (A:Type) (f:A -> A) (z:A) (n:nat) : list A :=
+match n with
+ O => nil
+|S m => z :: (iterateN f (f z) m)
+end.
+
+Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
+Proof.
+ intros A f z n.
+ revert f z.
+ induction n.
+  reflexivity.
+ simpl.
+ intros f z.
+ rewrite <- IHn.
+ reflexivity.
+Qed.
+
 (** Correctness properties of our interpretation. *)
 Section InterpRasterCorrect.
 
-Let f := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
+Let f := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * Z.of_nat n # 1).
 
 Lemma InterpRaster_correct1 : forall n m (t l b r:Q) (bitmap: raster n m) i j,
-Is_true (RasterIndex bitmap i j) -> In (f l r n j,f t b m i) (InterpRaster bitmap (l,t) (r,b)).
+    Is_true (RasterIndex bitmap i j)
+    -> In (f l r n (Z.of_nat j),f t b m (Z.of_nat i)) (InterpRaster bitmap (l,t) (r,b)).
 Proof.
  intros n m t l b r bitmap.
  unfold InterpRaster, InterpRow, UniformPartition.
@@ -135,7 +154,7 @@ Proof.
    simpl.
    left; reflexivity.
   rewrite inj_S.
-  cut (In ((f0 (Z.succ j)), (f1 0%Z)) (map (fun x : Q => (x, (f1 0%Z)))
+  cut (In ((f0 (Z.succ (Z.of_nat j))), (f1 0%Z)) (map (fun x : Q => (x, (f1 0%Z)))
     (map (@fst _ _) (filter (@snd _ _) (combine (map f0 (iterateN Z.succ 1%Z n)) a0))))).
    intros L.
    destruct a; try right; auto.
@@ -146,7 +165,7 @@ Proof.
   apply H.
  rewrite inj_S.
  set (f1':= fun (x:Z) =>(f1 (Z.succ x))).
- fold (f1' i).
+ fold (f1' (Z.of_nat i)).
  simpl.
  apply in_or_app.
  right.
@@ -160,7 +179,8 @@ Qed.
 
 Lemma InterpRaster_correct2 : forall n m (t l b r:Q) x y (bitmap: raster n m),
 In (x,y) (InterpRaster bitmap (l,t) (r,b)) ->
- exists p, Is_true (RasterIndex bitmap (fst p) (snd p)) /\ x=f l r n (snd p) /\ y=f t b m (fst p).
+exists p, Is_true (RasterIndex bitmap (fst p) (snd p)) /\ x=f l r n (Z.of_nat (snd p))
+     /\ y=f t b m (Z.of_nat (fst p)).
 Proof.
  intros n m t l b r x y bitmap.
  unfold InterpRaster, InterpRow, UniformPartition.
@@ -171,7 +191,7 @@ Proof.
   contradiction.
  simpl in H.
  destruct (in_app_or _ _ _ H) as [H0 | H0]; clear H.
-  cut (exists p : nat, Is_true (nth p a false) /\ x = f0 p /\ y = f1 0%Z).
+  cut (exists p : nat, Is_true (nth p a false) /\ x = f0 (Z.of_nat p) /\ y = f1 0%Z).
    intros [z Z].
    clear -Z.
    exists (0%nat,z).
@@ -237,10 +257,10 @@ Proof.
  unfold snd, fst in Ha1.
  destruct x2 as [x2l x2r].
  destruct y2 as [y2l y2r].
- assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * by' + 1 # 1) / (2 * n # 1)),
-   (x2r + (y2r - x2r) * (2 * bx + 1 # 1) / (2 * m # 1)))).
-  transitivity ((x1l + (y1l - x1l) * (2 * by' + 1 # 1) / (2 * n # 1)),
-    (x1r + (y1r - x1r) * (2 * bx + 1 # 1) / (2 * m # 1))).
+ assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
+   (x2r + (y2r - x2r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1)))).
+  transitivity ((x1l + (y1l - x1l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
+    (x1r + (y1r - x1r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1))).
    auto.
   clear - Hx Hy.
   destruct Hx as [Hx1 Hx2].
