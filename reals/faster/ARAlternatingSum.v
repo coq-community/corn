@@ -1,6 +1,7 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.reals.CRreal.
 Require Import 
   Coq.Program.Program CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QposMinMax
@@ -89,12 +90,12 @@ Proof.
 Qed.
 
 Definition ARInfAltSum_stream_Str_nth_tl sN sD k l n :
-  Str_nth_tl n (ARInfAltSum_stream sN sD k l) = ARInfAltSum_stream (Str_nth_tl n sN) (Str_nth_tl n sD) k (l + n).
+  Str_nth_tl n (ARInfAltSum_stream sN sD k l) = ARInfAltSum_stream (Str_nth_tl n sN) (Str_nth_tl n sD) k (l + Z.of_nat n).
 Proof.
   induction n.
-   change (l + 0%nat)%Z with (l + 0). now rewrite rings.plus_0_r.
+   change (l + Z.of_nat 0%nat)%Z with (l + 0). now rewrite rings.plus_0_r.
   rewrite !Str_nth_tl_S.
-  replace (l + S n)%Z with ((l + n) + 1)%Z.
+  replace (l + Z.of_nat (S n))%Z with ((l + Z.of_nat n) + 1)%Z.
    rewrite IHn. now apply ARInfAltSum_stream_tl.
   change (l + 'n + 1 = l + '(1 + n)).
   rewrite rings.preserves_plus, rings.preserves_1. ring.
@@ -257,7 +258,7 @@ Proof.
   unfold ARInfAltSum_length.
   apply semirings.nonneg_plus_lt_compat_r.
    apply naturals.nat_nonneg.
-  apply: (semirings.lt_0_4 (R:=nat)).
+   apply le_n_S, le_0_n.
 Qed.
 
 Lemma ARAltSum_correct_aux (l : positive) (k : Z) :
@@ -283,7 +284,7 @@ Proof.
   { unfold QposEq. simpl. 
     rewrite <- Pos.add_1_l. 
     rewrite Zpos_plus_distr.
-    setoid_replace (1 + l # 1) with (1 + (l # 1))%Q. ring.
+    setoid_replace (1 + Zpos l # 1) with (1 + (Zpos l # 1))%Q. ring.
     unfold Qplus, Qeq, Qnum, Qden. rewrite Pos.mul_1_l.
     do 4 rewrite Z.mul_1_r. reflexivity. }
   unfold QposEq in H5. rewrite H5. clear H5.
@@ -297,29 +298,31 @@ Proof.
 Qed.
 
 Lemma ARAltSum_correct {l : nat} `(Pl : 0 < l) (k : Z) :
-  ball (2 ^ k) ('ARAltSum sN sD l (k - Z.log2_up l)) (take sQ l Qminus' 0).
+  ball (2 ^ k) ('ARAltSum sN sD l (k - Z.log2_up (Z.of_nat l))) (take sQ l Qminus' 0).
 Proof.
   destruct l.
    now destruct (irreflexivity (<) (0 : nat)).
    apply ball_weak_le
-     with (proj1_sig ((P_of_succ_nat l#1) * 2 ^ (k - Z.log2_up (P_of_succ_nat l)))%Qpos).
+     with (proj1_sig ((P_of_succ_nat l#1)
+                      * 2 ^ (k - Z.log2_up (Zpos (P_of_succ_nat l))))%Qpos).
    set (l':=P_of_succ_nat l).
-   change ((inject_Z l') * 2 ^ (k - Z.log2_up l') ≤ 2 ^ k).
+   change ((inject_Z (Zpos l')) * 2 ^ (k - Z.log2_up (Zpos l')) ≤ 2 ^ k).
    rewrite int_pow_exp_plus; [| apply (rings.is_ne_0 (2:Q))].
-   apply (order_reflecting ((2:Q) ^ Z.log2_up l' *.)).
-   mc_setoid_replace (2 ^ Z.log2_up l' * ((inject_Z l') * (2 ^ k * 2 ^ (- Z.log2_up l')))) with (2 ^ k * (inject_Z l')).
+   apply (order_reflecting ((2:Q) ^ Z.log2_up (Zpos l') *.)).
+   mc_setoid_replace (2 ^ Z.log2_up (Zpos l') * ((inject_Z (Zpos l')) * (2 ^ k * 2 ^ (- Z.log2_up (Zpos l')))))
+     with (2 ^ k * (inject_Z (Zpos l'))).
     rewrite (commutativity _ ((2:Q) ^ k)).
     apply (order_preserving (2 ^ k *.)).
     replace (2:Q) with (inject_Z 2) by reflexivity.
     rewrite <-Qpower.Zpower_Qpower.
      apply (order_preserving _).
-     destruct (decide ((l':Z) = 1)) as [E|E].
+     destruct (decide ((Zpos l') = 1)) as [E|E].
       now rewrite E.
      apply Z.log2_up_spec. 
      auto with zarith.
     now apply Z.log2_up_nonneg.
    rewrite int_pow_negate.
-   rewrite (commutativity (inject_Z l')), (commutativity (2 ^ k)).
+   rewrite (commutativity (inject_Z (Zpos l'))), (commutativity (2 ^ k)).
    rewrite <-associativity.
    rewrite associativity, dec_recip_inverse by solve_propholds.
    now apply left_identity.

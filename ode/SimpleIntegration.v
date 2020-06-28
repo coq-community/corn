@@ -9,6 +9,7 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.reals.CRreal.
 Require Import
   CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano Coq.Unicode.Utf8
   Coq.QArith.QArith Coq.QArith.Qabs

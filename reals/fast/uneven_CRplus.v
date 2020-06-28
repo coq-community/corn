@@ -56,7 +56,7 @@ Section uneven_CRplus.
   Definition uneven_CRplus: CR := @mkRegularFunction Q_as_MetricSpace 0 _ uneven_CRplus_is_RegularFunction.
 
   Lemma uneven_CRplus_correct: (uneven_CRplus == x + y)%CR.
-  Proof with simpl; try ring.
+  Proof.
    simpl.
    apply regFunEq_e. intro e.
    rewrite approximate_CRplus...
@@ -66,7 +66,9 @@ Section uneven_CRplus.
     apply Qball_plus; apply regFun_prf.
      simpl in llrr.
    transitivity (proj1_sig e + proj1_sig e * proj1_sig (ll + rr)%Qpos)...
-   unfold QposEq in llrr. simpl in llrr. rewrite llrr. ring.
+   unfold QposEq in llrr. simpl in llrr. simpl. rewrite llrr.
+   unfold canonical_names.equiv, stdlib_rationals.Q_eq. ring.
+   unfold canonical_names.equiv, stdlib_rationals.Q_eq. simpl. ring.
   Qed.
 
 End uneven_CRplus.

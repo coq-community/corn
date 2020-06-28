@@ -1,6 +1,7 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.reals.CRreal.
 Require Import
  Coq.Unicode.Utf8 Coq.Program.Program
  CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs

@@ -93,7 +93,7 @@ Class decision (P: Prop): Set := decide: { P } + { ~ P }.
 Lemma decision_stable P: decision P -> Stable P.
 Proof. firstorder. Qed.
 
-Require Import CoRN.model.reals.CRreal CoRN.logic.Classic.
+Require Import CoRN.reals.fast.CRGroupOps CoRN.logic.Classic.
 
 Lemma Qle_dec x y: decision (Qle x y).
   intros.
@@ -136,7 +136,7 @@ Qed.
 
 Local Open Scope CR_scope.
 
-Lemma DN_or P Q: Not ((Not P) /\ (Not Q)) -> DN (P + Q).
+Lemma DN_or P Q: (((P -> False) /\ (Q -> False)) -> False) -> DN (P + Q).
 Proof. firstorder. Qed.
 
 Definition not_forall_exists_not_DN (T: Type) (P: T -> Prop) (Pd: forall x, P x \/ ~ P x):

@@ -249,13 +249,13 @@ Proof.
     apply (order_preserving _).
     mc_setoid_replace (-'m - 2 : Z) with (1 - '(m + 3) : Z).
      apply AQsqrt_mid_bounded_regular_aux1.
-     now apply: (order_preserving (+ (3:N))).
+     now refine (order_preserving (+ (3:N)) _ _ _).
     rewrite rings.preserves_plus, rings.preserves_3. ring.
    change (0 ≤ ('AQsqrt_mid_bounded_raw (n + 3) - 'AQsqrt_mid_bounded_raw (m + 3) : Q)).
    apply rings.flip_nonneg_minus.
    apply (order_preserving _).
    apply AQsqrt_mid_bounded_regular_aux2.
-   now apply: (order_preserving (+ (3:N))).
+   now refine (order_preserving (+ (3:N)) _ _ _).
   assert (∀ ε1 ε2 : Qpos, N_of_Z (-Qdlog2 (proj1_sig ε2)) ≤ N_of_Z (-Qdlog2 (proj1_sig ε1)) → 
      ball (proj1_sig ε1 + proj1_sig ε2) (AQsqrt_mid_raw ε1 : AQ_as_MetricSpace) (AQsqrt_mid_raw ε2)).
   { intros ε1 ε2 E.
@@ -340,7 +340,7 @@ Proof.
       change (0 ≤ -Qdlog2 (proj1_sig ε)).
       now apply rings.flip_nonpos_negate, Qdlog2_nonpos.
     rewrite N_of_Z_nonpos.
-     now apply: Qdlog2_nonneg.
+     now apply Qdlog2_nonneg.
      change (-Qdlog2 (proj1_sig ε) ≤ 0).
      now apply rings.flip_nonneg_negate, Qdlog2_nonneg.
    change ('(AQsqrt_mid_raw ε ^ 2) - 'a ≤ (0:Q)).
@@ -363,14 +363,14 @@ Proof.
       simpl. rewrite H5. reflexivity.
       rewrite H5. apply P.
     + transitivity (0:AQ).
-     apply rings.flip_nonneg_negate. now apply: semirings.le_0_4.
+     apply rings.flip_nonneg_negate. now apply semirings.le_0_4.
     now apply AQsqrt_mid_bounded_raw_lower_bound.
     + now apply AQsqrt_mid_bounded_raw_upper_bound.
   - split.
    transitivity (0:AR).
     apply rings.flip_nonneg_negate.
     apply (semirings.preserves_nonneg (f:=cast AQ AR)).
-    now apply: semirings.le_0_4.
+    now apply semirings.le_0_4.
    now apply AQsqrt_mid_nonneg.
   now apply AQsqrt_mid_upper_bound.
 Qed.

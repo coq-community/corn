@@ -210,7 +210,7 @@ Proof.
    apply rational_exp_opp.
     now apply semirings.preserves_nonneg.
    posed_rewrite <-(rings.preserves_negate (f:=cast AQ Q)).
-   apply: (AQexp_inv_pos_bound_correct (a:=-a)).
+   apply (AQexp_inv_pos_bound_correct (a:=-a)).
    now apply rings.flip_nonneg_negate.
   apply AQexp_neg_correct.
 Qed.

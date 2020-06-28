@@ -1481,11 +1481,9 @@ Proof.
   rewrite <- Qmult_1_l, <- Qmult_1_l.
   rewrite Qmult_assoc.
   apply Qmult_le_compat_r. 
-  apply (Qpos_mult_le_compat (1#1) (1#1)
-                             (CR_b (1#1) x + (1#1))
-                             (CR_b (1#1) z + (1#1))).
-  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
-  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  apply (Qpos_mult_le_compat (1#1) (1#1)).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, (Qpos_nonneg (CR_b (1#1) x)).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, (Qpos_nonneg (CR_b (1#1) z)).
   rewrite <- Qplus_assoc. apply (Qle_trans _ (0+2)).
   discriminate. apply Qplus_le_l. apply Qabs_nonneg.
 Qed.
@@ -1501,11 +1499,9 @@ Proof.
   rewrite <- Qmult_1_l, <- Qmult_1_l at 1.
   rewrite Qmult_assoc.
   apply Qmult_le_compat_r. 
-  apply (Qpos_mult_le_compat (1#1) (1#1)
-                             (CR_b (1#1) y + (1#1))
-                             (CR_b (1#1) z + (1#1))).
-  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
-  rewrite <- Qplus_0_l. apply Qplus_le_l, Qpos_nonneg.
+  apply (Qpos_mult_le_compat (1#1) (1#1)).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, (Qpos_nonneg (CR_b (1#1) y)).
+  rewrite <- Qplus_0_l. apply Qplus_le_l, (Qpos_nonneg (CR_b (1#1) z)).
   rewrite <- Qplus_assoc. apply (Qle_trans _ (0+2)).
   discriminate. apply Qplus_le_l. apply Qabs_nonneg.
 Qed.
@@ -1644,8 +1640,7 @@ Proof.
     apply CRle_Qle, Qopp_le_compat.
     apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos
                         * proj1_sig ((CR_b (1#1) y) + (1#1))%Qpos)).
-    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)
-                               (CR_b (1#1) x + (1#1)) (CR_b (1#1) y + (1#1))).
+    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)).
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     exact xyfactor_le.
@@ -1656,8 +1651,7 @@ Proof.
     apply CRle_Qle.
     apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos
                         * proj1_sig ((CR_b (1#1) y) + (1#1))%Qpos)).
-    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)
-                               (CR_b (1#1) x + (1#1)) (CR_b (1#1) y + (1#1))).
+    apply (Qpos_mult_le_compat (CR_b (1#1) x) (CR_b (1#1) y)).
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     exact xyfactor_le.

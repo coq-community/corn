@@ -18,9 +18,12 @@ Section contents.
   Global Instance proper: Proper (@st_eq _ ==> @st_eq _ ==> @st_eq _ ==> iff) CRball.
   Proof.
    intros ?? E ?? F ?? G.
-   apply iff_under_forall.
-   intro. rewrite E, F, G.
-   reflexivity.
+   split. intros. intros q H0.
+   rewrite <- E in H0.
+   specialize (H q H0). rewrite <- F, <- G. exact H.
+   intros. intros q H0.
+   rewrite E in H0.
+   specialize (H q H0). rewrite F, G. exact H.
   Qed.
 
   Global Instance reflexive (r: CR): CRnonNeg r -> Reflexive (CRball r).
@@ -33,7 +36,7 @@ Section contents.
    apply -> CRnonNeg_le_0...
   Qed.
 
-  Lemma zero (x y: M): x [=] y <-> CRball 0 x y.
+  Lemma zero (x y: M): st_eq x y <-> CRball 0 x y.
   Proof with auto.
    rewrite <- ball_0.
    split. intros H z zpos.
@@ -61,28 +64,26 @@ Lemma as_distance_bound (r x y: CR): CRball r x y <-> CRdistance x y <= r.
 Proof with auto.
  unfold CRball.
  rewrite <- CRdistance_CRle.
- rewrite <- (@iff_under_forall Q
-   (fun q: Q => (r <= 'q) -> (x - ' q <= y) /\ (y <= x + ' q))
-   (fun q: Q => (r <= 'q) -> ball q x y)).
-  2: intros; rewrite in_CRgball; intuition.
+ assert ((forall x0 : Q, r <= ' x0 -> x - ' x0 <= y /\ y <= x + ' x0) <->
+         x - r <= y /\ y <= x + r).
  split; intros.
-  split.
-   apply CRplus_le_l with (r - y).
-   CRring_replace (r - y + (x - r)) (x - y).
-   CRring_replace (r - y + y) r.
+ - split.
+   + apply CRplus_le_l with (r - y).
+     CRring_replace (r - y + (x - r)) (x - y).
+     CRring_replace (r - y + y) r.
    apply (proj1 (Qle_CRle_r _ _)).
    intros.
    apply CRplus_le_l with (y - ' y').
    CRring_replace (y - 'y' + (x - y)) (x - 'y').
    CRring_replace (y - 'y' + 'y') y.
    now apply (H y').
-  apply CRplus_le_r with (-x).
+   + apply CRplus_le_r with (-x).
   CRring_replace (x + r - x) r.
   apply (proj1 (Qle_CRle_r _ _)). intros.
   apply CRplus_le_l with x.
   CRring_replace (x + (y - x)) y...
   apply H...
- split.
+ - split.
   apply CRle_trans with (x - r).
   apply CRplus_le_compat...
   apply CRle_refl.
@@ -92,6 +93,10 @@ Proof with auto.
   apply H.
  apply CRplus_le_compat...
  apply CRle_refl.
+ - split. intros. destruct H. apply H.
+   intros; rewrite in_CRgball; intuition.
+   intros. destruct H.
+   rewrite <- in_CRgball. apply H2; assumption. 
 Qed. (* todo: clean up *)
 
 Lemma gball_CRabs (r : Q) (x y : CR) : ball r x y <-> CRabs (x - y) <= ' r.

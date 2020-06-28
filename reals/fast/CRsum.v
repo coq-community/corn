@@ -111,7 +111,7 @@ Proof.
  setoid_replace (proj1_sig e1'' + proj1_sig e1' + (proj1_sig e2'' + proj1_sig e2'))%Q
    with ((proj1_sig e1' + proj1_sig e2') + (proj1_sig e1'' + proj1_sig e2''))%Q.
  2: ring.
- apply AbsSmall_plus.
+ apply QAbsSmall_plus.
   auto.
  apply: (regFun_prf a).
  simpl. rewrite Qplus_assoc. assumption.
@@ -187,8 +187,14 @@ Proof.
   unfold QAbsSmall.
   setoid_replace (approximate a e3 + z1 - (approximate a e4 + z2))
     with ((approximate a e3 - approximate a e4) + (z1 - z2)). 2: ring.
-  apply AbsSmall_leEq_trans with (proj1_sig e3 + proj1_sig e4 + proj1_sig e5); auto.
-  apply AbsSmall_plus; auto.
+  pose proof (@ball_weak_le Q_as_MetricSpace
+                       (proj1_sig e3 + proj1_sig e4 + proj1_sig e5)
+                       (proj1_sig e6)
+                       (approximate a e3 - approximate a e4 + (z1 - z2)) 0).
+  simpl in H1. unfold Qball, QAbsSmall in H1.
+  unfold Qminus in H1. rewrite Qplus_0_r in H1.
+  apply H1. exact H.
+  apply QAbsSmall_plus; auto.
   apply: (regFun_prf a).
  simpl.
  apply (IHl (z1 + approximate a0 e1) e3 (e5 + (e1 + e2))%Qpos).
@@ -197,7 +203,7 @@ Proof.
    unfold QAbsSmall.
    setoid_replace (z1 + approximate a0 e1 - (z2 + approximate a0 e2))
      with ((z1 - z2) + (approximate a0 e1 - approximate a0 e2)). 2: ring.
-   apply AbsSmall_plus.
+   apply QAbsSmall_plus.
     auto.
    apply (regFun_prf a0).
   rewrite -> H0.
