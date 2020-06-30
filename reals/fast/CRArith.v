@@ -762,6 +762,20 @@ Proof.
   apply (CRltT_wd H0 H1), H.
 Qed.
 
+Lemma CRopp_le_compat : forall x y : CR,
+    x <= y -> -y <= -x.
+Proof.
+  intros. apply (CRplus_le_l _ _ (x+y)).
+  ring_simplify. exact H.
+Qed.
+
+Lemma CRopp_le_cancel : forall x y : CR,
+    -y <= -x -> x <= y.
+Proof.
+  intros. apply (CRplus_le_l (-y) (-x) (x+y)) in H.
+  ring_simplify in H. exact H.
+Qed. 
+
 Lemma CRle_Q : forall (x : CR) (q : Q),
     ('q <= x)%CR
     <-> (forall e:Qpos, q <= approximate x e + proj1_sig e)%Q. 
