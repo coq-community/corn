@@ -1125,15 +1125,10 @@ Proof.
   eapply AbsSmall_leEq_trans;[|apply mult_resp_AbsSmall;[|apply H]]; auto.
   rstepr (([1]:CR)[*]M).
   apply mult_resp_leEq_rht; auto.
-  simpl in H.
+  simpl in H. unfold AbsSmall in H.
   rewrite <- CRabs_AbsSmall in H.
   eapply leEq_transitive;[|apply H].
-  rewrite <- (CRasIRasCR_id p).
-  rewrite <- CRabs_correct.
-  simpl.
-  rewrite <- IR_Zero_as_CR.
-  rewrite <- IR_leEq_as_CR.
-  apply AbsIR_nonneg.
+  apply CRabs_nonneg.
  simpl.
  intros y Hy0 Hy1.
  rewrite -> mult_apply.
@@ -1166,6 +1161,7 @@ Proof.
       apply Qpos_nonzero.
      apply shift_mult_leEq with Z.
       apply: CRlt_Qlt; auto with *.
+      unfold AbsSmall in Hb.
      rewrite <- CRabs_AbsSmall in Hb.
      stepr ('(nb#db))%CR; auto.
      change ((' (nb # db))%CR[=](' proj1_sig e)%CR[*]CRinvT (' proj1_sig ((db # nb) * e)%Qpos)%CR Z).

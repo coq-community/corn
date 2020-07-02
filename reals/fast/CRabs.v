@@ -23,14 +23,10 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.reals.Max_AbsIR.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import Coq.QArith.Qabs.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import CoRN.reals.fast.CRcorrect.
-Require Import CoRN.reals.fast.CRIR.
-Require Import CoRN.tactics.CornTac.
 Require Import CoRN.logic.Stability.
 
 Local Open Scope Q_scope.
@@ -49,9 +45,10 @@ Proof.
   eapply Qle_trans;[|apply Hab].
   apply Qabs_triangle_reverse.
  intros _.
- stepl (Qabs b - Qabs a); [| simpl; ring].
- setoid_replace (a - b) with (- (b - a)) in Hab; [| simpl; ring].
- rewrite -> Qabs_opp in Hab.
+ setoid_replace (- (Qabs a - Qabs b))
+   with (Qabs b - Qabs a)
+   by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; ring).
+ rewrite Qabs_Qminus in Hab.
  eapply Qle_trans;[|apply Hab].
  apply Qabs_triangle_reverse.
 Qed.
@@ -63,90 +60,54 @@ Build_UniformlyContinuousFunction Qabs_uc_prf.
 
 Definition CRabs : CR --> CR := Cmap QPrelengthSpace Qabs_uc.
 
-Lemma CRabs_correct : forall x,
- (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR.
-Proof.
- intros x.
- apply stableEq.
-  apply Complete_stable.
-  apply stableQ.
- generalize (leEq_or_leEq _ [0] x).
- cut ((x[<=][0] or [0][<=]x) -> (IRasCR (AbsIR x) == CRabs (IRasCR x))%CR).
-  unfold Not.
-  tauto.
- intros [H|H].
-  transitivity (IRasCR ([--]x)).
-   apply IRasCR_wd.
-   apply AbsIR_eq_inv_x; auto.
-  rewrite -> IR_opp_as_CR.
-  rewrite -> IR_leEq_as_CR in H.
-  rewrite -> IR_Zero_as_CR in H.
-  revert H.
-  generalize (IRasCR x).
-  intros m Hm.
-  rewrite -> CRle_min_r in Hm.
-  rewrite -> CRmin_boundAbove in Hm.
-  setoid_replace (CRabs m)%CR with (- (- (CRabs m)))%CR.
-   apply CRopp_wd.
-   rewrite <- Hm.
-   apply: regFunEq_e.
-   intros e.
-   simpl.
-   rewrite -> Qabs_neg; auto with *.
-   rewrite -> Qopp_involutive.
-   apply: ball_refl. apply (Qpos_nonneg (e+e)).
-  cut (CRabs m== - - CRabs m)%CR.
-   intros. assumption.
-  ring.
- transitivity (IRasCR x).
-  apply IRasCR_wd.
-  apply AbsIR_eq_x; auto.
- rewrite -> IR_leEq_as_CR in H.
- rewrite -> IR_Zero_as_CR in H.
- revert H.
- generalize (IRasCR x).
- intros m Hm.
- rewrite -> CRle_max_r in Hm.
- rewrite -> CRmax_boundBelow in Hm.
- rewrite <- Hm.
- apply: regFunEq_e.
- intros e.
- simpl.
- rewrite -> Qabs_pos. apply ball_refl.
- apply (Qpos_nonneg (e+e)).
- auto with *.
-Qed.
-
 Lemma approximate_CRabs (x: CR) (e: Qpos):
   approximate (CRabs x) e = Qabs (approximate x e).
 Proof. reflexivity. Qed.
 
-Lemma CRabs_AbsSmall : forall a b, (CRabs b[<=]a) <-> AbsSmall a b.
+Lemma CRabs_AbsSmall : forall a b : CR, (CRabs b <= a)%CR <-> (-a <= b /\ b <= a)%CR.
 Proof.
- intros a b.
- rewrite <- (CRasIRasCR_id a).
- rewrite <- (CRasIRasCR_id b).
- rewrite <- CRabs_correct.
- rewrite <- IR_AbsSmall_as_CR.
- rewrite <- IR_leEq_as_CR.
- split.
-  apply AbsIR_imp_AbsSmall.
- apply AbsSmall_imp_AbsIR.
+  split.
+  - intros. split.
+    + intro e. simpl. unfold Cap_raw. simpl. 
+      specialize (H e). simpl in H.
+      unfold Cap_raw in H. simpl in H.
+      apply (Qle_trans _ _ _ H).
+      rewrite Qopp_involutive, Qplus_comm.
+      apply Qplus_le_l.
+      rewrite <- (Qopp_involutive (approximate b ((1#2)*e)%Qpos)) at 2.
+      apply Qopp_le_compat.
+      rewrite <- Qabs_opp. apply Qle_Qabs.
+    + intro e. simpl. unfold Cap_raw. simpl. 
+      specialize (H e). simpl in H.
+      unfold Cap_raw in H. simpl in H.
+      apply (Qle_trans _ _ _ H).
+      apply Qplus_le_r, Qopp_le_compat, Qle_Qabs.
+  - intros [H H0]. intro e. simpl. unfold Cap_raw. simpl.
+    specialize (H e). simpl in H.
+    unfold Cap_raw in H. simpl in H.
+    specialize (H0 e). simpl in H0.
+    unfold Cap_raw in H0. simpl in H0.
+    apply (Qplus_le_l _ _ (Qabs (approximate b ((1 # 2) * e)%Qpos) + proj1_sig e)).
+    simpl. ring_simplify.
+    apply Qabs_Qle_condition. split.
+    + apply (Qplus_le_l _ _ (- approximate a ((1 # 2) * e)%Qpos)) in H.
+      simpl in H. ring_simplify in H. ring_simplify. exact H.
+    + apply (Qplus_le_l _ _ (proj1_sig e + approximate b ((1 # 2) * e)%Qpos)) in H0.
+      simpl in H0. ring_simplify in H0. exact H0.
 Qed.
 
 Local Open Scope CR_scope.
 
 Lemma CRabs_pos : forall x:CR, 0 <= x -> CRabs x == x.
 Proof.
- intros x.
- rewrite <- (CRasIRasCR_id x).
- rewrite <- CRabs_correct.
- intros H.
- apply IRasCR_wd.
- apply AbsIR_eq_x.
- rewrite -> IR_leEq_as_CR.
- rewrite -> IR_Zero_as_CR.
- auto.
+  intros x H. apply CRle_def. split.
+  - apply CRabs_AbsSmall. split. 2: apply CRle_refl.
+    apply (@CRle_trans _ 0). 2: exact H.
+    rewrite <- CRopp_0. apply CRopp_le_compat, H.
+  - intro e. simpl. unfold Cap_raw; simpl.
+    apply (Qle_trans _ 0).
+    apply (Qopp_le_compat 0), Qpos_nonneg.
+    rewrite <- Qle_minus_iff. apply Qle_Qabs.
 Qed.
 
 Lemma CRabs_0: CRabs 0 == 0.
@@ -154,16 +115,17 @@ Proof. apply CRabs_pos, CRle_refl. Qed.
 
 Lemma CRabs_neg: forall x, x <= 0 -> CRabs x == - x.
 Proof.
- intros x.
- rewrite <- (CRasIRasCR_id x).
- rewrite <- CRabs_correct.
- intros H.
- rewrite <- IR_opp_as_CR.
- apply IRasCR_wd.
- apply AbsIR_eq_inv_x.
- rewrite -> IR_leEq_as_CR.
- rewrite -> IR_Zero_as_CR.
- auto.
+  intros x H. apply CRle_def. split.
+  - apply CRabs_AbsSmall. split.
+    apply (CRplus_le_l _ _ (-x)). ring_simplify.
+    apply CRle_refl.
+    apply (@CRle_trans _ 0). exact H.
+    rewrite <- CRopp_0. apply CRopp_le_compat, H.
+  - intro e. simpl. unfold Cap_raw; simpl.
+    apply (Qle_trans _ 0).
+    apply (Qopp_le_compat 0), Qpos_nonneg.
+    rewrite <- Qle_minus_iff, <- Qabs_opp.
+    apply Qle_Qabs.
 Qed.
 
 Lemma CRabs_cases
@@ -207,6 +169,14 @@ Proof with auto.
  apply -> CRle_opp...
 Qed.
 
+Lemma CRabs_nonneg (x: CR): 0 <= CRabs x.
+Proof.
+  intro e. simpl. unfold Cap_raw; simpl.
+  rewrite Qplus_0_r. apply (Qle_trans _ 0).
+  apply (Qopp_le_compat 0), Qpos_nonneg.
+  apply Qabs_nonneg.
+Qed.
+
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
@@ -235,7 +205,7 @@ Lemma CRdistance_CRle (r x y: CR): x - r <= y /\ y <= x + r <-> CRdistance x y <
 Proof.
  intros. unfold CRdistance.
  rewrite CRabs_AbsSmall.
- unfold AbsSmall. simpl.
+ simpl.
  rewrite (CRplus_le_l (x - r) y (r - y)).
  CRring_replace (r - y + (x - r)) (x - y).
  CRring_replace (r - y + y) r.
@@ -252,8 +222,11 @@ Proof.
  apply CRabs_opp.
 Qed.
 
-Import canonical_names.
+Import MathClasses.interfaces.canonical_names.
 
-Program Instance CR_abs : Abs CR := fun x => CRabs x.
-Next Obligation. split; [apply CRabs_pos | apply CRabs_neg]. Qed.
+Instance CR_abs : Abs CR.
+Proof.
+  intro x. exists (CRabs x).
+  split; [apply CRabs_pos | apply CRabs_neg].
+Defined.
 
