@@ -90,7 +90,8 @@ Proof.
    stepl (nring O:IR).
     exact Hc.
    apply eq_symmetric; apply (inj_Q_nring _ O).
-  assert (L:=(Limit_near seq 0 (Qpos2QposInf (exist _ _ Hc')))).
+   pose proof (Limit_near_zero (zl (Qpos2QposInf (exist _ _ Hc'))))
+     as L.
   exists (takeUntil _ L (fun _ => S) O).
   generalize dnn; clear dnn.
   set (Q:= (fun seq b => DecreasingNonNegative seq -> forall m : nat, (b <= m)%nat ->

@@ -608,7 +608,7 @@ Proof.
   apply AQball_fold. 
   setoid_replace (' c * ' c * (` ε1 + ` ε2))%Q
     with (proj1_sig (Qinv_modulus ('c) ε1 + Qinv_modulus ('c) ε2)%Qpos)
-    by (simpl; ring).
+    by (unfold equiv, stdlib_rationals.Q_eq; simpl; ring).
   apply regFun_prf.
 Qed.
 
@@ -618,7 +618,7 @@ Proof.
   simpl. unfold Cjoin_raw. simpl.
   setoid_replace (proj1_sig ε + proj1_sig ε)%Q
     with (proj1_sig ((1#2) * ε + ((1#2) * ε + ε)))%Qpos
-    by (simpl; ring).
+    by (unfold equiv, stdlib_rationals.Q_eq; simpl; ring).
   eapply ball_triangle.
    now apply aq_div_dlog2.
   rewrite aq_preserves_max. 
@@ -692,7 +692,7 @@ Proof.
   apply (injective (cast AR CR)).
   rewrite rings.preserves_mult, rings.preserves_1.
   destruct (ARtoCR_preserves_invT_l x x_) as [x__ E]. rewrite E.
-  apply: field_mult_inv.
+  apply CRmult_inv_r.
 Qed.
 
 Lemma ARinvT_wd x y x_ y_ : x = y → ARinvT x x_ = ARinvT y y_.

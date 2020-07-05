@@ -291,11 +291,17 @@ Proof.
 Qed.
 
 Lemma rational_exp_neg_bounded_correct_aux (a : Q) :
-  a ≤ 0 → (CRpower_N_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2)))) = IRasCR (Exp (inj_Q IR a)).
+  a ≤ 0 → (CRpower_N_bounded 2 (1 # 1)) (IRasCR (Exp (inj_Q IR (a / 2))))
+          = IRasCR (Exp (inj_Q IR a)).
 Proof.
  intros Ea.
  rewrite <- CRpower_N_bounded_correct.
-  apply IRasCR_wd.
+ - change (CRpower_slow (IRasCR (Exp (inj_Q IR (a / 2)))) (N.to_nat 2))%CR
+     with (IRasCR (Exp (inj_Q IR (a / 2)))
+           * (IRasCR (Exp (inj_Q IR (a / 2))) * 1))%CR. 
+   rewrite CRmult_1_r.
+   rewrite <- IR_mult_as_CR.
+   apply IRasCR_wd.
   set (a':=inj_Q IR (a/2)).
   simpl.
   rstepl (Exp a'[*]Exp a').
@@ -306,18 +312,19 @@ Proof.
    apply eq_symmetric; apply (inj_Q_plus IR).
   apply inj_Q_wd.
   change (a / (2#1) + a / (2#1) == a). field.
- apply leEq_imp_AbsSmall.
-  apply less_leEq; apply Exp_pos.
- stepr ([1]:IR).
-  apply Exp_leEq_One.
-  stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
-  apply inj_Q_leEq.
-  apply mult_cancel_leEq with (2:Q).
-   constructor.
-  change (a/2*2<=0).
-  now replace LHS with a by (simpl; field; discriminate).
- rstepl (nring 1:IR).
- apply eq_symmetric; apply (inj_Q_nring IR 1).
+ - apply leEq_imp_AbsSmall.
+   + rewrite <- IR_Zero_as_CR.
+     apply IR_leEq_as_CR.
+     apply less_leEq; apply Exp_pos.
+   + apply (@CRle_trans _ (IRasCR [1])).
+     apply IR_leEq_as_CR. apply Exp_leEq_One.
+     stepr (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
+     apply inj_Q_leEq.
+     apply mult_cancel_leEq with (2:Q).
+     constructor.
+     change (a/2*2<=0).
+     now replace LHS with a by (simpl; field; discriminate). 
+     simpl. rewrite IR_One_as_CR. apply CRle_refl.
 Qed.
 
 (** [exp] works on all nonpositive numbers. *)

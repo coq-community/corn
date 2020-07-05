@@ -6,9 +6,9 @@ Extract Inductive bool => Bool [ True False ].
 Extract Inductive option => Maybe [ Just Nothing ].
 
 Extract Inductive list => "([])" [ "[]" "( : )" ].
-Extract Inlined Constant tl => "tail".
-Extract Inlined Constant hd => "head".
-Extract Inlined Constant map => "map".
+Extract Inlined Constant List.tl => "tail".
+Extract Inlined Constant List.hd => "head".
+Extract Inlined Constant List.map => "map".
 
 Extract Inductive CoqStreams.Stream => "([])" ["( : )"].
 Extract Inlined Constant CoqStreams.tl => "tail".

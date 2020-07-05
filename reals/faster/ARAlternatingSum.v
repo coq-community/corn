@@ -238,9 +238,10 @@ terms so as to compensate for the loss of precision.
 *)
 
 Lemma ARInfAltSum_length_ge (ε : Qpos) :
-  takeUntil_length _ (Limit_near sQ 0 ε) ≤ ARInfAltSum_length (Qdlog2 (proj1_sig ε)).
+  takeUntil_length _ (Limit_near_zero (zl ε))
+  ≤ ARInfAltSum_length (Qdlog2 (proj1_sig ε)).
 Proof.
-  transitivity (4 + takeUntil_length _ (LazyExists_Str_nth_tl (Limit_near sQ 0 ε) (dnn_in_Qball_0_EventuallyForall sQ ε) 4)).
+  transitivity (4 + takeUntil_length _ (LazyExists_Str_nth_tl (Limit_near_zero (zl ε)) (dnn_in_Qball_0_EventuallyForall sQ ε) 4)).
    apply takeUntil_length_Str_nth_tl.
   unfold ARInfAltSum_length. 
   (* Regression, the following line was not necessary before. *)
