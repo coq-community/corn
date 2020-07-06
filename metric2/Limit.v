@@ -96,17 +96,16 @@ Fixpoint LazyExists_inc `{P : Stream A → Prop}
 *)
 
 Section TakeUntil.
-(* begin hide *)
-Local Coercion Is_true : bool >-> Sortclass.
-(* end hide *)
-(** takeUntil creates a list of of elements upto a the point where the predicate
+
+(** takeUntil creates a list of of elements up to the first point where the predicate
 P is satisfied.  For efficency reasons it doesn't actually build a list, but
 takes continuations for cons and nil instead.  To build an actual list pass in
 the const and nil constructors. *)
-Fixpoint takeUntil {A B : Type} (P : Stream A → bool) {s : Stream A} (ex:LazyExists P s) (cons: A → B → B) (nil : B) : B :=
-  (if P s as b return ((P s → b) → B)
+Fixpoint takeUntil {A B : Type} (P : Stream A → bool) {s : Stream A}
+         (ex:LazyExists (fun x => Is_true (P x)) s) (cons: A → B → B) (nil : B) : B :=
+  (if P s as b return ((Is_true (P s) → Is_true b) → B)
    then λ _, nil
-   else λ (n : P s → False), cons (hd s)
+   else λ (n : Is_true (P s) → False), cons (hd s)
      (@takeUntil A B P (tl s)
       match ex with
       | LazyHere H => (False_ind _ (n H))
@@ -114,14 +113,15 @@ Fixpoint takeUntil {A B : Type} (P : Stream A → bool) {s : Stream A} (ex:LazyE
       end cons nil))
   (λ x, x).
 
-Lemma Is_true_neq_left x : x ≡ false → ¬x.
+Lemma Is_true_neq_left x : x ≡ false → ¬Is_true x.
 Proof.
   intros E1 E2.
   pose proof (Is_true_eq_true x E2).
   subst. discriminate.
 Qed.
 
-Lemma takeUntil_wd {A B} {P : Stream A → bool} {s:Stream A} (ex1 ex2 : LazyExists P s) (cons : A → B → B) (nil : B) : 
+Lemma takeUntil_wd {A B} {P : Stream A → bool} {s:Stream A}
+      (ex1 ex2 : LazyExists (fun x => Is_true (P x)) s) (cons : A → B → B) (nil : B) : 
   takeUntil P ex1 cons nil ≡ takeUntil P ex2 cons nil.
 Proof.
  assert (H:=ex1).
@@ -132,8 +132,8 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma takeUntil_wd_alt `{Setoid A} `{Setoid B} `{!Proper ((=) ==> eq) (P : Stream A → bool)} `(ex1 : LazyExists P s1) 
-       `(ex2 : LazyExists P s2) (cons: A → B → B) `{!Proper ((=) ==> (=) ==> (=)) cons} (nil : B) :
+Lemma takeUntil_wd_alt `{Setoid A} `{Setoid B} `{!Proper ((=) ==> eq) (P : Stream A → bool)} `(ex1 : LazyExists (fun x => Is_true (P x)) s1) 
+       `(ex2 : LazyExists (fun x => Is_true (P x)) s2) (cons: A → B → B) `{!Proper ((=) ==> (=) ==> (=)) cons} (nil : B) :
   s1 = s2 → takeUntil P ex1 cons nil = takeUntil P ex2 cons nil.
 Proof with try easy.
   revert s2 ex2.
@@ -152,18 +152,21 @@ Proof with try easy.
   rewrite (IH tt); now rewrite E.
 Qed.
 
-Lemma takeUntil_end {A B} (P:Stream A → bool) `(ex:LazyExists P seq) (cons:A → B → B) (nil : B) :
- P seq → takeUntil P ex cons nil ≡ nil.
+Lemma takeUntil_end {A B} (P:Stream A → bool)
+      `(ex:LazyExists (fun x => Is_true (P x)) seq) (cons:A → B → B) (nil : B) :
+ Is_true (P seq) → takeUntil P ex cons nil ≡ nil.
 Proof.
  intros H.
- rewrite <- (takeUntil_wd (B:=B) (LazyHere (P:=P) H)).
+ rewrite <- (takeUntil_wd (B:=B) (LazyHere (P:= (fun x => Is_true (P x))) H)).
  unfold takeUntil.
  destruct (P seq);[|contradiction].
  reflexivity.
 Qed.
 
-Lemma takeUntil_step {A B} (P:Stream A → bool) `(ex:LazyExists P s) (cons: A → B → B) (nil: B) :
-  ¬P s → ∃ ex' : LazyExists P (tl s), takeUntil P ex cons nil ≡ cons (hd s) (takeUntil P ex' cons nil).
+Lemma takeUntil_step {A B} (P:Stream A → bool)
+      `(ex:LazyExists (fun x => Is_true (P x)) s) (cons: A → B → B) (nil: B) :
+  ¬Is_true (P s)
+  → ∃ ex' : LazyExists (fun x => Is_true (P x)) (tl s), takeUntil P ex cons nil ≡ cons (hd s) (takeUntil P ex' cons nil).
 Proof.
  intros H.
  assert (ex':=ex).
@@ -178,9 +181,9 @@ Proof.
 Qed.
 
 Lemma takeUntil_elim {A B} (P:Stream A → bool) (cons: A → B → B) (nil: B) (Q: Stream A → B → Prop) :
-  (∀ s, P s → Q s nil) →
-  (∀ s x, Q (tl s) x → ¬P s → Q s (cons (hd s) x)) →
-  ∀ `(ex : LazyExists P s), Q s (takeUntil P ex cons nil).
+  (∀ s, Is_true (P s) → Q s nil) →
+  (∀ s x, Q (tl s) x → ¬Is_true (P s) → Q s (cons (hd s) x)) →
+  ∀ `(ex : LazyExists (fun x => Is_true (P x)) s), Q s (takeUntil P ex cons nil).
 Proof.
  intros c1 c2 s ex.
  assert (ex':=ex).
@@ -207,7 +210,8 @@ Proof.
 Qed.
 
 (* Alternatively we can first compute the required length. This is useful in case we actually have to use the length *)
-Definition takeUntil_length `(P : Stream A → bool) `(ex : LazyExists P s)
+Definition takeUntil_length `(P : Stream A → bool)
+           `(ex : LazyExists (fun x => Is_true (P x)) s) : nat
   := takeUntil P ex (λ _, S) O.
 
 Fixpoint take {A B} (s : Stream A) (n : nat) (cons: A → B → B) (nil : B) : B := 
@@ -216,8 +220,9 @@ Fixpoint take {A B} (s : Stream A) (n : nat) (cons: A → B → B) (nil : B) : B
   | S m => cons (hd s) (take (tl s) m cons nil)
   end.
 
-Lemma takeUntil_length_correct {A} (P : Stream A → bool) `(ex : !LazyExists P s) :
-  P (Str_nth_tl (takeUntil_length P ex) s).
+Lemma takeUntil_length_correct {A} (P : Stream A → bool)
+      `(ex : !LazyExists (fun x => Is_true (P x)) s) :
+  Is_true (P (Str_nth_tl (takeUntil_length P ex) s)).
 Proof.
   assert (ex':=ex). unfold takeUntil_length.
   induction ex' as [s|s ? IH].
@@ -230,7 +235,8 @@ Proof.
   now apply (IH tt).
 Qed.
 
-Lemma takeUntil_correct {A B} (P : Stream A → bool) `(ex : !LazyExists P s) (cons: A → B → B) (nil : B) :
+Lemma takeUntil_correct {A B} (P : Stream A → bool)
+      `(ex : !LazyExists (fun x => Is_true (P x)) s) (cons: A → B → B) (nil : B) :
   takeUntil P ex cons nil ≡ take s (takeUntil_length P ex) cons nil.
 Proof with auto using Is_true_eq_left, Is_true_neq_left.
   assert (ex':=ex). unfold takeUntil_length.
@@ -245,7 +251,9 @@ Proof with auto using Is_true_eq_left, Is_true_neq_left.
   rewrite (takeUntil_wd ex1 ex2 (λ _, S) O)...
 Qed.
 
-Lemma takeUntil_length_tl {A} (P : Stream A → bool) `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) :
+Lemma takeUntil_length_tl {A} (P : Stream A → bool)
+      `(ex : !LazyExists (fun x => Is_true (P x)) s)
+      (Ptl : EventuallyForAll (fun x => Is_true (P x)) s) :
   takeUntil_length P ex ≤ S (takeUntil_length P (LazyExists_tl ex Ptl)).
 Proof.
   unfold takeUntil_length.
@@ -259,7 +267,9 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma takeUntil_length_Str_nth_tl {A} (P : Stream A → bool) `(ex : !LazyExists P s) (Ptl : EventuallyForAll P s) (n : nat) :
+Lemma takeUntil_length_Str_nth_tl {A} (P : Stream A → bool)
+      `(ex : !LazyExists (fun x => Is_true (P x)) s)
+      (Ptl : EventuallyForAll (fun x => Is_true (P x)) s) (n : nat) :
   takeUntil_length P ex ≤ n + takeUntil_length P (LazyExists_Str_nth_tl ex Ptl n).
 Proof with auto with *.
   revert s ex Ptl.
@@ -275,8 +285,11 @@ Proof with auto with *.
   apply IHn.
 Qed.
 
-Lemma takeUntil_length_ForAllIf {A1 A2} (P1 : Stream A1 → bool) `(ex1 : LazyExists P1 s1)
-       {P2 : Stream A2 → bool} `(ex2 : LazyExists P2 s2) (F : ForAllIf P2 P1 s2 s1) :
+Lemma takeUntil_length_ForAllIf {A1 A2} (P1 : Stream A1 → bool)
+      `(ex1 : LazyExists (fun x => Is_true (P1 x)) s1)
+      {P2 : Stream A2 → bool}
+      `(ex2 : LazyExists (fun x => Is_true (P2 x)) s2)
+      (F : ForAllIf (fun x => Is_true (P2 x)) (fun x => Is_true (P1 x)) s2 s1) :
   takeUntil_length P1 ex1 ≤ takeUntil_length P2 ex2.
 Proof with auto using Is_true_eq_left, Is_true_neq_left.
   revert s2 ex2 F.

@@ -541,17 +541,22 @@ Proof.
  rewrite <- (CRasIRasCR_id y).
  apply IRasCR_wd.
  assert (X:[0][<=](CRasIR y)[^]2).
-  apply sqr_nonneg.
+ { apply sqr_nonneg. } 
  stepl (sqrt _ X).
-  apply sqrt_wd.
+ - apply sqrt_wd.
   rewrite -> IR_eq_as_CR.
-  rewrite -> (CRpower_N_correct 2).
   rewrite -> IR_inj_Q_as_CR.
-  now rewrite -> (CRasIRasCR_id).
- apply sqrt_to_nonneg.
- rewrite -> IR_leEq_as_CR.
- rewrite -> IR_Zero_as_CR.
- now rewrite -> CRasIRasCR_id.
+  simpl.
+  rewrite <- f_sqrt.
+  rewrite <- (CRpower_N_correct 2).
+  simpl.
+  rewrite IR_mult_as_CR, IR_mult_as_CR.
+  rewrite CRasIRasCR_id. rewrite IR_One_as_CR.
+  ring.
+ - apply sqrt_to_nonneg.
+   rewrite -> IR_leEq_as_CR.
+   rewrite -> IR_Zero_as_CR.
+   now rewrite -> CRasIRasCR_id.
 Qed.
 
 Lemma rational_sqrt_mid_correct a Pa H : 
