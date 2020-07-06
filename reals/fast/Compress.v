@@ -25,9 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.metric2.CRmetric.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import CoRN.algebra.COrdAbs.
-Require Import CoRN.model.ordfields.Qordfield.
-Require Import CoRN.tactics.CornTac.
+Require Import Coq.ZArith.Zdiv.
 
 Opaque CR.
 
@@ -46,25 +44,27 @@ But for speed we simply do division to quickly find a good rational
 approximation.
 *)
 Definition approximateQ (x:Q) (p:positive) :=
-let (n,d) := x in (Z.div (n*p) d#p).
+let (n,d) := x in (Z.div (n*Zpos p) (Zpos d)#p).
 
 Lemma approximateQ_correct : forall x p,
     ball (1#p) x (approximateQ x p).
 Proof.
  intros [n d] p.
  split; simpl; unfold Qle; simpl.
-  apply Z.le_trans with 0%Z.
+ - apply Z.le_trans with 0%Z.
    discriminate.
   apply Zmult_le_0_compat; auto with *.
-  replace RHS with (n * p - ((n * p / d) * d))%Z by ring.
+  replace (n * Zpos p + - (n * Zpos p / Zpos d) * Zpos d)%Z
+    with (n * Zpos p - ((n * Zpos p / Zpos d) * Zpos d))%Z by ring.
   apply Zle_minus_le_0.
   rewrite Zmult_comm.
   apply Z_mult_div_ge; auto with *.
- rewrite Zpos_mult_morphism.
+ - rewrite Zpos_mult_morphism.
  apply Zmult_le_compat_r; auto with *.
- replace LHS with ((n*p) mod d)%Z.
-  destruct (Z_mod_lt (n*p) d); auto with *.
- transitivity (n * p - (d*(n * p / d)))%Z;[ring|].
+ replace (n * Zpos p + - (n * Zpos p / Zpos d) * Zpos d)%Z
+   with ((n*Zpos p) mod (Zpos d))%Z.
+  destruct (Z_mod_lt (n*Zpos p) (Zpos d)); auto with *.
+ symmetry. transitivity (n * Zpos p - (Zpos d*(n * Zpos p / Zpos d)))%Z;[ring|].
  symmetry.
  apply -> Zeq_plus_swap.
  rewrite Zplus_comm.
@@ -73,7 +73,7 @@ Proof.
  auto with *.
 Qed.
 
-Lemma approximateQ_big : forall (z:Z) a p, (z <= a) -> z <= approximateQ a p.
+Lemma approximateQ_big : forall (z:Z) a p, ((z#1) <= a) -> (z#1) <= approximateQ a p.
 Proof.
  intros z [n d] p Ha.
  unfold approximateQ.
@@ -81,19 +81,22 @@ Proof.
  simpl in *.
  apply Zlt_succ_le.
  unfold Z.succ.
- apply Zmult_gt_0_lt_reg_r with d.
-  auto with *.
- replace RHS with (d* (n*p/d) + (Zmod (n*p) d) - (Zmod (n*p) d) + d)%Z by ring.
- rewrite <- (Z_div_mod_eq (n*p) d) by auto with zarith.
- apply Z.le_lt_trans with (n*1*p)%Z.
-  replace LHS with (z*d*p)%Z by ring.
+ apply Zmult_gt_0_lt_reg_r with (Zpos d).
+ reflexivity.
+ replace ((n * Zpos p / Zpos d * 1 + 1) * Zpos d)%Z
+   with (Zpos d* (n*Zpos p/ Zpos d) + (Zmod (n*Zpos p) (Zpos d)) - (Zmod (n*Zpos p) (Zpos d)) + Zpos d)%Z
+   by ring.
+ rewrite <- (Z_div_mod_eq (n*Zpos p) (Zpos d)) by auto with zarith.
+ apply Z.le_lt_trans with (n*1*Zpos p)%Z.
+  replace (z*Zpos p*Zpos d)%Z with (z*Zpos d*Zpos p)%Z by ring.
   apply Zmult_lt_0_le_compat_r; auto with *.
  apply Zlt_0_minus_lt.
- replace RHS with (d - (Zmod (n*p) d))%Z by ring.
+ replace (n * Zpos p - (n * Zpos p) mod (Zpos d) + Zpos d - n * 1 * Zpos p)%Z
+   with (Zpos d - (Zmod (n*Zpos p) (Zpos d)))%Z by ring.
  rewrite <- Zlt_plus_swap.
  ring_simplify.
- assert (X:(d >0)%Z) by auto with *.
- destruct (Z_mod_lt (n*p) _ X).
+ assert (X:(Zpos d >0)%Z) by auto with *.
+ destruct (Z_mod_lt (n*Zpos p) _ X).
  assumption.
 Qed.
 
@@ -104,7 +107,7 @@ match e with
 | QposInfinity => approximate x e
 | Qpos2QposInf e =>
  let (n,d) := proj1_sig e in
- match (Z.succ (Z.div (2*d) n)) with
+ match (Z.succ (Z.div (2*Zpos d) n)) with
   Zpos p => approximateQ (approximate x (Qpos2QposInf (exist (Qlt 0) (1#p) eq_refl))) p
  |_ => approximate x e
  end
@@ -116,12 +119,12 @@ Proof.
  intros x. intros [[n d] dpos].
  destruct n as [|n|n]. inversion dpos. 2: inversion dpos.
  simpl.
- assert (0 < Z.succ ((d~0)%positive / n))%Z as zpos.
+ assert (0 < Z.succ (Zpos (d~0)%positive / Zpos n))%Z as zpos.
  { unfold Z.succ. 
    apply (Z.lt_le_trans _ (0+1)). reflexivity.
    apply Z.add_le_mono_r. apply Z_div_pos.
    reflexivity. discriminate. }
- destruct (Z.succ (xO d / n)) eqn:Hp.
+ destruct (Z.succ (Zpos (xO d) / Zpos n)) eqn:Hp.
  - exfalso. discriminate.
  - apply ball_weak_le with (2#p).
   unfold Qle.
@@ -131,11 +134,13 @@ Proof.
   unfold Z.succ.
   rewrite Zmult_plus_distr_r.
   apply Zle_0_minus_le.
-  replace RHS with (n - (xO d - n * (xO d / n)))%Z by ring.
+  replace (Zpos n * (Zpos (d~0)%positive / Zpos n) + Zpos n * 1 - Zpos (d~0)%positive)%Z
+    with (Zpos n - (Zpos (xO d) - Zpos n * (Zpos (xO d) / Zpos n)))%Z by ring.
   apply Zle_minus_le_0.
-  replace LHS with ((xO d) mod n)%Z.
-   destruct (Z_mod_lt (xO d) n); auto with *.
-  transitivity (xO d - (n*(xO d / n)))%Z;[ring|].
+  replace (Zpos (d~0)%positive - Zpos n * (Zpos (d~0)%positive / Zpos n))%Z
+    with (Zpos (xO d) mod (Zpos n))%Z.
+   destruct (Z_mod_lt (Zpos (xO d)) (Zpos n)); auto with *.
+  symmetry. transitivity (Zpos (xO d) - (Zpos n*(Zpos (xO d) / Zpos n)))%Z;[ring|].
   symmetry; apply -> Zeq_plus_swap.
   rewrite Zplus_comm.
   symmetry.
@@ -148,7 +153,7 @@ Proof.
     ring. }
  apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H. 
   eapply ball_triangle with (Cunit (approximate x (Qpos2QposInf (1#p)))).
-   apply: ball_approx_r.
+   apply ball_approx_r.
   Transparent CR.
   change (ball (m:=Complete Q_as_MetricSpace)
                (1 # p) (Cunit (approximate x (Qpos2QposInf (1 # p))))
@@ -174,7 +179,7 @@ Build_RegularFunction (compress_raw_prf x).
 Lemma compress_fun_correct : forall x, (compress_fun x==x)%CR.
 Proof.
  intros x.
- apply: regFunEq_e.
+ apply regFunEq_e.
  intros e.
  unfold compress_fun.
  unfold approximate at 1.

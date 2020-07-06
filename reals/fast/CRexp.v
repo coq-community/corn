@@ -25,7 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRAlternatingSum_alg.
-Require Import CoRN.reals.fast.CRseries.
+Require Import CoRN.reals.fast.CRstreams.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.iso_CReals.
@@ -503,6 +503,8 @@ Proof.
  now rewrite <- Z_to_nat_correct.
 Qed.
 
+(* Need transparent and fast positivity to define
+   exponential on positive rationals by division. *)
 Lemma rational_exp_neg_pos : forall (a:Q) Ha,
  CRpos (@rational_exp_neg a Ha).
 Proof.

@@ -3,7 +3,7 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import
   Coq.setoid_ring.Field CoRN.stdlib_omissions.Q
-  CoRN.reals.fast.CRarctan_small CoRN.reals.fast.CRarctan CoRN.reals.fast.CRseries CoRN.reals.fast.CRAlternatingSum
+  CoRN.reals.fast.CRarctan_small CoRN.reals.fast.CRarctan CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum
   CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
   MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export
