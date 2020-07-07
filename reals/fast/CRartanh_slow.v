@@ -24,7 +24,7 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRGeometricSum.
-Require Import CoRN.reals.fast.CRseries.
+Require Import CoRN.reals.fast.CRstreams.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import Coq.QArith.Qpower.

@@ -20,15 +20,11 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import CoRN.algebra.RSetoid.
-Require Import CoRN.metric2.Metric.
-Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.reals.fast.CRAlternatingSum.
-Require Import CoRN.reals.fast.CRGeometricSum.
+Require Import CoRN.model.metric2.Qmetric. 
 Require Import CoRN.metric2.Limit.
 Require Import Coq.QArith.Qabs. 
 Require Import Coq.Arith.Arith.
-Require Import CoRN.model.ordfields.Qordfield.
 Require Import Coq.QArith.Qpower.
 Require Import CoRN.reals.fast.LazyNat. 
 Require Import Coq.setoid_ring.Ring MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
@@ -39,15 +35,16 @@ Opaque Qabs.
 Local Open Scope Q_scope.
 
 (**
-** Specific results for series on [Q]
+** Specific results for streams on [Q]
 *)
 
 (** [everyOther] preserves limits. *)
-Lemma everyOther_nbz : forall (s : Stream Q) x, (NearBy 0 x s) -> NearBy 0 x (everyOther s).
+Lemma everyOther_nbz : forall (s : Stream Q) (e : QposInf),
+    (NearBy 0 e s) -> NearBy 0 e (everyOther s).
 Proof.
  cofix everyOther_nbz.
  intros [s [b r]] x [H [_ Hs]].
- constructor;[|apply: everyOther_nbz];assumption.
+ constructor;[|apply everyOther_nbz];assumption.
 Qed.
 
 Instance everyOther_zl `{Hx : !Limit s 0} : Limit (everyOther s) 0.
@@ -63,17 +60,17 @@ Proof.
  case (H tt);[intros X |intros X].
   right; left.
   clear - x X.
-  abstract ( destruct x as [a [b x]]; destruct X; apply: everyOther_nbz; assumption).
+  abstract ( destruct x as [a [b x]]; destruct X; apply everyOther_nbz; assumption).
  right; intros _.
- apply: everyOther_zl.
+ apply everyOther_zl.
  apply X.
  constructor.
 Defined.
 
 (** [mult_Streams] preserves convergeing to 0. *)
-Lemma mult_Streams_nbz : forall {s1 s2 : Stream Q} {x},
+Lemma mult_Streams_nbz : forall {s1 s2 : Stream Q} {x : QposInf},
     (NearBy 0 x s1)
-    -> forall {y}, NearBy 0 y s2
+    -> forall {y : QposInf}, NearBy 0 y s2
              -> NearBy 0 (x*y) (mult_Streams s1 s2).
 Proof.
  unfold NearBy.
@@ -92,8 +89,11 @@ Proof.
  ring_simplify. reflexivity.
 Qed.
 
-Lemma mult_Streams_zl : forall (a b : Stream Q), (Limit a 0) -> forall (x:Qpos), NearBy 0 x b ->
- Limit (mult_Streams a b) 0.
+(* The multiplication of a bounded stream b by a stream a
+   converging to 0 converges to 0. *)
+Lemma mult_Streams_zl : forall (a b : Stream Q),
+    (Limit a 0) -> forall (x:Qpos), NearBy 0 x b ->
+                              Limit (mult_Streams a b) 0.
 Proof.
  intros a b Ha x Hb e.
  assert (H:=Ha (e * (Qpos_inv x))%QposInf).
@@ -119,7 +119,8 @@ Defined.
 [StreamBounds] says that one stream pointwise bounds the absolute value
 of the other. *)
 Definition StreamBounds (a b : Stream Q)
-  := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(CoqStreams.hd x) in QAbsSmall a b) (zipWith (@pair _ _) a b).
+  := ForAll (fun (x:Stream (Q*Q)) => let (a,b):=(CoqStreams.hd x) in QAbsSmall a b)
+            (zipWith pair a b).
 
 (** If the bounding stream goes to 0, so does the bounded stream. *)
 Lemma Stream_Bound_nbz : forall a b e, (StreamBounds a b) -> NearBy 0 e a -> NearBy 0 e b.
@@ -164,63 +165,12 @@ Proof.
  destruct Hb; assumption.
 Defined.
 
-(** If one stream is [DecreasingNonNegative] and the other is
-a [GeometricSeries], then the result is a [GeometricSeries]. *)
-Lemma mult_Streams_Gs : forall a (x y  : Stream Q),
- (DecreasingNonNegative x) ->
- (GeometricSeries a y) ->
- (GeometricSeries a (mult_Streams x y)).
-Proof.
- cofix mult_Streams_Gs.
- intros a x y Hx Hy.
- constructor.
-  destruct Hy as [Hy _].
-  apply dnn_alt in Hx.
-  destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
-  simpl.
-  rewrite -> Qabs_Qmult.
-  apply Qle_trans
-    with (Qabs (CoqStreams.hd x) * Qabs (CoqStreams.hd (CoqStreams.tl y))).
-   apply Qmult_le_compat_r.
-    do 2 (rewrite -> Qabs_pos; try assumption).
-   apply Qabs_nonneg.
-  rewrite -> Qabs_Qmult.
-  rewrite Qmult_comm.
-  rewrite (Qmult_comm (Qabs (CoqStreams.hd x))), Qmult_assoc.
-  apply Qmult_le_compat_r; try assumption.
-  apply Qabs_nonneg.
- apply: mult_Streams_Gs.
- now destruct Hy.
-Qed.
-
 Section Qpowers.
 Variable a : Q.
 
-(** [powers] is a [GeometricSeries]. *)
-Lemma powers_help_Gs : (0 <= a) -> forall c,
- (GeometricSeries a (powers_help a c)).
-Proof.
- intros Ha.
- cofix powers_help_Gs.
- intros c.
- constructor.
-  simpl.
-  rewrite -> Qmult_comm.
-  rewrite -> Qabs_Qmult.
-  rewrite -> (Qabs_pos a); try assumption.
-  apply Qle_refl.
- apply: powers_help_Gs.
-Qed.
-
-Lemma powers_Gs : (0 <= a) -> (GeometricSeries a (powers a)).
-Proof.
- intros Ha.
- apply (powers_help_Gs Ha).
-Qed.
-
 Hypothesis Ha : 0 <= a <= 1.
 
-(** It is decreasing an nonnegative when a is between 0 and 1. *)
+(** It is decreasing and nonnegative when a is between 0 and 1. *)
 Lemma powers_help_dnn : forall x, (0 <= x) -> DecreasingNonNegative (powers_help a x).
 Proof.
  intros x Hx.
@@ -245,7 +195,8 @@ Proof.
  discriminate.
 Qed.
 
-Lemma powers_help_nbz : forall x, 0 <= x <= 1 -> NearBy 0 (Qpos2QposInf (1#1)) (powers_help a x).
+Lemma powers_help_nbz : forall x,
+    0 <= x <= 1 -> NearBy 0 (Qpos2QposInf (1#1)) (powers_help a x).
 Proof.
  cofix powers_help_nbz.
  intros b [Hb0 Hb1].
@@ -254,7 +205,7 @@ Proof.
   simpl.
   unfold Qball.
   unfold QAbsSmall. setoid_replace (b-0)%Q with b.
-  2: ring.
+  2: unfold Qminus; apply Qplus_0_r.
   split;simpl.
    apply Qle_trans with 0;[discriminate|assumption].
   assumption.
@@ -305,7 +256,8 @@ Proof.
  apply plus_n_Sm.
 Qed.
 
-Lemma Str_nth_ppositives' n : inject_Z (Str_nth n ppositives) = Str_nth n positives.
+Lemma Str_nth_ppositives' n
+  : inject_Z (Zpos (Str_nth n ppositives)) = Str_nth n positives.
 Proof.
   rewrite Str_nth_ppositives, Str_nth_positives.
   rewrite Z.P_of_succ_nat_Zplus.
@@ -342,24 +294,29 @@ Qed.
 
 (** The limit of [recip_positives] is 0. *)
 Lemma Qrecip_positives_help_nbz : forall (x: Qpos) (q:positive),
- (Qden (proj1_sig x) <= q)%Z -> NearBy 0 (Qpos2QposInf x) (CoqStreams.map (fun x => 1#x) (ppositives_help q)).
+    (Zpos (Qden (proj1_sig x)) <= Zpos q)%Z
+    -> NearBy 0 (Qpos2QposInf x) (CoqStreams.map (fun x => 1#x) (ppositives_help q)).
 Proof.
   assert (∀ (q n d : positive),
-    (d <= q)%Z
+    (Zpos d <= Zpos q)%Z
     → NearBy 0 (Qpos2QposInf (n # d)) (CoqStreams.map (λ x : positive, 1 # x) (ppositives_help q))).
  { cofix Qrecip_positives_help_nbz.
  intros q n d Hpq.
  constructor.
  - simpl.
   unfold Qball, QAbsSmall.
-  setoid_replace ((1#q)-0)%Q with (1#q). 2: ring.
+  setoid_replace ((1#q)-0)%Q with (1#q).
+  2: unfold Qminus; apply Qplus_0_r.
   split. discriminate.
-  change (1*d <= n*q)%Z.
-   apply Zmult_le_compat; auto with *.
- - apply: Qrecip_positives_help_nbz.
+  change (1*Zpos d <= Zpos n*Zpos q)%Z.
+  apply Zmult_le_compat.
+  apply Pos.le_1_l. exact Hpq.
+  discriminate. discriminate.
+ - apply Qrecip_positives_help_nbz.
  clear Qrecip_positives_help_nbz.
  rewrite Zpos_succ_morphism.
- auto with *. }
+ apply (Z.le_trans _ _ _ Hpq).
+ apply Z.le_succ_diag_r. }
  intros. destruct x as [[n d] xpos].
  destruct n as [|n|n]. inversion xpos. 2: inversion xpos.
  apply H. exact H0.
@@ -373,7 +330,7 @@ Proof.
   exact H0.
  right.
  intros _.
- apply: (H tt).
+ apply (H tt).
  apply H0.
 Defined.
 
@@ -404,7 +361,7 @@ Proof.
   simpl.
   split.
    discriminate.
-  change (p <= Pos.succ p)%Z.
+  change (Zpos p <= Zpos (Pos.succ p))%Z.
   repeat rewrite Zpos_succ_morphism.
   auto with *.
  simpl.
@@ -447,8 +404,11 @@ Proof.
  clear IHn.
  rewrite nat_of_P_succ_morphism in X.
  rewrite <- plus_n_Sm.
- apply surj_eq.
- apply Zmult_reg_l with (nat_of_P b:Z); [rewrite inject_nat_convert; auto with *|].
+ assert (forall (n m:nat), eq (Z_of_nat n) (Z_of_nat m) -> eq n m).
+ { intros i j H. intuition. }
+ apply H. clear H.
+ apply Zmult_reg_l with (Z.of_nat (nat_of_P b));
+   [rewrite positive_nat_Z; auto with *|].
  do 2 rewrite <- (inj_mult (nat_of_P b)).
  apply inj_eq.
  rewrite (Nat.mul_assoc (nat_of_P b) (nat_of_P a)).
@@ -456,11 +416,7 @@ Proof.
  rewrite <- pred_Sn in X.
  change (S (pred (nat_of_P b) + n))%nat with (S (pred (nat_of_P b)) + n)%nat.
  assert (Z:S (pred (nat_of_P b)) = nat_of_P b).
-  apply S_predn.
-  intros H.
-  symmetry in H.
-  apply (lt_not_le _ _ (lt_O_nat_of_P b)).
-  auto with *.
+ { apply (Nat.lt_succ_pred 0). apply Pos2Nat.is_pos. }
  rewrite Z.
  rewrite <- X.
  replace (fact (nat_of_P b)) with (fact (S (pred (nat_of_P b)))) by congruence.
@@ -469,13 +425,14 @@ Proof.
  ring.
 Qed.
 
-Lemma Str_nth_pfactorials' n : inject_Z (Str_nth n pfactorials) = Str_nth n factorials.
+Lemma Str_nth_pfactorials' n
+  : inject_Z (Zpos (Str_nth n pfactorials)) = Str_nth n factorials.
 Proof.
   rewrite Str_nth_factorials.
   rewrite <-Str_nth_pfactorials.
   rewrite <-(naturals.to_semiring_unique (Basics.compose inject_Z Z_of_nat)).
   unfold Basics.compose.
-  now rewrite inject_nat_convert.
+  rewrite positive_nat_Z. reflexivity.
 Qed.
 
 (**
@@ -490,7 +447,14 @@ Proof.
  unfold Qrecip_factorials.
  rewrite Str_nth_map.
  rewrite <- Str_nth_pfactorials.
- now rewrite <- anti_convert_pred_convert.
+ unfold equiv, stdlib_rationals.Q_eq, Qeq. simpl.
+ apply f_equal.
+ transitivity (Pos.of_nat (Pos.to_nat (Str_nth n pfactorials))).
+ 2: apply Pos2Nat.id. 
+ destruct (Pos.to_nat (Str_nth n pfactorials)) eqn:des.
+ 2: apply Pos.of_nat_succ.
+ exfalso. pose proof (Pos2Nat.is_pos (Str_nth n pfactorials)).
+ rewrite des in H. inversion H.
 Qed.
 
 Lemma Str_nth_Qrecip_factorials' n : Str_nth n Qrecip_factorials = / Str_nth n factorials.
@@ -514,8 +478,8 @@ Proof.
   simpl.
   split.
    discriminate.
-  change (b <= a*b)%Z.
-  auto with *.
+  apply (Z.mul_le_mono_nonneg_r 1 (Zpos a) (Zpos b)).
+  discriminate. apply Pos.le_1_l.
  simpl.
  apply Qrecip_factorials_dnn.
 Qed.
@@ -535,8 +499,10 @@ Proof.
   simpl.
   split.
    discriminate.
-  change (p <= p * q)%Z.
-  auto with *.
+  change (Zpos p <= Zpos p * Zpos q)%Z.
+  rewrite Z.mul_comm.
+  apply (Z.mul_le_mono_nonneg_r 1 (Zpos q) (Zpos p)).
+  discriminate. apply Pos.le_1_l.
  simpl in *.
  apply Qrecip_factorial_bounded.
 Qed.
@@ -546,6 +512,6 @@ Proof.
  intros e.
  right.
  intros _.
- apply: Stream_Bound_zl.
+ refine (Stream_Bound_zl _ _ _ _ _).
  apply Qrecip_factorial_bounded.
 Defined.

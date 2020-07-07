@@ -49,7 +49,7 @@ an point satifying a predicate, so long as that predicate eventually
 exists.
 
 By folding with Qminus we get an alternating sum
-p0 - (p1 - (p2 - ...
+p0 - (p1 - (p2 - ... - (pn - 0))))
  *)
 
 Definition PartialAlternatingSumUntil {P : Stream Q → bool}

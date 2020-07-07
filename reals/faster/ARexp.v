@@ -5,7 +5,7 @@ Require Import
   Coq.Program.Program MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QposMinMax 
   CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
-  CoRN.reals.fast.CRexp CoRN.reals.fast.CRseries CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
+  CoRN.reals.fast.CRexp CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
   MathClasses.orders.minmax MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export

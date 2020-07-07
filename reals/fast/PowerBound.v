@@ -25,10 +25,8 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import Coq.NArith.Ndigits.
 Require Import Coq.ZArith.ZArith.
 Require Import Coq.Program.Basics.
-Require Import CoRN.model.ordfields.Qordfield.
-Require Import CoRN.algebra.COrdFields2.
 Require Import Coq.QArith.Qpower.
-Require Import CoRN.tactics.CornTac.
+Require Import CoRN.stdlib_omissions.Z.
 
 Lemma Psize_Zlog2 (p: positive) :
   Zpos (Pos.size p) = Z.succ (Z.log2 (Zpos p)).
@@ -41,44 +39,49 @@ Local Open Scope Q_scope.
 (** These functions effiecently find bounds on rational numbers of the
 form 3^z or 4^z. *)
 
-Lemma power3bound : forall (q:Q), (q <= (3^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z).
+Lemma power3bound : forall (q:Q), (q <= (3^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z #1).
 Proof.
  intros [[|n|n] d]; try discriminate.
  unfold Qle.
  simpl.
  Open Scope Z_scope.
  rewrite Zpos_mult_morphism.
- apply Zmult_le_compat; auto with *.
+ apply Zmult_le_compat.
+ 2: apply Pos.le_1_l. 2: discriminate. 2: discriminate.
  clear - n.
  apply Z.le_trans with (two_p (Z.succ (Z.log2 (Zpos n)))-1)%Z.
-  rewrite <- Zle_plus_swap.
+ - rewrite <- Zle_plus_swap.
   apply Zlt_succ_le.
   change (Zpos n+1) with (Z.succ (Zpos n)).
   apply Zsucc_lt_compat.
   destruct (Z.log2_spec (Zpos n)); auto with zarith.
   rewrite two_p_correct.
   assumption.
- replace (Z.succ (Z.log2 (Zpos n))) with (Z_of_nat (Psize n)).
-  apply Z.le_trans with (two_p (Z_of_nat (Psize n))).
-   auto with *.
-  induction (Psize n); auto with *.
-  rewrite inj_S.
-  simpl.
-  unfold Z.succ.
-  rewrite two_p_is_exp; auto with *.
-  change (two_p 1) with 2.
-  rewrite Zpower_exp; auto with *.
-  change (3^1) with 3.
-  apply Zmult_le_compat; auto with *.
-  induction (Z_of_nat n0); auto with *.
-  rewrite <- Psize_Zlog2.
-  induction n as [ p ih | p ih | ]; auto; simpl;
-  rewrite Pos2Z.inj_succ, <- ih;
-  apply Z.P_of_succ_nat_Zplus.
+ - replace (Z.succ (Z.log2 (Zpos n))) with (Z_of_nat (Psize n)).
+   + apply Z.le_trans with (two_p (Z_of_nat (Psize n))).
+     auto with *.
+     induction (Psize n); auto with *.
+     rewrite inj_S.
+     simpl.
+     unfold Z.succ.
+     rewrite two_p_is_exp; auto with *.
+     change (two_p 1) with 2.
+     rewrite Zpower_exp.
+     2: apply Z.le_ge, Zle_0_nat. 2: discriminate.
+     apply Zmult_le_compat. exact IHn0.
+     discriminate.
+     induction (Z_of_nat n0).
+     discriminate. discriminate.
+     discriminate. discriminate.
+   + rewrite <- Psize_Zlog2.
+     induction n as [ p ih | p ih | ].
+     simpl; rewrite Pos2Z.inj_succ, <- ih; apply Z.P_of_succ_nat_Zplus.
+     simpl; rewrite Pos2Z.inj_succ, <- ih; apply Z.P_of_succ_nat_Zplus.
+     reflexivity. 
 Close Scope Z_scope.
 Qed.
 
-Lemma power4bound : forall (q:Q), (q <= (4^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z).
+Lemma power4bound : forall (q:Q), (q <= inject_Z (4^(Z_of_nat (let (n,_):= q in match n with Zpos p => Psize p | _ => O end)))%Z).
 Proof.
  intros q.
  eapply Qle_trans.
@@ -104,12 +107,13 @@ Proof.
  rewrite Zpower_exp; auto with *.
 Qed.
 
-Lemma power4bound' : forall (q:Q), (0 < q) -> ((/(4^(Z_of_nat (let (_,d):= q in Psize d)))%Z) <= q).
+Lemma power4bound' : forall (q:Q),
+    (0 < q) -> ((/inject_Z((4^(Z_of_nat (let (_,d):= q in Psize d)))%Z)) <= q).
 Proof.
  intros [[|n|n] d] H.
-   elim (Qlt_not_eq _ _ H).
-   constructor.
-  assert (X:=power4bound (d#n)).
+ elim (Qlt_not_eq _ _ H); constructor. 
+ 2: elim (Qlt_not_le _ _ H); discriminate.
+  assert (X:=power4bound (Zpos d#n)).
   simpl in X.
   rewrite -> Zpower_Qpower by auto with zarith.
   apply Qle_shift_inv_r.
@@ -119,15 +123,14 @@ Proof.
    rewrite inj_S.
    unfold Z.succ.
    rewrite -> Qpower_plus;[|discriminate].
-   apply: mult_resp_pos;[assumption|constructor].
+   rewrite <- (Qmult_0_r ((4%Z#1) ^ Z.of_nat n)).
+   apply Qmult_lt_l. exact IHn. constructor.
   rewrite <- Zpower_Qpower by auto with zarith.
-  destruct (inject_Z (4%positive ^ Psize d)%Z).
-  change ((1 * (d * Qden)%positive <= n * Qnum * 1)%Z).
+  destruct (inject_Z (Zpos 4%positive ^ Z.of_nat (Psize d))%Z).
+  change ((1 * Zpos (d * Qden)%positive <= Zpos n * Qnum * 1)%Z).
   ring_simplify.
   unfold Qle in *.
   simpl in X.
   rewrite Zmult_comm.
   assumption.
- elim (Qlt_not_le _ _ H).
- discriminate.
 Qed.

@@ -22,6 +22,7 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRAlternatingSum.
+Require Import CoRN.reals.fast.CRstreams.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -907,3 +908,55 @@ Proof.
 Qed.
 
 End GeometricSeries.
+
+(** If one stream is [DecreasingNonNegative] and the other is
+a [GeometricSeries], then the result is a [GeometricSeries]. *)
+Lemma mult_Streams_Gs : forall a (x y  : Stream Q),
+ (DecreasingNonNegative x) ->
+ (GeometricSeries a y) ->
+ (GeometricSeries a (mult_Streams x y)).
+Proof.
+ cofix mult_Streams_Gs.
+ intros a x y Hx Hy.
+ constructor.
+  destruct Hy as [Hy _].
+  apply dnn_alt in Hx.
+  destruct Hx as [[[Hx2 _] [[Hx0 Hx1] _]] _].
+  simpl.
+  rewrite -> Qabs_Qmult.
+  apply Qle_trans
+    with (Qabs (CoqStreams.hd x) * Qabs (CoqStreams.hd (CoqStreams.tl y))).
+   apply Qmult_le_compat_r.
+    do 2 (rewrite -> Qabs_pos; try assumption).
+   apply Qabs_nonneg.
+  rewrite -> Qabs_Qmult.
+  rewrite Qmult_comm.
+  rewrite (Qmult_comm (Qabs (CoqStreams.hd x))), Qmult_assoc.
+  apply Qmult_le_compat_r; try assumption.
+  apply Qabs_nonneg.
+ apply: mult_Streams_Gs.
+ now destruct Hy.
+Qed.
+
+(** [powers] is a [GeometricSeries]. *)
+Lemma powers_help_Gs (a : Q) : (0 <= a) -> forall c,
+ (GeometricSeries a (powers_help a c)).
+Proof.
+ intros Ha.
+ cofix powers_help_Gs.
+ intros c.
+ constructor.
+  simpl.
+  rewrite -> Qmult_comm.
+  rewrite -> Qabs_Qmult.
+  rewrite -> (Qabs_pos a); try assumption.
+  apply Qle_refl.
+ apply: powers_help_Gs.
+Qed.
+
+Lemma powers_Gs (a : Q) : (0 <= a) -> (GeometricSeries a (powers a)).
+Proof.
+ intros Ha.
+ apply (powers_help_Gs Ha).
+Qed.
+
