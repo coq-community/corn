@@ -505,7 +505,7 @@ Qed.
 to be the limit of these [stepSample] functions. *)
 Definition id01_raw (q:QposInf) : StepQ := stepSample (id01_raw_help q).
 
-Lemma id01_prf : is_RegularFunction (id01_raw:QposInf -> LinfStepQ).
+Lemma id01_prf : is_RegularFunction (@ball LinfStepQ) (id01_raw:QposInf -> LinfStepQ).
 Proof.
  intros a b.
  unfold id01_raw.
@@ -535,15 +535,16 @@ The distribution function maps StepF (Complete X) to Complete (StepF X).
 Definition distribComplete_raw (x:StepF CR) (e:QposInf) : LinfStepQ :=
 StepFunction.Map (fun z => approximate z e) x.
 
-Lemma distribComplete_prf : forall (x:StepF CR), is_RegularFunction (distribComplete_raw x).
+Lemma distribComplete_prf : forall (x:StepF CR),
+    is_RegularFunction (@ball LinfStepQ) (distribComplete_raw x).
 Proof.
  unfold distribComplete_raw.
  intros x a b.
  induction x using StepF_ind.
-  apply: regFun_prf.
+  apply (@regFun_prf _ Qball).
  simpl (ball (m:=LinfStepQ)).
- set (f:=(fun z : RegularFunction Q_as_MetricSpace => approximate z a)) in *.
- set (g:=(fun z : RegularFunction Q_as_MetricSpace => approximate z b)) in *.
+ set (f:=(fun z : RegularFunction (@ball Q_as_MetricSpace) => approximate z a)) in *.
+ set (g:=(fun z : RegularFunction (@ball Q_as_MetricSpace) => approximate z b)) in *.
  change (Map f (glue o x1 x2)) with (glue o (Map f x1:StepQ) (Map f x2)).
  change (Map g (glue o x1 x2)) with (glue o (Map g x1:StepQ) (Map g x2)).
  rewrite -> StepFSupBallGlueGlue.
@@ -788,9 +789,9 @@ Proof.
    apply: inj_Q_wd;simpl.
    rewrite Hba. ring.
   apply eq_symmetric; apply inj_Q_mult.
- - set (z:=(IntegralQ (glue o (Map (fun z : RegularFunction Q_as_MetricSpace =>
+ - set (z:=(IntegralQ (glue o (Map (fun z : RegularFunction Qball =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s1):StepQ) (Map
-     (fun z : RegularFunction Q_as_MetricSpace => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
+     (fun z : RegularFunction Qball => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
    change (IntegralQ (dist_raw (uc_stdFun f ^@> glue o s1 s2) ((1 # 2) * e)%Qpos))
      with z.
    apply CRAbsSmall_ball.
@@ -821,9 +822,9 @@ Proof.
  unfold z.
  rewrite -> Integral_glue.
  clear z.
- set (zl:=IntegralQ (Map (fun z : RegularFunction Q_as_MetricSpace =>
+ set (zl:=IntegralQ (Map (fun z : RegularFunction Qball =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s1))).
- set (zr:=IntegralQ (Map (fun z : RegularFunction Q_as_MetricSpace =>
+ set (zr:=IntegralQ (Map (fun z : RegularFunction Qball =>
    approximate z ((1 # 2) * e)%Qpos) (Map f s2))).
  setoid_replace ((b - a) * (o * zl + (1 - o) * zr))%Q with ((c - a)*zl + (b - c)*zr)%Q;
    [| now (unfold c, affineCombo, OpenUnitDual; simpl; ring)].

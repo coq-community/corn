@@ -277,8 +277,8 @@ Section completion_distributes.
   Definition distrib_Complete (xy: Complete (ProductMS X Y))
     : ProductMS (Complete X) (Complete Y).
   Proof.
-    refine (@Build_RegularFunction _ (fun e => fst (approximate xy e)) _,
-            @Build_RegularFunction _ (fun e => snd (approximate xy e)) _).
+    refine (@Build_RegularFunction _ _ (fun e => fst (approximate xy e)) _,
+            @Build_RegularFunction _ _ (fun e => snd (approximate xy e)) _).
     intros e1 e2. apply xy.
     intros e1 e2. apply xy.
   Defined.
@@ -296,7 +296,7 @@ Section completion_distributes.
     : Complete (ProductMS X Y).
   Proof.
     refine (@Build_RegularFunction
-             (ProductMS X Y)
+             (ProductMS X Y) _
              (fun e => (approximate (fst xy) e, approximate (snd xy) e)) _).
     intros e1 e2.
     split. apply (regFun_prf (fst (xy))). apply (regFun_prf (snd (xy))).
@@ -320,10 +320,11 @@ Section completion_distributes.
    apply (Qpos_nonneg (e+e)).
   Qed.
 
-  Lemma undistrib_after_distrib_Complete xy: st_eq (undistrib_Complete (distrib_Complete xy)) xy.
+  Lemma undistrib_after_distrib_Complete xy
+    : st_eq (undistrib_Complete (distrib_Complete xy)) xy.
   Proof.
    intros. unfold undistrib_Complete. simpl.
-   apply regFunEq_e.
+   apply (@regFunEq_e (ProductMS X Y)).
    split; simpl; apply ball_refl.
    apply (Qpos_nonneg (e+e)).
    apply (Qpos_nonneg (e+e)).

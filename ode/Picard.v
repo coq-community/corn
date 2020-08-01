@@ -530,8 +530,12 @@ assert (forall b, abs (y0 - (y0 + b)) [=] abs b).
 { intro b. pose proof (CRabs_negate b).
   apply ball_0 in H0. rewrite <- H0.
   rewrite <- ball_0. 
-  apply CRabs_proper. apply ball_0.
-  rewrite rings.negate_plus_distr, plus_assoc.
+  apply CRabs_proper.
+  apply ball_0.
+  transitivity (y0 + (-y0-b)).
+  apply ucFun2_wd. reflexivity.
+  exact (CRopp_plus_distr y0 b).
+  rewrite plus_assoc.
   rewrite rings.plus_negate_r, rings.plus_0_l. reflexivity. } 
 rewrite H0. clear H0.
 transitivity ('(abs (x - x0) * M)).
@@ -602,7 +606,10 @@ rewrite <- abs_int_minus. transitivity ('(abs (x - x0) * (L * e))).
   assert (forall i j k l : CR, i = j -> k = l -> abs (i-k) [=] abs (j-l)).
   { intros. apply ball_0. apply CRabs_proper.
     apply ball_0. apply ball_0 in H0. apply ball_0 in H1.
-    rewrite H0, H1. reflexivity. }
+    transitivity (i-l).
+    apply ucFun2_wd. reflexivity.
+    rewrite H1. reflexivity. 
+    rewrite H0. reflexivity. }
   rewrite (H0 _ _ _ _ (B1 _) (B1 _)). clear H0.
   apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
   apply (lip_prf (λ y, v (_, y)) L), A.

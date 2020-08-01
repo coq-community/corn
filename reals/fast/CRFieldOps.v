@@ -470,7 +470,7 @@ Proof.
  apply Qabs_case; intros H.
  ring_simplify. apply (Qpos_nonneg ((1#2)*e')).
  apply (Qplus_le_r _ _ ((2#1)*approximate x e)).
- ring_simplify.
+ simpl. ring_simplify.
  apply (Qle_trans _ 0).
  rewrite <- (Qmult_0_r (2#1)). apply Qmult_le_l.
  reflexivity. exact H. apply (Qpos_nonneg ((1#2)*e')).

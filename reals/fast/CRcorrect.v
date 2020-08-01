@@ -125,7 +125,7 @@ Proof.
 Defined.
 
 Lemma Cauchy_IRasCR_is_Regular : forall (x:Cauchy_IR),
-    @is_RegularFunction Q_as_MetricSpace (Cauchy_IRasCR_raw x).
+    is_RegularFunction Qball (Cauchy_IRasCR_raw x).
 Proof.
  intros [f Hf] e1 e2.
  simpl.

@@ -603,14 +603,13 @@ Proof.
            + exist _ _ (CompactTotallyBoundedStreamCauchyLemma
                           n _ (((1#1) + k)*(k*d1) + (k*d2)) Hk))%Qpos).
  setoid_replace (proj1_sig e') with (proj1_sig e0).
- - 
-   simpl.
+ - simpl.
    destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
                (@proj1_sig Q (Qlt 0) d1 +
                 @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
-               (@approximate (@FinEnum X stableX) s (Qpos2QposInf d1))
-               (@approximate (@FinEnum X stableX) s (Qpos2QposInf (k * d1)))
-               (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+               (@approximate _ (FinEnum_ball X) s (Qpos2QposInf d1))
+               (@approximate _ (FinEnum_ball X) s (Qpos2QposInf (k * d1)))
+               (@regFun_prf _ (FinEnum_ball X) s d1 (k * d1)%Qpos))
      as [f _].
   destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
   unfold e0.
@@ -672,9 +671,9 @@ Proof.
   destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
                (@proj1_sig Q (Qlt 0) d1 +
                 @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
-               (@approximate (@FinEnum X stableX) s d1)
-               (@approximate (@FinEnum X stableX) s (k * d1)%Qpos)
-               (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+               (@approximate _ (FinEnum_ball X) s d1)
+               (@approximate _ (FinEnum_ball X) s (k * d1)%Qpos)
+               (@regFun_prf _ (FinEnum_ball X) s d1 (k * d1)%Qpos))
     as [f _].
   destruct (f pt Hpt d2) as [pt' [Hpt' _]].
   simpl.
@@ -696,9 +695,9 @@ Proof.
              X stableX locatedX
              (@proj1_sig Q (Qlt 0) d1 +
               @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
-             (@approximate (@FinEnum X stableX) s d1)
-             (@approximate (@FinEnum X stableX) s (k * d1)%Qpos)
-             (@regFun_prf (@FinEnum X stableX) s d1 (k * d1)%Qpos))
+             (@approximate _ (FinEnum_ball X) s d1)
+             (@approximate _ (FinEnum_ball X) s (k * d1)%Qpos)
+             (@regFun_prf _ (FinEnum_ball X) s d1 (k * d1)%Qpos))
    as [f _].
  destruct (f pt Hpt d2) as [pt' [Hpt' _]].
  destruct (IHn s k (k*d1) (k*d2) pt' Hpt')%Qpos as [q Hq Hq0].
@@ -851,13 +850,14 @@ Proof.
  discriminate Hz.
 Qed.
 
-Definition CompactTotallyBounded_raw  (s:Compact) (d1 d2:Qpos) (pt:X) Hpt (e:QposInf) : X :=
-match e with
-|QposInfinity => pt
-|Qpos2QposInf e' => (Str_nth (CompactTotallyBoundedIndex e' d1 d2)
-                            (CompactTotallyBoundedStream
-                               s (exist (Qlt 0) (1#4) eq_refl) d1 d2 pt Hpt))
-end.
+Definition CompactTotallyBounded_raw  (s:Compact) (d1 d2:Qpos) (pt:X) Hpt (e:QposInf)
+  : X :=
+  match e with
+  |QposInfinity => pt
+  |Qpos2QposInf e' => (Str_nth (CompactTotallyBoundedIndex e' d1 d2)
+                              (CompactTotallyBoundedStream
+                                 s (exist (Qlt 0) (1#4) eq_refl) d1 d2 pt Hpt))
+  end.
 
 (*
 Lemma CompactTotallyBounded_raw_PI : forall s d1 d2 pt Hpt1 Hpt2 e,
@@ -872,7 +872,7 @@ Qed.
 
 (** This stream forms a regular function *)
 Lemma CompactTotallyBounded_prf : forall (s:Compact) (d1 d2:Qpos) (pt:X) Hpt,
- is_RegularFunction (CompactTotallyBounded_raw s d1 d2 pt Hpt).
+    is_RegularFunction (@ball X) (CompactTotallyBounded_raw s d1 d2 pt Hpt).
 Proof.
  unfold CompactTotallyBounded_raw, is_RegularFunction.
  pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
@@ -1189,14 +1189,15 @@ end.
 
 (** These approximations are coherent *)
 Lemma BishopCompactAsCompact_prf :
- forall P (HP:CompactSubset _ P), is_RegularFunction (BishopCompactAsCompact_raw HP).
+  forall P (HP:CompactSubset _ P),
+    is_RegularFunction (@ball (FinEnum stableX)) (BishopCompactAsCompact_raw HP).
 Proof.
- cut (forall (P : RegularFunction X -> Prop) (HP : CompactSubset (Complete X) P) (e1 e2 : Qpos),
+ cut (forall (P : RegularFunction (@ball X) -> Prop) (HP : CompactSubset (Complete X) P) (e1 e2 : Qpos),
    hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a
      (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e1)%Qpos in
-       map (fun x : RegularFunction X => approximate x ((1 # 2) * e1)%Qpos) l)) (fun a : X =>
+       map (fun x : RegularFunction (@ball X) => approximate x ((1 # 2) * e1)%Qpos) l)) (fun a : X =>
          InFinEnumC a (let (l, _, _) := totallyBoundedSubset HP ((1 # 2) * e2)%Qpos in
-           map (fun x : RegularFunction X => approximate x ((1 # 2) * e2)%Qpos) l))).
+           map (fun x : RegularFunction (@ball X) => approximate x ((1 # 2) * e2)%Qpos) l))).
   intros Z P [HP0 HP HP1] e1 e2.
   split. apply (Qpos_nonneg (e1+e2)). split.
    apply Z.
@@ -1349,7 +1350,7 @@ Proof.
   destruct (A e) as [y [_ Hy]].
   apply ball_sym.
   assumption.
- assert (Hf:is_RegularFunction (fun e => match e with QposInfinity => f (1#1)%Qpos | Qpos2QposInf e' => f e' end)).
+ assert (Hf: is_RegularFunction (@ball (Complete X)) (fun e => match e with QposInfinity => f (1#1)%Qpos | Qpos2QposInf e' => f e' end)).
   intros e1 e2.
   apply ball_triangle with x.
    apply Hf0.
@@ -1460,7 +1461,8 @@ Complete (FinEnum X).
 Definition FinCompact_raw (x: FinEnum stableCX) (e:QposInf) : FinEnum stableX :=
 map (fun x => approximate x e) x.
 
-Lemma FinCompact_prf : forall x, is_RegularFunction (FinCompact_raw x).
+Lemma FinCompact_prf : forall x,
+    is_RegularFunction (@ball (FinEnum stableX)) (FinCompact_raw x).
 Proof.
  intros x.
  cut (forall (e1 e2:Qpos), hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a (FinCompact_raw x e1))
@@ -1668,7 +1670,7 @@ Proof.
 Qed.
 
 Lemma CompactCompleteCompact_prf : forall x,
- is_RegularFunction (Cmap_raw FinCompact x).
+    is_RegularFunction (@ball (Compact stableX)) (Cmap_raw FinCompact x).
 Proof.
  intros x e1 e2.
  unfold Cmap_raw.
@@ -1844,15 +1846,16 @@ Proof.
                         ((1 # 4) * exist _ _ d1pos) (q+q)%Qpos). 2: apply H.
    simpl. simpl in Heqdum. rewrite <- Heqdum. apply: Qle_refl.
  - assert (Z:=H z z).
- destruct (approximate s z).
-  contradiction.
- apply: orWeaken.
- left.
- set (d:=((1 # 4) * exist _ _ d1pos)%Qpos).
- apply (mu_sum plX d (d::nil) f).
- simpl.
- unfold d.
- simpl. rewrite <- Heqdum. constructor.
+   simpl in Z.
+   destruct (@approximate _ (FinEnum_ball X) s z).
+   contradiction.
+   apply orWeaken.
+   left.
+   set (d:=((1 # 4) * exist _ _ d1pos)%Qpos).
+   apply (mu_sum plX d (d::nil) f).
+   simpl.
+   unfold d.
+   simpl. rewrite <- Heqdum. constructor.
 Qed.
 
 (*

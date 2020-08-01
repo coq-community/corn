@@ -771,8 +771,9 @@ Proof.
     apply ForAll_Str_nth_tl, H.
 Qed.
 
-Lemma InfiniteGeometricSum_raw_prf : forall series, GeometricSeries series ->
-is_RegularFunction (InfiniteGeometricSum_raw series).
+Lemma InfiniteGeometricSum_raw_prf : forall series,
+    GeometricSeries series ->
+    is_RegularFunction Qball (InfiniteGeometricSum_raw series).
 Proof.
  intros series H e0 e1.
  rewrite InfiniteGeometricSum_raw_correct.
@@ -1018,7 +1019,7 @@ Lemma InfiniteGeometricSum_raw_shift_prf
   : forall (s : Stream Q) (n : nat) {a : Q}
       (Gs : GeometricSeries a (Str_nth_tl n s)),
     0 <= a -> a < 1 ->
-    is_RegularFunction (InfiniteGeometricSum_shift_raw s n Gs).
+    is_RegularFunction Qball (InfiniteGeometricSum_shift_raw s n Gs).
 Proof.
   intros. intros e1 e2.
   apply AbsSmall_Qabs.

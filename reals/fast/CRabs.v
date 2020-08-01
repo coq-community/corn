@@ -177,6 +177,16 @@ Proof.
   apply Qabs_nonneg.
 Qed.
 
+Lemma CRle_abs : forall x:CR, (x <= CRabs x)%CR.
+Proof.
+  intros x e1. simpl.
+  unfold Cap_raw. simpl.
+  apply (Qle_trans _ (approximate x ((1 # 2) * e1)%Qpos + - approximate x ((1 # 2) * e1)%Qpos)).
+  rewrite Qplus_opp_r.
+  apply (Qopp_le_compat 0), Qpos_nonneg.
+  apply Qplus_le_l. apply Qabs.Qle_Qabs.
+Qed. 
+ 
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).

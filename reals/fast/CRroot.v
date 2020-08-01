@@ -357,7 +357,7 @@ match e with
 | Qpos2QposInf e' => root_loop e' (S (Psize (Qden (proj1_sig e')))) initial_root 2
 end.
 
-Lemma sqrt_regular : @is_RegularFunction Q_as_MetricSpace sqrt_raw.
+Lemma sqrt_regular : is_RegularFunction Qball sqrt_raw.
 Proof.
  intros e1 e2.
  apply ball_weak_le with (proj1_sig (Qpos_min (1#2) e1 + Qpos_min (1#2) e2)%Qpos).

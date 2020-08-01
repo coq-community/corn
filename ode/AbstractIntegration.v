@@ -666,13 +666,19 @@ Proof.
 induction n as [| n IH].
 + symmetry. apply ball_0. 
   apply (@cm_rht_unit CRasCMonoid (cmΣ 0 (f + g))).
-+ apply ball_0. rewrite !cmΣ_succ.
-  apply ball_0 in IH. rewrite IH. clear IH.
++ apply ball_0. rewrite cmΣ_succ.
+  transitivity ((f + g) n [+] (cmΣ n f + cmΣ n g)).
+  apply ucFun2_wd. reflexivity. 
+  apply ball_0 in IH. exact IH. clear IH.
+  rewrite cmΣ_succ.
+  transitivity (f n [+] cmΣ n f + (g n [+] cmΣ n g)).
   change (f n + g n + (cmΣ n f + cmΣ n g) [=] f n + cmΣ n f + (g n + cmΣ n g))%CR.
   do 2 rewrite <- CRplus_assoc.
   apply CRplus_eq_r.
   rewrite CRplus_comm, <- CRplus_assoc.
   apply CRplus_eq_r. apply CRplus_comm.
+  apply ucFun2_wd. reflexivity. 
+  symmetry. exact (cmΣ_succ n g).
 Qed.
 
 Lemma cmΣ_negate (n : nat) (f : nat -> CR) : cmΣ n (- f) = - cmΣ n f.
@@ -681,7 +687,10 @@ induction n as [| n IH].
 + apply ball_0. change ((0 : CR) [=] - 0)%CR.
   apply CRopp_0. 
 + apply ball_0. rewrite !cmΣ_succ.
-  apply ball_0 in IH. rewrite IH. clear IH.
+  apply ball_0 in IH.
+  transitivity ( (- f) n [+] - cmΣ n f).
+  apply ucFun2_wd. reflexivity. 
+  exact IH. clear IH.
   change (- f n - cmΣ n f [=] - (f n + cmΣ n f))%CR.
   apply (CRplus_eq_r (f n + cmΣ n f)%CR).
   rewrite CRplus_opp.
@@ -696,11 +705,15 @@ induction n as [| n IH].
 + apply ball_0. rewrite cmΣ_empty.
   change (0 [=] m * 0). symmetry; apply rings.mult_0_r.
 + apply ball_0. rewrite cmΣ_succ.
-  apply ball_0 in IH. rewrite IH, S_Qplus, <- CRplus_Qplus.
+  apply ball_0 in IH.
+  transitivity (m [+] (m*'n))%CR.
+  apply ucFun2_wd. reflexivity. 
+  exact IH. clear IH. rewrite S_Qplus, <- CRplus_Qplus.
   change (m + m * '(n : Q) [=] m * ('(n : Q) + 1)).
   rewrite rings.plus_mult_distr_l.
-  rewrite rings.mult_1_r.
-  rewrite rings.plus_comm. reflexivity.
+  rewrite rings.plus_comm.
+  apply ucFun2_wd. reflexivity. 
+  rewrite rings.mult_1_r. reflexivity.
 Qed.
 
 Lemma riemann_sum_const (a : Q) (w : Q) (m : CR) (n : positive) :
@@ -1016,10 +1029,12 @@ Lemma integral_additive' (a b : Q) (u v w : QnonNeg) :
   a + `u = b -> `u + `v = `w -> ∫ f a u + ∫ f b v = ∫ f a w.
 Proof.
   intros A1 A2.
-  Print QnonNeg.eq.
-  assert (QnonNeg.eq (u+v)%Qnn w) as H0. { apply A2. }
-  assert (Qeq (a+`u) b) as H1. { apply A1. }
-  apply ball_0. rewrite <- A1. rewrite <- H0.
+  assert (QnonNeg.eq (u+v)%Qnn w) as H0 by apply A2.
+  assert (Qeq (a+`u) b) as H1 by apply A1.
+  apply ball_0. 
+  transitivity ( ∫ f a u + ∫ f (a+`u) v).
+  apply ucFun2_wd. reflexivity. 
+  rewrite <- A1. reflexivity. rewrite <- H0.
   apply integral_additive.
 Qed.
 
@@ -1259,7 +1274,10 @@ Lemma int_minus (f g : Q -> CR)
 Proof.
   rewrite int_plus.
   pose proof (int_negate g a b).
-  apply ball_0. apply ball_0 in H1. rewrite H1. reflexivity.
+  apply ball_0. apply ball_0 in H1.
+  transitivity (int f a b + - int g a b).
+  apply ucFun2_wd. reflexivity. exact H1.
+  reflexivity.
 Qed.
 
 Lemma abs_int_minus (f g : Q -> CR)

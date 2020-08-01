@@ -251,7 +251,7 @@ Qed.
 
 Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s}
       {zl : @Limit Q_as_MetricSpace s 0} :
-  @is_RegularFunction Q_as_MetricSpace (InfiniteAlternatingSum_raw s).
+  is_RegularFunction Qball (InfiniteAlternatingSum_raw s).
 Proof.
   assert (∀ (ε1 ε2 : Qpos),
              (proj1_sig ε1) ≤ (proj1_sig ε2)
@@ -266,7 +266,7 @@ Proof.
    now apply (InfiniteAlternatingSum_length_weak _).
   intros ε1 ε2.
   destruct (total (≤) (proj1_sig ε1) (proj1_sig ε2)).
-   now auto.
+  apply H, H0.
   assert (QposEq (ε1 + ε2) (ε2+ε1)) by (unfold QposEq; simpl; ring).
   apply (ball_wd _ H1 _ _ (reflexivity _) _ _ (reflexivity _)). clear H1.
   apply ball_sym. apply H, H0. 

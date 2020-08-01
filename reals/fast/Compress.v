@@ -163,7 +163,8 @@ Proof.
  - exfalso. discriminate.
 Qed.
 
-Lemma compress_raw_prf : forall x, is_RegularFunction (compress_raw x).
+Lemma compress_raw_prf : forall x,
+    is_RegularFunction (@ball Q_as_MetricSpace) (compress_raw x).
 Proof.
  intros x e1 e2.
  rewrite <- ball_Cunit.

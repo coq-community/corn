@@ -266,7 +266,7 @@ match e with
   UniformPartition (max 1 (Z_to_nat (CompactIntervalQ_nat e')))
 end.
 
-Lemma CompactIntervalQ_prf : is_RegularFunction CompactIntervalQ_raw.
+Lemma CompactIntervalQ_prf : is_RegularFunction (@ball (FinEnum stableQ)) CompactIntervalQ_raw.
 Proof.
  cut (forall (e1 e2:Qpos), hemiMetric Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (fun a : Q_as_MetricSpace =>
    InFinEnumC a (CompactIntervalQ_raw e1)) (fun a : Q_as_MetricSpace =>

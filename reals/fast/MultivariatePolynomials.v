@@ -821,7 +821,7 @@ Fixpoint MVP_CR_apply n : extSetoid (MultivariatePolynomial CRasCRing n) (n_Func
 match n return extSetoid (MultivariatePolynomial CRasCRing n) (n_Function CR CR n) with
 | O => id
 | S n' => Build_Morphism _ (n_Function CR CR (S n')) (fun p => Build_Morphism _ _ (fun x => MVP_CR_apply n' (p!(MVP_C_ _ n' x)))
- (fun (x y : RegularFunction Q_as_MetricSpace) (Hxy : regFunEq x y) =>
+ (fun (x y : RegularFunction Qball) (Hxy : regFunEq x y) =>
        Morphism_prf (MVP_CR_apply n') p ! (MVP_C_ CRasCRing n' x)
          p ! (MVP_C_ CRasCRing n' y)
          (cpoly_apply_wd (MultivariatePolynomial CRasCRing n') p p
@@ -829,7 +829,7 @@ match n return extSetoid (MultivariatePolynomial CRasCRing n) (n_Function CR CR 
             (csf_wd CRasCSetoid (MultivariatePolynomial CRasCRing n')
                (MVP_C_ CRasCRing n') x y Hxy))))
  (fun (x1 x2 : cpoly_cring (MultivariatePolynomial CRasCRing n'))
-         (H : x1[=]x2) (x : RegularFunction Q_as_MetricSpace) =>
+         (H : x1[=]x2) (x : RegularFunction Qball) =>
        Morphism_prf (MVP_CR_apply n') x1 ! (MVP_C_ CRasCRing n' x)
          x2 ! (MVP_C_ CRasCRing n' x)
          (cpoly_apply_wd (MultivariatePolynomial CRasCRing n') x1 x2
