@@ -204,6 +204,16 @@ unfold CRabs, scale. setoid_rewrite <- fast_MonadLaw2.
 apply map_eq_complete. intro q. apply Qabs_Qmult.
 Qed.
 
+Lemma CRabs_triangle : forall (x y : CR),
+    CRabs (x+y) <= CRabs x + CRabs y.
+Proof.
+  intros. apply CRabs_AbsSmall. split.
+  2: apply CRplus_le_compat; apply CRle_abs.
+  rewrite CRopp_plus_distr.
+  apply CRplus_le_compat; apply CRopp_le_cancel;
+    rewrite CRopp_opp; rewrite <- CRabs_opp; apply CRle_abs.
+Qed.
+
 (* end hide *)
 
 Lemma CRabs_CRmult_Q (a : Q) (x : CR) : CRabs ('a * x) == '(Qabs a) * (CRabs x).
@@ -231,6 +241,97 @@ Proof.
  CRring_replace (x - y) (-(y - x)).
  apply CRabs_opp.
 Qed.
+
+Lemma CRdistance_triangle : forall (x y z : CR),
+    CRdistance x z <= CRdistance x y + CRdistance y z.
+Proof.
+  intros. unfold CRdistance.
+  setoid_replace (x-z) with (x-y + (y-z))
+    by (unfold canonical_names.equiv; ring).
+  apply CRabs_triangle.
+Qed. 
+
+Lemma regFunBall_e2 : forall (X: MetricSpace) (x y:Complete X) (e:Q),
+    (forall d:Qpos, ball (proj1_sig d + e)
+                    (approximate x ((1#2)*d)%Qpos)
+                    (approximate y ((1#2)*d)%Qpos))
+    -> ball e x y.
+Proof.
+ intros X x y e H.
+ apply ball_closed.
+ intros d dpos.
+ setoid_replace (e + d)%Q
+   with ((1#2)*((1#2)*d)
+         + ((1#2)*((1#2)*d) + e+(1#2)*((1#2)*d))
+         + (1#2)*((1#2)*d))%Q
+   by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
+ apply (regFunBall_ball
+          x y 
+          ((1 # 2) * ((1#2)*d) + e + (1 # 2) * ((1#2)*d))%Q
+          ((1#2)*((1#2)*exist _ _ dpos))%Qpos
+          ((1#2)*((1#2)*exist _ _ dpos))%Qpos ).
+ setoid_replace ((1 # 2) * ((1 # 2) * d) + e + (1 # 2) * ((1 # 2) * d))%Q
+   with ((1 # 2) * d + e)%Q
+   by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring). 
+ apply (H ((1#2)*(exist _ _ dpos))%Qpos).
+Qed.
+
+Lemma CRabs_ball : forall (x y : CR) (e:Q),
+    ball e x y <-> (CRabs (x-y) <= 'e)%CR.
+Proof.
+  assert (forall (x y:CR) e d,
+             ball e x y -> 
+             (- proj1_sig d <=
+              e + approximate x ((1 # 2) * d)%Qpos + - approximate y ((1 # 2) * d)%Qpos)%Q).
+  { intros.
+    specialize (H ((1#2)*d)%Qpos ((1#2)*d)%Qpos).
+    apply AbsSmall_Qabs in H.
+    simpl (proj1_sig ((1 # 2) * d)%Qpos) in H.
+    rewrite Qabs_Qminus in H.
+    apply (Qle_trans _ _ _ (Qle_Qabs _)) in H.
+    apply (Qplus_le_r _ _ (proj1_sig d + approximate y ((1#2)*d)%Qpos)).
+    ring_simplify.
+    setoid_replace ((1 # 2) * proj1_sig d + e + (1 # 2) * proj1_sig d)%Q
+      with (proj1_sig d + e)%Q in H
+      by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; ring).
+    apply (Qplus_le_l _ _ (approximate x ((1#2)*d)%Qpos)) in H.
+    ring_simplify in H.
+    rewrite (Qplus_comm (proj1_sig d + e)), Qplus_assoc.
+    exact H. }
+  split.
+  - intro H0. 
+    rewrite <- (CRdistance_CRle ('e)%CR x y). split.
+    + apply (CRplus_le_r _ _ ('e)%CR). ring_simplify.
+      rewrite CRplus_translate.
+      intro d. simpl. unfold Cap_raw. simpl.
+      apply H, ball_sym, H0.
+    + rewrite CRplus_comm, CRplus_translate.
+      intro d. simpl. unfold Cap_raw. simpl.
+      apply H, H0.
+  - intros H0. apply regFunBall_e2. intro d.
+    simpl.
+    apply CRdistance_CRle in H0. destruct H0.
+    rewrite CRplus_comm, CRplus_translate in H1.
+    rewrite (CRplus_le_r _ _ ('e)%CR) in H0.
+    ring_simplify in H0. rewrite CRplus_translate in H0.
+    apply AbsSmall_Qabs, Qabs_Qle_condition. split.
+    + specialize (H1 d). simpl in H1.
+      unfold Cap_raw in H1. simpl in H1.
+      apply (Qplus_le_l _ _ (approximate y ((1#2)*d)%Qpos
+                             + proj1_sig d + e)).
+      simpl. ring_simplify.
+      apply (Qplus_le_l _ _ (approximate y ((1 # 2) * d)%Qpos + proj1_sig d)) in H1.
+      simpl in H1. ring_simplify in H1.
+      exact H1.
+    + specialize (H0 d). simpl in H0.
+      unfold Cap_raw in H0. simpl in H0.
+      apply (Qplus_le_l _ _ (approximate y ((1#2)*d)%Qpos)).
+      simpl. ring_simplify.
+      apply (Qplus_le_l _ _ (approximate x ((1 # 2) * d)%Qpos + proj1_sig d)) in H0.
+      simpl in H0. ring_simplify in H0.
+      rewrite <- Qplus_assoc, Qplus_comm. exact H0.
+Qed.
+
 
 Import MathClasses.interfaces.canonical_names.
 

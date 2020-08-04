@@ -59,6 +59,11 @@ Definition regFunEq {X:Type} (ball : Q->X->X->Prop)
   := forall (e1 e2 : Qpos),
     ball (proj1_sig e1 + proj1_sig e2) (approximate f e1) (approximate g e2).
 
+Definition regFunBall {X:Type} (ball : Q->X->X->Prop)
+           (e:Q) (f g : RegularFunction ball) : Prop :=
+  forall d1 d2, ball (proj1_sig d1+e+ proj1_sig d2)
+                (approximate f (Qpos2QposInf d1)) (approximate g (Qpos2QposInf d2)).
+
 
 Section RegularFunction.
 
@@ -164,10 +169,6 @@ Qed.
 
 Definition regFun_Setoid := Build_RSetoid regFun_is_setoid.
 
-Definition regFunBall (e:Q) (f g : RegularFunction (@ball X)) :=
-  forall d1 d2, ball (m:=X) (proj1_sig d1+e+ proj1_sig d2)
-                (approximate f (Qpos2QposInf d1)) (approximate g (Qpos2QposInf d2)).
-
 Lemma regFunBall_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall (x1 x2 : regFun_Setoid), (st_eq x1 x2) ->
             forall (y1 y2 : regFun_Setoid), (st_eq y1 y2) ->
@@ -215,7 +216,7 @@ Proof.
  auto.
 Qed.
 
-Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid regFunBall.
+Lemma regFun_is_MetricSpace : is_MetricSpace regFun_Setoid (@regFunBall _ (@ball X)).
 Proof.
  unfold regFunBall.
  split.
@@ -607,6 +608,22 @@ Build_UniformlyContinuousFunction Cjoin_prf.
 End Cjoin.
 
 Arguments Cjoin {X}.
+
+Lemma Cjoin_ball : forall (X : MetricSpace) (x : Complete (Complete X)) (e : Qpos),
+    ball (proj1_sig e) (Cjoin_fun x) (approximate x e).
+Proof.
+  intros X x e d1 d2. simpl.
+  unfold Cjoin_raw. simpl.
+  destruct x as [x xreg]; simpl.
+  specialize (xreg ((1#2)*d1)%Qpos e ((1#2)*d1)%Qpos d2).
+  simpl in xreg. 
+  setoid_replace (proj1_sig d1 + proj1_sig e + proj1_sig d2)
+    with ((1 # 2) * proj1_sig d1 + ((1 # 2) * proj1_sig d1 + proj1_sig e) +
+            proj1_sig d2)
+    by ring.
+  exact xreg.
+Qed.
+
 
 Section Cmap.
 

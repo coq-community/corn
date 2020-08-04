@@ -254,20 +254,107 @@ Proof.
     apply CRle_abs. 
 Qed.
 
-Lemma CR_cauchy_complete : forall xn : nat -> RegularFunction Qball,
-  (forall p : positive,
+Definition CRcauchy_sequence (xn : nat -> CR) : Set
+  := forall p : positive,
    {n : nat
    | forall i j : nat,
      (n <= i)%nat ->
-     (n <= j)%nat -> (' (1 # p) < CRabs (CRplus (xn i) (- xn j)))%CR -> False}) ->
-  {l : RegularFunction Qball &
+     (n <= j)%nat -> (' (1 # p) < CRabs (xn i - xn j))%CR -> False}.
+
+Lemma Qarchimedean_le : forall q : Q, { p : positive | q <= Z.pos p # 1 }.
+Proof.
+  intros. destruct q as [a b]. destruct a.
+  - exists xH. discriminate.
+  - exists p. unfold Qle; simpl.
+    apply Pos.mul_le_mono_l, Pos.le_1_l.
+  - exists xH. discriminate.
+Defined.
+
+Definition CRstandard_modulus (xn : nat -> CR)
+           (xncau : CRcauchy_sequence xn)
+           (e : QposInf) : CR
+  := match e with
+     | Qpos2QposInf q
+       => xn (proj1_sig (xncau (proj1_sig (Qarchimedean_le (/ proj1_sig q)))))
+     | QposInfinity => 0%CR
+     end.
+
+Lemma CRstandard_regular : forall (xn : nat -> CR)
+                             (xncau : CRcauchy_sequence xn),
+    is_RegularFunction (@ball CR) (CRstandard_modulus xn xncau).
+Proof.
+  intros xn xncau e1 e2.
+  apply CRabs_ball. unfold CRstandard_modulus.
+  destruct (le_ge_dec
+             (proj1_sig (xncau (proj1_sig (Qarchimedean_le (/ proj1_sig e1))))) 
+             (proj1_sig (xncau (proj1_sig (Qarchimedean_le (/ proj1_sig e2)))))).
+  - destruct (xncau (proj1_sig (Qarchimedean_le (/ proj1_sig e1)))) as [n H].
+    simpl in l.
+    destruct e1 as [e1 e1pos].
+    destruct e2 as [e2 e2pos].
+    unfold proj1_sig. specialize (H n _ (Nat.le_refl _) l).
+    apply CRle_not_lt in H.
+    apply (CRle_trans H). clear H. 
+    apply CRle_Qle. unfold proj1_sig.
+    destruct (Qarchimedean_le (/ e1)) as [p H].
+    apply (Qle_trans _ (e1+0)).
+    2: apply Qplus_le_r, Qlt_le_weak, e2pos.
+    rewrite Qplus_0_r.
+    apply (Qmult_le_l _ _ e1) in H. 2: exact e1pos.
+    rewrite Qmult_inv_r in H.
+    change (1#p) with (/(Z.pos p#1)).
+    apply Qle_shift_inv_r. reflexivity.
+    apply H.
+    apply (Qpos_nonzero (exist _ e1 e1pos)).
+  - destruct (xncau (proj1_sig (Qarchimedean_le (/ proj1_sig e2)))) as [n H].
+    simpl in g.
+    destruct e1 as [e1 e1pos].
+    destruct e2 as [e2 e2pos].
+    unfold proj1_sig. specialize (H _ n g (Nat.le_refl _)).
+    apply CRle_not_lt in H.
+    apply (CRle_trans H). clear H. 
+    apply CRle_Qle. unfold proj1_sig.
+    destruct (Qarchimedean_le (/ e2)) as [p H].
+    apply (Qle_trans _ (0+e2)).
+    2: apply Qplus_le_l, Qlt_le_weak, e1pos.
+    rewrite Qplus_0_l.
+    apply (Qmult_le_l _ _ e2) in H. 2: exact e2pos.
+    rewrite Qmult_inv_r in H. 
+    change (1#p) with (/(Z.pos p#1)).
+    apply Qle_shift_inv_r. reflexivity.
+    apply H.
+    apply (Qpos_nonzero (exist _ e2 e2pos)).
+Qed.
+
+Lemma CRcauchy_complete : forall xn : nat -> CR,
+  CRcauchy_sequence xn ->
+  {l : CR &
   forall p : positive,
   {n : nat
   | forall i : nat,
-    (n <= i)%nat -> (' (1 # p) < CRabs (CRplus (xn i) (- l)))%CR -> False}}.
+    (n <= i)%nat -> (' (1 # p) < CRabs (xn i - l))%CR -> False}}.
 Proof.
-  intros.
-Admitted. 
+  intros xn xncau.
+  exists (Cjoin_fun (Build_RegularFunction (CRstandard_regular xn xncau))).
+  intro p.
+  exists (proj1_sig (xncau (2*p)%positive)).
+  intros i H. apply CRle_not_lt.
+  apply (CRle_trans (CRdistance_triangle _ (CRstandard_modulus xn xncau (Qpos2QposInf (1#2*p))) _)).
+  apply (@CRle_trans _ ('(1#2*p) + '(1#2*p))%CR).
+  apply CRplus_le_compat.
+  - simpl.
+    destruct (xncau (2*p)%positive) as [n H0] eqn:des.
+    apply CRle_not_lt. apply H0.
+    exact H. clear H i.
+    simpl in des. rewrite des. apply Nat.le_refl.
+  - apply CRabs_ball, ball_sym.
+    apply (Cjoin_ball (Build_RegularFunction (CRstandard_regular xn xncau))
+                      (1#2*p)).
+  - rewrite CRplus_Qplus.
+    apply CRle_Qle.
+    rewrite Qinv_plus_distr.
+    apply Z.le_refl.
+Qed. 
 
 Definition FastRealsConstructive : ConstructiveReals
   := Build_ConstructiveReals
@@ -286,5 +373,5 @@ Definition FastRealsConstructive : ConstructiveReals
        CRmult_lt_0_compat CRinvT
        CRmult_inv_r_nlt CRinv_0_lt_compat
        CRlt_Qmid CRup CRabs CRabs_nlt
-       CR_cauchy_complete.
+       CRcauchy_complete.
 
