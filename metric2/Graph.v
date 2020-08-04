@@ -126,7 +126,7 @@ Proof.
  setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
    with (proj1_sig ((e1 + d') + (d'+ e2))%Qpos)
    by (simpl; ring).
- assert (H':=H e1 d').
+ pose proof (H e1 d') as H'.
  clear H.
  unfold XY in *.
  destruct (approximate p e1) as [a b].
@@ -144,7 +144,7 @@ Proof.
    assumption.
   apply orWeaken.
   right.
-  apply IHs0.
+  apply IHl.
   assumption.
  eapply ball_weak_le;[|apply regFun_prf].
  unfold d2.
@@ -199,7 +199,7 @@ Proof.
    clear -H'.
    simpl in H'.
    unfold FinEnum_map_modulus, graphPoint_modulus in H'.
-   induction (@approximate (@FinEnum X stableX) s (Qpos2QposInf match @mu X Y f d' return Qpos with
+   induction (@approximate _ (FinEnum_ball X) s (Qpos2QposInf match @mu X Y f d' return Qpos with
      | Qpos2QposInf d => Qpos_min d' d | QposInfinity => d' end)).
     contradiction.
    destruct H' as [G | H | H] using orC_ind.
@@ -431,7 +431,7 @@ Proof.
    assumption.
   apply orWeaken.
   right.
-  apply IHs0.
+  apply IHl.
   assumption.
  eapply ball_weak_le;[|apply regFun_prf].
  rewrite Heqd2.
@@ -539,7 +539,7 @@ Proof.
                   | QposInfinity => ((1 # 2) * d')%Qpos
                   end) as mm.
    simpl in Heqmm. rewrite <- Heqmm in H'.
-   induction (approximate s mm). contradiction.
+   induction (@approximate _ (FinEnum_ball X) s mm). contradiction.
    destruct H' as [G | H | H] using orC_ind.
      auto using existsC_stable.
     apply existsWeaken.

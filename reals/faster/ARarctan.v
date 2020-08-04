@@ -21,13 +21,16 @@ Proof.
   rewrite rings.preserves_minus.
   rewrite ARtoCR_preserves_AQpi.
   rewrite aq_shift_opp_1, rings.preserves_1.
+  transitivity (r_pi (1 / 2)%mc - rational_arctan (/ ' a)).
+  apply ucFun2_wd. reflexivity. 
   rewrite AQarctan_small_pos_correct.
   mc_setoid_replace ('1 / 'a : Q) with (/'a).
+  reflexivity. 
+  now rewrite rings.preserves_1, rings.mult_1_l.
    apply rational_arctan_half_pi.
    transitivity (1:Q).
     now apply (semirings.lt_0_1 (R:=Q)).
    now apply semirings.preserves_gt_1.
-  now rewrite rings.preserves_1, rings.mult_1_l.
 Qed.
 
 Program Definition AQarctan_mid_pos {a : AQ} (Ha : 0 < a) : AR :=
@@ -48,13 +51,16 @@ Proof.
   unfold AQarctan_mid_pos.
   rewrite rings.preserves_plus.
   rewrite ARtoCR_preserves_AQpi.
-  rewrite AQarctan_small_correct.
-  rewrite aq_shift_opp_2, rings.preserves_1.
+  transitivity (r_pi (' (1 ≪ (-2))) + rational_arctan (('a - 1) / ('a + 1) : Q)).
+  apply ucFun2_wd. reflexivity. 
+  rewrite AQarctan_small_correct. 
   mc_setoid_replace ('(a - 1) / '(a + 1) : Q) with (('a - 1) / ('a + 1) : Q).
-   apply rational_arctan_fourth_pi.
-   now apply semirings.preserves_pos.
+  reflexivity.
   rewrite rings.preserves_minus, rings.preserves_plus.
   now rewrite rings.preserves_1.
+  rewrite aq_shift_opp_2, rings.preserves_1.
+   apply rational_arctan_fourth_pi.
+   now apply semirings.preserves_pos.
 Qed.
 
 Lemma AQarctan_pos_prf1 {a : AQ} : 0 ≤ a → a ≤ 1 ≪ (-1) → 0 ≤ a < 1.

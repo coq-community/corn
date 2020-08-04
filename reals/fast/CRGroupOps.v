@@ -176,8 +176,8 @@ Definition CRnonNeg (x:CR) := forall e:Qpos, (-proj1_sig e) <= (approximate x e)
 (* begin hide *)
 Add Morphism CRnonNeg with signature (@st_eq _) ==> iff as CRnonNeg_wd.
 Proof.
- assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
-   regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
+ assert (forall x1 x2 : RegularFunction Qball,
+            regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
   intros x y Hxy Hx e.
   apply Qnot_lt_le.
   intros He.
@@ -219,8 +219,8 @@ Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= proj1_sig e.
 (* begin hide *)
 Add Morphism CRnonPos with signature (@st_eq _) ==> iff as CRnonPos_wd.
 Proof.
- assert (forall x1 x2 : RegularFunction Q_as_MetricSpace,
-   regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
+ assert (forall x1 x2 : RegularFunction Qball,
+            regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
   intros x y Hxy Hx e.
   apply Qnot_lt_le.
   intros He.

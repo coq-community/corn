@@ -287,7 +287,8 @@ possible. *)
 Definition Cmap_raw (x:Complete X) (e:QposInf) :=
 f (approximate x (QposInf_bind (mu f) e)).
 
-Lemma Cmap_fun_prf (x:Complete X) : is_RegularFunction (fun e => f (approximate x (QposInf_bind (mu f) e))).
+Lemma Cmap_fun_prf (x:Complete X)
+  : is_RegularFunction (@ball Y) (fun e => f (approximate x (QposInf_bind (mu f) e))).
 Proof.
  intros e1 e2.
  simpl.
@@ -295,7 +296,7 @@ Proof.
  simpl.
  destruct (mu f e1) as [d1|].
   destruct (mu f e2) as [d2|].
-   apply regFun_prf.
+   apply (@regFun_prf _ (@ball X)).
   constructor.
  constructor.
 Qed.
@@ -418,7 +419,8 @@ Definition Cap_raw X Y plX (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
   approximate (Cmap plX (approximate f (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl)*e)%QposInf) x)
               (Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl)*e)%QposInf.
 
-Lemma Cap_fun_prf X Y plX (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_raw plX f x).
+Lemma Cap_fun_prf X Y plX (f:Complete (X --> Y)) (x:Complete X)
+  : is_RegularFunction (@ball Y) (Cap_raw plX f x).
 Proof.
  intros e1 e2.
  pose (exist (Qlt 0) (1#2) eq_refl) as half.
@@ -440,7 +442,7 @@ Proof.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
  apply (uc_prf (Cmap_strong Y plX)).
- apply regFun_prf.
+ apply (@regFun_prf _ (@ball (X-->Y))).
 Qed.
 
 Definition Cap_fun X Y plX (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
@@ -468,7 +470,8 @@ Proof.
    apply (ball_wd _ H _ _ (Cmap_correct _ _) _ _ (reflexivity _)).
    set (f1:=(approximate f (half * e1)%Qpos)).
    set (f2:=(approximate f (half * e2)%Qpos)).
-   apply Cmap_strong_slow_prf. apply regFun_prf. }
+   apply Cmap_strong_slow_prf.
+   apply (@regFun_prf _ (@ball (X-->Y))). }
  apply H.
 Qed.
 

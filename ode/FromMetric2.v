@@ -46,7 +46,7 @@ constructor.
 + apply ball_closed.
 Qed.
 
-Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction X.
+Definition conv_reg (f : RegularFunction X) : Complete.RegularFunction (@ball X).
 refine (@mkRegularFunction _ (f 0) (λ e : Qpos, let (e', _) := e in f e') _).
 intros [e1 e1_pos] [e2 e2_pos]. apply (rf_proof f); assumption.
 Defined.

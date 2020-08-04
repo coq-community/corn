@@ -23,19 +23,24 @@ Solve Obligations.
 Lemma ARtoCR_preserves_AQpi x : 'AQpi x = r_pi ('x).
 Proof.
   unfold AQpi, r_pi.
-  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < cast Z AQ (Zpos d)) (Pa : (0 <= 1#d < 1)%Q),
+  assert (∀ (k : Z) (d : positive) (Pnd: 0 ≤ 1 < cast Z AQ (Zpos d))
+            (Pa : (0 <= 1#d < 1)%Q),
              'ARscale ('k * x) (AQarctan_small_pos Pnd)
-             = scale (inject_Z k * 'x) (rational_arctan_small_pos Pa)) as P.
-   intros.
+             = scale (inject_Z k * 'x) (rational_arctan_small_pos Pa)) as PP.
+  { intros.
    rewrite ARtoCR_preserves_scale.
    rewrite rings.preserves_mult, AQtoQ_ZtoAQ.
    rewrite ARtoCR_preserves_arctan_small_pos.
    rewrite rational_arctan_small_pos_wd.
     reflexivity.
-   now rewrite rings.preserves_1, AQtoQ_ZtoAQ.
-  rewrite !rings.preserves_plus.
-  rewrite !P.
-  apply reflexivity.
+   now rewrite rings.preserves_1, AQtoQ_ZtoAQ. }
+  assert (forall x y : AR, cast AR CR (x+y) = 'x + 'y) as plusMorph.
+  { intros x0 y. apply (rings.preserves_plus x0 y). }
+  rewrite plusMorph. apply ucFun2_wd. 
+  rewrite plusMorph. apply ucFun2_wd.
+  apply PP. apply PP.
+  rewrite plusMorph.
+  apply ucFun2_wd. apply PP. apply PP.
 Qed.
 
 Definition ARpi := AQpi 1.

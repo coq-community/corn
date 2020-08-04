@@ -52,20 +52,20 @@ Definition dist_raw (x:StepFSup (Complete X)) (e:QposInf): (StepFSup X):=
 (Map (fun z=> approximate z e) x).
 
 Lemma dist_prf : forall (x:StepFSup (Complete X)),
- is_RegularFunction (dist_raw x).
+    is_RegularFunction (@ball (StepFSup X)) (dist_raw x).
 Proof.
  unfold dist_raw.
  intros x a b.
  induction x using StepF_ind.
-  apply: regFun_prf.
- simpl (ball (m:=StepFSup X)).
- set (f:=(fun z : RegularFunction X => approximate z a)) in *.
- set (g:=(fun z : RegularFunction X => approximate z b)) in *.
- simpl.
- fold (glue o (Map f x1) (Map f x2)).
- fold (glue o (Map g x1) (Map g x2)).
- setoid_rewrite (StepFSupBallGlueGlue).
- auto.
+ - apply (@regFun_prf _ (@ball X)).
+ - simpl (ball (m:=StepFSup X)).
+   set (f:=(fun z : RegularFunction (@ball X) => approximate z a)) in *.
+   set (g:=(fun z : RegularFunction (@ball X) => approximate z b)) in *.
+   simpl.
+   fold (glue o (Map f x1) (Map f x2)).
+   fold (glue o (Map g x1) (Map g x2)).
+   setoid_rewrite (StepFSupBallGlueGlue).
+   auto.
 Qed.
 
 Definition dist1 (x:StepFSup (Complete X)): (Complete (StepFSup X)).
@@ -91,11 +91,11 @@ Proof.
  unfold dist_raw.
  simpl.
  destruct H as [Hl Hr] using (glue_eq_ind x1 x2 y o).
- rewrite <- (glueSplit (Map (fun z : RegularFunction X => approximate z d2) y) o).
+ rewrite <- (glueSplit (Map (fun z : RegularFunction (@ball X) => approximate z d2) y) o).
  unfold SplitL, SplitR.
  rewrite StepFunction.SplitLMap, StepFunction.SplitRMap.
- fold (glue o (Map (fun z : RegularFunction X => approximate z d1) x1)
-   (Map (fun z : RegularFunction X => approximate z d1) x2)).
+ fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z d1) x1)
+   (Map (fun z : RegularFunction (@ball X) => approximate z d1) x2)).
  rewrite -> StepFSupBallGlueGlue.
  split; revert d1 d2.
   apply: IHx1; assumption.
@@ -117,10 +117,10 @@ Proof.
  simpl.
  unfold dist_raw.
  simpl.
- fold (glue o (Map (fun z : RegularFunction X => approximate z (Qpos2QposInf d1)) s)
-   (Map (fun z : RegularFunction X => approximate z (Qpos2QposInf d1)) s0)).
- fold (glue o (Map (fun z : RegularFunction X => approximate z (Qpos2QposInf d2)) t)
-   (Map (fun z : RegularFunction X => approximate z (Qpos2QposInf d2)) t0)).
+ fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d1)) s)
+   (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d1)) s0)).
+ fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d2)) t)
+   (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d2)) t0)).
  simpl in *.
  rewrite -> StepFSupBallGlueGlue in H |- *.
  split; revert d1 d2; tauto.
@@ -161,11 +161,11 @@ Proof.
  unfold Cmap_slow_fun. simpl.
  unfold Cap_slow_raw. simpl.
  unfold dist_raw.
- fold (glue o (Map (fun z : RegularFunction X => approximate z e) x)
-   (Map (fun z : RegularFunction X => approximate z e) y)).
+ fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z e) x)
+   (Map (fun z : RegularFunction (@ball X) => approximate z e) y)).
  rewrite -> StepFSupBallGlueGlue.
  assert (forall w:StepF (Complete X), StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1)
-   (Map (fun z : RegularFunction X => approximate z e) w) (Map (fun z : RegularFunction X =>
+   (Map (fun z : RegularFunction (@ball X) => approximate z e) w) (Map (fun z : RegularFunction (@ball X) =>
      approximate z (half * (half * e1))%Qpos) w)).
   induction w using StepF_ind.
    unfold StepFSupBall. unfold StepFfoldProp. simpl.
@@ -179,10 +179,10 @@ Proof.
      Qauto_nonneg.
    apply ball_approx_r.
   simpl.
-  change (StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1) (glue o0 (Map (fun z : RegularFunction X => approximate z e) w1)
-    (Map (fun z : RegularFunction X => approximate z e) w2)) (glue o0 (Map
-      (fun z : RegularFunction X => approximate z (half * (half * e1))%Qpos) w1) (Map
-        (fun z : RegularFunction X => approximate z (half * (half * e1))%Qpos) w2))).
+  change (StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1) (glue o0 (Map (fun z : RegularFunction (@ball X) => approximate z e) w1)
+    (Map (fun z : RegularFunction (@ball X) => approximate z e) w2)) (glue o0 (Map
+      (fun z : RegularFunction (@ball X) => approximate z (half * (half * e1))%Qpos) w1) (Map
+        (fun z : RegularFunction (@ball X) => approximate z (half * (half * e1))%Qpos) w2))).
   rewrite -> StepFSupBallGlueGlue.
   intuition.
  split;auto.
@@ -233,11 +233,11 @@ Proof.
   apply H.
  intros e1 e2. simpl. unfold dist_raw. simpl.
  (* Why do we need to fold glue??*)
- change (StepFSupBall (X:=Y) (proj1_sig e1 + proj1_sig e2) (glue o (Map (fun z : RegularFunction Y => approximate z e1)
-   (Map (Cmap_slow_fun f) x1)) (Map (fun z : RegularFunction Y => approximate z e1)
-     (Map (Cmap_slow_fun f) x2))) (glue o (Map f (Map (fun z : RegularFunction X => approximate z
+ change (StepFSupBall (X:=Y) (proj1_sig e1 + proj1_sig e2) (glue o (Map (fun z : RegularFunction (@ball Y) => approximate z e1)
+   (Map (Cmap_slow_fun f) x1)) (Map (fun z : RegularFunction (@ball Y) => approximate z e1)
+     (Map (Cmap_slow_fun f) x2))) (glue o (Map f (Map (fun z : RegularFunction (@ball X) => approximate z
        (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x1)) (Map f (Map
-         (fun z : RegularFunction X => approximate z
+         (fun z : RegularFunction (@ball X) => approximate z
            (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x2)))).
  rewrite -> (@StepFSupBallGlueGlue Y (proj1_sig e1+proj1_sig e2) o).
  split; [apply IHx1|apply IHx2].
@@ -273,7 +273,7 @@ Proof.
  intros X x e1 e2. simpl.
  unfold dist_raw.
  unfold StepFSupBall.
- setoid_replace ( Map (fun z : RegularFunction X => approximate z e1) (Map (Cunit_fun X) x))
+ setoid_replace ( Map (fun z : RegularFunction (@ball X) => approximate z e1) (Map (Cunit_fun X) x))
    with (Map (fun z  => (approximate ((Cunit_fun X) z) e1)) x).
   simpl.
   setoid_replace (Map (fun z : X => z) x) with x.

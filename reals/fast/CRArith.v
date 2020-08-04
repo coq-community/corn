@@ -673,6 +673,10 @@ Proof. intros. ring. Qed.
 Lemma CRplus_0_r (x: CR): (x + 0 == x)%CR.
 Proof. intros. ring. Qed.
 
+Lemma CRopp_plus_distr : forall (r1 r2 : CR),
+    - (r1 + r2) == - r1 + - r2.
+Proof. intros. ring. Qed.
+
 Lemma approximate_CRplus (x y: CR) (e: Qpos):
  approximate (x + y)%CR e = (approximate x ((1#2) * e)%Qpos + approximate y ((1#2) * e)%Qpos)%Q.
 Proof. reflexivity. Qed.
@@ -1144,7 +1148,7 @@ Proof.
       apply AbsSmall_Qabs in H.
       apply (Qle_trans _ _ _ (Qle_Qabs _)) in H.
       apply (Qplus_le_l _ _ (approximate z q + `r)).
-      ring_simplify.
+      simpl. ring_simplify.
       apply (Qplus_le_l _ _ (approximate z ((1#2)*r)%Qpos)) in H.
       ring_simplify in H. rewrite (Qplus_comm (`r)).
       apply (Qle_trans _ _ _ H).

@@ -61,14 +61,14 @@ Definition Cfst_raw (p:Complete XY) (e:QposInf) : X :=
 Definition Csnd_raw (p:Complete XY) (e:QposInf) : Y :=
 (snd (approximate p e)).
 
-Lemma Cfst_prf : forall p, is_RegularFunction (Cfst_raw p).
+Lemma Cfst_prf : forall p, is_RegularFunction (@ball X) (Cfst_raw p).
 Proof.
  intros p e1 e2.
  destruct (regFun_prf p e1 e2).
  auto.
 Qed.
 
-Lemma Csnd_prf : forall p, is_RegularFunction (Csnd_raw p).
+Lemma Csnd_prf : forall p, is_RegularFunction (@ball Y) (Csnd_raw p).
 Proof.
  intros p e1 e2.
  destruct (regFun_prf p e1 e2).
@@ -122,7 +122,7 @@ Qed.
 Definition Couple_raw (p: ProductMS (Complete X) (Complete Y)) (e:QposInf): XY :=
 (approximate (fst p) e,approximate (snd p) e).
 
-Lemma Couple_prf : forall p, is_RegularFunction (Couple_raw p).
+Lemma Couple_prf : forall p, is_RegularFunction (@ball XY) (Couple_raw p).
 Proof.
  intros [p1 p2] e1 e2.
  split; simpl; apply regFun_prf.

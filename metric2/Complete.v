@@ -35,10 +35,6 @@ Local Open Scope uc_scope.
 (**
 ** Complete metric space
 *)
-Section RegularFunction.
-
-Variable X:MetricSpace.
-
 (**
 *** Regular functions
 A regular function is one way of representing elements in a complete
@@ -48,15 +44,26 @@ approximations must be coherent and the definition belows state this
 property.
 *)
 
-Definition is_RegularFunction (x:QposInf -> X) : Prop :=
- forall (e1 e2:Qpos), ball (m:=X) (proj1_sig e1 + proj1_sig e2) (x e1) (x e2).
+Definition is_RegularFunction {X:Type} (ball : Q->X->X->Prop) (x:QposInf -> X) : Prop :=
+ forall (e1 e2:Qpos), ball (proj1_sig e1 + proj1_sig e2) (x e1) (x e2).
 
 (** A regular function consists of an approximation function, and
 a proof that the approximations are coherent. *)
-Record RegularFunction : Type :=
+Record RegularFunction {X:Type} (ball : Q->X->X->Prop) : Type :=
 {approximate : QposInf -> X
-;regFun_prf : is_RegularFunction approximate
+;regFun_prf : is_RegularFunction ball approximate
 }.
+
+Definition regFunEq {X:Type} (ball : Q->X->X->Prop)
+           (f g : RegularFunction ball) : Prop
+  := forall (e1 e2 : Qpos),
+    ball (proj1_sig e1 + proj1_sig e2) (approximate f e1) (approximate g e2).
+
+
+Section RegularFunction.
+
+Variable X:MetricSpace.
+
 
 (** The value of the approximation function at infinity is irrelevant,
  so we make a smart constructor that just takes a Qpos->X. *)
@@ -74,20 +81,18 @@ Section mkRegularFunction.
     | Qpos2QposInf e' => f e'
     end.
 
-  Let transport (f: Qpos -> X): is_RegularFunction_noInf f -> is_RegularFunction (lift f).
+  Let transport (f: Qpos -> X): is_RegularFunction_noInf f
+                               -> is_RegularFunction (@ball X) (lift f).
   Proof. firstorder. Qed.
 
-  Definition mkRegularFunction (f: Qpos -> X) (H: is_RegularFunction_noInf f): RegularFunction
+  Definition mkRegularFunction (f: Qpos -> X) (H: is_RegularFunction_noInf f)
+    : RegularFunction (@ball X)
     := Build_RegularFunction (transport H).
 
 End mkRegularFunction.
 
 (** Regular functions form a metric space *)
-Definition regFunEq (f g : RegularFunction) :=
-  forall (e1 e2 : Qpos),
-    ball (m:=X) (proj1_sig e1 + proj1_sig e2) (approximate f e1) (approximate g e2).
-
-Lemma regFunEq_e : forall (f g : RegularFunction),
+Lemma regFunEq_e : forall (f g : RegularFunction (@ball X)),
     (forall e : Qpos, ball (m:=X) (proj1_sig e + proj1_sig e) (approximate f e) (approximate g e)) -> (regFunEq f g).
 Proof.
  unfold regFunEq.
@@ -106,7 +111,7 @@ Proof.
   apply (regFun_prf _ ((1 # 4) * exist (Qlt 0) d dpos)%Qpos e2).
 Qed.
 
-Lemma regFunEq_e_small : forall (f g : RegularFunction) (E:Qpos),
+Lemma regFunEq_e_small : forall (f g : RegularFunction (@ball X)) (E:Qpos),
     (forall (e:Qpos), proj1_sig e <= proj1_sig E -> ball (m:=X) (proj1_sig e+ proj1_sig e) (approximate f e) (approximate g e)) -> (regFunEq f g).
 Proof.
  intros f g E H.
@@ -134,7 +139,8 @@ Proof.
  apply regFun_prf.
 Qed.
 
-Lemma regFun_is_setoid : Setoid_Theory RegularFunction regFunEq.
+Lemma regFun_is_setoid : Setoid_Theory (RegularFunction (@ball X))
+                                       (@regFunEq _ (@ball X)).
 Proof.
  split.
  - unfold Reflexive.
@@ -158,7 +164,7 @@ Qed.
 
 Definition regFun_Setoid := Build_RSetoid regFun_is_setoid.
 
-Definition regFunBall (e:Q) (f g : RegularFunction) :=
+Definition regFunBall (e:Q) (f g : RegularFunction (@ball X)) :=
   forall d1 d2, ball (m:=X) (proj1_sig d1+e+ proj1_sig d2)
                 (approximate f (Qpos2QposInf d1)) (approximate g (Qpos2QposInf d2)).
 
@@ -167,8 +173,9 @@ Lemma regFunBall_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall (y1 y2 : regFun_Setoid), (st_eq y1 y2) ->
             (regFunBall e1 x1 y1 <-> regFunBall e2 x2 y2).
 Proof.
- assert (forall x1 x2 : Q, x1 == x2 -> forall x3 x4 : RegularFunction , regFunEq x3 x4 ->
-   forall x5 x6 : RegularFunction , regFunEq x5 x6 -> (regFunBall x1 x3 x5 -> regFunBall x2 x4 x6)).
+  assert (forall x1 x2 : Q, x1 == x2 -> forall x3 x4 : RegularFunction (@ball X),
+               regFunEq x3 x4 ->
+   forall x5 x6 : RegularFunction (@ball X), regFunEq x5 x6 -> (regFunBall x1 x3 x5 -> regFunBall x2 x4 x6)).
   unfold regFunBall.
   unfold regFunEq.
   intros a1 a2 Ha f1 f2 Hf g1 g2 Hg H d1 d2.
@@ -298,7 +305,7 @@ Qed.
 *** Cunit
 There is an injection from the original space to the complete space
 given by the constant regular function. *)
-Lemma Cunit_fun_prf (x:X) : is_RegularFunction (fun _ => x).
+Lemma Cunit_fun_prf (x:X) : is_RegularFunction (@ball X) (fun _ => x).
 Proof.
  intros d1 d2.
  apply ball_refl.
@@ -400,7 +407,7 @@ Lemma regFun_prf_ex :
   ball_ex  (e1 + e2) (approximate r e1) (approximate r e2).
 Proof.
  intros r [e1|] [e2|]; try constructor.
- apply regFun_prf.
+ apply (@regFun_prf X (@ball X)).
 Qed.
 
 End RegularFunction.
@@ -480,7 +487,7 @@ Section FasterInGeneral.
 Variable f : Qpos -> Qpos.
 Hypothesis Hf : forall x, proj1_sig (f x) <= proj1_sig x.
 
-Lemma fasterIsRegular : is_RegularFunction (fun e => (approximate x (QposInf_bind f e))).
+Lemma fasterIsRegular : is_RegularFunction (@ball X) (fun e => (approximate x (QposInf_bind f e))).
 Proof.
  intros e1 e2.
  simpl.
@@ -555,7 +562,8 @@ Definition Cjoin_raw (x:Complete (Complete X)) (e:QposInf) :=
   (approximate (approximate x (QposInf_mult (Qpos2QposInf (1#2)) e))
                (QposInf_mult (Qpos2QposInf (1#2)) e))%Qpos.
 
-Lemma Cjoin_fun_prf (x:Complete (Complete X)) : is_RegularFunction (Cjoin_raw x).
+Lemma Cjoin_fun_prf (x:Complete (Complete X))
+  : is_RegularFunction (@ball X) (Cjoin_raw x).
 Proof.
  intros d1 d2.
  rewrite <- ball_Cunit.
@@ -649,7 +657,8 @@ Proof.
  assumption.
 Qed.
 
-Lemma Cmap_slow_fun_prf (x:Complete X) : is_RegularFunction (Cmap_slow_raw x).
+Lemma Cmap_slow_fun_prf (x:Complete X)
+  : is_RegularFunction (@ball Y) (Cmap_slow_raw x).
 Proof.
  intros e1 e2.
  unfold Cmap_slow_raw.
@@ -1006,7 +1015,8 @@ Definition Cap_slow_raw (f:Complete (X --> Y)) (x:Complete X) (e:QposInf) :=
               ((Qpos2QposInf (exist (Qlt 0) (1#2) eq_refl))*e)%QposInf.
 
 
-Lemma Cap_slow_fun_prf (f:Complete (X --> Y)) (x:Complete X) : is_RegularFunction (Cap_slow_raw f x).
+Lemma Cap_slow_fun_prf (f:Complete (X --> Y)) (x:Complete X)
+  : is_RegularFunction (@ball Y) (Cap_slow_raw f x).
 Proof.
  intros e1 e2.
  unfold Cap_slow_raw.
@@ -1027,7 +1037,7 @@ Proof.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
  apply (uc_prf Cmap_strong_slow).
- apply regFun_prf.
+ apply (@regFun_prf _ (@ball (X-->Y))).
 Qed.
 
 Definition Cap_slow_fun (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
@@ -1051,7 +1061,7 @@ Proof.
  apply ball_triangle with y2;[|apply ball_approx_r].
  apply ball_triangle with y1;[apply ball_approx_l|].
  apply (uc_prf Cmap_strong_slow).
- apply regFun_prf.
+ apply (@regFun_prf _ (@ball (X-->Y))).
 Qed.
 
 Definition Cap_slow_modulus (f:Complete (X --> Y)) (e:Qpos) : QposInf
