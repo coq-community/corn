@@ -2,7 +2,7 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import 
-  Coq.Program.Program Coq.setoid_ring.Ring CoRN.logic.CLogic
+  Coq.Program.Program Coq.setoid_ring.Ring
   Coq.QArith.Qabs CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QMinMax CoRN.model.totalorder.QposMinMax CoRN.util.Qdlog
   CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.metric2.MetricMorphisms 
@@ -61,7 +61,7 @@ Definition ARcompress : AR --> AR := Cbind AQPrelengthSpace AQcompress_uc.
 
 Lemma ARcompress_correct (x : AR) : ARcompress x = x.
 Proof.
-  apply: regFunEq_e. intros ε.
+  apply regFunEq_e. intros ε.
   assert (QposEq (ε + ε) ((1#2) * ε + ((1#2) * ε + ε)))
     by (unfold QposEq; simpl; ring).
  apply (ball_wd _ H5 _ _ (reflexivity _) _ _ (reflexivity _)). clear H5.
@@ -76,7 +76,7 @@ Global Instance inject_Z_AR: Cast Z AR := (cast AQ AR ∘ cast Z AQ)%prg.
 
 Lemma ARtoCR_inject (x : AQ) : cast AR CR (cast AQ AR x) = cast Q CR (cast AQ Q x).
 Proof.
-  apply: regFunEq_e. intros ε. apply ball_refl.
+  apply regFunEq_e. intros ε. apply ball_refl.
   apply (Qpos_nonneg (ε + ε)). 
 Qed.
 
@@ -240,9 +240,9 @@ Proof. change (SemiRing_Morphism (inverse (cast AR CR))). split; apply _. Qed.
 Instance: SemiRing_Morphism (cast AQ AR).
 Proof.
   repeat (split; try apply _); intros; try reflexivity.
-   apply: regFunEq_e. intros ε. apply ball_refl. 
+   apply regFunEq_e. intros ε. apply ball_refl. 
    apply (Qpos_nonneg (ε + ε)).
-   rewrite ARmult_scale. apply: regFunEq_e. intros ε.
+   rewrite ARmult_scale. apply regFunEq_e. intros ε.
    apply ball_refl.
    apply (Qpos_nonneg (ε + ε)).
 Qed.
@@ -324,7 +324,9 @@ Next Obligation.
   ring.
 Qed.
 
-Lemma ARtoCR_preserves_pos x : ARpos x IFF CRpos ('x).
+Lemma ARtoCR_preserves_pos x
+  : prod (ARpos x -> CRpos ('x))
+         (CRpos ('x) -> ARpos x).
 Proof with auto with qarith.
   split; intros [y E].
    exists (cast (AQ₊) (Q₊) y).
@@ -353,13 +355,17 @@ Qed.
 
 Definition ARltT: AR → AR → Type := λ x y, ARpos (y - x).
 
-Lemma ARtoCR_preserves_ltT x y : ARltT x y IFF CRltT ('x) ('y).
+Lemma ARtoCR_preserves_ltT x y
+  : prod (ARltT x y -> CRltT ('x) ('y))
+         (CRltT ('x) ('y) -> ARltT x y).
 Proof.
-  stepl (CRpos ('(y - x))). 
-   split; intros; eapply CRpos_wd; eauto. 
+  split; intros.
+  - apply ARtoCR_preserves_pos in X.
+    eapply CRpos_wd; eauto. 
     now autorewrite with ARtoCR.
-   now autorewrite with ARtoCR.
-  now split; apply ARtoCR_preserves_pos.
+  - apply ARtoCR_preserves_pos.
+    eapply CRpos_wd; eauto. 
+    now autorewrite with ARtoCR.
 Defined.
 
 Lemma ARltT_wd : ∀ x1 x2 : AR, x1 = x2 → ∀ y1 y2, y1 = y2 → ARltT x1 y1 → ARltT x2 y2.
@@ -370,16 +376,24 @@ Proof.
 Qed.
 
 (* Apartness in Type *)
-Definition ARapartT: AR → AR → Type := λ x y, ARltT x y or ARltT y x.
+Definition ARapartT: AR → AR → Type := λ x y, sum (ARltT x y) (ARltT y x).
 
-Lemma ARtoCR_preserves_apartT x y : ARapartT x y IFF CRapartT ('x) ('y).
+Lemma ARtoCR_preserves_apartT x y
+  : prod (ARapartT x y -> CRapartT ('x) ('y))
+         (CRapartT ('x) ('y) -> ARapartT x y).
 Proof. split; (intros [|]; [left|right]; now apply ARtoCR_preserves_ltT). Defined.
 
-Lemma ARtoCR_preserves_apartT_0 x : ARapartT x 0 IFF CRapartT ('x) 0.
+Lemma ARtoCR_preserves_apartT_0 x
+  : prod (ARapartT x 0 -> CRapartT ('x) 0)
+         (CRapartT ('x) 0 -> ARapartT x 0).
 Proof.
-  stepr (CRapartT ('x) (cast AR CR 0)).
-   split; apply ARtoCR_preserves_apartT.
-  split; apply CRapartT_wd; try rewrite ARtoCR_preserves_0; reflexivity.
+  split; intros.
+  - apply (@CRapartT_wd ('x)%mc _ (reflexivity _) (cast AR CR 0)).
+    apply ARtoCR_preserves_0.
+    apply ARtoCR_preserves_apartT, X.
+  - apply (@CRapartT_wd ('x)%mc _ (reflexivity _) _ (cast AR CR 0)) in H5.
+    apply ARtoCR_preserves_apartT in H5. exact H5.
+    symmetry; apply ARtoCR_preserves_0.
 Defined.
 
 (* Strict order in Prop *)
@@ -452,15 +466,16 @@ Qed.
 Global Instance ARlt: Lt AR := λ x y, 
   ∃ n : nat, AR_epsilon_sign_dec (-1 - cast nat Z n) (y - x) ≡ Gt.
 
-Lemma AR_lt_ltT x y : x < y IFF ARltT x y.
+Lemma AR_lt_ltT x y : prod (x < y -> ARltT x y)
+                           (ARltT x y -> x < y).
 Proof.
   split.
-   intros E.
+  - intros E.
    apply ConstructiveEpsilon.constructive_indefinite_description_nat in E. 
     destruct E as [n En].
     now apply AR_epsilon_sign_dec_pos with (-1 - cast nat Z n).
    intros. now apply comparison_eq_dec.
-  intros [ε Eε].
+  - intros [ε Eε].
   exists (Z.nat_of_Z (-Qdlog2 ('ε))).
   apply AR_epsilon_sign_dec_pos_rev.
   transitivity ('ε : AR); [| assumption].
@@ -498,10 +513,11 @@ Proof.
   now apply AR_lt_ltT, ARtoCR_preserves_ltT, CR_lt_ltT.
 Qed.
 
-Lemma AR_apart_apartT x y : x ≶ y IFF ARapartT x y.
+Lemma AR_apart_apartT x y : prod (x ≶ y -> ARapartT x y)
+                                 (ARapartT x y -> x ≶ y).
 Proof.
   split.
-   intros E.
+  - intros E.
    set (f (n : nat) := AR_epsilon_sign_dec (-1 - cast nat Z n)).
    assert (∃ n, f n (y - x) ≡ Gt ∨ f n (x - y) ≡ Gt) as E2.
     now destruct E as [[n En] | [n En]]; exists n; [left | right].
@@ -514,7 +530,7 @@ Proof.
    intros n. 
    destruct (comparison_eq_dec (f n (y - x)) Gt); auto.
    destruct (comparison_eq_dec (f n (x - y)) Gt); tauto.
-  intros [E|E].
+  - intros [E|E].
    left. now apply AR_lt_ltT.
   right. now apply AR_lt_ltT.
 Qed.
@@ -559,7 +575,7 @@ Proof.
   now apply (strong_injective _).
 Qed.
 
-Global Instance: FullPseudoSemiRingOrder ARle ARlt.
+Global Instance ARfpsro: FullPseudoSemiRingOrder ARle ARlt.
 Proof. 
   apply (rings.projected_full_pseudo_ring_order (cast AR CR)).
    apply ARtoCR_preserves_le.
@@ -593,7 +609,9 @@ Proof.
    now eapply aq_div_dlog2.
    simpl. aq_preservation.
   rewrite 2!left_identity.
-   exact (Qinv_pos_uc_prf (' c) ε (' x) (' y) E).
+   pose proof (Qinv_pos_uc_prf (' c) ε (' x) (' y)) as H5.
+   simpl in H5. apply H5.
+   exact E.
 Qed.
 
 Definition AQinv_pos_uc (c : AQ₊) := Build_UniformlyContinuousFunction (AQinv_pos_uc_prf c).
@@ -614,7 +632,7 @@ Qed.
 
 Lemma ARtoCR_preserves_inv_pos x c : 'ARinv_pos c x = CRinv_pos ('c) ('x).
 Proof.
-  apply: regFunEq_e. intros ε. 
+  apply regFunEq_e. intros ε. 
   simpl. unfold Cjoin_raw. simpl.
   setoid_replace (proj1_sig ε + proj1_sig ε)%Q
     with (proj1_sig ((1#2) * ε + ((1#2) * ε + ε)))%Qpos
@@ -718,9 +736,9 @@ Proof.
     apply (strong_injective (cast AQ AR)).
     solve_propholds.
    intros [x Px] [y Py] E.
-   now apply: ARinvT_wd.
+   now refine (ARinvT_wd _ _ _ _ _).
   intros x.
-  now apply: AR_inverseT.
+  now apply AR_inverseT.
 Qed.
 
 (* Nat pow *)

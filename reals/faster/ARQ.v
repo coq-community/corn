@@ -2,7 +2,7 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.Program.Program Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.model.structures.Qpossec CoRN.reals.fast.Compress
+  Coq.Program.Program Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
   MathClasses.theory.int_pow MathClasses.theory.nat_pow
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers.

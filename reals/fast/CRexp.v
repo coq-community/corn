@@ -389,6 +389,20 @@ Proof.
  apply Ha.
 Defined.
 
+(* Some time measures on a 5000 bogomips CPU
+Lemma Zneg_neg : forall p:positive, Z.neg p # 1 <= 0.
+Proof. intros. discriminate. Qed.
+Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 100%positive))
+                                     (Qpos2QposInf (1#(10 ^ 100)%positive))).
+1.8 secs
+Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 200%positive))
+                                     (Qpos2QposInf (1#(10 ^ 200)%positive))).
+10.8 secs
+Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 300%positive))
+                                     (Qpos2QposInf (1#(10 ^ 300)%positive))).
+31.7 secs
+*)
+
 Lemma rational_exp_neg_wd (a1 a2 : Q) (p1 : a1 <= 0) (p2 : a2 <= 0) :
   a1 = a2 → rational_exp_neg p1 = rational_exp_neg p2.
 Proof.
@@ -524,6 +538,17 @@ Proof.
   apply (Qopp_le_compat 0); assumption.
  apply (rational_exp_neg q).
 Defined.
+
+(* Some time measures on a 5000 bogomips CPU
+Time Eval vm_compute in (approximate (rational_exp (100#1)) (Qpos2QposInf (1#1))).
+1.5 secs
+
+Time Eval vm_compute in (approximate (rational_exp (200#1)) (Qpos2QposInf (1#1))).
+9.5 secs
+
+Time Eval vm_compute in (approximate (rational_exp (300#1)) (Qpos2QposInf (1#1))).
+30 secs
+*)
 
 Lemma rational_exp_pos_correct (a : Q) (Pa : 0 ≤ a) (c : Qpos) :
   ('proj1_sig c <= IRasCR (Exp (inj_Q IR (-a)%Q)))%CR → 
