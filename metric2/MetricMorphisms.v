@@ -4,7 +4,7 @@ Require
   MathClasses.theory.jections.
 Require Import 
   CoRN.model.totalorder.QposMinMax
-  Coq.Setoids.Setoid CoRN.tactics.CornTac
+  Coq.Setoids.Setoid 
   CoRN.stdlib_omissions.Q CoRN.model.totalorder.QMinMax
   CoRN.metric2.Complete CoRN.metric2.Prelength
   MathClasses.interfaces.abstract_algebra.
@@ -114,10 +114,10 @@ Section dense_prelength_embedding.
     pose proof (EPrelengthSpace_aux δ2 γ (1#3) G) as E2.
     destruct (@plY (f x) (f y) ε (exist _ _ E1) (exist _ _ E2)) as [z Ez1 Ez2]...
     - simpl.
-     replace RHS
-       with (`ε + (`γ - (2 # 3) * proj1_sig (Qpos_min γ (Qpos_min
+      apply (Qlt_le_trans
+       _ (`ε + (`γ - (2 # 3) * proj1_sig (Qpos_min γ (Qpos_min
           (Qpos_min (half * δ1 + half * δ2) (half * γ + half * δ2))
-          (half * δ1 + half * γ)))))%Q.
+          (half * δ1 + half * γ))))))%Q.
        rewrite <-(Qplus_0_r (`ε)) at 1. 
        apply Qplus_lt_r.
        apply EPrelengthSpace_aux...
@@ -131,7 +131,11 @@ Section dense_prelength_embedding.
        repeat rewrite <-Qmin_mult_pos_distr_r...
        unfold Qminus. unfold QposEq in Eγ.
        rewrite (Qplus_assoc (` ε)), <- Eγ.
-       simpl. ring. ring_simplify ((1 # 2) * ` γ + (1 # 2) * ` γ)%Q.
+       simpl.
+       ring_simplify.
+       setoid_replace (-2#6) with (-1#3).
+       apply Qle_refl. reflexivity.
+       ring_simplify ((1 # 2) * ` γ + (1 # 2) * ` γ)%Q.
        reflexivity.
     - exists (app_inverse f z (exist (Qlt 0) (1#3) eq_refl * Qpos_min γ (Qpos_min δ1 δ2))). 
       assert (QposEq δ1 (exist _ _ E1 + (third * Qpos_min δ1 γ)))

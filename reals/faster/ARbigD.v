@@ -29,9 +29,10 @@ Proof. unfold inject_N_bigZ. apply _. Qed.
 Instance: SemiRing_Morphism inject_bigD_Q.
 Proof. unfold inject_bigD_Q. apply _. Qed.
 
-Lemma inject_bigD_Q_correct x : cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
+Lemma inject_bigD_Q_correct
+  : forall x : bigD, cast bigD Q x = 'mant x * 2 ^ (cast bigZ Z (expo x)).
 Proof.
-  unfold cast at 1, inject_bigD_Q.
+  intro x. unfold cast at 1, inject_bigD_Q.
   unfold inject_bigZ_Q. 
   rewrite (DtoQ_correct _ _ (reflexivity x)).
   unfold DtoQ_slow.

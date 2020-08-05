@@ -6,9 +6,9 @@ Require
 Require Import 
   Coq.Program.Program
   CoRN.model.totalorder.QposMinMax
-  CoRN.tactics.CornTac MathClasses.misc.workaround_tactics
+  MathClasses.misc.workaround_tactics
   CoRN.stdlib_omissions.Q CoRN.util.Qdlog CoRN.model.metric2.Qmetric Coq.QArith.Qabs CoRN.classes.Qclasses CoRN.model.totalorder.QMinMax
-  CoRN.algebra.RSetoid CoRN.algebra.CSetoids CoRN.metric2.MetricMorphisms
+  CoRN.algebra.RSetoid CoRN.metric2.MetricMorphisms
   MathClasses.orders.minmax MathClasses.orders.dec_fields MathClasses.theory.abs MathClasses.theory.shiftl MathClasses.theory.int_pow.
 Require Export
   MathClasses.interfaces.abstract_algebra MathClasses.interfaces.additional_operations MathClasses.interfaces.orders.
@@ -98,7 +98,7 @@ Section approximate_rationals_more.
   Proof.
     eapply ball_weak_le.
      now apply Qpos_dlog2_spec.
-    now apply: aq_div.
+    now apply aq_div.
   Qed.
 
   Lemma aq_approx_dlog2 (x : AQ) (ε : Q₊) : 
@@ -106,7 +106,7 @@ Section approximate_rationals_more.
   Proof.
     eapply ball_weak_le.
      now apply Qpos_dlog2_spec.
-    now apply: aq_compress.
+    now apply aq_compress.
   Qed.
 
   Definition app_div_above (x y : AQ) (k : Z) : AQ := app_div x y k + 1 ≪ k.
@@ -194,7 +194,7 @@ Section approximate_rationals_more.
   Next Obligation.
     destruct x as [x Ex]. simpl.
     posed_rewrite <-(rings.preserves_0 (f:=cast AQ Q)).
-    now apply: (strictly_order_preserving (cast AQ Q)).
+    now apply (strictly_order_preserving (cast AQ Q)).
   Qed.
 
   Lemma AQposAsQpos_preserves_1 : cast (AQ₊) (Q₊) 1 = 1.
