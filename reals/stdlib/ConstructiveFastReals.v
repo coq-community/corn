@@ -83,7 +83,7 @@ Proof.
     apply Qplus_le_r. apply Qle_refl.
 Qed.
 
-Lemma CRlt_or_epsilon : (forall a b c d : RegularFunction Qball,
+Lemma CRlt_or_epsilon : (forall a b c d : CR,
        CRlt a b \/ CRlt c d -> (a < b)%CR + (c < d)%CR).
 Proof.
   intros. 
@@ -120,33 +120,33 @@ Qed.
 
 Lemma CReq_nlt : forall a b : CR,
     st_eq a b
-    <-> (fun x y : RegularFunction Qball =>
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y) a b.
+    <-> (fun x y : CR =>
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y) a b.
 Proof.
   split.
   - split. intro abs.
     exact (CRlt_irrefl _ (@CRltT_wd _ _ H b _ (reflexivity _) abs)).
     intro abs.
     exact (CRlt_irrefl _ (@CRltT_wd b _ (reflexivity _) _ _ H abs)).
-  - intros [H H0]. apply CRle_def. split.
+  - intros [H H0]. apply CRle_antisym. split.
     apply CRle_not_lt in H0. exact H0.
     apply CRle_not_lt in H. exact H.
 Qed.
 
 Lemma inject_Q_CR_plus : forall q r : Q,
-       (fun x y : RegularFunction Qball =>
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y)
+       (fun x y : CR =>
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y)
          (' (q + r)%Q)%CR (CRplus (' q)%CR (' r)%CR).
 Proof.
   intros q r. apply CReq_nlt, (CRplus_Qplus q r).
 Qed.
 
 Lemma inject_Q_CR_mult : forall q r : Q,
-       (fun x y : RegularFunction Qball =>
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y)
+       (fun x y : CR =>
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y)
          (' (q * r)%Q)%CR (CRmult (' q)%CR (' r)%CR).
 Proof.
   intros q r. 
@@ -154,10 +154,10 @@ Proof.
 Qed.
 
 Lemma CR_ring_nlt : ring_theory 0%CR 1%CR CRplus CRmult
-        (fun x y : RegularFunction Qball => CRplus x (- y)%CR) CRopp
-        (fun x y : RegularFunction Qball =>
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y).
+        (fun x y : CR => CRplus x (- y)%CR) CRopp
+        (fun x y : CR =>
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y).
 Proof.
   destruct CR_ring_theory. split.
   - intro x. apply CReq_nlt, Radd_0_l.
@@ -172,9 +172,9 @@ Proof.
 Qed.
 
 Lemma CR_ring_ext_nlt : ring_eq_ext CRplus CRmult CRopp
-        (fun x y : RegularFunction Qball =>
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-         (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y).
+        (fun x y : CR =>
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+         (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y).
 Proof.
   split.
   - intros x y H z t H0.
@@ -193,19 +193,18 @@ Proof.
     rewrite H. reflexivity.
 Qed.
 
-Lemma CRmult_inv_r_nlt : (forall (r : RegularFunction Qball)
-         (rnz : (fun x y : RegularFunction Qball => ((x < y)%CR + (y < x)%CR)%type) r
-                  0%CR),
-       (fun x y : RegularFunction Qball =>
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) y x /\
-        (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y)
+Lemma CRmult_inv_r_nlt : (forall (r : CR)
+         (rnz : (fun x y : CR => ((x < y)%CR + (y < x)%CR)%type) r 0%CR),
+       (fun x y : CR =>
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
+        (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y)
          (CRinvT r rnz * r)%CR 1%CR).
 Proof.
   intros. apply CReq_nlt.
   rewrite CRmult_comm. apply CRmult_inv_r.
 Qed.
 
-Definition CRup (x : RegularFunction Qball)
+Definition CRup (x : CR)
   : {n : positive & (x < ' (Z.pos n # 1))%CR}.
 Proof.
   exists (match Qnum (proj1_sig (CR_b (1#1)%Qpos x)) with
@@ -225,10 +224,9 @@ Proof.
   - reflexivity.
 Qed.
 
-Lemma CRabs_nlt : (forall x y : RegularFunction Qball,
-       (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) x y /\
-       (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) (- x)%CR y <->
-       (fun x0 y0 : RegularFunction Qball => (y0 < x0)%CR -> False) (CRabs x) y).
+Lemma CRabs_nlt : forall x y : CR,
+    (((y < x)%CR -> False) /\ ((y < -x)%CR -> False))
+    <-> ((y < CRabs x)%CR -> False).
 Proof.
   split.
   - intros [H H0] H1. 

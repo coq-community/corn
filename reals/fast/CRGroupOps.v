@@ -288,7 +288,7 @@ Proof.
  apply Qlt_le_weak. destruct e; exact q.
 Qed.
 
-Lemma CRle_def : forall x y, (x==y <-> (x <= y /\ y <= x))%CR.
+Lemma CRle_antisym : forall x y, (x==y <-> (x <= y /\ y <= x))%CR.
 Proof.
  intros x y.
  split;[intros H;rewrite -> H;split; apply CRle_refl|].
