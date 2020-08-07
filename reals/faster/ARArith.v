@@ -347,11 +347,9 @@ Defined.
 Lemma ARpos_wd : ∀ x1 x2, x1 = x2 → ARpos x1 → ARpos x2.
 Proof.
   intros x1 x2 E G.
-  apply ARtoCR_preserves_pos.
-  apply CRpos_wd with ('x1).
-   now rewrite E.
-  now apply ARtoCR_preserves_pos.
-Qed.
+  destruct G. exists x.
+  rewrite <- E. exact l.
+Defined.
 
 Definition ARltT: AR → AR → Type := λ x y, ARpos (y - x).
 
@@ -368,15 +366,42 @@ Proof.
     now autorewrite with ARtoCR.
 Defined.
 
+Lemma CRtoAR_preserves_ltT : forall x y,
+    prod (CRltT x y -> ARltT (cast CR AR x) (cast CR AR y))
+         (ARltT (cast CR AR x) (cast CR AR y) -> CRltT x y).
+Proof.
+  intros x y. 
+  pose proof (CRAR_id x) as H6.
+  pose proof (CRAR_id y) as H7. 
+  split.
+  - intros. symmetry in H6. symmetry in H7.
+    pose proof (CRltT_wd H6 H7 H5).
+    apply ARtoCR_preserves_ltT in H8. exact H8.
+  - intros H5.
+    apply (CRltT_wd H6 H7).
+    apply ARtoCR_preserves_ltT. exact H5.
+Qed.
+
 Lemma ARltT_wd : ∀ x1 x2 : AR, x1 = x2 → ∀ y1 y2, y1 = y2 → ARltT x1 y1 → ARltT x2 y2.
 Proof.
   intros x1 x2 E y1 y2 F G. 
-  apply ARpos_wd with (y1 + - x1); trivial.
+  apply (ARpos_wd (y1 + - x1)). 2: exact G.
   rewrite E, F. reflexivity.
-Qed.
+Defined.
 
 (* Apartness in Type *)
 Definition ARapartT: AR → AR → Type := λ x y, sum (ARltT x y) (ARltT y x).
+
+Lemma ARapartT_wd : forall x y z t : AR,
+    st_eq x y
+    -> st_eq z t
+    -> ARapartT x z
+    -> ARapartT y t.
+Proof.
+  intros. destruct X.
+  - left. apply (ARltT_wd _ _ H5 _ _ H6), a.
+  - right. apply (ARltT_wd _ _ H6 _ _ H5), a.
+Defined.
 
 Lemma ARtoCR_preserves_apartT x y
   : prod (ARapartT x y -> CRapartT ('x) ('y))
@@ -580,6 +605,17 @@ Proof.
   apply (rings.projected_full_pseudo_ring_order (cast AR CR)).
    apply ARtoCR_preserves_le.
   apply ARtoCR_preserves_lt.
+Qed.
+
+Lemma ARle_not_lt (x y: AR): ARle x y <-> (ARltT y x -> False).
+Proof.
+  destruct ARfpsro as [_ flip].
+  specialize (flip x y). destruct flip.
+  split.
+  - intros. apply H5. exact H7.
+    apply AR_lt_ltT, X.
+  - intros. apply H6. intro abs. apply H7.
+    apply AR_lt_ltT, abs.
 Qed.
 
 Global Instance: StrictOrderEmbedding (cast AR CR).

@@ -100,7 +100,7 @@ Local Open Scope CR_scope.
 
 Lemma CRabs_pos : forall x:CR, 0 <= x -> CRabs x == x.
 Proof.
-  intros x H. apply CRle_def. split.
+  intros x H. apply CRle_antisym. split.
   - apply CRabs_AbsSmall. split. 2: apply CRle_refl.
     apply (@CRle_trans _ 0). 2: exact H.
     rewrite <- CRopp_0. apply CRopp_le_compat, H.
@@ -115,7 +115,7 @@ Proof. apply CRabs_pos, CRle_refl. Qed.
 
 Lemma CRabs_neg: forall x, x <= 0 -> CRabs x == - x.
 Proof.
-  intros x H. apply CRle_def. split.
+  intros x H. apply CRle_antisym. split.
   - apply CRabs_AbsSmall. split.
     apply (CRplus_le_l _ _ (-x)). ring_simplify.
     apply CRle_refl.
@@ -143,12 +143,12 @@ Proof with auto.
   rewrite (CRabs_neg _ c)...
   intuition.
   revert H.
-  rewrite (proj2 (CRle_def x 0))...
+  rewrite (proj2 (CRle_antisym x 0))...
   rewrite CRopp_0...
  rewrite (CRabs_pos _ c)...
  intuition.
  revert H.
- rewrite (proj2 (CRle_def x 0))...
+ rewrite (proj2 (CRle_antisym x 0))...
  rewrite CRopp_0...
 Qed.
 

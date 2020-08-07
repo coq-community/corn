@@ -1675,7 +1675,7 @@ Proof.
     right. right. apply CR_lt_ltT.
     exact c. left. right. apply CR_lt_ltT. exact c.
   - split.
-    + intros. apply CRle_def. split.
+    + intros. apply CRle_antisym. split.
       apply CRle_not_lt. intro abs. apply H. right.
       apply CR_lt_ltT. exact abs.
       apply CRle_not_lt. intro abs. apply H. left.
