@@ -23,6 +23,7 @@ Require Import CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRabs.
 Require Import ConstructiveFastReals.
 
+Section ConstructiveFaster.
 
 Context {AQ : Set} `{AppRationals AQ}.
 
@@ -39,10 +40,10 @@ Proof.
   destruct ARfpsro, full_pseudo_srorder_pso.
   destruct pseudo_srorder_strict.
   split. split.
-  - intros x y H H0.
-    pose proof (AR_lt_ltT x y) as [_ H1].
-    pose proof (AR_lt_ltT y x) as [_ H2].
-    exact (pseudo_order_antisym x y (conj (H1 H) (H2 H0))).
+  - intros x y J J0.
+    pose proof (AR_lt_ltT x y) as [_ J1].
+    pose proof (AR_lt_ltT y x) as [_ J2].
+    exact (pseudo_order_antisym x y (conj (J1 J) (J2 J0))).
   - intros.
     destruct (ARtoCR_preserves_ltT x z) as [_ a].
     apply a. clear a.
@@ -51,9 +52,9 @@ Proof.
     destruct (ARtoCR_preserves_ltT y z) as [a _].
     apply a in H6.
     apply (CRlt_trans _ _ _ H5 H6). 
-  - intros x y z H.
+  - intros x y z J.
     destruct (CRlt_linear (cast AR CR x) (cast AR CR y) (cast AR CR z)).
-    apply (ARtoCR_preserves_ltT x z), H.
+    apply (ARtoCR_preserves_ltT x z), J.
     left. destruct (ARtoCR_preserves_ltT x y). apply a, c.
     right. destruct (ARtoCR_preserves_ltT y z). apply a, c.
 Qed.
@@ -111,11 +112,11 @@ Proof.
     rewrite H5. apply PreOrder_Reflexive.
     pose proof (ARle_not_lt a b) as [H6 _]. apply H6.
     rewrite H5. apply PreOrder_Reflexive.
-  - intros [H H0]. apply po_antisym.
+  - intros [J J0]. apply po_antisym.
     pose proof (ARle_not_lt a b) as [_ H6].
-    apply (H6 H0).
+    apply (H6 J0).
     pose proof (ARle_not_lt b a) as [_ H6].
-    apply (H6 H).
+    apply (H6 J).
 Qed. 
 
 Lemma inject_Q_AR_plus : ∀ q r : Q,
@@ -210,15 +211,15 @@ Lemma AR_ring_ext : ring_eq_ext ARplus ARmult ARopp
            ∧ (λ x0 y0 : AR, ARltS y0 x0 → False) x y).
 Proof.
   split.
-  - intros x y H z t H0.
-    apply AReq_nlt. apply AReq_nlt in H.
-    apply AReq_nlt in H0. rewrite H, H0. reflexivity.
-  - intros x y H z t H0.
-    apply AReq_nlt. apply AReq_nlt in H.
-    apply AReq_nlt in H0. rewrite H, H0. reflexivity.
-  - intros x y H.
-    apply AReq_nlt. apply AReq_nlt in H.
-    rewrite H. reflexivity.
+  - intros x y J z t J0.
+    apply AReq_nlt. apply AReq_nlt in J.
+    apply AReq_nlt in J0. rewrite J, J0. reflexivity.
+  - intros x y J z t J0.
+    apply AReq_nlt. apply AReq_nlt in J.
+    apply AReq_nlt in J0. rewrite J, J0. reflexivity.
+  - intros x y J.
+    apply AReq_nlt. apply AReq_nlt in J.
+    rewrite J. reflexivity.
 Qed.
 
 Lemma AR_lt_0_1 : ARltS (inject_Q_AR 0) (inject_Q_AR 1).
@@ -330,30 +331,30 @@ Definition AR_Q_dense (x y : AR)
   : ARltS x y
     → sigT (fun q : Q => prod (ARltS x (inject_Q_AR q)) (ARltS (inject_Q_AR q) y)).
 Proof.
-  intro H.
+  intro J.
   destruct (ARtoCR_preserves_ltT x y) as [a _].
-  apply a in H. clear a.
-  destruct (CRlt_Qmid (cast AR CR x) (cast AR CR y) H) as [q [H0 H1]].
+  apply a in J. clear a.
+  destruct (CRlt_Qmid (cast AR CR x) (cast AR CR y) J) as [q [J0 J1]].
   exists q. split.
   destruct (ARtoCR_preserves_ltT x (inject_Q_AR q)) as [_ a].
   apply a; clear a. 
   pose proof (CRAR_id ('q)%CR). symmetry in H5.
-  apply (CRltT_wd (reflexivity _) H5), H0.
+  apply (CRltT_wd (reflexivity _) H5), J0.
   destruct (ARtoCR_preserves_ltT (inject_Q_AR q) y) as [_ a].
   apply a; clear a. 
   pose proof (CRAR_id ('q)%CR). symmetry in H5.
-  apply (CRltT_wd H5 (reflexivity _)), H1.
+  apply (CRltT_wd H5 (reflexivity _)), J1.
 Qed.
 
 Definition ARup (x : AR)
   : sigT (fun n : positive => ARltS x (inject_Q_AR (Z.pos n # 1))).
 Proof.
-  destruct (CRup (cast AR CR x)) as [n H].
+  destruct (CRup (cast AR CR x)) as [n J].
   exists n.
   destruct (ARtoCR_preserves_ltT x (inject_Q_AR (Z.pos n # 1))) as [_ a].
   apply a; clear a.
   pose proof (CRAR_id ('(Z.pos n#1))%CR). symmetry in H5.
-  apply (CRltT_wd (reflexivity _) H5), H.
+  apply (CRltT_wd (reflexivity _) H5), J.
 Qed.
 
 Definition ARabs (x : AR) : AR
@@ -378,32 +379,32 @@ Proof.
     + intros. apply H8.
       destruct (ARtoCR_preserves_ltT y (ARopp x)) as [_ a].
       apply a; clear a.
-      pose proof (ARtoCR_preserves_opp x) as H. symmetry in H.
-      exact (CRltT_wd (reflexivity _) H H9). 
+      pose proof (ARtoCR_preserves_opp x) as J. symmetry in J.
+      exact (CRltT_wd (reflexivity _) J H9). 
   - intros.
     destruct H5 as [_ H5]. split.
-    + intro H.
+    + intro J.
       destruct (ARtoCR_preserves_ltT y x) as [a _].
-      apply a in H; clear a.
-      contradict H. apply H5.
-      intro H. apply H6; clear H6.
+      apply a in J; clear a.
+      contradict J. apply H5.
+      intro J. apply H6; clear H6.
       destruct (ARtoCR_preserves_ltT y (ARabs x)) as [_ a].
       apply a; clear a.
       pose proof (CRAR_id (CRabs (cast AR CR x))).
       symmetry in H6.
-      apply (CRltT_wd (reflexivity _) H6). exact H.
-    + intro H.
+      apply (CRltT_wd (reflexivity _) H6). exact J.
+    + intro J.
       destruct (ARtoCR_preserves_ltT y (ARopp x)) as [a _].
-      apply a in H; clear a.
-      pose proof (ARtoCR_preserves_opp x) as H0. 
-      apply (CRltT_wd (reflexivity _) H0) in H; clear H0.
-      contradict H. apply H5.
-      intro H. apply H6; clear H6.
+      apply a in J; clear a.
+      pose proof (ARtoCR_preserves_opp x) as J0.
+      apply (CRltT_wd (reflexivity _) J0) in J; clear J0.
+      contradict J. apply H5.
+      intro J. apply H6; clear H6.
       destruct (ARtoCR_preserves_ltT y (ARabs x)) as [_ a].
       apply a; clear a.
       pose proof (CRAR_id (CRabs (cast AR CR x))).
       symmetry in H6.
-      apply (CRltT_wd (reflexivity _) H6). exact H.
+      apply (CRltT_wd (reflexivity _) H6). exact J.
 Qed.
 
 Definition ARcauchy_sequence (xn : nat -> AR) : Set
@@ -421,9 +422,9 @@ Lemma ARtoCR_preserves_cauchy
     -> CRcauchy_sequence (fun n => cast AR CR (xn n)).
 Proof.
   intros xn xncau p.
-  specialize (xncau p) as [n H].
+  specialize (xncau p) as [n J].
   exists n. intros.
-  apply (H i j H5 H6); clear H.
+  apply (J i j H5 H6); clear J.
   destruct (CRtoAR_preserves_ltT (' (1 # p))%CR
                                  (CRabs (' ARplus (xn i) (ARopp (xn j))))) as [c _].
   apply c; clear c.
@@ -450,10 +451,10 @@ Lemma ARcauchy_complete
             → ARltS (inject_Q_AR (1 # p)) (ARabs (ARplus (xn i) (ARopp l))) → False}).
 Proof.
   intros. 
-  destruct (CRcauchy_complete _ (ARtoCR_preserves_cauchy xn H5)) as [l H].
+  destruct (CRcauchy_complete _ (ARtoCR_preserves_cauchy xn H5)) as [l J].
   exists (cast CR AR l).
-  intro p. specialize (H p) as [n H]. exists n.
-  intros. specialize (H i H6). apply H. 
+  intro p. specialize (J p) as [n J]. exists n.
+  intros. specialize (J i H6). apply J.
   unfold inject_Q_AR in H7.
   unfold ARabs in H7.
   destruct (CRtoAR_preserves_ltT (' (1 # p))%CR
@@ -487,3 +488,5 @@ Definition FasterRealsConstructive : ConstructiveReals
        ARinvS ARmult_inv_r ARinv_0_lt_compat
        AR_Q_dense ARup ARabs ARabs_spec
        ARcauchy_complete.
+
+End ConstructiveFaster.
