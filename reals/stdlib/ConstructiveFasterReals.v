@@ -14,6 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Require Import Coq.Reals.Abstract.ConstructiveReals.
 Require Import CoRN.reals.faster.ARArith.
+Require Import CoRN.reals.faster.ARabs.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.Complete.
 Require Import CoRN.metric2.MetricMorphisms.
@@ -357,54 +358,29 @@ Proof.
   apply (CRltT_wd (reflexivity _) H5), J.
 Qed.
 
-Definition ARabs (x : AR) : AR
-  := cast CR AR (CRabs (cast AR CR x)).
-
 Lemma ARabs_spec : ∀ x y : AR,
     (ARltS y x → False) ∧ (ARltS y (ARopp x) → False) ↔ (ARltS y (ARabs x) → False).
 Proof.
-  intros x y. pose proof (CRabs_nlt (cast AR CR x) (cast AR CR y)).
+  intros x y.
   split.
-  - intros.
-    destruct (ARtoCR_preserves_ltT y (ARabs x)) as [a _].
-    apply a in H7; clear a.
-    unfold ARabs in H7.
-    pose proof (CRAR_id (CRabs (cast AR CR x))).
-    apply (CRltT_wd (reflexivity _) H8) in H7; clear H8.
-    destruct H5 as [H5 _]. apply H5.
-    2: exact H7. destruct H6. split.
-    + intros. apply H6.
-      destruct (ARtoCR_preserves_ltT y x) as [_ a].
-      apply a; clear a. exact H9.
-    + intros. apply H8.
-      destruct (ARtoCR_preserves_ltT y (ARopp x)) as [_ a].
-      apply a; clear a.
-      pose proof (ARtoCR_preserves_opp x) as J. symmetry in J.
-      exact (CRltT_wd (reflexivity _) J H9). 
-  - intros.
-    destruct H5 as [_ H5]. split.
-    + intro J.
-      destruct (ARtoCR_preserves_ltT y x) as [a _].
-      apply a in J; clear a.
-      contradict J. apply H5.
-      intro J. apply H6; clear H6.
-      destruct (ARtoCR_preserves_ltT y (ARabs x)) as [_ a].
-      apply a; clear a.
-      pose proof (CRAR_id (CRabs (cast AR CR x))).
-      symmetry in H6.
-      apply (CRltT_wd (reflexivity _) H6). exact J.
-    + intro J.
-      destruct (ARtoCR_preserves_ltT y (ARopp x)) as [a _].
-      apply a in J; clear a.
-      pose proof (ARtoCR_preserves_opp x) as J0.
-      apply (CRltT_wd (reflexivity _) J0) in J; clear J0.
-      contradict J. apply H5.
-      intro J. apply H6; clear H6.
-      destruct (ARtoCR_preserves_ltT y (ARabs x)) as [_ a].
-      apply a; clear a.
-      pose proof (CRAR_id (CRabs (cast AR CR x))).
-      symmetry in H6.
-      apply (CRltT_wd (reflexivity _) H6). exact J.
+  - intros [H6 H7]. 
+    apply (ARle_not_lt (ARabs x) y).
+    apply (ARle_not_lt x y) in H6.
+    apply (ARle_not_lt (ARopp x) y) in H7.
+    pose proof (ARabs_AbsSmall y x) as [_ H5].
+    apply H5. split. 2: exact H6.
+    rewrite <- (rings.negate_involutive x). 
+    apply rings.flip_le_negate. exact H7.
+  - intro H6.
+    apply (ARle_not_lt (ARabs x) y) in H6.
+    pose proof (ARabs_AbsSmall y x) as [H5 _]. 
+    split.
+    + apply (ARle_not_lt x y).
+      apply H5. exact H6.
+    + apply (ARle_not_lt (ARopp x) y).
+      rewrite <- (rings.negate_involutive y). 
+      apply rings.flip_le_negate.
+      apply H5, H6.
 Qed.
 
 Definition ARcauchy_sequence (xn : nat -> AR) : Set
@@ -413,7 +389,7 @@ Definition ARcauchy_sequence (xn : nat -> AR) : Set
        | ∀ i j : nat,
            (n <= i)%nat
            → (n <= j)%nat
-             → ARltS (inject_Q_AR (1 # p)) (ARabs (ARplus (xn i) (ARopp (xn j))))
+             → ARltT (inject_Q_AR (1 # p)) (ARabs (ARplus (xn i) (ARopp (xn j))))
                → False}.
 
 Lemma ARtoCR_preserves_cauchy
@@ -427,17 +403,20 @@ Proof.
   apply (J i j H5 H6); clear J.
   destruct (CRtoAR_preserves_ltT (' (1 # p))%CR
                                  (CRabs (' ARplus (xn i) (ARopp (xn j))))) as [c _].
-  apply c; clear c.
-  apply (CRlt_le_trans _ _ _ H7); clear H7.
-  setoid_replace ((' xn i)%mc - (' xn j)%mc)%CR
-    with (cast AR CR (ARplus (xn i) (ARopp (xn j)))).
-  apply CRle_refl.
-  pose proof (ARtoCR_preserves_plus (xn i) (ARopp (xn j))).
-  rewrite H7.
-  apply ucFun2_wd. reflexivity.
-  pose proof (ARtoCR_preserves_opp (xn j)).
-  rewrite H8. apply Cmap_wd. apply uc_setoid.
-  reflexivity.
+  apply (ARltT_wd _ _ (reflexivity _) (' CRabs (' ARplus (xn i) (ARopp (xn j))))).
+  - rewrite <- ARtoCR_preserves_abs.
+    apply CRAR_id.
+  - apply c; clear c.
+    apply (CRlt_le_trans _ _ _ H7); clear H7.
+    setoid_replace ((' xn i)%mc - (' xn j)%mc)%CR
+      with (cast AR CR (ARplus (xn i) (ARopp (xn j)))).
+    apply CRle_refl.
+    pose proof (ARtoCR_preserves_plus (xn i) (ARopp (xn j))).
+    rewrite H7.
+    apply ucFun2_wd. reflexivity.
+    pose proof (ARtoCR_preserves_opp (xn j)).
+    rewrite H8. apply Cmap_wd. apply uc_setoid.
+    reflexivity.
 Qed.
 
 Lemma ARcauchy_complete
@@ -448,28 +427,32 @@ Lemma ARcauchy_complete
         {n : nat
         | ∀ i : nat,
             (n <= i)%nat
-            → ARltS (inject_Q_AR (1 # p)) (ARabs (ARplus (xn i) (ARopp l))) → False}).
+            → ARltT (inject_Q_AR (1 # p)) (ARabs (ARplus (xn i) (ARopp l))) → False}).
 Proof.
   intros. 
   destruct (CRcauchy_complete _ (ARtoCR_preserves_cauchy xn H5)) as [l J].
   exists (cast CR AR l).
   intro p. specialize (J p) as [n J]. exists n.
-  intros. specialize (J i H6). apply J.
+  intros i H6 H7. specialize (J i H6). apply J.
   unfold inject_Q_AR in H7.
   unfold ARabs in H7.
   destruct (CRtoAR_preserves_ltT (' (1 # p))%CR
                                  (CRabs (' ARplus (xn i) (ARopp (' l))))) as [_ c].
-  apply c in H7; clear c.
-  apply (CRlt_le_trans _ _ _ H7).
-  setoid_replace ((' xn i)%mc - l)%CR
-    with (cast AR CR (ARplus (xn i) (ARopp (' l)))).
-  apply CRle_refl.
-  pose proof (ARtoCR_preserves_plus (xn i) (ARopp ('l))).
-  rewrite H8.
-  apply ucFun2_wd. reflexivity.
-  pose proof (ARtoCR_preserves_opp ('l)).
-  rewrite H9. apply Cmap_wd. apply uc_setoid.
-  symmetry. apply CRAR_id. 
+  apply (ARltT_wd _ _ (reflexivity _)
+                  _ (' CRabs (' ARplus (xn i) (ARopp ('l))))) in H7.
+  - apply c in H7; clear c.
+    apply (CRlt_le_trans _ _ _ H7).
+    setoid_replace ((' xn i)%mc - l)%CR
+      with (cast AR CR (ARplus (xn i) (ARopp (' l)))).
+    apply CRle_refl.
+    pose proof (ARtoCR_preserves_plus (xn i) (ARopp ('l))).
+    rewrite H8.
+    apply ucFun2_wd. reflexivity.
+    pose proof (ARtoCR_preserves_opp ('l)).
+    rewrite H9. apply Cmap_wd. apply uc_setoid.
+    symmetry. apply CRAR_id. 
+  - rewrite <- ARtoCR_preserves_abs.
+    symmetry. apply CRAR_id.
 Qed.
 
 Definition FasterRealsConstructive : ConstructiveReals
