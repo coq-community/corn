@@ -49,6 +49,9 @@ CoRN includes the following parts:
   Fast verified computation inside Coq. This includes: real numbers, functions,
   integrals, graphs of functions, differential equations.
 
+## Homepage
+
+A [homepage](http://c-corn.github.io/) including related publications.
 
 ## Meta
 
