@@ -80,6 +80,25 @@ Section approximate_rationals_more.
      apply order_embedding_iff.
     apply strict_order_embedding_iff.
   Qed.
+
+  Lemma aq_opp : forall (x : AQ), '(-x) = -'x.
+  Proof.
+    intro x.
+    apply (Qplus_inj_l _ _ ('x)).
+    rewrite Qplus_opp_r.
+    assert ('zero0 = 0%Q) by (apply rings.preserves_0).
+    rewrite <- H5.
+    destruct aq_ring_morphism.
+    destruct semiringmor_plus_mor.
+    destruct monmor_sgmor.
+    rewrite <- preserves_sg_op.
+    destruct sgmor_setmor.
+    apply sm_proper.
+    unfold equiv.
+    destruct aq_ring, ring_group.
+    destruct abgroup_group.
+    apply negate_r.
+  Qed.
     
   Lemma aq_shift_correct (x : AQ) (k : Z) :  '(x ≪ k) = 'x * 2 ^ k.
   Proof. rewrite preserves_shiftl. apply shiftl_int_pow. Qed.
