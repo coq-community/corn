@@ -28,6 +28,36 @@ Global Instance CRtoAR: Cast CR AR := CRtoAR_uc.
 
 Global Instance inject_AQ_AR: Cast AQ AR := (@Cunit AQ_as_MetricSpace).
 Global Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
+Lemma inject_Q_AR_prf :
+  forall (q:Q), is_RegularFunction (@ball AQ_as_MetricSpace)
+             (fun e:QposInf => 
+                match e with
+                | Qpos2QposInf d => app_inverse (cast AQ Q) q d
+                | QposInfinity => 0
+                end).
+Proof.
+  intros q e1 e2. simpl.
+  destruct aq_dense_embedding.
+  simpl in dense_inverse.
+  unfold cast.
+  apply (ball_triangle _ _ _ _ q).
+  apply dense_inverse.
+  apply ball_sym, dense_inverse.
+Qed. 
+
+Definition inject_Q_AR (q : Q) : AR
+  := Build_RegularFunction (inject_Q_AR_prf q).
+
+(* inject_Q_AR is twice faster than the cast *)
+Lemma inject_Q_AR_CR : forall (q : Q),
+  inject_Q_AR q = cast CR AR (inject_Q_CR q).
+Proof.
+  intro q.
+  rewrite <- doubleSpeed_Eq.
+  intros e1 e2.
+  pose proof (regFun_prf (cast CR AR (inject_Q_CR q)) e1 e2) as H5.
+  apply H5.
+Qed.
 
 Lemma CRAR_id : forall x : CR,
     st_eq (cast AR CR (cast CR AR x)) x.

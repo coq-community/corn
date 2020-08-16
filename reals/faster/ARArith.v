@@ -857,4 +857,104 @@ Proof.
   rewrite <-ARtoCR_inject.
   apply (order_preserving _). intuition.
 Qed.
+
+Lemma inject_Q_AR_lt : ∀ q r : Q, q < r → ARltT (inject_Q_AR q) (inject_Q_AR r).
+Proof.
+  intros.
+  destruct (ARtoCR_preserves_ltT (' (' q)%CR) (' (' r)%CR)) as [_ a].
+  pose proof (inject_Q_AR_CR q).
+  pose proof (inject_Q_AR_CR r).
+  symmetry in H6. symmetry in H7.
+  apply (ARltT_wd _ _ H6 _ _ H7).
+  apply a. clear a H6 H7.
+  pose proof (CRAR_id ('q)%CR). pose proof (CRAR_id ('r)%CR).
+  symmetry in H6. symmetry in H7.
+  apply (@CRltT_wd _ _ H6 _ _ H7).
+  apply CRlt_Qlt, H5.
+Qed.
+
+Lemma inject_Q_AR_lt_rev : ∀ q r : Q, ARltT (inject_Q_AR q) (inject_Q_AR r) → q < r.
+Proof.
+  intros.
+  destruct (ARtoCR_preserves_ltT (' (' q)%CR) (' (' r)%CR)) as [c _].
+  pose proof (inject_Q_AR_CR q) as H6.
+  pose proof (inject_Q_AR_CR r) as H7.
+  apply (ARltT_wd _ _ H6 _ _ H7) in X.
+  apply c in X. clear c H6 H7.
+  pose proof (CRAR_id ('q)%CR). pose proof (CRAR_id ('r)%CR).
+  apply (@CRltT_wd _ _ H5 _ _ H6) in X.
+  apply Qlt_from_CRlt, X.
+Qed.
+
+Lemma inject_Q_AR_plus : ∀ q r : Q,
+    inject_Q_AR (q + r) = ARplus (inject_Q_AR q) (inject_Q_AR r).
+Proof.
+  intros.
+  apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
+  pose proof CRAR_id as H5.
+  unfold cast in H5.
+  unfold ARtoCR, ARtoCR_uc in H5.
+  unfold cast.
+  rewrite (inject_Q_AR_CR (q+r)).
+  rewrite (inject_Q_AR_CR q).
+  rewrite (inject_Q_AR_CR r).
+  unfold cast. unfold cast in H5.
+  rewrite H5.
+  pose proof (ARtoCR_preserves_plus (CRtoAR (' q)%CR) (CRtoAR (' r)%CR)) as H6.
+  rewrite H6.
+  rewrite <- CRplus_Qplus.
+  apply ucFun2_wd. rewrite (H5 ('q)%CR). reflexivity.
+  rewrite (H5 ('r)%CR). reflexivity.
+Qed.
+
+Lemma inject_Q_AR_mult : ∀ q r : Q,
+    inject_Q_AR (q * r) = ARmult (inject_Q_AR q) (inject_Q_AR r).
+Proof.
+  intros. 
+  apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
+  pose proof CRAR_id as H5.
+  unfold cast in H5.
+  unfold ARtoCR, ARtoCR_uc in H5.
+  rewrite (inject_Q_AR_CR (q*r)).
+  rewrite (inject_Q_AR_CR q).
+  rewrite (inject_Q_AR_CR r).
+  unfold cast. unfold cast in H5.
+  rewrite H5.
+  pose proof (ARtoCR_preserves_mult (CRtoAR (' q)%CR) (CRtoAR (' r)%CR)) as H6.
+  rewrite H6.
+  rewrite <- CRmult_Qmult.
+  apply CRmult_wd. rewrite (H5 ('q)%CR). reflexivity.
+  rewrite (H5 ('r)%CR). reflexivity.
+Qed.
+
+Lemma AR_mult_0_lt_compat : ∀ x y : AR,
+    ARltT (inject_Q_AR 0) x
+    → ARltT (inject_Q_AR 0) y
+    → ARltT (inject_Q_AR 0) (ARmult x y).
+Proof.
+  intros x y X X0.
+  destruct (ARtoCR_preserves_ltT (inject_Q_AR 0) (ARmult x y)) as [_ a].
+  apply a. clear a.
+  pose proof (ARtoCR_preserves_mult x y) as H5.
+  unfold mult in H5.
+  symmetry in H5.
+  assert (0 = ARtoCR (inject_Q_AR 0))%CR as H7.
+  { rewrite <- (CRAR_id 0%CR).
+    unfold cast.
+    rewrite (inject_Q_AR_CR 0). reflexivity. }
+  pose proof (ARtoCR_preserves_mult x y) as H8.
+  symmetry in H8.
+  apply (CRltT_wd H7 H8). clear H8 H5.
+  apply CRmult_lt_0_compat.
+  - destruct (ARtoCR_preserves_ltT (inject_Q_AR 0) x).
+    apply c in X. clear a c.
+    symmetry in H7.
+    apply (CRltT_wd H7 (reflexivity _)). exact X.
+  - destruct (ARtoCR_preserves_ltT (inject_Q_AR 0) y).
+    apply c in X0. clear a c.
+    symmetry in H7.
+    apply (CRltT_wd H7 (reflexivity _)). exact X0. 
+Qed.
+
+
 End ARarith.
