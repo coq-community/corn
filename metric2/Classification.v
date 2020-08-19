@@ -26,9 +26,9 @@ Local Open Scope Q_scope.
 
 (**
 ** Classification of metric spaces
-There is a heirarchy of properties that a metric space can possess.
+There is a hierarchy of properties that a metric space can possess.
 At the lowest level a metric space is stable if its ball relation is
-double negation stable.  Arguablely this could be made a requirement
+double negation stable. Arguably this could be made a requirement
 of metric spaces. *)
 Definition stableMetric (ms:MetricSpace) :=
  forall (e:Q) (x y:ms), ~~(ball e x y) -> ball e x y.
@@ -49,8 +49,9 @@ Proof.
 Qed.
 
 (** At the next level up a metric space is located if you can choose
-between ball d x y and ~ball e x y for e < d.  Every located metric
-is a stable metric. *)
+between ball d x y and ~ball e x y for e < d. Every located metric
+is a stable metric. This translates the located property of the real
+numbers e < d -> (e < d(x,y) \/ d(x,y) < d). *)
 Definition locatedMetric (ms:MetricSpace) :=
   forall (e d:Q) (x y:ms),
     e < d -> {ball d x y}+{~ball e x y}.

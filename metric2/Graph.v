@@ -26,8 +26,6 @@ Require Export CoRN.metric2.CompleteProduct.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.logic.Classic.
-Require Import CoRN.tactics.Qauto.
-Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -68,7 +66,7 @@ Proof.
   destruct (mu f e) as [d|].
    apply Qpos_min_lb_l.
   apply Qle_refl.
- apply: uc_prf.
+ apply uc_prf.
  eapply ball_ex_weak_le;[|apply H].
  destruct (mu f e) as [d|].
   apply Qpos_min_lb_r.
@@ -100,7 +98,11 @@ Proof.
   destruct (mu f e2); simpl.
    assert (Qmin (proj1_sig e2) (proj1_sig q) <= proj1_sig e2) by auto with *.
    rewrite -> Qle_minus_iff in *.
-   rewrite Q_Qpos_min. Qauto_le.
+   rewrite Q_Qpos_min.
+   rewrite <- Qle_minus_iff.
+   apply Qplus_le_r.
+   rewrite <- Qle_minus_iff in H.
+   exact H.
   apply Qle_refl.
  apply (mu_sum plX e2 (e1::nil) f).
  simpl.
@@ -110,8 +112,8 @@ Proof.
  destruct (mu f e2) as [d|]; try constructor.
  simpl. rewrite Q_Qpos_min.
  assert (Qmin (proj1_sig e2) (proj1_sig d) <= proj1_sig d) by auto with *.
- rewrite -> Qle_minus_iff in *.
- Qauto_le.
+ apply Qplus_le_r.
+ exact H.
 Qed.
 
 Lemma CompactGraph_correct2 : forall plFEX p s, inCompact p (CompactGraph plFEX s) ->
@@ -151,8 +153,8 @@ Proof.
  destruct (mu f d') as [d0|]; auto with *.
  simpl. rewrite Q_Qpos_min.
  assert (Qmin (proj1_sig d') (proj1_sig d0) <= proj1_sig d') by auto with *.
- rewrite -> Qle_minus_iff in *.
- Qauto_le.
+ apply Qplus_le_l.
+ exact H.
 Qed.
 
 Lemma CompactGraph_correct3 : forall plX plFEX p s, inCompact p (CompactGraph plFEX s) ->
@@ -180,16 +182,15 @@ Proof.
  assert (H':= H d' d').
  apply ball_triangle with (approximate (Csnd p) d').
   apply ball_triangle with (f (Cfst_raw p d')).
-   apply: (mu_sum plX e' (e2::nil) f).
+   apply (mu_sum plX e' (e2::nil) f).
    simpl.
    apply ball_ex_weak_le with (mu f e2 + d')%QposInf.
     destruct (mu f e2); try constructor.
     destruct (mu f e'); try constructor.
     clear - Hd'2.
     simpl in *.
-    autorewrite with QposElim.
-    rewrite -> Qle_minus_iff in *.
-    Qauto_le.
+    apply Qplus_le_r.
+    exact Hd'2.
    unfold Cfst_raw.
    simpl.
    assert (Z:=regFun_prf_ex p (mu f e2) d').
@@ -223,24 +224,18 @@ Proof.
     clear - Hd'2.
     destruct (mu f e'); try constructor.
     simpl in *.
-    autorewrite with QposElim.
-    rewrite -> Qle_minus_iff in *.
-    replace RHS with ((proj1_sig q + - proj1_sig d') + (proj1_sig q + - proj1_sig d'))
-      by simpl; ring.
-    Qauto_nonneg.
+    apply Qplus_le_compat; exact Hd'2.
    apply Hl.
   apply ball_sym.
   eapply ball_weak_le;[|apply Hr].
   simpl.
   clear - Hd'1.
-  rewrite -> Qle_minus_iff in *.
-  replace RHS with ((proj1_sig e' + - proj1_sig d') + (proj1_sig e' + - proj1_sig d'))
-    by simpl; ring.
-  Qauto_nonneg.
+  apply Qplus_le_compat; exact Hd'1.
  eapply ball_weak_le;[|apply regFun_prf].
  simpl.
- rewrite -> Qle_minus_iff in *.
- Qauto_le.
+ rewrite Qplus_comm.
+ apply Qplus_le_r.
+ exact Hd'1.
 Qed.
 
 Lemma CompactGraph_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s,
@@ -252,10 +247,10 @@ Proof.
  transitivity (Cmap plX f p).
   symmetry.
   rewrite <- (CoupleCorrect2 p q1).
-  apply: CompactGraph_correct3.
+  refine (CompactGraph_correct3 _ _).
   apply Hq1.
  rewrite <- (CoupleCorrect2 p q2).
- apply: CompactGraph_correct3.
+ refine (CompactGraph_correct3 _ _).
  apply Hq2.
 Qed.
 
@@ -270,13 +265,13 @@ Proof.
    exact H.
   symmetry.
   transitivity (Csnd (Couple (x,y))).
-   apply: CompactGraph_correct3.
+   refine (CompactGraph_correct3 _ _).
    apply H.
   apply CoupleCorrect3.
  destruct H as [H0 H1].
  change (x, y) with (PairMS x y).
  rewrite -> H1.
- apply: CompactGraph_correct1.
+ apply CompactGraph_correct1.
  auto.
 Qed.
 
@@ -314,22 +309,28 @@ Proof.
   eapply ball_ex_weak_le;[|apply H].
   unfold graphPoint_modulus.
   destruct (mu f e) as [d|].
-   simpl.
-   apply Qle_trans with (proj1_sig e).
-    apply: Qpos_min_lb_l.
-   autorewrite with QposElim.
-   Qauto_le.
-  simpl.
-  autorewrite with QposElim.
-  Qauto_le.
- simpl.
+ - simpl.
+   apply Qle_trans with (proj1_sig e + 0).
+   rewrite Qplus_0_r.
+    apply Qpos_min_lb_l.
+    rewrite <- (Qplus_comm (proj1_sig e)), <- Qplus_assoc.
+    apply Qplus_le_r.
+    apply (Qpos_nonneg (d1+d2)).
+ - simpl.
+   apply Qle_trans with (proj1_sig e + 0).
+   rewrite Qplus_0_r.
+    apply Qle_refl.
+    rewrite <- (Qplus_comm (proj1_sig e)), <- Qplus_assoc.
+    apply Qplus_le_r.
+    apply (Qpos_nonneg (d1+d2)).
+ - simpl.
  revert d1 d2.
  change (ball (proj1_sig e) (f a) (f b)).
- apply: uc_prf.
+ apply uc_prf.
  eapply ball_ex_weak_le;[|apply H].
  unfold graphPoint_modulus.
  destruct (mu f e) as [d|].
-  apply: Qpos_min_lb_r.
+  apply Qpos_min_lb_r.
  constructor.
 Qed.
 
@@ -341,8 +342,6 @@ Hypothesis stableXY : stableMetric XY.
 
 Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
 CompactImage_b (1#1) _ plFEX graphPoint_b.
-
-Require Import CoRN.model.ordfields.Qordfield.
 
 Local Open Scope Q_scope.
 
@@ -362,12 +361,18 @@ Proof.
    rewrite Q_Qpos_min.
   assert (Qmin ((1#2)*proj1_sig e2) (proj1_sig q)
           <= ((1#2)*proj1_sig e2)) by auto with *.
-   rewrite -> Qle_minus_iff in *.
-   replace RHS with ((1 # 2) * proj1_sig e2
-                     + ((1 # 2) * proj1_sig e2 + - Qmin ((1 # 2) * proj1_sig e2) (proj1_sig q)))
-     by simpl; ring.
-   Qauto_nonneg.
-   simpl. Qauto_le. 
+  apply Qplus_le_r.
+  apply (Qle_trans _ _ _ H).
+  rewrite <- (Qmult_1_l (proj1_sig e2)) at 2.
+  apply Qmult_le_r.
+  apply Qpos_ispos.
+  discriminate.
+   simpl. 
+   apply Qplus_le_r.
+  rewrite <- (Qmult_1_l (proj1_sig e2)) at 2.
+  apply Qmult_le_r.
+  apply Qpos_ispos.
+  discriminate. 
  simpl. unfold Cjoin_raw. 
  rewrite <- ball_Cunit.
  setoid_replace (proj1_sig e1 + proj1_sig e2)
@@ -393,7 +398,8 @@ Proof.
  destruct (mu f ((1 # 2) * e2)) as [d|]; try constructor.
  simpl. rewrite Q_Qpos_min.
  assert (Qmin (proj1_sig e2') (proj1_sig d) <= proj1_sig d) by auto with *.
- rewrite -> Qle_minus_iff in *. Qauto_le.
+ apply Qplus_le_r.
+ exact H.
 Qed.
 
 Lemma CompactGraph_b_correct2 : forall plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
@@ -438,21 +444,26 @@ Proof.
  destruct (@mu X (Complete Y) f
               (Qpos_mult
                  (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
-                         {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) d'))
+                         {| Qnum := Z.pos xH; Qden := xO xH |} (@eq_refl comparison Lt)) d'))
    as [d0|].
  simpl.
  assert (Qmin ((1#2)* proj1_sig d') (proj1_sig d0) <= ((1#2)*proj1_sig d'))
    by auto with *.
-  rewrite -> Qle_minus_iff in *.
+ apply Qplus_le_l.
   rewrite Q_Qpos_min.
-  replace RHS with ((1 # 2) * proj1_sig d'
-                    + - Qmin ((1 # 2) * proj1_sig d') (proj1_sig d0) + (1#2)*proj1_sig d')
-    by simpl; ring.
-  Qauto_nonneg.
+ apply (Qle_trans _ _ _ H).
+ apply Qmult_le_l. reflexivity.
+ simpl.
+ rewrite <- (Qmult_1_l d) at 2.
+ apply Qmult_le_r.
+ apply dpos.
+ discriminate. 
   simpl.
-  replace RHS with ((1 # 2) * proj1_sig d' + proj1_sig e2 + (1#2)*proj1_sig d')
-    by simpl; ring.
- simpl. Qauto_le.
+  apply Qplus_le_l.
+ rewrite <- (Qmult_1_l ((1 # 2) * d)) at 2.
+ apply Qmult_le_r.
+ apply (Qpos_ispos d').
+ discriminate. 
 Qed.
 
 Lemma CompactGraph_b_correct3 : forall plX plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
@@ -472,12 +483,14 @@ Proof.
   unfold d', graphPoint_modulus.
   destruct (mu f ((1#2)*e')); autorewrite with QposElim.
    apply Qle_trans with ((1#2)*proj1_sig e'); auto with *.
-   rewrite -> Qle_minus_iff.
-   ring_simplify.
-   Qauto_nonneg.
-  rewrite -> Qle_minus_iff.
-  simpl. ring_simplify.
-  Qauto_nonneg.
+  rewrite <- (Qmult_1_l (proj1_sig e')) at 2.
+  apply Qmult_le_r.
+  apply Qpos_ispos.
+  discriminate. 
+  rewrite <- (Qmult_1_l (proj1_sig e')).
+  apply Qmult_le_r.
+  apply Qpos_ispos.
+  discriminate. 
  assert (Hd'2 : QposInf_le (d') (mu f ((1#2)*e'))).
   unfold d', graphPoint_modulus.
   destruct (mu f ((1#2)*e')).
@@ -495,9 +508,14 @@ Proof.
    simpl.
     clear - Hd'1.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with ((1 # 2) * (proj1_sig e' + - proj1_sig d'))
-      by simpl; ring.
-    Qauto_nonneg.
+    setoid_replace (proj1_sig e2 + (1 # 6) * e1 +
+  -
+  ((1 # 2) * proj1_sig e2 + ((1 # 2) * proj1_sig e2 + (1 # 2) * ((1 # 6) * e1)) +
+   (1 # 2) * proj1_sig d'))
+      with ((1 # 2) * (proj1_sig e' + - proj1_sig d'))
+      by (simpl; ring).
+    apply Qmult_le_0_compat. discriminate.
+    exact Hd'1.
    cut (ball ((1 # 2) * proj1_sig e2 + (1 # 2) * proj1_sig e') (f (Cfst_raw p (mu f ((1 # 2) * e2))))
      (f (Cfst_raw p ((1 # 2) * d')%Qpos))).
     intros L.
@@ -509,20 +527,22 @@ Proof.
    destruct (@mu X (Complete Y) f
           (Qpos_mult
              (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
-                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e2))
+                     {| Qnum := Z.pos xH; Qden := xO xH |} (@eq_refl comparison Lt)) e2))
    ; try constructor.
    simpl in Hd'2.
    destruct (@mu X (Complete Y) f
           (Qpos_mult
              (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
-                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
+                     {| Qnum := Z.pos xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
    ; try constructor.
     clear - Hd'2.
     simpl in *.
-    rewrite -> Qle_minus_iff in *.
-    replace RHS with (proj1_sig q0 + - proj1_sig d' + (1#2)*proj1_sig d')
-      by simpl; ring.
-    Qauto_nonneg.
+    apply Qplus_le_r.
+    refine (Qle_trans _ _ _ _ Hd'2).
+    rewrite <- (Qmult_1_l (proj1_sig d')) at 2.
+    apply Qmult_le_r.
+    apply Qpos_ispos.
+    discriminate. 
    unfold Cfst_raw.
    assert (Z:=regFun_prf_ex p (mu f ((1#2)*e2)) (Qpos2QposInf (1#2)%Qpos*d')).
    destruct (mu f ((1#2)*e2)); try constructor.
@@ -557,7 +577,11 @@ Proof.
     clear - Hd'1.
     simpl.
     rewrite -> Qle_minus_iff in *.
-    replace RHS with (proj1_sig e' + - proj1_sig d') by simpl; ring.
+    setoid_replace ( (1 # 6) * e1 + (1 # 6) * e1 +
+  -
+  ((1 # 2) * proj1_sig d' + ((1 # 2) * ((1 # 6) * e1) + (1 # 2) * ((1 # 6) * e1)) +
+   (1 # 2) * proj1_sig d'))
+      with (proj1_sig e' + - proj1_sig d') by (simpl; ring).
     exact Hd'1.
    simpl.
    rewrite <- ball_Cunit.
@@ -572,32 +596,35 @@ Proof.
     destruct (@mu X (Complete Y) f
           (Qpos_mult
              (@exist Q (Qlt {| Qnum := Z0; Qden := xH |})
-                     {| Qnum := xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
+                     {| Qnum := Z.pos xH; Qden := xO xH |} (@eq_refl comparison Lt)) e'))
     ; try constructor.
     simpl in *.
-    rewrite -> Qle_minus_iff in *.
-    replace RHS with ((proj1_sig q + - proj1_sig d') + (proj1_sig q + - proj1_sig d'))
-      by simpl; ring.
-    Qauto_nonneg.
+    apply Qplus_le_compat; exact Hd'2.
    simpl.
    eapply ball_weak_le;[|apply Hl].
    simpl.
-   Qauto_le.
+   apply Qplus_le_l.
+   rewrite <- (Qmult_1_l (proj1_sig d')) at 2.
+   apply Qmult_le_r.
+   apply Qpos_ispos.
+   discriminate. 
   apply ball_sym.
   eapply ball_weak_le;[|apply Hr].
-  autorewrite with QposElim.
-  clear - Hd'1.
-  rewrite -> Qle_minus_iff in *.
-  replace RHS with ((proj1_sig e' + - proj1_sig d')
-                    + (proj1_sig e' + - proj1_sig d') + (1#2)*proj1_sig d')
-    by simpl; ring.
-  Qauto_nonneg.
+  apply Qplus_le_compat.
+  2: exact Hd'1.
+  refine (Qle_trans _ _ _ _ Hd'1).
+   rewrite <- (Qmult_1_l (proj1_sig d')).
+   apply Qmult_le_r.
+   apply Qpos_ispos.
+   discriminate. 
  eapply ball_weak_le;[|apply (regFun_prf (Csnd p) ((1#2)*d')%Qpos)].
- autorewrite with QposElim.
- rewrite -> Qle_minus_iff in *.
- replace RHS with ((proj1_sig e' + - proj1_sig d') + (1#2)*proj1_sig d')
-   by simpl; ring.
- Qauto_nonneg.
+ rewrite Qplus_comm.
+ apply Qplus_le_r.
+  refine (Qle_trans _ _ _ _ Hd'1).
+   rewrite <- (Qmult_1_l (proj1_sig d')).
+   apply Qmult_le_r.
+   apply Qpos_ispos.
+   discriminate. 
 Qed.
 
 Lemma CompactGraph_b_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s,
@@ -609,10 +636,10 @@ Proof.
  transitivity (Cbind plX f p).
   symmetry.
   rewrite <- (CoupleCorrect2 p q1).
-  apply: CompactGraph_b_correct3.
+  refine (CompactGraph_b_correct3 _ _).
   apply Hq1.
  rewrite <- (CoupleCorrect2 p q2).
- apply: CompactGraph_b_correct3.
+ refine (CompactGraph_b_correct3 _ _).
  apply Hq2.
 Qed.
 
@@ -627,7 +654,7 @@ Proof.
    exact H.
   symmetry.
   transitivity (Csnd (Couple (x,y))).
-   apply: CompactGraph_b_correct3.
+   refine (CompactGraph_b_correct3 _ _).
    apply H.
   apply CoupleCorrect3.
  destruct H as [H0 H1].

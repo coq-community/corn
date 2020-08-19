@@ -26,7 +26,6 @@ Require Import CoRN.reals.fast.Interval.
 Require Export CoRN.metric2.Graph.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Export CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.tactics.CornTac CoRN.tactics.AlgReflection.
 
 Section Plot.
 (**
@@ -58,7 +57,8 @@ Proof.
  apply QPrelengthSpace.
 Qed.
 
-Definition graphQ f := CompactGraph_b f stableQ2 plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
+Definition graphQ f : Compact stableQ2
+  := CompactGraph_b f stableQ2 plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
 
 Lemma graphQ_bonus : forall e x y,
  In (x, y) (approximate (graphQ (uc_compose clip f)) e) -> l <= x <= r /\ b <= y <= t.
@@ -84,21 +84,19 @@ Proof.
  apply Hz1.
 Qed.
 
-Variable n m : nat.
-Hypothesis Hn : eq_nat n 0 = false.
-Hypothesis Hm : eq_nat m 0 = false.
+Variable n m : nat. (* Number of horizontal and vertical pixels *)
+Hypothesis Hn : n <> O.
+Hypothesis Hm : m <> O.
 
 Let w := proj1_sig (Qpos_sub _ _ Hlr).
 Let h := proj1_sig (Qpos_sub _ _ Hbt).
 
-(*
-Variable err : Qpos.
-*)
 Let err := Qpos_max ((1 # 4 * P_of_succ_nat (pred n)) * w)
- ((1 # 4 * P_of_succ_nat (pred m)) * h).
+                    ((1 # 4 * P_of_succ_nat (pred m)) * h).
 
-(** [PlotQ] is the function that does all the work. *)
-Definition PlotQ := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
+(** [PlotQ] is the function that computes the pixels. *)
+Definition PlotQ : raster n m
+  := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
 
 Local Open Scope raster.
 
@@ -123,7 +121,7 @@ Proof.
  assert (L:st_eq ((l,t):Q2) (l,b + proj1_sig h)).
   split; simpl.
    reflexivity.
-  auto.
+  ring.
  set (Z0:=(l, t):Q2) in *.
  set (Z1:=(r, b):Q2) in *.
  set (Z:=(l, (b + proj1_sig h)):Q2) in *.
@@ -133,8 +131,8 @@ Proof.
   (* TODO: figure out why rewrite Hw, Hh hangs *)
   replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r)
     with (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
-  destruct n; try discriminate.
-  destruct m; try discriminate.
+  destruct n. contradict Hn; reflexivity.
+  destruct m. contradict Hm; reflexivity.
   split. apply Qpos_nonneg.
   apply (RasterizeQ2_correct).
   intros.
@@ -153,3 +151,16 @@ End Plot.
 (** Some nice notation for the graph of f. *)
 Notation "'graphCR' f [ l '..' r ]" :=
  (graphQ l r (refl_equal _) f) (f at level 0) : raster.
+
+(*
+(* Some graph examples *)
+Local Open Scope raster. (* enables pretty printing of rasters *)
+Definition id_raster
+  := PlotQ 0 1 eq_refl 0 1 eq_refl (@Cunit Q_as_MetricSpace) 30 30.
+Compute id_raster.
+
+Require Import CoRN.reals.fast.CRexp.
+Definition exp_raster
+  := PlotQ (-2) 1 eq_refl 0 3 eq_refl (exp_bound_uc 3) 30 30.
+Compute exp_raster.
+*)

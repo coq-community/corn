@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
-Require Import CoRN.model.Zmod.ZBasics.
 Require Import CoRN.logic.Classic.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Classification.
@@ -27,8 +26,6 @@ Require Import Coq.Lists.List.
 Require Import Coq.ZArith.ZArith.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.tactics.Qauto.
-Require Import CoRN.tactics.CornTac.
 
 Local Open Scope Q_scope.
 
@@ -36,18 +33,27 @@ Section HausdorffMetric.
 
 (**
 * Hausdorff Metric
-This module defines a Hausdorff metric for an arbitrary predicate over
-a metric space X.
+
+This module defines the Hausdorff metric on the subsets of a
+metric space X. Subsets are defined as predicates X -> Prop here.
+The Hausdorff distance between unbounded subsets is often infinite,
+which is accepted by our definition of a metric via the ball propositions.
+To get a separated metric we have to restrict to closed subsets of X,
+so that when the Hausdorff distance between A and B is zero,
+then A and B are subsets of each other (equality of subsets).
+One can still compute the Hausdorff distance between non-closed
+subsets, it is equal to the distance between the closures of the subsets.
 *)
 
 Variable X : MetricSpace.
 
 (** This is the (weak) hemiMetric, which makes an asymmetric metric.
-We make use of the classical quantifer in this definition.
+We make use of the classical quantifer in this definition, so that
+pairs of points {x,y} are compact subsets.
 *)
 Definition hemiMetric (e:Q) (A B: X -> Prop) :=
  forall x:X, A x ->
- existsC X (fun y => B y /\ ball e x y).
+ existsC X (fun (y:X) => B y /\ ball e x y).
 
 (** This (weak) metric, makes the full symmetric metric. *)
 Definition hausdorffBall (e:Q) (A B: X -> Prop) :=

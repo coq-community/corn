@@ -30,10 +30,34 @@ Set Implicit Arguments.
 
 (**
 * Metric Space
-In this version, a metric space over a setoid X is characterized by a
-ball relation B where B e x y is intended to mean that the two points
-x and y are within e of each other ( d(x,y)<=e ).  This is characterized
-by the axioms given in the record structure below.
+
+We define a metric space over a setoid X by a ball relation B
+where B e x y means that the distance between the two points
+x and y is less than or equal to the rational number e ( d(x,y) <= e ).
+
+We do not take the usual definition of a distance function d : X^2 -> R_+,
+because constructively this function would have to be computable.
+For example this would prevent us to define metrics on functions
+d(f,g) := inf_x d(f(x), g(x))
+where the infinimum does not always exist constructively.
+By using ball propositions instead, we make the distance function partial,
+it is not always defined. For topological applications, it is often enough
+to bound the distance instead of computing it exactly, this is
+precisely what the balls do.
+
+Interestingly, this definition by balls also handles infinite distances,
+by proving that forall e, not (B e x y). It generalizes the usual distance functions.
+
+This definition uses rational numbers instead of real numbers,
+which is simpler. It allows to define the real numbers as a certain metric
+space, namely the Cauchy completion of the rational numbers.
+
+Lastly, this definition could include 2 other properties of the distance functions
+~~B e x y -> B e x y
+and
+e < d -> {B d x y}+{~B e x y}.
+But those properties are only used late in the proofs, so we move them
+as additional definitions in module Classification.v (stability and locatedness). 
 *)
 
 Record is_MetricSpace (X : RSetoid) (B: Q -> relation X) : Prop :=
@@ -151,6 +175,18 @@ Proof.
     apply Qlt_le_weak, H0. exact H.
   - intros. rewrite H.
     apply ball_refl. apply Qle_refl.
+Qed.
+
+(* If d(x,y) is infinite and d(x,z) is finite, then d(z,y) is infinite. *)
+Lemma ball_infinite
+  : forall (x y z : X) (e : Q), 
+    (forall d : Q, ~ball d x y)
+    -> ball e x z
+    -> (forall d : Q, ~ball d z y).
+Proof.
+  intros. intro abs.
+  apply (H (e+d)).
+  exact (ball_triangle e d x z y H0 abs).
 Qed.
 
 End Metric_Space.

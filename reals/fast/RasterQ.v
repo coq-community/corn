@@ -26,7 +26,6 @@ Require Import CoRN.reals.fast.Interval.
 Require Export CoRN.metric2.FinEnum.
 Require Export CoRN.metric2.ProductMetric.
 Require Import CoRN.logic.Classic.
-Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 (**

@@ -21,7 +21,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.ProductMetric.
 Require Export CoRN.metric2.Complete.
-Require Import CoRN.tactics.Qauto.
 
 Set Implicit Arguments.
 

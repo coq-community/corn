@@ -37,15 +37,15 @@ Local Open Scope Q_scope.
 Section Prelength_Space.
 (**
 ** Prelength space
-In a length space the "internal" metric of a metric space corresponds
-to the given external metric.  The internal metric of a space measures
-the distance between two point by the length of curves connecting them.
 
-Because the notion of curves really only makes sense in a complete metric
-space, here we use a weaker notion of a prelength space.  In this case
-the internal metric says that two points are within e of each other if
-you can get between the two points making arbitarily short hops while
-covering a distance arbitrarily close to e.
+In a length metric space, the distances between points can be realized by
+continuous paths between the points. Loosely speaking they are metric
+spaces without holes.
+
+Because the notion of continuous paths makes most sense in complete metric
+spaces, here we use a weaker notion of a prelength space. In this case
+two points are within e of each other if you can get between the two points
+making arbitarily short hops while covering a distance arbitrarily close to e.
 *)
 Variable X:MetricSpace.
 
