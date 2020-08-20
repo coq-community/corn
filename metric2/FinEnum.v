@@ -26,9 +26,6 @@ Require Export CoRN.stdlib_omissions.List.
 Require Export CoRN.metric2.Classification.
 Require Import CoRN.metric2.Complete.
 Require Import CoRN.metric2.Prelength.
-Require Import CoRN.logic.CornBasics.
-Require Import CoRN.tactics.Qauto.
-Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
 
@@ -92,10 +89,10 @@ Proof.
   contradiction.
  destruct H as [ G | H | H] using orC_ind.
    auto using InFinEnumC_stable.
-  apply: orWeaken.
+  apply orWeaken.
   left.
   auto.
- apply: orWeaken.
+ apply orWeaken.
  right.
  apply IHl1.
  assumption.
@@ -106,7 +103,7 @@ Proof.
  intros x l1 l2 H.
  induction l1.
   assumption.
- apply: orWeaken.
+ apply orWeaken.
  right.
  apply IHl1.
 Qed.
@@ -204,7 +201,7 @@ Proof.
  intros e A b H x Hx.
  set (P:=fun n y => ball (e + (1#(P_of_succ_nat n))%Q) x y).
  assert (HP:(forall n, existsC X (fun x => ~~In x b /\ P n x))).
-  intros n.
+ { intros n.
   unfold P.
   destruct (H (1#(P_of_succ_nat n))%Q eq_refl x Hx)
     as [HG | y [Hy0 Hy1]] using existsC_ind.
@@ -223,7 +220,7 @@ Proof.
    apply existsC_stable; auto.
   apply existsWeaken.
   exists z.
-  split; auto 7 with *.
+  split; auto 7 with *. }
  destruct (infinitePidgeonHolePrinicple _ _ P HP) as [HG | y [Hy0 Hy1]] using existsC_ind.
   apply existsC_stable; auto.
  apply existsWeaken.
@@ -233,19 +230,19 @@ Proof.
  intros [n d] dpos.
  destruct n. inversion dpos. 2: inversion dpos.
  destruct (Hy1 (nat_of_P d)) as [HG | m [Hmd Hm]] using existsC_ind.
-  apply (Xstable (e + (p#d))%Q); assumption.
+  apply (Xstable (e + (Zpos p#d))%Q); assumption.
  eapply ball_weak_le;[|apply Hm].
  simpl.
  rewrite -> Qle_minus_iff.
  ring_simplify.
  rewrite <- Qle_minus_iff.
- apply Zmult_le_compat; auto with *.
- simpl.
- repeat rewrite <- inject_nat_convert.
- apply inj_le.
- apply le_trans with m; auto.
+ apply Zmult_le_compat.
+ apply Pos.le_1_l.
+ simpl. apply Pos2Nat.inj_le.
+ apply (le_trans _ _ _ Hmd).
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
- auto.
+ apply le_S, le_refl.
+ discriminate. discriminate.
 Qed.
 
 Lemma FinEnum_ball_closed : forall e a b,
@@ -284,12 +281,12 @@ Proof.
                                   /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
    intros e.
    apply (H (exist (Qlt 0) (1#(P_of_succ_nat e)) eq_refl)).
-   apply: orWeaken.
+   apply orWeaken.
    left;  assumption.
   assert (H'':forall n :nat ,
              existsC X (fun y : X => ~~In y b
                                   /\ ball (m:=X) (1#(P_of_succ_nat n)) x y)).
-   intros n.
+  { intros n.
    destruct (H' n) as [HG | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
    clear - Hz1 Hz0.
@@ -306,24 +303,35 @@ Proof.
     auto using existsC_stable.
    apply existsWeaken.
    exists y.
-   split; auto 7 with *.
-  destruct (infinitePidgeonHolePrinicple _ _ _ H'') as [HG | y [Hy0 Hy1]] using existsC_ind.
+   split; auto 7 with *. }
+   destruct (infinitePidgeonHolePrinicple _ _ _ H'')
+     as [HG | y [Hy0 Hy1]] using existsC_ind.
    auto using InFinEnumC_stable.
   rewrite -> (InFinEnumC_wd1 x y).
    auto using InFinEnumC_weaken.
   apply ball_eq.
   intros [n d] dpos.
   destruct n. inversion dpos. 2: inversion dpos.
-  rewrite (anti_convert_pred_convert d).
+  replace d with (Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d))).
   destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
-  apply (Xstable (p # Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d)))). auto.
+  apply (Xstable (Zpos p # Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d)))). auto.
   apply ball_weak_le with (1 # P_of_succ_nat z); auto.
   simpl.
   apply Zmult_le_compat; auto with *.
-  simpl.
-  repeat rewrite <- POS_anti_convert.
-  apply inj_le.
-  auto with *.
+  apply Pos.le_1_l. simpl.
+  assert (forall i j:nat, le i j -> Pos.of_succ_nat i <= Pos.of_succ_nat j)%positive.
+  { intros.
+    rewrite Pos.of_nat_succ, Pos.of_nat_succ.
+    apply Pos2Nat.inj_le.
+    rewrite Nat2Pos.id, Nat2Pos.id.
+    apply le_n_S, H0. discriminate. discriminate. }
+  apply H0, Hz0.
+  discriminate.
+  rewrite Pos.of_nat_succ.
+  rewrite <- (Pos2Nat.id d) at 2.
+  apply f_equal.
+  symmetry. apply (S_pred _ O).
+  apply Pos2Nat.is_pos.
  apply IHa; auto.
  intros e y Hy.
  apply H.
@@ -352,7 +360,7 @@ Build_MetricSpace FinEnum_ball_wd FinEnum_is_MetricSpace.
 Lemma FinEnum_stable : stableMetric FinEnum.
 Proof.
  intros e x y.
- apply: hausdorffBall_stable.
+ apply hausdorffBall_stable.
 Qed.
 
 Lemma FinEum_map_ball : forall (f:X -> X) (e:Qpos) (s:FinEnum),
@@ -366,14 +374,14 @@ Proof.
  split; intros x y; (destruct y as [G | y | y] using orC_ind; [auto using existsC_stable
    |apply existsWeaken |]).
     exists (f a);split.
-     apply: orWeaken; left; reflexivity.
+     apply orWeaken; left; reflexivity.
      apply (ball_wd _ eq_refl _ _ y _ _ (reflexivity _)); apply H.
    destruct ((proj1 IHs1) x y) as [G | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
    apply existsWeaken.
    exists z.
    split; auto.
-   apply: orWeaken.
+   apply orWeaken.
    right; assumption.
   exists a.
   split.
@@ -570,7 +578,7 @@ Proof.
  clear H.
  destruct (@preLengthX a b0 (e + half * g)%Qpos d1 d2) as [c Hc0 Hc1].
    abstract ( clear - Hg; unfold QposEq in Hg; rewrite -> Hg; simpl; rewrite -> Qlt_minus_iff; ring_simplify;
-     Qauto_pos).
+     apply (Qpos_ispos ((1#2)*g))).
   abstract (clear - Hb0; destruct Hb0; auto).
  exists (c :: c1).
  - split. apply Qpos_nonneg. split; intros x Hx.
@@ -645,10 +653,10 @@ Proof.
  intros Ha.
  destruct Ha as [G | Ha | Ha] using orC_ind.
    auto using InFinEnumC_stable.
-  apply: orWeaken.
+  apply orWeaken.
   left.
   rewrite -> Ha; reflexivity.
- apply: orWeaken.
+ apply orWeaken.
  right.
  apply IHl.
  auto.
@@ -745,7 +753,7 @@ Proof.
    auto using existsC_stable.
   clear IHs1.
   assert (Ha0:InFinEnumC (Cunit a0) (map Cunit (a0::s1))).
-   apply: orWeaken.
+   apply orWeaken.
    left; reflexivity.
   destruct (H _ Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
@@ -773,6 +781,6 @@ Proof.
  apply IHs1; auto.
  intros b Hb.
  apply H.
- apply: orWeaken.
+ apply orWeaken.
  right; assumption.
 Qed.

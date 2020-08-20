@@ -26,9 +26,8 @@ Require Import CoRN.reals.fast.Interval.
 Require Import CoRN.logic.Classic.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.Qabs.
-Require Import CoRN.tactics.Qauto.
 Require Import Coq.QArith.Qround.
-Require Import CoRN.tactics.CornTac.
+Require Import Omega.
 
 Local Open Scope Q_scope.
 
@@ -49,8 +48,8 @@ is chosen that contains all the points, so that this doesn't matter.
 
 [Rasterize Point] adds a single point [p] into a raster. *)
 Definition RasterizePoint n m (bm:raster n m) (t l b r:Q) (p:Q*Q) : raster n m :=
-let i := min (pred n) (Z_to_nat (Z.le_max_l 0 (rasterize1 l r n (fst p)))) in
-let j := min (pred m) (Z_to_nat (Z.le_max_l 0 (rasterize1 b t m (snd p)))) in
+let i := min (pred n) (Z.to_nat (Z.max 0 (rasterize1 l r n (fst p)))) in
+let j := min (pred m) (Z.to_nat (Z.max 0 (rasterize1 b t m (snd p)))) in
 setRaster bm true (pred m - j) i.
 (* begin hide *)
 Add Parametric Morphism n m bm : (@RasterizePoint n m bm) with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> (@eq _) ==> (@eq _) as RasterizePoint_wd.
@@ -75,10 +74,9 @@ Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
 Proof.
  intros t l b r m n bm p i j H.
  unfold RasterizePoint.
- set (j0:=(min (pred m) (Z_to_nat (z:=Z.max 0 (rasterize1 l r m (fst p)))
-   (Z.le_max_l 0 (rasterize1 l r m (fst p)))))).
+ set (j0:=(min (pred m) (Z.to_nat (Z.max 0 (rasterize1 l r m (fst p)))))).
  set (i0:=(pred n - min (pred n)
-   (Z_to_nat (z:=Z.max 0 (rasterize1 b t n (snd p))) (Z.le_max_l 0 (rasterize1 b t n (snd p)))))%nat).
+   (Z.to_nat (Z.max 0 (rasterize1 b t n (snd p)))))%nat).
  destruct (le_lt_dec n i0).
   rewrite setRaster_overflow; auto.
  destruct (le_lt_dec m j0).
@@ -112,19 +110,18 @@ Qed.
 (* end hide *)
 Section RasterizeCorrect.
 
-Let C := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * n # 1).
+Let C := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * Z.of_nat n # 1).
 
 Lemma rasterization_error : forall l (w:Qpos) n x,
 (l <= x <= l + proj1_sig w) ->
-ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * proj1_sig w) (C l (l + proj1_sig w) (S n) (min n
-             (Z_to_nat
-                (Z.le_max_l 0 (rasterize1 l (l+proj1_sig w) (S n) x))))) x.
+ball (m:=Q_as_MetricSpace) ((1 #2*P_of_succ_nat n) * proj1_sig w) (C l (l + proj1_sig w) (S n) (Z.of_nat (min n
+             (Z.to_nat
+                (Z.max 0 (rasterize1 l (l+proj1_sig w) (S n) x)))))) x.
 Proof.
  clear - C.
  intros l w n x H0.
  destruct (Qlt_le_dec x (l+proj1_sig w)).
-  replace (Z_of_nat (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x))
-                                     (Z.le_max_l 0 (rasterize1 l (l + proj1_sig w) (S n) x)))))
+  replace (Z_of_nat (min n (Z.to_nat (Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x)) )))
     with (rasterize1 l (l + proj1_sig w) (S n) x).
    apply ball_sym.
    simpl.
@@ -136,14 +133,16 @@ Proof.
    eapply Qle_trans.
     unfold C.
     apply (rasterize1_close H).
-    change ((l + proj1_sig w - l) / (2 * S n)
-            <=(/ 2%positive) * (/ P_of_succ_nat n) * proj1_sig w).
+    change ((l + proj1_sig w - l) / ((2#1) * inject_Z (Z.of_nat (S n)))
+            <=(/ inject_Z 2) * (1# (P_of_succ_nat n)) * proj1_sig w).
    unfold Qdiv.
    rewrite -> Qinv_mult_distr.
-   replace LHS with (((/ 2) * (/ S n) * proj1_sig w)) by simpl; ring.
+   setoid_replace ( (l + proj1_sig w - l) * (/ (2#1) * / inject_Z (Z.of_nat (S n))))
+     with (((/ (2#1)) * (/ inject_Z (Z.of_nat (S n))) * proj1_sig w))
+     by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
    apply Qle_refl.
   rewrite inj_min.
-  rewrite <- Z_to_nat_correct.
+  rewrite Z2Nat.id.
   rewrite Zmax_right.
    apply Z.min_case_strong.
     intros H.
@@ -158,74 +157,86 @@ Proof.
   destruct H0.
   apply rasterize1_boundL; auto.
   apply Qle_trans with x; auto.
+  apply Z.le_max_l.
  simpl.
- replace (min n (Z_to_nat (z:=Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x))
-   (Z.le_max_l 0 (rasterize1 l (l + proj1_sig w) (S n) x)))) with n.
+ replace (min n (Z.to_nat (Z.max 0 (rasterize1 l (l + proj1_sig w) (S n) x)))) with n.
   setoid_replace x with (l + proj1_sig w).
-   apply: ball_sym.
+   apply ball_sym.
    rewrite ->  Qball_Qabs.
    unfold C.
    autorewrite with QposElim.
-   replace RHS with (proj1_sig w*(1#xO (P_of_succ_nat n))) by simpl; ring.
-   change (1 # xO (P_of_succ_nat n)) with (/(2*(S n))).
-   change (2*S n #1) with (2*S n).
-   change (2*n + 1#1) with ((2*n + 1)%Z:Q).
+   setoid_replace ((1 # (Pos.of_succ_nat n)~0) * proj1_sig w) 
+     with (proj1_sig w*(1#xO (P_of_succ_nat n)))
+     by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
+   change (1 # xO (P_of_succ_nat n)) with (/((2#1)*inject_Z (Z.of_nat (S n)))).
+   change (2*Z.of_nat (S n) #1) with ((2#1)*inject_Z (Z.of_nat (S n))).
+   change (2*Z.of_nat n + 1#1) with (inject_Z (2*Z.of_nat n + 1)).
    rewrite (inj_S n).
    unfold Z.succ.
-   do 2 rewrite -> injz_plus.
-   setoid_replace ((2%positive * n)%Z:Q) with (2*n); [| now (unfold Qeq; simpl; auto with * )].
-   setoid_replace (l + proj1_sig w - (l + (l + proj1_sig w - l) * (2 * n + 1%positive) / (2 * (n + 1%positive))))
-     with ((proj1_sig w / (2 * (n + 1%positive)))); [| now (simpl; field; unfold Qeq; simpl; auto with * )].
+   do 2 rewrite -> Q.Zplus_Qplus.
+   rewrite -> Q.Zmult_Qmult.
+   change (inject_Z 2) with (2#1).
+   change (inject_Z 1) with 1%Q.
+   setoid_replace (l + proj1_sig w - (l + (l + proj1_sig w - l) * ((2#1) * inject_Z (Z.of_nat n) + 1) / ((2#1) * (inject_Z (Z.of_nat n) + 1))))
+     with ((proj1_sig w / ((2#1) * (inject_Z (Z.of_nat n) + 1))))
+     by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; unfold Qeq; simpl; auto with *).
    rewrite -> Qabs_pos;[apply Qle_refl|].
    apply Qle_shift_div_l.
    rewrite <- (Qmult_0_r (2#1)). apply Qmult_lt_l. reflexivity.
    simpl; auto with *; unfold Qlt; simpl; auto with *.
-   replace LHS with 0 by simpl; ring.
+   rewrite Qmult_0_l.
    auto with *.
   destruct H0.
   apply Qle_antisym; auto.
  symmetry.
  apply min_l.
- apply surj_le.
- rewrite <- Z_to_nat_correct.
+ apply Nat2Z.inj_le.
+ rewrite Z2Nat.id.
  eapply Z.le_trans;[|apply Z.le_max_r].
  unfold rasterize1.
- rewrite <- (Qfloor_Z n).
+ rewrite <- (Qfloor_Z (Z.of_nat n)).
  apply Qfloor_resp_le.
  setoid_replace x with (l+proj1_sig w).
-  setoid_replace (l + proj1_sig w - l) with (proj1_sig w); [| now simpl; ring].
-  field_simplify;[|apply Qpos_nonzero].
+ setoid_replace (l + proj1_sig w - l) with (proj1_sig w)
+   by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
+ unfold Qdiv.
+ rewrite <- Qmult_assoc, Qmult_inv_r, Qmult_1_r.
   unfold Qle.
   simpl.
-  change (n * 1 * 1 <= (S n)*1*1)%Z || change (n * 1 <= (S n)*1)%Z.
-  ring_simplify.
-  apply inj_le.
-  auto with *.
- destruct H0; simpl; auto with *.
+  rewrite Z.mul_1_r, Pos.mul_1_r, Zpos_P_of_succ_nat.
+  apply Z.le_succ_diag_r.
+  apply Qpos_nonzero.
+  apply Qle_antisym.
+  apply H0. exact q.
+  apply Z.le_max_l.
 Qed.
 
-Lemma switch_line_interp : forall t b m j, (j <= m)%nat -> C t b (S m) (m - j)%nat == C b t (S m) j.
+Lemma switch_line_interp : forall (t b : Q) (m j : nat),
+             (j <= m)%nat -> C t b (S m) (Z.of_nat (m - j)%nat) == C b t (S m) (Z.of_nat j).
 Proof.
  intros t b m j H.
  unfold C.
  rewrite inj_minus1;[|auto].
- change (2 * (m - j) + 1 # 1) with ((2 * (m - j) + 1)%Z:Q).
- change (2*S m#1) with (2*(S m)).
- change ((2*j +1)#1) with ((2*j+1)%Z:Q).
- do 2 rewrite -> injz_plus.
- change ((2%positive * (m - j))%Z:Q) with (2 * (m - j)%Z).
- change ((2%positive * j)%Z:Q) with (2 * j).
- change (1%Z:Q) with (1:Q).
+ change (2 * (Z.of_nat m - Z.of_nat j) + 1 # 1)
+   with (inject_Z (2 * (Z.of_nat m - Z.of_nat j) + 1)%Z).
+ change (2*Z.of_nat (S m)#1) with ((2#1)*inject_Z (Z.of_nat (S m))).
+ change ((2*Z.of_nat j +1)#1) with (inject_Z (2*Z.of_nat j+1)%Z).
+ do 2 rewrite -> Q.Zplus_Qplus.
+ rewrite -> Q.Zmult_Qmult.
+ change (inject_Z 1) with 1.
+ rewrite -> Q.Zmult_Qmult.
+ change (inject_Z 2) with (2#1).
  unfold Zminus.
- rewrite -> injz_plus.
+ rewrite -> Q.Zplus_Qplus.
  rewrite (inj_S m).
  unfold Z.succ.
- rewrite -> injz_plus.
- change ((-j)%Z:Q) with (-j).
+ rewrite -> Q.Zplus_Qplus.
+ change (inject_Z (-Z.of_nat j)) with (-inject_Z (Z.of_nat j)).
  field.
- unfold Qeq.
- simpl.
- auto with *.
+ change 1 with (inject_Z 1).
+ rewrite <- Q.Zplus_Qplus, Z.add_1_r.
+ rewrite <- Zpos_P_of_succ_nat.
+ apply Q.positive_nonzero_in_Q.
 Qed.
 
 Variable b l:Q.
@@ -274,17 +285,17 @@ Proof.
   unfold RasterizePoint at 1.
   simpl (pred (S n)).
   simpl (pred (S m)).
-  set (i:=min n (Z_to_nat (Z.le_max_l 0 (rasterize1 l r (S n) (fst a))))).
-  set (j:=min m (Z_to_nat (Z.le_max_l 0 (rasterize1 b t (S m) (snd a))))).
+  set (i:=min n (Z.to_nat (Z.max 0 (rasterize1 l r (S n) (fst a))))).
+  set (j:=min m (Z.to_nat (Z.max 0 (rasterize1 b t (S m) (snd a))))).
   cbv zeta.
   apply existsWeaken.
-  exists (C l r (S n) i,C t b (S m) (m -j)%nat).
+  exists (C l r (S n) (Z.of_nat i), C t b (S m) (Z.of_nat (m -j)%nat)).
   split.
    apply InFinEnumC_weaken.
    apply InterpRaster_correct1.
    rewrite setRaster_correct1; unfold i, j; auto with *.
   split.
-   change (ball (proj1_sig err) (C l r (S n) i) x).
+   change (ball (proj1_sig err) (C l r (S n) (Z.of_nat i)) x).
    change (st_eq x (fst a)) in Hl.
    rewrite -> Hl.
    eapply ball_weak_le.
@@ -294,7 +305,7 @@ Proof.
    simpl in Hl.
    rewrite ->  Hl in Hfl.
    auto.
-  change (ball (proj1_sig err) (C t b (S m) (m-j)%nat) y).
+  change (ball (proj1_sig err) (C t b (S m) (Z.of_nat (m-j)%nat)) y).
   change (st_eq y (snd a)) in Hr.
   rewrite -> Hr.
   eapply ball_weak_le.
@@ -370,10 +381,8 @@ Proof.
  simpl (fold_right (fun (y : Q * Q) (x : raster (S n) (S m)) =>
    RasterizePoint x t l b r y) (emptyRaster (S n) (S m)) (a :: l0)) in Hij.
  unfold RasterizePoint at 1 in Hij.
- set (i0:=min (pred (S n)) (Z_to_nat (z:=Z.max 0 (rasterize1 l r (S n) (fst a)))
-   (Z.le_max_l 0 (rasterize1 l r (S n) (fst a))))) in *.
- set (j0:=min (pred (S m)) (Z_to_nat (z:=Z.max 0 (rasterize1 b t (S m) (snd a)))
-   (Z.le_max_l 0 (rasterize1 b t (S m) (snd a))))) in *.
+ set (i0:=min (pred (S n)) (Z.to_nat (Z.max 0 (rasterize1 l r (S n) (fst a))))) in *.
+ set (j0:=min (pred (S m)) (Z.to_nat (Z.max 0 (rasterize1 b t (S m) (snd a))))) in *.
  cbv zeta in Hij.
  assert (L:((i=i0)/\(j=m-j0) \/ ((j<>(m-j0)) \/ (i<>i0)))%nat) by omega.
  destruct L as [[Hi Hj] | L].
@@ -407,7 +416,7 @@ Proof.
   eapply ball_weak_le.
    unfold err.
    apply Qpos_max_ub_r.
-  fold (C t b (S m) (m - j0)%nat).
+  fold (C t b (S m) (Z.of_nat (m - j0)%nat)).
   simpl (ball (m:=Q_as_MetricSpace)).
   rewrite -> switch_line_interp;[|unfold j0; auto with *].
   apply rasterization_error.
