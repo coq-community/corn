@@ -34,14 +34,9 @@ By attaching coordinates to the top-left and bottom-right corners of
 a raster, it can be interpreted as a finite set in [Q]^2. *)
 Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 
-Lemma stableQ2 : stableMetric Q2.
-Proof.
- apply ProductMS_stable; apply stableQ.
-Qed.
-
 (** For [Q2], classical membership in a finite enumeration is the
 same as a constructive membership. *)
-Lemma InStrengthen : forall x (l:FinEnum stableQ2),
+Lemma InStrengthen : forall x (l:FinEnum Q2),
 InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ st_eq x y.
 Proof.
  induction l.
@@ -66,10 +61,10 @@ Proof.
  split; auto with *.
 Qed.
 
-Definition InterpRow (up : list Q) n (v:Vector.t bool n) : FinEnum stableQ:=
+Definition InterpRow (up : list Q) n (v:Vector.t bool n) : FinEnum Q_as_MetricSpace :=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
-Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricSpace Q_as_MetricSpace)) : FinEnum stableQ2 :=
+Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricSpace Q_as_MetricSpace)) : FinEnum Q2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in

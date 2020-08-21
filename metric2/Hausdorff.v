@@ -132,8 +132,6 @@ Qed.
 assumptions are needed to show our definition of ball is closed.  See
 FinEnum for an example of an instance of the Hausdorff metric. *)
 
-Hypothesis stableX : stableMetric X.
-
 Lemma hemiMetric_stable :forall e A B, ~~(hemiMetric e A B) -> hemiMetric e A B.
 Proof.
  unfold hemiMetric.

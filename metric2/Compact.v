@@ -74,12 +74,11 @@ End BishopCompact.
 Section AlmostIn.
 
 Variable X : MetricSpace.
-Hypothesis stableX : stableMetric X.
 
 (** [almostIn] is a useful predicate that says when a point is within e
 of (classically) some member of a finite enumeration. We won't know which
 point it is close to. *)
-Fixpoint almostIn (e:Q) (x:X) (l:FinEnum stableX) : Prop :=
+Fixpoint almostIn (e:Q) (x:X) (l:FinEnum X) : Prop :=
 match l with
 | nil => False
 | y::ys => orC (ball e x y) (almostIn e x ys)
@@ -130,7 +129,7 @@ Proof.
    apply A.
    apply ball_eq.
    intros d dpos.
-   apply stableX.
+   apply (msp_stable (msp X)).
    apply (C (exist _ _ dpos)).
   destruct H0 as [ G | z Hz] using existsC_ind.
    tauto.
@@ -195,7 +194,7 @@ Proof.
   apply A.
   apply ball_closed.
   intros d0 d0pos.
-  apply stableX.
+  apply (msp_stable (msp X)).
   apply (Y (exist _ _ d0pos)). }
  destruct H0 as [G | d0 Hd0] using existsC_ind.
   auto using almostIn_stable.
@@ -323,12 +322,12 @@ Qed.
 
 End AlmostIn.
 (* begin hide *)
-Add Parametric Morphism X stableX : (@almostIn X stableX)
+Add Parametric Morphism X : (@almostIn X)
     with signature Qeq ==> (@st_eq _) ==> (@st_eq _) ==> iff as almostIn_wd.
 Proof.
  unfold FinEnum_eq.
  assert (Y:forall x1 x2 : Q, x1 == x2 -> forall y1 y2 : X,
-              st_eq y1 y2 ->forall z : FinEnum stableX,
+              st_eq y1 y2 ->forall z : FinEnum X,
                 (almostIn x1 y1 z
                  -> almostIn x2 y2 z)).
   { intros x1 x2 Hx y1 y2 Hy.
@@ -345,7 +344,7 @@ Proof.
   right.
   apply IHz; assumption. }
  intros x1 x2 Hx y1 y2 Hy.
- cut (forall z1 x3 : FinEnum stableX, (forall x : X, InFinEnumC x z1 -> InFinEnumC x x3) ->
+ cut (forall z1 x3 : FinEnum X, (forall x : X, InFinEnumC x z1 -> InFinEnumC x x3) ->
    (almostIn x1 y1 z1 -> almostIn x2 y2 x3)).
   intros Z z1 z2 Hz.
   split.
@@ -406,16 +405,17 @@ Qed.
 ** Definition of Compact
 A compact set is defined as the completion of finite enumerations as
 a metric space *)
-Definition Compact X (stableX : stableMetric X) := Complete (FinEnum stableX).
+Definition Compact X := Complete (FinEnum X).
 
 (** A point is in a compact set if all the approximations are almost in
 the approximations of the compact set. *)
-Definition inCompact X stableX (x:Complete X) (s:Compact stableX) :=
+Definition inCompact X (x:Complete X) (s:Compact X) :=
  forall (e1 e2:Qpos), almostIn (proj1_sig e1 + proj1_sig e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
-Add Parametric Morphism X stableX : (@inCompact X stableX) with signature (@st_eq _) ==> (@st_eq _) ==> iff as inCompact_wd.
+Add Parametric Morphism X : (@inCompact X)
+    with signature (@st_eq _) ==> (@st_eq _) ==> iff as inCompact_wd.
 Proof.
- cut (forall x1 x2 : Complete X, st_eq x1 x2 -> forall x3 x4 : Complete (FinEnum stableX),
+ cut (forall x1 x2 : Complete X, st_eq x1 x2 -> forall x3 x4 : Complete (FinEnum X),
    st_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
   intros Z x1 x2 Hx y1 y2 Hy.
   split.
@@ -439,10 +439,9 @@ Qed.
 Section Compact.
 
 Variable X : MetricSpace.
-Hypothesis stableX : stableMetric X.
 
-Let Compact := Compact stableX.
-Let inCompact := @inCompact X stableX.
+Let Compact := Compact X.
+Let inCompact := @inCompact X.
 
 Lemma inCompact_stable : forall x s, ~~inCompact x s -> inCompact x s.
 Proof.
@@ -483,7 +482,7 @@ Hypothesis locatedX : locatedMetric X.
 
 (** If a point is almost in an enumeration, then there it is close to
 a point in the enumeration in a constructive sense. *)
-Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum stableX),
+Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum X),
     proj1_sig e < proj1_sig d -> almostIn (proj1_sig e) x s
     -> {y | In y s /\ ball (proj1_sig d) x y}.
 Proof.
@@ -610,7 +609,7 @@ Proof.
                           n _ (((1#1) + k)*(k*d1) + (k*d2)) Hk))%Qpos).
  setoid_replace (proj1_sig e') with (proj1_sig e0).
  - simpl.
-   destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
+   destruct (@HausdorffBallHausdorffBallStrong X locatedX
                (@proj1_sig Q (Qlt 0) d1 +
                 @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
                (@approximate _ (FinEnum_ball X) s (Qpos2QposInf d1))
@@ -678,7 +677,7 @@ Proof.
   change (S m + n)%nat with (S (m + n))%nat.
   unfold Str_nth.
   simpl.
-  destruct (@HausdorffBallHausdorffBallStrong X stableX locatedX
+  destruct (@HausdorffBallHausdorffBallStrong X locatedX
                (@proj1_sig Q (Qlt 0) d1 +
                 @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
                (@approximate _ (FinEnum_ball X) s d1)
@@ -702,7 +701,7 @@ Proof.
  unfold Str_nth.
  simpl.
  destruct (@HausdorffBallHausdorffBallStrong
-             X stableX locatedX
+             X locatedX
              (@proj1_sig Q (Qlt 0) d1 +
               @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
              (@approximate _ (FinEnum_ball X) s d1)
@@ -1035,11 +1034,11 @@ Proof.
  apply orWeaken;right;assumption.
 Defined.
 
-Lemma CompactTotalBoundNotFar : forall SCX (s:Compact) (e:Qpos),
+Lemma CompactTotalBoundNotFar : forall (s:Compact) (e:Qpos),
     ball ((3#5)*proj1_sig e)
-         (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum SCX) (CompactTotalBound s e).
+         (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum (Complete X)) (CompactTotalBound s e).
 Proof.
- intros SCX s e.
+ intros s e.
  unfold CompactTotalBound.
  generalize (CompactTotallyBoundedNotFar s ((1#5)*e) ((1#5)*e)).
  generalize (CompactTotallyBounded_fun s ((1 # 5) * e) ((1 # 5) * e)).
@@ -1199,7 +1198,7 @@ definition.
 Given a Bishop compact set we construct finite enumerations that approximate
 that set. *)
 Definition BishopCompactAsCompact_raw
- (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum stableX) :=
+ (P:Complete X->Prop) (HP:CompactSubset _ P) (e:QposInf) : (FinEnum X) :=
 match e with
 |QposInfinity => nil
 |Qpos2QposInf e' =>
@@ -1210,7 +1209,7 @@ end.
 (** These approximations are coherent *)
 Lemma BishopCompactAsCompact_prf :
   forall P (HP:CompactSubset _ P),
-    is_RegularFunction (@ball (FinEnum stableX)) (BishopCompactAsCompact_raw HP).
+    is_RegularFunction (@ball (FinEnum X)) (BishopCompactAsCompact_raw HP).
 Proof.
  cut (forall (P : RegularFunction (@ball X) -> Prop) (HP : CompactSubset (Complete X) P) (e1 e2 : Qpos),
    hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a
@@ -1417,13 +1416,13 @@ Proof.
  apply ball_triangle with (approximate s ((1#5)*((1#2)*e2))%Qpos).
   apply regFun_prf.
  clear e1.
- rewrite -> (@FinEnum_map_Cunit _ stableX (Complete_stable stableX)).
+ rewrite -> FinEnum_map_Cunit.
  apply ball_triangle with (CompactTotalBound locatedX s ((1 # 2) * e2)).
   apply CompactTotalBoundNotFar.
   unfold ball, FinEnum.
   unfold BishopCompactAsCompact, approximate, BishopCompactAsCompact_raw.  
   unfold totallyBoundedSubset, CompactAsBishopCompact, CompactTotallyBounded.
- change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete_stable stableX))).
+ change (FinEnum_ball (Complete X)) with (@ball (FinEnum (Complete X))).
  induction (CompactTotalBound locatedX s ((1 # 2) * e2)). 
   apply ball_refl. apply Qpos_nonneg.
  destruct IHl as [_ [IHlA IHlB]].
@@ -1469,8 +1468,6 @@ Require Import CoRN.metric2.Prelength.
 Section CompactDistr.
 
 Variable X : MetricSpace.
-Hypothesis stableX : stableMetric X.
-Hypothesis stableCX : stableMetric (Complete X).
 
 (**
 ** FinEnum distributes over Complete
@@ -1478,11 +1475,11 @@ The FiniteEnumeration monad distributes over the Completion monad.
 This corresponds to a function from FinEnum (Complete X) to
 Complete (FinEnum X).
 *)
-Definition FinCompact_raw (x: FinEnum stableCX) (e:QposInf) : FinEnum stableX :=
+Definition FinCompact_raw (x: FinEnum (Complete X)) (e:QposInf) : FinEnum X :=
 map (fun x => approximate x e) x.
 
 Lemma FinCompact_prf : forall x,
-    is_RegularFunction (@ball (FinEnum stableX)) (FinCompact_raw x).
+    is_RegularFunction (@ball (FinEnum X)) (FinCompact_raw x).
 Proof.
  intros x.
  cut (forall (e1 e2:Qpos), hemiMetric X (proj1_sig e1 + proj1_sig e2) (fun a : X => InFinEnumC a (FinCompact_raw x e1))
@@ -1514,12 +1511,12 @@ Proof.
  right; auto.
 Qed.
 
-Definition FinCompact_fun (x: FinEnum stableCX) : Compact stableX :=
+Definition FinCompact_fun (x: FinEnum (Complete X)) : Compact X :=
  Build_RegularFunction (FinCompact_prf x).
 
 Lemma FinCompact_uc : is_UniformlyContinuousFunction FinCompact_fun Qpos2QposInf.
 Proof.
- cut (forall e (d1 d2:Qpos) (a b : FinEnum stableCX), (hemiMetric (Complete X) e
+ cut (forall e (d1 d2:Qpos) (a b : FinEnum (Complete X)), (hemiMetric (Complete X) e
    (fun a0 : Complete X => InFinEnumC a0 a) (fun a : Complete X => InFinEnumC a b)) ->
      (hemiMetric X (proj1_sig d1 + e + proj1_sig d2) (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun a) d1))
        (fun a0 : X => InFinEnumC a0 (approximate (FinCompact_fun b) d2)))).
@@ -1574,10 +1571,10 @@ Qed.
 
 Local Open Scope uc_scope.
 
-Definition FinCompact : FinEnum stableCX --> Compact stableX :=
+Definition FinCompact : FinEnum (Complete X) --> Compact X :=
  Build_UniformlyContinuousFunction FinCompact_uc.
 
-Lemma FinCompact_correct : forall x (s:FinEnum stableCX),
+Lemma FinCompact_correct : forall x (s:FinEnum (Complete X)),
  InFinEnumC x s <-> inCompact x (FinCompact s).
 Proof.
  intros x s.
@@ -1624,7 +1621,7 @@ Proof.
   destruct en as [|en|en]. inversion He. 2: inversion He.
   simpl in He.
   destruct (Hc (pred (nat_of_P ed))) as [G | m [Hm0 Hm1]] using existsC_ind.
-   auto using stableCX.
+  apply (msp_stable (msp _)), G.
   set (m' := (1#P_of_succ_nat m)%Qpos).
   apply ball_weak_le with (proj1_sig (m' + (m' + m') + m')%Qpos).
    unfold m'.
@@ -1708,7 +1705,7 @@ Proof.
 Qed.
 
 Lemma CompactCompleteCompact_prf : forall x,
-    is_RegularFunction (@ball (Compact stableX)) (Cmap_raw FinCompact x).
+    is_RegularFunction (@ball (Compact X)) (Cmap_raw FinCompact x).
 Proof.
  intros x e1 e2.
  unfold Cmap_raw.
@@ -1718,7 +1715,7 @@ Proof.
  apply regFun_prf.
 Qed.
 
-Definition CompactCompleteCompact_fun x : Complete (Compact stableX) :=
+Definition CompactCompleteCompact_fun x : Complete (Compact X) :=
  Build_RegularFunction (CompactCompleteCompact_prf x).
 
 Lemma CompactCompleteCompact_uc :
@@ -1730,7 +1727,7 @@ Proof.
  apply H.
 Qed.
 
-Definition CompactCompleteCompact : Compact stableCX --> Compact stableX :=
+Definition CompactCompleteCompact : Compact (Complete X) --> Compact X :=
  uc_compose Cjoin (Build_UniformlyContinuousFunction CompactCompleteCompact_uc).
 
 Lemma CompactCompleteCompact_correct : forall x s,
@@ -1809,18 +1806,16 @@ If x is in a compact set S, then f x is in the compact image of S under f.
 *)
 Variable z : Qpos.
 Variable X Y : MetricSpace.
-Hypothesis stableX : stableMetric X.
-Hypothesis stableY : stableMetric Y.
 Hypothesis plX : PrelengthSpace X.
-Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
+Hypothesis plFEX : PrelengthSpace (FinEnum X).
 
 Local Open Scope uc_scope.
 
 Variable f : X --> Y.
 
-Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum stableX),
+Lemma almostIn_map : forall (e d:Qpos) a (b:FinEnum X),
     (QposInf_le d (mu f e)) -> almostIn (proj1_sig d) a b ->
-    almostIn (proj1_sig e) (f a) (FinEnum_map z stableX stableY f b).
+    almostIn (proj1_sig e) (f a) (FinEnum_map z f b).
 Proof.
  intros e d a b Hd Hab.
  induction b.
@@ -1839,9 +1834,9 @@ Proof.
  auto.
 Qed.
 
-Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum stableX),
+Lemma almostIn_map2 : forall (e1 e2 d:Qpos) a (b:FinEnum X),
     (QposInf_le d ((mu f e1) + (mu f e2))) -> almostIn (proj1_sig d) a b ->
- almostIn (proj1_sig e1 + proj1_sig e2) (f a) (FinEnum_map z stableX stableY f b).
+ almostIn (proj1_sig e1 + proj1_sig e2) (f a) (FinEnum_map z f b).
 Proof.
  intros e1 e2 d a b Hd Hab.
  induction b.
@@ -1860,8 +1855,8 @@ Proof.
  auto.
 Qed.
 
-Definition CompactImage : Compact stableX --> Compact stableY :=
- Cmap plFEX (FinEnum_map z stableX stableY f).
+Definition CompactImage : Compact X --> Compact Y :=
+ Cmap plFEX (FinEnum_map z f).
 
 Lemma CompactImage_correct1 : forall x s,
  (inCompact x s) -> (inCompact (Cmap plX f x) (CompactImage s)).
@@ -1911,24 +1906,22 @@ Section CompactImageBind.
 
 Variable z : Qpos.
 Variable X Y : MetricSpace.
-Hypothesis stableX : stableMetric X.
-Hypothesis stableY : stableMetric Y.
 Hypothesis plX : PrelengthSpace X.
-Hypothesis plFEX : PrelengthSpace (FinEnum stableX).
+Hypothesis plFEX : PrelengthSpace (FinEnum X).
 
 Local Open Scope uc_scope.
 
 Variable f : X --> Complete Y.
 
-Definition CompactImage_b : Compact stableX --> Compact stableY :=
- uc_compose (CompactCompleteCompact _ _) (CompactImage z (Complete_stable stableY) plFEX f).
+Definition CompactImage_b : Compact X --> Compact Y :=
+ uc_compose (CompactCompleteCompact _) (CompactImage z plFEX f).
 
 Lemma CompactImage_b_correct1 : forall x s,
  (inCompact x s) -> (inCompact (Cbind plX f x) (CompactImage_b s)).
 Proof.
  intros x s H.
  change (inCompact (Cjoin (Cmap_fun plX f x))
-   (CompactCompleteCompact stableY _ (CompactImage z (Complete_stable stableY) plFEX f s))).
+   (CompactCompleteCompact _ (CompactImage z plFEX f s))).
  rewrite <- CompactCompleteCompact_correct.
  apply CompactImage_correct1;assumption.
 Qed.
