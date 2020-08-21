@@ -329,14 +329,14 @@ Proof.
   exact Hlr.
 Qed.
 
-Definition CompactIntervalQ_raw (e:QposInf) : FinEnum stableQ :=
+Definition CompactIntervalQ_raw (e:QposInf) : FinEnum Q_as_MetricSpace :=
 match e with
 | QposInfinity => nil
 | Qpos2QposInf e' =>
   UniformPartition (max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e')))))
 end.
 
-Lemma CompactIntervalQ_prf : is_RegularFunction (@ball (FinEnum stableQ)) CompactIntervalQ_raw.
+Lemma CompactIntervalQ_prf : is_RegularFunction (@ball (FinEnum Q_as_MetricSpace)) CompactIntervalQ_raw.
 Proof.
  cut (forall (e1 e2:Qpos), hemiMetric Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (fun a : Q_as_MetricSpace =>
    InFinEnumC a (CompactIntervalQ_raw e1)) (fun a : Q_as_MetricSpace =>
@@ -403,7 +403,7 @@ Proof.
    apply Nat.le_max_l.
 Qed.
 
-Definition CompactIntervalQ : Compact stableQ :=
+Definition CompactIntervalQ : Compact Q_as_MetricSpace :=
 Build_RegularFunction CompactIntervalQ_prf.
 
 Local Open Scope CR_scope.
@@ -484,7 +484,7 @@ Proof.
  intros x [Hlx Hxr] e1 e2.
  simpl.
  set (y:= (Qmax (Qmin (approximate x e1) r) l)).
- apply (@almostIn_triangle_l _ stableQ (proj1_sig e1) (proj1_sig e2) (approximate x e1) y).
+ apply (@almostIn_triangle_l _ (proj1_sig e1) (proj1_sig e2) (approximate x e1) y).
  - unfold y.
   apply Qmin_case.
    apply Qmax_case.

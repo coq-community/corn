@@ -56,7 +56,9 @@ Hint Unfold relation : type_classes.
     ; mspc_triangle: ∀ (e1 e2: Qinf) (a b c: X),
          mspc_ball e1 a b → mspc_ball e2 b c → mspc_ball (e1 + e2) a c
     ; mspc_closed: ∀ (e: Qinf) (a b: X),
-         (∀ d: Qpos, mspc_ball (e + d) a b) → mspc_ball e a b }.
+         (∀ d: Qpos, mspc_ball (e + d) a b) → mspc_ball e a b
+    ; mspc_stable: ∀ (e: Q) (a b: X),
+         (~~mspc_ball e a b) → mspc_ball e a b }.
 
   Context `{MetricSpaceClass}.
 Local Existing Instance mspc_setoid.
@@ -101,6 +103,7 @@ Local Existing Instance mspc_setoid.
    - intros. apply mspc_eq. intro e. apply H1. apply Qpos_ispos.
    - intros. apply Qnot_lt_le. intro abs.
      destruct H0. exact (mspc_ball_negative0 e abs a b H1).
+   - intros. apply mspc_stable, H1.
   Qed.
 
   (** .. which obviously have the same carrier: *)
@@ -273,6 +276,11 @@ Proof. intros; now apply genball_Proper. Qed.
    apply H2.
   Qed.*)
 
+  Lemma genball_stable :
+    (∀ (e: Q) (a b: X), (~~genball e a b) → genball e a b).
+  Proof with auto with *.
+  Admitted.
+
   Instance genball_MetricSpace: @MetricSpaceClass X _ genball.
   Proof with auto.
    constructor; try apply _.
@@ -282,6 +290,7 @@ Proof. intros; now apply genball_Proper. Qed.
      apply genball_Reflexive.
     apply genball_triangle.
    apply genball_closed.
+   apply genball_stable.
   Qed.
 
 End genball.
@@ -345,6 +354,13 @@ Section products.
    split.
     apply (mspc_closed X). apply H3.
    apply (mspc_closed Y). apply H3.
+   split.
+   apply (mspc_stable X).
+   intro abs. contradict H3; intro H3.
+   destruct H3. contradiction.
+   apply (mspc_stable Y).
+   intro abs. contradict H3; intro H3.
+   destruct H3. contradiction.
   Qed.
 
 End products.
@@ -492,6 +508,7 @@ Section sig_metricspace.
     apply (mspc_triangle X e1 e2 (` a) (` b))...
    intros.
    apply (mspc_closed X e (` a) (` b))...
+   intros. apply (mspc_stable X e (` a) (` b))...
   Qed.
 
 End sig_metricspace.

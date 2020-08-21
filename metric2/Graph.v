@@ -76,13 +76,10 @@ Qed.
 Definition graphPoint : X --> XY :=
 Build_UniformlyContinuousFunction graphPoint_uc.
 
-Hypothesis stableX : stableMetric X.
-Hypothesis stableXY : stableMetric XY.
-
 (** The compact image of graphFunction is the graph of [Cmap f] over any
 compact set S *)
-Definition CompactGraph (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
-CompactImage (1#1) _ plFEX graphPoint.
+Definition CompactGraph (plFEX:PrelengthSpace (FinEnum X)) : Compact X --> Compact XY :=
+CompactImage (1#1) plFEX graphPoint.
 
 Lemma CompactGraph_correct1 : forall plX plFEX x s, (inCompact x s) ->
 inCompact (Couple (x,(Cmap plX f x))) (CompactGraph plFEX s).
@@ -209,12 +206,9 @@ Proof.
     exists a.
     apply H.
    auto.
-  clear - L Hd'1 Hd'2 plX stableXY.
+  clear - L Hd'1 Hd'2 plX.
   destruct L as [G | a [Hl Hr]] using existsC_ind.
-   apply (@ProductMS_stableY X).
-     apply (approximate (Cfst p) (Qpos2QposInf (1#1))).
-    apply stableXY.
-   auto.
+  apply (msp_stable (msp _)), G.
   apply ball_triangle with (f a).
    simpl.
    apply (mu_sum plX e' (e'::nil) f).
@@ -337,11 +331,8 @@ Qed.
 Definition graphPoint_b : X --> Complete XY :=
 Build_UniformlyContinuousFunction graphPoint_b_uc.
 
-Hypothesis stableX : stableMetric X.
-Hypothesis stableXY : stableMetric XY.
-
-Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum stableX)) : Compact stableX --> Compact stableXY :=
-CompactImage_b (1#1) _ plFEX graphPoint_b.
+Definition CompactGraph_b (plFEX:PrelengthSpace (FinEnum X)) : Compact X --> Compact XY :=
+CompactImage_b (1#1) plFEX graphPoint_b.
 
 Local Open Scope Q_scope.
 
@@ -566,12 +557,9 @@ Proof.
     exists a.
     apply H.
    auto.
-  clear - L Hd'1 Hd'2 plX stableXY.
+  clear - L Hd'1 Hd'2 plX.
   destruct L as [G | a [Hl Hr]] using existsC_ind.
-   apply (@ProductMS_stableY X).
-     apply (approximate (Cfst p) (Qpos2QposInf (1#1))).
-    apply stableXY.
-   auto.
+  apply (msp_stable (msp _)), G.
   apply ball_triangle with (approximate (f a) (Qpos2QposInf ((1#2)%Qpos*d'))).
    apply ball_weak_le with (proj1_sig ((1#2)*d' + ((1#2)*e' + (1#2)*e') + (1#2)*d')%Qpos).
     clear - Hd'1.

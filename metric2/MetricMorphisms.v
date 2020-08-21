@@ -39,6 +39,7 @@ Section metric_embedding.
     - intros. apply (injective f). now apply ball_eq.
     - intros. 
       apply (msp_nonneg (msp Y)) in H0. exact H0.
+    - intros. apply (msp_stable (msp Y)), H0.
   Qed.
 
   Program Definition Emetric: MetricSpace := Build_MetricSpace _ is_MetricSpace.

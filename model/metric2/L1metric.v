@@ -455,6 +455,11 @@ Proof.
  - intros. unfold L1Ball, L1Distance in H.
    apply (Qle_trans _ (L1Norm (a-b))).
    apply L1Norm_nonneg. exact H.
+ - intros. unfold L1Ball, L1Distance.
+   unfold L1Ball, L1Distance in H.
+   apply Qnot_lt_le. intro abs.
+   contradict H; intro H.
+   exact (Qle_not_lt _ _ H abs).
 Qed.
 (* begin hide *)
 Add Morphism L1Ball with signature Qeq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.

@@ -218,6 +218,31 @@ Proof.
     destruct (Split b o). destruct H.
     apply (IHa1 _ H).
 Qed.
+
+Lemma StepFSupBall_stable : forall (e : Q) (a b : StepFS X),
+  (~~StepFSupBall e a b) -> StepFSupBall e a b. 
+Proof.
+  induction a.
+  - induction b.
+    unfold StepFSupBall, StepFfoldProp.
+    simpl. intros. apply (msp_stable (msp X)), H.
+    intros. split.
+    apply IHb1.
+    intro abs. contradict H; intros [H _].
+    contradiction.
+    apply IHb2.
+    intro abs. contradict H; intros [_ H].
+    contradiction.
+  - unfold StepFSupBall, StepFfoldProp, Ap.
+    simpl. intros b H.
+    destruct (Split b o). split.
+    apply IHa1.
+    intro abs. contradict H; intros [H _].
+    contradiction.
+    apply IHa2.
+    intro abs. contradict H; intros [_ H].
+    contradiction.
+Qed.
   
 (**
 *** Example of a Metric Space <Step, StepFSupBall>
@@ -233,6 +258,7 @@ Proof.
  - intros. apply: StepFSupBall_eq.
    intros. destruct e as [e epos]. apply H, epos.
  - exact StepFSupBall_nonneg.
+ - exact StepFSupBall_stable.
 Qed.
 
 Definition StepFSup : MetricSpace :=

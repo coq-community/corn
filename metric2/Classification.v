@@ -30,16 +30,13 @@ There is a hierarchy of properties that a metric space can possess.
 At the lowest level a metric space is stable if its ball relation is
 double negation stable. Arguably this could be made a requirement
 of metric spaces. *)
-Definition stableMetric (ms:MetricSpace) :=
- forall (e:Q) (x y:ms), ~~(ball e x y) -> ball e x y.
-
-Lemma stableEq : forall (ms:MetricSpace) (stable:stableMetric ms) (x y:ms),
+Lemma stableEq : forall (ms:MetricSpace) (x y:ms),
  ~~(st_eq x y) -> st_eq x y.
 Proof.
- intros ms stable x y Hxy.
+ intros ms x y Hxy.
  apply ball_eq.
  intros e epos.
- apply (stable e).
+ apply (msp_stable (msp ms) e).
  revert Hxy.
  cut (st_eq x y -> ball (m:=ms) e x y).
   tauto.
@@ -72,15 +69,3 @@ Proof.
  right; assumption.
 Defined.
 
-Lemma located_stable : forall ms,
- locatedMetric ms -> stableMetric ms.
-Proof.
- intros ms H e x y Hxy.
- apply ball_closed.
- intros d dpos.
- destruct (H e (e+d) x y); try (assumption || contradiction).
- apply (Qplus_lt_l _ _ (-e)). ring_simplify. exact dpos.
-Qed.
-(* begin hide *)
-Hint Resolve decidable_located located_stable : classification.
-(* end hide *)

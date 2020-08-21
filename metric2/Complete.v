@@ -259,6 +259,11 @@ Proof.
    ring_simplify in H. apply (Qlt_not_le _ _ abs).
    apply (Qmult_le_l _ _ (3#9)). reflexivity.
    rewrite Qmult_0_r. exact H.
+ - intros. apply (msp_stable (msp X)).
+   intro abs.
+   contradict H; intro H.
+   apply abs.
+   apply H.
 Qed.
 
 (** We define the completion of a metric space to be the space of
@@ -1233,20 +1238,8 @@ Definition Cmap2_slow (X Y Z:MetricSpace) (f:X --> Y --> Z) := uc_compose (@Cap_
 
 (**
 *** Completion and Classification
-The completion operations preserve stability and locatedness, but
-it does not preserve the decidability.
+The completion operations preserve locatedness, but not decidability.
 *)
-Lemma Complete_stable : forall X, stableMetric X -> stableMetric (Complete X).
-Proof.
- intros X HX e x y Hb e1 e2.
- apply (HX (proj1_sig e1+e+proj1_sig e2)%Q).
- intros H.
- apply Hb.
- intros H0.
- apply H.
- apply H0.
-Qed.
-
 Lemma Complete_located : forall X, locatedMetric X -> locatedMetric (Complete X).
 Proof.
  intros X Hx e d x y Hed.

@@ -154,6 +154,14 @@ Proof.
    apply (Qplus_le_l _ _ e) in H0. ring_simplify in H0.
    rewrite <- (Qmult_0_r (2#1)) in H0. apply Qmult_le_l in H0.
    exact H0. reflexivity.
+ - unfold Qball, QAbsSmall.
+   intros. split.
+   + apply Qnot_lt_le. intro abs.
+     contradict H; intros [H _].
+     exact (Qlt_not_le _ _ abs H).
+   + apply Qnot_lt_le. intro abs.
+     contradict H; intros [_ H].
+     exact (Qlt_not_le _ _ abs H).
 Qed.
 
 (* begin hide *)
@@ -257,14 +265,6 @@ Proof.
 Defined.
 
 Hint Resolve locatedQ : metricQ.
-
-Lemma stableQ : stableMetric Q_as_MetricSpace.
-Proof.
- apply located_stable.
- auto with *.
-Qed.
-
-Hint Resolve stableQ : metricQ.
 
 Lemma in_Qball (r: Q) (x y: Q)
   : (x - r <= y <= x + r) <-> Qball r x y.

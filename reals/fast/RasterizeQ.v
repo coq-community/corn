@@ -93,7 +93,7 @@ Qed.
 the resulting raster transfomers.  A fold_left is done for efficency.
 (It is translated to a fold_right when we reason about it). *)
 (* This function could be a bit more efficent by sorting x *)
-Definition RasterizeQ2 (f:FinEnum stableQ2) n m (t l b r:Q) : raster n m :=
+Definition RasterizeQ2 (f:FinEnum Q2) n m (t l b r:Q) : raster n m :=
 fold_left (fun x y => @RasterizePoint n m x t l b r y) f (emptyRaster _ _).
 (* begin hide *)
 Add Parametric Morphism f n m : (@RasterizeQ2 f n m) with signature Qeq ==> Qeq ==> Qeq ==> Qeq ==> (@eq _) as RasterizeQ2_wd.
@@ -245,7 +245,7 @@ Variable w h:Qpos.
 Let r:=l+proj1_sig w.
 Let t:=b+proj1_sig h.
 
-Variable f:FinEnum stableQ2.
+Variable f:FinEnum Q2.
 
 Variable n m : nat.
 

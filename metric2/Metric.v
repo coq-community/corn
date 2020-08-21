@@ -52,9 +52,7 @@ This definition uses rational numbers instead of real numbers,
 which is simpler. It allows to define the real numbers as a certain metric
 space, namely the Cauchy completion of the rational numbers.
 
-Lastly, this definition could include 2 other properties of the distance functions
-~~B e x y -> B e x y
-and
+Lastly, this definition could include one other property of the distance functions
 e < d -> {B d x y}+{~B e x y}.
 But those properties are only used late in the proofs, so we move them
 as additional definitions in module Classification.v (stability and locatedness). 
@@ -67,6 +65,7 @@ Record is_MetricSpace (X : RSetoid) (B: Q -> relation X) : Prop :=
 ; msp_closed: forall e a b, (forall d, 0 < d -> B (e + d) a b) -> B e a b
 ; msp_eq: forall a b, (forall e, 0 < e -> B e a b) -> st_eq a b
 ; msp_nonneg : forall e a b, B e a b -> 0 <= e
+; msp_stable : forall e a b, (~~B e a b) -> B e a b
 }.
 
 Record MetricSpace : Type :=

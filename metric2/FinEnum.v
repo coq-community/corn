@@ -192,8 +192,6 @@ Proof.
  apply hausdorffBall_wd; auto with *.
 Qed.
 
-Hypothesis Xstable : stableMetric X.
-
 Lemma hemiMetric_closed : forall e A b,
  (forall d, 0 < d -> hemiMetric X (e+d) A (fun a => InFinEnumC a b)) ->
   hemiMetric X e A (fun a => InFinEnumC a b).
@@ -230,7 +228,7 @@ Proof.
  intros [n d] dpos.
  destruct n. inversion dpos. 2: inversion dpos.
  destruct (Hy1 (nat_of_P d)) as [HG | m [Hmd Hm]] using existsC_ind.
-  apply (Xstable (e + (Zpos p#d))%Q); assumption.
+  apply (msp_stable (msp X) (e + (Zpos p#d))%Q); assumption.
  eapply ball_weak_le;[|apply Hm].
  simpl.
  rewrite -> Qle_minus_iff.
@@ -314,7 +312,7 @@ Proof.
   destruct n. inversion dpos. 2: inversion dpos.
   replace d with (Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d))).
   destruct (Hy1 (pred (nat_of_P d))) as [HG | z [Hz0 Hz1]] using existsC_ind.
-  apply (Xstable (Zpos p # Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d)))). auto.
+  apply (msp_stable (msp X) (Zpos p # Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d)))). auto.
   apply ball_weak_le with (1 # P_of_succ_nat z); auto.
   simpl.
   apply Zmult_le_compat; auto with *.
@@ -351,17 +349,12 @@ Proof.
  - intros. apply FinEnum_ball_eq.
    intros [e epos]. apply H, epos.
  - intros. apply H.
+ - intros e x y.
+   apply hausdorffBall_stable.
 Qed.
 
 Definition FinEnum : MetricSpace :=
 Build_MetricSpace FinEnum_ball_wd FinEnum_is_MetricSpace.
-
-(** Our definition preserves stability *)
-Lemma FinEnum_stable : stableMetric FinEnum.
-Proof.
- intros e x y.
- apply hausdorffBall_stable.
-Qed.
 
 Lemma FinEum_map_ball : forall (f:X -> X) (e:Qpos) (s:FinEnum),
  (forall x, ball (proj1_sig e) x (f x)) -> ball (proj1_sig e) s (map f s).
@@ -615,11 +608,10 @@ End Finite.
 Arguments InFinEnumC [X].
 (* end hide *)
 (** A list is equivalent to it's reverse as finite enumerations *)
-Lemma FinEnum_eq_rev : forall X (stable: stableMetric X) (f:FinEnum stable),
- st_eq f (rev f).
+Lemma FinEnum_eq_rev : forall X (f:FinEnum X), st_eq f (rev f).
 Proof.
  induction f.
-  change (st_eq (nil:FinEnum stable) (nil:FinEnum stable)).
+  change (st_eq (nil:FinEnum X) (nil:FinEnum X)).
   reflexivity.
  intros x.
  destruct (IHf x) as [H0 H1].
@@ -671,16 +663,16 @@ end.
 
 (* if a is empty and b is not, then (map f a) and (map f b) are not equivalent,
  even if f is the constant function *)
-Lemma FinEnum_map_uc : forall z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y),
-    is_UniformlyContinuousFunction (map f:FinEnum SX -> FinEnum SY)
+Lemma FinEnum_map_uc : forall z X Y (f:X --> Y),
+    is_UniformlyContinuousFunction (map f:FinEnum X -> FinEnum Y)
                                    (FinEnum_map_modulus z (mu f)).
 Proof.
- intros z X Y SX SY f e.
- cut (forall (a b : FinEnum SX) (d:Qpos),
+ intros z X Y f e.
+ cut (forall (a b : FinEnum X) (d:Qpos),
          (QposInf_le d (mu f e)) ->
          ball (proj1_sig d) a b
-         -> ball (m:=FinEnum SY) (proj1_sig e) (map f a) (map f b)).
-  intros Z a b.
+         -> ball (m:=FinEnum Y) (proj1_sig e) (map f a) (map f b)).
+ { intros Z a b.
   unfold FinEnum_map_modulus.
   case_eq (mu f e).
    intros d Hd H.
@@ -690,11 +682,11 @@ Proof.
   intros He H.
   apply Z with z; auto.
   rewrite He.
-  constructor.
+  constructor. }
  revert e.
- cut (forall (e d:Qpos), (QposInf_le d (mu f e)) -> forall (s1 s2 : FinEnum SX),
+ cut (forall (e d:Qpos), (QposInf_le d (mu f e)) -> forall (s1 s2 : FinEnum X),
    hemiMetric X (proj1_sig d) (fun a => InFinEnumC a s1) (fun a => InFinEnumC a s2) ->
-     hemiMetric Y (proj1_sig e) (fun a => InFinEnumC a (map f s1:FinEnum SY)) (fun a => InFinEnumC a (map f s2))).
+     hemiMetric Y (proj1_sig e) (fun a => InFinEnumC a (map f s1:FinEnum Y)) (fun a => InFinEnumC a (map f s2))).
   intros Z e s1 s2 d Hd [H0 H1].
   split. apply Qpos_nonneg.
   split; apply (Z e d Hd); apply H1.
@@ -725,21 +717,21 @@ Qed.
 (* begin hide *)
 Arguments FinEnum_map_uc z [X Y].
 (* end hide *)
-Definition FinEnum_map z X Y (SX:stableMetric X) (SY:stableMetric Y) (f:X --> Y) :=
- Build_UniformlyContinuousFunction (FinEnum_map_uc z SX SY f).
+Definition FinEnum_map z X Y (f:X --> Y) :=
+ Build_UniformlyContinuousFunction (FinEnum_map_uc z f).
 
 (** maping [Cunit] is an injection from FinEnum X to FinEnum Complete X that
 preserves the metric *)
-Lemma FinEnum_map_Cunit : forall X (SX:stableMetric X) SCX (s1 s2:FinEnum SX) (e:Qpos),
-    ball (proj1_sig e) s1 s2 <-> ball (proj1_sig e) (map Cunit s1:FinEnum SCX) (map Cunit s2).
+Lemma FinEnum_map_Cunit : forall X (s1 s2:FinEnum X) (e:Qpos),
+    ball (proj1_sig e) s1 s2 <-> ball (proj1_sig e) (map Cunit s1:FinEnum (Complete X)) (map Cunit s2).
 Proof.
- intros X SX SCX s1 s2 e.
+ intros X s1 s2 e.
  split.
  - intros H.
-   exact (@FinEnum_map_uc (1 # 1) _ _ SX SCX Cunit e s1 s2 H).
+   exact (@FinEnum_map_uc (1 # 1) _ _ Cunit e s1 s2 H).
  - revert s1 s2.
- cut (forall (s1 s2 : FinEnum SX) ,
-   hemiMetric (Complete X) (proj1_sig e) (fun a => InFinEnumC a (map Cunit s1:FinEnum SCX))
+ cut (forall (s1 s2 : FinEnum X) ,
+   hemiMetric (Complete X) (proj1_sig e) (fun a => InFinEnumC a (map Cunit s1:FinEnum (Complete X)))
      (fun a => InFinEnumC a (map Cunit s2)) ->
        hemiMetric X (proj1_sig e) (fun a => InFinEnumC a s1) (fun a => InFinEnumC a s2)).
   intros Z s1 s2.

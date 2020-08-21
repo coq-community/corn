@@ -161,6 +161,16 @@ Proof.
    apply ball_eq.
    firstorder.
  - intros e a b H. apply H. 
+ - intros. split.
+   apply Qnot_lt_le.
+   intro abs.
+   contradict H; intro H.
+   destruct H.
+   apply (Qle_not_lt _ _ H abs).
+   intros. apply (msp_stable (msp Y)). 
+   intro abs.
+   contradict H; intro H.
+   apply abs, H.
 Qed.
 
 Lemma ucBall_wd : forall (e1 e2:Q), (e1 == e2) ->

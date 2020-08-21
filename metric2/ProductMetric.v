@@ -99,6 +99,15 @@ Proof.
  - exact prod_ball_closed.
  - exact prod_ball_eq.
  - intros. destruct H. apply (msp_nonneg (msp X)) in H. exact H.
+ - intros. split.
+   + apply (msp_stable (msp X)).
+     intro abs.
+     contradict H; intros [H _].
+     contradiction.
+   + apply (msp_stable (msp Y)).
+     intro abs.
+     contradict H; intros [_ H].
+     contradiction.
 Qed.
 
 Definition ProductMS : MetricSpace.
@@ -120,51 +129,6 @@ Proof.
  destruct (HY (snd a) (snd b) e d1 d2 Hed (proj2 Hab)) as [c2 Hc2].
  exists (c1,c2); split; assumption.
 Defined.
-
-Lemma ProductMS_stable : stableMetric X -> stableMetric Y -> stableMetric ProductMS.
-Proof.
- unfold stableMetric.
- intros H0 H1 e [xl xr] [yl yr] H.
- simpl in H.
- unfold prod_ball in H.
- split.
-  apply H0; tauto.
- apply H1; tauto.
-Qed.
-
-(** Furthermore, if a product space is stable, then the components are
-stable (assuming the components are non-zero). *)
-Lemma ProductMS_stableX : Y -> stableMetric ProductMS -> stableMetric X.
-Proof.
- unfold stableMetric.
- intros a H0 e x y H.
- assert (Z:~ ~ ball (m:=ProductMS) e (x,a) (y,a)).
-  revert H.
-  cut (ball (m:=X) e x y -> ball (m:=ProductMS) e (x, a) (y, a)).
-   tauto.
-  intros H.
-  split; auto.
-  apply ball_refl. 
-  apply (msp_nonneg (msp X) e x y H).
- destruct (H0 _ _ _ Z).
- assumption.
-Qed.
-
-Lemma ProductMS_stableY : X -> stableMetric ProductMS -> stableMetric Y.
-Proof.
- unfold stableMetric.
- intros a H0 e x y H.
- assert (Z:~ ~ ball (m:=ProductMS) e (a,x) (a,y)).
-  revert H.
-  cut (ball (m:=Y) e x y -> ball (m:=ProductMS) e (a,x) (a, y)).
-   tauto.
-  intros H.
-  split; auto. 
-  apply ball_refl. 
-  apply (msp_nonneg (msp Y) e x y H).
- destruct (H0 _ _ _ Z).
- assumption.
-Qed.
 
 Lemma ProductMS_located : locatedMetric X -> locatedMetric Y -> locatedMetric ProductMS.
 Proof.

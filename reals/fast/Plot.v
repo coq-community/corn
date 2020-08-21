@@ -50,15 +50,15 @@ Let clip := uc_compose (boundBelow b) (boundAbove t).
 
 Variable f : Q_as_MetricSpace --> CR.
 
-Lemma plFEQ : PrelengthSpace (FinEnum stableQ).
+Lemma plFEQ : PrelengthSpace (FinEnum Q_as_MetricSpace).
 Proof.
  apply FinEnum_prelength.
   apply locatedQ.
  apply QPrelengthSpace.
 Qed.
 
-Definition graphQ f : Compact stableQ2
-  := CompactGraph_b f stableQ2 plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
+Definition graphQ f : Compact Q2
+  := CompactGraph_b f plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
 
 Lemma graphQ_bonus : forall e x y,
  In (x, y) (approximate (graphQ (uc_compose clip f)) e) -> l <= x <= r /\ b <= y <= t.
