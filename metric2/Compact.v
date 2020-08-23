@@ -408,8 +408,9 @@ a metric space *)
 Definition Compact X := Complete (FinEnum X).
 
 (** A point is in a compact set if all the approximations are almost in
-the approximations of the compact set. *)
-Definition inCompact X (x:Complete X) (s:Compact X) :=
+    the approximations of the compact set. inCompact also converts
+    the abstract s:Compact X into a usual subset Complete X -> Prop. *)
+Definition inCompact X (x:Complete X) (s:Compact X) : Prop :=
  forall (e1 e2:Qpos), almostIn (proj1_sig e1 + proj1_sig e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
 Add Parametric Morphism X : (@inCompact X)
@@ -480,7 +481,7 @@ definition, every metric space is located.  Therefore this is a fair
 assumption to make. *)
 Hypothesis locatedX : locatedMetric X.
 
-(** If a point is almost in an enumeration, then there it is close to
+(** If a point is almost in an enumeration, then it is close to
 a point in the enumeration in a constructive sense. *)
 Lemma AlmostInExists: forall (e d:Qpos) x (s:FinEnum X),
     proj1_sig e < proj1_sig d -> almostIn (proj1_sig e) x s
