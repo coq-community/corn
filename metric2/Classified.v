@@ -127,7 +127,8 @@ Section genball.
     (R: Qpos → relation X) `{!Proper (QposEq ==> (=)) R}  `{∀ e, Reflexive (R e)} `{∀ e, Symmetric (R e)}
     (Rtriangle: ∀ (e1 e2: Qpos) (a b c: X), R e1 a b → R e2 b c → R (e1 + e2)%Qpos a c)
     (Req: ∀ (a b: X), (∀ d: Qpos, R d a b) → a = b)
-    (Rclosed: ∀ (e: Qpos) (a b: X), (∀ d: Qpos, R (e + d)%Qpos a b) → R e a b).
+    (Rclosed: ∀ (e: Qpos) (a b: X), (∀ d: Qpos, R (e + d)%Qpos a b) → R e a b)
+    (Rstable: ∀ (e: Qpos) (a b: X), (~~R e a b) → R e a b).
 
   Definition genball: MetricSpaceBall X := λ (oe: Qinf),
     match oe with
@@ -278,8 +279,19 @@ Proof. intros; now apply genball_Proper. Qed.
 
   Lemma genball_stable :
     (∀ (e: Q) (a b: X), (~~genball e a b) → genball e a b).
-  Proof with auto with *.
-  Admitted.
+  Proof.
+    intros. unfold genball.
+    unfold genball in H2.
+    destruct (Qdec_sign e). destruct s.
+    - contradict H2. intro H2. contradiction.
+    - apply Rstable, H2.
+    - apply Req. unfold equiv in H2.
+      intro d. apply Rstable.
+      intro abs. contradict H2; intro H2.
+      contradict abs.
+      rewrite H2.
+      apply H0.
+  Qed.
 
   Instance genball_MetricSpace: @MetricSpaceClass X _ genball.
   Proof with auto.

@@ -56,7 +56,7 @@ end.
 
 (** [UniformPartition] produces a set of n points uniformly distributed
 inside the interval [[l, r]]. *)
-Definition UniformPartition (n:nat) :=
+Definition UniformPartition (n:nat) : list Q :=
 map (f n) (iterateN Z.succ 0%Z n).
 
 Lemma UniformPartitionZ : forall n z, In z (iterateN Z.succ 0%Z n) <-> (0 <= z < Z.of_nat n)%Z.
@@ -300,7 +300,7 @@ Proof.
     apply Q.positive_nonzero_in_Q.
 Qed.
 
-Lemma UniformPartition_fine : forall n x,
+Lemma UniformPartition_fine : forall (n:nat) (x:Q),
     l <= x <= r -> {y | In y (UniformPartition (S n))
                      /\ Qabs (x - y) <= ((r-l)/((2#1)*inject_Z (Z.of_nat (S n))))}.
 Proof.
@@ -329,14 +329,17 @@ Proof.
   exact Hlr.
 Qed.
 
-Definition CompactIntervalQ_raw (e:QposInf) : FinEnum Q_as_MetricSpace :=
+(* The finite approximation of real interval [l,r] by rational numbers,
+   at precision e. *)
+Definition CompactIntervalQ_raw (e:QposInf) : list Q :=
 match e with
 | QposInfinity => nil
 | Qpos2QposInf e' =>
   UniformPartition (max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e')))))
 end.
 
-Lemma CompactIntervalQ_prf : is_RegularFunction (@ball (FinEnum Q_as_MetricSpace)) CompactIntervalQ_raw.
+Lemma CompactIntervalQ_prf
+  : is_RegularFunction (@ball (FinEnum Q_as_MetricSpace)) CompactIntervalQ_raw.
 Proof.
  cut (forall (e1 e2:Qpos), hemiMetric Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (fun a : Q_as_MetricSpace =>
    InFinEnumC a (CompactIntervalQ_raw e1)) (fun a : Q_as_MetricSpace =>
