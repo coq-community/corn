@@ -230,21 +230,31 @@ Proof. intros; now apply genball_Proper. Qed.
    destruct (Qdec_sign (e1 + e2)) as [[G | I] | J];
    destruct (Qdec_sign e1) as [[A | B] | C];
    destruct (Qdec_sign e2) as [[D | E] | F]; intuition.
-              revert G. apply (Qlt_is_antisymmetric_unfolded _ _)...
-             revert G. rewrite F, Qplus_0_r. apply (Qlt_is_antisymmetric_unfolded _ _ B)...
-            revert G. rewrite C, Qplus_0_l. apply (Qlt_is_antisymmetric_unfolded _ _ E)...
-           revert G. rewrite C, F. apply Qlt_irrefl.
-          change (genball (exist _ e1 B + exist _ e2 E )%Qpos a c).
-          apply ball_genball.
-          apply Rtriangle with b; apply ball_genball...
-         rewrite <- V. Admitted. (*rewrite F. rewrite Qplus_0_r...
-        rewrite U, C, Qplus_0_l...
-       exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> C at 1. rewrite -> F at 1...
-      exfalso. apply (Qlt_irrefl (e1 + e2)). rewrite -> J at 1...
-     revert U. rewrite <- V, <- (Qplus_0_r e1), <- F, J...
-    revert V. rewrite <- (Qplus_0_l e2), <- C, J, U...
-   transitivity b...
-  Qed.*)
+   revert G. apply (Qlt_is_antisymmetric_unfolded _ _)...
+   revert G. rewrite F, Qplus_0_r. apply (Qlt_is_antisymmetric_unfolded _ _ B)...
+   revert G. rewrite C, Qplus_0_l. apply (Qlt_is_antisymmetric_unfolded _ _ E)...
+   revert G. rewrite C, F. apply Qlt_irrefl.
+   change (genball (exist _ e1 B + exist _ e2 E )%Qpos a c).
+   apply ball_genball.
+   apply Rtriangle with b; apply ball_genball...
+   rewrite <- V.
+   assert (e1 + e2 == e1) by (rewrite F, Qplus_0_r; reflexivity).
+   apply (genball_Proper (e1+e2) e1 H2 a a (reflexivity _) b b (reflexivity _)), U.
+   rewrite U.
+   assert (e1 + e2 == e2) by (rewrite C, Qplus_0_l; reflexivity).
+   apply (genball_Proper (e1+e2) e2 H2 b b (reflexivity _) c c (reflexivity _)), V.
+   rewrite U, V.
+   apply genball_Reflexive.
+   apply Qlt_le_weak, I.
+   exfalso.
+   apply Qlt_le_weak in E.
+   apply (Qplus_lt_le_compat _ _ _ _ B) in E.
+   rewrite J in E. apply (Qlt_irrefl 0 E).
+   exfalso. rewrite F, Qplus_0_r in J.
+   rewrite J in B. exact (Qlt_irrefl 0 B).
+   exfalso. rewrite C, Qplus_0_l in J.
+   rewrite J in E. exact (Qlt_irrefl 0 E).
+  Qed.
 
   Lemma genball_closed :
     (∀ (e: Qinf) (a b: X), (∀ d: Qpos, genball (e + d) a b) → genball e a b).
@@ -271,11 +281,9 @@ Proof. intros; now apply genball_Proper. Qed.
    apply Req.
    intros.
    apply ball_genball.
-   Admitted.
-   (*rewrite <- (Qplus_0_l d).
-   rewrite <- q0.
-   apply H2.
-  Qed.*)
+   assert (d == q + d) by (rewrite q0, Qplus_0_l; reflexivity).
+   apply (genball_Proper d (q+d) H3 a a (reflexivity _) b b (reflexivity _)), H2.
+  Qed.
 
   Lemma genball_stable :
     (∀ (e: Q) (a b: X), (~~genball e a b) → genball e a b).
@@ -313,14 +321,20 @@ Instance: ∀ X: MetricSpace, MetricSpaceBall X := λ X, @genball X _ (@ball X).
 
 Instance class_from_MetricSpace (X: MetricSpace): MetricSpaceClass X.
 Proof.
- apply genball_MetricSpace; try apply _.
-     (* apply msp_refl, X.
-    apply msp_sym, X.
-   apply msp_triangle, X.
-  apply msp_eq, X.
- apply msp_closed, X.
-Qed.*)
-Admitted.
+ apply genball_MetricSpace.
+ - intros q r H x y H0 z t H1.
+   apply ball_wd; assumption.
+ - intros e. apply msp_refl. exact (msp X).
+   apply Qpos_nonneg.
+ - intro e. apply msp_sym, (msp X).
+ - intros e1 e2. apply msp_triangle, X.
+ - intros x y H.
+   apply (msp_eq (msp X)).
+   intros. apply (H (exist _ _ H0)).
+ - intros e x y H. apply msp_closed.
+   exact (msp X). intros. apply (H (exist _ _ H0)).
+ - intros. apply (msp_stable (msp X)), H.
+Qed.
 
 Section products.
 

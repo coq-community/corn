@@ -58,7 +58,41 @@ Proof.
     exists y. split. apply YeqZ, yin. exact close.
 Qed.
 
-(* A finite subset is located when the metric itself is located. *)
+Lemma LocatedSubset_stable
+  : forall (X : MetricSpace) (Y : X -> Prop),
+    LocatedSubset X Y
+    -> LocatedSubset X (fun x => ~~Y x).
+Proof.
+  intros. intros d e x dlte.
+  specialize (X0 d e x dlte) as [far|close].
+  - left. intros y H abs.
+    contradict H; intro H.
+    revert abs. apply far, H.
+  - right. destruct close as [y close].
+    exists y. split. intro abs.
+    destruct close; contradiction. apply close.
+Qed. 
+
+Lemma LocatedSubset_union
+  : forall (X : MetricSpace) (Y Z : X -> Prop),
+    LocatedSubset X Y
+    -> LocatedSubset X Z
+    -> LocatedSubset X (fun x => Y x \/ Z x).
+Proof.
+  intros X Y Z Yloc Zloc d e x ltde.
+  destruct (Yloc d e x ltde) as [farY|closeY].
+  - destruct (Zloc d e x ltde) as [farZ|closeZ].
+    left. intros y [H|H]. 
+    apply farY, H.
+    apply farZ, H.
+    right. destruct closeZ as [y closeZ].
+    exists y. split. right. apply closeZ. apply closeZ.
+  - right. destruct closeY as [y closeY].
+    exists y. split. left. apply closeY. apply closeY.
+Qed.
+
+(* A finite subset is located when the metric itself is located.
+   Even singletons need located metrics to be located. *)
 Fixpoint LocatedFinite (X : MetricSpace) (loc : locatedMetric X) (l : list X)
          {struct l} : LocatedSubset X (fun x => In x l).
 Proof.
