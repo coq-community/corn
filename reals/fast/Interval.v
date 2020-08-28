@@ -23,7 +23,9 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.Compact.
+Require Export CoRN.metric2.LocatedSubset.
 Require Export CoRN.reals.fast.CRArith.
+Require Import CoRN.reals.fast.CRabs.
 Require Export CoRN.model.metric2.Qmetric.
 Require Import Coq.QArith.Qround.
 Require Import Coq.QArith.Qabs.
@@ -593,3 +595,65 @@ Proof.
 Qed.
 
 End Interval.
+
+(* Located subsets are more general than compact subsets. *)
+Lemma InfiniteIntervalLocated
+  : forall a : CR, LocatedSubset CR (fun x => a <= x)%CR.
+Proof.
+  intros a d e x ltde.
+  (* The distance between x and [a,+\infty[ is CRmax 0 (a-x). *)
+  destruct (CRlt_linear _ (CRmax 0%CR (a-x)%CR) _ (CRlt_Qlt d e ltde))
+    as [far|close].
+  - left. intros y H abs.
+    clear ltde e.
+    destruct (Qlt_le_dec d 0).
+    apply (msp_nonneg (msp CR)) in abs.
+    exact (Qlt_not_le _ _ q abs).
+    assert (~(('d < a - x)%CR -> False)).
+    { intros H0. apply CRle_not_lt in H0.
+      revert far. apply CRle_not_lt, CRmax_lub.
+      apply CRle_Qle, q. exact H0. }
+    clear far.
+    contradict H0. apply CRle_not_lt.
+    apply CRabs_ball, CRabs_AbsSmall in abs.
+    destruct abs as [abs _].
+    rewrite (CRplus_le_r _ _ (y+('d)))%CR in abs.
+    ring_simplify in abs.
+    apply (CRle_trans H) in abs.
+    clear H y.
+    rewrite (CRplus_le_r _ _ x).
+    ring_simplify.
+    rewrite CRplus_comm. exact abs.
+  - destruct (Qlt_le_dec d 0).
+    left. intros y H abs.
+    apply (msp_nonneg (msp CR)) in abs.
+    exact (Qlt_not_le _ _ q abs). 
+    right. exists (CRmax a x).
+    split. apply CRmax_ub_l.
+    apply CRabs_ball, CRabs_AbsSmall.
+    split.
+    + rewrite (CRplus_le_r _ _ (CRmax a x + 'e))%CR.
+      ring_simplify.
+      apply CRmax_lub.
+      rewrite (CRplus_le_r _ _ (-x))%CR.
+      rewrite <- CRplus_assoc.
+      rewrite CRplus_opp, CRplus_0_r.
+      apply CRle_not_lt. intro abs.
+      apply (CRlt_trans _ _ _ close) in abs.
+      clear close. revert abs.
+      apply CRle_not_lt.
+      apply CRmax_ub_r.
+      apply (@CRle_trans _ (0+x)%CR).
+      rewrite CRplus_0_l. apply CRle_refl.
+      apply CRplus_le_r.
+      apply CRle_Qle, (Qle_trans _ _ _ q).
+      apply Qlt_le_weak, ltde.
+    + rewrite (CRplus_le_r _ _ (CRmax a x)).
+      ring_simplify.
+      apply (@CRle_trans _ (CRmax a x + 0)%CR).
+      rewrite CRplus_0_r. apply CRmax_ub_r.
+      apply CRplus_le_l, CRle_Qle.
+      apply (Qle_trans _ _ _ q).
+      apply Qlt_le_weak, ltde.
+Qed.
+
