@@ -1,9 +1,9 @@
-Dump is a fast hack by Enrico Tassi, it can be used to export coq-objects.
-It is used in examples/Circle.v
-coq_makefile -f Make > Makefile
-COQBIN="YOURCODEDIR/bin/" 
-make
-./dumpcoq
+Dump is a Coq plugin that exports rasters to graymap PGM files.
+Rasters are defined in module CoRN.raster.Raster, as matrices of booleans.
 
-> Dump nat_ind.
-dumping to /tmp/dump.txt
+Type make to build this plugin, then 
+Require Import CoRN.dump.theories.Loader
+from a Coq file where you have rasters to export.
+The vernac command defined by the plugin is DumpGrayMap, which takes
+as argument the name of a global definition of a raster. It exports
+the raster in file plot.pgm, which it will place in the current directory.
