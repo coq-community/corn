@@ -151,18 +151,98 @@ Proof.
     destruct close as [y [yin close]].
     exists y. split. exact (H0 y yin).
     exact close.
+Defined.
+
+Lemma CompactIsLocated_close
+  : forall (X : MetricSpace) (Y : Compact X) (x : Complete X) (d e : Q)
+      (emdPos : 0 < e - d),
+    locatedMetric X
+    -> (exists y : Complete X,
+            In y
+              (map Cunit
+                 (approximate Y ((1 # 5) * exist (Qlt 0) (e - d) emdPos)%Qpos)) /\
+            ball (d+(3#10)*(e-d)) x y)
+    -> exists y : Complete X, inCompact y Y /\ ball e x y.
+Proof.
+  intros. 
+  destruct H as [y [yin close]].
+  (* Move the approx point z into the compact, as in the
+     Bishop-compact proof. *)
+  pose proof (@CompactTotalBoundNotFar
+                X X0 Y (exist _ _ emdPos)) as H0.
+  apply (HausdorffBallHausdorffBallStrong
+           (Complete_located X0))
+    in H0.
+  unfold proj1_sig in H0.
+  destruct H0 as [H0 _].
+  specialize (H0 y (InFinEnumC_weaken _ _ _ yin)
+                 ((1#10)*(exist _ _ emdPos))%Qpos)
+    as [z [H0 H2]].
+  exists z. split.
+  apply inCompact_stable.
+  intro abs.
+  apply InFinEnumC_equiv in H0.
+  contradict H0; intros [t [H0 H1]].
+  contradict abs. rewrite H1.
+  apply (CompactTotallyBoundedA _ _ _ _ H0).
+  apply (ball_triangle _ _ _ _ _ _ close) in H2. 
+  setoid_replace e with
+      ((d+(3#10)*(e-d)) + ((3 # 5) * (e - d) + (1#10) * (e - d)))%Q.
+  exact H2.
+  ring.
 Qed.
 
+Lemma CompactIsLocated_far
+  : forall (X : MetricSpace) (Y : Compact X) (x : Complete X) (d e : Q)
+      (emdPos : 0 < e - d),
+    locatedMetric X
+    -> (forall y : Complete X,
+        In y
+          (map Cunit (approximate Y ((1 # 5) * exist (Qlt 0) (e - d) emdPos)%Qpos)) ->
+        ~ ball (d+(1#5)*(e-d)) x y)
+    -> forall y : Complete X, inCompact y Y -> ~ ball d x y.
+Proof.
+  intros. intro abs.
+  (* t is in the compact Y, so there is a point y in l within
+     (e-d)/5 of t. So the distance between x and y is below 
+     d + (e-d)/5. *)
+  pose proof (@InCompact_approxC
+                X X0 _ _ ((1#5)*(exist _ _ emdPos)) H0) as H1.
+  contradict H1; intro H1.
+  destruct H1 as [z [H1 H3]].
+  specialize (H (Cunit z) (in_map _ _ _ H1)).
+  contradict H.
+  apply (ball_triangle _ _ _ _ _ _ abs) in H3. 
+  exact H3.
+Qed. 
+
+(* This function does not have to compute very fast, because it is
+   rarely used : compact subsets have a fast dedicated plotter. *)
 Lemma CompactIsLocated
   : forall (X : MetricSpace) (Y : Compact X),
     locatedMetric X
     -> LocatedSubset (Complete X) (fun z => inCompact z Y).
 Proof.
-  intros X Y loc d e x ltde. 
-  (* TODO faster to avoid Bishop compact subsets and work directly on approximations. *)
-  apply (TotallyBoundedIsLocated
-           (Complete X)
-           (fun z => inCompact z Y)
-           (totallyBoundedSubset (CompactAsBishopCompact loc Y))
-           (Complete_located loc) _ _ _ ltde).
-Qed.
+  intros X Y loc d e x ltde.
+  assert (0 < e-d) as emdPos.
+  { apply Qlt_minus_iff in ltde. exact ltde. }
+  pose (d+(1#5)*(e-d)) as oneFifth.
+  pose (d+(3#10)*(e-d)) as threeTenths.
+  assert (oneFifth < threeTenths).
+  { apply Qplus_lt_r, Qmult_lt_r.
+    exact emdPos. reflexivity. }
+  (* In CompactTotalBound the current factor is 5 to construct
+     limit points of Complete X inside the compact Y.
+     Maybe it would be faster to compare an approximation of x
+     to approxY in X instead of Complete X. *)
+  destruct (LocatedFinite (Complete X) (Complete_located loc)
+                          (map Cunit (approximate Y (Qpos2QposInf ((1#5)*(exist _ _ emdPos)))))
+                          oneFifth threeTenths
+                          x H)
+    as [far|close].
+  + left.
+    exact (CompactIsLocated_far X Y x d e emdPos loc far).
+  + right.
+    exact (CompactIsLocated_close X Y x d e emdPos loc close).
+Defined.
+

@@ -25,6 +25,7 @@ Require Import CoRN.metric2.Classification.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.metric2.Complete.
+Require Import CoRN.metric2.LocatedSubset.
 
 Set Implicit Arguments.
 
@@ -412,3 +413,23 @@ Proof.
   rewrite H1 in H0. apply H0.
 Qed.
 
+Lemma undistrib_Located
+  : forall (X Y : MetricSpace) (A : Complete (ProductMS X Y) -> Prop),
+    LocatedSubset _ A
+    -> LocatedSubset (ProductMS (Complete X) (Complete Y))
+                    (fun xy => exists p, st_eq p (undistrib_Complete xy) /\ A p).
+Proof.
+  intros X Y A loc d e p ltde.
+  destruct (loc d e (undistrib_Complete p) ltde) as [far|close].
+  - left. intros y H abs.
+    destruct H as [q [H H0]].
+    apply (far q H0).
+    rewrite H.
+    intros d1 d2; split; simpl; apply abs.
+  - right. destruct close as [y [Ay close]].
+    exists (distrib_Complete y). split.
+    exists y. split. symmetry. apply undistrib_after_distrib_Complete.
+    exact Ay.
+    rewrite <- distrib_after_undistrib_Complete.
+    split; intros d1 d2; apply close.
+Defined.

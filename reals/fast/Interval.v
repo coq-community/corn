@@ -159,8 +159,10 @@ Proof.
 Qed.
 
 (** Given a point [x] in the interval [[l, r]], one can find a
-nearby point in our [UniformPartition]. *)
-Definition rasterize1 n (x:Q) : Z
+nearby point in our [UniformPartition]. n is the number of points in
+the partition, ie the step is (r-l)/n. This function computes the
+maximum index k such that l+k(r-l)/n <= x. *)
+Definition rasterize1 (n:nat) (x:Q) : Z
   := Qfloor (inject_Z (Z.of_nat n)*(x-l)/(r-l)).
 
 Lemma rasterize1_close : l < r -> forall n (x:Q),

@@ -20,6 +20,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
+Require Import CoRN.metric2.ProductMetric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.reals.fast.RasterizeQ.
 Require Import CoRN.reals.fast.Interval.
@@ -34,9 +35,18 @@ Plotting a uniformly continuous function on a finite interval consists
 of producing the graph of a function as a compact set, approximating that
 graph, and finally rasterizing that approximation.
 
-A range for the plot must be provided.  We choose to clamp the plotted
+A range for the plot must be provided. We choose to clamp the plotted
 function so that it lies inside the specified range.  Thus we plot
 [compose (clip b t) f] rather than [f].
+
+Afterwards we will plot more general located subsets of the plane:
+- each blank pixels is correct, meaning there are no points of the subset
+  inside the rectangular regions it represents
+- each filled pixel means there exists a point of the subset inside its
+  rectangular region, or inside one of the adjacent pixels. Thus filled
+  pixels cover the subset and we can zoom in to see more structure.
+- the pixels overlap, meaning each corner belong to the 4 pixels that touch it
+ 
 *)
 Variable (l r:Q).
 Hypothesis Hlr : l < r.
@@ -155,7 +165,7 @@ Notation "'graphCR' f [ l '..' r ]" :=
 (*
 (* Some graph examples *)
 Local Open Scope raster. (* enables pretty printing of rasters *)
-Definition id_raster
+Definition id_raster : raster _ _
   := PlotQ 0 1 eq_refl 0 1 eq_refl (@Cunit Q_as_MetricSpace) 30 30.
 Compute id_raster.
 
@@ -163,4 +173,59 @@ Require Import CoRN.reals.fast.CRexp.
 Definition exp_raster
   := PlotQ (-2) 1 eq_refl 0 3 eq_refl (exp_bound_uc 3) 30 30.
 Compute exp_raster.
+*)
+
+(* Difficult to make tail-recursive, because the current vector
+   has no clear size to declare. Vector.map is not tail-recursive either. *)
+Fixpoint PlotLine (A : CR*CR -> Prop) (i:nat)
+           (r step:Q) (y : CR) (d e:Q) (ltde : d < e)
+           (loc : LocatedSubset (ProductMS CR CR) A)
+           { struct i }
+  : (Vector.t bool i) :=
+  match i with
+  | O => Vector.nil bool
+  | S p =>
+  Vector.cons bool (let xi := inject_Q_CR (r - inject_Z (Z.of_nat i) * step)%Q in
+                 if loc d e (xi,y) ltde then false else true)
+              p (PlotLine A p r step y d e ltde loc)
+  end.
+
+Fixpoint PlotSubset_fix (A : CR*CR -> Prop) (n j:nat)
+         (b r stepX stepY:Q) (d e:Q) (ltde : d < e)
+         (loc : LocatedSubset (ProductMS CR CR) A)
+         { struct j }
+  : raster n j :=
+  match j with
+  | O => emptyRaster n O
+  | S p => let yj := inject_Q_CR (b + inject_Z (Z.of_nat j) * stepY)%Q in
+          Vector.cons (Vector.t bool n)
+                      (PlotLine A n r stepX yj d e ltde loc)
+                      p (PlotSubset_fix A n p b r stepX stepY d e ltde loc)
+  end. 
+
+Definition PlotSubset {A : CR*CR -> Prop} (n m : nat) (t l b r : Q) :
+  l < r -> LocatedSubset (ProductMS CR CR) A -> raster n m.
+Proof.
+  intros ltlr loc.
+  pose ((r-l) * (1#Pos.of_nat n))%Q as stepX.
+  pose ((t-b) * (1#Pos.of_nat m))%Q as stepY.
+  pose (Qmax stepX stepY) as err.
+  (* A pixel is a square ball and its radius it half its side. *)
+  assert ((1#2)*err < err)%Q as ltde.
+  { rewrite <- (Qmult_1_l err) at 2. apply Qmult_lt_r.
+    2: reflexivity. apply (Qlt_le_trans _ stepX).
+    apply Qlt_minus_iff in ltlr.
+    apply (Qpos_ispos (exist _ _ ltlr * (1 # Pos.of_nat n))).
+    apply Qmax_ub_l. }
+  exact (PlotSubset_fix A n m b r stepX stepY _ _ ltde loc).
+Defined.
+
+(*
+Definition PlotDiagLocated := (PlotSubset
+         10 10 (1#1) (0#1) (0#1) (1#1) eq_refl
+         (undistrib_Located (CompactIsLocated
+         _ (graphQ 0 1 eq_refl (@Cunit Q_as_MetricSpace))
+         (ProductMS_located locatedQ locatedQ)))).
+Local Open Scope raster. (* enables pretty printing of rasters *)
+Time Eval vm_compute in PlotDiagLocated.
 *)

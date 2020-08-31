@@ -46,6 +46,23 @@ match l with
 | y::ys => orC (st_eq x y) (InFinEnumC x ys)
 end.
 
+Lemma InFinEnumC_equiv : forall (x:X) (l:list X),
+    InFinEnumC x l -> ~~(exists y, In y l /\ st_eq x y).
+Proof.
+ induction l.
+ - contradiction.
+ - intros H abs.
+   simpl in H.
+   unfold Classic.orC in H.
+   contradict H. split.
+   + intro H. contradict abs.
+     exists a. split. left. reflexivity. exact H.
+   + intro H. specialize (IHl H).
+     contradict IHl; intros [y IHl].
+     contradict abs. exists y.
+     split. right. apply IHl. apply IHl.
+Qed. 
+
 Lemma InFinEnumC_weaken : forall x l, (In x l) -> InFinEnumC x l.
 Proof.
  induction l.
