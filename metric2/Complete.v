@@ -1240,26 +1240,23 @@ Definition Cmap2_slow (X Y Z:MetricSpace) (f:X --> Y --> Z) := uc_compose (@Cap_
 *** Completion and Classification
 The completion operations preserve locatedness, but not decidability.
 *)
-Lemma Complete_located : forall X, locatedMetric X -> locatedMetric (Complete X).
+Lemma Complete_located : forall (X : MetricSpace),
+    locatedMetric X -> locatedMetric (Complete X).
 Proof.
  intros X Hx e d x y Hed.
- assert (0 < d - e).
- { apply (Qplus_lt_l _ _ e). ring_simplify. exact Hed. } 
- assert ({c:Qpos | d == e + proj1_sig c}) as H0.
- { exists (exist _ _ H).
-   unfold Qpos_plus, QposEq; destruct d,e; simpl.
-   ring_simplify. reflexivity. }
- destruct H0 as [c Hc]. 
- set (c':=((1#5)*c)%Qpos). clear H. 
+ pose (d - e) as c.
+ assert (0 < c) as Hc.
+ { apply Qlt_minus_iff in Hed. exact Hed. } 
+ set (c':=((1#5)*exist _ _ Hc)%Qpos).
  assert (proj1_sig c'+e+ proj1_sig c' < e+(3#1)*proj1_sig c') as H.
  { rewrite -> Qlt_minus_iff. simpl. ring_simplify.
-   apply (Qpos_ispos ((25#125)*c)). }
+   apply (Qpos_ispos ((25#125)*exist _ _ Hc)). }
  destruct (Hx _ _ (approximate x c') (approximate y c') H) as [H0 | H0].
  - left. 
-  rewrite -> Hc. rewrite <- ball_Cunit in H0.
-  setoid_replace (e+proj1_sig c)
+   rewrite <- ball_Cunit in H0.
+  setoid_replace d
     with (proj1_sig c' + (e + (3#1) * proj1_sig c') + proj1_sig c')%Q
-    by (simpl; ring).
+    by (simpl; unfold c; ring).
   eapply ball_triangle;[eapply ball_triangle;[|apply H0]|];
     [apply ball_approx_r|apply ball_approx_l].
  - right.
