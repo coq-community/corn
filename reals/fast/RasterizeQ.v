@@ -49,7 +49,8 @@ is chosen that contains all the points, so that this doesn't matter. *)
 (* [Rasterize Point] adds a single point [p] into a raster.
 The raster is inside the rectanle t l b r, meaning top, left, bottom and right.
 It has n points horizontally and m points vertically. The indexes (0,0)
-correspond to the point (l,b) ie the bottom left corner. *)
+correspond to the point (l,t) ie the top left corner. That yields the correct
+printing order of the raster, which is a vector of lines. *)
 Definition rasterize2 (n m:nat) (t l b r:Q) (p:Q*Q) : prod nat nat
   := pair (min (pred n) (Z.to_nat (Z.max 0 (rasterize1 l r n (fst p)))))
           (min (pred m) (Z.to_nat (Z.max 0 (rasterize1 b t m (snd p))))).
@@ -67,6 +68,8 @@ Proof.
   reflexivity.
 Qed.
 
+(* The y-coordinate is flipped by (pred m - j) before
+   calling setRaster, so the origin is the top left corner. *)
 Lemma rasterize2_origin
   : forall n m t l b r,
     rasterize2 n m t l b r (pair l b) = pair O O.

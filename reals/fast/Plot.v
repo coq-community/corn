@@ -40,11 +40,12 @@ function so that it lies inside the specified range.  Thus we plot
 [compose (clip b t) f] rather than [f].
 
 Afterwards we will plot more general located subsets of the plane:
-- each blank pixels is correct, meaning there are no points of the subset
-  inside the rectangular regions it represents
-- each filled pixel means there exists a point of the subset inside its
-  rectangular region, or inside one of the adjacent pixels. Thus filled
-  pixels cover the subset and we can zoom in to see more structure.
+- Each blank pixels is correct, meaning there are no points of the subset
+  inside the rectangular regions it represents. In other words, filled
+  pixels cover the subset.
+- Each filled pixel means there exists a point of the subset inside its
+  rectangular region, or inside one of the adjacent pixels. Thus when we
+  zoom in the filled pixels, we will see more structure.
 - the pixels overlap, meaning each corner belong to the 4 pixels that touch it
  
 *)
@@ -203,22 +204,30 @@ Fixpoint PlotSubset_fix (A : CR*CR -> Prop) (n j:nat)
                       p (PlotSubset_fix A n p b r stepX stepY d e ltde loc)
   end. 
 
-Definition PlotSubset {A : CR*CR -> Prop} (n m : nat) (t l b r : Q) :
-  l < r -> LocatedSubset (ProductMS CR CR) A -> raster n m.
+Definition PlotRadius (n m : nat) (t l b r : Q) : Q
+  := Qmax ((r-l) * (1#Pos.of_nat n))%Q
+          ((t-b) * (1#Pos.of_nat m))%Q.
+
+Lemma PlotRadiusInc
+  : forall n m t l b r,
+    l < r -> (1#2) * PlotRadius n m t l b r < PlotRadius n m t l b r.
 Proof.
-  intros ltlr loc.
-  pose ((r-l) * (1#Pos.of_nat n))%Q as stepX.
-  pose ((t-b) * (1#Pos.of_nat m))%Q as stepY.
-  pose (Qmax stepX stepY) as err.
-  (* A pixel is a square ball and its radius it half its side. *)
-  assert ((1#2)*err < err)%Q as ltde.
-  { rewrite <- (Qmult_1_l err) at 2. apply Qmult_lt_r.
-    2: reflexivity. apply (Qlt_le_trans _ stepX).
-    apply Qlt_minus_iff in ltlr.
-    apply (Qpos_ispos (exist _ _ ltlr * (1 # Pos.of_nat n))).
-    apply Qmax_ub_l. }
-  exact (PlotSubset_fix A n m b r stepX stepY _ _ ltde loc).
-Defined.
+  intros. rewrite <- (Qmult_1_l (PlotRadius n m t l b r)) at 2.
+  apply Qmult_lt_r.
+  2: reflexivity. apply (Qlt_le_trans _ ((r-l) * (1#Pos.of_nat n))%Q).
+  apply Qlt_minus_iff in H.
+  apply (Qpos_ispos (exist _ _ H * (1 # Pos.of_nat n))).
+  apply Qmax_ub_l.
+Qed.
+ 
+Definition PlotSubset {A : CR*CR -> Prop} (n m : nat) (t l b r : Q) 
+           (ltlr : l < r) (loc : LocatedSubset (ProductMS CR CR) A) : raster n m
+  := let stepX := ((r-l) * (1#Pos.of_nat n))%Q in
+     let stepY := ((t-b) * (1#Pos.of_nat m))%Q in
+     (* A pixel is a square ball and its radius it half its side. *)
+     PlotSubset_fix A n m (b-(1#2)*stepY) (r+(1#2)*stepX)
+                    stepX stepY _ _
+                    (PlotRadiusInc n m t l b r ltlr) loc.
 
 (*
 Definition PlotDiagLocated := (PlotSubset
@@ -229,3 +238,140 @@ Definition PlotDiagLocated := (PlotSubset
 Local Open Scope raster. (* enables pretty printing of rasters *)
 Time Eval vm_compute in PlotDiagLocated.
 *)
+
+
+(* The blank pixels have no points of the subset, in other words
+   the filled pixels cover the subset. *)
+Lemma PlotLine_blank
+  : forall (A : CR*CR -> Prop) (n i:nat) (ltni : (n < i)%nat)
+      (r step:Q) (x y z : CR) (d e:Q) (ltde : d < e)
+      (loc : LocatedSubset (ProductMS CR CR) A),
+    ball d x (inject_Q_CR (r - inject_Z (Z.of_nat (i-n)) * step)%Q)
+    -> ball d y z
+    -> Vector.nth (PlotLine A i r step y d e ltde loc) 
+                 (Fin.of_nat_lt ltni) = false
+    -> ~A (x,z).
+Proof.
+  induction n.
+  - intros. intro abs.
+    destruct i. exfalso; inversion ltni.
+    simpl in H1.
+    destruct (loc d e
+             (@pair (@RegularFunction Q Qball) (@RegularFunction Q Qball)
+                (inject_Q_CR
+                   (Qminus r (Qmult (inject_Z (Zpos (Pos.of_succ_nat i))) step))) y)
+             ltde).
+    2: discriminate. clear H1.
+    specialize (n (x,z) abs).
+    contradict n. split.
+    + unfold fst.
+      apply ball_sym.
+      exact H.
+    + exact H0.
+  - intros. intro abs. 
+    destruct i. inversion ltni. simpl in H1.
+    revert abs.
+    refine (IHn i (lt_S_n n i ltni) r step x y z d e
+                ltde loc _ H0 H1).
+    replace (i-n)%nat with (S i - S n)%nat by reflexivity.
+    exact H.
+Qed.
+
+Lemma PlotSubset_fix_blank
+  : forall (A : CR*CR -> Prop) (x y : CR) (i j n m:nat)
+      (ltin : (i < n)%nat) (ltjm : (j < m)%nat)
+      (b r stepX stepY:Q) (d e:Q) (ltde : d < e)
+      (loc : LocatedSubset (ProductMS CR CR) A),
+    ball d x (inject_Q_CR (r - inject_Z (Z.of_nat (n-i)) * stepX)%Q)
+    -> ball d y (inject_Q_CR (b + inject_Z (Z.of_nat (m-j)) * stepY)%Q)
+    -> Vector.nth
+        (Vector.nth (PlotSubset_fix A n m b r stepX stepY
+                                    d e ltde loc) 
+                    (Fin.of_nat_lt ltjm))
+        (Fin.of_nat_lt ltin) = false
+    -> ~A (x,y).
+Proof.
+  induction j.
+  - intros. intro abs.
+    destruct m. exfalso; inversion ltjm.
+    simpl in H1.
+    refine (PlotLine_blank
+              A i n ltin r stepX x
+              (' (b + inject_Z (Z.pos (Pos.of_succ_nat m)) * stepY)%Q)%CR
+              y d e ltde loc H _ H1 abs).
+    apply ball_sym.
+    exact H0.
+  - intros. intro abs.
+    destruct m. inversion ltjm.
+    simpl in H1.
+    apply (IHj n m ltin (lt_S_n j m ltjm) b r stepX stepY
+                    d e ltde loc H H0 H1 abs).
+Qed.
+
+Lemma PlotSubset_blank
+  : forall {A : CR*CR -> Prop} (i j n m : nat) (t l b r : Q) (x y : CR)
+      (ltin : (i < n)%nat) (ltjm : (j < m)%nat) (ltlr : l < r)
+      (loc : LocatedSubset (ProductMS CR CR) A),
+    Vector.nth (Vector.nth (PlotSubset n m t l b r ltlr loc) (Fin.of_nat_lt ltjm))
+               (Fin.of_nat_lt ltin) = false
+    -> let stepX := ((r-l) * (1#Pos.of_nat n))%Q in
+      let stepY := ((t-b) * (1#Pos.of_nat m))%Q in 
+      ball ((1#2)*(Qmax stepX stepY)) x
+           (inject_Q_CR (l + (inject_Z (Z.of_nat i) + (1#2)) * stepX)%Q)
+      -> ball ((1#2)*(Qmax stepX stepY)) y
+             (inject_Q_CR (t - (inject_Z (Z.of_nat j) + (1#2)) * stepY)%Q)
+      -> ~A (x,y).
+Proof.
+  intros. 
+  setoid_replace (' (l + (inject_Z (Z.of_nat i)+(1#2)) * stepX)%Q)%CR
+    with (inject_Q_CR ((r + (1#2)*stepX) - inject_Z (Z.of_nat (n-i)) * stepX)%Q)
+    in H0. 
+  setoid_replace (' (t - (inject_Z (Z.of_nat j) + (1#2)) * stepY)%Q)%CR
+    with (inject_Q_CR ((b-(1#2)*stepY) + inject_Z (Z.of_nat (m-j)) * stepY)%Q)
+    in H1. 
+  exact (PlotSubset_fix_blank A x y i j n m ltin ltjm
+                              _ _ stepX stepY
+                              ((1#2)*(Qmax stepX stepY)) 
+                              (Qmax stepX stepY)
+                              (PlotRadiusInc n m t l b r ltlr) loc
+                              H0 H1 H).
+  - apply inject_Q_CR_wd.
+    unfold canonical_names.equiv, stdlib_rationals.Q_eq.
+    rewrite Nat2Z.inj_sub.
+    unfold Zminus. rewrite Q.Zplus_Qplus, inject_Z_opp.
+    rewrite <- (Qplus_inj_r _ _ ((inject_Z (Z.of_nat j)+(1#2)) * stepY)).
+    ring_simplify.
+    unfold stepY.
+    rewrite <- Qmult_assoc.
+    setoid_replace ((1 # Pos.of_nat m) * inject_Z (Z.of_nat m)) with 1%Q.
+    rewrite Qmult_1_r. ring.
+    unfold canonical_names.equiv, stdlib_rationals.Q_eq, inject_Z.
+    unfold Qeq, Qmult, Qnum, Qden.
+    rewrite Z.mul_1_l, Z.mul_1_l, Z.mul_1_r, Pos.mul_1_r.
+    destruct m.
+    exfalso; inversion ltjm.
+    rewrite <- Pos.of_nat_succ. reflexivity.
+    apply (le_trans _ (S j)).
+    apply le_S, le_refl. exact ltjm. 
+  - apply inject_Q_CR_wd.
+    unfold canonical_names.equiv, stdlib_rationals.Q_eq.
+    rewrite Nat2Z.inj_sub.
+    unfold Zminus. rewrite Q.Zplus_Qplus, inject_Z_opp.
+    rewrite <- (Qplus_inj_r _ _ (stepX * inject_Z (Z.of_nat n)
+                                -inject_Z (Z.of_nat i) * stepX
+                                - (1#2)*stepX)).
+    ring_simplify.
+    unfold stepX.
+    rewrite <- Qmult_assoc.
+    setoid_replace ((1 # Pos.of_nat n) * inject_Z (Z.of_nat n)) with 1%Q.
+    rewrite Qmult_1_r. ring.
+    unfold canonical_names.equiv, stdlib_rationals.Q_eq, inject_Z.
+    unfold Qeq, Qmult, Qnum, Qden.
+    rewrite Z.mul_1_l, Z.mul_1_l, Z.mul_1_r, Pos.mul_1_r.
+    destruct n.
+    exfalso; inversion ltin.
+    rewrite <- Pos.of_nat_succ. reflexivity.
+    apply (le_trans _ (S i)).
+    apply le_S, le_refl. exact ltin.
+Qed.
+  
