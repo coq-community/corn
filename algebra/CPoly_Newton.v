@@ -15,40 +15,6 @@ Set Automatic Introduction.
 
 Coercion Vector.to_list: Vector.t >-> list.
 
-Instance: UniformlyContinuous_mu (util.uncurry Qplus).
-Admitted.
-Instance: UniformlyContinuous (util.uncurry Qplus).
-Admitted.
-Instance: forall x, UniformlyContinuous_mu (Qplus x).
-Admitted.
-Instance: forall x, UniformlyContinuous (Qplus x).
-Admitted.
-
-Instance: UniformlyContinuous_mu (util.uncurry Qminus).
-Admitted.
-Instance: UniformlyContinuous (util.uncurry Qminus).
-Admitted.
-Instance: forall x, UniformlyContinuous_mu (Qminus x).
-Admitted.
-Instance: forall x, UniformlyContinuous (Qminus x).
-Admitted.
-
-Instance: UniformlyContinuous_mu (util.uncurry Qmult).
-Admitted.
-Instance: UniformlyContinuous (util.uncurry Qmult).
-Admitted.
-Instance: forall x, UniformlyContinuous_mu (Qmult x).
-Admitted.
-Instance: forall x, UniformlyContinuous (Qmult x).
-Admitted.
-
-Instance: forall x, UniformlyContinuous_mu (Qscale_uc x).
-Admitted.
-Instance: forall x, UniformlyContinuous (Qscale_uc x).
-Admitted.
-  (** Todo: Prove and move. Only added here temporarily to make definition of repeated integral compile. *)
-
-
 Local Open Scope CR_scope.
 
 Local Notation Σ := cm_Sum.
@@ -62,15 +28,6 @@ Section continuous_vector_operations.
     := λ p, Vector.cons _ (fst p) _ (snd p).
 
   Global Instance Vector_cons_mu: UniformlyContinuous_mu uncurry_Vector_cons := { uc_mu := Qpos2QposInf }.
-
-  Global Instance Vector_cons_uc: UniformlyContinuous uncurry_Vector_cons.
-  Proof with auto.
-   constructor.
-     apply _.
-    apply _.
-   intros ??? A.
-   constructor; apply A.
-  Qed.
 
 End continuous_vector_operations.
 
@@ -464,89 +421,11 @@ Section contents.
 
   End again_with_qpoints.
 
-  Lemma N_Permutation (x y: ne_list QPoint): QNoDup (map fst x) → ne_list.Permutation x y → N x [=] N y.
-  Proof with auto.
-   intros D E.
-   apply (interpolation_unique (ne_list.map (first inject_Q_CR) x)).
-     rewrite ne_list.list_map.
-     rewrite map_fst_map_first.
-     apply (CNoDup_map _ inject_Q_CR).
-     apply CNoDup_weak with Qap...
-      intros. apply Qap_CRap...
-     apply QNoDup_CNoDup_Qap...
-    apply interpolates_economically...
-   rewrite E.
-   apply interpolates_economically.
-   unfold QNoDup.
-(*   assert (ne_list.Permutation (map fst x) (map fst y)).
-   assert (QNoDup (map fst y)).
-   rewrite <- E...*)
-  Admitted.
-
-  Lemma divdiff_Permutation (x y: ne_list QPoint): QNoDup (map fst x) →
-   ne_list.Permutation x y →
-   divdiff x [=] divdiff y.
-    (* Bah, can't express this as a Proper because of the NoDup requirement and the inability of
-     the current setoid rewriting infrastructure to deal with dependently typed functions. :-( *)
-  Proof with auto.
-   intros D P.
-   rewrite <- N_leading_coefficient...
-   rewrite <- N_leading_coefficient...
-    rewrite (ne_list.Permutation_ne_tl_length x y)...
-    rewrite (N_Permutation x y)...
-    reflexivity.
-   unfold QNoDup.
-   Admitted. (* too slow
-   rewrite <- P...
-  Qed.*)
-
 Fixpoint ne_list_zip {X Y} (xs: ne_list X) (ys: ne_list Y): ne_list (X * Y) :=
   match xs, ys with
   | ne_list.cons x xs', ne_list.cons y ys' => ne_list.cons (x, y) (ne_list_zip xs' ys')
   | _, _ => ne_list.one (ne_list.head xs, ne_list.head ys)
   end.
-(*
-Fixpoint iterate {T: nat → Type} (f: ∀ {n}, T (S n) → T n) {n}: T n → T O :=
-    match n return T n → T O with
-    | O => Datatypes.id
-    | S n' => (iterate f ∘ f n')%prg
-    end.
-*)
-(*
-  Section iterate.
-    Context (T: nat → Type) (f: ∀ {n}, T n → T (S n)).
-
-    Fixpoint iterate (n: nat) {m: nat} (x: T m): T (n + m) :=
-      match n with
-      | O => x
-      | S n' => f _ (iterate n' x)
-      end.
-
-    Definition iterate_comm (n: nat) {m: nat} (x: T m): T (m + n).
-     rewrite plus_comm.
-     exact (iterate n x).
-    Defined.
-
-    Context
-      `{∀ n, canonical_names.Equiv (T n)}
-      `{∀ n, MetricSpaceBall (T n)}
-      `{∀ n, MetricSpaceClass (T n)}
-      `{∀ n, UniformlyContinuous_mu (f n)}
-      `{∀ n, UniformlyContinuous (f n)}.
-
-    Global Instance iterate_mu {n m}: UniformlyContinuous_mu (@iterate n m).
-    Admitted.
-    Global Instance iterate_comm_mu {n m}: UniformlyContinuous_mu (@iterate_comm n m).
-    Admitted.
-
-    Global Instance iterate_uc {n m}: UniformlyContinuous (@iterate n m).
-    Admitted.
-    Global Instance iterate_comm__uc {n m}: UniformlyContinuous (@iterate_comm n m).
-    Admitted.
-
-  End iterate.
-*)
-
 
 Definition Q01 := sig (λ x: Q, 0 <= x <= 1).
 Definition Range (T: Type) := prod T T.
@@ -559,27 +438,6 @@ Instance in_QRange: Container Q (Range Q) := λ r x, fst r <= x <= snd r.
 Arguments proj1_sig {A P}.
 Program Instance in_sig_QRange (P: Q → Prop): Container (sig P) (Range (sig P)) := λ r x, fst r <= x <= snd r. 
 Definition B01: Ball Q Qpos := (1#2, (1#2)%Qpos).
-(*Definition D01 := sig (contains B01).
-
-    Program Definition D01zero: D01 := 0.
-    Next Obligation.
-     red.
-     simpl.
-     red.
-     red.
-     simpl.
-     red.
-     simpl.
-     red.
-     simpl.
-     split.
-      admit.
-     admit.
-    Qed.
-*)
-(*    Instance: Canonical (QnonNeg.T → Qinf.Qinf).
-    Admitted.
-*)
   Section divdiff_as_repeated_integral.
 
     Context
@@ -620,75 +478,10 @@ Definition ZeroRangeToBall (q: QnonNeg.T): Ball Q QnonNeg.T := (0, ((1#2) * q)%Q
 
     (** apply_weights: *)
 
-    Program Definition apply_weights (w: Weights): Qbp :=
-      @cm_Sum Q_as_CMonoid (map (λ p, Qmult (fst p) (` (snd p))) (zip points (Vector.to_list w))).
-
-    Next Obligation.
-    Admitted.
-
-    Instance apply_weights_mu: UniformlyContinuous_mu apply_weights.
-    Admitted.
-
-(*    Instance apply_weights_uc: UniformlyContinuous apply_weights.
-    Admitted.*)
-
     Obligation Tactic := idtac.
 
     (** "inner", the function of n weights: *)
-(*
-    Program Definition inner: SomeWeights n → CR
-      := λ ts, nth_deriv (apply_weights
-        (Vector.cons _ (1 - cm_Sum (map proj1_sig (Vector.to_list ts)): Q01) _ ts))%Q.
-
-    Next Obligation.
-     intros ts (*[ts ?]*).
-     simpl @proj1_sig.
-     split.
-      admit. (* easy *)
-     admit. (* easy *)
-    Qed.
-
-    Instance inner_mu: UniformlyContinuous_mu inner.
-    Admitted.
-     
-    Instance inner_uc: UniformlyContinuous inner.
-    Admitted.
-*)
     (* Next up is "reduce", which *)
-(*
-    Definition G (n: nat): Type := UCFunction (Vector.t Q01 n) CR.
-
-    Section reduce.
-      Variables (m: nat) (X: G (S m)).
-
-      Definition integrand (ts: SomeWeights m) (t: Q01): CR := X (uncurry_Vector_cons _ (t, ts)).
-
-      Program Definition reduce_raw: SomeWeights m → CR
-       := λ ts, integrate ((0, 1 - cm_Sum (map proj1_sig (Vector.to_list ts)))%Q, ucFunction (integrand ts)).
-
-      Next Obligation. split. reflexivity. auto. Qed.
-
-      Next Obligation.
-       intros ts (*[ts ?]*).
-       simpl.
-       split. admit. (* easy *)
-       admit. (* easy *)
-      Qed.
-
-      Axiom reduce_mu: UniformlyContinuous_mu reduce_raw.
-      Existing Instance reduce_mu.
-      Axiom reduce_uc: UniformlyContinuous reduce_raw.
-      Existing Instance reduce_uc.
-
-      Definition reduce: G m := ucFunction reduce_raw.
-
-    End reduce.
-
-    (*Program*) Definition alt_divdiff: CR (*sig (λ r, r <= upper)*)
-      := iterate reduce (ucFunction inner) (Vector.nil Q01).
-
-    Next Obligation. simpl. auto with arith. Qed.
-*)
   End divdiff_as_repeated_integral.
 
 End contents.

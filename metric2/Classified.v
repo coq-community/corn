@@ -391,36 +391,58 @@ Section products.
 
 End products.
 
-Definition vector_zip {X Y} {n} : Vector.t X n → Vector.t Y n → Vector.t (X * Y) n :=
-  Vector.rect2 (λ n _ _, Vector.t (X * Y) n)
-    (Vector.nil _)
-    (λ _ _ _ r (x: X) (y: Y), Vector.cons _ (x, y) _ r).
-      (* Todo: Move. *)
+(* Workaround Vector.Forall2, which is hard to destruct. *)
+Fixpoint Vector_Forall2 {X : Type} {n : nat} (P : X -> X -> Prop)
+         (x y : Vector.t X n) { struct x } : Prop.
+Proof.
+  destruct x as [|xh n xt].
+  - exact True.
+  - exact (P xh (Vector.hd y) /\ Vector_Forall2 X n P xt (Vector.tl y)).
+Defined.
 
 Section vector_setoid.
 
   Context `{Setoid X} (n: nat).
 
-  Global Instance: Equiv (Vector.t X n) := Vector.Forall2 equiv.
+  Global Instance: Equiv (Vector.t X n) := Vector_Forall2 equiv.
 
   Global Instance vector_setoid: Setoid (Vector.t X n).
-  Proof with auto.
+  Proof.
    constructor.
-     repeat intro.
-     unfold equiv.
-     unfold Equiv_instance_0.
-     induction x; simpl; constructor...
-  Admitted.
-(*     reflexivity.
-    unfold equiv.
-    unfold Equiv_instance_0.
-    unfold Symmetric.
-    intros.
-    revert n x y H0.
-    apply Vector.Forall2_ind; constructor...
-    symmetry...
-   admit. (* transitivity *)
-  Qed.*)
+   - intro x.
+     unfold equiv, Equiv_instance_0.
+     induction x; simpl; constructor.
+     reflexivity. exact IHx.
+   - intros x y H0.
+     unfold equiv, Equiv_instance_0, equiv.
+     unfold equiv, Equiv_instance_0, equiv in H0.
+     induction x.
+     + apply (Vector.case0 (fun y => Vector_Forall2 Ae y (Vector.nil X))).
+       simpl. trivial.
+     + simpl in H0.
+       revert H0.
+       apply (Vector.caseS' y). clear y.
+       intros. destruct H0.
+       split. simpl. symmetry. exact H0.
+       apply IHx, H1.
+   - intros x y z H1 H2.
+     unfold Transitive, equiv, Equiv_instance_0, equiv.
+     unfold Transitive, equiv, Equiv_instance_0, equiv in H1.
+     unfold Transitive, equiv, Equiv_instance_0, equiv in H2.
+     induction x.
+     + simpl. trivial.
+     + revert H2.
+       apply (Vector.caseS' z).
+       clear z. intros zh zt. 
+       revert H1.
+       apply (Vector.caseS' y).
+       clear y. intros yh yt H0 H1.
+       simpl in H0. simpl in H1.
+       destruct H0, H1.
+       split. simpl.
+       transitivity yh; assumption.
+       simpl. apply (IHx yt); assumption.
+  Qed.
 
 End vector_setoid. (* Todo: Move. *)
 
@@ -428,14 +450,8 @@ Section vectors.
 
   Context `{MetricSpaceClass X} (n: nat).
 
-  Global Instance: MetricSpaceBall (Vector.t X n) := λ e, Vector.Forall2 (mspc_ball X e).
-
-  Global Instance: MetricSpaceClass (Vector.t X n).
-  Proof with auto.
-   pose proof (mspc_setoid X).
-   split.
-           apply _.
-  Admitted.
+  Global Instance: MetricSpaceBall (Vector.t X n) :=
+    λ e, Vector_Forall2 (mspc_ball X e).
 
 End vectors.
 
@@ -709,48 +725,6 @@ Existing Instance ucFun_uc.
 Arguments UCFunction X {Xe Xb} Y {Ye Yb}.
 Arguments ucFunction {X Xe Xb Y Ye Yb} _ {ucFun_mu ucFun_uc}.
 
-
-Section delegated_mspc.
-
-  Context (X: Type) `{MetricSpaceClass Y} (xy: X → Y).
-
-  Instance delegated_ball: MetricSpaceBall X := λ e a b, mspc_ball e (xy a) (xy b).
-
-  Instance delegated_equiv: Equiv X := λ a b, xy a = xy b.
-
-  Instance delegated_mspc: MetricSpaceClass X.
-  Proof with intuition.
-   constructor.
-           admit.
-          repeat intro.
-          unfold mspc_ball, delegated_ball.
-          apply (mspc_ball_proper Y)...
-         intros.
-         unfold mspc_ball, delegated_ball.
-         apply (mspc_ball_inf Y).
-        repeat intro.
-        apply (mspc_ball_negative Y e H1 (xy x) (xy y))...
-       intros.
-       unfold mspc_ball, delegated_ball.
-       rewrite (mspc_ball_zero Y).
-       reflexivity.
-      unfold mspc_ball, delegated_ball.
-      repeat intro.
-      apply (mspc_refl Y e H1).
-     unfold mspc_ball, delegated_ball.
-     repeat intro.
-     apply (mspc_sym Y)...
-    unfold mspc_ball, delegated_ball.
-    intros e1 e2 a b c.
-    apply (mspc_triangle Y e1 e2).
-   unfold mspc_ball, delegated_ball.
-   intros.
-   apply (mspc_closed Y)...
-  Admitted.
-
-End delegated_mspc.
-
-
 Section proper_functions.
 
   (* Todo: This is bad. Make instances for (@sig (A → B) (Proper equiv)) instead and delegate to it for UCFunction. *)
@@ -759,114 +733,44 @@ Section proper_functions.
 
   Let T := (@sig (A → B) (Proper equiv)).
 
+  (* The equivalence on functions is ext_equiv, ie equivalence of images
+     for each equivalent arguments. *)
   Global Instance: Equiv T := λ x y, proj1_sig x = proj1_sig y.
 
   Let hint' := mspc_setoid B.
 
   Global Instance: Setoid T.
-  Proof with intuition.
+  Proof.
    constructor.
-     intros ????.
-     destruct x...
-    repeat intro. (*symmetry...
-   repeat intro.
-   transitivity (proj1_sig y x0)...
-  Qed.*)
-  Admitted.
+   - intros [f fproper] x y xyeq.
+     simpl. apply fproper, xyeq.
+   - intros [f fproper] [g gproper] fgeq x y xyeq.
+     simpl.
+     symmetry in xyeq.
+     specialize (fgeq y x xyeq).
+     simpl in fgeq.
+     apply (mspc_ball_zero B).
+     apply (mspc_ball_zero B) in fgeq.
+     apply (mspc_sym B), fgeq.
+   - intros [f fproper] [g gproper] [h hproper]
+            fgeq gheq x y xyeq.
+     simpl. 
+     apply (mspc_ball_zero B).
+     setoid_replace 0 with (0+0) by reflexivity.
+     apply (mspc_triangle B _ _ _ (g x)).
+     + specialize (fgeq x x (reflexivity _)).
+       simpl in fgeq.
+       apply (mspc_ball_zero B), fgeq.
+     + specialize (gheq x y xyeq).
+       simpl in gheq.
+       apply (mspc_ball_zero B), gheq.
+  Qed.
 
   Global Instance: MetricSpaceBall T := λ e f g, Qinf.le 0 e ∧ ∀ a, mspc_ball e (` f a) (` g a).
     (* The 0<=e condition is needed because otherwise if A is empty, we cannot deduce
      False from a premise of two functions being inside a negative ball of eachother.
      If this turns out to be annoying, we can make a separate higher-priority metric space instance
      for functions from a known-nonempty type (registered with a NonEmpty type class). *)
-
-  Global Instance ProperFunction_mspc: MetricSpaceClass T.
-  Proof with simpl; auto; try reflexivity.
-   constructor; try apply _.
-          split.
-           split.
-            rewrite <- H2.
-            apply H5.
-           intros.
-           rewrite <- H2.
-           rewrite <- (H3 a). 2: reflexivity.
-           rewrite <- (H4 a). 2: reflexivity.
-           apply H5...
-          split.
-           rewrite H2. apply H5.
-          intros.
-          rewrite H2.
-          rewrite (H3 a). 2: reflexivity.
-          rewrite (H4 a). 2: reflexivity.
-          apply H5.
-         split.
-          simpl.
-          auto.
-         intros.
-         apply (mspc_ball_inf B).
-        repeat intro.
-        unfold mspc_ball in H3.
-        destruct H3.
-        simpl in H3.
-        apply (Qlt_not_le e 0)...
-       unfold mspc_ball.
-       unfold MetricSpaceBall_instance_2.
-       intros.
-       split.
-        repeat intro.
-        destruct H2.
-        destruct x.
-        (*simpl.
-        rewrite H3.
-        apply (mspc_ball_zero B)...
-       split.
-        simpl. auto with *.
-       intros.
-       apply (mspc_ball_zero B)...
-       apply H2.
-       reflexivity.
-      split. simpl. auto.
-      intros.
-      apply (mspc_refl B e)...
-     split.
-      apply H2.
-     intros.
-     apply (mspc_sym B).
-     apply H2.
-    split.
-     apply Qinf.le_0_plus_compat.
-      apply H2.
-     apply H3.
-    intros.
-    apply (mspc_triangle B) with (proj1_sig b a0).
-     apply H2.
-    apply H3.
-   split.
-    destruct e. 2: simpl; auto.
-    unfold mspc_ball in H2.
-    unfold MetricSpaceBall_instance_2 in H2.
-    destruct (Qdec_sign q) as [[|]|].
-      exfalso.
-      assert (0 < (1#2) * -q)%Q.
-       apply Qmult_lt_0_compat...
-       apply Qopp_Qlt_0_l...
-      destruct (H2 (exist _ _ H3)).
-      simpl in H4.
-      clear H3 H5.
-      ring_simplify in H4.
-      apply (Qlt_not_le q 0). auto.
-      setoid_replace q with ((1 # 2) * q + (1 # 2) * q)%Q by (simpl; ring).
-      apply Qplus_nonneg...
-     simpl. auto with *.
-    rewrite q0.
-    simpl.
-    apply Qle_refl.
-   intros.
-   apply (mspc_closed B).
-   intros.
-   apply H2.
-  Qed.*) (* Todo: This is awful. Clean it up once these blasted evar anomalies are under control. *)
-  Admitted.
 
 End proper_functions.
 
@@ -883,15 +787,33 @@ Section uc_functions.
   Let hint' := mspc_setoid B.
 
   Global Instance: Setoid (UCFunction A B).
-  Proof with intuition.
+  Proof.
    constructor.
-     intros ????.
-     set (_: Proper (=) (ucFun_itself x)).
-     destruct x...
-    repeat intro. (*symmetry...
-   intros ? y ??? x. transitivity (y x)...
-  Qed.*)
-  Admitted.
+   - intros f x y xyeq.
+     set (_: Proper (=) (ucFun_itself f)).
+     destruct f as [f fproper].
+     simpl. simpl in p.
+     apply p, xyeq.
+   - intros f g fgeq x y xyeq.
+     apply (mspc_ball_zero A), (mspc_sym A), (mspc_ball_zero A) in xyeq.
+     specialize (fgeq y x xyeq); simpl in fgeq.
+     apply (mspc_ball_zero B), (mspc_sym B), (mspc_ball_zero B), fgeq.
+   - intros f g h fgeq gheq x y xyeq.
+     apply (mspc_ball_zero B).
+     assert (f x = f x).
+     { apply (mspc_ball_zero B), (mspc_refl B).
+       discriminate. }
+     pose proof (@mspc_ball_proper B _ H1 H2 (0+0) 0 (reflexivity _)
+                                   (f x) (f x) H3 (h y) (h y)).
+     rewrite <- H4.
+     apply (mspc_triangle B _ _ _ (g x)).
+     + apply (mspc_ball_zero B).
+       apply (fgeq x x).
+       apply (mspc_ball_zero A), (mspc_refl A); discriminate. 
+     + apply (mspc_ball_zero B).
+       apply (gheq x y), xyeq.
+     + apply (mspc_ball_zero B), (mspc_refl B); discriminate. 
+  Qed.
 
   Global Instance: MetricSpaceBall (UCFunction A B) := λ e f g, Qinf.le 0 e ∧ ∀ a, mspc_ball e (f a) (g a).
     (* The 0<=e condition is needed because otherwise if A is empty, we cannot deduce
@@ -899,91 +821,100 @@ Section uc_functions.
      If this turns out to be annoying, we can make a separate higher-priority metric space instance
      for functions from a known-nonempty type (registered with a NonEmpty type class). *)
 
-  Global Instance UCFunction_MetricSpace: MetricSpaceClass (UCFunction A B).
-  Proof with simpl; auto; try reflexivity.
-   constructor; try apply _.
-          split.
-           split.
-            rewrite <- H3.
-            apply H6.
-           intros.
-           (*rewrite <- H3.
-           rewrite <- (H4 a). 2: reflexivity.
-           rewrite <- (H5 a). 2: reflexivity.
-           apply H6...
-          split.
-           rewrite H3. apply H6.
-          intros.
-          rewrite H3.
-          rewrite (H4 a). 2: reflexivity.
-          rewrite (H5 a). 2: reflexivity.
-          apply H6.
-         split.
-          simpl.
-          auto.
-         intros.
-         apply (mspc_ball_inf B).
-        repeat intro.
-        unfold mspc_ball in H4.
-        destruct H4.
-        simpl in H4.
-        apply (Qlt_not_le e 0)...
-       unfold mspc_ball.
-       unfold MetricSpaceBall_instance_2.
-       intros.
-       split.
-        repeat intro.
-        destruct H3.
-        rewrite H4.
-        apply (mspc_ball_zero B)...
-       split.
-        simpl. auto with *.
-       intros.
-       apply (mspc_ball_zero B)...
-       apply H3.
-       reflexivity.
-      split. simpl. auto.
-      intros.
-      apply (mspc_refl B e)...
-     split.
-      apply H3.
-     intros.
-     apply (mspc_sym B).
-     apply H3.
+  Lemma Proper_uc_ball : Proper equiv mspc_ball.
+  Proof.
+    intros d e deeq f g fgeq h k hkeq.
     split.
-     apply Qinf.le_0_plus_compat.
-      apply H3.
-     apply H4.
-    intros.
-    apply (mspc_triangle B) with (b a0).
-     apply H3.
-    apply H4.
-   split.
-    destruct e. 2: simpl; auto.
-    unfold mspc_ball in H3.
-    unfold MetricSpaceBall_instance_2 in H3.
-    destruct (Qdec_sign q) as [[|]|].
-      exfalso.
-      assert (0 < (1#2) * -q)%Q.
-       apply Qmult_lt_0_compat...
-       apply Qopp_Qlt_0_l...
-      destruct (H3 (exist _ _ H4)).
-      simpl in H5.
-      clear H4 H6.
-      ring_simplify in H5.
-      apply (Qlt_not_le q 0). auto.
-      setoid_replace q with ((1 # 2) * q + (1 # 2) * q)%Q by (simpl; ring).
-      apply Qplus_nonneg...
-     simpl. auto with *.
-    rewrite q0.
-    simpl.
-    apply Qle_refl.
-   intros.
-   apply (mspc_closed B).
-   intros.
-   apply H3.
-  Qed.*) (* Todo: This is awful. Clean it up once these blasted evar anomalies are under control. *)
-  Admitted.
+    - intros [dpos H3].
+      split. rewrite <- deeq. exact dpos.
+      intro x. specialize (H3 x).
+      assert (x = x).
+      { apply (mspc_ball_zero A), (mspc_refl A); discriminate. } 
+      specialize (fgeq x x H4).
+      specialize (hkeq x x H4).
+      rewrite <- (@mspc_ball_proper B _ H1 H2 d e deeq
+                                   (f x) (g x) fgeq (h x) (k x) hkeq).
+      exact H3.
+    - intros [epos H3].
+      split. rewrite deeq. exact epos.
+      intro x. specialize (H3 x).
+      assert (x = x).
+      { apply (mspc_ball_zero A), (mspc_refl A); discriminate. } 
+      specialize (fgeq x x H4).
+      specialize (hkeq x x H4).
+      rewrite (@mspc_ball_proper B _ H1 H2 d e deeq
+                                 (f x) (g x) fgeq (h x) (k x) hkeq).
+      exact H3.
+  Qed.
+
+  Lemma uc_ball_zero : ∀ x y : UCFunction A B, mspc_ball 0 x y ↔ x = y.
+  Proof.
+    intros f g. split.
+    - intros [_ H3] x y xyeq. 
+      apply (mspc_ball_zero B).
+      specialize (H3 x).
+      apply (mspc_ball_zero B) in H3.
+      pose proof (@mspc_ball_proper B _ H1 H2 (0+0) 0 (reflexivity _)
+                                    (f x) (g x) H3 (g y) (g y)).
+      rewrite H4. clear H4 H3.
+      apply (mspc_ball_zero B). 
+      set (_: Proper (=) (ucFun_itself g)). 
+      apply p, xyeq.
+      apply (mspc_ball_zero B), (mspc_refl B); discriminate.
+    - intro fgeq. split. apply Qle_refl.
+      intros x.
+      apply (mspc_ball_zero B), (fgeq x x).
+      apply (mspc_ball_zero A), (mspc_refl A); discriminate.
+  Qed. 
+    
+  Global Instance UCFunction_MetricSpace: MetricSpaceClass (UCFunction A B).
+  Proof.
+   constructor.
+   - apply _.
+   - apply Proper_uc_ball.
+   - intros f g. split. simpl. trivial.
+     intro x. apply (mspc_ball_inf B).
+   - intros. intros [H4 _].
+     exact (Qlt_not_le _ _ H3 H4).
+   - apply uc_ball_zero.
+   - intros e epos f. split. exact epos.
+     intros x. apply (mspc_refl B _ epos).
+   - intros e f g [epos H3].
+     split. exact epos. intro x.
+     apply (mspc_sym B), (H3 x).
+   - intros. destruct H3, H4. split.
+     apply Qinf.le_0_plus_compat; assumption.
+     intros x. specialize (H5 x). specialize (H6 x).
+     apply (mspc_triangle B) with (b x); assumption.
+   - intros. split.
+     + destruct e as [e|]. 2: simpl; auto.
+       simpl. destruct (Qlt_le_dec e 0). 2: exact q.
+       exfalso.
+       assert (0 < (1#2) * -e)%Q.
+       apply Qmult_lt_0_compat. reflexivity.
+       apply Qopp_Qlt_0_l, q.
+       destruct (H3 (exist _ _ H4)) as [H5 _].
+       simpl in H5. clear q.
+       apply (Qlt_not_le _ _ H4). clear H4.
+       apply (Qplus_le_l ((1#2)*e)).
+       ring_simplify.
+       ring_simplify in H5.
+       setoid_replace (0#4) with 0%Q by reflexivity.
+       exact H5.
+     + intros x.
+       apply (mspc_closed B).
+       intros. apply H3.
+   - intros e f g H3. split.
+     + apply Qnot_lt_le. intro H4.
+       contradict H3; intro H3.
+       destruct H3 as [H3 _].
+       exact (Qlt_not_le _ _ H4 H3).
+     + intro x.
+       apply (mspc_stable B). intro abs.
+       contradict H3; intro H3.
+       destruct H3 as [epos H3].
+       exact (abs (H3 x)).
+  Qed.
 
 End uc_functions.
 
@@ -1123,15 +1054,6 @@ Section map_pair_uc.
   Let hint'' := uc_from f.
   Let hint''' := uc_to f.
 
-  Global Instance: UniformlyContinuous (map_pair f g).
-  Proof with auto.
-   constructor; try apply _. intros.
-   (*pose proof (together_uc (wrap_uc_fun f) (wrap_uc_fun g) e a b) as P.
-   apply P. simpl in *.
-   destruct (QposInf_min)...
-   simpl...
-  Qed.*)
-  Admitted.
 End map_pair_uc.
 
 (** The diagonal function is uniformly continuous: *)
@@ -1177,18 +1099,6 @@ Section compose_uc.
   Let hint' := uc_to g.
   Let hint'' := uc_to f.
 
-  Global Instance compose_uc: UniformlyContinuous (f ∘ g)%prg.
-  Proof with auto.
-   constructor; try apply _.
-   (*intros ??? P.
-   apply (uniformlyContinuous f).
-   revert P. simpl.
-   generalize (uc_mu f e).
-   destruct q; intros; simpl.
-    apply (uniformlyContinuous g)...
-   apply (mspc_ball_inf Y).
-  Qed.*)
-  Admitted.
 End compose_uc.
 
 Section curried_uc.
