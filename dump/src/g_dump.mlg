@@ -1,0 +1,53 @@
+DECLARE PLUGIN "dump_plugin"
+
+{
+
+open Pp
+open Names
+open Printer
+open Globnames
+open Stdarg
+open Typeops
+
+let dump_pgm (raster : Pp.t) (rastertype : Pp.t) =
+  (* Resolution 1920*1080 makes 2 millions of pixels *)
+  let buf = Buffer.create 4000000 in
+  let fmt = Format.formatter_of_buffer buf in
+  pp_with fmt rastertype; 
+  Format.pp_print_newline fmt (); 
+  pp_with fmt raster; 
+  Format.pp_print_flush fmt (); 
+  let (str : string) = Buffer.contents buf in 
+  (* P2 is the magic number for PGM ascii files.
+     Then come the dimensions of the image and 
+     the number of levels of gray, ie 1. *) 
+  let str = Str.global_replace (Str.regexp "(raster \\([0-9]+\\) \\([0-9]+\\))")
+              "P2\n\\1 \\2\n1" str in 
+  let str = Str.global_replace (Str.regexp "█ ") "1 " str in 
+  let str = Str.global_replace (Str.regexp "  ") "0 " str in
+  let str = Str.global_replace (Str.regexp "⎥") "" str in 
+  let str = Str.global_replace (Str.regexp "⎢") "" str in 
+  let str = Str.global_replace (Str.regexp "\\[\\]") "" str in 
+  let oc = open_out "plot.pgm" in
+  output_string oc str;
+  close_out oc
+
+(* Reduce the global term t and write it to an ascii PGM file
+   (portable gray map), which is a format for grayscale matrices. *)
+let eval_and_dump_pgm (t : Libnames.qualid) = 
+  let env = Global.env () in
+  prerr_endline "dumping to plot.pgm";
+  let (tg : GlobRef.t) = Constrintern.intern_reference t in
+  let (tt : Constr.types) = fst (type_of_global_in_context env tg) in
+  let (c : Constr.constr) = printable_constr_of_global tg in
+  (* Compute c to get a matrix of booleans, instead of just the name of c. *)
+  let evalc = Reductionops.nf_all env (Evd.from_env env) (EConstr.of_constr c) in
+  dump_pgm (pr_econstr_env env (Evd.from_env env) evalc)
+    (pr_econstr_env env (Evd.from_env env) (EConstr.of_constr tt))
+
+}
+
+VERNAC COMMAND EXTEND DumpGrayMap CLASSIFIED AS QUERY
+| [ "DumpGrayMap" global(a) ] -> { eval_and_dump_pgm a }
+END
+
