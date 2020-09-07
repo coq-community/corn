@@ -379,19 +379,4 @@ Proof.
  apply InfiniteAlternatingSum_nonneg.
 Qed.
 
-(*
-CoFixpoint stream_sum (x : Stream CR) (y : CR) : Stream CR
-  := match x with
-     | Cons s xx => (Cons (s+y) (stream_sum xx (s+y)))%CR
-     end.
-
-Lemma InfiniteAlternatingSum_correct (seq : Stream Q) (x : Stream CR)
- {dnn : DecreasingNonNegative seq} {zl : @Limit Q_as_MetricSpace seq 0} :
-  (forall n:nat, ' (((-(1))^Z.of_nat n)*Str_nth n seq)%Q = Str_nth n x)
-  -> Limit (stream_sum x 0%CR) (InfiniteAlternatingSum seq).
-Proof.
-  intros H e. unfold equiv in H.
-Admitted.
-*)
-
 End InfiniteAlternatingSum.
