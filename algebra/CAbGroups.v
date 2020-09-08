@@ -189,7 +189,7 @@ will allow us to go directly from a setoid to an abelian group.
 
 We start from a setoid S with an element [unit], a
 commutative and associative binary operation [plus] which
-is strongly extensional in its first argument and admits [unit]
+is strongly extensional in its first argument and has [unit]
 as a left unit, and a unary setoid
 function [inv] which inverts elements respective to [plus].
 *)

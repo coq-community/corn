@@ -30,7 +30,7 @@ Proof.
   rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
   rewrite associativity.
   apply sg_op_proper.
-   rewrite 2!preserves_powers_help. 
+  - rewrite 2!preserves_powers_help. 
    rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
    rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
    rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
@@ -38,17 +38,20 @@ Proof.
    rewrite 2!int_pow_mult. 
    rewrite 2!int_pow_recip.
    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
-   assert (PropHolds ('den ≠ (0:Q))). 
-    apply rings.injective_ne_0.
-    apply orders.lt_ne_flip.
-    now apply orders.le_lt_trans with num.
-   field_simplify.  admit. (* reflexivity.
-    solve_propholds.*) 
-   split; solve_propholds.
-  rewrite 2!Str_nth_everyOther.
-  rewrite Str_nth_Qrecip_positives'.
-  now rewrite preserves_positives.
-Admitted.
+   rewrite <- (Qmult_assoc ('num)).
+   rewrite <- (Qmult_assoc ('num)).
+   apply (Qmult_comp ('num)). reflexivity.
+   rewrite Qmult_comm.
+   rewrite <- Qmult_assoc.
+   apply (Qmult_comp ((' num ^ ' 2) ^ ' n)).
+   reflexivity.
+   rewrite Qmult_comm.
+   symmetry.
+   apply Qinv_mult_distr.
+  - rewrite 2!Str_nth_everyOther.
+    rewrite Str_nth_Qrecip_positives'.
+    now rewrite preserves_positives.
+Qed.
 
 Lemma AQarctan_small_pos_Qprf : 0 ≤ ('num / 'den : Q) < 1.
 Proof.
