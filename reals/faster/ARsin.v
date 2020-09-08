@@ -31,26 +31,36 @@ Proof.
   rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
   rewrite associativity.
   apply sg_op_proper.
-   rewrite 2!preserves_powers_help.
-   rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
-   rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
-   rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
-   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
-   rewrite 2!int_pow_mult. 
-   rewrite 2!int_pow_recip.
-   change (Qdiv ('num) ('den)) with ('num / 'den : Q).
-   destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, rings.mult_0_l, dec_recip_0. admit. (* ring.*)
-   assert (PropHolds ('den ≠ (0:Q))) by assumption. 
-   field_simplify. admit. (*reflexivity. solve_propholds.*)
-   split; solve_propholds.
-  rewrite 2!Str_nth_everyOther.
-  change (@tl AQ) with (@Str_nth_tl AQ 1).
-  change (@tl Q) with (@Str_nth_tl Q 1).
-  rewrite ?Str_nth_plus.
-  rewrite Str_nth_Qrecip_factorials'.
-  now rewrite preserves_factorials.
-Admitted.
+  - rewrite 2!preserves_powers_help.
+    rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
+    rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
+    rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
+    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
+    rewrite 2!int_pow_mult. 
+    rewrite 2!int_pow_recip.
+    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
+    destruct (decide ('den = (0:Q))) as [Pden | Pden].
+    + rewrite ?Pden, rings.mult_0_l, dec_recip_0.
+      rewrite Qmult_0_r, Qmult_0_l.
+      unfold dec_recip, stdlib_rationals.Q_recip.
+      unfold Qinv. simpl. rewrite Qmult_0_r. reflexivity.
+    + rewrite <- (Qmult_assoc ('num)).
+      rewrite <- (Qmult_assoc ('num)).
+      apply (Qmult_comp ('num)). reflexivity.
+      rewrite Qmult_comm.
+      rewrite <- Qmult_assoc.
+      apply (Qmult_comp ((' num ^ ' 2) ^ ' n)).
+      reflexivity.
+      rewrite Qmult_comm.
+      symmetry.
+      apply Qinv_mult_distr.
+  - rewrite 2!Str_nth_everyOther.
+    change (@tl AQ) with (@Str_nth_tl AQ 1).
+    change (@tl Q) with (@Str_nth_tl Q 1).
+    rewrite ?Str_nth_plus.
+    rewrite Str_nth_Qrecip_factorials'.
+    now rewrite preserves_factorials.
+Qed.
 
 Lemma AQsin_small_pos_Qprf : 0 ≤ ('num / 'den : Q) ≤ 1.
 Proof.

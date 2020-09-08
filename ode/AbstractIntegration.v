@@ -686,17 +686,16 @@ Proof.
 induction n as [| n IH].
 + apply ball_0. change ((0 : CR) [=] - 0)%CR.
   apply CRopp_0. 
-+ apply ball_0. rewrite !cmΣ_succ.
++ apply ball_0.
+  transitivity ((- f) n [+] cmΣ n (- f)).
+  apply cmΣ_succ.
   apply ball_0 in IH.
   transitivity ( (- f) n [+] - cmΣ n f).
   apply ucFun2_wd. reflexivity. 
   exact IH. clear IH.
   change (- f n - cmΣ n f [=] - (f n + cmΣ n f))%CR.
-  apply (CRplus_eq_r (f n + cmΣ n f)%CR).
-  rewrite CRplus_opp.
-  rewrite (CRplus_comm (f n)), <- CRplus_assoc.
-  rewrite (CRplus_assoc (f n)).
-  rewrite CRplus_opp, CRplus_0_l. apply CRplus_opp.
+  rewrite CRopp_plus_distr.
+  reflexivity.
 Qed.
 
 Lemma cmΣ_const (n : nat) (m : CR) : cmΣ n (λ _, m) = m * '(n : Q).
@@ -1112,27 +1111,55 @@ Proof.
 Qed.
 
 Lemma int_abs_bound (a b M : Q) :
-  (forall x : Q, x ∈ (a, b) -> abs (f x) ≤ 'M) -> abs (int a b) ≤ '(abs (b - a) * M).
+  (forall x : Q, x ∈ (a, b) -> abs (f x) ≤ 'M)
+  -> abs (int a b) ≤ '(abs (b - a) * M).
 Proof.
-intros A. unfold int. Admitted. (*
-(* Looks like a type class regression, unfolded the tactic soup a bit. *)
-(* destruct (decide (a ≤ b)) as [AB | AB];
-[| pose proof (orders.le_flip _ _ AB); mc_setoid_replace (b - a) with (-(a - b)) by ring;
-   rewrite CRabs_negate, abs.abs_negate];
-rewrite abs.abs_nonneg.  
-2: apply rings.flip_nonneg_minus. 
-4: try (now apply rings.flip_nonneg_minus). 
-1: apply integral_abs_bound;trivial; +(* [Integrable f] is not discharged *)
-intros x A1; apply A.
-3: apply integral_abs_bound;trivial; +(* [Integrable f] is not discharged *)
-intros x A1; apply A.
-+ apply -> range_le; [| easy].
-  now mc_setoid_replace b with (a + (b - a)) by ring.
-+ apply Qrange_comm. apply -> range_le; [| easy].
-  now mc_setoid_replace a with (b + (a - b)) by ring.*)
-Qed. *)
-
-(* [SearchAbout (CRabs (- ?x)%CR)] does not find [CRabs_opp] *)
+  intros A. unfold int.
+  assert (0 <= (' M))%CR as Mpos.
+  { apply (@CRle_trans _ (abs (f a))).
+    apply CRabs_nonneg. apply (A a).
+    split. apply meet_lb_l.
+    apply join_ub_l. }
+  destruct (decide (a ≤ b)) as [AB | AB].
+  - assert (∀ x : Q, a ≤ x ≤ a + ` ((b - a) ↾ int_obligation_1 a b AB)
+                     → CRabs (f x) ≤ ' M).
+    { intros. apply A. split; simpl.
+      apply (Qle_trans _ a). apply meet_lb_l.
+      apply H0.
+      simpl in H0.
+      apply (Qle_trans _ b).
+      destruct H0.
+      ring_simplify in H1.
+      exact H1. apply join_ub_r. }
+    apply (CRle_trans (integral_abs_bound
+                         f a ((b - a) ↾ int_obligation_1 a b AB) M H0)).
+    simpl.
+    rewrite Qmult_comm, <- (Qmult_comm M).
+    rewrite <- CRmult_Qmult, <- CRmult_Qmult.
+    apply CRmult_le_compat_l. exact Mpos.
+    apply CRle_Qle.
+    apply Qle_Qabs.
+  - unfold abs, abs_sig, CR_abs, proj1_sig. rewrite CRabs_opp.
+    assert (∀ x : Q,
+          b ≤ x ≤ b + ` ((a - b) ↾ int_obligation_2 a b AB) → CRabs (f x) ≤ ' M).
+    { intros. apply A. split; simpl.
+      apply (Qle_trans _ b). apply meet_lb_r.
+      apply H0.
+      simpl in H0.
+      apply (Qle_trans _ a). 
+      destruct H0.
+      ring_simplify in H1.
+      exact H1. apply join_ub_l. }
+    apply (CRle_trans (integral_abs_bound
+                  f b ((a - b) ↾ int_obligation_2 a b AB) M H0)).
+    unfold proj1_sig, stdlib_rationals.Abs_instance_0.
+    rewrite Qmult_comm, <- (Qmult_comm M).
+    rewrite <- CRmult_Qmult, <- CRmult_Qmult.
+    apply CRmult_le_compat_l. exact Mpos.
+    apply CRle_Qle.
+    rewrite (Qabs_Qminus b a).
+    apply Qle_Qabs.
+Qed.
 
 End IntegralTotal.
 
@@ -1189,13 +1216,14 @@ assert (Nf <= n)%positive by (transitivity (Pos.max Nf Ng); apply Pos.le_max_l).
 assert (Ng <= n)%positive by (transitivity (Pos.max Nf Ng); [apply Pos.le_max_r | apply Pos.le_max_l]).
 assert (Ns <= n)%positive by apply Pos.le_max_r.
 apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (f + g) a (proj1_sig w) n)). 
-  change (Qeq ((e / (2#1)) + (e / (2#1)))  e)%Q. 
- (* regression connected in field numbers ? [field; discriminate | |].*) Admitted. (*
-* apply mspc_symm, S; assumption.
-* rewrite riemann_sum_plus.
+- unfold Qdiv. rewrite <- Qmult_plus_distr_r.
+  setoid_replace (/ 2 + / 2)%Q with 1%Q by reflexivity.
+  apply Qmult_1_r.
+- apply mspc_symm, S; assumption.
+- rewrite riemann_sum_plus.
   mc_setoid_replace (e / 2) with (e / 4 + e / 4) by (field; split; discriminate).
   now apply mspc_ball_CRplus; [apply F | apply G].
-Qed. *)
+Qed.
 
 Lemma integrate_negate (f : Q -> CR)
   `{!IsUniformlyContinuous f f_mu} (a : Q) (w : QnonNeg) : ∫ (- f) a w = - ∫ f a w.
@@ -1209,10 +1237,12 @@ set (n := Pos.max N1 N2).
 assert (N1 <= n)%positive by apply Pos.le_max_l.
 assert (N2 <= n)%positive by apply Pos.le_max_r.
 apply (mspc_triangle' (e / 2) (e / 2) (riemann_sum (- f) a (proj1_sig w) n)).
-(* regression connected to numbers ? [field; discriminate | |].*) Admitted. (*
-* now apply mspc_symm, F1.
-* rewrite riemann_sum_negate. now apply mspc_ball_CRnegate, F2.
-Qed. *)
+- unfold Qdiv. rewrite <- Qmult_plus_distr_r.
+  setoid_replace (/ 2 + / 2)%Q with 1%Q by reflexivity.
+  apply Qmult_1_r.
+- now apply mspc_symm, F1.
+- rewrite riemann_sum_negate. now apply mspc_ball_CRnegate, F2.
+Qed.
 
 Lemma int_plus (f g : Q -> CR)
       `{@IsUniformlyContinuous

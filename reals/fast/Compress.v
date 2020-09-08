@@ -34,8 +34,8 @@ Local Open Scope uc_scope.
 
 (**
 ** Compression
-Compress improves the compuation by reducing the size of the numerator
-and denominator of rational numbers.  It works by increasing the
+Compress improves the computation by reducing the size of the numerator
+and denominator of rational numbers. It works by increasing the
 requested precession, but then rounding the result to a value with a
 small numerator and denominator.
 

@@ -2,12 +2,11 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.Program.Program Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.reals.fast.Compress
+  Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
-  MathClasses.theory.int_pow MathClasses.theory.nat_pow
-  MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers.
+  CoRN.model.totalorder.QposMinMax.
 
-Instance Q_approx: AppApprox Q := λ x k, 
+Instance Q_approx: AppApprox Q := λ (x : Q) (k : Z), 
   match k with
   | Zneg p => approximateQ x (2 ^ p)
   | _ => x
@@ -34,14 +33,45 @@ Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 (pr
 Instance: AppRationals Q.
 Proof.
   split; try apply _.
-     repeat (split; try apply _).
-    (* regression in type_classes *) admit. admit. admit. admit. admit. admit.  
-    split; try apply _.  Admitted. (*intros.
-    apply ball_weak_le with (2 ^ Qdlog2 ε)%Qpos.
-     now apply (Qpos_dlog2_spec ε).
-    now apply Q_approx_correct.
-   intros. now apply Q_approx_correct.
-  intros. now apply Q_approx_correct.
-Qed. *)
+  - repeat split; try apply _.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. exact H.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. exact H.
+  - repeat split; try apply _.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. exact H.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. rewrite <- H0, <- H. exact H1.
+    + intros. rewrite H0, H. exact H1.
+    + intros. exact H.
+  - repeat split; try apply _.
+  - repeat split; try apply _.
+    + intros. exact H.
+    + intros.
+      unfold inject_Q_Q, Datatypes.id.
+      unfold app_inverse, inverse_Q_Q.
+      pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [H _].
+      refine (Qle_trans _ _ _ _ H).
+      apply Qopp_le_compat.
+      apply (Qpos_dlog2_spec ε).
+    + unfold inject_Q_Q, Datatypes.id.
+      unfold app_inverse, inverse_Q_Q.
+      pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [_ H].
+      apply (Qle_trans _ _ _ H).
+      apply (Qpos_dlog2_spec ε). 
+  - intros. apply Q_approx_correct.
+  - intros. apply Q_approx_correct.
+Qed.
 
 Notation ARQ := (AR (AQ:=Q)).
