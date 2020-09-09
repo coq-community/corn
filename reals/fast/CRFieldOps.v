@@ -1126,7 +1126,7 @@ Lemma CRmult_uncurry_eq_3 : forall (c:Qpos) (x y z : CR),
              (Cmap (ProductMS_prelength
                       (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
                       QPrelengthSpace)
-                   (uc_compose (Qmult_uncurry c) (uc_pair (Qmult_uncurry c) (uc_id Q_as_MetricSpace)))
+                   (uc_compose (Qmult_uncurry c) (together (Qmult_uncurry c) (uc_id Q_as_MetricSpace)))
                    (undistrib_Complete (undistrib_Complete (x,y), z))).
 Proof.
   intros. 
@@ -1231,7 +1231,7 @@ Lemma CRmult_uncurry_eq_3r : forall (c:Qpos) (x y z : CR),
                       (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
                       QPrelengthSpace)
                    (uc_compose (Qmult_uncurry c)
-                               (uc_compose (uc_pair (uc_id Q_as_MetricSpace) (Qmult_uncurry c)) (uc_assoc _ _ _)))
+                               (uc_compose (together (uc_id Q_as_MetricSpace) (Qmult_uncurry c)) (uc_assoc _ _ _)))
                    (undistrib_Complete (undistrib_Complete (x,y), z))).
 Proof.
   intros. 
