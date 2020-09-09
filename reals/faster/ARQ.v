@@ -32,46 +32,27 @@ Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 (pr
 
 Instance: AppRationals Q.
 Proof.
-  split; try apply _.
-  - repeat split; try apply _.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. exact H.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. exact H.
-  - repeat split; try apply _.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. exact H.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. rewrite <- H0, <- H. exact H1.
-    + intros. rewrite H0, H. exact H1.
-    + intros. exact H.
-  - repeat split; try apply _.
-  - repeat split; try apply _.
-    + intros. exact H.
-    + intros.
-      unfold inject_Q_Q, Datatypes.id.
-      unfold app_inverse, inverse_Q_Q.
-      pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [H _].
-      refine (Qle_trans _ _ _ _ H).
-      apply Qopp_le_compat.
-      apply (Qpos_dlog2_spec ε).
-    + unfold inject_Q_Q, Datatypes.id.
-      unfold app_inverse, inverse_Q_Q.
-      pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [_ H].
-      apply (Qle_trans _ _ _ H).
-      apply (Qpos_dlog2_spec ε). 
+  repeat (split; try apply _).
+  intros; assumption.
+  intros; assumption.
+  intros; assumption.
+  intros; assumption.
+  intros; assumption.
+  - unfold inject_Q_Q, Datatypes.id.
+    unfold app_inverse, inverse_Q_Q.
+    pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [H _].
+    refine (Qle_trans _ _ _ _ H).
+    apply Qopp_le_compat.
+    apply (Qpos_dlog2_spec ε).
+  - unfold inject_Q_Q, Datatypes.id.
+    unfold app_inverse, inverse_Q_Q.
+    pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [_ H].
+    apply (Qle_trans _ _ _ H).
+    apply (Qpos_dlog2_spec ε). 
   - intros. apply Q_approx_correct.
   - intros. apply Q_approx_correct.
+  - apply Q_approx_correct.
+  - apply Q_approx_correct.
 Qed.
 
 Notation ARQ := (AR (AQ:=Q)).

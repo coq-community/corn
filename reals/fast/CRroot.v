@@ -967,6 +967,60 @@ Qed.
 Hint Rewrite CRsqrt_correct : IRtoCR.
 (* end hide *)
 
+Lemma CRsqrt_sqr : forall (x : CR),
+    (0 <= x -> CRsqrt x * CRsqrt x = x)%CR.
+Proof.
+  intros x xpos.
+  rewrite <- (CRasIRasCR_id x).
+  assert ([0] [<=] CRasIR x).
+  { apply IR_leEq_as_CR.
+    rewrite CRasIRasCR_id, IR_Zero_as_CR.
+    exact xpos. }
+  rewrite <- (CRsqrt_correct (CRasIR x) H).
+  rewrite <- IR_mult_as_CR.
+  apply IRasCR_wd.
+  setoid_replace (sqrt (CRasIR x) H [*] sqrt (CRasIR x) H)
+    with (sqrt (CRasIR x) H [^] 2).
+  exact (sqrt_sqr (CRasIR x) H).
+  simpl.
+  destruct (cr_proof IR), ax_mult_mon.
+  rewrite lunit. reflexivity.
+Qed.
+
+Lemma CRsqrt_mult : forall x y,
+    (0 <= x -> 0 <= y -> CRsqrt (x*y) = CRsqrt x * CRsqrt y)%CR.
+Proof.
+  intros x y xpos ypos.
+  assert (0 <= x*y)%CR.
+  { apply CRmult_le_0_compat; assumption. }
+  rewrite <- (CRasIRasCR_id (x*y)%CR). 
+  rewrite <- (CRasIRasCR_id x) at 2.
+  rewrite <- (CRasIRasCR_id y) at 2.
+  rewrite <- (CRasIRasCR_id x), <- IR_Zero_as_CR in xpos.
+  apply IR_leEq_as_CR in xpos.
+  rewrite <- (CRasIRasCR_id y), <- IR_Zero_as_CR in ypos.
+  apply IR_leEq_as_CR in ypos.
+  rewrite <- (CRsqrt_correct (CRasIR x) xpos).
+  rewrite <- (CRsqrt_correct (CRasIR y) ypos).
+  rewrite <- IR_mult_as_CR.
+  rewrite <- (CRasIRasCR_id (x*y)%CR), <- IR_Zero_as_CR in H.
+  pose proof (IR_leEq_as_CR [0] (CRasIR (x*y)%CR)) as [_ H0].
+  rewrite <- (CRsqrt_correct _ (H0 H)).
+  apply IRasCR_wd.
+  assert ([0] [<=] CRasIR x [*] CRasIR y).
+  { apply IR_leEq_as_CR.
+    rewrite IR_mult_as_CR.
+    rewrite CRasIRasCR_id, CRasIRasCR_id.
+    rewrite CRasIRasCR_id in H. exact H. }
+  rewrite <- (sqrt_mult _ _ _ _ H1).
+  apply sqrt_wd.
+  apply IR_eq_as_CR.
+  rewrite IR_mult_as_CR.
+  rewrite CRasIRasCR_id, CRasIRasCR_id, CRasIRasCR_id.
+  reflexivity.
+Qed.
+
+
 Lemma CRsqrt_Qsqrt : forall x : Q, (CRsqrt ('x) == rational_sqrt x)%CR.
 Proof.
  intros x.

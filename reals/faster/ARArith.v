@@ -215,7 +215,7 @@ Qed.
 Hint Rewrite ARtoCR_preserves_mult : ARtoCR.
 
 (* The approximate reals form a ring *)
-Instance: Ring AR.
+Instance ARring: Ring AR.
 Proof.
   apply (rings.projected_ring (cast AR CR)).
       exact ARtoCR_preserves_plus.
@@ -249,6 +249,49 @@ Qed.
 
 Add Ring CR : (rings.stdlib_ring_theory CR).
 Add Ring AR : (rings.stdlib_ring_theory AR).
+
+Lemma ARplus_comm : forall x y : AR, x + y = y + x.
+Proof.
+  intros x y. destruct ARring, ring_group.
+  apply abgroup_commutative.
+Qed. 
+
+Lemma ARplus_assoc : forall u v w : AR,
+    (u + v) + w = u + (v + w).
+Proof.
+  intros u v w. destruct ARring, ring_group.
+  destruct abgroup_group, group_monoid, monoid_semigroup.
+  symmetry. apply (sg_ass u v w).
+Qed.
+
+Lemma ARmult_comm : forall x y : AR, x * y = y * x.
+Proof.
+  intros x y. destruct ARring, ring_monoid.
+  apply commonoid_commutative.
+Qed.
+
+Lemma ARmult_assoc : forall u v w : AR,
+    (u * v) * w = u * (v * w).
+Proof.
+  intros u v w. destruct ARring, ring_monoid.
+  destruct commonoid_mon, monoid_semigroup.
+  symmetry. apply (sg_ass u v w).
+Qed.
+
+Lemma ARmult_1_l : forall x : AR, 1 * x = x.
+Proof.
+  intro x. destruct ARring, ring_monoid.
+  destruct commonoid_mon.
+  apply (monoid_left_id x).
+Qed. 
+
+Lemma ARmult_1_r : forall x : AR, x * 1 = x.
+Proof.
+  intro x. destruct ARring, ring_monoid.
+  destruct commonoid_mon.
+  apply (monoid_right_id x).
+Qed. 
+  
 
 (* Non strict order *) 
 Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, -cast Qpos Q ε ≤ cast AQ Q (approximate x ε).

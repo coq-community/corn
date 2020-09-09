@@ -457,4 +457,42 @@ Definition ARsqrt := Cbind AQPrelengthSpace ARsqrt_uc.
 
 Lemma ARtoCR_preserves_sqrt (x : AR) : 'ARsqrt x = CRsqrt ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
+
+Lemma ARsqrt_correct : forall (x : AR),
+    ARle 0 x -> ARsqrt x * ARsqrt x = x.
+Proof.
+  intros x xpos.
+  apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
+  change (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace) x)
+    with ('x).
+  change (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace) (ARsqrt x * ARsqrt x))
+    with ('(ARsqrt x * ARsqrt x)).
+  rewrite (ARtoCR_preserves_mult (ARsqrt x) (ARsqrt x)).
+  rewrite ARtoCR_preserves_sqrt.
+  apply CRsqrt_sqr.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le 0 x), xpos.
+Qed.
+
+Lemma ARsqrt_mult : forall (x y : AR),
+    ARle 0 x -> ARle 0 y -> ARsqrt (x*y) = ARsqrt x * ARsqrt y.
+Proof.
+  intros.
+  apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
+  change (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace) (ARsqrt (x*y)))
+    with ('(ARsqrt (x*y))).
+  change (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace) (ARsqrt x * ARsqrt y))
+    with ('(ARsqrt x * ARsqrt y)).
+  rewrite (ARtoCR_preserves_mult (ARsqrt x) (ARsqrt y)).
+  rewrite ARtoCR_preserves_sqrt.
+  rewrite ARtoCR_preserves_sqrt.
+  rewrite ARtoCR_preserves_sqrt.
+  rewrite <- CRsqrt_mult.
+  rewrite ARtoCR_preserves_mult. reflexivity.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le 0 x), H5.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le 0 y), H6.
+Qed.
+
 End ARsqrt.

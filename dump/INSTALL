@@ -7,3 +7,4 @@ from a Coq file where you have rasters to export.
 The vernac command defined by the plugin is DumpGrayMap, which takes
 as argument the name of a global definition of a raster. It exports
 the raster in file plot.pgm, which it will place in the current directory.
+See module CoRN.examples.Circle.

@@ -315,7 +315,7 @@ Proof.
     unfold CRpower_N_bounded.
     transitivity (Cmap QPrelengthSpace 
                        (uc_compose (Qmult_uncurry b)
-                                   (uc_compose (uc_pair (Qpower_N_uc (N.pos n) c)
+                                   (uc_compose (together (Qpower_N_uc (N.pos n) c)
                                                         (uc_id Q_as_MetricSpace))
                                                (diag Q_as_MetricSpace)))
                        x).

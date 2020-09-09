@@ -2,6 +2,8 @@ Makefile.bak
 Make
 Makefile
 Makefile.conf
+Makefile.coq
+Makefile.coq.conf
 *.vo
 *.vok
 *.vos
@@ -32,9 +34,11 @@ deps.pdf
 *.cmo
 *.cmx
 *.cmxs
+*.cmxa
 *.byte
 *.ml.d
 *.o
+*.a
 plot.pgm
 coqdoc
 *.native

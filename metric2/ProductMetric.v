@@ -358,33 +358,6 @@ Proof.
   - simpl. destruct H, H. split; assumption.
 Defined.
 
-Lemma uc_pair_prf : 
-  forall (A B C D : MetricSpace)
-    (f : A --> B) (g : C --> D), 
-    @is_UniformlyContinuousFunction
-      (ProductMS A C) (ProductMS B D)
-      (λ ac : ProductMS A C, (f (fst ac), g (snd ac)))
-      (λ e : Qpos, QposInf_min (mu f e) (mu g e)).
-Proof.
-  intros. intros e x y H. split.
-  - simpl. apply (uc_prf f).
-    destruct (mu f e). 2: reflexivity. 
-    apply (ball_ex_weak_le _ (QposInf_min q (mu g e))).
-    simpl. destruct (mu g e). apply Qpos_min_lb_l.
-    apply Qle_refl. simpl. destruct (mu g e).
-    apply H. apply H.
-  - simpl. apply (uc_prf g).
-    destruct (mu g e). 2: reflexivity. 
-    apply (ball_ex_weak_le _ (QposInf_min (mu f e) q)).
-    destruct (mu f e). simpl. apply Qpos_min_lb_r.
-    apply Qle_refl. destruct (mu f e).
-    apply H. apply H.
-Qed.
-
-Definition uc_pair (A B C D : MetricSpace)
-           (f : A --> B) (g : C --> D) : ProductMS A C --> ProductMS B D
-  := Build_UniformlyContinuousFunction (uc_pair_prf f g).
-  
 Definition uc_complete_curry {X Y Z : MetricSpace}
            (f : Complete (ProductMS X Y) --> Z)
   : Complete X --> Complete Y --> Z

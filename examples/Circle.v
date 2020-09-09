@@ -1,47 +1,23 @@
-Require Import Plot RasterQ Qmetric.
 (** Plotting graphs in the plane *)
 (* This file is based on examples/Plot.v *)
 (* I define the image of a path, a [Compact] subset of the plane.*)
 (* Finally, plot a hi-res Circle*)
 
-Notation Q:=Q_as_MetricSpace.
-Notation R2:=(Complete Q2).
-
-(* Should be moved *)
-Lemma stableComplete(X:MetricSpace):stableMetric X -> stableMetric (Complete X).
-Proof.
-unfold stableMetric. simpl. unfold regFunBall. intuition.
-Qed.
-
-Definition stableR2:=(stableComplete Q2 stableQ2).
-
-Local Open Scope uc_scope.
-
+Require Import Plot RasterQ Qmetric.
 Require Import metric2.Classified.
-
-
-(* Should be moved *)
-Section diag.
-Variable X:MetricSpace.
-Definition diag_raw:X->(ProductMS X X):=fun x=>(x,x).
-Lemma diag_uc:(is_UniformlyContinuousFunction diag_raw (fun e => e)%Qpos).
-Proof.
-unfold diag_raw, is_UniformlyContinuousFunction. simpl. unfold prod_ball. intuition.
-Qed.
-Definition diag:X-->(ProductMS X X):=Build_UniformlyContinuousFunction diag_uc.
-End diag.
-
 Require Import Interval.
+
 Local Open Scope uc_scope.
 
 Section PathImage.
-Variable path:Q-->R2.
-Variable CompleteMult:(Complete R2 -->R2).
+Variable path:Q_as_MetricSpace --> Complete Q2.
+Variable CompleteMult:(Complete (Complete Q2) --> (Complete Q2)).
 Variable (l r:Q).
 Hypothesis Hlr : l < r.
 (** The image of a path as a [Compact] subset of the plane.*)
-Definition PathImage:=(CompactImage (1#1)%Qpos stableR2 plFEQ path
-(CompactIntervalQ (Qlt_le_weak _ _ Hlr))).
+Definition PathImage : Compact (Complete Q2)
+  := CompactImage (1#1)%Qpos plFEQ path
+                  (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
 End PathImage.
 
 Section PlotPath.
@@ -56,59 +32,61 @@ Hypothesis Hbt : b < t.
 
 Variable n m : nat.
 
-Let w := proj1_sigT _ _ (Qpos_lt_plus Hlr).
-Let h := proj1_sigT _ _ (Qpos_lt_plus Hbt).
+Let w := r - l.
+Let h := t - b.
+
+Lemma wpos : 0 < w.
+Proof.
+  apply Qlt_minus_iff in Hlr. exact Hlr.
+Qed.
+
+Lemma hpos : 0 < h.
+Proof.
+  apply Qlt_minus_iff in Hbt. exact Hbt.
+Qed.
 
 (**
 Half the error in the Plot example, since we need to approximate twice.
 *)
-Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * w)
- ((1 # 8 * P_of_succ_nat (pred m)) * h).
+Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
+                    ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
 
-Variable path:Q-->R2.
+Variable path:Q_as_MetricSpace --> Complete Q2.
 (** The actual plot function *)
-Definition PlotPath := (n, m, 2, (RasterizeQ2 
+Definition PlotPath : nat * nat * Q * raster n m
+  := (n, m, 2, (RasterizeQ2 
 (approximate 
-(FinCompact stableQ2 stableR2 (approximate (PathImage path from to Hfromto) err))
+(FinCompact Q2 (approximate (PathImage path from to Hfromto) err))
 err) n m t l b r )).
 End PlotPath.
 
 Section PlotCirclePath.
 Require Import CRtrans.
-Require Import Vector.
-Export Vector.VectorNotations.
 
-Definition CircleFunction_aux:=(together cos_uc sin_uc).
+(* TODO faster reals instead of fast reals. *)
+Definition CircleFunction_aux
+  : ProductMS Q_as_MetricSpace Q_as_MetricSpace --> ProductMS CR CR
+  := together cos_uc sin_uc.
 
-Definition CirclePath:Q --> R2:= 
-  (Couple ∘ CircleFunction_aux ∘ (diag Q)).
+Definition CirclePath:Q_as_MetricSpace --> Complete Q2:= 
+  (Couple ∘ CircleFunction_aux ∘ (diag Q_as_MetricSpace)).
 (* The following hangs:
 Definition CirclePath': UCFunction Q R2:= 
   ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
 
 Notation star := (@refl_equal _ Lt).
-Notation "∗" := star.
 Local Open Scope raster.
 
-Notation "'Vcons'" := Vector.cons.
-Notation "'Vnil'" := Vector.nil.
-Notation "#  a b" := (Vcons (Vector.t bool _) a _ b)
-  (at level 0, a, b at level 0) : raster.
+(* 9 seconds :-( *)
+(* The raster must be evaluated before being plotted by DumpGrayMap,
+   here with vm_compute. *)
+Definition Circle : raster _ _
+  := Eval vm_compute in
+      (let (_,r) := PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 100 100 CirclePath
+      in r). 
 
-Notation "'#' a" := (Vcons (Vector.t bool _) a _ (Vnil _))
-  (at level 0, a, b at level 0) : raster.
-
-Notation "0 # a" := (Vcons bool true _ a) (at level 0, right associativity) : raster.
-Notation " # " := (Vnil bool) (at level 0, right associativity) : raster.
-Notation "1 # a" := (Vcons bool false _ a) (at level 0, right associativity) : raster.
-(*
-Notation "░ a" := (Vcons bool false _ a) (at level 0, right associativity, only parsing) : raster_parsing.
-*)
-
-Definition Circle:=Eval vm_compute in  (PlotPath 0 7 star (-(1)) 1 star (-(1)) 1 star 40 40 CirclePath).
-Add ML Path "dump".
-Declare ML Module "dump".
-Dump Circle.
+Require Import CoRN.dump.theories.Loader.
+DumpGrayMap Circle.
 (* Now have a look at plot.pgm *)
 End PlotCirclePath.
 
