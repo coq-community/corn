@@ -99,7 +99,8 @@ Lemma inject_Q_AR_plus_nlt : ∀ q r : Q,
     ∧ (ARltS (ARplus (inject_Q_AR q) (inject_Q_AR r)) (inject_Q_AR (q + r)) → False).
 Proof.
   intros. rewrite <- AReq_nlt.
-  apply inject_Q_AR_plus.
+  pose proof (inject_Q_AR_plus q r).
+  simpl in H5. simpl. exact H5.
 Qed.
 
 Lemma inject_Q_AR_mult_nlt : ∀ q r : Q,
@@ -107,7 +108,8 @@ Lemma inject_Q_AR_mult_nlt : ∀ q r : Q,
     ∧ (ARltS (ARmult (inject_Q_AR q) (inject_Q_AR r)) (inject_Q_AR (q * r)) → False).
 Proof.
   intros. rewrite <- AReq_nlt.
-  apply inject_Q_AR_mult.
+  pose proof (inject_Q_AR_mult q r).
+  simpl in H5. exact H5.
 Qed.
 
 Lemma AR_zero : st_eq (inject_Q_AR 0) (cast AQ AR zero0).

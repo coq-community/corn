@@ -673,6 +673,9 @@ Proof. intros. ring. Qed.
 Lemma CRplus_0_r (x: CR): (x + 0 == x)%CR.
 Proof. intros. ring. Qed.
 
+Lemma CRmult_0_r (x: CR): (x * 0 == 0)%CR.
+Proof. intros. ring. Qed.
+
 Lemma CRopp_plus_distr : forall (r1 r2 : CR),
     - (r1 + r2) == - r1 + - r2.
 Proof. intros. ring. Qed.
@@ -1660,6 +1663,22 @@ Proof.
   right. now apply CR_lt_ltT.
 Qed.
 
+Lemma CReq_not_apart : forall x y : CR,
+    st_eq x y <-> (CRapartT x y -> False).
+Proof.
+  split.
+  - intros. destruct H0.
+    revert c. apply CRle_not_lt.
+    rewrite H. apply CRle_refl.
+    revert c. apply CRle_not_lt.
+    rewrite H. apply CRle_refl.
+  - intros. apply CRle_antisym. split.
+    apply CRle_not_lt. intro abs.
+    contradict H. right. exact abs.
+    apply CRle_not_lt. intro abs.
+    contradict H. left. exact abs.
+Qed.
+
 Instance: StrongSetoid CR.
 Proof.
   split.
@@ -2082,6 +2101,96 @@ Proof.
     assert (b + (c - b) == c)%CR by ring.
     assert (b + 0 == b)%CR by ring.
     apply (CRltT_wd H3 H2) in H1. apply CR_lt_ltT, H1. 
+Qed.
+
+Lemma CRmult_le_0_reg_l : forall a b : CR,
+    ~((0 < a)%CR -> False) -> (0 <= a * b)%CR -> (0 <= b)%CR.
+Proof.
+  intros.
+  apply CRle_not_lt. intro abs.
+  contradict H; intro H.
+  rewrite <- CRopp_0 in H0.
+  setoid_replace (a*b)%CR with (-(a*-b))%CR in H0 by (unfold equiv; ring).
+  apply CRopp_le_cancel in H0.
+  pose proof (CRle_not_lt (a*-b)%CR 0%CR) as [H1 _].
+  specialize (H1 H0). contradict H1. clear H0.
+  apply CRmult_lt_0_compat.
+  exact H.
+  apply (CRltT_wd CRopp_0 (reflexivity _)).
+  apply CRopp_lt_compat, abs.
+Qed.
+
+Lemma CRmult_eq_0_reg_l : forall x y : CR,
+    (~st_eq y 0%CR)
+    -> st_eq (x*y)%CR 0%CR
+    -> st_eq x 0%CR.
+Proof.
+  intros. apply Metric_eq_stable.
+  intros abs.
+  rewrite CReq_not_apart in abs.
+  contradict abs; intro xap0.
+  rewrite CReq_not_apart in H.
+  contradict H; intro yap0.
+  pose proof CRopp_0 as opp0.
+  symmetry in opp0.
+  destruct xap0.
+  - pose proof (CRopp_opp x).
+    symmetry in H.
+    apply (CRltT_wd H opp0) in c. clear H.
+    apply CRopp_lt_cancel in c.
+    destruct yap0.
+    + pose proof (CRopp_opp y).
+      symmetry in H.
+      apply (CRltT_wd H opp0) in c0. clear H.
+      apply CRopp_lt_cancel in c0.
+      pose proof (CRmult_lt_0_compat _ _ c c0) as H.
+      revert H.
+      apply CRle_not_lt.
+      setoid_replace (-x*-y)%CR with (x*y)%CR by (unfold equiv; ring).
+      rewrite H0. apply CRle_refl.
+    + pose proof (CRmult_lt_0_compat _ _ c c0) as H.
+      revert H.
+      apply CRle_not_lt.
+      rewrite opp0.
+      setoid_replace (-x*y)%CR with (-(x*y))%CR by (unfold equiv; ring).
+      apply CRopp_le_compat.
+      rewrite H0. apply CRle_refl.
+  - destruct yap0.
+    + pose proof (CRopp_opp y).
+      symmetry in H.
+      apply (CRltT_wd H opp0) in c0. clear H.
+      apply CRopp_lt_cancel in c0.
+      pose proof (CRmult_lt_0_compat _ _ c c0) as H.
+      revert H.
+      apply CRle_not_lt.
+      setoid_replace (x*-y)%CR with (-(x*y))%CR by (unfold equiv; ring).
+      rewrite H0, <- opp0. apply CRle_refl. 
+    + pose proof (CRmult_lt_0_compat _ _ c c0) as H.
+      revert H.
+      apply CRle_not_lt.
+      rewrite H0. apply CRle_refl. 
+Qed.
+
+Lemma CRsquare_pos : forall x : CR, (0 <= x*x)%CR.
+Proof.
+  (* Goal is a negation, use excluded middle x is positive or not. *)
+  intros x. 
+  apply CRle_not_lt. intro abs.
+  assert (~(0 <= x)%CR) as H.
+  { intro J. revert abs.
+    apply CRle_not_lt. 
+    exact (CRmult_le_0_compat x x J J). }
+  contradict H. apply CRle_not_lt.
+  intro H.
+  revert abs.
+  apply CRle_not_lt. 
+  apply CRlt_le_weak in H.
+  setoid_replace (x*x)%CR with (-x*-x)%CR by (unfold equiv; ring).
+  apply CRmult_le_0_compat.
+  rewrite <- CRopp_0.
+  apply CRopp_le_compat, H.
+  rewrite <- CRopp_0.
+  apply CRopp_le_compat, H.
 Qed.
 
 

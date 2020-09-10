@@ -126,5 +126,46 @@ Proof.
     exact H6. exact H7. 
 Qed. 
 
+Lemma ARle_abs : forall x:AR, ARle x (ARabs x).
+Proof.
+  intro x. apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_abs.
+  apply CRle_abs.
+Qed.
+
+Lemma ARabs_opp : forall x:AR, ARabs (-x) = ARabs x.
+Proof.
+  intro x.
+  apply (injective ARtoCR).
+  pose proof (ARtoCR_preserves_abs (-x)).
+  unfold cast in H5. rewrite H5. clear H5.
+  pose proof (ARtoCR_preserves_abs x).
+  unfold cast in H5. rewrite H5.
+  rewrite (ARtoCR_preserves_opp x).
+  apply CRabs_opp.
+Qed.
+
+Lemma ARabs_pos : forall x:AR, ARle 0 x -> ARabs x = x.
+Proof.
+  intros x xpos.
+  apply (injective ARtoCR).
+  pose proof (ARtoCR_preserves_abs x).
+  unfold cast in H5. rewrite H5. clear H5.
+  apply CRabs_pos.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le AR0 x), xpos.
+Qed.
+
+Lemma ARabs_neg : forall x:AR, ARle x 0 -> ARabs x = -x.
+Proof.
+  intros x xneg.
+  apply (injective ARtoCR).
+  pose proof (ARtoCR_preserves_abs x).
+  unfold cast in H5. rewrite H5. clear H5.
+  rewrite CRabs_neg.
+  symmetry. apply ARtoCR_preserves_opp.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le x AR0), xneg.
+Qed.
 
 End ARabs.

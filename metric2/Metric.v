@@ -188,6 +188,17 @@ Proof.
   exact (ball_triangle e d x z y H0 abs).
 Qed.
 
+Lemma Metric_eq_stable : forall (x y : X),
+    ~~(st_eq x y) -> st_eq x y.
+Proof.
+  intros. apply (msp_eq (msp X)).
+  intros. apply (msp_stable (msp X)). 
+  intros H7. contradict H; intro H.
+  contradict H7. rewrite H.
+  apply ball_refl, Qlt_le_weak, H0.
+Qed.
+
+
 End Metric_Space.
 (* begin hide *)
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
