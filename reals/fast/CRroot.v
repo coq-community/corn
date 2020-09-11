@@ -569,7 +569,7 @@ Qed.
 
 (** By scaling the input the range of square root can be extened upto 4^n.
 *)
-Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) : CR.
+Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) { struct n } : CR.
  revert a Ha.
  destruct n as [|n].
   intros _ _.
@@ -987,39 +987,215 @@ Proof.
   rewrite lunit. reflexivity.
 Qed.
 
+Lemma CRsquare_nonneg_cancel : forall x y : CR,
+    (0 <= x)%CR -> (0 <= y)%CR -> st_eq (x*x)%CR (y*y)%CR -> st_eq x y.
+Proof.
+  intros.
+  assert (st_eq ((x-y)*(x+y))%CR 0%CR).
+  { rewrite (CRplus_eq_l (y*y)%CR).
+    ring_simplify. exact H1. }
+  apply Metric_eq_stable.
+  intro abs.
+  apply CRmult_eq_0_reg_l in H2.
+  contradict abs.
+  rewrite (CRplus_eq_l (-y)%CR x y).
+  rewrite CRplus_opp.
+  exact H2.
+  intro H3.
+  assert (st_eq x 0%CR).
+  { apply CRle_antisym. split.
+    2: exact H.
+    rewrite <- CRplus_0_r.
+    apply (@CRle_trans _ (x+y)%CR).
+    apply CRplus_le_l. exact H0.
+    rewrite H3. apply CRle_refl. }
+  rewrite H4, CRplus_0_l in H3.
+  contradict abs.
+  rewrite H3, H4. reflexivity.
+Qed.
+
+Lemma root_loop_nonneg : forall (n:nat) q (e:Qpos) (b:Q) (err:positive),
+    0 <= b -> 0 <= q -> 0 <= root_loop q e n b err.
+Proof.
+  induction n.
+  - intros. exact H.
+  - intros. simpl.
+    destruct (Qlt_le_dec_fast (`e) (1#err)).
+    2: exact H.
+    apply IHn. 2: exact H0.
+    destruct b as [b a].
+    unfold Qle in H; simpl in H. rewrite Z.mul_1_r in H.
+    destruct q as [q c].
+    unfold Qle in H0; simpl in H0. rewrite Z.mul_1_r in H0.
+    unfold Qle, Qnum, Qden.
+    rewrite Z.mul_0_l, Z.mul_1_r.
+    rewrite Z.mul_1_r.
+    apply Z_div_pos. reflexivity.
+    apply Z.mul_nonneg_nonneg.
+    2: discriminate.
+    apply Z.add_nonneg_nonneg.
+    apply Z.mul_nonneg_nonneg. apply H.
+    discriminate.
+    apply Z.mul_nonneg_nonneg. 
+    apply Z.mul_nonneg_nonneg. exact H0.
+    2: discriminate.
+    unfold Qinv, Qmult. simpl.
+    destruct b. discriminate.
+    discriminate. exfalso.
+    apply (Zle_not_lt _ _ H). reflexivity.
+Qed.
+
+Lemma sqrt_raw_nonneg :
+  forall a e, 0 <= a -> 0 <= sqrt_raw a e.
+Proof.
+  intros. destruct e. 2: discriminate.
+  simpl. destruct (Qlt_le_dec_fast (`q) (1#2)).
+  apply root_loop_nonneg. 
+  rewrite Z.mul_1_r, Z.mul_1_r.
+  destruct a as [a b]; simpl.
+  destruct a.
+  - simpl. unfold Qle; simpl.
+    rewrite Z.mul_1_r.
+    apply Z.div_pos. discriminate.
+    reflexivity.
+  - simpl.
+    unfold Qle, Qnum, Qden. 
+    rewrite Z.mul_0_l, Z.mul_1_r.
+    apply Z.div_pos. 2: reflexivity.
+    discriminate.
+  - exfalso. 
+    unfold Qle in H; simpl in H.
+    apply (Zle_not_lt _ _ H). reflexivity.
+  - exact H.
+  - unfold initial_root.
+    apply Qmult_le_0_compat. discriminate.
+    apply (Qle_trans _ (0+1)).
+    discriminate. apply Qplus_le_l, H.
+Qed.
+    
+Lemma rational_sqrt_big_bounded_nonneg : forall n (a:Q) Ha e,
+    0 <= approximate (rational_sqrt_big_bounded n a Ha) e.
+Proof.
+  induction n.
+  - intros. discriminate.
+  - intros. simpl.
+    destruct (Qle_total a (4#1)).
+    + simpl. apply (sqrt_raw_nonneg a e).
+      destruct Ha. apply (Qle_trans _ 1).
+      discriminate. exact H.
+    + unfold Cmap_fun; simpl.
+      rewrite <- (Qmult_0_r (2#1)).
+      apply Qmult_le_l. reflexivity.
+      apply IHn.
+Qed.
+
+Lemma rational_sqrt_small_bounded_nonneg
+  : forall (n:nat) a (Ha: / (4^n)%Z <= a <= (4#1)) e,
+    0 <= approximate (rational_sqrt_small_bounded n a Ha) e.
+Proof.
+  induction n.
+  - intros. simpl.
+    apply sqrt_raw_nonneg. destruct Ha.
+    unfold Qinv in H. simpl in H.
+    apply (Qle_trans _ 1).
+    discriminate. exact H. 
+  - intros. simpl.
+    destruct (Qle_total a 1). simpl.
+    apply Qmult_le_0_compat. discriminate.
+    apply IHn. simpl. apply sqrt_raw_nonneg.
+    apply (Qle_trans _ 1).
+    discriminate. exact q. 
+Qed.
+
+Lemma rational_sqrt_nonneg : forall (q : Q) (e : Qpos),
+    0 <= approximate (rational_sqrt q) e.
+Proof.
+  intros.
+  unfold rational_sqrt.
+  destruct (Qlt_le_dec_fast 0 q).
+  2: apply Qle_refl.
+  unfold rational_sqrt_pos.
+  destruct (Qle_total 1 q).
+  apply rational_sqrt_big_bounded_nonneg.
+  apply rational_sqrt_small_bounded_nonneg.
+Qed.
+
+Lemma CRsqrt_pos : forall x : CR, (0 <= x -> 0 <= CRsqrt x)%CR.
+Proof.
+  (* This cannot be proved algebraically, because there is also
+     a negative solution y to the equation y^2 = x. *)
+  intros x H e1. simpl.
+  unfold Cap_raw; simpl.
+  unfold Cjoin_raw; simpl.
+  rewrite Qplus_0_r.
+  apply (Qle_trans _ 0).
+  apply (Qopp_le_compat 0 (`e1)).
+  apply Qpos_nonneg.
+  apply rational_sqrt_nonneg.
+Qed.
+
 Lemma CRsqrt_mult : forall x y,
     (0 <= x -> 0 <= y -> CRsqrt (x*y) = CRsqrt x * CRsqrt y)%CR.
 Proof.
   intros x y xpos ypos.
-  assert (0 <= x*y)%CR.
-  { apply CRmult_le_0_compat; assumption. }
-  rewrite <- (CRasIRasCR_id (x*y)%CR). 
-  rewrite <- (CRasIRasCR_id x) at 2.
-  rewrite <- (CRasIRasCR_id y) at 2.
-  rewrite <- (CRasIRasCR_id x), <- IR_Zero_as_CR in xpos.
-  apply IR_leEq_as_CR in xpos.
-  rewrite <- (CRasIRasCR_id y), <- IR_Zero_as_CR in ypos.
-  apply IR_leEq_as_CR in ypos.
-  rewrite <- (CRsqrt_correct (CRasIR x) xpos).
-  rewrite <- (CRsqrt_correct (CRasIR y) ypos).
-  rewrite <- IR_mult_as_CR.
-  rewrite <- (CRasIRasCR_id (x*y)%CR), <- IR_Zero_as_CR in H.
-  pose proof (IR_leEq_as_CR [0] (CRasIR (x*y)%CR)) as [_ H0].
-  rewrite <- (CRsqrt_correct _ (H0 H)).
-  apply IRasCR_wd.
-  assert ([0] [<=] CRasIR x [*] CRasIR y).
-  { apply IR_leEq_as_CR.
-    rewrite IR_mult_as_CR.
-    rewrite CRasIRasCR_id, CRasIRasCR_id.
-    rewrite CRasIRasCR_id in H. exact H. }
-  rewrite <- (sqrt_mult _ _ _ _ H1).
-  apply sqrt_wd.
-  apply IR_eq_as_CR.
-  rewrite IR_mult_as_CR.
-  rewrite CRasIRasCR_id, CRasIRasCR_id, CRasIRasCR_id.
-  reflexivity.
+  apply (CRsquare_nonneg_cancel
+           (CRsqrt (x*y)%CR) (CRsqrt x * CRsqrt y)%CR
+           (CRsqrt_pos _ (CRmult_le_0_compat _ _ xpos ypos))).
+  apply CRmult_le_0_compat; apply CRsqrt_pos; assumption.
+  rewrite CRsqrt_sqr.
+  2: exact (CRmult_le_0_compat _ _ xpos ypos).
+  transitivity (CRsqrt x * CRsqrt x * (CRsqrt y * CRsqrt y))%CR.
+  2: ring.
+  rewrite CRsqrt_sqr, CRsqrt_sqr.
+  reflexivity. exact ypos. exact xpos.
 Qed.
 
+Lemma CRsqrt_inc :
+  forall x y : CR, (0 <= x -> x <= y -> CRsqrt x <= CRsqrt y)%CR.
+Proof.
+  (* Prove that 0 <= ARsqrt y - ARsqrt x,
+     ie that 0 <= (ARsqrt y - ARsqrt x) * (ARsqrt y + ARsqrt x) *)
+  intros.
+  apply (CRplus_le_r _ _ (-CRsqrt x)%CR).
+  rewrite CRplus_opp.
+  apply CRle_not_lt.
+  intro abs.
+  assert ((0 < y)%CR -> False).
+  { intro ypos.
+    revert abs.
+    apply CRle_not_lt.
+    apply (CRmult_le_0_reg_l (CRsqrt x + CRsqrt y)%CR).
+    - intro abs.
+      apply CRle_not_lt in abs.
+      assert (st_eq 0%CR (CRsqrt y)).
+      apply CRle_antisym. split.
+      apply CRsqrt_pos.
+      apply CRlt_le_weak, ypos.
+      rewrite <- CRplus_0_l.
+      refine (CRle_trans _ abs).
+      apply CRplus_le_r, CRsqrt_pos, H.
+      pose proof (CRmult_wd H1 H1) as H3.
+      rewrite CRmult_0_r, CRsqrt_sqr in H3.
+      apply CRle_antisym in H3.
+      revert ypos. apply CRle_not_lt, H3.
+      apply CRlt_le_weak, ypos.
+    - setoid_replace ((CRsqrt x + CRsqrt y) * (CRsqrt y + (- CRsqrt x)))%CR
+        with (CRsqrt y*CRsqrt y - (CRsqrt x*CRsqrt x))%CR by ring.
+      rewrite (CRsqrt_sqr y).
+      rewrite (CRsqrt_sqr x).
+      rewrite <- (CRplus_opp x).
+      apply CRplus_le_r, H0.
+      exact H. exact (CRle_trans H H0). }
+  apply CRle_not_lt in H1. 
+  revert abs. apply CRle_not_lt.
+  setoid_replace x with 0%CR.
+  setoid_replace y with 0%CR.
+  rewrite CRplus_opp. apply CRle_refl.
+  apply CRle_antisym. split.
+  exact H1. exact (CRle_trans H H0).
+  apply CRle_antisym. split.
+  exact (CRle_trans H0 H1). exact H.
+Qed.
 
 Lemma CRsqrt_Qsqrt : forall x : Q, (CRsqrt ('x) == rational_sqrt x)%CR.
 Proof.

@@ -6,6 +6,7 @@ Require Import
   CoRN.model.totalorder.QposMinMax 
   CoRN.metric2.Complete CoRN.model.metric2.Qmetric Coq.ZArith.ZArith CoRN.util.Qdlog
   CoRN.reals.fast.CRroot
+  CoRN.reals.faster.ARabs
   MathClasses.interfaces.abstract_algebra MathClasses.theory.shiftl MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export 
   CoRN.reals.faster.ARArith.
@@ -16,6 +17,7 @@ Context `{AppRationals AQ}.
 Add Ring AQ : (rings.stdlib_ring_theory AQ).
 Add Ring Q : (rings.stdlib_ring_theory Q).
 Add Ring Z : (rings.stdlib_ring_theory Z).
+Add Ring AR : (rings.stdlib_ring_theory AR).
 
 Section sqrt_mid.
 Context `(Pa : 1 ≤ a ≤ 4).
@@ -494,5 +496,54 @@ Proof.
   rewrite <- ARtoCR_preserves_0.
   apply (ARtoCR_preserves_le 0 y), H6.
 Qed.
+
+Lemma ARsqrt_srq_abs :
+  forall x : AR, ARsqrt (x*x) = ARabs x.
+Proof.
+  (* Goal is a negation, use excluded middle x is positive or not.
+     When positive, ARsqrt(x*x) = ARsqrt x*ARsqrt x = x. *)
+  assert (forall x : AR, ARle 0 x -> ARsqrt (x*x) = ARabs x) as posCase.
+  { intros.
+    rewrite ARsqrt_mult, ARsqrt_correct.
+    rewrite ARabs_pos. reflexivity.
+    exact H5. exact H5.
+    exact H5. exact H5. } 
+  intros. apply Metric_eq_stable.
+  intro abs. assert (~(ARle 0 x)).
+  - intro H5. contradict abs.
+    apply posCase, H5.
+  - contradict H5.
+    apply ARle_not_lt. intro H5.
+    contradict abs.
+    change (ARsqrt (x*x) = ARabs x).
+    rewrite <- ARabs_opp.
+    setoid_replace (x * x) with (-x * -x) by ring.
+    apply posCase.
+    destruct (ARtoCR_preserves_ltT x 0) as [c _].
+    specialize (c H5).
+    apply ARtoCR_preserves_le.
+    rewrite ARtoCR_preserves_0.
+    rewrite <- CRopp_0.
+    rewrite ARtoCR_preserves_opp.
+    apply CRopp_le_compat.
+    rewrite <- ARtoCR_preserves_0.
+    apply CRlt_le_weak, c.
+Qed.
+
+Lemma ARsqrt_inc :
+  forall x y : AR,
+    ARle 0 x -> ARle x y -> ARle (ARsqrt x) (ARsqrt y).
+Proof.
+  intros. 
+  apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_sqrt.
+  rewrite ARtoCR_preserves_sqrt.
+  apply CRsqrt_inc.
+  rewrite <- ARtoCR_preserves_0.
+  apply (ARtoCR_preserves_le 0 x), H5.
+  apply (ARtoCR_preserves_le x y), H6.
+Qed.
+
+
 
 End ARsqrt.

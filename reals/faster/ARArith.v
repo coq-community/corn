@@ -252,46 +252,57 @@ Add Ring AR : (rings.stdlib_ring_theory AR).
 
 Lemma ARplus_comm : forall x y : AR, x + y = y + x.
 Proof.
-  intros x y. destruct ARring, ring_group.
-  apply abgroup_commutative.
+  intros. ring.
 Qed. 
 
 Lemma ARplus_assoc : forall u v w : AR,
     (u + v) + w = u + (v + w).
 Proof.
-  intros u v w. destruct ARring, ring_group.
-  destruct abgroup_group, group_monoid, monoid_semigroup.
-  symmetry. apply (sg_ass u v w).
+  intros. ring.
 Qed.
+
+Lemma ARplus_opp_r :
+  forall x : AR, x - x = 0.
+Proof.
+  intros. ring.
+Qed. 
 
 Lemma ARmult_comm : forall x y : AR, x * y = y * x.
 Proof.
-  intros x y. destruct ARring, ring_monoid.
-  apply commonoid_commutative.
+  intros. ring.
 Qed.
 
 Lemma ARmult_assoc : forall u v w : AR,
     (u * v) * w = u * (v * w).
 Proof.
-  intros u v w. destruct ARring, ring_monoid.
-  destruct commonoid_mon, monoid_semigroup.
-  symmetry. apply (sg_ass u v w).
+  intros. ring.
 Qed.
 
 Lemma ARmult_1_l : forall x : AR, 1 * x = x.
 Proof.
-  intro x. destruct ARring, ring_monoid.
-  destruct commonoid_mon.
-  apply (monoid_left_id x).
+  intros. ring.
 Qed. 
 
 Lemma ARmult_1_r : forall x : AR, x * 1 = x.
 Proof.
-  intro x. destruct ARring, ring_monoid.
-  destruct commonoid_mon.
-  apply (monoid_right_id x).
+  intros. ring.
 Qed. 
-  
+
+Lemma ARopp_mult_distr_r : forall (r1 r2 : AR),
+    - (r1 * r2) = r1 * (- r2).
+Proof.
+  intros. ring.
+Qed. 
+
+Lemma ARopp_involutive : forall (r1 : AR), - - r1 = r1.
+Proof.
+  intros. ring.
+Qed. 
+
+Lemma ARplus_0_r : forall x : AR, x + 0 = x.
+Proof.
+  intros. ring.
+Qed.
 
 (* Non strict order *) 
 Definition ARnonNeg (x : AR) : Prop := ∀ ε : Qpos, -cast Qpos Q ε ≤ cast AQ Q (approximate x ε).
@@ -322,6 +333,48 @@ Proof.
   apply (maps.projected_partial_order (cast AR CR)).
   apply ARtoCR_preserves_le.
 Qed.
+
+Lemma ARle_trans : forall x y z : AR,
+    ARle x y -> ARle y z -> ARle x z.
+Proof.
+  intros. 
+  apply ARtoCR_preserves_le.
+  apply (@CRle_trans _ ('y)).
+  apply ARtoCR_preserves_le, H5.
+  apply ARtoCR_preserves_le, H6.
+Qed.
+
+Lemma ARsquare_pos : forall x : AR, ARle 0 (x*x).
+Proof.
+  intros x.
+  apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_mult.
+  rewrite ARtoCR_preserves_0.
+  apply CRsquare_pos.
+Qed.
+
+Lemma ARplus_le_compat_l :
+  forall x y z : AR, ARle x y -> ARle (z+x) (z+y).
+Proof.
+  intros. apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_plus.
+  rewrite ARtoCR_preserves_plus.
+  apply CRArith.CRplus_le_l.
+  apply ARtoCR_preserves_le in H5.
+  exact H5.
+Qed.
+
+Lemma ARplus_le_compat_r :
+  forall x y z : AR, ARle x y -> ARle (x+z) (y+z).
+Proof.
+  intros. apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_plus.
+  rewrite ARtoCR_preserves_plus.
+  apply CRArith.CRplus_le_r.
+  apply ARtoCR_preserves_le in H5.
+  exact H5.
+Qed.
+
 
 Global Instance: OrderEmbedding ARtoCR.
 Proof. repeat (split; try apply _); apply ARtoCR_preserves_le. Qed.
@@ -929,8 +982,17 @@ Proof.
   apply Qlt_from_CRlt, X.
 Qed.
 
+Lemma inject_Q_AR_le : ∀ q r : Q, q <= r → ARle (inject_Q_AR q) (inject_Q_AR r).
+Proof.
+  intros.
+  apply ARle_not_lt.
+  intro abs.
+  apply inject_Q_AR_lt_rev in abs.
+  exact (Qlt_not_le _ _ abs H5).
+Qed.
+
 Lemma inject_Q_AR_plus : ∀ q r : Q,
-    inject_Q_AR (q + r) = ARplus (inject_Q_AR q) (inject_Q_AR r).
+    inject_Q_AR (q + r) = inject_Q_AR q + inject_Q_AR r.
 Proof.
   intros.
   apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
@@ -951,7 +1013,7 @@ Proof.
 Qed.
 
 Lemma inject_Q_AR_mult : ∀ q r : Q,
-    inject_Q_AR (q * r) = ARmult (inject_Q_AR q) (inject_Q_AR r).
+    inject_Q_AR (q * r) = inject_Q_AR q * inject_Q_AR r.
 Proof.
   intros. 
   apply (injective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace))).
@@ -968,6 +1030,53 @@ Proof.
   rewrite <- CRmult_Qmult.
   apply CRmult_wd. rewrite (H5 ('q)%CR). reflexivity.
   rewrite (H5 ('r)%CR). reflexivity.
+Qed.
+
+Lemma inject_Q_AR_1 : inject_Q_AR (1#1) = 1.
+Proof.
+  Local Transparent regFunEq.
+  intros e1 e2. simpl.
+  destruct aq_dense_embedding.
+  specialize (dense_inverse 1 e1).
+  simpl in dense_inverse.
+  apply (@ball_weak_le Q_as_MetricSpace (`e1) (`e1+`e2)).
+  apply (Qle_trans _ (`e1 + 0)).
+  rewrite Qplus_0_r. apply Qle_refl.
+  apply Qplus_le_r, Qpos_nonneg.
+  simpl. unfold cast.
+  destruct aq_ring_morphism, semiringmor_mult_mor.
+  rewrite preserves_mon_unit.
+  exact dense_inverse.
+Qed.
+
+Lemma inject_Q_AR_0 : inject_Q_AR (0#1) = 0.
+Proof.
+  intros e1 e2. simpl.
+  destruct aq_dense_embedding.
+  simpl in dense_inverse.
+  apply (@ball_weak_le Q_as_MetricSpace (`e1) (`e1+`e2)).
+  apply (Qle_trans _ (`e1 + 0)).
+  rewrite Qplus_0_r. apply Qle_refl.
+  apply Qplus_le_r, Qpos_nonneg.
+  simpl. unfold cast.
+  destruct aq_ring_morphism, semiringmor_plus_mor.
+  rewrite preserves_mon_unit.
+  apply dense_inverse.
+Qed.
+
+
+Lemma inject_Q_AR_wd : forall q r : Q,
+    q == r -> inject_Q_AR q = inject_Q_AR r.
+Proof.
+  intros q r qreq e1 e2. 
+  simpl.
+  destruct aq_dense_embedding.
+  unfold cast.
+  apply ball_triangle with (b:=q).
+  apply dense_inverse.
+  rewrite qreq.
+  apply ball_sym.
+  apply dense_inverse.
 Qed.
 
 Lemma AR_mult_0_lt_compat : ∀ x y : AR,
@@ -998,6 +1107,22 @@ Proof.
     symmetry in H7.
     apply (CRltT_wd H7 (reflexivity _)). exact X0. 
 Qed.
+
+Lemma AR_mult_0_le_compat : ∀ x y : AR,
+    ARle 0 x
+    → ARle 0 y
+    → ARle 0 (x*y).
+Proof.
+  intros.
+  apply ARtoCR_preserves_le.
+  rewrite ARtoCR_preserves_mult.
+  rewrite ARtoCR_preserves_0.
+  apply (CRmult_le_0_compat ('x) ('y)).
+  rewrite <- ARtoCR_preserves_0.
+  apply ARtoCR_preserves_le, H5.
+  rewrite <- ARtoCR_preserves_0.
+  apply ARtoCR_preserves_le, H6.
+Qed. 
 
 
 End ARarith.
