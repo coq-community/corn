@@ -239,7 +239,7 @@ Proof.
   now rewrite distribute_r, left_identity.
 Qed.
 
-Instance: AppRationals bigD.
+Instance bigD_appRat : AppRationals bigD.
 Proof.
   split; try apply _; intros.
     split; apply _.

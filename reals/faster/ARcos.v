@@ -1,6 +1,7 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
+Require Import CoRN.model.metric2.Qmetric.
 Require Import
   MathClasses.misc.workaround_tactics
   CoRN.reals.fast.CRsin CoRN.reals.fast.CRcos CoRN.metric2.MetricMorphisms CoRN.metric2.Complete CoRN.reals.faster.ARsin MathClasses.interfaces.abstract_algebra.
@@ -9,6 +10,8 @@ Require Export
 
 Section ARcos.
 Context `{AppRationals AQ}.
+
+Local Open Scope uc_scope.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
@@ -54,12 +57,13 @@ Proof.
   now apply rational_cos_sin.
 Qed.
 
-Local Obligation Tactic := idtac.
-Program Definition ARcos_uc := unary_complete_uc 
-  Qmetric.QPrelengthSpace (cast AQ Qmetric.Q_as_MetricSpace) AQcos cos_uc _.
-Next Obligation. intros. apply AQcos_correct. Qed.
+Definition ARcos_uc : AQ_as_MetricSpace --> AR.
+Proof.
+  apply (unary_complete_uc QPrelengthSpace AQtoQ AQcos cos_uc).
+  intros. apply AQcos_correct.
+Defined.
 
-Definition ARcos := Cbind AQPrelengthSpace ARcos_uc.
+Definition ARcos : AR --> AR := Cbind AQPrelengthSpace ARcos_uc.
 
 Lemma ARtoCR_preserves_cos x : 'ARcos x = cos_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
