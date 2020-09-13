@@ -54,6 +54,17 @@ Record RegularFunction {X:Type} (ball : Q->X->X->Prop) : Type :=
 ;regFun_prf : is_RegularFunction ball approximate
 }.
 
+Lemma is_RegularFunction_wd
+  : forall (X : MetricSpace) (x y:QposInf -> X),
+    (forall q : Qpos, st_eq (x q) (y q))
+    -> is_RegularFunction (@ball X) x
+    -> is_RegularFunction (@ball X) y.
+Proof.
+  intros. intros e1 e2.
+  rewrite <- H, <- H.
+  apply H0.
+Qed.
+ 
 Definition regFunEq {X:Type} (ball : Q->X->X->Prop)
            (f g : RegularFunction ball) : Prop
   := forall (e1 e2 : Qpos),

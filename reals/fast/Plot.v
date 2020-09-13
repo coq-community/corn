@@ -28,7 +28,6 @@ Require Export CoRN.metric2.Graph.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Export CoRN.model.totalorder.QposMinMax.
 
-Section Plot.
 (**
 * Plotting
 Plotting a uniformly continuous function on a finite interval consists
@@ -49,17 +48,8 @@ Afterwards we will plot more general located subsets of the plane:
 - the pixels overlap, meaning each corner belong to the 4 pixels that touch it
  
 *)
-Variable (l r:Q).
-Hypothesis Hlr : l < r.
-
-Variable (b t:Q).
-Hypothesis Hbt : b < t.
 
 Local Open Scope uc_scope.
-
-Let clip := uc_compose (boundBelow b) (boundAbove t).
-
-Variable f : Q_as_MetricSpace --> CR.
 
 Lemma plFEQ : PrelengthSpace (FinEnum Q_as_MetricSpace).
 Proof.
@@ -67,6 +57,70 @@ Proof.
   apply locatedQ.
  apply QPrelengthSpace.
 Qed.
+
+(** The image of a path as a [Compact] subset of the plane.
+    A path is usually defined as a continuous function from a
+    real interval [l,r], but by continuity it is fully determined
+    by its values on rational numbers, which are faster to plot. *)
+Definition PathImage {X : MetricSpace} (path : Q_as_MetricSpace --> X)
+           (l r:Q) (Hlr : l <= r)
+  : Compact X
+  := CompactImage (1#1)%Qpos plFEQ path (CompactIntervalQ Hlr). 
+
+Section PlotPath.
+Variable (from to:Q).
+Hypothesis Hfromto:from<=to.
+
+Variable (l r:Q).
+Hypothesis Hlr : l < r.
+
+Variable (b t:Q).
+Hypothesis Hbt : b < t.
+
+Variable n m : nat.
+
+Let w := r - l.
+Let h := t - b.
+
+Lemma wpos : 0 < w.
+Proof.
+  apply Qlt_minus_iff in Hlr. exact Hlr.
+Qed.
+
+Lemma hpos : 0 < h.
+Proof.
+  apply Qlt_minus_iff in Hbt. exact Hbt.
+Qed.
+
+(**
+Half the error in the Plot example, since we need to approximate twice.
+*)
+Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
+                    ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
+
+Variable path:Q_as_MetricSpace --> Complete Q2.
+(** The actual plot function *)
+Definition PlotPath : nat * nat * Q * raster n m
+  := (n, m, 2#1, (RasterizeQ2 
+(approximate 
+(FinCompact Q2 (approximate (PathImage path from to Hfromto) err))
+err) n m t l b r )).
+End PlotPath.
+
+
+
+Section Plot.
+
+Variable (l r:Q).
+Hypothesis Hlr : l < r.
+
+Variable (b t:Q).
+Hypothesis Hbt : b < t.
+
+
+Let clip := uc_compose (boundBelow b) (boundAbove t).
+
+Variable f : Q_as_MetricSpace --> CR.
 
 Definition graphQ f : Compact Q2
   := CompactGraph_b f plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).

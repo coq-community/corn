@@ -319,7 +319,7 @@ Qed.
 
 Global Instance ARle: Le AR := λ x y, ARnonNeg (y - x).
 
-Global Instance: Proper ((=) ==> (=) ==> iff) ARle.
+Global Instance ARle_wd: Proper ((=) ==> (=) ==> iff) ARle.
 Proof. unfold ARle. solve_proper. Qed.
 
 Lemma ARtoCR_preserves_le (x y : AR) : x ≤ y ↔ ' x ≤ ' y.

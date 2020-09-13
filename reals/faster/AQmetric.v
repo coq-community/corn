@@ -17,6 +17,12 @@ Local Open Scope uc_scope.
 
 Definition AQ_as_MetricSpace := Emetric (cast AQ Q_as_MetricSpace).
 Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (cast AQ Q_as_MetricSpace).
+Definition AQLocated : locatedMetric AQ_as_MetricSpace.
+Proof.
+  intros e1 e2 x y lte.
+  apply (@locatedQ e1 e2 (AQtoQ x) (AQtoQ y) lte).
+Defined.
+
 Definition AR := Complete AQ_as_MetricSpace.
 
 Definition AQtoQ_uc : AQ_as_MetricSpace --> Q_as_MetricSpace := metric_embed_uc (cast AQ Q_as_MetricSpace).
@@ -57,6 +63,22 @@ Proof.
   intros e1 e2.
   pose proof (regFun_prf (cast CR AR (inject_Q_CR q)) e1 e2) as H5.
   apply H5.
+Qed.
+
+Lemma inject_Q_AR_uc : is_UniformlyContinuousFunction
+                         inject_Q_AR Qpos2QposInf.
+Proof.
+  intros d e1 e2 bd x y.
+  simpl. unfold cast.
+  unfold MetricMorphisms.app_inverse.
+  destruct aq_dense_embedding.
+  unfold MetricMorphisms.app_inverse in dense_inverse.
+  rewrite <- (Qplus_assoc (`x) (`d) (`y)).
+  apply ball_triangle with (b:=e1).
+  apply dense_inverse.
+  apply ball_triangle with (b:=e2).
+  apply bd.
+  apply ball_sym, dense_inverse.
 Qed.
 
 Lemma CRAR_id : forall x : CR,

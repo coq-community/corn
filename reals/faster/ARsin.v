@@ -13,6 +13,8 @@ Require Export
 Section ARsin.
 Context `{AppRationals AQ}.
 
+Local Open Scope uc_scope.
+
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Section sin_small_pos.
@@ -216,12 +218,14 @@ Proof.
   now apply rational_sin_opp.
 Qed.
 
-Local Obligation Tactic := idtac.
-Program Definition ARsin_uc := unary_complete_uc 
-  QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsin sin_uc _.
-Next Obligation. intros. apply AQsin_correct. Qed.
+Definition ARsin_uc : AQ_as_MetricSpace --> AR.
+Proof.
+  apply (unary_complete_uc 
+           QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsin sin_uc).
+  intros. apply AQsin_correct.
+Defined.
 
-Definition ARsin := Cbind AQPrelengthSpace ARsin_uc.
+Definition ARsin : AR --> AR := Cbind AQPrelengthSpace ARsin_uc.
 
 Lemma ARtoCR_preserves_sin x : 'ARsin x = sin_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
