@@ -33,6 +33,17 @@ Definition Circle_faster : raster _ _
                              (-(1)) 1 (reflexivity _) 10 10 CirclePath_faster
       in r.
 
+(* This is the approximation of the circle that will be rasterized.
+   For a 10x10 pixel plot, the precision is 1/40.
+   But we approximate by real numbers instead of rational numbers. *)
+Definition Circle_approx : list (Complete Q2)
+  := approximate (PathImage CirclePath_faster 0 7 zeroSeven)
+             (Qpos_max
+                ((1 # 8 * Pos.of_succ_nat (Init.Nat.pred 10)) ↾ eq_refl *
+                 (1 - - (1)) ↾ wpos (- (1)) 1 (reflexivity Datatypes.Lt))
+                ((1 # 8 * Pos.of_succ_nat (Init.Nat.pred 10)) ↾ eq_refl *
+                 (1 - - (1)) ↾ hpos (- (1)) 1 (reflexivity Datatypes.Lt))).
+
 End PlotCirclePath.
 
 (* 12 seconds :-( *)

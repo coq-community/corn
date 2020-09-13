@@ -310,27 +310,32 @@ To measure closeness, we use the product metric on Q2, which has
 square balls aligned with the 2 axes. *)
 Lemma RasterizeQ2_correct1 : forall (x y:Q),
  InFinEnumC ((x,y):ProductMS _ _) f ->
- existsC (ProductMS _ _)
-  (fun p => InFinEnumC p (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
-            /\ ball (proj1_sig err) p (x,y)).
+ ~~exists p, In p (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
+        /\ ball (proj1_sig err) p (x,y).
 Proof.
  intros x y.
  unfold RasterizeQ2.
  rewrite <- fold_left_rev_right.
- intros H.
- destruct (Hf _ _ H) as [Hfl Hfr].
+ intros H abs.
+ unfold InFinEnumC in H.
+ destruct (Hf H) as [Hfl Hfr].
  clear Hf.
  destruct (FinEnum_eq_rev f (x,y)) as [L _].
- generalize (L H).
+ specialize (L H).
+ contradict H; intro H.
+ unfold InFinEnumC in L.
+ contradict L; intro L.
+ revert abs.
+ generalize L.
  clear L H.
  simpl (st_car (msp_is_setoid Q2)).
  generalize (emptyRaster (S n) (S m)).
  induction (@rev (prod Q Q) f).
-  contradiction.
+ intros r0 [z [H _]]; contradiction.
  intros bm H.
- destruct H as [G | [Hl Hr] | H] using orC_ind.
- - auto using existsC_stable.
- - simpl in Hl, Hr.
+ destruct H as [yH [iny H]].
+ destruct iny.
+ - subst yH. destruct H as [Hl Hr]. simpl in Hl, Hr.
   simpl (fold_right (fun (y0 : Q * Q) (x0 : raster (S n) (S m)) =>
     RasterizePoint x0 t l b r y0) bm (a :: l0)).
   unfold RasterizePoint, rasterize2 at 1.
@@ -339,10 +344,9 @@ Proof.
   set (i:=min n (Z.to_nat (Z.max 0 (rasterize1 l r (S n) (fst a))))).
   set (j:=min m (Z.to_nat (Z.max 0 (rasterize1 b t (S m) (snd a))))).
   cbv zeta.
-  apply existsWeaken.
+  intro abs; contradict abs.
   exists (C l r (S n) (Z.of_nat i), C t b (S m) (Z.of_nat (m -j)%nat)).
   split.
-   apply InFinEnumC_weaken.
    apply InterpRaster_correct1.
    rewrite setRaster_correct1; unfold i, j; auto with *.
   split.
@@ -370,56 +374,61 @@ Proof.
   auto.
  - simpl ((fold_right (fun (y : Q * Q) (x : raster (S n) (S m)) =>
    RasterizePoint x t l b r y) bm) (a :: l0)).
- destruct (IHl0 bm H) as [G | z [Hz0 Hz1]] using existsC_ind.
-  auto using existsC_stable.
- apply existsWeaken.
- exists z.
- split; auto.
- clear - Hz0.
- destruct z as [zx zy].
- destruct (InStrengthen _ _ Hz0) as [[zx' zy'] [Hz'0 Hz'1]].
- rewrite -> (fun a => InFinEnumC_wd1 _ _ _ a Hz'1).
- apply InFinEnumC_weaken.
- destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Hz'0) as [[ax ay] [Ha1 [Ha2 Ha3]]].
- rewrite Ha2.
- rewrite Ha3.
- apply InterpRaster_correct1.
- apply RasterizePoint_carry.
- auto.
+   specialize (IHl0 bm (ex_intro _ yH (conj H0 H))).
+   intro abs.
+   contradict IHl0; intros [z [Hz0 Hz1]].
+   contradict abs.
+   exists z.
+   split; auto.
+   clear - Hz0.
+   destruct z as [zx zy].
+   destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Hz0) as [[ax ay] [Ha1 [Ha2 Ha3]]].
+   rewrite Ha2.
+   rewrite Ha3.
+   apply InterpRaster_correct1.
+   apply RasterizePoint_carry.
+   auto.
 Qed.
 
 Lemma RasterizeQ2_correct2 : forall x y,
     InFinEnumC ((x,y):ProductMS _ _)
                (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
- -> (existsC (ProductMS _ _)
-  (fun p => InFinEnumC p f /\ ball (proj1_sig err) p (x,y))).
+    -> ~~ exists p, In p f /\ ball (proj1_sig err) p (x,y).
 Proof.
  intros x y H.
- destruct (InStrengthen _ _ H) as [[x' y'] [H' Hxy]].
+ intro abs.
+ unfold InFinEnumC in H.
+ contradict H; intro H.
+ destruct H as [[x' y'] [H' Hxy]].
  destruct (InterpRaster_correct2 _ _ _ _ _ _ _ H') as [[j i] [Hij [Hx' Hy']]].
  rewrite Hx' in Hxy.
  rewrite Hy' in Hxy.
  assert (Hf':forall x y : Q_as_MetricSpace,
-   InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace)
-     ((x, y):ProductMS Q_as_MetricSpace Q_as_MetricSpace) (rev f) -> l <= x <= r /\ b <= y <= t).
+   InFinEnumC ((x, y):ProductMS Q_as_MetricSpace Q_as_MetricSpace) (rev f)
+   -> l <= x <= r /\ b <= y <= t).
  { intros c d Hcd.
   apply Hf.
   destruct (FinEnum_eq_rev f (c,d)); auto. }
  clear Hf.
- clear Hx' Hy' H' H.
+ clear Hx' Hy' H'.
  destruct Hxy as [Hx' Hy'].
  cut (existsC (ProductMS Q_as_MetricSpace Q_as_MetricSpace)
    (fun p : ProductMS Q_as_MetricSpace Q_as_MetricSpace =>
      InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) p (rev f) /\
        ball (m:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) (proj1_sig err) p (x, y))).
  - intros L.
-  clear -L.
-  destruct L as [G | z [Hz0 Hz]] using existsC_ind.
-   auto using existsC_stable.
-  apply existsWeaken.
-  exists z.
-  split; auto.
-  destruct (FinEnum_eq_rev f z); auto.
+   clear -L abs.
+   unfold existsC in L.
+   contradict L. intros x0 [H H0].
+   unfold InFinEnumC in H.
+   contradict H; intros H.
+   contradict abs.
+   destruct H.
+   exists x1. split.
+   rewrite in_rev. apply H.
+   destruct H.
+   rewrite <- H1.
+   exact H0.
  - unfold RasterizeQ2 in Hij.
  rewrite <- fold_left_rev_right in Hij.
  simpl (st_car (msp_is_setoid Q2)) in Hf'|-*.
@@ -446,12 +455,12 @@ Proof.
   exists a.
   change (st_car (msp_is_setoid Q2)) in a.
   split.
-   apply orWeaken.
-   left.
-   reflexivity.
+  intro H; contradict H.
+  exists a. split. left. reflexivity. reflexivity.
   destruct a as [ax ay].
   destruct (Hf' ax ay) as [Hax Hay].
-   apply orWeaken;left;change (ax, ay) with ((ax,ay):Q2);reflexivity.
+  intro H; contradict H.
+  exists (ax,ay). split. left. reflexivity. reflexivity.
   clear Hf'.
   split.
    unfold fst.
@@ -481,14 +490,15 @@ Proof.
    rewrite setRaster_correct2 in Hij; auto.
   intros c d Hcd.
   apply Hf'.
-  apply orWeaken; right; auto.
+  apply (@InFinEnumC_cons Q2 (c,d)).
+  reflexivity. exact Hcd.
  destruct L0 as [G | z [Hz0 Hz1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists z.
  split; auto.
- apply orWeaken.
- right; auto.
+  apply (@InFinEnumC_cons Q2 z).
+  reflexivity. exact Hz0.
 Qed.
 
 Lemma RasterizeQ2_correct :
@@ -497,19 +507,21 @@ Lemma RasterizeQ2_correct :
   f.
 Proof.
   split. apply Qpos_nonneg.
- split; intros [x y] Hx.
-  destruct (RasterizeQ2_correct2 Hx) as [ G | z [Hz0 Hz1]] using existsC_ind.
-   auto using existsC_stable.
-  apply existsWeaken.
-  exists z.
-  split; auto.
-  auto using ball_sym.
- destruct (RasterizeQ2_correct1 Hx) as [ G | z [Hz0 Hz1]] using existsC_ind.
-  auto using existsC_stable.
- apply existsWeaken.
- exists z.
- split; auto.
- auto using ball_sym.
+  split; intros [x y] Hx.
+  - pose proof (RasterizeQ2_correct2 Hx).
+    intro abs.
+    contradict H; intros [z [Hz0 Hz1]].
+    specialize (abs z). contradict abs.
+    split.
+    apply InFinEnumC_weaken, Hz0.
+    auto using ball_sym.
+  - intro abs.
+    pose proof (RasterizeQ2_correct1 Hx).
+    contradict H; intros [z [Hz0 Hz1]].
+    specialize (abs z). contradict abs.
+    split.
+    apply InFinEnumC_weaken, Hz0.
+    auto using ball_sym.
 Qed.
 
 End RasterizeCorrect.

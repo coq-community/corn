@@ -33,6 +33,8 @@ Proof.
  apply QPrelengthSpace.
 Qed.
 
+(* TODO this has twice as many points as CompactIntervalQ,
+   fine tune the subdivision. *)
 Lemma Iab_reg_prf
   : is_RegularFunction
       (FinEnum_ball AQ_as_MetricSpace)

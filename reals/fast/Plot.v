@@ -203,7 +203,7 @@ Proof.
   intros.
   rewrite <- Hw.
   rewrite <- Hh.
-  destruct (InStrengthen _ _ H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
+  destruct (InStrengthen H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
   simpl in Hz1, Hz2.
   rewrite -> Hz1, Hz2.
   eapply graphQ_bonus.
