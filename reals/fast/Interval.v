@@ -359,16 +359,16 @@ Proof.
   set (e1':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))))) in *.
   assert (L:=UniformPartition_inside e1').
   induction (UniformPartition e1').
-  exfalso; exact (InFinEnumC_nil Ha).
+  exfalso; exact (FinSubset_ball_nil Ha).
   destruct (Qeq_dec a a0) as [A|A].
    rewrite -> A.
    auto with *.
   apply IHl0; auto with *.
-  apply InFinEnumC_orC in Ha.
+  apply FinSubset_ball_orC in Ha.
   destruct Ha as [G | Ha | Ha] using orC_ind.
   intro abs. contradict G; intro G. contradiction.
    elim A.
-   assumption.
+   apply ball_0 in Ha. exact Ha.
   assumption. }
  unfold CompactIntervalQ_raw.
  set (e2':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
@@ -441,7 +441,8 @@ Proof.
   set (a:=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
   assert (L0:=UniformPartition_inside a).
   induction (UniformPartition a).
-   contradiction.
+  exfalso; exact (FinSubset_ball_nil L).
+  apply FinSubset_ball_orC in L.
   destruct L as [ G | L | L] using orC_ind.
     auto with *.
    rewrite -> Qball_Qabs in L.
@@ -471,7 +472,8 @@ Proof.
  set (a:=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
  assert (L0:=UniformPartition_inside a).
  induction (UniformPartition a).
-  contradiction.
+  exfalso; exact (FinSubset_ball_nil L).
+  apply FinSubset_ball_orC in L.
  destruct L as [ G | L | L] using orC_ind.
    auto with *.
   rewrite -> Qball_Qabs in L.
@@ -492,7 +494,7 @@ Proof.
  intros x [Hlx Hxr] e1 e2.
  simpl.
  set (y:= (Qmax (Qmin (approximate x e1) r) l)).
- apply (@almostIn_triangle_l _ (proj1_sig e1) (proj1_sig e2) (approximate x e1) y).
+ apply (@FinSubset_ball_triangle_l _ (proj1_sig e1) (proj1_sig e2) (approximate x e1) y).
  - unfold y.
   apply Qmin_case.
    apply Qmax_case.
@@ -549,8 +551,9 @@ Proof.
   destruct Hz as [Hz0 Hz1].
   induction (UniformPartition n).
    contradiction.
-  destruct Hz0 as [Hz0 | Hz0]; apply orWeaken.
-   + left.
+  destruct Hz0 as [Hz0 | Hz0].
+   + intro abs; contradict abs. exists a.
+     split. left. reflexivity.
    rewrite Hz0.
    simpl.
    rewrite -> Qball_Qabs.
@@ -583,7 +586,7 @@ Proof.
    discriminate.
    rewrite Z2Nat.id. apply Z.le_max_r.
    discriminate. discriminate.
-   + right.
+   + apply FinSubset_ball_cons.
      apply IHl0, Hz0.
 Qed.
 
