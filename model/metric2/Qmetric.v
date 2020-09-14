@@ -19,7 +19,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Prelength.
 Require Import CoRN.metric2.Classification.
@@ -103,9 +102,16 @@ Proof.
  exact (Qle_not_lt _ _ H abs). reflexivity.
 Qed.
 
-Definition QS : RSetoid := Build_RSetoid Q_Setoid.
-Canonical Structure QS.
-
+(* Useful to interact with QArith lemmas.
+   ball_wd uses the metric setoid instead. *)
+Add Parametric Morphism : Qball
+    with signature Qeq ==> Qeq ==> Qeq ==> iff as Qball_wd.
+Proof.
+  intros.
+  unfold Qball, QAbsSmall.
+  rewrite H, H0, H1. reflexivity.
+Qed.
+  
 Instance Qball_Reflexive e: 0 <= e -> Reflexive (Qball e).
 Proof.
  intros epos x.
@@ -124,7 +130,7 @@ Proof.
  refine (Qle_trans _ _ _ _ H0). ring_simplify. apply Qle_refl. 
 Qed.
 
-Lemma Q_is_MetricSpace : is_MetricSpace QS Qball.
+Lemma Q_is_MetricSpace : is_MetricSpace Qball.
 Proof.
  split; auto with typeclass_instances.
  - (* triangle inequality *)
@@ -144,18 +150,11 @@ Proof.
    simpl in H. ring_simplify in H. exact H.
    apply Qle_closed. intros. apply H.
    apply Qpos_ispos.
- - intros. apply Qle_antisym. apply Qle_closed.
-   intros [d dpos]. specialize (H d dpos). destruct H.
-   apply (Qplus_le_l _ _ b) in H0. ring_simplify in H0. exact H0.
-   apply Qle_closed. intros [d dpos]. specialize (H d dpos). destruct H.
-   apply (Qplus_le_l _ _ (b+d)) in H. ring_simplify in H.
-   rewrite Qplus_comm. exact H.
  - intros. destruct H. apply (Qle_trans _ _ _ H) in H0.
    apply (Qplus_le_l _ _ e) in H0. ring_simplify in H0.
    rewrite <- (Qmult_0_r (2#1)) in H0. apply Qmult_le_l in H0.
    exact H0. reflexivity.
- - unfold Qball, QAbsSmall.
-   intros. split.
+ - intros. split.
    + apply Qnot_lt_le. intro abs.
      contradict H; intros [H _].
      exact (Qlt_not_le _ _ abs H).
@@ -165,23 +164,23 @@ Proof.
 Qed.
 
 (* begin hide *)
-Add Morphism Qball with signature Qeq ==> Qeq ==> Qeq ==> iff as Qball_wd.
+Lemma Qball_e_wd : forall (e1 e2:Q) x y,
+    e1 == e2 -> (Qball e1 x y <-> Qball e2 x y).
 Proof.
- intros x1 x2 H x3 x4 H0 x5 x6 H1.
- unfold Qball, QAbsSmall.
- rewrite -> H0.
- rewrite -> H1.
- rewrite -> H.
- tauto.
+  intros.
+  unfold Qball, QAbsSmall.
+  rewrite -> H.
+  reflexivity.
 Qed.
+
 (* end hide *)
 Definition Q_as_MetricSpace : MetricSpace :=
-@Build_MetricSpace QS _ Qball_wd Q_is_MetricSpace.
+  @Build_MetricSpace Q _ Qball_e_wd Q_is_MetricSpace.
 
 Canonical Structure Q_as_MetricSpace.
 
 Lemma QPrelengthSpace_help
-  : forall (e d1 d2:Qpos), proj1_sig e < proj1_sig d1+ proj1_sig d2 -> forall (a b c:QS),
+  : forall (e d1 d2:Qpos), proj1_sig e < proj1_sig d1+ proj1_sig d2 -> forall (a b c:Q),
       ball (proj1_sig e) a b -> (c == (a*proj1_sig d2 + b*proj1_sig d1)/proj1_sig (d1+d2)%Qpos) -> ball (proj1_sig d1) a c.
 Proof with auto with *.
  intros e d1 d2 He a b c Hab Hc.
@@ -242,8 +241,8 @@ Lemma Qmetric_dec : decidableMetric Q_as_MetricSpace.
 Proof.
  intros e a b.
  simpl.
- unfold Qball, QAbsSmall.
  simpl.
+ unfold Qball, QAbsSmall.
  set (c:=-e).
  set (d:=(a-b)).
  destruct (Qlt_le_dec_fast d c) as [Hdc|Hdc].
@@ -302,8 +301,9 @@ Section Qball_Qmult.
   Lemma Qball_Qmult_Q_r : Qball (proj1_sig d) (x * z) (y * z).
   Proof.
    destruct (Qeq_dec z 0) as [E|E].
-    rewrite E. do 2 rewrite Qmult_0_r. apply ball_refl.
-    apply Qpos_nonneg.
+   rewrite E, Qmult_0_r, Qmult_0_r.
+   apply Qball_Reflexive.
+   apply Qpos_nonneg.
    apply Qball_Qabs.
    apply Qball_Qabs in B.
    assert (Qeq (x * z - y * z) ((x - y) * z)) by (simpl; ring).
@@ -388,8 +388,8 @@ Lemma QAbsSmall_plus : forall e1 e2 x1 x2 : Q,
  QAbsSmall e1 x1 -> QAbsSmall e2 x2 -> QAbsSmall (e1+e2) (x1+x2).
 Proof.
   intros. pose proof (@Qball_plus e1 e2 x1 0 x2 0).
-  unfold Qball, QAbsSmall in H1.
-  unfold Qminus in H1. repeat rewrite Qplus_0_r in H1.
+  unfold Qball, QAbsSmall, Qminus in H1.
+  do 4 rewrite Qplus_0_r in H1.
   apply H1. exact H. exact H0.
 Qed.
 
@@ -461,7 +461,7 @@ Qed.
 Definition Qball_ex_bool (e:QposInf) (a b:Q) : bool := 
  match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
 
-Instance: Proper (QposInfEq ==> @st_eq _ ==> @st_eq _ ==> eq) Qball_ex_bool.
+Instance: Proper (QposInfEq ==> @msp_eq _ ==> @msp_eq _ ==> eq) Qball_ex_bool.
 Proof.
   intros [ε1|] [ε2|] E1 x1 x2 E2 y1 y2 E3; try easy.
   unfold Qball_ex_bool.
@@ -489,3 +489,16 @@ Proof.
   rewrite <- AbsSmall_Qabs. reflexivity.
 Qed.
 
+Lemma Qball_0 : forall a b : Q,
+    Qball 0 a b <-> Qeq a b.
+Proof.
+  intros.
+  split.
+  - intros. apply Qle_antisym.
+    + apply (Qplus_le_l _ _ (-b)).
+      rewrite Qplus_opp_r. apply H.
+    + rewrite Qle_minus_iff. apply H.
+  - intros. rewrite H.
+    apply Qball_Reflexive.
+    discriminate.
+Qed.

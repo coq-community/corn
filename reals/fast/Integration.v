@@ -139,7 +139,7 @@ Lemma SupDistanceToLinear_wd1 : forall x l1 r1 (H1:l1 < r1) l2 r2 (H2:l2 < r2),
  (l1 == l2 -> r1 == r2 ->
   QposEq (SupDistanceToLinear x H1) (SupDistanceToLinear x H2))%Q.
 Proof.
- induction x using StepF_ind; intros l1 r1 H1 l2 r2 H2 Hl Hr.
+ induction x; intros l1 r1 H1 l2 r2 H2 Hl Hr.
  - unfold SupDistanceToLinear.
   unfold QposEq. simpl.
   rewrite -> Hl.
@@ -178,7 +178,7 @@ Lemma SupDistanceToLinear_split :
    (proj1_sig (SupDistanceToLinear (SplitR x o) H1)) ==
  proj1_sig (SupDistanceToLinear x (Qlt_trans _ _ _ H0 H1)))%Q.
 Proof.
- induction x using StepF_ind.
+ induction x.
   intros o a b c H0 H1 Hc.
   unfold SupDistanceToLinear.
   simpl.
@@ -214,8 +214,8 @@ Qed.
 Lemma SupDistanceToLinear_wd2 : forall x1 x2 a b (H: a < b), x1 == x2 ->
 QposEq (SupDistanceToLinear x1 H) (SupDistanceToLinear x2 H).
 Proof.
- induction x1 using StepF_ind.
-  induction x2 using StepF_ind.
+ induction x1.
+  induction x2.
    intros a b H Hx.
    unfold SupDistanceToLinear.
    simpl in *.
@@ -260,7 +260,7 @@ Lemma SupDistanceToLinear_translate :
    (proj1_sig (SupDistanceToLinear x H)
     == proj1_sig (SupDistanceToLinear (constStepF (c:QS) + x) H0))%Q.
 Proof.
- induction x using StepF_ind.
+ induction x.
   intros; unfold SupDistanceToLinear; simpl.
   autorewrite with QposElim.
   apply Qmax_compat; ring.
@@ -296,7 +296,7 @@ Proof.
   replace RHS with (c* b + - (c*a))%Q by simpl; ring.
   assumption.
  revert c a b H H0 X.
- induction x using StepF_ind.
+ induction x.
   intros; unfold SupDistanceToLinear; simpl.
   autorewrite with QposElim.
   rewrite -> Qmax_mult_pos_distr_r; auto with *.
@@ -329,12 +329,18 @@ Lemma SupDistanceToLinear_trans :
 Proof.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht H a b Hab.
+   apply StepF_eq_change_base_setoid in Hs.
+   apply StepF_eq_change_base_setoid in Ht.
    rewrite  <- Hs, <- Ht at 2.
    setoid_replace (proj1_sig (SupDistanceToLinear s0 Hab + SupDistanceToLinear t0 Hab)%Qpos)
      with (proj1_sig (SupDistanceToLinear s Hab + SupDistanceToLinear t Hab)%Qpos).
     apply H.
    unfold QposEq.
-   apply Qplus_wd; apply SupDistanceToLinear_wd2; auto.
+   apply Qplus_wd; apply SupDistanceToLinear_wd2.
+   apply StepF_eq_change_base_setoid in Hs.
+   symmetry. exact Hs.
+   apply StepF_eq_change_base_setoid in Ht.
+   symmetry. exact Ht. 
   intros x x0 a b H.
   unfold StepFSupBall, StepFfoldProp.
   simpl.
@@ -376,9 +382,9 @@ Proof.
    as balleq.
  { unfold QposEq. unfold QposEq in X. simpl.
    do 2 rewrite X. reflexivity. }
- apply (StepFSupBall_wd
-          _ balleq _ _ (reflexivity _) _ _ (reflexivity _)). clear balleq.
- rewrite -> StepFSupBallGlueGlue.
+ apply (@StepFSupBall_wd
+          _ _ _ balleq _ _ (reflexivity _) _ _ (reflexivity _)). clear balleq.
+ rewrite -> (StepFSupBallGlueGlue _ _ o s s0 t t0).
  split.
  - eapply ball_weak_le;[|simpl; apply H0].
    simpl. do 2 rewrite Q_Qpos_max.
@@ -532,26 +538,28 @@ End id01.
 The distribution function maps StepF (Complete X) to Complete (StepF X).
 *)
 (* approximate z e is not a morphism, so we revert to using the pre-setoid version of StepF's map *)
-Definition distribComplete_raw (x:StepF CR) (e:QposInf) : LinfStepQ :=
+Definition distribComplete_raw (x:StepF (msp_as_RSetoid CR)) (e:QposInf) : LinfStepQ :=
 StepFunction.Map (fun z => approximate z e) x.
 
-Lemma distribComplete_prf : forall (x:StepF CR),
+Lemma distribComplete_prf : forall (x:StepF (msp_as_RSetoid CR)),
     is_RegularFunction (@ball LinfStepQ) (distribComplete_raw x).
 Proof.
  unfold distribComplete_raw.
  intros x a b.
- induction x using StepF_ind.
+ induction x.
   apply (@regFun_prf _ Qball).
  simpl (ball (m:=LinfStepQ)).
  set (f:=(fun z : RegularFunction (@ball Q_as_MetricSpace) => approximate z a)) in *.
  set (g:=(fun z : RegularFunction (@ball Q_as_MetricSpace) => approximate z b)) in *.
  change (Map f (glue o x1 x2)) with (glue o (Map f x1:StepQ) (Map f x2)).
  change (Map g (glue o x1 x2)) with (glue o (Map g x1:StepQ) (Map g x2)).
- rewrite -> StepFSupBallGlueGlue.
+ rewrite -> (StepFSupBallGlueGlue
+              _ _ o (Map f x1 : StepQ) (Map f x2)
+              (Map g x1 : StepQ) (Map g x2)).
  auto.
 Qed.
 
-Definition distribComplete (x:StepF CR) : BoundedFunction :=
+Definition distribComplete (x:StepF (msp_as_RSetoid CR)) : BoundedFunction :=
 Build_RegularFunction (distribComplete_prf x).
 
 Local Open Scope uc_scope.
@@ -569,10 +577,14 @@ formalized yet. *)
 
 Definition ComposeContinuous_raw (f:Q_as_MetricSpace-->CR) (z:LinfStepQ) : BoundedFunction := dist (uc_stdFun f ^@> z).
 (* begin hide *)
-Add Parametric Morphism f : (@ComposeContinuous_raw f) with signature (@st_eq _) ==> (@st_eq _) as ComposeContinuous_raw_wd.
+Add Parametric Morphism f : (@ComposeContinuous_raw f)
+    with signature (@msp_eq _) ==> (@msp_eq _) as ComposeContinuous_raw_wd.
 Proof.
  intros x1 x2 Hx.
  unfold ComposeContinuous_raw.
+ apply uc_wd.
+ apply StepF_eq_equiv in Hx.
+ apply StepF_eq_equiv.
  rewrite -> Hx.
  reflexivity.
 Qed.
@@ -584,13 +596,11 @@ Proof.
  revert a b e.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht H e H0.
-   change (st_car LinfStepQ) in s, s0, t, t0.
-   rewrite <- Hs, <- Ht.
+   apply StepF_eq_equiv in Ht. rewrite <- Ht.
+   apply StepF_eq_equiv in Hs. rewrite <- Hs.
    apply H.
-   destruct (mu f e); try constructor.
-   change (ball (proj1_sig q) s t).
-   rewrite -> Hs, Ht.
-   assumption.
+   destruct (mu f e). 2: constructor.
+   simpl. rewrite Hs, Ht. exact H0.
   intros x y e H.
   change (ball (proj1_sig e) (f x) (f y)).
   apply uc_prf.
@@ -654,13 +664,13 @@ Lemma Integrate01_correct_generalize :
   (f : Q_as_MetricSpace --> CR)
   (e : Qpos),
   (forall (o : Q) (H : Dom F (inj_Q IR o)),
-   a <= o <= b -> f o [=] IRasCR (F (inj_Q IR o) H)) ->
+   a <= o <= b -> msp_eq (f o) (IRasCR (F (inj_Q IR o) H))) ->
   forall (H01 : inj_Q IR a [<=] inj_Q IR b) (HF : Continuous_I H01 F) 
     (c : a < b) (s : StepQ),
   QposInf_le (Qpos2QposInf (SupDistanceToLinear s c)) (mu f ((1 # 2) * e)) ->
-  AbsSmall (' ((b - a) * proj1_sig e)%Q)%CR
+  @AbsSmall CRasCOrdField (' ((b - a) * proj1_sig e)%Q)%CR
     (IRasCR (integral (inj_Q IR a) (inj_Q IR b) H01 F HF)
-     [-] (' ((b - a) * IntegralQ (dist_raw (uc_stdFun f ^@> s) ((1 # 2) * e)%Qpos))%Q)%CR).
+     - (' ((b - a) * IntegralQ (dist_raw (uc_stdFun f ^@> s) ((1 # 2) * e)%Qpos))%Q))%CR.
 Proof.
  intros a b F f e Hf Hab HF Hab0 s Hs.
  destruct (Qpos_sub _ _ Hab0) as [ba Hba].
@@ -669,7 +679,7 @@ Proof.
    rewrite Qplus_comm; unfold Qminus;
      rewrite <- Qplus_assoc, Qplus_opp_r, Qplus_0_r; reflexivity. 
  revert a b Hab0 ba Hba F Hab HF Hf Hs.
- induction s using StepF_ind; intros a b Hab0 ba Hba F Hab HF Hf Hs.
+ induction s; intros a b Hab0 ba Hba F Hab HF Hf Hs.
  - change (IntegralQ (dist_raw (constStepF (uc_stdFun f) <@^ x) ((1 # 2) * e)%Qpos))
    with (approximate (f x) ((1 # 2) * e)%Qpos).
   rewrite <- (IR_inj_Q_as_CR ((b - a) * approximate (f x) ((1 # 2) * e)%Qpos)).
@@ -686,14 +696,17 @@ Proof.
    intros y Hy Hyf.
    rewrite -> IR_AbsSmall_as_CR.
    unfold e'.
-   apply AbsSmall_wdr with (IRasCR (F y Hyf)[-]IRasCR a0)%CR;[|apply eq_symmetric; apply IR_minus_as_CR].
+   apply AbsSmall_wdr
+     with (IRasCR (F y Hyf) - IRasCR a0)%CR;[|apply eq_symmetric; apply IR_minus_as_CR].
    rewrite IR_inj_Q_as_CR.
-   apply CRAbsSmall_ball.
+   apply (CRAbsSmall_ball (IRasCR (F y Hyf))).
    unfold a0; rewrite -> IR_inj_Q_as_CR.
    assert (X0:(forall (q : Q) (Hq : Dom F (inj_Q IR q)), clcr (inj_Q IR a) (inj_Q IR b) (inj_Q IR q) ->
      (Cbind QPrelengthSpace f (' q) == IRasCR (F (inj_Q IR q) Hq))%CR)).
     intros q Hq [Hq0 H1].
-    rewrite -> (Cbind_correct QPrelengthSpace f (' q))%CR.
+    pose proof (Cbind_correct QPrelengthSpace f).
+    apply ucEq_equiv in H.
+    rewrite -> (H (' q))%CR. clear H.
     rewrite -> (BindLaw1 f).
     apply Hf.
     split.
@@ -709,7 +722,9 @@ Proof.
      with (proj1_sig ((1#2)*e + (1#2)*e)%Qpos) by (simpl; ring).
    apply ball_triangle with (f x); [|apply ball_approx_r].
    rewrite <- (BindLaw1 f).
-   rewrite <- (Cbind_correct QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x)).
+   pose proof (Cbind_correct QPrelengthSpace f) as H.
+   apply ucEq_equiv in H.
+   rewrite <- (H (Cunit_fun Q_as_MetricSpace x)). clear H.
    set (z0:=(Cbind QPrelengthSpace f (Cunit_fun Q_as_MetricSpace x))).
    apply: uc_prf.
    clear z X X0 Hyf.
@@ -794,7 +809,7 @@ Proof.
      (fun z : RegularFunction Qball => approximate z ((1 # 2) * e)%Qpos) (Map f s2))))).
    change (IntegralQ (dist_raw (uc_stdFun f ^@> glue o s1 s2) ((1 # 2) * e)%Qpos))
      with z.
-   apply CRAbsSmall_ball.
+   apply (CRAbsSmall_ball (IRasCR (integral (inj_Q IR a) (inj_Q IR b) Hab F HF))).
  set (c:=(affineCombo (OpenUnitDual o) a b:Q)).
  assert (Hac:inj_Q IR a[<=]inj_Q IR c).
   unfold c.
@@ -848,8 +863,12 @@ Proof.
     by (unfold QposEq; simpl; ring).
   unfold QposEq in H. rewrite H. clear H.
  rewrite <- CRAbsSmall_ball.
- stepr ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl)[-]('((c-a)*zl))%Q)+
-   ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)[-]('((b - c) * zr))))%Q)%CR.
+ setoid_replace (@cg_minus CRasCGroup (IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl) +
+      IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr))%CR
+      (' ((c - a) * zl + (b - c) * zr)%Q)%CR)
+   with 
+ ((IRasCR (integral (inj_Q IR a) (inj_Q IR c) Hac F HFl) - ('((c-a)*zl))%Q)+
+   ((IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr) - ('((b - c) * zr)%Q))))%CR.
   stepl ('proj1_sig (ca * e)%Qpos + 'proj1_sig (bc * e)%Qpos)%CR.
    apply: AbsSmall_plus.
    apply (IHs1 _ _ Hac0); auto.
@@ -882,7 +901,8 @@ Proof.
    (IRasCR (integral (inj_Q IR c) (inj_Q IR b) Hcb F HFr)).
  intros x y.
  clear - x y.
- change ((x-' ((c - a) * zl)%Q + (y-' ((b - c) * zr)%Q))== (x + y)-(' ((c - a) * zl + (b - c) * zr)%Q))%CR.
+ change (@cg_minus CRasCGroup (x + y)%CR (' ((c - a) * zl + (b - c) * zr)%Q)%CR)
+   with (x + y - ' ((c - a) * zl + (b - c) * zr)%Q)%CR.
  ring.
 Qed.
   

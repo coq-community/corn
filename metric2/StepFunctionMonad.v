@@ -116,7 +116,7 @@ Defined.
 Lemma MirrorBind(X Y : RSetoid):forall (x:StepF X) (f:X --> (StepFS Y)),
 Mirror (StFBind00 x f)==(StFBind00 (Mirror x) (compose (MirrorS Y) f)).
 Proof.
- induction x using StepF_ind.
+ induction x.
   reflexivity.
  intros. simpl. rewrite MirrorGlue. apply glue_wd; auto with *.
   rewrite -> IHx2. simpl. change
@@ -133,7 +133,7 @@ Qed.
 Lemma SplitLBind (X Y : RSetoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
  SplitL (StFBind00 y f) o == StFBind00 (SplitL y o) (compose1 (SplitLS Y o) f).
 Proof.
- induction y using StepF_ind. reflexivity.
+ induction y. reflexivity.
  intros p f. simpl.  apply SplitL_glue_ind; apply SplitL_glue_ind; intros H H0;
    try solve [ elim (Qlt_not_le o p); auto with *
      | elim (Qlt_not_le _ _  H0) || elim (Qlt_not_le _ _  H); rewrite -> H || rewrite -> H0; auto with *].
@@ -162,7 +162,7 @@ Qed.
 Lemma SplitRBind (X Y : RSetoid) : forall (y:(StepF X)) (o:OpenUnit) (f: (X-->(StepFS Y))),
  SplitR (StFBind00 y f) o == StFBind00 (SplitR y o) (compose1 (SplitRS Y o) f).
 Proof.
- induction y using StepF_ind. reflexivity.
+ induction y. reflexivity.
  intros p f. simpl.  apply SplitR_glue_ind; apply SplitR_glue_ind; intros H H0;
    try solve [ elim (Qlt_not_le o p); auto with *
      | elim (Qlt_not_le _ _  H0) || elim (Qlt_not_le _ _  H); rewrite -> H || rewrite -> H0; auto with *].
@@ -174,7 +174,8 @@ Proof.
     symmetry. apply StepF_Qeq_eq. apply ((SplitLSplitR (f x) p) (OpenUnitDualDiv _ _ H));
       simpl; field; auto with *.
    apply StFBind_wd1.
-   intro x. simpl. unfold compose0, SplitLS0. symmetry. apply: StepF_Qeq_eq. apply (SplitRSplitR (f x)).
+   intro x. simpl. unfold compose0, SplitLS0. symmetry.
+   apply: (@StepF_Qeq_eq). apply (SplitRSplitR (f x)).
    simpl. field. auto with *.
    (* o<p*)
    setoid_replace (OpenUnitDualDiv p o H0) with (OpenUnitDualDiv p o H) by (unfold ou_eq; reflexivity).
@@ -192,14 +193,14 @@ Lemma StFBind_wd(X Y : RSetoid): forall x1 x2 : StepFS X,
 st_eq  x1 x2 ->
 st_eq (StFBind1 Y x1) (StFBind1 Y x2).
 Proof.
- induction x1 using StepF_ind. intro y.
-  induction y using StepF_ind. simpl. intro H.
-   intro f. apply f. auto with *.
+ induction x1. intro y.
+  induction y. simpl. intro H.
+   intro f. apply f. exact H.
    simpl. intro H. destruct H as [Hl Hr] using (eq_glue_ind y1).
   intro f.
   rewrite <- (IHy1 Hl (compose1 (SplitLS Y o) f)). simpl. unfold compose0. clear IHy1.
   rewrite <- (IHy2 Hr (compose1 (SplitRS Y o) f)). simpl. unfold compose0.
-  unfold SplitLS0, SplitRS0. symmetry. apply: glueSplit.
+  unfold SplitLS0, SplitRS0. symmetry. apply: @glueSplit.
   intros y H f.
  simpl in H.
  destruct H as [Hl Hr] using (glue_eq_ind x1_1).
@@ -285,7 +286,7 @@ Qed.
 Lemma BindReturn(m:StepF X): (StFBind X X m (StFReturn X)) == m.
 Proof.
  unfold StFBind.
- induction m using StepF_ind.
+ induction m.
   simpl. auto with *.
   simpl.
  unfold StFBind00.

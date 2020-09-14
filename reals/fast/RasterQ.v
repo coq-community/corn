@@ -37,18 +37,20 @@ Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 (** For [Q2], classical membership in a finite enumeration is the
 same as a constructive membership. *)
 Lemma InStrengthen : forall x (l:FinEnum Q2),
-    InFinEnumC x l -> exists y : Q2, In y l /\ st_eq x y.
+    InFinEnumC x l -> exists y : Q2, In y l /\ msp_eq x y.
 Proof.
  induction l.
  intro abs. exfalso; exact (FinSubset_ball_nil abs).
  intros H.
- assert (L:st_eq x a \/ ~st_eq x a).
+ assert (L:msp_eq x a \/ ~msp_eq x a).
   destruct (Qeq_dec (fst x) (fst a)).
    destruct (Qeq_dec (snd x) (snd a)).
     left.
-    split; auto.
-   right; intros [_ B]; auto.
-  right; intros [B _]; auto.
+    split; apply Qball_0; auto.
+   right; intros [_ B].
+   apply Qball_0 in B. contradiction.
+  right; intros [B _].
+   apply Qball_0 in B. contradiction.
  destruct L.
   exists a.
   split; auto with *.
@@ -57,7 +59,6 @@ Proof.
   destruct H as [G | H | H] using orC_ind.
   intro abs. contradict G; intro G. contradiction.
    elim H0; auto.
-   apply ball_0 in H. exact H.
    exact H.
  exists y.
  split; auto with *.
@@ -66,7 +67,7 @@ Qed.
 Definition InterpRow (up : list Q) n (v:Vector.t bool n) : FinEnum Q_as_MetricSpace :=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
-Definition InterpRaster n m (bitmap : raster n m) (tl br:(ProductMS Q_as_MetricSpace Q_as_MetricSpace)) : FinEnum Q2 :=
+Definition InterpRaster (n m:nat) (bitmap : raster n m) (tl br:Q2) : FinEnum Q2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in
@@ -233,18 +234,22 @@ Qed.
 
 End InterpRasterCorrect.
 (* begin hide *)
-Add Parametric Morphism n m bm : (@InterpRaster n m bm) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as InterpRaster_wd.
+Add Parametric Morphism n m bm : (@InterpRaster n m bm)
+    with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _) as InterpRaster_wd.
 Proof.
- cut (forall (x1 x2 : Q2), prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x1 x2 -> forall x3 x4 : Q2,
-   prod_st_eq Q_as_MetricSpace Q_as_MetricSpace x3 x4 -> forall y,
-     InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y (InterpRaster bm x1 x3) ->
-       InFinEnumC (X:=ProductMS Q_as_MetricSpace Q_as_MetricSpace) y (InterpRaster bm x2 x4)).
-  intros L.
-  split.
-   apply L; auto.
-  apply L.
-   symmetry; auto.
-  symmetry; auto.
+ cut (forall (x1 x2 : Q2), msp_eq x1 x2 -> forall x3 x4 : Q2,
+   msp_eq x3 x4 -> forall y,
+     InFinEnumC y (InterpRaster bm x1 x3) ->
+       InFinEnumC y (InterpRaster bm x2 x4)).
+ { intro L. split. discriminate. split.
+   intros q H1 abs.
+   contradiction (abs q). split. exact (L x y H x0 y0 H0 q H1).
+   reflexivity.
+   intros q H1 abs.
+   contradiction (abs q). split.
+   symmetry in H, H0.
+   exact (L y x H y0 x0 H0 q H1).
+   reflexivity. }
  intros [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
  destruct (@InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
  destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by'] [Hb0 [Hb1 Hb2]]].
@@ -253,7 +258,7 @@ Proof.
  unfold snd, fst in Ha1.
  destruct x2 as [x2l x2r].
  destruct y2 as [y2l y2r].
- assert (L0:st_eq z ((x2l + (y2l - x2l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
+ assert (L0:msp_eq z ((x2l + (y2l - x2l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
    (x2r + (y2r - x2r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1)))).
   transitivity ((x1l + (y1l - x1l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
     (x1r + (y1r - x1r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1))).
@@ -262,8 +267,12 @@ Proof.
   destruct Hx as [Hx1 Hx2].
   destruct Hy as [Hy1 Hy2].
   split; unfold fst,snd in *.
+  apply Qball_0 in Hx1.
+  apply Qball_0 in Hy1.
    rewrite -> Hx1, Hy1.
    reflexivity.
+  apply Qball_0 in Hx2.
+  apply Qball_0 in Hy2. 
   rewrite -> Hx2, Hy2.
   reflexivity.
   unfold InFinEnumC.

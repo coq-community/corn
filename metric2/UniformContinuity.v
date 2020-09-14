@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax. 
 Require Export CoRN.metric2.Metric.
 Require Export CoRN.model.structures.QposInf.
@@ -77,7 +76,7 @@ Definition is_UniformlyContinuousFunction
 
 (** Every uniformly continuous function is automatically well defined *)
 Lemma is_UniformlyContinuousFunction_wd : forall (f1 f2:X -> Y) (mu1 mu2: Qpos -> QposInf),
- (forall x, st_eq (f1 x) (f2 x)) ->
+ (forall x, msp_eq (f1 x) (f2 x)) ->
  (forall x, QposInf_le (mu2 x) (mu1 x)) ->
  (is_UniformlyContinuousFunction f1 mu1) ->
  (is_UniformlyContinuousFunction f2 mu2).
@@ -116,28 +115,12 @@ Qed.
 (** *** The metric space of uniformly continuous functions
 The space of uniformly continuous functions from a metric space *)
 Definition ucEq (f g : UniformlyContinuousFunction) :=
- forall x, st_eq (f x) (g x).
-
-Lemma uc_setoid : Setoid_Theory UniformlyContinuousFunction ucEq.
-Proof.
- constructor.
-   intros x a.
-   reflexivity.
-  intros x y H a.
-  symmetry.
-  apply H.
- intros x y z H1 H2 a.
- transitivity (y a).
-  apply H1.
- apply H2.
-Qed.
-
-Definition uc_Setoid : RSetoid := (Build_RSetoid uc_setoid).
+  forall x:X, msp_eq (f x) (g x).
 
 Definition ucBall e (f g : UniformlyContinuousFunction)
   := 0 <= e /\ forall a:X, ball e (f a) (g a).
 
-Lemma uc_is_MetricSpace : is_MetricSpace uc_Setoid ucBall.
+Lemma uc_is_MetricSpace : is_MetricSpace ucBall.
 Proof.
  constructor.
  - firstorder using ball_refl.
@@ -157,9 +140,6 @@ Proof.
      rewrite <- (Qmult_le_l _ _ (1#2)).
      rewrite Qmult_0_r. exact H. reflexivity.
    + intro a. apply ball_closed. firstorder.
- - intros f g H a.
-   apply ball_eq.
-   firstorder.
  - intros e a b H. apply H. 
  - intros. split.
    apply Qnot_lt_le.
@@ -173,23 +153,17 @@ Proof.
    apply abs, H.
 Qed.
 
-Lemma ucBall_wd : forall (e1 e2:Q), (e1 == e2) ->
-            forall (x1 x2 : uc_Setoid), (st_eq x1 x2) ->
-            forall (y1 y2 : uc_Setoid), (st_eq y1 y2) ->
-            (ucBall e1 x1 y1 <-> ucBall e2 x2 y2).
+Lemma ucBall_e_wd : forall (e1 e2:Q) x y,
+    e1 == e2 -> (ucBall e1 x y <-> ucBall e2 x y).
 Proof.
  intros.
  unfold ucBall in *.
- simpl in H0, H1.
- unfold ucEq in H0, H1.
  split.
- - intros. destruct H2. split. rewrite <- H. exact H2.
-   intro a. apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
-   apply H3.
- - intros. destruct H2. split.
-   rewrite H. exact H2. intro a.
-   apply (ball_wd Y H _ _ (H0 a) _ _ (H1 a)).
-   auto.
+ - intros H0. destruct H0. split. rewrite <- H. exact H0.
+   intro a. apply (ball_e_wd _ _ _ H), H1.
+ - intros. destruct H0. split.
+   rewrite H. exact H0. intro a.
+   apply (ball_e_wd _ _ _ H), H1.
 Qed.
 
 (** mu_ex generalizes mu analogous to how ball_ex generalizes ball: *)
@@ -221,14 +195,24 @@ Add Setoid UniformlyContinuousFunction ucEq uc_setoid as uc_Setoid.
 (* end hide *)
 
 Definition UniformlyContinuousSpace (X Y:MetricSpace) : MetricSpace :=
-Build_MetricSpace (@ucBall_wd X Y) (@uc_is_MetricSpace X Y).
+  Build_MetricSpace (@ucBall_e_wd X Y) (@uc_is_MetricSpace X Y).
+
+Lemma ucEq_equiv : forall X Y (x y : UniformlyContinuousSpace X Y),
+    ucEq x y <-> msp_eq x y.
+Proof.
+  unfold msp_eq, ucEq. split.
+  - intros. split. apply Qle_refl.
+    intros. apply H.
+  - intros. destruct H.
+    apply H0.
+Qed.
 
 Notation "x --> y" := (UniformlyContinuousSpace x y) (at level 55, right associativity) : uc_scope.
 
 Local Open Scope uc_scope.
 (* begin hide *)
-Add Parametric Morphism (X Y:MetricSpace) f : (@ucFun X Y f)
-    with signature (@st_eq X) ==> (@st_eq Y) as uc_wd.
+Add Parametric Morphism (X Y:MetricSpace) (f : X --> Y) : (ucFun f)
+    with signature (@msp_eq X) ==> (@msp_eq Y) as uc_wd.
 Proof.
  intros x0 x1 Hx.
  apply ball_eq.
@@ -242,18 +226,19 @@ Proof.
 Qed.
 
 Instance uc_wd_more_Proper (X Y : MetricSpace):
-  Proper (@ucEq _ _ ==> @st_eq X ==> @st_eq Y) (@ucFun X Y).
+  Proper (@ucEq _ _ ==> @msp_eq X ==> @msp_eq Y) (@ucFun X Y).
 Proof. intros ?? E ?? F. now rewrite F. Qed.
 
 Definition ucFun2 (X Y Z:MetricSpace) (f: X --> Y --> Z) (x:X) (y:Y) := f x y.
 
-Add Parametric Morphism (X Y Z:MetricSpace) f : (@ucFun2 X Y Z f) with signature (@st_eq X) ==> (@st_eq Y) ==> (@st_eq Z) as ucFun2_wd.
+Add Parametric Morphism (X Y Z:MetricSpace) f : (@ucFun2 X Y Z f)
+    with signature (@msp_eq X) ==> (@msp_eq Y) ==> (@msp_eq Z) as ucFun2_wd.
 Proof.
  intros x y Hxy x0 y0 Hxy0.
  unfold ucFun2.
  rewrite -> Hxy0.
  generalize y0.
- change (st_eq (f x) (f y)).
+ apply ucEq_equiv.
  rewrite -> Hxy.
  reflexivity.
 Qed.
@@ -291,13 +276,16 @@ Definition uc_compose (X Y Z:MetricSpace) (g: Y --> Z) (f:X --> Y) : X --> Z :=
 Build_UniformlyContinuousFunction (uc_compose_prf g f).
 
 (* begin hide *)
-Add Parametric Morphism X Y Z : (@uc_compose X Y Z) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as uc_compose_wd.
+Add Parametric Morphism X Y Z : (@uc_compose X Y Z)
+    with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _) as uc_compose_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
- intros x.
+ apply ucEq_equiv. intros x.
  simpl.
+ apply ucEq_equiv in Hx.
  rewrite -> (Hx (y1 x)).
  apply uc_wd.
+ apply ucEq_equiv in Hy.
  rewrite -> (Hy x).
  reflexivity.
 Qed.

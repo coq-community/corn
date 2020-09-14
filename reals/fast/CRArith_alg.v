@@ -45,17 +45,18 @@ Require Import CRArith.
 Local Open Scope CR_scope.
 
 
-Lemma inject_Q_product (l: list Q): (' cr_Product l) [=] cr_Product (map inject_Q_CR l).
+Lemma inject_Q_product (l: list Q)
+  : (' cr_Product l) == @cr_Product CRasCRing (map inject_Q_CR l).
 Proof.
  induction l.
   reflexivity.
- change (' (a * cr_Product l)%Q[=]cr_Product (map inject_Q_CR (a :: l))).
+ change (' (a * cr_Product l)%Q == @cr_Product CRasCRing (map inject_Q_CR (a :: l))).
  rewrite <- CRmult_Qmult.
  rewrite IHl.
  reflexivity.
 Qed.
 
-Lemma inject_Qred_ap (x y: Q): Qred x <> Qred y -> ' x [#] ' y.
+Lemma inject_Qred_ap (x y: Q): Qred x <> Qred y -> ' x >< ' y.
 Proof with auto.
  intro.
  apply Qap_CRap.
@@ -64,13 +65,13 @@ Proof with auto.
  apply Qred_complete...
 Qed.
 
-Lemma inject_Q_strext : fun_strext inject_Q_CR.
+Lemma inject_Q_strext : @fun_strext _ CRasCSetoid inject_Q_CR.
 Proof.
  intros x y [Hxy|Hxy].
   apply: Qlt_not_eq.
   apply Qnot_le_lt.
   intros H.
-  absurd ('y[<=]'x).
+  absurd ('y <= 'x).
    rewrite -> leEq_def.
    auto with *.
   rewrite -> CRle_Qle.
@@ -79,7 +80,7 @@ Proof.
  apply: Qlt_not_eq.
  apply Qnot_le_lt.
  intros H.
- absurd ('x[<=]'y).
+ absurd ('x <= 'y).
   rewrite -> leEq_def.
   auto with *.
  rewrite -> CRle_Qle.

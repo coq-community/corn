@@ -20,7 +20,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -47,6 +46,7 @@ on rational numbers. *)
 Lemma CReq_Qeq : forall (x y:Q), inject_Q_CR x == inject_Q_CR y <-> (x == y)%Q.
 Proof.
  intros x y.
+ rewrite <- Qball_0.
  apply Cunit_eq.
 Qed.
 
@@ -66,6 +66,7 @@ Qed.
 Lemma CRplus_Qplus : forall (x y:Q), inject_Q_CR x + inject_Q_CR y == inject_Q_CR (x + y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
+ rewrite Qplus_0_r.
  apply (Qpos_nonneg (e1+e2)).
 Qed.
 
@@ -74,6 +75,7 @@ Hint Rewrite <- CRplus_Qplus : toCRring.
 Lemma CRopp_Qopp : forall (x:Q), - inject_Q_CR x == inject_Q_CR (- x)%Q.
 Proof.
  intros x e1 e2; apply ball_refl.
+ rewrite Qplus_0_r.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
@@ -83,6 +85,7 @@ Hint Rewrite <- CRopp_Qopp : toCRring.
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q_CR x - inject_Q_CR y == inject_Q_CR (x - y)%Q.
 Proof.
  intros x y e1 e2; apply ball_refl.
+ rewrite Qplus_0_r.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
@@ -93,6 +96,7 @@ Proof.
  intros x y.
  rewrite -> CRmult_scale.
  intros e1 e2; apply ball_refl.
+ rewrite Qplus_0_r.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
@@ -141,6 +145,7 @@ Lemma CRplus_0_l (x: CR): (0 + x == x)%CR.
 Proof.
   intros e1 e2. destruct x; simpl. 
   unfold Cap_raw; simpl.
+  rewrite Qplus_0_r.
   rewrite Qplus_0_l.
   assert ((1#2)*`e1 + `e2 <= `e1 + `e2)%Q.
   { apply Qplus_le_l. rewrite <- (Qmult_1_l (`e1)) at 2.
@@ -155,7 +160,7 @@ Proof.
   rewrite CRplus_uncurry_eq.
   rewrite CRplus_uncurry_eq.
   apply Cmap2_comm. 
-  intros a b. apply Qplus_comm.
+  intros a b. apply Qball_0, Qplus_comm.
 Qed.
 
 Lemma CRplus_assoc (x y z: CR): x + (y + z) == (x + y) + z.
@@ -177,6 +182,7 @@ Proof.
           + (approximate1 ((1 # 2) * ((1 # 2) * e1))%Qpos
              - approximate1 ((1 # 2) * e2)%Qpos))%Q
     by (unfold equiv, stdlib_rationals.Q_eq; ring).
+  rewrite Qplus_0_r.
   setoid_replace (` e1 + ` e2)%Q
     with (((1#2)* ` e1 + (1#2)*((1#2) * `e2))
           + ((1#2)*((1#2)* `e1) + (1#2)*((1#2)*`e2))
@@ -198,6 +204,7 @@ Lemma CRmult_1_l : forall (x: CR), 1 * x == x.
 Proof.
   intro x. rewrite CRmult_scale. 
   intros e1 e2. destruct x; simpl.
+  rewrite Qplus_0_r.
   rewrite Qmult_1_l.
   rewrite <- (Qmult_1_l (`e1)).
   apply (regFun_prf ((1#1)*e1)%Qpos e2).
@@ -213,7 +220,7 @@ Lemma CRmult_comm_bounded (x y: CR) (b:Qpos) :
 Proof.
   intros. rewrite CRmult_uncurry_eq, CRmult_uncurry_eq; try assumption.
   apply Cmap2_comm. 
-  intros. apply Qmult_comm.
+  intros. apply Qball_0, Qmult_comm.
 Qed.
 
 Lemma CRmult_comm (x y: CR): x * y == y * x.
@@ -267,7 +274,8 @@ Proof.
     apply (Qle_trans _ (` (CR_b (1#1)%Qpos z) + (1#1))).
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     apply CRmult_assoc_zfactor_le. }
-  rewrite <- (@CRmult_bounded_mult b), <- (@CRmult_bounded_mult b).
+  rewrite <- (@CRmult_bounded_mult b x y), <- (@CRmult_bounded_mult b).
+  2: exact zlower. 2: exact zupper.
   rewrite <- (@CRmult_bounded_mult b), <- (@CRmult_bounded_mult b).
   apply CRmult_assoc_bounded.
   - exact zlower.
@@ -307,12 +315,10 @@ Proof.
     apply (Qle_trans _ (` (CR_b (1#1)%Qpos y) + (1#1))).
     rewrite <- Qplus_0_r at 1. apply Qplus_le_r. discriminate.
     apply CRmult_assoc_yfactor_le.
-  - exact zlower.
-  - exact zupper.
 Qed.
 
 Lemma CRmult_plus_distr_r : ∀ x y z : CR,
-    st_eq ((x + y) * z) (x * z + y * z).
+    ((x + y) * z == x * z + y * z).
 Proof.
   intros x y z.
   pose ((CR_b (1#1) x + CR_b (1#1) y + CR_b (1#1) z))%Qpos as b.
@@ -388,6 +394,7 @@ Proof.
   ; exact yupper. 
   rewrite CRmult_uncurry_eq.
   intros e1 e2. 
+  rewrite Qplus_0_r.
   change (Qball (`e1 + `e2)
                 (QboundAbs b
                            (approximate (CRboundAbs (CR_b (1#1) x) x)
@@ -562,10 +569,19 @@ Proof.
     apply (Qpos_nonneg (CR_b (1#1) z)).
 Qed.
 
+Lemma CRmult_plus_distr_l : ∀ x y z : CR,
+    (z * (x + y) == z * x + z * y)%CR.
+Proof.
+  intros.
+  rewrite CRmult_comm, CRmult_plus_distr_r.
+  rewrite (CRmult_comm z).
+  rewrite (CRmult_comm z).
+  reflexivity.
+Qed.
 
 Lemma CR_ring_theory :
  @ring_theory CR 0 1 (ucFun2 CRplus_uc) CRmult
- (fun (x y:CR) => (x + - y)) CRopp (@st_eq CR).
+ (fun (x y:CR) => (x + - y)) CRopp (@msp_eq CR).
 Proof.
  split.
  - exact CRplus_0_l.
@@ -577,13 +593,14 @@ Proof.
  - exact CRmult_plus_distr_r.
  - reflexivity.
  - intros x e1 e2. simpl.
-   unfold Cap_raw;simpl. rewrite Qplus_opp_r.
-   apply ball_refl. apply (Qpos_nonneg (e1+e2)).
+   unfold Cap_raw;simpl. rewrite Qplus_0_r.
+   rewrite Qplus_opp_r.
+   apply Qball_Reflexive. apply (Qpos_nonneg (e1+e2)).
 Qed.
 
 Lemma CR_Q_ring_morphism :
  ring_morph 0%CR 1%CR (ucFun2 CRplus_uc) CRmult
- (fun x y => (x + - y)) CRopp (@st_eq CR)
+ (fun x y => (x + - y)) CRopp (@msp_eq CR)
   (0%Q) (1%Q) Qplus Qmult Qminus Qopp Qeq_bool (inject_Q_CR).
 Proof.
  split; try reflexivity.
@@ -605,7 +622,7 @@ Ltac CRcst t :=
 
 Ltac CRring_pre := autorewrite with toCRring.
 
-Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus_uc) CRmult CRopp (@st_eq CR).
+Lemma CR_ring_eq_ext : ring_eq_ext (ucFun2 CRplus_uc) CRmult CRopp (@msp_eq CR).
 Proof.
  split.
    rapply ucFun2_wd.
@@ -613,7 +630,7 @@ Proof.
  rapply uc_wd.
 Qed.
 
-Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@st_isSetoid (@msp_is_setoid CR)) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
+Add Ring CR_ring : CR_ring_theory (morphism CR_Q_ring_morphism, setoid (@msp_Setoid CR) CR_ring_eq_ext, constants [CRcst], preprocess [CRring_pre]).
 
 (** Relationship between strict and nonstrict positivity *)
 Lemma CRpos_nonNeg : forall x, CRpos x -> CRnonNeg x.
@@ -680,6 +697,15 @@ Lemma CRopp_plus_distr : forall (r1 r2 : CR),
     - (r1 + r2) == - r1 + - r2.
 Proof. intros. ring. Qed.
 
+Lemma CRopp_mult_distr_r : forall (r1 r2 : CR),
+    - (r1 * r2) == r1 * (- r2).
+Proof. intros. ring. Qed.
+
+Lemma CRopp_mult_distr_l : forall (r1 r2 : CR),
+    - (r1 * r2) == (-r1) * r2.
+Proof. intros. ring. Qed.
+
+
 Lemma approximate_CRplus (x y: CR) (e: Qpos):
  approximate (x + y)%CR e = (approximate x ((1#2) * e)%Qpos + approximate y ((1#2) * e)%Qpos)%Q.
 Proof. reflexivity. Qed.
@@ -727,12 +753,12 @@ Lemma CRplus_lt_r (x y z: CR):
 Proof.
   split.
   - intros. destruct H as [q H].
-    exists q. setoid_replace (y+z-(x+z)) with (y-x)
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+    exists q. setoid_replace (y+z-(x+z))%CR with (y-x)%CR
+      by (unfold equiv, msp_Equiv; ring).
     exact H.
   - intros. destruct H as [q H].
     exists q. setoid_replace (y-x) with (y+z-(x+z))
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      by (unfold equiv, msp_Equiv; ring).
     exact H.
 Qed.
 
@@ -743,11 +769,11 @@ Proof.
   split.
   - intros. destruct H as [q H].
     exists q. setoid_replace (z+y-(z+x)) with (y-x)
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      by (unfold equiv, msp_Equiv; ring).
     exact H.
   - intros. destruct H as [q H].
     exists q. setoid_replace (y-x) with (z+y-(z+x))
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      by (unfold equiv, msp_Equiv; ring).
     exact H.
 Qed.
 
@@ -1130,8 +1156,8 @@ Proof.
   split.
   - intros H [q H0]. 
     apply (CRplus_le_compat _ _ _ _ H) in H0.
-    setoid_replace (y + (x-y)) with (x+0) in H0
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+    setoid_replace (y + (x-y))%CR with (x+0) in H0
+      by (unfold equiv, msp_Equiv; ring).
     apply CRplus_le_l in H0.
     apply CRle_Qle in H0.
     apply (Qle_not_lt _ _ H0 (Qpos_ispos q)).
@@ -1165,7 +1191,7 @@ Proof.
       exists q. unfold CRle. unfold CRle in H0.
       setoid_replace (x - y - ' 0%Q - ' ` q)%CR
         with (x - y - ' ` q) in H0
-        by (unfold equiv, stdlib_rationals.Q_eq; ring).
+        by (unfold equiv, msp_Equiv; ring).
       exact H0. }
     apply (CRplus_le_r _ _ (-y)). 
     rewrite CRplus_opp.
@@ -1405,7 +1431,7 @@ Lemma CRmult_inv_r_bounded
     -> (/ `q <= `b)%Q
     -> (forall e:Qpos, approximate x e <= `b)%Q
     -> (forall e:Qpos, - `b <= approximate x e)%Q
-    -> st_eq (CRmult_bounded b x (CRinv_pos q x)) 1.
+    -> CRmult_bounded b x (CRinv_pos q x) == 1.
 Proof.
   intros x q b pos qltb invqleb xbelow xabove. 
   rewrite CRmult_uncurry_eq.
@@ -1497,6 +1523,7 @@ Proof.
     apply (Qle_trans _ ((`e1+`e2)*`q)).
     rewrite <- Qplus_0_r, Qmult_plus_distr_l.
     apply Qplus_le_r. apply (Qpos_nonneg (e2*q)).
+    rewrite Qplus_0_r.
     apply Qmult_le_l. apply (Qpos_ispos (e1+e2)).
     apply Qmax_ub_l.
   - apply Qlt_le_weak, Qinv_lt_0_compat.
@@ -1515,7 +1542,7 @@ Proof.
 Qed.
 
 Lemma CRmult_inv_r_pos : forall (x : CR) (xnz : (x >< 0)%CR),
-    (0 < x)%CR -> st_eq (x * CRinvT x xnz)%CR 1%CR.
+    (0 < x)%CR -> (x * CRinvT x xnz == 1).
 Proof.
   intros. destruct xnz.
   exfalso. exact (CRlt_irrefl x (CRlt_trans _ _ _ c H)).
@@ -1579,14 +1606,14 @@ Proof.
 Qed.
 
 Lemma CRmult_inv_r : forall (x : CR) (xnz : (x >< 0)%CR),
-    st_eq (x * CRinvT x xnz)%CR 1%CR.
+    x * CRinvT x xnz == 1.
 Proof.
   intros. destruct xnz as [neg|pos].
   - pose proof neg as otherNeg.
     destruct neg as [q neg]. unfold CRinvT.
     setoid_replace (x * - CRinv_pos q (- x))%CR
       with (-x * CRinv_pos q (- x))%CR
-      by (unfold equiv, stdlib_rationals.Q_eq; ring).
+      by (unfold equiv, msp_Equiv; ring).
     apply CRopp_lt_compat in otherNeg.
     apply (CRltT_wd CRopp_0 (reflexivity _)) in otherNeg.
     pose proof (CRmult_inv_r_pos (-x)%CR (inr otherNeg) otherNeg).
@@ -1664,7 +1691,7 @@ Proof.
 Qed.
 
 Lemma CReq_not_apart : forall x y : CR,
-    st_eq x y <-> (CRapartT x y -> False).
+    (x == y)%CR <-> (CRapartT x y -> False).
 Proof.
   split.
   - intros. destruct H0.
@@ -1912,6 +1939,7 @@ Proof.
   2: exact blower. 2: exact bupper.
   rewrite <- (CRmult_bounded_mult c).
   2: exact blower. 2: exact bupper.
+  change (0 <= ucFun2 (CRmult_bounded c) a b)%CR.
   rewrite <- (@CRboundAbs_Eq c a).
   rewrite <- (@CRboundAbs_Eq c b).
   apply (CRmult_le_0_compat_bounded
@@ -1948,7 +1976,7 @@ Proof.
   rewrite CRplus_opp.
   rewrite <- CRmult_scale.
   setoid_replace (a * b - ' ` q * b)%CR with ((a-'`q)*b)%CR
-    by (unfold equiv; ring).
+    by (unfold equiv, msp_Equiv; ring).
   apply CRmult_le_0_compat.
   apply (CRplus_le_l _ _ ('`q)%CR). ring_simplify. exact H.
   apply (@CRle_trans _ ('`r)%CR).
@@ -2110,7 +2138,8 @@ Proof.
   apply CRle_not_lt. intro abs.
   contradict H; intro H.
   rewrite <- CRopp_0 in H0.
-  setoid_replace (a*b)%CR with (-(a*-b))%CR in H0 by (unfold equiv; ring).
+  setoid_replace (a*b)%CR with (-(a*-b))%CR in H0
+    by (unfold equiv, msp_Equiv; ring).
   apply CRopp_le_cancel in H0.
   pose proof (CRle_not_lt (a*-b)%CR 0%CR) as [H1 _].
   specialize (H1 H0). contradict H1. clear H0.
@@ -2121,11 +2150,12 @@ Proof.
 Qed.
 
 Lemma CRmult_eq_0_reg_l : forall x y : CR,
-    (~st_eq y 0%CR)
-    -> st_eq (x*y)%CR 0%CR
-    -> st_eq x 0%CR.
+    (~(y == 0)%CR)
+    -> (x*y == 0)%CR
+    -> (x == 0)%CR.
 Proof.
-  intros. apply Metric_eq_stable.
+  intros. apply ball_stable.
+  change (~~(x==0)%CR).
   intros abs.
   rewrite CReq_not_apart in abs.
   contradict abs; intro xap0.
@@ -2146,13 +2176,15 @@ Proof.
       pose proof (CRmult_lt_0_compat _ _ c c0) as H.
       revert H.
       apply CRle_not_lt.
-      setoid_replace (-x*-y)%CR with (x*y)%CR by (unfold equiv; ring).
+      setoid_replace (-x*-y)%CR with (x*y)%CR
+        by (unfold equiv, msp_Equiv; ring).
       rewrite H0. apply CRle_refl.
     + pose proof (CRmult_lt_0_compat _ _ c c0) as H.
       revert H.
       apply CRle_not_lt.
       rewrite opp0.
-      setoid_replace (-x*y)%CR with (-(x*y))%CR by (unfold equiv; ring).
+      setoid_replace (-x*y)%CR with (-(x*y))%CR
+        by (unfold equiv, msp_Equiv; ring).
       apply CRopp_le_compat.
       rewrite H0. apply CRle_refl.
   - destruct yap0.
@@ -2163,7 +2195,8 @@ Proof.
       pose proof (CRmult_lt_0_compat _ _ c c0) as H.
       revert H.
       apply CRle_not_lt.
-      setoid_replace (x*-y)%CR with (-(x*y))%CR by (unfold equiv; ring).
+      setoid_replace (x*-y)%CR with (-(x*y))%CR
+        by (unfold equiv, msp_Equiv; ring).
       rewrite H0, <- opp0. apply CRle_refl. 
     + pose proof (CRmult_lt_0_compat _ _ c c0) as H.
       revert H.
@@ -2185,7 +2218,8 @@ Proof.
   revert abs.
   apply CRle_not_lt. 
   apply CRlt_le_weak in H.
-  setoid_replace (x*x)%CR with (-x*-x)%CR by (unfold equiv; ring).
+  setoid_replace (x*x)%CR with (-x*-x)%CR
+    by (unfold equiv, msp_Equiv; ring).
   apply CRmult_le_0_compat.
   rewrite <- CRopp_0.
   apply CRopp_le_compat, H.

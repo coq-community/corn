@@ -180,7 +180,7 @@ Build_RegularFunction (compress_raw_prf x).
 Lemma compress_fun_correct : forall x, (compress_fun x==x)%CR.
 Proof.
  intros x.
- apply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  unfold compress_fun.
  unfold approximate at 1.

@@ -295,10 +295,32 @@ Proof.
  apply (inj_Q_nring IR 24).
 Qed.
 
-Global Instance: Proper ((=) ==> (=)) r_pi.
+Global Instance: Proper (Qeq ==> msp_eq) r_pi.
 Proof.
   intros ? ? E. unfold r_pi.
-  now rewrite E.
+  apply ucFun2_wd.
+  apply ucFun2_wd.
+  apply Cmap_wd. 2: reflexivity. simpl.
+  split. discriminate. intro q. simpl.
+  unfold Qmetric.Qball, Qmetric.QAbsSmall.
+  rewrite E. unfold Qminus. rewrite Qplus_opp_r.
+  split; discriminate.
+  apply Cmap_wd. 2: reflexivity. simpl.
+  split. discriminate. intro q. simpl.
+  unfold Qmetric.Qball, Qmetric.QAbsSmall.
+  rewrite E. unfold Qminus. rewrite Qplus_opp_r.
+  split; discriminate.
+  apply ucFun2_wd.
+  apply Cmap_wd. 2: reflexivity. simpl.
+  split. discriminate. intro q. simpl.
+  unfold Qmetric.Qball, Qmetric.QAbsSmall.
+  rewrite E. unfold Qminus. rewrite Qplus_opp_r.
+  split; discriminate.
+  apply Cmap_wd. 2: reflexivity. simpl.
+  split. discriminate. intro q. simpl.
+  unfold Qmetric.Qball, Qmetric.QAbsSmall.
+  rewrite E. unfold Qminus. rewrite Qplus_opp_r.
+  split; discriminate.
 Qed.
 
 Definition CRpi : CR := (r_pi 1).

@@ -1,5 +1,4 @@
 
-Require Import CoRN.algebra.RSetoid.
 Require Import Program MathClasses.interfaces.canonical_names util.Container QArith QMinMax CRlattice.
 
 Definition Range (T: Type) := prod T T.
@@ -7,8 +6,7 @@ Definition Range (T: Type) := prod T T.
 Instance in_QRange: Container Q (Range Q)
   := λ r x, (Qmin (fst r) (snd r) <= x <= Qmax (fst r) (snd r))%Q.
 
-Instance in_CRRange: Container (st_car (msp_is_setoid CR))
-                               (Range (st_car (msp_is_setoid CR)))
+Instance in_CRRange: Container (msp_car CR) (Range (msp_car CR))
   := λ r x,
      (ucFun (ucFun CRmin (fst r)) (snd r) <= x)%CR
      ∧ (x <= ucFun (ucFun CRmax (fst r)) (snd r))%CR.

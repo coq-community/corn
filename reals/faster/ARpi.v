@@ -29,7 +29,9 @@ Proof.
              = scale (inject_Z k * 'x) (rational_arctan_small_pos Pa)) as PP.
   { intros.
    rewrite ARtoCR_preserves_scale.
+   apply Cmap_wd.
    rewrite rings.preserves_mult, AQtoQ_ZtoAQ.
+   reflexivity.
    rewrite ARtoCR_preserves_arctan_small_pos.
    rewrite rational_arctan_small_pos_wd.
     reflexivity.

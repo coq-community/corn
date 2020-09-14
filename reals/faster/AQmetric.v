@@ -1,4 +1,3 @@
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import 
@@ -33,7 +32,14 @@ Definition CRtoAR_uc : CR --> AR := Eembed_inverse QPrelengthSpace (cast AQ Q_as
 Global Instance CRtoAR: Cast CR AR := CRtoAR_uc.
 
 Global Instance inject_AQ_AR: Cast AQ AR := (@Cunit AQ_as_MetricSpace).
-Global Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
+Global Instance: Proper ((=) ==> (@msp_eq _)) inject_AQ_AR.
+Proof.
+  intros x y xyeq.
+  apply (uc_wd (@Cunit AQ_as_MetricSpace)).
+  simpl. 
+  rewrite xyeq. reflexivity.
+Qed.
+
 Lemma ARtoCR_approx : forall (d : QposInf) (x : AR),
     approximate (ARtoCR x) d ≡ AQtoQ (approximate x d).
 Proof. intros. destruct d; reflexivity. Qed.
@@ -65,6 +71,7 @@ Proof.
   intro q.
   rewrite <- doubleSpeed_Eq.
   intros e1 e2.
+  rewrite Qplus_0_r.
   pose proof (regFun_prf (cast CR AR (inject_Q_CR q)) e1 e2) as H5.
   apply H5.
 Qed.
@@ -86,7 +93,7 @@ Proof.
 Qed.
 
 Lemma CRAR_id : forall x : CR,
-    st_eq (cast AR CR (cast CR AR x)) x.
+    msp_eq (cast AR CR (cast CR AR x)) x.
 Proof.
   intro x.
   apply (surjective (Eembed QPrelengthSpace (cast AQ Q_as_MetricSpace)) x x).

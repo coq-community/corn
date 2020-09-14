@@ -27,14 +27,14 @@ Require Export CoRN.model.metric2.CRmetric.
 Require Export CoRN.algebra.CSetoids.
 Require Import CoRN.tactics.CornTac.
 
-Instance CR_default : @DefaultRelation CR (@st_eq CR) | 2 := {}.
+Instance CR_default : @DefaultRelation CR (@msp_eq CR) | 2 := {}.
 
 (**
 ** Example of a setoid: [CR]
 *** [CR]
 *)
 
-Lemma CRisCSetoid : is_CSetoid CR (@st_eq CR) CRapartT.
+Lemma CRisCSetoid : is_CSetoid CR (@msp_eq CR) CRapartT.
 Proof.
  split;simpl.
     intros x H.
@@ -66,6 +66,6 @@ Proof.
  apply X.
 Qed.
 
-Definition CRasCSetoid : CSetoid := makeCSetoid CR _ CRisCSetoid.
+Definition CRasCSetoid : CSetoid := makeCSetoid (msp_as_RSetoid CR) _ CRisCSetoid.
 
 Canonical Structure CRasCSetoid.

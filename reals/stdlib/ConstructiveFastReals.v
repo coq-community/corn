@@ -119,7 +119,7 @@ Proof.
 Qed.
 
 Lemma CReq_nlt : forall a b : CR,
-    st_eq a b
+    msp_eq a b
     <-> (fun x y : CR =>
          (fun x0 y0 : CR => (y0 < x0)%CR -> False) y x /\
          (fun x0 y0 : CR => (y0 < x0)%CR -> False) x y) a b.

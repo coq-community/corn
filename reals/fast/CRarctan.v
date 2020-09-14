@@ -321,8 +321,10 @@ Proof.
  intros q [] _.
  transitivity (rational_arctan q);[|apply rational_arctan_correct].
  unfold arctan.
- rewrite -> (Cbind_correct QPrelengthSpace arctan_uc (' q))%CR.
- apply: BindLaw1.
+ pose proof (Cbind_correct QPrelengthSpace arctan_uc).
+ apply ucEq_equiv in H. 
+ rewrite -> (H (' q))%CR.
+ apply BindLaw1.
 Qed.
 (* begin hide *)
 Hint Rewrite arctan_correct : IRtoCR.
@@ -331,8 +333,10 @@ Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
 Proof.
  intros x.
  unfold arctan.
- rewrite -> (Cbind_correct QPrelengthSpace arctan_uc (' x))%CR.
- apply: BindLaw1.
+ pose proof (Cbind_correct QPrelengthSpace arctan_uc).
+ apply ucEq_equiv in H.
+ rewrite -> (H (' x))%CR.
+ apply BindLaw1.
 Qed.
 (* begin hide *)
 Hint Rewrite arctan_Qarctan : CRfast_compute.

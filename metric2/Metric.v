@@ -21,7 +21,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Export Coq.QArith.QArith.
-Require Export CoRN.algebra.RSetoid.
+Require Import CoRN.algebra.RSetoid. 
+Require Import MathClasses.interfaces.canonical_names.
+Require Import MathClasses.interfaces.abstract_algebra.
 
 
 Local Open Scope Q_scope.
@@ -58,43 +60,89 @@ But those properties are only used late in the proofs, so we move them
 as additional definitions in module Classification.v (stability and locatedness). 
 *)
 
-Record is_MetricSpace (X : RSetoid) (B: Q -> relation X) : Prop :=
+Record is_MetricSpace {X : Type} (B: Q -> relation X) : Prop :=
 { msp_refl: forall e, 0 <= e -> Reflexive (B e)
 ; msp_sym: forall e, Symmetric (B e)
 ; msp_triangle: forall e1 e2 a b c, B e1 a b -> B e2 b c -> B (e1 + e2) a c
 ; msp_closed: forall e a b, (forall d, 0 < d -> B (e + d) a b) -> B e a b
-; msp_eq: forall a b, (forall e, 0 < e -> B e a b) -> st_eq a b
 ; msp_nonneg : forall e a b, B e a b -> 0 <= e
 ; msp_stable : forall e a b, (~~B e a b) -> B e a b
 }.
 
 Record MetricSpace : Type :=
-{ msp_is_setoid :> RSetoid (* TODO rename msp_car :> Type *)
-; ball : Q -> msp_is_setoid -> msp_is_setoid -> Prop
-(* This requires equivalence between the RSetoid and the zero-distance
-   relation. It is redundant, we should remove the RSetoid and declare
-   the zero-distance as the canonical metric setoid. *)
-; ball_wd : forall (e1 e2:Q), (e1 == e2) ->
-            forall x1 x2, (st_eq x1 x2) ->
-            forall y1 y2, (st_eq y1 y2) ->
-            (ball e1 x1 y1 <-> ball e2 x2 y2)
-; msp : is_MetricSpace msp_is_setoid ball
+{ msp_car :> Type
+; ball : Q -> msp_car -> msp_car -> Prop
+; ball_e_wd : forall (e d : Q) (x y : msp_car),
+    e == d -> (ball e x y <-> ball d x y)
+; msp : is_MetricSpace ball
 }.
 
 (* begin hide *)
 Arguments ball [m].
 
-(*This is intended to be used as a ``type cast'' that Coq won't randomly make disappear.
-  It is useful when defining setoid rewrite lemmas for st_eq.*)
-Definition ms_id (m:MetricSpace) (x:m) : m := x.
-Arguments ms_id [m].
+Definition msp_eq {m:MetricSpace} (x y : msp_car m) : Prop
+  := ball 0 x y.
 
-Add Parametric Morphism (m:MetricSpace) : (@ball m)
-    with signature Qeq ==> (@st_eq m) ==> (@st_eq m) ==> iff as ball_compat.
+Instance msp_Equiv (m : MetricSpace) : Equiv m := @msp_eq m.
+
+Add Parametric Morphism {m:MetricSpace} : (@ball m)
+    with signature Qeq ==> (@msp_eq m) ==> (@msp_eq m) ==> iff as ball_wd.
 Proof.
- exact (@ball_wd m).
+  unfold msp_eq. split.
+  - intros.
+    assert (0+(x+0) == y).
+    { rewrite Qplus_0_r, Qplus_0_l. exact H. }
+    apply (ball_e_wd m y0 y1 H3).
+    clear H H3 y.
+    apply (msp_triangle (msp m)) with (b:=x0).
+    apply (msp_sym (msp m)), H0.
+    apply (msp_triangle (msp m)) with (b:=x1).
+    exact H2. exact H1.
+  - intros.
+    assert (0+(y+0) == x).
+    { rewrite Qplus_0_r, Qplus_0_l, H. reflexivity. }
+    apply (ball_e_wd m x0 x1 H3).
+    clear H H3 x.
+    apply (msp_triangle (msp m)) with (b:=y0).
+    exact H0. clear H0 x0.
+    apply (msp_triangle (msp m)) with (b:=y1).
+    exact H2.
+    apply (msp_sym (msp m)), H1.
 Qed.
+
+Lemma msp_eq_refl : forall {m:MetricSpace} (x : m),
+    msp_eq x x.
+Proof.
+  intros. apply (msp_refl (msp m) (Qle_refl 0)).
+Qed.
+
+Lemma msp_eq_sym : forall {m:MetricSpace} (x y : m),
+    msp_eq x y -> msp_eq y x.
+Proof.
+  intros. apply (msp_sym (msp m)), H.
+Qed.
+
+Lemma msp_eq_trans : forall {m:MetricSpace} (x y z : m),
+    msp_eq x y -> msp_eq y z -> msp_eq x z.
+Proof.
+  unfold msp_eq. intros. 
+  rewrite <- (ball_wd m (Qplus_0_r 0)
+                     x x (msp_eq_refl x)
+                     z z (msp_eq_refl z)).
+  exact (msp_triangle (msp m) _ _ _ y _ H H0).
+Qed.
+
+Add Parametric Relation {m:MetricSpace} : (msp_car m) msp_eq
+    reflexivity proved by (msp_eq_refl)
+    symmetry proved by (msp_eq_sym)
+    transitivity proved by (msp_eq_trans)
+      as msp_eq_rel.
 (* end hide *)
+
+Instance msp_Setoid (m : MetricSpace) : Setoid m := {}.
+
+Definition msp_as_RSetoid : MetricSpace -> RSetoid
+  := fun m => Build_RSetoid (msp_Setoid m).
 
 Section Metric_Space.
 
@@ -129,19 +177,21 @@ Proof.
  apply (msp_closed (msp X)).
 Qed.
 
-Lemma ball_eq : forall (a b:X), (forall e, 0 < e -> ball e a b) -> st_eq a b.
+Lemma ball_eq : forall (a b:X), (forall e, 0 < e -> ball e a b) -> msp_eq a b.
 Proof.
- apply (msp_eq (msp X)).
+  intros. apply ball_closed.
+  intros. rewrite Qplus_0_l.
+  apply H, H0.
 Qed.
 
 Lemma ball_eq_iff : forall (a b:X),
-    (forall e, 0 < e -> ball e a b) <-> st_eq a b.
+    (forall e, 0 < e -> ball e a b) <-> msp_eq a b.
 Proof.
  split.
   apply ball_eq.
  intros H e epos.
- apply (ball_wd X eq_refl a b H b b (reflexivity _)).
- apply ball_refl. apply Qlt_le_weak, epos.
+ rewrite H. apply ball_refl.
+ apply Qlt_le_weak, epos.
 Qed.
 
 (** The ball constraint on a and b can always be weakened.  Here are
@@ -169,16 +219,6 @@ Proof.
  unfold Qminus. rewrite <- Qle_minus_iff. exact Hed.
 Qed.
 
-Lemma ball_0 (x y: X): ball 0 x y <-> st_eq x y.
-Proof.
-  split.
-  - intro H. apply ball_eq. intros.
-    apply (@ball_weak_le 0 e).
-    apply Qlt_le_weak, H0. exact H.
-  - intros. rewrite H.
-    apply ball_refl. apply Qle_refl.
-Qed.
-
 (* If d(x,y) is infinite and d(x,z) is finite, then d(z,y) is infinite. *)
 Lemma ball_infinite
   : forall (x y z : X) (e : Q), 
@@ -191,14 +231,10 @@ Proof.
   exact (ball_triangle e d x z y H0 abs).
 Qed.
 
-Lemma Metric_eq_stable : forall (x y : X),
-    ~~(st_eq x y) -> st_eq x y.
+Lemma ball_stable : forall e (x y : X),
+    ~~(ball e x y) -> ball e x y.
 Proof.
-  intros. apply (msp_eq (msp X)).
-  intros. apply (msp_stable (msp X)). 
-  intros H7. contradict H; intro H.
-  contradict H7. rewrite H.
-  apply ball_refl, Qlt_le_weak, H0.
+  intros. apply (msp_stable (msp X)), H. 
 Qed.
 
 

@@ -145,7 +145,7 @@ Proof.
  intros a apos aone seq x Hx Gs H.
  unfold series_sum.
  rewrite -> IR_Lim_as_CR.
- apply: SeqLimit_unique.
+ apply (SeqLimit_unique CRasCReals).
  intros e He.
  generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
  intros C.
@@ -155,27 +155,35 @@ Proof.
  unfold CS_seq in *.
  clear C.
  unfold seq_part_sum in *.
- rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
-   ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteGeometricSum apos aone Gs)))).
- apply AbsSmall_eps_div_two;[apply Hn; assumption|].
+ setoid_replace (@cg_minus CRasCGroup (IRasCR (Sum0 m x)) (InfiniteGeometricSum apos aone Gs))
+   with (((IRasCR (Sum0 (G:=IR) m x) - (IRasCR (Sum0 (G:=IR) n x))) + 
+          ((IRasCR (Sum0 (G:=IR) n x) - InfiniteGeometricSum apos aone Gs))))%CR
+   by (unfold cg_minus; simpl; ring).
+ apply (AbsSmall_eps_div_two CRasCOrdField
+          e (IRasCR (Sum0 m x) - IRasCR (Sum0 n x))
+          (IRasCR (Sum0 n x) - InfiniteGeometricSum apos aone Gs))%CR.
+ exact (Hn m Hm).
  clear m Hm.
- stepr (('(@Sum0 Q_as_CAbGroup n (fun n => (Str_nth n seq))%Q))%CR[-]InfiniteGeometricSum apos aone Gs).
+ setoid_replace (IRasCR (Sum0 n x))
+   with ('(@Sum0 Q_as_CAbGroup n (fun n => (Str_nth n seq))%Q))%CR.
   revert seq x H Hx Gs Hn.
   induction n.
    intros seq x H Hx Gs Hn.
-   stepr ([0][-]InfiniteGeometricSum apos aone Gs);
-     [|apply csbf_wd_unfolded; try apply eq_reflexive; apply eq_symmetric; apply IR_Zero_as_CR].
-   apply AbsSmall_minus.
-   rstepr (InfiniteGeometricSum apos aone Gs).
+   simpl (Sum0 0 (fun n : nat => Str_nth n seq)).
+   apply (AbsSmall_minus CRasCOrdField (e [/]TwoNZ) (InfiniteGeometricSum apos aone Gs) 0%CR).
+   setoid_replace (@cg_minus CRasCOrdField (InfiniteGeometricSum apos aone Gs) 0%CR)
+     with (InfiniteGeometricSum apos aone Gs)
+     by (unfold cg_minus; simpl; ring).
    assert (Hn' : forall m : nat, (0 <= m)%nat -> AbsSmall (R:=CRasCOrdField) (e [/]TwoNZ)
      (IRasCR (Sum0 (G:=IR) m x))).
-    intros m Hm.
-    stepr (IRasCR (Sum0 (G:=IR) m x)[-]IRasCR (Sum0 (G:=IR) 0 x)).
+   { intros m Hm.
+     setoid_replace (IRasCR (Sum0 m x))
+       with (@cg_minus CRasCOrdField (IRasCR (Sum0 (G:=IR) m x)) (IRasCR (Sum0 (G:=IR) 0 x))).
      apply Hn; assumption.
     unfold cg_minus.
     simpl.
     rewrite -> IR_Zero_as_CR.
-    ring.
+    ring. }
    stepl (IRasCR (CRasIR (e[/]TwoNZ)))%CR; [| now apply CRasIRasCR_id].
    stepr (IRasCR (CRasIR (InfiniteGeometricSum apos aone Gs)))%CR; [| now apply CRasIRasCR_id].
    rewrite <- IR_AbsSmall_as_CR.
@@ -191,9 +199,12 @@ Proof.
      assumption.
     apply eq_symmetric; apply (inj_Q_nring IR 0).
    destruct (InfiniteGeometricSum_small_tail apos aone (exist _ _ Hq0') Gs) as [m Hm].
-   rstepr ((IRasCR (Sum0 (G:=IR) m x))[+]((InfiniteGeometricSum apos aone Gs)[-](IRasCR (Sum0 (G:=IR) m x)))).
-   stepl (IRasCR (CRasIR (e [/]TwoNZ))[+](IRasCR d)); [| now apply eq_symmetric; apply IR_plus_as_CR].
-   apply AbsSmall_plus.
+   setoid_replace (InfiniteGeometricSum apos aone Gs)
+     with ((IRasCR (Sum0 (G:=IR) m x)) + ((InfiniteGeometricSum apos aone Gs) - (IRasCR (Sum0 (G:=IR) m x))))%CR by ring.
+   stepl (IRasCR (CRasIR (e [/]TwoNZ)) + (IRasCR d))%CR; [| now apply eq_symmetric; apply IR_plus_as_CR].
+   apply (AbsSmall_plus CRasCOrdField (IRasCR (CRasIR (e [/]TwoNZ))) (IRasCR d)
+                        (IRasCR (Sum0 m x))
+                        (InfiniteGeometricSum apos aone Gs - IRasCR (Sum0 m x)))%CR. 
     stepl (e [/]TwoNZ); [| now apply eq_symmetric; apply CRasIRasCR_id].
     apply Hn'; auto with *.
    apply AbsSmall_leEq_trans with ('q)%CR.
@@ -211,9 +222,10 @@ Proof.
     unfold cg_minus.
     simpl.
     rewrite -> IR_Zero_as_CR.
-    ring.
+    unfold msp_Equiv; ring.
    intros seq x Hx Gs Hm.
-   stepr ((InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs)[-]IRasCR (Sum0 (G:=IR) m (fun n => (x (S n)))))).
+   setoid_replace (InfiniteGeometricSum apos aone Gs - IRasCR (Sum0 (S m) x))%CR
+     with (InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs) - IRasCR (Sum0 (G:=IR) m (fun n => (x (S n)))))%CR.
     apply IHm.
      intros n.
      stepl ((inj_Q IR (Str_nth (S n) seq)%Q)).
@@ -221,10 +233,6 @@ Proof.
      apply eq_reflexive.
     intros.
     apply Hm.
-   change (InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs)-
-     IRasCR (Sum0 (G:=IR) m (fun n : nat => (x (S n)))) ==
-       InfiniteGeometricSum apos aone Gs-IRasCR (Sum0 (G:=IR) (S m) x))%CR.
-   symmetry.
    rewrite -> InfiniteGeometricSum_step.
    setoid_replace (IRasCR (Sum0 (G:=IR) (S m) x))
      with (IRasCR (inj_Q _ (CoqStreams.hd seq) [+](Sum0 (G:=IR) m (fun n0 : nat => (x (S n0)))%Q))).
@@ -243,8 +251,10 @@ Proof.
    apply eq_reflexive.
   intros seq x H Hx Gs Hn.
   set (y:=(fun n => (x (n + 1)%nat))).
-  stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  Str_nth n0 (CoqStreams.tl seq))%Q)))%CR)[-]
-    InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs))%CR; [apply (IHn (CoqStreams.tl seq) y )|].
+  setoid_replace (' Sum0 (S n) (fun n0 : nat => Str_nth n0 seq) -
+     InfiniteGeometricSum apos aone Gs)%CR
+    with (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  Str_nth n0 (CoqStreams.tl seq))%Q)))%CR) -  InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs))%CR.
+  apply (IHn (CoqStreams.tl seq) y ).
      apply tail_series with x.
       assumption.
      exists 1%nat.
@@ -256,21 +266,19 @@ Proof.
     rewrite <- Str_nth_plus.
     apply eq_reflexive.
    intros m Hm.
-   stepr (IRasCR (Sum0 (G:=IR) (S m) x)[-]IRasCR (Sum0 (G:=IR) (S n) x)).
-    apply Hn.
-    auto with *.
-   change ((IRasCR (Sum0 (G:=IR) (S m) x) - IRasCR (Sum0 (G:=IR) (S n) x) ==
-     IRasCR (Sum0 (G:=IR) m y) - IRasCR (Sum0 (G:=IR) n y))%CR).
+   setoid_replace (@cg_minus CRasCOrdField (IRasCR (Sum0 m y)) (IRasCR (Sum0 n y)))
+     with (IRasCR (Sum0 (G:=IR) (S m) x) - IRasCR (Sum0 (G:=IR) (S n) x))%CR.
+    apply (Hn (S m)).
+    apply le_n_S, Hm.
+    symmetry.
+    change (@cg_minus CRasCOrdField (IRasCR (Sum0 m y)) (IRasCR (Sum0 n y)))
+      with (IRasCR (Sum0 m y) - IRasCR (Sum0 n y))%CR.
    do 2 rewrite <- IR_minus_as_CR.
    apply IRasCR_wd.
    stepr ((x O[+]Sum0 (G:=IR) m y[-](x O[+]Sum0 (G:=IR) n y))).
     apply bin_op_wd_unfolded;[|apply un_op_wd_unfolded]; apply eq_symmetric; apply Sum0_shift;
       intros; unfold y;rewrite plus_comm; apply eq_reflexive.
    rational.
-  change ((' Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => (Str_nth n0 (CoqStreams.tl seq))%Q) -
-    InfiniteGeometricSum apos aone (ForAll_Str_nth_tl 1 Gs) == ' (Sum0 (G:=Q_as_CAbGroup) (S n)
-      (fun n0 : nat => (Str_nth n0 seq)%Q)) - InfiniteGeometricSum apos aone Gs))%CR.
-  symmetry.
   rewrite -> InfiniteGeometricSum_step.
   set (z:=(fun n0 : nat => (Str_nth n0 seq)%Q)).
   setoid_replace ((Sum0 (G:=Q_as_CAbGroup) (S n) z):Q) with ((z O + (Sum0 (G:=Q_as_CAbGroup) n
@@ -283,17 +291,16 @@ Proof.
   apply (@Sum0_shift Q_as_CAbGroup).
   intros i.
   reflexivity.
- apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].
  clear - Hx.
  induction n.
-  reflexivity.
- change ((' (Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat => (Str_nth n0 seq)) + (Str_nth n seq))%Q ==
-   (Sum0 (G:=CRasCAbGroup) n (fun n0 : nat => IRasCR (x n0)):CR) + IRasCR (x n))%CR).
+  exact IR_Zero_as_CR.
+  simpl.
+  rewrite IR_plus_as_CR, IHn.
  rewrite <- CRplus_Qplus.
- apply ucFun2_wd;[apply IHn|].
- transitivity (IRasCR (inj_Q IR (Str_nth n seq)%Q)); [symmetry;apply IR_inj_Q_as_CR|].
- apply IRasCR_wd.
- apply Hx.
+  apply CRplus_eq_r. 
+  transitivity (IRasCR (inj_Q IR (Str_nth n seq)%Q)).
+  apply IRasCR_wd; symmetry; apply Hx.
+  apply IR_inj_Q_as_CR.
 Qed.
 
 Lemma InfiniteGeometricSum_correct'

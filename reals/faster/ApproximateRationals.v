@@ -54,7 +54,13 @@ Section approximate_rationals_more.
   Proof. now apply (integers.to_ring_twice _ _ _). Qed.
 
   Global Instance: Injective (cast AQ Q). 
-  Proof. change (Injective (cast AQ Q_as_MetricSpace)). apply _. Qed.
+  Proof. 
+    destruct dense_injective.
+    split. 2: apply _.
+    intros. apply (injective x y).
+    unfold equiv. simpl.
+    rewrite H5. reflexivity.
+  Qed.
 
   Global Instance: StrongSetoid AQ.
   Proof strong_setoids.dec_strong_setoid.

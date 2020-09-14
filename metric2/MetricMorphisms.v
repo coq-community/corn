@@ -1,4 +1,3 @@
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require 
   MathClasses.theory.jections.
@@ -29,21 +28,20 @@ Section metric_embedding.
     apply (ball_wd Y E _ _ H0 _ _ H1).
   Qed.
 
-  Let is_MetricSpace: is_MetricSpace (mcSetoid_as_RSetoid X') Eball.
+  Let is_MetricSpace: is_MetricSpace Eball.
   Proof.
     constructor; unfold ball.
     - intros e H0 x. apply ball_refl, H0.
     - intros e x y. apply ball_sym.
     - intros. now eapply ball_triangle; eauto.
     - intros. now apply ball_closed.
-    - intros. apply (injective f). now apply ball_eq.
     - intros. 
       apply (msp_nonneg (msp Y)) in H0. exact H0.
     - intros. apply (msp_stable (msp Y)), H0.
   Qed.
 
   Program Definition Emetric: MetricSpace := Build_MetricSpace _ is_MetricSpace.
-  Next Obligation. apply Eball_wd; assumption. Qed.
+  Next Obligation. rewrite H0. reflexivity. Qed.
   Let X := Emetric.
 
   Lemma Eball_spec ε (x y : X) : ball ε x y ↔ ball ε (f x) (f y).
@@ -207,6 +205,7 @@ Section dense_prelength_embedding.
     intros x y E. rewrite <-E. 
     intros ε1 ε2.
     simpl. unfold Cjoin_raw. simpl.
+    rewrite Qplus_0_r.
     setoid_replace (proj1_sig ε1 + proj1_sig ε2)%Q
       with (proj1_sig (half * ε1 + (half * ε1 + ε2))%Qpos)
       by (simpl; ring).
@@ -241,7 +240,9 @@ Section dense_prelength_embedding.
 
     Lemma preserves_unary_fun x : F (Cmap plX g x) = Cmap plY h (F x).
     Proof.
-      intros e1 e2. apply regFunEq_e. intros ε. 
+      intros e1 e2.
+      apply regFunEq_equiv. 
+      apply regFunEq_e. intros ε. 
       simpl. rewrite QposInf_bind_id.
       apply (ball_wd _ eq_refl _ _ (g_eq_h _) _ _ (reflexivity _)). 
       apply ball_refl.
@@ -269,7 +270,7 @@ Section dense_prelength_embedding.
 
     Lemma preserves_binary_fun x y : F (Cmap2 plX plX g x y) = Cmap2 plY plY h (F x) (F y).
     Proof.
-      intros e1 e2. apply regFunEq_e. intros ε. 
+      intros e1 e2. apply regFunEq_equiv, regFunEq_e. intros ε. 
       simpl. unfold Cap_raw. simpl. 
       apply (ball_wd _ eq_refl _ _ (g_eq_h _ _) _ _ (reflexivity _)). 
       rewrite 2!QposInf_bind_id. 
@@ -296,11 +297,16 @@ Section dense_prelength_embedding.
                  + (δ2 + quarter * exist _ _ dpos))%Qpos)
         by (simpl; ring).
       eapply ball_triangle.
-      2: apply ball_sym, (g_eq_h y).
       eapply ball_triangle.
-       apply (g_eq_h x).
+       specialize (g_eq_h x).
+       apply regFunEq_equiv in g_eq_h.
+       apply g_eq_h.
       apply Eball_ex_spec in E.
-      now apply (uc_prf h).
+      apply (uc_prf h). apply E.
+      apply ball_sym.
+      specialize (g_eq_h y).
+       apply regFunEq_equiv in g_eq_h.
+       apply g_eq_h. 
     Qed.
 
     Definition unary_complete_uc : X --> Complete X := Build_UniformlyContinuousFunction unary_complete_uc_prf.
@@ -309,13 +315,15 @@ Section dense_prelength_embedding.
     Lemma preserves_unary_complete_fun x : F (Cbind plX g x) = Cbind plY h (F x).
     Proof.
       pose (exist (Qlt 0) (1#2) eq_refl) as half. 
-      intros ? ?. apply regFunEq_e. intros ε.
+      intros ? ?. rewrite Qplus_0_r. apply regFunEq_e. intros ε.
       simpl. unfold Cjoin_raw. simpl.
       rewrite QposInf_bind_id.
       apply ball_weak. apply Qpos_nonneg.
       assert (QposEq ε (half * ε + half * ε)) by (unfold QposEq; simpl; ring).
       apply (ball_wd _ H0 _ _ (reflexivity _) _ _ (reflexivity _)). clear H0. 
-      now apply (g_eq_h (approximate x (mu h (half * ε)))).
+      pose proof (g_eq_h (approximate x (mu h (half * ε)))).
+      apply regFunEq_equiv in H0.
+      apply H0.
     Qed.
   End unary_complete_functions.
 End dense_prelength_embedding.

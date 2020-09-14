@@ -189,7 +189,14 @@ Qed.
 Instance: DenseEmbedding inject_bigD_Q.
 Proof.
   split; try apply _.
-  intros [n d] ε.
+  - assert (@Injective bigD Q_as_MetricSpace _ Qeq inject_bigD_Q).
+    { apply _. }
+    destruct H. split. 
+    intros. apply Qball_0 in H. apply injective, H.
+    split. apply _. apply _. 
+    intros x y xyeq. apply Qball_0.
+    destruct injective_mor. apply sm_proper, xyeq.
+  - intros [n d] ε.
   unfold app_inverse, inverse_Q_bigD.
   apply ball_weak_le with (proj1_sig (Qpos_power 2 (Qdlog2 (proj1_sig ε)))).
    now apply (Qpos_dlog2_spec ε).

@@ -69,7 +69,8 @@ Proof.
 constructor; [| apply _].
 apply ext_equiv_r; [intros x y E; apply E |].
 intros f e1 e2 e1_pos e2_pos.
-eapply (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
+pose proof (CunitCjoin (conv_reg f) (e1 ↾ e1_pos) (e2 ↾ e2_pos)).
+rewrite Qplus_0_r in H. apply H.
 Qed.
 
 Lemma gball_complete (r : Q) (x y : Complete X) :
@@ -143,16 +144,6 @@ Add Ring CR : (stdlib_ring_theory CR).
 
 Close Scope CR_scope.
 Unset Printing Coercions.
-
-(* Uniformly continuous functions respect equality (see metric2.UniformContinuity.v) *)
-Global Instance CRabs_proper : Proper (equiv ==> equiv) (abs (A := CR)).
-Proof.
-  pose proof (@uc_wd_Proper CR CR CRabs).
-  intros x y Hxy e1 e2. specialize (H x y).
-  rewrite Qplus_0_r. apply H. simpl.
-  intros e3 e4. specialize (Hxy e3 e4).
-  rewrite Qplus_0_r in Hxy. exact Hxy.
-Qed.
 
 Section CRQBallProperties.
 

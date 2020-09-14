@@ -256,8 +256,8 @@ Proof.
 constructor.
 + intros. apply lip_modulus_pos; [apply (bounded_nonneg f) | easy].
 + intros e x1 x2 e_pos A. apply mspc_ball_CRabs.
-  pose proof (CRabs_proper _ _ (int_diff f x0 x1 x2)).
-  apply ball_0 in H0. rewrite H0. clear H0.
+  pose proof (CRabs_wd _ _ (int_diff f x0 x1 x2)).
+  rewrite H0. clear H0.
   transitivity ('(abs (x1 - x2) * M)).
   - apply int_abs_bound; [apply _ |]. intros x _; apply bounded.
   - apply CRle_Qle. change (abs (x1 - x2) * M ≤ e).
@@ -526,17 +526,17 @@ Proof.
 destruct x as [x x_sx]. unfold picard''; simpl.
 unfold restrict, Basics.compose; simpl.
 unfold picard'. apply mspc_ball_CRabs.
-assert (forall b, abs (y0 - (y0 + b)) [=] abs b).
+assert (forall b, CRabs (y0 - (y0 + b)) == abs b)%CR.
 { intro b. pose proof (CRabs_negate b).
-  apply ball_0 in H0. rewrite <- H0.
-  rewrite <- ball_0. 
-  apply CRabs_proper.
-  apply ball_0.
+  rewrite <- H0.
+  apply CRabs_wd.
   transitivity (y0 + (-y0-b)).
   apply ucFun2_wd. reflexivity.
   exact (CRopp_plus_distr y0 b).
   rewrite plus_assoc.
   rewrite rings.plus_negate_r, rings.plus_0_l. reflexivity. } 
+unfold abs, abs_sig, proj1_sig, CR_abs.
+unfold negate, plus.
 rewrite H0. clear H0.
 transitivity ('(abs (x - x0) * M)).
 + apply int_abs_bound; [apply _ |]. (* Should not be required *)
@@ -548,7 +548,7 @@ transitivity ('(abs (x - x0) * M)).
   apply (extend_inside (Y:=CR)) in A1.
   destruct A1 as [p A1].
   specialize (A1 (v ∘ together Datatypes.id f ∘ diag)).
-  pose proof (CRabs_proper _ _ A1). apply ball_0 in H0.
+  pose proof (CRabs_wd _ _ A1). 
   rewrite H0. clear H0. apply bounded.
 + apply CRle_Qle. change (abs (x - x0) * M ≤ proj1_sig ry). transitivity (`rx * M).
   - now apply (orders.order_preserving (.* M)), mspc_ball_Qabs_flip.
@@ -603,16 +603,21 @@ rewrite <- abs_int_minus. transitivity ('(abs (x - x0) * (L * e))).
     solve_propholds. trivial. trivial. }
   unfold plus, negate, ext_plus, ext_negate.
   apply (extend_inside (Y:=CR)) in B1. destruct B1 as [p B1].
-  assert (forall i j k l : CR, i = j -> k = l -> abs (i-k) [=] abs (j-l)).
-  { intros. apply ball_0. apply CRabs_proper.
-    apply ball_0. apply ball_0 in H0. apply ball_0 in H1.
+  assert (forall i j k l : CR, i = j -> k = l -> CRabs (i-k) == CRabs (j-l))%CR.
+  { intros. apply CRabs_wd.
     transitivity (i-l).
     apply ucFun2_wd. reflexivity.
     rewrite H1. reflexivity. 
     rewrite H0. reflexivity. }
+  unfold negate,plus.
+  unfold abs, abs_sig, CR_abs, proj1_sig.
   rewrite (H0 _ _ _ _ (B1 _) (B1 _)). clear H0.
-  apply mspc_ball_CRabs. unfold diag, together, Datatypes.id, Basics.compose; simpl.
-  apply (lip_prf (λ y, v (_, y)) L), A.
+  apply CRabs_ball.
+  unfold diag, together, Datatypes.id, Basics.compose; simpl.
+
+  specialize (v_lip (x' ↾ p)).
+  pose proof (lip_prf (λ y, v (_, y)) L).
+  apply H0, A.
 + apply CRle_Qle.
   mc_setoid_replace (L * proj1_sig rx * e) with ((proj1_sig rx) * (L * e)) by ring.
   assert (0 ≤ e).

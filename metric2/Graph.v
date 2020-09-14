@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.UniformContinuity.
 Require Export CoRN.metric2.Compact.
 Require Export CoRN.metric2.Prelength.
@@ -89,6 +88,7 @@ Proof.
  setoid_replace (Couple (X:=X) (Y:=Y) (x, (Cmap plX f x))) with (Cmap plX graphPoint x).
   auto using CompactImage_correct1.
  intros e1 e2.
+ rewrite Qplus_0_r.
  split;simpl.
   unfold graphPoint_modulus.
   eapply ball_weak_le;[|apply regFun_prf].
@@ -158,7 +158,7 @@ Proof.
 Qed.
 
 Lemma CompactGraph_correct3 : forall plX plFEX p s, inCompact p (CompactGraph plFEX s) ->
-st_eq (Cmap plX f (Cfst p)) (Csnd p).
+msp_eq (Cmap plX f (Cfst p)) (Csnd p).
 Proof.
  intros plX plFEX p s H.
  apply ball_eq.
@@ -239,7 +239,7 @@ Qed.
 Lemma CompactGraph_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s,
  inCompact (Couple (p,q1)) (CompactGraph plFEX s) ->
  inCompact (Couple (p,q2)) (CompactGraph plFEX s) ->
- st_eq q1 q2.
+ msp_eq q1 q2.
 Proof.
  intros plX plFEX p q1 q2 s Hq1 Hq2.
  transitivity (Cmap plX f p).
@@ -254,7 +254,7 @@ Qed.
 
 Lemma CompactGraph_correct : forall plX plFEX x y s,
 inCompact (Couple (x,y)) (CompactGraph plFEX s) <->
-(inCompact x s /\ st_eq y (Cmap plX f x)).
+(inCompact x s /\ msp_eq y (Cmap plX f x)).
 Proof.
  intros plX plFEX x y s.
  split; intros H.
@@ -348,6 +348,7 @@ Proof.
  setoid_replace (Couple (X:=X) (Y:=Y) (x, (Cbind plX f x))) with (Cbind plX graphPoint_b x).
   auto using CompactImage_b_correct1.
  intros e1 e2.
+ rewrite Qplus_0_r.
  split. 
  apply ball_weak_le with (proj1_sig (e1 + (graphPoint_modulus f ((1 # 2) * e2)))%Qpos)
  ;[|apply regFun_prf].
@@ -465,7 +466,7 @@ Proof.
 Qed.
 
 Lemma CompactGraph_b_correct3 : forall plX plFEX p s, inCompact p (CompactGraph_b plFEX s) ->
-st_eq (Cbind plX f (Cfst p)) (Csnd p).
+msp_eq (Cbind plX f (Cfst p)) (Csnd p).
 Proof.
  intros plX plFEX p s H.
  apply ball_eq.
@@ -627,7 +628,7 @@ Qed.
 Lemma CompactGraph_b_graph : forall (plX : PrelengthSpace X) plFEX p q1 q2 s,
  inCompact (Couple (p,q1)) (CompactGraph_b plFEX s) ->
  inCompact (Couple (p,q2)) (CompactGraph_b plFEX s) ->
- st_eq q1 q2.
+ msp_eq q1 q2.
 Proof.
  intros plX plFEX p q1 q2 s Hq1 Hq2.
  transitivity (Cbind plX f p).
@@ -642,7 +643,7 @@ Qed.
 
 Lemma CompactGraph_b_correct : forall plX plFEX x y s,
 inCompact (Couple (x,y)) (CompactGraph_b plFEX s) <->
-(inCompact x s /\ st_eq y (Cbind plX f x)).
+(inCompact x s /\ msp_eq y (Cbind plX f x)).
 Proof.
  intros plX plFEX x y s.
  split; intros H.

@@ -17,7 +17,7 @@ Record is_DistanceMetricSpace (X : RSetoid) (distance: X -> X -> CR) : Prop
 Record DistanceMetricSpace: Type := Build_alt_MetricSpace
   { dmsp_is_setoid:> RSetoid;
     distance: dmsp_is_setoid -> dmsp_is_setoid -> CR;
-    distance_wd: Proper (@st_eq _ ==> @st_eq _ ==> @st_eq _) distance;
+    distance_wd: Proper (@st_eq _ ==> @st_eq _ ==> @msp_eq _) distance;
     dmsp : is_DistanceMetricSpace dmsp_is_setoid distance }.
 
 Arguments distance [d].
@@ -134,14 +134,13 @@ Section from_alt.
    apply CRle_not_lt, H.
   Qed.
 
-  Lemma is_MetricSpace: is_MetricSpace X ball.
+  Lemma is_MetricSpace: is_MetricSpace ball.
   Proof with auto.
    constructor.
    - apply ball_refl.
    - apply ball_sym.
    - apply ball_triangle.
    - apply ball_closed.
-   - apply ball_eq.
    - intros. destruct H. exact H.
    - unfold ball. split.
      destruct (Qlt_le_dec e 0).
@@ -156,7 +155,7 @@ Section from_alt.
 
   Definition ballSpace: MetricSpace.
    apply (@Build_MetricSpace X ball).
-    apply ball_wd.
+   intros. rewrite H. reflexivity.
    apply is_MetricSpace.
   Defined.
 

@@ -15,7 +15,7 @@ Section contents.
   Definition CRball (r: CR) (x y: M): Prop
     := forall (q:Q), r <= ' q -> ball q x y.
 
-  Global Instance proper: Proper (@st_eq _ ==> @st_eq _ ==> @st_eq _ ==> iff) CRball.
+  Global Instance proper: Proper (@msp_eq _ ==> @msp_eq _ ==> @msp_eq _ ==> iff) CRball.
   Proof.
    intros ?? E ?? F ?? G.
    split. intros. intros q H0.
@@ -36,9 +36,8 @@ Section contents.
    apply -> CRnonNeg_le_0...
   Qed.
 
-  Lemma zero (x y: M): st_eq x y <-> CRball 0 x y.
+  Lemma zero (x y: M): msp_eq x y <-> CRball 0 x y.
   Proof with auto.
-   rewrite <- ball_0.
    split. intros H z zpos.
    apply (@ball_weak_le _ 0). apply CRle_Qle, zpos.
    exact H. intros. apply H. apply CRle_refl.
@@ -107,7 +106,7 @@ Lemma gball_CRmult_Q (e a : Q) (x y : CR) :
 Proof.
 intro A. apply gball_CRabs.
 setoid_replace ('a * x - 'a * y) with ('a * (x - y))
-  by (unfold canonical_names.equiv; ring).
+  by (unfold canonical_names.equiv, msp_Equiv; ring).
 rewrite CRabs_CRmult_Q, <- CRmult_Qmult.
 assert (0 <= 'Qabs a) by (apply CRle_Qle, Qabs_nonneg).
 apply (orders.order_preserving (CRmult (' Qabs a))).

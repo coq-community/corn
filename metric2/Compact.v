@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.metric2.Limit.
 Require Export CoRN.metric2.FinEnum.
@@ -52,10 +51,10 @@ Variable P : X -> Prop.
 
 Definition CompleteSubset :=
  forall (f:Complete X), (forall e, P (approximate f e)) ->
- {y:X | P y & st_eq (Cunit y) f}.
+ {y:X | P y & msp_eq (Cunit y) f}.
 
 Definition ExtSubset :=
- forall x y, (st_eq x y) -> (P x <-> P y).
+ forall x y, (msp_eq x y) -> (P x <-> P y).
 
 Definition TotallyBoundedSubset :=
   forall (e:Qpos),
@@ -87,10 +86,10 @@ Definition inCompact X (x:Complete X) (s:Compact X) : Prop :=
  forall (e1 e2:Qpos), FinSubset_ball (proj1_sig e1 + proj1_sig e2) (approximate x e1) (approximate s e2).
 (* begin hide *)
 Add Parametric Morphism {X : MetricSpace} : (@inCompact X)
-    with signature (@st_eq _) ==> (@st_eq _) ==> iff as inCompact_wd.
+    with signature (@msp_eq _) ==> (@msp_eq _) ==> iff as inCompact_wd.
 Proof.
- cut (forall x1 x2 : Complete X, st_eq x1 x2 -> forall x3 x4 : Complete (FinEnum X),
-   st_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
+ cut (forall x1 x2 : Complete X, msp_eq x1 x2 -> forall x3 x4 : Complete (FinEnum X),
+   msp_eq x3 x4 -> (inCompact x1 x3 -> inCompact x2 x4)).
   intros Z x1 x2 Hx y1 y2 Hy.
   split.
    apply Z; assumption.
@@ -106,8 +105,10 @@ Proof.
            (proj1_sig e1 + proj1_sig e2 + d)
            (proj1_sig ((e1 + d') + (d' + d') +  (d' + e2))%Qpos)
            H0 _ _ (reflexivity _) _ _ (reflexivity _)).
+ apply regFunEq_equiv in Hy.
  apply FinSubset_ball_triangle_r with (approximate y1 d');[|apply Hy].
  symmetry in Hx.
+ apply regFunEq_equiv in Hx.
  apply FinSubset_ball_triangle_l with (approximate x1 d');[apply Hx|].
  apply H.
 Qed.
@@ -749,13 +750,13 @@ Proof.
  pose (exist (Qlt 0) (1#5) eq_refl) as fifth.
  generalize (CompactTotallyBounded_fun s (fifth*e) (fifth*e)).
  induction (approximate s (fifth * e)%Qpos).
-  intros _.
+ - intros _.
   exact nil.
- intros H.
+ - intros H.
  apply cons.
   apply H with a.
   apply InFinEnumC_weaken; auto with *.
- apply IHs0.
+ apply IHm.
  intros pt Hpt.
  apply H with pt.
  apply FinSubset_ball_cons.
@@ -770,7 +771,7 @@ Proof.
  unfold CompactTotalBound.
  generalize (CompactTotallyBoundedNotFar s ((1#5)*e) ((1#5)*e)).
  generalize (CompactTotallyBounded_fun s ((1 # 5) * e) ((1 # 5) * e)).
- induction (approximate s ((1 # 5) * e)%Qpos); intros H L.
+ induction (approximate s ((1 # 5) * e)%Qpos) as [|a s0]; intros H L.
  - apply ball_refl. apply (Qpos_nonneg ((3#5)*e)).
  - split. apply (Qpos_nonneg ((3#5)*e)).
  split; intros x Hx.
@@ -782,8 +783,7 @@ Proof.
    split.
    intro abs; contradict abs.
    exists (H a (InFinEnumC_weaken X a (a :: s0) (in_eq a s0))).
-   split. left. reflexivity. apply ball_0. reflexivity.
-   apply ball_0 in Hx.
+   split. left. reflexivity. reflexivity.
    rewrite -> Hx.
    assert (QposEq ((3 # 5) * e)
                   ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))).
@@ -810,8 +810,7 @@ Proof.
   exists (Cunit a).
   split.
   intro abs; contradict abs.
-  exists (Cunit a). split. left. reflexivity. apply ball_0; reflexivity.
-  apply ball_0 in Hx.
+  exists (Cunit a). split. left. reflexivity. reflexivity.
   rewrite -> Hx.
   assert (QposEq ((3 # 5) * e)
                  ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)))
@@ -969,7 +968,7 @@ Proof.
    apply existsWeaken.
    exists a.
    split; auto with *.
-   apply ball_0 in Hx. rewrite -> Hx.
+   rewrite -> Hx.
    apply (@ball_approx_l _ _ ((1#2)*e1)%Qpos).
   destruct (IHl Hx) as [G | z [Hz0 Hz1]] using existsC_ind.
    auto using existsC_stable.
@@ -989,7 +988,7 @@ Proof.
    rewrite Hy0.
    intro abs; contradict abs.
    exists (approximate y ((1 # 2) * e2)%Qpos).
-   split. left. reflexivity. apply ball_0; reflexivity.
+   split. left. reflexivity. reflexivity.
    apply FinSubset_ball_cons.
   apply IHr; auto.
   setoid_replace (proj1_sig e1+proj1_sig e2)
@@ -1117,11 +1116,12 @@ Proof.
  unfold ExtSubset in HP3.
  rewrite -> (HP3 x y); auto.
  rewrite <- Cunit_eq.
- rewrite -> s.
+ rewrite -> m.
  intros e1 e2.
  apply ball_sym.
  rewrite Qplus_comm.
- apply ball_weak. apply Qpos_nonneg.
+ apply ball_weak.
+ rewrite Qplus_0_r. apply Qpos_nonneg.
  apply Hf0.
 Qed.
 
@@ -1136,9 +1136,10 @@ Proof.
 Qed.
 
 Lemma Compact_BishopCompact_Compact : forall s,
- st_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
+ msp_eq s (BishopCompactAsCompact (CompactAsBishopCompact locatedX s)).
 Proof.
  intros s e1 e2.
+ rewrite Qplus_0_r.
  assert (QposEq (e1 + e2)
                 (e1 + (1#5)*((1#2)*e2) + ((3#5)*((1#2)*e2) + (1#2)*e2) + (1#10)*e2))
    by (unfold QposEq; simpl; ring).
@@ -1165,8 +1166,8 @@ Proof.
     split.
     intro abs; contradict abs.
     exists (Cunit (approximate a ((1 # 2) * e2)%Qpos)).
-    split. left. reflexivity. apply ball_0; reflexivity.
-    apply ball_0 in Hx. rewrite -> Hx.
+    split. left. reflexivity. reflexivity.
+    rewrite -> Hx.
     apply ball_approx_r.
    destruct (IHlA x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
     auto using existsC_stable.
@@ -1178,8 +1179,8 @@ Proof.
   exists a.
   split.
   intro abs; contradict abs.
-  exists a. split. left. reflexivity. apply ball_0; reflexivity.
-  apply ball_0 in Hx. rewrite -> Hx.
+  exists a. split. left. reflexivity. reflexivity.
+  rewrite -> Hx.
   apply ball_approx_l.
  destruct (IHlB x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -1231,8 +1232,8 @@ Proof.
   exists (approximate a e2).
   split.
   intro abs; contradict abs.
-  exists (approximate a e2). split. left. reflexivity. apply ball_0; reflexivity.
-  apply ball_0 in Hb. rewrite -> Hb.
+  exists (approximate a e2). split. left. reflexivity. reflexivity.
+  rewrite -> Hb.
   apply regFun_prf.
  destruct (IHx b Hb) as [G | y [Hy0 Hy1]] using existsC_ind.
   auto using existsC_stable.
@@ -1260,20 +1261,19 @@ Proof.
  - intros e d1 d2 a b Hab c Hc.
  simpl in Hc.
  unfold FinCompact_raw in Hc.
- assert (existsC (Complete X) (fun d => InFinEnumC d a /\ st_eq c (approximate d d1))).
+ assert (existsC (Complete X) (fun d => InFinEnumC d a /\ msp_eq c (approximate d d1))).
   clear - Hc.
-  induction a.
+  induction a as [|a a0].
   exfalso; exact (FinSubset_ball_nil Hc).
-  apply FinSubset_ball_orC in Hc.
+  simpl in Hc. apply FinSubset_ball_orC in Hc.
   destruct Hc as [ G | Hc | Hc] using orC_ind.
     auto using existsC_stable.
    apply existsWeaken.
    exists a.
    split; auto.
    intro abs; contradict abs.
-   exists a. split. left. reflexivity. apply ball_0; reflexivity.
-   apply ball_0 in Hc. exact Hc.
-  destruct (IHa Hc) as [G | y [Hy0 Hy1]] using existsC_ind.
+   exists a. split. left. reflexivity. reflexivity.
+  destruct (IHa0 Hc) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
   apply existsWeaken.
   exists y.
@@ -1294,8 +1294,7 @@ Proof.
   exists (approximate a d2).
   split.
   intro abs; contradict abs.
-  exists (approximate a d2). split. left. reflexivity. apply ball_0; reflexivity.
-  apply ball_0 in Hz0.
+  exists (approximate a d2). split. left. reflexivity. reflexivity.
   rewrite -> Hz0 in Hz1.
   rewrite -> Hd1.
   apply Hz1.
@@ -1329,7 +1328,8 @@ Proof.
  intro abs; contradict abs.
  exists (approximate a e2). split.
  left. reflexivity.
- apply ball_0 in H. auto.
+ specialize (H e1 e2).
+ rewrite Qplus_0_r in H. exact H.
  apply FinSubset_ball_cons.
   apply IHs; auto.
  intros H.
@@ -1359,7 +1359,7 @@ Proof.
    split.
   left. reflexivity.
   unfold P in Hc.
-  apply ball_0. apply ball_eq.
+  apply ball_eq.
   intros e epos.
   destruct (((1#4)*exist _ _ epos)%Qpos) as [[en ed] He] eqn:des.
   destruct en as [|en|en]. inversion He. 2: inversion He.
@@ -1540,10 +1540,10 @@ Proof.
  intro abs; contradict G; intro G; contradiction.
  intro abs; contradict abs.
  exists a. split. left. reflexivity.
-  apply ball_0 in Hz1. rewrite -> Hz1.
+  rewrite -> Hz1.
   apply ball_approx_l.
   apply FinSubset_ball_cons.
- apply IHs0; auto.
+ apply IHm; auto.
 Qed.
 
 End CompactDistr.
@@ -1657,7 +1657,7 @@ Proof.
    simpl in Z.
    destruct (@approximate _ (FinEnum_ball X) s z).
    exfalso; exact (FinSubset_ball_nil Z).
-   intro abs; contradict abs. exists (f s0).
+   intro abs; contradict abs. exists (f m).
    split. left. reflexivity.
    set (d:=((1 # 4) * exist _ _ d1pos)%Qpos).
    apply (mu_sum plX d (d::nil) f).
@@ -1683,10 +1683,10 @@ Proof.
     rewrite <- (Qmult_1_l (proj1_sig d)) at 2.
     apply Qmult_lt_r. apply Qpos_ispos. reflexivity. }
   destruct (AlmostInExists locY H inys) as [n H0].
-  destruct (  @nth_error (st_car (msp_is_setoid Y))
-           (@map (st_car (msp_is_setoid X)) (st_car (msp_is_setoid Y)) 
+  destruct (  @nth_error (msp_car Y)
+           (@map (msp_car X) (msp_car Y) 
               (@ucFun X Y f)
-              (@approximate (list (st_car (msp_is_setoid X))) 
+              (@approximate (list (msp_car X)) 
                  (FinEnum_ball X) s
                  (Qpos2QposInf
                     (FinEnum_map_modulus z (@mu X Y f)
@@ -1698,7 +1698,7 @@ Proof.
   2: contradiction.
   destruct (nth_error (approximate s (FinEnum_map_modulus z (mu f) ((1#3)*d))) n)
            eqn:H1.
-  - exists s0. split.
+  - exists m. split.
     2: exact (nth_error_In _ _ H1).
     pose proof (map_nth_error f n _ H1).
     simpl in des. simpl in H2.

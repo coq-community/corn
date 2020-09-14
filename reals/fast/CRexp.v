@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QMinMax.
@@ -111,28 +110,34 @@ Proof.
  generalize H; clear H.
  induction n.
   intros H.
-  simpl.
-  unfold pring.
-  simpl.
-  rational.
+  simpl; unfold pring; simpl.
+  rewrite mult_one.
+  apply div_wd; reflexivity.
  intros H.
  stepl (([1][/](nring (S n))[//]nringS_ap_zero IR n)[*](inj_Q IR a)[*]Exp_ps n (inj_Q IR a) H).
   simpl.
   change (nring (R:=IR) n[+][1]) with (nring (R:=IR) (S n)).
-  rstepl ((([1][/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]
-    ([1][/]nring (R:=IR) (fact n)[//]nring_fac_ap_zero IR n))[*]
-      (nexp IR n (inj_Q IR a[-][0])[*]inj_Q IR a)).
-  apply mult_wd;[|rational].
-  assert (X:=(mult_resp_ap_zero _ _ _ (nringS_ap_zero IR n) (nring_fac_ap_zero IR n))).
-  rstepl ([1][/]((nring (R:=IR) (S n))[*]nring (R:=IR) (fact n))[//]X).
-  apply div_wd;[rational|].
+  rewrite (mult_commutes IR (nexp IR n (inj_Q IR a [-] [0]))).
+  rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
+  rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
+  apply mult_wd. 2: reflexivity.
+  rewrite cg_inv_zero.
+  rewrite <- (mult_commutes IR (inj_Q IR a)).
+  rewrite <- (mult_commutes IR (inj_Q IR a)).
+  rewrite <- (ax_mult_assoc IR _ _ (cr_proof IR)).
+  apply mult_wd. reflexivity.
+  pose proof (mult_resp_ap_zero _ _ _ (nringS_ap_zero IR n) (nring_fac_ap_zero IR n))
+    as X.
+  rewrite <- (mult_of_divs _ _ _ _ _ _ _ X).
+  apply div_wd. apply mult_one.
   apply eq_symmetric.
   change (fact n + n * fact n)%nat with (S n*(fact n))%nat.
   apply nring_comm_mult.
- stepl (inj_Q IR ((1#(P_of_succ_nat n))*a*((1 # P_of_succ_nat (pred (fact n))) * a ^ n))%Q).
+  stepl (inj_Q IR ((1#(P_of_succ_nat n))
+                   *a*((1 # P_of_succ_nat (pred (fact n))) * a ^ n))%Q).
   apply inj_Q_wd.
-  change ((1 # P_of_succ_nat n) * a * ((1 # P_of_succ_nat (pred (fact n))) * a ^ n) ==
-    (1 # P_of_succ_nat (pred (S n * fact n))) * a ^ S n)%Q.
+  change ((1 # P_of_succ_nat n) * a * ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)
+          == (1 # P_of_succ_nat (pred (S n * fact n))) * a ^ S n)%Q.
   replace (P_of_succ_nat (pred (S n * fact n))%nat) with
     (P_of_succ_nat (pred (S n)) * P_of_succ_nat (pred (fact n)))%positive.
    rewrite <- pred_Sn.
@@ -160,7 +165,7 @@ Proof.
  apply mult_wdl.
  change (1 # P_of_succ_nat n)%Q with (1/P_of_succ_nat n)%Q.
  assert (A:inj_Q IR ((P_of_succ_nat n):Q)[=]nring (S n)).
-  stepl (inj_Q IR (nring (S n))).
+ { stepl (inj_Q IR (nring (S n))).
    apply inj_Q_nring.
   apply inj_Q_wd.
   simpl.
@@ -173,17 +178,16 @@ Proof.
   simpl.
   rewrite Pplus_one_succ_r.
   repeat (rewrite Zpos_mult_morphism || rewrite Zpos_plus_distr).
-  ring.
+  ring. }
  assert (B:inj_Q IR (P_of_succ_nat n:Q)[#][0]).
-  stepl (nring (R:=IR) (S n)).
+ { stepl (nring (R:=IR) (S n)).
    apply nringS_ap_zero.
-  apply eq_symmetric;assumption.
+  apply eq_symmetric;assumption. }
  eapply eq_transitive;[apply inj_Q_div|].
  instantiate (1:=B).
  apply div_wd.
-  rstepr ([0][+][1]:IR).
-  apply (inj_Q_nring IR 1).
- assumption.
+ apply inj_Q_One.
+ exact A.
 Qed.
 
 Lemma Qle_ZO_flip : forall a, -(1) <= a <= 0 -> 0 <= (-a) <= 1.
@@ -304,7 +308,6 @@ Proof.
    apply IRasCR_wd.
   set (a':=inj_Q IR (a/2)).
   simpl.
-  rstepl (Exp a'[*]Exp a').
   stepl (Exp (a'[+]a')); [| now apply Exp_plus].
   apply Exp_wd.
   unfold a'.
@@ -445,7 +448,8 @@ Proof.
  unfold power.
  apply Exp_resp_leEq.
  destruct n.
-  rstepl ([0]:IR).
+ simpl (nring 0).
+ rewrite cring_mult_zero_op.
   stepl (inj_Q IR 0); [| now apply (inj_Q_nring IR 0)].
   apply inj_Q_leEq.
   assumption.
@@ -483,7 +487,7 @@ Proof.
   tauto.
  assert (X0:inj_Q IR (inject_Z (S n))[#][0]).
   stepl (inj_Q IR (nring (S n))).
-   stepl (nring (S n):IR); [| now (apply eq_symmetric; apply (inj_Q_nring IR (S n)))].
+   stepl (@nring IR (S n)); [| now (apply eq_symmetric; apply (inj_Q_nring IR (S n)))].
    apply (nringS_ap_zero).
   apply inj_Q_wd.
   apply nring_Q.
@@ -564,8 +568,8 @@ Proof.
  apply eq_symmetric.
  eapply eq_transitive;[|apply div_wd; apply eq_reflexive].
  apply Exp_inv'.
- rstepl ([--][--](inj_Q IR a)).
- now csetoid_rewrite_rev (inj_Q_inv IR a).
+ rewrite (inj_Q_inv IR a), cg_inv_inv.
+ reflexivity.
 Qed.
 
 Lemma rational_exp_correct (a : Q) :
@@ -616,10 +620,8 @@ Proof.
  unfold CRe.
  rewrite -> rational_exp_correct.
  apply IRasCR_wd.
- csetoid_replace (inj_Q IR 1) ([1]:IR).
-  algebra.
- rstepr (nring 1:IR).
- apply (inj_Q_nring IR 1).
+ rewrite inj_Q_One.
+ algebra.
 Qed.
 
 Hint Rewrite <- CRe_correct : IRtoCR.
@@ -638,17 +640,14 @@ Lemma exp_bound_bound : forall (z:Z) x, closer (inj_Q IR (z:Q)) x -> AbsIR (Exp 
 Proof.
  intros [|z|z]; simpl; intros x Hx; apply AbsSmall_imp_AbsIR;
    (apply leEq_imp_AbsSmall;[apply less_leEq; apply Exp_pos|]).
-   stepr ([1]:IR).
-    apply Exp_leEq_One.
-    stepr (inj_Q IR (0%Z:Q)).
-     assumption.
-    apply (inj_Q_nring IR 0).
-   rstepl (nring 1:IR).
-   apply eq_symmetric; apply (inj_Q_nring IR 1).
+ rewrite inj_Q_One.
+ apply Exp_leEq_One.
+ rewrite inj_Q_Zero in Hx.
+ exact Hx.
   apply leEq_transitive with (Exp (Max x [0])).
    apply Exp_resp_leEq.
    apply lft_leEq_Max.
-  stepr (Three[!](inj_Q IR (inject_Z z))[//](pos_three IR):IR).
+  stepr (Three[!](inj_Q IR (inject_Z z))[//](pos_three IR)).
    astepl (E[!](Max x [0])[//]pos_E).
    apply real_power_resp_leEq_both; try solve [IR_solve_ineq (1#1)%Qpos].
     apply rht_leEq_Max.
@@ -658,7 +657,7 @@ Proof.
     simpl; auto with *.
    apply (inj_Q_nring IR 0).
   stepl (Three[!]nring (nat_of_P z)[//]pos_three IR).
-   astepl (Three[^](nat_of_P z):IR).
+   astepl (@nring IR 3 [^](nat_of_P z)).
    stepl ((inj_Q IR (3%mc:Q))[^](nat_of_P z)).
     stepl (inj_Q IR (3%mc^z)).
      apply inj_Q_wd.
@@ -675,7 +674,7 @@ Proof.
   stepl (inj_Q IR (nring (nat_of_P z))).
    apply (inj_Q_nring).
   apply inj_Q_wd; apply nring_Q.
- stepr (Half[!](inj_Q IR (inject_Z z))[//](pos_half IR):IR).
+ stepr (Half[!](inj_Q IR (inject_Z z))[//](pos_half IR)).
   astepl (Exp [--][--]x).
   astepl ([1][/]_[//](Exp_ap_zero [--]x)).
   unfold Half.
@@ -689,7 +688,7 @@ Proof.
     apply inj_Q_leEq.
     simpl; auto with *.
    apply (inj_Q_nring IR 0).
-  rstepl ([--][--](inj_Q IR (z:Q))).
+   rewrite <- cg_inv_inv.
   apply inv_resp_leEq.
   stepr (inj_Q IR ((Zneg z):Q)).
    assumption.
@@ -697,7 +696,7 @@ Proof.
   apply inj_Q_wd.
   simpl; reflexivity.
  stepl (Half[!]nring (nat_of_P z)[//]pos_half IR).
-  astepl (Half[^](nat_of_P z):IR).
+  astepl (@Half IR [^](nat_of_P z)).
   stepl ((inj_Q IR ((1#2):Q))[^](nat_of_P z)).
    stepl (inj_Q IR ((1#2)^z)).
     apply inj_Q_wd.
@@ -716,8 +715,7 @@ Proof.
    apply inj_Q_wd.
    apply eq_symmetric; apply Qmake_Qdiv.
   apply div_wd.
-   rstepr (nring 1:IR).
-   apply (inj_Q_nring IR 1).
+  apply inj_Q_One.
   apply (inj_Q_nring IR 2).
  apply power_wd.
   apply eq_reflexive.
@@ -762,8 +760,10 @@ Proof.
  transitivity (exp_bound_uc z q);[|].
   change (' q)%CR with (Cunit_fun _ q).
   unfold exp_bounded.
-  rewrite -> (Cbind_correct QPrelengthSpace (exp_bound_uc z) (Cunit_fun Q_as_MetricSpace q)).
-  apply: BindLaw1.
+  pose proof (Cbind_correct QPrelengthSpace (exp_bound_uc z)).
+  apply ucEq_equiv in H0.
+  rewrite (H0 (Cunit_fun Q_as_MetricSpace q)). clear H0.
+  apply BindLaw1.
  change (rational_exp (Qmin z q) == IRasCR (Exp (inj_Q IR q)))%CR.
  rewrite -> rational_exp_correct.
  apply IRasCR_wd.
@@ -841,7 +841,7 @@ Proof.
  assumption.
 Qed.
 (* begin hide *)
-Add Morphism exp with signature (@st_eq _) ==> (@st_eq _) as exp_wd.
+Add Morphism exp with signature (@msp_eq _) ==> (@msp_eq _) as exp_wd.
 Proof.
  intros x y Hxy.
  unfold exp at 1.

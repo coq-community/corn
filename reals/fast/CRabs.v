@@ -60,6 +60,12 @@ Build_UniformlyContinuousFunction Qabs_uc_prf.
 
 Definition CRabs : CR --> CR := Cmap QPrelengthSpace Qabs_uc.
 
+Lemma CRabs_wd : Proper (@msp_eq CR ==> @msp_eq CR) CRabs.
+Proof.
+  intros x y xyeq. apply Cmap_wd.
+  reflexivity. rewrite xyeq. reflexivity.
+Qed.
+
 Lemma approximate_CRabs (x: CR) (e: Qpos):
   approximate (CRabs x) e = Qabs (approximate x e).
 Proof. reflexivity. Qed.
@@ -130,7 +136,7 @@ Qed.
 
 Lemma CRabs_cases
   (P: CR -> Prop)
-  {Pp: Proper (@st_eq _ ==> iff) P}
+  {Pp: Proper (@msp_eq _ ==> iff) P}
   {Ps: forall x, Stable (P x)}:
     forall x, ((0 <= x -> P x) /\ (x <= 0 -> P (- x))) <-> P (CRabs x).
 Proof with auto.
@@ -190,8 +196,10 @@ Qed.
 Lemma CRabs_scale (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 apply lift_eq_complete with (f := uc_compose CRabs (scale a)) (g := uc_compose (scale (Qabs a)) CRabs).
-intros q e1 e2. change (@ball Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
-apply <- ball_eq_iff. apply Qabs_Qmult.
+intros q e1 e2.
+rewrite Qplus_0_r.
+change (@ball Q_as_MetricSpace (proj1_sig e1 + proj1_sig e2) (Qabs (a * q)) (Qabs a * Qabs q)%Q).
+apply <- ball_eq_iff. apply Qball_0, Qabs_Qmult.
 apply (Qpos_ispos (e1+e2)).
 Qed.
 
@@ -201,7 +209,7 @@ Qed.
 Lemma CRabs_scale' (a : Q) (x : CR) : CRabs (scale a x) == scale (Qabs a) (CRabs x).
 Proof.
 unfold CRabs, scale. setoid_rewrite <- fast_MonadLaw2.
-apply map_eq_complete. intro q. apply Qabs_Qmult.
+apply map_eq_complete. intro q. apply Qball_0, Qabs_Qmult.
 Qed.
 
 Lemma CRabs_triangle : forall (x y : CR),
@@ -247,7 +255,7 @@ Lemma CRdistance_triangle : forall (x y z : CR),
 Proof.
   intros. unfold CRdistance.
   setoid_replace (x-z) with (x-y + (y-z))
-    by (unfold canonical_names.equiv; ring).
+    by (unfold canonical_names.equiv, msp_Equiv; ring).
   apply CRabs_triangle.
 Qed. 
 

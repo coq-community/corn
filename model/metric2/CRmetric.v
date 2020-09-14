@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.metric2.Complete.
@@ -41,7 +40,7 @@ Definition CR : MetricSpace
 Delimit Scope CR_scope with CR.
 Bind Scope CR_scope with CR.
 
-Instance inject_Q_CR: Cast Q (st_car CR)
+Instance inject_Q_CR: Cast Q (msp_car CR)
   := ucFun (@Cunit Q_as_MetricSpace).
 
 (* 
@@ -56,10 +55,15 @@ We omit this for backward, and forward, compatibity
 *)
 
 (* begin hide *)
-Instance inject_Q_CR_wd: Proper ((=) ==> (=)) inject_Q_CR.
-Proof uc_wd (@Cunit Q_as_MetricSpace).
+Instance inject_Q_CR_wd: Proper (Qeq ==> (=)) inject_Q_CR.
+Proof.
+  intros x y xyeq. apply (uc_wd (@Cunit Q_as_MetricSpace)).
+  unfold msp_eq. simpl.
+  rewrite xyeq. apply Qball_Reflexive.
+  discriminate.
+Qed.
 (* end hide *)
 
 Notation "' x" := (inject_Q_CR x) : CR_scope.
 
-Notation "x == y" := (@st_eq CR x y) (at level 70, no associativity) : CR_scope.
+Notation "x == y" := (@msp_eq CR x y) (at level 70, no associativity) : CR_scope.

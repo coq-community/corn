@@ -92,7 +92,7 @@ Lemma IntegralSplit : forall (o:OpenUnit) x,
 Proof.
  intros o x.
  revert o.
- induction x using StepF_ind.
+ induction x.
   unfold IntegralQ. simpl. intros. unfold affineCombo; simpl in x; ring.
   intros p.
  rewrite -> Integral_glue.
@@ -118,8 +118,8 @@ Add Morphism IntegralQ
   with signature  (@StepF_eq _) ==>  Qeq
  as IntegralQ_wd.
 Proof.
- induction x using StepF_ind.
-  intros x2 H. simpl. induction x2 using StepF_ind.
+ induction x.
+  intros x2 H. simpl. induction x2.
   auto with *.
   rewrite -> Integral_glue.
   simpl.
@@ -178,7 +178,7 @@ Qed.
 Lemma Integral_opp:forall s,
   (-(IntegralQ s)==(IntegralQ (- s)))%Q.
 Proof.
- induction s using StepF_ind.
+ induction s.
   reflexivity.
  unfold StepQopp in *.
  rewriteStepF.
@@ -201,7 +201,7 @@ Lemma Integral_scale :forall q x,
  (q*(IntegralQ x) == (IntegralQ (QscaleS q^@>x)))%Q.
 Proof.
  intros q x.
- induction x using StepF_ind.
+ induction x.
   reflexivity.
  rewriteStepF.
  rewrite <- IHx1.
@@ -213,7 +213,7 @@ Lemma Abs_Integral : forall x,
  (Qabs (IntegralQ x) <= IntegralQ (QabsS ^@> x))%Q.
 Proof.
  intros x.
- induction x using StepF_ind.
+ induction x.
   apply Qle_refl.
  rewriteStepF.
  eapply Qle_trans.
@@ -237,7 +237,7 @@ Proof.
  intros x.
  unfold StepQ_le.
  rewriteStepF.
- induction x using StepF_ind.
+ induction x.
   auto.
  rewriteStepF.
  intros [Hxl Hxr].
@@ -298,7 +298,7 @@ Lemma L1Norm_Zero : forall s,
 Proof.
  intros s.
  intros Hs.
- induction s using StepF_ind.
+ induction s.
   apply: Qle_antisym.
    eapply Qle_trans;[apply Qle_Qabs|assumption].
   rewrite <- (Qopp_involutive x).
@@ -351,7 +351,7 @@ Proof.
  rewrite -> Integral_scale.
  apply IntegralQ_wd.
  unfold StepF_eq.
- set (g:= st_eqS QS).
+ set (g:= st_eqS).
  set (q0 := (QscaleS q)).
  set (q1 := (QscaleS (Qabs q))).
  set (f:= ap (compose g (compose QabsS q0)) (compose q1 QabsS)).
@@ -432,6 +432,7 @@ Proof.
  rewrite -> Qlt_minus_iff.
  unfold L1Distance.
  unfold StepQminus.
+ simpl.
  ring_simplify.
  assumption.
 Qed.
@@ -444,14 +445,13 @@ Canonical Structure L1S.
 *** Example of a Metric Space <StepQ, L1Ball>
 *)
 Lemma L1_is_MetricSpace :
- (is_MetricSpace L1S L1Ball).
+ (is_MetricSpace L1Ball).
 Proof.
  split.
  - intros e H x. apply L1ball_refl, H.
  - apply: L1ball_sym.
  - apply: L1ball_triangle.
  - apply: L1ball_closed.
- - apply L1ball_eq.
  - intros. unfold L1Ball, L1Distance in H.
    apply (Qle_trans _ (L1Norm (a-b))).
    apply L1Norm_nonneg. exact H.
@@ -462,19 +462,17 @@ Proof.
    exact (Qle_not_lt _ _ H abs).
 Qed.
 (* begin hide *)
-Add Morphism L1Ball with signature Qeq ==> (@StepF_eq _) ==> (@StepF_eq _) ==> iff as L1Ball_wd.
+Lemma L1Ball_e_wd : forall (e1 e2:Q) x y,
+    Qeq e1 e2 -> (L1Ball e1 x y <-> L1Ball e2 x y).
 Proof.
- intros x1 x2 Hx y1 y2 Hy z1 z2 Hz.
+ intros x1 x2 y1 y2 Hx.
  unfold L1Ball.
- unfold QposEq in Hx.
  rewrite -> Hx.
- rewrite -> Hy.
- rewrite -> Hz.
  reflexivity.
 Qed.
 (* end hide *)
 Definition L1StepQ : MetricSpace :=
-@Build_MetricSpace L1S _ L1Ball_wd L1_is_MetricSpace.
+@Build_MetricSpace L1S _ L1Ball_e_wd L1_is_MetricSpace.
 (* begin hide *)
 Canonical Structure L1StepQ.
 (* end hide *)

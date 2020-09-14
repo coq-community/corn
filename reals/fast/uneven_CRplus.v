@@ -58,7 +58,8 @@ Section uneven_CRplus.
   Lemma uneven_CRplus_correct: (uneven_CRplus == x + y)%CR.
   Proof.
    simpl.
-   apply regFunEq_e. intro e.
+   apply regFunEq_equiv, regFunEq_e. intro e.
+   unfold ball, Q_as_MetricSpace, Qball, QAbsSmall.
    rewrite approximate_CRplus...
    unfold uneven_CRplus_approx.
    setoid_replace (proj1_sig e + proj1_sig e)

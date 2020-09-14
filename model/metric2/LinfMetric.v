@@ -59,7 +59,7 @@ Lemma StepQSupSplit : forall (o:OpenUnit) x,
 Proof.
  intros o x.
  revert o.
- induction x using StepF_ind.
+ induction x.
   intros o.
   change (x == Qmax x x)%Q.
   rewrite -> Qmax_idem.
@@ -84,8 +84,8 @@ Add Morphism StepQSup
  as StepQSup_wd.
 Proof.
  unfold IntegralQ.
- induction x using StepF_ind.
-  intros x2 H. simpl. induction x2 using StepF_ind.
+ induction x.
+  intros x2 H. simpl. induction x2.
   simpl.  auto with *.
    change (StepQSup (glue o x2_1 x2_2))%Q with (Qmax (StepQSup x2_1) (StepQSup x2_2)).
   destruct H as [H0 H1] using (eq_glue_ind x2_1).
@@ -133,6 +133,67 @@ Definition LinfStepQ : MetricSpace := StepFSup Q_as_MetricSpace.
 
 Definition LinfStepQPrelengthSpace := StepFSupPrelengthSpace QPrelengthSpace.
 
+Lemma StepF_eq_change_base_setoid_const
+  : forall (s : StepFunction.StepF Q) (q : Q),
+    (@StepF_eq (msp_as_RSetoid Q_as_MetricSpace) (constStepF q) s)
+    <-> (@StepF_eq QS (constStepF q) s).
+Proof.
+  induction s.
+  - intro q. apply Qball_0.
+  - split.
+    + intro metricEq. symmetry.
+      apply (@glue_StepF_eq QS).
+      unfold SplitL, StepFunction.SplitL. simpl.
+      apply SplitL_resp_Xeq with (a:=o) in metricEq.
+      rewrite (StepFunction.SplitLGlue) in metricEq.
+      unfold StepFunction.SplitL in metricEq.
+      simpl in metricEq. symmetry. apply (IHs1 q), metricEq.
+      unfold SplitR, StepFunction.SplitR. simpl.
+      apply SplitR_resp_Xeq with (a:=o) in metricEq.
+      rewrite StepFunction.SplitRGlue in metricEq.
+      unfold StepFunction.SplitR in metricEq.
+      simpl in metricEq. symmetry. apply (IHs2 q), metricEq.
+    + intro stdEq. symmetry.
+      apply (@glue_StepF_eq (msp_as_RSetoid (Q_as_MetricSpace))).
+      unfold SplitL, StepFunction.SplitL. simpl.
+      apply SplitL_resp_Xeq with (a:=o) in stdEq.
+      rewrite (StepFunction.SplitLGlue) in stdEq.
+      unfold StepFunction.SplitL in stdEq.
+      simpl in stdEq. symmetry. apply (IHs1 q), stdEq.
+      unfold SplitR, StepFunction.SplitR. simpl.
+      apply SplitR_resp_Xeq with (a:=o) in stdEq.
+      rewrite StepFunction.SplitRGlue in stdEq.
+      unfold StepFunction.SplitR in stdEq.
+      simpl in stdEq. symmetry. apply (IHs2 q), stdEq.
+Qed.
+
+Lemma StepF_eq_change_base_setoid
+  : forall s t : StepFunction.StepF Q,
+    (@StepF_eq (msp_as_RSetoid Q_as_MetricSpace) s t) <-> (@StepF_eq QS s t).
+Proof.
+  induction s.
+  - intro t. apply StepF_eq_change_base_setoid_const.
+  - intro t. split.
+    + intro metricEq. apply glue_StepF_eq.
+      apply SplitL_resp_Xeq with (a:=o) in metricEq.
+      rewrite StepFunction.SplitLGlue in metricEq.
+      apply IHs1 in metricEq.
+      exact metricEq.
+      apply SplitR_resp_Xeq with (a:=o) in metricEq.
+      rewrite StepFunction.SplitRGlue in metricEq.
+      apply IHs2 in metricEq.
+      exact metricEq.
+    + intro stdEq. apply glue_StepF_eq.
+      apply SplitL_resp_Xeq with (a:=o) in stdEq.
+      rewrite (StepFunction.SplitLGlue) in stdEq.
+      apply IHs1 in stdEq.
+      exact stdEq.
+      apply SplitR_resp_Xeq with (a:=o) in stdEq.
+      rewrite StepFunction.SplitRGlue in stdEq.
+      apply IHs2 in stdEq.
+      exact stdEq.
+Qed.
+
 (** Sup is uniformly continuous. *)
 Lemma sup_uc_prf :
   @is_UniformlyContinuousFunction
@@ -145,19 +206,25 @@ Proof.
  apply: StepF_ind2.
    intros s s0 t t0 Hs Ht.
    simpl.
-   rewrite -> Hs, Ht.
-   auto.
+   intros H H1. rewrite <- Hs, <- Ht in H1.
+   specialize (H H1). refine (Qle_trans _ _ _ _ H).
+   rewrite <- (StepQSup_wd s s0).
+   rewrite <- (StepQSup_wd t t0). apply Qle_refl.
+   apply StepF_eq_change_base_setoid, Ht.
+   apply StepF_eq_change_base_setoid, Hs.
   intros x y.
   rewrite <- Qball_Qabs.
   auto.
  intros o s s0 t t0 H0 H1 H2.
  simpl in *.
- repeat rewrite StepQSup_glue.
+ rewrite StepQSup_glue, StepQSup_glue.
  assert (X:forall a b, (-(a-b)==b-a)%Q).
   intros; ring.
  unfold StepFSupBall in H2.
  revert H2.
- rewriteStepF.
+ rewrite (GlueAp (ballS Q_as_MetricSpace (proj1_sig e) ^@> glue o s s0)).
+ rewrite (GlueAp (constStepF (ballS Q_as_MetricSpace (proj1_sig e)))). 
+ rewrite SplitLGlue, SplitRGlue.
  intros [H2a H2b].
  apply Qabs_case; intros H; [|rewrite <- Qabs_opp in H0, H1; rewrite -> X in *];
    (rewrite -> Qmax_minus_distr_l; unfold Qminus; apply Qmax_lub;[|clear H0; rename H1 into H0];
@@ -177,8 +244,13 @@ Proof.
  apply: StepF_ind2.
    simpl.
    intros s s0 t t0 Hs Ht H.
-   rewrite <- Hs , <- Ht.
-   assumption.
+   intro H0. rewrite <- Hs, <- Ht in H0.
+   specialize (H H0). clear H0.
+   unfold L1Ball.
+   apply StepF_eq_change_base_setoid in Hs. 
+   apply StepF_eq_change_base_setoid in Ht. 
+   rewrite <- (L1Distance_wd s s0 Hs t t0 Ht).
+   exact H.
   intros x y Hxy.
   change (Qball (proj1_sig e) x y) in Hxy.
   rewrite ->  Qball_Qabs in Hxy.
@@ -189,8 +261,12 @@ Proof.
  unfold L1Distance.
  unfold L1Norm.
  unfold StepQminus.
- rewrite MapGlue.
- rewrite ApGlueGlue.
+ change (@glue (msp_as_RSetoid Q_as_MetricSpace) o s s0)
+   with (@glue QS o s s0).
+ rewrite (MapGlue QminusS).
+ change (@glue (msp_as_RSetoid Q_as_MetricSpace) o t t0)
+   with (@glue QS o t t0).
+ rewrite (ApGlueGlue (QminusS ^@> s) (QminusS ^@> s0)).
  unfold StepQabs.
  rewrite MapGlue.
  rewrite -> Integral_glue.
@@ -199,8 +275,11 @@ Proof.
  simpl in H.
  unfold StepFSupBall, StepFfoldProp in H.
  simpl in H.
- rewrite MapGlue in H.
- rewrite ApGlueGlue in H.
+ rewrite (MapGlue (ballS Q_as_MetricSpace (proj1_sig e))) in H.
+ rewrite (ApGlueGlue
+            (ballS Q_as_MetricSpace (proj1_sig e) ^@> s)
+            (ballS Q_as_MetricSpace (proj1_sig e) ^@> s0))
+           in H.
  destruct H as [H0 H1].
  apply Qplus_le_compat.
   repeat rewrite -> (Qmult_comm o).

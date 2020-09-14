@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax. 
 Require Export CoRN.metric2.Metric.
 
@@ -26,26 +25,8 @@ Local Open Scope Q_scope.
 
 (**
 ** Classification of metric spaces
-There is a hierarchy of properties that a metric space can possess.
-At the lowest level a metric space is stable if its ball relation is
-double negation stable. Arguably this could be made a requirement
-of metric spaces. *)
-Lemma stableEq : forall (ms:MetricSpace) (x y:ms),
- ~~(st_eq x y) -> st_eq x y.
-Proof.
- intros ms x y Hxy.
- apply ball_eq.
- intros e epos.
- apply (msp_stable (msp ms) e).
- revert Hxy.
- cut (st_eq x y -> ball (m:=ms) e x y).
-  tauto.
- intros H.
- apply (ball_wd ms eq_refl _ _ H y y (reflexivity y)).
- apply ball_refl. apply Qlt_le_weak, epos.
-Qed.
 
-(** At the next level up a metric space is located if you can choose
+A metric space is located if you can choose
 between ball d x y and ~ball e x y for e < d. Every located metric
 is a stable metric. This translates the located property of the real
 numbers e < d -> (e < d(x,y) \/ d(x,y) < d). *)

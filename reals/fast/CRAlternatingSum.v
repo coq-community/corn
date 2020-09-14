@@ -150,7 +150,16 @@ Lemma InfiniteAlternatingSum_raw_wd (s1 s2 : Stream Q) {zl1 : @Limit Q_as_Metric
   s1 = s2 → InfiniteAlternatingSum_raw s1 ε = InfiniteAlternatingSum_raw s2 ε.
 Proof. 
   assert (Proper ((=) ==> eq) (λ s, Qball_ex_bool ε (hd s) 0)).
-   solve_proper.
+  intros x y xyeq. destruct x,y.
+  inversion xyeq as [H _]. unfold hd. unfold hd in H.
+  unfold Qball_ex_bool, ball_ex_dec.
+  destruct ε. 2: reflexivity. 
+  destruct (Qmetric_dec (` q1) q 0%Q), (Qmetric_dec (` q1) q0 0%Q).
+  reflexivity. 3: reflexivity.
+  exfalso. simpl in b.
+  rewrite H in b. contradiction.
+  exfalso. simpl in b.
+  rewrite <- H in b. contradiction.
   intros E.
   apply takeUntil_wd_alt. 
    now apply _. 
@@ -197,7 +206,8 @@ Proof.
     apply rings.flip_nonneg_negate.
     now apply (PartialAlternatingSumUntil_take_small _).
    easy.
-  simpl. do 2 rewrite Qminus'_correct. unfold Qminus.
+   simpl.
+   do 2 rewrite Qminus'_correct. unfold Qminus.
   apply Qball_plus_r, Qball_opp.
   now apply (IHk _ _ _).
 Qed.
@@ -233,8 +243,12 @@ Proof.
     easy.
    apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
    apply naturals.nat_le_plus in E1.
-   destruct E1 as [z E1]. rewrite E1. rewrite commutativity.
+   destruct E1 as [z E1].
+   simpl.
+   rewrite E1. rewrite <- Nat.add_comm.
    rewrite <-Str_nth_plus. 
+   change (Qball (` ε1 + ` ε2) 
+                 (Str_nth z (Str_nth_tl (InfiniteAlternatingSum_length s ε1) s)) 0).
    apply ball_weak, Qball_ex_bool_correct.
    apply Qpos_nonneg.
    apply (dnn_in_Qball_bool_0_Str_nth_tl _).
@@ -279,10 +293,10 @@ Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq}
 Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!@Limit Q_as_MetricSpace s1 0} `{!@Limit Q_as_MetricSpace s2 0} : 
   s1 = s2 → InfiniteAlternatingSum s1 = InfiniteAlternatingSum s2.
 Proof.
-  intros E. apply regFunEq_e. intros ε.
+  intros E. apply regFunEq_equiv, regFunEq_e. intros ε.
   unfold InfiniteAlternatingSum. simpl. 
   rewrite (InfiniteAlternatingSum_raw_wd s1 s2).
-  apply ball_refl. apply (Qpos_nonneg (ε + ε)). exact E.
+  apply Qball_Reflexive. apply (Qpos_nonneg (ε + ε)). exact E.
 Qed.
 
 Local Open Scope Q_scope.
@@ -293,7 +307,7 @@ Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative se
 Proof.
  destruct seq as [hd seq], dnn as [dnn_hd dnn].
  rewrite -> CRplus_translate.
- apply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  unfold Cap_raw; simpl.
@@ -307,7 +321,8 @@ Proof.
    rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
    simpl.
    change (Qball (proj1_sig e + proj1_sig e) 0 (hd + -0))%Q.
-   ring_simplify.
+   rewrite Qplus_0_r.
+   change (Qball (`e+`e) 0 hd).
    unfold P in H.
    apply ball_weak;simpl. apply Qpos_nonneg.
    apply ball_sym;simpl.
@@ -343,7 +358,7 @@ Proof.
  simpl.
  rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near_zero (Limit_tl zl e))).
  rewrite -> Qminus'_correct.
- apply ball_refl. apply (Qpos_nonneg (e+e)).
+ apply Qball_Reflexive. apply (Qpos_nonneg (e+e)).
 Qed.
 
 (** The infinite alternating series is always nonnegative. *)

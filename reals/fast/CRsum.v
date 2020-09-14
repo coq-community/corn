@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
@@ -54,7 +53,8 @@ Proof.
  simpl in e2'. fold e2'.
  assert (Qball (proj1_sig e1' + proj1_sig e2')
                (0 + @approximate Q Qball a e1') (0 + @approximate Q Qball a e2')) as H.
- { ring_simplify. apply (regFun_prf a). }
+ { rewrite Qplus_0_l, Qplus_0_l.
+   apply (regFun_prf a). }
  assert (forall e:Qpos,
             proj1_sig ((1 # p) * e)%Qpos * inject_Z (Z.of_nat (length t)) +
             proj1_sig ((1 # p) * e)%Qpos <= proj1_sig e) as X.
@@ -121,22 +121,25 @@ Definition CRsum_list (l:list CR) : CR := Build_RegularFunction (CRsum_list_prf 
 Lemma CRsum_correct : forall l, (CRsum_list l == fold_right (fun x y => x + y) 0 l)%CR.
 Proof.
  induction l.
-  apply regFunEq_e; intros e.
+  apply regFunEq_equiv, regFunEq_e; intros e.
   apply ball_refl. apply (Qpos_nonneg (e+e)).
  simpl (fold_right (fun x y : CR => (x + y)%CR) 0%CR (a :: l)).
  rewrite <- IHl.
  clear -l.
- apply regFunEq_e; intros e.
+ apply regFunEq_equiv, regFunEq_e; intros e.
  simpl.
  unfold Cap_raw.
  simpl.
  unfold CRsum_list_raw.
  simpl.
  destruct l; simpl.
-  ring_simplify.
+ rewrite Qplus_0_l, Qplus_0_r.
   setoid_replace (proj1_sig e+proj1_sig e)
     with (proj1_sig ((1 # 1) *e + (1 # 2) * e + (1 # 2) * e))%Qpos
          by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
+  change (Qball (proj1_sig ((1 # 1) * e + (1 # 2) * e + (1 # 2) * e)%Qpos)
+                (approximate a ((1 # 1) * e)%Qpos)
+                (approximate a ((1 # 2) * e)%Qpos)).
   apply ball_weak. apply Qpos_nonneg.
   apply regFun_prf.
  set (n:=  (@length (RegularFunction Qball) l)).
@@ -148,14 +151,15 @@ Proof.
      (map (fun x : RegularFunction Qball => approximate x e1) l) z3) (approximate a e4 +
        fold_left Qplus (map (fun x : RegularFunction Qball => approximate x e2) l) z2)).
  { intros H.
-  apply (H (approximate s ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos)
+  apply (H (approximate m ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos)
            ((1 # Pos.succ (P_of_succ_nat n)) * e)%Qpos
            ((1 # Pos.succ (P_of_succ_nat n)) * e +
             (1 # P_of_succ_nat n) * ((1 # 2) * e))%Qpos
            _ _ _ (e+e)%Qpos).
-    rewrite -> Qplus_0_l.
+  2: rewrite Qplus_0_l; reflexivity. 
+  pose proof (Qplus_0_l (approximate m ((1 # Pos.of_succ_nat n) * ((1 # 2) * e))%Qpos)).
+  apply Qball_0 in H0. rewrite H0.
     apply regFun_prf.
-    rewrite Qplus_0_l. reflexivity.
     simpl.
     apply (Qle_trans _ 
 ((1 # Pos.succ (P_of_succ_nat n)) * ((2#1)+(Z.of_nat n#1)) *proj1_sig e +
@@ -186,6 +190,7 @@ Proof.
   simpl in *.
   ring_simplify in H.
   ring_simplify.
+  apply Qball_0 in H0.
   rewrite -> H0.
   unfold Qball.
   unfold QAbsSmall.
@@ -196,8 +201,8 @@ Proof.
                        (proj1_sig e3 + proj1_sig e4 + proj1_sig e5)
                        (proj1_sig e6)
                        (approximate a e3 - approximate a e4 + (z1 - z2)) 0).
-  simpl in H1. unfold Qball, QAbsSmall in H1.
-  unfold Qminus in H1. rewrite Qplus_0_r in H1.
+  simpl in H1.
+  unfold Qball, QAbsSmall, Qminus in H1. rewrite Qplus_0_r in H1.
   apply H1. exact H.
   apply QAbsSmall_plus; auto.
   apply (regFun_prf a).
