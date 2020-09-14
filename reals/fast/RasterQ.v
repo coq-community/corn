@@ -40,7 +40,7 @@ Lemma InStrengthen : forall x (l:FinEnum Q2),
     InFinEnumC x l -> exists y : Q2, In y l /\ st_eq x y.
 Proof.
  induction l.
- intro abs. exfalso; exact (InFinEnumC_nil abs).
+ intro abs. exfalso; exact (FinSubset_ball_nil abs).
  intros H.
  assert (L:st_eq x a \/ ~st_eq x a).
   destruct (Qeq_dec (fst x) (fst a)).
@@ -53,11 +53,12 @@ Proof.
   exists a.
   split; auto with *.
  destruct (IHl) as [y [Hy0 Hy1]].
- apply InFinEnumC_orC in H.
+ apply FinSubset_ball_orC in H.
   destruct H as [G | H | H] using orC_ind.
   intro abs. contradict G; intro G. contradiction.
    elim H0; auto.
-  auto.
+   apply ball_0 in H. exact H.
+   exact H.
  exists y.
  split; auto with *.
 Qed.
@@ -265,7 +266,10 @@ Proof.
    reflexivity.
   rewrite -> Hx2, Hy2.
   reflexivity.
- rewrite -> (InFinEnumC_wd1 _ _ _ (InterpRaster bm (x2l, x2r) (y2l, y2r)) L0).
+  unfold InFinEnumC.
+  rewrite -> (@FinSubset_ball_wd _ z _ 0 0 
+                                (InterpRaster bm (x2l, x2r) (y2l, y2r))
+                                (reflexivity _) L0).
  apply InFinEnumC_weaken.
  auto using InterpRaster_correct1.
 Qed.

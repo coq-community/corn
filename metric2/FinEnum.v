@@ -35,57 +35,47 @@ Section Finite.
 
 Variable X:MetricSpace.
 
-(**
-* Finite Enumerations
-Here we define a classical in predicate for lists.
-When x is classically in a list l, we do not know at which position.
-*)
+(** [FinSubset_ball] says that the distance between x and l is <= e.
+    It is stated as a negation, to remind that a <= b means
+    ~(b < a) in the real numbers.
+    As shown by lemma AlmostInExists, the double negation can
+    be removed, at the cost of slightly increasing e. *)
+Definition FinSubset_ball (e:Q) (x:X) (l:list X) : Prop :=
+  ~~ exists y:X, In y l /\ ball e x y.
+
 Definition InFinEnumC (x:X) (l:list X) : Prop
-  := ~~(exists y:X, In y l /\ st_eq x y).
+  := FinSubset_ball 0 x l.
 
 Lemma InFinEnumC_weaken : forall x l, In x l -> InFinEnumC x l.
 Proof.
   intros. intro abs.
   contradict abs.
-  exists x. split. exact H. reflexivity.
+  exists x. split. exact H. apply ball_refl.
+  apply Qle_refl.
 Qed.
 
-Lemma InFinEnumC_nil : forall x, ~InFinEnumC x nil.
+Lemma FinSubset_ball_nil : forall e x, ~FinSubset_ball e x nil.
 Proof.
-  intros. intro abs. unfold InFinEnumC in abs.
-  contradict abs; intros [y [abs _]].
-  contradiction.
+ intros e x H.
+ unfold FinSubset_ball in H.
+ contradict H; intros [y [H _]].
+ contradiction.
 Qed.
 
-Lemma InFinEnumC_cons : forall x y a l,
-    st_eq x y -> InFinEnumC x l -> InFinEnumC y (a :: l).
+Lemma FinSubset_ball_cons : forall x e a l,
+    FinSubset_ball e x l -> FinSubset_ball e x (a :: l).
 Proof.
-  intros. intro abs. unfold InFinEnumC in H0.
-  contradict H0; intros [z [H0 H1]].
+  intros. intro abs. unfold FinSubset_ball in H.
+  contradict H; intros [z [H0 H1]].
   contradict abs. exists z. split.
-  right. exact H0. rewrite <- H. exact H1.
+  right. exact H0. exact H1.
 Qed.
 
-Lemma InFinEnumC_wd1 : forall x y l, st_eq x y -> (InFinEnumC x l <-> InFinEnumC y l).
-Proof.
-  split.
-  - intros H0 abs.
-    unfold InFinEnumC in H0.
-    contradict H0; intros [z [H0 H1]].
-    contradict abs. exists z. split.
-    exact H0. rewrite <- H. exact H1.
-  - intros H0 abs. 
-    unfold InFinEnumC in H0.
-    contradict H0; intros [z [H0 H1]].
-    contradict abs. exists z. split.
-    exact H0. rewrite H. exact H1.
-Qed.
-
-Lemma InFinEnumC_orC : forall x a l,
-    InFinEnumC x (a :: l) -> orC (st_eq x a) (InFinEnumC x l).
+Lemma FinSubset_ball_orC : forall e x a l,
+    FinSubset_ball e x (a :: l) -> orC (ball e x a) (FinSubset_ball e x l).
 Proof.
   intros. intro abs.
-  unfold InFinEnumC in H.
+  unfold FinSubset_ball in H.
   contradict H; intros [y [H H0]].
   destruct H.
   - subst y. destruct abs. contradiction.
@@ -94,33 +84,147 @@ Proof.
     exists y. split; assumption.
 Qed.
 
-Lemma InFinEnumC_app_l : forall x l1 l2, InFinEnumC x l1 -> InFinEnumC x (l1 ++ l2).
+Lemma FinSubset_ball_wd : forall x y d e l,
+    d == e -> st_eq x y -> (FinSubset_ball d x l <-> FinSubset_ball e y l).
 Proof.
- intros x l1 l2 H abs.
- unfold InFinEnumC in H.
+  split.
+  - intros H1 abs.
+    unfold FinSubset_ball in H1.
+    contradict H1; intros [z [H1 H2]].
+    contradict abs. exists z. split.
+    exact H1. rewrite <- H, <- H0. exact H2.
+  - intros H1 abs. 
+    unfold FinSubset_ball in H1.
+    contradict H1; intros [z [H1 H2]].
+    contradict abs. exists z. split.
+    exact H1. rewrite H, H0. exact H2.
+Qed.
+
+Lemma FinSubset_ball_weak_le : forall (e1 e2:Q) x l,
+    e1 <= e2 -> FinSubset_ball e1 x l
+    -> FinSubset_ball e2 x l.
+Proof.
+  intros. intro abs.
+  unfold FinSubset_ball in H0.
+  contradict H0; intros [y [iny H0]].
+  contradict abs. exists y. split.
+  exact iny. 
+  apply (ball_weak_le X x y H), H0.
+Qed.
+
+Lemma FinSubset_ball_nonneg : forall (e:Q) x l,
+    FinSubset_ball e x l -> 0 <= e.
+Proof.
+  intros. apply Qnot_lt_le. intro abs.
+  unfold FinSubset_ball in H.
+  contradict H; intros [y [_ H]].
+  apply (Qlt_not_le _ _ abs).
+  apply (msp_nonneg (msp X) e x y H).
+Qed.
+
+Lemma FinSubset_ball_closed : forall (e:Q) x l,
+    (forall d:Q, 0 < d -> FinSubset_ball (e+d) x l) -> FinSubset_ball e x l.
+Proof.
+ induction l.
+ - intros H. exfalso. exact (FinSubset_ball_nil (H (1#1) eq_refl)).
+ - intros H abs.
+   assert (~ball e x a) as A.
+   { intro H0. contradict abs. exists a.
+     split. left. reflexivity. exact H0. }
+   assert (~ (exists y : X, In y l /\ ball e x y)) as B.
+   { intros [y H1]. contradict abs. exists y.
+     split. right. apply H1. apply H1. }
+   clear abs.
+   revert B.
+   apply IHl. clear IHl.
+   intros d dpos.
+   (* Improve A *)
+   assert (existsC Qpos (fun d => ~ball (e+proj1_sig d) x a)) as Aprime.
+   { intros Y.
+     apply A.
+     apply ball_closed.
+     intros d0 d0pos.
+     apply (msp_stable (msp X)).
+     apply (Y (exist _ _ d0pos)). }
+   clear A.
+   destruct Aprime as [G | d0 Hd0] using existsC_ind.
+   intro abs; contradict G; intro G; contradiction.
+ intros Z.
+ destruct (Qlt_le_dec (proj1_sig d0) d).
+ + revert Z.
+  apply (@FinSubset_ball_weak_le (e + proj1_sig d0)).
+   apply Qlt_le_weak.
+   rewrite -> Qlt_minus_iff in *.
+   setoid_replace (e + d + - (e + proj1_sig d0))
+     with (d + - proj1_sig d0) by (simpl; ring).
+   assumption.
+  intros Y.
+  destruct d0 as [d0 d0pos].
+  apply (H d0 d0pos).
+  intros [y abs].
+  contradict Y. exists y.
+  simpl.
+  split. 2: apply abs.
+  destruct abs. destruct H0.
+  2: exact H0. subst y. contradiction.
+ + specialize (H d dpos).
+   unfold FinSubset_ball in H.
+   contradict H; intros [y [iny H]].
+   destruct iny. subst y.
+   contradict Hd0.
+   apply (@ball_weak_le X (e + d)).
+   rewrite -> Qle_minus_iff in *.
+   setoid_replace (e + proj1_sig d0 + - (e + d))
+     with (proj1_sig d0 + - d) by (simpl; ring).
+   assumption. exact H.
+   contradict Z. exists y.
+   split. exact H0. exact H.
+Qed.
+
+(** Left and right triangle laws for balls and [FinSubset_ball]. *)
+Lemma FinSubset_ball_triangle_l : forall e1 e2 x1 x2 l,
+    (ball e1 x1 x2) -> FinSubset_ball e2 x2 l -> FinSubset_ball (e1 + e2) x1 l.
+Proof.
+  intros. intro abs.
+  unfold FinSubset_ball in H0.
+  contradict H0; intros [y H0].
+  contradict abs. exists y. split.
+  apply H0.
+  eapply ball_triangle.
+   apply H.
+  apply H0.
+Qed.
+
+Lemma FinSubset_ball_app_l : forall e x l1 l2,
+    FinSubset_ball e x l1 -> FinSubset_ball e x (l1 ++ l2).
+Proof.
+ intros e x l1 l2 H abs.
+ unfold FinSubset_ball in H.
  contradict H; intros [y H].
  contradict abs. exists y. split.
  apply in_app_iff. left.
  apply H. apply H.
 Qed.
 
-Lemma InFinEnumC_app_r : forall x l1 l2, InFinEnumC x l2 -> InFinEnumC x (l1 ++ l2).
+Lemma FinSubset_ball_app_r : forall e x l1 l2,
+    FinSubset_ball e x l2 -> FinSubset_ball e x (l1 ++ l2).
 Proof.
- intros x l1 l2 H abs.
- unfold InFinEnumC in H.
+ intros e x l1 l2 H abs.
+ unfold FinSubset_ball in H.
  contradict H; intros [y H].
  contradict abs. exists y. split.
  apply in_app_iff. right.
  apply H. apply H.
 Qed.
 (* begin hide *)
-Hint Resolve InFinEnumC_app_l InFinEnumC_app_r.
+Hint Resolve FinSubset_ball_app_l FinSubset_ball_app_r.
 (* end hide *)
-Lemma InFinEnumC_app_orC : forall x l1 l2,
-    InFinEnumC x (l1 ++ l2) -> orC (InFinEnumC x l1) (InFinEnumC x l2).
+Lemma FinSubset_ball_app_orC : forall e x l1 l2,
+    FinSubset_ball e x (l1 ++ l2)
+    -> orC (FinSubset_ball e x l1) (FinSubset_ball e x l2).
 Proof.
- intros x l1 l2 H [H0 H1].
- unfold InFinEnumC in H.
+ intros e x l1 l2 H [H0 H1].
+ unfold FinSubset_ball in H.
  contradict H; intros [y [H H2]].
  apply in_app_iff in H. destruct H.
  contradict H0. intro abs.
@@ -201,11 +305,12 @@ Proof.
    apply existsC_stable; auto.
    clear - Hy0 Hy1.
    intro abs.
-   unfold InFinEnumC in Hy0.
+   unfold InFinEnumC, FinSubset_ball in Hy0.
    contradict Hy0; intros [y0 [Hy0 yeq]].
    specialize (abs y0).
    contradict abs. split.
    intro abs. contradiction.
+   apply ball_0 in yeq.
    rewrite <- yeq. exact Hy1. }
  destruct (infinitePidgeonHolePrinicple _ _ P HP) as [HG | y [Hy0 Hy1]] using existsC_ind.
   apply existsC_stable; auto.
@@ -259,12 +364,12 @@ Proof.
   split; apply H; firstorder. }
  induction a.
  intros. exfalso.
- unfold InFinEnumC in H0.
+ unfold InFinEnumC, FinSubset_ball in H0.
  contradict H0; intros [y [H0 _]].
  contradiction. 
  intros b H x Hx.
 
- intro abs. unfold InFinEnumC in Hx.
+ intro abs. unfold InFinEnumC, FinSubset_ball in Hx.
  contradict Hx; intros [y [iny Hx]].
  destruct iny.
  - subst y.
@@ -282,18 +387,20 @@ Proof.
    destruct (H' n) as [HG | z [Hz0 Hz1]] using existsC_ind.
     auto using existsC_stable.
    clear - Hz1 Hz0.
-   intro abs. unfold InFinEnumC in Hz0.
+   intro abs. unfold InFinEnumC, FinSubset_ball in Hz0.
    contradict Hz0; intros [y [iny Hz0]].
    specialize (abs y).
    contradict abs. split.
    intro abs. contradiction.
+   apply ball_0 in Hz0.
    rewrite <- Hz0. exact Hz1. }
    destruct (infinitePidgeonHolePrinicple _ _ _ H'')
      as [HG | y [Hy0 Hy1]] using existsC_ind.
   contradict HG. intro HG. contradiction.
-  revert abs. change (InFinEnumC x b).
-  rewrite -> (InFinEnumC_wd1 x y).
-   auto using InFinEnumC_weaken.
+  revert abs. change (FinSubset_ball 0 x b).
+  rewrite -> (FinSubset_ball_wd x y).
+  2: reflexivity.
+  apply InFinEnumC_weaken, Hy0.
   apply ball_eq.
   intros [n d] dpos.
   destruct n. inversion dpos. 2: inversion dpos.
@@ -320,7 +427,7 @@ Proof.
  - revert abs. apply IHa.
    intros e y0 Hy.
    apply H. intro abs.
-   unfold InFinEnumC in Hy.
+   unfold InFinEnumC, FinSubset_ball in Hy.
    contradict Hy; intros [y1 Hy].
    contradict abs.
    exists y1. split.
@@ -348,15 +455,46 @@ Qed.
 Definition FinEnum : MetricSpace :=
 Build_MetricSpace FinEnum_ball_wd FinEnum_is_MetricSpace.
 
+Lemma FinSubset_ball_triangle_r : forall e1 e2 x (l1 l2 : FinEnum),
+    FinSubset_ball e1 x l1 -> (ball e2 l1 l2) -> FinSubset_ball (e1 + e2) x l2.
+Proof.
+ intros e1 e2 x l1 l2 H1 [epos [H2 _]].
+ revert l2 H1 H2.
+ induction l1; intros l2 H1 H2.
+ exfalso; exact (FinSubset_ball_nil H1).
+ unfold hemiMetric in *.
+ apply FinSubset_ball_orC in H1.
+ destruct H1 as [G | H1 | H1] using orC_ind.
+ intro abs; contradict G; intro G; contradiction.
+  assert (Z:InFinEnumC a (a :: l1)).
+  { intro abs; contradict abs.
+    exists a. split. left; reflexivity. apply ball_0. reflexivity. }
+  destruct (H2 a Z) as [ G | z [Hz0 Hz1]] using existsC_ind.
+ intro abs; contradict G; intro G; contradiction.
+  clear - H1 Hz0 Hz1.
+  apply FinSubset_ball_closed.
+  intros d dpos.
+  apply FinSubset_ball_triangle_l with z.
+   apply ball_triangle with a; assumption.
+   apply FinSubset_ball_weak_le with (e1:=0).
+   apply Qlt_le_weak, dpos. exact Hz0.
+ apply IHl1.
+  assumption.
+ intros y Hy.
+ apply H2.
+ apply FinSubset_ball_cons.
+ exact Hy.
+Qed.
+
 Lemma FinEum_map_ball : forall (f:X -> X) (e:Qpos) (s:FinEnum),
  (forall x, ball (proj1_sig e) x (f x)) -> ball (proj1_sig e) s (map f s).
 Proof.
  intros f e s H.
  induction s. split. apply Qpos_nonneg.
- - split; intros a b abs; apply (InFinEnumC_nil b).
+ - split; intros a b abs; apply (FinSubset_ball_nil b).
  - destruct IHs as [IHs0 IHs1].
    split. apply Qpos_nonneg.
-   split; intros x y abs; unfold InFinEnumC in y; contradict y
+   split; intros x y abs; unfold InFinEnumC, FinSubset_ball in y; contradict y
    ; intros [y [iny H0]].
    destruct iny.
    + subst y.
@@ -364,29 +502,32 @@ Proof.
      split.
      apply InFinEnumC_weaken.
      left. reflexivity.
+     apply ball_0 in H0.
      rewrite H0. apply H.
    + destruct IHs1 as [IHs1 _].
-     pose proof (InFinEnumC_wd1 x y s H0) as [_ H2].
+     apply ball_0 in H0.
+     pose proof (@FinSubset_ball_wd x y 0 0 s eq_refl H0) as [_ H2].
      specialize (IHs1 x (H2 (InFinEnumC_weaken y s H1))).
      unfold existsC in IHs1. contradict IHs1.
      intros z [H3 H4].
      specialize (abs z). contradict abs.
      split. 2: exact H4. simpl.
-     apply (@InFinEnumC_cons z).
-     reflexivity. exact H3.
-   + destruct iny. subst y.
+     apply FinSubset_ball_cons.
+     exact H3.
+   + apply ball_0 in H0.
+     destruct iny. subst y.
      specialize (abs a). contradict abs.
      split. apply InFinEnumC_weaken. left. reflexivity.
      rewrite H0. apply ball_sym, H. 
-     destruct IHs1 as [_ IHs1].
-     pose proof (InFinEnumC_wd1 x y (map f s) H0) as [_ H2].
+     destruct IHs1 as [_ IHs1]. 
+     pose proof (@FinSubset_ball_wd x y 0 0 (map f s) eq_refl H0) as [_ H2].
      specialize (IHs1 x (H2 (InFinEnumC_weaken y _ H1))).
      unfold existsC in IHs1. contradict IHs1.
      intros z [H3 H4].
      specialize (abs z). contradict abs.
      split. 2: exact H4. simpl.
-     apply (@InFinEnumC_cons z).
-     reflexivity. exact H3.
+     apply FinSubset_ball_cons.
+     exact H3.
 Qed.
 
 Section Strong.
@@ -407,7 +548,7 @@ Proof.
  revert x Hx.
  induction b; intros x Hx H d.
  - abstract (unfold existsC in H; contradict H;
-             intros y [H _]; exact (InFinEnumC_nil H)).
+             intros y [H _]; exact (FinSubset_ball_nil H)).
  - destruct (@almostDecideX e (e + proj1_sig d) x a).
    clear - e d.
    abstract ( simpl; rewrite -> Qlt_minus_iff; ring_simplify; auto with * ).
@@ -420,16 +561,17 @@ Proof.
    auto using existsC_stable.
    apply existsWeaken. exists y.
    split. 2: exact Hy1.
-   apply InFinEnumC_orC in Hy0.
+   apply FinSubset_ball_orC in Hy0.
    destruct Hy0 as [HG | Hy | Hy] using orC_ind.
    intro abs. contradict HG; intro HG; contradiction.
    2: assumption.
+   apply ball_0 in Hy.
    apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ Hy) in Hy1. 
    contradiction. }
  exists (let (y,_) := (IHb x Hx Z d) in y).
  clear - IHb.
  abstract (destruct (IHb x Hx Z d) as [y [Hy0 Hy1]]; split; auto;
-           apply (@InFinEnumC_cons y _ _ _ (reflexivity _)); exact Hy0).
+           apply FinSubset_ball_cons, Hy0).
 Defined.
 
 Lemma HausdorffBallHausdorffBallStrong : forall (e:Q) (a b:FinEnum),
@@ -451,14 +593,14 @@ Proof.
   - intros Hed.
     right.
     abstract (intros H; apply (H a); try reflexivity;
-              intros x [Hx0 Hx1]; exact (InFinEnumC_nil Hx0)).
+              intros x [Hx0 Hx1]; exact (FinSubset_ball_nil Hx0)).
   - intros Hed.
     destruct (IHb Hed) as [H|H].
     left.
     abstract (intros x Hx; destruct (H x Hx) as [HG | z [Hz0 Hz1]] using existsC_ind;
               [apply existsC_stable; auto|]; apply existsWeaken; exists z; split;
               try assumption;
-              apply (@InFinEnumC_cons z _ _ _ (reflexivity _)); exact Hz0).
+              apply FinSubset_ball_cons, Hz0).
     destruct (@almostDecideX _ _ a a0 Hed).
     + left.
       intros x Hx; apply existsWeaken; exists a0.
@@ -468,9 +610,10 @@ Proof.
     + right.
       intros H0; assert (Haa:st_eq a a) by reflexivity;
         destruct (H0 a Haa) as [HG | z [Hz0 Hz1]] using existsC_ind; [tauto|].
-      apply InFinEnumC_orC in Hz0.
+      apply FinSubset_ball_orC in Hz0.
       destruct Hz0 as [HG | Hz2 | Hz2] using orC_ind.
       tauto.
+      apply ball_0 in Hz2.
       apply (ball_wd _ eq_refl _ _ (reflexivity _) _ _ Hz2) in Hz1. 
       contradiction.
       apply H; intros x Hx; apply existsWeaken; exists z.
@@ -488,21 +631,21 @@ Proof.
   intros a _.
   left.
   intros x Hx _.
-  exact (InFinEnumC_nil Hx).
+  exact (FinSubset_ball_nil Hx).
  intros b Hed.
  destruct (IHa b Hed) as [I|I].
   destruct (@HemiMetricStrongAlmostDecidableBody _ _ a b Hed) as [J|J].
    left.
-   abstract ( intros x Hx; apply InFinEnumC_orC in Hx;
+   abstract ( intros x Hx; apply FinSubset_ball_orC in Hx;
               destruct Hx as [HG | ? | ?] using orC_ind;
               [auto using existsC_stable
-     |apply J; assumption |apply I; assumption]).
+     |apply J, ball_0; assumption |apply I; assumption]).
   right.
   abstract (intros H; apply J; intros x Hx; apply H;
-            intro abs; contradict abs; exists a; split; [left; reflexivity | exact Hx]).
+            intro abs; contradict abs; exists a; split; [left; reflexivity | apply ball_0, Hx]).
  right.
   abstract (intros H; apply I; intros x Hx; apply H;
-            apply (@InFinEnumC_cons x _ _ _ (reflexivity _)), Hx).
+            apply FinSubset_ball_cons, Hx).
 Defined.
 
 (** Finite Enumerations preserve the locatedness property. *)
@@ -549,34 +692,34 @@ Proof.
   split. apply Qpos_nonneg. destruct Hc0 as [_ Hc0].
    abstract ( destruct Hc0 as [Hc0a Hc0b]; destruct Hc1 as [Hc1a Hc1b]; split; intros x Hx;
      [destruct (Hc0a x Hx) as [ G | y [Hya Hyb]] using existsC_ind;
-       [auto using existsC_stable | apply existsWeaken; exists y; auto]
-         |destruct (@InFinEnumC_app_orC _ _ _ Hx) as [G | Hxl | Hxr] using orC_ind;
+       [auto using existsC_stable | apply existsWeaken; exists y; unfold InFinEnumC; auto]
+         |destruct (@FinSubset_ball_app_orC _ _ _ _ Hx) as [G | Hxl | Hxr] using orC_ind;
            [auto using existsC_stable |destruct (Hc0b x Hxl) as [ G | y [Hya Hyb]] using existsC_ind;
              [auto using existsC_stable | apply existsWeaken; exists y; auto]
                |destruct (Hc1c x Hxr) as [ G | y [Hya Hyb]] using existsC_ind;
-                 [auto using existsC_stable | apply existsWeaken; exists y; auto]]]).
+                 [auto using existsC_stable | apply existsWeaken; exists y; auto]]]). 
    split. apply Qpos_nonneg.
    destruct Hc0 as [_ Hc0]. destruct Hc1 as [_ Hc1].
   abstract ( destruct Hc0 as [Hc0a Hc0b]; destruct Hc1 as [Hc1a Hc1b]; split; intros x Hx;
-    [destruct (@InFinEnumC_app_orC _ _ _ Hx) as [G | Hxl | Hxr] using orC_ind;
+    [destruct (@FinSubset_ball_app_orC _ _ _ _ Hx) as [G | Hxl | Hxr] using orC_ind;
       [auto using existsC_stable |destruct (Hc0c x Hxl) as [ G | y [Hya Hyb]] using existsC_ind;
         [auto using existsC_stable | apply existsWeaken; exists y; auto]
           |destruct (Hc1b x Hxr) as [ G | y [Hya Hyb]] using existsC_ind;
             [auto using existsC_stable | apply existsWeaken; exists y; auto]]
               |destruct (Hc1a x Hx) as [ G | y [Hya Hyb]] using existsC_ind;
-                [auto using existsC_stable | apply existsWeaken; exists y; auto]]).
+                [auto using existsC_stable | apply existsWeaken; exists y; unfold InFinEnumC; auto]]).
  intros d1 d2 He a b H.
  induction a.
   exists nil.
    apply ball_refl. apply Qpos_nonneg.
-  intros x Hx; exfalso; exact (InFinEnumC_nil Hx).
+  intros x Hx; exfalso; exact (FinSubset_ball_nil Hx).
  destruct IHa as [c1 Hc1a Hc1b].
- abstract (intros x Hx d; apply (H x);
-           apply (@InFinEnumC_cons x _ _ _ (reflexivity _)), Hx).
+ abstract (intros x Hx d; apply (H x); apply FinSubset_ball_cons, Hx).
  destruct (Qpos_sub _ _ He) as [g Hg].
  pose (exist (Qlt 0) (1#2) eq_refl) as half.
  destruct (fun z => H a z (half*g)%Qpos) as [b0 Hb0].
- abstract (intro abs; contradict abs; exists a; split; [left; reflexivity | reflexivity]).
+ abstract (intro abs; contradict abs; exists a; split;
+           [left; reflexivity | apply ball_0; reflexivity]).
  clear H.
  destruct (@preLengthX a b0 (e + half * g)%Qpos d1 d2) as [c Hc0 Hc1].
    abstract ( clear - Hg; unfold QposEq in Hg; rewrite -> Hg; simpl; rewrite -> Qlt_minus_iff; ring_simplify;
@@ -584,34 +727,37 @@ Proof.
   abstract (clear - Hb0; destruct Hb0; auto).
  exists (c :: c1).
  - split. apply Qpos_nonneg. split; intros x Hx.
-   + apply InFinEnumC_orC in Hx.
+   + apply FinSubset_ball_orC in Hx.
      destruct Hx as [ G | Hx | Hx ] using orC_ind.
      auto using existsC_stable.
      apply existsWeaken. exists c. split.
-     intro abs; contradict abs; exists c; split; [left; reflexivity | reflexivity].
-     apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)). assumption.
+     intro abs; contradict abs; exists c; split; [left; reflexivity | apply ball_0; reflexivity].
+     apply ball_0 in Hx.
+     rewrite Hx. assumption.
      destruct Hc1a as [_ Hc1a].
      destruct Hc1a as [Hc1a _].
      destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
        [auto using existsC_stable|].
      apply existsWeaken; exists y; split; auto.
-     apply (@InFinEnumC_cons y). reflexivity. exact Hy0.
-   + apply InFinEnumC_orC in Hx.
+     apply FinSubset_ball_cons. exact Hy0.
+   + apply FinSubset_ball_orC in Hx.
      destruct Hx as [ G | Hx | Hx ] using orC_ind.
      auto using existsC_stable.
      apply existsWeaken; exists a; split.
-     intro abs; contradict abs; exists a; split; [left; reflexivity | reflexivity].
+     intro abs; contradict abs; exists a; split; [left; reflexivity | apply ball_0; reflexivity].
+     apply ball_0 in Hx.
      apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)); auto with *.
      destruct Hc1a as [_ Hc1a].
      destruct Hc1a as [_ Hc1a];
        destruct (Hc1a x Hx) as [ G | y [Hy0 Hy1]] using existsC_ind;
        [auto using existsC_stable|]; apply existsWeaken; exists y; split; auto.
-     apply (@InFinEnumC_cons y). reflexivity. exact Hy0.
+     apply (@FinSubset_ball_cons y). exact Hy0.
  - destruct Hb0 as [Hb0a Hb0b]; intros x Hx.
-   apply InFinEnumC_orC in Hx.
+   apply FinSubset_ball_orC in Hx.
    destruct Hx as [ G | Hx | Hx ] using orC_ind.
    auto using existsC_stable.
    apply existsWeaken; exists b0; split; auto.
+   apply ball_0 in Hx.
    apply (ball_wd _ eq_refl _ _ Hx _ _ (reflexivity _)); auto.
    apply Hc1b; auto.
 Defined.
@@ -620,18 +766,103 @@ Defined.
 End Strong.
 
 End Finite.
+
+(* begin hide *)
+Add Parametric Morphism {X : MetricSpace} : (FinSubset_ball X)
+    with signature Qeq ==> (@st_eq _) ==> (@st_eq (FinEnum X)) ==> iff
+      as FinSubset_ball_wd_full.
+Proof.
+ unfold FinEnum_eq.
+ assert (Y:forall x1 x2 : Q, x1 == x2 -> forall y1 y2 : X,
+              st_eq y1 y2 ->forall z : FinEnum X,
+                (FinSubset_ball _ x1 y1 z
+                 -> FinSubset_ball _ x2 y2 z)).
+  { intros x1 x2 Hx y1 y2 Hy.
+  induction z.
+  intros. exfalso; exact (FinSubset_ball_nil H).
+  intros H.
+  apply FinSubset_ball_orC in H.
+  destruct H as [G | H | H] using orC_ind.
+  intro abs; contradict G; intro G; contradiction.
+  intro abs; contradict abs.
+  exists a. split. left. reflexivity.
+   unfold QposEq in Hx. rewrite <- Hx, <- Hy.
+   assumption.
+   apply FinSubset_ball_cons.
+  apply IHz; assumption. }
+ intros x1 x2 Hx y1 y2 Hy.
+ cut (forall z1 x3 : FinEnum X, (forall x : X, InFinEnumC _ x z1 -> InFinEnumC _ x x3) ->
+   (FinSubset_ball _ x1 y1 z1 -> FinSubset_ball _ x2 y2 x3)).
+  { intros Z z1 z2 Hz.
+  split.
+   apply Z.
+   intros x H.
+   simpl in Hz.
+   unfold FinEnum_eq in Hz.
+   apply -> Hz.
+   assumption.
+  intros H.
+  eapply Y.
+    unfold QposEq.
+    simpl; symmetry.
+    apply Hx.
+   symmetry.
+   apply Hy.
+  eapply Z.
+   intros a Ha.
+   simpl in Hz; unfold FinEnum_eq in Hz.
+   apply <- Hz.
+   apply Ha.
+  eapply Y.
+    unfold QposEq.
+    simpl; symmetry.
+    apply Hx.
+   symmetry.
+   apply Hy.
+  assumption. }
+ induction z1; intros z2 Hz.
+  intro abs; exfalso; exact (FinSubset_ball_nil abs).
+ intros H.
+ apply FinSubset_ball_orC in H.
+ destruct H as [G | H | H] using orC_ind.
+ intro abs; contradict G; intro G; contradiction.
+  assert (Z:InFinEnumC _ a z2).
+   apply Hz.
+   intro abs; contradict abs.
+   exists a. split. left; reflexivity. apply ball_0. reflexivity.
+  rewrite -> Hx, Hy in H.
+  clear - H Z.
+  induction z2.
+  exfalso; exact (FinSubset_ball_nil Z).
+  apply FinSubset_ball_orC in Z.
+  destruct Z as [G | Z | Z] using orC_ind.
+ intro abs; contradict G; intro G; contradiction.
+ apply ball_0 in Z.
+   rewrite -> Z in H.
+   intro abs; contradict abs.
+   exists a0. split. left. reflexivity. exact H.
+   apply FinSubset_ball_cons.
+  apply IHz2; auto.
+ apply IHz1.
+  intros b Hb.
+  apply Hz.
+  apply FinSubset_ball_cons.
+  exact Hb. exact H.
+Qed.
+
 (* begin hide *)
 Arguments InFinEnumC [X].
+Arguments FinSubset_ball [X].
 (* end hide *)
 (** A list is equivalent to it's reverse as finite enumerations *)
 Lemma FinEnum_eq_rev : forall X (f:FinEnum X), st_eq f (rev f).
 Proof.
   split.
-  - intros H abs. unfold InFinEnumC in H.
+  - intros H abs. unfold InFinEnumC, FinSubset_ball in H.
     contradict H; intros [y H].
     contradict abs. exists y. split.
     rewrite <- in_rev. apply H. apply H.
-  - intros H abs. unfold InFinEnumC in H.
+  - intros H abs. unfold InFinEnumC, FinSubset_ball in H.
     contradict H; intros [y H].
     contradict abs. exists y. split.
     rewrite in_rev. apply H. apply H.
@@ -645,10 +876,11 @@ Lemma InFinEnumC_map : forall (X Y:MetricSpace) (f:X --> Y) a l,
     InFinEnumC a l -> InFinEnumC (f a) (map f l).
 Proof.
   intros. intro abs.
-  unfold InFinEnumC in H.
+  unfold InFinEnumC, FinSubset_ball in H.
   contradict H; intros [y [H H0]].
   contradict abs. exists (f y). split.
   apply in_map. exact H.
+  apply ball_0. apply ball_0 in H0.
   rewrite H0. reflexivity.
 Qed.
 
@@ -691,27 +923,28 @@ Proof.
  intros e d Hd s1 s2.
  intros H a Ha.
  induction s1.
-  exfalso; exact (InFinEnumC_nil Ha).
-  apply InFinEnumC_orC in Ha.
+  exfalso; exact (FinSubset_ball_nil Ha).
+  apply FinSubset_ball_orC in Ha.
  destruct Ha as [G | Ha | Ha] using orC_ind.
    auto using existsC_stable.
   assert (Ha0:InFinEnumC a0 (a0::s1)).
   intro abs; contradict abs. exists a0.
-  split. left. reflexivity. reflexivity.
+  split. left. reflexivity. apply ball_0. reflexivity.
   destruct (H a0 Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
   apply existsWeaken.
   exists (f y).
   split.
    apply InFinEnumC_map; assumption.
-   apply (ball_wd _ eq_refl _ _ Ha _ _ (reflexivity _)).
+   apply ball_0 in Ha.
+   rewrite Ha.
   apply (uc_prf f).
   apply ball_ex_weak_le with d; auto.
  apply IHs1; auto.
  intros b Hb.
  apply H.
- apply (@InFinEnumC_cons _ b).
- reflexivity. exact Hb.
+ apply (@FinSubset_ball_cons _ b).
+ exact Hb.
 Qed.
 (* begin hide *)
 Arguments FinEnum_map_uc z [X Y].
@@ -740,21 +973,21 @@ Proof.
   split; apply Z; assumption. }
  intros s1 s2 H a Ha.
  induction s1.
- exfalso; exact (InFinEnumC_nil Ha).
- apply InFinEnumC_orC in Ha.
+ exfalso; exact (FinSubset_ball_nil Ha).
+ apply FinSubset_ball_orC in Ha.
  destruct Ha as [G | Ha | Ha] using orC_ind.
    auto using existsC_stable.
   clear IHs1.
   assert (Ha0:InFinEnumC (Cunit a0) (map Cunit (a0::s1))).
   intro abs; contradict abs.
   exists (Cunit a0). split.
-  left; reflexivity. reflexivity.
+  left; reflexivity. apply ball_0. reflexivity.
   destruct (H _ Ha0) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
   clear - Ha Hy0 Hy1.
   induction s2.
-  exfalso; exact (InFinEnumC_nil Hy0).
-  apply InFinEnumC_orC in Hy0.
+  exfalso; exact (FinSubset_ball_nil Hy0).
+  apply FinSubset_ball_orC in Hy0.
   destruct Hy0 as [G | Hy0 | Hy0] using orC_ind.
     auto using existsC_stable.
    apply existsWeaken.
@@ -762,9 +995,11 @@ Proof.
    split.
   intro abs; contradict abs.
   exists a1. split.
-  left; reflexivity. reflexivity.
+  left; reflexivity. apply ball_0. reflexivity.
+  apply ball_0 in Ha.
   rewrite Ha.
   rewrite <- ball_Cunit.
+  apply ball_0 in Hy0.
   rewrite <- Hy0.
   assumption.
   destruct (IHs2 Hy0) as [G | z [Hz0 Hz1]] using existsC_ind.
@@ -772,11 +1007,11 @@ Proof.
   apply existsWeaken.
   exists z.
   split; auto.
-  apply (@InFinEnumC_cons _ z).
-  reflexivity. exact Hz0.
+  apply FinSubset_ball_cons.
+  exact Hz0.
  apply IHs1; auto.
  intros b Hb.
  apply H.
- apply (@InFinEnumC_cons _ b).
- reflexivity. exact Hb.
+ apply FinSubset_ball_cons.
+ exact Hb.
 Qed.

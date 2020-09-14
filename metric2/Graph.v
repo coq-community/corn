@@ -119,12 +119,15 @@ Proof.
  intros plFEX p s H e1 e2.
  simpl.
  unfold Cfst_raw.
- apply almostIn_closed.
+ apply FinSubset_ball_closed.
  intros d dpos.
  set (d':=((1#2)*exist _ _ dpos)%Qpos).
- setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
-   with (proj1_sig ((e1 + d') + (d'+ e2))%Qpos)
+ assert (Qeq (proj1_sig e1 + proj1_sig e2 + d)
+             (proj1_sig ((e1 + d') + (d'+ e2))%Qpos))
    by (simpl; ring).
+ apply (@FinSubset_ball_wd_full _ _ _
+           H0 _ _ (reflexivity _) _ _ (reflexivity _)).
+ clear H0. 
  pose proof (H e1 d') as H'.
  clear H.
  unfold XY in *.
@@ -132,17 +135,17 @@ Proof.
  simpl in *.
  unfold FinEnum_map_modulus, graphPoint_modulus in H'.
  set (d2:=match mu f d' with | Qpos2QposInf d => Qpos_min d' d | QposInfinity => d' end) in *.
- eapply almostIn_triangle_r with (approximate s d2).
+ eapply FinSubset_ball_triangle_r with (approximate s d2).
   clear - H'.
   induction (approximate s d2).
-   contradiction.
+  exfalso; exact (FinSubset_ball_nil H').
+  apply FinSubset_ball_orC in H'.
   destruct H' as [G | [H' _] | H'] using orC_ind.
-    auto using almostIn_stable.
-   apply orWeaken.
-   left.
+ intro abs; contradict G; intro G; contradiction.
+ intro abs; contradict abs. exists a0.
+ split. left. reflexivity.
    assumption.
-  apply orWeaken.
-  right.
+   apply FinSubset_ball_cons.
   apply IHl.
   assumption.
  eapply ball_weak_le;[|apply regFun_prf].
@@ -199,9 +202,10 @@ Proof.
    unfold FinEnum_map_modulus, graphPoint_modulus in H'.
    induction (@approximate _ (FinEnum_ball X) s (Qpos2QposInf match @mu X Y f d' return Qpos with
      | Qpos2QposInf d => Qpos_min d' d | QposInfinity => d' end)).
-    contradiction.
+   exfalso; exact (FinSubset_ball_nil H').
+   apply FinSubset_ball_orC in H'.
    destruct H' as [G | H | H] using orC_ind.
-     auto using existsC_stable.
+ intro abs; contradict G; intro G; contradiction.
     apply existsWeaken.
     exists a.
     apply H.
@@ -399,12 +403,15 @@ Proof.
  intros plFEX p s H e1 e2.
  simpl.
  unfold Cfst_raw.
- apply almostIn_closed.
+ apply FinSubset_ball_closed.
  intros d dpos.
  set (d':=((1#2)*exist _ _ dpos)%Qpos).
- setoid_replace (proj1_sig e1 + proj1_sig e2 + d)
-   with (proj1_sig ((e1 + d') + (d'+ e2))%Qpos)
+ assert (Qeq (proj1_sig e1 + proj1_sig e2 + d)
+             (proj1_sig ((e1 + d') + (d'+ e2))%Qpos))
    by (simpl; ring).
+ apply (@FinSubset_ball_wd_full _ _ _
+           H0 _ _ (reflexivity _) _ _ (reflexivity _)).
+ clear H0. 
  assert (H':=H e1 d').
  clear H.
  unfold XY in *.
@@ -417,17 +424,17 @@ Proof.
            | Qpos2QposInf d => Qpos_min ((1#2)*d') d
            | QposInfinity => ((1#2)*d')%Qpos end) as d2.
  simpl in Heqd2. rewrite <- Heqd2 in H'.
- eapply almostIn_triangle_r with (approximate s d2).
+ eapply FinSubset_ball_triangle_r with (approximate s d2).
   clear - H'.
   induction (approximate s d2).
-   contradiction.
+  exfalso; exact (FinSubset_ball_nil H').
+  apply FinSubset_ball_orC in H'.
   destruct H' as [G | [H' _] | H'] using orC_ind.
-    auto using almostIn_stable.
-   apply orWeaken.
-   left.
+ intro abs; contradict G; intro G; contradiction.
+ intro abs; contradict abs. exists a0.
+ split. left. reflexivity.
    assumption.
-  apply orWeaken.
-  right.
+   apply FinSubset_ball_cons.
   apply IHl.
   assumption.
  eapply ball_weak_le;[|apply regFun_prf].
@@ -550,9 +557,11 @@ Proof.
                   | QposInfinity => ((1 # 2) * d')%Qpos
                   end) as mm.
    simpl in Heqmm. rewrite <- Heqmm in H'.
-   induction (@approximate _ (FinEnum_ball X) s mm). contradiction.
+   induction (@approximate _ (FinEnum_ball X) s mm).
+   exfalso; exact (FinSubset_ball_nil H').
+   apply FinSubset_ball_orC in H'.
    destruct H' as [G | H | H] using orC_ind.
-     auto using existsC_stable.
+ intro abs; contradict G; intro G; contradiction.
     apply existsWeaken.
     exists a.
     apply H.

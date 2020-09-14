@@ -181,9 +181,9 @@ Proof.
   exists z. split.
   apply inCompact_stable.
   intro abs.
-  unfold InFinEnumC in H0.
+  unfold InFinEnumC, FinSubset_ball in H0.
   contradict H0; intros [t [H0 H1]].
-  contradict abs. rewrite H1.
+  contradict abs. apply ball_0 in H1. rewrite H1.
   apply (CompactTotallyBoundedA _ _ _ _ H0).
   apply (ball_triangle _ _ _ _ _ _ close) in H2. 
   setoid_replace e with

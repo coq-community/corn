@@ -317,13 +317,13 @@ Proof.
  unfold RasterizeQ2.
  rewrite <- fold_left_rev_right.
  intros H abs.
- unfold InFinEnumC in H.
+ unfold InFinEnumC, FinSubset_ball in H.
  destruct (Hf H) as [Hfl Hfr].
  clear Hf.
  destruct (FinEnum_eq_rev f (x,y)) as [L _].
  specialize (L H).
  contradict H; intro H.
- unfold InFinEnumC in L.
+ unfold InFinEnumC, FinSubset_ball in L.
  contradict L; intro L.
  revert abs.
  generalize L.
@@ -351,7 +351,7 @@ Proof.
    rewrite setRaster_correct1; unfold i, j; auto with *.
   split.
    change (ball (proj1_sig err) (C l r (S n) (Z.of_nat i)) x).
-   change (st_eq x (fst a)) in Hl.
+   apply ball_0 in Hl.
    rewrite -> Hl.
    eapply ball_weak_le.
     unfold err.
@@ -361,7 +361,7 @@ Proof.
    rewrite ->  Hl in Hfl.
    auto.
   change (ball (proj1_sig err) (C t b (S m) (Z.of_nat (m-j)%nat)) y).
-  change (st_eq y (snd a)) in Hr.
+  apply ball_0 in Hr.
   rewrite -> Hr.
   eapply ball_weak_le.
    unfold err.
@@ -397,7 +397,7 @@ Lemma RasterizeQ2_correct2 : forall x y,
 Proof.
  intros x y H.
  intro abs.
- unfold InFinEnumC in H.
+ unfold InFinEnumC, FinSubset_ball in H.
  contradict H; intro H.
  destruct H as [[x' y'] [H' Hxy]].
  destruct (InterpRaster_correct2 _ _ _ _ _ _ _ H') as [[j i] [Hij [Hx' Hy']]].
@@ -420,14 +420,14 @@ Proof.
    clear -L abs.
    unfold existsC in L.
    contradict L. intros x0 [H H0].
-   unfold InFinEnumC in H.
+   unfold InFinEnumC, FinSubset_ball in H.
    contradict H; intros H.
    contradict abs.
    destruct H.
    exists x1. split.
    rewrite in_rev. apply H.
    destruct H.
-   rewrite <- H1.
+   apply ball_0 in H1. rewrite <- H1.
    exact H0.
  - unfold RasterizeQ2 in Hij.
  rewrite <- fold_left_rev_right in Hij.
@@ -456,15 +456,15 @@ Proof.
   change (st_car (msp_is_setoid Q2)) in a.
   split.
   intro H; contradict H.
-  exists a. split. left. reflexivity. reflexivity.
+  exists a. split. left. reflexivity. apply ball_0; reflexivity.
   destruct a as [ax ay].
   destruct (Hf' ax ay) as [Hax Hay].
   intro H; contradict H.
-  exists (ax,ay). split. left. reflexivity. reflexivity.
+  exists (ax,ay). split. left. reflexivity. apply ball_0; reflexivity.
   clear Hf'.
   split.
    unfold fst.
-   rewrite -> Hx'.
+   apply ball_0 in Hx'. rewrite -> Hx'.
    apply ball_sym.
    eapply ball_weak_le.
     unfold err.
@@ -472,7 +472,7 @@ Proof.
    apply rasterize1_error.
    auto.
   unfold snd.
-  rewrite -> Hy'.
+  apply ball_0 in Hy'. rewrite -> Hy'.
   apply ball_sym.
   eapply ball_weak_le.
    unfold err.
@@ -490,15 +490,15 @@ Proof.
    rewrite setRaster_correct2 in Hij; auto.
   intros c d Hcd.
   apply Hf'.
-  apply (@InFinEnumC_cons Q2 (c,d)).
-  reflexivity. exact Hcd.
+  apply FinSubset_ball_cons.
+  exact Hcd.
  destruct L0 as [G | z [Hz0 Hz1]] using existsC_ind.
   auto using existsC_stable.
  apply existsWeaken.
  exists z.
  split; auto.
-  apply (@InFinEnumC_cons Q2 z).
-  reflexivity. exact Hz0.
+  apply FinSubset_ball_cons.
+  exact Hz0.
 Qed.
 
 Lemma RasterizeQ2_correct :

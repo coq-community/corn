@@ -69,8 +69,11 @@ Record is_MetricSpace (X : RSetoid) (B: Q -> relation X) : Prop :=
 }.
 
 Record MetricSpace : Type :=
-{ msp_is_setoid :> RSetoid
+{ msp_is_setoid :> RSetoid (* TODO rename msp_car :> Type *)
 ; ball : Q -> msp_is_setoid -> msp_is_setoid -> Prop
+(* This requires equivalence between the RSetoid and the zero-distance
+   relation. It is redundant, we should remove the RSetoid and declare
+   the zero-distance as the canonical metric setoid. *)
 ; ball_wd : forall (e1 e2:Q), (e1 == e2) ->
             forall x1 x2, (st_eq x1 x2) ->
             forall y1 y2, (st_eq y1 y2) ->
