@@ -34,6 +34,10 @@ Global Instance CRtoAR: Cast CR AR := CRtoAR_uc.
 
 Global Instance inject_AQ_AR: Cast AQ AR := (@Cunit AQ_as_MetricSpace).
 Global Instance: Proper ((=) ==> (=)) inject_AQ_AR := uc_wd (@Cunit AQ_as_MetricSpace).
+Lemma ARtoCR_approx : forall (d : QposInf) (x : AR),
+    approximate (ARtoCR x) d ≡ AQtoQ (approximate x d).
+Proof. intros. destruct d; reflexivity. Qed.
+
 Lemma inject_Q_AR_prf :
   forall (q:Q), is_RegularFunction (@ball AQ_as_MetricSpace)
              (fun e:QposInf => 

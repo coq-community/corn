@@ -359,13 +359,14 @@ Proof.
   set (e1':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))))) in *.
   assert (L:=UniformPartition_inside e1').
   induction (UniformPartition e1').
-   contradiction.
+  exfalso; exact (InFinEnumC_nil Ha).
   destruct (Qeq_dec a a0) as [A|A].
    rewrite -> A.
    auto with *.
   apply IHl0; auto with *.
+  apply InFinEnumC_orC in Ha.
   destruct Ha as [G | Ha | Ha] using orC_ind.
-    auto using InFinEnumC_stable.
+  intro abs. contradict G; intro G. contradiction.
    elim A.
    assumption.
   assumption. }

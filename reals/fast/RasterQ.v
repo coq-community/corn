@@ -37,10 +37,10 @@ Definition Q2 := (ProductMS Q_as_MetricSpace Q_as_MetricSpace).
 (** For [Q2], classical membership in a finite enumeration is the
 same as a constructive membership. *)
 Lemma InStrengthen : forall x (l:FinEnum Q2),
-InFinEnumC x l -> exists y : ProductMS _ _, In y l /\ st_eq x y.
+    InFinEnumC x l -> exists y : Q2, In y l /\ st_eq x y.
 Proof.
  induction l.
-  contradiction.
+ intro abs. exfalso; exact (InFinEnumC_nil abs).
  intros H.
  assert (L:st_eq x a \/ ~st_eq x a).
   destruct (Qeq_dec (fst x) (fst a)).
@@ -53,8 +53,9 @@ Proof.
   exists a.
   split; auto with *.
  destruct (IHl) as [y [Hy0 Hy1]].
+ apply InFinEnumC_orC in H.
   destruct H as [G | H | H] using orC_ind.
-    auto using InFinEnumC_stable.
+  intro abs. contradict G; intro G. contradiction.
    elim H0; auto.
   auto.
  exists y.
@@ -244,7 +245,7 @@ Proof.
    symmetry; auto.
   symmetry; auto.
  intros [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
- destruct (InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
+ destruct (@InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
  destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by'] [Hb0 [Hb1 Hb2]]].
  rewrite Hb1 in Ha1.
  rewrite Hb2 in Ha1.

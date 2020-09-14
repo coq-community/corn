@@ -181,7 +181,7 @@ Proof.
   exists z. split.
   apply inCompact_stable.
   intro abs.
-  apply InFinEnumC_equiv in H0.
+  unfold InFinEnumC in H0.
   contradict H0; intros [t [H0 H1]].
   contradict abs. rewrite H1.
   apply (CompactTotallyBoundedA _ _ _ _ H0).
