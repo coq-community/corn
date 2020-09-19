@@ -195,7 +195,7 @@ Proof.
 Defined.
 
 Lemma rational_arctan_small_correct_aux (a : Q) : 
-  (- IRasCR (ArcTan (inj_Q IR (- a)%Q)))%CR[=]IRasCR (ArcTan (inj_Q IR a)).
+  (- IRasCR (ArcTan (inj_Q IR (- a)%Q)))%CR = IRasCR (ArcTan (inj_Q IR a)).
 Proof.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.

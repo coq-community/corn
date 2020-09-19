@@ -56,14 +56,12 @@ Lemma dist_prf : forall (x:StepFSup (Complete X)),
 Proof.
  unfold dist_raw.
  intros x a b.
- induction x using StepF_ind.
+ induction x.
  - apply (@regFun_prf _ (@ball X)).
  - simpl (ball (m:=StepFSup X)).
    set (f:=(fun z : RegularFunction (@ball X) => approximate z a)) in *.
    set (g:=(fun z : RegularFunction (@ball X) => approximate z b)) in *.
    simpl.
-   fold (glue o (Map f x1) (Map f x2)).
-   fold (glue o (Map g x1) (Map g x2)).
    setoid_rewrite (StepFSupBallGlueGlue).
    auto.
 Qed.
@@ -74,8 +72,7 @@ Proof.
  abstract (apply (dist_prf x)).
 Defined.
 
-Add Morphism dist1 with signature (@st_eq _)
- ==> (@st_eq _) as dist1_wd.
+Add Morphism dist1 with signature (@msp_eq _) ==> (@msp_eq _) as dist1_wd.
 Proof.
  induction x.
   induction y.
@@ -90,16 +87,18 @@ Proof.
  simpl.
  unfold dist_raw.
  simpl.
+ apply StepF_eq_equiv in H.
  destruct H as [Hl Hr] using (glue_eq_ind x1 x2 y o).
- rewrite <- (glueSplit (Map (fun z : RegularFunction (@ball X) => approximate z d2) y) o).
- unfold SplitL, SplitR.
+ rewrite <- (@glueSplit (msp_as_RSetoid X)
+                       (Map (fun z : Complete X => approximate z d2) y) o).
  rewrite StepFunction.SplitLMap, StepFunction.SplitRMap.
- fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z d1) x1)
-   (Map (fun z : RegularFunction (@ball X) => approximate z d1) x2)).
- rewrite -> StepFSupBallGlueGlue.
+ rewrite -> (StepFSupBallGlueGlue
+              _ (proj1_sig d1 + 0 + proj1_sig d2)
+              o (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d1) x1)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d1) x2)).
  split; revert d1 d2.
-  apply: IHx1; assumption.
- apply: IHx2; assumption.
+ apply IHx1, StepF_eq_equiv, Hl.
+ apply IHx2, StepF_eq_equiv, Hr.
 Qed.
 
 Lemma dist1_uc : is_UniformlyContinuousFunction dist1 Qpos2QposInf.
@@ -109,6 +108,8 @@ Proof.
    simpl (ball_ex).
    intros s s0 t t0 Hs Ht H.
    unfold ball_ex.
+   apply StepF_eq_equiv in Hs.
+   apply StepF_eq_equiv in Ht.
    rewrite <- Hs, <- Ht.
    assumption.
   intros.
@@ -117,13 +118,22 @@ Proof.
  simpl.
  unfold dist_raw.
  simpl.
+(*
  fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d1)) s)
    (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d1)) s0)).
  fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d2)) t)
    (Map (fun z : RegularFunction (@ball X) => approximate z (Qpos2QposInf d2)) t0)).
+*)
  simpl in *.
- rewrite -> StepFSupBallGlueGlue in H |- *.
- split; revert d1 d2; tauto.
+ rewrite -> (StepFSupBallGlueGlue
+              _ (proj1_sig d1 + proj1_sig e + proj1_sig d2) o
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d1) s)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d1) s0)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d2) t)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z d2) t0)).
+ rewrite -> StepFSupBallGlueGlue in H. destruct H.
+ split; revert d1 d2.
+ exact (Hl H). exact (Hr H0).
 Qed.
 
 Local Open Scope uc_scope.
@@ -141,19 +151,21 @@ Arguments dist {X}.
 
 Definition distconst(X : MetricSpace):(Complete X)->Complete (StepFSup X).
 Proof.
- intros x. exists (fun e => (constStepF (approximate x e ))).
+ intros x. exists (fun e => (@constStepF (msp_as_RSetoid X) (approximate x e ))).
  abstract (intros e1 e2; simpl; unfold StepFSupBall, StepFfoldProp; simpl; apply x).
 Defined.
 
 Lemma distConst(X : MetricSpace):forall (x:Complete X),
-(st_eq (dist (constStepF x)) (distconst x)).
+    msp_eq (dist (@constStepF (msp_as_RSetoid (Complete X)) x)) (distconst x).
 Proof.
  intros. intros e1 e2. simpl. unfold dist_raw. simpl.
- unfold StepFSupBall, StepFfoldProp;simpl; apply x.
+ unfold StepFSupBall, StepFfoldProp;simpl.
+ rewrite Qplus_0_r.
+ apply x.
 Qed.
 
 Lemma dist_glue(X:MetricSpace)(o:OpenUnit): forall (x y:(StepFSup (Complete X))),
-(st_eq (dist (glue o x y))  (Cmap2_slow (glue_uc _ o) (dist x) (dist y))).
+    msp_eq (dist (glue o x y)) (Cmap2_slow (glue_uc _ o) (dist x) (dist y)).
 Proof.
   pose (exist (Qlt 0) (1#2) eq_refl) as half.
  intros. simpl. intros e e1. simpl.
@@ -161,13 +173,15 @@ Proof.
  unfold Cmap_slow_fun. simpl.
  unfold Cap_slow_raw. simpl.
  unfold dist_raw.
- fold (glue o (Map (fun z : RegularFunction (@ball X) => approximate z e) x)
-   (Map (fun z : RegularFunction (@ball X) => approximate z e) y)).
- rewrite -> StepFSupBallGlueGlue.
- assert (forall w:StepF (Complete X), StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1)
+ rewrite -> (StepFSupBallGlueGlue
+              _ (proj1_sig e + 0 + proj1_sig e1) o
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z e) x)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z e) y)).
+ assert (forall w:StepF (msp_as_RSetoid (Complete X)),
+            StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1)
    (Map (fun z : RegularFunction (@ball X) => approximate z e) w) (Map (fun z : RegularFunction (@ball X) =>
      approximate z (half * (half * e1))%Qpos) w)).
-  induction w using StepF_ind.
+  induction w.
    unfold StepFSupBall. unfold StepFfoldProp. simpl.
    rewrite <- ball_Cunit.
    apply ball_triangle with x0.
@@ -179,13 +193,17 @@ Proof.
      Qauto_nonneg.
    apply ball_approx_r.
   simpl.
-  change (StepFSupBall (X:=X) (proj1_sig e + proj1_sig e1) (glue o0 (Map (fun z : RegularFunction (@ball X) => approximate z e) w1)
-    (Map (fun z : RegularFunction (@ball X) => approximate z e) w2)) (glue o0 (Map
-      (fun z : RegularFunction (@ball X) => approximate z (half * (half * e1))%Qpos) w1) (Map
-        (fun z : RegularFunction (@ball X) => approximate z (half * (half * e1))%Qpos) w2))).
-  rewrite -> StepFSupBallGlueGlue.
+  rewrite -> (StepFSupBallGlueGlue
+              _ (proj1_sig e + proj1_sig e1) o0
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z e) w1)
+              (Map (fun z : RegularFunction (ball (m:=X)) => approximate z e) w2)
+              (Map (fun z : RegularFunction (ball (m:=X)) =>
+                      approximate z (half * (half * e1))%Qpos) w1)
+              (Map (fun z : RegularFunction (ball (m:=X)) =>
+                      approximate z (half * (half * e1))%Qpos) w2)).
   intuition.
- split;auto.
+  rewrite Qplus_0_r.
+  split; apply H.
 Qed.
 
 Section DistributionLaws.
@@ -218,9 +236,10 @@ Proof.
   pose (exist (Qlt 0) (1#2) eq_refl) as half.
  intros.
  intro x.
- induction x using StepF_ind.
+ induction x.
   intros e e1. simpl.
   unfold dist_raw. simpl.
+  rewrite Qplus_0_r.
   change (ballS Y (proj1_sig e + proj1_sig e1) (Cmap_slow_raw f x e) (f (approximate x
     (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e1))))).
   unfold Cmap_slow_raw. simpl.
@@ -232,15 +251,23 @@ Proof.
    apply ball_triangle with (Cmap_slow f x);apply: (uc_prf (Cmap_slow f));[apply: ball_ex_approx_l|apply: ball_ex_approx_r].
   apply H.
  intros e1 e2. simpl. unfold dist_raw. simpl.
- (* Why do we need to fold glue??*)
- change (StepFSupBall (X:=Y) (proj1_sig e1 + proj1_sig e2) (glue o (Map (fun z : RegularFunction (@ball Y) => approximate z e1)
-   (Map (Cmap_slow_fun f) x1)) (Map (fun z : RegularFunction (@ball Y) => approximate z e1)
-     (Map (Cmap_slow_fun f) x2))) (glue o (Map f (Map (fun z : RegularFunction (@ball X) => approximate z
-       (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x1)) (Map f (Map
-         (fun z : RegularFunction (@ball X) => approximate z
-           (QposInf_bind (fun y' : Qpos => (half * y')%Qpos) (mu f e2))) x2)))).
- rewrite -> (@StepFSupBallGlueGlue Y (proj1_sig e1+proj1_sig e2) o).
- split; [apply IHx1|apply IHx2].
+ rewrite -> (@StepFSupBallGlueGlue
+              Y (proj1_sig e1+0+proj1_sig e2) o
+              (Map (fun z : RegularFunction (ball (m:=Y)) => approximate z e1)
+                   (Map (Cmap_slow_fun f) x1))
+              (Map (fun z : RegularFunction (ball (m:=Y)) => approximate z e1)
+                   (Map (Cmap_slow_fun f) x2))
+              (Map f
+                         (Map
+             (fun z : RegularFunction (ball (m:=X)) =>
+              approximate z
+                (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x1))
+              (Map f
+          (Map
+             (fun z : RegularFunction (ball (m:=X)) =>
+              approximate z
+                (QposInf_bind (fun y' : Qpos => ((1 # 2) * y')%Qpos) (mu f e2))) x2))).
+ split; revert e1 e2 ; [apply IHx1|apply IHx2].
 Qed.
 
 (* dist . returnM≍mapM returnN*)
@@ -255,8 +282,9 @@ Proof.
  intros e e1. simpl. unfold dist_raw. simpl.
  unfold StepFSupBall.
  (* From here onwards the proof is too difficult *)
- change (ballS X (proj1_sig e + proj1_sig e1) (approximate x e) (approximate x (half * e1)%Qpos)).
+ change (ballS X (proj1_sig e + 0 + proj1_sig e1) (approximate x e) (approximate x (half * e1)%Qpos)).
  simpl.
+ rewrite Qplus_0_r.
  apply ball_weak_le with (proj1_sig (Qpos_plus e (half * e1)%Qpos)).
   2: apply (regFun_prf_ex x e (half * e1)%Qpos).
  rewrite -> Qle_minus_iff. simpl.
@@ -265,28 +293,30 @@ Proof.
 Qed.
 
 (*dist . mapN returnM≍returnM*)
-Lemma distmapret: forall X, (ucEq
-(uc_compose dist
-(@Map_uc _ _ (@Cunit X)))
-(@Cunit (StepFSup X))).
+Lemma distmapret: forall (X:MetricSpace),
+    ucEq
+      (uc_compose dist (@Map_uc _ _ (@Cunit X)))
+      (@Cunit (StepFSup X)).
 Proof.
- intros X x e1 e2. simpl.
+ intros X x e1 e2. rewrite Qplus_0_r. simpl.
  unfold dist_raw.
  unfold StepFSupBall.
- setoid_replace ( Map (fun z : RegularFunction (@ball X) => approximate z e1) (Map (Cunit_fun X) x))
-   with (Map (fun z  => (approximate ((Cunit_fun X) z) e1)) x).
-  simpl.
-  setoid_replace (Map (fun z : X => z) x) with x.
-   set (b:=(@ballS X (proj1_sig e1+proj1_sig e2))).
-   set (f:=(@join _ _) ^@> (constStepF b)).
-   cut (StepFfoldProp (f <@> x )).
-    unfold f;  evalStepF; tauto.
-   apply: StepFfoldPropForall_Map.
-   simpl.
-   auto with *.
-  apply: Map_identity.
+ assert (@StepF_eq (msp_as_RSetoid X)
+                   (Map (fun z : Complete X => approximate z e1) (Map (Cunit_fun X) x))
+                   (Map (fun z  => (approximate ((Cunit_fun X) z) e1)) x)).
+ { apply StepF_Qeq_eq; rewrite <- Map_compose_Map; reflexivity. }
+ rewrite H. clear H.
+ simpl.
+ rewrite (Map_identity _ x).
+ set (b:=(@ballS X (proj1_sig e1+proj1_sig e2))).
+ set (f:=(@join _ _) ^@> (constStepF b)).
+ cut (StepFfoldProp (f <@> x )).
+ unfold f;  evalStepF; tauto.
+ apply: StepFfoldPropForall_Map.
+ simpl.
  (* Is there a general solution to avoid StepF_Qeq_eq??*)
- apply StepF_Qeq_eq; rewrite <- Map_compose_Map; reflexivity.
+ intro a. apply ball_refl.
+ apply (Qpos_nonneg (e1+e2)).
 Qed.
 
 (* We skip the proof of the following lemma since the obvious induction

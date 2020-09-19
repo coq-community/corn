@@ -320,7 +320,9 @@ Proof.
  unfold InFinEnumC, FinSubset_ball in H.
  destruct (Hf H) as [Hfl Hfr].
  clear Hf.
- destruct (FinEnum_eq_rev f (x,y)) as [L _].
+ pose proof (FinEnum_eq_rev f) as L.
+ apply FinEnum_eq_equiv in L.
+ specialize (L (x,y)) as [L _].
  specialize (L H).
  contradict H; intro H.
  unfold InFinEnumC, FinSubset_ball in L.
@@ -328,8 +330,8 @@ Proof.
  revert abs.
  generalize L.
  clear L H.
- simpl (st_car (msp_is_setoid Q2)).
  generalize (emptyRaster (S n) (S m)).
+ simpl (rev f).
  induction (@rev (prod Q Q) f).
  intros r0 [z [H _]]; contradiction.
  intros bm H.
@@ -351,7 +353,7 @@ Proof.
    rewrite setRaster_correct1; unfold i, j; auto with *.
   split.
    change (ball (proj1_sig err) (C l r (S n) (Z.of_nat i)) x).
-   apply ball_0 in Hl.
+   apply Qball_0 in Hl.
    rewrite -> Hl.
    eapply ball_weak_le.
     unfold err.
@@ -361,7 +363,7 @@ Proof.
    rewrite ->  Hl in Hfl.
    auto.
   change (ball (proj1_sig err) (C t b (S m) (Z.of_nat (m-j)%nat)) y).
-  apply ball_0 in Hr.
+  apply Qball_0 in Hr.
   rewrite -> Hr.
   eapply ball_weak_le.
    unfold err.
@@ -408,7 +410,9 @@ Proof.
    -> l <= x <= r /\ b <= y <= t).
  { intros c d Hcd.
   apply Hf.
-  destruct (FinEnum_eq_rev f (c,d)); auto. }
+  pose proof (FinEnum_eq_rev f).
+  apply FinEnum_eq_equiv in H.
+  destruct (H (c,d)). exact (H1 Hcd). }
  clear Hf.
  clear Hx' Hy' H'.
  destruct Hxy as [Hx' Hy'].
@@ -427,11 +431,11 @@ Proof.
    exists x1. split.
    rewrite in_rev. apply H.
    destruct H.
-   apply ball_0 in H1. rewrite <- H1.
+   rewrite <- H1.
    exact H0.
  - unfold RasterizeQ2 in Hij.
  rewrite <- fold_left_rev_right in Hij.
- simpl (st_car (msp_is_setoid Q2)) in Hf'|-*.
+ simpl (rev f). simpl (rev f) in Hf'.
  induction (@rev (prod Q Q) f).
   clear - Hij.
   set (z:=emptyRaster (S n) (S m)) in Hij.
@@ -453,18 +457,17 @@ Proof.
   unfold fst, snd in *.
   apply existsWeaken.
   exists a.
-  change (st_car (msp_is_setoid Q2)) in a.
   split.
   intro H; contradict H.
-  exists a. split. left. reflexivity. apply ball_0; reflexivity.
+  exists a. split. left. reflexivity. reflexivity.
   destruct a as [ax ay].
   destruct (Hf' ax ay) as [Hax Hay].
   intro H; contradict H.
-  exists (ax,ay). split. left. reflexivity. apply ball_0; reflexivity.
+  exists (ax,ay). split. left. reflexivity. reflexivity.
   clear Hf'.
   split.
    unfold fst.
-   apply ball_0 in Hx'. rewrite -> Hx'.
+   rewrite -> Hx'.
    apply ball_sym.
    eapply ball_weak_le.
     unfold err.
@@ -472,7 +475,7 @@ Proof.
    apply rasterize1_error.
    auto.
   unfold snd.
-  apply ball_0 in Hy'. rewrite -> Hy'.
+  rewrite -> Hy'.
   apply ball_sym.
   eapply ball_weak_le.
    unfold err.

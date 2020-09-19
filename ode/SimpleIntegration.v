@@ -6,7 +6,6 @@
  This implementation works for any uniformly continuous function, which
  makes it relatively generic, but it also means that it is fairly inefficient. *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.reals.CRreal.
@@ -60,7 +59,7 @@ Section integral_interface.
       (forall x, from <= x <= from+ proj1_sig width -> ball (proj1_sig r) (f x) ('mid)) ->
       ball (proj1_sig (width * r)%Qpos) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q)
 
-    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @st_eq CRasCSetoid) (∫ f) }.
+    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @msp_eq _) (∫ f) }.
 
   (* Todo: Show that the sign function is integrable while not locally uniformly continuous. *)
 
@@ -93,18 +92,18 @@ Section extension_to_nn_width.
     (pre_integral: Q → Qpos → CR) (* Note the Qpos instead of QnonNeg. *)
       (* The three properties limited to pre_integral: *)
     (pre_additive: forall (a: Q) (b c: Qpos),
-      pre_integral a b + pre_integral (a + `b)%Q c[=]pre_integral a (b + c)%Qpos)
+      pre_integral a b + pre_integral (a + `b)%Q c == pre_integral a (b + c)%Qpos)
     (pre_bounded: forall (from: Q) (width: Qpos) (mid: Q) (r: Qpos),
       (forall x: Q, from <= x <= from + proj1_sig width -> ball (proj1_sig r) (f x) (' mid)) ->
       ball (proj1_sig (width * r)%Qpos) (pre_integral from width) (' (proj1_sig width * mid)%Q))
-    {pre_wd: Proper (Qeq ==> QposEq ==> @st_eq _) pre_integral}.
+    {pre_wd: Proper (Qeq ==> QposEq ==> @msp_eq _) pre_integral}.
 
   Instance integral_extended_to_nn_width: Integral f :=
     fun from => QnonNeg.rect (fun _ => CR)
       (fun _ _ => '0%Q)
       (fun n d _ => pre_integral from (exist (Qlt 0) (n # d) eq_refl)).
 
-  Let proper: Proper (Qeq ==> QnonNeg.eq ==> @st_eq _) (∫ f).
+  Lemma integral_proper: Proper (Qeq ==> QnonNeg.eq ==> @msp_eq _) (∫ f).
   Proof with auto.
    intros ?????.
    induction x0 using QnonNeg.rect;
@@ -140,7 +139,7 @@ Section extension_to_nn_width.
   Qed.
 
   Lemma integral_extended_to_nn_width_correct: Integrable f.
-  Proof. constructor; auto. Qed.
+  Proof. constructor; auto. apply integral_proper. Qed.
 
 End extension_to_nn_width.
 
@@ -188,9 +187,10 @@ Section definition.
 
   Context (f: Q -> CR) `{UC : !IsLocallyUniformlyContinuous f lmu}.
 
-  Instance luc_proper_st_eq : Proper (Qeq ==> @st_eq CR) f.
+  Instance luc_proper_st_eq : Proper (Qeq ==> @msp_eq CR) f.
   Proof.
-    intros x y exy a b. apply ball_0 in exy.
+    intros x y exy a b. rewrite Qplus_0_r.
+    apply Qball_0 in exy.
     pose proof (luc_proper f x y exy a b).
     rewrite Qplus_0_r in H. exact H.
   Qed.
@@ -452,10 +452,11 @@ Section definition.
 
   Global Instance (*integrate*): Integral f := @integral_extended_to_nn_width f pre_result.
 
-  Global Instance: Proper (Qeq ==> QposEq ==> @st_eq _) pre_result.
+  Global Instance: Proper (Qeq ==> QposEq ==> @msp_eq _) pre_result.
   Proof.
    repeat intro. simpl.
-   apply (wd x y (fun b => if b then x0 else y0) (fun b => if b then e1 else e2)); assumption.
+   rewrite Qplus_0_r.
+   apply (wd x y (fun b => if b then x0 else y0) (fun b => if b then d1 else d2)); assumption.
   Qed.
 
 End definition.
@@ -474,11 +475,11 @@ Section implements_abstract_interface.
 
   Context (f: Q → CR) `{!IsLocallyUniformlyContinuous f lmu}.
 
-  Instance luc_proper_st_eq_2 : Proper (Qeq ==> @st_eq CR) f.
+  Instance luc_proper_st_eq_2 : Proper (Qeq ==> @msp_eq CR) f.
   Proof.
-    intros x y exy a b. apply ball_0 in exy.
+    intros x y exy a b. apply Qball_0 in exy.
     pose proof (luc_proper f x y exy a b).
-    rewrite Qplus_0_r in H. exact H.
+    exact H.
   Qed.
 
   Section additivity.
@@ -700,7 +701,7 @@ Section implements_abstract_interface.
      intros.
      rewrite <- (uneven_CRplus_correct (ww true) (ww false)).
      simpl.
-     apply regFunEq_e.
+     apply regFunEq_equiv, regFunEq_e.
      intro e.
      simpl.
      unfold uneven_CRplus_approx.

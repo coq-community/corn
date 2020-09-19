@@ -122,7 +122,7 @@ Qed.
 
 Hint Resolve CRnonNeg_stable.
 
-Instance CReq_stable (x y: st_car (msp_is_setoid CR)): Stable (x == y)%CR.
+Instance CReq_stable (x y: msp_car CR): Stable (x == y)%CR.
 Proof.
   simpl.
   unfold regFunEq, ball. simpl.

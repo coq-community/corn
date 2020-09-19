@@ -133,7 +133,7 @@ Lemma InfiniteAlternatingSum_correct (seq:Stream Q) (x:nat -> IR)
 Proof.
  unfold series_sum.
  rewrite -> IR_Lim_as_CR.
- apply: SeqLimit_unique.
+ apply (SeqLimit_unique CRasCReals).
  intros e He.
  generalize (IR_Cauchy_prop_as_CR (Build_CauchySeq IR (seq_part_sum x) H)).
  intros C.
@@ -143,52 +143,64 @@ Proof.
  unfold CS_seq in *.
  clear C.
  unfold seq_part_sum in *.
- rstepr (((IRasCR (Sum0 (G:=IR) m x)[-](IRasCR (Sum0 (G:=IR) n x)))[+]
-   ((IRasCR (Sum0 (G:=IR) n x)[-]InfiniteAlternatingSum seq)))).
- apply AbsSmall_eps_div_two;[apply Hn; assumption|].
+ setoid_replace (@cg_minus CRasCGroup (IRasCR (Sum0 m x)) (InfiniteAlternatingSum seq))%CR
+   with (((IRasCR (Sum0 (G:=IR) m x) - (IRasCR (Sum0 (G:=IR) n x))) + 
+          ((IRasCR (Sum0 (G:=IR) n x) - InfiniteAlternatingSum seq))))%CR
+   by (unfold cg_minus; simpl; ring).
+ apply (AbsSmall_eps_div_two CRasCOrdField e
+                             (IRasCR (Sum0 m x) - IRasCR (Sum0 n x))
+                             (IRasCR (Sum0 n x) - InfiniteAlternatingSum seq))%CR.
+ exact (Hn m Hm).
  assert (X:AbsSmall (@cf_div CRasCOrdField e _ (two_ap_zero CRasCOrdField)) (('(((-(1))^n)*(Str_nth n seq))%Q)%CR)).
-  stepr (IRasCR (x n)).
-   stepr (Sum n n (fun n => IRasCR (x n))); [| now apply: Sum_one].
+ { stepr (IRasCR (x n)).
+   setoid_replace (IRasCR (x n)) with (@Sum CRasCAbGroup n n (fun n => IRasCR (x n))).
+   2: rewrite Sum_one; reflexivity.
    unfold Sum, Sum1.
-   stepr (IRasCR (Sum0 (S n) x)[-]IRasCR (Sum0 n x )); [| now (apply cg_minus_wd; apply IR_Sum0_as_CR)].
+   rewrite <- IR_Sum0_as_CR, <- IR_Sum0_as_CR.
    apply Hn.
    auto.
   simpl.
   symmetry.
   rewrite <- IR_inj_Q_as_CR.
   apply IRasCR_wd.
-  apply Hx.
- stepr (('(Sum0 n (fun n => ((-(1))^n)*(Str_nth n seq))%Q))%CR[-]InfiniteAlternatingSum seq).
+  apply Hx. }
+ stepr (('(Sum0 n (fun n => ((-(1))^n)*(Str_nth n seq))%Q))%CR - InfiniteAlternatingSum seq)%CR.
   clear - X.
   generalize seq dnn zl X.
   clear seq dnn zl X.
+  change (@AbsSmall (crl_crr CRasCReals) (e [/]TwoNZ))
+    with (@AbsSmall CRasCOrdField (@cf_div CRasCOrdField e _ (two_ap_zero CRasCOrdField))).
   generalize (@cf_div CRasCOrdField e _ (two_ap_zero CRasCOrdField)). clear e.
   induction n; intros e seq dnn zl X.
-   simpl in *.
-   apply AbsSmall_minus.
-   stepr (InfiniteAlternatingSum seq); [| now (unfold cg_minus;simpl;ring)].
+ - simpl in *.
+   apply (AbsSmall_minus CRasCOrdField e (InfiniteAlternatingSum seq) 0%CR).
+   stepr (InfiniteAlternatingSum seq).
+   2: (unfold cg_minus;simpl;unfold msp_Equiv;ring).
    apply leEq_imp_AbsSmall;[apply InfiniteAlternatingSum_nonneg|].
    eapply leEq_transitive;simpl.
     apply InfiniteAlternatingSum_bound.
    assert ((hd seq)%CR == (1*hd seq)%Q). ring. rewrite -> H. clear H.
    destruct X; assumption.
-  apply AbsSmall_minus.
-  stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  ((- (1)) ^ n0 * Str_nth n0 (tl seq))%Q)))%CR)[-]
+ - pose proof (AbsSmall_minus CRasCOrdField e (InfiniteAlternatingSum seq)
+         (' Sum0 (S n) (λ n0 : nat, ((- (1)) ^ n0 * Str_nth n0 seq)%Q))).
+   apply H. clear H.
+  stepr (('(((Sum0 (G:=Q_as_CAbGroup) n (fun n0 : nat =>  ((- (1)) ^ n0 * Str_nth n0 (tl seq))%Q)))%CR) - 
     InfiniteAlternatingSum (tl seq)))%CR; [apply IHn|].
-   rewrite inj_S in X.
-   rstepr ([--][--]('(((- (1)) ^ n * Str_nth n (tl seq))%Q))%CR).
+  pose proof (CRopp_opp ('(((- (1)) ^ n * Str_nth n (tl seq))%Q))).
+  rewrite <- H. clear H.
    apply inv_resp_AbsSmall.
+   rewrite inj_S in X.
    stepr (' ((- (1)) ^ Z.succ n * Str_nth (S n) seq)%Q)%CR;[assumption|].
    simpl.
    change ((' ( (- (1)) ^ (n+1) * Str_nth n (tl seq))%Q == - ' ((- (1)) ^ n * Str_nth n (tl seq))%Q)%CR).
-   rewrite -> Qpower_plus;[|discriminate].
-   simpl.
-   ring.
-  stepl (InfiniteAlternatingSum seq[-](('(((- (1)) ^ 0 * Str_nth 0 seq)%Q[+]
+   rewrite -> Qpower_plus;[|discriminate]. 
+   simpl. ring.
+  stepl (InfiniteAlternatingSum seq - (('(((- (1)) ^ 0 * Str_nth 0 seq) + 
     ((Sum0 (G:=Q_as_CAbGroup) n
-      (fun n0 : nat => ((- (1)) ^ (S n0) * Str_nth n0 (tl seq))%Q))):Q))%CR));[
-        apply cg_minus_wd;[reflexivity| rewrite -> CReq_Qeq; apply: Sum0_shift;
-          intros i; simpl; reflexivity]|].
+           (fun n0 : nat => ((- (1)) ^ (S n0) * Str_nth n0 (tl seq))%Q))))%Q)))%CR.
+  apply CRplus_eq_r.
+  apply uc_wd, inject_Q_CR_wd.
+  apply Sum0_shift; intros i; simpl; reflexivity.
   unfold cg_minus; simpl.
   rewrite -> InfiniteAlternatingSum_step.
   generalize (@InfiniteAlternatingSum (tl seq) _).
@@ -198,7 +210,7 @@ Proof.
     (fun n0 : nat => Qpower_positive (- (1)) (P_of_succ_nat n0)  * Str_nth n0 (tl seq)))%Q:Q)
       with (-(Sum0 (G:=Q_as_CAbGroup) n
         (fun n0 : nat => ((- (1)) ^ n0 * Str_nth n0 (tl seq)))))%Q.
-   simpl. ring.
+   simpl. unfold msp_Equiv. ring.
   eapply eq_transitive;[|apply (inv_Sum0 Q_as_CAbGroup)].
   apply: Sum0_wd.
   intros i; simpl.
@@ -207,7 +219,8 @@ Proof.
   unfold Z.succ.
   rewrite -> Qpower_plus;[|discriminate].
   ring.
- apply cg_minus_wd;[rewrite -> IR_Sum0_as_CR|reflexivity].
+ - apply CRplus_eq_l.
+   rewrite -> IR_Sum0_as_CR.
  clear - Hx.
  induction n.
   reflexivity.

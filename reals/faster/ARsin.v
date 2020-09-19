@@ -108,6 +108,7 @@ Qed.
 Program Definition AQsin_poly_uc := unary_uc (cast AQ Q_as_MetricSpace)
   (λ x : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) sin_poly_uc _.
 Next Obligation.
+  apply Qball_0.
   rewrite AQsin_poly_fun_correct.
   change ('1) with (1:AQ).
   rewrite ?aq_preserves_max, ?aq_preserves_min.

@@ -368,7 +368,7 @@ Proof.
   destruct Ha as [G | Ha | Ha] using orC_ind.
   intro abs. contradict G; intro G. contradiction.
    elim A.
-   apply ball_0 in Ha. exact Ha.
+   apply Qball_0 in Ha. exact Ha.
   assumption. }
  unfold CompactIntervalQ_raw.
  set (e2':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).

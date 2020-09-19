@@ -383,6 +383,7 @@ Lemma ARInfAltSum_correct:
 Proof.
   intros ? ?.
   unfold cast, ARtoCR. simpl.
+  rewrite Qplus_0_r.
   now apply ARInfAltSum_raw_correct.
 Qed.
 End main_part.

@@ -72,7 +72,6 @@ Ltac IR_dec_precompute :=
                   let XH := fresh "IR_dec" in
                   assert (XH:(X==X0)%CR) by reflexivity;
                   autorewrite with IRtoCR in XH;
-                  unfold ms_id;
                   autorewrite with CRfast_compute in XH;
                   apply (CRpos_wd XH);
                   clear X0 XH

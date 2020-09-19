@@ -86,7 +86,8 @@ Hypothesis Hf : Derivative I properI f f'.
 Section GeneralCase.
 
 Variable g : Q_as_MetricSpace -> CR.
-Hypothesis Hg : forall (q:Q) Hq, I (inj_Q _ q) -> (g q == IRasCR (f (inj_Q _ q) Hq))%CR.
+Hypothesis Hg : forall (q:Q) Hq,
+    I (inj_Q _ q) -> (g q == IRasCR (f (inj_Q _ q) Hq))%CR.
 
 Variable c : Q.
 Hypothesis Hc : forall x Hx, I x -> (AbsIR (f' x Hx)[<=](inj_Q _ (c:Q))).

@@ -43,14 +43,13 @@ Hint Unfold relation : type_classes.
    constructor (defined later in this module) that takes the version with a Qpos parameter and extends
    it to Qinf in the way described above. All the ball's properties can be lifted along with this extension. *)
 
-  Context `{!Equiv X} `{!MetricSpaceBall}.
+  Context `{!MetricSpaceBall}.
 
   Class MetricSpaceClass: Prop :=
-    { mspc_setoid : Setoid X
-    ; mspc_ball_proper:> Proper (=) mspc_ball
+    { mspc_ball_proper:> forall (e1 e2 : Qinf) (x y : X),
+          equiv e1 e2 -> (mspc_ball e1 x y <-> mspc_ball e2 x y)
     ; mspc_ball_inf: ∀ x y, mspc_ball Qinf.infinite x y
     ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ mspc_ball e x y
-    ; mspc_ball_zero: ∀ x y, mspc_ball 0 x y ↔ x = y 
     ; mspc_refl:> ∀ e, (0 <= e)%Qinf → Reflexive (mspc_ball e)
     ; mspc_sym:> ∀ e, Symmetric (mspc_ball e)
     ; mspc_triangle: ∀ (e1 e2: Qinf) (a b c: X),
@@ -61,23 +60,26 @@ Hint Unfold relation : type_classes.
          (~~mspc_ball e a b) → mspc_ball e a b }.
 
   Context `{MetricSpaceClass}.
-Local Existing Instance mspc_setoid.
+
+  Local Instance mspc_equiv : Equiv X :=
+    fun x y => mspc_ball 0 x y.
+
   (** Two simple derived properties: *)
   Lemma mspc_eq a b: (∀ e: Qpos, mspc_ball e a b) → a = b.
   Proof with auto.
    intros.
-   apply mspc_ball_zero.
    apply mspc_closed.
    intros.
-   setoid_replace (@plus Qinf _ 0 d) with (d: Qinf)...
+   rewrite (mspc_ball_proper (0+d)%Qinf d).
+   apply H1.
    change (0 + d == d). ring.
-  Qed. (* Todo: Use a bi-impl instead. *)
+  Qed.
 
   Lemma mspc_ball_weak_le (q q': Qinf): (q <= q')%Qinf → ∀ x y: X, mspc_ball q x y → mspc_ball q' x y.
   Proof with auto.
    destruct q, q'; simpl; intros...
      assert (q0 == q + (q0 - q))%Q as E by ring.
-     rewrite E.
+     rewrite (mspc_ball_proper q0 (q+(q0-q)) x y E).
      change (mspc_ball (Qinf.finite q + Qinf.finite (q0 - q)%Q) x y).
      apply mspc_triangle with y...
      apply mspc_refl.
@@ -88,19 +90,55 @@ Local Existing Instance mspc_setoid.
    intuition.
   Qed.
 
+  Lemma mspc_ball_e_wd : ∀ (e d : Q) (x y : X),
+      e == d → mspc_ball e x y ↔ mspc_ball d x y.
+  Proof.
+    intros. apply mspc_ball_proper, H1.
+  Qed. 
+
+  Lemma mspc_ball_wd : forall (e d : Qinf) x1 x2 y1 y2,
+      e = d -> x1 = x2 -> y1 = y2
+      -> (mspc_ball e x1 y1 <-> mspc_ball d x2 y2).
+  Proof.
+    unfold equiv, mspc_equiv. split.
+    - intros.
+      destruct d as [d|]. 2: apply mspc_ball_inf.
+      destruct e as [e|]. 2: inversion H1. simpl in H1.
+    assert (0+(e+0) == d).
+    { rewrite Qplus_0_r, Qplus_0_l. exact H1. }
+    apply (mspc_ball_e_wd _ _ x2 y2 H5).
+    clear H5 H1 d.
+    pose proof (mspc_triangle 0 (e+0) x2 x1 y2).
+    apply H1. clear H1.
+    apply mspc_sym, H2.
+    pose proof (mspc_triangle e 0 x1 y1 y2).
+    apply H5. exact H4. exact H3.
+  - intros.
+    destruct e as [e|]. 2: apply mspc_ball_inf.
+    destruct d as [d|]. 2: inversion H1. simpl in H1. 
+    assert (0+(d+0) == e).
+    { rewrite Qplus_0_r, Qplus_0_l. rewrite H1. reflexivity. }
+    apply (mspc_ball_e_wd _ _ x1 y1 H5).
+    clear H5 H1 e.
+    pose proof (mspc_triangle 0 (d+0) x1 x2 y1).
+    apply H1. exact H2. clear H1.
+    pose proof (mspc_triangle d 0 x2 y2 y1).
+    apply H1. exact H4.
+    apply mspc_sym, H3.
+  Qed.
+
+
   (** Instances can be bundled to yield MetricSpaces: *)
   Program Definition bundle_MetricSpace: MetricSpace :=
-   @Build_MetricSpace (mcSetoid_as_RSetoid X) mspc_ball _ _.
-
-  Next Obligation. apply mspc_ball_proper; assumption. Qed.
+    Build_MetricSpace mspc_ball_e_wd _.
 
   Next Obligation. Proof with auto.
-   constructor; try apply _.
+   constructor.
    - intros e epos. apply mspc_refl, epos.
+   - intros. apply mspc_sym.
    - intros. apply (mspc_triangle e1 e2 a b c)...
    - intros. apply mspc_closed...
      intros. apply H1. apply Qpos_ispos.
-   - intros. apply mspc_eq. intro e. apply H1. apply Qpos_ispos.
    - intros. apply Qnot_lt_le. intro abs.
      destruct H0. exact (mspc_ball_negative0 e abs a b H1).
    - intros. apply mspc_stable, H1.
@@ -301,16 +339,16 @@ Proof. intros; now apply genball_Proper. Qed.
       apply H0.
   Qed.
 
-  Instance genball_MetricSpace: @MetricSpaceClass X _ genball.
-  Proof with auto.
+  Instance genball_MetricSpace: @MetricSpaceClass X genball.
+  Proof.
    constructor; try apply _.
-        unfold mspc_ball. simpl...
-       apply genball_negative.
-      reflexivity.
-     apply genball_Reflexive.
-    apply genball_triangle.
-   apply genball_closed.
-   apply genball_stable.
+   - unfold mspc_ball. intros. rewrite H2. reflexivity.
+   - reflexivity.
+   - apply genball_negative.
+   - apply genball_Reflexive.
+   - apply genball_triangle.
+   - apply genball_closed.
+   - apply genball_stable.
   Qed.
 
 End genball.
@@ -329,8 +367,8 @@ Proof.
  - intro e. apply msp_sym, (msp X).
  - intros e1 e2. apply msp_triangle, X.
  - intros x y H.
-   apply (msp_eq (msp X)).
-   intros. apply (H (exist _ _ H0)).
+   apply ball_closed. 
+   intros. rewrite Qplus_0_l. apply (H (exist _ _ H0)).
  - intros e x y H. apply msp_closed.
    exact (msp X). intros. apply (H (exist _ _ H0)).
  - intros. apply (msp_stable (msp X)), H.
@@ -348,39 +386,32 @@ Section products.
 
   Global Instance: MetricSpaceClass (X * Y).
   Proof with auto.
-   pose (mspc_setoid X).
-   pose (mspc_setoid Y).
    constructor.
-           apply _.
-          repeat intro.
-          split.
-           split.
-            rewrite <- H3, <- H4, <- H5. apply H6.
-           rewrite <- H3, <- H4, <- H5. apply H6.
-          split. rewrite -> H3, H4, H5. apply H6.
-          rewrite -> H3, H4, H5. apply H6.
-         split. apply (mspc_ball_inf X).
-         apply (mspc_ball_inf Y).
-        repeat intro.
+   - intros. split. intros. destruct H4. split.
+     rewrite <- (mspc_ball_proper X e1 e2 (fst x) (fst y) H3). exact H4.
+     rewrite <- (mspc_ball_proper Y e1 e2 (snd x) (snd y) H3). exact H5.
+     intros. destruct H4. split.
+     rewrite (mspc_ball_proper X e1 e2 (fst x) (fst y) H3). exact H4.
+     rewrite (mspc_ball_proper Y e1 e2 (snd x) (snd y) H3). exact H5.
+   - split. apply (mspc_ball_inf X).
+     apply (mspc_ball_inf Y).
+   - repeat intro.
         destruct H4.
         apply (mspc_ball_negative X _ H3 _ _ H4).
-       intros.
-       change ((mspc_ball X 0 (fst x) (fst y) ∧ mspc_ball Y 0 (snd x) (snd y)) ↔ x = y).
-       rewrite (mspc_ball_zero X), (mspc_ball_zero Y). reflexivity.
-      split. apply (mspc_refl X)...
-      apply (mspc_refl Y)...
-     split; apply (@symmetry _ _ ); try apply _; apply H3. (* just using [symmetry] here causes evar anomalies.. *)
-    split.
+   - intros e H3 x. split; apply mspc_refl.
+     exact H0. exact H3. exact H2. exact H3.
+   - split; apply (@symmetry _ _ ); try apply _; apply H3. (* just using [symmetry] here causes evar anomalies.. *)
+   - split.
      apply (mspc_triangle X) with (fst b).
       apply H3.
      apply H4.
     apply (mspc_triangle Y) with (snd b).
      apply H3.
     apply H4.
-   split.
+   - split.
     apply (mspc_closed X). apply H3.
    apply (mspc_closed Y). apply H3.
-   split.
+   - split.
    apply (mspc_stable X).
    intro abs. contradict H3; intro H3.
    destruct H3. contradiction.
@@ -461,7 +492,7 @@ End vectors.
  metric space structure if such parametrization is unneeded (for instance because there is
  already a UniformContinuous constraint which incorporates the metric space proof. *)
 
-Class MetricSpaceComponents X `{Equiv X} `{MetricSpaceBall X}: Prop.
+Class MetricSpaceComponents X `{MetricSpaceBall X}: Prop.
 
 (** Next, we introduce classes for uniform continuity (which is what we're really after, since
  we will use these to automatically derive uniform continuity for various forms of function
@@ -499,16 +530,20 @@ Section Ball.
 
   Global Instance ball_contains: Container X (Ball X R) := fun b => mspc_ball (canonical (snd b)) (fst b).
 
-  Context `{Equiv X} `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (canonical: R → Qinf)}.
+  Context `{Equiv R} `{!MetricSpaceClass X} `{!Proper (=) (canonical: R → Qinf)}.
+
+  Local Instance : Equiv X :=
+    fun x y => mspc_ball 0 x y.
 
   Global Instance ball_contains_Proper: Proper (=) (In: Ball X R → X → Prop).
   Proof with auto.
    repeat intro.
    unfold In, ball_contains.
-   apply (mspc_ball_proper X)...
+   unfold canonical. unfold canonical in Proper0.
+   apply mspc_ball_wd...
     apply Proper0.
-    apply H3.
-   apply H3.
+    apply H2.
+    apply H2.
   Qed. (* Todo: Clean up. *)
 
 End Ball.
@@ -527,36 +562,37 @@ Section sig_metricspace.
 
   Global Instance sig_mspc: MetricSpaceClass (sig P).
   Proof with auto.
-   pose proof (mspc_setoid X).
    constructor.
-           apply _.
-          repeat intro.
-          change (mspc_ball x (` x0) (` x1) = mspc_ball y (` y0) (` y1)).
-          apply (mspc_ball_proper X)...
-         repeat intro.
-         change (mspc_ball Qinf.infinite (` x) (` y)).
-         apply (mspc_ball_inf X).
-        repeat intro. apply (mspc_ball_negative X e H2 (` x) (` y))...
-       intros.
-       change (mspc_ball 0 (` x) (` y) ↔ (` x) = (` y)).
-       apply (mspc_ball_zero X).
-      repeat intro.
-      change (mspc_ball e (` x) (` x)).
-      apply (mspc_refl X)...
-     repeat intro.
+   - intros. destruct x, y. 
+     unfold mspc_ball, sig_mspc_ball. simpl.
+     apply mspc_ball_wd. exact H0. exact H1.
+     apply mspc_refl. exact H0. apply Qle_refl.
+     apply mspc_refl. exact H0. apply Qle_refl.
+   - intros.
+     change (mspc_ball Qinf.infinite (` x) (` y)).
+     apply (mspc_ball_inf X).
+   - intros. destruct x, y. 
+     unfold mspc_ball, sig_mspc_ball. simpl.
+     apply mspc_ball_negative. exact H0. exact H1.
+   - intros d H1 x. destruct x.
+     unfold mspc_ball, sig_mspc_ball. simpl.
+     apply mspc_refl. exact H0. exact H1.
+   - repeat intro.
      change (mspc_ball e (` y) (` x)).
      symmetry...
-    repeat intro.
+   - repeat intro.
     apply (mspc_triangle X e1 e2 (` a) (` b))...
-   intros.
+   - intros.
    apply (mspc_closed X e (` a) (` b))...
-   intros. apply (mspc_stable X e (` a) (` b))...
+   - intros. apply (mspc_stable X e (` a) (` b))...
   Qed.
 
 End sig_metricspace.
 
-Instance Qpos_mspc_ball: MetricSpaceBall Qpos := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
-Instance Qpos_mspc: MetricSpaceClass Qpos := @sig_mspc Q_as_MetricSpace _ _ _ (Qlt 0).
+Instance Qpos_mspc_ball: MetricSpaceBall Qpos
+  := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
+Instance Qpos_mspc: MetricSpaceClass Qpos
+  := @sig_mspc Q_as_MetricSpace _ _ (Qlt 0).
 
 Instance: Cast QnnInf.T Qinf :=
   λ x, match x with
@@ -628,31 +664,17 @@ Section local_uniform_continuity.
 
   Context `{LocallyUniformlyContinuous}.
 
+  Local Instance : Equiv (X -> Y) :=
+    fun x y => forall a : X, mspc_ball 0 (x a) (y a).
+
   Instance luc_Proper: Proper (=) f.
   Proof with simpl; intuition.
    repeat intro.
    pose proof luc_to.
    apply (mspc_eq Y).
-   intros.
-   set (b := (x, e): Ball X Qpos).
-   destruct H5.
-   specialize (luc_uc0 b).
-   destruct luc_uc0.
-   unfold restrict in uniformlyContinuous0.
-   unfold Basics.compose in *.
-   pose proof (mspc_setoid X).
-   assert (x ∈ b).
-    subst b. unfold In, ball_contains. simpl.
-    apply (mspc_refl X)...
-   assert (y ∈ b).
-    rewrite <- H6...
-   apply (uniformlyContinuous0 e (exist _ x H9) (exist _ y H10)).
-   change (mspc_ball (uc_mu (restrict b f) e) x y).
-   rewrite <- H6.
-   apply (mspc_refl X).
-   simpl.
-   set (uc_mu (restrict b f) e).
-   destruct q; simpl...
+   intros. apply mspc_refl.
+   exact H4.
+   apply Qpos_nonneg.
   Qed.
 
 End local_uniform_continuity.
@@ -697,7 +719,7 @@ End local_from_global_continuity.
 
 Section shallowly_wrapped_ucfuns.
 
-  Context `{@MetricSpaceComponents X Xe Xb} `{@MetricSpaceComponents Y Ye Yb}.
+  Context `{@MetricSpaceComponents X Xb} `{@MetricSpaceComponents Y Yb}.
     (* We must name Xe/Xb/Ye/Yb here so that we can repeat them in the implicit argument
      specification later on. This could have been avoided if Coq offered more flexible
      commands for implicit argument specification that would let one reset implicit-ness for
@@ -708,11 +730,14 @@ Section shallowly_wrapped_ucfuns.
     ; ucFun_mu: UniformlyContinuous_mu ucFun_itself
     ; ucFun_uc: UniformlyContinuous ucFun_itself }.
 
+  Local Instance : Equiv (X -> Y) :=
+    fun x y => forall a : X, mspc_ball 0 (x a) (y a).
+
   Global Instance: ∀ (f: UCFunction), Proper (=) (f: X → Y).
   Proof. intros. destruct f. 
    simpl.
    set (local_from_global_uc_mu ucFun_itself0).
-   apply (@luc_Proper X _ _ Y _ _ ucFun_itself0 l).
+   apply (@luc_Proper X _ Y _ ucFun_itself0 l).
    apply (local_from_global_uc _).
   Qed.
 
@@ -722,8 +747,8 @@ End shallowly_wrapped_ucfuns.
 Existing Instance ucFun_mu.
 Existing Instance ucFun_uc.
 
-Arguments UCFunction X {Xe Xb} Y {Ye Yb}.
-Arguments ucFunction {X Xe Xb Y Ye Yb} _ {ucFun_mu ucFun_uc}.
+Arguments UCFunction X {Xb} Y {Yb}.
+Arguments ucFunction {X Xb Y Yb} _ {ucFun_mu ucFun_uc}.
 
 Section proper_functions.
 
@@ -731,39 +756,28 @@ Section proper_functions.
 
   Context `{Setoid A} `{MetricSpaceClass B}.
 
+  Local Instance : Equiv (A -> B) :=
+    fun x y => forall a : A, mspc_ball 0 (x a) (y a). 
+
   Let T := (@sig (A → B) (Proper equiv)).
 
   (* The equivalence on functions is ext_equiv, ie equivalence of images
      for each equivalent arguments. *)
   Global Instance: Equiv T := λ x y, proj1_sig x = proj1_sig y.
 
-  Let hint' := mspc_setoid B.
-
   Global Instance: Setoid T.
   Proof.
    constructor.
-   - intros [f fproper] x y xyeq.
-     simpl. apply fproper, xyeq.
-   - intros [f fproper] [g gproper] fgeq x y xyeq.
-     simpl.
-     symmetry in xyeq.
-     specialize (fgeq y x xyeq).
-     simpl in fgeq.
-     apply (mspc_ball_zero B).
-     apply (mspc_ball_zero B) in fgeq.
-     apply (mspc_sym B), fgeq.
+   - intros [f fproper] x. simpl.
+     apply mspc_refl. exact H1. apply Qle_refl.
+   - intros [f fproper] [g gproper] fgeq x. simpl.
+     apply mspc_sym. exact H1. apply fgeq.
    - intros [f fproper] [g gproper] [h hproper]
-            fgeq gheq x y xyeq.
+            fgeq gheq x.
      simpl. 
-     apply (mspc_ball_zero B).
-     setoid_replace 0 with (0+0) by reflexivity.
-     apply (mspc_triangle B _ _ _ (g x)).
-     + specialize (fgeq x x (reflexivity _)).
-       simpl in fgeq.
-       apply (mspc_ball_zero B), fgeq.
-     + specialize (gheq x y xyeq).
-       simpl in gheq.
-       apply (mspc_ball_zero B), gheq.
+     rewrite (mspc_ball_e_wd B 0 (0+0) (f x) (h x) eq_refl).
+     pose proof (@mspc_triangle B H0 H1 0 0 (f x) (g x) (h x)).
+     apply H2. apply fgeq. apply gheq.
   Qed.
 
   Global Instance: MetricSpaceBall T := λ e f g, Qinf.le 0 e ∧ ∀ a, mspc_ball e (` f a) (` g a).
@@ -781,38 +795,20 @@ Section uc_functions.
 
   Context `{MetricSpaceClass A} `{MetricSpaceClass B}.
 
-  Global Instance: Equiv (UCFunction A B) := equiv: relation (A→B).
+  Local Instance : Equiv (A -> B) :=
+    fun x y => forall a : A, mspc_ball 0 (x a) (y a). 
 
-  Let hint := mspc_setoid A.
-  Let hint' := mspc_setoid B.
+  Global Instance: Equiv (UCFunction A B) := equiv: relation (A→B).
 
   Global Instance: Setoid (UCFunction A B).
   Proof.
    constructor.
-   - intros f x y xyeq.
-     set (_: Proper (=) (ucFun_itself f)).
-     destruct f as [f fproper].
-     simpl. simpl in p.
-     apply p, xyeq.
-   - intros f g fgeq x y xyeq.
-     apply (mspc_ball_zero A), (mspc_sym A), (mspc_ball_zero A) in xyeq.
-     specialize (fgeq y x xyeq); simpl in fgeq.
-     apply (mspc_ball_zero B), (mspc_sym B), (mspc_ball_zero B), fgeq.
-   - intros f g h fgeq gheq x y xyeq.
-     apply (mspc_ball_zero B).
-     assert (f x = f x).
-     { apply (mspc_ball_zero B), (mspc_refl B).
-       discriminate. }
-     pose proof (@mspc_ball_proper B _ H1 H2 (0+0) 0 (reflexivity _)
-                                   (f x) (f x) H3 (h y) (h y)).
-     rewrite <- H4.
-     apply (mspc_triangle B _ _ _ (g x)).
-     + apply (mspc_ball_zero B).
-       apply (fgeq x x).
-       apply (mspc_ball_zero A), (mspc_refl A); discriminate. 
-     + apply (mspc_ball_zero B).
-       apply (gheq x y), xyeq.
-     + apply (mspc_ball_zero B), (mspc_refl B); discriminate. 
+   - intros f x. apply mspc_refl. exact H2. apply Qle_refl.
+   - intros f g H3 x. apply mspc_sym. exact H2. apply H3.
+   - intros f g h fgeq gheq x.
+     rewrite (mspc_ball_e_wd B 0 (0+0) (f x) (h x) eq_refl).
+     pose proof (@mspc_triangle B H1 H2 0 0 (f x) (g x) (h x)).
+     apply H3. apply fgeq. apply gheq.
   Qed.
 
   Global Instance: MetricSpaceBall (UCFunction A B) := λ e f g, Qinf.le 0 e ∧ ∀ a, mspc_ball e (f a) (g a).
@@ -828,55 +824,44 @@ Section uc_functions.
     - intros [dpos H3].
       split. rewrite <- deeq. exact dpos.
       intro x. specialize (H3 x).
-      assert (x = x).
-      { apply (mspc_ball_zero A), (mspc_refl A); discriminate. } 
-      specialize (fgeq x x H4).
-      specialize (hkeq x x H4).
-      rewrite <- (@mspc_ball_proper B _ H1 H2 d e deeq
-                                   (f x) (g x) fgeq (h x) (k x) hkeq).
+      specialize (fgeq x).
+      specialize (hkeq x).
+      rewrite <- (@mspc_ball_wd B _ H2 d e (f x) (g x) (h x) (k x)
+                               deeq fgeq hkeq).
       exact H3.
-    - intros [epos H3].
-      split. rewrite deeq. exact epos.
+    - intros [dpos H3].
+      split. rewrite deeq. exact dpos.
       intro x. specialize (H3 x).
-      assert (x = x).
-      { apply (mspc_ball_zero A), (mspc_refl A); discriminate. } 
-      specialize (fgeq x x H4).
-      specialize (hkeq x x H4).
-      rewrite (@mspc_ball_proper B _ H1 H2 d e deeq
-                                 (f x) (g x) fgeq (h x) (k x) hkeq).
-      exact H3.
+      specialize (fgeq x).
+      specialize (hkeq x).
+      symmetry in deeq.
+      apply mspc_sym in fgeq.
+      apply mspc_sym in hkeq.
+      rewrite <- (@mspc_ball_wd B _ H2 e d (g x) (f x) (k x) (h x)
+                               deeq fgeq hkeq).
+      exact H3. exact H2. exact H2.
   Qed.
 
-  Lemma uc_ball_zero : ∀ x y : UCFunction A B, mspc_ball 0 x y ↔ x = y.
-  Proof.
-    intros f g. split.
-    - intros [_ H3] x y xyeq. 
-      apply (mspc_ball_zero B).
-      specialize (H3 x).
-      apply (mspc_ball_zero B) in H3.
-      pose proof (@mspc_ball_proper B _ H1 H2 (0+0) 0 (reflexivity _)
-                                    (f x) (g x) H3 (g y) (g y)).
-      rewrite H4. clear H4 H3.
-      apply (mspc_ball_zero B). 
-      set (_: Proper (=) (ucFun_itself g)). 
-      apply p, xyeq.
-      apply (mspc_ball_zero B), (mspc_refl B); discriminate.
-    - intro fgeq. split. apply Qle_refl.
-      intros x.
-      apply (mspc_ball_zero B), (fgeq x x).
-      apply (mspc_ball_zero A), (mspc_refl A); discriminate.
-  Qed. 
-    
   Global Instance UCFunction_MetricSpace: MetricSpaceClass (UCFunction A B).
   Proof.
    constructor.
-   - apply _.
-   - apply Proper_uc_ball.
+   - split. 
+     + intros. destruct H4. split.
+       rewrite <- H3. exact H4. intro a.
+       destruct e2 as [e2|]. 2: apply mspc_ball_inf, H2.
+       destruct e1 as [e1|].
+       rewrite (@mspc_ball_e_wd B _ H2 e2 e1). apply H5.
+       symmetry. exact H3. inversion H3.
+     + intros. destruct H4. split.
+       rewrite H3. exact H4. intro a.
+       destruct e1 as [e1|]. 2: apply mspc_ball_inf, H2.
+       destruct e2 as [e2|].
+       rewrite (@mspc_ball_e_wd B _ H2 e1 e2). apply H5.
+       exact H3. inversion H3.
    - intros f g. split. simpl. trivial.
      intro x. apply (mspc_ball_inf B).
    - intros. intros [H4 _].
      exact (Qlt_not_le _ _ H3 H4).
-   - apply uc_ball_zero.
    - intros e epos f. split. exact epos.
      intros x. apply (mspc_refl B _ epos).
    - intros e f g [epos H3].
@@ -923,7 +908,7 @@ End uc_functions.
 
 Program Definition wrap_uc_fun' {X Y: MetricSpace} (f: X → Y)
   `{!UniformlyContinuous_mu f}
-  `{@UniformlyContinuous X _ _ Y _ _ f _}:
+  `{@UniformlyContinuous X _ Y _ f _}:
     UniformlyContinuousFunction X Y :=
   @Build_UniformlyContinuousFunction X Y f (uc_mu f) _.
 
@@ -936,7 +921,7 @@ Next Obligation. Proof with auto.
   destruct q...
   apply <- (ball_genball (@ball X) q)...
  pose proof (uniformlyContinuous f e a b H1).
- apply (@ball_genball Y (@st_eq Y) _
+ apply (@ball_genball Y (@msp_eq Y) _
                       (fun q => ball (proj1_sig q))).
  2: auto.
  intros x y H4 z t H5 u v H6.
@@ -969,7 +954,7 @@ Section unwrap_uc.
    set (mu e) in *.
    destruct q...
    simpl.
-   apply (@ball_genball X (@st_eq X) _
+   apply (@ball_genball X (@msp_eq X) _
                       (fun q => ball (proj1_sig q))).
    2: auto.
    intros x y H4 z t H5 u v H6.
@@ -983,19 +968,17 @@ End unwrap_uc.
 
 Lemma UniformlyContinuous_proper `{MetricSpaceClass X} `{MetricSpaceClass Y} (f g: X → Y)
   `{!UniformlyContinuous_mu f} `{!UniformlyContinuous_mu g}:
-  (∀ x, f x = g x) → (∀ e, uc_mu f e ≡ uc_mu g e) →
+  (∀ x, mspc_equiv Y (f x) (g x)) → (∀ e, uc_mu f e ≡ uc_mu g e) →
     UniformlyContinuous f → UniformlyContinuous g.
       (* Todo: Stronger versions of this statement can be proved with a little effort. *)
 Proof.
  constructor; try apply _.
  intros ????.
- pose proof (mspc_ball_proper Y).
- pose proof (mspc_setoid X).
- pose proof (mspc_setoid Y).
- rewrite <- (H3 a).
- rewrite <- (H3 b).
+ pose proof (mspc_ball_proper Y) as H7.
+ rewrite <- (mspc_ball_wd Y e e (f a) (g a) (f b) (g b)).
  apply (uniformlyContinuous f).
  rewrite H4. auto.
+ reflexivity. apply H3. apply H3.
 Qed.
 
 
@@ -1163,22 +1146,25 @@ Section lambda_uc.
    unfold PointFree in PointFree0.
    rewrite PointFree0.
    apply uniformlyContinuous0.
-   unfold uc_mu in H5.
-   simpl in H5.
+   unfold uc_mu in H3.
+   simpl in H3.
    assumption.
   Qed. (* Todo: Clean up. *)
 
 End lambda_uc.
 
+(*
 Module test.
 Section test.
 
   Context
     `{MetricSpaceClass A}
     (f: A → A → A)
-    `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)} `{!Proper (=) f}.
+    `{!UniformlyContinuous_mu (uncurry f)} `{!UniformlyContinuous (uncurry f)}
+    `{!Proper (=) f}.
 
   Definition t0: UniformlyContinuous_mu (λ (x: A), f (f x x) (f x (f x x))) := _.
 
 End test.
 End test.
+*)

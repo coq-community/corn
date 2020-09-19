@@ -49,7 +49,7 @@ Fixpoint CRpower_slow (x : CR) (n : nat) { struct n }
      end.
 
 Lemma CRpower_slow_wd : forall (x y : CR) (n : nat),
-    st_eq x y -> st_eq (CRpower_slow x n) (CRpower_slow y n).
+    msp_eq x y -> msp_eq (CRpower_slow x n) (CRpower_slow y n).
 Proof.
   induction n.
   - intros. reflexivity.
@@ -220,9 +220,9 @@ End CRpower_N.
 Lemma Cmap_wd_bounded
   : forall (Y : MetricSpace)
       (f g : Q_as_MetricSpace --> Y) (x : CR) (c : Qpos),
-    (forall q:Q, -`c <= q <= `c -> st_eq (f q) (g q))
+    (forall q:Q, -`c <= q <= `c -> msp_eq (f q) (g q))
     -> (- ' (proj1_sig c) <= x /\ x <= ' (proj1_sig c))%CR
-    -> st_eq (Cmap_fun QPrelengthSpace f x) (Cmap_fun QPrelengthSpace g x).
+    -> msp_eq (Cmap_fun QPrelengthSpace f x) (Cmap_fun QPrelengthSpace g x).
 Proof.
   intros.
   setoid_replace x with (CRboundAbs c x).
@@ -235,7 +235,7 @@ Proof.
     apply Qpos_min_lb_l. }
   pose proof (uc_prf_smaller f mufg H1). clear H1.
   setoid_replace f with (Build_UniformlyContinuousFunction H2).
-  2: intro q; reflexivity.
+  2: apply ucEq_equiv; intro q; reflexivity.
   assert (∀ e : Qpos, QposInf_le (mufg e) (mu g e)).
   { intro e. unfold QposInf_le, mufg.
     destruct (mu g e). 2: trivial.
@@ -243,7 +243,7 @@ Proof.
     apply Qpos_min_lb_r. }
   pose proof (uc_prf_smaller g mufg H1). clear H1.
   setoid_replace g with (Build_UniformlyContinuousFunction H3).
-  2: intro q; reflexivity.
+  2: apply ucEq_equiv; intro q; reflexivity.
   intros e1 e2.
   assert (forall y, eq (QposInf_bind (fun e : Qpos => e) y) y) as elim_bind.
   { intro y. destruct y; reflexivity. }
@@ -253,6 +253,7 @@ Proof.
   { intro a. apply Qmax_lub.
     apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
     apply Qpos_nonneg. apply Qmin_lb_l. }
+  rewrite Qplus_0_r.
   destruct (mufg e1) as [q|] eqn:des. 
   - rewrite H.
     apply (mu_sum QPrelengthSpace e2 (cons e1 nil)
@@ -294,9 +295,10 @@ Proof.
     rewrite <- Qle_minus_iff. apply H. }
   destruct n as [|n].
   - setoid_replace (CRpower_N_bounded 0 c x) with 1%CR.
-    2: intros e1 e2; apply Qball_Reflexive; apply (Qpos_nonneg (e1+e2)). 
+    2: intros e1 e2; apply Qball_Reflexive; rewrite Qplus_0_r; apply (Qpos_nonneg (e1+e2)). 
     rewrite CRmult_1_r. simpl (1+0)%N. 
     intros e1 e2. simpl.
+    rewrite Qplus_0_r.
     rewrite elim_min. 2: apply H0.
     rewrite elim_max. 2: apply H.
     setoid_replace (` e1 + ` e2)%Q
@@ -321,6 +323,7 @@ Proof.
                        x).
     + apply Cmap_wd_bounded with (c:=c).
       intros q H1. destruct H1.
+      apply Qball_0.
       change (Qpower_positive (Qmax (- ` c) (Qmin (` c) q)) (1+n)
               ==
   Qmax (- ` b) (Qmin (` b) (Qpower_positive (Qmax (- ` c) (Qmin (` c) q)) n)) *
@@ -349,8 +352,9 @@ Proof.
       apply (Qle_trans _ (`c)). apply H2. apply Qpos_max_ub_l.
     + rewrite (fast_MonadLaw2 QPrelengthSpace
                               (ProductMS_prelength QPrelengthSpace QPrelengthSpace)).
-      apply Cmap_wd. intro a; reflexivity.
+      apply Cmap_wd. apply ucEq_equiv. intro a; reflexivity.
       intros e1 e2. split. 
+      rewrite Qplus_0_r.
       apply (mu_sum QPrelengthSpace e2 (cons e1 nil) (Qpower_N_uc (N.pos n) c)).
       apply (@ball_weak_le Q_as_MetricSpace
             (proj1_sig (Qpos_min
@@ -373,6 +377,7 @@ Proof.
                        Qpos_power c (Z.pred (Zpos n)) )) e1
              + e2)%Qpos)).
       apply Qplus_le_l.
+      rewrite Qplus_0_r.
       apply Qpos_min_lb_r.
       apply (regFun_prf x).
     + intro e. simpl.
@@ -432,9 +437,10 @@ Proof.
   assert (∀ (n : nat) (c : Qpos) (x : CR),
     (forall e, - (proj1_sig c) <= approximate x e)
     -> (forall e, approximate x e <= proj1_sig c)
-    → st_eq (CRpower_slow x n) (CRpower_N_bounded (N.of_nat n) c x)).
+    → msp_eq (CRpower_slow x n) (CRpower_N_bounded (N.of_nat n) c x)).
   induction n.
   - intros. intros e1 e2. simpl. apply Qball_Reflexive.
+    rewrite Qplus_0_r.
     apply (Qpos_nonneg (e1+e2)).
   - intros. change (S n) with (1+n)%nat.
     rewrite Nnat.Nat2N.inj_add.
@@ -454,7 +460,7 @@ Proof.
     intros e. apply Qmax_lub.
     apply (Qle_trans _ 0). apply (Qopp_le_compat 0), Qpos_nonneg.
     apply Qpos_nonneg. apply Qmin_lb_l.
-    apply Cmap_wd. intro a; reflexivity.
+    apply Cmap_wd. apply ucEq_equiv; intro a; reflexivity.
     apply CRboundAbs_Eq. apply H0. apply H0.
 Qed.
 
@@ -522,20 +528,27 @@ Qed.
 
 Hint Rewrite CRpower_N_correct' : IRtoCR.
 
-Instance: Proper (eq ==> QposEq ==> @st_eq _) Qpower_N_uc.
+Instance: Proper (eq ==> QposEq ==> @msp_eq _) Qpower_N_uc.
 Proof.
- intros p1 p2 Ep e1 e2 Ee x.
- apply ball_eq_iff. intros e epos.
- simpl. unfold QposEq in Ee. rewrite Ep, Ee.
- apply ball_refl. apply Qlt_le_weak, epos.
+  intros p1 p2 Ep e1 e2 Ee. apply ucEq_equiv.
+  intro x.
+  apply ball_closed.
+  intros e epos.
+  simpl. unfold QposEq in Ee.
+  rewrite Ep, Ee.
+  apply Qball_Reflexive.
+  rewrite Qplus_0_l.
+  apply Qlt_le_weak, epos.
 Qed.
 
-Instance: Proper (eq ==> QposEq ==> @st_eq _) CRpower_N_bounded. 
+Instance: Proper (eq ==> QposEq ==> @msp_eq _) CRpower_N_bounded. 
 Proof. 
- intros p1 p2 Ep e1 e2 Ee x. simpl. rewrite Ep, Ee. reflexivity.
+  intros p1 p2 Ep e1 e2 Ee.
+  apply ucEq_equiv.
+  intro x. simpl. rewrite Ep, Ee. reflexivity.
 Qed. 
 
-Instance: Proper (@st_eq _ ==> eq ==> @st_eq _) CRpower_N.
+Instance: Proper (@msp_eq _ ==> eq ==> @msp_eq _) CRpower_N.
 Proof.
  intros x1 x2 Hx ? n Hn. subst.
  transitivity (CRpower_N_bounded n (CR_b (1 # 1) x1) x2).

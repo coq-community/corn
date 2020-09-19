@@ -60,7 +60,8 @@ Proof.
   unfold MetricMorphisms.app_inverse.
   unfold canonical_names.equiv.
   unfold FinEnum_eq. simpl.
-  split; intros; assumption. 
+  apply (@ball_refl (FinEnum AQ_as_MetricSpace) 0).
+  discriminate.
 Qed.
   
 Definition IabCompact : Compact AQ_as_MetricSpace

@@ -367,8 +367,10 @@ Proof.
  transitivity (ln_pos_uc c q);[|].
   unfold CRln_pos.
   change (' q)%CR with (Cunit_fun Q_as_MetricSpace q).
-  rewrite -> (Cbind_correct QPrelengthSpace (ln_pos_uc c) (Cunit_fun Q_as_MetricSpace q)).
-  apply: BindLaw1.
+  pose proof (Cbind_correct QPrelengthSpace (ln_pos_uc c)).
+  apply ucEq_equiv in H0.
+  rewrite -> (H0 (Cunit_fun Q_as_MetricSpace q)).
+  apply BindLaw1.
  simpl.
  rewrite -> rational_ln_correct'.
  apply IRasCR_wd.

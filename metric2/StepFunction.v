@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.structures.OpenUnit.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.tactics.Qauto.
@@ -35,17 +34,29 @@ Variable X:Type.
 
 (**
 * Step Functions
-We represent step functions from [[0,1]] to [X] inductively as a tree
-structure.  In the base case a costant function is a step function.
-Given two step functions f and g, then they can be scaled and glued
-together at a point o yeilding the step function which is f(x/o) for
-x in [[0,o]], and g((x-o)/(1-o)) for x in [[o,1]].
+We represent step functions from [[a,b]] to [X] as binary trees.
+The tree nodes store rational numbers between 0 and 1, that represent the
+relative cut of the previous interval of definition. So a rational number o
+at the root means we cut [[a,b]] into the subintervals
+[[a, a+(b-a)*o]] and [[a+(b-a)*o, b]].
+The leaves of the trees store values in [X], that represent constant
+functions at those leaf intervals.
 
-Step functions are not functions.  They could be interpreted as
-functions; however, we don't give any particular interpretation to how
-the step functions ought to behave at the glue points in between step.
-Because our primary purpose for introducing step functions is to
-implement integration, this ambiguity is not a problem.
+The initial interval of definition [[a,b]] is not given in the inductive
+type StepF, it must be provided a posteriori when we want to interpret a StepF
+as an actual function.
+
+The step functions are not defined at the rational glue points,
+because constructively all total functions must be continuous.
+This is enough to implement integration where functions only need
+to be defined almost everywhere.
+
+StepF is an applicative functor. A function f : X -> Y maps on a StepF X
+by keeping the same cuts (tree nodes) and applying f at the leaves. When
+the StepF X is interpreted as an actual function, this functor is just
+function composition ([[a,b]] -> X) -> (X -> Y) -> ([[a,b]] -> Y).
+By splitting we can merge 2 trees of cuts, and that yields the applicative
+functor Ap : StepF (X->Y) -> StepF X -> StepF Y. 
 *)
 
 Inductive StepF :Type:=
@@ -67,18 +78,18 @@ StepFfold constStepF (fun a l r => glue (OpenUnitDual a) r l).
 
 (** [Split] decomposes (and scales) a step function at a point o.
 It is essentially an inverse operation of glue *)
-Definition Split : StepF -> OpenUnit -> StepF*StepF.
+Fixpoint Split (s : StepF) (a : OpenUnit) : StepF*StepF.
 Proof.
- fix Split 1.
- intros s a.
  destruct s as [x | b t1 t2].
-  exact (constStepF x , constStepF x).
- destruct (Q_dec a b) as [[H|H]|H].
-   destruct (Split t1 (OpenUnitDiv a b H)) as [L R].
-   exact (L, (glue (OpenUnitDualDiv b a H) R t2)).
-  destruct (Split t2 (OpenUnitDualDiv a b H)) as [L R].
-  refine ((glue (OpenUnitDiv b a H) t1 L), R).
- exact (t1,t2).
+ - exact (constStepF x, constStepF x).
+ - destruct (Q_dec a b) as [[ltab|ltba]|_].
+   + (* a < b so we split the left branch t1 and keep the same right branch t2. *)
+     destruct (Split t1 (OpenUnitDiv a b ltab)) as [L R].
+     exact (L, (glue (OpenUnitDualDiv b a ltab) R t2)).
+   + (* b < a so we split the right branch t2 and keep the same left branch t1. *)
+     destruct (Split t2 (OpenUnitDualDiv a b ltba)) as [L R].
+     refine ((glue (OpenUnitDiv b a ltba) t1 L), R).
+   + exact (t1,t2).
 Defined.
 
 Definition SplitL (s:StepF) (o:OpenUnit) : StepF :=

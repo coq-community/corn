@@ -101,7 +101,8 @@ Proof.
                QPrelengthSpace Qabs_uc
                (MetricMorphisms.metric_embed_uc (cast AQ Q_as_MetricSpace)) x).
   apply Cmap_wd. 2: reflexivity.
-  intro d. simpl. apply aq_abs.
+  apply ucEq_equiv.
+  intro d. simpl. apply Qball_0, aq_abs.
 Qed. 
 
 Lemma ARabs_AbsSmall : forall a b : AR, ARle (ARabs b) a <-> (ARle (-a) b /\ ARle b a).

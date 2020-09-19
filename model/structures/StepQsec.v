@@ -15,6 +15,8 @@ Local Open Scope sfstscope.
 
 Section QS.
 
+Definition QS : RSetoid := Build_RSetoid Q_Setoid.
+
 Definition QabsS : QS-->QS.
 Proof.
  exists Qabs.
@@ -137,7 +139,7 @@ Qed.
 Definition StepQsrt : (@ring_theory (StepQ) (constStepF (0:QS)) (constStepF (1:QS)) StepQplus StepQmult StepQminus StepQopp (@StepF_eq QS)).
 Proof.
  constructor; intros; unfold StepF_eq, StepQplus, StepQminus, StepQopp, StepQmult; rewriteStepF;
-   set (g:=st_eqS QS).
+   set (g:=@st_eqS QS).
          set (z:=QplusS 0).
          set (f:=(join (compose g z))).
          cut (StepFfoldProp (f ^@> x)).
@@ -343,7 +345,7 @@ Lemma StepQabsOpp : forall x, StepQabs (-x) == StepQabs (x).
 Proof.
  intros x.
  unfold StepF_eq.
- set (g:=(st_eqS QS)).
+ set (g:=(@st_eqS QS)).
  set (f:=(ap (compose g (compose QabsS QoppS)) QabsS)).
  cut (StepFfoldProp (f ^@> x)).
   unfold f.

@@ -158,7 +158,7 @@ Lemma Cauchy_IRasCR_wd
   : forall (x y:Cauchy_IR), x[=]y -> (Cauchy_IRasCR x==Cauchy_IRasCR y)%CR.
 Proof.
  intros [x Hx] [y Hy] Hxy.
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  apply ball_closed.
  intros d dpos.
@@ -185,7 +185,7 @@ Qed.
 Lemma CRasCR : forall x:CR, (Cauchy_IRasCR (CRasCauchy_IR x)==x)%CR.
 Proof.
  intros x.
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  destruct (CRasCauchy_IR_raw_is_Cauchy x (proj1_sig e) (Qpos_ispos e)) as [n Hn].
@@ -366,7 +366,7 @@ Lemma Cauchy_IR_inject_Q_as_CR_inject_Q : forall x:Q,
 (' x == Cauchy_IRasCR (Cauchy_CReals.inject_Q _ x))%CR.
 Proof.
  intros x.
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  destruct (CS_seq_const Q_as_COrdField x (proj1_sig e) (Qpos_ispos e)).
@@ -397,7 +397,7 @@ Lemma Cauchy_IR_plus_as_CR_plus : forall x y:Cauchy_IR,
 (Cauchy_IRasCR x + Cauchy_IRasCR y == Cauchy_IRasCR (x[+]y))%CR.
 Proof.
  intros [x Hx] [y Hy].
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  unfold Cap_raw.
@@ -445,7 +445,7 @@ Lemma Cauchy_IR_opp_as_CR_opp : forall x:Cauchy_IR,
 (-Cauchy_IRasCR x == Cauchy_IRasCR ([--]x))%CR.
 Proof.
  intros [x Hx].
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  destruct (Hx (proj1_sig e) (Qpos_ispos e)) as [n1 Hn1].
@@ -550,7 +550,7 @@ forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> AbsSmall (proj1_sig z) (CS_seq
 Proof.
  intros [x Hx] y z N Hz.
  destruct y as [y Hy].
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  destruct CS_seq_mult as [n3 Hn3].
@@ -794,7 +794,7 @@ forall (z:Qpos) (N:nat), (forall i:nat, (N<=i) -> (proj1_sig z <= (CS_seq _ x i)
 (CRinv_pos z (Cauchy_IRasCR x) == Cauchy_IRasCR (f_rcpcl x (@inr _ _ x_)))%CR.
 Proof.
  intros [x Hx] [a [d d_ x_]] z n Hn.
- eapply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  unfold Qinv_modulus.

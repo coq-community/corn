@@ -466,7 +466,7 @@ Proof.
   rewrite <- Qle_minus_iff.
   apply rational_sqrt_mid_le_3.
  rewrite <- (CRpower_N_bounded_N_power 2 (3#1));[|assumption].
- apply (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_N_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
+ apply regFunEq_equiv, (regFunEq_e_small (X:=Q_as_MetricSpace) (CRpower_N_bounded 2 (3 # 1) rational_sqrt_mid) (' a)%CR (1#1)).
  intros e.
  destruct e as [[en ed] epos].
  destruct en as [|en|en]. inversion epos. 2: inversion epos.
@@ -589,7 +589,7 @@ Fixpoint rational_sqrt_big_bounded (n:nat) a (Ha:1 <= a <= (4 ^ n)%Z) { struct n
 Defined.
 
 Lemma rational_sqrt_big_bounded_correct_aux a Xa4 Xa :
-  (scale (2#1)) (IRasCR (sqrt (inj_Q IR (a / (4#1))) Xa4)) [=] IRasCR (sqrt (inj_Q IR a) Xa).
+  ((scale (2#1)) (IRasCR (sqrt (inj_Q IR (a / (4#1))) Xa4)) == IRasCR (sqrt (inj_Q IR a) Xa))%CR.
 Proof.
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
@@ -685,8 +685,8 @@ Fixpoint rational_sqrt_small_bounded (n:nat) a (Ha: / (4^n)%Z <= a <= (4#1)) : C
  abstract (destruct H; tauto).
 Defined.
 
-Lemma rational_sqrt_small_bounded_correct_aux a X4a Xa :
-  (scale (1 # 2)) (IRasCR (sqrt (inj_Q IR (4%positive * a)) X4a))[=]IRasCR (sqrt (inj_Q IR a) Xa).
+Lemma rational_sqrt_small_bounded_correct_aux (a:Q) X4a Xa :
+  ((scale (1 # 2)) (IRasCR (sqrt (inj_Q IR ((4#1) * a)%Q) X4a)) == IRasCR (sqrt (inj_Q IR a) Xa))%CR.
 Proof.
  rewrite <- CRmult_scale.
  rewrite <- IR_inj_Q_as_CR.
@@ -960,8 +960,10 @@ Proof.
  intros q Hq Y.
  transitivity (rational_sqrt q);[|apply: rational_sqrt_correct].
  unfold CRsqrt.
- rewrite -> (Cbind_correct QPrelengthSpace sqrt_uc ('q)%CR).
- apply: BindLaw1.
+ pose proof (Cbind_correct QPrelengthSpace sqrt_uc).
+ apply ucEq_equiv in H0.
+ rewrite (H0 ('q)%CR).
+ apply BindLaw1.
 Qed.
 (* begin hide *)
 Hint Rewrite CRsqrt_correct : IRtoCR.
@@ -988,13 +990,13 @@ Proof.
 Qed.
 
 Lemma CRsquare_nonneg_cancel : forall x y : CR,
-    (0 <= x)%CR -> (0 <= y)%CR -> st_eq (x*x)%CR (y*y)%CR -> st_eq x y.
+    (0 <= x)%CR -> (0 <= y)%CR -> msp_eq (x*x)%CR (y*y)%CR -> msp_eq x y.
 Proof.
   intros.
-  assert (st_eq ((x-y)*(x+y))%CR 0%CR).
+  assert (msp_eq ((x-y)*(x+y))%CR 0%CR).
   { rewrite (CRplus_eq_l (y*y)%CR).
     ring_simplify. exact H1. }
-  apply Metric_eq_stable.
+  apply ball_stable.
   intro abs.
   apply CRmult_eq_0_reg_l in H2.
   contradict abs.
@@ -1002,7 +1004,7 @@ Proof.
   rewrite CRplus_opp.
   exact H2.
   intro H3.
-  assert (st_eq x 0%CR).
+  assert (msp_eq x 0%CR).
   { apply CRle_antisym. split.
     2: exact H.
     rewrite <- CRplus_0_r.
@@ -1167,7 +1169,7 @@ Proof.
     apply (CRmult_le_0_reg_l (CRsqrt x + CRsqrt y)%CR).
     - intro abs.
       apply CRle_not_lt in abs.
-      assert (st_eq 0%CR (CRsqrt y)).
+      assert (msp_eq 0%CR (CRsqrt y)).
       apply CRle_antisym. split.
       apply CRsqrt_pos.
       apply CRlt_le_weak, ypos.
@@ -1201,8 +1203,10 @@ Lemma CRsqrt_Qsqrt : forall x : Q, (CRsqrt ('x) == rational_sqrt x)%CR.
 Proof.
  intros x.
  unfold CRsqrt.
- rewrite -> (Cbind_correct QPrelengthSpace sqrt_uc (' x))%CR.
- apply: BindLaw1.
+ pose proof (Cbind_correct QPrelengthSpace sqrt_uc).
+ apply ucEq_equiv in H.
+ rewrite (H ('x)%CR).
+ apply BindLaw1.
 Qed.
 
 Instance: Proper ((=) ==> (=)) rational_sqrt.

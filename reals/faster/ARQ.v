@@ -37,7 +37,11 @@ Proof.
   intros; assumption.
   intros; assumption.
   intros; assumption.
-  intros; assumption.
+  - intros. apply Qball_0. assumption.
+  - unfold inject_Q_Q, Datatypes.id. rewrite H.
+    ring_simplify. discriminate.
+  - unfold inject_Q_Q, Datatypes.id. rewrite H.
+    ring_simplify. discriminate.
   - unfold inject_Q_Q, Datatypes.id.
     unfold app_inverse, inverse_Q_Q.
     pose proof (Q_approx_correct x (Qdlog2 (` ε))) as [H _].

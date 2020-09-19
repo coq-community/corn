@@ -45,7 +45,8 @@ Afterwards we will plot more general located subsets of the plane:
 - Each filled pixel means there exists a point of the subset inside its
   rectangular region, or inside one of the adjacent pixels. Thus when we
   zoom in the filled pixels, we will see more structure.
-- the pixels overlap, meaning each corner belong to the 4 pixels that touch it
+- The pixels overlap, meaning each edge belongs to the 2 pixels that
+  touch it, and each corner belongs to the 4 pixels that touch it.
  
 *)
 
@@ -183,10 +184,10 @@ Proof.
  unfold Compact.
  rewrite -> ball_Cunit.
  apply ball_sym.
- assert (L:st_eq ((l,t):Q2) (l,b + proj1_sig h)).
+ assert (L:msp_eq ((l,t):Q2) (l,b + proj1_sig h)).
   split; simpl.
    reflexivity.
-  ring.
+  apply Qball_0; ring.
  set (Z0:=(l, t):Q2) in *.
  set (Z1:=(r, b):Q2) in *.
  set (Z:=(l, (b + proj1_sig h)):Q2) in *.
@@ -205,10 +206,14 @@ Proof.
   rewrite <- Hh.
   destruct (InStrengthen H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
   simpl in Hz1, Hz2.
+  apply Qball_0 in Hz1.
+  apply Qball_0 in Hz2.
   rewrite -> Hz1, Hz2.
   eapply graphQ_bonus.
   apply Hz0.
- split; simpl; auto with *.
+  split; simpl.
+  apply Qball_0; ring.
+  reflexivity. 
 Qed.
 
 End Plot.

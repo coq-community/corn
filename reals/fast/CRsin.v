@@ -417,7 +417,7 @@ match n return 0 <= a <= (3^n)%Z -> CR with
 end.
 
 Lemma rational_sin_pos_bounded_correct_aux a :
-  sin_poly (IRasCR (Sin (inj_Q IR (a / 3))))[=]IRasCR (Sin (inj_Q IR a)).
+  (sin_poly (IRasCR (Sin (inj_Q IR (a / 3)))) == IRasCR (Sin (inj_Q IR a)))%CR. 
 Proof.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
    (stepr (nring 1:IR); [| now apply eq_symmetric; apply (inj_Q_nring IR 1)]); rstepr ([1]:IR);
@@ -470,7 +470,7 @@ match (Qle_total 0 a) with
 end.
 
 Lemma rational_sin_correct_aux (a : Q) :
- (- IRasCR (Sin (inj_Q IR (- a)%Q)))%CR[=]IRasCR (Sin (inj_Q IR a)).
+ (- IRasCR (Sin (inj_Q IR (- a)%Q)) == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
  rewrite <- IR_opp_as_CR.
  apply IRasCR_wd.

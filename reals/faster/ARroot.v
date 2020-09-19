@@ -350,7 +350,7 @@ Proof.
    apply (order_preserving _).
    now apply AQsqrt_mid_bounded_raw_square_upper_bound. }
   rewrite <-(ARpower_N_bounded_N_power _ _ 4). 
-  - intros ε1 ε2. simpl.
+  - intros ε1 ε2. rewrite Qplus_0_r. simpl.
    rewrite lattices.meet_r, lattices.join_r.
     + apply ball_weak. apply Qpos_nonneg.
       apply ball_weak_le with (proj1_sig (ε1 * Qpos_inv (8 # 1))%Qpos).
@@ -426,7 +426,12 @@ Lemma AQsqrt_pos_correct : 'AQsqrt_pos = rational_sqrt ('a).
 Proof.
   unfold AQsqrt_pos.
   rewrite ARtoCR_preserves_scale, AQsqrt_mid_correct.
-  rewrite 2!aq_shift_correct, rings.preserves_1, rings.mult_1_l.
+  transitivity (scale (2 ^ Qdlog4 (' a))
+                      (rational_sqrt (' (a ≪ (2 * - Qdlog4 (' a)))))).
+  apply Cmap_wd. 
+  rewrite aq_shift_correct, rings.preserves_1, rings.mult_1_l.
+  reflexivity. reflexivity.
+  rewrite aq_shift_correct.
   rewrite int_pow_exp_mult.
   apply rational_sqrt_scale.
   apply semirings.preserves_nonneg.
@@ -508,7 +513,7 @@ Proof.
     rewrite ARabs_pos. reflexivity.
     exact H5. exact H5.
     exact H5. exact H5. } 
-  intros. apply Metric_eq_stable.
+  intros. apply ball_stable.
   intro abs. assert (~(ARle 0 x)).
   - intro H5. contradict abs.
     apply posCase, H5.
@@ -543,7 +548,5 @@ Proof.
   apply (ARtoCR_preserves_le 0 x), H5.
   apply (ARtoCR_preserves_le x y), H6.
 Qed.
-
-
 
 End ARsqrt.

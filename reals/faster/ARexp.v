@@ -5,7 +5,8 @@ Require Import
   Coq.Program.Program MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QposMinMax 
   CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
-  CoRN.reals.fast.CRexp CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
+  CoRN.reals.fast.CRexp CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum
+  CoRN.reals.fast.Compress CoRN.reals.fast.CRpower
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
   MathClasses.orders.minmax MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export
@@ -95,10 +96,14 @@ Proof.
   rewrite ARcompress_correct.
   rewrite ARtoCR_preserves_power_N_bounded.
   rewrite IHn.
-  setoid_replace ('1 : Qpos) with (1#1)%Qpos by now rewrite AQposAsQpos_preserves_1.
-  rewrite aq_shift_opp_1.
-  apply rational_exp_square.
-  now apply semirings.preserves_nonpos.
+  transitivity (CRpower_N_bounded 2 (1#1)%Qpos (rational_exp (' (a ≪ (-1))))).
+  - apply Cmap_wd. 2: reflexivity. 
+    setoid_replace ('1 : Qpos) with (1#1)%Qpos.
+    reflexivity.
+    rewrite AQposAsQpos_preserves_1. reflexivity.
+  - rewrite aq_shift_opp_1.
+    apply rational_exp_square.
+    now apply semirings.preserves_nonpos.
 Qed.
 
 Section exp_neg.

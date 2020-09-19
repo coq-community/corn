@@ -20,7 +20,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
@@ -200,11 +199,8 @@ Proof.
  intros [[|an|an] ad] e b0 b1 H.
  - simpl in *.
    setoid_replace ((0 # ad)) with 0 by constructor.
-   unfold Qball.
-   unfold QAbsSmall. setoid_replace (0 * b0 - 0 * b1) with 0.
-   2: unfold equiv, stdlib_rationals.Q_eq; ring.
-   split. apply (Qopp_le_compat 0).
-   apply Qpos_nonneg. apply Qpos_nonneg.
+   rewrite Qmult_0_l, Qmult_0_l.
+   apply Qball_Reflexive, Qpos_nonneg.
  - simpl.
   simpl in *.
   unfold Qball in *.
@@ -224,8 +220,8 @@ Proof.
    setoid_replace ((Z.neg an # ad) * b1)
      with (-((Z.pos an # ad) * b1)).
    apply Qball_opp. 
-   unfold Qball, QAbsSmall.
    simpl in H.
+   unfold Qball, QAbsSmall.
   setoid_replace ((Zpos an # ad) * b0 - (Zpos an # ad) * b1)
     with (b0*(Zpos an#ad)-b1*(Zpos an#ad))
      by (unfold equiv, stdlib_rationals.Q_eq; ring).
@@ -244,11 +240,22 @@ Build_UniformlyContinuousFunction (Qscale_uc_prf a).
 
 Definition scale (a:Q) : CR --> CR := Cmap QPrelengthSpace (Qscale_uc a).
 
-Instance Qscale_uc_Proper: Proper (Qeq ==> @st_eq _) Qscale_uc.
-Proof. intros ?? E ?. simpl. rewrite E. reflexivity. Qed.
+Instance Qscale_uc_Proper: Proper (Qeq ==> @msp_eq _) Qscale_uc.
+Proof.
+  intros x y E.
+  apply ucEq_equiv.
+  intros q. simpl. 
+  apply Qball_0.
+  rewrite E. reflexivity.
+Qed.
 
-Instance scale_Proper: Proper (Qeq ==> @st_eq _) scale.
-Proof. intros ?? E ?. simpl ucFun. rewrite E. reflexivity. Qed.
+Instance scale_Proper: Proper (Qeq ==> @msp_eq (UniformlyContinuousSpace CR CR)) scale.
+Proof.
+  intros x y E.
+  apply ucEq_equiv.
+  intro z. simpl ucFun. rewrite E.
+  reflexivity.
+Qed.
 
 (** [CRboundAbs] clamps a real number between -c and c where c is
 rational. *)
@@ -394,17 +401,23 @@ Definition Qmult_uc (c:Qpos)
 Definition CRmult_bounded (yBound : Qpos) : CR --> CR --> CR
   := Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc yBound).
 
-Instance: Proper (QposEq ==> @st_eq _) Qmult_uc.
+Instance: Proper (QposEq ==> @msp_eq _) Qmult_uc.
 Proof.
- intros e1 e2 E x1 x2.
- apply ball_eq_iff. intros e epos.
- simpl. unfold QposEq in E. rewrite E.
- apply Qball_Reflexive. apply Qlt_le_weak, epos.
+  intros e1 e2 E.
+  simpl. split. discriminate.
+  intro a. simpl. split. discriminate.
+  intro b. simpl.
+  apply Qball_0.
+  unfold QposEq in E. rewrite E.
+  reflexivity.
 Qed.
 
-Instance: Proper (QposEq ==> @st_eq _) CRmult_bounded.
+Instance CRmult_bounded_wd : Proper (QposEq ==> @msp_eq _) CRmult_bounded.
 Proof.
-  intros e1 e2 E x1 x2.
+  intros e1 e2 E.
+  simpl. split. discriminate.
+  intro x1. split. discriminate.
+  intro x2.
   simpl (CRmult_bounded e1 x1 x2).
   simpl (CRmult_bounded e2 x1 x2).
   rewrite E. reflexivity.
@@ -507,7 +520,7 @@ Proof.
   unfold x'.
   rewrite -> fasterIsEq.
   reflexivity.
- apply regFunEq_e; intros e.
+ apply regFunEq_equiv, regFunEq_e; intros e.
  intros.
  simpl.
  do 3 (unfold Cap_raw; simpl).
@@ -524,7 +537,7 @@ Proof.
    intro abs. destruct c1. simpl in abs.
    apply (Qlt_not_le _ _ q). rewrite abs. apply Qle_refl. }
  simpl. simpl in H0. rewrite H0. 
- do 2 rewrite QposInf_bind_id. apply ball_refl.
+ do 2 rewrite QposInf_bind_id. apply Qball_Reflexive.
  apply (Qpos_nonneg (e+e)).
 Qed.
 
@@ -543,7 +556,8 @@ Proof.
  apply CR_b_upperBound.
 Qed.
 (* begin hide *)
-Add Morphism CRmult with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as CRmult_wd.
+Add Morphism CRmult with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _)
+      as CRmult_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
  unfold CRmult.
@@ -565,7 +579,7 @@ Proof.
  unfold ucFun2.
  unfold Cmap2.
  unfold inject_Q_CR.
- change (st_eq
+ change (msp_eq
     (Cap_fun QPrelengthSpace
        (Cmap_fun QPrelengthSpace (Qmult_uc (CR_b (1 ↾ eq_refl) y))
           (Cunit_fun Q_as_MetricSpace a)) y)
@@ -574,7 +588,7 @@ Proof.
  repeat rewrite -> Cmap_fun_correct.
  rewrite -> MonadLaw3.
  rewrite -> StrongMonadLaw1.
- change (st_eq (Cmap_slow_fun (Qscale_uc a ∘ QboundAbs (CR_b (1 ↾ eq_refl) y)) y)
+ change (msp_eq (Cmap_slow_fun (Qscale_uc a ∘ QboundAbs (CR_b (1 ↾ eq_refl) y)) y)
     (Cmap_slow_fun (Qscale_uc a) y)).
  transitivity (uc_compose (Cmap QPrelengthSpace (Qscale_uc a))
    (Cmap QPrelengthSpace (QboundAbs (CR_b (1#1) y))) y).
@@ -600,7 +614,7 @@ Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
 Proof.
  intros a b.
  unfold scale.
- change (st_eq (Cmap_fun QPrelengthSpace (Qscale_uc a) (' b)%CR) (' (a * b)%Q)%CR).
+ change (msp_eq (Cmap_fun QPrelengthSpace (Qscale_uc a) (' b)%CR) (' (a * b)%Q)%CR).
  rewrite -> Cmap_fun_correct.
  apply MonadLaw3.
 Qed.
@@ -666,13 +680,14 @@ Definition Qinv_pos_uc (c:Qpos) : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction (Qinv_pos_uc_prf c).
 
 Lemma Qinv_pos_uc_wd : forall (c1 c2:Qpos),
-    (proj1_sig c1 <= proj1_sig c2) -> forall x, (proj1_sig c2 <= x) -> st_eq (Qinv_pos_uc c1 x) (Qinv_pos_uc c2 x).
+    (proj1_sig c1 <= proj1_sig c2)
+    -> forall x, (proj1_sig c2 <= x) -> msp_eq (Qinv_pos_uc c1 x) (Qinv_pos_uc c2 x).
 Proof.
  intros c1 c2 Hc x Hx.
  simpl.
  setoid_replace (Qmax (proj1_sig c2) x) with x by (rewrite <- Qle_max_r; assumption).
  setoid_replace (Qmax (proj1_sig c1) x) with x.
-  reflexivity.
+ apply Qball_Reflexive. discriminate.
  rewrite <- Qle_max_r.
  apply Qle_trans with (proj1_sig c2); assumption.
 Qed.
@@ -704,7 +719,7 @@ Proof.
    apply Qmult_le_l. apply Qpos_ispos. exact Hc.
    apply Qmult_le_r. apply Qpos_ispos. exact Hc. }
  transitivity (CRinv_pos c2 (boundBelow (proj1_sig c2) (faster (QreduceApprox x) f Y))).
-  apply regFunEq_e.
+  apply regFunEq_equiv, regFunEq_e.
   intros e.
   assert (Z:=Qinv_pos_uc_wd _ _ Hc).
   simpl in Z.
@@ -723,19 +738,22 @@ Proof.
  reflexivity.
 Qed.
 
-Instance CRinv_pos_uc_Proper : Proper (QposEq ==> @st_eq _ ==> @st_eq _) Qinv_pos_uc.
+Instance CRinv_pos_uc_Proper : Proper (QposEq ==> @msp_eq _ ==> @msp_eq _) Qinv_pos_uc.
 Proof.
   intros [c1 ?] [c2 ?] E x1 x2 F. unfold QposEq in E. simpl in *.
+  apply Qball_0. apply Qball_0 in F.
   rewrite E, F. reflexivity.
 Qed.
 
-Instance: Proper (QposEq ==> @st_eq _) CRinv_pos.
+Instance: Proper (QposEq ==> @msp_eq _) CRinv_pos.
 Proof.
-  intros c1 c2 E x.
+  intros c1 c2 E.
+  apply ucEq_equiv. intro x.
   simpl (CRinv_pos c1 x).
   simpl (CRinv_pos c2 x).
   setoid_replace (Qinv_pos_uc c1) with (Qinv_pos_uc c2).
    easy.
+  apply ucEq_equiv. 
   intros y. now apply CRinv_pos_uc_Proper.
 Qed.
 
@@ -743,11 +761,11 @@ Lemma CRinv_pos_Qinv : forall (c:Qpos) x,
     (proj1_sig c <= x)%Q -> (CRinv_pos c (' x) == (' (/x)))%CR.
 Proof.
  intros c x H.
- apply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  simpl.
  setoid_replace (Qmax (proj1_sig c) x) with x.
-  apply ball_refl.
+  apply Qball_Reflexive.
   apply (Qpos_nonneg (e+e)).
  rewrite <- Qle_max_r.
  assumption.
@@ -817,21 +835,21 @@ Proof.
  assert (X:forall x, (0 + x == x)%CR).
   intros x.
   transitivity (doubleSpeed x);[|apply doubleSpeed_Eq].
-  apply regFunEq_e.
+  apply regFunEq_equiv, regFunEq_e.
   intros e.
   simpl.
   unfold Cap_raw; simpl.
-  ring_simplify.
-  apply ball_refl. apply (Qpos_nonneg (e+e)).
+  rewrite Qplus_0_l.
+  apply Qball_Reflexive. apply (Qpos_nonneg (e+e)).
  assert (Y:forall x, (x + - 0 == x)%CR).
   intros x.
   transitivity (doubleSpeed x);[|apply doubleSpeed_Eq].
-  apply regFunEq_e.
+  apply regFunEq_equiv, regFunEq_e.
   intros e.
   simpl.
   unfold Cap_raw; simpl.
-  ring_simplify.
-  apply ball_refl. apply (Qpos_nonneg (e+e)).
+  rewrite Qplus_0_r.
+  apply Qball_Reflexive. apply (Qpos_nonneg (e+e)).
  intros x y [[c x_]|[c x_]] [[d y_]|[d y_]] H.
     change (-(CRinv_pos c (-x))== (-(CRinv_pos d (-y))))%CR.
     rewrite -> H in *.
@@ -1003,15 +1021,17 @@ Definition Qmult_uncurry (c : Qpos)
 Lemma CRmult_uncurry_eq : forall (c:Qpos) (x y : CR),
     (' (-proj1_sig c)%Q <= x)%CR 
     -> (x <= ' (proj1_sig c)%Q)%CR
-    -> @st_eq CR (CRmult_bounded c x y)
-            (Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
-                  (Qmult_uncurry c) (undistrib_Complete (x,y))).
+    -> (CRmult_bounded c x y
+       == (Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                (Qmult_uncurry c) (undistrib_Complete (x,y))))%CR.
 Proof.
   (* Cannot use Cmap2_curry, because CRmult_bounded is not
      exactly Qmult_uc_uncurry, the first factor is not bounded. *)
   intros.
-  rewrite <- (CRboundAbs_Eq c H H0) at 1.
-  intros e1 e2. simpl.
+  transitivity (CRmult_bounded c (CRboundAbs c x) y).
+  apply (ucFun2_wd (CRmult_bounded c) x (CRboundAbs c x)).
+  symmetry. apply (CRboundAbs_Eq c H H0). reflexivity.
+  intros e1 e2. rewrite Qplus_0_r. simpl.
   unfold Cap_raw; simpl.
   assert (forall i, eq (QposInf_bind (λ e : Qpos, e) i) i) as bind_id.
   { intro i. destruct i; reflexivity. }
@@ -1122,26 +1142,27 @@ Lemma CRmult_uncurry_eq_3 : forall (c:Qpos) (x y z : CR),
     -> (x <= 'proj1_sig c)%CR
     -> (' (- ` c)%Q <= CRmult_bounded c x y)%CR 
     -> (CRmult_bounded c x y <= 'proj1_sig c)%CR
-    -> @st_eq CR (CRmult_bounded c (CRmult_bounded c x y) z)
-             (Cmap (ProductMS_prelength
-                      (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
-                      QPrelengthSpace)
-                   (uc_compose (Qmult_uncurry c) (together (Qmult_uncurry c) (uc_id Q_as_MetricSpace)))
-                   (undistrib_Complete (undistrib_Complete (x,y), z))).
+    -> (CRmult_bounded c (CRmult_bounded c x y) z
+       == Cmap (ProductMS_prelength
+                  (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                  QPrelengthSpace)
+               (uc_compose (Qmult_uncurry c) (together (Qmult_uncurry c) (uc_id Q_as_MetricSpace)))
+               (undistrib_Complete (undistrib_Complete (x,y), z)))%CR.
 Proof.
   intros. 
   assert (forall a, Qabs (QboundAbs c a) <= `c) as qbound_bound.
   { intros a. rewrite QboundAbs_abs. apply Qmin_lb_r. }
   rewrite (@CRmult_uncurry_eq c (CRmult_bounded c x y) z); try assumption. 
-  assert (st_eq (undistrib_Complete (CRmult_bounded c x y, z))
+  assert (msp_eq (undistrib_Complete (CRmult_bounded c x y, z))
                 (undistrib_Complete ((Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
                   (Qmult_uncurry c) (undistrib_Complete (x,y))), z))) as H4.
   { intros e1 e2. split. 
     apply (@CRmult_uncurry_eq c x y H H0).
+    rewrite Qplus_0_r.
     apply regFun_prf. }
   rewrite H4. clear H4.
   rewrite fast_MonadLaw2.
-  apply Cmap_wd. apply uc_setoid.
+  apply Cmap_wd. reflexivity.
   intros e1 e2. split.
   - simpl. apply AbsSmall_Qabs. 
     assert (forall i j k l : Q, Qabs (i*j-k*l) <= Qabs i * Qabs(j-l) + Qabs(i-k)*Qabs l)%Q
@@ -1217,6 +1238,7 @@ Proof.
     assert (`e1 + proj1_sig (Qpos_min ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c) e2)
             <= `e1 + `e2) as H4.
     { apply Qplus_le_r. apply Qpos_min_lb_r. }
+    rewrite Qplus_0_r.
     apply (ball_weak_le _ _ _ H4). apply regFun_prf.
 Qed.
 
@@ -1226,29 +1248,30 @@ Lemma CRmult_uncurry_eq_3r : forall (c:Qpos) (x y z : CR),
     -> (x <= 'proj1_sig c)%CR
     -> (' (- ` c)%Q <= y)%CR 
     -> (y <= 'proj1_sig c)%CR
-    -> @st_eq CR (CRmult_bounded c x (CRmult_bounded c y z))
-             (Cmap (ProductMS_prelength
-                      (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
-                      QPrelengthSpace)
-                   (uc_compose (Qmult_uncurry c)
-                               (uc_compose (together (uc_id Q_as_MetricSpace) (Qmult_uncurry c)) (uc_assoc _ _ _)))
-                   (undistrib_Complete (undistrib_Complete (x,y), z))).
+    -> (CRmult_bounded c x (CRmult_bounded c y z)
+       == Cmap (ProductMS_prelength
+                  (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
+                  QPrelengthSpace)
+               (uc_compose (Qmult_uncurry c)
+                           (uc_compose (together (uc_id Q_as_MetricSpace) (Qmult_uncurry c)) (uc_assoc _ _ _)))
+               (undistrib_Complete (undistrib_Complete (x,y), z)))%CR.
 Proof.
   intros. 
   assert (forall a, Qabs (QboundAbs c a) <= `c) as qbound_bound.
   { intros a. rewrite QboundAbs_abs. apply Qmin_lb_r. }
   rewrite (@CRmult_uncurry_eq c x (CRmult_bounded c y z)); try assumption. 
-  assert (st_eq (undistrib_Complete (x, CRmult_bounded c y z))
+  assert (msp_eq (undistrib_Complete (x, CRmult_bounded c y z))
                 (undistrib_Complete
                    (x, Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
                             (Qmult_uncurry c) (undistrib_Complete (y,z))))) as H4.
   { intros e1 e2. split. 
+    rewrite Qplus_0_r.
     apply regFun_prf.
     apply (@CRmult_uncurry_eq c y z H1 H2). }
   rewrite H4. clear H4.
   rewrite fast_MonadLaw2.
-  apply Cmap_wd. apply uc_setoid.
-  intros e1 e2. split.
+  apply Cmap_wd. reflexivity.
+  intros e1 e2. rewrite Qplus_0_r. split.
   - simpl.
     assert (`e1 + proj1_sig (Qpos_min e2 ((1 # 2) ↾ eq_refl * e2 * Qpos_inv c))
             <= `e1 + `e2) as H4.
@@ -1523,8 +1546,8 @@ Qed.
 Lemma CRmult_assoc_bounded (x y z : CR) :
   let b := ((CR_b (1#1) x + (1#1))
             * (CR_b (1#1) y + (1#1)) * (CR_b (1#1) z + (1#1)))%Qpos in
-  st_eq (CRmult_bounded b (CRmult_bounded b x y) z)
-        (CRmult_bounded b x (CRmult_bounded b y z)).
+  (CRmult_bounded b (CRmult_bounded b x y) z
+   == CRmult_bounded b x (CRmult_bounded b y z))%CR.
 Proof.
   intros.
   assert (' (- ` b)%Q <= x)%CR as xlower.
@@ -1584,6 +1607,7 @@ Proof.
   specialize (H (1#4)%Qpos (1#4)%Qpos).
   destruct H,H. 
   simpl in H1. simpl in H0.
+  apply Qball_0.
   apply (@Qmult_uncurry_assoc i j k b).
   - clear H0 H1. simpl in H. apply AbsSmall_Qabs in H.
     apply (Qle_trans _ (proj1_sig (CR_b (1#1) x + (1#1))%Qpos)).

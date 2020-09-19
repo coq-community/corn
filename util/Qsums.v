@@ -176,7 +176,7 @@ Proof with auto with *.
  apply (Nat.div_unique (x * k + i)%nat k x i)...
 Qed.
 
-Lemma Σ_multiply_bound n (k: positive) (f: nat -> Q):
+Lemma Σ_multiply_bound (n:nat) (k: positive) (f: nat -> Q):
   Σ n f == Σ (Pos.to_nat k * n) (f ∘ flip Nat.div (Pos.to_nat k)) / inject_Z (Zpos k).
 Proof.
  rewrite <- Qmult_Σ.
@@ -192,7 +192,7 @@ Lemma Qball_hetero_Σ (n m: positive) f g (e:Q):
    Qball e (Σ (Pos.to_nat n) f) (Σ (Pos.to_nat m) g).
 Proof.
  intros.
- rewrite (Σ_multiply_bound (nat_of_P n) m).
+ rewrite (Σ_multiply_bound (Pos.to_nat n) m).
  rewrite (Σ_multiply_bound (nat_of_P m) n).
  rewrite mult_comm.
  rewrite <- nat_of_P_mult_morphism.

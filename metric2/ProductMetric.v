@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Classification.
@@ -32,26 +31,6 @@ Set Implicit Arguments.
 (**
 ** Product Metric
 The product of two metric spaces forms a metric space *)
-Section ProductSetoid.
-
-Variable X Y : RSetoid.
-
-Definition prod_st_eq (a b:X*Y) :=
-st_eq (fst a) (fst b) /\ st_eq (snd a) (snd b).
-
-Lemma prodST : Setoid_Theory _ prod_st_eq.
-Proof.
- split; unfold prod_st_eq.
-   intros; split; reflexivity.
-  intros x y [H1 H2]; split; symmetry; assumption.
- intros x y z [H1 H2] [H3 H4]; split.
-  transitivity (fst y); assumption.
- transitivity (snd y); assumption.
-Qed.
-
-Definition prodS : RSetoid := Build_RSetoid prodST.
-End ProductSetoid.
-
 Section ProductMetric.
 Variable X Y : MetricSpace.
 
@@ -84,21 +63,13 @@ Proof.
  split; apply ball_closed; firstorder.
 Qed.
 
-Lemma prod_ball_eq : forall a b, (forall e, 0 < e -> prod_ball e a b) -> prod_st_eq _ _ a b.
-Proof.
- intros a b H.
- unfold prod_ball in *.
- split; apply ball_eq; firstorder.
-Qed.
-
-Lemma prod_is_MetricSpace : is_MetricSpace (prodS X Y) prod_ball.
+Lemma prod_is_MetricSpace : is_MetricSpace prod_ball.
 Proof.
  split.
  - intros. intros a. apply prod_ball_refl, H.
  - exact prod_ball_sym.
  - exact prod_ball_triangle.
  - exact prod_ball_closed.
- - exact prod_ball_eq.
  - intros. destruct H. apply (msp_nonneg (msp X)) in H. exact H.
  - intros. split.
    + apply (msp_stable (msp X)).
@@ -113,11 +84,11 @@ Qed.
 
 Definition ProductMS : MetricSpace.
 Proof.
- exists (prodS X Y) prod_ball.
+ exists (prod X Y) prod_ball.
  2: apply prod_is_MetricSpace.
- intros e1 e2 He a1 a2 [Ha0 Ha1] b1 b2 [Hb0 Hb1]; unfold prod_ball.
- rewrite (ball_wd X He _ _ Ha0 _ _ Hb0).
- rewrite (ball_wd Y He _ _ Ha1 _ _ Hb1). reflexivity.
+ intros e1 e2 a1 a2 He. split.
+ - intros [H H0]. split; rewrite <- He; assumption.
+ - intros [H H0]. split; rewrite He; assumption.
 Defined.
 
 (** Product metrics preserve properties of metric spaces such as
@@ -166,7 +137,8 @@ End ProductMetric.
 (* begin hide *)
 Arguments PairMS [X Y].
 
-Add Parametric Morphism X Y : (@PairMS X Y) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as PairMS_wd.
+Add Parametric Morphism X Y : (@PairMS X Y)
+    with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _) as PairMS_wd.
 Proof.
  intros.
  split; assumption.
@@ -276,19 +248,20 @@ Section completion_distributes.
   Definition undistrib_Complete_uc: ProductMS (Complete X) (Complete Y) --> Complete (ProductMS X Y) :=
     Build_UniformlyContinuousFunction undistrib_Complete_uc_prf.
 
-  Lemma distrib_after_undistrib_Complete xy: st_eq (distrib_Complete (undistrib_Complete xy)) xy.
+  Lemma distrib_after_undistrib_Complete xy
+    : msp_eq (distrib_Complete (undistrib_Complete xy)) xy.
   Proof.
    intros. unfold distrib_Complete, undistrib_Complete. simpl.
-   unfold prod_st_eq. simpl.
-   split; apply regFunEq_e; simpl; intros; apply ball_refl.
+   split; apply regFunEq_equiv, regFunEq_e; simpl; intros; apply ball_refl.
    apply (Qpos_nonneg (e+e)).
    apply (Qpos_nonneg (e+e)).
   Qed.
 
   Lemma undistrib_after_distrib_Complete xy
-    : st_eq (undistrib_Complete (distrib_Complete xy)) xy.
+    : msp_eq (undistrib_Complete (distrib_Complete xy)) xy.
   Proof.
-   intros. unfold undistrib_Complete. simpl.
+   intros. unfold undistrib_Complete. 
+   apply regFunEq_equiv.
    apply (@regFunEq_e (ProductMS X Y)).
    split; simpl; apply ball_refl.
    apply (Qpos_nonneg (e+e)).
@@ -320,12 +293,13 @@ Lemma Cmap2_curry
   : forall (A B C: MetricSpace)
       (Apl : PrelengthSpace A) (Bpl : PrelengthSpace B)
       (f : ProductMS A B --> C) (a : Complete A) (b : Complete B),
-    @st_eq (Complete C)
+    @msp_eq (Complete C)
            (Cmap2 Apl Bpl (uc_curry f) a b)
            (uc_compose (Cmap (ProductMS_prelength Apl Bpl) f)
                        undistrib_Complete_uc (a,b)).
 Proof.
   intros. intros e1 e2. 
+  rewrite Qplus_0_r.
   assert ((1#2)*proj1_sig e1 + proj1_sig e2 <= proj1_sig e1 + proj1_sig e2).
   { apply Qplus_le_l.
     rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
@@ -366,9 +340,9 @@ Definition uc_complete_curry {X Y Z : MetricSpace}
 Lemma Cmap2_comm
   : forall (X Y : MetricSpace) (Xpl : PrelengthSpace X)
       (f : ProductMS X X --> Y),
-    (forall a b :X, st_eq (f (a,b)) (f (b,a)))
+    (forall a b :X, msp_eq (f (a,b)) (f (b,a)))
     -> forall (a b:Complete X),
-      @st_eq (Complete Y)
+      @msp_eq (Complete Y)
              (uc_complete_curry (Cmap (ProductMS_prelength Xpl Xpl) f) a b)
              (uc_complete_curry (Cmap (ProductMS_prelength Xpl Xpl) f) b a).
 Proof.
@@ -377,6 +351,7 @@ Proof.
                (Cmap (ProductMS_prelength Xpl Xpl)
                      (uc_compose f (uc_flip X X)))).
   { intro x. apply Cmap_wd.
+    apply ucEq_equiv.
     intros xy. simpl. rewrite H. destruct xy. reflexivity. reflexivity. }
   specialize (H0 (undistrib_Complete (a,b))).
   simpl in H0. simpl. intros e1 e2. specialize (H0 e1 e2).
@@ -390,7 +365,7 @@ Lemma undistrib_Located
   : forall (X Y : MetricSpace) (A : Complete (ProductMS X Y) -> Prop),
     LocatedSubset _ A
     -> LocatedSubset (ProductMS (Complete X) (Complete Y))
-                    (fun xy => exists p, st_eq p (undistrib_Complete xy) /\ A p).
+                    (fun xy => exists p, msp_eq p (undistrib_Complete xy) /\ A p).
 Proof.
   intros X Y A loc d e p ltde.
   destruct (loc d e (undistrib_Complete p) ltde) as [far|close].

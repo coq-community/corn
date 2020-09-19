@@ -176,7 +176,7 @@ End Cos_Poly.
 Definition rational_cos (x:Q) := cos_poly (rational_sin (x/2)).
 
 Lemma rational_cos_correct_aux a :
-  cos_poly (IRasCR (Sin (inj_Q IR (a / 2))))[=]IRasCR (Cos (inj_Q IR a)).
+  (cos_poly (IRasCR (Sin (inj_Q IR (a / 2)))) == IRasCR (Cos (inj_Q IR a)))%CR.
 Proof.
  rewrite <- cos_poly_correct.
   apply IRasCR_wd.
@@ -246,8 +246,10 @@ Proof.
  intros q [] _.
  transitivity (rational_cos q);[|apply rational_cos_correct].
  unfold cos_slow.
- rewrite -> (Cbind_correct QPrelengthSpace cos_uc (' q))%CR.
- apply: BindLaw1.
+ pose proof (Cbind_correct QPrelengthSpace cos_uc).
+ apply ucEq_equiv in H.
+ rewrite -> (H (' q))%CR.
+ apply BindLaw1.
 Qed.
 
 Definition cos (x:CR) := cos_slow (x - (compress (scale (2*Qceiling (approximate (x*(CRinv_pos (6#1) (scale 2 CRpi))) (Qpos2QposInf (1#2)) -(1#2))) CRpi)))%CR.

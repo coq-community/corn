@@ -61,7 +61,7 @@ Definition ARcompress : AR --> AR := Cbind AQPrelengthSpace AQcompress_uc.
 
 Lemma ARcompress_correct (x : AR) : ARcompress x = x.
 Proof.
-  apply regFunEq_e. intros ε.
+  apply regFunEq_equiv, regFunEq_e. intros ε.
   assert (QposEq (ε + ε) ((1#2) * ε + ((1#2) * ε + ε)))
     by (unfold QposEq; simpl; ring).
  apply (ball_wd _ H5 _ _ (reflexivity _) _ _ (reflexivity _)). clear H5.
@@ -76,7 +76,7 @@ Global Instance inject_Z_AR: Cast Z AR := (cast AQ AR ∘ cast Z AQ)%prg.
 
 Lemma ARtoCR_inject (x : AQ) : cast AR CR (cast AQ AR x) = cast Q CR (cast AQ Q x).
 Proof.
-  apply regFunEq_e. intros ε. apply ball_refl.
+  apply regFunEq_equiv, regFunEq_e. intros ε. apply ball_refl.
   apply (Qpos_nonneg (ε + ε)). 
 Qed.
 
@@ -94,6 +94,8 @@ Hint Rewrite ARtoCR_preserves_1 : ARtoCR.
 Program Definition AQtranslate_uc (x : AQ_as_MetricSpace) := unary_uc 
   (cast AQ Q_as_MetricSpace)
   ((x +) : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qtranslate_uc ('x)) _.
+Next Obligation. apply Qball_0. apply preserves_sg_op. Qed.
+
 Definition ARtranslate (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQtranslate_uc x).
 
 Lemma ARtoCR_preserves_translate x y : 'ARtranslate x y = translate ('x) ('y).
@@ -103,6 +105,7 @@ Hint Rewrite ARtoCR_preserves_translate : ARtoCR.
 Program Definition AQplus_uc := binary_uc
   (cast AQ Q_as_MetricSpace) 
   ((+) : AQ_as_MetricSpace →  AQ_as_MetricSpace → AQ_as_MetricSpace) Qplus_uc _.
+Next Obligation. apply Qball_0. apply preserves_sg_op. Qed.
 
 Definition ARplus_uc : AR --> AR --> AR := Cmap2 AQPrelengthSpace AQPrelengthSpace AQplus_uc.
 Global Instance ARplus: Plus AR := ucFun2 ARplus_uc.
@@ -113,6 +116,8 @@ Hint Rewrite ARtoCR_preserves_plus : ARtoCR.
 
 (* Inverse *)
 Program Definition AQopp_uc := unary_uc (cast AQ Q_as_MetricSpace)  ((-) : AQ → AQ) Qopp_uc _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
+
 Definition ARopp_uc : AR --> AR := Cmap AQPrelengthSpace AQopp_uc.
 Global Instance ARopp: Negate AR := ARopp_uc.
 
@@ -125,6 +130,7 @@ Program Definition AQboundBelow_uc (x : AQ_as_MetricSpace) :
     AQ_as_MetricSpace --> AQ_as_MetricSpace := 
   unary_uc (cast AQ Q_as_MetricSpace)
   ((x ⊔) : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundBelow_uc ('x)) _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
   
 Definition ARboundBelow (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundBelow_uc x).
 
@@ -136,6 +142,7 @@ Program Definition AQboundAbove_uc (x : AQ_as_MetricSpace) :
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
   (cast AQ Q_as_MetricSpace)
   ((x ⊓) : AQ_as_MetricSpace → AQ_as_MetricSpace) (QboundAbove_uc ('x)) _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
 
 Definition ARboundAbove (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbove_uc x).
 
@@ -147,6 +154,7 @@ Program Definition AQboundAbs_uc (c : AQ₊) :
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
   (cast AQ Q_as_MetricSpace) 
   (λ x : AQ_as_MetricSpace, (-'c) ⊔ (('c) ⊓ x) : AQ_as_MetricSpace) (QboundAbs ('c)) _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
 
 Definition ARboundAbs (c : AQ₊) : AR --> AR := Cmap AQPrelengthSpace (AQboundAbs_uc c).
 
@@ -158,6 +166,7 @@ Program Definition AQscale_uc (x : AQ_as_MetricSpace) :
     AQ_as_MetricSpace --> AQ_as_MetricSpace := unary_uc 
   (cast AQ Q_as_MetricSpace)
   ((x *.)  : AQ_as_MetricSpace → AQ_as_MetricSpace) (Qscale_uc ('x)) _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
 
 Definition ARscale (x : AQ_as_MetricSpace) : AR --> AR := Cmap AQPrelengthSpace (AQscale_uc x).
 
@@ -169,6 +178,7 @@ Program Definition AQmult_uc (c : AQ₊) :
     AQ_as_MetricSpace --> AQ_as_MetricSpace --> AQ_as_MetricSpace := binary_uc 
   (cast AQ Q_as_MetricSpace)
   (λ x y : AQ_as_MetricSpace, x * AQboundAbs_uc c y : AQ_as_MetricSpace) (Qmult_uc ('c)) _.
+Next Obligation. apply Qball_0. aq_preservation. Qed.
 
 Definition ARmult_bounded (c : AQ₊) : AR --> AR --> AR 
   := Cmap2 AQPrelengthSpace AQPrelengthSpace (AQmult_uc c).
@@ -201,7 +211,7 @@ Proof.
   assert (QposEq ('AR_b y : Qpos) (CR_b (1 # 1) ('y))).
   { unfold QposEq. simpl.
     now rewrite ARtoCR_approximate, <-AR_b_correct. }
-  rewrite H5. reflexivity.
+  apply (CRmult_bounded_wd H5).
 Qed.
 
 Lemma ARmult_scale (x : AQ) (y : AR) :
@@ -227,9 +237,17 @@ Qed.
 
 Instance: SemiRing_Morphism (cast AR CR).
 Proof.
-  repeat (split; try apply _).
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  apply _.
      exact ARtoCR_preserves_plus.
     exact ARtoCR_preserves_0.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  apply _.
    exact ARtoCR_preserves_mult.
   exact ARtoCR_preserves_1.
 Qed.
@@ -239,10 +257,25 @@ Proof. change (SemiRing_Morphism (inverse (cast AR CR))). split; apply _. Qed.
 
 Instance: SemiRing_Morphism (cast AQ AR).
 Proof.
-  repeat (split; try apply _); intros; try reflexivity.
-   apply regFunEq_e. intros ε. apply ball_refl. 
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  apply _.
+   intros. apply regFunEq_equiv, regFunEq_e. intros ε. apply ball_refl. 
    apply (Qpos_nonneg (ε + ε)).
-   rewrite ARmult_scale. apply regFunEq_e. intros ε.
+   apply regFunEq_equiv, regFunEq_e. intros ε.
+   apply ball_refl.
+   apply (Qpos_nonneg (ε + ε)).
+
+  split. apply _. apply _.
+  split. apply _. apply _.
+  split. apply _. apply _.
+  apply _.
+  intros. rewrite ARmult_scale. apply regFunEq_equiv, regFunEq_e. intros ε.
+   apply ball_refl.
+   apply (Qpos_nonneg (ε + ε)).
+   apply regFunEq_equiv, regFunEq_e. intros ε.
    apply ball_refl.
    apply (Qpos_nonneg (ε + ε)).
 Qed.
@@ -489,8 +522,8 @@ Defined.
 Definition ARapartT: AR → AR → Type := λ x y, sum (ARltT x y) (ARltT y x).
 
 Lemma ARapartT_wd : forall x y z t : AR,
-    st_eq x y
-    -> st_eq z t
+    msp_eq x y
+    -> msp_eq z t
     -> ARapartT x z
     -> ARapartT y t.
 Proof.
@@ -764,17 +797,21 @@ Qed.
 
 Lemma ARtoCR_preserves_inv_pos x c : 'ARinv_pos c x = CRinv_pos ('c) ('x).
 Proof.
-  apply regFunEq_e. intros ε. 
+  apply regFunEq_equiv, regFunEq_e. intros ε. 
   simpl. unfold Cjoin_raw. simpl.
   setoid_replace (proj1_sig ε + proj1_sig ε)%Q
     with (proj1_sig ((1#2) * ε + ((1#2) * ε + ε)))%Qpos
     by (unfold equiv, stdlib_rationals.Q_eq; simpl; ring).
   eapply ball_triangle.
    now apply aq_div_dlog2.
+   simpl.
   rewrite aq_preserves_max. 
   rewrite rings.preserves_1.
   rewrite Qmult_1_l.
-  now apply ARtoCR_preserves_inv_pos_aux.
+  change (Qball ( (1 # 2) * ` ε + ` ε)
+                (/ Qmax (' (' c)) (' approximate x (Qinv_modulus (' c) ((1 # 2) ↾ eq_refl * ε))))%mc
+                ( / Qmax (' c) (' approximate x (Qinv_modulus (' c) ε)))).
+  apply (ARtoCR_preserves_inv_pos_aux c x ((1 # 2) * ε)%Qpos).
 Qed.
 Hint Rewrite ARtoCR_preserves_inv_pos : ARtoCR.
 
@@ -864,9 +901,11 @@ Next Obligation. apply AR_apart_apartT. now destruct x. Qed.
 
 Global Instance: Field AR.
 Proof.
-  repeat (split; try apply _).
-    apply (strong_injective (cast AQ AR)).
+  split. apply _. apply _.
+  apply _. apply _.
+    apply (strong_injective (cast AQ AR)). 
     solve_propholds.
+    split. apply _. apply _.
    intros [x Px] [y Py] E.
    now refine (ARinvT_wd _ _ _ _ _).
   intros x.
@@ -883,6 +922,7 @@ Next Obligation.
    intros y.
    rewrite nat_pow.preserves_nat_pow.
    now rewrite (int_pow.int_pow_nat_pow (f:=cast N Z)).
+   apply Qball_0.
   rewrite preserves_pow_pos. aq_preservation. 
 Qed.
 
@@ -899,6 +939,7 @@ Lemma ARtoCR_preserves_power_N (x : AR) (n : N) :
 Proof.
   unfold pow, CRpower_N, ARpower_N.
   rewrite ARtoCR_preserves_power_N_bounded.
+  apply Cmap_wd. 2: reflexivity.
   assert (QposEq (cast (AQ₊) (Q₊) (AR_b x)) (CR_b (1#1) ('x))).
   { unfold QposEq. simpl.
     now rewrite ARtoCR_approximate, <-AR_b_correct. }
@@ -1039,6 +1080,7 @@ Proof.
   destruct aq_dense_embedding.
   specialize (dense_inverse 1 e1).
   simpl in dense_inverse.
+  rewrite Qplus_0_r.
   apply (@ball_weak_le Q_as_MetricSpace (`e1) (`e1+`e2)).
   apply (Qle_trans _ (`e1 + 0)).
   rewrite Qplus_0_r. apply Qle_refl.
@@ -1054,6 +1096,7 @@ Proof.
   intros e1 e2. simpl.
   destruct aq_dense_embedding.
   simpl in dense_inverse.
+  rewrite Qplus_0_r.
   apply (@ball_weak_le Q_as_MetricSpace (`e1) (`e1+`e2)).
   apply (Qle_trans _ (`e1 + 0)).
   rewrite Qplus_0_r. apply Qle_refl.
@@ -1072,9 +1115,12 @@ Proof.
   simpl.
   destruct aq_dense_embedding.
   unfold cast.
+  rewrite Qplus_0_r.
   apply ball_triangle with (b:=q).
   apply dense_inverse.
+  simpl.
   rewrite qreq.
+  change (Qball (` e2) r (AQtoQ (app_inverse AQtoQ r e2))).
   apply ball_sym.
   apply dense_inverse.
 Qed.

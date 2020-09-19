@@ -76,7 +76,7 @@ Proof.
 Qed.
 
 Lemma AReq_nlt : forall a b : AR,
-    st_eq a b
+    msp_eq a b
     <-> (fun x y : AR =>
          (fun x0 y0 : AR => (ARltS y0 x0) -> False) y x /\
          (fun x0 y0 : AR => (ARltS y0 x0) -> False) x y) a b.
@@ -112,7 +112,7 @@ Proof.
   simpl in H5. exact H5.
 Qed.
 
-Lemma AR_zero : st_eq (inject_Q_AR 0) (cast AQ AR zero0).
+Lemma AR_zero : msp_eq (inject_Q_AR 0) (cast AQ AR zero0).
 Proof.
   pose proof (ARtoCR_inject zero0) as H5.
   unfold cast in H5. unfold cast.
@@ -125,7 +125,7 @@ Proof.
   symmetry. apply rings.preserves_0.
 Qed.
 
-Lemma AR_one : st_eq (inject_Q_AR 1) (cast AQ AR one0).
+Lemma AR_one : msp_eq (inject_Q_AR 1) (cast AQ AR one0).
 Proof.
   pose proof (ARtoCR_inject one0) as H5.
   unfold cast in H5. unfold cast.
@@ -358,8 +358,8 @@ Proof.
     rewrite H7.
     apply ucFun2_wd. reflexivity.
     pose proof (ARtoCR_preserves_opp (xn j)).
-    rewrite H8. apply Cmap_wd. apply uc_setoid.
-    reflexivity.
+    rewrite H8. apply Cmap_wd. 
+    reflexivity. reflexivity.
 Qed.
 
 Lemma ARcauchy_complete
@@ -393,7 +393,7 @@ Proof.
     rewrite H8.
     apply ucFun2_wd. reflexivity.
     pose proof (ARtoCR_preserves_opp ('l)).
-    rewrite H9. apply Cmap_wd. apply uc_setoid.
+    rewrite H9. apply Cmap_wd. reflexivity.
     symmetry. apply CRAR_id. 
   - rewrite <- ARtoCR_preserves_abs.
     symmetry. apply CRAR_id.

@@ -73,7 +73,17 @@ Instance inverse_Q_bigQ: AppInverse (cast bigQ Q_as_MetricSpace) := λ x ε, 'x.
 Instance: DenseEmbedding (cast bigQ Q_as_MetricSpace).
 Proof.
   split; try apply _.
-  intros. unfold app_inverse, inverse_Q_bigQ.
+  - Set Printing Implicit.
+    assert ( @Injective bigQ Q_as_MetricSpace BigQ_Rationals.QType_equiv
+                        Qeq
+    (@cast bigQ Q_as_MetricSpace BigQ_Rationals.inject_QType_Q)).
+    { apply _. }
+    destruct H. split. 
+    intros. apply Qball_0 in H. apply injective, H.
+    split. apply _. apply _. 
+    intros x y xyeq. apply Qball_0.
+    destruct injective_mor. apply sm_proper, xyeq.
+  - intros. unfold app_inverse, inverse_Q_bigQ.
   rewrite (rationals.morphisms_involutive _ _).
   apply ball_refl. apply QposMinMax.Qpos_nonneg.
 Qed.

@@ -93,9 +93,11 @@ Variable f : PartFunct IR.
 Hypothesis Hf : Continuous I f.
 
 Variable g : CR --> CR.
-Hypothesis Hg : forall (q:Q) Hq, I (inj_Q IR q) -> (g (' q) == IRasCR (f (inj_Q IR q) Hq))%CR.
+Hypothesis Hg : forall (q:Q) Hq,
+    I (inj_Q IR q) -> (g (' q) == IRasCR (f (inj_Q IR q) Hq))%CR.
 
-Lemma ContinuousCorrect : forall (x:IR) Hx, I x -> (IRasCR (f x Hx) == g (IRasCR x))%CR.
+Lemma ContinuousCorrect : forall (x:IR) Hx,
+    I x -> (IRasCR (f x Hx) == g (IRasCR x))%CR.
 Proof.
  intros x Hx H.
  set (J:=compact_in_interval I HI x H).

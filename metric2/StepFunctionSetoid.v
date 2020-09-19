@@ -31,50 +31,26 @@ Set Automatic Introduction.
 
 Local Open Scope Q_scope.
 
-Section StepF_Functions.
-
-Variable X : RSetoid.
 
 (**
 ** Step Functions over setoids
+
 In this section we redevelop step functions over a setoid X.
-Here we shadow the old Step Function operations to operate over
-setoids.
+The applicative functor StepF lifts equivalence relations (setoids).
+When type X has an equivalence relation eqX, then StepF X inherits
+an equivalence relation StepF_eq, by checking that the leaf values in X
+are equivalent for each rational argument. Moreover, a morphism f : X --> Y
+lifts to a morphism map StepF f : StepF X --> StepF Y.
+In other words, StepF is an endofunctor of the category of setoids.
+
 *)
 
-Definition StepF := StepF X.
-
-(** We lift the constructors and destructors to the setoid version *)
-Definition constStepF : X -> StepF := (@constStepF X).
-
-Definition glue : OpenUnit -> StepF -> StepF -> StepF := (@glue X).
-
-Lemma StepF_ind : forall (P : StepF -> Prop),
-       (forall x : X, P (constStepF x)) ->
-       (forall (o : OpenUnit) (s : StepF),
-        P s -> forall s0 : StepF, P s0 -> P (glue o s s0)) ->
-       forall s : StepF, P s.
-Proof.
- intros P H0 H1 s.
- induction s.
-  apply H0.
- apply H1; auto.
-Qed.
-
-Definition StepFfold  : forall Y, (X -> Y) -> (OpenUnit -> Y -> Y -> Y) -> StepF -> Y := (@StepFfold X).
-Definition Mirror : StepF -> StepF := (@Mirror X).
-Definition SplitL : StepF -> OpenUnit -> StepF := (@SplitL X).
-Definition SplitR : StepF -> OpenUnit -> StepF := (@SplitR X).
-End StepF_Functions.
-
-(* begin hide *)
-Arguments constStepF [X].
-(* end hide *)
 Local Open Scope setoid_scope.
 
 (** We lift ap to the setoid version.  Map is a notation calling ap so
-that all lemmas about ap automatically apply to ap *)
-Definition Ap (X Y : RSetoid) : (StepF (X --> Y))->(StepF X)->(StepF Y) := fun f x => (@Ap X Y (StepFunction.Map (@evalMorphism X Y) f) x).
+that all lemmas about ap automatically apply to Map. *)
+Definition Ap (X Y : RSetoid) : (StepF (X --> Y))->(StepF X)->(StepF Y)
+  := fun f x => (@Ap X Y (StepFunction.Map (@evalMorphism X Y) f) x).
 Notation "f <@> x" := (Ap f x) (at level 15, left associativity) : sfstscope.
 Notation "f ^@> x" := (Ap (constStepF f) x) (at level 15, left associativity) : sfstscope.
 Notation "f <@^ x" := (Ap f (constStepF x)) (at level 15, left associativity) : sfstscope.
@@ -112,62 +88,15 @@ Proof.
  intros X Y fl fr o l r.
  unfold Ap.
  simpl (StepFunction.Map (@evalMorphism X Y) (glue o fl fr)).
- unfold glue.
  rewrite ApGlueGlue.
  reflexivity.
-Qed.
-
-Lemma SplitLGlue : forall (X : RSetoid) (x y : StepF X) (o : OpenUnit),
-       SplitL (glue o x y) o = x.
-Proof.
- intros X.
- exact (@SplitLGlue X).
-Qed.
-
-Lemma SplitRGlue : forall (X : RSetoid) (x y : StepF X) (o : OpenUnit),
-       SplitR (glue o x y) o = y.
-Proof.
- intros X.
- exact (@SplitRGlue X).
-Qed.
-
-Lemma SplitLR_glue_ind : forall (X : RSetoid) (s1 s2 : StepF X) (a b : OpenUnit)
-         (P : StepF X -> StepF X -> Prop),
-       (forall H : a < b,
-        P (SplitL s1 (OpenUnitDiv a b H)) (glue (OpenUnitDualDiv b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
-       (forall H : b < a,
-        P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitDualDiv a b H))) (SplitR s2 (OpenUnitDualDiv a b H))) ->
-       (a == b -> P s1 s2) -> P (SplitL (glue b s1 s2) a) (SplitR (glue b s1 s2) a).
-Proof.
- intros X.
- exact (@SplitLR_glue_ind X).
-Qed.
-
-Lemma SplitL_glue_ind : forall (X : RSetoid) (s1 s2 : StepF X) (a b : OpenUnit)
-         (P : StepF X -> Prop),
-       (forall H : a < b, P (SplitL s1 (OpenUnitDiv a b H))) ->
-       (forall H : b < a, P (glue (OpenUnitDiv b a H) s1 (SplitL s2 (OpenUnitDualDiv a b H)))) ->
-       (a == b -> P s1) -> P (SplitL (glue b s1 s2) a).
-Proof.
- intros X.
- exact (@SplitL_glue_ind X).
-Qed.
-
-Lemma SplitR_glue_ind : forall (X : RSetoid) (s1 s2 : StepF X) (a b : OpenUnit)
-         (P : StepF X -> Prop),
-       (forall H : a < b, P (glue (OpenUnitDualDiv b a H) (SplitR s1 (OpenUnitDiv a b H)) s2)) ->
-       (forall H : b < a, P (SplitR s2 (OpenUnitDualDiv a b H))) ->
-       (a == b -> P s2) -> P (SplitR (glue b s1 s2) a).
-Proof.
- intros X.
- exact (@SplitR_glue_ind X).
 Qed.
 
 Lemma SplitLMap : forall (X Y : RSetoid) (x : StepF X) (a : OpenUnit) (f : X --> Y),
        SplitL (f ^@> x) a = f ^@> (SplitL x a).
 Proof.
  intros X Y x a f.
- unfold Ap, SplitL.
+ unfold Ap.
  simpl.
  rewrite SplitLMap.
  reflexivity.
@@ -177,27 +106,26 @@ Lemma SplitRMap : forall (X Y : RSetoid) (x : StepF X) (a : OpenUnit) (f : X -->
        SplitR (f ^@> x) a = f ^@> (SplitR x a).
 Proof.
  intros X Y x a f.
- unfold Ap, SplitR.
+ unfold Ap.
  simpl.
  rewrite SplitRMap.
  reflexivity.
 Qed.
 
 Section EquivalenceA.
-Variable X : RSetoid.
 (** A step function over [Prop], a characteristic function, can be
 folded into [Prop], which holds for the always true characteristic
 function *)
 Definition StepFfoldProp : StepF iffSetoid -> Prop := (StepFfold (X:=iffSetoid) (fun x => x ) (fun _ a b => a /\ b )).
 
-Definition st_eqS0 : X -> X --> iffSetoid.
+Definition st_eqS0 {X : RSetoid} : X -> X --> iffSetoid.
 Proof.
  intros x.
  exists (st_eq x).
  abstract ( intros x1 x2 Hx; simpl; rewrite -> Hx; reflexivity).
 Defined.
 
-Definition st_eqS : X --> X --> iffSetoid.
+Definition st_eqS {X : RSetoid} : X --> X --> iffSetoid.
 Proof.
  exists (st_eqS0).
  abstract ( intros x1 x2 Hx y; simpl; rewrite -> Hx; reflexivity).
@@ -210,25 +138,28 @@ The results is a characteristic function saying where two step functions
 are equivalent.  The step functions are considered equivalent if this
 characteristic function says they are equivalent everywhere.
 *)
-Definition StepF_eq (f g:StepF X):Prop:=
+Definition StepF_eq {X : RSetoid} (f g:StepF X):Prop:=
 (StepFfoldProp (st_eqS ^@> f <@> g)).
 
 Notation "x === y" := (StepF_eq x y) (at level 70).
 
 (** With equality defined we can complete the proof that split is the
 opposite of glue *)
-Lemma glue_StepF_eq:forall (s:StepF X) (s1 s2:StepF X), forall a, s1 === (SplitL s a) -> s2 === (SplitR s a) -> (glue a s1 s2) === s.
+Lemma glue_StepF_eq :
+  forall {X : RSetoid} (s:StepF X) (s1 s2:StepF X),
+  forall a, s1 === (SplitL s a) -> s2 === (SplitR s a) -> (glue a s1 s2) === s.
 Proof.
- intros s s1 s2 a H0 H1.
+ intros X s s1 s2 a H0 H1.
  unfold StepF_eq.
  rewrite MapGlue.
  rewrite ApGlue.
  split; assumption.
 Qed.
 
-Lemma glue_eq_ind : forall (s1 s2 s:StepF X) a (P:Prop), (s1 === SplitL s a -> s2 === SplitR s a -> P) -> (glue a s1 s2 === s) -> P.
+Lemma glue_eq_ind : forall {X : RSetoid} (s1 s2 s:StepF X) a (P:Prop),
+    (s1 === SplitL s a -> s2 === SplitR s a -> P) -> (glue a s1 s2 === s) -> P.
 Proof.
- intros s1 s2 s a P H H0.
+ intros X s1 s2 s a P H H0.
  unfold StepF_eq in *.
  rewrite -> MapGlue in *.
  rewrite ApGlue in H0.
@@ -236,9 +167,9 @@ Proof.
  auto.
 Qed.
 (** The equivalence relation is reflexive *)
-Lemma StepF_eq_refl:forall x : StepF X, x === x.
+Lemma StepF_eq_refl : forall {X : RSetoid} (x : StepF X), x === x.
 Proof.
- induction x using StepF_ind.
+ intro X. induction x.
   change (st_eq x x).
   reflexivity.
  apply glue_StepF_eq.
@@ -249,9 +180,10 @@ Qed.
 Hint Resolve StepF_eq_refl.
 (* end hide *)
 (** StepF_Qeq is a refinement of any setoid equality *)
-Lemma StepF_Qeq_eq : forall (s t:StepF X), (StepF_Qeq s t) -> s === t.
+Lemma StepF_Qeq_eq : forall {X : RSetoid} (s t:StepF X), (StepF_Qeq s t) -> s === t.
 Proof.
- induction s using StepF_ind; induction t using StepF_ind; try contradiction; simpl.
+  intro X.
+  induction s; induction t; try contradiction; simpl.
   intros H.
   rewrite H.
   auto with *.
@@ -263,9 +195,10 @@ Proof.
  apply SplitR_glue_ind; intros H2; try (elim (Qlt_not_le _ _ H2); rewrite -> H); auto with *.
 Qed.
 
-Lemma glueSplit:forall (s : StepF X), forall a, (glue a (SplitL s a) (SplitR s a)) === s.
+Lemma glueSplit : forall {X : RSetoid} (s : StepF X),
+    forall a, (glue a (SplitL s a) (SplitR s a)) === s.
 Proof.
- intros s a.
+ intros X s a.
  apply glue_StepF_eq; auto with *.
 Qed.
 
@@ -283,7 +216,7 @@ Lemma Map_resp_StepF_eq: forall f:X-->Y,
     forall s t:(StepF X), s == t -> (f ^@> s) == (f ^@> t).
 Proof.
  intros f H.
- induction s using StepF_ind. induction t using StepF_ind.
+ induction s. induction t.
   unfold StepF_eq, Map2, StepFfoldProp ;simpl;auto with *.
   unfold StepF_eq, Map2, StepFfoldProp. simpl;  intuition.
   intros t H0.
@@ -306,7 +239,7 @@ End EquivalenceB.
 Lemma StepFfoldPropglue:forall (y:StepF iffSetoid) o,
  StepFfoldProp (glue o (SplitL y o) (SplitR y o)) <-> StepFfoldProp y.
 Proof.
- induction y using StepF_ind.
+ induction y.
   unfold StepF_eq, StepFfoldProp.
   simpl; tauto.
  simpl.
@@ -324,7 +257,7 @@ Lemma StepFfoldProp_morphism:forall x y:(StepF iffSetoid),
   (StepF_eq x y) ->
   ((StepFfoldProp x)<->(StepFfoldProp y)).
 Proof.
- induction x using StepF_ind. induction y using StepF_ind.
+ induction x. induction y.
   auto with *.
   unfold StepF_eq. simpl. unfold StepFfoldProp;simpl;intuition.
   intros y H0.
@@ -364,12 +297,12 @@ Hint Resolve StepF_Qeq_eq StepF_Qeq_refl SplitL_resp_Qeq SplitR_resp_Qeq.
 (* end hide *)
 Lemma StepF_eq_resp_Qeq : forall (s t : StepF X) u v, (StepF_Qeq s t) -> (StepF_Qeq u v) -> s == u -> t == v.
 Proof.
- induction s using StepF_ind; induction t using StepF_ind; try contradiction.
+ induction s; induction t; try contradiction.
   intros u v Hst Huv Hsu.
   simpl in Hst.
   unfold StepF_eq in *.
   rewrite <- Hst.
-  rewrite <- (StepFfoldProp_morphism ((st_eqS X) ^@> constStepF x <@> u)); auto.
+  rewrite <- (StepFfoldProp_morphism ((st_eqS) ^@> constStepF x <@> u)); auto.
   apply: (Map_resp_StepF_eq); auto with *.
   intros a b Hab.
   simpl.
@@ -394,8 +327,8 @@ Qed.
 
 Lemma Mirror_eq_Mirror : forall (s t : StepF X), Mirror s == Mirror t <-> s == t.
 Proof.
- induction s using StepF_ind.
-  induction t using StepF_ind; simpl.
+ induction s.
+  induction t; simpl.
    reflexivity.
   change (constStepF x == (Mirror t2) /\ constStepF x == (Mirror t1) <-> constStepF x == t1 /\ constStepF x == t2).
   tauto.
@@ -424,10 +357,10 @@ Qed.
 
 Lemma SplitL_resp_Xeq : forall (s1 s2 : StepF X) a, s1 == s2 -> SplitL s1 a == SplitL s2 a.
 Proof.
- induction s1 using StepF_ind.
+ induction s1.
   intros s2 a H.
   unfold StepF_eq in *.
-  change (StepFfoldProp ((st_eqS X x:X-->iffSetoid) ^@> SplitL s2 a)).
+  change (StepFfoldProp ((st_eqS x:X-->iffSetoid) ^@> SplitL s2 a)).
   rewrite <- SplitLMap.
   apply StepFfoldPropSplitL.
   assumption.
@@ -445,9 +378,6 @@ Proof.
   apply StepF_eq_resp_Qeq with (SplitL s1_2 (OpenUnitDualDiv a o Hao)) (SplitL (SplitR s2 o) (OpenUnitDualDiv a o Hao)); auto.
   apply SplitLSplitR; simpl; field; auto with *.
  apply StepF_eq_resp_Qeq with s1_1 (SplitL s2 o); auto with *.
- apply SplitL_resp_Qeq; auto.
- symmetry.
- assumption.
 Qed.
 
 Lemma SplitR_resp_Xeq : forall (s1 s2:StepF X) a, s1 == s2 -> SplitR s1 a == SplitR s2 a.
@@ -465,9 +395,9 @@ Qed.
 (** equalitiy is transitive *)
 Lemma StepF_eq_trans:forall x y z : StepF X, x == y -> y == z -> x == z.
 Proof.
- induction x using StepF_ind. intros.
+ induction x. intros.
   unfold StepF_eq in *.
-  set (A:=((st_eqS X:X-->X-->iffSetoid) ^@> constStepF x)) in *.
+  set (A:=((st_eqS :X-->X-->iffSetoid) ^@> constStepF x)) in *.
   rewrite <- (StepFfoldProp_morphism (A <@> y)); auto with *.
   apply: (Map_resp_StepF_eq); auto with *.
   intros a b Hab.
@@ -503,7 +433,7 @@ Lemma StepF_eq_sym :forall x y: StepF X, x == y -> y == x.
 Proof.
  intros x y.
  revert x.
- induction y using StepF_ind.
+ induction y.
   unfold StepF_eq. simpl. intro x0. induction x0.
   unfold StepFfoldProp. simpl. intros. symmetry; assumption.
    simpl. unfold StepFfoldProp; simpl; intuition; auto with *.
@@ -517,7 +447,7 @@ Qed.
 
 End EquivalenceC.
 (* begin hide *)
-Add Parametric Relation X : (StepF X) (@StepF_eq X)
+Add Parametric Relation (X : RSetoid) : (StepF X) (@StepF_eq X)
  reflexivity proved by (@StepF_eq_refl X)
  symmetry proved by (@StepF_eq_sym X)
  transitivity proved by (@StepF_eq_trans X)
@@ -535,6 +465,7 @@ Qed.
 Lemma StepF_Sth (X : RSetoid) : (Setoid_Theory (StepF X) (@StepF_eq X)).
  split; unfold Reflexive, Symmetric, Transitive; eauto with sfarith.
 Qed.
+
 (**
 ** Common subdivision view
 This lemma allows to do induction over two step function as if the
@@ -549,8 +480,8 @@ Lemma StepF_ind2 : forall (X Y : RSetoid) (P : StepF X -> StepF Y -> Prop),
        forall (s:StepF X) (t:StepF Y), P s t.
 Proof.
  intros X Y P wd c0 c1.
- induction s using StepF_ind.
-  induction t using StepF_ind.
+ induction s.
+  induction t.
    apply c0.
   apply wd with (s:=(glue o (constStepF x) (constStepF x))) (t:=glue o t1 t2); try reflexivity.
    apply (glueSplit (constStepF x) o).
@@ -562,7 +493,7 @@ Proof.
  apply c1; auto.
 Qed.
 
-Lemma glue_injl X :forall o (x y x1 y1:StepF X),
+Lemma glue_injl {X : RSetoid} :forall o (x y x1 y1:StepF X),
 (glue o x y)==(glue o x1 y1) -> (x==x1).
 Proof.
  intros.
@@ -571,7 +502,7 @@ Proof.
  assumption.
 Qed.
 
-Lemma glue_injr X :forall o (x y x1 y1:StepF X),
+Lemma glue_injr {X:RSetoid} :forall o (x y x1 y1:StepF X),
 (glue o x y)==(glue o x1 y1) -> (y==y1).
 Proof.
  intros.
@@ -581,7 +512,7 @@ Proof.
 Qed.
 
 (** Decompose an equality over glue into two parts *)
-Lemma eq_glue_ind X : forall (s1 s2 s : StepF X) (a : OpenUnit) (P : Prop),
+Lemma eq_glue_ind {X : RSetoid} : forall (s1 s2 s : StepF X) (a : OpenUnit) (P : Prop),
        ((SplitL s a) == s1 -> (SplitR s a) == s2 -> P) ->
        s == (glue a s1 s2) -> P.
 Proof.
@@ -592,7 +523,7 @@ Proof.
  auto.
 Qed.
 
-Lemma MirrorSplitR X : forall (s : StepF X) (a b : OpenUnit),
+Lemma MirrorSplitR {X : RSetoid} : forall (s : StepF X) (a b : OpenUnit),
   (b == OpenUnitDual a)%Q ->
   (Mirror (SplitR s a)) == (SplitL (Mirror s) b).
 Proof.
@@ -601,7 +532,7 @@ Proof.
  apply MirrorSplitR_Qeq; auto with *.
 Qed.
 
-Lemma MirrorSplitL X : forall (s : StepF X) (a b : OpenUnit),
+Lemma MirrorSplitL {X : RSetoid} : forall (s : StepF X) (a b : OpenUnit),
   (b == OpenUnitDual a)%Q ->
   (Mirror (SplitL s a)) == (SplitR (Mirror s) b).
 Proof.
@@ -617,7 +548,7 @@ Lemma SplitRAp :forall (X Y : RSetoid) (f : StepF (Y --> X)) (s : StepF Y) (o : 
 Proof.
  intros X Y f s o.
  apply StepF_Qeq_eq; auto with *.
- unfold Ap, SplitR.
+ unfold Ap.
  rewrite <- StepFunction.SplitRMap.
  apply SplitRAp_Qeq.
 Qed.
@@ -627,7 +558,7 @@ Lemma SplitLAp :forall (X Y : RSetoid) (f : StepF (Y --> X)) (s : StepF Y) (o : 
 Proof.
  intros X Y f s o.
  apply StepF_Qeq_eq; auto with *.
- unfold Ap, SplitL.
+ unfold Ap.
  rewrite <- StepFunction.SplitLMap.
  apply SplitLAp_Qeq.
 Qed.
@@ -667,11 +598,11 @@ Qed.
 Add Parametric Morphism X Y : (@Ap X Y) with signature (@StepF_eq (extSetoid X Y)) ==> (@StepF_eq X) ==> (@StepF_eq Y) as Ap_wd.
 Proof.
  intros f.
- induction f using StepF_ind; intros g Hfg.
-  induction g using StepF_ind; intros x1.
+ induction f; intros g Hfg.
+  induction g; intros x1.
    simpl.
-   induction x1 using StepF_ind; intros x2.
-    induction x2 using StepF_ind.
+   induction x1; intros x2.
+    induction x2.
      intros H.
      transitivity (x ^@> (constStepF x2)).
       destruct x as [x Hx].
@@ -737,19 +668,19 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Map_identity X : forall (a:StepF X),
+Lemma Map_identity (X : RSetoid) : forall (a:StepF X),
  (@id X) ^@> a == a.
 Proof.
  intros a.
  now rewrite <-(Map_identity a) at 2.
 Qed.
 
-Lemma Map_composition X Y Z: forall (a:StepF (Y-->Z)) (b:StepF (X-->Y)) (c:StepF X),
+Lemma Map_composition (X Y Z : RSetoid) : forall (a:StepF (Y-->Z)) (b:StepF (X-->Y)) (c:StepF X),
  ((@compose X Y Z) ^@> a <@> b <@> c) == (a <@> (b <@> c)).
 Proof.
- induction a using StepF_ind.
+ induction a.
   simpl.
-  apply StepF_ind2; auto with *.
+  apply (StepF_ind2 (X --> Y) X); auto with *.
    intros s s0 t t0 Hs Ht.
    rewrite -> Hs, Ht.
    auto.
@@ -777,7 +708,7 @@ Qed.
 step functions.  Hence all of the lambda calculus lifts to operate
 over step functions.  Step functions form about a nice of an
 applicative functor as is possible. *)
-Lemma Map_discardable X Y : forall (a:StepF X) (b:StepF Y),
+Lemma Map_discardable (X Y : RSetoid) : forall (a:StepF X) (b:StepF Y),
  ((@const _ _) ^@> a <@> b == a).
 Proof.
  apply StepF_ind2; auto with *.
@@ -792,7 +723,7 @@ Qed.
 Lemma Map_commutative W X Y : forall (f:StepF (W --> X --> Y)) (x:StepF X) (w:StepF W),
  ((@flip _ _ _) ^@> f <@> x <@> w) == (f <@> w <@> x).
 Proof.
- induction f using StepF_ind.
+ induction f.
   simpl.
   apply StepF_ind2; auto with *.
    intros s s0 t t0 Hs Ht.
@@ -863,7 +794,7 @@ Lemma StepFfoldPropForall_Ap :
 Proof.
  intros X f x H.
  revert f H.
- induction x using StepF_ind.
+ induction x.
   intros f H.
   apply H.
  intros f H.
@@ -956,7 +887,7 @@ Lemma StepF_imp_imp:forall x y:(StepF iffSetoid),
   (StepF_imp x y) ->
   ((StepFfoldProp x)->(StepFfoldProp y)).
 Proof.
- induction x using StepF_ind. induction y  using StepF_ind.
+ induction x. induction y.
   auto with *.
   unfold StepF_imp. unfold StepFfoldProp;simpl;intuition.
   intros y.

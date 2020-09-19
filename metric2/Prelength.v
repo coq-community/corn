@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.metric2.Complete.
@@ -323,11 +322,13 @@ Definition Cmap : (Complete X) --> (Complete Y) :=
 Build_UniformlyContinuousFunction Cmap_prf.
 
 (** [Cmap] is equivalent to the original [Cmap_slow] *)
-Lemma Cmap_correct : st_eq Cmap (Cmap_slow f).
+Lemma Cmap_correct : msp_eq Cmap (Cmap_slow f).
 Proof.
+  apply ucEq_equiv.
  intros x e1 e2.
  simpl.
  unfold Cmap_slow_raw.
+ rewrite Qplus_0_r.
  apply (@mu_sum X plX Y e2 (e1::nil)).
  simpl.
  destruct (mu f e1) as [d1|]; try constructor.
@@ -339,7 +340,7 @@ Proof.
  apply Qmult_le_r. apply Qpos_ispos. discriminate.
 Qed.
 
-Lemma Cmap_fun_correct : forall x, st_eq (Cmap_fun x) (Cmap_slow_fun f x).
+Lemma Cmap_fun_correct : forall x, msp_eq (Cmap_fun x) (Cmap_slow_fun f x).
 Proof.
  apply Cmap_correct.
 Qed.
@@ -353,16 +354,32 @@ Variable X Y Z : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
 Hypothesis plY : PrelengthSpace Y.
 
-Notation "a =m b" := (st_eq a b)  (at level 70, no associativity).
+Notation "a =m b" := (msp_eq a b)  (at level 70, no associativity).
 
 Lemma fast_MonadLaw1 a : Cmap plX (uc_id X) a =m a.
-Proof. rewrite Cmap_correct. apply MonadLaw1. Qed.
+Proof.
+  destruct (Cmap_correct plX (uc_id X)).
+  rewrite H0. apply MonadLaw1.
+Qed.
 
-Lemma fast_MonadLaw2 (f:Y --> Z) (g:X --> Y) a : Cmap plX (uc_compose f g) a =m (Cmap plY f (Cmap plX g a)).
-Proof. do 3 rewrite Cmap_correct. simpl. apply MonadLaw2. Qed.
+Lemma fast_MonadLaw2 (f:Y --> Z) (g:X --> Y) a
+  : Cmap plX (uc_compose f g) a =m (Cmap plY f (Cmap plX g a)).
+Proof.
+  destruct (Cmap_correct plX (f ∘ g)).
+  rewrite H0. clear H0 H.
+  destruct (Cmap_correct plY f).
+  rewrite H0. clear H0 H.
+  destruct (Cmap_correct plX g).
+  rewrite H0. clear H0 H.
+  apply MonadLaw2.
+Qed.
 
 Lemma fast_MonadLaw3 (f:X --> Y) a : Cmap plX f (Cunit a) =m Cunit (f a).
-Proof. rewrite Cmap_correct. simpl. apply MonadLaw3. Qed.
+Proof.
+  destruct (Cmap_correct plX f).
+  rewrite H0. clear H0 H.
+  apply MonadLaw3.
+Qed.
 
 (* State them all in such a shape some day... *)
 
@@ -373,16 +390,17 @@ Local Open Scope uc_scope.
 (** [Cmap] preserves extensional equality *)
 
 Lemma map_eq_complete {X Y : MetricSpace} {plX : PrelengthSpace X} (f g : X --> Y) :
-  (forall x : X, st_eq (f x) (g x))
-  -> (forall x : Complete X, st_eq (Cmap plX f x) (Cmap plX g x)).
+  (forall x : X, msp_eq (f x) (g x))
+  -> (forall x : Complete X, msp_eq (Cmap plX f x) (Cmap plX g x)).
 Proof.
-intros A x. apply lift_eq_complete. intro y. rewrite !fast_MonadLaw3, A. reflexivity.
+  intros A x. apply lift_eq_complete. intro y.
+  rewrite fast_MonadLaw3, fast_MonadLaw3, A. reflexivity.
 Qed.
 
 (** Similarly we define a new Cbind *)
 Definition Cbind X Y plX (f:X-->Complete Y) := uc_compose Cjoin (Cmap plX f).
 
-Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), st_eq (Cbind plX f) (Cbind_slow f).
+Lemma Cbind_correct : forall X Y plX (f:X-->Complete Y), msp_eq (Cbind plX f) (Cbind_slow f).
 Proof.
  unfold Cbind, Cbind_slow.
  intros X Y plX f.
@@ -390,7 +408,8 @@ Proof.
  reflexivity.
 Qed.
 
-Lemma Cbind_fun_correct : forall X Y plX (f:X-->Complete Y) x, st_eq (Cbind plX f x) (Cbind_slow f x).
+Lemma Cbind_fun_correct : forall X Y plX (f:X-->Complete Y) x,
+    msp_eq (Cbind plX f x) (Cbind_slow f x).
 Proof.
  apply Cbind_correct.
 Qed.
@@ -408,10 +427,15 @@ Qed.
 Definition Cmap_strong X Y plX : (X --> Y) --> (Complete X --> Complete Y) :=
 Build_UniformlyContinuousFunction (@Cmap_strong_prf X Y plX).
 
-Lemma Cmap_strong_correct : forall X Y plX, st_eq (@Cmap_strong X Y plX) (@Cmap_strong_slow X Y).
+Lemma Cmap_strong_correct : forall X Y plX,
+    msp_eq (@Cmap_strong X Y plX) (@Cmap_strong_slow X Y).
 Proof.
- intros X Y plX.
- refine (Cmap_correct _).
+  intros X Y plX.
+  split. apply Qle_refl.
+  intro f. 
+  destruct (Cmap_correct plX f) as [_ H0].
+  split. apply Qle_refl.
+  intro x. apply H0.
 Qed.
 
 (** Similarly we define a new Cap *)
@@ -449,7 +473,7 @@ Definition Cap_fun X Y plX (f:Complete (X --> Y)) (x:Complete X) : Complete Y :=
 Build_RegularFunction (Cap_fun_prf plX f x).
 
 Lemma Cap_fun_correct : forall X Y plX (f:Complete (X --> Y)) x,
-    st_eq (Cap_fun plX f x) (Cap_slow_fun f x).
+    msp_eq (Cap_fun plX f x) (Cap_slow_fun f x).
 Proof.
  intros X Y plX f x e1 e2.
  pose (exist (Qlt 0) (1#2) eq_refl) as half.
@@ -457,6 +481,7 @@ Proof.
  unfold Cap_raw, Cap_slow_raw.
  set (e1':=(half * e1)%Qpos).
  set (e2':=(half * e2)%Qpos).
+ rewrite Qplus_0_r.
  change (ball (proj1_sig e1 + proj1_sig e2) (approximate (Cmap plX (approximate f (half * e1)%Qpos) x) e1')
    (approximate (Cmap_slow (approximate f (half * e2)%Qpos) x) e2')).
  setoid_replace (proj1_sig e1 + proj1_sig e2)
@@ -501,9 +526,11 @@ Qed.
 Definition Cap_weak X Y plX (f:Complete (X --> Y)) : Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction (Cap_weak_prf plX f).
 
-Lemma Cap_weak_correct : forall X Y plX (f:Complete (X --> Y)), st_eq (Cap_weak plX f) (Cap_weak_slow f).
+Lemma Cap_weak_correct : forall X Y plX (f:Complete (X --> Y)),
+    msp_eq (Cap_weak plX f) (Cap_weak_slow f).
 Proof.
- intros. refine (Cap_fun_correct _ _).
+  intros. split. apply Qle_refl.
+  apply (Cap_fun_correct plX f).
 Qed.
 
 Lemma Cap_prf X Y plX : is_UniformlyContinuousFunction (@Cap_weak X Y plX) Qpos2QposInf.
@@ -517,18 +544,19 @@ Qed.
 Definition Cap X Y plX : Complete (X --> Y) --> Complete X --> Complete Y :=
 Build_UniformlyContinuousFunction (Cap_prf plX).
 
-Lemma Cap_correct : forall X Y plX, st_eq (Cap Y plX) (Cap_slow X Y).
+Lemma Cap_correct : forall X Y plX, msp_eq (Cap Y plX) (Cap_slow X Y).
 Proof.
- intros. refine (Cap_fun_correct _).
+  intros. split. apply Qle_refl.
+  intro f. split. apply Qle_refl.
+  apply (Cap_fun_correct plX f).
 Qed.
 
 (* begin hide *)
 Add Parametric Morphism X Y plX : (@Cmap_fun X Y plX)
-    with signature (@ucEq _ _) ==> (@st_eq (Complete X)) ==> (@st_eq (Complete Y))
+    with signature (@msp_eq _) ==> (@msp_eq (Complete X)) ==> (@msp_eq (Complete Y))
       as Cmap_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
- change (st_eq (Cmap_fun plX x1 y1) (Cmap_fun plX x2 y2)).
  rewrite -> Cmap_fun_correct.
  set (a:=(Cmap_slow_fun x1 y1)).
  rewrite -> Cmap_fun_correct.
@@ -538,24 +566,25 @@ Qed.
 Lemma Cmap_wd_loc
   : forall (X Y : MetricSpace) (plX : PrelengthSpace X)
       (f g : X --> Y) (x : Complete X) (e : Qpos),
-    (forall a : X, ball (proj1_sig e) (Cunit a) x -> st_eq (f a) (g a)) ->
-    st_eq (Cmap_fun plX f x) (Cmap_fun plX g x).
+    (forall a : X, ball (proj1_sig e) (Cunit a) x -> msp_eq (f a) (g a)) ->
+    msp_eq (Cmap_fun plX f x) (Cmap_fun plX g x).
 Proof.
   intros. rewrite Cmap_fun_correct.
   rewrite Cmap_fun_correct.
   apply Cmap_slow_wd_loc with (e:=e). exact H.
 Qed. 
 
-Add Parametric Morphism X Y H : (@Cap_weak X Y H) with signature (@st_eq _) ==> (@st_eq _) as Cap_weak_wd.
+Add Parametric Morphism X Y H : (@Cap_weak X Y H)
+    with signature (@msp_eq _) ==> (@msp_eq _) as Cap_weak_wd.
 Proof.
  intros x1 x2 Hx.
  apply (@uc_wd _ _ (Cap Y H));assumption.
 Qed.
 
-Add Parametric Morphism X Y H : (@Cap_fun X Y H) with signature (@st_eq _) ==> (@st_eq _) ==> (@st_eq _) as Cap_wd.
+Add Parametric Morphism X Y H : (@Cap_fun X Y H)
+    with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _) as Cap_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
- change (st_eq (Cap_fun H x1 y1) (Cap_fun H x2 y2)).
  transitivity (Cap_fun H x1 y2).
   apply (@uc_wd _ _ (Cap_weak H x1) _ _ Hy).
  generalize y2.

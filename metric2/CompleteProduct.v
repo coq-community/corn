@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Export CoRN.metric2.ProductMetric.
 Require Export CoRN.metric2.Complete.
 
@@ -140,24 +139,27 @@ Definition Couple : (ProductMS (Complete X) (Complete Y)) --> (Complete (Product
 Build_UniformlyContinuousFunction Couple_uc.
 
 Lemma CoupleCorrect1 : forall p,
-st_eq (Couple ((Cfst p), (Csnd p))) p.
+msp_eq (Couple ((Cfst p), (Csnd p))) p.
 Proof.
  intros p e1 e2.
+ rewrite Qplus_0_r.
  destruct (regFun_prf p e1 e2).
  split; simpl; auto.
 Qed.
 
 Lemma CoupleCorrect2 : forall p q,
-st_eq (Cfst (Couple (p,q))) p.
+msp_eq (Cfst (Couple (p,q))) p.
 Proof.
  intros p q e1 e2.
+ rewrite Qplus_0_r.
  apply (regFun_prf p e1 e2).
 Qed.
 
 Lemma CoupleCorrect3 : forall p q,
-st_eq (Csnd (Couple (p,q))) q.
+msp_eq (Csnd (Couple (p,q))) q.
 Proof.
  intros p q e1 e2.
+ rewrite Qplus_0_r.
  apply (regFun_prf q e1 e2).
 Qed.
 

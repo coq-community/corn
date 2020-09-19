@@ -1,4 +1,3 @@
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import
  Unicode.Utf8
@@ -93,15 +92,15 @@ Section contents.
     set (/ (fst p - fst q)). ring.
    rewrite divdiff_e.
    set (' (/ (fst a - fst b))).
-   transitivity ((c * divdiff (a ::: xs) - c * divdiff (b ::: xs)) * s). ring.
+   transitivity ((c * divdiff (a ::: xs) - c * divdiff (b ::: xs)) * m). ring.
    rewrite IHxs, IHxs0.
    symmetry. rewrite divdiff_e.
-   simpl. fold s. ring.
+   simpl. fold m. ring.
   Qed.
 
   Lemma divdiff_product (xs: ne_list (Q * (CR * CR))):
       divdiff (ne_list.map (second (λ x: CR * CR, fst x * snd x)) xs) ==
-      cm_Sum (map (λ p, divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p)))
+      @cm_Sum CRasCMonoid (map (λ p, divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p)))
         (zip (ne_list.tails xs) (ne_list.inits xs))).
   Proof with simpl in *; auto.
    intros.
@@ -110,7 +109,7 @@ Section contents.
     unfold divdiff... set (' (/ (fst p - fst q))). ring.
    rewrite divdiff_e.
    set (λ p : ne_list (Q and CR and CR) and ne_list (Q and CR and CR),
-       divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p))) in *.
+       divdiff (ne_list.map (second fst) (fst p)) * divdiff (ne_list.map (second snd) (snd p))) as s in *.
    simpl in *.
    rewrite IHxs, IHxs0.
    repeat rewrite ne_list.list_map.
@@ -119,12 +118,12 @@ Section contents.
    generalize (zip (ne_list.tails xs) (ne_list.inits xs)). intro.
    set (s0 := ' (/ (fst a - fst b))).
    transitivity ((s (a ::: xs, ne_list.one a) - s (b ::: xs, ne_list.one b)) * s0 +
-     (Σ (map (s ∘ second (ne_list.cons a))%prg l) - Σ (map (s ∘ second (ne_list.cons b))%prg l)) * s0)...
+     (@Σ CRasCMonoid (map (s ∘ second (ne_list.cons a))%prg l) - @Σ CRasCMonoid (map (s ∘ second (ne_list.cons b))%prg l)) * s0)...
     ring.
    setoid_replace ((s (a ::: xs, ne_list.one a) - s (b ::: xs, ne_list.one b)) * s0)
-     with (s (a ::: b ::: xs, ne_list.one a)[+](s (b ::: xs, a ::: ne_list.one b))).
-    setoid_replace ((Σ (map (s ∘ second (ne_list.cons a))%prg l) - Σ (map (s ∘ second (ne_list.cons b))%prg l)) * s0)
-      with (Σ (map (s ∘ second (ne_list.cons a) ∘ second (ne_list.cons b))%prg l))...
+     with (s (a ::: b ::: xs, ne_list.one a) + (s (b ::: xs, a ::: ne_list.one b))).
+    setoid_replace ((@Σ CRasCMonoid (map (s ∘ second (ne_list.cons a))%prg l) - @Σ CRasCMonoid (map (s ∘ second (ne_list.cons b))%prg l)) * s0)
+      with (@Σ CRasCMonoid (map (s ∘ second (ne_list.cons a) ∘ second (ne_list.cons b))%prg l))...
      ring.
     induction l... ring.
     rewrite <- IHl.
@@ -159,7 +158,8 @@ Section contents.
   Qed.
 
   Let an (xs: ne_list QPoint): cpoly CRasCRing :=
-    _C_ (divdiff xs) [*] Π (map (fun x => ' (- fst x)%Q [+X*] [1]) (tl xs)).
+    (polyconst CRasCRing (divdiff xs))
+      [*] Π (map (fun x => @cpoly_linear_fun' CRasCRing (' (- fst x)%Q) [1]) (tl xs)).
 
   Section with_qpoints.
 
@@ -176,7 +176,8 @@ Section contents.
      replace (length (tl xs)) with (0 + length (tl xs))%nat by reflexivity.
      apply degree_le_mult.
       apply degree_le_c_.
-     replace (length (tl xs)) with (length (map (fun x => ' (-fst x)%Q[+X*][1]) (tl xs)) * 1)%nat.
+      replace (length (tl xs))
+        with (length (map (fun x => @cpoly_linear_fun' CRasCRing (' (-fst x)%Q) [1]) (tl xs)) * 1)%nat.
       apply degree_le_Product.
       intros.
       apply in_map_iff in H.
@@ -207,16 +208,16 @@ Section contents.
 
     (** Applying this polynomial gives what you'd expect: *)
 
-    Definition an_applied (x: Q) (txs: ne_list QPoint)
-      := divdiff txs [*] ' @cr_Product Q_as_CRing (map (Qminus x ∘ fst)%prg (tail txs)).
+    Definition an_applied (x: Q) (txs: ne_list QPoint) : CR
+      := divdiff txs * ' @cr_Product Q_as_CRing (map (Qminus x ∘ fst)%prg (tail txs)).
 
-    Definition applied (x: Q) := Σ (map (an_applied x) (ne_list.tails qpoints)).
+    Definition applied (x: Q) := @Σ CRasCMonoid (map (an_applied x) (ne_list.tails qpoints)).
 
     Lemma apply x: (N ! ' x) [=] applied x.
     Proof.
      unfold N, applied, an, an_applied.
      rewrite cm_Sum_apply, map_map.
-     apply cm_Sum_eq.
+     apply (@cm_Sum_eq CRasCMonoid).
      intro.
      autorewrite with apply.
      apply mult_wd. reflexivity.
@@ -227,7 +228,7 @@ Section contents.
      intro.
      unfold Basics.compose.
      rewrite <- CRminus_Qminus.
-     change ((' (- fst x1)%Q + ' x * (1 + ' x * 0)) [=] (' x - ' fst x1)).
+     change ((' (- fst x1)%Q + ' x * (1 + ' x * 0)) == (' x - ' fst x1)).
      ring.
     Qed.
 
@@ -245,13 +246,13 @@ Section contents.
   Proof. reflexivity. Qed.
 
   Lemma an_applied_0 (t: QPoint) (x: Q) (xs: ne_list QPoint):
-    In x (map fst xs) -> an_applied x (t ::: xs) [=] 0.
+    In x (map fst xs) -> an_applied x (t ::: xs) == 0.
   Proof with auto.
    intros. unfold an_applied.
    simpl @tl.
    rewrite (@cr_Product_0 Q_as_CRing (x - x))%Q.
-     change (divdiff (t ::: xs) [*] 0 [=] 0).
-     apply cring_mult_zero.
+     change (divdiff (t ::: xs) * 0 == 0).
+     apply (cring_mult_zero CRasCRing).
     change (x - x == 0)%Q. ring.
    unfold Basics.compose.
    rewrite <- map_map.
@@ -264,18 +265,18 @@ Section contents.
   Proof with auto.
    intro E.
    repeat rewrite applied_cons.
-   cut (an_applied (fst x) (x ::: y ::: xs) [+] (an_applied (fst x) (y ::: xs)) [=] an_applied (fst x) (x ::: xs)).
+   cut (an_applied (fst x) (x ::: y ::: xs) + (an_applied (fst x) (y ::: xs)) == an_applied (fst x) (x ::: xs)).
     intro H. rewrite <- H.
     change (an_applied (fst x) (x ::: y ::: xs) + (an_applied (fst x) (y ::: xs) + applied xs (fst x)) ==
       an_applied (fst x) (x ::: y ::: xs)+an_applied (fst x) (y ::: xs) + applied xs (fst x))%CR.
     ring.
-   change ((divdiff_l x xs - divdiff_l y xs) * ' (/ (fst x - fst y))[*]
+   change ((divdiff_l x xs - divdiff_l y xs) * ' (/ (fst x - fst y)) * 
      ' (Qminus (fst x) (fst y) * @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs))%Q+
-     divdiff_l y xs[*]' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)[=]
-     divdiff_l x xs[*]' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)).
+     divdiff_l y xs * ' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs) ==
+     divdiff_l x xs * ' @cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)).
    generalize (@cr_Product Q_as_CRing (map (Qminus (fst x) ∘ fst)%prg xs)).
    intros.
-   rewrite <- mult_assoc.
+   rewrite CRmult_assoc.
    change ((((divdiff_l x xs - divdiff_l y xs)*(' (/ (fst x - fst y))%Q*' ((fst x - fst y)*s)%Q) + divdiff_l y xs * ' s)) == divdiff_l x xs*' s)%CR.
    rewrite CRmult_Qmult.
    setoid_replace ((/ (fst x - fst y) * ((fst x - fst y) * s)))%Q with s.
@@ -294,7 +295,7 @@ Section contents.
 
     Let crpoints := ne_list.map (first inject_Q_CR) qpoints.
 
-    Lemma interpolates: interpolates crpoints (N qpoints).
+    Lemma interpolates: @interpolates CRasCField crpoints (N qpoints).
     Proof with simpl; auto.
      unfold interpolates.
      unfold crpoints.
@@ -309,11 +310,11 @@ Section contents.
        intros u v [? | []]. subst x. change (v * 1 + 0 == v)%CR. ring.
       intros.
       rewrite applied_cons.
-      change (((snd x - snd y) * ' (/ (fst x - fst y)) [*] ' ((x0 - fst y) * 1)%Q + (snd y * 1 + 0)) == y0)%CR.
+      change (((snd x - snd y) * ' (/ (fst x - fst y)) * ' ((x0 - fst y) * 1)%Q + (snd y * 1 + 0)) == y0)%CR.
       rewrite Qmult_1_r.
       destruct B.
        subst.
-       rewrite <- mult_assoc.
+       rewrite CRmult_assoc.
        change ((y0 - snd y)*(' (/ (x0 - fst y))* '(x0 - fst y)%Q) + (snd y * 1 + 0)==y0)%CR.
        rewrite CRmult_Qmult.
        setoid_replace  (/ (x0 - fst y) * (x0 - fst y))%Q with 1%Q. ring.
@@ -330,7 +331,7 @@ Section contents.
        subst.
        simpl @fst. simpl @snd.
        rewrite (proj2 (Q.Qminus_eq x0 x0)).
-        rewrite cring_mult_zero.
+        rewrite (cring_mult_zero CRasCRing).
         change (0 + (y0 * 1 + 0) == y0)%CR. ring.
        reflexivity.
       exfalso...
@@ -357,7 +358,7 @@ Section contents.
      destruct H1...
     Qed. (* Todo: Clean up more. *)
 
-    Lemma interpolates_economically: interpolates_economically crpoints (N qpoints).
+    Lemma interpolates_economically: @interpolates_economically CRasCField crpoints (N qpoints).
     Proof.
      split. apply interpolates.
      unfold crpoints.
@@ -370,10 +371,10 @@ Section contents.
      this Newton polynomial: *)
 
     Lemma coincides_with_polynomial_interpolators (p: cpoly CRasCRing):
-      CPoly_ApZero.interpolates_economically crpoints p →
+      @CPoly_ApZero.interpolates_economically CRasCField crpoints p →
       N qpoints [=] p.
     Proof with auto.
-     apply (interpolation_unique crpoints).
+     apply (@interpolation_unique CRasCField crpoints).
       unfold crpoints. rewrite ne_list.list_map, map_fst_map_first.
       apply (CNoDup_map _ inject_Q_CR).
       apply CNoDup_weak with Qap...
@@ -385,7 +386,7 @@ Section contents.
     Lemma N_leading_coefficient: nth_coeff (length (tl qpoints)) (N qpoints) == divdiff qpoints.
     Proof with try ring.
      destruct qpoints.
-      change (divdiff (ne_list.one p) * 1 + 0[=]divdiff (ne_list.one p))...
+      change (divdiff (ne_list.one p) * 1 + 0 == divdiff (ne_list.one p))...
      simpl @length.
      rewrite N_cons.
      rewrite nth_coeff_plus.
@@ -396,10 +397,10 @@ Section contents.
      unfold an.
      rewrite nth_coeff_c_mult_p.
      simpl tl.
-     set (f := fun x: Q and CR => ' (- fst x)%Q[+X*] [1]).
+     set (f := fun x: Q and CR => @cpoly_linear_fun' CRasCRing (' (- fst x)%Q) [1]).
      replace (length l) with (length (map f l) * 1)%nat.
       rewrite lead_coeff_product_1.
-       change (divdiff (p ::: l)*1[=]divdiff (p ::: l))... (* to change [*] into * *)
+       change (divdiff (p ::: l)*1 == divdiff (p ::: l))... (* to change [*] into * *)
       intros q. rewrite in_map_iff. intros [x [[] B]].
       split. reflexivity.
       apply degree_le_cpoly_linear_inv.
@@ -411,7 +412,7 @@ Section contents.
     economically interpolating polynomial: *)
 
     Lemma leading_coefficient (p: cpoly CRasCRing):
-      CPoly_ApZero.interpolates_economically crpoints p →
+      @CPoly_ApZero.interpolates_economically CRasCField crpoints p →
       nth_coeff (length (tl qpoints)) p == divdiff qpoints.
     Proof with auto.
      intros.

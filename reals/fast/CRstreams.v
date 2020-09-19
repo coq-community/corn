@@ -104,7 +104,8 @@ Proof.
   abstract ( destruct e as [e|];[|apply ForAll_True];
              assert (Heq:proj1_sig e== proj1_sig ((e*Qpos_inv x)*x)%Qpos);[
     simpl; field; apply Qpos_nonzero
-      |rewrite -> (NearBy_comp _ _ (Qeq_refl 0) _ _ Heq ); apply (mult_Streams_nbz H Hb)] ).
+             |rewrite -> (NearBy_comp _ _ (ball_refl _ 0 (Qle_refl 0)) _ _ Heq );
+              apply (mult_Streams_nbz H Hb)] ).
  right.
  simpl.
  rename H0 into IHExists.
@@ -304,9 +305,8 @@ Proof.
  intros q n d Hpq.
  constructor.
  - simpl.
-  unfold Qball, QAbsSmall.
-  setoid_replace ((1#q)-0)%Q with (1#q).
-  2: unfold Qminus; apply Qplus_0_r.
+   unfold Qball, QAbsSmall, Qminus.
+   rewrite Qplus_0_r.
   split. discriminate.
   change (1*Zpos d <= Zpos n*Zpos q)%Z.
   apply Zmult_le_compat.

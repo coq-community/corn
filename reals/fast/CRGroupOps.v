@@ -20,7 +20,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
 Require Import QArith Qabs.
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
@@ -50,7 +49,7 @@ Notation "1" := (inject_Q_CR 1) : CR_scope.
 Lifting addition over [Q] by one parameter yields a rational translation
 function. *)
 Lemma Qtranslate_uc_prf (a:Q)
-  : is_UniformlyContinuousFunction (fun b:QS => (a+b):QS) Qpos2QposInf.
+  : is_UniformlyContinuousFunction (fun b:Q => (a+b):Q) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
@@ -69,13 +68,15 @@ Lemma translate_ident : forall x:CR, (translate 0 x==x)%CR.
 Proof.
  intros x.
  unfold translate.
- assert (H:st_eq (Qtranslate_uc 0) (uc_id _)).
+ assert (H:msp_eq (Qtranslate_uc 0) (uc_id _)).
+ apply ucEq_equiv.
   intros a.
   simpl.
-  ring.
+  rewrite Qplus_0_l.
+  reflexivity.
  simpl.
  intros e1 e2. destruct x; simpl.
- unfold Qball, QAbsSmall.
+ rewrite Qplus_0_r.
  rewrite Qplus_0_l. apply regFun_prf.
 Qed. 
 
@@ -84,7 +85,7 @@ Lemma Qplus_uc_prf :  is_UniformlyContinuousFunction Qtranslate_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
- repeat rewrite -> (fun x => Qplus_comm x b).
+ do 2 rewrite -> (fun x => Qplus_comm x b).
  apply Qtranslate_uc_prf.
  assumption.
 Qed.
@@ -107,7 +108,6 @@ Proof.
  unfold inject_Q_CR.
  simpl. intros e1 e2. simpl.
  unfold Cap_raw. simpl. destruct y; simpl.
- unfold Qball, QAbsSmall.
  simpl. split.
  - ring_simplify.
    destruct (regFun_prf ((1#2)*e1)%Qpos e2) as [H _].
@@ -164,7 +164,7 @@ apply to subtraction.
 *)
 Notation "x - y" := (x + (- y))%CR : CR_scope.
 (* begin hide *)
-Add Morphism CRopp with signature (@st_eq _) ==> (@st_eq _) as CRopp_wd.
+Add Morphism CRopp with signature (@msp_eq _) ==> (@msp_eq _) as CRopp_wd.
 Proof.
  apply uc_wd.
 Qed.
@@ -174,7 +174,7 @@ Qed.
 First a predicate for nonnegative numbers is defined. *)
 Definition CRnonNeg (x:CR) := forall e:Qpos, (-proj1_sig e) <= (approximate x e).
 (* begin hide *)
-Add Morphism CRnonNeg with signature (@st_eq _) ==> iff as CRnonNeg_wd.
+Add Morphism CRnonNeg with signature (@msp_eq _) ==> iff as CRnonNeg_wd.
 Proof.
  assert (forall x1 x2 : RegularFunction Qball,
             regFunEq x1 x2 -> CRnonNeg x1 -> CRnonNeg x2).
@@ -207,9 +207,9 @@ Proof.
    unfold e'. simpl. ring_simplify. reflexivity.
  intros.
  split.
-  apply H; assumption.
+  apply H, regFunEq_equiv; assumption.
  apply H.
- change (y==x)%CR.
+ apply regFunEq_equiv.
  symmetry.
  assumption.
 Qed.
@@ -217,7 +217,7 @@ Qed.
 (** And similarly for nonpositive. *)
 Definition CRnonPos (x:CR) := forall e:Qpos, (approximate x e) <= proj1_sig e.
 (* begin hide *)
-Add Morphism CRnonPos with signature (@st_eq _) ==> iff as CRnonPos_wd.
+Add Morphism CRnonPos with signature (@msp_eq _) ==> iff as CRnonPos_wd.
 Proof.
  assert (forall x1 x2 : RegularFunction Qball,
             regFunEq x1 x2 -> CRnonPos x1 -> CRnonPos x2).
@@ -251,9 +251,9 @@ Proof.
    unfold e'. simpl. ring_simplify. reflexivity.
  intros.
  split.
-  apply H; assumption.
+  apply H, regFunEq_equiv; assumption.
  apply H.
- change (y==x)%CR.
+ apply regFunEq_equiv.
  symmetry.
  assumption.
 Qed.
@@ -263,7 +263,7 @@ Instance CRle: Le CR := λ x y, (CRnonNeg (y - x))%CR.
 Infix "<=" := CRle : CR_scope.
 
 (* begin hide *)
-Add Morphism CRle with signature (@st_eq _) ==> (@st_eq _) ==> iff as CRle_wd.
+Add Morphism CRle with signature (@msp_eq _) ==> (@msp_eq _) ==> iff as CRle_wd.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
  change (x1==x2)%CR in Hx.
@@ -295,7 +295,7 @@ Proof.
  intros [H1 H2].
  rewrite <- (doubleSpeed_Eq x).
  rewrite <- (doubleSpeed_Eq y).
- apply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  apply ball_weak. apply Qpos_nonneg.
  split;[apply H2|].
@@ -335,7 +335,7 @@ Qed.
 rational number.  It is the lifting of the first parameter of [Qmax].
 *)
 Lemma QboundBelow_uc_prf (a:Q)
-  : is_UniformlyContinuousFunction (fun b:QS => (Qmax a b):QS) Qpos2QposInf.
+  : is_UniformlyContinuousFunction (fun b:Q => (Qmax a b):Q) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
@@ -377,7 +377,7 @@ Lemma Qmax_uc_prf :  is_UniformlyContinuousFunction QboundBelow_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
- repeat rewrite -> (fun x => Qmax_comm x b).
+ do 2 rewrite -> (fun x => Qmax_comm x b).
  apply QboundBelow_uc_prf.
  assumption.
 Qed.
@@ -433,6 +433,7 @@ Proof.
  apply (Qle_trans _ _ _ regFun_prf).
  apply Qplus_le_l. simpl.
  rewrite <- (Qmult_1_l (proj1_sig e1)) at 2.
+ rewrite Qplus_0_r.
  apply Qmult_le_r. apply Qpos_ispos. discriminate.
 Qed.
 
@@ -518,7 +519,7 @@ Qed.
 rational number.  It is the lifting of the first parameter of [Qmin].
 *)
 Lemma QboundAbove_uc_prf (a:Q)
-  : is_UniformlyContinuousFunction (fun b:QS => (Qmin a b):QS) Qpos2QposInf.
+  : is_UniformlyContinuousFunction (fun b:Q => (Qmin a b):Q) Qpos2QposInf.
 Proof.
  intros e b0 b1 H.
  simpl in *.
@@ -548,7 +549,7 @@ Lemma Qmin_uc_prf :  is_UniformlyContinuousFunction QboundAbove_uc Qpos2QposInf.
 Proof.
  intros e a0 a1 H. split. apply Qpos_nonneg. intro b.
  simpl in *.
- repeat rewrite -> (fun x => Qmin_comm x b).
+ do 2 rewrite -> (fun x => Qmin_comm x b).
  apply QboundAbove_uc_prf.
  assumption.
 Qed.
@@ -567,7 +568,7 @@ Proof.
  intros e1 e2.
  destruct y; simpl; unfold Cmap_fun, Cap_fun, Cap_raw; simpl.
  specialize (regFun_prf ((1 # 2) * e1)%Qpos e2).
- split.
+ rewrite Qplus_0_r. split.
  - apply Qmin_case. intros. apply Qmin_case. intros.
    unfold Qminus. rewrite Qplus_opp_r. apply (Qopp_le_compat 0).
    apply (Qpos_nonneg (e1+e2)). intros.
@@ -700,7 +701,7 @@ Definition Qplus_uncurry
   := Build_UniformlyContinuousFunction Qplus_uc_uncurry.
 
 Lemma CRplus_uncurry_eq : forall x y : CR,
-    st_eq (CRplus x y)
+    msp_eq (CRplus x y)
           (Cmap (ProductMS_prelength QPrelengthSpace QPrelengthSpace)
                 Qplus_uncurry (undistrib_Complete (x,y))).
 Proof.
@@ -708,5 +709,8 @@ Proof.
   transitivity (Cmap2 QPrelengthSpace QPrelengthSpace (uc_curry Qplus_uncurry) x y).
   2: apply Cmap2_curry.
   apply Cap_wd. 2: reflexivity.
-  apply Cmap_wd. 2: reflexivity. intros a b. reflexivity.
+  apply Cmap_wd. 2: reflexivity.
+  apply ucEq_equiv.
+  split. apply Qle_refl.
+  intros a. reflexivity.
 Qed.

@@ -18,7 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.fast.CRAlternatingSum.
@@ -800,7 +799,7 @@ Lemma InfiniteGeometricSum_step : forall series (Gs:GeometricSeries series),
 Proof.
  intros series Gs.
  rewrite -> CRplus_translate.
- apply regFunEq_e.
+ apply regFunEq_equiv, regFunEq_e.
  intros e.
  change (approximate (InfiniteGeometricSum Gs) e)
    with (InfiniteGeometricSum_raw series e).
@@ -852,7 +851,7 @@ Proof.
    rewrite (@InfiniteSum_fat_add_stop
               (Pos.to_nat (InfiniteGeometricSum_maxIter series e))
               (Pos.to_nat (InfiniteGeometricSum_maxIter (tl series) e))). 
-   apply ball_refl.
+   apply Qball_Reflexive.
    apply (Qpos_nonneg (e+e)). 
    apply Pos2Nat.inj_le.
    apply (@InfiniteGeometricSum_maxIter_monotone series e), Gs.
@@ -873,7 +872,7 @@ Proof.
  - setoid_replace (InfiniteGeometricSum Gs) with 0%CR.
    split; simpl; rewrite -> Hq; try apply CRle_refl.
    rewrite CRopp_0. apply CRle_refl.
-  apply regFunEq_e.
+  apply regFunEq_equiv, regFunEq_e.
   intros e.
   apply ball_sym.
   change (approximate (InfiniteGeometricSum Gs) e)
@@ -907,7 +906,7 @@ Proof.
      split; assumption.
    + setoid_replace (InfiniteGeometricSum Gs)
        with (InfiniteGeometricSum Gs - 0)%CR
-       by (unfold canonical_names.equiv; ring).
+       by (unfold canonical_names.equiv, msp_Equiv; ring).
      apply CRAbsSmall_ball.
      apply regFunBall_e.
      intros d.
@@ -1045,7 +1044,7 @@ Lemma InfiniteGeometricSum_wd : forall (s : Stream Q) (a b : Q)
       (Gsb : GeometricSeries b s)
       (apos : 0 <= a) (aone : a < 1)
       (bpos : 0 <= b) (bone : b < 1),
-    st_eq (InfiniteGeometricSum apos aone Gsa)
+    msp_eq (InfiniteGeometricSum apos aone Gsa)
           (InfiniteGeometricSum bpos bone Gsb).
 Proof.
   assert (forall (s : Stream Q) (a b : Q)
@@ -1054,7 +1053,7 @@ Proof.
       (apos : 0 <= a) (aone : a < 1)
       (bpos : 0 <= b) (bone : b < 1),
     a <= b ->
-    st_eq (InfiniteGeometricSum apos aone Gsa)
+    msp_eq (InfiniteGeometricSum apos aone Gsa)
           (InfiniteGeometricSum bpos bone Gsb)).
   { intros. 
     (* The same series is summed up to 2 different indexes,
@@ -1092,7 +1091,8 @@ Proof.
     apply (InfiniteGeometricSum_maxIter_correct bpos bone _ Gsb).
     rewrite H4.
     destruct (Nat.lt_ge_cases i j) as [H0|H0].
-    - apply Nat.le_exists_sub in H0.
+    - rewrite Qplus_0_r.
+      apply Nat.le_exists_sub in H0.
       destruct H0 as [k [H0 _]]. subst j.
       unfold Qball. clear H5.
       rewrite <- AbsSmall_Qabs, Qabs_Qminus.
@@ -1104,7 +1104,8 @@ Proof.
       apply (err_prop_correct apos aone).
       apply ForAll_Str_nth_tl, Gsa. apply H3.
       apply Qplus_le_r, Qpos_nonneg.
-    - apply Nat.le_exists_sub in H0.
+    - rewrite Qplus_0_r.
+      apply Nat.le_exists_sub in H0.
       destruct H0 as [k [H0 _]]. subst i.
       unfold Qball. clear H3.
       rewrite <- AbsSmall_Qabs, Qabs_Qminus.
