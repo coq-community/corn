@@ -25,12 +25,13 @@ Require Import Coq.ZArith.Zpow_facts.
 Require Export CoRN.metric2.Complete.
 Require Import CoRN.logic.Classic.
 Require Import Coq.QArith.Qpower.
+Require Import Coq.QArith.Qround.
 Require Import Coq.Arith.Div2.
 
 Set Implicit Arguments.
 Set Automatic Introduction.
 
-Local Open Scope Q_scope.
+Local Open Scope uc_scope.
 
 (**
 * Compact sets
@@ -82,8 +83,9 @@ Definition Compact X := Complete (FinEnum X).
     As a compact s is closed, so it implies that x is in s.
     inCompact also converts the abstract s:Compact X into a usual
     subset Complete X -> Prop. *)
-Definition inCompact X (x:Complete X) (s:Compact X) : Prop :=
- forall (e1 e2:Qpos), FinSubset_ball (proj1_sig e1 + proj1_sig e2) (approximate x e1) (approximate s e2).
+Definition inCompact {X : MetricSpace} (x:Complete X) (s:Compact X) : Prop :=
+  forall (e1 e2:Qpos), FinSubset_ball (proj1_sig e1 + proj1_sig e2)
+                                 (approximate x e1) (approximate s e2).
 (* begin hide *)
 Add Parametric Morphism {X : MetricSpace} : (@inCompact X)
     with signature (@msp_eq _) ==> (@msp_eq _) ==> iff as inCompact_wd.
@@ -272,17 +274,28 @@ Proof.
 Qed.
 
 
-(** The limit of this stream is going to be used to construct a point
-inside the compact set close to a suitable starting point. *)
-CoFixpoint CompactTotallyBoundedStream (s:Compact X) (k d1 d2:Qpos) (pt:X)
-           (Hpt : InFinEnumC pt (approximate s d1))
+(** The limit of this stream constructs a point inside the compact set
+    close to any point pt inside an approximation of the compact.
+    The next point pt' is in approximate s (k*d), which converges to s
+    when k < 1. By regularity of the compact s, the distance between
+    the approximations at d and k*d is (1+k)*d. To constructively pick
+    pt' we must bump the distance a bit by e and we get
+    ball ((1+k)*d+e) pt pt'.
+    Continuing we get
+    ball ((1+k)*k*d+k*e) pt' pt''.
+    By summing we see that the stream of points stays within distance
+    (1+k)*d+e of pt, which we can take arbitrarily close to d,
+    the initial distance between pt and the compact s.
+ *)
+CoFixpoint CompactTotallyBoundedStream (s:Compact X) (k d e:Qpos)
+           (pt:X) (Hpt : InFinEnumC pt (approximate s d))
   : Stream X :=
 Cons pt
  (let (f,_) := HausdorffBallHausdorffBallStrong locatedX
-               (regFun_prf s d1 (k*d1)%Qpos) in
-  let (pt',HptX) := f pt Hpt d2 in
+               (regFun_prf s d (k*d)%Qpos) in
+  let (pt',HptX) := f pt Hpt e in
   let (Hpt',_) := HptX in
-  (@CompactTotallyBoundedStream s k (k*d1) (k*d2) pt' Hpt')).
+  (@CompactTotallyBoundedStream s k (k*d) (k*e) pt' Hpt')).
 
 (** This stream is Cauchy *)
 Lemma CompactTotallyBoundedStreamCauchyLemma : forall n (k d:Qpos),
@@ -317,78 +330,80 @@ Proof.
  constructor.
 Qed.
 
+(* In a friendlier notation, the distance is
+((1+k)*d1+d2) * (1-k^(S n)) / (1-k)
+*)
 Lemma CompactTotallyBoundedStreamCauchy1
-  : forall n s (k d1 d2:Qpos) pt Hpt
-      (Hd:0 < ((((1#1)+proj1_sig k)*proj1_sig d1+ proj1_sig d2)
-               * (1-proj1_sig k^Z.of_nat(S n))/(1-proj1_sig k))),
+  : forall n s (k d1 d2:Qpos) pt Hpt,
     proj1_sig k < 1 ->
-    ball (proj1_sig (exist _ _ Hd)) pt
-         (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
+    ball ((((1#1)+proj1_sig k)*proj1_sig d1+ proj1_sig d2)
+          * (1-proj1_sig k^Z.of_nat(S n))/(1-proj1_sig k))
+         pt (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
 Proof.
- induction n; intros s k d1 d2 pt Hpt Hd Hk.
-  apply ball_refl. apply Qpos_nonneg.
- unfold Str_nth.
- set (e:=(((1#1) + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
-         * (1 - proj1_sig k ^ Z.of_nat (S (S n))) / (1 - proj1_sig k)) in *.
- set (e':=(exist _ _ Hd)).
- set (e0:=((d1 + k * d1 + d2)
-           + exist _ _ (CompactTotallyBoundedStreamCauchyLemma
-                          n _ (((1#1) + k)*(k*d1) + (k*d2)) Hk))%Qpos).
- setoid_replace (proj1_sig e') with (proj1_sig e0).
- - simpl.
-   destruct (@HausdorffBallHausdorffBallStrong X locatedX
+  induction n; intros s k d1 d2 pt Hpt Hk.
+  apply ball_refl.
+  apply Qlt_le_weak.
+  apply (CompactTotallyBoundedStreamCauchyLemma
+           O k (((1#1) + k) * d1 + d2)%Qpos), Hk.
+  unfold Str_nth.
+  set (e:=(((1#1) + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
+          * (1 - proj1_sig k ^ Z.of_nat (S (S n))) / (1 - proj1_sig k)) in *.
+  set (e0:=((d1 + k * d1 + d2)
+            + exist _ _ (CompactTotallyBoundedStreamCauchyLemma
+                           n _ (((1#1) + k)*(k*d1) + (k*d2)) Hk))%Qpos).
+  setoid_replace e with (proj1_sig e0).
+  - simpl.
+    destruct (@HausdorffBallHausdorffBallStrong X locatedX
                (@proj1_sig Q (Qlt 0) d1 +
                 @proj1_sig Q (Qlt 0) k * @proj1_sig Q (Qlt 0) d1)
                (@approximate _ (FinEnum_ball X) s (Qpos2QposInf d1))
                (@approximate _ (FinEnum_ball X) s (Qpos2QposInf (k * d1)))
                (@regFun_prf _ (FinEnum_ball X) s d1 (k * d1)%Qpos))
-     as [f _].
-  destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
-  unfold e0.
-  apply ball_triangle with pt'.
-  assumption.
-  apply (IHn s k (k * d1)%Qpos (k * d2)%Qpos pt' Hpt' 
-                 (CompactTotallyBoundedStreamCauchyLemma n k
-                    (((1 # 1) + k) * (k * d1) + k * d2) Hk) Hk).
- - unfold e', e0, e.
- simpl. 
- assert (~proj1_sig k==0).
- { destruct k. simpl. intro abs. apply (Qlt_not_le _ _ q).
-   rewrite abs. apply Qle_refl. }
- rewrite <- Pos.add_1_l.
- rewrite Qpower_plus_positive. simpl.
- field.
- intros H0.
- apply (Qlt_not_le _ _ Hk).
- rewrite -> Qle_minus_iff.
- setoid_replace (proj1_sig k + - (1))
-   with (-(1-proj1_sig k)) by (simpl; ring).
- rewrite -> H0.
- discriminate.
+      as [f _].
+    destruct (f pt Hpt d2) as [pt' [Hpt' Hpt'']].
+    unfold e0.
+    apply ball_triangle with pt'.
+    assumption.
+    apply (IHn s k (k * d1)%Qpos (k * d2)%Qpos pt' Hpt' Hk).
+  - unfold e0, e.
+    simpl. 
+    assert (~proj1_sig k==0).
+    { destruct k. simpl. intro abs. apply (Qlt_not_le _ _ q).
+      rewrite abs. apply Qle_refl. }
+    rewrite <- Pos.add_1_l.
+    rewrite Qpower_plus_positive. simpl.
+    field.
+    intros H0.
+    apply (Qlt_not_le _ _ Hk).
+    rewrite -> Qle_minus_iff.
+    setoid_replace (proj1_sig k + - (1))
+      with (-(1-proj1_sig k)) by (simpl; ring).
+    rewrite -> H0.
+    discriminate.
 Qed.
 
 Lemma CompactTotallyBoundedStreamCauchy2
-  : forall (m n:nat) s (k d1 d2:Qpos) pt Hpt
-      (Hd:0 < ((((1#1)+proj1_sig k)*proj1_sig d1+proj1_sig d2)
-               *(1-proj1_sig k^Z.of_nat (S n))/(1-proj1_sig k))), proj1_sig k < 1 ->
- ball (proj1_sig (Qpos_power k (Z.of_nat m)*(exist _ _ Hd))%Qpos)
-  (Str_nth m (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
-  (Str_nth (m + n) (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
+  : forall (m n:nat) s (k d1 d2:Qpos) pt Hpt,
+    proj1_sig k < 1 ->
+    ball (proj1_sig k ^ (Z.of_nat m)
+          * ((((1#1)+proj1_sig k)*proj1_sig d1+proj1_sig d2)
+             *(1-proj1_sig k^Z.of_nat (S n))/(1-proj1_sig k)))
+         (Str_nth m (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
+         (Str_nth (m + n) (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
 Proof.
- induction m; intros n s k d1 d2 pt Hpt Hd Hk.
- setoid_replace (proj1_sig (Qpos_power k 0 * (exist _ _ Hd))%Qpos)
-   with (proj1_sig (exist _ _ Hd)).
- 2: unfold canonical_names.equiv, canonical_names.sig_equiv,
-    canonical_names.equiv; simpl; ring.
+  induction m; intros n s k d1 d2 pt Hpt Hk.
+  simpl (proj1_sig k ^ Z.of_nat 0). rewrite Qmult_1_l.
   apply CompactTotallyBoundedStreamCauchy1; assumption.
   pose (e':=(CompactTotallyBoundedStreamCauchyLemma
                n _ (((1#1)+k)*(k*d1) + (k*d2)) Hk)%Qpos).
   assert (~proj1_sig k==0) as knz.
   { destruct k. simpl. intro abs. apply (Qlt_not_le _ _ q).
     rewrite abs. apply Qle_refl. }
-  assert (QposEq (Qpos_power k (Z.of_nat (S m))*exist _ _ Hd)
-                 (Qpos_power k (Z.of_nat m)*exist _ _ e')).
-  { rewrite Nat2Z.inj_succ. unfold QposEq; simpl.
+  assert (Qeq (proj1_sig k ^ (Z.of_nat (S m))
+               * ((((1#1)+proj1_sig k)*proj1_sig d1+proj1_sig d2)
+                  *(1-proj1_sig k^Z.of_nat (S n))/(1-proj1_sig k)))
+              (proj1_sig (Qpos_power k (Z.of_nat m)*exist _ _ e')%Qpos)).
+  { rewrite Nat2Z.inj_succ. simpl.
     setoid_replace (proj1_sig k ^ (Z.succ (Z.of_nat m)))
       with (proj1_sig k ^ (1+Z.of_nat m)).
     rewrite Qpower_plus. simpl. field.
@@ -400,7 +415,7 @@ Proof.
     rewrite -> H0.
     discriminate. exact knz.
     rewrite <- Z.add_1_l. reflexivity. }
-  unfold QposEq in H. rewrite H. clear H.
+  rewrite H. clear H.
   change (S m + n)%nat with (S (m + n))%nat.
   unfold Str_nth.
   simpl.
@@ -413,11 +428,15 @@ Proof.
     as [f _].
   destruct (f pt Hpt d2) as [pt' [Hpt' _]].
   simpl.
-  apply (IHm n s k (k*d1)%Qpos (k*d2)%Qpos pt' Hpt' e'); assumption.
+  apply (IHm n s k (k*d1)%Qpos (k*d2)%Qpos pt' Hpt'); assumption.
 Qed.
 
+(* All points in the stream are in the approximations of s, 
+   at precisions k^n * d1. *)
 Lemma StreamInCompactApprox : forall n s k d1 d2 pt Hpt,
-  {q:Qpos | InFinEnumC (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)) (approximate s q) & QposEq q (Qpos_power k (Z.of_nat n)*d1) }.
+    {q:Qpos | InFinEnumC (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
+                         (approximate s q)
+              & QposEq q (Qpos_power k (Z.of_nat n)*d1) }.
 Proof.
  induction n.
   intros.
@@ -451,231 +470,197 @@ Proof.
  rewrite abs. apply Qle_refl.
 Qed.
 
-Definition CompactTotallyBoundedIndex (e d1 d2:Qpos) : nat :=
-let (n,d):=((1+(1#4))*proj1_sig d1 + proj1_sig d2)/proj1_sig e/(1-(1#4)) in
- match Z.succ (Z.div n (Z.pos d)) with
-| Zpos p => Nat.div2 (S (Z.to_nat (Z.log2_up (Zpos p)))) 
-| _ => O
-end.
+(* This is the index at which the stream has converged within e. *)
+Definition CompactTotallyBoundedIndex (e d1 d2:Qpos) : Z :=
+  Z.log2_up (Qceiling (((3#1)*proj1_sig d1+(2#1)*proj1_sig d2) / proj1_sig e)).
 
 Hint Resolve Qinv_lt_0_compat. (* todo: move, and put in appropriate hint db *)
 
-Lemma CompactTotallyBoundedIndexLemma : forall (e d1 d2:Qpos),
-    ((1+(1#4))*proj1_sig d1 + proj1_sig d2)*(1#4)^Z.of_nat (CompactTotallyBoundedIndex e d1 d2)/(1-(1#4))
+Lemma Qpower_inc : forall (n : nat) (a b : Q),
+    0 < a
+    -> a <= b
+    -> a ^ Z.of_nat n <= b ^ Z.of_nat n.
+Proof.
+  induction n.
+  - intros. discriminate.
+  - intros. rewrite Nat2Z.inj_succ.
+    rewrite <- Z.add_1_l.
+    rewrite Qpower_plus, Qpower_plus.
+    apply (Qle_trans _ (a * b ^ Z.of_nat n)).
+    apply Qmult_le_l. exact H.
+    apply IHn. exact H. exact H0.
+    apply Qmult_le_compat_r. exact H0.
+    apply Qpower_pos.
+    refine (Qle_trans _ _ _ _ H0).
+    apply Qlt_le_weak, H.
+    intro abs. rewrite abs in H0.
+    apply (Qlt_irrefl 0). exact (Qlt_le_trans _ _ _ H H0).
+    intro abs. rewrite abs in H.
+    apply (Qlt_irrefl 0 H).
+Qed.
+
+Lemma CompactTotallyBoundedIndexLemma : forall (e k d1 d2:Qpos),
+    proj1_sig k <= 1#2 ->
+    ((1+proj1_sig k)*proj1_sig d1 + proj1_sig d2)
+    *proj1_sig k^(CompactTotallyBoundedIndex e d1 d2)/(1-proj1_sig k)
     <= proj1_sig e.
 Proof.
- intros e d1 d2.
- unfold CompactTotallyBoundedIndex.
- set (a:=((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2)).
- set (b:=(1 - (1 # 4))).
- rewrite -> Qmake_Qdiv.
- rewrite -> Qdiv_power.
- rewrite -> Qpower_1.
+ intros e k d1 d2 khalf.
  unfold Qdiv.
- ring_simplify.
- rewrite <- Qmult_assoc.
- rewrite -> Qmult_comm.
- rewrite <- Qmult_assoc.
- rewrite -> Qmult_comm.
- apply Qle_shift_div_r.
-  induction (let (n, d) := a * / proj1_sig e * / b in match Z.succ (n / Z.pos d) with | Z0 => 0%nat
-    | Zpos p => Nat.div2 (S (Z.to_nat (Z.log2_up (Zpos p)))) | Zneg _ => 0%nat end).
-   constructor.
-  change (S n) with (1+n)%nat.
-  rewrite inj_plus.
-  rewrite -> Qpower_plus;[|discriminate].
-  change 0%Q with ((4#1) * 0).
-  apply Qmult_lt_l. reflexivity.
-  exact IHn.
- assert (He:~ proj1_sig e==0).
- { destruct e. simpl. intro abs. rewrite abs in q. exact (Qlt_irrefl 0 q). }
- set (z:=a * / proj1_sig e * / b).
- rewrite <- (Qinv_involutive (proj1_sig e)).
- rewrite -> (Qmult_comm (/ /proj1_sig e)).
- apply Qle_shift_div_l.
-  auto with *.
- setoid_replace ( / b * a * / proj1_sig e) with z by (unfold z;simpl; ring).
- assert (Hz:0 < z).
-  unfold z.
-  subst a.
-  apply Q.Qmult_lt_0_compat; auto with *.
-  apply Q.Qmult_lt_0_compat; auto with *.
-  apply Q.Qplus_lt_le_0_compat; auto with *.
-    (* todo: this is ugly ^ *)
- destruct z as [[|n|n] d].
-   elim (Qlt_not_le _ _ Hz).
-   discriminate.
-  apply Qle_trans with (Z.succ (Z.pos n/ Z.pos d) # 1).
-   rewrite -> Qmake_Qdiv.
-   apply Qle_shift_div_r; auto with *.
-   unfold Z.succ, Qle.
-   simpl.
-   rewrite Zpos_mult_morphism.
-   ring_simplify.
-   rewrite Zmult_comm.
-   rewrite (Z.div_mod (Z.pos n) (Z.pos d)) at 1.
-   2: discriminate.
-   apply Zplus_le_compat_l.
-   apply Z.lt_le_incl.
-   apply (Z.mod_bound_pos (Z.pos n) (Z.pos d)).
-   discriminate. reflexivity.
-  generalize (Z.succ (Z.pos n/Z.pos d)).
-  intros z.
-  clear -z.
-  destruct z.
-    discriminate.
-    2: discriminate.
-    2: discriminate.
-   change (Z.pos 4) with (2^2)%Z.
-   rewrite -> Zpower_Qpower;[|discriminate].
-   rewrite <- Qpower_mult.
-   apply Qle_trans with (2 ^ Z.log2_up (Zpos p) # 1).
-    unfold Qle; simpl.
-    rewrite Pmult_comm;simpl.
-    ring_simplify.
-    destruct (Z.log2_log2_up_spec (Z.pos p)); [ reflexivity | ].
-    assumption.
-   generalize  (Z.log2_up (Zpos p)) (Z.log2_up_nonneg (Zpos p)).
-   intros z Hz.
-   clear p.
-   cut (z <=  (2 * Z.of_nat (Nat.div2 (S (Z.to_nat z)))))%Z.
-   { generalize ((2 * Z.of_nat (Nat.div2 (S (Z.to_nat z)))))%Z.
-    intros y Hy.
-    rewrite <- Zpower_Qpower; auto with *.
-    unfold inject_Z, Qle, Qnum, Qden.
-    rewrite Z.mul_1_r, Z.mul_1_r.
-    replace y with (z + (y-z))%Z by ring.
-    rewrite Zpower_exp; auto with *.
-    replace  (two_p z) with (2^z)%Z.
-    rewrite <- (Z.mul_1_r (2^z)) at 1.
-     apply Zmult_le_compat_l.
-      assert (H:(0 <= y - z)%Z) by auto with *.
-      destruct (y -z)%Z; try discriminate.
-       simpl.
-       change 1%Z with (Z.succ 0)%Z.
-       apply Zlt_le_succ.
-       apply Zpower_pos_pos; constructor.
-      elim H; reflexivity.
-     destruct z as [|z|z].
-       discriminate.
-      simpl.
-      apply Zlt_le_weak.
-      apply Zpower_pos_pos; constructor.
-     elim Hz; constructor.
-    destruct z as [|z|z].
-      reflexivity.
-     simpl.
-     clear - z.
-     induction z using Pind; simpl.
-      reflexivity.
-     rewrite Pplus_one_succ_l.
-     rewrite Zpower_pos_is_exp.
-     rewrite two_power_pos_is_exp.
-     rewrite IHz.
-     reflexivity.
-    elim Hz; constructor. }
-    apply (Z.le_trans _ (Z.of_nat (Z.to_nat z))).
-   rewrite Z2Nat.id. apply Z.le_refl.
-   exact Hz.
-   generalize (Z.to_nat z).
-   intros n.
-   clear - n.
-   change 2%Z with (Z.of_nat 2).
-   rewrite <- inj_mult.
-   apply inj_le.
-   rewrite <- Nat.double_twice.
-   destruct (Even.even_or_odd n).
-    apply le_S_n.
-    rewrite <- Div2.odd_double; auto with *.
-   rewrite <- Div2.even_double; auto with *.
+ rewrite Qmult_comm, Qmult_assoc.
+ apply (Qle_trans
+          _  (((3#1)*proj1_sig d1+(2#1)*proj1_sig d2)
+              * proj1_sig k ^(CompactTotallyBoundedIndex e d1 d2))).
+ - apply Qmult_le_compat_r.
+   2: apply Qpower_pos, Qpos_nonneg.
+   apply (Qle_trans _ ((2#1) * ((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2))).
+   apply Qmult_le_compat_r.
+   2: apply (Qpos_nonneg (((1#1)+k)*d1+d2)%Qpos).
+   apply Qle_shift_inv_r.
+   unfold Qminus. rewrite <- Qlt_minus_iff.
+   apply (Qle_lt_trans _ _ _ khalf). reflexivity.
+   setoid_replace 1%Q with ((2#1)*(1#2)) at 1 by reflexivity.
+   apply Qmult_le_l. reflexivity.
+   apply (Qplus_le_l _ _ (proj1_sig k - (1#2))).
+   ring_simplify. exact khalf.
+   rewrite Qmult_plus_distr_r.
+   apply Qplus_le_l. rewrite Qmult_assoc.
+   apply Qmult_le_r. apply Qpos_ispos.
+   apply (Qplus_le_r _ _ (-(2#1))). ring_simplify.
+   setoid_replace 1%Q with ((2#1)*(1#2)) by reflexivity.
+   apply Qmult_le_l. reflexivity. exact khalf.
+ - apply (Qle_trans _ (((3#1) * proj1_sig d1 + (2#1) * proj1_sig d2) *
+                       (1#2) ^ (CompactTotallyBoundedIndex e d1 d2))).
+   apply Qmult_le_l.
+   apply (Qpos_ispos ((3#1) * d1 + (2#1) * d2)%Qpos).
+   rewrite <- (Z2Nat.id (CompactTotallyBoundedIndex e d1 d2)).
+   apply Qpower_inc.
+   apply Qpos_ispos. exact khalf.
+   apply Z.log2_up_nonneg.
+   rewrite <- (Qmult_1_r (proj1_sig e)).
+   rewrite <- (Qpower_1 (CompactTotallyBoundedIndex e d1 d2)).
+   setoid_replace (1#1)%Q with ((2#1)*(1#2))%Q by reflexivity.
+   rewrite Qmult_power, Qmult_assoc.
+   apply Qmult_le_compat_r.
+   2: apply Qpower_pos; discriminate.
+   rewrite <- (Zpower_Qpower 2 (CompactTotallyBoundedIndex e d1 d2)).
+   2: apply Z.log2_up_nonneg.
+   rewrite (Qmult_comm (proj1_sig e)).
+   apply (Qmult_le_r _ _ (/proj1_sig e)).
+   apply Qinv_lt_0_compat, Qpos_ispos.
+   rewrite <- Qmult_assoc, Qmult_inv_r, Qmult_1_r.
+   unfold CompactTotallyBoundedIndex.
+   unfold Qdiv.
+   assert (0 < ((3#1) * proj1_sig d1 + (2#1) * proj1_sig d2) * / proj1_sig e).
+   { apply (Qle_lt_trans _ (((3#1) * proj1_sig d1 + (2#1) * proj1_sig d2)*0)).
+     rewrite Qmult_0_r. discriminate.
+     apply Qmult_lt_l. apply (Qpos_ispos ((3#1)*d1 + (2#1)*d2)).
+     apply Qinv_lt_0_compat, Qpos_ispos. }
+   revert H.
+   generalize (((3#1) * proj1_sig d1 + (2#1) * proj1_sig d2) * / proj1_sig e).
+   intros q qpos.
+   apply (Qle_trans _ _ _ (Qle_ceiling q)).
+   rewrite <- Q.Zle_Qle.
+   apply Z.log2_up_le_pow2.
+   rewrite Q.Zlt_Qlt.
+   exact (Qlt_le_trans _ _ _ qpos (Qle_ceiling q)).
+   apply Z.le_refl.
+   apply Qpos_nonzero.
 Qed.
 
-Definition CompactTotallyBounded_raw  (s:Compact X) (d1 d2:Qpos) (pt:X) Hpt (e:QposInf)
-  : X :=
+Definition CompactTotallyBounded_raw (s:Compact X) (k d1 d2:Qpos)
+           (pt:X) Hpt (e:QposInf)
+  : X
+  :=
   match e with
   |QposInfinity => pt
-  |Qpos2QposInf e' => (Str_nth (CompactTotallyBoundedIndex e' d1 d2)
-                              (@CompactTotallyBoundedStream
-                                 s (exist (Qlt 0) (1#4) eq_refl) d1 d2 pt Hpt))
+  |Qpos2QposInf e' => Str_nth (Z.to_nat (CompactTotallyBoundedIndex e' d1 d2))
+                             (@CompactTotallyBoundedStream
+                                s k d1 d2 pt Hpt)
   end.
 
-(*
-Lemma CompactTotallyBounded_raw_PI : forall s d1 d2 pt Hpt1 Hpt2 e,
- (CompactTotallyBounded_raw s d1 d2 pt Hpt1 e) = (CompactTotallyBounded_raw s d1 d2 pt Hpt2 e).
-Proof.
-intros.
-destruct e; try reflexivity.
-unfold CompactTotallyBounded_raw.
-apply CompactTotallyBoundedStream_PI.
-Qed.
-*)
-
 (** This stream forms a regular function *)
-Lemma CompactTotallyBounded_prf : forall (s:Compact X) (d1 d2:Qpos) (pt:X) Hpt,
-    is_RegularFunction (@ball X) (@CompactTotallyBounded_raw s d1 d2 pt Hpt).
+Lemma CompactTotallyBounded_prf : forall (s:Compact X) (k d1 d2:Qpos) (pt:X) Hpt,
+    proj1_sig k <= 1#2 ->
+    is_RegularFunction (@ball X) (@CompactTotallyBounded_raw s k d1 d2 pt Hpt).
 Proof.
  unfold CompactTotallyBounded_raw, is_RegularFunction.
- pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
- cut (forall (s : Compact X) (d1 d2 : Qpos) (pt : X)
-   (Hpt : InFinEnumC pt (approximate s d1)) (e1 e2 : Qpos),
-     ((CompactTotallyBoundedIndex e1 d1 d2) <= (CompactTotallyBoundedIndex e2 d1 d2))%nat ->
-       ball (m:=X) (proj1_sig e1 + proj1_sig e2) (Str_nth (CompactTotallyBoundedIndex e1 d1 d2)
-         (@CompactTotallyBoundedStream s quarter d1 d2 pt Hpt))
-           (Str_nth (CompactTotallyBoundedIndex e2 d1 d2)
-             (@CompactTotallyBoundedStream s quarter d1 d2 pt Hpt))).
-  intros Z s d1 d2 pt Hpt e1 e2.
-  destruct (le_lt_dec (CompactTotallyBoundedIndex e1 d1 d2) (CompactTotallyBoundedIndex e2 d1 d2)).
-   apply Z; auto.
-   rewrite Qplus_comm.
-  apply ball_sym.
-  apply Z; auto with *.
- intros s d1 d2 pt Hpt e1 e2 H.
- set (A:=CompactTotallyBoundedIndex e1 d1 d2) in *.
- set (B:=CompactTotallyBoundedIndex e2 d1 d2) in *.
+ cut (forall (s : Compact X) (k d1 d2 : Qpos) (pt : X)
+        (Hpt : InFinEnumC pt (approximate s d1)) (e1 e2 : Qpos),
+         proj1_sig k <= 1#2 ->
+     (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2) <= Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))%nat ->
+       ball (m:=X) (proj1_sig e1 + proj1_sig e2) (Str_nth (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2))
+         (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
+           (Str_nth (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))
+             (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))).
+  - intros Z s k d1 d2 pt Hpt khalf e1 e2.
+    destruct (le_lt_dec (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2))
+                        (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))).
+    apply Z; auto.
+    rewrite Qplus_comm.
+    apply ball_sym.
+    apply Z; auto with *.
+  - intros s k d1 d2 pt Hpt e1 e2 khalf H.
+ set (A:=Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2)) in *.
+ set (B:=Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2)) in *.
  rewrite (le_plus_minus _ _ H).
- assert (Y:proj1_sig quarter < 1).
-  constructor.
+ assert (proj1_sig k < 1) as Y.
+ { apply (Qle_lt_trans _ _ _ khalf). reflexivity. }
   assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma
-                  (B-A) quarter (((1#1)+quarter)*d1 + d2) Y)%Qpos).
-  apply ball_weak_le with (proj1_sig (Qpos_power quarter (Z.of_nat A)*(exist _ _ Y0))%Qpos).
-  2: apply CompactTotallyBoundedStreamCauchy2;constructor.
+                  (B-A) k (((1#1)+k)*d1 + d2) Y)%Qpos).
+  apply ball_weak_le with (proj1_sig (Qpos_power k (Z.of_nat A)*(exist _ _ Y0))%Qpos).
+  2: apply CompactTotallyBoundedStreamCauchy2; exact Y.
   simpl.
  unfold Qdiv.
- set (C:=(((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2)
-          * (1 # 4) ^ Z.of_nat A * / (1 - (1 # 4)))).
- setoid_replace ( (1 # 4) ^ Z.of_nat A *
-  (((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2) *
-   (1 - Qpower_positive (1 # 4) (Pos.of_succ_nat (B - A))) * 
-   / (1 - (1 # 4))))
-   with ((1 - (1 # 4) ^ Z.of_nat (S (B - A))) * C) by (unfold C; simpl; ring).
+ set (C:=(((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
+          * proj1_sig k ^ Z.of_nat A * / (1 - proj1_sig k))).
+ setoid_replace ( proj1_sig k ^ Z.of_nat A *
+  (((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2) *
+   (1 - Qpower_positive (proj1_sig k) (Pos.of_succ_nat (B - A))) * 
+   / (1 - proj1_sig k)))
+   with ((1 - proj1_sig k ^ Z.of_nat (S (B - A))) * C)
+   by (unfold C; simpl; ring).
  apply Qle_trans with (1*C).
  apply Qmult_le_r.
   unfold C.
-  change (1-(1#4)) with (3#4).
-  apply (Qpos_ispos ((((1#1) + (1 # 4)) * d1 + d2) * Qpos_power (1 # 4) (Z.of_nat A) * Qpos_inv (3 # 4))).
+  apply (Qle_lt_trans _ (0 *(/(1-proj1_sig k)))).
+  rewrite Qmult_0_l. discriminate.
+  apply Qmult_lt_r.
+  apply Qinv_lt_0_compat.
+  unfold Qminus. rewrite <- Qlt_minus_iff.
+  exact Y.
+  apply (Qpos_ispos ((((1#1) + k) * d1 + d2) * Qpos_power k (Z.of_nat A))). 
    rewrite -> Qle_minus_iff.
    ring_simplify.
    apply Qpower_pos_positive.
-   discriminate.
+   apply Qpos_nonneg.
   rewrite Qmult_1_l.
  apply Qle_trans with (proj1_sig e1).
+ unfold A in C.
+ unfold C.
+ rewrite Z2Nat.id.
   apply CompactTotallyBoundedIndexLemma.
+  exact khalf.
+  apply Z.log2_up_nonneg.
   rewrite <- Qplus_0_r at 1.
   apply Qplus_le_r, Qpos_nonneg.
 Qed.
 
-Definition CompactTotallyBounded_fun  (s:Compact X) (d1 d2:Qpos) (pt:X) Hpt : Complete X :=
- Build_RegularFunction (@CompactTotallyBounded_prf s d1 d2 pt Hpt).
+Definition CompactTotallyBounded_fun
+           (s:Compact X) (k d1 d2:Qpos) (khalf : proj1_sig k <= 1#2)
+           (pt:X) (Hpt : InFinEnumC pt (approximate s d1)) 
+  : Complete X
+  := Build_RegularFunction (@CompactTotallyBounded_prf s k d1 d2 pt Hpt khalf).
 
 (** The limit is inside the compact set *)
-Lemma CompactTotallyBoundedInCompact : forall (s:Compact X) (d1 d2:Qpos) (pt:X) Hpt,
- inCompact (@CompactTotallyBounded_fun s d1 d2 pt Hpt) s.
+Lemma CompactTotallyBoundedInCompact
+  : forall (s:Compact X) (k d1 d2:Qpos) (khalf : proj1_sig k <= 1#2) (pt:X) Hpt,
+ inCompact (@CompactTotallyBounded_fun s k d1 d2 khalf pt Hpt) s.
 Proof.
- intros s d1 d2 pt Hpt e1 e2.
- pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
+ intros s k d1 d2 khalf pt Hpt e1 e2.
  simpl. 
  destruct (@StreamInCompactApprox
-             (CompactTotallyBoundedIndex e1 d1 d2) s quarter d1 d2 pt Hpt)
+             (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2)) s k d1 d2 pt Hpt)
    as [q Hq Hq0].
  apply FinSubset_ball_closed.
  intros d dpos.
@@ -686,21 +671,30 @@ Proof.
     with (proj1_sig e1 + - proj1_sig q) by (simpl; ring).
   rewrite <- Qle_minus_iff.
   unfold QposEq in Hq0. rewrite -> Hq0.
-  eapply Qle_trans;[|apply (CompactTotallyBoundedIndexLemma e1 d1 d2)].
+  eapply Qle_trans;[|apply (CompactTotallyBoundedIndexLemma e1 k d1 d2)].
   simpl.
-  cut (0 <= (1 # 4) ^ Z.of_nat (CompactTotallyBoundedIndex e1 d1 d2)).
-   generalize ( (1 # 4) ^ Z.of_nat (CompactTotallyBoundedIndex e1 d1 d2)).
+  rewrite Z2Nat.id.
+  cut (0 <= proj1_sig k ^ (CompactTotallyBoundedIndex e1 d1 d2)).
+  { generalize ( proj1_sig k ^ (CompactTotallyBoundedIndex e1 d1 d2)).
    intros z Hz.
-   clear - Hz.
-   rewrite -> Qle_minus_iff.
-   setoid_replace ( ((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2) * z / (1 - (1 # 4)) +
-  - (z * proj1_sig d1))
-     with (z*((proj1_sig d1 + (2#1)*proj1_sig d2)/(3#2)))
-     by (simpl; field).
-   apply Qmult_le_0_compat. exact Hz.
-   apply (Qpos_nonneg ((d1+(2#1)*d2) * Qpos_inv (3#2))).
+   clear - Hz khalf.
+   apply Qle_shift_div_l.
+   unfold Qminus. rewrite <- Qlt_minus_iff.
+   apply (Qle_lt_trans _ _ _ khalf). reflexivity.
+   rewrite <- Qmult_assoc, Qmult_comm.
+   apply Qmult_le_compat_r. 2: exact Hz.
+   apply (Qle_trans _ ((1 + proj1_sig k) * proj1_sig d1 + 0)).
+   rewrite Qplus_0_r, Qmult_comm.
+   apply Qmult_le_compat_r. 2: apply Qpos_nonneg.
+   apply Qplus_le_r.
+   apply (Qle_trans _ 0).
+   apply (Qopp_le_compat 0), Qpos_nonneg.
+   apply Qpos_nonneg.
+   apply Qplus_le_r, Qpos_nonneg. }
   apply Qpower_pos.
-  discriminate.
+  apply Qpos_nonneg.
+  apply Z.log2_up_nonneg.
+  exact khalf.
  eapply FinSubset_ball_triangle_r;[|apply regFun_prf].
  replace d with (proj1_sig (exist _ _ dpos)) by reflexivity.
  apply FinSubset_ball_weak_le with (e1:=0).
@@ -708,94 +702,100 @@ Proof.
 Qed.
 
 (** The limit is close to the initial starting point *)
-Lemma CompactTotallyBoundedNotFar : forall (s:Compact X) (d1 d2:Qpos) (pt:X) Hpt,
-    ball ((5#3)*proj1_sig d1 + (4#3)*proj1_sig d2)
-         (Cunit pt) (@CompactTotallyBounded_fun s d1 d2 pt Hpt).
+Lemma CompactTotallyBoundedNotFar
+  : forall (s:Compact X) (k d1 d2:Qpos) (khalf : proj1_sig k <= 1#2)
+      (pt:X) (Hpt : InFinEnumC pt (approximate s d1)),
+    ball (((1 + proj1_sig k)*proj1_sig d1 + proj1_sig d2)
+            / (1 - proj1_sig k))
+         (Cunit pt) (@CompactTotallyBounded_fun s k d1 d2 khalf pt Hpt).
 Proof.
- intros s d1 d2 pt Hpt e1 e2.
- pose (exist (Qlt 0) (1#1) eq_refl) as one.
- pose (exist (Qlt 0) (1#4) eq_refl) as quarter.
+ intros s k d1 d2 khalf pt Hpt e1 e2.
  simpl.
- assert (Z: proj1_sig quarter < 1) by constructor.
- assert (Z0:=(CompactTotallyBoundedStreamCauchyLemma
-                (CompactTotallyBoundedIndex e2 d1 d2)
-                _ ((one+quarter)*(d1) + (d2)) Z)%Qpos).
+ assert (proj1_sig k < 1) as Z.
+ { apply (Qle_lt_trans _ _ _ khalf). reflexivity. }
+ pose proof (CompactTotallyBoundedStreamCauchyLemma
+               (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))
+               _ (((1#1)+k)*d1 + d2)%Qpos Z) as Z0.
  apply ball_weak_le with (proj1_sig (exist _ _ Z0)).
- 2: apply CompactTotallyBoundedStreamCauchy1; constructor.
+ 2: apply CompactTotallyBoundedStreamCauchy1; exact Z.
  simpl.
- apply Qle_trans with (((1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2) / (1 - (1 # 4))).
+ apply Qle_trans with (((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2) / (1 - proj1_sig k)).
  apply Qmult_le_compat_r.
- 2: discriminate.
-  rewrite <- (Qmult_1_r ( (1 + (1 # 4)) * proj1_sig d1 + proj1_sig d2)) at 2.
+ - rewrite <- (Qmult_1_r ( (1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2)) at 2.
   apply Qmult_le_l.
-  apply Q.Qplus_lt_le_0_compat; auto with *. 
+  apply (Qpos_ispos (((1#1)+k)*d1 + d2)).
    rewrite -> Qle_minus_iff.
    ring_simplify.
-   apply (Qpower_pos (1#4) (Z.pos (P_of_succ_nat (CompactTotallyBoundedIndex e2 d1 d2)))).
-   discriminate.
-  simpl.
- rewrite -> Qle_minus_iff.
- unfold Qdiv.
- change (/(1-(1#4))) with (4#3).
- ring_simplify.
- apply Qlt_le_weak.
- apply Q.Qplus_lt_le_0_compat; auto with *.
+   apply Qpower_pos_positive.
+   apply Qpos_nonneg.
+ - apply Qlt_le_weak, Qinv_lt_0_compat.
+   unfold Qminus. rewrite <- Qlt_minus_iff. exact Z.
+ - apply (Qle_trans _ (0 + (((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2) / (1 - proj1_sig k)) + 0)).
+   rewrite Qplus_0_l, Qplus_0_r.
+   apply Qle_refl.
+   apply Qplus_le_compat. 2: apply Qpos_nonneg.
+   apply Qplus_le_compat. apply Qpos_nonneg.
+   apply Qle_refl.
 Qed.
+
+Fixpoint MapInFinEnumC {Y : Type} (l : list X)
+         (f : forall pt : X, InFinEnumC pt l -> Y) { struct l } : list Y.
+Proof.
+  destruct l as [|m l].
+  - exact nil.
+  - apply cons.
+    apply (f m).
+    apply InFinEnumC_weaken; left; reflexivity.
+    exact (MapInFinEnumC Y l (fun pt H => (f pt (FinSubset_ball_cons H)))).
+Defined.
+
+Lemma QuarterLeHalf : 1#4 <= 1#2.
+Proof. discriminate. Qed.
 
 (** Using CompactTotallyBounded_fun we can map the approximation of
 a compact set to a new enumeration that contains only points inside
 the compact sets, without moving the points too much *)
-Definition CompactTotalBound (s:Compact X) (e:Qpos) : list (Complete X).
-Proof.
- pose (exist (Qlt 0) (1#5) eq_refl) as fifth.
- generalize (CompactTotallyBounded_fun s (fifth*e) (fifth*e)).
- induction (approximate s (fifth * e)%Qpos).
- - intros _.
-  exact nil.
- - intros H.
- apply cons.
-  apply H with a.
-  apply InFinEnumC_weaken; auto with *.
- apply IHm.
- intros pt Hpt.
- apply H with pt.
- apply FinSubset_ball_cons.
- exact Hpt.
-Defined.
+Definition CompactTotalBound (s:Compact X) (e:Qpos) : list (Complete X)
+  := MapInFinEnumC (CompactTotallyBounded_fun
+                      s (1#4)%Qpos ((1#5)*e) ((1#5)*e) QuarterLeHalf).
 
 Lemma CompactTotalBoundNotFar : forall (s:Compact X) (e:Qpos),
-    ball ((3#5)*proj1_sig e)
-         (map Cunit (approximate s ((1#5)*e)%Qpos):FinEnum (Complete X)) (CompactTotalBound s e).
+    @ball (FinEnum (Complete X))
+          ((3#5)*proj1_sig e)
+          (map Cunit (approximate s ((1#5)*e)%Qpos))
+          (CompactTotalBound s e).
 Proof.
  intros s e.
  unfold CompactTotalBound.
- generalize (CompactTotallyBoundedNotFar s ((1#5)*e) ((1#5)*e)).
- generalize (CompactTotallyBounded_fun s ((1 # 5) * e) ((1 # 5) * e)).
+ generalize (CompactTotallyBoundedNotFar
+               s (1#4)%Qpos ((1#5)*e) ((1#5)*e) QuarterLeHalf).
+ generalize (CompactTotallyBounded_fun s (1 # 4) ((1 # 5) * e) 
+          ((1 # 5) * e) QuarterLeHalf).
  induction (approximate s ((1 # 5) * e)%Qpos) as [|a s0]; intros H L.
  - apply ball_refl. apply (Qpos_nonneg ((3#5)*e)).
- - split. apply (Qpos_nonneg ((3#5)*e)).
+ - unfold Qdiv in L.
+   split. apply (Qpos_nonneg ((3#5)*e)).
  split; intros x Hx.
    + apply FinSubset_ball_orC in Hx.
   destruct Hx as [G | Hx | Hx] using orC_ind.
     auto using existsC_stable.
    apply existsWeaken.
-   exists (H a (InFinEnumC_weaken X a (a :: s0) (in_eq a s0))).
+   exists (H a (InFinEnumC_weaken X a (a :: s0) (or_introl eq_refl))).
    split.
    intro abs; contradict abs.
-   exists (H a (InFinEnumC_weaken X a (a :: s0) (in_eq a s0))).
+   exists (H a (InFinEnumC_weaken X a (a :: s0) (or_introl eq_refl))).
    split. left. reflexivity. reflexivity.
    rewrite -> Hx.
-   assert (QposEq ((3 # 5) * e)
-                  ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))).
-   { unfold QposEq; simpl; ring. }
-   unfold QposEq in H0. rewrite H0. clear H0.
+   setoid_replace ((3 # 5) * proj1_sig e)
+     with (((5 # 4) * proj1_sig ((1 # 5) * e)%Qpos + proj1_sig ((1 # 5) * e)%Qpos) *
+         (4 # 3)) by (simpl; ring).
    apply L.
    set (H':=(fun pt (Hpt : InFinEnumC pt s0)
              => H pt (FinSubset_ball_cons Hpt))).
   assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
-    ball (m:=Complete X) (proj1_sig ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos) (Cunit pt) (H' pt Hpt)).
-   intros pt Hpt.
-   apply L.
+    ball (m:=Complete X) (((1 + proj1_sig (1 # 4)%Qpos) * proj1_sig ((1 # 5) * e)%Qpos +
+          proj1_sig ((1 # 5) * e)%Qpos) * / (1 - proj1_sig (1 # 4)%Qpos)) (Cunit pt) (H' pt Hpt)).
+  { intros pt Hpt. apply L. }
   destruct (IHs0 H' L') as [_ [A _]].
   destruct (A x Hx) as [G | y [Hy0 Hy1]] using existsC_ind.
    auto using existsC_stable.
@@ -812,16 +812,15 @@ Proof.
   intro abs; contradict abs.
   exists (Cunit a). split. left. reflexivity. reflexivity.
   rewrite -> Hx.
-  assert (QposEq ((3 # 5) * e)
-                 ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e)))
-    by (unfold QposEq; simpl; ring).
-  unfold QposEq in H0. rewrite H0. clear H0.
-  apply ball_sym.
-  apply L.
+  setoid_replace ((3 # 5) * proj1_sig e)
+    with (((5 # 4) * proj1_sig ((1 # 5) * e)%Qpos + proj1_sig ((1 # 5) * e)%Qpos) *
+          (4 # 3)) by (simpl; ring).
+  apply ball_sym, L.
   set (H':=(fun pt (Hpt : InFinEnumC pt s0)
             => H pt (FinSubset_ball_cons Hpt))).
  assert (L':forall (pt : X) (Hpt : InFinEnumC pt s0),
-   ball (m:=Complete X) (proj1_sig ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos) (Cunit pt) (H' pt Hpt)).
+   ball (m:=Complete X) (((1 + proj1_sig (1 # 4)%Qpos) * proj1_sig ((1 # 5) * e)%Qpos +
+          proj1_sig ((1 # 5) * e)%Qpos) * / (1 - proj1_sig (1 # 4)%Qpos)) (Cunit pt) (H' pt Hpt)).
   intros pt Hpt.
   apply L.
  destruct (IHs0 H' L') as [_ [_ A]].
@@ -838,8 +837,9 @@ Lemma CompactTotallyBoundedA : forall s e y, In y (CompactTotalBound s e) -> inC
 Proof.
  intros s e y.
  unfold CompactTotalBound.
- generalize (CompactTotallyBoundedInCompact s ((1#5)*e) ((1#5)*e)).
- generalize (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e)).
+ generalize (CompactTotallyBoundedInCompact
+               s (1#4)%Qpos ((1#5)*e) ((1#5)*e) QuarterLeHalf).
+ generalize (CompactTotallyBounded_fun s (1#4)%Qpos ((1#5)*e) ((1#5)*e) QuarterLeHalf).
  generalize (approximate s ((1 # 5) * e)%Qpos).
  intros l.
  induction l.
@@ -865,8 +865,10 @@ Proof.
  clear Z.
  unfold CompactTotalBound.
  revert Hy0.
- cut (forall pt Hpt, ball ((3#5)*proj1_sig e) (Cunit pt) (@CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e) pt Hpt)).
- { generalize (CompactTotallyBounded_fun s ((1#5)*e) ((1#5)*e)).
+ cut (forall pt Hpt, ball ((3#5)*proj1_sig e) (Cunit pt)
+                     (@CompactTotallyBounded_fun s (1#4)%Qpos ((1#5)*e) ((1#5)*e)
+                                                 QuarterLeHalf pt Hpt)).
+ { generalize (CompactTotallyBounded_fun s (1#4)%Qpos ((1#5)*e) ((1#5)*e) QuarterLeHalf).
   generalize (approximate s ((1 # 5) * e)%Qpos).
   intros l.
   induction l.
@@ -894,7 +896,16 @@ Proof.
  assert (QposEq ((3#5)*e) ((5#3)*((1#5)*e) + (4#3)*((1#5)*e)))
    by (unfold QposEq; simpl; ring).
  unfold QposEq in H. rewrite H. clear H.
- apply CompactTotallyBoundedNotFar.
+ pose proof (CompactTotallyBoundedNotFar
+               s (1#4)%Qpos ((1 # 5) * e) ((1 # 5) * e) QuarterLeHalf Hpt).
+ setoid_replace (proj1_sig ((5 # 3) * ((1 # 5) * e) + (4 # 3) * ((1 # 5) * e))%Qpos)
+   with (((1 + proj1_sig (1 # 4)%Qpos) * proj1_sig ((1 # 5) * e)%Qpos +
+          proj1_sig ((1 # 5) * e)%Qpos) / (1 - proj1_sig (1 # 4)%Qpos)).
+ apply H.
+ simpl. 
+ unfold Qdiv.
+ setoid_replace (/ (1 - (1 # 4))) with (4#3) by reflexivity.
+ ring.
 Qed.
 
 Lemma CompactTotallyBounded : forall s, TotallyBoundedSubset _ (fun z => inCompact z s).
@@ -904,8 +915,6 @@ Proof.
   apply CompactTotallyBoundedA.
  apply CompactTotallyBoundedB.
 Defined.
-
-
 
 (** And hence our compact sets are Bishop compact. *)
 Lemma CompactAsBishopCompact : forall s, CompactSubset _ (fun z => inCompact z s).
@@ -1307,8 +1316,6 @@ Proof.
  exact Hy0.
 Qed.
 
-Local Open Scope uc_scope.
-
 Definition FinCompact : FinEnum (Complete X) --> Compact X :=
  Build_UniformlyContinuousFunction FinCompact_uc.
 
@@ -1548,13 +1555,84 @@ Qed.
 
 End CompactDistr.
 
+(* A more synthetic presentation of CompactTotallyBounded_fun. *)
+Lemma InApproxCompact
+  : forall {X : MetricSpace} (K : Compact X) (x : X) (d:Qpos) (e : Q),
+    InFinEnumC x (approximate K d)
+    -> locatedMetric X
+    -> proj1_sig d < e
+    -> { y:Complete X | inCompact y K /\ ball e (Cunit x) y }.
+Proof.
+  intros X K x d e inx locX ltde.
+  pose ((1#2)*(e-proj1_sig d)) as d2.
+  pose (d2 / (proj1_sig d + e)) as k.
+  assert (0 < proj1_sig d + e) as depos.
+  { apply (Qlt_trans _ (proj1_sig d+0)).
+    rewrite Qplus_0_r. apply Qpos_ispos.
+    apply Qplus_lt_r. apply (Qlt_trans _ (proj1_sig d)).
+    apply Qpos_ispos. exact ltde. }
+  assert (0 < d2) as d2pos.
+  { unfold d2. apply (Qle_lt_trans _ ((1#2)*0)).
+    discriminate. apply Qmult_lt_l. reflexivity.
+    unfold Qminus. rewrite <- Qlt_minus_iff. exact ltde. } 
+  assert (0 < k) as kpos.
+  { unfold k.
+    apply (Qpos_ispos (exist _ _ d2pos * Qpos_inv (exist _ _ depos))%Qpos). }
+  assert (k <= 1#2) as khalf.
+  { unfold k. apply Qle_shift_div_r. exact depos.
+    unfold d2. apply Qmult_le_l. reflexivity.
+    unfold Qminus. rewrite Qplus_comm.
+    apply Qplus_le_l. apply (Qle_trans _ 0).
+    apply (Qopp_le_compat 0), Qpos_nonneg. apply Qpos_nonneg. }
+  exists (CompactTotallyBounded_fun
+       locX K (exist _ _ kpos) d (exist _ _ d2pos) khalf inx).
+  split.
+  apply CompactTotallyBoundedInCompact.
+  pose proof (CompactTotallyBoundedNotFar
+                locX K (exist _ _ kpos) d (exist _ _ d2pos) khalf inx) as H. 
+  apply (ball_weak_le)
+    with (e:= (((1 + proj1_sig (exist (Qlt 0) k kpos)) * proj1_sig d +
+          proj1_sig (exist (Qlt 0) d2 d2pos)) /
+         (1 - proj1_sig (exist (Qlt 0) k kpos)))).
+  2: exact H.
+  simpl.
+  apply Qle_shift_div_r.
+  unfold Qminus. rewrite <- Qlt_minus_iff.
+  apply (Qle_lt_trans _ _ _ khalf). reflexivity.
+  apply (Qplus_le_l _ _ (e*k - proj1_sig d)).
+  ring_simplify.
+  rewrite <- Qmult_plus_distr_r.
+  unfold k, Qdiv.
+  rewrite <- Qmult_assoc.
+  rewrite <- (Qmult_comm (proj1_sig d + e)), Qmult_inv_r, Qmult_1_r.
+  unfold d2.
+  rewrite <- Qmult_plus_distr_l.
+  setoid_replace ((1 # 2) + (1 # 2)) with 1%Q by reflexivity.
+  rewrite Qmult_1_l.
+  ring_simplify. apply Qle_refl.
+  intro abs.
+  rewrite abs in depos.
+  exact (Qlt_irrefl 0 depos).
+Qed.
+
+
 Section CompactImage.
 
 (**
 ** Compact Image
-If x is in a compact set S, then f x is in the compact image of S under f.
-Because of the definition of compactness by approximations in underlying
-metric spaces, the function really applied is rather
+
+Given a function f : X -> Y, the image by f of a subset A : X -> Prop could
+be defined as fun y:Y => exists x:X, A x /\ y = f x. When the subset A is
+compact and f is uniformly continuous, we want to prove that the image f(A)
+is also compact.
+
+However this is hard to do with those definitions and the notion of Bishop
+compactness given above, because we have to lift exists x:X, A x /\ y = f x
+from Prop to Type, by developing an algorithm that constructs x. 
+
+Our definition of compact by finite approximations allows to define the
+compact images directly in Prop, simply by mapping f over the approximations.
+In that definition, the function really applied is
 Cmap f : Complete X -> Complete Y.
 So a good example is X = Y = Q here. For more interesting continuous
 functions we will need X = Q and Y = R, which we will handle by joining
@@ -1564,8 +1642,6 @@ Variable z : Qpos.
 Variable X Y : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
 Hypothesis plFEX : PrelengthSpace (FinEnum X).
-
-Local Open Scope uc_scope.
 
 Variable f : X --> Y.
 
@@ -1611,10 +1687,10 @@ Proof.
  auto.
 Qed.
 
-(* An approximation of s : Compact X is a finite list X,
-   f maps on it to produce a list Y, which is the approximation
-   of a Compact Y. Cmap uses the modulus of uniform continuity of f
-   to select the correct approximation precision in X, given that in Y. *)
+(* The approximations of K : Compact X are finite lists of X which do not
+   have to be exactly inside K. When mapping a function f over those
+   approximations, we must make sure that they converge towards the exact
+   images of points of K by f. *)
 Definition CompactImage : Compact X --> Compact Y :=
   Cmap plFEX (FinEnum_map z f).
 
@@ -1720,8 +1796,6 @@ Variable z : Qpos.
 Variable X Y : MetricSpace.
 Hypothesis plX : PrelengthSpace X.
 Hypothesis plFEX : PrelengthSpace (FinEnum X).
-
-Local Open Scope uc_scope.
 
 Variable f : X --> Complete Y.
 

@@ -309,7 +309,7 @@ within error err (Hausdorff distance).
 To measure closeness, we use the product metric on Q2, which has
 square balls aligned with the 2 axes. *)
 Lemma RasterizeQ2_correct1 : forall (x y:Q),
- InFinEnumC ((x,y):ProductMS _ _) f ->
+ @InFinEnumC (ProductMS _ _) (x,y) f ->
  ~~exists p, In p (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
         /\ ball (proj1_sig err) p (x,y).
 Proof.
@@ -392,9 +392,9 @@ Proof.
    auto.
 Qed.
 
-Lemma RasterizeQ2_correct2 : forall x y,
-    InFinEnumC ((x,y):ProductMS _ _)
-               (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
+Lemma RasterizeQ2_correct2 : forall (x y : Q),
+    @InFinEnumC (ProductMS _ _) (x,y)
+                (InterpRaster (RasterizeQ2 f (S n) (S m) t l b r) (l,t) (r,b))
     -> ~~ exists p, In p f /\ ball (proj1_sig err) p (x,y).
 Proof.
  intros x y H.
