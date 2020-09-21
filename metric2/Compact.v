@@ -274,7 +274,7 @@ Proof.
 Qed.
 
 
-(** The limit of this stream constructs a point inside the compact set
+(** The limit of this sequence constructs a point inside the compact set
     close to any point pt inside an approximation of the compact.
     The next point pt' is in approximate s (k*d), which converges to s
     when k < 1. By regularity of the compact s, the distance between
@@ -287,15 +287,17 @@ Qed.
     (1+k)*d+e of pt, which we can take arbitrarily close to d,
     the initial distance between pt and the compact s.
  *)
-CoFixpoint CompactTotallyBoundedStream (s:Compact X) (k d e:Qpos)
-           (pt:X) (Hpt : InFinEnumC pt (approximate s d))
-  : Stream X :=
-Cons pt
- (let (f,_) := HausdorffBallHausdorffBallStrong locatedX
-               (regFun_prf s d (k*d)%Qpos) in
-  let (pt',HptX) := f pt Hpt e in
-  let (Hpt',_) := HptX in
-  (@CompactTotallyBoundedStream s k (k*d) (k*e) pt' Hpt')).
+Fixpoint CompactImproveApproximation (s:Compact X) (k d e:Qpos)
+         (pt:X) (Hpt : InFinEnumC pt (approximate s d))
+         (n : nat) { struct n } : X
+  := match n with
+     | O => pt
+     | S p => let (f,_) := HausdorffBallHausdorffBallStrong
+                            locatedX (regFun_prf s d (k*d)%Qpos) in
+             let (pt',HptX) := f pt Hpt e in
+             let (Hpt',_) := HptX in
+             @CompactImproveApproximation s k (k*d) (k*e) pt' Hpt' p
+     end.
 
 (** This stream is Cauchy *)
 Lemma CompactTotallyBoundedStreamCauchyLemma : forall n (k d:Qpos),
@@ -333,19 +335,19 @@ Qed.
 (* In a friendlier notation, the distance is
 ((1+k)*d1+d2) * (1-k^(S n)) / (1-k)
 *)
-Lemma CompactTotallyBoundedStreamCauchy1
+Lemma CompactImproveApproxCauchy1
   : forall n s (k d1 d2:Qpos) pt Hpt,
     proj1_sig k < 1 ->
     ball ((((1#1)+proj1_sig k)*proj1_sig d1+ proj1_sig d2)
           * (1-proj1_sig k^Z.of_nat(S n))/(1-proj1_sig k))
-         pt (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
+         pt (@CompactImproveApproximation s k d1 d2 pt Hpt n).
 Proof.
   induction n; intros s k d1 d2 pt Hpt Hk.
   apply ball_refl.
   apply Qlt_le_weak.
   apply (CompactTotallyBoundedStreamCauchyLemma
            O k (((1#1) + k) * d1 + d2)%Qpos), Hk.
-  unfold Str_nth.
+  simpl (CompactImproveApproximation s k d1 d2 Hpt (S n)).
   set (e:=(((1#1) + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
           * (1 - proj1_sig k ^ Z.of_nat (S (S n))) / (1 - proj1_sig k)) in *.
   set (e0:=((d1 + k * d1 + d2)
@@ -382,18 +384,18 @@ Proof.
     discriminate.
 Qed.
 
-Lemma CompactTotallyBoundedStreamCauchy2
+Lemma CompactImproveApproxCauchy2
   : forall (m n:nat) s (k d1 d2:Qpos) pt Hpt,
     proj1_sig k < 1 ->
     ball (proj1_sig k ^ (Z.of_nat m)
           * ((((1#1)+proj1_sig k)*proj1_sig d1+proj1_sig d2)
              *(1-proj1_sig k^Z.of_nat (S n))/(1-proj1_sig k)))
-         (Str_nth m (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
-         (Str_nth (m + n) (@CompactTotallyBoundedStream s k d1 d2 pt Hpt)).
+         (@CompactImproveApproximation s k d1 d2 pt Hpt m)
+         (@CompactImproveApproximation s k d1 d2 pt Hpt (m + n)).
 Proof.
   induction m; intros n s k d1 d2 pt Hpt Hk.
   simpl (proj1_sig k ^ Z.of_nat 0). rewrite Qmult_1_l.
-  apply CompactTotallyBoundedStreamCauchy1; assumption.
+  apply CompactImproveApproxCauchy1; assumption.
   pose (e':=(CompactTotallyBoundedStreamCauchyLemma
                n _ (((1#1)+k)*(k*d1) + (k*d2)) Hk)%Qpos).
   assert (~proj1_sig k==0) as knz.
@@ -434,7 +436,7 @@ Qed.
 (* All points in the stream are in the approximations of s, 
    at precisions k^n * d1. *)
 Lemma StreamInCompactApprox : forall n s k d1 d2 pt Hpt,
-    {q:Qpos | InFinEnumC (Str_nth n (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
+    {q:Qpos | InFinEnumC (@CompactImproveApproximation s k d1 d2 pt Hpt n)
                          (approximate s q)
               & QposEq q (Qpos_power k (Z.of_nat n)*d1) }.
 Proof.
@@ -571,13 +573,12 @@ Qed.
 Definition CompactTotallyBounded_raw (s:Compact X) (k d1 d2:Qpos)
            (pt:X) Hpt (e:QposInf)
   : X
-  :=
-  match e with
-  |QposInfinity => pt
-  |Qpos2QposInf e' => Str_nth (Z.to_nat (CompactTotallyBoundedIndex e' d1 d2))
-                             (@CompactTotallyBoundedStream
-                                s k d1 d2 pt Hpt)
-  end.
+  := match e with
+     | QposInfinity => pt
+     | Qpos2QposInf e' => @CompactImproveApproximation
+                           s k d1 d2 pt Hpt
+                           (Z.to_nat (CompactTotallyBoundedIndex e' d1 d2))
+     end.
 
 (** This stream forms a regular function *)
 Lemma CompactTotallyBounded_prf : forall (s:Compact X) (k d1 d2:Qpos) (pt:X) Hpt,
@@ -589,10 +590,13 @@ Proof.
         (Hpt : InFinEnumC pt (approximate s d1)) (e1 e2 : Qpos),
          proj1_sig k <= 1#2 ->
      (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2) <= Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))%nat ->
-       ball (m:=X) (proj1_sig e1 + proj1_sig e2) (Str_nth (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2))
-         (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))
-           (Str_nth (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))
-             (@CompactTotallyBoundedStream s k d1 d2 pt Hpt))).
+     ball (proj1_sig e1 + proj1_sig e2)
+          (@CompactImproveApproximation
+             s k d1 d2 pt Hpt
+             (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2)))
+          (@CompactImproveApproximation
+               s k d1 d2 pt Hpt
+               (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2)))).
   - intros Z s k d1 d2 pt Hpt khalf e1 e2.
     destruct (le_lt_dec (Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2))
                         (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))).
@@ -609,7 +613,7 @@ Proof.
   assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma
                   (B-A) k (((1#1)+k)*d1 + d2) Y)%Qpos).
   apply ball_weak_le with (proj1_sig (Qpos_power k (Z.of_nat A)*(exist _ _ Y0))%Qpos).
-  2: apply CompactTotallyBoundedStreamCauchy2; exact Y.
+  2: apply CompactImproveApproxCauchy2; exact Y.
   simpl.
  unfold Qdiv.
  set (C:=(((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2)
@@ -717,7 +721,7 @@ Proof.
                (Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2))
                _ (((1#1)+k)*d1 + d2)%Qpos Z) as Z0.
  apply ball_weak_le with (proj1_sig (exist _ _ Z0)).
- 2: apply CompactTotallyBoundedStreamCauchy1; exact Z.
+ 2: apply CompactImproveApproxCauchy1; exact Z.
  simpl.
  apply Qle_trans with (((1 + proj1_sig k) * proj1_sig d1 + proj1_sig d2) / (1 - proj1_sig k)).
  apply Qmult_le_compat_r.
