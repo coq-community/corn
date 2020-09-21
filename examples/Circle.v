@@ -10,7 +10,8 @@ Require Import CoRN.reals.faster.ARArith.
 Require Import ARplot.
 Require Import CoRN.reals.faster.ARcos
         CoRN.reals.faster.ARsin
-        CoRN.reals.faster.ARbigD.
+        CoRN.reals.faster.ARbigD
+        CoRN.reals.faster.ARinterval.
 Require Import CoRN.reals.fast.CRtrans.
 Require Import CoRN.dump.theories.Loader.
 
@@ -19,9 +20,9 @@ Local Open Scope uc_scope.
 Section PlotCirclePath.
 Context `{AppRationals AQ}.
 
-Definition CirclePath_faster : AQ_as_MetricSpace --> Complete Q2 := 
-  (uc_compose (uc_compose Couple (together (uc_compose ARtoCR_uc ARcos_uc)
-                                           (uc_compose ARtoCR_uc ARsin_uc)))
+Definition CirclePath_faster
+  : AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace) := 
+  (uc_compose (uc_compose Couple (together ARcos_uc ARsin_uc))
               (diag AQ_as_MetricSpace)).
 
 (* 7 is above 2 pi, which finishes a circle. *)
@@ -36,15 +37,19 @@ Definition Circle_faster : raster _ _
 (* This is the approximation of the circle that will be rasterized.
    For a 10x10 pixel plot, the precision is 1/40.
    But we approximate by real numbers instead of rational numbers. *)
-Definition Circle_approx : list (Complete Q2)
-  := approximate (PathImage CirclePath_faster 0 7 zeroSeven)
-             (Qpos_max
-                ((1 # 8 * Pos.of_succ_nat (Init.Nat.pred 10)) ↾ eq_refl *
-                 (1 - - (1)) ↾ wpos (- (1)) 1 (reflexivity Datatypes.Lt))
-                ((1 # 8 * Pos.of_succ_nat (Init.Nat.pred 10)) ↾ eq_refl *
-                 (1 - - (1)) ↾ hpos (- (1)) 1 (reflexivity Datatypes.Lt))).
+Definition Circle_approx : list (prod AQ_as_MetricSpace AQ_as_MetricSpace)
+  := map (fun x => approximate x (Qpos2QposInf (1#40)%Qpos))
+         (map CirclePath_faster
+              (approximate (IabCompact _ _ zeroSeven)
+                           (FinEnum_map_modulus (1 # 1) (mu CirclePath_faster)
+                                                (1#40)%Qpos))).
 
 End PlotCirclePath.
+
+Definition Circle_approx_bigD
+  := @Circle_approx bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
+Time Compute Circle_approx_bigD.
+
 
 (* 12 seconds :-( *)
 Definition Circle_bigD : raster _ _
@@ -56,7 +61,6 @@ DumpGrayMap Circle_bigD.
 (* Now have a look at plot.pgm *)
 
 
-(* TODO faster reals instead of fast reals. *)
 Definition CircleFunction_aux
   : ProductMS Q_as_MetricSpace Q_as_MetricSpace --> ProductMS CR CR
   := together cos_uc sin_uc.
@@ -66,6 +70,12 @@ Definition CirclePath : Q_as_MetricSpace --> Complete Q2:=
 (* The following hangs:
 Definition CirclePath': UCFunction Q R2:= 
   ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
+
+Definition Circle_approx_fast : list Q2
+  := map (fun x => approximate x (Qpos2QposInf (1#40)%Qpos))
+         (approximate (Plot.PathImage CirclePath 0 7 zeroSeven)
+                      (Qpos2QposInf (1#40)%Qpos)).
+Time Compute Circle_approx_fast.
 
 
 (* 9 seconds :-( *)

@@ -59,15 +59,6 @@ Proof.
  apply QPrelengthSpace.
 Qed.
 
-(** The image of a path as a [Compact] subset of the plane.
-    A path is usually defined as a continuous function from a
-    real interval [l,r], but by continuity it is fully determined
-    by its values on rational numbers, which are faster to plot. *)
-Definition PathImage {X : MetricSpace} (path : Q_as_MetricSpace --> X)
-           (l r:Q) (Hlr : l <= r)
-  : Compact X
-  := CompactImage (1#1)%Qpos plFEQ path (CompactIntervalQ Hlr). 
-
 Section PlotPath.
 Variable (from to:Q).
 Hypothesis Hfromto:from<=to.
@@ -100,12 +91,19 @@ Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
                     ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
 
 Variable path:Q_as_MetricSpace --> Complete Q2.
-(** The actual plot function *)
+
+(** The actual plot function.
+    The approximation of PathImage make a list (Complete Q2), ie a list
+    of points in the real plane. Those points still need to be approximated
+    by rational numbers, which map approximate does. *)
 Definition PlotPath : nat * nat * Q * raster n m
-  := (n, m, 2#1, (RasterizeQ2 
-(approximate 
-(FinCompact Q2 (approximate (PathImage path from to Hfromto) err))
-err) n m t l b r )).
+  := (n, m, 2#1,
+      RasterizeQ2 
+        (map (fun x => approximate x err)
+             (map path (approximate (CompactIntervalQ Hfromto)
+                                    (FinEnum_map_modulus (1 # 1) (mu path) err))))
+        n m t l b r).
+
 End PlotPath.
 
 

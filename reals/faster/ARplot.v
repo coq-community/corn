@@ -5,27 +5,6 @@ Require Import CoRN.model.metric2.Qmetric.
 
 Local Open Scope uc_scope.
 
-Section ARplot.
-Context `{AppRationals AQ}.
-
-Lemma plFEAQ : PrelengthSpace (FinEnum AQ_as_MetricSpace).
-Proof.
- apply FinEnum_prelength.
- apply AQLocated.
- exact AQPrelengthSpace.
-Qed.
-
-(** The image of a path as a [Compact] subset of the plane.
-    A path is usually defined as a continuous function from a
-    real interval [l,r], but by continuity it is fully determined
-    by its values on rational numbers, which are faster to plot. *)
-Definition PathImage {X : MetricSpace} (path : AQ_as_MetricSpace --> X)
-           (l r:Q) (Hlr : l <= r)
-  : Compact X
-  := CompactImage (1#1)%Qpos plFEAQ path (IabCompact l r Hlr). 
-
-End ARplot.
-
 Section PlotPath.
 Context `{AppRationals AQ}.
 
@@ -59,11 +38,16 @@ Half the error in the Plot example, since we need to approximate twice.
 Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
                     ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
 
-Variable path:AQ_as_MetricSpace --> Complete Q2.
+Variable path:AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace).
+
 (** The actual plot function *)
 Definition PlotPath : nat * nat * Q * raster n m
-  := (n, m, 2#1, (RasterizeQ2 
-(approximate 
-(FinCompact Q2 (approximate (PathImage path from to Hfromto) err))
-err) n m t l b r )).
+  := (n, m, 2#1,
+      RasterizeQ2 
+        (map (fun x :Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace)
+              => (let (a,b) := approximate x err in (AQtoQ a, AQtoQ b)))
+             (map path (approximate (IabCompact _ _ Hfromto)
+                                    (FinEnum_map_modulus (1 # 1) (mu path) err))))
+        n m t l b r).
+
 End PlotPath.
