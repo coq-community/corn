@@ -2,7 +2,7 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.Program.Program MathClasses.misc.workaround_tactics
+  MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
   CoRN.reals.fast.CRsin CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
@@ -17,9 +17,12 @@ Local Open Scope uc_scope.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
+(* First define sine as a decreasing alternating series on the segment [0,1]. *)
 Section sin_small_pos.
 Context {num den : AQ} (Pnd : 0 ≤ num ≤ den).
 
+(* Prove that the division of the 2 AQ numerator and denominator streams
+   are equal to fast reals' Q stream of sine. *)
 Lemma ARsinSequence : DivisionStream 
   (sinSequence ('num / 'den)) 
   (powers_help (num ^ (2:N)) num)
@@ -93,31 +96,59 @@ Proof.
 Qed.
 End sin_small_pos.
 
+Lemma AQsin_small_pos_wd :
+  forall (n1 n2 d1 d2 : AQ) (p1 : 0 ≤ n1 ≤ d1) (p2 : 0 ≤ n2 ≤ d2),
+    n1 = n2
+    -> d1 = d2
+    -> AQsin_small_pos p1 = AQsin_small_pos p2.
+Proof.
+  assert (forall x y, ARtoCR x = ARtoCR y -> x = y) as H5.
+  { intros x y H5. exact H5. }
+  intros. apply H5.
+  rewrite (AQsin_small_pos_correct p1).
+  rewrite (AQsin_small_pos_correct p2).
+  rewrite H6, H7. reflexivity.
+Qed.
+
+(** Sine's range can then be extended to [[0,3^n]] by [n] applications
+of the identity [sin(x) = 3*sin(x/3) - 4*(sin(x/3))^3]. *) 
 Definition AQsin_poly_fun (x : AQ) : AQ := x * (3 - 4 * x ^ (2:N)).
 
-Lemma AQsin_poly_fun_correct (x : AQ) :
-  'AQsin_poly_fun x = sin_poly_fun ('x).
+Lemma AQsin_poly_fun_correct (q : AQ) :
+  'AQsin_poly_fun q = sin_poly_fun ('q).
 Proof.
   unfold AQsin_poly_fun, sin_poly_fun.
   rewrite nat_pow_2.
   rewrite rings.preserves_mult, rings.preserves_minus, ?rings.preserves_mult.
   rewrite rings.preserves_3, rings.preserves_4.
-  now rewrite <-(associativity _ ('x) ('x : Q)).
+  now rewrite <-(associativity _ ('q) ('q : Q)).
 Qed.
 
-Program Definition AQsin_poly_uc := unary_uc (cast AQ Q_as_MetricSpace)
-  (λ x : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) sin_poly_uc _.
-Next Obligation.
-  apply Qball_0.
+(* AQsin_poly_fun is not uniformly continuous because of x^3, but it will
+   only be applied to sine values in [-1,1], a range on which it is
+   uniformly continuous. *)
+Lemma AQsin_poly_fun_bound_correct
+  : forall q : AQ, msp_eq (' AQsin_poly_fun (AQboundAbs_uc 1 q))
+                     (sin_poly_fun (Qmax (- (1)) (Qmin 1 (' q)))).
+Proof.
+  intro q. apply Qball_0.
   rewrite AQsin_poly_fun_correct.
+  f_equiv.
+  unfold AQboundAbs_uc. simpl.
   change ('1) with (1:AQ).
   rewrite ?aq_preserves_max, ?aq_preserves_min.
   now rewrite ?rings.preserves_negate, ?rings.preserves_1.
 Qed.
 
-Definition ARsin_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc).
+Definition AQsin_poly_uc : AQ_as_MetricSpace --> AQ_as_MetricSpace
+  := unary_uc (cast AQ Q_as_MetricSpace)
+              (λ q : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 q))
+              sin_poly_uc AQsin_poly_fun_bound_correct.
 
-Lemma ARtoCR_preserves_sin_poly x : 'ARsin_poly x = sin_poly ('x).
+Definition ARsin_poly : AR -> AR
+  := uc_compose ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc).
+
+Lemma ARtoCR_preserves_sin_poly (x : AR) : 'ARsin_poly x = sin_poly ('x).
 Proof.
   change ('ARcompress (Cmap AQPrelengthSpace AQsin_poly_uc x) 
     = compress (Cmap QPrelengthSpace sin_poly_uc ('x))).
@@ -125,33 +156,51 @@ Proof.
   now apply preserves_unary_fun.
 Qed.
 
-Lemma AQsin_pos_bounded_prf1 {num den : AQ} (Pnd : 0 ≤ num ≤ den * 1) : 
-  0 ≤ num ≤ den.
-Proof. now rewrite rings.mult_1_r in Pnd. Qed.
-
-Lemma AQsin_pos_bounded_prf2 {num den : AQ} {n : nat} (Pnd : 0 ≤ num ≤ den * 3^S n) :
-  0 ≤ num ≤ (den * 3) * 3^n.
-Proof. now rewrite <-associativity. Qed.
-
-Fixpoint AQsin_pos_bounded {n : nat} {num den : AQ} : 0 ≤ num ≤ den * 3^n → AR :=
+(* When x = sin y, this function computes sin (y*3^n). *)
+Fixpoint ARsin_poly_iter (n : nat) (x : AR) : AR :=
   match n with
-  | O => λ Pnd, AQsin_small_pos (AQsin_pos_bounded_prf1 Pnd)
-  | S n' => λ Pnd, ARsin_poly (AQsin_pos_bounded (AQsin_pos_bounded_prf2 Pnd))
+  | O => x
+  | S n' => ARsin_poly (ARsin_poly_iter n' x)
   end.
+
+Definition AQsin_pos_bounded {n : nat} {num den : AQ} (Pnd : 0 ≤ num ≤ den * 3^n) : AR
+  := ARsin_poly_iter n (AQsin_small_pos Pnd).
+
+Lemma ARsin_poly_iter_wd : forall n x y,
+    x = y -> ARsin_poly_iter n x = ARsin_poly_iter n y.
+Proof.
+  induction n.
+  - intros. exact H5.
+  - intros. simpl. rewrite (IHn x y H5).
+    reflexivity.
+Qed.
 
 Lemma AQsin_pos_bounded_correct {n : nat} {num den : AQ} (Pnd : 0 ≤ num ≤ den * 3^n) : 
   'AQsin_pos_bounded Pnd = rational_sin ('num / 'den).
 Proof.
   revert num den Pnd.
   induction n; intros.
-   apply AQsin_small_pos_correct.
-  unfold AQsin_pos_bounded. fold (AQsin_pos_bounded (AQsin_pos_bounded_prf2 Pnd)).
-  rewrite ARtoCR_preserves_sin_poly.
-  rewrite IHn.
-  change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
-  rewrite rings.preserves_mult, rings.preserves_3.
-  rewrite dec_fields.dec_recip_distr, associativity.
-  now apply rational_sin_poly.
+  - unfold AQsin_pos_bounded. simpl.
+    rewrite AQsin_small_pos_correct. 
+    change (3^0%nat) with 1.
+    rewrite rings.mult_1_r. reflexivity.
+  - unfold AQsin_pos_bounded.
+    simpl.
+    rewrite ARtoCR_preserves_sin_poly.
+    unfold AQsin_pos_bounded in IHn.
+    assert (num ≤ den * 3 * 3 ^ n).
+    { destruct Pnd.
+      rewrite <- (associativity den 3). exact H6. }
+    setoid_replace (ARsin_poly_iter n (AQsin_small_pos Pnd))
+      with (ARsin_poly_iter n (AQsin_small_pos (conj (proj1 Pnd) H5))).
+    rewrite IHn.
+    change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
+    rewrite rings.preserves_mult, rings.preserves_3.
+    rewrite dec_fields.dec_recip_distr, associativity.
+    apply rational_sin_poly.
+    apply ARsin_poly_iter_wd.
+    apply AQsin_small_pos_wd. reflexivity.
+    rewrite <- (associativity den 3). reflexivity.
 Qed.
 
 Section sin_pos.
@@ -176,8 +225,9 @@ Proof.
   apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg].
 Qed.
 
-(* We can also divide by any additional number of 3 powers. Doing this generally 
-   improves the performance because the sequence diverges more quickly. *)
+(* When we reach [0,1] we can continue dividing by 3 to compute a sine
+   closer to 0. Doing this generally improves the performance because
+   the sequence converges more quickly. *)
 Lemma AQsin_pos_bound_weaken (n : nat) : 0 ≤ a ≤ 1 * 3 ^ (n + AQsin_pos_bound).
 Proof.
   split; [assumption |].
@@ -190,7 +240,7 @@ Proof.
   now apply AQsin_pos_bound_correct.
 Qed.
 
-Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 75).
+Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 0).
 
 Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).
 Proof.
@@ -219,12 +269,9 @@ Proof.
   now apply rational_sin_opp.
 Qed.
 
-Definition ARsin_uc : AQ_as_MetricSpace --> AR.
-Proof.
-  apply (unary_complete_uc 
-           QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsin sin_uc).
-  intros. apply AQsin_correct.
-Defined.
+Definition ARsin_uc : AQ_as_MetricSpace --> AR
+  := unary_complete_uc 
+       QPrelengthSpace (cast AQ Q_as_MetricSpace) AQsin sin_uc AQsin_correct.
 
 Definition ARsin : AR --> AR := Cbind AQPrelengthSpace ARsin_uc.
 
@@ -232,3 +279,4 @@ Lemma ARtoCR_preserves_sin x : 'ARsin x = sin_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
 
 End ARsin.
+

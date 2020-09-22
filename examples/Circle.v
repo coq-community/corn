@@ -31,29 +31,29 @@ Proof. discriminate. Qed.
 
 Definition Circle_faster : raster _ _
   := let (_,r) := ARplot.PlotPath 0 7 zeroSeven (-(1)) 1 (reflexivity _)
-                             (-(1)) 1 (reflexivity _) 10 10 CirclePath_faster
+                             (-(1)) 1 (reflexivity _) 100 100 CirclePath_faster
       in r.
 
 (* This is the approximation of the circle that will be rasterized.
-   For a 10x10 pixel plot, the precision is 1/40.
-   But we approximate by real numbers instead of rational numbers. *)
-Definition Circle_approx : list (prod AQ_as_MetricSpace AQ_as_MetricSpace)
-  := map (fun x => approximate x (Qpos2QposInf (1#40)%Qpos))
-         (map CirclePath_faster
-              (approximate (IabCompact _ _ zeroSeven)
-                           (FinEnum_map_modulus (1 # 1) (mu CirclePath_faster)
-                                                (1#40)%Qpos))).
+   For a 100x100 pixel plot, the precision is 1/400.
+   The number of points computed is linear in the number of X-pixels (100 here).
+   The precision is also linear, which makes a total quadric time of
+   computation, ie linear in the surface of the grid. *)
+Definition Circle_approx : list (prod AQ AQ)
+  := map (fun x => approximate x (Qpos2QposInf (1#400)%Qpos))
+         (map (ucFun CirclePath_faster)
+              (approximate (IabCompact _ _ zeroSeven) (Qpos2QposInf (1#400)%Qpos))).
 
 End PlotCirclePath.
 
-Definition Circle_approx_bigD
-  := @Circle_approx bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
-Time Compute Circle_approx_bigD.
-
-
-(* 12 seconds :-( *)
-Definition Circle_bigD : raster _ _
+(* 3.5 seconds *)
+Time Definition Circle_approx_bigD
   := Eval vm_compute in
+      @Circle_approx bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
+
+(* 6 seconds :-( *)
+Time Definition Circle_bigD : raster _ _
+  := Eval vm_compute in 
       @Circle_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
 
 Local Open Scope raster.
@@ -71,17 +71,11 @@ Definition CirclePath : Q_as_MetricSpace --> Complete Q2:=
 Definition CirclePath': UCFunction Q R2:= 
   ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
 
-Definition Circle_approx_fast : list Q2
-  := map (fun x => approximate x (Qpos2QposInf (1#40)%Qpos))
-         (approximate (Plot.PathImage CirclePath 0 7 zeroSeven)
-                      (Qpos2QposInf (1#40)%Qpos)).
-Time Compute Circle_approx_fast.
-
 
 (* 9 seconds :-( *)
 (* The raster must be evaluated before being plotted by DumpGrayMap,
    here with vm_compute. *)
-Definition Circle : raster _ _
+Time Definition Circle : raster _ _
   := Eval vm_compute in
       (let (_,r) := Plot.PlotPath 0 7 (reflexivity _) (-(1)) 1 (reflexivity _)
                              (-(1)) 1 (reflexivity _) 100 100 CirclePath

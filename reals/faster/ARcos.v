@@ -47,7 +47,7 @@ Proof.
   now apply preserves_unary_fun.
 Qed.
 
-Definition AQcos (x : AQ) := ARcos_poly (AQsin (x ≪ (-1))).
+Definition AQcos (x : AQ) : AR := ARcos_poly (AQsin (x ≪ (-1))).
 
 Lemma AQcos_correct a : 'AQcos a = rational_cos ('a).
 Proof.
@@ -58,11 +58,12 @@ Proof.
   now apply rational_cos_sin.
 Qed.
 
-Definition ARcos_uc : AQ_as_MetricSpace --> AR.
-Proof.
-  apply (unary_complete_uc QPrelengthSpace AQtoQ AQcos cos_uc).
-  intros. apply AQcos_correct.
-Defined.
+Definition ARcos_uc : AQ_as_MetricSpace --> AR
+  := unary_complete_uc QPrelengthSpace AQtoQ AQcos cos_uc AQcos_correct.
+
+Lemma ARcos_uc_eval : forall q : AQ_as_MetricSpace,
+    ARcos_uc q ≡ AQcos q.
+Proof. reflexivity. Qed.
 
 Definition ARcos : AR --> AR := Cbind AQPrelengthSpace ARcos_uc.
 
