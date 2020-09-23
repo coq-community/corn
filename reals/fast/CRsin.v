@@ -281,12 +281,9 @@ Qed.
 
 Definition sin_poly_modulus (e:Qpos) := Qpos2QposInf ((1#9)*e).
 
-Let X:((-(1))<1)%Q.
-Proof.
- constructor.
-Qed.
-
-Let D : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) (inj_Q_less _ _ _ X) ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)
+Lemma DthreeXMinusFourX3 : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))
+                   (inj_Q_less _ (-1) 1 eq_refl)
+                   ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)
  ((Three:IR){**}[-C-]([1]:IR){-}(Four:IR){**}((nring 3){**}([-C-][1]{*}FId{^}2))).
 Proof.
  apply Derivative_minus.
@@ -299,7 +296,8 @@ Qed.
 
 Lemma sin_poly_prf : is_UniformlyContinuousFunction (fun x => sin_poly_fun (QboundAbs (1#1) x)) sin_poly_modulus.
 Proof.
- apply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D sin_poly_fun a (9#1)).
+  apply (fun a => is_UniformlyContinuousD_Q
+                 (Some (-(1))%Q) (Some (1:Q)) eq_refl _ _ DthreeXMinusFourX3 sin_poly_fun a (9#1)).
   simpl; intros q _ _.
   apply sin_poly_fun_correct.
  simpl; intros x' _ [Hx0 Hx1].
@@ -343,8 +341,10 @@ Proof.
  intros x Hx.
  assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)).
   eapply Derivative_imp_Continuous.
-  apply D.
- apply: (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
+  apply DthreeXMinusFourX3.
+  apply: (ContinuousCorrect
+            (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))))
+            (inj_Q_less _ (-1) 1 eq_refl) Y);
    [|repeat constructor|].
   intros q Hq Hq0.
   transitivity (IRasCR (inj_Q IR (sin_poly_fun q)));[|apply IRasCR_wd; apply sin_poly_fun_correct].

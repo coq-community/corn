@@ -78,12 +78,9 @@ Qed.
 
 Definition cos_poly_modulus (e:Qpos) := Qpos2QposInf ((1#4)*e).
 
-Let X:((-(1))<1)%Q.
-Proof.
- constructor.
-Qed.
-
-Let D : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) (inj_Q_less _ _ _ X) ([-C-]([1]:IR){-}(Two:IR){**}FId{^}2)
+Lemma DoneMinusX2 : Derivative (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))
+                   (inj_Q_less _ (-1) 1 eq_refl)
+                   ([-C-]([1]:IR){-}(Two:IR){**}FId{^}2)
  ([-C-]([0]:IR){-}(Two:IR){**}((nring 2){**}([-C-][1]{*}FId{^}1))).
 Proof.
  apply Derivative_minus.
@@ -98,7 +95,9 @@ Lemma cos_poly_prf
       Q_as_MetricSpace Q_as_MetricSpace
       (fun x => cos_poly_fun (QboundAbs (1#1) x)) cos_poly_modulus.
 Proof.
- apply (fun a => is_UniformlyContinuousD_Q (Some (-(1))%Q) (Some (1:Q)) X _ _ D cos_poly_fun a (4#1)).
+  apply (fun a => is_UniformlyContinuousD_Q
+                 (Some (-(1))%Q)
+                 (Some (1:Q)) eq_refl _ _ DoneMinusX2 cos_poly_fun a (4#1)).
   simpl; intros q _ _.
   apply cos_poly_fun_correct.
  simpl; intros x' _ [Hx0 Hx1].
@@ -129,8 +128,10 @@ Proof.
  intros x Hx.
  assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ([-C-]([1]:IR){-}(Two:IR){**}FId{^}2)).
   eapply Derivative_imp_Continuous.
-  apply D.
- apply: (ContinuousCorrect (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q)))) (inj_Q_less _ _ _ X) Y);
+  apply DoneMinusX2.
+  apply: (ContinuousCorrect
+            (I:=(clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))))
+            (inj_Q_less _ (-1) 1 eq_refl) Y);
    [|repeat constructor|].
   intros q Hq Hq0.
   transitivity (IRasCR (inj_Q IR (cos_poly_fun q)));[|apply IRasCR_wd; apply cos_poly_fun_correct].
