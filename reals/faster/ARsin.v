@@ -142,7 +142,7 @@ Qed.
 
 Definition AQsin_poly_uc : AQ_as_MetricSpace --> AQ_as_MetricSpace
   := unary_uc (cast AQ Q_as_MetricSpace)
-              (λ q : AQ_as_MetricSpace, AQsin_poly_fun (AQboundAbs_uc 1 q))
+              (λ q : AQ, AQsin_poly_fun (AQboundAbs_uc 1 q))
               sin_poly_uc AQsin_poly_fun_bound_correct.
 
 Definition ARsin_poly : AR -> AR
@@ -240,6 +240,8 @@ Proof.
   now apply AQsin_pos_bound_correct.
 Qed.
 
+(* TODO remove AQsin_pos_bound_weaken, each time this polynomial
+   is applied, the requested precision is multiplied by 9. *)
 Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 0).
 
 Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).

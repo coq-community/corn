@@ -21,7 +21,7 @@ let dump_pgm (raster : Pp.t) (rastertype : Pp.t) =
   (* P2 is the magic number for PGM ascii files.
      Then come the dimensions of the image and 
      the number of levels of gray, ie 1. *) 
-  let str = Str.global_replace (Str.regexp "(raster \\([0-9]+\\) \\([0-9]+\\))")
+  let str = Str.global_replace (Str.regexp "(Vector.t (Vector.t bool \\([0-9]+\\)) \\([0-9]+\\))")
               "P2\n\\1 \\2\n1" str in 
   let str = Str.global_replace (Str.regexp "█ ") "1 " str in 
   let str = Str.global_replace (Str.regexp "  ") "0 " str in
@@ -42,10 +42,12 @@ let eval_and_dump_pgm (t : Libnames.qualid) =
   let (tg : GlobRef.t) = Constrintern.intern_reference t in
   let (tt : Constr.types) = fst (type_of_global_in_context env tg) in
   let (c : Constr.constr) = printable_constr_of_global tg in
-  (* Compute c to get a matrix of booleans, instead of just the name of c. *)
-  let evalc = Reductionops.nf_all env (Evd.from_env env) (EConstr.of_constr c) in
+  (* Delta-reduce c to unfold the name of the matrix of booleans
+     and get its contents. *)
+  let evalc = Reductionops.whd_delta env (Evd.from_env env) (EConstr.of_constr c) in
+  let evalt = Reductionops.nf_all env (Evd.from_env env) (EConstr.of_constr tt) in
   dump_pgm (pr_econstr_env env (Evd.from_env env) evalc)
-    (pr_econstr_env env (Evd.from_env env) (EConstr.of_constr tt))
+    (pr_econstr_env env (Evd.from_env env) evalt)
 
 }
 

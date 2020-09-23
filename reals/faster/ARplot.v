@@ -1,3 +1,4 @@
+Require Import Coq.QArith.Qround.
 Require Import CoRN.reals.fast.Plot.
 Require Import CoRN.reals.faster.ARArith.
 Require Import CoRN.reals.faster.ARinterval.
@@ -17,20 +18,21 @@ Hypothesis Hlr : l < r.
 Variable (b t:Q).
 Hypothesis Hbt : b < t.
 
-Variable n m : nat.
+(* Number of pixels on the X-axis. *)
+Variable n : nat.
 
-Let w := r - l.
-Let h := t - b.
-
-Lemma wpos : 0 < w.
+Lemma wpos : 0 < r - l.
 Proof.
   apply Qlt_minus_iff in Hlr. exact Hlr.
 Qed.
 
-Lemma hpos : 0 < h.
+Lemma hpos : 0 < t - b.
 Proof.
   apply Qlt_minus_iff in Hbt. exact Hbt.
 Qed.
+
+(* Compute the number of pixels on the Y-axis to make square pixels. *)
+Let m : nat := Z.to_nat (Qceiling ((t-b) * inject_Z (Z.of_nat n) / (r-l))).
 
 (**
 Half the error in the Plot example, since we need to approximate twice.

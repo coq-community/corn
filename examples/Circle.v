@@ -31,7 +31,7 @@ Proof. discriminate. Qed.
 
 Definition Circle_faster : raster _ _
   := let (_,r) := ARplot.PlotPath 0 7 zeroSeven (-(1)) 1 (reflexivity _)
-                             (-(1)) 1 (reflexivity _) 100 100 CirclePath_faster
+                             (-(1)) 1 (reflexivity _) 100 CirclePath_faster
       in r.
 
 (* This is the approximation of the circle that will be rasterized.

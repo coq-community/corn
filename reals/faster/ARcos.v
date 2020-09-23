@@ -27,15 +27,23 @@ Proof.
   now rewrite associativity.
 Qed.
 
-Program Definition AQcos_poly_uc := unary_uc (cast AQ Qmetric.Q_as_MetricSpace)
-  (λ x : AQ_as_MetricSpace, AQcos_poly_fun (AQboundAbs_uc 1 x) : AQ_as_MetricSpace) cos_poly_uc _.
-Next Obligation.
-  apply Qball_0.
+Lemma AQcos_poly_uc_correct
+  : forall q : AQ, msp_eq (' AQcos_poly_fun (AQboundAbs_uc 1 q))
+                     (cos_poly_fun (QMinMax.Qmax (- (1)) (QMinMax.Qmin 1 (' q)))).
+Proof.
+  intro q. apply Qball_0.
   rewrite AQcos_poly_fun_correct.
+  f_equiv.
+  unfold AQboundAbs_uc. simpl.
   change ('1) with (1:AQ).
   rewrite ?aq_preserves_max, ?aq_preserves_min.
   now rewrite ?rings.preserves_negate, ?rings.preserves_1.
 Qed.
+
+Definition AQcos_poly_uc
+  := unary_uc (cast AQ Q_as_MetricSpace)
+              (λ x : AQ, AQcos_poly_fun (AQboundAbs_uc 1 x)) cos_poly_uc
+              AQcos_poly_uc_correct.
 
 Definition ARcos_poly := uc_compose ARcompress (Cmap AQPrelengthSpace AQcos_poly_uc).
 
