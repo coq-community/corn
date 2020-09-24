@@ -44,7 +44,7 @@ Lemma Iab_reg_prf
            => map (λ x : Q, AppInverse0 x ((1 # 2) * d)%Qpos)
                  (UniformPartition
                     a b
-                    (max 1 (Z.to_nat (Qround.Qceiling ((b - a) / (inject_Z 2 * ((1 # 2) * ` d)))))))
+                    (Pos.max 1 (Z.to_pos (Qround.Qceiling ((b - a) / (inject_Z 2 * ((1 # 2) * ` d)))))))
          | QposInfinity => nil
          end).
 Proof.

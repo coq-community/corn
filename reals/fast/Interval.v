@@ -43,65 +43,155 @@ Section Interval.
 * Intervals as a Compact Set.
 We want to make an efficent implementation of intervals as compact sets.
 We want to minimize the number of sample points in the approximations of
+
 a compact interval.
 *)
 Variable (l r:Q).
 Hypothesis Hlr : l <= r.
 
-Let f n (i:Z) := l + ((r-l)*(2*i+1#1))/(2*Z_of_nat n#1).
+Let f (n:positive) (i:Z) := l + ((r-l)*(2*i+1#1))/(2*Zpos n#1).
 
-Fixpoint iterateN A (f:A -> A) (z:A) (n:nat) : list A :=
-match n with
- O => nil
-|S m => z :: (iterateN f (f z) m)
-end.
+Fixpoint iterateN_succ (z:Z) (n:positive) : list Z :=
+  match n with
+  | xI p => z :: app (iterateN_succ (Z.succ z) p)
+                   (iterateN_succ (Z.succ z + Zpos p) p)
+  | xO p => app (iterateN_succ z p) (iterateN_succ (z + Zpos p) p)
+  | xH => z :: nil
+  end.
+
+Lemma iterateN_succ_example : iterateN_succ 4 3 = (4 :: 5 :: 6 :: nil)%Z.
+Proof. reflexivity. Qed.
+
+Lemma iterateN_succ_length
+  : forall n z,
+    length (iterateN_succ z n) = Pos.to_nat n.
+Proof.
+  induction n.
+  - intro z. simpl.
+    rewrite Pos2Nat.inj_xI. apply f_equal.
+    rewrite app_length, IHn, IHn.
+    simpl.
+    rewrite Nat.add_0_r. reflexivity.
+  - intro z. simpl.
+    rewrite app_length, IHn, IHn.
+    rewrite Pos2Nat.inj_xO. simpl.
+    rewrite Nat.add_0_r. reflexivity.
+  - reflexivity.
+Qed.
+
+Lemma iterateN_succ_nth
+  : forall n (j:nat) s z,
+    (j < Pos.to_nat n)%nat -> nth j (iterateN_succ s n) z = (s + Z.of_nat j)%Z.
+Proof.
+  induction n.
+  - intros. simpl.
+    destruct j. simpl. rewrite Z.add_0_r. reflexivity.
+    destruct (le_lt_dec (Pos.to_nat n) j) as [l0|l0].
+    + rewrite <- (iterateN_succ_length n (Z.succ s)) in l0.
+      rewrite (app_nth2 _ _ z l0).
+      pose proof (Nat.le_exists_sub _ _ l0) as [k [H0 _]].
+      subst j.
+      rewrite Nat.add_sub.
+      rewrite IHn.
+      rewrite iterateN_succ_length.
+      rewrite Nat2Z.inj_succ, Nat2Z.inj_add, <- positive_nat_Z.
+      ring.
+      rewrite (iterateN_succ_length n (Z.succ s)), Pos2Nat.inj_xI in H.
+      simpl in H. rewrite Nat.add_0_r in H.
+      apply le_S_n in H.
+      apply (Nat.add_le_mono_r _ _ (Pos.to_nat n)).
+      exact H.
+    + rewrite <- (iterateN_succ_length n (Z.succ s)) in l0.
+      rewrite (app_nth1 _ _ z l0).
+      rewrite IHn.
+      rewrite Nat2Z.inj_succ. ring.
+      rewrite <- (iterateN_succ_length n (Z.succ s)).
+      exact l0. 
+  - intros. simpl.
+    destruct (le_lt_dec (Pos.to_nat n) j) as [l0|l0].
+    + rewrite <- (iterateN_succ_length n s) in l0.
+      rewrite (app_nth2 (iterateN_succ s n)
+                        (iterateN_succ (s + Z.pos n) n) z l0).
+      pose proof (Nat.le_exists_sub _ _ l0) as [k [H0 _]].
+      subst j.
+      rewrite Nat.add_sub.
+      rewrite IHn.
+      rewrite (iterateN_succ_length n s).
+      rewrite Nat2Z.inj_add, <- positive_nat_Z.
+      ring.
+      rewrite (iterateN_succ_length n s), Pos2Nat.inj_xO in H.
+      simpl in H. rewrite Nat.add_0_r in H.
+      apply (Nat.add_le_mono_r _ _ (Pos.to_nat n)).
+      exact H.
+    + rewrite <- (iterateN_succ_length n s) in l0.
+      rewrite (app_nth1 (iterateN_succ s n)
+                        (iterateN_succ (s + Z.pos n) n) z l0).
+      apply IHn.
+      rewrite <- (iterateN_succ_length n s).
+      exact l0.
+  - intros. simpl.
+    destruct j. simpl. rewrite Z.add_0_r. reflexivity.
+    exfalso. inversion H. inversion H1.
+Qed.
+
 
 (** [UniformPartition] produces a set of n points uniformly distributed
-inside the interval [[l, r]]. *)
-Definition UniformPartition (n:nat) : list Q :=
-map (f n) (iterateN Z.succ 0%Z n).
+    inside the interval [[l, r]]. We use binary positive instead of
+    unary nat for faster computations. *)
+Definition UniformPartition (n:positive) : list Q :=
+  map (f n) (iterateN_succ 0%Z n).
 
-Lemma UniformPartitionZ : forall n z, In z (iterateN Z.succ 0%Z n) <-> (0 <= z < Z.of_nat n)%Z.
+Lemma UniformPartitionZ : forall n a z,
+    In z (iterateN_succ a n) <-> (a <= z < a + Zpos n)%Z.
 Proof.
- intros n z.
- change (0 <= z < Z.of_nat n)%Z with (0 <= z < 0 + Z.of_nat n)%Z.
- generalize 0%Z.
- induction n; intros a.
-  split; intros H.
-   contradiction.
-  apply (Zle_not_lt a a). auto with *.
-  rewrite Zplus_comm in H.
-  simpl in H.
-  apply Z.le_lt_trans with z; auto with *.
- split.
-  intros [H | H].
-   rewrite H.
-   rewrite inj_S.
-   auto with *.
-  change (In z (iterateN Z.succ (Z.succ a) n)) in H.
-  rewrite -> IHn in H.
-  rewrite inj_S.
-  auto with *.
- intros [H0 H1].
- destruct (Zle_lt_or_eq _ _ H0) as [H2 | H2].
-  simpl.
-  right.
-  rewrite -> IHn.
-  rewrite inj_S in H1.
-  auto with *.
- rewrite H2.
- left.
- reflexivity.
+  split.
+  - intro H. apply (In_nth _ _ 0%Z) in H.
+    destruct H as [p [H H0]].
+    subst z. rewrite iterateN_succ_length in H.
+    rewrite iterateN_succ_nth.
+    2: exact H. split.
+    rewrite <- (Z.add_0_r a) at 1.
+    apply Z.add_le_mono_l. apply Nat2Z.is_nonneg.
+    apply Z.add_lt_mono_l.
+    destruct p. reflexivity.
+    rewrite <- (Nat2Pos.id (S p)) in H.
+    2: discriminate.
+    apply Pos2Nat.inj_lt in H. 
+    simpl.
+    rewrite Pos.of_nat_succ. exact H.
+  - revert n z a. 
+    induction n; intros.
+    + simpl. destruct (Z.le_gt_cases z a).
+      left. apply Z.le_antisymm. apply H. exact H0.
+      right. destruct (Z.le_gt_cases (Z.succ a + Z.pos n) z).
+      apply in_app_iff. right. apply IHn.
+      split. apply H1.
+      rewrite <- Z.add_assoc, Z.add_diag.
+      apply (Z.lt_le_trans _ _ _ (proj2 H)).
+      rewrite <- Z.add_1_l, (Z.add_comm 1).
+      rewrite <- Z.add_assoc.
+      apply Z.le_refl.
+      apply in_app_iff. left. apply IHn.
+      split. apply Zlt_le_succ, H0. exact H1.
+    + simpl. destruct (Z.le_gt_cases (a + Z.pos n) z).
+      apply in_app_iff. right. apply IHn.
+      split. apply H0.
+      rewrite <- Z.add_assoc, Z.add_diag. apply H.
+      apply in_app_iff. left. apply IHn.
+      split. apply H. exact H0.
+    + left. destruct H. apply Z.le_antisymm. exact H.
+      rewrite Z.add_comm, Z.add_1_l in H0.
+      apply Zlt_succ_le, H0.
 Qed.
 
 Lemma UniformPartition_inside : forall n x, In x (UniformPartition n) -> l <= x <= r.
 Proof.
  intros n x.
  unfold UniformPartition.
- cut (forall z, In z (iterateN Z.succ 0%Z n) -> (0 <= z < Z.of_nat n)%Z).
- { destruct n.
-   contradiction.
-  generalize (iterateN Z.succ 0%Z (S n)).
+ assert (forall z, In z (iterateN_succ 0%Z n) -> (0 <= z < Zpos n)%Z) as H.
+ { intros. apply UniformPartitionZ in H. exact H. }
+ revert H.
+  generalize (iterateN_succ 0%Z n).
   intros s Hs H.
   induction s.
    contradiction.
@@ -110,81 +200,62 @@ Proof.
   destruct (Hs a) as [Hz0 Hz1]; auto with *.
   clear - Hz0 Hz1 Hlr.
   split.
-   rewrite -> Qle_minus_iff.
    unfold f, Qdiv.
-   setoid_replace (l + (r - l) * (2 * a + 1 # 1) * / (2 * Z.of_nat (S n) # 1) + - l)
-     with ((r + - l) * ((2 * a + 1 # 1) * / (2 * Z.of_nat (S n) # 1)))
-     by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; ring).
-   apply Qmult_le_0_compat.
-    rewrite ->Qle_minus_iff in Hlr; auto.
-   apply Qle_shift_div_l; auto with *.
+   rewrite <- (Qplus_0_r l) at 1.
+   apply Qplus_le_r.
+   apply Qle_shift_div_l. reflexivity.
    rewrite Qmult_0_l.
-   change (0 <= (2*a + 1)*1)%Z.
-   auto with *.
-  rewrite -> Qle_minus_iff.
+   apply Qmult_le_0_compat.
+  unfold Qminus. rewrite <- Qle_minus_iff. exact Hlr.
+   unfold Qle, Qnum, Qden.
+   rewrite Z.mul_1_r, Z.mul_1_r.
+   apply (Z.le_trans _ (1*a+0)%Z).
+   rewrite Z.add_0_r, Z.mul_1_l. exact Hz0.
+   apply Z.add_le_mono. apply Z.mul_le_mono_nonneg_r.
+   exact Hz0.
+   discriminate. discriminate.
   unfold f.
-  setoid_replace (r + - (l + (r - l) * (2 * a + 1 # 1) / (2 * Z.of_nat (S n) # 1)))
-    with (((r-l)*((2*Z.of_nat (S n)#1) + - (2 * a + 1 # 1))) / (2 * Z.of_nat (S n) # 1))
-    by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; discriminate).
-  apply Qle_shift_div_l; auto with *.
-  rewrite Qmult_0_l.
-  apply Qmult_le_0_compat.
-   rewrite -> Qle_minus_iff in Hlr; auto.
-  change (0 <= ((2*Z.of_nat (S n))*1 + - (2*a + 1)*1)*1)%Z.
-  auto with *. }
- clear - n.
- intros z.
- change (0 <= z < Z.of_nat n)%Z with (0 <= z < 0 + Z.of_nat n)%Z.
- revert z.
- generalize 0%Z.
- induction n.
-  contradiction.
- intros z x Hx.
- destruct Hx as [Hx | Hx].
- - rewrite <- Hx; split; simpl.
-  apply Z.le_refl.
-  apply (Z.le_lt_trans _ (z+0)).
-  rewrite Z.add_0_r. apply Z.le_refl.
-  apply Z.add_lt_mono_l. reflexivity.
- - destruct (IHn (Z.succ z) x Hx).
-   rewrite inj_S.
-   split.
-   exact (Z.le_trans _ _ _ (Z.le_succ_diag_r _) H).
-   apply (Z.lt_le_trans _ _ _ H0).
-   rewrite <- Z.add_1_r, <- Z.add_1_r.
-   rewrite <- Z.add_assoc.
-   apply Z.add_le_mono_l.
-   rewrite Z.add_comm.
-   apply Z.le_refl.
+  apply (Qplus_le_r _ _ (-l)).
+  rewrite Qplus_assoc.
+  rewrite (Qplus_comm (-l)), Qplus_opp_r, Qplus_0_l.
+  apply Qle_shift_div_r. reflexivity.
+  rewrite (Qplus_comm (-l)), Qmult_comm, (Qmult_comm (r+-l)).
+  apply Qmult_le_compat_r.
+  unfold Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_r.
+  rewrite Z.add_comm, Z.add_1_l.
+  apply Zlt_le_succ.
+  apply Z.mul_lt_mono_pos_l. 
+  reflexivity. exact Hz1.
+  rewrite <- Qle_minus_iff. exact Hlr.
 Qed.
 
 (** Given a point [x] in the interval [[l, r]], one can find a
 nearby point in our [UniformPartition]. n is the number of points in
 the partition, ie the step is (r-l)/n. This function computes the
 maximum index k such that l+k(r-l)/n <= x. *)
-Definition rasterize1 (n:nat) (x:Q) : Z
-  := Qfloor (inject_Z (Z.of_nat n)*(x-l)/(r-l)).
+Definition rasterize1 (n:positive) (x:Q) : Z
+  := Qfloor (inject_Z (Zpos n)*(x-l)/(r-l)).
 
-Lemma rasterize1_close : l < r -> forall n (x:Q),
-      Qabs (x - f (S n) (rasterize1 (S n) x))
-      <= ((r-l)/((2#1) * inject_Z (Z.of_nat (S n)))).
+Lemma rasterize1_close : l < r -> forall (n:positive) (x:Q),
+      Qabs (x - f n (rasterize1 n x))
+      <= ((r-l)/((2#1) * inject_Z (Zpos n))).
 Proof.
  clear Hlr.
  intros Hlr' n x.
  rewrite -> Qlt_minus_iff in Hlr'.
- assert (A:~ r - l == 0 /\ ~ inject_Z (Z.of_nat (S n)) == 0)
+ assert (A:~ r - l == 0 /\ ~ inject_Z (Zpos n) == 0)
    by (split;auto with *;discriminate).
- setoid_replace ((r - l) / ((2#1) * inject_Z (Z.of_nat (S n))))
-   with ((1#2)/(inject_Z (Z.of_nat (S n))/(r - l)))
+ setoid_replace ((r - l) / ((2#1) * inject_Z (Zpos n)))
+   with ((1#2)/(inject_Z (Zpos n)/(r - l)))
    by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; auto).
  apply Qle_shift_div_l.
   apply Qlt_shift_div_l; auto with *.
- rewrite <- (Qabs_pos (inject_Z (Z.of_nat (S n))/(r-l))); [|apply Qle_shift_div_l; auto with *].
+ rewrite <- (Qabs_pos (inject_Z (Zpos n)/(r-l))); [|apply Qle_shift_div_l; auto with *].
  rewrite <- Qabs_Qmult.
  unfold f.
- change (2*Z.of_nat (S n) # 1) with ((2#1)*inject_Z (Z.of_nat (S n))).
- setoid_replace ((x - (l + (r - l) * (2 * rasterize1 (S n) x + 1 # 1) / ((2#1) * inject_Z (Z.of_nat (S n))))) * (inject_Z (Z.of_nat (S n)) / (r - l)))
-   with (inject_Z (Z.of_nat (S n))*(x-l)/(r-l) - (2*rasterize1 (S n) x + 1 # 1)/(2#1))
+ change (2*Zpos n # 1) with ((2#1)*inject_Z (Zpos n)).
+ setoid_replace ((x - (l + (r - l) * (2 * rasterize1 n x + 1 # 1) / ((2#1) * inject_Z (Zpos n)))) * (inject_Z (Zpos n) / (r - l)))
+   with (inject_Z (Zpos n)*(x-l)/(r-l) - (2*rasterize1 n x + 1 # 1)/(2#1))
    by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; auto).
  rewrite -> Qmake_Qdiv.
  rewrite Q.Zplus_Qplus.
@@ -193,12 +264,12 @@ Proof.
  rewrite Qmult_1_r.
  rewrite Q.Zmult_Qmult. 
  change (inject_Z 2) with (2#1).
- setoid_replace (((2#1) * inject_Z (rasterize1 (S n) x) + 1) / (2#1))
-   with (inject_Z (rasterize1 (S n) x) + (1#2))
+ setoid_replace (((2#1) * inject_Z (rasterize1 n x) + 1) / (2#1))
+   with (inject_Z (rasterize1 n x) + (1#2))
    by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; auto).
  unfold rasterize1.
  unfold Qdiv.
- generalize (inject_Z (Z.of_nat (S n)) * (x - l) * / (r - l)).
+ generalize (inject_Z (Zpos n) * (x - l) * / (r - l)).
  intros q.
  clear - q.
  apply Qabs_case; intros H; rewrite -> Qle_minus_iff.
@@ -237,18 +308,12 @@ Proof.
  auto with *.
 Qed.
 
-Definition rasterize1_boundR : forall n (x:Q), x < r -> (rasterize1 (S n) x < Z.of_nat (S n))%Z.
+Definition rasterize1_boundR : forall n (x:Q), x < r -> (rasterize1 n x < Zpos n)%Z.
 Proof.
  intros n x Hx.
- cut (inject_Z (rasterize1 (S n) x) < inject_Z (Z.of_nat (S n)))%Q.
-  generalize (S n).
-  intros m.
-  unfold Qlt.
-  simpl.
-  auto with *.
+ rewrite Zlt_Qlt.
  unfold rasterize1.
- eapply Qle_lt_trans.
-  apply Qfloor_le.
+ apply (Qle_lt_trans _ _ _ (Qfloor_le _)).
  destruct (Qle_lt_or_eq _ _ Hlr) as [Hlr' | Hlr'].
   rewrite -> Qlt_minus_iff in Hlr'.
   apply Qlt_shift_div_r.
@@ -268,54 +333,56 @@ Proof.
  auto with *.
 Qed.
 
+(* Index of x = r in the partition. *)
 Lemma UniformPartition_fine_aux
-  : forall (n : nat) (x : Q) (Hx : l <= x <= r) (q : r <= x),
-  In (f (S n) (Z.of_nat n)) (UniformPartition (S n)) /\
-  Qabs (x - f (S n) (Z.of_nat n)) <= (r - l) / ((2#1) * inject_Z (Z.of_nat (S n))).
+  : forall (n : positive) (x : Q) (Hx : l <= x <= r) (q : r <= x),
+  In (f n (Zpos n - 1)) (UniformPartition n) /\
+  Qabs (x - f n (Zpos n - 1)) <= (r - l) / ((2#1) * inject_Z (Zpos n)).
 Proof.
   intros. 
   split.
-  - apply in_map; rewrite -> UniformPartitionZ; rewrite inj_S; auto with *.
+  - apply in_map; rewrite -> UniformPartitionZ.
+    split. apply Z.le_0_sub, Pos.le_1_l.
+    rewrite Z.add_comm.
+   apply Z.add_lt_mono_l. reflexivity.
   - destruct Hx as [_ Hx].
     setoid_replace x with r by (apply Qle_antisym; assumption).
     unfold f.
-    change (2*Z.of_nat (S n) #1) with ((2#1)*inject_Z (Z.of_nat (S n))).
-    change (2*Z.of_nat n + 1#1) with (inject_Z (2*Z.of_nat n + 1)).
-    rewrite (inj_S n).
-    unfold Z.succ.
-    do 2 rewrite Q.Zplus_Qplus.
+    replace (2 * (Z.pos n - 1) + 1)%Z with (2 * Z.pos n - 1)%Z by ring.
+    change (2*Zpos n #1) with ((2#1)*inject_Z (Zpos n)).
+    change (2*Zpos n - 1#1) with (inject_Z (2*Zpos n + - 1)).
+    rewrite Q.Zplus_Qplus.
     rewrite Q.Zmult_Qmult.
     change (inject_Z 2) with (2#1).
-    change (inject_Z 1) with (1#1).
-    setoid_replace (r - (l + (r - l) * ((2#1) * inject_Z (Z.of_nat n) + 1)
-                                         / ((2#1) * (inject_Z (Z.of_nat n) + 1))))
-      with (((r-l) / ((2#1) * (inject_Z (Z.of_nat n) + 1))))
+    change (inject_Z (-1)) with (-1#1).
+    setoid_replace (r - (l + (r - l) * ((2#1) * inject_Z (Zpos n) + (-1#1))
+                                         / ((2#1) * (inject_Z (Zpos n)))))
+      with (((r-l) / ((2#1) * (inject_Z (Zpos n)))))
       by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field; auto).
     rewrite -> Qabs_pos.
     apply Qle_refl.
-    apply Qle_shift_div_l.
-    rewrite <- (Qmult_0_r (2#1)).
-    apply Qmult_lt_l. reflexivity.
-    unfold Qlt; simpl; auto with *.
+    apply Qle_shift_div_l. reflexivity.
     rewrite Qmult_0_l; rewrite -> Qle_minus_iff in Hlr; auto.
-    change 1 with (inject_Z 1).
-    rewrite <- Q.Zplus_Qplus, Z.add_1_r.
-    rewrite <- Zpos_P_of_succ_nat.
-    apply Q.positive_nonzero_in_Q.
 Qed.
 
-Lemma UniformPartition_fine : forall (n:nat) (x:Q),
-    l <= x <= r -> {y | In y (UniformPartition (S n))
-                     /\ Qabs (x - y) <= ((r-l)/((2#1)*inject_Z (Z.of_nat (S n))))}.
+(* For any point x in [[l,r]], there is a point y in the uniform partition
+   that is close to x within half the partition's step. *)
+Lemma UniformPartition_fine : forall (n:positive) (x:Q),
+    l <= x <= r
+    -> {y | In y (UniformPartition n)
+           /\ Qabs (x - y) <= ((r-l)/((2#1)*inject_Z (Zpos n)))}.
 Proof.
  intros n x Hx.
  destruct (Qlt_le_dec_fast x r).
-  exists (f (S n) (rasterize1 (S n) x)).
-  abstract ( destruct Hx as [Hlx Hxr]; split; [apply in_map; rewrite -> UniformPartitionZ; split;
-    [apply rasterize1_boundL; auto |apply rasterize1_boundR; auto] |apply rasterize1_close;
-      apply Qle_lt_trans with x; auto]).
- exists (f (S n) (Z.of_nat n)).
- apply UniformPartition_fine_aux; assumption.
+ - (* x < r *)
+   exists (f n (rasterize1 n x)).
+ abstract ( destruct Hx as [Hlx Hxr]; split;
+            [apply in_map; rewrite -> UniformPartitionZ; split;
+             [apply rasterize1_boundL; auto |apply rasterize1_boundR; auto]
+            |apply rasterize1_close; apply Qle_lt_trans with x; auto]).
+ - (* x = r *)
+   exists (f n (Zpos n - 1)).
+   apply UniformPartition_fine_aux; assumption.
 Defined.
 
 (** Construct the compact set. *)
@@ -339,7 +406,7 @@ Definition CompactIntervalQ_raw (e:QposInf) : list Q :=
 match e with
 | QposInfinity => nil
 | Qpos2QposInf e' =>
-  UniformPartition (max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e')))))
+  UniformPartition (Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e')))))
 end.
 
 Lemma CompactIntervalQ_prf
@@ -356,7 +423,7 @@ Proof.
  intros e1 e2 a Ha.
  assert (l <= a <= r).
  { unfold CompactIntervalQ_raw in Ha.
-  set (e1':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))))) in *.
+  set (e1':=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))))) in *.
   assert (L:=UniformPartition_inside e1').
   induction (UniformPartition e1').
   exfalso; exact (FinSubset_ball_nil Ha).
@@ -371,10 +438,8 @@ Proof.
    apply Qball_0 in Ha. exact Ha.
   assumption. }
  unfold CompactIntervalQ_raw.
- set (e2':=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
- assert (L:=UniformPartition_fine (pred e2') H).
- rewrite <- (S_pred _ O) in L.
- destruct L as [y [Hy0 Hy1]].
+ set (e2':=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
+ pose proof (UniformPartition_fine e2' H) as [y [Hy0 Hy1]].
  apply existsWeaken.
  exists y.
  split.
@@ -397,18 +462,17 @@ Proof.
      intros q He.
      apply Qle_trans with (inject_Z (Qceiling q)).
      apply Qle_ceiling.
-     rewrite inj_max.
-     unfold Qle.
-     simpl.
-     ring_simplify.
+     rewrite Pos2Z.inj_max.
+     unfold Qle; simpl.
+     rewrite Z.mul_1_r, Z.mul_1_r.
      eapply Z.le_trans;[|apply Z.le_max_r].
-     rewrite Z2Nat.id. apply Z.le_refl.
-     exact He.
+     destruct (Qceiling q). discriminate.
+     rewrite Z2Pos.id.
+     apply Z.le_refl.
+     reflexivity. discriminate.
    + rewrite <- Qplus_0_l at 1.
      apply Qplus_le_l.
      apply Qpos_nonneg.
- - apply (lt_le_trans _ 1). auto.
-   apply Nat.le_max_l.
 Qed.
 
 Definition CompactIntervalQ : Compact Q_as_MetricSpace :=
@@ -438,7 +502,7 @@ Proof.
   intros e2.
   assert (L:=Hx e e2).
   simpl in L.
-  set (a:=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
+  set (a:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
   assert (L0:=UniformPartition_inside a).
   induction (UniformPartition a).
   exfalso; exact (FinSubset_ball_nil L).
@@ -469,7 +533,7 @@ Proof.
  intros e2.
  assert (L:=Hx e e2).
  simpl in L.
- set (a:=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
+ set (a:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
  assert (L0:=UniformPartition_inside a).
  induction (UniformPartition a).
   exfalso; exact (FinSubset_ball_nil L).
@@ -539,14 +603,8 @@ Proof.
   exact H0.
  - assert (L: l <= y <= r).
    { unfold y. auto with *. }
- set (n:=(max 1 (Z.to_nat (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
- destruct (UniformPartition_fine (pred n) L) as [z Hz].
- assert (L0:(0 < n)%nat).
- { unfold n.
-   apply (Nat.lt_le_trans _ 1).
-   apply le_refl.
-   apply Nat.le_max_l. }
- rewrite <- (S_pred _ O L0) in Hz.
+ set (n:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
+ destruct (UniformPartition_fine n L) as [z Hz].
   clear - Hz.
   destruct Hz as [Hz0 Hz1].
   induction (UniformPartition n).
@@ -560,32 +618,26 @@ Proof.
    eapply Qle_trans;[apply Hz1|].
    clear Hz1.
    apply Qle_shift_div_r.
-   rewrite <- (Qmult_0_r (2#1)).
-   apply Qmult_lt_l. reflexivity.
-   change 0%Q with (inject_Z 0).
-   rewrite <- Zlt_Qlt.
-   apply (Z.lt_le_trans _ 1).
    reflexivity.
-   apply (inj_le 1).
-   apply Nat.le_max_l.
-   rewrite Qmult_comm, (Qmult_comm (2#1)), <- Qmult_assoc.
-   rewrite <- (Qinv_involutive (inject_Z 2*proj1_sig e2)).
-   apply Qle_shift_div_l.
-   apply Qinv_lt_0_compat.
-   apply (Qpos_ispos ((2#1)*e2)).
    unfold Qdiv in n.
    unfold n. clear n.
-   generalize ((r - l) * / (inject_Z 2 * proj1_sig e2))%Q.
+   rewrite (Qmult_comm (r-l)).
+   apply (Qmult_le_l _ _ (/(inject_Z 2 * proj1_sig e2))).
+   apply Qinv_lt_0_compat. apply (Qpos_ispos ((2#1)*e2)).
+   generalize (/ (inject_Z 2 * proj1_sig e2) * (r-l))%Q.
    intro q. 
+   rewrite Qmult_assoc, Qmult_assoc.
+   setoid_replace (/ (inject_Z 2 * proj1_sig e2) * proj1_sig e2 * (2#1))%Q with 1%Q
+     by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field). 
+   rewrite Qmult_1_l.
    apply (Qle_trans _ (inject_Z (Qceiling q)) _ (Qle_ceiling _)).
-   rewrite inj_max.
-   unfold Qle.
-   simpl.
-   ring_simplify.
+   rewrite Pos2Z.inj_max.
+   unfold Qle; simpl.
+   rewrite Z.mul_1_r, Z.mul_1_r.
    destruct (Qceiling q).
    discriminate.
-   rewrite Z2Nat.id. apply Z.le_max_r.
-   discriminate. discriminate.
+   apply Z.le_max_r.
+   discriminate. apply Qpos_nonzero.
    + apply FinSubset_ball_cons.
      apply IHl0, Hz0.
 Qed.
