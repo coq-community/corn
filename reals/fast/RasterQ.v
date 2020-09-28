@@ -67,7 +67,9 @@ Qed.
 Definition InterpRow (up : list Q) n (v:Vector.t bool n) : FinEnum Q_as_MetricSpace :=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
-Definition InterpRaster (n m:nat) (bitmap : raster n m) (tl br:Q2) : FinEnum Q2 :=
+Definition InterpRaster (n m:positive) (bitmap : raster (Pos.to_nat n) (Pos.to_nat m))
+           (tl br:Q2)
+  : FinEnum Q2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in
@@ -91,91 +93,161 @@ Example ex5 :=
 Eval compute in (ex5).
 *)
 
-Fixpoint iterateN (A:Type) (f:A -> A) (z:A) (n:nat) : list A :=
-match n with
- O => nil
-|S m => z :: (iterateN f (f z) m)
-end.
-
-Lemma iterateN_f : forall A f (z:A) n, iterateN f (f z) n = map f (iterateN f z n).
+Lemma In_map_snd_const
+  : forall A (v : list A) f (a b : Q),
+    In a (map f v)
+    -> In (a,b) (map (fun x => (f x, b)) v).
 Proof.
- intros A f z n.
- revert f z.
- induction n.
-  reflexivity.
- simpl.
- intros f z.
- rewrite <- IHn.
- reflexivity.
+  induction v.
+  - intros. contradiction H.
+  - intros. simpl. destruct H.
+    subst a0. left. reflexivity.
+    right. apply IHv, H.
+Qed.
+
+Lemma In_filtered_list
+  : forall (l : list Q) (q : Q) (filterList : list bool) (j : nat),
+    (length filterList <= length l)%nat
+    -> Is_true (nth j filterList false)
+    -> In (nth j l q)
+         (map fst (filter snd (combine l filterList))).
+Proof.
+  induction l.
+  - intros. destruct filterList. 2: exfalso; inversion H.
+    exfalso. simpl in H0. destruct j; contradiction.
+  - intros. destruct filterList.
+    destruct j; contradiction.
+    simpl in H. apply le_S_n in H.
+    simpl. destruct j.
+    + simpl in H0. destruct b. 2: contradiction.
+      left. reflexivity.
+    + destruct b.
+      right. exact (IHl q _ _ H H0).
+      exact (IHl q _ _ H H0).
+Qed.
+
+Lemma In_filter_list
+  : forall (filterList : list bool) (j : nat),
+    Is_true (nth j filterList false)
+    -> (j < length filterList)%nat.
+Proof.
+  induction filterList.
+  - intros. destruct j; contradiction.
+  - intros. destruct j. simpl. apply le_n_S, le_0_n.
+    simpl. apply le_n_S. apply IHfilterList, H.
+Qed.
+
+Lemma Vector_bool_in
+  : forall n j (v : Vector.t bool n),
+    Is_true (nth j v false) -> (j < n)%nat.
+Proof.
+  induction n.
+  - intros j.
+    apply (Vector.case0 (fun P =>  Is_true (nth j P false) -> (j < O)%nat)).
+    intro H. simpl in H.
+    destruct j; contradiction.
+  - intros j v. 
+    apply (Vector.caseS' v). clear v. 
+    intros. 
+    destruct j. apply le_n_S, le_0_n.
+    apply le_n_S. apply (IHn j t H).
+Qed.
+
+Lemma RasterIndex_in
+  : forall m n i j (r : raster n m), Is_true (RasterIndex r i j) -> (i < m /\ j < n)%nat.
+Proof.
+  induction m.
+  - intros n i j r.
+    unfold RasterIndex.
+    apply (Vector.case0 
+             (fun P =>  Is_true (nth j (nth i (map Vector.to_list P) nil) false)
+                     -> (i < 0)%nat /\ (j < n)%nat)).
+    intro H. 
+    destruct i; destruct j; contradiction.
+  - intros n i j r.
+    apply (Vector.caseS' r). clear r. 
+    intros.
+    unfold RasterIndex in H.
+    destruct i.
+    + simpl in H. clear t.
+      split. apply le_n_S, le_0_n.
+      apply (Vector_bool_in _ h H).
+    + specialize (IHm n i j t H).
+      split. apply le_n_S, IHm. apply IHm.
+Qed.
+
+Lemma Vector_nth
+  : forall n i A a (v : Vector.t A n) (ltin : lt i n),
+    nth i v a = Vector.nth v (Fin.of_nat_lt ltin).
+Proof.
+  induction n.
+  - intros. exfalso. inversion ltin.
+  - intros i A a v.
+    apply (Vector.caseS' v). clear v. 
+    intros.
+    destruct i. reflexivity.
+    specialize (IHn i A a t (lt_S_n i n ltin)).
+    exact IHn.
 Qed.
 
 (** Correctness properties of our interpretation. *)
 Section InterpRasterCorrect.
 
-Let f := fun l r (n:nat) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * Z.of_nat n # 1).
+Let f := fun l r (n:positive) (i:Z) => l + (r - l) * (2 * i + 1 # 1) / (2 * Zpos n # 1).
 
-Lemma InterpRaster_correct1 : forall n m (t l b r:Q) (bitmap: raster n m) i j,
+Lemma InterpRaster_correct1
+  : forall n m (t l b r:Q) (bitmap: raster (Pos.to_nat n) (Pos.to_nat m)) i j,
     Is_true (RasterIndex bitmap i j)
-    -> In (f l r n (Z.of_nat j),f t b m (Z.of_nat i)) (InterpRaster bitmap (l,t) (r,b)).
+    -> In (f l r n (Z.of_nat j),f t b m (Z.of_nat i))
+         (InterpRaster n m bitmap (l,t) (r,b)).
 Proof.
- intros n m t l b r bitmap.
- unfold InterpRaster, InterpRow, UniformPartition.
- fold (f l r n).
- fold (f t b m).
- generalize (f l r n) (f t b m).
- induction bitmap as [ | a]; intros f0 f1 i j H.
-  unfold RasterIndex in H.
-  destruct (nth_in_or_default i (map (@Vector.to_list _ _) (@Vector.nil (@Vector.t bool n))) nil) as [A | A].
-   contradiction.
-  rewrite A in H; clear A.
-  destruct (nth_in_or_default j nil false) as [A | A].
-   contradiction.
-  rewrite A in H; clear A.
-  contradiction.
- destruct i as [|i].
-  simpl.
-  apply in_or_app.
-  left.
-  unfold RasterIndex in H.
-  simpl in H.
-  clear bitmap IHbitmap.
-  revert f0 j H.
-  induction a as [|a]; intros f0 j H.
-   destruct (nth_in_or_default j (@Vector.nil bool) false) as [A | A].
-    contradiction.
-   rewrite A in H; clear A.
-   contradiction.
-  destruct j as [|j].
-   simpl in H.
-   destruct a; try contradiction.
-   simpl.
-   left; reflexivity.
-  rewrite inj_S.
-  cut (In ((f0 (Z.succ (Z.of_nat j))), (f1 0%Z)) (map (fun x : Q => (x, (f1 0%Z)))
-    (map (@fst _ _) (filter (@snd _ _) (combine (map f0 (iterateN Z.succ 1%Z n)) a0))))).
-   intros L.
-   destruct a; try right; auto.
-  change (1%Z) with (Z.succ 0).
-  rewrite iterateN_f.
-  rewrite (map_map Z.succ f0).
-  apply (IHa (fun x:Z => f0 (Z.succ x))).
-  apply H.
- rewrite inj_S.
- set (f1':= fun (x:Z) =>(f1 (Z.succ x))).
- fold (f1' (Z.of_nat i)).
- simpl.
- apply in_or_app.
- right.
- change (1%Z) with (Z.succ 0).
- rewrite iterateN_f.
- rewrite map_map.
- fold f1'.
- apply IHbitmap.
- apply H.
+  intros n m t l b r bitmap.
+  unfold InterpRaster, InterpRow, UniformPartition.
+  fold (f l r n).
+  fold (f t b m).
+  generalize (f l r n) (f t b m).
+  clear t l b r f.
+  unfold RasterIndex.
+  intros.
+  apply in_flat_map.
+  pose proof (RasterIndex_in i j _ H) as [H0 H1].
+  exists (nth i (map q0 (iterateN_succ 0 m)) (q0 0%Z),
+     Vector.nth bitmap (Fin.of_nat_lt H0)).
+  split.
+  - pose proof (combine_nth (map q0 (iterateN_succ 0 m)) bitmap i
+                            (q0 0%Z) (Vector.nth bitmap (Fin.of_nat_lt H0))).
+    rewrite <- Vector_nth with (a:=bitmap[@Fin.of_nat_lt H0]), <- H2.
+    apply nth_In.
+    rewrite combine_length, map_length, iterateN_succ_length.
+    rewrite length_vectorAsList.
+    apply Nat.min_case; exact H0.
+    rewrite map_length, length_vectorAsList, iterateN_succ_length.
+    reflexivity.
+  - rewrite map_map.
+    replace (q0 (Z.of_nat i))
+      with (nth i (map q0 (iterateN_succ 0 m)) (q0 0%Z)).
+    apply In_map_snd_const.
+    replace (q (Z.of_nat j))
+      with (nth j (map q (iterateN_succ 0 n)) (q 0%Z)).
+    apply In_filtered_list. 
+    rewrite map_length, length_vectorAsList, iterateN_succ_length.
+    apply le_refl.
+    replace (Vector.to_list bitmap[@Fin.of_nat_lt H0])
+      with (nth i (map Vector.to_list (Vector.to_list bitmap)) nil).
+    exact H.
+    rewrite <- (Vector_nth (bitmap[@Fin.of_nat_lt H0])).
+    rewrite (nth_indep _ nil (Vector.to_list (bitmap[@Fin.of_nat_lt H0]))).
+    apply map_nth.
+    rewrite map_length, length_vectorAsList.
+    exact H0.
+    rewrite map_nth. apply f_equal.
+    apply iterateN_succ_nth, H1.
+    rewrite map_nth. apply f_equal.
+    apply iterateN_succ_nth, H0.
 Qed.
 
-Lemma InterpRaster_correct2 : forall n m (t l b r:Q) x y (bitmap: raster n m),
-In (x,y) (InterpRaster bitmap (l,t) (r,b)) ->
+Lemma InterpRaster_correct2 : forall n m (t l b r:Q) x y (bitmap: raster (Pos.to_nat n) (Pos.to_nat m)),
+In (x,y) (InterpRaster n m bitmap (l,t) (r,b)) ->
 exists p, Is_true (RasterIndex bitmap (fst p) (snd p)) /\ x=f l r n (Z.of_nat (snd p))
      /\ y=f t b m (Z.of_nat (fst p)).
 Proof.
@@ -184,52 +256,66 @@ Proof.
  fold (f l r n).
  fold (f t b m).
  generalize (f l r n) (f t b m).
- induction bitmap as [|a]; intros f0 f1 H.
-  contradiction.
- simpl in H.
- destruct (in_app_or _ _ _ H) as [H0 | H0]; clear H.
-  cut (exists p : nat, Is_true (nth p a false) /\ x = f0 (Z.of_nat p) /\ y = f1 0%Z).
-   intros [z Z].
-   clear -Z.
-   exists (0%nat,z).
-   auto.
-  clear bitmap IHbitmap.
-  revert f0 H0.
-  induction a as [|a]; intros f0 H0.
-   contradiction.
-  destruct a.
-   simpl in H0.
-   destruct H0 as [H0 | H0].
-    exists 0%nat.
-    split.
-     constructor.
-    simpl in H0.
-    inversion_clear H0.
-    auto.
-   edestruct IHa as [z Hz].
-    change 1%Z with (Z.succ 0) in H0.
-    rewrite iterateN_f in H0.
-    rewrite (map_map Z.succ f0) in H0.
-    apply H0.
-   exists (S z).
-   rewrite inj_S; auto.
-  edestruct IHa as [z Hz].
-   simpl in H0.
-   change 1%Z with (Z.succ 0) in H0.
-   rewrite iterateN_f in H0.
-   rewrite (map_map Z.succ f0) in H0.
-   apply H0.
-  exists (S z).
-  rewrite inj_S; auto.
- change 1%Z with (Z.succ 0) in H0.
- rewrite iterateN_f in H0.
- rewrite (map_map) in H0.
- edestruct IHbitmap as [z Hz].
-  apply H0.
- exists (S (fst z),snd z).
- simpl (fst ((S (fst z)), (snd z))).
- rewrite inj_S.
- auto.
+ clear t l b r f.
+ intros. apply in_flat_map in H.
+ destruct H as [[s v] [H H0]].
+ apply In_nth with (d:=(q0 0%Z,Vector.nth bitmap (Fin.of_nat_lt (Pos2Nat.is_pos m))))
+   in H.
+ destruct H as [i [ilt H]].
+ rewrite combine_length, map_length, iterateN_succ_length in ilt.
+ assert (i < Pos.to_nat m)%nat.
+ { apply (lt_le_trans _ _ _ ilt).
+   apply Nat.min_case. apply le_refl.
+   rewrite length_vectorAsList. apply le_refl. }
+ clear ilt.
+ rewrite combine_nth in H.
+ 2: rewrite map_length, iterateN_succ_length, length_vectorAsList; reflexivity.
+ inversion H. clear H.
+ rewrite (nth_indep _ _ (bitmap[@Fin.of_nat_lt (Pos2Nat.is_pos m)])) in H4.
+ 2: rewrite length_vectorAsList; exact H1.
+ subst s. subst v.
+ rewrite map_map in H0.
+ apply in_map_iff in H0.
+ destruct H0 as [[s b] [H H0]].
+ unfold fst in H.
+ inversion H. clear H.
+ subst s. clear H4 y.
+ apply filter_In in H0.
+ destruct H0. unfold snd in H0. subst b.
+ apply In_nth with (d:= (q 0%Z,true)) in H.
+ destruct H as [j [jlt H]].
+ rewrite combine_nth in H.
+ inversion H. clear H H2 x.
+ rewrite (nth_indep _ _ (bitmap[@Fin.of_nat_lt (Pos2Nat.is_pos m)])) in H3. 
+ rewrite combine_length, map_length, iterateN_succ_length in jlt.
+ assert (j < Pos.to_nat n)%nat.
+ { apply (lt_le_trans _ _ _ jlt).
+   apply Nat.min_case. apply le_refl.
+   rewrite length_vectorAsList. apply le_refl. }
+ clear jlt.
+ exists (i,j). split.
+ - simpl. unfold RasterIndex.
+   rewrite (nth_indep _ true false) in H3. 
+   replace (nth i (map Vector.to_list (Vector.to_list bitmap)) nil)
+     with (Vector.to_list
+             (nth i (Vector.to_list bitmap) bitmap[@Fin.of_nat_lt (Pos2Nat.is_pos m)])).
+   unfold Is_true. rewrite H3. trivial.
+   rewrite (nth_indep _ nil (Vector.to_list (bitmap[@Fin.of_nat_lt (Pos2Nat.is_pos m)]))).
+   symmetry. apply map_nth.
+   rewrite map_length, length_vectorAsList.
+   exact H1.
+   rewrite length_vectorAsList. exact H.
+ - simpl. split.
+   rewrite map_nth.
+   apply f_equal.
+   apply iterateN_succ_nth.
+   exact H.
+   rewrite map_nth.
+   apply f_equal.
+   apply iterateN_succ_nth, H1.
+ - rewrite length_vectorAsList. exact H1.
+ - rewrite map_length, iterateN_succ_length, length_vectorAsList.
+   reflexivity.
 Qed.
 
 End InterpRasterCorrect.
@@ -239,8 +325,8 @@ Add Parametric Morphism n m bm : (@InterpRaster n m bm)
 Proof.
  cut (forall (x1 x2 : Q2), msp_eq x1 x2 -> forall x3 x4 : Q2,
    msp_eq x3 x4 -> forall y,
-     InFinEnumC y (InterpRaster bm x1 x3) ->
-       InFinEnumC y (InterpRaster bm x2 x4)).
+     InFinEnumC y (InterpRaster n m bm x1 x3) ->
+       InFinEnumC y (InterpRaster n m bm x2 x4)).
  { intro L. split. discriminate. split.
    intros q H1 abs.
    contradiction (abs q). split. exact (L x y H x0 y0 H0 q H1).
@@ -252,16 +338,17 @@ Proof.
    reflexivity. }
  intros [x1l x1r] x2 Hx [y1l y1r] y2 Hy z Hz.
  destruct (@InStrengthen _ _ Hz) as [[ax ay] [Ha0 Ha1]].
- destruct (InterpRaster_correct2 _ _ _ _ _ _ _ Ha0) as [[bx by'] [Hb0 [Hb1 Hb2]]].
+ destruct (InterpRaster_correct2 _ _ _ _ _ _ _ _ _ Ha0)
+   as [[bx by'] [Hb0 [Hb1 Hb2]]].
  rewrite Hb1 in Ha1.
  rewrite Hb2 in Ha1.
  unfold snd, fst in Ha1.
  destruct x2 as [x2l x2r].
  destruct y2 as [y2l y2r].
- assert (L0:msp_eq z ((x2l + (y2l - x2l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
-   (x2r + (y2r - x2r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1)))).
-  transitivity ((x1l + (y1l - x1l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Z.of_nat n # 1)),
-    (x1r + (y1r - x1r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Z.of_nat m # 1))).
+ assert (L0:msp_eq z ((x2l + (y2l - x2l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Zpos n # 1)),
+   (x2r + (y2r - x2r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Zpos m # 1)))).
+  transitivity ((x1l + (y1l - x1l) * (2 * Z.of_nat by' + 1 # 1) / (2 * Zpos n # 1)),
+    (x1r + (y1r - x1r) * (2 * Z.of_nat bx + 1 # 1) / (2 * Zpos m # 1))).
    auto.
   clear - Hx Hy.
   destruct Hx as [Hx1 Hx2].
@@ -277,7 +364,7 @@ Proof.
   reflexivity.
   unfold InFinEnumC.
   rewrite -> (@FinSubset_ball_wd _ z _ 0 0 
-                                (InterpRaster bm (x2l, x2r) (y2l, y2r))
+                                (InterpRaster _ _ bm (x2l, x2r) (y2l, y2r))
                                 (reflexivity _) L0).
  apply InFinEnumC_weaken.
  auto using InterpRaster_correct1.

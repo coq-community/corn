@@ -69,7 +69,7 @@ Hypothesis Hlr : l < r.
 Variable (b t:Q).
 Hypothesis Hbt : b < t.
 
-Variable n m : nat.
+Variable n m : positive.
 
 Let w := r - l.
 Let h := t - b.
@@ -87,8 +87,8 @@ Qed.
 (**
 Half the error in the Plot example, since we need to approximate twice.
 *)
-Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
-                    ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
+Let err := Qpos_max ((1 # 8 * n) * (exist _ _ wpos))
+                    ((1 # 8 * m) * (exist _ _ hpos)).
 
 Variable path:Q_as_MetricSpace --> Complete Q2.
 
@@ -96,7 +96,7 @@ Variable path:Q_as_MetricSpace --> Complete Q2.
     The approximation of PathImage make a list (Complete Q2), ie a list
     of points in the real plane. Those points still need to be approximated
     by rational numbers, which map approximate does. *)
-Definition PlotPath : nat * nat * Q * raster n m
+Definition PlotPath : positive * positive * Q * raster (Pos.to_nat n) (Pos.to_nat m)
   := (n, m, 2#1,
       RasterizeQ2 
         (map (fun x => approximate x err)
@@ -148,28 +148,26 @@ Proof.
  apply Hz1.
 Qed.
 
-Variable n m : nat. (* Number of horizontal and vertical pixels *)
-Hypothesis Hn : n <> O.
-Hypothesis Hm : m <> O.
+Variable n m : positive. (* Number of horizontal and vertical pixels *)
 
 Let w := proj1_sig (Qpos_sub _ _ Hlr).
 Let h := proj1_sig (Qpos_sub _ _ Hbt).
 
-Let err := Qpos_max ((1 # 4 * P_of_succ_nat (pred n)) * w)
-                    ((1 # 4 * P_of_succ_nat (pred m)) * h).
+Let err := Qpos_max ((1 # 4 * n) * w)
+                    ((1 # 4 * m) * h).
 
 (** [PlotQ] is the function that computes the pixels. *)
-Definition PlotQ : raster n m
+Definition PlotQ : raster (Pos.to_nat n) (Pos.to_nat m)
   := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
 
 Local Open Scope raster.
 
 (** The resulting plot is close to the graph of [f] *)
 Theorem Plot_correct :
-ball (proj1_sig (err + Qpos_max ((1 # 2 * P_of_succ_nat (pred n)) * w)
-        ((1 # 2 * P_of_succ_nat (pred m)) * h))%Qpos)
+ball (proj1_sig (err + Qpos_max ((1 # 2 * n) * w)
+        ((1 # 2 * m) * h))%Qpos)
  (graphQ (uc_compose clip f))
- (Cunit (InterpRaster PlotQ (l,t) (r,b))).
+ (Cunit (InterpRaster _ _ PlotQ (l,t) (r,b))).
 Proof.
  assert (Hw:=(proj2_sig (Qpos_sub _ _ Hlr))).
  assert (Hh:=(proj2_sig (Qpos_sub _ _ Hbt))).
@@ -195,10 +193,8 @@ Proof.
   (* TODO: figure out why rewrite Hw, Hh hangs *)
   replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r)
     with (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
-  destruct n. contradict Hn; reflexivity.
-  destruct m. contradict Hm; reflexivity.
   split. apply Qpos_nonneg.
-  apply (RasterizeQ2_correct).
+  apply RasterizeQ2_correct.
   intros.
   rewrite <- Hw.
   rewrite <- Hh.

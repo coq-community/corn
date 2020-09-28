@@ -19,7 +19,7 @@ Variable (b t:Q).
 Hypothesis Hbt : b < t.
 
 (* Number of pixels on the X-axis. *)
-Variable n : nat.
+Variable n : positive.
 
 Lemma wpos : 0 < r - l.
 Proof.
@@ -32,18 +32,18 @@ Proof.
 Qed.
 
 (* Compute the number of pixels on the Y-axis to make square pixels. *)
-Let m : nat := Z.to_nat (Qceiling ((t-b) * inject_Z (Z.of_nat n) / (r-l))).
+Let m : positive := Z.to_pos (Qceiling ((t-b) * inject_Z (Z.pos n) / (r-l))).
 
 (**
 Half the error in the Plot example, since we need to approximate twice.
 *)
-Let err := Qpos_max ((1 # 8 * P_of_succ_nat (pred n)) * (exist _ _ wpos))
-                    ((1 # 8 * P_of_succ_nat (pred m)) * (exist _ _ hpos)).
+Let err := Qpos_max ((1 # 8 * n) * (exist _ _ wpos))
+                    ((1 # 8 * m) * (exist _ _ hpos)).
 
 Variable path:AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace).
 
 (** The actual plot function *)
-Definition PlotPath : nat * nat * Q * raster n m
+Definition PlotPath : positive * positive * Q * raster (Pos.to_nat n) (Pos.to_nat m)
   := (n, m, 2#1,
       RasterizeQ2 
         (map (fun x :Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace)

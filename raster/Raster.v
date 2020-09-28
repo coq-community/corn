@@ -1,7 +1,7 @@
 Require Coq.Vectors.Vector.
 Export Vector.VectorNotations.
 Require Export CoRN.stdlib_omissions.List.
-Require Import Coq.Arith.Arith.
+Require Import Coq.Arith.Arith Coq.PArith.BinPos.
 
 Set Implicit Arguments.
 
@@ -107,17 +107,18 @@ Proof.
  auto.
 Qed.
 
-Lemma setRaster_correct1 : forall n m (r:raster n m) x i j,
- (i < m) -> (j < n) ->
+Lemma setRaster_correct1
+  : forall (n m : positive) (r:raster (Pos.to_nat n) (Pos.to_nat m)) x i j,
+ (i < Pos.to_nat m) -> (j < Pos.to_nat n) ->
  RasterIndex (setRaster r x i j) i j = x.
 Proof.
  intros n m r x i j Hi Hj.
  unfold RasterIndex.
  replace (nth i (map (@Vector.to_list _ _) (setRaster r x i j)) nil)
-   with (nth i (map (@Vector.to_list _ _) (setRaster r x i j)) (Vector.const false n)).
+   with (nth i (map (@Vector.to_list _ _) (setRaster r x i j)) (Vector.const false (Pos.to_nat n))).
   rewrite map_nth.
   unfold setRaster.
-  rewrite (updateVector_correct1 r (fun row  => updateVector row (fun _ : bool => x) j) (Vector.const false n) (Vector.const false n) Hi).
+  rewrite (updateVector_correct1 r (fun row  => updateVector row (fun _ : bool => x) j) (Vector.const false (Pos.to_nat n)) (Vector.const false (Pos.to_nat n)) Hi).
   rewrite updateVector_correct1; auto.
  apply nth_indep.
  rewrite map_length.
