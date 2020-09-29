@@ -12,24 +12,29 @@ open Typeops
 let dump_pgm (raster : Pp.t) (rastertype : Pp.t) =
   (* Resolution 1920*1080 makes 2 millions of pixels *)
   let buf = Buffer.create 4000000 in
+  let bufType = Buffer.create 1000 in
   let fmt = Format.formatter_of_buffer buf in
-  pp_with fmt rastertype; 
-  Format.pp_print_newline fmt (); 
+  let fmtType = Format.formatter_of_buffer bufType in
+  pp_with fmtType rastertype; 
+  Format.pp_print_flush fmtType (); 
   pp_with fmt raster; 
   Format.pp_print_flush fmt (); 
+  let (strType : string) = Buffer.contents bufType in 
   let (str : string) = Buffer.contents buf in 
   (* P2 is the magic number for PGM ascii files.
      Then come the dimensions of the image and 
      the number of levels of gray, ie 1. *) 
-  let str = Str.global_replace (Str.regexp "(Vector.t (Vector.t bool \\([0-9]+\\)) \\([0-9]+\\))")
-              "P2\n\\1 \\2\n1" str in 
+  let strType = Str.global_replace (Str.regexp "(raster \\([0-9]+\\) \\([0-9]+\\))")
+                  "P2\n\\1 \\2\n1" strType in 
+  let start = Str.search_forward (Str.regexp "⎢") str 0 in
+  let str = String.sub str start (String.length str - start) in
   let str = Str.global_replace (Str.regexp "█ ") "1 " str in 
   let str = Str.global_replace (Str.regexp "  ") "0 " str in
   let str = Str.global_replace (Str.regexp "⎥") "" str in 
-  let str = Str.global_replace (Str.regexp "⎢") "" str in 
-  let str = Str.global_replace (Str.regexp "\\[\\]") "" str in 
+  let str = Str.global_replace (Str.regexp " *⎢") "" str in 
+  let str = Str.global_replace (Str.regexp ")") "" str in 
   let oc = open_out "plot.pgm" in
-  output_string oc str;
+  output_string oc (strType ^ str);
   close_out oc
 
 (* Write the global term t to an ascii PGM file (portable gray map),

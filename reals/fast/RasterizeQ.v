@@ -55,9 +55,8 @@ Definition rasterize2 (n m:positive) (t l b r:Q) (p:Q*Q) : prod Z Z
   := pair (Z.min (Zpos n -1) (Z.max 0 (rasterize1 l r n (fst p))))
           (Zpos m -1 - (Z.min (Zpos m -1) (Z.max 0 (rasterize1 b t m (snd p)))))%Z.
            
-Definition RasterizePoint (n m:positive) (bm:raster (Pos.to_nat n) (Pos.to_nat m))
-           (t l b r:Q) (p:Q*Q)
-  : raster (Pos.to_nat n) (Pos.to_nat m) :=
+Definition RasterizePoint (n m:positive) (bm:raster n m) (t l b r:Q) (p:Q*Q)
+  : raster n m :=
   let (i,j) := rasterize2 n m t l b r p in
   setRaster bm true (Z.to_nat j) (Z.to_nat i).
 
@@ -134,11 +133,12 @@ Qed.
 
 (* Adding a point to a raster preserves all the points that were
    already in it. *)
-Lemma RasterizePoint_carry : forall t l b r n m (bm:raster (Pos.to_nat n) (Pos.to_nat m)) p i j,
-    Is_true (RasterIndex bm i j)
-    -> Is_true (RasterIndex (RasterizePoint n m bm t l b r p) i j).
+Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
+    raster_well_formed bm
+    -> Is_true (RasterIndex bm i j)
+    -> Is_true (RasterIndex (RasterizePoint bm t l b r p) i j).
 Proof.
- intros t l b r m n bm p i j H.
+ intros t l b r m n bm p i j rWf H.
  unfold RasterizePoint, rasterize2.
  set (j0:=(Z.to_nat (Z.min (Z.pos m - 1) (Z.max 0 (rasterize1 l r m (fst p)))))).
  set (i0:=(Z.to_nat (Z.pos n - 1 - Z.min (Z.pos n - 1) (Z.max 0 (rasterize1 b t n (snd p)))))%nat).
@@ -159,10 +159,33 @@ the resulting raster transfomers. A fold_left is done for efficency.
 (It is translated to a fold_right when we reason about it). *)
 (* This function could be a bit more efficent by sorting rast *)
 Definition RasterizeQ2 (points:list Q2) (n m:positive) (t l b r:Q)
-  : raster (Pos.to_nat n) (Pos.to_nat m) :=
-  fold_left (fun (rast:raster (Pos.to_nat n) (Pos.to_nat m)) (p:Q*Q)
-             => @RasterizePoint n m rast t l b r p)
-            points (emptyRaster (Pos.to_nat n) (Pos.to_nat m)).
+  : raster n m :=
+  fold_left (fun (rast:raster n m) (p:Q*Q) => @RasterizePoint n m rast t l b r p)
+            points (emptyRaster n m).
+
+Lemma RasterizeQ2_wf : forall points n m t l b r,
+    raster_well_formed (RasterizeQ2 points n m t l b r).
+Proof.
+  intros. unfold RasterizeQ2.
+  pose proof (emptyRaster_wf n m).
+  revert H. generalize (emptyRaster n m).
+  induction points.
+  - intros. exact H.
+  - intros. simpl. apply IHpoints.
+    apply setRaster_wf, H.
+Qed.
+
+Lemma RasterizeQ2_wf_r : forall points n m (bm:raster n m) t l b r,
+    raster_well_formed bm ->
+    raster_well_formed
+      (fold_right (fun p (rast:raster n m) => @RasterizePoint n m rast t l b r p)
+                  bm points).
+Proof.
+  induction points.
+  - intros. exact H.
+  - intros. simpl.
+    apply setRaster_wf, IHpoints, H.
+Qed.
 
 (* begin hide *)
 Add Parametric Morphism f n m : (@RasterizeQ2 f n m)
@@ -321,7 +344,7 @@ To measure closeness, we use the product metric on Q2, which has
 square balls aligned with the 2 axes. *)
 Lemma RasterizeQ2_correct1 : forall (x y:Q),
  @InFinEnumC (ProductMS _ _) (x,y) f ->
- ~~exists p, In p (InterpRaster _ _ (RasterizeQ2 f n m t l b r) (l,t) (r,b))
+ ~~exists p, In p (InterpRaster (RasterizeQ2 f n m t l b r) (l,t) (r,b))
         /\ ball (proj1_sig err) p (x,y).
 Proof.
  intros x y.
@@ -341,11 +364,12 @@ Proof.
  revert abs.
  generalize L.
  clear L H.
- generalize (emptyRaster (Pos.to_nat n) (Pos.to_nat m)).
+ generalize (emptyRaster_wf n m).
+ generalize (emptyRaster n m).
  simpl (rev f).
- induction (@rev (prod Q Q) f).
- intros r0 [z [H _]]; contradiction.
- intros bm H.
+ induction (@rev (prod Q Q) f) as [|a l0].
+ intros bm bmWf [z [H _]]; contradiction.
+ intros bm bmWf H.
  destruct H as [yH [iny H]].
  destruct iny.
  - subst yH. destruct H as [Hl Hr]. simpl in Hl, Hr.
@@ -360,8 +384,11 @@ Proof.
   split.
   unfold C.
    apply InterpRaster_correct1.
+   apply setRaster_wf.
+   apply RasterizeQ2_wf_r, bmWf.
    rewrite setRaster_correct1; unfold i, j.
    reflexivity.
+   apply RasterizeQ2_wf_r, bmWf.
    apply Nat2Z.inj_lt.
    rewrite positive_nat_Z, Z2Nat.id.
    rewrite <- Z.sub_add_distr, <- Z.lt_sub_pos.
@@ -404,26 +431,29 @@ Proof.
   apply Z.le_0_sub.
   apply Z.le_min_l.
  - simpl.
-   specialize (IHl0 bm (ex_intro _ yH (conj H0 H))).
+   specialize (IHl0 bm bmWf (ex_intro _ yH (conj H0 H))).
    intro abs.
    contradict IHl0; intros [z [Hz0 Hz1]].
    contradict abs.
    exists z.
    split. 2: exact Hz1.
-   clear - Hz0.
+   clear - Hz0 bmWf.
    destruct z as [zx zy].
-   destruct (InterpRaster_correct2 _ _ _ _ _ _ _ _ _ Hz0)
+   pose proof (RasterizeQ2_wf_r l0 bm t l b r bmWf).
+   destruct (InterpRaster_correct2 _ _ _ _ _ _ _ H Hz0)
      as [[ax ay] [Ha1 [Ha2 Ha3]]].
    rewrite Ha2.
    rewrite Ha3.
    apply InterpRaster_correct1.
+   apply setRaster_wf, RasterizeQ2_wf_r, bmWf.
    apply RasterizePoint_carry.
+   apply RasterizeQ2_wf_r, bmWf.
    exact Ha1.
 Qed.
 
 Lemma RasterizeQ2_correct2 : forall (x y : Q),
     @InFinEnumC (ProductMS _ _) (x,y)
-                (InterpRaster _ _ (RasterizeQ2 f n m t l b r) (l,t) (r,b))
+                (InterpRaster (RasterizeQ2 f n m t l b r) (l,t) (r,b))
     -> ~~ exists p, In p f /\ ball (proj1_sig err) p (x,y).
 Proof.
  intros x y H.
@@ -431,7 +461,8 @@ Proof.
  unfold InFinEnumC, FinSubset_ball in H.
  contradict H; intro H.
  destruct H as [[x' y'] [H' Hxy]].
- destruct (InterpRaster_correct2 _ _ _ _ _ _ _ _ _ H')
+ destruct (InterpRaster_correct2
+             _ _ _ _ _ _ _ (RasterizeQ2_wf f n m t l b r) H')
    as [[j i] [Hij [Hx' Hy']]].
  rewrite Hx' in Hxy.
  rewrite Hy' in Hxy.
@@ -469,7 +500,9 @@ Proof.
  induction (@rev (prod Q Q) f).
   clear - Hij.
   simpl in Hij.
-  rewrite emptyRasterEmpty in Hij.
+  pose proof (emptyRasterEmpty n m j i).
+  simpl in H.
+  rewrite H in Hij. clear H.
   contradiction.
   simpl in Hij.
  unfold RasterizePoint, rasterize2 at 1 in Hij.
@@ -527,6 +560,7 @@ Proof.
    simpl in Hij.
    rewrite setRaster_correct2 in Hij.
    exact Hij.
+   apply RasterizeQ2_wf_r, emptyRaster_wf.
    exact L.
   intros c d Hcd.
   apply Hf'.
@@ -543,7 +577,7 @@ Qed.
 
 Lemma RasterizeQ2_correct :
  ball (proj1_sig err)
-  (InterpRaster _ _ (RasterizeQ2 f n m t l b r) (l,t) (r,b))
+  (InterpRaster (RasterizeQ2 f n m t l b r) (l,t) (r,b))
   f.
 Proof.
   split. apply Qpos_nonneg.

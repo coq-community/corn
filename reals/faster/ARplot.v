@@ -43,7 +43,7 @@ Let err := Qpos_max ((1 # 8 * n) * (exist _ _ wpos))
 Variable path:AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace).
 
 (** The actual plot function *)
-Definition PlotPath : positive * positive * Q * raster (Pos.to_nat n) (Pos.to_nat m)
+Definition PlotPath : positive * positive * Q * raster n m
   := (n, m, 2#1,
       RasterizeQ2 
         (map (fun x :Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace)

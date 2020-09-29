@@ -96,7 +96,7 @@ Variable path:Q_as_MetricSpace --> Complete Q2.
     The approximation of PathImage make a list (Complete Q2), ie a list
     of points in the real plane. Those points still need to be approximated
     by rational numbers, which map approximate does. *)
-Definition PlotPath : positive * positive * Q * raster (Pos.to_nat n) (Pos.to_nat m)
+Definition PlotPath : positive * positive * Q * raster n m
   := (n, m, 2#1,
       RasterizeQ2 
         (map (fun x => approximate x err)
@@ -157,7 +157,7 @@ Let err := Qpos_max ((1 # 4 * n) * w)
                     ((1 # 4 * m) * h).
 
 (** [PlotQ] is the function that computes the pixels. *)
-Definition PlotQ : raster (Pos.to_nat n) (Pos.to_nat m)
+Definition PlotQ : raster n m
   := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
 
 Local Open Scope raster.
@@ -167,7 +167,7 @@ Theorem Plot_correct :
 ball (proj1_sig (err + Qpos_max ((1 # 2 * n) * w)
         ((1 # 2 * m) * h))%Qpos)
  (graphQ (uc_compose clip f))
- (Cunit (InterpRaster _ _ PlotQ (l,t) (r,b))).
+ (Cunit (InterpRaster PlotQ (l,t) (r,b))).
 Proof.
  assert (Hw:=(proj2_sig (Qpos_sub _ _ Hlr))).
  assert (Hh:=(proj2_sig (Qpos_sub _ _ Hbt))).
@@ -187,9 +187,10 @@ Proof.
  set (Z0:=(l, t):Q2) in *.
  set (Z1:=(r, b):Q2) in *.
  set (Z:=(l, (b + proj1_sig h)):Q2) in *.
- rewrite -> L.
- setoid_replace Z1 with (l+proj1_sig w,b).
-  unfold Z, PlotQ.
+ assert (msp_eq Z1 (l+proj1_sig w,b)).
+ { split. simpl. apply Qball_0. ring. reflexivity. } 
+ rewrite (InterpRaster_wd PlotQ (RasterizeQ2_wf _ _ _ _ _ _ _) L H).
+  clear H. unfold Z, PlotQ.
   (* TODO: figure out why rewrite Hw, Hh hangs *)
   replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r)
     with (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
@@ -205,9 +206,6 @@ Proof.
   rewrite -> Hz1, Hz2.
   eapply graphQ_bonus.
   apply Hz0.
-  split; simpl.
-  apply Qball_0; ring.
-  reflexivity. 
 Qed.
 
 End Plot.
@@ -235,31 +233,30 @@ Fixpoint PlotLine (A : CR*CR -> Prop) (i:nat)
            (r step:Q) (y : CR) (d e:Q) (ltde : d < e)
            (loc : LocatedSubset (ProductMS CR CR) A)
            { struct i }
-  : (Vector.t bool i) :=
+  : list bool :=
   match i with
-  | O => Vector.nil bool
+  | O => nil
   | S p =>
-  Vector.cons bool (let xi := inject_Q_CR (r - inject_Z (Z.of_nat i) * step)%Q in
-                 if loc d e (xi,y) ltde then false else true)
-              p (PlotLine A p r step y d e ltde loc)
+    cons (let xi := inject_Q_CR (r - inject_Z (Z.of_nat i) * step)%Q in
+          if loc d e (xi,y) ltde then false else true)
+         (PlotLine A p r step y d e ltde loc)
   end.
 
 Fixpoint PlotSubset_fix (A : CR*CR -> Prop) (n j:nat)
          (b r stepX stepY:Q) (d e:Q) (ltde : d < e)
          (loc : LocatedSubset (ProductMS CR CR) A)
          { struct j }
-  : raster n j :=
+  : list (list bool) :=
   match j with
-  | O => emptyRaster n O
+  | O => nil
   | S p => let yj := inject_Q_CR (b + inject_Z (Z.of_nat j) * stepY)%Q in
-          Vector.cons (Vector.t bool n)
-                      (PlotLine A n r stepX yj d e ltde loc)
-                      p (PlotSubset_fix A n p b r stepX stepY d e ltde loc)
+          cons (PlotLine A n r stepX yj d e ltde loc)
+               (PlotSubset_fix A n p b r stepX stepY d e ltde loc)
   end. 
 
-Definition PlotRadius (n m : nat) (t l b r : Q) : Q
-  := Qmax ((r-l) * (1#Pos.of_nat n))%Q
-          ((t-b) * (1#Pos.of_nat m))%Q.
+Definition PlotRadius (n m : positive) (t l b r : Q) : Q
+  := Qmax ((r-l) * (1#n))%Q
+          ((t-b) * (1#m))%Q.
 
 Lemma PlotRadiusInc
   : forall n m t l b r,
@@ -267,20 +264,23 @@ Lemma PlotRadiusInc
 Proof.
   intros. rewrite <- (Qmult_1_l (PlotRadius n m t l b r)) at 2.
   apply Qmult_lt_r.
-  2: reflexivity. apply (Qlt_le_trans _ ((r-l) * (1#Pos.of_nat n))%Q).
+  2: reflexivity. apply (Qlt_le_trans _ ((r-l) * (1#n))%Q).
   apply Qlt_minus_iff in H.
-  apply (Qpos_ispos (exist _ _ H * (1 # Pos.of_nat n))).
+  apply (Qpos_ispos (exist _ _ H * (1 # n))).
   apply Qmax_ub_l.
 Qed.
  
-Definition PlotSubset {A : CR*CR -> Prop} (n m : nat) (t l b r : Q) 
-           (ltlr : l < r) (loc : LocatedSubset (ProductMS CR CR) A) : raster n m
-  := let stepX := ((r-l) * (1#Pos.of_nat n))%Q in
-     let stepY := ((t-b) * (1#Pos.of_nat m))%Q in
+Definition PlotSubset {A : CR*CR -> Prop} (n m : positive) (t l b r : Q) 
+           (ltlr : l < r) (loc : LocatedSubset (ProductMS CR CR) A)
+  : raster n m
+  := let stepX := ((r-l) * (1#n))%Q in
+     let stepY := ((t-b) * (1#m))%Q in
      (* A pixel is a square ball and its radius it half its side. *)
-     PlotSubset_fix A n m (b-(1#2)*stepY) (r+(1#2)*stepX)
-                    stepX stepY _ _
-                    (PlotRadiusInc n m t l b r ltlr) loc.
+     raster_data
+       _ _
+       (PlotSubset_fix A (Pos.to_nat n) (Pos.to_nat m) (b-(1#2)*stepY) (r+(1#2)*stepX)
+                       stepX stepY _ _
+                       (PlotRadiusInc n m t l b r ltlr) loc).
 
 (*
 Definition PlotDiagLocated := (PlotSubset
@@ -301,8 +301,7 @@ Lemma PlotLine_blank
       (loc : LocatedSubset (ProductMS CR CR) A),
     ball d x (inject_Q_CR (r - inject_Z (Z.of_nat (i-n)) * step)%Q)
     -> ball d y z
-    -> Vector.nth (PlotLine A i r step y d e ltde loc) 
-                 (Fin.of_nat_lt ltni) = false
+    -> nth n (PlotLine A i r step y d e ltde loc) false = false
     -> ~A (x,z).
 Proof.
   induction n.
@@ -337,11 +336,11 @@ Lemma PlotSubset_fix_blank
       (loc : LocatedSubset (ProductMS CR CR) A),
     ball d x (inject_Q_CR (r - inject_Z (Z.of_nat (n-i)) * stepX)%Q)
     -> ball d y (inject_Q_CR (b + inject_Z (Z.of_nat (m-j)) * stepY)%Q)
-    -> Vector.nth
-        (Vector.nth (PlotSubset_fix A n m b r stepX stepY
+    -> nth i
+        (nth j (PlotSubset_fix A n m b r stepX stepY
                                     d e ltde loc) 
-                    (Fin.of_nat_lt ltjm))
-        (Fin.of_nat_lt ltin) = false
+             nil)
+        false = false
     -> ~A (x,y).
 Proof.
   induction j.
@@ -362,13 +361,12 @@ Proof.
 Qed.
 
 Lemma PlotSubset_blank
-  : forall {A : CR*CR -> Prop} (i j n m : nat) (t l b r : Q) (x y : CR)
-      (ltin : (i < n)%nat) (ltjm : (j < m)%nat) (ltlr : l < r)
+  : forall {A : CR*CR -> Prop} (i j : nat) (n m : positive) (t l b r : Q) (x y : CR)
+      (ltin : (i < Pos.to_nat n)%nat) (ltjm : (j < Pos.to_nat m)%nat) (ltlr : l < r)
       (loc : LocatedSubset (ProductMS CR CR) A),
-    Vector.nth (Vector.nth (PlotSubset n m t l b r ltlr loc) (Fin.of_nat_lt ltjm))
-               (Fin.of_nat_lt ltin) = false
-    -> let stepX := ((r-l) * (1#Pos.of_nat n))%Q in
-      let stepY := ((t-b) * (1#Pos.of_nat m))%Q in 
+    RasterIndex (PlotSubset n m t l b r ltlr loc) j i = false
+    -> let stepX := ((r-l) * (1#n))%Q in
+      let stepY := ((t-b) * (1#m))%Q in 
       ball ((1#2)*(Qmax stepX stepY)) x
            (inject_Q_CR (l + (inject_Z (Z.of_nat i) + (1#2)) * stepX)%Q)
       -> ball ((1#2)*(Qmax stepX stepY)) y
@@ -376,54 +374,43 @@ Lemma PlotSubset_blank
       -> ~A (x,y).
 Proof.
   intros. 
-  setoid_replace (' (l + (inject_Z (Z.of_nat i)+(1#2)) * stepX)%Q)%CR
-    with (inject_Q_CR ((r + (1#2)*stepX) - inject_Z (Z.of_nat (n-i)) * stepX)%Q)
+  setoid_replace (l + (inject_Z (Z.of_nat i)+(1#2)) * stepX)%Q
+    with ((r + (1#2)*stepX) - inject_Z (Z.of_nat (Pos.to_nat n - i)) * stepX)%Q
     in H0. 
-  setoid_replace (' (t - (inject_Z (Z.of_nat j) + (1#2)) * stepY)%Q)%CR
-    with (inject_Q_CR ((b-(1#2)*stepY) + inject_Z (Z.of_nat (m-j)) * stepY)%Q)
+  setoid_replace (t - (inject_Z (Z.of_nat j) + (1#2)) * stepY)%Q
+    with ((b-(1#2)*stepY) + inject_Z (Z.of_nat (Pos.to_nat m - j)) * stepY)%Q
     in H1. 
-  exact (PlotSubset_fix_blank A x y i j n m ltin ltjm
-                              _ _ stepX stepY
-                              ((1#2)*(Qmax stepX stepY)) 
-                              (Qmax stepX stepY)
-                              (PlotRadiusInc n m t l b r ltlr) loc
-                              H0 H1 H).
-  - apply inject_Q_CR_wd.
-    unfold canonical_names.equiv, stdlib_rationals.Q_eq.
+  exact (PlotSubset_fix_blank
+           A x y i j (Pos.to_nat n) (Pos.to_nat m) ltin ltjm
+           _ _ stepX stepY
+           ((1#2)*(Qmax stepX stepY)) 
+           (Qmax stepX stepY)
+           (PlotRadiusInc n m t l b r ltlr) loc
+           H0 H1 H).
+  - unfold canonical_names.equiv, stdlib_rationals.Q_eq.
     rewrite Nat2Z.inj_sub.
     unfold Zminus. rewrite Q.Zplus_Qplus, inject_Z_opp.
     rewrite <- (Qplus_inj_r _ _ ((inject_Z (Z.of_nat j)+(1#2)) * stepY)).
     ring_simplify.
+    rewrite positive_nat_Z.
     unfold stepY.
     rewrite <- Qmult_assoc.
-    setoid_replace ((1 # Pos.of_nat m) * inject_Z (Z.of_nat m)) with 1%Q.
+    setoid_replace ((1 # m) * inject_Z (Z.pos m)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
-    unfold canonical_names.equiv, stdlib_rationals.Q_eq, inject_Z.
-    unfold Qeq, Qmult, Qnum, Qden.
-    rewrite Z.mul_1_l, Z.mul_1_l, Z.mul_1_r, Pos.mul_1_r.
-    destruct m.
-    exfalso; inversion ltjm.
-    rewrite <- Pos.of_nat_succ. reflexivity.
     apply (le_trans _ (S j)).
     apply le_S, le_refl. exact ltjm. 
-  - apply inject_Q_CR_wd.
-    unfold canonical_names.equiv, stdlib_rationals.Q_eq.
+  - unfold canonical_names.equiv, stdlib_rationals.Q_eq.
     rewrite Nat2Z.inj_sub.
     unfold Zminus. rewrite Q.Zplus_Qplus, inject_Z_opp.
-    rewrite <- (Qplus_inj_r _ _ (stepX * inject_Z (Z.of_nat n)
+    rewrite positive_nat_Z.
+    rewrite <- (Qplus_inj_r _ _ (stepX * inject_Z (Z.pos n)
                                 -inject_Z (Z.of_nat i) * stepX
                                 - (1#2)*stepX)).
     ring_simplify.
     unfold stepX.
     rewrite <- Qmult_assoc.
-    setoid_replace ((1 # Pos.of_nat n) * inject_Z (Z.of_nat n)) with 1%Q.
+    setoid_replace ((1 # n) * inject_Z (Z.pos n)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
-    unfold canonical_names.equiv, stdlib_rationals.Q_eq, inject_Z.
-    unfold Qeq, Qmult, Qnum, Qden.
-    rewrite Z.mul_1_l, Z.mul_1_l, Z.mul_1_r, Pos.mul_1_r.
-    destruct n.
-    exfalso; inversion ltin.
-    rewrite <- Pos.of_nat_succ. reflexivity.
     apply (le_trans _ (S i)).
     apply le_S, le_refl. exact ltin.
 Qed.
