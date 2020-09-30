@@ -55,8 +55,8 @@ Definition rasterize2 (n m:positive) (t l b r:Q) (p:Q*Q) : prod Z Z
   := pair (Z.min (Zpos n -1) (Z.max 0 (rasterize1 l r n (fst p))))
           (Zpos m -1 - (Z.min (Zpos m -1) (Z.max 0 (rasterize1 b t m (snd p)))))%Z.
            
-Definition RasterizePoint (n m:positive) (bm:raster n m) (t l b r:Q) (p:Q*Q)
-  : raster n m :=
+Definition RasterizePoint n m (bm:raster) (t l b r:Q) (p:Q*Q)
+  : raster :=
   let (i,j) := rasterize2 n m t l b r p in
   setRaster bm true (Z.to_nat j) (Z.to_nat i).
 
@@ -133,25 +133,39 @@ Qed.
 
 (* Adding a point to a raster preserves all the points that were
    already in it. *)
-Lemma RasterizePoint_carry : forall t l b r n m (bm:raster n m) p i j,
-    raster_well_formed bm
+Lemma RasterizePoint_carry : forall t l b r n m (bm:raster) p i j,
+    raster_well_formed_nm n m bm
     -> Is_true (RasterIndex bm i j)
-    -> Is_true (RasterIndex (RasterizePoint bm t l b r p) i j).
+    -> Is_true (RasterIndex (RasterizePoint n m bm t l b r p) i j).
 Proof.
  intros t l b r m n bm p i j rWf H.
  unfold RasterizePoint, rasterize2.
  set (j0:=(Z.to_nat (Z.min (Z.pos m - 1) (Z.max 0 (rasterize1 l r m (fst p)))))).
  set (i0:=(Z.to_nat (Z.pos n - 1 - Z.min (Z.pos n - 1) (Z.max 0 (rasterize1 b t n (snd p)))))%nat).
  destruct (le_lt_dec (Pos.to_nat n) i0).
-  rewrite setRaster_overflow; auto.
+ rewrite setRaster_overflow. exact H.
+ apply (raster_well_formed_weaken rWf).
+ left. destruct rWf. rewrite H0. exact l0.
  destruct (le_lt_dec (Pos.to_nat m) j0).
-  rewrite setRaster_overflow; auto.
+ rewrite setRaster_overflow. exact H.
+ apply (raster_well_formed_weaken rWf).
+ right. destruct rWf. unfold RasterLineLength.
+ rewrite H1. exact l1. apply nth_In.
+ rewrite H0. apply Pos2Nat.is_pos.
  destruct (eq_nat_dec i i0).
-  destruct (eq_nat_dec j j0).
+ - destruct (eq_nat_dec j j0).
    rewrite e, e0.
-   rewrite setRaster_correct1; try constructor; congruence.
-  rewrite setRaster_correct2; auto.
- rewrite setRaster_correct2; auto.
+   rewrite setRaster_correct1. reflexivity.
+   apply (raster_well_formed_weaken rWf).
+   destruct rWf. rewrite H0. exact l0.
+   destruct rWf. unfold RasterLineLength.
+   rewrite H1. exact l1. apply nth_In.
+   rewrite H0. apply Pos2Nat.is_pos.
+   rewrite setRaster_correct2. exact H.
+   exact (raster_well_formed_weaken rWf).
+   right. exact n0. 
+ - rewrite setRaster_correct2; auto.
+   exact (raster_well_formed_weaken rWf).
 Qed.
 
 (** Rasterization is done by rasterizing each point, and composing
@@ -159,12 +173,12 @@ the resulting raster transfomers. A fold_left is done for efficency.
 (It is translated to a fold_right when we reason about it). *)
 (* This function could be a bit more efficent by sorting rast *)
 Definition RasterizeQ2 (points:list Q2) (n m:positive) (t l b r:Q)
-  : raster n m :=
-  fold_left (fun (rast:raster n m) (p:Q*Q) => @RasterizePoint n m rast t l b r p)
+  : raster :=
+  fold_left (fun (rast:raster) (p:Q*Q) => @RasterizePoint n m rast t l b r p)
             points (emptyRaster n m).
 
 Lemma RasterizeQ2_wf : forall points n m t l b r,
-    raster_well_formed (RasterizeQ2 points n m t l b r).
+    raster_well_formed_nm n m (RasterizeQ2 points n m t l b r).
 Proof.
   intros. unfold RasterizeQ2.
   pose proof (emptyRaster_wf n m).
@@ -172,13 +186,14 @@ Proof.
   induction points.
   - intros. exact H.
   - intros. simpl. apply IHpoints.
+    unfold RasterizePoint.
     apply setRaster_wf, H.
 Qed.
 
-Lemma RasterizeQ2_wf_r : forall points n m (bm:raster n m) t l b r,
-    raster_well_formed bm ->
-    raster_well_formed
-      (fold_right (fun p (rast:raster n m) => @RasterizePoint n m rast t l b r p)
+Lemma RasterizeQ2_wf_r : forall points n m (bm:raster) t l b r,
+    raster_well_formed_nm n m bm ->
+    raster_well_formed_nm n m
+      (fold_right (fun p (rast:raster) => @RasterizePoint n m rast t l b r p)
                   bm points).
 Proof.
   induction points.
