@@ -31,27 +31,27 @@ Proof. discriminate. Qed.
 
 Definition Circle_faster : raster _ _
   := let (_,r) := ARplot.PlotPath 0 7 zeroSeven (-(1)) 1 (reflexivity _)
-                             (-(1)) 1 (reflexivity _) 100 CirclePath_faster
+                             (-(1)) 1 (reflexivity _) 200 CirclePath_faster
       in r.
 
 (* This is the approximation of the circle that will be rasterized.
-   For a 100x100 pixel plot, the precision is 1/400.
-   The number of points computed is linear in the number of X-pixels (100 here).
+   For a 200x200 pixel plot, the precision is 1/800.
+   The number of points computed is linear in the number of X-pixels (200 here).
    The precision is also linear, which makes a total quadric time of
    computation, ie linear in the surface of the grid. *)
 Definition Circle_approx : list (prod AQ AQ)
-  := map (fun x => approximate x (Qpos2QposInf (1#400)%Qpos))
+  := map (fun x => approximate x (Qpos2QposInf (1#800)%Qpos))
          (map (ucFun CirclePath_faster)
-              (approximate (IabCompact _ _ zeroSeven) (Qpos2QposInf (1#400)%Qpos))).
+              (approximate (IabCompact _ _ zeroSeven) (Qpos2QposInf (1#800)%Qpos))).
 
 End PlotCirclePath.
 
-(* 3.5 seconds *)
+(* 6 seconds *)
 Time Definition Circle_approx_bigD
   := Eval vm_compute in
       @Circle_approx bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
 
-(* 6 seconds :-( *)
+(* 6 seconds *)
 Time Definition Circle_bigD : raster _ _
   := Eval vm_compute in 
       @Circle_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
@@ -72,13 +72,13 @@ Definition CirclePath': UCFunction Q R2:=
   ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
 
 
-(* 9 seconds :-( *)
+(* 20 seconds *)
 (* The raster must be evaluated before being plotted by DumpGrayMap,
    here with vm_compute. *)
 Time Definition Circle : raster _ _
   := Eval vm_compute in
       (let (_,r) := Plot.PlotPath 0 7 (reflexivity _) (-(1)) 1 (reflexivity _)
-                             (-(1)) 1 (reflexivity _) 100 100 CirclePath
+                             (-(1)) 1 (reflexivity _) 200 200 CirclePath
       in r). 
 
 DumpGrayMap Circle.

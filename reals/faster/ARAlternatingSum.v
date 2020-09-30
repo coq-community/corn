@@ -205,7 +205,8 @@ Proof.
 Defined.
 
 Section main_part.
-Context `(d : DivisionStream sQ sN sD) {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0}.
+  Context `(d : DivisionStream sQ sN sD)
+          {dnn : DecreasingNonNegative sQ} {zl : Limit sQ 0}.
 
 (** 
 Now we can compute the required length of the stream that we have to sum
@@ -216,21 +217,26 @@ pick [big] such that computation will suffer from the implementation limits of C
 (e.g. a stack overflow) or runs out of memory, before we ever refer to the proof.
 *)
 
-Definition big := Eval vm_compute in (Z.nat_of_Z 5000).
-Obligation Tactic := idtac.
-Program Definition ARInfAltSum_length (k : Z) : nat := 4 + takeUntil_length 
-  (λ s, AQball_bool k (hd s) 0) 
-  (LazyExists_inc big (ARInfAltSum_stream (Str_nth_tl 4 sN) (Str_nth_tl 4 sD) k 4) _).
-Next Obligation.
-  intros.
+Definition big : nat := Eval vm_compute in (Z.nat_of_Z 5000).
+Lemma ARInfAltSum_length_aux : ∀ k : Z,
+    LazyExists (λ s : ∞ AQ, AQball_bool k (hd s) 0)
+               (Str_nth_tl big (ARInfAltSum_stream (Str_nth_tl 4 sN) (Str_nth_tl 4 sD) k 4)).
+Proof.
+  intro k.
   assert (Proper ((=) ==> iff) (λ s, AQball_bool k (hd s) 0)) by solve_proper.
-  rewrite ARInfAltSum_stream_Str_nth_tl.
+  rewrite (ARInfAltSum_stream_Str_nth_tl _ _ k 4 big).
   rewrite 2!Str_nth_tl_plus.
   eapply ARInfAltSum_length_ex.
     eapply DivisionStream_Str_nth_tl. now eexact d.
-   now apply Limit_Str_nth_tl.
+   exact (Limit_Str_nth_tl zl (big + 4)).
   now vm_compute.
-Qed.
+Qed. 
+
+Definition ARInfAltSum_length (k : Z) : nat
+  := 4 + takeUntil_length 
+  (λ s, AQball_bool k (hd s) 0) 
+  (LazyExists_inc big (ARInfAltSum_stream (Str_nth_tl 4 sN) (Str_nth_tl 4 sD) k 4)
+  (ARInfAltSum_length_aux k)).
 
 (**
 Since we are using approximate division, we obviously have to sum some extra
