@@ -10,6 +10,7 @@ Require Import CoRN.reals.faster.ARArith.
 Require Import ARplot.
 Require Import CoRN.reals.faster.ARcos
         CoRN.reals.faster.ARsin
+        CoRN.reals.faster.ARexp
         CoRN.reals.faster.ARbigD
         CoRN.reals.faster.ARinterval.
 Require Import CoRN.reals.fast.CRtrans.
@@ -25,39 +26,40 @@ Definition CirclePath_faster
   (uc_compose (uc_compose Couple (together ARcos_uc ARsin_uc))
               (diag AQ_as_MetricSpace)).
 
-(* 7 is above 2 pi, which finishes a circle. *)
-Lemma zeroSeven : (0 <= 7)%Q.
-Proof. discriminate. Qed.
+Definition CosPath_faster
+  : AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace) := 
+  (uc_compose (uc_compose Couple (together Cunit ARcos_uc))
+              (diag AQ_as_MetricSpace)).
 
-Definition Circle_faster : raster _ _
-  := let (_,r) := ARplot.PlotPath 0 7 zeroSeven (-(1)) 1 (reflexivity _)
+(* 7 is above 2 pi, which finishes a circle. *)
+(* Lemma zeroSeven : (0 <= 7)%Q.
+Proof. discriminate. Qed. *)
+
+Definition Circle_faster : sparse_raster _ _
+  := let (_,r) := ARplot.PlotPath 0 7 (-(1)) 1 (reflexivity _)
                              (-(1)) 1 (reflexivity _) 200 CirclePath_faster
       in r.
 
-(* This is the approximation of the circle that will be rasterized.
-   For a 200x200 pixel plot, the precision is 1/800.
-   The number of points computed is linear in the number of X-pixels (200 here).
-   The precision is also linear, which makes a total quadric time of
-   computation, ie linear in the surface of the grid. *)
-Definition Circle_approx : list (prod AQ AQ)
-  := map (fun x => approximate x (Qpos2QposInf (1#800)%Qpos))
-         (map (ucFun CirclePath_faster)
-              (approximate (IabCompact _ _ zeroSeven) (Qpos2QposInf (1#800)%Qpos))).
+Definition Cos_faster : sparse_raster _ _
+  := let (_,r) := ARplot.PlotPath 0 7 0 7 (reflexivity _)
+                             (-(1)) 1 (reflexivity _) 800 CosPath_faster
+      in r.
 
 End PlotCirclePath.
 
 (* 6 seconds *)
-Time Definition Circle_approx_bigD
-  := Eval vm_compute in
-      @Circle_approx bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
-
-(* 6 seconds *)
-Time Definition Circle_bigD : raster _ _
+Time Definition Circle_bigD : sparse_raster _ _
   := Eval vm_compute in 
       @Circle_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
 
-Local Open Scope raster.
 DumpGrayMap Circle_bigD.
+(* Now have a look at plot.pgm *)
+
+Time Definition Cos_bigD : sparse_raster _ _
+  := Eval vm_compute in 
+      @Cos_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
+
+DumpGrayMap Cos_bigD.
 (* Now have a look at plot.pgm *)
 
 
@@ -75,7 +77,7 @@ Definition CirclePath': UCFunction Q R2:=
 (* 20 seconds *)
 (* The raster must be evaluated before being plotted by DumpGrayMap,
    here with vm_compute. *)
-Time Definition Circle : raster _ _
+Time Definition Circle : sparse_raster _ _
   := Eval vm_compute in
       (let (_,r) := Plot.PlotPath 0 7 (reflexivity _) (-(1)) 1 (reflexivity _)
                              (-(1)) 1 (reflexivity _) 200 200 CirclePath

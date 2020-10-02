@@ -10,15 +10,15 @@ Set Implicit Arguments.
 An n by m raster is a matrix of booleans. Do not use Vector, which stores
 a slow nat on each cons.
 *)
-Variant raster (n m : positive) : Set :=
-| raster_data : list (list bool) -> raster n m.
+Variant raster (columns lines : positive) : Set :=
+| raster_data : list (list bool) -> raster columns lines.
 
 (* TODO directly list (list bool), length of first line then
    all lines same length. *)
-Definition raster_well_formed {n m : positive} (r : raster n m) : Prop
+Definition raster_well_formed {columns lines : positive} (r : raster columns lines) : Prop
   := match r with raster_data _ _ d =>
-     length d = Pos.to_nat m
-     /\ Forall (fun line : list bool => length line = Pos.to_nat n) d
+     length d = Pos.to_nat lines
+     /\ Forall (fun line : list bool => length line = Pos.to_nat columns) d
      end.
 
 (** A series of notation allows rasters to be rendered (and to a certain

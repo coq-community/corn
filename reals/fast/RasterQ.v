@@ -64,19 +64,20 @@ Proof.
  split; auto with *.
 Qed.
 
-Definition InterpRow (up : list Q) (v:list bool) : FinEnum Q_as_MetricSpace :=
+Definition InterpRow (up : list Q) (v:list bool) : list Q :=
  map (@fst _ _ ) (filter (@snd _ _) (combine up v)).
 
-Definition InterpRaster (n m:positive) (bitmap : raster n m) (tl br:Q2)
+(* TODO define on sparse rasters directly. *)
+Definition CentersOfPixels (n m:positive) (pixels : raster n m) (tl br:Q2)
   : FinEnum Q2 :=
  let (l,t) := tl in
  let (r,b) := br in
  let up := (UniformPartition l r n) in
  flat_map (fun (p:Q*list bool) => let (y,r):=p in map (fun x => (x,y)) (InterpRow up r))
-          (combine (UniformPartition t b m) (let (d):=bitmap in d)).
+          (combine (UniformPartition t b m) (let (d):=pixels in d)).
 
 (** Notation for the interpretation of a raster. *)
-Notation "a ⇱ b ⇲ c" := (InterpRaster b a c) (at level 1,
+Notation "a ⇱ b ⇲ c" := (CentersOfPixels b a c) (at level 1,
  format "a ⇱ '[v' '/' b ']' '[v' '/' ⇲ c ']'") : raster.
 
 (*
@@ -181,11 +182,11 @@ Lemma InterpRaster_correct1
   : forall n m (t l b r:Q) (bitmap: raster n m) i j,
     raster_well_formed bitmap
     -> Is_true (RasterIndex bitmap i j)
-    -> In (f l r n (Z.of_nat j),f t b m (Z.of_nat i))
-         (InterpRaster bitmap (l,t) (r,b)).
+    -> In (f l r n (Z.of_nat j), f t b m (Z.of_nat i))
+         (CentersOfPixels bitmap (l,t) (r,b)).
 Proof.
   intros n m t l b r bitmap.
-  unfold InterpRaster, InterpRow, UniformPartition.
+  unfold CentersOfPixels, InterpRow, UniformPartition.
   fold (f l r n).
   fold (f t b m).
   generalize (f l r n) (f t b m).
@@ -225,12 +226,12 @@ Qed.
 
 Lemma InterpRaster_correct2 : forall n m (t l b r:Q) x y (bitmap: raster n m),
 raster_well_formed bitmap ->
-In (x,y) (InterpRaster bitmap (l,t) (r,b)) ->
+In (x,y) (CentersOfPixels bitmap (l,t) (r,b)) ->
 exists p, Is_true (RasterIndex bitmap (fst p) (snd p)) /\ x=f l r n (Z.of_nat (snd p))
      /\ y=f t b m (Z.of_nat (fst p)).
 Proof.
  intros n m t l b r x y bitmap.
- unfold InterpRaster, InterpRow, UniformPartition.
+ unfold CentersOfPixels, InterpRow, UniformPartition.
  fold (f l r n).
  fold (f t b m).
  generalize (f l r n) (f t b m).
@@ -289,13 +290,13 @@ Qed.
 End InterpRasterCorrect.
 (* begin hide *)
 Add Parametric Morphism n m (bm:raster n m) (bmWf : raster_well_formed bm)
-  : (@InterpRaster n m bm)
+  : (@CentersOfPixels n m bm)
     with signature (@msp_eq _) ==> (@msp_eq _) ==> (@msp_eq _) as InterpRaster_wd.
 Proof.
  cut (forall (x1 x2 : Q2), msp_eq x1 x2 -> forall x3 x4 : Q2,
    msp_eq x3 x4 -> forall y,
-     InFinEnumC y (InterpRaster bm x1 x3) ->
-       InFinEnumC y (InterpRaster bm x2 x4)).
+     InFinEnumC y (CentersOfPixels bm x1 x3) ->
+       InFinEnumC y (CentersOfPixels bm x2 x4)).
  { intro L. split. discriminate. split.
    intros q H1 abs.
    contradiction (abs q). split. exact (L x y H x0 y0 H0 q H1).
@@ -333,7 +334,7 @@ Proof.
   reflexivity.
   unfold InFinEnumC.
   rewrite -> (@FinSubset_ball_wd _ z _ 0 0 
-                                (InterpRaster bm (x2l, x2r) (y2l, y2r))
+                                (CentersOfPixels bm (x2l, x2r) (y2l, y2r))
                                 (reflexivity _) L0).
  apply InFinEnumC_weaken.
  auto using InterpRaster_correct1.
