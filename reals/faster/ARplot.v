@@ -43,13 +43,51 @@ Let err := Qpos_max ((1 # 8 * n) * (exist _ _ wpos))
 Variable path:AQ_as_MetricSpace --> Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace).
 
 (** The actual plot function *)
-Definition PlotPath : positive * positive * Q * raster n m
+Definition PlotPath : positive * positive * Q * sparse_raster n m
+  := (n, m, 2,
+      let num := (Z.to_pos
+                    (Qceiling
+                       ((to - from) /
+                                    (inject_Z 2 *
+                                     ((1 # 2) *
+                                      ` (FinEnum_map_modulus 
+                                           (1 # 1)%Qpos 
+                                           (mu path) err)))))) in
+    sparse_raster_data n m
+      (map
+         (λ x : Z,
+            rasterize2 n m t l b r
+              (let (a, b0) :=
+                 approximate
+                    (path
+                      (AppInverse0
+                         (from +
+                          (to - from) * (2 * x + 1 # 1) /
+                          (2 *
+                           Z.pos num # 1))
+                         ((1 # 2)%Qpos *
+                          FinEnum_map_modulus (1#1)%Qpos (mu path) err)%Qpos))
+               err in
+               (AQtoQ a, AQtoQ b0))) (* TODO rasterize2AQ *)
+         (Interval.iterateN_succ 0 num))).
+
+Definition PlotPath_slow : positive * positive * Q * sparse_raster n m
   := (n, m, 2#1,
-      RasterizeQ2 
-        (map (fun x :Complete (ProductMS AQ_as_MetricSpace AQ_as_MetricSpace)
-              => (let (a,b) := approximate x err in (AQtoQ a, AQtoQ b)))
-             (map path (approximate (IabCompact _ _ Hfromto)
-                                    (FinEnum_map_modulus (1 # 1) (mu path) err))))
-        n m t l b r).
+ sparse_raster_data n m
+    (map
+       (λ x : AQ_as_MetricSpace,
+          rasterize2 n m t l b r
+            (let (a, b0) := approximate (path x) err in (AQtoQ a, AQtoQ b0)))
+       (approximate (IabCompact from to Hfromto)
+          (FinEnum_map_modulus (1 # 1) (mu path) err)))).
+
+Lemma PlotPath_correct : eq PlotPath PlotPath_slow.
+Proof.
+  unfold PlotPath_slow. unfold IabCompact, approximate.
+  rewrite map_map.
+  unfold Interval.UniformPartition.
+  rewrite map_map.
+  reflexivity.
+Qed.
 
 End PlotPath.

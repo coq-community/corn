@@ -96,7 +96,7 @@ Variable path:Q_as_MetricSpace --> Complete Q2.
     The approximation of PathImage make a list (Complete Q2), ie a list
     of points in the real plane. Those points still need to be approximated
     by rational numbers, which map approximate does. *)
-Definition PlotPath : positive * positive * Q * raster n m
+Definition PlotPath : positive * positive * Q * sparse_raster n m
   := (n, m, 2#1,
       RasterizeQ2 
         (map (fun x => approximate x err)
@@ -110,95 +110,79 @@ End PlotPath.
 
 Section Plot.
 
-Variable (l r:Q).
-Hypothesis Hlr : l < r.
+Variable (l b:Q).
+Variable w h:Qpos.
 
-Variable (b t:Q).
-Hypothesis Hbt : b < t.
-
+Let r:=l+proj1_sig w.
+Let t:=b+proj1_sig h.
 
 Let clip := uc_compose (boundBelow b) (boundAbove t).
 
 Variable f : Q_as_MetricSpace --> CR.
 
+Lemma lrle : l <= r.
+Proof.
+  rewrite <- (Qplus_0_r l).
+  unfold r. apply Qplus_le_r, Qpos_nonneg.
+Qed.
+
 Definition graphQ f : Compact Q2
-  := CompactGraph_b f plFEQ (CompactIntervalQ (Qlt_le_weak _ _ Hlr)).
+  := CompactGraph_b f plFEQ (CompactIntervalQ lrle).
 
 Lemma graphQ_bonus : forall e x y,
- In (x, y) (approximate (graphQ (uc_compose clip f)) e) -> l <= x <= r /\ b <= y <= t.
+    In (x, y) (approximate (graphQ (uc_compose clip f)) e)
+    -> l <= x <= r /\ b <= y <= t.
 Proof.
  intros [e|] x y;[|intros; contradiction].
  simpl.
  unfold Cjoin_raw.
- Opaque  CompactIntervalQ.
+ Opaque CompactIntervalQ.
  simpl.
  unfold FinCompact_raw.
  rewrite map_map.
  rewrite -> in_map_iff.
- unfold graphPoint_b_raw.
- simpl.
- unfold Couple_raw.
- simpl.
+ unfold graphPoint_b_raw; simpl.
+ unfold Couple_raw; simpl.
  intros [z [Hz0 Hz1]].
  inversion Hz0.
- rewrite <- H0.
- clear Hz0 x y H0 H1.
- split; auto with *.
+ subst x. subst y.
+ clear Hz0.
+ split.
  eapply CompactIntervalQ_bonus_correct.
  apply Hz1.
+ split. apply Qmax_ub_l.
+ apply Qmax_lub.
+ rewrite <- (Qplus_0_r b).
+ unfold t. apply Qplus_le_r, Qpos_nonneg.
+ apply Qmin_lb_l.
 Qed.
 
 Variable n m : positive. (* Number of horizontal and vertical pixels *)
-
-Let w := proj1_sig (Qpos_sub _ _ Hlr).
-Let h := proj1_sig (Qpos_sub _ _ Hbt).
 
 Let err := Qpos_max ((1 # 4 * n) * w)
                     ((1 # 4 * m) * h).
 
 (** [PlotQ] is the function that computes the pixels. *)
-Definition PlotQ : raster n m
+Definition PlotQ : sparse_raster n m
   := RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r.
 
 Local Open Scope raster.
 
 (** The resulting plot is close to the graph of [f] *)
 Theorem Plot_correct :
-ball (proj1_sig (err + Qpos_max ((1 # 2 * n) * w)
-        ((1 # 2 * m) * h))%Qpos)
- (graphQ (uc_compose clip f))
- (Cunit (InterpRaster PlotQ (l,t) (r,b))).
+  @ball (Compact Q2)
+        (proj1_sig (err + Qpos_max ((1 # 2 * n) * w) ((1 # 2 * m) * h))%Qpos)
+        (graphQ (uc_compose clip f))
+        (Cunit (CentersOfPixels (PixelizeQ2 PlotQ) (l,t) (r,b))).
 Proof.
- assert (Hw:=(proj2_sig (Qpos_sub _ _ Hlr))).
- assert (Hh:=(proj2_sig (Qpos_sub _ _ Hbt))).
- fold w in Hw.
- fold h in Hh.
- change (r == l + proj1_sig w) in Hw.
- change (t == b + proj1_sig h) in Hh.
  apply ball_triangle with (Cunit (approximate (graphQ (uc_compose clip f)) err)).
   apply ball_approx_r.
  unfold Compact.
  rewrite -> ball_Cunit.
  apply ball_sym.
- assert (L:msp_eq ((l,t):Q2) (l,b + proj1_sig h)).
-  split; simpl.
-   reflexivity.
-  apply Qball_0; ring.
- set (Z0:=(l, t):Q2) in *.
- set (Z1:=(r, b):Q2) in *.
- set (Z:=(l, (b + proj1_sig h)):Q2) in *.
- assert (msp_eq Z1 (l+proj1_sig w,b)).
- { split. simpl. apply Qball_0. ring. reflexivity. } 
- rewrite (InterpRaster_wd PlotQ (RasterizeQ2_wf _ _ _ _ _ _ _) L H).
-  clear H. unfold Z, PlotQ.
-  (* TODO: figure out why rewrite Hw, Hh hangs *)
-  replace (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m t l b r)
-    with (RasterizeQ2 (approximate (graphQ (uc_compose clip f)) err) n m (b + proj1_sig h) l b (l + proj1_sig w)) by now rewrite Hw, Hh.
   split. apply Qpos_nonneg.
   apply RasterizeQ2_correct.
-  intros.
-  rewrite <- Hw.
-  rewrite <- Hh.
+  intros. 
   destruct (InStrengthen H) as [[zx xy] [Hz0 [Hz1 Hz2]]].
   simpl in Hz1, Hz2.
   apply Qball_0 in Hz1.

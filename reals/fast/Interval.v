@@ -406,7 +406,7 @@ Definition CompactIntervalQ_raw (e:QposInf) : list Q :=
 match e with
 | QposInfinity => nil
 | Qpos2QposInf e' =>
-  UniformPartition (Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e')))))
+  UniformPartition (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e'))))
 end.
 
 Lemma CompactIntervalQ_prf
@@ -423,7 +423,7 @@ Proof.
  intros e1 e2 a Ha.
  assert (l <= a <= r).
  { unfold CompactIntervalQ_raw in Ha.
-  set (e1':=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))))) in *.
+  set (e1':=Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e1)))) in *.
   assert (L:=UniformPartition_inside e1').
   induction (UniformPartition e1').
   exfalso; exact (FinSubset_ball_nil Ha).
@@ -438,7 +438,7 @@ Proof.
    apply Qball_0 in Ha. exact Ha.
   assumption. }
  unfold CompactIntervalQ_raw.
- set (e2':=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
+ set (e2':=Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))).
  pose proof (UniformPartition_fine e2' H) as [y [Hy0 Hy1]].
  apply existsWeaken.
  exists y.
@@ -462,10 +462,6 @@ Proof.
      intros q He.
      apply Qle_trans with (inject_Z (Qceiling q)).
      apply Qle_ceiling.
-     rewrite Pos2Z.inj_max.
-     unfold Qle; simpl.
-     rewrite Z.mul_1_r, Z.mul_1_r.
-     eapply Z.le_trans;[|apply Z.le_max_r].
      destruct (Qceiling q). discriminate.
      rewrite Z2Pos.id.
      apply Z.le_refl.
@@ -502,7 +498,7 @@ Proof.
   intros e2.
   assert (L:=Hx e e2).
   simpl in L.
-  set (a:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
+  set (a:=Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))) in *.
   assert (L0:=UniformPartition_inside a).
   induction (UniformPartition a).
   exfalso; exact (FinSubset_ball_nil L).
@@ -533,7 +529,7 @@ Proof.
  intros e2.
  assert (L:=Hx e e2).
  simpl in L.
- set (a:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))) in *.
+ set (a:=Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))) in *.
  assert (L0:=UniformPartition_inside a).
  induction (UniformPartition a).
   exfalso; exact (FinSubset_ball_nil L).
@@ -603,7 +599,7 @@ Proof.
   exact H0.
  - assert (L: l <= y <= r).
    { unfold y. auto with *. }
- set (n:=(Pos.max 1 (Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))))).
+ set (n:=Z.to_pos (Qceiling ((r - l) / (inject_Z 2 * proj1_sig e2)))).
  destruct (UniformPartition_fine n L) as [z Hz].
   clear - Hz.
   destruct Hz as [Hz0 Hz1].
@@ -631,12 +627,10 @@ Proof.
      by (unfold canonical_names.equiv, stdlib_rationals.Q_eq; simpl; field). 
    rewrite Qmult_1_l.
    apply (Qle_trans _ (inject_Z (Qceiling q)) _ (Qle_ceiling _)).
-   rewrite Pos2Z.inj_max.
-   unfold Qle; simpl.
-   rewrite Z.mul_1_r, Z.mul_1_r.
+   rewrite <- Zle_Qle.
    destruct (Qceiling q).
    discriminate.
-   apply Z.le_max_r.
+   apply Z.le_refl.
    discriminate. apply Qpos_nonzero.
    + apply FinSubset_ball_cons.
      apply IHl0, Hz0.
