@@ -18,7 +18,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
-Require Import CoRN.algebra.RSetoid.
+Require Import QArith.Qround.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.ProductMetric.
 Require Import CoRN.metric2.UniformContinuity.
@@ -52,13 +52,6 @@ Afterwards we will plot more general located subsets of the plane:
 
 Local Open Scope uc_scope.
 
-Lemma plFEQ : PrelengthSpace (FinEnum Q_as_MetricSpace).
-Proof.
- apply FinEnum_prelength.
-  apply locatedQ.
- apply QPrelengthSpace.
-Qed.
-
 Section PlotPath.
 Variable (from to:Q).
 Hypothesis Hfromto:from<=to.
@@ -69,7 +62,7 @@ Hypothesis Hlr : l < r.
 Variable (b t:Q).
 Hypothesis Hbt : b < t.
 
-Variable n m : positive.
+Variable n : positive.
 
 Let w := r - l.
 Let h := t - b.
@@ -83,6 +76,9 @@ Lemma hpos : 0 < h.
 Proof.
   apply Qlt_minus_iff in Hbt. exact Hbt.
 Qed.
+
+(* Compute the number of pixels on the Y-axis to make square pixels. *)
+Let m : positive := Z.to_pos (Qceiling ((t-b) * inject_Z (Z.pos n) / (r-l))).
 
 (**
 Half the error in the Plot example, since we need to approximate twice.
@@ -98,14 +94,56 @@ Variable path:Q_as_MetricSpace --> Complete Q2.
     by rational numbers, which map approximate does. *)
 Definition PlotPath : positive * positive * Q * sparse_raster n m
   := (n, m, 2#1,
+      sparse_raster_data n m
+    (map
+       (fun x : Z =>
+        rasterize2 n m t l b r
+          ((let (approximate, _) :=
+              path
+                (from +
+                 (to - from) * (2 * x + 1 # 1) /
+                 (2 *
+                  Z.pos
+                    (Z.to_pos
+                       (Qceiling
+                          ((to - from) /
+                           (inject_Z 2 *
+                            proj1_sig (FinEnum_map_modulus (1 # 1) (mu path) err)))))
+                  # 1)) in
+            approximate) err))
+       (iterateN_succ 0
+          (Z.to_pos
+             (Qceiling
+                ((to - from) /
+                 (inject_Z 2 * proj1_sig (FinEnum_map_modulus (1 # 1) (mu path) err)))))))).
+
+Definition PlotPath_slow : positive * positive * Q * sparse_raster n m
+  := (n, m, 2#1,
       RasterizeQ2 
-        (map (fun x => approximate x err)
-             (map path (approximate (CompactIntervalQ Hfromto)
-                                    (FinEnum_map_modulus (1 # 1) (mu path) err))))
+        (map (fun x : Q_as_MetricSpace => approximate (path x) err)
+             (approximate (CompactIntervalQ Hfromto)
+                          (FinEnum_map_modulus (1 # 1) (mu path) err)))
         n m t l b r).
+
+Lemma PlotPath_correct : eq PlotPath PlotPath_slow.
+Proof.
+  unfold PlotPath, PlotPath_slow, RasterizeQ2.
+  rewrite map_map.
+  unfold CompactIntervalQ, approximate.
+  unfold CompactIntervalQ_raw, UniformPartition.
+  rewrite map_map.
+  reflexivity.
+Qed.
 
 End PlotPath.
 
+
+Lemma plFEQ : PrelengthSpace (FinEnum Q_as_MetricSpace).
+Proof.
+ apply FinEnum_prelength.
+  apply locatedQ.
+ apply QPrelengthSpace.
+Qed.
 
 
 Section Plot.
@@ -398,4 +436,3 @@ Proof.
     apply (le_trans _ (S i)).
     apply le_S, le_refl. exact ltin.
 Qed.
-  

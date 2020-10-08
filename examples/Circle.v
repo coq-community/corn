@@ -79,8 +79,8 @@ Definition CirclePath': UCFunction Q R2:=
    here with vm_compute. *)
 Time Definition Circle : sparse_raster _ _
   := Eval vm_compute in
-      (let (_,r) := Plot.PlotPath 0 7 (reflexivity _) (-(1)) 1 (reflexivity _)
-                             (-(1)) 1 (reflexivity _) 200 200 CirclePath
+      (let (_,r) := Plot.PlotPath 0 7 (-(1)) 1 (reflexivity _)
+                             (-(1)) 1 (reflexivity _) 200 CirclePath
       in r). 
 
 DumpGrayMap Circle.
