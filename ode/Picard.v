@@ -688,7 +688,7 @@ change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.
 apply flip_le_negate. apply (CRle_trans H1 H2).
 Qed.
 
-Instance : @IsUniformlyContinuous
+Instance : forall {r a}, @IsUniformlyContinuous
              _ (@Linf_product_metric_space_ball
                   _ (@sig_mspc_ball Q (msp_mspc_ball Q_as_MetricSpace) (ball r a))
                   _ (@sig_mspc_ball CR (msp_mspc_ball CR) (@ball CR (msp_mspc_ball CR) (proj1_sig ry) y0)) )
