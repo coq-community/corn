@@ -25,7 +25,7 @@ Require Export Coq.PArith.BinPos.
 * Lazy Nat
 This s a lazified version of the natural number that allow one to delay
 computation until demanded.  This is useful for large natural numbers
-(often upper bounds) where only a small number of terms are actually need
+(often upper bounds) where only a small number of terms are actually needed
 for compuation.
 *)
 Inductive LazyNat : Set :=
@@ -92,8 +92,11 @@ Proof.
  induction x; simpl; intros pow2; repeat (rewrite LazifyPlus||rewrite IHx); reflexivity.
 Qed.
 
-(** Convert a positive to a lazy nat.  This is the most common way of
-generating lazy nats. *)
+(** Convert a positive to a lazy nat. This is the most common way of
+    generating lazy nats. The simplest fixpoint to do this is not lazy,
+    because the weak head normal form for x=2^k is fully computed. To
+    get LazyS constructors sooner, we could also define a double function
+    on LazyNat. *)
 Definition LazyNat_of_P (x:positive) := Pmult_LazyNat x (LazyS (fun _ => LazyO)).
 
 Lemma LazifyNat_of_P : forall x, LazifyNat (nat_of_P x) = LazyNat_of_P x.

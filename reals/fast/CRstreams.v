@@ -1,5 +1,6 @@
 (*
 Copyright © 2006-2008 Russell O’Connor
+Copyright © 2020 Vincent Semeria
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this proof and associated documentation files (the "Proof"), to deal in
@@ -226,6 +227,7 @@ Proof.
 Qed.
 End Qpowers.
 
+
 (**
 *** [ppositives]
 The stream of postive numbers (as positive).
@@ -322,31 +324,40 @@ Proof.
  apply H. exact H0.
 Qed.
 
-Lemma Qrecip_positives_help_Exists : forall P n p, 
-    LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help (Pplus_LazyNat p n)))
-    -> LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help p)).
+(* Make a lazy list of LazyFurthers. *)
+Fixpoint Qrecip_positives_help_Exists P (n:LazyNat) (p:positive)
+  (H : LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help (Pplus_LazyNat p n))))  { struct n }
+  : LazyExists P (CoqStreams.map (fun x => (1#x)) (ppositives_help p)).
 Proof.
- induction n; intros p H0.
-  exact H0.
- right.
- intros _.
- apply (H tt).
- apply H0.
+  destruct n.
+  - exact H.
+  - apply LazyFurther.
+    exact (fun _ => Qrecip_positives_help_Exists P (l tt) (Pos.succ p) H). 
 Defined.
 
+Lemma Qrecip_positives_nbz : forall (n : Z) (d : positive) (U : 0 < n # d),
+    NearBy 0 (Qpos2QposInf (exist _ (n # d) U))
+           (map (λ x : positive, 1 # x)
+                (ppositives_help (Pplus_LazyNat 1 (LazyPred (LazyNat_of_P d))))).
+Proof.
+  intros. 
+  apply Qrecip_positives_help_nbz.
+  induction d using Pind;[simpl;auto with *|].
+  autorewrite with UnLazyNat in *.
+  rewrite nat_of_P_succ_morphism; assert (H:=lt_O_nat_of_P d);
+     destruct (nat_of_P d);[elimtype False;auto with *|]; simpl in *;
+       replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Pos.succ (Pplus_LazyNat 1 (LazifyNat n0)));[
+         repeat rewrite Zpos_succ_morphism; auto with * |]; clear -n0;
+           change 2%positive with (Pos.succ 1); generalize 1%positive;
+             induction n0;intros p;[reflexivity|]; simpl in *; rewrite IHn0; reflexivity.
+Qed.
+  
 Instance Qrecip_positives_zl : Limit Qrecip_positives 0.
  intros [[[n d] U] | ]; [| left; apply ForAll_True].
  unfold Qrecip_positives.
  unfold ppositives.
  apply Qrecip_positives_help_Exists with (LazyPred (LazyNat_of_P d)).
- left.
- abstract ( apply Qrecip_positives_help_nbz; induction d using Pind;[simpl;auto with *|];
-   autorewrite with UnLazyNat in *; rewrite nat_of_P_succ_morphism; assert (H:=lt_O_nat_of_P d);
-     destruct (nat_of_P d);[elimtype False;auto with *|]; simpl in *;
-       replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Pos.succ (Pplus_LazyNat 1 (LazifyNat n0)));[
-         repeat rewrite Zpos_succ_morphism; auto with * |]; clear -n0;
-           change 2%positive with (Pos.succ 1); generalize 1%positive;
-             induction n0;intros p;[reflexivity|]; simpl in *; rewrite IHn0; reflexivity ).
+ left. apply Qrecip_positives_nbz.
 Defined.
 
 (** [recip_positives] is [DecreasingNonNegative]. *)
@@ -512,6 +523,256 @@ Proof.
  intros e.
  right.
  intros _.
- refine (Stream_Bound_zl _ _ _ _ _).
- apply Qrecip_factorial_bounded.
+ apply (Stream_Bound_zl _ _ Qrecip_factorial_bounded).
+ apply Qrecip_positives_zl.
 Defined.
+
+Section InductiveStreams.
+  (* Streams as an inductive type with explicit state of type X.
+     Allows to compute series such as exp x = sum_k x^k / k!
+     without recomputing the power and the factorial from 0 for each k. *)
+
+  Variable X : Type.
+  Variable f : X -> X.
+
+  Fixpoint iterate (p : positive) (x : X) : X :=
+    match p with
+    | xI q => iterate q (iterate q (f x))
+    | xO q => iterate q (iterate q x)
+    | xH => f x
+    end.
+
+  Lemma iterate_one : forall x:X,
+      iterate 1 x ≡ f x.
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma iterate_shift : forall (p:positive) (x : X),
+      f (iterate p x) ≡ iterate p (f x).
+  Proof.
+    induction p.
+    - intro x. simpl.
+      rewrite IHp, IHp. reflexivity.
+    - intro x. simpl.
+      rewrite IHp, IHp. reflexivity.
+    - reflexivity.
+  Qed.
+
+  Lemma iterate_succ : forall (p:positive) (x : X),
+      iterate (Pos.succ p) x ≡ f (iterate p x).
+  Proof.
+    induction p.
+    - intro x. simpl.
+      rewrite IHp. f_equal.
+      rewrite IHp. f_equal.
+      rewrite iterate_shift. reflexivity.
+    - intro x. simpl.
+      rewrite iterate_shift, iterate_shift.
+      reflexivity.
+    - reflexivity.
+  Qed.
+
+  Lemma iterate_add : forall (p q:positive) (x : X),
+      iterate (p+q)%positive x ≡ iterate p (iterate q x).
+  Proof.
+    apply (Pos.peano_ind
+             (fun p => forall (q : positive) (x : X),
+                  iterate (p + q) x ≡ iterate p (iterate q x))).
+    - intros. rewrite Pos.add_1_l, iterate_succ. reflexivity.
+    - intros. rewrite iterate_succ.
+      rewrite <- Pos.add_1_l, <- Pos.add_assoc, Pos.add_1_l.
+      rewrite iterate_succ, H. reflexivity.
+  Qed.
+
+  Variable stop : X -> bool.
+
+  (* iterate_stop p x = iterate q x, where q = p or q < p and
+     q is the lowest index such as stop (iterate q) = true.
+     Testing whether the recursive iterate_stop stops regrettably
+     adds a logarithmic useless number of stop tests.
+     This could be improved by returning a pair X*bool to indicate
+     that the iteration stopped. We could also try using a LazyNat fuel. *)
+  Fixpoint iterate_stop (p : positive) (x : X) : X :=
+    match p with
+    | xI q => (* p = 2q+1 *)
+      let g := f x in
+      if stop g then g else
+        let h := iterate_stop q g in
+        if stop h then h else iterate_stop q h
+    | xO q => let g := iterate_stop q x in
+             if stop g then g else iterate_stop q g 
+    | xH => f x
+    end.
+
+  (* The q below is even unique. Because it is either p or
+     the first index where iterate stops. *)
+  Lemma iterate_stop_correct : forall (p:positive) (x:X),
+      exists q:positive,
+        iterate_stop p x ≡ iterate q x
+        /\ (forall r, Pos.lt r q -> stop (iterate r x) ≡ false)
+        /\ (p ≡ q
+           \/ (Pos.lt q p /\ stop (iterate q x) ≡ true)).
+  Proof.
+    induction p.
+    - intro x. simpl.
+      destruct (stop (f x)) eqn:des1.
+      exists xH. split. reflexivity.
+      split. intros. exfalso; exact (Pos.nlt_1_r r H).
+      right. split. rewrite Pos.xI_succ_xO.
+      apply Pos.lt_1_succ.
+      exact des1.
+      destruct (stop (iterate_stop p (f x))) eqn:des.
+      + (* Stopped at p+1 by the stop predicate,
+           prove that value is the same at 2p+1. *)
+        specialize (IHp (f x)) as [q [itereq [H H0]]]. 
+        exists (Pos.succ q). split.
+        rewrite itereq, iterate_succ, iterate_shift.
+        reflexivity. split.
+        apply (Pos.peano_case
+                 (fun r => (r < Pos.succ q)%positive → stop (iterate r x) ≡ false)).
+        intros. exact des1. intros.
+        rewrite iterate_succ, iterate_shift. apply H.
+        apply Pos.succ_lt_mono in H1.
+        exact H1. right.
+        split. rewrite Pos.xI_succ_xO.
+        rewrite <- Pos.succ_lt_mono.
+        destruct H0. rewrite H0.
+        rewrite <- Pos.add_diag. apply Pos.lt_add_r.
+        apply (Pos.lt_trans _ p). apply H0.
+        rewrite <- Pos.add_diag. apply Pos.lt_add_r.
+        rewrite iterate_succ, iterate_shift, <- itereq. exact des.
+      + pose proof (IHp (f x)) as [q [itereq [H H0]]].
+        destruct H0.
+        2: exfalso; destruct H0; rewrite <- itereq, des in H1; discriminate.
+        subst q.
+        specialize (IHp (iterate_stop p (f x))) as [q [qeq [H0 H1]]].
+        exists (Pos.succ q+p)%positive. split.
+        rewrite qeq.
+        rewrite <- Pos.add_1_r, <- Pos.add_assoc, iterate_add.
+        apply f_equal.
+        rewrite Pos.add_1_l, itereq, iterate_succ, iterate_shift.
+        reflexivity. split.
+        apply (Pos.peano_case
+                 (fun r => (r < Pos.succ q+p)%positive → stop (iterate r x) ≡ false)).
+        intros. exact des1.
+        intros r H2.
+        rewrite iterate_succ, iterate_shift.
+        destruct (Pos.lt_total r p).
+        apply H, H3.
+        destruct H3. rewrite H3. 
+        rewrite <- itereq. exact des.
+        rewrite <- (Pplus_minus r p).
+        2: apply Pos.lt_gt, H3. 
+        rewrite Pos.add_comm, iterate_add, <- itereq.
+        apply (H0 (r-p)%positive).
+        rewrite <- (Pos.add_1_l q), <- Pos.add_assoc, Pos.add_1_l in H2.
+        apply Pos.succ_lt_mono in H2.
+        rewrite <- (Pplus_minus r p) in H2.
+        2: apply Pos.lt_gt, H3.
+        rewrite Pos.add_comm in H2.
+        apply Pos.add_lt_mono_r in H2. exact H2.
+        destruct H1. left. rewrite H1.
+        rewrite Pos.xI_succ_xO.
+        rewrite <- (Pos.add_1_l q), <- Pos.add_assoc, Pos.add_1_l.
+        rewrite Pos.add_diag. reflexivity.
+        right. split. rewrite Pos.xI_succ_xO.
+        rewrite <- Pos.add_1_l, <- Pos.add_assoc, Pos.add_1_l.
+        rewrite <- Pos.succ_lt_mono, <- Pos.add_diag.
+        apply Pos.add_lt_mono_r, H1.
+        rewrite <- Pos.add_1_r, <- Pos.add_assoc, iterate_add.
+        rewrite Pos.add_1_l, iterate_succ, iterate_shift.
+        rewrite <- itereq. apply H1.
+    - intro x. simpl.
+      destruct (stop (iterate_stop p x)) eqn:des.
+      + (* Stopped at p by the stop predicate,
+           prove that value is the same at 2p. *)
+        specialize (IHp x) as [q [itereq [H H0]]].
+        exists q. split. exact itereq. split.
+        intros. apply H, H1. right.
+        split. destruct H0.
+        rewrite H0. rewrite <- Pos.add_diag. apply Pos.lt_add_r.
+        apply (Pos.lt_trans _ p). apply H0.
+        rewrite <- Pos.add_diag. apply Pos.lt_add_r.
+        rewrite <- itereq. exact des.
+      + pose proof (IHp x) as [q [itereq [H H0]]].
+        destruct H0.
+        2: exfalso; destruct H0; rewrite <- itereq, des in H1; discriminate.
+        subst q.
+        specialize (IHp (iterate_stop p x)) as [q [qeq [H0 H1]]].
+        exists (q+p)%positive. split.
+        rewrite qeq, iterate_add.
+        apply f_equal. exact itereq.
+        split. intros.
+        destruct (Pos.lt_total r p).
+        apply H, H3. destruct H3. rewrite H3. clear H3 H2 r.
+        rewrite <- itereq. exact des.
+        rewrite <- (Pplus_minus r p).
+        2: apply Pos.lt_gt, H3.
+        rewrite Pos.add_comm, iterate_add, <- itereq.
+        apply (H0 (r-p)%positive).
+        rewrite <- (Pplus_minus r p) in H2.
+        2: apply Pos.lt_gt, H3.
+        rewrite Pos.add_comm in H2.
+        apply Pos.add_lt_mono_r in H2.
+        exact H2.
+        destruct H1. left. rewrite H1.
+        rewrite Pos.add_diag. reflexivity.
+        right. split.
+        rewrite <- Pos.add_diag.
+        apply Pos.add_lt_mono_r, H1.
+        rewrite iterate_add, <- itereq. apply H1.
+    - intro x. exists xH. split. reflexivity.
+      split. intros. exfalso; exact (Pos.nlt_1_r r H).
+      left. reflexivity.
+  Qed.
+
+  Lemma iterate_stop_one : forall (x : X),
+      iterate_stop 1 x ≡ f x.
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma iterate_stop_indep : forall (p q : positive) (x : X),
+      stop (iterate p x) ≡ true
+      -> stop (iterate q x) ≡ true 
+      -> iterate_stop p x ≡ iterate_stop q x.
+  Proof.
+    intros.
+    pose proof (iterate_stop_correct p x) as [r [rpeq [H1 H2]]].
+    assert (stop (iterate r x) ≡ true) as rstop.
+    { destruct H2. rewrite <- H2. exact H. apply H2. }
+    rewrite rpeq. clear H2 rpeq H p.
+    pose proof (iterate_stop_correct q x) as [s [sqeq [H H2]]].
+    assert (stop (iterate s x) ≡ true) as sstop.
+    { destruct H2. rewrite <- H2. exact H0. apply H2. }
+    rewrite sqeq. clear H2 sqeq H0 q.
+    destruct (Pos.lt_total r s).
+    - exfalso. specialize (H r H0).
+      rewrite H in rstop. discriminate.
+    - destruct H0. rewrite H0. reflexivity.
+      exfalso. specialize (H1 s H0).
+      rewrite H1 in sstop. discriminate.
+  Qed.
+
+  Lemma iterate_stop_unique : forall (p q : positive) (x : X),
+      stop (iterate p x) ≡ true
+      -> stop (iterate q x) ≡ true 
+      -> (forall i:positive, Pos.lt i q -> stop (iterate i x) ≡ false)
+      -> iterate_stop p x ≡ iterate q x.
+  Proof.
+    intros. 
+    pose proof (iterate_stop_correct p x) as [r [rpeq [H2 H3]]].
+    rewrite rpeq. replace r with q. reflexivity.
+    destruct (Pos.lt_total q r).
+    - exfalso. specialize (H2 q H4). rewrite H0 in H2. discriminate.
+    - destruct H4. exact H4. exfalso.
+      destruct H3.
+      + subst r.
+        specialize (H1 p H4). rewrite H in H1. discriminate.
+      + destruct H3. specialize (H1 r H4).
+        rewrite H1 in H5. discriminate.
+  Qed.
+      
+End InductiveStreams.
+
