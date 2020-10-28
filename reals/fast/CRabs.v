@@ -70,6 +70,14 @@ Lemma approximate_CRabs (x: CR) (e: Qpos):
   approximate (CRabs x) e = Qabs (approximate x e).
 Proof. reflexivity. Qed.
 
+Lemma inject_Q_CR_abs : forall q : Q,
+    (CRabs (inject_Q_CR q) == inject_Q_CR (Qabs q))%CR.
+Proof.
+  intros q. 
+  apply regFunEq_equiv. intros e1 e2.
+  apply ball_refl, (Qpos_nonneg (e1+e2)).
+Qed.
+
 Lemma CRabs_AbsSmall : forall a b : CR, (CRabs b <= a)%CR <-> (-a <= b /\ b <= a)%CR.
 Proof.
   split.

@@ -63,20 +63,8 @@ Local Open Scope uc_scope.
 Section ExpSeries.
 Variable a:Q.
 
-Definition expSequence := mult_Streams Qrecip_factorials (powers a).
-
 Definition expStream (px : positive*Q) : positive*Q
   := (Pos.succ (fst px), snd px * a * (1#fst px)).
-
-Lemma Str_nth_expSequence : forall n, (Str_nth n expSequence = (1#P_of_succ_nat (pred (fact n)))*a^n)%Q.
-Proof.
- intros n.
- unfold expSequence.
- unfold mult_Streams.
- rewrite Str_nth_zipWith.
- rewrite ->(Str_nth_powers_int_pow _ (cast nat Z)). 
- now rewrite Str_nth_Qrecip_factorials.
-Qed.
 
 Lemma expStream_fst : forall p, fst (iterate _ expStream p (1%positive, 1)) ≡ Pos.succ p.
 Proof.
@@ -206,160 +194,165 @@ Proof.
       simpl in epos. rewrite Z.mul_1_r in epos. exact epos.
 Qed.
 
-(** The exponential is first defined on [[-1,0]]. *)
-Hypothesis Ha: 0 <= a <= 1.
-
-Lemma expSequence_dnn : DecreasingNonNegative expSequence.
-Proof.
- apply mult_Streams_dnn.
-  apply Qrecip_factorials_dnn.
- apply powers_dnn.
- assumption.
-Qed.
-
-Lemma expSequence_zl : Limit expSequence 0.
-Proof.
- eapply mult_Streams_zl.
-  apply Qrecip_factorials_zl.
- apply powers_nbz.
- assumption.
-Defined.
-
 End ExpSeries.
 
-Lemma exp_ps_correct : forall a (n:nat) H,
-  inj_Q IR ((((-(1))^n)*Str_nth n (expSequence (-a)))%Q) = Exp_ps n (inj_Q IR a) H.
+Lemma exp_ps_correct : forall (a:Q) (p:positive) H,
+    inj_Q IR (Str_pth _ (expStream a) p (xH,1))%Q
+    = Exp_ps (Pos.to_nat p) (inj_Q IR a) H.
 Proof.
- intros a n H.
- stepr (inj_Q IR ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)%Q).
-  apply inj_Q_wd;simpl.
-  rewrite -> Str_nth_expSequence.
-  setoid_replace (a^n)%Q with ((-(1))^n*(-a)^n)%Q.
-   ring.
-  rewrite <- Qmult_power.
-  setoid_replace (- (1) * - a) with a by (simpl; ring).
-  reflexivity.
- generalize H; clear H.
- induction n.
-  intros H.
-  simpl; unfold pring; simpl.
-  rewrite mult_one.
-  apply div_wd; reflexivity.
- intros H.
- stepl (([1][/](nring (S n))[//]nringS_ap_zero IR n)[*](inj_Q IR a)[*]Exp_ps n (inj_Q IR a) H).
-  simpl.
-  change (nring (R:=IR) n[+][1]) with (nring (R:=IR) (S n)).
-  rewrite (mult_commutes IR (nexp IR n (inj_Q IR a [-] [0]))).
-  rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
-  rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
-  apply mult_wd. 2: reflexivity.
-  rewrite cg_inv_zero.
-  rewrite <- (mult_commutes IR (inj_Q IR a)).
-  rewrite <- (mult_commutes IR (inj_Q IR a)).
-  rewrite <- (ax_mult_assoc IR _ _ (cr_proof IR)).
-  apply mult_wd. reflexivity.
-  pose proof (mult_resp_ap_zero _ _ _ (nringS_ap_zero IR n) (nring_fac_ap_zero IR n))
-    as X.
-  rewrite <- (mult_of_divs _ _ _ _ _ _ _ X).
-  apply div_wd. apply mult_one.
-  apply eq_symmetric.
-  change (fact n + n * fact n)%nat with (S n*(fact n))%nat.
-  apply nring_comm_mult.
-  stepl (inj_Q IR ((1#(P_of_succ_nat n))
-                   *a*((1 # P_of_succ_nat (pred (fact n))) * a ^ n))%Q).
-  apply inj_Q_wd.
-  change ((1 # P_of_succ_nat n) * a * ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)
-          == (1 # P_of_succ_nat (pred (S n * fact n))) * a ^ S n)%Q.
-  replace (P_of_succ_nat (pred (S n * fact n))%nat) with
-    (P_of_succ_nat (pred (S n)) * P_of_succ_nat (pred (fact n)))%positive.
-   rewrite <- pred_Sn.
-   rewrite inj_S.
-   unfold Z.succ.
-   rewrite -> Qpower_plus'; auto with *.
-   change ((1 # P_of_succ_nat n * P_of_succ_nat (pred (fact n))%positive))%Q
-     with ((1 # P_of_succ_nat n) * (1#P_of_succ_nat (pred (fact n))))%Q.
-   ring.
-  apply nat_of_P_inj.
-  rewrite nat_of_P_mult_morphism.
-  repeat rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
-  rewrite <- pred_Sn.
-  rewrite S_predn.
-   rewrite S_predn.
-    reflexivity.
-   cut (0 < S n * fact n)%nat;[auto with *|apply (lt_O_fact (S n))].
-  cut (0 < fact n)%nat;[auto with *|apply (lt_O_fact n)].
- stepl (([1][/]nring (R:=IR) (S n)[//]nringS_ap_zero IR n)[*]inj_Q IR a[*]
-   inj_Q IR ((1 # P_of_succ_nat (pred (fact n))) * a ^ n)%Q); [apply mult_wdr; apply IHn|].
- apply eq_symmetric.
- eapply eq_transitive;[apply inj_Q_mult|].
- eapply eq_transitive;[apply mult_wdl;apply inj_Q_mult|].
- apply mult_wdl.
- apply mult_wdl.
- change (1 # P_of_succ_nat n)%Q with (1/P_of_succ_nat n)%Q.
- assert (A:inj_Q IR ((P_of_succ_nat n):Q)[=]nring (S n)).
- { stepl (inj_Q IR (nring (S n))).
-   apply inj_Q_nring.
-  apply inj_Q_wd.
-  simpl.
-  clear - n.
-  induction n.
+ intros a p H.
+ rewrite (inj_Q_wd _ _ _ (Str_pth_expStream a p)).
+ revert p H.
+ apply (Pos.peano_ind (fun p =>  ∀ (H : Dom (Exp_ps (Pos.to_nat p)) (inj_Q IR a)),
+    inj_Q IR ((1 # Pos.of_nat (fact (Pos.to_nat p))) * a ^ p) =
+    Exp_ps (Pos.to_nat p) (inj_Q IR a) H)).
+ - intros H.
+   simpl ((1 # Pos.of_nat (fact (Pos.to_nat 1))) * a ^ 1).
+   rewrite (inj_Q_wd _ _ _ (one_mult _ a)).
+   unfold Pos.to_nat. simpl.
+   rewrite one_mult.
+   setoid_replace ([1] [/] [0] [+] [1] [//] nring_fac_ap_zero IR 1) with (cr_one IR).
+   rewrite one_mult.
+   rewrite cg_inv_zero.
    reflexivity.
-  simpl.
-  rewrite -> IHn.
-  unfold Qeq.
-  simpl.
-  rewrite Pplus_one_succ_r.
-  repeat (rewrite Zpos_mult_morphism || rewrite Zpos_plus_distr).
-  ring. }
- assert (B:inj_Q IR (P_of_succ_nat n:Q)[#][0]).
- { stepl (nring (R:=IR) (S n)).
-   apply nringS_ap_zero.
-  apply eq_symmetric;assumption. }
- eapply eq_transitive;[apply inj_Q_div|].
- instantiate (1:=B).
- apply div_wd.
- apply inj_Q_One.
- exact A.
-Qed.
-
-Lemma Qle_ZO_flip : forall a, -(1) <= a <= 0 -> 0 <= (-a) <= 1.
-Proof.
- intros a [H0 H1].
- auto with *.
- split.
-  change 0 with (-0).
-  apply Qopp_le_compat.
-  assumption.
- change 1 with (- (-(1))).
- apply Qopp_le_compat.
- assumption.
+   unfold cf_div.
+   rewrite one_mult.
+   rewrite <- inv_one at 2.
+   apply f_rcpcl_wd.
+   rewrite cm_lft_unit.
+   reflexivity.
+ - intros p IHp H.
+   rewrite Pos2Nat.inj_succ.
+   stepl (([1][/](nring (S (Pos.to_nat p)))[//]nringS_ap_zero IR (Pos.to_nat p))
+            [*](inj_Q IR a)[*]Exp_ps (Pos.to_nat p) (inj_Q IR a) H).
+   + simpl.
+     rewrite (mult_commutes IR (nexp IR (Pos.to_nat p) (inj_Q IR a [-] [0]))).
+     rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
+     rewrite (ax_mult_assoc IR _ _ (cr_proof IR)).
+     apply mult_wd. 2: reflexivity.
+     rewrite cg_inv_zero.
+     rewrite <- (mult_commutes IR (inj_Q IR a)).
+     rewrite <- (mult_commutes IR (inj_Q IR a)).
+     rewrite <- (ax_mult_assoc IR _ _ (cr_proof IR)).
+     apply mult_wd. reflexivity.
+     pose proof (mult_resp_ap_zero _ _ _ (nringS_ap_zero IR (Pos.to_nat p)) (nring_fac_ap_zero IR (Pos.to_nat p)))
+       as X.
+     rewrite <- (mult_of_divs _ _ _ _ _ _ _ X).
+     apply div_wd. apply mult_one.
+     apply eq_symmetric.
+     change (fact (Pos.to_nat p) + (Pos.to_nat p) * fact (Pos.to_nat p))%nat
+       with (S (Pos.to_nat p)*(fact (Pos.to_nat p)))%nat.
+     apply nring_comm_mult.
+   + stepl (inj_Q IR ((1#(Pos.succ p))
+                      *a*((1 # Pos.of_nat (fact (Pos.to_nat p))) * a ^ Pos.to_nat p))%Q).
+     * apply inj_Q_wd.
+       rewrite <- Pos.add_1_l at 2.
+       rewrite (Qpower_plus' a 1 p).
+       2: discriminate.
+       simpl (a ^ 1).
+       rewrite Qmult_assoc, Qmult_assoc.
+       apply Qmult_comp.
+       rewrite <- (Qmult_comm a), <- Qmult_assoc, Qmult_comm.
+       apply Qmult_comp. 2: reflexivity.
+       change (fact (S (Pos.to_nat p)))%nat
+         with ((S (Pos.to_nat p)) * fact (Pos.to_nat p))%nat.
+       rewrite Nat2Pos.inj_mul.
+       2: discriminate. 2: apply fact_neq_0.
+       replace (Pos.of_nat (S (Pos.to_nat p))) with (Pos.succ p).
+       reflexivity.
+       rewrite Nat2Pos.inj_succ.
+       rewrite Pos2Nat.id. reflexivity.
+       pose proof (Pos2Nat.is_pos p).
+       intro abs. rewrite abs in H0. inversion H0.
+       rewrite positive_nat_Z. reflexivity.
+     * stepl (([1][/]nring (R:=IR) (S (Pos.to_nat p))[//]nringS_ap_zero IR (Pos.to_nat p))[*]inj_Q IR a[*]
+            inj_Q IR ((1 # Pos.of_nat (fact (Pos.to_nat p))) * a ^ p)%Q)
+       ; [apply mult_wdr; apply IHp|].
+       clear IHp H.
+       apply eq_symmetric.
+       eapply eq_transitive;[apply inj_Q_mult|].
+       eapply eq_transitive;[apply mult_wdl;apply inj_Q_mult|].
+       rewrite positive_nat_Z. 
+       apply mult_wdl.
+       apply mult_wdl.
+       change (1 # Pos.succ p)%Q with (1/Pos.succ p)%Q.
+       assert (A:inj_Q IR ((Pos.succ p):Q)[=]nring (S (Pos.to_nat p))).
+       { stepl (inj_Q IR (nring (S (Pos.to_nat p)))).
+         apply inj_Q_nring.
+         apply inj_Q_wd.
+         simpl.
+         rewrite <- Pos.add_1_r.
+         rewrite Pos2Z.inj_add, inject_Z_plus.
+         apply Qplus_comp. 2: reflexivity.
+         revert p. apply Pos.peano_ind.
+         reflexivity. intros p IHp.
+         rewrite Pos2Nat.inj_succ. simpl.
+         rewrite -> IHp.
+         rewrite <- Pos.add_1_r.
+         rewrite Pos2Z.inj_add, inject_Z_plus.
+         reflexivity. }
+       assert (B:inj_Q IR (Pos.succ p:Q)[#][0]).
+       { stepl (nring (R:=IR) (S (Pos.to_nat p))).
+         apply nringS_ap_zero.
+         apply eq_symmetric;assumption. }
+       eapply eq_transitive;[apply inj_Q_div|].
+       instantiate (1:=B).
+       apply div_wd.
+       apply inj_Q_One.
+       exact A.
 Qed.
 
 Definition rational_exp_small_neg (a:Q) (p:-(1) <= a <= 0) : CR
-:= let p':= (Qle_ZO_flip p) in @InfiniteAlternatingSum (expSequence (-a)) (expSequence_dnn p') (expSequence_zl p').
-
-Definition rational_exp_small_neg_bis (a:Q) (p:-(1) <= a <= 0) : CR
-  := (1 + AltSeries _ (expStream a) (xH,1%Q) _
-               (expStream_alt p) (expStream_zl p))%CR.
+  := translate 1 (AltSeries _ (expStream a) (xH,1%Q) _
+                            (expStream_alt p) (expStream_zl p)).
 
 Lemma rational_exp_small_neg_wd (a1 a2 : Q) (p1 : -(1) <= a1 <= 0) (p2 : -(1) <= a2 <= 0) :
-  a1 = a2 → rational_exp_small_neg p1 = rational_exp_small_neg p2.
+  a1 == a2 → rational_exp_small_neg p1 = rational_exp_small_neg p2.
 Proof. 
   intros E. unfold rational_exp_small_neg. 
-  apply InfiniteAlternatingSum_wd.
-  unfold expSequence.
-  now rewrite E.
+  rewrite <- CRplus_translate.
+  rewrite <- CRplus_translate.
+  apply CRplus_eq_r.
+  apply AltSeries_wd.
+  apply Pos.peano_ind.
+  - unfold Str_pth; simpl.
+    rewrite E. reflexivity.
+  - intros. unfold Str_pth.
+    rewrite iterate_succ, iterate_succ.
+    simpl.
+    unfold Str_pth in H. rewrite H. clear H.
+    apply Qmult_comp. 
+    apply Qmult_comp. reflexivity.
+    exact E. 
+    rewrite expStream_fst, expStream_fst.
+    reflexivity.
+  - reflexivity.
 Qed.
 
 Lemma rational_exp_small_neg_correct : forall (a:Q) Ha,
- (@rational_exp_small_neg a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
+    (@rational_exp_small_neg a Ha == IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
- intros a Ha.
- unfold rational_exp_small_neg.
- apply: InfiniteAlternatingSum_correct.
- intros n.
- clear Ha.
- apply exp_ps_correct.
+  intros a Ha.
+  unfold rational_exp_small_neg.
+  rewrite <- CRplus_translate.
+  setoid_replace 1%CR with
+      (IRasCR
+         ((λ n : nat,
+                 Exp_ps n (inj_Q IR a)
+                        (fun_series_inc_IR realline Exp_ps Exp_conv (inj_Q IR a) I n)) 0%nat)).
+  apply: AltSeries_correct.
+  intro p.
+  apply exp_ps_correct.
+  simpl.
+  rewrite <- IR_One_as_CR.
+  apply IRasCR_wd.
+  rewrite mult_one.
+  unfold cf_div.
+  rewrite one_mult.
+  rewrite <- inv_one at 1.
+  apply f_rcpcl_wd.
+  rewrite cm_lft_unit.
+  reflexivity.
 Qed.
 
 Program Definition CRe_inv := @rational_exp_small_neg (-1) _.
@@ -510,24 +503,18 @@ Definition rational_exp_neg (a:Q) (Ha : a <= 0) : CR
        (rational_exp_small_neg
           (power_2_improve_bound_correct _ Ha (rational_exp_bound_power_2 Ha))).
 
-Definition rational_exp_neg_bis (a:Q) (Ha : a <= 0) : CR
-  := CRpower_2_iter
-       (Z.to_nat (Z.log2_up (Qceiling(-a))))
-       (rational_exp_small_neg_bis
-          (power_2_improve_bound_correct _ Ha (rational_exp_bound_power_2 Ha))).
-
 (* Some time measures on a 5000 bogomips CPU
 Lemma Zneg_neg : forall p:positive, Z.neg p # 1 <= 0.
 Proof. intros. discriminate. Qed.
 Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 100%positive))
                                      (Qpos2QposInf (1#(10 ^ 100)%positive))).
-(* 1.8 secs *)
+(* 1.3 secs *)
 Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 200%positive))
                                      (Qpos2QposInf (1#(10 ^ 200)%positive))).
-(* 10.8 secs *)
+(* 8 secs *)
 Time Eval vm_compute in (approximate (rational_exp_neg (@Zneg_neg 300%positive))
                                      (Qpos2QposInf (1#(10 ^ 300)%positive))).
-(* 31.7 secs *)
+(* 23.6 secs *)
 *)
 
 Lemma rational_exp_neg_correct : forall (a:Q) Ha,
@@ -654,21 +641,24 @@ Defined.
 is positive. *)
 Definition rational_exp (a:Q) : CR.
 Proof.
- destruct (Qle_total 0 a).
-  refine (CRinv_pos (Qpos_power (1#3) (Qceiling a))%Qpos (@rational_exp_neg (-a) _)).
-  apply (Qopp_le_compat 0); assumption.
- apply (rational_exp_neg q).
+  destruct a as [[|n|n] d].
+  - exact 1%CR.
+  - refine (CRinv_pos (Qpos_power (1#3) (Qceiling (n#d)))%Qpos
+                      (@rational_exp_neg (Zneg n#d) _)).
+    discriminate.
+  - apply (@rational_exp_neg (Zneg n#d)).
+    discriminate.
 Defined.
 
 (* Some time measures on a 5000 bogomips CPU
 Time Eval vm_compute in (approximate (rational_exp (100#1)) (Qpos2QposInf (1#1))).
-1.5 secs
+(* 1.2 secs *)
 
 Time Eval vm_compute in (approximate (rational_exp (200#1)) (Qpos2QposInf (1#1))).
-9.5 secs
+(* 7.1 secs *)
 
 Time Eval vm_compute in (approximate (rational_exp (300#1)) (Qpos2QposInf (1#1))).
-30 secs
+(* 21 secs *)
 *)
 
 Lemma rational_exp_pos_correct (a : Q) (Pa : 0 ≤ a) (c : Qpos) :
@@ -693,15 +683,20 @@ Lemma rational_exp_correct (a : Q) :
  (rational_exp a = IRasCR (Exp (inj_Q IR a)))%CR.
 Proof.
  unfold rational_exp.
- destruct (Qle_total 0 a).
-  rewrite rational_exp_neg_correct.
-  apply rational_exp_pos_correct.
-   easy. 
-  apply (rational_exp_neg_posH' (1#3)).
-   change (-a ≤ -0).
-   now apply Qopp_le_compat.
-  now apply CRe_inv_posH.
- now apply rational_exp_neg_correct.
+ destruct a as [[|n|n] d].
+ - rewrite <- IR_One_as_CR.
+   apply IRasCR_wd.
+   setoid_replace (inj_Q IR (0 # d)) with (cm_unit IR).
+   symmetry. apply Exp_zero.
+   rewrite <- inj_Q_Zero.
+   apply inj_Q_wd. reflexivity.
+ - rewrite rational_exp_neg_correct.
+   apply (@rational_exp_pos_correct (Zpos n#d)).
+   discriminate.
+   apply (rational_exp_neg_posH' (1#3)).
+   discriminate.
+   now apply CRe_inv_posH.
+ - apply rational_exp_neg_correct.
 Qed.
 
 Lemma rational_exp_square (a : Q) :
