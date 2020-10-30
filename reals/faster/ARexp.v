@@ -26,21 +26,7 @@ up into the streams
   (-a)^i    and    i!
 because we do not have exact division
 *)
-Lemma ARexpSequence : DivisionStream (expSequence (-'a)) (powers (-a)) factorials.
-Proof.
-  apply DivisionStream_Str_nth.
-  intros n.
-  unfold expSequence, mult_Streams.
-  rewrite Str_nth_zipWith.
-  rewrite commutativity.
-  apply sg_op_proper.
-   rewrite preserves_powers.
-   now rewrite rings.preserves_negate.
-  rewrite Str_nth_Qrecip_factorials'.
-  now rewrite preserves_factorials.
-Qed.
-
-Definition expStream (px : positive*(AQ*AQ)) : AQ*AQ
+Definition ARexpStream (px : positive*(AQ*AQ)) : AQ*AQ
   := (fst (snd px) * a, snd (snd px) * ZtoAQ (Zpos (fst px))).
 
 Lemma AQexp_small_neg_prf : -1 ≤ ('a : Q) ≤ 0.
@@ -55,15 +41,11 @@ The ARInfAltSum function computes the infinite alternating sum
 and takes care of:
 - Computing the length of the partial sum
 - Computing the precision of the approximate division
-- The trick to avoid evaluation of termination proofs
 *)
-Definition AQexp_small_neg : AR := ARInfAltSum ARexpSequence 
-  (dnn:=expSequence_dnn (Qle_ZO_flip AQexp_small_neg_prf)) (zl:=expSequence_zl (Qle_ZO_flip AQexp_small_neg_prf)).
-
 Lemma expStream_pos : ∀ x : positive * (AQ * AQ),
-    0 < snd (snd x) → 0 < snd (expStream x).
+    0 < snd (snd x) → 0 < snd (ARexpStream x).
 Proof.
-  intros. unfold expStream. simpl.
+  intros. unfold ARexpStream. simpl.
   assert (AQtoQ 0 == 0).
   apply rings.preserves_0.
   destruct aq_strict_order_embed.
@@ -88,7 +70,7 @@ Qed.
 
 Lemma expStream_correct : ∀ p : positive,
     Str_pth _ (CRexp.expStream (AQtoQ a)) p (1%positive, 1%Q)
-    == let (_, r) := iterate _ (fS expStream) p (1%positive, (1, 1)) in
+    == let (_, r) := iterate _ (fS ARexpStream) p (1%positive, (1, 1)) in
        AQtoQ (fst r) / AQtoQ (snd r).
 Proof.
   apply Pos.peano_ind.
@@ -102,10 +84,10 @@ Proof.
   - intros. unfold Str_pth.
     rewrite iterate_succ, iterate_succ.
     unfold Str_pth in H5.
-    pose proof (fS_fst expStream p (1,1)).
-    pose proof (CRexp.expStream_fst (AQtoQ a) p).
+    pose proof (fS_fst ARexpStream p (1,1)).
+    pose proof (expStream_fst (AQtoQ a) p).
     destruct (iterate _ (CRexp.expStream (AQtoQ a)) p (1%positive, 1%Q)) as [u v].
-    destruct (iterate (positive * (AQ * AQ)) (fS expStream) p (1%positive, (1, 1))).
+    destruct (iterate (positive * (AQ * AQ)) (fS ARexpStream) p (1%positive, (1, 1))).
     unfold snd in H5 at 1. simpl.
     unfold fst in H6. subst p0.
     rewrite H5. unfold fst in H7. clear H5 v.
@@ -121,28 +103,21 @@ Proof.
     ring. reflexivity.
 Qed.
 
-Definition AQexp_small_neg_bis : AR
-  := 1+ AltSeries expStream expStream_pos
+Definition AQexp_small_neg : AR
+  := 1+ AltSeries ARexpStream expStream_pos
                   positive (CRexp.expStream (AQtoQ a))
                   (1,1) (xH,1) expStream_correct
                   (fun e:Qpos => Pos.succ (Pos.size (Qden (proj1_sig e))))
                   (expStream_alt AQexp_small_neg_prf)
                   AQ0_lt_1 (expStream_zl AQexp_small_neg_prf).
                
-
-Lemma AQexp_small_neg_correct : 'AQexp_small_neg = rational_exp ('a).
+Lemma AQexp_small_neg_correct
+  : 'AQexp_small_neg = rational_exp_small_neg AQexp_small_neg_prf.
 Proof.
-  rewrite rational_exp_correct.
-  rewrite <-rational_exp_small_neg_correct.
-  apply ARInfAltSum_correct.
-Qed.
-
-Lemma AQexp_small_neg_correct_bis
-  : 'AQexp_small_neg_bis = rational_exp_small_neg_bis AQexp_small_neg_prf.
-Proof.
-  unfold AQexp_small_neg_bis, rational_exp_small_neg_bis.
+  unfold AQexp_small_neg, rational_exp_small_neg.
   rewrite ARtoCR_preserves_plus.
   rewrite ARtoCR_preserves_1.
+  rewrite <- CRplus_translate. 
   apply ucFun2_wd. reflexivity.
   apply AltSeries_correct.
 Qed.
@@ -178,8 +153,10 @@ Proof.
   induction n.
   - intros. simpl.
     rewrite AQexp_small_neg_correct.
-    setoid_replace (' (a * (1 ≪ (-1)) ^ 0%nat)) with ('a).
-    reflexivity.
+    rewrite rational_exp_small_neg_correct.
+    rewrite rational_exp_correct.
+    apply CRIR.IRasCR_wd, Exponential.Exp_wd.
+    apply Q_in_CReals.inj_Q_wd.
     rewrite rings.preserves_mult.
     unfold pow. simpl.
     rewrite rings.preserves_1, Qmult_1_r.
@@ -225,6 +202,7 @@ Proof.
     + apply ARpower_2_iter_wd.
       apply (injective (cast AR CR)).
       rewrite AQexp_small_neg_correct, AQexp_small_neg_correct.
+      apply rational_exp_small_neg_wd.
       setoid_replace (' (a * (1 ≪ (-1)) ^ S n))
         with (' (a * 1 ≪ (-1) * (1 ≪ (-1)) ^ n)).
       reflexivity.
@@ -287,12 +265,6 @@ Definition AQexp_neg : AR
   := ARpower_2_iter
        (Z.to_nat (Z.log2_up (Qceiling(-'a))))
        (AQexp_small_neg
-          (power_2_improve_bound_correct _ (AQexp_neg_bound_correct))).
-
-Definition AQexp_neg_bis : AR
-  := ARpower_2_iter
-       (Z.to_nat (Z.log2_up (Qceiling(-'a))))
-       (AQexp_small_neg_bis
           (power_2_improve_bound_correct _ (AQexp_neg_bound_correct))).
 
 Lemma AQexp_neg_correct: 'AQexp_neg = rational_exp ('a).

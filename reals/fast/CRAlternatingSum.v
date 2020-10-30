@@ -528,20 +528,32 @@ Section RationalStreamSum.
   Definition Limit_zero x (cvmod : Qpos -> positive) : Prop
     := forall q:Qpos, Qabs (Str_pth (cvmod q) x) <= proj1_sig q.
 
-  Lemma Limit_zero_tl : forall x cvmod,
+  Lemma Limit_zero_tl : forall x (cvmod : Qpos -> positive) (p : positive),
       Str_alt_decr x ->
-      Limit_zero x cvmod -> Limit_zero (f x) (fun e => Pos.pred (cvmod e)).
+      Limit_zero x cvmod -> Limit_zero (CRstreams.iterate _ f p x)
+                                      (fun e => cvmod e - p)%positive.
   Proof.
     intros. intro e. 
-    unfold Str_pth. rewrite <- iterate_shift, <- iterate_succ.
-    destruct (Pos.succ_pred_or (cvmod e)).
-    - rewrite H1. simpl. specialize (H0 e).
-      rewrite H1 in H0. unfold Str_pth in H0.
-      simpl in H0.
-      apply (Qle_trans _ (Qabs (snd (f x)))).
-      specialize (H xH) as [H _].
-      apply H. exact H0.
-    - rewrite H1. apply H0.
+    unfold Str_pth.
+    rewrite <- iterate_add.
+    assert (forall q:positive,
+               Qabs (snd (CRstreams.iterate (X * Q) f (q+cvmod e) x)) <= ` e).
+    { apply Pos.peano_ind.
+      - intros. rewrite Pos.add_1_l.
+        apply (Qle_trans _ (Qabs (snd (CRstreams.iterate (X * Q) f (cvmod e) x)))).
+        apply H. apply H0.
+      - intros.
+        rewrite <- Pos.add_1_l, <- Pos.add_assoc, Pos.add_1_l.
+        refine (Qle_trans _ _ _ _ H1).
+        apply H. }
+    destruct (Pos.lt_total p (cvmod e)).
+    2: destruct H2.
+    - rewrite Pos.sub_add. apply H0. exact H2.
+    - subst p. rewrite Pos.sub_diag. apply H1.
+    - rewrite Pos.sub_lt. 2: exact H2.
+      replace (1+p)%positive with (1+(p-cvmod e)+cvmod e)%positive.
+      apply H1. rewrite <- Pos.add_assoc.
+      apply f_equal. rewrite Pos.sub_add. reflexivity. exact H2.
   Qed.
 
   Definition SumStream x (p : positive) (e : Qpos) : Q
@@ -590,37 +602,6 @@ Section RationalStreamSum.
       rewrite iterate_succ.
       destruct (f (CRstreams.iterate (X * Q) f p (fst z))). reflexivity.
   Qed. 
-
-  Lemma SumStream_wd : forall (p:positive) z t,
-      fst z ≡ fst t
-      -> snd z == snd t
-      -> snd
-    (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
-       z) ==
-      snd
-    (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
-       t).
-  Proof.
-    induction p.
-    - intros. simpl.
-      apply IHp.
-      rewrite SumStream_fst, SumStream_fst, H.
-      destruct (f (fst t)). reflexivity.
-      apply IHp. rewrite H. destruct (f (fst t)).
-      reflexivity.
-      rewrite H. destruct (f (fst t)).
-      change (q + snd z == q + snd t).
-      rewrite H0. reflexivity.
-    - intros. simpl.
-      apply IHp. rewrite SumStream_fst, SumStream_fst, H. reflexivity.
-      apply IHp; assumption.
-    - intros. simpl. rewrite H.
-      destruct (f (fst t)).
-      change (q + snd z == q + snd t).
-      rewrite H0. reflexivity.
-  Qed.
 
   Lemma SumStream_red : forall (p:positive) z,
       snd (CRstreams.iterate _
@@ -1119,17 +1100,18 @@ Section RationalStreamSum.
   Qed. 
 
   (* AltSeries makes an infinite sum in the real numbers. *)
-  Lemma AltSeries_correct : forall x cvmod decr lz,
+  Lemma AltSeries_shift : forall x cvmod decr lz,
       (AltSeries x cvmod decr lz
        == '(snd (f x))
           + AltSeries (f x) _ (Str_alt_decr_tl x 1 decr)
-                      (Limit_zero_tl x cvmod decr lz))%CR.
+                      (Limit_zero_tl x cvmod 1 decr lz))%CR.
   Proof.
     intros. 
     rewrite -> CRplus_translate.
     apply regFunEq_equiv, regFunEq_e.
     intros e.
     simpl.
+    rewrite <- Pos.pred_sub.
     destruct (Qlt_le_dec (proj1_sig e) (Qabs (snd (f x)))).
     - (* The sum recombines after f x. *)
       rewrite SumStream_shift. 2: exact q.
@@ -1187,3 +1169,200 @@ Section RationalStreamSum.
 
 End RationalStreamSum.
 
+Lemma SumStream_wd : forall (p:positive)
+                       (X Y:Type) (f : X*Q -> X*Q) (g : Y*Q -> Y*Q)
+                       (x : X*Q) (y : Y*Q),
+    (forall p:positive, Str_pth _ f p x == Str_pth _ g p y)
+    -> snd (CRstreams.iterate _
+       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (x,0))
+      == snd (CRstreams.iterate _
+       (λ y : Y * Q * Q, let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
+       (y,0)).
+Proof.
+  apply (Pos.peano_ind (fun p => forall (X Y:Type) (f : X*Q -> X*Q) (g : Y*Q -> Y*Q)
+                       (x : X*Q) (y : Y*Q),
+    (forall p:positive, Str_pth _ f p x == Str_pth _ g p y)
+    -> snd (CRstreams.iterate _
+       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (x,0))
+      == snd (CRstreams.iterate _
+       (λ y : Y * Q * Q, let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
+       (y,0)))).
+  - intros. simpl. specialize (H xH).
+    unfold Str_pth in H. simpl in H.
+    destruct (f x), (g y). simpl. simpl in H.
+    rewrite H. reflexivity.
+  - intros.
+    pose proof (H0 (Pos.succ p)).
+    unfold Str_pth in H1.
+    rewrite iterate_succ, iterate_succ in H1.
+    rewrite iterate_succ, iterate_succ, SumStream_fst, SumStream_fst.
+    unfold fst.
+    destruct (f (CRstreams.iterate (X * Q) f p x)).
+    unfold snd at 1.
+    destruct (g (CRstreams.iterate (Y * Q) g p y)).
+    unfold snd at 3.
+    specialize (H X Y f g x y H0).
+    rewrite H. simpl in H1.
+    rewrite H1. reflexivity.
+Qed.
+
+Lemma AltSeries_wd : forall (X Y:Type) (f : X*Q -> X*Q) (g : Y*Q -> Y*Q)
+                       (x : X*Q) (y : Y*Q) cvmod ccvmod
+                       (fdecr : Str_alt_decr X f x) (gdecr : Str_alt_decr Y g y)
+                       (flz : Limit_zero X f x cvmod) (glz : Limit_zero Y g y ccvmod),
+    (forall p:positive, Str_pth _ f p x == Str_pth _ g p y)
+    -> (forall e, cvmod e ≡ ccvmod e)
+    -> (AltSeries X f x cvmod fdecr flz
+       == AltSeries Y g y ccvmod gdecr glz)%CR.
+Proof.
+  intros. 
+  apply regFunEq_equiv, regFunEq_e. intros e.
+  simpl.
+  setoid_replace (SumStream X f x (cvmod e) e)
+    with (SumStream Y g y (cvmod e) e).
+  rewrite H0.
+  apply ball_refl. apply (Qpos_nonneg (e+e)).
+  unfold SumStream.
+  destruct (iterate_stop_correct
+              _
+              (λ y0 : X * Q * Q, let (z, r) := f (fst y0) in (z, r, Qred (r + snd y0)))
+              (λ y0 : X * Q * Q, Qle_bool (Qabs (snd (fst y0))) (` e))
+              (cvmod e) (x,0)) as [q [qeq [H1 H2]]].
+  rewrite qeq, SumStream_red. clear qeq.
+  destruct (iterate_stop_correct
+              _
+              (λ y0 : Y * Q * Q, let (z, r) := g (fst y0) in (z, r, Qred (r + snd y0)))
+              (λ y0 : Y * Q * Q, Qle_bool (Qabs (snd (fst y0))) (` e))
+              (cvmod e) (y,0)) as [r [req [H3 H4]]].
+  rewrite req, SumStream_red. clear req.
+  destruct H4 as [fuel|predicate].
+  - subst r. destruct H2.
+    + subst q. apply (SumStream_wd _ _ _ _ _ _ _ H).
+    + exfalso. destruct H2.
+      specialize (H3 q H2).
+      rewrite SumStream_fst_red in H3.
+      unfold fst in H3.
+      rewrite SumStream_fst_red in H4.
+      unfold fst in H4.
+      specialize (H q). unfold Str_pth in H.
+      rewrite H in H4.
+      rewrite H4 in H3. discriminate.
+  - destruct predicate.
+    rewrite SumStream_fst_red in H5.
+    unfold fst in H5. 
+    destruct H2.
+    + exfalso. subst q.
+      specialize (H1 r H4).
+      rewrite SumStream_fst_red in H1.
+      unfold fst in H1.
+      specialize (H r). unfold Str_pth in H.
+      rewrite <- H in H5.
+      rewrite H5 in H1. discriminate.
+    + destruct H2.
+      rewrite SumStream_fst_red in H6. unfold fst in H6.
+      destruct (Pos.lt_total q r).
+      exfalso. specialize (H3 q H7).
+      rewrite SumStream_fst_red in H3; unfold fst in H3.
+      specialize (H q). unfold Str_pth in H.
+      rewrite H in H6. rewrite H6 in H3. discriminate.
+      destruct H7. rewrite H7.
+      exact (SumStream_wd _ _ _ _ _ _ _ H).
+      exfalso. specialize (H1 r H7).
+      rewrite SumStream_fst_red in H1; unfold fst in H1.
+      specialize (H r). unfold Str_pth in H.
+      rewrite H in H1. rewrite H1 in H5. discriminate.
+Qed.
+
+Lemma sym_sub_add_distr (p q r:positive) : (p-(q+r) ≡ p-q-r)%positive.
+Proof.
+  destruct (Pos.lt_total (q+r) p).
+  - apply Pos.sub_add_distr, H.
+  - destruct H. subst p.
+    rewrite Pos.sub_diag.
+    rewrite Pos.add_comm, Pos.add_sub.
+    rewrite Pos.sub_diag. reflexivity.
+    rewrite Pos.sub_lt. 2: exact H.
+    rewrite Pos.sub_le. reflexivity.
+    destruct (Pos.lt_total p q).
+    + rewrite Pos.sub_lt. apply Pos.le_1_l. exact H0.
+    + destruct H0. subst q. rewrite Pos.sub_diag. apply Pos.le_1_l.
+      change (Zpos (p-q) <= Zpos r)%Z.
+      rewrite Pos2Z.inj_sub. 2: exact H0.
+      apply (Z.add_le_mono_r _ _ (Zpos q)).
+      ring_simplify.
+      rewrite <- Pos2Z.inj_add.
+      apply Z.lt_le_incl, H.
+Qed.
+
+Lemma AltSeries_shift_pth : forall (p:positive) (X : Type) f x cvmod decr lz,
+    (AltSeries X f x cvmod decr lz
+     == inject_Q_CR (snd (CRstreams.iterate _
+            (λ y : (X * Q) * Q,
+               let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+            p (x, 0%Q)))
+        + AltSeries X f (CRstreams.iterate _ f p x)
+                    _ (Str_alt_decr_tl X f x p decr)
+                    (Limit_zero_tl X f x cvmod p decr lz))%CR.
+Proof.
+  apply (Pos.peano_ind (fun p => forall X f x cvmod decr lz,
+      (AltSeries X f x cvmod decr lz
+       == inject_Q_CR (snd (CRstreams.iterate _
+            (λ y : (X * Q) * Q,
+               let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+            p (x, 0%Q)))
+          + AltSeries X f _ _ (Str_alt_decr_tl X f x p decr)
+                      (Limit_zero_tl X f x cvmod p decr lz))%CR)).
+  - intros. rewrite AltSeries_shift.
+    apply CRplus_eq_l. rewrite SumStream_red.
+    rewrite iterate_one. simpl.
+    destruct (f x). simpl. rewrite Qplus_0_r. reflexivity.
+  - intros.
+    setoid_replace (AltSeries X f (CRstreams.iterate (X * Q) f (Pos.succ p) x)
+                              (λ e : Qpos, (cvmod e - Pos.succ p)%positive)
+                              (Str_alt_decr_tl X f x (Pos.succ p) decr)
+                              (Limit_zero_tl X f x cvmod (Pos.succ p) decr lz))
+      with (AltSeries X f (CRstreams.iterate (X * Q) f p (f x))
+                      _
+                      (Str_alt_decr_tl X f (f x) p (Str_alt_decr_tl X f x 1 decr))
+                      (Limit_zero_tl X f (f x) _ p (Str_alt_decr_tl X f x 1 decr)
+                                     (Limit_zero_tl X f x _ 1 decr lz))).
+    + setoid_replace (inject_Q_CR (snd
+       (CRstreams.iterate (X * Q * Q)
+          (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+          (Pos.succ p) (x, 0))))
+          with (inject_Q_CR (snd (f x)) + inject_Q_CR (snd
+              (CRstreams.iterate (X * Q * Q)
+                 (λ y : X * Q * Q,
+                    let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y))) p
+                 (f x, 0%Q))))%CR.
+      rewrite <- CRplus_assoc, <- (H X f (f x)).
+      rewrite <- AltSeries_shift. reflexivity.
+      clear H. rewrite SumStream_red, SumStream_red.
+      rewrite iterate_succ. rewrite SumStream_fst.
+      simpl.
+      rewrite CRplus_Qplus.
+      apply inject_Q_CR_wd.
+      transitivity (snd (f (CRstreams.iterate (X * Q) f p x) )
+                    + snd (CRstreams.iterate (X * Q * Q)
+              (λ y : X * Q * Q, let (z1, r0) := f (fst y) in (z1, r0, r0 + snd y)) p
+              (x, 0))).
+      destruct (f (CRstreams.iterate (X * Q) f p x)); reflexivity.
+      pose proof (SumStream_assoc X f x 1 p).
+      rewrite iterate_one, iterate_one in H.
+      setoid_replace (snd (let (z, r0) := f (fst (x, 0)) in (z, r0, r0 + snd (x, 0)))%Q)
+        with (snd (f x))%Q in H.
+      rewrite <- H. clear H.
+      rewrite Pos.add_1_l, iterate_succ, SumStream_fst.
+      unfold fst.
+      destruct (f (CRstreams.iterate (X * Q) f p x)). simpl.
+      reflexivity.
+      simpl. destruct (f x). simpl.
+      rewrite Qplus_0_r. reflexivity.
+    + apply AltSeries_wd.
+      intros. rewrite iterate_succ, iterate_shift.
+      reflexivity.
+      intro e. rewrite <- Pos.add_1_l.
+      rewrite sym_sub_add_distr. reflexivity.
+Qed.
