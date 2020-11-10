@@ -207,7 +207,7 @@ Lemma Zminus_antitone : forall a : Z, Zantitone (fun x => a - x).
 Proof.
  change (forall a x y : Z, x <= y -> a + - y <= a + - x).
  intros.
- apply Zplus_le_compat; firstorder using Z.le_refl Zopp_le_compat.
+ apply Zplus_le_compat; firstorder using Z.le_refl, Zopp_le_compat.
 Qed.
 
 Definition Zminus_min_max_antidistr_r : forall x y z : Z, x - Z.min y z = Z.max (x-y) (x-z) :=

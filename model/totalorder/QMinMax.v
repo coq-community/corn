@@ -205,7 +205,7 @@ Lemma Qminus_antitone : forall a : Q, Qantitone (fun x => a - x).
 Proof.
  change (forall a x y : Q, x <= y -> a + - y <= a + - x).
  intros.
- apply Qplus_le_compat; firstorder using Qle_refl Qopp_le_compat.
+ apply Qplus_le_compat; firstorder using Qle_refl, Qopp_le_compat.
 Qed.
 
 Definition Qminus_min_max_antidistr_r : forall x y z : Q, x - Qmin y z == Qmax (x-y) (x-z) :=

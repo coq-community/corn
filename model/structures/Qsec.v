@@ -323,7 +323,7 @@ Proof.
 Qed.
 
 Lemma Qle_is_not_lt : forall x y : Q, x <= y <-> ~ y < x.
-Proof. firstorder using Qle_not_lt Qnot_lt_le. Qed.
+Proof. firstorder using Qle_not_lt, Qnot_lt_le. Qed.
 
 Lemma Qge_is_not_gt : forall x y : Q, x >= y <-> y <= x.
 Proof. firstorder. Qed.
