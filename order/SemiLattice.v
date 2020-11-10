@@ -94,7 +94,7 @@ Lemma meet_assoc : forall x y z:X, meet x (meet y z) == meet (meet x y) z.
 Proof.
  assert (forall x y z : X, meet x (meet y z) <= meet (meet x y) z).
   intros.
-  apply meet_glb; [apply meet_glb|]; firstorder using meet_lb_l meet_lb_r le_trans.
+  apply meet_glb; [apply meet_glb|]; firstorder using meet_lb_l, meet_lb_r, le_trans.
  intros.
  apply le_antisym.
   apply H.
@@ -109,7 +109,7 @@ Qed.
 Lemma meet_idem : forall x:X, meet x x == x.
 Proof.
  intros.
- apply le_antisym; firstorder using meet_lb_l meet_glb le_refl.
+ apply le_antisym; firstorder using meet_lb_l, meet_glb, le_refl.
 Qed.
 
 Lemma le_meet_l : forall x y : X, x <= y <-> meet x y == x.
@@ -156,8 +156,8 @@ Lemma meet_le_compat : forall w x y z : X, w<=y -> x<=z -> meet w x <= meet y z.
 Proof.
  intros.
  apply le_trans with (y:=meet y x).
-  firstorder using meet_monotone_l monotone_def.
- firstorder using meet_monotone_r monotone_def.
+  firstorder using meet_monotone_l, monotone_def.
+ firstorder using meet_monotone_r, monotone_def.
 Qed.
 
 End Meet.
