@@ -1,12 +1,12 @@
 # C-CoRN
 
-[![Travis][travis-shield]][travis-link]
+[![CI][action-shield]][action-link]
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Zulip][zulip-shield]][zulip-link]
 
-[travis-shield]: https://travis-ci.com/coq-community/corn.svg?branch=master
-[travis-link]: https://travis-ci.com/coq-community/corn/builds
+[action-shield]: https://github.com/coq-community/corn/workflows/CI/badge.svg?branch=master
+[action-link]: https://github.com/coq-community/corn/actions?query=workflow%3ACI
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
@@ -49,9 +49,6 @@ CoRN includes the following parts:
   Fast verified computation inside Coq. This includes: real numbers, functions,
   integrals, graphs of functions, differential equations.
 
-## Homepage
-
-A [homepage](http://c-corn.github.io/) including related publications.
 
 ## Meta
 
@@ -94,7 +91,8 @@ structures that is heavily based on Coq's type classes.
 
   - [Bignums](https://github/com/coq/bignums)
 - Coq namespace: `CoRN`
-- Related publication(s): none
+- Related publication(s):
+  - [See this page for the list of publications](http://corn.cs.ru.nl/pub.html) 
 
 ## Building and installation instructions
 
