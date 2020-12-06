@@ -773,6 +773,36 @@ Section InductiveStreams.
       + destruct H3. specialize (H1 r H4).
         rewrite H1 in H5. discriminate.
   Qed.
-      
+
+  Definition CRstream_opp (X:Type) (f : X*Q->X*Q) (xq : X*Q) : X*Q
+    := let (x,q) := xq in
+       let (y,r) := f (x,-q) in
+       (y,-r).
+
 End InductiveStreams.
 
+Lemma CRstream_opp_pth : forall (X:Type) (f : X*Q->X*Q) (xq : X*Q) (p : positive),
+    let (y,r) := iterate _ f p xq in
+    let (z,s) := iterate _ (CRstream_opp X f) p (let (x,q):=xq in (x,-q)) in
+    y ≡ z /\ s ≡ -r.
+Proof.
+  intros X f xq.
+  apply Pos.peano_ind.
+  - simpl. destruct xq as [x q].
+    unfold CRstream_opp.
+    replace (--q) with q. destruct (f (x,q)).
+    split; reflexivity.
+    destruct q. unfold Qopp; simpl.
+    rewrite Z.opp_involutive. reflexivity.
+  - intros IHp H.
+    rewrite CRstreams.iterate_succ, CRstreams.iterate_succ.
+    destruct (iterate _ f IHp xq),
+    (iterate _ (CRstream_opp X f) IHp
+                       (let (x0, q0) := xq in (x0, - q0))).
+    unfold CRstream_opp. destruct H. subst q0. subst x0.
+    replace (--q) with q. destruct (f (x,q)).
+    split; reflexivity.
+    destruct q. unfold Qopp; simpl.
+    rewrite Z.opp_involutive. reflexivity.
+Qed.
+  

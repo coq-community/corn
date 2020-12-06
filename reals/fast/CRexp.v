@@ -55,6 +55,103 @@ Opaque Exp.
 Local Open Scope Q_scope.
 Local Open Scope uc_scope.
 
+Lemma Qpower_le_1 : forall (a : Q) (p : positive),
+    0 <= a <= 1 -> 0 <= a ^ p <= 1.
+Proof.
+  split.
+  - apply Qpower_pos, H.
+  - revert p. apply Pos.peano_ind. apply H.
+    intros p Hp. unfold Qpower.
+    rewrite <- Pos.add_1_l, Qpower_plus_positive.
+    apply (Qle_trans _ (1*Qpower_positive a p)).
+    apply Qmult_le_compat_r. apply H.
+    apply (Qpower_pos a p), H.
+    rewrite Qmult_1_l. apply Hp.
+Qed.
+
+Lemma Qabs_Qpower : forall (a:Q) (p:positive),
+    Qabs (a ^ p) == (Qabs a) ^ p.
+Proof.
+  intro a. apply Pos.peano_ind.
+  - reflexivity.
+  - intros p Hp. 
+    simpl. rewrite <- Pos.add_1_l.
+    rewrite Qpower_plus_positive.
+    rewrite Qabs_Qmult, Hp. clear Hp.
+    rewrite Qpower_plus_positive. reflexivity.
+Qed.
+
+Lemma Qinv_le_compat : forall (a b : Q),
+    0 < a -> a <= b -> /b <= /a.
+Proof.
+  intros. apply Qle_shift_inv_l. exact H.
+  apply (Qmult_le_l _ _ b).
+  exact (Qlt_le_trans _ a _ H H0).
+  rewrite Qmult_1_r, Qmult_assoc.
+  rewrite Qmult_inv_r.
+  rewrite Qmult_1_l. exact H0.
+  intro abs. rewrite abs in H0.
+  apply (Qlt_irrefl 0).
+  exact (Qlt_le_trans _ _ _ H H0).
+Qed.
+
+Lemma fact_power_2 : forall n:nat, (2^pred n <= fact n)%nat.
+Proof.
+  induction n.
+  - apply le_refl.
+  - apply (Nat.le_trans _ ((S n) * 2^pred n)).
+    2: apply Nat.mul_le_mono_nonneg_l; [apply le_0_n | exact IHn].
+    clear IHn. destruct n. simpl. apply le_refl.
+    simpl.
+    apply Nat.add_le_mono_l, Nat.add_le_mono_l, le_0_n.
+Qed.
+  
+Lemma Qceiling_fact_le : forall q:Q,
+    0 < q -> 
+    q <=
+    Pos.of_nat (fact (Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling q))))))
+               # 1.
+Proof.
+  intros q H. 
+  apply (Qle_trans _ _ _ (Qle_ceiling q)).
+  assert (0 < Qceiling q)%Z.
+  { rewrite Zlt_Qlt. apply (Qlt_le_trans _ _ _ H). apply Qle_ceiling. }
+  revert H0. generalize (Qceiling q). intros p ppos. clear H q.
+  unfold Qle; simpl.
+  rewrite Z.mul_1_r, Pos.mul_1_r.
+  destruct p as [|p|p].
+  exfalso; inversion ppos.
+  2: exfalso; inversion ppos. clear ppos.
+  apply (Z.le_trans _ (2 ^ Z.log2_up p)).
+  apply Z.log2_up_le_pow2. reflexivity.
+  apply Z.le_refl.
+  revert p. apply Pos.peano_case. discriminate.
+  intro p.
+  generalize (Z.log2_up (Pos.succ p))
+             (Z.log2_up_pos (Pos.succ p) (Pos.lt_1_succ p)).
+  clear p. intros p ppos.
+  destruct p. inversion ppos.
+  2: inversion ppos. clear ppos.
+  unfold Z.to_pos.
+  pose proof (fact_power_2 (Pos.to_nat (Pos.succ p))).
+  rewrite Pos2Nat.inj_succ in H.
+  unfold pred in H.
+  rewrite Pos2Nat.inj_succ.
+  simpl (2^p)%Z.
+  rewrite <- Pos2Z.inj_pow_pos.
+  apply Pos2Nat.inj_le.
+  rewrite Nat2Pos.id.
+  2: apply fact_neq_0.
+  refine (le_trans _ _ _ _ H).
+  clear H. generalize p.
+  apply Pos.peano_ind.
+  + apply le_refl.
+  + intros. rewrite Pos2Nat.inj_succ, Pos.pow_succ_r. 
+    rewrite Pos2Nat.inj_mul.
+    apply Nat.mul_le_mono_nonneg_l. apply le_0_n.
+    exact H.
+Qed.
+
 (**
 ** Exponential
 [exp] is implement by its alternating Taylor's series.
@@ -125,17 +222,6 @@ Proof.
     destruct q, Qnum; unfold Qle; discriminate.
 Qed.
 
-Lemma fact_power_2 : forall n:nat, (2^pred n <= fact n)%nat.
-Proof.
-  induction n.
-  - apply le_refl.
-  - apply (Nat.le_trans _ ((S n) * 2^pred n)).
-    2: apply Nat.mul_le_mono_nonneg_l; [apply le_0_n | exact IHn].
-    clear IHn. destruct n. simpl. apply le_refl.
-    simpl.
-    apply Nat.add_le_mono_l, Nat.add_le_mono_l, le_0_n.
-Qed.
-
 Lemma expStream_zl
   : -1 <= a <= 0
     -> Limit_zero _ expStream (xH,1)
@@ -151,68 +237,20 @@ Proof.
            _ (1 * Qabs (1 # Pos.of_nat (fact (Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e)))))))))).
   apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
   - generalize (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e))))).
-    apply Pos.peano_ind.
-    simpl. apply Qabs_Qle_condition. split.
-    apply aneg. apply (Qle_trans _ 0). apply aneg. discriminate.
-    intros. simpl.
-    rewrite <- Pos.add_1_l, Qpower_plus_positive, Qabs_Qmult.
-    apply (Qle_trans _ (1*Qabs (Qpower_positive a p))).
-    apply Qmult_le_compat_r. 
-    apply Qabs_Qle_condition. split.
-    apply aneg. apply (Qle_trans _ 0). apply aneg. discriminate.
-    apply Qabs_nonneg. rewrite Qmult_1_l. apply H.
+    intro p. rewrite Qabs_Qpower.
+    apply Qpower_le_1. split. apply Qabs_nonneg.
+    apply Qabs_Qle_condition. split. apply aneg.
+    apply (Qle_trans _ 0). apply aneg. discriminate.
   - rewrite Qmult_1_l. clear aneg a.
     (* Replace fact k by 2^k. *)
     simpl.
     rewrite <- (Qinv_involutive e) at 2.
     assert (0 < /e) as H.
     { apply Qinv_lt_0_compat, epos. }
-    revert H. generalize (/e). intros q qpos. clear epos e.
-    apply Qle_shift_inv_l. exact qpos.
-    apply (Qmult_le_l _ _ (inject_Z (Pos.of_nat (fact (Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling q))))))))).
-    reflexivity.
-    rewrite Qmult_assoc, Qmult_1_r.
-    apply (Qle_trans _ (1*q)).
-    apply Qmult_le_r. exact qpos.
-    unfold Qle; simpl.
-    rewrite Pos.mul_1_r, Pos.mul_1_r. apply Z.le_refl.
-    rewrite Qmult_1_l.
-    apply (Qle_trans _ _ _ (Qle_ceiling q)).
-    rewrite <- Zle_Qle.
-    assert (0 < Qceiling q)%Z.
-    { rewrite Zlt_Qlt.
-      apply (Qlt_le_trans _ _ _ qpos). apply Qle_ceiling. }
-    destruct (Qceiling q).
-    exfalso; inversion H.
-    2: exfalso; inversion H. clear qpos q H.
-    apply (Z.le_trans _ (2 ^ Z.log2_up p)).
-    apply Z.log2_up_le_pow2. reflexivity.
-    apply Z.le_refl.
-    revert p. apply Pos.peano_case. discriminate.
-    intro p.
-    generalize (Z.log2_up (Pos.succ p))
-               (Z.log2_up_pos (Pos.succ p) (Pos.lt_1_succ p)).
-    clear p. intros p ppos.
-    destruct p. inversion ppos.
-    2: inversion ppos. clear ppos.
-    unfold Z.to_pos.
-    pose proof (fact_power_2 (Pos.to_nat (Pos.succ p))).
-    rewrite Pos2Nat.inj_succ in H.
-    unfold pred in H.
-    rewrite Pos2Nat.inj_succ.
-    simpl (2^p)%Z.
-    rewrite <- Pos2Z.inj_pow_pos.
-    apply Pos2Nat.inj_le.
-    rewrite Nat2Pos.id.
-    2: apply fact_neq_0.
-    refine (le_trans _ _ _ _ H).
-    clear H. generalize p.
-    apply Pos.peano_ind.
-    + apply le_refl.
-    + intros. rewrite Pos2Nat.inj_succ, Pos.pow_succ_r. 
-      rewrite Pos2Nat.inj_mul.
-      apply Nat.mul_le_mono_nonneg_l. apply le_0_n.
-      exact H.
+    apply (@Qinv_le_compat
+             (/e) ((Pos.of_nat (fact (Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e)))))))) # 1)).
+    exact H.
+    apply Qceiling_fact_le, H.
 Qed.
 
 End ExpSeries.

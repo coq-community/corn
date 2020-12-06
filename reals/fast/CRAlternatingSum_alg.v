@@ -53,17 +53,17 @@ Lemma dnn_zl_convergent (seq : Stream Q) {dnn:DecreasingNonNegative seq}
       {zl: @Limit Q_as_MetricSpace seq 0} :
  convergent (fun n => inj_Q IR ((-(1))^n*Str_nth n seq))%Q.
 Proof.
- cut (convergent (fun n : nat => [--][1][^]n[*]inj_Q IR (Str_nth n seq))).
- - apply convergent_wd.
-  intros n.
-  stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| now (apply eq_symmetric; apply inj_Q_mult)].
-  apply mult_wdl.
-  stepr ((inj_Q IR (-(1)))[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
-  apply nexp_wd.
-  stepr ([--](inj_Q IR 1)); [| now (apply eq_symmetric; apply inj_Q_inv)].
-  apply un_op_wd_unfolded.
-  rstepl ((nring 1):IR).
-  apply eq_symmetric; apply (inj_Q_nring IR 1).
+  (* Prove convergence of another series that is pointwise equal. *)
+  apply (convergent_wd (fun n : nat => [--][1][^]n[*]inj_Q IR (Str_nth n seq))).
+  - intros n.
+    stepr ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n seq)))%Q; [| now (apply eq_symmetric; apply inj_Q_mult)].
+    apply mult_wdl.
+    stepr ((inj_Q IR (-(1)))[^]n); [| now (apply eq_symmetric; apply inj_Q_power)].
+    apply nexp_wd.
+    stepr ([--](inj_Q IR 1)); [| now (apply eq_symmetric; apply inj_Q_inv)].
+    apply un_op_wd_unfolded.
+    rstepl ((nring 1):IR).
+    apply eq_symmetric; apply (inj_Q_nring IR 1).
  - apply alternate_series_conv.
    + intros n.
    unfold Str_nth.
@@ -127,6 +127,155 @@ Proof.
  rewrite tl_nth_tl in X.
  assumption.
 Qed.
+
+Lemma abs_power_neg_one : forall n:nat, Qabs ((-1)^n) == 1.
+Proof.
+  induction n. reflexivity.
+  change (S n) with (1+n)%nat. rewrite Nat2Z.inj_add, Qpower_plus.
+  rewrite Qabs_Qmult, IHn. reflexivity.
+  intro abs. discriminate.
+Qed.
+
+Lemma Str_alt_decr_decr
+  : forall (X:Type) (f : X*Q->X*Q) x
+      (fdecr : Str_alt_decr X f x) (n : nat),
+    0 <= Str_pth _ f 1 x ->
+    (-1) ^ S n * Str_pth X f (Pos.of_nat (S (S n))) x
+    <= (-1) ^ n [*] Str_pth X f (Pos.of_nat (S n)) x.
+Proof.
+  intros.
+  pose proof (Str_alt_decr_pos X f x fdecr).
+  specialize (fdecr (Pos.of_nat (S n))) as [fdecr _].
+  rewrite <- Qmult_1_l in fdecr.
+  rewrite <- (abs_power_neg_one (S n)) in fdecr.
+  rewrite <- (Qmult_1_l (Qabs (Str_pth X f (Pos.of_nat (S n)) x))) in fdecr.
+  rewrite <- (abs_power_neg_one n) in fdecr.
+  rewrite <- Qabs_Qmult, <- Qabs_Qmult in fdecr.
+  rewrite Qabs_pos, Qabs_pos in fdecr.
+  rewrite Nat2Pos.inj_succ. 2: discriminate.
+  exact fdecr. apply H0, H. apply H0, H. 
+Qed.
+
+Lemma AltSeries_convergent_pos
+  : forall (X:Type) (f : X*Q->X*Q) x cvmod
+      (fdecr : Str_alt_decr X f x)
+      (flz : Limit_zero X f x cvmod),
+    0 <= Str_pth _ f 1 x ->
+    convergent (fun n:nat => inj_Q IR (Str_pth _ f (Pos.of_nat (S n)) x)).
+Proof.
+  intros.
+  assert (forall n:nat, [--] [1] [^] n [=] (inj_Q IR ((-1)^n))) as power_neg_one.
+  { intro n.
+    rewrite inj_Q_power. apply nexp_wd.
+    rewrite (inj_Q_inv IR 1), inj_Q_One. reflexivity. }
+  apply (convergent_wd (fun n : nat => [--][1][^]n[*]([--][1][^]n[*]inj_Q IR (Str_pth _ f (Pos.of_nat (S n)) x)))).
+  - intro n.
+    rewrite power_neg_one.
+    rewrite <- inj_Q_mult, <- inj_Q_mult. apply inj_Q_wd.
+    rewrite Qmult_assoc. rewrite <- Qpower_plus.
+    replace (n+n)%Z with (2* Z.of_nat n)%Z.
+    rewrite Qpower_mult. replace ((-1)^2) with 1%Q by reflexivity.
+    rewrite Qpower_1, Qmult_1_l. reflexivity. ring.
+    intro abs. discriminate.
+  - apply alternate_series_conv.
+    + (* positivity *)
+      clear flz. intro n.
+      pose proof (Str_alt_decr_pos X f x fdecr n).
+      rewrite power_neg_one.
+      rewrite <- inj_Q_mult, <- inj_Q_Zero.
+      apply inj_Q_leEq, H0, H.
+    + (* f tends to zero. *)
+      intros e epos.
+      destruct (Q_dense_in_CReals IR e epos) as [q qpos qmaj].
+      apply (less_wdl IR [0] _ (inj_Q IR 0)) in qpos.
+      apply less_inj_Q in qpos.
+      specialize (flz (exist _ _ qpos)).
+      exists (Pos.to_nat (cvmod (exist _ _ qpos))). intros m H1.
+      apply (AbsSmall_wdr _ _ (inj_Q IR ((-1)^m * Str_pth X f (Pos.of_nat (S m)) x))).
+      2: rewrite inj_Q_mult, power_neg_one; rational.
+      apply (AbsSmall_trans _ (inj_Q IR q) _ _ qmaj).
+      apply inj_Q_AbsSmall.
+      apply AbsSmall_Qabs.
+      refine (Qle_trans _ _ _ _ flz). clear flz.
+      rewrite Qabs_pos. 2: apply (Str_alt_decr_pos X f x fdecr), H.
+      rewrite <- (Pos2Nat.id (cvmod (q ↾ qpos))).
+      pose proof (Pos2Nat.is_pos (cvmod (q ↾ qpos))).
+      destruct (Pos.to_nat (cvmod (q ↾ qpos))). exfalso; inversion H0.
+      clear H0.
+      rewrite <- (Qmult_1_l (Qabs (Str_pth X f (Pos.of_nat (S n)) x))).
+      rewrite <- (abs_power_neg_one n).
+      rewrite <- Qabs_Qmult, Qabs_pos.
+      2: apply (Str_alt_decr_pos X f x fdecr), H.
+      revert m n H1. induction m.
+      intros. exfalso; inversion H1.
+      intros. apply Nat.le_succ_r in H1. destruct H1.
+      specialize (IHm n H0).
+      apply (Qle_trans _ _ _ (Str_alt_decr_decr X f x fdecr m H) IHm).
+      inversion H0. subst n. apply Str_alt_decr_decr.
+      exact fdecr. exact H.
+      rewrite inj_Q_Zero. reflexivity.
+    + (* Decreasing *)
+      intro n. rewrite power_neg_one, power_neg_one.
+      rewrite <- inj_Q_mult, <- inj_Q_mult.
+      apply inj_Q_leEq.
+      apply Str_alt_decr_decr; assumption.
+Qed.
+
+Lemma AltSeries_convergent
+  : forall (X:Type) (f : X*Q->X*Q) x cvmod
+      (fdecr : Str_alt_decr X f x)
+      (flz : Limit_zero X f x cvmod),
+    convergent (fun n:nat => inj_Q IR (Str_pth _ f (Pos.of_nat (S n)) x)).
+Proof.
+  (* Test whether the first term is positive or negative. *)
+  intros. 
+  destruct (Qlt_le_dec (Str_pth _ f 1 x) 0).
+  2: exact (AltSeries_convergent_pos X f x cvmod fdecr flz q).
+  apply (convergent_wd
+           (fun n : nat => [--][1][*]inj_Q IR (Str_pth _ (CRstreams.CRstream_opp X f) (Pos.of_nat (S n))
+                                                  (let (y,r):=x in (y,-r))))).
+  - (* the sequences are pointwise equal *)
+    intro n.
+    pose proof (CRstreams.CRstream_opp_pth X f x (Pos.of_nat (S n))).
+    unfold Str_pth.
+    destruct (CRstreams.iterate
+                _ (CRstreams.CRstream_opp X f) 
+                (Pos.of_nat (S n)) (let (y, r) := x in (y, - r))),
+    (CRstreams.iterate (X and Q) f (Pos.of_nat (S n)) x).
+    unfold snd. destruct H as [_ H]. subst q0.
+    rewrite (inj_Q_inv IR q1), inv_mult_invol.
+    rewrite <- inj_Q_One, <- inj_Q_mult.
+    apply inj_Q_wd, Qmult_1_l.
+  - apply conv_series_mult_scal.
+    apply (AltSeries_convergent_pos X (CRstreams.CRstream_opp X f)
+                                   (let (y, r) := x in (y, - r)) cvmod).
+    apply CRstream_opp_decr, fdecr.
+    apply CRstream_opp_limit_zero, flz.
+    unfold CRstreams.CRstream_opp, Str_pth; simpl.
+    destruct x. unfold Str_pth in q; simpl in q.
+    replace (--q0) with q0.
+    destruct (f (x,q0)). unfold snd. unfold snd in q.
+    apply (Qopp_le_compat q1 0), Qlt_le_weak, q.
+    destruct q0. unfold Qopp; simpl.
+    rewrite Z.opp_involutive. reflexivity. 
+Qed.
+
+Lemma AltSeries_convergent_0
+  : forall (X:Type) (f : X*Q->X*Q) x cvmod q
+      (fdecr : Str_alt_decr X f x)
+      (flz : Limit_zero X f x cvmod),
+    convergent (fun n:nat => match n with
+                        | O => q
+                        | S _ => inj_Q IR (Str_pth _ f (Pos.of_nat n) x) end).
+Proof.
+  intros.
+  (* Get rid of the initial zero. *)
+  apply (join_series (fun n : nat => inj_Q IR (Str_pth _ f (Pos.of_nat (S n)) x))).
+  - exact (AltSeries_convergent X f x cvmod fdecr flz). 
+  - exists 1%nat. exists O. intros n _.
+    rewrite Nat.add_comm. reflexivity.
+Qed.
+
 
 Lemma InfiniteAlternatingSum_correct (seq:Stream Q) (x:nat -> IR)
  (Hx : forall n:nat, inj_Q IR (((-(1))^n)*Str_nth n seq)%Q[=]x n)
@@ -325,7 +474,7 @@ Qed.
 Lemma AltSeries_correct : forall (X:Type) (f : X*Q->X*Q) x cvmod
                             (fdecr : Str_alt_decr X f x)
                             (flz : Limit_zero X f x cvmod)
-                            (g:nat -> IR) H,
+                            (g:nat -> IR) (H : convergent g),
     (forall n:positive, inj_Q IR (Str_pth _ f n x)%Q [=] g (Pos.to_nat n))
     -> (IRasCR (g O) + AltSeries _ f x cvmod fdecr flz == IRasCR (series_sum g H))%CR.
 Proof.
