@@ -106,8 +106,7 @@ Qed.
 Definition AQexp_small_neg : AR
   := 1+ AltSeries ARexpStream expStream_pos
                   positive (CRexp.expStream (AQtoQ a))
-                  (1,1) (xH,1) expStream_correct
-                  (fun e:Qpos => Pos.succ (Pos.size (Qden (proj1_sig e))))
+                  (1,1) (xH,1) expStream_correct _
                   (expStream_alt AQexp_small_neg_prf)
                   AQ0_lt_1 (expStream_zl AQexp_small_neg_prf).
                
