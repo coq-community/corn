@@ -1,8 +1,10 @@
 Require Import
-  Program QArith ZArith BigZ Qpossec
+  Program QArith ZArith Bignums.BigZ.BigZ Qpossec
   MetricMorphisms Qmetric Qdlog ARArith
-  theory.int_pow theory.nat_pow
-  stdlib_rationals stdlib_binary_integers fast_integers dyadics.
+  MathClasses.implementations.stdlib_rationals
+  MathClasses.implementations.stdlib_binary_integers
+  MathClasses.implementations.fast_integers
+  MathClasses.implementations.dyadics.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 

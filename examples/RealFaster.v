@@ -1,29 +1,18 @@
-Require Import BigZ CRArith ARbigD ARbigQ ARQ ARtrans ARsign.
+Require Import Bignums.BigZ.BigZ CRArith model.totalorder.QposMinMax
+        ARbigD ARbigQ ARQ ARtrans ARsign.
 
 Definition myAR := ARbigD.
 
-(*
-Definition answer (n : positive) (r : ARbigQ) : bigZ :=
- let m := iter_pos n _ (Pmult 10) 1%positive in 
- match (approximate r (1#m)%Qpos : bigQ) * 'Zpos m with
- | BigQ.Qz n => n
- | BigQ.Qq n d => BigZ.div n ('d)
- end.
-
-Definition answer (n : positive) (r : ARQ) : Z :=
- let m := (iter_pos n _ (Pmult 10) 1%positive) in
- let (a,b) := (approximate r (1#m)%Qpos)*m in
- Zdiv a b.
-*)
 Definition answer (n : positive) (r : ARbigD) : bigZ :=
- let m := iter_pos n _ (Pmult 10) 1%positive in 
- let (a, b) := (approximate r (1#m)%Qpos : bigD) * 'Zpos m in 
+ let m := iter_pos _ (Pmult 10) 1%positive n in 
+ let (a, b) := (approximate r (Qpos2QposInf (1#m)) : bigD) * 'Zpos m in 
  BigZ.shiftl a b.
 
 (* To avoid timing the printing mechanism *)
 Definition no_answer (n : positive) (r : myAR) :=
- let m := iter_pos n _ (Pmult 10) 1%positive in let _ := 
-    approximate r (1#m)%Qpos in tt.
+  let m := iter_pos _ (Pmult 10) 1%positive n in
+  let _ := approximate r (Qpos2QposInf (1#m)) in
+  tt.
 
 (* xkcd.org/217 *)
 Definition xkcd : myAR := (ARexp ARpi)-ARpi.

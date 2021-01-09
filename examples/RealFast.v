@@ -34,9 +34,9 @@ answer is useful for because it displays a familar list of digits rather
 than an unfamiliar fraction that approximate would return *)
 
 Definition answer (n:positive) (r:CR) : Z :=
- let m := (iter_pos n _ (Pmult 10) 1%positive) in
- let (a,b) := (approximate r (1#m)%Qpos)*m in
- Zdiv a b.
+ let m := (iter_pos _ (Pmult 10) 1%positive n) in
+ let (a,b) := (approximate r (Qpos2QposInf (1#m)))*(Zpos m#1) in
+ Z.div a (Zpos b).
 
 (* Here are some example approximations to real numbers *)
 
@@ -72,7 +72,7 @@ Time Eval vm_compute in answer 1 (exp (compress (exp (compress (rational_exp 1))
 (* sqrt (e/pi) *)
 Time Eval vm_compute in answer 20 (CRsqrt (compress (rational_exp (1))*compress (CRinv_pos (3#1) CRpi)))%CR.
 (* sin((e+1)^3) *)
-Time Eval vm_compute in answer 20 (sin (compress (CRpower_positive 3 (translate (1#1) (compress (rational_exp (1)))))))%CR.
+Time Eval vm_compute in answer 20 (sin (compress (CRpower_slow (translate (1#1) (compress (rational_exp (1)))) 3)))%CR.
 (* sin(10^22) still takes too long, see http://www.derekroconnor.net/DAMQ/FPArithSlidesHO.pdf *)
 Time Eval vm_compute in answer 10 (rational_sin (10^14))%CR.
 (* exp (exp (exp (1/2))) *)
@@ -81,7 +81,7 @@ Time Eval vm_compute in answer 10 (exp (compress (exp (compress (rational_exp (1
 Require Import CRsign.
 
 (* This example shows how to automatically solve inequalites for CR *)
-Example xkcd217A : (exp (CRpi) - CRpi < '(20%Z:Q))%CR.
+Example xkcd217A : (exp (CRpi) - CRpi < '(20#1))%CR.
 unfold CRlt.
 Time CR_solve_pos (1#1000)%Qpos.
 Qed.
