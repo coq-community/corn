@@ -34,6 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
+Require Import Lia.
 Require Export CoRN.algebra.CMonoids.
 Require Export CoRN.model.monoids.Nmonoid.
 Require Export CoRN.model.setoids.Nfinsetoid.
@@ -72,39 +73,12 @@ Proof.
  exact n.
 Defined.
 
+Hint Extern 10 => lia : core.
+
 Lemma  to_word_strext: (fun_strext to_word_).
 Proof.
- simpl.
- unfold fun_strext.
- double induction x y.
-    simpl.
-    intuition.
-   intros  n H2.
-   simpl.
-   unfold ap_nat.
-   intros T H.
-   set (H1:= (O_S n H)).
-   elim H1.
-  intros n H3.
-  simpl.
-  unfold ap_nat.
-  intros T H.
-  cut (0= (S n)).
-   intro H2.
-   set (H1:= (O_S n H2 )).
-   elim H1.
-  intuition.
- intros n H1 n0 H2.
- simpl.
- cut ( ap_fm A (to_word_ n0) (to_word_ n) -> S n0{#N}S n).
-  intuition.
- intro H3.
- simpl in H2.
- set (H4:=(H2 n H3)).
- unfold ap_nat in H4 |- *.
- intro H5.
- apply H4.
- apply (eq_add_S n0 n H5).
+ unfold fun_strext; simpl.
+ induction x; destruct y; firstorder with bool.
 Qed.
 
 Definition to_word_as_CSetoid_fun:=

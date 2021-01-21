@@ -34,6 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
+Require Import Lia.
 Require Export CoRN.algebra.CMonoids.
 Require Export CoRN.model.monoids.Nmonoid.
 
@@ -63,55 +64,22 @@ Let f:= fun (H:forall(m:M),{n:nat | (power_CMonoid c n)[=]m})=>
 
 Lemma f_strext: (fun_strext (f is_generated_by)).
 Proof.
- simpl.
- unfold fun_strext.
- simpl.
- double induction x y.
-    unfold f.
-    simpl.
-    intro H.
-    set (H1:=(ax_ap_irreflexive M (@cs_eq  M) (@cs_ap M))).
-    unfold irreflexive in H1.
-    unfold Not in H1.
-    unfold ap_nat.
-    intro H2.
-    elim H1 with (cm_unit M).
-     apply CSetoid_is_CSetoid.
-    exact H.
-   unfold ap_nat.
-   intros n H H0.
-   set (H1:= (O_S n)).
-   intuition.
-  unfold ap_nat.
-  intros n H H0 H2.
-  set (H1:= (O_S n)).
-  cut (0=(S n)).
-   intuition.
-  intuition.
- intros n H n0 H0.
- unfold f.
- simpl.
- elim (@csg_op M).
- simpl.
- intros op op_strext H1.
- unfold bin_fun_strext in op_strext.
- set (H2:=(op_strext c c (power_CMonoid c n0) (power_CMonoid c n)H1)).
- elim H2.
-  intros H3.
-  set (H4:=(ap_irreflexive_unfolded M c H3)).
-  elim H4.
- intro H3.
- unfold f in H0.
- set (H4:= (H0 n H3)).
- set (H5:= (not_eq_S n0 n)).
- unfold ap_nat in H4 |- *.
- unfold not in H5.
- intro H6.
- elim H5.
-  intro H7.
-  elim H4.
-  exact H7.
- exact H6.
+ unfold fun_strext; simpl.
+ induction x; destruct y.
+ - intros ? ?.
+   pose proof (ax_ap_irreflexive M (@cs_eq  M) (@cs_ap M)) as H_irreflexive.
+   unfold irreflexive, Not in H_irreflexive.
+   elim H_irreflexive with (cm_unit M); auto using CSetoid_is_CSetoid.
+ - firstorder lia.
+ - firstorder lia.
+ - unfold f.
+   simpl.
+   elim (@csg_op M).
+   simpl.
+   intros op op_strext H1.
+   pose proof (op_strext c c (power_CMonoid c _) (power_CMonoid c _) H1) as [ H3 | ].
+   + destruct (ap_irreflexive_unfolded M c H3).
+   + firstorder.
 Qed.
 
 Definition f_as_CSetoid_fun:=
