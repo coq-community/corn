@@ -3,9 +3,12 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import
   MathClasses.misc.workaround_tactics
-  CoRN.model.totalorder.QMinMax Coq.QArith.Qround CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
-  CoRN.reals.fast.CRsin CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum CoRN.reals.fast.Compress
-  CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
+  CoRN.model.totalorder.QMinMax CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
+  Coq.QArith.Qround Coq.QArith.Qpower 
+  CoRN.reals.fast.CRsin CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum
+  CoRN.reals.fast.Compress
+  CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum
+  MathClasses.interfaces.abstract_algebra 
   MathClasses.orders.minmax MathClasses.theory.nat_pow MathClasses.theory.int_pow.
 Require Export
   CoRN.reals.faster.ARArith.
@@ -13,100 +16,240 @@ Require Export
 Section ARsin.
 Context `{AppRationals AQ}.
 
+Lemma AQmult_lt_0_compat : forall a b : AQ, 0 < a -> 0 < b -> 0 < a*b.
+Proof.
+  intros.
+  apply (strictly_order_reflecting (cast AQ Q)).
+  pose proof (rings.preserves_0 (f:=cast AQ Q)).
+  rewrite H7.
+  rewrite rings.preserves_mult.
+  rewrite <- (Qmult_0_l ('b)).
+  apply Qmult_lt_compat_r.
+  rewrite <- H7.
+  apply (strictly_order_preserving (cast AQ Q)), H6.
+  rewrite <- H7.
+  apply (strictly_order_preserving (cast AQ Q)), H5.
+Qed.
+ 
 Local Open Scope uc_scope.
+
+
+Section sin_small.
+  (* First define (sin a) as a decreasing alternating series on the segment [-1,1].
+     a = num/den and -1 <= a <= 1. *)
+
+Context {num den : AQ} (Pnd : -den ≤ num ≤ den) (dpos : 0 < den).
+  
+(*
+Split the stream 
+  (-1)^i a^(2i+1) / (2i+1)! 
+up into the streams
+  (-1)^i a^(2i+1)    and    (2i+1)!
+because we do not have exact division
+*)
+Definition ARsinStream (px : positive*(AQ*AQ)) : AQ*AQ
+  := (- fst (snd px) * num * num,
+      snd (snd px) * den * den * ZtoAQ (Zpos (fst px)~0) * ZtoAQ (Zpos (fst px)~1)).
+
+Lemma ZtoQ : forall n:positive, AQtoQ (ZtoAQ (Zpos n)) == (Zpos n#1).
+Proof.
+  induction n.
+  - change (Z.pos n~1) with (1+2*Z.pos n)%Z.
+    pose proof (rings.preserves_plus (f:=cast Z AQ) 1 (2*Z.pos n)).
+    rewrite H5. clear H5.
+    rewrite rings.preserves_plus, rings.preserves_1.
+    rewrite rings.preserves_1.
+    pose proof (rings.preserves_mult (f:=cast Z AQ) 2 (Z.pos n)).
+    rewrite H5. clear H5.
+    rewrite rings.preserves_mult, IHn.
+    rewrite rings.preserves_2, rings.preserves_2.
+    unfold Qeq; simpl. rewrite Pos.mul_1_r. reflexivity.
+  - change (Z.pos n~0) with (2*Z.pos n)%Z.
+    pose proof (rings.preserves_mult (f:=cast Z AQ) 2 (Z.pos n)).
+    rewrite H5.
+    rewrite rings.preserves_mult, IHn.
+    rewrite rings.preserves_2. 
+    pose proof (rings.preserves_2 (f:=cast AQ Q)).
+    rewrite H6. reflexivity.
+  - pose proof (rings.preserves_1 (f:=cast Z AQ)).
+    rewrite H5. rewrite rings.preserves_1. reflexivity.
+Qed.
+
+Lemma sinStream_pos : ∀ x : positive * (AQ * AQ),
+    0 < snd (snd x) → 0 < snd (ARsinStream x).
+Proof.
+  assert (0 = ZtoAQ 0) as zero_int.
+  { destruct H4. destruct aq_ints_mor, semiringmor_plus_mor.
+    rewrite preserves_mon_unit. reflexivity. }
+  intros. destruct x; simpl.
+  simpl in H5.
+  apply AQmult_lt_0_compat.
+  apply AQmult_lt_0_compat.
+  apply AQmult_lt_0_compat.
+  apply AQmult_lt_0_compat.
+  exact H5. exact dpos. exact dpos.
+  rewrite zero_int.
+  apply (strictly_order_preserving (cast Z AQ)).
+  reflexivity.
+  rewrite zero_int.
+  apply (strictly_order_preserving (cast Z AQ)).
+  reflexivity.
+Qed.
+
+Lemma sinStream_pos_recurse : forall p (x : positive * (AQ * AQ)),
+    0 < snd (snd x)
+    -> 0 < snd (snd (iterate _ (fS ARsinStream) p (1%positive, (num, den)))).
+Proof.
+  apply (Pos.peano_ind (fun p => forall (x : positive * (AQ * AQ)), 0 < snd (snd x)
+    → 0 < snd (snd
+           (iterate (positive * (AQ * AQ)) (fS ARsinStream) p
+              (1%positive, (num, den)))))).
+  - intros. simpl.
+    pose proof (rings.preserves_0 (f:=cast Z AQ)). 
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    exact dpos. exact dpos. exact dpos.
+    rewrite <- H6.
+    apply (strictly_order_preserving (cast Z AQ)). reflexivity.
+    rewrite <- H6.
+    apply (strictly_order_preserving (cast Z AQ)). reflexivity.
+  - intros p IHp x xpos. rewrite iterate_succ.
+    specialize (IHp x xpos).
+    pose proof (rings.preserves_0 (f:=cast Z AQ)). 
+    destruct (iterate (positive * (AQ * AQ)) (fS ARsinStream) p
+                      (1%positive, (num, den))).
+    unfold ARsinStream. simpl. simpl in IHp.
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    apply AQmult_lt_0_compat.
+    exact IHp. exact dpos. exact dpos.
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast Z AQ)). reflexivity.
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast Z AQ)). reflexivity.
+Qed.
+
+Lemma sinStream_correct : ∀ p : positive,
+    Str_pth _ (sinStream (AQtoQ num / AQtoQ den))
+            p (1%positive, AQtoQ num / AQtoQ den)
+    == let (_, r) := iterate _ (fS ARsinStream) p (1%positive, (num, den)) in
+       AQtoQ (fst r) / AQtoQ (snd r).
+Proof.
+  assert (forall n:Z, AQtoQ (ZtoAQ n) == (n#1)).
+  { intro n. destruct n as [|n|n].
+    pose proof (rings.preserves_0 (f:=cast Z AQ)). rewrite H5. clear H5.
+    rewrite rings.preserves_0. reflexivity.
+    apply ZtoQ. change (Z.neg n) with (-Z.pos n)%Z.
+    pose proof (rings.preserves_negate (f:=cast Z AQ)).
+    rewrite H5. clear H5. rewrite rings.preserves_negate.
+    rewrite ZtoQ. reflexivity. } 
+  apply Pos.peano_ind.
+  - unfold Str_pth. simpl.
+    do 6 rewrite rings.preserves_mult.
+    rewrite rings.preserves_negate.
+    rewrite H5, H5.
+    unfold dec_recip, stdlib_rationals.Q_recip.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold negate, stdlib_rationals.Q_opp.
+    field. intro abs.
+    apply (strictly_order_preserving (cast AQ Q)) in dpos.
+    rewrite rings.preserves_0, abs in dpos.
+    exact (Qlt_irrefl 0 dpos).
+  - intros p IHp. unfold Str_pth. unfold Str_pth in IHp.
+    rewrite iterate_succ, iterate_succ.
+    pose proof (sinStream_fst (AQtoQ num / AQtoQ den) p) as H7.
+    unfold dec_recip, stdlib_rationals.Q_recip.
+    unfold dec_recip, stdlib_rationals.Q_recip in IHp.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold mult, stdlib_rationals.Q_mult in IHp.
+    unfold Qdiv in H7. unfold Qdiv.
+    unfold Qdiv in IHp.
+    unfold Q_as_MetricSpace, msp_car.
+    unfold Q_as_MetricSpace, msp_car in IHp.
+    destruct (iterate _ (sinStream (AQtoQ num * / AQtoQ den)%Q) p
+            (1%positive, (AQtoQ num * / AQtoQ den)%Q)).
+    simpl in H7. simpl in IHp. subst p0.
+    unfold sinStream, snd, fst. rewrite IHp. clear IHp.
+    pose proof (fS_fst ARsinStream p (num, den)).
+    pose proof (sinStream_pos_recurse p (1%positive, (num, den))).
+    destruct (iterate _ (fS ARsinStream) p (1%positive, (num, den))) as [p0 p1].
+    simpl in H6. simpl. subst p0.
+    do 6 rewrite rings.preserves_mult.
+    rewrite rings.preserves_negate.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold negate, stdlib_rationals.Q_opp.
+    rewrite ZtoQ, ZtoQ.
+    rewrite <- (Qmult_assoc (AQtoQ (snd p1) * AQtoQ den * AQtoQ den)).
+    rewrite Qinv_mult_distr.
+    setoid_replace (/ ((Z.pos (Pos.succ p)~0 # 1) * (Z.pos (Pos.succ p)~1 # 1)))
+      with (1 # (Pos.succ p * (Pos.succ p)~1)~0) by reflexivity.
+    field. split. intro abs.
+    apply (strictly_order_preserving (cast AQ Q)) in dpos.
+    rewrite rings.preserves_0, abs in dpos.
+    exact (Qlt_irrefl 0 dpos).
+    intro abs. simpl in H7.
+    specialize (H7 dpos).
+    apply (strictly_order_preserving (cast AQ Q)) in H7.
+    rewrite rings.preserves_0, abs in H7.
+    exact (Qlt_irrefl 0 H7).
+Qed.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
-(* First define sine as a decreasing alternating series on the segment [0,1]. *)
-Section sin_small_pos.
-Context {num den : AQ} (Pnd : 0 ≤ num ≤ den).
-
-(* Prove that the division of the 2 AQ numerator and denominator streams
-   are equal to fast reals' Q stream of sine. *)
-Lemma ARsinSequence : DivisionStream 
-  (sinSequence ('num / 'den)) 
-  (powers_help (num ^ (2:N)) num)
-  (mult_Streams (powers_help (den ^ (2:N)) den) (everyOther (tl factorials))).
-Proof.
-  apply DivisionStream_Str_nth.
-  intros n.
-  unfold sinSequence, mult_Streams.
-  rewrite ?Str_nth_zipWith.
-  rewrite commutativity. 
-  rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
-  rewrite associativity.
-  apply sg_op_proper.
-  - rewrite 2!preserves_powers_help.
-    rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
-    rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
-    rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
-    change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
-    rewrite 2!int_pow_mult. 
-    rewrite 2!int_pow_recip.
-    change (Qdiv ('num) ('den)) with ('num / 'den : Q).
-    destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    + rewrite ?Pden, rings.mult_0_l, dec_recip_0.
-      rewrite Qmult_0_r, Qmult_0_l.
-      unfold dec_recip, stdlib_rationals.Q_recip.
-      unfold Qinv. simpl. rewrite Qmult_0_r. reflexivity.
-    + rewrite <- (Qmult_assoc ('num)).
-      rewrite <- (Qmult_assoc ('num)).
-      apply (Qmult_comp ('num)). reflexivity.
-      rewrite Qmult_comm.
-      rewrite <- Qmult_assoc.
-      apply (Qmult_comp ((' num ^ ' 2) ^ ' n)).
-      reflexivity.
-      rewrite Qmult_comm.
-      symmetry.
-      apply Qinv_mult_distr.
-  - rewrite 2!Str_nth_everyOther.
-    change (@tl AQ) with (@Str_nth_tl AQ 1).
-    change (@tl Q) with (@Str_nth_tl Q 1).
-    rewrite ?Str_nth_plus.
-    rewrite Str_nth_Qrecip_factorials'.
-    now rewrite preserves_factorials.
-Qed.
-
-Lemma AQsin_small_pos_Qprf : 0 ≤ ('num / 'den : Q) ≤ 1.
+Lemma AQsin_small_Qprf : -1 ≤ AQtoQ num / AQtoQ den ≤ 1.
 Proof.
   split.
-   apply nonneg_mult_compat.
-    now apply semirings.preserves_nonneg.
-   apply dec_fields.nonneg_dec_recip_compat.
-   apply semirings.preserves_nonneg.
-   red. now transitivity num.
-  destruct (decide ('den = (0:Q))) as [Pden | Pden].
-    rewrite ?Pden, dec_recip_0. now ring_simplify.
-  rewrite <-(dec_recip_inverse ('den : Q)) by assumption.
-  apply (maps.order_preserving_flip_nonneg (.*.) (/'den)).
-   apply dec_fields.nonneg_dec_recip_compat.
-   apply semirings.preserves_nonneg.
-   red. now transitivity num.
-  now apply (order_preserving _).
+  - apply Qle_shift_div_l.
+    pose proof (rings.preserves_0 (f:=cast AQ Q)).
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast AQ Q)), dpos.
+    setoid_replace (-1 * AQtoQ den) with (-AQtoQ den) by reflexivity.
+    rewrite <- rings.preserves_negate.
+    apply (order_preserving (cast AQ Q)), Pnd.
+  - apply Qle_shift_div_r.
+    pose proof (rings.preserves_0 (f:=cast AQ Q)).
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast AQ Q)), dpos.
+    rewrite Qmult_1_l.
+    apply (order_preserving (cast AQ Q)), Pnd.
 Qed.
 
-Definition AQsin_small_pos : AR := ARInfAltSum ARsinSequence 
-  (dnn:=sinSequence_dnn AQsin_small_pos_Qprf) (zl:=sinSequence_zl AQsin_small_pos_Qprf).
+Definition AQsin_small : AR
+  := cast CR AR (inject_Q_CR (AQtoQ num / AQtoQ den))
+     + AltSeries ARsinStream sinStream_pos
+                 positive (CRsin.sinStream (AQtoQ num / AQtoQ den))
+                 (num,den) (xH,AQtoQ num / AQtoQ den) sinStream_correct _
+                 (sinStream_alt AQsin_small_Qprf)
+                 dpos (sinStream_zl AQsin_small_Qprf).
 
-Lemma AQsin_small_pos_correct : 'AQsin_small_pos = rational_sin ('num / 'den).
+Lemma AQsin_small_correct : 'AQsin_small = rational_sin (AQtoQ num / AQtoQ den).
 Proof.
-  rewrite rational_sin_correct.
-  rewrite <-rational_sin_small_pos_correct.
-  now apply ARInfAltSum_correct.
+  rewrite rational_sin_correct,
+  <- (rational_sin_small_correct AQsin_small_Qprf).
+  unfold AQsin_small, rational_sin_small.
+  rewrite ARtoCR_preserves_plus.
+  apply ucFun2_wd.
+  rewrite CRAR_id. reflexivity.
+  apply AltSeries_correct.
 Qed.
-End sin_small_pos.
+
+End sin_small.
 
 Lemma AQsin_small_pos_wd :
-  forall (n1 n2 d1 d2 : AQ) (p1 : 0 ≤ n1 ≤ d1) (p2 : 0 ≤ n2 ≤ d2),
+  forall (n1 n2 d1 d2 : AQ) (p1 : -d1 ≤ n1 ≤ d1) (p2 : -d2 ≤ n2 ≤ d2)
+    (d1pos : 0 < d1) (d2pos : 0 < d2),
     n1 = n2
     -> d1 = d2
-    -> AQsin_small_pos p1 = AQsin_small_pos p2.
+    -> AQsin_small p1 d1pos = AQsin_small p2 d2pos.
 Proof.
   assert (forall x y, ARtoCR x = ARtoCR y -> x = y) as H5.
   { intros x y H5. exact H5. }
   intros. apply H5.
-  rewrite (AQsin_small_pos_correct p1).
-  rewrite (AQsin_small_pos_correct p2).
+  rewrite (AQsin_small_correct p1 d1pos).
+  rewrite (AQsin_small_correct p2 d2pos).
   rewrite H6, H7. reflexivity.
 Qed.
 
@@ -163,8 +306,10 @@ Fixpoint ARsin_poly_iter (n : nat) (x : AR) : AR :=
   | S n' => ARsin_poly (ARsin_poly_iter n' x)
   end.
 
-Definition AQsin_pos_bounded {n : nat} {num den : AQ} (Pnd : 0 ≤ num ≤ den * 3^n) : AR
-  := ARsin_poly_iter n (AQsin_small_pos Pnd).
+Definition AQsin_bounded {n : nat} {num den : AQ}
+           (Pnd : - (den * 3^n) ≤ num ≤ den * 3^n)
+           (dpos : 0 < den * 3^n) : AR
+  := ARsin_poly_iter n (AQsin_small Pnd dpos).
 
 Lemma ARsin_poly_iter_wd : forall n x y,
     x = y -> ARsin_poly_iter n x = ARsin_poly_iter n y.
@@ -175,24 +320,26 @@ Proof.
     reflexivity.
 Qed.
 
-Lemma AQsin_pos_bounded_correct {n : nat} {num den : AQ} (Pnd : 0 ≤ num ≤ den * 3^n) : 
-  'AQsin_pos_bounded Pnd = rational_sin ('num / 'den).
+Lemma AQsin_bounded_correct {n : nat} {num den : AQ}
+      (Pnd : -(den * 3^n) ≤ num ≤ den * 3^n) (dpos : 0 < den * 3^n) : 
+  'AQsin_bounded Pnd dpos = rational_sin ('num / 'den).
 Proof.
-  revert num den Pnd.
+  revert num den dpos Pnd.
   induction n; intros.
-  - unfold AQsin_pos_bounded. simpl.
-    rewrite AQsin_small_pos_correct. 
+  - unfold AQsin_bounded. simpl.
+    rewrite AQsin_small_correct. 
     change (3^0%nat) with 1.
     rewrite rings.mult_1_r. reflexivity.
-  - unfold AQsin_pos_bounded.
+  - unfold AQsin_bounded.
     simpl.
     rewrite ARtoCR_preserves_sin_poly.
-    unfold AQsin_pos_bounded in IHn.
-    assert (num ≤ den * 3 * 3 ^ n).
-    { destruct Pnd.
-      rewrite <- (associativity den 3). exact H6. }
-    setoid_replace (ARsin_poly_iter n (AQsin_small_pos Pnd))
-      with (ARsin_poly_iter n (AQsin_small_pos (conj (proj1 Pnd) H5))).
+    unfold AQsin_bounded in IHn.
+    assert (le (-(den * 3 * 3 ^ n)) num /\ num ≤ den * 3 * 3 ^ n) as H5.
+    { rewrite <- (associativity den 3). exact Pnd. }
+    assert (0 < den * 3 * 3 ^ n) as H6.
+    { rewrite <- (associativity den 3). exact dpos. }
+    setoid_replace (ARsin_poly_iter n (AQsin_small Pnd dpos))
+      with (ARsin_poly_iter n (AQsin_small H5 H6)).
     rewrite IHn.
     change (Qdiv ('num) ('(den * 3))) with (('num : Q) / '(den * 3)).
     rewrite rings.preserves_mult, rings.preserves_3.
@@ -203,73 +350,59 @@ Proof.
     rewrite <- (associativity den 3). reflexivity.
 Qed.
 
-Section sin_pos.
-Context {a : AQ} (Pa : 0 ≤ a).
+Definition AQsin_bound (a : AQ) : nat := CRsin.sin_bound ('a).
 
-Definition AQsin_pos_bound : nat := Z.abs_nat (1 + Qdlog 3 ('a)).
-
-Lemma AQsin_pos_bound_correct : 0 ≤ a ≤ 3 ^ AQsin_pos_bound.
+Lemma AQsin_bound_correct : forall (a:AQ),
+    -(1 * 3 ^ AQsin_bound a) ≤ a ≤ 1 * 3 ^ AQsin_bound a.
 Proof.
-  split; [assumption |].
-  unfold AQsin_pos_bound.
-  apply (order_reflecting (cast AQ Q)).
+  intro a. unfold AQsin_bound.
+  pose proof (CRsin.sin_bound_correct ('a)).
+  split; apply (order_reflecting (cast AQ Q)).
+  - rewrite rings.preserves_negate.
+    destruct H4, aq_ring, ring_monoid.
+    destruct commonoid_mon. rewrite monoid_left_id.
+    rewrite preserves_nat_pow.
+    rewrite rings.preserves_3.
+    rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
+    rewrite <- (Zpower_Qpower 3).
+    apply H5. apply (Nat2Z.inj_le 0), le_0_n.
+  - destruct H4, aq_ring, ring_monoid.
+    destruct commonoid_mon. rewrite monoid_left_id.
+    rewrite preserves_nat_pow.
+    rewrite rings.preserves_3.
+    rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
+    rewrite <- (Zpower_Qpower 3).
+    apply H5. apply (Nat2Z.inj_le 0), le_0_n.
+Qed.
+
+Lemma AQsin_bound_pos : forall a, 0 < 1 * 3 ^ AQsin_bound a.
+Proof.
+  intro a.
+  destruct H4, aq_ring, ring_monoid.
+  destruct commonoid_mon. rewrite monoid_left_id.
+  apply (strictly_order_reflecting (cast AQ Q)).
   rewrite preserves_nat_pow.
   rewrite rings.preserves_3.
-  rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
-  destruct (total (≤) ('a : Q) 1).
-   rewrite Qdlog2_le1; simpl; try easy.
-   now transitivity (1:Q).
-  rewrite inj_Zabs_nat, Z.abs_eq.
-   now apply orders.lt_le, Qdlog_spec.
-  change (0 ≤ 1 + Qdlog 3 ('a)).
-  apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg].
+  rewrite <- (int_pow_nat_pow (f:=cast nat Z)).
+  rewrite rings.preserves_0.
+  apply (Qpower_0_lt 3 (Z.of_nat (AQsin_bound a))).
+  reflexivity.
 Qed.
 
-(* When we reach [0,1] we can continue dividing by 3 to compute a sine
-   closer to 0. Doing this generally improves the performance because
-   the sequence converges more quickly. *)
-Lemma AQsin_pos_bound_weaken (n : nat) : 0 ≤ a ≤ 1 * 3 ^ (n + AQsin_pos_bound).
-Proof.
-  split; [assumption |].
-  rewrite rings.mult_1_l.
-  rewrite nat_pow_exp_plus.
-  apply semirings.ge_1_mult_le_compat_l.
-    apply nat_pow_ge_1. 
-     now apply semirings.le_1_3.
-   now apply nat_pow_nonneg; solve_propholds.
-  now apply AQsin_pos_bound_correct.
-Qed.
+Definition AQsin (a:AQ) : AR
+  := AQsin_bounded (AQsin_bound_correct a) (AQsin_bound_pos a).
 
-(* TODO remove AQsin_pos_bound_weaken, each time this polynomial
-   is applied, the requested precision is multiplied by 9. *)
-Definition AQsin_pos : AR := AQsin_pos_bounded (AQsin_pos_bound_weaken 0).
-
-Lemma AQsin_pos_correct: 'AQsin_pos = rational_sin ('a).
+Lemma AQsin_correct : forall a, 'AQsin a = rational_sin ('a).
 Proof.
+  intro a.
   mc_setoid_replace ('a : Q) with ('a / '1 : Q).
-   now apply AQsin_pos_bounded_correct.
-  rewrite rings.preserves_1, dec_fields.dec_recip_1. ring.
+   now apply AQsin_bounded_correct.
+  rewrite rings.preserves_1, dec_fields.dec_recip_1. 
+  rewrite Qmult_1_r. reflexivity.
 Qed.
-End sin_pos.
 
 Lemma AQsin_prf {a : AQ} (pA : ¬0 ≤ a) : 0 ≤ -a.
 Proof. apply rings.flip_nonpos_negate. now apply orders.le_flip. Qed.
-
-Definition AQsin (a : AQ) : AR := 
-  match (decide_rel (≤) 0 a) with
-  | left Pa => AQsin_pos Pa
-  | right Pa => -AQsin_pos (AQsin_prf Pa)
-  end.
-
-Lemma AQsin_correct a : 'AQsin a = rational_sin ('a).
-Proof.
-  unfold AQsin.
-  case (decide_rel _); intros.
-   now apply AQsin_pos_correct.
-  rewrite rings.preserves_negate, AQsin_pos_correct.
-  rewrite rings.preserves_negate.
-  now apply rational_sin_opp.
-Qed.
 
 Definition ARsin_uc : AQ_as_MetricSpace --> AR
   := unary_complete_uc 

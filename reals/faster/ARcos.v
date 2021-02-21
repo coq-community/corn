@@ -4,9 +4,17 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import
   MathClasses.misc.workaround_tactics
-  CoRN.reals.fast.CRsin CoRN.reals.fast.CRcos CoRN.metric2.MetricMorphisms CoRN.metric2.Complete CoRN.reals.faster.ARsin MathClasses.interfaces.abstract_algebra.
+  CoRN.reals.fast.CRsin CoRN.reals.fast.CRcos CoRN.metric2.MetricMorphisms
+  CoRN.metric2.Complete CoRN.reals.faster.ARsin
+  MathClasses.interfaces.abstract_algebra.
 Require Export
   CoRN.reals.faster.ARArith.
+
+(**
+** Cosine
+Cosine is defined in terms of Sine.  [cos x = 1 - 2*(sin(x/2))^2].
+But cosine is still first defined on the rational numbers, and lifted
+to the real numbers. *)
 
 Section ARcos.
 Context `{AppRationals AQ}.

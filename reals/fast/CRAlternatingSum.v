@@ -1169,6 +1169,105 @@ Section RationalStreamSum.
 
 End RationalStreamSum.
 
+Lemma Str_alt_decr_pos
+  : forall (X:Type) (f : X*Q->X*Q) x 
+      (fdecr : Str_alt_decr X f x) (n:nat),
+    0 <= Str_pth _ f 1 x ->
+    0 <= (-1)^Z.of_nat n * Str_pth X f (Pos.of_nat (S n)) x.
+Proof.
+  intros X f x fdecr.
+  induction n.
+  - intros. simpl. rewrite Qmult_1_l. exact H.
+  - intro H. specialize (IHn H).
+    specialize (fdecr (Pos.of_nat (S n))).
+    rewrite Nat2Pos.inj_succ. 2: discriminate.
+    destruct (Str_pth X f (Pos.of_nat (S n)) x) as [p q].
+    destruct p as [|p|p].
+    + destruct fdecr.
+      setoid_replace (Qabs (0#q)) with 0%Q in H0 by reflexivity.
+      apply Qabs_Qle_condition in H0. change (-0) with 0 in H0.
+      setoid_replace (Str_pth X f (Pos.succ (Pos.of_nat (S n))) x) with 0%Q.
+      rewrite Qmult_0_r. apply Qle_refl.
+      apply Qle_antisym; apply H0.
+    + destruct fdecr. clear H0.
+      rewrite <- (Qmult_0_l (Z.pos p # q)) in H1.
+      rewrite Qmult_le_r in H1. 2: reflexivity.
+      rewrite <- (Qmult_0_l (Z.pos p # q)) in IHn.
+      rewrite Qmult_le_r in IHn. 2: reflexivity.
+      change (S n) with (1+n)%nat.
+      rewrite (Nat2Z.inj_add 1 n).
+      rewrite Qpower_plus. simpl ((-1)^Z.of_nat 1). rewrite (Qmult_comm (-1)).
+      rewrite <- Qmult_assoc.
+      rewrite Qmult_comm, <- (Qmult_0_l ((-1)^Z.of_nat n)).
+      apply Qmult_le_compat_r. 2: exact IHn.
+      change (S n) with (1+n)%nat in H1.
+      destruct (Str_pth X f (Pos.succ (Pos.of_nat (1+ n))) x).
+      destruct Qnum. apply Z.le_refl.
+      unfold Qle, Z.le in H1. simpl in H1.
+      exfalso; apply H1; reflexivity. 
+      discriminate. intro abs. discriminate.
+    + destruct fdecr. clear H0.
+      assert ((Z.neg p # q) == (-1) * (Z.pos p#q)) by reflexivity.
+      rewrite H0, Qmult_assoc in H1. rewrite H0, Qmult_assoc in IHn.
+      rewrite <- (Qmult_0_l (Z.pos p # q)) in H1.
+      rewrite Qmult_le_r in H1. 2: reflexivity.
+      rewrite <- (Qmult_0_l (Z.pos p # q)) in IHn.
+      rewrite Qmult_le_r in IHn. 2: reflexivity.
+      change (S n) with (1+n)%nat.
+      rewrite (Nat2Z.inj_add 1 n).
+      rewrite Qpower_plus. simpl ((-1)^Z.of_nat 1%nat). rewrite (Qmult_comm (-1)).
+      rewrite (Qmult_comm ((-1) ^ Z.of_nat n * -1)).
+      rewrite <- (Qmult_0_l ((-1) ^ Z.of_nat n * -1)).
+      apply Qmult_le_compat_r. 2: exact IHn.
+      change (S n) with (1+n)%nat in H1.
+      destruct (Str_pth X f (Pos.succ (Pos.of_nat (1+ n))) x).
+      destruct Qnum. apply Z.le_refl. discriminate.
+      unfold Qle, Z.le in H1. simpl in H1.
+      exfalso; apply H1; reflexivity. 
+      discriminate.
+Qed.
+
+Lemma CRstream_opp_decr : forall (X:Type) (f : X*Q->X*Q) x,
+    Str_alt_decr X f x
+    -> Str_alt_decr X (CRstreams.CRstream_opp X f) (let (y, r) := x in (y, - r)).
+Proof.
+  intros X f x H p. specialize (H p).
+  pose proof (CRstreams.CRstream_opp_pth X f x p).
+  pose proof (CRstreams.CRstream_opp_pth X f x (Pos.succ p)). 
+  unfold Str_pth. unfold Str_pth in H.
+  destruct x as [x q].
+  unfold negate, Q_opp.
+  destruct (CRstreams.iterate _ f p (x,q)).
+  destruct (CRstreams.iterate _ f (Pos.succ p) (x,q)).
+  unfold snd in H.
+  destruct (CRstreams.iterate _ (CRstreams.CRstream_opp X f) 
+                              (Pos.succ p) (x, (-q)%Q)).
+  destruct (CRstreams.iterate _ (CRstreams.CRstream_opp X f) p (x, (-q)%Q)).
+  unfold snd.
+  destruct H1. subst q2. subst x2.
+  destruct H0. subst q3. subst x3.
+  destruct H. split.
+  - rewrite Qabs_opp, Qabs_opp. exact H.
+  - setoid_replace (- q1 * - q0)%Q with (q1*q0)%Q.
+    exact H0. unfold equiv, Q_eq. ring.
+Qed.
+
+Lemma CRstream_opp_limit_zero : forall (X:Type) (f : X*Q->X*Q) x cvmod,
+  Limit_zero X f x cvmod
+  -> Limit_zero X (CRstreams.CRstream_opp X f) (let (y, r) := x in (y, - r)) cvmod.
+Proof.
+  intros. intro e.
+  specialize (H e).
+  pose proof (CRstreams.CRstream_opp_pth X f x (cvmod e)).
+  unfold Str_pth. unfold Str_pth in H.
+  destruct (CRstreams.iterate (X * Q) f (cvmod e) x) as [y r].
+  destruct x as [x q].
+  unfold negate, Q_opp.
+  destruct (CRstreams.iterate (X * Q) (CRstream_opp X f) (cvmod e) (x, (- q)%Q)).
+  unfold snd. unfold snd in H. destruct H0.
+  subst q0. rewrite Qabs_opp. exact H.
+Qed. 
+
 Lemma SumStream_wd : forall (p:positive)
                        (X Y:Type) (f : X*Q -> X*Q) (g : Y*Q -> Y*Q)
                        (x : X*Q) (y : Y*Q),

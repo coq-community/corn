@@ -26,10 +26,11 @@ Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRAlternatingSum_alg.
 Require Import CoRN.reals.fast.CRstreams.
+Require Import CoRN.reals.fast.CRexp.
 Require Import CoRN.reals.fast.CRpi.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
-Require Import Coq.QArith.Qpower.
+Require Import Coq.QArith.Qpower Coq.QArith.Qabs.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import Coq.QArith.Qround.
 Require Import CoRN.transc.Pi.
@@ -43,8 +44,7 @@ Require Import CoRN.reals.fast.Compress.
 Require Import CoRN.reals.fast.PowerBound.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
-
-Import MathClasses.theory.CoqStreams.
+Require Import CoRN.util.Qdlog.
 
 Set Implicit Arguments.
 
@@ -53,6 +53,45 @@ Local Open Scope uc_scope.
 
 Opaque inj_Q CR Qmin Qmax.
 
+Lemma Qmult_pos_neg : forall (a b : Q),
+    0 <= a -> b <= 0 -> a*b <= 0.
+Proof.
+  intros. rewrite Qmult_comm.
+  rewrite <- (Qmult_0_l a).
+  apply Qmult_le_compat_r; assumption.
+Qed. 
+
+Lemma Qmult_neg_1 : forall q : Q, (-1)*q == -q.
+Proof.
+  intro q. reflexivity.
+Qed.
+
+Lemma Qsquare_pos : forall q:Q, 0 <= q*q.
+Proof.
+  intros [n d]. destruct n; discriminate.
+Qed. 
+
+Lemma fact_inc : forall n:nat, (fact n <= fact (S n))%nat.
+Proof.
+  intro n. 
+  rewrite <- (Nat.mul_1_l (fact n)).
+  change (fact (S n)) with ((1+n)*fact n)%nat.
+  apply Nat.mul_le_mono_nonneg_r.
+  apply (Nat.le_trans _ 1).
+  auto. exact (lt_O_fact n).
+  apply le_n_S, le_0_n.
+Qed.
+
+Lemma fact_inc_recurse : forall p n:nat, (n <= p)%nat -> (fact n <= fact p)%nat.
+Proof.
+  induction p.
+  - intros. inversion H. apply le_refl.
+  - intros. apply Nat.le_succ_r in H. destruct H.
+    apply (Nat.le_trans (fact n) (fact p)).
+    apply IHp, H. apply fact_inc.
+    subst n. apply le_refl.
+Qed.
+
 (**
 ** Sine
 Sine is defined in terms of its alternating Taylor's series.
@@ -60,86 +99,253 @@ Sine is defined in terms of its alternating Taylor's series.
 Section SinSeries.
 Variable a:Q.
 
-Definition sinSequence := (mult_Streams (everyOther (tl Qrecip_factorials)) (powers_help (a^2) a)).
+(* (1,a) -> (3, -a^3/3!) -> ... *)
+Definition sinStream (px : positive*Q) : positive*Q
+  := let d := Pos.succ (fst px) in
+     (Pos.add 2 (fst px), - snd px * a * a * (1#(d*Pos.succ d))).
 
-Lemma Str_nth_sinSequence : forall n, (Str_nth n sinSequence == (1#P_of_succ_nat (pred (fact (1+2*n))))*a^(1+2*n)%nat)%Q.
+Lemma sinStream_fst : forall p,
+    fst (iterate _ sinStream p (1%positive, a)) ≡ Pos.succ (2*p).
 Proof.
- intros n.
- unfold sinSequence.
- unfold mult_Streams.
- rewrite Str_nth_zipWith.
- rewrite Str_nth_everyOther.
- change (tl Qrecip_factorials) with (Str_nth_tl 1 Qrecip_factorials).
- rewrite Str_nth_plus.
- rewrite plus_comm.
- rewrite Str_nth_Qrecip_factorials.
- rewrite -> (Str_nth_powers_help_int_pow _ (cast nat Z)).
- rewrite <- Qpower_mult.
- rewrite inj_plus.
- rewrite -> Qpower_plus';[|rewrite <- inj_plus; auto with *].
- rewrite inj_mult.
- reflexivity.
+  apply Pos.peano_ind.
+  - reflexivity.
+  - intros p H. rewrite iterate_succ. 
+    destruct (iterate (positive and Q) sinStream p (1%positive, a)).
+    simpl in H. subst p0.
+    transitivity (Pos.add 2 (p~1)). reflexivity.
+    clear q a. rewrite Pos.mul_succ_r.
+    rewrite <- Pos.add_1_l, (Pos.add_comm 1).
+    rewrite <- Pos.add_assoc. apply f_equal. reflexivity.
 Qed.
 
-(** Sine is first defined on [[0,1]]. *)
-Hypothesis Ha: 0 <= a <= 1.
-
-Lemma square_zero_one : 0 <= a^2 <= 1.
+(* The closed formula for the sine stream. *)
+Lemma Str_pth_sinStream : forall (p:positive),
+    Str_pth _ sinStream p (xH,a)
+    == (1#Pos.of_nat (fact (1+2*Pos.to_nat p))) * ((-1)^p*a^(1+2*p))%Q.
 Proof.
- split.
-  replace RHS with ((1*a)*a) by simpl; ring.
-  apply (sqr_nonneg Q_as_COrdField a).
- rewrite -> Qle_minus_iff.
- replace RHS with ((1-a)*(1+a)) by simpl; ring.
- destruct Ha as [Ha0 Ha1].
- apply: mult_resp_nonneg; [unfold Qminus|replace RHS with (a + - (-(1))) by simpl; ring];
-   rewrite <- Qle_minus_iff; try assumption.
- apply Qle_trans with 0.
-  discriminate.
- assumption.
+  apply Pos.peano_ind.
+  - unfold sinStream, Str_pth; simpl.
+    rewrite Qmult_comm. apply Qmult_comp. reflexivity.
+    rewrite <- Qmult_neg_1.
+    rewrite Qmult_assoc, Qmult_assoc.
+    reflexivity.
+  - intros p pInd. unfold Str_pth.
+    rewrite iterate_succ. unfold Str_pth in pInd.
+    pose proof (sinStream_fst p) as H0.
+    destruct (iterate (positive and Q) sinStream p (1%positive, a)) as [p0 q].
+    simpl in H0. subst p0. unfold snd in pInd. 
+    unfold sinStream, snd, fst.
+    rewrite pInd. clear pInd q.
+    (* Get rid of (-1)^p *)
+    rewrite <- (Qmult_comm ((-1) ^ Pos.succ p * a ^ (1 + 2 * Pos.succ p))).
+    rewrite <- (Pos.add_1_l p).
+    rewrite Pos2Z.inj_add, (Qpower_plus (-1)%Q).
+    simpl ((-1)^1). rewrite <- Qmult_neg_1.
+    do 5 rewrite <- (Qmult_assoc (-1)).
+    apply Qmult_comp. reflexivity.
+    rewrite (Qmult_comm (1 # Pos.of_nat (fact (1 + 2 * Pos.to_nat p)))).
+    do 5 rewrite <- (Qmult_assoc ((-1)^p)).
+    apply Qmult_comp. reflexivity.
+    (* Get rid of a *)
+    setoid_replace (a ^ (1 + 2 * (1 + p))) with (a ^ (1 + 2 * p) * (a * a)).
+    do 4 rewrite <- (Qmult_assoc (a ^ (1 + 2 * p))).
+    apply Qmult_comp. reflexivity.
+    rewrite <- (Qmult_assoc _ a a).
+    rewrite (Qmult_comm (1 # Pos.of_nat (fact (1 + 2 * Pos.to_nat p)))).
+    rewrite <- (Qmult_assoc (a*a)).
+    apply Qmult_comp. reflexivity.
+    (* Get rid of fact *)
+    unfold Qeq, Qmult, Qnum, Qden.
+    rewrite Z.mul_1_l, Z.mul_1_l.
+    rewrite <- (Pos2Nat.id (Pos.succ p~1 * Pos.succ (Pos.succ p~1))).
+    rewrite <- Nat2Pos.inj_mul.
+    2: apply fact_neq_0.
+    replace (fact (1 + 2 * Pos.to_nat (1 + p)))%nat
+      with (fact (1 + 2 * Pos.to_nat p) *
+            Pos.to_nat (Pos.succ p~1 * Pos.succ (Pos.succ p~1)))%nat.
+    reflexivity.
+    rewrite Nat.mul_comm.
+    replace (1 + 2 * Pos.to_nat (1 + p))%nat with (3 + 2 * Pos.to_nat p)%nat.
+    change (fact (3 + 2 * Pos.to_nat p))%nat
+      with ((3 + 2 * Pos.to_nat p)
+            * ((2 + 2 * Pos.to_nat p) * fact (1 + 2 * Pos.to_nat p)))%nat.
+    replace (Pos.to_nat (Pos.succ p~1 * Pos.succ (Pos.succ p~1)))%nat
+      with ((3 + 2 * Pos.to_nat p) * ((2 + 2 * Pos.to_nat p)))%nat.
+    rewrite Nat.mul_assoc.
+    reflexivity.
+    (* Finish equalities *)
+    rewrite Pos2Nat.inj_mul.
+    rewrite Nat.mul_comm. apply f_equal2.
+    rewrite Pos2Nat.inj_succ.
+    apply (f_equal S).
+    rewrite Pos2Nat.inj_xI. reflexivity.
+    rewrite Pos2Nat.inj_succ. apply (f_equal S).
+    rewrite Pos2Nat.inj_succ. apply (f_equal S).
+    rewrite Pos2Nat.inj_xI. reflexivity.
+    rewrite Pos2Nat.inj_add. simpl.
+    rewrite Nat.add_0_r, Nat.add_succ_r. reflexivity.
+    intro abs.
+    pose proof (Pos2Nat.is_pos (Pos.succ p~1 * Pos.succ (Pos.succ p~1))).
+    rewrite abs in H. inversion H.
+    rewrite <- (Qpower_plus_positive a 1 1).
+    rewrite <- (Qpower_plus_positive a (1+2*p)).
+    apply Qpower_positive_comp. reflexivity.
+    rewrite <- Pos.add_assoc.
+    apply f_equal. rewrite (Pos.add_comm 1 p).
+    reflexivity.
+    intro abs. discriminate.
 Qed.
 
-Lemma sinSequence_dnn : DecreasingNonNegative sinSequence.
-Proof. 
- apply mult_Streams_dnn.
-  apply _.
- apply powers_help_dnn.
-  apply square_zero_one; assumption.
- destruct Ha; assumption.
+(** Sine is first defined on [[-1,1]] by an alternating series. *)
+Lemma sinStream_alt : -1 <= a <= 1 -> Str_alt_decr _ sinStream (1%positive,a).
+Proof.
+  intro Ha. split.
+  - (* Replace a by Qabs a *)
+    rewrite Str_pth_sinStream, Str_pth_sinStream.
+    rewrite Qabs_Qmult, Qabs_Qmult, Qabs_Qmult, Qabs_Qmult.
+    rewrite Qabs_Qpower, Qabs_Qpower.
+    change (Qabs (-1)) with 1.
+    rewrite Qpower_1, Qpower_1, Qmult_1_l, Qmult_1_l.
+    rewrite (Qabs_Qpower a (1+2*Pos.succ p)), (Qabs_Qpower a (1+2*p)).
+    (* Finish inequality *)
+    setoid_replace (Qabs a ^ (1 + 2 * Pos.succ p)%positive)
+      with (Qabs a * Qabs a * Qabs a ^ (1 + 2 * p)%positive).
+    rewrite Qmult_assoc.
+    apply Qmult_le_compat_r.
+    2: rewrite <- Qabs_Qpower; apply Qabs_nonneg.
+    + rewrite Qmult_comm.
+      apply (Qabs_Qle_condition a 1) in Ha.
+      apply (Qle_trans _ (1* (1 # Pos.of_nat (fact (1 + 2 * Pos.to_nat (Pos.succ p)))))).
+      apply Qmult_le_compat_r. 2: discriminate.
+      apply (Qle_trans _ (1*Qabs a)).
+      apply Qmult_le_compat_r. exact Ha.
+      apply Qabs_nonneg. rewrite Qmult_1_l. exact Ha.
+      rewrite Qmult_1_l. unfold Qabs, Z.abs.
+      unfold Qle, Qnum, Qden.
+      rewrite Z.mul_1_l, Z.mul_1_l. 
+      apply Pos2Nat.inj_le.
+      rewrite Nat2Pos.id, Nat2Pos.id.
+      2: apply fact_neq_0. 2: apply fact_neq_0.
+      replace (1 + 2 * Pos.to_nat (Pos.succ p))%nat
+        with (2 + (1 + 2 * Pos.to_nat p))%nat
+        by (rewrite Pos2Nat.inj_succ; ring).
+      apply (Nat.le_trans _ _ _ (fact_inc _)).
+      apply fact_inc.
+    + replace (1 + 2 * Pos.succ p)%positive with (2 + (1 + 2 * p))%positive.
+      generalize (1 + 2 * p)%positive. clear p. intro p.
+      unfold Qpower.
+      rewrite Qpower_plus_positive. reflexivity.
+      rewrite Pos.add_comm, <- Pos.add_assoc. apply f_equal.
+      rewrite <- Pos.add_1_l. 
+      rewrite Pos.mul_add_distr_l, Pos.mul_1_r.
+      apply Pos.add_comm.
+  - rewrite Str_pth_sinStream, Str_pth_sinStream.
+    rewrite Qmult_comm, <- Qmult_assoc. apply Qmult_pos_neg.
+    discriminate. rewrite Qmult_comm, <- Qmult_assoc.
+    apply Qmult_pos_neg. discriminate.
+    rewrite <- Pos.add_1_l.
+    change ((-1) ^ (1 + p)%positive) with (Qpower_positive (-1) (1 + p)).
+    rewrite Qpower_plus_positive. simpl (Qpower_positive (-1) 1).
+    rewrite <- Qmult_assoc, <- Qmult_assoc.
+    rewrite Qmult_neg_1. apply (Qopp_le_compat 0). 
+    rewrite (Qmult_comm (a ^ (1 + 2 * (1 + p)%positive))).
+    rewrite Qmult_assoc, Qmult_assoc.
+    rewrite <- Qmult_assoc.
+    apply Qmult_le_0_compat.
+    apply Qsquare_pos.
+    setoid_replace (a ^ (1 + 2 * (1 + p))) with (a ^ (1 + 2 * p) * (a * a)).
+    rewrite Qmult_assoc.
+    apply Qmult_le_0_compat.
+    apply Qsquare_pos.
+    apply Qsquare_pos.
+    change (a*a) with (Qpower_positive a 2).
+    rewrite <- (Qpower_plus_positive a (1+2*p)).
+    change (a ^ (1 + 2 * (1 + p))) with (Qpower_positive a (1 + 2 * (1 + p))).
+    replace (1 + 2 * (1 + p))%positive with (1 + 2 * p + 2)%positive.
+    reflexivity.
+    rewrite <- Pos.add_assoc. apply f_equal.
+    rewrite Pos.mul_add_distr_l, Pos.mul_1_r.
+    apply Pos.add_comm.
 Qed.
 
-Lemma sinSequence_zl : Limit sinSequence 0.
+Lemma sinStream_zl
+  : -1 <= a <= 1
+    -> Limit_zero _ sinStream (xH,a)
+                 (fun e:Qpos => Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ (proj1_sig e)))))).
 Proof.
- unfold sinSequence.
- apply mult_Streams_zl with (1#1)%Qpos.
-  apply _.
- apply powers_help_nbz; try apply square_zero_one; assumption.
-Defined.
+  intro Ha.
+  intros [e epos]. rewrite Str_pth_sinStream, Qabs_Qmult, Qabs_Qmult.
+  rewrite Qabs_Qpower. change (Qabs (-1)) with 1.
+  rewrite Qpower_1, Qmult_1_l.
+  rewrite Qmult_comm.
+  apply (Qle_trans
+           _ (1 * Qabs (1 # Pos.of_nat (fact (1+2*(Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e))))))))))).
+  apply Qmult_le_compat_r. 2: apply Qabs_nonneg.
+  - rewrite (Qabs_Qpower
+               a (1 + 2 * Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ ` (e ↾ epos))))))).
+    apply Qpower_le_1. split.
+    apply Qabs_nonneg.
+    apply Qabs_Qle_condition, Ha.
+  - clear Ha a.
+    rewrite Qmult_1_l. unfold Qabs, Z.abs, proj1_sig.
+    rewrite <- (Qinv_involutive e) at 2.
+    assert (0 < /e) as H.
+    { apply Qinv_lt_0_compat, epos. }
+    apply (@Qinv_le_compat
+             (/e) ((Pos.of_nat (fact (1+2*(Pos.to_nat (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e))))))))) # 1)).
+    exact H.
+    apply (Qle_trans _ _ _ (Qceiling_fact_le H)).
+    generalize (Pos.succ (Z.to_pos (Z.log2_up (Qceiling (/ e))))).
+    clear H epos e. intro p.
+    unfold Qle, Qnum, Qden.
+    rewrite Z.mul_1_r, Z.mul_1_r.
+    apply Pos2Nat.inj_le.
+    rewrite Nat2Pos.id, Nat2Pos.id.
+    2: apply fact_neq_0. 2: apply fact_neq_0.
+    apply fact_inc_recurse. 
+    apply (Nat.le_trans (Pos.to_nat p) (1 + Pos.to_nat p)).
+    apply le_S, le_refl.
+    apply le_n_S.
+    rewrite <- (Nat.mul_1_l (Pos.to_nat p)) at 1.
+    apply Nat.mul_le_mono_nonneg_r.
+    apply le_0_n. apply le_S, le_refl.
+Qed.
 
 End SinSeries.
 
-Definition rational_sin_small_pos (a:Q) (p: 0 <= a <= 1) : CR :=
- @InfiniteAlternatingSum _ (sinSequence_dnn p) (sinSequence_zl p).
+Definition rational_sin_small (a:Q) (p: -1 <= a <= 1) : CR :=
+  (inject_Q_CR a + AltSeries _ (sinStream a) (xH,a) _
+                             (sinStream_alt p) (sinStream_zl p))%CR.
 
-Lemma rational_sin_small_pos_correct : forall (a:Q) Ha,
- (@rational_sin_small_pos a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
+Lemma rational_sin_small_correct : forall (a:Q) (Ha : -1 <= a <= 1),
+    (@rational_sin_small a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
- intros a Ha.
- unfold rational_sin_small_pos.
- simpl.
- generalize (fun_series_conv_imp_conv (inj_Q IR a) (inj_Q IR a)
+  intros a Ha.
+  unfold rational_sin_small.
+  simpl.
+  generalize (fun_series_conv_imp_conv (inj_Q IR a) (inj_Q IR a)
    (leEq_reflexive IR (inj_Q IR a)) sin_ps
      (sin_conv (inj_Q IR a) (inj_Q IR a) (leEq_reflexive IR (inj_Q IR a))
        (compact_single_iprop realline (inj_Q IR a) I)) (inj_Q IR a)
          (compact_single_prop (inj_Q IR a))
            (fun_series_inc_IR realline sin_ps sin_conv (inj_Q IR a) I)).
- intros H.
- rewrite -> InfiniteAlternatingSum_correct'.
- apply IRasCR_wd.
- unfold series_sum.
- apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
+  intros H.
+  (* Replace AltSeries by IRasCR (series_sum ...) *)
+  rewrite <- (IR_inj_Q_as_CR a).
+  rewrite
+       (AltSeries_correct
+          _ _ _ _ (sinStream_alt Ha) (sinStream_zl Ha)
+          _ (AltSeries_convergent_0 _ _ _ _ (inj_Q IR a)
+                                    (sinStream_alt Ha) (sinStream_zl Ha))).
+  apply IRasCR_wd.
+ - (* Prove the 2 series are equal in IR.
+    We need to sum twice as many terms in sin_seq, to get rid of
+    the zeros at even indexes. *) 
+   unfold series_sum.
+   apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
    intros; omega.
   intros n; exists (S n); omega.
+  (* Prove that the partial sums until n are equal. *)
  intros n.
  induction n.
   apply eq_reflexive.
@@ -153,21 +359,21 @@ Proof.
          nexp IR n' (inj_Q IR a[-][0])[+] (sin_seq (S n')[/]nring (R:=IR) (fact n' + n' * fact n')[//]
            nring_fac_ap_zero IR (S n'))[*] (nexp IR n' (inj_Q IR a[-][0])[*](inj_Q IR a[-][0])))).
  apply bin_op_wd_unfolded.
-  assumption.
- rstepl ([0][+]inj_Q IR ((- (1)) ^ n * Str_nth n (sinSequence a))).
+ assumption.
+ rewrite <- cm_lft_unit.
  unfold sin_seq.
  apply bin_op_wd_unfolded.
-  destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
-   rational.
-  elim (not_even_and_odd n').
-   apply (even_mult_l 2 n).
-   repeat constructor.
-  rewrite Hm.
-  constructor.
-  replace (m + m)%nat with (2*m)%nat by omega.
-  apply (even_mult_l 2 m).
-  repeat constructor.
- destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
+   + destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
+     rational.
+     elim (not_even_and_odd n').
+     apply (even_mult_l 2 n).
+     repeat constructor.
+     rewrite Hm.
+     constructor.
+     replace (m + m)%nat with (2*m)%nat by omega.
+     apply (even_mult_l 2 m).
+     repeat constructor.
+   + destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
   elim (not_even_and_odd (S n')).
    rewrite Hm.
    replace (m + m)%nat with (2*m)%nat by omega.
@@ -180,9 +386,23 @@ Proof.
  unfold n' in H1.
  replace m with n by omega.
  clear Hm H1.
- stepl ((inj_Q IR ((-(1))^n))[*](inj_Q IR (Str_nth n (sinSequence a)))); [| now
-   (apply eq_symmetric; apply inj_Q_mult)].
- change (inj_Q IR ((- (1)) ^ n)[*]inj_Q IR (Str_nth n (sinSequence a))[=]
+ (* Unfold sinStream *)
+ transitivity (inj_Q IR ((1#Pos.of_nat (fact (1+2*n))) * ((-1)^n*a^(1+2*n))%Q)).
+ clear IHn H. destruct n. simpl.
+ apply inj_Q_wd. rewrite Qmult_1_l, Qmult_1_l. reflexivity.
+ apply inj_Q_wd. rewrite Str_pth_sinStream.
+ rewrite Nat2Pos.id. 2: discriminate. 
+ replace (Z.pos (Pos.of_nat (S n))) with (Z.of_nat (S n)).
+ reflexivity.
+ simpl. destruct n. reflexivity.
+ rewrite <- Pos.succ_of_nat. reflexivity. discriminate.
+ (* Get rid of (-1)^n *)
+ transitivity (inj_Q IR ((-(1))^n) [*] (inj_Q IR (a ^ (1 + 2 * n)) [*] inj_Q IR (1 # Pos.of_nat (fact (1 + 2 * n))))).
+ rewrite <- inj_Q_mult, <- inj_Q_mult.
+ apply inj_Q_wd. rewrite Qmult_comm. rewrite Qmult_assoc. reflexivity.
+ change (inj_Q IR ((- (1)) ^ n) [*] (inj_Q IR (a ^ (1 + 2 * n))
+  [*] inj_Q IR (1 # Pos.of_nat (fact (1 + 2 * n))))
+               [=]
    (nexp IR n [--][1][/]nring (R:=IR) (fact (S n'))[//]nring_fac_ap_zero IR (S n'))[*]
      (nexp IR (S n') (inj_Q IR a[-][0]))).
  rstepr ((nexp IR n [--][1][*](nexp IR (S n') (inj_Q IR a[-][0])[/]nring (R:=IR) (fact (S n'))[//]
@@ -197,11 +417,18 @@ Proof.
   rstepr (nring 1:IR).
   apply (inj_Q_nring IR 1).
  stepr (inj_Q IR ((1/P_of_succ_nat (pred (fact (1+2*n))))*a^(1+2*n)%nat)).
+ rewrite <- inj_Q_mult.
   apply inj_Q_wd.
-  simpl.
-  rewrite -> Str_nth_sinSequence.
-  rewrite -> Qmake_Qdiv.
-  reflexivity.
+  rewrite Qmult_comm.
+  apply Qmult_comp.
+  replace (1 + 2 * Z.of_nat n)%Z with (Z.of_nat (1 + 2 * n)).
+  reflexivity. rewrite <- (Nat2Z.inj_mul 2), <- (Nat2Z.inj_add 1).
+  reflexivity. pose proof (fact_neq_0 (1+2*n)).
+  destruct (fact (1+2*n)). exfalso; apply H0; reflexivity.
+  simpl. destruct n0. reflexivity.
+  rewrite <- Pos2SuccNat.id_succ, Nat2Pos.id.
+  reflexivity. discriminate.
+  (* Finish equality *)
  rstepr ((nring 1[/]nring (R:=IR) (fact (S n'))[//]
    nring_fac_ap_zero IR (S n'))[*](nexp IR (S n') (inj_Q IR a[-][0]))).
  change (1+2*n)%nat with (S n').
@@ -247,9 +474,13 @@ Proof.
  change (inj_Q IR a[^]S n'[=](inj_Q IR a[-][0])[^]S n').
  apply nexp_wd.
  rational.
+- intro p.
+  pose proof (Pos2Nat.is_pos p). destruct (Pos.to_nat p) eqn:des.
+  exfalso; inversion H0.
+  rewrite <- des. rewrite Pos2Nat.id. reflexivity. 
 Qed.
 
-(** Sine's range can then be extended to [[0,3^n]] by [n] applications
+(** Sine's range can then be extended to [[-3^n,3^n]] by [n] applications
 of the identity [sin(x) = 3*sin(x/3) - 4*(sin(x/3))^3]. *)
 Section Sin_Poly.
 
@@ -334,9 +565,12 @@ Qed.
 Definition sin_poly_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction sin_poly_prf.
 
-Definition sin_poly : CR --> CR := uc_compose compress (Cmap QPrelengthSpace sin_poly_uc).
+Definition sin_poly : CR --> CR
+  := uc_compose compress (Cmap QPrelengthSpace sin_poly_uc).
 
-Lemma sin_poly_correct : forall x, AbsSmall (inj_Q IR (1)) x -> (IRasCR (Three[*]x[-]Four[*]x[^]3)==sin_poly (IRasCR x))%CR.
+Lemma sin_poly_correct : forall x,
+    AbsSmall (inj_Q IR (1)) x
+    -> (IRasCR (Three[*]x[-]Four[*]x[^]3)==sin_poly (IRasCR x))%CR.
 Proof.
  intros x Hx.
  assert (Y:Continuous (clcr (inj_Q IR (-(1))) (inj_Q IR (1:Q))) ((Three:IR){**}FId{-}(Four:IR){**}FId{^}3)).
@@ -389,34 +623,35 @@ Proof.
  apply FFT.
 Qed.
 
-Lemma shrink_by_three : forall n a, 0 <= a <= (3^(S n))%Z -> 0 <= a/3 <= (3^n)%Z.
+Lemma shrink_by_three : forall n a,
+    -(3^(S n))%Z <= a <= (3^(S n))%Z -> -(3^n)%Z <= a/3 <= (3^n)%Z.
 Proof.
- intros n a [H0 H1].
- split.
-  apply: mult_resp_nonneg.
-   assumption.
+  intros n a H0.
+  apply AbsSmall_Qabs. apply AbsSmall_Qabs in H0.
+  apply Qmult_lt_0_le_reg_r with (Qabs 3).
+  reflexivity. rewrite <- Qabs_Qmult.
+  unfold Qdiv. rewrite <- Qmult_assoc.
+  setoid_replace (/ 3 * 3) with 1 by reflexivity.
+  rewrite Qmult_1_r.
+  apply (Qle_trans _ _ _ H0). clear H0.
+  change (Qabs 3) with (inject_Z 3).
+  rewrite <- (inject_Z_mult (3^n) 3).
+  rewrite <- Zle_Qle.
+  change (S n) with (1+n)%nat.
+  rewrite (Nat2Z.inj_add 1 n).
+  rewrite ZBinary.Z.pow_add_r, Z.mul_comm.
+  apply Z.le_refl.
   discriminate.
- apply Qmult_lt_0_le_reg_r with 3.
-  constructor.
- rewrite -> Zpower_Qpower; auto with *.
- rewrite (inj_S n) in H1.
- replace RHS with (3%positive^n*3^1) by simpl; ring.
- rewrite <- Qpower_plus;[|discriminate].
- replace LHS with a by (simpl; field; discriminate).
- rewrite -> Zpower_Qpower in H1; auto with *.
+  apply (Nat2Z.inj_le 0), le_0_n.
 Qed.
 
-Fixpoint rational_sin_pos_bounded (n:nat) (a:Q) : 0 <= a <= (3^n)%Z -> CR :=
-match n return 0 <= a <= (3^n)%Z -> CR with
-| O => @rational_sin_small_pos a
-| S n' =>
-  match (Qlt_le_dec_fast 1 a) with
-  | left _ => fun H => sin_poly (rational_sin_pos_bounded n' (shrink_by_three n' H))
-  | right H' => fun H => rational_sin_small_pos (conj (proj1 H) H')
-  end
+Fixpoint rational_sin_bounded (n:nat) (a:Q) : -(3^n)%Z <= a <= (3^n)%Z -> CR :=
+match n return -(3^n)%Z <= a <= (3^n)%Z -> CR with
+| O => @rational_sin_small a
+| S n' => fun H => sin_poly (rational_sin_bounded n' (shrink_by_three n' H))
 end.
 
-Lemma rational_sin_pos_bounded_correct_aux a :
+Lemma rational_sin_bounded_correct_aux a :
   (sin_poly (IRasCR (Sin (inj_Q IR (a / 3)))) == IRasCR (Sin (inj_Q IR a)))%CR. 
 Proof.
  rewrite <- sin_poly_correct; [|apply AbsIR_imp_AbsSmall;
@@ -439,58 +674,50 @@ Proof.
  apply Sin_triple_angle.
 Qed.
 
-Lemma rational_sin_pos_bounded_correct :  forall n (a:Q) Ha,
- (@rational_sin_pos_bounded n a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
+Lemma rational_sin_bounded_correct :
+  forall (n:nat) (a:Q) (Ha : -(3^n #1) <= a <= (3^n #1)),
+    (@rational_sin_bounded n a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
  induction n.
-  apply rational_sin_small_pos_correct.
+  apply rational_sin_small_correct.
  intros a Ha.
- unfold rational_sin_pos_bounded; fold rational_sin_pos_bounded.
- destruct (Qlt_le_dec_fast 1 a);[|apply rational_sin_small_pos_correct].
+ unfold rational_sin_bounded; fold rational_sin_bounded.
  rewrite -> IHn.
- apply rational_sin_pos_bounded_correct_aux.
+ apply rational_sin_bounded_correct_aux.
 Qed.
 End Sin_Poly.
 
-(** Therefore sin works on all nonnegative numbers. *)
-Definition rational_sin_pos (a:Q) (Ha:0 <= a) : CR :=
- @rational_sin_pos_bounded _ a (conj Ha (power3bound a)).
+Definition sin_bound (q:Q) : nat := Z.abs_nat (1 + Qdlog 3 (Qabs q)).
 
-Lemma rational_sin_pos_correct : forall (a:Q) Ha,
- (@rational_sin_pos a Ha == IRasCR (Sin (inj_Q IR a)))%CR.
+Lemma sin_bound_correct : forall q, -(3 ^ sin_bound q #1) ≤ q ≤ (3 ^ sin_bound q #1).
 Proof.
- intros; apply rational_sin_pos_bounded_correct.
-Qed.
+  intro q.
+  apply AbsSmall_Qabs.
+  unfold sin_bound.
+  destruct (Qlt_le_dec (Qabs q) 1).
+  - apply (Qle_trans _ 1).
+    apply Qlt_le_weak, q0.
+    rewrite Qdlog2_le1; simpl; try easy.
+    apply Qlt_le_weak, q0.
+  - assert (2 ≤ 3%Z) as H by discriminate. 
+    pose proof (Qdlog_spec 3 (Qabs q) H q0) as [_ H0]. clear H.
+    unfold additional_operations.pow, stdlib_rationals.Q_pow in H0.
+    assert (0 <= 1 + Qdlog 3 (Qabs q))%Z.
+    { apply semirings.nonneg_plus_compat; [easy | now apply Qdlog_bounded_nonneg]. }
+    rewrite inj_Zabs_nat, Z.abs_eq.
+    apply Qlt_le_weak.
+    rewrite <- Zpower_Qpower in H0. apply H0.
+    exact H. exact H.
+Qed. 
 
-(** By symmetry sin is extented to its entire range. *)
+(** Therefore sin works on all real numbers. *)
 Definition rational_sin (a:Q) : CR :=
-match (Qle_total 0 a) with
-| left H => rational_sin_pos H
-| right H => (-rational_sin_pos (Qopp_le_compat _ _ H))%CR
-end.
-
-Lemma rational_sin_correct_aux (a : Q) :
- (- IRasCR (Sin (inj_Q IR (- a)%Q)) == IRasCR (Sin (inj_Q IR a)))%CR.
-Proof.
- rewrite <- IR_opp_as_CR.
- apply IRasCR_wd.
- csetoid_rewrite_rev (Sin_inv (inj_Q IR (-a))).
- apply Sin_wd.
- csetoid_rewrite_rev (inj_Q_inv IR (-a)).
- apply inj_Q_wd.
- simpl.
- ring.
-Qed.
+  rational_sin_bounded (sin_bound a) (sin_bound_correct a).
 
 Lemma rational_sin_correct : forall (a:Q),
- (@rational_sin a == IRasCR (Sin (inj_Q IR a)))%CR.
+    (rational_sin a == IRasCR (Sin (inj_Q IR a)))%CR.
 Proof.
- intros a.
- unfold rational_sin.
- destruct (Qle_total 0 a).
-  apply rational_sin_pos_correct.
- rewrite -> rational_sin_pos_correct.
- apply rational_sin_correct_aux.
+ intros; apply rational_sin_bounded_correct.
 Qed.
 
 Instance: Proper ((=) ==> (=)) rational_sin.
@@ -504,7 +731,20 @@ Lemma rational_sin_poly (a : Q) :
   sin_poly (rational_sin (a / 3)) = rational_sin a.
 Proof.
  rewrite ?rational_sin_correct.
- apply rational_sin_pos_bounded_correct_aux.
+ apply rational_sin_bounded_correct_aux.
+Qed.
+
+Lemma rational_sin_correct_aux (a : Q) :
+  (- IRasCR (Sin (inj_Q IR (- a)%Q)) == IRasCR (Sin (inj_Q IR a)))%CR.
+Proof.
+ rewrite <- IR_opp_as_CR.
+ apply IRasCR_wd.
+ csetoid_rewrite_rev (Sin_inv (inj_Q IR (-a))).
+ apply Sin_wd.
+ csetoid_rewrite_rev (inj_Q_inv IR (-a)).
+ apply inj_Q_wd.
+ simpl.
+ ring.
 Qed.
 
 Lemma rational_sin_opp (a : Q) :
