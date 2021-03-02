@@ -89,6 +89,7 @@ Proof.
   rewrite <- nat_of_P_o_P_of_succ_nat_eq_succ in H.
   apply nat_of_P_inj; symmetry; assumption.
  unfold list_Q.
+ intro H.
  rewrite -> in_flat_map.
  exists (Z.abs_nat c, Z.abs_nat d).
  split.

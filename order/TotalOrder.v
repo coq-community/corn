@@ -54,9 +54,9 @@ Hypothesis Hf : monotone X f.
 
 Add Morphism f with signature (@st_eq X) ==> (@st_eq X)  as monotone_compat.
 Proof.
- revert Hf;rewrite -> monotone_def;intros.
- revert H0; do 2 rewrite -> equiv_le_def.
- firstorder.
+  revert Hf;rewrite -> monotone_def;intros Hf ??.
+  do 2 rewrite -> equiv_le_def.
+  firstorder.
 Qed.
 
 (** meet distributes over any monotone function. *)
