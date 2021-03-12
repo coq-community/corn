@@ -48,9 +48,9 @@ Here we resume the results proved in four different files.  The aim is to prove 
 %\noindent\textbf{%#<b>#Theorem#</b>#%}% Let [f] be a continuous function on a
 compact interval [[a,b]] with modulus of continuity%\footnote{%# (#From our
 point of view, the modulus of continuity is simply the proof that [f] is
-continuous.#)#%}% [omega].
+continuous.#)#%}% [lia].
 Let [P] be a partition of [[a,b]] and [eps [>] [0]] be such that
-[mesh(P)  [<]  omega(eps)].
+[mesh(P)  [<]  lia(eps)].
 Then
 %\[\left|S(f,P)-\int_a^bf(x)dx\right|\leq\varepsilon(b-a),\]%#|S(f,P)-&int;f(x)dx|&le;&epsilon;(b-a)#
 where [S(f,P)] denotes any sum of the function [f] respecting the partition

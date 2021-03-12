@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.ftc.RefLemma.
+From Coq Require Import Lia.
 
 (** printing integral %\ensuremath{\int_I}% #&int;<sub>I</sub># *)
 (** printing Integral %\ensuremath{\int_I}% #&int;<sub>I</sub># *)
@@ -730,7 +731,7 @@ Variable Q : Partition Hcb m.
 (* begin hide *)
 Lemma partition_join_aux : forall i n m, n < i -> i <= S (n + m) -> i - S n <= m.
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 (* end hide *)
 
@@ -818,8 +819,8 @@ Proof.
     apply eq_symmetric_unfolded; apply start.
    apply prf1; auto with arith.
   elimtype False; apply le_not_lt with n i; auto with arith.
- cut (i - n = S (i - S n)); [ intro | omega ].
- cut (S (i - S n) <= m); [ intro | omega ].
+ cut (i - n = S (i - S n)); [ intro | lia ].
+ cut (S (i - S n) <= m); [ intro | lia ].
  apply leEq_wdr with (Q _ H1).
   apply prf2.
  apply prf1; auto.
@@ -872,7 +873,7 @@ Hypothesis HfQ' : nat_less_n_fun fQ.
 (* begin hide *)
 Lemma partition_join_aux' : forall i n m, n < i -> i < S (n + m) -> i - S n < m.
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 (* end hide *)
 
@@ -983,8 +984,8 @@ Proof.
    2: apply eq_symmetric_unfolded; apply pjp_2; auto.
   algebra.
  cut (n < j); [ intro | rewrite <- H; assumption ].
- cut (i - S n < m); [ intro | omega ].
- cut (j - S n < m); [ intro | omega ].
+ cut (i - S n < m); [ intro | lia ].
+ cut (j - S n < m); [ intro | lia ].
  eapply eq_transitive_unfolded.
   apply pjp_3 with (Hi' := H1); assumption.
  eapply eq_transitive_unfolded.
@@ -1015,7 +1016,7 @@ Proof.
      | elimtype False; apply le_not_lt with i n; auto with arith ].
   intros; apply mult_wd.
    apply pfwdef.
-   cut (i = S (n + i) - S n); [ intro | omega ].
+   cut (i = S (n + i) - S n); [ intro | lia ].
    generalize Hi; clear Hi; pattern i at 1 2 in |- *; rewrite H; intro.
    apply eq_symmetric_unfolded; apply pjp_3; auto with arith.
   apply cg_minus_wd; simpl in |- *.
@@ -1085,7 +1086,7 @@ Proof.
    cut (n - n = 0); [ intro | auto with arith ].
    rewrite H1; intros; apply start.
   apply finish.
- cut (i - n = S (i - S n)); [ intro | omega ].
+ cut (i - n = S (i - S n)); [ intro | lia ].
  cut (forall H, Q (i - n) H[-]Q _ (partition_join_aux _ _ _ b1 Hi) [<=] Max (Mesh P) (Mesh Q)); auto.
  rewrite H0; intros; eapply leEq_transitive.
   apply Mesh_lemma.
@@ -1198,7 +1199,7 @@ Proof.
       unfold Partition_imp_points in |- *; apply prf1.
       auto with arith.
      apply cg_minus_wd; simpl in |- *.
-      apply eq_symmetric_unfolded; apply pjf_3; [ auto with arith | omega ].
+      apply eq_symmetric_unfolded; apply pjf_3; [ auto with arith | lia ].
      apply eq_symmetric_unfolded; apply pjf_3; auto with arith.
     intro; apply x_mult_zero.
     astepr (c[-]c).

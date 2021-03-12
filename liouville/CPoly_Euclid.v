@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import CPoly_Degree Omega.
+Require Import CPoly_Degree Lia.
 Import CRing_Homomorphisms.coercions.
 
 Set Implicit Arguments.
@@ -37,13 +37,13 @@ Lemma degree_poly_div : forall (m n : nat) (f g : cpoly CR),
 Proof.
  intros m n f g f1 ge_m_n df dg p Hp; unfold f1; clear f1.
  rewrite -> nth_coeff_minus, nth_coeff_c_mult_p, nth_coeff_c_mult_p, nth_coeff_mult.
- rewrite -> (Sum_term _ _ _ (S m - n)); [ | omega | omega | intros ].
+ rewrite -> (Sum_term _ _ _ (S m - n)); [ | lia | lia | intros ].
   rewrite -> nth_coeff_nexp_eq.
   destruct Hp.
-   replace (S m - (S m - n)) with n by omega.
+   replace (S m - (S m - n)) with n by lia.
    unfold cg_minus. ring.
-  rewrite -> (dg (S m0 - (S m - n))); [ | omega].
-  rewrite -> df; [ unfold cg_minus; ring | omega].
+  rewrite -> (dg (S m0 - (S m - n))); [ | lia].
+  rewrite -> df; [ unfold cg_minus; ring | lia].
  rewrite nth_coeff_nexp_neq. ring. assumption.
 Qed.
 
@@ -58,18 +58,18 @@ Proof.
   exists (([0] : cpoly_cring CR),f).
    rewrite <- H.
    simpl (nth_coeff (S n) g[^]0). rewrite <- c_one. ring.
-  replace n with m by omega; assumption.
+  replace n with m by lia; assumption.
  set (f1 := (_C_ (nth_coeff (S n) g) [*] f [-] _C_ (nth_coeff m f) [*] ((_X_ [^] (m - (S n))) [*] g))).
- destruct (IHp (m - 1) n) with (f := f1) (g := g); [ omega | | assumption | omega | ].
+ destruct (IHp (m - 1) n) with (f := f1) (g := g); [ lia | | assumption | lia | ].
   unfold f1; clear f1.
-  assert (HypTmp : m = S (m - 1)); [ omega | rewrite HypTmp; rewrite <- HypTmp at 1 ].
-  apply degree_poly_div; [ omega | rewrite <- HypTmp; assumption | assumption ].
+  assert (HypTmp : m = S (m - 1)); [ lia | rewrite HypTmp; rewrite <- HypTmp at 1 ].
+  apply degree_poly_div; [ lia | rewrite <- HypTmp; assumption | assumption ].
  destruct x as [q1 r1].
  exists (q1 [+] _C_ ((nth_coeff (S n) g)[^](m - S n) [*] (nth_coeff m f)) [*] _X_ [^] (m - S n), r1); [ | assumption].
  unfold f1 in y.
  rewrite -> ring_distl_unfolded. rewrite <- plus_assoc_unfolded. rewrite -> (cag_commutes _ _ r1). rewrite -> plus_assoc_unfolded. rewrite  <- y.
- replace (m - n) with (S (m - S n)) by omega.
- replace (m - 1 - n) with (m - S n) by omega.
+ replace (m - n) with (S (m - S n)) by lia.
+ replace (m - 1 - n) with (m - S n) by lia.
  rewrite <- nexp_Sn.
  generalize (nth_coeff (S n) g) (nth_coeff m f) (m - S n).
  intros. rewrite c_mult, c_mult. unfold cg_minus. ring.

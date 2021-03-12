@@ -50,6 +50,7 @@ Require Export Coq.ZArith.ZArith.
 Require Export Coq.setoid_ring.ZArithRing.
 Require Export Coq.Arith.Div2.
 Require Export Coq.Arith.Wf_nat.
+From Coq Require Import Lia.
 
 Set Automatic Introduction.
 
@@ -730,7 +731,7 @@ Section Natural_Numbers.
 (**
 ** Algebraic Properties
 
-We now present a series of trivial things proved with [Omega] that are
+We now present a series of trivial things proved with [Lia] that are
 stated as lemmas to make proofs shorter and to aid in auxiliary
 definitions.  Giving a name to these results allows us to use them in
 definitions keeping conciseness.
@@ -765,7 +766,7 @@ Qed.
 Lemma lt_10 : forall i m n : nat,
  0 < i -> i < pred (m + n) -> pred i < pred m + pred n.
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 
 Lemma lt_pred' : forall m n : nat, 0 < m -> m < n -> pred m < pred n.
@@ -788,7 +789,7 @@ Qed.
 
 Lemma le_2 : forall i j : nat, i < j -> i <= pred j.
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 
 Lemma plus_eq_one_imp_eq_zero : forall m n : nat,
@@ -797,12 +798,12 @@ Proof.
  intros m n H.
  elim (le_lt_dec m 0); intro.
   left; auto with arith.
- right; omega.
+ right; lia.
 Qed.
 
 Lemma not_not_lt : forall i j : nat, ~ ~ i < j -> i < j.
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 
 Lemma plus_pred_pred_plus :
@@ -810,7 +811,7 @@ Lemma plus_pred_pred_plus :
   k <= pred i + pred j ->
   k <= pred (i + j).
 Proof.
- intros; omega.
+ intros; lia.
 Qed.
 
 (** We now prove some properties of functions on the natural numbers.
@@ -833,7 +834,7 @@ Lemma nat_local_mon_imp_mon :
 Proof.
  intros H i j H0.
  induction  j as [| j Hrecj].
-  elimtype False; omega.
+  elimtype False; lia.
  cut (i <= j); [ intro H1 | auto with arith ].
  elim (le_lt_eq_dec _ _ H1); intro H2.
   cut (h i < h j); [ intro | apply Hrecj; assumption ].
@@ -863,8 +864,8 @@ Lemma nat_mon_imp_inj : (forall i j : nat, i < j -> h i < h j) ->
  forall i j : nat, h i = h j -> i = j.
 Proof.
  intros H i j H0.
- cut (~ i <> j); [ omega | intro H1 ].
- cut (i < j \/ j < i); [ intro H2 | omega ].
+ cut (~ i <> j); [ lia | intro H1 ].
+ cut (i < j \/ j < i); [ intro H2 | lia ].
  inversion_clear H2.
   cut (h i < h j); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
  cut (h j < h i); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
@@ -956,7 +957,7 @@ Proof.
   cut (k 0 = k 1).
    intro H2.
    repeat split.
-     omega.
+     lia.
     assumption.
    rewrite <- H1.
    auto.
@@ -968,7 +969,7 @@ Proof.
  elim (Hrecn (fun m : nat => k (S (S m)))).
    3: intro; apply H0.
   intros m Hm.
-  exists (S (S m)); omega.
+  exists (S (S m)); lia.
  intro i.
  split.
   elim (H (S (S i))); auto.
@@ -976,13 +977,13 @@ Proof.
   elim H2; intro H3.
    generalize (H0 0); intro H4.
    generalize (H0 1); intro H5.
-   omega.
+   lia.
   tauto.
  generalize (H 0); intro H3.
  elim H3; intros H4 H5.
  generalize (lt_le_trans _ _ _ H2 H5); intro H6.
  cut (k 2 <= n).
-  2: omega.
+  2: lia.
  intro H7.
  induction  i as [| i Hreci].
   assumption.
@@ -1118,7 +1119,7 @@ Proof.
    exists m.
    unfold P' in Hm'.
    exists (le_S _ _ Hm).
-   eapply H with (i := m); [ omega | apply Hm' ].
+   eapply H with (i := m); [ lia | apply Hm' ].
   right.
   intros i H5.
   unfold Q' in H4.
@@ -1500,7 +1501,7 @@ Proof.
  intros m H.
  symmetry  in |- *.
  apply S_pred with 0.
- omega.
+ lia.
 Qed.
 
 Lemma absolu_1 : forall x : Z, Z.abs_nat x = 0 -> x = 0%Z.
@@ -1615,7 +1616,7 @@ Proof.
   apply Zlt_opp.
   apply Z.gt_lt.
   assumption.
- omega.
+ lia.
 Qed.
 
 Lemma Zmult_Sm_Sn : forall m n : Z,

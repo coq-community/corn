@@ -34,6 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 Require Export CoRN.algebra.COrdFields.
+From Coq Require Import Lia.
 
 (** printing one_div_succ %\ensuremath{\frac1{\cdot+1}}% *)
 (** printing Half %\ensuremath{\frac12}% #&frac12;# *)
@@ -1014,7 +1015,7 @@ Proof.
   astepr ((x[^]2)[^]m).
   apply nexp_resp_pos.
   apply pos_square. auto.
-  rewrite y. unfold double in |- *. omega.
+  rewrite y. unfold double in |- *. lia.
 Qed.
 
 

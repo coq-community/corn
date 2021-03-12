@@ -42,6 +42,7 @@
 
 Require Export CoRN.algebra.CAbGroups.
 Require Export Coq.Arith.Peano_dec.
+From Coq Require Import Lia.
 
 (**
 * Sums
@@ -578,12 +579,12 @@ Proof.
    astepr ([0][+]a (S m)).
    apply bin_op_wd_unfolded.
     apply Sum_zero. rewrite Hm; auto.
-     intros i H3 H4. apply H1. auto. omega. omega.
+     intros i H3 H4. apply H1. auto. lia. lia.
     algebra.
   rewrite <- H2 in H. rewrite <- H2.
   inversion H. algebra.
   apply Sum_zero. auto with arith.
-  intros. apply H1. omega. omega. auto.
+  intros. apply H1. lia. lia. auto.
 Qed.
 
 Lemma Sum0_shift : forall f g n, (forall i, f i [=] g (S i)) -> g 0[+]Sum0 n f [=] Sum0 (S n) g.
@@ -736,7 +737,7 @@ Proof.
    apply Sum_wd'.
     auto with arith.
    intros i H1 H2.
-   cut (i < n); [ intro | omega ].
+   cut (i < n); [ intro | lia ].
    eapply eq_transitive_unfolded.
     apply part_tot_nat_fun_ch1 with (Hi := H0).
     red in |- *; intros; apply Hf; auto.

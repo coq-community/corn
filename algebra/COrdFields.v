@@ -54,6 +54,7 @@
 Require Export CoRN.tactics.FieldReflection.
 Require Export CoRN.tactics.Rational.
 Require Export CoRN.algebra.CSetoids.
+From Coq Require Import Lia.
 
 (* ORDERED FIELDS *)
 
@@ -560,7 +561,7 @@ Qed.
 Lemma nring_fac_ap_zero : forall n : nat, nring (R:=R) (fact n) [#] [0].
 Proof.
  intro n; apply nring_ap_zero. cut (0 < fact n).
- omega.
+ lia.
  apply lt_O_fact.
 Qed.
 
@@ -814,7 +815,7 @@ Proof.
  unfold Char0 in |- *.
  intros.
  apply nring_ap_zero.
- omega.
+ lia.
 Qed.
 
 End consequences_of_infinity.

@@ -38,6 +38,7 @@
 
 Require Export CoRN.ftc.COrdLemmas.
 Require Export CoRN.ftc.Partitions.
+From Coq Require Import Lia.
 
 Section Refining_Separated.
 
@@ -241,7 +242,7 @@ Proof.
     algebra.
    elimtype False; inversion b0.
   apply eq_symmetric_unfolded; apply partition_length_zero with Hab.
-  cut (m + n <= 1); [ intro | omega ].
+  cut (m + n <= 1); [ intro | lia ].
   elim (plus_eq_one_imp_eq_zero _ _ H0); intro.
    rewrite <- a1; apply R.
   rewrite <- b1; apply P.
@@ -393,7 +394,7 @@ Proof.
   elim (le_lt_dec j 0); intros; simpl in |- *.
    apply lt_le_trans with j; try apply le_lt_trans with i; auto with arith.
   elim (le_lt_dec n j); intros; simpl in |- *.
-   omega.
+   lia.
   apply lt_O_Sn.
  elim (le_lt_dec n i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (lt_irrefl 0); apply lt_le_trans with j; try apply le_lt_trans with i; auto with arith.
@@ -584,7 +585,7 @@ Proof.
   elim (le_lt_dec j 0); intros; simpl in |- *.
    apply le_lt_trans with i; try apply lt_le_trans with j; auto with arith.
   elim (le_lt_dec m j); intros; simpl in |- *.
-   omega.
+   lia.
   apply lt_O_Sn.
  elim (le_lt_dec m i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (lt_irrefl 0); apply le_lt_trans with i; try apply lt_le_trans with j; auto with arith.

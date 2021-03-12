@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.transc.TaylorSeries.
+From Coq Require Import Lia.
 
 (**
 * The Trigonometric Functions
@@ -104,7 +105,7 @@ Proof.
   unfold cos_seq in |- *.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p; intros; simpl in |- *.
-   cut (x = 0); [ intro | omega ].
+   cut (x = 0); [ intro | lia ].
    rewrite H1; simpl in |- *; rational.
   elimtype False; inversion b.
  set (n := S m) in *.
@@ -168,13 +169,13 @@ Proof.
  elim p; intros; simpl in |- *.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p0; intros; simpl in |- *.
-   elimtype False; omega.
+   elimtype False; lia.
   algebra.
  elim even_or_odd_plus; intros; simpl in |- *.
  elim p0; intros; simpl in |- *.
-  cut (x0 = x); [ intro | omega ].
+  cut (x0 = x); [ intro | lia ].
   rewrite H; algebra.
- elimtype False; omega.
+ elimtype False; lia.
 Qed.
 
 Lemma sin_cos_seq : forall n : nat, sin_seq n [=] [--] (cos_seq (S n)).
@@ -185,13 +186,13 @@ Proof.
  elim p; intros; simpl in |- *.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p0; intros; simpl in |- *.
-   elimtype False; omega.
+   elimtype False; lia.
   algebra.
  elim even_or_odd_plus; intros; simpl in |- *.
  elim p0; intros; simpl in |- *.
-  cut (S x = x0); [ intro | omega ].
+  cut (S x = x0); [ intro | lia ].
   rewrite <- H; simpl in |- *; rational.
- elimtype False; omega.
+ elimtype False; lia.
 Qed.
 
 Lemma Derivative_Sin : forall H, Derivative realline H Sine Cosine.

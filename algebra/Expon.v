@@ -38,6 +38,7 @@
 
 Require Export Coq.Arith.Arith.
 Require Export CoRN.algebra.COrdCauchy.
+From Coq Require Import Lia.
 
 Load "Transparent_algebra".
 
@@ -99,7 +100,7 @@ Proof.
    astepr (x[^]m[*][1]).
    apply mult_resp_less_lft.
     apply H2.
-    omega.
+    lia.
    apply nexp_resp_pos.
    assumption.
   auto with arith.

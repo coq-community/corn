@@ -37,6 +37,7 @@
 
 Require Export Coq.ZArith.ZArith.
 Require Export CoRN.logic.CLogic.
+From Coq Require Import Lia.
 
 (**
 * Basic facts on Z
@@ -364,7 +365,7 @@ Lemma Zlt_asymmetric : forall a b : Z, {(a < b)%Z} + {a = b} + {(a > b)%Z}.
 Proof.
  intros a b.
  set (d := (a - b)%Z).
- replace a with (b + d)%Z; [ idtac | unfold d in |- *; omega ].
+ replace a with (b + d)%Z; [ idtac | unfold d in |- *; lia ].
  case d; simpl in |- *.
    left; right; auto with zarith.
   intro p.

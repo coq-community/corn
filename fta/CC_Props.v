@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.complex.AbsCC.
+From Coq Require Import Lia.
 
 (**
 * More properties of complex numbers
@@ -142,9 +143,9 @@ Proof.
      exists M. intros.
      apply AbsSmall_AbsCC. auto.
        astepr (Re (CC_seq s m) [-]Lim (CC_Cauchy2re s)).
-      apply H3. omega.
+      apply H3. lia.
       astepr (Im (CC_seq s m) [-]Lim (CC_Cauchy2im s)).
-     apply H4. omega.
+     apply H4. lia.
      elim (le_lt_dec N N'); intros.
      exists N'; auto.
     exists N; auto with arith.

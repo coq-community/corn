@@ -38,6 +38,7 @@
 
 Require Export CoRN.ftc.COrdLemmas.
 Require Export CoRN.ftc.Partitions.
+From Coq Require Import Lia.
 
 Section Separating_Partition.
 
@@ -1078,7 +1079,7 @@ Proof.
   apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
  intros k Hk Hk'.
  elim (le_lt_dec m (S i)); intro.
-  cut (S i = m); [ intro | clear Hk Hk'; omega ].
+  cut (S i = m); [ intro | clear Hk Hk'; lia ].
   generalize H0.
   unfold m at 1 in |- *; elim RS'_delta2_delta4; intro; simpl in |- *; intro.
    cut (i < m); [ intro | assumption ].
@@ -1164,7 +1165,7 @@ Proof.
     apply inv_resp_leEq; apply Partition_mon.
     eapply le_trans.
      2: apply a2.
-    clear Hk Hk'; omega.
+    clear Hk Hk'; lia.
    apply leEq_wdl with ZeroR.
     astepl (([0][+][0])[*]ZeroR).
     apply mult_resp_leEq_both.

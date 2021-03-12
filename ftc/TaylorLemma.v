@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.ftc.Rolle.
+From Coq Require Import Lia.
 
 Opaque Min.
 
@@ -426,8 +427,8 @@ Proof.
   simpl in H.
   elim H; intros f' H1 H2.
   apply Derivative_I_wdr with (PartInt f'); assumption.
- cut (S i = 1 + i); [ intro | omega ].
- cut (1 + i < S (S n)); [ intro | omega ].
+ cut (S i = 1 + i); [ intro | lia ].
+ cut (1 + i < S (S n)); [ intro | lia ].
  apply Derivative_I_n_wdr with (PartInt (fi (S n) Hf' _ H0)).
   apply Derivative_I_n_unique with (S i) F.
    generalize H0; clear H0.
@@ -574,7 +575,7 @@ Proof.
  unfold Taylor_seq'_aux in |- *; simpl in |- *.
  generalize Hf Hf'; clear Hf Hf'.
  rewrite <- H0; intros.
- cut (Diffble_I_n Hab' n F); [ intro H1 | apply le_imp_Diffble_I with (S n); [ omega | assumption ] ].
+ cut (Diffble_I_n Hab' n F); [ intro H1 | apply le_imp_Diffble_I with (S n); [ lia | assumption ] ].
  apply Derivative_I_wdl with (Taylor_seq'_aux n H1{+}funct_i' _ Hf _ (lt_n_Sn (S n))).
   unfold Taylor_seq'_aux in |- *.
   apply eq_imp_Feq.
@@ -639,7 +640,7 @@ Proof.
    auto.
   apply Hrecn.
  apply Taylor_lemma7.
- omega.
+ lia.
 Qed.
 
 Let g' n Hf Hf' Hab :=

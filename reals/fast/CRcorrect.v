@@ -25,7 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.reals.Cauchy_IR.
 Require Import CoRN.tactics.CornTac.
-Require Import Coq.omega.Omega.
+From Coq Require Import Lia.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import Coq.QArith.Qabs.
@@ -67,7 +67,7 @@ Proof.
  apply Qle_trans with (((1 # P_of_succ_nat (pred (nat_of_P (2*ed)))) + (1 # 2 * ed)))%Q.
   eapply plus_resp_leEq.
   change (P_of_succ_nat (pred (nat_of_P (2*ed))) <= P_of_succ_nat m)%Z.
-  rewrite <-!POS_anti_convert. apply inj_le. omega.
+  rewrite <-!POS_anti_convert. apply inj_le. lia.
  rewrite <- anti_convert_pred_convert.
  stepl ((2#1)*(1#(2*ed)))%Q; [|simpl; ring].
  change ((2#1)*((1/2)*(1/ed)) <= en#ed)%Q.
