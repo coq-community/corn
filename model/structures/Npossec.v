@@ -37,8 +37,7 @@
 (** printing Npos $\mathbb{N}^{+}$ #N<SUP>+</SUP># *)
 
 Require Export CoRN.model.structures.Nsec.
-Require Import Coq.Arith.Arith.
-Require Import Coq.omega.Omega.
+From Coq Require Import Arith Lia.
 
 (**
 ** [Npos]
@@ -53,7 +52,7 @@ Proof.
  intros H1.
  unfold not in H.
  apply H.
- omega.
+ lia.
 Qed.
 
 Lemma Npos_is_suc : forall y : nat, y <> 0 -> exists m : nat, y = S m.
@@ -90,8 +89,8 @@ Proof.
   apply gt_trans with (x*S y0).
    apply gt_le_trans with (x*S y0+0).
     apply plus_gt_compat_l.
-    omega.
-   omega.
+    lia.
+   lia.
   unfold gt in |- *.
   apply neq_O_lt.
   cut ((x*S y0) <> 0).

@@ -39,6 +39,7 @@
 Require Export Coq.Arith.Peano_dec.
 Require Export Coq.Relations.Relations.
 Require Import CoRN.logic.CLogic.
+From Coq Require Import Lia.
 
 (**
 * [nat]
@@ -168,7 +169,7 @@ Proof.
  unfold not in |- *.
  intro H4.
  apply H4.
- omega.
+ lia.
 Qed.
 
 

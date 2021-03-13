@@ -42,6 +42,7 @@
 
 Require Export CoRN.reals.CReals.
 Require CoRN.model.reals.Cauchy_IR.
+From Coq Require Import Lia.
 
 (**
 * Real Number Structures
@@ -108,7 +109,7 @@ Proof.
  elim (Archimedes x); intros n Hn.
  induction  n as [| n Hrecn].
   exists 0; split; auto.
-  intro; elimtype False; omega.
+  intro; elimtype False; lia.
  clear Hrecn.
  induction  n as [| n Hrecn].
   exists 1.

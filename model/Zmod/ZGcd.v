@@ -37,6 +37,7 @@
 
 Require Export CoRN.model.Zmod.ZDivides.
 Require Export Coq.Init.Wf.
+From Coq Require Import Lia.
 
 (**
 * The GCD-function over Z
@@ -65,7 +66,7 @@ Proof.
    elim (lt_n_O _ H0).
   intros n0 Hind a b HSn0.
   assert (Hdisj : nat_of_P b < n0 \/ nat_of_P b = n0).
-   omega.
+   lia.
   elim Hdisj.
    apply Hind.
   intro Heq.
@@ -294,7 +295,7 @@ Proof.
   rewrite (Zmult_assoc v' (Zpos b) q).
   rewrite (Zmult_comm (v' * Zpos b) q).
   rewrite (Zmult_assoc q v' (Zpos b)).
-  omega.
+  lia.
  auto with zarith.
 Qed.
 
@@ -1211,7 +1212,7 @@ Proof.
    apply (Zdivides_trans (Zgcd a (b + c)) a c).
     apply Zgcd_is_divisor_lft.
    assumption.
-  omega.
+  lia.
  rewrite (Zgcd_lin_comb a (b + c)).
  apply Zdivides_plus_elim.
   apply Zdivides_mult_elim_lft.
@@ -1266,7 +1267,7 @@ Proof.
   rewrite Zgcd_Zopp_r.
   apply Zgcd_minus_elim_rr.
   assumption.
- omega.
+ lia.
 Qed.
 
 Lemma Zgcd_minus_elim_lr :
