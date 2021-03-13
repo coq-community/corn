@@ -40,6 +40,7 @@
 
 Require Export CoRN.reals.CSumsReals.
 Require Export CoRN.reals.NRootIR.
+From Coq Require Import Lia.
 
 Section Definitions.
 
@@ -596,7 +597,7 @@ Proof.
   rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
   apply AbsSmall_plus.
    apply HN; cut (N <= k).
-    omega.
+    lia.
    apply le_trans with (max n N); unfold k in |- *; auto with arith.
   apply AbsSmall_minus; apply HN; auto.
   apply le_trans with (max n N); unfold k in |- *; auto with arith.
@@ -784,7 +785,7 @@ Proof.
    apply le_trans with (max N M); auto with arith.
   rewrite <- S_pred with (m := 0); auto.
   apply lt_le_trans with (S (max N M)); auto with arith.
- omega.
+ lia.
 Qed.
 
 Lemma join_series : convergent x -> forall y,
@@ -820,24 +821,24 @@ Proof.
   unfold Sum, Sum1 in |- *.
   rewrite <- S_pred with (m := 0).
    algebra.
-  omega.
+  lia.
  astepr (Sum (S (max N M + k)) (pred m) y).
   2: unfold Sum, Sum1 in |- *.
   2: rewrite <- S_pred with (m := 0).
    2: algebra.
-  2: omega.
+  2: lia.
  replace (pred m) with (pred (m - k) + k).
-  2: omega.
+  2: lia.
  pattern (S (max N M + k)) at 2 in |- *; replace (S (max N M + k)) with (S (max N M + k) - k + k).
-  2: omega.
+  2: lia.
  apply Sum_big_shift.
   intros; apply HN.
   apply le_trans with (max N M); auto with arith.
-  omega.
+  lia.
  rewrite <- S_pred with (m := 0); auto.
-  omega.
+  lia.
  apply lt_le_trans with (S (max N M)); auto with arith.
- omega.
+ lia.
 Qed.
 
 End Convergence_Criteria.
@@ -1011,7 +1012,7 @@ Proof.
   eapply eq_transitive_unfolded.
    apply nexp_plus.
   apply inv_one_even_nexp.
-  cut (n + S (S (n + (m + m))) = S (S (n + n + (m + m)))); [ intro | omega ].
+  cut (n + S (S (n + (m + m))) = S (S (n + n + (m + m)))); [ intro | lia ].
   rewrite H0.
   auto with arith.
  unfold Sum in |- *; simpl in |- *.

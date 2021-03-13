@@ -37,6 +37,7 @@
 Require Export CoRN.model.setoids.Nsetoid.
 Require Export CoRN.model.structures.Npossec.
 Require Import CoRN.algebra.CSetoidFun.
+From Coq Require Import Lia.
 
 (**
 ** Example of a setoid: [Npos]
@@ -114,5 +115,5 @@ Proof.
  case n.
  simpl in |- *.
  intros.
- omega.
+ lia.
 Qed.
