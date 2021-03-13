@@ -37,6 +37,7 @@
 Require Export CoRN.algebra.CPoly_NthCoeff.
 Require Export CoRN.algebra.CFields.
 Require Export CoRN.tactics.Rational.
+Require Import Lia.
 Import CRing_Homomorphisms.coercions.
 Set Automatic Introduction.
 
@@ -324,9 +325,9 @@ Proof.
   elim a; intro.
    auto.
   right.
-  omega.
+  lia.
  right.
- omega.
+ lia.
 Qed.
 
 Lemma degree_le_Product (l: list (cpoly R)) n:
@@ -377,7 +378,7 @@ Proof.
     apply Sum_zero. auto with arith. intros.
      cut (n < S x + n - i). intro.
      Step_final (nth_coeff i p[*][0]).
-    omega.
+    lia.
    replace (S x + n - S x) with n. algebra. auto with arith.
     rewrite <- y in H. rewrite <- y.
   pattern n at 2 in |- *. replace n with (0 + n - 0).
@@ -630,7 +631,7 @@ Proof.
  cut (forall k i : nat, n < i -> N - k < i -> nth_coeff i q [=] [0]). intro H5.
   elim (le_lt_dec m0 N); intros H6.
    replace m0 with (N - (N - m0)). apply H5 with (N - n).
-    omega. omega. omega.
+    lia. lia. lia.
     apply H4; auto.
  intro. induction  k as [| k Hreck]; intros.
  apply H4. rewrite <- minus_n_O in H5; auto.
@@ -646,14 +647,14 @@ Proof.
     cut (i < m + i - j). intro.
       cut (n < m + i - j). intro.
        Step_final (nth_coeff j p[*][0]).
-      omega. omega.
+      lia. lia.
      Step_final ([0][*]nth_coeff (m + i - j) q).
    auto with arith.
   astepl (nth_coeff (m + i) (p[*]q)).
   cut (m + n < m + i). intro.
    auto.
   auto with arith.
- omega.
+ lia.
 Qed.
 
 Lemma degree_mult_imp : forall (p q : FX) m n,

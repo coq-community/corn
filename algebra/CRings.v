@@ -56,6 +56,7 @@
 Require Import CoRN.tactics.CornTac.
 Require Export CoRN.algebra.CSums.
 Require Import CoRN.algebra.CAbMonoids Coq.Sorting.Permutation CoRN.util.SetoidPermutation Coq.Setoids.Setoid Coq.Classes.Morphisms.
+From Coq Require Import Lia.
 
 Transparent sym_eq.
 Transparent f_equal.
@@ -513,14 +514,14 @@ Proof.
     apply op_lft_resp_ap.
     apply ap_symmetric_unfolded.
     apply H.
-    omega.
+    lia.
    auto with arith.
   replace i with (j + (i - j)).
    astepl (nring j[+]nring (i - j):R).
    astepr (nring j[+] ([0]:R)).
    apply op_lft_resp_ap.
    apply H.
-   omega.
+   lia.
   auto with arith.
  auto.
 Qed.

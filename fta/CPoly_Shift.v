@@ -36,6 +36,7 @@
 
 Require Export CoRN.complex.CComplex.
 Import CRing_Homomorphisms.coercions.
+From Coq Require Import Lia.
 
 (**
 * Shifting polynomials
@@ -103,7 +104,7 @@ Proof.
   replace n with (0 + n).
    apply degree_le_mult. apply degree_le_c_.
     apply degree_le_mon with (1 * i).
-    omega.
+    lia.
    apply degree_le_nexp. apply degree_imp_degree_le.
    apply degree_wd with (_C_ a[+]_X_). algebra.
     apply degree_plus_rht with 0. apply degree_le_c_. apply degree_x_.
@@ -158,7 +159,7 @@ Proof.
      replace x with (0 + x).
      apply degree_le_mult. apply degree_le_c_.
       apply degree_le_mon with (1 * i).
-      omega.
+      lia.
      apply degree_le_nexp. apply degree_imp_degree_le.
      apply degree_wd with (_C_ a[+]_X_). algebra.
       apply degree_plus_rht with 0. apply degree_le_c_. apply degree_x_.

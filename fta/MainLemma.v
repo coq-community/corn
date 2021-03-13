@@ -41,6 +41,7 @@
 Require Export CoRN.reals.CSumsReals.
 Require Export CoRN.fta.KeyLemma.
 Require Import CoRN.algebra.CRing_as_Ring.
+From Coq Require Import Lia.
 
 (**
 ** Main Lemma
@@ -140,7 +141,7 @@ Proof.
    apply shift_leEq_plus'.
    apply H2.
     assumption.
-   omega.
+   lia.
   apply nexp_resp_ap_zero.
   apply three_ap_zero.
  apply leEq_wdl with (Sum 1 (pred k) (fun i : nat => Three[^]i) [*]
@@ -178,7 +179,7 @@ Proof.
           apply pos_three.
          apply great_nexp_resp_le.
           apply less_leEq; apply one_less_three.
-         omega.
+         lia.
         apply nexp_resp_ap_zero.
         apply three_ap_zero.
        apply eq_div.

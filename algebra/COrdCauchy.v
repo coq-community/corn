@@ -34,6 +34,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 Require Export CoRN.algebra.COrdAbs.
+From Coq Require Import Lia.
 Set Automatic Introduction.
 
 (* Begin_SpecReals *)
@@ -576,7 +577,7 @@ Lemma mon_imp_inj : forall f : nat -> R,
  (forall i j, i < j -> f i [<] f j) -> forall i j, f i [=] f j -> i = j.
 Proof.
  intros.
- cut (~ i <> j); [ omega | intro ].
+ cut (~ i <> j); [ lia | intro ].
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
  inversion_clear H1; (elimtype False; cut (f i [#] f j); [ apply eq_imp_not_ap; assumption | idtac ]).
   apply less_imp_ap; apply X; assumption.
@@ -653,7 +654,7 @@ Lemma mon_imp_inj_lt : forall n (f : forall i, i < n -> R),
 Proof.
  intros.
  cut (~ i <> j); intro.
-  clear X H Hj Hi; omega.
+  clear X H Hj Hi; lia.
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
  inversion_clear H1; (elimtype False; cut (f i Hi [#] f j Hj);
    [ apply eq_imp_not_ap; assumption | idtac ]).
@@ -730,7 +731,7 @@ Lemma mon_imp_inj_le : forall n (f : forall i, i <= n -> R),
 Proof.
  intros.
  cut (~ i <> j); intro.
-  clear H X Hj Hi; omega.
+  clear H X Hj Hi; lia.
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
  inversion_clear H1; (elimtype False; cut (f i Hi [#] f j Hj);
    [ apply eq_imp_not_ap; assumption | idtac ]).

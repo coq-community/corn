@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.ftc.Continuity.
+From Coq Require Import Lia.
 
 (** printing Partition_Sum %\ensuremath{\sum_P}% #&sum;<sub>P</sub># *)
 
@@ -81,7 +82,7 @@ Proof.
   cut (i = 0); [ intro | auto with arith ].
   apply eq_imp_leEq; apply prf1; auto.
  elim (le_lt_eq_dec _ _ H); intro H1.
-  cut (j <= lng); [ intro | clear Hrecj; omega ].
+  cut (j <= lng); [ intro | clear Hrecj; lia ].
   apply leEq_transitive with (Pts _ _ _ _ P j H0).
    apply Hrecj; clear Hrecj; auto with arith.
   apply prf2.

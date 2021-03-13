@@ -35,6 +35,7 @@
  *)
 
 Require Export CoRN.algebra.COrdCauchy.
+From Coq Require Import Lia.
 
 Section Lemmas.
 
@@ -320,7 +321,7 @@ Proof.
   clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *; auto with arith.
   intros. elim (le_lt_dec (f 1) i); intro; simpl in |- *.
   cut (0 < f 1).
-    intro; elimtype False; omega.
+    intro; elimtype False; lia.
    pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
   algebra.
  cut (0 < f n); [ intro | rewrite <- f0; apply f_mon; assumption ].
@@ -343,18 +344,18 @@ Proof.
       rewrite <- H1; apply lt_le_weak; assumption.
      intros.
      elim (le_lt_dec (f n) i); intro; simpl in |- *.
-      elimtype False; omega.
+      elimtype False; lia.
      elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
       cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
       elimtype False; apply (le_not_lt (f n) i); auto.
       apply le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
-       elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try elimtype False; try omega.
+       elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try elimtype False; try lia.
     rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
       cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
         rewrite <- H3; apply lt_le_weak; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);
-     [intro; simpl in |- *; elimtype False; omega| reflexivity].
+     [intro; simpl in |- *; elimtype False; lia| reflexivity].
   apply lt_trans with (f n); auto with arith.
  red in |- *; intros; rewrite -> H1; reflexivity.
 Qed.

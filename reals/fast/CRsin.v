@@ -45,6 +45,7 @@ Require Import CoRN.reals.fast.PowerBound.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import CoRN.util.Qdlog.
+From Coq Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -343,13 +344,13 @@ Proof.
     the zeros at even indexes. *) 
    unfold series_sum.
    apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
-   intros; omega.
-  intros n; exists (S n); omega.
+   intros; lia.
+  intros n; exists (S n); lia.
   (* Prove that the partial sums until n are equal. *)
  intros n.
  induction n.
   apply eq_reflexive.
- replace (2*(S n))%nat with (S (S (2*n)))%nat by omega.
+ replace (2*(S n))%nat with (S (S (2*n)))%nat by lia.
  set (n':=(2*n)%nat) in *.
  simpl in *.
  rstepr (seq_part_sum (fun n0 : nat =>
@@ -370,13 +371,13 @@ Proof.
      repeat constructor.
      rewrite Hm.
      constructor.
-     replace (m + m)%nat with (2*m)%nat by omega.
+     replace (m + m)%nat with (2*m)%nat by lia.
      apply (even_mult_l 2 m).
      repeat constructor.
    + destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
   elim (not_even_and_odd (S n')).
    rewrite Hm.
-   replace (m + m)%nat with (2*m)%nat by omega.
+   replace (m + m)%nat with (2*m)%nat by lia.
    apply (even_mult_l 2 m).
    repeat constructor.
   constructor.
@@ -384,7 +385,7 @@ Proof.
   repeat constructor.
  inversion Hm.
  unfold n' in H1.
- replace m with n by omega.
+ replace m with n by lia.
  clear Hm H1.
  (* Unfold sinStream *)
  transitivity (inj_Q IR ((1#Pos.of_nat (fact (1+2*n))) * ((-1)^n*a^(1+2*n))%Q)).
@@ -554,11 +555,11 @@ Proof.
  rstepr (Nine[-][0]:IR).
  apply minus_resp_leEq_both.
   apply nring_leEq.
-  omega.
+  lia.
  rstepr (Twelve[*]x[^]2).
  apply mult_resp_nonneg.
   apply (nring_leEq  IR 0 12).
-  omega.
+  lia.
  apply sqr_nonneg.
 Qed.
 

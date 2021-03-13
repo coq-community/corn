@@ -1,5 +1,6 @@
 
 Require Import Coq.ZArith.ZArith Coq.Numbers.Natural.Peano.NPeano CoRN.stdlib_omissions.P.
+Require Import Lia.
 
 (*Require Import NSigNAxioms.  was added in the trunk branch*)
 
@@ -132,5 +133,5 @@ assert (A : forall (m n : nat), not (m <= n)%nat <-> (n < m)%nat).
 Qed.
 
 Lemma add_pos_nonneg (a b: Z): 0 < a -> 0 <= b -> 0 < a+b.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 

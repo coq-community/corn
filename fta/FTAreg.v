@@ -37,6 +37,7 @@
 Require Export CoRN.fta.KneserLemma.
 Require Export CoRN.fta.CPoly_Shift.
 Require Export CoRN.fta.CPoly_Contin1.
+From Coq Require Import Lia.
 
 (**
 * FTA for regular polynomials
@@ -415,7 +416,7 @@ Proof.
   apply leEq_wdl with (ABSIR (Sum N (pred m) (fun i : nat => Re (s (S i)) [-]Re (s i)))).
    2: apply eq_symmetric_unfolded; apply Habseq.
   cut (N <= S (pred m)). intro leNm'.
-   (* FIXME was 2:Omega *) 2: clear nrtq_ nrtqlt1 nrtc nrtq; omega.
+   (* FIXME was 2:Lia *) 2: clear nrtq_ nrtqlt1 nrtc nrtq; lia.
   generalize (triangle_SumIR N (pred m) (fun i : nat => Re (s (S i)) [-]Re (s i)) leNm').
   intro Htri.
   apply leEq_transitive with (Sum N (pred m)
@@ -474,7 +475,7 @@ Proof.
   apply leEq_wdl with (ABSIR (Sum N (pred m) (fun i : nat => Im (s (S i)) [-]Im (s i)))).
    2: apply eq_symmetric_unfolded; apply Habseq.
   cut (N <= S (pred m)). intro leNm'.
-   (* FIXME was 2:Omega *) 2: clear nrtq_ nrtqlt1 nrtc nrtq; omega.
+   (* FIXME was 2:Lia *) 2: clear nrtq_ nrtqlt1 nrtc nrtq; lia.
   generalize (triangle_SumIR N (pred m) (fun i : nat => Im (s (S i)) [-]Im (s i)) leNm').
   intro Htri.
   apply leEq_transitive with (Sum N (pred m)

@@ -37,7 +37,7 @@ Require Import CoRN.transc.Pi.
 Require Import CoRN.transc.MoreArcTan.
 Require Import CoRN.logic.PropDecid.
 Require Import CoRN.transc.Exponential.
-From Coq Require Import Lra.
+From Coq Require Import Lia Lra.
 
 (* This changed in RLogic and should probably be moved there: *)
 Lemma forall_dec : forall P:nat->Prop, (forall n, {P n} + {~ P n}) -> {forall n, P n} + {~forall n, P n}.
@@ -612,8 +612,8 @@ Proof.
  simpl.
  unfold series_sum.
  apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
-   intros; omega.
-  intros n; exists (S n); omega.
+   intros; lia.
+  intros n; exists (S n); lia.
  induction n.
   reflexivity.
  simpl in *.
@@ -657,7 +657,7 @@ Proof.
    rewrite -> (R_div_as_IR ((-1)^n) (nring (R := RRing) (fact (n + n))) X).
    apply div_wd.
     autorewrite with RtoIR.
-    replace n with x0 by omega.
+    replace n with x0 by lia.
     reflexivity.
    autorewrite with RtoIR.
    reflexivity.
@@ -698,8 +698,8 @@ Proof.
  simpl.
  unfold series_sum.
  apply Lim_seq_eq_Lim_subseq with (fun n => 2*n)%nat.
-   intros; omega.
-  intros n; exists (S n); omega.
+   intros; lia.
+  intros n; exists (S n); lia.
  induction n.
   reflexivity.
  simpl in *.
@@ -729,7 +729,7 @@ Proof.
  apply bin_op_wd_unfolded.
   reflexivity.
  setoid_replace (RasIR x [-] [0]) with (RasIR x);[|rational].
- replace x1 with n by omega.
+ replace x1 with n by lia.
  clear.
  setoid_replace (([0][/]nring (R:=IR) (fact (n + n))[//]nring_fac_ap_zero IR (n + n))[*]
    nexp IR (n + n) (RasIR x)) with ([0]:IR);[|rational].
@@ -747,7 +747,7 @@ Proof.
     autorewrite with RtoIR; reflexivity.
    autorewrite with RtoIR.
    apply nring_wd.
-   replace (n + n + 1)%nat with (S (n + n)) by omega.
+   replace (n + n + 1)%nat with (S (n + n)) by lia.
    simpl.
    reflexivity.
   simpl.
@@ -756,7 +756,7 @@ Proof.
   apply (nring_fac_ap_zero RReals (n + n + 1)).
  induction n; simpl.
   reflexivity.
- replace (n + S n)%nat with (S(n + n)) by omega.
+ replace (n + S n)%nat with (S(n + n)) by lia.
  simpl.
  rewrite -> IHn.
  autorewrite with RtoIR.

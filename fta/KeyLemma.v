@@ -37,6 +37,7 @@
 Require Export Coq.ZArith.ZArith.
 Require Export Coq.Arith.Compare.
 Require Export CoRN.reals.NRootIR.
+From Coq Require Import Lia.
 
 (** printing p3m %\ensuremath{\frac13\hat{\ }}% *)
 (** printing Halfeps %\ensuremath{\frac\varepsilon2}% *)
@@ -80,20 +81,20 @@ Qed.
 Lemma lem_1a : n - (n - 1) = 1.
 Proof.
  cut (1 <= n).
-  omega.
+  lia.
  auto with arith.
 Qed.
 
 Lemma lem_1b : forall n j : nat, n - S j <= n - j.
 Proof.
  intros.
- omega.
+ lia.
 Qed.
 
 Lemma lem_1c : forall n j : nat, n - j <= n.
 Proof.
  intros.
- omega.
+ lia.
 Qed.
 
 Lemma lem_1 : {t : IR | [0] [<=] t |
@@ -352,8 +353,8 @@ Proof.
   cut (i = j). intro.
    rewrite H1.
    auto.
-  omega.
- omega.
+  lia.
+ lia.
 Qed.
 
 Definition Halfeps := Half[*]eps.

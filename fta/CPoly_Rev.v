@@ -36,6 +36,7 @@
 
 Require Export CoRN.algebra.CPoly_Degree.
 Import CRing_Homomorphisms.coercions.
+From Coq Require Import Lia.
 
 (**
 * Reverse of polynomials
@@ -75,7 +76,7 @@ Proof.
    simpl in |- *. algebra.
    elim (H y).
  elim (O_or_S n); intro y. elim y. clear y. intros x y. rewrite <- y.
-  simpl in |- *. apply Hrecm. omega.
+  simpl in |- *. apply Hrecm. lia.
   rewrite <- y.
  simpl in |- *. algebra.
 Qed.
@@ -85,7 +86,7 @@ Hint Resolve monom_coeff monom_coeff': algebra.
 Lemma monom_degree : forall (a : R) n, degree_le n (monom a n).
 Proof.
  unfold degree_le in |- *. intros.
- cut (n <> m). intro. algebra. omega.
+ cut (n <> m). intro. algebra. lia.
 Qed.
 
 Lemma monom_S : forall (a : R) n, monom a (S n) [=] _X_[*]monom a n.
@@ -153,7 +154,7 @@ Proof.
    algebra.
  apply eq_transitive_unfolded with ([0]:R).
   apply Sum_zero. auto with arith.
-   intros. cut (i0 <> i). intro. algebra. omega.
+   intros. cut (i0 <> i). intro. algebra. lia.
   algebra.
 Qed.
 
@@ -183,10 +184,10 @@ Proof.
  apply eq_transitive_unfolded with (nth_coeff i (monom (nth_coeff (n - i) p) (n - (n - i)))).
   apply Sum_term with (i := n - i)
     (f := fun i0 : nat => nth_coeff i (monom (nth_coeff i0 p) (n - i0))).
-    auto with arith. omega.
+    auto with arith. lia.
    intros.
-  cut (n - j <> i). intro. algebra. omega.
-   replace (n - (n - i)) with i. algebra. omega.
+  cut (n - j <> i). intro. algebra. lia.
+   replace (n - (n - i)) with i. algebra. lia.
 Qed.
 
 Lemma Rev_coeff' : forall n p i, n < i -> nth_coeff i (Rev n p) [=] [0].
@@ -198,7 +199,7 @@ Proof.
   apply nth_coeff_sum with (p_ := fun i0 : nat => monom (nth_coeff (R:=R) i0 p) (n - i0)).
  apply Sum_zero. auto with arith.
   intros.
- cut (n - i0 <> i). intro. algebra. omega.
+ cut (n - i0 <> i). intro. algebra. lia.
 Qed.
 
 Hint Resolve Rev_coeff Rev_coeff': algebra.
@@ -223,8 +224,8 @@ Proof.
   astepl (nth_coeff (n - i) (Rev n p)).
   pattern i at 2 in |- *. replace i with (n - (n - i)).
   apply Rev_coeff.
-   omega.
-  omega.
+   lia.
+  lia.
  unfold degree_le in H.
  Step_final ([0]:R).
 Qed.
@@ -255,13 +256,13 @@ Proof.
   elim (eq_nat_dec m (n - i)); intro H0.
    cut (i = n - m). intro y0.
     rewrite <- y0. rewrite H0. Step_final c.
-    omega.
+    lia.
   cut (n - m <> i). intro.
    Step_final ([0]:R).
-  omega.
+  lia.
  cut (n - m <> i). intro.
   Step_final ([0]:R).
- omega.
+ lia.
 Qed.
 
 Hint Resolve Rev_monom: algebra.
@@ -369,7 +370,7 @@ Proof.
       astepl (monom (nth_coeff i1 p1[*]nth_coeff i2 p2) (n1 - i1 + (n2 - i2))).
       replace (n1 - i1 + (n2 - i2)) with (n1 + n2 - (i1 + i2)).
        algebra.
-      omega.
+      lia.
      unfold Rev in |- *. algebra.
      unfold Rev in |- *. algebra.
     astepl (Rev (n1 + n2) (Sum 0 n2 (fun i2 : nat => Sum 0 n1 (fun i1 : nat =>
@@ -383,7 +384,7 @@ Proof.
       Rev (n1 + n2) (monom (nth_coeff i1 p1[*]nth_coeff i2 p2) (i1 + i2)))).
     apply Rev_sum with (a_ := fun i1 : nat => monom (nth_coeff i1 p1[*]nth_coeff i2 p2) (i1 + i2)).
    apply Sum_wd'. auto with arith. intro i1. intros.
-    apply Rev_monom. omega.
+    apply Rev_monom. lia.
    astepl (Sum 0 n1 (fun i1 : nat => monom (nth_coeff i1 p1) i1) [*]
      Sum 0 n2 (fun i2 : nat => monom (nth_coeff i2 p2) i2)).
   apply eq_transitive_unfolded with (Sum 0 n2 (fun i2 : nat =>

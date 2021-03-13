@@ -27,6 +27,7 @@ Require Import CoRN.algebra.COrdFields2.
 Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Coq.Vectors.Vector.
 Export Vector.VectorNotations.
+From Coq Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -65,7 +66,7 @@ Proof.
  destruct (le_lt_eq_dec _ _ H0).
   replace (lt_n_Sm_le (S i) n l) with (lt_n_Sm_le _ _ (lt_n_S _ _ H)) by apply le_irrelevent.
   reflexivity.
- elimtype False; omega.
+ elimtype False; lia.
 Qed.
 
 Lemma Bernstein_inv2 : forall n (H:S n <= S n),
@@ -74,7 +75,7 @@ Proof.
  intros n H.
  simpl (Bernstein H).
  destruct (le_lt_eq_dec _ _ H).
-  elimtype False; omega.
+  elimtype False; lia.
  replace (lt_n_Sm_le n n H) with (le_S_n n n H) by apply le_irrelevent.
  reflexivity.
 Qed.
@@ -136,7 +137,7 @@ Proof.
    unfold part_tot_nat_fun.
    destruct (le_lt_dec (S n) (S n)).
     reflexivity.
-   elimtype False; omega.
+   elimtype False; lia.
   intros i j Hij. subst.
   intros Hi Hj.
   unfold A.
@@ -147,22 +148,22 @@ Proof.
   rewrite <- (le_irrelevent _ _ (le_0_n _) _).
   ring.
  destruct (le_lt_dec (S n) i).
-  elimtype False; omega.
+  elimtype False; lia.
  destruct (le_lt_dec (S n) (S i)); simpl (Bernstein (lt_n_Sm_le (S i) (S n) Hi));
    destruct (le_lt_eq_dec (S i) (S n) (lt_n_Sm_le (S i) (S n) Hi)).
-    elimtype False; omega.
+    elimtype False; lia.
    replace  (lt_n_Sm_le i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   ring.
   replace (le_S_n i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   replace l1 with l0 by apply le_irrelevent.
   reflexivity.
- elimtype False; omega.
+ elimtype False; lia.
 Qed.
 
 Lemma RaiseDegreeA : forall n i (H:i<=n), (nring (S n))[*]_X_[*]Bernstein H[=](nring (S i))[*]Bernstein (le_n_S _ _ H).
 Proof.
  induction n.
-  intros [|i] H; [|elimtype False; omega].
+  intros [|i] H; [|elimtype False; lia].
   repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
@@ -206,7 +207,7 @@ Qed.
 Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*]([1][-]_X_)[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H).
 Proof.
  induction n.
-  intros [|i] H; [|elimtype False; omega].
+  intros [|i] H; [|elimtype False; lia].
   repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).

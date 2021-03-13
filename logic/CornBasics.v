@@ -45,7 +45,8 @@
 (** printing nat %\ensuremath{\mathbb N}% #<b>N</b># *)
 (** printing Z %\ensuremath{\mathbb Z}% #<b>Z</b># *)
 
-Require Export Coq.omega.Omega.
+From Coq Require Export ZArith.
+From Coq Require Import Lia.
 Require Export Coq.Arith.Even.
 Require Export Coq.Arith.Max.
 Require Export Coq.Arith.Min.
@@ -127,7 +128,7 @@ Proof.
    apply K_dec_set.
     decide equality.
    reflexivity.
-  intros; elimtype False; omega.
+  intros; elimtype False; lia.
  induction m.
   dependent inversion H1.
   symmetry.
@@ -142,7 +143,7 @@ Proof.
  generalize n at 1 2 7.
  generalize (S m) at 1 2 5 6.
  dependent inversion H3.
-  intros; elimtype False; omega.
+  intros; elimtype False; lia.
  intros e e0.
  assert (e':=e).
  assert (e0':=e0).
