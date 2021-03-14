@@ -27,7 +27,6 @@ Require Import CoRN.logic.Classic.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import Coq.QArith.Qabs.
 Require Import Coq.QArith.Qround.
-Require Import Omega.
 
 Local Open Scope Q_scope.
 
