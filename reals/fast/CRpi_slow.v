@@ -52,23 +52,23 @@ Pi is defined as
 68*arctan(1/23) + 32*arctan(1/182) + 40*arctan(1/5118) + 20*arctan(1/6072).
 *)
 
-Lemma small_per_23 : (0 <= (1#(23%positive)) < 1)%Q.
-Proof. split; easy. Qed.
+Lemma small_per_23 : (-(1#1) < 1#23 < 1)%Q.
+Proof. split; reflexivity. Qed.
 
-Lemma small_per_182 : (0 <= (1#(182%positive)) < 1)%Q.
-Proof. split; easy. Qed.
+Lemma small_per_182 : (-(1#1) < 1#182 < 1)%Q.
+Proof. split; reflexivity. Qed.
 
-Lemma small_per_5118 : (0 <= (1#(5118%positive)) < 1)%Q.
-Proof. split; easy. Qed.
+Lemma small_per_5118 : (-(1#1) < 1#5118 < 1)%Q.
+Proof. split; reflexivity. Qed.
 
-Lemma small_per_6072 : (0 <= (1#(6072%positive)) < 1)%Q.
-Proof. split; easy. Qed.
+Lemma small_per_6072 : (-(1#1) < 1#6072 < 1)%Q.
+Proof. split; reflexivity. Qed.
 
 Definition r_pi (r:Q) : CR :=
-((scale (68%Z*r) (rational_arctan_small_pos small_per_23) +
-  scale (32%Z*r) (rational_arctan_small_pos small_per_182)) +
- (scale (40%Z*r) (rational_arctan_small_pos small_per_5118) +
-  scale (20%Z*r) (rational_arctan_small_pos small_per_6072)))%CR.
+((scale (68%Z*r) (rational_arctan_small (widen_interval small_per_23)) +
+  scale (32%Z*r) (rational_arctan_small (widen_interval small_per_182))) +
+ (scale (40%Z*r) (rational_arctan_small (widen_interval small_per_5118)) +
+  scale (20%Z*r) (rational_arctan_small (widen_interval small_per_6072))))%CR.
 
 (** To prove that pi is is correct we repeatedly use the arctan sum law.
 The problem is that the arctan sum law only works for input between -1
@@ -264,11 +264,11 @@ Proof.
  setoid_replace (40*r) with (4*r*10) by (simpl; ring).
  setoid_replace (20*r) with (4*r*5) by (simpl; ring).
  repeat rewrite <- CRmult_Qmult.
- transitivity ('4 * 'r *(' 17 * rational_arctan_small_pos small_per_23 +
-   ' 8 * rational_arctan_small_pos small_per_182 + (' 10 * rational_arctan_small_pos small_per_5118 +
-     ' 5 * rational_arctan_small_pos small_per_6072)))%CR.
+ transitivity ('4 * 'r *(' 17 * rational_arctan_small (widen_interval small_per_23) +
+   ' 8 * rational_arctan_small (widen_interval small_per_182) + (' 10 * rational_arctan_small (widen_interval small_per_5118) +
+     ' 5 * rational_arctan_small (widen_interval small_per_6072))))%CR.
   ring.
- repeat rewrite rational_arctan_small_pos_correct.
+ repeat rewrite rational_arctan_small_correct.
  repeat rewrite <- IR_inj_Q_as_CR.
  repeat (rewrite <- IR_mult_as_CR || rewrite <- IR_plus_as_CR).
  apply IRasCR_wd.

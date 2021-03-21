@@ -1,126 +1,168 @@
-Require Import CoRN.algebra.RSetoid.
-Require Import CoRN.metric2.Metric.
-Require Import CoRN.metric2.UniformContinuity.
 Require Import
-  Coq.setoid_ring.Field CoRN.stdlib_omissions.Q
-  CoRN.reals.fast.CRarctan_small CoRN.reals.fast.CRarctan CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum
-  CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 
-  MathClasses.theory.nat_pow MathClasses.theory.int_pow.
+        MathClasses.interfaces.abstract_algebra 
+        MathClasses.theory.nat_pow
+        MathClasses.theory.int_pow
+        CoRN.algebra.RSetoid
+        CoRN.stdlib_omissions.Q
+        CoRN.metric2.Metric
+        CoRN.metric2.UniformContinuity
+        CoRN.reals.fast.CRarctan_small
+        CoRN.reals.fast.CRarctan
+        CoRN.reals.fast.CRstreams
+        CoRN.reals.fast.CRAlternatingSum
+        CoRN.reals.faster.ARAlternatingSum
+        CoRN.reals.faster.ARsin.
 Require Export
   CoRN.reals.faster.ARArith.
 
 Section ARarctan_small.
-Context `{AppRationals AQ}.
+Context `{AppRationals AQ}
+        {num den : AQ} (Pnd : -den < num < den) (dpos : 0 < den).
 
-Add Field Q : (dec_fields.stdlib_field_theory Q).
+(*
+Split the stream 
+  (-1)^i a^(2i+1) / (2i+1)
+up into the streams
+  (-1)^i a^(2i+1)    and    (2i+1)
+because we do not have exact division
+*)
+Definition ARarctanStream (px : positive*(AQ*AQ)) : AQ*AQ
+  := (- fst (snd px) * num * num * ZtoAQ (Zpos (Pos.pred (fst px)~0)),
+      snd (snd px) * den * den * ZtoAQ (Zpos (fst px)~1)).
 
-Section arctan_small_pos.
-Context {num den : AQ} (Pnd : 0 ≤ num < den).
-
-Lemma ARarctanSequence : DivisionStream 
-  (arctanSequence ('num / 'den)) 
-  (powers_help (num ^ (2:N)) num)
-  (mult_Streams (powers_help (den ^ (2:N)) den) (everyOther positives)).
+Lemma arctanStream_pos : ∀ x : positive * (AQ * AQ),
+    0 < snd (snd x) → 0 < snd (ARarctanStream x).
 Proof.
-  apply DivisionStream_Str_nth.
-  intros n.
-  unfold arctanSequence, mult_Streams.
-  rewrite ?Str_nth_zipWith.
-  rewrite commutativity. 
-  rewrite rings.preserves_mult, dec_fields.dec_recip_distr.
-  rewrite associativity.
-  apply sg_op_proper.
-  - rewrite 2!preserves_powers_help. 
-   rewrite 3!(Str_nth_powers_help_int_pow _ (cast nat Z)).
-   rewrite 2!(preserves_nat_pow (f:=cast AQ Q)).
-   rewrite <-2!(int_pow_nat_pow (f:=cast N Z)).
-   change (Qpower ('num / 'den) 2) with (('num / 'den) ^ ('(2 : N)) : Q).
-   rewrite 2!int_pow_mult. 
-   rewrite 2!int_pow_recip.
-   change (Qdiv ('num) ('den)) with ('num / 'den : Q).
-   rewrite <- (Qmult_assoc ('num)).
-   rewrite <- (Qmult_assoc ('num)).
-   apply (Qmult_comp ('num)). reflexivity.
-   rewrite Qmult_comm.
-   rewrite <- Qmult_assoc.
-   apply (Qmult_comp ((' num ^ ' 2) ^ ' n)).
-   reflexivity.
-   rewrite Qmult_comm.
-   symmetry.
-   apply Qinv_mult_distr.
-  - rewrite 2!Str_nth_everyOther.
-    rewrite Str_nth_Qrecip_positives'.
-    now rewrite preserves_positives.
-Qed.
-
-Lemma AQarctan_small_pos_Qprf : 0 ≤ ('num / 'den : Q) < 1.
-Proof.
-  split.
-   apply nonneg_mult_compat.
-    now apply semirings.preserves_nonneg.
-   apply dec_fields.nonneg_dec_recip_compat.
-   apply semirings.preserves_nonneg.
-   red. transitivity num; [easy |].
-   now apply orders.lt_le.
-  rewrite <-(dec_recip_inverse ('den : Q)).
-   apply (maps.strictly_order_preserving_flip_pos (.*.) (/'den)).
-    apply dec_fields.pos_dec_recip_compat.
-    apply semirings.preserves_pos.
-    now apply orders.le_lt_trans with num.
-   now apply (strictly_order_preserving _).
-  apply rings.injective_ne_0.
-  apply orders.lt_ne_flip.
-  now apply orders.le_lt_trans with num.
-Qed.
-
-Definition AQarctan_small_pos : AR := ARInfAltSum ARarctanSequence 
-  (dnn:=arctanSequence_dnn AQarctan_small_pos_Qprf) (zl:=arctanSequence_zl AQarctan_small_pos_Qprf).
-
-Lemma ARtoCR_preserves_arctan_small_pos : 
-  'AQarctan_small_pos = rational_arctan_small_pos AQarctan_small_pos_Qprf.
-Proof. apply ARInfAltSum_correct. Qed.
-
-Lemma AQarctan_small_pos_correct : 
-  'AQarctan_small_pos = rational_arctan ('num / 'den).
-Proof. 
-  rewrite ARtoCR_preserves_arctan_small_pos.
-  rewrite rational_arctan_correct, rational_arctan_small_pos_correct.
+  assert (0 = ZtoAQ 0) as zero_int.
+  { destruct H4. destruct aq_ints_mor, semiringmor_plus_mor.
+    rewrite preserves_mon_unit. reflexivity. }
+  intros. destruct x; simpl.
+  simpl in H5.
+  apply AQmult_lt_0_compat.
+  apply AQmult_lt_0_compat.
+  apply AQmult_lt_0_compat.
+  exact H5. exact dpos. exact dpos.
+  rewrite zero_int.
+  apply (strictly_order_preserving (cast Z AQ)).
   reflexivity.
 Qed.
-End arctan_small_pos.
 
-Section arctan_small.
-Context {num den : AQ} (Pnd : -den < num < den).
-
-(* Program loops, so we state the obligations manually *)
-Lemma AQarctan_small_prf1 : 0 ≤ num → 0 ≤ num < den.
-Proof. split; easy. Qed.
-
-Lemma AQarctan_small_prf2 : ¬0 ≤ num → 0 ≤ -num < den.
-Proof. 
-  split. 
-   now apply rings.flip_nonpos_negate, orders.le_flip.
-  apply rings.flip_lt_negate. now rewrite rings.negate_involutive.
+Lemma arctanStream_correct : ∀ p : positive,
+    Str_pth _ (arctanStream (AQtoQ num / AQtoQ den))
+            p (1%positive, AQtoQ num / AQtoQ den)
+    == let (_, r) := iterate _ (fS ARarctanStream) p (1%positive, (num, den)) in
+       AQtoQ (fst r) / AQtoQ (snd r).
+Proof.
+  assert (forall n:Z, AQtoQ (ZtoAQ n) == (n#1)).
+  { intro n. destruct n as [|n|n].
+    pose proof (rings.preserves_0 (f:=cast Z AQ)). rewrite H5. clear H5.
+    rewrite rings.preserves_0. reflexivity.
+    apply ZtoQ. change (Z.neg n) with (-Z.pos n)%Z.
+    pose proof (rings.preserves_negate (f:=cast Z AQ)).
+    rewrite H5. clear H5. rewrite rings.preserves_negate.
+    rewrite ZtoQ. reflexivity. } 
+  apply Pos.peano_ind.
+  - unfold Str_pth, iterate, arctanStream, snd.
+    rewrite Qred_correct. simpl.
+    do 6 rewrite rings.preserves_mult.
+    rewrite rings.preserves_negate.
+    rewrite H5, H5.
+    unfold dec_recip, stdlib_rationals.Q_recip.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold negate, stdlib_rationals.Q_opp.
+    rewrite Qmult_1_r.
+    change (1#3) with (/3)%Q.
+    unfold Qdiv.
+    do 3 rewrite Qinv_mult_distr.
+    do 3 rewrite Qmult_assoc.
+    apply Qmult_comp. 2: reflexivity.
+    do 2 rewrite Qmult_assoc.
+    apply Qmult_comp. 2: reflexivity.
+    ring.
+  - intros p IHp. unfold Str_pth. unfold Str_pth in IHp.
+    rewrite iterate_succ, iterate_succ.
+    pose proof (arctanStream_fst (AQtoQ num / AQtoQ den) p) as H7.
+    unfold dec_recip, stdlib_rationals.Q_recip.
+    unfold dec_recip, stdlib_rationals.Q_recip in IHp.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold mult, stdlib_rationals.Q_mult in IHp.
+    unfold Qdiv in H7. unfold Qdiv.
+    unfold Qdiv in IHp.
+    unfold Q_as_MetricSpace, msp_car.
+    unfold Q_as_MetricSpace, msp_car in IHp.
+    destruct (iterate _ (arctanStream (AQtoQ num * / AQtoQ den)%Q) p
+            (1%positive, (AQtoQ num * / AQtoQ den)%Q)).
+    simpl in H7. simpl in IHp. subst p0.
+    unfold arctanStream, snd, fst. rewrite Qred_correct.
+    rewrite IHp. clear IHp.
+    pose proof (fS_fst ARarctanStream p (num, den)) as H6.
+    destruct (iterate _ (fS ARarctanStream) p (1%positive, (num, den))) as [p0 p1].
+    simpl in H6. subst p0. unfold ARarctanStream, fS.
+    simpl (fst (Pos.succ p, p1)).
+    simpl (snd (Pos.succ p, p1)).
+    replace (Pos.pred (Pos.succ p)~0) with (p~1)%positive.
+    do 6 rewrite rings.preserves_mult.
+    rewrite rings.preserves_negate.
+    unfold mult, stdlib_rationals.Q_mult.
+    unfold negate, stdlib_rationals.Q_opp.
+    rewrite ZtoQ, ZtoQ.
+    do 3 rewrite Qinv_mult_distr.
+    setoid_replace (Z.pos p~1 # 2 + p~1)%Q
+      with ((Z.pos p~1 # 1) * / (Z.pos (Pos.succ p)~1 # 1))%Q.
+    ring.
+    unfold Qinv, Qeq, Qmult, Qnum, Qden.
+    rewrite Pos.mul_1_l, Z.mul_1_r.
+    replace (2 + p~1)%positive with ((Pos.succ p)~1)%positive.
+    reflexivity.
+    change (p~1)%positive with (2*p+1)%positive.
+    change ((Pos.succ p)~1)%positive with (2*Pos.succ p+1)%positive.
+    rewrite Pplus_one_succ_l.
+    rewrite Pos.mul_add_distr_l. reflexivity.
+    rewrite Pplus_one_succ_l.
+    change (p~1)%positive with (2*p+1)%positive.
+    change ((1+p)~0)%positive with (2*(1+p))%positive.
+    rewrite Pos.mul_add_distr_l.
+    rewrite Pos.pred_sub.
+    rewrite (Pos.add_comm (2*1)).
+    rewrite <- Pos.add_sub_assoc. reflexivity. reflexivity.
 Qed.
 
-Definition AQarctan_small : AR :=
-  match decide_rel (≤) 0 num with
-  | left Pn => AQarctan_small_pos (AQarctan_small_prf1 Pn)
-  | right Pn => -AQarctan_small_pos (AQarctan_small_prf2 Pn)
-  end.
+Lemma AQarctan_small_Qprf : -1 < AQtoQ num / AQtoQ den < 1.
+Proof.
+  split.
+  - apply Qlt_shift_div_l.
+    pose proof (rings.preserves_0 (f:=cast AQ Q)).
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast AQ Q)), dpos.
+    setoid_replace (-1 * AQtoQ den) with (-AQtoQ den) by reflexivity.
+    rewrite <- rings.preserves_negate.
+    apply (strictly_order_preserving (cast AQ Q)), Pnd.
+  - apply Qlt_shift_div_r.
+    pose proof (rings.preserves_0 (f:=cast AQ Q)).
+    rewrite <- H5.
+    apply (strictly_order_preserving (cast AQ Q)), dpos.
+    rewrite Qmult_1_l.
+    apply (strictly_order_preserving (cast AQ Q)), Pnd.
+Qed.
+
+Definition AQarctan_small : msp_car AR
+  := CRtoAR (inject_Q_CR (AQtoQ num / AQtoQ den))
+     + AltSeries ARarctanStream arctanStream_pos
+                 positive (arctanStream (AQtoQ num / AQtoQ den))
+                 (num,den) (xH,AQtoQ num / AQtoQ den) arctanStream_correct _
+                 (arctanStream_alt (widen_interval AQarctan_small_Qprf))
+                 dpos (arctanStream_zl (widen_interval AQarctan_small_Qprf)).
 
 Lemma AQarctan_small_correct : 
-  'AQarctan_small = rational_arctan ('num / 'den).
+  'AQarctan_small = rational_arctan_small (widen_interval AQarctan_small_Qprf).
 Proof.
-  unfold AQarctan_small.
-  case (decide_rel _); intros E.
-   apply AQarctan_small_pos_correct.
-  rewrite rings.preserves_negate.
-  rewrite AQarctan_small_pos_correct.
-  mc_setoid_replace ('(-num) / 'den : Q) with (-('num / 'den) : Q).
-   apply rational_arctan_opp.
-  rewrite rings.preserves_negate.
-  now rewrite <-rings.negate_mult_distr_l.
+  unfold AQarctan_small, rational_arctan_small.
+  rewrite ARtoCR_preserves_plus.
+  apply ucFun2_wd.
+  pose proof CRAR_id.
+  unfold cast. unfold cast in H5.
+  rewrite H5. reflexivity.
+  apply AltSeries_correct.
 Qed.
-End arctan_small.
+
 End ARarctan_small.

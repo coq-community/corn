@@ -46,13 +46,18 @@ Opaque inj_Q CR.
 Using pi and properties of arctangent, we define arctangent from 1 to
 infinity.
 *)
-Program Definition rational_arctan_big_pos (a:Q) (Ha:1 < a) : CR := 
-  (r_pi (1#2) - @rational_arctan_small_pos (/a) _)%CR.
-Next Obligation.
- split.
+
+Lemma Qinv_one_lt : forall (a:Q),
+    1 < a -> -1 < /a < 1.
+Proof.
+  split.
+  apply (Qlt_le_trans _ 0). reflexivity.
   apply Qinv_le_0_compat; apply Qle_trans with 1; auto with qarith.
- change (/a < /1); apply Q.Qdiv_flip_lt; auto with qarith.
+  change (/a < /1); apply Q.Qdiv_flip_lt; auto with qarith.
 Qed.
+  
+Definition rational_arctan_big_pos (a:Q) (Ha:1 < a) : CR := 
+  (r_pi (1#2) - @rational_arctan_small (/a) (widen_interval (Qinv_one_lt Ha)))%CR.
 
 Lemma rational_arctan_big_pos_correct_aux (a : Q) :
   0 < a → (r_pi (1 # 2) - IRasCR (ArcTan (inj_Q IR (/ a))))%CR = IRasCR (ArcTan (inj_Q IR a)).
@@ -104,7 +109,7 @@ Lemma rational_arctan_big_pos_correct : forall a (Ha: 1 < a),
 Proof.
  intros a Ha.
  unfold rational_arctan_big_pos.
- rewrite -> rational_arctan_small_pos_correct.
+ rewrite -> rational_arctan_small_correct.
  apply rational_arctan_big_pos_correct_aux.
  now apply Qlt_trans with 1.
 Qed.
@@ -114,10 +119,10 @@ Proof.
 split;(try apply Qlt_shift_div_l; try apply Qlt_shift_div_r; psatzl Q).
 Qed.
 
-(** Because we have slow convergence near 1, we have another compuation
+(** Because we have slow convergence near 1, we have another computation
 that works for nonnegative numbers, and is particularly fast near 1. *)
 Definition rational_arctan_mid_pos (a:Q) (Ha : 0 < a) : CR :=
- (r_pi (1#4) + (rational_arctan_small (rational_arctan_mid_pos_prf Ha)))%CR.
+ (r_pi (1#4) + (rational_arctan_small (widen_interval (rational_arctan_mid_pos_prf Ha))))%CR.
 
 Lemma rational_arctan_mid_pos_correct_aux (a : Q) : 
   0 < a → (r_pi (1#4) + IRasCR (ArcTan (inj_Q IR ((a - 1) / (a + 1)))))%CR = IRasCR (ArcTan (inj_Q IR a)).
@@ -211,8 +216,9 @@ Proof.
   apply (@rational_arctan_mid_pos a).
   abstract (eapply Qlt_le_trans;[|apply A];auto with qarith).
  intros H.
- apply (@rational_arctan_small_pos a).
- abstract ( split;[assumption| eapply Qle_lt_trans;[apply A|auto with qarith]]).
+ apply (@rational_arctan_small a).
+ apply widen_interval.
+ abstract ( split;[refine (Qlt_le_trans _ 0 a _ H); reflexivity| eapply Qle_lt_trans;[apply A|auto with qarith]]).
 Defined.
 
 Lemma rational_arctan_pos_correct : forall a (Ha: 0 <= a),
@@ -224,7 +230,7 @@ Proof.
   destruct (Qle_total (5 # 2) a).
    apply rational_arctan_big_pos_correct.
   apply rational_arctan_mid_pos_correct.
- apply rational_arctan_small_pos_correct.
+ apply rational_arctan_small_correct.
 Qed.
 
 (** By symmetry we get arctangent for all numbers. *)
@@ -235,6 +241,20 @@ Proof.
   abstract ( change (-0 <= -a); apply: (inv_resp_leEq); assumption).
  apply (rational_arctan_pos H).
 Defined.
+
+Lemma rational_arctan_small_correct_aux (a : Q) : 
+  (- IRasCR (ArcTan (inj_Q IR (- a)%Q)))%CR = IRasCR (ArcTan (inj_Q IR a)).
+Proof.
+ rewrite <- IR_opp_as_CR.
+ apply IRasCR_wd.
+ csetoid_rewrite_rev (ArcTan_inv (inj_Q IR (-a))).
+ apply ArcTan_wd.
+ eapply eq_transitive.
+  apply eq_symmetric; apply (inj_Q_inv IR (-a)).
+ apply inj_Q_wd.
+ simpl.
+ ring.
+Qed.
 
 Lemma rational_arctan_correct : forall (a:Q),
  (rational_arctan a == IRasCR (ArcTan (inj_Q IR a)))%CR.

@@ -527,10 +527,16 @@ Proof.
  apply Qrecip_positives_zl.
 Defined.
 
-Section InductiveStreams.
-  (* Streams as an inductive type with explicit state of type X.
-     Allows to compute series such as exp x = sum_k x^k / k!
-     without recomputing the power and the factorial from 0 for each k. *)
+Section StreamGenerators.
+  (* Strictly speaking those are generators of streams with a state X,
+     or stream co-algebras, rather than actual streams. Instead of using
+     corecursion to produce actual coinductive streams, we directly call
+     the generator functions.
+
+     The type Stream Y is isomorphic the type nat -> Y. We use the former
+     to compute series such as exp x = sum_k x^k / k!
+     because the (k+1)-th term is quickly computed from the k-th term,
+     rather than recomputing the power and the factorial from 0 for each k. *)
 
   Variable X : Type.
   Variable f : X -> X.
@@ -779,7 +785,7 @@ Section InductiveStreams.
        let (y,r) := f (x,-q) in
        (y,-r).
 
-End InductiveStreams.
+End StreamGenerators.
 
 Lemma CRstream_opp_pth : forall (X:Type) (f : X*Q->X*Q) (xq : X*Q) (p : positive),
     let (y,r) := iterate _ f p xq in
