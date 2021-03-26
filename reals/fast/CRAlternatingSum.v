@@ -19,21 +19,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+Require Import Coq.setoid_ring.ArithRing.
+Require Import Coq.Bool.Bool.
+Require Import Coq.QArith.Qpower Coq.QArith.Qabs.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import Coq.setoid_ring.ArithRing.
 Require Export CoRN.reals.fast.CRArith.
-Require Import Coq.Bool.Bool.
 Require Export CoRN.model.metric2.Qmetric.
 Require Import CoRN.reals.fast.LazyNat.
 Require Import CoRN.reals.fast.CRstreams.
 Require Export CoRN.metric2.Limit.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.QArith.Qpower Coq.QArith.Qabs.
-Require Export MathClasses.theory.CoqStreams.
 Require Import CoRN.classes.Qclasses.
-Require Import MathClasses.interfaces.abstract_algebra MathClasses.interfaces.orders MathClasses.theory.series MathClasses.theory.streams.
+Require Import MathClasses.interfaces.abstract_algebra.
 
 Opaque CR.
 
@@ -42,359 +41,6 @@ Opaque CR.
 Alternating series are particularly nice to sum because each term is also
 a bound on the error of the partial sum.
 *)
-
-Section InfiniteAlternatingSum.
-
-(** Given a stream, we can compute its alternating partial sum up to
-an point satifying a predicate, so long as that predicate eventually
-exists.
-
-By folding with Qminus we get an alternating sum
-p0 - (p1 - (p2 - ... - (pn - 0))))
- *)
-
-Definition PartialAlternatingSumUntil {P : Stream Q → bool}
-           `(ex : LazyExists (fun x => Is_true (P x)) s) : Q
-  := takeUntil P ex Qminus' 0.
-
-(** The value of the partial sum is between 0 and the head of the
-sequence if the sequence is decreasing and nonnegative. *)
-Lemma PartialAlternatingSumUntil_take_small
-      (s : Stream Q) {dnn : DecreasingNonNegative s} (n : nat) : 
-  0 ≤ take s n Qminus' 0 ≤ hd s.
-Proof.
-  revert s dnn. induction n.
-  - simpl.
-   split... apply Qle_refl. now apply dnn_hd_nonneg.
-  - intros s dnn. simpl.
-  rewrite Qminus'_correct. unfold Qminus.
-  split.
-   apply rings.flip_nonneg_minus.
-   transitivity (hd (tl s)).
-    now apply (IHn _ _).
-   now destruct dnn as [[? ?] ?].
-  setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
-  apply (order_preserving _).
-  apply rings.flip_nonneg_negate. 
-  now apply (IHn _ _).
-Qed.
-
-Lemma PartialAlternatingSumUntil_small {P : Stream Q → bool}
-      `(ex : LazyExists (fun x => Is_true (P x)) s) {dnn : DecreasingNonNegative s} : 
-  0 ≤ PartialAlternatingSumUntil ex ≤ hd s.
-Proof.
-  unfold PartialAlternatingSumUntil.
-  rewrite takeUntil_correct.
-  apply PartialAlternatingSumUntil_take_small, _.
-Qed.
-
-Lemma dnn_in_Qball_bool_0_tl (s : Stream Q) {dnn : DecreasingNonNegative s} (ε : Qpos)
-  : Is_true (Qball_ex_bool ε (hd s) 0)
-    → Is_true (Qball_ex_bool ε (hd (tl s)) 0).
-Proof.
-  intros E.
-  apply Qball_ex_bool_correct.
-  apply (nonneg_in_Qball_0 (dnn_hd_nonneg (dnn_tl dnn))).
-  apply Qle_trans with (hd s).
-   now destruct dnn as [[? ?] _].
-  apply (nonneg_in_Qball_0 (dnn_hd_nonneg dnn)).
-  now apply Qball_ex_bool_correct.
-Qed.
-
-Lemma dnn_in_Qball_bool_0_Str_nth_tl (seq:Stream Q) {dnn : DecreasingNonNegative seq}
-      (n : nat) (ε : Qpos) :
-  Is_true (Qball_ex_bool ε (hd seq) 0)
-  → Is_true (Qball_ex_bool ε (hd (Str_nth_tl n seq)) 0).
-Proof.
-  induction n.
-  - easy.
-  - intros E. 
-    simpl. rewrite <-tl_nth_tl.
-    now apply (dnn_in_Qball_bool_0_tl _ _), IHn.
-Qed.
-
-Lemma dnn_in_Qball_0_EventuallyForall
-      (s : Stream Q) {dnn : DecreasingNonNegative s} (ε : Qpos) :
-  EventuallyForAll (λ s, Is_true (Qball_ex_bool ε (hd s) 0)) s.
-Proof.
-  revert s dnn.
-  cofix FIX. intros dnn.
-  constructor.
-   apply (dnn_in_Qball_bool_0_tl _ _).
-  simpl.
-  apply (FIX _ _).
-Qed.
-
-(** If a sequence has a limit of 0, then there is a point
-    arbitrarily close to 0. *)
-Fixpoint Limit_near_zero {s : Stream Q} {ε:QposInf}
-      (zl : LazyExists (NearBy 0 ε) s) { struct zl }
-  : LazyExists (λ s, Is_true (Qball_ex_bool ε (hd s) 0)) s.
-Proof.
- destruct zl as [nb | zl].
- - left.
-  destruct nb as [nb _].
-  unfold Qball_ex_bool.
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec ε (@hd Q s) (0#1)) as [|n].
-   constructor.
-  apply n; clear n.
-  apply nb.
- - right. intro.
-   apply (Limit_near_zero (tl s) ε (zl tt)).
-Defined.
-
-(** The infinte sum of an alternating series is the limit of the partial sums. *)
-Definition InfiniteAlternatingSum_raw (s : Stream Q) `{zl : !@Limit Q_as_MetricSpace s 0} (ε : QposInf)
-  := PartialAlternatingSumUntil (Limit_near_zero (zl ε)).
-
-Lemma InfiniteAlternatingSum_raw_wd (s1 s2 : Stream Q) {zl1 : @Limit Q_as_MetricSpace s1 0} {zl2 : @Limit Q_as_MetricSpace s2 0} (ε : QposInf) : 
-  s1 = s2 → InfiniteAlternatingSum_raw s1 ε = InfiniteAlternatingSum_raw s2 ε.
-Proof. 
-  assert (Proper ((=) ==> eq) (λ s, Qball_ex_bool ε (hd s) 0)).
-  intros x y xyeq. destruct x,y.
-  inversion xyeq as [H _]. unfold hd. unfold hd in H.
-  unfold Qball_ex_bool, ball_ex_dec.
-  destruct ε. 2: reflexivity. 
-  destruct (Qmetric_dec (` q1) q 0%Q), (Qmetric_dec (` q1) q0 0%Q).
-  reflexivity. 3: reflexivity.
-  exfalso. simpl in b.
-  rewrite H in b. contradiction.
-  exfalso. simpl in b.
-  rewrite <- H in b. contradiction.
-  intros E.
-  apply takeUntil_wd_alt. 
-   now apply _. 
-  easy.
-Qed.
-
-Definition InfiniteAlternatingSum_length (s : Stream Q)
-           `{zl : !@Limit Q_as_MetricSpace s 0}
-           (e:QposInf) := takeUntil_length _ (Limit_near_zero (zl e)).
-
-Lemma InfiniteAlternatingSum_length_weak (s : Stream Q) {dnn:DecreasingNonNegative s}
-      {zl : @Limit Q_as_MetricSpace s 0} (ε1 ε2 : Qpos) :
-  proj1_sig ε1 ≤ proj1_sig ε2
-  → InfiniteAlternatingSum_length s ε2 ≤ InfiniteAlternatingSum_length s ε1.
-Proof.
-  intros E.
-  apply takeUntil_length_ForAllIf.
-  revert s dnn zl.
-  cofix FIX; intros.
-  constructor.
-   do 2 rewrite Qball_ex_bool_correct.
-   now apply ball_weak_le.
-  apply (FIX _ _ _).
-Qed.
-
-Lemma InfiniteAlternatingSum_further_aux (s : Stream Q) {dnn : DecreasingNonNegative s} (k l : nat) (ε : Qpos) :
-  k ≤ l → Str_nth k s ≤ proj1_sig ε
-  → @ball Q_as_MetricSpace (proj1_sig ε) (take s l Qminus' 0) (take s k Qminus' 0).
-Proof.
-  intros E.
-  apply naturals.nat_le_plus in E.
-  destruct E as [z E]. do 2 red in E. rewrite E. clear E l.
-  revert z s dnn ε.
-  induction k; intros.
-   destruct z; intros.
-    apply ball_refl, Qpos_nonneg.
-   apply nonneg_in_Qball_0.
-    now apply (PartialAlternatingSumUntil_take_small _).
-   simpl. rewrite Qminus'_correct. unfold Qminus.
-   apply Qle_trans with (hd s).
-    change (hd s + - take (tl s) z Qminus' 0 ≤ hd s).
-    setoid_rewrite <-(rings.plus_0_r (hd s)) at 2.
-    apply (order_preserving _).
-    apply rings.flip_nonneg_negate.
-    now apply (PartialAlternatingSumUntil_take_small _).
-   easy.
-   simpl.
-   do 2 rewrite Qminus'_correct. unfold Qminus.
-  apply Qball_plus_r, Qball_opp.
-  now apply (IHk _ _ _).
-Qed.
-
-Lemma InfiniteAlternatingSum_further (s : Stream Q) {dnn : DecreasingNonNegative s}
-      {zl : @Limit Q_as_MetricSpace s 0} (l : nat) (ε : Qpos) :
-  InfiniteAlternatingSum_length s ε ≤ l
-  → @ball Q_as_MetricSpace (proj1_sig ε) (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε).
-Proof.
-  intros E.
-  unfold InfiniteAlternatingSum_raw, PartialAlternatingSumUntil.
-  rewrite takeUntil_correct.
-  apply (InfiniteAlternatingSum_further_aux _).
-   easy.
-  apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-  apply Qball_ex_bool_correct.
-  unfold Str_nth.
-  now apply (takeUntil_length_correct (λ s, Qball_ex_bool ε (hd s) 0)).
-Qed.
-
-Lemma InfiniteAlternatingSum_further_alt (s : Stream Q) {dnn : DecreasingNonNegative s}
-      {zl : @Limit Q_as_MetricSpace s 0} (l : nat) (ε1 ε2 : Qpos) :
-  InfiniteAlternatingSum_length s ε1 ≤ l
-  → @ball Q_as_MetricSpace (proj1_sig ε1 + proj1_sig ε2) (take s l Qminus' 0) (InfiniteAlternatingSum_raw s ε2).
-Proof.
-  intros E1.
-  unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
-  rewrite takeUntil_correct.
-  destruct (total (≤) l (takeUntil_length _ (Limit_near_zero (zl ε2))))
-    as [E2|E2].
-  - apply ball_sym.
-   apply (InfiniteAlternatingSum_further_aux _ _ _ (ε1 + ε2)).
-    easy.
-   apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-   apply naturals.nat_le_plus in E1.
-   destruct E1 as [z E1].
-   simpl.
-   rewrite E1. rewrite <- Nat.add_comm.
-   rewrite <-Str_nth_plus. 
-   change (Qball (` ε1 + ` ε2) 
-                 (Str_nth z (Str_nth_tl (InfiniteAlternatingSum_length s ε1) s)) 0).
-   apply ball_weak, Qball_ex_bool_correct.
-   apply Qpos_nonneg.
-   apply (dnn_in_Qball_bool_0_Str_nth_tl _).
-   apply (takeUntil_length_correct (λ s, Qball_ex_bool ε1 (hd s) 0)).
-  - assert (QposEq (ε1 + ε2) (ε2+ε1)) by (unfold QposEq; simpl; ring).
- apply (ball_wd _ H _ _ (reflexivity _) _ _ (reflexivity _)). clear H.
-  apply ball_weak. apply Qpos_nonneg.
-  apply (InfiniteAlternatingSum_further_aux _).
-   easy.
-  apply (nonneg_in_Qball_0 (dnn_Str_nth_nonneg dnn _)).
-  apply Qball_ex_bool_correct.
-  apply (takeUntil_length_correct (λ s, Qball_ex_bool ε2 (hd s) 0)).
-Qed.
-
-Lemma InfiniteAlternatingSum_prf (s : Stream Q) {dnn : DecreasingNonNegative s}
-      {zl : @Limit Q_as_MetricSpace s 0} :
-  is_RegularFunction Qball (InfiniteAlternatingSum_raw s).
-Proof.
-  assert (∀ (ε1 ε2 : Qpos),
-             (proj1_sig ε1) ≤ (proj1_sig ε2)
-             → @ball Q_as_MetricSpace (proj1_sig ε1 + proj1_sig ε2) (InfiniteAlternatingSum_raw s ε1) (InfiniteAlternatingSum_raw s ε2)).
-  { intros ε1 ε2 E.
-   unfold InfiniteAlternatingSum_raw at 1, PartialAlternatingSumUntil.
-   rewrite takeUntil_correct.
-   rewrite Qplus_comm.
-   apply ball_weak. apply Qpos_nonneg.
-   apply (InfiniteAlternatingSum_further _).
-   apply (InfiniteAlternatingSum_length_weak _), E. }
-  intros ε1 ε2.
-  destruct (total (≤) (proj1_sig ε1) (proj1_sig ε2)).
-  apply H, H0.
-  rewrite Qplus_comm.
-  apply ball_sym. apply H, H0. 
-Qed.
-
-Definition InfiniteAlternatingSum (seq:Stream Q) {dnn:DecreasingNonNegative seq}
-           {zl: @Limit Q_as_MetricSpace seq 0} : CR :=
-  Build_RegularFunction (InfiniteAlternatingSum_prf seq).
-
-Lemma InfiniteAlternatingSum_wd (s1 s2 : Stream Q) `{!DecreasingNonNegative s1} `{!DecreasingNonNegative s2} `{!@Limit Q_as_MetricSpace s1 0} `{!@Limit Q_as_MetricSpace s2 0} : 
-  s1 = s2 → InfiniteAlternatingSum s1 = InfiniteAlternatingSum s2.
-Proof.
-  intros E. apply regFunEq_equiv, regFunEq_e. intros ε.
-  unfold InfiniteAlternatingSum. simpl. 
-  rewrite (InfiniteAlternatingSum_raw_wd s1 s2).
-  apply Qball_Reflexive. apply (Qpos_nonneg (ε + ε)). exact E.
-Qed.
-
-Local Open Scope Q_scope.
-
-Lemma InfiniteAlternatingSum_step (seq : Stream Q) {dnn:DecreasingNonNegative seq}
-      {zl: @Limit Q_as_MetricSpace seq 0} : 
- (InfiniteAlternatingSum seq == '(hd seq) - InfiniteAlternatingSum (tl seq))%CR.
-Proof.
- destruct seq as [hd seq], dnn as [dnn_hd dnn].
- rewrite -> CRplus_translate.
- apply regFunEq_equiv, regFunEq_e.
- intros e.
- simpl.
- unfold Cap_raw; simpl.
- unfold InfiniteAlternatingSum_raw.
- unfold PartialAlternatingSumUntil.
- simpl.
- set (P:=(fun s : Stream Q => Qball_ex_bool e (CoqStreams.hd s) 0)).
- case_eq (P (Cons hd seq)); intros H.
-  rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
-  case_eq (P seq); intros H0.
-   rewrite takeUntil_end;[|apply Is_true_eq_left;assumption].
-   simpl.
-   change (Qball (proj1_sig e + proj1_sig e) 0 (hd + -0))%Q.
-   rewrite Qplus_0_r.
-   change (Qball (`e+`e) 0 hd).
-   unfold P in H.
-   apply ball_weak;simpl. apply Qpos_nonneg.
-   apply ball_sym;simpl.
-   unfold Qball_ex_bool in H.
-   destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd (Cons hd seq))) as [X|X];
-     [apply X|discriminate H].
-  unfold P in *.
-  unfold Qball_ex_bool in *.
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd (Cons hd seq))) as [X|X];
-    [|discriminate H].
-  destruct (ball_ex_dec Q_as_MetricSpace Qmetric_dec e (CoqStreams.hd seq)) as [Y|Y]; [discriminate H0|].
-  elim Y.
-  simpl in dnn_hd.
-  destruct dnn_hd as [Z0 Z1].
-  split;simpl.
-   apply Qle_trans with 0.
-   change (- proj1_sig e <= 0)%Q.
-    rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
-   change (0 <= CoqStreams.hd seq - 0)%Q.
-   ring_simplify.
-   apply Z0.
-  change (CoqStreams.hd seq - 0 <= proj1_sig e)%Q.
-  ring_simplify.
-  eapply Qle_trans.
-   apply Z1.
-  destruct X as [_ X].
-  unfold Qminus in X. rewrite Qplus_0_r in X.
-  exact X.
-  destruct (takeUntil_step P (Limit_near_zero (zl e)) Qminus' 0)
-    as [ex' rw]; [rewrite H;auto|].
- change zero with (0:Q).
- rewrite rw; clear rw.
- simpl.
- rewrite (@takeUntil_wd Q Q P _ ex' (Limit_near_zero (Limit_tl zl e))).
- rewrite -> Qminus'_correct.
- apply Qball_Reflexive. apply (Qpos_nonneg (e+e)).
-Qed.
-
-(** The infinite alternating series is always nonnegative. *)
-Lemma InfiniteAlternatingSum_nonneg (seq : Stream Q) {dnn:DecreasingNonNegative seq}
-      {zl:@Limit Q_as_MetricSpace seq 0} :
- (0 <= InfiniteAlternatingSum seq)%CR.
-Proof.
- intros e.
- apply Qle_trans with 0.
-  change (-proj1_sig e ≤ 0)%Q.
-  rewrite -> Qle_minus_iff; ring_simplify; apply Qpos_nonneg.
- unfold InfiniteAlternatingSum.
- simpl.
- unfold Cap_raw.
- simpl.
- ring_simplify.
- unfold InfiniteAlternatingSum_raw.
- destruct (PartialAlternatingSumUntil_small
-             (Limit_near_zero (zl ((1 # 2) * e)%Qpos))).
- exact H.
-Qed.
-
-(** The infinite alternating series is always bounded by the first term
-in the series. *)
-Lemma InfiniteAlternatingSum_bound (seq : Stream Q) {dnn:DecreasingNonNegative seq}
-      {zl:@Limit Q_as_MetricSpace seq 0} :
- (InfiniteAlternatingSum seq <= inject_Q_CR (hd seq))%CR.
-Proof.
- rewrite -> InfiniteAlternatingSum_step.
- rewrite <- (CRplus_0_r (' hd seq)%CR) at 2.
- rewrite <- CRopp_0.
- apply CRplus_le_l, CRopp_le_compat.
- apply InfiniteAlternatingSum_nonneg.
-Qed.
-
-End InfiniteAlternatingSum.
-
 
 Section RationalStreamSum.
   Variable X : Type.
@@ -576,7 +222,7 @@ Section RationalStreamSum.
     apply (Pos.peano_ind (fun p => forall z : X * Q * Q,
     fst
       (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z0, r) := f (fst y) in (z0, r, r + snd y)) p z)
+         (fun y : X * Q * Q => let (z0, r) := f (fst y) in (z0, r, r + snd y)) p z)
     ≡ CRstreams.iterate (X * Q) f p (fst z))).
     - intro z. simpl. destruct (f (fst z)); reflexivity.
     - intros. rewrite iterate_succ, H.
@@ -595,7 +241,7 @@ Section RationalStreamSum.
     apply (Pos.peano_ind (fun p => forall z : X * Q * Q,
     fst
       (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z0, r) := f (fst y) in (z0, r, Qred (r + snd y))) p z)
+         (fun y : X * Q * Q => let (z0, r) := f (fst y) in (z0, r, Qred (r + snd y))) p z)
     ≡ CRstreams.iterate (X * Q) f p (fst z))).
     - intro z. simpl. destruct (f (fst z)); reflexivity.
     - intros. rewrite iterate_succ, H.
@@ -605,16 +251,16 @@ Section RationalStreamSum.
 
   Lemma SumStream_red : forall (p:positive) z,
       snd (CRstreams.iterate _
-             (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+             (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
              p z)
       == snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p z).
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p z).
   Proof.
     apply (Pos.peano_ind
              (fun p => forall z, snd (CRstreams.iterate _
-             (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+             (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
              p z) == snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p z))).
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p z))).
     - intros. rewrite iterate_one, iterate_one.
       destruct (f (fst z)). apply Qred_correct.
     - intros. rewrite iterate_succ, SumStream_fst_red.
@@ -627,19 +273,19 @@ Section RationalStreamSum.
 
   Lemma SumStream_init : forall (p:positive) z (r:Q),
       snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
        (z, r)) ==
       r +
       snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
        (z, 0)).
   Proof.
     apply (Pos.peano_ind (fun p => forall (z : X * Q) (r : Q),
     snd (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+         (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
          (z, r)) == r + snd
       (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+         (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
          (z, 0)))).
     - intros. rewrite iterate_one, iterate_one.
       unfold fst. destruct (f z). unfold snd. 
@@ -657,29 +303,29 @@ Section RationalStreamSum.
 
   Lemma SumStream_assoc : forall x (p q : positive),
       snd (CRstreams.iterate _
-                (λ y : X * Q * Q,
+                (fun y : X * Q * Q =>
                        let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
                 (p+q) (x,0))
       == snd (CRstreams.iterate _
-                      (λ y : X * Q * Q,
+                      (fun y : X * Q * Q =>
                              let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
                       p (x,0))
          + snd (CRstreams.iterate _
-                        (λ y : X * Q * Q,
+                        (fun y : X * Q * Q =>
                                let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
                 q (CRstreams.iterate _ f p x, 0)).
   Proof.
     intros x p. revert p x.
     apply (Pos.peano_ind (fun p => forall x q,
     snd (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+         (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
          (p + q) (x, 0)) ==
     snd (CRstreams.iterate (X * Q * Q)
-         (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p 
+         (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p 
          (x, 0)) +
      snd
        (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) q
+          (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) q
           (CRstreams.iterate _ f p x, 0)))).
     - intros x q.
       rewrite Pos.add_comm, iterate_add.
@@ -711,13 +357,13 @@ Section RationalStreamSum.
       0 <= snd (f x) ->
   0 <= snd
     (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
        (p~0) (x, 0)).
   Proof.
     (* Sum of positive terms. *)
     assert (forall x, Str_alt_decr x -> 0 <= snd (f x) ->
                  0 <= snd (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
        (1 + 1) (x, 0))).
     { intros.
       pose proof (Str_alt_neg 1 x H H0) as H1.
@@ -734,7 +380,7 @@ Section RationalStreamSum.
       rewrite Qopp_involutive, Qplus_comm in H. exact H. }
     apply (Pos.peano_ind (fun p => forall x, Str_alt_decr x -> 0 <= snd (f x) ->
   0 <= snd (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
        (p~0) (x, 0)))).
     - intros. exact (H x H0 H1).
     - intros.
@@ -751,13 +397,13 @@ Section RationalStreamSum.
       Str_alt_decr x ->
       snd (f x) <= 0 ->
       snd (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
        (p~0) (x, 0)) <= 0.
   Proof.
     (* Sum of negative terms. *)
     assert (forall x, Str_alt_decr x -> snd (f x) <= 0 ->
                  snd (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
        (1 + 1) (x, 0)) <= 0).
     { intros.
       specialize (H xH). 
@@ -773,7 +419,7 @@ Section RationalStreamSum.
       apply Qle_refl. exact H0. }
     apply (Pos.peano_ind (fun p => forall x, Str_alt_decr x -> snd (f x) <= 0 ->
        snd (CRstreams.iterate (X * Q * Q)
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y))
        (p~0) (x, 0)) <= 0)).
     - intros. exact (H x H0 H1).
     - intros.
@@ -798,7 +444,7 @@ Section RationalStreamSum.
       Str_alt_decr x ->
       0 <= snd (f x) ->
       0 <= snd (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+          (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
           p (x, 0)) <= snd (f x).
   Proof.
     (* This truncated sum starts at 0, and oscillates around 0
@@ -809,7 +455,7 @@ Section RationalStreamSum.
       Str_alt_decr x ->
       0 <= snd (f x) ->
       0 <= snd (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+          (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
           p (x, 0)) <= snd (f x))).
     - intros. simpl. destruct (f x). simpl.
       rewrite Qplus_0_r. split. exact H0. apply Qle_refl.
@@ -820,7 +466,7 @@ Section RationalStreamSum.
         rewrite SumStream_assoc, iterate_one.
         specialize (H x H0 H1) as [_ H].
         apply (Qle_trans _ (snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p~1 
+       (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p~1 
        (x, 0)) + 0)).
         2: rewrite Qplus_0_r; exact H.
         apply Qplus_le_r. unfold fst.
@@ -878,13 +524,13 @@ Section RationalStreamSum.
       Str_alt_decr x ->
     Qabs (snd
        (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
+          (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) 
           p (x, 0))) <= Qabs (snd (f x)).
   Proof.
     intros. destruct (Qlt_le_dec (snd (f x)) 0).
     - apply (Pos.peano_case (fun p => Qabs (snd
        (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p 
+          (fun y : X * Q * Q => let (z, r0) := f (fst y) in (z, r0, r0 + snd y)) p 
           (x, 0))) <= Qabs (snd (f x)))).
       + simpl. destruct (f x). unfold snd.
         rewrite Qplus_0_r. apply Qle_refl.
@@ -944,8 +590,8 @@ Section RationalStreamSum.
     (* Replace p by its stopping index r. *)
     pose proof (iterate_stop_correct
                   _
-                  (λ y : X * Q * Q, let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
-                  (λ y : X * Q * Q, Qle_bool (Qabs (snd (fst y))) (` d1))
+                  (fun y : X * Q * Q => let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
+                  (fun y : X * Q * Q => Qle_bool (Qabs (snd (fst y))) (` d1))
                   p (x,0)) as [r [req [_ H4]]].
     rewrite req. clear req.
     assert (Qabs (Str_pth r x) <= proj1_sig ε1) as rstop.
@@ -960,8 +606,8 @@ Section RationalStreamSum.
     (* Replace q by its stopping index s. *)
     pose proof (iterate_stop_correct
                   _
-                  (λ y : X * Q * Q, let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
-                  (λ y : X * Q * Q, Qle_bool (Qabs (snd (fst y))) (` d2))
+                  (fun y : X * Q * Q => let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
+                  (fun y : X * Q * Q => Qle_bool (Qabs (snd (fst y))) (` d2))
                   q (x,0)) as [s [seq [_ H2]]].
     rewrite seq. clear seq.
     assert (Qabs (Str_pth s x) <= proj1_sig ε2) as sstop.
@@ -1032,8 +678,8 @@ Section RationalStreamSum.
     intros. unfold SumStream.
     pose proof (iterate_stop_correct
                   _
-                  (λ y : X * Q * Q, let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
-                  (λ y : X * Q * Q, Qle_bool (Qabs (snd (fst y))) (` e))
+                  (fun y : X * Q * Q => let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
+                  (fun y : X * Q * Q => Qle_bool (Qabs (snd (fst y))) (` e))
                   p (f x,0)) as [s [seq [H0 H1]]].
     rewrite seq, SumStream_red.
     pose proof (SumStream_assoc x 1 s) as H2.
@@ -1045,8 +691,8 @@ Section RationalStreamSum.
     rewrite Pos.add_1_l.
     pose proof (iterate_stop_correct
                   _
-                  (λ y : X * Q * Q, let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
-                  (λ y : X * Q * Q, Qle_bool (Qabs (snd (fst y))) (` e))
+                  (fun y : X * Q * Q => let (z, r) := f (fst y) in (z, r, Qred (r + snd y)))
+                  (fun y : X * Q * Q => Qle_bool (Qabs (snd (fst y))) (` e))
                   (Pos.succ p) (x,0)) as [r [req [H2 H3]]].
     rewrite req, SumStream_red. 
     clear req seq.
@@ -1273,20 +919,20 @@ Lemma SumStream_wd : forall (p:positive)
                        (x : X*Q) (y : Y*Q),
     (forall p:positive, Str_pth _ f p x == Str_pth _ g p y)
     -> snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
        (x,0))
       == snd (CRstreams.iterate _
-       (λ y : Y * Q * Q, let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : Y * Q * Q => let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
        (y,0)).
 Proof.
   apply (Pos.peano_ind (fun p => forall (X Y:Type) (f : X*Q -> X*Q) (g : Y*Q -> Y*Q)
                        (x : X*Q) (y : Y*Q),
     (forall p:positive, Str_pth _ f p x == Str_pth _ g p y)
     -> snd (CRstreams.iterate _
-       (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, r1 + snd y)) p
        (x,0))
       == snd (CRstreams.iterate _
-       (λ y : Y * Q * Q, let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
+       (fun y : Y * Q * Q => let (z0, r1) := g (fst y) in (z0, r1, r1 + snd y)) p
        (y,0)))).
   - intros. simpl. specialize (H xH).
     unfold Str_pth in H. simpl in H.
@@ -1326,14 +972,14 @@ Proof.
   unfold SumStream.
   destruct (iterate_stop_correct
               _
-              (λ y0 : X * Q * Q, let (z, r) := f (fst y0) in (z, r, Qred (r + snd y0)))
-              (λ y0 : X * Q * Q, Qle_bool (Qabs (snd (fst y0))) (` e))
+              (fun y0 : X * Q * Q => let (z, r) := f (fst y0) in (z, r, Qred (r + snd y0)))
+              (fun y0 : X * Q * Q => Qle_bool (Qabs (snd (fst y0))) (` e))
               (cvmod e) (x,0)) as [q [qeq [H1 H2]]].
   rewrite qeq, SumStream_red. clear qeq.
   destruct (iterate_stop_correct
               _
-              (λ y0 : Y * Q * Q, let (z, r) := g (fst y0) in (z, r, Qred (r + snd y0)))
-              (λ y0 : Y * Q * Q, Qle_bool (Qabs (snd (fst y0))) (` e))
+              (fun y0 : Y * Q * Q => let (z, r) := g (fst y0) in (z, r, Qred (r + snd y0)))
+              (fun y0 : Y * Q * Q => Qle_bool (Qabs (snd (fst y0))) (` e))
               (cvmod e) (y,0)) as [r [req [H3 H4]]].
   rewrite req, SumStream_red. clear req.
   destruct H4 as [fuel|predicate].
@@ -1398,7 +1044,7 @@ Qed.
 Lemma AltSeries_shift_pth : forall (p:positive) (X : Type) f x cvmod decr lz,
     (AltSeries X f x cvmod decr lz
      == inject_Q_CR (snd (CRstreams.iterate _
-            (λ y : (X * Q) * Q,
+            (fun y : (X * Q) * Q =>
                let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
             p (x, 0%Q)))
         + AltSeries X f (CRstreams.iterate _ f p x)
@@ -1408,7 +1054,7 @@ Proof.
   apply (Pos.peano_ind (fun p => forall X f x cvmod decr lz,
       (AltSeries X f x cvmod decr lz
        == inject_Q_CR (snd (CRstreams.iterate _
-            (λ y : (X * Q) * Q,
+            (fun y : (X * Q) * Q =>
                let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
             p (x, 0%Q)))
           + AltSeries X f _ _ (Str_alt_decr_tl X f x p decr)
@@ -1419,7 +1065,7 @@ Proof.
     destruct (f x). simpl. rewrite Qplus_0_r. reflexivity.
   - intros.
     setoid_replace (AltSeries X f (CRstreams.iterate (X * Q) f (Pos.succ p) x)
-                              (λ e : Qpos, (cvmod e - Pos.succ p)%positive)
+                              (fun e : Qpos => (cvmod e - Pos.succ p)%positive)
                               (Str_alt_decr_tl X f x (Pos.succ p) decr)
                               (Limit_zero_tl X f x cvmod (Pos.succ p) decr lz))
       with (AltSeries X f (CRstreams.iterate (X * Q) f p (f x))
@@ -1429,11 +1075,11 @@ Proof.
                                      (Limit_zero_tl X f x _ 1 decr lz))).
     + setoid_replace (inject_Q_CR (snd
        (CRstreams.iterate (X * Q * Q)
-          (λ y : X * Q * Q, let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
+          (fun y : X * Q * Q => let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y)))
           (Pos.succ p) (x, 0))))
           with (inject_Q_CR (snd (f x)) + inject_Q_CR (snd
               (CRstreams.iterate (X * Q * Q)
-                 (λ y : X * Q * Q,
+                 (fun y : X * Q * Q =>
                     let (z0, r1) := f (fst y) in (z0, r1, Qred (r1 + snd y))) p
                  (f x, 0%Q))))%CR.
       rewrite <- CRplus_assoc, <- (H X f (f x)).
@@ -1445,7 +1091,7 @@ Proof.
       apply inject_Q_CR_wd.
       transitivity (snd (f (CRstreams.iterate (X * Q) f p x) )
                     + snd (CRstreams.iterate (X * Q * Q)
-              (λ y : X * Q * Q, let (z1, r0) := f (fst y) in (z1, r0, r0 + snd y)) p
+              (fun y : X * Q * Q => let (z1, r0) := f (fst y) in (z1, r0, r0 + snd y)) p
               (x, 0))).
       destruct (f (CRstreams.iterate (X * Q) f p x)); reflexivity.
       pose proof (SumStream_assoc X f x 1 p).

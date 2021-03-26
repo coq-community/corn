@@ -62,15 +62,11 @@ Proof.
   apply Qmult_le_compat_r; assumption.
 Qed. 
 
-Lemma Qmult_neg_1 : forall q : Q, (-1)*q == -q.
+Lemma Qmult_opp_1 : forall q : Q,
+    eq (-q) (-1 * q).
 Proof.
-  intro q. reflexivity.
+  reflexivity.
 Qed.
-
-Lemma Qsquare_pos : forall q:Q, 0 <= q*q.
-Proof.
-  intros [n d]. destruct n; discriminate.
-Qed. 
 
 Lemma fact_inc : forall n:nat, (fact n <= fact (S n))%nat.
 Proof.
@@ -127,7 +123,6 @@ Proof.
   apply Pos.peano_ind.
   - unfold sinStream, Str_pth; simpl.
     rewrite Qmult_comm. apply Qmult_comp. reflexivity.
-    rewrite <- Qmult_neg_1.
     rewrite Qmult_assoc, Qmult_assoc.
     reflexivity.
   - intros p pInd. unfold Str_pth.
@@ -141,9 +136,10 @@ Proof.
     rewrite <- (Qmult_comm ((-1) ^ Pos.succ p * a ^ (1 + 2 * Pos.succ p))).
     rewrite <- (Pos.add_1_l p).
     rewrite Pos2Z.inj_add, (Qpower_plus (-1)%Q).
-    simpl ((-1)^1). rewrite <- Qmult_neg_1.
+    simpl ((-1)^1).
+    rewrite Qmult_opp_1.
     do 5 rewrite <- (Qmult_assoc (-1)).
-    apply Qmult_comp. reflexivity.
+    apply (Qmult_comp (-1)). reflexivity.
     rewrite (Qmult_comm (1 # Pos.of_nat (fact (1 + 2 * Pos.to_nat p)))).
     do 5 rewrite <- (Qmult_assoc ((-1)^p)).
     apply Qmult_comp. reflexivity.
@@ -248,17 +244,18 @@ Proof.
     change ((-1) ^ (1 + p)%positive) with (Qpower_positive (-1) (1 + p)).
     rewrite Qpower_plus_positive. simpl (Qpower_positive (-1) 1).
     rewrite <- Qmult_assoc, <- Qmult_assoc.
-    rewrite Qmult_neg_1. apply (Qopp_le_compat 0). 
+    apply (Qopp_le_compat 0). 
     rewrite (Qmult_comm (a ^ (1 + 2 * (1 + p)%positive))).
     rewrite Qmult_assoc, Qmult_assoc.
     rewrite <- Qmult_assoc.
     apply Qmult_le_0_compat.
-    apply Qsquare_pos.
+    simpl.
+    destruct (Qpower_positive (-1) p), Qnum; discriminate.
     setoid_replace (a ^ (1 + 2 * (1 + p))) with (a ^ (1 + 2 * p) * (a * a)).
     rewrite Qmult_assoc.
     apply Qmult_le_0_compat.
-    apply Qsquare_pos.
-    apply Qsquare_pos.
+    destruct (a ^ (1 + 2 * p)), Qnum; discriminate.
+    destruct a, Qnum; discriminate.
     change (a*a) with (Qpower_positive a 2).
     rewrite <- (Qpower_plus_positive a (1+2*p)).
     change (a ^ (1 + 2 * (1 + p))) with (Qpower_positive a (1 + 2 * (1 + p))).

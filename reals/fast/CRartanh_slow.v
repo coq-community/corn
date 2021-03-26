@@ -49,9 +49,31 @@ Opaque inj_Q CR.
 (**
 ** Area Tangens Hyperbolicus (artanh)
 [artanh] is implemented by as the [GeometricSum] of it's taylor series.
+The Taylor series of arctan is the alternation of arctanh's, so we cannot
+use alternating series here.
 *)
 
-Lemma arctanSequence_Gs : forall a, GeometricSeries (a^2) (arctanSequence a).
+Definition artanhSequence (a:Q) : Stream Q
+  := mult_Streams (everyOther Qrecip_positives) (powers_help (a^2) a).
+
+Lemma Str_nth_artanhSequence n :
+  forall a, (Str_nth n (artanhSequence a) == (1#P_of_succ_nat (2*n))*a^(1+2*n)%nat)%Q.
+Proof.
+  intro a.
+  unfold artanhSequence.
+  unfold mult_Streams.
+  rewrite Str_nth_zipWith.
+  rewrite Str_nth_everyOther.
+  rewrite Str_nth_Qrecip_positives. 
+  rewrite -> (Str_nth_powers_help_int_pow _ Z.of_nat).
+  rewrite <- Qpower_mult.
+  rewrite inj_plus.
+  rewrite -> (Qpower_plus' a 1 (2*n)%nat); auto with *.
+  rewrite inj_mult.
+  reflexivity.
+Qed.
+
+Lemma arctanSequence_Gs : forall a, GeometricSeries (a^2) (artanhSequence a).
 Proof.
  intros a.
  apply mult_Streams_Gs.
@@ -344,7 +366,7 @@ csetoid_rewrite_rev IHn.
 clear IHn.
 csetoid_replace (ArTanH_series_coef (Nat.double n)[*]nexp IR (Nat.double n) (inj_Q IR a[-][0])) ([0]:IR).
 csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A) 
-                (inj_Q IR (Str_nth n (arctanSequence a))).
+                (inj_Q IR (Str_nth n (artanhSequence a))).
   rational.
  unfold ArTanH_series_coef.
  case_eq (even_odd_dec (S (double n))); intros H.
@@ -353,7 +375,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
   apply even_plus_n_n.
  intros _.
  eapply eq_transitive;
-  [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_arctanSequence].
+  [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_artanhSequence].
  eapply eq_transitive;
   [|apply eq_symmetric; apply inj_Q_mult].
  apply mult_wd.
