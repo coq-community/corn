@@ -84,7 +84,7 @@ Lemma Qplus_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qplu
 Proof. repeat intro. apply Qplus_strext0; trivial. Qed.
 
 Definition Qplus_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qplus_strext1.
-Canonical Structure Qplus_is_bin_fun.
+(* Canonical Structure Qplus_is_bin_fun. *)
 
 (** It is associative and commutative.
 *)
@@ -107,7 +107,7 @@ Proof. firstorder using Qopp_comp. Qed.
 
 
 Definition Qopp_is_fun := Build_CSetoid_fun _ _ _ Qopp_strext.
-Canonical Structure Qopp_is_fun.
+(* Canonical Structure Qopp_is_fun. *)
 
 (**
 *** Multiplication
@@ -120,7 +120,7 @@ Lemma Qmult_strext1 : bin_fun_strext Q_as_CSetoid Q_as_CSetoid Q_as_CSetoid Qmul
 Proof. repeat intro. apply Qmult_strext0; trivial. Qed.
 
 Definition Qmult_is_bin_fun := Build_CSetoid_bin_fun _ _ _ _ Qmult_strext1.
-Canonical Structure Qmult_is_bin_fun.
+(* Canonical Structure Qmult_is_bin_fun. *)
 
 (** It is associative and commutative.
 *)
