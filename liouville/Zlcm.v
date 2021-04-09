@@ -236,7 +236,7 @@ Proof.
    reflexivity.
   assumption.
  case (Z.eq_dec a 0).
-  intro H; rewrite H; simpl; apply Zmod_0_r.
+  now intro H; rewrite H in Hap.
  intro H; clear H.
  apply Zmod0_Zdivides; assumption.
 Qed.
