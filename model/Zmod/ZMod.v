@@ -55,7 +55,8 @@ Proof.
  case m; auto.
 Qed.
 
-Lemma Zmod_zero_rht : forall a : Z, (a mod 0)%Z = 0%Z.
+Lemma Zmod_zero_rht : forall a : Z, (a mod 0)%Z = 
+ltac:(match eval hnf in (1 mod 0) with | 0 => exact 0%Z | _ => exact a end).
 Proof.
  intro a.
  case a; auto.
