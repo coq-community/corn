@@ -245,6 +245,11 @@ Qed.
 
 Hint Rewrite R_opp_as_IR : RtoIR.
 
+Lemma IR_opp_as_R : forall x, (IRasR ([--] x) [=] (- (IRasR x))).
+Proof.
+ apply: map_pres_minus_unfolded.
+Qed.
+
 (** subtraction *)
 
 Lemma R_minus_as_IR : forall x y, (RasIR (x-y) [=] RasIR x [-] RasIR y).
@@ -258,13 +263,28 @@ Qed.
 
 Hint Rewrite R_minus_as_IR : RtoIR.
 
+Lemma IR_minus_as_R : forall x y, (IRasR (x[-]y) [=] IRasR x - IRasR y).
+Proof.
+  intros x y.
+  unfold Rminus.
+  rewrite <- IR_opp_as_R.
+  rewrite <- IR_plus_as_R.
+  reflexivity. 
+Qed.
+
 (** multiplication *)
 
 Lemma R_mult_as_IR : forall x y, (RasIR (x*y) [=] RasIR x [*] RasIR y).
 Proof.
  apply: map_pres_mult.
 Qed.
+
 Hint Rewrite R_mult_as_IR : RtoIR.
+
+Lemma IR_mult_as_R : forall x y, (IRasR (x[*]y) = IRasR x * IRasR y).
+Proof.
+ apply: map_pres_mult_unfolded.
+Qed.
 
 (** reciprocal *)
 
