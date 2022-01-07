@@ -110,7 +110,8 @@ Program Definition extend : Q -> Y :=
             else f (x ↾ _).
 Next Obligation.
 apply mspc_ball_Qle.
-apply orders.not_lt_le_flip in H1. apply orders.not_lt_le_flip in H2. now split.
+repeat match goal with [ H : ¬ _ < _ |- _ ] => apply orders.not_lt_le_flip in H end.
+now split.
 Qed.
 
 (*
