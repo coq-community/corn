@@ -273,8 +273,10 @@ End completion_distributes.
 
 (** The diagonal function [x ⟼ (x,x)] is a uniformly continuous function
   from a metric space X to the product space [X × X] *)
+
+Require Import Coq.Unicode.Utf8.
+
 Section diag.
- Require Import Coq.Unicode.Utf8.
  Variable X:MetricSpace.
 
  Definition diag_raw : X → (ProductMS X X) := λ x, (x,x).
