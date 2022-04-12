@@ -75,8 +75,8 @@ maintainers:
 opam-file-maintainer: b.a.w.spitters@gmail.com
 
 license:
-  fullname: GNU General Public License v2
-  identifier: GPL-2.0
+  fullname: GNU Lesser General Public License v2.1
+  identifier: LGPL-2.1-or-later
 
 supported_coq_versions:
   text: Coq 8.7 or greater
