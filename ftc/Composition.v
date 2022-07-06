@@ -1029,5 +1029,7 @@ Qed.
 
 End Corollaries.
 
+#[global]
 Hint Immediate included_comp: included.
+#[global]
 Hint Immediate Continuous_I_comp Continuous_comp: continuous.

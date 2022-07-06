@@ -351,6 +351,7 @@ Qed.
 
 End More_Nexp.
 
+#[global]
 Hint Resolve nexp_distr_div nexp_distr_recip: algebra.
 
 Arguments nexp_resp_ap_zero [R x].
@@ -789,11 +790,13 @@ Qed.
 
 End Zexp_properties.
 
+#[global]
 Hint Resolve nexp_resp_ap_zero zexp_zero zexp_nexp zexp_inv_nexp
   zexp_inv_nexp' zexp_plus1 zexp_resp_ap_zero zexp_inv zexp_inv1 zexp_plus
   zexp_minus one_zexp mult_zexp zexp_mult zexp_two inv_zexp_even inv_zexp_two
   zexp_one zexp_funny zexp_funny': algebra.
 
+#[global]
 Hint Resolve zexp_wd: algebra_c.
 
 Section Root_Unique.

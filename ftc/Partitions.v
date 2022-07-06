@@ -373,6 +373,7 @@ Arguments Even_Partition [a b].
 Arguments Even_Partition_Sum [a b].
 Arguments Refinement [a b Hab m n].
 
+#[global]
 Hint Resolve start finish: algebra.
 
 Section Lemmas.

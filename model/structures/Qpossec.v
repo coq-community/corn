@@ -46,6 +46,9 @@ Require Import Coq.QArith.Qround.
 Require Import Coq.QArith.Qabs.
 Require Import CoRN.stdlib_omissions.Q.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Local Open Scope Q_scope.
 
 (**
@@ -76,6 +79,7 @@ Coercion QposAsQ : Qpos >-> Q.
 (** Basic properties about [Qpos] *)
 Definition Qpos_prf : forall a:Qpos, 0 < a := @proj2_sig _ _.
 
+#[global]
 Hint Immediate Qpos_prf.
 
 Lemma Qpos_nonzero : forall x:Qpos, (x:Q)[#]0.
@@ -89,16 +93,19 @@ Lemma Qpos_nonzero' (q: Qpos): ~ q == 0.
   (* simpler variant that actually shows up as proof obligations *)
 Proof. apply Qpos_nonzero. Qed.
 
+#[global]
 Hint Immediate Qpos_nonzero'.
 
 Lemma Qpos_nonneg : forall a:Qpos, 0 <= a.
 Proof. intros [??]. auto with *. Qed.
 
+#[global]
 Hint Immediate Qpos_nonneg.
 
 Lemma Qopp_Qpos_neg (x: Qpos): -x < 0.
 Proof. apply Qopp_Qlt_0_r. auto. Qed.
 
+#[global]
 Hint Immediate Qopp_Qpos_neg.
 
 (** Any positive rational number can be transformed into a [Qpos]. *)
@@ -176,6 +183,7 @@ Proof.
 Qed.
 
 (* begin hide *)
+#[global]
 Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 (* end hide *)
 
@@ -183,6 +191,7 @@ Hint Rewrite QposAsmkQpos QposAsQposMake : QposElim.
 *** Equality
 *)
 Definition QposEq (a b:Qpos) := Qeq a b.
+#[global]
 Instance Qpos_default : @DefaultRelation Qpos QposEq | 2 := {}.
 
 Add Relation Qpos QposEq
@@ -224,6 +233,7 @@ Proof.
  trivial.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Q_Qpos_plus : QposElim.
 (* end hide *)
 
@@ -237,6 +247,7 @@ Notation "1" := Qpos_one : Qpos_scope.
 Lemma Q_Qpos_one : (1%Qpos:Q)=(1:Q).
 Proof. trivial. Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Q_Qpos_one : QposElim.
 (* end hide *)
 
@@ -262,6 +273,7 @@ Proof.
  trivial.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Q_Qpos_mult : QposElim.
 (* end hide *)
 (**
@@ -290,6 +302,7 @@ Lemma Q_Qpos_inv : forall (x:Qpos), Qpos_inv x = / x :> Q.
 Proof.
  trivial.
 Qed.
+#[global]
 Hint Rewrite Q_Qpos_inv : QposElim.
 
 Notation "a / b" := (Qpos_mult a (Qpos_inv b)) : Qpos_scope.
@@ -353,6 +366,7 @@ Defined.
 
 Infix "^" := Qpos_power : Qpos_scope.
 (* begin hide *)
+#[global]
 Instance Qpos_power_wd: Proper (QposEq ==> @eq Z ==> QposEq) Qpos_power.
 Proof.
  intros x1 x2 Hx y1 y2 Hy.
@@ -370,6 +384,7 @@ Proof.
  autorewrite with QposElim.
  reflexivity.
 Qed.
+#[global]
 Hint Rewrite Q_Qpos_power : QposElim.
 
 (**
@@ -399,6 +414,7 @@ Qed.
 
 Definition QposRed (a:Qpos) : Qpos := mkQpos (QposRed_prf a (Qpos_prf a)).
 
+#[global]
 Instance QposRed_complete: Proper (QposEq ==> eq) QposRed.
 Proof.
  intros p q H.

@@ -11,21 +11,29 @@ Require Import
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
 Notation bigD := (Dyadic bigZ).
+#[global]
 Instance inject_bigZ_Q: Cast bigZ Q_as_MetricSpace := inject_Z ∘ BigZ.to_Z.
+#[global]
 Instance inject_Z_bigD: Cast Z bigD := dy_inject ∘ BigZ.of_Z.
+#[global]
 Instance inject_N_bigZ: Cast N bigZ := BigZ.of_Z ∘ Z_of_N.
+#[global]
 Instance inject_bigD_Q: Cast bigD Q_as_MetricSpace := DtoQ inject_bigZ_Q.
 
 (* these casts ^^ are semiring (and thus setoid) morphims *)
+#[global]
 Instance: SemiRing_Morphism inject_bigZ_Q.
 Proof. unfold inject_bigZ_Q. apply _. Qed.
 
+#[global]
 Instance: SemiRing_Morphism inject_Z_bigD.
 Proof. unfold inject_Z_bigD. apply _. Qed.
 
+#[global]
 Instance: SemiRing_Morphism inject_N_bigZ.
 Proof. unfold inject_N_bigZ. apply _. Qed.
 
+#[global]
 Instance: SemiRing_Morphism inject_bigD_Q.
 Proof. unfold inject_bigD_Q. apply _. Qed.
 
@@ -44,6 +52,7 @@ Qed.
   in math-classes yet. Moreover, BigZ.shiftl behaves as shiftr on its negative domain,
   which is quite convenient here.
 *)
+#[global]
 Program Instance bigD_div: AppDiv bigD := λ x y k,
   BigZ.div (BigZ.shiftl (mant x) (-('k - 1) + expo x - expo y)) (mant y) ▼ ('k - 1).
 
@@ -167,9 +176,11 @@ Proof.
   apply in_Qball. split. apply Pleft. apply Pright.
 Qed.
 
+#[global]
 Instance inverse_Q_bigD: AppInverse inject_bigD_Q := λ x ε, 
   app_div ('Qnum x) ('(Zpos (Qden x))) (Qdlog2 (proj1_sig ε)).
 
+#[global]
 Instance bigD_approx : AppApprox bigD := λ x k,
   BigZ.shiftl (mant x) (-('k - 1) + expo x) ▼ ('k - 1).
 
@@ -186,6 +197,7 @@ Proof.
   now rewrite rings.negate_0, rings.plus_0_r.
 Qed.
 
+#[global]
 Instance: DenseEmbedding inject_bigD_Q.
 Proof.
   split; try apply _.
@@ -206,11 +218,14 @@ Proof.
   apply bigD_div_correct.
 Qed.
 
+#[global]
 Instance bigD_Zshiftl: ShiftL bigD Z := λ x n, x ≪ 'n.
 
+#[global]
 Instance: Proper ((=) ==> (=) ==> (=)) bigD_Zshiftl.
 Proof. unfold bigD_Zshiftl. solve_proper. Qed.
 
+#[global]
 Instance: ShiftLSpec bigD Z bigD_Zshiftl.
 Proof.
   split; try apply _; unfold shiftl, bigD_Zshiftl.
@@ -224,8 +239,10 @@ Qed.
   However, then the exponent would be translated from [N] into [BigZ] and back again, due to the 
   definition of [BigZ.pow]. 
 *) 
+#[global]
 Instance bigD_Npow: Pow bigD N := λ x n, (mant x) ^ n ▼ 'n * expo x.
 
+#[global]
 Instance: NatPowSpec bigD N bigD_Npow.
 Proof.
   split; unfold "^", bigD_Npow, equiv, dy_equiv, DtoQ_slow.
@@ -246,6 +263,7 @@ Proof.
   now rewrite distribute_r, left_identity.
 Qed.
 
+#[global]
 Instance bigD_appRat : AppRationals bigD.
 Proof.
   split; try apply _; intros.

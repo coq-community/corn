@@ -225,6 +225,7 @@ Proof.
  apply ball_refl. apply Qpos_nonneg.
 Qed.
 
+#[global]
 Instance uc_wd_more_Proper (X Y : MetricSpace):
   Proper (@ucEq _ _ ==> @msp_eq X ==> @msp_eq Y) (@ucFun X Y).
 Proof. intros ?? E ?? F. now rewrite F. Qed.

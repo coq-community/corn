@@ -40,6 +40,7 @@ Require Export Coq.ZArith.ZArith.
 Require Import CoRN.logic.CLogic.
 Require Import Coq.Setoids.Setoid.
 
+#[global]
 Instance Z_default : @DefaultRelation Z (@eq Z) | 2 := {}.
 
 (**

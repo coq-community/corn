@@ -92,11 +92,13 @@ Add Relation QposInf QposInfEq
  symmetry proved by QposInfEq_sym
  transitivity proved by QposInfEq_trans as QposInfSetoid.
 
+#[global]
 Instance: Proper (QposEq ==> QposInfEq) Qpos2QposInf.
 Proof.
   intros x y H. exact H.
 Qed.
 
+#[global]
 Instance QposInf_bind_wd (f : Qpos -> QposInf) {f_wd : Proper (QposEq ==> QposInfEq) f} : 
   Proper (QposInfEq ==> QposInfEq) (QposInf_bind f).
 Proof.
@@ -109,6 +111,7 @@ Qed.
 Definition QposInf_plus (x y : QposInf) : QposInf :=
 QposInf_bind (fun x' => QposInf_bind (fun y' => Qpos_plus x' y') y) x.
 
+#[global]
 Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_plus.
 Proof with auto.
   intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl...
@@ -119,6 +122,7 @@ Qed.
 Definition QposInf_mult (x y : QposInf) : QposInf :=
 QposInf_bind (fun x' => QposInf_bind (fun y' => Qpos_mult x' y') y) x.
 
+#[global]
 Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_mult.
 Proof with auto.
   intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl...
@@ -147,6 +151,7 @@ match x with
  end
 end.
 
+#[global]
 Instance: Proper (QposInfEq ==> QposInfEq ==> QposInfEq) QposInf_min.
 Proof with intuition.
   intros [x1|] [y1|] E1 [x2|] [y2|] E2; simpl in *...

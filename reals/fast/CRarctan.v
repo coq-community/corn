@@ -35,6 +35,10 @@ Require Import CoRN.tactics.CornTac.
 Require Import CoRN.stdlib_omissions.Q.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import Coq.micromega.Psatz.
+
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
@@ -347,6 +351,7 @@ Proof.
  apply BindLaw1.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite arctan_correct : IRtoCR.
 (* end hide *)
 Lemma arctan_Qarctan : forall x : Q, (arctan (' x) == rational_arctan x)%CR.
@@ -359,9 +364,11 @@ Proof.
  apply BindLaw1.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite arctan_Qarctan : CRfast_compute.
 (* end hide *)
 
+#[global]
 Instance: Proper ((=) ==> (=)) rational_arctan.
 Proof.
   intros x1 x2 E.

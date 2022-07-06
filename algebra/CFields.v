@@ -181,6 +181,7 @@ Qed.
 
 End Field_basics.
 
+#[global]
 Hint Resolve field_mult_inv field_mult_inv_op: algebra.
 
 Section Field_multiplication.
@@ -384,6 +385,7 @@ Qed.
 End x_square.
 
 
+#[global]
 Hint Resolve mult_resp_ap_zero: algebra.
 
 
@@ -700,6 +702,7 @@ Qed.
 
 End Div_properties.
 
+#[global]
 Hint Resolve div_1 div_1' div_1'' div_wd x_div_x x_div_one div_div div_div2
   mult_of_divs x_mult_y_div_z mult_of_divs div_dist div_dist' div_semi_sym
   div_prop: algebra.
@@ -911,6 +914,8 @@ Notation "{1/} x" := (Frecip x) (at level 4, right associativity).
 Arguments Fdiv [X].
 Infix "{/}" := Fdiv (at level 41, no associativity).
 
+#[global]
 Hint Resolve included_FRecip included_FDiv : included.
 
+#[global]
 Hint Immediate included_FRecip' included_FDiv' included_FDiv'' : included.

@@ -94,6 +94,7 @@ Qed.
 Lemma positive_nonzero_in_Q (p: positive): ~ inject_Z (Zpos p) == 0.
 Proof. discriminate. Qed.
 
+#[global]
 Hint Immediate positive_nonzero_in_Q.
 
 (* Properties of arithmetic: *)
@@ -247,6 +248,7 @@ Qed.
 Lemma Qpos_nonNeg (n d: positive): 0 <= Zpos n # d.
 Proof. discriminate. Qed.
 
+#[global]
 Hint Immediate Qpos_nonNeg.
 
 Lemma Qplus_le_l (z x y : Q): x + z <= y + z <-> x <= y.
@@ -285,6 +287,7 @@ Proof.
  apply Zmult_lt_0_compat.
 Qed.
 
+#[global]
 Hint Resolve Qmult_lt_0_compat.
 
 Lemma Qmult_nonneg_nonpos (x y: Q):
@@ -474,6 +477,7 @@ Proof with auto.
  assumption.
 Qed.
 
+#[global]
 Hint Resolve inject_Z_nonneg.
 
 Lemma positive_in_Q (p: positive): 0 < inject_Z (Zpos p).
@@ -483,6 +487,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Immediate positive_in_Q.
 
 Lemma Qlt_Qceiling (q : Q) : inject_Z (Qceiling q) < q + 1.
@@ -522,6 +527,7 @@ Proof. rewrite (Qlt_Zlt_inject_Z q (Z.of_nat n)); apply Z.lt_Zlt_to_nat. Qed.
 
 Definition QNoDup (l: list Q): Prop := NoDup (map Qred l).
 
+#[global]
 Instance: Proper (Qeq ==> eq) Qred.
 Proof. repeat intro. apply Qred_complete. assumption. Qed.
 

@@ -38,6 +38,9 @@ Require Import CoRN.transc.SinCos.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Opaque inj_Q CR Qmin Qmax.
 
 Local Open Scope Q_scope.
@@ -280,5 +283,6 @@ Proof.
 Qed.
 
 (* begin hide *)
+#[global]
 Hint Rewrite cos_correct : IRtoCR.
 (* end hide *)

@@ -113,4 +113,5 @@ End SubCAbMonoids.
 
 End Abelian_Monoids.
 
+#[global]
 Hint Resolve cam_commutes_unfolded: algebra.

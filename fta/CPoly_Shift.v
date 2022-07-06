@@ -181,5 +181,7 @@ Qed.
 
 End Poly_Shifted.
 
+#[global]
 Hint Resolve Shift_wdr: algebra_c.
+#[global]
 Hint Resolve Shift_apply Shift_shift Shift_mult: algebra.

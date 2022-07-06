@@ -225,6 +225,7 @@ End Nth_Root.
 
 Arguments NRoot [x n].
 
+#[global]
 Hint Resolve NRoot_power NRoot_power': algebra.
 
 Lemma NRoot_resp_leEq : forall x y xpos ypos k kpos,
@@ -382,7 +383,9 @@ Qed.
 
 End Square_root.
 
+#[global]
 Hint Resolve sqrt_wd: algebra_c.
+#[global]
 Hint Resolve sqrt_sqr sqrt_mult: algebra.
 
 
@@ -873,4 +876,5 @@ End Included.
 
 End Part_Function_NRoot.
 
+#[global]
 Hint Resolve included_FNRoot included_FNRoot' : included.

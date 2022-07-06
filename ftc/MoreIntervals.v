@@ -1275,6 +1275,7 @@ Qed.
 
 End Lemmas.
 
+#[global]
 Hint Resolve included_interval included_interval' included3_interval
   compact_single_inc compact_single_iprop included_compact_in_interval
   iprop_compact_in_interval_inc1 iprop_compact_in_interval_inc2

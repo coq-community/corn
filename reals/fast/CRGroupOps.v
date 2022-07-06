@@ -30,6 +30,9 @@ Require Import CoRN.metric2.ProductMetric.
 Require Import CoRN.stdlib_omissions.Pair.
 Require Import MathClasses.interfaces.canonical_names.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 Set Automatic Introduction.
 
@@ -38,9 +41,11 @@ Opaque CR Qmin Qmax.
 Local Open Scope Q_scope.
 Local Open Scope uc_scope.
 
+#[global]
 Instance CR0: Zero CR := cast Q CR 0.
 Notation "0" := (inject_Q_CR 0) : CR_scope.
 
+#[global]
 Instance CR1: One CR := cast Q CR 1.
 Notation "1" := (inject_Q_CR 1) : CR_scope.
 
@@ -97,6 +102,7 @@ Build_UniformlyContinuousFunction Qplus_uc_prf.
 (** Finally, CRplus: *)
 
 Definition CRplus_uc : CR --> CR --> CR := Cmap2 QPrelengthSpace QPrelengthSpace Qplus_uc.
+#[global]
 Instance CRplus: Plus CR := ucFun2 CRplus_uc.
 Notation "x + y" := (ucFun2 CRplus_uc x y) : CR_scope.
 
@@ -122,6 +128,7 @@ Proof.
    apply Qmult_le_r. apply Qpos_ispos. discriminate.
 Qed.
 
+#[global]
 Hint Rewrite CRplus_translate : CRfast_compute.
 
 Lemma translate_Qplus : forall a b:Q, (translate a ('b)=='(a+b)%Q)%CR.
@@ -132,6 +139,7 @@ Proof.
  apply MonadLaw3.
 Qed.
 
+#[global]
 Hint Rewrite translate_Qplus : CRfast_compute.
 (**
 ** Negation
@@ -152,6 +160,7 @@ Qed.
 Definition Qopp_uc : Q_as_MetricSpace --> Q_as_MetricSpace :=
 Build_UniformlyContinuousFunction Qopp_uc_prf.
 
+#[global]
 Instance CRopp: Negate CR := Cmap QPrelengthSpace Qopp_uc.
 
 Notation "- x" := (CRopp x) : CR_scope.
@@ -259,6 +268,7 @@ Proof.
 Qed.
 (* end hide *)
 (** Inequality is defined in terms of nonnegativity. *)
+#[global]
 Instance CRle: Le CR := λ x y, (CRnonNeg (y - x))%CR.
 Infix "<=" := CRle : CR_scope.
 

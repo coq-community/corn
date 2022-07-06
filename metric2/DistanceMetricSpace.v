@@ -21,6 +21,7 @@ Record DistanceMetricSpace: Type := Build_alt_MetricSpace
     dmsp : is_DistanceMetricSpace dmsp_is_setoid distance }.
 
 Arguments distance [d].
+#[global]
 Existing Instance distance_wd.
 
 Section DistanceMetricSpace. (* Just mimicking Russell's code for MetricSpace here. *)

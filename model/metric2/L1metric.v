@@ -34,6 +34,9 @@ Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.algebra.COrdFields2.
 Require Import CoRN.tactics.CornTac.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
@@ -112,6 +115,7 @@ Proof.
  reflexivity.
 Qed.
 (* begin hide *)
+#[global]
 Hint Resolve IntegralSplit : StepQArith.
 
 Add Morphism IntegralQ
@@ -157,6 +161,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite Integral_glue: StepF_rew.
 (* end hide *)
 (** How the intergral intreacts with arithemetic functions on step

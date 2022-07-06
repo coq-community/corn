@@ -33,15 +33,19 @@ destruct x as [x |]; destruct y as [y |]; [| easy..].
 change (x < y -> x ≤ y). intros; solve_propholds.
 Qed.
 
+#[global]
 Instance Q_nonneg (rx : QnonNeg) : PropHolds (@le Q _ 0 (proj1_sig rx)).
 Proof. intros. apply (proj2_sig rx). Qed.
 
+#[global]
 Instance Q_nonempty : NonEmpty Q := inhabits 0.
 
+#[global]
 Program Instance sig_nonempty `{ExtMetricSpaceClass X}
   (r : QnonNeg) (x : X) : NonEmpty (sig (ball (proj1_sig r) x)) := inhabits x.
 Next Obligation. apply mspc_refl; solve_propholds. Qed.
 
+#[global]
 Instance prod_nonempty `{NonEmpty X, NonEmpty Y} : NonEmpty (X * Y).
 Proof.
 (* In order not to refer to the name of the variable that has type NonEmpty X *)

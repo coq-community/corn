@@ -29,6 +29,9 @@ Require Import CoRN.reals.fast.CRArith.
 Require Export CoRN.model.reals.CRreal.
 Require Import CoRN.tactics.CornTac.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Opaque CR inject_Q.
 (**
 ** Isomorphism between CR and IR
@@ -105,6 +108,7 @@ Proof.
  apply (map_pres_zero_unfolded _ _ (iso_map_rht _ _ CRIR_iso)).
 Qed.
 
+#[global]
 Hint Rewrite IR_Zero_as_CR : IRtoCR.
 
 Lemma CR_ap_zero_as_IR : forall x, (IRasCR x >< 0 -> x[#][0])%CR.
@@ -124,6 +128,7 @@ Proof.
  apply (map_pres_plus _ _ (iso_map_rht _ _ CRIR_iso)).
 Qed.
 
+#[global]
 Hint Rewrite IR_plus_as_CR : IRtoCR.
 
 Lemma IR_Sum0_as_CR : forall m x,
@@ -145,6 +150,7 @@ Proof.
  apply (map_pres_minus _ _ (iso_map_rht _ _ CRIR_iso)).
 Qed.
 
+#[global]
 Hint Rewrite IR_opp_as_CR : IRtoCR.
 
 Lemma IR_minus_as_CR : forall x y,
@@ -157,6 +163,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite IR_minus_as_CR : IRtoCR.
 
 Lemma IR_One_as_CR : (IRasCR [1]==1)%CR.
@@ -164,6 +171,7 @@ Proof.
  apply (map_pres_one_unfolded _ _ (iso_map_rht _ _ CRIR_iso)).
 Qed.
 
+#[global]
 Hint Rewrite IR_One_as_CR : IRtoCR.
 
 Lemma IR_mult_as_CR : forall x y,
@@ -172,6 +180,7 @@ Proof.
  apply (map_pres_mult _ _ (iso_map_rht _ _ CRIR_iso)).
 Qed.
 
+#[global]
 Hint Rewrite IR_mult_as_CR : IRtoCR.
 
 Lemma IR_div_as_CR : forall x y y_ y__,
@@ -238,6 +247,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite IR_nring_as_CR : IRtoCR.
 
 Lemma IR_pring_as_CR : forall p,
@@ -294,6 +304,7 @@ Proof.
  apply IR_pring_as_CR.
 Qed.
 
+#[global]
 Hint Rewrite IR_zring_as_CR : IRtoCR.
 
 Lemma IR_inj_Q_as_CR : forall (a:Q), (IRasCR (inj_Q IR a)==('a))%CR.
@@ -348,6 +359,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite IR_inj_Q_as_CR : IRtoCR.
 
 Lemma IR_Cauchy_prop_as_CR : forall (x:CauchySeq IR),

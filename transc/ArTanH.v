@@ -266,8 +266,11 @@ Proof.
  apply Derivative_ArTanH.
 Qed.
 (* begin hide *)
+#[global]
 Hint Resolve ArTanH_wd: algebra.
+#[global]
 Hint Resolve Continuous_ArTanH: continuous.
+#[global]
 Hint Resolve Derivative_ArTanH: derivate.
 (* end hide *)
 (** Properties ofthe Inverse Hyperbolic Tangent Function. *)

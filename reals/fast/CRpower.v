@@ -31,6 +31,9 @@ Require Import CoRN.model.totalorder.QposMinMax.
 Require Import MathClasses.interfaces.canonical_names.
 Require Import MathClasses.interfaces.additional_operations.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Local Open Scope Q_scope.
 Local Open Scope uc_scope.
 
@@ -483,6 +486,7 @@ Qed.
 
 (** [CRpower_positive_bounded] is should be used when a known bound
 on the absolute value of x is available. *)
+#[global]
 Instance CRpower_N: Pow CR N := λ x n, ucFun (CRpower_N_bounded n (CR_b (1#1) x)) x.
 Arguments CRpower_N x%type n%N.
 
@@ -526,8 +530,10 @@ Proof.
  now rewrite Nnat.nat_of_N_of_nat.
 Qed.
 
+#[global]
 Hint Rewrite CRpower_N_correct' : IRtoCR.
 
+#[global]
 Instance: Proper (eq ==> QposEq ==> @msp_eq _) Qpower_N_uc.
 Proof.
   intros p1 p2 Ep e1 e2 Ee. apply ucEq_equiv.
@@ -541,6 +547,7 @@ Proof.
   apply Qlt_le_weak, epos.
 Qed.
 
+#[global]
 Instance: Proper (eq ==> QposEq ==> @msp_eq _) CRpower_N_bounded. 
 Proof. 
   intros p1 p2 Ep e1 e2 Ee.
@@ -548,6 +555,7 @@ Proof.
   intro x. simpl. rewrite Ep, Ee. reflexivity.
 Qed. 
 
+#[global]
 Instance: Proper (@msp_eq _ ==> eq ==> @msp_eq _) CRpower_N.
 Proof.
  intros x1 x2 Hx ? n Hn. subst.
@@ -562,6 +570,7 @@ Proof.
 Qed.
 (* end hide *)
 
+#[global]
 Instance: NatPowSpec CR N _.
 Proof.
   split; unfold pow. 

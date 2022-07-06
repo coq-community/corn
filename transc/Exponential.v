@@ -60,6 +60,7 @@ Proof.
  unfold Exp in |- *; algebra.
 Qed.
 
+#[global]
 Hint Resolve Exp_wd: algebra.
 
 Lemma Exp_zero : Exp [0] [=] [1].
@@ -104,6 +105,7 @@ Proof.
  apply nexp_wd; rational.
 Qed.
 
+#[global]
 Hint Resolve Exp_zero Exp_one: algebra.
 
 (**
@@ -125,6 +127,7 @@ Proof.
  fold Exp_ps in |- *; apply Exp_conv.
 Qed.
 
+#[global]
 Hint Resolve Derivative_Exp: derivate.
 
 Lemma Continuous_Exp : Continuous realline Expon.
@@ -133,6 +136,7 @@ Proof.
  apply Derivative_Exp.
 Qed.
 
+#[global]
 Hint Resolve Continuous_Exp: continuous.
 
 (**
@@ -308,6 +312,7 @@ Proof.
  unfold z in |- *; apply lft_leEq_Max.
 Qed.
 
+#[global]
 Hint Resolve Exp_plus: algebra.
 
 Lemma Exp_plus' : forall x y z : IR, z [=] x[+]y -> Exp z [=] Exp x[*]Exp y.
@@ -324,6 +329,7 @@ Proof.
  algebra.
 Qed.
 
+#[global]
 Hint Resolve Exp_inv_char: algebra.
 
 (** The exponential of any number is always positive---and thus apart
@@ -405,6 +411,7 @@ Proof.
  rstepr OneR; algebra.
 Qed.
 
+#[global]
 Hint Resolve Exp_inv: algebra.
 
 Lemma Exp_minus : forall x y : IR, Exp (x[-]y) [=] (Exp x[/] _[//]Exp_ap_zero y).
@@ -415,6 +422,7 @@ Proof.
  algebra.
 Qed.
 
+#[global]
 Hint Resolve Exp_minus: algebra.
 
 Lemma Exp_inv' : forall x y : IR, y [=] [--]x -> Exp y [=] ([1][/] _[//]Exp_ap_zero x).
@@ -484,6 +492,7 @@ Proof.
  Deriv.
 Qed.
 
+#[global]
 Hint Resolve Derivative_Log: derivate.
 
 Lemma Continuous_Log : Continuous (openl [0]) Logarithm.
@@ -492,6 +501,7 @@ Proof.
  Deriv.
 Qed.
 
+#[global]
 Hint Resolve Continuous_Log: continuous.
 
 (** Logarithm of [[1]]. *)
@@ -502,6 +512,7 @@ Proof.
  apply Integral_empty; algebra.
 Qed.
 
+#[global]
 Hint Resolve Log_one: algebra.
 
 (** The logarithm is (strongly) extensional. *)
@@ -519,6 +530,7 @@ Proof.
  unfold Log in |- *; algebra.
 Qed.
 
+#[global]
 Hint Resolve Log_wd: algebra.
 
 (** The rule for the logarithm of the product. *)
@@ -603,6 +615,7 @@ Proof.
  Deriv.
 Qed.
 
+#[global]
 Hint Resolve Log_mult: algebra.
 
 Lemma Log_mult' : forall x y z Hx Hy Hz, z [=] x[*]y -> Log z Hz [=] Log x Hx[+]Log y Hy.
@@ -629,6 +642,7 @@ Proof.
  apply IHn.
 Qed.
 
+#[global]
 Hint Resolve Log_nexp: algebra.
 
 (** A characterization of the domain of the logarithm. *)
@@ -705,6 +719,7 @@ Qed.
 
 Transparent Logarithm.
 
+#[global]
 Hint Resolve Log_Exp: algebra.
 
 Lemma Exp_Log_lemma : forall x y Hx Hy, [0] [=] Log y Hy[-]Log x Hx -> y [<=] x.
@@ -759,6 +774,7 @@ Proof.
  astepl ( [--]ZeroR); rstepr ( [--] (Log y H0[-]Log x H)); algebra.
 Qed.
 
+#[global]
 Hint Resolve Exp_Log: algebra.
 
 (** Exponential and logarithm are injective. *)
@@ -796,6 +812,7 @@ Proof.
  Step_final (Log (Exp [1]) (Exp_pos [1])).
 Qed.
 
+#[global]
 Hint Resolve Log_E: algebra.
 
 (** Several rules regarding inequalities. *)
@@ -921,6 +938,7 @@ Proof.
  apply cg_inv_unique'; apply Log_recip_char.
 Qed.
 
+#[global]
 Hint Resolve Log_recip: algebra.
 
 Lemma Log_recip' : forall x y Hx Hx' Hy, y [=] ([1][/] x[//]Hx) -> Log y Hy [=] [--] (Log x Hx').
@@ -938,6 +956,7 @@ Proof.
  Step_final (Log _ Hx[+]Log _ (recip_resp_pos _ _ Hy' Hy)).
 Qed.
 
+#[global]
 Hint Resolve Log_div: algebra.
 
 Lemma Log_div' : forall x y z Hx Hy Hy' Hz,
@@ -977,6 +996,7 @@ Proof.
  refine (zring_plus_nat IR (nat_of_P n)).
 Qed.
 
+#[global]
 Hint Resolve Log_zexp: algebra.
 
 Section Log_Series.

@@ -185,6 +185,7 @@ Qed.
 
 End More_Intervals.
 
+#[global]
 Hint Resolve included_refl' compact_map1 compact_map2 compact_map3 : included.
 
 Section Totally_Bounded.
@@ -1011,4 +1012,5 @@ Qed.
 
 End Compact.
 
+#[global]
 Hint Resolve included_compact included2_compact included3_compact : included.

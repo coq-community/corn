@@ -47,6 +47,9 @@ Require Import MathClasses.interfaces.abstract_algebra.
 Require Import CoRN.util.Qdlog.
 From Coq Require Import Lia.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
@@ -718,6 +721,7 @@ Proof.
  intros; apply rational_sin_bounded_correct.
 Qed.
 
+#[global]
 Instance: Proper ((=) ==> (=)) rational_sin.
 Proof.
  intros ? ? E.
@@ -818,5 +822,6 @@ Proof.
 Qed.
 
 (* begin hide *)
+#[global]
 Hint Rewrite sin_correct : IRtoCR.
 (* end hide *)

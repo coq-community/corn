@@ -37,6 +37,7 @@ Section def.
 
 End def.
 
+#[global]
 Hint Constructors SetoidPermutation Permutation.
 
 Lemma SetoidPermutation_stronger {A} (R U: relation A):
@@ -87,6 +88,7 @@ Proof with auto.
  apply _.
 Qed.
 
+#[global]
 Instance map_perm_proper {A B} (Ra: relation A) (Rb: relation B):
   Equivalence Ra →
   Equivalence Rb →

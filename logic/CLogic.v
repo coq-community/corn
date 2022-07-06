@@ -203,6 +203,7 @@ Qed.
 
 Declare Right Step Iff_right.
 Declare Left Step Iff_left.
+#[global]
 Hint Resolve Iff_trans Iff_sym Iff_refl Iff_right Iff_left Iff_imp_imp : algebra.
 
 
@@ -239,6 +240,7 @@ Notation "{ x : A  |  P  |  Q }" :=
 
 (* end hide *)
 
+#[global]
 Hint Resolve pair inl inr existT exist2T : core.
 
 Section Choice.
@@ -723,7 +725,9 @@ Qed.
 
 End Odd_and_Even.
 
+#[global]
 Hint Resolve even_plus_n_n: arith.
+#[global]
 Hint Resolve toCle: core.
 
 Section Natural_Numbers.

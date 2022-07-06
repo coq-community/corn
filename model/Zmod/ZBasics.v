@@ -121,9 +121,13 @@ Qed.
 
 End narith.
 
+#[global]
 Hint Resolve le_trans: zarith.
+#[global]
 Hint Resolve minus_n_Sk: zarith.
+#[global]
 Hint Resolve le_minus: zarith.
+#[global]
 Hint Resolve minus_n_minus_n_k: zarith.
 
 (**
@@ -226,13 +230,21 @@ Qed.
 End zarith.
 
 
+#[global]
 Hint Resolve Zdec: zarith.
+#[global]
 Hint Resolve unique_unit: zarith.
+#[global]
 Hint Resolve Zmult_zero_div: zarith.
+#[global]
 Hint Resolve Zmult_no_zero_div: zarith.
+#[global]
 Hint Resolve Zmult_unit_oneforall: zarith.
+#[global]
 Hint Resolve Zunit_eq_one: zarith.
+#[global]
 Hint Resolve Zmult_intro_lft: zarith.
+#[global]
 Hint Resolve Zmult_intro_rht: zarith.
 
 (**
@@ -526,48 +538,90 @@ Opaque Zplus.
 End zineq.
 
 
+#[global]
 Hint Resolve Z.lt_gt: zarith.
+#[global]
 Hint Resolve Z.gt_lt: zarith.
+#[global]
 Hint Resolve Z.le_ge: zarith.
+#[global]
 Hint Resolve Z.ge_le: zarith.
+#[global]
 Hint Resolve Z.lt_irrefl: zarith.
 
+#[global]
 Hint Resolve Zle_antisymm: zarith.
+#[global]
 Hint Resolve Zlt_irref: zarith.
+#[global]
 Hint Resolve Zgt_irref: zarith.
+#[global]
 Hint Resolve Zlt_NEG_0: zarith.
+#[global]
 Hint Resolve Zgt_0_NEG: zarith.
+#[global]
 Hint Resolve Zle_NEG_0: zarith.
+#[global]
 Hint Resolve Zge_0_NEG: zarith.
+#[global]
 Hint Resolve Zle_NEG_1: zarith.
+#[global]
 Hint Resolve Zge_1_NEG: zarith.
+#[global]
 Hint Resolve Zlt_0_POS: zarith.
+#[global]
 Hint Resolve Zgt_POS_0: zarith.
+#[global]
 Hint Resolve Zle_0_POS: zarith.
+#[global]
 Hint Resolve Zge_POS_0: zarith.
+#[global]
 Hint Resolve Zle_1_POS: zarith.
+#[global]
 Hint Resolve Zge_POS_1: zarith.
+#[global]
 Hint Resolve ZBasics.Zle_neg_pos: zarith.
+#[global]
 Hint Resolve ZPOS_neq_ZERO: zarith.
+#[global]
 Hint Resolve ZNEG_neq_ZERO: zarith.
+#[global]
 Hint Resolve Zgt_ge_succ: zarith.
+#[global]
 Hint Resolve Zgt_ge_pred: zarith.
+#[global]
 Hint Resolve Zge_gt_succ: zarith.
+#[global]
 Hint Resolve Zge_gt_pred: zarith.
+#[global]
 Hint Resolve Zlt_asymmetric: zarith.
+#[global]
 Hint Resolve Zle_neq_lt: zarith.
+#[global]
 Hint Resolve Zmult_pos_mon_le_lft: zarith.
+#[global]
 Hint Resolve Zmult_pos_mon_le_rht: zarith.
+#[global]
 Hint Resolve Zmult_pos_mon_lt_lft: zarith.
+#[global]
 Hint Resolve Zmult_pos_mon_lt_rht: zarith.
+#[global]
 Hint Resolve Zmult_pos_mon: zarith.
+#[global]
 Hint Resolve Zdiv_pos_pos: zarith.
+#[global]
 Hint Resolve Zdiv_pos_neg: zarith.
+#[global]
 Hint Resolve Zdiv_pos_nonpos: zarith.
+#[global]
 Hint Resolve Zdiv_pos_nonneg: zarith.
+#[global]
 Hint Resolve Zdiv_neg_pos: zarith.
+#[global]
 Hint Resolve Zdiv_neg_neg: zarith.
+#[global]
 Hint Resolve Zdiv_neg_nonpos: zarith.
+#[global]
 Hint Resolve Zdiv_neg_nonneg: zarith.
 
 
@@ -755,21 +809,37 @@ Qed.
 End zabs.
 
 
+#[global]
 Hint Resolve Zabs_idemp: zarith.
+#[global]
 Hint Resolve Zabs_nonneg: zarith.
+#[global]
 Hint Resolve Zabs_geq_zero: zarith.
+#[global]
 Hint Resolve Zabs_elim_nonneg: zarith.
+#[global]
 Hint Resolve Zabs_zero: zarith.
+#[global]
 Hint Resolve Zabs_Zopp: zarith.
+#[global]
 Hint Resolve Zabs_geq: zarith.
+#[global]
 Hint Resolve Zabs_Zopp_geq: zarith.
+#[global]
 Hint Resolve Zabs_Zminus_symm: zarith.
+#[global]
 Hint Resolve Zabs_lt_pos: zarith.
+#[global]
 Hint Resolve Zabs_le_pos: zarith.
+#[global]
 Hint Resolve Zabs_lt_elim: zarith.
+#[global]
 Hint Resolve Zabs_le_elim: zarith.
+#[global]
 Hint Resolve Zabs_mult_compat: zarith.
+#[global]
 Hint Resolve Zabs_triangle: zarith.
+#[global]
 Hint Resolve Zabs_Zminus_triangle: zarith.
 
 
@@ -839,13 +909,22 @@ Qed.
 End zsign.
 
 
+#[global]
 Hint Resolve Zsgn_mult_compat: zarith.
+#[global]
 Hint Resolve Zmult_sgn_abs: zarith.
+#[global]
 Hint Resolve Zmult_sgn_eq_abs: zarith.
+#[global]
 Hint Resolve Zsgn_plus_l: zarith.
+#[global]
 Hint Resolve Zsgn_plus_r: zarith.
+#[global]
 Hint Resolve Zsgn_opp: zarith.
+#[global]
 Hint Resolve Zsgn_ZERO: zarith.
+#[global]
 Hint Resolve Zsgn_pos: zarith.
+#[global]
 Hint Resolve Zsgn_neg: zarith.
 

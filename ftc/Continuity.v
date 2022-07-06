@@ -807,6 +807,7 @@ Qed.
 
 End Local_Results.
 
+#[global]
 Hint Resolve contin_imp_inc: included.
 
 Section Corolaries.
@@ -1083,6 +1084,7 @@ Qed.
 
 End Other.
 
+#[global]
 Hint Resolve Continuous_I_const Continuous_I_id Continuous_I_plus
   Continuous_I_inv Continuous_I_minus Continuous_I_mult Continuous_I_scal
   Continuous_I_recip Continuous_I_max Continuous_I_min Continuous_I_div

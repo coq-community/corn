@@ -8,8 +8,10 @@ Require Import
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.field_of_fractions
   MathClasses.implementations.fast_rationals MathClasses.implementations.fast_integers.
 
+#[global]
 Instance inject_Z_bigQ: Cast Z bigQ := cast bigZ bigQ ∘ cast Z bigZ.
 
+#[global]
 Instance bigQ_approx: AppApprox bigQ := λ x k,
   match k with
   | Zneg p => 
@@ -59,6 +61,7 @@ Proof.
   now apply Q_approx_correct.
 Qed.
 
+#[global]
 Instance bigQ_div: AppDiv bigQ := λ x y, app_approx (x / y).
 
 Lemma bigQ_div_correct (x y : bigQ) (k : Z) : Qball (2 ^ k) ('app_div x y k) ('x / 'y).
@@ -68,8 +71,10 @@ Proof.
   now rewrite rings.preserves_mult, dec_fields.preserves_dec_recip.
 Qed.
 
+#[global]
 Instance inverse_Q_bigQ: AppInverse (cast bigQ Q_as_MetricSpace) := λ x ε, 'x.
 
+#[global]
 Instance: DenseEmbedding (cast bigQ Q_as_MetricSpace).
 Proof.
   split; try apply _.
@@ -88,6 +93,7 @@ Proof.
   apply ball_refl. apply QposMinMax.Qpos_nonneg.
 Qed.
 
+#[global]
 Instance: AppRationals bigQ.
 Proof.
   split; try apply _.

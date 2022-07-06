@@ -25,6 +25,9 @@ Require Import Coq.QArith.Qpower Coq.QArith.Qround.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.order.TotalOrder.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 (** Positive rational numbers *)
 
 Definition Qpos: Set := sig (Qlt 0).
@@ -389,6 +392,7 @@ Proof.
    apply Qle_antisym; auto.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Q_Qpos_min : QposElim.
 (* end hide *)
 Lemma Q_Qpos_max : forall (x y:Qpos),
@@ -403,6 +407,7 @@ Proof.
    apply Qle_antisym; auto.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Q_Qpos_max : QposElim.
 (* end hide *)
 

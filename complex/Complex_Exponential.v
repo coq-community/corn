@@ -134,6 +134,7 @@ Proof.
   apply ExpCC_equation_aid_3. apply ExpCC_equation_aid_4.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_plus: algebra.
 
 Lemma ExpCC_Zero : ExpCC [0] [=] [1].
@@ -145,6 +146,7 @@ Proof.
  simpl in |- *. split; simpl in |- *; rational.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_Zero: algebra.
 
 Lemma ExpCC_inv_aid : forall z : CC, ExpCC z[*]ExpCC [--]z [=] [1].
@@ -157,6 +159,7 @@ Proof.
  algebra.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_inv_aid: algebra.
 
 Lemma ExpCC_ap_zero : forall z : CC, ExpCC z [#] [0].
@@ -175,6 +178,7 @@ Proof.
  astepl (ExpCC z[*]ExpCC [--]z[/] ExpCC z[//]H). rational.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_inv: algebra.
 
 Lemma ExpCC_pow : forall z n, ExpCC z[^]n [=] ExpCC (nring n[*]z).
@@ -196,6 +200,7 @@ Proof.
  rstepl ((nring n0[+][1]) [*]z). algebra.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_pow: algebra.
 
 Lemma AbsCC_ExpCC : forall z : CC, AbsCC (ExpCC z) [=] Exp (Re z).
@@ -238,6 +243,7 @@ Proof.
  apply AbsCC_square_Re_Im.
 Qed.
 
+#[global]
 Hint Resolve AbsCC_ExpCC: algebra.
 
 Lemma ExpCC_Periodic : forall z, ExpCC (z[+]II[*]Two[*]cc_IR Pi) [=] ExpCC z.
@@ -256,6 +262,7 @@ Proof.
  split; simpl in |- *; rational.
 Qed.
 
+#[global]
 Hint Resolve ExpCC_Periodic: algebra.
 
 Lemma ExpCC_Exp : forall x : IR, ExpCC (cc_IR x) [=] cc_IR (Exp x).
@@ -269,6 +276,7 @@ Proof.
  Step_final ([1][+I*][0]).
 Qed.
 
+#[global]
 Hint Resolve ExpCC_Exp: algebra.
 
 Theorem Euler : (ExpCC (II[*] (cc_IR Pi))) [+][1] [=] [0].

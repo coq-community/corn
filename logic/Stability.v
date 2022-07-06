@@ -9,14 +9,17 @@ Require Import Coq.Classes.Morphisms.
 
 Definition DN (T: Type): Prop := (T -> False) -> False.
 
+#[global]
 Hint Unfold DN.
 
+#[global]
 Instance DN_Proper: Proper (iff ==> iff) DN.
 Proof. firstorder. Qed.
 
 Definition DN_return {T: Type}: T -> DN T :=
   fun x f => f x.
 
+#[global]
 Hint Resolve @DN_return.
 
 Definition DN_bind {A: Type}: DN A -> forall B, (A -> DN B) -> DN B :=
@@ -65,25 +68,33 @@ Proof. firstorder. Qed.
 Lemma Stable_neg (P: Prop): Stable (~P).
 Proof. firstorder. Qed.
 
+#[global]
 Instance Stable_False: Stable False.
 Proof. firstorder. Qed.
 
+#[global]
 Instance Stable_True: Stable True.
 Proof. firstorder. Qed.
 
+#[global]
 Hint Immediate Stable_False Stable_True.
 
+#[global]
 Instance stable_conjunction (A B: Prop): Stable A -> Stable B -> Stable (A /\ B).
 Proof. firstorder. Qed.
 
+#[global]
 Hint Resolve stable_conjunction.
 
+#[global]
 Instance forall_stable (T: Type) (P: T -> Type): (forall x, Stable (P x)) -> Stable (forall x, P x).
 Proof. firstorder. Qed.
 
+#[global]
 Instance stable_iff (P Q: Prop): Stable P -> Stable Q -> Stable (P <-> Q).
 Proof. firstorder. Qed.
 
+#[global]
 Hint Resolve forall_stable.
 
 (*Require Import util.*)
@@ -109,6 +120,7 @@ Proof. firstorder. Qed.
 Lemma DN_decisionT (P: Type): DN (P + (P->False)).
 Proof. firstorder. Qed.
 
+#[global]
 Instance CRnonNeg_stable x: Stable (CRnonNeg x).
 Proof with auto.
   unfold CRnonNeg.
@@ -120,8 +132,10 @@ Proof with auto.
   elimtype False...
 Qed.
 
+#[global]
 Hint Resolve CRnonNeg_stable.
 
+#[global]
 Instance CReq_stable (x y: msp_car CR): Stable (x == y)%CR.
 Proof.
   simpl.

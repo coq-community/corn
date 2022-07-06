@@ -836,61 +836,117 @@ End zdivides.
 
 
 
+#[global]
 Hint Resolve Zdivides_zero_lft: zarith.
+#[global]
 Hint Resolve Zdivides_zero_rht: zarith.
+#[global]
 Hint Resolve Zdivides_one: zarith.
+#[global]
 Hint Resolve Zdivides_ref: zarith.
+#[global]
 Hint Resolve Zdivides_trans: zarith.
+#[global]
 Hint Resolve Zdivides_mult_intro_lft: zarith.
+#[global]
 Hint Resolve Zdivides_mult_intro_rht: zarith.
+#[global]
 Hint Resolve Zdivides_mult_lft: zarith.
+#[global]
 Hint Resolve Zdivides_mult_rht: zarith.
+#[global]
 Hint Resolve Zdivides_mult_elim_lft: zarith.
+#[global]
 Hint Resolve Zdivides_mult_elim_rht: zarith.
+#[global]
 Hint Resolve Zdivides_mult_cancel_lft: zarith.
+#[global]
 Hint Resolve Zdivides_mult_cancel_rht: zarith.
+#[global]
 Hint Resolve Zdivides_antisymm: zarith.
+#[global]
 Hint Resolve Zdivides_plus_elim: zarith.
+#[global]
 Hint Resolve Zdivides_opp_elim_lft: zarith.
+#[global]
 Hint Resolve Zdivides_opp_elim_rht: zarith.
+#[global]
 Hint Resolve Zdivides_opp_elim: zarith.
+#[global]
 Hint Resolve Zdivides_opp_intro_lft: zarith.
+#[global]
 Hint Resolve Zdivides_opp_intro_rht: zarith.
+#[global]
 Hint Resolve Zdivides_opp_intro: zarith.
+#[global]
 Hint Resolve Zdivides_minus_elim: zarith.
+#[global]
 Hint Resolve Zdivides_mult_elim: zarith.
+#[global]
 Hint Resolve Zdivides_mult_ll: zarith.
+#[global]
 Hint Resolve Zdivides_mult_lr: zarith.
+#[global]
 Hint Resolve Zdivides_mult_rl: zarith.
+#[global]
 Hint Resolve Zdivides_mult_rr: zarith.
+#[global]
 Hint Resolve Zdivides_abs_elim_lft: zarith.
+#[global]
 Hint Resolve Zdivides_abs_elim_rht: zarith.
+#[global]
 Hint Resolve Zdivides_abs_elim: zarith.
+#[global]
 Hint Resolve Zdivides_abs_intro_lft: zarith.
+#[global]
 Hint Resolve Zdivides_abs_intro_rht: zarith.
+#[global]
 Hint Resolve Zdivides_abs_intro: zarith.
+#[global]
 Hint Resolve Zdivisor_pos_le: zarith.
+#[global]
 Hint Resolve Zdivisor_small: zarith.
+#[global]
 Hint Resolve Zmodeq_small: zarith.
+#[global]
 Hint Resolve Zdiv_remainder_unique: zarith.
+#[global]
 Hint Resolve Zdiv_quotient_unique: zarith.
+#[global]
 Hint Resolve Zmod0_Zopp: zarith.
+#[global]
 Hint Resolve Zdiv_Zopp: zarith.
+#[global]
 Hint Resolve Zmod0_Zdivides: zarith.
+#[global]
 Hint Resolve Zdivides_Zmod0: zarith.
+#[global]
 Hint Resolve Zmod_mult_cancel_lft: zarith.
+#[global]
 Hint Resolve Zmod_mult_cancel_rht: zarith.
+#[global]
 Hint Resolve Zdiv_mult_cancel_lft: zarith.
+#[global]
 Hint Resolve Zdiv_mult_cancel_rht: zarith.
+#[global]
 Hint Resolve Zdiv_plus_elim: zarith.
+#[global]
 Hint Resolve Zdiv_elim: zarith.
+#[global]
 Hint Resolve Zabs_div_lft: zarith.
+#[global]
 Hint Resolve Zabs_div_rht: zarith.
+#[global]
 Hint Resolve Zdiv_same: zarith.
+#[global]
 Hint Resolve Zmult_div_simpl_1: zarith.
+#[global]
 Hint Resolve Zmult_div_simpl_2: zarith.
+#[global]
 Hint Resolve Zmult_div_simpl_3: zarith.
+#[global]
 Hint Resolve Zmult_div_simpl_4: zarith.
+#[global]
 Hint Resolve Zdivides_dec: zarith.
 
 
@@ -954,7 +1010,11 @@ Qed.
 End ineq.
 
 
+#[global]
 Hint Resolve Zmod_POS_nonNEG: zarith.
+#[global]
 Hint Resolve Zdiv_POS: zarith.
+#[global]
 Hint Resolve Zmod_lt_POS: zarith.
+#[global]
 Hint Resolve Zdiv_lt_POS: zarith.

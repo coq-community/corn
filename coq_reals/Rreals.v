@@ -33,6 +33,9 @@ Require Import Coq.Reals.Rlimit.
 Require Import Coq.Reals.Rbasic_fun.
 From Coq Require Import Lra.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Open Scope R_scope.
 
 (** * Coq Real Numbers
@@ -409,6 +412,7 @@ Proof.
  trivial.
 Qed.
 
+#[global]
 Hint Rewrite R_INR_as_IR : RtoIR.
 
 Lemma RisReals : is_CReals ROrdField RLim.

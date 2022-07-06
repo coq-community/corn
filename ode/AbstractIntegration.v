@@ -167,6 +167,7 @@ setoid_replace 0%Q with (n2 * 0)%Q by ring.
 apply CRΣ_gball. now intros m _; apply E2.
 Qed.*)
 
+#[global]
 Hint Immediate ball_refl Qle_refl.
 
 (** Next up, the actual interface for integrable functions. *)
@@ -964,6 +965,7 @@ Qed.
 
 Definition Range (T : Type) := prod T T.
 
+#[global]
 Instance contains_Q : Contains Q (Range Q) := λ x s, (fst s ⊓ snd s ≤ x ≤ fst s ⊔ snd s).
 
 Lemma Qrange_comm (a b x : Q) : x ∈ (a, b) <-> x ∈ (b, a).

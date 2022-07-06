@@ -83,6 +83,7 @@ Arguments ball [m].
 Definition msp_eq {m:MetricSpace} (x y : msp_car m) : Prop
   := ball 0 x y.
 
+#[global]
 Instance msp_Equiv (m : MetricSpace) : Equiv m := @msp_eq m.
 
 Add Parametric Morphism {m:MetricSpace} : (@ball m)
@@ -139,6 +140,7 @@ Add Parametric Relation {m:MetricSpace} : (msp_car m) msp_eq
       as msp_eq_rel.
 (* end hide *)
 
+#[global]
 Instance msp_Setoid (m : MetricSpace) : Setoid m := {}.
 
 Definition msp_as_RSetoid : MetricSpace -> RSetoid
@@ -240,6 +242,7 @@ Qed.
 
 End Metric_Space.
 (* begin hide *)
+#[global]
 Hint Resolve ball_refl ball_sym ball_triangle ball_weak : metric.
 (* end hide *)
 

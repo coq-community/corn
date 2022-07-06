@@ -187,6 +187,7 @@ End NthCoeff_def.
 Arguments nth_coeff [R].
 Arguments nth_coeff_fun [R].
 
+#[global]
 Hint Resolve nth_coeff_wd: algebra_c.
 
 Section NthCoeff_props.
@@ -469,8 +470,13 @@ Qed.
 
 End NthCoeff_props.
 
+#[global]
 Hint Resolve nth_coeff_wd: algebra_c.
+#[global]
 Hint Resolve nth_coeff_complicated poly_at_zero nth_coeff_inv: algebra.
+#[global]
 Hint Resolve nth_coeff_inv' nth_coeff_c_mult_p nth_coeff_mult: algebra.
+#[global]
 Hint Resolve nth_coeff_zero nth_coeff_plus nth_coeff_minus: algebra.
+#[global]
 Hint Resolve nth_coeff_nexp_eq nth_coeff_nexp_neq: algebra.

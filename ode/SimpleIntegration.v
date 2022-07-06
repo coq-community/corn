@@ -145,9 +145,13 @@ End extension_to_nn_width.
 
 Open Scope uc_scope.
 
+#[global]
 Hint Resolve Qpos_nonzero.
+#[global]
 Hint Immediate Q.Qle_nat.
+#[global]
 Hint Resolve Qmult_le_0_compat.
+#[global]
 Hint Resolve QnonNeg.Qplus_nonneg.
 
 Lemma half_Qpos (q: Qpos): proj1_sig q * (1#2) <= proj1_sig q.
@@ -158,6 +162,7 @@ Proof.
  discriminate. apply Qpos_nonneg.
 Qed.
 
+#[global]
 Hint Immediate half_Qpos.
 
 Lemma Qball_ex_plus_r e (x y y' : Q):

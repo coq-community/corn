@@ -237,10 +237,16 @@ Definition Qmax_mult_pos_distr_l : forall x y z : Q, 0 <= x -> Qmax y z * x == Q
 
 End QTotalOrder.
 (* begin hide *)
+#[global]
 Hint Resolve Qmin_lb_l: qarith.
+#[global]
 Hint Resolve Qmin_lb_r: qarith.
+#[global]
 Hint Resolve Qmin_glb: qarith.
+#[global]
 Hint Resolve Qmax_ub_l: qarith.
+#[global]
 Hint Resolve Qmax_ub_r: qarith.
+#[global]
 Hint Resolve Qmax_lub: qarith.
 (* end hide *)

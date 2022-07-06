@@ -41,6 +41,7 @@ Inductive LazyExists {A} (P : Stream A → Prop) (x : Stream A) : Prop :=
 Arguments LazyHere {A P x}.
 Arguments LazyFurther {A P x}.
 
+#[global]
 Instance LazyExists_proper `{Setoid A} `{!Proper ((=) ==> iff) (P : Stream A → Prop)} : Proper ((=) ==> iff) (LazyExists P).
 Proof.
   assert (∀ s1, LazyExists P s1 → ∀ s2, s1 = s2 → LazyExists P s2) as prf.

@@ -145,7 +145,9 @@ Proof.
  apply FTC1.
 Qed.
 
+#[global]
 Hint Resolve Derivative_ArcSin: derivate.
+#[global]
 Hint Resolve Continuous_ArcSin: continuous.
 
 (**
@@ -230,8 +232,11 @@ Proof.
  assumption.
 Qed.
 
+#[global]
 Hint Resolve ArcTan_wd: algebra.
+#[global]
 Hint Resolve Derivative_ArcCos Derivative_ArcTan: derivate.
+#[global]
 Hint Resolve Continuous_ArcCos Continuous_ArcTan: continuous.
 
 Section Inverses.

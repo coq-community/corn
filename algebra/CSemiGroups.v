@@ -168,6 +168,7 @@ Qed.
 
 (* End_SpecReals *)
 
+#[global]
 Hint Resolve plus_assoc_unfolded: algebra.
 
 (**
@@ -230,8 +231,10 @@ End Part_Function_Plus.
 Arguments Fplus [G].
 Infix "{+}" := Fplus (at level 50, left associativity).
 
+#[global]
 Hint Resolve included_FPlus : included.
 
+#[global]
 Hint Immediate included_FPlus' included_FPlus'' : included.
 
 (**

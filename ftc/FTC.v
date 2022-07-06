@@ -338,7 +338,9 @@ Proof.
 Qed.
 (* end hide *)
 
+#[global]
 Hint Resolve Continuous_prim: continuous.
+#[global]
 Hint Resolve FTC1: derivate.
 
 Section Limit_of_Integral_Seq.

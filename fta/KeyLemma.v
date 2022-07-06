@@ -528,4 +528,5 @@ Qed.
 
 End Key_Lemma.
 
+#[global]
 Hint Resolve p3m_S p3m_P p3m_pow: algebra.

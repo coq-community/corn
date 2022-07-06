@@ -830,6 +830,7 @@ why we chose to altogether do away with this approach.
 We now present some methods for defining partial functions.
 *)
 
+#[global]
 Hint Resolve I: core.
 
 Section CSetoid_Ops.
@@ -965,6 +966,7 @@ Notation FId := (Fid _).
 Arguments Fcomp [S].
 Infix "[o]" := Fcomp (at level 65, no associativity).
 
+#[global]
 Hint Resolve pfwdef bpfwdef: algebra.
 
 Section bijections.

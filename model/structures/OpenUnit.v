@@ -71,6 +71,7 @@ Proof.
  assumption.
 Qed.
 (* begin hide *)
+#[global]
 Hint Resolve OpenUnit_0_lt OpenUnit_lt_1 OpenUnit_0_lt_Dual OpenUnit_Dual_lt_1 : ouarith.
 (* end hide *)
 (** Multiplication *)
@@ -181,6 +182,7 @@ Proof.
  apply: mult_resp_pos; simpl; auto with *.
 Qed.
 (* begin hide *)
+#[global]
 Hint Resolve affineCombo_lt affineCombo_gt : ouarith.
 (* end hide *)
 

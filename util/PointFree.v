@@ -10,34 +10,42 @@ Class PointFree {T} (f r: T): Prop := pointfree_eq: f = r.
 
 (** If no other instances match, give up and declare the thing point-free: *)
 
+#[global]
 Instance proper_pf {T} (x: T): PointFree x x | 9.
 Proof. firstorder. Qed.
 
 (** Instances for various forms of lambdas: *)
 
+#[global]
 Instance eta_pf {A B} (f: A → B) `{!PointFree f f'}: PointFree (λ x, f x) (f' ∘ id)  | 10.
 Proof. firstorder. Qed.
 
+#[global]
 Instance const_pf {A B} (b: B): PointFree (λ _: A, b) (const b).
 Proof. firstorder. Qed.
 
+#[global]
 Instance id_pf {A}: PointFree (λ x: A, x) id.
 Proof. firstorder. Qed.
 
+#[global]
 Instance pair_pf {A B C} (f: A → B) (g: A → C) `{!PointFree f f'} `{!PointFree g g'}:
    PointFree (λ x: A, (f x, g x)) (map_pair f' g' ∘ diagonal).
 Proof. compute. rewrite PointFree0, PointFree1. reflexivity. Qed.
   (* This one may not be strictly needed in the presence of binapp_pf below. *)
 
+#[global]
 Instance compose_pf {A B C} (f: B → C) (g: A → B)
   `{!PointFree f f'} `{!PointFree g g'}: PointFree (λ x, f (g x)) (f' ∘ g').
 Proof. compute. rewrite PointFree0, PointFree1. reflexivity. Qed.
 
+#[global]
 Instance binapp_pf {A B C D} (f: A → B → C) (g: D → A) (h: D → B)
   `{!PointFree f f'} `{!PointFree g g'} `{!PointFree h h'}:
      PointFree (λ x: D, f (g x) (h x)) (uncurry f' ∘ map_pair g' h' ∘ diagonal).
 Proof. compute. rewrite PointFree0, PointFree1, PointFree2. reflexivity. Qed.
 
+#[global]
 Instance uncur_pf {A B C} (f: A → B → C) `{!PointFree (λ p, f (fst p) (snd p)) f'}: PointFree (uncurry (λ x: A, f x)) f'.
 Proof. compute. rewrite <- PointFree0. reflexivity. Qed.
 

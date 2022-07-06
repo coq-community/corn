@@ -6,6 +6,7 @@ Require Import
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
   CoRN.model.totalorder.QposMinMax.
 
+#[global]
 Instance Q_approx: AppApprox Q := λ (x : Q) (k : Z), 
   match k with
   | Zneg p => approximateQ x (2 ^ p)
@@ -25,11 +26,15 @@ Proof.
   now rewrite <- Zpower_Ppow.
 Qed.
 
+#[global]
 Instance Q_approx_div: AppDiv Q := λ x y k, app_approx (x / y) k.
 
+#[global]
 Instance inject_Q_Q: Cast Q Q_as_MetricSpace := Datatypes.id.
+#[global]
 Instance inverse_Q_Q: AppInverse inject_Q_Q := λ x ε, app_approx x (Qdlog2 (proj1_sig ε)).
 
+#[global]
 Instance: AppRationals Q.
 Proof.
   repeat (split; try apply _).

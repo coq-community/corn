@@ -33,6 +33,7 @@ Proof with auto.
  apply in_map_iff. eauto.
 Qed.
 
+#[global]
 Instance separates_Proper {A}:
   Proper (@Permutation _ ==> SetoidPermutation (pair_rel eq (@Permutation _))) (@separates A).
 Proof with simpl; auto; intuition.

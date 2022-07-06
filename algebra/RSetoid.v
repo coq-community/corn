@@ -19,6 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+(* Backwards compatibility for Typeclasses Transparent locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Require Export Coq.Setoids.Setoid.
@@ -37,8 +40,11 @@ Structure RSetoid: Type :=
   st_isSetoid : Setoid st_car
 }.
 
+#[global]
 Typeclasses Transparent Equiv.
+#[global]
 Hint Extern 10 (Equiv _) => apply @st_eq : typeclass_instances.
+#[global]
 Hint Extern 10 (Setoid _) => apply @st_isSetoid  : typeclass_instances.
 
 Arguments st_eq [r].

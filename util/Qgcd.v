@@ -33,6 +33,7 @@ Proof.
  intros [an ad] [bn bd]. simpl. unfold Qle. simpl. auto with *.
 Qed.
 
+#[global]
 Hint Immediate Qgcd_nonneg.
 
 Program Definition Qcd_pos: Qpos -> Qpos -> Qpos := Qgcd.

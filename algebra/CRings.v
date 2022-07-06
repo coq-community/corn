@@ -236,8 +236,11 @@ Proof.
 Qed.
 
 End Ring_unfolded.
+#[global]
 Hint Resolve mult_assoc_unfolded: algebra.
+#[global]
 Hint Resolve ring_non_triv mult_one one_mult mult_commut_unfolded: algebra.
+#[global]
 Hint Resolve ring_dist_unfolded ring_distl_unfolded: algebra.
 
 
@@ -368,11 +371,17 @@ Qed.
 
 
 End Ring_basics.
+#[global]
 Hint Resolve cring_mult_zero cring_mult_zero_op: algebra.
+#[global]
 Hint Resolve inv_mult_invol: algebra.
+#[global]
 Hint Resolve cring_inv_mult_lft cring_inv_mult_rht: algebra.
+#[global]
 Hint Resolve ring_dist_minus: algebra.
+#[global]
 Hint Resolve ring_distl_minus: algebra.
+#[global]
 Hint Resolve mult_minus1 ring_distr1 ring_distr2: algebra.
 (* Begin_SpecReals *)
 
@@ -467,6 +476,7 @@ Qed.
 
 End nat_injection.
 
+#[global]
 Hint Resolve nring_comm_plus nring_comm_mult: algebra.
 
 Arguments nring [R].
@@ -498,6 +508,7 @@ Proof.
  simpl in |- *; algebra.
 Qed.
 
+#[global]
 Hint Resolve one_plus_one x_plus_x: algebra.
 
 (**
@@ -846,6 +857,7 @@ End int_injection.
 
 Arguments zring [R].
 
+#[global]
 Hint Resolve pring_convert zring_zero zring_diff zring_plus_nat zring_inv_nat
   zring_plus zring_inv zring_minus zring_mult zring_one zring_inv_one:
   algebra.
@@ -991,6 +1003,7 @@ Qed.
 
 End Dist_properties.
 
+#[global]
 Hint Resolve dist_1b dist_2a dist_2b mult_distr_sum_lft mult_distr_sum_rht
   sumx_const: algebra.
 
@@ -1199,6 +1212,7 @@ Add Parametric Morphism c n : (nexp c n) with signature (@cs_eq (cr_crr c)) ==> 
 Proof.
  intros. apply: nexp_wd. assumption. Qed.
 
+#[global]
 Hint Resolve nexp_wd nexp_Sn nexp_plus one_nexp mult_nexp nexp_mult zero_nexp
   inv_nexp_even inv_nexp_two inv_nexp_odd nexp_one nexp_two nexp_funny
   inv_one_even_nexp inv_one_odd_nexp nexp_funny' one_nexp square_plus
@@ -1371,7 +1385,9 @@ Section cr_Product.
 End cr_Product.
 
 
+#[global]
 Hint Resolve included_FMult included_FScalMult included_FNth : included.
 
+#[global]
 Hint Immediate included_FMult' included_FMult'' included_FScalMult'
     included_FNth' : included.

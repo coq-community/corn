@@ -351,6 +351,7 @@ Qed.
 
 Import MathClasses.interfaces.canonical_names.
 
+#[global]
 Instance CR_abs : Abs CR.
 Proof.
   intro x. exists (CRabs x).

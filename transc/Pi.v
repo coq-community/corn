@@ -551,6 +551,7 @@ Qed.
 
 End Properties_of_Pi.
 
+#[global]
 Hint Resolve Cos_HalfPi: algebra.
 
 Section Pi_and_Order.
@@ -692,6 +693,7 @@ Qed.
 
 End Pi_and_Order.
 
+#[global]
 Hint Resolve pos_Pi pos_HalfPi pos_QuarterPi QuarterPi_less_HalfPi
   HalfPi_less_Pi QuarterPi_less_Pi neg_invPi neg_invHalfPi neg_invQuarterPi
   invHalfPi_less_invQuarterPi invPi_less_invHalfPi invPi_less_invQuarterPi
@@ -1112,6 +1114,7 @@ Qed.
 
 End Sin_And_Cos.
 
+#[global]
 Hint Resolve Cos_double Sin_double Tan_double Cos_QuarterPi Sin_QuarterPi
   Tan_QuarterPi Sin_Pi Cos_Pi Sin_HalfPi Sin_plus_HalfPi Sin_HalfPi_minus
   Cos_plus_HalfPi Cos_HalfPi_minus Sin_plus_Pi Cos_plus_Pi Sin_periodic

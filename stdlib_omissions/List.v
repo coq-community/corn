@@ -27,6 +27,7 @@ Proof with eauto.
  rewrite perm_swap...
 Qed.
 
+#[global]
 Hint Resolve nth_In.
 
 Lemma NoDup_indexed {A} (l: list A) (N: NoDup l) (d: A):
@@ -47,6 +48,7 @@ Proof with auto with arith.
  intro. subst a...
 Qed.
 
+#[global]
 Instance: forall A, Proper (@Permutation A ==> iff) (@NoDup A).
 Proof with auto.
  intro.
@@ -73,6 +75,7 @@ Proof with auto.
  intuition.
 Qed.
 
+#[global]
 Instance: forall A, Proper (@Permutation A ==> eq) (@length A).
 Proof Permutation_length.
 
@@ -139,11 +142,14 @@ Proof with auto.
  reflexivity.
 Qed.
 
+#[global]
 Instance: forall A (x: A), Proper (@Permutation A ==> iff) (@In A x).
 Proof. pose proof Permutation_in. firstorder auto with crelations. Qed.
 
 Lemma tl_map {A B} (l: list A) (f: A → B): tl (map f l) = map f (tl l).
 Proof. destruct l; reflexivity. Qed.
 
+#[global]
 Hint Resolve in_cons.
+#[global]
 Hint Immediate in_eq.

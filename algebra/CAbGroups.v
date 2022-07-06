@@ -167,7 +167,9 @@ End Various.
 
 End Abelian_Groups.
 
+#[global]
 Hint Resolve cag_commutes_unfolded: algebra.
+#[global]
 Hint Resolve cag_op_inv assoc_1 zero_minus minus_plus op_lft_resp_ap: algebra.
 
 Module Export coercions.
@@ -523,6 +525,7 @@ Qed.
 
 End Group_Extras.
 
+#[global]
 Hint Resolve nmult_wd nmult_one nmult_Zero nmult_plus nmult_inv nmult_mult
   nmult_plus' zmult_wd zmult_one zmult_min_one zmult_zero zmult_Zero
   zmult_plus zmult_mult zmult_plus': algebra.

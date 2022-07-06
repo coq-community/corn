@@ -581,7 +581,9 @@ Qed.
 
 End Degree_props.
 
+#[global]
 Hint Resolve poly_as_sum'' poly_as_sum' poly_as_sum: algebra.
+#[global]
 Hint Resolve degree_mult_aux: algebra.
 
 
