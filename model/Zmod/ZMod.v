@@ -391,27 +391,49 @@ Qed.
 End zmod.
 
 
+#[global]
 Hint Resolve Zmod_zero_lft: zarith.
+#[global]
 Hint Resolve Zmod_zero_rht: zarith.
+#[global]
 Hint Resolve Zmod_same: zarith.
+#[global]
 Hint Resolve Zmod_Zmod: zarith.
+#[global]
 Hint Resolve Zmod_cancel_multiple: zarith.
+#[global]
 Hint Resolve Zmod_multiple: zarith.
+#[global]
 Hint Resolve Zmod_minus_intro: zarith.
+#[global]
 Hint Resolve Zmod_plus_compat: zarith.
+#[global]
 Hint Resolve Zmod_plus_compat_lft: zarith.
+#[global]
 Hint Resolve Zmod_plus_compat_rht: zarith.
+#[global]
 Hint Resolve Zmod_opp_elim: zarith.
+#[global]
 Hint Resolve Zmod_minus_elim: zarith.
+#[global]
 Hint Resolve Zmod_mult_compat: zarith.
+#[global]
 Hint Resolve Zmod_mult_compat_lft: zarith.
+#[global]
 Hint Resolve Zmod_mult_compat_rht: zarith.
+#[global]
 Hint Resolve Zmod_opp_zero: zarith.
+#[global]
 Hint Resolve Zmod_small: zarith.
+#[global]
 Hint Resolve Zmod_opp_nonzero: zarith.
+#[global]
 Hint Resolve Zmod_one_lft: zarith.
+#[global]
 Hint Resolve Zmod_one_rht: zarith.
+#[global]
 Hint Resolve Zmod_lin_comb: zarith.
+#[global]
 Hint Resolve Zmod_relprime_inv: zarith.
 
 (*
@@ -668,32 +690,59 @@ Qed.
 End zmodeq.
 
 
+#[global]
 Hint Resolve Zmodeq_dec: zarith.
+#[global]
 Hint Resolve Zmodeq_modeq: zarith.
+#[global]
 Hint Resolve Zmodeq_eqmod: zarith.
+#[global]
 Hint Resolve Zmodeq_refl: zarith.
+#[global]
 Hint Resolve Zmodeq_symm: zarith.
+#[global]
 Hint Resolve Zmodeq_trans: zarith.
+#[global]
 Hint Resolve Zmodeq_zero: zarith.
+#[global]
 Hint Resolve Zmodeq_rem: zarith.
+#[global]
 Hint Resolve Zmodeq_plus_compat: zarith.
+#[global]
 Hint Resolve Zmodeq_plus_elim: zarith.
+#[global]
 Hint Resolve Zmodeq_plus_elim_lft: zarith.
+#[global]
 Hint Resolve Zmodeq_plus_elim_rht: zarith.
+#[global]
 Hint Resolve Zmodeq_mult_elim_lft: zarith.
+#[global]
 Hint Resolve Zmodeq_mult_elim_rht: zarith.
+#[global]
 Hint Resolve Zmodeq_mult_compat: zarith.
+#[global]
 Hint Resolve Zmodeq_mult_elim: zarith.
+#[global]
 Hint Resolve Zmodeq_opp_intro: zarith.
+#[global]
 Hint Resolve Zmodeq_opp_elim: zarith.
+#[global]
 Hint Resolve Zmodeq_gcd_compat_lft: zarith.
+#[global]
 Hint Resolve Zmodeq_gcd_compat_rht: zarith.
+#[global]
 Hint Resolve Zmodeq_relprime: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_elim: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_elim_lft: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_elim_rht: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_intro: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_intro_lft: zarith.
+#[global]
 Hint Resolve Zmodeq_mod_intro_rht: zarith.
 
 

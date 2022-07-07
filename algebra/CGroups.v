@@ -292,9 +292,13 @@ Proof.
  apply cg_minus_wd; assumption.
 Qed.
 
+#[global]
 Hint Resolve cg_rht_inv_unfolded cg_lft_inv_unfolded: algebra.
+#[global]
 Hint Resolve cg_inv_inv cg_minus_correct cg_zero_inv cg_inv_zero: algebra.
+#[global]
 Hint Resolve cg_minus_unfolded grp_inv_assoc cg_inv_op: algebra.
+#[global]
 Hint Resolve cg_minus_wd: algebra_c.
 
 (**
@@ -332,6 +336,7 @@ Qed.
 
 End Assoc_properties.
 
+#[global]
 Hint Resolve assoc_2 minus_plus zero_minus cg_cancel_mixed plus_resp_eq:
   algebra.
 
@@ -442,7 +447,9 @@ Proof.
 Qed.
 
 End cgroups_apartness.
+#[global]
 Hint Resolve op_rht_resp_ap: algebra.
+#[global]
 Hint Resolve minus_ap_zero zero_minus_apart inv_resp_ap_zero: algebra.
 
 Section CGroup_Ops.
@@ -617,6 +624,8 @@ Notation "{--} x" := (Finv x) (at level 4, right associativity).
 Arguments Fminus [G].
 Infix "{-}" := Fminus (at level 50, left associativity).
 
+#[global]
 Hint Resolve included_FInv included_FMinus : included.
 
+#[global]
 Hint Immediate included_FInv' included_FMinus' included_FMinus'' : included.

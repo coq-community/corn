@@ -48,6 +48,7 @@ Proof.
  constructor;[|apply everyOther_nbz];assumption.
 Qed.
 
+#[global]
 Instance everyOther_zl `{Hx : !Limit s 0} : Limit (everyOther s) 0.
 Proof.
  intros e.
@@ -352,6 +353,7 @@ Proof.
              induction n0;intros p;[reflexivity|]; simpl in *; rewrite IHn0; reflexivity.
 Qed.
   
+#[global]
 Instance Qrecip_positives_zl : Limit Qrecip_positives 0.
  intros [[[n d] U] | ]; [| left; apply ForAll_True].
  unfold Qrecip_positives.
@@ -361,6 +363,7 @@ Instance Qrecip_positives_zl : Limit Qrecip_positives 0.
 Defined.
 
 (** [recip_positives] is [DecreasingNonNegative]. *)
+#[global]
 Instance Qrecip_positives_dnn : DecreasingNonNegative Qrecip_positives.
 Proof.
  unfold Qrecip_positives.
@@ -478,6 +481,7 @@ Proof.
 Qed.
 
 (** [Qrecip_factorials] is [DecreasingNonNegative]. *)
+#[global]
 Instance Qrecip_factorials_dnn : DecreasingNonNegative Qrecip_factorials.
 Proof.
  unfold Qrecip_factorials.
@@ -518,6 +522,7 @@ Proof.
  apply Qrecip_factorial_bounded.
 Qed.
 
+#[global]
 Instance Qrecip_factorials_zl : Limit Qrecip_factorials 0.
 Proof.
  intros e.

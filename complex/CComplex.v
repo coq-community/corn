@@ -489,8 +489,10 @@ Qed.
 
 End I_properties.
 
+#[global]
 Hint Resolve I_square I_square' I_recip_lft I_recip_rht mult_I calculate_norm
   cc_calculate_square: algebra.
+#[global]
 Hint Resolve I_wd Re_wd Im_wd: algebra_c.
 
 (**
@@ -550,6 +552,7 @@ Qed.
 
 End Conj_properties.
 
+#[global]
 Hint Resolve CC_conj_plus CC_conj_mult CC_conj_nexp CC_conj_conj
   CC_conj_zero: algebra.
 
@@ -645,10 +648,14 @@ Qed.
 
 End cc_IR_properties.
 
+#[global]
 Hint Resolve Re_cc_IR Im_cc_IR: algebra.
+#[global]
 Hint Resolve cc_IR_wd: algebra_c.
+#[global]
 Hint Resolve cc_IR_mult cc_IR_nexp cc_IR_mult_lft cc_IR_mult_rht cc_IR_plus
   cc_IR_minus: algebra.
+#[global]
 Hint Resolve cc_IR_nring cc_IR_zero: algebra.
 
 (**

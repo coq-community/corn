@@ -158,6 +158,7 @@ Qed.
 Lemma proj1_sig_nonNeg (q: T): 0 <= `q.
 Proof. apply proj2_sig. Qed.
 
+#[global]
 Hint Immediate proj1_sig_nonNeg.
 
 Lemma rect (P: T -> Type)

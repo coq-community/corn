@@ -151,8 +151,10 @@ Hint Unfold relation : type_classes.
 
 End MetricSpaceClass.
 
+#[global]
 Instance: Params (@mspc_ball) 2 := {}.
 
+#[global]
 Hint Resolve Qlt_le_weak Qplus_lt_le_0_compat.
   (* Todo: Move. *)
 
@@ -355,8 +357,10 @@ End genball.
 
 (** Bundled MetricSpaces immediately yield instances of the classes: *)
 
+#[global]
 Instance: ∀ X: MetricSpace, MetricSpaceBall X := λ X, @genball X _ (@ball X).
 
+#[global]
 Instance class_from_MetricSpace (X: MetricSpace): MetricSpaceClass X.
 Proof.
  apply genball_MetricSpace.
@@ -503,10 +507,13 @@ Arguments mspc_ball {X MetricSpaceBall}.
 Class Canonical (T: Type): Type := canonical: T.
   (* Todo: Move. *)
 
+#[global]
 Instance: ∀ {T: Type}, Canonical (T → T) := @Datatypes.id.
 
+#[global]
 Instance: Canonical (Qpos → Qinf) := Qinf.finite ∘ QposAsQ.
 
+#[global]
 Instance composed_Proper `{Equiv A} `{Equiv B} `{Equiv C} (f: B → C) (g: A → B):
   Proper (=) f → Proper (=) g → Proper (=) (f ∘ g).
 Proof with auto.
@@ -517,12 +524,14 @@ Proof with auto.
  assumption.
 Qed.
 
+#[global]
 Instance: Proper (QposEq ==> (=)) QposAsQ.
 Proof. repeat intro. assumption. Qed.
 
 Require Import util.Container.
 
 Definition Ball X R := prod X R.
+#[global]
 Hint Extern 0 (Equiv (Ball _ _)) => eapply @prod_equiv : typeclass_instances.
 
 Section Ball.
@@ -589,11 +598,14 @@ Section sig_metricspace.
 
 End sig_metricspace.
 
+#[global]
 Instance Qpos_mspc_ball: MetricSpaceBall Qpos
   := @sig_mspc_ball Q_as_MetricSpace _ (Qlt 0).
+#[global]
 Instance Qpos_mspc: MetricSpaceClass Qpos
   := @sig_mspc Q_as_MetricSpace _ _ (Qlt 0).
 
+#[global]
 Instance: Cast QnnInf.T Qinf :=
   λ x, match x with
     | QnnInf.Infinite => Qinf.infinite
@@ -744,7 +756,9 @@ Section shallowly_wrapped_ucfuns.
 End shallowly_wrapped_ucfuns.
 
 
+#[global]
 Existing Instance ucFun_mu.
+#[global]
 Existing Instance ucFun_uc.
 
 Arguments UCFunction X {Xb} Y {Yb}.
@@ -1114,8 +1128,11 @@ End curried_uc.
 
 Class HasLambda `{X: Type} (x: X): Prop.
 
+#[global]
 Instance lambda_has_lambda `(f: A → B): HasLambda (λ x, f x) := {}.
+#[global]
 Instance application_has_lambda_left: ∀ `(f: A → B) (x: A), HasLambda f → HasLambda (f x) := {}.
+#[global]
 Instance application_has_lambda_right: ∀ `(f: A → B) (x: A), HasLambda x → HasLambda (f x) := {}.
 
 

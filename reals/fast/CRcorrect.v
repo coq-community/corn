@@ -31,6 +31,9 @@ Require Import CoRN.model.totalorder.QMinMax.
 Require Import Coq.QArith.Qabs.
 Require Export CoRN.reals.fast.CRFieldOps.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Automatic Introduction.
 
 Local Open Scope nat_scope.
@@ -374,6 +377,7 @@ Proof.
  apply (Qpos_nonneg (e + e)).
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_inject_Q_as_CR_inject_Q : CRtoCauchy_IR.
 
 Lemma CR_inject_Q_as_Cauchy_IR_inject_Q : forall x:Q,
@@ -431,6 +435,7 @@ Proof.
  eapply Hn3; unfold n; auto with *.
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_plus_as_CR_plus : CRtoCauchy_IR.
 
 Lemma CR_plus_as_Cauchy_IR_plus : forall x y:CR,
@@ -459,6 +464,7 @@ Proof.
  apply Hn2. apply Nat.le_max_r.
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_opp_as_CR_opp : CRtoCauchy_IR.
 
 Lemma CR_opp_as_Cauchy_IR_opp : forall x:CR,
@@ -532,6 +538,7 @@ Proof.
  apply le_trans with n; [unfold n;auto with *|assumption].
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_le_as_CR_le : CRtoCauchy_IR.
 
 Lemma CR_le_as_Cauchy_IR_le : forall (x y:CR),
@@ -701,6 +708,7 @@ Proof.
  reflexivity. apply Qabs_nonneg.
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_mult_as_CR_mult : CRtoCauchy_IR.
 
 Lemma CR_mult_as_Cauchy_IR_mult : forall x y:CR,
@@ -942,6 +950,7 @@ Proof.
  apply Hi.
 Qed.
 
+#[global]
 Hint Rewrite Cauchy_IR_inv_as_CR_inv_short : CRtoCauchy_IR.
 
 Lemma Cauchy_IR_inv_as_CR_inv : forall (x:Cauchy_IR) x_ H,

@@ -19,9 +19,11 @@ Import Qround Qpower Qinf.notations Qinf.coercions.
 (* Set Printing Coercions.*)
 
 Definition ext_plus {A} `{Plus B} : Plus (A -> B) := λ f g x, f x + g x.
+#[global]
 Hint Extern 10 (Plus (_ -> _)) => apply @ext_plus : typeclass_instances.
 
 Definition ext_negate {A} `{Negate B} : Negate (A -> B) := λ f x, - (f x).
+#[global]
 Hint Extern 10 (Negate (_ -> _)) => apply @ext_negate : typeclass_instances.
 
 (* The definitions above replace the following.
@@ -92,7 +94,9 @@ Instance Qpos_inv : DecRecip Qpos := Qpossec.Qpos_inv.
 Instance Qinf_one : One Qinf := 1%Q.
 *)
 
+#[global]
 Instance Qinf_le : Le Qinf := Qinf.le.
+#[global]
 Instance Qinf_lt : Lt Qinf := Qinf.lt.
 
 (*
@@ -418,6 +422,7 @@ Qed.
 Global Instance uniformly_continuous_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (UniformlyContinuous X Y) X Y := λ f, f.
 
+#[global]
 Hint Extern 10 (ExtMetricSpaceClass (UniformlyContinuous _ _)) =>
   apply @Linf_func_metric_space_class : typeclass_instances.
 
@@ -605,9 +610,11 @@ End LocallyLipschitz.
 
 Global Arguments LocallyLipschitz X {_} Y {_}.
 
+#[global]
 Instance locally_lipschitz_func `{MetricSpaceBall X, MetricSpaceBall Y} :
   Func (LocallyLipschitz X Y) X Y := λ f, f.
 
+#[global]
 Hint Extern 10 (ExtMetricSpaceClass (LocallyLipschitz _ _)) =>
   apply @Linf_func_metric_space_class : typeclass_instances.
 
@@ -887,6 +894,7 @@ End UCFComplete.
 
 Definition seq A := nat -> A.
 
+#[global]
 Hint Unfold seq : typeclass_instances.
 (* This unfolds [seq X] as [nat -> X] and allows ext_equiv to find an
 instance of [Equiv (seq X)] *)

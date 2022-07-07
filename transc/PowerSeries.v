@@ -296,6 +296,7 @@ Qed.
 
 End Power_Series.
 
+#[global]
 Hint Resolve FPowerSeries'_cont: continuous.
 
 Section More_on_PowerSeries.
@@ -540,6 +541,7 @@ Definition Logarithm := ( [-S-]log_defn_lemma) [1] (pos_one IR).
 
 End Definitions.
 
+#[global]
 Hint Resolve included_Exp included_Sin included_Cos: included.
 
 (**

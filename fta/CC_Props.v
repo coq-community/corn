@@ -41,6 +41,7 @@ From Coq Require Import Lia.
 * More properties of complex numbers
 ** Sequences and limits *)
 
+#[global]
 Hint Resolve AbsIR_sqrt_sqr: algebra.
 
 Lemma absCC_absIR_re : forall x : CC, AbsIR (Re x) [<=] AbsCC x.

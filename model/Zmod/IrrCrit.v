@@ -130,6 +130,7 @@ Proof.
  auto.
 Qed.
 
+#[global]
 Hint Resolve fpxeq_wd : algebra.
 
 
@@ -149,6 +150,7 @@ Proof.
  simpl; apply cpoly_mult_zero.
 Qed.
 
+#[global]
 Hint Resolve mult_zero : algebra.
 
 Lemma fp_resp_zero : zxfpx(cpoly_zero Z_as_CRing)[=](cpoly_zero fp).
@@ -170,6 +172,7 @@ Proof.
  intuition.
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_mult_cr : algebra.
 
 Lemma fpx_resp_plus :  forall f g:zx,
@@ -188,6 +191,7 @@ Proof.
  auto with *.
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_plus : algebra.
 
 Lemma fpx_resp_mult : forall f g:zx,
@@ -230,6 +234,7 @@ Proof.
  intuition.
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_mult : algebra.
 
 Lemma fpx_resp_coef : forall (f:zx)(n:nat), (zfp (nth_coeff n f))
@@ -244,6 +249,7 @@ Proof.
  apply (IHf n).
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_coef : algebra.
 
 
@@ -288,6 +294,7 @@ Proof.
  intuition.
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_deggemonic : algebra.
 
 Definition reducible (R:CRing)(f:(cpoly_cring R)) :=
@@ -312,6 +319,7 @@ Proof.
  exact Hfgh.
 Qed.
 
+#[global]
 Hint Resolve fpx_resp_red : algebra.
 
 Definition irreducible (R:CRing)(f:(cpoly_cring R)) :=

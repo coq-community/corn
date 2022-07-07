@@ -47,6 +47,9 @@ Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.theory.int_pow.
 Require Import MathClasses.interfaces.abstract_algebra.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Opaque CR.
@@ -795,6 +798,7 @@ Proof.
  algebra.
 Qed.
 
+#[global]
 Hint Rewrite <- CRe_correct : IRtoCR.
 
 Opaque inj_Q.
@@ -984,6 +988,7 @@ Proof.
  apply exp_bound_lemma.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite exp_correct : IRtoCR.
 (* end hide *)
 Lemma exp_bound_exp : forall (z:Z) (x:CR),
@@ -1035,6 +1040,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Instance: Proper ((=) ==> (=)) rational_exp.
 Proof.
   intros x1 x2 E.
@@ -1043,5 +1049,6 @@ Proof.
 Qed.
 
 (* begin hide *)
+#[global]
 Hint Rewrite exp_Qexp : CRfast_compute.
 (* end hide *)

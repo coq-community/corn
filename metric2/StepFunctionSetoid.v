@@ -26,6 +26,9 @@ Require Import CoRN.tactics.Qauto.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.algebra.COrdFields.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 Set Automatic Introduction.
 
@@ -204,6 +207,7 @@ Qed.
 
 End EquivalenceA.
 (* begin hide *)
+#[global]
 Hint Resolve StepF_eq_refl : sfarith.
 (* end hide *)
 Notation "x == y" := (StepF_eq x y) (at level 70) : sfstscope.
@@ -453,6 +457,7 @@ Add Parametric Relation (X : RSetoid) : (StepF X) (@StepF_eq X)
  transitivity proved by (@StepF_eq_trans X)
  as StepF_SetoidTheory.
 
+#[global]
 Hint Resolve StepF_eq_sym StepF_eq_trans.
 
 Add Morphism (StepFfoldProp)
@@ -751,10 +756,12 @@ Proof.
  rewrite -> H0, H1;reflexivity.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite
  ApGlueGlue ApGlue GlueAp SplitRAp SplitLAp SplitLGlue SplitRGlue
  Map_homomorphism : StepF_rew.
 
+#[global]
 Hint Rewrite
  Map_composition
  Map_discardable
@@ -785,6 +792,7 @@ Proof.
  reflexivity.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite Map_ap : StepF_eval.
 (* end hide *)
 Ltac rewriteStepF := autorewrite with StepF_rew.
@@ -881,6 +889,7 @@ Proof.
  auto with *.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite StepFfoldPropglue_rew:StepF_rew.
 (* end hide *)
 Lemma StepF_imp_imp:forall x y:(StepF iffSetoid),

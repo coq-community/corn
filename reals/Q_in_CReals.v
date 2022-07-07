@@ -988,6 +988,9 @@ Qed.
 
 End Rational_sequence_prelogue.
 
+#[global]
 Hint Resolve inj_Q_plus inj_Q_mult inj_Q_inv inj_Q_minus inj_Q_div : algebra.
+#[global]
 Hint Resolve inj_Q_nring inj_Q_pring inj_Q_zring : algebra.
+#[global]
 Hint Resolve inj_Q_power inj_Q_power_Z : algebra.

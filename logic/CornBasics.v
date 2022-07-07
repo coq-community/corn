@@ -75,6 +75,7 @@ Global Set Automatic Coercions Import.
 
 Global Set Automatic Introduction.
 
+#[global]
 Instance: @DefaultRelation nat eq | 2 := {}.
 
 (**

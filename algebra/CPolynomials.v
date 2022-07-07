@@ -43,6 +43,9 @@
 Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.tactics.Rational.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 (**
 * Polynomials
 The first section only proves the polynomials form a ring.
@@ -2422,15 +2425,23 @@ Proof (cpoly_double_ind0_cs CR).
 
 End Poly_Prop_Induction.
 
+#[global]
 Hint Resolve poly_linear cpoly_lin: algebra.
+#[global]
 Hint Resolve apply_wd cpoly_const_eq: algebra_c.
+#[global]
 Hint Resolve c_apply x_apply inv_apply plus_apply minus_apply mult_apply
   nexp_apply: algebra.
+#[global]
 Hint Resolve one_apply c_zero c_one c_mult: algebra.
+#[global]
 Hint Resolve poly_inv_apply: algebra.
+#[global]
 Hint Resolve c_mult_lin: algebra.
 
+#[global]
 Hint Rewrite one_apply c_apply x_apply mult_apply plus_apply minus_apply : apply.
+#[global]
 Hint Rewrite inv_apply nexp_apply c_mult_apply poly_inv_apply : apply.
 Ltac poly_apply:= autorewrite with apply; simpl.
 (** The tactic [poly_apply] applies polynomials to arguments *)
@@ -2592,6 +2603,7 @@ Qed.
 End Derivative.
 Notation "'_D_'" := (@cpolyder _).
 
+#[global]
 Hint Rewrite diff_zero diff_one diff_const diff_x diff_plus diff_c_mult diff_mult diff_linear : poly_diff.
 Section Map.
 

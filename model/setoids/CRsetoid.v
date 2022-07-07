@@ -27,6 +27,7 @@ Require Export CoRN.model.metric2.CRmetric.
 Require Export CoRN.algebra.CSetoids.
 Require Import CoRN.tactics.CornTac.
 
+#[global]
 Instance CR_default : @DefaultRelation CR (@msp_eq CR) | 2 := {}.
 
 (**

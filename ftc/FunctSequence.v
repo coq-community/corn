@@ -706,6 +706,7 @@ Qed.
 
 End More_Properties.
 
+#[global]
 Hint Resolve Cauchy_cont_Lim: continuous.
 
 Section Algebraic_Properties.
@@ -1111,4 +1112,5 @@ Qed.
 
 End Still_More_Algebraic_Properties.
 
+#[global]
 Hint Resolve Continuous_I_Sum Continuous_I_Sumx Continuous_I_Sum0: continuous.

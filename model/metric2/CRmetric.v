@@ -40,6 +40,7 @@ Definition CR : MetricSpace
 Delimit Scope CR_scope with CR.
 Bind Scope CR_scope with CR.
 
+#[global]
 Instance inject_Q_CR: Cast Q (msp_car CR)
   := ucFun (@Cunit Q_as_MetricSpace).
 
@@ -55,6 +56,7 @@ We omit this for backward, and forward, compatibity
 *)
 
 (* begin hide *)
+#[global]
 Instance inject_Q_CR_wd: Proper (Qeq ==> (=)) inject_Q_CR.
 Proof.
   intros x y xyeq. apply (uc_wd (@Cunit Q_as_MetricSpace)).

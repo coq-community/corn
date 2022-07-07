@@ -39,6 +39,9 @@ Require Import CoRN.logic.PropDecid.
 Require Import CoRN.transc.Exponential.
 From Coq Require Import Lia Lra.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 (* This changed in RLogic and should probably be moved there: *)
 Lemma forall_dec : forall P:nat->Prop, (forall n, {P n} + {~ P n}) -> {forall n, P n} + {~forall n, P n}.
 intros. 
@@ -206,6 +209,7 @@ Proof.
  apply: map_pres_zero_unfolded.
 Qed.
 
+#[global]
 Hint Rewrite R_Zero_as_IR : RtoIR.
 
 (** one *)
@@ -215,6 +219,7 @@ Proof.
  apply map_pres_one_unfolded.
 Qed.
 
+#[global]
 Hint Rewrite R_One_as_IR : RtoIR.
 
 Lemma IR_One_as_R : (IRasR [1] = R1).
@@ -229,6 +234,7 @@ Proof.
  apply: map_pres_plus.
 Qed.
 
+#[global]
 Hint Rewrite R_plus_as_IR : RtoIR.
 
 Lemma IR_plus_as_R : forall x y, (IRasR (x[+]y) [=] IRasR x + IRasR y).
@@ -243,6 +249,7 @@ Proof.
  apply: map_pres_minus.
 Qed.
 
+#[global]
 Hint Rewrite R_opp_as_IR : RtoIR.
 
 Lemma IR_opp_as_R : forall x, (IRasR ([--] x) [=] (- (IRasR x))).
@@ -261,6 +268,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite R_minus_as_IR : RtoIR.
 
 Lemma IR_minus_as_R : forall x y, (IRasR (x[-]y) [=] IRasR x - IRasR y).
@@ -279,6 +287,7 @@ Proof.
  apply: map_pres_mult.
 Qed.
 
+#[global]
 Hint Rewrite R_mult_as_IR : RtoIR.
 
 Lemma IR_mult_as_R : forall x y, (IRasR (x[*]y) = IRasR x * IRasR y).
@@ -304,6 +313,7 @@ Proof.
  apply div_wd; reflexivity.
 Qed.
 
+#[global]
 Hint Rewrite R_recip_as_IR : RtoIR.
 
 (** division *)
@@ -343,6 +353,7 @@ Proof.
  apply IR_le_as_R.
  lra.
 Qed.
+#[global]
 Hint Rewrite R_abs_as_IR : RtoIR.
 
 (** parital sum *)
@@ -488,6 +499,7 @@ Proof.
  rewrite -> IHi.
  reflexivity.
 Qed.
+#[global]
 Hint Rewrite R_nring_as_IR : RtoIR.
 
 Add Morphism RasIR with signature (@cs_eq _) ==> (@cs_eq _) as R_as_IR_wd.
@@ -567,6 +579,7 @@ Proof.
  auto with *.
 Qed.
 
+#[global]
 Hint Rewrite R_IZR_as_IR : RtoIR.
 
 (** exponents *)
@@ -583,6 +596,7 @@ Proof.
  rewrite -> IHi.
  auto with *.
 Qed.
+#[global]
 Hint Rewrite R_pow_as_IR : RtoIR.
 
 Lemma R_exp_as_IR : forall x, RasIR (exp x) [=] Exp (RasIR x).
@@ -616,6 +630,7 @@ Proof.
  apply (R_nring_as_IR).
 Qed.
 
+#[global]
 Hint Rewrite R_exp_as_IR : RtoIR.
 
 (** trigonometry *)
@@ -698,6 +713,7 @@ Proof.
  rational.
 Qed.
 
+#[global]
 Hint Rewrite R_cos_as_IR : RtoIR.
 
 Lemma R_sin_as_IR : forall x, RasIR (sin x) [=] Sin (RasIR x).
@@ -783,6 +799,7 @@ Proof.
  rational.
 Qed.
 
+#[global]
 Hint Rewrite R_sin_as_IR : RtoIR.
 
 Lemma R_tan_as_IR : forall x dom, RasIR (tan x) [=] Tan (RasIR x) dom.
@@ -965,6 +982,7 @@ Proof.
  auto with *.
 Qed.
 
+#[global]
 Hint Rewrite R_pi_as_IR : RtoIR.
 
 (** rationals *)
@@ -1001,6 +1019,7 @@ Proof.
  auto with *.
 Qed.
 
+#[global]
 Hint Rewrite R_Q2R_as_IR : RtoIR.
 
 Close Scope R_scope.

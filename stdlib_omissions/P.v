@@ -35,6 +35,7 @@ Proof.
  apply lt_O_nat_of_P.
 Qed.
 
+#[global]
 Hint Immediate nat_of_P_nonzero.
 
 Lemma Plt_lt (p q: positive): Pos.lt p q <-> (nat_of_P p < nat_of_P q).

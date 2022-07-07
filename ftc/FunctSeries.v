@@ -143,6 +143,7 @@ End Definitions.
 
 Arguments Fun_Series_Sum [a b Hab f].
 
+#[global]
 Hint Resolve fun_seq_part_sum_cont: continuous.
 
 Section More_Definitions.
@@ -557,6 +558,7 @@ Qed.
 
 End Other_Results.
 
+#[global]
 Hint Resolve Fun_Series_Sum_cont: continuous.
 
 Section Convergence_Criteria.

@@ -32,6 +32,9 @@ Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import CoRN.stdlib_omissions.Q.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
@@ -338,5 +341,6 @@ Qed.
 
 End Pi.
 (* begin hide *)
+#[global]
 Hint Rewrite CRpi_correct : IRtoCR.
 (* end hide *)

@@ -133,6 +133,7 @@ Qed.
 
 End Local_Properties.
 
+#[global]
 Hint Resolve diffble_imp_inc: included.
 
 Section Operations.
@@ -416,7 +417,9 @@ Proof.
  apply projT2.
 Qed.
 
+#[global]
 Hint Immediate included_imp_contin deriv_imp_contin_I deriv_imp_contin'_I
   diffble_imp_contin_I: continuous.
 
+#[global]
 Hint Immediate included_imp_deriv: derivate.

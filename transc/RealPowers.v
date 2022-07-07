@@ -92,6 +92,7 @@ Proof.
  Step_final (Exp [--] (y[*]Log x Hx)).
 Qed.
 
+#[global]
 Hint Resolve power_wd power_plus power_inv: algebra.
 
 Lemma power_minus : forall x y z Hx Hxz, x[!]y[-]z[//]Hx [=] (x[!]y[//]Hx[/] x[!]z[//]Hx[//]Hxz).
@@ -114,6 +115,7 @@ Proof.
  simpl in |- *; rational.
 Qed.
 
+#[global]
 Hint Resolve power_minus power_nat: algebra.
 
 Lemma power_zero : forall (x : IR) Hx, x[!][0][//]Hx [=] [1].
@@ -140,6 +142,7 @@ Proof.
  algebra.
 Qed.
 
+#[global]
 Hint Resolve power_zero power_one one_power: algebra.
 
 Opaque nexp_op.
@@ -157,6 +160,7 @@ Proof.
  Step_final ([1][/] x[^]nat_of_P p[//]nexp_resp_ap_zero _ Hx').
 Qed.
 
+#[global]
 Hint Resolve power_int: algebra.
 
 Lemma Exp_power : forall (x : IR) He, E[!]x[//]He [=] Exp x.
@@ -180,6 +184,7 @@ Proof.
  Step_final (Exp (y[*][--] (Log _ Hx))).
 Qed.
 
+#[global]
 Hint Resolve Exp_power mult_power recip_power: algebra.
 
 Lemma div_power : forall x y z Hx Hy Hy' Hxy Hyz,
@@ -193,6 +198,7 @@ Proof.
  Step_final (x[!]z[//]Hx[*]_[!]z[//]recip_resp_pos _ _ Hy' Hy).
 Qed.
 
+#[global]
 Hint Resolve div_power: algebra.
 
 Lemma power_ap_zero : forall (x y : IR) Hx, x[!]y[//]Hx [#] [0].
@@ -216,6 +222,7 @@ Proof.
  apply Exp_pos.
 Qed.
 
+#[global]
 Hint Resolve power_mult: algebra.
 
 Lemma power_recip : forall x q Hx (Hx' : [0] [<=] x) Hq (Hq' : 0 < q),
@@ -230,6 +237,7 @@ Proof.
  Step_final (x[!] ([1][/] _[//]Hq) [*]nring q[//]Hx).
 Qed.
 
+#[global]
 Hint Resolve power_recip: algebra.
 
 Lemma power_div : forall x p q Hx (Hx' : [0] [<=] x) Hq (Hq' : 0 < q),
@@ -242,6 +250,7 @@ Proof.
  Step_final ((x[!][1][/] _[//]Hq[//]Hx) [!]nring p[//]power_pos _ _ _).
 Qed.
 
+#[global]
 Hint Resolve power_div: algebra.
 
 Lemma real_power_resp_leEq_rht : forall x y p Hx Hy,
@@ -597,4 +606,5 @@ Qed.
 
 End More_on_Power_Function.
 
+#[global]
 Hint Resolve Derivative_power: derivate.

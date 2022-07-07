@@ -30,6 +30,9 @@ Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.metric2.ProductMetric.
 Require Import MathClasses.interfaces.canonical_names.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Set Implicit Arguments.
 
 Local Open Scope Q_scope.
@@ -240,6 +243,7 @@ Build_UniformlyContinuousFunction (Qscale_uc_prf a).
 
 Definition scale (a:Q) : CR --> CR := Cmap QPrelengthSpace (Qscale_uc a).
 
+#[global]
 Instance Qscale_uc_Proper: Proper (Qeq ==> @msp_eq _) Qscale_uc.
 Proof.
   intros x y E.
@@ -249,6 +253,7 @@ Proof.
   rewrite E. reflexivity.
 Qed.
 
+#[global]
 Instance scale_Proper: Proper (Qeq ==> @msp_eq (UniformlyContinuousSpace CR CR)) scale.
 Proof.
   intros x y E.
@@ -401,6 +406,7 @@ Definition Qmult_uc (c:Qpos)
 Definition CRmult_bounded (yBound : Qpos) : CR --> CR --> CR
   := Cmap2 QPrelengthSpace QPrelengthSpace (Qmult_uc yBound).
 
+#[global]
 Instance: Proper (QposEq ==> @msp_eq _) Qmult_uc.
 Proof.
   intros e1 e2 E.
@@ -412,6 +418,7 @@ Proof.
   reflexivity.
 Qed.
 
+#[global]
 Instance CRmult_bounded_wd : Proper (QposEq ==> @msp_eq _) CRmult_bounded.
 Proof.
   intros e1 e2 E.
@@ -492,6 +499,7 @@ Qed.
 (** This version of multiply computes a bound on the second argument
 just in time.  It should be avoided in favour of the bounded version
 whenever possible. *)
+#[global]
 Instance CRmult: Mult CR := λ x y, ucFun2 (CRmult_bounded (CR_b (1#1) y)) x y.
 
 Infix "*" := CRmult : CR_scope.
@@ -608,6 +616,7 @@ Proof.
  apply CR_b_upperBound.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite CRmult_scale : CRfast_compute.
 (* end hide *)
 Lemma scale_Qmult : forall a b:Q, (scale a ('b)=='(a*b)%Q)%CR.
@@ -619,6 +628,7 @@ Proof.
  apply MonadLaw3.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite scale_Qmult : CRfast_compute.
 (* end hide *)
 (**
@@ -738,6 +748,7 @@ Proof.
  reflexivity.
 Qed.
 
+#[global]
 Instance CRinv_pos_uc_Proper : Proper (QposEq ==> @msp_eq _ ==> @msp_eq _) Qinv_pos_uc.
 Proof.
   intros [c1 ?] [c2 ?] E x1 x2 F. unfold QposEq in E. simpl in *.
@@ -745,6 +756,7 @@ Proof.
   rewrite E, F. reflexivity.
 Qed.
 
+#[global]
 Instance: Proper (QposEq ==> @msp_eq _) CRinv_pos.
 Proof.
   intros c1 c2 E.

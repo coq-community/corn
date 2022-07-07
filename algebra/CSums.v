@@ -758,6 +758,8 @@ Qed.
 
 End More_Sums.
 
+#[global]
 Hint Resolve Sum_one Sum_Sum Sum_first Sum_last Sum_last' Sum_wd
   Sum_plus_Sum: algebra.
+#[global]
 Hint Resolve Sum_minus_Sum inv_Sum inv_Sum0: algebra.

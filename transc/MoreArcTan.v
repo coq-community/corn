@@ -53,6 +53,7 @@ Proof.
  apply Tan_QuarterPi.
 Qed.
 
+#[global]
 Hint Resolve ArcTan_zero ArcTan_one: algebra.
 
 Lemma ArcTan_inv : forall x, ArcTan [--]x[=][--](ArcTan x).

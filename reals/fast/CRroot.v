@@ -41,6 +41,9 @@ Require Import CoRN.tactics.Qauto.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.interfaces.abstract_algebra.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Local Open Scope Q_scope.
 
 Opaque CR.
@@ -966,6 +969,7 @@ Proof.
  apply BindLaw1.
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite CRsqrt_correct : IRtoCR.
 (* end hide *)
 
@@ -1209,6 +1213,7 @@ Proof.
  apply BindLaw1.
 Qed.
 
+#[global]
 Instance: Proper ((=) ==> (=)) rational_sqrt.
 Proof.
   intros x1 x2 E.

@@ -885,6 +885,7 @@ Qed.
 
 End Properties_of_leEq.
 
+#[global]
 Hint Resolve shift_leEq_lft mult_resp_nonneg plus_resp_nonneg: algebra.
 
 (*---------------------------------*)
@@ -1084,6 +1085,7 @@ Qed.
 
 End PosP_properties.
 
+#[global]
 Hint Resolve mult_resp_nonneg.
 
 (**
@@ -1196,4 +1198,5 @@ Proof.
 Qed.
 
 End Half_properties.
+#[global]
 Hint Resolve half_1 half_1' half_2: algebra.

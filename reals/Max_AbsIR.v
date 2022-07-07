@@ -463,6 +463,7 @@ End properties_of_Max.
 
 End Maximum.
 
+#[global]
 Hint Resolve Max_id: algebra.
 
 Section Minimum.
@@ -1285,6 +1286,7 @@ Qed.
 
 End Absolute.
 
+#[global]
 Hint Resolve AbsIRz_isz: algebra.
 
 Section SeqMax.
@@ -1376,6 +1378,7 @@ Qed.
 
 End Part_Function_Abs.
 
+#[global]
 Hint Resolve FAbs_char: algebra.
 
 Lemma FAbs_char' : forall F x Hx, AbsIR (FAbs F x Hx) [=] AbsIR (F x (ProjIR1 Hx)).
@@ -1397,6 +1400,7 @@ Proof.
  apply AbsIR_nonneg.
 Qed.
 
+#[global]
 Hint Resolve FAbs_char': algebra.
 
 Section Inclusion.
@@ -1457,7 +1461,9 @@ Qed.
 
 End Inclusion.
 
+#[global]
 Hint Resolve included_FMax included_FMin included_FAbs : included.
 
+#[global]
 Hint Immediate included_FMax' included_FMin' included_FAbs'
   included_FMax'' included_FMin'' : included.

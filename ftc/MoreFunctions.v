@@ -134,6 +134,7 @@ Qed.
 
 End Basic_Results.
 
+#[global]
 Hint Resolve Continuous_imp_inc: included.
 
 Section Other_Results.
@@ -260,10 +261,12 @@ Qed.
 
 End Other_Results.
 
+#[global]
 Hint Resolve continuous_compact Continuous_const Continuous_id
   Continuous_plus Continuous_inv Continuous_minus Continuous_mult
   Continuous_scal Continuous_nth Continuous_recip Continuous_abs Continuous_NRoot: continuous.
 
+#[global]
 Hint Immediate included_imp_Continuous Included_imp_Continuous: continuous.
 
 Section Corollaries.
@@ -294,6 +297,7 @@ Qed.
 
 End Corollaries.
 
+#[global]
 Hint Resolve Continuous_div: continuous.
 
 Section Sums.
@@ -338,6 +342,7 @@ Qed.
 
 End Sums.
 
+#[global]
 Hint Resolve Continuous_Sum0 Continuous_Sumx Continuous_Sum: continuous.
 
 Section Basic_Properties.
@@ -447,7 +452,9 @@ Qed.
 
 End Basic_Properties.
 
+#[global]
 Hint Immediate Derivative_imp_inc Derivative_imp_inc': included.
+#[global]
 Hint Immediate Derivative_imp_Continuous Derivative_imp_Continuous':
   continuous.
 
@@ -816,6 +823,7 @@ Qed.
 
 End Diffble_Basic_Properties.
 
+#[global]
 Hint Immediate Diffble_imp_inc: included.
 
 Section Diffble_Corollaries.
@@ -1471,15 +1479,19 @@ End Corollaries.
 
 End Nth_Derivative.
 
+#[global]
 Hint Resolve Derivative_const Derivative_id Derivative_plus Derivative_inv
   Derivative_minus Derivative_mult Derivative_scal Derivative_nth
   Derivative_recip Derivative_div Derivative_Sumx Derivative_Sum0
   Derivative_Sum: derivate.
 
+#[global]
 Hint Immediate Derivative_n_imp_inc Derivative_n_imp_inc' Diffble_n_imp_inc:
   included.
 
+#[global]
 Hint Resolve Deriv_lemma N_Deriv_lemma: derivate.
 
+#[global]
 Hint Immediate Derivative_n_imp_Continuous Derivative_n_imp_Continuous':
   continuous.

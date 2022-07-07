@@ -10,6 +10,7 @@ Require Import
 Inductive T: Set := finite (q: Q) | infinite.
   (* (This is positive infinity.) *)
 
+#[global]
 Instance eq: Equiv T := λ x y,
   match x, y with
   | infinite, infinite => True
@@ -17,9 +18,11 @@ Instance eq: Equiv T := λ x y,
   | _, _ => False
   end.
 
+#[global]
 Instance finite_Proper: Proper (=) finite.
 Proof. repeat intro. assumption. Qed.
 
+#[global]
 Instance setoid: Setoid T.
 Proof with intuition.
  constructor.
@@ -37,6 +40,7 @@ Definition le (x y: T): Prop :=
   | finite a, finite b => Qle a b
   end.
 
+#[global]
 Instance: Proper (=) le.
 Proof.
  intros [|] [|] E [|] [|] F; intuition; simpl; try reflexivity.
@@ -51,6 +55,7 @@ match x, y with
 | infinite, _ => False
 end.
 
+#[global]
 Instance: Proper (=) lt.
 Proof.
 intros [x1 |] [x2 |] A1 [y1 |] [y2 |] A2; revert A1 A2;
@@ -59,8 +64,10 @@ try contradiction; try reflexivity.
 rewrite A1, A2; reflexivity.
 Qed.
 
+#[global]
 Instance: Zero T := finite 0%Q.
 
+#[global]
 Instance plus: Plus T := λ x y,
   match x, y with
   | finite a, finite b => finite (a + b)
@@ -88,6 +95,7 @@ Proof with auto.
  simpl. intros. apply Qplus_nonneg...
 Qed.
 
+#[global]
 Hint Resolve le_0_plus_compat.
 
 Lemma le_0_Qpos (x: Qpos): le 0 x.
@@ -95,6 +103,7 @@ Proof.
   destruct x. simpl. apply Qlt_le_weak, q.
 Qed.
 
+#[global]
 Hint Immediate le_0_Qpos.
 
 Module notations.

@@ -14,6 +14,7 @@ Local Open Scope Q_scope.
 
 Definition pred_eq {X} (p q: X -> Prop): Prop := forall x, p x <-> q x.
 
+#[global]
 Instance: forall X, Equivalence (@pred_eq X) := {}.
 
 (* Some facts about Q: *)
@@ -112,8 +113,10 @@ is_bound stability so that the negated forall above can be classically flipped t
 an exists, or (2) using a separate inductively defined cut predicate for multiplication
 which has an additional constructor for the multiplication-by-0 case. *)
 
+#[global]
 Hint Immediate bound_is_bound.
 
+#[global]
 Instance is_bound_Proper: forall (x: T), Proper (QnonNeg.eq ==> iff) (is_bound x).
 Proof with auto.
  unfold QnonNeg.eq. intros x y z E.
@@ -332,9 +335,11 @@ Definition mult := binop Qmult Qmult_le_0_compat.
 Local Infix "+" := plus.
 Local Infix "*" := mult.
 
+#[global]
 Instance: Proper (eq ==> eq ==> eq) plus.
 Proof binop_Proper Qplus QnonNeg.Qplus_nonneg Qplus_comm Qplus_wiggle.
 
+#[global]
 Instance: Proper (eq ==> eq ==> eq) mult.
 Proof binop_Proper Qmult Qmult_le_0_compat Qmult_comm Qmult_wiggle.
 
@@ -422,6 +427,7 @@ Qed.
 Lemma le_0 x: 0%Qnn <= x.
 Proof. unfold le. simpl. auto. Qed.
 
+#[global]
 Hint Immediate le_0.
 
 Lemma le_0_eq x: x <= 0%Qnn -> x == 0%Qnn.

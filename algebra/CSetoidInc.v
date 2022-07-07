@@ -148,6 +148,8 @@ End inclusion.
 
 Arguments included [S].
 
+#[global]
 Hint Resolve included_refl included_FComp : included.
 
+#[global]
 Hint Immediate included_trans included_FComp' : included.

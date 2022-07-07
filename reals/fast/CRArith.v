@@ -39,6 +39,9 @@ Require Import CoRN.util.Qdlog.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import MathClasses.interfaces.orders.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 Local Open Scope CR_scope.
 
 (** Operations on rational numbers over CR are the same as the operations
@@ -70,6 +73,7 @@ Proof.
  apply (Qpos_nonneg (e1+e2)).
 Qed.
 
+#[global]
 Hint Rewrite <- CRplus_Qplus : toCRring.
 
 Lemma CRopp_Qopp : forall (x:Q), - inject_Q_CR x == inject_Q_CR (- x)%Q.
@@ -79,7 +83,9 @@ Proof.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite CRopp_Qopp : CRfast_compute.
+#[global]
 Hint Rewrite <- CRopp_Qopp : toCRring.
 (* end hide *)
 Lemma CRminus_Qminus : forall (x y:Q), inject_Q_CR x - inject_Q_CR y == inject_Q_CR (x - y)%Q.
@@ -89,6 +95,7 @@ Proof.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite <- CRminus_Qminus : toCRring.
 (* end hide *)
 Lemma CRmult_Qmult : forall (x y:Q), inject_Q_CR x * inject_Q_CR y == inject_Q_CR (x * y)%Q.
@@ -100,6 +107,7 @@ Proof.
  apply (Qpos_nonneg (e1+e2)). 
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite <- CRmult_Qmult : toCRring.
 (* end hide *)
 Lemma Qap_CRap : forall (x y:Q), (~(x==y))%Q -> (' x)><(' y).
@@ -134,6 +142,7 @@ Proof.
 Qed.
 
 (* begin hide *)
+#[global]
 Hint Rewrite <- CRinv_Qinv : toCRring.
 (* end hide *)
 (**
@@ -1010,6 +1019,7 @@ Proof.
  apply (in_CRball (proj1_sig e) x ('approximate x e)), ball_approx_r.
 Qed.
 
+#[global]
 Hint Immediate lower_CRapproximation upper_CRapproximation.
 
 Lemma reverseRegFun : forall (x : CR) (e1 e2 : Qpos),
@@ -1236,6 +1246,7 @@ Proof.
  apply (Qopp_le_compat 0). apply Qpos_nonneg.
 Qed.
 
+#[global]
 Hint Immediate CRnonNeg_0.
 
 Definition CRle_lt_dec: forall x y, DN ((x <= y)%CR + (y < x)%CR).
@@ -1628,10 +1639,12 @@ Qed.
 Close Scope CR_scope.
 Local Opaque CR.
 
+#[global]
 Instance: Ring CR.
 Proof. apply (rings.from_stdlib_ring_theory CR_ring_theory). Qed.
 
 (* We need the (1#4) because CR_epsilon_sign_dec_pos_rev is nasty *)
+#[global]
 Instance CRlt: Lt CR := λ x y, 
   ∃ n : nat, CR_epsilon_sign_dec ((1#4) * Qpos_power (2#1) (-cast nat Z n)) (y - x) ≡ Gt.
 
@@ -1664,6 +1677,7 @@ Proof.
   now apply Qlt_le_weak, Qnot_le_lt.
 Qed.
 
+#[global]
 Instance CRapart: Apart CR := λ x y, x < y ∨ y < x.
 
 Lemma CR_apart_apartT x y : prod (x ≶ y -> CRapartT x y)
@@ -1706,6 +1720,7 @@ Proof.
     contradict H. left. exact abs.
 Qed.
 
+#[global]
 Instance: StrongSetoid CR.
 Proof.
   split.
@@ -2228,6 +2243,7 @@ Proof.
 Qed.
 
 
+#[global]
 Instance: StrongSetoid_BinaryMorphism CRmult.
 Proof.
   split; try apply _.
@@ -2247,6 +2263,7 @@ Proof.
   right. destruct a. right. exact H. left. exact H. 
 Qed.
 
+#[global]
 Instance: FullPseudoOrder CRle CRlt.
 Proof.
   split.
@@ -2268,6 +2285,7 @@ Proof.
     apply H. apply CR_lt_ltT. exact abs.
 Qed.
 
+#[global]
 Instance: FullPseudoSemiRingOrder CRle CRlt.
 Proof.
   apply rings.from_full_pseudo_ring_order. 
@@ -2281,9 +2299,11 @@ Proof.
     apply CR_lt_ltT, H0.
 Qed.
 
+#[global]
 Program Instance CRinv: Recip CR := λ x, CRinvT x _.
 Next Obligation. apply CR_apart_apartT. now destruct x. Qed.
 
+#[global]
 Instance: Field CR.
 Proof.
   split; try apply _.
@@ -2301,12 +2321,14 @@ Proof.
     destruct x as [x xnz]. apply CRmult_inv_r.
 Qed.
 
+#[global]
 Instance: StrongSetoid_Morphism inject_Q_CR.
 Proof. 
   apply strong_setoids.dec_strong_morphism.
   split; try apply _.
 Qed.
 
+#[global]
 Instance: StrongSemiRing_Morphism inject_Q_CR.
 Proof.
   repeat (split; try apply _); intros; try reflexivity; symmetry.
@@ -2314,6 +2336,7 @@ Proof.
   now apply CRmult_Qmult.
 Qed.
 
+#[global]
 Instance: StrongInjective inject_Q_CR.
 Proof.
   repeat (split; try apply _); intros.
@@ -2321,9 +2344,11 @@ Proof.
   now apply Qap_CRap.
 Qed.
 
+#[global]
 Instance: OrderEmbedding inject_Q_CR.
 Proof. repeat (split; try apply _); now apply CRle_Qle. Qed.
 
+#[global]
 Instance: StrictOrderEmbedding inject_Q_CR.
 Proof. split; apply _. Qed.
 

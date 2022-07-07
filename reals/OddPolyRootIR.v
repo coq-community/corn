@@ -189,6 +189,7 @@ Qed.
 
 End Flip_Poly.
 
+#[global]
 Hint Resolve flip_poly: algebra.
 
 

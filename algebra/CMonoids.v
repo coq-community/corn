@@ -1040,4 +1040,5 @@ Definition Dbrack_as_CMonoid : CMonoid :=
 End Th15.
 
 
+#[global]
 Hint Resolve cm_rht_unit_unfolded cm_lft_unit_unfolded: algebra.

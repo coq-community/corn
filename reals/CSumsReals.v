@@ -95,6 +95,7 @@ Hint Resolve Sum_c_exp'.
 
 End Sums_over_Reals.
 
+#[global]
 Hint Resolve Sum0_c_exp Sum_c_exp Sum_c_exp': algebra.
 
 Lemma diff_is_Sum0 : forall (s : nat -> IR) n, s n[-]s 0 [=] Sum0 n (fun i => s (S i) [-]s i).
@@ -168,6 +169,7 @@ Proof.
   simpl in |- *. Step_final (Sum0 m s [*]a[+]s m[*]a).
 Qed.
 
+#[global]
 Hint Resolve Sum0_comm_scal: algebra.
 
 Lemma Sum_comm_scal : forall (s : nat -> IR) a N m,

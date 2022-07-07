@@ -1343,76 +1343,147 @@ Qed.
 End zgcd.
 
 
+#[global]
 Hint Resolve Zgcd_duv_zero_rht: zarith.
+#[global]
 Hint Resolve Zgcd_zero_rht: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_zero_rht: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_zero_rht: zarith.
+#[global]
 Hint Resolve Zgcd_duv_Zopp_l: zarith.
+#[global]
 Hint Resolve Zgcd_Zopp_l: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_Zopp_l: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_Zopp_l: zarith.
+#[global]
 Hint Resolve Zgcd_duv_Zopp_r: zarith.
+#[global]
 Hint Resolve Zgcd_Zopp_r: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_Zopp_r: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_Zopp_r: zarith.
+#[global]
 Hint Resolve Zgcd_duv_abs: zarith.
+#[global]
 Hint Resolve Zgcd_abs: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_abs: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_abs: zarith.
+#[global]
 Hint Resolve Zgcd_duv_rec: zarith.
+#[global]
 Hint Resolve Zgcd_rec: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_rec: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_rec: zarith.
+#[global]
 Hint Resolve Zgcd_duv_divisor: zarith.
+#[global]
 Hint Resolve Zgcd_divisor: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_divisor: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_divisor: zarith.
+#[global]
 Hint Resolve Zgcd_duv_symm: zarith.
+#[global]
 Hint Resolve Zgcd_symm: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_a_symm: zarith.
+#[global]
 Hint Resolve Zgcd_coeff_b_symm: zarith.
+#[global]
 Hint Resolve Zgcd_is_divisor_lft: zarith.
+#[global]
 Hint Resolve Zgcd_is_divisor_rht: zarith.
+#[global]
 Hint Resolve Zgcd_lin_comb: zarith.
+#[global]
 Hint Resolve Zgcd_zero: zarith.
+#[global]
 Hint Resolve Zgcd_nonneg: zarith.
+#[global]
 Hint Resolve Zgcd_nonzero: zarith.
+#[global]
 Hint Resolve Zgcd_pos: zarith.
+#[global]
 Hint Resolve Zgcd_is_gcd: zarith.
+#[global]
 Hint Resolve Zgcd_intro: zarith.
+#[global]
 Hint Resolve Zgcd_intro_unfolded: zarith.
+#[global]
 Hint Resolve Zdiv_gcd_elim_lft: zarith.
+#[global]
 Hint Resolve Zdiv_gcd_elim_rht: zarith.
+#[global]
 Hint Resolve Zdiv_gcd_elim: zarith.
+#[global]
 Hint Resolve Zgcd_mod0_lft: zarith.
+#[global]
 Hint Resolve Zgcd_mod0_rht: zarith.
+#[global]
 Hint Resolve Zgcd_div_mult_lft: zarith.
+#[global]
 Hint Resolve Zgcd_div_mult_rht: zarith.
+#[global]
 Hint Resolve Zgcd_idemp: zarith.
+#[global]
 Hint Resolve Zgcd_zero_lft: zarith.
+#[global]
 Hint Resolve Zgcd_zero_rht: zarith.
+#[global]
 Hint Resolve Zgcd_one_lft: zarith.
+#[global]
 Hint Resolve Zgcd_one_rht: zarith.
+#[global]
 Hint Resolve Zgcd_le_lft: zarith.
+#[global]
 Hint Resolve Zgcd_le_rht: zarith.
+#[global]
 Hint Resolve Zgcd_gcd_ll: zarith.
+#[global]
 Hint Resolve Zgcd_gcd_lr: zarith.
+#[global]
 Hint Resolve Zgcd_gcd_rl: zarith.
+#[global]
 Hint Resolve Zgcd_gcd_rr: zarith.
+#[global]
 Hint Resolve Zgcd_mult_elim_ll: zarith.
+#[global]
 Hint Resolve Zgcd_mult_elim_lr: zarith.
+#[global]
 Hint Resolve Zgcd_mult_elim_rl: zarith.
+#[global]
 Hint Resolve Zgcd_mult_elim_rr: zarith.
+#[global]
 Hint Resolve Zgcd_plus_elim_ll: zarith.
+#[global]
 Hint Resolve Zgcd_plus_elim_lr: zarith.
+#[global]
 Hint Resolve Zgcd_plus_elim_rl: zarith.
+#[global]
 Hint Resolve Zgcd_plus_elim_rr: zarith.
+#[global]
 Hint Resolve Zgcd_minus_elim_ll: zarith.
+#[global]
 Hint Resolve Zgcd_minus_elim_lr: zarith.
+#[global]
 Hint Resolve Zgcd_minus_elim_rl: zarith.
+#[global]
 Hint Resolve Zgcd_minus_elim_rr: zarith.
+#[global]
 Hint Resolve Zgcd_mod_lft: zarith.
+#[global]
 Hint Resolve Zgcd_mod_rht: zarith.
+#[global]
 Hint Resolve Zgcd_div_gcd_1: zarith.
 
 
@@ -1639,20 +1710,35 @@ Qed.
 
 End zrelprime.
 
+#[global]
 Hint Resolve Zrelprime_dec: zarith.
+#[global]
 Hint Resolve Zrelprime_irref: zarith.
+#[global]
 Hint Resolve Zrelprime_symm: zarith.
+#[global]
 Hint Resolve Zrelprime_one_lft: zarith.
+#[global]
 Hint Resolve Zrelprime_one_rht: zarith.
+#[global]
 Hint Resolve Zrelprime_nonzero_rht: zarith.
+#[global]
 Hint Resolve Zrelprime_nonzero_lft: zarith.
+#[global]
 Hint Resolve Zrelprime_mult_intro: zarith.
+#[global]
 Hint Resolve Zrelprime_divides_intro: zarith.
+#[global]
 Hint Resolve Zrelprime_div_mult_intro: zarith.
+#[global]
 Hint Resolve Zrelprime_mult_div_simpl: zarith.
+#[global]
 Hint Resolve Zrelprime_div_mult_elim: zarith.
+#[global]
 Hint Resolve Zrelprime_gcd_mult_elim_lft: zarith.
+#[global]
 Hint Resolve Zrelprime_gcd_mult_elim_rht: zarith.
+#[global]
 Hint Resolve Zrelprime_mult_elim_lft: zarith.
 
 

@@ -85,6 +85,7 @@ Qed.
 
 End Lemmas.
 
+#[global]
 Hint Resolve bnd_away_zero_square: included.
 
 Section Local_Results.
@@ -469,8 +470,10 @@ Qed.
 
 End Local_Results.
 
+#[global]
 Hint Immediate derivative_imp_inc derivative_imp_inc': included.
 
+#[global]
 Hint Resolve Derivative_I_const Derivative_I_id Derivative_I_plus
   Derivative_I_inv Derivative_I_mult Derivative_I_recip: derivate.
 
@@ -594,6 +597,7 @@ Qed.
 
 End Corolaries.
 
+#[global]
 Hint Resolve Derivative_I_minus Derivative_I_nth Derivative_I_scal
   Derivative_I_div Derivative_I_poly: derivate.
 
@@ -650,4 +654,5 @@ Qed.
 
 End Derivative_Sums.
 
+#[global]
 Hint Resolve Derivative_I_Sum0 Derivative_I_Sum Derivative_I_Sumx: derivate.

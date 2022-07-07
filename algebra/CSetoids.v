@@ -409,8 +409,11 @@ Definition ProdCSetoid (A B : CSetoid) : CSetoid := Build_CSetoid
 End product_csetoid.
 Arguments ex_unq [S].
 
+#[global]
 Hint Resolve eq_reflexive_unfolded ap_irreflexive_unfolded: algebra_r.
+#[global]
 Hint Resolve eq_symmetric_unfolded ap_symmetric_unfolded: algebra_s.
+#[global]
 Hint Resolve eq_transitive_unfolded ap_cotransitive_unfolded: algebra_c.
 
 Declare Left Step eq_wdl.
@@ -808,6 +811,7 @@ Definition bin_fun2fun_rht (S1 S2 S3:CSetoid) (f : CSetoid_bin_fun S1 S2 S3) (c 
 Definition bin_fun2fun_lft (S1 S2 S3:CSetoid) (f : CSetoid_bin_fun S1 S2 S3) (c : S2) : CSetoid_fun S1 S3 :=
   Build_CSetoid_fun _ _ (fun x : S1 => f x c) (bin_fun_is_strext_fun_lft _ _ _ f c).
 
+#[global]
 Hint Resolve csf_wd_unfolded csbf_wd_unfolded csf_strext_unfolded: algebra_c.
 
 Arguments fun_wd [S1 S2].
@@ -924,6 +928,7 @@ Arguments commutes [S].
 Arguments associative [S].
 
 (* Needs to be unfolded to be used as a Hint *)
+#[global]
 Hint Resolve ap_wdr_unfolded ap_wdl_unfolded  bin_op_wd_unfolded un_op_wd_unfolded : algebra_c.
 
 (**
@@ -955,6 +960,7 @@ Identity Coercion outer_op_bin_fun : CSetoid_outer_op >-> CSetoid_bin_fun.
 (* end hide *)
 
 End csetoid_outer_ops.
+#[global]
 Hint Resolve csoo_wd_unfolded: algebra_c.
 
 (**

@@ -21,6 +21,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export Coq.PArith.BinPos.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 (**
 * Lazy Nat
 This s a lazified version of the natural number that allow one to delay
@@ -105,6 +108,7 @@ Proof.
  refine (LazifyPmult_LazyNat _ _).
 Qed.
 (* begin hide *)
+#[global]
 Hint Rewrite <- LazifyNat_of_P LazifyPmult_LazyNat LazifyPlus LazifyPred : UnLazyNat.
 (* end hide *)
 

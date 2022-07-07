@@ -10,6 +10,7 @@ Definition Qdlog2 (x : Q) : Z :=
   | right _ => Z.log2 (Qround.Qfloor x)
   end.
 
+#[global]
 Instance: Proper (=) Qdlog2.
 Proof.
   intros ? ? E. unfold Qdlog2.
@@ -187,6 +188,7 @@ Proof.
   now apply (order_preserving (cast Z Q)) in En.
 Qed.
 
+#[global]
 Instance: Proper ((=) ==> (=)) Qdlog_bounded.
 Proof.
   intros b1 b2 Eb n1 n2 En x1 x2 Ex.
@@ -200,6 +202,7 @@ Proof.
   rewrite IHb2; [reflexivity| now rewrite Ex].
 Qed.
 
+#[global]
 Instance: Proper ((=) ==> (=)) Qdlog.
 Proof. unfold Qdlog. intros ? ? E1 ? ? E2. now rewrite E1, E2. Qed.
 
@@ -258,6 +261,7 @@ Qed.
 
 Definition Qdlog4 (x : Q) : Z := Z.div (Qdlog2 x) 2.
 
+#[global]
 Instance: Proper (=) Qdlog4.
 Proof. unfold Qdlog4. intros ? ? E. now rewrite E. Qed.
 

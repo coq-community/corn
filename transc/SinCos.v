@@ -251,8 +251,11 @@ Qed.
 
 End Sum_and_so_on.
 
+#[global]
 Hint Resolve Derivative_Sin Derivative_Cos: derivate.
+#[global]
 Hint Resolve Continuous_Sin Continuous_Cos: continuous.
+#[global]
 Hint Resolve Sin_zero Cos_zero Tan_zero Sin_plus Cos_plus Tan_plus Sin_inv
   Cos_inv Tan_inv FFT FFT': algebra.
 
@@ -405,4 +408,5 @@ Qed.
 
 End Basic_Properties.
 
+#[global]
 Hint Resolve Sin_wd Cos_wd Tan_wd: algebra.

@@ -430,6 +430,7 @@ Qed.
 
 End Basic_Properties_of_leEq.
 
+#[global]
 Hint Resolve less_leEq : algebra.
 
 Declare Left Step leEq_wdl.
@@ -773,6 +774,7 @@ End More_than_four.
 
 End infinity_of_cordfields.
 
+#[global]
 Hint Resolve pos_one : algebra.
 
 Declare Left Step leEq_wdl.

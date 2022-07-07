@@ -160,6 +160,7 @@ Qed.
 
 End Monomials.
 
+#[global]
 Hint Resolve monom_coeff monom_coeff' monom_mult monom_sum: algebra.
 
 Arguments monom [R].
@@ -404,7 +405,9 @@ Qed.
 
 End Poly_Reverse.
 
+#[global]
 Hint Resolve Rev_wd: algebra_c.
+#[global]
 Hint Resolve Rev_rev Rev_mult: algebra.
 
 Arguments Rev [R].

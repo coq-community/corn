@@ -726,4 +726,5 @@ Qed.
 
 End Tangent.
 
+#[global]
 Hint Resolve Derivative_Tan_1 Derivative_Tan_2: derivate.

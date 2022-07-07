@@ -112,6 +112,7 @@ Proof.
   rewrite H, H0, H1. reflexivity.
 Qed.
   
+#[global]
 Instance Qball_Reflexive e: 0 <= e -> Reflexive (Qball e).
 Proof.
  intros epos x.
@@ -120,6 +121,7 @@ Proof.
  apply (Qopp_le_compat 0). exact epos. exact epos.
 Qed.
 
+#[global]
 Instance Qball_symmetric e: Symmetric (Qball e).
 Proof.
  intros x y.
@@ -255,6 +257,7 @@ Proof.
  abstract auto.
 Defined.
 
+#[global]
 Hint Resolve Qmetric_dec : metricQ.
 
 Lemma locatedQ : locatedMetric Q_as_MetricSpace.
@@ -263,6 +266,7 @@ Proof.
  auto with *.
 Defined.
 
+#[global]
 Hint Resolve locatedQ : metricQ.
 
 Lemma in_Qball (r: Q) (x y: Q)
@@ -461,6 +465,7 @@ Qed.
 Definition Qball_ex_bool (e:QposInf) (a b:Q) : bool := 
  match ball_ex_dec _ Qmetric_dec e a b with left _ => true | right _ => false end.
 
+#[global]
 Instance: Proper (QposInfEq ==> @msp_eq _ ==> @msp_eq _ ==> eq) Qball_ex_bool.
 Proof.
   intros [ε1|] [ε2|] E1 x1 x2 E2 y1 y2 E3; try easy.

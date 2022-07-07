@@ -313,6 +313,7 @@ Qed.
 
 End More_Properties.
 
+#[global]
 Hint Resolve Cauchy_cont_Lim_IR: continuous.
 
 Section Algebraic_Properties.
@@ -758,7 +759,9 @@ Qed.
 
 End Convergence_Results.
 
+#[global]
 Hint Resolve convergent_imp_inc: included.
+#[global]
 Hint Resolve convergent_imp_Continuous Continuous_FSeries_Sum: continuous.
 
 Section Operations.

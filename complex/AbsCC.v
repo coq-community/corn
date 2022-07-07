@@ -432,7 +432,9 @@ Qed.
 
 End AbsCC_properties.
 
+#[global]
 Hint Resolve AbsCC_wd: algebra_c.
+#[global]
 Hint Resolve cc_inv_abs cc_mult_abs cc_div_abs cc_div_abs' cc_pow_abs
   AbsCC_zero AbsCC_one AbsCC_IR AbsCC_mult_conj AbsCC_mult_square
   cc_recip_char: algebra.

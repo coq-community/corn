@@ -136,6 +136,7 @@ Qed.
 
 End Equality_Results.
 
+#[global]
 Hint Resolve included_IR : included.
 
 Section Some_More.
@@ -300,7 +301,9 @@ Qed.
 
 End Away_from_Zero.
 
+#[global]
 Hint Resolve bnd_imp_inc_recip bnd_imp_inc_div: included.
+#[global]
 Hint Immediate bnd_in_P_imp_ap_zero: included.
 
 (**

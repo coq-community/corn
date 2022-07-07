@@ -49,6 +49,9 @@
 Require Export CoRN.algebra.CRings.
 Set Automatic Introduction.
 
+(* Backwards compatibility for Hint Rewrite locality attributes *)
+Set Warnings "-unsupported-attributes".
+
 (**
 * Ring Homomorphisms
 ** Definition of Ring Homomorphisms
@@ -178,8 +181,11 @@ End RingHom_Basics.
 
 End RingHom_Lemmas.
 
+#[global]
 Hint Resolve rh_strext rh_pres_plus rh_pres_mult rh_pres_unit : algebra.
+#[global]
 Hint Resolve rh_pres_zero rh_pres_minus rh_pres_inv rh_apzero : algebra.
+#[global]
 Hint Rewrite rh_pres_zero rh_pres_plus rh_pres_minus rh_pres_inv rh_pres_mult rh_pres_unit : ringHomPush.
 
 Definition RHid R : RingHom R R.
