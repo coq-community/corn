@@ -267,7 +267,7 @@ Qed.
 Lemma AbsCC_square_ap_zero : forall z : CC, z [#] [0] -> AbsCC z[^]2 [#] [0].
 Proof.
  intros z H.
- astepl (Re z[^]2[+]Im z[^]2).
+ stepl (Re z[^]2[+]Im z[^]2).
   apply (cc_inv_aid (Re z) (Im z) H).
  apply AbsCC_square_Re_Im with (x := Re z) (y := Im z).
 Qed.

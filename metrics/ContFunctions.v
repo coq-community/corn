@@ -146,7 +146,7 @@ Proof.
    apply shift_less_plus.
    apply minusOne_less.
   astepl (OneR[+]nexp IR p Two).
-  astepr (OneR[+]nring (power p 2)).
+  stepr (OneR[+]nring (power p 2)).
    apply plus_resp_eq.
    apply nexp_power.
   simpl in |- *.

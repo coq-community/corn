@@ -121,7 +121,7 @@ nexp IR n ([1][/] (Two:IR)[//]H).
 Proof.
  intros.
  astepl ((zexp Two H k)[*](nexp IR (n + k) ([1][/] Two[//]H) )).
- astepl ((zexp Two H k)[*](zexp Two H (- (n + k)%nat))).
+ stepl ((zexp Two H k)[*](zexp Two H (- (n + k)%nat))).
   astepr (zexp Two H (k + (- (n + k)%nat))).
    apply eq_symmetric.
    apply zexp_plus.

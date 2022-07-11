@@ -164,7 +164,7 @@ Proof.
        apply less_leEq; auto.
       apply a_nonneg.
      apply H12.
-      replace (n - j) with (S (n - S j)); auto with arith.
+      replace (n - j) with (S (n - S j)); [auto with arith|].
       rewrite minus_Sn_m; auto with arith.
      auto.
     rewrite <- H22.
@@ -192,7 +192,7 @@ Proof.
   intros i H15 H16.
  elim (le_lt_eq_dec _ _ H15); intro H18.
   apply H12.
-   replace (n - j) with (S (n - S j)); auto with arith.
+   replace (n - j) with (S (n - S j)); [auto with arith|].
    rewrite minus_Sn_m; auto with arith.
   auto.
  rewrite <- H18.

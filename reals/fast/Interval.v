@@ -582,7 +582,7 @@ Proof.
   rewrite -> Hlr.
   split; simpl.
    clear - H.
-   apply Qle_trans with 0%Q; auto with *.
+   apply Qle_trans with 0%Q.
    apply (Qopp_le_compat 0), Qpos_nonneg.
    rewrite -> Qle_minus_iff in *.
    rewrite Qplus_0_r.

@@ -567,17 +567,17 @@ Section implements_abstract_interface.
        apply Qpos_nonzero.
        rewrite E. simpl.
        setoid_replace (wbints true #1) with (/ (1#wbints true)) by reflexivity.
-       field... split. discriminate. apply Qpos_nonzero.
+       field. split. discriminate. apply Qpos_nonzero.
        assert (Zpos j == (proj1_sig (ww false) / wbints false / proj1_sig x)) as jE.
        { apply (Qmult_injective_l (proj1_sig x)). apply Qpos_nonzero.
        rewrite F. simpl.
        setoid_replace (wbints false #1) with (/ (1#wbints false)) by reflexivity.
-       field... split. discriminate. apply Qpos_nonzero. }
+       field. split. discriminate. apply Qpos_nonzero. }
        assert (Zpos k == (proj1_sig totalw / w01ints / proj1_sig x)) as kE.
        { apply (Qmult_injective_l (proj1_sig x)). apply Qpos_nonzero.
          rewrite G. simpl.
          setoid_replace (w01ints #1) with (/ (1#w01ints)) by reflexivity.
-         field... split. discriminate. apply Qpos_nonzero. }
+         field. split. discriminate. apply Qpos_nonzero. }
        apply Qball_plus.
         (* left case: *)
         apply Σ_Qball_pos_bounds.

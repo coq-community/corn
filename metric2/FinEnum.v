@@ -373,7 +373,7 @@ Proof.
   apply (msp_stable (msp X) (Zpos p # Pos.of_succ_nat (Init.Nat.pred (Pos.to_nat d)))). auto.
   apply ball_weak_le with (1 # P_of_succ_nat z); auto.
   simpl.
-  apply Zmult_le_compat; auto with *.
+  apply Zmult_le_compat; [..|auto with *].
   apply Pos.le_1_l. simpl.
   assert (forall i j:nat, le i j -> Pos.of_succ_nat i <= Pos.of_succ_nat j)%positive.
   { intros.
