@@ -943,7 +943,7 @@ Proof.
   pattern n at 1 in |- *; replace n with (1 * n).
    apply degree_nexp.
    apply degree_x_.
-  replace (1 * n) with n; auto.
+  replace (1 * n) with n; [auto|..].
   unfold mult in |- *.
   auto with arith.
  assumption.

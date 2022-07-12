@@ -624,7 +624,7 @@ Proof.
  intros n.
  rewrite plus_comm.
  simpl.
- Derivative_Help; [|apply Derivative_scal;apply Derivative_nth;Deriv].
+ Derivative_Help; [|apply Derivative_scal;apply Derivative_nth;Deriv..].
  FEQ.
 Qed.
 

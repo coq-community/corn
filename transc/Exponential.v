@@ -1324,7 +1324,8 @@ Proof.
  pose (G:=(([--][1][/]_[//]nringS_ap_zero IR n){**}([-C-][1]{-}FId){^}(S n))).
  assert (X0:Derivative (olor [0] Two) (pos_two IR) G (([-C-][1]{-}FId){^}n)).
   unfold G.
-  Derivative_Help; [|apply Derivative_scal;refine (Derivative_nth _ _ _ _ _ _);Deriv].
+  eapply Derivative_wdr; simpl in |- *;
+   [|apply Derivative_scal;refine (Derivative_nth _ _ _ _ _ _);Deriv].
   FEQ.
   repeat constructor.
  assert (X1:Continuous (olor [0] Two) (([-C-][1]{-}FId){^}n)).

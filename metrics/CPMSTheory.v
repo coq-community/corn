@@ -682,7 +682,7 @@ Proof.
  astepl (OneR[*]one_div_succ (n + (n + (n + 0)) + 2)[+]
    (Two:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
  astepl ((OneR[+]Two)[*]one_div_succ (n + (n + (n + 0)) + 2)).
- astepl ((Three:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
+ stepl ((Three:IR)[*]one_div_succ (n + (n + (n + 0)) + 2)).
   2: apply mult_wdl.
   2: rational.
  astepr ((Three:IR)[*]([1][/] Three[//]three_ap_zero IR)[*]one_div_succ n).
