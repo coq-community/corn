@@ -318,7 +318,7 @@ Qed.
 Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, odd n -> (nring (R:=R) n)[#][0].
 Proof.
  intros R [|n] H.
-  elimtype False.
+  exfalso.
   inversion H.
  apply nringS_ap_zero.
 Qed.

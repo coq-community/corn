@@ -407,7 +407,7 @@ Proof.
   apply le_O_n.
  simple induction n.
   intro.
-  elimtype False.
+  exfalso.
   inversion H.
  intros n0 H H0.
  generalize (le_S_n _ _ H0); intro H1.
@@ -453,7 +453,7 @@ Proof.
  intros p q H.
  elim (gt_eq_gt_dec p q); intro H0.
   elim H0; auto.
- elimtype False.
+ exfalso.
  apply lt_not_le with q p; auto.
 Qed.
 
@@ -464,7 +464,7 @@ Proof.
   intro H0.
   elim H0; intros.
    left; auto.
-  elimtype False.
+  exfalso.
   auto.
  auto.
 Qed.
@@ -515,7 +515,7 @@ Proof.
  simple induction n.
   split.
    intro H.
-   elimtype False.
+   exfalso.
    inversion H.
   intro H.
   apply Ceven_O.
@@ -838,7 +838,7 @@ Lemma nat_local_mon_imp_mon :
 Proof.
  intros H i j H0.
  induction  j as [| j Hrecj].
-  elimtype False; lia.
+  exfalso; lia.
  cut (i <= j); [ intro H1 | auto with arith ].
  elim (le_lt_eq_dec _ _ H1); intro H2.
   cut (h i < h j); [ intro | apply Hrecj; assumption ].
@@ -953,7 +953,7 @@ Proof.
  induction  n as [| n Hrecn]; intros k H H0.
   elim (H 0); intros H1 H2.
   generalize (le_trans _ _ _ H1 H2); intro H3.
-  elimtype False.
+  exfalso.
   inversion H3.
  elim (eq_nat_dec (k 0) (k 2)).
   intro H1.
@@ -1018,7 +1018,7 @@ Proof.
  induction  n as [| n Hrecn].
   auto.
  induction  n as [| n Hrecn0].
-  elimtype False; inversion H2; inversion H4.
+  exfalso; inversion H2; inversion H4.
  apply H0.
   inversion H2; inversion H4; auto.
  apply H1.
@@ -1033,7 +1033,7 @@ Lemma odd_induction :
   forall n, odd n -> P n.
 Proof.
  intros P H H0 n; case n.
-  intro H1; elimtype False; inversion H1.
+  intro H1; exfalso; inversion H1.
  clear n; intros n H1.
  pattern n in |- *; apply even_induction; auto.
   intros n0 H2 H3; auto with arith.
@@ -1157,7 +1157,7 @@ Proof.
    exists 0; exists (le_n 0).
    split.
     apply H with (H := le_n 0); auto.
-   intros; elimtype False; inversion H2.
+   intros; exfalso; inversion H2.
   right; intros.
   apply H0 with (H := le_n 0); auto with arith.
  intros P Q H H0 H1.
@@ -1221,7 +1221,7 @@ Proof.
  induction  n as [| n Hrecn].
   auto.
  induction  n as [| n Hrecn0].
-  elimtype False; inversion H2; inversion H4.
+  exfalso; inversion H2; inversion H4.
  apply H0.
   inversion H2; inversion H4; auto.
  apply H1.
@@ -1233,7 +1233,7 @@ Lemma odd_ind : forall P : nat -> Prop,
  P 1 -> (forall n, P n -> P (S (S n))) -> forall n, odd n -> P n.
 Proof.
  intros P H H0 n; case n.
-  intro H1; elimtype False; inversion H1.
+  intro H1; exfalso; inversion H1.
  clear n; intros n H1.
  pattern n in |- *; apply even_ind; auto.
  inversion H1; auto.

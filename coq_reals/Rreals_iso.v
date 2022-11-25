@@ -413,7 +413,7 @@ Proof.
  assert (HH := HN (pred m) N H (le_refl N)).
  clear - HH Hm.
  destruct m.
-  elimtype False.
+  exfalso.
   auto with *.
  rewrite <- R_sum_as_IR.
  rewrite <- R_sum_as_IR.
@@ -464,7 +464,7 @@ Proof.
  assert (HH := HN (pred m) H).
  clear - HH Hm.
  destruct m.
-  elimtype False.
+  exfalso.
   auto with *.
  rewrite <- R_sum_as_IR.
  rewrite <- R_minus_as_IR.
@@ -676,9 +676,9 @@ Proof.
  destruct (even_or_odd_plus (n + n)).
  destruct (even_or_odd_plus (S(n + n))).
  simpl.
- destruct s; [ | elimtype False; auto with *].
+ destruct s; [ | exfalso; auto with *].
  destruct s0; simpl.
-  elimtype False; auto with *.
+  exfalso; auto with *.
  autorewrite with RtoIR.
  stepr ( (nexp IR x0 [--][1][/]nring (R:=IR) (fact (n + n))[//]
    nring_fac_ap_zero IR (n + n))[*]nexp IR (n + n) (RasIR x[-][0]) ).
@@ -751,9 +751,9 @@ Proof.
  simpl.
  destruct (even_or_odd_plus (n + n)).
  destruct (even_or_odd_plus (S(n + n))).
- destruct s; [ | elimtype False; auto with *].
+ destruct s; [ | exfalso; auto with *].
  destruct s0; simpl.
-  elimtype False; auto with *.
+  exfalso; auto with *.
  rstepr ( seq_part_sum (fun n0 : nat =>
    (sin_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
      nexp IR n0 (RasIR x[-][0])) (n + n)[+](

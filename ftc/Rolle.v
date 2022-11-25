@@ -407,7 +407,7 @@ Proof.
    cut (e [/]TwoNZ [<] fcp' _ Hi' or fcp' _ Hi' [<] [--] (e [/]TwoNZ)).
     intro H2.
     elim H2; clear H2; intro H3.
-     elimtype False.
+     exfalso.
      cut (e [/]TwoNZ [<] [0]).
       apply less_antisymmetric_unfolded.
       apply pos_div_two; assumption.
@@ -459,7 +459,7 @@ Proof.
    cut (e [/]TwoNZ [<] fcp' _ Hi' or fcp' _ Hi' [<] [--] (e [/]TwoNZ)).
     intro H2; elim H2; clear H2; intro H3.
      assumption.
-    elimtype False.
+    exfalso.
     cut ([0] [<] [--] (e [/]TwoNZ)).
      apply less_antisymmetric_unfolded.
      astepr ( [--]ZeroR); apply inv_resp_less; apply pos_div_two; assumption.

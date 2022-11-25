@@ -218,7 +218,7 @@ Proof.
   exists i.
    elim (zerop i).
     intro H13.
-    elimtype False.
+    exfalso.
     elim (ap_irreflexive_unfolded _ ([0]:CC)).
     rstepl (nth_coeff i f[*] (x[^]0[-]y[^]0)).
     rewrite <- H13.

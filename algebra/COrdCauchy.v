@@ -266,9 +266,9 @@ Proof.
   apply less_leEq_trans with e; eauto with arith.
  unfold CS_seq_recip_seq in |- *.
  elim lt_le_dec; intro; simpl in |- *.
-  elimtype False; apply le_not_lt with N n; eauto with arith.
+  exfalso; apply le_not_lt with N n; eauto with arith.
  elim lt_le_dec; intro; simpl in |- *.
-  elimtype False; apply le_not_lt with N (max K N); eauto with arith.
+  exfalso; apply le_not_lt with N (max K N); eauto with arith.
  rstepr (f (max K N)[-]f n).
  apply AbsSmall_leEq_trans with (d[*]e[*]e).
   apply mult_resp_leEq_both.
@@ -477,7 +477,7 @@ Proof.
  intros.
  elim (ap_imp_less _ _ _ (X (less_imp_ap _ _ _ X0))); intros.
   auto.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := f x Hx).
  apply leEq_less_trans with (f y Hy); auto.
  apply H; apply less_leEq; auto.
@@ -533,7 +533,7 @@ Lemma local_mon_imp_mon : forall f : nat -> R,
  (forall i, f i [<] f (S i)) -> forall i j, i < j -> f i [<] f j.
 Proof.
  simple induction j.
-  intros H0; elimtype False; inversion H0.
+  intros H0; exfalso; inversion H0.
  clear j; intro j; intros H0 H1.
  elim (le_lt_eq_dec _ _ H1); intro.
   apply leEq_less_trans with (f j).
@@ -579,7 +579,7 @@ Proof.
  intros.
  cut (~ i <> j); [ lia | intro ].
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
- inversion_clear H1; (elimtype False; cut (f i [#] f j); [ apply eq_imp_not_ap; assumption | idtac ]).
+ inversion_clear H1; (exfalso; cut (f i [#] f j); [ apply eq_imp_not_ap; assumption | idtac ]).
   apply less_imp_ap; apply X; assumption.
  apply Greater_imp_ap; apply X; assumption.
 Qed.
@@ -588,7 +588,7 @@ Lemma local_mon_imp_mon_lt : forall n (f : forall i, i < n -> R),
  (forall i H H', f i H [<] f (S i) H') -> forall i j Hi Hj, i < j -> f i Hi [<] f j Hj.
 Proof.
  simple induction j.
-  intros Hi Hj H0; elimtype False; inversion H0.
+  intros Hi Hj H0; exfalso; inversion H0.
  clear j; intro j; intros.
  elim (le_lt_eq_dec _ _ H); intro.
   cut (j < n); [ intro | auto with arith ].
@@ -629,7 +629,7 @@ Lemma local_mon'_imp_mon'2_lt : forall n (f : forall i, i < n -> R),
  (forall i H H', f i H [<=] f (S i) H') -> forall i j Hi Hj, i < j -> f i Hi [<=] f j Hj.
 Proof.
  intros; induction  j as [| j Hrecj].
-  elimtype False; inversion H0.
+  exfalso; inversion H0.
  elim (le_lt_eq_dec _ _ H0); intro.
   cut (j < n); [ intro | auto with arith ].
   apply leEq_transitive with (f j H1).
@@ -656,7 +656,7 @@ Proof.
  cut (~ i <> j); intro.
   clear X H Hj Hi; lia.
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
- inversion_clear H1; (elimtype False; cut (f i Hi [#] f j Hj);
+ inversion_clear H1; (exfalso; cut (f i Hi [#] f j Hj);
    [ apply eq_imp_not_ap; assumption | idtac ]).
   apply less_imp_ap; auto.
  apply Greater_imp_ap; auto.
@@ -666,7 +666,7 @@ Lemma local_mon_imp_mon_le : forall n (f : forall i, i <= n -> R),
  (forall i H H', f i H [<] f (S i) H') -> forall i j Hi Hj, i < j -> f i Hi [<] f j Hj.
 Proof.
  simple induction j.
-  intros Hi Hj H0; elimtype False; inversion H0.
+  intros Hi Hj H0; exfalso; inversion H0.
  clear j; intro j; intros.
  elim (le_lt_eq_dec _ _ H); intro.
   cut (j <= n); [ intro | auto with arith ].
@@ -707,7 +707,7 @@ Lemma local_mon'_imp_mon'2_le : forall n (f : forall i, i <= n -> R),
  (forall i H H', f i H [<=] f (S i) H') -> forall i j Hi Hj, i < j -> f i Hi [<=] f j Hj.
 Proof.
  intros; induction  j as [| j Hrecj].
-  elimtype False; inversion H0.
+  exfalso; inversion H0.
  elim (le_lt_eq_dec _ _ H0); intro.
   cut (j <= n); [ intro | auto with arith ].
   apply leEq_transitive with (f j H1).
@@ -733,7 +733,7 @@ Proof.
  cut (~ i <> j); intro.
   clear H X Hj Hi; lia.
  cut (i < j \/ j < i); [ intro | apply not_eq; auto ].
- inversion_clear H1; (elimtype False; cut (f i Hi [#] f j Hj);
+ inversion_clear H1; (exfalso; cut (f i Hi [#] f j Hj);
    [ apply eq_imp_not_ap; assumption | idtac ]).
   apply less_imp_ap; auto.
  apply Greater_imp_ap; auto.

@@ -205,9 +205,9 @@ Proof.
      intros; apply HR.
     red in |- *; intros; apply prf1; auto.
    assumption.
-  elimtype False; apply (le_not_lt j' m); auto.
+  exfalso; apply (le_not_lt j' m); auto.
  elim (le_lt_dec j 0); intro.
-  elimtype False; apply lt_n_O with j'; red in |- *; apply le_trans with j; auto.
+  exfalso; apply lt_n_O with j'; red in |- *; apply le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
  set (jj := pred j) in *.
  cut (j = S jj); [ intro | unfold jj in |- *; apply S_pred with 0; auto ].
@@ -289,7 +289,7 @@ Proof.
     apply b0.
    apply AbsIR_wd; apply cg_minus_wd; apply prf1; auto.
   left; intro.
-  elimtype False; apply le_not_lt with i n; auto.
+  exfalso; apply le_not_lt with i n; auto.
  intros.
  apply less_cotransitive_unfolded.
  rstepl ((delta [/]TwoNZ) [/]TwoNZ).
@@ -453,7 +453,7 @@ Proof.
  intros.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
-  elimtype False; apply (le_Sn_O _ a0).
+  exfalso; apply (le_Sn_O _ a0).
  elim (le_lt_dec i 0); intro; simpl in |- *.
   elim (le_lt_eq_dec _ _ Hi'); intro; simpl in |- *.
    apply less_leEq_trans with (P (S i) Hi').
@@ -471,7 +471,7 @@ Proof.
    apply sep__sep_less with (Hi' := Hi').
   generalize Hi'; rewrite b2.
   intro; apply prf1; auto.
- elimtype False; rewrite b2 in Hi'; apply (le_Sn_n _ Hi').
+ exfalso; rewrite b2 in Hi'; apply (le_Sn_n _ Hi').
 Qed.
 
 Lemma sep__sep_fun_i_wd :
@@ -498,12 +498,12 @@ Proof.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec i 0); elim (le_lt_dec j 0); intros; simpl in |- *.
     algebra.
-   elimtype False; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
-  elimtype False; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
+   exfalso; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
+  exfalso; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
     apply sep__sep_fun_i_wd; auto.
-   elimtype False; rewrite H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
-  elimtype False; rewrite <- H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
+   exfalso; rewrite H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
+  exfalso; rewrite <- H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
  algebra.
 Qed.
 
@@ -515,14 +515,14 @@ Proof.
   intros; unfold sep__sep_fun in |- *.
   elim (le_lt_dec 0 0); intro; simpl in |- *.
    algebra.
-  elimtype False; inversion b0.
+  exfalso; inversion b0.
  intros; unfold sep__sep_fun in |- *.
  elim (le_lt_dec n 0); intro; simpl in |- *.
   apply partition_length_zero with Hab.
   cut (n = 0); [ intro | auto with arith ].
   rewrite <- H0; apply P.
  elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
-  elimtype False; apply (lt_irrefl _ a0).
+  exfalso; apply (lt_irrefl _ a0).
  algebra.
 Defined.
 
@@ -534,10 +534,10 @@ Proof.
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun in |- *; simpl in |- *.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  elimtype False; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
  elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
   apply sep__sep_ap.
- elimtype False; rewrite b1 in H1; apply (lt_irrefl _ H1).
+ exfalso; rewrite b1 in H1; apply (lt_irrefl _ H1).
 Qed.
 
 Variable g : forall i : nat, i < n -> IR.
@@ -564,11 +564,11 @@ Proof.
    eapply leEq_wdl.
     apply lft_leEq_Max.
    apply sep__sep_fun_i_wd; auto.
-  elimtype False; rewrite b1 in Hi; apply (lt_irrefl _ Hi).
+  exfalso; rewrite b1 in Hi; apply (lt_irrefl _ Hi).
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun, sep__sep_points in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
-  elimtype False; inversion a0.
+  exfalso; inversion a0.
  elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
   apply Max_leEq.
    apply less_leEq; apply sep__sep_mon_i; assumption.
@@ -746,7 +746,7 @@ Proof.
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun in |- *; simpl in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
-  elimtype False; inversion a0.
+  exfalso; inversion a0.
  elim (le_lt_eq_dec _ _ Hi'); intro; simpl in |- *.
   elim (le_lt_dec i 0); intro; simpl in |- *.
    cut (i = 0); [ intro | auto with arith ].
@@ -795,7 +795,7 @@ Proof.
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.
-  elimtype False; rewrite b2 in a0; apply lt_irrefl with (S n);
+  exfalso; rewrite b2 in a0; apply lt_irrefl with (S n);
     apply lt_trans with (S n); auto with arith.
  elim (le_lt_dec i 0); intro; simpl in |- *.
   cut (i = 0); [ intro | auto with arith ].
@@ -833,7 +833,7 @@ Proof.
   apply cg_minus_wd.
    generalize Hi'; rewrite b1; intro; apply finish.
   algebra.
- elimtype False; rewrite b3 in b1; apply n_Sn with n; auto.
+ exfalso; rewrite b3 in b1; apply n_Sn with n; auto.
 Qed.
 
 End Separating__Separated.

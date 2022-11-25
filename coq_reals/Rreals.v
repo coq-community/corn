@@ -77,11 +77,11 @@ Proof.
   intro xy.
   elim (total_order_T x y); intro H1.
    elim H1; clear H1; intro H2.
-    elimtype False.
+    exfalso.
     apply xy.
     apply Rlt_not_eq; assumption.
    assumption.
-  elimtype False.
+  exfalso.
   apply xy.
   apply Rgt_not_eq; assumption.
  intros H H0.
@@ -331,7 +331,7 @@ Proof.
      elim (total_order_T x y); intro H2.
       elim H2; clear H2; intro H3.
        left; assumption.
-      elimtype False; apply xy; assumption.
+      exfalso; apply xy; assumption.
      right; assumption.
     intro H; destruct H.
      apply: Rlt_not_eq; assumption.

@@ -129,7 +129,7 @@ Proof.
    apply K_dec_set.
     decide equality.
    reflexivity.
-  intros; elimtype False; lia.
+  intros; exfalso; lia.
  induction m.
   dependent inversion H1.
   symmetry.
@@ -144,7 +144,7 @@ Proof.
  generalize n at 1 2 7.
  generalize (S m) at 1 2 5 6.
  dependent inversion H3.
-  intros; elimtype False; lia.
+  intros; exfalso; lia.
  intros e e0.
  assert (e':=e).
  assert (e0':=e0).
@@ -741,7 +741,7 @@ Proof.
   case (not_Zeq x 0).
     assumption.
    intro H3.
-   elimtype False.
+   exfalso.
    cut (x * y > x * z)%Z.
     intro H4.
     cut ((x * y)%Z <> (x * z)%Z).
@@ -751,7 +751,7 @@ Proof.
     exact (Zgt_not_eq (x * y) (x * z) H4).
    exact (Zlt_conv_mult_l x y z H3 H2).
   intro H3.
-  elimtype False.
+  exfalso.
   cut (x * y < x * z)%Z.
    intro H4.
    cut ((x * y)%Z <> (x * z)%Z).

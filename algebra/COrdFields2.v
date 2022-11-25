@@ -306,7 +306,7 @@ Proof.
    assumption.
   elim (ap_imp_less _ _ _ H7); intro H9.
    assumption.
-  elimtype False.
+  exfalso.
   elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
@@ -323,7 +323,7 @@ Proof.
  split.
   assumption.
  elim (ap_imp_less _ _ _ H7); intro H9.
-  elimtype False.
+  exfalso.
   elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
@@ -592,7 +592,7 @@ Proof.
   auto with arith.
  intros.
  induction  m as [| m Hrecm].
-  elimtype False.
+  exfalso.
   cut (nring (R:=R) n [<] [0]).
    change (Not (nring (R:=R) n[<](nring 0))).
    rewrite <- leEq_def.
@@ -602,7 +602,7 @@ Proof.
   apply nring_less.
   apply lt_le_trans with (S n).
    auto with arith.
-  elimtype False. revert H; rewrite -> leEq_def. intro H; destruct H.
+  exfalso. revert H; rewrite -> leEq_def. intro H; destruct H.
   apply nring_less; auto with arith.
  cut (n <= m).
   auto with arith.
@@ -679,7 +679,7 @@ Lemma nexp_resp_less : forall (x y : R) n, 1 <= n -> [0] [<=] x -> x [<] y -> x[
 Proof.
  intros.
  induction  n as [| n Hrecn].
-  elimtype False.
+  exfalso.
   inversion H.
  elim n.
   simpl in |- *.
@@ -797,9 +797,9 @@ Proof.
   assumption.
  intros.
  elim (le_lt_dec m i); intro;
-   [ simpl in |- * | elimtype False; apply (le_not_lt m i); auto with arith ].
+   [ simpl in |- * | exfalso; apply (le_not_lt m i); auto with arith ].
  elim (le_lt_dec i n); intro;
-   [ simpl in |- * | elimtype False; apply (le_not_lt i n); auto with arith ].
+   [ simpl in |- * | exfalso; apply (le_not_lt i n); auto with arith ].
  apply H0.
 Qed.
 
@@ -863,7 +863,7 @@ Lemma power_plus_leEq : forall n (x y:R), (0 < n) -> ([0][<=]x) -> ([0][<=]y) ->
 (x[^]n [+] y[^]n)[<=](x[+]y)[^]n.
 Proof.
  intros [|n] x y Hn Hx Hy.
-  elimtype False; auto with *.
+  exfalso; auto with *.
  induction n.
   simpl.
   rstepl ([1][*](x[+]y)).
@@ -921,7 +921,7 @@ Proof.
    assumption.
   elim (ap_imp_less _ _ _ H7); intro.
    assumption.
-  elimtype False.
+  exfalso.
   elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
@@ -938,7 +938,7 @@ Proof.
  split.
   assumption.
  elim (ap_imp_less _ _ _ H7); intro.
-  elimtype False.
+  exfalso.
   elim (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b).
    assumption.
@@ -1061,7 +1061,7 @@ Lemma square_eq_pos : forall x a : R, [0] [<] a -> [0] [<] x -> x[^]2 [=] a[^]2 
 Proof.
  intros.
  elim (square_eq _ x a); intros; auto.
-  elimtype False.
+  exfalso.
   apply less_irreflexive_unfolded with (x := ZeroR).
   apply less_leEq_trans with x.
    auto.
@@ -1075,7 +1075,7 @@ Lemma square_eq_neg : forall x a : R, [0] [<] a -> x [<] [0] -> x[^]2 [=] a[^]2 
 Proof.
  intros.
  elim (square_eq _ x a); intros; auto.
-  elimtype False.
+  exfalso.
   apply less_irreflexive_unfolded with (x := ZeroR).
   apply leEq_less_trans with x.
    astepr a; apply less_leEq; auto.

@@ -324,10 +324,10 @@ Lemma pi_seq_bnd'' :
   pi_seq (S n) [-]pi_seq n [<=] ([1][-]Sin [1]) [^]pred n[*] (pi_seq 2[-]pi_seq 1).
 Proof.
  intro; case n.
-  intros; elimtype False; inversion H.
+  intros; exfalso; inversion H.
  clear n.
  intro; case n; intros.
-  elimtype False; inversion H; inversion H1.
+  exfalso; inversion H; inversion H1.
  eapply leEq_wdr.
   apply pi_seq_bnd'.
  algebra.
@@ -1091,11 +1091,11 @@ Proof.
   intros i iH.
   change ([1] [+] Cos [1][<=] pi_seq i).
   induction i.
-   elimtype False.
+   exfalso.
    auto with *.
   clear IHi.
   induction i.
-   elimtype False.
+   exfalso.
    auto with *.
   clear iH.
   clear IHi.

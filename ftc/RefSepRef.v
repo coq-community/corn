@@ -226,10 +226,10 @@ Proof.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); elim (le_lt_dec i 0); intros; simpl in |- *.
         algebra.
        apply RSR_h_nlnf; reflexivity.
-      elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
-     elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
-    elimtype False; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
-   elimtype False; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
+      exfalso; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
+     exfalso; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
+    exfalso; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
+   exfalso; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
   algebra.
  algebra.
 Qed.
@@ -240,13 +240,13 @@ Proof.
  intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
  elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
     algebra.
-   elimtype False; inversion b0.
+   exfalso; inversion b0.
   apply eq_symmetric_unfolded; apply partition_length_zero with Hab.
   cut (m + n <= 1); [ intro | lia ].
   elim (plus_eq_one_imp_eq_zero _ _ H0); intro.
    rewrite <- a1; apply R.
   rewrite <- b1; apply P.
- elimtype False; inversion b0.
+ exfalso; inversion b0.
 Qed.
 
 Lemma Separated_Refinement_lemma4 :
@@ -256,8 +256,8 @@ Proof.
  intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
  elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
     algebra.
-    elimtype False; apply (lt_irrefl _ a1).
-   elimtype False; apply (lt_irrefl _ a0).
+    exfalso; apply (lt_irrefl _ a1).
+   exfalso; apply (lt_irrefl _ a0).
   algebra.
  algebra.
 Qed.
@@ -269,7 +269,7 @@ Proof.
  intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
  elim (le_lt_eq_dec _ _ H); elim (le_lt_eq_dec _ _ H'); intros; simpl in |- *.
     elim (le_lt_dec i 0); elim (le_lt_dec (S i) 0); intros; simpl in |- *.
-       elimtype False; inversion a2.
+       exfalso; inversion a2.
       apply RSR_h_PropAll with (P := fun x : IR => a[<=]x).
         red in |- *; intros.
         apply leEq_wdr with x; assumption.
@@ -279,12 +279,12 @@ Proof.
       intros; unfold g' in |- *.
       astepl (R 0 (le_O_n _)).
       apply Partition_mon; apply le_O_n.
-     elimtype False; inversion a2.
+     exfalso; inversion a2.
     apply less_leEq; apply RSR_h_mon; auto with arith.
    elim (le_lt_dec i 0); elim (le_lt_dec (S i) 0); intros; simpl in |- *.
-      elimtype False; inversion a1.
+      exfalso; inversion a1.
      assumption.
-    elimtype False; inversion a1.
+    exfalso; inversion a1.
    apply RSR_h_PropAll with (P := fun x : IR => x[<=]b).
      red in |- *; intros.
      apply leEq_wdl with x; assumption.
@@ -296,7 +296,7 @@ Proof.
    apply leEq_wdr with (R _ (le_n _)).
     apply Partition_mon; apply le_trans with (pred m); auto with arith.
    apply finish.
-  elimtype False; rewrite <- b0 in H'; apply (le_Sn_n _ H').
+  exfalso; rewrite <- b0 in H'; apply (le_Sn_n _ H').
  apply leEq_reflexive.
 Qed.
 
@@ -334,7 +334,7 @@ Proof.
  unfold RSR_auxP in |- *.
  elim (le_lt_dec 0 0); intro; simpl in |- *.
   reflexivity.
- elimtype False; inversion b0.
+ exfalso; inversion b0.
 Qed.
 
 Lemma RSR_h_inj : forall (i j : nat) Hi Hj, h i Hi[=]h j Hj -> i = j.
@@ -352,9 +352,9 @@ Proof.
  intros.
  unfold RSR_auxP in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  elimtype False; apply le_not_lt with n i; auto.
+  exfalso; apply le_not_lt with n i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  elimtype False; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_f' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_f' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -382,7 +382,7 @@ Proof.
   apply partition_length_zero with Hab; rewrite <- H; apply P.
  elim (le_lt_dec n n); intro; simpl in |- *.
   rewrite <- minus_n_n; auto.
- elimtype False; apply lt_irrefl with n; auto.
+ exfalso; apply lt_irrefl with n; auto.
 Qed.
 
 Lemma RSR_auxP_lemma1 : forall i j : nat, i < j -> RSR_auxP i < RSR_auxP j.
@@ -443,7 +443,7 @@ Proof.
   2: apply RSR_f'_mon.
   2: apply lt_pred'; assumption.
  intro.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := f' _ (lt_pred' _ _ b1 b3)).
  eapply leEq_less_trans; [ apply H1 | apply X0 ].
 Qed.
@@ -464,7 +464,7 @@ Proof.
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
-   elimtype False; inversion b0.
+   exfalso; inversion b0.
   apply eq_transitive_unfolded with a.
    apply start.
   apply partition_length_zero with Hab.
@@ -487,7 +487,7 @@ Proof.
      cut (RSR_auxP i = 0); [ intro | auto with arith ].
      rewrite <- RSR_auxP_lemma0 in H2.
      cut (RSR_auxP 0 < RSR_auxP i); [ intro | apply RSR_auxP_lemma1; assumption ].
-     elimtype False; rewrite H2 in H3; apply (lt_irrefl _ H3).
+     exfalso; rewrite H2 in H3; apply (lt_irrefl _ H3).
     generalize b1 a1; clear b1 a1.
     rewrite (RSR_auxP_lemmai i b0 a0); intros.
     simpl in |- *.
@@ -500,7 +500,7 @@ Proof.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxP_lemman in b1.
    cut (i = n).
-    intro; elimtype False; rewrite H2 in a0; apply (lt_irrefl _ a0).
+    intro; exfalso; rewrite H2 in a0; apply (lt_irrefl _ a0).
    apply nat_mon_imp_inj with (h := RSR_auxP).
     apply RSR_auxP_lemma1.
    assumption.
@@ -516,7 +516,7 @@ Proof.
  rewrite RSR_auxP_lemman.
  exists (le_n (pred (m + n))).
  elim le_lt_eq_dec; intro; simpl in |- *.
-  elimtype False; apply (lt_irrefl _ a0).
+  exfalso; apply (lt_irrefl _ a0).
  apply finish.
 Qed.
 
@@ -533,7 +533,7 @@ Proof.
  unfold RSR_auxR in |- *.
  elim (le_lt_dec 0 0); intro; simpl in |- *.
   reflexivity.
- elimtype False; inversion b0.
+ exfalso; inversion b0.
 Qed.
 
 Lemma RSR_auxR_lemmai :
@@ -543,9 +543,9 @@ Proof.
  intros.
  unfold RSR_auxR in |- *.
  elim (le_lt_dec m i); intro; simpl in |- *.
-  elimtype False; apply le_not_lt with m i; auto.
+  exfalso; apply le_not_lt with m i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  elimtype False; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_g' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_g' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -637,7 +637,7 @@ Proof.
   2: apply RSR_g'_mon.
   2: apply lt_pred'; assumption.
  intro.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := g' _ (lt_pred' _ _ b1 b3)).
  eapply leEq_less_trans; [ apply H1 | apply X0 ].
 Qed.
@@ -658,7 +658,7 @@ Proof.
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
-   elimtype False; inversion b0.
+   exfalso; inversion b0.
   apply eq_transitive_unfolded with a.
    apply start.
   apply partition_length_zero with Hab.
@@ -681,7 +681,7 @@ Proof.
      cut (RSR_auxR j = 0); [ intro | auto with arith ].
      rewrite <- RSR_auxR_lemma0 in H2.
      cut (RSR_auxR 0 < RSR_auxR j); [ intro | apply RSR_auxR_lemma1; assumption ].
-     elimtype False; rewrite H2 in H3; apply (lt_irrefl _ H3).
+     exfalso; rewrite H2 in H3; apply (lt_irrefl _ H3).
     generalize b1 a1; clear b1 a1.
     rewrite (RSR_auxR_lemmai j b0 a0); intros.
     simpl in |- *.
@@ -694,7 +694,7 @@ Proof.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxR_lemmam in b1.
    cut (j = m).
-    intro; elimtype False; rewrite H2 in a0; apply (lt_irrefl _ a0).
+    intro; exfalso; rewrite H2 in a0; apply (lt_irrefl _ a0).
    apply nat_mon_imp_inj with (h := RSR_auxR).
     apply RSR_auxR_lemma1.
    assumption.
@@ -712,7 +712,7 @@ Proof.
  rewrite RSR_auxR_lemmam.
  exists (le_n (pred (m + n))).
  elim le_lt_eq_dec; intro; simpl in |- *.
-  elimtype False; apply (lt_irrefl _ a0).
+  exfalso; apply (lt_irrefl _ a0).
  apply finish.
 Qed.
 

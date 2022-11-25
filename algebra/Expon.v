@@ -106,7 +106,7 @@ Proof.
   auto with arith.
  simple induction k.
   intro H2.
-  elimtype False.
+  exfalso.
   inversion H2.
  intros.
  elim n0.
@@ -128,7 +128,7 @@ Qed.
 Lemma great_nexp_resp_lt : forall (x : R) m n, [1] [<] x -> m < n -> x[^]m [<] x[^]n.
 Proof.
  intros. induction  n as [| n Hrecn]; intros.
- elimtype False.
+ exfalso.
   inversion H.
  cut (m <= n). intro.
   cut (x[^]n [<] x[^]S n). intro.
@@ -229,7 +229,7 @@ Lemma nexp_resp_leEq_neg_odd : forall n, odd n ->
  forall x y : R, y [<=] [0] -> x [<=] y -> x[^]n [<=] y[^]n.
 Proof.
  intro; case n.
-  intros; elimtype False; inversion H.
+  intros; exfalso; inversion H.
  clear n; intros.
  astepl (x[^]n[*]x); astepr (y[^]n[*]y).
  rstepl ([--] (x[^]n[*][--]x)); rstepr ([--] (y[^]n[*][--]y)).

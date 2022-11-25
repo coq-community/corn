@@ -312,7 +312,7 @@ Proof.
   apply less_antisymmetric_unfolded.
   assumption.
  intro.
- elimtype False.
+ exfalso.
  generalize b.
  change (q1[~=]q2) in |- *.
  apply ap_imp_neq.

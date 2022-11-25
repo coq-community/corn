@@ -468,7 +468,7 @@ Proof.
    rewrite -> injz_plus.
    reflexivity.
   destruct (fact (S n')).
-   elimtype False; auto with *.
+   exfalso; auto with *.
   simpl; reflexivity.
  stepr ((inj_Q IR a)[^](S n')).
   apply inj_Q_power.

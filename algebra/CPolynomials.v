@@ -748,7 +748,7 @@ Proof.
   intro.
   rewrite cpoly_zero_plus.
   intro H.
-  elimtype False.
+  exfalso.
   apply (ap_irreflexive _ _ H).
  do 4 intro.
  pattern q in |- *; apply Ccpoly_ind_cs.

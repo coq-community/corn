@@ -81,7 +81,7 @@ Lemma Fprim_strext : forall x y Hx Hy,
 Proof.
  intros x y Hx Hy H.
  elim (Integral_strext' _ _ _ _ _ _ _ _ _ H).
-  intro; elimtype False.
+  intro; exfalso.
   generalize a0; apply ap_irreflexive_unfolded.
  auto.
 Qed.

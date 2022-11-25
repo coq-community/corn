@@ -350,7 +350,7 @@ Proof.
        apply a0.
       algebra.
      algebra.
-    elimtype False; generalize b0; exact (ap_irreflexive_unfolded _ _).
+    exfalso; generalize b0; exact (ap_irreflexive_unfolded _ _).
    eapply ap_wdl_unfolded.
     eapply ap_wdr_unfolded.
      apply HN.
@@ -392,34 +392,34 @@ Proof.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ H); clear H; intro.
      left; auto.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
-     elimtype False; generalize a0; apply ap_irreflexive_unfolded.
+     exfalso; generalize a0; apply ap_irreflexive_unfolded.
     elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
      elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
       right; auto.
      left; auto.
-    elimtype False; generalize b0; apply ap_irreflexive_unfolded.
+    exfalso; generalize b0; apply ap_irreflexive_unfolded.
    elim (cg_minus_strext _ _ _ _ _ b0); clear b0; intro.
     simpl in a0.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ a0); clear a0; intro.
      left; auto.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
-     elimtype False; generalize a0; apply ap_irreflexive_unfolded.
+     exfalso; generalize a0; apply ap_irreflexive_unfolded.
     elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
      elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
       right; auto.
      left; auto.
-    elimtype False; generalize b0; apply ap_irreflexive_unfolded.
+    exfalso; generalize b0; apply ap_irreflexive_unfolded.
    elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
     left; auto.
    elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
-    elimtype False; generalize a0; apply ap_irreflexive_unfolded.
+    exfalso; generalize a0; apply ap_irreflexive_unfolded.
    elim (div_strext _ _ _ _ _ _ _ b0); clear b0; intro.
     elim (cg_minus_strext _ _ _ _ _ a0); clear a0; intro.
      right; auto.
     left; auto.
    elim (bin_op_strext_unfolded _ _ _ _ _ _ b0); clear b0; intro.
-    elimtype False; generalize a0; apply ap_irreflexive_unfolded.
-   elimtype False; generalize b0; apply ap_irreflexive_unfolded.
+    exfalso; generalize a0; apply ap_irreflexive_unfolded.
+   exfalso; generalize b0; apply ap_irreflexive_unfolded.
   red in |- *.
   do 3 intro.
   rewrite H0; clear H0; intros.
@@ -750,7 +750,7 @@ Proof.
  intros; unfold partition_join_fun in |- *.
  elim le_lt_dec; intro; simpl in |- *.
   apply prf1; auto.
- elimtype False; apply le_not_lt with i n; auto.
+ exfalso; apply le_not_lt with i n; auto.
 Qed.
 
 Lemma pjf_2 : forall (i : nat) Hi, i = n -> partition_join_fun i Hi [=] c.
@@ -760,7 +760,7 @@ Proof.
  rewrite H; clear H; intro.
  elim le_lt_dec; intro; simpl in |- *.
   apply finish.
- elimtype False; apply lt_irrefl with n; auto.
+ exfalso; apply lt_irrefl with n; auto.
 Qed.
 
 Lemma pjf_2' : forall (i : nat) Hi, i = S n -> partition_join_fun i Hi [=] c.
@@ -769,7 +769,7 @@ Proof.
  generalize Hi; clear Hi.
  rewrite H; clear H; intro.
  elim le_lt_dec; intro; simpl in |- *.
-  elimtype False; apply (le_Sn_n _ a0).
+  exfalso; apply (le_Sn_n _ a0).
  cut (forall H, Q (n - n) H [=] c); auto.
  cut (n - n = 0); [ intro | auto with arith ].
  rewrite H; intros; apply start.
@@ -781,7 +781,7 @@ Proof.
  intros; unfold partition_join_fun in |- *.
  generalize Hj; rewrite H0; clear Hj; intros.
  elim le_lt_dec; intro; simpl in |- *.
-  elimtype False; apply le_not_lt with i n; auto.
+  exfalso; apply le_not_lt with i n; auto.
  apply prf1; auto.
 Qed.
 
@@ -792,10 +792,10 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec i n); elim (le_lt_dec j n); intros; simpl in |- *.
     apply prf1; auto.
-   elimtype False; apply le_not_lt with i n.
+   exfalso; apply le_not_lt with i n.
     assumption.
    rewrite H; assumption.
-  elimtype False; apply le_not_lt with j n.
+  exfalso; apply le_not_lt with j n.
    assumption.
   rewrite <- H; assumption.
  apply prf1; auto.
@@ -818,7 +818,7 @@ Proof.
    apply eq_transitive_unfolded with (Q 0 (le_O_n _)).
     apply eq_symmetric_unfolded; apply start.
    apply prf1; auto with arith.
-  elimtype False; apply le_not_lt with n i; auto with arith.
+  exfalso; apply le_not_lt with n i; auto with arith.
  cut (i - n = S (i - S n)); [ intro | lia ].
  cut (S (i - S n) <= m); [ intro | lia ].
  apply leEq_wdr with (Q _ H1).
@@ -832,7 +832,7 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec 0 n); intro; simpl in |- *.
   apply start.
- elimtype False; apply (lt_n_O _ b0).
+ exfalso; apply (lt_n_O _ b0).
 Qed.
 
 Lemma partition_join_finish : forall H, partition_join_fun (S (n + m)) H [=] b.
@@ -840,7 +840,7 @@ Proof.
  intro.
  unfold partition_join_fun in |- *.
  elim le_lt_dec; intro; simpl in |- *.
-  elimtype False; apply le_Sn_n with n; apply le_trans with (S (n + m)); auto with arith.
+  exfalso; apply le_Sn_n with n; apply le_trans with (S (n + m)); auto with arith.
  apply eq_transitive_unfolded with (Q _ (le_n _)).
   apply prf1; auto with arith.
  apply finish.
@@ -895,8 +895,8 @@ Proof.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
    algebra.
-  elimtype False; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
- elimtype False; apply le_not_lt with i n; auto with arith.
+  exfalso; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
+ exfalso; apply le_not_lt with i n; auto with arith.
 Qed.
 
 Lemma pjp_2 : forall (i : nat) Hi, i = n -> partition_join_pts i Hi [=] c.
@@ -904,9 +904,9 @@ Proof.
  intros; unfold partition_join_pts in |- *.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
-   elimtype False; rewrite H in a1; apply (lt_irrefl _ a1).
+   exfalso; rewrite H in a1; apply (lt_irrefl _ a1).
   algebra.
- elimtype False; rewrite H in b0; apply (lt_irrefl _ b0).
+ exfalso; rewrite H in b0; apply (lt_irrefl _ b0).
 Qed.
 
 Lemma pjp_3 : forall (i : nat) Hi Hi',
@@ -914,7 +914,7 @@ Lemma pjp_3 : forall (i : nat) Hi Hi',
 Proof.
  intros; unfold partition_join_pts in |- *.
  elim le_lt_dec; intro; simpl in |- *.
-  elimtype False; apply le_not_lt with i n; auto.
+  exfalso; apply le_not_lt with i n; auto.
  cut (fQ _ (partition_join_aux' _ _ _ b0 Hi) [=] fQ _ Hi').
   2: apply HfQ'; auto.
  algebra.
@@ -941,7 +941,7 @@ Proof.
      eapply leEq_wdr.
       apply b0.
      apply prf1; auto.
-    elimtype False; clear H'; rewrite b0 in a0; apply (le_Sn_n _ a0).
+    exfalso; clear H'; rewrite b0 in a0; apply (le_Sn_n _ a0).
    cut (i = n); [ intro | clear H'; apply le_antisym; auto with arith ].
    generalize H a0 b0 H'; clear H' a0 b0 H; rewrite H0; intros.
    apply compact_wd with c.
@@ -952,7 +952,7 @@ Proof.
    cut (forall H, Q (n - n) H [=] c); auto.
    cut (n - n = 0); [ intro | auto with arith ].
    rewrite H1; intros; apply start.
-  elimtype False; apply le_not_lt with n i; auto with arith.
+  exfalso; apply le_not_lt with n i; auto with arith.
  elim (HfQ _ (partition_join_aux' _ _ _ b1 H)); intros.
  apply compact_wd with (fQ _ (partition_join_aux' _ _ _ b1 H)).
   2: apply eq_symmetric_unfolded; apply pjp_3; assumption.
@@ -1011,9 +1011,9 @@ Proof.
     apply pfwdef; apply eq_symmetric_unfolded; apply pjp_1.
    apply cg_minus_wd; simpl in |- *.
     unfold partition_join_fun in |- *; elim le_lt_dec; simpl in |- *; intro; [ apply prf1; auto
-      | elimtype False; apply le_not_lt with n i; auto with arith ].
+      | exfalso; apply le_not_lt with n i; auto with arith ].
    unfold partition_join_fun in |- *; elim le_lt_dec; simpl in |- *; intro; [ apply prf1; auto
-     | elimtype False; apply le_not_lt with i n; auto with arith ].
+     | exfalso; apply le_not_lt with i n; auto with arith ].
   intros; apply mult_wd.
    apply pfwdef.
    cut (i = S (n + i) - S n); [ intro | lia ].
@@ -1023,7 +1023,7 @@ Proof.
    Opaque minus.
    unfold partition_join, partition_join_fun in |- *.
    elim le_lt_dec; simpl in |- *; intro.
-    elimtype False; apply le_Sn_n with n; eapply le_trans.
+    exfalso; apply le_Sn_n with n; eapply le_trans.
      2: apply a0.
     auto with arith.
    Transparent minus.
@@ -1031,7 +1031,7 @@ Proof.
   Opaque minus.
   unfold partition_join, partition_join_fun in |- *.
   elim le_lt_dec; simpl in |- *; intro.
-   elimtype False; apply le_Sn_n with n; eapply le_trans.
+   exfalso; apply le_Sn_n with n; eapply le_trans.
     2: apply a0.
    auto with arith.
   Transparent minus.
@@ -1044,8 +1044,8 @@ Proof.
  apply eq_transitive_unfolded with c; unfold partition_join_fun in |- *;
    elim le_lt_dec; simpl in |- *.
     intro; apply finish.
-   intro; elimtype False; apply (lt_irrefl _ b0).
-  intro; elimtype False; apply (le_Sn_n _ a0).
+   intro; exfalso; apply (lt_irrefl _ b0).
+  intro; exfalso; apply (le_Sn_n _ a0).
  intro; apply eq_symmetric_unfolded.
  apply eq_transitive_unfolded with (Q _ (le_O_n _)).
   apply prf1; auto with arith.
@@ -1071,7 +1071,7 @@ Proof.
    eapply leEq_transitive.
     apply Mesh_lemma.
    apply lft_leEq_Max.
-  elimtype False; apply le_not_lt with i n; auto with arith.
+  exfalso; apply le_not_lt with i n; auto with arith.
  elim le_lt_dec; intro; simpl in |- *.
   cut (i = n); [ intro | apply le_antisym; auto with arith ].
   generalize a0 b0 Hi'; clear Hx Hi Hi' a0 b0.
@@ -1181,8 +1181,8 @@ Proof.
        elim le_lt_dec; intro; simpl in |- *.
         elim le_lt_eq_dec; intro; simpl in |- *.
          apply Partition_imp_points_2; auto.
-        elimtype False; rewrite b0 in Hi; apply (lt_irrefl _ Hi).
-       elimtype False; apply le_not_lt with i0 (S i); auto with arith.
+        exfalso; rewrite b0 in Hi; apply (lt_irrefl _ Hi).
+       exfalso; apply le_not_lt with i0 (S i); auto with arith.
       apply cg_minus_wd; simpl in |- *.
        apply eq_symmetric_unfolded; apply pjf_1.
       apply eq_symmetric_unfolded; apply pjf_1.
@@ -1191,10 +1191,10 @@ Proof.
       unfold partition_join_pts in |- *.
       elim le_lt_dec; intro; simpl in |- *.
        elim le_lt_eq_dec; intro; simpl in |- *.
-        elimtype False; apply le_Sn_n with (S i); eapply le_trans.
+        exfalso; apply le_Sn_n with (S i); eapply le_trans.
          2: apply a0.
         auto with arith.
-       elimtype False; apply lt_irrefl with (S i); pattern (S i) at 2 in |- *;
+       exfalso; apply lt_irrefl with (S i); pattern (S i) at 2 in |- *;
          rewrite <- b0; auto with arith.
       unfold Partition_imp_points in |- *; apply prf1.
       auto with arith.

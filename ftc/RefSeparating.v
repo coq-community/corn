@@ -203,7 +203,7 @@ Lemma sep__part_h_mon_3 :
  sep__part_h i < n -> i < j -> sep__part_h i < sep__part_h j.
 Proof.
  intros; induction  j as [| j Hrecj].
-  elimtype False; inversion H0.
+  exfalso; inversion H0.
  cut (sep__part_h j <= sep__part_h (S j)); intros.
   2: apply sep__part_h_mon_1.
  elim (le_lt_eq_dec _ _ H0); intro.
@@ -259,8 +259,8 @@ Proof.
   simpl in |- *.
   elim (le_lt_dec (sep__part_h i) n); intro; simpl in |- *.
    elim (sep__part_lemma (sep__part_h i) a1); intro; simpl in |- *.
-    2: intro; elimtype False; apply (lt_irrefl n); auto.
-   2: intro; elimtype False; apply (lt_irrefl n); auto.
+    2: intro; exfalso; apply (lt_irrefl n); auto.
+   2: intro; exfalso; apply (lt_irrefl n); auto.
   set (m' := ProjT1 a2) in *.
   change (m' < n -> forall Hi' : n <= n, P (sep__part_h i) Hi[<]P n Hi') in |- *; intros.
   elim (ProjT2 a2); fold m' in |- *; intros Hm' Hm''.
@@ -274,7 +274,7 @@ Proof.
   apply local_mon'_imp_mon'2_le with (f := fun (i : nat) Hi => P i Hi).
    intros; apply prf2.
   assumption.
- elimtype False; apply (le_not_lt _ _ Hi b0).
+ exfalso; apply (le_not_lt _ _ Hi b0).
 Qed.
 
 Lemma sep__part_h_lemma2 :
@@ -303,7 +303,7 @@ Proof.
   unfold cg_minus in |- *; apply plus_resp_leEq_both.
    apply Partition_mon; assumption.
   apply inv_resp_leEq; apply eq_imp_leEq; apply prf1; auto.
- elimtype False; exact (le_not_lt _ _ (sep__part_h_bnd _) b0).
+ exfalso; exact (le_not_lt _ _ (sep__part_h_bnd _) b0).
 Qed.
 
 Lemma sep__part_h_lemma3 :
@@ -364,7 +364,7 @@ Proof.
  elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
  cut (0 <> RS'_m1); intro.
   auto with arith.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := delta [/]TwoNZ).
  apply less_transitive_unfolded with (b[-]a).
   assumption.
@@ -406,7 +406,7 @@ Proof.
  unfold sep__part_fun in |- *.
  elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
   reflexivity.
- elimtype False.
+ exfalso.
  generalize b0.
  apply lt_O_neq; apply RS'_pos_m.
 Qed.
@@ -690,7 +690,7 @@ Proof.
       apply b2.
      apply cg_minus_wd; apply prf1; auto.
     astepl ([0][+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
-   elimtype False.
+   exfalso.
    exact (le_not_lt _ _ (sep__part_h_bnd _) b2).
   rstepl (Mesh P[+]delta).
   apply plus_resp_leEq_lft; apply RS'_delta_csi.
@@ -815,26 +815,26 @@ Proof.
      unfold h in |- *.
      do 2 elim le_lt_dec; intros; simpl in |- *.
         apply cg_minus_wd; apply prf1; auto.
-       elimtype False; apply le_not_lt with j n.
+       exfalso; apply le_not_lt with j n.
         apply le_trans with (S j); auto with arith.
        assumption.
-      elimtype False; apply le_not_lt with (S j) n.
+      exfalso; apply le_not_lt with (S j) n.
        exact (RS'_Hsep_S _ _ Hi a1).
       assumption.
-     elimtype False; apply le_not_lt with (S j) n.
+     exfalso; apply le_not_lt with (S j) n.
       exact (RS'_Hsep_S _ _ Hi a1).
      assumption.
-    elimtype False; exact (le_not_lt _ _ H1 b0).
-   elimtype False; exact (le_not_lt _ _ H2 b0).
-  elimtype False; exact (le_not_lt _ _ H1 b0).
+    exfalso; exact (le_not_lt _ _ H1 b0).
+   exfalso; exact (le_not_lt _ _ H2 b0).
+  exfalso; exact (le_not_lt _ _ H1 b0).
  unfold h in |- *.
  apply cg_minus_wd.
   elim le_lt_dec; simpl in |- *; intros.
    apply prf1; auto.
-  elimtype False; exact (le_not_lt _ _ H0 b0).
+  exfalso; exact (le_not_lt _ _ H0 b0).
  elim le_lt_dec; intro; simpl in |- *.
   apply prf1; auto.
- elimtype False; rewrite <- H in H0; apply le_not_lt with (sep__part_fun i (lt_le_weak _ _ Hi)) n.
+ exfalso; rewrite <- H in H0; apply le_not_lt with (sep__part_fun i (lt_le_weak _ _ Hi)) n.
   apply sep__part_fun_bnd.
  assumption.
 Qed.
@@ -876,7 +876,7 @@ Proof.
     elim le_lt_dec; intro; simpl in |- *.
      unfold part_tot_nat_fun in |- *.
      elim (le_lt_dec n j); intro; simpl in |- *.
-      elimtype False.
+      exfalso.
       apply le_not_lt with n j.
        assumption.
       apply lt_le_trans with (sep__part_fun (S i) Hi'').
@@ -884,13 +884,13 @@ Proof.
       apply sep__part_fun_bnd.
      apply mult_wd; algebra.
      apply cg_minus_wd; apply prf1; auto.
-    elimtype False.
+    exfalso.
     apply le_not_lt with (sep__part_fun i Hi') j.
      assumption.
     cut (sep__part_fun i Hi' = sep__part_fun i (lt_le_weak _ _ Hi));
       [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; assumption.
-   elimtype False.
+   exfalso.
    apply le_not_lt with (S j) (sep__part_fun (S i) Hi).
     cut (sep__part_fun (S i) Hi = sep__part_fun (S i) Hi''); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; apply H0.
@@ -901,7 +901,7 @@ Proof.
  apply Sumx_wd; intros.
  unfold part_tot_nat_fun in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  elimtype False; apply le_not_lt with n i; auto.
+  exfalso; apply le_not_lt with n i; auto.
  apply mult_wd; algebra.
  apply cg_minus_wd; apply prf1; auto.
 Qed.
@@ -996,7 +996,7 @@ Proof.
       apply Sumx_resp_leEq; intros.
       unfold part_tot_nat_fun in |- *.
       elim (le_lt_dec n i); intro; simpl in |- *.
-       elimtype False; exact (le_not_lt _ _ a0 H).
+       exfalso; exact (le_not_lt _ _ a0 H).
       unfold delta in |- *.
       apply leEq_transitive with ((M[+]M)[*] (alpha[/] _[//]
         mult_resp_ap_zero _ _ _ (nring_ap_zero _ _ SPap_n) (max_one_ap_zero M)) [/]TwoNZ).
@@ -1022,19 +1022,19 @@ Proof.
   intros; elim (le_lt_dec (sep__part_fun i (lt_le_weak _ _ Hi)) j); intro; simpl in |- *.
    elim (le_lt_dec j (pred (sep__part_fun (S i) Hi))); intro; simpl in |- *.
     elim (le_lt_dec n j); intro; simpl in |- *.
-     elimtype False; apply (le_not_lt n j).
+     exfalso; apply (le_not_lt n j).
       assumption.
      eapply lt_le_trans.
       apply H0.
      apply sep__part_fun_bnd.
     algebra.
-   elimtype False; apply (le_not_lt _ _ H0).
+   exfalso; apply (le_not_lt _ _ H0).
    rewrite (S_pred (sep__part_fun (S i) Hi'') (sep__part_fun i Hi')).
     cut (sep__part_fun (S i) Hi'' = sep__part_fun (S i) Hi); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; auto with arith.
    apply sep__part_fun_mon.
    apply lt_n_Sn.
-  elimtype False; apply (le_not_lt _ _ H).
+  exfalso; apply (le_not_lt _ _ H).
   rewrite sep__part_fun_i.
    2: assumption.
   rewrite sep__part_fun_i in b0; assumption.

@@ -211,7 +211,7 @@ Proof.
  case m.
    case n.
      intro H.
-     elimtype False.
+     exfalso.
      cut ([0] [=] ([0]:R1)).
       change (~ ([0] [=] ([0]:R1))) in |- *.
       apply ap_imp_neq.
@@ -538,7 +538,7 @@ Proof.
    intro.
    assumption.
   intro.
-  elimtype False.
+  exfalso.
   cut (inj_Q q2 [<] inj_Q q1).
    change (Not (inj_Q q2 [<] inj_Q q1)) in |- *.
    apply less_antisymmetric_unfolded.

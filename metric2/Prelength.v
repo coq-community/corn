@@ -85,7 +85,7 @@ Proof.
   simpl in *.
   pose (f:= (fun n => match n with O => a | S _ => b end)).
   exists f; auto.
-  intros [|i] z H;[|elimtype False; auto with *].
+  intros [|i] z H;[|exfalso; auto with *].
   clear z H.
   ring_simplify in pe.
   apply ball_weak_le with (proj1_sig e).
