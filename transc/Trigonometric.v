@@ -82,7 +82,7 @@ Proof.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p; intros; simpl in |- *.
    rational.
-  elimtype False; inversion b.
+  exfalso; inversion b.
  clear n; intro; simpl in |- *.
  rational.
 Qed.
@@ -99,7 +99,7 @@ Proof.
  simpl in |- *.
  unfold seq_part_sum in |- *.
  induction  m as [| m Hrecm].
-  elimtype False; inversion H0.
+  exfalso; inversion H0.
  clear Hrecm; induction  m as [| m Hrecm].
   simpl in |- *.
   unfold cos_seq in |- *.
@@ -107,7 +107,7 @@ Proof.
   elim p; intros; simpl in |- *.
    cut (x = 0); [ intro | lia ].
    rewrite H1; simpl in |- *; rational.
-  elimtype False; inversion b.
+  exfalso; inversion b.
  set (n := S m) in *.
  cut (1 <= n); [ intro | unfold n in |- *; auto with arith ].
  cut (n = S m); [ intro | auto ].
@@ -169,13 +169,13 @@ Proof.
  elim p; intros; simpl in |- *.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p0; intros; simpl in |- *.
-   elimtype False; lia.
+   exfalso; lia.
   algebra.
  elim even_or_odd_plus; intros; simpl in |- *.
  elim p0; intros; simpl in |- *.
   cut (x0 = x); [ intro | lia ].
   rewrite H; algebra.
- elimtype False; lia.
+ exfalso; lia.
 Qed.
 
 Lemma sin_cos_seq : forall n : nat, sin_seq n [=] [--] (cos_seq (S n)).
@@ -186,13 +186,13 @@ Proof.
  elim p; intros; simpl in |- *.
   elim even_or_odd_plus; intros; simpl in |- *.
   elim p0; intros; simpl in |- *.
-   elimtype False; lia.
+   exfalso; lia.
   algebra.
  elim even_or_odd_plus; intros; simpl in |- *.
  elim p0; intros; simpl in |- *.
   cut (S x = x0); [ intro | lia ].
   rewrite <- H; simpl in |- *; rational.
- elimtype False; lia.
+ exfalso; lia.
 Qed.
 
 Lemma Derivative_Sin : forall H, Derivative realline H Sine Cosine.

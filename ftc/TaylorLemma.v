@@ -374,7 +374,7 @@ Proof.
     cut (forall H', FSumx_to_FSum (S n) (funct_i' n Hf) 0 b H' [=] Part _ _ Hb); auto.
     unfold FSumx_to_FSum in |- *.
     elim le_lt_dec; intro; simpl in |- *.
-     elimtype False; inversion a0.
+     exfalso; inversion a0.
     intros; simpl in |- *.
     rstepr (Part _ _ Hb[*][1][*][1]).
     apply mult_wdl.

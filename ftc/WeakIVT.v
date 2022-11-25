@@ -96,7 +96,7 @@ Proof.
     elim H0; clear H0; intros H0 H0'.
     cut (F a Ha[-]z [<=] [--]m); intros.
      cut (m [<=] F b Hb[-]z); intros.
-      elimtype False.
+      exfalso.
       elim (contin_prop _ _ _ _ contF m a1); intros d H4 H5.
       set (incF := contin_imp_inc _ _ _ _ contF) in *.
       set (f := fun i Hi => F (compact_part _ _ Hab' d H4 i Hi)
@@ -126,7 +126,7 @@ Proof.
        apply plus_resp_leEq.
        cut ({m [<=] f _ Hi'} + {f _ Hi' [<=] [--]m}).
         intro; inversion_clear H6.
-         elimtype False.
+         exfalso.
          apply (less_irreflexive_unfolded _ m).
          apply leEq_less_trans with ZeroR.
           eapply leEq_transitive; [ apply H7 | apply (Hrec Hi') ].
@@ -186,7 +186,7 @@ Proof.
  set (H2 := pfstrx _ _ _ _ _ _ H1) in *.
  elim (ap_imp_less _ _ _ H2); intro.
   auto.
- elimtype False.
+ exfalso.
  apply (less_irreflexive_unfolded _ a).
  apply leEq_less_trans with b; auto.
 Qed.

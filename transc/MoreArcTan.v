@@ -239,7 +239,7 @@ Proof.
    stepl ([1]:IR); [| now apply eq_symmetric; assumption].
    apply leEq_reflexive.
   destruct Hx1' as [c|c]; try assumption.
-  elimtype False.
+  exfalso.
   refine (eq_imp_not_ap _ _ _ _ Hxy').
   unfold cg_minus.
   csetoid_rewrite c.
@@ -290,13 +290,13 @@ Proof.
     apply ArcTan_wd.
     csetoid_rewrite Hx1'.
     assumption.
-   elimtype False.
+   exfalso.
    refine (eq_imp_not_ap _ _ _ _ Hxy').
    unfold cg_minus.
    csetoid_rewrite_rev Hx0'.
    csetoid_rewrite_rev Hy0.
    rational.
-  elimtype False.
+  exfalso.
   refine (eq_imp_not_ap _ [--][1] [1] _ _).
   1: now stepr x.
   apply ap_symmetric.

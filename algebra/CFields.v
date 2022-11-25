@@ -809,7 +809,7 @@ Lemma part_function_recip_strext : forall x y Hx Hy,
 Proof.
  intros x y Hx Hy H.
  elim (div_strext _ _ _ _ _ _ _ H); intro H1.
-  elimtype False; apply ap_irreflexive_unfolded with (x := [1]:X); auto.
+  exfalso; apply ap_irreflexive_unfolded with (x := [1]:X); auto.
  exact (pfstrx _ _ _ _ _ _ H1).
 Qed.
 

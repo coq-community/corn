@@ -146,7 +146,7 @@ Proof.
    case (less_cotransitive_unfolded OF z [--]b H6 x).
     trivial.
    intro.
-   elimtype False.
+   exfalso.
    apply (less_irreflexive_unfolded _ b).
    apply H3 with (x := [--]x) (z := b).
     apply (strong_extensionality_of_X x [--][--]x).

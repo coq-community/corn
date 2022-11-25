@@ -129,7 +129,7 @@ Proof with auto.
   intros.
   destruct (Qle_dec (-proj1_sig e) (approximate x (Qpos2QposInf e))).
   exact q.
-  elimtype False...
+  exfalso...
 Qed.
 
 #[global]

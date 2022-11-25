@@ -684,9 +684,9 @@ Proof.
   assumption.
  intros.
  elim (le_lt_dec m i); intro;
-   [ simpl in |- * | elimtype False; apply (le_not_lt m i); auto with arith ].
+   [ simpl in |- * | exfalso; apply (le_not_lt m i); auto with arith ].
  elim (le_lt_dec i n); intro;
-   [ simpl in |- * | elimtype False; apply (le_not_lt i n); auto with arith ].
+   [ simpl in |- * | exfalso; apply (le_not_lt i n); auto with arith ].
  algebra.
 Qed.
 

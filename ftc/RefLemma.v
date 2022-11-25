@@ -264,22 +264,22 @@ Proof.
      elim (le_lt_dec (S j) m); intro; simpl in |- *.
       apply prf1; auto.
      cut (S j <= m); [ intro | apply H' with i; assumption ].
-     elimtype False; apply (le_not_lt _ _ H2 b0).
+     exfalso; apply (le_not_lt _ _ H2 b0).
     elim (le_lt_dec j m); intro; simpl in |- *.
      apply prf1; auto.
     cut (j < m); [ intro | apply H with i; assumption ].
-    elimtype False; apply le_not_lt with m j; auto with arith.
-   elimtype False; apply le_not_lt with (sub i) j; auto with arith.
-  elimtype False; apply (le_not_lt _ _ Hj' b0).
+    exfalso; apply le_not_lt with m j; auto with arith.
+   exfalso; apply le_not_lt with (sub i) j; auto with arith.
+  exfalso; apply (le_not_lt _ _ Hj' b0).
  unfold h in |- *.
  apply cg_minus_wd.
   elim (le_lt_dec (S (pred (sub (S i)))) m); intro; simpl in |- *.
    apply prf1; auto.
-  elimtype False.
+  exfalso.
   apply (le_not_lt _ _ P1 b0).
  elim (le_lt_dec (sub i) m); intro; simpl in |- *.
   apply prf1; auto.
- elimtype False.
+ exfalso.
  apply (le_not_lt _ _ P2 b0).
 Qed.
 
@@ -326,7 +326,7 @@ Proof.
     elim (le_lt_dec j (pred (sub (S i)))); intro; simpl in |- *.
      unfold part_tot_nat_fun in |- *.
      elim (le_lt_dec m j); intro; simpl in |- *.
-      elimtype False.
+      exfalso.
       cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
       cut (sub (S i) <= m); intros.
        apply (le_not_lt _ _ H4); apply le_lt_trans with j; auto.
@@ -336,14 +336,14 @@ Proof.
       apply pfwdef.
       apply HfQ'; auto.
      apply cg_minus_wd; apply prf1; auto.
-    elimtype False; apply (le_not_lt _ _ b0).
+    exfalso; apply (le_not_lt _ _ b0).
     rewrite <- (S_pred _ _ (RL_sub_S i)); auto.
-   elimtype False; apply (le_not_lt _ _ H1 b0).
+   exfalso; apply (le_not_lt _ _ H1 b0).
   symmetry  in |- *; apply RL_sub_n.
  apply Sumx_wd; intros.
  unfold part_tot_nat_fun in |- *.
  elim (le_lt_dec m i); intro; simpl in |- *.
-  elimtype False; apply le_not_lt with m i; auto.
+  exfalso; apply le_not_lt with m i; auto.
  apply mult_wd.
   apply pfwdef; apply HfQ'; auto.
  apply cg_minus_wd; apply prf1; auto.

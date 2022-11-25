@@ -334,7 +334,7 @@ generalize (H x Hx).
 clear H.
 revert B Hl x Hx.
 induction l; intros B Hl x Hx H d.
- elimtype False.
+ exfalso.
  generalize H.
  apply existsC_ind.
   tauto.

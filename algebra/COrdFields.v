@@ -455,7 +455,7 @@ Proof.
  elim (ap_imp_less _ _ _ (ring_non_triv R)).
   2: auto.
  intro H.
- elimtype False.
+ exfalso.
  apply (less_irreflexive_unfolded R [1]).
  apply less_transitive_unfolded with ([0]:R).
   auto.
@@ -1074,7 +1074,7 @@ Proof.
  cut ([0] [<] ([1][/] y[//]y_) or ([1][/] y[//]y_) [<] [0]).
   intros H0. elim H0; clear H0; intros H0.
   auto.
-  elimtype False.
+  exfalso.
   apply (less_irreflexive_unfolded R [0]).
   eapply less_transitive_unfolded.
    2: apply H0.
@@ -1159,7 +1159,7 @@ Proof.
   split; auto.
   elim (ap_imp_less _ _ _ H7); auto.
   intro H9.
-  elimtype False.
+  exfalso.
   apply (less_irreflexive_unfolded R [0]).
   apply less_leEq_trans with (a[*]b); auto.
   apply less_leEq.
@@ -1173,7 +1173,7 @@ Proof.
  split; auto.
  elim (ap_imp_less _ _ _ H7); auto.
  intro H9.
- elimtype False.
+ exfalso.
  apply (less_irreflexive_unfolded R [0]).
  apply less_leEq_trans with (a[*]b); auto.
  apply less_leEq.
@@ -1468,11 +1468,11 @@ Proof.
  intro n; induction  n as [| n Hrecn].
   intros m H.
   induction  m as [| m Hrecm].
-   elimtype False; generalize H; apply less_irreflexive_unfolded.
+   exfalso; generalize H; apply less_irreflexive_unfolded.
   auto with arith.
  intros m H.
  induction  m as [| m Hrecm].
-  elimtype False.
+  exfalso.
   cut (nring (R:=R) 0 [<] nring (S n)).
    apply less_antisymmetric_unfolded; assumption.
   apply nring_less; auto with arith.
@@ -1539,7 +1539,7 @@ Lemma Sumx_resp_less : forall n, 0 < n -> forall f g : forall i, i < n -> R,
  (forall i H, f i H [<] g i H) -> Sumx f [<] Sumx g.
 Proof.
  simple induction n.
-  intros; simpl in |- *; elimtype False; inversion H.
+  intros; simpl in |- *; exfalso; inversion H.
  simple induction n0.
   intros.
   clear H.
@@ -1572,7 +1572,7 @@ Lemma positive_Sumx : forall n (f : forall i, i < n -> R),
 Proof.
  simple induction n.
   simpl in |- *.
-  intros; elimtype False; generalize X; apply less_irreflexive_unfolded.
+  intros; exfalso; generalize X; apply less_irreflexive_unfolded.
  simple induction n0.
   simpl in |- *.
   intros.

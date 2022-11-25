@@ -91,7 +91,7 @@ Proof.
   red in |- *; simpl in |- *; auto.
  red in |- *; intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro;
-   repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (elimtype False; auto with zarith; fail);
+   repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (exfalso; auto with zarith; fail);
      try apply eq_reflexive_unfolded.
   set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
   set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
@@ -125,7 +125,7 @@ Proof.
   simpl in |- *; auto.
  intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro;
-   repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (elimtype False; auto with zarith; fail).
+   repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (exfalso; auto with zarith; fail).
     set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
     set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
     assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
@@ -152,7 +152,7 @@ Lemma om_fun_3a : forall n m f g Hfg, nat_less_n_fun f -> nat_less_n_fun g ->
  forall i Hi, {j : nat | {Hj : j < m + n | f i Hi [=] om_fun n m f g Hfg j Hj}}.
 Proof.
  intro n. induction  n as [| n Hrecn].
- simpl in |- *; intros. elimtype False; inversion Hi.
+ simpl in |- *; intros. exfalso; inversion Hi.
   intro m; induction  m as [| m Hrecm].
   simpl in |- *; intros. exists i. exists Hi. algebra.
   intros.
@@ -166,7 +166,7 @@ Proof.
   elim le_lt_eq_dec; simpl in |- *; intro.
    astepl (om_fun _ _ f h Hfh _ Hj).
    refine (om_fun_1 _ _ f h Hfh H Hh j j _ Hj (om_fun_lt _ _ a0)). auto.
-   elimtype False; auto with zarith.
+   exfalso; auto with zarith.
  elim (le_lt_eq_dec _ _ Hi); intro.
   set (h := fun i Hi => f i (lt_S _ _ Hi)) in *.
   set (Hfh := fun i j Hi Hj => Hfg i j (lt_S _ _ Hi) Hj) in *.
@@ -179,10 +179,10 @@ Proof.
    eapply eq_transitive_unfolded. eapply eq_transitive_unfolded. 2: apply Hj'.
     unfold h in |- *; apply H; auto.
    apply om_fun_1; auto.
-  elimtype False; auto with zarith.
+  exfalso; auto with zarith.
  exists (m + S n). exists (lt_n_Sn (m + S n)).
  elim le_lt_eq_dec; simpl in |- *; intro.
-  elimtype False; auto with zarith.
+  exfalso; auto with zarith.
  apply H. inversion b0. auto.
 Qed.
 
@@ -194,7 +194,7 @@ Proof.
   assert (i < m + 0). rewrite <- plus_n_O. auto.
    exists H1. algebra.
   intro m; induction  m as [| m Hrecm].
-  simpl in |- *; intros. elimtype False; inversion Hi.
+  simpl in |- *; intros. exfalso; inversion Hi.
   intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro.
   elim (le_lt_eq_dec _ _ Hi); intro.
@@ -208,10 +208,10 @@ Proof.
     eapply eq_transitive_unfolded. eapply eq_transitive_unfolded. 2: apply Hj'.
      unfold h in |- *; apply H0; auto.
     refine (om_fun_1 _ _ f h Hfh H Hh j j _ Hj (om_fun_lt _ _ a1)). auto.
-    elimtype False; auto with zarith.
+    exfalso; auto with zarith.
   exists (m + S n). exists (lt_n_Sn (m + S n)).
   elim le_lt_eq_dec; simpl in |- *; intro.
-   elimtype False; auto with zarith.
+   exfalso; auto with zarith.
   apply H0. inversion b. auto.
   set (h := fun i Hi => f i (lt_S _ _ Hi)) in *.
  set (Hfh := fun i j Hi Hj => Hfg i j (lt_S _ _ Hi) Hj) in *.
@@ -222,7 +222,7 @@ Proof.
   exists j; exists H1.
  elim le_lt_eq_dec; simpl in |- *; intro.
   eapply eq_transitive_unfolded. apply Hj'. apply om_fun_1; auto.
-   elimtype False; auto with zarith.
+   exfalso; auto with zarith.
 Qed.
 
 Lemma om_fun_4a : forall n m f g Hfg (P : F -> CProp), pred_wd F P ->
@@ -321,7 +321,7 @@ Proof.
   clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *; auto with arith.
   intros. elim (le_lt_dec (f 1) i); intro; simpl in |- *.
   cut (0 < f 1).
-    intro; elimtype False; lia.
+    intro; exfalso; lia.
    pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
   algebra.
  cut (0 < f n); [ intro | rewrite <- f0; apply f_mon; assumption ].
@@ -344,18 +344,18 @@ Proof.
       rewrite <- H1; apply lt_le_weak; assumption.
      intros.
      elim (le_lt_dec (f n) i); intro; simpl in |- *.
-      elimtype False; lia.
+      exfalso; lia.
      elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
       cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
-      elimtype False; apply (le_not_lt (f n) i); auto.
+      exfalso; apply (le_not_lt (f n) i); auto.
       apply le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
-       elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try elimtype False; try lia.
+       elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try exfalso; try lia.
     rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
       cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
         rewrite <- H3; apply lt_le_weak; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);
-     [intro; simpl in |- *; elimtype False; lia| reflexivity].
+     [intro; simpl in |- *; exfalso; lia| reflexivity].
   apply lt_trans with (f n); auto with arith.
  red in |- *; intros; rewrite -> H1; reflexivity.
 Qed.
@@ -429,7 +429,7 @@ Proof.
       transitivity (f 0 (le_O_n m)).
        apply H0; auto.
       apply H.
-     elimtype False; inversion b.
+     exfalso; inversion b.
     intros; apply nat_local_mon_imp_mon.
      clear H5 j i; intros.
      unfold f' in |- *.
@@ -443,7 +443,7 @@ Proof.
        intro.
        rewrite <- H6.
        rewrite <- plus_n_Sm; auto with arith.
-      elimtype False; apply (le_not_lt i m); auto with arith.
+      exfalso; apply (le_not_lt i m); auto with arith.
      set (x := f m (le_n m)) in *; clearbody x; auto with arith.
     assumption.
    intros.

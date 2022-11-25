@@ -154,10 +154,10 @@ Proof.
  simpl in |- *.
  unfold seq_part_sum in |- *.
  induction  i as [| i Hreci].
-  elimtype False; inversion Hi.
+  exfalso; inversion Hi.
  clear Hreci.
  induction  i as [| i Hreci].
-  elimtype False; inversion Hi; inversion H1.
+  exfalso; inversion Hi; inversion H1.
  clear Hreci.
  induction  i as [| i Hreci].
   simpl in |- *.
@@ -1033,7 +1033,7 @@ Proof.
   assumption.
  intros x [Hx0 Hx1] n Hn Hx Hx'.
  destruct n.
-  elimtype False; auto with *.
+  exfalso; auto with *.
  unfold Log_ps, FPowerSeries, Log_series_coef.
  generalize (nringS_ap_zero IR (S n)).
  generalize (nringS_ap_zero IR (n)).

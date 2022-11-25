@@ -785,11 +785,11 @@ Proof.
  unfold wfF in |- *.
  intros e H.
  elim H. intro.
- elim e; simpl in |- *; try (intros; elimtype False; inversion H0; fail).
+ elim e; simpl in |- *; try (intros; exfalso; inversion H0; fail).
  intros e0 H0 e1 H1.
- elim e0; simpl in |- *; try (intros; elimtype False; inversion H2; fail).
+ elim e0; simpl in |- *; try (intros; exfalso; inversion H2; fail).
  intro.
- elim z; simpl in |- *; try (intros; elimtype False; inversion H2; fail); intros H2 H3.
+ elim z; simpl in |- *; try (intros; exfalso; inversion H2; fail); intros H2 H3.
  inversion H2. try (rewrite H4 in X; rewrite H6 in X0; rewrite H5 in H7). (* compat 8.0 *)
  apply interpF_div with ([0]:F) y nzy; auto.
   algebra.

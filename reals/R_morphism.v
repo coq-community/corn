@@ -460,7 +460,7 @@ Proof.
   intro.
   assumption.
  intro.
- elimtype False.
+ exfalso.
  cut (f y[<]f x).
   change (Not (f y[<]f x)) in |- *.
   apply less_antisymmetric_unfolded.

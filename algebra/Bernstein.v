@@ -66,7 +66,7 @@ Proof.
  destruct (le_lt_eq_dec _ _ H0).
   replace (lt_n_Sm_le (S i) n l) with (lt_n_Sm_le _ _ (lt_n_S _ _ H)) by apply le_irrelevent.
   reflexivity.
- elimtype False; lia.
+ exfalso; lia.
 Qed.
 
 Lemma Bernstein_inv2 : forall n (H:S n <= S n),
@@ -75,7 +75,7 @@ Proof.
  intros n H.
  simpl (Bernstein H).
  destruct (le_lt_eq_dec _ _ H).
-  elimtype False; lia.
+  exfalso; lia.
  replace (lt_n_Sm_le n n H) with (le_S_n n n H) by apply le_irrelevent.
  reflexivity.
 Qed.
@@ -91,7 +91,7 @@ Proof.
  revert n i H.
  induction n; intros [|i] H.
     apply H0.
-   elimtype False; auto with *.
+   exfalso; auto with *.
   apply H1.
   apply IHn.
  simpl.
@@ -137,7 +137,7 @@ Proof.
    unfold part_tot_nat_fun.
    destruct (le_lt_dec (S n) (S n)).
     reflexivity.
-   elimtype False; lia.
+   exfalso; lia.
   intros i j Hij. subst.
   intros Hi Hj.
   unfold A.
@@ -148,22 +148,22 @@ Proof.
   rewrite <- (le_irrelevent _ _ (le_0_n _) _).
   ring.
  destruct (le_lt_dec (S n) i).
-  elimtype False; lia.
+  exfalso; lia.
  destruct (le_lt_dec (S n) (S i)); simpl (Bernstein (lt_n_Sm_le (S i) (S n) Hi));
    destruct (le_lt_eq_dec (S i) (S n) (lt_n_Sm_le (S i) (S n) Hi)).
-    elimtype False; lia.
+    exfalso; lia.
    replace  (lt_n_Sm_le i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   ring.
   replace (le_S_n i n (lt_n_Sm_le (S i) (S n) Hi)) with (lt_n_Sm_le i n l) by apply le_irrelevent.
   replace l1 with l0 by apply le_irrelevent.
   reflexivity.
- elimtype False; lia.
+ exfalso; lia.
 Qed.
 
 Lemma RaiseDegreeA : forall n i (H:i<=n), (nring (S n))[*]_X_[*]Bernstein H[=](nring (S i))[*]Bernstein (le_n_S _ _ H).
 Proof.
  induction n.
-  intros [|i] H; [|elimtype False; lia].
+  intros [|i] H; [|exfalso; lia].
   repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
@@ -207,7 +207,7 @@ Qed.
 Lemma RaiseDegreeB : forall n i (H:i<=n), (nring (S n))[*]([1][-]_X_)[*]Bernstein H[=](nring (S n - i))[*]Bernstein (le_S _ _ H).
 Proof.
  induction n.
-  intros [|i] H; [|elimtype False; lia].
+  intros [|i] H; [|exfalso; lia].
   repeat split; ring.
  intros i H.
  change (nring (S (S n)):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
@@ -340,7 +340,7 @@ Proof.
   rewrite (V0_eq v1), (V0_eq v2). ring.
  intros l v1 v2.
  destruct n as [|n].
-  elimtype False; auto with *.
+  exfalso; auto with *.
  rewrite (VSn_eq v1), (VSn_eq v2).
  simpl.
  rewrite IHi.
@@ -377,7 +377,7 @@ Proof.
  clear - i.
  unfold part_tot_nat_fun.
  destruct (le_lt_dec (S n) i).
-  elimtype False; auto with *.
+  exfalso; auto with *.
  simpl.
  replace (lt_n_Sm_le _ _ l0) with (le_S_n _ _ l) by apply le_irrelevent.
  reflexivity.
@@ -422,7 +422,7 @@ Proof.
   rewrite <- c_zero. ring.
  intros l l0 v.
  destruct n as [|n].
-  elimtype False; auto with *.
+  exfalso; auto with *.
  rewrite (VSn_eq v).
  simpl.
  rewrite -> IHi.

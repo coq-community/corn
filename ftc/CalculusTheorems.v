@@ -671,7 +671,7 @@ Lemma Derivative_imp_resp_less' : forall J pJ a b F F', Derivative J pJ F F' ->
 Proof.
  intros J pJ a b F F' H H0 H1 H2 H3 Ha Hb H4.
  elim (ap_imp_less _ _ _ H4); intro; auto.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := F a Ha).
  apply leEq_less_trans with (F b Hb); auto.
  apply Derivative_imp_resp_leEq with J pJ F'; auto.
@@ -685,7 +685,7 @@ real power preserves the less or equal than relation!
 Lemma nexp_resp_leEq_odd : forall n, odd n -> forall x y : IR, x [<=] y -> x[^]n [<=] y[^]n.
 Proof.
  intro; case n.
-  intros; elimtype False; inversion H.
+  intros; exfalso; inversion H.
  clear n; intros.
  astepl (Part (FId{^}S n) x I).
  astepr (Part (FId{^}S n) y I).

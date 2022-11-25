@@ -131,7 +131,7 @@ Proof.
  exists (map2 F l (fun (x : IR) (Hx : member x l) => H0 x (Hl' x Hx))).
   intros x H.
   clear Hl; induction  l as [| a0 l Hrecl].
-   elimtype False; assumption.
+   exfalso; assumption.
   simpl in H; elim H; clear H; intro H1.
    cut (forall x : IR, member x l -> compact a b Hab x).
     intro H.
@@ -408,7 +408,7 @@ Proof.
    eapply leEq_transitive; [ apply leEq_AbsIR | assumption ].
   elim (less_AbsIR _ _ H H3); intro H6.
    assumption.
-  elimtype False.
+  exfalso.
   cut ([0] [<] [--]e).
    intro; cut (e [<] [0]).
     exact (less_antisymmetric_unfolded _ _ _ H).

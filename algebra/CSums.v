@@ -87,7 +87,7 @@ Proof.
  intros n f Hf i Hi.
  unfold part_tot_nat_fun in |- *.
  elim le_lt_dec; intro.
-  elimtype False; apply (le_not_lt n i); auto.
+  exfalso; apply (le_not_lt n i); auto.
  simpl in |- *; apply Hf; auto.
 Qed.
 
@@ -98,7 +98,7 @@ Proof.
  unfold part_tot_nat_fun in |- *.
  elim le_lt_dec; intro.
   simpl in |- *; algebra.
- elimtype False; apply (le_not_lt n i); auto.
+ exfalso; apply (le_not_lt n i); auto.
 Qed.
 
 (** [Sum0] defines the sum for [i=0..(n-1)] *)
@@ -243,7 +243,7 @@ Proof.
     rewrite H1 in H0.
     astepl (Sum 0 0 f); astepr (Sum 0 0 g); assumption.
    inversion H2; [ auto | inversion H3 ].
-  elimtype False.
+  exfalso.
   cut (0 = pred 1); [ intro H3 | auto ].
   rewrite H3 in H0.
   rewrite H2 in H0.
@@ -264,7 +264,7 @@ Proof.
   apply bin_op_strext_unfolded with (csg_op (c:=G)).
   astepl (Sum m (S n) f); astepr (Sum m (S n) g); assumption.
  clear Hrecn.
- elimtype False.
+ exfalso.
  cut (S n = pred (S (S n))); [ intro H1 | auto ].
  rewrite H1 in H0.
  rewrite Hmn in H0.
@@ -365,8 +365,8 @@ Proof.
  apply Sum_wd'.
   assumption.
  intros i H1 H2.
- elim le_lt_dec; intro H3; [ simpl in |- * | elimtype False; apply (le_not_lt i n); auto ].
- elim le_lt_dec; intro H4; [ simpl in |- * | elimtype False; apply (le_not_lt m i); auto ].
+ elim le_lt_dec; intro H3; [ simpl in |- * | exfalso; apply (le_not_lt i n); auto ].
+ elim le_lt_dec; intro H4; [ simpl in |- * | exfalso; apply (le_not_lt m i); auto ].
  algebra.
 Qed.
 
@@ -723,7 +723,7 @@ Lemma Sumx_to_Sum : forall n, 0 < n -> forall f, nat_less_n_fun f ->
  Sumx f [=] Sum 0 (pred n) (part_tot_nat_fun G n f).
 Proof.
  intro n; induction  n as [| n Hrecn]; intros H f Hf.
-  elimtype False; inversion H.
+  exfalso; inversion H.
  cut (0 <= n); [ intro H0 | auto with arith ].
  elim (le_lt_eq_dec _ _ H0); clear H H0; intro H.
   simpl in |- *.

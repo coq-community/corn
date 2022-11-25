@@ -144,7 +144,7 @@ Lemma maxlist_greater : forall l x, member x l -> x [<=] maxlist l.
 Proof.
  intros l x H.
  induction  l as [| a l Hrecl].
-  elimtype False; assumption.
+  exfalso; assumption.
  simpl in |- *.
  induction  l as [| a0 l Hrecl0].
   simpl in H; elim H.
@@ -242,7 +242,7 @@ Lemma maxlist_less : forall x l,
  0 < length l -> (forall y, member y l -> y [<] x) -> maxlist l [<] x.
 Proof.
  simple induction l.
-  simpl in |- *; intros; elimtype False; inversion H.
+  simpl in |- *; intros; exfalso; inversion H.
  clear l.
  do 2 intro. intro H.
  clear H; induction  l as [| a0 l Hrecl].
@@ -267,7 +267,7 @@ Lemma maxlist_leEq : forall y l,
  0 < length l -> (forall x, member x l -> x [<=] y) -> maxlist l [<=] y.
 Proof.
  simple induction l.
-  simpl in |- *; intros; elimtype False; inversion H.
+  simpl in |- *; intros; exfalso; inversion H.
  clear l.
  do 3 intro.
  clear H; induction  l as [| a0 l Hrecl].
@@ -389,7 +389,7 @@ Lemma less_minlist : forall x l,
  0 < length l -> (forall y, member y l -> x [<] y) -> x [<] minlist l.
 Proof.
  simple induction l.
-  simpl in |- *; intros; elimtype False; inversion H.
+  simpl in |- *; intros; exfalso; inversion H.
  clear l.
  do 2 intro. intro H.
  clear H; induction  l as [| a0 l Hrecl].
@@ -414,7 +414,7 @@ Lemma leEq_minlist : forall x l,
  0 < length l -> (forall y, member y l -> x [<=] y) -> x [<=] minlist l.
 Proof.
  simple induction l.
-  simpl in |- *; intros; elimtype False; inversion H.
+  simpl in |- *; intros; exfalso; inversion H.
  clear l.
  do 3 intro.
  clear H; induction  l as [| a0 l Hrecl].

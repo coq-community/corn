@@ -388,7 +388,7 @@ Lemma length_Part_Mesh_List : forall n (a b : IR) (Hab : a [<=] b) (P : Partitio
  0 < n -> 0 < length (Part_Mesh_List P).
 Proof.
  intro; case n; intros.
-  elimtype False; inversion H.
+  exfalso; inversion H.
  simpl in |- *; auto with arith.
 Qed.
 
@@ -484,7 +484,7 @@ Lemma Mesh_lemma : forall i H H', P (S i) H'[-]P i H [<=] Mesh P.
 Proof.
  clear I; generalize n a b Hab P; clear P n Hab a b.
  simple induction n.
-  intros; elimtype False; inversion H'.
+  intros; exfalso; inversion H'.
  clear n; intro m; intros.
  induction  m as [| m Hrecm].
   cut (0 = i); [ intro | inversion H'; auto; inversion H2 ].
@@ -512,7 +512,7 @@ Lemma AntiMesh_lemma : forall i H H', AntiMesh P [<=] P (S i) H'[-]P i H.
 Proof.
  clear I; generalize n a b Hab P; clear P n Hab a b.
  simple induction n.
-  intros; elimtype False; inversion H'.
+  intros; exfalso; inversion H'.
  clear n; intro m; intros.
  induction  m as [| m Hrecm].
   cut (0 = i); [ intro | inversion H'; auto; inversion H2 ].
@@ -627,7 +627,7 @@ Lemma even_partition_Mesh : forall m Hm a b (Hab : a [<=] b),
  Mesh (Even_Partition Hab m Hm) [=] (b[-]a[/] _[//]nring_ap_zero' _ _ Hm).
 Proof.
  simple induction m.
-  intros; elimtype False; apply Hm; auto.
+  intros; exfalso; apply Hm; auto.
  intros.
  unfold Mesh in |- *.
  elim (le_lt_dec n 0); intro.
@@ -685,7 +685,7 @@ Proof.
  intros.
  cut (~ j <= i); intro.
   apply not_ge; auto.
- elimtype False.
+ exfalso.
  apply less_irreflexive_unfolded with (x := P i Hi).
  apply less_leEq_trans with (P j Hj).
   assumption.
@@ -824,7 +824,7 @@ Lemma pos_AntiMesh : forall n (P : Partition Hab n),
  0 < n -> _Separated P -> [0] [<] AntiMesh P.
 Proof.
  intro; case n; clear n.
-  intros P H H0; elimtype False; apply (lt_irrefl _ H).
+  intros P H H0; exfalso; apply (lt_irrefl _ H).
  intros n P H H0.
  unfold AntiMesh in |- *.
  apply less_minlist.
@@ -872,7 +872,7 @@ Proof.
  intros n P H.
  cut (0 <> n); intro.
   apply neq_O_lt; auto.
- elimtype False.
+ exfalso.
  cut (a [=] b).
   intro; apply less_irreflexive_unfolded with (x := a).
   astepr b; assumption.

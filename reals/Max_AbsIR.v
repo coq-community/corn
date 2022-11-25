@@ -697,10 +697,10 @@ Lemma Min_less_Max_imp_ap : Min a b [<] Max a b -> a [#] b.
 Proof.
  intro H.
  elim (Min_less_imp _ _ _ H); clear H; intro H; elim (less_Max_imp _ _ _ H); intro H0.
-    elimtype False; exact (less_irreflexive _ _ H0).
+    exfalso; exact (less_irreflexive _ _ H0).
    apply less_imp_ap; auto.
   apply Greater_imp_ap; auto.
- elimtype False; exact (less_irreflexive _ _ H0).
+ exfalso; exact (less_irreflexive _ _ H0).
 Qed.
 
 Lemma Max_monotone : forall (f: PartIR),
@@ -1063,7 +1063,7 @@ Proof.
      2: apply less_leEq_trans with x; auto.
      2: apply shift_minus_less; apply shift_less_plus'; astepl ZeroR; auto.
     elim (less_AbsIR (x[-]e) y); auto.
-     intro; elimtype False.
+     intro; exfalso.
      apply (less_irreflexive_unfolded _ y).
      eapply leEq_less_trans.
       2: apply a.
@@ -1102,7 +1102,7 @@ Proof.
     2: apply less_leEq_trans with x; auto.
     2: apply shift_minus_less; apply shift_less_plus'; astepl ZeroR; auto.
    elim (less_AbsIR (x[-]e) y); auto.
-     intro; elimtype False.
+     intro; exfalso.
      apply (less_irreflexive_unfolded _ y).
      eapply leEq_less_trans.
       2: apply a.

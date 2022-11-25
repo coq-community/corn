@@ -207,7 +207,7 @@ Lemma deriv_n_imp_diffble : forall n : nat, 0 < n ->
  forall F F' : PartIR, Derivative_I_n Hab' n F F' -> Diffble_I Hab' F.
 Proof.
  simple destruct n.
-  intros; elimtype False; inversion H.
+  intros; exfalso; inversion H.
  clear n; intros n H F F' H0.
  elim H0; clear H0; intros f'' H0 H1.
  exists f''; assumption.
@@ -252,7 +252,7 @@ Lemma Diffble_I_imp_le : forall n, 0 < n -> forall F F',
  Diffble_I_n Hab' n F -> Derivative_I Hab' F F' -> Diffble_I_n Hab' (pred n) F'.
 Proof.
  simple destruct n.
-  intros; elimtype False; inversion H.
+  intros; exfalso; inversion H.
  clear n; intros n H F F' H0 H1.
  elim H0; intros f'' Hf''.
  simpl in |- *.

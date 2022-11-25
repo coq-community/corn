@@ -346,7 +346,7 @@ Proof.
   induction d using Pind;[simpl;auto with *|].
   autorewrite with UnLazyNat in *.
   rewrite nat_of_P_succ_morphism; assert (H:=lt_O_nat_of_P d);
-     destruct (nat_of_P d);[elimtype False;auto with *|]; simpl in *;
+     destruct (nat_of_P d);[exfalso;auto with *|]; simpl in *;
        replace (Pplus_LazyNat 2 (LazifyNat n0)) with (Pos.succ (Pplus_LazyNat 1 (LazifyNat n0)));[
          repeat rewrite Zpos_succ_morphism; auto with * |]; clear -n0;
            change 2%positive with (Pos.succ 1); generalize 1%positive;

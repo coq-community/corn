@@ -110,7 +110,7 @@ Proof.
  elim (Archimedes x); intros n Hn.
  induction  n as [| n Hrecn].
   exists 0; split; auto.
-  intro; elimtype False; lia.
+  intro; exfalso; lia.
  clear Hrecn.
  induction  n as [| n Hrecn].
   exists 1.

@@ -324,7 +324,7 @@ Lemma FSumx_pred : forall n (f : forall i, i < n -> PartIR),
  ext_fun_seq' f -> forall x, Dom (FSumx n f) x -> forall i Hi, Dom (f i Hi) x.
 Proof.
  intros n f H x H0 i Hi; red in H; induction  n as [| n Hrecn].
-  elimtype False; inversion Hi.
+  exfalso; inversion Hi.
  elim (le_lt_eq_dec _ _ Hi); intro.
   cut (i < n); [ intro | auto with arith ].
   set (g := fun i Hi => f i (lt_S _ _ Hi)) in *.
@@ -390,7 +390,7 @@ Proof.
  do 6 intro.
  unfold FSumx_to_FSum in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  elimtype False; apply (le_not_lt n i); auto.
+  exfalso; apply (le_not_lt n i); auto.
  intros; apply H; auto.
  algebra.
 Qed.
@@ -402,7 +402,7 @@ Proof.
  unfold FSumx_to_FSum in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
   intro; algebra.
- intros; elimtype False; apply (le_not_lt n i); auto.
+ intros; exfalso; apply (le_not_lt n i); auto.
 Qed.
 
 Lemma FSum_FSumx_to_FSum : forall n (f : forall i, i < S n -> PartIR),
