@@ -629,7 +629,7 @@ Proof.
      replace ((n / Zpos d + 1) * Zpos d - n * 1)%Z
        with (Zpos d*(n/Zpos d) + n mod (Zpos d) - n mod (Zpos d) - n + Zpos d)%Z
        by ring.
-     rewrite <- Z_div_mod_eq; auto with *.
+     rewrite <- Z_div_mod_eq_full.
      replace (n - n mod (Zpos d) - n + Zpos d)%Z
        with (Zpos d - n mod (Zpos d))%Z by ring.
      apply Zle_minus_le_0.

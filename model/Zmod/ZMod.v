@@ -68,7 +68,7 @@ Proof.
  intros m a Hm.
  apply (Zdiv_remainder_unique (a mod m) m (a mod m / m) ((a mod m) mod m) 0 (a mod m)).
     rewrite Zmult_comm.
-    apply Z_div_mod_eq; auto.
+    apply Z_div_mod_eq_full.
    apply Z_mod_lt; auto.
   auto with zarith.
  apply Z_mod_lt; auto.
@@ -129,9 +129,9 @@ Proof.
     repeat rewrite Zplus_assoc.
     rewrite Zplus_opp_r.
     auto with zarith.
-   generalize (Z_div_mod_eq (a + b) m Hm); auto with zarith.
-  generalize (Z_div_mod_eq b m Hm); auto with zarith.
- generalize (Z_div_mod_eq a m Hm); auto with zarith.
+   generalize (Z_div_mod_eq_full (a + b) m); auto with zarith.
+  generalize (Z_div_mod_eq_full b m); auto with zarith.
+ generalize (Z_div_mod_eq_full a m); auto with zarith.
 Qed.
 
 Lemma Zmod_plus_compat_rht :
@@ -165,7 +165,7 @@ Proof.
  replace (- m)%Z with (-1 * m)%Z; auto with zarith.
  rewrite Zmod_cancel_multiple; auto.
  replace (a mod m - a)%Z with (- (a / m) * m)%Z; auto with zarith.
- generalize (Z_div_mod_eq a m Hm).
+ generalize (Z_div_mod_eq_full a m).
  set (q := (a / m)%Z); set (r := (a mod m)%Z); intro Ha; rewrite Ha.
  rewrite Zplus_comm; unfold Zminus in |- *; rewrite Zopp_plus_distr;
    rewrite Zplus_assoc; rewrite Zplus_opp_r; rewrite Zplus_0_l;
@@ -192,7 +192,7 @@ Proof.
   rewrite Zmod_cancel_multiple; auto.
   apply Zmod_same; auto.
  set (q := (b / m)%Z); set (r := (b mod m)%Z).
- rewrite (Z_div_mod_eq b m Hm).
+ rewrite (Z_div_mod_eq_full b m).
  fold q in |- *; fold r in |- *.
  rewrite Zmult_comm.
  unfold Zminus in |- *.
@@ -227,9 +227,9 @@ Proof.
       repeat rewrite Z.opp_involutive.
     simpl in |- *.
     apply Zdivides_plus_elim; auto with zarith.
-   generalize (Z_div_mod_eq (a * b) m Hm); auto with zarith.
-  generalize (Z_div_mod_eq b m Hm); auto with zarith.
- generalize (Z_div_mod_eq a m Hm); auto with zarith.
+   generalize (Z_div_mod_eq_full (a * b) m); auto with zarith.
+  generalize (Z_div_mod_eq_full b m); auto with zarith.
+ generalize (Z_div_mod_eq_full a m); auto with zarith.
 Qed.
 
 Lemma Zmod_mult_compat_rht :
@@ -298,7 +298,7 @@ Proof.
   exact Ha.
  replace (a mod m - a)%Z with (- m * (a / m))%Z.
   auto with zarith.
- generalize (Z_div_mod_eq a m Hm).
+ generalize (Z_div_mod_eq_full a m).
  set (q := (a / m)%Z); set (r := (a mod m)%Z); intro H; rewrite H.
  rewrite Zplus_comm; unfold Zminus in |- *; rewrite Zopp_plus_distr;
    rewrite Zplus_assoc; rewrite Zplus_opp_r; rewrite Zplus_0_l;
@@ -336,7 +336,7 @@ Lemma Zmod_lin_comb :
 Proof.
  intros m a Hm Hgcd.
  generalize (Zgcd_lin_comb a m); intro Hlincomb.
- rewrite (Z_div_mod_eq (Zgcd_coeff_a a m * a) m Hm) in Hlincomb.
+ rewrite (Z_div_mod_eq_full (Zgcd_coeff_a a m * a) m) in Hlincomb.
  rewrite Zmult_comm in Hlincomb.
  rewrite Zplus_comm in Hlincomb.
  rewrite Zplus_assoc in Hlincomb.
@@ -378,8 +378,7 @@ Proof.
   rewrite <- Zplus_assoc.
   rewrite Zopp_mult_distr_l_reverse.
   auto with zarith.
- generalize (Z_div_mod_eq (a * Zgcd_coeff_a a m) m); intro Hdivmod;
-   assert (Hm0 : (m > 0)%Z); auto with zarith; generalize (Hdivmod Hm0); clear Hdivmod; intro Hdivmod.
+ set (Hdivmod:=Z_div_mod_eq_full (a * Zgcd_coeff_a a m) m).
  rewrite (Zmult_comm m (a * Zgcd_coeff_a a m / m)) in Hdivmod.
  apply (Zdiv_remainder_unique _ _ _ _ (- Zgcd_coeff_b a m) 1 Hdivmod).
    apply Z_mod_lt.
@@ -513,8 +512,8 @@ Proof.
  unfold Zmodeq in |- *.
  exists (a / m)%Z.
  rewrite Zmult_comm.
- generalize (Z_div_mod_eq a m).
- cut (m > 0)%Z; auto with zarith.
+ generalize (Z_div_mod_eq_full a m).
+ auto with zarith.
 Qed.
 
 Lemma Zmodeq_plus_compat :

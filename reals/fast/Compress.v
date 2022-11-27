@@ -69,8 +69,7 @@ Proof.
  apply -> Zeq_plus_swap.
  rewrite Zplus_comm.
  symmetry.
- apply Z_div_mod_eq.
- auto with *.
+ apply Z_div_mod_eq_full.
 Qed.
 
 Lemma approximateQ_big : forall (z:Z) a p, ((z#1) <= a) -> (z#1) <= approximateQ a p.
@@ -86,7 +85,7 @@ Proof.
  replace ((n * Zpos p / Zpos d * 1 + 1) * Zpos d)%Z
    with (Zpos d* (n*Zpos p/ Zpos d) + (Zmod (n*Zpos p) (Zpos d)) - (Zmod (n*Zpos p) (Zpos d)) + Zpos d)%Z
    by ring.
- rewrite <- (Z_div_mod_eq (n*Zpos p) (Zpos d)) by auto with zarith.
+ rewrite <- (Z_div_mod_eq_full (n*Zpos p) (Zpos d)).
  apply Z.le_lt_trans with (n*1*Zpos p)%Z.
   replace (z*Zpos p*Zpos d)%Z with (z*Zpos d*Zpos p)%Z by ring.
   apply Zmult_lt_0_le_compat_r; auto with *.
@@ -120,7 +119,7 @@ Proof.
  destruct n as [|n|n]. inversion dpos. 2: inversion dpos.
  simpl.
  assert (0 < Z.succ (Zpos (d~0)%positive / Zpos n))%Z as zpos.
- { unfold Z.succ. 
+ { unfold Z.succ.
    apply (Z.lt_le_trans _ (0+1)). reflexivity.
    apply Z.add_le_mono_r. apply Z_div_pos.
    reflexivity. discriminate. }
@@ -144,8 +143,7 @@ Proof.
   symmetry; apply -> Zeq_plus_swap.
   rewrite Zplus_comm.
   symmetry.
-  apply Z_div_mod_eq.
-  auto with *.
+  apply Z_div_mod_eq_full.
   assert (QposEq (2#p) ((1#p)+(1#p))).
   { unfold QposEq. simpl. 
     repeat rewrite -> Qmake_Qdiv.

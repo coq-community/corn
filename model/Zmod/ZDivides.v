@@ -584,7 +584,7 @@ Lemma Zmod0_Zdivides_pos :
 Proof.
  intros a b Hb Hdiv.
  elim Hdiv; intros q Hq.
- rewrite (Z_div_mod_eq a b) in Hq.
+ rewrite (Z_div_mod_eq_full a b) in Hq.
   rewrite <- (Zplus_0_r (q * b)) in Hq.
   symmetry  in |- *.
   apply (Zdiv_remainder_unique (q * b + 0) b q 0 (a / b) (a mod b)).
@@ -592,18 +592,16 @@ Proof.
     auto with zarith.
    rewrite (Zmult_comm (a / b) b); exact Hq.
   apply Z_mod_lt; auto with zarith.
- exact Hb.
 Qed.
 
 Lemma Zdivides_Zmod0_pos :
- forall a b : Z, (b > 0)%Z -> (a mod b)%Z = 0%Z -> Zdivides b a.
+ forall a b : Z, (a mod b)%Z = 0%Z -> Zdivides b a.
 Proof.
- intros a b Hb Hmod.
- rewrite (Z_div_mod_eq a b).
+ intros a b Hmod.
+ rewrite (Z_div_mod_eq_full a b).
   rewrite (Zmult_comm b (a / b)); rewrite Hmod; rewrite Zplus_0_r.
   exists (a / b)%Z.
   reflexivity.
- exact Hb.
 Qed.
 
 Lemma Zmod0_Zdivides :
@@ -679,7 +677,7 @@ Proof.
   apply (Zdiv_quotient_unique (Zpos p * b) (Zpos p) (Zpos p * b / Zpos p)
     ((Zpos p * b) mod Zpos p) b 0).
      rewrite (Zmult_comm (Zpos p * b / Zpos p) (Zpos p)).
-     apply Z_div_mod_eq; auto with zarith.
+     apply Z_div_mod_eq_full.
     apply Z_mod_lt; auto with zarith.
    rewrite Zplus_0_r; auto with zarith.
   auto with zarith.
@@ -691,7 +689,7 @@ Proof.
   apply (Zdiv_quotient_unique (Zneg p * b) (Zpos p) (Zneg p * b / Zpos p)
     ((Zneg p * b) mod Zpos p) (- b) 0).
      rewrite (Zmult_comm (Zneg p * b / Zpos p) (Zpos p)).
-     apply Z_div_mod_eq; auto with zarith.
+     apply Z_div_mod_eq_full.
     apply Z_mod_lt; auto with zarith.
    rewrite Zplus_0_r; rewrite Zmult_opp_comm; fold (- Zpos p)%Z in |- *; auto with zarith.
   auto with zarith.
@@ -973,7 +971,7 @@ Proof.
  intros a b.
  rewrite <- (Zplus_0_r (Zpos b * (Zpos a / Zpos b))).
  set (lhs := (Zpos b * (Zpos a / Zpos b) + 0)%Z) in *.
- rewrite (Z_div_mod_eq (Zpos a) (Zpos b)).
+ rewrite (Z_div_mod_eq_full (Zpos a) (Zpos b)).
   unfold lhs in |- *.
   apply Zplus_le_compat_l.
   auto with zarith.
@@ -982,7 +980,6 @@ Proof.
   elim H.
    auto with zarith.
   auto with zarith.
- auto with zarith.
 Qed.
 
 Lemma Zmod_lt_POS :
@@ -992,7 +989,7 @@ Proof.
  apply (Zdiv_remainder_unique (Zpos a) (Zpos b) (Zpos a / Zpos b)
    (Zpos a mod Zpos b) 0 (Zpos a)); auto with zarith.
   rewrite Zmult_comm.
-  apply Z_div_mod_eq; auto with zarith.
+  apply Z_div_mod_eq_full.
  apply Z_mod_lt; auto with zarith.
 Qed.
 
@@ -1003,7 +1000,7 @@ Proof.
  apply (Zdiv_quotient_unique (Zpos a) (Zpos b) (Zpos a / Zpos b)
    (Zpos a mod Zpos b) 0 (Zpos a)); auto with zarith.
   rewrite Zmult_comm.
-  apply Z_div_mod_eq; auto with zarith.
+  apply Z_div_mod_eq_full.
  apply Z_mod_lt; auto with zarith.
 Qed.
 
