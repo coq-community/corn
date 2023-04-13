@@ -287,7 +287,7 @@ Proof.
  elim (p_gcd_duv b r); intros d' uv'; elim uv'; intros u' v'.
  intro Hd'; rewrite Hd'.
  set (q := (Zpos a / Zpos b)%Z) in *.
- rewrite (Z_div_mod_eq (Zpos a) (Zpos b)).
+ rewrite (Z_div_mod_eq_full (Zpos a) (Zpos b)).
   fold q in |- *.
   rewrite Hr.
   rewrite Zmult_plus_distr_r.
@@ -296,7 +296,6 @@ Proof.
   rewrite (Zmult_comm (v' * Zpos b) q).
   rewrite (Zmult_assoc q v' (Zpos b)).
   lia.
- auto with zarith.
 Qed.
 
 Lemma p_gcd_lin_comb :
@@ -328,13 +327,12 @@ Proof.
  elim (p_gcd_duv b r); intros d' uv'; elim uv'; intros u' v'.
  intro Hd'.
  split.
-  rewrite (Z_div_mod_eq (Zpos a) (Zpos b)).
+  rewrite (Z_div_mod_eq_full (Zpos a) (Zpos b)).
    rewrite Hr.
    apply Zdivides_plus_elim.
     apply Zdivides_mult_elim_rht.
     tauto.
    tauto.
-  auto with zarith.
  tauto.
 Qed.
 
@@ -1060,9 +1058,7 @@ Proof.
  rewrite <- Zplus_0_r.
  rewrite <- Hmod0.
   rewrite Zmult_comm.
-  apply Z_div_mod_eq.
-  generalize (Zgcd_nonneg a b).
-  auto with zarith.
+  apply Z_div_mod_eq_full.
  assumption.
 Qed.
 
@@ -1295,7 +1291,7 @@ Proof.
   apply Zgcd_minus_elim_lr.
   apply Zdivides_mult_elim_rht.
   apply Zdivides_ref.
- generalize (Z_div_mod_eq a b Hb).
+ generalize (Z_div_mod_eq_full a b).
  auto with zarith.
 Qed.
 

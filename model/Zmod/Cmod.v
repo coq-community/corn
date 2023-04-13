@@ -107,8 +107,8 @@ Proof.
  intros a b c0 r b' r' H H1 H2 H3.
  cut (c0>0)%Z.
   intro H5.
-  set (H4:=(Z_div_mod_eq (Z_of_nat a) (Z_of_nat c0) H5)).
   2:intuition.
+ set (H4:=(Z_div_mod_eq_full (Z_of_nat a) (Z_of_nat c0))).
  cut ((Z_of_nat a mod (Z_of_nat c0))%Z = r').
   intro H6.
   rewrite<- H6.
@@ -117,10 +117,7 @@ Proof.
    rewrite<- H7.
    reflexivity.
   rewrite H.
-  cut (c0>0)%Z.
-   intro H7.
-   set (H8:= (Zmod_cancel_multiple c0 r b H7)).
-   2:intuition.
+  set (H8:= (Zmod_cancel_multiple c0 r b H5)).
   set (H9:= (inj_mult b c0)).
   set (H10:= (inj_plus (b*c0) r)).
   rewrite H10.

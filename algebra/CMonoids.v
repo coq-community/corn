@@ -372,10 +372,7 @@ Proof.
  intros M u  k l n H2 H H15.
  set (H13:=(power_k M u k l)).
  intros H4.
- cut ((l-k)>0)%Z.
-  intro H5.
-  set (H6:=(Z_div_mod_eq (n-k)(l-k) H5)).
-  2:intuition.
+ set (H6:=(Z_div_mod_eq_full (n-k)(l-k))).
  cut (((n - k) mod (l - k))= (n-k)%Z -((l - k) * ((n - k) / (l - k))))%Z.
   2:intuition.
  set (H7:=(mod_nat_correct (n-k) (l-k) H2)).

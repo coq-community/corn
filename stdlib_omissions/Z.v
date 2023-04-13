@@ -51,34 +51,6 @@ Qed.
 
 (* Injection from nat preserves various operations: *)
 
-Lemma div_Zdiv (n m: nat): m <> 0%nat -> Z_of_nat (n / m) = Z_of_nat n / Z_of_nat m.
-Proof.
- intros.
- apply (Zdiv_unique (Z_of_nat n) (Z_of_nat m) (Z_of_nat (n/m)%nat) (Z_of_nat (n mod m))).
-  split.
-   auto with *.
-  apply inj_lt.
-  apply Nat.mod_upper_bound.
-  assumption.
- rewrite <- inj_mult.
- rewrite <- inj_plus.
- apply inj_eq.
- apply Nat.div_mod.
- assumption.
-Qed.
-
-Lemma mod_Zmod (n m: nat): m <> 0%nat -> Z_of_nat (n mod m) = (Z_of_nat n) mod (Z_of_nat m).
-Proof with auto with *.
- intros.
- apply (Zmod_unique (Z_of_nat n) (Z_of_nat m) (Z_of_nat n / Z_of_nat m)).
-  split...
-  apply inj_lt.
-  apply Nat.mod_upper_bound...
- rewrite <- div_Zdiv...
- rewrite <- inj_mult, <- inj_plus.
- apply inj_eq, Nat.div_mod...
-Qed.
-
 Lemma P_of_succ_nat_Zplus (m: nat): Zpos (P_of_succ_nat m) = Z_of_nat m + 1.
 Proof.
  destruct m. reflexivity.
