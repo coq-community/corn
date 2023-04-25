@@ -791,7 +791,7 @@ Definition picard_iter (n : nat) :=
                     IsUniformlyContinuous_instance_0 rx_M)
            (f0 x0 y0 rx ry).
 
-(* (* This takes too long co compile. *)
+(* (* This takes too long to compile. *)
 Definition answer (n : positive) (r : CR) : Z :=
  let m := (iter_pos n (Pmult 10) 1%positive) in
  let (a,b) := (approximate r (1#m)%Qpos)*m in
