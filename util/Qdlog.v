@@ -170,7 +170,7 @@ Lemma Qdlog_bounded_nonneg (b : nat) (n : Z) (x : Q) :
   0 ≤ Qdlog_bounded b n x.
 Proof.
   revert x. induction b; unfold Qdlog_bounded; [reflexivity |].
-  intros. case (decide_rel _); intros; [reflexivity |].
+  intros. case (decide_rel); intros; [reflexivity |].
   apply  semirings.nonneg_plus_compat ; [easy | apply IHb].
 Qed.
 
@@ -180,7 +180,7 @@ Proof.
   intros En Ex. unfold Qdlog.
   generalize (Z.abs_nat (Qdlog2 x)). 
   intros b. induction b; simpl; [reflexivity |].
-  case (decide_rel _); intros E; [reflexivity |].
+  case (decide_rel); intros E; [reflexivity |].
   destruct E.
   apply orders.le_lt_trans with 1; try assumption.
   apply orders.lt_le_trans with 2.
@@ -195,7 +195,7 @@ Proof.
   change (b1 ≡ b2) in Eb. change (n1 ≡ n2) in En. subst.
   revert x1 x2 Ex. induction b2; simpl; [reflexivity |].
   intros x1 x2 Ex.
-  case (decide_rel _); case (decide_rel _); intros E1 E2.
+  case (decide_rel); case (decide_rel); intros E1 E2.
      reflexivity.
     destruct E1. now rewrite <-Ex.
    destruct E2. now rewrite Ex.
@@ -223,7 +223,7 @@ Proof.
    apply (antisymmetry (≤)); try assumption.
    now apply Qdlog2_nonneg.
   intros x Eb Ex.
-  unfold Qdlog_bounded. case (decide_rel _); [intuition |]; intros E.
+  unfold Qdlog_bounded. case (decide_rel); [intuition |]; intros E.
   apply orders.not_lt_le_flip in E.
   assert (x = 'n * (x / 'n)) as Ex2.
    rewrite (commutativity x), associativity.

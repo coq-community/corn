@@ -196,7 +196,7 @@ Lemma IcontinuousClassic
     -> ElemIntegralContinuous I.
 Proof.
   intros E I Ihomogeneous Iadd cont f fn fL fnL nonneg intMaj.
-  specialize (cont f) as [[Z [ZL Zpos]] cont].
+  rename cont into cont0; specialize (cont0 f); edestruct cont0 as [[Z [ZL Zpos]] cont]; clear cont0.
   destruct intMaj as [l [lcv lmaj]].
   destruct (Rmult_continuous_zero (I Z ZL + 1) (I f fL - l))
     as [alpha [alphapos alphamaj]].
