@@ -218,173 +218,359 @@ and that we defined compacts as we did.
 
 Lemma compact_is_totally_bounded : forall a b Hab, totally_bounded (compact a b Hab).
 Proof.
- intros; split.
-  exists a.
-  apply compact_inc_lft.
- cut (forall (n : nat) (a b e : IR) (Hab : a [<=] b) (He : [0] [<] e),
-   (b[-]a[/] e[//]pos_ap_zero _ _ He) [<=] nring n ->
-     (2 <= n -> nring n[-]Two [<=] (b[-]a[/] e[//]pos_ap_zero _ _ He)) ->
+ intros. split.
+  - (* compact intervals are nonempty because they include their left endpoints. *)
+    exists a.
+    apply compact_inc_lft.
+  -  (* Show that if you have n, [a,b], and e, and (b-a)/e <= n and n - 2 <= (b-a)/e when 2 <= n...
+        then we can construct our list of reals for purposes of covering the interval in balls with radius e.
+        It will then be on us to prove that this fact is true. *)
+     enough (forall (n : nat) (a b e : IR) (Hab : a [<=] b) (He : [0] [<] e),
+     ((b[-]a)[/] e[//]pos_ap_zero IR e He) [<=] nring n ->
+     (2 <= n -> nring n[-]Two [<=] ((b[-]a)[/] e[//]pos_ap_zero _ _ He)) ->
        {l : list IR | forall x : IR, member x l -> compact a b Hab x | forall x : IR,
-         compact a b Hab x -> {y : IR | member y l | AbsIR (x[-]y) [<=] e}}).
-  intros H e He.
-  elim (str_Archimedes (b[-]a[/] _[//]pos_ap_zero _ _ (pos_div_two _ _ He))).
-   intros n Hn.
-   inversion_clear Hn.
-   elim (H n a b _ Hab (pos_div_two _ _ He)).
-     intros l Hl' Hl.
-     2: assumption.
-    2: assumption.
-   exists l.
-    assumption.
-   intros x Hx; elim (Hl x Hx).
-   intros y Hy Hy'.
-   exists y.
-    assumption.
-   apply AbsIR_imp_AbsSmall.
-   apply leEq_transitive with (e [/]TwoNZ).
-    assumption.
-   apply less_leEq; apply pos_div_two'; assumption.
-  apply shift_leEq_div; [ apply pos_div_two; assumption | apply shift_leEq_minus ].
-  rstepl a; assumption.
- clear Hab a b; intro n; induction  n as [| n Hrecn].
-  intros.
-  exists (a::nil).
-   intros x H1.
-   inversion H1 as [H2 | H2]. elim H2.
-   apply compact_wd with a; algebra.
-   apply compact_inc_lft.
-  intros.
-  exists a.
-   right; algebra.
-  apply leEq_wdl with ZeroR.
-   apply less_leEq; auto.
-  astepl (AbsIR [0]).
-  apply AbsIR_wd.
-  apply leEq_imp_eq. try rename X into H1.
-   apply shift_leEq_minus; astepl a; elim H1; auto.
-  apply shift_minus_leEq.
-  apply leEq_transitive with b. try rename X into H1.
-   elim H1; auto.
-  apply shift_leEq_plus.
-  apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
-   apply recip_resp_pos; auto.
-  astepr ZeroR.
-  rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He); auto.
- clear Hrecn; induction  n as [| n Hrecn].
-  intros.
-  exists (a::nil).
-   intros x H1.
-   inversion_clear H1 as [H2|].
-    elim H2.
-   apply compact_wd with a; [ apply compact_inc_lft | algebra ].
-  intros x Hx; inversion_clear Hx.
-  exists a.
-   simpl in |- *; right; algebra.
-  eapply leEq_wdl.
-   2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-   apply leEq_transitive with (b[-]a).
-    apply minus_resp_leEq; assumption.
-   rstepr (e[*]nring 1); eapply shift_leEq_mult'; [ assumption | apply H ].
-  apply shift_leEq_minus; astepl a.
-  assumption.
- clear Hrecn; induction  n as [| n Hrecn].
-  intros.
-  set (enz := pos_ap_zero _ _ He) in *.
-  exists (cons ((a[+]b) [/]TwoNZ) (@nil IR)).
-   intros x H1.
-   inversion_clear H1 as [H2|].
-    inversion_clear H2.
-   apply compact_wd with ((a[+]b) [/]TwoNZ); [ split | algebra ].
-    astepl (a[+][0]); apply shift_plus_leEq'.
-    apply mult_cancel_leEq with (Two:IR).
-     apply pos_two.
-    astepl ZeroR.
-    rstepr (b[-]a).
-    apply shift_leEq_minus; astepl a; auto.
-   astepr (b[+][0]); apply shift_leEq_plus'.
-   apply mult_cancel_leEq with (Two:IR).
-    apply pos_two.
-   astepr ZeroR.
-   rstepl (a[-]b).
-   apply shift_minus_leEq; astepr b; auto.
-  intros.
-  exists ((a[+]b) [/]TwoNZ).
-   right; algebra.
-  eapply leEq_wdl.
-   2: apply eq_symmetric_unfolded; apply Abs_Max.
-  apply shift_minus_leEq; apply Max_leEq; apply shift_leEq_plus'; apply leEq_Min.
-     apply shift_minus_leEq; apply shift_leEq_plus'.
-     astepl ZeroR; apply less_leEq; auto.
-    apply shift_minus_leEq.
-    apply leEq_transitive with b. try rename X into H1.
-     elim H1; auto.
-    apply shift_leEq_plus'.
-    apply mult_cancel_leEq with (Two:IR).
-     apply pos_two.
-    apply shift_leEq_mult' with enz.
-     auto.
-    rstepl (b[-]a[/] e[//]enz); auto.
-   apply leEq_transitive with a.
-    2: try rename X into H1; elim H1; auto.
-   apply shift_minus_leEq; apply shift_leEq_plus'.
-   apply mult_cancel_leEq with (Two:IR).
-    apply pos_two.
-   apply shift_leEq_mult' with enz.
-    auto.
-   rstepl (b[-]a[/] e[//]enz); auto.
-  apply shift_minus_leEq; apply shift_leEq_plus'.
-  astepl ZeroR; apply less_leEq; auto.
- intros.
- set (b' := b[-]e) in *.
- cut (a [<=] b'); intros.
-  elim (Hrecn a b' e H1 He).
-    intros l Hl' Hl.
-    exists (cons b' l).
-     intros.
-     unfold b' in H1; apply compact_map3 with (e := e) (Hab' := H1) (b := b).
-      assumption. try rename X into H2.
-     simpl in H2; inversion_clear H2.
-      apply Hl'; assumption.
-     apply compact_wd with b'; [ apply compact_inc_rht | algebra ].
-    intros.
-    cut (x [<] b' or b'[-]e [<] x). intros H3.
-     inversion_clear H3.
-      cut (compact a b' H1 x). intros H3.
-       elim (Hl x H3).
-       intros y Hy Hy'.
-       exists y.
-        left; assumption.
-       auto. try rename X into H2.
-      inversion_clear H2; split.
-       assumption.
-      apply less_leEq; auto.
-     exists b'.
-      right; algebra.
-     simpl in |- *; unfold ABSIR in |- *.
-     apply Max_leEq.
-      apply shift_minus_leEq; unfold b' in |- *.
-      rstepr b. try rename X into H2.
-      elim H2; auto.
-     rstepl (b'[-]x); apply shift_minus_leEq; apply shift_leEq_plus'; apply less_leEq; assumption.
-    cut (b'[-]e [<] x or x [<] b'); [ tauto | apply less_cotransitive_unfolded ].
-    apply shift_minus_less; apply shift_less_plus'; astepl ZeroR; assumption.
-   unfold b' in |- *.
-   rstepl ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
-   apply shift_minus_leEq.
-   astepr (nring (R:=IR) (S (S (S n)))); auto.
-  intro.
-  unfold b' in |- *.
-  rstepr ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
-  apply shift_leEq_minus.
-  rstepl (nring (R:=IR) (S (S n)) [+][1][-]Two).
-  auto with arith.
- unfold b' in |- *.
- apply shift_leEq_minus; apply shift_plus_leEq'.
- astepl ([1][*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
-  auto.
- apply leEq_transitive with (nring (R:=IR) (S (S (S n))) [-]Two).
-  apply shift_leEq_minus; rstepl (Three:IR); apply nring_leEq; auto with arith.
- auto with arith.
+         compact a b Hab x -> {y : IR | member y l | AbsIR (x[-]y) [<=] e}}) as H.
+    + (* first we use the fact above to prove the conclusion that our compact interval is totally bounded. *)
+      intros e He.
+      (* Strong Archimedes implies we can find an element n such that n - 2 <= b-a / (e /2) <= n *)
+      destruct (str_Archimedes ((b[-]a)[/] (e[/]TwoNZ) [//]pos_ap_zero IR (e [/]TwoNZ) (pos_div_two IR e He))) as [n Hn].
+       * (* This is only going to pass muster if we can show that 0 <= (b-a) / (e / 2). *) 
+         { (* we are at liberty to move (e/2) over to the LHS provided it's positive. *)
+           apply shift_leEq_div.
+           - (* showing that 0 < e / 2 *)
+             (* 0 < e implies 0 < e / 2, but 0 < e is known. *) apply pos_div_two; assumption. 
+           - (* showing that 0 * (e / 2) <= b - a *)
+             (* 0 * e/2 + a <= b implies 0 * e/2 <= b - a *) apply shift_leEq_minus.
+             (* 0 * e/2 + a = a on the LHS *) rstepl a.
+             (* but a <= b was known already *) assumption. }
+       * (* split the facts that b-a/(e/2) <= n and 2 <= n -> n - 2 <= (b-a)/(e/2) into two hypotheses. *)
+         destruct Hn.
+         (* Use the hypothesis for (e/2) *)
+         (* the next step would nominally require we prove two other steps, that (b-a)/(e/2) <= n and that n-2 <= (b-a)/(e/2).
+            but we have these from the Strong Archimedian Principle, so we immediately dispatch them with "try assumption". *)
+         destruct (H n a b _ Hab (pos_div_two _ _ He)) as [l Hl' Hl]; try assumption.
+         (* now we are obliged to prove that we have a list for which every member is in [a,b],  *)
+         (* The claimed hypotheses are that we have our list already, that all the x in l are in our interval, and
+            that for every x in [a,b], there's a y in l such that the |x-y| <= (e/2). But obviously this means it would
+            work for e as well, since e/2 < e. *)
+         exists l.
+         (* we already had the elements guaranteed to be in the interval by assumption! *)
+         assumption.
+         (* Let's look at the x in our interval and show they have some y that they are within e of. *)
+         intros x Hx.
+         (* If we have x in Hx, we can apply it to our list we generated before to exhibit some y such that |x-y| <= e/2 *)
+         destruct (Hl x Hx) as [y Hy Hy'].
+         (* Let's use that y now for |x - y| < e *)
+         { exists y.
+           - (* Need to show y is in l but we already assumed that y was in l. *) assumption.
+           - (* Basically just converting AbsSmall notation into AbsIR notation *) apply AbsIR_imp_AbsSmall.
+             (* If |x - y| <= e / 2 and e / 2 <= e, then |x - y | <= e *) apply leEq_transitive with (e [/]TwoNZ).
+             + (* we have | x - y | <= e/2 by assumption *) assumption.
+             + (* e / 2 < e implies e / 2 <= e *) apply less_leEq.
+               (* we previously proved that if 0 < e then e / 2 < e *) apply pos_div_two'; assumption. }
+   + (* It is now time to induct on the size of n.
+        This makes sense--we are saying that depending on how small we make our epsilon, 
+        we may exploit the existence of an n such that n - 2 <= (b-a) / e <= n to construct our list.
+        Probably by explicitly constructing the list of nish elements? *)
+        clear Hab a b; intro n; destruct n as [| n'].
+        * (* n = 0 means our interval is a point, and our list can just be {a}. *)
+          intros.
+          { exists (a::nil).
+            - (* must show that every element of this list is in the interval! *)
+              (* suppose x is in our list a::nil. *) intros x H1.
+              inversion H1 as [H2 | H2].
+              + (* case 1: x in nil. Dumb as hell. *) destruct H2.
+              + (* because being in the interval [a,b] is well-defined, we can replace x with a. *) 
+                apply compact_wd with a; algebra.
+                (* it is known that the left endpoint is inside a compact interval. *) apply compact_inc_lft.
+            - (* remains to show that for x in the interval, there's an element in the list within e of the element. *)
+              (* let x be such an element *) intros x H1.
+              (* our y can just be a. In fact this is all it can be *) exists a.
+              + (* a is in our list *)
+              right; algebra.
+              + (* and |x - a| <= e *)
+                (* we claim that x - a = 0, and prove that this implies 0 <= e *) apply leEq_wdl with ZeroR.
+                * (* 0 <= e because 0 < e which is assumed. *) apply less_leEq; assumption.
+                * (* 0 = |0| so we can replace it *) astepl (AbsIR [0]).
+                  (* if 0 = x - a, then |0| = |x-a| *) apply AbsIR_wd.
+                  { (* it'd be enough to show x - a <= 0 and 0 <= x - a *) apply leEq_imp_eq.
+                    - (* a <= x implies 0 <= x - a, but this is true by the fact that x in [a,b] *)
+                      apply shift_leEq_minus. astepl a. destruct H1 as [HL HU]. apply HL.
+                    - (* x <= a implies x - a <= 0 *) apply shift_minus_leEq.
+                      (* if x <= b and b <= a then x <= a.
+                         despite the fact that b <= a looks wrong, this will work because of how small n was! *)
+                      apply leEq_transitive with b.
+                      + (* x <= b follows from x in [a,b] *) destruct H1 as [HL HU]. assumption.
+                      + (* b <= a if b - a <= 0 *) apply shift_leEq_plus.
+                        (* we can multiply by 1/e since 0 < 1/e *) apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
+                        * (* 0 < 1/e since 0 < e *) apply recip_resp_pos; auto.
+                        * (* the RHS can be replaced with zero *) astepr ZeroR.
+                          (* we can rewrite as (b-a)/e <= 0 *) rstepl (b[-]a[/] _[//]pos_ap_zero _ _ He).
+                          (* but this was known by our use of the Archimedian principle and the fact that n = 0 *) assumption. } }
+        * (* The case where n = S n'. We again destruct n'. *)
+          { destruct n' as [| n''].
+            - (* case: n = 1 *)
+              intros.
+              (* again, all we need is the singleton list {a} *) 
+              exists (a::nil).
+              + (* and again we have to prove that this list is in [a,b] *) 
+                intros x H1.
+                destruct H1 as [H2|].
+                * destruct H2.
+                * apply compact_wd with a; [ apply compact_inc_lft | algebra ].
+              + (* now we prove that all points are contained in a bubble about a. *)
+                 (* let x in [a,b] *)
+                 intros x Hx.
+                 (* then a <= x and x <= b *)
+                 destruct Hx.
+                 (* for our y we have only one choice: a. *)
+                 exists a.
+                 * (* proving a is in {a} *) simpl in |- *; right; algebra.
+                 * (* proving |x - a| <= e *)
+                   { (* we will replace |x - a| with x - a *)
+                     apply (leEq_wdl IR (x [-] a) e (AbsIR (x [-] a))).
+                     - (* to show x - a <= e, show x - a <= b - a and b - a <= e. *) 
+                       apply leEq_transitive with (b[-]a).
+                       + (* x <= b implies x - a <= b - a *)
+                         apply minus_resp_leEq. assumption.
+                       + (* showing b - a <= e *)
+                         (* b - a <= e * 1 implies b - a <= e *)
+                         rstepr (e[*]nring 1).
+                         (* (b - a ) / e <= 1 *)
+                         eapply shift_leEq_mult'.
+                         * (* we need e positive. It is by assumption. *) assumption.
+                         * (* (b - a) / e <= 1. this is true because of n = 1 *) apply H.
+                     - (* finally showing x - a = |x - a| *)
+                       (* x - a = | x - a | if 0 <= x - a *)
+                       apply eq_symmetric_unfolded; apply AbsIR_eq_x.
+                       (* 0 + a <= x implies 0 <= x - a *)
+                       apply shift_leEq_minus.
+                       (* 0 + a = 0 on LHS *)
+                       astepl a.
+                       (* we assumed a <= x *)
+                       assumption. }
+          - (* finally, real induction. *) 
+            induction n'' as [| n''' Hrecn].
+            + (* n = 2 *) intros.
+              (* useful to have the fact that e is apart from 0 *)
+              set (enz := pos_ap_zero _ _ He) in *.
+              (* the midpoint of a and b is actually good enough.
+                 in other words we can just use {(a+b)/2} as our list. *)
+              exists (cons ((a[+]b) [/]TwoNZ) (@nil IR)).
+              * (* time to prove a <= (a+b)/2 <= b *)
+                intros x H1.
+                (* x in (a+b)/2 :: nil means x = (a+b)/2 or x in nil *)
+                { destruct H1 as [H2|].
+                  - (* x in nil is absurd *) destruct H2.
+                  - (* x = (a+b)/2 *)
+                    (* use the fact that membership in [a,b] is well-defined to rewrite.*) 
+                    apply compact_wd with ((a[+]b) [/]TwoNZ).
+                    + (* prove that a <= (a+b)/2 and (a+b)/2 <= b separately. *)
+                      split.
+                      * (* a <= (a+b)/2 *)
+                        (* rewrite as 0 <= (a+b)/2 - a *)
+                        astepl (a[+][0]); apply shift_plus_leEq'.
+                        (* multiply both sides by two *)
+                        { apply mult_cancel_leEq with (Two:IR).
+                          - (* need 0 < 2 to do this operation *) apply pos_two.
+                          - (* LHS = 0 *) astepl ZeroR.
+                            (* RHS = b - a *) rstepr (b[-]a).
+                            (* a <= b implies 0 <= b - a *)
+                            apply shift_leEq_minus; astepl a; auto. }
+                      * (* (a+b)/2 <= b *)
+                        (* (a+b)/2 - b <= 0 implies (a-b) / 2 <= b *)
+                        astepr (b[+][0]); apply shift_leEq_plus'.
+                        (* multiply by 2 on both sides *)
+                        { apply mult_cancel_leEq with (Two:IR).
+                          - apply pos_two.
+                          - astepr ZeroR.
+                            rstepl (a[-]b).
+                            apply shift_minus_leEq; astepr b; auto. }
+                   + algebra. }
+              * (* time to prove that a ball of radius e about this point covers *)
+                (* let x in [a,b] *) intros.
+                (* x will be covered by the ball about the midpoint. *)
+                { exists ((a[+]b) [/]TwoNZ).
+                  - (* proving this midpoint is in our list *) right; algebra.
+                  - (* proving x is in our ball *)
+                    (* we rewrite |x - (a+b)/2| as max(x, (a+b)/2) - min(x, (a+b)/2). *)
+                    eapply (leEq_wdl IR (Max x ((a [+] b) [/]TwoNZ) [-] Min x ((a [+] b) [/]TwoNZ)) e).
+                    + (* rewrite as max(x, (a+b)/2) <= e + min(x, (a+b)/2) *)
+                      apply shift_minus_leEq.
+                      (* to prove that Max(x, (a+b)/2) is less than e + min(x, (a+b)/2),
+                         it suffices to prove 
+                         x <= e + min(x, (a+b)/2) and (a+b)/2 <= e + min(x, (a+b)/2). *)
+                      apply Max_leEq.
+                      * (* x <= e + min(x, (a+b)/2) *)
+                        (* x - e <= min(x, (a+b)/2) *) apply shift_leEq_plus'.
+                        { (* prove that x - e <= min(x, (a+b)/2) by cases. *)
+                          apply leEq_Min.
+                          - (* x - e <= x *)
+                            (* x - x <= e *)
+                            apply shift_minus_leEq. apply shift_leEq_plus'.
+                            astepl ZeroR. apply less_leEq. assumption.
+                          - (* x - e <= (a+b)/2 *)
+                            (* x <= (a+b)/2 + e *)
+                            apply shift_minus_leEq.
+                            (* x <= b and b <= (a+b)/2 + e implies x <= (a+b)/2+e *)
+                            apply leEq_transitive with b.
+                            + (* x <= b, by x in [a,b] *) destruct H1; auto.
+                            + (* b <= (a+b)/2 + e *)
+                              (* b - (a+b)/2 <= e *)
+                              apply shift_leEq_plus'.
+                              (* multiply by 2 *)
+                              apply mult_cancel_leEq with (Two:IR).
+                              * (* need 0 < 2 *) apply pos_two.
+                              * { (* divide by e *)
+                                  apply shift_leEq_mult' with enz.
+                                  - (* need 0 < e, known by assumption. *) assumption.
+                                  - (* LHS is now (b-a)/e *) rstepl (b[-]a[/] e[//]enz).
+                                    (* (b-a)/e <= n = 2 is from our case analysis on n *)
+                                     assumption. } }
+                      * (* (a+b)/2 <= e + min(x, (a+b)/2) *)
+                        (* (a+b)/2 - e <= min(x, (a+b)/2) *) apply shift_leEq_plus'. 
+                        { (* prove that (a+b)/2 - e <= min(x, (a+b)/2) by cases *) 
+                          apply leEq_Min.
+                          - (* (a+b)/2 - e <= x *)
+                            (* (a+b)/2 - e <= a and a <= x implies (a+b)/2 <= x *)
+                            apply leEq_transitive with a.
+                            + (* (a+b)/2 - e <= a *) 
+                              (* (a+b)/2 - a <= e *)
+                              apply shift_minus_leEq; apply shift_leEq_plus'.
+                              (* multiply by 2 *)
+                              apply mult_cancel_leEq with (Two:IR).
+                              * (* need 0 < 2 *) apply pos_two.
+                              * { (* divide by e *) 
+                                  apply shift_leEq_mult' with enz.
+                                  - (* need 0 < e, known by assumption *) assumption.
+                                  - (* (b - a) / 2 <= n = 2 from our case analysis on n *) 
+                                    rstepl (b[-]a[/] e[//]enz); auto. }
+                            + (* a <= x from x in [a,b] *) elim H1; auto.
+                        - (* (a+b)/2 - e <= (a+b)/2 *) 
+                          (* (a+b)/2 - (a+b)/2 <= e *)
+                          apply shift_minus_leEq; apply shift_leEq_plus'.
+                          (* 0 <= e, follows from 0 < e which is assumed. *)
+                          astepl ZeroR; apply less_leEq; auto. }
+                    + (* justifying the rewrite of |x-(a+b)/2| *)
+                      apply eq_symmetric_unfolded; apply Abs_Max. }
+            + (* n = S (S (S n''')) *) 
+              (* reintroduce a,b,e, a<=b, 0 < e, 
+                 (b-a)/e <= n, and 2 <= n -> n - 2 <= (b-a)/e *)
+              intros.
+              (* introduce b' = b-e *)
+              set (b' := b[-]e) in *.
+              (* we'll need a <= b', so introduce and later prove it. *)
+              enough (a [<=] b') as H1.
+              (* Applying the fact that if you have interval [a,b'], 0<e, (b-a)/e <= n-1, and
+                 2 <= n - 1, then you can construct a cover of [a,b']. l is our list,
+                 Hl' is the fact that the list is composed of elements of [a,b'], and
+                 Hl is the fact that balls over the list elements cover [a,b'].
+                 The fact that we've applied this with b', and not b, is essential
+                 because otherwise we can't repurpose the cover (the balls will be too big!) *)
+              destruct (Hrecn a b' e H1 He) as [l Hl' Hl].
+              * (* to have applied our Hrecn, we actually need that
+                   (b'-a)/e <= n-1. *)
+                (* replace b' = b-e in our conclusion,
+                   (b-e-a)/e <= n-1 *)
+                unfold b' in |- *.
+                (* (b-a)/e - 1 <= n - 1 *)
+                rstepl ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
+                (* (b-a)/e <= n - 1 + 1 *)
+                apply shift_minus_leEq.
+                (* simplify to (b-a)/e <= n, which is known by assumption *)
+                astepr (nring (R:=IR) (S (S (S n''')))). assumption.
+              * (* 2 <= n - 1 -> n - 1 - 2 <= (b'-a)/e *)
+                (* move the 2 <= n - 1 into the proof environment,
+                   where we won't use it. *) intro.
+                (* rewrite b' = b-e in the conclusion *)
+                unfold b' in |- *.
+                (* n - 1 - 2 <= (b-a)/e - 1 *)
+                rstepr ((b[-]a[/] e[//]pos_ap_zero _ _ He) [-][1]).
+                (* n - 1 - 2 + 1 <= (b-a)/e *)
+                apply shift_leEq_minus.
+                (* n - 1 + 1 - 2 <= (b-a)/e *)
+                rstepl (nring (R:=IR) (S (S n''')) [+][1][-]Two).
+                (* simplify with arithmetic to get our given assumption about n *)
+                auto with arith.
+              * (* take the list that worked for [a,b'], and add b' to the list.
+                   this will work for [a,b]. *)
+                { exists (cons b' l).
+                  - (* must prove b' :: l is composed of elements of [a,b] *)
+                    (* let x be an element of b'::l *)
+                    intros x H2.
+                    (* rewrite b' as b - e in a<=b' (proof environment) *)
+                    unfold b' in H1. Check compact_map3.
+                    (* if a <= b and a <= b - e, 0 < e, then [a,b-e] is in [a,b] *)
+                    apply compact_map3 with (e := e) (Hab' := H1) (b := b).
+                    + (* the fact that 0 < e is known by assumption *) assumption.
+                    + (* remains to show that x in [a,b-e]. *) 
+                      (* either x in l or x = b' *)
+                      simpl in H2. destruct H2.
+                      * (* if x in l', we can use the knowledge that l' in [a,b-e] *) apply Hl'. assumption.
+                      * (* if x = b', we can use the fact that membership is well-defined to substitute x for b' *)
+                        apply compact_wd with b'; [ apply compact_inc_rht | algebra ]. 
+                  - (* must prove that our list of balls covers [a,b] *)
+                    (* let x be an element of [a,b] *) intros.
+                    (* we will use the fact that either x < b' or b'-e < x *)
+                    enough (x [<] b' or b'[-]e [<] x) as H3.
+                    * { destruct H3.
+                        - (* case x < b' *)
+                          (* enough to use the fact that x in [a,b'] *)
+                          enough (compact a b' H1 x) as H3.
+                          + (* being in [a,b'] implies you can grab an open ball radius e from l and cover yourself *)
+                            destruct (Hl x H3) as [y Hy Hy'].
+                            (* but now we can use the fact that this open ball from l is in b' :: l (our new list) *)
+                            exists y.
+                            * (* the fact that y is in b' :: l comes from the assumption it is in l *) left; assumption.
+                            * (* the fact that x is within e of y comes from the fact that we used our previous cover to get y *) assumption.
+                          + (* need to show that in fact [a,b'] is in [a,b] *) 
+                            (* rewrite the fact that x in [a,b] as a <= x and x <= b *)
+                            destruct H2 as [Halex Hxleb].
+                            (* prove x in [a,b'] by splitting into proofs that a <= x and x<=b' *)
+                            split.
+                            * (* we got a <= x from x in [a,b] *) assumption.
+                            * (* if x < b', then x <= b' *) apply less_leEq. assumption.
+                        - (* case b' - e < x *)
+                          (* then x is covered by the ball around b' that we added to the original list *)
+                          exists b'.
+                          + (* b' in b' :: l *) right; algebra.
+                          + (* |x-b'| <= e *)
+                            (* rewrite |x-b'| as max(x-b', -(x-b')) *) simpl in |- *; unfold ABSIR in |- *.
+                            (* if x-b' <= e, and -(x-b') <= e, then max(x-b', -(x-b')) <= e *)
+                            apply Max_leEq.
+                            * (* x-b' <= e *)
+                              (* x <= e + b' *) apply shift_minus_leEq.
+                              (* x <= e + b - e *) unfold b' in |- *.
+                              (* x <= b *) rstepr b.
+                              (* follows from x in [a,b] *) destruct H2 as [Halex Hxleb]. assumption.
+                            * (* -(x-b') <= e *)
+                              (* b'-x <= e *)
+                              rstepl (b'[-]x).
+                              (* b' <= e + x *) apply shift_minus_leEq.
+                              (* b' - e <= x *) apply shift_leEq_plus'. 
+                              (* b' - e < x implies b' - e <= x *) apply less_leEq.
+                              (* but this was the assumption of the current case *) assumption. }
+                    * (* proving that x<b' or b'-e < x so we can use it above *)
+                      { enough (b'[-]e [<] x or x [<] b') as Hcotrans.
+                        - (* b'-e < x or x < b' implies x < b' or b'-e < x is just commutativity of \/ *) tauto.
+                        - (* b' - e < b' will imply b'-e < x or x < b' *) apply less_cotransitive_unfolded.
+                          (* b' < b' + e *) apply shift_minus_less.
+                          (* b' - b' < e *) apply shift_less_plus'.
+                          (* 0 < e, which is assumed *) astepl ZeroR. assumption. } }
+              * (* to have applied Hrecn, we also actually needed a <= b', which is guaranteed by the smallness of e *)
+                (* b' = b - e *) unfold b' in |- *.
+                (* e <= b - a *) apply shift_leEq_minus; apply shift_plus_leEq'.
+                (* divide both sides by e so we can use the hypothesis about e being small *) 
+                { astepl ([1][*]e); apply shift_mult_leEq with (pos_ap_zero _ _ He).
+                  - (* 0 < e is assumed *) assumption.
+                  - (* if 1 <= n - 2 and n-2 <= (a-b)/e, this will show 1 <= (a-b)/e *)
+                    apply leEq_transitive with (nring (R:=IR) (S (S (S n'''))) [-]Two).
+                    + (* 1 + 2 <= n *) apply shift_leEq_minus.
+                      (* 3 <= n *) rstepl (Three:IR).
+                      (* both sides are natural numbers. turn into a problem in nat *) apply nring_leEq.
+                      (* n = S (S (S n''')) so this is going to be automatic *) auto with arith.
+                    + (* as long as 2 <= S (S (S n''')), we will have n - 2 <= (a-b)/e *) apply H0.
+                      (* but this is automatic from how S (S (S n''')) is constructed. *) auto with arith. } }
 Qed.
 
 (**
