@@ -840,7 +840,7 @@ Proof.
  intro.
  unfold partition_join_fun in |- *.
  elim le_lt_dec; intro; simpl in |- *.
-  exfalso; apply le_Sn_n with n; apply le_trans with (S (n + m)); auto with arith.
+  exfalso; apply le_Sn_n with n; apply Nat.le_trans with (S (n + m)); auto with arith.
  apply eq_transitive_unfolded with (Q _ (le_n _)).
   apply prf1; auto with arith.
  apply finish.
@@ -1023,7 +1023,7 @@ Proof.
    Opaque minus.
    unfold partition_join, partition_join_fun in |- *.
    elim le_lt_dec; simpl in |- *; intro.
-    exfalso; apply le_Sn_n with n; eapply le_trans.
+    exfalso; apply le_Sn_n with n; eapply Nat.le_trans.
      2: apply a0.
     auto with arith.
    Transparent minus.
@@ -1031,7 +1031,7 @@ Proof.
   Opaque minus.
   unfold partition_join, partition_join_fun in |- *.
   elim le_lt_dec; simpl in |- *; intro.
-   exfalso; apply le_Sn_n with n; eapply le_trans.
+   exfalso; apply le_Sn_n with n; eapply Nat.le_trans.
     2: apply a0.
    auto with arith.
   Transparent minus.
@@ -1146,7 +1146,7 @@ Proof.
        apply leEq_less_trans with (nring (R:=IR) n2).
         assumption.
        apply nring_less.
-       apply le_lt_trans with p.
+       apply Nat.le_lt_trans with p.
         unfold p in |- *; apply le_max_r.
        auto with arith.
       unfold EP2 in |- *; eapply less_wdl.
@@ -1157,7 +1157,7 @@ Proof.
       apply leEq_less_trans with (nring (R:=IR) n1).
        assumption.
       apply nring_less.
-      apply le_lt_trans with p.
+      apply Nat.le_lt_trans with p.
        unfold p in |- *; apply le_max_l.
       auto with arith.
      red in |- *; do 3 intro.
@@ -1191,7 +1191,7 @@ Proof.
       unfold partition_join_pts in |- *.
       elim le_lt_dec; intro; simpl in |- *.
        elim le_lt_eq_dec; intro; simpl in |- *.
-        exfalso; apply le_Sn_n with (S i); eapply le_trans.
+        exfalso; apply le_Sn_n with (S i); eapply Nat.le_trans.
          2: apply a0.
         auto with arith.
        exfalso; apply lt_irrefl with (S i); pattern (S i) at 2 in |- *;

@@ -231,13 +231,13 @@ Proof.
   intros n Hn.
   exists n.
   inversion_clear Hn.
-  apply le_lt_trans with (f 0); auto with arith.
+  apply Nat.le_lt_trans with (f 0); auto with arith.
  intros n H.
  elim H; clear H; intros n' Hn'.
  elim (crescF n').
  intros i Hi; elim Hi; clear Hi; intros Hi Hi'.
  exists i.
- apply le_lt_trans with (f n'); auto.
+ apply Nat.le_lt_trans with (f n'); auto.
 Qed.
 
 (* begin hide *)
@@ -271,7 +271,7 @@ Proof.
     2: apply shift_leEq_minus; astepl (seq2 (f N)); apply H2; assumption.
    eapply leEq_wdr.
     2: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
-    2: apply shift_leEq_minus; astepl (seq2 (f N)); apply H2; apply le_trans with m; auto with arith.
+    2: apply shift_leEq_minus; astepl (seq2 (f N)); apply H2; apply Nat.le_trans with m; auto with arith.
    apply minus_resp_leEq.
    apply H2; auto with arith.
   eapply leEq_wdl.
@@ -279,13 +279,13 @@ Proof.
    2: apply shift_minus_leEq; astepr (seq2 (f N)); auto.
   eapply leEq_wdr.
    2: apply eq_symmetric_unfolded; apply AbsIR_eq_inv_x.
-   2: apply shift_minus_leEq; astepr (seq2 (f N)); apply H2; apply le_trans with m; auto with arith.
+   2: apply shift_minus_leEq; astepr (seq2 (f N)); apply H2; apply Nat.le_trans with m; auto with arith.
   apply inv_resp_leEq; apply minus_resp_leEq.
   apply H2; auto with arith.
  apply leEq_wdl with (AbsIR (seq1 i[-]seq1 N)).
   apply AbsSmall_imp_AbsIR; apply HN.
   apply lt_le_weak.
-  apply mon_F'; apply le_lt_trans with m; auto.
+  apply mon_F'; apply Nat.le_lt_trans with m; auto.
  apply AbsIR_wd; algebra.
 Qed.
 
@@ -303,7 +303,7 @@ Proof.
  astepr (seq2 (f m) [-]a).
  apply HN.
  cut (f i <= f m).
-  intros; apply le_trans with (f i); auto with arith.
+  intros; apply Nat.le_trans with (f i); auto with arith.
  apply monF; assumption.
 Qed.
 

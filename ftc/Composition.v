@@ -479,9 +479,9 @@ Proof.
  exists (max N M).
  intros n Hn x Hx.
  assert (Hn0 : N <= n).
-  apply le_trans with (max N M); auto with *.
+  apply Nat.le_trans with (max N M); auto with *.
  assert (Hn1 : M <= n).
-  apply le_trans with (max N M); auto with *.
+  apply Nat.le_trans with (max N M); auto with *.
  apply AbsSmall_imp_AbsIR.
  assert (X:Continuous_I (a:=a) (b:=b) Hab (G[o]f n)).
   eapply Continuous_I_comp.

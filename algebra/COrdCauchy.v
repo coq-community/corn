@@ -214,12 +214,12 @@ Proof.
  apply AbsSmall_wdl_unfolded with (Three[*]((eg[+]eg)[*]Mg)[+]Three[*]((ef[+]ef)[*]Mf)).
   2: unfold eg, ef in |- *; rational.
  apply AbsSmall_plus; apply AbsSmall_mult; try apply AbsSmall_plus; try apply inv_resp_AbsSmall.
-      apply HPf; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
-     apply HPf; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
-    apply HNg; auto; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
-   apply HPg; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
-  apply HPg; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
- apply HNf; auto; apply le_trans with N; auto; unfold N in |- *; eauto with arith.
+      apply HPf; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
+     apply HPf; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
+    apply HNg; auto; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
+   apply HPg; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
+  apply HPg; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
+ apply HNf; auto; apply Nat.le_trans with N; auto; unfold N in |- *; eauto with arith.
 Qed.
 
 (**

@@ -333,7 +333,7 @@ Proof.
  apply Hrecn.
  intros.
  apply H.
- apply le_trans with (m := n).
+ apply Nat.le_trans with (m := n).
   assumption.
  apply le_n_Sn.
 Qed.
@@ -356,7 +356,7 @@ Proof.
  apply Hrecn.
  intros.
  apply H.
- apply le_trans with (m := n).
+ apply Nat.le_trans with (m := n).
   assumption.
  apply le_n_Sn.
 Qed.
@@ -389,12 +389,12 @@ Proof.
    apply Hrecn.
      intros.
      apply H.
-     apply le_trans with (m := n).
+     apply Nat.le_trans with (m := n).
       assumption.
      apply le_n_Sn.
     intros.
     apply H0.
-    apply le_trans with (m := n).
+    apply Nat.le_trans with (m := n).
      assumption.
     apply le_n_Sn.
    assumption.
@@ -409,7 +409,7 @@ Proof.
  apply bound_tk1.
  intros.
  apply H.
- apply le_trans with (m := n).
+ apply Nat.le_trans with (m := n).
   assumption.
  apply le_n_Sn.
 Qed.
@@ -442,12 +442,12 @@ Proof.
    apply Hrecn.
      intros.
      apply H.
-     apply le_trans with (m := n).
+     apply Nat.le_trans with (m := n).
       assumption.
      apply le_n_Sn.
     intros.
     apply H0.
-    apply le_trans with (m := n).
+    apply Nat.le_trans with (m := n).
      assumption.
     apply le_n_Sn.
    assumption.
@@ -462,7 +462,7 @@ Proof.
  apply bound_tk2.
  intros.
  apply H.
- apply le_trans with (m := n).
+ apply Nat.le_trans with (m := n).
   assumption.
  apply le_n_Sn.
 Qed.
@@ -590,7 +590,7 @@ Proof.
 (* Case HrecN.
  Intros.
  Apply H.
- Apply le_trans with m:=N.
+ Apply Nat.le_trans with m:=N.
  Assumption.
  Apply le_n_Sn.
  Intro.
@@ -623,7 +623,7 @@ Proof.
  Elim H1.
  Intros.
  Split.
- Apply le_trans with m:=N.
+ Apply Nat.le_trans with m:=N.
  Assumption.
  Apply le_n_Sn.
  Assumption.
@@ -656,7 +656,7 @@ Proof.
  case HrecN.
    intros.
    apply H.
-   apply le_trans with (m := N).
+   apply Nat.le_trans with (m := N).
     assumption.
    apply le_n_Sn.
   intro.
@@ -687,7 +687,7 @@ Proof.
  intros.
  exists j.
   apply toCle.
-  apply le_trans with (m := N).
+  apply Nat.le_trans with (m := N).
    apply Cle_to.
    assumption.
   apply le_n_Sn.
@@ -1416,7 +1416,7 @@ Proof.
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
   apply a.
-  apply le_trans with (m := m).
+  apply Nat.le_trans with (m := m).
    assumption.
   apply le_plus_r.
  apply AbsSmall_minus.
@@ -1540,7 +1540,7 @@ Proof.
     intros.
     assumption.
    apply a.
-   apply le_trans with (m := m).
+   apply Nat.le_trans with (m := m).
     assumption.
    apply le_plus_l.
   apply pos_div_two'.
@@ -1574,7 +1574,7 @@ Proof.
   apply leEq_wdl with (x := CS_seq OF (tail_seq g n) j).
    simpl in |- *.
    apply sup_tail_leEq.
-   apply le_trans with (m := n).
+   apply Nat.le_trans with (m := n).
     assumption.
    apply le_plus_l.
   apply eq_symmetric_unfolded.
@@ -1640,7 +1640,7 @@ Proof.
  intro j.
  intros.
  exists (k + N + j).
-  apply le_trans with (m := k + N).
+  apply Nat.le_trans with (m := k + N).
    apply le_plus_l.
   apply le_plus_l.
  split.
@@ -1697,14 +1697,14 @@ Proof.
   rstepr (g_ m[-]g_ N1[+](g_ N1[-]g_ Nk)).
   apply AbsSmall_plus.
    apply a.
-   apply le_trans with (m := Nk).
-    apply le_trans with (m := N1 + k).
+   apply Nat.le_trans with (m := Nk).
+    apply Nat.le_trans with (m := N1 + k).
      apply le_plus_l.
     assumption.
    assumption.
   apply AbsSmall_minus.
   apply a.
-  apply le_trans with (m := N1 + k).
+  apply Nat.le_trans with (m := N1 + k).
    apply le_plus_l.
   assumption.
  apply AbsSmall_leEq_trans with (e1 := one_div_succ (R:=OF) (N1 + k)).

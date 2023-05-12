@@ -284,12 +284,12 @@ Proof.
    exists (max N1 N2); intros.
    apply less_leEq_trans with Av.
     apply H4.
-    apply le_trans with (max N1 N2).
+    apply Nat.le_trans with (max N1 N2).
      apply le_max_l.
     assumption.
    apply less_leEq.
    apply H5.
-   apply le_trans with (max N1 N2).
+   apply Nat.le_trans with (max N1 N2).
     apply le_max_r.
    assumption.
   unfold Av in |- *.
@@ -879,11 +879,11 @@ Proof.
   rstepr (seq1 m[-]y1[+] (seq2 m[-]y2)).
   apply AbsSmall_eps_div_two.
    apply H3.
-   apply le_trans with (max x x0).
+   apply Nat.le_trans with (max x x0).
     apply le_max_l.
    assumption.
   apply H4.
-  apply le_trans with (max x x0).
+  apply Nat.le_trans with (max x x0).
    apply le_max_r.
   assumption.
  apply pos_div_two.
@@ -1005,11 +1005,11 @@ Proof.
    apply H4; clear H4; intros.
     apply AbsSmall_wdr_unfolded with ([--] (seq1 m[-]y1)).
      apply inv_resp_AbsSmall.
-     apply H. apply le_trans with N; auto.
+     apply H. apply Nat.le_trans with N; auto.
      rational.
    apply AbsSmall_wdr_unfolded with ([--] (seq2 m[-]y2)).
     apply inv_resp_AbsSmall.
-    apply H0. apply le_trans with N; auto.
+    apply H0. apply Nat.le_trans with N; auto.
     rational.
   rational.
  elim (le_lt_dec N1 N2); intros.

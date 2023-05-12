@@ -189,7 +189,7 @@ Lemma degree_le_mon : forall (p : RX) m n,
  m <= n -> degree_le m p -> degree_le n p.
 Proof.
  unfold degree_le in |- *. intros. apply H0.
- apply le_lt_trans with n; auto with arith.
+ apply Nat.le_lt_trans with n; auto with arith.
 Qed.
 
 Lemma degree_le_inv : forall (p : RX) n, degree_le n p -> degree_le n [--]p.
@@ -271,7 +271,7 @@ Proof.
  astepl (nth_coeff m0 p[+]nth_coeff m0 q).
  cut (m < m0). intro.
   Step_final ([0][+] ([0]:R)).
- apply lt_trans with n; auto.
+ apply Nat.lt_trans with n; auto.
 Qed.
 
 Lemma degree_minus_lft : forall (p q : RX) m n,
@@ -297,7 +297,7 @@ Proof.
  astepl (nth_coeff m0 p[+]nth_coeff m0 q).
  cut (m < m0). intro.
   Step_final ([0][+] ([0]:R)).
- apply lt_trans with n; auto.
+ apply Nat.lt_trans with n; auto.
 Qed.
 
 Lemma monic_minus : forall (p q : RX) m n,

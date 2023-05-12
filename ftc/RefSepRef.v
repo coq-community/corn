@@ -290,11 +290,11 @@ Proof.
      apply leEq_wdl with x; assumption.
     intros; unfold f' in |- *.
     apply leEq_wdr with (P _ (le_n _)).
-     apply Partition_mon; apply le_trans with (pred n); auto with arith.
+     apply Partition_mon; apply Nat.le_trans with (pred n); auto with arith.
     apply finish.
    intros; unfold g' in |- *.
    apply leEq_wdr with (R _ (le_n _)).
-    apply Partition_mon; apply le_trans with (pred m); auto with arith.
+    apply Partition_mon; apply Nat.le_trans with (pred m); auto with arith.
    apply finish.
   exfalso; rewrite <- b0 in H'; apply (le_Sn_n _ H').
  apply leEq_reflexive.
@@ -354,7 +354,7 @@ Proof.
  elim (le_lt_dec n i); intro; simpl in |- *.
   exfalso; apply le_not_lt with n i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_f' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_f' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -392,25 +392,25 @@ Proof.
  assert (X'':=RSR_mn0); assert (X''':=RSR_nm0).
  elim (le_lt_dec i 0); intro.
   elim (le_lt_dec j 0); intros; simpl in |- *.
-   apply lt_le_trans with j; try apply le_lt_trans with i; auto with arith.
+   apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
   elim (le_lt_dec n j); intros; simpl in |- *.
    lia.
   apply lt_O_Sn.
  elim (le_lt_dec n i); elim (le_lt_dec j 0); intros; simpl in |- *.
-    elim (lt_irrefl 0); apply lt_le_trans with j; try apply le_lt_trans with i; auto with arith.
+    elim (lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
    elim (le_lt_dec n j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with n.
     repeat rewrite <- le_plus_minus; auto.
-   elim (le_not_lt n i); auto; apply lt_trans with j; auto.
-  elim (lt_irrefl 0); apply lt_trans with i; auto; apply lt_le_trans with j; auto.
+   elim (le_not_lt n i); auto; apply Nat.lt_trans with j; auto.
+  elim (lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec n j); intro; simpl in |- *.
-  apply lt_le_trans with (S (pred m + pred n)).
+  apply Nat.lt_le_trans with (S (pred m + pred n)).
    apply lt_n_S.
    apply (ProjT1 (ProjT2 (RSR_h_f' (pred i) (lt_pred' _ _ b0 b2)))).
   rewrite plus_n_Sm.
   rewrite <- S_pred with n 0.
-   2: apply lt_trans with i; auto.
+   2: apply Nat.lt_trans with i; auto.
   replace (pred m + n) with (pred (m + n)).
    auto with arith.
   cut (S (pred (m + n)) = S (pred m + n)); auto.
@@ -419,7 +419,7 @@ Proof.
   apply neq_O_lt.
   intro.
   apply lt_irrefl with 0.
-  apply lt_trans with i; auto.
+  apply Nat.lt_trans with i; auto.
   rewrite RSR_mn0; auto.
  apply lt_n_S.
  cut (~ ~ ProjT1 (RSR_h_f' (pred i) (lt_pred' _ _ b0 b2)) <
@@ -508,7 +508,7 @@ Proof.
   elim (le_lt_dec i 0); intro; simpl in |- *.
    apply le_O_n.
   elim (le_lt_dec n i); intro; simpl in |- *.
-   elim (lt_irrefl n); apply le_lt_trans with i; auto.
+   elim (lt_irrefl n); apply Nat.le_lt_trans with i; auto.
   apply plus_pred_pred_plus.
   elim (ProjT2 (RSR_h_f' _ (lt_pred' i n b1 b2))); intros.
   assumption.
@@ -545,7 +545,7 @@ Proof.
  elim (le_lt_dec m i); intro; simpl in |- *.
   exfalso; apply le_not_lt with m i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_g' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_g' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -583,37 +583,37 @@ Proof.
  assert (X'':=RSR_mn0); assert (X''':=RSR_nm0).
  elim (le_lt_dec i 0); intro.
   elim (le_lt_dec j 0); intros; simpl in |- *.
-   apply le_lt_trans with i; try apply lt_le_trans with j; auto with arith.
+   apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
   elim (le_lt_dec m j); intros; simpl in |- *.
    lia.
   apply lt_O_Sn.
  elim (le_lt_dec m i); elim (le_lt_dec j 0); intros; simpl in |- *.
-    elim (lt_irrefl 0); apply le_lt_trans with i; try apply lt_le_trans with j; auto with arith.
+    elim (lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
    elim (le_lt_dec m j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with m.
     repeat rewrite <- le_plus_minus; auto.
-   elim (le_not_lt m i); auto; apply lt_trans with j; auto.
-  elim (lt_irrefl 0); apply lt_trans with i; auto; apply lt_le_trans with j; auto.
+   elim (le_not_lt m i); auto; apply Nat.lt_trans with j; auto.
+  elim (lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec m j); intro; simpl in |- *.
-  set (H0 := RSR_nm0) in *; set (H1 := RSR_mn0) in *; apply lt_le_trans with (S (pred m + pred n)).
+  set (H0 := RSR_nm0) in *; set (H1 := RSR_mn0) in *; apply Nat.lt_le_trans with (S (pred m + pred n)).
    apply lt_n_S.
    apply (ProjT1 (ProjT2 (RSR_h_g' (pred i) (lt_pred' _ _ b0 b2)))).
   rewrite <- plus_Sn_m.
   rewrite <- S_pred with m 0.
-   2: apply lt_trans with i; auto.
+   2: apply Nat.lt_trans with i; auto.
   replace (m + pred n) with (pred (m + n)).
    auto with arith.
   cut (S (pred (m + n)) = S (m + pred n)); auto.
   rewrite plus_n_Sm.
   rewrite <- S_pred with n 0; auto with arith.
    symmetry  in |- *; apply S_pred with 0.
-   apply lt_le_trans with m; auto with arith.
-   apply lt_trans with i; auto.
+   apply Nat.lt_le_trans with m; auto with arith.
+   apply Nat.lt_trans with i; auto.
   apply neq_O_lt.
   intro.
   apply lt_irrefl with 0.
-  apply lt_trans with i; auto.
+  apply Nat.lt_trans with i; auto.
   rewrite RSR_nm0; auto.
  apply lt_n_S.
  cut (~ ~ ProjT1 (RSR_h_g' (pred i) (lt_pred' _ _ b0 b2)) <

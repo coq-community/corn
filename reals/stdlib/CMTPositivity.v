@@ -80,7 +80,7 @@ Proof.
   intros. simpl.
   destruct (Un_cv_nat_real un l cv (bound (S n)) (boundPos (S n))),
   (ControlSubSeqCv un l bound cv boundPos n).
-  apply (lt_le_trans _ (S x0)). apply le_n_S, le_refl.
+  apply (Nat.lt_le_trans _ (S x0)). apply le_n_S, le_refl.
   apply Nat.le_max_r.
 Qed.
 
@@ -323,7 +323,7 @@ Proof.
       reflexivity. do 2 rewrite <- Nat.sub_1_r.
       rewrite Nat.add_sub_assoc.
       rewrite Nat.add_comm, Nat.sub_add. reflexivity.
-      rewrite <- des. apply (le_trans _ (S (n (S n0)))).
+      rewrite <- des. apply (Nat.le_trans _ (S (n (S n0)))).
       apply le_S, le_refl. exact (ninc (S n0)).
       rewrite <- des. apply Nat.le_add_le_sub_r. apply ninc.
       apply CRlt_asym, CRpow_gt_zero. simpl.

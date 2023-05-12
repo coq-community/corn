@@ -622,7 +622,7 @@ Section implements_abstract_interface.
           with (i0 * / Zpos (w01ints * k) * proj1_sig totalw).
          apply sampling_over_subdivision...
          rewrite Pmult_comm.
-         apply lt_trans with (Pos.to_nat (i * wbints true))...
+         apply Nat.lt_trans with (Pos.to_nat (i * wbints true))...
          apply inj_lt_iff.
          rewrite Zlt_Qlt.
          do 2 rewrite ZL9.
@@ -678,7 +678,7 @@ Section implements_abstract_interface.
          ((Pos.to_nat (i * wbints true) + i0)%nat * / Zpos (intervals lmu a totalw (e * (1#2)) * k) * proj1_sig totalw).
         apply (sampling_over_subdivision f a (Pos.to_nat (i * wbints true) + i0) k (e*(1#2)) totalw).
         fold w01ints.
-        apply lt_le_trans with (Pos.to_nat (i * wbints true) + Pos.to_nat (j * wbints false)%positive)%nat...
+        apply Nat.lt_le_trans with (Pos.to_nat (i * wbints true) + Pos.to_nat (j * wbints false)%positive)%nat...
         apply inj_le_iff.
         rewrite Zle_Qle.
         rewrite inj_plus.

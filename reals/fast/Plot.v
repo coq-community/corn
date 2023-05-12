@@ -419,7 +419,7 @@ Proof.
     rewrite <- Qmult_assoc.
     setoid_replace ((1 # m) * inject_Z (Z.pos m)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
-    apply (le_trans _ (S j)).
+    apply (Nat.le_trans _ (S j)).
     apply le_S, le_refl. exact ltjm. 
   - unfold canonical_names.equiv, stdlib_rationals.Q_eq.
     rewrite Nat2Z.inj_sub.
@@ -433,6 +433,6 @@ Proof.
     rewrite <- Qmult_assoc.
     setoid_replace ((1 # n) * inject_Z (Z.pos n)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
-    apply (le_trans _ (S i)).
+    apply (Nat.le_trans _ (S i)).
     apply le_S, le_refl. exact ltin.
 Qed.

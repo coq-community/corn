@@ -179,8 +179,8 @@ Proof.
  autorewrite with QposElim.
  repeat (eapply AbsSmall_plus).
    apply AbsSmall_minus.
-   apply Ha;unfold n;apply le_trans with (max a b); auto with *.
-  apply Hb; unfold n;apply le_trans with (max a b); auto with *.
+   apply Ha;unfold n;apply Nat.le_trans with (max a b); auto with *.
+  apply Hb; unfold n;apply Nat.le_trans with (max a b); auto with *.
  apply Hc; unfold n;auto with *.
 Qed.
 
@@ -256,13 +256,13 @@ Proof.
    rewrite Zpos_eq_Z_of_nat_o_nat_of_P.
    apply inj_lt.
    apply le_lt_n_Sm.
-   apply le_trans with (max n (nat_of_P ed));auto with *.
+   apply Nat.le_trans with (max n (nat_of_P ed));auto with *.
   change (1*P_of_succ_nat m <= en * P_of_succ_nat m)%Z.
   apply Zmult_lt_0_le_compat_r;auto with *.
  stepl ((1#2)*(Z.pos en#ed)+(1#2)*(Z.pos en#ed))%Q; [| simpl; ring].
  rstepr ((x m[-]x n)[+](x n[-]x n')).
  assert (Y:n <= m).
-  apply le_trans with (max n (nat_of_P ed));auto with *.
+  apply Nat.le_trans with (max n (nat_of_P ed));auto with *.
  apply AbsSmall_plus.
   apply Hn.
   assumption.
@@ -490,8 +490,8 @@ Proof.
   simpl in H2.
   set (m:=max n (max n1 n2)).
   assert (m1:n<=m);[unfold m; auto with *|].
-  assert (m2:n1<=m);[unfold m; apply le_trans with (max n1 n2); auto with *|].
-  assert (m3:n2<=m);[unfold m; apply le_trans with (max n1 n2); auto with *|].
+  assert (m2:n1<=m);[unfold m; apply Nat.le_trans with (max n1 n2); auto with *|].
+  assert (m3:n2<=m);[unfold m; apply Nat.le_trans with (max n1 n2); auto with *|].
   apply (Qle_not_lt _ _ H1').
   eapply inv_cancel_less;simpl.
   clear H1'.
@@ -532,10 +532,10 @@ Proof.
  stepl (-((1 # 2) * proj1_sig e) + - ((1 # 2) * proj1_sig e))%Q; [| simpl; ring].
  apply plus_resp_leEq_both.
   refine (proj1 (Hn2 _ _)).
-  apply le_trans with n; [unfold n;auto with *|assumption].
+  apply Nat.le_trans with n; [unfold n;auto with *|assumption].
  apply inv_resp_leEq.
  refine (proj2 (Hn1 _ _)).
- apply le_trans with n; [unfold n;auto with *|assumption].
+ apply Nat.le_trans with n; [unfold n;auto with *|assumption].
 Qed.
 
 #[global]
@@ -587,15 +587,15 @@ Proof.
    apply Qpos_ispos.
    stepl (((1#2)*proj1_sig e/ proj1_sig z)* proj1_sig z)%Q;
      [| simpl;field;apply Qpos_nonzero].
-  apply mult_AbsSmall;[apply Hn1|apply Hz]; unfold n; apply le_trans with (max n1 N); auto with *.
+  apply mult_AbsSmall;[apply Hn1|apply Hz]; unfold n; apply Nat.le_trans with (max n1 N); auto with *.
  intros w Hw.
  simpl.
  destruct (Hy (proj1_sig w) (Qpos_ispos w)) as [n2 Hn2].
  pose (n:=(max (max n1 n2) (max n3 N))).
- assert (n1 <= n);[unfold n; apply le_trans with (max n1 n2); auto with *|].
- assert (n2 <= n);[unfold n; apply le_trans with (max n1 n2); auto with *|].
- assert (n3 <= n);[unfold n; apply le_trans with (max n3 N); auto with *|].
- assert (N <= n);[unfold n; apply le_trans with (max n3 N); auto with *|].
+ assert (n1 <= n);[unfold n; apply Nat.le_trans with (max n1 n2); auto with *|].
+ assert (n2 <= n);[unfold n; apply Nat.le_trans with (max n1 n2); auto with *|].
+ assert (n3 <= n);[unfold n; apply Nat.le_trans with (max n3 N); auto with *|].
+ assert (N <= n);[unfold n; apply Nat.le_trans with (max n3 N); auto with *|].
  change (Qball (proj1_sig e+proj1_sig e))
    with (@ball Q_as_MetricSpace (proj1_sig e + proj1_sig e)).
  apply ball_triangle with (x n * y n)%Q;[|eapply Hn3; assumption].
@@ -817,7 +817,7 @@ Proof.
  simpl in y.
  set (m:=max (max a n) (max b c)).
  assert (Hm1: c<=m).
-  unfold m; apply le_trans with (max b c); auto with *.
+  unfold m; apply Nat.le_trans with (max b c); auto with *.
  change (@ball Q_as_MetricSpace (proj1_sig e+proj1_sig e) (/ Qmax (proj1_sig z) (x b))%Q (y c)).
  apply ball_triangle with (y m);[|eapply Hc;assumption].
  clear Hc.
@@ -825,7 +825,7 @@ Proof.
  destruct (lt_le_dec m a) as [Z|Z].
   elim (le_not_lt _ _ Z).
   unfold m.
-  apply lt_le_trans with (S (max a n)); auto with *.
+  apply Nat.lt_le_trans with (S (max a n)); auto with *.
  change (AbsSmall (proj1_sig e) (/ Qmax (proj1_sig z) (x b)-1 * / x m))%Q.
  clear y.
  assert (T:(~ (x m == 0)%Q /\ ~ (Qmax (proj1_sig z) (x b) == 0)%Q)).
@@ -833,7 +833,7 @@ Proof.
    apply Qlt_le_trans with (proj1_sig z).
     apply Qpos_ispos.
    apply Hn.
-   apply le_trans with (max a n).
+   apply Nat.le_trans with (max a n).
     auto with *.
    unfold m; auto with *.
   apply Qlt_le_trans with (proj1_sig z); auto with *.
@@ -853,22 +853,22 @@ Proof.
   apply Qle_trans with (proj1_sig z).
    apply Qpos_nonneg.
   apply Hn.
-  apply le_trans with (max a n); unfold m; auto with *.
+  apply Nat.le_trans with (max a n); unfold m; auto with *.
  simpl in x_.
  apply (AbsSmall_leEq_trans _ (proj1_sig z*proj1_sig z*proj1_sig e)%Q).
   apply mult_resp_leEq_rht;[apply mult_resp_leEq_both|]; try apply Qpos_nonneg.
    apply Qmax_ub_l.
   apply Hn.
-  apply le_trans with (max a n); unfold m; auto with *.
+  apply Nat.le_trans with (max a n); unfold m; auto with *.
  assert (W:AbsSmall (R:=Q_as_COrdField) (proj1_sig z * proj1_sig z * proj1_sig e)%Q (x m - x b)%Q).
   apply Hb.
-  apply le_trans with (max b c); unfold m; auto with *.
+  apply Nat.le_trans with (max b c); unfold m; auto with *.
  apply Qmax_case;intros C;[|assumption].
  apply leEq_imp_AbsSmall.
   unfold Qminus.
   rewrite <- Qle_minus_iff.
   apply Hn.
-  apply le_trans with (max a n); unfold m; auto with *.
+  apply Nat.le_trans with (max a n); unfold m; auto with *.
  apply Qle_trans with (x m - x b)%Q.
   rewrite -> Qle_minus_iff.
   stepr (proj1_sig z + - x b)%Q; [| simpl; ring].

@@ -193,7 +193,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H1); clear H1; intro.
   cut (sub (S i) < sub n); [ intro | apply RL_sub_mon; assumption ].
   rewrite <- RL_sub_n.
-  apply le_lt_trans with (sub (S i)); auto; eapply le_trans; [ apply H0 | apply le_pred_n ].
+  apply Nat.le_lt_trans with (sub (S i)); auto; eapply Nat.le_trans; [ apply H0 | apply le_pred_n ].
  cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
  rewrite <- RL_sub_n.
  rewrite <- b0.
@@ -329,7 +329,7 @@ Proof.
       exfalso.
       cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
       cut (sub (S i) <= m); intros.
-       apply (le_not_lt _ _ H4); apply le_lt_trans with j; auto.
+       apply (le_not_lt _ _ H4); apply Nat.le_lt_trans with j; auto.
       rewrite <- RL_sub_n.
       apply RL_sub_mon'; apply Hi.
      apply mult_wd.

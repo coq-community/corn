@@ -262,7 +262,7 @@ Proof.
     apply Pos2Nat.inj_le.
     rewrite Nat2Pos.id.
     exact H1. 
-    apply (lt_le_trans _ _ _ (Pos2Nat.is_pos n)) in H1.
+    apply (Nat.lt_le_trans _ _ _ (Pos2Nat.is_pos n)) in H1.
     destruct k. inversion H1. discriminate.
     unfold Qle; simpl.
     apply (Z.mul_le_mono_nonneg_r 1 a (Z.pos n)).

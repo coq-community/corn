@@ -122,7 +122,7 @@ Qed.
 End narith.
 
 #[global]
-Hint Resolve le_trans: zarith.
+Hint Resolve Nat.le_trans: zarith.
 #[global]
 Hint Resolve minus_n_Sk: zarith.
 #[global]

@@ -244,7 +244,7 @@ Proof.
  destruct H as [i [ilt H]].
  rewrite combine_length, map_length, iterateN_succ_length in ilt.
  assert (i < Pos.to_nat m)%nat.
- { apply (lt_le_trans _ _ _ ilt), Nat.le_min_l. }
+ { apply (Nat.lt_le_trans _ _ _ ilt), Nat.le_min_l. }
  clear ilt.
  rewrite combine_nth in H.
  2: rewrite map_length, iterateN_succ_length, H1; reflexivity.
@@ -264,7 +264,7 @@ Proof.
  inversion H. clear H H4 x.
  rewrite combine_length, map_length, iterateN_succ_length in jlt.
  assert (j < Pos.to_nat n)%nat.
- { apply (lt_le_trans _ _ _ jlt). apply Nat.le_min_l. }
+ { apply (Nat.lt_le_trans _ _ _ jlt). apply Nat.le_min_l. }
  clear jlt.
  exists (i,j). split.
  - simpl.

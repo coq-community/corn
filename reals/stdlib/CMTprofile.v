@@ -212,8 +212,8 @@ Proof.
   - rewrite CRabs_opp, CRabs_right. apply CR_of_Q_le.
     unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_l.
     apply Pos2Z.pos_le_pos. rewrite Pos2Nat.inj_le, Nat2Pos.id.
-    2: discriminate. apply (le_trans _ _ _ H). simpl.
-    apply le_S. apply (le_trans _ (i+0)).
+    2: discriminate. apply (Nat.le_trans _ _ _ H). simpl.
+    apply le_S. apply (Nat.le_trans _ (i+0)).
     rewrite Nat.add_comm. apply le_refl.
     apply Nat.add_le_mono_l, le_0_n.
     apply CR_of_Q_le. discriminate.
@@ -979,11 +979,11 @@ Proof.
       apply CRle_refl.
       apply StepApproxIntegralIncr.
       apply BinarySubdivInside. apply CRlt_asym, ltab.
-      apply le_S_n in l0. apply (le_trans _ (S j)).
+      apply le_S_n in l0. apply (Nat.le_trans _ (S j)).
       apply le_S, le_refl. exact l0.
       apply (CRle_trans _ b). apply BinarySubdivInside.
       apply CRlt_asym, ltab. apply le_S_n, l0. apply CRlt_asym, (snd beta).
-      exfalso. pose proof (lt_le_trans _ _ _ l l0).
+      exfalso. pose proof (Nat.lt_le_trans _ _ _ l l0).
       apply (lt_not_le _ _ H0). apply le_S, le_refl.
       apply StepApproxIntegralIncr.
       apply CRlt_asym, BinarySubdivIncr. exact (pair aPos ltab).
@@ -1014,20 +1014,20 @@ Proof.
     apply StepApproxIntegralIncr.
     apply (CRle_trans _ a). apply CRlt_asym, (snd aeta).
     apply BinarySubdivInside. apply CRlt_asym, ltab.
-    apply le_S_n in l. apply (le_trans _ (S i)). apply le_S, le_refl.
+    apply le_S_n in l. apply (Nat.le_trans _ (S i)). apply le_S, le_refl.
     exact l. apply BinarySubdivInside. apply CRlt_asym, ltab.
     apply le_S_n, l.
   - exfalso. inversion H.
   - destruct (le_lt_dec (S (2 ^ n)) (S j)), (le_lt_dec (S (2 ^ S n)) (S i)).
     + apply CRle_refl.
     + exfalso. apply le_S_n in l0.
-      apply (le_trans _ _ _ H) in l0. clear H.
+      apply (Nat.le_trans _ _ _ H) in l0. clear H.
       apply (Nat.mul_le_mono_pos_l _ _ 2) in l0.
-      apply (le_trans _ _ _ l) in l0. apply (le_not_lt _ _ l0 (le_refl _)).
+      apply (Nat.le_trans _ _ _ l) in l0. apply (le_not_lt _ _ l0 (le_refl _)).
       apply le_n_S, le_0_n.
     + apply StepApproxIntegralIncr.
       apply BinarySubdivInside. apply CRlt_asym, ltab.
-      apply le_S_n in l. apply (le_trans _ (S j)).
+      apply le_S_n in l. apply (Nat.le_trans _ (S j)).
       apply le_S, le_refl. exact l. apply (CRle_trans _ b).
       apply BinarySubdivInside. apply CRlt_asym, ltab.
       apply le_S_n, l. apply CRlt_asym, (snd beta).
@@ -1043,7 +1043,7 @@ Proof.
       unfold Qmult, Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
       replace 2%Z with (Z.of_nat 2). 2: reflexivity.
       rewrite <- Nat2Z.inj_mul. apply Nat2Z.inj_le.
-      apply le_S_n. apply (le_trans _ (2*S j)). 2: exact H.
+      apply le_S_n. apply (Nat.le_trans _ (2*S j)). 2: exact H.
       rewrite Nat.mul_comm.
       simpl. rewrite Nat.add_0_r, Nat.add_succ_r. apply le_S, le_refl.
       apply CRplus_le_compat_l.
@@ -1057,7 +1057,7 @@ Proof.
       unfold Qmult, Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
       replace 2%Z with (Z.of_nat 2). 2: reflexivity.
       rewrite <- Nat2Z.inj_mul. apply Nat2Z.inj_le.
-      apply (le_trans _ (2*S j)). 2: exact H.
+      apply (Nat.le_trans _ (2*S j)). 2: exact H.
       rewrite Nat.mul_comm. apply le_refl.
 Qed.
 
@@ -1085,20 +1085,20 @@ Proof.
     apply StepApproxIntegralIncr. apply (CRle_trans _ a).
     apply CRlt_asym, aeta.
     apply BinarySubdivInside. apply CRlt_asym, ltab.
-    apply le_S_n in l. apply (le_trans _ (S j)). apply le_S, le_refl.
+    apply le_S_n in l. apply (Nat.le_trans _ (S j)). apply le_S, le_refl.
     exact l. apply BinarySubdivInside. apply CRlt_asym, ltab.
     apply le_S_n, l.
   - destruct (le_lt_dec (S (2 ^ n)) (S j)), (le_lt_dec (S (2 ^ S n)) (S i)).
     + apply CRle_refl.
     + apply StepApproxIntegralIncr.
       apply BinarySubdivInside. apply CRlt_asym, ltab.
-      apply le_S_n in l0. apply (le_trans _ (S i)). apply le_S, le_refl.
+      apply le_S_n in l0. apply (Nat.le_trans _ (S i)). apply le_S, le_refl.
       exact l0. apply (CRle_trans _ b).
       apply BinarySubdivInside. apply CRlt_asym, ltab.
       apply le_S_n, l0. apply CRlt_asym, (snd beta).
     + exfalso. apply le_S_n in l0. apply le_S_n in l.
-      apply (le_trans _ _ (2^S n)) in H.
-      apply (le_trans _ _ _ H) in l0. apply (le_not_lt _ _ l0).
+      apply (Nat.le_trans _ _ (2^S n)) in H.
+      apply (Nat.le_trans _ _ _ H) in l0. apply (le_not_lt _ _ l0).
       apply le_S, le_refl. apply Nat.mul_le_mono_nonneg_l.
       apply le_0_n. exact l.
     + clear l l0.
@@ -1130,7 +1130,7 @@ Proof.
       replace 2%Z with (Z.of_nat 2). 2: reflexivity.
       rewrite <- (Nat2Z.inj_mul (S j) 2). apply Nat2Z.inj_le.
       replace (S j * 2)%nat with (S (S (2*j))). apply le_n_S.
-      apply (le_trans _ _ _ H). apply le_S, le_refl.
+      apply (Nat.le_trans _ _ _ H). apply le_S, le_refl.
       rewrite (Nat.mul_comm (S j)). simpl.
       rewrite Nat.add_0_r, Nat.add_succ_r. reflexivity.
 Qed.
@@ -1270,7 +1270,7 @@ Proof.
       rewrite <- CR_of_Q_plus. apply CR_of_Q_le.
       unfold Qplus, Qle, Qnum, Qden. do 4 rewrite Z.mul_1_r.
       replace 1%Z with (Z.of_nat 1). rewrite <- Nat2Z.inj_add.
-      apply Nat2Z.inj_le. apply (le_trans _ i _ l1).
+      apply Nat2Z.inj_le. apply (Nat.le_trans _ i _ l1).
       rewrite Nat.add_comm. apply le_S, le_refl.
       reflexivity.
       rewrite <- CR_of_Q_mult. apply CR_of_Q_morph. reflexivity.
@@ -1304,7 +1304,7 @@ Proof.
         replace 1%Z with (Z.of_nat 1). rewrite <- Nat2Z.inj_add. 2: reflexivity.
         replace 2%Z with (Z.of_nat 2). rewrite <- Nat2Z.inj_mul. 2: reflexivity.
         apply Nat2Z.inj_le. apply le_S_n.
-        apply (le_trans _ _ _ l1).
+        apply (Nat.le_trans _ _ _ l1).
         rewrite (Nat.mul_comm (i+1)). apply le_S. rewrite Nat.add_comm.
         apply le_refl.
 Qed.
@@ -1367,7 +1367,7 @@ Proof.
     destruct (le_lt_dec (S (2 ^ n)) (S j)).
     exfalso. apply le_S_n in l1. exact (le_not_lt _ _ l1 l0).
     destruct (le_lt_dec (S (2 ^ n)) (S i)).
-    apply le_S_n in l1. apply le_S_n in l2. exact (le_trans _ _ _ l1 l2).
+    apply le_S_n in l1. apply le_S_n in l2. exact (Nat.le_trans _ _ _ l1 l2).
     destruct (le_lt_dec (S j) i). exact l3. exfalso.
     apply (StepApproxIntegralIncr
              f fInt
@@ -2038,13 +2038,13 @@ Proof.
     rewrite CRopp_0, CRplus_0_r. rewrite CRabs_right.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_l.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite Nat2Pos.id. apply (le_trans _ _ _ H3).
+    rewrite Nat2Pos.id. apply (Nat.le_trans _ _ _ H3).
     apply le_S, le_refl. discriminate.
     apply CR_of_Q_le. discriminate. }
   destruct (CR_cv_open_above an x 0 stepCv H2) as [i imaj].
   destruct (CRup_nat x) as [j jmaj].
   specialize (imaj (max n (max i j))
-                   (le_trans _ _ _ (Nat.le_max_l i j) (Nat.le_max_r _ _))).
+                   (Nat.le_trans _ _ _ (Nat.le_max_l i j) (Nat.le_max_r _ _))).
   specialize (H5 (max n (max i j))).
   destruct (H1 (max n (max i j))) as [s a0], a0, H6, H7.
   (* Locate x in an open interval ]s k, s (k+1)[ *)
@@ -2052,9 +2052,9 @@ Proof.
   split. rewrite H3. exact imaj. rewrite H6.
   apply (CRlt_le_trans _ _ _ jmaj). apply CR_of_Q_le.
   unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
-  apply Nat2Z.inj_le. apply (le_trans _ (2+j)).
+  apply Nat2Z.inj_le. apply (Nat.le_trans _ (2+j)).
   apply le_S, le_S, le_refl. apply le_n_S, le_n_S.
-  exact (le_trans _ _ _ (Nat.le_max_r i _) (Nat.le_max_r _ _)).
+  exact (Nat.le_trans _ _ _ (Nat.le_max_r i _) (Nat.le_max_r _ _)).
   apply le_refl.
   destruct (IntervalOpenEta (s k) (s (S k)) x kmaj) as [eta etamaj].
   destruct etamaj.

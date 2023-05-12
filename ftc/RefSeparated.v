@@ -168,7 +168,7 @@ Proof.
  intros j Hj H; intros.
  elim (Cnat_total_order _ _ H0); clear H0; intro H0.
   elim (le_lt_dec j' m); intro.
-   cut (S j <= m); [ intro | clear H; apply le_trans with j'; auto ].
+   cut (S j <= m); [ intro | clear H; apply Nat.le_trans with j'; auto ].
    eapply less_wdr.
     2: apply AbsIR_minus.
    cut (R (S j) H1[<=]R j' Hj'); intros.
@@ -207,7 +207,7 @@ Proof.
    assumption.
   exfalso; apply (le_not_lt j' m); auto.
  elim (le_lt_dec j 0); intro.
-  exfalso; apply lt_n_O with j'; red in |- *; apply le_trans with j; auto.
+  exfalso; apply lt_n_O with j'; red in |- *; apply Nat.le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
  set (jj := pred j) in *.
  cut (j = S jj); [ intro | unfold jj in |- *; apply S_pred with 0; auto ].
@@ -498,8 +498,8 @@ Proof.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec i 0); elim (le_lt_dec j 0); intros; simpl in |- *.
     algebra.
-   exfalso; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
-  exfalso; apply (lt_irrefl 0); apply lt_le_trans with j; auto; rewrite <- H; auto.
+   exfalso; apply (lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
+  exfalso; apply (lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
     apply sep__sep_fun_i_wd; auto.
    exfalso; rewrite H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
@@ -534,7 +534,7 @@ Proof.
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun in |- *; simpl in |- *.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply lt_le_trans with i; auto.
+  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
   apply sep__sep_ap.
  exfalso; rewrite b1 in H1; apply (lt_irrefl _ H1).
@@ -796,7 +796,7 @@ Proof.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.
   exfalso; rewrite b2 in a0; apply lt_irrefl with (S n);
-    apply lt_trans with (S n); auto with arith.
+    apply Nat.lt_trans with (S n); auto with arith.
  elim (le_lt_dec i 0); intro; simpl in |- *.
   cut (i = 0); [ intro | auto with arith ].
   rewrite H0 in b1.

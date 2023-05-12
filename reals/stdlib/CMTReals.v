@@ -1163,7 +1163,7 @@ Proof.
     rewrite CRopp_0, CRplus_0_r. rewrite CRabs_right.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_l.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite Nat2Pos.id. apply (le_trans _ _ _ H0). rewrite Nat.add_comm.
+    rewrite Nat2Pos.id. apply (Nat.le_trans _ _ _ H0). rewrite Nat.add_comm.
     apply le_S, le_S, le_refl. intro abs. rewrite Nat.add_comm in abs. discriminate.
     apply CR_of_Q_le. discriminate.
     rewrite CRmult_0_l. reflexivity. rewrite CRplus_0_r. reflexivity. }
@@ -1191,9 +1191,9 @@ Proof.
     simpl. rewrite CSUCTrapezePlateau. unfold CRminus.
     rewrite CRplus_opp_r, CRabs_right. 
     apply CR_of_Q_le. discriminate. apply CRle_refl.
-    split; apply CRlt_asym. apply c. apply (le_trans _ (max x1 x2)).
+    split; apply CRlt_asym. apply c. apply (Nat.le_trans _ (max x1 x2)).
     apply Nat.le_max_l. exact H2. apply c0.
-    apply (le_trans _ (max x1 x2)). apply Nat.le_max_r. exact H2. }
+    apply (Nat.le_trans _ (max x1 x2)). apply Nat.le_max_r. exact H2. }
 
   assert (forall n:nat, a + (b - a) * CR_of_Q R (1 # Pos.of_nat (n + 2))
                  <= b - (b - a) * CR_of_Q R (1 # Pos.of_nat (n + 2))) as fnL.

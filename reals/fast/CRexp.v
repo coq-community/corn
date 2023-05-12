@@ -145,7 +145,7 @@ Proof.
   apply Pos2Nat.inj_le.
   rewrite Nat2Pos.id.
   2: apply fact_neq_0.
-  refine (le_trans _ _ _ _ H).
+  refine (Nat.le_trans _ _ _ _ H).
   clear H. generalize p.
   apply Pos.peano_ind.
   + apply le_refl.

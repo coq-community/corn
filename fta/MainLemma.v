@@ -244,7 +244,7 @@ Proof.
   rstepl (a i[*] (r[^]i[*]Three[^]i) [-]eps).
   astepl (a i[*] (r[*]Three) [^]i[-]eps).
   apply H2; auto with arith.
-  apply le_trans with (S k); auto.
+  apply Nat.le_trans with (S k); auto.
  astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*][1][/] Three[^]i[//]H3 i)).
  astepl (Sum (S k) n (fun i : nat => (a k[*] (r[*]Three) [^]k[+]eps) [*] ([1][/] Three[^]i[//]H3 i))).
  apply leEq_wdl with ((a k[*] (r[*]Three) [^]k[+]eps) [*]
@@ -463,7 +463,7 @@ Proof.
   intros i0 H17 H18.
   rewrite <- H12.
   apply H8; auto with arith.
-  apply le_trans with (S j); auto with arith.
+  apply Nat.le_trans with (S j); auto with arith.
  split.
   astepl ([1][*] (t[*]p3m (S j)) [^]n).
   astepl (a n[*] (t[*]p3m (S j)) [^]n).

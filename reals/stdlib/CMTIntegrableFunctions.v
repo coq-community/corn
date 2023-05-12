@@ -376,7 +376,7 @@ Proof.
                CRsum (fun _ : nat => 0)
                  (if Nat.even (i * 2) then Init.Nat.pred i else i)
            end) with (CR_of_Q R 0) in cv.
-    rewrite CRplus_0_r in cv. apply cv. apply (le_trans _ i).
+    rewrite CRplus_0_r in cv. apply cv. apply (Nat.le_trans _ i).
     assumption. rewrite mult_comm. simpl. rewrite <- (plus_0_r i).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply le_0_n.
     destruct (i*2)%nat eqn:des. reflexivity.
@@ -407,8 +407,8 @@ Proof.
       exfalso. assert (Nat.Odd (1+n*2)). exists n. rewrite plus_comm.
       rewrite mult_comm. reflexivity. apply Nat.odd_spec in H3.
       unfold Nat.odd in H3. rewrite des in H3. inversion H3.
-      apply cv. apply (le_trans N n). assumption.
-      apply (le_trans n (n*2)). rewrite <- (mult_1_r n).
+      apply cv. apply (Nat.le_trans N n). assumption.
+      apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
       rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
       apply le_0_n. apply le_S. apply le_refl.
       rewrite <- (plus_0_l (n*2)). rewrite plus_assoc.
@@ -435,15 +435,15 @@ Proof.
     setoid_replace (1 # n)%Q with ((1 # (2*n)) + (1 # (2*n)))%Q.
     apply le_S_n in H1. rewrite CR_of_Q_plus. apply CRplus_le_compat.
     apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
-    auto. apply (le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
-    apply (le_trans _ i). assumption.
+    auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
+    apply (Nat.le_trans _ i). assumption.
     apply le_S. apply le_refl. auto.
     apply H0. assert (N0 = pred (S N0)). reflexivity.
     rewrite H2. apply le_pred. rewrite <- (Nat.div_mul (S N0) 2).
     apply Nat.div_le_mono. auto.
-    apply (le_trans _ (N*2 + (S N0)*2)).
+    apply (Nat.le_trans _ (N*2 + (S N0)*2)).
     rewrite plus_comm. apply Nat.le_add_r.
-    apply (le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply le_refl. auto.
+    apply (Nat.le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.
     unfold CRminus. do 2 rewrite CRplus_assoc.
     apply CRplus_morph. reflexivity. rewrite CRopp_plus_distr, CRplus_comm.
@@ -454,15 +454,15 @@ Proof.
     setoid_replace (1 # n)%Q with ((1 # (2*n)) + (1 # (2*n)))%Q.
     apply le_S_n in H1. rewrite CR_of_Q_plus. apply CRplus_le_compat.
     apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
-    auto. apply (le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
-    apply (le_trans _ i). assumption. apply le_S. apply le_refl. auto.
+    auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
+    apply (Nat.le_trans _ i). assumption. apply le_S. apply le_refl. auto.
     apply H0. rewrite <- (Nat.div_mul N0 2).
     apply Nat.div_le_mono. auto.
-    apply (le_trans (N0*2) (N*2 + (S N0)*2)). rewrite plus_comm.
-    apply (le_trans (N0 * 2) (S N0 * 2)).
+    apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite plus_comm.
+    apply (Nat.le_trans (N0 * 2) (S N0 * 2)).
     apply mult_le_compat_r. apply le_S. apply le_refl.
     apply Nat.le_add_r.
-    apply (le_trans _ i). assumption. apply le_S. apply le_refl. auto.
+    apply (Nat.le_trans _ i). assumption. apply le_S. apply le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.
     unfold CRminus. do 2 rewrite CRplus_assoc.
     apply CRplus_morph. reflexivity. rewrite CRopp_plus_distr, CRplus_comm.
@@ -485,7 +485,7 @@ Proof.
       { rewrite <- (CRsum_eq (fun k => 0)). rewrite sum_const.
         apply CRmult_0_l. intros.
         destruct (le_dec (S N + i)). exfalso. assert (S N <= N)%nat.
-        apply (le_trans (S N) (S N + i)). apply Nat.le_add_r. assumption.
+        apply (Nat.le_trans (S N) (S N + i)). apply Nat.le_add_r. assumption.
         exact (Nat.nle_succ_diag_l N H1). reflexivity. }
       rewrite H0. rewrite CRplus_0_r.
       rewrite (CRsum_eq u (fun n1 : nat => if le_dec n1 N then u n1 else 0)).
