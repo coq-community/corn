@@ -558,7 +558,7 @@ Proof.
    rstepr (nring (R:=R1) m).
    astepl (nring (R:=R1) 1).
     apply nring_less.
-    apply lt_trans with (m := 3).
+    apply Nat.lt_trans with (m := 3).
      constructor.
      constructor.
     apply lt_S_n.
@@ -785,7 +785,7 @@ Proof.
  induction  n as [| n Hrecn].
   apply False_rect.
   apply (lt_n_O 0).
-  apply lt_trans with (m := 1).
+  apply Nat.lt_trans with (m := 1).
    apply lt_O_Sn.
   assumption.
  case (le_lt_eq_dec 2 (S n) (lt_le_S 1 (S n) H0)).
@@ -952,11 +952,11 @@ Proof.
    rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
    apply AbsSmall_plus.
     apply H2.
-    apply le_trans with (m := N1 + N2).
+    apply Nat.le_trans with (m := N1 + N2).
      apply le_plus_l.
     assumption.
    apply H3.
-   apply le_trans with (m := N1 + N2).
+   apply Nat.le_trans with (m := N1 + N2).
     apply le_plus_r.
    assumption.
   unfold B in |- *.
@@ -1053,11 +1053,11 @@ Proof.
    rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
    apply AbsSmall_plus.
     apply a.
-    apply le_trans with (m := N1 + N2).
+    apply Nat.le_trans with (m := N1 + N2).
      apply le_plus_l.
     assumption.
    apply a0.
-   apply le_trans with (m := N1 + N2).
+   apply Nat.le_trans with (m := N1 + N2).
     apply le_plus_r.
    assumption.
   unfold B in |- *.

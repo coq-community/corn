@@ -154,7 +154,7 @@ Proof.
    apply Qpos_nonneg.
   apply ball_triangle with (f n);[|apply ball_sym]; rewrite <- CRAbsSmall_ball; apply Hn.
    auto.
-  apply le_trans with m; auto.
+  apply Nat.le_trans with m; auto.
  (*Archimedean*)
  intros x.
  assert (X:=(CR_b_upperBound (1#1) x)).

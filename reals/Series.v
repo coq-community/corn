@@ -168,9 +168,9 @@ Proof.
    rstepl (eps [/]TwoNZ[+]eps [/]TwoNZ).
    apply AbsSmall_plus.
     apply HN.
-    apply le_trans with (max N 1); auto with arith.
+    apply Nat.le_trans with (max N 1); auto with arith.
    apply AbsSmall_minus; apply HN.
-   apply le_trans with (max N 1); auto with arith.
+   apply Nat.le_trans with (max N 1); auto with arith.
   rational.
  eapply eq_transitive_unfolded.
   apply seq_part_sum_n; auto with arith.
@@ -562,10 +562,10 @@ Proof.
   rstepr (x m[-]x N[+] (x N[-]x (max n N))).
   rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
   apply AbsSmall_plus.
-   apply HN; apply le_trans with (max n N); auto with arith.
-  apply AbsSmall_minus; apply HN; apply le_trans with (max n N); auto with arith.
+   apply HN; apply Nat.le_trans with (max n N); auto with arith.
+  apply AbsSmall_minus; apply HN; apply Nat.le_trans with (max n N); auto with arith.
  apply cg_minus_wd; apply Hn.
-  apply le_trans with (max n N); auto with arith.
+  apply Nat.le_trans with (max n N); auto with arith.
  apply le_max_l.
 Qed.
 
@@ -579,9 +579,9 @@ Proof.
  exists (max n N).
  intros.
  apply AbsSmall_wdr_unfolded with (x m[-]c).
-  apply HN; apply le_trans with (max n N); auto with arith.
+  apply HN; apply Nat.le_trans with (max n N); auto with arith.
  apply cg_minus_wd; [ apply Hn | algebra ].
- apply le_trans with (max n N); auto with arith.
+ apply Nat.le_trans with (max n N); auto with arith.
 Qed.
 
 Lemma aew_series_conv : convergent x -> convergent y.
@@ -598,22 +598,22 @@ Proof.
   apply AbsSmall_plus.
    apply HN; cut (N <= k).
     lia.
-   apply le_trans with (max n N); unfold k in |- *; auto with arith.
+   apply Nat.le_trans with (max n N); unfold k in |- *; auto with arith.
   apply AbsSmall_minus; apply HN; auto.
-  apply le_trans with (max n N); unfold k in |- *; auto with arith.
+  apply Nat.le_trans with (max n N); unfold k in |- *; auto with arith.
  cut (1 <= k); intros.
   eapply eq_transitive_unfolded.
    apply seq_part_sum_n; auto.
-   apply lt_le_trans with k; auto.
+   apply Nat.lt_le_trans with k; auto.
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply seq_part_sum_n; auto.
-   2: apply lt_le_trans with k; auto.
+   2: apply Nat.lt_le_trans with k; auto.
   apply Sum_wd'.
    rewrite <- S_pred with m 0; auto with arith.
-   apply lt_le_trans with k; auto.
+   apply Nat.lt_le_trans with k; auto.
   intros; apply Hn.
-  apply le_trans with (max n N); auto with arith.
-  apply le_trans with k; unfold k in |- *; auto with arith.
+  apply Nat.le_trans with (max n N); auto with arith.
+  apply Nat.le_trans with k; unfold k in |- *; auto with arith.
  unfold k in |- *; apply le_max_r.
 Qed.
 
@@ -673,18 +673,18 @@ Proof.
    apply leEq_transitive with (Sum N (pred m) (fun n : nat => AbsIR (x n))).
     apply leEq_wdl with (AbsIR (Sum N (pred m) x)).
      2: apply AbsIR_wd; apply eq_symmetric_unfolded; apply seq_part_sum_n; auto.
-     2: apply lt_le_trans with N; auto; apply le_lt_trans with k; auto with arith.
+     2: apply Nat.lt_le_trans with N; auto; apply Nat.le_lt_trans with k; auto with arith.
     apply triangle_SumIR.
     rewrite <- (S_pred m k); auto with arith.
-    apply lt_le_trans with N; auto.
+    apply Nat.lt_le_trans with N; auto.
    eapply leEq_wdr.
     2: apply eq_symmetric_unfolded; apply seq_part_sum_n; auto.
-    2: apply le_lt_trans with k; auto with arith; apply lt_le_trans with N; auto.
+    2: apply Nat.le_lt_trans with k; auto with arith; apply Nat.lt_le_trans with N; auto.
    apply Sum_resp_leEq.
     rewrite <- (S_pred m k); auto with arith.
-    apply lt_le_trans with N; auto.
+    apply Nat.lt_le_trans with N; auto.
    intros.
-   apply Hk; apply le_trans with N; auto with arith.
+   apply Hk; apply Nat.le_trans with N; auto with arith.
   eapply leEq_transitive.
    apply leEq_AbsIR.
   apply AbsSmall_imp_AbsIR.
@@ -699,7 +699,7 @@ Proof.
  rstepr (seq_part_sum y m[-]seq_part_sum y N[+] (seq_part_sum y N[-]seq_part_sum y (S (max N k)))).
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
-  apply HN; apply le_trans with (max N k); auto with arith.
+  apply HN; apply Nat.le_trans with (max N k); auto with arith.
  apply AbsSmall_minus; apply HN; auto with arith.
 Qed.
 
@@ -764,7 +764,7 @@ Proof.
     (seq_part_sum y M[-]seq_part_sum y (S (max N M) + k))).
   apply AbsSmall_plus.
    apply HM.
-   apply le_trans with (max N M); auto with arith.
+   apply Nat.le_trans with (max N M); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   auto with arith.
@@ -773,18 +773,18 @@ Proof.
   unfold Sum, Sum1 in |- *.
   rewrite <- S_pred with (m := 0).
    algebra.
-  apply lt_le_trans with (S (max N M)); auto with arith.
+  apply Nat.lt_le_trans with (S (max N M)); auto with arith.
  astepr (Sum (S (max N M)) (pred m) x).
   2: unfold Sum, Sum1 in |- *.
   2: rewrite <- S_pred with (m := 0).
    2: algebra.
-  2: apply lt_le_trans with (S (max N M)); auto with arith.
+  2: apply Nat.lt_le_trans with (S (max N M)); auto with arith.
  replace (pred (m + k)) with (pred m + k).
   apply eq_symmetric_unfolded; apply Sum_big_shift.
    intros; apply HN.
-   apply le_trans with (max N M); auto with arith.
+   apply Nat.le_trans with (max N M); auto with arith.
   rewrite <- S_pred with (m := 0); auto.
-  apply lt_le_trans with (S (max N M)); auto with arith.
+  apply Nat.lt_le_trans with (S (max N M)); auto with arith.
  lia.
 Qed.
 
@@ -806,16 +806,16 @@ Proof.
    apply HM.
    apply (fun p n m : nat => plus_le_reg_l n m p) with k.
    rewrite <- le_plus_minus.
-    apply le_trans with (max N M + k); auto with arith.
+    apply Nat.le_trans with (max N M + k); auto with arith.
     rewrite plus_comm; auto with arith.
-   apply le_trans with (S (max N M + k)); auto with arith.
+   apply Nat.le_trans with (S (max N M + k)); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   apply (fun p n m : nat => plus_le_reg_l n m p) with k.
   rewrite <- le_plus_minus.
-   apply le_trans with (max N M + k); auto.
+   apply Nat.le_trans with (max N M + k); auto.
    rewrite plus_comm; auto with arith.
-  apply le_trans with (S (max N M + k)); auto with arith.
+  apply Nat.le_trans with (S (max N M + k)); auto with arith.
  unfold seq_part_sum in |- *.
  apply eq_transitive_unfolded with (Sum (S (max N M + k) - k) (pred (m - k)) x).
   unfold Sum, Sum1 in |- *.
@@ -833,11 +833,11 @@ Proof.
   2: lia.
  apply Sum_big_shift.
   intros; apply HN.
-  apply le_trans with (max N M); auto with arith.
+  apply Nat.le_trans with (max N M); auto with arith.
   lia.
  rewrite <- S_pred with (m := 0); auto.
   lia.
- apply lt_le_trans with (S (max N M)); auto with arith.
+ apply Nat.lt_le_trans with (S (max N M)); auto with arith.
  lia.
 Qed.
 
@@ -919,7 +919,7 @@ Proof.
   intro n.
   cut (S N <= max (S N) n); [ intro | apply le_max_l ].
   elim (H _ H0); intros m Hm; elim Hm; clear H Hm; intros Hm H; exists m.
-   apply le_trans with (max (S N) n); auto with arith.
+   apply Nat.le_trans with (max (S N) n); auto with arith.
   assumption.
  intros; exists n.
  split.
@@ -1225,7 +1225,7 @@ Proof.
   elim (even_odd_dec N); intro.
    apply AbsIR_wd.
    eapply eq_transitive_unfolded.
-    apply seq_part_sum_n; auto; apply lt_le_trans with N; auto.
+    apply seq_part_sum_n; auto; apply Nat.lt_le_trans with N; auto.
    eapply eq_transitive_unfolded.
     2: apply Sum_comm_scal'.
    apply Sum_wd.
@@ -1241,7 +1241,7 @@ Proof.
    2: apply eq_symmetric_unfolded; apply AbsIR_inv.
   apply AbsIR_wd.
   eapply eq_transitive_unfolded.
-   apply seq_part_sum_n; auto; apply lt_le_trans with N; auto.
+   apply seq_part_sum_n; auto; apply Nat.lt_le_trans with N; auto.
   rstepr ( [--] ( [--][1][^]N) [*]Sum N (pred m) y).
   eapply eq_transitive_unfolded.
    2: apply Sum_comm_scal'.

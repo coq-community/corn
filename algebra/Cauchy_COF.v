@@ -112,8 +112,8 @@ Proof.
        unfold z0 in |- *; elim (HNz NN); auto; unfold NN in |- *; eauto with arith.
       apply shift_minus_leEq; apply shift_leEq_plus'.
       unfold cg_minus in |- *; apply shift_plus_leEq'.
-      elim (HNz n); auto; apply le_trans with NN; auto; unfold NN in |- *; eauto with arith.
-     elim (HNx n); auto; apply le_trans with NN; auto; unfold NN in |- *; eauto with arith.
+      elim (HNz n); auto; apply Nat.le_trans with NN; auto; unfold NN in |- *; eauto with arith.
+     elim (HNx n); auto; apply Nat.le_trans with NN; auto; unfold NN in |- *; eauto with arith.
     apply shift_minus_leEq; apply shift_leEq_plus'.
     unfold cg_minus in |- *; apply shift_plus_leEq'.
     unfold x0 in |- *; elim (HNx NN); auto; unfold NN in |- *; eauto with arith.
@@ -133,10 +133,10 @@ Proof.
       apply shift_minus_leEq; apply shift_leEq_plus'.
       unfold cg_minus in |- *; apply shift_plus_leEq'.
       unfold z0 in |- *; elim (HNz NN); auto; unfold NN in |- *; eauto with arith.
-     elim (HNz n); auto; apply le_trans with NN; auto; unfold NN in |- *; eauto with arith.
+     elim (HNz n); auto; apply Nat.le_trans with NN; auto; unfold NN in |- *; eauto with arith.
     apply shift_minus_leEq; apply shift_leEq_plus'.
     unfold cg_minus in |- *; apply shift_plus_leEq'.
-    elim (HNy n); auto; apply le_trans with NN; auto; unfold NN in |- *; eauto with arith.
+    elim (HNy n); auto; apply Nat.le_trans with NN; auto; unfold NN in |- *; eauto with arith.
    unfold y0 in |- *; elim (HNy NN); auto; unfold NN in |- *; eauto with arith.
   apply shift_minus_leEq.
   rstepr (y0[-]z0).
@@ -378,8 +378,8 @@ Proof.
       unfold KK in |- *; apply div_resp_pos; auto.
       apply mult_resp_pos; auto; apply pos_three.
      intros; simpl in |- *; unfold KK in |- *.
-     cut (N <= n); [ intro Hn | apply le_trans with (max N Ny); auto with arith ].
-     cut (Ny <= n); [ intro Hn' | apply le_trans with (max N Ny); auto with arith ].
+     cut (N <= n); [ intro Hn | apply Nat.le_trans with (max N Ny); auto with arith ].
+     cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (max N Ny); auto with arith ].
      apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
       apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
        apply recip_resp_pos; auto.
@@ -402,8 +402,8 @@ Proof.
      unfold KK in |- *; apply div_resp_pos; auto.
      apply mult_resp_pos; auto; apply pos_three.
     intros; simpl in |- *; unfold KK in |- *.
-    cut (N <= n); [ intro Hn | apply le_trans with (max N Ny); auto with arith ].
-    cut (Ny <= n); [ intro Hn' | apply le_trans with (max N Ny); auto with arith ].
+    cut (N <= n); [ intro Hn | apply Nat.le_trans with (max N Ny); auto with arith ].
+    cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (max N Ny); auto with arith ].
     apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
      apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
       apply recip_resp_pos; auto.
@@ -885,19 +885,19 @@ Proof.
   rstepr (x_ m[-]x_ N1[+] (x_ N1[-]x_ m0)).
   apply AbsSmall_plus.
    apply px2.
-   apply le_trans with NN; assumption.
+   apply Nat.le_trans with NN; assumption.
   apply AbsSmall_minus.
   apply px2.
-  apply le_trans with NN; assumption.
+  apply Nat.le_trans with NN; assumption.
  unfold e8 in |- *.
  rstepl (e [/]SixteenNZ[+]e [/]SixteenNZ).
  rstepr (y_ m0[-]y_ N2[+] (y_ N2[-]y_ m)).
  apply AbsSmall_plus.
   apply py2.
-  apply le_trans with NN; assumption.
+  apply Nat.le_trans with NN; assumption.
  apply AbsSmall_minus.
  apply py2.
- apply le_trans with NN; assumption.
+ apply Nat.le_trans with NN; assumption.
 Qed.
 
 Lemma R_ap_alt_2 : forall x y : R_CSetoid, {e : F | [0] [<] e |
@@ -927,9 +927,9 @@ Proof.
  assert (N_NN : N <= NN).
   unfold NN in |- *; auto with arith.
  assert (N1_NN : N1 <= NN).
-  unfold NN in |- *; apply le_trans with (max N1 N2); auto with arith.
+  unfold NN in |- *; apply Nat.le_trans with (max N1 N2); auto with arith.
  assert (N2_NN : N2 <= NN).
-  unfold NN in |- *; apply le_trans with (max N1 N2); auto with arith.
+  unfold NN in |- *; apply Nat.le_trans with (max N1 N2); auto with arith.
  set (x0 := x_ NN) in *.
  set (y0 := y_ NN) in *.
  simpl in |- *.
@@ -961,7 +961,7 @@ Proof.
     rstepr (x_ m[-]x_ N1[+] (x_ N1[-]x0)).
     apply plus_resp_leEq_both.
      assert (H7 : AbsSmall e16 (x_ m[-]x_ N1)).
-      apply H31; apply le_trans with NN; auto.
+      apply H31; apply Nat.le_trans with NN; auto.
      elim H7; intros.
      rstepl ([--]e16).
      assumption.
@@ -986,7 +986,7 @@ Proof.
   assert (H7 : AbsSmall e16 (y_ N2[-]y_ m)).
    apply AbsSmall_minus.
    apply H41.
-   apply le_trans with NN; auto.
+   apply Nat.le_trans with NN; auto.
   elim H7; intros.
   rstepl ([--]e16).
   assumption.
@@ -1006,7 +1006,7 @@ Proof.
    apply plus_resp_leEq_both.
     assert (H8 : AbsSmall e16 (y_ m[-]y_ N2)).
      apply H41.
-     apply le_trans with NN; auto.
+     apply Nat.le_trans with NN; auto.
     elim H8; intros.
     rstepl ([--]e16).
     assumption.
@@ -1033,7 +1033,7 @@ Proof.
  assert (H8 : AbsSmall e16 (x_ N1[-]x_ m)).
   apply AbsSmall_minus.
   apply H31.
-  apply le_trans with NN; auto.
+  apply Nat.le_trans with NN; auto.
  elim H8; intros.
  rstepl ([--]e16).
  assumption.

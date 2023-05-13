@@ -348,7 +348,7 @@ Proof.
      elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
       cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
       exfalso; apply (le_not_lt (f n) i); auto.
-      apply le_trans with (f (S n)); auto with arith.
+      apply Nat.le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
        elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try exfalso; try lia.
     rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
@@ -356,7 +356,7 @@ Proof.
         rewrite <- H3; apply lt_le_weak; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);
      [intro; simpl in |- *; exfalso; lia| reflexivity].
-  apply lt_trans with (f n); auto with arith.
+  apply Nat.lt_trans with (f n); auto with arith.
  red in |- *; intros; rewrite -> H1; reflexivity.
 Qed.
 

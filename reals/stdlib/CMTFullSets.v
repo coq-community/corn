@@ -168,9 +168,9 @@ Proof.
   { intros. unfold diagPlane. apply plus_lt_le_compat. assumption.
     apply Nat.div_le_mono. auto. apply mult_le_compat.
     apply plus_le_compat. apply le_refl. unfold lt in H0.
-    apply (le_trans _ (S a)). apply le_S. apply le_refl. assumption.
+    apply (Nat.le_trans _ (S a)). apply le_S. apply le_refl. assumption.
     apply le_n_S. apply plus_le_compat. apply le_refl. unfold lt in H0.
-    apply (le_trans _ (S a)). apply le_S. apply le_refl. assumption. }
+    apply (Nat.le_trans _ (S a)). apply le_S. apply le_refl. assumption. }
   pose proof (CR_complete R _ cvDiag) as [lim cvlim].
   destruct (SubSeriesCv (fun k : nat =>
                 CRabs _ (partialApply (diagSeq fnk k) x (xnDiag k)))
@@ -486,7 +486,7 @@ Proof.
     rewrite (CRsum_eq (fun i : nat => un (N + S i)%nat) (fun i : nat => un (S N + i)%nat)).
     rewrite CRplus_assoc.
     rewrite <- sum_assoc. rewrite CRplus_comm. simpl in maj. apply maj.
-    apply (le_trans k (S i)). assumption. simpl.
+    apply (Nat.le_trans k (S i)). assumption. simpl.
     apply le_n_S. rewrite plus_comm. rewrite <- (plus_0_r i). rewrite <- plus_assoc.
     apply Nat.add_le_mono_l. apply le_0_n.
     intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
@@ -506,7 +506,7 @@ Proof.
   exists (S N + k)%nat. (* translated same modulus of convergence *)
   intros n kLen.
   destruct (Nat.le_exists_sub (S N) n) as [m [inf _]].
-  apply (le_trans _ (S N + k)). rewrite <- (plus_0_r (S N)).
+  apply (Nat.le_trans _ (S N + k)). rewrite <- (plus_0_r (S N)).
   rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply le_0_n.
   assumption.
   subst n. replace (m + S N)%nat with (S N + m)%nat. rewrite sum_assoc.
@@ -521,7 +521,7 @@ Proof.
   rewrite (CRplus_comm (-s)). rewrite <- CRplus_assoc.
   rewrite (CRsum_eq _ (fun i : nat => un (N + S i)%nat)). apply maj.
   rewrite plus_comm in kLen. apply Nat.add_le_mono_r in kLen.
-  apply (le_trans k m). assumption. apply le_S. apply le_refl.
+  apply (Nat.le_trans k m). assumption. apply le_S. apply le_refl.
   intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
   apply le_0_n. rewrite plus_comm. reflexivity.
 Qed.
@@ -540,7 +540,7 @@ Proof.
     destruct (n - N)%nat eqn:des. exfalso. apply (Nat.sub_gt n N); assumption.
     rewrite <- (Nat.sub_add N n). rewrite des. rewrite plus_comm.
     exact d. subst d.
-    apply (le_trans N (S N)). apply le_S. apply le_refl. assumption.
+    apply (Nat.le_trans N (S N)). apply le_S. apply le_refl. assumption.
 Qed.
 
 Definition domainInfiniteSumPackInc
@@ -585,13 +585,13 @@ Proof.
     specialize (s eps) as [k maj].
     exists (S N + k)%nat. (* translated modulus of convergence *)
     intros n H0. destruct (Nat.le_exists_sub N n) as [m [inf _]].
-    apply (le_trans _ (S N + k)).
+    apply (Nat.le_trans _ (S N + k)).
     simpl. apply le_S. rewrite <- (plus_0_r N).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l.
     apply le_0_n. assumption. subst n.
     rewrite <- (applyPackFirstSum X fn m N x x1 x0).
     apply maj. apply (Nat.add_le_mono_l k m (S N)).
-    apply (le_trans _ (m + N)). assumption. rewrite plus_comm.
+    apply (Nat.le_trans _ (m + N)). assumption. rewrite plus_comm.
     apply Nat.add_le_mono_r. apply le_S. apply le_refl.
 Qed.
 
@@ -1239,7 +1239,7 @@ Proof.
                           CMTIntegrableFunctions.IntFnL.
   specialize (IntAbsSumCv p) as [j jmaj].
   exists j. intros. apply jmaj.
-  apply (le_trans _ (0+i) _ H). apply Nat.add_le_mono_r, le_0_n.
+  apply (Nat.le_trans _ (0+i) _ H). apply Nat.add_le_mono_r, le_0_n.
 Defined.
 
 Lemma IntegralRepresentationShiftVal
@@ -1263,7 +1263,7 @@ Proof.
   apply CR_cv_minus. 2: apply CR_cv_const.
   intro p.
   pose proof (IntegralCv fInt p) as [k kmaj]. exists k.
-  intros. apply kmaj. apply (le_trans _ (0+i) _ H).
+  intros. apply kmaj. apply (Nat.le_trans _ (0+i) _ H).
   apply Nat.add_le_mono_r, le_0_n.
 Qed.
 

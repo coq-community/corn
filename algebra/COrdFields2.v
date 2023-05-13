@@ -600,7 +600,7 @@ Proof.
    auto with arith.
   change (nring n [<] nring (R:=R) 0) in |- *.
   apply nring_less.
-  apply lt_le_trans with (S n).
+  apply Nat.lt_le_trans with (S n).
    auto with arith.
   exfalso. revert H; rewrite -> leEq_def. intro H; destruct H.
   apply nring_less; auto with arith.

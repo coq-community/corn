@@ -403,7 +403,7 @@ Proof.
        apply Sum_resp_leEq.
         rewrite <- H3; auto.
        intros; apply pi_seq_bnd''.
-       apply le_trans with (S (S N)); auto with arith.
+       apply Nat.le_trans with (S (S N)); auto with arith.
       eapply leEq_wdl.
        2: apply eq_symmetric; apply Sum_comm_scal with (s := fun i : nat => z[^]pred i).
       rstepl (Sum (S (S N)) (pred m) (fun i : nat => z[^]pred i) [*] (pi_seq 2[-]pi_seq 1)).

@@ -637,7 +637,7 @@ Proof.
    rstepr (nring (R:=Q_as_COrdField) m).
    astepl (nring (R:=Q_as_COrdField) 1).
    apply nring_less.
-   apply lt_trans with (m := 3).
+   apply Nat.lt_trans with (m := 3).
     constructor.
     constructor.
    apply lt_S_n.
@@ -908,7 +908,7 @@ Proof.
    apply shift_zero_less_minus.
    apply l_less_r.
   apply G_conversion_rate_resp_x.
-  apply le_trans with (m := S (N + 3)).
+  apply Nat.le_trans with (m := S (N + 3)).
    apply le_n_S.
    apply le_plus_r.
   assumption.

@@ -295,7 +295,7 @@ Proof.
  apply Zmult_le_compat.
  apply Pos.le_1_l.
  simpl. apply Pos2Nat.inj_le.
- apply (le_trans _ _ _ Hmd).
+ apply (Nat.le_trans _ _ _ Hmd).
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
  apply le_S, le_refl.
  discriminate. discriminate.

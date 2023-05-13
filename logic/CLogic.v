@@ -749,22 +749,22 @@ Qed.
 
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
 Proof.
- intros; apply le_lt_trans with (pred n).
+ intros; apply Nat.le_lt_trans with (pred n).
   apply le_pred; auto with arith.
- apply lt_pred_n_n; apply le_lt_trans with i; auto with arith.
+ apply lt_pred_n_n; apply Nat.le_lt_trans with i; auto with arith.
 Qed.
 
 Lemma lt_8 : forall m n : nat, m < pred n -> m < n.
 Proof.
- intros; apply lt_le_trans with (pred n); auto with arith.
+ intros; apply Nat.lt_le_trans with (pred n); auto with arith.
 Qed.
 
 Lemma pred_lt : forall m n : nat, m < pred n -> S m < n.
 Proof.
- intros; apply le_lt_trans with (pred n); auto with arith.
- apply lt_pred_n_n; apply le_lt_trans with m.
+ intros; apply Nat.le_lt_trans with (pred n); auto with arith.
+ apply lt_pred_n_n; apply Nat.le_lt_trans with m.
   auto with arith.
- apply lt_le_trans with (pred n); auto with arith.
+ apply Nat.lt_le_trans with (pred n); auto with arith.
 Qed.
 
 Lemma lt_10 : forall i m n : nat,
@@ -787,7 +787,7 @@ Lemma le_1 : forall m n : nat, Cle m n -> pred m <= n.
 Proof.
  intros.
  cut (m <= n); [ intro | apply Cle_to; assumption ].
- apply le_trans with (pred n); auto with arith.
+ apply Nat.le_trans with (pred n); auto with arith.
  apply le_pred; auto.
 Qed.
 
@@ -843,7 +843,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H1); intro H2.
   cut (h i < h j); [ intro | apply Hrecj; assumption ].
   cut (h j < h (S j)); [ intro | apply H ].
-  apply lt_trans with (h j); auto.
+  apply Nat.lt_trans with (h j); auto.
  rewrite H2; apply H.
 Qed.
 
@@ -858,7 +858,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H0); intro H1.
   cut (h i <= h j); [ intro | apply Hrecj; auto with arith ].
   cut (h j <= h (S j)); [ intro | apply H ].
-  apply le_trans with (h j); auto.
+  apply Nat.le_trans with (h j); auto.
  rewrite H1; apply le_n.
 Qed.
 
@@ -901,7 +901,7 @@ Proof.
  induction  k as [| k Hreck].
   exists 0.
    rewrite H0; auto with arith.
-  cut (h 0 < h 1); [ intro; apply le_trans with (h 0); auto with arith | apply H; apply lt_n_Sn ].
+  cut (h 0 < h 1); [ intro; apply Nat.le_trans with (h 0); auto with arith | apply H; apply lt_n_Sn ].
  cut (h k < h (S k)); [ intro H2 | apply H; apply lt_n_Sn ].
  elim (le_lt_dec (S n) (h k)); intro H3.
   elim (Hreck H3); intros i Hi.
@@ -924,7 +924,7 @@ Proof.
    assumption.
   auto with arith.
  exists (S m).
-  apply le_lt_trans with (f m).
+  apply Nat.le_lt_trans with (f m).
    rewrite b; auto with arith.
   apply H.
   rewrite b; apply lt_n_Sn.
@@ -952,7 +952,7 @@ Proof.
  generalize k; clear k.
  induction  n as [| n Hrecn]; intros k H H0.
   elim (H 0); intros H1 H2.
-  generalize (le_trans _ _ _ H1 H2); intro H3.
+  generalize (Nat.le_trans _ _ _ H1 H2); intro H3.
   exfalso.
   inversion H3.
  elim (eq_nat_dec (k 0) (k 2)).
@@ -985,13 +985,13 @@ Proof.
   tauto.
  generalize (H 0); intro H3.
  elim H3; intros H4 H5.
- generalize (lt_le_trans _ _ _ H2 H5); intro H6.
+ generalize (Nat.lt_le_trans _ _ _ H2 H5); intro H6.
  cut (k 2 <= n).
   2: lia.
  intro H7.
  induction  i as [| i Hreci].
   assumption.
- apply le_trans with (k (S (S i))); auto.
+ apply Nat.le_trans with (k (S (S i))); auto.
 Qed.
 
 Section Predicates_to_CProp.
@@ -1174,7 +1174,7 @@ Proof.
      split.
       eapply H with (i := m); [ auto with arith | apply Hm' ].
      unfold Q' in Hj; intros j' Hj' H2.
-     cut (j' <= n); [ intro H4 | apply le_trans with m; auto with arith ].
+     cut (j' <= n); [ intro H4 | apply Nat.le_trans with m; auto with arith ].
      apply H0 with (H := le_S _ _ H4); [ auto | apply Hj; assumption ].
     elim (H1 (S n) (le_n (S n))); intro H1'.
      intro H2.

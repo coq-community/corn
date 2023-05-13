@@ -608,7 +608,7 @@ Proof.
         Transparent Frestr.
         eapply leEq_wdr.
          apply triangle_SumIR.
-         rewrite <- (S_pred m k); auto; apply lt_le_trans with N; auto.
+         rewrite <- (S_pred m k); auto; apply Nat.lt_le_trans with N; auto.
         apply Sum_wd; intros.
         Opaque FAbs.
         simpl in |- *.
@@ -626,7 +626,7 @@ Proof.
         apply Feq_imp_eq with I.
          apply Feq_transitive with (FSum N (pred m) f).
           unfold I in |- *; apply fun_seq_part_sum_n; auto with arith.
-          apply le_lt_trans with k; [ idtac | apply lt_le_trans with N ]; auto with arith.
+          apply Nat.le_lt_trans with k; [ idtac | apply Nat.lt_le_trans with N ]; auto with arith.
          apply eq_imp_Feq.
            unfold I in |- *; apply contin_imp_inc; Contin.
           simpl in |- *.
@@ -641,7 +641,7 @@ Proof.
      cut (Dom (FSum N (pred m) g) x). intro H6.
       apply leEq_wdr with (Part _ _ H6).
        apply FSum_resp_leEq.
-        rewrite <- (S_pred m k); auto; apply lt_le_trans with N; auto.
+        rewrite <- (S_pred m k); auto; apply Nat.lt_le_trans with N; auto.
        intros.
        Opaque FAbs.
        simpl in |- *.
@@ -649,7 +649,7 @@ Proof.
         2: apply eq_symmetric_unfolded;
           apply FAbs_char with (Hx' := contin_imp_inc _ _ _ _ (contF i) x0 (HxF i)).
        apply Hk.
-        apply le_trans with N; auto with arith.
+        apply Nat.le_trans with N; auto with arith.
        simpl in HxF.
        apply (HxF 0).
       cut (Dom (fun_seq_part_sum g m{-}fun_seq_part_sum g N) x). intro H7.
@@ -658,7 +658,7 @@ Proof.
         simpl in |- *; rational.
        apply Feq_imp_eq with I.
         unfold I in |- *; apply fun_seq_part_sum_n; auto with arith.
-        apply le_lt_trans with k; [ idtac | apply lt_le_trans with N ]; auto with arith.
+        apply Nat.le_lt_trans with k; [ idtac | apply Nat.lt_le_trans with N ]; auto with arith.
        auto.
       split; simpl in |- *.
        apply (contin_imp_inc _ _ _ _ (fun_seq_part_sum_cont _ _ _ _ contG m)); auto.
@@ -680,7 +680,7 @@ Proof.
   auto with arith.
  intros m H5 x H6 Hx Hx'.
  apply AbsIR_imp_AbsSmall.
- cut (N <= m); [ intro | apply le_trans with (max N k); auto with arith ].
+ cut (N <= m); [ intro | apply Nat.le_trans with (max N k); auto with arith ].
  eapply leEq_wdl.
   Transparent fun_seq_part_sum.
   simpl in Hx'.

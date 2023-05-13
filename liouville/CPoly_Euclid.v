@@ -143,7 +143,7 @@ Proof.
  assert (f[=]q[*]g[+]r and degree_lt_pair r g).
   split; [ assumption | ].
   split.
-   intros; unfold degree_le; intros; apply y0; apply le_lt_trans with n0; [ | assumption ].
+   intros; unfold degree_le; intros; apply y0; apply Nat.le_lt_trans with n0; [ | assumption ].
    unfold degree_le in H1; apply not_gt; intro; unfold gt in H3.
    set (tmp := (H1 (S n) (lt_n_S _ _ H3))); rewrite -> H in tmp.
    apply (eq_imp_not_ap _ _ _ tmp); apply ring_non_triv.

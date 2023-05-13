@@ -789,7 +789,7 @@ Proof.
       exfalso. apply n0. apply applyUnionIterate.
       apply applyUnionIterate in u. destruct u. exists x0.
       destruct H, H0. repeat split; try assumption.
-      apply (le_trans _ _ _ H), le_S, le_refl.
+      apply (Nat.le_trans _ _ _ H), le_S, le_refl.
       destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
     + intros. apply IntegralNonDecreasing. intros x xdf xdg.
       simpl. destruct xdf. destruct xdg. apply CRle_refl.
@@ -1786,7 +1786,7 @@ Proof.
     apply CRinv_0_lt_compat, H. }
   specialize (fnCvZero idom_support0 idom_int0 _ H0) as [N Nmaj].
   exists (max N idom_idx0). intros.
-  specialize (Nmaj i (le_trans _ _ _ (Nat.le_max_l _ _) H1)) as [[C Cint] Cmaj].
+  specialize (Nmaj i (Nat.le_trans _ _ _ (Nat.le_max_l _ _) H1)) as [[C Cint] Cmaj].
   unfold sa_approx in Cmaj.
   assert (Integral
             (MeasurableIntersectIntegrable
@@ -1802,7 +1802,7 @@ Proof.
     contradict n. split; apply a.
     destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl. }
   assert (le idom_idx0 i).
-  { apply (le_trans _ (max N idom_idx0)). apply Nat.le_max_r. exact H1. }
+  { apply (Nat.le_trans _ (max N idom_idx0)). apply Nat.le_max_r. exact H1. }
   specialize (idom_dom0 _ _ _ H3 H2). clear H2 H3.
   apply (CRle_lt_trans
            _ (Integral

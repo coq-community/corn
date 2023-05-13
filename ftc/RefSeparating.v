@@ -207,7 +207,7 @@ Proof.
  cut (sep__part_h j <= sep__part_h (S j)); intros.
   2: apply sep__part_h_mon_1.
  elim (le_lt_eq_dec _ _ H0); intro.
-  apply lt_le_trans with (sep__part_h j); auto.
+  apply Nat.lt_le_trans with (sep__part_h j); auto.
   apply Hrecj; auto with arith.
  rewrite <- b0; apply sep__part_h_mon_2; auto.
 Qed.
@@ -292,7 +292,7 @@ Proof.
     2: apply cg_minus_wd; apply prf1; auto.
    apply H0.
    apply lt_pred_n_n.
-   apply le_lt_trans with (sep__part_h i).
+   apply Nat.le_lt_trans with (sep__part_h i).
     apply le_O_n.
    apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).
    apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
@@ -319,7 +319,7 @@ Proof.
    unfold cg_minus in |- *; apply plus_resp_leEq_both.
     apply Partition_mon; assumption.
    apply inv_resp_leEq; apply Partition_mon; assumption.
-  apply le_trans with (sep__part_h (S i)).
+  apply Nat.le_trans with (sep__part_h (S i)).
    auto with arith.
   apply sep__part_h_bnd.
  apply sep__part_h_bnd.
@@ -600,7 +600,7 @@ Proof.
   rewrite sep__part_fun_i.
    2: assumption.
   intros.
-  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply le_trans; [ apply le_pred_n | auto ] ].
+  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
   rstepl (P _ Ha[-]P _ H0[+](P _ H0[-]P _ Hb)).
   apply plus_resp_leEq_both.
    generalize Ha; pattern (sep__part_h (S i)) at 1 2 in |- *;
@@ -626,7 +626,7 @@ Proof.
    cut (i = RS'_m1); [ intro | unfold sep__part_length in b0; rewrite <- b0 in H0; auto with arith ].
    rewrite H2.
    intros.
-   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply le_trans; [ apply le_pred_n | auto ] ].
+   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
    rstepl (P _ Ha0[-]P _ H3[+](P _ H3[-]P _ Hb0)).
    apply plus_resp_leEq_both.
     generalize Ha0; pattern (sep__part_h (S RS'_m1)) at 1 2 in |- *;
@@ -667,7 +667,7 @@ Proof.
      elim (ProjT2 a1); fold j in |- *; intros Hj Hj'.
      elim Hj'; clear Hj'; intros H2 H3.
      intros.
-     cut (pred j <= n); [ intro | apply le_trans with j; auto with arith ].
+     cut (pred j <= n); [ intro | apply Nat.le_trans with j; auto with arith ].
      rstepl (P j H4[-]P (pred j) H5[+](P (pred j) H5[-]P (sep__part_h i) Hb)).
      cut (0 < j); intros.
       apply plus_resp_leEq_both.
@@ -679,7 +679,7 @@ Proof.
        2: apply cg_minus_wd; apply prf1; auto.
       apply H3.
       auto with arith.
-     apply le_lt_trans with (sep__part_h i); auto with arith.
+     apply Nat.le_lt_trans with (sep__part_h i); auto with arith.
      apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).
      apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
       apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
@@ -757,7 +757,7 @@ Lemma RS'_Hsep_S :
   j <= pred (sep__part_fun (S i) Hi) -> S j <= n.
 Proof.
  intros.
- apply le_trans with (sep__part_fun (S i) Hi).
+ apply Nat.le_trans with (sep__part_fun (S i) Hi).
   2: apply sep__part_fun_bnd.
  rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))) .
   auto with arith.
@@ -769,7 +769,7 @@ Lemma RS'_Hsep :
   j <= pred (sep__part_fun (S i) Hi) -> j <= n.
 Proof.
  intros.
- apply le_trans with (sep__part_fun (S i) Hi).
+ apply Nat.le_trans with (sep__part_fun (S i) Hi).
   2: apply sep__part_fun_bnd.
  rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))) .
   apply le_S; assumption.
@@ -816,7 +816,7 @@ Proof.
      do 2 elim le_lt_dec; intros; simpl in |- *.
         apply cg_minus_wd; apply prf1; auto.
        exfalso; apply le_not_lt with j n.
-        apply le_trans with (S j); auto with arith.
+        apply Nat.le_trans with (S j); auto with arith.
        assumption.
       exfalso; apply le_not_lt with (S j) n.
        exact (RS'_Hsep_S _ _ Hi a1).
@@ -879,7 +879,7 @@ Proof.
       exfalso.
       apply le_not_lt with n j.
        assumption.
-      apply lt_le_trans with (sep__part_fun (S i) Hi'').
+      apply Nat.lt_le_trans with (sep__part_fun (S i) Hi'').
        assumption.
       apply sep__part_fun_bnd.
      apply mult_wd; algebra.
@@ -1024,7 +1024,7 @@ Proof.
     elim (le_lt_dec n j); intro; simpl in |- *.
      exfalso; apply (le_not_lt n j).
       assumption.
-     eapply lt_le_trans.
+     eapply Nat.lt_le_trans.
       apply H0.
      apply sep__part_fun_bnd.
     algebra.
@@ -1163,7 +1163,7 @@ Proof.
       apply H3; apply le_n.
      apply lt_n_Sn.
     apply inv_resp_leEq; apply Partition_mon.
-    eapply le_trans.
+    eapply Nat.le_trans.
      2: apply a2.
     clear Hk Hk'; lia.
    apply leEq_wdl with ZeroR.
@@ -1210,7 +1210,7 @@ Proof.
    apply sep__part_h_lemma3 with i.
     rewrite sep__part_fun_i in Hk; assumption.
    rewrite sep__part_fun_i in a0; assumption.
-  apply le_trans with (sep__part_fun (S i) H).
+  apply Nat.le_trans with (sep__part_fun (S i) H).
    auto with arith.
   apply sep__part_fun_bnd.
  apply leEq_wdl with ZeroR.

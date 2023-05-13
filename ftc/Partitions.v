@@ -240,7 +240,7 @@ Proof.
   clear Hj' Hf Hf0.
   cut (i < f n).
    intro.
-   cut (f j < f n); [ intro | apply le_lt_trans with i; auto ].
+   cut (f j < f n); [ intro | apply Nat.le_lt_trans with i; auto ].
    apply not_ge.
    intro; red in H1.
    apply (le_not_lt (f j) (f n)); auto with arith.

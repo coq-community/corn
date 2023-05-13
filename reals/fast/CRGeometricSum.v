@@ -210,7 +210,7 @@ Proof.
     assert (forall p : nat, (p < 2 ^ fuel)%nat -> filter (Str_nth_tl p s) = false) as firstHalf.
     { intros. apply (H p).
       simpl. rewrite Nat.add_0_r.
-      apply (lt_le_trans _ (0+2^fuel)).
+      apply (Nat.lt_le_trans _ (0+2^fuel)).
       exact H0. apply Nat.add_le_mono_r, le_0_n. }
     rewrite IHfuel, IHfuel.
     3: exact firstHalf.
@@ -273,14 +273,14 @@ Proof.
       rewrite (@InfiniteSum_fat_add_stop _ p).
       3: exact H0.
       rewrite <- (@InfiniteSum_fat_add_stop (2^fuel)).
-      2: apply (le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
+      2: apply (Nat.le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
       2: exact H0.
       rewrite <- IHfuel.
       apply (@InfiniteSum_raw_N_cont_invariant fuel p).
       exact H. exact H0.
-      apply (le_trans _ (2^fuel + 0)).
+      apply (Nat.le_trans _ (2^fuel + 0)).
       rewrite Nat.add_0_r.
-      apply (le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
+      apply (Nat.le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
       apply Nat.add_le_mono_l, le_0_n.
     + rewrite InfiniteSum_fat_add_pass. 2: exact H.
       rewrite <- IHfuel. rewrite <- IHfuel.

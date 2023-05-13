@@ -412,7 +412,7 @@ Proof.
     rewrite Nat.sub_0_r. reflexivity.
   - intros.
     assert (forall k : nat, k <= n -> Pn k < Pn (S k))%nat.
-    { intros. apply H. apply (le_trans _ n _ H1). apply le_S, le_refl. }
+    { intros. apply H. apply (Nat.le_trans _ n _ H1). apply le_S, le_refl. }
     specialize (IHn H1 H0). clear H1. simpl.
     rewrite IHn.
     destruct (Pn (S (S n)) - Pn (S n))%nat eqn:des.
@@ -435,7 +435,7 @@ Proof.
     rewrite <- des. rewrite Nat.add_comm. rewrite Nat.sub_add.
     reflexivity. destruct (le_lt_dec n2 n1).
     apply Nat.sub_0_le in l. rewrite l in des. discriminate.
-    apply (le_trans _ (S n1)). apply le_S, le_refl. exact l.
+    apply (Nat.le_trans _ (S n1)). apply le_S, le_refl. exact l.
 Qed.
 
 
@@ -446,7 +446,7 @@ Proof.
   induction n.
   - apply le_0_n.
   - destruct sub; simpl. simpl in IHn. specialize (l n (S n) (le_refl _)).
-    apply (le_trans _ (S (x n))). apply le_n_S, IHn. exact l.
+    apply (Nat.le_trans _ (S (x n))). apply le_n_S, IHn. exact l.
 Qed.
 
 Lemma SubSeqCvMerge : forall {R : ConstructiveReals} (un : nat -> CRcarrier R)
@@ -456,7 +456,7 @@ Lemma SubSeqCvMerge : forall {R : ConstructiveReals} (un : nat -> CRcarrier R)
 Proof.
   intros. intros n. specialize (H0 n) as [p pmaj].
   exists p. intros. apply pmaj.
-  apply (le_trans _ i _ H0), H.
+  apply (Nat.le_trans _ i _ H0), H.
 Qed.
 
 Lemma Qpower_positive : forall (q : Q) (n : nat),
@@ -1204,7 +1204,7 @@ Proof.
       apply CRmult_lt_reg_r in kmaj. 2: apply (fst fUC).
       destruct (Q_dec (Z.pos p # 1) (Z.of_nat k # 1)). destruct s.
       unfold Qlt, Qnum, Qden in q.
-      apply le_S_n. apply (le_trans _ k).
+      apply le_S_n. apply (Nat.le_trans _ k).
       apply Nat2Z.inj_lt. rewrite positive_nat_Z.
       do 2 rewrite Z.mul_1_r in q. exact q.
       apply le_S, le_refl. exfalso. apply (CR_of_Q_lt R) in q.

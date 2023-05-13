@@ -230,7 +230,7 @@ Proof.
   - exists O. split. apply le_refl. reflexivity.
   - simpl. destruct IHl as [k [H H0]]. destruct a.
     + exists k. split. rewrite app_length, map_length, map_length.
-      apply (lt_le_trans _ (0+length (FreeSubsets (length l)))).
+      apply (Nat.lt_le_trans _ (0+length (FreeSubsets (length l)))).
       exact H. rewrite <- Nat.add_le_mono_r. apply le_0_n.
       rewrite app_nth1.
       rewrite (nth_indep _ nil (true::nil)), map_nth, H0.
@@ -243,7 +243,7 @@ Proof.
       rewrite (nth_indep _ nil (false::nil)), map_nth, H0.
       reflexivity. rewrite map_length. exact H.
       rewrite map_length.
-      apply (le_trans _ (0+length (FreeSubsets (length l)))).
+      apply (Nat.le_trans _ (0+length (FreeSubsets (length l)))).
       apply le_refl. rewrite <- Nat.add_le_mono_r. apply le_0_n.
 Qed.
 
@@ -711,7 +711,7 @@ Proof.
                    _ (@nil bool, @nil bool)).
   rewrite (nth_list_prod
                 (FreeSubsets (length hn)) (FreeSubsets (length hn)) nil nil i
-                (lt_trans _ _ _ H H0)).
+                (Nat.lt_trans _ _ _ H H0)).
   rewrite (nth_list_prod
                 (FreeSubsets (length hn)) (FreeSubsets (length hn)) nil nil j H0).
   unfold fst, snd.
@@ -760,7 +760,7 @@ Proof.
     apply nth_In. subst a.
     apply Nat.div_lt_upper_bound. intro abs.
     rewrite abs in lenPos. exact (lt_irrefl 0 lenPos).
-    exact (lt_trans _ _ _ H H0).
+    exact (Nat.lt_trans _ _ _ H H0).
     apply nth_In. exact cin.
     rewrite (FreeSubsetsLength (length hn)).
     rewrite map_length. reflexivity. apply nth_In. exact cin.
@@ -769,7 +769,7 @@ Proof.
     subst a.
     apply Nat.div_lt_upper_bound. intro abs.
     rewrite abs in lenPos. exact (lt_irrefl 0 lenPos).
-    exact (lt_trans _ _ _ H H0).
+    exact (Nat.lt_trans _ _ _ H H0).
 Qed.
 
 Fixpoint ProdIntegrableSubsetLeft
@@ -1191,7 +1191,7 @@ Proof.
         specialize (H0 n).
         rewrite map_length in H1. intro abs. apply H0.
         unfold ProdIntegrableSimplify. rewrite map_length, prod_length.
-        apply (lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
+        apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
         apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen.
         clear H0.
@@ -1206,11 +1206,11 @@ Proof.
                                nil nil n).
         unfold snd. rewrite Nat.mod_small. rewrite <- H1, H3. exact abs.
         rewrite <- H1. exact H2.
-        apply (lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
+        apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
         apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen.
         rewrite map_length, prod_length.
-        apply (lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
+        apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
         apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen. }
       intros. right. rewrite Forall_forall in H1.
@@ -1239,7 +1239,7 @@ Proof.
           < length (ProdIntegrableSimplify hn))%nat.
   { unfold ProdIntegrableSimplify. rewrite map_length, prod_length.
     destruct H.
-    apply (lt_le_trans _ (length (FreeSubsets (length hn))
+    apply (Nat.lt_le_trans _ (length (FreeSubsets (length hn))
                           + kf * length (FreeSubsets (length hn)))).
     rewrite <- Nat.add_lt_mono_r. apply H0.
     apply (Nat.mul_le_mono_nonneg_r (S kf) _ (length (FreeSubsets (length hn)))).
@@ -1320,7 +1320,7 @@ Proof.
     2: rewrite map_length, prod_length; exact H3.
     clear H4.
     assert (0 < length (FreeSubsets (length hn)))%nat as lenPos.
-    { apply (le_lt_trans _ kg _ (le_0_n _)). apply H0. }
+    { apply (Nat.le_lt_trans _ kg _ (le_0_n _)). apply H0. }
     destruct (Nat.eq_dec (k / length (FreeSubsets (length hn))) kf).
     + rewrite e in p0. clear p. simpl in p0.
       apply (ProdIntegrableSubsetsDisjoint
@@ -2174,7 +2174,7 @@ Proof.
     unfold CRminus. rewrite CRopp_0, CRplus_0_r, CRabs_right.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos, Pos2Nat.inj_le.
-    rewrite Nat2Pos.id. 2: discriminate. apply (le_trans _ _ _ H1).
+    rewrite Nat2Pos.id. 2: discriminate. apply (Nat.le_trans _ _ _ H1).
     apply le_S, le_refl. apply CR_of_Q_le. discriminate.
 Qed.
 

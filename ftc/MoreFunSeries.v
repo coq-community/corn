@@ -1079,8 +1079,8 @@ Proof.
  intros e H.
  elim (HCauchy e H); intros N HN.
  exists (S N); do 4 intro.
- cut (m = S (pred m)); [ intro | apply S_pred with 0; apply lt_le_trans with (S N); auto with arith ].
- cut (n = S (pred n)); [ intro | apply S_pred with 0; apply lt_le_trans with (S N); auto with arith ].
+ cut (m = S (pred m)); [ intro | apply S_pred with 0; apply Nat.lt_le_trans with (S N); auto with arith ].
+ cut (n = S (pred n)); [ intro | apply S_pred with 0; apply Nat.lt_le_trans with (S N); auto with arith ].
  generalize H0 H1; clear H1 H0.
  rewrite H2; rewrite H3; clear H2 H3.
  intros.

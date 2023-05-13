@@ -860,7 +860,7 @@ Proof.
  apply Acc_intro.
  unfold ltof in |- *; intros b ltfafb.
  apply IHn.
- apply lt_le_trans with (f a); auto with arith.
+ apply Nat.lt_le_trans with (f a); auto with arith.
 Qed.
 
 

@@ -750,11 +750,11 @@ Proof.
       apply recip_resp_leEq.
        apply pos_div_two; apply AbsIR_pos; apply Hy.
       apply Hn0.
-      apply le_trans with (max N n0); auto with arith.
+      apply Nat.le_trans with (max N n0); auto with arith.
      apply less_leEq; apply recip_resp_pos; apply AbsIR_pos; apply Hy.
     apply AbsSmall_imp_AbsIR.
     apply HN.
-    apply le_trans with (max N n0); auto with arith.
+    apply Nat.le_trans with (max N n0); auto with arith.
    apply eq_transitive_unfolded with
      (AbsIR ([1][/] _[//]Hn m) [*]AbsIR ([1][/] _[//]Hy) [*]AbsIR (y[-]seq m)).
     repeat apply mult_wd; apply eq_symmetric_unfolded.

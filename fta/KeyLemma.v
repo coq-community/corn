@@ -128,7 +128,7 @@ Proof.
   apply less_leEq; apply a_0_eps_fuzz.
  intros l H H0.
  cut (1 <= n - j). intro H1.
-  2: apply le_trans with (n - S j); [ auto | apply lem_1b ].
+  2: apply Nat.le_trans with (n - S j); [ auto | apply lem_1b ].
  cut (n - j <= n). intro H2.
   2: apply lem_1c.
  elim (Hrecj H1 H2). intros t' H4 H5.
@@ -184,7 +184,7 @@ Proof.
   auto.
  exists k'.
  split.
-  apply le_trans with (n - j).
+  apply Nat.le_trans with (n - j).
    unfold l in |- *; apply lem_1b.
   auto.
  split. auto.
@@ -502,7 +502,7 @@ Proof.
  exists (chfun k' k_SJ J).
  split. intro i.
   apply chfun_3. auto. auto.
-    apply le_trans with (k' J); auto.
+    apply Nat.le_trans with (k' J); auto.
   elim (H10 J). auto.
   split.
   intro i. apply chfun_4; auto.

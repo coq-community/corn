@@ -80,7 +80,7 @@ Proof.
   split.
    apply list_nat_prod_spec.
     apply le_O_n.
-   apply (le_trans _ _ _ (le_pred_n _) Hdb).
+   apply (Nat.le_trans _ _ _ (le_pred_n _) Hdb).
   left.
   f_equal.
   destruct (ZL4 d).
@@ -154,7 +154,7 @@ Proof.
  split.
   apply list_nat_prod_spec.
    apply le_O_n.
-  apply (le_trans _ _ _ (le_pred_n _) Hle).
+  apply (Nat.le_trans _ _ _ (le_pred_n _) Hle).
  left.
  f_equal.
  destruct (ZL4 d).
