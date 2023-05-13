@@ -254,7 +254,7 @@ Proof.
  intros x H2.
  elim H1.
  intros x0 H3.
- exists (max x x0 + 1).
+ exists (Nat.max x x0 + 1).
  intros x1 y.
  astepl (dIR (f x1[+]g x1) (f y[+]g y)).
  unfold dIR in |- *.
@@ -270,8 +270,8 @@ Proof.
    apply plus_resp_leEq_lft.
    astepl (f x1[-d]f y).
    apply H2.
-  astepr ((Two:IR)[*]Two[^]max x x0[*](x1[-d]y)).
-   apply leEq_transitive with (Two[^]max x x0[*](x1[-d]y)[+]Two[^]max x x0[*](x1[-d]y)).
+  astepr ((Two:IR)[*]Two[^]Nat.max x x0[*](x1[-d]y)).
+   apply leEq_transitive with (Two[^]Nat.max x x0[*](x1[-d]y)[+]Two[^]Nat.max x x0[*](x1[-d]y)).
     apply plus_resp_leEq_both.
      apply mult_resp_leEq_rht.
       apply great_nexp_resp_le.
@@ -289,13 +289,13 @@ Proof.
     apply CPsMetricSpace_is_CPsMetricSpace.
    apply eq_imp_leEq.
    rational.
-  astepl (Two[^]1[*]Two[^]max x x0[*](x1[-d]y)).
+  astepl (Two[^]1[*]Two[^]Nat.max x x0[*](x1[-d]y)).
   2: apply AbsIR_wd.
   apply mult_wdl.
-  astepl ((Two:IR)[^](max x x0 + 1)).
-   2: astepl ((Two:IR)[^]max x x0[*]Two[^]1).
+  astepl ((Two:IR)[^](Nat.max x x0 + 1)).
+   2: astepl ((Two:IR)[^]Nat.max x x0[*]Two[^]1).
    2: apply mult_commutes.
-  astepr ((Two:IR)[^](max x x0 + 1)).
+  astepr ((Two:IR)[^](Nat.max x x0 + 1)).
   rational.
  rational.
 
@@ -319,7 +319,7 @@ Proof.
  intros x H2.
  elim (H0 (S n) H1).
  intros x0 H3.
- exists (max x x0).
+ exists (Nat.max x x0).
  intros x1 y H6.
  astepl (ABSIR (f x1[-]f y[+](g x1[-]g y))).
   apply leEq_less_trans with (ABSIR (f x1[-]f y)[+]ABSIR (g x1[-]g y)).
@@ -332,12 +332,12 @@ Proof.
    apply H7.
    generalize H6.
    intro H8.
-   apply less_leEq_trans with (nexp IR (max x x0) ([1][/] [0][+][1][+][1][//]H1)).
+   apply less_leEq_trans with (nexp IR (Nat.max x x0) ([1][/] [0][+][1][+][1][//]H1)).
     apply H8.
    3: simpl in |- *.
-   astepl (nexp IR (max x x0) ([1][/] Two:IR[//]H1)).
+   astepl (nexp IR (Nat.max x x0) ([1][/] Two:IR[//]H1)).
    astepr (nexp IR x ([1][/] Two:IR[//]H1)).
-   astepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
+   astepl ((OneR[/] Two:IR[//]H1)[^]Nat.max x x0).
    astepr ((OneR[/] Two:IR[//]H1)[^]x).
    apply small_nexp_resp_le.
      apply shift_leEq_div.
@@ -358,10 +358,10 @@ Proof.
    simpl in |- *.
    intro H7.
    apply H7.
-   apply less_leEq_trans with (nexp IR (max x x0) ([1][/] Two:IR[//]H1)).
+   apply less_leEq_trans with (nexp IR (Nat.max x x0) ([1][/] Two:IR[//]H1)).
     exact H6.
    astepr (nexp IR x0 ([1][/] Two:IR[//]H1)).
-   astepl ((OneR[/] Two:IR[//]H1)[^]max x x0).
+   astepl ((OneR[/] Two:IR[//]H1)[^]Nat.max x x0).
    astepr ((OneR[/] Two:IR[//]H1)[^]x0).
    apply small_nexp_resp_le.
      apply shift_leEq_div.
@@ -415,7 +415,7 @@ Proof.
  intros xn H2.
  elim (H0 x (S n) H1).
  intros x0 H3.
- exists (max xn x0).
+ exists (Nat.max xn x0).
  intros y H6.
  astepl (ABSIR (f x[-]f y[+](g x[-]g y))).
   apply leEq_less_trans with (ABSIR (f x[-]f y)[+]ABSIR (g x[-]g y)).
@@ -423,9 +423,9 @@ Proof.
   apply less_leEq_trans with ((OneR[/] [0][+][1][+][1][//]H1)[^]S n[+]ABSIR (g x[-]g y)).
    apply plus_resp_less_rht.
    apply H2.
-   apply less_leEq_trans with (nexp IR (max xn x0) ([1][/] [0][+][1][+][1][//]H1)).
+   apply less_leEq_trans with (nexp IR (Nat.max xn x0) ([1][/] [0][+][1][+][1][//]H1)).
     exact H6.
-   astepl ((OneR[/] [0][+][1][+][1][//]H1)[^]max xn x0).
+   astepl ((OneR[/] [0][+][1][+][1][//]H1)[^]Nat.max xn x0).
    astepr ((OneR[/] [0][+][1][+][1][//]H1)[^]xn).
    apply small_nexp_resp_le.
      apply shift_leEq_div.
@@ -448,9 +448,9 @@ Proof.
    apply plus_resp_leEq_lft.
    apply less_leEq.
    apply H3.
-   apply less_leEq_trans with (nexp IR (max xn x0) ([1][/] [0][+][1][+][1][//]H1)).
+   apply less_leEq_trans with (nexp IR (Nat.max xn x0) ([1][/] [0][+][1][+][1][//]H1)).
     exact H6.
-   astepl ((OneR[/] [0][+][1][+][1][//]H1)[^]max xn x0).
+   astepl ((OneR[/] [0][+][1][+][1][//]H1)[^]Nat.max xn x0).
    astepr ((OneR[/] [0][+][1][+][1][//]H1)[^]x0).
    apply small_nexp_resp_le.
      apply shift_leEq_div.

@@ -575,7 +575,7 @@ A sequence in a metric space has at most one limit.
 Arguments MSseqLimit [X].
 
 (* begin hide *)
-Lemma nz : forall n m : nat, n <= max n m.
+Lemma nz : forall n m : nat, n <= Nat.max n m.
 Proof.
  intro n.
  intro m.
@@ -634,21 +634,21 @@ Proof.
    (less_imp_ap IR [0] ([0][+][1][+][1]) (less_transitive_unfolded IR [0] ([0][+][1]) (
      [0][+][1][+][1]) (less_plusOne IR [0]) (less_plusOne IR ([0][+][1]:IR)))))).
  intros y H9.
- set (H10 := H9 (max y x)) in *.
- set (H11 := H8 (max x y)) in *.
+ set (H10 := H9 (Nat.max y x)) in *.
+ set (H11 := H8 (Nat.max x y)) in *.
  simpl in |- *.
  set (H12 := H11 (nz x y)) in *.
  set (H13 := H10 (nz y x)) in *.
  set (H14 := ap_symmetric_unfolded IR [0] ([0][+][1][+][1]) (less_imp_ap IR [0] ([0][+][1][+][1])
    (less_transitive_unfolded IR [0] ([0][+][1]) ( [0][+][1][+][1]) (less_plusOne IR [0])
      (less_plusOne IR ([0][+][1]))))) in *.
- cut ((seq (max x y)[-d]a)[+](seq (max y x)[-d]b)[<]
+ cut ((seq (Nat.max x y)[-d]a)[+](seq (Nat.max y x)[-d]b)[<]
    nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[+]
      nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)).
   intro H15.
   cut (nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[+]
     nexp IR (S (S n)) ([1][/] [0][+][1][+][1][//]H14)[<=]
-      (seq (max x y)[-d]a)[+](seq (max y x)[-d]b)).
+      (seq (Nat.max x y)[-d]a)[+](seq (Nat.max y x)[-d]b)).
    rewrite -> leEq_def in |- *.
    intro H16.
    auto.
@@ -657,18 +657,18 @@ Proof.
    intro H16.
    apply leEq_transitive with (a[-d]b).
     exact H16.
-   astepr ((seq (max x y)[-d]a)[+](seq (max x y)[-d]b)).
-    astepr ((a[-d]seq (max x y))[+](seq (max x y)[-d]b)).
+   astepr ((seq (Nat.max x y)[-d]a)[+](seq (Nat.max x y)[-d]b)).
+    astepr ((a[-d]seq (Nat.max x y))[+](seq (Nat.max x y)[-d]b)).
      apply ax_d_tri_ineq.
      apply CPsMetricSpace_is_CPsMetricSpace.
-    astepl ((seq (max x y)[-d]b)[+](a[-d]seq (max x y))).
-    astepr ((seq (max x y)[-d]b)[+](seq (max x y)[-d]a)).
+    astepl ((seq (Nat.max x y)[-d]b)[+](a[-d]seq (Nat.max x y))).
+    astepr ((seq (Nat.max x y)[-d]b)[+](seq (Nat.max x y)[-d]a)).
     apply plus_resp_eq.
     simpl in |- *.
     apply d_com.
    apply plus_resp_eq.
    apply d_wd.
-   cut (max x y = max y x -> seq (max x y)[=]seq (max y x)).
+   cut (Nat.max x y = Nat.max y x -> seq (Nat.max x y)[=]seq (Nat.max y x)).
     intro H17.
     apply H17.
     apply max_comm.

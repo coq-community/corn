@@ -96,7 +96,7 @@ Proof.
  generalize (degree_le_mon _ _ _ _ (le_max_l n m) Hdeg).
  generalize (degree_le_mon _ _ _ _ (le_max_r n m) HdegA).
  revert HI.
- generalize (max n m). clear.
+ generalize (Nat.max n m). clear.
  intros n HI HdegP HdegA.
  rewrite -> (poly_as_sum _ _ _ HdegP).
  rewrite -> (poly_as_sum _ _ _ HdegA).

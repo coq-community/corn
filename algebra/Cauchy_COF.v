@@ -94,7 +94,7 @@ Proof.
  elim (px e24 He24); intros Nx HNx.
  elim (py e24 He24); intros Ny HNy.
  elim (pz e24 He24); intros Nz HNz.
- set (NN := max N (max Nx (max Ny Nz))) in *.
+ set (NN := Nat.max N (Nat.max Nx (Nat.max Ny Nz))) in *.
  set (x0 := x_ NN) in *.
  set (y0 := y_ NN) in *.
  set (z0 := z_ NN) in *.
@@ -374,12 +374,12 @@ Proof.
     right.
     cut (forall n : nat, Ny <= n -> [0] [<] Two[*]K[-]CS_seq _ y n); [ intro Hy' | intros n Hn ].
      set (KK := e[/] _[//]mult_resp_ap_zero _ _ _ (three_ap_zero _) (pos_ap_zero _ _ HK)) in *.
-     exists (max N Ny); exists KK.
+     exists (Nat.max N Ny); exists KK.
       unfold KK in |- *; apply div_resp_pos; auto.
       apply mult_resp_pos; auto; apply pos_three.
      intros; simpl in |- *; unfold KK in |- *.
-     cut (N <= n); [ intro Hn | apply Nat.le_trans with (max N Ny); auto with arith ].
-     cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (max N Ny); auto with arith ].
+     cut (N <= n); [ intro Hn | apply Nat.le_trans with (Nat.max N Ny); auto with arith ].
+     cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (Nat.max N Ny); auto with arith ].
      apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
       apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
        apply recip_resp_pos; auto.
@@ -398,12 +398,12 @@ Proof.
    left.
    cut (forall n : nat, Ny <= n -> [0] [<] Two[*]K[-]CS_seq _ y n); [ intro Hy' | intros n Hn ].
     set (KK := e[/] _[//]mult_resp_ap_zero _ _ _ (three_ap_zero _) (pos_ap_zero _ _ HK)) in *.
-    exists (max N Ny); exists KK.
+    exists (Nat.max N Ny); exists KK.
      unfold KK in |- *; apply div_resp_pos; auto.
      apply mult_resp_pos; auto; apply pos_three.
     intros; simpl in |- *; unfold KK in |- *.
-    cut (N <= n); [ intro Hn | apply Nat.le_trans with (max N Ny); auto with arith ].
-    cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (max N Ny); auto with arith ].
+    cut (N <= n); [ intro Hn | apply Nat.le_trans with (Nat.max N Ny); auto with arith ].
+    cut (Ny <= n); [ intro Hn' | apply Nat.le_trans with (Nat.max N Ny); auto with arith ].
     apply leEq_transitive with (e[/] _[//]pos_ap_zero _ _ (Hy' n Hn')).
      apply mult_cancel_leEq with ([1][/] _[//]pos_ap_zero _ _ He).
       apply recip_resp_pos; auto.
@@ -539,28 +539,28 @@ Proof.
    intros ex Hex HNx; simpl in HNx; elim Hy; intro Hlt;
      elim Hlt; intros Ny HN; elim HN; clear Hy Hlt HN; intros ey Hey HNy; simpl in HNy.
     right.
-    exists (max Nx Ny); exists (ex[*]ey).
+    exists (Nat.max Nx Ny); exists (ex[*]ey).
      apply mult_resp_pos; auto.
     intros; simpl in |- *; rstepr ([--] (CS_seq _ x n) [*][--] (CS_seq _ y n)).
     apply mult_resp_leEq_both; try (apply less_leEq; assumption).
      astepr ([0][-]CS_seq _ x n); eauto with arith.
     astepr ([0][-]CS_seq _ y n); eauto with arith.
    left.
-   exists (max Nx Ny); exists (ex[*]ey).
+   exists (Nat.max Nx Ny); exists (ex[*]ey).
     apply mult_resp_pos; auto.
    intros; simpl in |- *; rstepr ([--] (CS_seq _ x n) [*]CS_seq _ y n).
    apply mult_resp_leEq_both; try (apply less_leEq; assumption).
     astepr ([0][-]CS_seq _ x n); eauto with arith.
    astepr (CS_seq _ y n[-][0]); eauto with arith.
   left.
-  exists (max Nx Ny); exists (ex[*]ey).
+  exists (Nat.max Nx Ny); exists (ex[*]ey).
    apply mult_resp_pos; auto.
   intros; simpl in |- *; rstepr (CS_seq _ x n[*][--] (CS_seq _ y n)).
   apply mult_resp_leEq_both; try (apply less_leEq; assumption).
    astepr (CS_seq _ x n[-][0]); eauto with arith.
   astepr ([0][-]CS_seq _ y n); eauto with arith.
  right.
- exists (max Nx Ny); exists (ex[*]ey).
+ exists (Nat.max Nx Ny); exists (ex[*]ey).
   apply mult_resp_pos; auto.
  intros; simpl in |- *; astepr (CS_seq _ x n[*]CS_seq _ y n).
  apply mult_resp_leEq_both; try (apply less_leEq; assumption).
@@ -590,33 +590,33 @@ Proof.
     apply leEq_less_trans with ([0]:F); auto.
     simpl in HM.
     eapply leEq_wdr.
-     apply (HM (max K N)); auto with arith.
+     apply (HM (Nat.max K N)); auto with arith.
     unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-     exfalso; apply le_not_lt with N (max K N); auto with arith.
+     exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
     simpl in |- *; rational.
    apply (less_irreflexive_unfolded _ d).
    apply leEq_less_trans with ([0]:F); auto.
    simpl in HM.
    eapply leEq_wdr.
-    apply (HM (max K N)); auto with arith.
+    apply (HM (Nat.max K N)); auto with arith.
    unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-    exfalso; apply le_not_lt with N (max K N); auto with arith.
+    exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
    simpl in |- *; rational.
   apply (less_irreflexive_unfolded _ d).
   apply leEq_less_trans with ([0]:F); auto.
   simpl in HM.
   eapply leEq_wdr.
-   apply (HM (max K N)); auto with arith.
+   apply (HM (Nat.max K N)); auto with arith.
   unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-   exfalso; apply le_not_lt with N (max K N); auto with arith.
+   exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
   simpl in |- *; rational.
  apply (less_irreflexive_unfolded _ d).
  apply leEq_less_trans with ([0]:F); auto.
  simpl in HM.
  eapply leEq_wdr.
-  apply (HM (max K N)); auto with arith.
+  apply (HM (Nat.max K N)); auto with arith.
  unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-  exfalso; apply le_not_lt with N (max K N); auto with arith.
+  exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
  simpl in |- *; rational.
 Qed.
 
@@ -681,7 +681,7 @@ Proof.
  simpl in H, H'.
  elim H; intros N1 HN1; elim HN1; clear H HN1; intros e1 He1 HN1.
  elim H'; intros N2 HN2; elim HN2; clear H' HN2; intros e2 He2 HN2.
- exists (max N1 N2); exists (e1[+]e2).
+ exists (Nat.max N1 N2); exists (e1[+]e2).
   apply plus_resp_pos; auto.
  intros; rstepr (CS_seq _ y n[-]CS_seq _ x n[+] (CS_seq _ z n[-]CS_seq _ y n)).
  apply plus_resp_leEq_both; eauto with arith.
@@ -708,7 +708,7 @@ Proof.
  intros x y Hx Hy.
  elim Hx; intros Nx HN; elim HN; clear Hx HN; intros ex Hex HNx; simpl in HNx;
    elim Hy; intros Ny HN; elim HN; clear Hy HN; intros ey Hey HNy; simpl in HNy.
- exists (max Nx Ny); exists (ex[*]ey).
+ exists (Nat.max Nx Ny); exists (ex[*]ey).
   apply mult_resp_pos; auto.
  intros; simpl in |- *; astepr (CS_seq _ x n[*]CS_seq _ y n).
  apply mult_resp_leEq_both; try (apply less_leEq; assumption).
@@ -825,7 +825,7 @@ Proof.
  unfold CS_seq in |- *; intro.
  case (px e16 He16); intros N1 px2.
  case (py e16 He16); intros N2 py2.
- set (NN := max N1 N2) in *.
+ set (NN := Nat.max N1 N2) in *.
  assert (N1_NN : N1 <= NN).
   unfold NN in |- *; auto with arith.
  assert (N2_NN : N2 <= NN).
@@ -923,13 +923,13 @@ Proof.
  case (px e16 He16); intros N1 H31.
  case (py e16 He16); intros N2 H41.
  simpl in |- *; intro H2; case H2; intros N H21.
- set (NN := max N (max N1 N2)) in *.
+ set (NN := Nat.max N (Nat.max N1 N2)) in *.
  assert (N_NN : N <= NN).
   unfold NN in |- *; auto with arith.
  assert (N1_NN : N1 <= NN).
-  unfold NN in |- *; apply Nat.le_trans with (max N1 N2); auto with arith.
+  unfold NN in |- *; apply Nat.le_trans with (Nat.max N1 N2); auto with arith.
  assert (N2_NN : N2 <= NN).
-  unfold NN in |- *; apply Nat.le_trans with (max N1 N2); auto with arith.
+  unfold NN in |- *; apply Nat.le_trans with (Nat.max N1 N2); auto with arith.
  set (x0 := x_ NN) in *.
  set (y0 := y_ NN) in *.
  simpl in |- *.
@@ -1074,7 +1074,7 @@ Proof.
  intros e H2 H3.
  case H3; intros N1 A.
  case (H e H2); intros N2 B.
- set (NN := max N1 N2) in *.
+ set (NN := Nat.max N1 N2) in *.
  assert (N1_NN : N1 <= NN).
   unfold NN in |- *; auto with arith.
  assert (N2_NN : N2 <= NN).

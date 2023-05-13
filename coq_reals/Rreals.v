@@ -433,7 +433,7 @@ Proof.
   intros m Hm.
   destruct (u (e/2)).
    lra.
-  set (z:=max x0 m).
+  set (z:=Nat.max x0 m).
   rstepr (((s m[-]s N)[+](s N[-]s z))[+](s z[-]x)).
   apply AbsSmall_eps_div_two.
    apply AbsSmall_eps_div_two.

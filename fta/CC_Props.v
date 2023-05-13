@@ -178,7 +178,7 @@ Proof.
        auto.
       apply H3. auto.
       apply H4. auto.
-     exists (max N N'); auto with arith.
+     exists (Nat.max N N'); auto with arith.
    auto. auto.
   apply pos_div_three. auto.
 Qed.

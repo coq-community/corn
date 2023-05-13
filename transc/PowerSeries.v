@@ -192,7 +192,7 @@ Proof.
  elim HN; intros c H H0.
  clear HN Ha'.
  elim (Archimedes (Max (Max b x0[-]Min a0 x0) [1][*]Two[*]c)); intros y Hy.
- exists (max N y); exists (Half:IR); repeat split.
+ exists (Nat.max N y); exists (Half:IR); repeat split.
    unfold Half in |- *.
    apply pos_div_two'; apply pos_one.
   apply less_leEq; apply pos_half.
@@ -269,7 +269,7 @@ Proof.
   apply pos_max_one.
  apply leEq_transitive with (c[*]AbsIR (a n)).
   apply H0.
-  apply Nat.le_trans with (max N y); auto; apply le_max_l.
+  apply Nat.le_trans with (Nat.max N y); auto; apply le_max_l.
  apply shift_leEq_div.
   apply pos_max_one.
  rstepl (c[*]Max (Max b x0[-]Min a0 x0) [1][*]AbsIR (a n)).
@@ -284,7 +284,7 @@ Proof.
  apply nring_less.
  red in |- *.
  cut (y <= n); intros; auto with arith.
- apply Nat.le_trans with (max N y); auto with arith.
+ apply Nat.le_trans with (Nat.max N y); auto with arith.
 Qed.
 
 Lemma FPowerSeries'_conv : fun_series_convergent_IR realline FPowerSeries'.

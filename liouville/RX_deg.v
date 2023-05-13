@@ -162,7 +162,7 @@ Proof.
  apply inv_resp_ap_zero; assumption.
 Qed.
 
-Lemma RX_deg_sum : forall p q, RX_deg p <> RX_deg q -> RX_deg (p[+]q)=max (RX_deg p) (RX_deg q).
+Lemma RX_deg_sum : forall p q, RX_deg p <> RX_deg q -> RX_deg (p[+]q)=Nat.max (RX_deg p) (RX_deg q).
 Proof.
  intros p q Hneq.
  case (RX_dec p [0]).
@@ -205,7 +205,7 @@ Proof.
  apply RX_deg_spec; assumption.
 Qed.
 
-Lemma RX_deg_minus : forall p q, RX_deg p <> RX_deg q -> RX_deg (p[-]q)=max (RX_deg p) (RX_deg q).
+Lemma RX_deg_minus : forall p q, RX_deg p <> RX_deg q -> RX_deg (p[-]q)=Nat.max (RX_deg p) (RX_deg q).
 Proof.
  unfold cg_minus; intros p q Hneq.
  rewrite (RX_deg_inv q) in Hneq.

@@ -476,12 +476,12 @@ Proof.
  destruct (convG _ (pos_div_two _ _ He)) as [N HN].
  destruct (CAnd_proj2 _ _ contG _ (pos_div_two _ _ He)) as [z Hz Hz0].
  destruct (convF _ Hz) as [M HM].
- exists (max N M).
+ exists (Nat.max N M).
  intros n Hn x Hx.
  assert (Hn0 : N <= n).
-  apply Nat.le_trans with (max N M); auto with *.
+  apply Nat.le_trans with (Nat.max N M); auto with *.
  assert (Hn1 : M <= n).
-  apply Nat.le_trans with (max N M); auto with *.
+  apply Nat.le_trans with (Nat.max N M); auto with *.
  apply AbsSmall_imp_AbsIR.
  assert (X:Continuous_I (a:=a) (b:=b) Hab (G[o]f n)).
   eapply Continuous_I_comp.

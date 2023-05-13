@@ -163,18 +163,18 @@ Proof.
  unfold Cauchy_prop in Hg.
  elim (Hf e_div_4 Heps); intros N1 H21.
  elim (Hg e_div_4 Heps); intros N2 H31.
- exists (max N1 N2).
+ exists (Nat.max N1 N2).
  intros.
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
- rstepr (f m[-]f (max N1 N2)[+](g m[-]g (max N1 N2))).
+ rstepr (f m[-]f (Nat.max N1 N2)[+](g m[-]g (Nat.max N1 N2))).
  apply AbsSmall_plus.
-  rstepr (f m[-]f N1[+](f N1[-]f (max N1 N2))).
+  rstepr (f m[-]f N1[+](f N1[-]f (Nat.max N1 N2))).
   rstepl (e [/]FourNZ[+]e [/]FourNZ).
   apply AbsSmall_plus.
    apply H21; eauto with arith.
   apply AbsSmall_minus.
   apply H21; eauto with arith.
- rstepr (g m[-]g N2[+](g N2[-]g (max N1 N2))).
+ rstepr (g m[-]g N2[+](g N2[-]g (Nat.max N1 N2))).
  rstepl (e [/]FourNZ[+]e [/]FourNZ).
  apply AbsSmall_plus.
   apply H31; eauto with arith.
@@ -209,7 +209,7 @@ Proof.
    | unfold eg in |- *; apply div_resp_pos; try apply mult_resp_pos; auto; apply pos_twelve ].
  elim (Hf eg Heg); intros Pf HPf.
  elim (Hg ef Hef); intros Pg HPg.
- set (N := max (max Nf Pf) (max Ng Pg)) in *; exists N; intros m Hm.
+ set (N := Nat.max (Nat.max Nf Pf) (Nat.max Ng Pg)) in *; exists N; intros m Hm.
  rstepr ((f m[-]f Pf[+][--](f N[-]f Pf))[*]g m[+] (g m[-]g Pg[+][--](g N[-]g Pg))[*]f N).
  apply AbsSmall_wdl_unfolded with (Three[*]((eg[+]eg)[*]Mg)[+]Three[*]((ef[+]ef)[*]Mf)).
   2: unfold eg, ef in |- *; rational.
@@ -259,8 +259,8 @@ Proof.
  red in |- *; intros d Hd.
  elim (Hf ((d[*]e[*]e) [/]TwoNZ));
    [ intros K HK | apply pos_div_two; repeat apply mult_resp_pos; auto ].
- exists (max K N); intros n Hn.
- apply AbsSmall_cancel_mult with (f (max K N)).
+ exists (Nat.max K N); intros n Hn.
+ apply AbsSmall_cancel_mult with (f (Nat.max K N)).
   apply less_leEq_trans with e; auto with arith.
  apply AbsSmall_cancel_mult with (f n).
   apply less_leEq_trans with e; eauto with arith.
@@ -268,8 +268,8 @@ Proof.
  elim lt_le_dec; intro; simpl in |- *.
   exfalso; apply le_not_lt with N n; eauto with arith.
  elim lt_le_dec; intro; simpl in |- *.
-  exfalso; apply le_not_lt with N (max K N); eauto with arith.
- rstepr (f (max K N)[-]f n).
+  exfalso; apply le_not_lt with N (Nat.max K N); eauto with arith.
+ rstepr (f (Nat.max K N)[-]f n).
  apply AbsSmall_leEq_trans with (d[*]e[*]e).
   apply mult_resp_leEq_both.
      apply less_leEq; apply mult_resp_pos; auto.
@@ -279,7 +279,7 @@ Proof.
    apply less_leEq; auto.
   auto with arith.
  auto with arith.
- rstepr (f (max K N)[-]f K[+](f K[-]f n)).
+ rstepr (f (Nat.max K N)[-]f K[+](f K[-]f n)).
  apply AbsSmall_eps_div_two.
   auto with arith.
  apply AbsSmall_minus; apply HK.

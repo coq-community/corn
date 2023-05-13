@@ -673,14 +673,14 @@ Proof.
   apply AbsSmall_imp_AbsIR.
   apply HN; assumption.
  elim (convG _ H2).
- intros N HN; exists (S (max N k)).
- cut (N <= max N k); [ intro | apply le_max_l ].
- cut (k <= max N k); [ intro | apply le_max_r ].
+ intros N HN; exists (S (Nat.max N k)).
+ cut (N <= Nat.max N k); [ intro | apply le_max_l ].
+ cut (k <= Nat.max N k); [ intro | apply le_max_r ].
  split.
   auto with arith.
  intros m H5 x H6 Hx Hx'.
  apply AbsIR_imp_AbsSmall.
- cut (N <= m); [ intro | apply Nat.le_trans with (max N k); auto with arith ].
+ cut (N <= m); [ intro | apply Nat.le_trans with (Nat.max N k); auto with arith ].
  eapply leEq_wdl.
   Transparent fun_seq_part_sum.
   simpl in Hx'.

@@ -516,12 +516,12 @@ Proof.
     intro H3.
     case H3.
     intros N H4.
-    exists (max N M).
+    exists (Nat.max N M).
     intros.
     apply ing_cancel_AbsSmall.
     rstepl (inject_Q e [/]ThreeNZ[+]inject_Q e [/]ThreeNZ[+]inject_Q e [/]ThreeNZ).
-    rstepr (inject_Q (CS_seq F (a_ m) (T (a_ m) m)) [-]a_ m[+] (a_ (max N M) [-]
-      inject_Q (CS_seq F (a_ (max N M)) (T (a_ (max N M)) (max N M)))) [+] (a_ m[-]a_ (max N M))).
+    rstepr (inject_Q (CS_seq F (a_ m) (T (a_ m) m)) [-]a_ m[+] (a_ (Nat.max N M) [-]
+      inject_Q (CS_seq F (a_ (Nat.max N M)) (T (a_ (Nat.max N M)) (Nat.max N M)))) [+] (a_ m[-]a_ (Nat.max N M))).
     apply AbsSmall_plus.
      apply AbsSmall_plus.
       astepl (inject_Q (e [/]ThreeNZ)).
@@ -605,14 +605,14 @@ Proof.
        rstepr (nring (R:=F) M).
        exact H2.
       apply AbsSmall_minus.
-      apply expand_Q_R_2 with (x := a_ (max N M)) (e := Four[*]one_div_succ (R:=F) M)
-        (N := T (a_ (max N M)) (max N M)).
+      apply expand_Q_R_2 with (x := a_ (Nat.max N M)) (e := Four[*]one_div_succ (R:=F) M)
+        (N := T (a_ (Nat.max N M)) (Nat.max N M)).
        apply mult_resp_pos.
         apply pos_four.
        apply one_div_succ_pos.
       intros.
       rstepl (one_div_succ (R:=F) M).
-      apply AbsSmall_leEq_trans with (R := F) (e1 := one_div_succ (R:=F) (max N M)).
+      apply AbsSmall_leEq_trans with (R := F) (e1 := one_div_succ (R:=F) (Nat.max N M)).
        apply one_div_succ_resp_leEq.
        auto with arith.
       apply modulus_property_2.
@@ -620,7 +620,7 @@ Proof.
      apply eq_symmetric_unfolded.
      apply ing_div_three.
     rstepl (inject_Q e [/]SixNZ[+]inject_Q e [/]SixNZ).
-    rstepr (a_ m[-]a_ N[+] (a_ N[-]a_ (max N M))).
+    rstepr (a_ m[-]a_ N[+] (a_ N[-]a_ (Nat.max N M))).
     apply AbsSmall_plus.
      apply H4; eauto with arith.
     apply AbsSmall_minus.
@@ -711,17 +711,17 @@ Proof.
  elim (pa (e [/]SixNZ)); [ intros N2 HN2 | apply pos_div_six; auto ].
  elim (CS_seq_diagonal (Build_CauchySeq R_COrdField' a_ pa) (q [/]EightNZ));
    [ intros N1 HN1 | apply pos_div_eight; auto ].
- exists (max M (max N1 N2)).
+ exists (Nat.max M (Nat.max N1 N2)).
  intros.
  rstepl (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ).
- rstepr (a_ m[-]a_ (max M (max N1 N2)) [+] (a_ (max M (max N1 N2)) [-] inject_Q
-   (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (max M (max N1 N2)))) [+] (inject_Q
-     (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (max M (max N1 N2))) [-]
+ rstepr (a_ m[-]a_ (Nat.max M (Nat.max N1 N2)) [+] (a_ (Nat.max M (Nat.max N1 N2)) [-] inject_Q
+   (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (Nat.max M (Nat.max N1 N2)))) [+] (inject_Q
+     (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (Nat.max M (Nat.max N1 N2))) [-]
        LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa))).
  apply AbsSmall_plus.
   apply AbsSmall_plus.
    rstepl (e [/]SixNZ[+]e [/]SixNZ).
-   rstepr (a_ m[-]a_ N2[+] (a_ N2[-]a_ (max M (max N1 N2)))).
+   rstepr (a_ m[-]a_ N2[+] (a_ N2[-]a_ (Nat.max M (Nat.max N1 N2)))).
    apply AbsSmall_plus.
     apply HN2; eauto with arith.
    apply AbsSmall_minus; apply HN2; eauto with arith.
@@ -730,7 +730,7 @@ Proof.
   apply AbsSmall_minus.
   simpl in |- *.
   apply AbsSmall_leEq_trans with (R := R_COrdField')
-    (e1 := Four[*] (one_div_succ (max M (max N1 N2)):R_COrdField')).
+    (e1 := Four[*] (one_div_succ (Nat.max M (Nat.max N1 N2)):R_COrdField')).
    apply less_leEq.
    apply leEq_less_trans with (R := R_COrdField') (y := Four[*]one_div_succ (R:=R_COrdField') M).
     apply mult_resp_leEq_lft.
@@ -794,20 +794,20 @@ Proof.
    apply plus_resp_eq.
    apply eq_symmetric_unfolded.
    apply ing_nring.
-  astepl (inject_Q (Four[*]one_div_succ (R:=F) (max M (max N1 N2)))).
-   apply expand_Q_R_2 with (x := a_ (max M (max N1 N2)))
-     (e := Four[*]one_div_succ (R:=F) (max M (max N1 N2)))
-       (N := T (a_ (max M (max N1 N2))) (max M (max N1 N2))).
+  astepl (inject_Q (Four[*]one_div_succ (R:=F) (Nat.max M (Nat.max N1 N2)))).
+   apply expand_Q_R_2 with (x := a_ (Nat.max M (Nat.max N1 N2)))
+     (e := Four[*]one_div_succ (R:=F) (Nat.max M (Nat.max N1 N2)))
+       (N := T (a_ (Nat.max M (Nat.max N1 N2))) (Nat.max M (Nat.max N1 N2))).
     apply mult_resp_pos.
      apply pos_four.
     apply one_div_succ_pos.
    intros.
-   rstepl (one_div_succ (R:=F) (max M (max N1 N2))).
+   rstepl (one_div_succ (R:=F) (Nat.max M (Nat.max N1 N2))).
    apply modulus_property_2.
    assumption.
-  apply eq_transitive_unfolded with (inject_Q (Four:F) [*]inject_Q (one_div_succ (max M (max N1 N2)))).
+  apply eq_transitive_unfolded with (inject_Q (Four:F) [*]inject_Q (one_div_succ (Nat.max M (Nat.max N1 N2)))).
    apply ing_mult.
-  apply eq_transitive_unfolded with (Four[*]inject_Q (one_div_succ (max M (max N1 N2)))).
+  apply eq_transitive_unfolded with (Four[*]inject_Q (one_div_succ (Nat.max M (Nat.max N1 N2)))).
    apply mult_wd.
     apply eq_symmetric_unfolded.
     apply ing_nring.
@@ -816,9 +816,9 @@ Proof.
    apply eq_reflexive_unfolded.
   unfold one_div_succ in |- *.
   unfold Snring in |- *.
-  astepl (inject_Q ([1][/] _[//]nringS_ap_zero _ (max M (max N1 N2)))).
-  Step_final ([1][/] _[//]nringS_ap_zero R_COrdField' (max M (max N1 N2))).
-  apply eq_transitive_unfolded with (inject_Q ([1]:F) [/] _[//]nringS_ap_zero _ (max M (max N1 N2))).
+  astepl (inject_Q ([1][/] _[//]nringS_ap_zero _ (Nat.max M (Nat.max N1 N2)))).
+  Step_final ([1][/] _[//]nringS_ap_zero R_COrdField' (Nat.max M (Nat.max N1 N2))).
+  apply eq_transitive_unfolded with (inject_Q ([1]:F) [/] _[//]nringS_ap_zero _ (Nat.max M (Nat.max N1 N2))).
    apply eq_symmetric_unfolded.
    apply ing_n.
   apply div_wd.
@@ -827,14 +827,14 @@ Proof.
  apply AbsSmall_leEq_trans with (R := R_COrdField') (e1 := inject_Q q).
   apply less_leEq; assumption.
  apply expand_Q_R_2 with (x := LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (e := q)
-   (N := max M (max N1 N2)).
+   (N := Nat.max M (Nat.max N1 N2)).
   assumption.
  intros.
  rstepl (q [/]EightNZ[+]q [/]EightNZ).
  rstepr (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) m0[-]
    CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) N1[+]
      (CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) N1[-]
-       CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (max M (max N1 N2)))).
+       CS_seq F (LimR_CauchySeq (Build_CauchySeq R_COrdField' a_ pa)) (Nat.max M (Nat.max N1 N2)))).
  apply AbsSmall_plus.
   unfold LimR_CauchySeq in |- *; simpl in |- *; apply HN1; eauto with arith.
  apply AbsSmall_minus.

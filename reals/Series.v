@@ -161,16 +161,16 @@ Proof.
  red in H.
  elim (H _ (pos_div_two _ _ H0)).
  intros N HN.
- exists (max N 1); intros.
+ exists (Nat.max N 1); intros.
  apply AbsSmall_wdr_unfolded with (seq_part_sum (S m) [-]seq_part_sum m).
   apply AbsSmall_wdr_unfolded with
     (seq_part_sum (S m) [-]seq_part_sum N[+] (seq_part_sum N[-]seq_part_sum m)).
    rstepl (eps [/]TwoNZ[+]eps [/]TwoNZ).
    apply AbsSmall_plus.
     apply HN.
-    apply Nat.le_trans with (max N 1); auto with arith.
+    apply Nat.le_trans with (Nat.max N 1); auto with arith.
    apply AbsSmall_minus; apply HN.
-   apply Nat.le_trans with (max N 1); auto with arith.
+   apply Nat.le_trans with (Nat.max N 1); auto with arith.
   rational.
  eapply eq_transitive_unfolded.
   apply seq_part_sum_n; auto with arith.
@@ -556,16 +556,16 @@ Proof.
  elim (H _ (pos_div_two _ _ H0)).
  intros N HN.
  elim aew_equal; intros n Hn.
- exists (max n N).
+ exists (Nat.max n N).
  intros.
- apply AbsSmall_wdr_unfolded with (x m[-]x (max n N)).
-  rstepr (x m[-]x N[+] (x N[-]x (max n N))).
+ apply AbsSmall_wdr_unfolded with (x m[-]x (Nat.max n N)).
+  rstepr (x m[-]x N[+] (x N[-]x (Nat.max n N))).
   rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
   apply AbsSmall_plus.
-   apply HN; apply Nat.le_trans with (max n N); auto with arith.
-  apply AbsSmall_minus; apply HN; apply Nat.le_trans with (max n N); auto with arith.
+   apply HN; apply Nat.le_trans with (Nat.max n N); auto with arith.
+  apply AbsSmall_minus; apply HN; apply Nat.le_trans with (Nat.max n N); auto with arith.
  apply cg_minus_wd; apply Hn.
-  apply Nat.le_trans with (max n N); auto with arith.
+  apply Nat.le_trans with (Nat.max n N); auto with arith.
  apply le_max_l.
 Qed.
 
@@ -576,12 +576,12 @@ Proof.
  elim (H eps H0).
  intros N HN.
  elim aew_equal; intros n Hn.
- exists (max n N).
+ exists (Nat.max n N).
  intros.
  apply AbsSmall_wdr_unfolded with (x m[-]c).
-  apply HN; apply Nat.le_trans with (max n N); auto with arith.
+  apply HN; apply Nat.le_trans with (Nat.max n N); auto with arith.
  apply cg_minus_wd; [ apply Hn | algebra ].
- apply Nat.le_trans with (max n N); auto with arith.
+ apply Nat.le_trans with (Nat.max n N); auto with arith.
 Qed.
 
 Lemma aew_series_conv : convergent x -> convergent y.
@@ -590,7 +590,7 @@ Proof.
  red in |- *; red in |- *; intros. rename X into H0.
  elim (H _ (pos_div_two _ _ H0)); intros N HN.
  elim aew_equal; intros n Hn.
- set (k := max (max n N) 1) in *.
+ set (k := Nat.max (Nat.max n N) 1) in *.
  exists k; intros.
  apply AbsSmall_wdr_unfolded with (seq_part_sum x m[-]seq_part_sum x k).
   rstepr (seq_part_sum x m[-]seq_part_sum x N[+] (seq_part_sum x N[-]seq_part_sum x k)).
@@ -598,9 +598,9 @@ Proof.
   apply AbsSmall_plus.
    apply HN; cut (N <= k).
     lia.
-   apply Nat.le_trans with (max n N); unfold k in |- *; auto with arith.
+   apply Nat.le_trans with (Nat.max n N); unfold k in |- *; auto with arith.
   apply AbsSmall_minus; apply HN; auto.
-  apply Nat.le_trans with (max n N); unfold k in |- *; auto with arith.
+  apply Nat.le_trans with (Nat.max n N); unfold k in |- *; auto with arith.
  cut (1 <= k); intros.
   eapply eq_transitive_unfolded.
    apply seq_part_sum_n; auto.
@@ -612,7 +612,7 @@ Proof.
    rewrite <- S_pred with m 0; auto with arith.
    apply Nat.lt_le_trans with k; auto.
   intros; apply Hn.
-  apply Nat.le_trans with (max n N); auto with arith.
+  apply Nat.le_trans with (Nat.max n N); auto with arith.
   apply Nat.le_trans with k; unfold k in |- *; auto with arith.
  unfold k in |- *; apply le_max_r.
 Qed.
@@ -690,16 +690,16 @@ Proof.
   apply AbsSmall_imp_AbsIR.
   apply HN; assumption. rename X into H1.
  elim (H _ (pos_div_two _ _ H1)).
- intros N HN; exists (S (max N k)).
- cut (N <= max N k); [ intro | apply le_max_l ].
- cut (k <= max N k); [ intro | apply le_max_r ].
+ intros N HN; exists (S (Nat.max N k)).
+ cut (N <= Nat.max N k); [ intro | apply le_max_l ].
+ cut (k <= Nat.max N k); [ intro | apply le_max_r ].
  split.
   auto with arith.
  intros.
- rstepr (seq_part_sum y m[-]seq_part_sum y N[+] (seq_part_sum y N[-]seq_part_sum y (S (max N k)))).
+ rstepr (seq_part_sum y m[-]seq_part_sum y N[+] (seq_part_sum y N[-]seq_part_sum y (S (Nat.max N k)))).
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
  apply AbsSmall_plus.
-  apply HN; apply Nat.le_trans with (max N k); auto with arith.
+  apply HN; apply Nat.le_trans with (Nat.max N k); auto with arith.
  apply AbsSmall_minus; apply HN; auto with arith.
 Qed.
 
@@ -757,34 +757,34 @@ Proof.
  clear Hk H0.
  red in |- *. intros e H0.
  elim (H (e [/]TwoNZ) (pos_div_two _ _ H0)); intros M HM.
- exists (S (max N M)); intros.
+ exists (S (Nat.max N M)); intros.
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
- apply AbsSmall_wdr_unfolded with (seq_part_sum y (m + k) [-]seq_part_sum y (S (max N M) + k)).
+ apply AbsSmall_wdr_unfolded with (seq_part_sum y (m + k) [-]seq_part_sum y (S (Nat.max N M) + k)).
   rstepr (seq_part_sum y (m + k) [-]seq_part_sum y M[+]
-    (seq_part_sum y M[-]seq_part_sum y (S (max N M) + k))).
+    (seq_part_sum y M[-]seq_part_sum y (S (Nat.max N M) + k))).
   apply AbsSmall_plus.
    apply HM.
-   apply Nat.le_trans with (max N M); auto with arith.
+   apply Nat.le_trans with (Nat.max N M); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   auto with arith.
  unfold seq_part_sum in |- *.
- apply eq_transitive_unfolded with (Sum (S (max N M) + k) (pred (m + k)) y).
+ apply eq_transitive_unfolded with (Sum (S (Nat.max N M) + k) (pred (m + k)) y).
   unfold Sum, Sum1 in |- *.
   rewrite <- S_pred with (m := 0).
    algebra.
-  apply Nat.lt_le_trans with (S (max N M)); auto with arith.
- astepr (Sum (S (max N M)) (pred m) x).
+  apply Nat.lt_le_trans with (S (Nat.max N M)); auto with arith.
+ astepr (Sum (S (Nat.max N M)) (pred m) x).
   2: unfold Sum, Sum1 in |- *.
   2: rewrite <- S_pred with (m := 0).
    2: algebra.
-  2: apply Nat.lt_le_trans with (S (max N M)); auto with arith.
+  2: apply Nat.lt_le_trans with (S (Nat.max N M)); auto with arith.
  replace (pred (m + k)) with (pred m + k).
   apply eq_symmetric_unfolded; apply Sum_big_shift.
    intros; apply HN.
-   apply Nat.le_trans with (max N M); auto with arith.
+   apply Nat.le_trans with (Nat.max N M); auto with arith.
   rewrite <- S_pred with (m := 0); auto.
-  apply Nat.lt_le_trans with (S (max N M)); auto with arith.
+  apply Nat.lt_le_trans with (S (Nat.max N M)); auto with arith.
  lia.
 Qed.
 
@@ -797,47 +797,47 @@ Proof.
  clear Hk H0.
  red in |- *; intros e H0.
  elim (H (e [/]TwoNZ) (pos_div_two _ _ H0)); intros M HM.
- exists (S (max N M + k)); intros.
+ exists (S (Nat.max N M + k)); intros.
  rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
- apply AbsSmall_wdr_unfolded with (seq_part_sum x (m - k) [-]seq_part_sum x (S (max N M + k) - k)).
+ apply AbsSmall_wdr_unfolded with (seq_part_sum x (m - k) [-]seq_part_sum x (S (Nat.max N M + k) - k)).
   rstepr (seq_part_sum x (m - k) [-]seq_part_sum x M[+]
-    (seq_part_sum x M[-]seq_part_sum x (S (max N M + k) - k))).
+    (seq_part_sum x M[-]seq_part_sum x (S (Nat.max N M + k) - k))).
   apply AbsSmall_plus.
    apply HM.
    apply (fun p n m : nat => plus_le_reg_l n m p) with k.
    rewrite <- le_plus_minus.
-    apply Nat.le_trans with (max N M + k); auto with arith.
+    apply Nat.le_trans with (Nat.max N M + k); auto with arith.
     rewrite plus_comm; auto with arith.
-   apply Nat.le_trans with (S (max N M + k)); auto with arith.
+   apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   apply (fun p n m : nat => plus_le_reg_l n m p) with k.
   rewrite <- le_plus_minus.
-   apply Nat.le_trans with (max N M + k); auto.
+   apply Nat.le_trans with (Nat.max N M + k); auto.
    rewrite plus_comm; auto with arith.
-  apply Nat.le_trans with (S (max N M + k)); auto with arith.
+  apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
  unfold seq_part_sum in |- *.
- apply eq_transitive_unfolded with (Sum (S (max N M + k) - k) (pred (m - k)) x).
+ apply eq_transitive_unfolded with (Sum (S (Nat.max N M + k) - k) (pred (m - k)) x).
   unfold Sum, Sum1 in |- *.
   rewrite <- S_pred with (m := 0).
    algebra.
   lia.
- astepr (Sum (S (max N M + k)) (pred m) y).
+ astepr (Sum (S (Nat.max N M + k)) (pred m) y).
   2: unfold Sum, Sum1 in |- *.
   2: rewrite <- S_pred with (m := 0).
    2: algebra.
   2: lia.
  replace (pred m) with (pred (m - k) + k).
   2: lia.
- pattern (S (max N M + k)) at 2 in |- *; replace (S (max N M + k)) with (S (max N M + k) - k + k).
+ pattern (S (Nat.max N M + k)) at 2 in |- *; replace (S (Nat.max N M + k)) with (S (Nat.max N M + k) - k + k).
   2: lia.
  apply Sum_big_shift.
   intros; apply HN.
-  apply Nat.le_trans with (max N M); auto with arith.
+  apply Nat.le_trans with (Nat.max N M); auto with arith.
   lia.
  rewrite <- S_pred with (m := 0); auto.
   lia.
- apply Nat.lt_le_trans with (S (max N M)); auto with arith.
+ apply Nat.lt_le_trans with (S (Nat.max N M)); auto with arith.
  lia.
 Qed.
 
@@ -917,9 +917,9 @@ Proof.
   intro H.
   clear Hn.
   intro n.
-  cut (S N <= max (S N) n); [ intro | apply le_max_l ].
+  cut (S N <= Nat.max (S N) n); [ intro | apply le_max_l ].
   elim (H _ H0); intros m Hm; elim Hm; clear H Hm; intros Hm H; exists m.
-   apply Nat.le_trans with (max (S N) n); auto with arith.
+   apply Nat.le_trans with (Nat.max (S N) n); auto with arith.
   assumption.
  intros; exists n.
  split.

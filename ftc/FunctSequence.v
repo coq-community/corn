@@ -803,9 +803,9 @@ Proof.
  intros H H' e H0.
  elim (convF _ (pos_div_two _ _ H0)); intros Nf HNf.
  elim (convG _ (pos_div_two _ _ H0)); intros Ng HNg.
- cut (Nf <= max Nf Ng); [ intro | apply le_max_l ].
- cut (Ng <= max Nf Ng); [ intro | apply le_max_r ].
- exists (max Nf Ng); intros.
+ cut (Nf <= Nat.max Nf Ng); [ intro | apply le_max_l ].
+ cut (Ng <= Nat.max Nf Ng); [ intro | apply le_max_r ].
+ exists (Nat.max Nf Ng); intros.
  apply leEq_wdl with (AbsIR (Part _ _ (incf n x Hx) [+]Part _ _ (incg n x Hx) [-]
    (Part _ _ (incF x Hx) [+]Part _ _ (incG x Hx)))).
   2: apply AbsIR_wd; simpl in |- *; algebra.
@@ -816,8 +816,8 @@ Proof.
  eapply leEq_transitive.
   apply triangle_IR.
  apply plus_resp_leEq_both.
-  unfold incf in |- *; apply HNf; apply Nat.le_trans with (max Nf Ng); auto.
- unfold incg in |- *; apply HNg; apply Nat.le_trans with (max Nf Ng); auto.
+  unfold incf in |- *; apply HNf; apply Nat.le_trans with (Nat.max Nf Ng); auto.
+ unfold incg in |- *; apply HNg; apply Nat.le_trans with (Nat.max Nf Ng); auto.
 Qed.
 
 Lemma fun_Lim_seq_minus' : forall H H',
@@ -826,9 +826,9 @@ Proof.
  intros H H' e H0.
  elim (convF _ (pos_div_two _ _ H0)); intros Nf HNf.
  elim (convG _ (pos_div_two _ _ H0)); intros Ng HNg.
- cut (Nf <= max Nf Ng); [ intro | apply le_max_l ].
- cut (Ng <= max Nf Ng); [ intro | apply le_max_r ].
- exists (max Nf Ng); intros.
+ cut (Nf <= Nat.max Nf Ng); [ intro | apply le_max_l ].
+ cut (Ng <= Nat.max Nf Ng); [ intro | apply le_max_r ].
+ exists (Nat.max Nf Ng); intros.
  apply leEq_wdl with (AbsIR (Part _ _ (incf n x Hx) [-]Part _ _ (incg n x Hx) [-]
    (Part _ _ (incF x Hx) [-]Part _ _ (incG x Hx)))).
   2: apply AbsIR_wd; simpl in |- *; algebra.
@@ -839,8 +839,8 @@ Proof.
  eapply leEq_transitive.
   apply triangle_IR_minus.
  apply plus_resp_leEq_both.
-  unfold incf in |- *; apply HNf; apply Nat.le_trans with (max Nf Ng); auto.
- unfold incg in |- *; apply HNg; apply Nat.le_trans with (max Nf Ng); auto.
+  unfold incf in |- *; apply HNf; apply Nat.le_trans with (Nat.max Nf Ng); auto.
+ unfold incg in |- *; apply HNg; apply Nat.le_trans with (Nat.max Nf Ng); auto.
 Qed.
 
 Lemma fun_Lim_seq_mult' : forall H H',
@@ -860,9 +860,9 @@ Proof.
     intro Hef.
     elim (convF _ Hef); intros NF HNF; clear convF.
     elim (convG _ Heg); intros NG HNG; clear convG.
-    cut (NF <= max NF NG); [ intro | apply le_max_l ].
-    cut (NG <= max NF NG); [ intro | apply le_max_r ].
-    exists (max NF NG); intros.
+    cut (NF <= Nat.max NF NG); [ intro | apply le_max_l ].
+    cut (NG <= Nat.max NF NG); [ intro | apply le_max_r ].
+    exists (Nat.max NF NG); intros.
     apply leEq_transitive with ee.
      2: unfold ee in |- *; apply Min_leEq_lft.
     apply leEq_wdl with (AbsIR (Part _ _ (incf n x Hx) [*]Part _ _ (incg n x Hx) [-]
@@ -891,14 +891,14 @@ Proof.
        apply AbsIR_nonneg.
       eapply shift_mult_leEq'.
        apply pos_max_one.
-      unfold eg in HNG; unfold incg in |- *; apply HNG; apply Nat.le_trans with (max NF NG); auto.
+      unfold eg in HNG; unfold incg in |- *; apply HNG; apply Nat.le_trans with (Nat.max NF NG); auto.
      eapply leEq_wdl.
       2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
      apply leEq_transitive with (ee [/]ThreeNZ[*]ee [/]ThreeNZ).
       2: astepr (ee [/]ThreeNZ[*][1]); apply mult_resp_leEq_lft.
        apply mult_resp_leEq_both; try apply AbsIR_nonneg.
         eapply leEq_transitive.
-         unfold incf in |- *; apply HNF; apply Nat.le_trans with (max NF NG); auto.
+         unfold incf in |- *; apply HNF; apply Nat.le_trans with (Nat.max NF NG); auto.
         unfold ef in |- *.
         apply shift_div_leEq.
          apply pos_max_one.
@@ -906,7 +906,7 @@ Proof.
          apply rht_leEq_Max.
         apply less_leEq; apply shift_less_div; astepl ZeroR; [ apply pos_three | assumption ].
        eapply leEq_transitive.
-        unfold incg in |- *; apply HNG; apply Nat.le_trans with (max NF NG); auto.
+        unfold incg in |- *; apply HNG; apply Nat.le_trans with (Nat.max NF NG); auto.
        unfold eg in |- *.
        apply shift_div_leEq.
         apply pos_max_one.
@@ -932,7 +932,7 @@ Proof.
      apply AbsIR_nonneg.
     eapply shift_mult_leEq'.
      apply pos_max_one.
-    unfold ef in HNF; unfold incf in |- *; apply HNF; apply Nat.le_trans with (max NF NG); auto.
+    unfold ef in HNF; unfold incf in |- *; apply HNF; apply Nat.le_trans with (Nat.max NF NG); auto.
    unfold ef in |- *.
    apply div_resp_pos.
     apply pos_max_one.

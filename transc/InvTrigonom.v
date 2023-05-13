@@ -260,7 +260,7 @@ Proof.
   elim (H _ (compact_inc_rht _ _ Hab)); intros Hb1 Hb2.
   split.
    intros x H1.
-   unfold min, max in H1; inversion_clear H1; split.
+   unfold min, Nat.max in H1; inversion_clear H1; split.
     apply less_leEq_trans with min.
      unfold min in |- *; apply less_Min.
       apply inv_cancel_less; astepr OneR.
@@ -279,7 +279,7 @@ Proof.
   intros x Hx H1.
   apply compact_wd with (Sin x).
    2: simpl in |- *; algebra.
-  unfold min, max in |- *; inversion_clear H1.
+  unfold min, Nat.max in |- *; inversion_clear H1.
   split.
    eapply leEq_transitive; [ apply Min_leEq_lft | apply Sin_resp_leEq; auto ].
     apply less_leEq; auto.
@@ -289,7 +289,7 @@ Proof.
   apply Sin_resp_leEq; auto.
    apply leEq_transitive with a; auto; apply less_leEq; auto.
   apply less_leEq; auto.
- unfold min, max in |- *; apply less_transitive_unfolded with ZeroR.
+ unfold min, Nat.max in |- *; apply less_transitive_unfolded with ZeroR.
   eapply leEq_less_trans.
    apply Min_leEq_rht.
   astepr ( [--][0]:IR); apply inv_resp_less; apply (pos_half IR).
@@ -637,7 +637,7 @@ Proof.
      Included.
     intros x Hx H3.
     fold (Tan x Hx) in |- *.
-    unfold min, max in |- *; inversion_clear H3.
+    unfold min, Nat.max in |- *; inversion_clear H3.
     split.
      eapply leEq_transitive; [ apply Min_leEq_lft | apply Tan_resp_leEq; auto ].
      apply leEq_less_trans with b; auto.
@@ -645,7 +645,7 @@ Proof.
      2: apply lft_leEq_Max.
     apply Tan_resp_leEq; auto.
     apply less_leEq_trans with a; auto.
-   unfold min, max in |- *.
+   unfold min, Nat.max in |- *.
    eapply leEq_less_trans.
     apply Min_leEq_rht.
    eapply less_leEq_trans; [ apply pos_one | apply rht_leEq_Max ].
