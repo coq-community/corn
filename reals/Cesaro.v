@@ -145,7 +145,7 @@ Proof.
   apply (seq_inf_sum_imp_div_small y H3 H2 C (eps[/]TwoNZ) H4).
  destruct H7 as [N2 H7].
  (* Now we can choose N as max of N1 and N2 *)
- exists (S (max (S N1) N2)).
+ exists (S (Nat.max (S N1) N2)).
  intros.
  astepr (seq_part_sum (fun k : nat => y k [*] (x k [-] l)) (S m)[/]
    seq_part_sum y (S m)[//]seq_pos_imp_ap_zero y H2 m).

@@ -1123,7 +1123,7 @@ Proof.
        (Build_CauchySeq _ _ (Cauchy_Darboux_Seq _ _ Hcb _ Hcb'))))
          (Cauchy_const [--] (Integral _ Hab'))))))).
     apply str_seq_leEq_so_Lim_leEq.
-    set (p := max n1 n2) in *; exists p; intros.
+    set (p := Nat.max n1 n2) in *; exists p; intros.
     astepl (AbsIR (integral_seq _ _ Hac _ Hac' i[+]integral_seq _ _ Hcb _ Hcb' i[-] Integral _ Hab')).
     unfold integral_seq, Even_Partition_Sum in |- *.
     set (EP1 := Even_Partition Hac (S i) (O_S i)) in *.

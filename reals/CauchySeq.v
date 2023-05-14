@@ -281,15 +281,15 @@ Proof.
    generalize (less_Lim_so_less_seq _ _ H1); intro H3.
    elim H2; intro N1; intro H4.
    elim H3; intro N2; intro H5.
-   exists (max N1 N2); intros.
+   exists (Nat.max N1 N2); intros.
    apply less_leEq_trans with Av.
     apply H4.
-    apply Nat.le_trans with (max N1 N2).
+    apply Nat.le_trans with (Nat.max N1 N2).
      apply le_max_l.
     assumption.
    apply less_leEq.
    apply H5.
-   apply Nat.le_trans with (max N1 N2).
+   apply Nat.le_trans with (Nat.max N1 N2).
     apply le_max_r.
    assumption.
   unfold Av in |- *.
@@ -366,7 +366,7 @@ Proof.
  elim H1; intros M HM.
  cut (y [<] y).
   apply less_irreflexive_unfolded.
- apply leEq_less_trans with (seq (max N M)).
+ apply leEq_less_trans with (seq (Nat.max N M)).
   apply HN; apply le_max_l.
  apply HM; apply le_max_r.
 Qed.
@@ -411,7 +411,7 @@ Proof.
  elim H1; intros M HM.
  cut (y [<] y).
   apply less_irreflexive_unfolded.
- apply less_leEq_trans with (seq (max N M)).
+ apply less_leEq_trans with (seq (Nat.max N M)).
   apply HM; apply le_max_r.
  apply HN; apply le_max_l.
 Qed.
@@ -454,7 +454,7 @@ Proof.
   2: apply H10.
  apply plus_cancel_leEq_rht with ([--]y[-]eps).
  rstepl ([--]eps).
- rstepr (seq (max N N') [-]y).
+ rstepr (seq (Nat.max N N') [-]y).
  assumption.
 Qed.
 
@@ -756,9 +756,9 @@ Proof.
  elim (H (e[/]TwoNZ) (pos_div_two IR e H1)).
  intros N Hn.
  destruct H0 as [M H0].
- exists (max M N). intros.
- astepr (seq1 m[-]seq1 (max M N)).
-  astepr ((seq1 m[-]seq1 N)[+](seq1 N [-]seq1 (max M N))).
+ exists (Nat.max M N). intros.
+ astepr (seq1 m[-]seq1 (Nat.max M N)).
+  astepr ((seq1 m[-]seq1 N)[+](seq1 N [-]seq1 (Nat.max M N))).
    apply AbsSmall_eps_div_two.
     apply Hn. eauto with arith.
     apply AbsSmall_minus. apply Hn. eauto with arith.
@@ -783,7 +783,7 @@ Proof.
  elim (H1 eps H3).
  intros M H4.
  destruct H2 as [N H2].
- exists (max N M) .
+ exists (Nat.max N M) .
  intros.
  assert (N <= m); eauto with arith.
  assert (M <= m); eauto with arith.
@@ -874,16 +874,16 @@ Proof.
   intro H2.
   elim (H _ H2); intros x H3.
   elim (H0 _ H2); intros x0 H4.
-  exists (max x x0).
+  exists (Nat.max x x0).
   intros.
   rstepr (seq1 m[-]y1[+] (seq2 m[-]y2)).
   apply AbsSmall_eps_div_two.
    apply H3.
-   apply Nat.le_trans with (max x x0).
+   apply Nat.le_trans with (Nat.max x x0).
     apply le_max_l.
    assumption.
   apply H4.
-  apply Nat.le_trans with (max x x0).
+  apply Nat.le_trans with (Nat.max x x0).
    apply le_max_r.
   assumption.
  apply pos_div_two.
