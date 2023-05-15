@@ -170,7 +170,7 @@ Proof.
    elim (ProjT2 a1); intros Hj Hj'; fold j in Hj, Hj'.
    elim Hj'; clear Hj'; intros Hj0 Hj1.
    cut (sep__part_h i < j); intros.
-    apply lt_le_weak; assumption.
+    apply Nat.lt_le_incl; assumption.
    apply (Partition_Points_mon _ _ _ _ P) with a0 Hj.
    apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
     apply shift_less_plus'; astepl ZeroR.
@@ -607,7 +607,7 @@ Proof.
      replace (sep__part_h (S i)) with (S (pred (sep__part_h (S i)))); intros.
     apply Mesh_lemma.
    symmetry  in |- *; apply S_pred with (sep__part_h i); apply sep__part_h_mon_2.
-   rewrite <- sep__part_fun_i with (H := lt_le_weak _ _ H).
+   rewrite <- sep__part_fun_i with (H := Nat.lt_le_incl _ _ H).
     apply sep__part_fun_bnd'; assumption.
    assumption.
   eapply leEq_transitive.
@@ -714,7 +714,7 @@ Proof.
    replace (S (pred (sep__part_h (S i)))) with (sep__part_h (S i)); intros.
     apply sep__part_h_bnd.
    apply S_pred with (sep__part_h i); assumption.
-  rewrite <- sep__part_fun_i with (H := lt_le_weak _ _ Hi).
+  rewrite <- sep__part_fun_i with (H := Nat.lt_le_incl _ _ Hi).
    apply sep__part_fun_bnd'; assumption.
   assumption.
  apply lt_n_Sn.
@@ -732,9 +732,9 @@ Lemma sep__part_pts_in_Partition :
  Points_in_Partition sep__part sep__part_pts.
 Proof.
  red in |- *; intros i Hi.
- set (H := sep__part_h_mon_3 _ _ (eq_ind (sep__part_fun i (lt_le_weak _ _ Hi)) (
-   fun n0 : nat => n0 < n) (sep__part_fun_bnd' i (lt_le_weak _ _ Hi) Hi)
-     (sep__part_h i) (sep__part_fun_i i (lt_le_weak _ _ Hi) Hi)) (lt_n_Sn i)) in *.
+ set (H := sep__part_h_mon_3 _ _ (eq_ind (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) (
+   fun n0 : nat => n0 < n) (sep__part_fun_bnd' i (Nat.lt_le_incl _ _ Hi) Hi)
+     (sep__part_h i) (sep__part_fun_i i (Nat.lt_le_incl _ _ Hi) Hi)) (lt_n_Sn i)) in *.
  set (H0 := S_pred (sep__part_h (S i)) (sep__part_h i) H) in *.
  set (H' := eq_ind (sep__part_h (S i)) (fun j : nat => j <= n) (
    sep__part_h_bnd (S i)) (S (pred (sep__part_h (S i)))) H0) in *.
@@ -759,7 +759,7 @@ Proof.
  intros.
  apply Nat.le_trans with (sep__part_fun (S i) Hi).
   2: apply sep__part_fun_bnd.
- rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))) .
+ rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
   auto with arith.
  apply sep__part_fun_mon; apply lt_n_Sn.
 Qed.
@@ -771,7 +771,7 @@ Proof.
  intros.
  apply Nat.le_trans with (sep__part_fun (S i) Hi).
   2: apply sep__part_fun_bnd.
- rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))) .
+ rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
   apply le_S; assumption.
  apply sep__part_fun_mon; apply lt_n_Sn.
 Qed.
@@ -792,24 +792,24 @@ Notation just2 :=
 Lemma sep__part_suRS'_m1 :
   forall (i : nat) (Hi : i < m),
   Sum2
-    (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+    (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
        (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
      P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))[=]
-  sep__part _ Hi[-]sep__part _ (lt_le_weak _ _ Hi).
+  sep__part _ Hi[-]sep__part _ (Nat.lt_le_incl _ _ Hi).
 Proof.
  intros; simpl in |- *.
  unfold Sum2 in |- *.
  cut (sep__part_fun (S i) Hi = S (pred (sep__part_fun (S i) Hi))).
-  2: apply S_pred with (sep__part_fun i (lt_le_weak _ _ Hi)); apply sep__part_fun_mon; apply lt_n_Sn.
+  2: apply S_pred with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)); apply sep__part_fun_mon; apply lt_n_Sn.
  intro.
  cut (S (pred (sep__part_fun (S i) Hi)) <= n).
   2: rewrite <- H; apply sep__part_fun_bnd.
  intro.
- apply eq_transitive_unfolded with (P _ H0[-]P _ (sep__part_fun_bnd i (lt_le_weak _ _ Hi))).
+ apply eq_transitive_unfolded with (P _ H0[-]P _ (sep__part_fun_bnd i (Nat.lt_le_incl _ _ Hi))).
   2: apply cg_minus_wd; apply prf1; auto.
  eapply eq_transitive_unfolded.
   apply str_Mengolli_Sum_gen with (f := h).
-   rewrite <- H; apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+   rewrite <- H; apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
   intro j; intros.
   do 2 elim le_lt_dec; intros; simpl in |- *.
      unfold h in |- *.
@@ -834,7 +834,7 @@ Proof.
   exfalso; exact (le_not_lt _ _ H0 b0).
  elim le_lt_dec; intro; simpl in |- *.
   apply prf1; auto.
- exfalso; rewrite <- H in H0; apply le_not_lt with (sep__part_fun i (lt_le_weak _ _ Hi)) n.
+ exfalso; rewrite <- H in H0; apply le_not_lt with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) n.
   apply sep__part_fun_bnd.
  assumption.
 Qed.
@@ -844,7 +844,7 @@ Lemma sep__part_Sum2 :
   Sumx
     (fun (i : nat) (Hi : i < m) =>
      Sum2
-       (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+       (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
           (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
         F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
         (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
@@ -853,10 +853,10 @@ Proof.
  apply eq_symmetric_unfolded.
  unfold Sum2 in |- *.
  apply eq_transitive_unfolded with (Sumx (fun (j : nat) (Hj : j < n) => part_tot_nat_fun _ _
-   (fun (i : nat) (H : i < n) => F (g i H) just1[*](P _ H[-]P _ (lt_le_weak _ _ H))) j)).
+   (fun (i : nat) (H : i < n) => F (g i H) just1[*](P _ H[-]P _ (Nat.lt_le_incl _ _ H))) j)).
   apply str_Sumx_Sum_Sum' with (g := fun (i : nat) (Hi : i < m) (i0 : nat) => sumbool_rect (fun
-    _ : {sep__part_fun i (lt_le_weak i m Hi) <= i0} + {i0 < sep__part_fun i (lt_le_weak i m Hi)} => IR)
-      (fun _ : sep__part_fun i (lt_le_weak i m Hi) <= i0 => sumbool_rect (fun
+    _ : {sep__part_fun i (Nat.lt_le_incl i m Hi) <= i0} + {i0 < sep__part_fun i (Nat.lt_le_incl i m Hi)} => IR)
+      (fun _ : sep__part_fun i (Nat.lt_le_incl i m Hi) <= i0 => sumbool_rect (fun
         _ : {i0 <= pred (sep__part_fun (S i) Hi)} + {pred (sep__part_fun (S i) Hi) < i0} => IR)
           (fun H0 : i0 <= pred (sep__part_fun (S i) Hi) => F (g i0 (RS'_Hsep_S i i0 Hi H0))
             (incF (g i0 (RS'_Hsep_S i i0 Hi H0))
@@ -864,10 +864,10 @@ Proof.
                 (P (S i0) (RS'_Hsep_S i i0 Hi H0)[-]P i0 (RS'_Hsep i i0 Hi H0)))
                   (fun _ : pred (sep__part_fun (S i) Hi) < i0 => [0])
                     (le_lt_dec i0 (pred (sep__part_fun (S i) Hi))))
-                      (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => [0])
-                        (le_lt_dec (sep__part_fun i (lt_le_weak i m Hi)) i0))
+                      (fun _ : i0 < sep__part_fun i (Nat.lt_le_incl i m Hi) => [0])
+                        (le_lt_dec (sep__part_fun i (Nat.lt_le_incl i m Hi)) i0))
                           (h := part_tot_nat_fun _ _ (fun (i : nat) (H : i < n) =>
-                            F (g i H) just1[*](P _ H[-]P _ (lt_le_weak _ _ H)))).
+                            F (g i H) just1[*](P _ H[-]P _ (Nat.lt_le_incl _ _ H)))).
       apply sep__part_fun_0.
      intros; apply sep__part_fun_wd; auto.
     intros; apply sep__part_fun_mon; auto.
@@ -887,14 +887,14 @@ Proof.
     exfalso.
     apply le_not_lt with (sep__part_fun i Hi') j.
      assumption.
-    cut (sep__part_fun i Hi' = sep__part_fun i (lt_le_weak _ _ Hi));
+    cut (sep__part_fun i Hi' = sep__part_fun i (Nat.lt_le_incl _ _ Hi));
       [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; assumption.
    exfalso.
    apply le_not_lt with (S j) (sep__part_fun (S i) Hi).
     cut (sep__part_fun (S i) Hi = sep__part_fun (S i) Hi''); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; apply H0.
-   rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))) .
+   rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
     auto with arith.
    apply sep__part_fun_mon; apply lt_n_Sn.
   intros; symmetry  in |- *; apply sep__part_fun_m.
@@ -913,26 +913,26 @@ Lemma sep__part_Sum3 :
     (Sumx
        (fun (i : nat) (Hi : i < m) =>
         Sum2
-          (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+          (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
              (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
            (F (g j (RS'_Hsep_S _ _ _ Hj')) just1[-]F (sep__part_pts i Hi) just2)[*]
            (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))))).
 Proof.
  apply AbsIR_wd.
  apply eq_transitive_unfolded with (Sumx (fun (i : nat) (Hi : i < m) => Sum2
-   (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+   (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
      (Hj' : j <= pred (sep__part_fun (S i) Hi)) => F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
        (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))[-] F (sep__part_pts i Hi) just2[*]
-         Sum2 (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+         Sum2 (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
            (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
              P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
   eapply eq_transitive_unfolded.
    2: apply Sumx_minus_Sumx with (f := fun (i : nat) (Hi : i < m) => Sum2
-     (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+     (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
        (Hj' : j <= pred (sep__part_fun (S i) Hi)) => F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
          (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))) (g := fun (i : nat) (Hi : i < m) =>
            F (sep__part_pts i Hi) just2[*] Sum2
-             (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+             (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
                (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
                  P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj'))).
   apply cg_minus_wd.
@@ -942,10 +942,10 @@ Proof.
   apply eq_symmetric_unfolded; apply sep__part_suRS'_m1.
  apply Sumx_wd; intros i Hi.
  apply eq_transitive_unfolded with (Sum2
-   (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+   (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
      (Hj' : j <= pred (sep__part_fun (S i) Hi)) => F (g j (RS'_Hsep_S _ _ _ Hj')) just1[*]
        (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))[-] Sum2
-         (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+         (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
            (Hj' : j <= pred (sep__part_fun (S i) Hi)) => F (sep__part_pts i Hi) just2[*]
              (P _ (RS'_Hsep_S _ _ _ Hj')[-]P _ (RS'_Hsep _ _ _ Hj')))).
   apply cg_minus_wd.
@@ -953,18 +953,18 @@ Proof.
   apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
    2: apply Sum2_comm_scal'.
    algebra.
-  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))
+  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
  eapply eq_transitive_unfolded.
   apply Sum2_minus_Sum2.
-  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))
+  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
  apply Sum2_wd; intros.
-  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (lt_le_weak _ _ Hi))
+  rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
  algebra.
 Qed.
 
@@ -972,7 +972,7 @@ Lemma sep__part_Sum4 :
   Sumx
     (fun (i : nat) (Hi : i < m) =>
      Sum2
-       (fun (j : nat) (Hj : sep__part_fun i (lt_le_weak _ _ Hi) <= j)
+       (fun (j : nat) (Hj : sep__part_fun i (Nat.lt_le_incl _ _ Hi) <= j)
           (Hj' : j <= pred (sep__part_fun (S i) Hi)) =>
         (M[+]M)[*]delta [/]TwoNZ))[<=]alpha.
 Proof.
@@ -981,15 +981,15 @@ Proof.
    (fun (i : nat) (_ : i < n) => (M[+]M)[*]delta [/]TwoNZ) j)).
   2: apply eq_symmetric_unfolded; apply str_Sumx_Sum_Sum' with
     (g := fun (i : nat) (Hi : i < m) (i0 : nat) => sumbool_rect (fun
-      _ : {sep__part_fun i (lt_le_weak i m Hi) <= i0} +
-        {i0 < sep__part_fun i (lt_le_weak i m Hi)} => IR)
-          (fun _ : sep__part_fun i (lt_le_weak i m Hi) <= i0 => sumbool_rect (fun
+      _ : {sep__part_fun i (Nat.lt_le_incl i m Hi) <= i0} +
+        {i0 < sep__part_fun i (Nat.lt_le_incl i m Hi)} => IR)
+          (fun _ : sep__part_fun i (Nat.lt_le_incl i m Hi) <= i0 => sumbool_rect (fun
             _ : {i0 <= pred (sep__part_fun (S i) Hi)} + {pred (sep__part_fun (S i) Hi) < i0} => IR)
               (fun _ : i0 <= pred (sep__part_fun (S i) Hi) => (M[+]M)[*]delta [/]TwoNZ)
                 (fun _ : pred (sep__part_fun (S i) Hi) < i0 => [0])
                   (le_lt_dec i0 (pred (sep__part_fun (S i) Hi))))
-                    (fun _ : i0 < sep__part_fun i (lt_le_weak i m Hi) => [0])
-                      (le_lt_dec (sep__part_fun i (lt_le_weak i m Hi)) i0)) (h := part_tot_nat_fun _ _
+                    (fun _ : i0 < sep__part_fun i (Nat.lt_le_incl i m Hi) => [0])
+                      (le_lt_dec (sep__part_fun i (Nat.lt_le_incl i m Hi)) i0)) (h := part_tot_nat_fun _ _
                         (fun (i : nat) (_ : i < n) => (M[+]M)[*]delta [/]TwoNZ)).
       apply leEq_wdr with (Sumx (fun (i : nat) (_ : i < n) => alpha[/] _[//]nring_ap_zero _ _ SPap_n)).
        2: rstepr (nring n[*](alpha[/] _[//]nring_ap_zero _ _ SPap_n)); apply sumx_const.
@@ -1019,7 +1019,7 @@ Proof.
     exact sep__part_fun_wd.
    exact sep__part_fun_mon.
   unfold part_tot_nat_fun in |- *.
-  intros; elim (le_lt_dec (sep__part_fun i (lt_le_weak _ _ Hi)) j); intro; simpl in |- *.
+  intros; elim (le_lt_dec (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) j); intro; simpl in |- *.
    elim (le_lt_dec j (pred (sep__part_fun (S i) Hi))); intro; simpl in |- *.
     elim (le_lt_dec n j); intro; simpl in |- *.
      exfalso; apply (le_not_lt n j).
@@ -1070,13 +1070,13 @@ Proof.
  apply Sumx_resp_leEq; intros.
  eapply leEq_transitive.
   apply triangle_Sum2IR.
-  rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (lt_le_weak _ _ H))
+  rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (Nat.lt_le_incl _ _ H))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
  apply Sum2_resp_leEq.
-  rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (lt_le_weak _ _ H))
+  rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (Nat.lt_le_incl _ _ H))
     (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply lt_le_weak; apply sep__part_fun_mon; apply lt_n_Sn.
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
  intros k Hk Hk'.
  elim (le_lt_dec m (S i)); intro.
   cut (S i = m); [ intro | clear Hk Hk'; lia ].

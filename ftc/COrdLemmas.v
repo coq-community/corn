@@ -341,7 +341,7 @@ Proof.
    eapply eq_transitive_unfolded.
     2: apply Sum_Sum with (m := pred (f n)).
    apply bin_op_wd_unfolded; apply Sum_wd'.
-      rewrite <- H1; apply lt_le_weak; assumption.
+      rewrite <- H1; apply Nat.lt_le_incl; assumption.
      intros.
      elim (le_lt_dec (f n) i); intro; simpl in |- *.
       exfalso; lia.
@@ -353,7 +353,7 @@ Proof.
        elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try exfalso; try lia.
     rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
       cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
-        rewrite <- H3; apply lt_le_weak; auto with arith.
+        rewrite <- H3; apply Nat.lt_le_incl; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);
      [intro; simpl in |- *; exfalso; lia| reflexivity].
   apply Nat.lt_trans with (f n); auto with arith.
@@ -377,7 +377,7 @@ Proof.
   cut (0 < f (S i)); [ intro | rewrite <- f0; auto with arith ].
   cut (f (S i) = S (pred (f (S i)))); [ intro | apply S_pred with 0; auto ].
   rewrite <- H3.
-  apply lt_le_weak; auto with arith.
+  apply Nat.lt_le_incl; auto with arith.
  intros; apply H.
   assumption.
  rewrite (S_pred (f (S i)) 0); auto with arith.
@@ -410,7 +410,7 @@ Lemma str_Sumx_Sum_Sum' :
  (forall H, n = f m H) ->
  Sumx
    (fun (i : nat) (H : i < m) =>
-    Sum (f i (lt_le_weak _ _ H)) (pred (f (S i) H)) (g i H)) [=]
+    Sum (f i (Nat.lt_le_incl _ _ H)) (pred (f (S i) H)) (g i H)) [=]
  Sumx (fun (i : nat) (_ : i < n) => h i).
 Proof.
  intros.
@@ -419,9 +419,9 @@ Proof.
   apply eq_transitive_unfolded with (Sumx (fun (i : nat) (H3 : i < m) =>
     Sum (f' m f i) (pred (f' m f (S i))) (g i H3))).
    apply Sumx_wd; intros.
-   rewrite <- (H4 i (lt_le_weak _ _ H5)); rewrite <- (H4 (S i) H5); apply Sum_wd'.
-    rewrite <- (S_pred (f (S i) H5) (f i (lt_le_weak _ _ H5)) (H1 _ _ _ _ (lt_n_Sn i))) .
-    apply lt_le_weak; apply H1; apply lt_n_Sn.
+   rewrite <- (H4 i (Nat.lt_le_incl _ _ H5)); rewrite <- (H4 (S i) H5); apply Sum_wd'.
+    rewrite <- (S_pred (f (S i) H5) (f i (Nat.lt_le_incl _ _ H5)) (H1 _ _ _ _ (lt_n_Sn i))) .
+    apply Nat.lt_le_incl; apply H1; apply lt_n_Sn.
    intros; algebra.
   apply str_Sumx_Sum_Sum.
      unfold f' in |- *; simpl in |- *.
@@ -447,7 +447,7 @@ Proof.
      set (x := f m (le_n m)) in *; clearbody x; auto with arith.
     assumption.
    intros.
-   apply H2 with (Hi' := lt_le_weak _ _ Hi) (Hi'' := Hi).
+   apply H2 with (Hi' := Nat.lt_le_incl _ _ Hi) (Hi'' := Hi).
     rewrite H4; assumption.
    rewrite H4; assumption.
   unfold f' in |- *.

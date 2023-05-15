@@ -263,7 +263,7 @@ some condition.  We define the condition and the sum for a fixed [P]:
 *)
 
 Definition Points_in_Partition (g : forall i, i < n -> IR) : CProp :=
-  forall i Hi, Compact (prf2 _ _ _ _ P i (lt_le_weak _ _ Hi) Hi) (g i Hi).
+  forall i Hi, Compact (prf2 _ _ _ _ P i (Nat.lt_le_incl _ _ Hi) Hi) (g i Hi).
 
 Lemma Pts_part_lemma : forall g, Points_in_Partition g -> forall i Hi, compact a b Hab (g i Hi).
 Proof.
@@ -284,7 +284,7 @@ Qed.
 
 Definition Partition_Sum g F (H : Points_in_Partition g) (incF : included (Compact Hab) (Dom F)) :=
  Sumx (fun i Hi => F (g i Hi) (incF _ (Pts_part_lemma _ H i Hi)) [*]
-     (P (S i) Hi[-]P i (lt_le_weak _ _ Hi))).
+     (P (S i) Hi[-]P i (Nat.lt_le_incl _ _ Hi))).
 
 End Refinements.
 
@@ -323,7 +323,7 @@ Variable Q : Partition a b Hab m.
 Definition Partition_imp_points : forall i : nat, i < m -> IR.
 Proof.
  intros.
- apply (Q i (lt_le_weak _ _ H)).
+ apply (Q i (Nat.lt_le_incl _ _ H)).
 Defined.
 
 Lemma Partition_imp_points_1 : Points_in_Partition Q Partition_imp_points.

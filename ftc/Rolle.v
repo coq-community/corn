@@ -164,7 +164,7 @@ Let fcp (i : nat) (Hi : i <= n) :=
     (incF _ (compact_part_hyp a b Hab Hab' d Hd i Hi)).
 
 Let Rolle_lemma1 :
-  Sumx (fun (i : nat) (H : i < n) => fcp (S i) H[-]fcp i (lt_le_weak i n H)) [=]
+  Sumx (fun (i : nat) (H : i < n) => fcp (S i) H[-]fcp i (Nat.lt_le_incl i n H)) [=]
   [0].
 Proof.
  apply eq_transitive_unfolded with (fcp _ (le_n n) [-]fcp 0 (le_O_n n)).
@@ -198,31 +198,31 @@ Let Rolle_lemma4 :
   {i : nat |
   {H : i < n |
   [0] [<]
-  (fcp' _ (lt_le_weak _ _ H) [+]e) [*] (cp (S i) H[-]cp i (lt_le_weak _ _ H))}}.
+  (fcp' _ (Nat.lt_le_incl _ _ H) [+]e) [*] (cp (S i) H[-]cp i (Nat.lt_le_incl _ _ H))}}.
 Proof.
- apply positive_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (lt_le_weak _ _ H) [+]e) [*]
-   (cp _ H[-]cp _ (lt_le_weak _ _ H))).
+ apply positive_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (Nat.lt_le_incl _ _ H) [+]e) [*]
+   (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H))).
   red in |- *; do 3 intro.
   rewrite H; intros.
   unfold fcp' in |- *; algebra.
- apply less_wdl with (Sumx (fun (i : nat) (H : i < n) => fcp _ H[-]fcp _ (lt_le_weak _ _ H))).
+ apply less_wdl with (Sumx (fun (i : nat) (H : i < n) => fcp _ H[-]fcp _ (Nat.lt_le_incl _ _ H))).
   2: apply Rolle_lemma1.
  apply Sumx_resp_less.
   apply less_nring with (IR:COrdField); simpl in |- *; unfold n in |- *; apply pos_compact_nat; auto.
  intros.
- apply leEq_less_trans with ((fcp' i (lt_le_weak _ _ H) [+]e [/]TwoNZ) [*]
-   (cp (S i) H[-]cp i (lt_le_weak _ _ H))).
+ apply leEq_less_trans with ((fcp' i (Nat.lt_le_incl _ _ H) [+]e [/]TwoNZ) [*]
+   (cp (S i) H[-]cp i (Nat.lt_le_incl _ _ H))).
   2: apply mult_resp_less.
    3: apply compact_less.
   2: apply plus_resp_less_lft.
   2: apply pos_div_two'; assumption.
- rstepl (fcp' i (lt_le_weak _ _ H) [*] (cp _ H[-]cp _ (lt_le_weak _ _ H)) [+]
-   (fcp _ H[-]fcp _ (lt_le_weak _ _ H) [-]
-     fcp' i (lt_le_weak _ _ H) [*] (cp _ H[-]cp _ (lt_le_weak _ _ H)))).
+ rstepl (fcp' i (Nat.lt_le_incl _ _ H) [*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H)) [+]
+   (fcp _ H[-]fcp _ (Nat.lt_le_incl _ _ H) [-]
+     fcp' i (Nat.lt_le_incl _ _ H) [*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H)))).
  eapply leEq_wdr.
   2: apply eq_symmetric_unfolded; apply ring_distl_unfolded.
  apply plus_resp_leEq_lft.
- apply leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp (S i) H[-]cp i (lt_le_weak _ _ H))).
+ apply leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp (S i) H[-]cp i (Nat.lt_le_incl _ _ H))).
   2: apply mult_wd.
    2: algebra.
   2: apply AbsIR_eq_x.
@@ -245,7 +245,7 @@ Qed.
 Let Rolle_lemma5 : {i : nat | {H : i <= n | [--]e [<] fcp' _ H}}.
 Proof.
  elim Rolle_lemma4; intros i Hi; elim Hi; clear Hi; intros Hi Hi'.
- exists i; exists (lt_le_weak _ _ Hi).
+ exists i; exists (Nat.lt_le_incl _ _ Hi).
  astepl ([0][-]e); apply shift_minus_less.
  eapply mult_cancel_less.
   2: eapply less_wdl.
@@ -257,32 +257,32 @@ Qed.
 Let Rolle_lemma6 :
   {i : nat |
   {H : i < n |
-  (fcp' _ (lt_le_weak _ _ H) [-]e) [*] (cp (S i) H[-]cp i (lt_le_weak _ _ H)) [<]
+  (fcp' _ (Nat.lt_le_incl _ _ H) [-]e) [*] (cp (S i) H[-]cp i (Nat.lt_le_incl _ _ H)) [<]
   [0]}}.
 Proof.
- apply negative_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (lt_le_weak _ _ H) [-]e) [*]
-   (cp _ H[-]cp _ (lt_le_weak _ _ H))).
+ apply negative_Sumx with (f := fun (i : nat) (H : i < n) => (fcp' _ (Nat.lt_le_incl _ _ H) [-]e) [*]
+   (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H))).
   red in |- *; do 3 intro.
   rewrite H; intros.
   unfold fcp' in |- *; algebra.
- apply less_wdr with (Sumx (fun (i : nat) (H : i < n) => fcp _ H[-]fcp _ (lt_le_weak _ _ H))).
+ apply less_wdr with (Sumx (fun (i : nat) (H : i < n) => fcp _ H[-]fcp _ (Nat.lt_le_incl _ _ H))).
   2: apply Rolle_lemma1.
  apply Sumx_resp_less.
   apply less_nring with (IR:COrdField); simpl in |- *; unfold n in |- *; apply pos_compact_nat; auto.
  intros.
- apply less_leEq_trans with ((fcp' _ (lt_le_weak _ _ H) [-]e [/]TwoNZ) [*]
-   (cp _ H[-]cp _ (lt_le_weak _ _ H))).
+ apply less_leEq_trans with ((fcp' _ (Nat.lt_le_incl _ _ H) [-]e [/]TwoNZ) [*]
+   (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H))).
   apply mult_resp_less.
    2: apply compact_less.
   unfold cg_minus in |- *; apply plus_resp_less_lft.
   apply inv_resp_less; apply pos_div_two'; assumption.
- rstepr (fcp' _ (lt_le_weak _ _ H) [*] (cp _ H[-]cp _ (lt_le_weak _ _ H)) [+] [--] [--]
-   (fcp _ H[-]fcp _ (lt_le_weak _ _ H) [-]
-     fcp' _ (lt_le_weak _ _ H) [*] (cp _ H[-]cp _ (lt_le_weak _ _ H)))).
- rstepl (fcp' _ (lt_le_weak _ _ H) [*] (cp _ H[-]cp _ (lt_le_weak _ _ H)) [-]
-   e [/]TwoNZ[*] (cp _ H[-]cp _ (lt_le_weak _ _ H))).
+ rstepr (fcp' _ (Nat.lt_le_incl _ _ H) [*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H)) [+] [--] [--]
+   (fcp _ H[-]fcp _ (Nat.lt_le_incl _ _ H) [-]
+     fcp' _ (Nat.lt_le_incl _ _ H) [*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H)))).
+ rstepl (fcp' _ (Nat.lt_le_incl _ _ H) [*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H)) [-]
+   e [/]TwoNZ[*] (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H))).
  unfold cg_minus at 1 in |- *; apply plus_resp_leEq_lft.
- apply inv_resp_leEq; apply leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp _ H[-]cp _ (lt_le_weak _ _ H))).
+ apply inv_resp_leEq; apply leEq_wdr with (e [/]TwoNZ[*]AbsIR (cp _ H[-]cp _ (Nat.lt_le_incl _ _ H))).
   2: apply mult_wd.
    2: algebra.
   2: apply AbsIR_eq_x.
@@ -305,14 +305,14 @@ Qed.
 Let Rolle_lemma7 : {i : nat | {H : i <= n | fcp' _ H [<] e}}.
 Proof.
  elim Rolle_lemma6; intros i Hi; elim Hi; clear Hi; intros Hi Hi'.
- exists i; exists (lt_le_weak _ _ Hi).
+ exists i; exists (Nat.lt_le_incl _ _ Hi).
  astepr (e[+][0]); apply shift_less_plus'.
  eapply mult_cancel_less.
   2: eapply less_wdr.
    2: apply Hi'.
   2: algebra.
  apply shift_less_minus.
- astepl (cp _ (lt_le_weak _ _ Hi)).
+ astepl (cp _ (Nat.lt_le_incl _ _ Hi)).
  unfold compact_part in |- *.
  apply plus_resp_less_lft.
  apply mult_resp_less.

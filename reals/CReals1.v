@@ -284,7 +284,7 @@ Proof.
   apply H2; auto with arith.
  apply leEq_wdl with (AbsIR (seq1 i[-]seq1 N)).
   apply AbsSmall_imp_AbsIR; apply HN.
-  apply lt_le_weak.
+  apply Nat.lt_le_incl.
   apply mon_F'; apply Nat.le_lt_trans with m; auto.
  apply AbsIR_wd; algebra.
 Qed.

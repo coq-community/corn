@@ -170,7 +170,7 @@ Lemma RL_sub_mon' : forall i j : nat, i <= j -> sub i <= sub j.
 Proof.
  intros.
  elim (le_lt_eq_dec _ _ H); intro.
-  apply lt_le_weak; apply RL_sub_mon; assumption.
+  apply Nat.lt_le_incl; apply RL_sub_mon; assumption.
  rewrite b0; apply le_n.
 Qed.
 
@@ -213,7 +213,7 @@ Qed.
 Lemma RL_sub_SS : forall i : nat, sub i <= S (pred (sub (S i))).
 Proof.
  intro; cut (sub i < sub (S i)); [ intro | apply H0 ].
- rewrite <- (S_pred _ _ H1); apply lt_le_weak; apply H0.
+ rewrite <- (S_pred _ _ H1); apply Nat.lt_le_incl; apply H0.
 Qed.
 
 Definition RL_h : nat -> IR.
@@ -229,7 +229,7 @@ Proof.
  intro i.
  elim (le_lt_dec m i); intro.
   apply ZeroR.
- apply (Q _ b0[-]Q _ (lt_le_weak _ _ b0)).
+ apply (Q _ b0[-]Q _ (Nat.lt_le_incl _ _ b0)).
 Defined.
 
 Notation g := RL_g.
@@ -239,13 +239,13 @@ Lemma ref_calc1 :
   forall (i : nat) (Hi : i < n),
   Sum2
     (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-     Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))) [=]
-  P _ Hi[-]P _ (lt_le_weak _ _ Hi).
+     Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))) [=]
+  P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi).
 Proof.
  intros.
  unfold Sum2 in |- *.
  elim (RL_sub_hyp (S i) Hi); intros P1 HP1.
- elim (RL_sub_hyp i (lt_le_weak _ _ Hi)); intros P2 HP2.
+ elim (RL_sub_hyp i (Nat.lt_le_incl _ _ Hi)); intros P2 HP2.
  apply eq_transitive_unfolded with (Q _ P1[-]Q _ P2).
   2: apply eq_symmetric_unfolded; apply cg_minus_wd; [ apply HP1 | apply HP2 ].
  cut (sub (S i) = S (pred (sub (S i)))).
@@ -294,13 +294,13 @@ Lemma ref_calc2 :
         Part F (fP i Hi) just1[*]
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-           Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))) [-]
+           Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))) [-]
      Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  apply AbsIR_wd; unfold Partition_Sum in |- *.
  apply cg_minus_wd.
@@ -309,16 +309,16 @@ Proof.
   apply eq_symmetric_unfolded; apply ref_calc1.
  apply eq_symmetric_unfolded; unfold Sum2 in |- *.
  apply eq_transitive_unfolded with (Sumx (fun (j : nat) (Hj : j < m) => part_tot_nat_fun _ _
-   (fun (i : nat) (H : i < m) => Part F (fQ i H) just2[*] (Q _ H[-]Q _ (lt_le_weak _ _ H))) j)).
+   (fun (i : nat) (H : i < m) => Part F (fQ i H) just2[*] (Q _ H[-]Q _ (Nat.lt_le_incl _ _ H))) j)).
   apply str_Sumx_Sum_Sum with (g := fun (i : nat) (Hi : i < n) (i0 : nat) =>
     sumbool_rect (fun _ : {sub i <= i0} + {i0 < sub i} => IR) (fun _ : sub i <= i0 => sumbool_rect
       (fun _ : {i0 <= pred (sub (S i))} + {pred (sub (S i)) < i0} => IR)
         (fun a1 : i0 <= pred (sub (S i)) => Part F (fQ i0 (H i i0 Hi a1)) just2[*]
-          (Q (S i0) (H' i i0 Hi a1) [-] Q i0 (lt_le_weak i0 m (H i i0 Hi a1))))
+          (Q (S i0) (H' i i0 Hi a1) [-] Q i0 (Nat.lt_le_incl i0 m (H i i0 Hi a1))))
             (fun _ : pred (sub (S i)) < i0 => [0]) (le_lt_dec i0 (pred (sub (S i)))))
               (fun _ : i0 < sub i => [0]) (le_lt_dec (sub i) i0)) (h := part_tot_nat_fun _ _
                 (fun (i : nat) (H : i < m) =>
-                  Part F (fQ i H) just2[*] (Q _ H[-]Q _ (lt_le_weak _ _ H)))).
+                  Part F (fQ i H) just2[*] (Q _ H[-]Q _ (Nat.lt_le_incl _ _ H)))).
      exact RL_sub_0.
     exact RL_sub_mon.
    intros.
@@ -356,32 +356,32 @@ Lemma ref_calc3 :
         Part F (fP i Hi) just1[*]
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-           Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))) [-]
+           Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))) [-]
      Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [=]
   AbsIR
     (Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fP i Hi) just1[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))))) [-]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))))) [-]
      Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  apply AbsIR_wd.
  apply cg_minus_wd; apply Sumx_wd; intros.
   apply eq_symmetric_unfolded; apply Sum2_comm_scal' with
     (f := fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-      Q (S j) (H' _ _ H1 Hj') [-]Q j (lt_le_weak _ _ (H _ _ H1 Hj'))).
+      Q (S j) (H' _ _ H1 Hj') [-]Q j (Nat.lt_le_incl _ _ (H _ _ H1 Hj'))).
   apply RL_sub_SS.
  algebra.
 Qed.
@@ -393,22 +393,22 @@ Lemma ref_calc4 :
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fP i Hi) just1[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))))) [-]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))))) [-]
      Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [=]
   AbsIR
     (Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fP i Hi) just1[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))) [-]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))) [-]
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  apply AbsIR_wd.
  eapply eq_transitive_unfolded.
@@ -427,16 +427,16 @@ Lemma ref_calc5 :
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            Part F (fP i Hi) just1[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))) [-]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))) [-]
            Part F (fQ j (H _ _ Hi Hj')) just2[*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [=]
   AbsIR
     (Sumx
        (fun (i : nat) (Hi : i < n) =>
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            (Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  apply AbsIR_wd; apply Sumx_wd; intros.
  apply Sum2_wd; intros.
@@ -451,14 +451,14 @@ Lemma ref_calc6 :
         Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            (Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [<=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [<=]
   Sumx
     (fun (i : nat) (Hi : i < n) =>
      AbsIR
        (Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            (Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  eapply leEq_wdr.
   apply triangle_SumxIR.
@@ -478,14 +478,14 @@ Lemma ref_calc7 :
        (Sum2
           (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
            (Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [<=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [<=]
   Sumx
     (fun (i : nat) (Hi : i < n) =>
      Sum2
        (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
         AbsIR
           ((Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))).
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))).
 Proof.
  apply Sumx_resp_leEq; intros.
  eapply leEq_wdr.
@@ -501,12 +501,12 @@ Lemma ref_calc8 :
        (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
         AbsIR
           ((Part F (fP i Hi) just1[-]Part F (fQ j (H _ _ Hi Hj')) just2) [*]
-           (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj')))))) [<=]
+           (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj')))))) [<=]
   Sumx
     (fun (i : nat) (Hi : i < n) =>
      Sum2
        (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-        e[*] (Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))))).
+        e[*] (Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))))).
 Proof.
  apply Sumx_resp_leEq; intros.
  apply Sum2_resp_leEq.
@@ -523,19 +523,19 @@ Proof.
    unfold I in |- *; apply Pts_part_lemma with m Q; assumption.
   apply leEq_transitive with (Mesh P).
    2: assumption.
-  apply leEq_transitive with (AbsIR (P (S i) H1[-]P i (lt_le_weak _ _ H1))).
+  apply leEq_transitive with (AbsIR (P (S i) H1[-]P i (Nat.lt_le_incl _ _ H1))).
    2: eapply leEq_wdl.
     3: apply eq_symmetric_unfolded; apply AbsIR_eq_x.
     2: apply Mesh_lemma.
-   2: apply shift_leEq_minus; astepl (P i (lt_le_weak _ _ H1)); apply prf2.
-  apply compact_elements with (prf2 _ _ _ _ P i (lt_le_weak _ _ H1) H1).
+   2: apply shift_leEq_minus; astepl (P i (Nat.lt_le_incl _ _ H1)); apply prf2.
+  apply compact_elements with (prf2 _ _ _ _ P i (Nat.lt_le_incl _ _ H1) H1).
    apply HfP.
   elim (HfQ j (H _ _ H1 Hj')); intros.
   split.
-   elim (RL_sub_hyp i (lt_le_weak _ _ H1)); intros.
+   elim (RL_sub_hyp i (Nat.lt_le_incl _ _ H1)); intros.
    eapply leEq_wdl.
     2: apply eq_symmetric_unfolded; apply p.
-   apply leEq_transitive with (Q j (lt_le_weak _ _ (H i j H1 Hj'))).
+   apply leEq_transitive with (Q j (Nat.lt_le_incl _ _ (H i j H1 Hj'))).
     apply Partition_mon; assumption.
    assumption.
   elim (RL_sub_hyp (S i) H1); intros.
@@ -546,7 +546,7 @@ Proof.
   apply Partition_mon.
   rewrite (S_pred _ _ (RL_sub_S i)); auto with arith.
  apply eq_imp_leEq; apply AbsIR_eq_x.
- apply shift_leEq_minus; astepl (Q j (lt_le_weak _ _ (H _ _ H1 Hj'))); apply prf2.
+ apply shift_leEq_minus; astepl (Q j (Nat.lt_le_incl _ _ (H _ _ H1 Hj'))); apply prf2.
 Qed.
 (* end hide *)
 
@@ -568,10 +568,10 @@ Proof.
   apply ref_calc8.
  apply leEq_wdl with (e[*] Sumx (fun (i : nat) (Hi : i < n) => Sum2
    (fun (j : nat) (Hj : sub i <= j) (Hj' : j <= pred (sub (S i))) =>
-     Q _ (H' _ _ Hi Hj') [-]Q _ (lt_le_weak _ _ (H _ _ Hi Hj'))))).
+     Q _ (H' _ _ Hi Hj') [-]Q _ (Nat.lt_le_incl _ _ (H _ _ Hi Hj'))))).
   apply mult_resp_leEq_lft.
    2: apply less_leEq; assumption.
-  apply leEq_wdl with (Sumx (fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (lt_le_weak _ _ Hi))).
+  apply leEq_wdl with (Sumx (fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))).
    2: apply Sumx_wd; intros.
    2: apply eq_symmetric_unfolded; apply ref_calc1.
   eapply leEq_wdl.
@@ -961,11 +961,11 @@ Lemma RL_sum_lemma_aux :
   Fa[*] (b[-]a) [-]
   Sumx
     (fun (i : nat) (Hi : i < n) =>
-     (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi))).
+     (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))).
 Proof.
  intros; apply eq_transitive_unfolded with (Sumx (fun (i : nat) (Hi : i < n) =>
-   Fa[*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi))) [-] Sumx (fun (i : nat) (Hi : i < n) =>
-     (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi)))).
+   Fa[*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))) [-] Sumx (fun (i : nat) (Hi : i < n) =>
+     (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi)))).
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply Sumx_minus_Sumx.
   unfold Partition_Sum in |- *; apply Sumx_wd; intros.
@@ -1030,15 +1030,15 @@ Proof.
  generalize (proj2b_sig2T _ _ _ (contF' e' He'));
    generalize (proj2a_sig2T _ _ _ (contF' e' He')); fold d' in |- *; intros Hd' Hdd'.
  apply leEq_wdl with (AbsIR (Fa[*] (b[-]a) [-] Sumx (fun (i : nat) (Hi : i < n) =>
-   (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi))) [-] (Fa[*] (b[-]a) [-]
+   (Fa[-]Part F (fP i Hi) (just HfP)) [*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))) [-] (Fa[*] (b[-]a) [-]
      Sumx (fun (j : nat) (Hj : j < m) => (Fa[-]Part F (fR j Hj) (just HfR)) [*]
-       (R _ Hj[-]R _ (lt_le_weak _ _ Hj)))))).
+       (R _ Hj[-]R _ (Nat.lt_le_incl _ _ Hj)))))).
   2: apply AbsIR_wd; apply eq_symmetric_unfolded.
   2: apply cg_minus_wd; apply RL_sum_lemma_aux.
  apply leEq_wdl with (AbsIR (Sumx (fun (j : nat) (Hj : j < m) =>
-   (Fa[-]Part F (fR j Hj) (just HfR)) [*] (R _ Hj[-]R _ (lt_le_weak _ _ Hj))) [-] Sumx
+   (Fa[-]Part F (fR j Hj) (just HfR)) [*] (R _ Hj[-]R _ (Nat.lt_le_incl _ _ Hj))) [-] Sumx
      (fun (i : nat) (Hi : i < n) => (Fa[-]Part F (fP i Hi) (just HfP)) [*]
-       (P _ Hi[-]P _ (lt_le_weak _ _ Hi))))).
+       (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))))).
   2: apply AbsIR_wd; rational.
  rstepr (e'[*] (b[-]a) [+]e[*] (b[-]a)).
  eapply leEq_transitive.
@@ -1046,7 +1046,7 @@ Proof.
  apply plus_resp_leEq_both.
   eapply leEq_transitive.
    apply triangle_SumxIR.
-  apply leEq_wdr with (Sumx (fun (i : nat) (Hi : i < m) => e'[*] (R _ Hi[-]R _ (lt_le_weak _ _ Hi)))).
+  apply leEq_wdr with (Sumx (fun (i : nat) (Hi : i < m) => e'[*] (R _ Hi[-]R _ (Nat.lt_le_incl _ _ Hi)))).
    apply Sumx_resp_leEq; intros.
    eapply leEq_wdl.
     2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -1065,9 +1065,9 @@ Proof.
      apply less_leEq; apply Hab'.
     apply Min_leEq_rht.
    apply eq_imp_leEq; apply AbsIR_eq_x.
-   apply shift_leEq_minus; astepl (R i (lt_le_weak _ _ H)); apply prf2.
+   apply shift_leEq_minus; astepl (R i (Nat.lt_le_incl _ _ H)); apply prf2.
   eapply eq_transitive_unfolded.
-   apply Sumx_comm_scal' with (f := fun (i : nat) (Hi : i < m) => R _ Hi[-]R _ (lt_le_weak _ _ Hi)).
+   apply Sumx_comm_scal' with (f := fun (i : nat) (Hi : i < m) => R _ Hi[-]R _ (Nat.lt_le_incl _ _ Hi)).
   apply mult_wdr.
   eapply eq_transitive_unfolded.
    apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= m) => R i Hi).
@@ -1077,7 +1077,7 @@ Proof.
   apply cg_minus_wd; [ apply finish | apply start ].
  eapply leEq_transitive.
   apply triangle_SumxIR.
- apply leEq_wdr with (Sumx (fun (i : nat) (Hi : i < n) => e[*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi)))).
+ apply leEq_wdr with (Sumx (fun (i : nat) (Hi : i < n) => e[*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi)))).
   apply Sumx_resp_leEq; intros.
   eapply leEq_wdl.
    2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -1096,9 +1096,9 @@ Proof.
     apply less_leEq; apply Hab'.
    apply Min_leEq_lft.
   apply eq_imp_leEq; apply AbsIR_eq_x.
-  apply shift_leEq_minus; astepl (P i (lt_le_weak _ _ H)); apply prf2.
+  apply shift_leEq_minus; astepl (P i (Nat.lt_le_incl _ _ H)); apply prf2.
  eapply eq_transitive_unfolded.
-  apply Sumx_comm_scal' with (f := fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (lt_le_weak _ _ Hi)).
+  apply Sumx_comm_scal' with (f := fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi)).
  apply mult_wdr.
  eapply eq_transitive_unfolded.
   apply Mengolli_Sum with (f := fun (i : nat) (Hi : i <= n) => P i Hi).

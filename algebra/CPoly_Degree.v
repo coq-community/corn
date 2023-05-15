@@ -463,7 +463,7 @@ Qed.
 Lemma poly_degree_lth : forall p : RX, degree_le (lth_of_poly p) p.
 Proof.
  unfold degree_le in |- *. intros. apply not_ap_imp_eq. intro.
- elim (lt_not_le _ _ H). apply lt_le_weak.
+ elim (lt_not_le _ _ H). apply Nat.lt_le_incl.
  apply lt_i_lth_of_poly. auto.
 Qed.
 

@@ -329,11 +329,11 @@ Proof.
  simpl in HN.
  unfold integral_seq, Even_Partition_Sum, Partition_Sum in HN.
  set (f' := fun (i : nat) (H : i < S N) => Part F _ (contin_imp_inc _ _ _ _ contF _
-   (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
-     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) in *.
+   (compact_partition_lemma _ _ Hab _ (O_S N) _ (Nat.lt_le_incl _ _ H))) [*]
+     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (Nat.lt_le_incl _ _ H))) in *.
  set (g' := fun (i : nat) (H : i < S N) => Part G _ (contin_imp_inc _ _ _ _ contG _
-   (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
-     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) in *.
+   (compact_partition_lemma _ _ Hab _ (O_S N) _ (Nat.lt_le_incl _ _ H))) [*]
+     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (Nat.lt_le_incl _ _ H))) in *.
  cut (nat_less_n_fun f'); intros.
   cut (nat_less_n_fun g'); intros.
    cut (Sumx f' [#] Sumx g'). intros H1.
@@ -342,7 +342,7 @@ Proof.
     elim Hn; clear Hn; intros Hn H'.
     exists (a[+]nring n[*] (b[-]a[/] nring _[//]nring_ap_zero' _ _ (O_S N))).
      unfold I in |- *; apply compact_partition_lemma; auto.
-     apply lt_le_weak; assumption.
+     apply Nat.lt_le_incl; assumption.
     intros.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ H'); clear H'; intro.
      eapply ap_wdl_unfolded.
@@ -375,11 +375,11 @@ Proof.
  set (f1 := fun (i : nat) (Hi : i < S N) => Part _ _ (contin_imp_inc _ _ _ _ HF1 _
    (Pts_part_lemma _ _ _ _ _ _ (Partition_imp_points_1 _ _ _ _ (Even_Partition Hab _ (O_S N))) i
      Hi)) [*] (Even_Partition Hab _ (O_S N) _ Hi[-]
-       Even_Partition Hab _ (O_S N) _ (lt_le_weak _ _ Hi))) in *.
+       Even_Partition Hab _ (O_S N) _ (Nat.lt_le_incl _ _ Hi))) in *.
  set (f2 := fun (i : nat) (Hi : i < S N) => Part _ _ (contin_imp_inc _ _ _ _ HF2 _
    (Pts_part_lemma _ _ _ _ _ _ (Partition_imp_points_1 _ _ _ _ (Even_Partition Hcd _ (O_S N))) i
      Hi)) [*] (Even_Partition Hcd _ (O_S N) _ Hi[-]
-       Even_Partition Hcd _ (O_S N) _ (lt_le_weak _ _ Hi))) in *.
+       Even_Partition Hcd _ (O_S N) _ (Nat.lt_le_incl _ _ Hi))) in *.
  cut (nat_less_n_fun f1); intros.
   cut (nat_less_n_fun f2); intros.
    elim (Sumx_strext _ _ _ _ H H0 HN).
@@ -925,7 +925,7 @@ Lemma partition_join_Pts_in_partition : Points_in_Partition partition_join parti
 Proof.
  red in |- *; intros.
  rename Hi into H.
- cut (forall H', compact (partition_join i (lt_le_weak _ _ H)) (partition_join (S i) H) H'
+ cut (forall H', compact (partition_join i (Nat.lt_le_incl _ _ H)) (partition_join (S i) H) H'
    (partition_join_pts i H)); auto.
  unfold partition_join in |- *; simpl in |- *.
  unfold partition_join_fun in |- *.

@@ -744,7 +744,7 @@ definitions keeping conciseness.
 Lemma Clt_le_weak : forall i j : nat, Clt i j -> Cle i j.
 Proof.
  intros.
- apply toCle; apply lt_le_weak; apply Clt_to; assumption.
+ apply toCle; apply Nat.lt_le_incl; apply Clt_to; assumption.
 Qed.
 
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
@@ -882,7 +882,7 @@ Lemma nat_mon_imp_mon' : (forall i j : nat, i < j -> h i < h j) ->
 Proof.
  intros H i j H0.
  elim (le_lt_eq_dec _ _ H0); intro H1.
-  apply lt_le_weak; apply H; assumption.
+  apply Nat.lt_le_incl; apply H; assumption.
  rewrite H1; apply le_n.
 Qed.
 

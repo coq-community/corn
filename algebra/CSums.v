@@ -649,7 +649,7 @@ Section More_Sums.
 Variable G : CAbGroup.
 
 Lemma Mengolli_Sum : forall n (f : forall i, i <= n -> G) (g : forall i, i < n -> G),
- nat_less_n_fun' f -> (forall i H, g i H [=] f (S i) H[-]f i (lt_le_weak _ _ H)) ->
+ nat_less_n_fun' f -> (forall i H, g i H [=] f (S i) H[-]f i (Nat.lt_le_incl _ _ H)) ->
  Sumx g [=] f n (le_n n) [-]f 0 (le_O_n n).
 Proof.
  intro n; induction  n as [| n Hrecn]; intros f g Hf H; simpl in |- *.

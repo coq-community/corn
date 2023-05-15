@@ -546,7 +546,7 @@ Hypothesis gP : Points_in_Partition P g.
 Definition sep__sep_points (i : nat) (Hi : i < n) : IR.
 Proof.
  intros.
- apply (Max (sep__sep_fun_i i (lt_le_weak _ _ Hi)) (g i Hi)).
+ apply (Max (sep__sep_fun_i i (Nat.lt_le_incl _ _ Hi)) (g i Hi)).
 Defined.
 
 Lemma sep__sep_points_lemma :
@@ -560,7 +560,7 @@ Proof.
    apply leEq_transitive with (g i Hi).
     elim (Pts_part_lemma _ _ _ _ _ _ gP i Hi); intros; assumption.
    apply rht_leEq_Max.
-  elim (le_lt_eq_dec _ _ (lt_le_weak _ _ Hi)); intro; simpl in |- *.
+  elim (le_lt_eq_dec _ _ (Nat.lt_le_incl _ _ Hi)); intro; simpl in |- *.
    eapply leEq_wdl.
     apply lft_leEq_Max.
    apply sep__sep_fun_i_wd; auto.
@@ -586,7 +586,7 @@ Proof.
      apply RS_delta_deltaP.
     unfold deltaP in |- *; apply AntiMesh_lemma.
    elim (Partition_in_compact _ _ _ _ P (S i) Hi); intros; assumption.
-  elim (Partition_in_compact _ _ _ _ P i (lt_le_weak _ _ Hi)); intros; assumption.
+  elim (Partition_in_compact _ _ _ _ P i (Nat.lt_le_incl _ _ Hi)); intros; assumption.
  elim (Pts_part_lemma _ _ _ _ _ _ gP i Hi); intros; assumption.
 Qed.
 
@@ -606,7 +606,7 @@ Proof.
   apply shift_minus_leEq; apply Max_leEq.
    unfold sep__sep_fun_i in |- *.
    elim sep__sep_aux_lemma; intro; simpl in |- *.
-    apply leEq_transitive with (P i (lt_le_weak _ _ H)[+]delta).
+    apply leEq_transitive with (P i (Nat.lt_le_incl _ _ H)[+]delta).
      apply plus_resp_leEq_lft.
      apply less_leEq; astepl (delta [/]TwoNZ); apply pos_div_two'; exact RS_delta_pos.
     eapply leEq_wdr.
@@ -614,7 +614,7 @@ Proof.
     apply plus_resp_leEq_both.
      elim (gP i H); intros; assumption.
     apply RS_delta_d.
-   astepl ([0][+]P i (lt_le_weak _ _ H)).
+   astepl ([0][+]P i (Nat.lt_le_incl _ _ H)).
    apply plus_resp_leEq_both.
     apply less_leEq; exact RS_Hd.
    elim (gP i H); intros; auto.
@@ -636,18 +636,18 @@ Proof.
  unfold Partition_Sum in |- *; simpl in |- *.
  rstepr (alpha [/]TwoNZ[+]alpha [/]TwoNZ).
  apply leEq_transitive with (e[*](b[-]a)[+]nring n[*]M[*]delta).
-  apply leEq_wdr with (e[*] Sumx (fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (lt_le_weak _ _ Hi))[+]
+  apply leEq_wdr with (e[*] Sumx (fun (i : nat) (Hi : i < n) => P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))[+]
     Sumx (fun (i : nat) (Hi : i < n) => M[*]delta)).
    apply leEq_transitive with (Sumx (fun (i : nat) (Hi : i < n) =>
-     AbsIR (F (g i Hi) just1[-]F (sep__sep_points i Hi) just2)[*] (P _ Hi[-]P _ (lt_le_weak _ _ Hi)))[+]
+     AbsIR (F (g i Hi) just1[-]F (sep__sep_points i Hi) just2)[*] (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi)))[+]
        Sumx (fun (i : nat) (Hi : i < n) => AbsIR (F (sep__sep_points i Hi) just2)[*]
          (AbsIR (sep__sep_fun _ Hi[-]P _ Hi)[+]
-           AbsIR (P _ (lt_le_weak _ _ Hi)[-]sep__sep_fun _ (lt_le_weak _ _ Hi))))).
+           AbsIR (P _ (Nat.lt_le_incl _ _ Hi)[-]sep__sep_fun _ (Nat.lt_le_incl _ _ Hi))))).
     apply leEq_transitive with (AbsIR (Sumx (fun (i : nat) (Hi : i < n) =>
-      F (g i Hi) just1[*](P _ Hi[-]P _ (lt_le_weak _ _ Hi))[-] F (sep__sep_points i Hi) just2[*]
-        (P _ Hi[-]P _ (lt_le_weak _ _ Hi))))[+] AbsIR (Sumx (fun (i : nat) (Hi : i < n) =>
+      F (g i Hi) just1[*](P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))[-] F (sep__sep_points i Hi) just2[*]
+        (P _ Hi[-]P _ (Nat.lt_le_incl _ _ Hi))))[+] AbsIR (Sumx (fun (i : nat) (Hi : i < n) =>
           F (sep__sep_points i Hi) just2[*] (sep__sep_fun _ Hi[-]P _ Hi[+]
-            (P _ (lt_le_weak _ _ Hi)[-]sep__sep_fun _ (lt_le_weak _ _ Hi)))))).
+            (P _ (Nat.lt_le_incl _ _ Hi)[-]sep__sep_fun _ (Nat.lt_le_incl _ _ Hi)))))).
      eapply leEq_wdl.
       apply triangle_IR_minus.
      apply eq_symmetric_unfolded.
@@ -657,21 +657,21 @@ Proof.
      eapply eq_transitive_unfolded.
       2: apply eq_symmetric_unfolded; apply Sumx_minus_Sumx.
      apply Sumx_wd; intros.
-     astepl (F (g i H) just1[*](P _ H[-]P _ (lt_le_weak _ _ H))[-] F (sep__sep_points i H) just2[*]
-       (sep__sep_fun _ H[-]sep__sep_fun _ (lt_le_weak _ _ H))).
+     astepl (F (g i H) just1[*](P _ H[-]P _ (Nat.lt_le_incl _ _ H))[-] F (sep__sep_points i H) just2[*]
+       (sep__sep_fun _ H[-]sep__sep_fun _ (Nat.lt_le_incl _ _ H))).
      rational.
     apply plus_resp_leEq_both.
      eapply leEq_wdr.
       apply triangle_SumxIR.
      apply Sumx_wd; intros.
      apply eq_transitive_unfolded with (AbsIR (F (g i H) just1[-]F (sep__sep_points i H) just2)[*]
-       AbsIR (P _ H[-]P _ (lt_le_weak _ _ H))).
+       AbsIR (P _ H[-]P _ (Nat.lt_le_incl _ _ H))).
       eapply eq_transitive_unfolded.
        2: apply AbsIR_resp_mult.
       apply AbsIR_wd; algebra.
      apply mult_wdr.
      apply AbsIR_eq_x.
-     apply shift_leEq_minus; astepl (P i (lt_le_weak _ _ H)); apply prf2.
+     apply shift_leEq_minus; astepl (P i (Nat.lt_le_incl _ _ H)); apply prf2.
     eapply leEq_transitive.
      apply triangle_SumxIR.
     apply Sumx_resp_leEq; intros.
@@ -686,7 +686,7 @@ Proof.
     apply Sumx_resp_leEq; intros.
     apply mult_resp_leEq_rht.
      apply sep__sep_aux.
-    apply shift_leEq_minus; astepl (P i (lt_le_weak _ _ H)); apply prf2.
+    apply shift_leEq_minus; astepl (P i (Nat.lt_le_incl _ _ H)); apply prf2.
    apply Sumx_resp_leEq; intros.
    apply mult_resp_leEq_both.
       apply AbsIR_nonneg.
