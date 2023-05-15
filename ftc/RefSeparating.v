@@ -638,8 +638,8 @@ Proof.
     intro.
     rewrite <- sep__part_fun_i with (H := H4).
      apply sep__part_fun_bnd'.
-     rewrite H0; apply lt_n_Sn.
-    rewrite H0; apply lt_n_Sn.
+     rewrite H0; apply Nat.lt_succ_diag_r.
+    rewrite H0; apply Nat.lt_succ_diag_r.
    eapply leEq_transitive.
     apply sep__part_h_lemma2.
    apply less_leEq; apply less_leEq_trans with delta.
@@ -717,7 +717,7 @@ Proof.
   rewrite <- sep__part_fun_i with (H := Nat.lt_le_incl _ _ Hi).
    apply sep__part_fun_bnd'; assumption.
   assumption.
- apply lt_n_Sn.
+ apply Nat.lt_succ_diag_r.
 Defined.
 
 Lemma sep__part_pts_lemma :
@@ -734,7 +734,7 @@ Proof.
  red in |- *; intros i Hi.
  set (H := sep__part_h_mon_3 _ _ (eq_ind (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) (
    fun n0 : nat => n0 < n) (sep__part_fun_bnd' i (Nat.lt_le_incl _ _ Hi) Hi)
-     (sep__part_h i) (sep__part_fun_i i (Nat.lt_le_incl _ _ Hi) Hi)) (lt_n_Sn i)) in *.
+     (sep__part_h i) (sep__part_fun_i i (Nat.lt_le_incl _ _ Hi) Hi)) (Nat.lt_succ_diag_r i)) in *.
  set (H0 := S_pred (sep__part_h (S i)) (sep__part_h i) H) in *.
  set (H' := eq_ind (sep__part_h (S i)) (fun j : nat => j <= n) (
    sep__part_h_bnd (S i)) (S (pred (sep__part_h (S i)))) H0) in *.
@@ -761,7 +761,7 @@ Proof.
   2: apply sep__part_fun_bnd.
  rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
   auto with arith.
- apply sep__part_fun_mon; apply lt_n_Sn.
+ apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
 Qed.
 
 Lemma RS'_Hsep :
@@ -773,7 +773,7 @@ Proof.
   2: apply sep__part_fun_bnd.
  rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
   apply le_S; assumption.
- apply sep__part_fun_mon; apply lt_n_Sn.
+ apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
 Qed.
 
 Definition RS'_h : nat -> IR.
@@ -800,7 +800,7 @@ Proof.
  intros; simpl in |- *.
  unfold Sum2 in |- *.
  cut (sep__part_fun (S i) Hi = S (pred (sep__part_fun (S i) Hi))).
-  2: apply S_pred with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)); apply sep__part_fun_mon; apply lt_n_Sn.
+  2: apply S_pred with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)); apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  intro.
  cut (S (pred (sep__part_fun (S i) Hi)) <= n).
   2: rewrite <- H; apply sep__part_fun_bnd.
@@ -809,7 +809,7 @@ Proof.
   2: apply cg_minus_wd; apply prf1; auto.
  eapply eq_transitive_unfolded.
   apply str_Mengolli_Sum_gen with (f := h).
-   rewrite <- H; apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+   rewrite <- H; apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
   intro j; intros.
   do 2 elim le_lt_dec; intros; simpl in |- *.
      unfold h in |- *.
@@ -896,7 +896,7 @@ Proof.
     rewrite H1; apply H0.
    rewrite (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))) .
     auto with arith.
-   apply sep__part_fun_mon; apply lt_n_Sn.
+   apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
   intros; symmetry  in |- *; apply sep__part_fun_m.
  apply Sumx_wd; intros.
  unfold part_tot_nat_fun in |- *.
@@ -954,17 +954,17 @@ Proof.
    2: apply Sum2_comm_scal'.
    algebra.
   rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
-    (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+    (sep__part_fun_mon _ _ _ _ (Nat.lt_succ_diag_r i))).
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  eapply eq_transitive_unfolded.
   apply Sum2_minus_Sum2.
   rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
-    (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+    (sep__part_fun_mon _ _ _ _ (Nat.lt_succ_diag_r i))).
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  apply Sum2_wd; intros.
   rewrite <- (S_pred (sep__part_fun (S i) Hi) (sep__part_fun i (Nat.lt_le_incl _ _ Hi))
-    (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+    (sep__part_fun_mon _ _ _ _ (Nat.lt_succ_diag_r i))).
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  algebra.
 Qed.
 
@@ -1033,7 +1033,7 @@ Proof.
     cut (sep__part_fun (S i) Hi'' = sep__part_fun (S i) Hi); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; auto with arith.
    apply sep__part_fun_mon.
-   apply lt_n_Sn.
+   apply Nat.lt_succ_diag_r.
   exfalso; apply (le_not_lt _ _ H).
   rewrite sep__part_fun_i.
    2: assumption.
@@ -1071,12 +1071,12 @@ Proof.
  eapply leEq_transitive.
   apply triangle_Sum2IR.
   rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (Nat.lt_le_incl _ _ H))
-    (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+    (sep__part_fun_mon _ _ _ _ (Nat.lt_succ_diag_r i))).
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  apply Sum2_resp_leEq.
   rewrite <- (S_pred (sep__part_fun (S i) H) (sep__part_fun i (Nat.lt_le_incl _ _ H))
-    (sep__part_fun_mon _ _ _ _ (lt_n_Sn i))).
-  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply lt_n_Sn.
+    (sep__part_fun_mon _ _ _ _ (Nat.lt_succ_diag_r i))).
+  apply Nat.lt_le_incl; apply sep__part_fun_mon; apply Nat.lt_succ_diag_r.
  intros k Hk Hk'.
  elim (le_lt_dec m (S i)); intro.
   cut (S i = m); [ intro | clear Hk Hk'; lia ].
@@ -1161,7 +1161,7 @@ Proof.
      apply sep__part_h_mon_3.
       elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
       apply H3; apply le_n.
-     apply lt_n_Sn.
+     apply Nat.lt_succ_diag_r.
     apply inv_resp_leEq; apply Partition_mon.
     eapply Nat.le_trans.
      2: apply a2.

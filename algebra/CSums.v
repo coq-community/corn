@@ -64,7 +64,7 @@ Fixpoint Sumlist (l : list G) : G :=
 Fixpoint Sumx n : (forall i : nat, i < n -> G) -> G :=
   match n return ((forall i : nat, i < n -> G) -> G) with
   | O   => fun _ => [0]:G
-  | S m => fun f => Sumx m (fun i l => f i (lt_S _ _ l)) [+]f m (lt_n_Sn m)
+  | S m => fun f => Sumx m (fun i l => f i (lt_S _ _ l)) [+]f m (Nat.lt_succ_diag_r m)
   end.
 
 (**
@@ -297,7 +297,7 @@ Proof.
     apply H'.
    algebra.
   algebra.
- exists n. exists (lt_n_Sn n).
+ exists n. exists (Nat.lt_succ_diag_r n).
  eapply ap_wdl_unfolded.
   eapply ap_wdr_unfolded.
    apply H1.
@@ -408,10 +408,10 @@ Proof.
   intros; simpl in |- *; algebra.
  intros f g; simpl in |- *.
  apply eq_transitive_unfolded with (Sumx _ (fun (i : nat) (l : i < n) => f i (lt_S i n l)) [+]
-   Sumx _ (fun (i : nat) (l : i < n) => g i (lt_S i n l)) [+] (f n (lt_n_Sn n) [+]g n (lt_n_Sn n))).
+   Sumx _ (fun (i : nat) (l : i < n) => g i (lt_S i n l)) [+] (f n (Nat.lt_succ_diag_r n) [+]g n (Nat.lt_succ_diag_r n))).
   set (Sf := Sumx _ (fun (i : nat) (l : i < n) => f i (lt_S i n l))) in *.
   set (Sg := Sumx _ (fun (i : nat) (l : i < n) => g i (lt_S i n l))) in *.
-  set (fn := f n (lt_n_Sn n)) in *; set (gn := g n (lt_n_Sn n)) in *.
+  set (fn := f n (Nat.lt_succ_diag_r n)) in *; set (gn := g n (Nat.lt_succ_diag_r n)) in *.
   astepl (Sf[+]fn[+]Sg[+]gn).
   astepl (Sf[+] (fn[+]Sg) [+]gn).
   astepl (Sf[+] (Sg[+]fn) [+]gn).
@@ -466,7 +466,7 @@ Proof.
  intro n; induction  n as [| n Hrecn].
   simpl in |- *; algebra.
  intro f; simpl in |- *.
- astepl ([--] (Sumx _ (fun i (l : i < n) => f i (lt_S i n l))) [+] [--] (f n (lt_n_Sn n))).
+ astepl ([--] (Sumx _ (fun i (l : i < n) => f i (lt_S i n l))) [+] [--] (f n (Nat.lt_succ_diag_r n))).
  apply bin_op_wd_unfolded.
   apply Hrecn with (f := fun i (l : i < n) => f i (lt_S i n l)).
  algebra.
@@ -752,7 +752,7 @@ Proof.
  simpl in |- *; intros f Hf.
  eapply eq_transitive_unfolded.
   2: apply eq_symmetric_unfolded; apply Sum_one.
- astepl (f 0 (lt_n_Sn 0)).
+ astepl (f 0 (Nat.lt_succ_diag_r 0)).
  apply eq_symmetric_unfolded; apply part_tot_nat_fun_ch1; auto.
 Qed.
 

@@ -1577,19 +1577,19 @@ Proof.
   simpl in |- *.
   intros.
   exists 0.
-  exists (lt_n_Sn 0).
+  exists (Nat.lt_succ_diag_r 0).
   eapply less_wdr.
    apply X0.
-  astepl (f _ (lt_n_Sn 0)).
+  astepl (f _ (Nat.lt_succ_diag_r 0)).
   apply H; auto.
  simpl in |- *; intros.
  clear X.
- cut ([0] [<] f _ (lt_n_Sn (S n1)) or [0] [<]
+ cut ([0] [<] f _ (Nat.lt_succ_diag_r (S n1)) or [0] [<]
    Sumx (fun (i : nat) (l : i < n1) => f i (lt_S i (S n1) (lt_S i n1 l)))[+]
-     f n1 (lt_S n1 (S n1) (lt_n_Sn n1))).
+     f n1 (lt_S n1 (S n1) (Nat.lt_succ_diag_r n1))).
   intro X.  inversion_clear X.
   exists (S n1).
-   exists (lt_n_Sn (S n1)).
+   exists (Nat.lt_succ_diag_r (S n1)).
    eapply less_wdr.
     apply X2.
    apply H; auto.
@@ -1633,7 +1633,7 @@ Proof.
   intros; algebra.
  intros.
  simpl in |- *.
- rstepl ([--](Sumx (fun (i : nat) (l : i < n) => f i (lt_S i n l)))[+] [--](f n (lt_n_Sn n))).
+ rstepl ([--](Sumx (fun (i : nat) (l : i < n) => f i (lt_S i n l)))[+] [--](f n (Nat.lt_succ_diag_r n))).
  apply bin_op_wd_unfolded.
   2: algebra.
  apply Hrecn with (f := fun (i : nat) (l : i < n) => f i (lt_S i n l)).

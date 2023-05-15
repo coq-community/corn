@@ -265,7 +265,7 @@ to use the [FSumx] operator.
 Fixpoint FSumx (n : nat) : (forall i, i < n -> PartIR) -> PartIR :=
   match n return ((forall i, i < n -> PartIR) -> PartIR) with
   | O   => fun _ => [-C-][0]
-  | S p => fun f => FSumx p (fun i l => f i (lt_S i p l)) {+} f p (lt_n_Sn p)
+  | S p => fun f => FSumx p (fun i l => f i (lt_S i p l)) {+} f p (Nat.lt_succ_diag_r p)
   end.
 
 (**
@@ -337,7 +337,7 @@ Proof.
    apply H with i0 (lt_S i0 n Hi0) x0; auto.
   inversion_clear H0; assumption.
  elim H0; intros H1 H2; clear H0 H1.
- apply H with n (lt_n_Sn n) x; auto.
+ apply H with n (Nat.lt_succ_diag_r n) x; auto.
   symmetry  in |- *; auto.
  algebra.
 Qed.
@@ -414,8 +414,8 @@ Proof.
   eapply eq_transitive_unfolded.
    apply Sum_one.
   simpl in |- *.
-  cut (0 < 1); [ intro | apply lt_n_Sn ].
-  astepr (Part (f 0 (lt_n_Sn 0)) x (ProjIR2 Hx')).
+  cut (0 < 1); [ intro | apply Nat.lt_succ_diag_r ].
+  astepr (Part (f 0 (Nat.lt_succ_diag_r 0)) x (ProjIR2 Hx')).
   apply FSumx_lt; assumption.
  clear n; intros n H f H0 H1 x Hx Hx'.
  simpl in |- *.
@@ -427,7 +427,7 @@ Proof.
    cut (ext_fun_seq' g).
     intro H3.
     astepr (FSumx n (fun i (l : i < n) => g i (lt_S _ _ l)) x
-      (ProjIR1 (ProjIR1 Hx')) [+]g n (lt_n_Sn n) x (ProjIR2 (ProjIR1 Hx'))).
+      (ProjIR1 (ProjIR1 Hx')) [+]g n (Nat.lt_succ_diag_r n) x (ProjIR2 (ProjIR1 Hx'))).
     cut (Dom (FSumx _ g) x).
      intro H4; cut (forall m : nat, Dom (FSumx_to_FSum (S n) g m) x).
       intro Hx''.

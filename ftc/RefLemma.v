@@ -207,7 +207,7 @@ Qed.
 
 Let H0 : forall i : nat, sub i < sub (S i).
 Proof.
- intro; apply RL_sub_mon; apply lt_n_Sn.
+ intro; apply RL_sub_mon; apply Nat.lt_succ_diag_r.
 Qed.
 
 Lemma RL_sub_SS : forall i : nat, sub i <= S (pred (sub (S i))).

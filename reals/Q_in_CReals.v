@@ -706,7 +706,7 @@ Proof.
      assumption.
     apply nring_less.
     rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
-    apply lt_n_Sn.
+    apply Nat.lt_succ_diag_r.
    astepr (inj_Q (g_ m[-]g_ N)).
    apply inj_Q_AbsSmall.
    apply a.

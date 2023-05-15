@@ -141,7 +141,7 @@ Lemma cmΣ_0 (f : nat -> CR) (n : nat) :
   (forall m, (m < n)%nat -> f m == 0) -> @cmΣ CRasCMonoid n f == 0.
 Proof.
 induction n as [| n IH]; intro H; [reflexivity |].
-unfold cmΣ. simpl @cm_Sum. rewrite H by apply lt_n_Sn.
+unfold cmΣ. simpl @cm_Sum. rewrite H by apply Nat.lt_succ_diag_r.
 rewrite IH; [apply CRplus_0_l |].
 intros m H1; apply H. now apply lt_S.
 Qed.

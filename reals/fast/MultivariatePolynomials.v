@@ -300,12 +300,12 @@ Proof.
    apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmax_mult_pos_distr_l.
       replace LHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
         (Bernstein (MultivariatePolynomial Q_as_CRing n)
-          (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vector.cons _ a _ v0)).
+          (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))) (Vector.cons _ a _ v0)).
        apply Qmax_ub_l.
       simpl.
       rewrite <- (MVP_mult_apply Q_as_CRing).
       apply: MVP_apply_wd; try reflexivity.
-      replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
+      replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
         with (Le.le_S_n n1 m l) by apply le_irrelevent.
       apply c_mult_apply.
      apply MVP_BernsteinNonNeg; auto.
@@ -428,12 +428,12 @@ Proof.
   apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmin_mult_pos_distr_l.
      replace RHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
        (Bernstein (MultivariatePolynomial Q_as_CRing n)
-         (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vector.cons _ a _ v0)).
+         (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))) (Vector.cons _ a _ v0)).
       apply Qmin_lb_l.
      simpl.
      rewrite <- (MVP_mult_apply Q_as_CRing).
      apply: MVP_apply_wd; try reflexivity.
-     replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
+     replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
        with (Le.le_S_n n1 m l) by apply le_irrelevent.
      apply c_mult_apply.
     apply MVP_BernsteinNonNeg; auto.

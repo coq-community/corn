@@ -68,18 +68,18 @@ Proof.
  intro m. induction  m as [| m Hrecm].
   do 3 intro. apply f.
  intros.
- elim (ap_imp_less _ _ _ (Hfg n m (lt_n_Sn n) (lt_n_Sn m))); intro.
+ elim (ap_imp_less _ _ _ (Hfg n m (Nat.lt_succ_diag_r n) (Nat.lt_succ_diag_r m))); intro.
   set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
   elim (le_lt_eq_dec _ _ H); intro.
    apply Hrecm with (f := f) (g := h) (i := i); unfold h in |- *; auto.
    apply om_fun_lt; auto.
-  apply (g m (lt_n_Sn m)).
+  apply (g m (Nat.lt_succ_diag_r m)).
  clear Hrecm.
  set (h := fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) in *.
  elim (le_lt_eq_dec _ _ H); intro.
   apply Hrecn with (f := h) (g := g) (i := i); unfold h in |- *; auto.
   apply om_fun_lt. rewrite plus_n_Sm. auto.
- apply (f n (lt_n_Sn n)).
+ apply (f n (Nat.lt_succ_diag_r n)).
 Defined.
 
 Lemma om_fun_1 : forall n m f g Hfg,
@@ -134,17 +134,17 @@ Proof.
    set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
    set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
    assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
-    refine (om_fun_2a _ _ f h Hfh (g m (lt_n_Sn m)) _ _ i (om_fun_lt _ _ a0)).
+    refine (om_fun_2a _ _ f h Hfh (g m (Nat.lt_succ_diag_r m)) _ _ i (om_fun_lt _ _ a0)).
     intros j Hj. elim (le_lt_eq_dec _ _ Hj); intro.
-    apply less_transitive_unfolded with (f n (lt_n_Sn n)); auto with arith.
-    apply less_wdl with (f n (lt_n_Sn n)); auto.
+    apply less_transitive_unfolded with (f n (Nat.lt_succ_diag_r n)); auto with arith.
+    apply less_wdl with (f n (Nat.lt_succ_diag_r n)); auto.
     apply H; auto. inversion b0. auto.
     unfold h in |- *; auto.
   apply Hrecn; auto. red in |- *; auto.
   apply om_fun_2a; auto.
  intros j Hj. elim (le_lt_eq_dec _ _ Hj); intro.
- apply less_transitive_unfolded with (g m (lt_n_Sn m)); auto with arith.
- apply less_wdl with (g m (lt_n_Sn m)); auto.
+ apply less_transitive_unfolded with (g m (Nat.lt_succ_diag_r m)); auto with arith.
+ apply less_wdl with (g m (Nat.lt_succ_diag_r m)); auto.
  apply H0; auto. inversion b1. auto.
 Qed.
 
@@ -180,7 +180,7 @@ Proof.
     unfold h in |- *; apply H; auto.
    apply om_fun_1; auto.
   exfalso; auto with zarith.
- exists (m + S n). exists (lt_n_Sn (m + S n)).
+ exists (m + S n). exists (Nat.lt_succ_diag_r (m + S n)).
  elim le_lt_eq_dec; simpl in |- *; intro.
   exfalso; auto with zarith.
  apply H. inversion b0. auto.
@@ -209,7 +209,7 @@ Proof.
      unfold h in |- *; apply H0; auto.
     refine (om_fun_1 _ _ f h Hfh H Hh j j _ Hj (om_fun_lt _ _ a1)). auto.
     exfalso; auto with zarith.
-  exists (m + S n). exists (lt_n_Sn (m + S n)).
+  exists (m + S n). exists (Nat.lt_succ_diag_r (m + S n)).
   elim le_lt_eq_dec; simpl in |- *; intro.
    exfalso; auto with zarith.
   apply H0. inversion b. auto.
@@ -316,13 +316,13 @@ Proof.
   simpl in |- *. astepl (Sum (f 0) (pred (f 1)) h). rewrite f0.
   apply eq_symmetric. eapply eq_transitive.
   apply Sumx_to_Sum.
-    pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
+    pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply Nat.lt_succ_diag_r.
    intros i j H0 H1 H'; rewrite H0; algebra.
   clear H; apply Sum_wd'; unfold part_tot_nat_fun in |- *; auto with arith.
   intros. elim (le_lt_dec (f 1) i); intro; simpl in |- *.
   cut (0 < f 1).
     intro; exfalso; lia.
-   pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply lt_n_Sn.
+   pattern 0 at 1 in |- *; rewrite <- f0; apply f_mon; apply Nat.lt_succ_diag_r.
   algebra.
  cut (0 < f n); [ intro | rewrite <- f0; apply f_mon; assumption ].
  simpl in |- *.
@@ -346,7 +346,7 @@ Proof.
      elim (le_lt_dec (f n) i); intro; simpl in |- *.
       exfalso; lia.
      elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
-      cut (f n < f (S n)); [ intro | apply f_mon; apply lt_n_Sn ].
+      cut (f n < f (S n)); [ intro | apply f_mon; apply Nat.lt_succ_diag_r ].
       exfalso; apply (le_not_lt (f n) i); auto.
       apply Nat.le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
@@ -420,8 +420,8 @@ Proof.
     Sum (f' m f i) (pred (f' m f (S i))) (g i H3))).
    apply Sumx_wd; intros.
    rewrite <- (H4 i (Nat.lt_le_incl _ _ H5)); rewrite <- (H4 (S i) H5); apply Sum_wd'.
-    rewrite <- (S_pred (f (S i) H5) (f i (Nat.lt_le_incl _ _ H5)) (H1 _ _ _ _ (lt_n_Sn i))) .
-    apply Nat.lt_le_incl; apply H1; apply lt_n_Sn.
+    rewrite <- (S_pred (f (S i) H5) (f i (Nat.lt_le_incl _ _ H5)) (H1 _ _ _ _ (Nat.lt_succ_diag_r i))) .
+    apply Nat.lt_le_incl; apply H1; apply Nat.lt_succ_diag_r.
    intros; algebra.
   apply str_Sumx_Sum_Sum.
      unfold f' in |- *; simpl in |- *.
@@ -434,7 +434,7 @@ Proof.
      clear H5 j i; intros.
      unfold f' in |- *.
      elim (le_lt_dec i m); elim (le_lt_dec (S i) m); intros; simpl in |- *.
-        apply H1; apply lt_n_Sn.
+        apply H1; apply Nat.lt_succ_diag_r.
        cut (i = m); [ intro | apply le_antisym; auto with arith ].
        generalize a; clear a; pattern i at 1 2 in |- *; rewrite H5; intro.
        set (x := f m a) in *.

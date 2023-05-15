@@ -901,8 +901,8 @@ Proof.
  induction  k as [| k Hreck].
   exists 0.
    rewrite H0; auto with arith.
-  cut (h 0 < h 1); [ intro; apply Nat.le_trans with (h 0); auto with arith | apply H; apply lt_n_Sn ].
- cut (h k < h (S k)); [ intro H2 | apply H; apply lt_n_Sn ].
+  cut (h 0 < h 1); [ intro; apply Nat.le_trans with (h 0); auto with arith | apply H; apply Nat.lt_succ_diag_r ].
+ cut (h k < h (S k)); [ intro H2 | apply H; apply Nat.lt_succ_diag_r ].
  elim (le_lt_dec (S n) (h k)); intro H3.
   elim (Hreck H3); intros i Hi.
   exists i; assumption.
@@ -927,13 +927,13 @@ Proof.
   apply Nat.le_lt_trans with (f m).
    rewrite b; auto with arith.
   apply H.
-  rewrite b; apply lt_n_Sn.
+  rewrite b; apply Nat.lt_succ_diag_r.
  intros.
  elim (le_lt_eq_dec _ _ H0); intro.
   auto with arith.
  cut (i = m); [ intro | auto ].
  rewrite b; rewrite <- H1.
- apply lt_n_Sn.
+ apply Nat.lt_succ_diag_r.
 Qed.
 
 End Natural_Numbers.

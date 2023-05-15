@@ -95,10 +95,10 @@ Proof.
   astepl (x[-] ([0][+]z)).
   rational.
  intros.
- astepl (x[-] (Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [+] y (S n) (lt_n_Sn (S n)))).
- rstepl (x[-]Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [-] y (S n) (lt_n_Sn (S n))).
- astepr (x[-]z[-] (Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [+]y' n (lt_n_Sn n))).
- rstepr (x[-]z[-]Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [-] y' n (lt_n_Sn n)).
+ astepl (x[-] (Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [+] y (S n) (Nat.lt_succ_diag_r (S n)))).
+ rstepl (x[-]Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [-] y (S n) (Nat.lt_succ_diag_r (S n))).
+ astepr (x[-]z[-] (Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [+]y' n (Nat.lt_succ_diag_r n))).
+ rstepr (x[-]z[-]Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [-] y' n (Nat.lt_succ_diag_r n)).
  algebra.
 Qed.
 
@@ -248,14 +248,14 @@ Proof.
        simpl in |- *; Included.
       apply compact_Min_lft.
      apply eq_transitive_unfolded with (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ _ _ _
-       (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (lt_n_Sn n)) _ H2)))
+       (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_succ_diag_r n)) _ H2)))
          a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
       simpl in |- *; algebra.
      apply Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
       apply Derivative_I_n_unique with n F.
        apply projT2.
       unfold fi in |- *.
-      elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI n n (lt_n_Sm_le _ _ (lt_n_Sn n)) _ Hf'));
+      elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI n n (lt_n_Sm_le _ _ (Nat.lt_succ_diag_r n)) _ Hf'));
         intros incF0 H'.
       elim H'; intros Hinc derivF; clear H'.
       apply derivF.
@@ -406,7 +406,7 @@ Proof.
    Transparent N_Deriv.
    simpl in |- *.
    cut (included (Compact (Min_leEq_Max a b)) I); Included.
-  apply Derivative_n_imp_Diffble_n with (f n (lt_n_Sn n)).
+  apply Derivative_n_imp_Diffble_n with (f n (Nat.lt_succ_diag_r n)).
   apply derF.
  apply Derivative_n_imp_Diffble_n with F'.
  assumption.
