@@ -95,10 +95,10 @@ Proof.
   astepl (x[-] ([0][+]z)).
   rational.
  intros.
- astepl (x[-] (Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [+] y (S n) (Nat.lt_succ_diag_r (S n)))).
- rstepl (x[-]Sumx (fun i (l : i < S n) => y i (lt_S _ _ l)) [-] y (S n) (Nat.lt_succ_diag_r (S n))).
- astepr (x[-]z[-] (Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [+]y' n (Nat.lt_succ_diag_r n))).
- rstepr (x[-]z[-]Sumx (fun i (l : i < n) => y' i (lt_S _ _ l)) [-] y' n (Nat.lt_succ_diag_r n)).
+ astepl (x[-] (Sumx (fun i (l : i < S n) => y i (Nat.lt_lt_succ_r _ _ l)) [+] y (S n) (Nat.lt_succ_diag_r (S n)))).
+ rstepl (x[-]Sumx (fun i (l : i < S n) => y i (Nat.lt_lt_succ_r _ _ l)) [-] y (S n) (Nat.lt_succ_diag_r (S n))).
+ astepr (x[-]z[-] (Sumx (fun i (l : i < n) => y' i (Nat.lt_lt_succ_r _ _ l)) [+]y' n (Nat.lt_succ_diag_r n))).
+ rstepr (x[-]z[-]Sumx (fun i (l : i < n) => y' i (Nat.lt_lt_succ_r _ _ l)) [-] y' n (Nat.lt_succ_diag_r n)).
  algebra.
 Qed.
 
@@ -234,14 +234,14 @@ Proof.
       apply div_wd.
        2: algebra.
       apply eq_transitive_unfolded with (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ _ _ _
-        (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (lt_S _ _ Hi)) _ H2)))
+        (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ H2)))
           a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
        simpl in |- *; algebra.
       apply Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
        apply Derivative_I_n_unique with i F.
         apply projT2.
        unfold fi in |- *.
-       elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI i n (lt_n_Sm_le _ _ (lt_S _ _ Hi)) _ Hf'));
+       elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI i n (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ Hf'));
          intros incF0 H'.
        elim H'; intros Hinc derivF; clear H'.
        apply derivF.

@@ -601,15 +601,15 @@ Proof.
     repeat (split; auto).
    intros x0 H4; intros; simpl in |- *.
    repeat apply mult_wdl.
-   apply eq_transitive_unfolded with (PartInt (fi n H1 i (lt_S _ _ H3)) x0 H4).
+   apply eq_transitive_unfolded with (PartInt (fi n H1 i (Nat.lt_lt_succ_r _ _ H3)) x0 H4).
     simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
-   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf i (lt_S _ _ (lt_S _ _ H'))) x0 H4).
+   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf i (Nat.lt_lt_succ_r _ _ (Nat.lt_lt_succ_r _ _ H'))) x0 H4).
     2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    apply Feq_imp_eq with (Compact Hab).
     unfold Hab in |- *; apply Derivative_I_n_unique with i F; apply Taylor_lemma1.
    auto.
   apply eq_transitive_unfolded with (PartInt (fi n H1 n (Nat.lt_succ_diag_r _)) x H2).
-   2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf n (lt_S _ _ (Nat.lt_succ_diag_r _))) x H2).
+   2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf n (Nat.lt_lt_succ_r _ _ (Nat.lt_succ_diag_r _))) x H2).
     simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
   apply Feq_imp_eq with (Compact Hab).

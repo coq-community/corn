@@ -265,7 +265,7 @@ to use the [FSumx] operator.
 Fixpoint FSumx (n : nat) : (forall i, i < n -> PartIR) -> PartIR :=
   match n return ((forall i, i < n -> PartIR) -> PartIR) with
   | O   => fun _ => [-C-][0]
-  | S p => fun f => FSumx p (fun i l => f i (lt_S i p l)) {+} f p (Nat.lt_succ_diag_r p)
+  | S p => fun f => FSumx p (fun i l => f i (Nat.lt_lt_succ_r i p l)) {+} f p (Nat.lt_succ_diag_r p)
   end.
 
 (**
@@ -327,14 +327,14 @@ Proof.
   exfalso; inversion Hi.
  elim (le_lt_eq_dec _ _ Hi); intro.
   cut (i < n); [ intro | auto with arith ].
-  set (g := fun i Hi => f i (lt_S _ _ Hi)) in *.
-  apply H with i (lt_S _ _ H1) x.
+  set (g := fun i Hi => f i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  apply H with i (Nat.lt_lt_succ_r _ _ H1) x.
     auto.
    algebra.
   change (Dom (g i H1) x) in |- *.
   apply Hrecn.
    unfold g in |- *; intros.
-   apply H with i0 (lt_S i0 n Hi0) x0; auto.
+   apply H with i0 (Nat.lt_lt_succ_r i0 n Hi0) x0; auto.
   inversion_clear H0; assumption.
  elim H0; intros H1 H2; clear H0 H1.
  apply H with n (Nat.lt_succ_diag_r n) x; auto.
@@ -363,13 +363,13 @@ Proof.
   algebra.
  intros; simpl in |- *.
  apply bin_op_wd_unfolded; algebra.
- cut (ext_fun_seq' (fun i Hi => f i (lt_S i n Hi))).
+ cut (ext_fun_seq' (fun i Hi => f i (Nat.lt_lt_succ_r i n Hi))).
   intro H.
   eapply eq_transitive_unfolded.
    apply Hrecn with (Hf := H).
   apply Sumx_wd; intros; simpl in |- *; algebra.
  intros i j H H0 H' x0 y H1 H2.
- apply Hf with i (lt_S i n H0) x0; auto.
+ apply Hf with i (Nat.lt_lt_succ_r i n H0) x0; auto.
 Qed.
 
 (**
@@ -422,11 +422,11 @@ Proof.
  eapply eq_transitive_unfolded.
   apply Sum_last.
  apply bin_op_wd_unfolded.
-  set (g := fun i (l : i < S n) => f i (lt_S _ _ l)) in *.
+  set (g := fun i (l : i < S n) => f i (Nat.lt_lt_succ_r _ _ l)) in *.
   cut (ext_fun_seq g); intros.
    cut (ext_fun_seq' g).
     intro H3.
-    astepr (FSumx n (fun i (l : i < n) => g i (lt_S _ _ l)) x
+    astepr (FSumx n (fun i (l : i < n) => g i (Nat.lt_lt_succ_r _ _ l)) x
       (ProjIR1 (ProjIR1 Hx')) [+]g n (Nat.lt_succ_diag_r n) x (ProjIR2 (ProjIR1 Hx'))).
     cut (Dom (FSumx _ g) x).
      intro H4; cut (forall m : nat, Dom (FSumx_to_FSum (S n) g m) x).
@@ -457,7 +457,7 @@ Proof.
     simpl in Hx'.
     unfold g in |- *; inversion_clear Hx'; intros; assumption.
    unfold g in |- *; red in |- *; intros.
-   red in H1; apply H1 with i (lt_S _ _ Hi) x0; auto.
+   red in H1; apply H1 with i (Nat.lt_lt_succ_r _ _ Hi) x0; auto.
   unfold g in |- *; red in |- *; intros.
   red in H0; apply H0; auto.
  apply FSumx_lt; auto.

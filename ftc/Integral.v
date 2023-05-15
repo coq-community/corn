@@ -56,8 +56,8 @@ Proof.
   intros; simpl in |- *; apply eq_symmetric_unfolded.
   astepr (g 0 (Nat.lt_succ_diag_r 0)); algebra.
  do 2 intro; rewrite H; intros.
- astepl (Sumx (fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) [+]f n (Nat.lt_succ_diag_r n)).
- Step_final (Sumx (fun (i : nat) (Hi : i < S n) => g i (lt_S _ _ Hi)) [+] g (S n) (Nat.lt_succ_diag_r (S n))).
+ astepl (Sumx (fun (i : nat) (Hi : i < n) => f i (Nat.lt_lt_succ_r _ _ Hi)) [+]f n (Nat.lt_succ_diag_r n)).
+ Step_final (Sumx (fun (i : nat) (Hi : i < S n) => g i (Nat.lt_lt_succ_r _ _ Hi)) [+] g (S n) (Nat.lt_succ_diag_r (S n))).
 Qed.
 
 Lemma Sumx_weird_lemma :
@@ -84,9 +84,9 @@ Proof.
  intros l Hl.
  rewrite Hl; intros f1 f2 f3 Hf1 Hf2 Hf3 Hf1_f3 Hf2_f3 Hf3_f3.
  apply eq_transitive_unfolded with
-   (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (lt_S _ _ Hi)) [+] f2 m (Nat.lt_succ_diag_r m)).
+   (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (Nat.lt_lt_succ_r _ _ Hi)) [+] f2 m (Nat.lt_succ_diag_r m)).
   simpl in |- *; algebra.
- astepr (Sumx (fun (i : nat) (Hi : i < l') => f3 i (lt_S _ _ Hi)) [+] f3 l' (Nat.lt_succ_diag_r l')).
+ astepr (Sumx (fun (i : nat) (Hi : i < l') => f3 i (Nat.lt_lt_succ_r _ _ Hi)) [+] f3 l' (Nat.lt_succ_diag_r l')).
  apply bin_op_wd_unfolded.
   apply Hrecm.
         unfold l' in |- *; auto.

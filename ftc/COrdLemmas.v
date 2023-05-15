@@ -69,13 +69,13 @@ Proof.
   do 3 intro. apply f.
  intros.
  elim (ap_imp_less _ _ _ (Hfg n m (Nat.lt_succ_diag_r n) (Nat.lt_succ_diag_r m))); intro.
-  set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
+  set (h := fun (i : nat) (Hi : i < m) => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
   elim (le_lt_eq_dec _ _ H); intro.
    apply Hrecm with (f := f) (g := h) (i := i); unfold h in |- *; auto.
    apply om_fun_lt; auto.
   apply (g m (Nat.lt_succ_diag_r m)).
  clear Hrecm.
- set (h := fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) in *.
+ set (h := fun (i : nat) (Hi : i < n) => f i (Nat.lt_lt_succ_r _ _ Hi)) in *.
  elim (le_lt_eq_dec _ _ H); intro.
   apply Hrecn with (f := h) (g := g) (i := i); unfold h in |- *; auto.
   apply om_fun_lt. rewrite plus_n_Sm. auto.
@@ -93,8 +93,8 @@ Proof.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro;
    repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (exfalso; auto with zarith; fail);
      try apply eq_reflexive_unfolded.
-  set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
-  set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
+  set (h := fun (i : nat) (Hi : i < m) => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
   assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
    exact (Hrecm f h Hfh H Hh i j H1 (om_fun_lt _ _ a0) (om_fun_lt _ _ a1)).
  apply Hrecn; try red in |- *; auto.
@@ -109,9 +109,9 @@ Proof.
   simpl in |- *; auto.
  intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro; elim le_lt_eq_dec; simpl in |- *; intro; auto.
- set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
- set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
- set (Hh := fun i Hi => X0 i (lt_S _ _ Hi)) in *.
+ set (h := fun (i : nat) (Hi : i < m) => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+ set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
+ set (Hh := fun i Hi => X0 i (Nat.lt_lt_succ_r _ _ Hi)) in *.
  exact (Hrecm f h Hfh x X Hh i (om_fun_lt _ _ a0)).
 Qed.
 
@@ -126,13 +126,13 @@ Proof.
  intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro;
    repeat (elim le_lt_eq_dec; simpl in |- *; intro); try (exfalso; auto with zarith; fail).
-    set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
-    set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
+    set (h := fun (i : nat) (Hi : i < m) => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+    set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
     assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
-     set (inch := fun i i' Hi Hi' Hii' => X0 i i' (lt_S _ _ Hi) (lt_S _ _ Hi') Hii') in *.
+     set (inch := fun i i' Hi Hi' Hii' => X0 i i' (Nat.lt_lt_succ_r _ _ Hi) (Nat.lt_lt_succ_r _ _ Hi') Hii') in *.
     exact (Hrecm f h Hfh H Hh X inch i i' (om_fun_lt _ _ a0) (om_fun_lt _ _ a1) H1).
-   set (h := fun (i : nat) (Hi : i < m) => g i (lt_S _ _ Hi)) in *.
-   set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
+   set (h := fun (i : nat) (Hi : i < m) => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+   set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
    assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
     refine (om_fun_2a _ _ f h Hfh (g m (Nat.lt_succ_diag_r m)) _ _ i (om_fun_lt _ _ a0)).
     intros j Hj. elim (le_lt_eq_dec _ _ Hj); intro.
@@ -157,19 +157,19 @@ Proof.
   simpl in |- *; intros. exists i. exists Hi. algebra.
   intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro.
-  set (h := fun i Hi => g i (lt_S _ _ Hi)) in *.
-  set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
+  set (h := fun i Hi => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
   assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
    elim (Hrecm f h Hfh H Hh i Hi); intros j Hj.
   elim Hj; clear Hj; intros Hj Hj'.
-  exists j; exists (lt_S _ _ Hj).
+  exists j; exists (Nat.lt_lt_succ_r _ _ Hj).
   elim le_lt_eq_dec; simpl in |- *; intro.
    astepl (om_fun _ _ f h Hfh _ Hj).
    refine (om_fun_1 _ _ f h Hfh H Hh j j _ Hj (om_fun_lt _ _ a0)). auto.
    exfalso; auto with zarith.
  elim (le_lt_eq_dec _ _ Hi); intro.
-  set (h := fun i Hi => f i (lt_S _ _ Hi)) in *.
-  set (Hfh := fun i j Hi Hj => Hfg i j (lt_S _ _ Hi) Hj) in *.
+  set (h := fun i Hi => f i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  set (Hfh := fun i j Hi Hj => Hfg i j (Nat.lt_lt_succ_r _ _ Hi) Hj) in *.
   assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
    elim (Hrecn _ h g Hfh Hh H0 i (om_fun_lt _ _ a)); intros j Hj.
   elim Hj; clear Hj; intros Hj Hj'.
@@ -198,12 +198,12 @@ Proof.
   intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro.
   elim (le_lt_eq_dec _ _ Hi); intro.
-   set (h := fun i Hi => g i (lt_S _ _ Hi)) in *.
-   set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
+   set (h := fun i Hi => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+   set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
    assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
     elim (Hrecm f h Hfh H Hh i (om_fun_lt _ _ a0)); intros j Hj.
    elim Hj; clear Hj; intros Hj Hj'.
-   exists j; exists (lt_S _ _ Hj).
+   exists j; exists (Nat.lt_lt_succ_r _ _ Hj).
    elim le_lt_eq_dec; simpl in |- *; intro.
     eapply eq_transitive_unfolded. eapply eq_transitive_unfolded. 2: apply Hj'.
      unfold h in |- *; apply H0; auto.
@@ -213,8 +213,8 @@ Proof.
   elim le_lt_eq_dec; simpl in |- *; intro.
    exfalso; auto with zarith.
   apply H0. inversion b. auto.
-  set (h := fun i Hi => f i (lt_S _ _ Hi)) in *.
- set (Hfh := fun i j Hi Hj => Hfg i j (lt_S _ _ Hi) Hj) in *.
+  set (h := fun i Hi => f i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+ set (Hfh := fun i j Hi Hj => Hfg i j (Nat.lt_lt_succ_r _ _ Hi) Hj) in *.
  assert (Hh : nat_less_n_fun h). red in |- *; unfold h in |- *; auto.
   elim (Hrecn _ h g Hfh Hh H0 i Hi); intros j Hj.
  elim Hj; clear Hj; intros Hj Hj'.
@@ -234,9 +234,9 @@ Proof.
   simpl in |- *; auto.
  intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro; elim le_lt_eq_dec; simpl in |- *; intro; auto.
-  set (h := fun i Hi => g i (lt_S _ _ Hi)) in *.
-  set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
-  set (Hh := fun i Hi => X1 i (lt_S _ _ Hi)) in *.
+  set (h := fun i Hi => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
+  set (Hh := fun i Hi => X1 i (Nat.lt_lt_succ_r _ _ Hi)) in *.
   exact (Hrecm f h Hfh P X X0 Hh k (om_fun_lt _ _ a0)).
  apply Hrecn; auto.
 Qed.
@@ -250,9 +250,9 @@ Proof.
   simpl in |- *; auto.
  intros.
  simpl in |- *; elim ap_imp_less; simpl in |- *; intro; elim le_lt_eq_dec; simpl in |- *; intro; auto.
-  set (h := fun i Hi => g i (lt_S _ _ Hi)) in *.
-  set (Hfh := fun i j Hi Hj => Hfg i j Hi (lt_S _ _ Hj)) in *.
-  set (Hh := fun i Hi => H1 i (lt_S _ _ Hi)) in *.
+  set (h := fun i Hi => g i (Nat.lt_lt_succ_r _ _ Hi)) in *.
+  set (Hfh := fun i j Hi Hj => Hfg i j Hi (Nat.lt_lt_succ_r _ _ Hj)) in *.
+  set (Hh := fun i Hi => H1 i (Nat.lt_lt_succ_r _ _ Hi)) in *.
   exact (Hrecm f h Hfh P H H0 Hh k (om_fun_lt _ _ a0)).
  apply Hrecn; auto.
 Qed.

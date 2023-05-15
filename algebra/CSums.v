@@ -64,7 +64,7 @@ Fixpoint Sumlist (l : list G) : G :=
 Fixpoint Sumx n : (forall i : nat, i < n -> G) -> G :=
   match n return ((forall i : nat, i < n -> G) -> G) with
   | O   => fun _ => [0]:G
-  | S m => fun f => Sumx m (fun i l => f i (lt_S _ _ l)) [+]f m (Nat.lt_succ_diag_r m)
+  | S m => fun f => Sumx m (fun i l => f i (Nat.lt_lt_succ_r _ _ l)) [+]f m (Nat.lt_succ_diag_r m)
   end.
 
 (**
@@ -285,13 +285,13 @@ Proof.
  intros f g H H0 H1.
  simpl in H1.
  elim (bin_op_strext_unfolded _ _ _ _ _ _ H1); clear H1; intro H1.
-  cut (nat_less_n_fun (fun (i : nat) (l : i < n) => f i (lt_S _ _ l)));
+  cut (nat_less_n_fun (fun (i : nat) (l : i < n) => f i (Nat.lt_lt_succ_r _ _ l)));
     [ intro H2 | red in |- *; intros; apply H; assumption ].
-  cut (nat_less_n_fun (fun (i : nat) (l : i < n) => g i (lt_S _ _ l)));
+  cut (nat_less_n_fun (fun (i : nat) (l : i < n) => g i (Nat.lt_lt_succ_r _ _ l)));
     [ intro H3 | red in |- *; intros; apply H0; assumption ].
   elim (Hrecn _ _ H2 H3 H1); intros N HN.
   elim HN; clear HN; intros HN H'.
-  exists N. exists (lt_S _ _ HN).
+  exists N. exists (Nat.lt_lt_succ_r _ _ HN).
   eapply ap_wdl_unfolded.
    eapply ap_wdr_unfolded.
     apply H'.
@@ -407,10 +407,10 @@ Proof.
  intro n; induction  n as [| n Hrecn].
   intros; simpl in |- *; algebra.
  intros f g; simpl in |- *.
- apply eq_transitive_unfolded with (Sumx _ (fun (i : nat) (l : i < n) => f i (lt_S i n l)) [+]
-   Sumx _ (fun (i : nat) (l : i < n) => g i (lt_S i n l)) [+] (f n (Nat.lt_succ_diag_r n) [+]g n (Nat.lt_succ_diag_r n))).
-  set (Sf := Sumx _ (fun (i : nat) (l : i < n) => f i (lt_S i n l))) in *.
-  set (Sg := Sumx _ (fun (i : nat) (l : i < n) => g i (lt_S i n l))) in *.
+ apply eq_transitive_unfolded with (Sumx _ (fun (i : nat) (l : i < n) => f i (Nat.lt_lt_succ_r i n l)) [+]
+   Sumx _ (fun (i : nat) (l : i < n) => g i (Nat.lt_lt_succ_r i n l)) [+] (f n (Nat.lt_succ_diag_r n) [+]g n (Nat.lt_succ_diag_r n))).
+  set (Sf := Sumx _ (fun (i : nat) (l : i < n) => f i (Nat.lt_lt_succ_r i n l))) in *.
+  set (Sg := Sumx _ (fun (i : nat) (l : i < n) => g i (Nat.lt_lt_succ_r i n l))) in *.
   set (fn := f n (Nat.lt_succ_diag_r n)) in *; set (gn := g n (Nat.lt_succ_diag_r n)) in *.
   astepl (Sf[+]fn[+]Sg[+]gn).
   astepl (Sf[+] (fn[+]Sg) [+]gn).
@@ -466,9 +466,9 @@ Proof.
  intro n; induction  n as [| n Hrecn].
   simpl in |- *; algebra.
  intro f; simpl in |- *.
- astepl ([--] (Sumx _ (fun i (l : i < n) => f i (lt_S i n l))) [+] [--] (f n (Nat.lt_succ_diag_r n))).
+ astepl ([--] (Sumx _ (fun i (l : i < n) => f i (Nat.lt_lt_succ_r i n l))) [+] [--] (f n (Nat.lt_succ_diag_r n))).
  apply bin_op_wd_unfolded.
-  apply Hrecn with (f := fun i (l : i < n) => f i (lt_S i n l)).
+  apply Hrecn with (f := fun i (l : i < n) => f i (Nat.lt_lt_succ_r i n l)).
  algebra.
 Qed.
 
@@ -664,7 +664,7 @@ Proof.
     apply H.
    apply cg_minus_wd; apply Hf; algebra.
   set (f' := fun i (H : i <= n) => f i (le_S _ _ H)) in *.
-  set (g' := fun i (H : i < n) => g i (lt_S _ _ H)) in *.
+  set (g' := fun i (H : i < n) => g i (Nat.lt_lt_succ_r _ _ H)) in *.
   apply eq_transitive_unfolded with (f' n (le_n n) [-]f' 0 (le_O_n n)).
    apply Hrecn.
     red in |- *; intros; unfold f' in |- *; apply Hf; algebra.
@@ -743,7 +743,7 @@ Proof.
     red in |- *; intros; apply Hf; auto.
    apply eq_symmetric_unfolded.
    eapply eq_transitive_unfolded.
-    apply part_tot_nat_fun_ch1 with (Hi := lt_S _ _ H0).
+    apply part_tot_nat_fun_ch1 with (Hi := Nat.lt_lt_succ_r _ _ H0).
     red in |- *; intros; apply Hf; auto.
    algebra.
   rewrite <- (S_pred _ _ H).
