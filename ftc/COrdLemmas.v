@@ -453,7 +453,7 @@ Proof.
   unfold f' in |- *.
   elim (le_lt_dec m m); intro; simpl in |- *.
    apply H3.
-  elim (lt_irrefl _ b).
+  elim (Nat.lt_irrefl _ b).
  clear H3 H2 g n h; intros.
  unfold f' in |- *.
  elim (le_lt_dec i m); intro; simpl in |- *.

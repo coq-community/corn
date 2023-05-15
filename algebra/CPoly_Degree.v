@@ -153,7 +153,7 @@ Proof. intro. reflexivity. Qed.
 Lemma degree_le_c_ : forall c : R, degree_le 0 (_C_ c).
 Proof.
  unfold degree_le in |- *. intros c m. elim m; intros.
- elim (lt_irrefl _ H).
+ elim (Nat.lt_irrefl _ H).
  simpl in |- *. algebra.
 Qed.
 
@@ -171,7 +171,7 @@ Lemma degree_le_x_ : degree_le 1 (_X_:RX).
 Proof.
  unfold degree_le in |- *.
  intro. elim m. intros. elim (lt_n_O _ H).
- intro. elim n. intros. elim (lt_irrefl _ H0).
+ intro. elim n. intros. elim (Nat.lt_irrefl _ H0).
  intros. simpl in |- *. algebra.
 Qed.
 

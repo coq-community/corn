@@ -202,7 +202,7 @@ Hint Resolve Sum_last: algebra.
 Lemma Sum_last' : forall m n f, 0 < n -> Sum m n f [=] Sum m (pred n) f[+]f n.
 Proof.
  intros m n f H. induction  n as [| n Hrecn].
- elim (lt_irrefl 0 H).
+ elim (Nat.lt_irrefl 0 H).
  apply Sum_last.
 Qed.
 

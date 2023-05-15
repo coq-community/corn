@@ -871,8 +871,8 @@ Proof.
  cut (~ i <> j); [ lia | intro H1 ].
  cut (i < j \/ j < i); [ intro H2 | lia ].
  inversion_clear H2.
-  cut (h i < h j); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
- cut (h j < h i); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
+  cut (h i < h j); [ rewrite H0; apply Nat.lt_irrefl | apply H; assumption ].
+ cut (h j < h i); [ rewrite H0; apply Nat.lt_irrefl | apply H; assumption ].
 Qed.
 
 (** And (not completely trivial) a function that preserves [lt] also preserves [le]. *)

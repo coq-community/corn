@@ -181,7 +181,7 @@ Proof.
     apply cg_add_ap_zero.
    astepl (nth_coeff (S m) f). auto.
     Step_final (nth_coeff (S m) ((_C_ a[*]_X_[+]_C_ b) [*]g)).
-  rewrite <- y in H0. elim (lt_irrefl 0 H0).
+  rewrite <- y in H0. elim (Nat.lt_irrefl 0 H0).
   apply nth_coeff_ap_zero_imp with m'. auto.
 Qed.
 

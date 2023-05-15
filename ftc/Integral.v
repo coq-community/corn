@@ -760,7 +760,7 @@ Proof.
  rewrite H; clear H; intro.
  elim le_lt_dec; intro; simpl in |- *.
   apply finish.
- exfalso; apply lt_irrefl with n; auto.
+ exfalso; apply Nat.lt_irrefl with n; auto.
 Qed.
 
 Lemma pjf_2' : forall (i : nat) Hi, i = S n -> partition_join_fun i Hi [=] c.
@@ -895,7 +895,7 @@ Proof.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
    algebra.
-  exfalso; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
+  exfalso; rewrite b0 in Hi'; apply (Nat.lt_irrefl _ Hi').
  exfalso; apply le_not_lt with i n; auto with arith.
 Qed.
 
@@ -904,9 +904,9 @@ Proof.
  intros; unfold partition_join_pts in |- *.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
-   exfalso; rewrite H in a1; apply (lt_irrefl _ a1).
+   exfalso; rewrite H in a1; apply (Nat.lt_irrefl _ a1).
   algebra.
- exfalso; rewrite H in b0; apply (lt_irrefl _ b0).
+ exfalso; rewrite H in b0; apply (Nat.lt_irrefl _ b0).
 Qed.
 
 Lemma pjp_3 : forall (i : nat) Hi Hi',
@@ -1044,7 +1044,7 @@ Proof.
  apply eq_transitive_unfolded with c; unfold partition_join_fun in |- *;
    elim le_lt_dec; simpl in |- *.
     intro; apply finish.
-   intro; exfalso; apply (lt_irrefl _ b0).
+   intro; exfalso; apply (Nat.lt_irrefl _ b0).
   intro; exfalso; apply (le_Sn_n _ a0).
  intro; apply eq_symmetric_unfolded.
  apply eq_transitive_unfolded with (Q _ (Nat.le_0_l _)).
@@ -1181,7 +1181,7 @@ Proof.
        elim le_lt_dec; intro; simpl in |- *.
         elim le_lt_eq_dec; intro; simpl in |- *.
          apply Partition_imp_points_2; auto.
-        exfalso; rewrite b0 in Hi; apply (lt_irrefl _ Hi).
+        exfalso; rewrite b0 in Hi; apply (Nat.lt_irrefl _ Hi).
        exfalso; apply le_not_lt with i0 (S i); auto with arith.
       apply cg_minus_wd; simpl in |- *.
        apply eq_symmetric_unfolded; apply pjf_1.
@@ -1194,7 +1194,7 @@ Proof.
         exfalso; apply le_Sn_n with (S i); eapply Nat.le_trans.
          2: apply a0.
         auto with arith.
-       exfalso; apply lt_irrefl with (S i); pattern (S i) at 2 in |- *;
+       exfalso; apply Nat.lt_irrefl with (S i); pattern (S i) at 2 in |- *;
          rewrite <- b0; auto with arith.
       unfold Partition_imp_points in |- *; apply prf1.
       auto with arith.

@@ -259,8 +259,8 @@ Proof.
   simpl in |- *.
   elim (le_lt_dec (sep__part_h i) n); intro; simpl in |- *.
    elim (sep__part_lemma (sep__part_h i) a1); intro; simpl in |- *.
-    2: intro; exfalso; apply (lt_irrefl n); auto.
-   2: intro; exfalso; apply (lt_irrefl n); auto.
+    2: intro; exfalso; apply (Nat.lt_irrefl n); auto.
+   2: intro; exfalso; apply (Nat.lt_irrefl n); auto.
   set (m' := ProjT1 a2) in *.
   change (m' < n -> forall Hi' : n <= n, P (sep__part_h i) Hi[<]P n Hi') in |- *; intros.
   elim (ProjT2 a2); fold m' in |- *; intros Hm' Hm''.
@@ -418,7 +418,7 @@ Proof.
  unfold sep__part_fun in |- *.
  elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
   reflexivity.
- rewrite b0 in H0; elim (lt_irrefl _ H0).
+ rewrite b0 in H0; elim (Nat.lt_irrefl _ H0).
 Qed.
 
 Lemma sep__part_fun_m : forall H : m <= m, sep__part_fun m H = n.
@@ -426,7 +426,7 @@ Proof.
  intros.
  unfold sep__part_fun in |- *.
  elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
-  elim (lt_irrefl _ a0).
+  elim (Nat.lt_irrefl _ a0).
  reflexivity.
 Qed.
 
@@ -453,7 +453,7 @@ Proof.
   unfold m in |- *; elim (RS'_delta2_delta4 RS'_m1); intro; simpl in |- *.
    auto with arith.
   auto with arith.
- rewrite b0 in H0; elim (lt_irrefl _ H0).
+ rewrite b0 in H0; elim (Nat.lt_irrefl _ H0).
 Qed.
 
 Lemma sep__part_fun_wd :
@@ -463,8 +463,8 @@ Proof.
  unfold sep__part_fun in |- *.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
     rewrite H; auto.
-   rewrite H in a0; rewrite b0 in a0; elim (lt_irrefl _ a0).
-  rewrite <- H in a0; rewrite b0 in a0; elim (lt_irrefl _ a0).
+   rewrite H in a0; rewrite b0 in a0; elim (Nat.lt_irrefl _ a0).
+  rewrite <- H in a0; rewrite b0 in a0; elim (Nat.lt_irrefl _ a0).
  auto.
 Qed.
 

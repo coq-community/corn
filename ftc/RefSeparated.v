@@ -352,7 +352,7 @@ Proof.
    elim (le_lt_eq_dec _ _ a0); clear a0; intro.
     apply less_imp_ap; apply separation_conseq with j' Hj'.
      apply H.
-    intro; rewrite H0 in a0; apply (lt_irrefl _ a0).
+    intro; rewrite H0 in a0; apply (Nat.lt_irrefl _ a0).
    apply Greater_imp_ap.
    eapply less_wdl.
     apply H with (Hi' := Hi).
@@ -362,7 +362,7 @@ Proof.
    apply prf1; auto.
   apply less_imp_ap; apply separation_conseq with j' Hj'.
    apply H.
-  intro; rewrite H0 in b0; apply (lt_irrefl _ b0).
+  intro; rewrite H0 in b0; apply (Nat.lt_irrefl _ b0).
  unfold pred2 in b0.
  eapply less_transitive_unfolded.
   2: apply b0.
@@ -498,12 +498,12 @@ Proof.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec i 0); elim (le_lt_dec j 0); intros; simpl in |- *.
     algebra.
-   exfalso; apply (lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
-  exfalso; apply (lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
+   exfalso; apply (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
+  exfalso; apply (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; auto; rewrite <- H; auto.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); intros; simpl in |- *.
     apply sep__sep_fun_i_wd; auto.
-   exfalso; rewrite H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
-  exfalso; rewrite <- H in a0; rewrite b2 in a0; apply (lt_irrefl _ a0).
+   exfalso; rewrite H in a0; rewrite b2 in a0; apply (Nat.lt_irrefl _ a0).
+  exfalso; rewrite <- H in a0; rewrite b2 in a0; apply (Nat.lt_irrefl _ a0).
  algebra.
 Qed.
 
@@ -522,7 +522,7 @@ Proof.
   cut (n = 0); [ intro | auto with arith ].
   rewrite <- H0; apply P.
  elim (le_lt_eq_dec _ _ H); intro; simpl in |- *.
-  exfalso; apply (lt_irrefl _ a0).
+  exfalso; apply (Nat.lt_irrefl _ a0).
  algebra.
 Defined.
 
@@ -534,10 +534,10 @@ Proof.
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun in |- *; simpl in |- *.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
+  exfalso; apply Nat.lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  elim (le_lt_eq_dec _ _ Hi); intro; simpl in |- *.
   apply sep__sep_ap.
- exfalso; rewrite b1 in H1; apply (lt_irrefl _ H1).
+ exfalso; rewrite b1 in H1; apply (Nat.lt_irrefl _ H1).
 Qed.
 
 Variable g : forall i : nat, i < n -> IR.
@@ -564,7 +564,7 @@ Proof.
    eapply leEq_wdl.
     apply lft_leEq_Max.
    apply sep__sep_fun_i_wd; auto.
-  exfalso; rewrite b1 in Hi; apply (lt_irrefl _ Hi).
+  exfalso; rewrite b1 in Hi; apply (Nat.lt_irrefl _ Hi).
  unfold sep__sep_part in |- *; simpl in |- *.
  unfold sep__sep_fun, sep__sep_points in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
@@ -795,7 +795,7 @@ Proof.
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.
    apply less_leEq; assumption.
-  exfalso; rewrite b2 in a0; apply lt_irrefl with (S n);
+  exfalso; rewrite b2 in a0; apply Nat.lt_irrefl with (S n);
     apply Nat.lt_trans with (S n); auto with arith.
  elim (le_lt_dec i 0); intro; simpl in |- *.
   cut (i = 0); [ intro | auto with arith ].

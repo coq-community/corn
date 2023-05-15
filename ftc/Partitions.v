@@ -246,7 +246,7 @@ Proof.
    apply (le_not_lt (f j) (f n)); auto with arith.
    apply Hfmon.
    elim (le_lt_eq_dec _ _ H1); intro; auto.
-   rewrite b0 in H0; elim (lt_irrefl (f j)); auto.
+   rewrite b0 in H0; elim (Nat.lt_irrefl (f j)); auto.
   rewrite <- Hfn in Hi'; auto.
  apply mon_fun_covers; auto.
  exists n; clear Hf Hfmon.
@@ -824,7 +824,7 @@ Lemma pos_AntiMesh : forall n (P : Partition Hab n),
  0 < n -> _Separated P -> [0] [<] AntiMesh P.
 Proof.
  intro; case n; clear n.
-  intros P H H0; exfalso; apply (lt_irrefl _ H).
+  intros P H H0; exfalso; apply (Nat.lt_irrefl _ H).
  intros n P H H0.
  unfold AntiMesh in |- *.
  apply less_minlist.

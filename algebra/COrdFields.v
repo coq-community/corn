@@ -1455,7 +1455,7 @@ Section misc.
 Lemma nring_pos : forall m : nat, 0 < m -> [0] [<] nring (R:=R) m.
 Proof.
  intro m. elim m.
- intro; elim (lt_irrefl 0 H).
+ intro; elim (Nat.lt_irrefl 0 H).
  clear m; intros.
  apply leEq_less_trans with (nring (R:=R) n).
   astepl (nring (R:=R) 0).
