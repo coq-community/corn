@@ -753,8 +753,8 @@ Proof.
    unfold sep__sep_fun_i in |- *; simpl in |- *.
    elim (sep__sep_aux_lemma (S i)); intro; simpl in |- *.
     generalize Hi'; rewrite H0; clear Hx Hi'; intro.
-    apply leEq_wdl with (P 1 Hi'[+]delta [/]TwoNZ[-]P 0 (le_O_n _)).
-     rstepl (P 1 Hi'[-]P 0 (le_O_n _)[+]delta [/]TwoNZ).
+    apply leEq_wdl with (P 1 Hi'[+]delta [/]TwoNZ[-]P 0 (Nat.le_0_l _)).
+     rstepl (P 1 Hi'[-]P 0 (Nat.le_0_l _)[+]delta [/]TwoNZ).
      apply plus_resp_leEq_both.
       fold (Mesh P) in |- *; apply Mesh_lemma.
      apply leEq_transitive with delta.
@@ -762,7 +762,7 @@ Proof.
      apply RS_delta_csi.
     apply cg_minus_wd; [ algebra | apply start ].
    generalize Hi'; rewrite H0; clear Hx Hi'; intro.
-   apply leEq_wdl with (P 1 Hi'[-]P 0 (le_O_n _)).
+   apply leEq_wdl with (P 1 Hi'[-]P 0 (Nat.le_0_l _)).
     fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
      astepr (Mesh P); apply Mesh_lemma.
     apply plus_resp_leEq_lft.
@@ -801,7 +801,7 @@ Proof.
   cut (i = 0); [ intro | auto with arith ].
   rewrite H0 in b1.
   clear Hx; rewrite H0 in Hi'.
-  apply leEq_wdl with (P 1 Hi'[-]P 0 (le_O_n n)).
+  apply leEq_wdl with (P 1 Hi'[-]P 0 (Nat.le_0_l n)).
    fold (Mesh P) in |- *; apply leEq_transitive with (Mesh P[+][0]).
     astepr (Mesh P); apply Mesh_lemma.
    apply plus_resp_leEq_lft.

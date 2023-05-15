@@ -404,7 +404,7 @@ Proof.
   intros n0 H H0.
   apply Cle_S.
   apply H.
-  apply le_O_n.
+  apply Nat.le_0_l.
  simple induction n.
   intro.
   exfalso.
@@ -1491,13 +1491,13 @@ Proof.
   apply Zle_lt_succ.
   change (Z_of_nat 0 <= Z_of_nat n)%Z in |- *.
   apply Znat.inj_le.
-  apply le_O_n.
+  apply Nat.le_0_l.
  apply Z.lt_gt.
  change (0 < Z.succ (Z_of_nat m))%Z in |- *.
  apply Zle_lt_succ.
  change (Z_of_nat 0 <= Z_of_nat m)%Z in |- *.
  apply Znat.inj_le.
- apply le_O_n.
+ apply Nat.le_0_l.
 Qed.
 
 Theorem S_predn : forall m : nat, m <> 0 -> S (pred m) = m.

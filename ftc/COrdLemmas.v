@@ -401,7 +401,7 @@ Variable F : COrdField.
 
 Lemma str_Sumx_Sum_Sum' :
  forall (m : nat) (f : forall i, i <= m -> nat),
- f 0 (le_O_n _) = 0 ->
+ f 0 (Nat.le_0_l _) = 0 ->
  (forall (i j : nat) Hi Hj, i = j -> f i Hi = f j Hj) ->
  (forall (i j : nat) Hi Hj, i < j -> f i Hi < f j Hj) ->
  forall (h : nat -> F) (n : nat) (g : forall i : nat, i < m -> nat -> F),
@@ -426,7 +426,7 @@ Proof.
   apply str_Sumx_Sum_Sum.
      unfold f' in |- *; simpl in |- *.
      elim (le_lt_dec 0 m); intro; simpl in |- *.
-      transitivity (f 0 (le_O_n m)).
+      transitivity (f 0 (Nat.le_0_l m)).
        apply H0; auto.
       apply H.
      exfalso; inversion b.

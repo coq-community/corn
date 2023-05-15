@@ -274,11 +274,11 @@ Proof.
         red in |- *; intros.
         apply leEq_wdr with x; assumption.
        intros; unfold f' in |- *.
-       astepl (P 0 (le_O_n _)).
-       apply Partition_mon; apply le_O_n.
+       astepl (P 0 (Nat.le_0_l _)).
+       apply Partition_mon; apply Nat.le_0_l.
       intros; unfold g' in |- *.
-      astepl (R 0 (le_O_n _)).
-      apply Partition_mon; apply le_O_n.
+      astepl (R 0 (Nat.le_0_l _)).
+      apply Partition_mon; apply Nat.le_0_l.
      exfalso; inversion a2.
     apply less_leEq; apply RSR_h_mon; auto with arith.
    elim (le_lt_dec i 0); elim (le_lt_dec (S i) 0); intros; simpl in |- *.
@@ -460,7 +460,7 @@ Proof.
   generalize H; clear a0 H; rewrite H0.
   rewrite RSR_auxP_lemma0.
   clear H0; intros.
-  exists (le_O_n (pred (m + n))).
+  exists (Nat.le_0_l (pred (m + n))).
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
@@ -506,7 +506,7 @@ Proof.
    assumption.
   unfold RSR_auxP in |- *.
   elim (le_lt_dec i 0); intro; simpl in |- *.
-   apply le_O_n.
+   apply Nat.le_0_l.
   elim (le_lt_dec n i); intro; simpl in |- *.
    elim (lt_irrefl n); apply Nat.le_lt_trans with i; auto.
   apply plus_pred_pred_plus.
@@ -654,7 +654,7 @@ Proof.
   generalize H; clear a0 H; rewrite H0.
   rewrite RSR_auxR_lemma0.
   clear H0; intros.
-  exists (le_O_n (pred (m + n))).
+  exists (Nat.le_0_l (pred (m + n))).
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
@@ -700,7 +700,7 @@ Proof.
    assumption.
   unfold RSR_auxR in |- *.
   elim (le_lt_dec j 0); intro; simpl in |- *.
-   apply le_O_n.
+   apply Nat.le_0_l.
   elim (le_lt_dec m j); intro; simpl in |- *.
    rewrite not_le_minus_0.
     rewrite <- plus_n_O; auto with arith.

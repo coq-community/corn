@@ -167,7 +167,7 @@ Let Rolle_lemma1 :
   Sumx (fun (i : nat) (H : i < n) => fcp (S i) H[-]fcp i (Nat.lt_le_incl i n H)) [=]
   [0].
 Proof.
- apply eq_transitive_unfolded with (fcp _ (le_n n) [-]fcp 0 (le_O_n n)).
+ apply eq_transitive_unfolded with (fcp _ (le_n n) [-]fcp 0 (Nat.le_0_l n)).
   apply Mengolli_Sum with (f := fun (i : nat) (H : i <= n) => fcp _ H).
    red in |- *; do 3 intro.
    rewrite H; intros.
@@ -523,10 +523,10 @@ Qed.
 
 Let Rolle_lemma15 :
   (forall (i : nat) (H : i <= n), e [/]TwoNZ [<] AbsIR (fcp' _ H)) ->
-  fcp' _ (le_O_n n) [<] [--] (e [/]TwoNZ) or e [/]TwoNZ [<] fcp' _ (le_O_n n).
+  fcp' _ (Nat.le_0_l n) [<] [--] (e [/]TwoNZ) or e [/]TwoNZ [<] fcp' _ (Nat.le_0_l n).
 Proof.
  intro H.
- cut (e [/]TwoNZ [<] fcp' _ (le_O_n n) or fcp' _ (le_O_n n) [<] [--] (e [/]TwoNZ)).
+ cut (e [/]TwoNZ [<] fcp' _ (Nat.le_0_l n) or fcp' _ (Nat.le_0_l n) [<] [--] (e [/]TwoNZ)).
   intro H0; inversion_clear H0; [ right | left ]; assumption.
  apply less_AbsIR.
   apply pos_div_two; assumption.

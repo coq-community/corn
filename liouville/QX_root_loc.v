@@ -96,7 +96,7 @@ Proof.
    intro H; apply (degree_le_wd _ (_C_ [0])).
     rewrite -> H; split; [reflexivity|apply I].
    apply (degree_le_mon _ _ 0).
-    apply le_O_n.
+    apply Nat.le_0_l.
    apply degree_le_c_.
   intro Hap.
   destruct (RX_deg_spec _ Z_dec _ Hap).
@@ -108,7 +108,7 @@ Proof.
  rewrite <- mult_distr_sum_lft.
  rewrite -> (Sum_ring_hom _ _ injZ_rh).
  apply Sum_wd'.
-  apply le_O_n.
+  apply Nat.le_0_l.
  intros i H0 Hn.
  rewrite -> nth_coeff_zx2qx.
  rewrite -> rh_pres_mult.
@@ -177,7 +177,7 @@ Proof.
  apply cs_bin_op_wd; [|reflexivity].
  rewrite <- (mult_distr_sum_rht Z_as_CRing).
  apply Sum_wd'.
-  apply le_O_n.
+  apply Nat.le_0_l.
  intros i H0 Hn.
  rewrite <- CRings.mult_assoc.
  apply mult_wd.
@@ -296,7 +296,7 @@ Proof.
  apply cs_bin_op_wd; [reflexivity|].
  rewrite <- (mult_distr_sum_rht Z_as_CRing).
  apply Sum_wd'.
-  apply le_O_n.
+  apply Nat.le_0_l.
  intros i H0 Hn.
  rewrite <- nexp_Sn.
  simpl (S n - S i).

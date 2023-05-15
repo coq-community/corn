@@ -267,7 +267,7 @@ Proof.
      apply Derivative_I_n_unique with (S n) F.
       apply Derivative_I_n_wdr with (n_deriv_I _ _ _ _ _ H0).
        apply Derivative_I_n_unique with n (n_deriv_I _ _ _ _ _
-         (le_imp_Diffble_I _ _ _ _ _ (le_n_S _ _ (le_O_n n)) _ H0)).
+         (le_imp_Diffble_I _ _ _ _ _ (le_n_S _ _ (Nat.le_0_l n)) _ H0)).
         cut (forall HS HSn, Derivative_I_n (ap_imp_Min_less_Max _ _ H1) n
           (n_deriv_I _ _ (ap_imp_Min_less_Max _ _ H1) 1 F HS)
             (n_deriv_I _ _ (ap_imp_Min_less_Max _ _ H1) (S n) F HSn)); auto.
@@ -278,7 +278,7 @@ Proof.
         2: apply n_deriv_lemma.
        apply Derivative_I_unique with F.
         apply projT2.
-       apply Derivative_I_wdl with (n_deriv_I _ _ _ _ _ (le_imp_Diffble_I _ _ _ _ _ (le_O_n _) F H0)).
+       apply Derivative_I_wdl with (n_deriv_I _ _ _ _ _ (le_imp_Diffble_I _ _ _ _ _ (Nat.le_0_l _) F H0)).
         simpl in |- *.
         FEQ.
         apply (included_trans _ (Compact (less_leEq IR (Min a b) (Max a b) (ap_imp_Min_less_Max a b H1))) I); Included.

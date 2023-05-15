@@ -79,7 +79,7 @@ Proof.
   exists (0, pred (nat_of_P d)).
   split.
    apply list_nat_prod_spec.
-    apply le_O_n.
+    apply Nat.le_0_l.
    apply (Nat.le_trans _ _ _ (le_pred_n _) Hdb).
   left.
   f_equal.
@@ -153,7 +153,7 @@ Proof.
  exists (0, pred (nat_of_P d)).
  split.
   apply list_nat_prod_spec.
-   apply le_O_n.
+   apply Nat.le_0_l.
   apply (Nat.le_trans _ _ _ (le_pred_n _) Hle).
  left.
  f_equal.
@@ -181,14 +181,14 @@ Proof.
   simpl.
   rewrite <- (plus_0_r (Z.abs_nat a)) at 1.
   apply plus_le_compat_l.
-  apply le_O_n.
+  apply Nat.le_0_l.
  simpl.
  destruct (ZL4 p).
  rewrite H0.
  simpl.
  rewrite <- (plus_0_r (Z.abs_nat a)) at 1.
  apply plus_le_compat_l.
- apply le_O_n.
+ apply Nat.le_0_l.
 Qed.
 
 Lemma list_Q_spec : forall (a b : Z_as_CRing) q, a [#] [0] -> b [#] [0] ->

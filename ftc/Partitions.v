@@ -94,7 +94,7 @@ Lemma Partition_in_compact : forall a b Hab lng (P : Partition a b Hab lng) i Hi
 Proof.
  intros.
  split.
-  apply leEq_wdl with (P _ (le_O_n _)).
+  apply leEq_wdl with (P _ (Nat.le_0_l _)).
    apply Partition_mon; auto with arith.
   apply start.
  apply leEq_wdr with (P _ (le_n _)).
@@ -112,7 +112,7 @@ define it.
 Lemma part_pred_lemma : forall a b Hab lng (P : Partition a b Hab lng) i Hi, a [<=] P i Hi.
 Proof.
  intros.
- apply leEq_wdl with (P 0 (le_O_n _)).
+ apply leEq_wdl with (P 0 (Nat.le_0_l _)).
   apply Partition_mon; auto with arith.
  apply start.
 Qed.
@@ -272,7 +272,7 @@ Proof.
  split.
   eapply leEq_transitive.
    2: apply a0.
-  apply leEq_wdl with (P 0 (le_O_n _)).
+  apply leEq_wdl with (P 0 (Nat.le_0_l _)).
    apply Partition_mon; auto with arith.
   apply start.
  eapply leEq_transitive.
@@ -848,7 +848,7 @@ endpoints of the interval are the same then it must have one point.
 Lemma partition_length_zero : Partition Hab 0 -> a [=] b.
 Proof.
  intro H.
- Step_final (H 0 (le_O_n 0)).
+ Step_final (H 0 (Nat.le_0_l 0)).
 Qed.
 
 Lemma _Separated_imp_length_zero : forall n (P : Partition Hab n),
@@ -859,7 +859,7 @@ Proof.
  cut (0 < n); [ intro | apply neq_O_lt; auto ].
  cut (a [#] b).
   exact (eq_imp_not_ap _ _ _ H0).
- astepl (P _ (le_O_n _)).
+ astepl (P _ (Nat.le_0_l _)).
  astepr (P _ (le_n _)).
  apply less_imp_ap.
  apply local_mon_imp_mon_le with (f := fun (i : nat) (H : i <= n) => P i H).

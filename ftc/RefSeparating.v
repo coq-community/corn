@@ -150,7 +150,7 @@ Lemma sep__part_h_bnd : forall i : nat, sep__part_h i <= n.
 Proof.
  intro.
  induction  i as [| i Hreci].
-  apply le_O_n.
+  apply Nat.le_0_l.
  simpl in |- *.
  elim (le_lt_dec (sep__part_h i) n); intro; simpl in |- *.
   elim (sep__part_lemma (sep__part_h i) a0); intro; simpl in |- *.
@@ -293,7 +293,7 @@ Proof.
    apply H0.
    apply lt_pred_n_n.
    apply Nat.le_lt_trans with (sep__part_h i).
-    apply le_O_n.
+    apply Nat.le_0_l.
    apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).
    apply less_transitive_unfolded with (P (sep__part_h i) a0[+]delta [/]FourNZ).
     apply shift_less_plus'; astepl ZeroR; apply pos_div_four; exact RS'_delta_pos.
@@ -376,7 +376,7 @@ Proof.
   apply prf1.
   auto.
  eapply eq_transitive_unfolded.
-  2: apply start with (p := P) (H := le_O_n n).
+  2: apply start with (p := P) (H := Nat.le_0_l n).
  apply prf1.
  rewrite <- H1.
  simpl in |- *; auto.
@@ -509,7 +509,7 @@ Proof.
     intros; apply prf2.
    apply sep__part_fun_mon; auto.
   intro.
-  apply eq_transitive_unfolded with (P 0 (le_O_n _)).
+  apply eq_transitive_unfolded with (P 0 (Nat.le_0_l _)).
    apply prf1.
    apply sep__part_fun_0.
   apply start.
@@ -1048,7 +1048,7 @@ Proof.
  rewrite <- S_pred with (sep__part_h (S i)) (sep__part_h 0).
   apply sep__part_h_bnd.
  apply sep__part_h_mon_3.
-  rewrite <- sep__part_fun_i with (H := le_O_n m).
+  rewrite <- sep__part_fun_i with (H := Nat.le_0_l m).
    2: apply RS'_pos_m.
   2: apply lt_O_Sn.
  rewrite <- sep__part_fun_m with (H := le_n m).

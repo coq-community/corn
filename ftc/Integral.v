@@ -815,7 +815,7 @@ Proof.
    apply eq_imp_leEq.
    apply eq_transitive_unfolded with c.
     apply finish.
-   apply eq_transitive_unfolded with (Q 0 (le_O_n _)).
+   apply eq_transitive_unfolded with (Q 0 (Nat.le_0_l _)).
     apply eq_symmetric_unfolded; apply start.
    apply prf1; auto with arith.
   exfalso; apply le_not_lt with n i; auto with arith.
@@ -1047,7 +1047,7 @@ Proof.
    intro; exfalso; apply (lt_irrefl _ b0).
   intro; exfalso; apply (le_Sn_n _ a0).
  intro; apply eq_symmetric_unfolded.
- apply eq_transitive_unfolded with (Q _ (le_O_n _)).
+ apply eq_transitive_unfolded with (Q _ (Nat.le_0_l _)).
   apply prf1; auto with arith.
  apply start.
 Qed.

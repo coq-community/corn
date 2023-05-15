@@ -650,13 +650,13 @@ Variable G : CAbGroup.
 
 Lemma Mengolli_Sum : forall n (f : forall i, i <= n -> G) (g : forall i, i < n -> G),
  nat_less_n_fun' f -> (forall i H, g i H [=] f (S i) H[-]f i (Nat.lt_le_incl _ _ H)) ->
- Sumx g [=] f n (le_n n) [-]f 0 (le_O_n n).
+ Sumx g [=] f n (le_n n) [-]f 0 (Nat.le_0_l n).
 Proof.
  intro n; induction  n as [| n Hrecn]; intros f g Hf H; simpl in |- *.
   astepl (f 0 (le_n 0) [-]f 0 (le_n 0)).
   apply cg_minus_wd; algebra.
  apply eq_transitive_unfolded with (f _ (le_n (S n)) [-]f _ (le_S _ _ (le_n n)) [+]
-   (f _ (le_S _ _ (le_n n)) [-]f 0 (le_O_n (S n)))).
+   (f _ (le_S _ _ (le_n n)) [-]f 0 (Nat.le_0_l (S n)))).
   eapply eq_transitive_unfolded.
    apply cag_commutes_unfolded.
   apply bin_op_wd_unfolded.
@@ -665,7 +665,7 @@ Proof.
    apply cg_minus_wd; apply Hf; algebra.
   set (f' := fun i (H : i <= n) => f i (le_S _ _ H)) in *.
   set (g' := fun i (H : i < n) => g i (Nat.lt_lt_succ_r _ _ H)) in *.
-  apply eq_transitive_unfolded with (f' n (le_n n) [-]f' 0 (le_O_n n)).
+  apply eq_transitive_unfolded with (f' n (le_n n) [-]f' 0 (Nat.le_0_l n)).
    apply Hrecn.
     red in |- *; intros; unfold f' in |- *; apply Hf; algebra.
    intros i Hi.
@@ -674,11 +674,11 @@ Proof.
     apply H.
    apply cg_minus_wd; apply Hf; algebra.
   unfold f' in |- *; apply cg_minus_wd; apply Hf; algebra.
- astepr (f (S n) (le_n (S n)) [+][0][-]f 0 (le_O_n (S n))).
+ astepr (f (S n) (le_n (S n)) [+][0][-]f 0 (Nat.le_0_l (S n))).
  astepr (f (S n) (le_n (S n)) [+] ([--] (f n (le_S _ _ (le_n n))) [+]f n (le_S _ _ (le_n n))) [-]
-   f 0 (le_O_n (S n))).
+   f 0 (Nat.le_0_l (S n))).
  Step_final (f (S n) (le_n (S n)) [+] [--] (f n (le_S _ _ (le_n n))) [+]
-   f n (le_S _ _ (le_n n)) [-]f 0 (le_O_n (S n))).
+   f n (le_S _ _ (le_n n)) [-]f 0 (Nat.le_0_l (S n))).
 Qed.
 
 Lemma Mengolli_Sum_gen : forall f g : nat -> G, (forall n, g n [=] f (S n) [-]f n) ->

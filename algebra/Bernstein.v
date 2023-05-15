@@ -48,7 +48,7 @@ match n return (i <= n) -> cpoly_cring R  with
  O => fun _ => [1]
 |S n' =>
   match i return (i <= S n') -> cpoly_cring R  with
-   O => fun _ => ([1][-]_X_)[*](Bernstein (le_O_n n'))
+   O => fun _ => ([1][-]_X_)[*](Bernstein (Nat.le_0_l n'))
   |S i' => fun p =>
     match (le_lt_eq_dec _ _ p) with
      | left p' => ([1][-]_X_)[*](Bernstein (lt_n_Sm_le _ _ p'))[+]_X_[*](Bernstein (le_S_n _ _ p))
@@ -170,9 +170,9 @@ Proof.
  rstepl (nring (S n)[*]_X_[*]Bernstein H[+]_X_[*]Bernstein H).
  destruct i as [|i].
   simpl (Bernstein H) at 1.
-  rstepl (([1][-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (le_O_n n))[+] _X_[*]Bernstein H).
+  rstepl (([1][-]_X_)[*](nring (S n)[*]_X_[*]Bernstein (Nat.le_0_l n))[+] _X_[*]Bernstein H).
   rewrite -> IHn.
-  rstepl ((([1][-]_X_)[*]Bernstein (le_n_S _ _ (le_O_n n))[+]_X_[*]Bernstein H)).
+  rstepl ((([1][-]_X_)[*]Bernstein (le_n_S _ _ (Nat.le_0_l n))[+]_X_[*]Bernstein H)).
   rstepr (Bernstein (le_n_S 0 (S n) H)).
   set (le_n_S 0 n (le_0_n n)).
   rewrite (Bernstein_inv1 l).
@@ -216,14 +216,14 @@ Proof.
  destruct i as [|i].
   simpl (Bernstein H) at 1.
   fold X0.
-  rstepl (X0[*](nring (S n)[*]X0[*]Bernstein (le_O_n n))[+] X0[*]Bernstein H).
+  rstepl (X0[*](nring (S n)[*]X0[*]Bernstein (Nat.le_0_l n))[+] X0[*]Bernstein H).
   rewrite -> IHn.
-  replace (le_S 0 n (le_O_n n)) with H by apply le_irrelevent.
+  replace (le_S 0 n (Nat.le_0_l n)) with H by apply le_irrelevent.
   simpl (S n - 0).
   change (nring (S (S n) - 0):cpoly_cring R) with (nring (S n)[+][1]:cpoly_cring R).
   rstepl ((nring (S n))[*](X0[*]Bernstein H)[+]X0[*]Bernstein H).
-  change (Bernstein (le_S _ _ H)) with (X0[*]Bernstein (le_O_n (S n))).
-  replace (le_O_n (S n)) with H by apply le_irrelevent.
+  change (Bernstein (le_S _ _ H)) with (X0[*]Bernstein (Nat.le_0_l (S n))).
+  replace (Nat.le_0_l (S n)) with H by apply le_irrelevent.
   ring.
  simpl (Bernstein H) at 1.
  destruct (le_lt_eq_dec _ _ H).

@@ -102,9 +102,9 @@ Proof.
  rewrite -> (poly_as_sum _ _ _ HdegA).
  apply (leEq_transitive _ _ (Sum 0 n (fun i => AbsIR (nth_coeff i P[*]x[^]i)))).
   apply triangle_SumIR.
-  apply le_O_n.
+  apply Nat.le_0_l.
  apply Sum_resp_leEq.
-  apply le_O_n.
+  apply Nat.le_0_l.
  intros i H1 H2.
  rewrite -> AbsIR_resp_mult.
  rewrite -> Abs_poly_nth_coeff.
