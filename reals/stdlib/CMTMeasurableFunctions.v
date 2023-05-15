@@ -598,10 +598,10 @@ Proof.
     apply (CRle_trans _ (- CR_of_Q R (Z.of_nat n # 1))).
     apply CRopp_ge_le_contravar. apply CR_of_Q_le.
     unfold Qle, Qnum, Qden.
-    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, le_refl. exact H.
+    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, Nat.le_refl. exact H.
     apply (CRle_trans _ (CR_of_Q R (Z.of_nat n # 1)) _ H0).
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
-    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, le_refl.
+    do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le, le_S, Nat.le_refl.
   - destruct xdg. apply CRlt_asym, CRzero_lt_one. apply CRle_refl.
 Qed.
 
@@ -831,7 +831,7 @@ Proof.
   specialize (invIm t tpos tcont) as [invIm _].
   exists t. split. apply (CRlt_le_trans _ _ _ tmin). apply CRmin_r.
   exists invIm.
-  specialize (nmaj n (le_refl n)). refine (CRle_lt_trans _ _ _ _ nmaj).
+  specialize (nmaj n (Nat.le_refl n)). refine (CRle_lt_trans _ _ _ _ nmaj).
   unfold CRminus. rewrite CRopp_0, CRplus_0_r, CRabs_right.
   apply IntegralNonDecreasing. intros x xdf xdg.
   destruct xdf, d0, d0. 
@@ -1160,7 +1160,7 @@ Proof.
   - apply (CRle_trans _ (MeasureSet Aint - MeasureSet (seqInt i))).
     apply CRplus_le_compat_l, CRopp_ge_le_contravar.
     apply MeasureNonDecreasing. intros.
-    apply applyUnionIterate. exists i. exact (conj (le_refl i) H0).
+    apply applyUnionIterate. exists i. exact (conj (Nat.le_refl i) H0).
     specialize (ncv i H).
     apply (CRle_trans _ (CRpow (CR_of_Q _ (1#2)) i)).
     generalize (seqInt i). intro iint.
@@ -1651,7 +1651,7 @@ Proof.
       { apply (CR_cv_proper _ (0 * eps)).
         apply CR_cv_scale. exact GeoCvZero. apply CRmult_0_l. }
       specialize (H3 p) as [j jmaj]. exists j. intros.
-      specialize (jmaj j (le_refl j)).
+      specialize (jmaj j (Nat.le_refl j)).
       unfold fi. destruct dF. destruct (x0 i). unfold snd.
       unfold fi in d1. unfold Bi in s. specialize (s i).
       destruct (H (eps * CRpow (CR_of_Q _ (1 # 2)) (S i)) (H0 (S i))).
@@ -1723,7 +1723,7 @@ Proof.
   intros IS fn f fFull fnMes fnCv.
   apply (MeasurableGenApprox f fFull). intros.
   specialize (fnCv A Aint eps epsPos) as [N Ncv].
-  specialize (Ncv N (le_refl N)) as [B Bcv].
+  specialize (Ncv N (Nat.le_refl N)) as [B Bcv].
   specialize (fnMes N A n Aint).
   exists (pair (XmaxConst
                (XminConst (Xmult (CharacFunc A) (fn N))
@@ -1948,7 +1948,7 @@ Proof.
         rewrite CRabs_opp, (DomainProp f x d4 d3). apply CRle_refl.
       + apply (CRlt_le_trans _ (eps * CR_of_Q (RealT (ElemFunc IS)) (1 # 2)
                                 + eps * CR_of_Q (RealT (ElemFunc IS)) (1 # 2))).
-        apply CRplus_le_lt_compat. specialize (nmaj (S n) (le_S _ _ (le_refl n))).
+        apply CRplus_le_lt_compat. specialize (nmaj (S n) (le_S _ _ (Nat.le_refl n))).
         apply CRlt_asym in nmaj. rewrite CRabs_minus_sym, CRabs_right in nmaj.
         apply (CRplus_le_reg_r
                  (- (MeasureSet (MeasurableIntersectIntegrable Bmes tsupp)

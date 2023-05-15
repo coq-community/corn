@@ -40,7 +40,7 @@ Proof.
   intros [un inc]. induction n. simpl. apply le_0_n.
   simpl. simpl in IHn. specialize (inc n (S n)).
   unfold lt in inc. apply (Nat.le_trans _ (S (un n))).
-  apply le_n_S. assumption. apply inc. apply le_refl.
+  apply le_n_S. assumption. apply inc. apply Nat.le_refl.
 Qed.
 
 (* Inversion of a subsequence *)
@@ -58,11 +58,11 @@ Proof.
   - simpl. split.
     + intro. destruct (Nat.eq_dec (proj1_sig un O) n).
       assumption. exfalso. apply (lt_not_le n (S n)).
-      apply le_refl. assumption.
+      apply Nat.le_refl. assumption.
     + intro. destruct (Nat.eq_dec (proj1_sig un O) n). apply le_0_n.
       exfalso. pose proof (SubSeqAboveId un n).
       destruct un. simpl in H. simpl in n0. simpl in H0.
-      apply (lt_not_le (x n) (x (S n))). apply l. apply le_refl.
+      apply (lt_not_le (x n) (x (S n))). apply l. apply Nat.le_refl.
       rewrite H. assumption.
   - split.
     + intro. simpl. simpl in H.
@@ -82,19 +82,19 @@ Proof.
       discriminate. destruct un. simpl in absurd. simpl in n0.
       inversion H0. subst p. contradiction.
     + intros. simpl. destruct (Nat.eq_dec (proj1_sig un O) n).
-      exfalso. exact (H O (le_refl 0) e). reflexivity.
+      exfalso. exact (H O (Nat.le_refl 0) e). reflexivity.
   - split.
     + intros. intro absurd. simpl in H.
       destruct (Nat.eq_dec (proj1_sig un (S k)) n).
       inversion H. subst k. pose proof (SubSeqAboveId un (S n)).
-      rewrite e in H1. apply (lt_not_le n (S n)). apply le_refl.
+      rewrite e in H1. apply (lt_not_le n (S n)). apply Nat.le_refl.
       assumption. apply Nat.le_succ_r in H0. destruct H0.
       specialize (IHk n) as [IHk _].
       specialize (IHk H p H0). contradiction. subst p. contradiction.
     + intros. simpl. destruct (Nat.eq_dec (proj1_sig un (S k)) n).
-      exfalso. specialize (H (S k) (le_refl _)). contradiction.
+      exfalso. specialize (H (S k) (Nat.le_refl _)). contradiction.
       apply IHk. intros. apply H. apply (Nat.le_trans _ k). assumption.
-      apply le_S. apply le_refl.
+      apply le_S. apply Nat.le_refl.
 Qed.
 
 Lemma SubSeqInvInit : forall (un : SubSeq) (n : nat),
@@ -105,7 +105,7 @@ Proof.
     exfalso. exact (n (eq_refl _)).
   - simpl. destruct (Nat.eq_dec (proj1_sig un (S n)) (proj1_sig un O)).
     exfalso. destruct un. simpl in e. apply (lt_not_le (x O) (x (S n))).
-    apply l. apply le_n_S. apply le_0_n. rewrite e. apply le_refl.
+    apply l. apply le_n_S. apply le_0_n. rewrite e. apply Nat.le_refl.
     apply IHn.
 Qed.
 
@@ -168,7 +168,7 @@ Proof.
     { rewrite absurd. apply (Nat.lt_le_trans _ (S (sub n)
                                             + (sub (S n) - S (sub n)))).
       simpl. apply le_n_S. apply Nat.add_lt_mono_l. assumption. rewrite plus_comm.
-      rewrite Nat.sub_add. apply le_refl. apply inc. apply le_refl. }
+      rewrite Nat.sub_add. apply Nat.le_refl. apply inc. apply Nat.le_refl. }
     destruct (Nat.lt_trichotomy p (S n)).
     apply Nat.le_succ_r in H2. destruct H2.
     specialize (inc p n H2). rewrite absurd in inc.
@@ -177,7 +177,7 @@ Proof.
     apply Nat.add_le_mono_l. apply le_0_n. inversion H2. subst p.
     apply (lt_not_le (sub n) (S (sub n + k))). apply le_n_S.
     rewrite <- (plus_0_r (sub n)). rewrite <- plus_assoc.
-    apply Nat.add_le_mono_l. apply le_0_n. rewrite <- absurd. apply le_refl.
+    apply Nat.add_le_mono_l. apply le_0_n. rewrite <- absurd. apply Nat.le_refl.
     destruct H2. subst p. exact (lt_irrefl (sub (S n)) H1).
     specialize (inc (S n) p H2). apply (lt_asym (sub p) (sub (S n))); assumption.
   - rewrite plus_comm. rewrite Nat.sub_add.
@@ -185,7 +185,7 @@ Proof.
     destruct (Nat.eq_dec (SubSeqInv sub (proj1_sig sub (S n)) (proj1_sig sub (S n))) (S (proj1_sig sub (S n)))).
     exfalso. pose proof (SubSeqInvNotFound sub (proj1_sig sub (S n)) (proj1_sig sub (S n))) as [H _].
     specialize (H e (S n) (SubSeqAboveId _ _)). apply H. reflexivity. reflexivity.
-    destruct sub. simpl. apply l. apply le_refl.
+    destruct sub. simpl. apply l. apply Nat.le_refl.
 Qed.
 
 (* The same modulus of convergence applies to any subsequence. *)
@@ -218,7 +218,7 @@ Proof.
     + simpl. rewrite <- IHn. clear IHn.
       destruct (Nat.le_exists_sub (S (proj1_sig sub n)) (proj1_sig sub (S n)))
         as [p [inf _]].
-      destruct sub. simpl. apply l. apply le_n_S. apply le_refl.
+      destruct sub. simpl. apply l. apply le_n_S. apply Nat.le_refl.
       rewrite inf. rewrite plus_comm. rewrite sum_assoc.
       apply CRplus_morph. reflexivity. rewrite plus_comm. rewrite <- inf.
       apply eq_sym in inf. apply Nat.add_sub_eq_r in inf.
@@ -364,7 +364,7 @@ Proof.
     pose proof (H (S (n - i))). simpl in H5.
     assert (S (n - i) <= S n)%nat.
     { apply le_n_S. apply Nat.le_sub_l. }
-    2: reflexivity. 2: apply le_refl.
+    2: reflexivity. 2: apply Nat.le_refl.
     specialize (H5 H6).
     rewrite Nat.add_succ_r in H5. rewrite H5.
     unfold diagSeq. rewrite diagPlaneInject. rewrite sub_cancel_m.
@@ -467,7 +467,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_r. destruct epsN. discriminate.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply le_refl. discriminate.
+    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply Nat.le_refl. discriminate.
     unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
   - destruct (DiagTruncateRect _ u sumCol eps n H H0) as [pp geo].
     assert (0 < CRpow (CR_of_Q R (1#2)) (S n)).
@@ -504,7 +504,7 @@ Proof.
       apply CR_of_Q_le. unfold Qle, Qnum, Qden.
       do 2 rewrite Z.mul_1_r. destruct epsN. discriminate.
       apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-      rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply le_refl. discriminate.
+      rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply Nat.le_refl. discriminate.
       unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
 Qed.
 
@@ -560,7 +560,7 @@ Proof.
   apply Nat.add_le_mono_l. apply le_0_n.
   apply plus_le_compat. assumption. apply Nat.div_le_mono. auto.
   apply mult_le_compat. assumption. apply le_n_S. assumption.
-  rewrite CRabs_minus_sym. apply H. apply le_refl.
+  rewrite CRabs_minus_sym. apply H. apply Nat.le_refl.
   unfold CRminus. rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
   rewrite <- CRplus_assoc, CRplus_opp_l, CRplus_0_l. reflexivity.
 Qed.
@@ -832,7 +832,7 @@ Proof.
     apply le_0_n.
     (* Extend to the infinite vertical rectangle *)
     apply (CRle_trans _ (s - CRsum sumCol N + CR_of_Q R (1#2*n))).
-    specialize (H1 N (le_refl N)).
+    specialize (H1 N (Nat.le_refl N)).
     rewrite CRabs_minus_sym in H1.
     apply (CRle_trans _ _ _ (CRle_abs _)) in H1.
     unfold CRminus. rewrite CRplus_assoc. apply CRplus_le_compat_l.
@@ -864,7 +864,7 @@ Proof.
     rewrite CRplus_opp_r. rewrite CRplus_0_r.
     rewrite <- CR_of_Q_opp, <- CR_of_Q_plus.
     setoid_replace ((1 # n) + - (1 # 2 * n))%Q with (1 # 2*n)%Q.
-    specialize (H1 N (le_refl N)).
+    specialize (H1 N (Nat.le_refl N)).
     apply (CRle_trans _ _ _ (CRle_abs _)).
     rewrite CRabs_minus_sym. apply H1.
     rewrite <- (Qplus_inj_r _ _ (1#2*n)).
@@ -884,14 +884,14 @@ Fixpoint FindPointInSubdivision (Pn : nat -> nat) (n : nat)
     -> { p : nat | (Pn p <= n < Pn (S p))%nat }.
 Proof.
   intros. destruct n.
-  - exists O. repeat split. rewrite H0. apply le_refl.
+  - exists O. repeat split. rewrite H0. apply Nat.le_refl.
     specialize (H O). rewrite H0 in H. apply H.
   - destruct (FindPointInSubdivision Pn n H H0) as [k kmaj].
     destruct (le_lt_dec (Pn (S k)) (S n)).
     + exists (S k). split. apply l. apply (Nat.lt_le_trans _ (S (Pn (S k)))).
       apply le_n_S. apply kmaj. apply (H (S k)).
     + exists k. split. 2: apply l. apply (Nat.le_trans _ n).
-      apply kmaj. apply le_S. apply le_refl.
+      apply kmaj. apply le_S. apply Nat.le_refl.
 Qed.
 
 Lemma FindPointInSubdivisionSmallest
@@ -944,11 +944,11 @@ Proof.
   intros.
   assert (forall p q : nat, p <= q -> Pn p <= Pn q)%nat as PnInc.
   { induction q.
-    - intros. inversion H3. apply le_refl.
+    - intros. inversion H3. apply Nat.le_refl.
     - intros. apply Nat.le_succ_r in H3. destruct H3.
       apply (Nat.le_trans _ (Pn q)). apply IHq. apply H3.
-      apply (Nat.le_trans _ (S (Pn q))). apply le_S. apply le_refl.
-      apply H. subst p. apply le_refl. }
+      apply (Nat.le_trans _ (S (Pn q))). apply le_S. apply Nat.le_refl.
+      apply H. subst p. apply Nat.le_refl. }
   assert (forall p:nat,
              CRsum (fun n : nat => CRsum (fun k : nat => xn (k + Pn n))%nat (Pn (S n) - Pn n - 1)) p
              == CRsum xn (Pn (S p) - 1)) as assocSum.
@@ -969,7 +969,7 @@ Proof.
       reflexivity. rewrite Nat.add_sub_assoc.
       rewrite <- H4. rewrite plus_comm. rewrite Nat.sub_add.
       reflexivity. rewrite <- H3. apply (Nat.le_trans _ (S (Pn (S p)))).
-      apply le_S. apply le_refl. apply H. rewrite <- H3.
+      apply le_S. apply Nat.le_refl. apply H. rewrite <- H3.
       destruct (Nat.le_exists_sub (S (Pn (S p))) (Pn (S (S p)))).
       apply H. destruct H5. rewrite H5. simpl.
       replace (S (Pn (S p))) with (1 + Pn (S p))%nat.
@@ -1011,5 +1011,5 @@ Proof.
   rewrite plus_comm. apply H5.
   rewrite CRabs_minus_sym; apply pmaj.
   apply (Nat.le_trans _ (S p)).
-  apply le_S. apply le_refl. apply H5.
+  apply le_S. apply Nat.le_refl. apply H5.
 Qed.

@@ -167,10 +167,10 @@ Proof.
   assert (forall a b:nat, lt a b -> lt (diagPlane n a) (diagPlane n b)).
   { intros. unfold diagPlane. apply plus_lt_le_compat. assumption.
     apply Nat.div_le_mono. auto. apply mult_le_compat.
-    apply plus_le_compat. apply le_refl. unfold lt in H0.
-    apply (Nat.le_trans _ (S a)). apply le_S. apply le_refl. assumption.
-    apply le_n_S. apply plus_le_compat. apply le_refl. unfold lt in H0.
-    apply (Nat.le_trans _ (S a)). apply le_S. apply le_refl. assumption. }
+    apply plus_le_compat. apply Nat.le_refl. unfold lt in H0.
+    apply (Nat.le_trans _ (S a)). apply le_S. apply Nat.le_refl. assumption.
+    apply le_n_S. apply plus_le_compat. apply Nat.le_refl. unfold lt in H0.
+    apply (Nat.le_trans _ (S a)). apply le_S. apply Nat.le_refl. assumption. }
   pose proof (CR_complete R _ cvDiag) as [lim cvlim].
   destruct (SubSeriesCv (fun k : nat =>
                 CRabs _ (partialApply (diagSeq fnk k) x (xnDiag k)))
@@ -521,7 +521,7 @@ Proof.
   rewrite (CRplus_comm (-s)). rewrite <- CRplus_assoc.
   rewrite (CRsum_eq _ (fun i : nat => un (N + S i)%nat)). apply maj.
   rewrite plus_comm in kLen. apply Nat.add_le_mono_r in kLen.
-  apply (Nat.le_trans k m). assumption. apply le_S. apply le_refl.
+  apply (Nat.le_trans k m). assumption. apply le_S. apply Nat.le_refl.
   intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
   apply le_0_n. rewrite plus_comm. reflexivity.
 Qed.
@@ -540,7 +540,7 @@ Proof.
     destruct (n - N)%nat eqn:des. exfalso. apply (Nat.sub_gt n N); assumption.
     rewrite <- (Nat.sub_add N n). rewrite des. rewrite plus_comm.
     exact d. subst d.
-    apply (Nat.le_trans N (S N)). apply le_S. apply le_refl. assumption.
+    apply (Nat.le_trans N (S N)). apply le_S. apply Nat.le_refl. assumption.
 Qed.
 
 Definition domainInfiniteSumPackInc
@@ -592,7 +592,7 @@ Proof.
     rewrite <- (applyPackFirstSum X fn m N x x1 x0).
     apply maj. apply (Nat.add_le_mono_l k m (S N)).
     apply (Nat.le_trans _ (m + N)). assumption. rewrite plus_comm.
-    apply Nat.add_le_mono_r. apply le_S. apply le_refl.
+    apply Nat.add_le_mono_r. apply le_S. apply Nat.le_refl.
 Qed.
 
 (* Lemma 1.15 in Bishop's article, a representation
@@ -652,7 +652,7 @@ Proof.
   (* Prove the epsilon majoration *)
   apply (CRle_trans _ (Iabs (Xsum fn N) (LsumStable fn fnL N)
                        + eps * CR_of_Q _ (1#2))).
-  - simpl. specialize (limN N (le_refl N)).
+  - simpl. specialize (limN N (Nat.le_refl N)).
     rewrite <- (CRplus_comm (eps * CR_of_Q _ (1#2))).
     apply CRplus_le_compat. 2: apply CRle_refl.
     rewrite CRabs_minus_sym in limN.
@@ -676,7 +676,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_r. destruct epsN. discriminate.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply le_refl. discriminate.
+    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply Nat.le_refl. discriminate.
     unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
   - (* Replace the limit at infinity by a finite m > N *)
     apply (CR_cv_bound_down
@@ -731,7 +731,7 @@ Proof.
     rewrite CRmult_assoc, CRinv_l, CRmult_1_r in majEpsN.
     2: exact H.
     apply (CRle_lt_trans _ (CR_of_Q _ (1 # Pos.of_nat epsN))).
-    apply limN. apply le_refl.
+    apply limN. apply Nat.le_refl.
     apply (CRmult_lt_reg_r (CR_of_Q _ 2)).
     apply CR_of_Q_lt; reflexivity.
     rewrite CRmult_assoc, <- (CR_of_Q_mult _ (1#2)).
@@ -746,7 +746,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_r. destruct epsN. discriminate.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply le_refl. discriminate.
+    rewrite SuccNat2Pos.id_succ, Nat2Pos.id. apply Nat.le_refl. discriminate.
     unfold Qmult, Qeq, Qnum, Qden. do 2 rewrite Z.mul_1_r. reflexivity.
     rewrite <- (CRmult_1_r eps), CRopp_mult_distr_r.
     rewrite CRmult_assoc, <- CRmult_plus_distr_l.
@@ -1371,7 +1371,7 @@ Proof.
     apply (CRle_trans _ _ _ (CRmin_r _ _)).
     apply CR_of_Q_le.
     unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_r.
-    apply Nat2Z.inj_le, le_S, le_refl.
+    apply Nat2Z.inj_le, le_S, Nat.le_refl.
   - intro n. apply IntegralNonDecreasing.
     intros x xdf xdg. unfold XminConst, Xop, partialApply.
     rewrite (DomainProp f x xdf xdg). apply CRmin_l.
@@ -1380,7 +1380,7 @@ Proof.
                   & { gL : L (ElemFunc IS) g
                     | IntegralDistance fInt (IntegrableL g gL) <= CR_of_Q _ (1#3*p) } }).
     { pose proof (IntegralDense f fInt (3*p)%positive) as [n nmaj].
-      specialize (nmaj n (le_refl n)).
+      specialize (nmaj n (Nat.le_refl n)).
       exists (Xsum (IntFn (let (intRepres, _) := fInt in intRepres)) n).
       exists (LsumStable _ (IntFnL (let (intRepres, _) := fInt in intRepres)) n).
       rewrite IntegralDistance_sym.
@@ -1436,7 +1436,7 @@ Proof.
     apply CRplus_le_compat. 2: apply CRle_refl.
     unfold CRminus. rewrite (CRplus_comm (I IS g gL)), CRplus_assoc.
     apply CRplus_le_compat_l.
-    specialize (nmaj n (le_refl n)). rewrite CRabs_minus_sym in nmaj.
+    specialize (nmaj n (Nat.le_refl n)). rewrite CRabs_minus_sym in nmaj.
     exact (CRle_trans _ _ _ (CRle_abs _) nmaj).
     rewrite <- CR_of_Q_plus, <- CR_of_Q_plus. apply CR_of_Q_le.
     rewrite Qinv_plus_distr, Qinv_plus_distr.
@@ -1906,7 +1906,7 @@ Proof.
     apply Pos2Nat.inj_le. rewrite Nat2Pos.id, Nat2Pos.id.
     apply le_n_S, H. discriminate. discriminate.
   - clear H i.
-    specialize (nmaj n (le_refl n)). 
+    specialize (nmaj n (Nat.le_refl n)). 
     specialize (kmaj (max n k) (Nat.le_max_r _ _)).
     unfold IntegralDistance in nmaj.
     rewrite <- CRplus_0_r.

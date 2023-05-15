@@ -601,7 +601,7 @@ Proof.
     rewrite Nat.add_comm. apply CSUCposPointApproxSequenceNested.
     destruct (CSUCposPointApproxSequence (x0 + p)); simpl. exact lexy0.
     rewrite Nat.add_comm. apply CSUCposPointApproxSequenceNested.
-  - specialize (pmaj p (le_refl p)).
+  - specialize (pmaj p (Nat.le_refl p)).
     unfold CRminus in pmaj. rewrite CRopp_0, CRplus_0_r in pmaj.
     apply (CRlt_le_trans _ (CR_of_Q R ((Z.of_nat (S i) # 1) * (/ 2) ^ Z.of_nat p ))).
     rewrite CR_of_Q_mult.
@@ -648,7 +648,7 @@ Proof.
     apply (CRle_trans _ (y (CSUCposPointApproxSequence (x1 + p)))).
     destruct (CSUCposPointApproxSequence (x1 + p)); simpl. exact lexy0.
     rewrite Nat.add_comm. apply CSUCposPointApproxSequenceNested.
-  - specialize (pmaj p (le_refl p)). unfold CRminus in pmaj.
+  - specialize (pmaj p (Nat.le_refl p)). unfold CRminus in pmaj.
     unfold CRminus. apply CRlt_asym.
     exact (CRle_lt_trans _ _ _ (CRle_abs _) pmaj).
 Qed.
@@ -697,7 +697,7 @@ Proof.
     exfalso. contradict qpPos. apply (CRle_trans _ (CR_of_Q R 0)).
     apply CR_of_Q_le. discriminate. apply CRle_refl. }
   destruct (CSUCposPointApproxSequenceCvZero (Pos.of_nat p)) as [i imaj].
-  specialize (imaj i (le_refl i)). specialize (H i).
+  specialize (imaj i (Nat.le_refl i)). specialize (H i).
   destruct (CSUCposPointApproxSequence i); unfold x,y in imaj.
   destruct lambdaInfiniteMaj0. simpl in H.
   assert (CRsum (fun j : nat => UC_integral (fn j) x0 y0
@@ -1164,7 +1164,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden. do 2 rewrite Z.mul_1_l.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
     rewrite Nat2Pos.id. apply (Nat.le_trans _ _ _ H0). rewrite Nat.add_comm.
-    apply le_S, le_S, le_refl. intro abs. rewrite Nat.add_comm in abs. discriminate.
+    apply le_S, le_S, Nat.le_refl. intro abs. rewrite Nat.add_comm in abs. discriminate.
     apply CR_of_Q_le. discriminate.
     rewrite CRmult_0_l. reflexivity. rewrite CRplus_0_r. reflexivity. }
   assert (CR_cv R (fun n => a + (b - a) * CR_of_Q R (1 # Pos.of_nat (n + 2))) a)
@@ -1224,7 +1224,7 @@ Proof.
       + left.
         apply (CR_cv_open_below _ 0) in lcv. 2: exact c.
         destruct lcv as [n nmaj].
-        specialize (nmaj n (le_refl n)).
+        specialize (nmaj n (Nat.le_refl n)).
         apply (CSUCTrapezeInPlateau
                  (a + (b-a) * CR_of_Q R (1#Pos.of_nat (n+2)))
                  (b - (b-a) * CR_of_Q R (1#Pos.of_nat (n+2)))
@@ -1343,7 +1343,7 @@ Proof.
     apply CR_of_Q_le.
     unfold Qle,Qnum,Qden. rewrite Z.mul_1_l, Z.mul_1_l.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite Nat2Pos.id, Nat2Pos.id. apply le_S, le_refl.
+    rewrite Nat2Pos.id, Nat2Pos.id. apply le_S, Nat.le_refl.
     discriminate.
     intro abs. rewrite Nat.add_comm in abs. discriminate.
   - simpl.
@@ -1422,14 +1422,14 @@ Proof.
     do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos.
     destruct n0. discriminate.
     apply Pos2Nat.inj_le. rewrite Nat2Pos.id, Nat2Pos.id.
-    apply le_S, le_refl. discriminate. discriminate.
+    apply le_S, Nat.le_refl. discriminate. discriminate.
     apply CRltEpsilon in H1. apply CRltForget.
     apply (CRlt_le_trans _ _ _ H1).
     apply CRplus_le_compat_l. apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos.
     destruct n0. discriminate.
     apply Pos2Nat.inj_le. rewrite Nat2Pos.id, Nat2Pos.id.
-    apply le_S, le_refl. discriminate. discriminate.
+    apply le_S, Nat.le_refl. discriminate. discriminate.
     apply CR_cv_minus.
     apply (CR_cv_proper _ (b+0)). apply CR_cv_plus.
     apply CR_cv_const. exact invCv. rewrite CRplus_0_r. reflexivity.

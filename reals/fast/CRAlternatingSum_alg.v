@@ -330,7 +330,7 @@ Proof.
   - apply AltSeries_remainder.
     apply kSmall.
     rewrite Nat2Pos.id. apply (Nat.le_trans _ (S n)).
-    apply le_S, le_refl. exact Hm.
+    apply le_S, Nat.le_refl. exact Hm.
     destruct m. inversion Hm. discriminate.
   - clear kSmall.
     replace (S m) with (S (Pos.to_nat (Pos.of_nat m))).

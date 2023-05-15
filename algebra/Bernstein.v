@@ -285,7 +285,7 @@ match v in Vector.t _ i return i <= n -> cpoly_cring R with
 end.
 
 Definition evalBernsteinBasis (n:nat) (v:Vector.t R n) : cpoly_cring R :=
-evalBernsteinBasisH v (le_refl n).
+evalBernsteinBasisH v (Nat.le_refl n).
 
 (** The coefficents are linear *)
 Opaque polyconst.
@@ -332,7 +332,7 @@ evalBernsteinBasis (Vbinary (fun (x y:R)=>x[+]y) v1 v2)[=]evalBernsteinBasis v1[
 Proof.
  unfold evalBernsteinBasis.
  intros n.
- generalize (le_refl n).
+ generalize (Nat.le_refl n).
  generalize n at 1 3 4  6 7  9 11.
  intros i.
  induction i.
@@ -355,7 +355,7 @@ Proof.
   rewrite -> Sum_empty by auto with *.
   ring.
  unfold evalBernsteinBasis.
- generalize (le_refl (S n)).
+ generalize (Nat.le_refl (S n)).
  generalize (S n) at 1 4 5 6.
  intros i l.
  induction i.
@@ -405,14 +405,14 @@ match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
 end.
 
 Definition BernsteinBasisTimesX (n:nat) (v:Vector.t R n) : Vector.t R (S n) :=
-BernsteinBasisTimesXH v (le_refl n).
+BernsteinBasisTimesXH v (Nat.le_refl n).
 
 Lemma evalBernsteinBasisTimesX : forall n (v:Vector.t R n),
  evalBernsteinBasis (BernsteinBasisTimesX v)[=]_X_[*]evalBernsteinBasis v.
 Proof.
  intros n.
  unfold evalBernsteinBasis, BernsteinBasisTimesX.
- generalize (le_refl (S n)) (le_refl n).
+ generalize (Nat.le_refl (S n)) (Nat.le_refl n).
  generalize n at 1 3 5 7 9 11.
  intros i.
  induction i.

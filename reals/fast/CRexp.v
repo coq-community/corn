@@ -101,10 +101,10 @@ Qed.
 Lemma fact_power_2 : forall n:nat, (2^pred n <= fact n)%nat.
 Proof.
   induction n.
-  - apply le_refl.
+  - apply Nat.le_refl.
   - apply (Nat.le_trans _ ((S n) * 2^pred n)).
     2: apply Nat.mul_le_mono_nonneg_l; [apply le_0_n | exact IHn].
-    clear IHn. destruct n. simpl. apply le_refl.
+    clear IHn. destruct n. simpl. apply Nat.le_refl.
     simpl.
     apply Nat.add_le_mono_l, Nat.add_le_mono_l, le_0_n.
 Qed.
@@ -148,7 +148,7 @@ Proof.
   refine (Nat.le_trans _ _ _ _ H).
   clear H. generalize p.
   apply Pos.peano_ind.
-  + apply le_refl.
+  + apply Nat.le_refl.
   + intros. rewrite Pos2Nat.inj_succ, Pos.pow_succ_r. 
     rewrite Pos2Nat.inj_mul.
     apply Nat.mul_le_mono_nonneg_l. apply le_0_n.

@@ -420,7 +420,7 @@ Proof.
     setoid_replace ((1 # m) * inject_Z (Z.pos m)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
     apply (Nat.le_trans _ (S j)).
-    apply le_S, le_refl. exact ltjm. 
+    apply le_S, Nat.le_refl. exact ltjm. 
   - unfold canonical_names.equiv, stdlib_rationals.Q_eq.
     rewrite Nat2Z.inj_sub.
     unfold Zminus. rewrite Q.Zplus_Qplus, inject_Z_opp.
@@ -434,5 +434,5 @@ Proof.
     setoid_replace ((1 # n) * inject_Z (Z.pos n)) with 1%Q by reflexivity.
     rewrite Qmult_1_r. ring.
     apply (Nat.le_trans _ (S i)).
-    apply le_S, le_refl. exact ltin.
+    apply le_S, Nat.le_refl. exact ltin.
 Qed.

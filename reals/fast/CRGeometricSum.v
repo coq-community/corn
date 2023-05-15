@@ -151,7 +151,7 @@ Lemma InfiniteSum_fat_extend
       = InfiniteSum_fat filter s q (S n).
 Proof.
   intros. symmetry. apply InfiniteSum_fat_add_stop.
-  apply le_S, le_refl. exact H.
+  apply le_S, Nat.le_refl. exact H.
 Qed. 
 
 Lemma InfiniteSum_fat_add_pass
@@ -173,7 +173,7 @@ Proof.
     apply Nat.le_succ_r in H0. destruct H0.
     apply (H (S k)), le_n_S, le_S, H0.
     inversion H0. subst k.
-    apply (H (S n) (le_refl _)).
+    apply (H (S n) (Nat.le_refl _)).
 Qed. 
 
 Lemma decide_filter_before_n
@@ -185,7 +185,7 @@ Proof.
   - intros. right.
     intros. exfalso. inversion H.
   - intros. destruct (filter (Str_nth_tl n s)) eqn:des.
-    left. exists n. split. apply le_refl. exact des.
+    left. exists n. split. apply Nat.le_refl. exact des.
     destruct (IHn filter s).
     + left. destruct H as [p [H H0]]. exists p.
       split. apply le_S, H. exact H0.
@@ -204,7 +204,7 @@ Proof.
   induction fuel.
   - intros. simpl. unfold InfiniteSum_raw_F.
     destruct (filter s) eqn:des. 2: reflexivity.
-    exfalso. specialize (H O (le_refl _)). simpl in H.
+    exfalso. specialize (H O (Nat.le_refl _)). simpl in H.
     rewrite H in des. discriminate.
   - intros. simpl.
     assert (forall p : nat, (p < 2 ^ fuel)%nat -> filter (Str_nth_tl p s) = false) as firstHalf.
@@ -273,14 +273,14 @@ Proof.
       rewrite (@InfiniteSum_fat_add_stop _ p).
       3: exact H0.
       rewrite <- (@InfiniteSum_fat_add_stop (2^fuel)).
-      2: apply (Nat.le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
+      2: apply (Nat.le_trans _ (S p) _ (le_S _ _ (Nat.le_refl p)) H).
       2: exact H0.
       rewrite <- IHfuel.
       apply (@InfiniteSum_raw_N_cont_invariant fuel p).
       exact H. exact H0.
       apply (Nat.le_trans _ (2^fuel + 0)).
       rewrite Nat.add_0_r.
-      apply (Nat.le_trans _ (S p) _ (le_S _ _ (le_refl p)) H).
+      apply (Nat.le_trans _ (S p) _ (le_S _ _ (Nat.le_refl p)) H).
       apply Nat.add_le_mono_l, le_0_n.
     + rewrite InfiniteSum_fat_add_pass. 2: exact H.
       rewrite <- IHfuel. rewrite <- IHfuel.

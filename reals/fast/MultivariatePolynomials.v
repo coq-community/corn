@@ -271,10 +271,10 @@ Proof.
   change (L[<=]R).
   rstepr (R[*][1]).
   rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
-  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
+  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (Nat.le_refl _))))) (Vector.cons _ a _ v0))).
    fold (MultivariatePolynomial Q_as_CRing n).
    unfold L, R; clear L R.
-   generalize (le_refl (S m)).
+   generalize (Nat.le_refl (S m)).
    revert b.
    generalize (S m) at 1 2 5 6 7 8 9.
    induction b as [| a0]; intros l.
@@ -352,7 +352,7 @@ Proof.
   rewrite <- (fun X => partitionOfUnity X m).
   apply Sumx_wd.
   intros i H.
-  replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (le_refl (S m))))
+  replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (Nat.le_refl (S m))))
     with (lt_n_Sm_le i m H) by apply le_irrelevent.
   reflexivity.
  clear - IHn Hv.
@@ -399,10 +399,10 @@ Proof.
  change (R[<=]L).
  rstepl (R[*][1]).
  rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
- stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
+ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (Nat.le_refl _))))) (Vector.cons _ a _ v0))).
   fold (MultivariatePolynomial Q_as_CRing n).
   unfold L, R; clear L R.
-  generalize (le_refl (S m)).
+  generalize (Nat.le_refl (S m)).
   revert b.
   generalize (S m) at 1 2 4 5 6 7 10.
   induction b as [| a0]; intros l.
@@ -480,7 +480,7 @@ Proof.
  rewrite <- (fun X => partitionOfUnity X m).
  apply Sumx_wd.
  intros i H.
- replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (le_refl (S m))))
+ replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (Nat.le_refl (S m))))
    with (lt_n_Sm_le i m H) by apply le_irrelevent.
  reflexivity.
 Qed.

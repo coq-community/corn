@@ -412,14 +412,14 @@ Proof.
     rewrite Nat.sub_0_r. reflexivity.
   - intros.
     assert (forall k : nat, k <= n -> Pn k < Pn (S k))%nat.
-    { intros. apply H. apply (Nat.le_trans _ n _ H1). apply le_S, le_refl. }
+    { intros. apply H. apply (Nat.le_trans _ n _ H1). apply le_S, Nat.le_refl. }
     specialize (IHn H1 H0). clear H1. simpl.
     rewrite IHn.
     destruct (Pn (S (S n)) - Pn (S n))%nat eqn:des.
     exfalso. apply Nat.sub_0_le in des.
-    apply (le_not_lt _ _ des). apply H, le_refl. simpl.
+    apply (le_not_lt _ _ des). apply H, Nat.le_refl. simpl.
     pose proof (H n). destruct (Pn (S n)).
-    exfalso. apply (le_not_lt 0 (Pn n) (le_0_n _)). apply H1, le_S, le_refl.
+    exfalso. apply (le_not_lt 0 (Pn n) (le_0_n _)). apply H1, le_S, Nat.le_refl.
     clear H1. simpl.
     rewrite (CRsum_eq (fun k : nat => xn (k + S n1)%nat)
                       (fun k : nat => xn (S n1 + k)%nat)).
@@ -427,7 +427,7 @@ Proof.
     rewrite <- (sum_assoc xn n1).
     replace (S n1 + n0)%nat with (Init.Nat.pred (Pn (S (S n)))).
     reflexivity.
-    pose proof (H (S n) (le_refl _)). destruct (Pn (S (S n))). exfalso.
+    pose proof (H (S n) (Nat.le_refl _)). destruct (Pn (S (S n))). exfalso.
     inversion H1.
     simpl. simpl in des.
     replace (S (n1 + n0)) with (n1 + S n0)%nat.
@@ -435,7 +435,7 @@ Proof.
     rewrite <- des. rewrite Nat.add_comm. rewrite Nat.sub_add.
     reflexivity. destruct (le_lt_dec n2 n1).
     apply Nat.sub_0_le in l. rewrite l in des. discriminate.
-    apply (Nat.le_trans _ (S n1)). apply le_S, le_refl. exact l.
+    apply (Nat.le_trans _ (S n1)). apply le_S, Nat.le_refl. exact l.
 Qed.
 
 
@@ -445,7 +445,7 @@ Lemma ShouldReplaceSubSeq : forall (sub : SubSeq) (n : nat),
 Proof.
   induction n.
   - apply le_0_n.
-  - destruct sub; simpl. simpl in IHn. specialize (l n (S n) (le_refl _)).
+  - destruct sub; simpl. simpl in IHn. specialize (l n (S n) (Nat.le_refl _)).
     apply (Nat.le_trans _ (S (x n))). apply le_n_S, IHn. exact l.
 Qed.
 
@@ -1207,7 +1207,7 @@ Proof.
       apply le_S_n. apply (Nat.le_trans _ k).
       apply Nat2Z.inj_lt. rewrite positive_nat_Z.
       do 2 rewrite Z.mul_1_r in q. exact q.
-      apply le_S, le_refl. exfalso. apply (CR_of_Q_lt R) in q.
+      apply le_S, Nat.le_refl. exfalso. apply (CR_of_Q_lt R) in q.
       exact (CRlt_asym _ _ q kmaj). exfalso.
       rewrite q in kmaj. exact (CRlt_asym _ _ kmaj kmaj).
 Qed.
