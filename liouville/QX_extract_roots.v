@@ -172,7 +172,7 @@ Proof.
   rewrite -> QX_deg_mult.
     unfold QX_deg; rewrite RX_deg_minus.
      rewrite RX_deg_c_, RX_deg_x_, RX_deg_c_; fold QX_deg.
-     simpl; rewrite plus_comm; simpl.
+     simpl; rewrite Nat.add_comm; simpl.
      intro H; injection H; symmetry; assumption.
     rewrite RX_deg_x_, RX_deg_c_; discriminate.
    apply QX_div_deg0; assumption.
@@ -181,7 +181,7 @@ Proof.
  rewrite -> QX_deg_mult.
    unfold QX_deg; rewrite RX_deg_minus.
     rewrite RX_deg_x_, RX_deg_c_.
-    rewrite plus_comm; discriminate.
+    rewrite Nat.add_comm; discriminate.
    rewrite RX_deg_x_, RX_deg_c_; discriminate.
   apply QX_div_deg0; assumption.
  right; left; discriminate.

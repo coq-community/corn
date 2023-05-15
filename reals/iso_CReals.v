@@ -170,7 +170,7 @@ Proof.
         apply le_plus_l.
        assumption.
       apply H9.
-      rewrite -> plus_comm with (m := N2).
+      rewrite -> Nat.add_comm with (m := N2).
       rewrite -> plus_permute with (m := N2).
       apply le_plus_l.
      apply H8.
@@ -687,7 +687,7 @@ Proof.
          change (AbsSmall (inj_Q IR (e [/]ThreeNZ)) (CS_seq IR (inj_Q_G_as_CauchySeq IR y) m[-]y)) in |- *.
          apply H5.
          apply Nat.le_trans with (m := K + (N1 + N2)).
-          rewrite -> plus_comm with (m := N2).
+          rewrite -> Nat.add_comm with (m := N2).
           rewrite -> plus_permute with (m := N2).
           apply le_plus_l.
          assumption.
@@ -828,7 +828,7 @@ Proof.
     apply AbsSmall_mult.
      apply H5.
      apply Nat.le_trans with (m := N1 + (N2 + M1)).
-      rewrite -> plus_comm with (m := M1).
+      rewrite -> Nat.add_comm with (m := M1).
       rewrite -> plus_permute with (m := M1).
       apply le_plus_l.
      assumption.
@@ -977,7 +977,7 @@ Proof.
         apply inj_Q_AbsSmall.
         apply H6.
         apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
-         rewrite -> plus_comm with (m := M1).
+         rewrite -> Nat.add_comm with (m := M1).
          rewrite -> plus_permute with (m := M1).
          rewrite -> plus_permute with (m := M1).
          apply le_plus_l.

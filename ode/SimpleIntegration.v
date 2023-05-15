@@ -550,7 +550,7 @@ Section implements_abstract_interface.
         field.
         repeat split; discriminate. 
        do 2 rewrite <- nat_of_P_mult_morphism.
-       rewrite Plus.plus_comm.
+       rewrite Nat.add_comm.
        rewrite Σ_plus_bound.
        setoid_replace (proj1_sig (e + e)%Qpos / proj1_sig x)
          with (proj1_sig ((ec true + ec true) * Qpos_inv x + (ec false + ec false) * Qpos_inv x)%Qpos).

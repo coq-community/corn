@@ -114,7 +114,7 @@ Proof.
  red in |- *.
  simpl in |- *.
  intros x y.
- exact (plus_comm x y).
+ exact (Nat.add_comm x y).
 Qed.
 
 (**

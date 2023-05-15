@@ -807,14 +807,14 @@ Proof.
    apply (fun p n m : nat => plus_le_reg_l n m p) with k.
    rewrite <- le_plus_minus.
     apply Nat.le_trans with (Nat.max N M + k); auto with arith.
-    rewrite plus_comm; auto with arith.
+    rewrite Nat.add_comm; auto with arith.
    apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   apply (fun p n m : nat => plus_le_reg_l n m p) with k.
   rewrite <- le_plus_minus.
    apply Nat.le_trans with (Nat.max N M + k); auto.
-   rewrite plus_comm; auto with arith.
+   rewrite Nat.add_comm; auto with arith.
   apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
  unfold seq_part_sum in |- *.
  apply eq_transitive_unfolded with (Sum (S (Nat.max N M + k) - k) (pred (m - k)) x).
@@ -872,7 +872,7 @@ Proof.
   exists N.
   exists 0.
   intro.
-  rewrite plus_comm; rewrite Minus.minus_plus.
+  rewrite Nat.add_comm; rewrite Minus.minus_plus.
   algebra.
  simple induction n.
   intro.

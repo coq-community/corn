@@ -459,7 +459,7 @@ Section integral_approximation.
        setoid_rewrite <- (Qmult_1_l (` iw')) at 2. change 1%Q with (inject_Z (Z.of_nat 1)).
        rewrite <- Qplus_assoc, <- Qmult_plus_distr_l, <- Zplus_Qplus, <- Nat2Z.inj_add.
        apply Qplus_le_r. change (S n * proj1_sig iw' == proj1_sig w) in A. rewrite <- A.
-       apply Qmult_le_compat_r. rewrite <- Zle_Qle. apply inj_le. rewrite Plus.plus_comm.
+       apply Qmult_le_compat_r. rewrite <- Zle_Qle. apply inj_le. rewrite Nat.add_comm.
        now apply lt_le_S.
        apply (proj2_sig iw').
        apply Qplus_le_l with (z := x), Qplus_le_l with (z := - proj1_sig w).

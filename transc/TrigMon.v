@@ -387,7 +387,7 @@ Proof.
   rstepl ((x[/](Two[*]Pi)[//]Greater_imp_ap IR (Two[*]Pi) [0] Hpi)[-](nring 1)).
   apply shift_minus_less.
   csetoid_rewrite_rev (nring_comm_plus IR (S n) 1).
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   assumption.
  intros x Hx0 Hx1 Hx2.
  destruct (ap_imp_less _ _ _ Hx2).

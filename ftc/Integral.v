@@ -97,7 +97,7 @@ Proof.
    red in |- *; intros; apply Hf2_f3.
   red in |- *; intros; apply Hf3_f3.
  unfold l' at 1 in |- *.
- cut (S (n + m) < S l'); [ intro | unfold l' in |- *; simpl in |- *; rewrite plus_comm; auto ].
+ cut (S (n + m) < S l'); [ intro | unfold l' in |- *; simpl in |- *; rewrite Nat.add_comm; auto ].
  apply eq_transitive_unfolded with (f3 _ H).
   apply Hf2_f3.
  apply Hf3; simpl in |- *; auto with arith.

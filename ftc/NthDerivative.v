@@ -634,7 +634,7 @@ Proof.
    apply projT2.
   apply projT2.
  apply le_imp_Diffble_I with (S m + n).
-  simpl in |- *; rewrite plus_comm; auto with arith.
+  simpl in |- *; rewrite Nat.add_comm; auto with arith.
  assumption.
 Qed.
 
