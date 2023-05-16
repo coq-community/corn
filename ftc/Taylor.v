@@ -271,7 +271,7 @@ Proof.
         cut (forall HS HSn, Derivative_I_n (ap_imp_Min_less_Max _ _ H1) n
           (n_deriv_I _ _ (ap_imp_Min_less_Max _ _ H1) 1 F HS)
             (n_deriv_I _ _ (ap_imp_Min_less_Max _ _ H1) (S n) F HSn)); auto.
-        cut (S n = n + 1); [ intro | rewrite plus_comm; auto ].
+        cut (S n = n + 1); [ intro | rewrite Nat.add_comm; auto ].
         rewrite H6.
         intros; apply n_deriv_plus.
        eapply Derivative_I_n_wdl.

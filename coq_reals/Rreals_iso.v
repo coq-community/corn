@@ -653,7 +653,7 @@ Proof.
   reflexivity.
  simpl in *.
  rewrite -> IHn.
- rewrite (plus_comm n (S (n + 0))).
+ rewrite (Nat.add_comm n (S (n + 0))).
  simpl.
  rstepr ( seq_part_sum (fun n0 : nat =>
    (cos_seq n0[/]nring (R:=IR) (fact n0)[//]nring_fac_ap_zero IR n0)[*]
@@ -665,7 +665,7 @@ Proof.
                nring_fac_ap_zero IR (S (n + 0 + n)))[*]
                  (nexp IR (n + 0 + n) (RasIR x[-][0])[*](RasIR x[-][0]))) ).
  apply bin_op_wd_unfolded.
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   reflexivity.
  replace (n + 0 + n)%nat with (n + n)%nat by auto with *.
  unfold Rsqr.
@@ -740,7 +740,7 @@ Proof.
   reflexivity.
  simpl in *.
  rewrite -> IHn.
- rewrite (plus_comm n (S (n + 0))).
+ rewrite (Nat.add_comm n (S (n + 0))).
  simpl.
  replace (n + 0 + n)%nat with (n + n)%nat by auto with *.
  unfold sin_n.

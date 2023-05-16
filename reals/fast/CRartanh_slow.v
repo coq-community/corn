@@ -299,7 +299,7 @@ Proof.
    apply IRasCR_wd.
    stepr ((x O[+]Sum0 (G:=IR) m y[-](x O[+]Sum0 (G:=IR) n y))).
     apply bin_op_wd_unfolded;[|apply un_op_wd_unfolded]; apply eq_symmetric; apply Sum0_shift;
-      intros; unfold y;rewrite plus_comm; apply eq_reflexive.
+      intros; unfold y;rewrite Nat.add_comm; apply eq_reflexive.
    rational.
   rewrite -> InfiniteGeometricSum_step.
   set (z:=(fun n0 : nat => (Str_nth n0 seq)%Q)).
@@ -359,7 +359,7 @@ induction n.
  apply eq_reflexive.
 simpl.
 set (A:=nexp IR (Nat.add n (S n)) (inj_Q IR a[-][0])).
-rewrite plus_comm.
+rewrite Nat.add_comm.
 simpl.
 fold (double n).
 csetoid_rewrite_rev IHn.

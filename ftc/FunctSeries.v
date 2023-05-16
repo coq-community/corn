@@ -740,7 +740,7 @@ Proof.
    exists N.
    exists 0.
    intro.
-   rewrite plus_comm; rewrite Minus.minus_plus.
+   rewrite Nat.add_comm; rewrite Minus.minus_plus.
    algebra.
   Contin.
  intros x H0 n; induction  n as [| n Hrecn].

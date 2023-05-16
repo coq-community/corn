@@ -250,7 +250,7 @@ Proof.
  generalize 1%positive.
  induction n.
   intros c.
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   reflexivity.
  intros c.
  unfold Str_nth in *.
@@ -409,7 +409,7 @@ Proof.
   intros a b.
   unfold Str_nth.
   simpl.
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   now rewrite mult_comm.
  intros a b.
  unfold Str_nth in *.

@@ -1445,7 +1445,7 @@ Proof.
   elim H; auto.
  apply Derivative_n_plus with 1 n (f n); auto.
   apply Derivative_n_1; auto.
- rewrite plus_comm; auto.
+ rewrite Nat.add_comm; auto.
 Qed.
 
 Lemma Derivative_n_imp_Continuous : forall n F G, 0 < n ->
